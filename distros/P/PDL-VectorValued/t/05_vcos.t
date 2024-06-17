@@ -30,7 +30,7 @@ my $c_want = pdl([1,0.8660254,-1]);
 
 ##-- 1..2: vcos: basic
 pdlapprox("vv_vcos:flat", $a->vv_vcos($b), $c_want, 1e-4);
-pdlapprox("vv_vcos:threaded", $a->vv_vcos($b->slice(",*3")), $c_want->slice(",*3"), 1e-4);
+pdlapprox("vv_vcos:broadcasted", $a->vv_vcos($b->slice(",*3")), $c_want->slice(",*3"), 1e-4);
 
 ##-- 3: vcos: nullvec: a
 my $a0 = $a->pdl;

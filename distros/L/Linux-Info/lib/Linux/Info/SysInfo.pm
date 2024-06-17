@@ -1,11 +1,10 @@
 package Linux::Info::SysInfo;
 use strict;
 use warnings;
-use Carp qw(croak);
+use Carp qw(confess);
 use POSIX 1.15;
 use Hash::Util qw(lock_keys);
-use Class::XSAccessor
-  getters => {
+use Class::XSAccessor getters => {
     get_raw_time   => 'raw_time',
     get_hostname   => 'hostname',
     get_domain     => 'domain',
@@ -14,28 +13,25 @@ use Class::XSAccessor
     get_version    => 'version',
     get_mem        => 'mem',
     get_swap       => 'swap',
-    get_pcpucount  => 'pcpucount',
-    get_tcpucount  => 'tcpucount',
     get_interfaces => 'interfaces',
-    get_arch       => 'arch',
-    get_proc_arch  => 'proc_arch',
-    get_cpu_flags  => 'cpu_flags',
     get_uptime     => 'uptime',
     get_idletime   => 'idletime',
-    get_model      => 'model',
-  },
-  exists_predicates => { has_multithread => 'multithread', };
+    get_cpu        => 'cpu',
+};
 
 use Linux::Info::KernelFactory;
+use Linux::Info::SysInfo::CPU::Intel;
+use Linux::Info::SysInfo::CPU::Arm;
+use Linux::Info::SysInfo::CPU::AMD;
+use Linux::Info::SysInfo::CPU::S390;
 
-our $VERSION = '2.16'; # VERSION
+our $VERSION = '2.17'; # VERSION
 
 my @_attribs = (
-    'raw_time',  'hostname',  'domain',     'kernel',
-    'release',   'version',   'mem',        'swap',
-    'pcpucount', 'tcpucount', 'interfaces', 'arch',
-    'proc_arch', 'cpu_flags', 'uptime',     'idletime',
-    'model',     'mainline_version',
+    'raw_time',   'hostname', 'domain', 'kernel',
+    'release',    'version',  'mem',    'swap',
+    'interfaces', 'arch',     'uptime', 'idletime',
+    'model',      'mainline_version',
 );
 
 # ABSTRACT: Collect linux system information.
@@ -54,22 +50,33 @@ sub new {
       : ( $raw_time = 0 );
 
     my %self = (
-        files => {
-            path     => '/proc',
-            meminfo  => 'meminfo',
-            sysinfo  => 'sysinfo',
-            cpuinfo  => 'cpuinfo',
-            uptime   => 'uptime',
-            hostname => 'sys/kernel/hostname',
-            domain   => 'sys/kernel/domainname',
-            kernel   => 'sys/kernel/ostype',
-            release  => 'sys/kernel/osrelease',
-            version  => 'version',
-            netdev   => 'net/dev',
-        },
-        arch     => ( uname() )[4],
+        arch     => ( uname() )[4],    # TODO: useless?
         raw_time => $raw_time,
+        files    => {},
     );
+
+    my $default_root  = '/proc';
+    my %default_files = (
+        meminfo  => 'meminfo',
+        sysinfo  => 'sysinfo',
+        cpuinfo  => 'cpuinfo',
+        uptime   => 'uptime',
+        hostname => 'sys/kernel/hostname',
+        domain   => 'sys/kernel/domainname',
+        kernel   => 'sys/kernel/ostype',
+        release  => 'sys/kernel/osrelease',
+        version  => 'version',
+        netdev   => 'net/dev',
+    );
+
+    foreach my $info ( keys %default_files ) {
+        if ( ( exists $opts_ref->{$info} ) and defined( $opts_ref->{$info} ) ) {
+            $self{files}->{$info} = $opts_ref->{$info};
+        }
+        else {
+            $self{files}->{$info} = $default_root . '/' . $default_files{$info};
+        }
+    }
 
     my $self = bless \%self, $class;
 
@@ -80,8 +87,31 @@ sub new {
 }
 
 
-sub _set {
+sub get_proc_arch {
+    return shift->{cpu}->get_arch;
+}
 
+sub has_multithread {
+    return shift->{cpu}->has_multithread;
+}
+
+sub get_pcpucount {
+    return shift->{cpu}->get_cores;
+}
+
+sub get_tcpucount {
+    return shift->{cpu}->get_threads;
+}
+
+sub get_model {
+    return shift->{cpu}->get_model;
+}
+
+sub get_cpu_flags {
+    return shift->{cpu}->get_flags;
+}
+
+sub _set {
     my $self  = shift;
     my $class = ref $self;
     my $file  = $self->{files};
@@ -117,17 +147,16 @@ sub get_detailed_kernel {
 }
 
 sub _set_common {
-    my $self  = shift;
-    my $class = ref($self);
-    my $file  = $self->{files};
+    my $self     = shift;
+    my $class    = ref($self);
+    my $file_ref = $self->{files};
 
     for my $attrib (qw(hostname domain kernel release version)) {
-        my $filename =
-          $file->{path} ? "$file->{path}/$file->{$attrib}" : $file->{$attrib};
+        my $filename = $file_ref->{$attrib};
         open my $fh, '<', $filename
-          or croak "$class: unable to open $filename: $!";
+          or confess "Unable to read $filename: $!";
         $self->{$attrib} = <$fh>;
-        chomp( $self->{$attrib} );
+        chomp $self->{$attrib};
         close($fh);
     }
 
@@ -138,16 +167,19 @@ sub _set_meminfo {
     my $class = ref($self);
     my $file  = $self->{files};
 
-    my $filename =
-      $file->{path} ? "$file->{path}/$file->{meminfo}" : $file->{meminfo};
+    my $filename = $file->{meminfo};
     open my $fh, '<', $filename
-      or croak "$class: unable to open $filename ($!)";
+      or confess "$class: unable to open $filename ($!)";
+    my $mem_regex  = qr/^MemTotal:\s+(\d+ \w+)/;
+    my $swap_regex = qr/^SwapTotal:\s+(\d+ \w+)/;
 
     while ( my $line = <$fh> ) {
-        if ( $line =~ /^MemTotal:\s+(\d+ \w+)/ ) {
+        if ( $line =~ $mem_regex ) {
             $self->{mem} = $1;
+            next;
         }
-        elsif ( $line =~ /^SwapTotal:\s+(\d+ \w+)/ ) {
+
+        if ( $line =~ $swap_regex ) {
             $self->{swap} = $1;
         }
     }
@@ -156,86 +188,65 @@ sub _set_meminfo {
 }
 
 sub _set_cpuinfo {
-    my $self  = shift;
-    my $class = ref($self);
-    my $file  = $self->{files};
-    my ( %cpu, $phyid );
+    my $self     = shift;
+    my $class    = ref($self);
+    my $file_ref = $self->{files};
+    my $filename = $file_ref->{cpuinfo};
 
-    $self->{tcpucount} = 0;
-
-    my $filename =
-      $file->{path} ? "$file->{path}/$file->{cpuinfo}" : $file->{cpuinfo};
     open my $fh, '<', $filename
-      or croak "$class: unable to open $filename ($!)";
+      or confess "Unable to read $filename: $!";
 
     # default value for hyper threading
     $self->{multithread} = 0;
 
-    # model name      : Intel(R) Core(TM) i5-4300M CPU @ 2.60GHz
-    my $model_regex = qr/^model\sname\s+\:\s(.*)/;
+    my $intel_regex = Linux::Info::SysInfo::CPU::Intel->processor_regex;
+    my $arm_regex   = Linux::Info::SysInfo::CPU::Arm->processor_regex;
+    my $s390_regex  = Linux::Info::SysInfo::CPU::S390->processor_regex;
+    my $amd_regex   = Linux::Info::SysInfo::CPU::AMD->processor_regex;
+    my $model;
 
-    # Processor	: ARMv7 Processor rev 4 (v7l)
-    my $arm_regex = qr/^Processor\s+\:\s(.*)/;
-
-    while ( my $line = <$fh> ) {
+  LINE: while ( my $line = <$fh> ) {
         chomp($line);
 
-      CASE: {
-
-            if ( ( $line =~ $model_regex ) or ( $line =~ $arm_regex ) ) {
-                $self->{model} = $1;
+        if ( $line =~ $intel_regex ) {
+            if ( $1 eq 'GenuineIntel' ) {
+                $model = 'Intel';
+                last LINE;
             }
+        }
 
-            if ( $line =~ /^physical\s+id\s*:\s*(\d+)/ ) {
-                $phyid = $1;
-                $cpu{$phyid}{count}++;
-                last CASE;
+        if ( $line =~ $arm_regex ) {
+            $model = 'Arm';
+            last LINE;
+        }
+
+        if ( $line =~ $s390_regex ) {
+            if ( $1 eq 'IBM/S390' ) {
+                $model = 'S390';
+                last LINE;
             }
+        }
 
-            if ( $line =~ /^core\s+id\s*:\s*(\d+)/ ) {
-                $cpu{$phyid}{cores}{$1}++;
-                last CASE;
-            }
-
-            if ( $line =~ /^processor\s*:\s*\d+/ ) {    # x86
-                $self->{tcpucount}++;
-                last CASE;
-            }
-
-            if ( $line =~ /^# processors\s*:\s*(\d+)/ ) {    # s390
-                $self->{tcpucount} = $1;
-                last CASE;
-            }
-
-            if ( $line =~ /^flags\s+\:/ ) {
-
-                last CASE if ( $self->get_cpu_flags );   # no use to repeat this
-
-                my ( $attribute, $value ) = split( /\s+:\s/, $line );
-                my @flags = split( /\s/, $value );
-
-                $self->{cpu_flags} = \@flags;
-
-                #long mode
-                if ( $value =~ /\slm\s/ ) {
-                    $self->{proc_arch} = 64;
-                }
-                else {
-                    $self->{proc_arch} = 32;
-                }
-
-                #hyper threading
-                if ( $value =~ /\sht\s/ ) {
-                    $self->{multithread} = 1;
-                }
-
-                last CASE;
+        if ( $line =~ $amd_regex ) {
+            if ( $1 eq 'AuthenticAMD' ) {
+                $model = 'AMD';
             }
         }
     }
 
     close($fh);
-    $self->{pcpucount} = scalar( keys(%cpu) ) || $self->{tcpucount};
+
+    unless ( defined($model) ) {
+        open my $fh, '<', $filename or confess "Unable to read $filename: $!";
+        local $/ = undef;
+        my $data = <$fh>;
+        close($fh);
+
+        confess
+"Failed to recognize the processor, submit the /proc/cpuinfo to this project as an issue.\n$data";
+    }
+
+    $self->{cpu} = "Linux::Info::SysInfo::CPU::$model"->new($filename);
 }
 
 sub _set_interfaces {
@@ -244,10 +255,9 @@ sub _set_interfaces {
     my $file  = $self->{files};
     my @iface = ();
 
-    my $filename =
-      $file->{path} ? "$file->{path}/$file->{netdev}" : $file->{netdev};
+    my $filename = $file->{netdev};
     open my $fh, '<', $filename
-      or croak "$class: unable to open $filename ($!)";
+      or confess "$class: unable to open $filename ($!)";
     { my $head = <$fh>; }
 
     while ( my $line = <$fh> ) {
@@ -265,10 +275,9 @@ sub _set_time {
     my $class = ref($self);
     my $file  = $self->{files};
 
-    my $filename =
-      $file->{path} ? "$file->{path}/$file->{uptime}" : $file->{uptime};
+    my $filename = $file->{uptime};
     open my $fh, '<', $filename
-      or croak "$class: unable to open $filename ($!)";
+      or confess "$class: unable to open $filename ($!)";
     ( $self->{uptime}, $self->{idletime} ) = split /\s+/, <$fh>;
     close $fh;
 
@@ -305,7 +314,7 @@ Linux::Info::SysInfo - Collect linux system information.
 
 =head1 VERSION
 
-version 2.16
+version 2.17
 
 =head1 SYNOPSIS
 
@@ -394,7 +403,7 @@ Returns the total number of CPUs (cores, hyper threading).
 
 Returns the interfaces of the system.
 
-=head2 get_arch
+=head2 get_proc_arch
 
 Returns the processor architecture (like C<uname -m>).
 
@@ -412,6 +421,10 @@ Returns the processor name and model.
 Returns "true" (1) or "false" (0) if the instance is enabled to present time
 attributes with their original (raw) format, or formatted ones.
 
+=head2 get_cpu
+
+Returns a instance of L<Linux::Info::SysInfo::CPU> sub classes.
+
 =head2 is_multithread
 
 A deprecated getter for the C<multithread> attribute.
@@ -420,11 +433,12 @@ Use C<has_multithread> method instead.
 
 =head2 get_proc_arch
 
-This method will return an integer as the architecture of the CPUs: 32 or 64 bits, depending on the flags
-retrieve for one CPU.
+This method will return an integer as the architecture of the CPUs: 32 or 64
+bits, depending on the flags retrieve for one CPU.
 
-It is assumed that all CPUs will have the same flags, so this method will consider only the flags returned
-by the CPU with "core id" equal to 0 (in other words, the first CPU found).
+It is assumed that all CPUs will have the same flags, so this method will
+consider only the flags returned by the CPU with "core id" equal to 0 (in
+other words, the first CPU found).
 
 =head2 get_cpu_flags
 

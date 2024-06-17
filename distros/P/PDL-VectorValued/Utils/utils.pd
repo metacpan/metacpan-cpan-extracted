@@ -5,7 +5,7 @@
 ##======================================================================
 
 #require "../VectorValued/Version.pm"; ##-- use perl-reversion from Perl::Version instead
-my $VERSION = '1.0.22';
+my $VERSION = '1.0.23';
 pp_setversion($VERSION);
 
 require "../VectorValued/Dev.pm";
@@ -132,7 +132,7 @@ pp_def('vv_rldvec',
 sub PDL::vv_rldvec {
   my ($a,$b,$c) = @_;
   if (!defined($c)) {
-# XXX Need to improve emulation of threading in auto-generating c
+# XXX Need to improve emulation of broadcasting in auto-generating c
     my ($rowlen) = $b->dim(0);
     my ($size) = $a->sumover->max;
     my (@dims) = $a->dims;
@@ -1006,13 +1006,13 @@ of a dense PDL $a().  This is basically the same thing as:
 
  ($a * $b)->sumover / ($a->pow(2)->sumover->sqrt * $b->pow(2)->sumover->sqrt)
 
-... but should be must faster to compute, and avoids allocating potentially large temporaries for
+... but should be much faster to compute, and avoids allocating potentially large temporaries for
 the vector magnitudes.  Output values in $vcos() are cosine similarities in the range [-1,1],
 except for zero-magnitude vectors which will result in NaN values in $vcos().
 
-You can use PDL threading to batch-compute distances for multiple $b() vectors simultaneously:
+You can use PDL broadcasting to batch-compute distances for multiple $b() vectors simultaneously:
 
-  $bx   = random($M, $NB);   ##-- get $NB random vectors of size $N
+  $bx   = random($M, $NB);   ##-- get $NB random vectors of size $M
   $vcos = vv_vcos($a,$bx);   ##-- $vcos(i,j) ~ sim($a(,i),$b(,j))
 
 },

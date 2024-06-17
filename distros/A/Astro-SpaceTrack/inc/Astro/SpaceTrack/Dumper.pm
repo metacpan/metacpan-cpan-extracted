@@ -9,17 +9,55 @@ use Carp;
 use JSON;
 
 use Astro::SpaceTrack;
+use HTTP::Response;
+use HTTP::Status qw{ HTTP_OK };
 our @ISA = qw{ Astro::SpaceTrack };
 
-eval {
-    local @INC = @INC;
-    require lib;
-    lib->import( 'inc' );
-    require Mock::LWP::UserAgent;
-    1;
-} or croak 'Can not load Mock::LWP::UserAgent. Code must be run from the base directory of the Astro-SpaceTrack distribution';
+# NOTE that these live in inc/, but so does this module, so we assume
+# inc/ is already in @INC.
 
-our $VERSION = '0.165';
+use Mock::LWP::UserAgent;
+use My::Module::Test;
+
+our $VERSION = '0.166';
+
+sub new {
+    my ( $class, %arg ) = @_;
+    local $Mock::LWP::UserAgent::CANNED_RESPONSE_FILE = delete
+    $arg{canned_response_file};
+    my $self = $class->SUPER::new( %arg );
+    $self->{ +__PACKAGE__ } = Mock::LWP::UserAgent::__load_data(
+	optional	=> 1,
+    );
+    return $self;
+}
+
+sub site_check {
+    my ( $self, $site ) = @_;
+    my $uri = My::Module::Test::__site_to_check_uri( $site )
+	or die "No check URI for site '$site'\n";
+    return $self->_get_from_net( url => $uri );
+}
+
+sub _readline_complete_command_site_check {
+    # my ( $self, $text, $line, $start, $cmd_line ) = @_;
+    my ( $self, $text ) = @_;
+    my @sites = My::Module::Test::__site_codes();
+    $text eq ''
+	and return @sites;
+    my $re = qr/ \A \Q$text\E /smx;
+    return grep { $_ =~ $re } @sites;
+}
+
+sub request {
+    my ( $self, $method, $uri ) = @_;
+    defined $uri
+	or ( $method, $uri ) = ( GET => $method );
+    return $self->_get_from_net(
+	method	=> uc $method,
+	url	=> $uri,
+    );
+}
 
 {
     my $json;
@@ -110,15 +148,6 @@ sub _censor_tle {	## no critic (ProhibitUnusedPrivateSubroutines)
 	my $method = $rqst->method();
 	my $url = $rqst->url();
 
-	my $path = Mock::LWP::UserAgent::__file_name_for( $method, $url );
-	-e $path
-	    and return;
-
-	my $dump_flags = $self->getv( 'dump_headers' );
-	$dump_flags & $self->DUMP_RESPONSE
-	    and warn "Creating $path\n";
-
-	$json ||= JSON->new()->utf8()->pretty()->canonical();
 	$censors ||= _list_censors();
 	my $content = $resp->content();
 	foreach my $code ( @{ $censors } ) {
@@ -138,19 +167,30 @@ sub _censor_tle {	## no critic (ProhibitUnusedPrivateSubroutines)
 		_dump_header_item( $resp, 'Status' ),
 	    ],
 	    $content,
-	    {
-		method	=> $method,
-		uri		=> '' . $url,	# Stringify
-	    },
 	);
 
-	open my $fh, '>:encoding(utf-8)', $path
-	    or die "Unable to open $path: $!\n";
-	print { $fh } $json->encode( \@data );
-	close $fh;
+	Mock::LWP::UserAgent::__modify_data(
+	    $self->{ +__PACKAGE__ }, $url, $method, \@data );
 
 	return;
     }
+}
+
+sub list {
+    my ( $self ) = @_;
+    my $data = $self->{ +__PACKAGE__ }{data};
+    my @content;
+    foreach my $url ( sort keys %{ $data } ) {
+	foreach my $method ( sort keys %{ $data->{$url} } ) {
+	    push @content, "$method $url\r\n";
+	}
+    }
+    return HTTP::Response->new(
+	HTTP_OK,
+	undef,
+	undef,
+	join( '', @content ),
+    );
 }
 
 sub _dump_header_item {
@@ -223,16 +263,12 @@ This class supports the following protected methods:
 
  $st->__dump_response( $resp );
 
-This override of the superclass' method unconditionally checks the
-C<Mock::LWP::UserAgent> data directory to see if the
-C<HTTP::Response|HTTP::Response> object is represented there. If not, it
-is written. If the C<DUMP_HEADERS> bit is set, a message is written to
-standard error before a new file is created.
+This override of the superclass' method adds the given response to the
+C<Mock::LWP::UserAgent> data file.
 
 =head1 ATTRIBUTES
 
 This class has no additional attributes.
-
 
 =head1 SEE ALSO
 

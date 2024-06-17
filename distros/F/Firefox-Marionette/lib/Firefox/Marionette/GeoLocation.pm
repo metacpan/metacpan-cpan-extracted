@@ -6,7 +6,7 @@ use Encode();
 use overload q[""] => '_lat_long';
 use charnames qw(:full);
 
-our $VERSION = '1.57';
+our $VERSION = '1.58';
 
 sub _MINUTES_IN_ONE_HOUR             { return 60 }
 sub _MINUTES_IN_ONE_DEGREE           { return 60 }
@@ -47,6 +47,7 @@ sub new {
         altitudeAccuracy => 1,
         speed            => 1,
         timezone_offset  => 1,
+        timezone_name    => 1,
         country_code     => 1,
     );
     foreach my $original ( sort { $a cmp $b } keys %parameters ) {
@@ -70,6 +71,9 @@ sub new {
             $self->{timezone_offset} =
               $self->_calculate_offset_for_javascript( $1, $2, $3 );
         }
+    }
+    if ( defined $parameters{time_zone}{name} ) {
+        $self->{tz} = $parameters{time_zone}{name};
     }
     if ( defined $self->{country_code} ) {
         if ( $self->{country_code} !~ /^[[:upper:]]{2}$/smx ) {
@@ -132,7 +136,7 @@ sub TO_JSON {
         if ( $key =~ /^(?:$longitude_code|$latitude_code)$/smx ) {
             $json->{location}->{$key} = $self->{$key};
         }
-        else {
+        elsif ( $key =~ /^(?:accuracy|altitude)$/smx ) {
             $json->{$key} = $self->{$key};
         }
     }
@@ -179,6 +183,11 @@ sub timezone_offset {
     return $self->{timezone_offset};
 }
 
+sub tz {
+    my ($self) = @_;
+    return $self->{tz};
+}
+
 sub country_code {
     my ($self) = @_;
     return $self->{country_code};
@@ -203,7 +212,7 @@ Firefox::Marionette::GeoLocation - Represents a GeoLocation for Firefox
 
 =head1 VERSION
 
-Version 1.57
+Version 1.58
 
 =head1 SYNOPSIS
 
@@ -274,9 +283,7 @@ accepts an optional hash as a parameter.  Allowed keys are below;
 
 =item * speed - the velocity of the device in meters per second.
 
-=item * timeZone - see timezone_offset.
-
-=item * timezone_offset - the timezone offset in minutes from GMT.
+=item * tz - the timezone as an L<Olson TZ identifier|https://en.wikipedia.org/wiki/List_of_tz_database_time_zones#List>.
 
 =back
 
@@ -289,6 +296,10 @@ returns the velocity of the device in meters per second.  This value may not be 
 =head2 timezone_offset
 
 returns the timezone offset in minutes from GMT.  This value may not be defined.
+
+=head2 tz
+
+returns the timezone as an L<Olson TZ identifier|https://en.wikipedia.org/wiki/List_of_tz_database_time_zones#List>.  This value may not be defined.
 
 =head2 TO_JSON
 

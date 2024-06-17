@@ -46,7 +46,7 @@ use Data::Dumper;
 use Moose;
 
 BEGIN {
-	our $VERSION = '0.6.1';
+	our $VERSION = '0.6.2';
 }
 
 use POSIX qw/EXIT_SUCCESS/;

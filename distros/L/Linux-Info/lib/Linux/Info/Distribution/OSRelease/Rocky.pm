@@ -17,7 +17,7 @@ use Class::XSAccessor getters => {
     get_redhat_support_product_version => 'redhat_support_product_version',
 };
 
-our $VERSION = '2.16'; # VERSION
+our $VERSION = '2.17'; # VERSION
 
 # ABSTRACT: a subclass of Linux::Info::Distribution::OSRelease
 
@@ -59,7 +59,7 @@ Linux::Info::Distribution::OSRelease::Rocky - a subclass of Linux::Info::Distrib
 
 =head1 VERSION
 
-version 2.16
+version 2.17
 
 =head1 DESCRIPTION
 

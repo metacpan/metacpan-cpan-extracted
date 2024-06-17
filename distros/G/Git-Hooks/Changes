@@ -1,5 +1,28 @@
 Revision history for perl module Git-Hooks. -*- text -*-
 
+4.0.0     2024-06-16 17:55:55-03:00 America/Sao_Paulo
+
+This new major version removes support for Perl 5.16 and requires Perl 5.30
+instead. It also removes support for Git 1.8.3 and requires at least Git 2.25.1
+instead.
+
+This was motivated by the CentOS release policy changes which essentially
+stopped it from producing new releases. Also, by the EOL of Ubuntu 18.04.
+
+We take advantage of this incompatible change to also remove several
+configuration options which were deprecated more than two years ago.
+
+[Incompatible changes]
+
+  - Require Perl 5.30 and Git 2.25.1, which are used by Ubuntu 20.04. A few
+    simplifications and improvements were made on the code.
+
+  - Remove the following deprecated options. Check their documentation on the
+    previous version to know how to replace them with newer options.
+
+    * githooks.disable
+    * githooks.checkfile.deny-token
+
 3.6.0     2023-11-16 10:57:01-03:00 America/Sao_Paulo
 
 [New features]

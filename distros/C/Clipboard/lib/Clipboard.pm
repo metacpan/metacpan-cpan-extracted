@@ -1,5 +1,5 @@
 package Clipboard;
-$Clipboard::VERSION = '0.29';
+$Clipboard::VERSION = '0.30';
 use strict;
 use warnings;
 
@@ -29,6 +29,7 @@ sub find_driver {
         bind_os(Xclip => qw(linux bsd$ aix bsdos dec_osf dgux
             dynixptx gnu hpux irix dragonfly machten next os2 sco_sv solaris
             sunos svr4 svr5 unicos unicosmk)),
+        #bind_os(WaylandClipboard => qw(linux)), # Do not uncomment this line...
         bind_os(MacPasteboard => qw(darwin)),
     );
 
@@ -44,6 +45,12 @@ sub find_driver {
         }
 
         return 'Win32';
+    }
+    # Preferentially use Clipboard::WaylandClipboard if we see WAYLAND_DISPLAY
+    if (exists($ENV{WAYLAND_DISPLAY}) && length($ENV{WAYLAND_DISPLAY}))
+    {
+        require Clipboard::WaylandClipboard;
+        return 'WaylandClipboard' if Clipboard::WaylandClipboard::available();
     }
     foreach my $d (sort keys %drivers)
     {
@@ -87,7 +94,7 @@ Clipboard - Copy and paste with any OS
 
 =head1 VERSION
 
-version 0.29
+version 0.30
 
 =head1 SYNOPSIS
 

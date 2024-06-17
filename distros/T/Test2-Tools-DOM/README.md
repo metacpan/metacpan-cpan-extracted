@@ -48,8 +48,8 @@ of documents (eg. SVG images, other XML documents, etc).
 
 # FUNCTIONS
 
-The functions described in this section are exported by default by this
-distribution.
+Unless otherwise stated, the functions described in this section are exported
+by default by this distribution.
 
 Most of the heavy lifting behind the scenes is done by [Mojo::DOM58](https://metacpan.org/pod/Mojo%3A%3ADOM58), and
 most of the functions described below are thin wrappers around the methods
@@ -84,7 +84,7 @@ advanced to its first child element, if one exists.
 
 Takes a check only. Extracts the text content from all descendants of this
 element (by calling
-[all\_text on the Mojo::DOM58 object](https://metacpan.org/pod/Mojo%3A%3ADOM58#all_text)), and this is
+['all\_text' on the Mojo::DOM58 object](https://metacpan.org/pod/Mojo%3A%3ADOM58#all_text)), and this is
 passed to the provided check.
 
     is '<p>Hello, <em>World!</em></p>', dom {
@@ -98,7 +98,7 @@ passed to the provided check.
     at SELECTOR, CHECK
 
 Takes a selector and a check. The selector is used to find the first matching
-descendant (by calling [at on the Mojo::DOM58 object](https://metacpan.org/pod/Mojo%3A%3ADOM58#at)), and
+descendant (by calling ['at' on the Mojo::DOM58 object](https://metacpan.org/pod/Mojo%3A%3ADOM58#at)), and
 this is passed to the provided check.
 
 The
@@ -126,7 +126,7 @@ Takes either a single check, or the name of an attribute and a check.
 
 When called without a name, all attributes are fetched and passed to the
 check as a hashref (by calling
-[attr on the Mojo::DOM58 object](https://metacpan.org/pod/Mojo%3A%3ADOM58#attr)), and this is passed to the
+['attr' on the Mojo::DOM58 object](https://metacpan.org/pod/Mojo%3A%3ADOM58#attr)), and this is passed to the
 provided check.
 
 When called with a name, only the attribute with that name will be read
@@ -163,6 +163,28 @@ without a value in the DOM will be undefined but true.
         attr checked => T; # OK: the attribute is present, so it's true
     };
 
+## call
+
+    call NAME, CHECK
+    call [ NAME, ARGUMENTS ], CHECK
+    call CODEREF, CHECK
+
+    call_list ...
+    call_hash ...
+
+_Supported from version 0.004003_.
+
+Within the test context created by the ["dom"](#dom) keyword the 'call' family of
+keywords provided by [Test2::Tools::Compare](https://metacpan.org/pod/Test2%3A%3ATools%3A%3ACompare) can be used to make calls on the
+underlying [Mojo::DOM58](https://metacpan.org/pod/Mojo%3A%3ADOM58) object as if the test were using the
+[object builder](https://metacpan.org/pod/Test2%3A%3ATools%3A%3ACompare#OBJECT-BUILDER).
+
+Please refer to the documentation in that distribution for more details on
+how to use this keyword.
+
+Since this is a core function from [Test2::Suite](https://metacpan.org/pod/Test2%3A%3ASuite), it will not be exported by
+this distribution.
+
 ## children
 
     children CHECK
@@ -172,7 +194,7 @@ Takes either a single check, or a selector and a check.
 
 When called without a selector, all direct children of the current element
 will be passed to the check as a possibly empty arrayref (by calling
-[children on the Mojo::DOM58 object](https://metacpan.org/pod/Mojo%3A%3ADOM58#children)).
+['children' on the Mojo::DOM58 object](https://metacpan.org/pod/Mojo%3A%3ADOM58#children)).
 
 When called with a selector, only children that match will be passed to the
 check.
@@ -200,7 +222,7 @@ check.
 
 Takes a check only. Extracts the raw content from this element and all its
 descendants (by calling
-[content on the Mojo::DOM58 object](https://metacpan.org/pod/Mojo%3A%3ADOM58#content)), and this is passed
+['content' on the Mojo::DOM58 object](https://metacpan.org/pod/Mojo%3A%3ADOM58#content)), and this is passed
 to the provided check.
 
     is '<div>Hello, <em>World!</em></div>', dom {
@@ -216,7 +238,7 @@ to the provided check.
 Takes a selector and a check. The selector will be used to find all the
 matching descendants of this elements, which will be passed to the check as a
 possibly empty arrayref (by calling
-[find on the Mojo::DOM58 object](https://metacpan.org/pod/Mojo%3A%3ADOM58#find)).
+['find' on the Mojo::DOM58 object](https://metacpan.org/pod/Mojo%3A%3ADOM58#find)).
 
     is '<div><p>A</p><div><p>B</p><div><p>C</p></div></div></div>', dom {
         # Find all matching direct and indirect children
@@ -232,7 +254,7 @@ possibly empty arrayref (by calling
     tag CHECK
 
 Takes a check only. Extracts the tag of the current element (by calling
-[tag on the Mojo::DOM58 object](https://metacpan.org/pod/Mojo%3A%3ADOM58#tag)), and this is passed to
+['tag' on the Mojo::DOM58 object](https://metacpan.org/pod/Mojo%3A%3ADOM58#tag)), and this is passed to
 the provided check.
 
     is '<p></p>', dom { tag 'p' };
@@ -242,7 +264,7 @@ the provided check.
     text CHECK
 
 Takes a check only. Extracts the text content from this element only (by
-calling [text on the Mojo::DOM58 object](https://metacpan.org/pod/Mojo%3A%3ADOM58#text)), and this is
+calling ['text' on the Mojo::DOM58 object](https://metacpan.org/pod/Mojo%3A%3ADOM58#text)), and this is
 passed to the provided check.
 
     is '<p>Hello, <em>World!</em></p>', dom {

@@ -11,17 +11,21 @@ binmode(STDOUT, "utf8");
 
 my $cmd_name = path($0)->basename;
 
-my ($output, $title, $author, $cover, $no_okuzuke, $help);
+my ($output, $title, $author, $cover, $no_okuzuke);
 Getopt::Long::Configure ("bundling");
 GetOptions("o|output=s" => \$output,
            "t|title=s" => \$title,
            "a|author=s" => \$author,
            "c|cover=s" => \$cover,
            "no-okuzuke" => \$no_okuzuke,
-           "h|help" => \$help,
+           "h|help" => sub { usage(0) },
+           "version" => sub { show_version(); exit 0; },
        ) or usage(1, 1);
 
-$help and usage(0);
+sub show_version {
+    print "$cmd_name version $Aozora2Epub::VERSION ($0)\n";
+    print "Running under Perl $^V ($^X)\n\n";
+}
 
 my @files = @ARGV;
 @files or usage(1, 1, "$cmd_name requires one or more arguments");
@@ -67,6 +71,7 @@ Options:
  -o,--output     出力するEPUBファイル名。デフォルトは`タイトル'.epub
  --no-okuzuke    奥付を含めない
  -h,--help       このヘルプを表示
+ --version       このコマンドのバージョンを表示
 USAGE
     }
     exit($exit_status);
@@ -153,6 +158,10 @@ EPUBに奥付を含めません。
 =item B<-h>, B<--help>
 
 ヘルプを表示します。
+
+=item B<--version>
+
+このコマンドのバージョンを表示します。
 
 =back
 

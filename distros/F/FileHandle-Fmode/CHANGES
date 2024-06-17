@@ -1,3 +1,8 @@
+0.15
+     - Doc improvements.
+     - Avoid win32_fmode() when perl is built by UCRT compiler, as UCRT changes struct _iobuf.
+       (Affects MSWin32 only.)
+
 0.14 - Add metadata to Makefile.PL.
      - Define PERL_NO_GET_CONTEXT
 

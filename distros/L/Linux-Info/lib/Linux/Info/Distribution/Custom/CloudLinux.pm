@@ -5,7 +5,7 @@ use strict;
 use parent 'Linux::Info::Distribution::Custom';
 use Class::XSAccessor getters => { get_codename => 'codename', };
 
-our $VERSION = '2.16'; # VERSION
+our $VERSION = '2.17'; # VERSION
 # ABSTRACT: a subclass of Linux::Info::Distribution::Custom
 
 
@@ -36,7 +36,7 @@ Linux::Info::Distribution::Custom::CloudLinux - a subclass of Linux::Info::Distr
 
 =head1 VERSION
 
-version 2.16
+version 2.17
 
 =head1 METHODS
 

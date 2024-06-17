@@ -1,6 +1,6 @@
 #!/usr/bin/env perl
 
-use v5.16.0;
+use v5.30.0;
 use warnings;
 use lib qw/t lib/;
 use Git::Hooks::Test ':all';
@@ -96,7 +96,7 @@ sub set_search_iterator {
     my ($jira, $query) = @_;
     my $jql = $query->{jql};
     if (exists $queries{$jql}) {
-        $jira->{iterator} = [@{$queries{$jql}}];
+        $jira->{iterator} = [$queries{$jql}->@*];
     } else {
         die $jql;
     }
@@ -105,8 +105,8 @@ sub set_search_iterator {
 
 sub next_issue {
     my ($jira) = @_;
-    if (@{$jira->{iterator}}) {
-        return shift @{$jira->{iterator}};
+    if ($jira->{iterator}->@*) {
+        return shift $jira->{iterator}->@*;
     } else {
         return;
     }

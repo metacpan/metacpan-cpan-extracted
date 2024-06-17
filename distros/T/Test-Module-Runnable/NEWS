@@ -1,3 +1,7 @@
+2024-06-16
+----------
+  * Drop test for mocked method which doesn't exist
+
 2024-05-17
 ----------
   * The repository has been migrated to Git, please do not use Mercurial going foward,

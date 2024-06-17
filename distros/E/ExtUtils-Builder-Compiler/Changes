@@ -1,5 +1,9 @@
 Revision history for ExtUtils-Builder-Compiler
 
+0.005     2024-06-16 18:17:46+02:00 Europe/Brussels
+          - Simplify executable check
+          - Reorder libperl argument on Windows
+
 0.004     2024-05-14 10:38:55+02:00 Europe/Brussels
           - Set default export value for Linker::PE::GCC
           - Correct loading ExtUtils::Builder::Action::Function in Linker

@@ -8,7 +8,7 @@ use parent 'Linux::Info::Distribution';
 use Class::XSAccessor getters =>
   { get_source => 'source', get_regex => 'regex' };
 
-our $VERSION = '2.16'; # VERSION
+our $VERSION = '2.17'; # VERSION
 
 # ABSTRACT: custom files data of a Linux distribution
 
@@ -79,7 +79,7 @@ Linux::Info::Distribution::Custom - custom files data of a Linux distribution
 
 =head1 VERSION
 
-version 2.16
+version 2.17
 
 =head1 DESCRIPTION
 

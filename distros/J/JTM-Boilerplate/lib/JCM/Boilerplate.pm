@@ -1,11 +1,10 @@
-#
-# Copyright (C) 2015-2023 Joelle Maslak
+# Copyright (C) 2015-2024 Joelle Maslak
 # All Rights Reserved - See License
 #
 
 package JCM::Boilerplate;
 # ABSTRACT: Default Boilerplate for Joelle Maslak's Code
-$JCM::Boilerplate::VERSION = '2.231980';
+$JCM::Boilerplate::VERSION = '2.241690';
 use strict;
 use warnings;
 
@@ -75,7 +74,7 @@ sub import ( $self, $type = 'script' ) {
 
     # For "re 'strict'" feature
     warnings->unimport::out_of( $target, 'experimental::re_strict' );
-    re->import( 'strict' );
+    re->import('strict');
 
     if ( $PERL_VERSION ge v5.32.0 ) {
         # Turn off indirect syntax
@@ -111,18 +110,18 @@ JCM::Boilerplate - Default Boilerplate for Joelle Maslak's Code
 
 =head1 VERSION
 
-version 2.231980
+version 2.241690
 
 =head1 SYNOPSIS
 
-  use JCM::Boilerplate 'script';
+  use JTM::Boilerplate 'script';
 
 =head1 DESCRIPTION
 
 This module serves two purposes.  First, it sets some default imports,
 and turns on the strictures I've come to rely upon.  Secondly, it depends
 on a number of other modules to aid in setting up new environments (I can
-just do a "cpan JCM-Boilerplate" to install everything I need).
+just do a "cpan JTM-Boilerplate" to install everything I need).
 
 This module optionally takes one of two parameters, 'script', 'class',
 or 'role'. If 'script' is specified, the module assumes that you do not
@@ -142,7 +141,7 @@ Joelle Maslak <jmaslak@antelope.net>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2015-2023 by Joelle Maslak.
+This software is copyright (c) 2015-2024 by Joelle Maslak.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

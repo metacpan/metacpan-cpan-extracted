@@ -16,8 +16,9 @@ do { my $x = {
                     },
        'runtime' => {
                       'requires' => {
-                                      'Mojo::DOM58' => '0.999',
-                                      'Test2::Suite' => '0.000072',
+                                      'Mojo::DOM58' => '1.000',
+                                      'Test2::API' => '1.302180',
+                                      'Test2::Suite' => '0.000084',
                                       'perl' => 'v5.20.0'
                                     }
                     },

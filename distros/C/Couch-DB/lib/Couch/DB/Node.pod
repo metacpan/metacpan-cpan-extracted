@@ -146,8 +146,8 @@ Collect node statistics.
 
 =head1 SEE ALSO
 
-This module is part of Couch-DB distribution version 0.003,
-built on June 08, 2024. Website: F<http://perl.overmeer.net/CPAN/>
+This module is part of Couch-DB distribution version 0.004,
+built on June 17, 2024. Website: F<http://perl.overmeer.net/CPAN/>
 
 =head1 LICENSE
 

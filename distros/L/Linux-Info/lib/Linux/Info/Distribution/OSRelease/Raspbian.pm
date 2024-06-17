@@ -12,7 +12,7 @@ use Class::XSAccessor getters => {
 
 use constant OUTDATED_VERSION => 0.1;
 
-our $VERSION = '2.16'; # VERSION
+our $VERSION = '2.17'; # VERSION
 
 # ABSTRACT: a subclass of Linux::Info::Distribution::OSRelease
 
@@ -87,7 +87,7 @@ Linux::Info::Distribution::OSRelease::Raspbian - a subclass of Linux::Info::Dist
 
 =head1 VERSION
 
-version 2.16
+version 2.17
 
 =head1 DESCRIPTION
 

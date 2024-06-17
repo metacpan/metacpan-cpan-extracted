@@ -39,9 +39,9 @@ CONSTANTS
  BCD_PATH
 
     returns the local path used for storing the brower compability data for
-    the agent method when the <code>stealth</code> parameter is supplied to
-    the new method. This database is built by the build-bcd-for-firefox
-    binary.
+    the agent method when the stealth parameter is supplied to the new
+    method. This database is built by the build-bcd-for-firefox
+    <https://metacpan.org/pod/build-bcd-for-firefox> binary.
 
 SUBROUTINES/METHODS
 
@@ -454,10 +454,13 @@ SUBROUTINES/METHODS
         # Mozilla/5.0 (X11; Linux s390x; rv:109.0) Gecko/20100101 Firefox/115.0
 
     If the stealth parameter has supplied to the new method, it will also
-    attempt to delete/provide dummy implementations for number of
-    javascript attributes <https://github.com/mdn/browser-compat-data> to
-    match the desired browser. The following websites have been very useful
-    in testing these ideas;
+    attempt to create known specific javascript functions to imitate the
+    required browser. If the database built by build-bcd-for-firefox
+    <https://metacpan.org/pod/build-bcd-for-firefox> is accessible, then it
+    will also attempt to delete/provide dummy implementations for the
+    corresponding javascript attributes
+    <https://github.com/mdn/browser-compat-data> for the desired browser.
+    The following websites have been very useful in testing these ideas;
 
       * https://browserleaks.com/javascript
 
@@ -676,8 +679,9 @@ SUBROUTINES/METHODS
             }
         }
 
-    The ca-bundle-for-firefox command that is provided as part of this
-    distribution does this.
+    The ca-bundle-for-firefox
+    <https://metacpan.org/pod/ca-bundle-for-firefox> command that is
+    provided as part of this distribution does this.
 
  certificates
 
@@ -1455,10 +1459,16 @@ SUBROUTINES/METHODS
         warn "Apparently, we're now at " . Firefox::Marionette->new( proxy => 'https://this.is.another.location:3128', geo => 'https://freeipapi.com/api/json/' )->go('https://maps.google.com/')->geo();
 
     NOTE: currently this call sets the location to be exactly what is
-    specified. It doesn't change anything else relevant (yet, but it may in
-    future), such as languages or the timezone
-    <https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date/getTimezoneOffset>.
-    This function should be considered experimental. Feedback welcome.
+    specified. It will also attempt to modify the current timezone (if
+    available in the geo location parameter) to match the specified
+    timezone. This function should be considered experimental. Feedback
+    welcome.
+
+    If particular, the ipgeolocation API
+    <https://ipgeolocation.io/documentation/ip-geolocation-api.html> is the
+    only API that currently providing geolocation data and matching
+    timezone data in one API call. If anyone finds/develops another similar
+    API, I would be delighted to include support for it in this module.
 
  go
 
@@ -2208,10 +2218,17 @@ SUBROUTINES/METHODS
       than creating a new profile. Firefox <https://firefox.com> refuses to
       allow more than one instance of a profile to run at the same time.
       Profile names can be obtained by using the
-      Firefox::Marionette::Profile::names() method. NOTE: firefox ignores
-      any changes made to the profile on the disk while it is running,
-      instead, use the set_pref and clear_pref methods to make changes
-      while firefox is running.
+      Firefox::Marionette::Profile::names() method. The following
+      conditions are required to use existing profiles;
+
+	* the preference security.webauth.webauthn_enable_softtoken must be
+	set to true in the profile OR
+
+	* the webauth parameter to this method must be set to 0
+
+      NOTE: firefox ignores any changes made to the profile on the disk
+      while it is running, instead, use the set_pref and clear_pref methods
+      to make changes while firefox is running.
 
       * proxy - this is a shortcut method for setting a proxy using the
       capabilities parameter above. It accepts a proxy URL, with the
@@ -2228,7 +2245,8 @@ SUBROUTINES/METHODS
 
       * scp - force the scp protocol when transferring files to remote
       hosts via ssh. See REMOTE AUTOMATION OF FIREFOX VIA SSH and the
-      --scp-only option in the ssh-auth-cmd-marionette script in this
+      --scp-only option in the ssh-auth-cmd-marionette
+      <https://metacpan.org/pod/ssh-auth-cmd-marionette> script in this
       distribution.
 
       * script - a shortcut to allow directly providing the script timeout,
@@ -2964,6 +2982,13 @@ SUBROUTINES/METHODS
 
     returns the current timeouts for page loading, searching, and scripts.
 
+ tz
+
+    accepts a Olson TZ identifier
+    <https://en.wikipedia.org/wiki/List_of_tz_database_time_zones#List> as
+    the first parameter. This method returns itself to aid in chaining
+    methods.
+
  title
 
     returns the current title
@@ -3319,9 +3344,12 @@ GEO LOCATION
     methods in providing the desired location to the Geolocation API
     <https://developer.mozilla.org/en-US/docs/Web/API/Geolocation_API>.
 
-    The country_code and timezone_offset methods can be used to help set
-    the languages method and possibly in the future change the timezone of
-    the browser.
+    As mentioned in the geo method documentation, the ipgeolocation API
+    <https://ipgeolocation.io/documentation/ip-geolocation-api.html> is the
+    only API that currently providing geolocation data and matching
+    timezone data in one API call. If this url is used, the tz method will
+    be automatically called to set the timezone to the matching timezone
+    for the geographic location.
 
 CONSOLE LOGGING
 
@@ -3385,8 +3413,9 @@ REMOTE AUTOMATION OF FIREFOX VIA SSH
 
         no-agent-forwarding,no-pty,no-X11-forwarding,permitopen="127.0.0.1:*",command="/usr/local/bin/ssh-auth-cmd-marionette" ssh-rsa AAAA ... == user@server
 
-    As an example, the ssh-auth-cmd-marionette command is provided as part
-    of this distribution.
+    As an example, the ssh-auth-cmd-marionette
+    <https://metacpan.org/pod/ssh-auth-cmd-marionette> command is provided
+    as part of this distribution.
 
     The module will expect to access private keys via the local ssh-agent
     <https://man.openbsd.org/ssh-agent> when authenticating.
@@ -3510,6 +3539,10 @@ IMITATING OTHER BROWSERS
 
       * the languages method, which can change the requested languages
       <https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Accept-Language>
+      for your browser session.
+
+      * the tz method, which can change the timezone
+      <https://en.wikipedia.org/wiki/List_of_tz_database_time_zones#List>
       for your browser session.
 
     This list of methods may grow.

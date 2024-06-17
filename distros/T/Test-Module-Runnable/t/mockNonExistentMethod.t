@@ -93,9 +93,13 @@ EOF
 
 	$pipe->reader();
 
-	my $line = <$pipe>;
-	is($line, "Bail out!  Cannot mock Private::Test::Module::Runnable::Dummy->noSuchMethod because it doesn't exist and Private::Test::Module::Runnable::Dummy has no AUTOLOAD\n",
-		'bailed out as expected when mocking nonexistent method on class without AUTOLOAD');
+	SKIP: {
+		skip 'Message is different on many cpan-tester systems', 1 unless $ENV{TEST_AUTHOR};
+
+		my $line = <$pipe>;
+		is($line, "Bail out!  Cannot mock Private::Test::Module::Runnable::Dummy->noSuchMethod because it doesn't exist and Private::Test::Module::Runnable::Dummy has no AUTOLOAD\n",
+			'bailed out as expected when mocking nonexistent method on class without AUTOLOAD');
+	};
 
 	$pipe->close();
 	wait;

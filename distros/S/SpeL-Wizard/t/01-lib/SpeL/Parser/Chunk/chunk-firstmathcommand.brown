@@ -1,0 +1,259 @@
+$tex = bless( {
+  'path' => 't/01-lib/SpeL/Parser/Chunk',
+  'tree' => bless( {
+    'ElementList' => bless( {
+      'Element' => [
+        bless( {
+          '' => 'Hieruit kunnen we onmiddellijk afleiden dat   '
+        }, 'SpeL::Object::TokenSequence' ),
+        bless( {
+          'MathUnit' => bless( {
+            '' => '|z_1 \\cdot
+z_2| = r_1 \\cdot r_2',
+            'Left' => bless( {
+              'Absval' => bless( {
+                'Component' => bless( {
+                  'Alphabet' => 'z',
+                  'trailingws' => ''
+                }, 'SpeL::Object::Variable' ),
+                'Rest' => bless( {
+                  'Op' => bless( {
+                    'Lit' => '1',
+                    'sub' => '_'
+                  }, 'SpeL::Object::Subscript' ),
+                  'Remainder' => bless( {
+                    'Op' => bless( {
+                      'Op' => '\\cdot'
+                    }, 'SpeL::Object::Binop' ),
+                    'Remainder' => bless( {
+                      'Component' => bless( {
+                        'Alphabet' => 'z',
+                        'trailingws' => ''
+                      }, 'SpeL::Object::Variable' ),
+                      'Rest' => bless( {
+                        'Op' => bless( {
+                          'Lit' => '2',
+                          'sub' => '_'
+                        }, 'SpeL::Object::Subscript' ),
+                        'Remainder' => bless( {
+                          'ws' => ''
+                        }, 'SpeL::Object::Expressionrest' )
+                      }, 'SpeL::Object::Expressionrest' )
+                    }, 'SpeL::Object::Expression' )
+                  }, 'SpeL::Object::Expressionrest' )
+                }, 'SpeL::Object::Expressionrest' )
+              }, 'SpeL::Object::Expression' )
+            }, 'SpeL::Object::Expression' ),
+            'RelationChain' => [
+              {
+                'RelOperator' => bless( {
+                  '' => '='
+                }, 'SpeL::Object::RelOperator' ),
+                'Right' => bless( {
+                  'Component' => bless( {
+                    'Alphabet' => 'r',
+                    'trailingws' => ''
+                  }, 'SpeL::Object::Variable' ),
+                  'Rest' => bless( {
+                    'Op' => bless( {
+                      'Lit' => '1',
+                      'sub' => '_'
+                    }, 'SpeL::Object::Subscript' ),
+                    'Remainder' => bless( {
+                      'Op' => bless( {
+                        'Op' => '\\cdot'
+                      }, 'SpeL::Object::Binop' ),
+                      'Remainder' => bless( {
+                        'Component' => bless( {
+                          'Alphabet' => 'r',
+                          'trailingws' => ''
+                        }, 'SpeL::Object::Variable' ),
+                        'Rest' => bless( {
+                          'Op' => bless( {
+                            'Lit' => '2',
+                            'sub' => '_'
+                          }, 'SpeL::Object::Subscript' ),
+                          'Remainder' => bless( {
+                            'ws' => ''
+                          }, 'SpeL::Object::Expressionrest' )
+                        }, 'SpeL::Object::Expressionrest' )
+                      }, 'SpeL::Object::Expression' )
+                    }, 'SpeL::Object::Expressionrest' )
+                  }, 'SpeL::Object::Expressionrest' )
+                }, 'SpeL::Object::Expression' )
+              }
+            ]
+          }, 'SpeL::Object::Relation' )
+        }, 'SpeL::Object::MathInline' ),
+        bless( {
+          '' => ', en dat
+'
+        }, 'SpeL::Object::TokenSequence' ),
+        bless( {
+          'MathUnit' => bless( {
+            '' => '\\Arg{(z_1 \\cdot z_2)}',
+            'Left' => bless( {
+              'Component' => bless( {
+                'Args' => [
+                  bless( {
+                    '' => '(z_1 \\cdot z_2)',
+                    'Left' => bless( {
+                      'Component' => bless( {
+                        '' => 'z_1 \\cdot z_2',
+                        'Left' => bless( {
+                          'Component' => bless( {
+                            'Alphabet' => 'z',
+                            'trailingws' => ''
+                          }, 'SpeL::Object::Variable' ),
+                          'Rest' => bless( {
+                            'Op' => bless( {
+                              'Lit' => '1',
+                              'sub' => '_'
+                            }, 'SpeL::Object::Subscript' ),
+                            'Remainder' => bless( {
+                              'Op' => bless( {
+                                'Op' => '\\cdot'
+                              }, 'SpeL::Object::Binop' ),
+                              'Remainder' => bless( {
+                                'Component' => bless( {
+                                  'Alphabet' => 'z',
+                                  'trailingws' => ''
+                                }, 'SpeL::Object::Variable' ),
+                                'Rest' => bless( {
+                                  'Op' => bless( {
+                                    'Lit' => '2',
+                                    'sub' => '_'
+                                  }, 'SpeL::Object::Subscript' ),
+                                  'Remainder' => bless( {
+                                    'ws' => ''
+                                  }, 'SpeL::Object::Expressionrest' )
+                                }, 'SpeL::Object::Expressionrest' )
+                              }, 'SpeL::Object::Expression' )
+                            }, 'SpeL::Object::Expressionrest' )
+                          }, 'SpeL::Object::Expressionrest' )
+                        }, 'SpeL::Object::Expression' )
+                      }, 'SpeL::Object::Relation' ),
+                      'Rest' => bless( {
+                        'ws' => ''
+                      }, 'SpeL::Object::Expressionrest' ),
+                      'cbracket' => ')',
+                      'obracket' => '('
+                    }, 'SpeL::Object::Expression' )
+                  }, 'SpeL::Object::Relation' )
+                ],
+                'Name' => 'Arg',
+                'trailingws' => ''
+              }, 'SpeL::Object::Command' ),
+              'Rest' => bless( {
+                'ws' => ''
+              }, 'SpeL::Object::Expressionrest' )
+            }, 'SpeL::Object::Expression' )
+          }, 'SpeL::Object::Relation' )
+        }, 'SpeL::Object::MathInline' ),
+        bless( {
+          'Args' => [
+            bless( {
+              '' => ''
+            }, 'SpeL::Object::ElementList' )
+          ],
+          'Name' => 'textasciitilde',
+          'trailingws' => ''
+        }, 'SpeL::Object::Command' ),
+        bless( {
+          'Args' => [
+            bless( {
+              'Element' => [
+                bless( {
+                  '' => 'op een veelvoud van   '
+                }, 'SpeL::Object::TokenSequence' ),
+                bless( {
+                  'MathUnit' => bless( {
+                    '' => '2\\pi',
+                    'Left' => bless( {
+                      'Component' => bless( {
+                        'Realnumber' => bless( {
+                          'Sign' => '',
+                          'Value' => '2',
+                          'trailingws' => ''
+                        }, 'SpeL::Object::Realnumber' )
+                      }, 'SpeL::Object::Number' ),
+                      'Rest' => bless( {
+                        'Op' => bless( {
+                          'Op' => ''
+                        }, 'SpeL::Object::Binop' ),
+                        'Remainder' => bless( {
+                          'Component' => bless( {
+                            'Realnumber' => bless( {
+                              'Sign' => '',
+                              'Value' => '\\pi',
+                              'trailingws' => ''
+                            }, 'SpeL::Object::Realnumber' )
+                          }, 'SpeL::Object::Number' ),
+                          'Rest' => bless( {
+                            'ws' => ''
+                          }, 'SpeL::Object::Expressionrest' )
+                        }, 'SpeL::Object::Expression' )
+                      }, 'SpeL::Object::Expressionrest' )
+                    }, 'SpeL::Object::Expression' )
+                  }, 'SpeL::Object::Relation' )
+                }, 'SpeL::Object::MathInline' ),
+                bless( {
+                  '' => 'na'
+                }, 'SpeL::Object::TokenSequence' )
+              ]
+            }, 'SpeL::Object::ElementList' )
+          ],
+          'Name' => 'emph',
+          'trailingws' => '  '
+        }, 'SpeL::Object::Command' ),
+        bless( {
+          '' => 'gelijk is aan   '
+        }, 'SpeL::Object::TokenSequence' ),
+        bless( {
+          'MathUnit' => bless( {
+            '' => '\\theta_1 + \\theta_2',
+            'Left' => bless( {
+              'Component' => bless( {
+                'Greek' => '\\theta',
+                'trailingws' => ''
+              }, 'SpeL::Object::Variable' ),
+              'Rest' => bless( {
+                'Op' => bless( {
+                  'Lit' => '1',
+                  'sub' => '_'
+                }, 'SpeL::Object::Subscript' ),
+                'Remainder' => bless( {
+                  'Op' => bless( {
+                    'Op' => '+'
+                  }, 'SpeL::Object::Binop' ),
+                  'Remainder' => bless( {
+                    'Component' => bless( {
+                      'Greek' => '\\theta',
+                      'trailingws' => ''
+                    }, 'SpeL::Object::Variable' ),
+                    'Rest' => bless( {
+                      'Op' => bless( {
+                        'Lit' => '2',
+                        'sub' => '_'
+                      }, 'SpeL::Object::Subscript' ),
+                      'Remainder' => bless( {
+                        'ws' => ''
+                      }, 'SpeL::Object::Expressionrest' )
+                    }, 'SpeL::Object::Expressionrest' )
+                  }, 'SpeL::Object::Expression' )
+                }, 'SpeL::Object::Expressionrest' )
+              }, 'SpeL::Object::Expressionrest' )
+            }, 'SpeL::Object::Expression' )
+          }, 'SpeL::Object::Relation' )
+        }, 'SpeL::Object::MathInline' ),
+        bless( {
+          '' => '.
+Dit wordt geïllustreerd in de volgende figuur:
+
+'
+        }, 'SpeL::Object::TokenSequence' )
+      ]
+    }, 'SpeL::Object::ElementList' )
+  }, 'SpeL::Object::Document' )
+}, 'SpeL::Parser::Chunk' );
+

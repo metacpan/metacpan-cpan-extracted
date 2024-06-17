@@ -1901,6 +1901,7 @@ SKIP: {
 			no strict;
 			TODO: {
 				local $TODO = ($major_version < 113 && $name !~ /^(CLEAR_COOKIES|CLEAR_NETWORK_CACHE|CLEAR_IMAGE_CACHE)$/smx) ? "Older firefox (less than 113) can have different values for Firefox::Marionette::Cache constants" : q[];
+				local $TODO = $TODO || ($major_version < 128 && $name =~ /^(?:CLEAR_CREDENTIAL_MANAGER_STATE|CLEAR_COOKIE_BANNER_EXCEPTION|CLEAR_COOKIE_BANNER_EXECUTED_RECORD|CLEAR_FINGERPRINTING_PROTECTION_STATE|CLEAR_BOUNCE_TRACKING_PROTECTION_STATE|CLEAR_FORGET_ABOUT_SITE|CLEAR_STORAGE_PERMISSIONS|CLEAR_COOKIES_AND_SITE_DATA)$/) ? "Old firefox (less than 128) can have different values for Firefox::Marionette::Cache constants" : q[];
 				my $result = $firefox->check_cache_key($name);
 				if (($name eq 'CLEAR_FORGET_ABOUT_SITE') && ($major_version < 124)) {
 					ok($result <= &$name(), "\$firefox->check_cache_key($name) eq Firefox::Marionette::Cache::${name} which should less than or equal to $result and is " . &$name());
@@ -3893,11 +3894,7 @@ SKIP: {
 	}
 	$firefox->sleep_time_in_ms(2_000);
 	ok($firefox->find_id($search_box_id)->clear()->find_id($search_box_id)->type('Test::More'), "Sent 'Test::More' to the '$search_box_id' field directly to the element");
-	if ($ENV{FIREFOX_BINARY}) {
-		ok($firefox->go("https://metacpan.org/pod/Test::More"), "Just directly going to https://metacpan.org/pod/Test::More b/c FIREFOX_BINARY has been specified");
-	} else {
-		ok($firefox->await(sub { $firefox->find_class('autocomplete-suggestion'); })->click(), "Clicked on the first result");
-	}
+	ok($firefox->go("https://metacpan.org/pod/Test::More"), "Just directly going to https://metacpan.org/pod/Test::More");
 	diag("Going to Test::More page with a page load strategy of " . ($capabilities->page_load_strategy() || ''));
 	SKIP: {
 		if ($major_version < 45) {

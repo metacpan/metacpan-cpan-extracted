@@ -383,6 +383,49 @@ See also L</slurp> to reading data from file
 
 See L</spew>
 
+=head2 strf
+
+    print strf( $format, %data );
+    print strf( $format, \%data );
+
+The C<strf> function returns a string representing hash-data as string in specified C<$format>.
+This function is somewhat similar to the C function strftime(), except that the data source
+is not the date and time, but the set of data passed to the function.
+
+The format string may be containing any combination of regular characters and special format
+specifiers (patterns). These patterns are replaced to the corresponding values to represent
+the data passed as  second function argument. They all begin with a percentage (%) sign,
+and are: '%c' or '%{word}'. The "c" is single character specifier like %d, the "word" is
+regular word like "month" or "filename"
+
+If you give a pattern that doesn't exist, then it is simply treated as text.
+If you give a pattern that doesn't defined but is exist in data set, then it will be
+replaced to empty text string ('')
+
+B<Please note!> All patterns C<'%%'> will be replaced to literal C<'%'> character if you not
+redefinet this pattern in Your data set manually
+
+Simple examples:
+
+    my %d = (
+        f => 'foo',
+        b => 'bar',
+        baz => 'test',
+        u => undef,
+        t => time,
+        d => 1,
+        i => 2000,
+        n => "\n",
+    );
+
+    print strf("test %f string", %d); # "test foo string"
+    print strf("%{baz} time=%t", %d); # "test time=1234567890"
+    print strf("test %f%b%i", %d); # "test foobar2000"
+    print strf("%d%% %{baz}", \%d); # "1% test"
+    print strf("%f%n%b", \%d); # "foo\nbar"
+    print strf("%f%u%b", \%d); # "foobar"
+    print strf("%f%X%b", \%d); # "foo%Xbar"
+
 =head2 touch
 
     touch( "file" ) or die "Can't touch file";
@@ -488,7 +531,7 @@ our @EXPORT_OK = (qw/
         fbytes human2bytes humanize_duration humanize_number
         fdt dtf tz_diff fdate fdatetime fduration
         randchars
-        dformat trim truncstr indent words
+        dformat strf trim truncstr indent words
         touch eqtime slurp spew spurt
         parse_expire parse_time_offset
         os_type is_os_type
@@ -763,11 +806,34 @@ sub trim {
     $val =~ s|\s+$||s; # trim right
     return $val;
 }
-sub dformat { # Simple template
+sub dformat { # Simple templating processor
     my $f = shift;
     my $d = @_ ? @_ > 1 ? {@_} : {%{$_[0]}} : {};
     $f =~ s/\[([A-Z0-9_\-.]+?)\]/(defined($d->{$1}) ? $d->{$1} : "[$1]")/eg;
     return $f;
+}
+sub strf { # Yet another simple templating processor
+    my $s = shift // '';
+    my $h = @_ ? @_ > 1 ? {@_} : {%{$_[0]}} : {};
+    return '' unless length $s;
+    $h->{'%'} //= '%'; # by default '%' eq '%''
+
+    $s =~ s/
+            (?:
+              %\{(\w+)\}       # short name like %{name}
+              |
+              %([%a-zA-Z])     # single character specifier like %d
+            )
+           /
+            ( $1
+              ? ( defined($h->{$1}) ? $h->{$1} : exists($h->{$1}) ? '' : "\%{$1}" )
+              : $2
+              ? ( defined($h->{$2}) ? $h->{$2} : exists($h->{$2}) ? '' : "\%$2" )
+              : ''
+            )
+        /sgex;
+
+    return $s;
 }
 sub randchars {
     my $l = shift || return '';

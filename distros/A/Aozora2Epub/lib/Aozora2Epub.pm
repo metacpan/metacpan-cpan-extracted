@@ -12,7 +12,7 @@ use HTML::Escape qw/escape_html/;
 use base qw(Class::Accessor);
 __PACKAGE__->mk_accessors(qw/files title author epub bib_info notation_notes/);
 
-our $VERSION = '0.01';
+our $VERSION = '0.03';
 
 our $AOZORA_GAIJI_URI = URI->new("https://www.aozora.gr.jp/gaiji/");
 

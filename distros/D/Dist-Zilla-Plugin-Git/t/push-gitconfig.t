@@ -13,8 +13,7 @@ eval { require Dist::Zilla::Plugin::Config::Git };
 plan skip_all => 'Dist::Zilla::Plugin::Config::Git not installed'
     if $@ and $@ !~ /^Can't locate /;
 
-# rt#56485 - skip test to avoid failures for old git versions
-skip_unless_git_version('1.7.0');
+skip_unless_git_version('2.4.1'); # for push.followTags
 
 plan tests => 7;
 

@@ -208,55 +208,55 @@
    "provides" : {
       "Dist::Zilla::Plugin::Git" : {
          "file" : "lib/Dist/Zilla/Plugin/Git.pm",
-         "version" : "2.050"
+         "version" : "2.051"
       },
       "Dist::Zilla::Plugin::Git::Check" : {
          "file" : "lib/Dist/Zilla/Plugin/Git/Check.pm",
-         "version" : "2.050"
+         "version" : "2.051"
       },
       "Dist::Zilla::Plugin::Git::Commit" : {
          "file" : "lib/Dist/Zilla/Plugin/Git/Commit.pm",
-         "version" : "2.050"
+         "version" : "2.051"
       },
       "Dist::Zilla::Plugin::Git::CommitBuild" : {
          "file" : "lib/Dist/Zilla/Plugin/Git/CommitBuild.pm",
-         "version" : "2.050"
+         "version" : "2.051"
       },
       "Dist::Zilla::Plugin::Git::GatherDir" : {
          "file" : "lib/Dist/Zilla/Plugin/Git/GatherDir.pm",
-         "version" : "2.050"
+         "version" : "2.051"
       },
       "Dist::Zilla::Plugin::Git::Init" : {
          "file" : "lib/Dist/Zilla/Plugin/Git/Init.pm",
-         "version" : "2.050"
+         "version" : "2.051"
       },
       "Dist::Zilla::Plugin::Git::NextVersion" : {
          "file" : "lib/Dist/Zilla/Plugin/Git/NextVersion.pm",
-         "version" : "2.050"
+         "version" : "2.051"
       },
       "Dist::Zilla::Plugin::Git::Push" : {
          "file" : "lib/Dist/Zilla/Plugin/Git/Push.pm",
-         "version" : "2.050"
+         "version" : "2.051"
       },
       "Dist::Zilla::Plugin::Git::Tag" : {
          "file" : "lib/Dist/Zilla/Plugin/Git/Tag.pm",
-         "version" : "2.050"
+         "version" : "2.051"
       },
       "Dist::Zilla::PluginBundle::Git" : {
          "file" : "lib/Dist/Zilla/PluginBundle/Git.pm",
-         "version" : "2.050"
+         "version" : "2.051"
       },
       "Dist::Zilla::Role::Git::DirtyFiles" : {
          "file" : "lib/Dist/Zilla/Role/Git/DirtyFiles.pm",
-         "version" : "2.050"
+         "version" : "2.051"
       },
       "Dist::Zilla::Role::Git::Repo" : {
          "file" : "lib/Dist/Zilla/Role/Git/Repo.pm",
-         "version" : "2.050"
+         "version" : "2.051"
       },
       "Dist::Zilla::Role::Git::StringFormatter" : {
          "file" : "lib/Dist/Zilla/Role/Git/StringFormatter.pm",
-         "version" : "2.050"
+         "version" : "2.051"
       }
    },
    "release_status" : "stable",
@@ -274,7 +274,7 @@
       "x_IRC" : "irc://irc.perl.org/#distzilla",
       "x_MailingList" : "http://dzil.org/#mailing-list"
    },
-   "version" : "2.050",
+   "version" : "2.051",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.040000"
@@ -349,7 +349,7 @@
                }
             },
             "name" : "@Author::ETHER/Git::GatherDir",
-            "version" : "2.050"
+            "version" : "2.051"
          },
          {
             "class" : "Dist::Zilla::Plugin::MetaYAML",
@@ -897,7 +897,7 @@
                }
             },
             "name" : "@Author::ETHER/initial check",
-            "version" : "2.050"
+            "version" : "2.051"
          },
          {
             "class" : "Dist::Zilla::Plugin::Git::CheckFor::MergeConflicts",
@@ -953,7 +953,7 @@
                }
             },
             "name" : "@Author::ETHER/after tests",
-            "version" : "2.050"
+            "version" : "2.051"
          },
          {
             "class" : "Dist::Zilla::Plugin::CheckIssues",
@@ -1068,7 +1068,7 @@
                }
             },
             "name" : "@Author::ETHER/@Git::VersionManager/release snapshot",
-            "version" : "2.050"
+            "version" : "2.051"
          },
          {
             "class" : "Dist::Zilla::Plugin::Git::Tag",
@@ -1077,7 +1077,7 @@
                   "branch" : null,
                   "changelog" : "Changes",
                   "signed" : 0,
-                  "tag" : "v2.050",
+                  "tag" : "v2.051",
                   "tag_format" : "v%V",
                   "tag_message" : "v%v%t"
                },
@@ -1090,7 +1090,7 @@
                }
             },
             "name" : "@Author::ETHER/@Git::VersionManager/Git::Tag",
-            "version" : "2.050"
+            "version" : "2.051"
          },
          {
             "class" : "Dist::Zilla::Plugin::BumpVersionAfterRelease::Transitional",
@@ -1140,7 +1140,7 @@
                }
             },
             "name" : "@Author::ETHER/@Git::VersionManager/post-release commit",
-            "version" : "2.050"
+            "version" : "2.051"
          },
          {
             "class" : "Dist::Zilla::Plugin::Prereqs",
@@ -1168,7 +1168,7 @@
                }
             },
             "name" : "@Author::ETHER/Git::Push",
-            "version" : "2.050"
+            "version" : "2.051"
          },
          {
             "class" : "Dist::Zilla::Plugin::GitHub::Update",

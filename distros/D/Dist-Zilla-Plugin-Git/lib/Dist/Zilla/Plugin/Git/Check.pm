@@ -13,7 +13,7 @@ use warnings;
 package Dist::Zilla::Plugin::Git::Check;
 # ABSTRACT: Check your git repository before releasing
 
-our $VERSION = '2.050';
+our $VERSION = '2.051';
 
 use Moose;
 use namespace::autoclean 0.09;
@@ -139,7 +139,7 @@ Dist::Zilla::Plugin::Git::Check - Check your git repository before releasing
 
 =head1 VERSION
 
-version 2.050
+version 2.051
 
 =head1 SYNOPSIS
 

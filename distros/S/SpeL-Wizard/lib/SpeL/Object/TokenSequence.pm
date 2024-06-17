@@ -34,7 +34,7 @@ SpeL::Object::TokenSequence - LaTeX token sequence object
 
 =head1 VERSION
 
-version 20240615
+version 20240616.1738
 
 =head1 METHODS
 

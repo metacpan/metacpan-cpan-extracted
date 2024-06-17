@@ -1,5 +1,9 @@
 Revision history for ExtUtils-Typemaps-Magic
 
+0.006     2024-06-16 15:44:01+02:00 Europe/Brussels
+          - Soften dependency on mg_findext
+          - Refactor Synopses to be more useful to end-users
+
 0.005     2024-06-12 23:15:22+02:00 Europe/Brussels
           - Clarify ppport usage in docs
 

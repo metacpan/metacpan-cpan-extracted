@@ -2,6 +2,16 @@
 ##
 ## Change log for perl distribution PDL::VectorValued
 
+v1.0.23 Sun, 16 Jun 2024 17:09:01 +0200 moocow
+	* typo fixes
+	* import vv_vcos from PDL core if available
+	* bump minimum PDL requirement to 2.025 (~ debian 11)
+	* mohawk2: thread -> broadcast in docs/comments
+	* mohawk2: use macos-latest in CI
+
+v1.0.22 Sat, 08 Apr 2023 11:57:16 +0200 moocow
+	* port test tweaks from https://github.com/moocow-the-bovine/PDL-HMM/pull/2/, contributed by mohawk2
+
 v1.0.21 Sun, 29 May 2022 21:58:45 +0200 moocow
 	* suppress "redefined" warnings under PDL v2.080 which break Debian (contributed by mohawk2)
 	* fix bogus POD references to non-existant PDL::Ngrams::ngutils

@@ -8,6 +8,8 @@ use Test::More;
 
 $File::ShareDir::DIST_SHARE{'Aozora2Epub'} = path('share')->absolute;
 
+binmode(STDERR, "utf8");
+binmode(STDOUT, "utf8");
 {
     # utf8 hack from Amon2
     binmode Test::More->builder->$_, ":utf8" for qw/output failure_output todo_output/;

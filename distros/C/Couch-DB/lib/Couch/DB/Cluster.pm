@@ -7,7 +7,7 @@
 
 package Couch::DB::Cluster;
 use vars '$VERSION';
-$VERSION = '0.003';
+$VERSION = '0.004';
 
 
 use Couch::DB::Util  qw/flat/;;

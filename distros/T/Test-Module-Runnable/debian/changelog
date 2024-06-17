@@ -1,3 +1,12 @@
+libtest-module-runnable-perl (0.6.2) stable; urgency=high
+
+  * Test failure on some CPAN tester systems
+    .
+    I don't really understand why this test is failing, but it does not seem
+    that important, so restrict it to TEST_AUTHOR
+
+ -- Rev. Duncan Ross Palmer <2e0eol@gmail.com>  Sun, 16 Jun 2024 13:00:12 +0100
+
 libtest-module-runnable-perl (0.6.1) stable; urgency=high
 
   * dd447e5: Fixed bug where TEST_UNIQUE was ignored

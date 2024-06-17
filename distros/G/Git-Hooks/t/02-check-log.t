@@ -1,6 +1,6 @@
 #!/usr/bin/env perl
 
-use v5.16.0;
+use v5.30.0;
 use warnings;
 use lib qw/t lib/;
 use Git::Hooks::Test ':all';

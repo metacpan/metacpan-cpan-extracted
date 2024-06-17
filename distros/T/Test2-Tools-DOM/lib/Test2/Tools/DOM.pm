@@ -11,7 +11,7 @@ use Test2::Compare ();
 use Test2::Compare::Wildcard ();
 use Test2::Tools::DOM::Check ();
 
-our $VERSION = '0.004';
+our $VERSION = '0.100';
 
 use Exporter 'import';
 our @EXPORT = qw(
@@ -32,30 +32,30 @@ sub dom :prototype(&) {
 }
 
 my sub call ( $name, $args, $expect ) {
-    Carp::croak 'Missing method name' unless $name;
-
     my $build = Test2::Compare::get_build
-        or Carp::croak 'No current build!';
+        or Carp::croak "'$name' cannot be called in a context with no test build";
 
-    Carp::croak "'$build' is not a Test2::Tools::DOM::Check"
+    Carp::croak "'$name' is not supported in a '$build' build"
         unless ref $build eq 'Test2::Tools::DOM::Check';
 
     my @caller = caller;
     $build->add_call(
-        $name => $args,
+        @$args ? [ $name => @$args ] : $name,
         Test2::Compare::Wildcard->new(
             expect => $expect,
             file   => $caller[1],
             lines  => [ $caller[2] ],
         ),
+        $name,
+        'scalar',
     );
 }
 
 # Calls with either only a check, or a key and a check
-my sub multi ( $method, $want, $check = '.oO NOT  A  REAL  VALUE Oo.' ) {
-    $check && $check eq '.oO NOT  A  REAL  VALUE Oo.'
-        ? call( $method => [       ] => $want  )
-        : call( $method => [ $want ] => $check )
+my sub multi {
+    @_ > 2
+        ? call( $_[0] => [ $_[1] ] => $_[2] )
+        : call( $_[0] => [       ] => $_[1] )
 }
 
 sub all_text (        $check ) { call all_text => [       ] => $check }

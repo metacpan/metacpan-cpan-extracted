@@ -345,7 +345,7 @@ else {
 }
 
 eval{FileHandle::Fmode::win32_fmode(\*WR);};
-if($^O =~ /mswin32/i) {
+if($^O =~ /mswin32/i && !FileHandle::Fmode::LIBC_IS_UCRT) {
   if($@) {print "not ok 52\n"}
   else {print "ok 52\n"}
 }

@@ -7,7 +7,7 @@
 
 package Couch::DB;
 use vars '$VERSION';
-$VERSION = '0.003';
+$VERSION = '0.004';
 
 use version;
 
@@ -171,33 +171,18 @@ sub call($$%)
 	defined $send || ($method ne 'POST' && $method ne 'PUT')
 		or panic "No send in $method $path";
 
-	if(my $paging = $args{paging})
-	{	# Translate paging status into call parameters
-		my $params   = $method eq 'GET' ? $query : $send;
-		my $progress = @{$paging->{harvested}};      # within a page
-#use Data::Dumper;
-#warn "PAGING IN=", Dumper $paging;
-		$params->{limit} = min $paging->{page_size} - $progress, $paging->{req_max};
-
-		my $start    = $paging->{start};
-		if(my $bookmark = $paging->{bookmarks}{$start + $progress})
-		{	$params->{bookmark} = $bookmark;
-			$params->{skip}     = $paging->{skip};
-		}
-		else
-		{	delete $params->{bookmark};
-			$params->{skip}     = $start + $progress + $paging->{skip};
-		}
-
-		if(my $client = $paging->{client})
-		{	# No free choices for clients once we are on page 2
-			$args{client} = $client;
-			delete $args{clients};
-		}
-#warn "PAGING PARAMS = ", Dumper $params;
-	}
+	my $introduced = $args{introduced};
+	$self->check(exists $args{$_}, $_ => delete $args{$_}, "Endpoint '$method $path'")
+		for qw/removed introduced deprecated/;
 
 	### On this level, we pick a client.  Extensions implement the transport.
+
+	my $paging = $args{paging};
+	if($paging && (my $client = $paging->{client}))
+	{	# No free choices for clients once we are on page 2
+		$args{client} = $client;
+		delete $args{clients};
+	}
 
 	my @clients;
 	if(my $client = delete $args{client})
@@ -211,17 +196,13 @@ sub call($$%)
 	}
 	@clients or error __x"No clients can run {method} {path}.", method => $method, path => $path;
 
-	my $introduced = $args{introduced};
-	$self->check(exists $args{$_}, $_ => delete $args{$_}, "Endpoint '$method $path'")
-		for qw/removed introduced deprecated/;
-
 	my $result  = Couch::DB::Result->new(
 		couch     => $self,
 		on_values => $args{on_values},
 		on_error  => $args{on_error},
 		on_final  => $args{on_final},
 		on_chain  => $args{on_chain},
-		paging    => $args{paging},
+		paging    => $paging,
 	);
 
   CLIENT:
@@ -230,8 +211,22 @@ sub call($$%)
 		! $introduced || $client->version >= $introduced
 			or next CLIENT;  # server release too old
 
-		$self->_callClient($result, $client, %args)
-			and last;
+		if($paging)
+		{	do
+			{	# Merge paging setting into the request
+	    		$self->_pageRequest($paging, $method, $query, $send);
+
+				$self->_callClient($result, $client, %args)
+					or next CLIENT;  # fail
+			} while $result->pageIsPartial;
+
+			last CLIENT;
+		}
+		else
+		{	# Non-paging commands are simple
+			$self->_callClient($result, $client, %args)
+				and last CLIENT;
+		}
 	}
 
 	# The error from the last try will remain.
@@ -294,6 +289,9 @@ sub _resultsPaging($%)
 			$h eq 'DEFAULT' || $args->{_harvester}
 				or panic "Harvester does not survive pagingState(), resupply.";
 
+			$succeeds->{map} eq 'NONE' || $args->{_map}
+				or panic "Map does not survive pagingState(), resupply.";
+
 			$succ  = $succeeds;
 			$args->{_client} = $succeeds->{client};
 		}
@@ -301,9 +299,11 @@ sub _resultsPaging($%)
 
 	$state{start}     = $succ->{start} || 0;
 	$state{skip}      = delete $args->{skip} || 0;
+	$state{all}       = delete $args->{_all} || 0;
+	$state{map}       = my $map = delete $args->{_map} || $succ->{map};
 	$state{harvester} = my $harvester = delete $args->{_harvester} || $succ->{harvester};
-	$state{page_size} = delete $args->{_page_size} || $succ->{page_size} || 25;
-	$state{req_max}   = delete $args->{limit}      || $succ->{req_max}   || 100;
+	$state{page_size} = my $size = delete $args->{_page_size} || $succ->{page_size} || 25;
+	$state{req_max}   = delete $args->{limit} || $succ->{req_max} || 100;
 
 	if(my $page = delete $args->{_page})
 	{	$state{start}  = ($page - 1) * $state{page_size};
@@ -315,23 +315,36 @@ sub _resultsPaging($%)
 	}
 
 	$harvester ||= sub { $_[0]->values->{docs} };
-	my $continue_partial = sub {
-		my $result = shift;
-		if($result)
-		{	my @found = flat $harvester->($result);
-			$result->_pageAdd($result->answer->{bookmark}, @found) if @found;
-
-$result->_pageAdd if $result->pageIsPartial;
-#warn "NOT YET IMPLEMENTED" if $result->pageIsPartial;   #XXX
-		}
-		$result;
+	my $harvest = sub {
+		my $result = shift or return;
+		my @found  = flat $harvester->($result);
+		@found     = map $map->($result, $_), @found if $map;
+		$result->_pageAdd($result->answer->{bookmark}, @found);  # also call with 0
 	};
 
 	# When less elements are returned
 	return
-	( $self->_resultsConfig($args, @more, on_chain => $continue_partial),
+	( $self->_resultsConfig($args, @more, on_final => $harvest),
 	   paging => \%state,
 	);
+}
+
+sub _pageRequest($$$$)
+{	my ($self, $paging, $method, $query, $send) = @_;
+	my $params   = $method eq 'GET' ? $query : $send;
+	my $progress = @{$paging->{harvested}};      # within the page
+	my $start    = $paging->{start};
+
+	$params->{limit} = $paging->{all} ? $paging->{req_max} : (min $paging->{page_size} - $progress, $paging->{req_max});
+
+	if(my $bookmark = $paging->{bookmarks}{$start + $progress})
+	{	$params->{bookmark} = $bookmark;
+		$params->{skip}     = $paging->{skip};
+	}
+	else
+	{	delete $params->{bookmark};
+		$params->{skip}     = $start + $paging->{skip} + $progress;
+	}
 }
 
 #-------------
@@ -489,10 +502,10 @@ sub freshUUIDs($%)
 # Returns the JSON structure which is part of the response by the CouchDB
 # server.  Usually, this is the bofy of the response.  In multipart
 # responses, it is the first part.
-sub _extractAnswer($) { panic "must be extended" }
+sub _extractAnswer($)  { panic "must be extended" }
 
 # The the decoded named extension from the multipart message
-sub _attachment($$)   { panic "must be extended" }
+sub _attachment($$)    { panic "must be extended" }
 
 # Extract the decoded body of the message
 sub _messageContent($) { panic "must be extended" }

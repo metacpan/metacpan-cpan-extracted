@@ -7,7 +7,7 @@ use experimental 'signatures';
 use Test2::Util ();
 use Mojo::DOM58;
 
-our $VERSION = '0.004';
+our $VERSION = '0.100';
 
 use parent 'Test2::Compare::Base';
 
@@ -17,8 +17,13 @@ sub verify ( $self, %params ) { !!$params{exists} }
 
 sub init ( $self ) { $self->{calls} = [] }
 
-sub add_call ( $self, $method, $check, $args ) {
-    push @{ $self->{calls} } => [ $method, $check, $args ];
+sub add_call ( $self, $call, $check, $name, $context, @ ) {
+    $name
+        ||= ref $call eq 'ARRAY' ? $call->[0]
+          : ref $call eq 'CODE'  ? '\&CODE'
+          : $call;
+
+    push @{ $self->{calls} } => [ $call, $check, $name, $context || 'scalar' ];
 }
 
 sub deltas ( $self, %params ) {
@@ -42,16 +47,28 @@ sub deltas ( $self, %params ) {
 
     my $dom = $self->{dom};
 
-    for my $call (@{ $self->{calls} // [] }) {
-        my ( $name, $args, $check ) = @$call;
+    for (@{ $self->{calls} // [] }) {
+        my ( $method, $check, $name, $context ) = @$_;
+
+        my @args;
+        ( $method, @args ) = @$method if ref $method eq 'ARRAY';
 
         $check = $convert->($check);
 
-        my $method = $dom->can($name)
-            or Carp::croak "Cannot call $name on an object of type " . ref $dom;
+        $method = ref $method eq 'CODE'
+            ? $method
+            : $dom->can($name);
+
+        Carp::croak "Cannot call '$name' on an object of type " . ref $dom
+            unless $method;
+
 
         my $value;
-        my ( $ok, $err ) = Test2::Util::try { $value = $dom->$method(@$args) };
+        my ( $ok, $err ) = Test2::Util::try {
+            $value = $context eq 'list' ? [ $dom->$method(@args) ] :
+                     $context eq 'hash' ? { $dom->$method(@args) } :
+                                            $dom->$method(@args);
+        };
 
         if ($ok) {
             my %args = (
@@ -59,12 +76,12 @@ sub deltas ( $self, %params ) {
                 seen    => $seen,
                 convert => $convert,
                 got     => $value,
-                exists  => $method,
+                exists  => defined $method,
             );
 
             # Support HTML/XML logic for element attributes
-            if ( @$args && $name eq 'attr' ) {
-                my $exists = exists $dom->attr->{ $args->[0] };
+            if ( @args && $name eq 'attr' ) {
+                my $exists = exists $dom->attr->{ $args[0] };
                 $args{got}    = $exists if $check->name =~ /^(?:TRUE|FALSE)$/;
                 $args{exists} = $exists if $check->name =~ /EXIST/;
             }
@@ -88,5 +105,7 @@ sub deltas ( $self, %params ) {
 
     return @deltas;
 }
+
+sub stringify_got { 1 }
 
 1;

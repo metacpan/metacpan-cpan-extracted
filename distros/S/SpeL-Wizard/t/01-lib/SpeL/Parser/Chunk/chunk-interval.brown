@@ -1,0 +1,53 @@
+$tex = bless( {
+  'path' => 't/01-lib/SpeL/Parser/Chunk',
+  'tree' => bless( {
+    'ElementList' => bless( {
+      'Element' => [
+        bless( {
+          '' => 'het interval  '
+        }, 'SpeL::Object::TokenSequence' ),
+        bless( {
+          'MathUnit' => bless( {
+            '' => ']-\\pi,\\pi]',
+            'Left' => bless( {
+              'Interval' => bless( {
+                'Intervalend' => ']',
+                'Intervalstart' => ']',
+                'left' => bless( {
+                  'Component' => bless( {
+                    'Realnumber' => bless( {
+                      'Sign' => '-',
+                      'Value' => '\\pi',
+                      'trailingws' => ''
+                    }, 'SpeL::Object::Realnumber' )
+                  }, 'SpeL::Object::Number' ),
+                  'Rest' => bless( {
+                    'ws' => ''
+                  }, 'SpeL::Object::Expressionrest' )
+                }, 'SpeL::Object::Expression' ),
+                'right' => bless( {
+                  'Component' => bless( {
+                    'Realnumber' => bless( {
+                      'Sign' => '',
+                      'Value' => '\\pi',
+                      'trailingws' => ''
+                    }, 'SpeL::Object::Realnumber' )
+                  }, 'SpeL::Object::Number' ),
+                  'Rest' => bless( {
+                    'ws' => ''
+                  }, 'SpeL::Object::Expressionrest' )
+                }, 'SpeL::Object::Expression' )
+              }, 'SpeL::Object::Interval' )
+            }, 'SpeL::Object::Expression' )
+          }, 'SpeL::Object::Relation' )
+        }, 'SpeL::Object::MathInline' ),
+        bless( {
+          '' => '. 
+
+'
+        }, 'SpeL::Object::TokenSequence' )
+      ]
+    }, 'SpeL::Object::ElementList' )
+  }, 'SpeL::Object::Document' )
+}, 'SpeL::Parser::Chunk' );
+

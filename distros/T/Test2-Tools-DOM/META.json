@@ -41,8 +41,9 @@
       },
       "runtime" : {
          "requires" : {
-            "Mojo::DOM58" : "0.999",
-            "Test2::Suite" : "0.000072",
+            "Mojo::DOM58" : "1.000",
+            "Test2::API" : "1.302180",
+            "Test2::Suite" : "0.000084",
             "perl" : "v5.20.0"
          }
       },
@@ -61,11 +62,11 @@
    "provides" : {
       "Test2::Tools::DOM" : {
          "file" : "lib/Test2/Tools/DOM.pm",
-         "version" : "0.004"
+         "version" : "0.100"
       },
       "Test2::Tools::DOM::Check" : {
          "file" : "lib/Test2/Tools/DOM/Check.pm",
-         "version" : "0.004"
+         "version" : "0.100"
       }
    },
    "release_status" : "stable",
@@ -79,7 +80,7 @@
          "web" : "https://gitlab.com/jjatria/test2-tools-dom"
       }
    },
-   "version" : "0.004",
+   "version" : "0.100",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.038000"
@@ -225,7 +226,7 @@
                   "changelog" : "Changes"
                },
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.34.1",
+                  "git_version" : "2.40.1",
                   "repo_root" : "."
                }
             },
@@ -307,7 +308,7 @@
                   "changelog" : "Changes"
                },
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.34.1",
+                  "git_version" : "2.40.1",
                   "repo_root" : "."
                },
                "Dist::Zilla::Role::Git::StringFormatter" : {
@@ -324,12 +325,12 @@
                   "branch" : null,
                   "changelog" : "Changes",
                   "signed" : 0,
-                  "tag" : "0.004",
+                  "tag" : "0.100",
                   "tag_format" : "%v",
                   "tag_message" : ""
                },
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.34.1",
+                  "git_version" : "2.40.1",
                   "repo_root" : "."
                },
                "Dist::Zilla::Role::Git::StringFormatter" : {
@@ -373,7 +374,7 @@
                   "changelog" : "Changes"
                },
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.34.1",
+                  "git_version" : "2.40.1",
                   "repo_root" : "."
                },
                "Dist::Zilla::Role::Git::StringFormatter" : {
@@ -469,7 +470,7 @@
             "class" : "Dist::Zilla::Plugin::Git::Contributors",
             "config" : {
                "Dist::Zilla::Plugin::Git::Contributors" : {
-                  "git_version" : "2.34.1",
+                  "git_version" : "2.40.1",
                   "include_authors" : 0,
                   "include_releaser" : 1,
                   "order_by" : "name",
@@ -543,10 +544,6 @@
          "version" : "6.030"
       }
    },
-   "x_contributors" : [
-      "Jos\u00e9 Joaqu\u00edn Atria <j.atria@cv-library.co.uk>",
-      "Jos\u00e9 Joaqu\u00edn Atria <jjatria@gmail.com>"
-   ],
    "x_generated_by_perl" : "v5.38.0",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.37",
    "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"

@@ -19,65 +19,30 @@ use JSON;
 use Mock::LWP::UserAgent ();
 use My::Module::Test ();
 
-our $VERSION = '0.165';
+our $VERSION = '0.166';
 
 my %opt = (
-    directory		=> $Mock::LWP::UserAgent::CANNED_RESPONSE_DIR,
     retrieval_size	=> $Astro::SpaceTrack::RETRIEVAL_SIZE,
 );
 
 GetOptions( \%opt,
-    qw{ directory=s list! retrieval_size|retrieval-size=i verbose! },
+    qw{ file=s list! retrieval_size|retrieval-size=i verbose! },
     help => sub { pod2usage( { -verbose => 2 } ) },
 ) or pod2usage( { -verbose => 0 } );
 
-$Mock::LWP::UserAgent::CANNED_RESPONSE_DIR = $opt{directory};
-
-$opt{list}
-    and list_captures();
-
 my $st = Astro::SpaceTrack::Dumper->new(
+    canned_response_file	=> $opt{file},
     prompt => 'SpaceTrack capture> ',
 );
+
+$opt{list}
+    and list_captures( $st );
 
 {
     local $Astro::SpaceTrack::RETRIEVAL_SIZE = $opt{retrieval_size};
     $opt{verbose}
 	and $st->set( dump_headers => Astro::SpaceTrack->DUMP_RESPONSE() );
     $st->shell( @ARGV );
-}
-
-{
-    my $ast;
-    sub Astro::SpaceTrack::site_check {
-	my ( undef, $site ) = @_;
-	my $uri = My::Module::Test::__site_to_check_uri( $site )
-	    or die "No check URI for site '$site'\n";
-	return $st->_get_from_net( url => $uri );
-    }
-}
-
-sub list_captures {
-    my $json = JSON->new()->utf8();
-    foreach my $path ( bsd_glob( File::Spec->catfile(
-		$Mock::LWP::UserAgent::CANNED_RESPONSE_DIR, '*.json' ) )
-    ) {
-	local $/ = undef;
-	open my $fh, '<:encoding(utf-8)', $path
-	    or die "Failed to open $path: $!\n";
-##	my ( $code, $message, $headers, $content, $request ) =
-	my ( undef, undef, undef, $content, $request ) =
-	    @{ $json->decode( <$fh> ) };
-	close $fh;
-	print "$path\n";
-	print "    $request->{method} $request->{uri}\n";
-	if ( $opt{verbose} ) {
-	    ( my $buffer = $content ) =~ s/ ( \A | [\r\n]+ ) /$1    /smxg;
-	    $buffer =~ s/ \s+ \z //smx;
-	    print "$buffer\n";
-	}
-    }
-    exit;
 }
 
 __END__
@@ -89,41 +54,41 @@ capture - Capture HTTP::Response objects to feed to a mock LWP::UserAgent.
 =head1 SYNOPSIS
 
  capture
- capture -help
- capture -version
+ capture --help
+ capture --version
 
 =head1 OPTIONS
 
 The following options are supported directly by this script. Any
 unrecognized options will be passed through to C<Astro::SpaceTrack>.
 
-=head2 -directory
+=head2 --directory
 
 This option specifies the directory in which the responses are to be
 written. The default is the default for C<Mock::LWP::UserAgent>.
 
-=head2 -help
+=head2 --help
 
 This option displays the documentation for this script. The script then
 exits.
 
-=head2 -list
+=head2 --list
 
 If this Boolean option is asserted, the captured objects are listed. The
 script then exits. The list includes captured data if
-L<-verbose|/-verbose> is also asserted.
+L<--verbose|/--verbose> is also asserted.
 
-=head2 -retrieval-size
+=head2 --retrieval-size
 
 This option specifies the maximum number of OIDs to retrieve in a single
 query. The default is C<200>.
 
-=head2 -verbose
+=head2 --verbose
 
 If this option is asserted, file creation will be logged to standard
 error.
 
-=head2 -version
+=head2 --version
 
 This option displays the version of this script. The script then exits.
 
@@ -138,6 +103,16 @@ C<shell()> method. But it uses a subclass of
 L<Astro::SpaceTrack|Astro::SpaceTrack> to dump HTTP responses to JSON
 files whose name is an MD5 digest of the URL that generated the
 response. The files are censored heavily by this subclass.
+
+In addition, the following commands/methods are added:
+
+=head2 GET
+
+This method simply gets the specified URL.
+
+=head2 site_check
+
+This method performs an accessability check on the named site.
 
 =head1 AUTHOR
 

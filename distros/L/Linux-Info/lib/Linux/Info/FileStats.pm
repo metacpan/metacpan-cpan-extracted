@@ -3,7 +3,7 @@ use strict;
 use warnings;
 use Carp qw(croak);
 
-our $VERSION = '2.16'; # VERSION
+our $VERSION = '2.17'; # VERSION
 
 # ABSTRACT: Collect linux file statistics.
 
@@ -100,7 +100,7 @@ Linux::Info::FileStats - Collect linux file statistics.
 
 =head1 VERSION
 
-version 2.16
+version 2.17
 
 =head1 SYNOPSIS
 

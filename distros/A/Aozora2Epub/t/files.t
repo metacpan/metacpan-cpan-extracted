@@ -4,6 +4,7 @@ use utf8;
 use Test::More;
 use Test::Base;
 use Aozora2Epub;
+use Aozora2Epub::Gensym;
 use lib qw/./;
 use t::Util;
 
@@ -23,6 +24,8 @@ filters {
 
 run {
     my $block = shift;
+    Aozora2Epub::Gensym->reset_counter;
+    
     my $doc = Aozora2Epub->new($block->html, no_fetch_assets=>1);
     my $got = [ map { $_->as_html } @{$doc->files} ];
     is_deeply($got,
@@ -32,35 +35,44 @@ run {
 
 __DATA__
 
+=== beginning br
+--- html
+<br/><br />あいうえお
+--- expected
+- あいうえお
+--- note
+本の先頭の<br/>の連続は削除される。
+
 === o-midashi
 --- html
-<br/>
+あ<br/>
 <h3 class="o-midashi">
   <a class="midashi_anchor" id="midashi001">見出し</a>
 </h3>
 あいう
 --- expected
-- <h3 class="o-midashi" id="midashi001">見出し</h3> あいう
+- あ
+- <br /><h3 class="o-midashi" id="midashi001">見出し</h3> あいう
 
 === naka-midashi
 --- html
-<br/>
+あ<br/>
 <h4 class="naka-midashi">
   <a class="midashi_anchor" id="midashi001">見出し</a>
 </h4>
 あいう
 --- expected
-- <h4 class="naka-midashi" id="midashi001">見出し</h4> あいう
+- あ<br /><h4 class="naka-midashi" id="midashi001">見出し</h4> あいう
 
 === ko-midashi
 --- html
-<br/>
+あ<br/>
 <h5 class="ko-midashi">
   <a class="midashi_anchor" id="midashi001">見出し</a>
 </h5>
 あいう
 --- expected
-- <h5 class="ko-midashi" id="midashi001">見出し</h5> あいう
+- あ<br /><h5 class="ko-midashi" id="midashi001">見出し</h5> あいう
 --- note
 小見出しは別のxhmlにファイル分割しない
 
@@ -78,13 +90,38 @@ __DATA__
 
 === h1 h2 h3
 --- html
-<h1>header1</h1><h2>header1-1</h2><h3>header1-1-1</h3>aaa<h2>header1-2</h2><h3>header1-2-1</h3>bbb
+<h1 id="h1">header1</h1>
+<h2 id="h11">header1-1</h2>
+<h3 id="h111">header1-1-1</h3>aaa<br />
+<h2 id="h12">header1-2</h2>
+<h3 id="h121">header1-2-1</h3>bbb<br />
 --- expected
-- <h1 id="g000000004">header1</h1><h2 id="g000000005">header1-1</h2><h3 id="g000000007">header1-1-1</h3>aaa
-- <h2 id="g000000006">header1-2</h2><h3 id="g000000008">header1-2-1</h3>bbb
+- |
+  <h1 id="h1">header1</h1>
+  <h2 id="h11">header1-1</h2>
+  <h3 id="h111">header1-1-1</h3>aaa
+- |
+  <br /><h2 id="h12">header1-2</h2>
+  <h3 id="h121">header1-2-1</h3>bbb<br />
 --- note
 連続する<h[123]では一度しかファイル分割しない
 
+=== dokuritu tobira
+--- html
+あ
+<span class="notes">［＃改丁］</span><br />
+<span class="notes">［＃ページの左右中央］</span><br />
+<br />
+<br />
+<div class="jisage_7" style="margin-left: 7em"><h3 class="o-midashi"><a class="midashi_anchor" id="midashi260">昭和十八年</a></h3></div>
+<br />
+<br />
+<span class="notes">［＃改丁］</span><br />
+<br />いうえ
+--- expected
+- 'あ '
+- '<br /><br /><br /><br /><h3 class="o-midashi" id="midashi260" style="text-indent: 7em">昭和十八年</h3><br /><br />'
+- <br /><br />いうえ
 
 === jisage
 --- html

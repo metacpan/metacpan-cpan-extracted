@@ -6,7 +6,7 @@ use POSIX qw(strftime);
 use UNIVERSAL;
 use Linux::Info::Compilation;
 
-our $VERSION = '2.16'; # VERSION
+our $VERSION = '2.17'; # VERSION
 
 # ABSTRACT: API in Perl to recover information about the running Linux OS
 
@@ -159,7 +159,7 @@ Linux::Info - API in Perl to recover information about the running Linux OS
 
 =head1 VERSION
 
-version 2.16
+version 2.17
 
 =head1 SYNOPSIS
 
@@ -364,22 +364,60 @@ Every time you call the script the initial statistics are loaded/stored from/to 
 This could be helpful if you doesn't run it as daemon and if you want to calculate the
 average load of your system since the last call.
 
-To get more information about the statistics refer the different modules of the distribution.
+To get more information about the statistics refer the different modules of the
+distributions below:
 
-    cpustats    -  Collect cpu statistics                  with Linux::Info::CpuStats.
-    procstats   -  Collect process statistics              with Linux::Info::ProcStats.
-    memstats    -  Collect memory statistics               with Linux::Info::MemStats.
-    pgswstats   -  Collect paging and swapping statistics  with Linux::Info::PgSwStats.
-    netstats    -  Collect net statistics                  with Linux::Info::NetStats.
-    sockstats   -  Collect socket statistics               with Linux::Info::SockStats.
-    diskstats   -  Collect disk statistics                 with Linux::Info::DiskStats.
-    diskusage   -  Collect the disk usage                  with Linux::Info::DiskUsage.
-    loadavg     -  Collect the load average                with Linux::Info::LoadAVG.
-    filestats   -  Collect inode statistics                with Linux::Info::FileStats.
-    processes   -  Collect process statistics              with Linux::Info::Processes.
+=over
 
-The options just described don't apply to L<Linux::Info::SysInfo> since this module doesn't hold statistics from the OS.
-If you try to use it C<Linux::Info> will C<die> with an error message. In order to use L<Linux::Info::SysInfo>, just
+=item *
+
+Collect CPU load statistics using L<Linux::Info::CpuStats>
+
+=item *
+
+Collect process statistics using L<Linux::Info::ProcStats>
+
+=item *
+
+Collect memory statistics using L<Linux::Info::MemStats>
+
+=item *
+
+Collect paging and swapping statistics using L<Linux::Info::PgSwStats>
+
+=item *
+
+Collect net statistics using L<Linux::Info::NetStats>
+
+=item *
+
+Collect socket statistics using L<Linux::Info::SockStats>
+
+=item *
+
+Collect disk statistics using L<Linux::Info::DiskStats>
+
+=item *
+
+Collect the disk usage using L<Linux::Info::DiskUsage>
+
+=item *
+
+Collect the load average using L<Linux::Info::LoadAVG>
+
+=item *
+
+Collect inode statistics using L<Linux::Info::FileStats>
+
+=item *
+
+Collect process statistics using L<Linux::Info::Processes>
+
+=back
+
+The options just described don't apply to L<Linux::Info::SysInfo> since this
+module doesn't hold statistics from the OS, if you try to use it C<Linux::Info>
+will C<die> with an error message. In order to use L<Linux::Info::SysInfo>, just
 create an instance of it directly. See L<Linux::Info::SysInfo> for information on that.
 
 =head1 METHODS
@@ -448,9 +486,7 @@ Or you can pass the time to sleep with the call of C<get()>.
 Now the statistcs are available with
 
     $stat->cpustats
-
     # or
-
     $stat->{cpustats}
 
 Take a look to the documentation of L<Linux::Info::Compilation> for more information.
@@ -591,7 +627,7 @@ Nothing.
 
 =item *
 
-The L<Sys::Statistics::Linux> distribution, which is base of Linux::Info
+The L<Sys::Statistics::Linux> distribution, which is the base of C<Linux::Info>.
 
 =item *
 

@@ -8,6 +8,6 @@ exclude  = RegularExpressions::RequireExtendedFormatting ProhibitCascadingIfElse
 max_arguments = 6
 
 [Modules::RequireExplicitPackage]
-# We have to use strict and warnings before the package statement because of the
+# We have to use warnings before the package statement because of the
 # interaction with the PkgVersion dzil plugin.
 allow_import_of = strict warnings

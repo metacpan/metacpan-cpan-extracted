@@ -51,7 +51,7 @@ my @module_files = (
     'SpeL/Object/Unop.pm',
     'SpeL/Object/Variable.pm',
     'SpeL/Object/VerbatimEnvironment.pm',
-    'SpeL/Parser/Aux.pm',
+    'SpeL/Parser/Auxiliary.pm',
     'SpeL/Parser/Chunk.pm',
     'SpeL/Wizard.pm'
 );

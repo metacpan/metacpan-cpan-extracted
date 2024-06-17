@@ -568,6 +568,14 @@ To manage paged results, selected calls support the following options:
 
 =over 4
 
+=item * C<all> =E<gt> BOOLEAN (default false)
+
+Return all results at once.  This may involve multiple calls, like
+when the page size is larger than what the server wants to produce
+in one go.
+
+Do not use this when you expect many or large results.
+
 =item * C<_page> =E<gt> INTEGER (default 1)
 
 Start-point of returned results, for calls which support paging.
@@ -596,6 +604,19 @@ reaches C<_page_size>.
 
 If you accidentally know the bookmark for the search.  Usually, this is
 automatically picked-up via C<_succeed>.
+
+=item * C<_map> =E<gt> CODE
+
+Call the CODE on each of the (defined) harvested page elements.  The CODE
+is called with the result object, and one of the harvested elements.  When
+a single page requires multiple requests to the CouchDB server, this map
+will happen on the moment each response has been received, which may help
+to create a better interactive experience.
+
+Your CODE may return the harvested object, but also something small
+(even undef) which will free-up the memory use of the object immediately.
+However: at least return a single scalar (it will be returned in the
+"page"), because an empty list signals "end of results".
 
 =item * C<skip> =E<gt> INTEGER
 
@@ -637,7 +658,7 @@ when you have a specific harvester, than you need to resupply it.
   my $page2 = $couch->find(\%search, _succeed => $prev);
   my $docs2 = $page2->page;
 
-B<. Example: get all results>
+B<. Example: get all results in a loop>
 
 Handle the responses which are coming in one by one.  This is useful
 when the documents (with attachements?) are large.
@@ -665,10 +686,27 @@ pages already seen.
   my $page5 = $couch->find(\%search, _succeed => $page4);
   my $docs5 = $page5->page;
 
+B<. Example: get all results in one call>
+
+Do not attempt this unless you know there there is a limited number of
+results, maybe just a bit more than a page.
+
+  my $all   = $couch->find(\%search, _all => 1) or die;
+  my $docs6 = $all->page;
+
+B<. Example: processing results when they arrive>
+
+When a page (may) require multiple calls to the server, this may enhance
+the user experience.
+
+  sub do_something($$) { my ($result, $doc) = @_; ...; 42 }
+  my $all = $couch->find(\%search, _all => 1, _map => \&do_something);
+  # $all->page will no show elements containing '42'.
+
 =head1 SEE ALSO
 
-This module is part of Couch-DB distribution version 0.003,
-built on June 08, 2024. Website: F<http://perl.overmeer.net/CPAN/>
+This module is part of Couch-DB distribution version 0.004,
+built on June 17, 2024. Website: F<http://perl.overmeer.net/CPAN/>
 
 =head1 LICENSE
 

@@ -2,8 +2,8 @@ use warnings;
 
 package Git::Hooks;
 # ABSTRACT: Framework for implementing Git (and Gerrit) hooks
-$Git::Hooks::VERSION = '3.6.0';
-use v5.16.0;
+$Git::Hooks::VERSION = '4.0.0';
+use v5.30.0;
 use utf8;
 use Carp;
 use Exporter qw/import/;
@@ -39,7 +39,7 @@ BEGIN {                         ## no critic (RequireArgUnpacking)
         $hook =~ tr/A-Z_/a-z-/;
         no strict 'refs';       ## no critic (ProhibitNoStrict)
         *{"Git::Hooks::$directive"} = sub (&) {
-            push @{$Hooks{$hook}}, {
+            push $Hooks{$hook}->@*, {
                 package => scalar(caller),
                 sub     => shift(@_),
             };
@@ -79,7 +79,7 @@ sub GITHOOKS_CHECK_AFFECTED_REFS (&;$) {
     };
 
     foreach my $name (qw/commit-received pre-receive ref-update submit update/) {
-        push @{$Hooks{$name}}, $hook;
+        push $Hooks{$name}->@*, $hook;
     }
 
     return;
@@ -114,7 +114,7 @@ sub GITHOOKS_CHECK_PRE_COMMIT (&;$) {
     };
 
     foreach my $name (qw/pre-applypatch pre-commit/) {
-        push @{$Hooks{$name}}, $hook;
+        push $Hooks{$name}->@*, $hook;
     }
 
     return;
@@ -157,7 +157,7 @@ sub GITHOOKS_CHECK_PATCHSET (&;$) {
     };
 
     foreach my $name (qw/draft-published patchset-created/) {
-        push @{$Hooks{$name}}, $hook;
+        push $Hooks{$name}->@*, $hook;
     }
 
     return;
@@ -202,7 +202,7 @@ EOS
     };
 
     foreach my $name (qw/applypatch-msg commit-msg/) {
-        push @{$Hooks{$name}}, $hook;
+        push $Hooks{$name}->@*, $hook;
     }
 
     return;
@@ -234,7 +234,7 @@ sub run_hook {
     $git->load_plugins();
 
     # Call every hook function installed by the hook scripts before.
-    for my $hook (@{$Hooks{$hook_basename}}) {
+    for my $hook ($Hooks{$hook_basename}->@*) {
         my $ok = eval { $hook->{sub}->($git, @args) };
         if (defined $ok) {
             # Modern hooks return a boolean value indicating their success.
@@ -294,7 +294,7 @@ Git::Hooks - Framework for implementing Git (and Gerrit) hooks
 
 =head1 VERSION
 
-version 3.6.0
+version 4.0.0
 
 =head1 SYNOPSIS
 
@@ -322,7 +322,7 @@ options. (More on this later.)
 
         #!/usr/bin/env perl
 
-        use v5.16.0;
+        use v5.30.0;
         use warnings;
         use Git::Hooks;
 
@@ -1291,46 +1291,6 @@ is useful if you want to enable a plugin globally and only disable it for some
 repositories. You can even re-enable it later, if you want, by mentioning it
 again without the prefix.
 
-=head2 [DEPRECATED after v3.3.0] disable PLUGIN...
-
-B<This option is deprecated.> Please, use the C<githooks.plugin> option with an
-exclamation point before the plugin name to disable it. This option has higher
-priority than the C<githooks.plugin> option and don't allow for re-enabling a
-disabled plugin later.
-
-This option disables plugins enabled by the C<githooks.plugin>
-option. It's useful if you want to enable a plugin globally and only
-disable it for some repositories. For example:
-
-    # In ~/.gitconfig:
-    [githooks]
-      plugin = CheckJira
-
-    # In .git/config:
-    [githooks]
-      disable = CheckJira
-
-You may also temporarily disable a plugin by assigning to "0" an
-environment variable with its name. This is useful sometimes, when you
-are denied some perfectly fine commit by one of the check plugins. For
-example, suppose you got an error from the CheckLog plugin because you
-used an uncommon word that is not in the system's dictionary yet. If
-you don't intend to use the word again you can bypass all CheckLog
-checks this way:
-
-    $ CheckLog=0 git commit
-
-This works for every hook. For plugins specified by fully qualified
-module names, the environment variable name has to match the last part
-of it. For example, to disable the C<My::Hook::CheckSomething> plugin
-you must define an environment variable called C<CheckSomething>.
-
-Note, however, that this works for local hooks only. Remote hooks
-(like B<update> or B<pre-receive>) are run on the server. You can set
-up the server so that it defines the appropriate variable, but this
-isn't so useful as for the local hooks, as it's intended for
-once-in-a-while events.
-
 =head2 plugins DIR
 
 This option specify a list of directories where plugins are looked for
@@ -1701,25 +1661,19 @@ The indented lines providing details for error messages. (Default value is empty
 
 =head1 GIT AND PERL VERSION COMPATIBILITY POLICY
 
-Currently L<Git::Hooks> require Perl 5.16 and Git 1.8.3.
+Currently L<Git::Hooks> require Perl 5.30 and Git 2.25.1.
 
 We try to be compatible with the Git and Perl native packages of the oldest
-L<Ubuntu LTS|https://www.ubuntu.com/info/release-end-of-life> and
-L<CentOS|https://wiki.centos.org/About/Product> Linux distributions still
-getting maintenance updates.
+L<Ubuntu LTS|https://www.ubuntu.com/info/release-end-of-life> Linux distribution
+still getting maintenance updates.
 
   +-------------+-----------------------+------+--------+
   | End of Life | Distro                | Perl |   Git  |
   +-------------+-----------------------+------+--------+
-  |   2023-04   | Ubuntu 18.04 (bionic) | 5.26 | 2.15.1 |
-  |   2024-07   | CentOS 7              | 5.16 |  1.8.3 |
   |   2025-04   | Ubuntu 20.04 (focal ) | 5.30 | 2.25.1 |
   |   2027-04   | Ubuntu 22.04 (jammy)  | 5.34 | 2.34.1 |
-  |   2029-05   | CentOS 8              | 5.26 | 2.18.4 |
+  |   2029-04   | Ubuntu 24.04 (noble)  | 5.38 | 2.43.0 |
   +-------------+-----------------------+------+--------+
-
-As you can see, we're kept behind mostly by the slow pace of CentOS (actually,
-RHEL) releases.
 
 There are a few features of Git::Hooks which require newer Gits. If they're used
 with older Gits an appropriate error message tells the user to upgrade Git or to
@@ -1753,7 +1707,7 @@ Gustavo L. de M. Chaves <gnustavo@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2023 by CPQD <www.cpqd.com.br>.
+This software is copyright (c) 2024 by CPQD <www.cpqd.com.br>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

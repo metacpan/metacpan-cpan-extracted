@@ -1,4 +1,63 @@
-liblinux-info-perl (2.16) trusty; urgency=low
+liblinux-info-perl (2.17) trusty; urgency=low
+  * Added support to ARM and AMD processors (#25)
+  * refactor: reused compiled regex
+  * refactor: better message
+  * doc: better format
+  * refactor: testing multiple samples
+  * fix: additional new line
+  * chore: version bump
+  * fix: simulated error
+  * chore: new classes skeleton
+  * chore: added required info
+  * refactor: better naming
+  * chore: finished implementation (untested)
+  * refactor: not needed
+  * chore: incomplete
+  * feat: vendor information
+  * feat: ARM support
+  * feat: Intel support
+  * feat: more attributes for Intel
+  * fix: Intel bugs
+  * refactor: parsing lists
+  - Bugs are specific to Intel CPU - sorting flags in order to have
+    consistent results
+  * refactor: interface changes to support CPU class
+  * feat: S390 support
+  * doc: added missing Pod
+  * fix: capturing GHA cpuinfo
+  * chore: standard naming
+  * feat: AMD support 
+
+ -- Alceu Rodrigues de Freitas Junior <glasswalk3r@yahoo.com.br>  Sun, 16 Jun 2024 23:11:17 +0000
+
+liblinux-info-perl () trusty; urgency=low
+  * feat: AMD support 
+  * chore: standard naming 
+  * fix: capturing GHA cpuinfo 
+  * doc: added missing Pod 
+  * feat: S390 support 
+  * refactor: interface changes to support CPU class 
+  * refactor: parsing lists
+  - Bugs are specific to Intel CPU - sorting flags in order to have
+    consistent results 
+  * fix: Intel bugs 
+  * feat: more attributes for Intel 
+  * feat: Intel support 
+  * feat: ARM support 
+  * feat: vendor information 
+  * chore: incomplete 
+  * refactor: not needed 
+  * chore: finished implementation (untested) 
+  * refactor: better naming 
+  * chore: added required info 
+  * chore: new classes skeleton 
+  * fix: simulated error 
+  * chore: version bump 
+  * fix: additional new line 
+  * refactor: testing multiple samples 
+  * doc: better format 
+  * refactor: better message 
+  * refactor: reused compiled regex 
   * Bugfix/distro factory (#24)
   * chore: version bump
   * feat: Finder handles os-release anywhere
@@ -11,7 +70,7 @@ liblinux-info-perl (2.16) trusty; urgency=low
   * fix: GHA testing requirements
   * chore: deprecated 
 
- -- Alceu Rodrigues de Freitas Junior <glasswalk3r@yahoo.com.br>  Fri, 31 May 2024 00:53:40 +0000
+ -- Alceu Rodrigues de Freitas Junior <glasswalk3r@yahoo.com.br>  Sun, 16 Jun 2024 23:02:14 +0000
 
 liblinux-info-perl () trusty; urgency=low
   * chore: deprecated 

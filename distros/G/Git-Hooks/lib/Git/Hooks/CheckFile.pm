@@ -2,8 +2,8 @@ use warnings;
 
 package Git::Hooks::CheckFile;
 # ABSTRACT: Git::Hooks plugin for checking files
-$Git::Hooks::CheckFile::VERSION = '3.6.0';
-use v5.16.0;
+$Git::Hooks::CheckFile::VERSION = '4.0.0';
+use v5.30.0;
 use utf8;
 use Carp;
 use Log::Any '$log';
@@ -134,7 +134,7 @@ sub check_sizes {
     my %re_checks;
     foreach ($git->get_config("$CFG.basename" => 'sizelimit')) {
         my ($bytes, $regexp) = split ' ', $_, 2;
-        unshift @{$re_checks{basename}{sizelimit}}, [qr/$regexp/, $bytes];
+        unshift $re_checks{basename}{sizelimit}->@*, [qr/$regexp/, $bytes];
     }
 
     return 0 unless $sizelimit || %re_checks;
@@ -147,7 +147,7 @@ sub check_sizes {
         my $size = $git->file_size($commit, $file);
 
         my $file_sizelimit = $sizelimit;
-        foreach my $spec (@{$re_checks{basename}{sizelimit}}) {
+        foreach my $spec ($re_checks{basename}{sizelimit}->@*) {
             if ($basename =~ $spec->[0]) {
                 $file_sizelimit = $spec->[1];
                 last;
@@ -180,7 +180,7 @@ sub check_executables {
             } else {
                 $pattern = glob_to_regex($pattern);
             }
-            push @{$executable_checks{$check}}, $pattern;
+            push $executable_checks{$check}->@*, $pattern;
         }
     }
 
@@ -194,7 +194,7 @@ sub check_executables {
 
         my $mode;
 
-        if (any {$basename =~ $_} @{$executable_checks{'executable'}}) {
+        if (any {$basename =~ $_} $executable_checks{'executable'}->@*) {
             $mode = $git->file_mode($commit, $file);
             unless ($mode & 0b1) {
                 $git->fault(<<"EOS", {%$ctx, option => 'executable'});
@@ -205,7 +205,7 @@ EOS
             }
         }
 
-        if (any {$basename =~ $_} @{$executable_checks{'not-executable'}}) {
+        if (any {$basename =~ $_} $executable_checks{'not-executable'}->@*) {
             if (defined $mode) {
                 git->fault(<<"EOS", {%$ctx, option => '[not-]executable'});
 Configuration error: The file '$file' matches a 'executable' and a
@@ -367,31 +367,6 @@ EOS
     return @bigs;
 }
 
-sub deny_token {
-    my ($git, $ctx, $commit) = @_;
-
-    my $regex = $git->get_config($CFG => 'deny-token')
-        or return 0;
-
-    # Extract only the lines showing addition of the $regex
-    my @diff = grep {/^\+.*?(?:$regex)/}
-        ($commit ne ':0'
-         ? $git->run(qw/diff-tree  -p --diff-filter=AM --ignore-submodules/,
-                     "-G$regex", $commit)
-         : $git->run(qw/diff-index --cached -p --diff-filter=AM --ignore-submodules/,
-                     "-G$regex", $git->get_head_or_empty_tree));
-
-    if (@diff) {
-        $git->fault(<<"EOS", {%$ctx, option => 'deny-token', details => join("\n", @diff)});
-Invalid tokens detected in added lines.
-This option rejects lines matching $regex.
-Please, amend these lines and try again.
-EOS
-    }
-
-    return scalar @diff;
-}
-
 # Assign meaningful names to action codes.
 my %ACTION = (
     A => 'add',
@@ -428,7 +403,7 @@ sub check_acls {
 
             unless ($acl->{allow}) {
                 my $action = $ACTION{$statuses} || $statuses;
-                push @{$acl_errors{$acl->{acl}}{$action}}, $file;
+                push $acl_errors{$acl->{acl}}{$action}->@*, $file;
             }
 
             next FILE;
@@ -511,9 +486,7 @@ sub check_everything {
     my %context = (ref => $ref);
     $context{commit} = $commit unless $commit eq ':0';
 
-    my $errors =
-        check_acls($git, \%context, \%name2status) +
-        deny_token($git, \%context, $commit);
+    my $errors = check_acls($git, \%context, \%name2status);
 
     if (my @AC_files = sort grep {$name2status{$_} =~ /[AC]/} keys %name2status) {
         $errors +=
@@ -595,7 +568,7 @@ Git::Hooks::CheckFile - Git::Hooks plugin for checking files
 
 =head1 VERSION
 
-version 3.6.0
+version 4.0.0
 
 =head1 SYNOPSIS
 
@@ -689,7 +662,7 @@ option:
     [githooks]
       plugin = CheckFile
 
-=for Pod::Coverage check_command check_commands check_sizes check_executables check_max_paths deny_case_conflicts check_locks deny_token check_acls check_everything check_ref check_commit check_patchset
+=for Pod::Coverage check_command check_commands check_sizes check_executables check_max_paths deny_case_conflicts check_locks check_acls check_everything check_ref check_commit check_patchset
 
 =head1 NAME
 
@@ -938,28 +911,13 @@ potentially many files (e.g. F<^lib/.*\\.pm$>).
 
 See the L</SYNOPSIS> section for some examples.
 
-=head2 [DEPRECATED after v2.13.0] deny-token REGEXP
-
-This option is deprecated. Please, use the C<CheckDiff::deny-token> option
-instead.
-
-This directive rejects commits or pushes which diff (patch) matches REGEXP. This
-is a multi-valued directive, i.e., you can specify it multiple times to check
-several REGEXes.
-
-It is useful to detect marks left by developers in the code while developing,
-such as FIXME or TODO. These marks are usually a reminder to fix things before
-commit, but as it so often happens, they end up being forgotten.
-
-Note that this option requires Git 1.7.4 or newer.
-
 =head1 AUTHOR
 
 Gustavo L. de M. Chaves <gnustavo@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2023 by CPQD <www.cpqd.com.br>.
+This software is copyright (c) 2024 by CPQD <www.cpqd.com.br>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

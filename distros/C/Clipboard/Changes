@@ -1,3 +1,10 @@
+0.30    2024-06-16
+
+    - Add Wayland detection and support
+        - https://github.com/shlomif/Clipboard/issues/13
+        - https://github.com/shlomif/Clipboard/pull/14
+        - Thanks to @hightowe
+
 0.29    2024-04-07
 
     - Add Xsel.pm / xsel support.

@@ -2,8 +2,8 @@ use warnings;
 
 package Git::Hooks::CheckCommit;
 # ABSTRACT: Git::Hooks plugin to enforce commit policies
-$Git::Hooks::CheckCommit::VERSION = '3.6.0';
-use v5.16.0;
+$Git::Hooks::CheckCommit::VERSION = '4.0.0';
+use v5.30.0;
 use utf8;
 use Carp;
 use Log::Any '$log';
@@ -59,19 +59,19 @@ sub match_errors {
         foreach my $info (qw/name email/) {
             foreach my $regexp ($git->get_config($CFG => $info)) {
                 $regexp =~ s/^(\!?)//;
-                push @{$cache->{identity}{$info}{$1}}, qr/$regexp/; ## no critic (ProhibitCaptureWithoutTest)
+                push $cache->{identity}{$info}{$1}->@*, qr/$regexp/; ## no critic (ProhibitCaptureWithoutTest)
             }
         }
     }
 
-    if (keys %{$cache->{identity}}) {
+    if (keys $cache->{identity}->%*) {
         foreach my $info (qw/name email/) {
             if (my $checks = $cache->{identity}{$info}) {
                 foreach my $who (qw/author committer/) {
                     my $who_info = "${who}_${info}";
                     my $data     = $commit->$who_info;
 
-                    if (none { $data =~ $_ } @{$checks->{''}}) {
+                    if (none { $data =~ $_ } $checks->{''}->@*) {
                         $git->fault(<<"EOS", {commit => $commit, option => $info});
 The commit $who $info ($data) is invalid.
 It must match at least one positive option.
@@ -80,7 +80,7 @@ EOS
                         ++$errors;
                     }
 
-                    if (any { $data =~ $_ } @{$checks->{'!'}}) {
+                    if (any { $data =~ $_ } $checks->{'!'}->@*) {
                         $git->fault(<<"EOS", {commit => $commit, option => $info});
 The commit $who $info ($data) is invalid.
 It matches some negative option.
@@ -289,7 +289,7 @@ sub code_errors {
                 }
             }
             if (defined $code && ref $code && ref $code eq 'CODE') {
-                push @{$cache->{codes}}, $code;
+                push $cache->{codes}->@*, $code;
             } else {
                 $git->fault("The option value must end with a code ref.",
                             {commit => $commit, option => 'check-code'});
@@ -298,7 +298,7 @@ sub code_errors {
         }
     }
 
-    foreach my $code (@{$cache->{codes}}) {
+    foreach my $code ($cache->{codes}->@*) {
         my $ok = eval { $code->($git, $commit, $ref) };
         if (defined $ok) {
             unless ($ok) {
@@ -430,7 +430,7 @@ Git::Hooks::CheckCommit - Git::Hooks plugin to enforce commit policies
 
 =head1 VERSION
 
-version 3.6.0
+version 4.0.0
 
 =head1 SYNOPSIS
 
@@ -744,7 +744,7 @@ Gustavo L. de M. Chaves <gnustavo@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2023 by CPQD <www.cpqd.com.br>.
+This software is copyright (c) 2024 by CPQD <www.cpqd.com.br>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

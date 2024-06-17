@@ -11,7 +11,7 @@ WriteMakefile(
 	      AUTHOR       => 'Bryan Jurish',
 	      LICENSE      => 'perl',
 	      PREREQ_PM => {
-			    PDL => 2.019, # really want 2.075 for $SIZE(N) access in RedoDimsCode for utils.pd
+			    PDL => 2.025, # really want 2.075 for $SIZE(N) access in RedoDimsCode for utils.pd
 			    'Test::More' => 0,
 			   },
 	      CONFIGURE_REQUIRES => {

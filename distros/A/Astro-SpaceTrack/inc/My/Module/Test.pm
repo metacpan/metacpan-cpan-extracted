@@ -13,7 +13,7 @@ use HTTP::Date;
 use HTTP::Status qw{ :constants };
 use Test::More 0.96;	# For subtest
 
-our $VERSION = '0.165';
+our $VERSION = '0.166';
 
 # Set the following to zero if Space Track (or any other SSL host)
 # starts using a certificate that can not be verified.
@@ -222,6 +222,10 @@ sub not_defined {
     sub __site_to_check_uri {
 	my ( $site ) = @_;
 	return $info{$site}{url};
+    }
+
+    sub __site_codes {
+	return sort keys %info;
     }
 
     my $ua;

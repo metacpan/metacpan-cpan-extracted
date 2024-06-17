@@ -1,5 +1,8 @@
 Revision history for Dist::Zilla::Plugin::Git
 
+2.051     2024-06-16 16:53:20Z
+  - skip some tests if git version is not new enough
+
 2.050     2024-06-15 00:02:39Z
   - [Git::Push] now only pushes annotated and reachable tags (such as a
     release tag just created by [Git::Tag]), rather than all tags

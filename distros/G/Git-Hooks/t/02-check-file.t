@@ -1,11 +1,11 @@
 #!/usr/bin/env perl
 
-use v5.16.0;
+use v5.30.0;
 use warnings;
 use lib qw/t lib/;
 use Git::Hooks::Test ':all';
 use Path::Tiny;
-use Test::More tests => 44;
+use Test::More tests => 42;
 use Test::Requires::Git;
 
 my ($repo, $clone, $T);
@@ -174,19 +174,6 @@ SKIP: {
     $repo->run(qw/config --remove-section githooks.checkfile/);
 }
 
-$repo->run(qw/config githooks.checkfile.deny-token FIXME/);
-
-check_cannot_commit('Deny commit if match FIXME',
-                    qr/Invalid tokens detected in added lines/,
-                    'file.txt',
-                    undef,
-                    "FIXME: something\n",
-                );
-
-$repo->run(qw/reset --hard/);
-
-$repo->run(qw/config --remove-section githooks.checkfile/);
-
 $repo->run(qw/config githooks.checkfile.executable *.sh/);
 
 $repo->run(qw/config githooks.checkfile.not-executable *.txt/);
@@ -313,16 +300,5 @@ SKIP: {
 
     $clone->run(qw/config --remove-section githooks.checkfile/);
 }
-
-$clone->run(qw/config githooks.checkfile.deny-token FIXME/);
-
-check_cannot_push('Deny push if match FIXME',
-                  qr/Invalid tokens detected in added lines/,
-                  'file.txt',
-                  undef,
-                  "FIXME: something\n",
-              );
-
-$clone->run(qw/config --remove-section githooks.checkfile/);
 
 1;

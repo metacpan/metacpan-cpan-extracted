@@ -15,15 +15,19 @@
 SV * win32_fmode(pTHX_  FILE *stream ) {
 
 #ifdef _WIN32
-/*
- * Win32 code supplied by BrowserUK
- * to work aroumd the MS C runtime library's
- * lack of a function to retrieve the file mode
- * used when a file is opened
-*/
-  return newSViv(stream->_flag);
+#  ifndef LIBC_IS_UCRT
+  /*
+   * Win32 code supplied by BrowserUK
+   * to work aroumd the MS C runtime library's
+   * lack of a function to retrieve the file mode
+   * used when a file is opened
+  */
+     return newSViv(stream->_flag);
+#  else
+    croak("win32_fmode function works only with MSVCRT");
+#  endif
 #else
-  croak("win32_fmode function works only with Win32");
+  croak("win32_fmode function works only with MS Windows");
 #endif
 }
 
@@ -85,6 +89,7 @@ SV * is_appendable(pTHX_ SV * handle) {
      croak("is_appendable function implemented only with perl 5.6.1 or later");
 #endif
 }
+
 
 MODULE = FileHandle::Fmode  PACKAGE = FileHandle::Fmode
 

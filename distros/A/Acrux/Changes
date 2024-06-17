@@ -1,5 +1,8 @@
 # Version/Revision history
 
+0.04 Fri 14 Jun 2024 19:25:44
+    * Added strf util function
+
 0.03 Sun 18 Feb 2024 07:50:05 MSK
     * Added new requiremets
     * Documentation modified

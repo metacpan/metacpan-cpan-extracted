@@ -59,11 +59,11 @@
    "provides" : {
       "App::AKG" : {
          "file" : "lib/App/AKG.pm",
-         "version" : "0.001"
+         "version" : "0.002"
       },
       "App::KemenkesUtils::RDA" : {
          "file" : "lib/App/KemenkesUtils/RDA.pm",
-         "version" : "0.001"
+         "version" : "0.002"
       }
    },
    "release_status" : "stable",
@@ -78,7 +78,7 @@
          "web" : "https://github.com/perlancar/perl-App-KemenkesUtils-RDA"
       }
    },
-   "version" : "0.001",
+   "version" : "0.002",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.038002"

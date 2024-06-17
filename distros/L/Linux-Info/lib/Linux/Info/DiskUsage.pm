@@ -6,7 +6,7 @@ use Set::Tiny 0.04;
 use Filesys::Df 0.92;
 use Hash::Util 'lock_keys';
 
-our $VERSION = '2.16'; # VERSION
+our $VERSION = '2.17'; # VERSION
 
 # ABSTRACT: Collect linux disk usage.
 
@@ -126,7 +126,7 @@ Linux::Info::DiskUsage - Collect linux disk usage.
 
 =head1 VERSION
 
-version 2.16
+version 2.17
 
 =head1 SYNOPSIS
 

@@ -34,7 +34,7 @@ if ( $ENV{SPACETRACK_TEST_LIVE} ) {
 
 } else {
     require Mock::LWP::UserAgent;
-    Mock::LWP::UserAgent->import();
+    Mock::LWP::UserAgent->install_mock();
     note <<'EOD';
 Testing against canned data. Set environment variable
 SPACETRACK_TEST_LIVE to test against the actual Space Track web site,
@@ -351,65 +351,6 @@ SKIP: {
 
 	is $st->content_interface(), $desired_content_interface,
 	    "Content version is $desired_content_interface";
-    }
-
-    SKIP: {
-	my $number_skipped = 13;
-
-	my $skip;
-	$skip = site_check( 'celestrak.org' )
-	    and skip $skip, $number_skipped;
-
-	SKIP: {
-	    is_success_or_skip( $st, celestrak => 'stations',
-		'Fetch Celestrak stations', 3 );
-
-	    is $st->content_type(), 'orbit', "Content type is 'orbit'";
-
-	    is $st->content_source(), 'spacetrack',
-		"Content source is 'spacetrack'";
-
-	    is $st->content_interface(), $desired_content_interface,
-		"Content version is $desired_content_interface";
-	}
-
-	$st->set( fallback => 1 );
-
-	SKIP: {
-
-	    is_success_or_skip( $st, celestrak => 'stations',
-		'Fetch Celestrak stations with fallback', 3 );
-
-	    is $st->content_type(), 'orbit', "Content type is 'orbit'";
-
-	    is $st->content_source(), 'spacetrack',
-		"Content source is 'spacetrack'";
-
-	    is $st->content_interface(), $desired_content_interface,
-		"Content version is $desired_content_interface";
-	}
-
-	$st->set( username => undef, password => undef );
-
-	SKIP: {
-
-	    is_success_or_skip( $st, celestrak => 'stations',
-		'Fetch Celestrak stations with fallback, without account', 3 );
-
-	    is $st->content_type(), 'orbit', "Content type is 'orbit'";
-
-	    is $st->content_source(), 'celestrak',
-		"Content source is 'celestrak'";
-
-	    not_defined( $st->content_interface(),
-		'Content version is not defined' );
-	}
-
-	$st->set( fallback => 0 );
-
-	is_not_success( $st, celestrak => 'stations',
-	    'Fetch Celestrak stations without fallback or account fails' );
-
     }
 
 }

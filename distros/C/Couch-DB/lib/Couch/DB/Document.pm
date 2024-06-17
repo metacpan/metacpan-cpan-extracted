@@ -7,7 +7,7 @@
 
 package Couch::DB::Document;
 use vars '$VERSION';
-$VERSION = '0.003';
+$VERSION = '0.004';
 
 use Couch::DB::Util;
 

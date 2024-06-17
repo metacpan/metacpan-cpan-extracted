@@ -20,33 +20,19 @@ sub capturex {
 	return $ret;
 }
 
-plan skip_all => 'No libperl' unless -e "$Config{archlibexp}/CORE/$Config{libperl}";
-
 my $planner = ExtUtils::Builder::Planner->new;
 $planner->load_module('ExtUtils::Builder::AutoDetect::C',
-	profile => '@Perl', type => 'executable',
+	type => 'executable',
 );
 
 my $source_file = catfile('t', 'executable.c');
 {
 	open my $fh, '>', $source_file or die "Can't create $source_file: $!";
 	my $content = <<END;
-#define PERL_NO_GET_CONTEXT
-#include "EXTERN.h"
-#include "perl.h"
-
-static PerlInterpreter* my_perl;
+#include <stdio.h>
 
 int main(int argc, char **argv, char **env) {
-	PERL_SYS_INIT3(&argc,&argv,&env);
-	my_perl = perl_alloc();
-	perl_construct(my_perl);
-	PL_exit_flags |= PERL_EXIT_DESTRUCT_END;
-	perl_parse(my_perl, NULL, argc, argv, env);
-	perl_run(my_perl);
-	perl_destruct(my_perl);
-	perl_free(my_perl);
-	PERL_SYS_TERM();
+	printf("Dubrovnik\\n");
 	return 0;
 }
 END
@@ -70,7 +56,7 @@ ok eval { $plan->run($exe_file, logger => \&note); 1 } or diag "Got exception: $
 ok(-e $object_file, "object file $object_file has been created");
 ok(-e $exe_file, "lib file $exe_file has been created");
 
-my $output = eval { capturex($exe_file, '-e', "print 'Dubrovnik\n'") };
+my $output = eval { capturex($exe_file) };
 is ($output, "Dubrovnik\n", 'Output is "Dubrovnik"') or diag("Error: $@");
 
 END {

@@ -4,7 +4,7 @@
       "Joelle Maslak <jmaslak@antelope.net>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.030, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.032, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -135,11 +135,11 @@
    "provides" : {
       "JCM::Boilerplate" : {
          "file" : "lib/JCM/Boilerplate.pm",
-         "version" : "2.231980"
+         "version" : "2.241690"
       },
       "JTM::Boilerplate" : {
          "file" : "lib/JTM/Boilerplate.pm",
-         "version" : "2.231980"
+         "version" : "2.241690"
       }
    },
    "release_status" : "stable",
@@ -153,12 +153,12 @@
          "web" : "https://github.com/jmaslak/JTM-Boilerplate"
       }
    },
-   "version" : "2.231980",
+   "version" : "2.241690",
    "x_contributor_covenant" : {
       "version" : 0.02
    },
-   "x_generated_by_perl" : "v5.38.0",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.37",
+   "x_generated_by_perl" : "v5.40.0",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.38",
    "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"
 }
 

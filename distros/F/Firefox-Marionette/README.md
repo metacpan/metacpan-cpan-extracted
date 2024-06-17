@@ -35,7 +35,7 @@ This is a client module to automate the Mozilla Firefox browser via the [Marione
 
 ## BCD\_PATH
 
-returns the local path used for storing the brower compability data for the [agent](#agent) method when the &lt;code>stealth&lt;/code> parameter is supplied to the [new](#new) method.  This database is built by the build-bcd-for-firefox binary.
+returns the local path used for storing the brower compability data for the [agent](#agent) method when the `stealth` parameter is supplied to the [new](#new) method.  This database is built by the [build-bcd-for-firefox](https://metacpan.org/pod/build-bcd-for-firefox) binary.
 
 # SUBROUTINES/METHODS
 
@@ -300,7 +300,7 @@ These parameters can be used to set a user agent string like so;
     # user agent is now equal to
     # Mozilla/5.0 (X11; Linux s390x; rv:109.0) Gecko/20100101 Firefox/115.0
 
-If the `stealth` parameter has supplied to the [new](#new) method, it will also attempt to delete/provide dummy implementations for number of [javascript attributes](https://github.com/mdn/browser-compat-data) to match the desired browser.  The following websites have been very useful in testing these ideas;
+If the `stealth` parameter has supplied to the [new](#new) method, it will also attempt to create known specific javascript functions to imitate the required browser.  If the database built by [build-bcd-for-firefox](https://metacpan.org/pod/build-bcd-for-firefox) is accessible, then it will also attempt to delete/provide dummy implementations for the corresponding [javascript attributes](https://github.com/mdn/browser-compat-data) for the desired browser.  The following websites have been very useful in testing these ideas;
 
 - [https://browserleaks.com/javascript](https://browserleaks.com/javascript)
 - [https://www.amiunique.org/fingerprint](https://www.amiunique.org/fingerprint)
@@ -1116,7 +1116,9 @@ NOTE: firefox will only allow [Geolocation](https://developer.mozilla.org/en-US/
 
     warn "Apparently, we're now at " . Firefox::Marionette->new( proxy => 'https://this.is.another.location:3128', geo => 'https://freeipapi.com/api/json/' )->go('https://maps.google.com/')->geo();
 
-NOTE: currently this call sets the location to be exactly what is specified.  It doesn't change anything else relevant (yet, but it may in future), such as [languages](#languages) or the [timezone](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date/getTimezoneOffset).  This function should be considered experimental.  Feedback welcome.
+NOTE: currently this call sets the location to be exactly what is specified.  It will also attempt to modify the current timezone (if available in the [geo location](https://metacpan.org/pod/Firefox::Marionette::GeoLocation) parameter) to match the specified [timezone](https://metacpan.org/pod/Firefox::Marionette::GeoLocation#tz).  This function should be considered experimental.  Feedback welcome.
+
+If particular, the [ipgeolocation API](https://ipgeolocation.io/documentation/ip-geolocation-api.html) is the only API that currently providing geolocation data and matching timezone data in one API call.  If anyone finds/develops another similar API, I would be delighted to include support for it in this module.
 
 ## go
 
@@ -1624,7 +1626,13 @@ accepts an optional hash as a parameter.  Allowed keys are below;
 - port - if the "host" parameter is also set, use [ssh](https://man.openbsd.org/ssh.1) to create and automate firefox via the specified port.  See [REMOTE AUTOMATION OF FIREFOX VIA SSH](#remote-automation-of-firefox-via-ssh) and [NETWORK ARCHITECTURE](#network-architecture).
 - page\_load - a shortcut to allow directly providing the [page\_load](https://metacpan.org/pod/Firefox::Marionette::Timeouts#page_load) timeout, instead of needing to use timeouts from the capabilities parameter.  Overrides all longer ways.
 - profile - create a new profile based on the supplied [profile](https://metacpan.org/pod/Firefox::Marionette::Profile).  NOTE: firefox ignores any changes made to the profile on the disk while it is running, instead, use the [set\_pref](#set_pref) and [clear\_pref](#clear_pref) methods to make changes while firefox is running.
-- profile\_name - pick a specific existing profile to automate, rather than creating a new profile.  [Firefox](https://firefox.com) refuses to allow more than one instance of a profile to run at the same time.  Profile names can be obtained by using the [Firefox::Marionette::Profile::names()](https://metacpan.org/pod/Firefox::Marionette::Profile#names) method.  NOTE: firefox ignores any changes made to the profile on the disk while it is running, instead, use the [set\_pref](#set_pref) and [clear\_pref](#clear_pref) methods to make changes while firefox is running.
+- profile\_name - pick a specific existing profile to automate, rather than creating a new profile.  [Firefox](https://firefox.com) refuses to allow more than one instance of a profile to run at the same time.  Profile names can be obtained by using the [Firefox::Marionette::Profile::names()](https://metacpan.org/pod/Firefox::Marionette::Profile#names) method. The following conditions are required to use existing profiles;
+
+    - the preference `security.webauth.webauthn_enable_softtoken` must be set to `true` in the profile OR
+    - the `webauth` parameter to this method must be set to `0`
+
+    NOTE: firefox ignores any changes made to the profile on the disk while it is running, instead, use the [set\_pref](#set_pref) and [clear\_pref](#clear_pref) methods to make changes while firefox is running.
+
 - proxy - this is a shortcut method for setting a [proxy](https://metacpan.org/pod/Firefox::Marionette::Proxy) using the [capabilities](https://metacpan.org/pod/Firefox::Marionette::Capabilities) parameter above.  It accepts a proxy URL, with the following allowable schemes, 'http' and 'https'.  It also allows a reference to a list of proxy URLs which will function as list of proxies that Firefox will try in [left to right order](https://developer.mozilla.org/en-US/docs/Web/HTTP/Proxy_servers_and_tunneling/Proxy_Auto-Configuration_PAC_file#description) until a working proxy is found.  See [REMOTE AUTOMATION OF FIREFOX VIA SSH](#remote-automation-of-firefox-via-ssh), [NETWORK ARCHITECTURE](#network-architecture) and [SETTING UP SOCKS SERVERS USING SSH](https://metacpan.org/pod/Firefox::Marionette::Proxy#SETTING-UP-SOCKS-SERVERS-USING-SSH).
 - reconnect - an experimental parameter to allow a reconnection to firefox that a connection has been discontinued.  See the survive parameter.
 - scp - force the scp protocol when transferring files to remote hosts via ssh. See [REMOTE AUTOMATION OF FIREFOX VIA SSH](#remote-automation-of-firefox-via-ssh) and the --scp-only option in the [ssh-auth-cmd-marionette](https://metacpan.org/pod/ssh-auth-cmd-marionette) script in this distribution.
@@ -2108,6 +2116,10 @@ accepts a [element](https://metacpan.org/pod/Firefox::Marionette::Element) as th
 
 returns the current [timeouts](https://metacpan.org/pod/Firefox::Marionette::Timeouts) for page loading, searching, and scripts.
 
+## tz
+
+accepts a [Olson TZ identifier](https://en.wikipedia.org/wiki/List_of_tz_database_time_zones#List) as the first parameter. This method returns [itself](https://metacpan.org/pod/Firefox::Marionette) to aid in chaining methods.
+
 ## title
 
 returns the current [title](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/title) of the window.
@@ -2388,7 +2400,7 @@ the combination of a variety of parameter names and the ability to pass paramete
 
 These sites were active at the time this documentation was written, but mainly function as an illustration of the flexibility of [geo](#geo) and [json](#json) methods in providing the desired location to the [Geolocation API](https://developer.mozilla.org/en-US/docs/Web/API/Geolocation_API).
 
-The [country\_code](https://metacpan.org/pod/Firefox::Marionette::GeoLocation#country_code) and [timezone\_offset](https://metacpan.org/pod/Firefox::Marionette::GeoLocation#timezone_offset) methods can be used to help set the [languages](#languages) method and possibly in the future change the timezone of the browser.
+As mentioned in the [geo](#geo) method documentation, the [ipgeolocation API](https://ipgeolocation.io/documentation/ip-geolocation-api.html) is the only API that currently providing geolocation data and matching timezone data in one API call.  If this url is used, the [tz](#tz) method will be automatically called to set the timezone to the matching timezone for the geographic location.
 
 # CONSOLE LOGGING
 
@@ -2495,6 +2507,7 @@ There are a collection of methods and techniques that may be useful if you would
 - the [agent](#agent) method, which if supplied a recognisable [User Agent](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/User-Agent), will attempt to change other attributes to match the desired browser.  This is extremely experimental and feedback is welcome.
 - the [geo](#geo) method, which allows the modification of the [Geolocation](https://developer.mozilla.org/en-US/docs/Web/API/Geolocation) reported by the browser, but not the location produced by mapping the external IP address used by the browser (see the [NETWORK ARCHITECTURE](#network-architecture) section for a discussion of different types of proxies that can be used to change your external IP address).
 - the [languages](#languages) method, which can change the [requested languages](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Accept-Language) for your browser session.
+- the [tz](#tz) method, which can change the [timezone](https://en.wikipedia.org/wiki/List_of_tz_database_time_zones#List) for your browser session.
 
 This list of methods may grow.
 

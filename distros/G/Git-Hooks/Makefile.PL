@@ -29,8 +29,8 @@ use ExtUtils::MakeMaker;
  # Check if we have a proper git
  chomp(my $git_version = git('version'));
  if (my ($major, $minor, $patch) = ($git_version =~ /(\d+)\.(\d+)\.(\d+)/)) {
-     if ($major < 1 || $major == 1 && ($minor < 8 || $minor == 8 && $patch < 3)) {
- 	warn "Don't support gits older than 1.8.3. Your version is $git_version.\n";
+     if ($major < 2 || $major == 2 && ($minor < 25 || $minor == 25 && $patch < 1)) {
+ 	warn "Don't support gits older than 2.25.1. Your version is $git_version.\n";
  	exit 0;
      }
  } else {
@@ -83,7 +83,7 @@ my %WriteMakefileArgs = (
     "Test::Requires::Git" => 0,
     "lib" => 0
   },
-  "VERSION" => "3.6.0",
+  "VERSION" => "4.0.0",
   "test" => {
     "TESTS" => "t/*.t"
   }

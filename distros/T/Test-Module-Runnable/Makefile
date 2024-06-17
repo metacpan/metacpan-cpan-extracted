@@ -58,11 +58,11 @@ DIRFILESEP = /
 DFSEP = $(DIRFILESEP)
 NAME = Test::Module::Runnable
 NAME_SYM = Test_Module_Runnable
-VERSION = 0.6.1
+VERSION = 0.6.2
 VERSION_MACRO = VERSION
-VERSION_SYM = 0_6_1
+VERSION_SYM = 0_6_2
 DEFINE_VERSION = -D$(VERSION_MACRO)=\"$(VERSION)\"
-XS_VERSION = 0.6.1
+XS_VERSION = 0.6.2
 XS_VERSION_MACRO = XS_VERSION
 XS_DEFINE_VERSION = -D$(XS_VERSION_MACRO)=\"$(XS_VERSION)\"
 INST_ARCHLIB = blib/arch
@@ -259,7 +259,7 @@ RCS_LABEL = rcs -Nv$(VERSION_SYM): -q
 DIST_CP = best
 DIST_DEFAULT = tardist
 DISTNAME = Test-Module-Runnable
-DISTVNAME = Test-Module-Runnable-0.6.1
+DISTVNAME = Test-Module-Runnable-0.6.2
 
 
 # --- MakeMaker macro section:
@@ -515,7 +515,7 @@ metafile : create_distdir
 	$(NOECHO) $(ECHO) '  Moose: '\''0'\''' >> META_new.yml
 	$(NOECHO) $(ECHO) '  Test::MockModule: '\''0'\''' >> META_new.yml
 	$(NOECHO) $(ECHO) '  Test::More: '\''0'\''' >> META_new.yml
-	$(NOECHO) $(ECHO) 'version: v0.6.1' >> META_new.yml
+	$(NOECHO) $(ECHO) 'version: v0.6.2' >> META_new.yml
 	$(NOECHO) $(ECHO) 'x_serialization_backend: '\''CPAN::Meta::YAML version 0.018'\''' >> META_new.yml
 	-$(NOECHO) $(MV) META_new.yml $(DISTVNAME)/META.yml
 	$(NOECHO) $(ECHO) Generating META.json
@@ -566,7 +566,7 @@ metafile : create_distdir
 	$(NOECHO) $(ECHO) '      }' >> META_new.json
 	$(NOECHO) $(ECHO) '   },' >> META_new.json
 	$(NOECHO) $(ECHO) '   "release_status" : "stable",' >> META_new.json
-	$(NOECHO) $(ECHO) '   "version" : "v0.6.1",' >> META_new.json
+	$(NOECHO) $(ECHO) '   "version" : "v0.6.2",' >> META_new.json
 	$(NOECHO) $(ECHO) '   "x_serialization_backend" : "JSON::PP version 4.07"' >> META_new.json
 	$(NOECHO) $(ECHO) '}' >> META_new.json
 	-$(NOECHO) $(MV) META_new.json $(DISTVNAME)/META.json
@@ -852,7 +852,7 @@ testdb_static :: static pure_all
 # --- MakeMaker ppd section:
 # Creates a PPD (Perl Package Description) for a binary distribution.
 ppd :
-	$(NOECHO) $(ECHO) '<SOFTPKG NAME="Test-Module-Runnable" VERSION="0.6.1">' > Test-Module-Runnable.ppd
+	$(NOECHO) $(ECHO) '<SOFTPKG NAME="Test-Module-Runnable" VERSION="0.6.2">' > Test-Module-Runnable.ppd
 	$(NOECHO) $(ECHO) '    <ABSTRACT>Base class for runnable unit tests using Moose introspection</ABSTRACT>' >> Test-Module-Runnable.ppd
 	$(NOECHO) $(ECHO) '    <AUTHOR>Duncan Ross Palmer, 2E0EOL (palmer@overchat.org)</AUTHOR>' >> Test-Module-Runnable.ppd
 	$(NOECHO) $(ECHO) '    <IMPLEMENTATION>' >> Test-Module-Runnable.ppd

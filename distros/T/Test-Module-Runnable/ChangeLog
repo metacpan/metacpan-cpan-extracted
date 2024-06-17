@@ -1,3 +1,7 @@
+0.6.2
+-----
+  * fecfbf1: Drop test for mocked method which doesn't exist
+
 0.6.1
 -----
   * dd447e5: Fixed bug where TEST_UNIQUE was ignored

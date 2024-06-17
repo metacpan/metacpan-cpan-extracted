@@ -11,6 +11,7 @@ use HTTP::Status qw{ HTTP_I_AM_A_TEAPOT };
 use lib 'inc';
 
 use Mock::LWP::UserAgent;
+Mock::LWP::UserAgent->install_mock();
 
 use constant DUMP_REQUEST => Astro::SpaceTrack->DUMP_REQUEST |
     Astro::SpaceTrack->DUMP_DRY_RUN;

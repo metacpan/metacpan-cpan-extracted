@@ -1,0 +1,39 @@
+$tex = bless( {
+  'path' => 't/01-lib/SpeL/Parser/Chunk',
+  'tree' => bless( {
+    'ElementList' => bless( {
+      'Element' => [
+        bless( {
+          '' => 'These are a few limitexpressions:
+'
+        }, 'SpeL::Object::TokenSequence' ),
+        bless( {
+          'MathUnit' => [
+            bless( {
+              '' => 'a
+',
+              'Left' => bless( {
+                'Component' => bless( {
+                  'Alphabet' => 'a',
+                  'trailingws' => '
+'
+                }, 'SpeL::Object::Variable' ),
+                'Rest' => bless( {
+                  'ws' => ''
+                }, 'SpeL::Object::Expressionrest' )
+              }, 'SpeL::Object::Expression' )
+            }, 'SpeL::Object::Relation' )
+          ],
+          'mathtag' => 'align',
+          'trailingws' => '
+  '
+        }, 'SpeL::Object::MathEnvironment' ),
+        bless( {
+          '' => '
+'
+        }, 'SpeL::Object::TokenSequence' )
+      ]
+    }, 'SpeL::Object::ElementList' )
+  }, 'SpeL::Object::Document' )
+}, 'SpeL::Parser::Chunk' );
+

@@ -4,7 +4,7 @@ require 5.026;
 
 use IO::Handle;
 
-my $VERSION = '0.003';
+my $VERSION = '0.004';
 
 my %prereq =  # also included in t/00use.t
   (	'DateTime'			=> 0

@@ -39,6 +39,8 @@ is_deeply $p1{paging}, +{
 	req_max   => 100,
 	skip      => 0,
 	start     => 0,
+	all       => 0,
+    map       => undef,
 }, '... defaults';
 
 my %p2 = $couch->_resultsPaging( +{
@@ -56,9 +58,11 @@ is_deeply $p2{paging}, +{
 	harvester => "MYCODE",
 	harvested => [],
 	page_size => 35,
-	req_max => 10,
-	skip => 0,
-	start => 140,
+	req_max   => 10,
+	skip      => 0,
+	start     => 140,
+	all       => 0,
+    map       => undef,
 }, '... all fresh';
 
 
@@ -104,17 +108,38 @@ my $this3 = $f3->_thisPage;
 #warn "THIS 3: ", Dumper $this3;
 ok exists $this3->{bookmarks}{25}, '... remembered bookmark 1';
 ok exists $this3->{bookmarks}{50}, '... remembered bookmark 2';
-cmp_ok keys %{$this3->{bookmarks}}, '==', 3, '... new bookmark 3';
+cmp_ok keys %{$this3->{bookmarks}}, '==', 3, '... bookmarks on page 3';
 
 cmp_ok @{$this3->{harvested}}, '==', 20, '... harvested new';
 
-ok $f3->pageIsPartial, '... partial page';
+ok ! $f3->pageIsPartial, '... not full but also not partial page';
 ok $f3->isLastPage, '... last page';
 my $docs3 = $f3->page;
 cmp_ok @$docs3, '==', 20, '... page';
 
 ok $_->isa('Couch::DB::Document'), '... is doc '.$_->id 
 	for @$docs3;
+
+### find, all at once
+
+my $f5 =  _result find_all => $db->find($query, _all => 1);
+my $docs5 = $f5->page;
+cmp_ok @$docs5, '==', 70, '.. all at once';
+
+### find, map
+
+sub map6($$)
+{   my ($result, $doc) = @_;
+	isa_ok $result, 'Couch::DB::Result', '...';
+	isa_ok $doc, 'Couch::DB::Document', '...';
+	42;
+}
+
+my $f6 =  _result find_all_map => $db->find($query, _all => 1, _map => \&map6);
+my $docs6 = $f6->page;
+cmp_ok @$docs6, '==', 70, '.. all at once';
+is $docs6->[0], 42, '... first 42';
+cmp_ok +(grep $_==42, @$docs6), '==', 70, '... all 42';
 
 ####### Cleanup
 _result removed          => $db->remove;

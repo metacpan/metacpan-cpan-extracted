@@ -2,8 +2,8 @@ use warnings;
 
 package Git::Hooks::CheckJira;
 # ABSTRACT: Git::Hooks plugin which requires citation of Jira issues in commit messages
-$Git::Hooks::CheckJira::VERSION = '3.6.0';
-use v5.16.0;
+$Git::Hooks::CheckJira::VERSION = '4.0.0';
+use v5.30.0;
 use utf8;
 use Log::Any '$log';
 use Git::Hooks;
@@ -169,12 +169,12 @@ sub check_codes {
                     or $git->fault("The option value must end with a code-ref.",
                                    {option => $type})
                     and next CODE;
-                push @{$cache->{codes}}, [$type => $code];
+                push $cache->{codes}->@*, [$type => $code];
             }
         }
     }
 
-    return @{$cache->{codes}};
+    return $cache->{codes}->@*;
 }
 
 sub _check_jira_keys {          ## no critic (ProhibitExcessComplexity)
@@ -296,7 +296,7 @@ EOS
 
           VERSION:
             foreach my $version (@versions) {
-                foreach my $fixversion (@{$issue->{fields}{fixVersions}}) {
+                foreach my $fixversion ($issue->{fields}{fixVersions}->@*) {
                     if (ref $version) {
                         next VERSION if $fixversion->{name} =~ $version;
                     } else {
@@ -534,7 +534,7 @@ Git::Hooks::CheckJira - Git::Hooks plugin which requires citation of Jira issues
 
 =head1 VERSION
 
-version 3.6.0
+version 4.0.0
 
 =head1 SYNOPSIS
 
@@ -1006,7 +1006,7 @@ Gustavo L. de M. Chaves <gnustavo@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2023 by CPQD <www.cpqd.com.br>.
+This software is copyright (c) 2024 by CPQD <www.cpqd.com.br>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

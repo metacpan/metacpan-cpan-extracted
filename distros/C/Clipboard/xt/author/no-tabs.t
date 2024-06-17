@@ -9,6 +9,7 @@ use Test::NoTabs;
 my @files = (
     'lib/Clipboard.pm',
     'lib/Clipboard/MacPasteboard.pm',
+    'lib/Clipboard/WaylandClipboard.pm',
     'lib/Clipboard/Win32.pm',
     'lib/Clipboard/Xclip.pm',
     'lib/Clipboard/Xsel.pm',

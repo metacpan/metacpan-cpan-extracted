@@ -21,9 +21,10 @@ plan tests => scalar @testfiles;
 foreach my $file ( @testfiles ) {
   $file =~ qr{(?<base>.*)\.(?<ext>[^\.]+)$};
   $base = $+{base};
-  system( "bin/spel-wizard.pl -v -v --test $base > $base.brown 2> $base.stderr" );
+  system( "perl bin/spel-wizard.pl -v -v --test $base > $base.brown 2> $base.stderr" );
   eval {
-    if( compare( "$base.brown", "$base.golden" ) ) {
+    if( File::Compare::compare_text( "$base.brown", "$base.golden",
+				     sub { $_[0] =~ s/\015$//; $_[0] ne $_[1] } ) ) {
       fail( $file );
     }
     else {

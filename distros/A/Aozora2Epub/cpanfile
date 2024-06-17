@@ -1,3 +1,4 @@
+requires 'perl', '5.024';
 requires 'Archive::Zip';
 requires 'Cache::FileCache';
 requires 'Carp';
@@ -21,4 +22,5 @@ requires 'Class::Accessor';
 on test => sub {
     requires 'Test::More', '0.96';
     requires 'Test::Base';
+    requires 'YAML';
 };

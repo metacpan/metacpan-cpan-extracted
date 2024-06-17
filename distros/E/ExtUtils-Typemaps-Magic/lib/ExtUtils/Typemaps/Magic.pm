@@ -1,5 +1,5 @@
 package ExtUtils::Typemaps::Magic;
-$ExtUtils::Typemaps::Magic::VERSION = '0.005';
+$ExtUtils::Typemaps::Magic::VERSION = '0.006';
 use strict;
 use warnings;
 
@@ -11,15 +11,19 @@ sub new {
 
 	$self->add_inputmap(xstype => 'T_MAGIC', code => <<'END');
 	{
+	%:ifdef mg_findext
 	MAGIC* magic = SvROK($arg) && SvMAGICAL(SvRV($arg)) ? mg_findext(SvRV($arg), PERL_MAGIC_ext, NULL) : NULL;
+	%:else
+	MAGIC* magic = SvROK($arg) && SvMAGICAL(SvRV($arg)) ? mg_find(SvRV($arg), PERL_MAGIC_ext) : NULL;
+	%:end
 	if (magic)
-		$var = (${type})magic->mg_ptr;
+		$var = ($type)magic->mg_ptr;
 	else
-		Perl_croak(aTHX_ \"${ntype} object is lacking magic\");
+		Perl_croak(aTHX_ \"$ntype object is lacking magic\");
 	}
 END
 
-	$self->add_outputmap(xstype => 'T_MAGIC', code => '	sv_magic(newSVrv($arg, \"${ntype}\"), NULL, PERL_MAGIC_ext, (const char*)$var, 0);');
+	$self->add_outputmap(xstype => 'T_MAGIC', code => '	sv_magic(newSVrv($arg, "$ntype"), NULL, PERL_MAGIC_ext, (const char*)$var, 0);');
 
 	return $self;
 }
@@ -40,31 +44,48 @@ ExtUtils::Typemaps::Magic - Typemap for storing objects in magic
 
 =head1 VERSION
 
-version 0.005
+version 0.006
 
 =head1 SYNOPSIS
 
- use ExtUtils::Typemaps::Magic;
- # First, read my own type maps:
- my $private_map = ExtUtils::Typemaps->new(file => 'my.map');
+In your typemap
 
- # Then, get the Magic set and merge it into my maps
- my $map = ExtUtils::Typemaps::Magic->new;
- $private_map->merge(typemap => $map);
+ My::Object	T_MAGIC
 
- # Now, write the combined map to an output file
- $private_map->write(file => 'typemap');
+In your XS:
+
+ typedef struct object_t* My__Object;
+
+ MODULE = My::Object    PACKAGE = My::Object    PREFIX = object_
+
+ My::Object object_new(int argument)
+
+ int object_baz(My::Object self)
 
 =head1 DESCRIPTION
 
-C<ExtUtils::Typemaps::Magic> is an C<ExtUtils::Typemaps> subclass that is essentially a drop-in replacement for C<T_PTROBJ>, except that it hides the value of the pointer from pure-perl code by storing it in attached magic. In particular that means the pointer won't be serialized/deserialized (this is usually a thing because after deserialization the pointer is probably not valid). Note that like C<T_PTROBJ>, you probably need a C<DESTROY> method to destroy and free the buffer, and this is not thread cloning safe without further measures.
+C<ExtUtils::Typemaps::Magic> is a typemap bundle that provides C<T_MAGIC>, a drop-in replacement for C<T_PTROBJ> except that it hides the value of the pointer from pure-perl code by storing it in attached magic. In particular that means the pointer won't be serialized/deserialized (this is usually a good thing because after deserialization the pointer is probably not valid). Note that like C<T_PTROBJ>, you probably need a C<DESTROY> method to destroy and free the buffer, and this is not thread cloning safe without further measures.
 
 =head1 DEPENDENCIES
 
-On perls older than C<5.14>, this will require F<ppport.h> to provide C<mg_findext>. E.g.
+If your module supports perls older than C<5.14>, it is recommended to include F<ppport.h> to provide C<mg_findext>. E.g.
 
  #define NEED_mg_findext
  #include "ppport.h"
+
+=head1 INCLUSION
+
+To use this typemap template you need to include it into your local typemap. The easiest way to do that is to use the L<typemap> script in L<App::typemap>. E.g.
+
+ typemap --merge ExtUtils::Typemaps::Magic
+
+If you author using C<Dist::Zilla> you can use L<Dist::Zilla::Plugin::Typemap> instead.
+
+Alternatively, you can include it at runtime by adding the following to your XS file:
+
+ INCLUDE_COMMAND: $^X -MExtUtils::Typemaps::Cmd -e "print embeddable_typemap('Magic')"
+
+That does require adding a build time dependency on this module.
 
 =head1 AUTHOR
 

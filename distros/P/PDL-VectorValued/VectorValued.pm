@@ -20,7 +20,8 @@ our (@EXPORT_OK);
 BEGIN {
   ##--------------------------------------------------------------------
   ## Conditional bindings for PDL > v2.079
-  ##  + see https://github.com/moocow-the-bovine/PDL-VectorValued/issues/5
+  ##  + see https://github.com/moocow-the-bovine/PDL-VectorValued/issues/5,
+  ##    https://github.com/moocow-the-bovine/PDL-VectorValued/pull/8
 
   ## @VV_SYMBOLS : exportable symbols (vv_FOO)
   my @VV_SYMBOLS =
@@ -49,6 +50,7 @@ BEGIN {
 		   v_setdiff => {vv=>'v_setdiff', p=>PDL->can('setdiff_sorted')},
 		   vv_rleND => {vv=>'rleND', p=>PDL->can('rleND')},
 		   vv_rldND => {vv=>'rldND', p=>PDL->can('rldND')},
+		   vv_vcos => {vv=>'vv_vcos', p=>PDL->can('vcos')},
 		   #vv_indx => {vv=>'vv_indx', p=>PDL->can('indx')}, # DEBUG
 		  );
 
@@ -78,7 +80,7 @@ our %EXPORT_TAGS =
   );
 
 ## VERSION was formerly set by PDL::VectorValued::Version, now use perl-reversion from Perl::Version instead
-our $VERSION = '1.0.22';
+our $VERSION = '1.0.23';
 
 ##======================================================================
 ## pod: header

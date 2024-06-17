@@ -9,7 +9,7 @@ use HTML::Element;
 use base qw(Class::Accessor);
 __PACKAGE__->mk_accessors(qw/title author content bib_info notation_notes gaiji fig/);
 
-our $VERSION = '0.01';
+our $VERSION = "0.03";
 
 sub new {
     my ($class, $url) = @_;
@@ -149,6 +149,23 @@ sub process_doc {
     $self->{fig} = \@fig;
 }
 
+sub _is_chuuki {
+    my $elem = shift;
+    return $elem->isa('HTML::Element')
+           && $elem->tag eq 'span'
+           && $elem->attr('class') && $elem->attr('class') =~ /notes/;
+}
+
+sub _is_pagebreak {
+    my $elem = shift;
+    return _is_chuuki($elem) && $elem->as_text =~ /＃改丁|＃改ページ/;
+}
+
+sub _is_center_chuuki {
+    my $elem = shift;
+    return _is_chuuki($elem) && $elem->as_text =~ /＃ページの左右中央/;
+}
+
 sub split {
     my $self = shift;
 
@@ -162,8 +179,7 @@ sub split {
             push @cur, $c;
             next;
         }
-        if ($c->tag eq 'span' && $c->attr('class') =~ /notes/
-            && $c->as_text =~ /＃改丁|＃改ページ/) {
+        if (_is_pagebreak($c)) {
             push @files, [@cur] if @cur;
             @cur = ();
             next;
@@ -172,10 +188,13 @@ sub split {
             # 直前の<br/>あるいは空白文字は新しいファイルにいれる
             my @newcur;
             my $last_elem = pop @cur;
-            while ($last_elem && _is_empty($last_elem)) {
-                push @newcur, $last_elem;
+            while ($last_elem
+                   && (_is_empty($last_elem)
+                       || _is_center_chuuki($last_elem))) {
+                push @newcur, $last_elem unless _is_center_chuuki($last_elem);
                 $last_elem = pop @cur;
             }
+
             push @cur, $last_elem if $last_elem; # popしすぎた分は戻す
             push @files, [@cur] if @cur; # @curが空なら改ページ直後なので何もしない
             push @newcur, $c;
@@ -190,6 +209,11 @@ sub split {
                     push @newcur, $c1;
                     last;
                 }
+                if (_is_pagebreak($c1)) {
+                    push @files, [@newcur] if @newcur;
+                    @newcur = ();
+                    last;
+                }
                 push @newcur, $c1;
             }
 
@@ -200,6 +224,26 @@ sub split {
     }
     push @files, [@cur] if @cur;
     return map { Aozora2Epub::File->new($_) } @files;
+}
+
+sub _dump_elem {
+    my ($e, $no_nl) = @_;
+
+    if (ref $e eq 'ARRAY') {
+        for my $x (@$e) {
+            _dump_elem($x, 1);
+        }
+        print STDERR "\n";
+        return;
+    }
+    
+    my $str;
+    unless ($e->isa('HTML::Element')) {
+        $str = $e;
+    } else {
+        $str = $e->as_HTML('<>&', undef, {});
+    }
+    print STDERR "!E!$str", $no_nl ? " " : "\n";
 }
 
 1;

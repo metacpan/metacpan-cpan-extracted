@@ -1,3 +1,10 @@
+.gitattributes
+.github/workflows/linux-ubuntu-latest-32bit.yml
+.github/workflows/linux-ubuntu-latest-perl-5.8.9.yml
+.github/workflows/linux-ubuntu-latest.yml
+.github/workflows/macos-latest.yml
+.github/workflows/windows-latest.yml
+.gitignore
 Changes
 examples/complex/complex.pl
 examples/complex/lib/SPVM/MyComplex.spvm
@@ -8,6 +15,7 @@ lib/SPVM/Math.spvm
 LICENSE
 Makefile.PL
 MANIFEST			This list of files
+MANIFEST.SKIP
 README.md
 t/basic.t
 t/lib/SPVM/TestCase/Math.spvm

@@ -18,9 +18,9 @@ no_index:
     - t
     - inc
 requires:
-  PDL: '2.019'
+  PDL: '2.025'
   Test::More: '0'
 resources:
   repository: https://github.com/moocow-the-bovine/PDL-VectorValued.git
-version: v1.0.22
+version: v1.0.23
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

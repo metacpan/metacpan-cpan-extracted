@@ -222,6 +222,8 @@ ok(SPVM::TestCase::Math->isunorderedf);
   ok(SPVM::TestCase::Math->cadd);
   ok(SPVM::TestCase::Math->csubf);
   ok(SPVM::TestCase::Math->csub);
+  ok(SPVM::TestCase::Math->cnegf);
+  ok(SPVM::TestCase::Math->cneg);
   ok(SPVM::TestCase::Math->cmulf);
   ok(SPVM::TestCase::Math->cmul);
   ok(SPVM::TestCase::Math->cscamulf);

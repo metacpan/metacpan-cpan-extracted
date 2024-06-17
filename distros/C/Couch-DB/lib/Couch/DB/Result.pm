@@ -7,7 +7,7 @@
 
 package Couch::DB::Result;
 use vars '$VERSION';
-$VERSION = '0.003';
+$VERSION = '0.004';
 
 
 use Couch::DB::Util     qw(flat pile);
@@ -113,6 +113,7 @@ sub pagingState(%)
 {	my ($self, %args) = @_;
 	my $next = $self->nextPageSettings;
 	$next->{harvester} = defined $next->{harvester} ? 'CODE' : 'DEFAULT';
+	$next->{map}       = defined $next->{map} ? 'CODE' : 'NONE';
 	$next->{client}    = $self->client->name;
 
 	if(my $maxbook = delete $args{max_bookmarks} // 10)
@@ -146,17 +147,21 @@ sub _pageAdd($@)
 {	my $this     = shift->_thisPage;
 	my $bookmark = shift;
 	my $page     = $this->{harvested};
-	$this->{end_reached} = ! @_;
-	push @$page, @_;
-	$this->{bookmarks}{$this->{start} + $this->{skip} + @$page} = $bookmark
-		if defined $bookmark;
+	if(@_)
+	{	push @$page, @_;
+		$this->{bookmarks}{$this->{start} + $this->{skip} + @$page} = $bookmark
+			if defined $bookmark;
+	}
+	else
+	{	$this->{end_reached} = 1;
+	}
 	$page;
 }
 
 
 sub pageIsPartial()
 {	my $this = shift->_thisPage;
-	$this->{end_reached} || @{$this->{harvested}} < $this->{page_size};
+	! $this->{end_reached} && ($this->{all} || @{$this->{harvested}} < $this->{page_size});
 }
 
 
@@ -176,13 +181,18 @@ sub setFinalResult($%)
 	$self->{CDR_response} = delete $data->{response};
 	$self->status($code, delete $data->{message});
 
+	delete $self->{CDR_answer};  # remove cached while paging
+	delete $self->{CDR_values};
+
+	# "on_error" handler
 	unless(is_success $code)
 	{	$_->($self) for @{$self->{CDR_on_error}};
-		#XXX what to do with pagination here?
 	}
 
+	# "on_final" handler
 	$_->($self) for @{$self->{CDR_on_final}};
 
+	# "on_change" handler
 	# First run inner chains, working towards outer
 	my @chains = @{$self->{CDR_on_chain} || []};
 	my $tail   = $self;

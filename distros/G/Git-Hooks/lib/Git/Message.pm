@@ -2,8 +2,8 @@ use warnings;
 
 package Git::Message;
 # ABSTRACT: A Git commit message
-$Git::Message::VERSION = '3.6.0';
-use v5.16.0;
+$Git::Message::VERSION = '4.0.0';
+use v5.30.0;
 use utf8;
 use Carp;
 
@@ -52,12 +52,12 @@ sub new {
                 $in_footer_comment = 0 if /\]$/;
             } elsif (/^\[[\w-]+:/i) {
                 # A line beginning with '[key:' starts a comment.
-                push @{$footer{$key}}, $_;
+                push $footer{$key}->@*, $_;
                 $in_footer_comment = 1;
             } elsif (/^([\w-]+):\s*(.*)/i) {
                 # This is a key:value line
                 $key = lc $1;
-                push @{$footer{$key}}, [$1, $2];
+                push $footer{$key}->@*, [$1, $2];
             } else {
                 # Oops. This is not a valid footer. So, let's push
                 # $footer back to @blocks,
@@ -120,7 +120,7 @@ sub footer {
         @keys = sort keys %$footer;
     }
     foreach my $key (@keys) {
-        foreach my $line (@{$footer->{$key}}) {
+        foreach my $line ($footer->{$key}->@*) {
             if (ref $line) {
                 $foot .= join(': ', @$line);
             } else {
@@ -135,7 +135,7 @@ sub footer {
 
 sub get_footer_keys {
     my ($self) = @_;
-    return keys %{$self->{footer}};
+    return keys $self->{footer}->%*;
 }
 
 sub delete_footer_key {
@@ -159,7 +159,7 @@ sub add_footer_values {
         unless $key =~ /^[\w-]+$/i;
 
     ## no critic (BuiltinFunctions::ProhibitComplexMappings)
-    push @{$self->{footer}{lc $key}},
+    push $self->{footer}{lc $key}->@*,
         map { [$key => $_] }
             map { s/\n+$//r } # strip trailing newlines to keep the footer structure
                 @values;
@@ -189,7 +189,7 @@ Git::Message - A Git commit message
 
 =head1 VERSION
 
-version 3.6.0
+version 4.0.0
 
 =head1 SYNOPSIS
 
@@ -394,7 +394,7 @@ Gustavo L. de M. Chaves <gnustavo@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2023 by CPQD <www.cpqd.com.br>.
+This software is copyright (c) 2024 by CPQD <www.cpqd.com.br>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

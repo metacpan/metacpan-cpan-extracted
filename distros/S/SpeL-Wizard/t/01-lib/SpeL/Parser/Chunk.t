@@ -37,7 +37,9 @@ foreach my $testfile ( @files ) {
     my $tex = $parser->object();
     say $logfile Data::Dumper->Dump( [ $tex ], [ qw (tex) ] );
     $logfile->close();
-    if( compare( "$base.brown", "$base.golden" ) ) {
+    if( File::Compare::compare_text( "$base.brown",
+				     "$base.golden",
+				     sub { $_[0] =~ s/\015$//; $_[0] ne $_[1] } ) ) {
       fail( $testfile );
     }
     else {
@@ -66,7 +68,9 @@ foreach my $testfile ( @badfiles ) {
     say $logfile "$@\n";
     $logfile->close();
     eval {
-      if( compare( "$base.brown", "$base.golden" ) ) {
+      if( File::Compare::compare_text( "$base.brown",
+				       "$base.golden",
+				       sub { $_[0] =~ s/\015$//; $_[0] ne $_[1] } ) ) {
 	fail( "Diagnosing $testfile" );
       }
       else {
@@ -93,7 +97,9 @@ foreach my $testfile ( @gooddocs ) {
     my $tex = $parser->object();
     say $logfile Data::Dumper->Dump( [ $tex ], [ qw (tex) ] );
     $logfile->close();
-    if( compare( "$base.brown", "$base.golden" ) ) {
+    if( File::Compare::compare_text( "$base.brown",
+				     "$base.golden",
+				     sub { $_[0] =~ s/\015$//; $_[0] ne $_[1] } ) ) {
       fail( $testfile );
     }
     else {

@@ -54,6 +54,9 @@ _Note that by definition every JSON document is also a valid RJSON document._
     # Object-oriented parsing.
     my $parser = JSON::Relaxed->new();
     $hash = $parser->decode($rjson);
+	
+	# Pretty output.
+	print encode_json( data => $hash, pretty => 1 );
 
 # DESCRIPTION
 
@@ -66,38 +69,79 @@ Extensions can be disabled with the `strict` option.
 
 - Hash keys without values
 
-    JSON::Relaxed supports object keys without a specified value.
-    In that case the hash element is simply assigned the undefined value.
+  JSON::Relaxed supports object keys without a specified value.
+  In that case the hash element is simply assigned the undefined value.
 
-    In the following example, a is assigned 1, and b is assigned undef:
+  In the following example, a is assigned 1, and b is assigned undef:
 
-        { a:1, b }
+      { a:1, b }
+
+- Implied outer hash braces
+
+  If the input starts with a hash key, the outer braces are implied.
+  The following are identical
+
+      a : 1
+      b : 2
+
+      { a : 1, b : 2 }
+
+- Optional colon for hash-valued keys
+
+  If a key is associated with a hash value, the colon may be left out.
+  The following are identical
+
+      a { b : 1 }
+    
+      a : { b : 1 }
+
+- Combined hash keys
+
+  Multiple levels of keys, separated by periods.
+  The following are identical
+	
+      a.b.c : 1
+      
+      a : { b : { c : 1 } }
+
+  This even works for arrays, but can be tricky:
+	
+      a.2.c : 1
+
+      a [ null, null, { c : 1 } ]
+
+  But
+
+      a.2.c : 1
+      a.1.d : 2
+
+      a [ null, { d : 2 }, { c : 1 } ]
 
 - String continuation
 
-    Long strings can be split over multiple lines by putting a backslash
-    at the end of the line:
+  Long strings can be split over multiple lines by putting a backslash
+  at the end of the line:
 
-        "this is a " \
-        "long string"
+      "this is a " \
+      "long string"
 
-    Note that this is different from
+  Note that this is different from
 
-        "this is a \
-        long string"
+      "this is a \
+      long string"
 
     which **embeds** the newline into the string.
 
 - Extended Unicode escapes
 
-    Unicode escapes in strings may contain an arbitrary number of hexadecimal
-    digits enclosed in braces:
+  Unicode escapes in strings may contain an arbitrary number of hexadecimal
+  digits enclosed in braces:
 
-        \u{1d10e}
+      \u{1d10e}
 
     This eliminates the need to use [surrogates](https://unicode.org/faq/utf_bom.html#utf16-2) to obtain the same character:
 
-        \uD834\uDD0E
+      \uD834\uDD0E
 
 # SUBROUTINES
 
@@ -116,6 +160,32 @@ in JSON::Relaxed::Parser.
 
     $structure = decode_rjson( $rjson, %options );
 
+## encode\_json
+
+`encode_json` produces a formatted string from a Perl data structure.
+It takes a hash as argument.
+
+    $string = encode_json( data => $struct, %options )
+	
+Possible options are
+
+* strict
+
+  If set to a true value, the formatted string will conform to strict
+  Relaxed JSON.
+
+* pretty
+
+  The result will be pretty-printed, i.e. nicely formatted for human
+  eyes.
+
+* schema
+
+  If this argument is provided it must be the result from parsing a
+  valid JSON Schema that is associated with the data to be formatted. 
+  The `"description"` nodes from the schema will be used to provide
+  comments in the output.
+
 # METHODS
 
 ## new
@@ -128,7 +198,11 @@ Then call the parser's `decode` method, passing in the RJSON string:
 
     $structure = $parser->decode($rjson);
 
-For more details, see [Object-oriented parsing](https://metacpan.org/pod/JSON::Relaxed#OBJECT-ORIENTED-PARSING) in JSON::Relaxed::Parser.
+Similar for encoding:
+
+    $string = $parser->encode( data => $structure );
+
+For more details, see [Object-oriented parsing](https://metacpan.org/pod/JSON::Relaxed#OBJECT-ORIENTED-PARSING) in JSON::Relaxed.
 
 # ERROR HANDLING
 

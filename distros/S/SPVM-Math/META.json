@@ -1,5 +1,5 @@
 {
-   "abstract" : "Mathematical Functions",
+   "abstract" : "Mathematical Calculations",
    "author" : [
       "Yuki Kimoto<kimoto.yuki@gmail.com>"
    ],
@@ -47,6 +47,6 @@
          "web" : "https://github.com/yuki-kimoto/Perl-SPVM-Math"
       }
    },
-   "version" : "1.001",
+   "version" : "1.002",
    "x_serialization_backend" : "JSON::PP version 4.07"
 }

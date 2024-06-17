@@ -1,3 +1,12 @@
+0.166		2024-06-16	T. R. Wyant
+    Correct celestrak_supplemental() status when an unknown catalog is
+    specified. The previous was the oxymoronic '400 OK'. The intended
+    (and now implemented) is 404 with a custom error message.
+
+    Add back Celestrak SES supplemental data.
+
+    Add Project Kuiper to Celestrak supplemental data.
+
 0.165		2024-05-04	T. R. Wyant
     Space Track options in celestrak() are now fatal.
 
@@ -11,7 +20,8 @@
     from the test into Astro::SpaceTrack so I could display the notes in
     names->( 'celestrak' )
 
-    Kelso dropped Iridium status April 26 2024.
+    Kelso dropped Iridium status and SES supplemental data April 26
+    2024.
 
 0.164		2024-01-31	T. R. Wyant
     Deprecate iridium_status() and associated attributes

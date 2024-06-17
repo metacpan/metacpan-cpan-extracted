@@ -2,7 +2,7 @@
 use strict;
 use warnings;
 
-
+use 5.024;
 
 use ExtUtils::MakeMaker;
 
@@ -24,6 +24,7 @@ my %WriteMakefileArgs = (
     "script/aozora2epub"
   ],
   "LICENSE" => "perl",
+  "MIN_PERL_VERSION" => "5.024",
   "NAME" => "Aozora2Epub",
   "PREREQ_PM" => {
     "Archive::Zip" => 0,
@@ -48,9 +49,10 @@ my %WriteMakefileArgs = (
   },
   "TEST_REQUIRES" => {
     "Test::Base" => 0,
-    "Test::More" => "0.96"
+    "Test::More" => "0.96",
+    "YAML" => 0
   },
-  "VERSION" => "0.01",
+  "VERSION" => "0.03",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -78,7 +80,8 @@ my %FallbackPrereqs = (
   "Test::More" => "0.96",
   "Text::Xslate" => 0,
   "URI" => 0,
-  "UUID" => 0
+  "UUID" => 0,
+  "YAML" => 0
 );
 
 

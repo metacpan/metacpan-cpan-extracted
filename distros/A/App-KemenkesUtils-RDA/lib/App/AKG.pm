@@ -3,9 +3,9 @@ package App::AKG;
 use strict;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2024-06-08'; # DATE
+our $DATE = '2024-06-13'; # DATE
 our $DIST = 'App-KemenkesUtils-RDA'; # DIST
-our $VERSION = '0.001'; # VERSION
+our $VERSION = '0.002'; # VERSION
 
 1;
 # ABSTRACT: Shorter alias for App::KemenkesUtils::RDA
@@ -22,7 +22,7 @@ App::AKG - Shorter alias for App::KemenkesUtils::RDA
 
 =head1 VERSION
 
-This document describes version 0.001 of App::AKG (from Perl distribution App-KemenkesUtils-RDA), released on 2024-06-08.
+This document describes version 0.002 of App::AKG (from Perl distribution App-KemenkesUtils-RDA), released on 2024-06-13.
 
 =head1 DESCRIPTION
 

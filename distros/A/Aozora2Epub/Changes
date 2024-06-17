@@ -1,4 +1,13 @@
 Revision history for Aozora2Epub
 
+0.03  2024-06-16 23:26:30 JST
+        - perl 5.24以上が必要
+	- テストの依存モジュールにYAMLが欠けていたのを修正
+	- 独立扉ページの注記が解釈できていなかったのを修正
+        - aozora2epub コマンドに --version オプションを追加
+
+0.02  2024-06-16 23:13:26 JST
+        - Skipped
+
 0.01  2024-06-14 19:09:07 JST
         - Initial release

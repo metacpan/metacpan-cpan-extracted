@@ -2,10 +2,10 @@ use warnings;
 
 package Git::Repository::Plugin::GitHooks;
 # ABSTRACT: A Git::Repository plugin with some goodies for hook developers
-$Git::Repository::Plugin::GitHooks::VERSION = '3.6.0';
+$Git::Repository::Plugin::GitHooks::VERSION = '4.0.0';
 use parent qw/Git::Repository::Plugin/;
 
-use v5.16.0;
+use v5.30.0;
 use utf8;
 use Carp;
 use Path::Tiny;
@@ -63,7 +63,7 @@ our $CONFIG_ENCODING = undef;
 
 sub _push_input_data {
     my ($git, $data) = @_;
-    push @{$git->{_plugin_githooks}{input_data}}, $data;
+    push $git->{_plugin_githooks}{input_data}->@*, $data;
     return;
 }
 
@@ -89,7 +89,7 @@ sub _prepare_input_data {
 
 sub _prepare_receive {
     my ($git) = @_;
-    foreach (@{_prepare_input_data($git)}) {
+    foreach (_prepare_input_data($git)->@*) {
         my ($old_commit, $new_commit, $ref) = @$_;
         _set_affected_ref($git, $ref, $old_commit, $new_commit);
     }
@@ -191,7 +191,7 @@ sub _prepare_gerrit_ref_update {
     $refname = "refs/heads/$refname"
         unless $refname =~ m:^refs/:;
 
-    _set_affected_ref($git, $refname, @{$args->[0]}{qw/--oldrev --newrev/});
+    _set_affected_ref($git, $refname, $args->[0]->%{qw/--oldrev --newrev/});
     $log->debug(_prepare_gerrit_ref_update => {affected_refs => _get_affected_refs_hash($git)});
     return;
 }
@@ -253,7 +253,7 @@ sub _gerrit_patchset_post_hook {
     require URI::Escape;
     my $id = $args->{'--change'} =~ /~/
         ? $args->{'--change'}
-        : URI::Escape::uri_escape(join('~', @{$args}{qw/--project --branch --change/}));
+        : URI::Escape::uri_escape(join('~', $args->%{qw/--project --branch --change/}));
 
     my $patchset = $args->{'--patchset'};
 
@@ -398,10 +398,6 @@ sub load_plugins {
 
     return unless %plugins; # no one configured
 
-    # Remove disabled plugins from the list of plugins
-    my %disabled_plugins = map {($_ => undef)} map {split} $git->get_config(githooks => 'disable');
-    delete @plugins{grep {exists $disabled_plugins{$_}} keys %plugins};
-
     # Define the list of directories where we'll look for the hook
     # plugins. First the local directory 'githooks' under the
     # repository path, then the optional list of directories
@@ -469,7 +465,7 @@ sub _invoke_external_hook {     ## no critic (ProhibitExcessComplexity)
             $git->fault("I can't fork: $!", {prefix => $prefix});
         } elsif ($pid) {
             # parent
-            $pipe->print(join("\n", map {join(' ', @$_)} @{_get_input_data($git)}) . "\n");
+            $pipe->print(join("\n", map {join(' ', @$_)} _get_input_data($git)->@*) . "\n");
             my $exit = $pipe->close;
 
             ## no critic (RequireBriefOpen, RequireCarping)
@@ -508,7 +504,7 @@ sub _invoke_external_hook {     ## no critic (ProhibitExcessComplexity)
 
         if (@args && ref $args[0]) {
             # This is a Gerrit hook and we need to expand its arguments
-            @args = %{$args[0]};
+            @args = $args[0]->%*;
         }
 
         my $exit = system {$file} ($hook, @args);
@@ -574,14 +570,14 @@ sub invoke_external_hooks {
 
 sub post_hook {
     my ($git, $sub) = @_;
-    push @{$git->{_plugin_githooks}{post_hooks}}, $sub;
+    push $git->{_plugin_githooks}{post_hooks}->@*, $sub;
     return;
 }
 
 sub post_hooks {
     my ($git) = @_;
     if ($git->{_plugin_githooks}{post_hooks}) {
-        return @{$git->{_plugin_githooks}{post_hooks}}
+        return $git->{_plugin_githooks}{post_hooks}->@*
     } else {
         return;
     }
@@ -630,13 +626,13 @@ sub get_config {
                             # this variable.
                             delete $config{$osection}{$okey};
                         } else {
-                            push @{$config{$osection}{$okey}}, $value;
+                            push $config{$osection}{$okey}->@*, $value;
                         }
                     } else {
                         # An option without a value is considered a boolean
                         # true. We mark it explicitly so instead of leaving it
                         # undefined because Perl would consider it false.
-                        push @{$config{$osection}{$okey}}, 'true';
+                        push $config{$osection}{$okey}->@*, 'true';
                     }
                 } else {
                     croak __PACKAGE__, ": Cannot grok config variable name '$option'.\n";
@@ -670,7 +666,7 @@ sub get_config {
                 var       => $var,
                 result    => $config->{$section}{$var},
             });
-            return @{$config->{$section}{$var}};
+            return $config->{$section}{$var}->@*;
         } else {
             $log->trace(get_config => {
                 wantarray => 0,
@@ -834,7 +830,7 @@ sub fault {
         $msg .= "\n$colors->{details}$details$colors->{reset}\n\n";
     }
 
-    push @{$git->{_plugin_githooks}{faults}}, $msg;
+    push $git->{_plugin_githooks}{faults}->@*, $msg;
 
     # Return true to allow for the idiom: <expression> or $git->fault(...) and <next|last|return>;
     return 1;
@@ -853,7 +849,7 @@ sub get_faults {
         $faults .= $colors->{header} . qx{$header} . "$colors->{reset}\n"; ## no critic (ProhibitBacktickOperators)
     }
 
-    $faults .= join("\n\n", @{$git->{_plugin_githooks}{faults}});
+    $faults .= join("\n\n", $git->{_plugin_githooks}{faults}->@*);
 
     if ($git->{_plugin_githooks}{hookname} =~ /^commit-msg|pre-commit$/
             && ! $git->get_config_boolean(githooks => 'abort-commit')) {
@@ -986,28 +982,12 @@ sub get_commits {
             # fast-forward merge. So, we only remove it if it's reachable by a
             # single reference, which must be the reference being pushed.
 
-            if ($git->version_ge('2.7.0')) {
-                # The --points-at option was implemented in this version of Git
-                my @new_commit_refs = $git->run(
-                    qw/for-each-ref --format %(refname) --count 2 --points-at/, $new_commit,
-                );
-                if (@new_commit_refs == 1) {
-                    @excludes = grep {$_ ne "^$new_commit"} @excludes;
-                }
-            } else {
-                # KLUDGE: I couldn't find a direct way to see how many refs
-                # point to $new_commit in older Gits. So, I use the porcelain
-                # git-log command with a format that shows the decoration for a
-                # single commit, which returns something like: (HEAD -> next,
-                # tag: v2.2.0, origin/next)
-                my $decoration = $git->run(qw/log -n1 --format=%d/, $new_commit);
-                $decoration =~ s/HEAD,\s*//;
-
-                # If there are commas in $decoration it means that there are
-                # more than one reference.
-                if ($decoration !~ /,/) {
-                    @excludes = grep {$_ ne "^$new_commit"} @excludes;
-                }
+            # The --points-at option was implemented in this version of Git
+            my @new_commit_refs = $git->run(
+                qw/for-each-ref --format %(refname) --count 2 --points-at/, $new_commit,
+            );
+            if (@new_commit_refs == 1) {
+                @excludes = grep {$_ ne "^$new_commit"} @excludes;
             }
 
             # And we have to make sure $old_commit is on the list, as --not
@@ -1026,7 +1006,7 @@ sub get_commits {
         $cache->{$range} = [$git->log(@arguments)];
     }
 
-    return @{$cache->{$range}};
+    return $cache->{$range}->@*;
 }
 
 sub read_commit_msg_file {
@@ -1099,7 +1079,7 @@ sub _get_affected_refs_hash {
 sub get_affected_refs {
     my ($git) = @_;
 
-    return keys %{_get_affected_refs_hash($git)};
+    return keys _get_affected_refs_hash($git)->%*;
 }
 
 sub get_affected_ref_range {
@@ -1110,7 +1090,7 @@ sub get_affected_ref_range {
     exists $affected->{$ref}{range}
         or croak __PACKAGE__, ": get_affected_ref_range($ref): no such affected ref\n";
 
-    return @{$affected->{$ref}{range}};
+    return $affected->{$ref}{range}->@*;
 }
 
 sub get_affected_ref_commits {
@@ -1245,12 +1225,12 @@ sub filter_name_status_in_commit {
     # we remove the $commit level, joining all $actions together under $file.
 
     foreach my $file (keys %actions) {
-        if (keys(%{$actions{$file}}) == $parents) {
+        if (keys($actions{$file}->%*) == $parents) {
             # For merge commits we're interested only in files that were
             # affected in all parent commits.  For files affected in all parents
             # we join their actions together.  Non-merge commits ($parents == 1)
             # reduce to the general case of merge commits.
-            $actions{$file} = join('', values %{$actions{$file}});
+            $actions{$file} = join('', values $actions{$file}->%*);
         } else {
             # Files not affected in all parents we don't care about.
             delete $actions{$file};
@@ -1262,19 +1242,19 @@ sub filter_name_status_in_commit {
 
 sub filter_files_in_index {
     my ($git, $filter) = @_;
-    my @files = sort keys %{$git->filter_name_status_in_index($filter)};
+    my @files = sort keys $git->filter_name_status_in_index($filter)->%*;
     return @files;
 }
 
 sub filter_files_in_range {
     my ($git, @args) = @_;
-    my @files = sort keys %{$git->filter_name_status_in_range(@args)};
+    my @files = sort keys $git->filter_name_status_in_range(@args)->%*;
     return @files;
 }
 
 sub filter_files_in_commit {
     my ($git, $commit) = @_;
-    my @files = sort keys %{$git->filter_name_status_in_commit($commit)};
+    my @files = sort keys $git->filter_name_status_in_commit($commit)->%*;
     return @files;
 }
 
@@ -1621,7 +1601,7 @@ Git::Repository::Plugin::GitHooks - A Git::Repository plugin with some goodies f
 
 =head1 VERSION
 
-version 3.6.0
+version 4.0.0
 
 =head1 SYNOPSIS
 
@@ -2387,7 +2367,7 @@ Gustavo L. de M. Chaves <gnustavo@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2023 by CPQD <www.cpqd.com.br>.
+This software is copyright (c) 2024 by CPQD <www.cpqd.com.br>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

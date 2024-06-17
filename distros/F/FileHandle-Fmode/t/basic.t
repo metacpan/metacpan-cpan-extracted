@@ -3,6 +3,9 @@ use FileHandle::Fmode qw(:all);
 
 # Same tests as binmode.t - but no binmode() on the handles
 
+warn "\nIS_WIN32     : ", FileHandle::Fmode::IS_WIN32, "\n";
+warn "LIBC_IS_UCRT : ", FileHandle::Fmode::LIBC_IS_UCRT, "\n";
+
 print "1..52\n";
 
 my $no_skip = ($] < 5.006001 && $^O =~ /mswin32/i) ? 0 : 1;
@@ -345,7 +348,7 @@ else {
 }
 
 eval{FileHandle::Fmode::win32_fmode(\*WR);};
-if($^O =~ /mswin32/i) {
+if($^O =~ /mswin32/i && !FileHandle::Fmode::LIBC_IS_UCRT) {
   if($@) {print "not ok 52\n"}
   else {print "ok 52\n"}
 }

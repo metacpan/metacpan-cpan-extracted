@@ -1,13 +1,17 @@
 package FileHandle::Fmode;
 use Fcntl qw(O_ACCMODE O_RDONLY O_WRONLY O_RDWR O_APPEND F_GETFL);
 use strict;
+use Config;
+
+use constant  IS_WIN32     => $^O =~ /mswin32/i ? 1 : 0;
+use constant  LIBC_IS_UCRT => $Config{libc} =~ /\-lucrt$|ucrt\.lib$/i ? 1 : 0;
 
 require Exporter;
 require DynaLoader;
 
 *is_FH = \&is_arg_ok;
 
-our $VERSION = '0.14';
+our $VERSION = '0.15';
 #$VERSION = eval $VERSION;
 
 @FileHandle::Fmode::ISA = qw(Exporter DynaLoader);
@@ -17,9 +21,7 @@ our $VERSION = '0.14';
 %FileHandle::Fmode::EXPORT_TAGS = (all => [qw
     (is_R is_W is_RO is_WO is_RW is_arg_ok is_A is_FH)]);
 
-bootstrap FileHandle::Fmode $VERSION;
-
-my $is_win32 = $^O =~ /mswin32/i ? 1 : 0;
+FileHandle::Fmode->DynaLoader::bootstrap($VERSION);
 
 sub is_arg_ok {
     my $fileno = eval{fileno($_[0])};
@@ -37,12 +39,12 @@ sub is_arg_ok {
 sub is_RO {
     my $fileno = fileno($_[0]);
     if(!defined( $fileno)) {die "Not an open filehandle"}
-    if( $fileno == -1) {
+    if( $fileno == -1 || (IS_WIN32 && LIBC_IS_UCRT)) {
       if($] < 5.007) {die "Illegal fileno() return"}
       if(perliol_readable($_[0]) && !perliol_writable($_[0])) {return 1}
       return 0;
     }
-    if($is_win32) {
+    if(IS_WIN32 && !LIBC_IS_UCRT) {
       if(win32_fmode($_[0]) & 1) {return 1}
       return 0;
     }
@@ -54,12 +56,12 @@ sub is_RO {
 sub is_WO {
     my $fileno = fileno($_[0]);
     if(!defined( $fileno)) {die "Not an open filehandle"}
-    if( $fileno == -1) {
+    if( $fileno == -1 || (IS_WIN32 && LIBC_IS_UCRT)) {
       if($] < 5.007) {die "Illegal fileno() return"}
       if(!perliol_readable($_[0]) && perliol_writable($_[0])) {return 1}
       return 0;
     }
-    if($is_win32) {
+    if(IS_WIN32 && !LIBC_IS_UCRT) {
       if(win32_fmode($_[0]) & 2) {return 1}
       return 0;
     }
@@ -81,12 +83,12 @@ sub is_R {
 sub is_RW {
     my $fileno = fileno($_[0]);
     if(!defined( $fileno)) {die "Not an open filehandle"}
-    if( $fileno == -1) {
+    if( $fileno == -1 || (IS_WIN32 && LIBC_IS_UCRT)) {
       if($] < 5.007) {die "Illegal fileno() return"}
       if(perliol_readable($_[0]) && perliol_writable($_[0])) {return 1}
       return 0;
     }
-    if($is_win32) {
+    if(IS_WIN32 && !LIBC_IS_UCRT) {
       if(win32_fmode($_[0]) & 128) {return 1}
       return 0;
     }
@@ -102,7 +104,7 @@ sub is_A {
       if($] < 5.007) {die "Illegal fileno() return"}
       return is_appendable($_[0]);
     }
-    if($is_win32) {
+    if(IS_WIN32) {
       if($] < 5.006001) {die "is_A not currently implemented on Win32 for pre-5.6.1 perl"}
       return is_appendable($_[0]);
     }
@@ -151,10 +153,9 @@ FileHandle::Fmode - determine whether a filehandle is opened for reading, writin
  function call in an eval{} block.
 
  Note that it may be possible that a filehandle opened for writing may
- become unwritable - if (eg) the disk becomes full. I don't know how
- the below functions would be affected by such an event. I suspect
- that they would be unaware of the change ... but I haven't actually
- checked.
+ become unwritable. If for example the disk runs full on Linux, a write
+ attempt will fail, while is_W($fh) still reports true. The behavior
+ for other platforms is not tested.
 
  $bool = is_R($fh);
  $bool = is_R(\*FH);
@@ -164,22 +165,22 @@ FileHandle::Fmode - determine whether a filehandle is opened for reading, writin
  $bool = is_W($fh);
  $bool = is_W(\*FH);
   Returns true if the filehandle is writable.
-  Else returns false
+  Else returns false.
 
  $bool = is_RO($fh);
  $bool = is_RO(\*FH);
   Returns true if the filehandle is readable but not writable.
-  Else returns false
+  Else returns false.
 
  $bool = is_WO($fh);
  $bool = is_WO(\*FH);
   Returns true if the filehandle is writable but not readable.
-  Else returns false
+  Else returns false.
 
  $bool = is_RW($fh);
  $bool = is_RW(\*FH);
   Returns true if the filehandle is both readable and writable.
-  Else returns false
+  Else returns false.
 
  $bool = is_A($fh);
  $bool = is_A(\*FH);
@@ -210,9 +211,10 @@ FileHandle::Fmode - determine whether a filehandle is opened for reading, writin
 
 =head1 TODO
 
- I don't know that anyone still runs pre-5.6.1 perl on Win32. However, if
- someone likes to tell me how is_A() could be made to work on pre-5.6.1
- Win32 perl, I would be quite happy to implement it.
+
+ I don't know that anyone still runs pre-5.6.1 perl on Win32 (or anywhere
+ else). However, if someone likes to tell me how is_A() could be made to
+ work on pre-5.6.1 Win32 perl, I would be quite happy to implement it.
 
 
 =head1 LICENSE
@@ -220,7 +222,8 @@ FileHandle::Fmode - determine whether a filehandle is opened for reading, writin
 
  This program is free software; you may redistribute it and/or
  modify it under the same terms as Perl itself.
- Copyright 2006-2008, 2009, 2010, 2012 Sisyphus
+ Copyright 2006-2008, 2009, 2010, 2012, 2024 Sisyphus
+
 
 =head1 AUTHOR
 

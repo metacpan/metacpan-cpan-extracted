@@ -1,6 +1,6 @@
 #!/usr/bin/env perl
 
-use v5.16.0;
+use v5.30.0;
 use warnings;
 use Path::Tiny 0.060;
 use lib qw/t lib/;

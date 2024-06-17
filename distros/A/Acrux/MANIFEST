@@ -43,6 +43,7 @@ t/07-digest-fnv32a.t                    FNV32a Digest test
 t/08-config.t                           Config test
 t/09-log.t                              Logger test
 t/10-app-min.t                          App with a minimum number of args
+t/11-strf.t                             The strf() function
 t/test.conf                             Test file of config
 
 # Examples

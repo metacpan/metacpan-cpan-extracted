@@ -2,8 +2,8 @@ use warnings;
 
 package Git::Hooks::Notify;
 # ABSTRACT: Git::Hooks plugin to notify users via email
-$Git::Hooks::Notify::VERSION = '3.6.0';
-use v5.16.0;
+$Git::Hooks::Notify::VERSION = '4.0.0';
+use v5.30.0;
 use utf8;
 use Log::Any '$log';
 use Git::Hooks;
@@ -112,7 +112,7 @@ sub sha1_link {
 sub notify {
     my ($git, $ref, $old_commit, $new_commit, $rule, $message) = @_;
 
-    return 1 unless @{$rule->{recipients}};
+    return 1 unless $rule->{recipients}->@*;
 
     (my $branch = $ref) =~ s:refs/heads/::;
 
@@ -128,7 +128,7 @@ sub notify {
 
     my @headers = (
         'Subject' => $subject,
-        'To'      => join(', ', @{$rule->{recipients}}),
+        'To'      => join(', ', $rule->{recipients}->@*),
     );
 
     if (my $from = $git->get_config($CFG, 'from')) {
@@ -147,11 +147,11 @@ FROM: $old_commit
 TO:   $new_commit
 EOS
 
-    if (my @paths = @{$rule->{paths}}) {
+    if (my @paths = $rule->{paths}->@*) {
         $body .= join(' ', 'FILTER:', @paths) . "\n";
     }
 
-    if (my @extra_options = @{$rule->{options}}) {
+    if (my @extra_options = $rule->{options}->@*) {
         $body .= join(' ', 'EXTRA OPTIONS:', @extra_options) . "\n";
     }
 
@@ -272,10 +272,10 @@ sub notify_affected_refs {
         next unless $git->is_reference_enabled($ref);
         my ($old_commit, $new_commit) = $git->get_affected_ref_range($ref);
         foreach my $rule (@rules) {
-            next if @{$rule->{refs}} && none {$ref =~ /$_/} @{$rule->{refs}};
+            next if $rule->{refs}->@* && none {$ref =~ /$_/} $rule->{refs}->@*;
 
             my @commits = $git->get_commits($old_commit, $new_commit,
-                                            [@options, @{$rule->{options}}],
+                                            [@options, $rule->{options}->@*],
                                             $rule->{paths});
 
             next unless @commits;
@@ -316,7 +316,7 @@ Git::Hooks::Notify - Git::Hooks plugin to notify users via email
 
 =head1 VERSION
 
-version 3.6.0
+version 4.0.0
 
 =head1 SYNOPSIS
 
@@ -640,7 +640,7 @@ Gustavo L. de M. Chaves <gnustavo@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2023 by CPQD <www.cpqd.com.br>.
+This software is copyright (c) 2024 by CPQD <www.cpqd.com.br>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

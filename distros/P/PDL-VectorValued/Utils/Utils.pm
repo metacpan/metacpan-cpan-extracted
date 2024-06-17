@@ -1,26 +1,28 @@
-
 #
 # GENERATED WITH PDL::PP! Don't modify!
 #
 package PDL::VectorValued::Utils;
 
-@EXPORT_OK  = qw( PDL::PP vv_rlevec PDL::PP vv_rldvec PDL::PP vv_enumvec PDL::PP vv_enumvecg PDL::PP vv_rleseq PDL::PP vv_rldseq PDL::PP vv_vsearchvec PDL::PP vv_cmpvec vv_qsortvec vv_qsortveci PDL::PP vv_union PDL::PP vv_intersect PDL::PP vv_setdiff PDL::PP v_union PDL::PP v_intersect PDL::PP v_setdiff PDL::PP vv_vcos );
-%EXPORT_TAGS = (Func=>[@EXPORT_OK]);
+our @EXPORT_OK = qw(vv_rlevec vv_rldvec vv_enumvec vv_enumvecg vv_rleseq vv_rldseq vv_vsearchvec vv_cmpvec vv_qsortvec vv_qsortveci vv_union vv_intersect vv_setdiff v_union v_intersect v_setdiff vv_vcos );
+our %EXPORT_TAGS = (Func=>\@EXPORT_OK);
 
 use PDL::Core;
 use PDL::Exporter;
 use DynaLoader;
 
 
-
-   $PDL::VectorValued::Utils::VERSION = 1.0.22;
-   @ISA    = ( 'PDL::Exporter','DynaLoader' );
+   our $VERSION = '1.0.23';
+   our @ISA = ( 'PDL::Exporter','DynaLoader' );
    push @PDL::Core::PP, __PACKAGE__;
    bootstrap PDL::VectorValued::Utils $VERSION;
 
 
 
 
+
+
+
+#line 21 "utils.pd"
 
 use strict;
 
@@ -39,32 +41,24 @@ PDL::VectorValued::Utils - Low-level utilities for vector-valued PDLs
  ## ... stuff happens
 
 =cut
-
-
-
-
-
-
+#line 45 "Utils.pm"
 
 =head1 FUNCTIONS
-
-
 
 =cut
 
 
 
 
+
+#line 67 "utils.pd"
 
 =pod
 
 =head1 Vector-Based Run-Length Encoding and Decoding
 
 =cut
-
-
-
-
+#line 62 "Utils.pm"
 
 =head2 vv_rlevec
 
@@ -87,22 +81,18 @@ over a 1d PDL.
 
 See also: PDL::Slices::rle, PDL::Ufunc::qsortvec, PDL::Primitive::uniqvec
 
-
-
 =for bad
 
 vv_rlevec does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
-
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
 
 
 
 
-
-
 *vv_rlevec = \&PDL::vv_rlevec;
+
 
 
 
@@ -123,13 +113,10 @@ Can be used together with clump() to run-length decode "values" of arbitrary dim
 
 See also: PDL::Slices::rld.
 
-
-
 =for bad
 
 vv_rldvec does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
-
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
 
@@ -139,7 +126,7 @@ It will set the bad-value flag of all output piddles if the flag is set for any 
 sub PDL::vv_rldvec {
   my ($a,$b,$c) = @_;
   if (!defined($c)) {
-# XXX Need to improve emulation of threading in auto-generating c
+# XXX Need to improve emulation of broadcasting in auto-generating c
     my ($rowlen) = $b->dim(0);
     my ($size) = $a->sumover->max;
     my (@dims) = $a->dims;
@@ -151,7 +138,9 @@ sub PDL::vv_rldvec {
 }
 
 
+
 *vv_rldvec = \&PDL::vv_rldvec;
+
 
 
 
@@ -172,22 +161,18 @@ Note that the keys returned in $k are only unique over a run of a single vector 
 so that each unique vector in $v has at least one 0 (zero) index in $k associated with it.
 If you need global keys, see enumvecg().
 
-
-
 =for bad
 
 vv_enumvec does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
-
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
 
 
 
 
-
-
 *vv_enumvec = \&PDL::vv_enumvec;
+
 
 
 
@@ -209,22 +194,18 @@ Basically does the same thing as:
 
 ... but somewhat more efficiently.
 
-
-
 =for bad
 
 vv_enumvecg does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
-
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
 
 
 
 
-
-
 *vv_enumvecg = \&PDL::vv_enumvecg;
+
 
 
 
@@ -245,22 +226,18 @@ As for rle(), only the elements up to the first instance of 0 in $a should be co
 
 See also PDL::Slices::rle.
 
-
-
 =for bad
 
 vv_rleseq does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
-
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
 
 
 
 
-
-
 *vv_rleseq = \&PDL::vv_rleseq;
+
 
 
 
@@ -284,13 +261,10 @@ as for:
 
 See also: PDL::Slices::rld.
 
-
-
 =for bad
 
 vv_rldseq does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
-
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
 
@@ -310,7 +284,9 @@ sub PDL::vv_rldseq {
 }
 
 
+
 *vv_rldseq = \&PDL::vv_rldseq;
+
 
 
 
@@ -341,17 +317,12 @@ returned.
 
 See also: PDL::Primitive::vsearch().
 
-
-
 =for bad
 
 vv_vsearchvec does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
-
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
-
-
 
 
 
@@ -360,6 +331,9 @@ It will set the bad-value flag of all output piddles if the flag is set for any 
 
 
 
+
+
+#line 392 "utils.pd"
 
 =pod
 
@@ -372,10 +346,7 @@ Older versions of this module used a dedicated implementation as a workaround
 for a bug in PDL-2.4.3, which has long since been fixed.
 
 =cut
-
-
-
-
+#line 350 "Utils.pm"
 
 =head2 vv_cmpvec
 
@@ -383,21 +354,14 @@ for a bug in PDL-2.4.3, which has long since been fixed.
 
   Signature: (a(N); b(N); int [o]cmp())
 
-=for ref
-
 Lexicographically compare a pair of vectors.
-
-
 
 =for bad
 
 vv_cmpvec does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
-
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
-
-
 
 
 
@@ -407,18 +371,19 @@ It will set the bad-value flag of all output piddles if the flag is set for any 
 
 
 
+
+#line 422 "utils.pd"
+
 =head2 vv_qsortvec
 
 =for sig
 
   Signature: (a(n,m); [o]b(n,m))
 
-
 =for ref
 
 Deprecated alias for L<PDL::Ufunc::qsortvec()|PDL::Ufunc/qsortvec>,
 which see for details.
-
 
 =head2 vv_qsortveci
 
@@ -438,9 +403,7 @@ BEGIN {
   *vv_qsortveci = *PDL::vv_qsortveci = *PDL::qsortveci;
 }
 
-
-
-
+#line 463 "utils.pd"
 =pod
 
 =head1 Vector-Valued Set Operations
@@ -449,17 +412,13 @@ The following functions are provided for set operations on
 sorted vector-valued PDLs.
 
 =cut
-
-
-
-
+#line 416 "Utils.pm"
 
 =head2 vv_union
 
 =for sig
 
   Signature: (a(M,NA); b(M,NB); [o]c(M,NC); int [o]nc())
-
 
 Union of two vector-valued PDLs.  Input PDLs $a() and $b() B<MUST> be
 sorted in lexicographic order.
@@ -468,14 +427,10 @@ On return, $nc() holds the actual number of vector-values in the union.
 In scalar context, slices $c() to the actual number of elements in the union
 and returns the sliced PDL.
 
-
-
-
 =for bad
 
 vv_union does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
-
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
 
@@ -493,7 +448,9 @@ It will set the bad-value flag of all output piddles if the flag is set for any 
  }
 
 
+
 *vv_union = \&PDL::vv_union;
+
 
 
 
@@ -505,7 +462,6 @@ It will set the bad-value flag of all output piddles if the flag is set for any 
 
   Signature: (a(M,NA); b(M,NB); [o]c(M,NC); int [o]nc())
 
-
 Intersection of two vector-valued PDLs.
 Input PDLs $a() and $b() B<MUST> be sorted in lexicographic order.
 On return, $nc() holds the actual number of vector-values in the intersection.
@@ -513,13 +469,10 @@ On return, $nc() holds the actual number of vector-values in the intersection.
 In scalar context, slices $c() to the actual number of elements in the intersection
 and returns the sliced PDL.
 
-
-
 =for bad
 
 vv_intersect does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
-
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
 
@@ -540,7 +493,9 @@ It will set the bad-value flag of all output piddles if the flag is set for any 
  }
 
 
+
 *vv_intersect = \&PDL::vv_intersect;
+
 
 
 
@@ -552,7 +507,6 @@ It will set the bad-value flag of all output piddles if the flag is set for any 
 
   Signature: (a(M,NA); b(M,NB); [o]c(M,NC); int [o]nc())
 
-
 Set-difference ($a() \ $b()) of two vector-valued PDLs.
 Input PDLs $a() and $b() B<MUST> be sorted in lexicographic order.
 On return, $nc() holds the actual number of vector-values in the computed vector set.
@@ -560,13 +514,10 @@ On return, $nc() holds the actual number of vector-values in the computed vector
 In scalar context, slices $c() to the actual number of elements in the output vector set
 and returns the sliced PDL.
 
-
-
 =for bad
 
 vv_setdiff does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
-
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
 
@@ -587,10 +538,14 @@ It will set the bad-value flag of all output piddles if the flag is set for any 
  }
 
 
+
 *vv_setdiff = \&PDL::vv_setdiff;
 
 
 
+
+
+#line 697 "utils.pd"
 
 =pod
 
@@ -601,10 +556,7 @@ flat sorted PDLs with unique values.  They may be more efficient to compute
 than the corresponding implementations via PDL::Primitive::setops().
 
 =cut
-
-
-
-
+#line 560 "Utils.pm"
 
 =head2 v_union
 
@@ -612,20 +564,16 @@ than the corresponding implementations via PDL::Primitive::setops().
 
   Signature: (a(NA); b(NB); [o]c(NC); int [o]nc())
 
-
 Union of two flat sorted unique-valued PDLs.
 Input PDLs $a() and $b() B<MUST> be sorted in lexicographic order and contain no duplicates.
 On return, $nc() holds the actual number of values in the union.
 
 In scalar context, reshapes $c() to the actual number of elements in the union and returns it.
 
-
-
 =for bad
 
 v_union does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
-
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
 
@@ -643,7 +591,9 @@ It will set the bad-value flag of all output piddles if the flag is set for any 
  }
 
 
+
 *v_union = \&PDL::v_union;
+
 
 
 
@@ -655,20 +605,16 @@ It will set the bad-value flag of all output piddles if the flag is set for any 
 
   Signature: (a(NA); b(NB); [o]c(NC); int [o]nc())
 
-
 Intersection of two flat sorted unique-valued PDLs.
 Input PDLs $a() and $b() B<MUST> be sorted in lexicographic order and contain no duplicates.
 On return, $nc() holds the actual number of values in the intersection.
 
 In scalar context, reshapes $c() to the actual number of elements in the intersection and returns it.
 
-
-
 =for bad
 
 v_intersect does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
-
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
 
@@ -689,7 +635,9 @@ It will set the bad-value flag of all output piddles if the flag is set for any 
  }
 
 
+
 *v_intersect = \&PDL::v_intersect;
+
 
 
 
@@ -701,20 +649,16 @@ It will set the bad-value flag of all output piddles if the flag is set for any 
 
   Signature: (a(NA); b(NB); [o]c(NC); int [o]nc())
 
-
 Set-difference ($a() \ $b()) of two flat sorted unique-valued PDLs.
 Input PDLs $a() and $b() B<MUST> be sorted in lexicographic order and contain no duplicate values.
 On return, $nc() holds the actual number of values in the computed vector set.
 
 In scalar context, reshapes $c() to the actual number of elements in the difference set and returns it.
 
-
-
 =for bad
 
 v_setdiff does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
-
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
 
@@ -735,20 +679,21 @@ It will set the bad-value flag of all output piddles if the flag is set for any 
  }
 
 
+
 *v_setdiff = \&PDL::v_setdiff;
 
 
 
+
+
+#line 923 "utils.pd"
 
 =pod
 
 =head1 Miscellaneous Vector-Valued Operations
 
 =cut
-
-
-
-
+#line 697 "Utils.pm"
 
 =head2 vv_vcos
 
@@ -756,32 +701,26 @@ It will set the bad-value flag of all output piddles if the flag is set for any 
 
   Signature: (a(M,N);b(M);float+ [o]vcos(N))
 
-
 Computes the vector cosine similarity of a dense vector $b() with respect to each row $a(*,i)
 of a dense PDL $a().  This is basically the same thing as:
 
  ($a * $b)->sumover / ($a->pow(2)->sumover->sqrt * $b->pow(2)->sumover->sqrt)
 
-... but should be must faster to compute, and avoids allocating potentially large temporaries for
+... but should be much faster to compute, and avoids allocating potentially large temporaries for
 the vector magnitudes.  Output values in $vcos() are cosine similarities in the range [-1,1],
 except for zero-magnitude vectors which will result in NaN values in $vcos().
 
-You can use PDL threading to batch-compute distances for multiple $b() vectors simultaneously:
+You can use PDL broadcasting to batch-compute distances for multiple $b() vectors simultaneously:
 
-  $bx   = random($M, $NB);   ##-- get $NB random vectors of size $N
+  $bx   = random($M, $NB);   ##-- get $NB random vectors of size $M
   $vcos = vv_vcos($a,$bx);   ##-- $vcos(i,j) ~ sim($a(,i),$b(,j))
-
-
 
 =for bad
 
 vv_vcos() will set the bad status flag on the output piddle $vcos() if it is set on either of the input
 piddles $a() or $b(), but BAD values will otherwise be ignored for computing the cosine similarity.
 
-
 =cut
-
-
 
 
 
@@ -790,6 +729,9 @@ piddles $a() or $b(), but BAD values will otherwise be ignored for computing the
 
 
 
+
+
+#line 1033 "utils.pd"
 
 ##---------------------------------------------------------------------
 =pod
@@ -824,14 +766,12 @@ Probably many.
 
 =cut
 
-
 ##---------------------------------------------------------------------
 =pod
 
 =head1 AUTHOR
 
 Bryan Jurish E<lt>moocow@cpan.orgE<gt>
-
 
 =head1 COPYRIGHT
 
@@ -848,7 +788,6 @@ the file COPYING in the PDL distribution. If this file is separated
 from the PDL distribution, the copyright notice should be included in
 the file.
 
-
 =item *
 
 All other parts copyright (c) 2007-2022, Bryan Jurish.  All rights reserved.
@@ -859,21 +798,13 @@ as Perl itself.
 
 =back
 
-
 =head1 SEE ALSO
 
 perl(1), PDL(3perl)
 
 =cut
-
-
-
-;
-
-
+#line 807 "Utils.pm"
 
 # Exit with OK status
 
 1;
-
-		   

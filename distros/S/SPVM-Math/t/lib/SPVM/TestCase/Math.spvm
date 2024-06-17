@@ -2808,6 +2808,34 @@ class TestCase::Math {
     return 1;
   }
 
+  static method cnegf : int () {
+    my $z : Complex_2f;
+    $z->{re} = 0.5f;
+    $z->{im} = 0.25f;
+    
+    my $z3 = Math->cnegf($z);
+    
+    unless ($z3->{re} == -0.5f && $z3->{im} == -0.25f) {
+      return 0;
+    }
+    
+    return 1;
+  }
+
+  static method cneg : int () {
+    my $z : Complex_2d;
+    $z->{re} = 0.5;
+    $z->{im} = 0.25;
+    
+    my $z3 = Math->cneg($z);
+    
+    unless ($z3->{re} == -0.5 && $z3->{im} == -0.25) {
+      return 0;
+    }
+    
+    return 1;
+  }
+
   static method cmulf : int () {
     my $eps = 0.001f;
 

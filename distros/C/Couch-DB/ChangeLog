@@ -3,6 +3,11 @@
 	  All code was made by Mark Overmeer.
 	  Attributes refer to people who made contributions in ideas and bug-reports.
 
+version 0.004: Mon 17 Jun 09:20:52 CEST 2024
+
+	Improvements:
+	- implement paging, cleanly.
+
 version 0.003: Sat  8 Jun 10:46:02 CEST 2024
 
 	Changes:

@@ -5,9 +5,9 @@ use strict;
 use warnings;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2024-06-08'; # DATE
+our $DATE = '2024-06-13'; # DATE
 our $DIST = 'App-KemenkesUtils-RDA'; # DIST
-our $VERSION = '0.001'; # VERSION
+our $VERSION = '0.002'; # VERSION
 
 our @EXPORT_OK = qw(
                        kemenkes_get_rda
@@ -72,10 +72,11 @@ $SPEC{kemenkes_get_rda} = {
             summary => 'List all nutrient (symbols)',
             argv => [qw/--list-nutrients/],
             test => 0,
+            'x.doc.max_result_lines' => 8,
         },
         {
             summary => 'List all groups (symbols)',
-            argv => [qw/--list-nutrients/],
+            argv => [qw/--list-groups/],
             test => 0,
         },
         {
@@ -147,7 +148,7 @@ App::KemenkesUtils::RDA - Get one or more values from Indonesian Ministry of Hea
 
 =head1 VERSION
 
-This document describes version 0.001 of App::KemenkesUtils::RDA (from Perl distribution App-KemenkesUtils-RDA), released on 2024-06-08.
+This document describes version 0.002 of App::KemenkesUtils::RDA (from Perl distribution App-KemenkesUtils-RDA), released on 2024-06-13.
 
 =head1 SYNOPSIS
 
@@ -193,33 +194,7 @@ Result:
      "Ca",
      "Cl",
      "Cr",
-     "Cu",
-     "Dietary_Fiber",
-     "Energy",
-     "F",
-     "Fe",
-     "I",
-     "K",
-     "Mg",
-     "Mn",
-     "Na",
-     "Omega3",
-     "Omega6",
-     "P",
-     "Protein",
-     "Se",
-     "Total_Carbohydrate",
-     "Total_Fat",
-     "VA",
-     "VB1",
-     "VB12",
-     "VB2" .. "VB7",
-     "VB9",
-     "VC",
-     "VD",
-     "VE",
-     "VK",
-     "Water",
+ # ...snipped 27 lines for brevity...
      "Zn",
      "group",
      "height",
@@ -230,7 +205,7 @@ Result:
 
 =item * List all groups (symbols):
 
- kemenkes_get_rda(action => "list_nutrients");
+ kemenkes_get_rda(action => "list_groups");
 
 Result:
 
@@ -238,40 +213,32 @@ Result:
    200,
    "OK",
    [
-     "Ca",
-     "Cl",
-     "Cr",
-     "Cu",
-     "Dietary_Fiber",
-     "Energy",
-     "F",
-     "Fe",
-     "I",
-     "K",
-     "Mg",
-     "Mn",
-     "Na",
-     "Omega3",
-     "Omega6",
-     "P",
-     "Protein",
-     "Se",
-     "Total_Carbohydrate",
-     "Total_Fat",
-     "VA",
-     "VB1",
-     "VB12",
-     "VB2" .. "VB7",
-     "VB9",
-     "VC",
-     "VD",
-     "VE",
-     "VK",
-     "Water",
-     "Zn",
-     "group",
-     "height",
-     "weight",
+     "0to5mo",
+     "1to3y",
+     "4to6y",
+     "6to11mo",
+     "7to9y",
+     "add_breastfeeding_0to6m",
+     "add_breastfeeding_6to12m",
+     "add_pregnant_trimst1",
+     "add_pregnant_trimst2",
+     "add_pregnant_trimst3",
+     "female_10to12y",
+     "female_13to15y",
+     "female_16to18y",
+     "female_19to29y",
+     "female_30to49y",
+     "female_50to64y",
+     "female_65to80y",
+     "female_80y_plus",
+     "male_10to12y",
+     "male_13to15y",
+     "male_16to18y",
+     "male_19to29y",
+     "male_30to49y",
+     "male_50to64y",
+     "male_65to80y",
+     "male_80y_plus",
    ],
    {},
  ]

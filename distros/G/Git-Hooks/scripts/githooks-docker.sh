@@ -169,30 +169,3 @@ EOF
         error "Invalid COMMAND: $COMMAND"
         ;;
 esac
-
-__END__
-
-=pod
-
-=encoding UTF-8
-
-=head1 NAME
-
-githooks-docker.sh - Manage Docker images and containers to run Git::Hooks
-
-=head1 VERSION
-
-version 3.6.0
-
-=head1 AUTHOR
-
-Gustavo L. de M. Chaves <gnustavo@cpan.org>
-
-=head1 COPYRIGHT AND LICENSE
-
-This software is copyright (c) 2023 by CPQD <www.cpqd.com.br>.
-
-This is free software; you can redistribute it and/or modify it under
-the same terms as the Perl 5 programming language system itself.
-
-=cut

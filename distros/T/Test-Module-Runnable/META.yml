@@ -27,5 +27,5 @@ requires:
   Moose: '0'
   Test::MockModule: '0'
   Test::More: '0'
-version: v0.6.1
+version: v0.6.2
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

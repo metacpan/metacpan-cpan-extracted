@@ -1,5 +1,34 @@
 Revision history for Test2-Tools-DOM
 
+0.100     2024-06-16 20:21:46+01:00 Europe/London
+
+* Minor documentation changes.
+
+0.004004  2024-06-11 22:19:34+01:00 Europe/London (TRIAL RELEASE)
+
+* Bump minimum required version of Test2::Suite to 0.000084
+
+0.004003  2024-06-11 21:03:49+01:00 Europe/London (TRIAL RELEASE)
+
+* Make DOM checker call-aware: the standard 'call' function from
+  Test2::Tools::Compare can be used to make calls on the underlying
+  Mojo::DOM58 object, as if we were using an object checker
+
+0.004002  2024-06-10 21:54:14+01:00 Europe/London (TRIAL RELEASE)
+
+* Re-instate runtime dependencies that were moved to the test
+  phase in the previous release. Since this is a Test2::Tools
+  distribution, those are always needed.
+
+0.004001  2024-06-10 17:48:27+01:00 Europe/London (TRIAL RELEASE)
+
+* Set Test2::Tools::DOM::Check to stringify what the test 'got'
+  for each delta. This should result in better error diagnostics,
+  since results will now render the partial DOM at each failing
+  step.
+* Use new intercept API in tests, provided by Test2::API v.1302180
+* Bump minimal dependency on Mojo::DOM58 to a non-trial release
+
 0.004     2024-06-07 17:37:02+01:00 Europe/London
 
 * Fixed an issue with tests that explicitly checked for attributes

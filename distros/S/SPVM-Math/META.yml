@@ -1,5 +1,5 @@
 ---
-abstract: 'Mathematical Functions'
+abstract: 'Mathematical Calculations'
 author:
   - 'Yuki Kimoto<kimoto.yuki@gmail.com>'
 build_requires:
@@ -21,5 +21,5 @@ requires:
   SPVM: '0.971006'
 resources:
   repository: https://github.com/yuki-kimoto/Perl-SPVM-Math.git
-version: '1.001'
+version: '1.002'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -7,9 +7,10 @@ use English qw( -no_match_vars );
 use strict;
 use warnings;
 
-our $VERSION = '1.57';
+our $VERSION = '1.58';
 
-sub _BUFFER_SIZE { return 65_536 }
+sub _BUFFER_SIZE  { return 65_536 }
+sub _MSIE_VERSION { return 11 }
 
 my $content_name = 'content.js';
 
@@ -48,17 +49,13 @@ q[return { getLayoutMap: function() { }, lock: function() { }, unlock: function(
 );
 
 sub new {
-    my ( $class, $from_user_agent_string, $to_user_agent_string ) = @_;
+    my ( $class, %agent_parameters ) = @_;
     my $zip = Archive::Zip->new();
     my $manifest =
       $zip->addString( $class->_manifest_contents(), 'manifest.json' );
     $manifest->desiredCompressionMethod( Archive::Zip::COMPRESSION_DEFLATED() );
-    my $content = $zip->addString(
-        $class->_content_contents(
-            $from_user_agent_string, $to_user_agent_string
-        ),
-        $content_name
-    );
+    my $content = $zip->addString( $class->_content_contents(%agent_parameters),
+        $content_name );
     $content->desiredCompressionMethod( Archive::Zip::COMPRESSION_DEFLATED() );
     return $zip;
 }
@@ -88,11 +85,8 @@ _JS_
 }
 
 sub _content_contents {
-    my ( $class, $from_user_agent_string, $to_user_agent_string ) = @_;
-    my $user_agent_contents = $class->user_agent_contents(
-        from => $from_user_agent_string,
-        to   => $to_user_agent_string
-    );
+    my ( $class, %agent_parameters ) = @_;
+    my $user_agent_contents = $class->user_agent_contents(%agent_parameters);
     $user_agent_contents =~ s/\s+/ /smxg;
     $user_agent_contents =~ s/\\n/\\\\n/smxg;
     return <<"_JS_";
@@ -101,15 +95,59 @@ sub _content_contents {
   let text = document.createTextNode('$user_agent_contents');
   script.appendChild(text);
   (document.head || document.documentElement).appendChild(script);
+  script.remove();
 }
 _JS_
 }
 
+my $_function_definition_count = 1;
+
+sub _get_browser_type_and_version {
+    my ( $class, $user_agent_string ) = @_;
+    my ( $browser_type, $browser_version );
+    if ( $user_agent_string =~ /Chrome\/(\d+)/smx ) {
+        ( $browser_type, $browser_version ) = ( 'chrome', $1 );
+        if ( $user_agent_string =~ /Edg(?:[eA]|iOS)?\/(\d+)/smx ) {
+            ( $browser_type, $browser_version ) = ( 'edge', $1 );
+        }
+        elsif ( $user_agent_string =~ /(?:Opera|Presto|OPR)\/(\d+)/smx ) {
+            ( $browser_type, $browser_version ) = ( 'opera', $1 );
+        }
+    }
+    elsif (
+        $user_agent_string =~ /Version\/(\d+)(?:[.]\d+)?[ ].*Safari\/\d+/smx )
+    {
+        ( $browser_type, $browser_version ) = ( 'safari', $1 );
+    }
+    elsif ( $user_agent_string =~ /Trident/smx ) {
+        ( $browser_type, $browser_version ) = ( 'ie', _MSIE_VERSION() );
+    }
+    my $general_token_re   = qr/Mozilla\/5[.]0[ ]/smx;
+    my $platform_etc_re    = qr/[(][^)]+[)][ ]/smx;
+    my $gecko_trail_re     = qr/Gecko\/20100101[ ]/smx;
+    my $firefox_version_re = qr/Firefox\/(\d+)[.]0/smx;
+    if ( $user_agent_string =~
+/^$general_token_re$platform_etc_re$gecko_trail_re$firefox_version_re$/smx
+      )
+    {
+        ( $browser_type, $browser_version ) = ( 'firefox', $1 );
+    }
+    return ( $browser_type, $browser_version );
+}
+
 sub user_agent_contents {
     my ( $class, %parameters ) = @_;
+    my ( $to_browser_type, $to_browser_version );
+    if ( defined $parameters{to} ) {
+        ( $to_browser_type, $to_browser_version ) =
+          $class->_get_browser_type_and_version( $parameters{to} );
+    }
+    $_function_definition_count = 1;
     my ( $definition_name, $function_definition ) =
-      $class->_get_js_function_definition( 'webdriver', 'return false' );
-    my $contents = <<"_JS_";
+      $class->_get_js_function_definition( $to_browser_type, 'webdriver',
+        'return false' );
+    my $native_code_body = $class->_native_code_body($to_browser_type);
+    my $contents         = <<"_JS_";
 {
   if (("console" in window) && ("log" in window.console)) {
     console.log("Loading Firefox::Marionette::Extension::Stealth");
@@ -118,19 +156,64 @@ sub user_agent_contents {
   let winProto = Object.getPrototypeOf(window);
   $function_definition
   Object.defineProperty(navProto, "webdriver", {get: $definition_name, enumerable: false, configurable: true});
-  let getUserMedia = window.navigator.mozGetUserMedia;
+  console.clear = function() { console.log("$class blocked an attempt at clearing the console...") };
+  console.clear.toString = function clear_def() { return "function clear() $native_code_body" };
+  let getUserMedia = navProto.mozGetUserMedia;
 _JS_
-    my $from_user_agent_string = $parameters{from};
-    my $to_user_agent_string   = $parameters{to};
-    if ( defined $to_user_agent_string ) {
-        my ( $from_browser_type, $from_browser_version );
-        my ( $to_browser_type,   $to_browser_version );
-        if ( $to_user_agent_string =~ /Chrome\/(\d+)/smx ) {
-            ( $to_browser_type, $to_browser_version ) = ( 'chrome', $1 );
+    my ( $from_browser_type, $from_browser_version );
+    if ( defined $to_browser_type ) {
+        ( $from_browser_type, $from_browser_version ) =
+          $class->_get_browser_type_and_version( $parameters{from} );
+        if (   ( defined $from_browser_type )
+            && ( $from_browser_type ne $to_browser_type ) )
+        {
+            $contents .= <<"_JS_";
+  window.eval.toString = function eval_def() { return "function eval() $native_code_body" };
+  Function.prototype.bind.toString = function bind_def() { return "function bind() $native_code_body" };
+_JS_
+        }
+        if (   ( $to_browser_type eq 'chrome' )
+            || ( $to_browser_type eq 'edge' )
+            || ( $to_browser_type eq 'opera' ) )
+        {
+            $contents .= $class->_check_and_add_function(
+                $to_browser_type,
+                'Navigator.webkitPersistentStorage',
+                {
+                    function_body =>
+q[return { queryUsageAndQuota: function() { return undefined }, requestQuota: function() { return undefined } }]
+                },
+                {}
+            );
+            $contents .= $class->_check_and_add_function(
+                $to_browser_type,
+                'Navigator.webkitTemporaryStorage',
+                {
+                    function_body =>
+q[return { queryUsageAndQuota: function() { return undefined }, requestQuota: function() { return undefined } }]
+                },
+                {}
+            );
+            $contents .= $class->_check_and_add_function(
+                $to_browser_type,
+                'Window.webkitResolveLocalFileSystemURL',
+                { function_body => q[return undefined] }, {}
+            );
+            $contents .=
+              $class->_check_and_add_function( $to_browser_type,
+                'Window.webkitMediaStream',
+                { function_body => q[return undefined] }, {} );
+            $contents .=
+              $class->_check_and_add_function( $to_browser_type,
+                'Window.webkitSpeechGrammar',
+                { function_body => q[return undefined] }, {} );
             $contents .= <<'_JS_';
-  Object.defineProperty(navProto, "vendor", {value: "Google Inc.", writable: true});
-  Object.defineProperty(navProto, "productSub", {value: "20030107", writable: true});
   delete navProto.oscpu;
+  delete window.ApplePayError;
+  delete window.CSSPrimitiveValue;
+  delete window.Counter;
+  delete navigator.getStorageUpdates;
+  delete window.WebKitMediaKeys;
   let chrome = {
                   csi: function () { },
                   getVariableName: function () { },
@@ -164,27 +247,24 @@ _JS_
                   app: function () { },
                   runtime: { connect: function() { }, sendMessage: function() { } }
                };
-  Object.defineProperty(winProto, "chrome", {value: chrome, writable: true, enumerable: true});
+  Object.defineProperty(winProto, "chrome", {value: chrome, writable: true, enumerable: true, configurable: true});
 
   let canLoadAdAuctionFencedFrame = function() { return true };
  
-  Object.defineProperty(navProto, "canLoadAdAuctionFencedFrame", {value: canLoadAdAuctionFencedFrame, writable: true, enumerable: true});
+  Object.defineProperty(navProto, "canLoadAdAuctionFencedFrame", {value: canLoadAdAuctionFencedFrame, writable: true, enumerable: true, configurable: true});
 
   let createAuctionNonce = function() { return crypto.randomUUID() };
-  Object.defineProperty(navProto, "createAuctionNonce", {value: createAuctionNonce, writable: true, enumerable: true});
+  Object.defineProperty(navProto, "createAuctionNonce", {value: createAuctionNonce, writable: true, enumerable: true, configurable: true});
 
-  Object.defineProperty(navProto, "deprecatedRunAdAuctionEnforcesKAnonymity", {value: false, writable: true, enumerable: true});
-
-  delete window.navigator.mozGetUserMedia;
+  Object.defineProperty(navProto, "deprecatedRunAdAuctionEnforcesKAnonymity", {value: false, writable: true, enumerable: true, configurable: true});
 _JS_
-            if ( $to_user_agent_string =~ /Edg(?:[eA]|iOS)?\/(\d+)/smx ) {
-                ( $to_browser_type, $to_browser_version ) = ( 'edge', $1 );
+
+            if ( $to_browser_type eq 'edge' ) {
             }
-            elsif ( $to_user_agent_string =~ /(?:Opera|Presto|OPR)\/(\d+)/smx )
-            {
-                ( $to_browser_type, $to_browser_version ) = ( 'opera', $1 );
+            elsif ( $to_browser_type eq 'opera' ) {
                 my ( $scrap_name, $scrap_definition ) =
-                  $class->_get_js_function_definition( 'scrap', 'return null' );
+                  $class->_get_js_function_definition( $to_browser_type,
+                    'scrap', 'return null' );
                 $contents .= <<"_JS_";
   $scrap_definition
   Object.defineProperty(winProto, "g_opr", {value: {scrap: $scrap_name}, enumerable: true, configurable: true});
@@ -192,57 +272,96 @@ _JS_
 _JS_
             }
         }
-        elsif ( $to_user_agent_string =~
-            /Version\/(\d+)(?:[.]\d+)?[ ].*Safari\/\d+/smx )
-        {
-            ( $to_browser_type, $to_browser_version ) = ( 'safari', $1 );
+        elsif ( $to_browser_type eq 'safari' ) {
             $contents .= <<'_JS_';
-  Object.defineProperty(navProto, "vendor", {value: "Apple Computer, Inc.", writable: true});
-  Object.defineProperty(navProto, "productSub", {value: "20030107", writable: true});
   delete navProto.oscpu;
-  delete window.navigator.mozGetUserMedia;
+  delete navigator.webkitPersistentStorage;
+  delete navigator.webkitTemporaryStorage;
+  delete window.webkitResolveLocalFileSystemURL;
+  delete window.webkitMediaStream;
+  delete window.webkitSpeechGrammar;
 _JS_
+            $contents .=
+              $class->_check_and_add_function( $to_browser_type,
+                'Window.ApplePayError',
+                { function_body => q[return undefined] }, {} );
+            $contents .=
+              $class->_check_and_add_function( $to_browser_type,
+                'Window.CSSPrimitiveValue',
+                { function_body => q[return undefined] }, {} );
+            $contents .=
+              $class->_check_and_add_function( $to_browser_type,
+                'Window.Counter', { function_body => q[return undefined] },
+                {} );
+            $contents .=
+              $class->_check_and_add_function( $to_browser_type,
+                'Navigator.getStorageUpdates',
+                { function_body => q[return undefined] }, {} );
+            $contents .=
+              $class->_check_and_add_function( $to_browser_type,
+                'Window.WebKitMediaKeys',
+                { function_body => q[return undefined] }, {} );
         }
-        elsif ( $to_user_agent_string =~ /Trident/smx ) {
+        elsif ( $to_browser_type eq 'ie' ) {
             $contents .= <<'_JS_';
   let docProto = Object.getPrototypeOf(window.document);
-  delete navProto.productSub;
-  delete navProto.vendorSub;
-  delete navProto.oscpu;
-  delete window.navigator.mozGetUserMedia;
-  Object.defineProperty(navProto, "vendor", {value: "", writable: true});
-  Object.defineProperty(docProto, "documentMode", {value: true, writable: true, enumerable: true});
-  Object.defineProperty(navProto, "msDoNotTrack", {value: "0", writable: true});
-  Object.defineProperty(winProto, "msWriteProfilerMark", {value: {}, writable: true});
+  delete navigator.webkitPersistentStorage;
+  delete navigator.webkitTemporaryStorage;
+  delete window.webkitResolveLocalFileSystemURL;
+  delete window.webkitMediaStream;
+  delete window.webkitSpeechGrammar;
+  delete window.ApplePayError;
+  delete window.CSSPrimitiveValue;
+  delete window.Counter;
+  delete navigator.getStorageUpdates;
+  delete window.WebKitMediaKeys;
+  Object.defineProperty(docProto, "documentMode", {value: true, writable: true, enumerable: true, configurable: true});
+  Object.defineProperty(navProto, "msDoNotTrack", {value: "0", writable: true, configurable: true});
+  Object.defineProperty(winProto, "msWriteProfilerMark", {value: {}, writable: true, configurable: true});
 _JS_
         }
-        my $general_token_re   = qr/Mozilla\/5[.]0[ ]/smx;
-        my $platform_etc_re    = qr/[(][^)]+[)][ ]/smx;
-        my $gecko_trail_re     = qr/Gecko\/20100101[ ]/smx;
-        my $firefox_version_re = qr/Firefox\/(\d+)[.]0/smx;
-        if ( $to_user_agent_string =~
-/^$general_token_re$platform_etc_re$gecko_trail_re$firefox_version_re$/smx
-          )
-        {
-            ( $to_browser_type, $to_browser_version ) = ( 'firefox', $1 );
+        if ( $to_browser_type eq 'firefox' ) {
             $contents .= <<'_JS_';
-  Object.defineProperty(navProto, "vendor", {value: "", writable: true});
-  Object.defineProperty(navProto, "productSub", {value: "20100101", writable: true});
+  delete navigator.webkitPersistentStorage;
+  delete navigator.webkitTemporaryStorage;
+  delete window.webkitResolveLocalFileSystemURL;
+  delete window.webkitMediaStream;
+  delete window.webkitSpeechGrammar;
+  delete window.ApplePayError;
+  delete window.CSSPrimitiveValue;
+  delete window.Counter;
+  delete navigator.getStorageUpdates;
+  delete window.WebKitMediaKeys;
+  if ("onmozfullscreenchange" in window) {
+  } else {
+    Object.defineProperty(window, "onmozfullscreenchange", {value: undefined, writable: true, configurable: true});
+  }
+  if ("mozInnerScreenX" in window) {
+  } else {
+    Object.defineProperty(window, "mozInnerScreenX", {value: 0, writable: true, configurable: true});
+  }
+  if ("CSSMozDocumentRule" in window) {
+  } else {
+    Object.defineProperty(window, "CSSMozDocumentRule", {value: undefined, writable: true, configurable: true});
+  }
+  if ("CanvasCaptureMediaStream" in window) {
+  } else {
+    Object.defineProperty(window, "CanvasCaptureMediaStream", {value: undefined, writable: true, configurable: true});
+  }
 _JS_
         }
         else {
             $contents .= <<'_JS_';
   delete navProto.buildID;
   delete window.InstallTrigger;
+  delete navProto.mozGetUserMedia;
+  delete window.onmozfullscreenchange;
+  delete window.mozInnerScreenX;
+  delete window.CSSMozDocumentRule;
+  delete window.CanvasCaptureMediaStream;
 _JS_
         }
-        if ( $from_user_agent_string =~
-/^$general_token_re$platform_etc_re$gecko_trail_re$firefox_version_re$/smx
-          )
-        {
-            ( $from_browser_type, $from_browser_version ) = ( 'firefox', $1 );
-        }
-        if ( $from_browser_version && $to_browser_version ) {
+        if ($from_browser_version) {
             $contents .= $class->_browser_compat_data(
                 from_browser_type    => $from_browser_type,
                 from_browser_version => $from_browser_version,
@@ -250,6 +369,36 @@ _JS_
                 to_browser_version   => $to_browser_version,
                 filters              => $parameters{filters},
             );
+        }
+    }
+    my %navigator_agent_mappings = (
+        to          => 'userAgent',
+        app_version => 'appVersion',
+        platform    => 'platform',
+        product     => 'product',
+        product_sub => 'productSub',
+        vendor      => 'vendor',
+        vendor_sub  => 'vendorSub',
+        oscpu       => 'oscpu',
+    );
+    foreach my $key ( sort { $a cmp $b } keys %navigator_agent_mappings ) {
+        if ( defined $parameters{$key} ) {
+            my $encoded = URI::Escape::uri_escape( $parameters{$key} );
+            $contents .= $class->_check_and_add_function(
+                $to_browser_type,
+                'Navigator.' . $navigator_agent_mappings{$key},
+                {
+                    function_body =>
+                      qq[return decodeURIComponent(\\x27$encoded\\x27)],
+                    override => 1
+                },
+                {}
+            );
+        }
+        elsif ( $parameters{to} ) {
+            $contents .= <<"_JS_";
+  delete navigator.$navigator_agent_mappings{$key};
+_JS_
         }
     }
     $contents .= <<'_JS_';
@@ -291,20 +440,30 @@ _JS_
     return $contents;
 }
 
-my $_function_definition_count = 1;
+sub _native_code_body {
+    my ( $class, $to_browser_type ) = @_;
+    my $native_code_body =
+      q[{] . q[\\] . 'n\\x20\\x20\\x20\\x20[native code]' . q[\\] . q[n}];
+    if ( ( defined $to_browser_type ) && ( $to_browser_type eq 'chrome' ) ) {
+        $native_code_body = q[{ [native code] }];
+    }
+    return $native_code_body;
+}
 
 sub _get_js_function_definition {
-    my ( $class, $name, $function_body ) = @_;
+    my ( $class, $to_browser_type, $name, $function_body ) = @_;
     $_function_definition_count += 1;
-    my $actual_name = "fm_def_$_function_definition_count";
+    my $native_code_body = $class->_native_code_body($to_browser_type);
+    my $actual_name      = "fm_def_$_function_definition_count";
     return ( $actual_name, <<"_JS_");
 let $actual_name = new Function("$function_body");
-  $actual_name.toString = function fm_def() { return "function ${name}() {\\n    [native code]\\n}" };
+  $actual_name.toString = function fm_def() { return "function ${name}() $native_code_body" };
 _JS_
 }
 
 sub _check_and_add_function {
-    my ( $class, $property_name, $proposed_change_properties, $deleted_classes )
+    my ( $class, $to_browser_type, $property_name, $proposed_change_properties,
+        $deleted_classes )
       = @_;
     my $javascript_class = $property_name;
     $javascript_class =~ s/[.][\-_@[:alnum:]]+$//smx;
@@ -317,10 +476,28 @@ sub _check_and_add_function {
     my $contents = q[];
     if ( !$deleted_classes->{$javascript_class} ) {
         my ( $definition_name, $function_definition ) =
-          $class->_get_js_function_definition( $function_name,
+          $class->_get_js_function_definition( $to_browser_type, $function_name,
             $proposed_change_properties->{function_body} );
         $contents .= <<"_JS_";
   $function_definition
+_JS_
+        if ( $proposed_change_properties->{override} ) {
+            $contents .=
+              <<"_JS_";    # So far, all overrides are Navigator overrides
+  Object.defineProperty(window.$javascript_class, "$function_name", {get: $definition_name, enumerable: true, configurable: true});
+  Object.defineProperty(navProto, "$function_name", {get: $definition_name, enumerable: true, configurable: true});
+_JS_
+        }
+        elsif ( $javascript_class eq 'Window' ) {
+            $contents .= <<"_JS_";
+  if ("$function_name" in window) {
+  } else {
+    Object.defineProperty(window, "$function_name", {get: $definition_name, enumerable: true, configurable: true});
+  }
+_JS_
+        }
+        else {
+            $contents .= <<"_JS_";
   if (winProto.$parent_class && winProto.$javascript_class) {
     if ("$function_name" in winProto.$javascript_class) {
     } else {
@@ -339,19 +516,20 @@ sub _check_and_add_function {
       }
     }
 _JS_
-        if ( $javascript_class eq 'Navigator' ) {
-            $contents .= <<"_JS_";
-  Object.defineProperty(navProto, "$function_name", {get: $definition_name, enumerable: true, configurable: true});
+            if ( $javascript_class eq 'Navigator' ) {
+                $contents .= <<"_JS_";
+    Object.defineProperty(navProto, "$function_name", {get: $definition_name, enumerable: true, configurable: true});
 _JS_
-        }
-        elsif ( $javascript_class eq 'Document' ) {
-            $contents .= <<"_JS_";
-  Object.defineProperty(window.document, "$function_name", {get: $definition_name, enumerable: true, configurable: true});
+            }
+            elsif ( $javascript_class eq 'Document' ) {
+                $contents .= <<"_JS_";
+    Object.defineProperty(window.document, "$function_name", {get: $definition_name, enumerable: true, configurable: true});
 _JS_
-        }
-        $contents .= <<"_JS_";
+            }
+            $contents .= <<"_JS_";
   }
 _JS_
+        }
     }
     return $contents;
 }
@@ -489,7 +667,7 @@ sub _available_in {
                 }
             }
         }
-        else {
+        elsif ( defined $proposed_change_properties->{rm} ) {
             if ( $proposed_change_properties->{rm} <=
                 $properties{browser_version} )
             {
@@ -553,7 +731,20 @@ sub _browser_compat_data {
                 $change_properties = $proposed_change_properties;
             }
         }
+        my $to_string_tag_allowed = 0;
+        if (
+            defined $browser_properties{'Symbol.toStringTag'}{browsers}
+            { $parameters{to_browser_type} }[0]{add} )
+        {
+            if ( $browser_properties{'Symbol.toStringTag'}{browsers}
+                { $parameters{to_browser_type} }[0]{add} <
+                $parameters{to_browser_version} )
+            {
+                $to_string_tag_allowed = 1;
+            }
+        }
         my $change_details = {
+            to_browser_type            => $parameters{to_browser_type},
             delete_property            => $delete_property,
             add_property               => $add_property,
             change_number              => $change_number,
@@ -562,10 +753,7 @@ sub _browser_compat_data {
             filters                    => $parameters{filters},
             proposed_change_properties => $change_properties,
             deleted_classes            => \%deleted_classes,
-            to_string_tag_allowed      =>
-              $browser_properties{'Symbol.toStringTag'}{browsers}
-              { $parameters{to_browser_type} }[0]{add} <
-              $parameters{to_browser_version},
+            to_string_tag_allowed      => $to_string_tag_allowed,
         };
         $contents .= $class->_process_change($change_details);
     }
@@ -636,6 +824,7 @@ sub _process_change {
         else {
             if (
                 my $proposed_change = $class->_check_and_add_function(
+                    $change_details->{to_browser_type},
                     $change_details->{property_name},
                     $change_details->{proposed_change_properties},
                     $change_details->{deleted_classes}
@@ -668,7 +857,7 @@ Firefox::Marionette::Extension::Stealth - Contains the Stealth Extension
 
 =head1 VERSION
 
-Version 1.57
+Version 1.58
 
 =head1 SYNOPSIS
 

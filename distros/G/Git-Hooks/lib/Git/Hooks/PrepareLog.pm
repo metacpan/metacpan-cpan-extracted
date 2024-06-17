@@ -2,8 +2,8 @@ use warnings;
 
 package Git::Hooks::PrepareLog;
 # ABSTRACT: Git::Hooks plugin to prepare commit messages before being edited
-$Git::Hooks::PrepareLog::VERSION = '3.6.0';
-use v5.16.0;
+$Git::Hooks::PrepareLog::VERSION = '4.0.0';
+use v5.30.0;
 use utf8;
 use Log::Any '$log';
 use Git::Hooks;
@@ -50,17 +50,8 @@ sub insert_issue_in_title {
 sub insert_issue_as_trailer {
     my ($git, $msg_file, $issue, $key) = @_;
 
-    if ($git->version_ge('2.8.0')) {
-        # The interpret-trailers was implemented on Git 2.1.0 and its --in-place
-        # option only on Git 2.8.0.
-        $key = ucfirst lc $key;
-        $git->run(qw/interpret-trailers --in-place --trailer/, "$key:$issue", $msg_file);
-    } else {
-        $git->fault(<<'EOS', {option => 'issue-place'});
-The option 'trailer' setting requires Git 2.8.0 or newer.
-Please, either upgrade your Git or disable this option.
-EOS
-    }
+    $key = ucfirst lc $key;
+    $git->run(qw/interpret-trailers --in-place --trailer/, "$key:$issue", $msg_file);
 
     return;
 }
@@ -146,7 +137,7 @@ Git::Hooks::PrepareLog - Git::Hooks plugin to prepare commit messages before bei
 
 =head1 VERSION
 
-version 3.6.0
+version 4.0.0
 
 =head1 SYNOPSIS
 
@@ -315,7 +306,7 @@ Gustavo L. de M. Chaves <gnustavo@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2023 by CPQD <www.cpqd.com.br>.
+This software is copyright (c) 2024 by CPQD <www.cpqd.com.br>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

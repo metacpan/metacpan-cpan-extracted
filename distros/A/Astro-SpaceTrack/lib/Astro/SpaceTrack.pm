@@ -131,7 +131,7 @@ use Exporter;
 
 our @ISA = qw{ Exporter };
 
-our $VERSION = '0.165';
+our $VERSION = '0.166';
 our @EXPORT_OK = qw{
     shell
 
@@ -361,12 +361,13 @@ my %catalogs = (	# Catalog names (and other info) for each source.
 	    match	=> 1,
 	},
 	# Removed 2024-04-26
-	#ses		=> {
-	#    name	=> 'SES',
-	#    # source	=> 'SES-11P',
-	#    rms		=> 1,
-	#    match	=> 1,
-	#},
+	# Added back 2024-05-23
+	ses		=> {
+	    name	=> 'SES',
+	    # source	=> 'SES-11P',
+	    rms		=> 1,
+	    match	=> 1,
+	},
 	telesat		=> {
 	    name	=> 'Telesat',
 	    # source	=> 'Telesat-E',
@@ -411,12 +412,15 @@ my %catalogs = (	# Catalog names (and other info) for each source.
 	    rms		=> 1,
 	    match	=> 1,
 	},
+	kuiper		=> {
+	    name	=> 'Project Kuiper (Amazon; no match data)',
+	    rms		=> 1,
+	},
 	ast		=> {
 	    name	=> 'AST Space Mobile',
 	    rms		=> 1,
 	    match	=> 1,
 	},
-	# Project Kuiper Internet
     },
     iridium_status => {
 	kelso => {name => 'Celestrak (Kelso)'},
@@ -1551,7 +1555,6 @@ sub _celestrak_repack_iridium {
     sub _celestrak_response_check {
 	my ($self, $resp, $source, $name, @args) = @_;
 
-	$DB::single = 1;
 	# As of 2023-10-17, celestrak( 'fubar' ) gives 200 OK, with
 	# content
 	# Invalid query: "GROUP=fubar&FORMAT=TLE" (GROUP=fubar not found)
@@ -1566,10 +1569,12 @@ sub _celestrak_repack_iridium {
 	my $content = $resp->decoded_content();
 
 	if ( $content =~ m/ \A Invalid \s+ query: /smx ) {
-	    $content =~ m/ \b GROUP=\Q$name\E \s not \s found \b /smx
+	    $content =~ m/ \b (?: GROUP | FILE ) =\Q$name\E \s not \s found \b /smx
 		and return $self->_no_such_catalog(
 		$source => $name, @args);
 	    $resp->code( HTTP_BAD_REQUEST );
+	    $resp->message( HTTP::Status::status_message(
+		    HTTP_BAD_REQUEST ) );
 	    return $resp;
 	}
 
