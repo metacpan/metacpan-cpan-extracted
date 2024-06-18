@@ -3,9 +3,9 @@ package App::ALG;
 use strict;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2024-05-30'; # DATE
+our $DATE = '2024-06-13'; # DATE
 our $DIST = 'App-BPOMUtils-NutritionLabelRef'; # DIST
-our $VERSION = '0.003'; # VERSION
+our $VERSION = '0.004'; # VERSION
 
 1;
 # ABSTRACT: Shorter alias for App::BPOMUtils::NutritionLabelRef
@@ -22,7 +22,7 @@ App::ALG - Shorter alias for App::BPOMUtils::NutritionLabelRef
 
 =head1 VERSION
 
-This document describes version 0.003 of App::ALG (from Perl distribution App-BPOMUtils-NutritionLabelRef), released on 2024-05-30.
+This document describes version 0.004 of App::ALG (from Perl distribution App-BPOMUtils-NutritionLabelRef), released on 2024-06-13.
 
 =head1 DESCRIPTION
 

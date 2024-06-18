@@ -9,7 +9,7 @@ App::Codit::Plugins::Snippets - plugin for App::Codit
 use strict;
 use warnings;
 use vars qw( $VERSION );
-$VERSION = 0.04;
+$VERSION = 0.05;
 
 use Carp;
 
@@ -97,6 +97,7 @@ sub new {
 		-scrollbars => 'osoe',
 		-tabs => '8m',
 		-wrap => 'none',
+		-height => 4,
 		-width => 20,
 	)->pack(@padding, -expand => 1, -fill => 'both');
 	$self->{TEXT} = $text;

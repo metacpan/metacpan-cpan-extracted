@@ -1,6 +1,7 @@
 bin/codit
 Changes
 lib/App/Codit.pm
+lib/App/Codit/BaseClasses/TextModPlugin.pm
 lib/App/Codit/CodeTextManager.pm
 lib/App/Codit/codit_logo.png
 lib/App/Codit/CoditTagsEditor.pm
@@ -27,6 +28,7 @@ README.md
 t/010-App-Codit-CodeTextManager.t
 t/020-App-Codit-SessionManager.t
 t/030-App-Codit-CoditTagsEditor.t
+t/035-App-Codit-BaseClasses-TextModPlugin.t
 t/040-App-Codit.t
 t/050-App-Codit-Plugins-Backups.t
 t/060-App-Codit-Plugins-Bookmarks.t

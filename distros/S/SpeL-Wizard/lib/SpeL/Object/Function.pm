@@ -58,7 +58,7 @@ SpeL::Object::Function - LaTeX function (math) object
 
 =head1 VERSION
 
-version 20240616.1738
+version 20240617.1739
 
 =head1 METHODS
 

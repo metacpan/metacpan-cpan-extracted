@@ -177,10 +177,7 @@ sub Unload {
 	$self->cmdUnhookBefore('deferred_open', 'docOpen', $self);
 	$self->cmdUnhookAfter('modified', 'activate', $self);
 	$self->cmdUnhookAfter('doc_close', 'docClose', $self);
-	# TODO Change this after new version of Tk::AppWindow
-	#return $self->SUPER::Unload;
-	$self->SUPER::Unload;
-	return 1
+	return $self->SUPER::Unload;
 }
 
 =head1 LICENSE

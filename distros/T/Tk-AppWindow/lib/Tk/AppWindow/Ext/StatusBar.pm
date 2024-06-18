@@ -200,11 +200,14 @@ sub AddImageItem {
 	my $self = shift;
 	my $name = shift;
 	my %options = (@_);
-	my $img = $options{'-valueimages'};
-	if (defined $img) {
-		for (keys %$img) {
-			$img->{$_} = $self->getArt($img->{$_})
+	my $imgo = delete $options{'-valueimages'};
+	my %vi = ();
+	if (defined $imgo) {
+		for (keys %$imgo) {
+			my $img = $imgo->{$_};
+			$vi{$_} = $self->getArt($img);
 		}
+		$options{'-valueimages'} = \%vi;
 	}
 	return $self->Add('image', $name, %options);
 }

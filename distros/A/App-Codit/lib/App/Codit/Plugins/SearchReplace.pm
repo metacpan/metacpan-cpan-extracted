@@ -9,7 +9,7 @@ App::Codit::Plugins::SearchReplace - plugin for App::Codit
 use strict;
 use warnings;
 use vars qw( $VERSION );
-$VERSION = 0.03;
+$VERSION = 0.05;
 
 use base qw( Tk::AppWindow::BaseClasses::Plugin );
 require Tk::LabFrame;
@@ -48,14 +48,15 @@ sub new {
 	my $useregex = '-exact';
 	my $searchmode = 'Search in current document';
 
-	$self->{SEARCH} = \$searchterm;
+	$self->{CASE} = \$casesensitive;
 	$self->{FRESH} = {};
+	$self->{MODE} = \$searchmode;
 	$self->{OFFSET} = {};
 	$self->{REPLACE} = \$replaceterm;
-	$self->{REPLACES} = 0;
-	$self->{CASE} = \$casesensitive;
+	$self->{REPLACED} = 0;
 	$self->{REGEX} = \$useregex;
-	$self->{MODE} = \$searchmode;
+	$self->{SEARCH} = \$searchterm;
+	$self->{SKIPPED} = 0;
 
 	my @padding = (-padx => 2, -pady => 2);
 
@@ -158,6 +159,7 @@ sub new {
 		-command => ['BrowseNext', $self],
 	)->pack(@padding, -side => 'left', -expand => 1, -fill => 'x');
 	my $results = $tf->Scrolled('ITree',
+		-height => 4,
 		-browsecmd => ['Select', $self],
 		-scrollbars => 'osoe',
 		-separator => '@',
@@ -167,6 +169,18 @@ sub new {
 
 	return $self;
 }
+sub _repl {
+	my $self = shift;
+	$self->{REPLACED} = shift if @_;
+	return $self->{REPLACED}
+}
+
+sub _skip {
+	my $self = shift;
+	$self->{SKIPPED} = shift if @_;
+	return $self->{SKIPPED}
+}
+
 
 sub BrowseNext {
 	my $self = shift;
@@ -242,7 +256,8 @@ sub Clear {
 	my @c = $list->infoChildren('');
 	$list->deleteAll;
 	$self->{OFFSET} = {};
-	$self->{REPLACES} = 0;
+	$self->_repl(0);
+	$self->_skip(0);
 }
 
 sub ClearFresh {
@@ -372,7 +387,7 @@ sub FinishedCheck {
 	unless (defined $cur) {
 		$self->{RESULTSLIST}->selectionClear;
 		my $num = $self->{REPLACES};
-		$self->log("Replace completed, $num replaces made");
+		$self->Report(1);
 		return 1
 	}
 	return 0;
@@ -483,15 +498,24 @@ sub Replace {
 		$widg->ReplaceSelectionsWith($$replace);
 		$list->deleteEntry($cur);
 
-		my $num = $self->{REPLACES};
-		$num ++;
-		$self->{REPLACES} = $num;
+		$self->_repl($self->_repl + 1);
+		$self->Report;
 		my @h = $list->infoChildren($name);
 		$list->deleteEntry($name) unless @h;
 		$self->GoCurrent unless $self->FinishedCheck;
 	} else {
 		$self->GoCurrent unless $self->FinishedCheck;
 	}
+}
+
+sub Report {
+	my ($self, $flag) = @_;
+	$flag = 0 unless defined $flag;
+	my $rep = $self->_repl;
+	my $skp = $self->_skip;
+	my $text = "Made $rep replaces and skipped $skp";
+	$text = "Replacing finished. $text" if $flag;
+	$self->log($text)
 }
 
 sub Select {
@@ -522,6 +546,8 @@ sub Skip {
 	}
 	my ($name, $index) = split(/@/, $cur);
 	$self->OffsetInc($name);
+	$self->_skip($self->_skip + 1);
+	$self->Report;
 	$self->GoCurrent unless $self->FinishedCheck;
 }
 

@@ -10,6 +10,7 @@ use Config;
 my $mswin = $Config{'osname'} eq 'MSWin32';
 $mwclass = 'App::Codit';
 
+$delay = 2000;
 $quitdelay = 1000 if $mswin;
 
 BEGIN { use_ok('App::Codit::Plugins::PodViewer') };
@@ -26,12 +27,12 @@ if (defined $app) {
 	$pext = $app->extGet('Plugins');
 }
 push @tests, (
-	[ sub { 
+	[ sub {
 		return $pext->plugExists('PodViewer') 
 	}, 1, 'Plugin PodViewer loaded' ],
 	[ sub {
-		pause(100);
 		$pext->plugUnload('PodViewer');
+		pause(400);
 		my $b = $pext->plugGet('PodViewer');
 		return defined $b 
 #		return $pext->plugExists('PodViewer') 

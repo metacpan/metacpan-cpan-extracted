@@ -52,9 +52,16 @@ pod2usage( -message => "Incorrect number of arguments",
 ###################
 # Read config file
 #################
-my $configfilename = $ENV{'SPELWIZARD_CONFIG'} ?
-  $ENV{'SPELWIZARD_CONFIG'} :
-  ( File::Spec->catfile( File::ShareDir::dist_dir( 'SpeL-Wizard' ) , "tts.conf") );
+# use 1. specific location if SPELWIZARD_CONIG is set,
+#     2. else, home configuration folder,
+#     3. or else, distribution folder
+my $home = $^O eq 'MSWin32' ? $ENV{'userprofile'} : $ENV{'HOME'};
+my $configdir = $ENV{'SPELWIZARD_CONFIG'}
+  // File::Spec->catfile( $home, '.spel-wizard' );
+my $configfilename = ( File::Spec->catfile( $configdir, 'tts.conf' ) );
+$configfilename = 
+  File::Spec->catfile( File::ShareDir::dist_dir( 'SpeL-Wizard' ) ,
+		       "tts.conf") if ( ! -r $configfilename );
 dieExit( 13, "Error: cannot find config file" )
   unless( -r $configfilename );
 my $config = Config::Tiny->read( $configfilename )
@@ -68,6 +75,8 @@ my $openingline = "spel-wizard.pl - v$version - $author";
 say STDERR $openingline . "\n" .
   ("=" x length( $openingline ) )
   if( $opt_verbose >= 1 );
+
+say STDERR "- Reading configuration file from $configfilename";
 
 my $spelWizard = SpeL::Wizard->new( $argument, $config );
 
@@ -119,7 +128,7 @@ spel-wizard.pl - converts spelchunks to to plain text
 
 =head1 VERSION
 
-version 20240616.1738
+version 20240617.1739
 
 =head1 SYNOPSIS
 

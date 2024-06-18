@@ -1,0 +1,52 @@
+#!/usr/bin/env perl
+
+package TOTP::Debugger;
+
+use strict;
+use warnings;
+
+use POSIX qw{strftime};
+use Trog::TOTP;
+use Getopt::Long qw{GetOptionsFromArray};
+
+sub help {
+    my $code = shift;
+    print "totp_debugger [--code CODE] [--period PERIOD] SECRET\n";
+    return $code;
+}
+
+sub main {
+    my @args = @_;
+    my ($code, $period, $when, $help);
+    GetOptionsFromArray(\@args,
+        'help|?'   => \$help,
+        'code=s'   => \$code,
+        'period=s' => \$period,
+        'when=i'   => \$when,
+    );
+    my $secret = shift @args;
+
+    return help(0) if $help;
+    return help(1) unless $secret;
+
+    my $tp = Trog::TOTP->new();
+    $tp->_valid_secret($secret);
+    $tp->_valid_period($period);
+
+    my $cur = $tp->expected_totp_code(time);
+    print "Currently valid code: $cur\n";
+
+    if ($code) {
+        my $valid_at = $tp->time_for_code($code);
+        if ($valid_at) {
+            print "Code provided was valid at ".strftime("%Y-%m-%d %H:%M:%S", gmtime($valid_at))."Z\n";
+        } else {
+            print "Code provided was not valid at any time in the last or next 24 hours.\n";
+        }
+    }
+    return 0;
+}
+
+exit main(@ARGV) unless caller();
+
+1;

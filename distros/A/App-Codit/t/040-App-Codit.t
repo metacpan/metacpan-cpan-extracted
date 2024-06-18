@@ -4,7 +4,7 @@ use warnings;
 use Tk;
 
 use Test::Tk;
-use Test::More tests => 13;
+use Test::More tests => 12;
 use File::Spec;
 $mwclass = 'App::Codit';
 #$delay = 1500;
@@ -22,9 +22,6 @@ push @tests, (
 	[ sub { 
 		return $app->extExists('Art') 
 	}, 1, 'Extension Art loaded' ],
-	[ sub { 
-		return $app->extExists('Balloon') 
-	}, 1, 'Extension Balloon loaded' ],
 	[ sub { 
 		return $app->extExists('CoditMDI') 
 	}, 1, 'Extension CodMDI loaded' ],

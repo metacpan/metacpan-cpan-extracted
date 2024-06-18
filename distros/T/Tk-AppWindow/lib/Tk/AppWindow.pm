@@ -10,7 +10,7 @@ use strict;
 use warnings;
 use Carp;
 use vars qw($VERSION);
-$VERSION="0.08";
+$VERSION="0.10";
 
 use base qw(Tk::Derived Tk::MainWindow);
 Construct Tk::Widget 'AppWindow';
@@ -167,6 +167,7 @@ sub Populate {
 	$self->{GEOEXCLUSIVE} = '';
 	$self->{EXTENSIONS} = {};
 	$self->{EXTLOADORDER} = [];
+	$self->{LOGDISABLED} = 0;
 	$self->{NAMESPACE} = $namespace;
 	$self->{WORKSPACE} = $self;
 
@@ -760,18 +761,51 @@ sub getArt {
 	return undef
 }
 
+=item B<log>I<($message)>
+
+Log $message
+
+=cut
+
 sub log {
 	my ($self, $message) = @_;
+	return if $self->logDisabled;
 	$self->Callback('-logcall', $message);
 }
 
+=item B<logDisabled>I<(?$flag?)>
+
+Disable/enable logging of messages.
+
+=cut
+
+sub logDisabled {
+	my $self = shift;
+	$self->{LOGDISABLED} = shift if @_;
+	return $self->{LOGDISABLED}
+}
+
+=item B<logError>I<($message)>
+
+Log $message as an error
+
+=cut
+
 sub logError {
 	my ($self, $message) = @_;
+	return if $self->logDisabled;
 	$self->Callback('-logerrorcall', $message);
 }
 
+=item B<logWarning>I<($message)>
+
+Log $message as a warning
+
+=cut
+
 sub logWarning {
 	my ($self, $message) = @_;
+	return if $self->logDisabled;
 	$self->Callback('-logwarningcall', $message);
 }
 

@@ -1,6 +1,6 @@
 package SPVM::Math;
 
-our $VERSION = "1.002";
+our $VERSION = "1.003";
 
 1;
 
@@ -99,6 +99,12 @@ Calls L<atan|https://linux.die.net/man/3/atan> function defined in C<math.h> in 
 C<static method atan2 : double ($y : double, $x : double);>
 
 Calls L<atan2|https://linux.die.net/man/3/atan2> function defined in C<math.h> in the C language and returns its return value.
+
+=head2 atan2f
+
+C<static method atan2f : float ($y : float, $x : float);>
+
+Calls L<atan2f|https://linux.die.net/man/3/atan2f> function defined in C<math.h> in the C language and returns its return value.
 
 =head2 atanf
 

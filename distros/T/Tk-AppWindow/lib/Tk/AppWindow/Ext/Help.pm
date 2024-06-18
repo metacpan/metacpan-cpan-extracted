@@ -196,6 +196,19 @@ sub CmdAbout {
 				$row++
 			}
 		}
+		$lp->Button(
+			-text => 'Copy',
+			-command => sub {
+				my $text = '';
+				for (@$components) {
+					my $module = $_;
+					my $version = $self->moduleVersion($module);
+					$text = $text . "$module: $version\n";
+				}
+				$self->clipboardClear;
+				$self->clipboardAppend($text);
+			}
+		)->pack;
 	} else {
 		$ap = $db->Frame->pack(-expand => 1, -fill => 'both') unless defined $ap;
 	}

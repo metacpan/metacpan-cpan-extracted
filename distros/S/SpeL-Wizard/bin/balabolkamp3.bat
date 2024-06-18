@@ -17,4 +17,4 @@ set "OUTPUT_FILE=%~2"
 set "VOICE=%~3"
 
 REM Call Balabolka to synthesize speech
-balabolka.exe -f "%TEXT_FILE%" -m "%OUTPUT_FILE%" -n "%VOICE%"
+balabolka.exe -mqs "%TEXT_FILE%" "%OUTPUT_FILE%" "%VOICE%"

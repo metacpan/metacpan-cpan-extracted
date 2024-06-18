@@ -2,7 +2,8 @@
 
 use warnings;
 use strict;
-use Test::Most tests => 6;
+use Test::Most tests => 7;
+use Test::NoWarnings;
 
 BEGIN {
 	use_ok('LWP::UserAgent::Throttled');

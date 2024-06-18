@@ -99,6 +99,15 @@ int32_t SPVM__Math__atan2(SPVM_ENV* env, SPVM_VALUE* stack) {
   return 0;
 }
 
+int32_t SPVM__Math__atan2f(SPVM_ENV* env, SPVM_VALUE* stack) {
+  
+  double ret = atan2f(stack[0].fval, stack[1].fval);
+  
+  stack[0].fval = ret;
+  
+  return 0;
+}
+
 int32_t SPVM__Math__atanf(SPVM_ENV* env, SPVM_VALUE* stack) {
   
   float ret = atanf(stack[0].fval);

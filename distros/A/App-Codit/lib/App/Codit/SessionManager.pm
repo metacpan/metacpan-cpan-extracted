@@ -12,7 +12,7 @@ use Carp;
 require Tk::YAMessage;
 use File::Copy;
 use vars qw($VERSION);
-$VERSION="0.01";
+$VERSION="0.06";
 
 use base qw(Tk::Derived Tk::YADialog);
 Construct Tk::Widget 'SessionManager';
@@ -46,43 +46,43 @@ sub Populate {
 	)->pack(-side => 'left', -fill => 'y', @padding);
 
 	$bf->Button(
-		-image => $art->CreateCompound(
+		-image => $art->createCompound(
 			-text => 'Open',
-			-image => $art->GetIcon('document-open', 22),
+			-image => $art->getIcon('document-open', 22),
 		),
 		-anchor => 'w',
 		-command => ['Open', $self],
 	)->pack(@padding, -fill => 'x');
 	$bf->Button(
-		-image => $art->CreateCompound(
+		-image => $art->createCompound(
 			-text => 'New session',
-			-image => $art->GetIcon('document-new', 22),
+			-image => $art->getIcon('document-new', 22),
 		),
 		-anchor => 'w',
 		-command => ['NewSession', $self],
 	)->pack(@padding, -fill => 'x');
 	$bf->Label(-text => ' ')->pack(@padding);
 	$bf->Button(
-		-image => $art->CreateCompound(
+		-image => $art->createCompound(
 			-text => 'Duplicate',
-			-image => $art->CreateEmptyImage(22),
+			-image => $art->createEmptyImage(22),
 		),
 		-anchor => 'w',
 		-command => ['Duplicate', $self],
 	)->pack(@padding, -fill => 'x');
 	$bf->Button(
-		-image => $art->CreateCompound(
+		-image => $art->createCompound(
 			-text => 'Rename',
-			-image => $art->CreateEmptyImage(22),
+			-image => $art->createEmptyImage(22),
 		),
 		-anchor => 'w',
 		-command => ['Rename', $self],
 	)->pack(@padding, -fill => 'x');
 	$bf->Label(-text => ' ')->pack(@padding);
 	$bf->Button(
-		-image => $art->CreateCompound(
+		-image => $art->createCompound(
 			-text => 'Delete',
-			-image => $art->GetIcon('edit-delete', 22),
+			-image => $art->getIcon('edit-delete', 22),
 		),
 		-anchor => 'w',
 		-command => ['Delete', $self],

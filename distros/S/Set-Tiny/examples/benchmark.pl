@@ -1,16 +1,17 @@
 #!/usr/bin/perl
+use warnings;
 use strict;
 use lib 'lib';
 
 # non-representative benchmark of different Set:: modules
-
+# TODO: replace Benchmark with https://metacpan.org/pod/Benchmark::Dumb
 use Benchmark qw( cmpthese );
 
 use Set::Tiny;
 use Set::Scalar;
 use Set::Object;
 
-my @a =  1 .. 100;
+my @a = 1 .. 100;
 my @b = 51 .. 150;
 
 my $s_t1 = Set::Tiny->new(@a);
@@ -28,6 +29,7 @@ my %tests = (
         s => sub { Set::Scalar->new(@a) },
         o => sub { Set::Object->new(@a) },
     },
+
     # Set::Object doesn't have a clone() method
     #clone => {
     #    t => sub { $s_t1->clone },
@@ -79,6 +81,7 @@ my %tests = (
         s => sub { $s_s1->is_disjoint($s_s2) },
         o => sub { $s_o1->is_disjoint($s_o2) },
     },
+
     # The $set->contains(@elemets) methods are not identical:
     # Set::Tiny's and Set::Object's contains() returns true if $set contains
     # *all* of @elements
@@ -111,13 +114,16 @@ my %tests = (
 );
 
 print "running benchmarks with sets of size ",
-      scalar @a, " and ", scalar @b, "\n";
-for my $test (sort keys %tests) {
+  scalar @a, " and ", scalar @b, "\n";
+for my $test ( sort keys %tests ) {
     print "\n$test:\n";
-    cmpthese( -1, {
-        'Set::Tiny'   => $tests{$test}{t},
-        'Set::Scalar' => $tests{$test}{s},
-        'Set::Object' => $tests{$test}{o},
-    });
+    cmpthese(
+        -1,
+        {
+            'Set::Tiny'   => $tests{$test}{t},
+            'Set::Scalar' => $tests{$test}{s},
+            'Set::Object' => $tests{$test}{o},
+        }
+    );
 }
 

@@ -138,7 +138,7 @@ use strict;
 use warnings;
 use Carp;
 use vars qw($VERSION);
-$VERSION="0.04";
+$VERSION="0.06";
 use Tk;
 require App::Codit::CodeTextManager;
 
@@ -151,18 +151,19 @@ sub Populate {
 	$self->geometry('800x600+150+150');
 
 	my %opts = (
-		-appname => 'Codit',
+#		-appname => 'Codit',
 		-logo => Tk::findINC('App/Codit/codit_logo.png'),
-		-extensions => [qw[Art Balloon CoditMDI ToolBar StatusBar MenuBar Navigator ToolPanel Help Settings Plugins]],
+		-extensions => [qw[Art CoditMDI ToolBar StatusBar MenuBar Navigator ToolPanel Help Settings Plugins]],
 		-documentinterface => 'CoditMDI',
 		-namespace => 'App::Codit',
 		-savegeometry => 1,
 
 		-aboutinfo => {
-			version => $VERSION,
+#			version => $VERSION,
 			author => 'Hans Jeuken',
+			components => ['Syntax::Kamelon', 'Tk', 'Tk::AppWindow', 'Tk::CodeText'],
 			http => 'https://github.com/haje61/App-Codit',
-			license => 'Same as Perl',
+#			license => 'Same as Perl',
 		},
 		-helpfile => Tk::findINC('App/Codit/manual.pdf'),
 
@@ -200,9 +201,9 @@ sub Populate {
 			'*end',
 			'*section' => 'Editor settings',
 			-contentautoindent => ['boolean', 'Auto indent'],
-			-contentindent => ['text', 'Indent style'],
+			-contentindent => ['text', 'Indent style', -width => 4],
 			'*column',
-			-contenttabs => ['text', 'Tab size'],
+			-contenttabs => ['text', 'Tab size', -width => 4],
 			-contentwrap => ['radio', 'Wrap', -values => [qw[none char word]]],
 			'*end',
 			'*section' => 'Show indicators',
@@ -213,12 +214,12 @@ sub Populate {
 
 			'*page' => 'GUI',
 			'*section' => 'Icon sizes',
-			-iconsize => ['spin', 'General'],
-			-menuiconsize => ['spin', 'Menu bar'],
-			-tooliconsize => ['spin', 'Tool bar'],
+			-iconsize => ['spin', 'General', -width => 4],
+			-menuiconsize => ['spin', 'Menu bar', -width => 4],
+			-tooliconsize => ['spin', 'Tool bar', -width => 4],
 			'*column',
-			-navigatorpaneliconsize => ['spin', 'Navigator panel'],
-			-toolpaneliconsize => ['spin', 'Tool panel'],
+			-navigatorpaneliconsize => ['spin', 'Navigator panel', -width => 4],
+			-toolpaneliconsize => ['spin', 'Tool panel', -width => 4],
 			'*end',
 			'*section' => 'Visibility at lauch',
 			-toolbarvisible => ['boolean', 'Tool bar'],

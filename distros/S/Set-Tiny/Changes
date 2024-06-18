@@ -1,5 +1,12 @@
 Revision history for Set-Tiny
 
+0.05    2024-06-17
+        Migration from Makefile.PL to Dist::Zilla.
+        Enabled warnings pragma.
+        Replaced test files with Dist::Zilla extensions.
+        Minor refactorings to more "modern" Perl.
+        Forcing minimum Perl version.
+
 0.04    2016-02-22
         Updated convenience initializer:
             - If you pass a Set::Tiny, it will return a clone of that Set::Tiny

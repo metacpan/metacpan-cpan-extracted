@@ -1,4 +1,4 @@
-package Trog::TOTP 1.003;
+package Trog::TOTP 1.004;
 
 use strict;
 use warnings;
@@ -11,6 +11,8 @@ use v5.14.0;    # Before 5.006, v5.10.0 would not be understood.
 use Ref::Util qw{is_coderef is_hashref};
 use Digest::SHA();
 use Encode::Base2N();
+use List::Util qw{first};
+use POSIX qw{floor};
 
 use Carp::Always;
 
@@ -248,6 +250,17 @@ sub expected_totp_code {
     return sprintf( "%0" . $self->{digits} . "d", ( $encrypted % ( 10**$self->{digits} ) ) );
 }
 
+
+sub time_for_code {
+    my ( $self, $code, $now ) = @_;
+    $now //= time;
+    my $day_in_seconds = 86400;
+    my @past   = map { $now - ($_ * $self->{period}) } 0 .. floor($day_in_seconds / $self->{period});
+    my @future = map { $now + ($_ * $self->{period}) } 0 .. floor($day_in_seconds / $self->{period});
+    return first { $self->expected_totp_code($_) == $code } (@past, @future);
+    return;
+}
+
 sub _gen_secret {
     my $self   = shift;
     my $length = shift || 20;
@@ -336,13 +349,15 @@ Trog::TOTP - Fork of Authen::TOTP
 
 =head1 VERSION
 
-version 1.003
+version 1.004
 
 =head1 DESCRIPTION
 
 C<Trog::TOTP> is a fork of C<Authen::TOTP>.
 
 While patches were initially merged upstream, no CPAN releases happened, so here we are.
+
+Also includes a bin/ script totp_debugger to help you debug situations where TOTP isn't working for your users.
 
 =head1 NAME
 
@@ -395,6 +410,10 @@ Trog::TOTP - Interface to RFC6238 two factor authentication (2FA)
 
   # Just print out the dang code
   print $gen->expected_totp_code(time);
+
+  # For when your users just can't seem to get it to work (100% chance of this)
+  # This is the only way to have them dead to rights that their clock is wrong, or they have the wrong code
+  print $gen->time_for_code($code);
 
 =head1 CONSTRUCTOR
 
@@ -471,6 +490,13 @@ Returns, and optionally sets the algorithm if passed.
 
 Returns what a code "ought" to be at any given unix timestamp.
 Useful for integrating into command line tooling to fix things when people have "tecmological differences" with their telephone.
+
+=head2 time_for_code( STRING $code, TIME_T $when )
+
+Search at what time during the prior (or future!) 24 hours about $when in which the provided code is valid
+This is useful for dealing with users that just inexplicably fail due to bad clocks
+
+Returns undef in the event the code is not valid for the period, in which case their scan of a QR was bogus, or their validator app is buggy.
 
 =head2 generate_otp
 

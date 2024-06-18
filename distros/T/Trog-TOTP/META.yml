@@ -19,12 +19,13 @@ name: Trog-TOTP
 provides:
   Trog::TOTP:
     file: lib/Trog/TOTP.pm
-    version: '1.003'
+    version: '1.004'
 requires:
   Carp::Always: '0'
   Digest::SHA: '0'
   Encode::Base2N: '0'
   List::Util: '1.33'
+  POSIX: '0'
   Ref::Util: '0'
   perl: '5.014'
   strict: '0'
@@ -33,7 +34,7 @@ resources:
   bugtracker: https://github.com/teodesian/Trog-TOTP/issues
   homepage: https://github.com/teodesian/Trog-TOTP
   repository: https://github.com/teodesian/Trog-TOTP.git
-version: '1.003'
+version: '1.004'
 x_contributors:
   - 'Thanos Chatziathanassiou <tchatzi@arx.net>'
 x_generated_by_perl: v5.30.0

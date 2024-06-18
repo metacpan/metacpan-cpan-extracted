@@ -1,5 +1,18 @@
 Revision history for Perl extension App::Codit.
 
+0.06 Tue Jun 18 2024
+	-fixed bugs in SessionManager module.
+
+0.05 Mon Jun 17 2024
+	- fixed POD errors
+	- adjusted plugins Backup and WordCompletion to Tk::AppWindow 0.07.
+	- added plugin base class TextModPlugin
+	- revised plugins PerlSubs and PodViewer they are now based on TextModPlugin
+	- added components tab to the about dialog.
+	- text widgets now have a context menu
+	- connected text widgets to the logging system
+	- plugin SearchReplace now logs replaces and skips
+
 0.04 Thu May 23 2024
 	- Fixed bug in plugins PerlSubs and PodViewer
 	- improved testing for windows

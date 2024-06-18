@@ -1,13 +1,13 @@
 package Set::Tiny;
 
-use 5.004;
+use warnings;
 use strict;
+use Exporter 'import';
+our @EXPORT_OK = qw(set);
 
-require Exporter;
-@Set::Tiny::ISA = qw(Exporter);
-@Set::Tiny::EXPORT_OK = qw(set);
+our $VERSION = '0.05'; # VERSION
 
-$Set::Tiny::VERSION = '0.04';
+# ABSTRACT: Simple sets of strings
 
 sub new {
     my $class = shift;
@@ -17,24 +17,24 @@ sub new {
 }
 
 sub set {
-    if (ref($_[0]) eq "Set::Tiny") {
+    if ( ref( $_[0] ) eq 'Set::Tiny' ) {
         return $_[0]->clone();
     }
-    elsif (ref($_[0]) eq 'ARRAY') {
-        return Set::Tiny->new(@{$_[0]});
+    elsif ( ref( $_[0] ) eq 'ARRAY' ) {
+        return Set::Tiny->new( @{ $_[0] } );
     }
     else {
         return Set::Tiny->new(@_);
     }
 }
 
-sub as_string { "(" . join(" ", sort keys %{$_[0]}) . ")" }
+sub as_string { '(' . join( ' ', sort keys %{ $_[0] } ) . ')' }
 
-sub size { scalar keys %{$_[0]} }
+sub size { scalar keys %{ $_[0] } }
 
-sub element { exists $_[0]->{$_[1]} ? $_[1] : () }
+sub element { exists $_[0]->{ $_[1] } ? $_[1] : () }
 
-sub elements { keys %{$_[0]} }
+sub elements { keys %{ $_[0] } }
 
 sub contains {
     my $self = shift;
@@ -44,11 +44,11 @@ sub contains {
 
 sub clone {
     my $class = ref $_[0];
-    return $class->new( keys %{$_[0]} );
+    return $class->new( keys %{ $_[0] } );
 }
 
 sub clear {
-    %{$_[0]} = ();
+    %{ $_[0] } = ();
     return $_[0];
 }
 
@@ -66,63 +66,70 @@ sub remove {
 
 sub invert {
     my $self = shift;
-    exists $self->{$_} ? delete $self->{$_} : ($self->{$_} = undef) for @_;
+    exists $self->{$_} ? delete $self->{$_} : ( $self->{$_} = undef ) for @_;
     return $self;
 }
 
-sub is_null { ! %{$_[0]} }
+sub is_null { !%{ $_[0] } }
 
-sub is_subset { $_[1]->contains( keys %{$_[0]} ) }
+sub is_subset { $_[1]->contains( keys %{ $_[0] } ) }
 
-sub is_proper_subset { $_[0]->size < $_[1]->size && $_[0]->is_subset($_[1]) }
+sub is_proper_subset { $_[0]->size < $_[1]->size && $_[0]->is_subset( $_[1] ) }
 
-sub is_superset { $_[1]->is_subset($_[0]) }
+sub is_superset { $_[1]->is_subset( $_[0] ) }
 
-sub is_proper_superset { $_[0]->size > $_[1]->size && $_[1]->is_subset($_[0]) }
-
-sub is_equal { $_[1]->is_subset($_[0]) && $_[0]->is_subset($_[1]) }
-
-sub is_disjoint { ! $_[0]->intersection($_[1])->size }
-
-sub is_properly_intersecting {
-    ! $_[0]->is_disjoint($_[1])
-      && $_[0]->difference($_[1])->size
-      && $_[1]->difference($_[0])->size
+sub is_proper_superset {
+    $_[0]->size > $_[1]->size && $_[1]->is_subset( $_[0] );
 }
 
-sub difference { $_[0]->clone->remove(keys %{$_[1]}) }
+sub is_equal { $_[1]->is_subset( $_[0] ) && $_[0]->is_subset( $_[1] ) }
+
+sub is_disjoint { !$_[0]->intersection( $_[1] )->size }
+
+sub is_properly_intersecting {
+    !$_[0]->is_disjoint( $_[1] )
+      && $_[0]->difference( $_[1] )->size
+      && $_[1]->difference( $_[0] )->size;
+}
+
+sub difference { $_[0]->clone->remove( keys %{ $_[1] } ) }
 
 sub union {
     my $class = ref $_[0];
-    return $class->new( keys %{$_[0]}, keys %{$_[1]} );
+    return $class->new( keys %{ $_[0] }, keys %{ $_[1] } );
 }
 
 sub intersection {
     my $class = ref $_[0];
-    return $class->new( grep { exists($_[0]->{$_}) } keys %{$_[1]} );
+    return $class->new( grep { exists( $_[0]->{$_} ) } keys %{ $_[1] } );
 }
 
 sub intersection2 {
     my $class = ref $_[0];
-    my ($a, $b) = $_[0]->size > $_[1]->size ? ($_[0], $_[1]) : ($_[1], $_[0]);
-    return $class->new( grep { exists($a->{$_}) } keys %{$b} );
+    my ( $a, $b ) =
+      $_[0]->size > $_[1]->size ? ( $_[0], $_[1] ) : ( $_[1], $_[0] );
+    return $class->new( grep { exists( $a->{$_} ) } keys %{$b} );
 }
 
-sub symmetric_difference { $_[0]->clone->invert(keys %{$_[1]}) }
+sub symmetric_difference { $_[0]->clone->invert( keys %{ $_[1] } ) }
 
 {
-    *copy = \&clone;
-    *has = \&contains;
-    *member = \&element;
-    *members = \&elements;
-    *delete = \&remove;
+    *copy     = \&clone;
+    *has      = \&contains;
+    *member   = \&element;
+    *members  = \&elements;
+    *delete   = \&remove;
     *is_empty = \&is_null;
-    *unique = \&symmetric_difference;
+    *unique   = \&symmetric_difference;
 }
 
 1;
 
 __END__
+
+=pod
+
+=encoding UTF-8
 
 =head1 NAME
 
@@ -130,7 +137,7 @@ Set::Tiny - Simple sets of strings
 
 =head1 VERSION
 
-Version 0.04
+version 0.05
 
 =head1 SYNOPSIS
 
@@ -172,9 +179,9 @@ L<Set::Scalar>. For sets of arbitrary objects, see L<Set::Object>.
 
 =item Convenience
 
-Set::Tiny aims to provide a convenient interface to commonly used set
+C<Set::Tiny> aims to provide a convenient interface to commonly used set
 operations, which you would usually implement using regular hashes and a couple
-of C<for> loops (in fact, that's exactly what Set::Tiny does).
+of C<for> loops (in fact, that's exactly what C<Set::Tiny> does).
 
 =item Speed
 
@@ -187,7 +194,7 @@ between different C<Set::> modules.
 =item Ease of use
 
 L<Set::Object> offers better performance than L<Set::Scalar>, but needs a C
-compiler to install. Set::Tiny has no dependencies and contains no C code.
+compiler to install. C<Set::Tiny> has no dependencies and contains no C code.
 
 =back
 
@@ -339,19 +346,25 @@ Stanis Trendelenburg, C<< <trendels at cpan.org> >>
 
 Thanks to Adam Kennedy for advice on how to make this module C<Tiny>.
 
-=head1 BUGS
-
-Please report any bugs or feature requests to C<bug-set-tiny at rt.cpan.org>, or through
-the web interface at L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Set-Tiny>.  I will be notified, and then you'll
-automatically be notified of progress on your bug as I make changes.
-
-=head1 COPYRIGHT & LICENSE
-
-Copyright 2009 Stanis Trendelenburg, all rights reserved.
-
-This program is free software; you can redistribute it and/or modify it
-under the same terms as Perl itself.
-
 =head1 SEE ALSO
 
-L<Set::Scalar>, L<Set::Object>
+=over
+
+=item *
+
+L<Set::Scalar>
+
+=back
+
+=head1 AUTHOR
+
+Stanis Trendelenburg <trendels@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2024 by Stanis Trendelenburg.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

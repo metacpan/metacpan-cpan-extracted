@@ -1,5 +1,5 @@
 package ExtUtils::Builder::Compiler;
-$ExtUtils::Builder::Compiler::VERSION = '0.005';
+$ExtUtils::Builder::Compiler::VERSION = '0.006';
 use strict;
 use warnings;
 
@@ -92,7 +92,7 @@ ExtUtils::Builder::Compiler - Portable compilation
 
 =head1 VERSION
 
-version 0.005
+version 0.006
 
 =head1 METHODS
 

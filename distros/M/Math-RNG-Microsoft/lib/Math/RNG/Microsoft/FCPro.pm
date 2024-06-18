@@ -1,11 +1,13 @@
 package Math::RNG::Microsoft::FCPro;
-$Math::RNG::Microsoft::FCPro::VERSION = '0.2.0';
+$Math::RNG::Microsoft::FCPro::VERSION = '0.4.0';
 use 5.014;
 use strict;
 use warnings;
 use integer;
 use bigint;
 
+
+use parent 'Math::RNG::Microsoft::Base';
 
 my $MAX_SEED = ( ( 1 << ( 31 + 2 ) ) - 1 );    # 33 bits
 
@@ -91,23 +93,6 @@ sub max_rand
     return ( $self->rand() % $max );
 }
 
-sub shuffle
-{
-    my ( $self, $deck ) = @_;
-
-    if (@$deck)
-    {
-        my $i = @$deck;
-        while ( --$i )
-        {
-            my $j = $self->max_rand( $i + 1 );
-            @$deck[ $i, $j ] = @$deck[ $j, $i ];
-        }
-    }
-
-    return $deck;
-}
-
 
 1;
 
@@ -124,7 +109,7 @@ with Visual C with Freecell Pro extended seeds.
 
 =head1 VERSION
 
-version 0.2.0
+version 0.4.0
 
 =head1 SYNOPSIS
 
@@ -171,6 +156,15 @@ Returns a random integer in the range 0 to ($max-1).
 
 Shuffles the array reference of the first argument, B<destroys it> and returns
 it. This is using the fisher-yates shuffle.
+
+=head2 my $new_array_ref = $randomizer->fresh_shuffle(\@array)
+
+Copies the array reference of the first argument to a new array, shuffles it
+and returns it. This is using the fisher-yates shuffle.
+
+@array remains unchanged.
+
+(Added in version 0.4.0 .)
 
 =for :stopwords cpan testmatrix url bugtracker rt cpants kwalitee diff irc mailto metadata placeholders metacpan
 

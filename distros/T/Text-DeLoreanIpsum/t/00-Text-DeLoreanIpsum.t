@@ -16,7 +16,7 @@ BEGIN {
     ok( my $words = $object->words(3),                      "Got some words" );
     is( my @words = split( /\s+/, $words ), 3,              "There were 3 words" );
     ok( my $sentences = $object->sentences(3),              "Got some sentences" );
-    is( my @sentences = split( /\./, $sentences ), 3,       "There were 3 sentences" );
+    is( my @sentences = split( /\. /, $sentences ), 3,      "There were 3 sentences" );
     ok( my $paragraphs = $object->paragraphs(4),            "Got some paragraphs" );
     is( my @paragraphs = split ( /\n\n/, $paragraphs ), 4,  "There were 4 paragraphs" );
 };

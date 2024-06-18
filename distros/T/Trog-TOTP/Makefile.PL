@@ -21,6 +21,7 @@ my %WriteMakefileArgs = (
     "Digest::SHA" => 0,
     "Encode::Base2N" => 0,
     "List::Util" => "1.33",
+    "POSIX" => 0,
     "Ref::Util" => 0,
     "strict" => 0,
     "warnings" => 0
@@ -31,7 +32,7 @@ my %WriteMakefileArgs = (
     "IPC::Open3" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "1.003",
+  "VERSION" => "1.004",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -46,6 +47,7 @@ my %FallbackPrereqs = (
   "IO::Handle" => 0,
   "IPC::Open3" => 0,
   "List::Util" => "1.33",
+  "POSIX" => 0,
   "Ref::Util" => 0,
   "Test::More" => 0,
   "strict" => 0,

@@ -1,5 +1,5 @@
 package ExtUtils::Builder::MultiLingual;
-$ExtUtils::Builder::MultiLingual::VERSION = '0.005';
+$ExtUtils::Builder::MultiLingual::VERSION = '0.006';
 use strict;
 use warnings;
 
@@ -30,7 +30,7 @@ ExtUtils::Builder::MultiLingual
 
 =head1 VERSION
 
-version 0.005
+version 0.006
 
 =head1 AUTHOR
 

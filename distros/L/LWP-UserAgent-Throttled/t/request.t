@@ -53,7 +53,7 @@ THROTTLE: {
 		$start = Time::HiRes::time();
 		# Will fail on slow machines
 		time_atmost(sub { $response = $ua->get('https://www.perl.org/'); }, 8, 'should not be throttled');
-		ok($response->is_success());
+		cmp_ok($response->is_success(), '!=', 0, 'Gets sucess from www.perl.org');
 
 		sleep(8);
 

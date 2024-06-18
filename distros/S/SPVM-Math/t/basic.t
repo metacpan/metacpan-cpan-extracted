@@ -71,6 +71,8 @@ ok(SPVM::TestCase::Math->asin);
 ok(SPVM::TestCase::Math->asinf);
 ok(SPVM::TestCase::Math->atan);
 ok(SPVM::TestCase::Math->atanf);
+ok(SPVM::TestCase::Math->atan2);
+ok(SPVM::TestCase::Math->atan2f);
 
 # Hyperbolic functions
 ok(SPVM::TestCase::Math->cosh);

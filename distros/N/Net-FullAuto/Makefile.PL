@@ -26,7 +26,7 @@
 ################################################################
 
 
-our $VERSION='1.0000654';
+our $VERSION='1.0000656';
 
 
 if ($ENV{'AUTOMATED_TESTING'}) {
@@ -879,23 +879,49 @@ if ($^O eq 'cygwin') {
       if ($packs) {
          my $message=<<END;
 
-   FATAL ERROR!: The following Cygwin
-                 packages are missing from
-                 your installation:
+    __  __ _       _              ___                 _
+   |  \\/  (_)_____(_)_ _  __ _   / __|  _ __ ___ __ _(_)_ _
+   | |\\/| | (_-<_-< | ' \\/ _` | | (_| || / _` \\ V  V / | ' \\
+   |_|  |_|_/__/__/_|_||_\\__, |  \\___\\_, \\__, |\\_/\\_/|_|_||_|
+                         |___/       |__/|___/
+    ___               _                       _      _
+   | _ \\___ __ _ _  _(_)_ _ ___ _ __  ___ _ _| |_ __| |
+   |   / -_) _` | || | | '_/ -_) '  \\/ -_) ' \\  _(_-<_|
+   |_|_\\___\\__, |\\_,_|_|_| \\___|_|_|_\\___|_||_\\__/__(_)
+              |_|
+
+   The following Cygwin packages are missing from your
+   installation:
 
    $packs
 
-   Please report any bugs and send any
-   questions, thoughts or feedback to:
-
-      Brian.Kelly\@FullAuto.com
+   Attempt to install these requirements?:
 
 END
-         print $message;
-         if (exists $ENV{PAR_TEMP}) {
-            print "   Press ANY key to exit.\n\n";<STDIN>;
+
+         my $timeout=120;
+         my $fae="No   (FullAuto Setup will exit)";
+         {
+            local $SIG{__DIE__}; # No sigdie handler
+            eval {
+               local $SIG{ALRM} = sub { die "alarm\n" }; # NB: \n required
+               alarm $timeout;
+               my $menu1 = [
+                     $message,
+                     [ "Yes", sub{ return 'Yes' } ],
+                     [ $fae, sub{ return 'No' } ],
+                     ];
+               my $selection=&menu($menu1);
+               exit 0 if $selection eq ']quit[';
+               exit 0 if -1<index $selection, 'No';
+               alarm 0;
+            };
          }
-         exit 1;
+      } print "\n\n   FullAuto install continues . . .\n\n";
+      my $cw='https://cygwin.com/setup-x86_64.exe';
+      fa_system("wget $cw");
+      foreach my $pck (split / /,$packs) {
+         fa_system("./setup-x86_64.exe -q -P $pck");
       }
    }
    my @required_cygwin_services=();

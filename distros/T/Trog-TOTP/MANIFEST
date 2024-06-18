@@ -6,6 +6,7 @@ MANIFEST.SKIP
 META.yml
 Makefile.PL
 README.md
+bin/totp_debugger
 lib/Trog/TOTP.pm
 t/00-compile.t
 t/01-rfc-test-vectors.t

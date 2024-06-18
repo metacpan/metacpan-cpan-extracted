@@ -43,11 +43,11 @@ sub Message {
 	#shorten message if it is larger than the label allows.
 	my $l = $self->{L};
 	my $lw = $l->width;
-	my $font = $self->cget('-font');
-	my $width = $font->measure($message);
+	my $font = $l->cget('-font');
+	my $width = $self->fontMeasure($font, $message);
 	while ($width > $lw) {
-		$message = substr($message, 0, length($message - 1));
-		$width = $font->measure($message);
+		$message = substr($message, 0, length($message) - 1);
+		$width = $self->fontMeasure($font, $message);
 	}
 
 	$self->configure(

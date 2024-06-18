@@ -2,13 +2,14 @@ use ExtUtils::MakeMaker;
 
 use strict;
 my %prereq = (
+	'Data::Compare'       => '1.29',
 	'File::Path'          => '2.18',
 	'File::Spec'          => '3.75',
 	'Test::Tk'            => '3.03',
-	'Tk'                  => '804.023',
-	'Tk::AppWindow'       => '0.06',
-	'Tk::CodeText'        => '0.50',
-	'Tk::FileBrowser'     =>	'0.03'
+	'Tk'                  => '804.030',
+	'Tk::AppWindow'       => '0.10',
+	'Tk::CodeText'        => '0.51',
+	'Tk::FileBrowser'     =>	'0.04',
 );
 
 WriteMakefile(

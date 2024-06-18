@@ -437,7 +437,7 @@ sub getIcon {
 	$fdi->theme($self->configGet('-icontheme'));
 	my $resize = 0;
 	my $file = $fdi->get($name, $size, $context, \$resize);
-	if (defined $file) { 
+	if (defined $file) {
 		return $self->loadImage($file, $size);
 	}
 	return undef

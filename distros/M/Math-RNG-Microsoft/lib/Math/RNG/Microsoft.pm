@@ -1,11 +1,13 @@
 package Math::RNG::Microsoft;
-$Math::RNG::Microsoft::VERSION = '0.2.0';
+$Math::RNG::Microsoft::VERSION = '0.4.0';
 use 5.006;
 use strict;
 use warnings;
 
 
 use integer;
+
+use parent 'Math::RNG::Microsoft::Base';
 
 use Class::XSAccessor {
     constructor => 'new',
@@ -16,31 +18,33 @@ sub rand
 {
     my $self = shift;
     $self->seed( ( $self->seed() * 214013 + 2531011 ) & (0x7FFF_FFFF) );
-    return ( ( $self->seed >> 16 ) & 0x7fff );
+    return scalar( ( $self->seed >> 16 ) & 0x7fff );
+}
+
+sub _custom_bound
+{
+    my ( $self, $bigint, $max ) = @_;
+
+    return ( $bigint % $max );
+}
+
+sub _private_max_random
+{
+    my ( $obj, $max ) = @_;
+
+    my $bigint = scalar( $obj->rand() );
+    my $result = scalar( $obj->_custom_bound( $bigint, $max ) );
+
+    return $result;
 }
 
 sub max_rand
 {
-    my ( $self, $max ) = @_;
+    my ( $obj, $max ) = @_;
 
-    return ( $self->rand() % $max );
-}
+    my $result = $obj->_private_max_random( $max, );
 
-sub shuffle
-{
-    my ( $self, $deck ) = @_;
-
-    if (@$deck)
-    {
-        my $i = @$deck;
-        while ( --$i )
-        {
-            my $j = $self->max_rand( $i + 1 );
-            @$deck[ $i, $j ] = @$deck[ $j, $i ];
-        }
-    }
-
-    return $deck;
+    return $result;
 }
 
 
@@ -59,7 +63,7 @@ with Visual C.
 
 =head1 VERSION
 
-version 0.2.0
+version 0.4.0
 
 =head1 SYNOPSIS
 
@@ -110,6 +114,15 @@ Can be used to re-assign the seed of the randomizer (though not recommended).
 
 Shuffles the array reference of the first argument, B<destroys it> and returns
 it. This is using the fisher-yates shuffle.
+
+=head2 my $new_array_ref = $randomizer->fresh_shuffle(\@array)
+
+Copies the array reference of the first argument to a new array, shuffles it
+and returns it. This is using the fisher-yates shuffle.
+
+@array remains unchanged.
+
+(Added in version 0.4.0 .)
 
 =for :stopwords cpan testmatrix url bugtracker rt cpants kwalitee diff irc mailto metadata placeholders metacpan
 

@@ -8,11 +8,13 @@ App::Codit::Plugins::Colors - plugin for App::Codit
 
 use strict;
 use warnings;
-require Tk::ColorPicker;
 use vars qw( $VERSION );
-$VERSION = 0.03;
+$VERSION = 0.05;
 
-use base qw( Tk::AppWindow::BaseClasses::Plugin );
+require Tk::ColorPicker;
+use Tie::Watch;
+
+use base qw( Tk::AppWindow::BaseClasses::PluginJobs );
 
 =head1 DESCRIPTION
 
@@ -20,7 +22,7 @@ Easily select and insert colors.
 
 =head1 DETAILS
 
-The Colors plugin lets you choose a color and insert it’s hex value into your document. 
+The Colors plugin lets you choose a color and insert it's hex value into your document. 
 
 You can select a color in RGB, CMY and HSV space. Whenever you select a color it is added to the Recent tab. 
 
@@ -35,31 +37,24 @@ sub new {
 	my $self = $class->SUPER::new(@_, 'ToolPanel');
 	return undef unless defined $self;
 	
+#	$self->interval(50);
+
 	my $tp = $self->extGet('ToolPanel');
 	my $page = $tp->addPage('Colors', 'fill-color', undef, 'Select and insert colors');
 	
-	my $color = '';
 	my @padding = (-padx => 3, -pady => 3);
-	my $picker;
-	my $indicator;
 
 	my $eframe = $page->Frame->pack(-fill => 'x');
 
 	my $fframe = $eframe->Frame->pack(-side => 'left');
 
+	my $picker;
+	my $color = '';
 	my $entry = $fframe->Entry(
 		-textvariable => \$color,
 	)->pack(@padding, -fill => 'x');
-	$entry->bind('<Key>', sub {
-		if ($picker->validate($color)) {
-			$indicator->configure(-background => $color);
-			$entry->configure(-foreground => $self->configGet('-foreground'));
-			$picker->put($color);
-		} else {
-			$indicator->configure(-background => $self->configGet('-background'));
-			$entry->configure(-foreground => $self->configGet('-errorcolor'));
-		}
-	});
+	$entry->bind('<Key>', [$self, 'updateEntry']);
+	$self->{ENTRY} = $entry;
 
 	my $bframe = $fframe->Frame->pack(-fill => 'x');
 
@@ -86,28 +81,81 @@ sub new {
 		},
 	)->pack(@padding, -side => 'left', -expand => 1, -fill => 'x');
 
-	$indicator = $eframe->Label(
+	my $indicator = $eframe->Label(
 		-width => 4,
 		-relief => 'sunken',
 		-borderwidth => 2,
 	)->pack(@padding, -side => 'left', -expand => 1, -fill => 'both');
+	$self->{INDICATOR} = $indicator;
 
 	$picker = $page->ColorPicker(
 		-depthselect => 1,
 		-historyfile => $self->extGet('ConfigFolder')->ConfigFolder . '/color_history',
-		-updatecall => sub {
-			$color = shift;
-			$indicator->configure(-background => $color);
-		}
+		-updatecall => ['updatePicker', $self],
 	)->pack(-padx => 2, -pady => 2, -expand => 1, -fill => 'both');
+	$self->{PICKER} = $picker;
+	$self->jobStart('selection_check', 'SelectionCheck', $self);
 	return $self;
 }
 
+sub _ent { 
+	my ($self, $value) = @_;
+	my $entry = $self->{ENTRY};
+	if (defined $value) {
+		$entry->delete('0', 'end');
+		$entry->insert('end', $value);
+	}
+	return $entry
+}
+
+sub _ind { 
+	my ($self, $value) = @_;
+	$self->{INDICATOR}->configure(-background => $value) if defined $value;
+	return $self->{INDICATOR}
+}
+
+sub _pick { 
+	my ($self, $value) = @_;
+	$self->{PICKER}->put($value) if defined $value;
+	return $self->{PICKER}
+}
+
+sub SelectionCheck {
+	my $self = shift;
+	my @sel = $self->cmdExecute('doc_get_sel');
+	if (@sel) {
+		my $text = $self->cmdExecute('doc_get_text', @sel);
+		chomp($text);
+		if ($self->_pick->validate($text)) {
+			$self->_ent($text);
+			$self->updateEntry;
+		}
+	}
+}
 
 sub Unload {
 	my $self = shift;
 	$self->extGet('ToolPanel')->deletePage('Colors');
 	return $self->SUPER::Unload
+}
+
+sub updateEntry {
+	my ($self, $value) = @_;
+	$value = $self->_ent->get unless defined $value;
+	if ($self->_pick->validate($value)) {
+		$self->_ind($value);
+		$self->_ent->configure(-foreground => $self->configGet('-foreground'));
+		$self->_pick($value);
+	} else {
+		$self->_ind($self->configGet('-background'));
+		$self->_ent->configure(-foreground => $self->configGet('-errorcolor'));
+	}
+}
+
+sub updatePicker {
+	my ($self, $value) = @_;
+	$self->_ent($value);
+	$self->_ind($value);
 }
 
 =head1 LICENSE

@@ -1,16 +1,15 @@
 package ExtUtils::Builder::Linker::PE::MSVC;
-$ExtUtils::Builder::Linker::PE::MSVC::VERSION = '0.005';
+$ExtUtils::Builder::Linker::PE::MSVC::VERSION = '0.006';
 use strict;
 use warnings;
 
 use ExtUtils::Builder::Action::Command;
 
-use base qw/ExtUtils::Builder::Linker ExtUtils::Builder::Linker::COFF/;
+use base qw/ExtUtils::Builder::Linker::COFF/;
 
 sub _init {
 	my ($self, %args) = @_;
 	$args{ld} ||= ['link'];
-	$self->ExtUtils::Builder::Linker::_init(%args);
 	$self->ExtUtils::Builder::Linker::COFF::_init(%args);
 	return;
 }
@@ -51,7 +50,7 @@ ExtUtils::Builder::Linker::PE::MSVC
 
 =head1 VERSION
 
-version 0.005
+version 0.006
 
 =head1 AUTHOR
 

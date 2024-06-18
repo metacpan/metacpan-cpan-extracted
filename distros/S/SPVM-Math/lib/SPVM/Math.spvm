@@ -2,7 +2,7 @@
 # MIT License
 
 class Math : precompile {
-  version "1.002";
+  version "1.003";
   
   use Complex_2f;
   use Complex_2d;
@@ -35,6 +35,8 @@ class Math : precompile {
   native static method atan : double ($x : double);
   
   native static method atan2 : double ($y : double, $x : double);
+  
+  native static method atan2f : float ($y : float, $x : float);
   
   native static method atanf : float ($x : float);
   

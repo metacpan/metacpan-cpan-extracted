@@ -23,5 +23,5 @@ resources:
   bugtracker: https://github.com/spadacciniweb/Text-DeLoreanIpsum/issues
   homepage: https://one2zero.it/
   repository: https://github.com/spadacciniweb/Text-DeLoreanIpsum
-version: '0.03'
+version: '0.05'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

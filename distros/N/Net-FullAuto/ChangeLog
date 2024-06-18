@@ -20,6 +20,20 @@
 #######################################################################
 
 
+2024-06-17  Brian M. Kelly <Brian.Kelly@fullauto.com>
+
+        * Version 1.0000656 released
+
+        * Setup configuration is now truly optional
+
+	* New '__debug__' option for cmd() method
+
+2024-06-16  Brian M. Kelly <Brian.Kelly@fullauto.com>
+
+        * Version 1.0000655 released
+
+        * Optimized local shell discovery 
+
 2024-06-12  Brian M. Kelly <Brian.Kelly@fullauto.com>
 
         * Version 1.0000654 released

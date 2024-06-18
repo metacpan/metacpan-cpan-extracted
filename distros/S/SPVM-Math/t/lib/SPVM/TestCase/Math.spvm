@@ -1009,6 +1009,26 @@ class TestCase::Math {
     return 1;
   }
 
+  static method atan2 : int () {
+    my $eps      = 0.000000001;
+    my $got      = Math->atan2(0.777350269189625764509148780501957455647601751270126876018, 0.577350269189625764509148780501957455647601751270126876018);
+    my $expected = 0.9319734769439985;
+    unless ($expected - $eps <= $got && $got <= $expected + $eps) {
+      return 0;
+    }
+    return 1;
+  }
+
+  static method atan2f : int () {
+    my $eps      = 0.0001f;
+    my $got      = Math->atan2f(0.777350269189625764509148780501957455647601751270126876018f, 0.577350269189625764509148780501957455647601751270126876018f);
+    my $expected = 0.9319734769439985f;
+    unless ($expected - $eps <= $got && $got <= $expected + $eps) {
+      return 0;
+    }
+    return 1;
+  }
+
   # Hyperbolic functions
   static method cosh : int () {
     my $eps      = 0.000000001;

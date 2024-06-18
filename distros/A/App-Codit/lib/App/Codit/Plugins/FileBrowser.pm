@@ -9,7 +9,7 @@ App::Codit::Plugins::FileBrowser - plugin for App::Codit
 use strict;
 use warnings;
 use vars qw( $VERSION );
-$VERSION = 0.03;
+$VERSION = 0.05;
 
 use base qw( Tk::AppWindow::BaseClasses::Plugin );
 
@@ -25,7 +25,7 @@ The FileBrowser plugin lets you browse your harddrive and open multiple
 documents at once through its context menu (left-click).
 
 All columns are sortable and sizable. If you left-click the header
-it will give you options to display hidden files (that start with a ‘.’), Sort case dependant or not and directories first.
+it will give you options to display hidden files (that start with a '.'), Sort case dependant or not and directories first.
 
 Pressing CTRL+F when the file browser has the focus invokes a filter entry at the bottom.
 
@@ -45,7 +45,7 @@ sub new {
 	my $page = $tp->addPage('FileBrowser', 'folder', undef, 'Browse your file system');
 	my $b = $page->FileBrowser(
 		-invokefile => ['cmdExecute', $self, 'doc_open'],
-		-listmenu => $self->extGet('MenuBar')->MenuStack(@contextmenu),
+		-listmenu => $self->extGet('MenuBar')->menuStack(@contextmenu),
 		-diriconcall => ['GetDirIcon', $self],
 		-fileiconcall => ['GetFileIcon', $self],
 		-reloadimage => $self->getArt('appointment-recurring'),
@@ -66,7 +66,8 @@ sub GetDirIcon {
 
 sub GetFileIcon {
 	my ($self, $name) = @_;
-	my $icon = $self->getArt('text-x-plain');
+	my $art = $self->extGet('Art');
+	my $icon = $art->getFileIcon($name);
 	return $icon if defined $icon;
 	return $self->{BROWSER}->DefaultFileIcon;
 }

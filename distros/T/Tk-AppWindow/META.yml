@@ -20,6 +20,7 @@ no_index:
 requires:
   Data::Compare: '1.29'
   File::Basename: '2.85'
+  File::MimeInfo: '0.35'
   File::Path: '2.18'
   File::Spec: '3.84'
   FreeDesktop::Icons: '0.01'
@@ -40,5 +41,5 @@ requires:
   Tk::YANoteBook: '0.06'
 resources:
   repository: git://github.com/haje61/Tk-AppWindow.git
-version: '0.08'
+version: '0.10'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -5,9 +5,9 @@ use strict;
 use warnings;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2024-05-30'; # DATE
+our $DATE = '2024-06-13'; # DATE
 our $DIST = 'App-BPOMUtils-NutritionLabelRef'; # DIST
-our $VERSION = '0.003'; # VERSION
+our $VERSION = '0.004'; # VERSION
 
 our @EXPORT_OK = qw(
                        bpom_get_nutrition_label_ref
@@ -72,10 +72,11 @@ $SPEC{bpom_get_nutrition_label_ref} = {
             summary => 'List all nutrient (symbols)',
             argv => [qw/--list-nutrients/],
             test => 0,
+            'x.doc.max_result_lines' => 8,
         },
         {
             summary => 'List all groups (symbols)',
-            argv => [qw/--list-nutrients/],
+            argv => [qw/--list-groups/],
             test => 0,
         },
         {
@@ -147,7 +148,7 @@ App::BPOMUtils::NutritionLabelRef - Get one or more values from BPOM nutrition l
 
 =head1 VERSION
 
-This document describes version 0.003 of App::BPOMUtils::NutritionLabelRef (from Perl distribution App-BPOMUtils-NutritionLabelRef), released on 2024-05-30.
+This document describes version 0.004 of App::BPOMUtils::NutritionLabelRef (from Perl distribution App-BPOMUtils-NutritionLabelRef), released on 2024-06-13.
 
 =head1 SYNOPSIS
 
@@ -192,37 +193,7 @@ Result:
      "Alpha_Linoleic_Acid",
      "Biotin",
      "Ca",
-     "Carbohydrate",
-     "Cholesterol",
-     "Choline",
-     "Cr",
-     "Cu",
-     "Dietary_Fiber",
-     "Energy",
-     "F",
-     "Fe",
-     "I",
-     "K",
-     "L_Carnitine",
-     "Linoleic_Acid",
-     "Mg",
-     "Mn",
-     "Myo_Inositol",
-     "Na",
-     "P",
-     "Protein",
-     "Saturated_Fat",
-     "Se",
-     "Total_Fat",
-     "VA",
-     "VB1",
-     "VB12",
-     "VB2",
-     "VB3",
-     "VB5",
-     "VB6",
-     "VB9",
-     "VC",
+ # ...snipped 31 lines for brevity...
      "VD",
      "VE",
      "VK",
@@ -233,7 +204,7 @@ Result:
 
 =item * List all groups (symbols):
 
- bpom_get_nutrition_label_ref(action => "list_nutrients");
+ bpom_get_nutrition_label_ref(action => "list_groups");
 
 Result:
 
@@ -241,44 +212,12 @@ Result:
    200,
    "OK",
    [
-     "Alpha_Linoleic_Acid",
-     "Biotin",
-     "Ca",
-     "Carbohydrate",
-     "Cholesterol",
-     "Choline",
-     "Cr",
-     "Cu",
-     "Dietary_Fiber",
-     "Energy",
-     "F",
-     "Fe",
-     "I",
-     "K",
-     "L_Carnitine",
-     "Linoleic_Acid",
-     "Mg",
-     "Mn",
-     "Myo_Inositol",
-     "Na",
-     "P",
-     "Protein",
-     "Saturated_Fat",
-     "Se",
-     "Total_Fat",
-     "VA",
-     "VB1",
-     "VB12",
-     "VB2",
-     "VB3",
-     "VB5",
-     "VB6",
-     "VB9",
-     "VC",
-     "VD",
-     "VE",
-     "VK",
-     "Zn",
+     "0to6mo",
+     "1to3y",
+     "7to11mo",
+     "breastfeeding",
+     "general",
+     "pregnant",
    ],
    {},
  ]

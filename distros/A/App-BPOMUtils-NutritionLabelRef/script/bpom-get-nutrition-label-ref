@@ -11,9 +11,9 @@ use Log::ger;
 use Perinci::CmdLine::Any;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2024-05-30'; # DATE
+our $DATE = '2024-06-13'; # DATE
 our $DIST = 'App-BPOMUtils-NutritionLabelRef'; # DIST
-our $VERSION = '0.003'; # VERSION
+our $VERSION = '0.004'; # VERSION
 
 my $cmdline = Perinci::CmdLine::Any->new(
     url => "/App/BPOMUtils/NutritionLabelRef/bpom_get_nutrition_label_ref",
@@ -41,7 +41,7 @@ bpom-get-nutrition-label-ref - Get one or more values from BPOM nutrition label 
 
 =head1 VERSION
 
-This document describes version 0.003 of bpom-get-nutrition-label-ref (from Perl distribution App-BPOMUtils-NutritionLabelRef), released on 2024-05-30.
+This document describes version 0.004 of bpom-get-nutrition-label-ref (from Perl distribution App-BPOMUtils-NutritionLabelRef), released on 2024-06-13.
 
 =head1 SYNOPSIS
 
@@ -282,82 +282,20 @@ For fish and zsh, install L<shcompgen> as described above.
  Biotin
  Ca
  Carbohydrate
- Cholesterol
- Choline
- Cr
- Cu
- Dietary_Fiber
- Energy
- F
- Fe
- I
- K
- L_Carnitine
- Linoleic_Acid
- Mg
- Mn
- Myo_Inositol
- Na
- P
- Protein
- Saturated_Fat
- Se
- Total_Fat
- VA
- VB1
- VB12
- VB2
- VB3
- VB5
- VB6
- VB9
- VC
- VD
+ ... 31 more lines ...
  VE
  VK
  Zn
 
 =head2 List all groups (symbols)
 
- % bpom-get-nutrition-label-ref --list-nutrients
- Alpha_Linoleic_Acid
- Biotin
- Ca
- Carbohydrate
- Cholesterol
- Choline
- Cr
- Cu
- Dietary_Fiber
- Energy
- F
- Fe
- I
- K
- L_Carnitine
- Linoleic_Acid
- Mg
- Mn
- Myo_Inositol
- Na
- P
- Protein
- Saturated_Fat
- Se
- Total_Fat
- VA
- VB1
- VB12
- VB2
- VB3
- VB5
- VB6
- VB9
- VC
- VD
- VE
- VK
- Zn
+ % bpom-get-nutrition-label-ref --list-groups
+ 0to6mo
+ 1to3y
+ 7to11mo
+ breastfeeding
+ general
+ pregnant
 
 =head2 List all ALG values
 

@@ -1,5 +1,9 @@
 Revision history for Perl extension Trog-TOTP
 
+1.004 2024-06-17 TEODESIAN
+    - Add the time_for_code method
+    - Add the totp_debugger utility
+
 1.003 2023-12-06 TEODESIAN
     - More fixes to POD
 

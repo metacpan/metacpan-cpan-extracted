@@ -1,5 +1,12 @@
 Revision history for Perl extension Tk::AppWindow.
 
+0.10 Mon Jun 17 2024
+	- fixed bug in message item module of extension StatusBar
+	- the components tab in the About dialog now has a copy button
+
+0.09 Mon Jun 17 2024
+	- fixed missing prerequisite File::MimeInfo.
+
 0.08 Fri Jun 14 2024
 	- fixed bug in extension MDI.
 	- added methods menuCreate and menuConfig to extension MenuBar
@@ -8,6 +15,7 @@ Revision history for Perl extension Tk::AppWindow.
 	- added method getFileIcon to extension Art
 	- extension art now has a cache to reduce system resources for frequently used icons.
 	- corrected documentation in extension Panels
+	- the settings dialog is no longer destroyed when closed.
 	- extension MDI now has a dropdown item for recent files on the toolbar
 	- revised about box in extension Help
 

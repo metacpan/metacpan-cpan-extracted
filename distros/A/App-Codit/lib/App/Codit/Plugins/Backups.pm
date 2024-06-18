@@ -10,7 +10,7 @@ use strict;
 use warnings;
 use Carp;
 use vars qw( $VERSION );
-$VERSION = 0.03;
+$VERSION = 0.05;
 
 use File::Basename;
 use File::Path qw(make_path);
@@ -24,7 +24,7 @@ Protect yourself against crashes. This plugin keeps backups of your unsaved file
 =head1 DETAILS
 
 The Backups plugin protects you against crashes of all kinds. 
-It silently does it’s job in the background and only reports when it 
+It silently does it's job in the background and only reports when it 
 finds an existing backup of a file you open. 
 
 It keeps backups of all open and unsaved files. Whenever a file is saved or closed 
@@ -214,10 +214,7 @@ sub Unload {
 	$self->cmdUnhookAfter('doc_close', 'closeDocAfter', $self);
 	$self->cmdUnhookBefore('doc_rename', 'docRenameBefore', $self);
 	$self->cmdUnhookAfter('doc_save', 'saveDocAfter', $self);
-	# TODO Change this after new version of Tk::AppWindow
-	#return $self->SUPER::Unload;
-	$self->SUPER::Unload;
-	return 1
+	return $self->SUPER::Unload;
 }
 
 =head1 LICENSE

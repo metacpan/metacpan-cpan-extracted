@@ -17,14 +17,14 @@ BEGIN {
 
 
 createapp(
-	-extensions => [qw[Art StatusBar MenuBar]],
+	-extensions => [qw[ Art MenuBar StatusBar ]],
 );
 
 my $ext;
 if (defined $app) {
 	$app->geometry('640x400+100+100') if defined $app;
 	$ext = $app->extGet('StatusBar');
-	my $bl = $app->extGet('Balloon');
+	pause(200);
 
 	my @padding = (-side => 'left', -padx => 10, -pady => 10);
 	my $ws = $app->WorkSpace;
@@ -46,8 +46,8 @@ if (defined $app) {
 	my $boole = 1;
 	$ext->AddImageItem('image',
 		-valueimages => {
-			0 => 'network-disconnect',
-			1 => 'network-connect',
+			0 => 'edit-copy',
+			1 => 'edit-paste',
 		},
 		-label => 'Image',
 		-updatecommand => sub {

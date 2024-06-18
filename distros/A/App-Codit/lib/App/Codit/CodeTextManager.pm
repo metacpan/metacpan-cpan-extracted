@@ -10,7 +10,7 @@ use strict;
 use warnings;
 use Carp;
 use vars qw($VERSION);
-$VERSION="0.01";
+$VERSION="0.08";
 use Tk;
 require Tk::CodeText;
 
@@ -21,10 +21,16 @@ sub Populate {
 	my ($self,$args) = @_;
 	
 	$self->SUPER::Populate($args);
+	my $ext = $self->Extension;
+	
 	my $text = $self->CodeText(
-		-saveimage => $self->Extension->getArt('document-save', 16),
+		-contextmenu => $ext->ContextMenu,
+		-height => 8,
+		-logcall => ['log', $ext],
 		-modifiedcall => ['Modified', $self],
+		-saveimage => $self->Extension->getArt('document-save', 16),
 		-scrollbars => 'osoe',
+		-width => 8,
 	)->pack(-expand => 1, -fill => 'both');
 	$self->CWidg($text);
 	my $xt = $text->Subwidget('XText');

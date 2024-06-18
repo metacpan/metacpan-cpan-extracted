@@ -8,7 +8,7 @@ use Text::DeLoreanIpsumData qw/ getData /;
 
 use vars qw($VERSION);
 
-our $VERSION = '0.03';
+our $VERSION = '0.05';
 
 my $deLoreanIpsum;
 
@@ -195,7 +195,7 @@ Mariano Spadaccini (MARIANOS)
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2016, 2023 by Mariano Spadaccini
+Copyright (C) 2016, 2023, 2024 by Mariano Spadaccini
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself, either Perl version 5.18.2 or,
 at your option, any later version of Perl 5 you may have available.
