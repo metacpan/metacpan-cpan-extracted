@@ -117,7 +117,7 @@
    "provides" : {
       "CXC::Data::Visitor" : {
          "file" : "lib/CXC/Data/Visitor.pm",
-         "version" : "0.04"
+         "version" : "0.05"
       }
    },
    "release_status" : "stable",
@@ -132,7 +132,7 @@
          "web" : "https://gitlab.com/djerius/cxc-data-visitor"
       }
    },
-   "version" : "0.04",
+   "version" : "0.05",
    "x_generated_by_perl" : "v5.38.2",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.37",
    "x_spdx_expression" : "GPL-3.0-only"

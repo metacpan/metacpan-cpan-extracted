@@ -92593,3 +92593,17 @@ H/HM/HMBRAND/Text-CSV_XS-1.55.tgz
 M/MA/MARIANOS/Text-DeLoreanIpsum-0.05.tar.gz
 H/HA/HANJE/Tk-AppWindow-0.10.tar.gz
 T/TE/TEODESIAN/Trog-TOTP-1.004.tar.gz
+P/PE/PERLANCAR/App-BPOMUtils-NutritionFacts-0.026.tar.gz
+L/LE/LEEJO/CGI-4.66.tar.gz
+D/DJ/DJERIUS/CXC-Data-Visitor-0.05.tar.gz
+L/LE/LEONT/ExtUtils-Builder-Compiler-0.007.tar.gz
+L/LE/LEONT/ExtUtils-Helpers-0.027.tar.gz
+S/SL/SLAFFAN/Geo-GDAL-FFI-0.12.tar.gz
+E/ET/ETHER/JSON-Schema-Modern-0.585.tar.gz
+Q/QG/QGARNIER/Libssh-Session-1.1.tar.gz
+M/MB/MBRADSHAW/Mail-DKIM-1.20240619.tar.gz
+R/RS/RSCHUPP/PAR-Dist-0.53.tar.gz
+E/EW/EWHEELER/PDL-IO-Touchstone-1.015.tar.gz
+W/WD/WDAEMS/SpeL-Wizard-20240619.0646.tar.gz
+M/MV/MVSJES/Sub-Override-0.12.tar.gz
+E/ET/ETHER/Test-JSON-Schema-Acceptance-1.026.tar.gz

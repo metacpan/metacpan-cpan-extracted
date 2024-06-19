@@ -1,9 +1,15 @@
+0.53  2024-06-18
+
+- fix #2: PAR::Dist::blib_to_par quotes the version number of the dist when making the PAR file
+
+- quote value of "version" in generated META.yml (if there is no (MY)META.yml)
+
 0.52  2023-06-07
 
 - change bugtracker to GitHub issues
 
 - quote all version numbers in META.yml files in test *.par
-  files to avoid CPAN Testers failures like 
+  files to avoid CPAN Testers failures like
   http://www.cpantesters.org/cpan/report/973fa832-ec54-11ed-98b0-b3c3213a625c
 
 0.51  2020-11-30

@@ -1,5 +1,8 @@
 Revision history for PDL-IO-Touchstone
 
+1.015	2024-06-18T13:06:19-07:00
+	- Fix false-negative test error (issue #6)
+
 1.014	2023-02-26T15:49:37-08:00
 	- Fix typos in Touchstone.pm and MDIF.pm
 	- Fixed args cloning in rmdif

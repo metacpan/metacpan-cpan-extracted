@@ -3,6 +3,7 @@ use strictures 2;
 use 5.020;
 use stable 0.031 'postderef';
 use experimental 'signatures';
+no autovivification warn => qw(fetch store exists delete);
 use if "$]" >= 5.022, experimental => 're_strict';
 no if "$]" >= 5.031009, feature => 'indirect';
 no if "$]" >= 5.033001, feature => 'multidimensional';
@@ -19,11 +20,13 @@ use Test::Memory::Cycle;
 use Test::File::ShareDir -share => { -dist => { 'JSON-Schema-Modern' => 'share' } };
 use JSON::Schema::Modern;
 
+my $note;
 BEGIN {
+  $note = $ENV{AUTHOR_TESTING} || $ENV{AUTOMATED_TESTING} ? \&diag : \&note;
   foreach my $env (qw(AUTHOR_TESTING AUTOMATED_TESTING EXTENDED_TESTING NO_TODO TEST_DIR NO_SHORT_CIRCUIT)) {
-    note $env.': '.($ENV{$env} // '');
+    $note->($env.': '.($ENV{$env} // ''));
   }
-  note '';
+  $note->('');
 }
 
 sub acceptance_tests (%options) {
@@ -66,12 +69,11 @@ sub acceptance_tests (%options) {
       my $result_short = $ENV{NO_SHORT_CIRCUIT} || $js_short_circuit->evaluate($instance_data, $schema);
 
       note 'result: ', $result->dump;
-      note 'short-circuited result: ', $result_short->dump
-        if not $ENV{NO_SHORT_CIRCUIT};
-
-      die 'results inconsistent between short_circuit = false and true'
-        if not $ENV{NO_SHORT_CIRCUIT}
-          and ($result xor $result_short);
+      if (not $ENV{NO_SHORT_CIRCUIT}) {
+        note 'short-circuited result: ', $result_short->dump;
+        die 'results inconsistent between short_circuit = false and true'
+          if ($result xor $result_short);
+      }
 
       my $in_todo;
 
@@ -79,7 +81,7 @@ sub acceptance_tests (%options) {
       # to count that as a failure (an exception would be caught and perhaps TODO'd).
       # (This might change if tests are added that are expected to produce exceptions.)
       foreach my $r ($result, ($ENV{NO_SHORT_CIRCUIT} ? () : $result_short)) {
-        print STDERR 'evaluation generated an exception: '.$_->dump
+        diag 'evaluation generated an exception: '.$_->dump
           foreach
             grep +($_->{error} =~ /^EXCEPTION/
                 && $_->{error} !~ /(max|min)imum value is not a number$/)   # optional/bignum.json

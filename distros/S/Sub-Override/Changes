@@ -1,3 +1,9 @@
+0.12  Mon Jun 17 2024
+    - Add 'inject' method which can inject a new subroutine into a namespace.
+    - Add 'inherit' method which can inherit a subroutine from a parent object.
+    - Bug fix for wrap not restoring during destruction.
+    - Internal cleanup.
+
 0.11  Tue May 14 2024
     - Update the 'wrap' routine so it handles prototypes transparently.
     - Update the 'wrap' routine to prevent creation of an extra stack frame.

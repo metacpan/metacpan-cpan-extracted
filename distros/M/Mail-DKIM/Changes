@@ -1,5 +1,9 @@
 This file summarizes what's changed between releases of Mail-DKIM.
 
+1.20240619 2024-06-19 Australia/Melbourne
+  * Remove version check for Net::DNS, this fixes issues when using a
+    development version of Net::DNS
+
 1.20240124 2024-01-24 UTC
   * ARC: Return fail for any ARC set with an instance number greater than 50.
     This brings ARC verification in line with DKIM verification limits.

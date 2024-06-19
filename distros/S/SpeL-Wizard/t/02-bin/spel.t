@@ -25,6 +25,16 @@ foreach my $file ( @testfiles ) {
   eval {
     if( File::Compare::compare_text( "$base.brown", "$base.golden",
 				     sub { $_[0] =~ s/\015$//; $_[0] ne $_[1] } ) ) {
+      # Added this to get more info from fails reported by CPAN testers
+      if ( $base =~ /^bracket|docstrip|i18n/ ) {
+       	say STDERR "== GOLDEN ==== $base =======================";
+       	system( "cat $base.golden" );
+       	say STDERR "== BROWN ===================================";
+       	system( "cat $base.brown" );
+       	say STDERR "== STDERR===================================";
+       	system( "cat $base.stderr" );
+       	say STDERR "============================================";
+      }
       fail( $file );
     }
     else {

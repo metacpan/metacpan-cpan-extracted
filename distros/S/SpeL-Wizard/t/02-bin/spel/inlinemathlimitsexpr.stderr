@@ -1,24 +1,120 @@
-Can't locate SpeL/Object/Wee.pm in @INC (you may need to install the SpeL::Object::Wee module) (@INC entries checked: /home/wdaems/lab/spelbox/perl/lib /home/wdaems/perl5/lib/perl5/x86_64-linux-gnu-thread-multi /home/wdaems/perl5/lib/perl5 /etc/perl /usr/local/lib/x86_64-linux-gnu/perl/5.38.2 /usr/local/share/perl/5.38.2 /usr/lib/x86_64-linux-gnu/perl5/5.38 /usr/share/perl5 /usr/lib/x86_64-linux-gnu/perl-base /usr/lib/x86_64-linux-gnu/perl/5.38 /usr/share/perl/5.38 /usr/local/lib/site_perl) at /home/wdaems/lab/spelbox/perl/lib/SpeL/Object/Subscript.pm line 13.
-BEGIN failed--compilation aborted at /home/wdaems/lab/spelbox/perl/lib/SpeL/Object/Subscript.pm line 13.
-Compilation failed in require at /home/wdaems/lab/spelbox/perl/lib/SpeL/Object/Expressionrest.pm line 13.
-BEGIN failed--compilation aborted at /home/wdaems/lab/spelbox/perl/lib/SpeL/Object/Expressionrest.pm line 13.
-Compilation failed in require at /home/wdaems/lab/spelbox/perl/lib/SpeL/Object/Expression.pm line 16.
-BEGIN failed--compilation aborted at /home/wdaems/lab/spelbox/perl/lib/SpeL/Object/Expression.pm line 16.
-Compilation failed in require at /home/wdaems/lab/spelbox/perl/lib/SpeL/Object/Relation.pm line 15.
-BEGIN failed--compilation aborted at /home/wdaems/lab/spelbox/perl/lib/SpeL/Object/Relation.pm line 15.
-Compilation failed in require at /home/wdaems/lab/spelbox/perl/lib/SpeL/Object/MathUnit.pm line 14.
-BEGIN failed--compilation aborted at /home/wdaems/lab/spelbox/perl/lib/SpeL/Object/MathUnit.pm line 14.
-Compilation failed in require at /home/wdaems/lab/spelbox/perl/lib/SpeL/Object/MathInline.pm line 19.
-BEGIN failed--compilation aborted at /home/wdaems/lab/spelbox/perl/lib/SpeL/Object/MathInline.pm line 19.
-Compilation failed in require at /home/wdaems/lab/spelbox/perl/lib/SpeL/Object/Element.pm line 15.
-BEGIN failed--compilation aborted at /home/wdaems/lab/spelbox/perl/lib/SpeL/Object/Element.pm line 15.
-Compilation failed in require at /home/wdaems/lab/spelbox/perl/lib/SpeL/Object/ElementList.pm line 17.
-BEGIN failed--compilation aborted at /home/wdaems/lab/spelbox/perl/lib/SpeL/Object/ElementList.pm line 17.
-Compilation failed in require at /home/wdaems/lab/spelbox/perl/lib/SpeL/Object/Document.pm line 14.
-BEGIN failed--compilation aborted at /home/wdaems/lab/spelbox/perl/lib/SpeL/Object/Document.pm line 14.
-Compilation failed in require at /home/wdaems/lab/spelbox/perl/lib/SpeL/Parser/Chunk.pm line 20.
-BEGIN failed--compilation aborted at /home/wdaems/lab/spelbox/perl/lib/SpeL/Parser/Chunk.pm line 20.
-Compilation failed in require at /home/wdaems/lab/spelbox/perl/lib/SpeL/Wizard.pm line 18.
-BEGIN failed--compilation aborted at /home/wdaems/lab/spelbox/perl/lib/SpeL/Wizard.pm line 18.
-Compilation failed in require at bin/spel-wizard.pl line 29.
-BEGIN failed--compilation aborted at bin/spel-wizard.pl line 29.
+spel-wizard.pl - v0.9 - Walter Daems <walter.daems@uantwerpen.be>
+=================================================================
+- Reading configuration file from /home/wdaems/perl5/lib/perl5/auto/share/dist/SpeL-Wizard/tts.conf
+- no t/02-bin/spel/inlinemathlimitsexpr.aux available at /home/wdaems/lab/spelbox/perl/lib/SpeL/Wizard.pm line 96.
+- Treating t/02-bin/spel/spel/inlinemathlimitsexpr.tex             
+  Parsing t/02-bin/spel/spel/inlinemathlimitsexpr.tex       [  0%]  Parsed  t/02-bin/spel/spel/inlinemathlimitsexpr.tex       [  0%]$Parsetree = bless( {
+  'Element' => [
+    bless( {
+      '' => 'The Laplace transform: '
+    }, 'SpeL::Object::TokenSequence' ),
+    bless( {
+      'MathUnit' => bless( {
+        '' => 'F(s) = \\int_0^\\infty f(t) \\dx{t}',
+        'Left' => bless( {
+          'Component' => bless( {
+            'Argument' => bless( {
+              'Component' => bless( {
+                'Alphabet' => 's',
+                'trailingws' => ''
+              }, 'SpeL::Object::Variable' ),
+              'Rest' => bless( {
+                'ws' => ''
+              }, 'SpeL::Object::Expressionrest' )
+            }, 'SpeL::Object::Expression' ),
+            'Name' => bless( {
+              'Alphabet' => 'F',
+              'trailingws' => ''
+            }, 'SpeL::Object::Variable' ),
+            'cbracket' => ')',
+            'obracket' => '('
+          }, 'SpeL::Object::Function' ),
+          'Rest' => bless( {
+            'ws' => ''
+          }, 'SpeL::Object::Expressionrest' )
+        }, 'SpeL::Object::Expression' ),
+        'RelationChain' => [
+          {
+            'RelOperator' => bless( {
+              '' => '='
+            }, 'SpeL::Object::RelOperator' ),
+            'Right' => bless( {
+              'Component' => bless( {
+                'LBound' => bless( {
+                  'Realnumber' => bless( {
+                    'Sign' => '',
+                    'Value' => '0',
+                    'trailingws' => ''
+                  }, 'SpeL::Object::Realnumber' )
+                }, 'SpeL::Object::Number' ),
+                'Limitscommand' => bless( {
+                  '' => '\\int'
+                }, 'SpeL::Object::Limitscommand' ),
+                'UBound' => bless( {
+                  'Realnumber' => bless( {
+                    'Sign' => '',
+                    'Value' => '\\infty',
+                    'trailingws' => ' '
+                  }, 'SpeL::Object::Realnumber' )
+                }, 'SpeL::Object::Number' )
+              }, 'SpeL::Object::Limitsexpression' ),
+              'Rest' => bless( {
+                'Component' => bless( {
+                  'Argument' => bless( {
+                    'Component' => bless( {
+                      'Alphabet' => 't',
+                      'trailingws' => ''
+                    }, 'SpeL::Object::Variable' ),
+                    'Rest' => bless( {
+                      'ws' => ''
+                    }, 'SpeL::Object::Expressionrest' )
+                  }, 'SpeL::Object::Expression' ),
+                  'Name' => bless( {
+                    'Alphabet' => 'f',
+                    'trailingws' => ''
+                  }, 'SpeL::Object::Variable' ),
+                  'cbracket' => ')',
+                  'obracket' => '('
+                }, 'SpeL::Object::Function' ),
+                'Rest' => bless( {
+                  'Op' => bless( {
+                    'Op' => ''
+                  }, 'SpeL::Object::Binop' ),
+                  'Remainder' => bless( {
+                    'Component' => bless( {
+                      'Args' => [
+                        bless( {
+                          '' => 't',
+                          'Left' => bless( {
+                            'Component' => bless( {
+                              'Alphabet' => 't',
+                              'trailingws' => ''
+                            }, 'SpeL::Object::Variable' ),
+                            'Rest' => bless( {
+                              'ws' => ''
+                            }, 'SpeL::Object::Expressionrest' )
+                          }, 'SpeL::Object::Expression' )
+                        }, 'SpeL::Object::Relation' )
+                      ],
+                      'Name' => 'dx',
+                      'trailingws' => ''
+                    }, 'SpeL::Object::Command' ),
+                    'Rest' => bless( {
+                      'ws' => ''
+                    }, 'SpeL::Object::Expressionrest' )
+                  }, 'SpeL::Object::Expression' )
+                }, 'SpeL::Object::Expressionrest' )
+              }, 'SpeL::Object::Expression' )
+            }, 'SpeL::Object::Expression' )
+          }
+        ]
+      }, 'SpeL::Object::Relation' )
+    }, 'SpeL::Object::MathInline' ),
+    bless( {
+      '' => '.
+'
+    }, 'SpeL::Object::TokenSequence' )
+  ]
+}, 'SpeL::Object::ElementList' );
+
+Done.

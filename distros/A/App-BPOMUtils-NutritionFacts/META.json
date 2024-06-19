@@ -72,7 +72,7 @@
    "provides" : {
       "App::BPOMUtils::NutritionFacts" : {
          "file" : "lib/App/BPOMUtils/NutritionFacts.pm",
-         "version" : "0.025"
+         "version" : "0.026"
       }
    },
    "release_status" : "stable",
@@ -87,7 +87,7 @@
          "web" : "https://github.com/perlancar/perl-App-BPOMUtils-NutritionFacts"
       }
    },
-   "version" : "0.025",
+   "version" : "0.026",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.038002"
@@ -469,7 +469,7 @@
                      {
                         "class" : "Pod::Weaver::Plugin::AppendPrepend",
                         "name" : "@Author::PERLANCAR/AppendPrepend",
-                        "version" : "0.01"
+                        "version" : "0.021"
                      },
                      {
                         "class" : "Pod::Weaver::Plugin::EnsureUniqueSections",

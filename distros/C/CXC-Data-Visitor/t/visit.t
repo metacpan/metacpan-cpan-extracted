@@ -316,6 +316,62 @@ subtest 'visit' => sub {
 
     };
 
+    subtest 'array' => sub {
+
+        my @path;
+        ok(
+            lives {
+                visit(
+                    $struct, \&callback,
+                    context => { path => \@path },
+                    visit   => VISIT_ARRAY,
+                )
+            },
+        ) or note $@;
+
+        is(
+            \@path,
+            array {
+                item array {
+                    item $_ for qw( a c );
+                    end;
+                };
+
+                end;
+            },
+        ) or do { require Data::Dump; note Data::Dump::pp( \@path ); };
+
+    };
+
+
+    subtest 'hash' => sub {
+
+        my @path;
+        ok(
+            lives {
+                visit(
+                    $struct, \&callback,
+                    context => { path => \@path },
+                    visit   => VISIT_HASH,
+                )
+            },
+        ) or note $@;
+
+        is(
+            \@path,
+            array {
+                item array {
+                    item $_ for qw( a );
+                    end;
+                };
+
+                end;
+            },
+        ) or do { require Data::Dump; note Data::Dump::pp( \@path ); };
+
+    };
+
+
     subtest 'leaf' => sub {
 
         my @path;

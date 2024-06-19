@@ -1,5 +1,15 @@
 Revision history for Perl extension Libssh.
 
+1.1 2024-06-18
+  - Fix release
+
+1.0 2024-05-28
+  - Fix race condition when exiting channel (PR #13)
+
+0.9 2022-05-03
+  - Add sftp_canonicalize_path binding
+  - Add sftp_read binding
+
 0.8 2020-06-29
   - Add ssh_channel_request_shell binding
 

@@ -31,5 +31,5 @@ resources:
   bugtracker: https://github.com/KJ7LNW/perl-PDL-IO-Touchstone/issues
   homepage: https://github.com/KJ7LNW/perl-PDL-IO-Touchstone
   repository: https://github.com/KJ7LNW/perl-PDL-IO-Touchstone.git
-version: '1.014'
+version: '1.015'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

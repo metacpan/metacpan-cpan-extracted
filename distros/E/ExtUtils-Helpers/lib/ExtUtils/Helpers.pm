@@ -1,5 +1,5 @@
 package ExtUtils::Helpers;
-$ExtUtils::Helpers::VERSION = '0.026';
+$ExtUtils::Helpers::VERSION = '0.027';
 use strict;
 use warnings FATAL => 'all';
 use Exporter 5.57 'import';
@@ -7,7 +7,6 @@ use Exporter 5.57 'import';
 use Config;
 use File::Basename qw/basename/;
 use File::Spec::Functions qw/splitpath canonpath abs2rel splitdir/;
-use Text::ParseWords 3.24 ();
 
 our @EXPORT_OK = qw/make_executable split_like_shell man1_pagename man3_pagename detildefy/;
 
@@ -17,16 +16,6 @@ BEGIN {
 	my $impl = $impl_for{$^O} || 'Unix';
 	require "ExtUtils/Helpers/$impl.pm";
 	"ExtUtils::Helpers::$impl"->import();
-}
-
-sub split_like_shell {
-	my ($string) = @_;
-
-	return if not defined $string;
-	$string =~ s/^\s+|\s+$//g;
-	return if not length $string;
-
-	return Text::ParseWords::shellwords($string);
 }
 
 sub man1_pagename {
@@ -67,7 +56,7 @@ ExtUtils::Helpers - Various portability utilities for module builders
 
 =head1 VERSION
 
-version 0.026
+version 0.027
 
 =head1 SYNOPSIS
 

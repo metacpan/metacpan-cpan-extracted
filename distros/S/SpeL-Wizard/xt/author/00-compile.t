@@ -6,7 +6,7 @@ use warnings;
 
 use Test::More;
 
-plan tests => 47;
+plan tests => 50;
 
 my @module_files = (
     'SpeL/I18n.pm',
@@ -57,6 +57,9 @@ my @module_files = (
 );
 
 my @scripts = (
+    'bin/awspolly.pl',
+    'bin/balabolka.pl',
+    'bin/festival.pl',
     'bin/spel-wizard.pl'
 );
 

@@ -628,6 +628,26 @@ sftp_write_len(sftp_file file, char *buf, int length)
         RETVAL = sftp_write(file, (void *)buf, length);
     OUTPUT: RETVAL
 
+HV *
+sftp_read(sftp_file file, int buffer_size)
+    CODE:
+        HV *hv_ret = newHV();
+        char *buffer;
+        int ret;
+
+        Newxz(buffer, buffer_size + 1, char);
+        ret = sftp_read(file, (void *)buffer, buffer_size);
+        (void)hv_store(hv_ret, "code", 4, newSViv(ret), 0);
+        if (ret > 0) {
+            (void)hv_store(hv_ret, "data", 4, newSVpv(buffer, ret), 0);
+        } else {
+            (void)hv_store(hv_ret, "data", 4, newSV(0), 0);
+        }
+
+        Safefree(buffer);
+        RETVAL = hv_ret;
+    OUTPUT: RETVAL
+
 int
 sftp_close(sftp_file file)
     CODE:
@@ -638,4 +658,10 @@ int
 sftp_unlink(sftp_session sftp, char *file)
     CODE:
         RETVAL = sftp_unlink(sftp, file);
+    OUTPUT: RETVAL
+
+char *
+sftp_canonicalize_path(sftp_session sftp, char *path)
+    CODE:
+        RETVAL = sftp_canonicalize_path(sftp, path);
     OUTPUT: RETVAL

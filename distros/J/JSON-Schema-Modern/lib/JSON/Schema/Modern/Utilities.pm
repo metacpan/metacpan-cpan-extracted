@@ -4,7 +4,7 @@ package JSON::Schema::Modern::Utilities;
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Internal utilities for JSON::Schema::Modern
 
-our $VERSION = '0.584';
+our $VERSION = '0.585';
 
 use 5.020;
 use strictures 2;
@@ -53,6 +53,7 @@ use JSON::PP ();
 use constant { true => JSON::PP::true, false => JSON::PP::false };
 
 # supports the six core types, plus integer (which is also a number)
+# we do NOT check stringy_numbers here -- you must do that in the caller
 sub is_type ($type, $value) {
   if ($type eq 'null') {
     return !(defined $value);
@@ -94,6 +95,7 @@ sub is_type ($type, $value) {
 }
 
 # returns one of the six core types, plus integer
+# we do NOT check stringy_numbers here -- you must do that in the caller
 sub get_type ($value) {
   return 'object' if is_plain_hashref($value);
   return 'boolean' if is_bool($value);
@@ -109,12 +111,17 @@ sub get_type ($value) {
   return int($value) == $value ? 'integer' : 'number'
     if !($flags & B::SVf_POK) && ($flags & (B::SVf_IOK | B::SVf_NOK));
 
+  # this might be a PVIV or PVNV
   return 'ambiguous type';
 }
 
 # lifted from JSON::MaybeXS
+use constant HAVE_BUILTIN => $] ge '5.036';
+use if HAVE_BUILTIN, experimental => 'builtin';
 sub is_bool ($value) {
-  Scalar::Util::blessed($value)
+  HAVE_BUILTIN and builtin::is_bool($value)
+  or
+  !!Scalar::Util::blessed($value)
     and ($value->isa('JSON::PP::Boolean')
       or $value->isa('Cpanel::JSON::XS::Boolean')
       or $value->isa('JSON::XS::Boolean'));
@@ -126,7 +133,9 @@ sub is_bignum ($value) {
 
 # compares two arbitrary data payloads for equality, as per
 # https://json-schema.org/draft/2020-12/json-schema-core.html#rfc.section.4.2.2
-# if provided with a state hashref with a 'path' key, any differences are recorded within
+# $state hashref supports the following fields:
+# - path: any differences are recorded within
+# - stringy_numbers: strings will be typed as numbers if looks_like_number() is true
 sub is_equal ($x, $y, $state = {}) {
   $state->{path} //= '';
 
@@ -139,9 +148,9 @@ sub is_equal ($x, $y, $state = {}) {
 
   if ($state->{stringy_numbers}) {
     ($x, $types[0]) = (0+$x, int(0+$x) == $x ? 'integer' : 'number')
-      if $types[0] eq 'string' and looks_like_number($x);
+      if ($types[0] eq 'string' or $types[0] eq 'ambiguous type') and looks_like_number($x);
     ($y, $types[1]) = (0+$y, int(0+$y) == $y ? 'integer' : 'number')
-      if $types[1] eq 'string' and looks_like_number($y);
+      if ($types[1] eq 'string' or $types[1] eq 'ambiguous type') and looks_like_number($y);
   }
 
   return 0 if $types[0] ne $types[1];
@@ -174,6 +183,9 @@ sub is_equal ($x, $y, $state = {}) {
 
 # checks array elements for uniqueness. short-circuits on first pair of matching elements
 # if second arrayref is provided, it is populated with the indices of identical items
+# $state hashref supports the following fields:
+# - scalarref_booleans: treats \0 and \1 as boolean values
+# - stringy_numbers: strings will be typed as numbers if looks_like_number() is true
 sub is_elements_unique ($array, $equal_indices = undef, $state = {}) {
   my %s = $state->%{qw(scalarref_booleans stringy_numbers)};
   foreach my $idx0 (0 .. $array->$#*-1) {
@@ -393,7 +405,7 @@ JSON::Schema::Modern::Utilities - Internal utilities for JSON::Schema::Modern
 
 =head1 VERSION
 
-version 0.584
+version 0.585
 
 =head1 SYNOPSIS
 

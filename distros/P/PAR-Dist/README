@@ -24,8 +24,10 @@ You can check out the most recent revision from PAR's GitHub repository:
 You can write
 to the mailing list at <par@perl.org>, or send an empty mail to
 <par-subscribe@perl.org> to participate in the discussion.
+Archives of the mailing list are available at
+<https://www.mail-archive.com/par@perl.org/> or <https://groups.google.com/g/perl.par>.
 
-Please submit bug reports to <bug-par-dist@rt.cpan.org>.
+Please submit bug reports to <https://github.com/rschupp/PAR-Dist/issues>.
 
 * Copyright
 

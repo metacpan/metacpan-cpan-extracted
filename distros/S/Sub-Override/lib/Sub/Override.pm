@@ -3,53 +3,10 @@ package Sub::Override;
 use strict;
 use warnings;
 
-use Sub::Prototype qw(set_prototype);
+use Carp qw(croak);
+use Scalar::Util qw(set_prototype);
 
-our $VERSION = '0.11';
-
-my $_croak = sub {
-    local *__ANON__ = '__ANON__croak';
-    my ( $proto, $message ) = @_;
-    require Carp;
-    Carp::croak($message);
-};
-
-my $_validate_code_slot = sub {
-    local *__ANON__ = '__ANON__validate_code_slot';
-    my ( $self, $code_slot ) = @_;
-    no strict 'refs';
-    unless ( defined *{$code_slot}{CODE} ) {
-        $self->$_croak("Cannot replace non-existent sub ($code_slot)");
-    }
-    return $self;
-};
-
-my $_validate_sub_ref = sub {
-    local *__ANON__ = '__ANON__validate_sub_ref';
-    my ( $self, $sub_ref ) = @_;
-    unless ( 'CODE' eq ref $sub_ref ) {
-        $self->$_croak("($sub_ref) must be a code reference");
-    }
-    return $self;
-};
-
-my $_normalize_sub_name = sub {
-    local *__ANON__ = '__ANON__normalize_sub_name';
-    my ( $self, $subname ) = @_;
-    if ( ( $subname || '' ) =~ /^\w+$/ ) { # || "" for suppressing test warnings
-        my $package = do {
-            my $call_level = 0;
-            my $this_package;
-            while ( !$this_package || __PACKAGE__ eq $this_package ) {
-                ($this_package) = caller($call_level);
-                $call_level++;
-            }
-            $this_package;
-        };
-        $subname = "${package}::$subname";
-    }
-    return $subname;
-};
+our $VERSION = '0.12';
 
 sub new {
     my $class = shift;
@@ -67,8 +24,8 @@ sub new {
 
 sub replace {
     my ( $self, $sub_to_replace, $new_sub ) = @_;
-    $sub_to_replace = $self->$_normalize_sub_name($sub_to_replace);
-    $self->$_validate_code_slot($sub_to_replace)->$_validate_sub_ref($new_sub);
+    $sub_to_replace = $self->_get_fully_qualified_sub_name($sub_to_replace);
+    $self->_ensure_code_slot_exists($sub_to_replace)->_validate_sub_ref($new_sub);
     {
         no strict 'refs';
         $self->{$sub_to_replace} ||= *$sub_to_replace{CODE};
@@ -78,16 +35,46 @@ sub replace {
     return $self;
 }
 
+sub inject {
+    my ( $self, $sub_to_inject, $new_sub ) = @_;
+    $sub_to_inject = $self->_get_fully_qualified_sub_name($sub_to_inject);
+    $self->_ensure_code_slot_does_not_exist($sub_to_inject)->_validate_sub_ref($new_sub);
+    {
+        no strict 'refs';
+        $self->{$sub_to_inject} = undef;
+        no warnings 'redefine';
+        *$sub_to_inject = $new_sub;
+    }
+    return $self;
+}
+
+sub inherit {
+    my ( $self, $sub_to_inherit, $new_sub ) = @_;
+    $sub_to_inherit = $self->_get_fully_qualified_sub_name($sub_to_inherit);
+    $self->_ensure_code_slot_exists_in_parent_class($sub_to_inherit)->_validate_sub_ref($new_sub);
+    {
+        no strict 'refs';
+        $self->{$sub_to_inherit} = undef;
+        no warnings 'redefine';
+        *$sub_to_inherit = $new_sub;
+    }
+    return $self;
+}
+
 sub wrap {
     my ( $self, $sub_to_replace, $new_sub ) = @_;
-    $sub_to_replace = $self->$_normalize_sub_name($sub_to_replace);
-    $self->$_validate_code_slot($sub_to_replace)->$_validate_sub_ref($new_sub);
+    $sub_to_replace = $self->_get_fully_qualified_sub_name($sub_to_replace);
+    $self->_ensure_code_slot_exists($sub_to_replace)->_validate_sub_ref($new_sub);
     {
         no strict 'refs';
         $self->{$sub_to_replace} ||= *$sub_to_replace{CODE};
-        my $code =  sub { unshift @_, $self->{$sub_to_replace}; goto &$new_sub };
+
+        # passing $sub_to_replace directly to arguments prevents early destruction.
+        my $weakened_sub_to_replace = $self->{$sub_to_replace};
+        my $code = sub { unshift(@_, $weakened_sub_to_replace); goto &$new_sub };
         my $prototype = prototype($self->{$sub_to_replace});
-        set_prototype($code, $prototype) if defined $prototype;
+        set_prototype(\&$code, $prototype) if defined $prototype;
+
         no warnings 'redefine';
         *$sub_to_replace = $code;
     }
@@ -96,30 +83,99 @@ sub wrap {
 
 sub restore {
     my ( $self, $name_of_sub ) = @_;
-    $name_of_sub = $self->$_normalize_sub_name($name_of_sub);
+    $name_of_sub = $self->_get_fully_qualified_sub_name($name_of_sub);
     if ( !$name_of_sub && 1 == keys %$self ) {
         ($name_of_sub) = keys %$self;
     }
-    $self->$_croak(
+    croak(
         sprintf 'You must provide the name of a sub to restore: (%s)' => join
           ', ' => sort keys %$self )
-      unless $name_of_sub;
-    $self->$_croak("Cannot restore a sub that was not replaced ($name_of_sub)")
-      unless exists $self->{$name_of_sub};
+        unless $name_of_sub;
+    croak("Cannot restore a sub that was not replaced ($name_of_sub)")
+        unless exists $self->{$name_of_sub};
+
     no strict 'refs';
     no warnings 'redefine';
-    *$name_of_sub = delete $self->{$name_of_sub};
+    my $maybe_sub_ref = delete $self->{$name_of_sub};
+    if ( defined $maybe_sub_ref ) {
+        *$name_of_sub = $maybe_sub_ref;
+    }
+    else {
+        undef *$name_of_sub;
+    }
     return $self;
 }
 
 sub DESTROY {
     my $self = shift;
     no strict 'refs';
-    no warnings 'redefine';
-    while ( my ( $sub_name, $sub_ref ) = each %$self ) {
-        *$sub_name = $sub_ref;
+    # "misc" suppresses warning: 'Undefined value assigned to typeglob'
+    no warnings 'redefine', 'misc';
+    while ( my ( $sub_name, $maybe_sub_ref ) = each %$self ) {
+        if ( defined $maybe_sub_ref ) {
+            *$sub_name = $maybe_sub_ref;
+        }
+        else {
+            undef *$sub_name;
+        }
     }
 }
+
+sub _get_fully_qualified_sub_name {
+    my ( $self, $subname ) = @_;
+    if ( ( $subname || '' ) =~ /^\w+$/ ) { # || "" for suppressing test warnings
+        my $package = do {
+            my $call_level = 0;
+            my $this_package;
+            while ( !$this_package || __PACKAGE__ eq $this_package ) {
+                ($this_package) = caller($call_level);
+                $call_level++;
+            }
+            $this_package;
+        };
+        $subname = "${package}::$subname";
+    }
+    return $subname;
+};
+
+sub _validate_sub_ref {
+    my ( $self, $sub_ref ) = @_;
+    unless ( 'CODE' eq ref $sub_ref ) {
+        croak("($sub_ref) must be a code reference");
+    }
+    return $self;
+};
+
+sub _ensure_code_slot_exists {
+    my ( $self, $code_slot ) = @_;
+    no strict 'refs';
+    unless ( defined *{$code_slot}{CODE} ) {
+        croak("Cannot replace non-existent sub ($code_slot)");
+    }
+    return $self;
+};
+
+sub _ensure_code_slot_does_not_exist {
+    my ( $self, $code_slot ) = @_;
+    no strict 'refs';
+    if ( defined *{$code_slot}{CODE} ) {
+        croak("Cannot create a sub that already exists ($code_slot)");
+    }
+    return $self;
+};
+
+sub _ensure_code_slot_exists_in_parent_class {
+    my ( $self, $code_slot ) = @_;
+    $self->_ensure_code_slot_does_not_exist($code_slot);
+    {
+        no strict 'refs';
+        my $class  = *{$code_slot}{PACKAGE};
+        my $method = *{$code_slot}{NAME};
+        croak("Sub does not exist in parent class ($code_slot)")
+            unless $class->can($method);
+    }
+    return $self;
+};
 
 1;
 
@@ -131,7 +187,7 @@ Sub::Override - Perl extension for easily overriding subroutines
 
 =head1 VERSION
 
-0.11
+0.12
 
 =head1 SYNOPSIS
 
@@ -216,6 +272,49 @@ when testing how code behaves with multiple conditions.
   $override->replace('Some::thing', sub { 1 });
   is($object->foo, 'puppies', 'puppies are returned if Some::thing is true');
 
+=head2 Injecting a subroutine
+
+If you want to inject a subroutine into a package, you can use the C<inject()>
+method. This is identical to C<replace()>, except that it requires that the
+subroutine does not exist:
+
+  $override->inject('Some::sub', sub {'new data'});
+
+This is useful if you want to add a subroutine to a package that doesn't
+already have it.
+
+If you attempt to inject a subroutine that already exists, an exception will be
+thrown.
+
+  $override->inject('Some::sub', sub {'new data'}); # works
+  $override->inject('Some::sub', sub {'new data'}); # throws an exception
+
+Calling C<restore()> or allowing the C<$override> to go out of scope will
+remove the injected subroutine.
+
+  $override->inject('Some::sub', sub {'new data'});
+  $override->restore('Some::sub'); # removes the injected subroutine
+
+=head2 Inheriting a subroutine
+
+Similar to 'inject', 'inherit' will only allow you to create a new subroutine
+on a child object that inherits the routine from the parent, and doesn't
+exist in the child:
+
+  package Parent;
+  sub foo {}
+  sub bar {}
+
+  package Child;
+  use parent 'Parent';
+  sub foo {}
+
+'Inherit' will allow you to set up a new 'Child::bar' subroutine since it is
+inherited from Parent. Attempting to 'inherit' 'Child::foo' will result in an
+exception being thrown since 'foo' already exists in Child. Similarly,
+attempting to 'inherit' new subroutine 'something' in Child will also result
+in an exception since it doesn't exist in Parent and won't be inherited by Child.
+
 =head2 Wrapping a subroutine
 
 There may be times when you want to 'conditionally' replace a subroutine - for
@@ -299,6 +398,23 @@ This method will C<croak> if the subroutine to be replaced does not exist.
 
 C<override> is an alternate name for C<replace>.  They are the same method.
 
+=head2 inject
+
+ $sub->inject($sub_name, $sub_body);
+
+Temporarily injects a subroutine into a package.  Returns the instance, so
+chaining the method is allowed:
+
+ $sub->inject($sub_name, $sub_body)
+     ->inject($another_sub, $another_body);
+
+=head2 inherit
+
+ $sub->inherit($sub_name, $sub_body);
+
+Checks that the subroutine exists in a parent class, but not in the current
+class, and injects it into the current class to inherit the parent's version.
+
 =head2 restore
 
  $sub->restore($sub_name);
@@ -355,6 +471,10 @@ L<Hook::LexWrap> -- can also override subs, but with different capabilities
 L<Test::MockObject> -- use this if you need to alter an entire class
 
 =back
+
+=head1 MAINTAINER
+
+Robin Murray (mvsjes2 on github)
 
 =head1 AUTHOR
 

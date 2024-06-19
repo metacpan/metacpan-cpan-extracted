@@ -24,7 +24,7 @@ SpeL::I18n::en - class for English localization
 
 =head1 VERSION
 
-version 20240617.1739
+version 20240619.0646
 
 =head1 SYNOPSYS
 

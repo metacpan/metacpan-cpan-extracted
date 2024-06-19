@@ -7,7 +7,7 @@ use Exporter qw(import);
 use XSLoader;
 use Time::HiRes;
 
-our $VERSION = '0.8';
+our $VERSION = '1.1';
 
 XSLoader::load('Libssh::Session', $VERSION);
 
@@ -531,9 +531,9 @@ sub add_command_internal {
     my $channel_id = $self->open_channel();
     if ($channel_id !~ /^\d+\:\d+$/) {
         if (defined($options{command}->{callback})) {
-            $options{command}->{callback}->(exit => SSH_ERROR, error_msg => 'cannot init channel', session => $self);
+            $options{command}->{callback}->(exit => SSH_ERROR, error_msg => 'cannot init channel', session => $self, userdata => $options{command}->{userdata});
         } else {
-            push @{$self->{store_no_callback}}, { exit => SSH_ERROR, error_msg => 'cannot init channel', session => $self };
+            push @{$self->{store_no_callback}}, { exit => SSH_ERROR, error_msg => 'cannot init channel', session => $self, userdata => $options{command}->{userdata} };
         }
         return undef;
     }
@@ -559,9 +559,9 @@ sub add_command_internal {
         if ($self->channel_write(channel => ${$self->{channels}->{$channel_id}}, data => $options{command}->{input_data}) == SSH_ERROR) {
             $self->close_channel(channel_id => $channel_id);
             if (defined($options{command}->{callback})) {
-                $options{command}->{callback}->(exit => SSH_ERROR, error_msg => 'cannot write in channel', session => $self);
+                $options{command}->{callback}->(exit => SSH_ERROR, error_msg => 'cannot write in channel', session => $self, userdata => $options{command}->{userdata});
             } else {
-                push @{$self->{store_no_callback}}, { exit => SSH_ERROR, error_msg => 'cannot write in channel', session => $self };
+                push @{$self->{store_no_callback}}, { exit => SSH_ERROR, error_msg => 'cannot write in channel', session => $self, userdata => $options{command}->{userdata} };
             }
             return undef;
         }
@@ -605,7 +605,13 @@ sub execute_read_channel {
     }
     
     if (ssh_channel_is_eof($channel) != 0) {
-        $self->{slots}->{$channel_id}->{exit_code} = $self->channel_get_exit_status(channel => $channel);
+        my $channel_exit_status = SSH_ERROR;
+        for (my $i = 0; $i < 20; $i++) {
+            $channel_exit_status = $self->channel_get_exit_status(channel => $channel);
+            last if $channel_exit_status != SSH_ERROR;
+            Time::HiRes::usleep(50000);
+        }
+        $self->{slots}->{$channel_id}->{exit_code} = $channel_exit_status;
         $self->close_channel(channel_id => $channel_id);
         
         my %callback_options = (
@@ -887,11 +893,13 @@ Libssh::Session - Support for the SSH protocol via libssh.
     #$options{session}->add_command(command => { cmd => 'ls -l', callback => \&my_callback, userdata => 'cmd 3'});
   }
 
-  $session->execute(commands => [ 
-                    { cmd => 'ls -l', callback => \&my_callback, userdata => 'cmd 1'},
-                    { cmd => 'ls wanterrormsg', callback => \&my_callback, userdata => 'cmd 2 error'},
-                  ],
-                  timeout => 60, timeout_nodata => 30, parallel => 4);
+  $session->execute(
+    commands => [ 
+        { cmd => 'ls -l', callback => \&my_callback, userdata => 'cmd 1'},
+        { cmd => 'ls wanterrormsg', callback => \&my_callback, userdata => 'cmd 2 error'}
+    ],
+    timeout => 60, timeout_nodata => 30, parallel => 4
+  );
   exit(0);
 
 =head1 DESCRIPTION

@@ -20,7 +20,7 @@
 #  respective owners and no grant or license is provided thereof.
 
 package PDL::IO::Touchstone;
-our $VERSION = '1.014';
+our $VERSION = '1.015';
 
 use 5.010;
 use strict;
@@ -146,7 +146,7 @@ sub rsnp_fh
 	my $EOF_REGEX = $args->{EOF_REGEX};
 
 	# Try to enforce the number of ports based on the filename extension.
-	$n_ports = $1 if ($fn =~ /s(\d+)p/i);
+	$n_ports = $1 if ($fn =~ /\.s(\d+)p$/i);
 
 	my $n = 0;
 	my $line;
@@ -231,7 +231,7 @@ sub rsnp_fh
 
 				if ($sqrt_n_params != $n_ports)
 				{
-					croak "$fn:$n: expected $n_ports fields of port data but found $sqrt_n_params: $n_ports != $sqrt_n_params";
+					carp "$fn:$n: expected $n_ports fields of port data (based on filename .sNp extension), but found $sqrt_n_params in the file itself: $n_ports != $sqrt_n_params";
 				}
 			}
 
@@ -245,7 +245,7 @@ sub rsnp_fh
 		for (my $i = 0; $i < @params; $i += 2)
 		{
 			# The data format could be ri, ma, or db but there is
-			# always a pair of data.  Please each in its own array
+			# always a pair of data.  Place each in its own array
 			# and we will convert the format below.
 			push @{ $cols[$col_idx]->[0] }, $params[$i];
 			push @{ $cols[$col_idx]->[1] }, $params[$i+1];

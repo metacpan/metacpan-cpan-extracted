@@ -1,5 +1,5 @@
 package ExtUtils::Builder::AutoDetect::C;
-$ExtUtils::Builder::AutoDetect::C::VERSION = '0.006';
+$ExtUtils::Builder::AutoDetect::C::VERSION = '0.007';
 use strict;
 use warnings;
 
@@ -7,19 +7,19 @@ use base 'ExtUtils::Builder::Planner::Extension';
 
 use Carp 'croak';
 use ExtUtils::Config 0.007;
+use ExtUtils::Helpers 0.027 'split_like_shell';
 use Perl::OSType 'is_os_type';
-use Text::ParseWords 'shellwords';
 
 sub _split_conf {
 	my ($config, $name) = @_;
-	return shellwords($config->get($name));
+	return split_like_shell($config->get($name));
 }
 
 sub _make_command {
 	my ($self, $shortname, $argument, $command, %options) = @_;
 	my $module = "ExtUtils::Builder::$shortname";
 	require_module($module);
-	my @command = ref $command ? @{$command} : shellwords($command);
+	my @command = ref $command ? @{$command} : split_like_shell($command);
 	return $module->new($argument => \@command, %options);
 }
 
@@ -82,7 +82,7 @@ sub _unix_flags {
 	my $optimize = $opts->{config}->get('optimize');
 	$lddlflags =~ s/ ?\Q$optimize// if not $self->{auto_optimize};
 	my %ldflags = map { ($_ => 1) } _split_conf($opts->{config}, 'ldflags');
-	my @lddlflags = grep { not $ldflags{$_} } shellwords($lddlflags);
+	my @lddlflags = grep { not $ldflags{$_} } split_like_shell($lddlflags);
 	my @cc = _split_conf($opts->{config}, 'ccdlflags');
 	return (cc => \@cc, ldd_flags => \@lddlflags )
 }
@@ -179,7 +179,7 @@ ExtUtils::Builder::AutoDetect::C - compiler configuration, derived from perl's c
 
 =head1 VERSION
 
-version 0.006
+version 0.007
 
 =head1 SYNOPSIS
 

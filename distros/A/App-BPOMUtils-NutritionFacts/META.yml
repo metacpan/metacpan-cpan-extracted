@@ -19,7 +19,7 @@ name: App-BPOMUtils-NutritionFacts
 provides:
   App::BPOMUtils::NutritionFacts:
     file: lib/App/BPOMUtils/NutritionFacts.pm
-    version: '0.025'
+    version: '0.026'
 requires:
   Browser::Open: '0'
   Data::Sah::Coerce::perl::To_float::From_str::percent: '0'
@@ -50,7 +50,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=App-BPOMUtils-NutritionFacts
   homepage: https://metacpan.org/release/App-BPOMUtils-NutritionFacts
   repository: git://github.com/perlancar/perl-App-BPOMUtils-NutritionFacts.git
-version: '0.025'
+version: '0.026'
 x_Dist_Zilla:
   perl:
     version: '5.038002'
@@ -352,7 +352,7 @@ x_Dist_Zilla:
             -
               class: Pod::Weaver::Plugin::AppendPrepend
               name: '@Author::PERLANCAR/AppendPrepend'
-              version: '0.01'
+              version: '0.021'
             -
               class: Pod::Weaver::Plugin::EnsureUniqueSections
               name: '@Author::PERLANCAR/EnsureUniqueSections'

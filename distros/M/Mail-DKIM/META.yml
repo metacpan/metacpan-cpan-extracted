@@ -9,13 +9,14 @@ build_requires:
   Test::More: '0'
   Test::RequiresInternet: '0'
   Test::Simple: '0'
+  YAML: '0'
   YAML::XS: '0'
   lib: '0'
   perl: '5.006'
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.031, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Zilla version 6.032, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -37,12 +38,13 @@ requires:
 resources:
   bugtracker: https://github.com/fastmail/mail-dkim/issues
   repository: git://github.com/fastmail/mail-dkim.git
-version: '1.20240124'
+version: '1.20240619'
 x_contributors:
   - 'Aaron Thompson <dev@aaront.org>'
   - 'Bron Gondwana <brong@fastmail.fm>'
   - 'Christian Jaeger <ch@christianjaeger.ch>'
   - 'Damien MASCRÉ <damienmascre@free.fr>'
+  - 'Giovanni <g.bechis@snb.it>'
   - 'jasonlong <jasonlong@f38efd27-133c-0410-a3cc-a5f95e9cf04f>'
   - 'José Borges Ferreira <jose.ferreira@bitsighttech.com>'
   - 'Marc Bradshaw <marc@fastmailteam.com>'

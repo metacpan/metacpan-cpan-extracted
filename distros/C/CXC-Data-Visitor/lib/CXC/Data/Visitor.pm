@@ -10,13 +10,14 @@ use warnings;
 use feature 'current_sub';
 use experimental 'signatures', 'lexical_subs', 'postderef';
 
-our $VERSION = '0.04';
+our $VERSION = '0.05';
 
 use base 'Exporter::Tiny';
 use Hash::Util 'lock_hash', 'unlock_hash', 'unlock_value';
 use POSIX 'floor';
 use Scalar::Util 'refaddr', 'looks_like_number';
-use Ref::Util 'is_plain_arrayref', 'is_plain_hashref', 'is_coderef', 'is_plain_refref';
+use Ref::Util 'is_plain_arrayref', 'is_plain_hashref', 'is_coderef', 'is_plain_ref',
+  'is_plain_refref';
 use Feature::Compat::Defer;
 
 use constant {
@@ -25,7 +26,13 @@ use constant {
     CYCLE_TRUNCATE => 'truncate',
 };
 use constant CYCLE_QR => qr /\A die|continue|truncate \z/x;
-use constant { VISIT_CONTAINER => 0b01, VISIT_LEAF => 0b10, VISIT_ALL => 0b11 };
+use constant {
+    VISIT_HASH      => 0b001,
+    VISIT_ARRAY     => 0b010,
+    VISIT_CONTAINER => 0b011,
+    VISIT_LEAF      => 0b100,
+    VISIT_ALL       => 0b111,
+};
 use constant {
     RESULT_RETURN            => 0,
     RESULT_CONTINUE          => 1,
@@ -39,7 +46,7 @@ our %EXPORT_TAGS = (
     funcs     => [qw( visit )],
     results   => [qw( RESULT_RETURN RESULT_CONTINUE RESULT_REVISIT_CONTAINER RESULT_REVISIT_ELEMENT )],
     cycles    => [qw( CYCLE_DIE CYCLE_CONTINUE CYCLE_TRUNCATE )],
-    visits    => [qw( VISIT_CONTAINER VISIT_LEAF VISIT_ALL )],
+    visits    => [qw( VISIT_ARRAY VISIT_HASH VISIT_CONTAINER VISIT_LEAF VISIT_ALL )],
     passes    => [qw( PASS_VISIT_ELEMENT PASS_REVISIT_ELEMENT )],
     constants => [qw( :results :cycles :visits )],
 );
@@ -91,8 +98,9 @@ my sub _visit ( $node, $code, $context, $cycle, $visit, $meta ) {
     push $ancestors->@*, $node;
     defer { pop $ancestors->@* };
 
-    my $visit_leaf = !!( $visit & VISIT_LEAF );
-    my $visit_node = !!( $visit & VISIT_CONTAINER );
+    my $visit_leaf  = !!( $visit & VISIT_LEAF );
+    my $visit_hash  = !!( $visit & VISIT_HASH );
+    my $visit_array = !!( $visit & VISIT_ARRAY );
 
   SCAN: {
         last unless --$revisit_limit;
@@ -106,9 +114,11 @@ my sub _visit ( $node, $code, $context, $cycle, $visit, $meta ) {
 
             my $vref = \( $is_hashref ? $node->{$idx} : $node->[$idx] );
 
-            my $is_node = is_plain_refref( $vref );
+            my $visit_element
+              = is_plain_hashref( $$vref )  ? $visit_hash
+              : is_plain_arrayref( $$vref ) ? $visit_array
+              :                               $visit_leaf;
 
-            my $visit_element   = $is_node ? $visit_node : $visit_leaf;
             my $revisit_element = !!0;
 
             $meta{pass} = PASS_VISIT_ELEMENT;
@@ -147,6 +157,12 @@ my sub _visit ( $node, $code, $context, $cycle, $visit, $meta ) {
     return !!1;
 }
 ## critic (Subroutines::ProhibitManyArgs  Subroutines::ProhibitExcessComplexity)
+
+
+
+
+
+
 
 
 
@@ -473,7 +489,7 @@ CXC::Data::Visitor - Invoke a callback on every element at every level of a data
 
 =head1 VERSION
 
-version 0.04
+version 0.05
 
 =head1 SYNOPSIS
 
@@ -735,7 +751,7 @@ indicating what should be done.
 
 =back
 
-=item I<visit> => VISIT_CONTAINER | VISIT_LEAF | VISIT_ALL
+=item I<visit> => VISIT_HASH | VISIT_ARRAY | VISIT_CONTAINER | VISIT_LEAF | VISIT_ALL
 
 The parts of the structure that will trigger a callback.
 See L</EXPORTS> to import the constants.
@@ -744,8 +760,8 @@ See L</EXPORTS> to import the constants.
 
 =item VISIT_CONTAINER
 
-Invoke L</$callback> on containers.  For example, the elements in the
-following structure
+Invoke L</$callback> on containers (either hashes or arrays).  For
+example, the elements in the following structure
 
   $struct = { a => { b => 1, c => [ 2, 3 ] } }
 
@@ -753,6 +769,12 @@ passed to L</$callback> are:
 
   a => {...}  # $struct->{a}
   c => [...]  # $struct->{c}
+
+=item VISIT_ARRAY
+
+=item VISIT_HASH
+
+Only visit containers of the given type.
 
 =item VISIT_LEAF
 

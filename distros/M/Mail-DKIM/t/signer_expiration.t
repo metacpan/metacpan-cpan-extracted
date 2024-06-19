@@ -101,7 +101,7 @@ sub Mail::DKIM::DNS::fake_query {
             foreach my $rr (@result) {
 
                 # join with no intervening spaces, RFC 6376
-                if ( Net::DNS->VERSION >= 0.69 ) {
+                if ( $rr->can('txtdata') ) {
 
                     # must call txtdata() in a list context
                     printf STDERR ( "%s\n", join( "", $rr->txtdata ) );

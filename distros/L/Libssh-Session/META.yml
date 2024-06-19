@@ -1,22 +1,38 @@
 ---
-abstract: 'Support for the SSH protocol via libssh.'
+abstract: 'Perl interface for libssh'
 author:
-  - 'Quentin Garnier'
+  - 'Quentin Garnier <qgarnier at ose-consulting.com>'
 build_requires:
-  ExtUtils::MakeMaker: 0
+  ExtUtils::MakeMaker: '0'
 configure_requires:
-  ExtUtils::MakeMaker: 0
+  ExtUtils::MakeMaker::Config: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 6.68, CPAN::Meta::Converter version 2.120921'
-license: unknown
+generated_by: 'ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010'
+license: apache2
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
-  version: 1.4
+  version: '1.4'
 name: Libssh-Session
 no_index:
   directory:
     - t
     - inc
+recommends:
+  ExtUtils::PkgConfig: '0'
+  XSLoader: '0'
 requires:
-  Test::More: 0
-version: 0.8
+  Carp: '0'
+  DynaLoader: '0'
+  Exporter: '0'
+  overload: '0'
+  perl: '5.008001'
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/garnier-quentin/perl-libssh/issues
+  homepage: https://github.com/garnier-quentin/perl-libssh
+  repository: git://github.com/garnier-quentin/perl-libssh.git
+version: '1.1'
+x_contributors:
+  - 'Vesislav Dimitrov'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

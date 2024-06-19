@@ -6,6 +6,7 @@ use 5.020;  # for fc, unicode_strings features
 use strictures 2;
 use stable 0.031 'postderef';
 use experimental 'signatures';
+no autovivification warn => qw(fetch store exists delete);
 use if "$]" >= 5.022, experimental => 're_strict';
 no if "$]" >= 5.031009, feature => 'indirect';
 no if "$]" >= 5.033001, feature => 'multidimensional';
@@ -118,7 +119,7 @@ json-schema-eval - A command-line interface to JSON::Schema::Modern::evaluate()
 
 =head1 VERSION
 
-version 0.584
+version 0.585
 
 =head1 SYNOPSIS
 

@@ -1,12 +1,12 @@
 {
-   "abstract" : "Support for the SSH protocol via libssh.",
+   "abstract" : "Perl interface for libssh",
    "author" : [
-      "Quentin Garnier"
+      "Quentin Garnier <qgarnier@ose-consulting.com>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 6.68, CPAN::Meta::Converter version 2.120921",
+   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150001",
    "license" : [
-      "unknown"
+      "apache2"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
@@ -27,15 +27,25 @@
       },
       "configure" : {
          "requires" : {
-            "ExtUtils::MakeMaker" : "0"
+            "ExtUtils::MakeMaker::Config" : "0"
          }
       },
       "runtime" : {
+         "recommends" : {
+            "ExtUtils::PkgConfig" : "0",
+            "XSLoader" : "0"
+         },
          "requires" : {
-            "Test::More" : "0"
+            "Carp" : "0",
+            "DynaLoader" : "0",
+            "Exporter" : "0",
+            "overload" : "0",
+            "perl" : "5.008001",
+            "strict" : "0",
+            "warnings" : "0"
          }
       }
    },
    "release_status" : "stable",
-   "version" : "0.8"
+   "version" : "1.1"
 }

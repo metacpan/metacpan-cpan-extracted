@@ -1,7 +1,7 @@
 package Mail::DKIM::Verifier;
 use strict;
 use warnings;
-our $VERSION = '1.20240124'; # VERSION
+our $VERSION = '1.20240619'; # VERSION
 # ABSTRACT: verifies a DKIM-signed message
 
 # Copyright 2005-2009 Messiah College. All rights reserved.
@@ -500,7 +500,7 @@ Mail::DKIM::Verifier - verifies a DKIM-signed message
 
 =head1 VERSION
 
-version 1.20240124
+version 1.20240619
 
 =head1 SYNOPSIS
 

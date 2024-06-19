@@ -1,5 +1,8 @@
 Revision history for JSON-Schema-Modern
 
+0.585     2024-06-19 04:03:36Z
+          - make use of core bool functionality where it exists (perl 5.36+)
+
 0.584     2024-05-18 21:06:35Z
           - add 'get_entity_locations' helper sub to ::Document
 
@@ -526,4 +529,4 @@ Revision history for JSON-Schema-Modern
           - add support for $id and $anchor in single schema documents
 
 0.001     2020-05-21 15:51:00Z
-          - Initial release.
+          - Initial release [as JSON-Schema-Draft201909].

@@ -4,7 +4,7 @@
       "Marc Bradshaw <marc@marcbradshaw.net>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.031, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.032, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -51,6 +51,7 @@
             "Test::More" : "0",
             "Test::RequiresInternet" : "0",
             "Test::Simple" : "0",
+            "YAML" : "0",
             "YAML::XS" : "0",
             "lib" : "0",
             "perl" : "5.006"
@@ -68,12 +69,13 @@
          "web" : "https://github.com/fastmail/mail-dkim/"
       }
    },
-   "version" : "1.20240124",
+   "version" : "1.20240619",
    "x_contributors" : [
       "Aaron Thompson <dev@aaront.org>",
       "Bron Gondwana <brong@fastmail.fm>",
       "Christian Jaeger <ch@christianjaeger.ch>",
       "Damien MASCR\u00c9 <damienmascre@free.fr>",
+      "Giovanni <g.bechis@snb.it>",
       "jasonlong <jasonlong@f38efd27-133c-0410-a3cc-a5f95e9cf04f>",
       "Jose\u0301 Borges Ferreira <jose.ferreira@bitsighttech.com>",
       "Marc Bradshaw <marc@fastmailteam.com>",
@@ -83,7 +85,7 @@
       "Mohammad S Anwar <mohammad.anwar@yahoo.com>"
    ],
    "x_generated_by_perl" : "v5.38.2",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.37",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.38",
    "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"
 }
 

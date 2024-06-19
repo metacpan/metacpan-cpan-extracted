@@ -4,7 +4,7 @@ Sub::Override - Perl extension for easily overriding subroutines
 
 # VERSION
 
-0.11
+0.12
 
 # SYNOPSIS
 
@@ -89,6 +89,49 @@ when testing how code behaves with multiple conditions.
     $override->replace('Some::thing', sub { 1 });
     is($object->foo, 'puppies', 'puppies are returned if Some::thing is true');
 
+## Injecting a subroutine
+
+If you want to inject a subroutine into a package, you can use the `inject()`
+method. This is identical to `replace()`, except that it requires that the
+subroutine does not exist:
+
+    $override->inject('Some::sub', sub {'new data'});
+
+This is useful if you want to add a subroutine to a package that doesn't
+already have it.
+
+If you attempt to inject a subroutine that already exists, an exception will be
+thrown.
+
+    $override->inject('Some::sub', sub {'new data'}); # works
+    $override->inject('Some::sub', sub {'new data'}); # throws an exception
+
+Calling `restore()` or allowing the `$override` to go out of scope will
+remove the injected subroutine.
+
+    $override->inject('Some::sub', sub {'new data'});
+    $override->restore('Some::sub'); # removes the injected subroutine
+
+## Inheriting a subroutine
+
+Similar to 'inject', 'inherit' will only allow you to create a new subroutine
+on a child object that inherits the routine from the parent, and doesn't
+exist in the child:
+
+    package Parent;
+    sub foo {}
+    sub bar {}
+
+    package Child;
+    use parent 'Parent';
+    sub foo {}
+
+'Inherit' will allow you to set up a new 'Child::bar' subroutine since it is
+inherited from Parent. Attempting to 'inherit' 'Child::foo' will result in an
+exception being thrown since 'foo' already exists in Child. Similarly,
+attempting to 'inherit' new subroutine 'something' in Child will also result
+in an exception since it doesn't exist in Parent and won't be inherited by Child.
+
 ## Wrapping a subroutine
 
 There may be times when you want to 'conditionally' replace a subroutine - for
@@ -172,6 +215,23 @@ This method will `croak` if the subroutine to be replaced does not exist.
 
 `override` is an alternate name for `replace`.  They are the same method.
 
+## inject
+
+    $sub->inject($sub_name, $sub_body);
+
+Temporarily injects a subroutine into a package.  Returns the instance, so
+chaining the method is allowed:
+
+    $sub->inject($sub_name, $sub_body)
+        ->inject($another_sub, $another_body);
+
+## inherit
+
+    $sub->inherit($sub_name, $sub_body);
+
+Checks that the subroutine exists in a parent class, but not in the current
+class, and injects it into the current class to inherit the parent's version.
+
 ## restore
 
     $sub->restore($sub_name);
@@ -221,6 +281,10 @@ Probably.  Tell me about 'em.
 
 - [Hook::LexWrap](https://metacpan.org/pod/Hook%3A%3ALexWrap) -- can also override subs, but with different capabilities
 - [Test::MockObject](https://metacpan.org/pod/Test%3A%3AMockObject) -- use this if you need to alter an entire class
+
+# MAINTAINER
+
+Robin Murray (mvsjes2 on github)
 
 # AUTHOR
 

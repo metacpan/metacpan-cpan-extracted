@@ -14,9 +14,61 @@ my @unix_splits =
    { qq{one\\\ntwo}                       => [ "one\ntwo"                           ] },  # TODO
   );
 
-plan tests => 2 * @unix_splits;
-foreach my $test (@unix_splits) {
-	do_split_tests($test);
+my @win_splits =
+  (
+   { 'a" "b\\c" "d'         => [ 'a b\c d'       ] },
+   { '"a b\\c d"'           => [ 'a b\c d'       ] },
+   { '"a b"\\"c d"'         => [ 'a b"c', 'd'    ] },
+   { '"a b"\\\\"c d"'       => [ 'a b\c d'       ] },
+   { '"a"\\"b" "a\\"b"'     => [ 'a"b a"b'       ] },
+   { '"a"\\\\"b" "a\\\\"b"' => [ 'a\b', 'a\b'    ] },
+   { '"a"\\"b a\\"b"'       => [ 'a"b', 'a"b'    ] },
+   { 'a"\\"b" "a\\"b'       => [ 'a"b', 'a"b'    ] },
+   { 'a"\\"b"  "a\\"b'      => [ 'a"b', 'a"b'    ] },
+   { 'a           b'        => [ 'a', 'b'        ] },
+   { "a\nb"                 => [ 'a', 'b'        ] },
+   { 'a"\\"b a\\"b'         => [ 'a"b a"b'       ] },
+   { '"a""b" "a"b"'         => [ 'a"b ab'        ] },
+   { '\\"a\\"'              => [ '"a"'           ] },
+   { '"a"" "b"'             => [ 'a"', 'b'       ] },
+   { 'a"b'                  => [ 'ab'            ] },
+   { 'a""b'                 => [ 'ab'            ] },
+   { 'a"""b'                => [ 'a"b'           ] },
+   { 'a""""b'               => [ 'a"b'           ] },
+   { 'a"""""b'              => [ 'a"b'           ] },
+   { 'a""""""b'             => [ 'a""b'          ] },
+   { '"a"b"'                => [ 'ab'            ] },
+   { '"a""b"'               => [ 'a"b'           ] },
+   { '"a"""b"'              => [ 'a"b'           ] },
+   { '"a""""b"'             => [ 'a"b'           ] },
+   { '"a"""""b"'            => [ 'a""b'          ] },
+   { '"a""""""b"'           => [ 'a""b'          ] },
+   { ''                     => [                 ] },
+   { ' '                    => [                 ] },
+   { '""'                   => [ ''              ] },
+   { '" "'                  => [ ' '             ] },
+   { '""a'                  => [ 'a'             ] },
+   { '""a b'                => [ 'a', 'b'        ] },
+   { 'a""'                  => [ 'a'             ] },
+   { 'a"" b'                => [ 'a', 'b'        ] },
+   { '"" a'                 => [ '', 'a'         ] },
+   { 'a ""'                 => [ 'a', ''         ] },
+   { 'a "" b'               => [ 'a', '', 'b'    ] },
+   { 'a " " b'              => [ 'a', ' ', 'b'   ] },
+   { 'a " b " c'            => [ 'a', ' b ', 'c' ] },
+);
+
+if ($^O eq 'MSWin32') {
+	plan tests => 2 * @win_splits;
+	foreach my $test (@win_splits) {
+		do_split_tests($test);
+	}
+}
+else {
+	plan tests => 2 * @unix_splits;
+	foreach my $test (@unix_splits) {
+		do_split_tests($test);
+	}
 }
 
 sub do_split_tests {

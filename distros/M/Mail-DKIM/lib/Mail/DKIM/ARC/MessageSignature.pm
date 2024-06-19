@@ -1,7 +1,7 @@
 package Mail::DKIM::ARC::MessageSignature;
 use strict;
 use warnings;
-our $VERSION = '1.20240124'; # VERSION
+our $VERSION = '1.20240619'; # VERSION
 # ABSTRACT: Subclass of Mail::DKIM::Signature which represents a ARC-Message-Signature header
 
 # Copyright 2017 FastMail Pty Ltd. All Rights Reserved.
@@ -70,7 +70,7 @@ Mail::DKIM::ARC::MessageSignature - Subclass of Mail::DKIM::Signature which repr
 
 =head1 VERSION
 
-version 1.20240124
+version 1.20240619
 
 =head1 CONSTRUCTORS
 

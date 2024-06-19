@@ -1,7 +1,7 @@
 package Mail::DKIM::PublicKey;
 use strict;
 use warnings;
-our $VERSION = '1.20240124'; # VERSION
+our $VERSION = '1.20240619'; # VERSION
 # ABSTRACT: Represents a DKIM key
 
 # Copyright 2005 Messiah College. All rights reserved.
@@ -84,7 +84,7 @@ sub fetch_async {
             next unless $rr->type eq 'TXT';
 
             # join with no intervening spaces, RFC 6376
-            if ( Net::DNS->VERSION >= 0.69 ) {
+            if ( $rr->can('txtdata') ) {
 
                 # must call txtdata() in a list context
                 $strn = join '', $rr->txtdata;
@@ -522,7 +522,7 @@ Mail::DKIM::PublicKey - Represents a DKIM key
 
 =head1 VERSION
 
-version 1.20240124
+version 1.20240619
 
 =head1 CONSTRUCTOR
 

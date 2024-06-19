@@ -7,7 +7,7 @@ use POSIX;
 use Libssh::Session;
 use Exporter qw(import);
 
-our $VERSION = '0.8';
+our $VERSION = '1.1';
 
 use constant SSH_OK => 0;
 use constant SSH_ERROR => -1;
@@ -287,6 +287,12 @@ sub server_version {
     return sftp_server_version($self->{sftp_session});
 }
 
+sub canonicalize_path {
+    my ($self, %options) = @_;
+    
+    return sftp_canonicalize_path($self->{sftp_session}, $options{path});
+}
+
 sub open {
     my ($self, %options) = @_;
 
@@ -310,6 +316,35 @@ sub open {
     return $file;
 }
 
+sub read {
+    my ($self, %options) = @_;
+
+    my $no_close = defined($options{no_close}) ? $options{no_close} : 0;
+
+    if (!defined($options{handle_file})) {
+        $self->set_err(msg => 'please specify handle file option');
+        return undef;
+    }
+
+    my $content = '';
+    while (1) {
+        my $ret = sftp_read($options{handle_file}, 8092);
+        if ($ret->{code} < 0) {
+            $self->set_err(msg => sprintf("Can't read file: %s", $self->get_msg_error()));
+            $self->close(handle_file => $options{handle_file});
+            return SSH_ERROR;
+        }
+        last if ($ret->{code} == 0);
+        $content .= $ret->{data};
+    }
+
+    if ($no_close == 0 && $self->close(handle_file => $options{handle_file}) != SSH_OK) {
+        return SSH_ERROR;
+    }
+
+    return (SSH_OK, $content);
+}
+
 sub write {
     my ($self, %options) = @_;
     
@@ -319,7 +354,7 @@ sub write {
         $self->set_err(msg => 'please specify handle file option');
         return undef;
     }
-    
+
     my $nwritten = sftp_write($options{handle_file}, $data);
     if ($nwritten < 0) {
         $self->set_err(msg => sprintf("Can't write data to file: %s", $self->get_msg_error()));

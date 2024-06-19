@@ -39,7 +39,7 @@ SpeL::Object::Arrow - LaTeX arrow object
 
 =head1 VERSION
 
-version 20240617.1739
+version 20240619.0646
 
 =head1 METHODS
 

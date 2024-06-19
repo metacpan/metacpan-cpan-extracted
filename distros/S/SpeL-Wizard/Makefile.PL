@@ -2,7 +2,7 @@
 use strict;
 use warnings;
 
-
+use 5.032000;
 
 use ExtUtils::MakeMaker;
 
@@ -21,17 +21,13 @@ my %WriteMakefileArgs = (
   },
   "DISTNAME" => "SpeL-Wizard",
   "EXE_FILES" => [
-    "bin/awspollymp3",
-    "bin/awspollymp3.bat",
-    "bin/awspollyogg",
-    "bin/awspollyogg.bat",
-    "bin/balabolkamp3.bat",
-    "bin/balabolkaogg.bat",
-    "bin/festivalmp3",
-    "bin/festivalogg",
+    "bin/awspolly.pl",
+    "bin/balabolka.pl",
+    "bin/festival.pl",
     "bin/spel-wizard.pl"
   ],
   "LICENSE" => "gpl",
+  "MIN_PERL_VERSION" => "5.032000",
   "NAME" => "SpeL::Wizard",
   "PREREQ_PM" => {
     "Carp" => 0,
@@ -46,6 +42,7 @@ my %WriteMakefileArgs = (
     "FindBin" => 0,
     "Getopt::Long" => 0,
     "IO::File" => 0,
+    "IPC::Run" => 0,
     "Locale::Maketext" => 0,
     "Pod::Usage" => 0,
     "Regexp::Common" => 0,
@@ -60,7 +57,7 @@ my %WriteMakefileArgs = (
     "File::Spec" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "20240617.1739",
+  "VERSION" => "20240619.0646",
   "test" => {
     "TESTS" => "t/*.t t/01-lib/SpeL/Object/*.t t/01-lib/SpeL/Parser/*.t t/02-bin/*.t"
   }
@@ -82,6 +79,7 @@ my %FallbackPrereqs = (
   "FindBin" => 0,
   "Getopt::Long" => 0,
   "IO::File" => 0,
+  "IPC::Run" => 0,
   "Locale::Maketext" => 0,
   "Pod::Usage" => 0,
   "Regexp::Common" => 0,

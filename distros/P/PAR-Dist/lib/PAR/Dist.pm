@@ -4,7 +4,7 @@ use strict;
 require Exporter;
 use vars qw/$VERSION @ISA @EXPORT @EXPORT_OK $DEBUG/;
 
-$VERSION    = '0.52';
+$VERSION    = '0.53';
 @ISA        = 'Exporter';
 @EXPORT     = qw/
   blib_to_par
@@ -196,15 +196,9 @@ sub blib_to_par {
                 $name ||= $1;
                 $name =~ s/::/-/g;
             }
-            elsif (/^version:\s+.*Module::Build::Version/) {
-                while (<OLD_META>) {
-                    /^\s+original:\s+(.*)/ or next;
-                    $version ||= $1;
-                    last;
-                }
-            }
-            elsif (/^version:\s+(.*)/) {
+            elsif (/^version:\s+(\S*)/) {
                 $version ||= $1;
+                $version =~ s/^['"]|['"]$//g;
             }
         }
         close OLD_META;
@@ -245,7 +239,7 @@ sub blib_to_par {
 
     print META << "YAML" if fileno(META);
 name: $name
-version: $version
+version: '$version'
 build_requires: {}
 conflicts: {}
 dist_name: $file
@@ -1238,7 +1232,7 @@ sub generate_blib_stub {
           or die "Could not open META.yml file for writing: $!";
         print META << "YAML" if fileno(META);
 name: $name
-version: $version
+version: '$version'
 build_requires: {}
 conflicts: {}
 dist_name: $name-$version-$suffix.par
@@ -1411,8 +1405,10 @@ Steffen Mueller E<lt>smueller@cpan.orgE<gt> 2005-2011
 PAR has a mailing list, E<lt>par@perl.orgE<gt>, that you can write to;
 send an empty mail to E<lt>par-subscribe@perl.orgE<gt> to join the list
 and participate in the discussion.
+Archives of the mailing list are available at
+E<lt>https://www.mail-archive.com/par@perl.org/E<gt> or E<lt>https://groups.google.com/g/perl.parE<gt>.
 
-Please send bug reports to E<lt>bug-par@rt.cpan.orgE<gt>.
+Please send bug reports to E<lt>https://github.com/rschupp/PAR-Dist/issuesE<gt>.
 
 =head1 COPYRIGHT
 

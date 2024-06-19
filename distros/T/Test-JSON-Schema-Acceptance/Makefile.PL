@@ -30,6 +30,7 @@ my %WriteMakefileArgs = (
     "Git::Wrapper" => 0,
     "List::Util" => "1.33",
     "Mojo::JSON" => 0,
+    "Mojolicious" => "7.87",
     "Moo" => 0,
     "MooX::TypeTiny" => "0.002002",
     "Path::Tiny" => "0.069",
@@ -66,7 +67,7 @@ my %WriteMakefileArgs = (
     "open" => 0,
     "utf8" => 0
   },
-  "VERSION" => "1.025",
+  "VERSION" => "1.026",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -83,6 +84,7 @@ my %FallbackPrereqs = (
   "JSON::PP" => 0,
   "List::Util" => "1.33",
   "Mojo::JSON" => 0,
+  "Mojolicious" => "7.87",
   "Moo" => 0,
   "MooX::TypeTiny" => "0.002002",
   "Path::Tiny" => "0.069",
