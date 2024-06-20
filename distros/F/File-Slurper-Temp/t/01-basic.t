@@ -5,6 +5,8 @@ use warnings;
 use Test::Exception;
 use Test::More 0.98;
 
+# TODO: RT#138255 - some chmod tests fail, don't know why yet
+
 use File::Slurper qw(
                         read_text
                 );

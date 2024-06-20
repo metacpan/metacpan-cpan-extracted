@@ -3,7 +3,7 @@
 #
 #  (C) Paul Evans, 2023 -- leonerd@leonerd.org.uk
 
-package Signature::Attribute::Checked 0.02;
+package Signature::Attribute::Checked 0.03;
 
 use v5.14;
 use warnings;

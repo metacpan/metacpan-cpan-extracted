@@ -14,9 +14,9 @@ BEGIN {
     ok( my $characters = $object->characters(),             "Got characters" );
     is( my @characters = split( / \/ /, $characters ), 42,  "List of characters" );
     ok( my $words = $object->words(3),                      "Got some words" );
-    is( my @words = split( /\s+/, $words ), 3,              "There were 3 words" );
+    is( my @words = split( /\s+/, $words ), 3,              "There are 3 words" );
     ok( my $sentences = $object->sentences(3),              "Got some sentences" );
-    is( my @sentences = split( /\. /, $sentences ), 3,      "There were 3 sentences" );
+    ok( (scalar split( /\. /, $sentences )) >= 3,           "There are at least 3 sentences" );
     ok( my $paragraphs = $object->paragraphs(4),            "Got some paragraphs" );
     is( my @paragraphs = split ( /\n\n/, $paragraphs ), 4,  "There were 4 paragraphs" );
 };

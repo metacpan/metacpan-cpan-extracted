@@ -2,9 +2,7 @@ package Data::Enum;
 
 # ABSTRACT: immutable enumeration classes
 
-use v5.10;
-
-use strict;
+use v5.14;
 use warnings;
 
 use Package::Stash;
@@ -18,12 +16,15 @@ use overload ();
 use constant TRUE  => 1;
 use constant FALSE => 0;
 
-our $VERSION = 'v0.2.7';
+our $VERSION = 'v0.3.0';
 
 
 
 sub new {
     my $this = shift;
+
+    my $opts = ref( $_[0] ) eq "HASH" ? shift : {};
+    my $prefix = $opts->{prefix} // "is_";
 
     my @values = uniqstr( sort map { "$_" } @_ );
 
@@ -54,7 +55,7 @@ sub new {
 
     my $_make_predicate = sub {
         my ($value) = @_;
-        return "is_" . $value;
+        return $prefix . $value;
     };
 
     $base->add_symbol(
@@ -74,6 +75,8 @@ sub new {
     $base->add_symbol( '&values', sub { return @values });
 
     $base->add_symbol( '&predicates', sub { return map { $_make_predicate->($_) } @values } );
+
+    $base->add_symbol( '&prefix', sub { $prefix });
 
     my $match = sub {
         my ( $self, $arg ) = @_;
@@ -122,7 +125,7 @@ Data::Enum - immutable enumeration classes
 
 =head1 VERSION
 
-version v0.2.7
+version v0.3.0
 
 =head1 SYNOPSIS
 
@@ -205,6 +208,13 @@ Each instance will have an C<is_> method for each value.
 
 Each instance stringifies to its value.
 
+Since v0.3.0 you can change the method prefix to something other than C<is_>. For example,
+
+  my $class = Data::Enum->new( { prefix => "from_" }, "home", "work" );
+  my $place = $class->new("work");
+
+  $place->from_home;
+
 =head2 values
 
   my @values = $class->values;
@@ -228,6 +238,12 @@ A hash of predicates to values is roughly
 
 This was added in v0.2.1.
 
+=head2 prefix
+
+This returns the prefix.
+
+This was added in v0.3.0.
+
 =head2 MATCH
 
 This method adds support for L<match::simple>.
@@ -243,7 +259,7 @@ strings.  When using this in production code, you may want to benchmark performa
 
 =head1 SUPPORT FOR OLDER PERL VERSIONS
 
-This module requires Perl v5.10 or later.
+This module requires Perl v5.14 or later.
 
 Future releases may only support Perl versions released in the last ten years.
 
@@ -279,7 +295,7 @@ Robert Rothenberg <rrwo@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2021-2023 by Robert Rothenberg.
+This software is Copyright (c) 2021-2024 by Robert Rothenberg.
 
 This is free software, licensed under:
 

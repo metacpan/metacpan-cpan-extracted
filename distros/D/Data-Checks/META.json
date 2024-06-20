@@ -1,0 +1,57 @@
+{
+   "abstract" : "XS functions to assist in value constraint checking",
+   "author" : [
+      "Paul Evans <leonerd@leonerd.org.uk>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4234",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Data-Checks",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::CBuilder" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.4004"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "File::ShareDir" : "1.00",
+            "perl" : "5.022"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test2::V0" : "0.000148"
+         }
+      }
+   },
+   "provides" : {
+      "Data::Checks" : {
+         "file" : "lib/Data/Checks.pm",
+         "version" : "0.01"
+      },
+      "Data::Checks::Builder" : {
+         "file" : "lib/Data/Checks/Builder.pm",
+         "version" : "0.42"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ]
+   },
+   "version" : "0.01",
+   "x_serialization_backend" : "JSON::PP version 4.16"
+}

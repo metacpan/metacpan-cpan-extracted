@@ -12,9 +12,9 @@ BEGIN {
 SKIP: {
 	skip 'Database not installed', 4 if(!-r 'lib/Genealogy/ObituaryDailyTimes/data/obituaries.sql');
 
-	my $search = new_ok('Genealogy::ObituaryDailyTimes');
-
 	Test::Carp->import();
+
+	my $search = new_ok('Genealogy::ObituaryDailyTimes' => [ directory => 'lib/Genealogy/ObituaryDailyTimes/data' ]);
 
 	does_carp_that_matches(sub { my @empty = $search->search(); }, qr/^Value for 'last' is mandatory/);
 	does_carp_that_matches(sub { my @empty = $search->search(last => undef); }, qr/^Value for 'last' is mandatory/);

@@ -1,7 +1,12 @@
 
 Revision history for Perl module MCE::Shared.
 
-1.890 Sun Jun 10 01:00:00 EST 2024
+1.891 Wed Jun 19 22:00:00 EST 2024
+
+  * In scalar context, MCE::Hobo->init returns a guard to call finish
+    automatically upon leaving the { scope i.e. omitting finish }.
+
+1.890 Sun Jun 09 01:00:00 EST 2024
 
   * Revert back to calling CORE::rand() to set the internal seed.
     MCE::Hobo cannot assume the srand or setter function used by the

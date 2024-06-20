@@ -4,7 +4,7 @@ use ExtUtils::MakeMaker 6.64;
 
 WriteMakefile(
 	      NAME                => 'Crypt::RSA::Blind',
-	      AUTHOR              => q{Ashish Gulhati <crypt-rsab at hash.neo.tc>},
+	      AUTHOR              => q{Ashish Gulhati <crypt-rsab at hash.neo.email>},
 	      VERSION_FROM        => 'lib/Crypt/RSA/Blind.pm',
 	      ABSTRACT_FROM       => 'lib/Crypt/RSA/Blind.pm',
 	      PL_FILES            => {},
@@ -12,6 +12,9 @@ WriteMakefile(
 				      'Test::More' => 0,
 				     },
 	      PREREQ_PM => {
+			    'Attribute::Deprecated' => 0,
+			    'Carp' => 0,
+			    'Carp::Assert' => 0,
 			    'Crypt::FDH' => 0,
 			    'Crypt::RSA' => 0,
 			    'Compress::Zlib' => 0

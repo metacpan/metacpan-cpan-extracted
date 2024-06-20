@@ -1,4 +1,5 @@
 package Config::ROFL;
+our $VERSION = '1.09';
 
 use strict;
 use warnings;
@@ -28,6 +29,8 @@ has 'name'         => is => 'lazy', isa => Str, default => sub { $ENV{CONFIG_ROF
 has 'lookup_order' => is => 'lazy', default => sub {
   [ 'global_path', (shift->mode eq 'test') ? ('relative', 'by_dist', 'by_self') : ('by_dist', 'by_self', 'relative') ]
 };
+has 'envvar_prefix' => is => 'lazy', default => '';
+
 
 sub _build_relative_dir {
   my ($self) = @_;
@@ -73,6 +76,16 @@ sub _build_config {
   }
   else {
     Carp::croak 'Could not find config file: ' . $self->config_path . '/' . $self->name . '.(conf|yml|json)';
+  }
+
+  if (my $prefix = $self->envvar_prefix) {
+    my $hash = {};
+    foreach my $key (grep { /^${prefix}_/ } keys %ENV) {
+      my $unprefixed_key = $key;
+      $unprefixed_key =~ s/^${prefix}_//gmx;
+      $hash->{lc $unprefixed_key} = $ENV{$key};
+    }
+    $config->_config(Hash::Merge::Simple->merge($config->_config, $hash))
   }
 
   return $config;
@@ -232,6 +245,11 @@ Path where to look for config files.
 =head2 lookup_order
 
 Order of config lookup. Default is ['by_dist', 'by_self', 'relative'], except when under tests when it is ['relative', 'by_dist', 'by_self']
+
+=head2 envvar_prefix
+
+Allowe overriding config values with environment variables starting with a given prefix. Setting envvar_prefix to 'MYPREFIX', will allow setting the environment variable
+'MYPREFIX_MYKEY' to override the config key 'mykey'.
 
 =head1 METHODS
 

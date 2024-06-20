@@ -27,19 +27,19 @@ no_index:
 provides:
   Authorization::AccessControl:
     file: lib/Authorization/AccessControl.pm
-    version: '0.03'
+    version: '0.04'
   Authorization::AccessControl::ACL:
     file: lib/Authorization/AccessControl/ACL.pm
-    version: '0.03'
+    version: '0.04'
   Authorization::AccessControl::Dispatch:
     file: lib/Authorization/AccessControl/Dispatch.pm
-    version: '0.03'
+    version: '0.04'
   Authorization::AccessControl::Grant:
     file: lib/Authorization/AccessControl/Grant.pm
-    version: '0.03'
+    version: '0.04'
   Authorization::AccessControl::Request:
     file: lib/Authorization/AccessControl/Request.pm
-    version: '0.03'
+    version: '0.04'
 requires:
   Data::Compare: '1.29'
   Readonly: '2.05'
@@ -47,7 +47,7 @@ requires:
 resources:
   bugtracker: https://github.com/tyrrminal/authorization-accesscontrol/issues
   repository: https://github.com/tyrrminal/authorization-accesscontrol.git
-version: '0.03'
+version: '0.04'
 x_generated_by_perl: v5.38.2
 x_serialization_backend: 'YAML::Tiny version 1.74'
 x_spdx_expression: MIT

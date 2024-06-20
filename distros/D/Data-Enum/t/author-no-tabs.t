@@ -20,6 +20,7 @@ my @files = (
     't/00-report-prereqs.t',
     't/01-basic.t',
     't/02-match_simple.t',
+    't/03-prefix.t',
     't/author-critic.t',
     't/author-eof.t',
     't/author-eol.t',
@@ -29,7 +30,7 @@ my @files = (
     't/author-pod-linkcheck.t',
     't/author-pod-syntax.t',
     't/author-portability.t',
-    't/release-check-manifest.t',
+    't/release-dist-manifest.t',
     't/release-fixme.t',
     't/release-kwalitee.t',
     't/release-trailing-space.t'

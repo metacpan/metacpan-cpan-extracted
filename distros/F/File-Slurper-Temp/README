@@ -2,8 +2,8 @@ NAME
     File::Slurper::Temp - File::Slurper + File::Temp
 
 VERSION
-    This document describes version 0.008 of File::Slurper::Temp (from Perl
-    distribution File-Slurper-Temp), released on 2021-08-02.
+    This document describes version 0.009 of File::Slurper::Temp (from Perl
+    distribution File-Slurper-Temp), released on 2024-06-17.
 
 SYNOPSIS
     Use like you would use File::Slurper's "write_text" and "write_binary":
@@ -34,7 +34,7 @@ DESCRIPTION
     temporary file first using File::Temp's tempfile() before renaming to
     the final destination path using Perl's rename(). If the destination
     path is originally a symlink, it will be replaced with a regular file by
-    "rename()". This can avoid symlink attack.
+    rename(). This can avoid symlink attack.
 
     In addition the above two functions, this module also provides
     "write_text_to_tempfile" and "write_binary_to_tempfile". You don't have
@@ -42,9 +42,9 @@ DESCRIPTION
     will return the temporary filename created.
 
 VARIABLES
-  $FILE_PERM_DIR
-  $FILE_PERM_PERMS
-  $FILE_PERM_TEMPLATE
+  $FILE_TEMP_DIR
+  $FILE_TEMP_PERMS
+  $FILE_TEMP_TEMPLATE
 FUNCTIONS
   write_text
     Usage:
@@ -53,13 +53,13 @@ FUNCTIONS
 
     Just like the original File::Slurper's version, except will write to
     temporary file created by File::Temp's "tempfile" first, then rename the
-    temporary file using Perl's "rename()". The function will croak if
-    "rename()" fails.
+    temporary file using Perl's rename(). The function will croak if
+    rename() fails.
 
     By default, the temporary file is created in the same directory as
-    $filename, using "tempfile()"'s option "DIR => dirname($filename)". If
-    you want to set a specific temporary directory, set "$FILE_TEMP_DIR".
-    But keep in mind that "rename()" doesn't work cross-device.
+    $filename, using tempfile()'s option "DIR => dirname($filename)". If you
+    want to set a specific temporary directory, set "$FILE_TEMP_DIR". But
+    keep in mind that rename() doesn't work cross-device.
 
     By default, if the target file exists, the temporary file is also
     created with the same permission as the target file. Otherwise,
@@ -81,8 +81,7 @@ FUNCTIONS
 
      $tempname = write_text_to_tempfile($content [ , $encoding, $crlf ])
 
-    Temporary file is created with default option
-    ("File::Temp::tempfile()").
+    Temporary file is created with default option (File::Temp::tempfile()).
 
   write_binary_to_tempfile
     Usage:
@@ -109,26 +108,46 @@ SOURCE
     Source repository is at
     <https://github.com/perlancar/perl-File-Slurper-Temp>.
 
+SEE ALSO
+    File::Slurper
+
+    File::Temp
+
+    modify_text() and modify_binary() follows File::Slurper::Shortcuts.
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+CONTRIBUTOR
+    George Baugh <george@troglodyne.net>
+
+CONTRIBUTING
+    To contribute, you can send patches by email/via RT, or send pull
+    requests on GitHub.
+
+    Most of the time, you don't need to build the distribution yourself. You
+    can simply modify the code, then test via:
+
+     % prove -l
+
+    If you want to build the distribution (e.g. to try to install it locally
+    on your system), you can install Dist::Zilla,
+    Dist::Zilla::PluginBundle::Author::PERLANCAR,
+    Pod::Weaver::PluginBundle::Author::PERLANCAR, and sometimes one or two
+    other Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps
+    required beyond that are considered a bug and can be reported to me.
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2024, 2019, 2017 by perlancar
+    <perlancar@cpan.org>.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+
 BUGS
     Please report any bugs or feature requests on the bugtracker website
     <https://rt.cpan.org/Public/Dist/Display.html?Name=File-Slurper-Temp>
 
     When submitting a bug or request, please include a test-file or a patch
     to an existing test-file that illustrates the bug or desired feature.
-
-SEE ALSO
-    File::Slurper
-
-    File::Temp
-
-    "modify_text()" and "modify_binary()" follows File::Slurper::Shortcuts.
-
-AUTHOR
-    perlancar <perlancar@cpan.org>
-
-COPYRIGHT AND LICENSE
-    This software is copyright (c) 2021, 2019, 2017 by perlancar@cpan.org.
-
-    This is free software; you can redistribute it and/or modify it under
-    the same terms as the Perl 5 programming language system itself.
 

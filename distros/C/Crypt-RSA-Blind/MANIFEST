@@ -5,6 +5,7 @@ README
 lib/Crypt/RSA/Blind.pm
 t/00-load.t
 t/01-blindrsa.t
+t/02-rsabssa.t
 t/manifest.t
 t/pod-coverage.t
 t/pod.t

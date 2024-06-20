@@ -1,7 +1,7 @@
 /*  You may distribute under the terms of either the GNU General Public License
  *  or the Artistic License (the same terms as Perl itself)
  *
- *  (C) Paul Evans, 2023 -- leonerd@leonerd.org.uk
+ *  (C) Paul Evans, 2023-2024 -- leonerd@leonerd.org.uk
  */
 #define PERL_NO_GET_CONTEXT
 
@@ -16,7 +16,7 @@
 
 #include "compilerun_sv.c.inc"
 
-#include "check.h"
+#include "DataChecks.h"
 
 static void apply_Checked(pTHX_ struct XPSSignatureParamContext *ctx, SV *attrvalue, void **attrdata_ptr, void *funcdata)
 {
@@ -50,7 +50,7 @@ static void apply_Checked(pTHX_ struct XPSSignatureParamContext *ctx, SV *attrva
     LEAVE;
   }
 
-  struct CheckData *data = make_checkdata(checker);
+  struct DataChecks_Checker *data = make_checkdata(checker);
 
   data->assertmess =
     newSVpvf(
@@ -73,7 +73,7 @@ static OP *S_newPADxVOP(pTHX_ I32 type, I32 flags, PADOFFSET padix)
 
 static void post_defop_Checked(pTHX_ struct XPSSignatureParamContext *ctx, void *attrdata, void *funcdata)
 {
-  struct CheckData *data = attrdata;
+  struct DataChecks_Checker *data = attrdata;
 
   OP *assertop = make_assertop(data, newPADxVOP(OP_PADSV, 0, ctx->padix));
 
@@ -83,7 +83,7 @@ static void post_defop_Checked(pTHX_ struct XPSSignatureParamContext *ctx, void 
 
 static void free_Checked(pTHX_ struct XPSSignatureParamContext *ctx, void *attrdata, void *funcdata)
 {
-  struct CheckData *data = attrdata;
+  struct DataChecks_Checker *data = attrdata;
 
   SvREFCNT_dec(data->assertmess);
 
@@ -102,5 +102,6 @@ MODULE = Signature::Attribute::Checked    PACKAGE = Signature::Attribute::Checke
 
 BOOT:
   boot_xs_parse_sublike(0.19);
+  boot_data_checks(0);
 
   register_xps_signature_attribute("Checked", &funcs_Checked, NULL);

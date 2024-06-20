@@ -1,5 +1,9 @@
 Revision history for Dist-Data
 
+0.007     2024-06-19 23:40:43+02:00 Europe/Berlin
+	Replacing Module::Extract::Namespaces with Module::Metadata (haarg)
+	Bugfix for Win32 tests (Mithaldu)
+
 0.006     2015-05-13 18:02:17+02:00 Europe/Berlin
 
 0.005     2013-11-09 04:55:40 Europe/Berlin

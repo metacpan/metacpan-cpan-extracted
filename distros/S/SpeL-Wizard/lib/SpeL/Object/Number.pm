@@ -35,7 +35,7 @@ SpeL::Object::Number - LaTeX Number object
 
 =head1 VERSION
 
-version 20240619.0646
+version 20240619.1846
 
 =head1 METHODS
 

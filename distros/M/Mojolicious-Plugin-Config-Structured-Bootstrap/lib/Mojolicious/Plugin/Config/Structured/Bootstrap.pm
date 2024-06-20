@@ -1,4 +1,4 @@
-package Mojolicious::Plugin::Config::Structured::Bootstrap 0.03;
+package Mojolicious::Plugin::Config::Structured::Bootstrap 0.04;
 use v5.26;
 use warnings;
 
@@ -132,11 +132,9 @@ sub register($self, $app, $app_config) {
         make_routes    => 0,
 
         get_token => sub ($c) {
-          if (my $t = $c->cookie('oidc_auth_token')) {
-            $c->cookie(oidc_auth_token => '', {expires => 1});
-            return $t;
-          }
-          if (($c->req->headers->authorization // '') =~ /^Bearer (.*)/) {return $1;}
+          if (my $t = $c->cookie('oidc_auth_token'))                                               {return $t;}
+          if (($c->req->headers->authorization // '') =~ /^Bearer (.*)/)                           {return $1;}
+          if (($c->req->headers->header('Sec-WebSocket-Protocol') // '') =~ /^access_token, (.*)/) {return $1;}
           return undef;
         },
         get_user => sub ($token) {
@@ -161,7 +159,7 @@ sub register($self, $app, $app_config) {
         },
 
         on_success => sub ($c, $token, $url) {
-          $c->cookie(oidc_auth_token => $token, {expires => time + 60});
+          $c->cookie(oidc_auth_token => $token, {path => '/api', expires => time + 60, sameSite => 'Lax'});
           $c->redirect_to($url);
         },
         on_login => sub ($c, $u) {
@@ -172,6 +170,13 @@ sub register($self, $app, $app_config) {
         on_activity => sub ($c, $u) {
           my $now = DateTime::Format::MySQL->format_datetime(DateTime->now(time_zone => 'local'));
           $u->update({last_activity_at => $now});
+          if ($app->conf->auth->enable_media_access) {
+            if (my $token = $c->__oidc_token(undef, 0)) {
+              $c->cookie(oidc_auth_token => $token, {path => '/api', expires => time + 300, samesite => 'Strict'});
+              return;
+            }
+          }
+          $c->cookie(oidc_auth_token => '', {path => '/api', expires => 1});
         }
       }
     }

@@ -7,6 +7,8 @@ use Module::Build;
 Module::Build->VERSION( '0.4004' );
 
 sub _readme {
+    eval { require Pod::Markdown };
+    return if $@;
     print "Building README\n";
     system "pod2markdown lib/e.pm > README.md";
 }

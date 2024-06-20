@@ -3,9 +3,10 @@ use strict;
 use warnings;
 
 name 'Config-ROFL';
+abstract 'Yet another config module';
 author q{Nicolas Mendoza <mendoza@pvv.ntnu.no>};
 license 'perl';
-version '1.09';
+version '1.10';
 
 configure_requires 'Module::Install';
 

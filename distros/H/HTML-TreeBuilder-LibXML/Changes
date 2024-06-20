@@ -1,5 +1,18 @@
 Revision history for Perl extension HTML::TreeBuilder::LibXML
 
+0.28 2024-06-20T08:48:55Z
+
+0.28 2024-06-20T08:17:27Z
+
+    - Same code as 0.27 - republishing to force CPAN reindexing
+
+0.27 2024-01-09T06:19:12Z
+
+    - don't have the parser string blanks by default #15
+      https://github.com/tokuhirom/HTML-TreeBuilder-LibXML/pull/15
+    - fallback to toString() when toStringC14N(1) gives an empty string #17
+      https://github.com/tokuhirom/HTML-TreeBuilder-LibXML/pull/17
+
 0.26 2016-10-19T15:03:00Z
 
     - Improve `HTML::TreeBuilder::LibXML::Node->new` compatibility

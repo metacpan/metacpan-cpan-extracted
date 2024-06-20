@@ -32,7 +32,8 @@ my $prereqs = {
 	'File::Slurp' => 0,
 	'File::Spec' => 0,
 	'File::Temp' => 0,
-	'Module::Info' => 0
+	'Module::Info' => 0,
+	'Text::CSV' => 0
 };
 
 unless(defined($ENV{'AUTOMATED_TESTING'})) {
@@ -69,6 +70,7 @@ WriteMakefile(
 		'IPC::System::Simple' => 0,
 	}, PREREQ_PM => $prereqs,
 	dist => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
+	clean => { FILES => 'Genealogy-ObituaryDailyTimes-*' },
 	realclean => {
 		FILES => 'Genealogy-ObituaryDailyTimes-* lib/Genealogy/ObituaryDailyTimes/data'
 	},

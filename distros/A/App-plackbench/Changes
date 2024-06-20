@@ -1,3 +1,6 @@
+0.7  2024-06-19
+      - Dramatically improve testing performance
+
 0.6  2024-06-10
       - Add a new command line option -p for specifying time precision
       - Add rate (requests per second) to the default output

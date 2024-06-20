@@ -1,7 +1,7 @@
 /*  You may distribute under the terms of either the GNU General Public License
  *  or the Artistic License (the same terms as Perl itself)
  *
- *  (C) Paul Evans, 2023 -- leonerd@leonerd.org.uk
+ *  (C) Paul Evans, 2023-2024 -- leonerd@leonerd.org.uk
  */
 #define PERL_NO_GET_CONTEXT
 
@@ -17,11 +17,11 @@
 #include "compilerun_sv.c.inc"
 #include "optree-additions.c.inc"
 
-#include "check.h"
+#include "DataChecks.h"
 
 static int magic_set(pTHX_ SV *sv, MAGIC *mg)
 {
-  struct CheckData *data = (struct CheckData *)mg->mg_ptr;
+  struct DataChecks_Checker *data = (struct DataChecks_Checker *)mg->mg_ptr;
   assert_value(data, sv);
   return 1;
 }
@@ -39,7 +39,7 @@ static int checkmagic_get(pTHX_ SV *sv, MAGIC *mg)
 
 static int checkmagic_set(pTHX_ SV *sv, MAGIC *mg)
 {
-  struct CheckData *data = (struct CheckData *)mg->mg_ptr;
+  struct DataChecks_Checker *data = (struct DataChecks_Checker *)mg->mg_ptr;
   assert_value(data, sv);
 
   SV *fieldsv = mg->mg_obj;
@@ -58,7 +58,7 @@ static OP *pp_wrap_checkmagic(pTHX)
   SV *sv = TOPs;
   SV *ret = sv_newmortal();
 
-  struct CheckData *data = (struct CheckData *)cUNOP_AUX->op_aux;
+  struct DataChecks_Checker *data = (struct DataChecks_Checker *)cUNOP_AUX->op_aux;
 
   sv_magicext(ret, sv, PERL_MAGIC_ext, &vtbl_checkmagic, (char *)data, 0);
 
@@ -97,7 +97,7 @@ static bool checked_apply(pTHX_ FieldMeta *fieldmeta, SV *value, SV **attrdata_p
     LEAVE;
   }
 
-  struct CheckData *data = make_checkdata(checker);
+  struct DataChecks_Checker *data = make_checkdata(checker);
 
   data->assertmess =
     newSVpvf("Field %" SVf " requires a value satisfying :Checked(%" SVf ")",
@@ -111,7 +111,7 @@ static bool checked_apply(pTHX_ FieldMeta *fieldmeta, SV *value, SV **attrdata_p
 static void checked_gen_accessor_ops(pTHX_ FieldMeta *fieldmeta, SV *attrdata, void *_funcdata,
     enum AccessorType type, struct AccessorGenerationCtx *ctx)
 {
-  struct CheckData *data = (struct CheckData *)attrdata;
+  struct DataChecks_Checker *data = (struct DataChecks_Checker *)attrdata;
 
   switch(type) {
     case ACCESSOR_READER:
@@ -199,4 +199,6 @@ static const struct FieldHookFuncs checked_hooks = {
 MODULE = Object::Pad::FieldAttr::Checked    PACKAGE = Object::Pad::FieldAttr::Checked
 
 BOOT:
+  boot_data_checks(0);
+
   register_field_attribute("Checked", &checked_hooks, NULL);

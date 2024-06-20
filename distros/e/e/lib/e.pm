@@ -30,7 +30,7 @@ package e;
            ⠹⡽⣾⣿⠹⣿⣆⣾⢯⣿⣿ ⡞ ⠻⣿⣿⣿⠁ ⢠⣿⢏  ⡀ ⡟  ⢀⣴⣿⠃⢁⡼⠁ ⠈
              ⠈⠛ ⢻⣿⣧⢸⢟⠶⢾⡇  ⣸⡿⠁ ⢠⣾⡟⢼  ⣷ ⡇ ⣰⠋⠙⠁
                 ⠈⣿⣻⣾⣦⣇⢸⣇⣀⣶⡿⠁⣀⣀⣾⢿⡇⢸  ⣟⡦⣧⣶⠏ unleashed
-                 ⠸⢿⡍⠛⠻⠿⠿⠿⠋⣠⡾⢋⣾⣏⣸⣷⡸⣇⢰⠟⠛⠻⡄  v1.19
+                 ⠸⢿⡍⠛⠻⠿⠿⠿⠋⣠⡾⢋⣾⣏⣸⣷⡸⣇⢰⠟⠛⠻⡄  v1.21
                    ⢻⡄   ⠐⠚⠋⣠⡾⣧⣿⠁⠙⢳⣽⡟
                    ⠈⠳⢦⣤⣤⣀⣤⡶⠛ ⠈⢿⡆  ⢿⡇
                          ⠈    ⠈⠓  ⠈
@@ -45,7 +45,7 @@ use 5.006;
 use strict;
 use warnings;
 
-our $VERSION = '1.19';
+our $VERSION = '1.21';
 
 =head1 SYNOPSIS
 
@@ -119,6 +119,15 @@ Print data as a table:
     | blue | 222   |
     +------+-------+
 
+Encode/decode UTF-8:
+
+    perl -C -Me -e 'printf "%#X\n", ord for enc("\x{5D0}") =~ /./g'
+    0XD7
+    0X90
+
+    perl -C -Me -e 'say dec "\xD7\x90"'
+    א
+    
 =cut
 
 =head1 DESCRIPTION
@@ -219,6 +228,25 @@ XML parser.
 =head2 yml
 
 YAML parser.
+
+=head2 enc
+
+Encode UTF-8 code point to a byte stream:
+
+    perl -C -Me -e 'printf "%#X\n", ord for enc("\x{5D0}") =~ /./g'
+    0XD7
+    0X90
+    
+=head2 dec
+
+Decode a byte steam to UTF-8 code point:
+
+    perl -C -Me -e 'say dec "\xD7\x90"'
+    א
+
+=head2 utf8
+
+Set STDOUT and STDERR as UTF-8 encoded.
 
 =head2 b
 
@@ -367,7 +395,7 @@ sub import {
                 require Tiny::Prof;
             }
             Tiny::Prof->run(
-                Name => 'Test',
+                name => 'Test',
                 @_,
             );
         },
@@ -401,6 +429,30 @@ sub import {
             ref $thing
               ? YAML::XS::Dump( $thing )
               : YAML::XS::Load( $thing );
+        },
+
+        # UTF-8 conversions.
+        enc => sub {
+            if ( !$imported{$caller}{"Encode"}++ ) {
+                require Encode;
+            }
+            my ( $ucp ) = @_;
+            Encode::encode( "UTF-8", $ucp,
+                Encode::WARN_ON_ERR() | Encode::LEAVE_SRC() );
+        },
+        dec => sub {
+            if ( !$imported{$caller}{"Encode"}++ ) {
+                require Encode;
+            }
+            my ( $ubs ) = @_;
+            Encode::decode( "UTF-8", $ubs,
+                Encode::WARN_ON_ERR() | Encode::LEAVE_SRC() );
+        },
+
+        # Set UTF-8 for STDOUT and STDERR.
+        utf8 => sub {
+            binmode *STDOUT, "encoding(UTF-8)";
+            binmode *STDERR, "encoding(UTF-8)";
         },
 
         ######################################

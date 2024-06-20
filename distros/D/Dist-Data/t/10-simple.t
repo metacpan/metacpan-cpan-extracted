@@ -30,7 +30,7 @@ BEGIN {
 		t/release-pod-syntax.t
 	)],'Checking files');
 
-	like($dist->file('dist.ini'),qr/\/dist.ini$/,'Checking if file function gives back valid filename');
+	like($dist->file('dist.ini'),qr/[\/\\]dist.ini$/,'Checking if file function gives back valid filename');
 	ok(-f $dist->file('dist.ini'),'Checking if file exist');
 	is((stat($dist->file('dist.ini')))[7],214,'Checking filesize');
 	

@@ -7,6 +7,7 @@ do { my $x = {
        'develop' => {
                       'requires' => {
                                       'Pod::Coverage::TrustPod' => '0',
+                                      'Test::DistManifest' => '0',
                                       'Test::EOF' => '0',
                                       'Test::EOL' => '0',
                                       'Test::Kwalitee' => '1.21',
@@ -31,8 +32,7 @@ do { my $x = {
                                       'Scalar::Util' => '0',
                                       'constant' => '0',
                                       'overload' => '0',
-                                      'perl' => 'v5.10.0',
-                                      'strict' => '0',
+                                      'perl' => 'v5.14.0',
                                       'warnings' => '0'
                                     }
                     },
@@ -44,7 +44,8 @@ do { my $x = {
                                    'File::Spec' => '0',
                                    'Module::Metadata' => '0',
                                    'Test::More' => '0',
-                                   'Test::Most' => '0'
+                                   'Test::Most' => '0',
+                                   'strict' => '0'
                                  }
                  }
      };

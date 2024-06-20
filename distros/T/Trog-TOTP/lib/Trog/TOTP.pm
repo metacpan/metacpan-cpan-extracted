@@ -1,4 +1,4 @@
-package Trog::TOTP 1.004;
+package Trog::TOTP 1.005;
 
 use strict;
 use warnings;
@@ -252,11 +252,12 @@ sub expected_totp_code {
 
 
 sub time_for_code {
-    my ( $self, $code, $now ) = @_;
+    my ( $self, $code, $now, $period ) = @_;
+    chomp $code;
     $now //= time;
-    my $day_in_seconds = 86400;
-    my @past   = map { $now - ($_ * $self->{period}) } 0 .. floor($day_in_seconds / $self->{period});
-    my @future = map { $now + ($_ * $self->{period}) } 0 .. floor($day_in_seconds / $self->{period});
+    $period //= 86400;
+    my @past   = map { $now - ($_ * $self->{period}) } 0 .. floor($period / $self->{period});
+    my @future = map { $now + ($_ * $self->{period}) } 0 .. floor($period / $self->{period});
     return first { $self->expected_totp_code($_) == $code } (@past, @future);
     return;
 }
@@ -305,8 +306,8 @@ sub generate_otp {
 
 sub validate_otp {
     my $self = shift;
-    my ( $digits, $period, $algorithm, $secret, $when, $tolerance, $base32secret, $otp ) =
-      $self->_process_sub_arguments( \@_, [ 'digits', 'period', 'algorithm', 'secret', 'when', 'tolerance', 'base32secret', 'otp' ] );
+    my ( $digits, $period, $algorithm, $secret, $when, $tolerance, $base32secret, $otp, $return_when ) =
+      $self->_process_sub_arguments( \@_, [ 'digits', 'period', 'algorithm', 'secret', 'when', 'tolerance', 'base32secret', 'otp', 'return_when' ] );
 
     unless ( $otp && $otp =~ m|^\d{6,8}$| ) {
         $otp ||= "";
@@ -320,19 +321,10 @@ sub validate_otp {
     $self->_valid_tolerance($tolerance);
     $self->_valid_secret( $secret, $base32secret );
 
-    my @tests = ( $self->{when} );
-    for my $i ( 1 .. $self->{tolerance} ) {
-        push @tests, ( $self->{when} - ( $self->{period} * $i ) );
-        push @tests, ( $self->{when} + ( $self->{period} * $i ) );
-    }
-
-    foreach my $when (@tests) {
-        my $code = $self->expected_totp_code($when);
-        $self->_debug_print("comparing $code to $otp");
-        return 1 if $code eq sprintf( "%0" . $self->{digits} . "d", $otp );
-    }
-
-    return 0;
+    my $tperiod = $self->{tolerance} * $self->{period};
+    my $res = $self->time_for_code( $otp, $when, $tperiod );
+    return $res if $return_when;
+    return $res ? 1 : 0;
 }
 
 1;
@@ -349,7 +341,7 @@ Trog::TOTP - Fork of Authen::TOTP
 
 =head1 VERSION
 
-version 1.004
+version 1.005
 
 =head1 DESCRIPTION
 
@@ -491,9 +483,9 @@ Returns, and optionally sets the algorithm if passed.
 Returns what a code "ought" to be at any given unix timestamp.
 Useful for integrating into command line tooling to fix things when people have "tecmological differences" with their telephone.
 
-=head2 time_for_code( STRING $code, TIME_T $when )
+=head2 time_for_code( STRING $code, TIME_T $when, TIME_T $period )
 
-Search at what time during the prior (or future!) 24 hours about $when in which the provided code is valid
+Search at what time during the prior (or future!) period (default 24 hrs) about $when in which the provided code is valid
 This is useful for dealing with users that just inexplicably fail due to bad clocks
 
 Returns undef in the event the code is not valid for the period, in which case their scan of a QR was bogus, or their validator app is buggy.
@@ -525,13 +517,14 @@ Returns 1 on success, undef if OTP doesn't match
 Usage:
 
  $gen->validate_otp(
-	 digits 	=>	[6|8],
-	 period		=>	[30|60],
-	 algorithm	=>	"SHA1", #SHA256 and SHA512 are equally valid
-	 secret		=>	"the_same_random_stuff_you_used_to_generate_the_TOTP",
-	 when		=>	<epoch_to_use_as_reference>,
-	 tolerance	=>	<try this many iterations before/after when>
-	 otp		=>	<OTP to compare to>
+	 digits 	 =>	[6|8],
+	 period		 =>	[30|60],
+	 algorithm	 =>	"SHA1", #SHA256 and SHA512 are equally valid
+	 secret		 =>	"the_same_random_stuff_you_used_to_generate_the_TOTP",
+	 when		 =>	<epoch_to_use_as_reference>,
+	 tolerance	 =>	<try this many iterations before/after when>
+	 otp		 =>	<OTP to compare to>
+     return_when => Boolean.  When high, return true or false.  Otherwise return the time @ which the code was valid (useful for tolerance > 1).
  );
 
 =head1 BUGS

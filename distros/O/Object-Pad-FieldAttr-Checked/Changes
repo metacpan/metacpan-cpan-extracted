@@ -1,5 +1,9 @@
 Revision history for Object-Pad-FieldAttr-Checked
 
+0.09    2024-06-19
+        [CHANGES]
+         * Migrate actual checker logic to new `Data::Checks` module
+
 0.08    2024-06-10
         [BUGFIXES]
          * Remember to keep listop's op_last pointer updated when reshaping optree

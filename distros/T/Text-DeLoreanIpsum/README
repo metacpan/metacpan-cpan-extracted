@@ -1,4 +1,4 @@
-Text-DeLoreanIpsum version 0.05
+Text-DeLoreanIpsum version 0.06
 ===============================
 
 Often when developing a website or other application, it's important to have placeholders for content. This module generates prescribed amounts of fake Back to the Future text
@@ -22,5 +22,3 @@ Copyright (C) 2016, 2023, 2024 by Mariano Spadaccini
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself, either Perl version 5.18.2 or,
 at your option, any later version of Perl 5 you may have available.
-
-

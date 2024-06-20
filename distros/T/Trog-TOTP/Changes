@@ -1,5 +1,9 @@
 Revision history for Perl extension Trog-TOTP
 
+1.005 2024-06-18 TEODESIAN
+    - Re-factor & remove false-negatives
+    - Add the return_when parameter to validate_otp
+
 1.004 2024-06-17 TEODESIAN
     - Add the time_for_code method
     - Add the totp_debugger utility

@@ -42,6 +42,7 @@ requires:
   LWP::UserAgent::WithCache: '0'
   Lingua::EN::NameCase: '0'
   Module::Info: '0'
+  Text::CSV: '0'
   Try::Tiny: '0'
   autodie: '0'
   perl: '5.006002'
@@ -49,5 +50,5 @@ resources:
   bugtracker: https://github.com/nigelhorne/Genealogy-ObituaryDailyTimes/issues
   homepage: https://sites.rootsweb.com/~obituary
   repository: git://github.com/nigelhorne/Genealogy-ObituaryDailyTimes.git
-version: '0.11'
+version: '0.12'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

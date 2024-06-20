@@ -79,187 +79,187 @@
    "provides" : {
       "SpeL::I18n" : {
          "file" : "lib/SpeL/I18n.pm",
-         "version" : "20240619.0646"
+         "version" : "20240619.1846"
       },
       "SpeL::I18n::en" : {
          "file" : "lib/SpeL/I18n/en.pm",
-         "version" : "20240619.0646"
+         "version" : "20240619.1846"
       },
       "SpeL::I18n::nl" : {
          "file" : "lib/SpeL/I18n/nl.pm",
-         "version" : "20240619.0646"
+         "version" : "20240619.1846"
       },
       "SpeL::Object::Arrow" : {
          "file" : "lib/SpeL/Object/Arrow.pm",
-         "version" : "20240619.0646"
+         "version" : "20240619.1846"
       },
       "SpeL::Object::Binop" : {
          "file" : "lib/SpeL/Object/Binop.pm",
-         "version" : "20240619.0646"
+         "version" : "20240619.1846"
       },
       "SpeL::Object::Command" : {
          "file" : "lib/SpeL/Object/Command.pm",
-         "version" : "20240619.0646"
+         "version" : "20240619.1846"
       },
       "SpeL::Object::Document" : {
          "file" : "lib/SpeL/Object/Document.pm",
-         "version" : "20240619.0646"
+         "version" : "20240619.1846"
       },
       "SpeL::Object::Element" : {
          "file" : "lib/SpeL/Object/Element.pm",
-         "version" : "20240619.0646"
+         "version" : "20240619.1846"
       },
       "SpeL::Object::ElementList" : {
          "file" : "lib/SpeL/Object/ElementList.pm",
-         "version" : "20240619.0646"
+         "version" : "20240619.1846"
       },
       "SpeL::Object::Environment" : {
          "file" : "lib/SpeL/Object/Environment.pm",
-         "version" : "20240619.0646"
+         "version" : "20240619.1846"
       },
       "SpeL::Object::Expression" : {
          "file" : "lib/SpeL/Object/Expression.pm",
-         "version" : "20240619.0646"
+         "version" : "20240619.1846"
       },
       "SpeL::Object::Expressionrest" : {
          "file" : "lib/SpeL/Object/Expressionrest.pm",
-         "version" : "20240619.0646"
+         "version" : "20240619.1846"
       },
       "SpeL::Object::Fraction" : {
          "file" : "lib/SpeL/Object/Fraction.pm",
-         "version" : "20240619.0646"
+         "version" : "20240619.1846"
       },
       "SpeL::Object::Function" : {
          "file" : "lib/SpeL/Object/Function.pm",
-         "version" : "20240619.0646"
+         "version" : "20240619.1846"
       },
       "SpeL::Object::Group" : {
          "file" : "lib/SpeL/Object/Group.pm",
-         "version" : "20240619.0646"
+         "version" : "20240619.1846"
       },
       "SpeL::Object::Interval" : {
          "file" : "lib/SpeL/Object/Interval.pm",
-         "version" : "20240619.0646"
+         "version" : "20240619.1846"
       },
       "SpeL::Object::Item" : {
          "file" : "lib/SpeL/Object/Item.pm",
-         "version" : "20240619.0646"
+         "version" : "20240619.1846"
       },
       "SpeL::Object::Limitscommand" : {
          "file" : "lib/SpeL/Object/Limitscommand.pm",
-         "version" : "20240619.0646"
+         "version" : "20240619.1846"
       },
       "SpeL::Object::Limitsexpression" : {
          "file" : "lib/SpeL/Object/Limitsexpression.pm",
-         "version" : "20240619.0646"
+         "version" : "20240619.1846"
       },
       "SpeL::Object::MathElement" : {
          "file" : "lib/SpeL/Object/MathElement.pm",
-         "version" : "20240619.0646"
+         "version" : "20240619.1846"
       },
       "SpeL::Object::MathElementList" : {
          "file" : "lib/SpeL/Object/MathElementList.pm",
-         "version" : "20240619.0646"
+         "version" : "20240619.1846"
       },
       "SpeL::Object::MathEnvironment" : {
          "file" : "lib/SpeL/Object/MathEnvironment.pm",
-         "version" : "20240619.0646"
+         "version" : "20240619.1846"
       },
       "SpeL::Object::MathEnvironmentInner" : {
          "file" : "lib/SpeL/Object/MathEnvironmentInner.pm",
-         "version" : "20240619.0646"
+         "version" : "20240619.1846"
       },
       "SpeL::Object::MathEnvironmentSimple" : {
          "file" : "lib/SpeL/Object/MathEnvironmentSimple.pm",
-         "version" : "20240619.0646"
+         "version" : "20240619.1846"
       },
       "SpeL::Object::MathGroup" : {
          "file" : "lib/SpeL/Object/MathGroup.pm",
-         "version" : "20240619.0646"
+         "version" : "20240619.1846"
       },
       "SpeL::Object::MathInline" : {
          "file" : "lib/SpeL/Object/MathInline.pm",
-         "version" : "20240619.0646"
+         "version" : "20240619.1846"
       },
       "SpeL::Object::MathUnit" : {
          "file" : "lib/SpeL/Object/MathUnit.pm",
-         "version" : "20240619.0646"
+         "version" : "20240619.1846"
       },
       "SpeL::Object::Mathtotextcommand" : {
          "file" : "lib/SpeL/Object/Mathtotextcommand.pm",
-         "version" : "20240619.0646"
+         "version" : "20240619.1846"
       },
       "SpeL::Object::Matrix" : {
          "file" : "lib/SpeL/Object/Matrix.pm",
-         "version" : "20240619.0646"
+         "version" : "20240619.1846"
       },
       "SpeL::Object::Number" : {
          "file" : "lib/SpeL/Object/Number.pm",
-         "version" : "20240619.0646"
+         "version" : "20240619.1846"
       },
       "SpeL::Object::Operator" : {
          "file" : "lib/SpeL/Object/Operator.pm",
-         "version" : "20240619.0646"
+         "version" : "20240619.1846"
       },
       "SpeL::Object::Option" : {
          "file" : "lib/SpeL/Object/Option.pm",
-         "version" : "20240619.0646"
+         "version" : "20240619.1846"
       },
       "SpeL::Object::Power" : {
          "file" : "lib/SpeL/Object/Power.pm",
-         "version" : "20240619.0646"
+         "version" : "20240619.1846"
       },
       "SpeL::Object::Realnumber" : {
          "file" : "lib/SpeL/Object/Realnumber.pm",
-         "version" : "20240619.0646"
+         "version" : "20240619.1846"
       },
       "SpeL::Object::RelOperator" : {
          "file" : "lib/SpeL/Object/RelOperator.pm",
-         "version" : "20240619.0646"
+         "version" : "20240619.1846"
       },
       "SpeL::Object::Relation" : {
          "file" : "lib/SpeL/Object/Relation.pm",
-         "version" : "20240619.0646"
+         "version" : "20240619.1846"
       },
       "SpeL::Object::Squareroot" : {
          "file" : "lib/SpeL/Object/Squareroot.pm",
-         "version" : "20240619.0646"
+         "version" : "20240619.1846"
       },
       "SpeL::Object::Subscript" : {
          "file" : "lib/SpeL/Object/Subscript.pm",
-         "version" : "20240619.0646"
+         "version" : "20240619.1846"
       },
       "SpeL::Object::TokenSequence" : {
          "file" : "lib/SpeL/Object/TokenSequence.pm",
-         "version" : "20240619.0646"
+         "version" : "20240619.1846"
       },
       "SpeL::Object::Unop" : {
          "file" : "lib/SpeL/Object/Unop.pm",
-         "version" : "20240619.0646"
+         "version" : "20240619.1846"
       },
       "SpeL::Object::Variable" : {
          "file" : "lib/SpeL/Object/Variable.pm",
-         "version" : "20240619.0646"
+         "version" : "20240619.1846"
       },
       "SpeL::Object::VerbatimEnvironment" : {
          "file" : "lib/SpeL/Object/VerbatimEnvironment.pm",
-         "version" : "20240619.0646"
+         "version" : "20240619.1846"
       },
       "SpeL::Parser::Auxiliary" : {
          "file" : "lib/SpeL/Parser/Auxiliary.pm",
-         "version" : "20240619.0646"
+         "version" : "20240619.1846"
       },
       "SpeL::Parser::Chunk" : {
          "file" : "lib/SpeL/Parser/Chunk.pm",
-         "version" : "20240619.0646"
+         "version" : "20240619.1846"
       },
       "SpeL::Wizard" : {
          "file" : "lib/SpeL/Wizard.pm",
-         "version" : "20240619.0646"
+         "version" : "20240619.1846"
       }
    },
    "release_status" : "stable",
-   "version" : "20240619.0646",
+   "version" : "20240619.1846",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.038002"

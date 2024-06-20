@@ -1,13 +1,13 @@
 package Dist::Data;
 our $AUTHORITY = 'cpan:GETTY';
 # ABSTRACT: API to access the data of a Perl distribution file or directory
-$Dist::Data::VERSION = '0.006';
+$Dist::Data::VERSION = '0.007';
 use Moo;
 use Archive::Any;
 use CPAN::Meta;
 use File::Temp;
 use File::Find::Object;
-use Module::Extract::Namespaces;
+use Module::Metadata;
 use DateTime::Format::Epoch::Unix;
 use Dist::Metadata ();
 
@@ -194,9 +194,10 @@ sub _build_namespaces {
 	for (keys %{$self->files}) {
 		my $key = $_;
 		if ($key =~ /\.pm$/ || $key =~ /\.pl$/) {
-			my @namespaces = Module::Extract::Namespaces->from_file($self->files->{$key});
+			my $metadata = Module::Metadata->new_from_file($self->files->{$key});
+			my @namespaces = $metadata->packages_inside;
 			for (@namespaces) {
-				next unless defined $_;
+				next unless defined $_ && $_ ne 'main';
 				$namespaces{$_} = [] unless defined $namespaces{$_};
 				push @{$namespaces{$_}}, $key;
 			}
@@ -299,7 +300,7 @@ Dist::Data - API to access the data of a Perl distribution file or directory
 
 =head1 VERSION
 
-version 0.006
+version 0.007
 
 =head1 SYNOPSIS
 
@@ -331,7 +332,7 @@ version 0.006
   my @authors = $dist->authors;
 
   my %packages = %{$dist->packages};             # via Dist::Metadata
-  my %packages = %{$dist->namespaces};           # via Module::Extract::Namespaces
+  my %namespaces = %{$dist->namespaces};         # via Module::Metadata
   my %documentations = %{$dist->documentations}; # only .pod inside of lib/ (so far)
   my %scripts = %{$dist->scripts};               # all files in bin/ and script/
 
@@ -345,7 +346,7 @@ This distribution is used to get all information from a CPAN distribution or an 
 
 IRC
 
-  Join #duckduckgo on irc.freenode.net. Highlight Getty for fast reaction :).
+  Join #perl-help on irc.perl.org. Highlight Getty for fast reaction :).
 
 Repository
 
@@ -358,11 +359,11 @@ Issue Tracker
 
 =head1 AUTHOR
 
-Torsten Raudssus <torsten@raudss.us> L<http://raudss.us/>
+Torsten Raudssus <torsten@raudssus.de> L<https://raudss.us/>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2012 by DuckDuckGo, Inc. L<http://duckduckgo.com/>.
+This software is copyright (c) 2024 by Torsten Raudssus <torsten@raudssus.de> L<https://raudss.us/>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

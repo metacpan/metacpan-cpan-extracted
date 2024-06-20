@@ -1,4 +1,5 @@
 ---
+abstract: 'Yet another config module'
 author:
   - 'Nicolas Mendoza <mendoza@pvv.ntnu.no>'
 build_requires:
@@ -41,4 +42,4 @@ requires:
   namespace::clean: 0
 resources:
   license: http://dev.perl.org/licenses/
-version: '1.09'
+version: '1.10'

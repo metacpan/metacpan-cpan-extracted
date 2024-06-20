@@ -20,6 +20,12 @@
 #######################################################################
 
 
+2024-06-19  Brian M. Kelly <Brian.Kelly@fullauto.com>
+
+        * Version 1.0000657 released
+
+        * display() outputs more accurately
+
 2024-06-17  Brian M. Kelly <Brian.Kelly@fullauto.com>
 
         * Version 1.0000656 released

@@ -1,5 +1,5 @@
 package App::plackbench;
-$App::plackbench::VERSION = '0.6';
+$App::plackbench::VERSION = '0.7';
 use strict;
 use warnings;
 use autodie;
@@ -104,6 +104,7 @@ sub run {
         $a;
     }  App::plackbench::Stats->new(), ( 0 .. ( $count - 1 ) );
 
+    $stats->finalize;
     return $stats;
 }
 

@@ -1,7 +1,7 @@
 #!perl -wT
 
 use strict;
-use Test::Most tests => 13;
+use Test::Most tests => 14;
 
 use lib 'lib';
 use lib 't/lib';
@@ -12,7 +12,9 @@ BEGIN {
 }
 
 SKIP: {
-	skip 'Database not installed', 12 if(!-r 'lib/Genealogy/ObituaryDailyTimes/data/obituaries.sql');
+	skip 'Database not installed', 13 if(!-r 'lib/Genealogy/ObituaryDailyTimes/data/obituaries.sql');
+
+	Database::Abstraction::init('directory' => 'lib/Genealgy/ObituaryDailyTimes/data');
 
 	my $search;
 	if($ENV{'TEST_VERBOSE'}) {
@@ -41,7 +43,8 @@ SKIP: {
 	if($ENV{'TEST_VERBOSE'}) {
 		diag(Data::Dumper->new([$baal])->Dump());
 	}
-	cmp_ok($baal->{'url'}, 'eq', 'https://mlarchives.rootsweb.com/listindexes/emails?listname=gen-obit&page=96', 'Check Baal URL');
+	# cmp_ok($baal->{'url'}, 'eq', 'https://mlarchives.rootsweb.com/listindexes/emails?listname=gen-obit&page=96', 'Check Baal URL');
+	cmp_ok($baal->{'url'}, 'eq', 'https://wayback.archive-it.org/20669/20231102044925/https://mlarchives.rootsweb.com/listindexes/emails?listname=gen-obit&page=96', 'Check Baal URL');
 
 	my @coppage = $search->search({ first => 'John', middle => 'W', last => 'Coppage' });
 
@@ -66,6 +69,13 @@ SKIP: {
 	my $adams = $search->search({ first => 'Almetta', middle => 'Ivaleen', last => 'Adams' });
 	is($adams->{'maiden'}, 'Paterson', 'Picks up maiden name');
 	is($adams->{'url'}, 'https://www.freelists.org/post/obitdailytimes/Obituary-Daily-Times-v25no101', 'Check Adams URL');
+
+	# Locally added data
+	my $erickson = $search->search(first => 'David', last => 'Erickson', age => 92);
+	if($ENV{'TEST_VERBOSE'}) {
+		diag(Data::Dumper->new([$erickson])->Dump());
+	}
+	cmp_ok($erickson->{'url'}, 'eq', 'https://www.beaconjournal.com/obituaries/pwoo0723808', 'Check locally added data');
 
 	my @empty = $search->search(last => 'xyzzy');
 	is(scalar(@empty), 0, 'Search for xyzzy should return an empty list');

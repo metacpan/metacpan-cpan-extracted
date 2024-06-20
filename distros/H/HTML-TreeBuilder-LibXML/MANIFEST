@@ -14,6 +14,7 @@ t/04_new_methods.t
 t/05_empty.t
 t/06_web_query.t
 t/HTML-TreeBuilder-XPath.t
+t/blanks.t
 t/clone_list.t
 t/content_list.t
 t/delete_content.t

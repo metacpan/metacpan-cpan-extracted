@@ -1,0 +1,81 @@
+use alienfile;
+
+use constant {
+    SUNVOX_LIB_HOMEPAGE       => 'https://warmplace.ru/soft/sunvox/sunvox_lib.php',
+    SUNVOX_LIB_FILE_FILTER    => qr/sunvox_lib-([0-9.]+[a-z]?)\.zip/,
+    SUNVOX_LIB_VERSION_FILTER => qr/([0-9.]+[a-z]?)/,
+};
+
+my $os_map = {
+    linux   => 'linux',
+    MSWin32 => 'windows',
+    darwin  => 'macos'
+};
+
+my $ext_map = {
+    linux   => '.so',
+    MSWin32 => '.dll',
+    darwin  => '.dylib'
+};
+
+my $arch_map = {
+    aarch64 => 'arm_64',
+    armel   => 'arm',
+    armhf   => 'arm',
+    x86     => 'x86',
+    x86_64  => 'x86_64'
+};
+
+my $arch_name = meta->prop->{platform}{cpu}{arch}{name};
+my $arch = $arch_map->{ $arch_name };
+my $os   = $os_map->{ $^O };
+my $ext  = quotemeta $ext_map->{ $^O };
+
+my $valid_combos = {
+    map {
+        $_ => 1
+    } qw/ linux-arm linux-arm64 linux-x86 linux-x86_64
+          windows-x86 windows-x86_64
+          macos-arm64 macos-x86_64 /
+};
+
+my $combo = "$os-$arch";
+die "SunVox library unavailable for $os $arch_name - skipping download"
+    unless $valid_combos->{ $combo };
+
+share {
+    requires 'Path::Tiny';
+    require Path::Tiny; Path::Tiny->import;
+
+    before build => sub {
+        my $path = path( $os, "lib_$arch" );
+        die "SunVox library not available for $os-$arch" unless $path->is_dir;
+        my $libdir = path( 'dynamic' )->mkdir;
+        my $incdir = path( 'include' )->mkdir;
+        my @libs = $path->children( qr/$ext$/ );
+        die "Configuration error" unless @libs;
+
+        $_->copy( $libdir->child( 'lib' . $_->basename ) ) for @libs;
+        if ( $arch_name eq 'armel' ) {
+            my @libs = $libdir->children;
+            # Should be just Linux .so but let's be agnostic
+            my ( $armel_lib ) = grep { /_armel\./ } @libs;
+            my ( $orig_lib ) = grep { /sunvox\.[a-z]+$/ } @libs;
+            my $armhf_lib = $armel_lib =~ s/_armel/_armhf/r;
+            $orig_lib->move( $armhf_lib );
+            $armel_lib->move( $orig_lib );
+        }
+        $_->copy( $incdir ) for ( path('headers')->children( qr/\.h$/ ) );
+
+        path( $_ )->remove_tree for qw/ android headers ios js linux macos windows /;
+    };
+
+    start_url SUNVOX_LIB_HOMEPAGE;
+    plugin 'Download' => (
+        filter => SUNVOX_LIB_FILE_FILTER,
+        version => SUNVOX_LIB_VERSION_FILTER,
+    );
+    plugin 'Extract' => 'zip';
+
+    plugin 'Build::Copy';
+};

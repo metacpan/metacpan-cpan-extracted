@@ -1,3 +1,11 @@
+0.009   2024-06-17  Released-By: PERLANCAR; Urgency: medium
+
+        - [doc] Correct references to $FILE_TEMP_* variables.
+
+        - Update dependency version of File::Temp to one (0.2310) that has the
+          PERMS flag.
+
+
 0.008   2021-08-02  Released-By: PERLANCAR; Urgency: medium
 
 	- [ux] Add modify_text() and modify_binary().

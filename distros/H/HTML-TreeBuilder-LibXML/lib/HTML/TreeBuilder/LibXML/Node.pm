@@ -74,7 +74,8 @@ sub as_HTML {
     {
         local $@; # protect existing $@
         my $output = eval { $_[0]->{node}->toStringC14N(1) };
-        return $@ ? $_[0]->{node}->toString : $output;
+        return $_[0]->{node}->toString if ($@ or $output eq '');
+        return $output;
     }
 }
 

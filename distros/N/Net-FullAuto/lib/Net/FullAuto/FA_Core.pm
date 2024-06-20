@@ -17373,7 +17373,7 @@ sub new {
       our $timeout=$Net::FullAuto::FA_Core::timeout;
       our $test=$Net::FullAuto::FA_Core::test;
       my $class = ref($_[0]) || $_[0];
-      my $hostlabel=$_[1];
+      my $hostlabel=$_[1]||'';
       my $new_master=$_[2]||'';
       my $_connect=$_[3]||'';
       my $cache=$_[4]||$main::cache||'';
@@ -17420,10 +17420,12 @@ sub new {
             -1<index $Net::FullAuto::FA_Core::LOG,'*';
          return $ftp_handle,$die;
       }
+#print "WTFFFFF is the HOSTLABEL HERE=$hostlabel<==\n";sleep 10;
       $self->{_hostlabel}=[ $hostlabel,'' ];
       if ($ftr_cmd) {
          $self->{_cmd_handle}=$ftr_cmd->{_cmd_handle};
          $self->{_sh_pid}=$ftr_cmd->{_sh_pid};
+         $self->{_shell}=$ftr_cmd->{_shell};
          $self->{_cmd_pid}=$ftr_cmd->{_cmd_pid};
          $self->{_uname}=$ftr_cmd->{_uname};
          $self->{_luname}=$ftr_cmd->{_luname};
@@ -18274,8 +18276,13 @@ sub get
          return 'SEMAPHORE';
       }
       $file=~s/^["']+(.*)["']+$/$1/;
-      ($output,$stderr)=&Rem_Command::ftpcmd($self,
-         "get \"$file\"",$cache);
+      if ($display) {
+         ($output,$stderr)=&Rem_Command::ftpcmd($self,
+            "get \"$file\"",$cache,'__display__');
+      } else {
+         ($output,$stderr)=&Rem_Command::ftpcmd($self,
+            "get \"$file\"",$cache);
+      }
       &Net::FullAuto::FA_Core::release_fa_lock($file_arg);
       if ($stderr) {
          if ((!$Net::FullAuto::FA_Core::cron
@@ -20812,11 +20819,11 @@ sub cwd
                ($self->{_connect} eq 'connect_telnet') ||
                ($self->{_connect} eq 'connect_telnet_ssh')) {
 	    my $cwd='';
-	    ($cwd,$stderr)=$self->cmd('pwd','__delay__=20');
+	    ($cwd,$stderr)=$self->cmd('pwd','__delay__=200');
             ($output,$stderr)=$self->cmd("cd \'$target_dir\'",
-               '__delay__=20');
+               '__delay__=200');
             my $pwd='';
-	    ($pwd,$stderr)=$self->cmd('pwd','__delay__=20');
+	    ($pwd,$stderr)=$self->cmd('pwd','__delay__=200');
             $stderr=$output if -1<index $output,"Couldn't can";
             if ($stderr) {
                if (wantarray) {
@@ -20824,11 +20831,11 @@ sub cwd
                } else { &Net::FullAuto::FA_Core::handle_error($stderr,'-4') }
 	    } elsif (!exists $self->{_work_dirs}->{_cwd}) {
 	       if ($cwd ne $pwd) {
-		  $self->{_work_dirs}->{_pre}=$cwd;
-		  $self->{_work_dirs}->{_cwd}=$pwd; 
+		  $self->{_work_dirs}->{_pre}=$cwd.'/';
+		  $self->{_work_dirs}->{_cwd}=$pwd.'/'; 
 	       } else {
                   $self->{_work_dirs}->{_pre}=
-		     $self->{_work_dirs}->{_cwd}=$pwd;
+		     $self->{_work_dirs}->{_cwd}=$pwd.'/';
 	       }
 	       if ($self->{_uname} eq 'cygwin') {
                   my $tdir='';
@@ -28150,7 +28157,8 @@ print $Net::FullAuto::FA_Core::LOG "WHAT IS THE ERROR=$cmd_errmsg<=== and RETRYS
             } else {
                my $host= $hostname ? $hostname : $ip;
                my $hostl=$hostlabel;
-               $hostl=$Hosts{$hostlabel}{HostName} if $hostlabel=~/^__Mast/;
+               $hostl=$Hosts{$hostlabel}{HostName}
+                  if $hostlabel=~/^__Mast/;
                $cmd_errmsg="$@\n\n        While Attempting "
                    . "Login to $host\n       -> HostLabel "
                    . "\'$hostl\'\n\n";
@@ -28602,7 +28610,7 @@ sub ftpcmd
    }
    &Net::FullAuto::FA_Core::handle_error($handle->{_ftp_handle}->errmsg)
       if $handle->{_ftp_handle}->errmsg;
-   my $cmdflag=0;my $tcmd='';my $loop=0;
+   my $cmdflag=0;my $tcmd='';my $loop=0;my $save='';
    while (1) {
       my $starttime=time();
       eval {
@@ -28800,10 +28808,8 @@ sub ftpcmd
                $loop=0;
                $output=~s/[ ]*\015//g;
                $output=~tr/\0-\11\13-\37\177-\377//d;
-               $output=~tr/ //s;
-               my $save='';
                my $prompt=($handle->{_ftm_type} eq 'ftp')?'ftp>':'sftp>';
-               $save=&display($output,$prompt,$save)
+               $save=&display($output,$prompt,$save,$cmd)
                   if $display;
                if ($output=~/s*ftp> ?$/s || $stdout=~/s*ftp> ?$/s || $more) {
                   $nfound=select
@@ -30442,8 +30448,9 @@ print $Net::FullAuto::FA_Core::LOG "GRO_OUT_AFTER_MEGA_STRIP=$growoutput\n"
                                  $stripped_live_command)) {
                               if ($output=~/$cmd_prompt$/s &&
                                     $growoutput!~/$cmd_prompt$/s) {
+                                 $save=&display($output,$cmd_prompt,$save)
+                                    if $display;
                                  $growoutput=$output;
-                                 $output='';
                                  $command_stripped_from_output=1;
                               }
                               $output='';
@@ -30462,20 +30469,17 @@ print $Net::FullAuto::FA_Core::LOG "GRO_OUT_AFTER_MEGA_STRIP=$growoutput\n"
                                  $output=unpack("x$ltso a*",$output);
                                  if ($output=~s/^\s*(stdout.*
                                        \n$cmd_prompt)$/$1/sx) {
-                                    $save=&display($output,$cmd_prompt,$save)
-                                       if $display;
-                                    $growoutput.=$output;$output='';
+                                    $growoutput.=$output;
                                     $first=0;
                                  } else {
-                                    $growoutput=$output;$output='';
+                                    $growoutput=$output;
                                     $command_stripped_from_output=1;
                                  }
+                                 $output='';
                               }
                               if (!$first && !$command_stripped_from_output) {
                                  my $tsst=unpack("a$lslc",
                                        $test_stripped_output);
-                                 $save=&display($last_line,$cmd_prompt,$save)
-                                    if $display;
                                  $first=0;$growoutput.=$last_line;
                                  $growoutput=~s/^.*($cmd_prompt)$/$1/s;
                                  $output='';
@@ -30495,6 +30499,8 @@ print $Net::FullAuto::FA_Core::LOG "GRO_OUT_AFTER_MEGA_STRIP=$growoutput\n"
                            ($ignore,$growoutput)=
                                  split /2\s*\>\s*\&\s*1\s*/s,
                                  $output;
+                           $save=&display($growoutput,$cmd_prompt,$save)
+                              if $display;
                            #$output=$growoutput;
                            next
                         } else {
@@ -30570,6 +30576,8 @@ print $Net::FullAuto::FA_Core::LOG "NO GROWOUTPUTTTTTTTTTTTTT\n" if $Net::FullAu
                               if ($growoutput=~/$cmd_prompt$/s) {
                                  $growoutput=~s/^(.*)($cmd_prompt)*$/$1/s;
                                  chomp($growoutput);
+                                 $save=&display($growoutput,$cmd_prompt,$save)
+                                    if $display;
                                  $growoutput.="\n".$cmd_prompt;
                                  $lastline=$cmd_prompt;
                               } else {
@@ -30583,6 +30591,8 @@ print $Net::FullAuto::FA_Core::LOG "NO GROWOUTPUTTTTTTTTTTTTT\n" if $Net::FullAu
                               $command_stripped_from_output=0;
                               $appendout=$tou;
                               $fetchflag=1;
+                              $save=&display($tou,$cmd_prompt,$save)
+                                 if $display;
                               next FETCH;
                            } last FETCH;
                         } elsif (-1<index $output,'Connection reset by peer') {
@@ -30885,12 +30895,14 @@ print $Net::FullAuto::FA_Core::LOG "LETS LOOK AT LINE=$line<== and LASTLINE=$las
                                     $growoutput=~s/$line//s;
                                  } elsif ($fulloutput || $line!~/^\s*$/s) {
                                     $fulloutput.=$line;
-                                    $save=&display($line,$cmd_prompt,$save)
-                                       if $display;
+                                    #$save=&display($line,$cmd_prompt,$save)
+                                    #   if $display;
                                     $errflag='';
-                                 } elsif ($display) {
-                                    $save=&display($line,$cmd_prompt,$save);
-                                 }
+                                 } #elsif ($display) {
+                                   # $save=&display($line,$cmd_prompt,$save);
+                                 #}
+                                 #$save=&display($line,$cmd_prompt,$save)
+                                 #   if $display;
                               }
                            }
                         } elsif ($fulloutput || $line!~/^\s*$/s) {
@@ -30900,6 +30912,8 @@ print $Net::FullAuto::FA_Core::LOG "LETS LOOK AT LINE=$line<== and LASTLINE=$las
                            $growoutput=~s/^stdout: ?//mg;
                            $fulloutput=$growoutput;
                         }
+                        $save=&display($line,$cmd_prompt,$save)
+                           if $display;
                      }
 print "GROW_ADDED_TO_FULL=$growoutput<==\n" if !$Net::FullAuto::FA_Core::cron && ($Net::FullAuto::FA_Core::debug || $debug) && $loop_count<$loop_max;
 print $Net::FullAuto::FA_Core::LOG "GROW_ADDED_TO_FULL=$growoutput\n"
@@ -31305,7 +31319,16 @@ sub display
    return '' if -1<index $line,'[sudo]';
    my $cmd_prompt=$_[1];
    my $save=$_[2]||'';
+   my $chomp_save=$save;
+   $chomp_save=~s/\n//g;
+   my $tchomp_save=$chomp_save;
+   $tchomp_save=~s/["|']/X/g;
    my $cmd=$_[3]||'';
+   my $tcmd=$cmd;
+   $tcmd=~s/["|']/X/g;
+   my $tline=$line;
+   $tline=~s/["|']/X/g;
+   $tline=~s/\s*$//s;
    if ((-1<index $line,'[K') &&
          ($line eq '[K' ||
          (substr($line,-2) eq '[K') ||
@@ -31335,8 +31358,10 @@ sub display
       }
    } elsif ($line=~/^\s*\[c\s*$/s) {
       $line=~s/\[c//gs
+   } elsif ($cmd && (($tcmd=~/^$tchomp_save$tline/) ||
+         ($tcmd eq "$tchomp_save$tline"))) {
+      return "$chomp_save$line";
    }
-
    $line=~s/^stdout: ?//mg;
    my $print_out=0;
    $print_out=1 if $Net::FullAuto::FA_Core::log &&
@@ -31385,8 +31410,13 @@ sub display
       return '';
    } else {
       $line=~s/\s+\d(\d|\d\d)?\s*$//s;
-      print $line;
-      print $OUTPUT $line if $print_out;
+      if ($line=~/ETA$/) {
+         print $line,"\n";
+         print $OUTPUT $line,"\n" if $print_out;
+      } else {
+         print $line;
+         print $OUTPUT $line if $print_out;
+      }
       return '';
    }
 }

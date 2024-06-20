@@ -1,5 +1,12 @@
 Revision history for Genealogy::ObituaryDailyTimes
 
+0.12	Wed Jun 19 21:01:56 EDT 2024
+	t/carp.t could sometimes fail
+	Added t/version.t
+	Use directory from Database::Abstraction::init, if that is set
+	Import "other" file from MLARCHIVES_DIR
+	Import DATA section of bin/create_db.PL for locally added data
+
 0.11	Thu Feb  8 09:03:49 EST 2024
 	Added first, last, age as an index
 	Renamed database to data

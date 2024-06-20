@@ -1,5 +1,18 @@
 Revision history for Data-Enum:
 
+v0.3.0    2024-06-19 17:31:12+01:00 Europe/London
+  [Enhancements]
+  - Added the "prefix" constructor option and method.
+
+  [Incompatible Changes]
+  - Bumped minimum version of Perl to v5.14.
+
+  [Documentation]
+  - Updated copyright year.
+
+  [Tests]
+  - Changed the author MANIFEST tests to use a maintained module.
+
 v0.2.7    2023-06-11 14:25:38+01:00 Europe/London
   [Documentation]
   - Document support policy for older Perl versions.

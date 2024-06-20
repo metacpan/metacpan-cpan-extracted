@@ -10,6 +10,7 @@ bin/balabolka.pl
 bin/festival.pl
 bin/spel-wizard.pl
 dist.ini
+lib/SpeL/#Wizard.pm#
 lib/SpeL/I18n.pm
 lib/SpeL/I18n/en.pm
 lib/SpeL/I18n/nl.pm
@@ -158,7 +159,6 @@ t/02-bin/auxiliary/realistic.brown
 t/02-bin/auxiliary/realistic.golden
 t/02-bin/auxiliary/realistic.stderr
 t/02-bin/spel.t
-t/02-bin/spel.t~
 t/02-bin/spel/bracketstring.brown
 t/02-bin/spel/bracketstring.golden
 t/02-bin/spel/bracketstring.m3u

@@ -4,7 +4,7 @@ Data::Enum - immutable enumeration classes
 
 # VERSION
 
-version v0.2.7
+version v0.3.0
 
 # SYNOPSIS
 
@@ -87,6 +87,15 @@ Each instance will have an `is_` method for each value.
 
 Each instance stringifies to its value.
 
+Since v0.3.0 you can change the method prefix to something other than `is_`. For example,
+
+```perl
+my $class = Data::Enum->new( { prefix => "from_" }, "home", "work" );
+my $place = $class->new("work");
+
+$place->from_home;
+```
+
 ## values
 
 ```perl
@@ -116,6 +125,12 @@ my %handlers = mesh [ $class->values ], [ $class->predicates ];
 
 This was added in v0.2.1.
 
+## prefix
+
+This returns the prefix.
+
+This was added in v0.3.0.
+
 ## MATCH
 
 This method adds support for [match::simple](https://metacpan.org/pod/match%3A%3Asimple).
@@ -127,7 +142,7 @@ strings.  When using this in production code, you may want to benchmark performa
 
 # SUPPORT FOR OLDER PERL VERSIONS
 
-This module requires Perl v5.10 or later.
+This module requires Perl v5.14 or later.
 
 Future releases may only support Perl versions released in the last ten years.
 
@@ -163,7 +178,7 @@ Robert Rothenberg <rrwo@cpan.org>
 
 # COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2021-2023 by Robert Rothenberg.
+This software is Copyright (c) 2021-2024 by Robert Rothenberg.
 
 This is free software, licensed under:
 

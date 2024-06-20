@@ -21,6 +21,7 @@
       },
       "configure" : {
          "requires" : {
+            "Data::Checks::Builder" : "0",
             "Module::Build" : "0.4004",
             "XS::Parse::Sublike::Builder" : "0.19"
          }
@@ -40,7 +41,7 @@
    "provides" : {
       "Signature::Attribute::Checked" : {
          "file" : "lib/Signature/Attribute/Checked.pm",
-         "version" : "0.02"
+         "version" : "0.03"
       }
    },
    "release_status" : "stable",
@@ -49,6 +50,6 @@
          "http://dev.perl.org/licenses/"
       ]
    },
-   "version" : "0.02",
+   "version" : "0.03",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

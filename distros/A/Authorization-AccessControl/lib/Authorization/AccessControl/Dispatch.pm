@@ -1,4 +1,4 @@
-package Authorization::AccessControl::Dispatch 0.03;
+package Authorization::AccessControl::Dispatch 0.04;
 use v5.26;
 use warnings;
 

@@ -30,6 +30,8 @@ can_ok( $red, qw/ values predicates is_red is_green is_blue / );
 
 is_deeply [ $red->predicates ], [sort qw/ is_red is_green is_blue / ], 'predicates';
 
+is $red->prefix, "is_", "prefix";
+
 ok $red->is_red, 'is_red';
 ok !$red->is_blue, '!is_blue';
 ok !$red->is_green, '!is_green';

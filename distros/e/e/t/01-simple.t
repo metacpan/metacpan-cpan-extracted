@@ -5,6 +5,9 @@ use warnings;
 use Test::More;
 use e;
 
+binmode *STDOUT, "encoding(UTF-8)";
+binmode *STDERR, "encoding(UTF-8)";
+
 sub run {
     my $out = "";
 
@@ -87,6 +90,40 @@ is_deeply
   yml( "---\na: 1" ),
   { a => 1 },
   "yml - yml string to ref";
+
+# UTF-8.
+is
+  enc( "\x{5D0}" ),
+  "\x{D7}\x{90}",
+  "enc - alef code to bytes";
+
+is
+  enc( "\N{HEBREW LETTER ALEF}" ),
+  "\x{D7}\x{90}",
+  "enc - alef name to bytes";
+
+is
+  dec( "\x{D7}\x{90}" ),
+  "\x{5D0}",
+  "dec - bytes to alef code";
+
+is
+  dec( enc( "\x{5D0}" ) ),
+  "\x{5D0}",
+  "enc,dec - same value";
+
+is
+  enc( dec( "\x{D7}\x{90}" ) ),
+  "\x{D7}\x{90}",
+  "dec,enc - same value";
+
+is
+  scalar enc( "\x{5D0}" ) =~ /\w/, "",
+  "enc - not word";
+
+is
+  scalar dec( "\x{D7}\x{90}" ) =~ /\w/, 1,
+  "dec - is word";
 
 ######################################
 #          Enhanced Types

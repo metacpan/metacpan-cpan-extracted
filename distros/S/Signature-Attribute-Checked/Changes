@@ -1,5 +1,9 @@
 Revision history for Signature-Attribute-Checked
 
+0.03    2024-06-19
+        [CHANGES]
+         * Migrate actual checker logic to new `Data::Checks` module
+
 0.02    2024-06-10
         [BUGFIXES]
          * Remember to PUTBACK after POPs in check.c

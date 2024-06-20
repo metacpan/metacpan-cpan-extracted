@@ -4,8 +4,9 @@ use warnings;
 
 use Module::Build;
 use XS::Parse::Sublike::Builder;
+use Data::Checks::Builder;
 
-my @extra_compiler_flags = qw( -Ihax -Iinclude );
+my @extra_compiler_flags = qw( -Ihax );
 
 push @extra_compiler_flags, qw( -DDEBUGGING=-g ) if $^X =~ m|/debugperl|;
 
@@ -26,6 +27,8 @@ my $build = Module::Build->new(
    },
    configure_requires => {
       'Module::Build' => '0.4004', # test_requires
+
+      'Data::Checks::Builder' => 0,
       'XS::Parse::Sublike::Builder' => '0.19',
    },
    license => 'perl',
@@ -33,9 +36,10 @@ my $build = Module::Build->new(
    create_readme  => 1,
 
    extra_compiler_flags => \@extra_compiler_flags,
-   c_source => [ "src/" ],
 );
 
 XS::Parse::Sublike::Builder->extend_module_build( $build );
+
+Data::Checks::Builder->extend_module_build( $build );
 
 $build->create_build_script;

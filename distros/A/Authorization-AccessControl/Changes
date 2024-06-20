@@ -1,5 +1,8 @@
 Revision history for perl distribution Authorization::AccessControl
 
+0.04      2024-06-19T08:28:10-05:00
+  - Add method for prechecking authorization
+
 0.03      2024-05-16T10:52:43-05:00
   - Don't mark yielded entities as read-only in dispatch
 

@@ -4,7 +4,7 @@
       "Robert Rothenberg <rrwo@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.030, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.032, CPAN::Meta::Converter version 2.150010",
    "keywords" : [
       "immutable",
       "read-only",
@@ -28,6 +28,7 @@
       "develop" : {
          "requires" : {
             "Pod::Coverage::TrustPod" : "0",
+            "Test::DistManifest" : "0",
             "Test::EOF" : "0",
             "Test::EOL" : "0",
             "Test::Kwalitee" : "1.21",
@@ -52,8 +53,7 @@
             "Scalar::Util" : "0",
             "constant" : "0",
             "overload" : "0",
-            "perl" : "v5.10.0",
-            "strict" : "0",
+            "perl" : "v5.14.0",
             "warnings" : "0"
          }
       },
@@ -65,14 +65,15 @@
             "File::Spec" : "0",
             "Module::Metadata" : "0",
             "Test::More" : "0",
-            "Test::Most" : "0"
+            "Test::Most" : "0",
+            "strict" : "0"
          }
       }
    },
    "provides" : {
       "Data::Enum" : {
          "file" : "lib/Data/Enum.pm",
-         "version" : "v0.2.7"
+         "version" : "v0.3.0"
       }
    },
    "release_status" : "stable",
@@ -86,10 +87,10 @@
          "web" : "https://github.com/robrwo/perl-Data-Enum"
       }
    },
-   "version" : "v0.2.7",
+   "version" : "v0.3.0",
    "x_authority" : "cpan:RRWO",
-   "x_generated_by_perl" : "v5.34.0",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.35",
+   "x_generated_by_perl" : "v5.34.3",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.38",
    "x_spdx_expression" : "Artistic-2.0"
 }
 

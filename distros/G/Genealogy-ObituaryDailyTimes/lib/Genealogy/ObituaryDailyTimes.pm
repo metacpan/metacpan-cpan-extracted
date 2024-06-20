@@ -13,11 +13,11 @@ Genealogy::ObituaryDailyTimes - Lookup an entry in the Obituary Daily Times
 
 =head1 VERSION
 
-Version 0.11
+Version 0.12
 
 =cut
 
-our $VERSION = '0.11';
+our $VERSION = '0.12';
 
 =head1 SYNOPSIS
 
@@ -38,8 +38,7 @@ Takes two optional arguments:
 =cut
 
 sub new {
-	my $class = $_[0];
-	shift;
+	my $class = shift;
 	my %args = (ref($_[0]) eq 'HASH') ? %{$_[0]} : @_;
 
 	if(!defined($class)) {
@@ -54,7 +53,7 @@ sub new {
 		return bless { %{$class}, %args }, ref($class);
 	}
 
-	if(!(my $directory = $args{'directory'})) {
+	if(!defined((my $directory = ($args{'directory'} || $Database::Abstraction::init->{'directory'})))) {
 		# If the directory argument isn't given, see if we can find the data
 		$directory ||= Module::Info->new_from_loaded(__PACKAGE__)->file();
 		$directory =~ s/\.pm$//;
@@ -128,10 +127,14 @@ sub _create_url {
 	}
 
 	if($source eq 'M') {
-		return "https://mlarchives.rootsweb.com/listindexes/emails?listname=gen-obit&page=$page";
+		# return "https://mlarchives.rootsweb.com/listindexes/emails?listname=gen-obit&page=$page";
+		return "https://wayback.archive-it.org/20669/20231102044925/https://mlarchives.rootsweb.com/listindexes/emails?listname=gen-obit&page=$page";
 	}
 	if($source eq 'F') {
 		return "https://www.freelists.org/post/obitdailytimes/Obituary-Daily-Times-$page";
+	}
+	if($source eq 'L') {
+		return $obit->{'newspaper'};
 	}
 	Carp::croak(__PACKAGE__, ": Invalid source, '$source'");
 }

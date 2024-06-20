@@ -1,0 +1,94 @@
+NAME
+
+    Data::Checks - XS functions to assist in value constraint checking
+
+DESCRIPTION
+
+    Eventually this module will provide functions that implement various
+    value constraint checking behaviours.
+
+    Currently it does not contain anything directly visible to end-user
+    Perl code, but instead only provides the underlying common framework XS
+    functions to assist in writing modules that actually implement such
+    constraint checking. It is unlikely to be useful to end-users at this
+    time.
+
+XS FUNCTIONS
+
+    The following functions are provided by the DataChecks.h header file
+    for use in XS modules that implement value constraint checking.
+
+ boot_data_checks
+
+       void boot_data_checks(double ver);
+
+    Call this function from your BOOT section in order to initialise the
+    module and load the rest of the support functions.
+
+    ver should either be 0 or a decimal number for the module version
+    requirement; e.g.
+
+       boot_data_checks(0.01);
+
+ make_checkdata
+
+       struct DataChecks_Checker *make_checkdata(SV *checkspec);
+
+    Creates a struct DataChecks_Checker structure, which wraps the intent
+    of the value constraint check. The returned value is used as the
+    checker argument for the remaining functions.
+
+    The constraint check itself is specified by the SV given by checkspec,
+    which should come directly from the user code. The constraint check may
+    be specified in any of three ways:
+
+      * An object reference in a class which has a check method. Value
+      checks will be invoked as
+
+         $ok = $checkerobj->check( $value );
+
+      * A package name as a plain string of a package which has a check
+      method. Value checks will be invoked as
+
+         $ok = $checkrpkg->check( $value );
+
+      * A code reference. Value checks will be invoked with a single
+      argument, as
+
+         $ok = $checkersub->( $value );
+
+    Once constructed into a checker structure, the choice of which
+    implementation is used is fixed, and if a method lookup is involved its
+    result is stored directly as a CV pointer for efficiency of later
+    invocations.
+
+ make_assertop
+
+       OP *make_assertop(struct DataChecks_Checker *checker, OP *argop);
+
+    Creates an optree fragment for a value check assertion operation.
+
+    Given an optree fragment in scalar context that generates an argument
+    value (argop), constructs a larger optree fragment that consumes it and
+    checks that the value passes the constraint check given by checker. The
+    returned optree fragment will operate in void context (i.e. it does not
+    yield the argument value itself).
+
+ check_value
+
+       bool check_value(struct DataChecks_Checker *checker, SV *value);
+
+    Checks whether a given SV passes the given constraint check, returning
+    true if so, or false if not.
+
+ assert_value
+
+       void assert_value(struct DataChecks_Checker *checker, SV *value);
+
+    Checks whether a given SV passes the given constraint check, throwing
+    its assertion message if it does not.
+
+AUTHOR
+
+    Paul Evans <leonerd@leonerd.org.uk>
+

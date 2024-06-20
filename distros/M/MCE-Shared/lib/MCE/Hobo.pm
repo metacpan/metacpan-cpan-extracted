@@ -13,7 +13,7 @@ no warnings qw( threads recursion uninitialized once redefine );
 
 package MCE::Hobo;
 
-our $VERSION = '1.890';
+our $VERSION = '1.891';
 
 ## no critic (BuiltinFunctions::ProhibitStringyEval)
 ## no critic (Subroutines::ProhibitExplicitReturnUndef)
@@ -85,6 +85,17 @@ sub _max_workers {
 
 bless my $_SELF = { MGR_ID => "$$.$_tid", WRK_ID => $$ }, __PACKAGE__;
 
+sub MCE::Hobo::_guard::DESTROY {
+   my ($pkg, $id) = @{ $_[0] };
+
+   if (defined $pkg && $id eq "$$.$_tid") {
+      @{ $_[0] } = ();
+      MCE::Hobo->finish($pkg);
+   }
+
+   return;
+}
+
 sub init {
    shift if ( defined $_[0] && $_[0] eq __PACKAGE__ );
 
@@ -142,7 +153,9 @@ sub init {
    require POSIX
       if ( $mngd->{on_finish} && !$INC{'POSIX.pm'} && !$_is_MSWin32 );
 
-   return;
+   defined wantarray
+      ? bless([$pkg, "$$.$_tid"], MCE::Hobo::_guard::)
+      : ();
 }
 
 ###############################################################################
@@ -350,7 +363,7 @@ sub finish {
    _croak('Usage: MCE::Hobo->finish()') if ref($_[0]);
    shift if ( defined $_[0] && $_[0] eq __PACKAGE__ );
 
-   my $pkg = defined($_[0]) ? $_[0] : caller();
+   my $pkg = defined($_[0]) ? shift : "$$.$_tid.".caller();
 
    if ( $pkg eq 'MCE' ) {
       for my $key ( keys %{ $_LIST } ) { MCE::Hobo->finish($key); }
@@ -997,7 +1010,7 @@ MCE::Hobo - A threads-like parallelization module
 
 =head1 VERSION
 
-This document describes MCE::Hobo version 1.890
+This document describes MCE::Hobo version 1.891
 
 =head1 SYNOPSIS
 
@@ -1286,7 +1299,10 @@ processes not yet joined.
 
 The init function accepts a list of MCE::Hobo options.
 
- MCE::Hobo->init(
+In scalar context (API available since 1.891), call C<MCE::Hobo->finish>
+automatically upon leaving the scope or program.
+
+ my $guard = MCE::Hobo->init(
      max_workers => 'auto',   # default undef, unlimited
 
      # Specify a percentage. MCE::Hobo 1.874+.

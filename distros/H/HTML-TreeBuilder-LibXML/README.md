@@ -59,7 +59,7 @@ id:dailyflower
 
 # SEE ALSO
 
-[HTML::TreeBuilder](https://metacpan.org/pod/HTML::TreeBuilder), [HTML::TreeBuilder::XPath](https://metacpan.org/pod/HTML::TreeBuilder::XPath)
+[HTML::TreeBuilder](https://metacpan.org/pod/HTML%3A%3ATreeBuilder), [HTML::TreeBuilder::XPath](https://metacpan.org/pod/HTML%3A%3ATreeBuilder%3A%3AXPath)
 
 # LICENSE
 

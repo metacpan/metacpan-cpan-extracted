@@ -61,23 +61,23 @@
    "provides" : {
       "Authorization::AccessControl" : {
          "file" : "lib/Authorization/AccessControl.pm",
-         "version" : "0.03"
+         "version" : "0.04"
       },
       "Authorization::AccessControl::ACL" : {
          "file" : "lib/Authorization/AccessControl/ACL.pm",
-         "version" : "0.03"
+         "version" : "0.04"
       },
       "Authorization::AccessControl::Dispatch" : {
          "file" : "lib/Authorization/AccessControl/Dispatch.pm",
-         "version" : "0.03"
+         "version" : "0.04"
       },
       "Authorization::AccessControl::Grant" : {
          "file" : "lib/Authorization/AccessControl/Grant.pm",
-         "version" : "0.03"
+         "version" : "0.04"
       },
       "Authorization::AccessControl::Request" : {
          "file" : "lib/Authorization/AccessControl/Request.pm",
-         "version" : "0.03"
+         "version" : "0.04"
       }
    },
    "release_status" : "stable",
@@ -91,7 +91,7 @@
          "web" : "https://github.com/tyrrminal/authorization-accesscontrol.git"
       }
    },
-   "version" : "0.03",
+   "version" : "0.04",
    "x_generated_by_perl" : "v5.38.2",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.37",
    "x_spdx_expression" : "MIT"

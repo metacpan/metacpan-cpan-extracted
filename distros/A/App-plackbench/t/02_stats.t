@@ -36,12 +36,10 @@ sub test_insert {
     my $stats = App::plackbench::Stats->new(10);
 
     $stats->insert(9);
-    cmp_deeply($stats, noclass([9, 10]), 'should insert the new number in the list');
-
     $stats->insert(12);
-    cmp_deeply($stats, noclass([9, 10, 12]), 'should insert the new number in the list in the right order');
-
     $stats->insert(11);
+    $stats->finalize;
+
     cmp_deeply($stats, noclass([9, 10, 11, 12]), 'should insert the new number in the list in the right order');
 
     return;
