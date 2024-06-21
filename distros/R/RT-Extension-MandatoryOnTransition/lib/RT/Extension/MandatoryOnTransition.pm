@@ -2,7 +2,7 @@ use strict;
 use warnings;
 package RT::Extension::MandatoryOnTransition;
 
-our $VERSION = '0.23';
+our $VERSION = '0.24';
 
 =head1 NAME
 
@@ -143,13 +143,14 @@ For example,
 
     Set( %MandatoryOnTransition,
         'MyQueue' => {
-            '__CREATE__ -> open' => [ 'CF.MyField1' ],
+            '__CREATE__ -> new' => [ 'CF.MyField1' ],
             '* -> open' => [ 'CF.MyField2', 'CF.MyField3' ],
         },
     );
 
 would require C<CF.MyField1> on ticket creation and C<CF.MyField2> and
-C<CF.MyField3> on any other transition to C<open>.
+C<CF.MyField3> on any other transition to C<open>. The C<to> status for
+CREATE rules must be a valid create status in the lifecycle.
 
 The fallback for queues without specific rules is specified with C<'*'> where
 the queue name would normally be.
@@ -676,6 +677,16 @@ sub CheckMandatoryFields {
                     # RT can automatically create users with email addresses.
                     if ( $value =~ /@/ ) {
                         push @role_values, $value;
+                    } elsif ( $value =~ /^group:(.+)$/ ) {
+                        my $group = RT::Group->new( RT->SystemUser );
+                        my $group_name = $1;
+                        my ( $ret, $msg ) = $group->LoadUserDefinedGroup($group_name);
+                        unless ( $ret ) {
+                            push @errors, $CurrentUser->loc( "Could not load group: [_1]", $group_name );
+                        }
+                        else {
+                            push @role_values, $group;
+                        }
                     }
                     else {
                         push @errors, $CurrentUser->loc( "Could not load user: [_1]", $value );
@@ -996,7 +1007,7 @@ or via the web at
 
 =head1 LICENSE AND COPYRIGHT
 
-This software is Copyright (c) 2012-2023 by Best Pracical Solutions, LLC.
+This software is Copyright (c) 2012-2024 by Best Pracical Solutions, LLC.
 
 This is free software, licensed under:
 

@@ -5,9 +5,6 @@ use warnings;
 use Test::More;
 use e;
 
-binmode *STDOUT, "encoding(UTF-8)";
-binmode *STDERR, "encoding(UTF-8)";
-
 sub run {
     my $out = "";
 
@@ -16,6 +13,7 @@ sub run {
         local *STDERR;
         open STDOUT, ">",  \$out or die $!;
         open STDERR, ">>", \$out or die $!;
+        utf8;
         eval { shift->() };
     }
 
@@ -124,6 +122,16 @@ is
 is
   scalar dec( "\x{D7}\x{90}" ) =~ /\w/, 1,
   "dec - is word";
+
+is
+    length(run( sub{ say dec "\x{D7}\x{90}" } )),
+    3,
+    "dec - no wide char warning";
+
+is
+    length(run( sub{ say "\x{5D0}" } )),
+    3,
+    "dec - no wide char warning";
 
 ######################################
 #          Enhanced Types

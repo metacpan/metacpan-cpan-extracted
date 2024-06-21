@@ -1,5 +1,25 @@
 Revision history for Data-Enum:
 
+v0.4.0    2024-06-20 13:30:56+01:00 Europe/London
+  [Enhancements]
+  - Use a shared method for MATCH.
+
+  - Added explicit as_string method.
+
+  - All instances of classes have Data::Enum as a parent.
+
+  - Internal code improvements.
+
+  [Documentation]
+  - Emphasised that value order does not matter in the SYNOPSIS.
+
+  - Adjusted the wording related to the new predicate prefix option.
+
+  - Clarified that predicates return 0 for false, not an empty string.
+
+  [Other]
+  - Added a benchmark script for development.
+
 v0.3.0    2024-06-19 17:31:12+01:00 Europe/London
   [Enhancements]
   - Added the "prefix" constructor option and method.

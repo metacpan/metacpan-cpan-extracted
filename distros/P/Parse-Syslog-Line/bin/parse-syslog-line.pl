@@ -9,7 +9,7 @@ use Getopt::Long::Descriptive;
 use Pod::Usage;
 use JSON::MaybeXS;
 use Parse::Syslog::Line qw( parse_syslog_line );
-use YAML;
+use YAML::XS;
 
 my $enc;
 my %formats = (
@@ -23,7 +23,7 @@ my %formats = (
         print $enc->encode($_[0]);
     },
     yaml => sub {
-        print YAML::Dump($_[0]);
+        print YAML::XS::Dump($_[0]);
     },
 );
 my ($opt,$usage) = describe_options("%c %o",
@@ -80,7 +80,7 @@ parse-syslog-line.pl - Parse a syslog message and display the structured data
 
 =head1 VERSION
 
-version 5.1
+version 5.3
 
 =head1 SYNOPSIS
 

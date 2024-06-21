@@ -20,7 +20,7 @@ name: File-Slurper-Temp
 provides:
   File::Slurper::Temp:
     file: lib/File/Slurper/Temp.pm
-    version: '0.009'
+    version: '0.010'
 requires:
   Carp: '1.12'
   Exporter: '5.57'
@@ -33,7 +33,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=File-Slurper-Temp
   homepage: https://metacpan.org/release/File-Slurper-Temp
   repository: git://github.com/perlancar/perl-File-Slurper-Temp.git
-version: '0.009'
+version: '0.010'
 x_Dist_Zilla:
   perl:
     version: '5.038002'

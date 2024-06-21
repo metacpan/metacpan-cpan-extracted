@@ -18,7 +18,7 @@ my %module_build_args = (
     "Kathryn Andersen <perlkat\@katspace.org>"
   ],
   "dist_name" => "File-Sticker",
-  "dist_version" => "3.0101",
+  "dist_version" => "3.0204",
   "license" => "perl",
   "module_name" => "File::Sticker",
   "recursive_test_files" => 1,

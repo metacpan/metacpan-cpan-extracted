@@ -1,5 +1,8 @@
 Revision history for Syntax-Construct
 
+1.037   2024-06-20
+        - Fix turkic casing: reset original locale
+
 1.036   2024-06-12
         - Fix treating some stable versions as unstable
 

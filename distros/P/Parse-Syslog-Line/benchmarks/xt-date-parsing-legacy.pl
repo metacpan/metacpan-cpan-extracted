@@ -8,7 +8,7 @@ use DateTime::Format::HTTP;
 use HTTP::Date;
 use Time::Moment;
 use Time::Piece;
-use YAML;
+use YAML::XS;
 
 my %dates;
 while(<DATA>) {

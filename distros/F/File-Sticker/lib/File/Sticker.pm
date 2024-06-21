@@ -1,12 +1,12 @@
 package File::Sticker;
-$File::Sticker::VERSION = '3.0101';
+$File::Sticker::VERSION = '3.0204';
 =head1 NAME
 
 File::Sticker - Read, Write file meta-data
 
 =head1 VERSION
 
-version 3.0101
+version 3.0204
 
 =head1 SYNOPSIS
 
@@ -610,6 +610,11 @@ sub derive_values {
         if (!$meta->{linkdate})
         {
             $meta->{linkdate} = $meta->{filedate};
+        }
+        if (!$meta->{date_added})
+        {
+            $meta->{date_added} =
+            ($meta->{date} ? $meta->{date} : $meta->{filedate});
         }
     }
 

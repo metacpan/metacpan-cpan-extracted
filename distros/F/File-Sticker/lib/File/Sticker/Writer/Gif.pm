@@ -1,12 +1,12 @@
 package File::Sticker::Writer::Gif;
-$File::Sticker::Writer::Gif::VERSION = '3.0101';
+$File::Sticker::Writer::Gif::VERSION = '3.0204';
 =head1 NAME
 
 File::Sticker::Writer::Gif - write and standardize meta-data from GIF file
 
 =head1 VERSION
 
-version 3.0101
+version 3.0204
 
 =head1 SYNOPSIS
 

@@ -1,5 +1,5 @@
 ---
-abstract: 'SCS archive controller'
+abstract: 'Read the contents of SCS union mount archives (HashFS)'
 author:
   - 'nautofon <nautofon@cpan.org>'
 build_requires:
@@ -26,36 +26,36 @@ no_index:
 provides:
   Archive::SCS:
     file: lib/Archive/SCS.pm
-    version: '1.03'
+    version: '1.04'
   Archive::SCS::CityHash:
     file: lib/Archive/SCS/CityHash.pm
-    version: '1.03'
+    version: '1.04'
   Archive::SCS::DirIndex:
     file: lib/Archive/SCS/DirIndex.pm
-    version: '1.03'
+    version: '1.04'
   Archive::SCS::GameDir:
     file: lib/Archive/SCS/GameDir.pm
-    version: '1.03'
+    version: '1.04'
   Archive::SCS::HashFS:
     file: lib/Archive/SCS/HashFS.pm
-    version: '1.03'
+    version: '1.04'
   Archive::SCS::HashFS2:
     file: lib/Archive/SCS/HashFS2.pm
-    version: '1.03'
+    version: '1.04'
   Archive::SCS::InMemory:
     file: lib/Archive/SCS/InMemory.pm
-    version: '1.03'
+    version: '1.04'
   Archive::SCS::Mountable:
     file: lib/Archive/SCS/Mountable.pm
-    version: '1.03'
+    version: '1.04'
   Archive::SCS::TObj:
     file: lib/Archive/SCS/TObj.pm
-    version: '1.03'
+    version: '1.04'
 requires:
   Compress::Raw::Zlib: '2.048'
   List::Util: '1.45'
   Object::Pad: '0.73'
-  Path::Tiny: '0.119'
+  Path::Tiny: '0.125'
   builtin::Backport: '0'
   perl: '5.032'
   stable: '0.031'
@@ -63,5 +63,5 @@ resources:
   bugtracker: https://forum.scssoft.com/viewtopic.php?t=330746
   homepage: https://forum.scssoft.com/viewtopic.php?t=330746
   repository: git://github.com/nautofon/Archive-SCS.git
-version: '1.03'
+version: '1.04'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

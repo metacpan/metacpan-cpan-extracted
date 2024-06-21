@@ -1,5 +1,13 @@
 Revision history for perl distribution Archive-SCS
 
+1.04 - 2024-06-20
+
+  - Harden scs_archive tool against path traversal (CWE-22)
+
+  - Release fix: Up the required version of Path::Tiny to 0.125 from 0.119
+
+  - Improve tests and documentation
+
 1.03 - 2024-06-01
 
   - Fix CLI tool: Output files in the same order they were requested in

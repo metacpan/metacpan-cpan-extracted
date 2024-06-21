@@ -14,7 +14,7 @@ my $changes_file = "$FindBin::Bin/../Changes";
 ok open my $CH, '<', $changes_file;
 
 my $date_re = qr/\d{4}-\d{2}-\d{2}/;
-my $version_re = qr/\d\.\d{2,3}/;
+my $version_re = qr/\d\.\d{2,3}(?:_\d{2,3})?/;
 my ($found, $format) = (0, 1);
 my $most_recent;
 while (<$CH>) {

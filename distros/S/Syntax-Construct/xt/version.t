@@ -19,7 +19,7 @@ while (<$source>) {
     } elsif (/^=head1/) {
         undef $in_version;
     }
-    if ($in_version && /^Version ([0-9.]+)/) {
+    if ($in_version && /^Version ([0-9._]+)/) {
         is($code_version, $1, 'pod version');
     }
 }

@@ -6,7 +6,7 @@ name 'Config-ROFL';
 abstract 'Yet another config module';
 author q{Nicolas Mendoza <mendoza@pvv.ntnu.no>};
 license 'perl';
-version '1.10';
+version '1.11';
 
 configure_requires 'Module::Install';
 

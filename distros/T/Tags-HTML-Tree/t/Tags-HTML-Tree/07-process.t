@@ -3,7 +3,7 @@ use warnings;
 
 use Tags::HTML::Tree;
 use Tags::Output::Structure;
-use Test::More 'tests' => 5;
+use Test::More 'tests' => 6;
 use Test::NoWarnings;
 use Tree;
 
@@ -128,6 +128,42 @@ is_deeply(
 		['e', 'ul'],
 	],
 	'Tags code for Tree (root with advanced structure).',
+);
+
+# Test.
+$tags = Tags::Output::Structure->new;
+$obj = Tags::HTML::Tree->new(
+	'cb_value' => sub {
+		my ($self, $tree) = @_;
+
+		# Tree value in italic element.
+		$self->{'tags'}->put(
+			['b', 'i'],
+			['d', $tree->value],
+			['e', 'i'],
+		);
+
+		return;
+	},
+	'tags' => $tags,
+);
+$tree = Tree->new('Root');
+$obj->init($tree);
+$obj->process;
+$ret_ar = $tags->flush(1);
+is_deeply(
+	$ret_ar,
+	[
+		['b', 'ul'],
+		['a', 'class', 'tree'],
+		['b', 'li'],
+		['b', 'i'],
+		['d', 'Root'],
+		['e', 'i'],
+		['e', 'li'],
+		['e', 'ul'],
+	],
+	'Tags code for Tree (only root element with explicit cb_value).',
 );
 
 # Test.

@@ -1,7 +1,10 @@
 Revision history for RT-Extension-MandatoryOnTransition
 
-0.23 2023-03-16
+0.24 2024-06-20
+ - Parse group values on role related validations
+ - Clarify the example "to" status for __CREATE__ rules
 
+0.23 2023-03-16
  - Do not render cf inputs if RT::Extension::CustomFieldsOnUpdate is on
  - Add support for CF type Binary/Image
 

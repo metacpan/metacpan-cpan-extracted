@@ -4,7 +4,7 @@
       "Hoe Kit CHEW <hoekit@gmail.com>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.62, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "artistic_2"
    ],
@@ -45,6 +45,6 @@
       }
    },
    "release_status" : "stable",
-   "version" : "v0.0.6",
-   "x_serialization_backend" : "JSON::PP version 2.97001"
+   "version" : "v0.0.7",
+   "x_serialization_backend" : "JSON::PP version 4.06"
 }

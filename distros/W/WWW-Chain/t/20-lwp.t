@@ -13,7 +13,7 @@ my $server = Test::HTTP::Server->new();
 my $ua = WWW::Chain::UA::LWP->new;
 isa_ok($ua,'WWW::Chain::UA::LWP');
 
-my $chain = WWW::Chain->new(HTTP::Request->new( GET => $server->uri.'echo' ), sub {
+my $chain = www_chain(HTTP::Request->new( GET => $server->uri.'echo' ), sub {
 	isa_ok($_[0],'WWW::Chain');
 	$_[0]->stash->{a} = 1;
 	ok(!$_[0]->done,'Chain is not done');

@@ -1,5 +1,8 @@
 Revision history for File-Edit
 
+0.0.7   21 Jun, 2024
+        Fixed ticket: https://rt.cpan.org/Ticket/Display.html?id=147848
+
 0.0.6   18 Apr, 2021
         Add methods at() and insert() to insert lines at a location
 

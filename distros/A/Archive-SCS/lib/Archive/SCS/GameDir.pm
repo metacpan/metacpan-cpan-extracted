@@ -2,7 +2,7 @@ use v5.32;
 use warnings;
 use Object::Pad 0.73;
 
-class Archive::SCS::GameDir 1.03;
+class Archive::SCS::GameDir 1.04;
 
 use builtin 'trim';
 use stable 0.031 'isa';
@@ -237,6 +237,12 @@ if the search was unsuccessful.
 Returns an abbreviation for the game name (like C<ATS>),
 or C<undef> if the search was unsuccessful.
 
+=head2 library_paths
+
+  @steam_paths = $gamedir->library_paths;
+
+Returns the current list of paths to search for the Steam library.
+
 =head2 mounted
 
   $scs = $gamedir->mounted;
@@ -261,12 +267,6 @@ Will call C<find()> with the given game as argument.
 
 Returns a L<Path::Tiny> object for the game directory,
 or C<undef> if the search was unsuccessful.
-
-=head2 library_paths
-
-  @steam_paths = $gamedir->library_paths;
-
-Returns the current list of paths to search for the Steam library.
 
 =head2 set_library_paths
 

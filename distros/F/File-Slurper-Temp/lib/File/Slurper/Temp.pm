@@ -11,7 +11,7 @@ use File::Temp ();
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
 our $DATE = '2024-06-17'; # DATE
 our $DIST = 'File-Slurper-Temp'; # DIST
-our $VERSION = '0.009'; # VERSION
+our $VERSION = '0.010'; # VERSION
 
 our @EXPORT_OK = qw(
                        write_text write_binary
@@ -109,7 +109,7 @@ File::Slurper::Temp - File::Slurper + File::Temp
 
 =head1 VERSION
 
-This document describes version 0.009 of File::Slurper::Temp (from Perl distribution File-Slurper-Temp), released on 2024-06-17.
+This document describes version 0.010 of File::Slurper::Temp (from Perl distribution File-Slurper-Temp), released on 2024-06-17.
 
 =head1 SYNOPSIS
 

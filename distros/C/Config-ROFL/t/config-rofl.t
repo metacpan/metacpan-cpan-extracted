@@ -135,13 +135,12 @@ subtest 'Shared directories' => sub {
 
 subtest 'Using dist as parameter' => sub {
   my $c = Config::ROFL->new( lookup_order => ['by_dist'], dist => 'File-Share' );
-  like $c->share_file, qr{auto/File/Share}, 'Correct share dir when setting dist to external module';
+  like $c->share_file, qr{auto/File/Share|site/share}, 'Correct share dir when setting dist to external module';
 };
 
 subtest 'sub-class' => sub {
   require "$Bin/test-subclass/lib/Foo/Config.pm";
   my $c = Foo::Config->new();
-  diag explain $c->config;
   is $c->get('foo'), 'bar', 'Correct value';
 };
 
@@ -150,8 +149,6 @@ subtest 'Test prefix ENV config values' => sub {
   local $ENV{MYPREFIX_KEY}            = 'Some value';
 
   my $c = Config::ROFL->new( envvar_prefix => 'MYPREFIX' );
-
-  diag explain $c->config;
 
   is $c->get('key'), 'Some value', 'Got value from environment'
 };

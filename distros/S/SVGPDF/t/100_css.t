@@ -7,7 +7,7 @@ my $css = SVGPDF::CSS->new;
 
 is_deeply( $css->base,
 	   {
-	    'background-color'	=> 'white',
+	    'background-color'	=> 'none',
 	    color		=> 'black',
 	    fill		=> 'currentColor',
 	    'font-family'	=> 'serif',

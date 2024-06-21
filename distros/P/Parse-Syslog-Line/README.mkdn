@@ -4,7 +4,7 @@ Parse::Syslog::Line - Simple syslog line parser
 
 # VERSION
 
-version 5.1
+version 5.3
 
 # SYNOPSIS
 
@@ -43,6 +43,7 @@ parsed out.
     #       message         => 'program[pid]: the rest of the message',
     #       message_raw     => 'The message as it was passed',
     #       ntp             => 'ok',        # Only set for Cisco messages
+    #       version         => 1,
     #       SDATA           => { ... },     # RFC Structured data, decoded JSON, or K/V Pairs in the message
     # };
     ...

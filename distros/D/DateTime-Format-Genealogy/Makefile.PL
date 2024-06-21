@@ -28,7 +28,6 @@ WriteMakefile(
 		'warnings' => 0,
 		'WWW::RT::CPAN' => 0
 	}, PREREQ_PM => {
-		'namespace::clean' => 0,
 		'Carp' => 0,
 		'DateTime::Format::Natural' => 0,
 		'Genealogy::Gedcom::Date' => 2.01,

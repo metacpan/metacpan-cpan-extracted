@@ -162,7 +162,7 @@ SpeL::I18n - Base class for localizations
 
 =head1 VERSION
 
-version 20240619.1846
+version 20240620.1922
 
 =head1 SYNOPSYS
 

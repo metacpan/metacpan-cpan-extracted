@@ -11,6 +11,7 @@ README.md
 SIGNATURE
 cpanfile
 dist.ini
+eg/benchmark.pl
 lib/Data/Enum.pm
 t/00-report-prereqs.dd
 t/00-report-prereqs.t

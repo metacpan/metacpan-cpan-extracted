@@ -6,4 +6,4 @@ use Test::More 'tests' => 2;
 use Test::NoWarnings;
 
 # Test.
-is($Tags::HTML::Tree::VERSION, 0.05, 'Version.');
+is($Tags::HTML::Tree::VERSION, 0.06, 'Version.');

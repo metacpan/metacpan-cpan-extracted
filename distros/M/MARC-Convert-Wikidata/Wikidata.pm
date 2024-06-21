@@ -12,7 +12,7 @@ use MARC::Convert::Wikidata::Transform;
 use MARC::Leader;
 use Scalar::Util qw(blessed);
 
-our $VERSION = 0.07;
+our $VERSION = 0.08;
 
 # Constructor.
 sub new {
@@ -81,15 +81,15 @@ sub type {
 
 	# Language material
 	if ($leader_obj->type eq 'a' && $leader_obj->bibliographic_level eq 'm') {
-		return 'monograph';
+		return 'monograph_text';
 
-	# XXX Notated music
+	# Notated music
 	} elsif ($leader_obj->type eq 'c' && $leader_obj->bibliographic_level eq 'm') {
-		return 'monograph';
+		return 'monograph_music';
 
 	# Nonmusical sound recording
 	} elsif ($leader_obj->type eq 'i' && $leader_obj->bibliographic_level eq 'm') {
-		return 'audiobook';
+		return 'monograph_audiobook';
 
 	# Serial
 	} elsif ($leader_obj->bibliographic_level eq 's') {
@@ -116,11 +116,11 @@ sub wikidata {
 
 	my $wikidata;
 	my $marc_type = $self->type;
-	if ($marc_type eq 'monograph') {
+	if ($marc_type eq 'monograph_text') {
 		$wikidata = MARC::Convert::Wikidata::Item::BookEdition->new(
 			%params,
 		)->wikidata;
-	} elsif ($marc_type eq 'audiobook') {
+	} elsif ($marc_type eq 'monograph_audiobook') {
 		$wikidata = MARC::Convert::Wikidata::Item::AudioBook->new(
 			%params,
 		)->wikidata;
@@ -502,12 +502,12 @@ L<http://skim.cz>
 
 =head1 LICENSE AND COPYRIGHT
 
-© 2021-2023 Michal Josef Špaček
+© 2021-2024 Michal Josef Špaček
 
 BSD 2-Clause License
 
 =head1 VERSION
 
-0.07
+0.08
 
 =cut

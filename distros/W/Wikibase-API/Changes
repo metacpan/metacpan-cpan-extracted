@@ -1,3 +1,13 @@
+0.05 2024-06-21T10:49:24+02:00
+ - Add constructor tests.
+ - Add summary to create_item().
+ - Fix depdendencies.
+ - Fix error output, could be utf8.
+ - Improve doc in Wikibase::API.
+ - Sort Wikibase::API parameters in code and doc.
+ - Update Module::Install to 1.21 version.
+ - Update copyright years.
+
 0.04 2023-04-23T18:38:49+02:00
  - Add support for property.
  - Document get_item_raw() and add example to doc.

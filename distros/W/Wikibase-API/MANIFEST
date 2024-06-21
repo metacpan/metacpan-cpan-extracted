@@ -23,8 +23,10 @@ README
 SIGNATURE
 t/Wikibase-API-Resolve/01-use.t
 t/Wikibase-API-Resolve/02-version.t
+t/Wikibase-API-Resolve/03-new.t
 t/Wikibase-API/01-use.t
 t/Wikibase-API/02-version.t
+t/Wikibase-API/03-new.t
 xt/Wikibase-API-Resolve/01-pod_coverage.t
 xt/Wikibase-API-Resolve/02-pod.t
 xt/Wikibase-API/01-pod_coverage.t

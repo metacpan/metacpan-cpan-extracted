@@ -3,8 +3,8 @@
 # Author          : Johan Vromans
 # Created On      : Wed Jul  5 09:14:28 2023
 # Last Modified By: 
-# Last Modified On: Fri Dec 22 10:41:37 2023
-# Update Count    : 238
+# Last Modified On: Fri Jun 21 10:26:29 2024
+# Update Count    : 244
 # Status          : Unknown, Use with caution!
 
 ################ Common stuff ################
@@ -34,6 +34,7 @@ my $api = "PDF::API2";		# or PDF::Builder
 my $pagesize;
 my $ppi = 96;			# pixels per inch
 my $fontsize = 12;		# design
+my $background;
 my $wstokens = 0;
 my $combine = "none";		# combine multiple into one
 my $grid;			# add grid
@@ -64,11 +65,27 @@ app_ident() if $ident;
 
 my $pdf = $api->new;
 $api->add_to_font_path($ENV{HOME}."/.fonts");
-my $page = $pdf->page;
-$page->size( [ 0, 0, @pgsz ] );
-my $gfx = $page->gfx;
-my $x = 10;
-my $y = $pgsz[1]-10;
+
+my $page;
+my $gfx;
+my $x;
+my $y;
+
+sub newpage {
+    $page = $pdf->page;
+    $page->size( [ 0, 0, @pgsz ] );
+    $gfx = $page->gfx;
+    $x = 10;
+    $y = $pgsz[1]-10;
+    if ( $background ) {
+	$gfx->save;
+	$gfx->rectangle( 0, 0, @pgsz );
+	$gfx->fillcolor($background);
+	$gfx->fill;
+	$gfx->restore;
+    }
+}
+newpage();
 
 foreach my $file ( @ARGV ) {
     my $p = SVGPDF->new
@@ -134,13 +151,7 @@ foreach my $file ( @ARGV ) {
 	    $yscale *= $scale;
 	}
 
-	if ( $y - $h * $yscale < 0 ) {
-	    $page = $pdf->page;
-	    $page->size( [ 0, 0, @pgsz ] );
-	    $gfx = $page->gfx;
-	    $x = 10;
-	    $y = $pgsz[1]-10;
-	}
+	newpage() if $y - $h * $yscale < 0;
 	warn(sprintf("object %d [ %.2f, %.2f %s] ( %.2f, %.2f, %.2f, %.2f @%.g,%.g )\n",
 		     $i, $w, $h,
 		     $xo->{vwidth}
@@ -148,7 +159,6 @@ foreach my $file ( @ARGV ) {
 		     : "",
 		     $x, $y-$h*$yscale, $w, $h, $xscale, $yscale ))
 	  if $verbose;
-
 	$gfx->object( $xo->{xo}, $x-$bb[0]*$xscale,
 		      $y-($bb[1]+$h)*$yscale, $xscale, $yscale );
 	if ( $test ) {
@@ -203,6 +213,7 @@ sub app_options {
 		     'pagesize=s' => \$pagesize,
 		     'ppi=i'    => \$ppi,
 		     'fontsize=f' => \$fontsize,
+		     'background=s' => \$background,
 		     'ws!'	=> \$wstokens,
 		     'ident'	=> \$ident,
 		     'verbose|v+'	=> \$verbose,
@@ -242,6 +253,7 @@ Usage: $0 [options] [svg-file ...]
    --combine=XXX	combine (none, stacked, bbox)
    --grid=N             provides a grid with spacing N
    --nows               ignore whitespace tokens
+   --[no]test		shows position guides (enabled by default)
    --ident		shows identification
    --help		shows a brief help message and exits
    --verbose		provides more verbose information

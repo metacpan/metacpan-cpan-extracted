@@ -237,7 +237,7 @@ txtsize = 2
 
 
 ggplot(datOMPCME, aes(x = TotWorkers, y = Time, shape = Type)) +
-  geom_point(size = 0.5, color = "red") +
+  geom_point(size = 0.5,aes(color=Type)) +
   geom_line(
     data = datOMPCME,
     aes(x = TotWorkers, y = pr2),
@@ -352,7 +352,7 @@ txtsize = 2
 
 
 ggplot(datOMPCME, aes(x = TotWorkers, y = Workers * Time, shape = Type)) +
-  geom_point(size = 0.5, color = "red") +
+  geom_point(size = 0.5,aes(color=Type)) +
   geom_line(
     data = datOMPCME,
     aes(x = TotWorkers, y = pr3),
@@ -483,8 +483,7 @@ datOpenMP$fitSpaceTime <-predict(f5,type="response")
 minTime<-datOpenMP[order(Time)][1:round(nrow(datOpenMP)*0.05)]
 minSpaceTime<-datOpenMP[order(Time*Workers)][1:round(nrow(datOpenMP)*0.05)]
 
-## find the row with the minimum Time in datOpenMP
-minTime<-datOpenMP[which.min(datOpenMP$Time),]
+
 
 ## three dimensional plots as contourplots
 

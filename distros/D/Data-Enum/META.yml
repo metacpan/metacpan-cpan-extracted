@@ -25,7 +25,7 @@ name: Data-Enum
 provides:
   Data::Enum:
     file: lib/Data/Enum.pm
-    version: v0.3.0
+    version: v0.4.0
 recommends:
   Package::Stash::XS: '0'
 requires:
@@ -39,7 +39,7 @@ requires:
 resources:
   bugtracker: https://github.com/robrwo/perl-Data-Enum/issues
   repository: git://github.com/robrwo/perl-Data-Enum.git
-version: v0.3.0
+version: v0.4.0
 x_authority: cpan:RRWO
 x_generated_by_perl: v5.34.3
 x_serialization_backend: 'YAML::Tiny version 1.74'

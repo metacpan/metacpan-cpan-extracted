@@ -1,5 +1,8 @@
 Revision history for DateTime::Format::Genealogy
 
+0.07	Thu Jun 20 07:29:46 EDT 2024
+	Handle entries with Janv (unless strict is enabled)
+
 0.06	Tue Apr 23 08:28:40 EDT 2024
 	Handle entries which have the French 'Mai' instead of the English 'May'
 	Some messages were printed even in quiet mode

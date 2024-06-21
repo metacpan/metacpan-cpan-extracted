@@ -10,7 +10,6 @@ bin/balabolka.pl
 bin/festival.pl
 bin/spel-wizard.pl
 dist.ini
-lib/SpeL/#Wizard.pm#
 lib/SpeL/I18n.pm
 lib/SpeL/I18n/en.pm
 lib/SpeL/I18n/nl.pm

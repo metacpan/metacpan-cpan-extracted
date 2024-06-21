@@ -5,7 +5,7 @@ use English;
 use Error::Pure::Utils qw(clean err_msg);
 use Tags::HTML::Tree;
 use Test::MockObject;
-use Test::More 'tests' => 15;
+use Test::More 'tests' => 16;
 use Test::NoWarnings;
 
 # Test.
@@ -20,6 +20,16 @@ eval {
 };
 is($EVAL_ERROR, "Parameter 'css' must be a 'CSS::Struct::Output::*' class.\n",
 	"Parameter 'css' must be a 'CSS::Struct::Output::*' class (bad string).");
+clean();
+
+# Test.
+eval {
+	Tags::HTML::Tree->new(
+		'cb_value' => 'bad',
+	);
+};
+is($EVAL_ERROR, "Parameter 'cb_value' must be a code.\n",
+	"Parameter 'cb_value' must be a code (bad).");
 clean();
 
 # Test.

@@ -1,7 +1,7 @@
   use strict;
   use warnings;
   package Bio::SeqAlignment::Examples::EnhancingEdlib;
-$Bio::SeqAlignment::Examples::EnhancingEdlib::VERSION = '0.02';
+$Bio::SeqAlignment::Examples::EnhancingEdlib::VERSION = '0.03';
 1;
 =head1 NAME
 
@@ -9,7 +9,7 @@ Bio::SeqAlignment::Examples::EnhancingEdlib - Parallelizing Edlib with MCE, Open
 
 =head1 VERSION
 
-version 0.02
+version 0.03
 
 =head1 SYNOPSIS
 

@@ -115,8 +115,13 @@ my %tests = (
           q("\N{ORIYA DIGIT FOUR}" =~ m'\N{ORIYA DIGIT FOUR}'), 1 ],
         [ 'turkic-casing',
           'use locale; use POSIX "locale_h";' . skippable(
-              'eval{setlocale(LC_ALL, "tr_TR.UTF-8") eq "tr_TR.UTF-8" or die;'
-                  . ' lc "I" eq "\N{LATIN SMALL LETTER DOTLESS I}"}',
+              'my $o = setlocale(LC_CTYPE);'
+              . 'eval {'
+              .    '(setlocale(LC_CTYPE, "tr_TR.UTF-8") || "") eq "tr_TR.UTF-8"'
+              .        'or die;'
+              .    'my $r = lc "I" eq "\N{LATIN SMALL LETTER DOTLESS I}";'
+              .    'setlocale(LC_CTYPE, $o);'
+              . '$r }',
               '": testing locale not supported"',
               "", '1'),
           1 ],
@@ -367,7 +372,7 @@ for my $version (keys %tests) {
                 like($load_error,
                      qr/\Q$triple->[0] removed in $removed_version/,
                      "$triple->[0] removed message");
-                ok($run_error, "$triple->[0] doens't run");
+                ok($run_error, "$triple->[0] doesn't run");
                 $count += 2;
             } else {
                 if ('SKIPPED' ne ($value || "")) {

@@ -5,7 +5,6 @@ use lib 'lib', 't/lib';
 use blib;
 use Feature::Compat::Defer;
 
-use IPC::Run3;
 use Path::Tiny 0.119;
 use Test::More;
 use TestArchiveSCS;

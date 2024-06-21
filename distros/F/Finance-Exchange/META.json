@@ -1,10 +1,10 @@
 {
    "abstract" : "represents a financial stock exchange object.",
    "author" : [
-      "binary.com <cpan@binary.com>"
+      "DERIV <DERIV@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.024, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.029, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -13,29 +13,42 @@
       "version" : 2
    },
    "name" : "Finance-Exchange",
+   "no_index" : {
+      "directory" : [
+         "eg",
+         "share",
+         "shares",
+         "t",
+         "xt"
+      ]
+   },
    "prereqs" : {
-      "build" : {
-         "requires" : {
-            "perl" : "5.010000"
-         }
-      },
       "configure" : {
          "requires" : {
-            "ExtUtils::MakeMaker" : "6.48",
+            "ExtUtils::MakeMaker" : "7.64",
             "File::ShareDir::Install" : "0.06"
          }
       },
       "develop" : {
          "requires" : {
-            "Pod::Coverage::TrustPod" : "0",
+            "Dist::Zilla" : "5",
+            "Dist::Zilla::Plugin::PerlTidy" : "0",
+            "Dist::Zilla::Plugin::Test::Perl::Critic" : "0",
+            "Dist::Zilla::PluginBundle::Author::DERIV" : "0",
+            "Software::License::Perl_5" : "0",
+            "Test::CPAN::Changes" : "0.19",
+            "Test::CPAN::Meta" : "0",
             "Test::EOL" : "0",
+            "Test::MinimumVersion" : "0",
             "Test::Mojibake" : "0",
-            "Test::More" : "0.88",
+            "Test::More" : "0.96",
+            "Test::NoTabs" : "0",
+            "Test::Perl::Critic" : "0",
             "Test::Pod" : "1.41",
-            "Test::Pod::Coverage" : "1.08",
-            "Test::Pod::LinkCheck" : "0",
-            "Test::Synopsis" : "0",
-            "Test::Version" : "1"
+            "Test::Portability::Files" : "0",
+            "Test::Version" : "1",
+            "strict" : "0",
+            "warnings" : "0"
          }
       },
       "runtime" : {
@@ -57,11 +70,21 @@
             "IO::Handle" : "0",
             "IPC::Open3" : "0",
             "Test::CheckDeps" : "0.010",
+            "Test::Deep" : "0",
             "Test::Exception" : "0",
             "Test::FailWarnings" : "0.008",
             "Test::More" : "0.98",
-            "Test::Most" : "0.34"
+            "Test::Most" : "0.34",
+            "perl" : "5.006",
+            "strict" : "0",
+            "warnings" : "0"
          }
+      }
+   },
+   "provides" : {
+      "Finance::Exchange" : {
+         "file" : "lib/Finance/Exchange.pm",
+         "version" : "0.02"
       }
    },
    "release_status" : "stable",
@@ -69,15 +92,31 @@
       "bugtracker" : {
          "web" : "https://github.com/binary-com/perl-Finance-Exchange/issues"
       },
+      "homepage" : "https://github.com/binary-com/perl-Finance-Exchange",
       "repository" : {
          "type" : "git",
-         "url" : "git://github.com/binary-com/perl-Finance-Exchange.git",
+         "url" : "https://github.com/binary-com/perl-Finance-Exchange.git",
          "web" : "https://github.com/binary-com/perl-Finance-Exchange"
       }
    },
-   "version" : "0.01",
+   "version" : "0.02",
+   "x_authority" : "cpan:DERIV",
+   "x_contributors" : [
+      "Jun Bon <junbon@binary.com>",
+      "Md Masud Rana <masud@regentmarkets.com>",
+      "Jean-Yves Sireau <jy@binary.com>",
+      "Tom Molesworth <tom@binary.com>",
+      "Yng Shan <yngshan@binary.com>",
+      "chylli-binary <52912308+chylli-binary@users.noreply.github.com>",
+      "lim-deriv <lim.kai@deriv.com>",
+      "Arun Venkataraman <arun@regentmarkets.com>",
+      "Hossein Shahsahebi <67314444+hossein-binary@users.noreply.github.com>",
+      "mukesh-deriv <85932084+mukesh-deriv@users.noreply.github.com>",
+      "Raunak Kathuria <raunakkathuria@gmail.com>",
+      "stanly-binary <stanly@binary.com>"
+   ],
    "x_generated_by_perl" : "v5.26.2",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.27",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.32",
    "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"
 }
 

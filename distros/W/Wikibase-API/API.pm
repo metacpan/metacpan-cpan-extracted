@@ -7,13 +7,13 @@ use Class::Utils qw(set_params);
 use Error::Pure qw(err);
 use JSON::XS qw(encode_json);
 use MediaWiki::API;
-use Unicode::UTF8 qw(decode_utf8);
+use Unicode::UTF8 qw(decode_utf8 encode_utf8);
 use Wikibase::Datatype::Struct::Item;
 use Wikibase::Datatype::Struct::Lexeme;
 use Wikibase::Datatype::Struct::Mediainfo;
 use Wikibase::Datatype::Struct::Property;
 
-our $VERSION = 0.04;
+our $VERSION = 0.05;
 
 # Constructor.
 sub new {
@@ -22,17 +22,17 @@ sub new {
 	# Create object.
 	my $self = bless {}, $class;
 
-	# MediaWiki::API object.
-	$self->{'mediawiki_api'} = MediaWiki::API->new;
-
-	# MediaWiki site.
-	$self->{'mediawiki_site'} = 'test.wikidata.org';
-
 	# Login name.
 	$self->{'login_name'} = undef;
 
 	# Login password.
 	$self->{'login_password'} = undef;
+
+	# MediaWiki::API object.
+	$self->{'mediawiki_api'} = MediaWiki::API->new;
+
+	# MediaWiki site.
+	$self->{'mediawiki_site'} = 'test.wikidata.org';
 
 	# Process parameters.
 	set_params($self, @params);
@@ -58,7 +58,7 @@ sub new {
 }
 
 sub create_item {
-	my ($self, $item_obj) = @_;
+	my ($self, $item_obj, $summary) = @_;
 
 	$self->_init;
 
@@ -66,6 +66,9 @@ sub create_item {
 		'action' => 'wbeditentity',
 		'new' => 'item',
 		'data' => $self->_obj2json($item_obj),
+		defined $summary ? (
+			'summary' => $summary,
+		) : (),
 		'token' => $self->{'_csrftoken'},
 	});
 	$self->_mediawiki_api_error($res, 'Cannot create item.');
@@ -83,6 +86,7 @@ sub get_item {
 		return;
 	}
 
+	# XXX Rewrite to Wikibase::Datatype::Struct
 	my $item_obj;
 	if ($struct_hr->{'type'} eq 'item') {
 		$item_obj = Wikibase::Datatype::Struct::Item::struct2obj($struct_hr);
@@ -175,7 +179,7 @@ sub _mediawiki_api_error {
 	if (! defined $res) {
 		err $message,
 			'Error code' => $self->{'mediawiki_api'}->{'error'}->{'code'},
-			'Error details' => $self->{'mediawiki_api'}->{'error'}->{'details'},
+			'Error details' => encode_utf8($self->{'mediawiki_api'}->{'error'}->{'details'}),
 		;
 	}
 
@@ -199,7 +203,7 @@ Wikibase::API - Wikibase API class.
  use Wikibase::API;
 
  my $obj = Wikibase::API->new(%params);
- my $res = $obj->create_item($item_obj);
+ my $res = $obj->create_item($item_obj, $summary);
  my $item_obj = $obj->get_item($id);
  my $struct_hr = $obj->get_item_raw($id);
 
@@ -211,21 +215,7 @@ Wikibase::API - Wikibase API class.
 
 Constructor.
 
-Returns instance of object.
-
 =over 8
-
-=item * C<mediawiki_api>
-
-MediaWiki::API object.
-
-Default value is MediaWiki::API->new.
-
-=item * C<mediawiki_site>
-
-MediaWiki site.
-
-Default value is 'test.wikidata.org'.
 
 =item * C<login_name>
 
@@ -239,14 +229,29 @@ Login password.
 
 Default value is undef.
 
+=item * C<mediawiki_api>
+
+MediaWiki::API object.
+
+Default value is MediaWiki::API->new.
+
+=item * C<mediawiki_site>
+
+MediaWiki site.
+
+Default value is 'test.wikidata.org'.
+
 =back
+
+Returns instance of object.
 
 =head2 C<create_item>
 
- my $res = $obj->create_item($item_obj)
+ my $res = $obj->create_item($item_obj, $summary);
 
 Create item in system.
 C<$item_obj> is Wikibase::Datatype::Item instance.
+C<$summary> is text comment of change.
 
 Returns reference to hash like this:
 
@@ -591,12 +596,12 @@ L<http://skim.cz>
 
 =head1 LICENSE AND COPYRIGHT
 
-© 2020-2023 Michal Josef Špaček
+© 2020-2024 Michal Josef Špaček
 
 BSD 2-Clause License
 
 =head1 VERSION
 
-0.04
+0.05
 
 =cut

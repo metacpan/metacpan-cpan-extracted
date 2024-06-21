@@ -243,6 +243,23 @@ CME:
   symbol: CME
   trading_days: weekdays
   trading_timezone: America/New_York
+CME_OTC:
+  currency: USD
+  delay_amount: '0'
+  display_name: OTC Chicago Board of Trade Exchange
+  market_times:
+    dst:
+      daily_close: 20h
+      daily_open: 13h30m
+      daily_settlement: 22h
+    partial_trading: {}
+    standard:
+      daily_close: 21h
+      daily_open: 14h30m
+      daily_settlement: 23h
+  symbol: CME_OTC
+  trading_days: weekdays
+  trading_timezone: America/New_York
 DFM:
   currency: AED
   delay_amount: '1440'
@@ -1185,6 +1202,19 @@ SGX:
       daily_open: 1h
       daily_settlement: 23h59m59s
   symbol: SGX
+  trading_days: weekdays
+  trading_timezone: Asia/Singapore
+SGX_OTC:
+  currency: SGD
+  delay_amount: '0'
+  display_name: OTC Singapore Derivatives Exchange
+  market_times:
+    partial_trading: {}
+    standard:
+      daily_close: 9h
+      daily_open: 1h
+      daily_settlement: 23h
+  symbol: SGX_OTC
   trading_days: weekdays
   trading_timezone: Asia/Singapore
 SP_GLOBAL:

@@ -31,7 +31,7 @@ sub fc_fallback {
     # Resolve from cache.
     if ( $fontcache->{$pdf}->{$key} ) {
 	# Found. Return it.
-	return $pdf->font( $fontcache->{$pdf}->{$key}, $fsize );
+	return $fontcache->{$pdf}->{$key};
     }
 
     # First, find the fc-match program.

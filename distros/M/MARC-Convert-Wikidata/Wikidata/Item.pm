@@ -18,7 +18,7 @@ use Wikibase::Datatype::Value::Quantity;
 use Wikibase::Datatype::Value::String;
 use Wikibase::Datatype::Value::Time;
 
-our $VERSION = 0.07;
+our $VERSION = 0.08;
 
 # Constructor.
 sub new {
@@ -458,6 +458,7 @@ sub wikidata_number_of_pages {
 			'snak' => Wikibase::Datatype::Snak->new(
 				'datatype' => 'quantity',
 				'datavalue' => Wikibase::Datatype::Value::Quantity->new(
+					'unit' => 'Q1069725',
 					'value' => $self->{'transform_object'}->number_of_pages,
 				),
 				'property' => 'P1104',

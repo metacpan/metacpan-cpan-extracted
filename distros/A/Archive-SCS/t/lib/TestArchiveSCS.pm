@@ -29,7 +29,8 @@ my @CMD = ( $Config{perlpath}, qw[ -Iblib/arch -Iblib/lib -Ilib ]);
 
 # The cli test using a different perl than the harness leads to trouble
 sub can_test_cli {
-  my @run = ( '-MArchive::SCS', '-we', 'print Archive::SCS->VERSION' );
+  my @run = ( '-MArchive::SCS', '-e', 'print Archive::SCS->VERSION' );
+  $ENV{AUTHOR_TESTING} and unshift @run, '-w';
   my $bin_version = eval { perl_run(@run) } // '';
   my $versions_ok = $bin_version eq Archive::SCS->VERSION
     or warn sprintf "Version mismatch (%s/%s on %s)",

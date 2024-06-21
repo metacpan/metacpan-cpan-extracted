@@ -8,26 +8,28 @@ use HTTP::Request;
 use HTTP::Response;
 
 {
-	package TestWWWChainMethods;
-	use Moo;
-	extends 'WWW::Chain';
+  package TestWWWChainMethods;
+  use Moo;
+  extends 'WWW::Chain';
 
-	sub first_request {
-		main::isa_ok($_[0],'WWW::Chain');
-		$_[0]->stash->{a} = 1;
-		main::isa_ok($_[1],'HTTP::Response');
-		return HTTP::Request->new( GET => 'http://www.perl.org/' ), "second_request";
-	}
+  use HTTP::Request;
 
-	sub second_request {
-		main::isa_ok($_[0],'WWW::Chain');
-		$_[0]->stash->{b} = 2;
-		main::isa_ok($_[1],'HTTP::Response');
-		return;
-	}
+  sub start_chain {
+    return HTTP::Request->new( GET => 'http://www.chain.internal/' ), 'first_response';
+  }
+
+  sub first_response {
+    $_[0]->stash->{a} = 1;
+    return HTTP::Request->new( GET => 'http://www.chain.internal/' ), 'second_response';
+  }
+
+  sub second_response {
+    $_[0]->stash->{b} = 2;
+    return;
+  }
 }
 
-my $chain = TestWWWChainMethods->new(HTTP::Request->new( GET => 'http://www.perl.org/' ), 'first_request');
+my $chain = TestWWWChainMethods->new(HTTP::Request->new( GET => 'http://www.chain.internal/' ), 'first_request');
 isa_ok($chain,'TestWWWChainMethods');
 
 $chain->next_responses(HTTP::Response->new);

@@ -1,5 +1,5 @@
 {
-   "abstract" : "SCS archive controller",
+   "abstract" : "Read the contents of SCS union mount archives (HashFS)",
    "author" : [
       "nautofon <nautofon@cpan.org>"
    ],
@@ -38,7 +38,7 @@
             "Compress::Raw::Zlib" : "2.048",
             "List::Util" : "1.45",
             "Object::Pad" : "0.73",
-            "Path::Tiny" : "0.119",
+            "Path::Tiny" : "0.125",
             "builtin::Backport" : "0",
             "perl" : "5.032",
             "stable" : "0.031"
@@ -55,39 +55,39 @@
    "provides" : {
       "Archive::SCS" : {
          "file" : "lib/Archive/SCS.pm",
-         "version" : "1.03"
+         "version" : "1.04"
       },
       "Archive::SCS::CityHash" : {
          "file" : "lib/Archive/SCS/CityHash.pm",
-         "version" : "1.03"
+         "version" : "1.04"
       },
       "Archive::SCS::DirIndex" : {
          "file" : "lib/Archive/SCS/DirIndex.pm",
-         "version" : "1.03"
+         "version" : "1.04"
       },
       "Archive::SCS::GameDir" : {
          "file" : "lib/Archive/SCS/GameDir.pm",
-         "version" : "1.03"
+         "version" : "1.04"
       },
       "Archive::SCS::HashFS" : {
          "file" : "lib/Archive/SCS/HashFS.pm",
-         "version" : "1.03"
+         "version" : "1.04"
       },
       "Archive::SCS::HashFS2" : {
          "file" : "lib/Archive/SCS/HashFS2.pm",
-         "version" : "1.03"
+         "version" : "1.04"
       },
       "Archive::SCS::InMemory" : {
          "file" : "lib/Archive/SCS/InMemory.pm",
-         "version" : "1.03"
+         "version" : "1.04"
       },
       "Archive::SCS::Mountable" : {
          "file" : "lib/Archive/SCS/Mountable.pm",
-         "version" : "1.03"
+         "version" : "1.04"
       },
       "Archive::SCS::TObj" : {
          "file" : "lib/Archive/SCS/TObj.pm",
-         "version" : "1.03"
+         "version" : "1.04"
       }
    },
    "release_status" : "stable",
@@ -102,6 +102,6 @@
          "web" : "https://github.com/nautofon/Archive-SCS"
       }
    },
-   "version" : "1.03",
+   "version" : "1.04",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

@@ -31,15 +31,15 @@ subtest 'trading_days' => sub {
         everyday     => ['RANDOM', 'RANDOM_NOCTURNE'],
         sun_thru_thu => ['EGX',    'SAS', 'KRX', 'DFM', 'ADS'],
         weekdays     => [
-            'ICE_LIFFE',   'EEI_PA', 'BIS',         'NYSE_SPC', 'KRX',          'SYNFSE', 'BSE',         'HKF',
-            'BOVESPA',     'SWX',    'TRSE',        'EURONEXT', 'SYNTSE',       'TSE_S',  'TSE',         'OSLO',
-            'LSE',         'SES',    'SYNLSE',      'EEI_BU',   'SFE',          'EUREX',  'SYNNYSE_SPC', 'ISE',
-            'NSE',         'STOXX',  'SGX',         'EEI_AM',   'BI',           'FSE',    'MEFF',        'ASX_S',
-            'SYNEURONEXT', 'NYSE',   'MOF',         'BMF',      'NASDAQ_INDEX', 'EEI_LI', 'CME',         'ASX',
-            'OMX',         'FOREX',  'SYNSTOXX',    'SZSE',     'SYNSWX',       'RTS',    'JSC',         'METAL',
-            'OSE',         'FS',     'NZSE',        'ODLS',     'SP_GLOBAL',    'JSE',    'NASDAQ',      'BM',
-            'HKSE',        'MICEX',  'SYNNYSE_DJI', 'SP_GSCI',  'EUREX_SWISS',  'IDM',    'SSE',         'OIL_OTC',
-            'BRENT_OTC'
+            'ICE_LIFFE',   'EEI_PA',  'BIS',         'NYSE_SPC', 'KRX',          'SYNFSE', 'BSE',         'HKF',
+            'BOVESPA',     'SWX',     'TRSE',        'EURONEXT', 'SYNTSE',       'TSE_S',  'TSE',         'OSLO',
+            'LSE',         'SES',     'SYNLSE',      'EEI_BU',   'SFE',          'EUREX',  'SYNNYSE_SPC', 'ISE',
+            'NSE',         'STOXX',   'SGX',         'EEI_AM',   'BI',           'FSE',    'MEFF',        'ASX_S',
+            'SYNEURONEXT', 'NYSE',    'MOF',         'BMF',      'NASDAQ_INDEX', 'EEI_LI', 'CME',         'ASX',
+            'OMX',         'FOREX',   'SYNSTOXX',    'SZSE',     'SYNSWX',       'RTS',    'JSC',         'METAL',
+            'OSE',         'FS',      'NZSE',        'ODLS',     'SP_GLOBAL',    'JSE',    'NASDAQ',      'BM',
+            'HKSE',        'MICEX',   'SYNNYSE_DJI', 'SP_GSCI',  'EUREX_SWISS',  'IDM',    'SSE',         'OIL_OTC',
+            'BRENT_OTC',   'CME_OTC', 'SGX_OTC'
         ],
     };
 

@@ -15,7 +15,17 @@ METHODS
 
     Constructor.
 
-    Returns instance of object.
+    *       "login_name"
+
+            Login name.
+
+            Default value is undef.
+
+    *       "login_password"
+
+            Login password.
+
+            Default value is undef.
 
     *       "mediawiki_api"
 
@@ -29,17 +39,7 @@ METHODS
 
             Default value is 'test.wikidata.org'.
 
-    *       "login_name"
-
-            Login name.
-
-            Default value is undef.
-
-    *       "login_password"
-
-            Login password.
-
-            Default value is undef.
+    Returns instance of object.
 
   "create_item"
      my $res = $obj->create_item($item_obj)
@@ -362,10 +362,10 @@ AUTHOR
     <http://skim.cz>
 
 LICENSE AND COPYRIGHT
-    © 2020-2023 Michal Josef Špaček
+    © 2020-2024 Michal Josef Špaček
 
     BSD 2-Clause License
 
 VERSION
-    0.04
+    0.05
 

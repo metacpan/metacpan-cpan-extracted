@@ -9,7 +9,7 @@ use Module::Load qw( load );
 use Path::Tiny qw(path);
 use Test::MockTime;
 use Test::More;
-use YAML ();
+use YAML::XS ();
 
 use Parse::Syslog::Line qw/:with_timezones/;
 
@@ -36,7 +36,7 @@ $dataDir->visit(sub {
 
     # Load the Test Data, fatal errors will cause test failures
     eval {
-        my $test = YAML::LoadFile( $p->stringify );
+        my $test = YAML::XS::LoadFile( $p->stringify );
         if( $test->{options} and $test->{options}{AutoDetectJSON} ) {
             push @TESTS, $test if $JSON_OK;
         }
@@ -73,7 +73,7 @@ subtest "Basic Functionality Test" => sub {
         my $msg = parse_syslog_line($test->{string});
         delete $msg->{$_} for grep { exists $msg->{$_} } @_delete;
         delete $test->{expected}{$_} for grep { exists $test->{expected}{$_} } @_delete;
-        is_deeply( $msg, $test->{expected}, $test->{name} ) || diag( Dumper $msg );
+        is_deeply( $msg, $test->{expected}, $test->{name} ) || diag( YAML::XS::Dump($msg) );
         # Restore Defaults
         if( keys %restore ) {
             foreach my $k ( keys %restore ) {

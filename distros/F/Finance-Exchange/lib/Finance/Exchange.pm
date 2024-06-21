@@ -7,7 +7,7 @@ use Clone qw(clone);
 use File::ShareDir;
 use YAML::XS qw(LoadFile);
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 =head1 NAME
 
@@ -106,16 +106,16 @@ This should be a string which will allow the standard DateTime module to find th
 
 has [
     qw( display_name symbol trading_days trading_timezone
-        )
-    ] => (
+    )
+] => (
     is       => 'ro',
     required => 1,
-    );
+);
 
 has _market_times => (
     is       => 'ro',
     required => 1,
-    );
+);
 
 =head2 trading_days_list
 
@@ -168,7 +168,7 @@ sub _build_market_times {
 
     foreach my $key (keys %$mt) {
         foreach my $trading_segment (keys %{$mt->{$key}}) {
-            if ($trading_segment eq 'day_of_week_extended_trading_breaks') { next; }
+            if    ($trading_segment eq 'day_of_week_extended_trading_breaks') { next; }
             elsif ($trading_segment ne 'trading_breaks') {
                 $market_times->{$key}->{$trading_segment} = Time::Duration::Concise::Localize->new(
                     interval => $mt->{$key}->{$trading_segment},

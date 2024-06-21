@@ -2,7 +2,7 @@ package File::Edit;
 use Mojo::Base -base;
 use Path::Tiny qw/path/;
 use Carp;
-our $VERSION = '0.0.6';
+our $VERSION = '0.0.7';
 
 has 'file';
 has 'found';        # Line numbers of found lines. ArrayRef.
@@ -270,7 +270,7 @@ L<https://rt.cpan.org/NoAuth/Bugs.html?Dist=File-Edit>
 
 =item * CPAN Ratings
 
-L<https://cpanratings.perl.org/d/File-Edit>
+L<https://metacpan.org/pod/File::Edit>
 
 =item * Search CPAN
 

@@ -1,5 +1,8 @@
 Revision history for Bio-SeqAlignment-Examples-EnhancingEdlib
 
+0.03      2024-06-20 21:21:00-06:00 America/Denver
+- Introduced additional color to certain plots to allow better delineation
+of the performance differences between implementations.
 0.02      2024-06-13 21:12:11-06:00 America/Denver
 - Fixed bug that would lead to a segmentation fault 
 in systems that do not include an OMP_NUM_THREADS

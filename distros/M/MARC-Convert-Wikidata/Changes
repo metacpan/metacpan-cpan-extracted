@@ -1,3 +1,12 @@
+0.08 2024-06-21T09:12:52+02:00
+ - Add Cieszyn to publishing places cleanup.
+ - Add Kroměříž to publishing places cleanup.
+ - Add Kutná Hora to publishing places cleanup.
+ - Add Praha to publishing places cleanup.
+ - Add unit (page) to P1104.
+ - Rewrite item types.
+ - Update copyright years.
+
 0.07 2023-11-29T01:53:01+01:00
  - Add $options_hr return value to clean_date(). Implment circa date.
  - Add Litoměřice to publishing places cleanup.

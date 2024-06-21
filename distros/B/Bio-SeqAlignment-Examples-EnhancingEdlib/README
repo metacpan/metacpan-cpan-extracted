@@ -3,7 +3,7 @@ NAME
     MCE, OpenMP using Inline and FFI::Platypus
 
 VERSION
-    version 0.02
+    version 0.03
 
 SYNOPSIS
     A collection of examples that demonstrate how to enhance the sequence

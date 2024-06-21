@@ -113,13 +113,14 @@ CONFIGURATION
 
         Set( %MandatoryOnTransition,
             'MyQueue' => {
-                '__CREATE__ -> open' => [ 'CF.MyField1' ],
+                '__CREATE__ -> new' => [ 'CF.MyField1' ],
                 '* -> open' => [ 'CF.MyField2', 'CF.MyField3' ],
             },
         );
 
     would require CF.MyField1 on ticket creation and CF.MyField2 and
-    CF.MyField3 on any other transition to open.
+    CF.MyField3 on any other transition to open. The to status for CREATE
+    rules must be a valid create status in the lifecycle.
 
     The fallback for queues without specific rules is specified with '*'
     where the queue name would normally be.
@@ -330,7 +331,7 @@ BUGS
         L<rt.cpan.org|http://rt.cpan.org/Public/Dist/Display.html?Name=RT-Extension-MandatoryOnTransition>.
 
 LICENSE AND COPYRIGHT
-    This software is Copyright (c) 2012-2023 by Best Pracical Solutions,
+    This software is Copyright (c) 2012-2024 by Best Pracical Solutions,
     LLC.
 
     This is free software, licensed under:

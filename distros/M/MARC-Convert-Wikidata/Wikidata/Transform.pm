@@ -36,7 +36,7 @@ Readonly::Hash our %PEOPLE_TYPE => {
 	'trl' => 'translators',
 };
 
-our $VERSION = 0.07;
+our $VERSION = 0.08;
 
 # Constructor.
 sub new {
@@ -460,6 +460,8 @@ sub _publishers {
 
 sub _series {
 	my $self = shift;
+
+	my @series_830 = $self->{'marc_record'}->field('830');
 
 	my @series_490 = $self->{'marc_record'}->field('490');
 	my @series;

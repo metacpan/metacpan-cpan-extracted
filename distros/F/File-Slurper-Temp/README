@@ -2,7 +2,7 @@ NAME
     File::Slurper::Temp - File::Slurper + File::Temp
 
 VERSION
-    This document describes version 0.009 of File::Slurper::Temp (from Perl
+    This document describes version 0.010 of File::Slurper::Temp (from Perl
     distribution File-Slurper-Temp), released on 2024-06-17.
 
 SYNOPSIS

@@ -49,7 +49,7 @@
    "provides" : {
       "Syntax::Construct" : {
          "file" : "lib/Syntax/Construct.pm",
-         "version" : "1.036"
+         "version" : "1.037"
       }
    },
    "release_status" : "stable",
@@ -60,6 +60,6 @@
          "web" : "https://github.com/choroba/syntactic-construct"
       }
    },
-   "version" : "1.036",
+   "version" : "1.037",
    "x_serialization_backend" : "JSON::PP version 4.06"
 }

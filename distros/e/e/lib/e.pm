@@ -30,7 +30,7 @@ package e;
            ⠹⡽⣾⣿⠹⣿⣆⣾⢯⣿⣿ ⡞ ⠻⣿⣿⣿⠁ ⢠⣿⢏  ⡀ ⡟  ⢀⣴⣿⠃⢁⡼⠁ ⠈
              ⠈⠛ ⢻⣿⣧⢸⢟⠶⢾⡇  ⣸⡿⠁ ⢠⣾⡟⢼  ⣷ ⡇ ⣰⠋⠙⠁
                 ⠈⣿⣻⣾⣦⣇⢸⣇⣀⣶⡿⠁⣀⣀⣾⢿⡇⢸  ⣟⡦⣧⣶⠏ unleashed
-                 ⠸⢿⡍⠛⠻⠿⠿⠿⠋⣠⡾⢋⣾⣏⣸⣷⡸⣇⢰⠟⠛⠻⡄  v1.21
+                 ⠸⢿⡍⠛⠻⠿⠿⠿⠋⣠⡾⢋⣾⣏⣸⣷⡸⣇⢰⠟⠛⠻⡄  v1.22
                    ⢻⡄   ⠐⠚⠋⣠⡾⣧⣿⠁⠙⢳⣽⡟
                    ⠈⠳⢦⣤⣤⣀⣤⡶⠛ ⠈⢿⡆  ⢿⡇
                          ⠈    ⠈⠓  ⠈
@@ -45,19 +45,19 @@ use 5.006;
 use strict;
 use warnings;
 
-our $VERSION = '1.21';
+our $VERSION = '1.22';
 
 =head1 SYNOPSIS
 
 Add a trace marker:
 
-    perl -Me -e 'sub f1 { trace } sub f2 { f1 } f2'
+   $ perl -Me -e 'sub f1 { trace } sub f2 { f1 } f2'
 
 Watch a reference for changes:
 
-    perl -Me -e 'my $v = {}; sub f1 { watch( $v ) } sub f2 { f1; $v->{a} = 1 } f2'
+   $ perl -Me -e 'my $v = {}; sub f1 { watch( $v ) } sub f2 { f1; $v->{a} = 1 } f2'
 
-    perl -Me -e '
+   $ perl -Me -e '
         package A {
             use e;
             my %h = ( aaa => 111 );
@@ -79,39 +79,39 @@ Watch a reference for changes:
 
 Benchmark two snippets of code:
 
-    perl -Me -e 'n { slow => sub{ ... }, fast => sub{ ... }}, 10000'
+   $ perl -Me -e 'n { slow => sub{ ... }, fast => sub{ ... }}, 10000'
 
 Launch the Runtime::Debugger:
 
-    perl -Me -e 'repl'
+   $ perl -Me -e 'repl'
 
 Invoke the Tiny::Prof:
 
-    perl -Me -e 'prof'
+   $ perl -Me -e 'prof'
 
 Convert a data structure to json:
 
-    perl -Me -e 'say j { a => [ 1..3] }'
+   $ perl -Me -e 'say j { a => [ 1..3] }'
 
 Convert a data structure to yaml:
 
-    perl -Me -e 'say yml { a => [ 1..3] }'
+   $ perl -Me -e 'say yml { a => [ 1..3] }'
 
 Pretty print a data structure:
 
-    perl -Me -e 'p { a => [ 1..3] }'
+   $ perl -Me -e 'p { a => [ 1..3] }'
 
 Data dump a data structure:
 
-    perl -Me -e 'd { a => [ 1..3] }'
+   $ perl -Me -e 'd { a => [ 1..3] }'
 
 Devel::Peek dump a data structure:
 
-    perl -Me -e 'dd { a => [ 1..3] }'
+   $ perl -Me -e 'dd { a => [ 1..3] }'
 
 Print data as a table:
 
-    perl -Me -e 'table( [qw(key value)], [qw(red 111)], [qw(blue 222)] )'
+   $ perl -Me -e 'table( [qw(key value)], [qw(red 111)], [qw(blue 222)] )'
     +------+-------+
     | key  | value |
     +------+-------+
@@ -121,13 +121,14 @@ Print data as a table:
 
 Encode/decode UTF-8:
 
-    perl -C -Me -e 'printf "%#X\n", ord for enc("\x{5D0}") =~ /./g'
+   $ perl -Me -e 'printf "%#X\n", ord for split //, enc "\x{5D0}"'
     0XD7
     0X90
 
-    perl -C -Me -e 'say dec "\xD7\x90"'
+   $ perl -C -Me -e 'say dec "\xD7\x90"'
+   $ perl -Me -e 'utf8; say dec "\xD7\x90"'
     א
-    
+
 =cut
 
 =head1 DESCRIPTION
@@ -143,19 +144,11 @@ thereby making its startup cost quite low.
 
 =head1 SUBROUTINES
 
-=head2 monkey_patch
+=cut
 
-Insert subroutines into the symbol table.
+=head2 Investigation
 
-Extracted from Mojo::Util for performance.
-
-Perhaps can be updated based on the outcome
-of this issue:
-L<https://github.com/mojolicious/mojo/pull/2173>
-
-=head2 import
-
-=head2 repl
+=head3 repl
 
 Add a breakpoint to code.
 
@@ -163,13 +156,24 @@ Basically inserts a Read Evaluate Print Loop.
 
 Enable to analyze code in the process.
 
-=head2 trace
+    CODE ...
+
+    # Breakpoint
+    repl
+
+    CODE ...
+
+Simple debugger on the command line:
+
+    $ perl -Me -e 'repl'
+
+=head3 trace
 
 Show a stack trace.
 
     trace( $depth=1 )
 
-=head2 watch
+=head3 watch
 
 Watch a reference for changes.
 
@@ -191,7 +195,7 @@ OPTIONS:
     -message => STR,           # Message to display.
     STR,                       # Same.
 
-=head2 prof
+=head3 prof
 
 Profile the code from this point on.
 
@@ -199,7 +203,7 @@ Profile the code from this point on.
     ...
     # $obj goes out of scope and builds results.
 
-=head2 n
+=head3 n
 
 Benchmark and compare different pieces of code.
 
@@ -217,80 +221,150 @@ Benchmark and compare different pieces of code.
         fast => sub{ ... },
     }, 10000;
 
-=head2 j
+=cut
+
+=head2 Format Conversions
+
+=head3 j
 
 JSON Parser.
 
-=head2 x
+  my $bytes = j([1, 2, 3]);
+  my $bytes = j({foo => 'bar'});
+  my $value = j($bytes);
+
+Encode Perl data structure or decode JSON with L<Mojo::JSON/"j">.
+
+Convert Perl object to JSON string:
+
+  $ perl -Me -e 'say j { a => [1..3]}'
+
+Convert JSON string to Perl object:
+
+  $ perl -Me -e 'p j q({"a":[1,2,3]})'
+
+=head3 x
 
 XML parser.
 
-=head2 yml
+  my $dom = x('<div>Hello!</div>');
+
+Turn HTML/XML input into L<Mojo::DOM> object.
+
+  $ perl -Me -e 'say x("<div>hey</dev>")->at("div")->text'
+
+=head3 yml
 
 YAML parser.
 
-=head2 enc
+Convert Perl object to YAML string:
+
+    $ perl -Me -e 'say yml { a => [1..3]}'
+
+Convert YAML string to Perl object:
+
+    $ perl -Me -e 'p yml "---\na:\n- 1\n- 2\n- 3"'
+
+=head3 enc
 
 Encode UTF-8 code point to a byte stream:
 
-    perl -C -Me -e 'printf "%#X\n", ord for enc("\x{5D0}") =~ /./g'
+    $ perl -C -Me -e 'printf "%#X\n", ord for enc("\x{5D0}") =~ /./g'
     0XD7
     0X90
-    
-=head2 dec
+
+=head3 dec
 
 Decode a byte steam to UTF-8 code point:
 
-    perl -C -Me -e 'say dec "\xD7\x90"'
+    $ perl -C -Me -e 'say dec "\xD7\x90"'
     א
 
-=head2 utf8
+=head3 utf8
 
 Set STDOUT and STDERR as UTF-8 encoded.
 
-=head2 b
+=cut
+
+=head2 Enhanced Types
+
+=head3 b
 
 Work with strings.
 
-=head2 c
+  my $stream = b('lalala');
+
+Turn string into a L<Mojo::ByteStream> object.
+
+  $ perl -Me -e 'b(g("mojolicious.org")->body)->html_unescape->say'
+
+=head3 c
 
 Work with arrays.
 
-=head2 f
+  my $collection = c(1, 2, 3);
+
+Turn list into a L<Mojo::Collection> object.
+
+=cut
+
+=head2 Files Convenience
+
+=head3 f
 
 Work with files.
 
-=head2 say
+  my $path = f('/home/sri/foo.txt');
+
+Turn string into a L<Mojo::File> object.
+
+  $ perl -Me -e 'say r j f("hello.json")->slurp'
+
+=cut
+
+=head2 Output
+
+=head3 say
 
 Print with newline.
 
-=head2 p
+    $ perl -Me -e 'say 123'
+
+=head3 p
 
 Pretty data printer.
 
-=head2 np
+    $ perl -Me -e 'p [1..3]'
+
+=head3 np
 
 Return pretty printer data.
 
-=head2 d
+    $ perl -Me -e 'my $v = np [1..3]; say "got: $v"'
+
+=head3 d
 
 Data dumper.
 
-=head2 dd
+    $ perl -Me -e 'd [1..3]'
+
+=head3 dd
 
 Internal data dumper.
 
-=head2 dye
+    $ perl -Me -e 'dd [1..3]'
+
+=head3 dye
 
 Color a string.
 
-    say dye( "HEY", "RED" );
+    $ perl -Me -e 'say dye 123, "RED"'
 
-=head2 table
+=head3 table
 
 Print data as a table:
 
-    perl -Me -e 'table( [qw(key value)], [qw(red 111)], [qw(blue 222)] )'
+   $ perl -Me -e 'table( [qw(key value)], [qw(red 111)], [qw(blue 222)] )'
     +------+-------+
     | key  | value |
     +------+-------+
@@ -304,17 +378,62 @@ Context sensitive!
     - List   - return individual lines.
     - Scalar - return entire table as a string.
 
-=head2 g
+=cut
 
-Perform a get request.
+=head2 Web Related
 
-=head2 l
+=head3 g
+
+  my $res = g('example.com');
+  my $res = g('http://example.com' => {Accept => '*/*'} => 'Hi!');
+  my $res = g('http://example.com' => {Accept => '*/*'} => form => {a => 'b'});
+  my $res = g('http://example.com' => {Accept => '*/*'} => json => {a => 'b'});
+
+Perform C<GET> request with L<Mojo::UserAgent/"get"> and return resulting L<Mojo::Message::Response> object.
+
+  $ perl -Me -e 'say g("mojolicious.org")->dom("h1")->map("text")->join("\n")'
+
+=head3 l
 
 Work with URLs.
 
-=head2 pod
+  my $url = l('https://mojolicious.org');
+
+Turn a string into a L<Mojo::URL> object.
+
+  $ perl -Me -e 'say l("/perldoc")->to_abs(l("https://mojolicious.org"))'
+
+=cut
+
+=head2 Package Tools
+
+=head3 monkey_patch
+
+Insert subroutines into the symbol table.
+
+Extracted from Mojo::Util for performance.
+
+Import methods into another function
+(as done this module):
+
+    $ perl -e 'package A; use e; sub import { my $c = caller(); monkey_patch $c, new => sub { say "Im new" } } package main; A->import; new()'
+    Im new
+
+Import methods into the same package
+(probably not so useful):
+
+    $ perl -e 'package A; use e; sub import { my $c = caller(); monkey_patch $c, new => sub { say "Im new" } } A->import; A->new()'
+    Im new
+
+Perhaps can be updated based on the outcome
+of this issue:
+L<https://github.com/mojolicious/mojo/pull/2173>
+
+=head3 pod
 
 Work with perl pod.
+
+=head3 import
 
 =cut
 
@@ -371,6 +490,16 @@ sub import {
             Data::Trace::Trace( @_ );
         },
 
+        # Profiling.
+        prof => sub {
+            if ( !$imported{$caller}{"Tiny::Prof"}++ ) {
+                require Tiny::Prof;
+            }
+            Tiny::Prof->run(
+                name => 'Test',
+                @_,
+            );
+        },
 
         # Benchmark/timing.
         n => sub {
@@ -387,17 +516,6 @@ sub import {
             $times //= 1;
 
             Benchmark::cmpthese( $times, $subs );
-        },
-
-        # Profiling.
-        prof => sub {
-            if ( !$imported{$caller}{"Tiny::Prof"}++ ) {
-                require Tiny::Prof;
-            }
-            Tiny::Prof->run(
-                name => 'Test',
-                @_,
-            );
         },
 
         ######################################
@@ -590,8 +708,10 @@ sub import {
         },
 
         ######################################
-        #              Pod
+        #         Package Tools
         ######################################
+
+        monkey_patch => \&monkey_patch,
 
         pod => sub {
             if ( !$imported{$caller}{"App::Pod"}++ ) {
@@ -602,12 +722,6 @@ sub import {
             local @ARGV = @_;
             App::Pod->run;
         },
-
-        ######################################
-        #         Package Building
-        ######################################
-
-        monkey_patch => \&monkey_patch,
 
     );
 }

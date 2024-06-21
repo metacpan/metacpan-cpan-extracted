@@ -27,5 +27,6 @@ t/prereq.t
 t/snippets.t
 t/unused.t
 t/vars.t
+t/version.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

@@ -4,7 +4,7 @@ use ExtUtils::CppGuess;
 use ExtUtils::MakeMaker::CPANfile;
 use Path::Tiny 0.062;
 
-$Config{use64bitint} or die "Can't build on 32-bit perl, aborting.";
+$Config{use64bitint} or die "Can't build on 32-bit perl, aborting";
 
 # The Perl toolchain doesn't know about feature class yet, so we
 # must specify all namespaces in META using the provides key.
@@ -18,7 +18,7 @@ path('lib')->visit(
     $path =~ /\.pm$/ or return;
     my ($namespace, $version) = $path->slurp_raw =~
       m/ \s (?:class|package) \s+ ([A-Za-z0-9_:]+) \s+ ([v0-9.]+) \b /x
-      or die "No namespace found in $path";
+      or die "No namespace found in $path, aborting";
     $provides{$namespace} = {
       file => "$path",
       version => $version,
@@ -37,7 +37,7 @@ path('Changes')->slurp_raw =~ m/^\Q$main_module_version\E\s/m
 
 WriteMakefile(
   ExtUtils::CppGuess->new->makemaker_options,
-  ABSTRACT => 'SCS archive controller',
+  ABSTRACT => 'Read the contents of SCS union mount archives (HashFS)',
   AUTHOR => 'nautofon <nautofon@cpan.org>',
   EXE_FILES => [
     'script/scs_archive',
@@ -71,6 +71,9 @@ WriteMakefile(
   XSOPT => '-C++',
   dist => {
     TARFLAGS => '--format=ustar -c -v -f', # avoid PaxHeader in tarball
+  },
+  realclean => {
+    FILES => 'MANIFEST MANIFEST.bak',
   },
   test => {
     RECURSIVE_TEST_FILES => 1,

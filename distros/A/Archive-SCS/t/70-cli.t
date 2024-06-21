@@ -20,8 +20,8 @@ like scs_archive(),
 like scs_archive(qw[ --version ]),
   qr{Archive::SCS version}, 'version';
 
-my @help = scs_archive(qw[ --help ]);
-ok @help > 60 && ( any { /OPTIONS/ } @help ), 'help';
+my $help = scs_archive(qw[ --help ]);
+ok length $help > 400, 'help' or diag $help;
 
 like scs_archive(qw[ --foobar ]),
   qr{Unknown option: foobar.*Usage:}s, 'unknown option';

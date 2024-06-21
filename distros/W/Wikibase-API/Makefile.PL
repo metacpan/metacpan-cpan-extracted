@@ -31,13 +31,17 @@ requires 'Wikibase::Datatype' => 0.03;
 requires 'Wikibase::Datatype::Struct::Item' => 0;
 requires 'Wikibase::Datatype::Struct::Lexeme' => 0;
 requires 'Wikibase::Datatype::Struct::Mediainfo' => 0;
+requires 'Wikibase::Datatype::Struct::Property' => 0;
 resources 'bugtracker' => 'https://github.com/michal-josef-spacek/Wikibase-API/issues',
 resources 'homepage' => 'https://github.com/michal-josef-spacek/Wikibase-API';
 resources 'repository' => 'git://github.com/michal-josef-spacek/Wikibase-API';
+test_requires 'English' => 0;
+test_requires 'Error::Pure::Utils' => 0;
+test_requires 'Test::MockObject' => 0;
 test_requires 'Test::More' => 0;
 test_requires 'Test::NoWarnings' => 0;
 tests_recursive;
-version '0.04';
+version '0.05';
 
 # Run.
 WriteAll();

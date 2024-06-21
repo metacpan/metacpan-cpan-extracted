@@ -17,7 +17,7 @@ use Module::Loaded qw( is_loaded );
 use POSIX          qw( strftime tzset );
 use Ref::Util      qw( is_arrayref );
 
-our $VERSION = '5.1';
+our $VERSION = '5.3';
 
 # Default for Handling Parsing
 our $DateParsing     = 1;
@@ -121,7 +121,7 @@ our %EXPORT_TAGS = (
 # Regex to Extract Data
 const my %RE => (
     IPv4            => qr/(?>(?:[0-9]{1,3}\.){3}[0-9]{1,3})/,
-    preamble        => qr/^\<(\d+)\>/,
+    preamble        => qr/^\<(\d+)\>(\d{0,2})\s*/,
     year            => qr/^(\d{4}) /,
     date            => qr/(?<date>[A-Za-z]{3}\s+[0-9]+\s+[0-9]{1,2}(?:\:[0-9]{2}){1,2})/,
     date_long => qr/
@@ -228,11 +228,11 @@ sub parse_syslog_line {
     # Lines that begin with a space aren't syslog messages, skip
     return \%msg if $raw_string =~ /^\s/;
 
-    #
     # grab the preamble:
     if( $raw_string =~ s/^$RE{preamble}//o ) {
         # Cast to integer
         $msg{preamble} = int $1;
+        $msg{version}  = int $2 if $2;
 
         # Extract Integers
         $msg{priority_int} = $msg{preamble} & $CONV_MASK{priority};
@@ -594,7 +594,7 @@ Parse::Syslog::Line - Simple syslog line parser
 
 =head1 VERSION
 
-version 5.1
+version 5.3
 
 =head1 SYNOPSIS
 
@@ -633,6 +633,7 @@ parsed out.
     #       message         => 'program[pid]: the rest of the message',
     #       message_raw     => 'The message as it was passed',
     #       ntp             => 'ok',        # Only set for Cisco messages
+    #       version         => 1,
     #       SDATA           => { ... },     # RFC Structured data, decoded JSON, or K/V Pairs in the message
     # };
     ...

@@ -17,11 +17,36 @@ DESCRIPTION
 
     The page contains clickable tree with usage of Javascript code.
 
+    Tree node value in HTML could be defined by 'cb_value' callback
+    parameter.
+
 METHODS
   "new"
      my $obj = Tags::HTML::Tree->new(%params);
 
     Constructor.
+
+    *       "cb_value"
+
+            Callback for Tree value, which call "$self->{'tags'}->put" for
+            adding some value.
+
+            Arguments of callback are Tags::HTML::Tree $self and $tree
+            objects.
+
+            Default value is subroutine:
+
+             sub {
+                     my ($self, $tree) = @_;
+         
+                     $self->{'tags'}->put(
+                             ['d', $tree->value],
+                     );
+         
+                     return;
+             };
+
+            which adds HTML text content with "$tree->value" value.
 
     *       "css"
 
@@ -84,8 +109,11 @@ ERRORS
      new():
              From Class::Utils::set_params():
                      Unknown parameter '%s'.
+             From Mo::utils::check_code():
+                     Parameter 'cb_value' must be a code.
+                             Value: %s
              From Mo::utils::check_required():
-                     Parameter '%s' is required.
+                     Parameter 'css_class' is required.
              From Mo::utils::CSS::check_css_class():
                      Parameter 'css_class' has bad CSS class name.
                              Value: %s
@@ -444,5 +472,5 @@ LICENSE AND COPYRIGHT
     BSD 2-Clause License
 
 VERSION
-    0.05
+    0.06
 

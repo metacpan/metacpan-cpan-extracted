@@ -1,9 +1,17 @@
+0.010   2024-06-17  Released-By: PERLANCAR; Urgency: medium
+
+        - No functional changes.
+
+        - Forgot to credit contributor in Changes file.
+
+
 0.009   2024-06-17  Released-By: PERLANCAR; Urgency: medium
 
-        - [doc] Correct references to $FILE_TEMP_* variables.
+        - [doc] Correct references to $FILE_TEMP_* variables (thanks
+          TEODESIAN!).
 
         - Update dependency version of File::Temp to one (0.2310) that has the
-          PERMS flag.
+          PERMS flag (thanks TEODESIAN!).
 
 
 0.008   2021-08-02  Released-By: PERLANCAR; Urgency: medium

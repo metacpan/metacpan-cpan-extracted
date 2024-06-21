@@ -1,12 +1,12 @@
 package File::Sticker::Reader::Exif;
-$File::Sticker::Reader::Exif::VERSION = '3.0101';
+$File::Sticker::Reader::Exif::VERSION = '3.0204';
 =head1 NAME
 
 File::Sticker::Reader::Exif - read and standardize meta-data from EXIF file
 
 =head1 VERSION
 
-version 3.0101
+version 3.0204
 
 =head1 SYNOPSIS
 
@@ -123,7 +123,8 @@ sub read_meta {
     say STDERR whoami(), " filename=$filename" if $self->{verbose} > 2;
 
     $filename = $self->_get_the_real_file(filename=>$filename);
-    my $info = ImageInfo($filename);
+    my $exif_options = {DateFormat => "%Y-%m-%d %H:%M:%S"};
+    my $info = ImageInfo($filename,$exif_options);
     my %meta = ();
 
     # Check if this is a Gutenberg book; they have quirks.

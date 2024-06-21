@@ -1,9 +1,72 @@
 ==================================================
-Changes from 2022-05-25 00:00:00 +0000 to present.
+Changes from 2022-06-21 00:00:00 +0000 to present.
 ==================================================
 
 ----------------------------------------
-version 5.1 at 2024-05-24 18:18:36 +0000
+version 5.3 at 2024-06-20 21:10:30 +0000
+----------------------------------------
+
+  Change: 403cddd9b4b685f8cc53817fb7d4695c20e2a354
+  Author: Brad Lhotsky <brad@divisionbyzero.net>
+  Date : 2024-06-20 14:09:27 +0000
+
+    Updates broken regex
+
+    The `{,MAX}` quantifier appears to have been broken until v5.33.6, which is
+    what MinimumPerl was picking up on. This uses `{0,2}` to work-around it. 
+
+----------------------------------------
+version 5.2 at 2024-06-20 20:56:49 +0000
+----------------------------------------
+
+  Change: fe1b7405a75fa190df57a677cde813c896f4e383
+  Author: Brad Lhotsky <brad@divisionbyzero.net>
+  Date : 2024-06-20 13:56:49 +0000
+
+    Prep 5.2 Release 
+
+  Change: cee1e129ded8b27311a44fcf97473919fd749d07
+  Author: Brad Lhotsky <brad@divisionbyzero.net>
+  Date : 2024-06-20 13:55:50 +0000
+
+    Bumping for 5.1 Release
+
+    * Adds better handling of JunOS firewall logs 
+
+  Change: 75cce74d48812906ab551eb16a4b4c18e0ab7d57
+  Author: Brad Lhotsky <brad@divisionbyzero.net>
+  Date : 2024-06-20 13:54:08 +0000
+
+    Add more test cases 
+
+  Change: 1216861b44f50e7e338430cbcfe7a14ea691284a
+  Author: Brad Lhotsky <brad@divisionbyzero.net>
+  Date : 2024-06-20 13:53:20 +0000
+
+    Replace YAML is YAML::XS, MinimumPerl got whacky, rollback to 5.14 manually 
+
+  Change: ad6f3e1f684b67b3ca87d3545cc57db98baa4514
+  Author: Brad Lhotsky <brad@divisionbyzero.net>
+  Date : 2024-06-20 13:38:26 +0000
+
+    Create releases on GitHub too! 
+
+  Change: b85ae1cd0b82f4038929cc3a5bbbf96fe52601b1
+  Author: Brad Lhotsky <brad@divisionbyzero.net>
+  Date : 2024-06-20 13:32:49 +0000
+
+    Add version detection for RFC5424 formatted messages
+
+    I mistakenly missed the "VERSION" part of the RFC-5424 format 
+
+  Change: 1286f4d05287a600fbd90dde279ec85cf0909925
+  Author: Brad Lhotsky <brad@divisionbyzero.net>
+  Date : 2024-06-11 13:43:57 +0000
+
+    Minor fixes and cleanups 
+
+----------------------------------------
+version 5.1 at 2024-05-24 18:17:59 +0000
 ----------------------------------------
 
   Change: c3b622953845aefa0c29f66c2772113d293ded8e
@@ -160,5 +223,5 @@ version 5.0 at 2022-11-14 04:46:30 +0000
     interact with `Parse::Syslog::Line` 
 
 =================================================
-Plus 37 releases after 2022-05-25 00:00:00 +0000.
+Plus 37 releases after 2022-06-21 00:00:00 +0000.
 =================================================

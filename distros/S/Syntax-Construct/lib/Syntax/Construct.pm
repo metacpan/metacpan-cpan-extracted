@@ -4,7 +4,7 @@ use 5.006002;
 use strict;
 use warnings;
 
-our $VERSION = '1.036';
+our $VERSION = '1.037';
 
 my %introduces = do { no warnings 'qw';
                  ( '5.040' => [qw[
@@ -201,8 +201,12 @@ sub _hook {
           eval {
               use locale;
               require POSIX;
-              POSIX::setlocale(POSIX::LC_ALL(), 'tr_TR.UTF-8');
-              lc 'I' ne 'i'
+              my $orig_locale = POSIX::setlocale(POSIX::LC_CTYPE());
+              (POSIX::setlocale(POSIX::LC_CTYPE(), 'tr_TR.UTF-8') || "")
+                  eq 'tr_TR.UTF-8' or die;
+              my $cmp = lc 'I' ne 'i';
+              POSIX::setlocale(POSIX::LC_CTYPE(), $orig_locale);
+              $cmp
           } or die 'Turkic locale casing not working at '
               . _position(1) . "\.\n";
       },
@@ -297,7 +301,7 @@ Syntax::Construct - Explicitly state which non-feature constructs are used in th
 
 =head1 VERSION
 
-Version 1.036
+Version 1.037
 
 =head1 SYNOPSIS
 

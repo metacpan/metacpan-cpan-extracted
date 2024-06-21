@@ -1,5 +1,11 @@
 Revision history for SVGPDF
 
+0.087	2024-06-21
+
+	- Fix missing transparency (default background-color -> none).
+	- svgpdf: Add --background for page background colour.
+	- Prevent some unwanted verbose messages.
+
 0.086	2024-02-14
 
 	- Change font and text callback api to use hash parameter.

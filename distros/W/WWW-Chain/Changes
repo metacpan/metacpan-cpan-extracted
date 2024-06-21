@@ -1,9 +1,26 @@
 ==================================================
-Changes from 1746-04-24 00:00:00 +0000 to present.
+Changes from 1750-09-06 00:00:00 +0000 to present.
 ==================================================
 
 ------------------------------------------
-version 0.006 at 2020-02-06 06:32:59 +0000
+version 0.007 at 2024-06-20 19:25:31 +0000
+------------------------------------------
+
+  Change: cd9c3d4a0284c3037d55ba300aecf1af822d4565
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2024-06-20 21:23:56 +0000
+
+    Slightly updating API and making the methods capable of a start chain
+    method. 
+
+  Change: 6d2043cc3997f07b8cd074ebe062f70ad9b25e22
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2024-06-20 02:25:17 +0000
+
+    Fixing intendation, removing .travis.yml 
+
+------------------------------------------
+version 0.006 at 2020-02-06 06:32:44 +0000
 ------------------------------------------
 
   Change: a025932a3924fe7bca26ddcfe32d97999f177ec5

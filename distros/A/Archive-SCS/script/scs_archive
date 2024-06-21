@@ -8,7 +8,7 @@ use Archive::SCS;
 use Archive::SCS::CityHash qw( cityhash64 cityhash64_hex );
 use Archive::SCS::GameDir;
 use Getopt::Long 2.33 qw( :config gnu_getopt no_bundling no_ignore_case );
-use Path::Tiny;
+use Path::Tiny 0.125;
 use Pod::Usage;
 
 my %opts;
@@ -109,6 +109,10 @@ for my $path ( map { s{^/|/$}{}rg } @extracts ) {
   else {
     push @files, $path;
   }
+}
+
+for ( grep { length && path($_)->is_absolute || m{\.\.[/\\]} } @dirs, @files ) {
+  die sprintf "Refusing to extract insecure path '%s'", $_;
 }
 
 

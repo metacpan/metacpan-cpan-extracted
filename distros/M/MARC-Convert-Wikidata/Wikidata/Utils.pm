@@ -15,7 +15,7 @@ Readonly::Array our @EXPORT_OK => qw(clean_cover clean_date clean_edition_number
 	clean_title);
 Readonly::Array our @COVERS => qw(hardback paperback);
 
-our $VERSION = 0.07;
+our $VERSION = 0.08;
 our $DEBUG = 0;
 
 sub clean_cover {
@@ -352,9 +352,12 @@ sub clean_publisher_place {
 
 	my $dict_hr = {
 		'Blansku' => 'Blansko',
+		decode_utf8('w Cieszynie') => decode_utf8('Cieszyn'),
 		decode_utf8('Č. Budějovice') => decode_utf8('České Budějovice'),
 		'Plzni' => decode_utf8('Plzeň'),
+		'Prag' => 'Praha',
 		'Praze' => 'Praha',
+		'W Praze' => 'Praha',
 		decode_utf8('Pardubicích') => 'Pardubice',
 		decode_utf8('Brně') => 'Brno',
 		decode_utf8('Hradci Králové') => decode_utf8('Hradec Králové'),
@@ -362,6 +365,8 @@ sub clean_publisher_place {
 		decode_utf8('Jihlavě') => 'Jihlava',
 		decode_utf8('Jimramově') => 'Jimramov',
 		decode_utf8('Karlových Varech') => 'Karlovy Vary',
+		decode_utf8('Kroměříži') => decode_utf8('Kroměříž'),
+		decode_utf8('Hoře Kutné') => decode_utf8('Kutná Hora'),
 		'Liberci' => 'Liberec',
 		decode_utf8('Litoměřicích') => decode_utf8('Litoměřice'),
 		decode_utf8('Náchodě') => decode_utf8('Náchod'),
@@ -749,12 +754,12 @@ L<http://skim.cz>
 
 =head1 LICENSE AND COPYRIGHT
 
-© 2021-2023 Michal Josef Špaček
+© 2021-2024 Michal Josef Špaček
 
 BSD 2-Clause License
 
 =head1 VERSION
 
-0.07
+0.08
 
 =cut

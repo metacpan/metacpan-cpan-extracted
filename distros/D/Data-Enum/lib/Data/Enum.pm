@@ -11,45 +11,46 @@ use Scalar::Util qw/ blessed refaddr /;
 
 # RECOMMEND PREREQ: Package::Stash::XS
 
-use overload ();
+use overload
+  q{""} => \&as_string,
+  q{eq} => \&MATCH,
+  q{ne} => \&_NOT_MATCH;
 
 use constant TRUE  => 1;
 use constant FALSE => 0;
 
-our $VERSION = 'v0.3.0';
-
+our $VERSION = 'v0.4.0';
 
 
 sub new {
     my $this = shift;
 
-    my $opts = ref( $_[0] ) eq "HASH" ? shift : {};
+    my $opts   = ref( $_[0] ) eq "HASH" ? shift : {};
     my $prefix = $opts->{prefix} // "is_";
 
     my @values = uniqstr( sort map { "$_" } @_ );
 
     die "has no values" unless @values;
 
-    die "values must be alphanumeric" if any{ /\W/ } @values;
+    die "values must be alphanumeric" if any { /\W/ } @values;
 
     my $key = join chr(28), @values;
 
     state %Cache;
     state $Counter = 1;
 
-
     if ( my $name = $Cache{$key} ) {
         return $name;
     }
 
-    my $name = "Data::Enum::" . $Counter++;
+    my $name = __PACKAGE__ . "::" . $Counter++;
 
     my $base = Package::Stash->new($name);
 
     my $_make_symbol = sub {
         my ($value) = @_;
-        my $self = bless \$value, "${name}::${value}";
-        Internals::SvREADONLY($value, 1);
+        my $self    = bless \$value, "${name}::${value}";
+        Internals::SvREADONLY( $value, 1 );
         return $self;
     };
 
@@ -63,51 +64,55 @@ sub new {
         sub {
             my ( $class, $value ) = @_;
             state $symbols = {
-                map {
-                    $_ => $_make_symbol->($_)
-                } @values
+                map { $_ => $_make_symbol->($_) } @values
             };
             exists $symbols->{"$value"} or die "invalid value: '$value'";
             return $symbols->{"$value"};
         }
     );
 
-    $base->add_symbol( '&values', sub { return @values });
+    $base->add_symbol( '&values', sub { return @values } );
 
-    $base->add_symbol( '&predicates', sub { return map { $_make_predicate->($_) } @values } );
-
-    $base->add_symbol( '&prefix', sub { $prefix });
-
-    my $match = sub {
-        my ( $self, $arg ) = @_;
-        return blessed($arg)
-            ? refaddr($arg) == refaddr($self)
-            : $arg eq $$self;
-    };
-
-    $base->add_symbol( '&MATCH', $match );
-
-    $name->overload::OVERLOAD(
-        q{""} => sub { my ($self) = @_; return $$self; },
-        q{eq} => $match,
-        q{ne} => sub {
-            my ( $self, $arg ) = @_;
-            return blessed($arg)
-              ? refaddr($arg) != refaddr($self)
-              : $arg ne $$self;
-        },
+    $base->add_symbol(
+        '&predicates',
+        sub {
+            return map { $_make_predicate->($_) } @values;
+        }
     );
+
+    $base->add_symbol( '&prefix', sub { $prefix } );
 
     for my $value (@values) {
         my $predicate = $_make_predicate->($value);
         $base->add_symbol( '&' . $predicate, \&FALSE );
         my $elem    = "${name}::${value}";
         my $subtype = Package::Stash->new($elem);
-        $subtype->add_symbol( '@ISA',  [$name] );
+        $subtype->add_symbol( '@ISA',           [ __PACKAGE__, $name ] );
         $subtype->add_symbol( '&' . $predicate, \&TRUE );
     }
 
     return $Cache{$key} = $name;
+}
+
+sub _NOT_MATCH {
+    my ( $self, $arg ) = @_;
+    return blessed($arg)
+      ? refaddr($arg) != refaddr($self)
+      : $arg ne $$self;
+}
+
+
+sub MATCH {
+    my ( $self, $arg ) = @_;
+    return blessed($arg)
+      ? refaddr($arg) == refaddr($self)
+      : $arg eq $$self;
+}
+
+
+sub as_string {
+    my ($self) = @_;
+    return $$self;
 }
 
 
@@ -125,7 +130,7 @@ Data::Enum - immutable enumeration classes
 
 =head1 VERSION
 
-version v0.3.0
+version v0.4.0
 
 =head1 SYNOPSIS
 
@@ -136,9 +141,9 @@ version v0.3.0
   my $red = $color->new("red");
 
   $red->is_red;    # "1"
-  $red->is_yellow; # "" (false)
-  $red->is_blue;   # "" (false)
-  $red->is_green;  # "" (false)
+  $red->is_yellow; # "0" (false)
+  $red->is_blue;   # "0" (false)
+  $red->is_green;  # "0" (false)
 
   say $red;        # outputs "red"
 
@@ -160,7 +165,7 @@ Any two classes with the same elements are equivalent.
 The following two classes are the I<same>:
 
   my $one = Data::Enum->new( qw[ foo bar baz ] );
-  my $two = Data::Enum->new( qw[ foo bar baz ] );
+  my $two = Data::Enum->new( qw[ baz bar foo ] );
 
 =item *
 
@@ -189,7 +194,7 @@ Values are immutable (read-only).
 
 This is done by creating a unique internal class name based on the
 possible values.  Each value is actually a subclass of that class,
-with the appropriate C<is_> method returning a constant.
+with the appropriate predicate method returning a constant.
 
 =head1 METHODS
 
@@ -208,7 +213,7 @@ Each instance will have an C<is_> method for each value.
 
 Each instance stringifies to its value.
 
-Since v0.3.0 you can change the method prefix to something other than C<is_>. For example,
+Since v0.3.0 you can change the method prefix of the predicate methods to something other than C<is_>. For example,
 
   my $class = Data::Enum->new( { prefix => "from_" }, "home", "work" );
   my $place = $class->new("work");
@@ -247,6 +252,12 @@ This was added in v0.3.0.
 =head2 MATCH
 
 This method adds support for L<match::simple>.
+
+=head2 as_string
+
+This stringifies the the object.
+
+This was added in v0.4.0.
 
 =for Pod::Coverage TRUE
 

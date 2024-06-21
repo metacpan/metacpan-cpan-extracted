@@ -1,6 +1,20 @@
 Revision History for File-Sticker
 =================================
 
+v3.0204 2024-06-21
+------------------
+
+* 2024-06-21 00:48:05 +1000
+  Fixing field deletion for MP3 files
+* 2024-01-05 00:35:39 +1100
+  do not phantom the date_added field
+* 2023-09-27 13:38:28 +1000
+  more tweaking dates
+* 2023-09-27 11:21:55 +1000
+  trying some more
+* 2023-09-27 10:38:04 +1000
+  derive date_added as file date
+
 v3.0101 2023-07-08
 ------------------
 
@@ -16,60 +30,6 @@ v3.0101 2023-07-08
   updating MANIFEST.SKIP
 * 2023-05-23 02:06:18 +1000
   adding MANIFEST.SKIP
-
-v3.0008 2023-05-21
-------------------
-
-* 2023-05-21 20:12:20 +1000
-  Accidental inclusion of images fixed!
-* 2023-05-16 08:13:18 +1000
-  Further attempt to fix ExifTool soft links problem
-
-v3.0006 2023-05-15
-------------------
-
-* 2023-05-15 19:45:10 +1000
-  Fixing bug where soft links are destroyed
-
-v3.0005 2023-05-14
-------------------
-
-* 2023-05-14 20:42:18 +1000
-  fixing bug with symlinked files
-* 2023-05-14 20:23:05 +1000
-  ignore test images
-* 2023-04-10 13:17:48 +1000
-  Valid YAML data field should have prefix of "---"
-* 2023-04-10 13:10:11 +1000
-  formatting
-* 2023-04-10 13:04:10 +1000
-  problem loading YAML data
-* 2023-04-10 12:49:55 +1000
-  Merge branch 'master' of ssh://azure/home/kat/files/git/public/File-Sticker
-* 2023-04-10 12:39:57 +1000
-  Yet another incompatible change with freeform data.
-* 2023-02-01 14:49:39 +1100
-  Dealing with listing tags for readonly database
-* 2023-02-01 07:04:46 +1100
-  readonly option, prevent table creation
-* 2023-02-01 06:07:02 +1100
-  readonly option
-* 2021-11-03 16:14:39 +1100
-  fixed bug with writing YAML files
-* 2021-11-03 14:59:26 +1100
-  fixing error in reading freeform meta
-* 2021-11-01 18:44:31 +1100
-  Replace UserComment with ImageDescription for EXIF
-* 2021-08-10 16:26:27 +1000
-  space separators
-* 2021-08-10 16:24:04 +1000
-  space separators
-* 2021-08-10 16:22:31 +1000
-  space separators
-* 2020-11-25 18:32:03 +1100
-  as ever, there was a bug
-* 2020-11-25 18:14:22 +1100
-  more data from wiki pages
 
 ===================================
 End of changes in the last 365 days

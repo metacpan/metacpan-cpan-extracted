@@ -38,7 +38,7 @@ balabolka.pl - script converting textfile named $1
 
 =head1 VERSION
 
-version 20240619.1846
+version 20240620.1922
 
 =head1 AUTHOR
 

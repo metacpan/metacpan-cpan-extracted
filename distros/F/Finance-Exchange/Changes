@@ -1,4 +1,7 @@
 Revision history for Finance-Exchange
 
-0.01      2022-10-14 08:48:45+00:00 UTC
+0.02      2024-06-21 08:36:16+00:00 UTC
+        - Add new OTC exchanges (CME_OTC and SGX_OTC) for new symbols
+
+0.01 2022-10-14 10:50:42 +0000
         - Initial release

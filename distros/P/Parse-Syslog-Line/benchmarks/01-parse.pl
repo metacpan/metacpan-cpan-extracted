@@ -44,10 +44,10 @@ my $results = timethese(50_000, {
     'Defaults' => sub {
         $stub->('Defaults');
     },
-    #'NormalizeToUTC' => sub {
-        #local $Parse::Syslog::Line::NormalizeToUTC  = 1;
-        #$stub->('NormalizeToUTC');
-    #},
+    'NormalizeToUTC' => sub {
+        local $Parse::Syslog::Line::NormalizeToUTC  = 1;
+        $stub->('NormalizeToUTC');
+    },
     'PruneEmpty' => sub {
         local $Parse::Syslog::Line::PruneEmpty      = 1;
         $stub->('PruneEmpty');

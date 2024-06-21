@@ -4,7 +4,7 @@ Data::Enum - immutable enumeration classes
 
 # VERSION
 
-version v0.3.0
+version v0.4.0
 
 # SYNOPSIS
 
@@ -16,9 +16,9 @@ my $color = Data::Enum->new( qw[ red yellow blue green ] );
 my $red = $color->new("red");
 
 $red->is_red;    # "1"
-$red->is_yellow; # "" (false)
-$red->is_blue;   # "" (false)
-$red->is_green;  # "" (false)
+$red->is_yellow; # "0" (false)
+$red->is_blue;   # "0" (false)
+$red->is_green;  # "0" (false)
 
 say $red;        # outputs "red"
 
@@ -38,7 +38,7 @@ properties:
 
     ```perl
     my $one = Data::Enum->new( qw[ foo bar baz ] );
-    my $two = Data::Enum->new( qw[ foo bar baz ] );
+    my $two = Data::Enum->new( qw[ baz bar foo ] );
     ```
 
 - All class instances are singletons.
@@ -64,7 +64,7 @@ properties:
 
 This is done by creating a unique internal class name based on the
 possible values.  Each value is actually a subclass of that class,
-with the appropriate `is_` method returning a constant.
+with the appropriate predicate method returning a constant.
 
 # METHODS
 
@@ -87,7 +87,7 @@ Each instance will have an `is_` method for each value.
 
 Each instance stringifies to its value.
 
-Since v0.3.0 you can change the method prefix to something other than `is_`. For example,
+Since v0.3.0 you can change the method prefix of the predicate methods to something other than `is_`. For example,
 
 ```perl
 my $class = Data::Enum->new( { prefix => "from_" }, "home", "work" );
@@ -134,6 +134,12 @@ This was added in v0.3.0.
 ## MATCH
 
 This method adds support for [match::simple](https://metacpan.org/pod/match%3A%3Asimple).
+
+## as\_string
+
+This stringifies the the object.
+
+This was added in v0.4.0.
 
 # CAVEATS
 
