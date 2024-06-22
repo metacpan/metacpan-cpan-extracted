@@ -1,3 +1,10 @@
+0.04 2024-06-21T15:10:12+02:00
+ - Add contructor tests.
+ - Fix example in doc.
+ - Regen example to output with Wikibase::Datatype::Print@0.17 with Czech
+   translation.
+ - Update copyright years.
+
 0.03 2023-11-02T20:05:39+01:00
  - Add -r option for print with references. Change default to not print
    references.

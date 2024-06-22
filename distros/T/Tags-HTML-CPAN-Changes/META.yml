@@ -36,6 +36,8 @@ requires:
   Class::Utils: 0
   English: 0
   Error::Pure: 0
+  Mo::utils: 0.01
+  Mo::utils::CSS: 0.02
   Scalar::Util: 0
   Tags::HTML: 0.06
   perl: 5.8.0
@@ -44,4 +46,4 @@ resources:
   homepage: https://github.com/michal-josef-spacek/Tags-HTML-CPAN-Changes
   license: http://opensource.org/licenses/bsd-license.php
   repository: git://github.com/michal-josef-spacek/Tags-HTML-CPAN-Changes
-version: '0.04'
+version: '0.05'

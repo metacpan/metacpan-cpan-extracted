@@ -2,7 +2,9 @@ Changes
 examples/example_tree_indent.pl
 examples/example_tree_raw.pl
 examples/plack_app_tree.pl
+examples/plack_app_tree_color.pl
 images/plack_app_tree.png
+images/plack_app_tree_color.png
 inc/Module/Install.pm
 inc/Module/Install/AuthorRequires.pm
 inc/Module/Install/AuthorTests.pm

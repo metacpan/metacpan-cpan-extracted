@@ -9,13 +9,14 @@ use Test::Shared::Fixture::Wikibase::Datatype::Form::Wikidata::DogCzechSingular;
 use Unicode::UTF8 qw(decode_utf8);
 use Wikibase::Datatype::Item;
 use Wikibase::Datatype::Print::Statement;
+use Wikibase::Datatype::Print::Texts qw(texts);
 use Wikibase::Datatype::Print::Utils qw(print_common);
 use Wikibase::Datatype::Print::Value::Monolingual;
 use Wikibase::Datatype::Value::Monolingual;
 
 # Test.
 my $obj = Test::Shared::Fixture::Wikibase::Datatype::Form::Wikidata::DogCzechSingular->new;
-my @ret = print_common($obj, {},
+my @ret = print_common($obj, { 'texts' => texts() },
 	'statements',
 	\&Wikibase::Datatype::Print::Statement::print,
 	'Statements');
@@ -41,7 +42,7 @@ $obj = Wikibase::Datatype::Item->new(
 		),
 	],
 );
-@ret = print_common($obj, {},
+@ret = print_common($obj, { 'texts' => texts() },
 	'aliases',
 	\&Wikibase::Datatype::Print::Value::Monolingual::print,
 	'Aliases');
@@ -68,7 +69,7 @@ $obj = Wikibase::Datatype::Item->new(
 		),
 	],
 );
-@ret = print_common($obj, {},
+@ret = print_common($obj, { 'texts' => texts(), },
 	'aliases',
 	\&Wikibase::Datatype::Print::Value::Monolingual::print,
 	'Aliases', sub { grep { $_->language eq 'cs' } @_ });
@@ -94,7 +95,7 @@ $obj = Wikibase::Datatype::Item->new(
 		),
 	],
 );
-@ret = print_common($obj, {},
+@ret = print_common($obj, { 'texts' => texts() },
 	'aliases',
 	\&Wikibase::Datatype::Print::Value::Monolingual::print,
 	'Aliases', sub { grep { $_->language eq 'en' } @_ });
@@ -116,7 +117,7 @@ $obj = Wikibase::Datatype::Item->new(
 		),
 	],
 );
-@ret = print_common($obj, {},
+@ret = print_common($obj, { 'texts' => texts() },
 	'labels',
 	\&Wikibase::Datatype::Print::Value::Monolingual::print,
 	'Label', sub { grep { $_->language eq 'en' } @_ }, 1);
@@ -137,7 +138,7 @@ $obj = Wikibase::Datatype::Item->new(
 		),
 	],
 );
-@ret = print_common($obj, {},
+@ret = print_common($obj, { 'texts' => texts() },
 	'labels',
 	\&Wikibase::Datatype::Print::Value::Monolingual::print,
 	'Label', sub { grep { $_->language eq 'en' } @_ }, 0);
@@ -164,7 +165,7 @@ $obj = Wikibase::Datatype::Item->new(
 	],
 );
 eval {
-	print_common($obj, {}, 'aliases',
+	print_common($obj, { 'texts' => texts() }, 'aliases',
 	\&Wikibase::Datatype::Print::Value::Monolingual::print,
 	'Aliases', undef, 1);
 };

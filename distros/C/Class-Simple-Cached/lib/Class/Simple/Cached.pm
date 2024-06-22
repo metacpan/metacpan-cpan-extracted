@@ -13,11 +13,11 @@ Class::Simple::Cached - cache messages to an object
 
 =head1 VERSION
 
-Version 0.04
+Version 0.05
 
 =cut
 
-our $VERSION = '0.04';
+our $VERSION = '0.05';
 
 =head1 SYNOPSIS
 
@@ -32,8 +32,8 @@ that works on objects with a get/set model such as:
 
     use Class::Simple;
     my $obj = Class::Simple->new();
-    $obj->val($newval);
-    $oldval = $obj->val();
+    $obj->val('foo');
+    my $oldval = $obj->val();
 
 =head1 SUBROUTINES/METHODS
 
@@ -53,7 +53,8 @@ and that is used.
 
 =cut
 
-sub new {
+sub new
+{
 	my $proto = shift;
 	my $class = ref($proto) || $proto;
 
@@ -84,17 +85,52 @@ sub new {
 	return;	# undef
 }
 
-sub _caller_class
+=head2 can
+
+Returns if the embedded object can handle a message
+
+=cut
+
+sub can
 {
 	my $self = shift;
+	my $method = shift;
 
-	if(ref($self->{'object'}) eq 'Class::Simple') {
-		# return $self->SUPER::_caller_class(@_);
-		return $self->Class::Simple::_caller_class(@_);
+	if(($method eq 'new') || $self->{'object'}->can($method) || $self->SUPER::can($method)) {
+		return 1;
 	}
+	return 0;
 }
 
-sub AUTOLOAD {
+=head2 isa
+
+Returns if the embedded object is the given type of object
+
+=cut
+
+sub isa
+{
+	my $self = shift;
+	my $class = shift;
+
+	if($class eq ref($self) || ($class eq __PACKAGE__) || $self->SUPER::isa($self)) {
+		return 1;
+	}
+	return $self->{'object'}->isa($class);
+}
+
+# sub _caller_class
+# {
+	# my $self = shift;
+# 
+	# if(ref($self->{'object'}) eq 'Class::Simple') {
+		# # return $self->SUPER::_caller_class(@_);
+		# return $self->Class::Simple::_caller_class(@_);
+	# }
+# }
+
+sub AUTOLOAD
+{
 	our $AUTOLOAD;
 	my $param = $AUTOLOAD;
 	$param =~ s/.*:://;
@@ -116,13 +152,13 @@ sub AUTOLOAD {
 		return;
 	}
 
-	# my $func = $self->{'object'} . "::$param";
-	my $func = $param;
+	# my $method = $self->{'object'} . "::$param";
+	my $method = $param;
 	my $object = $self->{'object'};
 
 	# if($param =~ /^[gs]et_/) {
 		# # $param = "SUPER::$param";
-		# return $object->$func(\@_);
+		# return $object->$method(\@_);
 	# }
 
 	if(scalar(@_) == 0) {
@@ -147,7 +183,7 @@ sub AUTOLOAD {
 			return $rc;
 		}
 		if(wantarray) {
-			my @rc = $object->$func();
+			my @rc = $object->$method();
 			if(scalar(@rc) == 0) {
 				return;
 			}
@@ -158,7 +194,7 @@ sub AUTOLOAD {
 			}
 			return @rc;
 		}
-		if(defined(my $rc = $object->$func())) {
+		if(defined(my $rc = $object->$method())) {
 			if(ref($cache) eq 'HASH') {
 				return $cache->{$param} = $rc;
 			}
@@ -176,7 +212,7 @@ sub AUTOLOAD {
 	if($_[1]) {
 		# Storing an array
 		# We store a ref to the array, and dereference on retrieval
-		if(defined(my $val = $object->$func(\@_))) {
+		if(defined(my $val = $object->$method(\@_))) {
 			if(ref($cache) eq 'HASH') {
 				$cache->{$param} = $val;
 			} else {
@@ -192,9 +228,9 @@ sub AUTOLOAD {
 	}
 	# Storing a scalar
 	if(ref($cache) eq 'HASH') {
-		return $cache->{$param} = $object->$func($_[0]);
+		return $cache->{$param} = $object->$method($_[0]);
 	}
-	return $cache->set($param, $object->$func($_[0]), 'never');
+	return $cache->set($param, $object->$method($_[0]), 'never');
 }
 
 =head1 AUTHOR
@@ -206,6 +242,7 @@ Nigel Horne, C<< <njh at bandsman.co.uk> >>
 Doesn't work with L<Memoize>.
 
 Only works on messages that take no arguments.
+For that, use L<Class::Simple::Readonly::Cached>.
 
 Please report any bugs or feature requests to L<https://github.com/nigelhorne/Class-Simple-Readonly/issues>.
 I will be notified, and then you'll
@@ -241,10 +278,6 @@ L<http://cpants.cpanauthors.org/dist/Class-Simple-Cached>
 
 L<http://matrix.cpantesters.org/?dist=Class-Simple-Cached>
 
-=item * CPAN Ratings
-
-L<http://cpanratings.perl.org/d/Class-Simple-Cached>
-
 =item * CPAN Testers Dependencies
 
 L<http://deps.cpantesters.org/?module=Class::Simple::Cached>
@@ -254,7 +287,7 @@ L<http://deps.cpantesters.org/?module=Class::Simple::Cached>
 =head1 LICENCE AND COPYRIGHT
 
 Author Nigel Horne: C<njh@bandsman.co.uk>
-Copyright (C) 2019-2021, Nigel Horne
+Copyright (C) 2019-2024, Nigel Horne
 
 Usage is subject to licence terms.
 The licence terms of this software are as follows:

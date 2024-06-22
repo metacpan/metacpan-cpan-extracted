@@ -8,21 +8,24 @@ use Error::Pure qw(err);
 use Readonly;
 use Wikibase::Datatype::Print::Reference;
 use Wikibase::Datatype::Print::Snak;
-use Wikibase::Datatype::Print::Utils qw(print_references);
+use Wikibase::Datatype::Print::Utils qw(defaults print_references);
 
 Readonly::Array our @EXPORT_OK => qw(print);
 
-our $VERSION = 0.16;
+our $VERSION = 0.17;
 
 sub print {
 	my ($obj, $opts_hr) = @_;
+
+	$opts_hr = defaults($obj, $opts_hr);
 
 	if (! $obj->isa('Wikibase::Datatype::Statement')) {
 		err "Object isn't 'Wikibase::Datatype::Statement'.";
 	}
 
+	my $text_rank = $opts_hr->{'texts'}->{'rank_'.$obj->rank};
 	my @ret = (
-		Wikibase::Datatype::Print::Snak::print($obj->snak, $opts_hr).' ('.$obj->rank.')',
+		Wikibase::Datatype::Print::Snak::print($obj->snak, $opts_hr).' ('.$text_rank.')',
 	);
 	foreach my $property_snak (@{$obj->property_snaks}) {
 		push @ret, ' '.Wikibase::Datatype::Print::Snak::print($property_snak, $opts_hr);
@@ -72,6 +75,8 @@ Returns list of lines in array context.
 =head1 ERRORS
 
  print():
+         From Wikibase::Datatype::Print::Utils::defaults():
+                 Defined text keys are bad.
          Object isn't 'Wikibase::Datatype::Statement'.
 
 =head1 EXAMPLE1
@@ -282,13 +287,12 @@ L<http://skim.cz>
 
 =head1 LICENSE AND COPYRIGHT
 
-© 2020-2023 Michal Josef Špaček
+© 2020-2024 Michal Josef Špaček
 
 BSD 2-Clause License
 
 =head1 VERSION
 
-0.16
+0.17
 
 =cut
-

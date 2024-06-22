@@ -50,7 +50,7 @@ XS FUNCTIONS
       * A package name as a plain string of a package which has a check
       method. Value checks will be invoked as
 
-         $ok = $checkrpkg->check( $value );
+         $ok = $checkerpkg->check( $value );
 
       * A code reference. Value checks will be invoked with a single
       argument, as
@@ -60,7 +60,29 @@ XS FUNCTIONS
     Once constructed into a checker structure, the choice of which
     implementation is used is fixed, and if a method lookup is involved its
     result is stored directly as a CV pointer for efficiency of later
-    invocations.
+    invocations. In either of the first two cases, the reference count on
+    the checkspec SV is increased to account for the argument value used on
+    each invocation. In the third case, the reference SV is not retained,
+    but the underlying CV it refers to has its reference count increased.
+
+ free_checkdata
+
+       void free_checkdata(struct DataChecks_Checker *checker);
+
+    Releases any stored SVs in the checker structure, and the structure
+    itself.
+
+ gen_assertmess
+
+       void gen_assertmess(struct DataChecks_Checker *checker, SV *name, SV *constraint);
+
+    Generates and stores a message string for the assert message to be used
+    by "make_assertop" and "assert_value". The message will take the form
+
+       NAME requires a value satisfying CONSTRAINT
+
+    Both name and constraint SVs used as temporary strings to generate the
+    stored message string. Neither SV is retained by the checker directly.
 
  make_assertop
 

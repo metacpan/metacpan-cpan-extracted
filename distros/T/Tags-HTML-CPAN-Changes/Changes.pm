@@ -8,9 +8,11 @@ use Class::Utils qw(set_params split_params);
 use CPAN::Version;
 use English;
 use Error::Pure qw(err);
+use Mo::utils 0.01 qw(check_required);
+use Mo::utils::CSS 0.02 qw(check_css_class);
 use Scalar::Util qw(blessed);
 
-our $VERSION = 0.04;
+our $VERSION = 0.05;
 
 # Constructor.
 sub new {
@@ -27,9 +29,8 @@ sub new {
 	# Process params.
 	set_params($self, @{$object_params_ar});
 
-	if (! defined $self->{'css_class'}) {
-		err "Parameter 'css_class' is required.";
-	}
+	check_required($self, 'css_class');
+	check_css_class($self, 'css_class');
 
 	# Object.
 	return $self;
@@ -295,9 +296,15 @@ Returns undef.
  new():
          From Class::Utils::set_params():
                  Unknown parameter '%s'.
+         From Mo::utils::check_required():
+                 Parameter 'css_class' is required.
+         From Mo::utils::CSS::check_css_class():
+                 Parameter 'css_class' has bad CSS class name.
+                         Value: %s
+                 Parameter 'css_class' has bad CSS class name (number on begin).
+                         Value: %s
          From Tags::HTML::new():
                  Parameter 'tags' must be a 'Tags::Output::*' class.
-         Parameter 'css_class' is required.
 
  init():
          Data object must be a 'CPAN::Changes' instance.
@@ -522,6 +529,8 @@ L<Class::Utils>,
 L<CPAN::Version>,
 L<English>,
 L<Error::Pure>,
+L<Mo::utils>,
+L<Mo::utils::CSS>,
 L<Scalar::Util>,
 L<Tags::HTML>.
 
@@ -543,6 +552,6 @@ BSD 2-Clause License
 
 =head1 VERSION
 
-0.04
+0.05
 
 =cut

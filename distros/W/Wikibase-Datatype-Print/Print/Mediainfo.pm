@@ -7,36 +7,30 @@ use warnings;
 use Error::Pure qw(err);
 use Readonly;
 use Wikibase::Datatype::Print::MediainfoStatement;
-use Wikibase::Datatype::Print::Utils qw(print_descriptions print_labels
+use Wikibase::Datatype::Print::Utils qw(defaults print_descriptions print_labels
 	print_statements);
 use Wikibase::Datatype::Print::Value::Monolingual;
 
 Readonly::Array our @EXPORT_OK => qw(print);
 
-our $VERSION = 0.16;
+our $VERSION = 0.17;
 
 sub print {
 	my ($obj, $opts_hr) = @_;
 
-	if (! defined $opts_hr) {
-		$opts_hr = {};
-	}
-
-	if (! exists $opts_hr->{'lang'}) {
-		$opts_hr->{'lang'} = 'en';
-	}
+	$opts_hr = defaults($obj, $opts_hr);
 
 	if (! $obj->isa('Wikibase::Datatype::Mediainfo')) {
 		err "Object isn't 'Wikibase::Datatype::Mediainfo'.";
 	}
 
 	my @ret = (
-		defined $obj->id ? 'Id: '.$obj->id : (),
-		defined $obj->title ? 'Title: '.$obj->title : (),
-		defined $obj->ns ? 'NS: '.$obj->ns : (),
-		defined $obj->lastrevid ? 'Last revision id: '.$obj->lastrevid : (),
-		defined $obj->modified ? 'Date of modification: '.$obj->modified : (),
-		defined $obj->page_id ? 'Page ID: '.$obj->page_id : (),
+		defined $obj->id ? $opts_hr->{'texts'}->{'id'}.': '.$obj->id : (),
+		defined $obj->title ? $opts_hr->{'texts'}->{'title'}.': '.$obj->title : (),
+		defined $obj->ns ? $opts_hr->{'texts'}->{'ns'}.': '.$obj->ns : (),
+		defined $obj->lastrevid ? $opts_hr->{'texts'}->{'last_revision_id'}.': '.$obj->lastrevid : (),
+		defined $obj->modified ? $opts_hr->{'texts'}->{'date_of_modification'}.': '.$obj->modified : (),
+		defined $obj->page_id ? $opts_hr->{'texts'}->{'page_id'}.': '.$obj->page_id : (),
 	);
 
 	# Label.
@@ -89,6 +83,8 @@ Returns list of lines in array context.
 =head1 ERRORS
 
  print():
+         From Wikibase::Datatype::Print::Utils::defaults():
+                 Defined text keys are bad.
          Object isn't 'Wikibase::Datatype::Mediainfo'.
 
 =head1 EXAMPLE1
@@ -451,12 +447,12 @@ L<http://skim.cz>
 
 =head1 LICENSE AND COPYRIGHT
 
-© 2020-2023 Michal Josef Špaček
+© 2020-2024 Michal Josef Špaček
 
 BSD 2-Clause License
 
 =head1 VERSION
 
-0.16
+0.17
 
 =cut

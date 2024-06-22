@@ -2,7 +2,7 @@ package Net::DNS::Paranoid;
 use strict;
 use warnings;
 use 5.008008;
-our $VERSION = '0.08';
+our $VERSION = '0.10';
 
 use Class::Accessor::Lite (
     rw => [qw(timeout blocked_hosts whitelisted_hosts resolver)]
@@ -113,7 +113,7 @@ sub _bad_host {
         $host =~ /\s/i;               # any whitespace is questionable
  
     # Let's assume it's an IP address now, and get it into 32 bits.
-    # Uf at any time something doesn't look like a number, then it's
+    # If at any time something doesn't look like a number, then it's
     # probably a hostname and we've already either whitelisted or
     # blacklisted those, so we'll just say it's okay and it'll come
     # back here later when the resolver finds an IP address.

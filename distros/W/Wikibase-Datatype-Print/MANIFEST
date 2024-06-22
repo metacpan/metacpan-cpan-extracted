@@ -60,6 +60,7 @@ Print/Sense.pm
 Print/Sitelink.pm
 Print/Snak.pm
 Print/Statement.pm
+Print/Texts.pm
 Print/Utils.pm
 Print/Value.pm
 Print/Value/Globecoordinate.pm
@@ -109,6 +110,10 @@ t/Wikibase-Datatype-Print-Snak/03-print.t
 t/Wikibase-Datatype-Print-Statement/01-use.t
 t/Wikibase-Datatype-Print-Statement/02-version.t
 t/Wikibase-Datatype-Print-Statement/03-print.t
+t/Wikibase-Datatype-Print-Texts/01-use.t
+t/Wikibase-Datatype-Print-Texts/02-version.t
+t/Wikibase-Datatype-Print-Texts/03-text_keys.t
+t/Wikibase-Datatype-Print-Texts/04-texts.t
 t/Wikibase-Datatype-Print-Utils/01-use.t
 t/Wikibase-Datatype-Print-Utils/02-version.t
 t/Wikibase-Datatype-Print-Utils/03-print_aliases.t
@@ -178,6 +183,8 @@ xt/Wikibase-Datatype-Print-Snak/01-pod_coverage.t
 xt/Wikibase-Datatype-Print-Snak/02-pod.t
 xt/Wikibase-Datatype-Print-Statement/01-pod_coverage.t
 xt/Wikibase-Datatype-Print-Statement/02-pod.t
+xt/Wikibase-Datatype-Print-Texts/01-pod_coverage.t
+xt/Wikibase-Datatype-Print-Texts/02-pod.t
 xt/Wikibase-Datatype-Print-Utils/01-pod_coverage.t
 xt/Wikibase-Datatype-Print-Utils/02-pod.t
 xt/Wikibase-Datatype-Print-Value-Globecoordinate/01-pod_coverage.t

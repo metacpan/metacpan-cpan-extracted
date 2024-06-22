@@ -21,6 +21,8 @@ my @files = (
     't/01-basic.t',
     't/02-match_simple.t',
     't/03-prefix.t',
+    't/04-name.t',
+    't/05-case.t',
     't/author-critic.t',
     't/author-eof.t',
     't/author-eol.t',

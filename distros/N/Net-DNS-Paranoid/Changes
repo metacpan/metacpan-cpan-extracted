@@ -1,5 +1,35 @@
 Revision history for Perl extension Net::DNS::Paranoid
 
+0.10 2024-06-22T05:07:58Z
+
+    force reindex!
+
+0.09 2024-02-06T05:59:30Z
+
+    commit 2d84b68bcdcf1325ba15d6d0252894d828a0d765
+    Author: Graham TerMarsch <graham@howlingfrog.com>
+    Date:   Mon Aug 30 13:14:00 2021 -0700
+
+        Switch to `nip.io`, from `xip.io` in this test.
+        
+        `xip.io` stopped working long ago, and `nip.io` provides a similar
+        service and should be working.  Update test accordingly.
+        
+        Resolves #4
+    ---
+    t/01_simple.t | 6 +++---
+    1 file changed, 3 insertions(+), 3 deletions(-)
+
+    commit d642ca14c2bdeb7bf13f2c1bcd5b023bfeca893a
+    Author: Anirvan Chatterjee <anirvan@users.noreply.github.com>
+    Date:   Fri Aug 24 11:53:18 2018 -0700
+
+        Fix typo in comment ("Uf" -> "If")
+    ---
+    lib/Net/DNS/Paranoid.pm | 2 +-
+    1 file changed, 1 insertion(+), 1 deletion(-)
+
+
 0.08 2015-09-30T07:01:36Z
 
     - fixed test case

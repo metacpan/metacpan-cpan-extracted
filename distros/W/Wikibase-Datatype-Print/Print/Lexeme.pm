@@ -9,46 +9,44 @@ use Readonly;
 use Wikibase::Datatype::Print::Form;
 use Wikibase::Datatype::Print::Sense;
 use Wikibase::Datatype::Print::Statement;
-use Wikibase::Datatype::Print::Utils qw(print_forms print_senses print_statements);
+use Wikibase::Datatype::Print::Utils qw(defaults print_forms print_senses print_statements);
 use Wikibase::Datatype::Print::Value::Monolingual;
 
 Readonly::Array our @EXPORT_OK => qw(print);
 
-our $VERSION = 0.16;
+our $VERSION = 0.17;
 
 sub print {
 	my ($obj, $opts_hr) = @_;
 
-	if (! defined $opts_hr) {
-		$opts_hr = {};
-	}
+	$opts_hr = defaults($obj, $opts_hr);
 
 	if (! $obj->isa('Wikibase::Datatype::Lexeme')) {
 		err "Object isn't 'Wikibase::Datatype::Lexeme'.";
 	}
 
 	my @ret = (
-		'Title: '.$obj->title,
+		$opts_hr->{'texts'}->{'title'}.': '.$obj->title,
 	);
 
 	# Lemmas.
 	my ($lemma) = @{$obj->lemmas};
 	if (defined $lemma) {
-		push @ret, 'Lemmas: '.
+		push @ret, $opts_hr->{'texts'}->{'lemmas'}.': '.
 			Wikibase::Datatype::Print::Value::Monolingual::print($lemma, $opts_hr);
 	}
 
 	# Language.
 	if ($obj->language) {
 		push @ret, (
-			'Language: '.$obj->language,
+			$opts_hr->{'texts'}->{'language'}.': '.$obj->language,
 		);
 	}
 
 	# Lexical category.
 	if ($obj->lexical_category) {
 		push @ret, (
-			'Lexical category: '.$obj->lexical_category,
+			$opts_hr->{'texts'}->{'lexical_category'}.': '.$obj->lexical_category
 		);
 	}
 
@@ -102,6 +100,8 @@ Returns list of lines in array context.
 =head1 ERRORS
 
  print():
+         From Wikibase::Datatype::Print::Utils::defaults():
+                 Defined text keys are bad.
          Object isn't 'Wikibase::Datatype::Lexeme'.
 
 =head1 EXAMPLE
@@ -289,13 +289,12 @@ L<http://skim.cz>
 
 =head1 LICENSE AND COPYRIGHT
 
-© 2020-2023 Michal Josef Špaček
+© 2020-2024 Michal Josef Špaček
 
 BSD 2-Clause License
 
 =head1 VERSION
 
-0.16
+0.17
 
 =cut
-

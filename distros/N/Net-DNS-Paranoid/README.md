@@ -60,7 +60,7 @@ This module detects IP address / host names for internal servers.
 
 # USE WITH Furl
 
-You can use [Net::DNS::Paranoid](https://metacpan.org/pod/Net::DNS::Paranoid) with Furl!
+You can use [Net::DNS::Paranoid](https://metacpan.org/pod/Net%3A%3ADNS%3A%3AParanoid) with Furl!
 
     use Furl::HTTP;
     use Net::DNS::Paranoid;
@@ -76,12 +76,12 @@ You can use [Net::DNS::Paranoid](https://metacpan.org/pod/Net::DNS::Paranoid) wi
 
 # USE WITH LWP
 
-I shipped [LWPx::ParanoidHandler](https://metacpan.org/pod/LWPx::ParanoidHandler) to wrap this module.
+I shipped [LWPx::ParanoidHandler](https://metacpan.org/pod/LWPx%3A%3AParanoidHandler) to wrap this module.
 Please use it.
 
 # THANKS TO
 
-Most of code was taken from [LWPx::ParanoidAgent](https://metacpan.org/pod/LWPx::ParanoidAgent).
+Most of code was taken from [LWPx::ParanoidAgent](https://metacpan.org/pod/LWPx%3A%3AParanoidAgent).
 
 # AUTHOR
 

@@ -5,9 +5,9 @@ author:
 build_requires:
   Test::More: '0.98'
 configure_requires:
-  Module::Build: '0.38'
+  Module::Build::Tiny: '0.035'
 dynamic_config: 0
-generated_by: 'Minilla/v2.5.0, CPAN::Meta::Converter version 2.150005'
+generated_by: 'Minilla/v3.1.10, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -26,7 +26,7 @@ no_index:
 provides:
   Net::DNS::Paranoid:
     file: lib/Net/DNS/Paranoid.pm
-    version: '0.08'
+    version: '0.10'
 requires:
   Class::Accessor::Lite: '0.05'
   Net::DNS: '0.68'
@@ -36,7 +36,10 @@ resources:
   bugtracker: https://github.com/tokuhirom/Net-DNS-Paranoid/issues
   homepage: https://github.com/tokuhirom/Net-DNS-Paranoid
   repository: git://github.com/tokuhirom/Net-DNS-Paranoid.git
-version: '0.08'
+version: '0.10'
 x_contributors:
+  - 'Anirvan Chatterjee <anirvan@users.noreply.github.com>'
+  - 'Graham TerMarsch <graham@howlingfrog.com>'
   - 'Tokuhiro Matsuno <tokuhirom@gmail.com>'
-x_serialization_backend: 'CPAN::Meta::YAML version 0.017'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+x_static_install: 1

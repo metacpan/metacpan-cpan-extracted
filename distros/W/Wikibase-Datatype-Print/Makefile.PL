@@ -60,7 +60,7 @@ test_requires 'Wikibase::Datatype::Value::Sense' => 0.29;
 test_requires 'Wikibase::Datatype::Value::String' => 0;
 test_requires 'Wikibase::Datatype::Value::Time' => 0;
 tests_recursive;
-version '0.16';
+version '0.17';
 
 # Run.
 WriteAll();

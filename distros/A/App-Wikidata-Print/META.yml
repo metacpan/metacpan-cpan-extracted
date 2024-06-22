@@ -4,6 +4,7 @@ author:
   - 'Michal Josef Spacek <skim@cpan.org>'
 build_requires:
   English: 0
+  Error::Pure::Utils: 0
   ExtUtils::MakeMaker: 6.36
   File::Object: 0
   File::Spec::Functions: 0
@@ -32,11 +33,11 @@ requires:
   Getopt::Std: 0
   Unicode::UTF8: 0
   Wikibase::API: 0.04
-  Wikibase::Datatype::Print: 0.16
+  Wikibase::Datatype::Print: 0.17
   perl: 5.6.0
 resources:
   bugtracker: https://github.com/michal-josef-spacek/App-Wikidata-Print/issues
   homepage: https://github.com/michal-josef-spacek/App-Wikidata-Print
   license: http://opensource.org/licenses/bsd-license.php
   repository: git://github.com/michal-josef-spacek/App-Wikidata-Print
-version: '0.03'
+version: '0.04'

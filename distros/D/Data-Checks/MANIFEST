@@ -2,6 +2,7 @@
 Build.PL
 Changes
 hax/optree-additions.c.inc
+inc/Module/Build/with/XSTests.pm
 lib/Data/Checks.pm
 lib/Data/Checks.xs
 lib/Data/Checks/Builder.pm
@@ -12,4 +13,10 @@ META.yml
 README
 share/include/DataChecks.h
 t/00use.t
+t/01check-obj.t
+t/02check-pkg.t
+t/03check-sub.t
 t/99pod.t
+t/test.c
+t/test.xs
+t/testcase.pm

@@ -12,7 +12,7 @@ use Geo::WebService::Elevation::USGS;
 use Pod::Usage;
 use Scalar::Util qw{ looks_like_number };
 
-our $VERSION = '0.120';
+our $VERSION = '0.200';
 
 BEGIN {
     eval {
@@ -117,27 +117,6 @@ sub cmd_help {
     return;
 }
 
-# The 'ned' command sets the usgs_url attribute to
-# 'https://ned.usgs.gov/epqs/pqs.php'.
-
-{
-    my $dflt;
-    BEGIN {
-	$dflt = 1;
-    }
-    sub cmd_ned {
-	my ( $arg ) = @_;
-	defined $arg
-	    or $arg = $dflt;
-	$dflt = !$arg;
-	my $url = $arg ? 'https://ned.usgs.gov/epqs/pqs.php' :
-	Geo::WebService::Elevation::USGS->USGS_URL;
-	$ele->set( usgs_url => $url );
-	cmd_show( 'usgs_url' );
-	return;
-    }
-}
-
 # The 'new' command wraps the Geo::WebService::Elevation::USGS 'new',
 # nabs the new object, and puts it where we can find it.
 
@@ -235,13 +214,6 @@ This command displays the value of the attribute named in the command.
 
 This command displays this text.
 
-=head2 ned
-
-This command toggles between the old (v0.114 and earlier) and new
-(post-v0.114) URLs. If you provide an argument, you get the old URL if
-the argument is true in the Perl sense (e.g. C<1>) and the new URL if it
-is false (e.g. C<0>).
-
 =head2 new
 
 This command creates a new Geo::WebService::Elevation::USGS object.
@@ -287,7 +259,7 @@ Thomas R. Wyant, III F<wyant at cpan dot org>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2008-2021 by Thomas R. Wyant, III
+Copyright (C) 2008-2022, 2024 by Thomas R. Wyant, III
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl 5.10.0. For more details, see the full text

@@ -1,3 +1,11 @@
+0.17 2024-06-21T14:06:58+02:00
+ - Add Czech translation of texts.
+ - Fix tests for Wikibase::Datatype::Print.
+ - Remove defaults from Print, not needed.
+ - Rewrite all default settings to Utils::defaults().
+ - Rewrite to use of translations.
+ - Update copyright years.
+
 0.16 2023-11-02T19:59:25+01:00
  - Add Wikibase::Datatype::Print::print() for all top objects like
    Item/Lexeme/Mediainfo and Property.

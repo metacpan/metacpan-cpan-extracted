@@ -3,7 +3,7 @@
 #
 #  (C) Paul Evans, 2024 -- leonerd@leonerd.org.uk
 
-package Data::Checks::Builder 0.42;
+package Data::Checks::Builder 0.02;
 
 use v5.14;
 use warnings;

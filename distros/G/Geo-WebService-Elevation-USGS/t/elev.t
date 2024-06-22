@@ -4,7 +4,7 @@ use strict;
 use warnings;
 
 use HTTP::Response;
-use HTTP::Status;
+use HTTP::Status qw{ HTTP_BAD_REQUEST HTTP_OK };
 use JSON;
 use Test::More 0.88;
 
@@ -43,37 +43,33 @@ diag "Accessing @{[ $ele->get( 'usgs_url' ) ]}";
     my $rslt = _skip_it(eval {$ua->get($pxy)},
 	'Unable to execute GET (should not happen)');
 
-    _skip_it($rslt->is_success(),
-	"Unable to access $pxy");
+    _skip_it( $rslt->is_success() || $rslt->code() == HTTP_BAD_REQUEST,
+	"Unable to access $pxy: @{[ $rslt->status_line() ]}");
 }
 
 #x# my $ele_dataset = 'Elev_DC_Washington';	# Expected data set
 #y# my $ele_dataset = 'NED 1/3 arc-second';	# Expected data set
-my $ele_dataset = '3DEP 1/3 arc-second';	# Expected data set
+# my $ele_dataset = '3DEP 1/3 arc-second';	# Expected data set
 my $ele_re = qr{ \A Elev_DC }smx;	# Regexp for data set
 #x# my $ele_ft = '57.03';	# expected elevation in feet.
 #x# my $ele_ft = '56.95';	# expected elevation in feet.
-my $ele_ft = '56.53';	# expected elevation in feet.
+# my $ele_ft = '56.53';	# expected elevation in feet.
+my $ele_ft = '56.59';	# expected elevation in feet.
 my @ele_loc = ( 38.898748, -77.037684 );	# Lat/Lon to get elevation for
 #x# my $ele_mt = '17.38';	# Expected elevation in meters.
 #x# my $ele_mt = '17.36';	# Expected elevation in meters.
-my $ele_mt = '17.23';	# Expected elevation in meters.
+# my $ele_mt = '17.23';	# Expected elevation in meters.
+my $ele_mt = '17.25';	# Expected elevation in meters.
 
 my $rslt;
 
 SKIP: {
     $rslt = eval {$ele->elevation( @ele_loc )};
-    _skip_on_server_error($ele, 7);
+    _skip_on_server_error( $ele, 5 );
     ok(!$@, 'elevation() succeeded')
 	or _skip_tests( 4 );
-    # Note that prior to version 0.106_01 the default for
-    # the 'compatibility' attribute was true, which caused an array to
-    # be returned.
     is( ref $rslt, HASH_REF, 'elevation() returned a hash' );
     $rslt ||= {};	# To keep following from blowing up.
-    is( $rslt->{Data_Source}, $ele_dataset,
-	"Data came from $ele_dataset" );
-    is($rslt->{Units}, 'Feet', 'Elevation is in feet');
     is($rslt->{Elevation}, $ele_ft, "Elevation is $ele_ft");
 }
 
@@ -83,48 +79,26 @@ $ele->set(
 );
 
 SKIP: {
-    $rslt = eval {[$ele->elevation( @ele_loc )]};
-    _skip_on_server_error($ele, 7);
+    $rslt = eval { [ $ele->elevation( @ele_loc ) ] };
+    _skip_on_server_error( $ele, 5 );
     ok(!$@, 'elevation() succeeded in list context')
 	or _skip_tests( 7 );
     is(ref $rslt, ARRAY_REF, 'elevation() returns an array in list context');
     ref $rslt eq ARRAY_REF or $rslt = [];	# To keep following from blowing up.
     cmp_ok(scalar @$rslt, '==', 1, 'elevation() returned a single result');
     is(ref ($rslt->[0]), HASH_REF, 'elevation\'s only result was a hash');
-    is( $rslt->[0]{Data_Source}, $ele_dataset, "Data came from $ele_dataset" );
-    is($rslt->[0]{Units}, 'Meters', 'Elevation is in meters');
     is($rslt->[0]{Elevation}, $ele_mt, "Elevation is $ele_mt");
-}
-
-SKIP: {
-    $rslt = eval {[$ele->elevation( @ele_loc )]};
-    _skip_on_server_error($ele, 6);
-    ok(!$@, 'elevation() succeeded with regexp source')
-	or _skip_tests( 6 );
-    is(ref $rslt, ARRAY_REF, 'Get an array back from regexp source');
-    ref $rslt eq ARRAY_REF or $rslt = [];	# To keep following from blowing up.
-    cmp_ok(scalar @$rslt, '>=', 1, 'Should have at least one result');
-    $rslt = {map {$_->{Data_Source} => $_} @$rslt};
-    ok($rslt->{$ele_dataset}, "We have results from $ele_dataset");
-    is($rslt->{$ele_dataset}{Units}, 'Meters', 'Elevation is in meters');
-    is($rslt->{$ele_dataset}{Elevation}, $ele_mt, "Elevation is $ele_mt");
 }
 
 my $gp = bless [ @ele_loc ], 'Geo::Point';
 
 SKIP: {
-    $rslt = eval {$ele->elevation($gp)};
-    _skip_on_server_error($ele, 7);
-    ok(!$@, 'elevation(Geo::Point) succeeded')
-	or _skip_tests( 4 );
-    # Note that prior to version 0.106_01 the default for
-    # the 'compatibility' attribute was true, which caused an array to
-    # be returned.
-    is( ref $rslt, HASH_REF,
-	'elevation(Geo::Point) returns a hash' );
-    $rslt ||= {};	# To keep following from blowing up.
-    is( $rslt->{Data_Source}, $ele_dataset, "Data came from $ele_dataset" );
-    is( $rslt->{Units}, 'Meters', 'Elevation is in meters' );
+    $rslt = eval { $ele->elevation( @ele_loc ) };
+    _skip_on_server_error( $ele, 4 );
+    ok(!$@, 'elevation() succeeded')
+	or _skip_tests( 7 );
+    is( ref $rslt, HASH_REF, 'elevation() returned a hash' )
+	or $rslt = {};	# Prevent blowup on failure.
     is( $rslt->{Elevation}, $ele_mt, "Elevation is $ele_mt" );
 }
 
@@ -144,14 +118,11 @@ SKIP: {
     }
 
     $rslt = eval {$ele->elevation($gp)};
-    _skip_on_server_error($ele, 7);
+    _skip_on_server_error( $ele, 3 );
     ok(!$@, "elevation($kind) succeeded")
-	or _skip_tests( 7 );
-    is( ref $rslt, HASH_REF, "elevation($kind) returns a hash");
-    $rslt ||= {};	# To keep following from blowing up.
-    is($rslt->{Data_Source}, $ele_dataset,
-	"$kind data came from $ele_dataset");
-    is($rslt->{Units}, 'Meters', "$kind elevation is in meters");
+	or _skip_tests( 2 );
+    is( ref $rslt, HASH_REF, "elevation($kind) returns a hash")
+	or $rslt = {};	# To keep following from blowing up.
     is($rslt->{Elevation}, $ele_mt, "$kind elevation is $ele_mt");
 }
 
@@ -165,7 +136,7 @@ done_testing();
 	my ( $content, $code ) = @_;
 	$json ||= JSON->new()->utf8()->allow_nonref();
 	defined $code
-	    or $code = HTTP::Status->HTTP_OK;
+	    or $code = HTTP_OK;
 	my $resp = HTTP::Response->new( $code );
 	$resp->content( $json->encode( $content ) );
 	return $resp;
@@ -189,8 +160,14 @@ sub _skip_it {
     @args > 1
 	or unshift @args, undef;  # Because eval{} returns () in list context.
     my ($check, $reason) = @args;
-    unless ($check) {
-	plan (skip_all => $reason);
+    if ( $ENV{AUTHOR_TESTING} ) {
+	local $Test::Builder::Level = $Test::Builder::Level + 1;
+	unless ( ok $check, $reason ) {
+	    done_testing;
+	    exit;
+	}
+    } elsif ( ! $check ) {
+	plan skip_all => $reason;
 	exit;
     }
     return $check;
@@ -227,14 +204,6 @@ eod
 
 sub Geo::Point::latlong {
     return ( @{ $_[0] } )
-}
-
-my $VAR1;
-sub Geo::WebService::Elevation::USGS::_get_bad_som {
-##  my ( $self ) = @_;
-    return ( $VAR1 ||= HTTP::Response->new(
-	    HTTP::Status->HTTP_INTERNAL_SERVER_ERROR,
-	    'Internal Server Error' ) );
 }
 
 1;

@@ -13,41 +13,43 @@ Geo::WebService::Elevation::USGS - Elevation queries against USGS web services.
 
 =head1 NOTICE
 
-The GIS data web service this module was originally based on has gone
-the way of the dodo. This release uses the NED service, which is similar
-but simpler. When the change was made, code was installed to ease the
-transition by emulating the old service to the extent possible. This
-code was deprecated pretty much when it was released as 0.100_01 in July
-of 2014.
+Some time while I was not looking the USGS changed the web address and
+the API for the point elevation service yet again.
 
-With the release of 0.116_01 all this compatibility code has been
-removed. Specifically, methods C<getElevation()> and
-C<getAllElevations()> are gone, as are attributes C<compatible>,
-C<default_ns>, C<proxy>, C<source>, and C<use_all_limit>.
+I have dealt with this by resurrecting the C<compatible> attribute and
+defaulting it to a true value. This attribute affects the hash returned
+by the C<elevation()> method. See that method's documentation
+for the gory details.
+
+You are encouraged to set this attribute to a false value as soon as you
+can, since my long-term plan is to discourage a true value, and then
+ultimately deprecate and remove it.
 
 =head1 DESCRIPTION
 
 This module executes elevation queries against the United States
-Geological Survey's web NAD server. You provide the latitude and longitude
-in degrees, with south latitude and west longitude being negative. The
-return is typically a hash containing the data you want. Query errors
-are exceptions by default, though the object can be configured to signal
-an error by an undef response, with the error retrievable from the
-'error' attribute.
+Geological Survey's Elevation Data Point Service. You provide the
+latitude and longitude in degrees, with south latitude and west
+longitude being negative. The return is typically a hash containing the
+data you want. Query errors are exceptions by default, though the object
+can be configured to signal an error by an undef response, with the
+error retrievable from the 'error' attribute.
 
 For documentation on the underlying web service, see
-L<https://nationalmap.gov>.
+L<https://www.usgs.gov/programs/national-geospatial-program/national-map>,
+particularly L<https://epqs.nationalmap.gov/v1/docs>.
 
 For all methods, the input latitude and longitude are documented at the
 above web site as being WGS84, which for practical purposes I understand
 to be equivalent to NAD83. The vertical reference is not documented
 under the above link, but correspondence with the USGS says that it is
 derived from the National Elevation Dataset (NED; see
-L<https://nationalmap.gov>). This is referred to NAD83 (horizontal) and
-NAVD88 (vertical). NAVD88 is based on geodetic leveling surveys, B<not
-the WGS84/NAD83 ellipsoid,> and takes as its zero datum sea level at
-Father Point/Rimouski, in Quebec, Canada. Alaska is an exception, and is
-based on NAD27 (horizontal) and NAVD29 (vertical).
+L<https://www.usgs.gov/programs/national-geospatial-program/national-map>).
+This is referred to NAD83 (horizontal) and NAVD88 (vertical). NAVD88 is
+based on geodetic leveling surveys, B<not the WGS84/NAD83 ellipsoid,>
+and takes as its zero datum sea level at Father Point/Rimouski, in
+Quebec, Canada. Alaska is an exception, and is based on NAD27
+(horizontal) and NAVD29 (vertical).
 
 Anyone interested in the gory details may find the paper I<Converting
 GPS Height into NAVD88 Elevation with the GEOID96 Geoid Height Model> by
@@ -76,10 +78,11 @@ use JSON;
 use LWP::UserAgent;
 use Scalar::Util 1.10 qw{ blessed looks_like_number };
 
-our $VERSION = '0.120';
+our $VERSION = '0.200';
 
 # use constant USGS_URL => 'https://ned.usgs.gov/epqs/pqs.php';
-use constant USGS_URL => 'https://nationalmap.gov/epqs/pqs.php';
+# use constant USGS_URL => 'https://nationalmap.gov/epqs/pqs.php';
+use constant USGS_URL => 'https://epqs.nationalmap.gov/v1/json';
 
 use constant ARRAY_REF	=> ref [];
 use constant CODE_REF	=> ref sub {};
@@ -133,6 +136,7 @@ sub new {
     shift;
     my $self = {
 	carp	=> 0,
+	compatible	=> 1,
 	croak	=> 1,
 	error	=> undef,
 	places	=> undef,
@@ -151,6 +155,7 @@ sub new {
 my %mutator = (
     croak	=> \&_set_literal,
     carp	=> \&_set_literal,
+    compatible	=> \&_set_literal,
     error	=> \&_set_literal,
     places	=> \&_set_integer_or_undef,
     retry	=> \&_set_unsigned_integer,
@@ -190,29 +195,39 @@ sub attributes {
 =head3 $rslt = $usgs->elevation($lat, $lon, $valid);
 
 This method queries the data base for the elevation at the given
-latitude and longitude, returning the results as a hash reference. This
-hash will contain the following keys:
+latitude and longitude, returning the results as a hash reference.
 
-{Data_Source} => A text description of the data source;
+If the C<compatible> attribute is true, this hash will contain the
+following keys:
 
-{Elevation} => The elevation in the given units;
+=over
 
-{Units} => The units of the elevation (C<'Feet'> or C<'Meters'>);
+=item {Data_Source} => A text description of the data source (always 'USGS Elevation Point Query Service');
 
-{x} => The C<$lon> argument;
+=item {Elevation} => The elevation in the given units;
 
-{y} => The C<$lat> argument.
+=item {Units} => The units of the elevation (C<'Feet'> or C<'Meters'>);
+
+=item {x} => The C<$lon> argument;
+
+=item {y} => The C<$lat> argument.
+
+=back
+
+If the C<compatible> attribute is false, the hash will contain the
+values documented at L<https://epqs.nationalmap.gov/v1/docs>. B<Note>
+that the elevation comes back in key C<{value}>. For my own sanity key
+C<{Elevation}> is added to this hash; it contains the value of
+C<{value}>, rounded to C<places> if that attribute is set.
 
 You can also pass a C<Geo::Point>, C<GPS::Point>, or C<Net::GPSD::Point>
 object in lieu of the C<$lat> and C<$lon> arguments. If you do this,
 C<$valid> becomes the second argument, rather than the third.
 
-If the optional C<$valid> argument is specified and the returned data
-are invalid, nothing is returned. The NAD source does not seem to
-produce data recognizable as invalid, so you will probably not see this.
-
-The NAD server appears to return an elevation of C<0> if the elevation
-is unavailable.
+If the optional C<$valid> argument is specified as a true value B<and>
+the returned data are invalid, nothing is returned. The source does not
+seem to produce data recognizable as invalid, so you will probably not
+see this.
 
 =cut
 
@@ -300,6 +315,11 @@ subroutine) returns true if the given datum represents a valid
 elevation, and false otherwise. A valid elevation is a number having a
 value greater than -1e+300. The input can be either an elevation value
 or a hash whose {Elevation} key supplies the elevation value.
+
+B<Note> that as of June 11 2024 I am unable to find any documentation to
+support this method. Therefore use of this method is discouraged, and it
+will deprecated and removed when I drop support for the C<compatible>
+attribute.
 
 =cut
 
@@ -406,7 +426,7 @@ sub _set_unsigned_integer {
 	attribute	=> {
 	    dflt	=> sub { return },
 	    item	=> {
-		compatible	=> 3,
+		compatible	=> 0,
 		default_ns	=> 3,
 		proxy		=> 3,
 		source		=> 3,
@@ -548,7 +568,7 @@ sub _request {
     my ( $self, %arg ) = @_;
 
     # The allow_nonref() is for the benefit of {_hack_result}.
-    my $json = $self->{_json} ||= JSON->new()->utf8()->allow_nonref();
+    my $json = $self->{_json} ||= JSON->new()->allow_nonref();
 
     my $ua = $self->{_transport_object} ||=
 	LWP::UserAgent->new( timeout => $self->{timeout} );
@@ -558,7 +578,6 @@ sub _request {
     $arg{units} = $arg{units} =~ m/ \A meters \z /smxi
 	? 'Meters'
 	: 'Feet';
-    $arg{output}	= 'json';
 
     my $uri = URI->new( $self->get( 'usgs_url' ) );
     $uri->query_form( \%arg );
@@ -582,10 +601,27 @@ sub _request {
     $rslt->is_success()
 	or croak $rslt->status_line();
 
-    $rslt = $json->decode( $rslt->content() );
+    {
+	local $@ = undef;
+	eval {
+	    $rslt = $json->decode( $rslt->decoded_content() );
+	    ref $rslt;
+	} or return $self->_error( $rslt->decoded_content() );
+    }
 
-    defined $rslt
-	or return $self->_error( 'No data found in query result' );
+    if ( $self->get( 'compatible' ) ) {
+	$rslt = {
+	    x	=>	$rslt->{location}{x},
+	    y	=>	$rslt->{location}{y},
+	    Data_Source	=> 'USGS Elevation Point Query Service',
+	    Elevation	=> $rslt->{value},
+	    Units	=> $arg{units},
+	};
+    } else {
+	$rslt->{Elevation} = $rslt->{value};
+    }
+
+=begin comment
 
     foreach my $key (
 	qw{ USGS_Elevation_Point_Query_Service Elevation_Query }
@@ -601,6 +637,10 @@ sub _request {
 	$rslt =~ s/ (?<! [.?!] ) \z /./smx;
 	return $self->_error( $rslt );
     }
+
+=end comment
+
+=cut
 
     my $places;
     defined $rslt->{Elevation}
@@ -788,11 +828,12 @@ This attribute specifies the URL to query. Under normal circumstances
 you will not need to change this, but maybe it can get you going again
 if the USGS moves the service.
 
-The default is the value of environment variable 
+The default is the value of environment variable
 C<GEO_WEBSERVICE_ELEVATION_USGS_URL>. If that is undefined, the default
-is C<https://nationalmap.gov/epqs/pqs.php>. B<Note> that without query
+is C<https://epqs.nationalmap.gov/v1/json>. B<Note> that without query
 parameters this URL does nothing useful. See
-L<https://nationalmap.gov/epqs/> for details.
+L<https://www.usgs.gov/programs/national-geospatial-program/national-map>
+for details.
 
 =head1 ACKNOWLEDGMENTS
 
@@ -820,7 +861,7 @@ Thomas R. Wyant, III; F<wyant at cpan dot org>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2008-2021 Thomas R. Wyant, III
+Copyright (C) 2008-2022, 2024 Thomas R. Wyant, III
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl 5.10.0. For more details, see the full text

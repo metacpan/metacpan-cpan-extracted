@@ -6,7 +6,7 @@ build_requires:
   ExtUtils::CBuilder: '0'
   Test2::V0: '0'
 configure_requires:
-  Data::Checks::Builder: '0'
+  Data::Checks::Builder: '0.02'
   Module::Build: '0.4004'
   Object::Pad::ExtensionBuilder: '0.802'
 dynamic_config: 1
@@ -19,11 +19,12 @@ name: Object-Pad-FieldAttr-Checked
 provides:
   Object::Pad::FieldAttr::Checked:
     file: lib/Object/Pad/FieldAttr/Checked.pm
-    version: '0.09'
+    version: '0.10'
 requires:
+  Data::Checks: '0.02'
   Object::Pad: '0.802'
   perl: '5.022'
 resources:
   license: http://dev.perl.org/licenses/
-version: '0.09'
+version: '0.10'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -9,9 +9,11 @@ t/00-load.t
 t/10-new.t
 t/carp.t
 t/chi.t
+t/comment-spelling.t
 t/coverage.t
 t/critic.t
 t/dist.t
+t/eof.t
 t/eol.t
 t/hash.t
 t/kwalitee.t
@@ -22,11 +24,12 @@ t/no404s.t
 t/noopentickets.t
 t/noplan.t
 t/pod-cm.t
+t/pod-spelling.t
+t/pod-synopsis.t
 t/pod.t
 t/port.t
 t/prereq.t
 t/snippets.t
-t/spelling.t
 t/strict.t
 t/test.t
 t/unused.t

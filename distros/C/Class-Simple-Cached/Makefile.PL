@@ -12,17 +12,19 @@ WriteMakefile(
 	  ? ('LICENSE'=> 'GPL')
 	  : ()),
 	PL_FILES	=> {},
-	TEST_REQUIRES => {
+	PREREQ_PM => {
+		'Carp' => 0,
+		'Class::Simple' => 0,
+	}, TEST_REQUIRES => {
 		'CHI' => 0,
 		'Class::Simple' => 0,
+		'File::Spec' => 0,
 		'Test::Carp' => 0,
 		'Test::Most' => 0,
+		'Test::Needs' => 0,
 		'Test::NoWarnings' => 0,
 		'Test::Requires' => 0,
 		# 'Test::Kwalitee' => 0,
-	}, PREREQ_PM => {
-		'Carp' => 0,
-		'Class::Simple' => 0,
 	},
 	dist		=> { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
 	clean		=> { FILES => 'Class-Simple-Cached-*' },

@@ -4,7 +4,7 @@
       "Andy Wardley <abw@wardley.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 6.66, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.64, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -19,6 +19,31 @@
          "inc"
       ]
    },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "AppConfig" : "1.56",
+            "File::Spec" : "0.8",
+            "File::Temp" : "0.12",
+            "Scalar::Util" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::LeakTrace" : "0"
+         }
+      }
+   },
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
@@ -31,6 +56,6 @@
          "web" : "https://github.com/abw/Template2"
       }
    },
-   "version" : "3.101",
-   "x_serialization_backend" : "JSON::PP version 4.05"
+   "version" : "3.102",
+   "x_serialization_backend" : "JSON::PP version 4.07"
 }

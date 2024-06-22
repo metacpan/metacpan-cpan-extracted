@@ -7,31 +7,25 @@ use warnings;
 use Error::Pure qw(err);
 use Readonly;
 use Wikibase::Datatype::Print::Statement;
-use Wikibase::Datatype::Print::Utils qw(print_aliases print_descriptions
+use Wikibase::Datatype::Print::Utils qw(defaults print_aliases print_descriptions
 	print_labels print_statements);
 use Wikibase::Datatype::Print::Value::Monolingual;
 
 Readonly::Array our @EXPORT_OK => qw(print);
 
-our $VERSION = 0.16;
+our $VERSION = 0.17;
 
 sub print {
 	my ($obj, $opts_hr) = @_;
 
-	if (! defined $opts_hr) {
-		$opts_hr = {};
-	}
-
-	if (! exists $opts_hr->{'lang'}) {
-		$opts_hr->{'lang'} = 'en';
-	}
+	$opts_hr = defaults($obj, $opts_hr);
 
 	if (! $obj->isa('Wikibase::Datatype::Property')) {
 		err "Object isn't 'Wikibase::Datatype::Property'.";
 	}
 
 	my @ret = (
-		'Data type: '.$obj->datatype,
+		$opts_hr->{'texts'}->{'data_type'}.': '.$obj->datatype,
 	);
 
 	# Label.
@@ -88,6 +82,8 @@ Returns list of lines in array context.
 =head1 ERRORS
 
  print():
+         From Wikibase::Datatype::Print::Utils::defaults():
+                 Defined text keys are bad.
          Object isn't 'Wikibase::Datatype::Property'.
 
 =head1 EXAMPLE
@@ -211,13 +207,12 @@ L<http://skim.cz>
 
 =head1 LICENSE AND COPYRIGHT
 
-© 2020-2023 Michal Josef Špaček
+© 2020-2024 Michal Josef Špaček
 
 BSD 2-Clause License
 
 =head1 VERSION
 
-0.16
+0.17
 
 =cut
-

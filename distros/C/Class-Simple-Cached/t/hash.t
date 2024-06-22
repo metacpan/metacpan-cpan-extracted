@@ -2,7 +2,7 @@
 
 use strict;
 use warnings;
-use Test::Most tests => 28;
+use Test::Most tests => 31;
 use Test::NoWarnings;
 
 BEGIN {
@@ -12,36 +12,40 @@ BEGIN {
 CLASS: {
 	my %cache;
 
-	my $l = new_ok('Class::Simple::Cached' => [ cache => \%cache, object => x->new() ]);
+	my $cached = new_ok('Class::Simple::Cached' => [ cache => \%cache, object => x->new() ]);
 
-	ok($l->calls() == 0);
-	ok($l->barney('betty') eq 'betty');
-	ok($l->calls() == 1);
-	ok($l->barney() eq 'betty');
-	ok($l->calls() == 1);
-	ok($l->barney() eq 'betty');
-	ok($l->calls() == 1);
-	my @abc = $l->abc();
+	ok($cached->can('barney'));
+	ok(!$cached->can('xyz'));
+	ok($cached->can('xyz') || $cached->isa('Class::Simple::Cached'));
+
+	ok($cached->calls() == 0);
+	ok($cached->barney('betty') eq 'betty');
+	ok($cached->calls() == 1);
+	ok($cached->barney() eq 'betty');
+	ok($cached->calls() == 1);
+	ok($cached->barney() eq 'betty');
+	ok($cached->calls() == 1);
+	my @abc = $cached->abc();
 	ok(scalar(@abc) == 3);
 	ok($abc[0] eq 'a');
 	ok($abc[1] eq 'b');
 	ok($abc[2] eq 'c');
-	@abc = $l->abc();
+	@abc = $cached->abc();
 	ok(scalar(@abc) == 3);
 	ok($abc[0] eq 'a');
 	ok($abc[1] eq 'b');
 	ok($abc[2] eq 'c');
-	my @a = $l->a();
+	my @a = $cached->a();
 	ok(scalar(@a) == 1);
 	ok($a[0] eq 'a');
-	@a = $l->a();
+	@a = $cached->a();
 	ok(scalar(@a) == 1);
 	ok($a[0] eq 'a');
 
 	# FIXME: why is this test different from t/chi.t?
-	my @empty = $l->empty();
+	my @empty = $cached->empty();
 	ok(scalar(@empty) == 0);
-	@empty = $l->empty();
+	@empty = $cached->empty();
 	ok(scalar(@empty) == 0);
 
 	# White box test the cache

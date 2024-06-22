@@ -1,5 +1,9 @@
 Revision history for Signature-Attribute-Checked
 
+0.04    2024-06-21
+        [CHANGES]
+         * Updated for Data::Checks v0.02
+
 0.03    2024-06-19
         [CHANGES]
          * Migrate actual checker logic to new `Data::Checks` module

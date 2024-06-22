@@ -1,5 +1,9 @@
 Revision history for Object-Pad-FieldAttr-Checked
 
+0.10    2024-06-21
+        [CHANGES]
+         * Updated for Data::Checks v0.02
+
 0.09    2024-06-19
         [CHANGES]
          * Migrate actual checker logic to new `Data::Checks` module

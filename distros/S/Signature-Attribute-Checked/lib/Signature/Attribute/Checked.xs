@@ -24,7 +24,7 @@ static void apply_Checked(pTHX_ struct XPSSignatureParamContext *ctx, SV *attrva
   if(PadnamePV(pn)[0] != '$')
     croak("Can only apply the :Checked attribute to scalar parameters");
 
-  SV *checker;
+  SV *checkspec;
 
   {
     dSP;
@@ -44,21 +44,20 @@ static void apply_Checked(pTHX_ struct XPSSignatureParamContext *ctx, SV *attrva
 
     SPAGAIN;
 
-    checker = SvREFCNT_inc(POPs);
+    checkspec = SvREFCNT_inc(POPs);
 
     FREETMPS;
     LEAVE;
   }
 
-  struct DataChecks_Checker *data = make_checkdata(checker);
+  struct DataChecks_Checker *checker = make_checkdata(checkspec);
+  SvREFCNT_dec(checkspec);
 
-  data->assertmess =
-    newSVpvf(
-      ctx->is_named ? "Named parameter :%s requires a value satisfying :Checked(%" SVf ")"
-                    : "Parameter %s requires a value satisfying :Checked(%" SVf ")",
-    PadnamePV(pn), SVfARG(attrvalue));
+  gen_assertmess(checker,
+    sv_2mortal(newSVpvf(ctx->is_named ? "Named parameter :%s" : "Parameter %s", PadnamePV(pn))),
+    sv_2mortal(newSVpvf(":Checked(%" SVf ")", SVfARG(attrvalue))));
 
-  *attrdata_ptr = data;
+  *attrdata_ptr = checker;
 }
 
 #ifndef newPADxVOP
@@ -73,9 +72,9 @@ static OP *S_newPADxVOP(pTHX_ I32 type, I32 flags, PADOFFSET padix)
 
 static void post_defop_Checked(pTHX_ struct XPSSignatureParamContext *ctx, void *attrdata, void *funcdata)
 {
-  struct DataChecks_Checker *data = attrdata;
+  struct DataChecks_Checker *checker = attrdata;
 
-  OP *assertop = make_assertop(data, newPADxVOP(OP_PADSV, 0, ctx->padix));
+  OP *assertop = make_assertop(checker, newPADxVOP(OP_PADSV, 0, ctx->padix));
 
   ctx->op = op_append_elem(OP_SCOPE,
     ctx->op, assertop);
@@ -83,11 +82,8 @@ static void post_defop_Checked(pTHX_ struct XPSSignatureParamContext *ctx, void 
 
 static void free_Checked(pTHX_ struct XPSSignatureParamContext *ctx, void *attrdata, void *funcdata)
 {
-  struct DataChecks_Checker *data = attrdata;
-
-  SvREFCNT_dec(data->assertmess);
-
-  Safefree(data);
+  struct DataChecks_Checker *checker = attrdata;
+  free_checkdata(checker);
 }
 
 static const struct XPSSignatureAttributeFuncs funcs_Checked = {
@@ -102,6 +98,6 @@ MODULE = Signature::Attribute::Checked    PACKAGE = Signature::Attribute::Checke
 
 BOOT:
   boot_xs_parse_sublike(0.19);
-  boot_data_checks(0);
+  boot_data_checks(0.02);
 
   register_xps_signature_attribute("Checked", &funcs_Checked, NULL);

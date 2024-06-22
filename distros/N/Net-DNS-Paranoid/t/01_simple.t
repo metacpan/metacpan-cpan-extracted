@@ -2,6 +2,7 @@ use strict;
 use warnings;
 use utf8;
 use Test::More;
+use lib '.';
 use lib 'lib';
 use Net::DNS::Paranoid;
 use t::MockResolver;
@@ -78,15 +79,15 @@ subtest "can't do decimal/octal IPs" => sub {
         [ undef, 'DNS lookup resulted in bad host.' ] );
 };
 
-subtest "this domain is okay.  50.112.116.235.xip.io isn't blocked" => sub {
-    is_deeply( [ $dns->resolve('50.112.116.235.xip.io') ],
+subtest "this domain is okay.  50.112.116.235.nip.io isn't blocked" => sub {
+    is_deeply( [ $dns->resolve('50.112.116.235.nip.io') ],
         [ ['50.112.116.235'], undef ] );
 };
 
 subtest 'internal. bad.  blocked by default by module.' => sub {
     is_deeply( [ $dns->resolve('10.2.3.4') ],
         [ undef, 'DNS lookup resulted in bad host.' ] );
-    is_deeply( [ $dns->resolve('50.112.116.235.xip.io') ],
+    is_deeply( [ $dns->resolve('50.112.116.235.nip.io') ],
         [ ['50.112.116.235'], undef ], 'ok' );
 };
 

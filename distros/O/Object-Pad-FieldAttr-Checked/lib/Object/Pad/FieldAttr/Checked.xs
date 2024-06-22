@@ -21,8 +21,8 @@
 
 static int magic_set(pTHX_ SV *sv, MAGIC *mg)
 {
-  struct DataChecks_Checker *data = (struct DataChecks_Checker *)mg->mg_ptr;
-  assert_value(data, sv);
+  struct DataChecks_Checker *checker = (struct DataChecks_Checker *)mg->mg_ptr;
+  assert_value(checker, sv);
   return 1;
 }
 
@@ -39,8 +39,8 @@ static int checkmagic_get(pTHX_ SV *sv, MAGIC *mg)
 
 static int checkmagic_set(pTHX_ SV *sv, MAGIC *mg)
 {
-  struct DataChecks_Checker *data = (struct DataChecks_Checker *)mg->mg_ptr;
-  assert_value(data, sv);
+  struct DataChecks_Checker *checker = (struct DataChecks_Checker *)mg->mg_ptr;
+  assert_value(checker, sv);
 
   SV *fieldsv = mg->mg_obj;
   sv_setsv_nomg(fieldsv, sv);
@@ -58,9 +58,9 @@ static OP *pp_wrap_checkmagic(pTHX)
   SV *sv = TOPs;
   SV *ret = sv_newmortal();
 
-  struct DataChecks_Checker *data = (struct DataChecks_Checker *)cUNOP_AUX->op_aux;
+  struct DataChecks_Checker *checker = (struct DataChecks_Checker *)cUNOP_AUX->op_aux;
 
-  sv_magicext(ret, sv, PERL_MAGIC_ext, &vtbl_checkmagic, (char *)data, 0);
+  sv_magicext(ret, sv, PERL_MAGIC_ext, &vtbl_checkmagic, (char *)checker, 0);
 
   SETs(ret);
   RETURN;
@@ -68,7 +68,7 @@ static OP *pp_wrap_checkmagic(pTHX)
 
 static bool checked_apply(pTHX_ FieldMeta *fieldmeta, SV *value, SV **attrdata_ptr, void *_funcdata)
 {
-  SV *checker;
+  SV *checkspec;
 
   if(mop_field_get_sigil(fieldmeta) != '$')
     croak("Can only apply the :Checked attribute to scalar fields");
@@ -91,19 +91,20 @@ static bool checked_apply(pTHX_ FieldMeta *fieldmeta, SV *value, SV **attrdata_p
 
     SPAGAIN;
 
-    checker = SvREFCNT_inc(POPs);
+    checkspec = SvREFCNT_inc(POPs);
 
     FREETMPS;
     LEAVE;
   }
 
-  struct DataChecks_Checker *data = make_checkdata(checker);
+  struct DataChecks_Checker *checker = make_checkdata(checkspec);
+  SvREFCNT_dec(checkspec);
 
-  data->assertmess =
-    newSVpvf("Field %" SVf " requires a value satisfying :Checked(%" SVf ")",
-      SVfARG(mop_field_get_name(fieldmeta)), SVfARG(value));
+  gen_assertmess(checker,
+    sv_2mortal(newSVpvf("Field %" SVf, SVfARG(mop_field_get_name(fieldmeta)))),
+    sv_2mortal(newSVpvf(":Checked(%" SVf ")", SVfARG(value))));
 
-  *attrdata_ptr = (SV *)data;
+  *attrdata_ptr = (SV *)checker;
 
   return TRUE;
 }
@@ -111,7 +112,7 @@ static bool checked_apply(pTHX_ FieldMeta *fieldmeta, SV *value, SV **attrdata_p
 static void checked_gen_accessor_ops(pTHX_ FieldMeta *fieldmeta, SV *attrdata, void *_funcdata,
     enum AccessorType type, struct AccessorGenerationCtx *ctx)
 {
-  struct DataChecks_Checker *data = (struct DataChecks_Checker *)attrdata;
+  struct DataChecks_Checker *checker = (struct DataChecks_Checker *)attrdata;
 
   switch(type) {
     case ACCESSOR_READER:
@@ -119,7 +120,7 @@ static void checked_gen_accessor_ops(pTHX_ FieldMeta *fieldmeta, SV *attrdata, v
 
     case ACCESSOR_WRITER:
       ctx->bodyop = op_append_elem(OP_LINESEQ,
-        make_assertop(data, newSLUGOP(0)),
+        make_assertop(checker, newSLUGOP(0)),
         ctx->bodyop);
       return;
 
@@ -156,7 +157,7 @@ static void checked_gen_accessor_ops(pTHX_ FieldMeta *fieldmeta, SV *attrdata, v
         newLOGOP(OP_AND, 0,
           /* scalar @_ */
           op_contextualize(newUNOP(OP_RV2AV, 0, newGVOP(OP_GV, 0, PL_defgv)), G_SCALAR),
-          make_assertop(data, newSLUGOP(0))),
+          make_assertop(checker, newSLUGOP(0))),
         ctx->bodyop);
       return;
 
@@ -199,6 +200,6 @@ static const struct FieldHookFuncs checked_hooks = {
 MODULE = Object::Pad::FieldAttr::Checked    PACKAGE = Object::Pad::FieldAttr::Checked
 
 BOOT:
-  boot_data_checks(0);
+  boot_data_checks(0.02);
 
   register_field_attribute("Checked", &checked_hooks, NULL);

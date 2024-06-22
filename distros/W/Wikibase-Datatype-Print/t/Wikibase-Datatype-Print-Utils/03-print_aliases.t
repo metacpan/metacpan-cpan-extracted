@@ -5,12 +5,13 @@ use Test::More 'tests' => 3;
 use Test::NoWarnings;
 use Test::Shared::Fixture::Wikibase::Datatype::Item::Wikidata::Dog;
 use Unicode::UTF8 qw(decode_utf8);
+use Wikibase::Datatype::Print::Texts qw(texts);
 use Wikibase::Datatype::Print::Utils qw(print_aliases);
 use Wikibase::Datatype::Print::Value::Monolingual;
 
 # Test.
 my $obj = Test::Shared::Fixture::Wikibase::Datatype::Item::Wikidata::Dog->new;
-my @ret = print_aliases($obj, {'lang' => 'cs'},
+my @ret = print_aliases($obj, { 'lang' => 'cs', 'texts' => texts() },
 	\&Wikibase::Datatype::Print::Value::Monolingual::print);
 is_deeply(
 	\@ret,
@@ -23,7 +24,7 @@ is_deeply(
 
 # Test.
 $obj = Test::Shared::Fixture::Wikibase::Datatype::Item::Wikidata::Dog->new;
-@ret = print_aliases($obj, {'lang' => 'en'},
+@ret = print_aliases($obj, { 'lang' => 'en', 'texts' => texts() },
 	\&Wikibase::Datatype::Print::Value::Monolingual::print);
 is_deeply(
 	\@ret,

@@ -6,4 +6,4 @@ use Test::NoWarnings;
 use Wikibase::Datatype::Print::Sense;
 
 # Test.
-is($Wikibase::Datatype::Print::Sense::VERSION, 0.16, 'Version.');
+is($Wikibase::Datatype::Print::Sense::VERSION, 0.17, 'Version.');

@@ -5,19 +5,45 @@ use strict;
 use warnings;
 
 use Error::Pure qw(err);
+use List::Util 1.33 qw(all);
 use Readonly;
+use Wikibase::Datatype::Print::Texts qw(text_keys texts);
 
-Readonly::Array our @EXPORT_OK => qw(print_aliases print_common print_descriptions
+Readonly::Array our @EXPORT_OK => qw(defaults print_aliases print_common print_descriptions
 	print_forms print_glosses print_labels print_references print_senses
 	print_sitelinks print_statements);
 
-our $VERSION = 0.16;
+our $VERSION = 0.17;
+
+sub defaults {
+	my ($obj, $opts_hr) = @_;
+
+	if (! defined $opts_hr) {
+		$opts_hr = {};
+	}
+
+	if (! exists $opts_hr->{'lang'}) {
+		$opts_hr->{'lang'} = 'en';
+	}
+
+	if (! exists $opts_hr->{'texts'}) {
+		$opts_hr->{'texts'} = texts($opts_hr->{'lang'});
+
+	# Check 'texts' keys if are right.
+	} else {
+		if (! all { exists $opts_hr->{'texts'}->{$_} } text_keys()) {
+			err 'Defined text keys are bad.';
+		}
+	}
+
+	return $opts_hr;
+}
 
 sub print_aliases {
 	my ($obj, $opts_hr, $alias_cb) = @_;
 
 	return print_common($obj, $opts_hr, 'aliases', $alias_cb,
-		'Aliases', sub {
+		$opts_hr->{'texts'}->{'aliases'}, sub {
 			grep { $_->language eq $opts_hr->{'lang'} } @_
 		},
 	);
@@ -64,7 +90,7 @@ sub print_descriptions {
 	my ($obj, $opts_hr, $desc_cb) = @_;
 
 	return print_common($obj, $opts_hr, 'descriptions', $desc_cb,
-		'Description', sub {
+		$opts_hr->{'texts'}->{'description'}, sub {
 			grep { $_->language eq $opts_hr->{'lang'} } @_
 		}, 1,
 	);
@@ -74,21 +100,21 @@ sub print_forms {
 	my ($obj, $opts_hr, $form_cb) = @_;
 
 	return print_common($obj, $opts_hr, 'forms', $form_cb,
-		'Forms');
+		$opts_hr->{'texts'}->{'forms'});
 }
 
 sub print_glosses {
 	my ($obj, $opts_hr, $glosse_cb) = @_;
 
 	return print_common($obj, $opts_hr, 'glosses', $glosse_cb,
-		'Glosses');
+		$opts_hr->{'texts'}->{'glosses'});
 }
 
 sub print_labels {
 	my ($obj, $opts_hr, $label_cb) = @_;
 
 	return print_common($obj, $opts_hr, 'labels', $label_cb,
-		'Label', sub {
+		$opts_hr->{'texts'}->{'label'}, sub {
 			grep { $_->language eq $opts_hr->{'lang'} } @_
 		}, 1,
 	);
@@ -98,28 +124,28 @@ sub print_references {
 	my ($obj, $opts_hr, $reference_cb) = @_;
 
 	return print_common($obj, $opts_hr, 'references', $reference_cb,
-		'References');
+		$opts_hr->{'texts'}->{'references'});
 }
 
 sub print_senses {
 	my ($obj, $opts_hr, $sense_cb) = @_;
 
 	return print_common($obj, $opts_hr, 'senses', $sense_cb,
-		'Senses');
+		$opts_hr->{'texts'}->{'senses'});
 }
 
 sub print_sitelinks {
 	my ($obj, $opts_hr, $sitelink_cb) = @_;
 
 	return print_common($obj, $opts_hr, 'sitelinks', $sitelink_cb,
-		'Sitelinks');
+		$opts_hr->{'texts'}->{'sitelinks'});
 }
 
 sub print_statements {
 	my ($obj, $opts_hr, $statement_cb) = @_;
 
 	return print_common($obj, $opts_hr, 'statements', $statement_cb,
-		'Statements');
+		$opts_hr->{'texts'}->{'statements'});
 }
 
 1;
@@ -136,10 +162,11 @@ Wikibase::Datatype::Print::Utils - Wikibase pretty print helper utils.
 
 =head1 SYNOPSIS
 
- use Wikibase::Datatype::Print::Utils qw(print_aliases print_common print_descriptions
+ use Wikibase::Datatype::Print::Utils qw(defaults print_aliases print_common print_descriptions
          print_forms print_glosses print_labels print_references print_senses
          print_sitelinks print_statements);
 
+ my $opts_hr = defaults($obj, $opts_hr);
  my @aliase_strings = print_aliases($obj, $opts_hr, $alias_cb);
  my @common_strings = print_common($obj, $opts_hr, $list_method, $print_cb, $title, $input_cb, $flag_one_line);
  my @desc_strings = print_descriptions($obj, $opts_hr, $desc_cb);
@@ -152,6 +179,29 @@ Wikibase::Datatype::Print::Utils - Wikibase pretty print helper utils.
  my @statement_strings = print_statements($obj, $opts_hr, $statement_cb);
 
 =head1 SUBROUTINES
+
+=head2 C<defaults>
+
+ my $opts_hr = defaults($obj, $opts_hr);
+
+Set default C<$opts_hr> options variable which is used in all main objects.
+Updates:
+
+=over
+
+=item main C<$opts_hr> variable if doesn't exist ({})
+
+=item language if doesn't exist (en)
+
+=item texts (English texts)
+
+=item check texts if are defined from user (error)
+
+=back
+
+Returns updated C<$opts_hr> variable.
+
+Returns reference to hash.
 
 =head2 C<print_aliases>
 
@@ -234,6 +284,9 @@ Get statement strings from data object.
 Returns array with pretty print strings.
 
 =head1 ERRORS
+
+ defaults():
+         Defined text keys are bad.
 
  print_common():
          Multiple values are printed to one line.
@@ -339,12 +392,12 @@ L<http://skim.cz>
 
 =head1 LICENSE AND COPYRIGHT
 
-© 2020-2023 Michal Josef Špaček
+© 2020-2024 Michal Josef Špaček
 
 BSD 2-Clause License
 
 =head1 VERSION
 
-0.16
+0.17
 
 =cut

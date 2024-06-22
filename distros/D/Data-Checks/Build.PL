@@ -2,9 +2,10 @@ use v5;
 use strict;
 use warnings;
 
-use Module::Build;
+use lib 'inc';
+use Module::Build::with::XSTests;
 
-my $build = Module::Build->new(
+my $build = Module::Build::with::XSTests->new(
    module_name => 'Data::Checks',
    requires => {
       perl => '5.022', # op_convert_list()

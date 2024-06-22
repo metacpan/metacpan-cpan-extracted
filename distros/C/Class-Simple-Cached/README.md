@@ -7,7 +7,7 @@ Class::Simple::Cached - cache messages to an object
 
 # VERSION
 
-Version 0.04
+Version 0.05
 
 # SYNOPSIS
 
@@ -22,8 +22,8 @@ that works on objects with a get/set model such as:
 
     use Class::Simple;
     my $obj = Class::Simple->new();
-    $obj->val($newval);
-    $oldval = $obj->val();
+    $obj->val('foo');
+    my $oldval = $obj->val();
 
 # SUBROUTINES/METHODS
 
@@ -41,6 +41,14 @@ which is an object which is taken to be the object to be cached.
 If not given, an object of the class [Class::Simple](https://metacpan.org/pod/Class%3A%3ASimple) is instantiated
 and that is used.
 
+## can
+
+Returns if the embedded object can handle a message
+
+## isa
+
+Returns if the embedded object is the given type of object
+
 # AUTHOR
 
 Nigel Horne, `<njh at bandsman.co.uk>`
@@ -50,6 +58,7 @@ Nigel Horne, `<njh at bandsman.co.uk>`
 Doesn't work with [Memoize](https://metacpan.org/pod/Memoize).
 
 Only works on messages that take no arguments.
+For that, use [Class::Simple::Readonly::Cached](https://metacpan.org/pod/Class%3A%3ASimple%3A%3AReadonly%3A%3ACached).
 
 Please report any bugs or feature requests to [https://github.com/nigelhorne/Class-Simple-Readonly/issues](https://github.com/nigelhorne/Class-Simple-Readonly/issues).
 I will be notified, and then you'll
@@ -83,10 +92,6 @@ You can also look for information at:
 
     [http://matrix.cpantesters.org/?dist=Class-Simple-Cached](http://matrix.cpantesters.org/?dist=Class-Simple-Cached)
 
-- CPAN Ratings
-
-    [http://cpanratings.perl.org/d/Class-Simple-Cached](http://cpanratings.perl.org/d/Class-Simple-Cached)
-
 - CPAN Testers Dependencies
 
     [http://deps.cpantesters.org/?module=Class::Simple::Cached](http://deps.cpantesters.org/?module=Class::Simple::Cached)
@@ -94,7 +99,7 @@ You can also look for information at:
 # LICENCE AND COPYRIGHT
 
 Author Nigel Horne: `njh@bandsman.co.uk`
-Copyright (C) 2019-2021, Nigel Horne
+Copyright (C) 2019-2024, Nigel Horne
 
 Usage is subject to licence terms.
 The licence terms of this software are as follows:

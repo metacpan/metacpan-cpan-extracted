@@ -5,12 +5,13 @@ use Test::More 'tests' => 2;
 use Test::NoWarnings;
 use Test::Shared::Fixture::Wikibase::Datatype::Lexeme::Wikidata::DogCzechNoun;
 use Unicode::UTF8 qw(decode_utf8);
+use Wikibase::Datatype::Print::Texts qw(texts);
 use Wikibase::Datatype::Print::Utils qw(print_senses);
 use Wikibase::Datatype::Print::Sense;
 
 # Test.
 my $obj = Test::Shared::Fixture::Wikibase::Datatype::Lexeme::Wikidata::DogCzechNoun->new;
-my @ret = print_senses($obj, {},
+my @ret = print_senses($obj, { 'texts' => texts() },
 	\&Wikibase::Datatype::Print::Sense::print);
 is_deeply(
 	\@ret,

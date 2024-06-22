@@ -1,3 +1,6 @@
+0.07 2024-06-21T19:24:13+02:00
+ - Add another example to doc.
+
 0.06 2024-06-20T13:38:34+02:00
  - Add 'cb_value' parameter.
  - Fix presentation of error in ERRORS section in doc.

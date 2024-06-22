@@ -17,6 +17,10 @@ BEGIN {
 }
 
 Test::Pod::LinkCheck::Lite->new(
+    # We ignore the following URL because it returns 403 to a HEAD
+    # request. A GET request succeeds, but there is no way to tell
+    # Test::Pod::LinkCheck::Lite this. Yet.
+    ignore_url	=> 'https://epqs.nationalmap.gov/v1/docs',
     prohibit_redirect	=> sub {
 	my ( undef, undef, $url ) = @_;
 	'https://nationalmap.gov' =~ $url

@@ -6,14 +6,17 @@ use warnings;
 
 use Error::Pure qw(err);
 use Readonly;
+use Wikibase::Datatype::Print::Utils qw(defaults);
 use Wikibase::Datatype::Print::Value;
 
 Readonly::Array our @EXPORT_OK => qw(print);
 
-our $VERSION = 0.16;
+our $VERSION = 0.17;
 
 sub print {
 	my ($obj, $opts_hr) = @_;
+
+	$opts_hr = defaults($obj, $opts_hr);
 
 	if (! $obj->isa('Wikibase::Datatype::MediainfoSnak')) {
 		err "Object isn't 'Wikibase::Datatype::MediainfoSnak'.";
@@ -33,9 +36,9 @@ sub print {
 	if ($obj->snaktype eq 'value') {
 		$ret .= Wikibase::Datatype::Print::Value::print($obj->datavalue, $opts_hr);
 	} elsif ($obj->snaktype eq 'novalue') {
-		$ret .= 'no value';
+		$ret .= $opts_hr->{'texts'}->{'value_no'};
 	} elsif ($obj->snaktype eq 'somevalue') {
-		$ret .= 'unknown value';
+		$ret .= $opts_hr->{'texts'}->{'value_unknown'};
 	} else {
 		err 'Bad snaktype.',
 			'snaktype', $obj->snaktype,
@@ -80,6 +83,8 @@ Returns list of lines in array context.
 =head1 ERRORS
 
  print():
+         From Wikibase::Datatype::Print::Utils::defaults():
+                 Defined text keys are bad.
          Object isn't 'Wikibase::Datatype::MediainfoSnak'.
          Bad snaktype.
                  snaktype: %s
@@ -148,6 +153,7 @@ Returns list of lines in array context.
 L<Error::Pure>,
 L<Exporter>,
 L<Readonly>,
+L<Wikibase::Datatype::Print::Utils>,
 L<Wikibase::Datatype::Print::Value>.
 
 =head1 SEE ALSO
@@ -172,13 +178,12 @@ L<http://skim.cz>
 
 =head1 LICENSE AND COPYRIGHT
 
-© 2020-2023 Michal Josef Špaček
+© 2020-2024 Michal Josef Špaček
 
 BSD 2-Clause License
 
 =head1 VERSION
 
-0.16
+0.17
 
 =cut
-

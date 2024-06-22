@@ -3,7 +3,7 @@
 #
 #  (C) Paul Evans, 2024 -- leonerd@leonerd.org.uk
 
-package Data::Checks 0.01;
+package Data::Checks 0.02;
 
 use v5.14;
 use warnings;
@@ -70,7 +70,7 @@ will be invoked as
 A B<package> name as a plain string of a package which has a C<check> method.
 Value checks will be invoked as
 
-   $ok = $checkrpkg->check( $value );
+   $ok = $checkerpkg->check( $value );
 
 =item *
 
@@ -82,7 +82,29 @@ A B<code reference>. Value checks will be invoked with a single argument, as
 
 Once constructed into a checker structure, the choice of which implementation
 is used is fixed, and if a method lookup is involved its result is stored
-directly as a CV pointer for efficiency of later invocations.
+directly as a CV pointer for efficiency of later invocations. In either of the
+first two cases, the reference count on the I<checkspec> SV is increased to
+account for the argument value used on each invocation. In the third case, the
+reference SV is not retained, but the underlying CV it refers to has its
+reference count increased.
+
+=head2 free_checkdata
+
+   void free_checkdata(struct DataChecks_Checker *checker);
+
+Releases any stored SVs in the checker structure, and the structure itself.
+
+=head2 gen_assertmess
+
+   void gen_assertmess(struct DataChecks_Checker *checker, SV *name, SV *constraint);
+
+Generates and stores a message string for the assert message to be used by
+L</make_assertop> and L</assert_value>. The message will take the form
+
+   NAME requires a value satisfying CONSTRAINT
+
+Both I<name> and I<constraint> SVs used as temporary strings to generate the
+stored message string. Neither SV is retained by the checker directly.
 
 =head2 make_assertop
 

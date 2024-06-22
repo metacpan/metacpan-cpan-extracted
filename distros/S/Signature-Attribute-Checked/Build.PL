@@ -20,6 +20,7 @@ my $build = Module::Build->new(
    module_name => 'Signature::Attribute::Checked',
    requires => {
       'perl' => '5.026', # OP_ARGELEM
+      'Data::Checks' => '0.02',
       'XS::Parse::Sublike' => '0.19',
    },
    test_requires => {
@@ -28,7 +29,7 @@ my $build = Module::Build->new(
    configure_requires => {
       'Module::Build' => '0.4004', # test_requires
 
-      'Data::Checks::Builder' => 0,
+      'Data::Checks::Builder' => '0.02',
       'XS::Parse::Sublike::Builder' => '0.19',
    },
    license => 'perl',

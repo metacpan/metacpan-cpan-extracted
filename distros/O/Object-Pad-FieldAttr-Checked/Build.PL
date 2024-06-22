@@ -20,6 +20,7 @@ my $build = Module::Build->new(
    module_name => 'Object::Pad::FieldAttr::Checked',
    requires => {
       'perl' => '5.022', # op_convert_list
+      'Data::Checks' => '0.02',
       'Object::Pad' => '0.802',
    },
    test_requires => {
@@ -28,7 +29,7 @@ my $build = Module::Build->new(
    configure_requires => {
       'Module::Build' => '0.4004', # test_requires
 
-      'Data::Checks::Builder' => 0,
+      'Data::Checks::Builder' => '0.02',
       'Object::Pad::ExtensionBuilder' => '0.802',
    },
    license => 'perl',

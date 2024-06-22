@@ -4,7 +4,7 @@
       "Nigel Horne <njh@bandsman.co.uk>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.60, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "open_source"
    ],
@@ -41,8 +41,10 @@
          "requires" : {
             "CHI" : "0",
             "Class::Simple" : "0",
+            "File::Spec" : "0",
             "Test::Carp" : "0",
             "Test::Most" : "0",
+            "Test::Needs" : "0",
             "Test::NoWarnings" : "0",
             "Test::Requires" : "0"
          }
@@ -62,6 +64,6 @@
          "x_repository" : "https://github.com/nigelhorne/Class-Simple-Cached"
       }
    },
-   "version" : "0.04",
-   "x_serialization_backend" : "JSON::PP version 4.06"
+   "version" : "0.05",
+   "x_serialization_backend" : "JSON::PP version 4.16"
 }

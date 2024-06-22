@@ -17,14 +17,14 @@ name: Data-Checks
 provides:
   Data::Checks:
     file: lib/Data/Checks.pm
-    version: '0.01'
+    version: '0.02'
   Data::Checks::Builder:
     file: lib/Data/Checks/Builder.pm
-    version: '0.42'
+    version: '0.02'
 requires:
   File::ShareDir: '1.00'
   perl: '5.022'
 resources:
   license: http://dev.perl.org/licenses/
-version: '0.01'
+version: '0.02'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

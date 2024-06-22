@@ -85,7 +85,9 @@ sub no_index {
 }
 
 sub optional_modules {
-    return ( qw{ Time::HiRes } );
+    # return ( qw{ Time::HiRes } );
+    # As of Test::Builder 1.302190 (March 2 2022) Time::HiRes is needed
+    return;
 }
 
 sub provides {
@@ -144,6 +146,7 @@ sub requires {
     return {
 	'Carp'			=> 0,
 	'HTTP::Request::Common'	=> 0,
+	'HTTP::Status'		=> 0,
 	'JSON'			=> 0,
 	'LWP::Protocol::https'	=> 0,
 	'LWP::UserAgent'	=> 0,
@@ -163,7 +166,6 @@ sub build_requires {
     return {
 	'Test::More'		=> 0.88,
 	'HTTP::Response'	=> 0,
-	'HTTP::Status'		=> 0,
     };
 }
 
@@ -348,7 +350,7 @@ Thomas R. Wyant, III F<wyant at cpan dot org>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2010-2021 Thomas R. Wyant, III
+Copyright (C) 2010-2022, 2024 Thomas R. Wyant, III
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl 5.10.0. For more details, see the full text

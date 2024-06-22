@@ -7,38 +7,32 @@ use warnings;
 use Error::Pure qw(err);
 use Readonly;
 use Wikibase::Datatype::Print::Statement;
-use Wikibase::Datatype::Print::Utils qw(print_statements);
+use Wikibase::Datatype::Print::Utils qw(defaults print_statements);
 use Wikibase::Datatype::Print::Value::Item;
 use Wikibase::Datatype::Print::Value::Monolingual;
 
 Readonly::Array our @EXPORT_OK => qw(print);
 
-our $VERSION = 0.16;
+our $VERSION = 0.17;
 
 sub print {
 	my ($obj, $opts_hr) = @_;
 
-	if (! defined $opts_hr) {
-		$opts_hr = {};
-	}
-
-	if (! exists $opts_hr->{'lang'}) {
-		$opts_hr->{'lang'} = 'en';
-	}
+	$opts_hr = defaults($obj, $opts_hr);
 
 	if (! $obj->isa('Wikibase::Datatype::Form')) {
 		err "Object isn't 'Wikibase::Datatype::Form'.";
 	}
 
 	my @ret = (
-		'Id: '.$obj->id,
+		$opts_hr->{'texts'}->{'id'}.': '.$obj->id,
 	);
 
 	# Representation.
 	# XXX In every time one?
 	my ($representation) = @{$obj->representations};
 	if (defined $representation) {
-		push @ret, 'Representation: '.
+		push @ret, $opts_hr->{'texts'}->{'representation'}.': '.
 			Wikibase::Datatype::Print::Value::Monolingual::print($representation, $opts_hr);
 	}
 
@@ -49,7 +43,7 @@ sub print {
 			Wikibase::Datatype::Print::Value::Item::print($gr_feature, $opts_hr);
 	}
 	if (@gr_features) {
-		push @ret, 'Grammatical features: '.(join ', ', @gr_features);
+		push @ret, $opts_hr->{'texts'}->{'grammatical_features'}.': '.(join ', ', @gr_features);
 	}
 
 	# Statements.
@@ -94,6 +88,8 @@ Returns list of lines in array context.
 =head1 ERRORS
 
  print():
+         From Wikibase::Datatype::Print::Utils::defaults():
+                 Defined text keys are bad.
          Object isn't 'Wikibase::Datatype::Form'.
 
 =head1 EXAMPLE
@@ -186,13 +182,12 @@ L<http://skim.cz>
 
 =head1 LICENSE AND COPYRIGHT
 
-© 2020-2023 Michal Josef Špaček
+© 2020-2024 Michal Josef Špaček
 
 BSD 2-Clause License
 
 =head1 VERSION
 
-0.16
+0.17
 
 =cut
-

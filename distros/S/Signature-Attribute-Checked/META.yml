@@ -6,7 +6,7 @@ build_requires:
   ExtUtils::CBuilder: '0'
   Test2::V0: '0'
 configure_requires:
-  Data::Checks::Builder: '0'
+  Data::Checks::Builder: '0.02'
   Module::Build: '0.4004'
   XS::Parse::Sublike::Builder: '0.19'
 dynamic_config: 1
@@ -19,11 +19,12 @@ name: Signature-Attribute-Checked
 provides:
   Signature::Attribute::Checked:
     file: lib/Signature/Attribute/Checked.pm
-    version: '0.03'
+    version: '0.04'
 requires:
+  Data::Checks: '0.02'
   XS::Parse::Sublike: '0.19'
   perl: '5.026'
 resources:
   license: http://dev.perl.org/licenses/
-version: '0.03'
+version: '0.04'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

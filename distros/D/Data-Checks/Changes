@@ -1,4 +1,10 @@
 Revision history for Data-Checks
 
+0.02    2024-06-21
+        [CHANGES]
+         * Added `free_checkdata()` and `gen_assertmess()` API functions
+         * Better management of SV reference counts
+         * `struct DataChecks_Checker` is now an opaque structure
+
 0.01    2024-06-19
         First version, released on an unsuspecting world.

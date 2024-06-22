@@ -19,7 +19,7 @@ use overload
 use constant TRUE  => 1;
 use constant FALSE => 0;
 
-our $VERSION = 'v0.4.0';
+our $VERSION = 'v0.5.0';
 
 
 sub new {
@@ -43,7 +43,7 @@ sub new {
         return $name;
     }
 
-    my $name = __PACKAGE__ . "::" . $Counter++;
+    my $name = $opts->{name} || ( __PACKAGE__ . "::" . $Counter++ );
 
     my $base = Package::Stash->new($name);
 
@@ -130,7 +130,7 @@ Data::Enum - immutable enumeration classes
 
 =head1 VERSION
 
-version v0.4.0
+version v0.5.0
 
 =head1 SYNOPSIS
 
@@ -209,16 +209,42 @@ constructor:
 
 Calling the constructor with an invalid value will throw an exception.
 
-Each instance will have an C<is_> method for each value.
+Each instance will have a predicate C<is_> method for each value.
+
+The values are case sensitive.
 
 Each instance stringifies to its value.
 
-Since v0.3.0 you can change the method prefix of the predicate methods to something other than C<is_>. For example,
+Since v0.3.0 you can change the specify options in the class generator:
+
+  my $class = Data::Enum->new( \%options, @values );
+
+The following options are supported:
+
+=over
+
+=item prefix
+
+Change prefix of the predicate methods to something other than C<is_>. For example,
 
   my $class = Data::Enum->new( { prefix => "from_" }, "home", "work" );
   my $place = $class->new("work");
 
   $place->from_home;
+
+This was added in v0.3.0.
+
+=item name
+
+This assigns a name to the class, so instances can be constructed by name:
+
+  my $class = Data::Enum->new( { name => "Colours" }, "red", "orange", "yellow", "green" );
+
+  my $color = Colours->new("yellow");
+
+This was added in v0.5.0.
+
+=back
 
 =head2 values
 

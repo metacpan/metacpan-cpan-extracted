@@ -13,6 +13,12 @@
 #define HAVE_DATA_CHECKS_IMPL
 #include "DataChecks.h"
 
+struct DataChecks_Checker {
+  SV *obj;
+  CV *cv;
+  SV *assertmess;
+};
+
 #define HAVE_PERL_VERSION(R, V, S) \
     (PERL_REVISION > (R) || (PERL_REVISION == (R) && (PERL_VERSION > (V) || (PERL_VERSION == (V) && (PERL_SUBVERSION >= (S))))))
 
@@ -29,7 +35,6 @@ static struct DataChecks_Checker *S_DataChecks_make_checkdata(pTHX_ SV *checkspe
     ; /* checkspec is package name */
   else if(SvROK(checkspec) && !SvOBJECT(SvRV(checkspec)) && SvTYPE(SvRV(checkspec)) == SVt_PVCV) {
     checkcv = (CV *)SvREFCNT_inc(SvRV(checkspec));
-    SvREFCNT_dec(checkspec);
     checkspec = NULL;
   }
   else
@@ -48,10 +53,29 @@ static struct DataChecks_Checker *S_DataChecks_make_checkdata(pTHX_ SV *checkspe
   struct DataChecks_Checker *checker;
   Newx(checker, 1, struct DataChecks_Checker);
 
-  checker->obj = checkspec;
+  checker->obj = SvREFCNT_inc(checkspec);
   checker->cv  = checkcv;
 
   return checker;
+}
+
+static void S_DataChecks_free_checkdata(pTHX_ struct DataChecks_Checker *checker)
+{
+  if(checker->assertmess)
+    SvREFCNT_dec(checker->assertmess);
+
+  if(checker->obj)
+    SvREFCNT_dec(checker->obj);
+
+  SvREFCNT_dec(checker->cv);
+
+  Safefree(checker);
+}
+
+static void S_DataChecks_gen_assertmess(pTHX_ struct DataChecks_Checker *checker, SV *name, SV *constraint)
+{
+  checker->assertmess = newSVpvf("%" SVf " requires a value satisfying %" SVf,
+      SVfARG(name), SVfARG(constraint));
 }
 
 static OP *S_DataChecks_make_assertop(pTHX_ struct DataChecks_Checker *checker, OP *argop)
@@ -121,6 +145,10 @@ BOOT:
 
   sv_setuv(*hv_fetchs(PL_modglobal, "Data::Checks/make_checkdata()@0", GV_ADD),
     PTR2UV(&S_DataChecks_make_checkdata));
+  sv_setuv(*hv_fetchs(PL_modglobal, "Data::Checks/free_checkdata()@0", GV_ADD),
+    PTR2UV(&S_DataChecks_free_checkdata));
+  sv_setuv(*hv_fetchs(PL_modglobal, "Data::Checks/gen_assertmess()@0", GV_ADD),
+    PTR2UV(&S_DataChecks_gen_assertmess));
   sv_setuv(*hv_fetchs(PL_modglobal, "Data::Checks/make_assertop()@0", GV_ADD),
     PTR2UV(&S_DataChecks_make_assertop));
   sv_setuv(*hv_fetchs(PL_modglobal, "Data::Checks/check_value()@0", GV_ADD),
