@@ -7,7 +7,7 @@ use English;
 use Error::Pure::Utils qw(clean);
 use File::Object;
 use File::Spec::Functions qw(abs2rel);
-use Test::More 'tests' => 20;
+use Test::More 'tests' => 23;
 use Test::NoWarnings;
 use Test::Output;
 use Test::Warn;
@@ -19,31 +19,41 @@ my $modules_dir = File::Object->new->up->dir('modules');
 @ARGV = (
 	'-h',
 );
-my $script = abs2rel(File::Object->new->file('04-run.t')->s);
-# XXX Hack for missing abs2rel on Windows.
-if ($OSNAME eq 'MSWin32') {
-	$script =~ s/\\/\//msg;
-}
-my $right_ret = <<"END";
-Usage: $script [-d flag] [-e] [-h] [-n number] [-p] [-r]
-	[-s section] [--version] pod_file_or_module [argument ..]
-
-	-d flag		Turn debug (0/1) (default is 1).
-	-e		Enumerate lines. Only for print mode.
-	-h		Help.
-	-n number	Number of example (default is nothing).
-	-p		Print example.
-	-r		Run example.
-	-s section	Use section (default EXAMPLE).
-	--version	Print version.
-END
+my $right_ret = help();
 stderr_is(
 	sub {
 		App::Pod::Example->new->run;
 		return;
 	},
 	$right_ret,
-	'Run help.',
+	'Run help (-h).',
+);
+
+# Test.
+@ARGV = ();
+$right_ret = help();
+stderr_is(
+	sub {
+		App::Pod::Example->new->run;
+		return;
+	},
+	$right_ret,
+	'Run help (no arguments).',
+);
+
+# Test.
+@ARGV = (
+	'-x',
+);
+$right_ret = help();
+stderr_is(
+	sub {
+		warning_is { App::Pod::Example->new->run; } "Unknown option: x\n",
+			'Warning about bad argument';
+		return;
+	},
+	$right_ret,
+	'Run help (-x - bad option).',
 );
 
 # Test.
@@ -339,3 +349,26 @@ stdout_is(
 	'Example with simple print() without debug and with '.
 		'enumerating lines.',
 );
+
+sub help {
+	my $script = abs2rel(File::Object->new->file('04-run.t')->s);
+	# XXX Hack for missing abs2rel on Windows.
+	if ($OSNAME eq 'MSWin32') {
+		$script =~ s/\\/\//msg;
+	}
+	my $help = <<"END";
+Usage: $script [-d flag] [-e] [-h] [-n number] [-p] [-r]
+	[-s section] [--version] pod_file_or_module [argument ..]
+
+	-d flag		Turn debug (0/1) (default is 1).
+	-e		Enumerate lines. Only for print mode.
+	-h		Help.
+	-n number	Number of example (default is nothing).
+	-p		Print example.
+	-r		Run example.
+	-s section	Use section (default EXAMPLE).
+	--version	Print version.
+END
+
+	return $help;
+}

@@ -1,7 +1,7 @@
 ---
 abstract: 'interact with RabbitMQ over AMQP using librabbitmq'
 author:
-  - 'Mark Ellis <markellis@cpan.org>, Michael Stemle, Jr. <mstemle@cpan.org>'
+  - 'Mike "manchicken" Stemle <hello@mikestemle.com>'
 build_requires:
   ExtUtils::MakeMaker: '0'
   Sys::Hostname: '0'
@@ -27,11 +27,11 @@ requires:
 resources:
   bugtracker: https://github.com/net-amqp-rabbitmq/net-amqp-rabbitmq/issues
   repository: git://github.com/net-amqp-rabbitmq/net-amqp-rabbitmq.git
-version: '2.40010'
+version: '2.40011'
 x_contributors:
+  - 'mstemle - Mike "manchicken" Stemle <hello@mikestemle.com>'
   - 'jesus - Theo Schlossnagle <jesus@omniti.com>'
   - 'markellis - Mark Ellis <markellis@cpan.org>'
-  - 'mstemle - Mike "manchicken" Stemle, Jr. <mstemle@cpan.org>'
   - 'drolsky - Dave Rolsky <autarch@urth.org>'
   - 'srezic - Slaven Rezić <slaven@rezic.de>'
   - 'armand - Armand Leclercq <marman.email@gmail.com>'

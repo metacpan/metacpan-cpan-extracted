@@ -1,5 +1,7 @@
 Revision history for App-pod
 
+0.38
+        2024-06-22 - Updated bashrc - improved completions.
 0.37
         2024-06-11 - Updated git flow for perl v5.40.
 0.36

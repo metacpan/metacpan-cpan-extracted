@@ -11,7 +11,7 @@ Couch::DB::Database - One database connection
 =head1 DESCRIPTION
 
 One I<node> (server) contains multiple databases.  Databases
-do not contain "collections", like MongoDB; each document is
+do not contain "collections", like MongoDB: each document is
 a direct child of a database.  Per database, you get multiple
 files to store that data, for views, replication, and so on.  
 Per database, you need to set permissions.
@@ -27,6 +27,9 @@ are provided by the L<Couch::DB::Cluster|Couch::DB::Cluster> package.
 
 =item Couch::DB::Database-E<gt>B<new>(%options)
 
+B<Do not call this> method yourself, but use C<Couch::DB::db()>
+to instantiate this object.
+
  -Option--Default
   batch   false
   couch   <required>
@@ -38,7 +41,7 @@ are provided by the L<Couch::DB::Cluster|Couch::DB::Cluster> package.
 
 When set, all write actions (which support this) to this database
 will not wait for the actual update of the database.  This gives a
-higher performance, but not all error may be reported.
+much higher performance, but not all errors may be reported.
 
 =item couch => C<Couch::DB>-object
 
@@ -64,8 +67,8 @@ The name of a database must match C<< ^[a-z][a-z0-9_$()+/-]*$ >>.
 
 =head2 Database information
 
-B<All CouchDB API calls> documented below, support %options like C<_delay>
-and C<on_error>.  See L<Couch::DB/Using the CouchDB API>.
+B<All CouchDB API calls> documented below, support C<%options> like C<_delay>,
+C<_client>, and C<on_error>.  See L<Couch::DB/Using the CouchDB API>.
 
 =over 4
 
@@ -81,15 +84,15 @@ Feed of changes made on this database.
  [CouchDB API "POST /{db}/_compact"]
  [CouchDB API "POST /{db}/_compact/{ddoc}", UNTESTED]
 
-Instruct the database files to be compacted.  By default, the data gets
-compacted.
+Instruct the database files to be compacted now.  By default, the data gets
+compacted on unexpected moments.
 
  -Option--Default
-  ddoc    undef
+  design  undef
 
 =over 2
 
-=item ddoc => $ddoc
+=item design => $design|$ddocid
 
 Compact all indexes related to this design document, instead.
 
@@ -99,12 +102,12 @@ Compact all indexes related to this design document, instead.
 
  [CouchDB API "PUT /{db}"]
 
-Create a new database.  The result object will have code HTTP_CREATED when the
+Create a new database.  The result object will have code C<HTTP_CREATED> when the
 database is successfully created.  When the database already exists, it
-returns HTTP_PRECONDITION_FAILED and an error in the body.
+returns C<HTTP_PRECONDITION_FAILED> and an error in the body.
 
-Options: C<partitioned> (bool), C<q> (shards, default 8), and C<n> (replicas,
-default 3).
+Options: C<partitioned> (bool), C<q> (number of shards, default 8), and C<n> (number
+of replicas, defaults to 3).
 
 =item $obj-E<gt>B<details>(%options)
 
@@ -130,7 +133,7 @@ Support for old replicators.
 
 =item $obj-E<gt>B<exists>()
 
-Returns a boolean, whether the database exists already.  This will
+Returns a boolean, whether the database exist on the server.  This will
 call L<ping()|Couch::DB::Database/"Database information"> and wait for an anwser.
 
 =item $obj-E<gt>B<ping>(%options)
@@ -140,7 +143,7 @@ call L<ping()|Couch::DB::Database/"Database information"> and wait for an anwser
 Check whether the database exists.  You may get some useful response
 headers, but nothing more: the response body is empty.
 
-=item $obj-E<gt>B<purgeDocuments>(\%plan, %options)
+=item $obj-E<gt>B<purgeDocs>(\%plan, %options)
 
  [CouchDB API "POST /{db}/_purge", UNTESTED]
 
@@ -178,13 +181,15 @@ Remove the database.
 
  [CouchDB API "GET /{db}/_revs_limit", UNTESTED]
 
-Returns the soft maximum number of records kept about deleting records.
+Returns the limit of historical revisions to store for a single document
+in the database.
 
 =item $obj-E<gt>B<revisionLimitSet>($limit, %options)
 
  [CouchDB API "PUT /{db}/_revs_limit", UNTESTED]
 
-Set a new soft limit.  The default is 1000.
+Sets the limit of historical revisions to store for a single document
+in the database.  The default is 1000.
 
 =item $obj-E<gt>B<revisionsDiff>(\%plan, %options)
 
@@ -254,7 +259,7 @@ When no design document is specified, then one will be created.
 
 =back
 
-=item $obj-E<gt>B<listDesigns>( [\%search|\@%search, %options] )
+=item $obj-E<gt>B<designs>( [\%search|\@%search, %options] )
 
  [CouchDB API "GET /{db}/_design_docs", UNTESTED]
  [CouchDB API "POST /{db}/_design_docs", UNTESTED]
@@ -267,7 +272,7 @@ parameters are added and missing.
 If there are searches, then C<GET> is used, otherwise the C<POST> version.
 The returned structure depends on the searches and the number of searches.
 
-=item $obj-E<gt>B<listIndexes>(%options)
+=item $obj-E<gt>B<indexes>(%options)
 
  [CouchDB API "GET /{db}/_index", UNTESTED]
 
@@ -279,15 +284,15 @@ Collect all indexes for the database.
 
 =over 4
 
-=item $obj-E<gt>B<doc>(ID, %options)
+=item $obj-E<gt>B<doc>($docid, %options)
 
-Returns a L<Couch::DB::Document|Couch::DB::Document> for this ID.  Be aware that this does not have
-any interaction with the CouchDB server.  Only when you call actions, like
-L<Couch::DB::Document::exists()|Couch::DB::Document/"Document in the database">, on that object, you can see the status and
+Returns a L<Couch::DB::Document|Couch::DB::Document> for this C<$docid>.  Be aware that this
+does not have any interaction with the CouchDB server.  Only when you
+call actions, like C<exists()>, on that object, you can see the status and
 content of the document.
 
-The %options are passed to L<Couch::DB::Database::new()|Couch::DB::Database/"Constructors">.  Of course, you do not
-need to pass the database object explicitly.
+All C<%options> are passed to L<Couch::DB::Database::new()|Couch::DB::Database/"Constructors">.  Of course, you do
+not need to pass the C<Couch::DB::Database> object explicitly.
 
 =item $obj-E<gt>B<find>( [\%search, %options] )
 
@@ -300,8 +305,9 @@ data is not included.
 
 The default search will select everything (uses a blank HASH as required
 C<selector>).  By default, the number of results has a C<limit> of 25.
-Pass C<limit> and C<skip> in %options with other pagination control,
-not %search.
+j
+Pass C<limit> and C<skip> in C<%options> with other pagination control,
+not in C<%search>.
 
  -Option   --Default
   partition  undef
@@ -320,13 +326,13 @@ example: of find() with a single query
 
 example: of find() more than one query:
 
-  my $result = $couch->find(search => [ \%q0, \%q1 ]) or die;
+  my $result = $couch->find( [\%q0, \%q1] ) or die;
   my $docs   = $result->values->{results}[1]{docs};
   foreach my $doc (@$docs) { ... }
 
 =item $obj-E<gt>B<findExplain>(\%search, %options)
 
- [CouchDB API "POST /{db}/_explain", UNTESTED]
+ [CouchDB API "POST /{db}/_explain"]
  [CouchDB API "POST /{db}/_partition/{partition_id}/_explain", UNTESTED]
 
 Explain how the a search will be executed.
@@ -340,7 +346,7 @@ Explain how the a search will be executed.
 
 =back
 
-=item $obj-E<gt>B<inspectDocuments>(\@docs, %options)
+=item $obj-E<gt>B<inspectDocs>(\@docs, %options)
 
  [CouchDB API "POST /{db}/_bulk_get", UNTESTED]
 
@@ -357,22 +363,75 @@ Include the revision history of each document.
 
 =back
 
-=item $obj-E<gt>B<listDocuments>( [\%search|\@%search, %options] )
+=item $obj-E<gt>B<saveBulk>(\@docs, %options)
 
- [CouchDB API "GET /{db}/_all_docs", UNTESTED]
- [CouchDB API "POST /{db}/_all_docs", UNTESTED]
+ [CouchDB API "POST /{db}/_bulk_docs"]
+
+Insert, update, and delete multiple documents in one go.  This is more efficient
+than saving them one by one.
+
+Pass the documents which need to be save/updated in an ARRAY as first argument.
+
+ -Option   --Default
+  delete     [ ]
+  issues     undef
+  new_edits  true
+
+=over 2
+
+=item delete => $doc|\@docs
+
+List of documents to remove.  You should not call the C<delete()> method on
+them yourself!
+
+=item issues => CODE
+
+By default, missing reports are ignored.  When a CODE is specified, it will be called
+with the result object, the failing document, and named parameters error details.
+The %details contain the C<error> type, the error C<reason>, and the optional
+C<deleting> boolean boolean.
+
+=item new_edits => BOOLEAN
+
+When false, than the docs will replace the existing revisions.
+
+=back
+
+example: bulk adding documents
+
+  my $doc1 = $db->doc('new1', content => $data1);
+  my $doc2 = $db->doc('new2', content => $data2);
+  $db->saveBulk([$doc1, $doc2]);
+
+example: deleting a document
+
+Can be combined with added documents.
+
+  my $del1 = $db->doc('victim');
+  $db->saveBulk([], delete => $del1);
+
+example: for error handling
+
+  sub handle($result, $doc, %details) { ... }
+  $db->saveBulk(@save, issues => \&handle);
+
+=item $obj-E<gt>B<search>( [\%search|\@%search, %options] )
+
+ [CouchDB API "GET /{db}/_all_docs"]
+ [CouchDB API "POST /{db}/_all_docs"]
  [CouchDB API "POST /{db}/_all_docs/queries", UNTESTED]
  [CouchDB API "GET /{db}/_local_docs", UNTESTED]
  [CouchDB API "POST /{db}/_local_docs", UNTESTED]
  [CouchDB API "POST /{db}/_local_docs/queries", UNTESTED]
  [CouchDB API "GET /{db}/_partition/{partition}/_all_docs", UNTESTED]
 
-Get the documents, optionally limited by a view.
-If there are searches, then C<POST> is used, otherwise the C<GET> version.
-The returned structure depends on the searches and the number of searches.
+Get the documents, optionally limited by a view.  If there are searches,
+then C<POST> is used, otherwise the C<GET> version.  The returned
+structure depends on the searches and the number of searches.  Of course,
+this method support pagination.
 
 The usual way to use this method with a view, is by calling
-L<Couch::DB::Design::viewFind()|Couch::DB::Design/"Views">.
+L<Couch::DB::Design::viewSearch()|Couch::DB::Design/"Views">.
 
  -Option   --Default
   design     undef
@@ -382,9 +441,9 @@ L<Couch::DB::Design::viewFind()|Couch::DB::Design/"Views">.
 
 =over 2
 
-=item design => $ddoc|$ddoc_id
+=item design => $design|$ddocid
 
-Usually called via L<Couch::DB::Design::viewFind()|Couch::DB::Design/"Views">.
+Usually called via L<Couch::DB::Design::viewSearch()|Couch::DB::Design/"Views">.
 
 =item local => BOOLEAN
 
@@ -401,51 +460,20 @@ Restrict the search to the named view.  Requires the C<design> document.
 
 =back
 
-=item $obj-E<gt>B<updateDocuments>(\@docs, %options)
+example: getting all documents in a database
 
- [CouchDB API "POST /{db}/_bulk_docs", UNTESTED]
+Be warned: doing it this way is memory hungry: better use paging.
 
-Insert, update, and delete multiple documents in one go.  This is more efficient
-than saving them one by one.
-
-Pass the documents which need to be save/updated in an ARRAY as first argument.
-
- -Option   --Default
-  delete     [ ]
-  new_edits  true
-  on_error   undef
-
-=over 2
-
-=item delete => $doc|\@docs
-
-List of documents to remove.  You should not call the C<delete()> method on
-them yourself!
-
-=item new_edits => BOOLEAN
-
-When false, than the docs will replace the existing revisions.
-
-=item on_error => CODE
-
-By default, errors are ignored.  When a CODE is specified, it will be called
-with the result object, the failing document, and named parameters error details.
-The %details contain the C<error> type, the error C<reason>, and the optional
-C<deleting> boolean boolean.
-
-=back
-
-example: for error handling
-
-  sub handle($result, $doc, %details) { ... }
-  $db->updateDocuments(@save, on_error => \&handle);
+  my $all  = $couch->db('users')->search({include_docs => 1}, _all => 1);
+  my $hits = $all->page;
+  my @docs = map $_->{doc}, @$hits;
 
 =back
 
 =head1 SEE ALSO
 
-This module is part of Couch-DB distribution version 0.004,
-built on June 17, 2024. Website: F<http://perl.overmeer.net/CPAN/>
+This module is part of Couch-DB distribution version 0.005,
+built on June 23, 2024. Website: F<http://perl.overmeer.net/CPAN/>
 
 =head1 LICENSE
 

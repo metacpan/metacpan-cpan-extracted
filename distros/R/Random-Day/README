@@ -127,6 +127,9 @@ ERRORS
                      Parameter 'dt_to' must be a 'DateTime' object.
                              Value: %s
                              Reference: %s
+             Parameter 'dt_from' must have older or same date than 'dt_to'.
+                     Date from: %s
+                     Date to: %s
 
      random_day():
              Day cannot be a zero.
@@ -224,6 +227,9 @@ SEE ALSO
     Data::Random
         Perl module to generate random data
 
+    DateTime::Event::Random
+        DateTime extension for creating random datetimes.
+
     Random::Day::InTheFuture
         Class for random day generation in the future.
 
@@ -244,5 +250,5 @@ LICENSE AND COPYRIGHT
     BSD 2-Clause License
 
 VERSION
-    0.15
+    0.16
 

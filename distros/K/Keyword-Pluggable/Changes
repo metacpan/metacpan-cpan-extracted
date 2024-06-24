@@ -1,5 +1,8 @@
 Revision history for Keyword-Pluggable
 
+1.05    2024-06-24
+        - allow code to decide if it is a statement or an expression by Paul Jarc
+
 1.04    2018-12-12
         - allow modifying the source after the keyword
 

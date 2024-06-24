@@ -1,37 +1,5 @@
-/*
- * ***** BEGIN LICENSE BLOCK *****
- * Version: MIT
- *
- * Portions created by Alan Antonuk are Copyright (c) 2012-2014
- * Alan Antonuk. All Rights Reserved.
- *
- * Portions created by VMware are Copyright (c) 2007-2012 VMware, Inc.
- * All Rights Reserved.
- *
- * Portions created by Tony Garnock-Jones are Copyright (c) 2009-2010
- * VMware, Inc. and Tony Garnock-Jones. All Rights Reserved.
- *
- * Permission is hereby granted, free of charge, to any person
- * obtaining a copy of this software and associated documentation
- * files (the "Software"), to deal in the Software without
- * restriction, including without limitation the rights to use, copy,
- * modify, merge, publish, distribute, sublicense, and/or sell copies
- * of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- *
- * The above copyright notice and this permission notice shall be
- * included in all copies or substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
- * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
- * MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
- * NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS
- * BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN
- * ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
- * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
- * SOFTWARE.
- * ***** END LICENSE BLOCK *****
- */
+// Copyright 2007 - 2021, Alan Antonuk and the rabbitmq-c contributors.
+// SPDX-License-Identifier: mit
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -721,10 +689,11 @@ start_recv:
 
 int amqp_try_recv(amqp_connection_state_t state) {
   amqp_time_t timeout;
+  int res;
 
   while (amqp_data_in_buffer(state)) {
     amqp_frame_t frame;
-    int res = consume_one_frame(state, &frame);
+    res = consume_one_frame(state, &frame);
 
     if (AMQP_STATUS_OK != res) {
       return res;
@@ -760,7 +729,7 @@ int amqp_try_recv(amqp_connection_state_t state) {
       state->last_queued_frame = link;
     }
   }
-  int res = amqp_time_s_from_now(&timeout, 0);
+  res = amqp_time_from_now(&timeout, &(struct timeval){0});
   if (AMQP_STATUS_OK != res) {
     return res;
   }
@@ -995,7 +964,9 @@ static int simple_wait_method_inner(amqp_connection_state_t state,
                                     amqp_method_number_t expected_method,
                                     amqp_time_t deadline,
                                     amqp_method_t *output) {
-  amqp_method_number_t expected_methods[] = {expected_method, 0};
+  amqp_method_number_t expected_methods[2];
+  expected_methods[0] = expected_method;
+  expected_methods[1] = 0;
   return amqp_simple_wait_method_list(state, expected_channel, expected_methods,
                                       deadline, output);
 }
@@ -1056,7 +1027,7 @@ static amqp_rpc_reply_t simple_rpc_inner(
 
   retry:
     status = wait_frame_inner(state, &frame, deadline);
-    if (status < 0) {
+    if (status != AMQP_STATUS_OK) {
       if (status == AMQP_STATUS_TIMEOUT) {
         amqp_socket_close(state->socket, AMQP_SC_FORCE);
       }
@@ -1464,7 +1435,8 @@ error_res:
 
 amqp_rpc_reply_t amqp_login(amqp_connection_state_t state, char const *vhost,
                             int channel_max, int frame_max, int heartbeat,
-                            int sasl_method, ...) {
+                            amqp_sasl_method_enum sasl_method, ...) {
+
   va_list vl;
   amqp_rpc_reply_t ret;
 
@@ -1482,7 +1454,7 @@ amqp_rpc_reply_t amqp_login(amqp_connection_state_t state, char const *vhost,
 amqp_rpc_reply_t amqp_login_with_properties(
     amqp_connection_state_t state, char const *vhost, int channel_max,
     int frame_max, int heartbeat, const amqp_table_t *client_properties,
-    int sasl_method, ...) {
+    amqp_sasl_method_enum sasl_method, ...) {
   va_list vl;
   amqp_rpc_reply_t ret;
 

@@ -3,6 +3,31 @@
 	  All code was made by Mark Overmeer.
 	  Attributes refer to people who made contributions in ideas and bug-reports.
 
+version 0.005: Sun 23 Jun 09:33:12 CEST 2024
+
+	Changes:
+	- searchAnalyse -> searchAnalyze
+	- clusterSetup(%options) -> clusterSetup($config, %options)
+	- ::Client::dbUpdates(%options) -> dbUpdates(\%feed, %options)
+	- ::Database::compact(ddoc) -> compact(design)
+	- ::Database::listDocuments() -> search()
+	- ::Database::listDesigns() -> designs()
+	- ::Database::listIndexes() -> indexes()
+	- ::Database::{purge,inspect}Documents() -> *Docs()
+	- ::Database::updateDocuments() -> saveBulk()
+	- ::Database::saveBulk(on_error) -> saveBulk(issues)
+	- ::Design::viewFind() -> viewSearch()
+
+	Fixes:
+	- detection of introduced version.
+	- option search(design)
+
+	Improvements:
+	- added test for some cluster commands.
+	- reorder methods in Couch::DB.
+	- test UUID methods
+	- search now partially works.
+
 version 0.004: Mon 17 Jun 09:20:52 CEST 2024
 
 	Improvements:

@@ -6,7 +6,7 @@ use warnings;
 
 use Test::More;
 
-plan tests => 8 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+plan tests => 9 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 my @module_files = (
     'CXC/DB/DDL.pm',
@@ -14,6 +14,7 @@ my @module_files = (
     'CXC/DB/DDL/Constants.pm',
     'CXC/DB/DDL/Failure.pm',
     'CXC/DB/DDL/Field.pm',
+    'CXC/DB/DDL/Field/Pg.pm',
     'CXC/DB/DDL/Table.pm',
     'CXC/DB/DDL/Types.pm',
     'CXC/DB/DDL/Util.pm'

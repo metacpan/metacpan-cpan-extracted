@@ -3,19 +3,23 @@ package Acme::CPANModules::OneLinerTools;
 use strict;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2023-10-29'; # DATE
+our $DATE = '2024-06-21'; # DATE
 our $DIST = 'Acme-CPANModules-OneLinerTools'; # DIST
-our $VERSION = '0.004'; # VERSION
+our $VERSION = '0.005'; # VERSION
 
 our $LIST = {
     summary => 'List of modules to make your life easier when writing perl one-liners',
-    description => <<'_',
-_
+    description => <<'MARKDOWN',
+
+This list also tries to catalog modules that are meant to be primarily used in
+one-liners.
+
+MARKDOWN
     entries => [
 
         {
             module => 'L',
-            description => <<'_',
+            description => <<'MARKDOWN',
 
 One of the "module autoloader" modules, which happens to have a short name for
 one-liner usage. So instead of having to type this:
@@ -32,13 +36,13 @@ you can now write:
 subroutine. <pm:L>'s AUTOLOADER loads the module using <pm:Module::Load> then
 try to invoke the undefined subroutine once again.
 
-_
-            tags => ['module'],
+MARKDOWN
+            tags => ['module-loading'],
         },
 
         {
             module => 'lib::xi',
-            description => <<'_',
+            description => <<'MARKDOWN',
 
 This module can automatically install missing module during run-time using
 `cpanm`. Convenient when running a Perl script (that comes without a proper
@@ -48,38 +52,27 @@ Perl script to see which module it tries and fails to load.
 
 lib::xi works by installing a hook in `@INC`.
 
-_
-            tags => ['module'],
+MARKDOWN
+            tags => ['module-loading'],
             alternate_modules => [
                 'Require::Hook::More', # the autoinstalling feature has not been implemented though
             ],
         },
 
         {
-            module => 'Log::Any::App',
-            description => <<'_',
-
-A convenient way to display (consume) logs if your application uses
-<pm:Log::Any> to produce logs.
-
-_
-            tags => ['logging'],
-        },
-
-        {
             module => 'Log::ger::App',
-            description => <<'_',
+            description => <<'MARKDOWN',
 
 A convenient way to display (consume) logs if your application uses
 <pm:Log::ger> to produce logs.
 
-_
+MARKDOWN
             tags => ['logging'],
         },
 
         {
             module => 'DD::Dummy',
-            description => <<'_',
+            description => <<'MARKDOWN',
 
 My preference when dumping data structure when debugging Perl application is,
 well, Perl format (unlike some others which prefer custom format like
@@ -90,14 +83,14 @@ output but can be changed with this environment variable setting:
 
     PERL_XXX_DUMPER=Data::Dump
 
-_
+MARKDOWN
             alternate_modules => ['XXX', 'Data::Printer'],
             tags => ['debugging'],
         },
 
         {
             module => 'Devel::Confess',
-            description => <<'_',
+            description => <<'MARKDOWN',
 
 Forces stack trace when your application warns or dies. Used with the perl's
 `-d` flag:
@@ -105,26 +98,26 @@ Forces stack trace when your application warns or dies. Used with the perl's
     % perl -d:Confess ...
     % perl -d:Confess=dump ...
 
-_
+MARKDOWN
             tags => ['debugging'],
         },
 
         {
             module => 'Carp::Patch::Config',
-            description => <<'_',
+            description => <<'MARKDOWN',
 
 <pm:Carp> is used as a stack trace printer (also indirectly if you use
 <pm:Devel::Confess>). Sometimes you want to customize some Carp parameters like
 $Carp::MaxArgNums and $Carp::MaxArgLen from the command-line, and this is where
 this module helps.
 
-_
+MARKDOWN
             tags => ['debugging'],
         },
 
         {
             module => 'DBIx::Conn::MySQL',
-            description => <<'_',
+            description => <<'MARKDOWN',
 
 Shortcut when connecting to MySQL database in your one-liner. Instead of:
 
@@ -134,13 +127,13 @@ you can type:
 
     % perl -MDBIx::Conn::MySQL=mydb -E'$dbh->selectrow_array("query"); ...'
 
-_
+MARKDOWN
             tags => ['database', 'dbi'],
         },
 
         {
             module => 'DBIx::Conn::SQLite',
-            description => <<'_',
+            description => <<'MARKDOWN',
 
 Shortcut when connecting to MySQL database in your one-liner. Instead of:
 
@@ -150,10 +143,16 @@ you can type:
 
     % perl -MDBIx::Conn::SQLite=mydb -E'$dbh->selectrow_array("query"); ...'
 
-_
+MARKDOWN
             tags => ['database', 'dbi'],
         },
 
+        {module=>'ojo'},
+        {module=>'DDP', summary=>'From the Data::Printer distribution', tags=>['debugging']},
+        {module=>'XXX', tags=>['debugging']},
+        {module=>'eval', tags=>['debugging']},
+        {module=>'this_mod', tags=>['module-loading']},
+        {module=>'lib::filter', tags=>['debugging', 'module-loading']},
     ],
 };
 
@@ -172,7 +171,12 @@ Acme::CPANModules::OneLinerTools - List of modules to make your life easier when
 
 =head1 VERSION
 
-This document describes version 0.004 of Acme::CPANModules::OneLinerTools (from Perl distribution Acme-CPANModules-OneLinerTools), released on 2023-10-29.
+This document describes version 0.005 of Acme::CPANModules::OneLinerTools (from Perl distribution Acme-CPANModules-OneLinerTools), released on 2024-06-21.
+
+=head1 DESCRIPTION
+
+This list also tries to catalog modules that are meant to be primarily used in
+one-liners.
 
 =head1 ACME::CPANMODULES ENTRIES
 
@@ -212,14 +216,6 @@ lib::xi works by installing a hook in C<@INC>.
 
 
 Alternate modules: L<Require::Hook::More>
-
-=item L<Log::Any::App>
-
-Author: L<PERLANCAR|https://metacpan.org/author/PERLANCAR>
-
-A convenient way to display (consume) logs if your application uses
-L<Log::Any> to produce logs.
-
 
 =item L<Log::ger::App>
 
@@ -291,6 +287,30 @@ you can type:
 
  % perl -MDBIx::Conn::SQLite=mydb -E'$dbh->selectrow_array("query"); ...'
 
+
+=item L<ojo>
+
+Author: L<SRI|https://metacpan.org/author/SRI>
+
+=item L<DDP>
+
+From the Data::Printer distribution.
+
+Author: L<GARU|https://metacpan.org/author/GARU>
+
+=item L<XXX>
+
+Author: L<INGY|https://metacpan.org/author/INGY>
+
+=item L<eval>
+
+=item L<this_mod>
+
+Author: L<PERLANCAR|https://metacpan.org/author/PERLANCAR>
+
+=item L<lib::filter>
+
+Author: L<PERLANCAR|https://metacpan.org/author/PERLANCAR>
 
 =back
 
@@ -375,7 +395,7 @@ that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2023, 2020 by perlancar <perlancar@cpan.org>.
+This software is copyright (c) 2024, 2023, 2020 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -40,7 +40,7 @@
             "Data::Sah::Compiler::perl::TH::str" : "0.914",
             "Exporter" : "5.57",
             "File::Slurper" : "0",
-            "File::Temp" : "0.2307",
+            "File::Temp" : "0.2310",
             "Log::ger" : "0.038",
             "Math::Round" : "0",
             "Number::Format" : "0",
@@ -72,7 +72,7 @@
    "provides" : {
       "App::BPOMUtils::NutritionFacts" : {
          "file" : "lib/App/BPOMUtils/NutritionFacts.pm",
-         "version" : "0.026"
+         "version" : "0.027"
       }
    },
    "release_status" : "stable",
@@ -87,7 +87,7 @@
          "web" : "https://github.com/perlancar/perl-App-BPOMUtils-NutritionFacts"
       }
    },
-   "version" : "0.026",
+   "version" : "0.027",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.038002"

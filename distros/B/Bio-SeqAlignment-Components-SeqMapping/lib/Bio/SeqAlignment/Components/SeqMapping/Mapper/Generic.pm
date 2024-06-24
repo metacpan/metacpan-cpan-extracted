@@ -1,5 +1,5 @@
 package Bio::SeqAlignment::Components::SeqMapping::Mapper::Generic;
-$Bio::SeqAlignment::Components::SeqMapping::Mapper::Generic::VERSION = '0.02';
+$Bio::SeqAlignment::Components::SeqMapping::Mapper::Generic::VERSION = '0.03';
 use strict;
 use warnings;
 
@@ -208,7 +208,7 @@ Bio::SeqAlignment::Components::SeqMapping::Mapper::Generic Generic Sequence Mapp
 
 =head1 VERSION
 
-version 0.02
+version 0.03
 
 =head1 SYNOPSIS
 

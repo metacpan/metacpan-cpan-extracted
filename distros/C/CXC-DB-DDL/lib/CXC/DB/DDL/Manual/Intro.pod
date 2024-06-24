@@ -1,5 +1,7 @@
 # PODNAME: CXC::DB::DDL::Manual::Intro
 
+# ABSTRACT: Introduction to CXC::DB::DDL
+
 __END__
 
 =pod
@@ -8,11 +10,11 @@ __END__
 
 =head1 NAME
 
-CXC::DB::DDL::Manual::Intro
+CXC::DB::DDL::Manual::Intro - Introduction to CXC::DB::DDL
 
 =head1 VERSION
 
-version 0.13
+version 0.14
 
 =head1 SYNOPSIS
 

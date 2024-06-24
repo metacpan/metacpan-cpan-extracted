@@ -1,6 +1,6 @@
 package Object::Import;
 use warnings;
-our $VERSION = 1.005;
+our $VERSION = 1.006;
 
 
 =head1 NAME
@@ -100,7 +100,7 @@ the import.
 Prepends a string to the names of functions imported.  This is useful if
 some of the method names are the same as existing subs or builtins.  Eg.
 
-	use Object::Import $object, prefix => "foo";
+	use Object::Import $object, prefix => "foo_";
 	foo_bar(); # calls $object->bar();
 
 =item C<< suffix => >> I<$string>

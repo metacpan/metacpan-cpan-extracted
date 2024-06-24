@@ -7,7 +7,7 @@
 
 package Couch::DB;
 use vars '$VERSION';
-$VERSION = '0.004';
+$VERSION = '0.005';
 
 use version;
 
@@ -100,9 +100,19 @@ sub db($%)
 }
 
 
+sub node($)
+{	my ($self, $name) = @_;
+	$self->{CD_nodes}{$name} ||= Couch::DB::Node->new(name => $name, couch => $self);
+}
+
+
+sub cluster() { $_[0]->{CD_cluster} ||= Couch::DB::Cluster->new(couch => $_[0]) }
+
+#-------------
+
 #XXX the API-doc might be mistaken, calling the "analyzer" parameter "field".
 
-sub searchAnalyse(%)
+sub searchAnalyze(%)
 {	my ($self, %args) = @_;
 
 	my %send = (
@@ -118,13 +128,29 @@ sub searchAnalyse(%)
 }
 
 
-sub node($)
-{	my ($self, $name) = @_;
-	$self->{CD_nodes}{$name} ||= Couch::DB::Node->new(name => $name, couch => $self);
+sub requestUUIDs($%)
+{	my ($self, $count, %args) = @_;
+
+	$self->call(GET => '/_uuids',
+		introduced => '2.0.0',
+		query      => { count => $count },
+		$self->_resultsConfig(\%args),
+	);
 }
 
 
-sub cluster() { $_[0]->{CD_cluster} ||= Couch::DB::Cluster->new(couch => $_[0]) }
+sub freshUUIDs($%)
+{	my ($self, $count, %args) = @_;
+	my $stock = $self->{CDC_uuids} || [];
+	my $bulk  = delete $args{bulk} || 50;
+
+	while($count > @$stock)
+	{	my $result = $self->requestUUIDs($bulk, _delay => 0) or last;
+		push @$stock, @{$result->values->{uuids} || []};
+	}
+
+	splice @$stock, 0, $count;
+}
 
 #-------------
 
@@ -216,7 +242,9 @@ sub call($$%)
 			{	# Merge paging setting into the request
 	    		$self->_pageRequest($paging, $method, $query, $send);
 
-				$self->_callClient($result, $client, %args)
+				$self->_callClient($result, $client, %args);
+
+				$result
 					or next CLIENT;  # fail
 			} while $result->pageIsPartial;
 
@@ -314,7 +342,7 @@ sub _resultsPaging($%)
 	{	$state{bookmarks}{$state{start}} = $b;
 	}
 
-	$harvester ||= sub { $_[0]->values->{docs} };
+	$harvester ||= sub { my $v = $_[0]->values; $v->{docs} || $v->{rows} };
 	my $harvest = sub {
 		my $result = shift or return;
 		my @found  = flat $harvester->($result);
@@ -347,7 +375,6 @@ sub _pageRequest($$$$)
 	}
 }
 
-#-------------
 
 my %default_toperl = (  # sub ($couch, $name, $datum) returns value/object
 	abs_uri   => sub { URI->new($_[2]) },
@@ -456,43 +483,18 @@ sub check($$$$)
 				what => $what, release => $version, api => $self->api;
 	}
 	elsif($change eq 'introduced')
-	{	$self->api >= $cv && ! $surpress_intro{$what}++
+	{	$self->api >= $cv || $surpress_intro{$what}++
 			or warning __x"{what} was introduced in {release}, but you specified api {api}.",
 				what => $what, release => $version, api => $self->api;
 	}
 	elsif($change eq 'deprecated')
-	{	$self->api >= $cv && ! $surpress_depr{$what}++
+	{	$self->api >= $cv || $surpress_depr{$what}++
 			or warning __x"{what} got deprecated in api {release}.",
 					what => $what, release => $version;
 	}
 	else { panic "$change $cv $what" }
 
 	$self;
-}
-
-
-sub requestUUIDs($%)
-{	my ($self, $count, %args) = @_;
-
-	$self->call(GET => '/_uuids',
-		introduced => '2.0.0',
-		query      => { count => $count },
-		$self->_resultsConfig(\%args),
-	);
-}
-
-
-sub freshUUIDs($%)
-{	my ($self, $count, %args) = @_;
-	my $stock = $self->{CDC_uuids};
-	my $bulk  = delete $args{bulk} || 50;
-
-	while($count > @$stock)
-	{	my $result = $self->requestUUIDs($bulk, _delay => 0) or last;
-		push @$stock, @{$result->values->{uuids} || []};
-	}
-
-	splice @$stock, 0, $count;
 }
 
 #-------------

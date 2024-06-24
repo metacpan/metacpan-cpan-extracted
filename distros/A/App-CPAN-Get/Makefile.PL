@@ -33,17 +33,22 @@ requires 'URI' => 0;
 resources 'bugtracker' => 'https://github.com/michal-josef-spacek/App-CPAN-Get/issues',
 resources 'homepage' => 'https://github.com/michal-josef-spacek/App-CPAN-Get';
 resources 'repository' => 'git://github.com/michal-josef-spacek/App-CPAN-Get';
+test_requires 'Cwd' => 0;
 test_requires 'English' => 0;
 test_requires 'Error::Pure::Utils' => 0;
 test_requires 'File::Spec::Functions' => 0;
 test_requires 'File::Object' => 0;
+test_requires 'File::Temp' => 0;
+test_requires 'HTTP::Response' => 0;
+test_requires 'Perl6::Slurp' => 0;
 test_requires 'Test::LWP::UserAgent' => 0;
 test_requires 'Test::MockObject' => 0;
 test_requires 'Test::More' => 0;
 test_requires 'Test::NoWarnings' => 0;
 test_requires 'Test::Output' => 0;
+test_requires 'Test::Warn' => 0;
 tests_recursive;
-version '0.10';
+version '0.11';
 
 # Run.
 WriteAll();

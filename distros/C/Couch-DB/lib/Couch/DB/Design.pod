@@ -36,15 +36,18 @@ Extends L<"Constructors" in Couch::DB::Document|Couch::DB::Document/"Constructor
 
 =item Couch::DB::Design-E<gt>B<new>(%options)
 
- -Option--Defined in         --Default
-  batch   Couch::DB::Document  from database
-  db      Couch::DB::Document  undef
-  id      Couch::DB::Document  undef
-  local   Couch::DB::Document  false
+ -Option --Defined in         --Default
+  batch    Couch::DB::Document  from database
+  content  Couch::DB::Document  undef
+  db       Couch::DB::Document  undef
+  id       Couch::DB::Document  undef
+  local    Couch::DB::Document  false
 
 =over 2
 
 =item batch => BOOLEAN
+
+=item content => DATA
 
 =item db => L<Couch::DB::Database|Couch::DB::Database>-object
 
@@ -312,17 +315,17 @@ The search query.
 
 =over 4
 
-=item $obj-E<gt>B<viewFind>( $view, [\%search|\@%search), %options] )
+=item $obj-E<gt>B<viewSearch>( $view, [\%search|\@%search), %options] )
 
- [CouchDB API "GET /{db}/_design/{ddoc}/_view/{view}"]
+ [CouchDB API "GET /{db}/_design/{ddoc}/_view/{view}", UNTESTED]
  [CouchDB API "POST /{db}/_design/{ddoc}/_view/{view}", UNTESTED]
  [CouchDB API "POST /{db}/_design/{ddoc}/_view/{view}/queries", UNTESTED]
  [CouchDB API "GET /{db}/_partition/{partition}/_design/{ddoc}/_view/{view}", UNTESTED]
 
 Executes the specified view function.
 
-This work is handled in L<Couch::DB::Database::listDocuments()|Couch::DB::Database/"Handling documents">.  See that method for
-%options and results.
+This work is handled in L<Couch::DB::Database::search()|Couch::DB::Database/"Handling documents">.  See that method for
+C<%options> and results.
 
 =back
 
@@ -373,8 +376,8 @@ undef, a C<null> document will be used.
 
 =head1 SEE ALSO
 
-This module is part of Couch-DB distribution version 0.004,
-built on June 17, 2024. Website: F<http://perl.overmeer.net/CPAN/>
+This module is part of Couch-DB distribution version 0.005,
+built on June 23, 2024. Website: F<http://perl.overmeer.net/CPAN/>
 
 =head1 LICENSE
 

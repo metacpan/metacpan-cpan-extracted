@@ -30,7 +30,8 @@ no_index:
 requires:
   Class::Utils: 0
   Error::Pure: 0
-  List::MoreUtils: 0
+  List::Util: 1.33
+  Scalar::Util: 0
   Tags::HTML: 0.06
   Tags::HTML::Element::A: 0
   perl: 5.8.0
@@ -39,4 +40,4 @@ resources:
   homepage: https://github.com/michal-josef-spacek/Tags-HTML-Table-View
   license: http://opensource.org/licenses/bsd-license.php
   repository: git://github.com/michal-josef-spacek/Tags-HTML-Table-View
-version: '0.06'
+version: '0.07'

@@ -392,6 +392,23 @@ UUID LIBRARY
     first. This is no longer the case. Version 0.33 bundled the e2fsprogs
     UUID code, and version 0.34 removed it altogether.
 
+BENCHMARKS
+    There are a few benchmarks in the distribution ubin directory which can
+    be run either standalone or through the Makefile.
+
+  make compare
+    Runs all three of the following tests.
+
+  make speeds
+    Runs ubin/cmp_speeds.pl to compare the speeds of various UUID versions.
+
+  make styles
+    Runs ubin/cmp_styles.pl to compare different UUID calling styles.
+
+  make persist
+    Runs ubin/cmp_persist.pl to compare different deferral values for
+    persistent state.
+
 COPYRIGHT AND LICENSE
     This software is Copyright (c) 2014-2024 by Rick Myers.
 
@@ -428,6 +445,8 @@ CONTRIBUTORS
     twata
 
     Christopher Rasch-Olsen Raa
+
+    Petr Pisar
 
 SEE ALSO
     RFC4122 - <https://www.rfc-editor.org/rfc/rfc4122>

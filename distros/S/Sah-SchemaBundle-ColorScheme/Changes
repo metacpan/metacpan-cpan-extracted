@@ -1,0 +1,9 @@
+0.003   2024-06-21  Released-By: PERLANCAR; Urgency: medium
+
+        - Rename module/dist Sah-Schema{s,Bundle}-* for consistency with
+          others.
+
+
+0.001   2021-01-20  Released-By: PERLANCAR
+
+        - First release.

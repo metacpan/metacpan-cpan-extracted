@@ -3,9 +3,13 @@ NAME
     easier when writing perl one-liners
 
 VERSION
-    This document describes version 0.004 of
+    This document describes version 0.005 of
     Acme::CPANModules::OneLinerTools (from Perl distribution
-    Acme-CPANModules-OneLinerTools), released on 2023-10-29.
+    Acme-CPANModules-OneLinerTools), released on 2024-06-21.
+
+DESCRIPTION
+    This list also tries to catalog modules that are meant to be primarily
+    used in one-liners.
 
 ACME::CPANMODULES ENTRIES
     L   Author: SONGMU <https://metacpan.org/author/SONGMU>
@@ -39,12 +43,6 @@ ACME::CPANMODULES ENTRIES
         lib::xi works by installing a hook in @INC.
 
         Alternate modules: Require::Hook::More
-
-    Log::Any::App
-        Author: PERLANCAR <https://metacpan.org/author/PERLANCAR>
-
-        A convenient way to display (consume) logs if your application uses
-        Log::Any to produce logs.
 
     Log::ger::App
         Author: PERLANCAR <https://metacpan.org/author/PERLANCAR>
@@ -107,6 +105,21 @@ ACME::CPANMODULES ENTRIES
         you can type:
 
          % perl -MDBIx::Conn::SQLite=mydb -E'$dbh->selectrow_array("query"); ...'
+
+    ojo Author: SRI <https://metacpan.org/author/SRI>
+
+    DDP From the Data::Printer distribution.
+
+        Author: GARU <https://metacpan.org/author/GARU>
+
+    XXX Author: INGY <https://metacpan.org/author/INGY>
+
+    eval
+    this_mod
+        Author: PERLANCAR <https://metacpan.org/author/PERLANCAR>
+
+    lib::filter
+        Author: PERLANCAR <https://metacpan.org/author/PERLANCAR>
 
 FAQ
   What is an Acme::CPANModules::* module?
@@ -182,7 +195,7 @@ CONTRIBUTING
     required beyond that are considered a bug and can be reported to me.
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2023, 2020 by perlancar
+    This software is copyright (c) 2024, 2023, 2020 by perlancar
     <perlancar@cpan.org>.
 
     This is free software; you can redistribute it and/or modify it under

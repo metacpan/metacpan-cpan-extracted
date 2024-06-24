@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 package Bio::SeqAlignment::Components::SeqMapping::Dataflow;
-$Bio::SeqAlignment::Components::SeqMapping::Dataflow::VERSION = '0.02';
+$Bio::SeqAlignment::Components::SeqMapping::Dataflow::VERSION = '0.03';
 use Module::Find;
 
 #ABSTRACT: Imports all modules relevant to Dataflow for sequence mapping
@@ -18,7 +18,7 @@ Bio::SeqAlignment::Components::SeqMapping::Dataflow Components that implement da
 
 =head1 VERSION
 
-version 0.02
+version 0.03
 
 =head1 SYNOPSIS
 

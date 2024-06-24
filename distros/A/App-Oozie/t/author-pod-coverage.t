@@ -19,7 +19,7 @@ BEGIN {
 }
 use Pod::Coverage::TrustPod;
 
-my %skip = map { $_ => 1 } qw( App::Oozie::Forked::Template::ttree App::Oozie::Deploy::Template::ttree );
+my %skip = map { $_ => 1 } qw( App::Oozie::Deploy::Template::ttree );
 
 my @modules;
 for my $module ( all_modules() ) {

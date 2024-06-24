@@ -1,17 +1,20 @@
 package Kelp::Module::Template::Null;
 use Kelp::Base 'Kelp::Module::Template';
-use Plack::Util;
 
-attr ext => 'null';
+attr ext => undef;
 
-sub build_engine {
-    my ( $self, %args ) = @_;
-    Plack::Util::inline_object( render => sub { "All the ducks" } );
+sub build_engine
+{
+    return undef;
 }
 
-sub render {
-    my ( $self, $template, $vars, @rest ) = @_;
-    $self->engine->render();
+sub render
+{
+    return '';
 }
 
 1;
+
+# This is a stub template module which may be used as a placeholder for a
+# future template module.
+

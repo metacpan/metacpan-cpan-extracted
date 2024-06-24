@@ -1,5 +1,5 @@
 package Crypt::HSM;
-$Crypt::HSM::VERSION = '0.016';
+$Crypt::HSM::VERSION = '0.017';
 use strict;
 use warnings;
 
@@ -22,7 +22,7 @@ Crypt::HSM - A PKCS11 interface for Perl
 
 =head1 VERSION
 
-version 0.016
+version 0.017
 
 =head1 SYNOPSIS
 
@@ -46,7 +46,7 @@ This loads the pkcs11 found a $path, and returns it as a new L<Crypt::HSM::Provi
 
 =head1 AUTHOR
 
-Leon Timmermans <leont@cpan.org>
+Leon Timmermans <fawaka@gmail.com>
 
 =head1 COPYRIGHT AND LICENSE
 

@@ -1,5 +1,8 @@
 Revision history for ExtUtils-Typemaps-Magic
 
+0.007     2024-06-23 14:58:07+02:00 Europe/Brussels
+          - Correct #endif for <5.14 compatibility
+
 0.006     2024-06-16 15:44:01+02:00 Europe/Brussels
           - Soften dependency on mg_findext
           - Refactor Synopses to be more useful to end-users

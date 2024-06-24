@@ -22,13 +22,13 @@ no_index:
 provides:
   CLI::Simple:
     file: lib/CLI/Simple.pm
-    version: v0.0.6
+    version: v0.0.7
   CLI::Simple::Constants:
     file: lib/CLI/Simple/Constants.pm
-    version: v0.0.6
+    version: v0.0.7
   CLI::Simple::Utils:
     file: lib/CLI/Simple/Utils.pm
-    version: v0.0.6
+    version: v0.0.7
 requires:
   Class::Accessor::Fast: '0.51'
   File::Which: '1.23'
@@ -42,5 +42,5 @@ resources:
   bugtracker: http://github.com/rlauer6/perl-CLI-Simple/issues
   homepage: http://github.com/rlauer6/perl-CLI-Simple
   repository: git://github.com/rlauer6/perl-CLI-Simple.git
-version: v0.0.6
+version: v0.0.7
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

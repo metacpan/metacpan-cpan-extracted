@@ -346,6 +346,12 @@ L<Net::Clacks::Server> also has an additional way to call the event loop, runOnc
 
 Special thanks goes to kcott from PerlMonks for the MIN_PERL_VERSION stuff in Makefile.PL
 
+=head2 VERSION 29
+
+Increase the Listen queue (=how many new connections can be handled per cycle) from 1 to 20. This should increase reliability of initial startup (and reconnects after a network problem) of clients more reliable.
+
+This version is fully backwards compatible to Version 28
+
 
 =head1 AUTHOR
 
@@ -358,7 +364,7 @@ L<https://cavac.at/public/mercurial/Net-Clacks/>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2008-2023 Rene Schickbauer
+Copyright (C) 2008-2024 Rene Schickbauer
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself, either Perl version 5.10.0 or,

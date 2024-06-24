@@ -7,7 +7,7 @@
 
 package Couch::DB::Result;
 use vars '$VERSION';
-$VERSION = '0.004';
+$VERSION = '0.005';
 
 
 use Couch::DB::Util     qw(flat pile);

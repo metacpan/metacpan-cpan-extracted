@@ -6,7 +6,7 @@ use diagnostics;
 use mro 'c3';
 use English qw(-no_match_vars);
 use Carp qw[carp croak confess cluck longmess shortmess];
-our $VERSION = 28;
+our $VERSION = 29;
 use autodie qw( close );
 use Array::Contains;
 use utf8;
@@ -37,8 +37,8 @@ foreach my $file (@files) {
 
     open(my $ofh, ">", $file) or die($ERRNO);
     foreach my $line (@lines) {
-        $line =~ s/\(C\)\ \d\d\d\d-\d\d\d\d\ Rene\ Schickbauer/\(C\) 2008-2023 Rene Schickbauer/ig;
-        $line =~ s/\(C\)\ \d\d\d\d-\d\d\d\d\ by\ Rene\ Schickbauer/\(C\) 2008-2023 Rene Schickbauer/ig;
+        $line =~ s/\(C\)\ \d\d\d\d-\d\d\d\d\ Rene\ Schickbauer/\(C\) 2008-2024 Rene Schickbauer/ig;
+        $line =~ s/\(C\)\ \d\d\d\d-\d\d\d\d\ by\ Rene\ Schickbauer/\(C\) 2008-2024 Rene Schickbauer/ig;
         print $ofh $line;
     }
     close $ofh;

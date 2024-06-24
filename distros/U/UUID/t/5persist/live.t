@@ -12,12 +12,14 @@ use Config;
 use vars qw(@OPTS $TMPDIR $STATEFILE);
 
 BEGIN {
-    my $tdo = File::Temp->newdir('asserttestXXXXXXXX',
-        DIR => File::Spec->curdir(), CLEANUP => 0);
+    my $tdo = File::Temp->newdir(CLEANUP => 0);
     $TMPDIR = $tdo->dirname;
 
-    my $tfo = File::Temp->new(TEMPLATE => 'stateXXXXXXXX',
-        SUFFIX => '.txt', DIR => $TMPDIR, UNLINK => 0);
+    my $tfo = File::Temp->new(
+        TEMPLATE => 'UUID.state.XXXXXXXX',
+        DIR      => $TMPDIR,
+        UNLINK   => 0,
+    );
     $STATEFILE = $tfo->filename;
 
     @OPTS = ":persist=$STATEFILE";
@@ -46,8 +48,8 @@ like $uu, qr/^[-0-9a-f]{36}$/, 'smells like uuid';
     like $state, qr/adj:\s+[0-9a-f]{8}/,                 'adj field';
 }
 
-# do this so UUID closes state file, thus
-# allowing Win32 File::Temp to unlink it.
+# do this so UUID closes state file,
+# thus allowing Win32 to unlink it.
 UUID::_persist(undef);
 unlink $STATEFILE;
 rmdir  $TMPDIR;

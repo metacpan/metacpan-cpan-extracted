@@ -1,12 +1,12 @@
 package Term::Output::List::Win32;
-use strict;
-use warnings;
+use 5.020;
 use Moo 2;
+use Scalar::Util 'weaken';
 use Win32::Console;
-use feature 'signatures';
-no warnings 'experimental::signatures';
+use experimental 'signatures';
 
-our $VERSION = '0.03';
+our $VERSION = '0.05';
+with 'Term::Output::List::Role';
 
 =head1 NAME
 
@@ -14,7 +14,9 @@ Term::Output::List::Win32 - output an updateable list of ongoing jobs to a Win32
 
 =head1 SYNOPSIS
 
-    my $printer = Term::Output::List->new();
+    my $printer = Term::Output::List->new(
+        hook_warnings => 1,
+    );
     my @ongoing_tasks = ('file1: frobnicating', 'file2: bamboozling', 'file3: frobnicating');
     $printer->output_list(@ongoing_tasks);
 
@@ -39,19 +41,44 @@ has 'fh' => (
     default => sub { \*STDOUT },
 );
 
+has 'ellipsis' => (
+    is => 'lazy',
+    default => sub { "..." },
+);
+
 has 'console' => (
     is => 'lazy',
     default => sub($s) { Win32::Console->new(STD_OUTPUT_HANDLE) },
 );
 
-has 'interactive' => (
-    is => 'lazy',
-    default => sub { -t $_[0]->fh },
-);
+=head2 C<< interactive >>
+
+Whether the script is run interactively and should output intermittent
+updateable information
+
+=head2 C<< hook_warnings >>
+
+Install a hook for sending warnings to C<< ->output_permanent >>. This
+prevents ugly tearing/overwriting when your code outputs warnings.
+
+=cut
 
 =head1 METHODS
 
 =head2 C<< Term::Output::List::Win32->new() >>
+
+  my $output = Term::Output::List::Win32->new(
+      hook_warnings => 1,
+  )
+
+=over 4
+
+=item C<< hook_warnings >>
+
+Install a hook for sending warnings to C<< ->output_permanent >>. This
+prevents ugly tearing/overwriting when your code outputs warnings.
+
+=back
 
 =cut
 
@@ -101,22 +128,22 @@ output the (remaining) list of ongoing jobs after that.
 
 sub output_permanent( $self, @items ) {
     my $total = $self->_last_lines // 0;
-    if( $self->interactive ) {
+    if( !$self->interactive ) {
+        print { $self->fh } join("\n", @items) . "\n";
+
+    } else {
         $self->scroll_up($total);
         my $w = $self->width;
+
         if( @items ) {
             $self->do_clear_eol(scalar @items);
             print { $self->fh }
                   join("\n",
-                    map { length($_) > $w - 1 ? (substr($_,0,$w-3).'..'): $_
+                    map { s/\s*\z//r }
+                    map { $self->_trim( $_, $w ) }
                         } @items)."\n";
         };
-    } else {
-        print { $self->fh } join("\n", @items) . "\n";
-    }
-    #sleep 1;
 
-    if( $self->interactive ) {
         my $blank = $total - @items;
         if( $blank > 0 ) {
             $self->do_clear_eol($blank);
@@ -135,16 +162,6 @@ Outputs items that can be updated later, as long as no intervening output
 (like from C<print>, C<say> or C<warn>) has happened. If you want to output
 lines that should not be overwritten later, see C<</->output_permanent>>
 
-=cut
-
-sub output_list( $self, @items ) {
-    if( $self->interactive ) {
-        $self->output_permanent(@items);
-        #sleep 1;
-        $self->_last_lines( 0+@items);
-    }
-}
-
 =head2 C<<->fresh_output >>
 
   $o->fresh_output();
@@ -154,12 +171,6 @@ Helper subroutine to make all items from the last output list remain as is.
 For compatibility between output to a terminal and output without a terminal,
 you should use C<< ->output_permanent >> for things that should be permanent
 instead.
-
-=cut
-
-sub fresh_output( $self ) {
-    $self->_last_lines( 0 );
-}
 
 =head2 C<< ->do_clear_eol >>
 

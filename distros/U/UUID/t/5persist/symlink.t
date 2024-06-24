@@ -20,19 +20,13 @@ BEGIN {
 }
 
 BEGIN {
-    $TMPDIR = File::Temp::tempdir(
-        'asserttestXXXXXXXX',
-        DIR     => File::Spec->curdir(),
-        CLEANUP => 1,
-    );
+    $TMPDIR = File::Temp::tempdir(CLEANUP => 1);
     ok -d $TMPDIR, 'tmpdir exists';
 
     $TARG = 'foo.txt';
     $FULL = File::Spec->catdir($TMPDIR, $TARG);
 
-    my $newfile = File::Spec->catfile(
-        File::Spec->curdir(), $TMPDIR, 'state.txt'
-    );
+    my $newfile = File::Spec->catfile($TMPDIR, 'state.txt');
 
     symlink $TARG, $newfile;
     ok -l $newfile, 'symlink exists';

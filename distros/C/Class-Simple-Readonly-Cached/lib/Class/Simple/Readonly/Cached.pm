@@ -15,11 +15,11 @@ Class::Simple::Readonly::Cached - cache messages to an object
 
 =head1 VERSION
 
-Version 0.09
+Version 0.10
 
 =cut
 
-our $VERSION = '0.09';
+our $VERSION = '0.10';
 
 =head1 SYNOPSIS
 
@@ -39,11 +39,11 @@ that works on objects which doesn't change its state based on input:
     $obj = Class::Simple::Readonly::Cached->new(object => $obj, cache => {});
     my $val = $obj->val();
     print "$val\n";	# Prints "foo"
-  
+
     #... set $obj to be some other class which will take an argument 'a',
     #	with a value 'b'
-  
-    $val = $obj->val(a => 'b');	# You
+
+    $val = $obj->val(a => 'b');
 
 =head1 SUBROUTINES/METHODS
 
@@ -65,7 +65,7 @@ and that is used.
 
     my %hash;
     my $person = Gedcom::Person->new();
-    ... # Set up some data
+    # ...Set up some data
     my $object = Class::Simple::Readonly::Cached(object => $person, cache => \%hash);
     my $father1 = $object->father();	# Will call gedcom->father() to get the person's father
     my $father2 = $object->father();	# Will retrieve the father from the cache without calling person->father()
@@ -77,17 +77,11 @@ The 'quiet' option, when non-zero, silences the warning.
 
 =cut
 
-sub new {
-	my $proto = shift;
-	my $class = ref($proto) || $proto;
-
-	# Use Class::Simple::Readonly::Cached->new(), not Class::Simple::Readonly::Cached::new()
-	if(!defined($class)) {
-		Carp::carp(__PACKAGE__, ' use ->new() not ::new() to instantiate');
-		return;
-	}
-
+sub new
+{
+	my $class = shift;
 	my %args;
+
 	if(ref($_[0]) eq 'HASH') {
 		%args = %{$_[0]};
 	} elsif(ref($_[0])) {
@@ -95,6 +89,15 @@ sub new {
 		return;
 	} elsif(@_ % 2 == 0) {
 		%args = @_;
+	}
+
+	# Use Class::Simple::Readonly::Cached->new(), not Class::Simple::Readonly::Cached::new()
+	if(!defined($class)) {
+		Carp::carp(__PACKAGE__, ' use ->new() not ::new() to instantiate');
+		return;
+	} elsif(ref($class)) {
+		# clone the given object
+		return bless { %{$class}, %args }, ref($class);
 	}
 
 	if(!$args{'cache'}) {
@@ -125,14 +128,13 @@ sub new {
 		unless($args{'quiet'}) {
 			Carp::carp(__PACKAGE__, ' $object is already cached at ', $rc->{'line'}, ' of ', $rc->{'file'});
 		}
-		$rc = $rc->{'object'};
-	} else {
-		$rc = bless \%args, $class;
-		$cached{$args{'object'}}->{'object'} = $rc;
-		my @call_details = caller(0);
-		$cached{$args{'object'}}->{'file'} = $call_details[1];
-		$cached{$args{'object'}}->{'line'} = $call_details[2];
+		return $rc->{'object'};
 	}
+	$rc = bless \%args, $class;
+	$cached{$args{'object'}}->{'object'} = $rc;
+	my @call_details = caller(0);
+	$cached{$args{'object'}}->{'file'} = $call_details[1];
+	$cached{$args{'object'}}->{'line'} = $call_details[2];
 
 	return $rc;
 }
@@ -150,32 +152,70 @@ sub object
 	return $self->{'object'};
 }
 
-sub _caller_class
-{
-	my $self = shift;
-
-	if(ref($self->{'object'}) eq 'Class::Simple') {
-		# return $self->SUPER::_caller_class(@_);
-		return $self->Class::Simple::_caller_class(@_);
-	}
-}
+# sub _caller_class
+# {
+	# my $self = shift;
+#
+	# if(ref($self->{'object'}) eq 'Class::Simple') {
+		# # return $self->SUPER::_caller_class(@_);
+		# return $self->Class::Simple::_caller_class(@_);
+	# }
+# }
 
 =head2 state
 
 Returns the state of the object
 
-    print Data::Dumper->new([$obj->state()]->Dump();
+    print Data::Dumper->new([$obj->state()])->Dump();
 
 =cut
 
-sub state {
+sub state
+{
 	my $self = shift;
 
 	return { hits => $self->{_hits}, misses => $self->{_misses} };
 }
 
+=head2 can
+
+Returns if the embedded object can handle a message
+
+=cut
+
+sub can
+{
+	my $self = shift;
+	my $method = shift;
+
+	if(($method eq 'state') || ($method eq 'object') || ($method eq 'new') ||
+	   $self->{'object'}->can($method) || $self->SUPER::can($method)) {
+		return 1;
+	}
+	return 0;
+}
+
+=head2 isa
+
+Returns if the embedded object is the given type of object
+
+=cut
+
+sub isa
+{
+	my $self = shift;
+	my $class = shift;
+
+	if($class eq ref($self) || ($class eq __PACKAGE__) || $self->SUPER::isa($self)) {
+		return 1;
+	}
+	return $self->{'object'}->isa($class);
+}
+
+
 # Returns a cached object, if you want it to be uncached, you'll need to clone it
-sub AUTOLOAD {
+sub AUTOLOAD
+{
 	our $AUTOLOAD;
 	my $param = $AUTOLOAD;
 	$param =~ s/.*:://;
@@ -199,12 +239,12 @@ sub AUTOLOAD {
 		return;
 	}
 
-	# my $func = $self->{'object'} . "::$param";
-	my $func = $param;
+	# my $method = $self->{'object'} . "::$param";
+	my $method = $param;
 
 	# if($param =~ /^[gs]et_/) {
 		# # $param = "SUPER::$param";
-		# return $object->$func(\@_);
+		# return $object->$method(\@_);
 	# }
 
 	my $key = $param . '::' . join('::', grep defined, @_);
@@ -226,7 +266,8 @@ sub AUTOLOAD {
 					die $key if($foo[0] eq __PACKAGE__ . '>UNDEF<');
 					die $key if($foo[0] eq 'never');
 				}
-				return @{$rc};
+				# return @{$rc};
+				return @foo;
 			}
 			return pop @foo;
 		}
@@ -243,7 +284,7 @@ sub AUTOLOAD {
 	$self->{_misses}{$key}++;
 	my $object = $self->{'object'};
 	if(wantarray) {
-		my @rc = $object->$func(@_);
+		my @rc = $object->$method(@_);
 		if(scalar(@rc) == 0) {
 			return;
 		}
@@ -254,7 +295,7 @@ sub AUTOLOAD {
 		}
 		return @rc;
 	}
-	$rc = $object->$func(@_);
+	$rc = $object->$method(@_);
 	if(!defined($rc)) {
 		if(ref($cache) eq 'HASH') {
 			$cache->{$key} = __PACKAGE__ . '>UNDEF<';
@@ -265,7 +306,7 @@ sub AUTOLOAD {
 	}
 	# This would be nice, but it does break gedcom.  TODO: find out why
 	# if(ref($rc) && (ref($rc) =~ /::/) && (ref($rc) ne __PACKAGE__)) {
-		# $rc = Class::Simple::Readonly::Cached->new(object => $rc, cache => {});
+		# $rc = Class::Simple::Readonly::Cached->new(object => $rc, cache => $cache);
 	# }
 	if(ref($cache) eq 'HASH') {
 		return $cache->{$key} = $rc;
@@ -332,7 +373,7 @@ L<http://search.cpan.org/dist/Class-Simple-Readonly-Cached/>
 =head1 LICENSE AND COPYRIGHT
 
 Author Nigel Horne: C<njh@bandsman.co.uk>
-Copyright (C) 2019-2023 Nigel Horne
+Copyright (C) 2019-2024 Nigel Horne
 
 Usage is subject to licence terms.
 The licence terms of this software are as follows:

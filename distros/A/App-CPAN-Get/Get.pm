@@ -11,7 +11,7 @@ use Getopt::Std;
 use LWP::UserAgent;
 use Scalar::Util qw(blessed);
 
-our $VERSION = 0.10;
+our $VERSION = 0.11;
 
 # Constructor.
 sub new {
@@ -54,8 +54,9 @@ sub run {
 	$self->{'_opts'} = {
 		'h' => 0,
 	};
-	if (! getopts('h', $self->{'_opts'}) || @ARGV < 1
-		|| $self->{'_opts'}->{'h'}) {
+	if (! getopts('h', $self->{'_opts'})
+		|| $self->{'_opts'}->{'h'}
+		|| @ARGV < 1) {
 
 		print STDERR "Usage: $0 [-h] [--version] module_name[module_version]\n";
 		print STDERR "\t-h\t\tPrint help.\n";
@@ -188,6 +189,6 @@ BSD 2-Clause License
 
 =head1 VERSION
 
-0.10
+0.11
 
 =cut

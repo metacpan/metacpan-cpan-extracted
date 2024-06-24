@@ -4,55 +4,77 @@ use Kelp::Base 'Kelp::Module';
 
 use Carp;
 use Log::Dispatch;
+use Time::Piece;
 use Data::Dumper;
 
-sub _logger {
-    my ( $self, %args ) = @_;
-    Log::Dispatch->new(%args);
+attr logger => undef;
+attr date_format => '%Y-%m-%d %T';
+attr log_format => '%s - %s - %s';
+
+sub _logger
+{
+    my ($self, %args) = @_;
+
+    return Log::Dispatch->new(%args);
 }
 
-sub build {
-    my ( $self, %args ) = @_;
-    $self->{logger} = $self->_logger(%args);
+sub load_configuration
+{
+    my ($self, %args) = @_;
 
-    # Register a few levels
-    my @levels_to_register = qw/debug info error/;
+    for my $field (qw(date_format log_format)) {
+        $self->$field(delete $args{$field})
+            if $args{$field};
+    }
+
+    return %args;
+}
+
+sub build
+{
+    my ($self, %args) = @_;
+
+    # load module config
+    %args = $self->load_configuration(%args);
+
+    # load logger with the rest of the config
+    $self->logger($self->_logger(%args));
 
     # Build the registration hash
     my %LEVELS = map {
         my $level = $_;
         $level => sub {
             shift;
-            $self->message( $level, @_ );
+            $self->message($level, @_);
         };
-    } @levels_to_register;
+    } qw(debug info error);
 
-    # Register the log levels
+    # Register a few levels
     $self->register(%LEVELS);
 
     # Also register the message method as 'logger'
-    $self->register( logger => sub {
-        shift;
-        $self->message(@_);
-    });
+    $self->register(
+        logger => sub {
+            shift;
+            $self->message(@_);
+        }
+    );
 }
 
-sub message {
-    my ( $self, $level, @messages ) = @_;
-    my @a    = localtime(time);
-    my $date = sprintf(
-        "%4i-%02i-%02i %02i:%02i:%02i",
-        $a[5] + 1900,
-        $a[4] + 1,
-        $a[3], $a[2], $a[1], $a[0]
-    );
+sub message
+{
+    my ($self, $level, @messages) = @_;
+    my $date = localtime->strftime($self->date_format);
 
-    for (@messages) {
-        $self->{logger}->log(
-            level   => $level,
-            message => sprintf( '%s - %s - %s',
-                $date, $level, ref($_) ? Dumper($_) : $_ )
-        );
+    local $Data::Dumper::Sortkeys = 1;
+    for my $message (@messages) {
+        $message = sprintf $self->log_format,
+            $date,
+            $level,
+            (ref $message ? Dumper($message) : $message),
+            ;
+
+        $self->logger->log(level => $level, message => $message);
     }
 }
 
@@ -95,6 +117,28 @@ Kelp::Module::Logger - Logger for Kelp applications
 This module provides an log interface for Kelp web application. It uses
 L<Log::Dispatch> as underlying logging module.
 
+=head1 CONFIGURATION
+
+All module's configuration is passed to L<Log::Dispatch>, so consult its docs
+for details. In addition, following keys can be configured which change how the
+module behaves:
+
+=head2 date_format
+
+A string in L<strftime
+format|https://www.unix.com/man-page/FreeBSD/3/strftime/> which will be used to
+generate the date.
+
+By default, value C<'%Y-%m-%d %T'> is used.
+
+=head2 log_format
+
+A string in L<sprintf format|https://perldoc.perl.org/functions/sprintf> which
+will be used to generate the log. Three string values will be used in this
+string, in order: date, log level and the message itself.
+
+By default, value C<'%s - %s - %s'> is used.
+
 =head1 REGISTERED METHODS
 
 =head2 debug
@@ -103,4 +147,13 @@ L<Log::Dispatch> as underlying logging module.
 
 =head2 error
 
+=head2 logger
+
+C<< $app->logger(info => 'message') >> is equivalent to C<< $app->info('message') >>.
+
+=head1 SEE ALSO
+
+L<Kelp::Module::Logger::Simple> - always dumps to standard output
+
 =cut
+

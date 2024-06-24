@@ -1,38 +1,7 @@
-/* Generated code. Do not edit. Edit and re-run codegen.py instead.
- *
- * ***** BEGIN LICENSE BLOCK *****
- * Version: MIT
- *
- * Portions created by Alan Antonuk are Copyright (c) 2012-2013
- * Alan Antonuk. All Rights Reserved.
- *
- * Portions created by VMware are Copyright (c) 2007-2012 VMware, Inc.
- * All Rights Reserved.
- *
- * Portions created by Tony Garnock-Jones are Copyright (c) 2009-2010
- * VMware, Inc. and Tony Garnock-Jones. All Rights Reserved.
- *
- * Permission is hereby granted, free of charge, to any person
- * obtaining a copy of this software and associated documentation
- * files (the "Software"), to deal in the Software without
- * restriction, including without limitation the rights to use, copy,
- * modify, merge, publish, distribute, sublicense, and/or sell copies
- * of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- *
- * The above copyright notice and this permission notice shall be
- * included in all copies or substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
- * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
- * MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
- * NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS
- * BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN
- * ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
- * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
- * SOFTWARE.
- * ***** END LICENSE BLOCK *****
- */
+// Copyright 2007 - 2021, Alan Antonuk and the rabbitmq-c contributors.
+// SPDX-License-Identifier: mit
+
+/* Generated code. Do not edit. Edit and re-run codegen.py instead. */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -156,6 +125,10 @@ char const *amqp_method_name(amqp_method_number_t methodNumber) {
       return "AMQP_CONNECTION_BLOCKED_METHOD";
     case AMQP_CONNECTION_UNBLOCKED_METHOD:
       return "AMQP_CONNECTION_UNBLOCKED_METHOD";
+    case AMQP_CONNECTION_UPDATE_SECRET_METHOD:
+      return "AMQP_CONNECTION_UPDATE_SECRET_METHOD";
+    case AMQP_CONNECTION_UPDATE_SECRET_OK_METHOD:
+      return "AMQP_CONNECTION_UPDATE_SECRET_OK_METHOD";
     case AMQP_CHANNEL_OPEN_METHOD:
       return "AMQP_CHANNEL_OPEN_METHOD";
     case AMQP_CHANNEL_OPEN_OK_METHOD:
@@ -502,6 +475,38 @@ int amqp_decode_method(amqp_method_number_t methodNumber, amqp_pool_t *pool,
       amqp_connection_unblocked_t *m =
           (amqp_connection_unblocked_t *)amqp_pool_alloc(
               pool, sizeof(amqp_connection_unblocked_t));
+      if (m == NULL) {
+        return AMQP_STATUS_NO_MEMORY;
+      }
+      *decoded = m;
+      return 0;
+    }
+    case AMQP_CONNECTION_UPDATE_SECRET_METHOD: {
+      amqp_connection_update_secret_t *m =
+          (amqp_connection_update_secret_t *)amqp_pool_alloc(
+              pool, sizeof(amqp_connection_update_secret_t));
+      if (m == NULL) {
+        return AMQP_STATUS_NO_MEMORY;
+      }
+      {
+        uint32_t len;
+        if (!amqp_decode_32(encoded, &offset, &len) ||
+            !amqp_decode_bytes(encoded, &offset, &m->new_secret, len))
+          return AMQP_STATUS_BAD_AMQP_DATA;
+      }
+      {
+        uint8_t len;
+        if (!amqp_decode_8(encoded, &offset, &len) ||
+            !amqp_decode_bytes(encoded, &offset, &m->reason, len))
+          return AMQP_STATUS_BAD_AMQP_DATA;
+      }
+      *decoded = m;
+      return 0;
+    }
+    case AMQP_CONNECTION_UPDATE_SECRET_OK_METHOD: {
+      amqp_connection_update_secret_ok_t *m =
+          (amqp_connection_update_secret_ok_t *)amqp_pool_alloc(
+              pool, sizeof(amqp_connection_update_secret_ok_t));
       if (m == NULL) {
         return AMQP_STATUS_NO_MEMORY;
       }
@@ -1740,6 +1745,22 @@ int amqp_encode_method(amqp_method_number_t methodNumber, void *decoded,
     case AMQP_CONNECTION_UNBLOCKED_METHOD: {
       return (int)offset;
     }
+    case AMQP_CONNECTION_UPDATE_SECRET_METHOD: {
+      amqp_connection_update_secret_t *m =
+          (amqp_connection_update_secret_t *)decoded;
+      if (UINT32_MAX < m->new_secret.len ||
+          !amqp_encode_32(encoded, &offset, (uint32_t)m->new_secret.len) ||
+          !amqp_encode_bytes(encoded, &offset, m->new_secret))
+        return AMQP_STATUS_BAD_AMQP_DATA;
+      if (UINT8_MAX < m->reason.len ||
+          !amqp_encode_8(encoded, &offset, (uint8_t)m->reason.len) ||
+          !amqp_encode_bytes(encoded, &offset, m->reason))
+        return AMQP_STATUS_BAD_AMQP_DATA;
+      return (int)offset;
+    }
+    case AMQP_CONNECTION_UPDATE_SECRET_OK_METHOD: {
+      return (int)offset;
+    }
     case AMQP_CHANNEL_OPEN_METHOD: {
       amqp_channel_open_t *m = (amqp_channel_open_t *)decoded;
       if (UINT8_MAX < m->out_of_band.len ||
@@ -2434,13 +2455,35 @@ int amqp_encode_properties(uint16_t class_id, void *decoded,
 }
 
 /**
+ * amqp_connection_update_secret
+ *
+ * @param [in] state connection state
+ * @param [in] channel the channel to do the RPC on
+ * @param [in] new_secret new_secret
+ * @param [in] reason reason
+ * @returns amqp_connection_update_secret_ok_t
+ */
+AMQP_EXPORT
+amqp_connection_update_secret_ok_t *AMQP_CALL amqp_connection_update_secret(
+    amqp_connection_state_t state, amqp_channel_t channel,
+    amqp_bytes_t new_secret, amqp_bytes_t reason) {
+  amqp_connection_update_secret_t req;
+  req.new_secret = new_secret;
+  req.reason = reason;
+
+  return amqp_simple_rpc_decoded(state, channel,
+                                 AMQP_CONNECTION_UPDATE_SECRET_METHOD,
+                                 AMQP_CONNECTION_UPDATE_SECRET_OK_METHOD, &req);
+}
+
+/**
  * amqp_channel_open
  *
  * @param [in] state connection state
  * @param [in] channel the channel to do the RPC on
  * @returns amqp_channel_open_ok_t
  */
-AMQP_PUBLIC_FUNCTION
+AMQP_EXPORT
 amqp_channel_open_ok_t *AMQP_CALL
     amqp_channel_open(amqp_connection_state_t state, amqp_channel_t channel) {
   amqp_channel_open_t req;
@@ -2458,7 +2501,7 @@ amqp_channel_open_ok_t *AMQP_CALL
  * @param [in] active active
  * @returns amqp_channel_flow_ok_t
  */
-AMQP_PUBLIC_FUNCTION
+AMQP_EXPORT
 amqp_channel_flow_ok_t *AMQP_CALL
     amqp_channel_flow(amqp_connection_state_t state, amqp_channel_t channel,
                       amqp_boolean_t active) {
@@ -2483,7 +2526,7 @@ amqp_channel_flow_ok_t *AMQP_CALL
  * @param [in] arguments arguments
  * @returns amqp_exchange_declare_ok_t
  */
-AMQP_PUBLIC_FUNCTION
+AMQP_EXPORT
 amqp_exchange_declare_ok_t *AMQP_CALL amqp_exchange_declare(
     amqp_connection_state_t state, amqp_channel_t channel,
     amqp_bytes_t exchange, amqp_bytes_t type, amqp_boolean_t passive,
@@ -2513,7 +2556,7 @@ amqp_exchange_declare_ok_t *AMQP_CALL amqp_exchange_declare(
  * @param [in] if_unused if_unused
  * @returns amqp_exchange_delete_ok_t
  */
-AMQP_PUBLIC_FUNCTION
+AMQP_EXPORT
 amqp_exchange_delete_ok_t *AMQP_CALL
     amqp_exchange_delete(amqp_connection_state_t state, amqp_channel_t channel,
                          amqp_bytes_t exchange, amqp_boolean_t if_unused) {
@@ -2538,7 +2581,7 @@ amqp_exchange_delete_ok_t *AMQP_CALL
  * @param [in] arguments arguments
  * @returns amqp_exchange_bind_ok_t
  */
-AMQP_PUBLIC_FUNCTION
+AMQP_EXPORT
 amqp_exchange_bind_ok_t *AMQP_CALL
     amqp_exchange_bind(amqp_connection_state_t state, amqp_channel_t channel,
                        amqp_bytes_t destination, amqp_bytes_t source,
@@ -2566,7 +2609,7 @@ amqp_exchange_bind_ok_t *AMQP_CALL
  * @param [in] arguments arguments
  * @returns amqp_exchange_unbind_ok_t
  */
-AMQP_PUBLIC_FUNCTION
+AMQP_EXPORT
 amqp_exchange_unbind_ok_t *AMQP_CALL
     amqp_exchange_unbind(amqp_connection_state_t state, amqp_channel_t channel,
                          amqp_bytes_t destination, amqp_bytes_t source,
@@ -2596,7 +2639,7 @@ amqp_exchange_unbind_ok_t *AMQP_CALL
  * @param [in] arguments arguments
  * @returns amqp_queue_declare_ok_t
  */
-AMQP_PUBLIC_FUNCTION
+AMQP_EXPORT
 amqp_queue_declare_ok_t *AMQP_CALL amqp_queue_declare(
     amqp_connection_state_t state, amqp_channel_t channel, amqp_bytes_t queue,
     amqp_boolean_t passive, amqp_boolean_t durable, amqp_boolean_t exclusive,
@@ -2626,7 +2669,7 @@ amqp_queue_declare_ok_t *AMQP_CALL amqp_queue_declare(
  * @param [in] arguments arguments
  * @returns amqp_queue_bind_ok_t
  */
-AMQP_PUBLIC_FUNCTION
+AMQP_EXPORT
 amqp_queue_bind_ok_t *AMQP_CALL amqp_queue_bind(
     amqp_connection_state_t state, amqp_channel_t channel, amqp_bytes_t queue,
     amqp_bytes_t exchange, amqp_bytes_t routing_key, amqp_table_t arguments) {
@@ -2650,7 +2693,7 @@ amqp_queue_bind_ok_t *AMQP_CALL amqp_queue_bind(
  * @param [in] queue queue
  * @returns amqp_queue_purge_ok_t
  */
-AMQP_PUBLIC_FUNCTION
+AMQP_EXPORT
 amqp_queue_purge_ok_t *AMQP_CALL amqp_queue_purge(amqp_connection_state_t state,
                                                   amqp_channel_t channel,
                                                   amqp_bytes_t queue) {
@@ -2673,7 +2716,7 @@ amqp_queue_purge_ok_t *AMQP_CALL amqp_queue_purge(amqp_connection_state_t state,
  * @param [in] if_empty if_empty
  * @returns amqp_queue_delete_ok_t
  */
-AMQP_PUBLIC_FUNCTION
+AMQP_EXPORT
 amqp_queue_delete_ok_t *AMQP_CALL amqp_queue_delete(
     amqp_connection_state_t state, amqp_channel_t channel, amqp_bytes_t queue,
     amqp_boolean_t if_unused, amqp_boolean_t if_empty) {
@@ -2699,7 +2742,7 @@ amqp_queue_delete_ok_t *AMQP_CALL amqp_queue_delete(
  * @param [in] arguments arguments
  * @returns amqp_queue_unbind_ok_t
  */
-AMQP_PUBLIC_FUNCTION
+AMQP_EXPORT
 amqp_queue_unbind_ok_t *AMQP_CALL amqp_queue_unbind(
     amqp_connection_state_t state, amqp_channel_t channel, amqp_bytes_t queue,
     amqp_bytes_t exchange, amqp_bytes_t routing_key, amqp_table_t arguments) {
@@ -2724,7 +2767,7 @@ amqp_queue_unbind_ok_t *AMQP_CALL amqp_queue_unbind(
  * @param [in] global global
  * @returns amqp_basic_qos_ok_t
  */
-AMQP_PUBLIC_FUNCTION
+AMQP_EXPORT
 amqp_basic_qos_ok_t *AMQP_CALL amqp_basic_qos(amqp_connection_state_t state,
                                               amqp_channel_t channel,
                                               uint32_t prefetch_size,
@@ -2752,7 +2795,7 @@ amqp_basic_qos_ok_t *AMQP_CALL amqp_basic_qos(amqp_connection_state_t state,
  * @param [in] arguments arguments
  * @returns amqp_basic_consume_ok_t
  */
-AMQP_PUBLIC_FUNCTION
+AMQP_EXPORT
 amqp_basic_consume_ok_t *AMQP_CALL amqp_basic_consume(
     amqp_connection_state_t state, amqp_channel_t channel, amqp_bytes_t queue,
     amqp_bytes_t consumer_tag, amqp_boolean_t no_local, amqp_boolean_t no_ack,
@@ -2779,7 +2822,7 @@ amqp_basic_consume_ok_t *AMQP_CALL amqp_basic_consume(
  * @param [in] consumer_tag consumer_tag
  * @returns amqp_basic_cancel_ok_t
  */
-AMQP_PUBLIC_FUNCTION
+AMQP_EXPORT
 amqp_basic_cancel_ok_t *AMQP_CALL
     amqp_basic_cancel(amqp_connection_state_t state, amqp_channel_t channel,
                       amqp_bytes_t consumer_tag) {
@@ -2799,7 +2842,7 @@ amqp_basic_cancel_ok_t *AMQP_CALL
  * @param [in] requeue requeue
  * @returns amqp_basic_recover_ok_t
  */
-AMQP_PUBLIC_FUNCTION
+AMQP_EXPORT
 amqp_basic_recover_ok_t *AMQP_CALL
     amqp_basic_recover(amqp_connection_state_t state, amqp_channel_t channel,
                        amqp_boolean_t requeue) {
@@ -2817,7 +2860,7 @@ amqp_basic_recover_ok_t *AMQP_CALL
  * @param [in] channel the channel to do the RPC on
  * @returns amqp_tx_select_ok_t
  */
-AMQP_PUBLIC_FUNCTION
+AMQP_EXPORT
 amqp_tx_select_ok_t *AMQP_CALL amqp_tx_select(amqp_connection_state_t state,
                                               amqp_channel_t channel) {
   amqp_tx_select_t req;
@@ -2833,7 +2876,7 @@ amqp_tx_select_ok_t *AMQP_CALL amqp_tx_select(amqp_connection_state_t state,
  * @param [in] channel the channel to do the RPC on
  * @returns amqp_tx_commit_ok_t
  */
-AMQP_PUBLIC_FUNCTION
+AMQP_EXPORT
 amqp_tx_commit_ok_t *AMQP_CALL amqp_tx_commit(amqp_connection_state_t state,
                                               amqp_channel_t channel) {
   amqp_tx_commit_t req;
@@ -2849,7 +2892,7 @@ amqp_tx_commit_ok_t *AMQP_CALL amqp_tx_commit(amqp_connection_state_t state,
  * @param [in] channel the channel to do the RPC on
  * @returns amqp_tx_rollback_ok_t
  */
-AMQP_PUBLIC_FUNCTION
+AMQP_EXPORT
 amqp_tx_rollback_ok_t *AMQP_CALL amqp_tx_rollback(amqp_connection_state_t state,
                                                   amqp_channel_t channel) {
   amqp_tx_rollback_t req;
@@ -2865,7 +2908,7 @@ amqp_tx_rollback_ok_t *AMQP_CALL amqp_tx_rollback(amqp_connection_state_t state,
  * @param [in] channel the channel to do the RPC on
  * @returns amqp_confirm_select_ok_t
  */
-AMQP_PUBLIC_FUNCTION
+AMQP_EXPORT
 amqp_confirm_select_ok_t *AMQP_CALL
     amqp_confirm_select(amqp_connection_state_t state, amqp_channel_t channel) {
   amqp_confirm_select_t req;

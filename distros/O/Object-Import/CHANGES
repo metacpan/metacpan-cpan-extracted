@@ -1,5 +1,9 @@
-2018-10.29 v1.005 release to CPAN
- - fix syntax error with newer Perl versions
+2019-04.26 v1.006 release to CPAN
+ - documentation fix for "prefix" option - the prefix and suffix do not
+   automatically provide an underscore
+
+2018-10-29 v1.005 release to CPAN
+ - fix syntax error with newer Perl versions ( RT106769, fix by Slaven Rezic )
  - New Maintainer Max Maischein
 
 2012-10-17 v1.004 release to CPAN

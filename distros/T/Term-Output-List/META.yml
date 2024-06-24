@@ -9,7 +9,7 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.44, CPAN::Meta::Converter version 2.150010'
+generated_by: 'ExtUtils::MakeMaker version 7.64, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -22,12 +22,14 @@ no_index:
 requires:
   Module::Load: '0'
   Moo: '2'
+  Scalar::Util: '0'
   Term::Cap: '0'
+  experimental: '0.031'
   perl: '5.020'
 resources:
   bugtracker: https://github.com/Corion/Term-Output-List/issues
   license: https://dev.perl.org/licenses/
   repository: git://github.com/Corion/Term-Output-List.git
-version: '0.03'
+version: '0.05'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
 x_static_install: 0

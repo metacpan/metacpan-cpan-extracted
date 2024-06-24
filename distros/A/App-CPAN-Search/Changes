@@ -1,3 +1,12 @@
+0.10 2024-06-23T11:56:53+02:00
+ - Add tests.
+ - Improve cpan-search doc.
+ - Improve tool abstract.
+ - Rewrite arguments process to more intuitive way.
+ - Rewrite run() tests to use of help() helper.
+ - Update Module::Install to 1.21 version.
+ - Update copyright years.
+
 0.09 2023-01-23T18:24:20+01:00
  - Rename example to better name.
  - Update copyright years.

@@ -2,6 +2,7 @@
 Changes
 lib/Term/Output/List.pm
 lib/Term/Output/List/ANSI.pm
+lib/Term/Output/List/Role.pm
 lib/Term/Output/List/Win32.pm
 LICENSE
 Makefile.PL

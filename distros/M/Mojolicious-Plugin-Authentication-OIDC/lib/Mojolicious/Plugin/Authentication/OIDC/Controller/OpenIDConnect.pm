@@ -1,4 +1,4 @@
-package Mojolicious::Plugin::Authentication::OIDC::Controller::OpenIDConnect 0.05;
+package Mojolicious::Plugin::Authentication::OIDC::Controller::OpenIDConnect 0.06;
 use v5.26;
 
 # ABSTRACT: OpenID controller endpoints implementation
@@ -46,9 +46,15 @@ use Syntax::Keyword::Try;
 use experimental qw(signatures);
 
 my sub make_app_url($self, $path = '/') {
-  my $url = $self->tx->req->url->to_abs->clone;
-  $url->fragment(undef);
-  $url->query(Mojo::Parameters->new);
+  my $oidc_params = $self->app->renderer->get_helper('__oidc_params')->($self);
+  my $url;
+  if ($oidc_params->{base_url}) {
+    $url = Mojo::URL->new($oidc_params->{base_url});
+  } else {
+    $url = $self->tx->req->url->to_abs->clone;
+    $url->fragment(undef);
+    $url->query(Mojo::Parameters->new);
+  }
   $url->path($path);
 }
 

@@ -1,5 +1,9 @@
 Revision history for Bio-SeqAlignment-Components-Libraries-edlib
 
+0.03      2024-06-23 07:04:07-06:00 America/Denver
+Implemented suggestions by Mario Roy to enhance speed
+1. Using 'for' OMP work sharing construct inside parallel regions
+2. Scheduling threads is now done dynamically with a no wait clause 
 0.02      2024-06-13 20:46:38-06:00 America/Denver
 - Minor changes in the exported symbols from the OpenMP version
 0.01      2024-06-12 21:22:24-06:00 America/Denver

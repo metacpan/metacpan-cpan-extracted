@@ -102,9 +102,73 @@ Inherited, see L<Couch::DB/"Interface starting points">
 
 Inherited, see L<Couch::DB/"Interface starting points">
 
-=item $obj-E<gt>B<searchAnalyse>(%options)
+=back
 
-Inherited, see L<Couch::DB/"Interface starting points">
+=head2 Unrelated calls
+
+Extends L<"Unrelated calls" in Couch::DB|Couch::DB/"Unrelated calls">.
+ 
+=over 4
+
+=item $obj-E<gt>B<freshUUIDs>($count, %options)
+
+Inherited, see L<Couch::DB/"Unrelated calls">
+
+=item $obj-E<gt>B<requestUUIDs>($count, %options)
+
+Inherited, see L<Couch::DB/"Unrelated calls">
+
+=item $obj-E<gt>B<searchAnalyze>(%options)
+
+Inherited, see L<Couch::DB/"Unrelated calls">
+
+=back
+
+=head2 Processing
+
+Extends L<"Processing" in Couch::DB|Couch::DB/"Processing">.
+ 
+=over 4
+
+=item $obj-E<gt>B<addClient>($client)
+
+Inherited, see L<Couch::DB/"Processing">
+
+=item $obj-E<gt>B<call>($method, $path, %options)
+
+Inherited, see L<Couch::DB/"Processing">
+
+=item $obj-E<gt>B<check>($condition, $change, $version, $what)
+
+Inherited, see L<Couch::DB/"Processing">
+
+=item $obj-E<gt>B<client>($name)
+
+Inherited, see L<Couch::DB/"Processing">
+
+=item $obj-E<gt>B<clients>(%options)
+
+Inherited, see L<Couch::DB/"Processing">
+
+=item $obj-E<gt>B<jsonText>($json, %options)
+
+Inherited, see L<Couch::DB/"Processing">
+
+=item $obj-E<gt>B<listToPerl>($set, $type, @data|\@data)
+
+Inherited, see L<Couch::DB/"Processing">
+
+=item $obj-E<gt>B<toJSON>(\%data, $type, @keys)
+
+Inherited, see L<Couch::DB/"Processing">
+
+=item $obj-E<gt>B<toPerl>(\%data, $type, @keys)
+
+Inherited, see L<Couch::DB/"Processing">
+
+=item $obj-E<gt>B<toQuery>(\%data, $type, @keys)
+
+Inherited, see L<Couch::DB/"Processing">
 
 =back
 
@@ -113,76 +177,14 @@ Inherited, see L<Couch::DB/"Interface starting points">
 The C<server> is a Mojo::URL, or will be transformed into one.
 The C<user_agent> is a Mojo::UserAgent.
 
-Extends L<"Server connections" in Couch::DB|Couch::DB/"Server connections">.
- 
-=over 4
-
-=item $obj-E<gt>B<addClient>($client)
-
-Inherited, see L<Couch::DB/"Server connections">
-
-=item $obj-E<gt>B<call>($method, $path, %options)
-
-Inherited, see L<Couch::DB/"Server connections">
-
-=item $obj-E<gt>B<client>($name)
-
-Inherited, see L<Couch::DB/"Server connections">
-
-=item $obj-E<gt>B<clients>(%options)
-
-Inherited, see L<Couch::DB/"Server connections">
-
-=back
-
-=head2 Conversions
-
-Extends L<"Conversions" in Couch::DB|Couch::DB/"Conversions">.
- 
-=over 4
-
-=item $obj-E<gt>B<check>($condition, $change, $version, $what)
-
-Inherited, see L<Couch::DB/"Conversions">
-
-=item $obj-E<gt>B<freshUUIDs>($count, %options)
-
-Inherited, see L<Couch::DB/"Conversions">
-
-=item $obj-E<gt>B<jsonText>($json, %options)
-
-Inherited, see L<Couch::DB/"Conversions">
-
-=item $obj-E<gt>B<listToPerl>($set, $type, @data|\@data)
-
-Inherited, see L<Couch::DB/"Conversions">
-
-=item $obj-E<gt>B<requestUUIDs>($count, %options)
-
-Inherited, see L<Couch::DB/"Conversions">
-
-=item $obj-E<gt>B<toJSON>(\%data, $type, @keys)
-
-Inherited, see L<Couch::DB/"Conversions">
-
-=item $obj-E<gt>B<toPerl>(\%data, $type, @keys)
-
-Inherited, see L<Couch::DB/"Conversions">
-
-=item $obj-E<gt>B<toQuery>(\%data, $type, @keys)
-
-Inherited, see L<Couch::DB/"Conversions">
-
-=back
-
 =head1 DETAILS
 
 Extends L<"DETAILS" in Couch::DB|Couch::DB/"DETAILS">.
  
 =head1 SEE ALSO
 
-This module is part of Couch-DB distribution version 0.004,
-built on June 17, 2024. Website: F<http://perl.overmeer.net/CPAN/>
+This module is part of Couch-DB distribution version 0.005,
+built on June 23, 2024. Website: F<http://perl.overmeer.net/CPAN/>
 
 =head1 LICENSE
 

@@ -2,9 +2,9 @@ package App::Oozie::Deploy::Template::ttree;
 
 use strict;
 use warnings;
-use parent qw( App::Oozie::Forked::Template::ttree );
+use parent qw( Template::App::ttree );
 
-our $VERSION = '0.017'; # VERSION
+our $VERSION = '0.019'; # VERSION
 
 sub new {
     my($class, $log_collector, @pass_through) = @_;
@@ -54,7 +54,7 @@ App::Oozie::Deploy::Template::ttree
 
 =head1 VERSION
 
-version 0.017
+version 0.019
 
 =head1 AUTHORS
 

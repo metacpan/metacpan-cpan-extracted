@@ -15,6 +15,10 @@ Couch::DB::Document - one document as exchanged with a CouchDB server
   my $doc = $db->doc->create(\%data);
   my $doc = $db->doc($id, local => 1);
 
+  my $doc = $db->doc($id, content => { });
+  $doc->save;
+  $db->saveBulk([$doc]);
+
   my $content = $db->latest;
 
 =head1 DESCRIPTION
@@ -32,11 +36,12 @@ in your data.
 
 =item Couch::DB::Document-E<gt>B<new>(%options)
 
- -Option--Default
-  batch   from database
-  db      undef
-  id      undef
-  local   false
+ -Option --Default
+  batch    from database
+  content  undef
+  db       undef
+  id       undef
+  local    false
 
 =over 2
 
@@ -45,6 +50,11 @@ in your data.
 For all of the writes which support it, use batch (no wait) writing.  Of course,
 this may cause data to be lost when technical or logical issues emerge while the
 actual writing is done, but is much faster.
+
+=item content => DATA
+
+Create a new document, with the first revision of the content.  Once saved,
+it will get a revision.
 
 =item db => L<Couch::DB::Database|Couch::DB::Database>-object
 
@@ -328,8 +338,8 @@ Returns the names of all attachments.
 
 =head1 SEE ALSO
 
-This module is part of Couch-DB distribution version 0.004,
-built on June 17, 2024. Website: F<http://perl.overmeer.net/CPAN/>
+This module is part of Couch-DB distribution version 0.005,
+built on June 23, 2024. Website: F<http://perl.overmeer.net/CPAN/>
 
 =head1 LICENSE
 

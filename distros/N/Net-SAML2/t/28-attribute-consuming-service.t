@@ -24,6 +24,11 @@ is(
     "Net::SAML2 testsuite",
     ".. and has the correct content"
 );
+is(
+    $node->getAttribute('xml:lang'),
+    "en",
+    ".. and has the correct xml:lang"
+);
 
 $node = get_single_node_ok($xpath,
     '/md:AttributeConsumingService/md:RequestedAttribute');

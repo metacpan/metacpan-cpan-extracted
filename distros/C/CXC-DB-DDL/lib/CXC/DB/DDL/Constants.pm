@@ -7,7 +7,7 @@ use strict;
 use warnings;
 use experimental 'signatures', 'postderef';
 
-our $VERSION = '0.13';
+our $VERSION = '0.14';
 
 use DBI ();
 use CXC::Exporter::Util ':all';
@@ -91,7 +91,7 @@ CXC::DB::DDL::Constants - Constants
 
 =head1 VERSION
 
-version 0.13
+version 0.14
 
 =head1 SYNOPSIS
 
@@ -208,7 +208,7 @@ tag|DBI >>.  There are far too many to list here;  run this code to enumerate th
 
 =head2 Enumerating Functions
 
-These functions return the values for the constants with the associated lower cased tag. For example,
+These functions return the values of the constants with the associated lower cased tag. For example,
 
   SCHEMA_CONSTRAINT_MATCH_TYPES() -> 'full', 'partial', 'simple'
 
@@ -227,6 +227,24 @@ These functions return the values for the constants with the associated lower ca
 =head4 SQL_TYPE_CONSTANTS
 
 All of the SQL types provided by L<< DBI's B<sql_types> tag|DBI >>
+
+These functions return the names of the constants with the associated lower cased tag. For example,
+
+  SCHEMA_CONSTRAINT_MATCH_TYPES_NAMES() -> 'FULL', 'PARTIAL', 'SIMPLE'
+
+=head4 SCHEMA_CONSTANTS_NAMES
+
+=head4 SCHEMA_CONSTRAINT_MATCH_TYPES_NAMES
+
+=head4 SCHEMA_CONSTRAINT_ON_DELETE_NAMES
+
+=head4 SCHEMA_CONSTRAINT_ON_UPDATE_NAMES
+
+=head4 CREATE_CONSTANTS_NAMES
+
+=head4 SUPPORTED_DBDS_NAMES
+
+=head4 SQL_TYPE_CONSTANTS_NAMES
 
 Z<>
 

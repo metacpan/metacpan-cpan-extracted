@@ -68,6 +68,7 @@ WriteMakefile1(
         'DynaLoader'  => $DL_version,
         'Exporter'    => $EX_version,
         'Time::HiRes' => $HRT_version,
+        'blib'        => 0,
         'strict'      => 0,
         'vars'        => 0,
         'warnings'    => 0,
@@ -86,6 +87,7 @@ WriteMakefile1(
         'File::Spec'          => $FS_version,
         'File::Temp'          => $FT_version,
         'List::Util'          => $LU_version,
+        'blib'                => 0,
         'strict'              => 0,
         'warnings'            => 0,
     },
@@ -101,6 +103,7 @@ WriteMakefile1(
         'Test::More'         => $TM_version,
         'Time::HiRes'        => $HRT_version,
         'Try::Tiny'          => 0,
+        'blib'               => 0,
         'lib'                => 0,
         'strict'             => 0,
         'vars'               => 0,
@@ -108,9 +111,9 @@ WriteMakefile1(
         'warnings'           => 0,
         ( $has_threads
             ? (
-            'threads'           => 0,
-            'threads::shared'   => 0,
-            'Thread::Semaphore' => 0,
+                'threads'           => 0,
+                'threads::shared'   => 0,
+                'Thread::Semaphore' => 0,
             )
             : ()
         ),
@@ -139,7 +142,6 @@ WriteMakefile1(
             assertlib*.c
             assertlib*.exe
             assertlib*.obj
-            asserttest*
             perl.core
             perl.exe.stackdump
             ulib/*.obj
@@ -270,14 +272,14 @@ use Config;
 sub top_targets {
     my $t = shift->SUPER::top_targets(@_);
     # add 'compare' targets.
+    $t .= "\npersist : dynamic pure_all\n";
+    $t .= "\t\$(NOECHO) \$(ABSPERLRUN) ubin\$(DFSEP)cmp_persist.pl 2\n";
+    $t .= "\n";
     $t .= "\nspeeds : dynamic pure_all\n";
-    $t .= "\t\$(NOECHO) \$(ABSPERLRUN) -Iblib\$(DFSEP)lib -Iblib\$(DFSEP)arch ubin\$(DFSEP)cmp_speeds.pl 1\n";
+    $t .= "\t\$(NOECHO) \$(ABSPERLRUN) ubin\$(DFSEP)cmp_speeds.pl  2\n";
     $t .= "\n";
     $t .= "\nstyles : dynamic pure_all\n";
-    $t .= "\t\$(NOECHO) \$(ABSPERLRUN) -Iblib\$(DFSEP)lib -Iblib\$(DFSEP)arch ubin\$(DFSEP)cmp_styles.pl 1\n";
-    $t .= "\n";
-    $t .= "\npersist : dynamic pure_all\n";
-    $t .= "\t\$(NOECHO) \$(ABSPERLRUN) -Iblib\$(DFSEP)lib -Iblib\$(DFSEP)arch ubin\$(DFSEP)cmp_persist.pl 1\n";
+    $t .= "\t\$(NOECHO) \$(ABSPERLRUN) ubin\$(DFSEP)cmp_styles.pl  2\n";
     $t .= "\n";
     $t .= "\ncompare : speeds styles persist\n";
     $t .= "\t\$(NOECHO) \$(NOOP)";

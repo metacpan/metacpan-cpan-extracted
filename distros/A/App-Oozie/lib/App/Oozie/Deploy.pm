@@ -4,7 +4,7 @@ use 5.014;
 use strict;
 use warnings;
 
-our $VERSION = '0.017'; # VERSION
+our $VERSION = '0.019'; # VERSION
 
 use namespace::autoclean -except => [qw/_options_data _options_config/];
 
@@ -1289,7 +1289,7 @@ App::Oozie::Deploy
 
 =head1 VERSION
 
-version 0.017
+version 0.019
 
 =head1 SYNOPSIS
 

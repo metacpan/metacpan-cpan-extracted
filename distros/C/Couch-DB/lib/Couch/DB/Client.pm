@@ -7,7 +7,7 @@
 
 package Couch::DB::Client;
 use vars '$VERSION';
-$VERSION = '0.004';
+$VERSION = '0.005';
 
 
 use Couch::DB::Util   qw(flat);
@@ -256,17 +256,16 @@ sub databaseInfo(%)
 }
 
 
-sub dbUpdates(%)
-{	my ($self, %args) = @_;
+sub dbUpdates($%)
+{	my ($self, $feed, %args) = @_;
 	$self->_clientIsMe(\%args);
 
-	my %config = $self->couch->_resultsConfig(\%args);
-	my $query  = \%args;
+	my $query  = +{ %$feed };
 
 	$self->couch->call(GET => '/_db_updates',
 		introduced => '1.4.0',
 		query      => $query,
-		%config,
+		$self->couch->_resultsConfig(\%args),
 	);
 }
 

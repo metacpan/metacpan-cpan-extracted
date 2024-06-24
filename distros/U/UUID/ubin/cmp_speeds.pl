@@ -1,14 +1,17 @@
+
+# seconds per test
+my $seconds = $ARGV[0] || 2;
+
+#------------------------------------------------------------------------------
+use blib;
 use strict;
 use warnings;
-use File::Temp ();
 use Benchmark qw(:hireswallclock cmpthese countit);
 use UUID qw(
     generate_v1 generate_v3 generate_v4 generate_v5 generate_v6 generate_v7
     uuid1 uuid3 uuid4 uuid5 uuid6 uuid7
     unparse
 );
-
-my $seconds = $ARGV[0] || 1;
 
 print "\ncomparing version speeds...\n\n";
 
@@ -26,12 +29,7 @@ my $r = cmpthese({
     'v7bin' => countit($seconds, 'generate_v7(my $b)'),
     'v7str' => countit($seconds, 'my $s = uuid7()'),
 }, 'none');
-    #'v1testS'  => countit($seconds, 'my $s = UUID::_v1testS()'),
-    #'v1testB'  => countit($seconds, 'UUID::_v1testB(my $b)'),
-    #'v4testS'  => countit($seconds, 'my $s = UUID::_v4testS()'),
-    #'v4testB'  => countit($seconds, 'UUID::_v4testB(my $b)'),
 
-#printf("%9s %11s %7s %7s %7s %7s %7s %7s %7s %7s\n", @$_) for @$r;
 printf("%9s %11s %7s %7s %7s %7s %7s %7s %7s %7s %7s %7s %7s %7s\n", @$_) for @$r;
 
 print <<'EOT';

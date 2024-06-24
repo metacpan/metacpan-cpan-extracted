@@ -1,55 +1,55 @@
 ---
 abstract: 'A web framework light, yet rich in nutrients.'
 author:
-  - 'Stefan G.'
+  - 'Stefan Geneshky'
 build_requires:
-  Exporter: '0'
-  File::Temp: '0'
-  HTTP::Request::Common: '0'
-  IO::File: '0'
-  Plack::Middleware::Session: '0'
+  Test::Deep: '0'
   Test::Exception: '0'
-  Test::Harness: '0'
-  lib: '0'
-  parent: '0'
-  perl: v5.10.0
-  utf8: '0'
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.030, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Zilla version 6.032, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: '1.4'
 name: Kelp
 requires:
-  Carp: '0'
   Class::Inspector: '0'
-  Data::Dumper: '0'
-  Encode: '0'
-  FindBin: '0'
-  Getopt::Long: '0'
-  HTTP::Cookies: '0'
+  HTTP::Message: '0'
+  Hash::MultiValue: '0'
   JSON::MaybeXS: '0'
   Log::Dispatch: '0'
   Path::Tiny: '0'
-  Plack::Test: '0'
-  Plack::Util: '0'
-  Scalar::Util: '0'
-  Sys::Hostname: '0'
+  Plack: '1.0041'
   Template::Tiny: '0'
-  Test::Deep: '0'
-  Test::More: '0'
   Try::Tiny: '0'
-  feature: '0'
+  URI: '0'
   namespace::autoclean: '0'
-  strict: '0'
-  warnings: '0'
+  perl: '5.014'
 resources:
-  bugtracker: https://github.com/sgnix/kelp/issues
-  repository: git://github.com/sgnix/kelp.git
-version: '2.00'
-x_generated_by_perl: v5.38.0
+  bugtracker: https://github.com/Kelp-framework/Kelp/issues
+  homepage: http://kelp-framework.github.io/
+  repository: git://github.com/Kelp-framework/Kelp.git
+version: '2.10'
+x_contributors:
+  - 'Stefan Geneshky <minimal@cpan.org>'
+  - 'Bartosz Jarzyna <bbrtj.pro@gmail.com>'
+  - 'Konstantin Yakunin <yakunink@cpan.org>'
+  - 'Ivan Baidakou <dmol@cpan.org>'
+  - 'Maurice Aubrey <maurice@cpan.org>'
+  - 'Николай Мишин <mishin@cpan.org>'
+  - 'David Steinbrunner <dsteinbrunner@pobox.com>'
+  - 'Perlover <perlover@perlover.com>'
+  - 'Sergiy Borodych <bor@cpan.org>'
+  - 'Andrew Ruder <andy@aeruder.net>'
+  - 'ben hengst <notbenh@cpan.org>'
+  - 'Christian Froemmel <christian.froemmel@charite.de>'
+  - 'Gurunandan Bhat <grbhat@cpan.org>'
+  - 'Julio Fraire Domínguez <jfraire@cpan.org>'
+  - 'roy-tate <roy.l.tate@gmail.com>'
+  - 'Ruslan Zakirov <Ruslan.Zakirov@gmail.com>'
+  - 'Serguei Trouchelle <stro@cpan.org>'
+x_generated_by_perl: v5.40.0
 x_serialization_backend: 'YAML::Tiny version 1.74'
 x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

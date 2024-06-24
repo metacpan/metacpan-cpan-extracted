@@ -28,7 +28,8 @@
       "configure" : {
          "requires" : {
             "ExtUtils::Constant" : "0.22",
-            "ExtUtils::PkgConfig" : "0"
+            "ExtUtils::PkgConfig" : "0",
+            "File::Which" : "0"
          }
       },
       "develop" : {
@@ -67,6 +68,6 @@
          "web" : "https://github.com/lstein/Perl-GD"
       }
    },
-   "version" : "2.82",
+   "version" : "2.83",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

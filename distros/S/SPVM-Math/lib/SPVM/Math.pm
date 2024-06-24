@@ -1,6 +1,6 @@
 package SPVM::Math;
 
-our $VERSION = "1.003";
+our $VERSION = "1.004";
 
 1;
 
@@ -399,18 +399,6 @@ Calls L<cpow|https://linux.die.net/man/3/cpow> function defined in C<complex.h> 
 C<static method cpowf : L<Complex_2f|SPVM::Complex_2f> ($z1 : L<Complex_2f|SPVM::Complex_2f>, $z2 : L<Complex_2f|SPVM::Complex_2f>);>
 
 Calls L<cpowf|https://linux.die.net/man/3/cpowf> function defined in C<complex.h> in the C language and returns its return value.
-
-=head2 cscamul
-
-C<static method cscamul : L<Complex_2d|SPVM::Complex_2d> ($c : double, $z : L<Complex_2d|SPVM::Complex_2d>);>
-
-Perlforms the multiplication operation on the real number $c and the complex number $z, and returns the resulting value.
-
-=head2 cscamulf
-
-C<static method cscamulf : L<Complex_2f|SPVM::Complex_2f> ($c : float, $z : L<Complex_2f|SPVM::Complex_2f>);>
-
-Perlforms the multiplication operation on the real number $c and the complex number $z, and returns the resulting value.
 
 =head2 csin
 

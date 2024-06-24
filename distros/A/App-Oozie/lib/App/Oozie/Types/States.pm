@@ -4,7 +4,7 @@ use 5.014;
 use strict;
 use warnings;
 
-our $VERSION = '0.017'; # VERSION
+our $VERSION = '0.019'; # VERSION
 
 use Type::Library -base;
 use Type::Utils -all;
@@ -40,7 +40,7 @@ App::Oozie::Types::States
 
 =head1 VERSION
 
-version 0.017
+version 0.019
 
 =head1 SYNOPSIS
 

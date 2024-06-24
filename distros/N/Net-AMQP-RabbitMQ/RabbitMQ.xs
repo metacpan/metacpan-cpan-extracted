@@ -17,15 +17,17 @@
 #  define MUTABLE_HV(p) ((HV*)MUTABLE_PTR(p))
 #endif
 
-#include "amqp.h"
+#include "rabbitmq-c/amqp.h"
 #include "amqp_socket.h"
-#include "amqp_tcp_socket.h"
-#include "amqp_ssl_socket.h"
+#include "rabbitmq-c/tcp_socket.h"
+#include "rabbitmq-c/ssl_socket.h"
 /* For struct timeval */
 #include "amqp_time.h"
 
 /* This is for the Math::UInt64 integration */
 #include "perl_math_int64.h"
+
+extern void dump_table(amqp_table_t table);
 
 /* perl Makefile.PL; make CCFLAGS=-DDEBUG */
 #if DEBUG
@@ -209,16 +211,16 @@ amqp_field_value_kind_t amqp_kind_for_sv(SV** perl_value, short force_utf8) {
 
   switch (SvTYPE( *perl_value ))
   {
-    // Integer types (and references beyond 5.10)
+    /* Integer types (and references beyond 5.10) */
     case SVt_IV:
-      // References
+      /* References */
       if ( SvROK( *perl_value ) ) {
-        // Array Reference
+        /* Array Reference */
         if ( SvTYPE( SvRV( *perl_value ) ) == SVt_PVAV ) {
           return AMQP_FIELD_KIND_ARRAY;
         }
 
-        // Hash Reference
+        /* Hash Reference */
         if ( SvTYPE( SvRV( *perl_value ) ) == SVt_PVHV ) {
           return AMQP_FIELD_KIND_TABLE;
         }
@@ -228,18 +230,18 @@ amqp_field_value_kind_t amqp_kind_for_sv(SV** perl_value, short force_utf8) {
         );
       }
 
-      // Regular integers
-      // In the event that it could be unsigned
+      /* Regular integers */
+      /* In the event that it could be unsigned */
       if ( SvUOK( *perl_value ) ) {
         return AMQP_FIELD_KIND_U64;
       }
       return AMQP_FIELD_KIND_I64;
 
-    // Numeric type
+    /* Numeric type */
     case SVt_NV:
       return AMQP_FIELD_KIND_F64;
 
-    // String (handle types which are upgraded to handle IV/UV/NV as well as PV)
+    /* String (handle types which are upgraded to handle IV/UV/NV as well as PV) */
     case SVt_PVIV:
       if ( SvI64OK( *perl_value ) ) {
         return AMQP_FIELD_KIND_I64;
@@ -247,7 +249,7 @@ amqp_field_value_kind_t amqp_kind_for_sv(SV** perl_value, short force_utf8) {
       if ( SvU64OK( *perl_value ) ) {
         return AMQP_FIELD_KIND_U64;
       }
-      // It could be a PV or an IV/UV!
+      /* It could be a PV or an IV/UV! */
       if ( SvIOK( *perl_value ) ) {
         if ( SvUOK( *perl_value ) ) {
           return AMQP_FIELD_KIND_U64;
@@ -256,13 +258,13 @@ amqp_field_value_kind_t amqp_kind_for_sv(SV** perl_value, short force_utf8) {
       }
 
     case SVt_PVNV:
-      // It could be a PV or an NV
+      /* It could be a PV or an NV */
       if ( SvNOK( *perl_value ) ) {
         return AMQP_FIELD_KIND_F64;
       }
 
     case SVt_PV:
-      // UTF-8?
+      /* UTF-8? */
       if ( force_utf8 || SvUTF8( *perl_value ) ) {
         return AMQP_FIELD_KIND_UTF8;
       }
@@ -287,12 +289,12 @@ amqp_field_value_kind_t amqp_kind_for_sv(SV** perl_value, short force_utf8) {
 
     default:
       if ( SvROK( *perl_value ) ) {
-        // Array Reference
+        /* Array Reference */
         if ( SvTYPE( SvRV( *perl_value ) ) == SVt_PVAV ) {
           return AMQP_FIELD_KIND_ARRAY;
         }
 
-        // Hash Reference
+        /* Hash Reference */
         if ( SvTYPE( SvRV( *perl_value ) ) == SVt_PVHV ) {
           return AMQP_FIELD_KIND_TABLE;
         }
@@ -434,7 +436,7 @@ static amqp_rpc_reply_t read_message(amqp_connection_state_t state, amqp_channel
             );
             break;
 
-          // Integer types
+          /* Integer types */
           case AMQP_FIELD_KIND_I8:
             hv_store( headers,
                 header_entry->key.bytes, header_entry->key.len,
@@ -499,7 +501,7 @@ static amqp_rpc_reply_t read_message(amqp_connection_state_t state, amqp_channel
             );
             break;
 
-          // Floating point precision
+          /* Floating point precision */
           case AMQP_FIELD_KIND_F32:
             hv_store( headers,
                 header_entry->key.bytes, header_entry->key.len,
@@ -509,7 +511,7 @@ static amqp_rpc_reply_t read_message(amqp_connection_state_t state, amqp_channel
             break;
 
           case AMQP_FIELD_KIND_F64:
-            // TODO: I don't think this is a natively supported type on all Perls.
+            /* TODO: I don't think this is a natively supported type on all Perls. */
 
             hv_store( headers,
                 header_entry->key.bytes, header_entry->key.len,
@@ -526,7 +528,7 @@ static amqp_rpc_reply_t read_message(amqp_connection_state_t state, amqp_channel
             );
             break;
 
-          // Handle kind UTF8 and kind BYTES
+          /* Handle kind UTF8 and kind BYTES */
           case AMQP_FIELD_KIND_UTF8:
           case AMQP_FIELD_KIND_BYTES:
             hv_store( headers,
@@ -540,7 +542,7 @@ static amqp_rpc_reply_t read_message(amqp_connection_state_t state, amqp_channel
             );
             break;
 
-          // Handle arrays
+          /* Handle arrays */
           case AMQP_FIELD_KIND_ARRAY:
             __DEBUG__(
               fprintf(stderr, "ARRAY KIND FOR KEY:>%.*s< KIND:>%c< AMQP_FIELD_KIND_ARRAY:[%c].\n",
@@ -557,7 +559,7 @@ static amqp_rpc_reply_t read_message(amqp_connection_state_t state, amqp_channel
             );
             break;
 
-          // Handle tables (hashes when translated to Perl)
+          /* Handle tables (hashes when translated to Perl) */
           case AMQP_FIELD_KIND_TABLE:
             hv_store( headers,
               header_entry->key.bytes, header_entry->key.len,
@@ -729,10 +731,10 @@ void array_to_amqp_array(AV *perl_array, amqp_array_t *mq_array, short force_utf
   for ( idx = 0; idx <= av_len(perl_array); idx += 1) {
     value = av_fetch( perl_array, idx, 0 );
 
-    // We really should never see NULL here.
+    /* We really should never see NULL here. */
     assert(value != NULL);
 
-    // Let's start getting the type...
+    /* Let's start getting the type... */
     element = &mq_array->entries[mq_array->num_entries];
     mq_array->num_entries += 1;
     element->kind = amqp_kind_for_sv(value, force_utf8);
@@ -750,7 +752,7 @@ void array_to_amqp_array(AV *perl_array, amqp_array_t *mq_array, short force_utf
         break;
 
       case AMQP_FIELD_KIND_F64:
-        // TODO: I don't think this is a native type on all Perls
+        /* TODO: I don't think this is a native type on all Perls */
         element->value.f64 = (double) SvNV(*value);
         break;
 
@@ -773,7 +775,7 @@ void array_to_amqp_array(AV *perl_array, amqp_array_t *mq_array, short force_utf
   }
 }
 
-// Iterate over the array entries and decode them to Perl...
+/* Iterate over the array entries and decode them to Perl... */
 SV* mq_array_to_arrayref(amqp_array_t *mq_array) {
   AV* perl_array = newAV();
 
@@ -788,12 +790,12 @@ SV* mq_array_to_arrayref(amqp_array_t *mq_array) {
     __DEBUG__( warn("%d KIND >%c<", __LINE__, mq_element->kind) );
 
     switch (mq_element->kind) {
-      // Boolean
+      /* Boolean */
       case AMQP_FIELD_KIND_BOOLEAN:
         perl_element = newSViv(mq_element->value.boolean);
         break;
 
-      // Signed values
+      /* Signed values */
       case AMQP_FIELD_KIND_I8:
         perl_element = newSViv(mq_element->value.i8);
         break;
@@ -807,7 +809,7 @@ SV* mq_array_to_arrayref(amqp_array_t *mq_array) {
         perl_element = newSVi64(mq_element->value.i64);
         break;
 
-      // Unsigned values
+      /* Unsigned values */
       case AMQP_FIELD_KIND_U8:
         perl_element = newSViv(mq_element->value.u8);
         break;
@@ -822,16 +824,16 @@ SV* mq_array_to_arrayref(amqp_array_t *mq_array) {
         perl_element = newSVu64(mq_element->value.u64);
         break;
 
-      // Floats
+      /* Floats */
       case AMQP_FIELD_KIND_F32:
         perl_element = newSVnv(mq_element->value.f32);
         break;
       case AMQP_FIELD_KIND_F64:
-        // TODO: I don't think this is a native type on all Perls
+        /* TODO: I don't think this is a native type on all Perls */
         perl_element = newSVnv(mq_element->value.f64);
         break;
 
-      // Strings and bytes
+      /* Strings and bytes */
       case AMQP_FIELD_KIND_BYTES:
         perl_element = newSVpvn(
           mq_element->value.bytes.bytes,
@@ -839,28 +841,28 @@ SV* mq_array_to_arrayref(amqp_array_t *mq_array) {
         );
         break;
 
-      // UTF-8 strings
+      /* UTF-8 strings */
       case AMQP_FIELD_KIND_UTF8:
         perl_element = newSVpvn(
           mq_element->value.bytes.bytes,
           mq_element->value.bytes.len
         );
-        SvUTF8_on(perl_element); // It's UTF-8!
+        SvUTF8_on(perl_element); /* It's UTF-8! */
         break;
 
-      // Arrays
+      /* Arrays */
       case AMQP_FIELD_KIND_ARRAY:
         perl_element = mq_array_to_arrayref(&(mq_element->value.array));
         break;
 
-      // Tables
+      /* Tables */
       case AMQP_FIELD_KIND_TABLE:
         perl_element = mq_table_to_hashref(&(mq_element->value.table));
         break;
 
-      // WTF
+      /* WTF */
       default:
-        // ACK!
+        /* ACK! */
         Perl_croak(
           aTHX_ "Unsupported Perl type >%c< at index %d",
           (unsigned char)mq_element->kind,
@@ -875,7 +877,7 @@ SV* mq_array_to_arrayref(amqp_array_t *mq_array) {
 }
 
 SV* mq_table_to_hashref( amqp_table_t *mq_table ) {
-  // Iterate over the table keys and decode them to Perl...
+  /* Iterate over the table keys and decode them to Perl... */
   int i;
   SV *perl_element;
   HV *perl_hash = newHV();
@@ -894,12 +896,12 @@ SV* mq_table_to_hashref( amqp_table_t *mq_table ) {
     );
 
     switch (hash_entry->value.kind) {
-      // Boolean
+      /* Boolean */
       case AMQP_FIELD_KIND_BOOLEAN:
         perl_element = newSViv(hash_entry->value.value.boolean);
         break;
 
-      // Integers
+      /* Integers */
       case AMQP_FIELD_KIND_I8:
         perl_element = newSViv(hash_entry->value.value.i8);
         break;
@@ -926,12 +928,12 @@ SV* mq_table_to_hashref( amqp_table_t *mq_table ) {
         perl_element = newSVu64(hash_entry->value.value.u64);
         break;
 
-      // Foats
+      /* Foats */
       case AMQP_FIELD_KIND_F32:
         perl_element = newSVnv(hash_entry->value.value.f32);
         break;
       case AMQP_FIELD_KIND_F64:
-        // TODO: I don't think this is a native type on all Perls.
+        /* TODO: I don't think this is a native type on all Perls. */
         perl_element = newSVnv(hash_entry->value.value.f64);
         break;
 
@@ -947,7 +949,7 @@ SV* mq_table_to_hashref( amqp_table_t *mq_table ) {
           hash_entry->value.value.bytes.bytes,
           hash_entry->value.value.bytes.len
         );
-        SvUTF8_on(perl_element); // It's UTF-8!
+        SvUTF8_on(perl_element); /* It's UTF-8! */
         break;
 
       case AMQP_FIELD_KIND_ARRAY:
@@ -959,7 +961,7 @@ SV* mq_table_to_hashref( amqp_table_t *mq_table ) {
         break;
 
       default:
-        // ACK!
+        /* ACK! */
         Perl_croak(
           aTHX_ "Unsupported Perl type >%c< at index %d",
           (unsigned char)hash_entry->value.kind,
@@ -967,7 +969,7 @@ SV* mq_table_to_hashref( amqp_table_t *mq_table ) {
         );
     }
 
-    // Stash this in our hash.
+    /* Stash this in our hash. */
     hv_store(
       perl_hash,
       hash_entry->key.bytes, hash_entry->key.len,
@@ -1003,10 +1005,10 @@ void hash_to_amqp_table(HV *hash, amqp_table_t *table, short force_utf8) {
     entry = &table->entries[table->num_entries];
     entry->key = amqp_cstring_bytes( key );
 
-    // Reserved headers, per spec must force UTF-8 for strings.
-    // Other headers aren't necessarily required to do so.
+    /* Reserved headers, per spec must force UTF-8 for strings. */
+    /* Other headers aren't necessarily required to do so. */
     if (
-      // "x-*" exchanges
+      /* "x-*" exchanges */
       (
         strlen(key) > 2
         &&
@@ -1044,7 +1046,7 @@ void hash_to_amqp_table(HV *hash, amqp_table_t *table, short force_utf8) {
         break;
 
       case AMQP_FIELD_KIND_F64:
-        // TODO: I don't think this is a native type on all Perls.
+        /* TODO: I don't think this is a native type on all Perls. */
         entry->value.value.f64 = (double) SvNV( value );
         break;
 
@@ -1074,7 +1076,7 @@ void hash_to_amqp_table(HV *hash, amqp_table_t *table, short force_utf8) {
         Perl_croak( aTHX_ "amqp_kind_for_sv() returned a type I don't understand." );
     }
 
-    // Successfully (we think) added an entry to the table.
+    /* Successfully (we think) added an entry to the table. */
     table->num_entries++;
   }
 
@@ -1190,9 +1192,13 @@ net_amqp_rabbitmq_connect(conn, hostname, options, client_properties = NULL)
     }
 
     if ( ssl ) {
+        __DEBUG__(warn("!!! SSL ENABLED !!!\n"));
 #ifndef NAR_HAVE_OPENSSL
         Perl_croak(aTHX_ "no ssl support, please install openssl and reinstall");
 #endif
+        if (!hv_exists(options, "port", 4)) {
+          port = 5671;
+        }
         amqp_set_initialize_ssl_library( (amqp_boolean_t)ssl_init );
         sock = amqp_ssl_socket_new(conn);
         if ( !sock ) {
@@ -1206,11 +1212,6 @@ net_amqp_rabbitmq_connect(conn, hostname, options, client_properties = NULL)
                 Perl_croak(aTHX_ "error setting CA certificate");
             }
         }
-        else {
-            // TODO
-            // in librabbitmq > 0.7.1, amqp_ssl_socket_set_verify_peer makes this optional
-            Perl_croak(aTHX_ "required arg ssl_cacert not provided");
-        }
 
         if ( ( ssl_key != NULL ) && strlen(ssl_key) && ( ssl_cert != NULL ) && strlen(ssl_cert) ) {
             if ( amqp_ssl_socket_set_key( sock, ssl_cert, ssl_key ) ) {
@@ -1219,19 +1220,21 @@ net_amqp_rabbitmq_connect(conn, hostname, options, client_properties = NULL)
         }
     }
     else {
+        __DEBUG__(
+          warn("!!! SSL DISABLED !!!\n"));
         sock = amqp_tcp_socket_new(conn);
         if (!sock) {
           Perl_croak(aTHX_ "error creating TCP socket");
         }
     }
 
-    //if there's data in the buffer, clear it
+    /*if there's data in the buffer, clear it */
     while ( amqp_data_in_buffer(conn) ) {
         amqp_frame_t frame;
         amqp_simple_wait_frame( conn, &frame );
     }
 
-    // should probably be amqp_raw_equal, but this is a minimal hack
+    /* should probably be amqp_raw_equal, but this is a minimal hack */
     if (strcasecmp(sasl_method, "external") == 0) {
        sasl_type = AMQP_SASL_METHOD_EXTERNAL;
     }
@@ -1344,10 +1347,10 @@ void net_amqp_rabbitmq_exchange_bind(conn, channel, destination, source, routing
     amqp_exchange_bind_ok_t *reply = (amqp_exchange_bind_ok_t*)NULL;
     amqp_table_t arguments = amqp_empty_table;
   CODE:
-    // We must be connected
+    /* We must be connected */
     assert_amqp_connected(conn);
 
-    // Parameter validation
+    /* Parameter validation */
     if( ( source == NULL || 0 == strlen(source) )
       ||
       ( destination == NULL || 0 == strlen(destination) )
@@ -1356,7 +1359,7 @@ void net_amqp_rabbitmq_exchange_bind(conn, channel, destination, source, routing
       Perl_croak(aTHX_ "source and destination must both be specified");
     }
 
-    // Pull in arguments if we have any
+    /* Pull in arguments if we have any */
     if(args)
     {
       hash_to_amqp_table(args, &arguments, 1);
@@ -1383,10 +1386,10 @@ void net_amqp_rabbitmq_exchange_unbind(conn, channel, destination, source, routi
     amqp_exchange_unbind_ok_t *reply = (amqp_exchange_unbind_ok_t*)NULL;
     amqp_table_t arguments = amqp_empty_table;
   CODE:
-    // We must be connected
+    /* We must be connected */
     assert_amqp_connected(conn);
 
-    // Parameter validation
+    /* Parameter validation */
     if( ( source == NULL || 0 == strlen(source) )
       ||
       ( destination == NULL || 0 == strlen(destination) )
@@ -1395,7 +1398,7 @@ void net_amqp_rabbitmq_exchange_unbind(conn, channel, destination, source, routi
       Perl_croak(aTHX_ "source and destination must both be specified");
     }
 
-    // Pull in arguments if we have any
+    /* Pull in arguments if we have any */
     if(args)
     {
       hash_to_amqp_table(args, &arguments, 1);
@@ -1473,7 +1476,7 @@ net_amqp_rabbitmq_queue_declare(conn, channel, queuename, options = NULL, args =
                                                     arguments);
     die_on_amqp_error(aTHX_ amqp_get_rpc_reply(conn), conn, "Declaring queue");
     XPUSHs(sv_2mortal(newSVpvn(r->queue.bytes, r->queue.len)));
-    if(GIMME_V == G_ARRAY) {
+    if(GIMME_V == G_LIST) {
       XPUSHs(sv_2mortal(newSVuv(r->message_count)));
       XPUSHs(sv_2mortal(newSVuv(r->consumer_count)));
     }
@@ -1606,13 +1609,14 @@ net_amqp_rabbitmq_recv(conn, timeout = 0)
     struct timeval timeout_tv;
   CODE:
     assert_amqp_connected(conn);
+    __DEBUG__(fprintf(stderr, "RECV()!\n");); 
 
     if (timeout > 0) {
       timeout_tv.tv_sec = timeout / 1000;
       timeout_tv.tv_usec = (timeout % 1000) * 1000;
     }
 
-    // Set the waiting time to 0
+    /* Set the waiting time to 0 */
     if (timeout == -1) {
       timeout_tv.tv_sec = 0;
       timeout_tv.tv_usec = 0;
@@ -1729,7 +1733,7 @@ net_amqp_rabbitmq__publish(conn, channel, routing_key, body, options = NULL, pro
         exchange_b = amqp_cstring_bytes(SvPV_nolen(*v));
       }
 
-      // This is an internal option, only for determining if we want to force utf8
+      /* This is an internal option, only for determining if we want to force utf8 */
       int_from_hv(options, force_utf8_in_header_strings);
     }
     properties.headers = amqp_empty_table;
@@ -1850,7 +1854,7 @@ net_amqp_rabbitmq_get_sockfd(conn)
       RETVAL = newSViv( amqp_get_sockfd(conn) );
     }
     else {
-      // We don't have a connection, we're still here.
+      /* We don't have a connection, we're still here. */
       RETVAL = &PL_sv_undef;
     }
   OUTPUT:
@@ -1864,7 +1868,7 @@ net_amqp_rabbitmq_is_connected(conn)
       RETVAL = newSViv(1);
     }
     else {
-      // We don't have a connection, we're still here.
+      /* We don't have a connection, we're still here. */
       RETVAL = &PL_sv_undef;
     }
   OUTPUT:
@@ -1912,6 +1916,7 @@ net_amqp_rabbitmq_heartbeat(conn)
   CODE:
     f.frame_type = AMQP_FRAME_HEARTBEAT;
     f.channel = 0;
+    __DEBUG__(fprintf(stderr, "HEARTBEAT!\n"););
     amqp_send_frame(conn, &f);
 
 void
@@ -1974,7 +1979,7 @@ void net_amqp_rabbitmq__set_rpc_timeout(conn, args = NULL)
   CODE:
     old_timeout = amqp_get_rpc_timeout(conn);
 
-    // If we are setting the RPC timeout to NULL...
+    /* If we are setting the RPC timeout to NULL... */
     if (args == NULL || !SvOK(args) || args == &PL_sv_undef) {
       __DEBUG__( warn("%d set_rpc_timeout: No args. Setting to unlimited RPC timeout.", __LINE__) );
 
@@ -1984,12 +1989,12 @@ void net_amqp_rabbitmq__set_rpc_timeout(conn, args = NULL)
       }
     }
 
-    // If we are setting the RPC timeout to something other than NULL...
+    /* If we are setting the RPC timeout to something other than NULL... */
     else {
       int_from_hv(SvRV(args), tv_sec);
       int_from_hv(SvRV(args), tv_usec);
       __DEBUG__( warn("%d set_rpc_timeout: Setting to tv_sec:%d and tv_usec:%d.", __LINE__, tv_sec, tv_usec) );
-      // If we need to allocate the timeout...
+      /* If we need to allocate the timeout... */
 
       timeout.tv_sec = tv_sec;
       timeout.tv_usec = tv_usec;

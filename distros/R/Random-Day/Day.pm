@@ -11,7 +11,7 @@ use English;
 use Error::Pure qw(err);
 use Mo::utils 0.08 qw(check_isa);
 
-our $VERSION = 0.15;
+our $VERSION = 0.16;
 
 # Constructor.
 sub new {
@@ -44,6 +44,13 @@ sub new {
 
 	check_isa($self, 'dt_from', 'DateTime');
 	check_isa($self, 'dt_to', 'DateTime');
+
+	if (DateTime->compare($self->{'dt_from'}, $self->{'dt_to'}) == 1) {
+		err "Parameter 'dt_from' must have older or same date than 'dt_to'.",
+			'Date from', $self->{'dt_from'},
+			'Date to', $self->{'dt_to'},
+		;
+	}
 
 	return $self;
 }
@@ -242,9 +249,14 @@ sub random_day_month_year {
 sub random_month {
 	my ($self, $month) = @_;
 
-	my $random_day = $self->_range;
+	my @possible_years = ($self->{'dt_from'}->year .. $self->{'dt_to'}->year);
+	if ($month > $self->{'dt_to'}->month) {
+		pop @possible_years;
+	}
+	my $random_year_index =  int(rand(scalar @possible_years));
+	my $random_year = $possible_years[$random_year_index];
 
-	return $self->random_month_year($month, $random_day->year);
+	return $self->random_month_year($month, $random_year);
 }
 
 # Random DateTime object for day defined by month and year.
@@ -502,6 +514,9 @@ Returns DateTime object for date.
                  Parameter 'dt_to' must be a 'DateTime' object.
                          Value: %s
                          Reference: %s
+         Parameter 'dt_from' must have older or same date than 'dt_to'.
+                 Date from: %s
+                 Date to: %s
 
  random_day():
          Day cannot be a zero.
@@ -612,6 +627,10 @@ L<Mo::utils>.
 
 Perl module to generate random data
 
+=item L<DateTime::Event::Random>
+
+DateTime extension for creating random datetimes.
+
 =item L<Random::Day::InTheFuture>
 
 Class for random day generation in the future.
@@ -640,6 +659,6 @@ BSD 2-Clause License
 
 =head1 VERSION
 
-0.15
+0.16
 
 =cut

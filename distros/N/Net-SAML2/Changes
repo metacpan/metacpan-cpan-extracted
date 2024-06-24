@@ -1,5 +1,26 @@
 Revision history for Perl extension Net::SAML2.
 
+0.80 -- Sat Jun 22 13:13:42 ADT 2024
+
+    [Compatibility Deprecation Warning]
+    As of Release 0.79 the following have been changed and the old version may be
+    removed in an upcoming release.
+
+    - Net::SAML2::Protocol::Artifact
+        - response_to changed to in_response_to
+    - Net::SAML2::Protocol::LogoutResponse
+        - response_to changed to in_response_to
+
+    [Significant Changes]
+    - Minor XML compatibility fixes thanks to Martijn van de Streek (MartijnVdS)
+
+    [Detailed Change Log]
+    - c20e976 Updates for next release
+    - 931b29f Use "true" and "false" for more boolean values
+    - aefae65 Include `xml:lang` attribute in ServiceName and ServiceDescription
+    - a19257d Increment repo version after release
+    - b4a6c52 v0.79
+
 0.79 -- Sun Apr 21 18:13:48 ADT 2024
 
     [Compatibility Deprecation Warning]

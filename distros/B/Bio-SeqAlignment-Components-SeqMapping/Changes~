@@ -1,0 +1,12 @@
+Revision history for {{$dist->name}}
+
+{{$NEXT}}
+- Numerous changes suggested by Mario Roy for speed enhancements:
+1. MCE workers exit with posix_exit, avoiding all END and destructor processing
+2. Using 'for' OMP work sharing construct inside parallel regions
+3. Scheduling threads is now done statically with a no wait clause 
+0.02      2024-06-13 18:22:47-06:00 America/Denver
+- Explicitly reaping workings after processing with MCE by calling shutdown as
+suggested by Mario Roy, the creator of MCE.
+0.01      2024-06-09 22:15:06-06:00 America/Denver
+- Initial build

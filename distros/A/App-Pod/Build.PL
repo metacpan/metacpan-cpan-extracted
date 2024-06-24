@@ -7,11 +7,13 @@ use Module::Build;
 use File::Spec::Functions qw( catfile );
 Module::Build->VERSION( '0.4004' );
 
-sub readme {
+sub _readme {
+    eval { require Pod::Markdown };
+    return if $@;
     print "Building README\n";
     system "pod2markdown lib/App/Pod.pm > README.md";
 }
-readme();
+_readme();
 
 my $class = Module::Build->subclass(
     code => q{
@@ -83,6 +85,9 @@ my $builder = $class->new(
     },
     add_to_cleanup => [
         'App-Pod-*',
+        'MANIFEST*.bak',
+        'pod2htmd.tmp',
+        'blib/',
         sprintf( "%s/.cache/my_pod*.cache",
             $ENV{HOME} // $ENV{USEPROFILE}
               // catfile( $ENV{HOMEDRIVE}, $ENV{HOMEPATH}, '' ) ),

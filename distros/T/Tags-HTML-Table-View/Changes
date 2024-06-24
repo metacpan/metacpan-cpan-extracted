@@ -1,3 +1,10 @@
+0.07 2024-06-24T09:25:26+02:00
+ - Add test for no table data without 'no_data' message.
+ - Fix DEPENDENCIES section in doc.
+ - Fix dependencies.
+ - Remove obsolete code.
+ - Rewrite from List::MoreUtils to List::Util.
+
 0.06 2024-04-21T17:26:14+02:00
  - Fix of setting of table data. Copy in this time.
 

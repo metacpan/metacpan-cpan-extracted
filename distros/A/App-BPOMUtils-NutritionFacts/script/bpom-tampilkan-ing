@@ -11,9 +11,9 @@ use Log::ger;
 use Perinci::CmdLine::Any;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2024-06-16'; # DATE
+our $DATE = '2024-06-17'; # DATE
 our $DIST = 'App-BPOMUtils-NutritionFacts'; # DIST
-our $VERSION = '0.026'; # VERSION
+our $VERSION = '0.027'; # VERSION
 
 my $cmdline = Perinci::CmdLine::Any->new(
     url => "/App/BPOMUtils/NutritionFacts/bpom_show_nutrition_facts",
@@ -39,7 +39,7 @@ bpom-tampilkan-ing - Render BPOM-compliant nutrition fact table (ING - informasi
 
 =head1 VERSION
 
-This document describes version 0.026 of bpom-tampilkan-ing (from Perl distribution App-BPOMUtils-NutritionFacts), released on 2024-06-16.
+This document describes version 0.027 of bpom-tampilkan-ing (from Perl distribution App-BPOMUtils-NutritionFacts), released on 2024-06-17.
 
 =head1 SYNOPSIS
 
@@ -47,7 +47,7 @@ B<bpom-tampilkan-ing> B<L<--help|/"--help, -h, -?">> (or B<L<-h|/"--help, -h, -?
 
 B<bpom-tampilkan-ing> B<L<--version|/"--version, -v">> (or B<L<-v|/"--version, -v">>)
 
-B<bpom-tampilkan-ing> [B<L<--browser|/"--browser">>] [B<L<--carbohydrate|/"--carbohydrate=s*">>=I<L<ufloat|Sah::Schema::ufloat>>] [B<L<--cholesterol|/"--cholesterol=s">>=I<L<ufloat|Sah::Schema::ufloat>>] [B<L<--color|/"--color=s">>=I<str>] [B<L<--config-path|/"--config-path=s, -c">>=I<path>|B<L<-c|/"--config-path=s, -c">>|B<L<--no-config|/"--no-config, -C">>|B<L<-C|/"--no-config, -C">>] [B<L<--config-profile|/"--config-profile=s, -P">>=I<profile>|B<L<-P|/"--config-profile=s, -P">>] [B<L<--debug|/"--debug">>|B<L<--log-level|/"--log-level=s">>=I<level>|B<L<--quiet|/"--quiet">>|B<L<--trace|/"--trace">>|B<L<--verbose|/"--verbose">>] [B<L<--fat|/"--fat=s*">>=I<L<ufloat|Sah::Schema::ufloat>>] [B<L<--format|/"--format=s">>=I<name>|B<L<--json|/"--json">>] [B<L<--(no)naked-res|/"--naked-res">>] [B<L<--name|/"--name=s">>=I<str>] [B<L<--no-env|/"--no-env">>] [B<L<--output-format|/"--output-format=s, -f">>=I<str>|B<L<-f|/"--output-format=s, -f">>=I<str>] [B<L<--package-size|/"--package-size=s*">>=I<L<ufloat|Sah::Schema::ufloat>>] [B<L<--page-result|/"--page-result">>[=I<program>]|B<L<--view-result|/"--view-result">>[=I<program>]] [B<L<--protein|/"--protein=s*">>=I<L<ufloat|Sah::Schema::ufloat>>] [B<L<--saturated-fat|/"--saturated-fat=s*">>=I<L<ufloat|Sah::Schema::ufloat>>] [B<L<--serving-size|/"--serving-size=s*">>=I<L<ufloat|Sah::Schema::ufloat>>] [B<L<--sodium|/"--sodium=s*, --salt">>=I<L<ufloat|Sah::Schema::ufloat>>|B<L<--salt|/"--sodium=s*, --salt">>=I<L<ufloat|Sah::Schema::ufloat>>] [B<L<--sugar|/"--sugar=s*">>=I<L<ufloat|Sah::Schema::ufloat>>] [B<L<--va|/"--va=s">>=I<L<ufloat|Sah::Schema::ufloat>>]
+B<bpom-tampilkan-ing> [B<L<--biotin|/"--biotin=s">>=I<L<ufloat|Sah::Schema::ufloat>>] [B<L<--browser|/"--browser">>] [B<L<--ca|/"--ca=s">>=I<L<ufloat|Sah::Schema::ufloat>>] [B<L<--carbohydrate|/"--carbohydrate=s*">>=I<L<ufloat|Sah::Schema::ufloat>>] [B<L<--cholesterol|/"--cholesterol=s">>=I<L<ufloat|Sah::Schema::ufloat>>] [B<L<--choline|/"--choline=s">>=I<L<ufloat|Sah::Schema::ufloat>>] [B<L<--color|/"--color=s">>=I<str>] [B<L<--config-path|/"--config-path=s, -c">>=I<path>|B<L<-c|/"--config-path=s, -c">>|B<L<--no-config|/"--no-config, -C">>|B<L<-C|/"--no-config, -C">>] [B<L<--config-profile|/"--config-profile=s, -P">>=I<profile>|B<L<-P|/"--config-profile=s, -P">>] [B<L<--cr|/"--cr=s">>=I<L<ufloat|Sah::Schema::ufloat>>] [B<L<--cu|/"--cu=s">>=I<L<ufloat|Sah::Schema::ufloat>>] [B<L<--debug|/"--debug">>|B<L<--log-level|/"--log-level=s">>=I<level>|B<L<--quiet|/"--quiet">>|B<L<--trace|/"--trace">>|B<L<--verbose|/"--verbose">>] [B<L<--fat|/"--fat=s*">>=I<L<ufloat|Sah::Schema::ufloat>>] [B<L<--fe|/"--fe=s">>=I<L<ufloat|Sah::Schema::ufloat>>] [B<L<--fluorine|/"--fluorine=s">>=I<L<ufloat|Sah::Schema::ufloat>>] [B<L<--folate|/"--folate=s">>=I<L<ufloat|Sah::Schema::ufloat>>] [B<L<--format|/"--format=s">>=I<name>|B<L<--json|/"--json">>] [B<L<--iodium|/"--iodium=s">>=I<L<ufloat|Sah::Schema::ufloat>>] [B<L<-k|/"-k=s">>=I<L<ufloat|Sah::Schema::ufloat>>] [B<L<--mg|/"--mg=s">>=I<L<ufloat|Sah::Schema::ufloat>>] [B<L<--mn|/"--mn=s">>=I<L<ufloat|Sah::Schema::ufloat>>] [B<L<--(no)naked-res|/"--naked-res">>] [B<L<--name|/"--name=s">>=I<str>] [B<L<--no-env|/"--no-env">>] [B<L<--output-format|/"--output-format=s, -f">>=I<str>|B<L<-f|/"--output-format=s, -f">>=I<str>] [B<L<--package-size|/"--package-size=s*">>=I<L<ufloat|Sah::Schema::ufloat>>] [B<L<--page-result|/"--page-result">>[=I<program>]|B<L<--view-result|/"--view-result">>[=I<program>]] [B<L<--phosphorus|/"--phosphorus=s">>=I<L<ufloat|Sah::Schema::ufloat>>] [B<L<--protein|/"--protein=s*">>=I<L<ufloat|Sah::Schema::ufloat>>] [B<L<--saturated-fat|/"--saturated-fat=s*">>=I<L<ufloat|Sah::Schema::ufloat>>] [B<L<--se|/"--se=s">>=I<L<ufloat|Sah::Schema::ufloat>>] [B<L<--serving-size|/"--serving-size=s*">>=I<L<ufloat|Sah::Schema::ufloat>>] [B<L<--sodium|/"--sodium=s*, --salt">>=I<L<ufloat|Sah::Schema::ufloat>>|B<L<--salt|/"--sodium=s*, --salt">>=I<L<ufloat|Sah::Schema::ufloat>>] [B<L<--sugar|/"--sugar=s*">>=I<L<ufloat|Sah::Schema::ufloat>>] [B<L<--va|/"--va=s">>=I<L<ufloat|Sah::Schema::ufloat>>] [B<L<--vb12|/"--vb12=s">>=I<L<ufloat|Sah::Schema::ufloat>>] [B<L<--vb1|/"--vb1=s">>=I<L<ufloat|Sah::Schema::ufloat>>] [B<L<--vb2|/"--vb2=s">>=I<L<ufloat|Sah::Schema::ufloat>>] [B<L<--vb3|/"--vb3=s">>=I<L<ufloat|Sah::Schema::ufloat>>] [B<L<--vb5|/"--vb5=s">>=I<L<ufloat|Sah::Schema::ufloat>>] [B<L<--vb6|/"--vb6=s">>=I<L<ufloat|Sah::Schema::ufloat>>] [B<L<--vc|/"--vc=s">>=I<L<ufloat|Sah::Schema::ufloat>>] [B<L<--vd|/"--vd=s">>=I<L<ufloat|Sah::Schema::ufloat>>] [B<L<--ve|/"--ve=s">>=I<L<ufloat|Sah::Schema::ufloat>>] [B<L<--vk|/"--vk=s">>=I<L<ufloat|Sah::Schema::ufloat>>] [B<L<--zn|/"--zn=s">>=I<L<ufloat|Sah::Schema::ufloat>>]
 
 
 
@@ -61,6 +61,14 @@ C<*> marks required options.
 
 =over
 
+=item B<--biotin>=I<s>
+
+Biotin, in mcg/100g.
+
+=item B<--ca>=I<s>
+
+Calcium, in mg/100g.
+
 =item B<--carbohydrate>=I<s>*
 
 Total carbohydrate, in g/100g.
@@ -69,9 +77,45 @@ Total carbohydrate, in g/100g.
 
 Cholesterol, in mg/100g.
 
+=item B<--choline>=I<s>
+
+Choline, in mg/100g.
+
+=item B<--cr>=I<s>
+
+Chromium, in mcg/100g.
+
+=item B<--cu>=I<s>
+
+Copper, in mcg/100g.
+
 =item B<--fat>=I<s>*
 
 Total fat, in g/100g.
+
+=item B<--fe>=I<s>
+
+Iron, in mg/100g.
+
+=item B<--fluorine>=I<s>
+
+Fluorine, in mg/100g.
+
+=item B<--folate>=I<s>
+
+Folate (vitamin B9), in mcg/100g.
+
+=item B<--iodium>=I<s>
+
+Iodium, in mcg/100g.
+
+=item B<--mg>=I<s>
+
+Magnesium, in mg/100g.
+
+=item B<--mn>=I<s>
+
+Manganese, in mcg/100g.
 
 =item B<--name>=I<s>
 
@@ -82,6 +126,10 @@ Total fat, in g/100g.
 
 Packaging size, in g.
 
+=item B<--phosphorus>=I<s>
+
+Phosphorus, in mg/100g.
+
 =item B<--protein>=I<s>*
 
 Protein, in g/100g.
@@ -89,6 +137,10 @@ Protein, in g/100g.
 =item B<--saturated-fat>=I<s>*
 
 Saturated fat, in g/100g.
+
+=item B<--se>=I<s>
+
+Selenium, in mcg/100g.
 
 =item B<--serving-size>=I<s>*
 
@@ -105,6 +157,54 @@ Total sugar, in g/100g.
 =item B<--va>=I<s>
 
 Vitamin A, in mcg/100g (all-trans-)retinol.
+
+=item B<--vb12>=I<s>
+
+Vitamin B12, in mcg/100g.
+
+=item B<--vb1>=I<s>
+
+Vitamin B1, in mg/100g.
+
+=item B<--vb2>=I<s>
+
+Vitamin B2, in mg/100g.
+
+=item B<--vb3>=I<s>
+
+Vitamin B3, in mg/100g.
+
+=item B<--vb5>=I<s>
+
+Vitamin B5 (pantothenic acid), in mg/100g.
+
+=item B<--vb6>=I<s>
+
+Vitamin B6, in mg/100g.
+
+=item B<--vc>=I<s>
+
+Vitamin C, in mg/100g.
+
+=item B<--vd>=I<s>
+
+Vitamin D, in mcg.
+
+=item B<--ve>=I<s>
+
+Vitamin E, in mg alpha-TE (tocopherol-equivalent).
+
+=item B<--vk>=I<s>
+
+Vitamin K, in mcg.
+
+=item B<--zn>=I<s>
+
+Zinc, in mg/100g.
+
+=item B<-k>=I<s>
+
+Potassium, in mg/100g.
 
 =back
 
@@ -375,23 +475,48 @@ which is equivalent to setting C<< -plugins=-DumpArgs@before_validate_args@99,-F
 
 List of available configuration parameters:
 
+ biotin (see --biotin)
  browser (see --browser)
+ ca (see --ca)
  carbohydrate (see --carbohydrate)
  cholesterol (see --cholesterol)
+ choline (see --choline)
  color (see --color)
+ cr (see --cr)
+ cu (see --cu)
  fat (see --fat)
+ fe (see --fe)
+ fluorine (see --fluorine)
+ folate (see --folate)
  format (see --format)
+ iodium (see --iodium)
+ k (see -k)
  log_level (see --log-level)
+ mg (see --mg)
+ mn (see --mn)
  naked_res (see --naked-res)
  name (see --name)
  output_format (see --output-format)
  package_size (see --package-size)
+ phosphorus (see --phosphorus)
  protein (see --protein)
  saturated_fat (see --saturated-fat)
+ se (see --se)
  serving_size (see --serving-size)
  sodium (see --sodium)
  sugar (see --sugar)
  va (see --va)
+ vb1 (see --vb1)
+ vb12 (see --vb12)
+ vb2 (see --vb2)
+ vb3 (see --vb3)
+ vb5 (see --vb5)
+ vb6 (see --vb6)
+ vc (see --vc)
+ vd (see --vd)
+ ve (see --ve)
+ vk (see --vk)
+ zn (see --zn)
 
 =head1 ENVIRONMENT
 
@@ -412,7 +537,7 @@ String. Specify additional command-line options.
 =head2 An example, in linear text format (color/emphasis is shown with markup)
 
  % bpom-tampilkan-ing --carbohydrate 13.113 --color never --fat 0.223 --output-format raw_linear --package-size 20 --protein 0.99 --saturated-fat 0.01 --serving-size 175 --sodium 0.223 --sugar 7.173
- *INFORMASI NILAI GIZI*   *JUMLAH PER KEMASAN (20 g)* : *Energi total 10 kkal*, Energi dari lemak 0 kkal, Energi dari lemak jenuh 0 kkal, *Lemak total 0 g (0% AKG)*, *Lemak jenuh 0 g (0% AKG)*, *Protein 0 g (0% AKG)*, *Karbohidrat total 3 g (1% AKG)*, *Gula 1 g*, *Garam (Natrium) 0 mg (0% AKG)*. Vitamin A (0% AKG)/Persen AKG berdasarkan kebutuhan energi 2150 kkal. Kebutuhan energi Anda mungkin lebih tinggi atau lebih rendah./
+ *INFORMASI NILAI GIZI*   *JUMLAH PER KEMASAN (20 g)* : *Energi total 10 kkal*, Energi dari lemak 0 kkal, Energi dari lemak jenuh 0 kkal, *Lemak total 0 g (0% AKG)*, *Lemak jenuh 0 g (0% AKG)*, *Protein 0 g (0% AKG)*, *Karbohidrat total 3 g (1% AKG)*, *Gula 1 g*, *Garam (Natrium) 0 mg (0% AKG)*. /Persen AKG berdasarkan kebutuhan energi 2150 kkal. Kebutuhan energi Anda mungkin lebih tinggi atau lebih rendah./
 
 =head2 An example, in raw_linear format (just like linear_text but with no border)
 
@@ -421,9 +546,9 @@ String. Specify additional command-line options.
  | *INFORMASI NILAI GIZI* *JUMLAH PER KEMASAN (20 g)* : *Energi total 10 kkal*,    |
  | Energi dari lemak 0 kkal, Energi dari lemak jenuh 0 kkal, *Lemak total 0 g (0%  |
  | AKG)*, *Lemak jenuh 0 g (0% AKG)*, *Protein 0 g (0% AKG)*, *Karbohidrat total 3 |
- | g (1% AKG)*, *Gula 1 g*, *Garam (Natrium) 0 mg (0% AKG)*. Vitamin A (0%         |
- | AKG)/Persen AKG berdasarkan kebutuhan energi 2150 kkal. Kebutuhan energi Anda   |
- | mungkin lebih tinggi atau lebih rendah./                                        |
+ | g (1% AKG)*, *Gula 1 g*, *Garam (Natrium) 0 mg (0% AKG)*. /Persen AKG           |
+ | berdasarkan kebutuhan energi 2150 kkal. Kebutuhan energi Anda mungkin lebih     |
+ | tinggi atau lebih rendah./                                                      |
  `---------------------------------------------------------------------------------'
 
 =head2 The same example in vertical HTML table format
@@ -447,8 +572,6 @@ String. Specify additional command-line options.
  <tr><td colspan=2><b>Karbohidrat total</b></td><td align="right"><b>3 g</b></td><td align="right">1 %</td><td></td></tr>
  <tr><td colspan=2><b>Gula</b></td><td align="right"><b>1 g</b></td><td></td><td></td></tr>
  <tr class=has_bottom_border><td colspan=2><b>Garam (Natrium)</b></td><td align="right"><b>0 mg</b></td><td align="right">0 %</td><td></td></tr>
- <tr><td colspan=5>Vitamin dan mineral</td></tr>
- <tr class=has_bottom_border><td></td><td colspan=2>Vitamin A</td><td colspan=2 align="right">0 %</td></tr>
  <tr><td colspan=5><i>*Persen AKG berdasarkan kebutuhan energi 2150 kkal. Kebutuhan energi Anda mungkin lebih tinggi atau lebih rendah.</i></td></tr>
  </tbody>
  </table>
@@ -470,9 +593,6 @@ String. Specify additional command-line options.
  | *Gula*                                       |                 *1 g* |                      |                       |
  | *Garam (Natrium)*                            |                *0 mg* |                  0 % |                       |
  +-----------------------|----------------------+-----------------------+----------------------+-----------------------+
- | Vitamin dan mineral                                                                                                 |
- |                       | Vitamin A                                    |                                          0 % |
- +-----------------------+----------------------|-----------------------+----------------------|-----------------------+
  | /*Persen AKG berdasarkan kebutuhan energi 2150 kkal. Kebutuhan energi Anda mungkin lebih tinggi atau lebih rendah./ |
  `---------------------------------------------------------------------------------------------------------------------'
 
@@ -541,13 +661,6 @@ String. Specify additional command-line options.
  |                                                                             *%AKG natrium*                                                                              |
  |                                                                    %AKG | = 0.0446 / 1500 × 100 = 0.00297333333333333                                                   |
  |                                              (dibulatkan ke % terdekat) | = *0*                                                                                         |
- |                                                                               *Vitamin A*                                                                               |
- |                                                         Vitamin A 100 g | =  mcg all-trans retinol                                                                      |
- |                                        Vitamin A total per kemasan 20 g | =  × 20 / 100 = 0 g                                                                           |
- |                                                                         |                                                                                               |
- |                                                                            *%AKG Vitamin A*                                                                             |
- |                                                                    %AKG | = 0 / 600 × 100 = 0                                                                           |
- |        (dibulatkan [<=10% AKG -> 2% terdekat, >10% AKG -> 5% terdekat]) | = *0*                                                                                         |
  `-------------------------------------------------------------------------+-----------------------------------------------------------------------------------------------'
 
 =head1 HOMEPAGE

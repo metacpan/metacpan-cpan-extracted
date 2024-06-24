@@ -2,7 +2,7 @@ package Net::SAML2::AttributeConsumingService;
 use Moose;
 use XML::Generator;
 use URN::OASIS::SAML2 qw(URN_METADATA NS_METADATA);
-our $VERSION = '0.79'; # VERSION
+our $VERSION = '0.80'; # VERSION
 
 # ABSTRACT: An attribute consuming service object
 
@@ -64,10 +64,10 @@ sub to_xml {
         $self->namespace,
         {
             index     => $self->index,
-            isDefault => $self->default,
+            isDefault => $self->default ? 'true' : 'false',
         },
-        $xml->ServiceName($self->namespace, undef, $self->service_name),
-        $self->_has_service_description ? $xml->ServiceDescription($self->namespace, undef, $self->service_description) : (),
+        $xml->ServiceName($self->namespace, { 'xml:lang' => 'en' }, $self->service_name),
+        $self->_has_service_description ? $xml->ServiceDescription($self->namespace, { 'xml:lang' => 'en' }, $self->service_description) : (),
         map { $_->to_xml } @{ $self->attributes },
     );
 }
@@ -86,7 +86,7 @@ Net::SAML2::AttributeConsumingService - An attribute consuming service object
 
 =head1 VERSION
 
-version 0.79
+version 0.80
 
 =head1 SYNOPSIS
 

@@ -1,7 +1,7 @@
 package Net::SAML2::Role::ProtocolMessage;
 use Moose::Role;
 
-our $VERSION = '0.79'; # VERSION
+our $VERSION = '0.80'; # VERSION
 
 # ABSTRACT: Common behaviour for Protocol messages
 
@@ -107,7 +107,7 @@ Net::SAML2::Role::ProtocolMessage - Common behaviour for Protocol messages
 
 =head1 VERSION
 
-version 0.79
+version 0.80
 
 =head1 DESCRIPTION
 

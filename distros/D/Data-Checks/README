@@ -1,17 +1,94 @@
 NAME
 
-    Data::Checks - XS functions to assist in value constraint checking
+    Data::Checks - Value constraint checking
+
+SYNOPSIS
+
+    With Signature::Attribute::Checked:
+
+       use v5.26;
+       use Sublike::Extended;
+       use Signature::Attribute::Checked;
+    
+       use Data::Checks qw( Str );
+    
+       extended sub greet ( $message :Checked(Str) ) {
+          say "Hello, $message";
+       }
+    
+       greet( "world" );  # is fine
+       greet( undef );    # throws an exception
+
+    With Object::Pad::FieldAttr::Checked:
+
+       use v5.22;
+       use Object::Pad;
+       use Object::Pad::FieldAttr::Checked;
+    
+       use Data::Checks qw( Str );
+    
+       class Datum {
+          field $name :param :reader :Checked(Str);
+       }
+    
+       my $x = Datum->new( name => "something" );  # is fine
+       my $y = Datum->new( name => undef );        # throws an exception
 
 DESCRIPTION
 
-    Eventually this module will provide functions that implement various
-    value constraint checking behaviours.
+    This module provides functions that implement various value constraint
+    checking behaviours. These are the parts made visible by the use
+    Data::Checks ... import line, in Perl code.
 
-    Currently it does not contain anything directly visible to end-user
-    Perl code, but instead only provides the underlying common framework XS
-    functions to assist in writing modules that actually implement such
-    constraint checking. It is unlikely to be useful to end-users at this
-    time.
+    It also provides the underlying common framework XS functions to assist
+    in writing modules that actually implement such constraint checking.
+    These parts are not visible in Perl code, but instead made visible at
+    the XS level by the #include "DataChecks.h" directive.
+
+CONSTRAINTS
+
+    The following constraint checks are inspired by the same-named ones in
+    Types::Standard. They may be called fully-qualified, or imported
+    lexically into the calling scope.
+
+    Note to users familiar with Types::Standard: some of these functions
+    behave slightly differently. In particular, these constraints are
+    generally happy to accept an object reference to a class that provides
+    a conversion overload, whereas the ones in Types::Standard often are
+    not.
+
+ Defined
+
+       Defined()
+
+    Passes for any defined value, fails only for undef.
+
+ Object
+
+       Object()
+
+    Passes for any blessed object reference, fails for non-references or
+    references to unblessed data.
+
+ Str
+
+       Str()
+
+    Passes for any defined non-reference value, or a reference to an object
+    in a class that overloads stringification. Fails for undefined,
+    unblessed references, or references to objects in classes that do not
+    overload stringification.
+
+ Num
+
+       Num()
+
+    Passes for any defined non-reference value that is either a plain
+    number, or a string that could be used as one without warning, or a
+    reference to an object in a class that overloads numification. Fails
+    for undefined, strings that would raise a warning if converted to a
+    number, unblessed references, or references to objects in classes that
+    do not overload numification.
 
 XS FUNCTIONS
 
@@ -56,6 +133,11 @@ XS FUNCTIONS
       argument, as
 
          $ok = $checkersub->( $value );
+
+      * Additionally, the constraint check functions provided by this
+      module may be implemented using any of the above mechanisms, or may
+      use an unspecified fourth different mechanism. Outside code should
+      not rely on what that mechanism may be.
 
     Once constructed into a checker structure, the choice of which
     implementation is used is fixed, and if a method lookup is involved its

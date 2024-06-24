@@ -5,13 +5,25 @@ use Plack::Test;
 use Plack::Util;
 use Test::More import => ['!note'];
 use Test::Deep;
+use Kelp::Test::CookieJar;
 use Carp;
-use Encode ();
-use HTTP::Cookies;
 use Try::Tiny;
+use Kelp::Util;
 
 BEGIN {
     $ENV{KELP_TESTING} = 1;    # Set the ENV for testing
+}
+
+sub import
+{
+    my ($me, @args) = @_;
+
+    if ($args[0] && $args[0] eq -utf8) {
+        my $builder = Test::More->builder;
+        binmode $builder->output, ":encoding(utf8)";
+        binmode $builder->failure_output, ":encoding(utf8)";
+        binmode $builder->todo_output, ":encoding(utf8)";
+    }
 }
 
 attr -psgi => undef;
@@ -19,18 +31,26 @@ attr -psgi => undef;
 attr -app => sub {
     my $self = shift;
     return defined $self->psgi
-      ? Plack::Util::load_psgi( $self->psgi )
-      : die "'app' or 'psgi' parameter is required";
+        ? Plack::Util::load_psgi($self->psgi)
+        : die "'app' or 'psgi' parameter is required";
 };
+attr charset => undef;
 
-attr res  => sub { die "res is not initialized" };
+attr res => sub { die "res is not initialized" };
 
-attr cookies => sub { HTTP::Cookies->new };
+attr cookies => sub { Kelp::Test::CookieJar->new };
 
-sub request {
-    my ( $self, $req ) = @_;
+sub _decode
+{
+    my ($self, $string) = @_;
+    return Kelp::Util::charset_decode($self->charset // $self->app->charset, $string);
+}
+
+sub request
+{
+    my ($self, $req) = @_;
     croak "HTTP::Request object needed" unless ref($req) eq 'HTTP::Request';
-    $self->note( $req->method . ' ' . $req->uri );
+    $self->note($req->method . ' ' . $req->uri);
 
     # Most likely the request was not initialized with a URI that had a scheme,
     # so we add a default http to prevent unitialized regex matches further
@@ -40,14 +60,14 @@ sub request {
     # If no host was given to the request's uri (most likely), then add
     # localhost. This is needed by the cookies header, which will not be
     # applied unless the request uri has a proper domain.
-    if ( $req->uri->opaque =~ qr|^/{1}| ) {
-        $req->uri->opaque( '//localhost' . $req->uri->opaque );
+    if ($req->uri->opaque =~ qr|^/{1}|) {
+        $req->uri->opaque('//localhost' . $req->uri->opaque);
     }
 
     # Add the current cookie to the request headers
     $self->cookies->add_cookie_header($req);
 
-    my $res = test_psgi( $self->app->run, sub { shift->($req) } );
+    my $res = test_psgi($self->app->run, sub { shift->($req) });
 
     # Extract the cookies from the response and add them to the cookie jar
     $self->cookies->extract_cookies($res);
@@ -56,30 +76,33 @@ sub request {
     return $self;
 }
 
-sub request_ok {
-    my ( $self, $req, $test_name ) = @_;
+sub request_ok
+{
+    my ($self, $req, $test_name) = @_;
     local $Test::Builder::Level = $Test::Builder::Level + 1;
 
-    $self->request($req)->code_is( 200, $test_name );
+    $self->request($req)->code_is(200, $test_name);
 }
 
-sub code_is {
-    my ( $self, $code, $test_name ) = @_;
+sub code_is
+{
+    my ($self, $code, $test_name) = @_;
     local $Test::Builder::Level = $Test::Builder::Level + 1;
 
     $test_name ||= "Response code is $code";
     is $self->res->code, $code, $test_name;
 
     # If we got 500 back and shouldn't have, we show the content
-    if ( $code != 500 && $self->res->code == 500 ) {
+    if ($code != 500 && $self->res->code == 500) {
         fail $self->res->content;
     }
 
     return $self;
 }
 
-sub code_isnt {
-    my ( $self, $code, $test_name ) = @_;
+sub code_isnt
+{
+    my ($self, $code, $test_name) = @_;
     local $Test::Builder::Level = $Test::Builder::Level + 1;
 
     $test_name ||= "Response code is not $code";
@@ -87,48 +110,65 @@ sub code_isnt {
     return $self;
 }
 
-sub content_is {
-    my ( $self, $value, $test_name ) = @_;
+sub content_is
+{
+    my ($self, $value, $test_name) = @_;
     local $Test::Builder::Level = $Test::Builder::Level + 1;
 
     $test_name ||= "Content is '$value'";
-    is Encode::decode( $self->app->charset, $self->res->content ), $value,
-      $test_name;
+    is $self->_decode($self->res->content), $value,
+        $test_name;
     return $self;
 }
 
-sub content_isnt {
-    my ( $self, $value, $test_name ) = @_;
+sub content_bytes_are
+{
+    my ($self, $value, $test_name) = @_;
+    local $Test::Builder::Level = $Test::Builder::Level + 1;
+
+    $test_name ||= "Content is '$value'";
+    my $got = unpack 'H*', $self->res->content;
+    my $expected = unpack 'H*', $value;
+    is $got, $expected, $test_name;
+    return $self;
+}
+
+sub content_isnt
+{
+    my ($self, $value, $test_name) = @_;
     local $Test::Builder::Level = $Test::Builder::Level + 1;
 
     $test_name ||= "Content is not '$value'";
-    isnt Encode::decode( $self->app->charset, $self->res->content ), $value,
-      $test_name;
+    isnt $self->_decode($self->res->content), $value,
+        $test_name;
     return $self;
 }
 
-sub content_like {
-    my ( $self, $regexp, $test_name ) = @_;
+sub content_like
+{
+    my ($self, $regexp, $test_name) = @_;
     local $Test::Builder::Level = $Test::Builder::Level + 1;
 
     $test_name ||= "Content matches $regexp";
-    like Encode::decode( $self->app->charset, $self->res->content ), $regexp,
-      $test_name;
+    like $self->_decode($self->res->content), $regexp,
+        $test_name;
     return $self;
 }
 
-sub content_unlike {
-    my ( $self, $regexp, $test_name ) = @_;
+sub content_unlike
+{
+    my ($self, $regexp, $test_name) = @_;
     local $Test::Builder::Level = $Test::Builder::Level + 1;
 
     $test_name ||= "Content does not match $regexp";
-    unlike Encode::decode( $self->app->charset, $self->res->content ), $regexp,
-      $test_name;
+    unlike $self->_decode($self->res->content), $regexp,
+        $test_name;
     return $self;
 }
 
-sub content_type_is {
-    my ( $self, $value, $test_name ) = @_;
+sub content_type_is
+{
+    my ($self, $value, $test_name) = @_;
     local $Test::Builder::Level = $Test::Builder::Level + 1;
 
     $test_name ||= "Content-Type is '$value'";
@@ -136,8 +176,19 @@ sub content_type_is {
     return $self;
 }
 
-sub content_type_isnt {
-    my ( $self, $value, $test_name ) = @_;
+sub full_content_type_is
+{
+    my ($self, $value, $test_name) = @_;
+    local $Test::Builder::Level = $Test::Builder::Level + 1;
+
+    $test_name ||= "Full Content-Type is '$value'";
+    is join('; ', $self->res->content_type), $value, $test_name;
+    return $self;
+}
+
+sub content_type_isnt
+{
+    my ($self, $value, $test_name) = @_;
     local $Test::Builder::Level = $Test::Builder::Level + 1;
 
     $test_name ||= "Content-Type is not '$value'";
@@ -145,52 +196,57 @@ sub content_type_isnt {
     return $self;
 }
 
-sub header_is {
-    my ( $self, $header, $value, $test_name ) = @_;
+sub header_is
+{
+    my ($self, $header, $value, $test_name) = @_;
     local $Test::Builder::Level = $Test::Builder::Level + 1;
 
     $test_name ||= "Header '$header' => '$value'";
     is $self->res->header($header), $value, $test_name
-      || $self->diag_headers();
+        || $self->diag_headers();
     return $self;
 }
 
-sub header_isnt {
-    my ( $self, $header, $value, $test_name ) = @_;
+sub header_isnt
+{
+    my ($self, $header, $value, $test_name) = @_;
     local $Test::Builder::Level = $Test::Builder::Level + 1;
 
     $test_name ||= "Header '$header' is not '$value'";
     isnt $self->res->header($header), $value, $test_name
-      || $self->diag_headers();
+        || $self->diag_headers();
     return $self;
 }
 
-sub header_like {
-    my ( $self, $header, $regexp, $test_name ) = @_;
+sub header_like
+{
+    my ($self, $header, $regexp, $test_name) = @_;
     local $Test::Builder::Level = $Test::Builder::Level + 1;
 
     $test_name ||= "Header '$header' =~ $regexp";
     like $self->res->header($header), $regexp, $test_name
-      || $self->diag_headers();
+        || $self->diag_headers();
     return $self;
 }
 
-sub header_unlike {
-    my ( $self, $header, $regexp, $test_name ) = @_;
+sub header_unlike
+{
+    my ($self, $header, $regexp, $test_name) = @_;
     local $Test::Builder::Level = $Test::Builder::Level + 1;
 
     $test_name ||= "Header '$header' !~ $regexp";
     unlike $self->res->header($header), $regexp, $test_name
-      || $self->diag_headers();
+        || $self->diag_headers();
     return $self;
 }
 
-sub json_content {
+sub json_content
+{
     my $self = shift;
     fail "No JSON decoder" unless $self->app->can('json');
     my $result;
     try {
-        $result = $self->app->json->decode( $self->res->content );
+        $result = $self->app->json->decode($self->res->content);
     }
     catch {
         fail("Poorly formatted JSON");
@@ -198,31 +254,35 @@ sub json_content {
     return $result;
 }
 
-sub json_cmp {
-    my ( $self, $expected, $test_name ) = @_;
+sub json_cmp
+{
+    my ($self, $expected, $test_name) = @_;
     local $Test::Builder::Level = $Test::Builder::Level + 1;
 
     $test_name ||= "JSON structure matches";
     like $self->res->header('content-type'), qr/json/, 'Content-Type is JSON'
-      or return $self;
+        or return $self;
     my $json = $self->json_content;
-    cmp_deeply( $json, $expected, $test_name ) or diag explain $json;
+    cmp_deeply($json, $expected, $test_name) or diag explain $json;
     return $self;
 }
 
-sub note {
+sub note
+{
     my $self = shift;
     Test::More::note @_;
     return $self;
 }
 
-sub diag_headers {
+sub diag_headers
+{
     my $self = shift;
     diag $self->res->headers->as_string;
     return $self;
 }
 
-sub diag_content {
+sub diag_content
+{
     my $self = shift;
     diag $self->res->content;
     return $self;
@@ -254,6 +314,9 @@ Kelp::Test - Automated tests for a Kelp web app
     $t->request( POST '/api' )
       ->json_cmp({auth => 1});
 
+    # automatically sets wide output for Test::More (disables Wide character warnings)
+    use Kelp::Test -utf8;
+
 =head1 DESCRIPTION
 
 This module provides basic tools for testing a Kelp based web application. It
@@ -282,6 +345,12 @@ is a reference to a Kelp based web app.
 
 From this point on, all requests run with C<$t-E<gt>request> will be sent to C<$app>.
 
+=head2 charset
+
+The charset to use for decoding the response. By default, application's charset
+will be used. Use it if some responses are in a different charset. Can be
+cleared by setting it back to undef.
+
 =head2 res
 
 Each time C<$t-E<gt>request> is used to send a request, an HTTP::Response object is
@@ -295,7 +364,19 @@ C<res>.
 
 =head2 cookies
 
-An L<HTTP::Cookies> object containing the cookie jar for all tests.
+An object of C<Kelp::Test::CookieJar> implementing the partial interface of
+L<HTTP::Cookies> module, containing the cookie jar for all tests. Compared to
+the module it's mocking, it does not handle cookie parameters other than name
+and value, but properly escapes the cookie name and value for the request.
+Its usage should usually be as trivial as this:
+
+    # NOTE: extra undef parameters are required to match HTTP::Cookies interface
+
+    $t->set_cookie(undef, $name, $value);
+    $t->request(...);
+
+    my $cookies_hash = $t->get_cookies;
+    my @cookie_values = $t->get_cookies(undef, 'cookie1', 'cookie2');
 
 =head1 METHODS
 
@@ -350,6 +431,11 @@ An optional name of the test can be added as a second parameter.
     $t->request( GET '/path' )->content_is("Ok.");
     $t->request( GET '/path' )->content_isnt("Fail.");
 
+=head2 content_bytes_are
+
+Same as C<content_is>, but the result is not decoded and the values are
+compared byte by byte as hex-encoded string.
+
 =head2 content_like, content_unlike
 
 C<content_like( $regexp, $test_name )>, C<content_unlike( $regexp, $test_name )>
@@ -369,6 +455,10 @@ An optional name of the test can be added as a second parameter.
 
     $t->request( GET '/path' )->content_type_is("text/plain");
     $t->request( GET '/path' )->content_type_isnt("text/html");
+
+=head2 full_content_type_is
+
+Like L</content_type_is>, but checks the full content type (with charset).
 
 =head2 header_is, header_isnt
 
@@ -437,3 +527,4 @@ Prints the entire content for debugging purposes.
       ->diag_content();
 
 =cut
+

@@ -33,5 +33,5 @@ requires:
   XML::Simple: '0'
   YAML::Syck: '0'
   perl: '5.036000'
-version: 28
+version: 29
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -7,7 +7,7 @@ Class::Simple::Readonly::Cached - cache messages to an object
 
 # VERSION
 
-Version 0.09
+Version 0.10
 
 # SYNOPSIS
 
@@ -20,18 +20,18 @@ for example by changing its state.
 You can use this class to create a caching layer to an object of any class
 that works on objects which doesn't change its state based on input:
 
-      use Class::Simple::Readonly::Cached;
+    use Class::Simple::Readonly::Cached;
 
-      my $obj = Class::Simple->new();
-      $obj->val('foo');
-      $obj = Class::Simple::Readonly::Cached->new(object => $obj, cache => {});
-      my $val = $obj->val();
-      print "$val\n";     # Prints "foo"
-    
-      #... set $obj to be some other class which will take an argument 'a',
-      #   with a value 'b'
-    
-      $val = $obj->val(a => 'b'); # You
+    my $obj = Class::Simple->new();
+    $obj->val('foo');
+    $obj = Class::Simple::Readonly::Cached->new(object => $obj, cache => {});
+    my $val = $obj->val();
+    print "$val\n";     # Prints "foo"
+
+    #... set $obj to be some other class which will take an argument 'a',
+    #   with a value 'b'
+
+    $val = $obj->val(a => 'b');
 
 # SUBROUTINES/METHODS
 
@@ -53,7 +53,7 @@ and that is used.
 
     my %hash;
     my $person = Gedcom::Person->new();
-    ... # Set up some data
+    # ...Set up some data
     my $object = Class::Simple::Readonly::Cached(object => $person, cache => \%hash);
     my $father1 = $object->father();    # Will call gedcom->father() to get the person's father
     my $father2 = $object->father();    # Will retrieve the father from the cache without calling person->father()
@@ -71,7 +71,15 @@ Return the encapsulated object
 
 Returns the state of the object
 
-    print Data::Dumper->new([$obj->state()]->Dump();
+    print Data::Dumper->new([$obj->state()])->Dump();
+
+## can
+
+Returns if the embedded object can handle a message
+
+## isa
+
+Returns if the embedded object is the given type of object
 
 # AUTHOR
 
@@ -128,7 +136,7 @@ You can also look for information at:
 # LICENSE AND COPYRIGHT
 
 Author Nigel Horne: `njh@bandsman.co.uk`
-Copyright (C) 2019-2023 Nigel Horne
+Copyright (C) 2019-2024 Nigel Horne
 
 Usage is subject to licence terms.
 The licence terms of this software are as follows:

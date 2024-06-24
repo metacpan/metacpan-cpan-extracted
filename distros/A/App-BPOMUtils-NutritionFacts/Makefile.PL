@@ -28,7 +28,7 @@ my %WriteMakefileArgs = (
     "Data::Sah::Compiler::perl::TH::str" => "0.914",
     "Exporter" => "5.57",
     "File::Slurper" => 0,
-    "File::Temp" => "0.2307",
+    "File::Temp" => "0.2310",
     "Log::ger" => "0.038",
     "Math::Round" => 0,
     "Number::Format" => 0,
@@ -52,7 +52,7 @@ my %WriteMakefileArgs = (
     "IPC::Open3" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.026",
+  "VERSION" => "0.027",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -68,7 +68,7 @@ my %FallbackPrereqs = (
   "Exporter" => "5.57",
   "File::Slurper" => 0,
   "File::Spec" => 0,
-  "File::Temp" => "0.2307",
+  "File::Temp" => "0.2310",
   "IO::Handle" => 0,
   "IPC::Open3" => 0,
   "Log::ger" => "0.038",

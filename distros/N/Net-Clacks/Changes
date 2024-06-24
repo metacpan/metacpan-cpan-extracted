@@ -1,5 +1,37 @@
-@  changeset:   199:bfad51286b33
+@  changeset:   203:51ba83316803
 |  tag:         tip
+|  user:        Rene Schickbauer <cavac@palebluedot>
+|  date:        Mon Jun 24 11:43:12 2024 +0200
+|  files:       devscripts/fixpragmas.pl devscripts/resetpod.pl devscripts/setcopyright.pl devscripts/setversion.pl lib/Net/Clacks.pm lib/Net/Clacks/ClacksCache.pm lib/Net/Clacks/Client.pm lib/Net/Clacks/PostgreSQL2Clacks.pm lib/Net/Clacks/Server.pm lib/Net/Clacks/UpgradeGuide.pod
+|  description:
+|  Bump copyright date (it's now 2024)
+|
+|
+o  changeset:   202:546ee0b25ab5
+|  user:        Rene Schickbauer <cavac@palebluedot>
+|  date:        Mon Jun 24 11:42:13 2024 +0200
+|  files:       devscripts/fixpragmas.pl devscripts/resetpod.pl devscripts/setcopyright.pl devscripts/setversion.pl example/chat.pl example/chat_unixdomainsocket.pl example/chatbot.pl example/clock.pl example/permissiontestclient.pl example/rawclient.pl example/server.pl lib/Net/Clacks.pm lib/Net/Clacks/ClacksCache.pm lib/Net/Clacks/Client.pm lib/Net/Clacks/PostgreSQL2Clacks.pm lib/Net/Clacks/Server.pm lib/Net/Clacks/UpgradeGuide.pod
+|  description:
+|  Bump version to 29
+|
+|
+o  changeset:   201:d2e3d989839b
+|  user:        Rene Schickbauer <cavac@palebluedot>
+|  date:        Mon Jun 24 11:39:06 2024 +0200
+|  files:       lib/Net/Clacks/Server.pm
+|  description:
+|  Increase Listen queue for new incoming connections to make initial startup more reliable
+|
+|
+o  changeset:   200:c7597854c050
+|  user:        Rene Schickbauer <cavac@earthrise>
+|  date:        Thu Dec 14 13:44:25 2023 +0100
+|  files:       Changes lib/Net/Clacks/UpgradeGuide.pod
+|  description:
+|  Prepare for release of Version 28
+|
+|
+o  changeset:   199:bfad51286b33
 |  user:        Rene Schickbauer <cavac@earthrise>
 |  date:        Thu Dec 14 13:40:52 2023 +0100
 |  files:       MANIFEST

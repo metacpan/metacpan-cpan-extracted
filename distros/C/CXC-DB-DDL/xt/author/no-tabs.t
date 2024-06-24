@@ -12,6 +12,7 @@ my @files = (
     'lib/CXC/DB/DDL/Constants.pm',
     'lib/CXC/DB/DDL/Failure.pm',
     'lib/CXC/DB/DDL/Field.pm',
+    'lib/CXC/DB/DDL/Field/Pg.pm',
     'lib/CXC/DB/DDL/Manual/Intro.pod',
     'lib/CXC/DB/DDL/Table.pm',
     'lib/CXC/DB/DDL/Types.pm',
@@ -19,8 +20,12 @@ my @files = (
     't/00-compile.t',
     't/00-report-prereqs.dd',
     't/00-report-prereqs.t',
+    't/DDL/Field/Pg.t',
     't/DDL/Util.t',
-    't/DDL/create.t'
+    't/DDL/Util/dbd_types.t',
+    't/DDL/create.t',
+    't/lib/DBD/MyTestDBD.pm',
+    't/lib/My/Field.pm'
 );
 
 notabs_ok($_) foreach @files;

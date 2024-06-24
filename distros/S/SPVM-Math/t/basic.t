@@ -228,8 +228,6 @@ ok(SPVM::TestCase::Math->isunorderedf);
   ok(SPVM::TestCase::Math->cneg);
   ok(SPVM::TestCase::Math->cmulf);
   ok(SPVM::TestCase::Math->cmul);
-  ok(SPVM::TestCase::Math->cscamulf);
-  ok(SPVM::TestCase::Math->cscamul);
   ok(SPVM::TestCase::Math->cdivf);
   ok(SPVM::TestCase::Math->cdiv);
 }

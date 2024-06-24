@@ -1,5 +1,5 @@
 ---
-abstract: 'Base class and script for CPAN searching.'
+abstract: 'Tool to search on CPAN archive.'
 author:
   - 'Michal Josef Spacek <skim@cpan.org>'
 build_requires:
@@ -10,11 +10,12 @@ build_requires:
   Test::More: 0
   Test::NoWarnings: 0
   Test::Output: 0
+  Test::Warn: 0
 configure_requires:
   ExtUtils::MakeMaker: 6.59
 distribution_type: module
 dynamic_config: 1
-generated_by: 'Module::Install version 1.19'
+generated_by: 'Module::Install version 1.21'
 license: bsd
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -35,4 +36,4 @@ resources:
   homepage: https://github.com/michal-josef-spacek/App-CPAN-Search
   license: http://opensource.org/licenses/bsd-license.php
   repository: git://github.com/michal-josef-spacek/App-CPAN-Search
-version: '0.09'
+version: '0.10'

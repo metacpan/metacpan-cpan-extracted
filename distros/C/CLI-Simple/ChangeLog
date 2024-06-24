@@ -1,3 +1,10 @@
+Sat Jun 22 10:52:48 2024  Rob Lauer  <rlauer6@comcast.net>
+
+	[0.0.7]:
+	* VERSION: bump
+	* src/main/perl/lib/CLI/Simple.pm.in: pod fixes
+	* src/main/perl/lib/CLI/Simple/README.md: generated
+
 Wed May 22 07:37:11 2024  Rob Lauer  <rlauer6@comcast.net>
 
 	[0.0.6]:

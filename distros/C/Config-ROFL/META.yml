@@ -25,13 +25,13 @@ no_index:
     - t
 requires:
   Carp: 0
-  Config::Any: 0.33
+  Config::Any: '0.33'
   Config::General: 0
   Config::ZOMG: 0
   Cpanel::JSON::XS: '4.04'
   Cwd: 0
   Data::Rmap: 0
-  File::Share: 0
+  File::Share: '0.27'
   File::Spec: 0
   List::Util: '1.33'
   Moo: 0
@@ -42,4 +42,4 @@ requires:
   namespace::clean: 0
 resources:
   license: http://dev.perl.org/licenses/
-version: '1.11'
+version: '1.12'

@@ -1,6 +1,34 @@
 Revision history for CXC-DB-DDL
 
-0.13      2024-04-04 12:23:58-04:00 America/New_York
+0.14      2024-06-23 13:25:54-04:00 America/New_York
+
+  [DEPRECATION]
+
+    * field constraints are treated by SQLT as table constraints, and
+      CDD's attempt to mask that was too primitive to accomodate real
+      world applications, so they are now deprecated in favor of table
+      constraints.
+
+  [BUG FIX]
+
+    * constraints must include a type attribute; this was not enforced.
+
+    * Constraint attributes 'fields', and 'referenced_fields' did not
+      coerce from a string to an arrayref.
+
+    * automatic names for table constraints tried to use attributes
+      which may not be present.
+
+  [ENHANCEMENT]
+
+    * CHECK_C constraint expressions may now be provided via a coderef
+
+    * the DSL (CXC::DB:DDL::Util) now supports DBD specific types.
+      The interface it is still evolving and the documentation
+      lacking.  See CXC::DB::DDL::Field::Pg and t/DDL/Field/Pg.t.
+
+
+0.13 2024-04-04 12:23:58-04:00 America/New_York
 
   [API BREAKAGE]
 

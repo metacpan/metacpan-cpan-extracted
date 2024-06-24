@@ -14,7 +14,7 @@ use Types::Common::String qw( NonEmptyStr );
 use Moo;
 use experimental 'signatures', 'postderef', 'declared_refs', 'refaliasing';
 
-our $VERSION = '0.13';
+our $VERSION = '0.14';
 
 use namespace::clean -except => [ 'has', '_tag_list', '_tags' ];
 
@@ -129,6 +129,8 @@ has foreign_key => (
 
 
 
+
+
 has check => (
     is         => 'ro',
     isa        => NonEmptyStr,
@@ -159,6 +161,15 @@ has default_value => (
 
 
 
+sub type_name ( $self, $dbh ) {
+    return ( $dbh->type_info( $self->data_type )
+          // $dbh->type_info( [ SQL_VARCHAR, SQL_LONGVARCHAR ] ) )->{TYPE_NAME};
+}
+
+
+
+
+
 
 
 
@@ -174,15 +185,11 @@ sub to_sqlt ( $self, $dbh, $table ) {
 
     require SQL::Translator::Schema::Field;
 
-    my $data_type
-      = ( $dbh->type_info( $self->data_type ) // $dbh->type_info( [ SQL_VARCHAR, SQL_LONGVARCHAR ] ) )
-      ->{TYPE_NAME};
-
     my %attr = (
         name              => $self->name,
         table             => $table,
         is_nullable       => $self->is_nullable,
-        data_type         => $data_type,
+        data_type         => $self->type_name( $dbh ),
         is_auto_increment => $self->is_auto_increment,
         (
             $self->has_default_value
@@ -291,7 +298,7 @@ CXC::DB::DDL::Field - DDL Representation of a field
 
 =head1 VERSION
 
-version 0.13
+version 0.14
 
 =head1 OBJECT ATTRIBUTES
 
@@ -329,7 +336,9 @@ Required if this column references a foreign key.
 
 =head2 check => NonEmptyStr
 
-Table check constraint
+DEPRECATED; use a table constraint
+
+Field check constraint.
 
 =head2 default_value => NonEmptyStr | ScalarRef | CodeRef
 
@@ -348,6 +357,8 @@ Returns true if a check constraint has been specified.
 =head2 has_default_value
 
 Default value
+
+=head2 type_name
 
 =head2 to_sqlt
 

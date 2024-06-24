@@ -1,4 +1,4 @@
-package Mojolicious::Plugin::Authentication::OIDC 0.05;
+package Mojolicious::Plugin::Authentication::OIDC 0.06;
 use v5.26;
 use warnings;
 
@@ -66,7 +66,7 @@ Readonly::Array my @REQUIRED_PARAMS => qw(
   public_key
 );
 Readonly::Array my @ALLOWED_PARAMS => qw(
-  client_id on_login on_activity
+  client_id on_login on_activity base_url
 );
 Readonly::Hash my %DEFAULT_PARAMS => (
   login_path    => '/auth/login',
@@ -289,7 +289,7 @@ sub register($self, $app, $params) {
   $app->helper(
     $params_helper => sub {
       return {map {$_ => $conf{$_}}
-          qw(auth_endpoint scope response_type login_path token_endpoint client_id client_secret grant_type on_error on_success logout_endpoint)
+          qw(auth_endpoint scope response_type login_path token_endpoint client_id client_secret grant_type on_error on_success logout_endpoint base_url)
       };
     }
   );

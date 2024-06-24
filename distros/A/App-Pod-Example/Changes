@@ -1,3 +1,11 @@
+0.21 2024-06-23T11:38:18+02:00
+ - Finish tests.
+ - Fix test dependencies.
+ - Rewrite arguments process to more intuitive way.
+ - Rewrite run() test to use of help() helper.
+ - Update Module::Install to 1.21 version.
+ - Update copyright years.
+
 0.20 2023-03-29T11:56:59+02:00
  - Add name for example.
  - Move code from constructor to run(). Fix and improve tests.

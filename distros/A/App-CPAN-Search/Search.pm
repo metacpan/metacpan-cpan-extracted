@@ -6,7 +6,7 @@ use warnings;
 use CPAN;
 use Getopt::Std;
 
-our $VERSION = 0.09;
+our $VERSION = 0.10;
 
 # Constructor.
 sub new {
@@ -27,8 +27,9 @@ sub run {
 	$self->{'_opts'} = {
 		'h' => 0,
 	};
-	if (! getopts('h', $self->{'_opts'}) || @ARGV < 1
-		|| $self->{'_opts'}->{'h'}) {
+	if (! getopts('h', $self->{'_opts'})
+		|| $self->{'_opts'}->{'h'}
+		|| @ARGV < 1) {
 
 		print STDERR "Usage: $0 [-h] [--version] module_prefix\n";
 		print STDERR "\t-h\t\tPrint help.\n";
@@ -47,7 +48,6 @@ sub run {
 }
 
 1;
-
 
 __END__
 
@@ -129,12 +129,12 @@ L<http://skim.cz>
 
 =head1 LICENSE AND COPYRIGHT
 
-© 2015-2023 Michal Josef Špaček
+© 2015-2024 Michal Josef Špaček
 
 BSD 2-Clause License
 
 =head1 VERSION
 
-0.09
+0.10
 
 =cut

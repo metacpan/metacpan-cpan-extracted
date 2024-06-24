@@ -3,6 +3,8 @@ Changes
 CONCEPT
 examples/download_app_pod_example.pl
 examples/process_module_name_and_version.pl
+examples/search_module.pl
+examples/search_module_versions.pl
 Get.pm
 Get/MetaCPAN.pm
 Get/Utils.pm
@@ -27,6 +29,7 @@ SIGNATURE
 t/App-CPAN-Get-MetaCPAN/01-use.t
 t/App-CPAN-Get-MetaCPAN/02-version.t
 t/App-CPAN-Get-MetaCPAN/03-new.t
+t/App-CPAN-Get-MetaCPAN/04-search.t
 t/App-CPAN-Get-Utils/01-use.t
 t/App-CPAN-Get-Utils/02-version.t
 t/App-CPAN-Get-Utils/03-process_module_name_and_version.t

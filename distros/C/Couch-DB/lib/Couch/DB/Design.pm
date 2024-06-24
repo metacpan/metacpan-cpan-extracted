@@ -7,7 +7,7 @@
 
 package Couch::DB::Design;
 use vars '$VERSION';
-$VERSION = '0.004';
+$VERSION = '0.005';
 
 use parent 'Couch::DB::Document';
 
@@ -119,9 +119,9 @@ sub indexDetails($%)
 
 #-------------
 
-sub viewFind($;$%)
+sub viewSearch($;$%)
 {	my ($self, $view, $search, %args) = @_;
-	$self->db->listDocuments($search, view => $view, design => $self, %args);
+	$self->db->search($search, view => $view, design => $self, %args);
 }
 
 #-------------
@@ -152,6 +152,10 @@ sub list($$%)
 	);
 }
 
+
+#XXX The 3.3.3 doc says /{docid} version requires PUT, but shows a POST example.
+#XXX The 3.3.3post4 docs make the example patch with PUT.
+#XXX The code probably says: anything except GET is okay.
 
 sub applyUpdate($%)
 {	my ($self, $function, $doc, %args) = @_;

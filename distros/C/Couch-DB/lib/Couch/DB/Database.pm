@@ -7,7 +7,7 @@
 
 package Couch::DB::Database;
 use vars '$VERSION';
-$VERSION = '0.004';
+$VERSION = '0.005';
 
 
 use Log::Report 'couch-db';
@@ -16,6 +16,7 @@ use Couch::DB::Util   qw(flat);
 
 use Scalar::Util      qw(weaken blessed);
 use HTTP::Status      qw(HTTP_OK HTTP_NOT_FOUND);
+use JSON::PP ();
 
 
 sub new(@) { my ($class, %args) = @_; (bless {}, $class)->init(\%args) }
@@ -56,9 +57,10 @@ sub ping(%)
 sub exists()
 {	my $self = shift;
 	my $result = $self->ping(_delay => 0);
+
 	  $result->code eq HTTP_NOT_FOUND ? 0
     : $result->code eq HTTP_OK        ? 1
-	:                                   undef;  # will probably die in the next step
+	:     undef;  # will probably die in the next step
 }
 
 
@@ -140,8 +142,8 @@ sub compact(%)
 {	my ($self, %args) = @_;
 	my $path = $self->_pathToDB('_compact');
 
-	if(my $ddoc = delete $args{ddoc})
-	{	$path .= '/' . $ddoc->id;
+	if(my $ddoc = delete $args{design})
+	{	$path .= '/' . (blessed $ddoc ? $ddoc->id :$ddoc);
 	}
 
 	$self->couch->call(POST => $path,
@@ -170,7 +172,7 @@ sub ensureFullCommit(%)
 }
 
 
-sub purgeDocuments($%)
+sub purgeDocs($%)
 {	my ($self, $plan, %args) = @_;
 
 	#XXX looking for smarter behavior here, to construct a plan.
@@ -261,7 +263,7 @@ sub revisionLimitSet($%)
 
 #-------------
 
-sub listDesigns(;$%)
+sub designs(;$%)
 {	my ($self, $search, %args) = @_;
 	my $couch   = $self->couch;
 	my @search  = flat $search;
@@ -319,7 +321,7 @@ sub createIndex($%)
 }
 
 
-sub listIndexes(%)
+sub indexes(%)
 {	my ($self, %args) = @_;
 
 	$self->couch->call(GET => $self->_pathToDB('_index'),
@@ -335,8 +337,8 @@ sub doc($%)
 }
 
 
-sub __updated($$$$)
-{	my ($self, $result, $saves, $deletes, $on_error) = @_;
+sub __bulk($$$$)
+{	my ($self, $result, $saves, $deletes, $issues) = @_;
 	$result or return;
 
 	my %saves   = map +($_->id => $_), @$saves;
@@ -349,51 +351,59 @@ sub __updated($$$$)
 			or panic "missing report for updated $id";
 
 		if($report->{ok})
-		{	$doc->saved($id, $report->{rev});
-			$doc->deleted if $delete;
+		{	$doc->_saved($id, $report->{rev});
+			$doc->_deleted($report->{rev}) if $delete;
 		}
 		else
-		{	$on_error->($result, $doc, +{ %$report, delete => $delete });
+		{	$issues->($result, $doc, +{ %$report, delete => $delete });
 		}
 	}
 
-	$on_error->($result, $saves{$_},
+	$issues->($result, $saves{$_},
 		+{ error => 'missing', reason => "The server did not report back on saving $_." }
 	) for keys %saves;
 
-	$on_error->($result, $deletes{$_},
+	$issues->($result, $deletes{$_},
 		+{ error => 'missing', reason => "The server did not report back on deleting $_.", delete => 1 }
 	) for keys %deletes;
 }
 
-sub updateDocuments($%)
+sub saveBulk($%)
 {	my ($self, $docs, %args) = @_;
 	my $couch   = $self->couch;
+	my $issues  = delete $args{issues} || sub {};
 
-	my @plan    = map $_->data, @$docs;
+	my @plan;
+	foreach my $doc (@$docs)
+	{	my $rev     = $doc->rev;
+		my %plan    = %{$doc->revision($rev)};
+		$plan{_id}  = $doc->id;
+		$plan{_rev} = $rev if $rev ne '_new';
+		push @plan, \%plan;
+	}
+
 	my @deletes = flat delete $args{delete};
-
 	foreach my $del (@deletes)
-	{	push @plan, +{ _id => $del->id, _rev => $del->rev, _delete => 1 };
+	{	push @plan, +{ _id => $del->id, _rev => $del->rev, _deleted => JSON::PP::true };
 		$couch->toJSON($plan[-1], bool => qw/_delete/);
 	}
 
 	@plan or error __x"need at least on document for bulk processing.";
 	my $send    = +{ docs => \@plan };
 
-	$send->{new_edits} = delete $args{new_edits} if exists $args{new_edits};
+	$send->{new_edits} = delete $args{new_edits} if exists $args{new_edits};  # default true
 	$couch->toJSON($send, bool => qw/new_edits/);
 
 	$couch->call(POST => $self->_pathToDB('_bulk_docs'),
 		send     => $send,
 		$couch->_resultsConfig(\%args,
-			on_final => sub { $self->_updated($_[0], $docs, \@deletes) },
+			on_final => sub { $self->__bulk($_[0], $docs, \@deletes, $issues) },
 		),
 	);
 }
 
 
-sub inspectDocuments($%)
+sub inspectDocs($%)
 {	my ($self, $docs, %args) = @_;
 	my $couch = $self->couch;
 
@@ -416,13 +426,16 @@ sub inspectDocuments($%)
 
 sub __toDocs($$%)
 {	my ($self, $result, $data, %args) = @_;
-	my @docs = flat $data->{docs};
-	$data->{docs} = [ map Couch::DB::Document->_fromResponse($result, $_, %args), @docs ] if @docs;
+	foreach my $row (@{$data->{rows}})
+	{	my $doc = $row->{doc} or next;
+		$row->{doc} = Couch::DB::Document->_fromResponse($result, $doc, %args);
+	}
 	$data;
 }
 
-sub __listValues($$%)
+sub __searchValues($$%)
 {	my ($self, $result, $raw, %args) = @_;
+
 	$args{db}  = $self;
 	my $values = +{ %$raw };
 
@@ -438,7 +451,7 @@ sub __listValues($$%)
 	$values;
 }
 
-sub listDocuments(;$%)
+sub search(;$%)
 {	my ($self, $search, %args) = @_;
 	my $couch  = $self->couch;
 
@@ -446,13 +459,13 @@ sub listDocuments(;$%)
 	my $part   = delete $args{partition};
 	my $local  = delete $args{local};
 	my $view   = delete $args{view};
-	my $ddoc   = delete $args{ddoc};
+	my $ddoc   = delete $args{design};
 	my $ddocid = blessed $ddoc ? $ddoc->id : $ddoc;
 
-	!$view  || $ddoc  or panic "listDocuments(view) requires design document.";
-	!$local || !$part or panic "listDocuments(local) cannot be combined with partition.";
-	!$local || !$view or panic "listDocuments(local) cannot be combined with a view.";
-	!$part  || @search < 2 or panic "listDocuments(partition) cannot work with multiple searches.";
+	!$view  || $ddoc  or panic "docs(view) requires design document.";
+	!$local || !$part or panic "docs(local) cannot be combined with partition.";
+	!$local || !$view or panic "docs(local) cannot be combined with a view.";
+	!$part  || @search < 2 or panic "docs(partition) cannot work with multiple searches.";
 
 	my $set
 	  = $local ? '_local_docs'
@@ -463,11 +476,11 @@ sub listDocuments(;$%)
 	my $path   = $self->_pathToDB($set);
 
 	# According to the spec, _all_docs is just a special view.
-	my @send   = map $self->_viewPrepare($method, $_, "listDocuments search"), @search;
+	my @send   = map $self->_viewPrepare($method, $_, "docs search"), @search;
 		
 	my @params;
 	if($method eq 'GET')
-	{	@send < 2 or panic "Only one search with listDocuments(GET)";
+	{	@send < 2 or panic "Only one search with docs(GET)";
 		@params = (query => $send[0]);
 	}
 	elsif(@send==1)
@@ -481,8 +494,8 @@ sub listDocuments(;$%)
 
 	$couch->call($method => $path,
 		@params,
-		$couch->_resultsConfig(\%args,
-			on_values => sub { $self->__listValues($_[0], $_[1], local => $local) },
+		$couch->_resultsPaging(\%args,
+			on_values => sub { $self->__searchValues($_[0], $_[1], local => $local) },
 		),
 	);
 }
@@ -501,12 +514,12 @@ sub _viewPrepare($$$)
 	# Main doc in 1.5.4.  /{db}/_design/{ddoc}/_view/{view}
 	if($method eq 'GET')
 	{	$couch
-			->toQuery($s, bool => \@search_bools)
+			->toQuery($s, bool => @search_bools)
 			->toQuery($s, json => qw/endkey end_key key keys start_key startkey/);
 	}
 	else
 	{	$couch
-			->toJSON($s, bool => \@search_bools)
+			->toJSON($s, bool => @search_bools)
 			->toJSON($s, int  => qw/group_level limit skip/);
 	}
 
@@ -523,7 +536,12 @@ sub _viewPrepare($$$)
 
 sub __findValues($$)
 {	my ($self, $result, $raw) = @_;
-	$self->__toDocs($result, +{ %$raw }, db => $self);
+	my @docs = flat $raw->{docs};
+	@docs or return $raw;
+
+	my %data = %$raw;
+	$data{docs} = [ map Couch::DB::Document->_fromResponse($result, $_, db => $self), @docs ];
+	\%data;
 }
 
 sub find($%)

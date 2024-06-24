@@ -1,5 +1,5 @@
 package Crypt::HSM::Slot;
-$Crypt::HSM::Slot::VERSION = '0.016';
+$Crypt::HSM::Slot::VERSION = '0.017';
 use strict;
 use warnings;
 
@@ -22,7 +22,7 @@ Crypt::HSM::Slot - A PKCS11 slot
 
 =head1 VERSION
 
-version 0.016
+version 0.017
 
 =head1 SYNOPSIS
 
@@ -36,7 +36,7 @@ This represents a slot on a PKCS implementation.
 
 =head2 open_session($flags = [])
 
-This opens a session to this slot. C<$flag> is an optional array that may currenlt contain the value C<'rw-session'> to enable writing to the token. This returns a Crypt::HSM::Session object.
+This opens a L<Crypt::HSM::Session|Crypt::HSM::Session> to this slot. C<$flag> is an optional array that may currently contain the value C<'rw-session'> to enable writing to the token.
 
 =head2 mechanisms()
 
@@ -68,7 +68,7 @@ This initializes a token on the slot, with the associalted C<$pin> and C<$label>
 
 =head1 AUTHOR
 
-Leon Timmermans <leont@cpan.org>
+Leon Timmermans <fawaka@gmail.com>
 
 =head1 COPYRIGHT AND LICENSE
 

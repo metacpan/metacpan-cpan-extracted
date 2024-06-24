@@ -11,7 +11,7 @@ require DynaLoader;
 use vars qw(@ISA %EXPORT_TAGS @EXPORT_OK $VERSION);
 @ISA = qw(DynaLoader);
 
-$VERSION = '0.35';
+$VERSION = '0.36';
 
 %EXPORT_TAGS = (
     'all' => [qw(
@@ -521,6 +521,29 @@ Releases prior to UUID-0.32 required libuuid or similar be installed
 first. This is no longer the case. Version 0.33 bundled the e2fsprogs
 UUID code, and version 0.34 removed it altogether.
 
+=head1 BENCHMARKS
+
+There are a few benchmarks in the distribution ubin directory which
+can be run either standalone or through the Makefile.
+
+=head2 make compare
+
+Runs all three of the following tests.
+
+=head2 make speeds
+
+Runs ubin/cmp_speeds.pl to compare the speeds of various UUID
+versions.
+
+=head2 make styles
+
+Runs ubin/cmp_styles.pl to compare different UUID calling styles.
+
+=head2 make persist
+
+Runs ubin/cmp_persist.pl to compare different deferral values for
+persistent state.
+
 =head1 COPYRIGHT AND LICENSE
 
 This software is Copyright (c) 2014-2024 by Rick Myers.
@@ -560,6 +583,8 @@ Slaven Rezic
 twata
 
 Christopher Rasch-Olsen Raa
+
+Petr Pisar
 
 =head1 SEE ALSO
 

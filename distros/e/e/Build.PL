@@ -40,7 +40,7 @@ my $builder = $class->new(
     },
     requires => {
         'perl'              => '5.016',
-        'App::Pod'          => '0.37',
+        'App::Pod'          => '0.38',
         'Data::Printer'     => '0',
         'Data::Trace'       => '1.05',
         'Mojolicious'       => '0',

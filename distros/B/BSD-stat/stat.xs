@@ -1,5 +1,5 @@
 /*
- * $Id: stat.xs,v 1.31 2012/10/23 03:36:24 dankogai Exp $
+ * $Id: stat.xs,v 1.32 2024/06/22 22:28:18 dankogai Exp dankogai $
  */
 
 #include "EXTERN.h"
@@ -56,14 +56,14 @@ st2aref(struct stat *st){
 
     /* same as CORE::stat */
 
-    sva[0]  = sv_2mortal(newSViv(PL_statcache.st_dev     = st->st_dev));
-    sva[1]  = sv_2mortal(newSViv(PL_statcache.st_ino     = st->st_ino));
+    sva[0]  = sv_2mortal(newSVuv(PL_statcache.st_dev     = st->st_dev));
+    sva[1]  = sv_2mortal(newSVuv(PL_statcache.st_ino     = st->st_ino));
     sva[2]  = sv_2mortal(newSVuv(PL_statcache.st_mode    = st->st_mode));
     sva[3]  = sv_2mortal(newSVuv(PL_statcache.st_nlink   = st->st_nlink));
     sva[4]  = sv_2mortal(newSVuv(PL_statcache.st_uid     = st->st_uid));
     sva[5]  = sv_2mortal(newSVuv(PL_statcache.st_gid     = st->st_gid));
-    sva[6]  = sv_2mortal(newSViv(PL_statcache.st_rdev    = st->st_rdev));
-    sva[7]  = sv_2mortal(newSVnv(PL_statcache.st_size    = st->st_size));
+    sva[6]  = sv_2mortal(newSVuv(PL_statcache.st_rdev    = st->st_rdev));
+    sva[7]  = sv_2mortal(newSVuv(PL_statcache.st_size    = st->st_size));
     sva[8]  = sv_2mortal(newSViv(PL_statcache.st_atime   = st->st_atime));
     sva[9]  = sv_2mortal(newSViv(PL_statcache.st_mtime   = st->st_mtime));
     sva[10] = sv_2mortal(newSViv(PL_statcache.st_ctime   = st->st_ctime));

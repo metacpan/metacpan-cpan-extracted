@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 
-use v5.14;
+use v5.22;
 use warnings;
 
 use Test2::V0;
@@ -27,6 +27,13 @@ package CheckerClass
    like( dies { t::test::assert_value( $checker, "bad" ) },
       qr/^Value requires a value satisfying CheckerClass at /,
       'assert_value bad' );
+
+   my $asserter = t::test::make_asserter_sub( $checker );
+   is( dies { $asserter->( "ok" ) }, undef,
+      'asserter OK' );
+   like( dies { $asserter->( "bad" ) },
+      qr/^Value requires a value satisfying CheckerClass at /,
+      'asserter bad' );
 
    t::test::free_checkdata( $checker );
 }

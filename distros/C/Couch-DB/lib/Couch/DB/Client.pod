@@ -257,15 +257,11 @@ returned.
 
 =back
 
-=item $obj-E<gt>B<dbUpdates>()
+=item $obj-E<gt>B<dbUpdates>(\%feed, %options)
 
  [CouchDB API "GET /_db_updates", since 1.4, UNTESTED]
 
 Get a feed of database changes, mainly for debugging purposes.
-
-All %options are used as parameters: C<feed> (type),
-C<timeout> (milliseconds!, default 60_000),
-C<heartbeat> (milliseconds, default 60_000), C<since> (sequence ID).
 
 =item $obj-E<gt>B<node>()
 
@@ -362,7 +358,7 @@ not be lost.
 
 Returns a true value when the server status is "ok".
 
-=item $obj-E<gt>B<serverStatus>()
+=item $obj-E<gt>B<serverStatus>(%options)
 
  [CouchDB API "GET /_up", since 2.0, UNTESTED]
 
@@ -377,8 +373,8 @@ Returns the version of the server software, as version object.
 
 =head1 SEE ALSO
 
-This module is part of Couch-DB distribution version 0.004,
-built on June 17, 2024. Website: F<http://perl.overmeer.net/CPAN/>
+This module is part of Couch-DB distribution version 0.005,
+built on June 23, 2024. Website: F<http://perl.overmeer.net/CPAN/>
 
 =head1 LICENSE
 

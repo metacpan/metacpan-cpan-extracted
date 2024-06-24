@@ -1,13 +1,15 @@
 package CXC::DB::DDL::Table;
 
+# ABSTRACT: CXC::DB::DDL Table class
+
 use v5.26;
 use strict;
 use warnings;
 
-our $VERSION = '0.13';
+our $VERSION = '0.14';
 
 use List::Util qw( any );
-use Ref::Util  qw( is_ref is_arrayref );
+use Ref::Util  qw( is_ref is_arrayref is_coderef);
 
 use CXC::DB::DDL::Failure;
 use CXC::DB::DDL::Constants -all;
@@ -89,14 +91,31 @@ has indexes => (
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
 has constraints => (
     is         => 'lazy',
-    isa        => ArrayRef [Constraint],
+    isa        => ArrayRef->of( Constraint )->plus_coercions( Constraint, q{ [$_] } ),
     coerce     => 1,
     clearer    => 1,
     cloneclear => 1,
     builder    => sub { [] },
 );
+
+
+
+
 
 
 
@@ -121,7 +140,7 @@ has checks => (
 has fields => (
     is  => 'lazy',
     isa => ArrayRef( [ InstanceOf ['CXC::DB::DDL::Field'] ] )
-      ->plus_coercions( ArrayRef [HashRef], sub { [ map CXC::DB::DDL::Field->new( $_ ), $_->@* ] }, ),
+      ->plus_coercions( ArrayRef [HashRef], q{ [ map CXC::DB::DDL::Field->new( $_ ), $_->@* ] }, ),
     clearer    => 1,
     cloneclear => 1,
     coerce     => 1,
@@ -200,10 +219,12 @@ sub to_sqlt ( $self, $dbh, $schema ) {
             sprintf( 'error adding index %s: %s', $attr{name}, $sqlt_table->error, ) );
     }
 
+    my $cstr = 'cstr000';
     for my $constraint ( $self->constraints->@* ) {
 
         my %attr = $constraint->%*;
 
+        # replace fields => '-all' with all of the fields.
         if ( defined( my $fields = $attr{fields} ) ) {
             $attr{fields} = $self->field_names
               if !ref $fields && $fields eq '-all';
@@ -213,14 +234,19 @@ sub to_sqlt ( $self, $dbh, $schema ) {
         $attr{name} //= join(
             '_',
             $self->_name,    # name without schema
-            'cstr',
+            ++$cstr,
             lc( $attr{type} =~ s/\s+/_/gr ),
-            (
+            defined( $attr{fields} )
+            ? (
                 is_arrayref( $attr{fields} )
                 ? $attr{fields}->@*
-                : $attr{fields}
-            ),
+                : $attr{fields} )
+            : (),
         );
+
+        if ( is_coderef( my $expr = $attr{expression} ) ) {
+            $attr{expression} = $expr->( $dbh, $schema->translator, $constraint );
+        }
 
         $sqlt_table->add_constraint( %attr )
           or CXC::DB::DDL::Failure::ddl->throw(
@@ -340,11 +366,11 @@ __END__
 
 =head1 NAME
 
-CXC::DB::DDL::Table
+CXC::DB::DDL::Table - CXC::DB::DDL Table class
 
 =head1 VERSION
 
-version 0.13
+version 0.14
 
 =head1 OBJECT ATTRIBUTES
 
@@ -366,9 +392,26 @@ The list of table indexes
 
 =head2 constraints
 
-The list of table constraints
+One or more table constraints, either as a single constraint or an
+array of constraints.
+
+The constraints must meet the L<CXC::DB::DDL::Types/Constraint> type.
+
+If the constraint attribute B<expression> is a coderef, it is called as
+
+   $expression->( $dbh, $sqlt, $constraint )
+
+where B<$dbh> is L<DBI> handle,  B<$sqlt> is the L<SQL::Translator> object, and must return a scalar
+containing the final expression. This is typically used to ensure that identifiers are properly quoted.
+See L<DBI/quote> and L<DBI/quote_identifier>.
+
+B<$dbh>, B<$sqlt> and B<$constraint> must B<not> be changed.
 
 =head2 checks
+
+DEPRECATED; add an entry to L</constraints> with fields
+
+   type => CHECK_C, expression => $expr
 
 The list of table check constraints
 

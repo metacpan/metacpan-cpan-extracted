@@ -21,11 +21,6 @@
 severity = brutal
 verbose  = [%p] %m at line %l, column %c. (Severity: %s) - %f - %r\n
 
-# ===================== Revisit ======================= #
-
-# we need to get rid of the forked ttree
-[-Miscellanea::ProhibitUnrestrictedNoCritic]
-[-Miscellanea::ProhibitUselessNoCritic]
 
 # =============== Temporarily Disabled ================ #
 

@@ -1,6 +1,6 @@
 package testcase;
 
-use v5.14;
+use v5.22;
 use warnings;
 
 use lib "t/blib", "t/blib/arch";

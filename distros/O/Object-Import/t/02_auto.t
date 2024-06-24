@@ -1,5 +1,5 @@
 use warnings; no warnings qw"prototype"; use strict;
-use Test::More tests => 39;
+use Test::More tests => 41;
 
 BEGIN { 
 $::W4 = 0;
@@ -92,6 +92,7 @@ our %nm2;
 use Object::Import bless(["bunny"], X1B::);
 use Object::Import bless(["package"], X1B::), suffix => "er", savenames => \%nm2, debug => 0;
 use Object::Import bless(["package"], X1B::), prefix => "mal";
+use Object::Import bless(["package"], X1B::), prefix => "well_";
 use Object::Import bless(["package"], X1B::), prefix => "bis", underscore => 1;
 
 ok(defined(&{$_}), "G2 def\&$_") for qw"greet getprotobynumb greeter coser bis_frobnicate";
@@ -100,6 +101,8 @@ is_deeply(\%nm2, {greeter => 1, coser => 1}, "G2 savenames");
 
 is(greet(), "hello bunny", "G2 &greet");
 is(greeter(), "hello package", "G2 &greeter");
+is(well_greet(), "hello package", "G2 &greeter");
+is(malgreet(), "hello package", "G2 &greeter");
 is(cos(0), 1, "G2 COREcos");
 is(getprotobynumber(1), "icmp", "G2 COREgetprotobynumber");
 }

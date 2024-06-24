@@ -19,7 +19,12 @@
 
 #include "DataChecks.h"
 
-#line 23 "t/test.c"
+#define HAVE_PERL_VERSION(R, V, S) \
+    (PERL_REVISION > (R) || (PERL_REVISION == (R) && (PERL_VERSION > (V) || (PERL_VERSION == (V) && (PERL_SUBVERSION >= (S))))))
+
+#include "optree-additions.c.inc"
+
+#line 28 "t/test.c"
 #ifndef PERL_UNUSED_VAR
 #  define PERL_UNUSED_VAR(var) if (0) var = var
 #endif
@@ -163,7 +168,7 @@ S_croak_xs_usage(const CV *const cv, const char *const params)
 #  define newXS_deffile(a,b) Perl_newXS_deffile(aTHX_ a,b)
 #endif
 
-#line 167 "t/test.c"
+#line 172 "t/test.c"
 
 XS_EUPXS(XS_t__test_make_checkdata); /* prototype to pass -Wmissing-prototypes */
 XS_EUPXS(XS_t__test_make_checkdata)
@@ -180,10 +185,10 @@ XS_EUPXS(XS_t__test_make_checkdata)
 ;
 	SV *	constraint = ST(2)
 ;
-#line 21 "t/test.xs"
+#line 26 "t/test.xs"
     RETVAL = make_checkdata(checkspec);
     gen_assertmess(RETVAL, name, constraint);
-#line 187 "t/test.c"
+#line 192 "t/test.c"
 	XSprePUSH;
 	PUSHi(PTR2IV(RETVAL));
     }
@@ -244,6 +249,43 @@ XS_EUPXS(XS_t__test_assert_value)
     XSRETURN_EMPTY;
 }
 
+
+XS_EUPXS(XS_t__test_make_asserter_sub); /* prototype to pass -Wmissing-prototypes */
+XS_EUPXS(XS_t__test_make_asserter_sub)
+{
+    dVAR; dXSARGS;
+    if (items != 1)
+       croak_xs_usage(cv,  "checker");
+    {
+	SV *	RETVAL;
+	struct DataChecks_Checker *	checker = INT2PTR(struct DataChecks_Checker *,SvIV(ST(0)))
+;
+#line 39 "t/test.xs"
+  {
+    if(!PL_parser) {
+      /* We need to generate just enough of a PL_parser to keep newSTATEOP()
+       * happy, otherwise it will SIGSEGV
+       */
+      SAVEVPTR(PL_parser);
+      Newxz(PL_parser, 1, yy_parser);
+      SAVEFREEPV(PL_parser);
+
+      PL_parser->copline = NOLINE;
+      PL_parser->preambling = NOLINE;
+    }
+
+    I32 floorix = start_subparse(FALSE, 0);
+    OP *body = make_assertop(checker, newSLUGOP(0));
+    CV *cv = newATTRSUB(floorix, NULL, NULL, NULL, body);
+    RETVAL = newRV_noinc((SV *)cv);
+  }
+#line 283 "t/test.c"
+	RETVAL = sv_2mortal(RETVAL);
+	ST(0) = RETVAL;
+    }
+    XSRETURN(1);
+}
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -276,13 +318,14 @@ XS_EXTERNAL(boot_t__test)
         newXS_deffile("t::test::free_checkdata", XS_t__test_free_checkdata);
         newXS_deffile("t::test::check_value", XS_t__test_check_value);
         newXS_deffile("t::test::assert_value", XS_t__test_assert_value);
+        newXS_deffile("t::test::make_asserter_sub", XS_t__test_make_asserter_sub);
 
     /* Initialisation Section */
 
-#line 33 "t/test.xs"
+#line 61 "t/test.xs"
   boot_data_checks(0);
 
-#line 286 "t/test.c"
+#line 329 "t/test.c"
 
     /* End of Initialisation Section */
 

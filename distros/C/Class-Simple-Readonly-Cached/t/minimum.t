@@ -10,7 +10,7 @@ BEGIN {
 			require Test::MinimumVersion;
 		};
 		if($@) {
-			plan(skip_all => 'Test::MininumVersion not installed');
+			plan(skip_all => 'Test::MinimumVersion not installed');
 		} else {
 			import Test::MinimumVersion;
 			all_minimum_version_ok('5.8');

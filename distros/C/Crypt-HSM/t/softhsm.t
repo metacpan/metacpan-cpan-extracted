@@ -90,13 +90,13 @@ note unpack('H*', $signature);
 ok $session->verify('sha256-rsa-pkcs-pss', $public_key, $plain_text, $signature);
 }
 
-my $attributes = $session->get_attributes($public_key, [ 'modulus', 'public-exponent' ]);
+my $attributes = $public_key->get_attributes([ 'modulus', 'public-exponent' ]);
 
 note 'modulus: ', unpack('H*', $attributes->{modulus});
 note 'exponent: ', unpack('H*', $attributes->{'public-exponent'});
 
-$session->destroy_object($public_key);
-$session->destroy_object($private_key);
+$public_key->destroy_object;
+$private_key->destroy_object;
 
 my $aes_key = $session->generate_key('aes-key-gen', { 'value-len' => 32, token => 0 });
 

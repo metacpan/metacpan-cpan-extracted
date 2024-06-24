@@ -9,9 +9,9 @@ use Log::ger;
 use Exporter 'import';
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2024-06-16'; # DATE
+our $DATE = '2024-06-17'; # DATE
 our $DIST = 'App-BPOMUtils-NutritionFacts'; # DIST
-our $VERSION = '0.026'; # VERSION
+our $VERSION = '0.027'; # VERSION
 
 our @EXPORT_OK = qw(
                        bpom_show_nutrition_facts
@@ -90,6 +90,31 @@ _
         sugar         => {summary => 'Total sugar, in g/100g'         , schema => 'ufloat*', req=>1},
         sodium        => {summary => 'Sodium, in mg/100g'             , schema => 'ufloat*', req=>1, cmdline_aliases=>{salt=>{}}},
         va            => {summary => 'Vitamin A, in mcg/100g (all-trans-)retinol', schema => 'ufloat*'},
+        vd            => {summary => 'Vitamin D, in mcg', schema => 'ufloat*'},
+        ve            => {summary => 'Vitamin E, in mg alpha-TE (tocopherol-equivalent)', schema => 'ufloat*'},
+        vk            => {summary => 'Vitamin K, in mcg', schema => 'ufloat*'},
+        vb1           => {summary => 'Vitamin B1, in mg/100g', schema => 'ufloat*'},
+        vb2           => {summary => 'Vitamin B2, in mg/100g', schema => 'ufloat*'},
+        vb3           => {summary => 'Vitamin B3, in mg/100g', schema => 'ufloat*'},
+        vb5           => {summary => 'Vitamin B5 (pantothenic acid), in mg/100g', schema => 'ufloat*'},
+        vb6           => {summary => 'Vitamin B6, in mg/100g', schema => 'ufloat*'},
+        folate        => {summary => 'Folate (vitamin B9), in mcg/100g', schema => 'ufloat*'},
+        vb12          => {summary => 'Vitamin B12, in mcg/100g', schema => 'ufloat*'},
+        biotin        => {summary => 'Biotin, in mcg/100g', schema => 'ufloat*'},
+        choline       => {summary => 'Choline, in mg/100g', schema => 'ufloat*'},
+        vc            => {summary => 'Vitamin C, in mg/100g', schema => 'ufloat*'},
+        ca            => {summary => 'Calcium, in mg/100g', schema => 'ufloat*'},
+        phosphorus    => {summary => 'Phosphorus, in mg/100g', schema => 'ufloat*'},
+        mg            => {summary => 'Magnesium, in mg/100g', schema => 'ufloat*'},
+        k             => {summary => 'Potassium, in mg/100g', schema => 'ufloat*'},
+        mn            => {summary => 'Manganese, in mcg/100g', schema => 'ufloat*'},
+        cu            => {summary => 'Copper, in mcg/100g', schema => 'ufloat*'},
+        cr            => {summary => 'Chromium, in mcg/100g', schema => 'ufloat*'},
+        fe            => {summary => 'Iron, in mg/100g', schema => 'ufloat*'},
+        iodium        => {summary => 'Iodium, in mcg/100g', schema => 'ufloat*'},
+        zn            => {summary => 'Zinc, in mg/100g', schema => 'ufloat*'},
+        se            => {summary => 'Selenium, in mcg/100g', schema => 'ufloat*'},
+        fluorine      => {summary => 'Fluorine, in mg/100g', schema => 'ufloat*'},
 
         serving_size  => {summary => 'Serving size, in g'             , schema => 'ufloat*', req=>1},
         package_size  => {summary => 'Packaging size, in g'           , schema => 'ufloat*', req=>1},
@@ -711,19 +736,25 @@ sub bpom_show_nutrition_facts {
                 else               { _nearest(5, $val) }
             };
 
-          VITAMIN_A: {
-                my $val0 = $args{va};
+            my $do_vm = sub {
+                my ($name_ind, $val0, $akg, $unit, $name_eng) = @_;
+
+                $name_eng //= $name_ind;
                 my $val  = $val0*$args{$size_key}/100;
-                my $pct_dv = $val/600 *100;
+                my $pct_dv = $val/$akg *100;
                 my $pct_dv_R = $code_round_vitamin_mineral_pct_dv->($pct_dv, $pct_dv);
+                if ($pct_dv_R < 2) {
+                    warn "$name_eng value is below 2% AKG, skipped showing in nutrition facts\n";
+                    return;
+                }
                 $funcraw->{va_pct_dv_per_srv} = $pct_dv           if !$per_package_ing;
                 $funcraw->{va_pct_dv_per_srv_rounded} = $pct_dv_R if !$per_package_ing;
                 $funcraw->{va_pct_dv_per_pkg} = $pct_dv           if  $per_package_ing;
                 $funcraw->{va_pct_dv_per_pkg_rounded} = $pct_dv_R if  $per_package_ing;
                 if ($output_format eq 'raw_table') {
                     push @rows_vm, {
-                        name_eng => 'Vitamin A',
-                        name_ind => 'Vitamin A',
+                        name_eng => $name_eng,
+                        name_ind => $name_ind,
                         val_per_100g  => $val0,
                         (val_per_srv   => $val) x (!$per_package_ing ? 1:0),
                         (val_per_pkg   => $val) x ( $per_package_ing ? 1:0),
@@ -731,24 +762,50 @@ sub bpom_show_nutrition_facts {
                         pct_dv_R => $pct_dv_R,
                     };
                 } elsif ($output_format =~ /vertical/) {
-                    push @rows_vm, [{}, {colspan=>2, $attr=>$code_fmttext->("Vitamin A")}, {colspan=>2, align=>'right', $attr=>$code_fmttext->("$pct_dv_R %")}];
+                    push @rows_vm, [{}, {colspan=>2, $attr=>$code_fmttext->($name_ind)}, {colspan=>2, align=>'right', $attr=>$code_fmttext->("$pct_dv_R %")}];
                 } elsif ($output_format =~ /linear/) {
-                    push @rows_vm, $code_fmttext->("Vitamin A ($pct_dv_R% AKG)");
+                    push @rows_vm, $code_fmttext->("$name_ind ($pct_dv_R% AKG)");
                 } elsif ($output_format =~ /calculation/) {
-                    push @rows_vm, [{colspan=>2, align=>'middle', $attr=>$code_fmttext->('*Vitamin A*')}];
-                    push @rows_vm, [{align=>'right', text=>'Vitamin A 100 g'},
-                                     {align=>'left', $attr=>"= $args{va} mcg all-trans retinol"}];
+                    push @rows_vm, [{colspan=>2, align=>'middle', $attr=>$code_fmttext->("*$name_ind*")}];
+                    push @rows_vm, [{align=>'right', text=>"$name_ind per 100 g"},
+                                     {align=>'left', $attr=>"= $args{va} $unit"}];
                     push @rows_vm, [{align=>'right', text=>"Vitamin A total per ".($per_package_ing ? "kemasan $args{package_size} g" : "takaran saji $args{serving_size} g")},
-                                     {align=>'left', $attr=>"= $val0 $M $args{$size_key} / 100 = $val g"}];
+                                     {align=>'left', $attr=>"= $val0 $M $args{$size_key} / 100 = $val $unit"}];
                     push @rows_vm, ['', ''];
-                    push @rows_vm, [{colspan=>2, align=>'middle', $attr=>$code_fmttext->('*%AKG Vitamin A*')}];
+                    push @rows_vm, [{colspan=>2, align=>'middle', $attr=>$code_fmttext->("*%AKG $name_ind*")}];
                     push @rows_vm, [{align=>'right', text=>"\%AKG"},
-                                    {align=>'left', $attr=>"= $val / 600 $M 100 = $pct_dv"}];
+                                    {align=>'left', $attr=>"= $val / $akg $M 100 = $pct_dv"}];
                     push @rows_vm, [{align=>'right', text=>"(dibulatkan [<=10% AKG -> 2% terdekat, >10% AKG -> 5% terdekat])"},
                                     {align=>'left', $attr=>$code_fmttext->("= *$pct_dv_R*")}];
                 }
-            } # VITAMIN_A
+            }; # do_vm
 
+            $do_vm->("Vitamin A", $args{va}, 600, "mcg (all-trans-)retinol") if $args{va};
+            $do_vm->("Vitamin D", $args{vd}, 15, "mcg") if $args{vd};
+            $do_vm->("Vitamin E", $args{ve}, 15, "mg alpha-TE (tocopherol-equivalent)") if $args{ve};
+            $do_vm->("Vitamin K", $args{vk}, 60, "mcg") if $args{vk};
+            $do_vm->("Vitamin B1", $args{vb1}, 1.4, "mg") if $args{vb1};
+            $do_vm->("Vitamin B2", $args{vb2}, 1.6, "mg") if $args{vb2};
+            $do_vm->("Vitamin B3", $args{vb3}, 15, "mg") if $args{vb3};
+            $do_vm->("Vitamin B5", $args{vb5}, 5, "mg") if $args{vb5};
+            $do_vm->("Vitamin B6", $args{vb6}, 1.3, "mg") if $args{vb6};
+            $do_vm->("Folat", $args{folate}, 400, "mcg", "Folate") if $args{folate};
+            $do_vm->("Vitamin B12", $args{vb12}, 2.4, "mcg") if $args{vb12};
+            $do_vm->("Biotin", $args{biotin}, 30, "mcg") if $args{biotin};
+            $do_vm->("Kolin", $args{choline}, 450, "mg", "Choline") if $args{choline};
+            $do_vm->("Vitamin C", $args{vc}, 90, "mg") if $args{vc};
+            $do_vm->("Kalsium", $args{ca}, 1100, "mg", "Calcium") if $args{ca};
+            $do_vm->("Fosfor", $args{phosphorus}, 700, "mg", "Phosphorus") if $args{phosphorus};
+            $do_vm->("Magnesium", $args{mg}, 350, "mg") if $args{mg};
+            $do_vm->("Kalium", $args{potassium}, 4700, "mg", "Potassium") if $args{potassium};
+            $do_vm->("Mangan", $args{mn}, 2000, "mcg", "Manganese") if $args{mn};
+            $do_vm->("Tembaga", $args{cu}, 800, "mcg", "Copper") if $args{cu};
+            $do_vm->("Kromium", $args{cr}, 26, "mcg", "Chromium") if $args{cr};
+            $do_vm->("Besi", $args{fe}, 22, "mg", "Iron") if $args{fe};
+            $do_vm->("Iodium", $args{iodium}, 90, "mcg", "Iodium") if $args{iodium};
+            $do_vm->("Seng", $args{zn}, 13, "mg", "Zinc") if $args{zn};
+            $do_vm->("Selenium", $args{se}, 30, "mcg") if $args{se};
+            $do_vm->("Fluor", $args{fluorine}, 2.5, "mg", "Fluorine") if $args{fluorine};
         } # VITAMIN_MINERAL
 
         my @rows_nn;
@@ -772,7 +829,11 @@ sub bpom_show_nutrition_facts {
             }
         }
 
-        push @rows, @rows_vm, @rows_nn;
+        if ($output_format =~ /linear/) {
+            push @rows, join(", ", @rows_vm, @rows_nn), (@rows_vm || @rows_nn ? ". " : "");
+        } else {
+            push @rows, @rows_vm, @rows_nn;
+        }
 
     } # VITAMIN_MINERAL_NONNUTRIENTS
 
@@ -869,7 +930,7 @@ App::BPOMUtils::NutritionFacts - Utilities related to BPOM nutrition facts
 
 =head1 VERSION
 
-This document describes version 0.026 of App::BPOMUtils::NutritionFacts (from Perl distribution App-BPOMUtils-NutritionFacts), released on 2024-06-16.
+This document describes version 0.027 of App::BPOMUtils::NutritionFacts (from Perl distribution App-BPOMUtils-NutritionFacts), released on 2024-06-17.
 
 =head1 SYNOPSIS
 
@@ -920,7 +981,7 @@ Result:
  [
    200,
    "OK",
-   "*INFORMASI NILAI GIZI*   *JUMLAH PER KEMASAN (20 g)* : *Energi total 10 kkal*, Energi dari lemak 0 kkal, Energi dari lemak jenuh 0 kkal, *Lemak total 0 g (0% AKG)*, *Lemak jenuh 0 g (0% AKG)*, *Protein 0 g (0% AKG)*, *Karbohidrat total 3 g (1% AKG)*, *Gula 1 g*, *Garam (Natrium) 0 mg (0% AKG)*. Vitamin A (0% AKG)/Persen AKG berdasarkan kebutuhan energi 2150 kkal. Kebutuhan energi Anda mungkin lebih tinggi atau lebih rendah./\n",
+   "*INFORMASI NILAI GIZI*   *JUMLAH PER KEMASAN (20 g)* : *Energi total 10 kkal*, Energi dari lemak 0 kkal, Energi dari lemak jenuh 0 kkal, *Lemak total 0 g (0% AKG)*, *Lemak jenuh 0 g (0% AKG)*, *Protein 0 g (0% AKG)*, *Karbohidrat total 3 g (1% AKG)*, *Gula 1 g*, *Garam (Natrium) 0 mg (0% AKG)*. /Persen AKG berdasarkan kebutuhan energi 2150 kkal. Kebutuhan energi Anda mungkin lebih tinggi atau lebih rendah./\n",
    {
      "cmdline.skip_format" => 1,
      "func.raw" => {
@@ -945,8 +1006,6 @@ Result:
        total_fat_per_pkg_rounded                 => 0,
        total_sugar_per_pkg                       => 1.4346,
        total_sugar_per_pkg_rounded               => 1,
-       va_pct_dv_per_pkg                         => 0,
-       va_pct_dv_per_pkg_rounded                 => 0,
      },
    },
  ]
@@ -971,7 +1030,7 @@ Result:
  [
    200,
    "OK",
-   ".---------------------------------------------------------------------------------.\n| *INFORMASI NILAI GIZI* *JUMLAH PER KEMASAN (20 g)* : *Energi total 10 kkal*,    |\n| Energi dari lemak 0 kkal, Energi dari lemak jenuh 0 kkal, *Lemak total 0 g (0%  |\n| AKG)*, *Lemak jenuh 0 g (0% AKG)*, *Protein 0 g (0% AKG)*, *Karbohidrat total 3 |\n| g (1% AKG)*, *Gula 1 g*, *Garam (Natrium) 0 mg (0% AKG)*. Vitamin A (0%         |\n| AKG)/Persen AKG berdasarkan kebutuhan energi 2150 kkal. Kebutuhan energi Anda   |\n| mungkin lebih tinggi atau lebih rendah./                                        |\n`---------------------------------------------------------------------------------'\n",
+   ".---------------------------------------------------------------------------------.\n| *INFORMASI NILAI GIZI* *JUMLAH PER KEMASAN (20 g)* : *Energi total 10 kkal*,    |\n| Energi dari lemak 0 kkal, Energi dari lemak jenuh 0 kkal, *Lemak total 0 g (0%  |\n| AKG)*, *Lemak jenuh 0 g (0% AKG)*, *Protein 0 g (0% AKG)*, *Karbohidrat total 3 |\n| g (1% AKG)*, *Gula 1 g*, *Garam (Natrium) 0 mg (0% AKG)*. /Persen AKG           |\n| berdasarkan kebutuhan energi 2150 kkal. Kebutuhan energi Anda mungkin lebih     |\n| tinggi atau lebih rendah./                                                      |\n`---------------------------------------------------------------------------------'\n",
    {
      "cmdline.skip_format" => 1,
      "func.raw" => {
@@ -996,8 +1055,6 @@ Result:
        total_fat_per_pkg_rounded                 => 0,
        total_sugar_per_pkg                       => 1.4346,
        total_sugar_per_pkg_rounded               => 1,
-       va_pct_dv_per_pkg                         => 0,
-       va_pct_dv_per_pkg_rounded                 => 0,
      },
    },
  ]
@@ -1021,7 +1078,7 @@ Result:
  [
    200,
    "OK",
-   "\n<style>\n  table.vertical_html_table { border-collapse: collapse; border: solid 1pt black; }\n  table.vertical_html_table tr.has_bottom_border { border-bottom: solid 1pt black; }\n</style>\n<table class=\"vertical_html_table\"><colgroup><col style=\"width:16pt;\"><col style=\"width:200pt;\"><col style=\"width:48pt;\"><col style=\"width:48pt;\"><col style=\"width:36pt;\"></colgroup>\n<tbody>\n<tr><td colspan=5 align=\"middle\"><b>INFORMASI NILAI GIZI</b></td></tr>\n<tr><td colspan=5></td></tr>\n<tr><td colspan=5 align=\"left\"><b>JUMLAH PER KEMASAN (20 g)</b></td></tr>\n<tr class=has_bottom_border><td colspan=5><b>Energi total 10 kkal</b></td></tr>\n<tr><td colspan=3></td><td colspan=2 align=\"middle\"><b>% AKG</b>*</td></tr>\n<tr><td colspan=2><b>Lemak total</b></td><td align=\"right\"><b>0 g</b></td><td align=\"right\">0 %</td><td></td></tr>\n<tr><td colspan=2><b>Lemak jenuh</b></td><td align=\"right\"><b>0 g</b></td><td align=\"right\">0 %</td><td></td></tr>\n<tr><td colspan=2><b>Protein</b></td><td align=\"right\"><b>0 g</b></td><td align=\"right\">0 %</td><td></td></tr>\n<tr><td colspan=2><b>Karbohidrat total</b></td><td align=\"right\"><b>3 g</b></td><td align=\"right\">1 %</td><td></td></tr>\n<tr><td colspan=2><b>Gula</b></td><td align=\"right\"><b>1 g</b></td><td></td><td></td></tr>\n<tr class=has_bottom_border><td colspan=2><b>Garam (Natrium)</b></td><td align=\"right\"><b>0 mg</b></td><td align=\"right\">0 %</td><td></td></tr>\n<tr><td colspan=5>Vitamin dan mineral</td></tr>\n<tr class=has_bottom_border><td></td><td colspan=2>Vitamin A</td><td colspan=2 align=\"right\">0 %</td></tr>\n<tr><td colspan=5><i>*Persen AKG berdasarkan kebutuhan energi 2150 kkal. Kebutuhan energi Anda mungkin lebih tinggi atau lebih rendah.</i></td></tr>\n</tbody>\n</table>\n",
+   "\n<style>\n  table.vertical_html_table { border-collapse: collapse; border: solid 1pt black; }\n  table.vertical_html_table tr.has_bottom_border { border-bottom: solid 1pt black; }\n</style>\n<table class=\"vertical_html_table\"><colgroup><col style=\"width:16pt;\"><col style=\"width:200pt;\"><col style=\"width:48pt;\"><col style=\"width:48pt;\"><col style=\"width:36pt;\"></colgroup>\n<tbody>\n<tr><td colspan=5 align=\"middle\"><b>INFORMASI NILAI GIZI</b></td></tr>\n<tr><td colspan=5></td></tr>\n<tr><td colspan=5 align=\"left\"><b>JUMLAH PER KEMASAN (20 g)</b></td></tr>\n<tr class=has_bottom_border><td colspan=5><b>Energi total 10 kkal</b></td></tr>\n<tr><td colspan=3></td><td colspan=2 align=\"middle\"><b>% AKG</b>*</td></tr>\n<tr><td colspan=2><b>Lemak total</b></td><td align=\"right\"><b>0 g</b></td><td align=\"right\">0 %</td><td></td></tr>\n<tr><td colspan=2><b>Lemak jenuh</b></td><td align=\"right\"><b>0 g</b></td><td align=\"right\">0 %</td><td></td></tr>\n<tr><td colspan=2><b>Protein</b></td><td align=\"right\"><b>0 g</b></td><td align=\"right\">0 %</td><td></td></tr>\n<tr><td colspan=2><b>Karbohidrat total</b></td><td align=\"right\"><b>3 g</b></td><td align=\"right\">1 %</td><td></td></tr>\n<tr><td colspan=2><b>Gula</b></td><td align=\"right\"><b>1 g</b></td><td></td><td></td></tr>\n<tr class=has_bottom_border><td colspan=2><b>Garam (Natrium)</b></td><td align=\"right\"><b>0 mg</b></td><td align=\"right\">0 %</td><td></td></tr>\n<tr><td colspan=5><i>*Persen AKG berdasarkan kebutuhan energi 2150 kkal. Kebutuhan energi Anda mungkin lebih tinggi atau lebih rendah.</i></td></tr>\n</tbody>\n</table>\n",
    {
      "cmdline.skip_format" => 1,
      "func.raw" => {
@@ -1046,8 +1103,6 @@ Result:
        total_fat_per_pkg_rounded                 => 0,
        total_sugar_per_pkg                       => 1.4346,
        total_sugar_per_pkg_rounded               => 1,
-       va_pct_dv_per_pkg                         => 0,
-       va_pct_dv_per_pkg_rounded                 => 0,
      },
    },
  ]
@@ -1072,7 +1127,7 @@ Result:
  [
    200,
    "OK",
-   ".---------------------------------------------------------------------------------------------------------------------.\n|                                               *INFORMASI NILAI GIZI*                                                |\n|                                                                                                                     |\n| *JUMLAH PER KEMASAN (20 g)*                                                                                         |\n| *Energi total 10 kkal*                                                                                              |\n+-----------------------|----------------------|-----------------------+----------------------|-----------------------+\n|                                                                      |                   *% AKG**                   |\n| *Lemak total*                                |                 *0 g* |                  0 % |                       |\n| *Lemak jenuh*                                |                 *0 g* |                  0 % |                       |\n| *Protein*                                    |                 *0 g* |                  0 % |                       |\n| *Karbohidrat total*                          |                 *3 g* |                  1 % |                       |\n| *Gula*                                       |                 *1 g* |                      |                       |\n| *Garam (Natrium)*                            |                *0 mg* |                  0 % |                       |\n+-----------------------|----------------------+-----------------------+----------------------+-----------------------+\n| Vitamin dan mineral                                                                                                 |\n|                       | Vitamin A                                    |                                          0 % |\n+-----------------------+----------------------|-----------------------+----------------------|-----------------------+\n| /*Persen AKG berdasarkan kebutuhan energi 2150 kkal. Kebutuhan energi Anda mungkin lebih tinggi atau lebih rendah./ |\n`---------------------------------------------------------------------------------------------------------------------'\n",
+   ".---------------------------------------------------------------------------------------------------------------------.\n|                                               *INFORMASI NILAI GIZI*                                                |\n|                                                                                                                     |\n| *JUMLAH PER KEMASAN (20 g)*                                                                                         |\n| *Energi total 10 kkal*                                                                                              |\n+-----------------------|----------------------|-----------------------+----------------------|-----------------------+\n|                                                                      |                   *% AKG**                   |\n| *Lemak total*                                |                 *0 g* |                  0 % |                       |\n| *Lemak jenuh*                                |                 *0 g* |                  0 % |                       |\n| *Protein*                                    |                 *0 g* |                  0 % |                       |\n| *Karbohidrat total*                          |                 *3 g* |                  1 % |                       |\n| *Gula*                                       |                 *1 g* |                      |                       |\n| *Garam (Natrium)*                            |                *0 mg* |                  0 % |                       |\n+-----------------------|----------------------+-----------------------+----------------------+-----------------------+\n| /*Persen AKG berdasarkan kebutuhan energi 2150 kkal. Kebutuhan energi Anda mungkin lebih tinggi atau lebih rendah./ |\n`---------------------------------------------------------------------------------------------------------------------'\n",
    {
      "cmdline.skip_format" => 1,
      "func.raw" => {
@@ -1097,8 +1152,6 @@ Result:
        total_fat_per_pkg_rounded                 => 0,
        total_sugar_per_pkg                       => 1.4346,
        total_sugar_per_pkg_rounded               => 1,
-       va_pct_dv_per_pkg                         => 0,
-       va_pct_dv_per_pkg_rounded                 => 0,
      },
    },
  ]
@@ -1123,7 +1176,7 @@ Result:
  [
    200,
    "OK",
-   ".-------------------------------------------------------------------------------------------------------------------------------------------------------------------------.\n|                                                                   *PERHITUNGAN INFORMASI NILAI GIZI*                                                                    |\n|                                                                             *Energi total*                                                                              |\n|                                                  Energi total per 100 g | = lemak \xD7 9 + protein \xD7 4 + karbohidrat \xD7 4 = 0.223 \xD7 9 + 0.99 \xD7 4 + 13.113 \xD7 4 = 58.419 kkal |\n|                                           Energi total per kemasan 20 g | = 58.419 \xD7 20 / 100 = 11.6838 kkal                                                            |\n| (dibulatkan: <5 -> 0, <=50 -> 5 kkal terdekat, >50 -> 10 kkal terdekat) | = *10* kkal                                                                                   |\n|                                                                         |                                                                                               |\n|                                                                           *%AKG energi total*                                                                           |\n|                                                                    %AKG | = 11.6838 / 2150 \xD7 100 = 0.543432558139535                                                    |\n|                                              (dibulatkan ke % terdekat) | = *1*                                                                                         |\n|                                                                           *Energi dari lemak*                                                                           |\n|                                             Energi dari lemak per 100 g | = lemak \xD7 9 = 0.223 \xD7 9 = 2.007 kkal                                                          |\n|                                      Energi dari lemak per kemasan 20 g | = 2.007 \xD7 20 / 100 = 3.51225 kkal                                                             |\n| (dibulatkan: <5 -> 0, <=50 -> 5 kkal terdekat, >50 -> 10 kkal terdekat) | = *0* kkal                                                                                    |\n|                                                                        *Energi dari lemak jenuh*                                                                        |\n|                                             Energi dari lemak per 100 g | = lemak jenuh \xD7 9 = 0.01 \xD7 9 = 0.09 kkal                                                      |\n|                                Energi dari lemak jenuh per kemasan 20 g | = 0.09 \xD7 20 / 100 = 0.018 kkal                                                                |\n| (dibulatkan: <5 -> 0, <=50 -> 5 kkal terdekat, >50 -> 10 kkal terdekat) | = *0* kkal                                                                                    |\n|                                                                              *Lemak total*                                                                              |\n|                                                   Lemak total per 100 g | = 0.223 g                                                                                     |\n|                                            Lemak total per kemasan 20 g | = 0.223 \xD7 20 / 100 = 0.0446 g                                                                 |\n|     (dibulatkan: <0.5 -> 0, <=5 -> 0.5 g terdekat, >=5 -> 1 g terdekat) | = *0* g                                                                                       |\n|                                                                         |                                                                                               |\n|                                                                           *%AKG lemak total*                                                                            |\n|                                                                    %AKG | = 0.0446 / 67 \xD7 100 = 0.0665671641791045                                                      |\n|                                              (dibulatkan ke % terdekat) | = *0*                                                                                         |\n|                                                                              *Lemak jenuh*                                                                              |\n|                                                   Lemak jenuh per 100 g | = 0.01 g                                                                                      |\n|                                            Lemak jenuh per kemasan 20 g | = 0.01 \xD7 20 / 100 = 0.002 g                                                                   |\n|     (dibulatkan: <0.5 -> 0, <=5 -> 0.5 g terdekat, >=5 -> 1 g terdekat) | = *0* g                                                                                       |\n|                                                                         |                                                                                               |\n|                                                                           *%AKG lemak jenuh*                                                                            |\n|                                                                    %AKG | = 0.002 / 67 \xD7 100 = 0.01                                                                     |\n|                                              (dibulatkan ke % terdekat) | = *0*                                                                                         |\n|                                                                                *Protein*                                                                                |\n|                                                       Protein per 100 g | = 0.99 g                                                                                      |\n|                                          Protein total per kemasan 20 g | = 0.99 \xD7 20 / 100 = 0.198 g                                                                   |\n|                          (dibulatkan: <0.5 -> 0, >=0.5 -> 1 g terdekat) | = *0* g                                                                                       |\n|                                                                         |                                                                                               |\n|                                                                             *%AKG protein*                                                                              |\n|                                                                    %AKG | = 0.198 / 60 \xD7 100 = 0.33                                                                     |\n|                                              (dibulatkan ke % terdekat) | = *0*                                                                                         |\n|                                                                           *Karbohidrat total*                                                                           |\n|                                             Karbohidrat total per 100 g | = 13.113 g                                                                                    |\n|                                      Karbohidrat total per kemasan 20 g | = 13.113 \xD7 20 / 100 = 2.6226 g                                                                |\n|                          (dibulatkan: <0.5 -> 0, >=0.5 -> 1 g terdekat) | = *3* g                                                                                       |\n|                                                                         |                                                                                               |\n|                                                                        *%AKG karbohidrat total*                                                                         |\n|                                                                    %AKG | = 2.6226 / 325 \xD7 100 = 0.0665671641791045                                                     |\n|                                              (dibulatkan ke % terdekat) | = *1*                                                                                         |\n|                                                                                 *Gula*                                                                                  |\n|                                                          Gula per 100 g | = 7.173 g                                                                                     |\n|                                                   Gula per kemasan 20 g | = 7.173 \xD7 20 / 100 = 1.4346 g                                                                 |\n|                          (dibulatkan: <0.5 -> 0, >=0.5 -> 1 g terdekat) | = *1* g                                                                                       |\n|                                                                                *Natrium*                                                                                |\n|                                                       Natrium per 100 g | = 0.223 mg                                                                                    |\n|                                                Natrium per kemasan 20 g | = 0.223 \xD7 20 / 100 = 0.0446 mg                                                                |\n|   (dibulatkan: <5 -> 0, <=140 -> 5 mg terdekat, >140 -> 10 mg terdekat) | = *0* mg                                                                                      |\n|                                                                         |                                                                                               |\n|                                                                             *%AKG natrium*                                                                              |\n|                                                                    %AKG | = 0.0446 / 1500 \xD7 100 = 0.00297333333333333                                                   |\n|                                              (dibulatkan ke % terdekat) | = *0*                                                                                         |\n|                                                                               *Vitamin A*                                                                               |\n|                                                         Vitamin A 100 g | =  mcg all-trans retinol                                                                      |\n|                                        Vitamin A total per kemasan 20 g | =  \xD7 20 / 100 = 0 g                                                                           |\n|                                                                         |                                                                                               |\n|                                                                            *%AKG Vitamin A*                                                                             |\n|                                                                    %AKG | = 0 / 600 \xD7 100 = 0                                                                           |\n|        (dibulatkan [<=10% AKG -> 2% terdekat, >10% AKG -> 5% terdekat]) | = *0*                                                                                         |\n`-------------------------------------------------------------------------+-----------------------------------------------------------------------------------------------'\n",
+   ".-------------------------------------------------------------------------------------------------------------------------------------------------------------------------.\n|                                                                   *PERHITUNGAN INFORMASI NILAI GIZI*                                                                    |\n|                                                                             *Energi total*                                                                              |\n|                                                  Energi total per 100 g | = lemak \xD7 9 + protein \xD7 4 + karbohidrat \xD7 4 = 0.223 \xD7 9 + 0.99 \xD7 4 + 13.113 \xD7 4 = 58.419 kkal |\n|                                           Energi total per kemasan 20 g | = 58.419 \xD7 20 / 100 = 11.6838 kkal                                                            |\n| (dibulatkan: <5 -> 0, <=50 -> 5 kkal terdekat, >50 -> 10 kkal terdekat) | = *10* kkal                                                                                   |\n|                                                                         |                                                                                               |\n|                                                                           *%AKG energi total*                                                                           |\n|                                                                    %AKG | = 11.6838 / 2150 \xD7 100 = 0.543432558139535                                                    |\n|                                              (dibulatkan ke % terdekat) | = *1*                                                                                         |\n|                                                                           *Energi dari lemak*                                                                           |\n|                                             Energi dari lemak per 100 g | = lemak \xD7 9 = 0.223 \xD7 9 = 2.007 kkal                                                          |\n|                                      Energi dari lemak per kemasan 20 g | = 2.007 \xD7 20 / 100 = 3.51225 kkal                                                             |\n| (dibulatkan: <5 -> 0, <=50 -> 5 kkal terdekat, >50 -> 10 kkal terdekat) | = *0* kkal                                                                                    |\n|                                                                        *Energi dari lemak jenuh*                                                                        |\n|                                             Energi dari lemak per 100 g | = lemak jenuh \xD7 9 = 0.01 \xD7 9 = 0.09 kkal                                                      |\n|                                Energi dari lemak jenuh per kemasan 20 g | = 0.09 \xD7 20 / 100 = 0.018 kkal                                                                |\n| (dibulatkan: <5 -> 0, <=50 -> 5 kkal terdekat, >50 -> 10 kkal terdekat) | = *0* kkal                                                                                    |\n|                                                                              *Lemak total*                                                                              |\n|                                                   Lemak total per 100 g | = 0.223 g                                                                                     |\n|                                            Lemak total per kemasan 20 g | = 0.223 \xD7 20 / 100 = 0.0446 g                                                                 |\n|     (dibulatkan: <0.5 -> 0, <=5 -> 0.5 g terdekat, >=5 -> 1 g terdekat) | = *0* g                                                                                       |\n|                                                                         |                                                                                               |\n|                                                                           *%AKG lemak total*                                                                            |\n|                                                                    %AKG | = 0.0446 / 67 \xD7 100 = 0.0665671641791045                                                      |\n|                                              (dibulatkan ke % terdekat) | = *0*                                                                                         |\n|                                                                              *Lemak jenuh*                                                                              |\n|                                                   Lemak jenuh per 100 g | = 0.01 g                                                                                      |\n|                                            Lemak jenuh per kemasan 20 g | = 0.01 \xD7 20 / 100 = 0.002 g                                                                   |\n|     (dibulatkan: <0.5 -> 0, <=5 -> 0.5 g terdekat, >=5 -> 1 g terdekat) | = *0* g                                                                                       |\n|                                                                         |                                                                                               |\n|                                                                           *%AKG lemak jenuh*                                                                            |\n|                                                                    %AKG | = 0.002 / 67 \xD7 100 = 0.01                                                                     |\n|                                              (dibulatkan ke % terdekat) | = *0*                                                                                         |\n|                                                                                *Protein*                                                                                |\n|                                                       Protein per 100 g | = 0.99 g                                                                                      |\n|                                          Protein total per kemasan 20 g | = 0.99 \xD7 20 / 100 = 0.198 g                                                                   |\n|                          (dibulatkan: <0.5 -> 0, >=0.5 -> 1 g terdekat) | = *0* g                                                                                       |\n|                                                                         |                                                                                               |\n|                                                                             *%AKG protein*                                                                              |\n|                                                                    %AKG | = 0.198 / 60 \xD7 100 = 0.33                                                                     |\n|                                              (dibulatkan ke % terdekat) | = *0*                                                                                         |\n|                                                                           *Karbohidrat total*                                                                           |\n|                                             Karbohidrat total per 100 g | = 13.113 g                                                                                    |\n|                                      Karbohidrat total per kemasan 20 g | = 13.113 \xD7 20 / 100 = 2.6226 g                                                                |\n|                          (dibulatkan: <0.5 -> 0, >=0.5 -> 1 g terdekat) | = *3* g                                                                                       |\n|                                                                         |                                                                                               |\n|                                                                        *%AKG karbohidrat total*                                                                         |\n|                                                                    %AKG | = 2.6226 / 325 \xD7 100 = 0.0665671641791045                                                     |\n|                                              (dibulatkan ke % terdekat) | = *1*                                                                                         |\n|                                                                                 *Gula*                                                                                  |\n|                                                          Gula per 100 g | = 7.173 g                                                                                     |\n|                                                   Gula per kemasan 20 g | = 7.173 \xD7 20 / 100 = 1.4346 g                                                                 |\n|                          (dibulatkan: <0.5 -> 0, >=0.5 -> 1 g terdekat) | = *1* g                                                                                       |\n|                                                                                *Natrium*                                                                                |\n|                                                       Natrium per 100 g | = 0.223 mg                                                                                    |\n|                                                Natrium per kemasan 20 g | = 0.223 \xD7 20 / 100 = 0.0446 mg                                                                |\n|   (dibulatkan: <5 -> 0, <=140 -> 5 mg terdekat, >140 -> 10 mg terdekat) | = *0* mg                                                                                      |\n|                                                                         |                                                                                               |\n|                                                                             *%AKG natrium*                                                                              |\n|                                                                    %AKG | = 0.0446 / 1500 \xD7 100 = 0.00297333333333333                                                   |\n|                                              (dibulatkan ke % terdekat) | = *0*                                                                                         |\n`-------------------------------------------------------------------------+-----------------------------------------------------------------------------------------------'\n",
    {
      "cmdline.skip_format" => 1,
      "func.raw" => {
@@ -1148,8 +1201,6 @@ Result:
        total_fat_per_pkg_rounded                 => 0,
        total_sugar_per_pkg                       => 1.4346,
        total_sugar_per_pkg_rounded               => 1,
-       va_pct_dv_per_pkg                         => 0,
-       va_pct_dv_per_pkg_rounded                 => 0,
      },
    },
  ]
@@ -1162,9 +1213,17 @@ Arguments ('*' denotes required arguments):
 
 =over 4
 
+=item * B<biotin> => I<ufloat>
+
+Biotin, in mcgE<sol>100g.
+
 =item * B<browser> => I<true>
 
 View output HTML in browser instead of returning it.
+
+=item * B<ca> => I<ufloat>
+
+Calcium, in mgE<sol>100g.
 
 =item * B<carbohydrate>* => I<ufloat>
 
@@ -1174,13 +1233,53 @@ Total carbohydrate, in gE<sol>100g.
 
 Cholesterol, in mgE<sol>100g.
 
+=item * B<choline> => I<ufloat>
+
+Choline, in mgE<sol>100g.
+
 =item * B<color> => I<str> (default: "auto")
 
 (No description)
 
+=item * B<cr> => I<ufloat>
+
+Chromium, in mcgE<sol>100g.
+
+=item * B<cu> => I<ufloat>
+
+Copper, in mcgE<sol>100g.
+
 =item * B<fat>* => I<ufloat>
 
 Total fat, in gE<sol>100g.
+
+=item * B<fe> => I<ufloat>
+
+Iron, in mgE<sol>100g.
+
+=item * B<fluorine> => I<ufloat>
+
+Fluorine, in mgE<sol>100g.
+
+=item * B<folate> => I<ufloat>
+
+Folate (vitamin B9), in mcgE<sol>100g.
+
+=item * B<iodium> => I<ufloat>
+
+Iodium, in mcgE<sol>100g.
+
+=item * B<k> => I<ufloat>
+
+Potassium, in mgE<sol>100g.
+
+=item * B<mg> => I<ufloat>
+
+Magnesium, in mgE<sol>100g.
+
+=item * B<mn> => I<ufloat>
+
+Manganese, in mcgE<sol>100g.
 
 =item * B<name> => I<str>
 
@@ -1198,6 +1297,10 @@ in a paragraph.
 
 Packaging size, in g.
 
+=item * B<phosphorus> => I<ufloat>
+
+Phosphorus, in mgE<sol>100g.
+
 =item * B<protein>* => I<ufloat>
 
 Protein, in gE<sol>100g.
@@ -1205,6 +1308,10 @@ Protein, in gE<sol>100g.
 =item * B<saturated_fat>* => I<ufloat>
 
 Saturated fat, in gE<sol>100g.
+
+=item * B<se> => I<ufloat>
+
+Selenium, in mcgE<sol>100g.
 
 =item * B<serving_size>* => I<ufloat>
 
@@ -1221,6 +1328,50 @@ Total sugar, in gE<sol>100g.
 =item * B<va> => I<ufloat>
 
 Vitamin A, in mcgE<sol>100g (all-trans-)retinol.
+
+=item * B<vb1> => I<ufloat>
+
+Vitamin B1, in mgE<sol>100g.
+
+=item * B<vb12> => I<ufloat>
+
+Vitamin B12, in mcgE<sol>100g.
+
+=item * B<vb2> => I<ufloat>
+
+Vitamin B2, in mgE<sol>100g.
+
+=item * B<vb3> => I<ufloat>
+
+Vitamin B3, in mgE<sol>100g.
+
+=item * B<vb5> => I<ufloat>
+
+Vitamin B5 (pantothenic acid), in mgE<sol>100g.
+
+=item * B<vb6> => I<ufloat>
+
+Vitamin B6, in mgE<sol>100g.
+
+=item * B<vc> => I<ufloat>
+
+Vitamin C, in mgE<sol>100g.
+
+=item * B<vd> => I<ufloat>
+
+Vitamin D, in mcg.
+
+=item * B<ve> => I<ufloat>
+
+Vitamin E, in mg alpha-TE (tocopherol-equivalent).
+
+=item * B<vk> => I<ufloat>
+
+Vitamin K, in mcg.
+
+=item * B<zn> => I<ufloat>
+
+Zinc, in mgE<sol>100g.
 
 
 =back

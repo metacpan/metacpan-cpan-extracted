@@ -1,5 +1,7 @@
 package CXC::DB::DDL::CloneClear;
 
+# ABSTRACT: Provide attribute tags and a method for Moo objects to indicate they should be cloned
+
 use v5.26;
 
 use Moo::Role;
@@ -9,7 +11,7 @@ use experimental 'signatures', 'postderef';
 
 use namespace::clean -except => [ '_tag_list', '_tags' ];
 
-our $VERSION = '0.13';
+our $VERSION = '0.14';
 
 
 
@@ -45,6 +47,16 @@ sub clone_simple ( $self ) {
 
 1;
 
+#
+# This file is part of CXC-DB-DDL
+#
+# This software is Copyright (c) 2022 by Smithsonian Astrophysical Observatory.
+#
+# This is free software, licensed under:
+#
+#   The GNU General Public License, Version 3, June 2007
+#
+
 __END__
 
 =pod
@@ -53,13 +65,29 @@ __END__
 
 =head1 NAME
 
-CXC::DB::DDL::CloneClear
+CXC::DB::DDL::CloneClear - Provide attribute tags and a method for Moo objects to indicate they should be cloned
 
 =head1 VERSION
 
-version 0.13
+version 0.14
 
-=head1 SUBROUTINES
+=head1 SYNOPSIS
+
+  package Class {
+    use Moo;
+    with "CXC::DB::DDL::CloneClear';
+
+    has attr1 => ( is => 'rw', default => 'A1', cloneclear => 1 );
+    has attr2 => ( is => 'rw', default => 'A2' );
+  }
+
+  my $obj =  Class->new( attr1 => 'B1', attr2 => 'B2' );
+  my $clone = $obj->clone_simple;
+
+  say $clone->attr1; # A1
+  say $clone->attr2; # B2
+
+=head1 METHODS
 
 =head2 clone
 

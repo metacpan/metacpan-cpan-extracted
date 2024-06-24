@@ -1,5 +1,5 @@
 NAME
-    cpan-search - Script to search on CPAN archive.
+    cpan-search - Tool to search on CPAN archive.
 
 SYNOPSIS
      cpan-search [-h] [--version] module_prefix
@@ -7,16 +7,17 @@ SYNOPSIS
 ARGUMENTS
     *       "-h"
 
-             Print help.
+            Print help.
 
     *       "--version"
 
-             Print version of script.
+            Print version of script.
 
     *       "module_prefix"
 
-             Perl module prefix.
-             e.g. Module::Install
+            Perl module prefix.
+
+            e.g. Module::Install
 
 EXAMPLE
      cpan-search Module::Install
@@ -30,10 +31,10 @@ AUTHOR
     <http://skim.cz>
 
 LICENSE AND COPYRIGHT
-    © 2015-2023 Michal Josef Špaček
+    © 2015-2024 Michal Josef Špaček
 
     BSD 2-Clause License
 
 VERSION
-    0.09
+    0.10
 

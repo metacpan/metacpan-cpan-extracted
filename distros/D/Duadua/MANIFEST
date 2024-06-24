@@ -14,6 +14,7 @@ lib/Duadua/Parser/Bot/BingPreview.pm
 lib/Duadua/Parser/Bot/BotMisc.pm
 lib/Duadua/Parser/Bot/Bytespider.pm
 lib/Duadua/Parser/Bot/CentroAdsCrawler.pm
+lib/Duadua/Parser/Bot/ChatGPTUser.pm
 lib/Duadua/Parser/Bot/ClaudeBot.pm
 lib/Duadua/Parser/Bot/DuckDuckBot.pm
 lib/Duadua/Parser/Bot/FacebookCrawler.pm
@@ -90,6 +91,7 @@ t/testset/bot/bot_general.yaml
 t/testset/bot/bot_misc.yaml
 t/testset/bot/bytespider.yaml
 t/testset/bot/centro_ads_crawler.yaml
+t/testset/bot/chatgpt-user.yaml
 t/testset/bot/claudebot.yaml
 t/testset/bot/duckduckbot.yaml
 t/testset/bot/facebookcrawler.yaml

@@ -116,7 +116,7 @@ static HV * global_kw = NULL;
 
 static int (*next_keyword_plugin)(pTHX_ char *, STRLEN, OP **);
 
-static SV *kw_handler(pTHX_ const char *kw_ptr, STRLEN kw_len, int * is_expr) {
+static SV *kw_handler(pTHX_ const char *kw_ptr, STRLEN kw_len, int * mode) {
 	HV *hints;
 	SV **psv, *sv, *sv2 = NULL;
 	AV *av;
@@ -171,7 +171,7 @@ static SV *kw_handler(pTHX_ const char *kw_ptr, STRLEN kw_len, int * is_expr) {
 	if ( !( psv = av_fetch(av, 1, 0))) {
 		croak("%s: internal error: $^H{'%s'}{'%.*s'} bad item #1: %"SVf, MY_PKG, HINTK_KEYWORDS, (int)kw_len, kw_ptr, SVfARG(sv));
 	}
-	*is_expr = SvIV(*psv);
+	*mode = SvIV(*psv);
 
 	return sv2;
 }
@@ -201,8 +201,9 @@ static I32 playback(pTHX_ int idx, SV *buf, int n) {
 	return 1;
 }
 
-static void total_recall(pTHX_ SV *cb) {
-	SV *sv;
+static int total_recall(pTHX_ SV *cb) {
+	int cb_result_ct, cb_result;
+	SV *sv, *cb_result_sv;
 	dSP;
 
 	ENTER;
@@ -231,8 +232,10 @@ static void total_recall(pTHX_ SV *cb) {
 	mXPUSHs(newRV_inc(sv));
 	PUTBACK;
 
-	call_sv(cb, G_VOID);
+	cb_result_ct = call_sv(cb, G_SCALAR);
 	SPAGAIN;
+	cb_result_sv = cb_result_ct? POPs: &PL_sv_undef;
+	cb_result = SvTRUE(cb_result_sv);
 
 	{ /* $sv .= "\n" */
 		char *p;
@@ -253,21 +256,41 @@ static void total_recall(pTHX_ SV *cb) {
 
 	FREETMPS;
 	LEAVE;
+	return cb_result;
 }
+
+enum {
+	mode_statement,
+	mode_expression,
+	mode_dynamic
+};
 
 static int my_keyword_plugin(pTHX_ char *keyword_ptr, STRLEN keyword_len, OP **op_ptr) {
 	SV *cb;
-	int is_expr;
+	int mode, cb_result;
 
-	if ((cb = kw_handler(aTHX_ keyword_ptr, keyword_len, &is_expr))) {
-		total_recall(aTHX_ cb);
-		if ( is_expr ) {
+	if ((cb = kw_handler(aTHX_ keyword_ptr, keyword_len, &mode))) {
+		cb_result = total_recall(aTHX_ cb);
+		switch (mode) {
+			case mode_statement:
+				mode = KEYWORD_PLUGIN_STMT;
+				break;
+			case mode_expression:
+				mode = KEYWORD_PLUGIN_EXPR;
+				break;
+			case mode_dynamic:
+				mode = cb_result? KEYWORD_PLUGIN_EXPR: KEYWORD_PLUGIN_STMT;
+				break;
+			default:
+				croak("%s: internal error: unrecognized expression mode %d", MY_PKG, mode);
+				break;
+		}
+		if (mode == KEYWORD_PLUGIN_EXPR) {
 			*op_ptr = parse_fullexpr(0);
-			return KEYWORD_PLUGIN_EXPR;
 		} else {
 			*op_ptr = newOP(OP_NULL, 0);
-			return KEYWORD_PLUGIN_STMT;
 		}
+		return mode;
 	}
 
 	return next_keyword_plugin(aTHX_ keyword_ptr, keyword_len, op_ptr);
@@ -278,6 +301,9 @@ static void my_boot(pTHX) {
 	HV *const stash = gv_stashpvs(MY_PKG, GV_ADD);
 
 	newCONSTSUB(stash, "HINTK_KEYWORDS", newSVpvs(HINTK_KEYWORDS));
+	newCONSTSUB(stash, "MODE_STATEMENT",  newSViv(mode_statement));
+	newCONSTSUB(stash, "MODE_EXPRESSION", newSViv(mode_expression));
+	newCONSTSUB(stash, "MODE_DYNAMIC",    newSViv(mode_dynamic));
 
 	next_keyword_plugin = PL_keyword_plugin;
 	PL_keyword_plugin = my_keyword_plugin;

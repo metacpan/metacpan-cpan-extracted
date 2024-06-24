@@ -1,5 +1,5 @@
 {
-   "abstract" : "XS functions to assist in value constraint checking",
+   "abstract" : "Value constraint checking",
    "author" : [
       "Paul Evans <leonerd@leonerd.org.uk>"
    ],
@@ -39,11 +39,11 @@
    "provides" : {
       "Data::Checks" : {
          "file" : "lib/Data/Checks.pm",
-         "version" : "0.02"
+         "version" : "0.03"
       },
       "Data::Checks::Builder" : {
          "file" : "lib/Data/Checks/Builder.pm",
-         "version" : "0.02"
+         "version" : "0.03"
       }
    },
    "release_status" : "stable",
@@ -52,6 +52,6 @@
          "http://dev.perl.org/licenses/"
       ]
    },
-   "version" : "0.02",
+   "version" : "0.03",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

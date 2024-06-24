@@ -2,7 +2,7 @@ use strict;
 use warnings;
 
 package Bio::SeqAlignment::Components::Libraries::edlib;
-$Bio::SeqAlignment::Components::Libraries::edlib::VERSION = '0.02';
+$Bio::SeqAlignment::Components::Libraries::edlib::VERSION = '0.03';
 # ABSTRACT: basic edlib library
 use Alien::SeqAlignment::edlib;
 use Carp;
@@ -88,7 +88,7 @@ package EdlibAlignConfig {
         )
     );
 }
-$EdlibAlignConfig::VERSION = '0.02';
+$EdlibAlignConfig::VERSION = '0.03';
 
 package EdlibAlignResult {
     use FFI::Platypus::Record;
@@ -104,7 +104,7 @@ package EdlibAlignResult {
         )
     );
 }
-$EdlibAlignResult::VERSION = '0.02';
+$EdlibAlignResult::VERSION = '0.03';
 
 package EdlibEqualityPair {
     use FFI::Platypus::Record;
@@ -115,7 +115,7 @@ package EdlibEqualityPair {
         )
     );
 }
-$EdlibEqualityPair::VERSION = '0.02';
+$EdlibEqualityPair::VERSION = '0.03';
 
 use Env qw( @PATH );
 unshift @PATH, Alien::SeqAlignment::edlib->bin_dir;
@@ -203,7 +203,7 @@ Bio::SeqAlignment::Components::Libraries::edlib - edlib library for developing s
 
 =head1 VERSION
 
-version 0.02
+version 0.03
 
 =head1 SYNOPSIS
 

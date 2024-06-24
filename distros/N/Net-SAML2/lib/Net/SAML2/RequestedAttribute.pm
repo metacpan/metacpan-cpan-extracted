@@ -2,7 +2,7 @@ package Net::SAML2::RequestedAttribute;
 use Moose;
 use XML::Generator;
 use URN::OASIS::SAML2 qw(URN_METADATA NS_METADATA);
-our $VERSION = '0.79'; # VERSION
+our $VERSION = '0.80'; # VERSION
 
 # ABSTRACT: RequestedAttribute class
 
@@ -59,7 +59,7 @@ sub _build_attributes {
   my $self = shift;
 
   my %attrs = (
-    $self->required ? (isRequired => 1) : (),
+    $self->required ? (isRequired => 'true') : (),
     Name => $self->name,
     $self->_has_friendly ? (FriendlyName => $self->friendly_name) : (),
   );
@@ -80,7 +80,7 @@ Net::SAML2::RequestedAttribute - RequestedAttribute class
 
 =head1 VERSION
 
-version 0.79
+version 0.80
 
 =head1 SYNOPSIS
 

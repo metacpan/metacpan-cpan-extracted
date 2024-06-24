@@ -2,7 +2,7 @@ use strict;
 use warnings;
 
 package Bio::SeqAlignment::Components::Libraries::edlib::OpenMP;
-$Bio::SeqAlignment::Components::Libraries::edlib::OpenMP::VERSION = '0.02';
+$Bio::SeqAlignment::Components::Libraries::edlib::OpenMP::VERSION = '0.03';
 # ABSTRACT: basic edlib library that uses OpenMP for parallelism
 use Config;
 use Alien::SeqAlignment::edlib;
@@ -154,7 +154,7 @@ Bio::SeqAlignment::Components::Libraries::edlib::OpenMP - basic edlib library th
 
 =head1 VERSION
 
-version 0.02
+version 0.03
 
 =head1 SYNOPSIS
 
@@ -291,11 +291,7 @@ SV* _make_C_index(AV* sequences) {
     Seq* RefDB = (Seq *)buf;
     #pragma omp parallel
     {
-        /*
-        pid_t pid = getpid();
-        printf("Process ID: %d, Threads %d out of %d\n",pid, omp_get_thread_num(), omp_get_num_threads());
-        */
-        
+       
         int nthreads = omp_get_num_threads();
         size_t thread_id = omp_get_thread_num();
         size_t tbegin = thread_id * n / nthreads;
@@ -335,6 +331,7 @@ SV* _configure_edlib_aligner(int k, int mode, int task, AV* additionalEqualities
 
 }
 
+// This version for version 0.03
 AV *_edlib_align(char *query_seq, int query_len, SV *ref_DB, SV *config) {
 
   // initialization for the mapping
@@ -352,12 +349,81 @@ AV *_edlib_align(char *query_seq, int query_len, SV *ref_DB, SV *config) {
 
   _ENV_set_num_threads();
 #pragma omp parallel
+{
+    int thread_min_val = INT_MAX;
+    int thread_min_idx = -1;
+#pragma omp for schedule(dynamic, 1) nowait
+    for (size_t i = 0; i < n_of_seqs; i++) {
+      EdlibAlignResult align =
+          edlibAlign(query_seq, query_len, (char *)RefDB[i].seq_address,
+                     RefDB[i].seq_len, alignconfig);
+      if (align.editDistance < thread_min_val) {
+        thread_min_val = align.editDistance;
+        thread_min_idx = i;
+      }
+      edlibFreeAlignResult(align);
+    }
+#pragma omp critical
+    {
+      unsigned int absthread_min_val = abs(thread_min_val);
+      if (absthread_min_val < min_val) {
+        min_val = absthread_min_val;
+        min_idx = thread_min_idx;
+      }
+    }
+  }
+  // perl 5.36 and above
+  av_push_simple(mapping, newSViv(min_idx)); // best match index
+  av_push_simple(mapping, newSViv(min_val)); // match score (min edit distance)
+  return mapping;
+}
+
+void _ENV_set_num_threads() {
+  char *num;
+  num = getenv("OMP_NUM_THREADS");
+  omp_set_num_threads(atoi(num));
+}
+
+
+void _print_config(SV* config) {
+    EdlibAlignConfig* alignconfig = (EdlibAlignConfig *)SvPVbyte_nolen(config);
+
+    printf("k: %d, mode: %d, task: %d\n", alignconfig->k, alignconfig->mode, alignconfig->task);    
+    printf("additionalEqualitiesLength: %d\n", alignconfig->additionalEqualitiesLength);   
+    EdlibEqualityPair* additionalEqualities = (EdlibEqualityPair *)alignconfig->additionalEqualities;
+    for (int i = 0; i < alignconfig->additionalEqualitiesLength; i++) {
+        printf("additionalEqualities[%d]: %c %c\n", i, additionalEqualities[i].first, additionalEqualities[i].second);
+    }
+}
+
+/* CODE CEMETERY
+ * Various snippets of code that were used for testing and debugging
+ * but hopefully are no longer needed.
+
+ * This is a snippet of code that was used to test the parallelism of the code
+  pid_t pid = getpid();
+  printf("Process ID: %d, Threads %d out of %d\n",pid, omp_get_thread_num(), omp_get_num_threads());
+
+
+* v0.02 version of the alignment function
+  AV *_edlib_align(char *query_seq, int query_len, SV *ref_DB, SV *config) {
+
+  // initialization for the mapping
+  int min_val = INT_MAX;
+  int min_idx = -1;
+
+  // get stuff from perl
+  Seq *RefDB = (Seq *)SvPVbyte_nolen(ref_DB);
+  int n_of_seqs = SvCUR(ref_DB) / sizeof(Seq); // size of database
+  EdlibAlignConfig alignconfig = *(EdlibAlignConfig *)SvPVbyte_nolen(config);
+
+  // prepare to send stuff back to perl
+  AV *mapping = newAV();
+  sv_2mortal((SV *)mapping);
+
+  _ENV_set_num_threads();
+#pragma omp parallel
   {
-    /*
-    pid_t pid = getpid();
-    printf("Process ID: %d, Threads %d out of %d\n",pid, omp_get_thread_num(),
-    omp_get_num_threads());
-    */
 
     int nthreads = omp_get_num_threads();
     size_t thread_id = omp_get_thread_num();
@@ -391,22 +457,4 @@ AV *_edlib_align(char *query_seq, int query_len, SV *ref_DB, SV *config) {
   return mapping;
 }
 
-
-
-void _ENV_set_num_threads() {
-  char *num;
-  num = getenv("OMP_NUM_THREADS");
-  omp_set_num_threads(atoi(num));
-}
-
-
-void _print_config(SV* config) {
-    EdlibAlignConfig* alignconfig = (EdlibAlignConfig *)SvPVbyte_nolen(config);
-
-    printf("k: %d, mode: %d, task: %d\n", alignconfig->k, alignconfig->mode, alignconfig->task);    
-    printf("additionalEqualitiesLength: %d\n", alignconfig->additionalEqualitiesLength);   
-    EdlibEqualityPair* additionalEqualities = (EdlibEqualityPair *)alignconfig->additionalEqualities;
-    for (int i = 0; i < alignconfig->additionalEqualitiesLength; i++) {
-        printf("additionalEqualities[%d]: %c %c\n", i, additionalEqualities[i].first, additionalEqualities[i].second);
-    }
-}
+*/

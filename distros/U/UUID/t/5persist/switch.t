@@ -12,11 +12,9 @@ use Time::HiRes ();
 use vars qw(@OPTS $tmpdir $fn0 $fn1);
 
 BEGIN {
-    $tmpdir = File::Temp->newdir(
-        TEMPLATE => 'asserttestXXXXXXXX', CLEANUP => 0,
-    );
-    $fn0 = File::Temp::tempnam($tmpdir, 'asserttest');
-    $fn1 = File::Temp::tempnam($tmpdir, 'asserttest');
+    $tmpdir = File::Temp->newdir(CLEANUP => 0);
+    $fn0 = File::Temp::tempnam($tmpdir, 'UUID.test.');
+    $fn1 = File::Temp::tempnam($tmpdir, 'UUID.test.');
     @OPTS = ('uuid1', ':mac=random', ':persist='.$fn0);
 }
 

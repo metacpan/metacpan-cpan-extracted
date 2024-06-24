@@ -4,9 +4,26 @@ use strict ();
 use warnings ();
 use feature ();
 use Carp;
+use Data::Dumper ();
 use namespace::autoclean ();
 
-sub import {
+sub _DEBUG
+{
+    my ($stage, @messages) = @_;
+    my $env = $ENV{KELP_DEBUG};
+    return if !$env;
+    return if !grep { lc $env eq $_ } '1', 'all', lc $stage;
+
+    local $Data::Dumper::Sortkeys = 1;
+    my $message = join ' ', map {
+        ref $_ ? Data::Dumper::Dumper($_) : $_
+    } @messages;
+
+    print "DEBUG: $message\n";
+}
+
+sub import
+{
     my $class = shift;
     my $caller = caller;
 
@@ -15,16 +32,16 @@ sub import {
 
     my $base = shift || $class;
 
-    if ( $base ne '-strict' ) {
+    if ($base ne '-strict') {
         no strict 'refs';
         no warnings 'redefine';
 
         my $file = $base;
         $file =~ s/::|'/\//g;
-        require "$file.pm" unless $base->can('new'); # thanks sri
+        require "$file.pm" unless $base->can('new');    # thanks sri
 
         push @{"${caller}::ISA"}, $base;
-        *{"${caller}::attr"} = sub { attr( $caller, @_ ) };
+        *{"${caller}::attr"} = sub { attr($caller, @_) };
     }
 
     strict->import;
@@ -36,33 +53,36 @@ sub import {
     );
 }
 
-sub new {
-    bless { @_[ 1 .. $#_ ] }, $_[0];
+sub new
+{
+    my $self = shift;
+    return bless {@_}, $self;
 }
 
-sub attr {
-    my ( $class, $name, $default ) = @_;
+sub attr
+{
+    my ($class, $name, $default) = @_;
 
-    if ( ref $default && ref $default ne 'CODE' ) {
+    if (ref $default && ref $default ne 'CODE') {
         croak "Default value for '$name' can not be a reference.";
     }
-
-    no strict 'refs';
-    no warnings 'redefine';
 
     # Readonly attributes are marked with '-'
     my $readonly = $name =~ s/^\-//;
 
-    *{"${class}::$name"} = sub {
-        if ( @_ > 1 && !$readonly ) {
-            $_[0]->{$name} = $_[1];
-        }
-        return $_[0]->{$name} if exists $_[0]->{$name};
-        return $_[0]->{$name} =
-          ref $default eq 'CODE'
-          ? $default->( $_[0] )
-          : $default;
-    };
+    # Remember if default is a function
+    my $default_sub = ref $default eq 'CODE';
+
+    {
+        no strict 'refs';
+        no warnings 'redefine';
+
+        *{"${class}::$name"} = sub {
+            return $_[0]->{$name} = $_[1] if @_ > 1 && !$readonly;
+            return $_[0]->{$name} if exists $_[0]->{$name};
+            return $_[0]->{$name} = $default_sub ? $default->($_[0]) : $default;
+        };
+    }
 }
 
 1;
@@ -116,8 +136,12 @@ answer is that the Kelp web framework needs lazy attributes, but the
 author wanted to keep the code light and object manager agnostic.
 This allows the users of the framework to choose an object manager to
 their liking.
+
 There is nothing more annoying than a module that forces you to use L<Moose> when you
 are perfectly fine with L<Moo> or L<Mo>, for example.
+
+As a nice addition, our getters and constructors are quite a bit faster than
+any non-XS variant of L<Moose>.
 
 =head1 USAGE
 
@@ -152,3 +176,4 @@ name with a dash.
 L<Kelp>, L<Moose>, L<Moo>, L<Mo>, L<Any::Moose>
 
 =cut
+

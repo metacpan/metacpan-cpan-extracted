@@ -1,5 +1,5 @@
 package Crypt::HSM::Encrypt;
-$Crypt::HSM::Encrypt::VERSION = '0.016';
+$Crypt::HSM::Encrypt::VERSION = '0.017';
 use strict;
 use warnings;
 
@@ -22,7 +22,7 @@ Crypt::HSM::Encrypt - A PKCS11 ongoing encryption operation.
 
 =head1 VERSION
 
-version 0.016
+version 0.017
 
 =head1 SYNOPSIS
 
@@ -49,7 +49,7 @@ This finished the encryption, and returns and remaining ciphertext.
 
 =head1 AUTHOR
 
-Leon Timmermans <leont@cpan.org>
+Leon Timmermans <fawaka@gmail.com>
 
 =head1 COPYRIGHT AND LICENSE
 

@@ -3,27 +3,124 @@
 #
 #  (C) Paul Evans, 2024 -- leonerd@leonerd.org.uk
 
-package Data::Checks 0.02;
+package Data::Checks 0.03;
 
-use v5.14;
+use v5.22;
 use warnings;
+
+use Carp;
+
+use builtin qw( export_lexically );
+no warnings "experimental::builtin";
+
+sub import
+{
+   shift;
+   my @syms = @_;
+
+   # @EXPORT_OK is provided by XS code
+   foreach my $sym ( @syms ) {
+      grep { $sym eq $_ } our @EXPORT_OK or
+         croak "$sym is not exported by ".__PACKAGE__;
+
+      export_lexically( $sym => \&$sym );
+   }
+}
 
 require XSLoader;
 XSLoader::load( __PACKAGE__, our $VERSION );
 
 =head1 NAME
 
-C<Data::Checks> - XS functions to assist in value constraint checking
+C<Data::Checks> - Value constraint checking
+
+=head1 SYNOPSIS
+
+With L<Signature::Attribute::Checked>:
+
+   use v5.26;
+   use Sublike::Extended;
+   use Signature::Attribute::Checked;
+
+   use Data::Checks qw( Str );
+
+   extended sub greet ( $message :Checked(Str) ) {
+      say "Hello, $message";
+   }
+
+   greet( "world" );  # is fine
+   greet( undef );    # throws an exception
+
+With L<Object::Pad::FieldAttr::Checked>:
+
+   use v5.22;
+   use Object::Pad;
+   use Object::Pad::FieldAttr::Checked;
+
+   use Data::Checks qw( Str );
+
+   class Datum {
+      field $name :param :reader :Checked(Str);
+   }
+
+   my $x = Datum->new( name => "something" );  # is fine
+   my $y = Datum->new( name => undef );        # throws an exception
 
 =head1 DESCRIPTION
 
-I<Eventually> this module will provide functions that implement various value
-constraint checking behaviours.
+This module provides functions that implement various value constraint
+checking behaviours. These are the parts made visible by the
+C<use Data::Checks ...> import line, in Perl code.
 
-Currently it does not contain anything directly visible to end-user Perl code,
-but instead only provides the underlying common framework XS functions to
-assist in writing modules that actually implement such constraint checking. It
-is unlikely to be useful to end-users at this time.
+It also provides the underlying common framework XS functions to assist in
+writing modules that actually implement such constraint checking. These parts
+are not visible in Perl code, but instead made visible at the XS level by the
+C<#include "DataChecks.h"> directive.
+
+=cut
+
+=head1 CONSTRAINTS
+
+The following constraint checks are inspired by the same-named ones in
+L<Types::Standard>. They may be called fully-qualified, or imported
+I<lexically> into the calling scope.
+
+B<Note> to users familiar with C<Types::Standard>: some of these functions
+behave slightly differently. In particular, these constraints are generally
+happy to accept an object reference to a class that provides a conversion
+overload, whereas the ones in C<Types::Standard> often are not.
+
+=head2 Defined
+
+   Defined()
+
+Passes for any defined value, fails only for C<undef>.
+
+=head2 Object
+
+   Object()
+
+Passes for any blessed object reference, fails for non-references or
+references to unblessed data.
+
+=head2 Str
+
+   Str()
+
+Passes for any defined non-reference value, or a reference to an object in a
+class that overloads stringification. Fails for undefined, unblessed
+references, or references to objects in classes that do not overload
+stringification.
+
+=head2 Num
+
+   Num()
+
+Passes for any defined non-reference value that is either a plain number, or a
+string that could be used as one without warning, or a reference to an object
+in a class that overloads numification. Fails for undefined, strings that
+would raise a warning if converted to a number, unblessed references, or
+references to objects in classes that do not overload numification.
 
 =cut
 
@@ -77,6 +174,13 @@ Value checks will be invoked as
 A B<code reference>. Value checks will be invoked with a single argument, as
 
    $ok = $checkersub->( $value );
+
+=item *
+
+Additionally, the constraint check functions provided by this module may be
+implemented using any of the above mechanisms, or may use an unspecified
+fourth different mechanism. Outside code should not rely on what that
+mechanism may be.
 
 =back
 

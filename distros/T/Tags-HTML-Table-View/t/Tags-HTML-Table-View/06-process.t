@@ -7,7 +7,7 @@ use Error::Pure::Utils qw(clean);
 use Tags::HTML::Table::View;
 use Tags::Output::Structure;
 use Test::MockObject;
-use Test::More 'tests' => 15;
+use Test::More 'tests' => 17;
 use Test::NoWarnings;
 
 # Test.
@@ -235,6 +235,26 @@ is_deeply(
 		['e', 'table'],
 	],
 	'Tags code for table with data (data in Data::HTML::Element::A object).',
+);
+
+# Test.
+$tags = Tags::Output::Structure->new;
+$obj = Tags::HTML::Table::View->new(
+	'header' => 0,
+	'tags' => $tags,
+);
+$obj->init([]);
+$ret = $obj->process;
+is($ret, undef, 'process() returns undef.');
+$ret_ar = $tags->flush(1);
+is_deeply(
+	$ret_ar,
+	[
+		['b', 'table'],
+		['a', 'class', 'table'],
+		['e', 'table'],
+	],
+	'Tags code for table (without data).',
 );
 
 # Test.

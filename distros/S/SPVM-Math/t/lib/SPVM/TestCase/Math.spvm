@@ -2896,46 +2896,6 @@ class TestCase::Math {
     return 1;
   }
 
-  static method cscamulf : int () {
-    my $z1 = -0.5f;
-
-    my $z2 : Complex_2f;
-    $z2->{re} = -0.1f;
-    $z2->{im} = 0.05f;
-
-    my $z3 = Math->cscamulf($z1, $z2);
-    
-    unless ($z3->{re} == 0.05f) {
-      return 0;
-    }
-    
-    unless ($z3->{im} == -0.025f) {
-      return 0;
-    }
-
-    return 1;
-  }
-
-  static method cscamul : int () {
-    my $z1 = 0.001;
-
-    my $z2 : Complex_2d;
-    $z2->{re} = -1.0;
-    $z2->{im} = 3.0;
-
-    my $z3 = Math->cscamul($z1, $z2);
-
-    unless ($z3->{re} == -0.001) {
-      return 0;
-    }
-    
-    unless ($z3->{im} == 0.003) {
-      return 0;
-    }
-
-    return 1;
-  }
-
   static method cdivf : int () {
     my $z1 : Complex_2f;
     $z1->{re} = 0.5f;

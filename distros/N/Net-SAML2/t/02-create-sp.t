@@ -385,7 +385,7 @@ use URN::OASIS::SAML2 qw(:bindings :urn);
                 {
                     Binding  => BINDING_HTTP_ARTIFACT,
                     Location => 'https://foo.example.com/acs-http-artifact',
-                    isDefault => 0,
+                    isDefault => 'false',
                 }
             ],
             error_url => 'https://foo.example.com/error-url',
@@ -469,7 +469,7 @@ use URN::OASIS::SAML2 qw(:bindings :urn);
     my $acs  = get_single_node_ok($node,  '//md:AttributeConsumingService');
 
     is($acs->getAttribute('index'),     1, ".. index is 1");
-    is($acs->getAttribute('isDefault'), 0, "Not the default");
+    is($acs->getAttribute('isDefault'), 'false', "Not the default");
 
 
     my @child = $acs->childNodes();
@@ -480,13 +480,15 @@ use URN::OASIS::SAML2 qw(:bindings :urn);
         'Net::SAML2 testsuite',
         ".. with the correct value"
     );
+    is($child[0]->getAttribute("xml:lang"),
+        "en", ".. and xml:lang is set");
 
     is($child[1]->nodeName, "md:RequestedAttribute",
         "Requested attribute found");
     is($child[1]->getAttribute('FriendlyName'),
         'foo', ".. with the correct friendly name");
     is($child[1]->getAttribute('Name'),       'urn:foo:bar', ".. and name");
-    is($child[1]->getAttribute('isRequired'), '1', ".. and requiredness");
+    is($child[1]->getAttribute('isRequired'), 'true', ".. and requiredness");
 }
 
 {

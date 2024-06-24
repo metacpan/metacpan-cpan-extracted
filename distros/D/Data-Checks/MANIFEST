@@ -1,6 +1,8 @@
 .editorconfig
 Build.PL
 Changes
+hax/make_argcheck_aux.c.inc
+hax/make_argcheck_ops.c.inc
 hax/optree-additions.c.inc
 inc/Module/Build/with/XSTests.pm
 lib/Data/Checks.pm
@@ -16,6 +18,11 @@ t/00use.t
 t/01check-obj.t
 t/02check-pkg.t
 t/03check-sub.t
+t/10constraints.t
+t/80checks+field.t
+t/80checks+signature.t
+t/95benchmark-fields.t
+t/95benchmark-signature.t
 t/99pod.t
 t/test.c
 t/test.xs

@@ -3,9 +3,9 @@
 #
 #  (C) Paul Evans, 2024 -- leonerd@leonerd.org.uk
 
-package Data::Checks::Builder 0.02;
+package Data::Checks::Builder 0.03;
 
-use v5.14;
+use v5.22;
 use warnings;
 
 =head1 NAME

@@ -7,13 +7,14 @@
 
 package Couch::DB::Document;
 use vars '$VERSION';
-$VERSION = '0.004';
+$VERSION = '0.005';
 
 use Couch::DB::Util;
 
 use Log::Report 'couch-db';
-use Scalar::Util qw(weaken);
-use MIME::Base64 qw(decode_base64);
+use Scalar::Util             qw/weaken/;
+use MIME::Base64             qw/decode_base64/;
+use Devel::GlobalDestruction qw/in_global_destruction/;
 
 
 sub new(@) { my ($class, %args) = @_; (bless {}, $class)->init(\%args) }
@@ -24,17 +25,27 @@ sub init($)
 	$self->{CDD_db}    = my $db = delete $args->{db};
 	$self->{CDD_info}  = {};
 	$self->{CDD_batch} = exists $args->{batch} ? delete $args->{batch} : $db->batch;
-	$self->{CDD_revs}  = {};
+	$self->{CDD_revs}  = my $revs = {};
 	$self->{CDD_local} = delete $args->{local};
 
 	$self->{CDD_couch} = $db->couch;
 	weaken $self->{CDD_couch};
+
+	if(my $content = delete $args->{content})
+	{	$revs->{_new} = $content;
+	}
 
 	# The Document is (for now) not linked to its Result source, because
 	# that might consume a lot of memory.  Although it may help debugging.
 	# weaken $self->{CDD_result} = my $result = delete $args->{result};
 
 	$self;
+}
+
+sub DESTROY()
+{	my $self = shift;
+	$self->{CDD_revs}{_new} || ! in_global_destruction
+		or panic "Unsaved new document.";
 }
 
 sub _consume($$)
@@ -90,10 +101,10 @@ sub _deleted($)
 	$self->{CDD_deleted} = 1;
 }
 
-sub _saved($$$)
+sub _saved($$;$)
 {	my ($self, $id, $rev, $data) = @_;
 	$self->{CDD_id} ||= $id;
-	$self->{CDD_revs}{$rev} = $data;
+	$self->{CDD_revs}{$rev} = $data || delete $self->{CDD_revs}{_new};
 }
 
 #-------------

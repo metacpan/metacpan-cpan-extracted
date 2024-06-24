@@ -6,39 +6,50 @@ use Kelp::Template;
 attr ext => 'tt';
 attr engine => sub { die "'engine' must be initialized" };
 
-sub build {
-    my ( $self, %args ) = @_;
+sub build
+{
+    my ($self, %args) = @_;
 
     # Build and initialize the engine attribute
-    $self->engine( $self->build_engine(%args) );
+    $self->engine($self->build_engine(%args));
 
     # Register one method - template
     $self->register(
         template => sub {
-            my ( $app, $template, $vars, @rest ) = @_;
-            return $self->render( $self->_rename($template), $vars, @rest );
+            my ($app, $template, $vars, @rest) = @_;
+            $vars //= {};
+            $vars->{app} //= $app;
+
+            return $self->render($self->_rename($template), $vars, @rest);
         }
     );
 }
 
-sub build_engine {
-    my ( $self, %args ) = @_;
-    return Kelp::Template->new( %args );
+sub build_engine
+{
+    my ($self, %args) = @_;
+    return Kelp::Template->new(%args);
 }
 
-sub render {
-    my ( $self, $template, $vars ) = @_;
-    return $self->engine->process( $template, $vars );
+sub render
+{
+    my ($self, $template, $vars) = @_;
+    return $self->engine->process($template, $vars);
 }
 
-sub _rename {
-    my ( $self, $name ) = @_;
-    return unless $name;
+sub _rename
+{
+    my ($self, $name) = @_;
+    $name //= '';
 
-    return $name if ref($name) || $name =~ /\.(.+)$/;
+    return $name if ref $name;
+    return undef unless length $name;
 
-    my $ext = $self->ext;
-    return (defined $ext && length $ext) ? "$name.$ext" : $name;
+    my $ext = $self->ext // '';
+    return $name unless length $ext;
+
+    return $name if $name =~ /\./;
+    return "$name.$ext";
 }
 
 1;
@@ -85,6 +96,8 @@ C<template($filename, \%vars)>
 Renders a file using the currently loaded template engine. If the file doesn't
 have an extension, the one specified in L</ext> will be assigned to it.
 
+If there is no C<app> in C<%vars>, it will be automatically added.
+
 =head1 ATTRIBUTES
 
 =head2 ext
@@ -94,7 +107,8 @@ C<tt>, so
 
     $self->template( 'home' );
 
-will look for C<home.tt>.
+will look for C<home.tt>. Set to undef or empty string to skip adding the
+extension to filenames.
 
 =head2 engine
 
@@ -180,3 +194,4 @@ Overrides the L</render> method and renders using C<$self-E<gt>engine>.
 =back
 
 =cut
+

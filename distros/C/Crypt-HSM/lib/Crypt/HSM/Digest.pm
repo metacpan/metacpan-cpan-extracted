@@ -1,5 +1,5 @@
 package Crypt::HSM::Digest;
-$Crypt::HSM::Digest::VERSION = '0.016';
+$Crypt::HSM::Digest::VERSION = '0.017';
 use strict;
 use warnings;
 
@@ -22,7 +22,7 @@ Crypt::HSM::Digest - A PKCS11 ongoing digesting operation.
 
 =head1 VERSION
 
-version 0.016
+version 0.017
 
 =head1 SYNOPSIS
 
@@ -52,7 +52,7 @@ This finished the digestion and returns the digest.
 
 =head1 AUTHOR
 
-Leon Timmermans <leont@cpan.org>
+Leon Timmermans <fawaka@gmail.com>
 
 =head1 COPYRIGHT AND LICENSE
 

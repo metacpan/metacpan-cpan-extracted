@@ -3,6 +3,7 @@ abstract: 'Class for random day generation'
 author:
   - 'Michal Josef Spacek <skim@cpan.org>'
 build_requires:
+  DateTime: 0
   English: 0
   Error::Pure::Utils: 0
   ExtUtils::MakeMaker: 6.59
@@ -38,4 +39,4 @@ resources:
   homepage: https://github.com/michal-josef-spacek/Random-Day
   license: http://opensource.org/licenses/bsd-license.php
   repository: git://github.com/michal-josef-spacek/Random-Day
-version: '0.15'
+version: '0.16'

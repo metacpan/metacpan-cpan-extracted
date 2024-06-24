@@ -1,25 +1,5 @@
-/*
- * Portions created by Alan Antonuk are Copyright (c) 2017 Alan Antonuk.
- * All Rights Reserved.
- *
- * Permission is hereby granted, free of charge, to any person obtaining a
- * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
- *
- * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
- * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
- * DEALINGS IN THE SOFTWARE.
- */
+// Copyright 2007 - 2021, Alan Antonuk and the rabbitmq-c contributors.
+// SPDX-License-Identifier: mit
 
 #include "amqp_openssl_bio.h"
 #include "amqp_socket.h"
@@ -120,48 +100,34 @@ static int amqp_openssl_bio_read(BIO *b, char *out, int outl) {
 
   return res;
 }
-
-#ifndef AMQP_OPENSSL_V110
-static int BIO_meth_set_write(BIO_METHOD *biom,
-                              int (*wfn)(BIO *, const char *, int)) {
-  biom->bwrite = wfn;
-  return 0;
-}
-
-static int BIO_meth_set_read(BIO_METHOD *biom, int (*rfn)(BIO *, char *, int)) {
-  biom->bread = rfn;
-  return 0;
-}
-#endif /* AQP_OPENSSL_V110 */
 #endif /* AMQP_USE_AMQP_BIO */
 
 int amqp_openssl_bio_init(void) {
   assert(!amqp_ssl_bio_initialized);
 #ifdef AMQP_USE_AMQP_BIO
-#ifdef AMQP_OPENSSL_V110
   if (!(amqp_bio_method = BIO_meth_new(BIO_TYPE_SOCKET, "amqp_bio_method"))) {
     return AMQP_STATUS_NO_MEMORY;
   }
-
-  // casting away const is necessary until
-  // https://github.com/openssl/openssl/pull/2181/, which is targeted for
-  // openssl 1.1.1
-  BIO_METHOD *meth = (BIO_METHOD *)BIO_s_socket();
-  BIO_meth_set_create(amqp_bio_method, BIO_meth_get_create(meth));
-  BIO_meth_set_destroy(amqp_bio_method, BIO_meth_get_destroy(meth));
-  BIO_meth_set_ctrl(amqp_bio_method, BIO_meth_get_ctrl(meth));
-  BIO_meth_set_callback_ctrl(amqp_bio_method, BIO_meth_get_callback_ctrl(meth));
-  BIO_meth_set_read(amqp_bio_method, BIO_meth_get_read(meth));
-  BIO_meth_set_write(amqp_bio_method, BIO_meth_get_write(meth));
-  BIO_meth_set_gets(amqp_bio_method, BIO_meth_get_gets(meth));
-  BIO_meth_set_puts(amqp_bio_method, BIO_meth_get_puts(meth));
+#ifdef OPENSSL_IS_BORINGSSL
+  BIO_meth_set_create(amqp_bio_method, BIO_s_socket()->create);
+  BIO_meth_set_destroy(amqp_bio_method, BIO_s_socket()->destroy);
+  BIO_meth_set_ctrl(amqp_bio_method, BIO_s_socket()->ctrl);
+  BIO_meth_set_read(amqp_bio_method, BIO_s_socket()->bread);
+  BIO_meth_set_write(amqp_bio_method, BIO_s_socket()->bwrite);
+  BIO_meth_set_gets(amqp_bio_method, BIO_s_socket()->bgets);
+  BIO_meth_set_puts(amqp_bio_method, BIO_s_socket()->bputs);
 #else
-  if (!(amqp_bio_method = OPENSSL_malloc(sizeof(BIO_METHOD)))) {
-    return AMQP_STATUS_NO_MEMORY;
-  }
-
-  memcpy(amqp_bio_method, BIO_s_socket(), sizeof(BIO_METHOD));
+  BIO_meth_set_create(amqp_bio_method, BIO_meth_get_create(BIO_s_socket()));
+  BIO_meth_set_destroy(amqp_bio_method, BIO_meth_get_destroy(BIO_s_socket()));
+  BIO_meth_set_ctrl(amqp_bio_method, BIO_meth_get_ctrl(BIO_s_socket()));
+  BIO_meth_set_callback_ctrl(amqp_bio_method,
+                             BIO_meth_get_callback_ctrl(BIO_s_socket()));
+  BIO_meth_set_read(amqp_bio_method, BIO_meth_get_read(BIO_s_socket()));
+  BIO_meth_set_write(amqp_bio_method, BIO_meth_get_write(BIO_s_socket()));
+  BIO_meth_set_gets(amqp_bio_method, BIO_meth_get_gets(BIO_s_socket()));
+  BIO_meth_set_puts(amqp_bio_method, BIO_meth_get_puts(BIO_s_socket()));
 #endif
+
   BIO_meth_set_write(amqp_bio_method, amqp_openssl_bio_write);
   BIO_meth_set_read(amqp_bio_method, amqp_openssl_bio_read);
 #endif
@@ -173,11 +139,7 @@ int amqp_openssl_bio_init(void) {
 void amqp_openssl_bio_destroy(void) {
   assert(amqp_ssl_bio_initialized);
 #ifdef AMQP_USE_AMQP_BIO
-#ifdef AMQP_OPENSSL_V110
   BIO_meth_free(amqp_bio_method);
-#else
-  OPENSSL_free(amqp_bio_method);
-#endif
   amqp_bio_method = NULL;
 #endif
   amqp_ssl_bio_initialized = 0;

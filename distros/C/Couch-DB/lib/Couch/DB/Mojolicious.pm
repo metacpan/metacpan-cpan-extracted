@@ -7,7 +7,7 @@
 
 package Couch::DB::Mojolicious;
 use vars '$VERSION';
-$VERSION = '0.004';
+$VERSION = '0.005';
 
 use parent 'Couch::DB';
 use feature 'state';

@@ -2,108 +2,160 @@ package Kelp::Response;
 
 use Kelp::Base 'Plack::Response';
 
-use Encode;
 use Carp;
 use Try::Tiny;
-use Scalar::Util;
+use Scalar::Util qw(blessed);
+use HTTP::Status qw(status_message);
+use Kelp::Util;
 
 attr -app => sub { croak "app is required" };
+attr charset => undef;
 attr rendered => 0;
-attr partial  => 0;
+attr partial => 0;
 
-sub new {
-    my ( $class, %args ) = @_;
+sub new
+{
+    my ($class, %args) = @_;
     my $self = $class->SUPER::new();
     $self->{$_} = $args{$_} for keys %args;
     return $self;
 }
 
-sub set_content_type {
-    $_[0]->content_type( $_[1] );
-    return $_[0];
+sub set_content_type
+{
+    my ($self, $type) = @_;
+    $self->content_type($type);
+    return $self;
 }
 
-sub text {
-    $_[0]->set_content_type( 'text/plain; charset=' . $_[0]->app->charset );
+sub charset_encode
+{
+    my ($self, $string) = @_;
+    return Kelp::Util::charset_encode(
+        Kelp::Util::effective_charset($self->charset) // $self->app->charset,
+        $string,
+    );
 }
 
-sub html {
-    $_[0]->set_content_type( 'text/html; charset=' . $_[0]->app->charset );
+sub _apply_charset
+{
+    my ($self) = @_;
+    my $charset = $self->charset;
+    return unless $charset;
+
+    my $ct = $self->content_type;
+
+    croak 'Cannot apply charset to response without content_type'
+        unless $ct;
+
+    # content_type is actually an array, getting it in scalar context only
+    # yields the actual type without charset. It will be split after setting it
+    # like this
+    $self->content_type("$ct; charset=$charset");
 }
 
-sub json {
-    $_[0]->set_content_type('application/json');
-}
-
-sub xml {
-    $_[0]->set_content_type('application/xml');
-}
-
-sub finalize {
+sub text
+{
     my $self = shift;
-    my $arr  = $self->SUPER::finalize(@_);
+    $self->set_content_type('text/plain');
+    $self->charset($self->app->charset) unless $self->charset;
+    return $self;
+}
+
+sub html
+{
+    my $self = shift;
+    $self->set_content_type('text/html');
+    $self->charset($self->app->charset) unless $self->charset;
+    return $self;
+}
+
+sub json
+{
+    my $self = shift;
+    $self->set_content_type('application/json');
+    $self->charset($self->app->charset) unless $self->charset;
+    return $self;
+}
+
+sub xml
+{
+    my $self = shift;
+    $self->set_content_type('application/xml');
+    $self->charset($self->app->charset) unless $self->charset;
+    return $self;
+}
+
+sub finalize
+{
+    my $self = shift;
+
+    $self->_apply_charset;
+
+    my $arr = $self->SUPER::finalize(@_);
     pop @$arr if $self->partial;
     return $arr;
 }
 
-sub set_header {
+sub set_header
+{
     my $self = shift;
     $self->SUPER::header(@_);
     return $self;
 }
 
-sub no_cache {
+sub no_cache
+{
     my $self = shift;
-    $self->set_header( 'Cache-Control' => 'no-cache, no-store, must-revalidate' );
-    $self->set_header( 'Pragma'        => 'no-cache' );
-    $self->set_header( 'Expires'       => '0' );
+    $self->set_header('Cache-Control' => 'no-cache, no-store, must-revalidate');
+    $self->set_header('Pragma' => 'no-cache');
+    $self->set_header('Expires' => '0');
     return $self;
 }
 
-sub set_code {
+sub set_code
+{
     my $self = shift;
     $self->SUPER::code(@_);
     return $self;
 }
 
-sub render {
-    my $self = shift;
-    my $body = shift // '';
+sub render
+{
+    my ($self, $body) = @_;
+    my $ct = $self->content_type;
+    my $ref = ref $body;
 
     # Set code 200 if the code has not been set
     $self->set_code(200) unless $self->code;
 
-    my $is_json = $self->content_type eq 'application/json';
-    my $guess_json = !$self->content_type && ref($body);
-    my $guess_html = !$self->content_type && !ref($body);
-
     # If the content has been determined as JSON, then encode it
-    if ( $is_json || $guess_json ) {
-        die "No JSON decoder" unless $self->app->can('json');
-        die "Data must be a reference" unless ref($body);
-        my $json = $self->app->json;
-        $body = $json->encode($body);
-        $body = encode($self->app->charset, $body) unless $json->get_utf8;
-        $self->json if $guess_json;
-        $self->body( $body );
-    } else {
-        $self->html if $guess_html;
-        $self->body( encode( $self->app->charset, $body ) );
+    if ($ref && (!$ct || $ct =~ m{^application/json}i)) {
+        $body = $self->app->get_encoder(json => 'internal')->encode($body);
+        $self->json if !$ct;
+    }
+    elsif (!$ref) {
+        $self->html if !$ct;
+    }
+    else {
+        croak "Don't know how to handle non-json reference in response (forgot to serialize?)";
     }
 
+    $self->body($self->charset_encode($body));
     $self->rendered(1);
     return $self;
 }
 
-sub render_binary {
-    my $self = shift;
-    my $body = shift // '';
+sub render_binary
+{
+    my ($self, $body) = @_;
+    $body //= '';
 
     # Set code 200 if the code has not been set
     $self->set_code(200) unless $self->code;
 
-    if ( !$self->content_type ) {
-        die "Content-type must be explicitly set for binaries";
+    if (!$self->content_type) {
+        croak "Content-type must be explicitly set for binaries";
     }
 
     $self->body($body);
@@ -111,104 +163,101 @@ sub render_binary {
     return $self;
 }
 
-sub render_error {
-    my ( $self, $code, $error ) = @_;
+sub render_error
+{
+    my ($self, $code, $error) = @_;
 
-    $code  //= 500;
-    $error //= "Internal Server Error";
+    $code //= 500;
+    $error //= status_message($code) // 'Error';
 
     $self->set_code($code);
 
     # Look for a template and if not found, then show a generic text
     try {
-        local $SIG{__DIE__};  # Silence StackTrace
-        my $filename = "error/$code";
+        local $SIG{__DIE__};    # Silence StackTrace
         $self->template(
-            $filename, {
-                app   => $self->app,
+            "error/$code", {
                 error => $error
             }
         );
     }
     catch {
-        $self->render("$code - $error");
+        $self->text->render("$code - $error");
     };
 
     return $self;
 }
 
-sub render_exception {
-    my ( $self, $exception ) = @_;
+sub render_exception
+{
+    my ($self, $exception) = @_;
 
-    my $code = $exception->code;
-    my $body = $exception->body;
+    # If the error is 500, do the same thing normal errors do: provide more
+    # info on non-production
+    return $self->render_500($exception->body)
+        if $exception->code == 500;
 
-    $self->set_code($code);
-    if ( defined $body ) {
-        my $is_html = $self->content_type =~ m{^text/html};
-        my $guess_html = !$self->content_type && !ref($body);
-
-        if ( $is_html || $guess_html ) {
-            $self->render_error($code, $body);
-        }
-        else {
-            $self->render($body);
-        }
-
-    }
-    elsif ( $self->content_type ) {
-        $self->content_type('');
-    }
+    return $self->render_error($exception->code);
 }
 
-sub render_404 {
-    $_[0]->render_error( 404, "File Not Found" );
+sub render_401
+{
+    $_[0]->render_error(401);
 }
 
-sub render_500 {
-    my ( $self, $error ) = @_;
+sub render_403
+{
+    $_[0]->render_error(403);
+}
 
-    if ( !defined $error || $self->app->mode eq 'deployment' ) {
+sub render_404
+{
+    $_[0]->render_error(404);
+}
+
+sub render_500
+{
+    my ($self, $error) = @_;
+
+    # Do not leak information on production!
+    if ($self->app->is_production) {
         return $self->render_error;
     }
 
-    # if render_500 gets blessed object as error stringify it
-    $error = ref $error if Scalar::Util::blessed $error;
+    # if render_500 gets blessed object as error, stringify it
+    $error = "$error" if blessed $error;
+    $error //= 'No error, something is wrong';
 
-    return $self->set_code(500)->render($error);
+    # at this point, error will never be in HTML, since the exception body
+    # would have to be HTML itself. Try to nest it inside a template. NOTE: We
+    # don't currently handle ref errors here which aren't objects
+    return $self->render_error(500, $error);
 }
 
-sub render_401 {
-    $_[0]->render_error( 401, "Unauthorized" );
-}
-
-sub render_403 {
-    $_[0]->render_error( 403, "Forbidden" );
-}
-
-sub redirect {
+sub redirect
+{
     my $self = shift;
     $self->rendered(1);
     $self->SUPER::redirect(@_);
 }
 
-sub redirect_to {
-    my ( $self, $where, $args, $code ) = @_;
+sub redirect_to
+{
+    my ($self, $where, $args, $code) = @_;
     my $url = $self->app->url_for($where, %$args);
-    $self->redirect( $url, $code );
+    $self->redirect($url, $code);
 }
 
-sub template {
-    my ( $self, $template, $vars, @rest ) = @_;
-
-    # Add the app object for convenience
-    $vars->{app} = $self->app;
+sub template
+{
+    my ($self, $template, $vars, @rest) = @_;
 
     # Do we have a template module loaded?
-    die "No template module loaded"
-      unless $self->app->can('template');
+    croak "No template module loaded"
+        unless $self->app->can('template');
 
-    my $output = $self->app->template( $template, $vars, @rest );
+    # run template in current controller context
+    my $output = $self->app->context->current->template($template, $vars, @rest);
     $self->render($output);
 }
 
@@ -268,6 +317,20 @@ which makes them easy to chain.
 
 =head1 ATTRIBUTES
 
+=head2 app
+
+A reference to the Kelp application. This will always be the real application,
+not the reblessed controller.
+
+=head2 charset
+
+The charset to be used in response. Will be glued to C<Content-Type> header
+just before the response is finalized.
+
+NOTE: charset will be glued regardless of it having any sense with a given
+C<Content-Type>, and will override any charset set explicitly through
+L</set_content_type> - use with caution.
+
 =head2 rendered
 
 Tells if the response has been rendered. This attribute is used internally and
@@ -321,8 +384,8 @@ If the response code was not previously set, this method will set it to 200.
 
 =item
 
-If no content-type is previously set, C<render> will set is based on the type of
-the data rendered. If it's a reference, then the content-type will be set to
+If no content-type is previously set, C<render> will set is based on the type
+of the data rendered. If it's a reference, then the content-type will be set to
 C<application/json>, otherwise it will be set to C<text/html>.
 
     # Will set the content-type to json
@@ -330,7 +393,9 @@ C<application/json>, otherwise it will be set to C<text/html>.
 
 =item
 
-Last, the data will be encoded with the charset specified by the app.
+Last, the data will be encoded with the charset from L</charset> or the one
+specified by the app - see L<Kelp/charset>. Any string you pass here should not
+already be encoded, unless your application has its charset set to undef.
 
 =back
 
@@ -350,6 +415,9 @@ chained.
     $self->res->text->render("word");
     $self->res->html->render("<p>word</p>");
     $self->res->json->render({ word => \1 });
+
+NOTE: These methods will also call L</charset> and set it to
+application's charset (unless it was previously set).
 
 =head2 set_header
 
@@ -375,8 +443,9 @@ Set the response code.
 
 =head2 render_binary
 
-Render binary files, such as images, etc. You must explicitly set the content_type
-before that.
+Render binary data such as byte streams, files, images, etc. You must
+explicitly set the content_type before that. Will not encode the content into
+any charset.
 
     use Kelp::Less;
 
@@ -406,6 +475,9 @@ found it will render this message:
     510 - Not Extended
 
 A return code of 510 will also be set.
+
+If a standard error message is to be used, it may be skipped - will be pulled
+from L<HTTP::Status>.
 
 =head2 render_404
 
@@ -452,4 +524,9 @@ module.
         $self->res->template('home.tt', { login => 'user' });
     }
 
+=head2 charset_encode
+
+Shortcut method, which encodes a string using the L</charset> or L<Kelp/charset>.
+
 =cut
+

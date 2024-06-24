@@ -6,3 +6,7 @@ Version 0.2
 
 Version 0.3
   * Added protections for bad enc_payload to validate()
+
+Version 0.4
+  * Added Sub::Util to META.yml requires per rt.cpan.org issue 154107.
+

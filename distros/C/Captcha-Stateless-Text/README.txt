@@ -83,4 +83,4 @@ LICENSE
 
 
 
-perl v5.34.0                      2024-04-2.::lib::Captcha::Stateless::Text(3)
+perl v5.34.0                      2024-06-2.::lib::Captcha::Stateless::Text(3)

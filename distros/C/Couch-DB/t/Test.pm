@@ -8,7 +8,7 @@
 #!!! leading blank to make Pause ignore this package
    package Test;
 use vars '$VERSION';
-$VERSION = '0.004';
+$VERSION = '0.005';
 
    use parent 'Exporter';
 

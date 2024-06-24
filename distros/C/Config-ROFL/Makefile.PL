@@ -6,7 +6,7 @@ name 'Config-ROFL';
 abstract 'Yet another config module';
 author q{Nicolas Mendoza <mendoza@pvv.ntnu.no>};
 license 'perl';
-version '1.11';
+version '1.12';
 
 configure_requires 'Module::Install';
 
@@ -17,9 +17,9 @@ requires 'Carp';
 requires 'Config::General';
 requires 'Cpanel::JSON::XS' => '4.04';
 requires 'Config::ZOMG';
-requires 'Config::Any' => 0.33;
+requires 'Config::Any' => '0.33';
 requires 'Data::Rmap';
-requires 'File::Share';
+requires 'File::Share' => '0.27';
 requires 'File::Spec';
 requires 'List::Util' => '1.33';    # 1.33 needed for 'any'
 requires 'Moo';

@@ -2,7 +2,7 @@
 # MIT License
 
 class Math : precompile {
-  version "1.003";
+  version "1.004";
   
   use Complex_2f;
   use Complex_2d;
@@ -170,24 +170,6 @@ class Math : precompile {
   native static method cpow : Complex_2d ($z1 : Complex_2d, $z2 : Complex_2d);
   
   native static method cpowf : Complex_2f ($z1 : Complex_2f, $z2 : Complex_2f);
-  
-  static method cscamul : Complex_2d ($c : double, $z : Complex_2d) {
-    my $z_ret : Complex_2d;
-    
-    $z_ret->{re} = $c * $z->{re};
-    $z_ret->{im} = $c * $z->{im};
-    
-    return $z_ret;
-  }
-  
-  static method cscamulf : Complex_2f ($c : float, $z : Complex_2f) {
-    my $z_ret : Complex_2f;
-    
-    $z_ret->{re} = $c * $z->{re};
-    $z_ret->{im} = $c * $z->{im};
-    
-    return $z_ret;
-  }
   
   native static method csin : Complex_2d ($z : Complex_2d);
   

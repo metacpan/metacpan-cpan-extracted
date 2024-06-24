@@ -18,7 +18,7 @@ Readonly::Scalar my $EMPTY_STR => q{};
 Readonly::Scalar my $HASH => q{#};
 Readonly::Scalar my $SPACE => q{ };
 
-our $VERSION = 0.20;
+our $VERSION = 0.21;
 
 # Constructor.
 sub new {
@@ -48,8 +48,9 @@ sub run {
 		'r' => 0,
 		's' => 'EXAMPLE',
 	};
-	if (! getopts('d:ehn:prs:', $self->{'_opts'}) || @ARGV < 1
-		|| $self->{'_opts'}->{'h'}) {
+	if (! getopts('d:ehn:prs:', $self->{'_opts'})
+		|| $self->{'_opts'}->{'h'}
+		|| @ARGV < 1) {
 
 		print STDERR "Usage: $0 [-d flag] [-e] [-h] [-n number] ".
 			"[-p] [-r]\n\t[-s section] [--version] ".
@@ -224,12 +225,12 @@ L<http://skim.cz>
 
 =head1 LICENSE AND COPYRIGHT
 
-© 2011-2023 Michal Josef Špaček
+© 2011-2024 Michal Josef Špaček
 
 BSD 2-Clause License
 
 =head1 VERSION
 
-0.20
+0.21
 
 =cut

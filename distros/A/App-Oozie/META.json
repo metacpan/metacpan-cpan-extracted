@@ -5,7 +5,7 @@
       "Burak Gursoy"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.031, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.032, CPAN::Meta::Converter version 2.150010",
    "keywords" : [
       "hadoop",
       "oozie",
@@ -47,7 +47,6 @@
       },
       "runtime" : {
          "requires" : {
-            "AppConfig" : "0",
             "Archive::Zip" : "0",
             "Carp" : "0",
             "Carp::Always" : "0",
@@ -65,7 +64,6 @@
             "Exporter" : "0",
             "Fcntl" : "0",
             "File::Basename" : "0",
-            "File::Copy" : "0",
             "File::Find" : "0",
             "File::Find::Rule" : "0",
             "File::Path" : "0",
@@ -93,10 +91,9 @@
             "Scalar::Util" : "0",
             "Sub::Quote" : "0",
             "Sys::Hostname" : "0",
-            "Template" : "0",
-            "Template::Base" : "0",
+            "Template" : "3.102",
+            "Template::App::ttree" : "0",
             "Text::Glob" : "0",
-            "Text::ParseWords" : "0",
             "Text::Trim" : "0",
             "Time::Duration" : "0",
             "Time::HiRes" : "0",
@@ -110,7 +107,6 @@
             "XML::LibXML::Simple" : "0",
             "XML::Twig" : "0",
             "YAML::XS" : "0",
-            "base" : "0",
             "constant" : "0",
             "namespace::autoclean" : "0",
             "overload" : "0",
@@ -144,7 +140,7 @@
          "web" : "https://github.com/Perl-Hadoop/App-Oozie"
       }
    },
-   "version" : "0.017",
+   "version" : "0.019",
    "x_contributors" : [
       "Abdelrahman Elsergani",
       "Achyuth Samudrala",

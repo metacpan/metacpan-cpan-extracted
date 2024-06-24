@@ -1,5 +1,9 @@
 Revision history for Perl extension UUID.
 
+0.36 Sat Jun 22 21:24:39 EDT 2024
+  - Fix distro tests run from read-only location.
+    - Thanks Petr Pisar. [rt.cpan.org #153854]
+
 0.35 Wed May 29 14:40:34 EDT 2024
   - Reworked persist file handling for speed.
   - Reworked seeding for front-loading prefork processes.

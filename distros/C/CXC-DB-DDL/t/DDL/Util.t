@@ -14,9 +14,11 @@ use CXC::DB::DDL::Constants {
 my %TYPE_FUNCS;
 use CXC::DB::DDL::Util {
     into   => \%TYPE_FUNCS,
-    prefix => 'DDL_'
+    prefix => 'DDL_',
   },
   -type_funcs;
+
+use CXC::DB::DDL::Util 'xTYPE';
 
 is( [ keys %TYPE_FUNCS ], bag { item $_ for keys %SQL_TYPES }, 'types' );
 
@@ -25,9 +27,18 @@ for my $type ( keys %SQL_TYPES ) {
     subtest $type => sub {
         my $constant = $SQL_TYPES{$type}->();
 
-        my $field = $TYPE_FUNCS{$type}->()->( 'foo' );
-        isa_ok( $field, ['CXC::DB::DDL::Field'], 'object' );
-        is( $field->data_type, [$constant], 'type' );
+        subtest 'explicit type generating function' => sub {
+            my $field = $TYPE_FUNCS{$type}->()->( 'foo' );
+            isa_ok( $field, ['CXC::DB::DDL::Field'], 'object' );
+            is( $field->data_type, [$constant], 'type' );
+        };
+
+        subtest 'generic type generating function' => sub {
+            my $field = xTYPE( $constant )->( 'foo' );
+            isa_ok( $field, ['CXC::DB::DDL::Field'], 'object' );
+            is( $field->data_type, [$constant], 'type' );
+        };
+
     };
 }
 

@@ -1,5 +1,12 @@
 Revision history for Data-Checks
 
+0.03    2024-06-23
+        [CHANGES]
+         * Added a few basic constraints: `Defined`, `Str`, `Num`, `Object`
+         * Added some cross-module integration tests for
+           `Signature::Attribute::Checked` and `Object::Pad::FieldAttr::Checked`
+         * Added SYNOPSIS documentation section giving examples of each
+
 0.02    2024-06-21
         [CHANGES]
          * Added `free_checkdata()` and `gen_assertmess()` API functions

@@ -1,6 +1,6 @@
 
 package Bio::SeqAlignment::Components::SeqMapping::Dataflow::Linear;
-$Bio::SeqAlignment::Components::SeqMapping::Dataflow::Linear::VERSION = '0.02';
+$Bio::SeqAlignment::Components::SeqMapping::Dataflow::Linear::VERSION = '0.03';
 use strict;
 use warnings;
 
@@ -38,6 +38,7 @@ sub sim_seq_search {
             max_workers => $max_workers,
             chunk_size  => $chunk_size,
             gather      => MCE::Candy::out_iter_array( \@results ),
+            posix_exit  => 1,
             user_func   => sub {
                 my ( $mce, $chunk_ref, $chunk_id ) = @_;
                 my @chunk_results;
@@ -63,7 +64,7 @@ Bio::SeqAlignment::Components::SeqMapping::Dataflow::Linear - A role to implemen
 
 =head1 VERSION
 
-version 0.02
+version 0.03
 
 =head1 DESCRIPTION
 

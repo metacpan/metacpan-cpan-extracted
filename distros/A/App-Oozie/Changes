@@ -1,5 +1,11 @@
 Revision history for App-Oozie
 
+0.019     2024-06-23 17:23:52+02:00 Europe/Brussels
+- dzil seems to have failed to upload. Retrying.
+
+0.018     2024-06-23 17:15:14+02:00 Europe/Brussels
+- Use the new TT having the split and remove our own fork.
+
 0.017     2024-06-07 12:47:11+02:00 Europe/Brussels
 - Use the ssl change in Net::Hadoop::WebHDFS::LWP.
 

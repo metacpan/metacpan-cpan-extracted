@@ -1,5 +1,5 @@
 package ExtUtils::Typemaps::MagicBuf;
-$ExtUtils::Typemaps::MagicBuf::VERSION = '0.006';
+$ExtUtils::Typemaps::MagicBuf::VERSION = '0.007';
 use strict;
 use warnings;
 
@@ -15,7 +15,7 @@ sub new {
 	MAGIC* magic = SvROK($arg) && SvMAGICAL(SvRV($arg)) ? mg_findext(SvRV($arg), PERL_MAGIC_ext, NULL) : NULL;
 	%:else
 	MAGIC* magic = SvROK($arg) && SvMAGICAL(SvRV($arg)) ? mg_find(SvRV($arg), PERL_MAGIC_ext) : NULL;
-	%:end
+	%:endif
 	if (magic)
 		$var = ($type)magic->mg_ptr;
 	else
@@ -44,7 +44,7 @@ ExtUtils::Typemaps::MagicBuf - Typemap for storing objects in magic
 
 =head1 VERSION
 
-version 0.006
+version 0.007
 
 =head1 SYNOPSIS
 

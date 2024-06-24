@@ -99,17 +99,23 @@
       "runtime" : {
          "requires" : {
             "CXC::Exporter::Util" : "0",
+            "Carp" : "0",
             "Clone" : "0",
             "DBI" : "0",
             "DBI::Const::GetInfoType" : "0",
+            "Digest::MD5" : "0",
             "Exporter::Tiny" : "0",
             "Feature::Compat::Try" : "0.05",
             "Hash::Ordered" : "0",
+            "Hash::Util" : "0",
+            "Import::Into" : "0",
             "List::Util" : "1.33",
+            "Module::Runtime" : "0",
             "Moo" : "0",
             "Moo::Role" : "0",
             "MooX::StrictConstructor" : "0",
             "MooX::TaggedAttributes" : "0.18",
+            "Package::Stash" : "0",
             "Ref::Util" : "0",
             "SQL::Translator" : "1.61",
             "SQL::Translator::Schema" : "0",
@@ -118,6 +124,7 @@
             "SQL::Translator::Schema::Field" : "0",
             "SQL::Translator::Schema::Table" : "0",
             "Scalar::Util" : "0",
+            "Sub::Util" : "1.40",
             "Syntax::Keyword::Defer" : "0",
             "Type::Library" : "0",
             "Type::Params" : "0",
@@ -141,12 +148,14 @@
          },
          "requires" : {
             "DBIx::QuickDB" : "0",
+            "Exporter::Shiny" : "0",
             "ExtUtils::MakeMaker" : "0",
             "File::Spec" : "0",
             "IO::Handle" : "0",
             "IPC::Open3" : "0",
             "Test2::Tools::QuickDB" : "0",
             "Test2::V0" : "0",
+            "Test::Lib" : "0",
             "Test::More" : "0"
          }
       }
@@ -154,35 +163,39 @@
    "provides" : {
       "CXC::DB::DDL" : {
          "file" : "lib/CXC/DB/DDL.pm",
-         "version" : "0.13"
+         "version" : "0.14"
       },
       "CXC::DB::DDL::CloneClear" : {
          "file" : "lib/CXC/DB/DDL/CloneClear.pm",
-         "version" : "0.13"
+         "version" : "0.14"
       },
       "CXC::DB::DDL::Constants" : {
          "file" : "lib/CXC/DB/DDL/Constants.pm",
-         "version" : "0.13"
+         "version" : "0.14"
       },
       "CXC::DB::DDL::Failure" : {
          "file" : "lib/CXC/DB/DDL/Failure.pm",
-         "version" : "0.13"
+         "version" : "0.14"
       },
       "CXC::DB::DDL::Field" : {
          "file" : "lib/CXC/DB/DDL/Field.pm",
-         "version" : "0.13"
+         "version" : "0.14"
+      },
+      "CXC::DB::DDL::Field::Pg" : {
+         "file" : "lib/CXC/DB/DDL/Field/Pg.pm",
+         "version" : "0.14"
       },
       "CXC::DB::DDL::Table" : {
          "file" : "lib/CXC/DB/DDL/Table.pm",
-         "version" : "0.13"
+         "version" : "0.14"
       },
       "CXC::DB::DDL::Types" : {
          "file" : "lib/CXC/DB/DDL/Types.pm",
-         "version" : "0.13"
+         "version" : "0.14"
       },
       "CXC::DB::DDL::Util" : {
          "file" : "lib/CXC/DB/DDL/Util.pm",
-         "version" : "0.13"
+         "version" : "0.14"
       }
    },
    "release_status" : "stable",
@@ -197,7 +210,7 @@
          "web" : "https://gitlab.com/djerius/cxc-db-ddl"
       }
    },
-   "version" : "0.13",
+   "version" : "0.14",
    "x_generated_by_perl" : "v5.38.2",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.37",
    "x_spdx_expression" : "GPL-3.0-only"

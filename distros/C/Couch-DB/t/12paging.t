@@ -20,7 +20,7 @@ my $db = $couch->db('test');
 _result removed          => $db->remove;
 _result create           => $db->create;
 
-foreach my $docnr (01..70)
+foreach my $docnr (1..70)
 {	my $r = $db->doc("doc$docnr")->create({nr => $docnr});
 	$r or die $r->response->to_string;
 }
@@ -128,6 +128,8 @@ cmp_ok @$docs5, '==', 70, '.. all at once';
 
 ### find, map
 
+ok 1, 'New call: find_all_map';  # map runs before _result reports test label
+
 sub map6($$)
 {   my ($result, $doc) = @_;
 	isa_ok $result, 'Couch::DB::Result', '...';
@@ -140,6 +142,10 @@ my $docs6 = $f6->page;
 cmp_ok @$docs6, '==', 70, '.. all at once';
 is $docs6->[0], 42, '... first 42';
 cmp_ok +(grep $_==42, @$docs6), '==', 70, '... all 42';
+
+### findExplain
+
+_result find_explain => $db->findExplain($query);
 
 ####### Cleanup
 _result removed          => $db->remove;

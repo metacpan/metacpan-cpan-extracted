@@ -8,20 +8,32 @@ use Carp qw(croak);
 
 use XSLoader;
 BEGIN {
-	our $VERSION = '1.04';
+	our $VERSION = '1.05';
 	XSLoader::load __PACKAGE__, $VERSION;
 }
+
+my %modes = (
+	'statement'  => MODE_STATEMENT,
+	'expression' => MODE_EXPRESSION,
+	'dynamic'    => MODE_DYNAMIC,
+);
 
 sub define {
 	my %p = @_;
 	my ($kw, $sub, $expression, $global, $package) = @p{qw(keyword code expression global package)};
 	$kw =~ /^\p{XIDS}\p{XIDC}*\z/ or croak "'$kw' doesn't look like an identifier";
 	defined($sub) or croak "'code' is not defined";
+	$expression //= 'statement';
+	my $sub_is_code = (ref($sub) and
+	                   (UNIVERSAL::isa($sub, 'CODE') or
+	                    $sub->isa('CODE')));
+	$sub_is_code or $expression ne 'dynamic' or croak("expression=dynamic requires a coderef");
 
-	my $xsub = (ref($sub) eq 'CODE') ? $sub : 
-		sub { substr ${$_[0]}, 0, 0, $sub };
+	my $xsub = $sub_is_code ? $sub : sub { substr ${$_[0]}, 0, 0, $sub };
 
-	my $entry = [ $xsub, !!$expression ];
+	my $entry = [ $xsub,
+	              ($modes{$expression} //
+	               ($expression? MODE_EXPRESSION: MODE_STATEMENT)) ];
 
 	if ( defined $package) {
 		no strict 'refs';
@@ -125,8 +137,13 @@ if examination and change is needed.
 
 =item expression
 
-Boolean flag; if true then the perl parser will treat new code as expression,
-otherwise as a statement
+String value; if C<"statement">, then the injected code will be parsed as a
+statement.  If C<"expression">, if will be parsed as an expression.  If
+C<"dynamic">, then C<code> must be a coderef rather than a string, returning
+a true value to indicate an expression or a false value to indicate a
+statement.  (For backward compatibility, a false value for C<expression> is
+treated as C<"statement">, and any unrecognized value is treated as
+C<"expression">.)
 
 =item global
 
@@ -184,10 +201,14 @@ Lukas Mai, C<< <l.mai at web.de> >>
 
 Dmitry Karasik , C<< <dmitry at karasik.eu.org> >>
 
+=head1 THANKS
+
+Paul Jarc
+
 =head1 COPYRIGHT & LICENSE
 
 Copyright (C) 2012, 2013 Lukas Mai.
-Copyright (C) 2018 Dmitry Karasik
+Copyright (C) 2018-2024 Dmitry Karasik
 
 This program is free software; you can redistribute it and/or modify it
 under the terms of either: the GNU General Public License as published

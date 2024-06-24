@@ -2,11 +2,9 @@ amqp_api.c
 amqp_connection.c
 amqp_consumer.c
 amqp_framing.c
-amqp_hostcheck.c
 amqp_mem.c
 amqp_openssl.c
 amqp_openssl_bio.c
-amqp_openssl_hostname_validation.c
 amqp_socket.c
 amqp_table.c
 amqp_tcp_socket.c
@@ -20,8 +18,7 @@ inc/Devel/CheckLib.pm
 LICENSE
 LICENSE-MIT
 Makefile.PL
-MANIFEST			This list of files
-'MANIFEST 3'
+MANIFEST
 manual_tests/001_dead_letter_headers.t
 perl_math_int64.c
 perl_math_int64.h
@@ -37,13 +34,18 @@ rabbitmq-include/amqp_ssl_socket.h
 rabbitmq-include/amqp_table.h
 rabbitmq-include/amqp_tcp_socket.h
 rabbitmq-include/amqp_time.h
+rabbitmq-include/rabbitmq-c/amqp.h
+rabbitmq-include/rabbitmq-c/export.h
+rabbitmq-include/rabbitmq-c/framing.h
+rabbitmq-include/rabbitmq-c/ssl_socket.h
+rabbitmq-include/rabbitmq-c/tcp_socket.h
 rabbitmq-include/unix/threads.h
-'rabbitmq-include/win32/msinttypes/stdint 2.h'
 rabbitmq-include/win32/msinttypes/stdint.h
 rabbitmq-include/win32/threads.h
 RabbitMQ.pm
 RabbitMQ.xs
 README.md
+run-one-test
 t/000_use_ok.t
 t/001_declare_exchange.t
 t/002_publish_consume.t

@@ -46,7 +46,6 @@ t/1uuid/v4.t
 t/1uuid/v5.t
 t/1uuid/v6.t
 t/1uuid/v7.t
-t/3names/v3bare.t
 t/3names/v3dns.t
 t/3names/v3oid.t
 t/3names/v3url.t
@@ -62,6 +61,7 @@ t/3unique/v7.t
 t/5defer/base.t
 t/5defer/default.t
 t/5defer/extra.t
+t/5defer/fork.t
 t/5defer/noarg.t
 t/5defer/nonum.t
 t/5defer/real.t

@@ -6,11 +6,11 @@ use warnings;
 
 use Class::Utils qw(set_params split_params);
 use Error::Pure qw(err);
-use List::MoreUtils qw(none);
+use List::Util 1.33 qw(none);
 use Scalar::Util qw(blessed);
 use Tags::HTML::Element::A;
 
-our $VERSION = 0.06;
+our $VERSION = 0.07;
 
 # Constructor.
 sub new {
@@ -150,32 +150,6 @@ sub _process_css {
 		['s', '.'.$self->{'css_table'}.' td'],
 		['d', 'padding', '15px'],
 		['e'],
-	);
-
-	return;
-}
-
-sub _tags_a {
-	my ($self, $value) = @_;
-
-	$self->{'tags'}->put(
-		['b', 'a'],
-		defined $value->css_class ? (
-			['a', 'class', $value->css_class],
-		) : (),
-		defined $value->url ? (
-			['a', 'href', $value->url],
-		) : (),
-	);
-	if ($value->data_type eq 'plain') {
-		$self->{'tags'}->put(
-			['d', @{$value->data}],
-		);
-	} elsif ($value->data_type eq 'tags') {
-		$self->{'tags'}->put($value->data);
-	}
-	$self->{'tags'}->put(
-		['e', 'a'],
 	);
 
 	return;
@@ -587,9 +561,10 @@ Returns undef.
 
 L<Class::Utils>,
 L<Error::Pure>,
-L<List::MoreUtils>,
+L<List::Util>,
 L<Scalar::Util>,
-L<Tags::HTML>.
+L<Tags::HTML>,
+L<Tags::HTML::Element::A>.
 
 =head1 REPOSITORY
 
@@ -609,6 +584,6 @@ BSD 2-Clause License
 
 =head1 VERSION
 
-0.06
+0.07
 
 =cut

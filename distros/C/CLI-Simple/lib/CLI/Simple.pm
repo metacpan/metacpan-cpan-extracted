@@ -15,7 +15,7 @@ use Pod::Usage;
 use CLI::Simple::Constants qw(:booleans :chars :log-levels);
 use CLI::Simple::Utils qw(normalize_options);
 
-our $VERSION = '0.0.6';
+our $VERSION = '0.0.7';
 
 use parent qw(Class::Accessor::Fast Exporter);
 
@@ -91,7 +91,9 @@ sub new {
   $option_specs    //= $OPTION_SPECS;
   $commands        //= $COMMANDS;
 
-  croak 'usage: ' . $class . '->new( option_specs => specs, commands => commands, [defaults => default-options)'
+  croak 'usage: '
+    . $class
+    . '->new( option_specs => specs, commands => commands, [defaults => default-options)'
     if !$option_specs || !$commands;
 
   $default_options //= {};
@@ -283,13 +285,15 @@ CLI::Simple - a framework for creating option driven Perl scripts
  )->run;
 
  1;
-  
+
 =head1 DESCRIPTION
 
 Tired of writing the same 'ol boilerplate code for command line
 scripts? Want a standard, simple way to create a Perl script?
 C<CLI::Simple> makes it easy to create scripts that take I<options>,
 I<commands> and I<arguments>.
+
+This documentation describes version 0.0.7.
 
 =head2 Features
 
@@ -398,7 +402,7 @@ Example:
 
 =item option_specs (required)
 
-An array reference of option specfications.  These are the same as
+An array reference of option specifications.  These are the same as
 those passed to C<Getopt::Long>.
 
 =back
@@ -471,8 +475,8 @@ In your command subroutines you can then access these options using gettters.
  $cli->get_log_level;
 
 Note that options that use dashes in the name will be automatically
-converted to snake case names. Some folks find it easier to use '-'
-rather than '_' for option names.
+converted to snake case names. (Some folks find it easier to use '-'
+rather than '_' for option names.)
 
 =head1 COMMAND ARGUMENTS
 
@@ -489,14 +493,15 @@ easier to read and understand.
    ...
  }
 
-If pass an empty list then all of the command arguments will be returned.
+If you pass an empty list then all of the command arguments will be
+returned.
 
  my ($phone_number, $message) = $self->get_args;
 
 =head1 SETTING DEFAULT VALUES FOR OPTIONS
 
 To set default values for your option, pass a hash reference as the
-C<default_options> argument to the constructur.
+C<default_options> argument to the constructor.
 
   my $cli = CLI::Simple->new(
     default_option => { foo => 'bar' },
@@ -506,7 +511,7 @@ C<default_options> argument to the constructur.
 
 =head1 ADDING ADDITIONAL SETTERS & GETTERS
 
-As note all command line options are available using getters of the
+As noted all command line options are available using getters of the
 same name preceded by C<get_>.
 
 If you want to create additional setter and getters, pass an array of
@@ -521,8 +526,8 @@ variable names as the C<extra_options> argument to the constructor.
 
 =head1 ADDING USAGE TO YOUR SCRIPTS
 
-To add a usage or help capability to your scripts, just add some pod
-at the bottom of your script with a USAGE section (head1).
+To add usage or help capability to your scripts, just add some pod
+at the bottom of your script in a USAGE section (head1).
 
  =head1 USAGE
 
@@ -534,16 +539,16 @@ at the bottom of your script with a USAGE section (head1).
   ....
 
 If the command specified is 'help' or if you have added an optional
-C<--help> option, users can access the usage section from the command line.
+C<--help> option, users can then access the usage section from the command line.
 
- perl myscript.pm -h
- perl myscript.pm help
+ perl myscript.pm -h perl myscript.pm help
 
 =head1 LOGGING
 
 C<CLI::Simple> will enable you to automatically add logging to your
-script using a L<Log::Log4perl> logger. You can pass in a C<Log4perl> configuration
-string or let the class instantiate C<Log::Log4perl> in easy mode.
+script using a L<Log::Log4perl> logger. You can pass in a C<Log4perl>
+configuration string or let the class instantiate C<Log::Log4perl> in
+easy mode.
 
 Do this at the top of your class:
 
@@ -560,7 +565,7 @@ to retrieve the logger.
 =item How do I execute some startup code before my command runs?
 
 The C<new> constructor will execute an C<init()> method prior to
-returning. Implement your own L</init> function which has all of the
+returning. Implement your own L</init> function which will have of the
 commands and arguments available to it at that time.
 
 =item Do I need to implement commands?
@@ -640,13 +645,13 @@ calls the module with the arguments passed on the command line.
 
 The script (C<modulino>) is include in this distribution.
 
-You can also us the include C<create-modulino.pl> script to create a
+You can also use the included C<create-modulino.pl> script to create a
 symbolic link to your class that will be executed as if it is a Perl
 script if you've implemented the modulino pattern described above.
 
   sudo create-modulino.pl Foo::Bar foo-bar
 
-If you do not provide and alias name as the second argument the script
+If you do not provide an alias name as the second argument the script
 will create a copy of the C<modulino> script as a normalized name of
 your module but will not create a symbolic link.
 
@@ -654,9 +659,9 @@ The script essentially executes the recipe below.
 
 =over 5
 
-=item 1. Copy the C<modulino> script using a name that convert the
+=item 1. Copy the C<modulino> script using a name that converts the
 first letter of the class to lower case and any CamelCased words
-inside the class name to lower case with all words snake caseds.
+inside the class name to lower case with all words snake cased.
 Example: C<Module::ScanDeps::FindRequires> becomes:
 C<module_scanDeps_findRequires>.
 
@@ -669,6 +674,8 @@ C<module_scanDeps_findRequires>.
 =item 3. Create a symlink with a name of your chosing to the new script.
 
  sudo ln -s /usr/local/bin/module_scanDeps_findRequire /usr/local/bin/find-requires 
+
+=back
 
 =back
 

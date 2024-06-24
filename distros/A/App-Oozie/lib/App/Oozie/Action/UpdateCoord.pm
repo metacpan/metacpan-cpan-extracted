@@ -7,7 +7,7 @@ use strict;
 use warnings;
 use parent qw( App::Oozie::Update::Coordinator );
 
-our $VERSION = '0.017'; # VERSION
+our $VERSION = '0.019'; # VERSION
 
 1;
 
@@ -23,7 +23,7 @@ App::Oozie::Action::UpdateCoord
 
 =head1 VERSION
 
-version 0.017
+version 0.019
 
 =head1 SYNOPSIS
 

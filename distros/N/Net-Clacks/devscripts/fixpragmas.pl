@@ -6,7 +6,7 @@ use diagnostics;
 use mro 'c3';
 use English qw(-no_match_vars);
 use Carp qw[carp croak confess cluck longmess shortmess];
-our $VERSION = 28;
+our $VERSION = 29;
 use autodie qw( close );
 use Array::Contains;
 use utf8;
@@ -16,7 +16,7 @@ use builtin qw[true false is_bool];
 no warnings qw(experimental::builtin); ## no critic (TestingAndDebugging::ProhibitNoWarnings)
 #---AUTOPRAGMAEND---
 
-# PAGECAMEL  (C) 2008-2023 Rene Schickbauer
+# PAGECAMEL  (C) 2008-2024 Rene Schickbauer
 # Developed under Artistic license
 
 
@@ -84,7 +84,7 @@ foreach my $file (@files) {
             print $ofh "use mro 'c3';\n";
             print $ofh "use English qw(-no_match_vars);\n";
             print $ofh "use Carp qw[carp croak confess cluck longmess shortmess];\n";
-            print $ofh "our \$VERSION = 28;\n";
+            print $ofh "our \$VERSION = 29;\n";
             print $ofh "use autodie qw( close );\n";
             print $ofh "use Array::Contains;\n";
             print $ofh "use utf8;\n";

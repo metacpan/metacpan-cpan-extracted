@@ -1,3 +1,9 @@
+
+# seconds per test
+my $seconds = $ARGV[0] || 2;
+
+#------------------------------------------------------------------------------
+use blib;
 use strict;
 use warnings;
 use File::Temp ();
@@ -8,36 +14,46 @@ use UUID qw(
     unparse
 );
 
-my $seconds = $ARGV[0] || 1;
+use vars qw($tmpdir $fname);
+
+BEGIN {
+    $tmpdir = File::Temp->newdir(CLEANUP => 0);
+    $fname  = File::Temp::tempnam($tmpdir, 'UUID.test.');
+}
+
+END {
+    unlink $fname  if defined $fname;
+    rmdir  $tmpdir if defined $tmpdir;
+}
+
+# call END block on ^C
+$SIG{INT} = sub { exit 0 };
 
 print "\ncomparing persist...\n\n";
 
-my ($fh, $fname) = File::Temp::tempfile(
-    'assertconfXXXXXXXX', SUFFIX => '.txt', UNLINK => 0
-);
-close $fh;
-
 UUID::_persist(undef);
-my $t1 = countit(2*$seconds, 'my $s = uuid1()');
+my $t0 = countit($seconds, 'my $s = uuid1()');
 UUID::_persist($fname);
-my $t2 = countit(2*$seconds, 'my $s = uuid1()');
+my $t1 = countit($seconds, 'my $s = uuid1()');
 UUID::_defer(0.0000001);
-my $t3 = countit(2*$seconds, 'my $s = uuid1()');
+my $t2 = countit($seconds, 'my $s = uuid1()');
 UUID::_defer(0.000001);
-my $t4 = countit(2*$seconds, 'my $s = uuid1()');
+my $t3 = countit($seconds, 'my $s = uuid1()');
 UUID::_defer(0.00001);
-my $t5 = countit(2*$seconds, 'my $s = uuid1()');
+my $t4 = countit($seconds, 'my $s = uuid1()');
 UUID::_defer(0.0001);
-my $t6 = countit(2*$seconds, 'my $s = uuid1()');
+my $t5 = countit($seconds, 'my $s = uuid1()');
 UUID::_defer(0.001);
-my $t7 = countit(2*$seconds, 'my $s = uuid1()');
+my $t6 = countit($seconds, 'my $s = uuid1()');
 UUID::_defer(0.01);
-my $t8 = countit(2*$seconds, 'my $s = uuid1()');
+my $t7 = countit($seconds, 'my $s = uuid1()');
 UUID::_defer(0.1);
-my $t9 = countit(2*$seconds, 'my $s = uuid1()');
-unlink $fname;
+my $t8 = countit($seconds, 'my $s = uuid1()');
+UUID::_defer(1.0);
+my $t9 = countit($seconds, 'my $s = uuid1()');
 
 my $r = cmpthese({
+    'case0' => $t0,
     'case1' => $t1,
     'case2' => $t2,
     'case3' => $t3,
@@ -49,19 +65,20 @@ my $r = cmpthese({
     'case9' => $t9,
 }, 'none');
 
-printf("%9s %11s %6s %6s %6s %6s %6s %6s %6s %6s %6s\n", @$_) for @$r;
+printf("%9s %11s %6s %6s %6s %6s %6s %6s %6s %6s %6s %6s\n", @$_) for @$r;
 
 print <<'EOT';
 
-    case1  ->  no persist; eval 'my $s = uuid1()'
-    case2  ->  persistent; eval 'my $s = uuid1()' # undeferred
-    case3  ->  persistent; eval 'my $s = uuid1()' # deferred 100ns
-    case4  ->  persistent; eval 'my $s = uuid1()' # deferred 1us
-    case5  ->  persistent; eval 'my $s = uuid1()' # deferred 10us
-    case6  ->  persistent; eval 'my $s = uuid1()' # deferred 100us
-    case7  ->  persistent; eval 'my $s = uuid1()' # deferred 1ms
-    case8  ->  persistent; eval 'my $s = uuid1()' # deferred 10ms
-    case9  ->  persistent; eval 'my $s = uuid1()' # deferred 100ms
+    case0  ->  no persist; eval 'my $s = uuid1()'
+    case1  ->  persistent; eval 'my $s = uuid1()' # undeferred
+    case2  ->  persistent; eval 'my $s = uuid1()' # deferred 100ns
+    case3  ->  persistent; eval 'my $s = uuid1()' # deferred 1us
+    case4  ->  persistent; eval 'my $s = uuid1()' # deferred 10us
+    case5  ->  persistent; eval 'my $s = uuid1()' # deferred 100us
+    case6  ->  persistent; eval 'my $s = uuid1()' # deferred 1ms
+    case7  ->  persistent; eval 'my $s = uuid1()' # deferred 10ms
+    case8  ->  persistent; eval 'my $s = uuid1()' # deferred 100ms
+    case9  ->  persistent; eval 'my $s = uuid1()' # deferred 1ms
 EOT
 
 exit 0;

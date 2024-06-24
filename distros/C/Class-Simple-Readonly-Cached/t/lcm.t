@@ -18,7 +18,7 @@ LCM: {
 		$cache->on_set_error('die');
 		$cache->on_get_error('die');
 
-		my $lcm = new_ok('Class::Simple::Readonly::Cached' => [ cache => $cache, object => new_ok('Locale::Country::Multilingual') ]);
+		my $lcm = new_ok('Class::Simple::Readonly::Cached' => [{ cache => $cache, object => new_ok('Locale::Country::Multilingual') }]);
 
 		is($lcm->code2country('US', 'fr_FR'), 'États-Unis', 'First call to États-Unis');
 		is($lcm->code2country('US', 'fr_FR'), 'États-Unis', 'Second call to États-Unis');

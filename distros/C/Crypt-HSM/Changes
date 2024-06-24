@@ -1,5 +1,14 @@
 Revision history for Crypt-HSM
 
+0.017     2024-06-23 14:59:22+02:00 Europe/Brussels
+          - Add Crypt::HSM::Key
+          - Fixed using Mechanism object as mechanism argument
+          - Fix hash/generator distinction in RSA PKCS PSS
+          - Add support for AES/DES CFB/OFB
+          - Fix argument handling for ecdh1-derive
+          - Swap arguments to eddsa
+          - Fix various compiler warnings in XS code
+
 0.016     2024-01-05 18:38:07+01:00 Europe/Brussels
           - Add missing parentheses to refcount.h
 

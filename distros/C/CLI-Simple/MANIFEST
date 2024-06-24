@@ -2,12 +2,12 @@ bin/create-modulino
 bin/create-modulino.pl
 bin/modulino
 ChangeLog
-examples/MyScript.pm
 lib/CLI/Simple.pm
 lib/CLI/Simple/Constants.pm
 lib/CLI/Simple/Utils.pm
 Makefile.PL
 MANIFEST			This list of files
+MyScript.pm
 t/00-cli-simple-constants.t
 t/00-cli-simple-utils.t
 t/00-cli-simple.t

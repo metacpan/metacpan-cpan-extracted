@@ -4,32 +4,31 @@ use Kelp::Base;
 
 use Carp qw/ longmess croak /;
 use FindBin;
-use Encode;
 use Try::Tiny;
-use Data::Dumper;
 use Sys::Hostname;
 use Plack::Util;
 use Class::Inspector;
+use List::Util qw(any);
 use Scalar::Util qw(blessed);
+use Kelp::Context;
 
-our $VERSION = '2.00';
+our $VERSION = '2.10';
 
 # Basic attributes
 attr -host => hostname;
-attr  mode => $ENV{KELP_ENV} // $ENV{PLACK_ENV} // 'development';
+attr mode => $ENV{KELP_ENV} // $ENV{PLACK_ENV} // 'development';
 attr -path => $FindBin::Bin;
-attr -name => sub { ( ref( $_[0] ) =~ /(\w+)$/ ) ? $1 : 'Noname' };
-attr  request_obj  => 'Kelp::Request';
-attr  response_obj => 'Kelp::Response';
-
+attr -name => sub { (ref($_[0]) =~ /(\w+)$/) ? $1 : 'Noname' };
+attr request_obj => 'Kelp::Request';
+attr response_obj => 'Kelp::Response';
 
 # Debug
 attr long_error => $ENV{KELP_LONG_ERROR} // 0;
 
-# The charset is UTF-8 unless otherwise instructed
-attr -charset => sub {
-    $_[0]->config("charset") // 'UTF-8';
-};
+# The charset is set to UTF-8 by default in config module.
+# No default here because we want to support 'undef' charset
+attr charset => sub { $_[0]->config('charset') };
+attr request_charset => sub { $_[0]->config('request_charset') };
 
 # Name the config module
 attr config_module => 'Config';
@@ -40,39 +39,50 @@ attr __config => undef;
 
 attr -loaded_modules => sub { {} };
 
-# Each route's request an response objects will
-# be put here:
+# Data for handling routes
+attr context => sub { Kelp::Context->new(app => $_[0]) };
 attr req => undef;
 attr res => undef;
 
+# registered application encoder modules
+attr encoder_modules => sub { {} };
+
 # Initialization
-sub new {
+sub new
+{
     my $self = shift->SUPER::new(@_);
+
+    Kelp::Base::_DEBUG(1 => 'Loading essential modules...');
 
     # Always load these modules, but allow client to override
     $self->_load_config();
     $self->_load_routes();
 
+    Kelp::Base::_DEBUG(1 => 'Loading modules from config...');
+
     # Load the modules from the config
-    if ( defined( my $modules = $self->config('modules') ) ) {
+    if (defined(my $modules = $self->config('modules'))) {
         $self->load_module($_) for (@$modules);
     }
+
+    Kelp::Base::_DEBUG(1 => 'Calling build method...');
 
     $self->build();
     return $self;
 }
 
-sub new_anon {
+sub new_anon
+{
     state $last_anon = 0;
     my $class = shift;
 
     # make sure we don't eval something dodgy
     die "invalid class for new_anon"
-        if ref $class                         # not a string
-        || !$class                            # not an empty string, undef or 0
-        || !Class::Inspector->loaded($class)  # not a loaded class
-        || !$class->isa(__PACKAGE__)          # not a correct class
-    ;
+        if ref $class    # not a string
+        || !$class    # not an empty string, undef or 0
+        || !Class::Inspector->loaded($class)    # not a loaded class
+        || !$class->isa(__PACKAGE__)    # not a correct class
+        ;
 
     my $anon_class = "Kelp::Anonymous::$class" . ++$last_anon;
     my $err = do {
@@ -97,28 +107,34 @@ sub new_anon {
     return $anon_class->new(@_);
 }
 
-sub _load_config {
+sub _load_config
+{
     my $self = shift;
-    $self->load_module( $self->config_module, extra => $self->__config );
+    $self->load_module($self->config_module, extra => $self->__config);
+
+    Kelp::Base::_DEBUG(config => 'Merged configuration: ', $self->config_hash);
 }
 
-sub _load_routes {
+sub _load_routes
+{
     my $self = shift;
     $self->load_module('Routes');
 }
 
 # Create a shallow copy of the app, optionally blessed into a
 # different subclass.
-sub _clone {
+sub _clone
+{
     my $self = shift;
     my $subclass = shift || ref($self);
 
     ref $self or croak '_clone requires instance';
-    return bless { %$self }, $subclass;
+    return bless {%$self}, $subclass;
 }
 
-sub load_module {
-    my ( $self, $name, %args ) = @_;
+sub load_module
+{
+    my ($self, $name, %args) = @_;
 
     # A module name with a leading + indicates it's already fully
     # qualified (i.e., it does not need the Kelp::Module:: prefix).
@@ -127,72 +143,81 @@ sub load_module {
     # Make sure the module was not already loaded
     return if $self->loaded_modules->{$name};
 
-    my $class = Plack::Util::load_class( $name, $prefix );
-    my $module = $self->loaded_modules->{$name} = $class->new( app => $self );
+    my $class = Plack::Util::load_class($name, $prefix);
+    my $module = $self->loaded_modules->{$name} = $class->new(app => $self);
 
     # When loading the Config module itself, we don't have
     # access to $self->config yet. This is why we check if
     # config is available, and if it is, then we pull the
     # initialization hash.
     my $args_from_config = {};
-    if ( $self->can('config') ) {
+    if ($self->can('config')) {
         $args_from_config = $self->config("modules_init.$name") // {};
     }
 
-    $module->build( %$args_from_config, %args );
+    Kelp::Base::_DEBUG(modules => "Loading $class module with args: ", {%$args_from_config, %args});
+
+    $module->build(%$args_from_config, %args);
     return $module;
 }
 
 # Override this one to add custom initializations
-sub build {
+sub build
+{
 }
 
 # Override to use a custom request object
-sub build_request {
-    my ( $self, $env ) = @_;
-    my $package = $self->request_obj;
-    eval qq{require $package};
-    return $package->new( app => $self, env => $env);
+sub build_request
+{
+    return Kelp::Util::load_package($_[0]->request_obj)->new(
+        app => $_[0],
+        env => $_[1],
+    );
 }
 
 # Override to use a custom response object
-sub build_response {
-    my $self = shift;
-    my $package = $self->response_obj;
-    eval qq{require $package};
-    return $package->new( app => $self );
+sub build_response
+{
+    return Kelp::Util::load_package($_[0]->response_obj)->new(
+        app => $_[0],
+    );
 }
 
 # Override to change what happens before the route is handled
-sub before_dispatch {
-    my ( $self, $destination ) = @_;
+sub before_dispatch
+{
+    my ($self, $destination) = @_;
 
     # Log info about the route
-    if ( $self->can('logger') ) {
+    if ($self->can('logger')) {
         my $req = $self->req;
 
         $self->info(
             sprintf "%s: %s - %s %s - %s",
-                ref $self,
-                $req->address, $req->method,
-                $req->path,    $destination
+            ref $self,
+            $req->address, $req->method,
+            $req->path, $destination
         );
     }
 }
 
 # Override to manipulate the end response
-sub before_finalize {
+sub before_finalize
+{
     my $self = shift;
     $self->res->header('X-Framework' => 'Perl Kelp');
 }
 
 # Override this to wrap more middleware around the app
-sub run {
+sub run
+{
     my $self = shift;
     my $app = sub { $self->psgi(@_) };
 
+    Kelp::Base::_DEBUG(1 => 'Running the application...');
+
     # Add middleware
-    if ( defined( my $middleware = $self->config('middleware') ) ) {
+    if (defined(my $middleware = $self->config('middleware'))) {
         for my $class (@$middleware) {
 
             # Make sure the middleware was not already loaded
@@ -202,81 +227,100 @@ sub run {
 
             my $mw = Plack::Util::load_class($class, 'Plack::Middleware');
             my $args = $self->config("middleware_init.$class") // {};
-            $app = $mw->wrap( $app, %$args );
+
+            Kelp::Base::_DEBUG(modules => "Wrapping app in $mw middleware with args: ", $args);
+
+            $app = $mw->wrap($app, %$args);
         }
     }
 
     return $app;
 }
 
-sub psgi {
-    my ( $self, $env ) = @_;
+sub psgi
+{
+    my ($self, $env) = @_;
 
-    # Create the request and response objects
-    my $req = $self->req( $self->build_request($env) );
-    my $res = $self->res( $self->build_response );
+    # Initialize the app object state
+    $self->context->clear;
+    my $req = $self->req($self->build_request($env));
+    my $res = $self->res($self->build_response);
 
     # Get route matches
-    my $match = $self->routes->match( $req->path, $req->method );
+    my $match = $self->routes->match($req->path, $req->method);
 
-    # None found? Show 404 ...
-    if ( !@$match ) {
+    # None found? Short-circuit and show 404
+    if (!@$match) {
         $res->render_404;
         return $self->finalize;
     }
 
-    try {
+    return try {
 
         # Go over the entire route chain
         for my $route (@$match) {
 
             # Dispatch
-            $req->named( $route->named );
-            $req->route_name( $route->name );
-            my $data = $self->routes->dispatch( $self, $route );
+            $req->named($route->named);
+            $req->route_name($route->name);
+            my $data = $self->routes->dispatch($self, $route);
 
-            # Is it a bridge? Bridges must return a true value
-            # to allow the rest of the routes to run.
-            if ( $route->bridge ) {
-                if ( !$data ) {
+            if ($route->bridge) {
+
+                # Is it a bridge? Bridges must return a true value to allow the
+                # rest of the routes to run. They may also have rendered
+                # something, in which case trust that and don't render 403 (but
+                # still end the execution chain)
+
+                if (!$data) {
                     $res->render_403 unless $res->rendered;
-                    last;
                 }
-                next;
             }
+            elsif (defined $data) {
 
-            # If the route returned something, then analyze it and render it
-            if ( defined $data ) {
+                # If the non-bridge route returned something, then analyze it and render it
 
                 # Handle delayed response if CODE
-                return $data if ref($data) eq 'CODE';
+                return $data if ref $data eq 'CODE';
                 $res->render($data) unless $res->rendered;
             }
+
+            # Do not go any further if we got a render
+            last if $res->rendered;
         }
 
         # If nothing got rendered
-        if ( !$res->rendered ) {
+        if (!$res->rendered) {
+
             # render 404 if only briges matched
-            if ( $match->[-1]->bridge ) {
+            if ($match->[-1]->bridge) {
                 $res->render_404;
             }
+
             # or die with error
             else {
-              die $match->[-1]->to
-              . " did not render for method "
-              . $req->method;
+                die $match->[-1]->to
+                    . " did not render for method "
+                    . $req->method;
             }
         }
 
-        $self->finalize;
+        return $self->finalize;
     }
     catch {
         my $exception = $_;
 
+        # CONTEXT CHANGE: we need to clear response state because anything that
+        # was rendered beforehand is no longer valid. Body and code will be
+        # replaced automatically with render methods, but headers must be
+        # cleared explicitly
+        $res->headers->clear;
+
         if (blessed $exception && $exception->isa('Kelp::Exception')) {
-            # No logging here, since it is a message for the user with a code
-            # rather than a real exceptional case
-            # (Nothing really broke, user code invoked this)
+
+            # only log it as an error if the body is present
+            $self->logger('error', $exception->body)
+                if $self->can('logger') && defined $exception->body;
 
             $res->render_exception($exception);
         }
@@ -284,26 +328,32 @@ sub psgi {
             my $message = $self->long_error ? longmess($exception) : $exception;
 
             # Log error
-            $self->logger( 'critical', $message ) if $self->can('logger');
+            $self->logger('critical', $message) if $self->can('logger');
 
-            # Render 500
-            $res->render_500($_);
+            # Render an application erorr (hides details on production)
+            $res->render_500($exception);
         }
-        $self->finalize;
+
+        return $self->finalize;
     };
 }
 
-sub finalize {
+sub finalize
+{
     my $self = shift;
-    $self->before_finalize;
-    $self->res->finalize;
-}
 
+    # call it with current context, so that it will get controller's hook if
+    # possible
+    $self->context->current->before_finalize;
+
+    return $self->res->finalize;
+}
 
 #----------------------------------------------------------------
 # Request and Response shortcuts
 #----------------------------------------------------------------
-sub param {
+sub param
+{
     my $self = shift;
     unshift @_, $self->req;
 
@@ -313,12 +363,14 @@ sub param {
 
 sub session { shift->req->session(@_) }
 
-sub stash {
+sub stash
+{
     my $self = shift;
     @_ ? $self->req->stash->{$_[0]} : $self->req->stash;
 }
 
-sub named {
+sub named
+{
     my $self = shift;
     @_ ? $self->req->named->{$_[0]} : $self->req->named;
 }
@@ -327,17 +379,35 @@ sub named {
 # Utility
 #----------------------------------------------------------------
 
-sub url_for {
-    my ( $self, $name, @args ) = @_;
+sub is_production
+{
+    my $self = shift;
+    return any { lc $self->mode eq $_ } qw(deployment production);
+}
+
+sub url_for
+{
+    my ($self, $name, @args) = @_;
     my $result = $name;
-    try { $result = $self->routes->url( $name, @args ) };
+    try { $result = $self->routes->url($name, @args) };
     return $result;
 }
 
-sub abs_url {
-    my ( $self, $name, @args ) = @_;
-    my $url = $self->url_for( $name, @args );
-    return URI->new_abs( $url, $self->config('app_url') )->as_string;
+sub abs_url
+{
+    my ($self, $name, @args) = @_;
+    my $url = $self->url_for($name, @args);
+    return URI->new_abs($url, $self->config('app_url'))->as_string;
+}
+
+sub get_encoder
+{
+    my ($self, $type, $name) = @_;
+
+    my $encoder = $self->encoder_modules->{$type} //
+        croak "No $type encoder";
+
+    return $encoder->get_encoder($name);
 }
 
 1;
@@ -383,11 +453,65 @@ Kelp is a light, modular web framework built on top of Plack.
 
 This document lists all the methods and attributes available in the main
 instance of a Kelp application, passed as a first argument to route handling
-routines.
+routines. If you're just getting started, you may be more interested in the
+following documentation pages:
 
 See L<Kelp::Manual> for a complete reference.
 
 See L<Kelp::Manual::Cookbook> for solutions to common problems.
+
+=head1 REASONS TO USE KELP
+
+=over
+
+=item
+
+B<Plack ecosystem>. Kelp isn't just compatible with L<Plack>, it's built on top
+of it. Your application can be supported by a collection of already available Plack
+components.
+
+=item
+
+B<Advanced Routing>. Create intricate, yet simple ways to capture HTTP requests
+and route them to their designated code. Use explicit and optional named
+placeholders, wildcards, or just regular expressions.
+
+=item
+
+B<Flexible Configuration>. Use different configuration file for each
+environment, e.g. development, deployment, etc. Merge a temporary configuration
+into your current one for testing and debugging purposes.
+
+=item
+
+B<Enhanced Logging>. Log messages at different levels of emergency. Log to a
+file, screen, or anything supported by L<Log::Dispatch>.
+
+=item
+
+B<Powerful Rendering>. Use the built-in auto-rendering logic, or the template
+module of your choice to return rich text, html and JSON responses.
+
+=item
+
+B<JSON encoder/decoder>. Kelp can handle JSON-formatted requests and responses
+automatically, making working with JSON much more enjoyable. On top of that, it
+uses L<JSON::MaybeXS> to choose the best (fastest, most secure) backend
+available.
+
+=item
+
+B<Extendable Core>. Kelp has straightforward code and uses pluggable modules
+for everything. This allows anyone to extend it or add a module for a custom
+interface. Writing Kelp modules is easy.
+
+=item
+
+B<Sleek Testing>. Kelp takes Plack::Test and wraps it in an object oriented
+class of convenience methods. Testing is done via sending requests to your
+routes, then analyzing the response.
+
+=back
 
 =head1 ATTRIBUTES
 
@@ -458,8 +582,23 @@ class will be used.
 
 =head2 charset
 
-Sets of gets the encoding charset of the app. It will be C<UTF-8>, if not set to
-anything else. The charset could also be changed in the config files.
+Gets or sets the output encoding charset of the app. It will be C<UTF-8>, if
+not set to anything else. The charset can also changed in the config files.
+
+If the charset is explicitly configured to be C<undef> or false, the
+application won't do any automatic encoding of responses, unless you set it by
+explicitly calling L<Kelp::Response/charset>.
+
+=head2 request_charset
+
+Same as L</charset>, but only applies to the input. Request data will be
+decoded using this charset or charset which came with the request.
+
+If the request charset is explicitly configured to be C<undef> or false, the
+application won't do any automatic decoding of requests, B<even if message came
+with a charset>.
+
+For details, see L<Kelp::Request/ENCODING>.
 
 =head2 long_error
 
@@ -479,6 +618,7 @@ contain a reference to the current L<Kelp::Request> instance.
         }
     }
 
+
 =head2 res
 
 This attribute only makes sense if called within a route definition. It will
@@ -488,6 +628,24 @@ contain a reference to the current L<Kelp::Response> instance.
         my $self = shift;
         $self->res->json->render( { success => 1 } );
     }
+
+=head2 context
+
+This holds application's context. Its usage is advanced and only useful for
+controller logic, but may allow for some introspection into Kelp.
+
+For example, if you have a route in a controller and need to get the original
+Kelp app object, you may call this:
+
+    sub some_route {
+        my $controller = shift;
+        my $app = $controller->context->app;
+    }
+
+=head2 encoder_modules
+
+A hash reference of registered encoder modules. Should only be interacted with
+through L</get_encoder> or inside encoder module's code.
 
 =head1 METHODS
 
@@ -670,6 +828,39 @@ arguments.
 
 Same as L</url_for>, but returns the full absolute URI for the current
 application (based on configuration).
+
+=head2 is_production
+
+Returns whether the application is in production mode. Checks if L</mode> is
+either C<deployment> or C<production>.
+
+=head2 get_encoder
+
+    my $json_encoder = $self->get_encoder('json');
+
+Gets an instance of a given encoder. It takes two arguments:
+
+=over
+
+=item * type of the encoder module (eg. C<json>)
+
+=item * optional name of the encoder (default is C<default>)
+
+=back
+
+It will get extra config (if available) from C<encoders.TYPE.NAME>
+configuration hash. Will instantiate the encoder just once and then reuse it.
+Croaks when there is no such encoder type.
+
+Example new JSON encoder type defined in config:
+
+    encoders => {
+        json => {
+            not_very_pretty => {
+                pretty => 0,
+            },
+        },
+    },
 
 =head1 AUTHOR
 

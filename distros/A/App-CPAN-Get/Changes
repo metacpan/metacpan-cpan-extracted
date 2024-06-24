@@ -1,3 +1,11 @@
+0.11 2024-06-23T16:49:45+02:00
+ - Add doc for App::CPAN::Get::MetaCPAN.
+ - Add tests for Get::run().
+ - Add tests for MetaCPAN::search().
+ - Finish tests of Get module.
+ - Rewrite arguments process to more intuitive way.
+ - Rewrite run() tests to use of help() helper.
+
 0.10 2024-04-20T14:51:38+02:00
  - Add tests for App::CPAN::Get::MetaCPAN.
  - Improve abstract.

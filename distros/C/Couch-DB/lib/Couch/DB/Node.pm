@@ -7,7 +7,7 @@
 
 package Couch::DB::Node;
 use vars '$VERSION';
-$VERSION = '0.004';
+$VERSION = '0.005';
 
 
 use Couch::DB::Util;

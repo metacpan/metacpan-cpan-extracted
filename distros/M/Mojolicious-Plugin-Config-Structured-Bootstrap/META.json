@@ -41,7 +41,7 @@
       },
       "runtime" : {
          "recommends" : {
-            "Mojolicious::Plugin::Authentication::OIDC" : "0.05",
+            "Mojolicious::Plugin::Authentication::OIDC" : "0.06",
             "Mojolicious::Plugin::Authorization::AccessControl" : "0.02",
             "Mojolicious::Plugin::Cron::Scheduler" : "0.02",
             "Mojolicious::Plugin::Data::Transfigure" : "0.01",
@@ -80,7 +80,7 @@
    "provides" : {
       "Mojolicious::Plugin::Config::Structured::Bootstrap" : {
          "file" : "lib/Mojolicious/Plugin/Config/Structured/Bootstrap.pm",
-         "version" : "0.04"
+         "version" : "0.06"
       }
    },
    "release_status" : "stable",
@@ -94,7 +94,7 @@
          "web" : "https://github.com/tyrrminal/mojolicious-plugin-config-structured-bootstrap.git"
       }
    },
-   "version" : "0.04",
+   "version" : "0.06",
    "x_generated_by_perl" : "v5.38.2",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.37",
    "x_spdx_expression" : "MIT"

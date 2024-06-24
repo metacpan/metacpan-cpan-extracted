@@ -346,7 +346,8 @@ EXAMPLE3
      # </body>
 
 DEPENDENCIES
-    Class::Utils, Error::Pure, List::MoreUtils, Scalar::Util, Tags::HTML.
+    Class::Utils, Error::Pure, List::Util, Scalar::Util, Tags::HTML,
+    Tags::HTML::Element::A.
 
 REPOSITORY
     <https://github.com/michal-josef-spacek/Tags-HTML-Table-View>
@@ -362,5 +363,5 @@ LICENSE AND COPYRIGHT
     BSD 2-Clause License
 
 VERSION
-    0.06
+    0.07
 

@@ -12,20 +12,73 @@ _my_clear_cache(){
    rm -frv $MY_CACHE_DIR/my_*.cache
 }
 
+# Build list of all perl modules which can be
+# 'require'd from the current @INC.
 _tab__pod_get_modules_list(){
-   perl -le 'print for @INC' | while
-      read dir; do
-         find $dir \( -type f -or -type l \) \( -name "*.pm" \) -printf "%P\n" |
-         perl -lpe '
-            s&^[^/]+/&& while /-/;
-            s&/&::&g;
-            s/\.pm$//
-         ' | sort -u
-      done
+    perl -MFile::Find -E '
+        use strict;
+        use warnings;
+
+        my @pkgs;
+        my %seen;
+
+        local $/ = ""; # Paragraph mode.
+
+        for my $dir ( @INC ) {
+            find (
+                {
+                    wanted => sub{
+
+                        my $file = $File::Find::name;
+                        my $pkg  = $file;
+                        
+                        # Skip duplicates in different paths.
+                        return if $seen{$file}++;
+                        
+                        # Only pm files.
+                        return unless / \. pm $ /x;
+
+                        # Skip broken links;
+                        return if not -e $file;
+
+                        # Change to package.
+                        $pkg =~ s{ \. pm $ }{}x;
+                        $pkg =~ s{ ^ $dir / }{}x;
+                        $pkg =~ s{ / }{::}xg;
+                        
+                        # Valid perl package names.
+                        return if $pkg !~ / ^ [a-zA-Z_:0-9]+ $ /x;
+
+                        # Process first 2 blocks to
+                        # see if it has the expected
+                        # package name (if any).
+                        open my $fh, "<", $file or return;
+                        for ( 1..2 ) {
+                            my $block = <$fh>;
+                            next if not $block;
+                            if ( $block =~ / ^ \s* package \s+ $pkg; /xm ) {
+                                push @pkgs, $pkg;
+                            }
+
+                        }
+                        close $fh;
+                    },
+                    follow      => 1,
+                    follow_skip => 2,
+                },
+                $dir
+            );
+        }
+
+        for ( sort @pkgs ) {
+            say;
+        }
+    ' 
 }
 
+# Build completions based on the number of arguments.
 _tab__pod_get_command(){
-   perl -le '
+    perl -le '
         my $cnt   = 0;
         my $class = "";
 
@@ -57,29 +110,29 @@ _tab__pod_get_command(){
 }
 
 _tab__pod(){
-   local cur prev words cword _possible
-   _init_completion -n : || return
+    local cur prev words cword _possible
+    _init_completion -n : || return
 
-   if [ ! -e "$MY_POD_CACHE" ]; then
-      _tab__pod_make_class_cache
-   fi
+    if [ ! -e "$MY_POD_CACHE" ]; then
+        _tab__pod_make_class_cache
+    fi
 
-   if [[ $cur =~ ^- ]]; then                    # Option
-       _possible=$(pod --tool_options)
-   elif [[ "$prev" =~ ^-+q(uery)?$ ]]; then     # --query
-       return                                   # Since it can be anything.
-   else
-       # Filter out script name, options, and query value.
-       # Then count how many arguments remain.
-       local command=$(_tab__pod_get_command "${words[@]}")
-       _possible=$(eval "$command")
-       compopt -o nospace                       # No space afterwards.
-   fi
+    if [[ $cur =~ ^- ]]; then                    # Option
+        _possible=$(pod --tool_options)
+    elif [[ "$prev" =~ ^-+q(uery)?$ ]]; then     # --query
+        return                                   # Since it can be anything.
+    else
+        # Filter out script name, options, and query value.
+        # Then count how many arguments remain.
+        local command=$(_tab__pod_get_command "${words[@]}")
+        _possible=$(eval "$command")
+        compopt -o nospace                       # No space afterwards.
+    fi
 
-   COMPREPLY=($(compgen -W "$_possible" -- $cur))
+    COMPREPLY=($(compgen -W "$_possible" -- $cur))
 
-   # Remove colon contain prefix from COMPREPLY
-   __ltrim_colon_completions "$cur"
+    # Remove colon contain prefix from COMPREPLY
+    __ltrim_colon_completions "$cur"
 }
 
 complete -F _tab__pod pod

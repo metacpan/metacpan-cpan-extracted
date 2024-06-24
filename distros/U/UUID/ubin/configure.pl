@@ -10,7 +10,6 @@ use strict;
 use warnings;
 use Config;
 use List::Util;
-use File::Temp ();
 use Devel::CheckLib;
 
 my ($out, $flagfile) = @ARGV;

@@ -9,7 +9,10 @@ Term::Output::List - output an updateable list of ongoing jobs
 
 # SYNOPSIS
 
-    my $printer = Term::Output::List->new();
+    my $printer = Term::Output::List->new(
+        hook_warnings => 1,
+        ellipsis => "\N{HORIZONTAL ELLIPSIS}",
+    );
     my @ongoing_tasks = ('file1: frobnicating', 'file2: bamboozling', 'file3: frobnicating');
     $printer->output_list(@ongoing_tasks);
 
@@ -18,6 +21,20 @@ Term::Output::List - output an updateable list of ongoing jobs
 # METHODS
 
 ## `Term::Output::List->new()`
+
+- `fh`
+
+    Filehandle used for output. Default is `STDOUT`.
+
+- `interactive`
+
+    Whether the script is run interactively and should output intermittent
+    updateable information
+
+- `hook_warnings`
+
+    Install a hook for sending warnings to `->output_permanent`. This
+    prevents ugly tearing/overwriting when your code outputs warnings.
 
 ## `->scroll_up`
 
@@ -29,6 +46,7 @@ Helper method to place the cursor at the top of the updateable list.
     $o->output_list("Frobnicating 9 items for job 1",
                     "Frobnicating 2 items for job 3",
     );
+    $o->output_permanent("Frobnicated 3 items for job 2");
 
 Outputs items that should go on the permanent record. It is expected to
 output the (remaining) list of ongoing jobs after that.
