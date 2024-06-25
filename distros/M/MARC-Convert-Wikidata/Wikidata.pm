@@ -10,9 +10,10 @@ use MARC::Convert::Wikidata::Item::BookEdition;
 use MARC::Convert::Wikidata::Item::Periodical;
 use MARC::Convert::Wikidata::Transform;
 use MARC::Leader;
+use Mo::utils 0.08 qw(check_isa check_required);
 use Scalar::Util qw(blessed);
 
-our $VERSION = 0.08;
+our $VERSION = 0.09;
 
 # Constructor.
 sub new {
@@ -51,14 +52,8 @@ sub new {
 	# Process parameters.
 	set_params($self, @params);
 
-	if (! defined $self->{'marc_record'}) {
-		err "Parameter 'marc_record' is required.";
-	}
-	if (! blessed($self->{'marc_record'})
-		|| ! $self->{'marc_record'}->isa('MARC::Record')) {
-
-		err "Parameter 'marc_record' must be a MARC::Record object.";
-	}
+	check_required($self, 'marc_record');
+	check_isa($self, 'marc_record', 'MARC::Record');
 
 	$self->{'_transform_object'} = MARC::Convert::Wikidata::Transform->new(
 		'marc_record' => $self->{'marc_record'},
@@ -263,8 +258,10 @@ Returns Wikibase::Datatype instance.
  new():
          From Class::Utils::set_params():
                  Unknown parameter '%s'.
-         Parameter 'marc_record' is required.
-         Parameter 'marc_record' must be a MARC::Record object.
+         From Mo::utils::check_isa():
+                 Parameter 'marc_record' must be a 'MARC::Record' object.
+         From Mo::utils::check_required():
+                 Parameter 'marc_record' is required.
 
  type():
          Unsupported item with leader '%s'.
@@ -508,6 +505,6 @@ BSD 2-Clause License
 
 =head1 VERSION
 
-0.08
+0.09
 
 =cut

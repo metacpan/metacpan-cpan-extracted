@@ -1,5 +1,8 @@
 Revision history for Perl extension Kelp::Module::Sereal.
 
+2.10 Mon Jun 24 2024
+	- module now uses Kelp 2.10 encoders and registers itself under name 'sereal'
+
 1.02 Sun Oct 23 2022
 	- fix tests for Sereal 5
 

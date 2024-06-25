@@ -11,8 +11,6 @@ requires "Regexp::Common" => "2017060201";
 requires "Set::Tiny" => "0.04";
 requires "Time::HiRes" => "1.9764";
 requires "YAML::XS" => "0.88";
-requires "overload" => "0";
-requires "parent" => "0";
 requires "perl" => "5.012000";
 
 on 'test' => sub {
@@ -32,6 +30,7 @@ on 'test' => sub {
 };
 
 on 'configure' => sub {
+  requires "Devel::AssertOS" => "1.21";
   requires "ExtUtils::MakeMaker" => "0";
   requires "perl" => "5.012000";
 };

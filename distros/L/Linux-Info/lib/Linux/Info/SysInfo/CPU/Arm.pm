@@ -5,9 +5,9 @@ use Carp qw(confess);
 use Class::XSAccessor getters =>
   { get_variant => 'variant', get_part => 'part', get_revision => 'revision' };
 
-use parent 'Linux::Info::SysInfo::CPU';
+use base 'Linux::Info::SysInfo::CPU';
 
-our $VERSION = '2.17'; # VERSION
+our $VERSION = '2.18'; # VERSION
 
 # ABSTRACT: Collects Arm based CPU information from /proc/cpuinfo
 
@@ -197,7 +197,7 @@ Linux::Info::SysInfo::CPU::Arm - Collects Arm based CPU information from /proc/c
 
 =head1 VERSION
 
-version 2.17
+version 2.18
 
 =head1 SYNOPSIS
 

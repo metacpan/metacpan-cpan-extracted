@@ -1,5 +1,5 @@
 package Kelp::Module::Symbiosis;
-$Kelp::Module::Symbiosis::VERSION = '2.00';
+$Kelp::Module::Symbiosis::VERSION = '2.10';
 use Kelp::Base qw(Kelp::Module);
 use KelpX::Symbiosis::Adapter;
 
@@ -57,6 +57,15 @@ applications should be ran alongside the Kelp framework. The intended use is to
 introduce new "organisms" into symbiotic interaction by creating Kelp modules
 that are then attached onto Kelp. Then, the added method I<run_all> should be
 invoked in place of Kelp's I<run>, which will construct and return an ecosystem.
+
+=head2 Module state with Kelp 2.10
+
+This module isn't as useful anymore with Kelp version C<2.10> adding easy
+mounting of Plack apps. It may still be useful in some specific scenarios, like
+automatic URLMap usage or when some modules use it, but generally you can
+consider it outdated, as the problem it was solving is now easily solved using
+core L<Kelp>. See L<Kelp::Manual/Nesting Plack apps> for details on how Kelp
+deals with mounting applications under a route natively.
 
 =head2 Why not just use Plack::Builder in a .psgi script?
 

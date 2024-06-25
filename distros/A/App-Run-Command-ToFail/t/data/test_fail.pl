@@ -8,13 +8,13 @@ use IO::Barf qw(barf);
 use Perl6::Slurp;
 
 if (@ARGV < 2) {
-	print STDERR "Usage: $0 cycles cycle_to_fail\n";
+	print STDERR "Usage: $0 cycles cycle_to_fail state_file\n";
 	exit 1;
 }
 my $cycles = $ARGV[0];
 my $cycle_to_fail = $ARGV[1];
+my $state_file = $ARGV[2] || File::Object->new->file('state')->s;
 
-my $state_file = File::Object->new->file('state')->s;
 my $state = 0;
 if (-r $state_file) {
 	$state = slurp($state_file);

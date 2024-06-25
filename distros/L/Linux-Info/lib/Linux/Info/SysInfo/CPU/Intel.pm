@@ -10,9 +10,9 @@ use Class::XSAccessor getters => {
     get_cache     => 'cache',
 };
 
-use parent 'Linux::Info::SysInfo::CPU';
+use base 'Linux::Info::SysInfo::CPU';
 
-our $VERSION = '2.17'; # VERSION
+our $VERSION = '2.18'; # VERSION
 
 # ABSTRACT: Collects Intel based CPU information from /proc/cpuinfo
 
@@ -198,7 +198,7 @@ Linux::Info::SysInfo::CPU::Intel - Collects Intel based CPU information from /pr
 
 =head1 VERSION
 
-version 2.17
+version 2.18
 
 =head1 SYNOPSIS
 

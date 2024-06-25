@@ -6,10 +6,11 @@ use warnings;
 
 use Class::Utils qw(set_params split_params);
 use Error::Pure qw(err);
+use Mo::utils 0.12 qw(check_code);
 use Mo::utils::CSS 0.02 qw(check_css_class);
 use Scalar::Util qw(blessed);
 
-our $VERSION = 0.02;
+our $VERSION = 0.03;
 
 # Constructor.
 sub new {
@@ -52,26 +53,14 @@ sub new {
 	check_css_class($self, 'css_class');
 
 	# Check callback codes.
-	$self->_check_callback('img_comment_cb');
-	$self->_check_callback('img_select_cb');
-	$self->_check_callback('img_src_cb');
+	check_code($self, 'img_comment_cb');
+	check_code($self, 'img_select_cb');
+	check_code($self, 'img_src_cb');
 
 	$self->_cleanup;
 
 	# Object.
 	return $self;
-}
-
-sub _check_callback {
-	my ($self, $callback_key) = @_;
-
-	if (defined $self->{$callback_key}
-		&& ref $self->{$callback_key} ne 'CODE') {
-
-		err "Parameter '$callback_key' must be a code.";
-	}
-
-	return;
 }
 
 sub _cleanup {
@@ -416,6 +405,10 @@ Returns undef.
  new():
          From Class::Utils::set_params():
                  Unknown parameter '%s'.
+         From Mo::utils::check_code():
+                 Parameter 'img_comment_cb' must be a code.
+                 Parameter 'img_select_cb' must be a code.
+                 Parameter 'img_src_cb' must be a code.
          From Mo::utils::CSS::check_css_class():
                  Parameter 'css_class' has bad CSS class name.
                          Value: %s
@@ -424,9 +417,6 @@ Returns undef.
          From Tags::HTML::new():
                  Parameter 'css' must be a 'CSS::Struct::Output::*' class.
                  Parameter 'tags' must be a 'Tags::Output::*' class.
-         Parameter 'img_comment_cb' must be a code.
-         Parameter 'img_select_cb' must be a code.
-         Parameter 'img_src_cb' must be a code.
 
  init():
          Image object is required.
@@ -628,6 +618,7 @@ Returns undef.
 
 L<Class::Utils>,
 L<Error::Pure>,
+L<Mo::utils>,
 L<Mo::utils::CSS>,
 L<Scalar::Util>,
 L<Tags::HTML>.
@@ -650,6 +641,6 @@ BSD 2-Clause License
 
 =head1 VERSION
 
-0.02
+0.03
 
 =cut

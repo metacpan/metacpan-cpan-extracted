@@ -4,7 +4,8 @@ use strict;
 use FindBin qw($Bin);
 
 use lib 't/lib';
-use Test::Most tests => 12;
+use Test::Most tests => 14;
+use Test::NoWarnings;
 
 use_ok('Database::test1');
 
@@ -46,3 +47,12 @@ if($ENV{'TEST_VERBOSE'}) {
 }
 
 cmp_ok($entry, 'eq', 'two', 'look up a key');
+
+@rc = $test1->execute("SELECT number FROM test1 WHERE entry IS NOT NULL AND entry NOT LIKE '#%'");
+
+if($ENV{'TEST_VERBOSE'}) {
+	use Data::Dumper;
+	diag(Data::Dumper->new([\@rc])->Dump());
+}
+
+cmp_ok(scalar(@rc), '==', 3, 'execute() returns all entries');

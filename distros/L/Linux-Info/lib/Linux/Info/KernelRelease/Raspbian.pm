@@ -2,14 +2,14 @@ package Linux::Info::KernelRelease::Raspbian;
 
 use warnings;
 use strict;
-use parent 'Linux::Info::KernelRelease';
+use base 'Linux::Info::KernelRelease';
 use Carp qw(confess);
 use Class::XSAccessor getters => {
     get_binutils_version => 'binutils_version',
     get_build_number     => 'build_number',
 };
 
-our $VERSION = '2.17'; # VERSION
+our $VERSION = '2.18'; # VERSION
 
 # ABSTRACT: a subclass of Linux::Info::KernelRelease specific to parse Alpine kernel information
 
@@ -42,7 +42,7 @@ Linux::Info::KernelRelease::Raspbian - a subclass of Linux::Info::KernelRelease 
 
 =head1 VERSION
 
-version 2.17
+version 2.18
 
 =head1 METHODS
 

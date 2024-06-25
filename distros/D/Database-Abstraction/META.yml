@@ -12,6 +12,7 @@ build_requires:
   Test::Compile: '0'
   Test::Most: '0'
   Test::Needs: '0'
+  Test::NoWarnings: '0'
   Text::xSV::Slurp: '0'
 configure_requires:
   ExtUtils::MakeMaker: '0'
@@ -41,5 +42,5 @@ requires:
 resources:
   bugtracker: https://github.com/nigelhorne/Database-Abstraction/issues
   repository: git://github.com/nigelhorne/Database-Abstraction.git
-version: '0.08'
+version: '0.09'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

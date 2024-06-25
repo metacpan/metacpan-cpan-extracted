@@ -12,7 +12,7 @@ use Class::XSAccessor getters => {
     get_version_id => 'version_id',
 };
 
-our $VERSION = '2.17'; # VERSION
+our $VERSION = '2.18'; # VERSION
 
 # ABSTRACT: base class to handle Linux distribution information
 
@@ -57,7 +57,7 @@ Linux::Info::Distribution - base class to handle Linux distribution information
 
 =head1 VERSION
 
-version 2.17
+version 2.18
 
 =head1 SYNOPSIS
 

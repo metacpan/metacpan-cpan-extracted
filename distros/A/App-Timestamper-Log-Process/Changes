@@ -1,5 +1,11 @@
 Revision history for App-Timestamper-Log-Process
 
+0.0.4       2024-06-25
+
+    - Try to fix tests' suite failures on MS Windows (strawberryperl / etc.)
+        - E,g: http://www.cpantesters.org/cpan/report/263b39b8-6d2d-1014-8aed-c9c8dea7032c
+        - The problem likely was CR/LF mismatches.
+
 0.0.3       2024-06-10
 
     - Use a more portable regular-expression syntax:

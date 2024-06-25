@@ -23,6 +23,7 @@ WriteMakefile(
 		'Test::Compile' => 0,
 		'Test::Most' => 0,
 		'Test::Needs' => 0,
+		'Test::NoWarnings' => 0,
 		'Text::xSV::Slurp' => 0
 	}, PREREQ_PM => {
 		'autodie' => 0,

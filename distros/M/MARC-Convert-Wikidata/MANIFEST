@@ -50,12 +50,16 @@ t/data/cnb003369415.mrc
 t/data/INFO
 t/MARC-Convert-Wikidata-Item-AudioBook/01-use.t
 t/MARC-Convert-Wikidata-Item-AudioBook/02-version.t
+t/MARC-Convert-Wikidata-Item-AudioBook/03-new.t
 t/MARC-Convert-Wikidata-Item-BookEdition/01-use.t
 t/MARC-Convert-Wikidata-Item-BookEdition/02-version.t
+t/MARC-Convert-Wikidata-Item-BookEdition/03-new.t
 t/MARC-Convert-Wikidata-Item-Periodical/01-use.t
 t/MARC-Convert-Wikidata-Item-Periodical/02-version.t
+t/MARC-Convert-Wikidata-Item-Periodical/03-new.t
 t/MARC-Convert-Wikidata-Item/01-use.t
 t/MARC-Convert-Wikidata-Item/02-version.t
+t/MARC-Convert-Wikidata-Item/03-new.t
 t/MARC-Convert-Wikidata-Transform/01-use.t
 t/MARC-Convert-Wikidata-Transform/02-version.t
 t/MARC-Convert-Wikidata-Transform/03-new.t

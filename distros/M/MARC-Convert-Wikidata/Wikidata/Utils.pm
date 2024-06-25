@@ -15,7 +15,7 @@ Readonly::Array our @EXPORT_OK => qw(clean_cover clean_date clean_edition_number
 	clean_title);
 Readonly::Array our @COVERS => qw(hardback paperback);
 
-our $VERSION = 0.08;
+our $VERSION = 0.09;
 our $DEBUG = 0;
 
 sub clean_cover {
@@ -394,13 +394,13 @@ sub clean_publisher_place {
 	# [V Praze]
 	$ret_publisher_place =~ s/^\[(.*?)\]?$/$1/ms;
 
-	$ret_publisher_place =~ s/^V\s+//ms;
+	$ret_publisher_place =~ s/^[VW]e?\s+//ms;
 
 	foreach my $origin (keys %{$dict_hr}) {
 		$ret_publisher_place =~ s/^$origin$/$dict_hr->{$origin}/ms;
 	}
 
-	$ret_publisher_place =~ s/^V\s+([\s\w]+)$/$1/ms;
+	$ret_publisher_place =~ s/^[VW]e?\s+([\s\w]+)$/$1/ms;
 	# [Praha]
 	$ret_publisher_place =~ s/^\[(.*?)\]$/$1/ms;
 
@@ -760,6 +760,6 @@ BSD 2-Clause License
 
 =head1 VERSION
 
-0.08
+0.09
 
 =cut

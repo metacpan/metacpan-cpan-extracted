@@ -17,9 +17,11 @@ use lib 't/lib';
 	{
 		my $self = shift;
 
-		$self->add_route("/kelp/test" => sub {
-			"kelp";
-		});
+		$self->add_route(
+			"/kelp/test" => sub {
+				"kelp";
+			}
+		);
 	}
 
 	1;

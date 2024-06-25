@@ -1,23 +1,27 @@
 package Kelp::Module::JSON::XS;
-use Kelp::Base 'Kelp::Module';
+use Kelp::Base 'Kelp::Module::Encoder';
 use JSON::XS;
-use Carp;
 
-our $VERSION = 0.502;
+our $VERSION = '0.503';
+
+sub encoder_name { 'json' }
+
+sub build_encoder {
+    my ($self, $args) = @_;
+    my $json = JSON::XS->new;
+
+    for my $key (keys %{$args}) {
+        $json->$key($args->{$key});
+    }
+
+    return $json;
+}
 
 sub build {
     my ( $self, %args ) = @_;
-    my $json = JSON::XS->new;
+    $self->SUPER::build(%args);
 
-    # JSON::XS doesn't seem to have a property method
-    my $opts = join '->', map { "${_}($args{$_})" } keys %args;
-    if ( $opts ) {
-        local $@;
-        eval "\$json->$opts;";
-        croak $@ if $@;
-    }
-
-    $self->register( json => $json );
+    $self->register(json => $self->get_encoder);
 }
 
 1;
@@ -26,13 +30,18 @@ __END__
 
 =head1 NAME
 
-Kelp::Module::JSON::XS - JSON:XS module for Kelp applications
+Kelp::Module::JSON::XS - DEPRECATED JSON:XS module for Kelp applications
 
 =head1 DEPRECATED
 
-*** This module is now deprecated. ***
-Beginning with version 2.0 of the JSON module, when both JSON and
-JSON::XS are installed, then JSON will fall back on JSON::XS
+B<*** This module is now deprecated. ***>
+
+Kelp is now using L<JSON::MaybeXS>, which will automatically choose the most
+fitting backend for JSON.
+
+Kelp used L<JSON> module before that. Beginning with version 2.0 of the JSON
+module, when both JSON and JSON::XS are installed, then JSON will fall back on
+JSON::XS
 
 =head1 SYNOPSIS
 

@@ -1,13 +1,14 @@
 package App::INIUtils;
 
-our $VERSION = '0.034'; # VERSION
-our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2019-12-15'; # DATE
-our $DIST = 'App-INIUtils'; # DIST
-
+use strict;
 use 5.010001;
 
 use Sort::Sub;
+
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2024-06-24'; # DATE
+our $DIST = 'App-INIUtils'; # DIST
+our $VERSION = '0.035'; # VERSION
 
 our %SPEC;
 
@@ -203,7 +204,7 @@ App::INIUtils - INI utilities
 
 =head1 VERSION
 
-This document describes version 0.034 of App::INIUtils (from Perl distribution App-INIUtils), released on 2019-12-15.
+This document describes version 0.035 of App::INIUtils (from Perl distribution App-INIUtils), released on 2024-06-24.
 
 =head1 SYNOPSIS
 
@@ -211,29 +212,29 @@ This distribution provides the following command-line utilities:
 
 =over
 
-=item * L<delete-ini-key>
+=item 1. L<delete-ini-key>
 
-=item * L<delete-ini-section>
+=item 2. L<delete-ini-section>
 
-=item * L<dump-ini>
+=item 3. L<dump-ini>
 
-=item * L<get-ini-key>
+=item 4. L<get-ini-key>
 
-=item * L<get-ini-section>
+=item 5. L<get-ini-section>
 
-=item * L<grep-ini>
+=item 6. L<grep-ini>
 
-=item * L<insert-ini-key>
+=item 7. L<insert-ini-key>
 
-=item * L<insert-ini-section>
+=item 8. L<insert-ini-section>
 
-=item * L<list-ini-sections>
+=item 9. L<list-ini-sections>
 
-=item * L<map-ini>
+=item 10. L<map-ini>
 
-=item * L<parse-ini>
+=item 11. L<parse-ini>
 
-=item * L<sort-ini-sections>
+=item 12. L<sort-ini-sections>
 
 =back
 
@@ -248,6 +249,8 @@ Usage:
 
  sort_ini_sections(%args) -> any
 
+.
+
 This function is not exported.
 
 Arguments ('*' denotes required arguments):
@@ -256,19 +259,24 @@ Arguments ('*' denotes required arguments):
 
 =item * B<allow_duplicate_key> => I<bool> (default: 1)
 
+(No description)
+
 =item * B<default_section> => I<str> (default: "GLOBAL")
+
+(No description)
 
 =item * B<ini>* => I<str>
 
 INI file.
 
-=item * B<sort_args> => I<hash>
+=item * B<sort_args> => I<array[str]>
 
 Arguments to pass to the Sort::Sub::* routine.
 
 =item * B<sort_sub> => I<sortsub::spec>
 
 Name of a Sort::Sub::* module (without the prefix).
+
 
 =back
 
@@ -282,14 +290,6 @@ Please visit the project's homepage at L<https://metacpan.org/release/App-INIUti
 
 Source repository is at L<https://github.com/perlancar/perl-App-INIUtils>.
 
-=head1 BUGS
-
-Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-INIUtils>
-
-When submitting a bug or request, please include a test-file or a
-patch to an existing test-file that illustrates the bug or desired
-feature.
-
 =head1 SEE ALSO
 
 L<App::IODUtils>
@@ -298,11 +298,37 @@ L<App::IODUtils>
 
 perlancar <perlancar@cpan.org>
 
+=head1 CONTRIBUTING
+
+
+To contribute, you can send patches by email/via RT, or send pull requests on
+GitHub.
+
+Most of the time, you don't need to build the distribution yourself. You can
+simply modify the code, then test via:
+
+ % prove -l
+
+If you want to build the distribution (e.g. to try to install it locally on your
+system), you can install L<Dist::Zilla>,
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>,
+L<Pod::Weaver::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps required beyond
+that are considered a bug and can be reported to me.
+
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019, 2015 by perlancar@cpan.org.
+This software is copyright (c) 2024, 2019, 2015 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-INIUtils>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
 
 =cut

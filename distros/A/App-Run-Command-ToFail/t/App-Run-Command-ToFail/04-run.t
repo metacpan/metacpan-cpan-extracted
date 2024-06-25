@@ -5,6 +5,7 @@ use App::Run::Command::ToFail;
 use English;
 use File::Object;
 use File::Spec::Functions qw(abs2rel);
+use File::Temp qw(tempfile);
 use Test::More 'tests' => 9;
 use Test::NoWarnings;
 use Test::Output;
@@ -92,12 +93,13 @@ stderr_is(
 );
 
 # Test.
+my (undef, $temp_file) = tempfile();
 @ARGV = (
 	'-n',
 	10,
 	'-p',
 	'blank',
-	$EXECUTABLE_NAME.' '.File::Object->new->up->dir('data')->file('test_ok.pl')->s.' 10',
+	$EXECUTABLE_NAME.' '.File::Object->new->up->dir('data')->file('test_ok.pl')->s.' 10 '.$temp_file,
 	10,
 );
 $right_ret = <<'END';
@@ -111,14 +113,16 @@ stdout_is(
 	$right_ret,
 	'Run test, which is successful (10x run).',
 );
+unlink $temp_file;
 
 # Test.
+(undef, $temp_file) = tempfile();
 @ARGV = (
 	'-n',
 	10,
 	'-p',
 	'blank',
-	$EXECUTABLE_NAME.' '.File::Object->new->up->dir('data')->file('test_fail.pl')->s.' 10 5',
+	$EXECUTABLE_NAME.' '.File::Object->new->up->dir('data')->file('test_fail.pl')->s.' 10 5 '.$temp_file,
 );
 $right_ret = <<'END';
 Error.
@@ -132,6 +136,7 @@ stderr_is(
 	$right_ret,
 	'Run test, which is failing (10x run, fail in 5 round).',
 );
+unlink $temp_file;
 
 sub help {
 	my $script = abs2rel(File::Object->new->file('04-run.t')->s);

@@ -1,8 +1,10 @@
 Revision history for Test-Instruction
 
+0.05    [2024-06-25]
+	- Extends instruction(s) with ref_key and ref_index to more easily enable testing of a reference
+
 0.04    [2023-01-28]
 	- extend to allow debugging of instruction/s by setting debug => 1.
 
 0.01    Date/time
         First version, released on an unsuspecting world.
-

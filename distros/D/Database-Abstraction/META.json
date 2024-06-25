@@ -55,6 +55,7 @@
             "Test::Compile" : "0",
             "Test::Most" : "0",
             "Test::Needs" : "0",
+            "Test::NoWarnings" : "0",
             "Text::xSV::Slurp" : "0"
          }
       }
@@ -73,6 +74,6 @@
          "x_repository" : "https://github.com/nigelhorne/Database-Abstraction"
       }
    },
-   "version" : "0.08",
+   "version" : "0.09",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

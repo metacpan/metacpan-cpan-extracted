@@ -1,7 +1,12 @@
 Revision history for Database-Abstraction
 
+0.09	Mon Jun 24 20:42:48 EDT 2024
+	Added t/chi.t
+	selectall_hash: speed up slurp mode when 'entry' is one of the parameters
+	execute: add the table name to the query
+
 0.08	Mon May 20 08:43:08 EDT 2024
-	Add unique as a synomym of distinct
+	Add unique as a synonym for distinct
 	Allow max_slurp_size to be tweaked
 	Fix CSV search on a column other than the keyed column
 	Added t/error.t

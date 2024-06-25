@@ -14,7 +14,7 @@ sub build_from_methods
 	my $self = shift;
 
 	if ($self->symbiosis->engine->isa('KelpX::Symbiosis::Engine::Kelp')) {
-		$self->symbiosis->mount('/test', $self->testmod);
+		$self->symbiosis->mount(qr{^/test(?!/test2)(/.+)?}, $self->testmod);
 	}
 	else {
 		$self->symbiosis->mount('/test', $self->testmod);
@@ -27,7 +27,7 @@ sub build_from_loaded
 
 	if ($self->symbiosis->engine->isa('KelpX::Symbiosis::Engine::Kelp')) {
 		$self->symbiosis->mount('/test/test2', 'AnotherTestSymbiont');
-		$self->symbiosis->mount('/test', 'symbiont');
+		$self->symbiosis->mount(qr{^/test(?!/test2)(/.+)?}, 'symbiont');
 	}
 	else {
 		$self->symbiosis->mount('/s', $self);

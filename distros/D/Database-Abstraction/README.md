@@ -4,7 +4,7 @@ Database::Abstraction - database abstraction layer
 
 # VERSION
 
-Version 0.08
+Version 0.09
 
 # SYNOPSIS
 
@@ -26,7 +26,7 @@ For example, you can access the files in /var/db/foo.csv via this class:
 You can then access the data using:
 
     my $foo = MyPackageName::Database::Foo->new(directory => '/var/db');
-    print 'Customer name ', $foo->name(customer_id => 'plugh');
+    print 'Customer name ', $foo->name(customer_id => 'plugh'), "\n";
     my $row = $foo->fetchrow_hashref(customer_id => 'xyzzy');
     print Data::Dumper->new([$row])->Dump();
 
@@ -94,6 +94,10 @@ which is worked out from the class name
 Execute the given SQL on the data.
 In an array context, returns an array of hash refs,
 in a scalar context returns a hash of the first row
+
+On CSV tables without no\_entry, it may help to add
+"WHERE entry IS NOT NULL AND entry NOT LIKE '#%'"
+to the query.
 
 ## updated
 

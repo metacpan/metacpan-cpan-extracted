@@ -1,1 +1,7 @@
 something: 1
+hash:
+  something: 2
+array:
+- something1
+- something2
+

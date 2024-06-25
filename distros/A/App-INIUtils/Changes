@@ -1,3 +1,11 @@
+0.035   2024-06-24  Released-By: PERLANCAR; Urgency: low
+
+        - No functional changes.
+
+        - [ux] [doc] Cross-mention parse-ini/dump-ini, mention
+          parse-iod/dump-iod.
+
+
 0.034   2019-12-15  Released-By: PERLANCAR; Urgency: medium
 
 	- Add utility: sort-ini-sections.

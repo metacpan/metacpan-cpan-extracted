@@ -7,6 +7,7 @@ build_requires:
   ExtUtils::MakeMaker: 6.59
   File::Object: 0
   File::Spec::Functions: 0
+  File::Temp: 0
   IO::Barf: 0
   Perl6::Slurp: 0
   Test::More: 0
@@ -38,4 +39,4 @@ resources:
   homepage: https://github.com/michal-josef-spacek/App-Run-Command-ToFail
   license: http://opensource.org/licenses/bsd-license.php
   repository: git://github.com/michal-josef-spacek/App-Run-Command-ToFail
-version: '0.03'
+version: '0.04'

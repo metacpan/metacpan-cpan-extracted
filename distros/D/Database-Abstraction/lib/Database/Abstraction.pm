@@ -44,11 +44,11 @@ use constant	DEFAULT_MAX_SLURP_SIZE => 16 * 1024;	# CSV files <= than this size 
 
 =head1 VERSION
 
-Version 0.08
+Version 0.09
 
 =cut
 
-our $VERSION = '0.08';
+our $VERSION = '0.09';
 
 =head1 SYNOPSIS
 
@@ -70,7 +70,7 @@ For example, you can access the files in /var/db/foo.csv via this class:
 You can then access the data using:
 
     my $foo = MyPackageName::Database::Foo->new(directory => '/var/db');
-    print 'Customer name ', $foo->name(customer_id => 'plugh');
+    print 'Customer name ', $foo->name(customer_id => 'plugh'), "\n";
     my $row = $foo->fetchrow_hashref(customer_id => 'xyzzy');
     print Data::Dumper->new([$row])->Dump();
 
@@ -426,28 +426,32 @@ Returns an array of hash references
 
 =cut
 
-sub selectall_hash {
+sub selectall_hash
+{
 	my $self = shift;
 	my %params = (ref($_[0]) eq 'HASH') ? %{$_[0]} : @_;
 
 	my $table = $self->{table} || ref($self);
 	$table =~ s/.*:://;
 
-	$self->_open() if(!$self->{$table});
-
-	if((scalar(keys %params) == 0) && $self->{'data'}) {
-		if($self->{'logger'}) {
-			$self->{'logger'}->trace("$table: selectall_hash fast track return");
+	if($self->{'data'}) {
+		if(scalar(keys %params) == 0) {
+			if($self->{'logger'}) {
+				$self->{'logger'}->trace("$table: selectall_hash fast track return");
+			}
+			return values %{$self->{'data'}};
+			# my @rc = values %{$self->{'data'}};
+			# return @rc;
+		} elsif((scalar(keys %params) == 1) && defined($params{'entry'}) && !$self->{'no_entry'}) {
+			return $self->{'data'}->{$params{'entry'}};
 		}
-		return values %{$self->{'data'}};
-		# my @rc = values %{$self->{'data'}};
-		# return @rc;
 	}
-	# if((scalar(keys %params) == 1) && $self->{'data'} && defined($params{'entry'})) {
-	# }
 
 	my $query;
 	my $done_where = 0;
+
+	$self->_open() if(!$self->{$table});
+
 	if(($self->{'type'} eq 'CSV') && !$self->{no_entry}) {
 		$query = "SELECT * FROM $table WHERE entry IS NOT NULL AND entry NOT LIKE '#%'";
 		$done_where = 1;
@@ -563,8 +567,6 @@ sub fetchrow_hashref {
 	my $table = $params{'table'} || $self->{'table'} || ref($self);
 	$table =~ s/.*:://;
 
-	$self->_open() if(!$self->{$table});
-
 	if($self->{'data'} && (!$self->{'no_entry'}) && (scalar keys(%params) == 1) && defined($params{'entry'})) {
 		if(my $logger = $self->{'logger'}) {
 			$logger->debug('Fast return from slurped data');
@@ -579,6 +581,9 @@ sub fetchrow_hashref {
 		$query .= $table;
 	}
 	my $done_where = 0;
+
+	$self->_open() if(!$self->{$table});
+
 	if(($self->{'type'} eq 'CSV') && !$self->{no_entry}) {
 		$query .= " WHERE entry IS NOT NULL AND entry NOT LIKE '#%'";
 		$done_where = 1;
@@ -638,6 +643,7 @@ sub fetchrow_hashref {
 			return $rc;
 		}
 	}
+
 	my $sth = $self->{$table}->prepare($query) or die $self->{$table}->errstr();
 	# $sth->execute(@query_args) || throw Error::Simple("$query: @query_args");
 	$sth->execute(@query_args) || croak("$query: @query_args");
@@ -662,6 +668,10 @@ Execute the given SQL on the data.
 In an array context, returns an array of hash refs,
 in a scalar context returns a hash of the first row
 
+On CSV tables without no_entry, it may help to add
+"WHERE entry IS NOT NULL AND entry NOT LIKE '#%'"
+to the query.
+
 =cut
 
 sub execute {
@@ -684,6 +694,9 @@ sub execute {
 	$self->_open() if(!$self->{$table});
 
 	my $query = $args{'query'};
+	if($query !~ / FROM /i) {
+		$query .= " FROM $table";
+	}
 	if($self->{'logger'}) {
 		$self->{'logger'}->debug("execute $query");
 	}
@@ -739,8 +752,6 @@ sub AUTOLOAD {
 	my $table = $self->{table} || ref($self);
 	$table =~ s/.*:://;
 
-	$self->_open() if(!$self->{$table});
-
 	my %params;
 	if(ref($_[0]) eq 'HASH') {
 		%params = %{$_[0]};
@@ -752,6 +763,8 @@ sub AUTOLOAD {
 		}
 		$params{'entry'} = shift;
 	}
+
+	$self->_open() if(!$self->{$table});
 
 	my $query;
 	my $done_where = 0;
@@ -813,6 +826,7 @@ sub AUTOLOAD {
 					}
 					return map { $_->{$column} } values %{$data}
 				}
+				# FIXME - this works but really isn't the right way to do it
 				foreach my $v (values %{$data}) {
 					return $v->{$column}
 				}

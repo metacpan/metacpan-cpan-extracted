@@ -1,5 +1,5 @@
 package App::Timestamper::Log::Process;
-$App::Timestamper::Log::Process::VERSION = '0.0.3';
+$App::Timestamper::Log::Process::VERSION = '0.0.4';
 use 5.014;
 use strict;
 use warnings;
@@ -166,7 +166,7 @@ L<App::Timestamper> logs.
 
 =head1 VERSION
 
-version 0.0.3
+version 0.0.4
 
 =head1 SYNOPSIS
 

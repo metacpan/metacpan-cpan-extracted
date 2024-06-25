@@ -19,6 +19,7 @@ readme_from 'Image.pm';
 recursive_author_tests('xt');
 requires 'Class::Utils' => 0.02;
 requires 'Error::Pure' => 0.07;
+requires 'Mo::utils' => 0.12;
 requires 'Mo::utils::CSS' => 0.02;
 requires 'Scalar::Util' => 0;
 requires 'Tags::HTML' => 0.06;
@@ -35,7 +36,7 @@ test_requires 'Tags::Output::Structure' => 0;
 test_requires 'Test::More' => 0;
 test_requires 'Test::NoWarnings' => 0;
 tests_recursive;
-version '0.02';
+version '0.03';
 
 # Run.
 WriteAll();

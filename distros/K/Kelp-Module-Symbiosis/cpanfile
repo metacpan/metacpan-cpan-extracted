@@ -1,4 +1,4 @@
-requires 'Kelp' => '2.00';
+requires 'Kelp' => '2.10';
 requires 'Plack';
 
 on 'test' => sub {

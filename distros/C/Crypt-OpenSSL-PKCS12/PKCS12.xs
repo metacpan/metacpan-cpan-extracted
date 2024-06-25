@@ -18,6 +18,9 @@
 #if OPENSSL_VERSION_NUMBER < 0x10100000L
 #define PKCS12_SAFEBAG_get0_p8inf(o) ((o)->value.keybag)
 #define PKCS12_SAFEBAG_get0_attr PKCS12_get_attr
+#define PKCS12_SAFEBAG_get_bag_nid M_PKCS12_cert_bag_type
+#define PKCS12_SAFEBAG_get_nid M_PKCS12_bag_type
+#define PKCS12_SAFEBAG_get1_cert PKCS12_certbag2x509
 #define CONST_PKCS8_PRIV_KEY_INFO PKCS8_PRIV_KEY_INFO
 #else
 #define CONST_PKCS8_PRIV_KEY_INFO const PKCS8_PRIV_KEY_INFO
@@ -97,21 +100,25 @@ STACK_OF(X509)* _load_cert_chain(char* keyString, STACK_OF(X509_INFO)*(*p_loader
   return stack;
 }
 
+#if OPENSSL_VERSION_NUMBER >= 0x30000000L
+long bio_write_cb(struct bio_st *bm, int m, const char *ptr, size_t len, int l, long x, int y, size_t *processed) {
+#else
+long bio_write_cb(struct bio_st *bm, int m, const char *ptr, int len, long x, long y) {
+#endif
 /* stolen from OpenSSL.xs */
-long bio_write_cb(struct bio_st *bm, int m, const char *ptr, int l, long x, long y) {
 
   if (m == BIO_CB_WRITE) {
     SV *sv = (SV *) BIO_get_callback_arg(bm);
-    sv_catpvn(sv, ptr, l);
+    sv_catpvn(sv, ptr, len);
   }
 
   if (m == BIO_CB_PUTS) {
     SV *sv = (SV *) BIO_get_callback_arg(bm);
-    l = strlen(ptr);
-    sv_catpvn(sv, ptr, l);
+    len = strlen(ptr);
+    sv_catpvn(sv, ptr, len);
   }
 
-  return l;
+  return len;
 }
 
 static BIO* sv_bio_create(void) {
@@ -121,7 +128,11 @@ static BIO* sv_bio_create(void) {
   /* create an in-memory BIO abstraction and callbacks */
   BIO *bio = BIO_new(BIO_s_mem());
 
+#if OPENSSL_VERSION_NUMBER >= 0x30000000L
+  BIO_set_callback_ex(bio, bio_write_cb);
+#else
   BIO_set_callback(bio, bio_write_cb);
+#endif
   BIO_set_callback_arg(bio, (void *)sv);
 
   return bio;
@@ -134,7 +145,11 @@ static SV* sv_bio_final(BIO *bio) {
   (void)BIO_flush(bio);
   sv = (SV *)BIO_get_callback_arg(bio);
   BIO_set_callback_arg(bio, (void *)NULL);
+#if OPENSSL_VERSION_NUMBER >= 0x30000000L
+  BIO_set_callback_ex(bio, (void *)NULL);
+#else
   BIO_set_callback(bio, (void *)NULL);
+#endif
   BIO_free_all(bio);
 
   if (!sv) sv = &PL_sv_undef;
@@ -169,8 +184,24 @@ int dump_certs_pkeys_bag (BIO *bio, PKCS12_SAFEBAG *bag, char *pass, int passlen
   X509 *x509;
   PKCS8_PRIV_KEY_INFO *p8;
   CONST_PKCS8_PRIV_KEY_INFO *p8c;
+#if OPENSSL_VERSION_NUMBER >= 0x30000000L
+  const STACK_OF(X509_ATTRIBUTE) *attrs;
+#endif
+  int ret = 0;
 
-  switch (M_PKCS12_bag_type(bag)) {
+#if OPENSSL_VERSION_NUMBER >= 0x30000000L
+  attrs = PKCS12_SAFEBAG_get0_attrs(bag);
+#endif
+
+#ifndef OPENSSL_NO_DES
+  EVP_CIPHER *default_enc = (EVP_CIPHER *)EVP_des_ede3_cbc();
+  enc = NULL; //default_enc;
+#else
+  EVP_CIPHER *default_enc = (EVP_CIPHER *)EVP_aes_256_cbc();
+  enc = default_enc;
+#endif
+
+  switch (PKCS12_SAFEBAG_get_nid(bag)) {
 
     case NID_keyBag: ;
 
@@ -190,10 +221,10 @@ int dump_certs_pkeys_bag (BIO *bio, PKCS12_SAFEBAG *bag, char *pass, int passlen
 
       if (options & NOKEYS) return 1;
 
-      if (!(p8 = PKCS12_decrypt_skey(bag, pass, passlen)))
+      if ((p8 = PKCS12_decrypt_skey(bag, pass, passlen)) == NULL)
         return 0;
 
-      if (!(pkey = EVP_PKCS82PKEY (p8))) {
+      if ((pkey = EVP_PKCS82PKEY (p8)) == NULL) {
         PKCS8_PRIV_KEY_INFO_free(p8);
         return 0;
       }
@@ -219,15 +250,27 @@ int dump_certs_pkeys_bag (BIO *bio, PKCS12_SAFEBAG *bag, char *pass, int passlen
         return 1;
       }
 
-      if (M_PKCS12_cert_bag_type(bag) != NID_x509Certificate) return 1;
+      if (PKCS12_SAFEBAG_get_bag_nid(bag) != NID_x509Certificate) return 1;
 
-      if (!(x509 = PKCS12_certbag2x509(bag))) return 0;
-
+      if ((x509 = PKCS12_SAFEBAG_get1_cert(bag)) == NULL) return 0;
       PEM_write_bio_X509 (bio, x509);
 
       X509_free(x509);
 
       break;
+
+    case NID_secretBag:
+        if (options & INFO) return 1;
+        //print_attribute(bio, PKCS12_SAFEBAG_get0_bag_obj(bag));
+        printf ("Well this is a NID_secretBag\n");
+
+        break;
+    case NID_safeContentsBag:
+        if (options & INFO) return 1;
+        //dump_certs_pkeys_bags(bio, PKCS12_SAFEBAG_get0_safes(bag),
+        //                pass, passlen, options, pempass, enc);
+        printf ("Well this is a NID_safeContentsBag\n");
+        break;
   }
 
   return 1;
@@ -262,6 +305,8 @@ int dump_certs_keys_p12(BIO *bio, PKCS12 *p12, char *pass, int passlen, int opti
 
   for (i = 0; i < sk_PKCS7_num(asafes); i++) {
 
+    STACK_OF(PKCS12_SAFEBAG) *bags;
+
     p7 = sk_PKCS7_value(asafes, i);
 
     bagnid = OBJ_obj2nid(p7->type);
@@ -278,7 +323,7 @@ int dump_certs_keys_p12(BIO *bio, PKCS12 *p12, char *pass, int passlen, int opti
       continue;
     }
 
-    if (!bags) return 0;
+    if (bags == NULL) return 0;
 
     if (!dump_certs_pkeys_bags(bio, bags, pass, passlen, options, pempass)) {
 
@@ -549,12 +594,15 @@ certificate(pkcs12, pwd = "")
 
   PREINIT:
   BIO *bio;
+  STACK_OF(PKCS7) *asafes = NULL;
 
   CODE:
 
   bio = sv_bio_create();
 
-  PKCS12_unpack_authsafes(pkcs12);
+  if ((asafes = PKCS12_unpack_authsafes(pkcs12)) == NULL)
+        RETVAL = newSVpvn("",0);
+
   dump_certs_keys_p12(bio, pkcs12, pwd, strlen(pwd), CLCERTS|NOKEYS, NULL);
 
   RETVAL = sv_bio_final(bio);
@@ -575,6 +623,7 @@ private_key(pkcs12, pwd = "")
   bio = sv_bio_create();
 
   PKCS12_unpack_authsafes(pkcs12);
+
   dump_certs_keys_p12(bio, pkcs12, pwd, strlen(pwd), NOCERTS, NULL);
 
   RETVAL = sv_bio_final(bio);

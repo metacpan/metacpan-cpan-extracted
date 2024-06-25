@@ -1,5 +1,5 @@
 package KelpX::Symbiosis::Test;
-$KelpX::Symbiosis::Test::VERSION = '2.00';
+$KelpX::Symbiosis::Test::VERSION = '2.10';
 use Kelp::Base;
 use Kelp::Test;
 use Carp;
@@ -38,7 +38,7 @@ sub can
 
 sub AUTOLOAD
 {
-	my ($self) = @_;
+	my $self = shift;
 
 	my $func = our $AUTOLOAD;
 	return if $func =~ /::DESTROY$/;

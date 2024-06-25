@@ -7,6 +7,7 @@ use Class::Utils qw(set_params);
 use DateTime;
 use English;
 use Error::Pure qw(err);
+use Mo::utils 0.08 qw(check_isa check_required);
 use Scalar::Util qw(blessed);
 use Unicode::UTF8 qw(decode_utf8);
 use Wikibase::Datatype::Reference;
@@ -18,7 +19,7 @@ use Wikibase::Datatype::Value::Quantity;
 use Wikibase::Datatype::Value::String;
 use Wikibase::Datatype::Value::Time;
 
-our $VERSION = 0.08;
+our $VERSION = 0.09;
 
 # Constructor.
 sub new {
@@ -57,14 +58,8 @@ sub new {
 	# Process parameters.
 	set_params($self, @params);
 
-	if (! defined $self->{'marc_record'}) {
-		err "Parameter 'marc_record' is required.";
-	}
-	if (! blessed($self->{'marc_record'})
-		|| ! $self->{'marc_record'}->isa('MARC::Record')) {
-
-		err "Parameter 'marc_record' must be a MARC::Record object.";
-	}
+	check_required($self, 'marc_record');
+	check_isa($self, 'marc_record', 'MARC::Record');
 
 	if (! defined $self->{'date_retrieved'}) {
 		$self->{'date_retrieved'} = '+'.DateTime->now

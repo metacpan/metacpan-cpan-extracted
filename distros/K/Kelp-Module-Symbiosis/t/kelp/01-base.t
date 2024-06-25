@@ -19,11 +19,13 @@ use lib 't/lib';
 		$self->load_module("+TestSymbiont", middleware => [qw(ContentMD5)]);
 
 		$self->symbiosis->mount('/test', $self->testmod);
-		$self->symbiosis->mount([GET => qr{^/test2(?:/.+)?$}], $self->testmod);
+		$self->symbiosis->mount([GET => qr{^/test2(/.+)?$}], $self->testmod);
 
-		$self->add_route("/testkelp" => sub {
-			"kelp";
-		});
+		$self->add_route(
+			"/testkelp" => sub {
+				"kelp";
+			}
+		);
 	}
 
 	1;

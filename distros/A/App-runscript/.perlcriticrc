@@ -1,0 +1,16 @@
+severity = harsh
+#severity = cruel
+#severity = brutal
+
+verbose = %f: %m at line %l, column %c.  (Policy: %p, Severity: %s)\n
+
+[-BuiltinFunctions::ProhibitSleepViaSelect]
+# https://github.com/Perl-Critic/Perl-Critic/issues/1053
+[-Modules::RequireEndWithOne]
+[-Modules::RequireExplicitPackage]
+[-RegularExpressions::RequireExtendedFormatting]
+[-Subroutines::ProtectPrivateSubs]
+[-Subroutines::ProhibitSubroutinePrototypes]
+[-Subroutines::RequireArgUnpacking]
+[-Subroutines::RequireFinalReturn]
+[-ValuesAndExpressions::RequireInterpolationOfMetachars]

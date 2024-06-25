@@ -1,0 +1,83 @@
+=pod
+
+=head1 NAME
+
+App::runscript - Module that implements the runscript utility
+
+=head1 SYNOPSIS
+
+  runscript [ -V | -h ]
+
+  runscript <perl application> <arguments passed to the perl application>
+
+=head1 DESCRIPTION
+
+This module assumes that you have deployed a "perl application" locally using
+the L<local::lib/Other-bootstrapping-options> procedure.  Usually you are able
+to execute the application only because the PERL5LIB environment variable was
+amended. This amendment is needed so that the application is able to locate the
+libraries it depends on. If the application does not find its dependencies it
+will fail with the message
+
+  Can't locate ... in @INC (@INC contains: ...)
+
+The C<runscript> utility helps you to avoid the PERL5LIB amendment. It has the
+following processing steps:
+
+=over 4
+
+=item 1.
+
+It finds out the absolute path of a given perl application. If the application
+is in the PATH you may pass its basename to C<runscript>.
+
+=item 2.
+
+It takes the dirname of the absolute path and removes the I<bin/> subdirectory.
+The result is the "install base".
+
+=item 3.
+
+It adds the directory I<lib/perl5/> to the install base.
+
+=item 4.
+
+It prepends the final library path to L<@INC|perlvar/"@INC"> before executing
+the application.
+
+=back
+
+=head1 SEE ALSO
+
+=over 4
+
+=item *
+
+L<App::rbinperl>
+
+=item *
+
+L<App::rlibperl>
+
+=item *
+
+L<App::local::lib::helper>
+
+=item *
+
+L<lib::relative>
+
+=back
+
+=head1 AUTHOR
+
+Sven Willenbuecher <sven.willenbuecher@gmx.de>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2024 by Sven Willenbuecher.
+
+This is free software; you can redistribute it and/or modify it under the same
+terms as the Perl 5 programming language system itself.
+
+=cut

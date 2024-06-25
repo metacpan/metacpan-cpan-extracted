@@ -1,5 +1,8 @@
 Revision history for Benchmark-DKbench
 
+2.8     2024-06-24
+        - Added suite_calc.
+
 2.7     2024-04-27
         - Improved calc_scalability, returns a hash.
         - Improved and documented suite_run output.

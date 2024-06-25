@@ -2,10 +2,10 @@ package Linux::Info::Distribution::Custom::CentOS;
 
 use warnings;
 use strict;
-use parent 'Linux::Info::Distribution::Custom';
+use base 'Linux::Info::Distribution::Custom';
 use Class::XSAccessor getters => { get_type => 'type', };
 
-our $VERSION = '2.17'; # VERSION
+our $VERSION = '2.18'; # VERSION
 # ABSTRACT: a subclass of Linux::Info::Distribution::Custom
 
 
@@ -36,7 +36,7 @@ Linux::Info::Distribution::Custom::CentOS - a subclass of Linux::Info::Distribut
 
 =head1 VERSION
 
-version 2.17
+version 2.18
 
 =head1 METHODS
 

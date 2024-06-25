@@ -1,11 +1,7 @@
 #!perl
 
 # Note: This script is a CLI for Riap function /App/INIUtils/sort_ini_sections
-# and generated automatically using Perinci::CmdLine::Gen version 0.491
-
-our $DATE = '2019-12-15'; # DATE
-our $DIST = 'App-INIUtils'; # DIST
-our $VERSION = '0.034'; # VERSION
+# and generated automatically using Perinci::CmdLine::Gen version 0.502
 
 use 5.010001;
 use strict;
@@ -13,6 +9,11 @@ use warnings;
 use Log::ger;
 
 use Perinci::CmdLine::Any;
+
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2024-06-24'; # DATE
+our $DIST = 'App-INIUtils'; # DIST
+our $VERSION = '0.035'; # VERSION
 
 my $cmdline = Perinci::CmdLine::Any->new(
     url => "/App/INIUtils/sort_ini_sections",
@@ -39,13 +40,15 @@ sort-ini-sections -
 
 =head1 VERSION
 
-This document describes version 0.034 of sort-ini-sections (from Perl distribution App-INIUtils), released on 2019-12-15.
+This document describes version 0.035 of sort-ini-sections (from Perl distribution App-INIUtils), released on 2024-06-24.
 
 =head1 SYNOPSIS
 
-Usage:
+B<sort-ini-sections> B<L<--help|/"--help, -h, -?">> (or B<L<-h|/"--help, -h, -?">>, B<L<-?|/"--help, -h, -?">>)
 
- % sort-ini-sections [options] <ini>
+B<sort-ini-sections> B<L<--version|/"--version, -v">> (or B<L<-v|/"--version, -v">>)
+
+B<sort-ini-sections> [B<L<--allow-duplicate-key|/"--disallow-duplicate-key">>|B<L<--disallow-duplicate-key|/"--disallow-duplicate-key">>] [B<L<--debug|/"--debug">>|B<L<--log-level|/"--log-level=s">>=I<level>|B<L<--quiet|/"--quiet">>|B<L<--trace|/"--trace">>|B<L<--verbose|/"--verbose">>] [B<L<--default-section|/"--default-section=s">>=I<str>] [B<L<--format|/"--format=s">>=I<name>|B<L<--json|/"--json">>] [B<L<--(no)naked-res|/"--naked-res">>] [B<L<--page-result|/"--page-result">>[=I<program>]|B<L<--view-result|/"--view-result">>[=I<program>]] [(B<L<--sort-arg|/"--sort-args-json=s">>=I<str>)+|B<L<--sort-args-json|/"--sort-args-json=s">>=I<json>|(B<L<-A|/"--sort-args-json=s">>=I<str>)+] [B<L<--sort-sub|/"--sort-sub=s, -S">>=I<L<sortsub::spec|Sah::Schema::sortsub::spec>>|B<L<-S|/"--sort-sub=s, -S">>=I<L<sortsub::spec|Sah::Schema::sortsub::spec>>] -- E<lt>I<L<ini|/"--ini=s*">>E<gt>
 
 =head1 OPTIONS
 
@@ -55,17 +58,17 @@ C<*> marks required options.
 
 =over
 
-=item B<--sort-args-json>=I<s>, B<-A>
-
-Arguments to pass to the Sort::Sub::* routine (JSON-encoded).
-
-See C<--sort-args>.
-
-=item B<--sort-args>=I<s>%
+=item B<--sort-arg>=I<s@>, B<-A>
 
 Arguments to pass to the Sort::Sub::* routine.
 
-Each value is a name-value pair, use I<key=value> syntax. Can be specified multiple times.
+Can be specified multiple times.
+
+=item B<--sort-args-json>=I<s>
+
+Arguments to pass to the Sort::Sub::* routine (JSON-encoded).
+
+See C<--sort-arg>.
 
 =item B<--sort-sub>=I<s>, B<-S>
 
@@ -84,6 +87,17 @@ Shortcut for --log-level=debug.
 =item B<--log-level>=I<s>
 
 Set log level.
+
+By default, these log levels are available (in order of increasing level of
+importance, from least important to most): C<trace>, C<debug>, C<info>,
+C<warn>/C<warning>, C<error>, C<fatal>. By default, the level is usually set to
+C<warn>, which means that log statements with level C<info> and less important
+levels will not be shown. To increase verbosity, choose C<info>, C<debug>, or
+C<trace>.
+
+For more details on log level and logging, as well as how new logging levels can
+be defined or existing ones modified, see L<Log::ger>.
+
 
 =item B<--quiet>
 
@@ -111,6 +125,12 @@ Default value:
 
  undef
 
+Output can be displayed in multiple formats, and a suitable default format is
+chosen depending on the application and/or whether output destination is
+interactive terminal (i.e. whether output is piped). This option specifically
+chooses an output format.
+
+
 =item B<--json>
 
 Set output format to json.
@@ -125,15 +145,32 @@ Default value:
 
 By default, when outputing as JSON, the full enveloped result is returned, e.g.:
 
-    [200,"OK",[1,2,3],{"func.extra"=>4}]
+ [200,"OK",[1,2,3],{"func.extra"=>4}]
 
 The reason is so you can get the status (1st element), status message (2nd
 element) as well as result metadata/extra result (4th element) instead of just
 the result (3rd element). However, sometimes you want just the result, e.g. when
 you want to pipe the result for more post-processing. In this case you can use
-`--naked-res` so you just get:
+C<--naked-res> so you just get:
 
-    [1,2,3]
+ [1,2,3]
+
+
+=item B<--page-result>
+
+Filter output through a pager.
+
+This option will pipe the output to a specified pager program. If pager program
+is not specified, a suitable default e.g. C<less> is chosen.
+
+
+=item B<--view-result>
+
+View output using a viewer.
+
+This option will first save the output to a temporary file, then open a viewer
+program to view the temporary file. If a viewer program is not chosen, a
+suitable default, e.g. the browser, is chosen.
 
 
 =back
@@ -150,6 +187,9 @@ Default value:
 
 =item B<--disallow-duplicate-key>
 
+(No description)
+
+
 =back
 
 =head2 Other options
@@ -163,6 +203,8 @@ Display help message and exit.
 =item B<--ini>=I<s>*
 
 INI file.
+
+Can also be specified as the 1st command-line argument.
 
 =item B<--version>, B<-v>
 
@@ -212,6 +254,35 @@ Please visit the project's homepage at L<https://metacpan.org/release/App-INIUti
 
 Source repository is at L<https://github.com/perlancar/perl-App-INIUtils>.
 
+=head1 AUTHOR
+
+perlancar <perlancar@cpan.org>
+
+=head1 CONTRIBUTING
+
+
+To contribute, you can send patches by email/via RT, or send pull requests on
+GitHub.
+
+Most of the time, you don't need to build the distribution yourself. You can
+simply modify the code, then test via:
+
+ % prove -l
+
+If you want to build the distribution (e.g. to try to install it locally on your
+system), you can install L<Dist::Zilla>,
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>,
+L<Pod::Weaver::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps required beyond
+that are considered a bug and can be reported to me.
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2024, 2019, 2015 by perlancar <perlancar@cpan.org>.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
 =head1 BUGS
 
 Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-INIUtils>
@@ -219,16 +290,5 @@ Please report any bugs or feature requests on the bugtracker website L<https://r
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
 feature.
-
-=head1 AUTHOR
-
-perlancar <perlancar@cpan.org>
-
-=head1 COPYRIGHT AND LICENSE
-
-This software is copyright (c) 2019, 2015 by perlancar@cpan.org.
-
-This is free software; you can redistribute it and/or modify it under
-the same terms as the Perl 5 programming language system itself.
 
 =cut

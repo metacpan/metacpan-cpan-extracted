@@ -2,7 +2,7 @@ package Linux::Info::Distribution::OSRelease::Ubuntu;
 
 use warnings;
 use strict;
-use parent 'Linux::Info::Distribution::OSRelease';
+use base 'Linux::Info::Distribution::OSRelease';
 use Hash::Util qw(lock_hash unlock_hash);
 use Class::XSAccessor getters => {
     get_version_codename   => 'version_codename',
@@ -12,7 +12,7 @@ use Class::XSAccessor getters => {
     get_ubuntu_codename    => 'ubuntu_codename',
 };
 
-our $VERSION = '2.17'; # VERSION
+our $VERSION = '2.18'; # VERSION
 
 # ABSTRACT: a subclass of Linux::Info::Distribution::OSRelease
 
@@ -52,7 +52,7 @@ Linux::Info::Distribution::OSRelease::Ubuntu - a subclass of Linux::Info::Distri
 
 =head1 VERSION
 
-version 2.17
+version 2.18
 
 =head1 DESCRIPTION
 

@@ -1,6 +1,6 @@
 package Test::Instruction;
 
-use 5.006; use strict; use warnings; our $VERSION = '0.04';
+use 5.006; use strict; use warnings; our $VERSION = '0.05';
 use Compiled::Params::OO qw/cpo/;
 use Types::Standard qw/Optional Str Int Bool Any CodeRef ArrayRef HashRef/;
 use B qw/svref_2object/;
@@ -27,6 +27,8 @@ BEGIN {
 			catch     => Optional->of(Bool),
 			key       => Optional->of(Str),
 			index     => Optional->of(Int),
+			ref_key   => Optional->of(Str),
+			ref_index => Optional->of(Int),
 			debug 	  => Optional->of(Bool),
 		},
 		instructions => {
@@ -463,6 +465,18 @@ sub _run_the_code {
 			"function: ${func_name}",
 			$instruction->func->($instruction->args_list ? @{$instruction->args} : $instruction->args)
 		);
+	} elsif ($instruction->ref_key) {
+		my $key = $instruction->ref_key;
+		return (
+			"key: ${key}",
+			$instruction->instance->{$key}
+		);
+	} elsif (defined $instruction->ref_index) {
+		my $index = $instruction->ref_index;
+		return (
+			"index: ${index}",
+			$instruction->instance->[$index]
+		);
 	} elsif ($instruction->instance) {
 		return ('instance', $instruction->instance); 
 	}
@@ -684,6 +698,16 @@ call a method from the instance
 =head3 func
  
     func => \&My::Test::Module::render,
+
+=head3 ref_key
+
+    instance => { a => 1 },
+    ref_key => 'a'
+
+=head3 ref_index
+
+    instance => [ 1, 2, 3 ],
+    ref_index => 2
  
 =head3 args
  
@@ -706,9 +730,56 @@ key - required when testing - ref_key_* and list_key_*
 
 =head2 instructions
 
+	package Foo;
+
+	sub new { bless {}, shift; }
+
+	sub bar { ['a', [1, 2, 3], 'b'] }
+
+	1;
+
+	instructions(
+		name => 'Testing Foo',
+		build => {
+        		class => 'Foo',
+   		},
+		run => [
+			{
+                		test => 'ok',
+                		meth => 'bar',
+				instructions => [
+		                        {
+		                                test => 'ref_index_scalar',
+        		                        index => 0,
+                       			        expected => 'a'
+                        		},
+		                        {
+						test => 'ok',
+						ref_index => 1,
+						instructions => [
+							{
+								test => 'array',
+								expected => [1, 2, 3]
+							},
+							{
+								test => 'ref_index_scalar',
+								index => 0,
+								expected => 1
+							}
+						]
+					},
+					...
+				]
+			}
+		]
+	);
+
 =cut
 
 =head2 finish
+
+	finish();
+	finish($total_number_of_tests);
 
 =cut
 

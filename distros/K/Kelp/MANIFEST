@@ -76,6 +76,7 @@ t/conf/null/config.pl
 t/conf/process_mode/a.pl
 t/conf/process_mode/b.pl
 t/conf/stack_trace_enabled/test.pl
+t/cookbook_yaml.t
 t/custom_req_resp.t
 t/encoders.t
 t/exceptions.t

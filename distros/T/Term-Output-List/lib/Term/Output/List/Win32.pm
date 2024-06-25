@@ -5,8 +5,7 @@ use Scalar::Util 'weaken';
 use Win32::Console;
 use experimental 'signatures';
 
-our $VERSION = '0.05';
-with 'Term::Output::List::Role';
+our $VERSION = '0.06';
 
 =head1 NAME
 
@@ -50,6 +49,8 @@ has 'console' => (
     is => 'lazy',
     default => sub($s) { Win32::Console->new(STD_OUTPUT_HANDLE) },
 );
+
+with 'Term::Output::List::Role';
 
 =head2 C<< interactive >>
 
@@ -141,7 +142,7 @@ sub output_permanent( $self, @items ) {
                   join("\n",
                     map { s/\s*\z//r }
                     map { $self->_trim( $_, $w ) }
-                        } @items)."\n";
+                        @items)."\n";
         };
 
         my $blank = $total - @items;

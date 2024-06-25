@@ -1,0 +1,28 @@
+Release history for App-runscript
+
+1.0.0        2024-06-25
+             - prepare stable release
+
+1.0.0-TRIAL6 2024-06-24
+             - croak if an unspecified option is found
+             - use -V instead of -v as version option
+
+1.0.0-TRIAL5 2024-06-20
+             - add help (-h) and version (-v) options processing
+             - change min perl version from 5.10.1 to 5.8.9
+             - fix pod documentation
+
+1.0.0-TRIAL4 2024-06-19
+             - change the creation of trial releases
+             - remove the leading "v" from the tuple version
+             - make tests more robust
+
+v1.0.0_03    2024-06-17
+             - make tests more robust
+             - use File::Which::which() to implement _which()
+
+v1.0.0_02    2024-06-16
+             - make tests more robust
+
+v1.0.0_01    2024-06-14
+             - initial trial release

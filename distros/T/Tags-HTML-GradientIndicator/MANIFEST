@@ -23,5 +23,6 @@ t/Tags-HTML-GradientIndicator/01-use.t
 t/Tags-HTML-GradientIndicator/02-version.t
 t/Tags-HTML-GradientIndicator/03-new.t
 t/Tags-HTML-GradientIndicator/04-process.t
+t/Tags-HTML-GradientIndicator/05-process_css.t
 xt/Tags-HTML-GradientIndicator/01-pod_coverage.t
 xt/Tags-HTML-GradientIndicator/02-pod.t

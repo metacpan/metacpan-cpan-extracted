@@ -1,4 +1,10 @@
-liblinux-info-perl (2.17) trusty; urgency=low
+liblinux-info-perl () trusty; urgency=low
+  * Minor bugs fixes (#26)
+  * fix: missing SysInfo::get_cpu testing
+  * fix: "removing" core dependencies
+  * fix: useless uname exec
+  * fix: Kwalitee configure_prereq_matches_use
+  * doc: fixes 
   * Added support to ARM and AMD processors (#25)
   * refactor: reused compiled regex
   * refactor: better message
@@ -28,7 +34,7 @@ liblinux-info-perl (2.17) trusty; urgency=low
   * chore: standard naming
   * feat: AMD support 
 
- -- Alceu Rodrigues de Freitas Junior <glasswalk3r@yahoo.com.br>  Sun, 16 Jun 2024 23:11:17 +0000
+ -- Alceu Rodrigues de Freitas Junior <glasswalk3r@yahoo.com.br>  Mon, 24 Jun 2024 23:41:30 +0000
 
 liblinux-info-perl () trusty; urgency=low
   * feat: AMD support 

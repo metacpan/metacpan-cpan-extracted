@@ -3,7 +3,7 @@ package Linux::Info::Distribution::OSRelease;
 use warnings;
 use strict;
 use Carp qw(confess);
-use parent 'Linux::Info::Distribution';
+use base 'Linux::Info::Distribution';
 use Hash::Util qw(lock_hash unlock_hash);
 use Class::XSAccessor getters => {
     get_pretty_name => 'pretty_name',
@@ -13,7 +13,7 @@ use Class::XSAccessor getters => {
 
 use constant DEFAULT_FILE => '/etc/os-release';
 
-our $VERSION = '2.17'; # VERSION
+our $VERSION = '2.18'; # VERSION
 
 # ABSTRACT: a subclass with data from /etc/os-release file
 
@@ -127,7 +127,7 @@ Linux::Info::Distribution::OSRelease - a subclass with data from /etc/os-release
 
 =head1 VERSION
 
-version 2.17
+version 2.18
 
 =head1 SYNOPSIS
 

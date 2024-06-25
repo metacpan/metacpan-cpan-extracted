@@ -1,5 +1,11 @@
 Revision history for Perl extension KelpX::Hooks.
 
+1.03 Mon Jun 24 2024
+	- hooks are now tail call optimized
+	- build method is now replaced only once per package (instead of once per hook)
+	- hooks are now trying harder to apply to a package
+	  * if they can't apply before build, they will try again after it finished
+
 1.02 Tue May 10 2022
 	- maintenance work
 	- switch to Dist::Zilla

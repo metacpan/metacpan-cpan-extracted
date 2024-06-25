@@ -8,7 +8,7 @@ use Class::XSAccessor getters => {
     get_file_path => 'file_path',
 };
 
-our $VERSION = '2.17'; # VERSION
+our $VERSION = '2.18'; # VERSION
 
 # ABSTRACT: simple class to exchange data between DistributionFinder and DistributionFactory classes
 
@@ -44,7 +44,7 @@ Linux::Info::Distribution::BasicInfo - simple class to exchange data between Dis
 
 =head1 VERSION
 
-version 2.17
+version 2.18
 
 =head1 METHODS
 

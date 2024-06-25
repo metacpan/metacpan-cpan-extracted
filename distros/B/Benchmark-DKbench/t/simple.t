@@ -23,14 +23,15 @@ diag $std[0];
 if ($threads && $threads > 1) {
     $opt{include} = 'Astro';
     $opt{ver}     = 1;
-    @std = capture {%stats2 = suite_run({%opt, threads=>2})};
+    @std          = capture {%stats2 = suite_run({%opt, threads => 2})};
     diag $std[0];
 } else {
-    %stats2 = %stats1;
+    $stats2{$_} = {%{$stats1{$_}}} for qw/Astro _opt _total/;
     $stats2{_opt}->{threads} = 2;
 }
 
 @std = capture {%scal = calc_scalability(\%stats1, \%stats2)};
+
 like($std[0], qr/scalability/, 'Scalability');
 diag $std[0];
 

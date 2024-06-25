@@ -13,6 +13,7 @@ my %WriteMakefileArgs = (
   "ABSTRACT" => "API in Perl to recover information about the running Linux OS",
   "AUTHOR" => "Alceu Rodrigues de Freitas Junior <glasswalk3r\@yahoo.com.br>",
   "CONFIGURE_REQUIRES" => {
+    "Devel::AssertOS" => "1.21",
     "ExtUtils::MakeMaker" => 0
   },
   "DISTNAME" => "Linux-Info",
@@ -29,9 +30,7 @@ my %WriteMakefileArgs = (
     "Regexp::Common" => "2017060201",
     "Set::Tiny" => "0.04",
     "Time::HiRes" => "1.9764",
-    "YAML::XS" => "0.88",
-    "overload" => 0,
-    "parent" => 0
+    "YAML::XS" => "0.88"
   },
   "TEST_REQUIRES" => {
     "Exporter" => 0,
@@ -47,7 +46,7 @@ my %WriteMakefileArgs = (
     "Test::TempDir::Tiny" => "0.018",
     "lib" => 0
   },
-  "VERSION" => "2.17",
+  "VERSION" => "2.18",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -76,9 +75,7 @@ my %FallbackPrereqs = (
   "Test::TempDir::Tiny" => "0.018",
   "Time::HiRes" => "1.9764",
   "YAML::XS" => "0.88",
-  "lib" => 0,
-  "overload" => 0,
-  "parent" => 0
+  "lib" => 0
 );
 
 

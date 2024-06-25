@@ -1,3 +1,7 @@
+0.03 2024-06-24T20:42:51+02:00
+ - Add test for cleanup() method.
+ - Rewrite own implementation of callback code to Mo::utils.
+
 0.02 2024-05-22T19:17:53+02:00
  - Add check CSS class of 'css_class' parameter.
  - Add tests for init().

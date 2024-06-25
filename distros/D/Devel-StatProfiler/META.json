@@ -1,0 +1,64 @@
+{
+   "abstract" : "low-overhead sampling code profiler",
+   "author" : [
+      "Mattia Barbon <mattia@barbon.org>",
+      "Steffen Mueller <smueller@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.030, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Devel-StatProfiler",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::XSpp" : "0.18",
+            "Module::Build" : "0.3601",
+            "Module::Build::WithXSpp" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.3601"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::Pod" : "1.41"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Archive::Zip" : "0",
+            "File::ShareDir" : "0",
+            "Text::MicroTemplate" : "0",
+            "parent" : "0",
+            "perl" : "5.014"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::Differences" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "homepage" : "https://github.com/mbarbon/devel-statprofiler",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/mbarbon/devel-statprofiler.git",
+         "web" : "https://github.com/mbarbon/devel-statprofiler"
+      }
+   },
+   "version" : "0.52",
+   "x_generated_by_perl" : "v5.24.4",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.32",
+   "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"
+}
+

@@ -5,6 +5,7 @@ use strict;
 use Test::More tests => 29;
 use File::Spec::Functions qw(:ALL);
 use Data::Dumper;
+use Crypt::OpenSSL::Guess;
 
 BEGIN { use_ok('Crypt::OpenSSL::PKCS12') };
 
@@ -38,7 +39,16 @@ BEGIN { use_ok('Crypt::OpenSSL::PKCS12') };
 my $base   = 'certs';
 my $pass   = 'testing';
 
-my $certfile = catdir($base, 'test.p12');
+my ($major, $minor, $patch) = openssl_version();
+
+diag("OpenSSL version: $major.$minor $patch\n");
+
+my $certfile;
+if ($major le "1.1" )  {
+    $certfile = catdir($base, 'test_le_1.1.p12');
+} else {
+    $certfile = catdir($base, 'test.p12');
+}
 
 diag("Attempting to read certificate string from file $certfile");
 
@@ -93,13 +103,19 @@ ok($pkcs12->mac_ok($pass), 'Asserting mac');
 
 ok($pkcs12->as_string, 'Asserting PKCS12 as string');
 
-# try changing the password
-ok($pkcs12->changepass($pass, 'foo'), 'Changing password');
+SKIP: {
+    # https://github.com/openssl/openssl/issues/19092
+    if ($major =~ /^3\./) {
+        skip("OpenSSL 3.x cannot change pkcs12 passwords", 3);
+    } else {
+        # try changing the password
+        ok($pkcs12->changepass($pass, 'foo'), 'Changing password');
 
-ok($pkcs12->mac_ok('foo'), 'Reasserting mac');
+        ok($pkcs12->mac_ok('foo'), 'Reasserting mac');
 
-ok($pkcs12->changepass('foo', $pass), 'Changing password again');
-
+        ok($pkcs12->changepass('foo', $pass), 'Changing password again');
+    }
+}
 # Try creating a PKCS12 file.
 my $outfile = catdir($base, 'out.p12');
 

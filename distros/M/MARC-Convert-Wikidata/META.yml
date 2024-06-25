@@ -35,6 +35,7 @@ requires:
   Error::Pure: 0
   MARC::Convert::Wikidata::Object: 0
   MARC::Leader: 0
+  Mo::utils: 0.08
   Readonly: 0
   Roman: 0
   URI: 0
@@ -46,4 +47,4 @@ resources:
   homepage: https://github.com/michal-josef-spacek/MARC-Convert-Wikidata
   license: http://opensource.org/licenses/bsd-license.php
   repository: git://github.com/michal-josef-spacek/MARC-Convert-Wikidata
-version: '0.08'
+version: '0.09'

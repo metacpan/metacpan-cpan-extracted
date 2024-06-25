@@ -1,32 +1,53 @@
 ---
 abstract: "Perl extension to OpenSSL's PKCS12 API."
 author:
-  - 'Dan Sully, <daniel@cpan.org>'
+  - 'Dan Sully'
 build_requires:
-  ExtUtils::MakeMaker: 6.59
-  File::Spec::Functions: 0
-  Pod::Coverage: '0.19'
-  Test::More: '0.47'
-  Test::Pod::Coverage: '1.08'
+  Crypt::OpenSSL::Guess: '0.11'
+  Crypt::OpenSSL::PKCS10: '0'
+  Data::Dumper: '0'
+  File::Spec::Functions: '0'
+  Test::More: '0'
 configure_requires:
-  ExtUtils::MakeMaker: 6.59
-distribution_type: module
-dynamic_config: 1
-generated_by: 'Module::Install version 1.19'
+  Crypt::OpenSSL::Guess: '0.11'
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.032, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
-  version: 1.4
+  version: '1.4'
 name: Crypt-OpenSSL-PKCS12
-no_index:
-  directory:
-    - inc
-    - t
-requires:
-  perl: 5.6.0
 resources:
   bugtracker: https://github.com/dsully/perl-crypt-openssl-pkcs12/issues
   homepage: https://github.com/dsully/perl-crypt-openssl-pkcs12
-  license: http://dev.perl.org/licenses/
-  repository: https://github.com/dsully/perl-crypt-openssl-pkcs12
-version: '1.8'
+  repository: https://github.com/dsully/perl-crypt-openssl-pkcs12.git
+version: '1.91'
+x_contributors:
+  - '@mmuehlenhoff'
+  - '@sectokia'
+  - '@SmartCodeMaker'
+  - 'Alexandr Ciornii, @chorny'
+  - 'Christopher Hoskin, @mans0954'
+  - 'Daisuke Murase, @typester'
+  - 'Darko Prelec, @dprelec'
+  - 'David Steinbrunner, @dsteinbrunner'
+  - 'Giuseppe Di Terlizzi, @giterlizzi'
+  - 'H.Merijn Brand, @tux'
+  - 'Hakim, @osfameron'
+  - 'J. Nick Koston, @bdraco'
+  - 'James Rouzier, @jrouzierinverse'
+  - 'jonasbn. @jonasbn'
+  - 'Kelson, @kelson42'
+  - 'Lance Wicks, @lancew'
+  - 'Leonid Antonenkov'
+  - 'Masayuki Matsuki, @songmu'
+  - 'Mikołaj Zalewski'
+  - 'Shoichi Kaji'
+  - 'Slaven Rezić'
+  - 'Todd Rinaldo, @toddr'
+x_generated_by_perl: v5.40.0
+x_maintainers:
+  - 'JONASBN <jonasbn@cpan.org>'
+x_serialization_backend: 'YAML::Tiny version 1.74'
+x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

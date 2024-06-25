@@ -4,7 +4,7 @@ use strict;
 use FindBin qw($Bin);
 
 use lib 't/lib';
-use Test::Most tests => 9;
+use Test::Most tests => 10;
 
 use_ok('Database::test3');
 
@@ -41,3 +41,5 @@ if($ENV{'TEST_VERBOSE'}) {
 cmp_ok(scalar(@rc), '==', 2, 'selectall_hash returns correct number of matches');
 
 ok(($rc[0]->{'fr'} eq 'Deux') && ($rc[1]->{'fr'} eq 'Deux'));
+
+cmp_ok($test3->updated(), '<', time, 'Updated is a time in the past');

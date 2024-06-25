@@ -86,8 +86,9 @@ ERRORS
                      Parameter 'width' contain bad unit.
                              Unit: %s
                              Value: %s
-             Parameter 'css' must be a 'CSS::Struct::Output::*' class.
-             Parameter 'tags' must be a 'Tags::Output::*' class.
+             From Tags::HTML::new():
+                     Parameter 'css' must be a 'CSS::Struct::Output::*' class.
+                     Parameter 'tags' must be a 'Tags::Output::*' class.
 
 EXAMPLE1
      use strict;
@@ -176,7 +177,7 @@ EXAMPLE2
      # </div>
 
 DEPENDENCIES
-    Class::Utils, Error::Pure, Mo::utils::CSS.
+    Class::Utils, Error::Pure, Mo::utils::CSS, Tags::HTML.
 
 SEE ALSO
     Tags::HTML::Stars
@@ -196,5 +197,5 @@ LICENSE AND COPYRIGHT
     BSD 2-Clause License
 
 VERSION
-    0.05
+    0.06
 

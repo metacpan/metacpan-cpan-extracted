@@ -1,3 +1,10 @@
+0.09 2024-06-25T08:35:41+02:00
+ - Add another publishing places cleanup (Ve Praze, We Praze). Thanks Josef
+   Moravec.
+ - Add constructor tests.
+ - Rewrite checks in Wikidata to use of Mo::utils.
+ - Rewrite checks in Item to use of Mo::utils.
+
 0.08 2024-06-21T09:12:52+02:00
  - Add Cieszyn to publishing places cleanup.
  - Add Kroměříž to publishing places cleanup.

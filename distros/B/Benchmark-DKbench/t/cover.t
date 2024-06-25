@@ -144,4 +144,15 @@ is(system_identity(1), 1, 'System identity');
 
 is(Benchmark::DKbench::benchmark_list(), Benchmark::DKbench::benchmark_list({}), 'benchmark_list');
 
+my @out = suite_calc({include => 'Astro', quick => '1'});
+is(scalar @out, 1, 'Single Core result only');
+
+my $mock2 = Test2::Mock->new(
+    class => 'Benchmark::DKbench',
+    override => [ system_identity => sub {return 2} ]
+);
+
+@out = suite_calc({include => 'Astro', quick => '1'});
+is(scalar @out, 3, 'Multi / Scalability results');
+
 done_testing();

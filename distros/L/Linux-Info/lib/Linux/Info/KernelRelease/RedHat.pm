@@ -2,14 +2,14 @@ package Linux::Info::KernelRelease::RedHat;
 
 use warnings;
 use strict;
-use parent 'Linux::Info::KernelRelease';
+use base 'Linux::Info::KernelRelease';
 use Carp qw(confess);
 use Class::XSAccessor getters => {
     get_revision    => 'revision',
     get_distro_info => 'distro_info',
 };
 
-our $VERSION = '2.17'; # VERSION
+our $VERSION = '2.18'; # VERSION
 
 # ABSTRACT: a subclass of Linux::Info::KernelRelease specific to parse RedHat kernel information
 
@@ -53,7 +53,7 @@ Linux::Info::KernelRelease::RedHat - a subclass of Linux::Info::KernelRelease sp
 
 =head1 VERSION
 
-version 2.17
+version 2.18
 
 =head1 METHODS
 

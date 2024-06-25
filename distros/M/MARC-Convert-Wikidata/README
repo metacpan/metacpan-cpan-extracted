@@ -107,8 +107,10 @@ ERRORS
      new():
              From Class::Utils::set_params():
                      Unknown parameter '%s'.
-             Parameter 'marc_record' is required.
-             Parameter 'marc_record' must be a MARC::Record object.
+             From Mo::utils::check_isa():
+                     Parameter 'marc_record' must be a 'MARC::Record' object.
+             From Mo::utils::check_required():
+                     Parameter 'marc_record' is required.
 
      type():
              Unsupported item with leader '%s'.
@@ -333,5 +335,5 @@ LICENSE AND COPYRIGHT
     BSD 2-Clause License
 
 VERSION
-    0.08
+    0.09
 

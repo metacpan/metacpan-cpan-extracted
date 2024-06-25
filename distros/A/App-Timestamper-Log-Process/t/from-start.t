@@ -18,6 +18,19 @@ my $expected_results_fn =
     ->child( "t", "data", "expected-output", "from-start",
     "hp1.build.log.txt" );
 
+sub _portable_lines
+{
+    my $fh = shift;
+
+    return $fh->lines( { binmode => ":raw:encoding(UTF-8)", chomp => 1, } );
+}
+
+sub _portable_lines_aref
+{
+    my $fh = shift;
+    return [ _portable_lines($fh) ];
+}
+
 {
     my $ofn = $dir->child("output.log.txt");
     system(
@@ -31,8 +44,8 @@ my $expected_results_fn =
 
     # TEST
     is_deeply(
-        [ $ofn->lines_utf8(), ],
-        [ $expected_results_fn->lines_utf8(), ],
+        _portable_lines_aref($ofn),
+        _portable_lines_aref($expected_results_fn),
         "Expected from-start results ",
     )
 }
@@ -47,8 +60,8 @@ my $expected_results_fn =
 
     # TEST
     is_deeply(
-        [ $ofn->lines_utf8(), ],
-        [ $expected_results_fn->lines_utf8(), ],
+        _portable_lines_aref($ofn),
+        _portable_lines_aref($expected_results_fn),
         "Expected from-start results ",
     )
 }
@@ -66,8 +79,8 @@ my $expected_results_fn =
 
     # TEST
     is_deeply(
-        [ $ofn->lines_utf8(), ],
-        [ $expected_results_fn->lines_utf8(), ],
+        _portable_lines_aref($ofn),
+        _portable_lines_aref($expected_results_fn),
         "Expected from-start with dash results ",
     )
 }

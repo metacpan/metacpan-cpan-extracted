@@ -15,7 +15,7 @@ use constant DEFAULT_CONFIG_DIR => '/etc';
 use Linux::Info::Distribution::OSRelease;
 use Linux::Info::Distribution::BasicInfo;
 
-our $VERSION = '2.17'; # VERSION
+our $VERSION = '2.18'; # VERSION
 
 # ABSTRACT: class to search for candidate files
 
@@ -190,7 +190,7 @@ Linux::Info::DistributionFinder - class to search for candidate files
 
 =head1 VERSION
 
-version 2.17
+version 2.18
 
 =head2 SYNOPSIS
 

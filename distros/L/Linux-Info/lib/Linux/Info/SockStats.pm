@@ -3,7 +3,7 @@ use strict;
 use warnings;
 use Carp qw(croak);
 
-our $VERSION = '2.17'; # VERSION
+our $VERSION = '2.18'; # VERSION
 # ABSTRACT: Collect linux socket statistics.
 
 
@@ -72,7 +72,7 @@ Linux::Info::SockStats - Collect linux socket statistics.
 
 =head1 VERSION
 
-version 2.17
+version 2.18
 
 =head1 SYNOPSIS
 

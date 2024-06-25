@@ -17,12 +17,16 @@ END
 
 # Arguments.
 @ARGV = (
-        '-n 10',
+        '-n', '10',
         $tmp_file,
 );
 
 # Run.
-exit App::Run::Command::ToFail->new->run;
+my $exit = App::Run::Command::ToFail->new->run;
+
+unlink $tmp_file;
+
+exit $exit;
 
 # Output like:
 # ..........Everything is ok.

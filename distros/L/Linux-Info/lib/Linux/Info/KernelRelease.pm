@@ -15,7 +15,7 @@ use Class::XSAccessor getters => {
     get_build_datetime => 'build_datetime',
 };
 
-our $VERSION = '2.17'; # VERSION
+our $VERSION = '2.18'; # VERSION
 
 # ABSTRACT: parses and provide Linux kernel detailed information
 
@@ -179,13 +179,12 @@ Linux::Info::KernelRelease - parses and provide Linux kernel detailed informatio
 
 =head1 VERSION
 
-version 2.17
+version 2.18
 
 =head1 SYNOPSIS
 
 Getting the current kernel information:
 
-    my $sys = Linux::Info::SysInfo->new;
     my $current = Linux::Info::KernelRelease->new;
 
 Or using L<Linux::Info::SysInfo> syntax sugar to achieve the same result:
@@ -197,20 +196,18 @@ Or using a given Linux kernel release string:
 
     my $kernel = Linux::Info::KernelRelease->new('2.4.20-0-generic');
 
-Now you can compare both:
+Now you can compare the version of both of them:
 
-    if ($current > $kernel) {
-        say 'Kernel was upgraded!';
-    }
+    say 'Kernel was upgraded!' if ($current > $kernel);
 
 =head1 DESCRIPTION
 
 This module parses the Linux kernel information obtained from sources like the
 C<uname> command and others.
 
-This make it easier to fetch each information piece of information from the
-string and also to compare different kernel versions, since instances of this
-class overload operators like ">=", ">" and "<".
+This make it easier to fetch each piece of information from a string and also
+to compare different kernels (C<KernelRelease> sub classes) versions, since sub
+classes of this class will overload operators like ">=", ">" and "<".
 
 =head1 METHODS
 

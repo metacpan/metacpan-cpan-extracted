@@ -38,8 +38,8 @@ use Text::Levenshtein::XS;
 
 my $mono_clock = $^O !~ /win/i || $Time::HiRes::VERSION >= 1.9764;
 
-our $VERSION = '2.7';
-our @EXPORT  = qw(system_identity suite_run calc_scalability);
+our $VERSION = '2.8';
+our @EXPORT  = qw(system_identity suite_run calc_scalability suite_calc);
 our $datadir = dist_dir("Benchmark-DKbench");
 
 =head1 NAME
@@ -360,6 +360,17 @@ The result hash return looks like this:
    _total => $total_avg_scalability
  );
 
+=head2 C<suite_calc>
+
+ my ($stats, $stats_multi, $scal) = suite_calc(\%suite_run_options);
+
+Convenience function that combines 3 calls, L<suite_run> with C<threads=E<gt>1>,
+L<suite_run> with C<threads=E<gt>system_identity(1)> and L<calc_scalability> with
+the results of those two, returning hashrefs with the results of all three calls.
+
+For single-core systems (or when C<system_identity(1)> does not return E<gt> 1)
+only C<$stats> will be returned;
+
 =head1 CUSTOM BENCHMARKS
 
 Version 2.5 introduced the ability to add custom benchmarks to be run along any
@@ -415,6 +426,14 @@ If you want to do a multi-threaded run as well and then calculate scalability:
   );
 
   my %scal = calc_scalability(\%stats, \%stats_multi);
+
+Or, with a single call via the convenience function L<suite_calc>:
+
+  my ($stats, $stats_multi, $scal) = suite_calc({
+      include     => 'custom',
+      extra_bench => { custom1 => [sub {my @a=split(//, 'x'x$_) for 1..10000}] }
+    }
+  );
 
 =head1 NOTES
 
@@ -525,6 +544,15 @@ sub system_identity {
 
     return $ncpu;
 };
+
+sub suite_calc {
+    my $opt    = shift;
+    my %single = suite_run({%$opt, threads => 1});
+    my $cpus   = system_identity(1);
+    return \%single unless $cpus > 1;
+    my %multi  = suite_run({%$opt, threads => $cpus});
+    return \%single, \%multi, {calc_scalability(\%single, \%multi)};
+}
 
 sub suite_run {
     my $opt = shift;

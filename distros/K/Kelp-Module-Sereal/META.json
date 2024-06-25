@@ -4,7 +4,7 @@
       "Bartosz Jarzyna <bbrtj.pro@gmail.com>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.025, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.032, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -26,9 +26,9 @@
       },
       "runtime" : {
          "requires" : {
-            "Kelp" : "1",
+            "Kelp" : "2.10",
             "Sereal" : "0",
-            "perl" : "5.010"
+            "perl" : "5.014"
          }
       }
    },
@@ -43,9 +43,9 @@
          "web" : "https://github.com/bbrtj/perl-kelp-module-sereal"
       }
    },
-   "version" : "1.02",
-   "x_generated_by_perl" : "v5.36.0",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.29",
+   "version" : "2.10",
+   "x_generated_by_perl" : "v5.40.0",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.38",
    "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"
 }
 

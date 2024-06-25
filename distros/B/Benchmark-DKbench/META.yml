@@ -50,5 +50,5 @@ requires:
   perl: '5.012000'
 resources:
   repository: git://github.com/dkechag/Benchmark-DKbench.git
-version: '2.7'
+version: '2.8'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

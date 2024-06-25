@@ -23,8 +23,9 @@ sub new
 
 sub set_content_type
 {
-    my ($self, $type) = @_;
+    my ($self, $type, $charset) = @_;
     $self->content_type($type);
+    $self->charset($charset) if $charset;
     return $self;
 }
 
@@ -57,32 +58,28 @@ sub _apply_charset
 sub text
 {
     my $self = shift;
-    $self->set_content_type('text/plain');
-    $self->charset($self->app->charset) unless $self->charset;
+    $self->set_content_type('text/plain', $self->charset || $self->app->charset);
     return $self;
 }
 
 sub html
 {
     my $self = shift;
-    $self->set_content_type('text/html');
-    $self->charset($self->app->charset) unless $self->charset;
+    $self->set_content_type('text/html', $self->charset || $self->app->charset);
     return $self;
 }
 
 sub json
 {
     my $self = shift;
-    $self->set_content_type('application/json');
-    $self->charset($self->app->charset) unless $self->charset;
+    $self->set_content_type('application/json', $self->charset || $self->app->charset);
     return $self;
 }
 
 sub xml
 {
     my $self = shift;
-    $self->set_content_type('application/xml');
-    $self->charset($self->app->charset) unless $self->charset;
+    $self->set_content_type('application/xml', $self->charset || $self->app->charset);
     return $self;
 }
 
@@ -123,27 +120,40 @@ sub set_code
 sub render
 {
     my ($self, $body) = @_;
-    my $ct = $self->content_type;
-    my $ref = ref $body;
+
+    my $method = ref $body ? '_render_ref' : '_render_nonref';
+    $body = $self->$method($body);
 
     # Set code 200 if the code has not been set
     $self->set_code(200) unless $self->code;
 
-    # If the content has been determined as JSON, then encode it
-    if ($ref && (!$ct || $ct =~ m{^application/json}i)) {
-        $body = $self->app->get_encoder(json => 'internal')->encode($body);
-        $self->json if !$ct;
-    }
-    elsif (!$ref) {
-        $self->html if !$ct;
-    }
-    else {
-        croak "Don't know how to handle non-json reference in response (forgot to serialize?)";
-    }
-
     $self->body($self->charset_encode($body));
     $self->rendered(1);
     return $self;
+}
+
+# override to change how references are serialized
+sub _render_ref
+{
+    my ($self, $body) = @_;
+    my $ct = $self->content_type;
+
+    if (!$ct || $ct =~ m{^application/json}i) {
+        $self->json if !$ct;
+        return $self->app->get_encoder(json => 'internal')->encode($body);
+    }
+    else {
+        croak "Don't know how to handle reference for $ct in response (forgot to serialize?)";
+    }
+}
+
+# override to change how non-references are handled
+sub _render_nonref
+{
+    my ($self, $body) = @_;
+    $self->html if !$self->content_type;
+
+    return $body;
 }
 
 sub render_binary
@@ -405,6 +415,9 @@ Sets the content type of the response and returns C<$self>.
 
     # Inside a route definition
     $self->res->set_content_type('image/png');
+
+An optional second argument can be passed, which will be used for C<charset>
+part of C<Content-Type> (will set L</charset> field).
 
 =head2 text, html, json, xml
 

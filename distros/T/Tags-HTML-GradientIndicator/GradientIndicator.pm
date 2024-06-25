@@ -1,23 +1,23 @@
 package Tags::HTML::GradientIndicator;
 
+use base qw(Tags::HTML);
 use strict;
 use warnings;
 
-use Class::Utils qw(set_params);
+use Class::Utils qw(set_params split_params);
 use Error::Pure qw(err);
 use Mo::utils::CSS 0.07 qw(check_css_unit);
 
-our $VERSION = 0.05;
+our $VERSION = 0.06;
 
 # Constructor.
 sub new {
 	my ($class, @params) = @_;
 
 	# Create object.
-	my $self = bless {}, $class;
-
-	# 'CSS::Struct::Output' object.
-	$self->{'css'} = undef;
+	my ($object_params_ar, $other_params_ar) = split_params(
+		['css_background_image', 'css_gradient_class', 'height', 'width'], @params);
+	my $self = $class->SUPER::new(@{$other_params_ar});
 
 	# Default gradient is left-right direction from red to violet.
 	$self->{'css_background_image'} = 'linear-gradient(to right, red, orange, yellow, green, blue, indigo, violet)';
@@ -31,21 +31,8 @@ sub new {
 	# Width.
 	$self->{'width'} = '500px';
 
-	# 'Tags::Output' object.
-	$self->{'tags'} = undef;
-
 	# Process params.
-	set_params($self, @params);
-
-	# Check to 'CSS::Struct::Output' object.
-	if ($self->{'css'} && ! $self->{'css'}->isa('CSS::Struct::Output')) {
-		err "Parameter 'css' must be a 'CSS::Struct::Output::*' class.";
-	}
-
-	# Check to 'Tags' object.
-	if (! $self->{'tags'} || ! $self->{'tags'}->isa('Tags::Output')) {
-		err "Parameter 'tags' must be a 'Tags::Output::*' class.";
-	}
+	set_params($self, @{$object_params_ar});
 
 	# Check height;
 	check_css_unit($self, 'height');
@@ -58,7 +45,7 @@ sub new {
 }
 
 # Process 'Tags'.
-sub process {
+sub _process {
 	my ($self, $percent_value) = @_;
 
 	# Value.
@@ -81,7 +68,7 @@ sub process {
 }
 
 # Process 'CSS::Struct'.
-sub process_css {
+sub _process_css {
 	my $self = shift;
 
 	$self->{'css'}->put(
@@ -202,8 +189,9 @@ Returns undef.
                  Parameter 'width' contain bad unit.
                          Unit: %s
                          Value: %s
-         Parameter 'css' must be a 'CSS::Struct::Output::*' class.
-         Parameter 'tags' must be a 'Tags::Output::*' class.
+         From Tags::HTML::new():
+                 Parameter 'css' must be a 'CSS::Struct::Output::*' class.
+                 Parameter 'tags' must be a 'Tags::Output::*' class.
 
 =head1 EXAMPLE1
 
@@ -301,7 +289,8 @@ Returns undef.
 
 L<Class::Utils>,
 L<Error::Pure>,
-L<Mo::utils::CSS>.
+L<Mo::utils::CSS>,
+L<Tags::HTML>.
 
 =head1 SEE ALSO
 
@@ -331,6 +320,6 @@ BSD 2-Clause License
 
 =head1 VERSION
 
-0.05
+0.06
 
 =cut

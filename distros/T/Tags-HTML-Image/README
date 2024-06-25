@@ -116,6 +116,10 @@ ERRORS
      new():
              From Class::Utils::set_params():
                      Unknown parameter '%s'.
+             From Mo::utils::check_code():
+                     Parameter 'img_comment_cb' must be a code.
+                     Parameter 'img_select_cb' must be a code.
+                     Parameter 'img_src_cb' must be a code.
              From Mo::utils::CSS::check_css_class():
                      Parameter 'css_class' has bad CSS class name.
                              Value: %s
@@ -124,9 +128,6 @@ ERRORS
              From Tags::HTML::new():
                      Parameter 'css' must be a 'CSS::Struct::Output::*' class.
                      Parameter 'tags' must be a 'Tags::Output::*' class.
-             Parameter 'img_comment_cb' must be a code.
-             Parameter 'img_select_cb' must be a code.
-             Parameter 'img_src_cb' must be a code.
 
      init():
              Image object is required.
@@ -319,7 +320,8 @@ EXAMPLE2
      # </html>
 
 DEPENDENCIES
-    Class::Utils, Error::Pure, Mo::utils::CSS, Scalar::Util, Tags::HTML.
+    Class::Utils, Error::Pure, Mo::utils, Mo::utils::CSS, Scalar::Util,
+    Tags::HTML.
 
 REPOSITORY
     <https://github.com/michal-josef-spacek/Tags-HTML-Image>
@@ -335,5 +337,5 @@ LICENSE AND COPYRIGHT
     BSD 2-Clause License
 
 VERSION
-    0.02
+    0.03
 

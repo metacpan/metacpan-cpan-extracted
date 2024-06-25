@@ -2,7 +2,7 @@ package Linux::Info::Distribution::OSRelease::Raspbian;
 
 use warnings;
 use strict;
-use parent 'Linux::Info::Distribution::OSRelease';
+use base 'Linux::Info::Distribution::OSRelease';
 use Hash::Util qw(lock_hash unlock_hash);
 use Class::XSAccessor getters => {
     get_bug_report_url   => 'bug_report_url',
@@ -12,7 +12,7 @@ use Class::XSAccessor getters => {
 
 use constant OUTDATED_VERSION => 0.1;
 
-our $VERSION = '2.17'; # VERSION
+our $VERSION = '2.18'; # VERSION
 
 # ABSTRACT: a subclass of Linux::Info::Distribution::OSRelease
 
@@ -87,7 +87,7 @@ Linux::Info::Distribution::OSRelease::Raspbian - a subclass of Linux::Info::Dist
 
 =head1 VERSION
 
-version 2.17
+version 2.18
 
 =head1 DESCRIPTION
 

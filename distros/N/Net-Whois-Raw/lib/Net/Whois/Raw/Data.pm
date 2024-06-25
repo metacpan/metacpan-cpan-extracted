@@ -1,5 +1,5 @@
 package Net::Whois::Raw::Data;
-$Net::Whois::Raw::Data::VERSION = '2.99039';
+$Net::Whois::Raw::Data::VERSION = '2.99040';
 # ABSTRACT: Config for Net::Whois::Raw.
 
 use utf8;
@@ -118,6 +118,7 @@ our %servers = qw(
     VOLOGDA.SU          whois.flexireg.net
     YAKUTIA.SU          whois.nic.ru
     YEKATERINBURG.RU    whois.nic.ru
+    XN--90A1AF.XN--P1AI whois.flexireg.net
 
     NS     whois.nsiregistry.net
     RIPE   whois.ripe.net
@@ -4485,7 +4486,7 @@ Net::Whois::Raw::Data - Config for Net::Whois::Raw.
 
 =head1 VERSION
 
-version 2.99039
+version 2.99040
 
 =head1 AUTHOR
 

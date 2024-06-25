@@ -1,7 +1,10 @@
-0.05 2024-06-23
+0.06 2024-06-23
+    * Fix Windows errors
+
+0.05 2024-06-22
     * 0.04 was a failed upload
 
-0.04 2024-06-23
+0.04 2024-06-22
     * Output UTF-8 ellipsis when using ANSI console
     * Fix output of lines when items contain newlines
     * Optionally hook into output of warnings

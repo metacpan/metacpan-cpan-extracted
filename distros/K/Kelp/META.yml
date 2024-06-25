@@ -31,7 +31,7 @@ resources:
   bugtracker: https://github.com/Kelp-framework/Kelp/issues
   homepage: http://kelp-framework.github.io/
   repository: git://github.com/Kelp-framework/Kelp.git
-version: '2.10'
+version: '2.11'
 x_contributors:
   - 'Stefan Geneshky <minimal@cpan.org>'
   - 'Bartosz Jarzyna <bbrtj.pro@gmail.com>'

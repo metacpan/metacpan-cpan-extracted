@@ -7,16 +7,16 @@ BEGIN { use_ok('Linux::Info::SysInfo') }
 
 my $obj     = new_ok('Linux::Info::SysInfo');
 my @methods = (
-    'get_raw_time',   'get_hostname',
-    'get_domain',     'get_kernel',
-    'get_release',    'get_version',
-    'get_mem',        'get_swap',
-    'get_pcpucount',  'get_tcpucount',
-    'get_interfaces', 'get_proc_arch',
-    'get_cpu_flags',  'get_uptime',
-    'get_idletime',   'is_multithread',
-    'get_model',      'has_multithread',
-    'get_detailed_kernel',
+    'get_raw_time',        'get_hostname',
+    'get_domain',          'get_kernel',
+    'get_release',         'get_version',
+    'get_mem',             'get_swap',
+    'get_pcpucount',       'get_tcpucount',
+    'get_interfaces',      'get_proc_arch',
+    'get_cpu_flags',       'get_uptime',
+    'get_idletime',        'is_multithread',
+    'get_model',           'has_multithread',
+    'get_detailed_kernel', 'get_cpu'
 );
 can_ok( $obj, @methods );
 
@@ -105,6 +105,9 @@ foreach my $cpuinfo_sample ( @{ cpuinfo_samples() } ) {
             "$method returns a number" )
           or diag( explain( check_cpuinfo($cpuinfo_sample) ) );
     }
+
+    isa_ok( $instance->get_cpu, 'Linux::Info::SysInfo::CPU' )
+      or diag( explain( $instance->get_cpu ) );
 }
 
 my $obj2 = Linux::Info::SysInfo->new( { raw_time => 1 } );
@@ -114,6 +117,10 @@ note('Testing times returned by instance with raw_time attribute set to true');
 foreach my $method (qw(get_uptime get_idletime)) {
     ok( looks_like_number( $obj2->$method ), "$method returns a number" );
 }
+
+note('Testing get_cpu with current host running the tests');
+isa_ok( $obj->get_cpu, 'Linux::Info::SysInfo::CPU' )
+  or diag( explain( $obj2->get_cpu ) );
 
 done_testing;
 

@@ -1,0 +1,52 @@
+---
+abstract: 'Module that implements the runscript utility'
+author:
+  - 'Sven Willenbuecher <sven.willenbuecher@gmx.de>'
+build_requires:
+  App::Prove: '3.17'
+  ExtUtils::MakeMaker: '0'
+  Sub::Override: '0.12'
+  Test::Fatal: '0'
+  Test::More: '0.92'
+  Test::Needs: '0'
+configure_requires:
+  Config: '0'
+  ExtUtils::MakeMaker::CPANfile: '0.09'
+  File::Basename: '0'
+  File::Spec: '0'
+  lib: '0'
+  strict: '0'
+  subs: '0'
+  version: '0.9915'
+  warnings: '0'
+dynamic_config: 0
+generated_by: 'ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.143240'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: App-runscript
+no_index:
+  directory:
+    - t
+    - inc
+provides:
+  App::runscript:
+    file: lib/App/runscript.pm
+    version: v1.0.0
+requires:
+  Carp: '1.32'
+  Config: '0'
+  Cwd: '0'
+  File::Basename: '0'
+  File::Spec: '0'
+  File::Which: '0'
+  Getopt::Std: '0'
+  POSIX: '0'
+  perl: '5.008009'
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/XSven/App-runscript/issues
+  repository: git://github.com/XSven/App-runscript.git
+version: 1.0.0

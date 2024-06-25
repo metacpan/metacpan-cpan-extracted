@@ -1,5 +1,10 @@
 Revision history for Perl extension Kelp::Module::Symbiosis.
 
+2.10 Mon Jun 24 2024
+	- plack_to_kelp was moved to Kelp::Util::adapt_psgi
+	- add a note about Kelp 2.10 solving plack app mounting natively
+	- adjust to use new framework capabilities
+
 2.00 Wed Jun 12 2024
 	- added interchangeable engines, configured through 'engine'
 	- existing functionality moved to Adapter and Engine::URLMap

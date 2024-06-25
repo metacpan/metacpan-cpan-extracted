@@ -1,7 +1,8 @@
 package KelpX::Symbiosis::Util;
-$KelpX::Symbiosis::Util::VERSION = '2.00';
+$KelpX::Symbiosis::Util::VERSION = '2.10';
 use Kelp::Base -strict;
 use Plack::Util;
+use Kelp::Util;
 
 sub wrap
 {
@@ -35,51 +36,7 @@ sub load_middleware
 
 sub plack_to_kelp
 {
-	my ($app) = @_;
-
-	return sub {
-		my $kelp = shift;
-		my $path = pop() // '';
-		my $env = $kelp->req->env;
-
-		# remember script and path
-		my $orig_script = $env->{SCRIPT_NAME};
-		my $orig_path = $env->{PATH_INFO};
-
-		# adjust slashes in paths
-		my $trailing_slash = $orig_path =~ m{/$} ? '/' : '';
-		$path =~ s{^/?}{/};
-		$path =~ s{/?$}{$trailing_slash};
-
-		# adjust script and path
-		$env->{SCRIPT_NAME} = $orig_path;
-		$env->{SCRIPT_NAME} =~ s{\Q$path\E$}{};
-		$env->{PATH_INFO} = $path;
-
-		# run the callback
-		my $result = $app->($env, @_);
-
-		# restore old script and path
-		$env->{SCRIPT_NAME} = $orig_script;
-		$env->{PATH_INFO} = $orig_path;
-
-		# produce a response
-		if (ref $result eq 'ARRAY') {
-			my ($status, $headers, $body) = @{$result};
-
-			my $res = $kelp->res;
-			$res->status($status) if $status;
-			$res->headers($headers) if $headers;
-			$res->body($body) if $body;
-			$res->rendered(1);
-		}
-		elsif (ref $result eq 'CODE') {
-			return $result;
-		}
-
-		# this should be an error unless already rendered
-		return;
-	};
+	goto \&Kelp::Util::adapt_psgi;
 }
 
 1;
@@ -126,8 +83,6 @@ C<$obj> (adds to it, does not clear it). Can be used later with L</wrap>.
 
 =head3 plack_to_kelp
 
-	my $kelp_destination = KelpX::Symbiosis::Util::plack_to_kelp($plack_app);
-
-Turns a Plack app into a Kelp destination (a sub). Useful to mount Plack stuff
-under a specific Kelp route.
+Moved to core Kelp in version I<2.10>. This function will not be removed for
+backward compatilibity, but is now just an alias for L<Kelp::Util/adapt_psgi>.
 

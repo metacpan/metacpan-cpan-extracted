@@ -1,0 +1,9 @@
+Revision history for Kelp::Module::Config::YAML.
+
+1.00 - 2024-06-25
+        - Switch backend from YAML to YAML::PP
+        - Improved tests
+
+0.02 - 2013-04-14
+        - Undocumented version
+

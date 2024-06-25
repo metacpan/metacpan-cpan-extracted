@@ -1,5 +1,5 @@
 package Net::Whois::Raw::Common;
-$Net::Whois::Raw::Common::VERSION = '2.99039';
+$Net::Whois::Raw::Common::VERSION = '2.99040';
 # ABSTRACT: Helper for Net::Whois::Raw.
 
 use Encode;
@@ -606,7 +606,7 @@ Net::Whois::Raw::Common - Helper for Net::Whois::Raw.
 
 =head1 VERSION
 
-version 2.99039
+version 2.99040
 
 =head1 AUTHOR
 

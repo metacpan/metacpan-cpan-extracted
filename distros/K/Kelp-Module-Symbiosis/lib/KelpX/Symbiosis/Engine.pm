@@ -1,5 +1,5 @@
 package KelpX::Symbiosis::Engine;
-$KelpX::Symbiosis::Engine::VERSION = '2.00';
+$KelpX::Symbiosis::Engine::VERSION = '2.10';
 use Kelp::Base;
 use Carp;
 use Scalar::Util qw(blessed refaddr);
