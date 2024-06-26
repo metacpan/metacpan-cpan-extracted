@@ -1,9 +1,8 @@
-use strict;
-use warnings;
-
+use Kelp::Base -strict;
 use Test::More;
 use Kelp;
 use YAML::PP qw(Dump Load);
+use Kelp::Request;
 
 my $app = Kelp->new(mode => 'test');
 
@@ -31,14 +30,23 @@ for my $doc (@documents) {
 	push @yaml_res, Dump($doc);
 }
 
-while (@res) {
-	my $doc = shift @documents;
+subtest 'testing documents together' => sub {
+	is_deeply [$app->yaml->decode(join '', @yaml_res)], \@documents, 'decode ok';
+	is $app->yaml->encode(@documents), join('', @yaml_res), 'decode ok';
+};
 
-	is_deeply $app->yaml->decode(shift @yaml_res), $doc, 'decode ok';
-	is_deeply Load(shift @res), $doc, 'decode against yaml ok';
-}
+subtest 'testing documents separately' => sub {
+	while (@res) {
+		my $doc = shift @documents;
 
-is scalar @yaml_res, 0, 'fully decoded ok';
+		is_deeply $app->yaml->decode(shift @yaml_res), $doc, 'decode ok';
+		is_deeply Load(shift @res), $doc, 'decode against yaml ok';
+	}
+
+	is scalar @yaml_res, 0, 'fully decoded ok';
+};
+
+ok !Kelp::Request->can('is_yaml'), 'no yaml extensions ok';
 
 done_testing;
 

@@ -15,7 +15,9 @@ t/00-report-prereqs.dd
 t/00-report-prereqs.t
 t/00_load.t
 t/01_main.t
+t/_xml.t
 t/cmp_ver.t
+t/encodings.t
 t/gen-parse.t
 t/iter.t
 t/key-order.t
@@ -23,8 +25,10 @@ t/larose_trk1.gpx
 t/larose_trk2.gpx
 t/larose_wpt.gpx
 t/misc.t
+t/mix_of_latin1_utf8_chars.xml
 t/pod-coverage.t
 t/pod.t
 t/point.t
+t/sample.gpx
 t/set.t
 t/time.t

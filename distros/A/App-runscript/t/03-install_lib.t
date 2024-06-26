@@ -1,10 +1,10 @@
 use strict;
 use warnings;
 
-use Test::More import => [ qw( is is_deeply like pass plan subtest ) ], tests => 6;
+use Test::More import => [ qw( is is_deeply like pass plan subtest ) ], tests => 7;
 use Test::Fatal qw( exception );
 
-use File::Basename qw( basename );
+use File::Basename qw( basename dirname );
 use File::Spec     ();
 use Sub::Override  ();
 
@@ -20,8 +20,11 @@ like exception { App::runscript::_prepend_install_lib( 'baz.pl' ) }, qr/\ACannot
   'application is not in PATH';
 
 {
-  my $override = Sub::Override->new( 'App::runscript::_which' => sub ( $;$ ) { '/foo/bar/baz.pl' } );
-  like exception { App::runscript::_prepend_install_lib( 'baz.pl' ) }, qr/\ABasename of '\/foo\/bar' is not 'bin'/,
+  my $application = File::Spec->catfile( File::Spec->rootdir, qw( foo bar baz.pl ) );
+  my $override    = Sub::Override->new(
+    'App::runscript::_which' => sub ( $;$ ) { pass( 'mocked _which() called once' ); return $application } );
+  like exception { App::runscript::_prepend_install_lib( 'baz.pl' ) },
+    "/\\ABasename of '" . dirname( $application ) . "' is not 'bin'/",
     'application is not in bin directory';
 }
 
@@ -36,14 +39,15 @@ like exception { App::runscript::_prepend_install_lib( 'baz.pl' ) }, qr/\ACannot
 subtest 'successfull execution' => sub {
   plan tests => 5;
 
-  my $expected_application = '/foo/bin/baz.pl';
+  my $expected_application = File::Spec->catfile( File::Spec->rootdir, qw( foo bin baz.pl ) );
   my $expected_args        = [ qw( arg1 arg2 ) ];
   my $override             = Sub::Override->new->override(
     'App::runscript::_which' => sub ( $;$ ) { pass( 'mocked _which() called once' ); return $expected_application } )
     ->override( 'App::runscript::_is_dir' => sub ( $ ) { pass( 'mocked _is_dir() called once' ); return 1 } );
 
   my @got = App::runscript::_prepend_install_lib( basename( $expected_application ), @$expected_args );
-  is $got[ 0 ], '-I/foo/lib/perl5',    'check library path passed to -I option';
+  is $got[ 0 ], '-I' . File::Spec->catfile( File::Spec->rootdir, qw( foo lib perl5 ) ),
+    'check library path passed to -I option';
   is $got[ 1 ], $expected_application, 'check absolute path of application';
   is_deeply [ @got[ 2 .. 3 ] ], $expected_args, 'check arguments passed to application';
 };

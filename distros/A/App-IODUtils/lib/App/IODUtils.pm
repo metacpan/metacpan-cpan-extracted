@@ -5,9 +5,9 @@ use strict;
 use warnings;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-05-03'; # DATE
+our $DATE = '2024-06-24'; # DATE
 our $DIST = 'App-IODUtils'; # DIST
-our $VERSION = '0.163'; # VERSION
+our $VERSION = '0.164'; # VERSION
 
 our %common_args = (
     iod => {
@@ -197,7 +197,7 @@ App::IODUtils - IOD utilities
 
 =head1 VERSION
 
-This document describes version 0.163 of App::IODUtils (from Perl distribution App-IODUtils), released on 2022-05-03.
+This document describes version 0.164 of App::IODUtils (from Perl distribution App-IODUtils), released on 2024-06-24.
 
 =head1 SYNOPSIS
 
@@ -205,27 +205,27 @@ This distribution provides the following command-line utilities:
 
 =over
 
-=item * L<delete-iod-key>
+=item 1. L<delete-iod-key>
 
-=item * L<delete-iod-section>
+=item 2. L<delete-iod-section>
 
-=item * L<dump-iod>
+=item 3. L<dump-iod>
 
-=item * L<get-iod-key>
+=item 4. L<get-iod-key>
 
-=item * L<get-iod-section>
+=item 5. L<get-iod-section>
 
-=item * L<grep-iod>
+=item 6. L<grep-iod>
 
-=item * L<insert-iod-key>
+=item 7. L<insert-iod-key>
 
-=item * L<insert-iod-section>
+=item 8. L<insert-iod-section>
 
-=item * L<list-iod-sections>
+=item 9. L<list-iod-sections>
 
-=item * L<map-iod>
+=item 10. L<map-iod>
 
-=item * L<parse-iod>
+=item 11. L<parse-iod>
 
 =back
 
@@ -289,13 +289,14 @@ simply modify the code, then test via:
 
 If you want to build the distribution (e.g. to try to install it locally on your
 system), you can install L<Dist::Zilla>,
-L<Dist::Zilla::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
-Dist::Zilla plugin and/or Pod::Weaver::Plugin. Any additional steps required
-beyond that are considered a bug and can be reported to me.
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>,
+L<Pod::Weaver::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps required beyond
+that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2022, 2019, 2017, 2016, 2015, 2014 by perlancar <perlancar@cpan.org>.
+This software is copyright (c) 2024, 2022, 2019, 2017, 2016, 2015, 2014 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

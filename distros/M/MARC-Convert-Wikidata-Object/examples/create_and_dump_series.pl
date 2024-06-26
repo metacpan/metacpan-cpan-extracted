@@ -4,12 +4,15 @@ use strict;
 use warnings;
 
 use Data::Printer;
+use MARC::Convert::Wikidata::Object::Publisher;
 use MARC::Convert::Wikidata::Object::Series;
 use Unicode::UTF8 qw(decode_utf8);
 
 my $obj = MARC::Convert::Wikidata::Object::Series->new(
         'name' => decode_utf8('Malé encyklopedie'),
-        'publisher' => decode_utf8('Mladá Fronta'),
+        'publisher' => MARC::Convert::Wikidata::Object::Publisher->new(
+                'name' => decode_utf8('Mladá Fronta'),
+        ),
         'series_ordinal' => 5,
 );
 
@@ -22,7 +25,7 @@ p $obj;
 #     private methods (1) : __ANON__ (Mo::is)
 #     internals: {
 #         name             "Mal� encyklopedie",
-#         publisher        "Mlad� Fronta",
+#         publisher        MARC::Convert::Wikidata::Object::Publisher,
 #         series_ordinal   5
 #     }
 # }

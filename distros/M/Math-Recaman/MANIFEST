@@ -1,0 +1,20 @@
+Changes
+bin/recaman
+lib/Math/Recaman.pm
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+README
+t/00-load.t
+t/01-sequence.t
+t/01-sequence-intspan.t
+t/01-sequence-common.pl
+t/02-wantarray.t
+t/03-sequence-a008336.t
+t/manifest.t
+t/pod-coverage.t
+t/pod.t
+xt/boilerplate.t
+TODO.md
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

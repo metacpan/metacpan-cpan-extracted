@@ -15,6 +15,7 @@ isa_ok($obj, 'MARC::Convert::Wikidata::Object::Publisher');
 
 # Test.
 $obj = MARC::Convert::Wikidata::Object::Publisher->new(
+	'id' => '000010003',
 	'name' => 'Academia',
 	'place' => 'Praha',
 );

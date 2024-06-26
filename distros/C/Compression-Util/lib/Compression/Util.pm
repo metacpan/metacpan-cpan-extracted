@@ -8,12 +8,12 @@ require Exporter;
 
 our @ISA = qw(Exporter);
 
-our $VERSION = '0.08';
+our $VERSION = '0.09';
 our $VERBOSE = 0;        # verbose mode
 
 our $LZ_MIN_LEN       = 4;      # minimum match length in LZ parsing
 our $LZ_MAX_LEN       = 258;    # maximum match length in LZ parsing
-our $LZ_MAX_DIST      = ~0;     # maximum allowed backreference distance in LZ parsing
+our $LZ_MAX_DIST      = ~0;     # maximum allowed back-reference distance in LZ parsing
 our $LZ_MAX_CHAIN_LEN = 32;     # how many recent positions to remember in LZ parsing
 
 # Arithmetic Coding settings
@@ -312,10 +312,6 @@ sub accumulate ($deltas) {
 
 sub fibonacci_encode ($symbols) {
 
-    if (ref($symbols) eq '') {
-        return __SUB__->(string2symbols($symbols));
-    }
-
     my $bitstring = '';
 
     foreach my $n (scalar(@$symbols), @$symbols) {
@@ -484,7 +480,7 @@ sub _create_cfreq ($freq) {
 sub ac_encode ($symbols) {
 
     if (ref($symbols) eq '') {
-        return __SUB__->(string2symbols($symbols));
+        $symbols = string2symbols($symbols);
     }
 
     my $enc        = '';
@@ -659,7 +655,7 @@ sub _increment_freq ($c, $alphabet_size, $freq, $cf) {
 sub adaptive_ac_encode ($symbols) {
 
     if (ref($symbols) eq '') {
-        return __SUB__->(string2symbols($symbols));
+        $symbols = string2symbols($symbols);
     }
 
     my $enc        = '';
@@ -907,6 +903,10 @@ sub bwt_sort ($s, $LOOKAHEAD_LEN = 128) {    # O(n * LOOKAHEAD_LEN) space (fast)
 
 sub bwt_encode ($s, $LOOKAHEAD_LEN = 128) {
 
+    if (ref($s) eq 'ARRAY') {
+        return bwt_encode_symbolic($s);
+    }
+
     my $bwt = bwt_sort($s, $LOOKAHEAD_LEN);
     my $ret = join('', map { substr($s, $_ - 1, 1) } @$bwt);
 
@@ -981,7 +981,7 @@ sub bwt_sort_symbolic ($s) {    # O(n) space (slowish)
 sub bwt_encode_symbolic ($symbols) {
 
     if (ref($symbols) eq '') {
-        return __SUB__->(string2symbols($symbols));
+        $symbols = string2symbols($symbols);
     }
 
     my $bwt = bwt_sort_symbolic($symbols);
@@ -1027,6 +1027,10 @@ sub bwt_decode_symbolic ($bwt, $idx) {    # fast inversion
 
 sub rle4_encode ($symbols, $max_run = 255) {    # RLE1
 
+    if (ref($symbols) eq '') {
+        $symbols = string2symbols($symbols);
+    }
+
     my $end = $#{$symbols};
     return [] if ($end < 0);
 
@@ -1070,6 +1074,10 @@ sub rle4_encode ($symbols, $max_run = 255) {    # RLE1
 }
 
 sub rle4_decode ($symbols) {    # RLE1
+
+    if (ref($symbols) eq '') {
+        $symbols = string2symbols($symbols);
+    }
 
     my $end = $#{$symbols};
     return [] if ($end < 0);
@@ -1186,10 +1194,6 @@ sub _find_best_encoding_method ($integers) {
 }
 
 sub delta_encode ($integers) {
-
-    if (ref($integers) eq '') {
-        return __SUB__->(string2symbols($integers));
-    }
 
     my $deltas = deltas($integers);
 
@@ -1428,11 +1432,11 @@ sub decode_alphabet ($fh) {
 sub mtf_encode ($symbols, $alphabet = undef) {
 
     if (ref($symbols) eq '') {
-        return __SUB__->(string2symbols($symbols), $alphabet);
+        $symbols = string2symbols($symbols);
     }
 
     if (defined($alphabet) and ref($alphabet) eq '') {
-        return __SUB__->($symbols, string2symbols($alphabet));
+        $alphabet = string2symbols($alphabet);
     }
 
     my (@C, @table);
@@ -1465,11 +1469,11 @@ sub mtf_encode ($symbols, $alphabet = undef) {
 sub mtf_decode ($encoded, $alphabet) {
 
     if (ref($encoded) eq '') {
-        return __SUB__->(string2symbols($encoded), $alphabet);
+        $encoded = string2symbols($encoded);
     }
 
     if (ref($alphabet) eq '') {
-        return __SUB__->($encoded, string2symbols($alphabet));
+        $alphabet = string2symbols($alphabet);
     }
 
     my @S;
@@ -1488,6 +1492,10 @@ sub mtf_decode ($encoded, $alphabet) {
 ###########################
 
 sub zrle_encode ($symbols) {    # RLE2
+
+    if (ref($symbols) eq '') {
+        $symbols = string2symbols($symbols);
+    }
 
     my @rle;
     my $end = $#{$symbols};
@@ -1514,6 +1522,10 @@ sub zrle_encode ($symbols) {    # RLE2
 }
 
 sub zrle_decode ($rle) {    # RLE2
+
+    if (ref($rle) eq '') {
+        $rle = string2symbols($rle);
+    }
 
     my @dec;
     my $end = $#{$rle};
@@ -1545,7 +1557,7 @@ sub zrle_decode ($rle) {    # RLE2
 sub mrl_compress_symbolic ($symbols, $entropy_sub = \&create_huffman_entry) {
 
     if (ref($symbols) eq '') {
-        return __SUB__->(string2symbols($symbols), $entropy_sub);
+        $symbols = string2symbols($symbols);
     }
 
     my ($mtf, $alphabet) = mtf_encode($symbols);
@@ -1624,7 +1636,7 @@ sub bwt_decompress ($fh, $entropy_sub = \&decode_huffman_entry) {
 sub bwt_compress_symbolic ($symbols, $entropy_sub = \&create_huffman_entry) {
 
     if (ref($symbols) eq '') {
-        return __SUB__->(string2symbols($symbols), $entropy_sub);
+        $symbols = string2symbols($symbols);
     }
 
     my $rle4 = rle4_encode($symbols);
@@ -1668,7 +1680,7 @@ sub bwt_decompress_symbolic ($fh, $entropy_sub = \&decode_huffman_entry) {
 sub create_ac_entry ($symbols) {
 
     if (ref($symbols) eq '') {
-        return __SUB__->(string2symbols($symbols));
+        $symbols = string2symbols($symbols);
     }
 
     my ($enc, $freq) = ac_encode($symbols);
@@ -1719,7 +1731,7 @@ sub decode_ac_entry ($fh) {
 sub create_adaptive_ac_entry ($symbols) {
 
     if (ref($symbols) eq '') {
-        return __SUB__->(string2symbols($symbols));
+        $symbols = string2symbols($symbols);
     }
 
     my ($enc, $alphabet) = adaptive_ac_encode($symbols);
@@ -1859,7 +1871,7 @@ sub huffman_from_freq ($freq) {
 sub huffman_from_symbols ($symbols) {
 
     if (ref($symbols) eq '') {
-        return __SUB__->(string2symbols($symbols));
+        $symbols = string2symbols($symbols);
     }
 
     huffman_from_freq(frequencies($symbols));
@@ -1872,7 +1884,7 @@ sub huffman_from_symbols ($symbols) {
 sub create_huffman_entry ($symbols) {
 
     if (ref($symbols) eq '') {
-        return __SUB__->(string2symbols($symbols));
+        $symbols = string2symbols($symbols);
     }
 
     my $dict = huffman_from_symbols($symbols);
@@ -1918,12 +1930,12 @@ sub decode_huffman_entry ($fh) {
 # DEFLATE-like encoding of literals and backreferences produced by the LZSS methods
 ###################################################################################
 
-sub make_deflate_tables ($size) {
+sub make_deflate_tables ($max_dist = $LZ_MAX_DIST, $max_len = $LZ_MAX_LEN) {
 
     # [distance value, offset bits]
     my @DISTANCE_SYMBOLS = map { [$_, 0] } (0 .. 4);
 
-    until ($DISTANCE_SYMBOLS[-1][0] > $size) {
+    until ($DISTANCE_SYMBOLS[-1][0] > $max_dist) {
         push @DISTANCE_SYMBOLS, [int($DISTANCE_SYMBOLS[-1][0] * (4 / 3)), $DISTANCE_SYMBOLS[-1][1] + 1];
         push @DISTANCE_SYMBOLS, [int($DISTANCE_SYMBOLS[-1][0] * (3 / 2)), $DISTANCE_SYMBOLS[-1][1]];
     }
@@ -1933,14 +1945,17 @@ sub make_deflate_tables ($size) {
 
     {
         my $delta = 1;
-        until ($LENGTH_SYMBOLS[-1][0] > 163) {
+        until ($LENGTH_SYMBOLS[-1][0] > $max_len) {
             push @LENGTH_SYMBOLS, [$LENGTH_SYMBOLS[-1][0] + $delta, $LENGTH_SYMBOLS[-1][1] + 1];
             $delta *= 2;
             push @LENGTH_SYMBOLS, [$LENGTH_SYMBOLS[-1][0] + $delta, $LENGTH_SYMBOLS[-1][1]];
             push @LENGTH_SYMBOLS, [$LENGTH_SYMBOLS[-1][0] + $delta, $LENGTH_SYMBOLS[-1][1]];
             push @LENGTH_SYMBOLS, [$LENGTH_SYMBOLS[-1][0] + $delta, $LENGTH_SYMBOLS[-1][1]];
         }
-        push @LENGTH_SYMBOLS, [258, 0];
+        while (@LENGTH_SYMBOLS and $LENGTH_SYMBOLS[-1][0] >= $max_len) {
+            pop @LENGTH_SYMBOLS;
+        }
+        push @LENGTH_SYMBOLS, [$max_len, 0];
     }
 
     my @LENGTH_INDICES;
@@ -1966,9 +1981,11 @@ sub find_deflate_index ($value, $table) {
 
 sub deflate_encode ($literals, $distances, $lengths, $entropy_sub = \&create_huffman_entry) {
 
-    my $size       = max(@$distances) // 0;
+    my $max_dist   = max(@$distances) // 0;
+    my $max_len    = max(@$lengths)   // 0;
     my $max_symbol = (max(grep { defined($_) } @$literals) // -1) + 1;
-    my ($DISTANCE_SYMBOLS, $LENGTH_SYMBOLS, $LENGTH_INDICES) = make_deflate_tables($size);
+
+    my ($DISTANCE_SYMBOLS, $LENGTH_SYMBOLS, $LENGTH_INDICES) = make_deflate_tables($max_dist, $max_len);
 
     my @len_symbols;
     my @dist_symbols;
@@ -2007,7 +2024,7 @@ sub deflate_encode ($literals, $distances, $lengths, $entropy_sub = \&create_huf
         }
     }
 
-    fibonacci_encode([$max_symbol, $size]) . $entropy_sub->(\@len_symbols) . $entropy_sub->(\@dist_symbols) . pack('B*', $offset_bits);
+    fibonacci_encode([$max_symbol, $max_dist, $max_len]) . $entropy_sub->(\@len_symbols) . $entropy_sub->(\@dist_symbols) . pack('B*', $offset_bits);
 }
 
 sub deflate_decode ($fh, $entropy_sub = \&decode_huffman_entry) {
@@ -2017,8 +2034,8 @@ sub deflate_decode ($fh, $entropy_sub = \&decode_huffman_entry) {
         return __SUB__->($fh2, $entropy_sub);
     }
 
-    my ($max_symbol,       $size)           = @{fibonacci_decode($fh)};
-    my ($DISTANCE_SYMBOLS, $LENGTH_SYMBOLS) = make_deflate_tables($size);
+    my ($max_symbol, $max_dist, $max_len) = @{fibonacci_decode($fh)};
+    my ($DISTANCE_SYMBOLS, $LENGTH_SYMBOLS) = make_deflate_tables($max_dist, $max_len);
 
     my $len_symbols  = $entropy_sub->($fh);
     my $dist_symbols = $entropy_sub->($fh);
@@ -2066,10 +2083,6 @@ sub deflate_decode ($fh, $entropy_sub = \&decode_huffman_entry) {
 
 sub elias_gamma_encode ($integers) {
 
-    if (ref($integers) eq '') {
-        return __SUB__->(string2symbols($integers));
-    }
-
     my $bitstring = '';
     foreach my $k (scalar(@$integers), @$integers) {
         my $t = sprintf('%b', $k + 1);
@@ -2110,10 +2123,6 @@ sub elias_gamma_decode ($fh) {
 #####################
 
 sub elias_omega_encode ($integers) {
-
-    if (ref($integers) eq '') {
-        return __SUB__->(string2symbols($integers));
-    }
 
     my $bitstring = '';
     foreach my $k (scalar(@$integers), @$integers) {
@@ -2233,7 +2242,8 @@ sub lzss_encode_symbolic ($symbols) {
                 }
             }
         }
-        else {
+
+        if ($best_n == 1) {
             $table{$lookahead} = [$la];
         }
 
@@ -2274,13 +2284,13 @@ sub lzss_decode_symbolic ($literals, $distances, $lengths) {
         my $length = $lengths->[$i];
         my $dist   = $distances->[$i];
 
-        if ($dist == 1) {
-            push @data, ($data[-1]) x $length;
-        }
-        elsif ($dist >= $length) {
+        if ($dist >= $length) {    # non-overlapping matches
             push @data, @data[$data_len - $dist .. $data_len - $dist + $length - 1];
         }
-        else {
+        elsif ($dist == 1) {       # run-length of last character
+            push @data, ($data[-1]) x $length;
+        }
+        else {                     # overlapping matches
             foreach my $j (1 .. $length) {
                 push @data, $data[$data_len + $j - $dist - 1];
             }
@@ -2350,7 +2360,8 @@ sub lzss_encode ($str) {
                 }
             }
         }
-        else {
+
+        if ($best_n == 1) {
             $table{$lookahead} = [$la];
         }
 
@@ -2391,13 +2402,13 @@ sub lzss_decode ($literals, $distances, $lengths) {
         my $length = $lengths->[$i];
         my $dist   = $distances->[$i];
 
-        if ($dist == 1) {
-            $data .= substr($data, -1) x $length;
-        }
-        elsif ($dist >= $length) {
+        if ($dist >= $length) {    # non-overlapping matches
             $data .= substr($data, $data_len - $dist, $length);
         }
-        else {
+        elsif ($dist == 1) {       # run-length of last character
+            $data .= substr($data, -1) x $length;
+        }
+        else {                     # overlapping matches
             foreach my $i (1 .. $length) {
                 $data .= substr($data, $data_len + $i - $dist - 1, 1);
             }
@@ -2454,12 +2465,9 @@ sub lzss_encode_fast($str) {
 
             $best_p = $p;
             $best_n = $n;
+        }
 
-            $table{$lookahead} = $la;
-        }
-        else {
-            $table{$lookahead} = $la;
-        }
+        $table{$lookahead} = $la;
 
         if ($best_n > $min_len) {
 
@@ -2570,13 +2578,13 @@ sub lz77_decode($symbols, $len_symbols, $match_symbols, $dist_symbols) {
 
         my $dist = shift(@dist_symbols);
 
-        if ($dist == 1) {
-            $data .= substr($data, -1) x $match_len;
-        }
-        elsif ($dist >= $match_len) {
+        if ($dist >= $match_len) {    # non-overlapping matches
             $data .= substr($data, $data_len - $dist, $match_len);
         }
-        else {
+        elsif ($dist == 1) {          # run-length of last character
+            $data .= substr($data, -1) x $match_len;
+        }
+        else {                        # overlapping matches
             foreach my $i (1 .. $match_len) {
                 $data .= substr($data, $data_len + $i - $dist - 1, 1);
             }
@@ -2628,13 +2636,13 @@ sub lz77_decode_symbolic($symbols, $len_symbols, $match_symbols, $dist_symbols) 
 
         my $dist = shift(@dist_symbols);
 
-        if ($dist == 1) {
-            push @data, ($data[-1]) x $match_len;
-        }
-        elsif ($dist >= $match_len) {
+        if ($dist >= $match_len) {    # non-overlapping matches
             push @data, @data[scalar(@data) - $dist .. scalar(@data) - $dist + $match_len - 1];
         }
-        else {
+        elsif ($dist == 1) {          # run-length of last character
+            push @data, ($data[-1]) x $match_len;
+        }
+        else {                        # overlapping matches
             foreach my $j (1 .. $match_len) {
                 push @data, $data[$data_len + $j - $dist - 1];
             }
@@ -2687,13 +2695,13 @@ sub lz77_decompress_symbolic($fh, $entropy_sub = \&decode_huffman_entry) {
 # LZSS + DEFLATE encoding
 #########################
 
-sub lzss_compress_symbolic($chunk, $entropy_sub = \&create_huffman_entry, $lzss_encoding_sub = \&lzss_encode_symbolic) {
+sub lzss_compress_symbolic($symbols, $entropy_sub = \&create_huffman_entry, $lzss_encoding_sub = \&lzss_encode_symbolic) {
 
-    if (ref($chunk) ne 'ARRAY') {
-        return __SUB__->(string2symbols($chunk), $entropy_sub, $lzss_encoding_sub);
+    if (ref($symbols) eq '') {
+        $symbols = string2symbols($symbols);
     }
 
-    my ($literals, $distances, $lengths) = $lzss_encoding_sub->($chunk);
+    my ($literals, $distances, $lengths) = $lzss_encoding_sub->($symbols);
     deflate_encode($literals, $distances, $lengths, $entropy_sub);
 }
 
@@ -2823,13 +2831,13 @@ sub lzb_decompress($fh) {
 
         $search_window .= $literals;
 
-        if ($offset == 1) {
-            $search_window .= substr($search_window, -1) x $match_len;
-        }
-        elsif ($offset >= $match_len) {    # non-overlapping matches
+        if ($offset >= $match_len) {    # non-overlapping matches
             $search_window .= substr($search_window, length($search_window) - $offset, $match_len);
         }
-        else {                             # overlapping matches
+        elsif ($offset == 1) {          # run-length of last character
+            $search_window .= substr($search_window, -1) x $match_len;
+        }
+        else {                          # overlapping matches
             foreach my $i (1 .. $match_len) {
                 $search_window .= substr($search_window, length($search_window) - $offset, 1);
             }
@@ -2848,8 +2856,8 @@ sub lzb_decompress($fh) {
 
 sub obh_encode ($distances, $entropy_sub = \&create_huffman_entry) {
 
-    my $size = max(@$distances) // 0;
-    my ($DISTANCE_SYMBOLS) = make_deflate_tables($size);
+    my $max_dist = max(@$distances) // 0;
+    my ($DISTANCE_SYMBOLS) = make_deflate_tables($max_dist, 0);
 
     my @symbols;
     my $offset_bits = '';
@@ -2866,7 +2874,7 @@ sub obh_encode ($distances, $entropy_sub = \&create_huffman_entry) {
         }
     }
 
-    pack('N', $size) . $entropy_sub->(\@symbols) . pack('B*', $offset_bits);
+    fibonacci_encode([$max_dist]) . $entropy_sub->(\@symbols) . pack('B*', $offset_bits);
 }
 
 sub obh_decode ($fh, $entropy_sub = \&decode_huffman_entry) {
@@ -2876,8 +2884,8 @@ sub obh_decode ($fh, $entropy_sub = \&decode_huffman_entry) {
         return __SUB__->($fh2, $entropy_sub);
     }
 
-    my $size = bits2int($fh, 32, \my $buffer);
-    my ($DISTANCE_SYMBOLS) = make_deflate_tables($size);
+    my $max_dist = fibonacci_decode($fh)->[0];
+    my ($DISTANCE_SYMBOLS) = make_deflate_tables($max_dist, 0);
 
     my $symbols  = $entropy_sub->($fh);
     my $bits_len = 0;
@@ -3098,18 +3106,49 @@ B<Compression::Util> provides the following package variables:
     $Compression::Util::LZ_MIN_LEN = 4;        # minimum match length in LZ parsing
     $Compression::Util::LZ_MAX_LEN = 258;      # maximum match length in LZ parsing
 
-    $Compression::Util::LZ_MAX_DIST = ~0;      # maximum backreference distance allowed
+    $Compression::Util::LZ_MAX_DIST = ~0;      # maximum back-reference distance allowed
     $Compression::Util::LZ_MAX_CHAIN_LEN = 32; # how many recent positions to remember for each match in LZ parsing
 
-The package variables can also be imported as:
+These package variables can also be imported as:
 
-    use Compression::Util qw($LZ_MAX_CHAIN_LEN);
+    use Compression::Util qw(
+        $LZ_MIN_LEN
+        $LZ_MAX_LEN
+        $LZ_MAX_DIST
+        $LZ_MAX_CHAIN_LEN
+    );
+
+=head2 $LZ_MIN_LEN
+
+Minimum length of a match in LZ parsing. The value must be an integer greater than or equal to C<2>. Larger values will result in faster parsing, but lower compression ratio.
+
+By default, <$LZ_MIN_LEN> is set to C<4>.
+
+B<NOTE:> for C<lzss_encode_fast()> is recommended to set C<$LZ_MIN_LEN = 5>, which will result in slightly better compression ratio.
+
+=head2 $LZ_MAX_LEN
+
+Maximum length of a match in LZ parsing. The value must be an integer greater than or equal to C<0>.
+
+By default, <$LZ_MAX_LEN> is set to C<258>.
+
+B<NOTE:> the functions C<lz77_encode()> and C<lzb_compress()> will ignore this value and will always use unlimited match lengths.
+
+=head2 $LZ_MAX_DIST
+
+Maximum back-reference distance allowed in LZ parsing. Smaller values will result in faster parsing, but lower compression ratio.
+
+By default, the value is unlimited, meaning that arbitrarily large back-references will be generated.
+
+B<NOTE:> the function C<lzb_compress()> will ignore this value and will always use the value C<2**16 - 1> as the maximum back-reference distance.
 
 =head2 $LZ_MAX_CHAIN_LEN
 
 The value of C<$LZ_MAX_CHAIN_LEN> controls the amount of recent positions to remember for each matched prefix. A larger value results in better compression, finding longer matches, at the expense of speed.
 
-By default, <$LZ_MAX_CHAIN_LEN> is set to C<32>.
+By default, C<$LZ_MAX_CHAIN_LEN> is set to C<32>.
+
+B<NOTE:> the function C<lzss_encode_fast()> will ignore this value, always using a value of C<1>.
 
 =head1 HIGH-LEVEL FUNCTIONS
 
@@ -3154,7 +3193,7 @@ By default, <$LZ_MAX_CHAIN_LEN> is set to C<32>.
       deltas(\@ints)                       # Computes the differences between integers
       accumulate(\@deltas)                 # Inverse of the above method
 
-      delta_encode(\@ints)                 # Delta+RLE encoding of an array of ints
+      delta_encode(\@ints)                 # Delta+RLE encoding of an array of integers
       delta_decode($fh)                    # Inverse of the above method
 
       fibonacci_encode(\@symbols)          # Fibonacci coding of an array of symbols
@@ -3234,15 +3273,15 @@ By default, <$LZ_MAX_CHAIN_LEN> is set to C<32>.
       huffman_from_symbols(\@symbols)      # Create Huffman dictionaries, given an array of symbols
       huffman_from_code_lengths(\@lens)    # Create canonical Huffman codes, given an array of code lengths
 
-      make_deflate_tables($size)           # Returns the DEFLATE tables for distance and length symbols
-      find_deflate_index($value, \@table)  # Returns the index in a DEFLATE table, given a numerical value
+      make_deflate_tables($max_dist, $max_len) # Returns the DEFLATE tables for distance and length symbols
+      find_deflate_index($value, \@table)      # Returns the index in a DEFLATE table, given a numerical value
 
-      lzss_encode($string)                 # LZSS encoding of a string into literals, distances and lengths
-      lzss_encode_fast($string)            # Fast-LZSS encoding of a string into literals, distances and lengths
-      lzss_decode(\@lits, \@idxs, \@lens)  # Inverse of the above two methods
+      lzss_encode($string)                     # LZSS encoding of a string into literals, distances and lengths
+      lzss_encode_fast($string)                # Fast-LZSS encoding of a string into literals, distances and lengths
+      lzss_decode(\@lits, \@idxs, \@lens)      # Inverse of the above two methods
 
-      deflate_encode(\@lits, \@idxs, \@lens)  # DEFLATE-like encoding of values returned by lzss_encode()
-      deflate_decode($fh)                     # Inverse of the above method
+      deflate_encode(\@lits, \@idxs, \@lens)   # DEFLATE-like encoding of values returned by lzss_encode()
+      deflate_decode($fh)                      # Inverse of the above method
 
 =head1 INTERFACE FOR HIGH-LEVEL FUNCTIONS
 
@@ -3348,7 +3387,7 @@ The function accepts either a string or an array-ref of symbols as the first arg
     my $data = lzss_decompress($fh);
     my $data = lzss_decompress($string);
 
-    # With Arithemtic coding
+    # With Arithmetic coding
     my $data = lzss_decompress($fh, \&decode_ac_entry);
     my $data = lzss_decompress($string, \&decode_ac_entry);
 
@@ -3473,7 +3512,7 @@ Inverse of C<mrl_compress_symbolic()>.
 
     my $freq = frequencies(\@symbols);
 
-Returns an hash ref dictionary with frequencies, given an array of symbols.
+Returns an hash ref dictionary with frequencies, given an array-ref of symbols.
 
 =head2 deltas
 
@@ -3493,7 +3532,7 @@ Inverse of C<deltas()>.
 
 Encodes a sequence of integers (including negative integers) using Delta + Run-length + Elias omega coding, returning a binary string.
 
-Delta encoding calculates the difference between consecutive integers in the sequence and encodes these differences using Elias omega coding. When it's beneficial, runs of identitical symbols are collapsed with RLE.
+Delta encoding calculates the difference between consecutive integers in the sequence and encodes these differences using Elias omega coding. When it's beneficial, runs of identical symbols are collapsed with RLE.
 
 =head2 delta_decode
 
@@ -3559,11 +3598,11 @@ Inverse of C<elias_omega_encode()>.
 
 Encodes a sequence of non-negative integers using the Adaptive Binary Concatenation encoding method.
 
-This method is particularly effective in encoding a sequence of integers that are in ascending order.
+This method is particularly effective in encoding a sequence of integers that are in ascending order or have roughly the same size in binary.
 
 =head2 abc_decode
 
-    # Given a filehandle
+    # Given a file-handle
     my $symbols = abc_decode($fh);
 
     # Given a binary string
@@ -3576,7 +3615,7 @@ Inverse of C<abc_encode()>.
     # With Huffman Coding
     my $string = obh_encode(\@symbols);
 
-    # With Arithemtic Coding
+    # With Arithmetic Coding
     my $string = obh_encode(\@symbols, \&create_ac_entry);
 
 Encodes a sequence of non-negative integers using offset bits and Huffman coding.
@@ -3585,13 +3624,13 @@ This method is particularly effective in encoding a sequence of moderately large
 
 =head2 obh_decode
 
-    # Given a filehandle
+    # Given a file-handle
     my $symbols = obh_decode($fh);                        # Huffman decoding
-    my $symbols = obh_decode($fh, \&decode_ac_entry);     # Arithemtic decoding
+    my $symbols = obh_decode($fh, \&decode_ac_entry);     # Arithmetic decoding
 
     # Given a binary string
     my $symbols = obh_decode($string);                    # Huffman decoding
-    my $symbols = obh_decode($string, \&decode_ac_entry); # Arithemtic decoding
+    my $symbols = obh_decode($string, \&decode_ac_entry); # Arithmetic decoding
 
 Inverse of C<obh_encode()>.
 
@@ -3643,14 +3682,14 @@ Inverse of C<mtf_encode()>.
 
     my $string = encode_alphabet(\@alphabet);
 
-Efficienlty encodes an alphabet of symbols into a binary string.
+Encodes an alphabet of symbols into a binary string.
 
 =head2 decode_alphabet
 
     my $alphabet = decode_alphabet($fh);
     my $alphabet = decode_alphabet($string);
 
-Decodes an encoded alphabet, given a file-handle or a binary string, returning an array of symbols. Inverse of C<encode_alphabet()>.
+Decodes an encoded alphabet, given a file-handle or a binary string, returning an array-ref of symbols. Inverse of C<encode_alphabet()>.
 
 =head2 run_length
 
@@ -3669,6 +3708,7 @@ By default, the maximum run-length is unlimited.
 
 =head2 rle4_encode
 
+    my $rle4 = rle4_encode($string);
     my $rle4 = rle4_encode(\@symbols);
     my $rle4 = rle4_encode(\@symbols, $max_run);
 
@@ -3682,7 +3722,8 @@ By default, the maximum run-length is limited to C<255>.
 
 =head2 rle4_decode
 
-    my $symbols = rle4_decode($rle4);
+    my $symbols = rle4_decode(\@rle4);
+    my $symbols = rle4_decode($rle4_string);
 
 Inverse of C<rle4_encode()>.
 
@@ -3768,7 +3809,7 @@ The function returns the decoded string.
 
 Reads a single bit from a file-handle C<$fh> (MSB order).
 
-The function stores the extra bits inside the C<$buffer>, reading one character at a time from the filehandle.
+The function stores the extra bits inside the C<$buffer>, reading one character at a time from the file-handle.
 
 =head2 read_bit_lsb
 
@@ -3776,7 +3817,7 @@ The function stores the extra bits inside the C<$buffer>, reading one character 
 
 Reads a single bit from a file-handle C<$fh> (LSB order).
 
-The function stores the extra bits inside the C<$buffer>, reading one character at a time from the filehandle.
+The function stores the extra bits inside the C<$buffer>, reading one character at a time from the file-handle.
 
 =head2 read_bits
 
@@ -3808,7 +3849,7 @@ Convert a non-negative integer to a bitstring of width C<$size>, in LSB order.
 
 Read C<$size> bits from file-handle C<$fh> and convert them to an integer, in MSB order. Inverse of C<int2bits()>.
 
-The function stores the extra bits inside the C<$buffer>, reading one character at a time from the filehandle.
+The function stores the extra bits inside the C<$buffer>, reading one character at a time from the file-handle.
 
 =head2 bits2int_lsb
 
@@ -3816,7 +3857,7 @@ The function stores the extra bits inside the C<$buffer>, reading one character 
 
 Read C<$size> bits from file-handle C<$fh> and convert them to an integer, in LSB order. Inverse of C<int2bits_lsb()>.
 
-The function stores the extra bits inside the C<$buffer>, reading one character at a time from the filehandle.
+The function stores the extra bits inside the C<$buffer>, reading one character at a time from the file-handle.
 
 =head2 string2symbols
 
@@ -3889,7 +3930,7 @@ The prefix codes are in canonical form, as defined in RFC 1951 (Section 3.2.2).
     my $dict = huffman_from_symbols(\@symbols);
     my ($dict, $rev_dict) = huffman_from_symbols(\@symbols);
 
-Low-level function that constructs Huffman prefix codes, given an array of symbols.
+Low-level function that constructs Huffman prefix codes, given an array-ref of symbols.
 
 It takes a single parameter, C<\@symbols>, from which it computes the frequency of each symbol and generates the corresponding Huffman prefix codes.
 
@@ -3940,7 +3981,7 @@ The function returns four values:
     $literals   # array-ref of uncompressed symbols
     $lengths    # array-ref of literal lengths
     $matches    # array-ref of match lengths
-    $distances  # array-ref of backreference distances
+    $distances  # array-ref of back-reference distances
 
 The output can be decoded with C<lz77_decode()> and C<lz77_decode_symbolic()>, respectively.
 
@@ -3968,7 +4009,7 @@ Low-level function that applies the LZSS (Lempel-Ziv-Storer-Szymanski) algorithm
 The function returns three values:
 
     $literals   # array-ref of uncompressed symbols
-    $distances  # array-ref of backreference distances
+    $distances  # array-ref of back-reference distances
     $lengths    # array-ref of match lengths
 
 The output can be decoded with C<lzss_decode()> and C<lzss_decode_symbolic>, respectively.
@@ -4004,9 +4045,14 @@ Inverse of C<deflate_encode()>.
 
 =head2 make_deflate_tables
 
-    my ($DISTANCE_SYMBOLS, $LENGTH_SYMBOLS, $LENGTH_INDICES) = make_deflate_tables($size);
+    my ($DISTANCE_SYMBOLS, $LENGTH_SYMBOLS, $LENGTH_INDICES) = make_deflate_tables($max_dist, $max_len);
 
 Low-level function that returns a list of tables used in encoding the relative back-reference distances and lengths returned by C<lzss_encode()> and C<lzss_encode_fast()>.
+
+When no arguments are provided:
+
+    $max_dist = $Compression::Util::LZ_MAX_DIST
+    $max_len  = $Compression::Util::LZ_MAX_LEN
 
 There is no need to call this function explicitly. Use C<deflate_encode()> instead!
 
@@ -4027,6 +4073,51 @@ By specifying the B<:all> keyword, will export all the exportable functions:
     use Compression::Util qw(:all);
 
 Nothing is exported by default.
+
+=head2 EXAMPLES
+
+The functions can be combined in various ways, easily creating novel compression methods, as illustrated in the following examples.
+
+Combining LZSS + MRL compression:
+
+    my $enc = lzss_compress($str, \&mrl_compress_symbolic);
+    my $dec = lzss_decompress($enc, \&mrl_decompress_symbolic);
+
+Combining LZ77 + OBH encoding:
+
+    my $enc = lz77_compress($str, \&obh_encode);
+    my $dec = lz77_decompress($enc, \&obh_decode);
+
+Combining LZSS + BWT compression:
+
+    my $enc = lzss_compress($str, \&bwt_compress_symbolic);
+    my $dec = lzss_decompress($enc, \&bwt_decompress_symbolic);
+
+Combining LZW + Fibonacci encoding:
+
+    my $enc = lzw_compress($str, \&fibonacci_encode);
+    my $dec = lzw_decompress($enc, \&fibonacci_decode);
+
+Combining LZ77 + BWT compression + Fibonacci encoding + Huffman coding + OBH encoding + MRL compression:
+
+    # Compression
+    my $enc = do {
+        my ($literals, $lengths, $matches, $distances) = lz77_encode($str);
+        bwt_compress(symbols2string($literals))
+          . fibonacci_encode($lengths)
+          . create_huffman_entry($matches)
+          . obh_encode($distances, \&mrl_compress_symbolic);
+    };
+
+    # Decompression
+    my $dec = do {
+        open my $fh, '<:raw', \$enc;
+        my $literals  = string2symbols(bwt_decompress($fh));
+        my $lengths   = fibonacci_decode($fh);
+        my $matches   = decode_huffman_entry($fh);
+        my $distances = obh_decode($fh, \&mrl_decompress_symbolic);
+        lz77_decode($literals, $lengths, $matches, $distances);
+    };
 
 =head1 SEE ALSO
 

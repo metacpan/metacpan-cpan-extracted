@@ -1,5 +1,8 @@
 Release history for App-runscript
 
+1.0.1        2024-06-26
+             - make tests portable
+
 1.0.0        2024-06-25
              - prepare stable release
 

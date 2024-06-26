@@ -179,12 +179,12 @@ $gpx->keywords( [ 'this', 'that', 'the other' ] );
 
 for my $version ( keys %refxml ) {
   my $xml = normalise( $refxml{$version} );
-  my $gen = normalise( $gpx->xml( $version ) );
+  my $gen = normalise( $gpx->xml( version => $version ) );
   is_xml( $gen, $xml, 'generated version ' . $version );
 
   # Parse reference XMLs
   my $ngpx = Geo::Gpx->new( xml => $refxml{$version} );
-  my $ngen = normalise( $ngpx->xml() );
+  my $ngen = normalise( $ngpx->xml( version => $version ) );
   is_xml( $ngen, $xml, 'reparsed version ' . $version );
 }
 

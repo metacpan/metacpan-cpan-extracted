@@ -16,6 +16,7 @@ test_requires	'Test::Requires'			=> 0;
 test_requires	'Test::LWP::UserAgent'		=> 0;
 test_requires	'Test::More'				=> 0.88;
 test_requires	'XML::Simple'				=> 0;
+test_requires	'HTTP::Headers'				=> 0;
 
 perl_version	'5.014';
 
@@ -42,6 +43,7 @@ requires		'Sub::Util'					=> 1.40;
 requires		'Test::Modern'				=> 0.012;
 requires		'Test::Moose'				=> 0;
 requires		'Test::Roo'					=> 0;
+requires		'Test::TypeTiny'			=> 0;
 requires		'Text::CSV'					=> 0;
 requires		'Text::Table'				=> 0;
 requires		'Try::Tiny'					=> 0;
@@ -63,5 +65,5 @@ install_script glob('bin/attean_*');
 
 write_doap_changes "meta/changes.ttl", "Changes", "turtle";
 
-sign;
+sign if ! exists $ENV{CI};
 WriteAll;

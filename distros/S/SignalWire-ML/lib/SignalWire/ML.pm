@@ -8,7 +8,7 @@ use Data::Dumper;
 
 use vars qw(@ISA @EXPORT @EXPORT_OK %EXPORT_TAGS $AUTOLOAD);
 
-our $VERSION = '1.19';
+our $VERSION = '1.20';
 our $AUTOLOAD;
 
 sub new {
@@ -16,7 +16,7 @@ sub new {
     my $args  = shift;
     my $class = ref($proto) || $proto;
     my $self  = {};
-
+    
     $self->{_content}->{version}        = $args->{version} ||= '1.0.0';
     return bless($self, $class);
 }
@@ -34,7 +34,41 @@ sub add_aiapplication {
 	next unless $self->{"_$data"};
 	$args->{$data} = $self->{"_$data"};
     }
+
     push @{$self->{_content}->{sections}->{$section} },  { $app =>  $args };
+
+    return;
+}
+
+# Set context steps, overriding any existing steps
+sub set_context_steps {
+    my $self = shift;
+    my $context_name = shift;
+    my $steps = shift;
+
+    $self->{_prompt}->{contexts}->{$context_name}->{steps} = $steps;
+
+    return;
+}
+
+# Add steps to context, appending to any existing steps
+sub add_context_steps {
+    my $self = shift;
+    my $context_name = shift;
+    my $steps = shift;
+
+    $self->{_prompt}->{contexts}->{$context_name}->{steps} //= [];
+    push @{$self->{_prompt}->{contexts}->{$context_name}->{steps}}, @$steps;
+
+    return;
+}
+
+# Set contexts for prompt, allowing for initial setup of multiple contexts
+sub set_prompt_contexts {
+    my $self = shift;
+    my $contexts = shift;
+
+    $self->{_prompt}->{contexts} = $contexts;
 
     return;
 }
@@ -201,13 +235,13 @@ sub add_aiinclude {
 
 # Function included in native SWAIG
 sub add_ainativefunction {
-	my $self   = shift;
-	my $native = shift;
-	$self->{_SWAIG}->{native_functions} //= [];
-	
-	@{ $self->{_SWAIG}->{native_functions} } = (@{ $self->{_SWAIG}->{native_functions}}, $native);
+    my $self   = shift;
+    my $native = shift;
+    $self->{_SWAIG}->{native_functions} //= [];
+    
+    @{ $self->{_SWAIG}->{native_functions} } = (@{ $self->{_SWAIG}->{native_functions}}, $native);
 
-	return;
+    return;
 }
 
 #set post_prompt
@@ -227,18 +261,18 @@ sub set_aipost_prompt {
     return;
 }
 
-# set prompt
+# Set the prompt text and other settings
 sub set_aiprompt {
-    my $self   = shift;
+    my $self = shift;
     my $prompt = shift;
     my @keys = ("confidence", "barge_confidence", "top_p", "temperature", "frequency_penalty", "presence_penalty");
 
     while ( my ($k,$v) = each(%{$prompt}) ) {
-	if ( grep { $_ eq $k } @keys ) {
+        if ( grep { $_ eq $k } @keys ) {
             $self->{_prompt}->{$k} = $v + 0;
-	} else {
+        } else {
             $self->{_prompt}->{$k} = $v;
-	}
+        }
     }
 
     return;

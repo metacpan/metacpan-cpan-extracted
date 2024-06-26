@@ -7,7 +7,7 @@ Attean::API::Parser - Parser role
 
 =head1 VERSION
 
-This document describes Attean::API::Parser version 0.033
+This document describes Attean::API::Parser version 0.034
 
 =head1 DESCRIPTION
 
@@ -58,10 +58,11 @@ File extensions should NOT include a leading dot.
 
 use Type::Tiny::Role;
 
-package Attean::API::Parser 0.033 {
+package Attean::API::Parser 0.034 {
 	use Types::Standard qw(CodeRef Bool);
 
 	use Moo::Role;
+	use Scalar::Util qw(blessed);
 	use namespace::clean;
 	
 	has 'handler' => (is => 'rw', isa => CodeRef, default => sub { sub {} });
@@ -93,11 +94,24 @@ C<lazy_iris> attribute.
 		}
 		return Attean::IRI->new(%args);
 	}
+
+=item C<< new_literal( value => $value, [ datatype => $dt, ] [ language => $lang ])	>>
+
+Constructs and returns a new L<Attean::Literal> object.
+
+=cut
+
+	sub new_literal {
+		my $self	= shift;
+		my %args	= @_;
+		
+		return Attean::Literal->new(%args);
+	}
 	
 	sub file_extensions { return [] }
 }
 
-package Attean::API::AbbreviatingParser 0.033 {
+package Attean::API::AbbreviatingParser 0.034 {
 	use Types::Standard qw(ConsumerOf InstanceOf Maybe);
 	use Types::Namespace qw( NamespaceMap );
 	use Scalar::Util qw(blessed);
@@ -105,11 +119,48 @@ package Attean::API::AbbreviatingParser 0.033 {
 	use Moo::Role;
 	
 	with 'Attean::API::Parser';
-	has 'base' 		=> (is => 'rw', isa => ConsumerOf['Attean::API::IRI'], coerce => sub { blessed($_[0]) ? Attean::IRI->new($_[0]->as_string) : Attean::IRI->new($_[0]) }, predicate => 'has_base');
+	has 'base' 			=> (is => 'rw', isa => ConsumerOf['Attean::API::IRI'], coerce => sub { blessed($_[0]) ? Attean::IRI->new($_[0]->as_string) : Attean::IRI->new($_[0]) }, predicate => 'has_base');
 	has 'namespaces'	=> (is => 'ro', isa => Maybe[NamespaceMap]);
 }
 
-package Attean::API::PushParser 0.033 {
+package Attean::API::CDTBlankNodeMappingParser 0.034 {
+	use Types::Standard qw(HashRef ConsumerOf InstanceOf Maybe Bool);
+	use Scalar::Util qw(blessed);
+	use UUID::Tiny ':std';
+	use Data::Dumper;
+	use Moo::Role;
+	
+	with 'Attean::API::Parser';
+	has 'blank_nodes'	=> (is => 'ro', isa => Maybe[HashRef[ConsumerOf['Attean::API::Blank']]]);
+	has 'parse_id'		=> (is => 'rw', default => sub { unpack('H*', create_uuid()) });
+	has 'enable_cdt_rewriting' => (is => 'rw', isa => Bool, default => 1);
+
+	foreach my $method (qw(parse_iter_from_io parse_iter_from_bytes parse_cb_from_io parse_cb_from_bytes)) {
+		around $method => sub {
+			my $orig	= shift;
+			my $self	= $_[0];
+
+			$self->parse_id(unpack('H*', create_uuid()));
+			my $term	= $orig->(@_);
+			return $term;
+		};
+	}
+	
+	around 'new_literal' => sub {
+		my $orig	= shift;
+		my $self	= $_[0];
+		my $term	= $orig->(@_);
+		if ($self->enable_cdt_rewriting) {
+			my $dt 		= $term->datatype();
+			if (blessed($dt) and ($dt->value eq 'http://w3id.org/awslabs/neptune/SPARQL-CDTs/Map' or $dt->value eq 'http://w3id.org/awslabs/neptune/SPARQL-CDTs/List')) {
+				return AtteanX::Functions::CompositeLists::rewrite_lexical($term, $self->blank_nodes, $self->parse_id);
+			}
+		}
+		return $term;
+	};
+}
+
+package Attean::API::PushParser 0.034 {
 	use Moo::Role;
 	with 'Attean::API::Parser';
 
@@ -173,7 +224,7 @@ package Attean::API::PushParser 0.033 {
 	}
 }
 
-package Attean::API::PullParser 0.033 {
+package Attean::API::PullParser 0.034 {
 	use Moo::Role;
 	with 'Attean::API::Parser';
 	
@@ -215,7 +266,7 @@ package Attean::API::PullParser 0.033 {
 	}
 }
 
-package Attean::API::AtOnceParser 0.033 {
+package Attean::API::AtOnceParser 0.034 {
 	use Moo::Role;
 	with 'Attean::API::Parser';
 	
@@ -276,7 +327,7 @@ package Attean::API::AtOnceParser 0.033 {
 	
 }
 
-package Attean::API::TermParser 0.033 {
+package Attean::API::TermParser 0.034 {
 	# Parser returns objects that conform to Attean::API::Term
 	use Moo::Role;
 	with 'Attean::API::Parser';
@@ -286,7 +337,7 @@ package Attean::API::TermParser 0.033 {
 	}
 }
 
-package Attean::API::TripleParser 0.033 {
+package Attean::API::TripleParser 0.034 {
 	# Parser returns objects that conform to Attean::API::Triple
 	use Moo::Role;
 	with 'Attean::API::Parser';
@@ -296,7 +347,7 @@ package Attean::API::TripleParser 0.033 {
 	}
 }
 
-package Attean::API::QuadParser 0.033 {
+package Attean::API::QuadParser 0.034 {
 	# Parser returns objects that conform to Attean::API::Quad
 	use Moo::Role;
 	with 'Attean::API::Parser';
@@ -306,7 +357,7 @@ package Attean::API::QuadParser 0.033 {
 	}
 }
 
-package Attean::API::MixedStatementParser 0.033 {
+package Attean::API::MixedStatementParser 0.034 {
 	# Parser returns objects that conform to either Attean::API::Triple or Attean::API::Quad
 	use Moo::Role;
 	with 'Attean::API::Parser';
@@ -316,7 +367,7 @@ package Attean::API::MixedStatementParser 0.033 {
 	}
 }
 
-package Attean::API::ResultOrTermParser 0.033 {
+package Attean::API::ResultOrTermParser 0.034 {
 	# Parser returns objects that conform to either Attean::API::Result or Attean::API::Term
 	use Moo::Role;
 	with 'Attean::API::Parser';
@@ -326,7 +377,7 @@ package Attean::API::ResultOrTermParser 0.033 {
 	}
 }
 
-package Attean::API::ResultParser 0.033 {
+package Attean::API::ResultParser 0.034 {
 	# Parser returns objects that conform to Attean::API::Result
 	use Moo::Role;
 	with 'Attean::API::Parser';

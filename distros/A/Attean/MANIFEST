@@ -86,6 +86,8 @@ lib/Attean/TripleModel.pm
 lib/Attean/Variable.pm
 lib/AtteanX/API/JoinRotatingPlanner.pm
 lib/AtteanX/API/Lexer.pm
+lib/AtteanX/Functions/CompositeMaps.pm
+lib/AtteanX/Functions/CompositeLists.pm
 lib/AtteanX/Parser/NQuads.pm
 lib/AtteanX/Parser/NTriples.pm
 lib/AtteanX/Parser/NTuples.pm
@@ -187,6 +189,7 @@ t/store-simpletriple.t
 t/term-map.t
 t/term.t
 t/treerewrite.t
+t/types-general.t
 t/types-iri.t
 xt/dawg11-memory.t
 xt/eval-sparql-star-memory-simpleeval.t

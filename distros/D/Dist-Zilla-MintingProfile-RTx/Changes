@@ -1,3 +1,6 @@
+0.15 2024-06-26
+ - Switch to module name in abstract
+
 0.14 2020-02-20
  - Default to 4.4-5.0 compat
  - Add "." to @INC to run Makefile.PL even without Module::Install installed

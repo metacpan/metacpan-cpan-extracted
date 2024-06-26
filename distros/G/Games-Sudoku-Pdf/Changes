@@ -1,6 +1,10 @@
 
 Changes for Games::Sudoku::Pdf
 
+v0.06 2024-06-25
+
+	Bug #152360: Followed ANDK's recommendation to change required versions of imports from strings to barewords.
+
 v0.05 2024-03-08
 
 	Fix the fix: Testing the time format failed for UTC.

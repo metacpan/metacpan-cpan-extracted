@@ -1,0 +1,75 @@
+# Copyright (c) 2024 Yuki Kimoto
+# MIT License
+
+class R::NDArray::Time::Piece extends R::NDArray::Object {
+  
+  use Fn;
+  use Array;
+  use Time::Piece;
+  
+  # Class Mehtods
+  static method new : R::NDArray::Time::Piece ($options : object[] = undef) {
+    
+    my $self = new R::NDArray::Time::Piece;
+    
+    $self->init($options);
+    
+    return $self;
+  }
+  
+  protected method init : void ($options : object[] = undef) {
+    
+    my $element_size = Fn->sizeof_native_pointer;
+    
+    $options = Fn->merge_options($options, {element_size => $element_size, type => "Time::Piece"});
+    
+    $self->SUPER::init($options);
+  }
+  
+  method data : Time::Piece[] () {
+    
+    return (Time::Piece[])$self->{data};
+  }
+  
+  protected method check : void () {
+    
+    my $data = (Time::Piece[])$self->{data};
+    
+    my $length = $self->length;
+    
+    unless (@$data == $length) {
+      die "The length of data field must be the same as length field.";
+    }
+  }
+  
+  protected method create_default_data : Time::Piece[] ($length : int) {
+    
+    unless ($length >= 0) {
+      die "The length \$length must be more than or equal to 0.";
+    }
+    
+    my $data = new Time::Piece[$length];
+    
+    return $data;
+  }
+  
+  method clone : R::NDArray::Time::Piece () {
+    return (R::NDArray::Time::Piece)$self->SUPER::clone;
+  }
+  
+  method element_to_string : string ($data_index : int) {
+    
+    my $data = $self->data;
+    
+    my $element = $data->[$data_index];
+    
+    unless ($element) {
+      return "undef";
+    }
+    
+    my $string = $element->strftime("%Y-%m-%d %H:%M:%S");
+    
+    return $string;
+  }
+  
+}

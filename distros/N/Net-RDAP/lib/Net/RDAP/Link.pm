@@ -141,6 +141,17 @@ sub type { $_[0]->{'type'} ? MIME::Type->new('type' => $_[0]->{'type'}) : undef 
 
 =pod
 
+    $is = $link->is_rdap;
+
+Returns true if the media type of the target resource suggests that it is in an
+RDAP resource.
+
+=cut
+
+sub is_rdap { $_[0]->{'type'} =~ /^application\/rdap/i }
+
+=pod
+
 =head1 COPYRIGHT
 
 Copyright 2018-2023 CentralNic Ltd, 2024 Gavin Brown. All rights reserved.

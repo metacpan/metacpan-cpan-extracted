@@ -5,7 +5,7 @@ package App::runscript;
 
 # keeping the following $VERSION declaration on a single line is important
 #<<<
-use version 0.9915; our $VERSION = version->declare( '1.0.0' );
+use version 0.9915; our $VERSION = version->declare( '1.0.1' );
 #>>>
 
 use subs qw( main _croakf _is_dir _locate_install_lib _prepend_install_lib _which );

@@ -1,0 +1,82 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+
+use App::NKC2MARC;
+
+our $VERSION = 0.01;
+
+# Run.
+exit App::NKC2MARC->new->run;
+
+# Print version.
+sub VERSION_MESSAGE {
+	print $VERSION."\n";
+	exit 0;
+}
+
+__END__
+
+=pod
+
+=encoding utf8
+
+=head1 NAME
+
+nkc-to-marc - Tool to fetch record from National library of the Czech Republic to MARC file.
+
+=head1 SYNOPSIS
+
+ nkc-to-marc [-h] [--version] id_of_book
+
+=head1 ARGUMENTS
+
+=over 8
+
+=item * C<-h>
+
+Print help.
+
+=item * C<--version>
+
+Print version of script.
+
+=item * C<id_of_book>
+
+Identifier of book.
+Possible ids are: ISBN or Czech national bibliography id.
+
+=back
+
+=head1 EXAMPLE1
+
+ # Adding book edition defined by ISBN number
+ nkc-to-marc 978-80-276-0470-8
+
+=head1 EXAMPLE2
+
+ # Adding book edition defined by Czech national bibliography id
+ nkc-to-marc cnb003322696
+
+=head1 REPOSITORY
+
+L<https://github.com/michal-josef-spacek/App-NKC2MARC>
+
+=head1 AUTHOR
+
+Michal Josef Špaček L<mailto:skim@cpan.org>
+
+L<http://skim.cz>
+
+=head1 LICENSE AND COPYRIGHT
+
+© 2024 Michal Josef Špaček
+
+BSD 2-Clause License
+
+=head1 VERSION
+
+0.01
+
+=cut

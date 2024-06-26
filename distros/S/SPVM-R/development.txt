@@ -1,0 +1,4 @@
+
+Generates all links for modules.
+
+  find lib | grep \.spvm | sort | perl -p -e 'chomp;s/\//::/g;s/lib::SPVM:://;s/\.spvm$//; $_ = "=item * L<$_|SPVM::$_>\n\n"'

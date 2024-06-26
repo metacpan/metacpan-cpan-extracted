@@ -23,8 +23,8 @@ requires 'Error::Pure' => 0;
 requires 'List::MoreUtils' => 0;
 requires 'List::Util' => 0;
 requires 'Mo' => 0;
-requires 'Mo::utils' => 0.07;
-requires 'Mo::utils::Date' => 0;
+requires 'Mo::utils' => 0.26;
+requires 'Mo::utils::Date' => 0.04;
 requires 'Readonly' => 0;
 resources 'bugtracker' => 'https://github.com/michal-josef-spacek/MARC-Convert-Wikidata-Object/issues',
 resources 'homepage' => 'https://github.com/michal-josef-spacek/MARC-Convert-Wikidata-Object';
@@ -33,7 +33,7 @@ test_requires 'Test::More' => 0;
 test_requires 'Test::NoWarnings' => 0;
 test_requires 'Unicode::UTF8' => 0;
 tests_recursive;
-version '0.03';
+version '0.04';
 
 # Run.
 WriteAll();

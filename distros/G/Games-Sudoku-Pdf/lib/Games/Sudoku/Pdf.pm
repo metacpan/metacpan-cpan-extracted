@@ -3,12 +3,12 @@ package Games::Sudoku::Pdf;
 use strict;
 use warnings;
 
-our $VERSION = '0.05';
+our $VERSION = '0.06';
 
 require 5.006;
 
-use PDF::API2 '2.000';
-use PDF::Table '0.9.3';
+use PDF::API2 2.000;
+use PDF::Table v0.9.3;
 use Time::Local qw( timelocal );
 $| = 1;
 

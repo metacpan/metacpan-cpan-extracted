@@ -73,8 +73,8 @@ sub setup {
 	$self->default_graph(iri('http://graph/'));
 
 	warn 'setting up sparql test harness' if ($self->debug);
-	my @manifests	= $self->manifest_paths();
-	unless (scalar(@manifests)) {
+	my @manifests_iris	= $self->manifest_paths();
+	unless (scalar(@manifests_iris)) {
 		my $dir		= $self->tests_dir;
 		plan skip_all => "No manifest files found in $dir";
 		exit(0);
@@ -83,14 +83,32 @@ sub setup {
 	my $model	= $self->memory_model();
 	my $class	= Attean->get_parser("turtle") || die "Failed to load parser for 'turtle'";
 
-	my @load	= map { iri("file://" . File::Spec->rel2abs($_)) } @manifests;
-	$model->load_urls_into_graph($self->default_graph, @load);
+	my %loaded;
+	
+	my @manifests;
+	my @load	= map { iri("file://" . File::Spec->rel2abs($_)) } @manifests_iris;
+	while (scalar(@load)) {
+		foreach my $iri (@load) {
+			warn "Loading " . $iri->value . "\n" if ($self->debug);
+			$loaded{ $iri->value }++;
+		}
+		$model->load_urls_into_graph($self->default_graph, @load);
+		@load	= ();
 
-	warn "done parsing manifests" if $self->debug;
-	$self->model($model);
-	my $subjects = $model->subjects( iri("${RDF}type"), iri("${MF}Manifest") );
-	my @manifest_matches	= $subjects->elements;
-	$self->manifests(\@manifest_matches);
+		warn "done parsing manifests" if $self->debug;
+		$self->model($model);
+		my $subjects = $model->subjects( iri("${RDF}type"), iri("${MF}Manifest") );
+		my @manifest_matches	= $subjects->elements;
+		push(@manifests, @manifest_matches);
+	
+		foreach my $m (@manifest_matches) {
+			my @list_heads	= $model->objects( $m, iri("${MF}include") )->elements;
+			my @elements	= map { $model->get_list(undef, $_)->elements() } @list_heads;
+			push(@load, grep { not exists($loaded{$_->value}) } @elements);
+		}
+	}
+	
+	$self->manifests(\@manifests);
 }
 
 sub syntax_test {
@@ -179,7 +197,7 @@ sub update_eval_test {
 	my ($req)		= $model->objects( $test, iri("${MF}requires") )->elements;
 	my ($approved)	= $model->objects( $test, iri("${DAWGT}approval") )->elements;
 	my ($queryd)	= $model->objects( $action, iri("${UT}request") )->elements;
-	my ($data)		= $model->objects( $action, iri("${UT}data") )->elements;
+	my @data		= $model->objects( $action, iri("${UT}data") )->elements;
 	my @gdata		= $model->objects( $action, iri("${UT}graphData") )->elements;
 	
 	if ($self->strict_approval) {
@@ -205,7 +223,9 @@ sub update_eval_test {
 	if ($self->debug) {
 		warn "### test     : " . $test->value . "\n";
 		warn "# sparql     : $q\n";
-		warn "# data       : " . $data->value . "\n" if (blessed($data));
+		foreach my $data (@data) {
+			warn "# data       : " . $data->value . "\n" if (blessed($data));
+		}
 		warn "# graph data : " . $_->value . "\n" for (@gdata);
 		warn "# result     : " . $result->value . "\n";
 		warn "# requires   : " . $req->value . "\n" if (blessed($req));
@@ -215,15 +235,17 @@ sub update_eval_test {
 
 	warn "constructing model...\n" if ($self->debug);
 	my $test_model	= $self->test_model();
-	eval {
-		if (blessed($data)) {
-			$test_model->load_urls_into_graph($self->default_graph, $data);
+	foreach my $data (@data) {
+		eval {
+			if (blessed($data)) {
+				$test_model->load_urls_into_graph($self->default_graph, $data);
+			}
+		};
+		if ($@) {
+			fail($test->value);
+			print "# died: " . $test->value . ": $@\n";
+			return;
 		}
-	};
-	if ($@) {
-		fail($test->value);
-		print "# died: " . $test->value . ": $@\n";
-		return;
 	}
 	foreach my $gdata (@gdata) {
 		my ($data)	= ($model->objects( $gdata, iri("${UT}data") )->elements)[0] || ($model->objects( $gdata, iri("${UT}graph") )->elements)[0];
@@ -345,7 +367,7 @@ sub query_eval_test {
 	my ($req)		= $model->objects( $test, iri("${MF}requires") )->elements;
 	my ($approved)	= $model->objects( $test, iri("${DAWGT}approval") )->elements;
 	my ($queryd)	= $model->objects( $action, iri("${RQ}query") )->elements;
-	my ($data)		= $model->objects( $action, iri("${RQ}data") )->elements;
+	my @data		= $model->objects( $action, iri("${RQ}data") )->elements;
 	my @gdata		= $model->objects( $action, iri("${RQ}graphData") )->elements;
 	my @sdata		= $model->objects( $action, iri("${RQ}serviceData") )->elements;
 	
@@ -372,7 +394,9 @@ sub query_eval_test {
 	if ($self->debug) {
 		warn "### test     : " . $test->value . "\n";
 		warn "# sparql     : $q\n";
-		warn "# data       : " . ($data->value =~ s#file://##r) . "\n" if (blessed($data));
+		foreach my $data (@data) {
+			warn "# data       : " . ($data->value =~ s#file://##r) . "\n" if (blessed($data));
+		}
 		warn "# graph data : " . ($_->value =~ s#file://##r) . "\n" for (@gdata);
 		warn "# result     : " . ($result->value =~ s#file://##r) . "\n";
 		warn "# requires   : " . ($req->value =~ s#file://##r) . "\n" if (blessed($req));
@@ -383,11 +407,18 @@ STRESS:	foreach (1 .. $count) {
 		my $test_model	= $self->test_model();
 		my $next_stress	= 0;
 		try {
-			if (blessed($data)) {
-				$test_model->load_urls_into_graph($self->default_graph, $data);
+			foreach my $data (@data) {
+				if (blessed($data)) {
+					$test_model->load_urls_into_graph($self->default_graph, $data);
+				}
 			}
 			foreach my $g (@gdata) {
+				my $start = $test_model->size;
 				$test_model->load_urls_into_graph($g, $g);
+				my $end	= $test_model->size;
+				unless ($start < $end) {
+					warn "*** Loading file did not result in any new quads: " . $g;
+				}
 			}
 		} catch {
 			fail($test->value);
@@ -485,10 +516,12 @@ sub get_actual_results {
 			warn "Walking plan:\n";
 			warn $plan->as_string;
 		}
-		$results	= $plan->evaluate($model);
+		$results	= eval { $plan->evaluate($model) };
+		warn $@ if $@;
 	} else {
 		my $e		= Attean::SimpleQueryEvaluator->new( model => $model, default_graph => $self->default_graph );
-		$results	= $e->evaluate($algebra, $self->default_graph);
+		$results	= eval { $e->evaluate($algebra, $self->default_graph) };
+		warn $@ if $@;
 	}
 	my $count	= 1;
 	
@@ -503,7 +536,7 @@ sub get_actual_results {
 			$type	= 'boolean';
 		}
 	}
-	
+
 	$self->print_results("Actual results", \$results) if ($self->results);
 	return ($results, $type);
 	
@@ -659,7 +692,10 @@ sub compare_results {
 			$actual	= $actual->map($mapper->binding_mapper);
 		}
 
-		my $ok		= ok( $eqtest->equals( $actual, $expected ), $test ) or diag($eqtest->error);
+		my $ok		= eval { ok( $eqtest->equals( $actual, $expected ), $test ) or diag($eqtest->error) };
+		if ($@) {
+			diag($@);
+		}
 		$self->record_result('evaluation', $ok, $test);
 		return $ok;
 	} elsif ($actual->does('Attean::API::TermIterator')) {

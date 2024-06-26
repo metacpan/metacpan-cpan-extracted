@@ -23,7 +23,7 @@ use vars qw($VERSION);
 use constant DEFAULT_CACHE_TTL => 3600;
 use strict;
 
-$VERSION = 0.25;
+$VERSION = 0.26;
 
 =pod
 
@@ -686,6 +686,14 @@ RDAP-related modules that all work together. They are:
 =item * L<Net::RDAP::EPPStatusMap>
 
 =item * L<Net::RDAP::JCard>
+
+=over
+
+=item * L<Net::RDAP::JCard::Property>
+
+=item * L<Net::RDAP::JCard::Address>
+
+=back
 
 =item * L<Net::RDAP::Registry>
 

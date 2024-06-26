@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<gpx xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" version="1.1" creator="Geo::Gpx" xsi:schemaLocation="http://www.topografix.com/GPX/1/1 http://www.topografix.com/GPX/1/1/gpx.xsd" xmlns="http://www.topografix.com/GPX/1/1">
+<metadata>
+<link href="http://www.garmin.com">
+<text>Garmin International</text>
+</link>
+<bounds maxlat="45.956740" maxlon="-75.850125" minlat="45.9277526" minlon="-75.879737" />
+</metadata>
+<wpt lat="45.944199" lon="-75.871187">
+<ele>202.96</ele>
+<name>CC &#x26; URj</name>
+<desc>Cookie&#x27;s Climb &#x26; Upper Ridgeback junction (ampersand and single-quote are the same ascii, latin1 and unicode codes)</desc>
+<sym>Flag, Green</sym>
+</wpt>
+<wpt lat="45.936782" lon="-75.850928">
+<ele>548.00</ele>
+<name>βelvé (name hard-coded, added a beta too)</name>
+<desc>Belv&#xE9;d&#xE8;re en haut de la montagne (1-byte codes based on ASCII/latin-1 codes</desc>
+<sym>Flag, Green</sym>
+</wpt>
+<wpt lat="45.936782" lon="-75.850928">
+<ele>548.00</ele>
+<name>βé (hard-coded)</name>
+<sym>Flag, Green</sym>
+</wpt>
+<wpt lat="45.937820" lon="-75.850954">
+<ele>537.74</ele>
+<name>RRtop</name>
+<desc>Belv&#xC3;&#xA9;d&#xC3;&#xA8;re en haut de la montagne (2-bytes codes based on binary values)</desc>
+<sym>Flag, Green</sym>
+</wpt>
+<wpt lat="45.937277" lon="-75.850605">
+<ele>535.00</ele>
+<name>α, é, &#x26; γ (hard-coded except the ampersand)</name>
+<desc>pr&#x00E8;s du d&#x00E9;but de Family Jewel (2-bytes codes based on unicode character code)</desc>
+<sym>Flag, Green</sym>
+</wpt>
+</gpx>

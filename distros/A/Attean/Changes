@@ -6,6 +6,31 @@ Home page:    <https://metacpan.org/release/Attean/>
 Bug tracker:  <https://github.com/kasei/attean/issues>
 Maintainer:   Gregory Todd Williams <mailto:gwilliams@cpan.org>
 
+0.034  2024-06-25
+
+ - (Addition) Add registry to allow extension literal datatypes to map to
+   Moo roles.
+ - (Addition) Add support for composite types (CDTs).
+ - (Addition) Allow extension functions to register as functional forms.
+ - (Update) Add Attean::API::NumericLiteral->equals.
+ - (Update) Add GitHub workflow using perlrdf/devops actions (#163 from
+   @zmughal).
+ - (Update) Add HTTP::Headers to test requirements.
+ - (Update) Add types for RDF triple/quad and their terms (#166 from
+   @zmughal).
+ - (Update) Change in `import()` behaviour for Perl > 5.39.1 (#168 from
+   @zmughal).
+ - (Update) Fix bit-rotten code in W3C test suite harnesses.
+ - (Update) Fix bugs discovered based on run of updated W3C test suite
+   harnesses.
+ - (Update) Fix casing for AtteanIRI type (#165 from @zmughal).
+ - (Update) Fix handling of BOUND and error-causing INVOKE expressions in
+   Attean::Plan.
+ - (Update) Impove error reporting in
+   Attean::API::MutableModel->load_urls_into_graph.
+ - (Update) Improve Attean::API::CanonicalizingLiteral to have strict and
+   non-strict c14n variants.
+
 0.033  2022-10-02
 
  - (Addition) Add new Attean::SPARQLClient protocol implementation.

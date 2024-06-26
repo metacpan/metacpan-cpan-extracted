@@ -1,8 +1,14 @@
 Revision history for perl module Net::RDAP:
 
+0.26 - 2024-06-25
+  - add is_rdap() method to Net::RDAP::Link.
+  - renamed Net::RDAP::JCard::Node to Net::RDAP::JCard::Property.
+  - ensure case-insensitivity of JCard property elements is handled properly.
+  - added Net::RDAP::JCard::Address to provide an ergonomic interface to addresses.
+
 0.25 - 2024-06-07
   - add a new object (Net::RDAP::JCard) that provides a way to access
-    contact data in entity objects that isn't lossless, unless vCard.
+    contact data in entity objects that isn't lossless, unlike vCard.
 
 0.24 - 2024-05-30
   - add support for Redacted Fields (RFC 9537)

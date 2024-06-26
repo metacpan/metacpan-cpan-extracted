@@ -1,0 +1,55 @@
+["vcard",
+  [
+    ["version", {}, "text", "4.0"],
+    ["fn", {}, "text", "John Doe"],
+    ["n",
+      {},
+      "text",
+      ["Doe", "John", "", "Dr.", "M.D."]
+    ],
+    ["bday", {}, "date-and-or-time", "--02-03"],
+    ["anniversary",
+      {},
+      "date-and-or-time",
+      "2009-08-08T14:30:00-05:00"
+    ],
+    ["gender", {}, "text", "M"],
+    ["lang", { "pref": "1" }, "language-tag", "en"],
+    ["lang", { "pref": "2" }, "language-tag", "fr"],
+    ["org", { "type": "work" }, "text", "Example Inc."],
+    ["adr",
+       {
+           "type": "work",
+           "cc": "US"
+       },
+       "text",
+       [
+        "",
+        "Suite 100",
+        "123 Example Dr.",
+        "Dulles",
+        "VA",
+        "20166-6503",
+        "United States of America"
+       ]
+    ],
+    ["tel",
+      { "type": ["work", "voice"], "pref": "1" },
+      "uri",
+      "tel:+1.7035555555;ext=1234"
+    ],
+    ["email",
+      { "type": "work" },
+      "text",
+      "john.doe@example.com"
+    ],
+    ["geo", { "type": "work" }, "uri", "geo:38.9523,-77.4586"],
+    ["key",
+      { "type": "work" },
+      "uri",
+      "https://www.example.com"
+    ],
+    ["tz", {}, "utc-offset", "-05:00"],
+    ["url", { "type": "home" }, "uri", "https://www.example.com"]
+  ]
+]

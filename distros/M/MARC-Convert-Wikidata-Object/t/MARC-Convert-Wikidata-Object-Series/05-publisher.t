@@ -1,6 +1,7 @@
 use strict;
 use warnings;
 
+use MARC::Convert::Wikidata::Object::Publisher;
 use MARC::Convert::Wikidata::Object::Series;
 use Test::More 'tests' => 3;
 use Test::NoWarnings;
@@ -15,7 +16,9 @@ is($ret, undef, 'Get default publisher of series.');
 # Test.
 $obj = MARC::Convert::Wikidata::Object::Series->new(
 	'name' => 'book series',
-	'publisher' => 'publisher',
+	'publisher' => MARC::Convert::Wikidata::Object::Publisher->new(
+		'name' => 'Grada',
+	),
 );
 $ret = $obj->publisher;
-is($ret, 'publisher', 'Get explicit publisher of series.');
+isa_ok($ret, 'MARC::Convert::Wikidata::Object::Publisher');

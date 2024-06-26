@@ -6,7 +6,11 @@ use warnings;
 use Mo qw(build is);
 use Mo::utils qw(check_required);
 
-our $VERSION = 0.03;
+our $VERSION = 0.04;
+
+has id => (
+	is => 'ro',
+);
 
 has name => (
 	is => 'ro',
@@ -41,6 +45,7 @@ MARC::Convert::Wikidata::Object::Publisher - Bibliographic Wikidata object for p
  use MARC::Convert::Wikidata::Object::Publisher;
 
  my $obj = MARC::Convert::Wikidata::Object::Publisher->new(%params);
+ my $id = $obj->id;
  my $name = $obj->name;
  my $place = $obj->place;
 
@@ -55,6 +60,14 @@ Constructor.
 Returns instance of object.
 
 =over 8
+
+=item * C<id>
+
+Id of publishing house.
+
+Parameter is optional.
+
+Default value is undef.
 
 =item * C<name>
 
@@ -71,6 +84,14 @@ Location of publishing house.
 Default value is undef.
 
 =back
+
+=head2 C<id>
+
+ my $id = $obj->id;
+
+Get id of publishing house.
+
+Returns string.
 
 =head2 C<name>
 
@@ -104,6 +125,7 @@ Returns string.
  use MARC::Convert::Wikidata::Object::Publisher;
  
  my $obj = MARC::Convert::Wikidata::Object::Publisher->new(
+         'id' => '000010003',
          'name' => 'Academia',
          'place' => 'Praha',
  );
@@ -116,6 +138,7 @@ Returns string.
  #     public methods (4) : can (UNIVERSAL), DOES (UNIVERSAL), isa (UNIVERSAL), VERSION (UNIVERSAL)
  #     private methods (1) : __ANON__ (Mo::is)
  #     internals: {
+ #         id      "000010003",
  #         name    "Academia",
  #         place   "Praha"
  #     }
@@ -148,12 +171,12 @@ L<http://skim.cz>
 
 =head1 LICENSE AND COPYRIGHT
 
-© Michal Josef Špaček 2021-2023
+© Michal Josef Špaček 2021-2024
 
 BSD 2-Clause License
 
 =head1 VERSION
 
-0.03
+0.04
 
 =cut

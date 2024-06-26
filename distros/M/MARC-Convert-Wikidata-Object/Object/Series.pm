@@ -4,9 +4,9 @@ use strict;
 use warnings;
 
 use Mo qw(build is);
-use Mo::utils qw(check_required);
+use Mo::utils 0.08 qw(check_isa check_required);
 
-our $VERSION = 0.03;
+our $VERSION = 0.04;
 
 has name => (
 	is => 'ro',
@@ -24,6 +24,8 @@ sub BUILD {
 	my $self = shift;
 
 	check_required($self, 'name');
+
+	check_isa($self, 'publisher', 'MARC::Convert::Wikidata::Object::Publisher');
 
 	return;
 }
@@ -69,7 +71,7 @@ Parameter is required.
 
 =item * C<publisher>
 
-Name of publishing house.
+Publishing house L<MARC::Convert::Wikidata::Object::Publisher> object.
 
 Default value is undef.
 
@@ -89,13 +91,13 @@ Get name of book series.
 
 Returns string.
 
-=head2 C<place>
+=head2 C<publisher>
 
  my $place = $obj->publisher;
 
-Get name of publishing house.
+Get publishing house.
 
-Returns string.
+Returns L<MARC::Convert::Wikidata::Object::Publisher> object.
 
 =head2 C<series_ordinal>
 
@@ -108,7 +110,12 @@ Returns string.
 =head1 ERRORS
 
  new():
-         Parameter 'name' is required.
+         From Mo::utils::check_isa():
+                 Parameter 'publisher' must be a 'MARC::Convert::Wikidata::Object::Publisher' object.
+                         Value: %s
+                         Reference: %s
+         From Mo::utils::check_required():
+                 Parameter 'name' is required.
 
 =head1 EXAMPLE1
 
@@ -118,12 +125,15 @@ Returns string.
  use warnings;
 
  use Data::Printer;
+ use MARC::Convert::Wikidata::Object::Publisher;
  use MARC::Convert::Wikidata::Object::Series;
  use Unicode::UTF8 qw(decode_utf8);
  
  my $obj = MARC::Convert::Wikidata::Object::Series->new(
          'name' => decode_utf8('Malé encyklopedie'),
-         'publisher' => decode_utf8('Mladá Fronta'),
+         'publisher' => MARC::Convert::Wikidata::Object::Publisher->new(
+                 'name' => decode_utf8('Mladá Fronta'),
+         ),
          'series_ordinal' => 5,
  );
  
@@ -136,7 +146,7 @@ Returns string.
  #     private methods (1) : __ANON__ (Mo::is)
  #     internals: {
  #         name             "Mal� encyklopedie",
- #         publisher        "Mlad� Fronta",
+ #         publisher        MARC::Convert::Wikidata::Object::Publisher,
  #         series_ordinal   5
  #     }
  # }
@@ -168,12 +178,12 @@ L<http://skim.cz>
 
 =head1 LICENSE AND COPYRIGHT
 
-© Michal Josef Špaček 2021-2023
+© Michal Josef Špaček 2021-2024
 
 BSD 2-Clause License
 
 =head1 VERSION
 
-0.03
+0.04
 
 =cut

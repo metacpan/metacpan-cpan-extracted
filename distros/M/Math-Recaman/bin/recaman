@@ -1,0 +1,293 @@
+#!perl
+
+use warnings;
+use strict;
+use Math::Recaman qw(recaman recaman_a008336);
+use Getopt::Long;
+use Pod::Usage;
+
+our $SVG;
+our $MIDI;
+BEGIN {
+    eval { require SVG };
+    unless ($@ ) {
+        SVG->import();
+        $SVG = 1;
+    } else {
+        $SVG = 0;
+    }
+
+    eval {
+        require MIDI::Simple;
+        require IO::String;
+    };
+    unless ($@ ) {
+        MIDI::Simple->import();
+        IO::String->import();
+        $MIDI = 1;
+    }
+}
+
+my $help = 0;
+my $man  = 0;
+my $alt  = 0;
+my $mode;
+my $output;
+
+my @reg_checks = (0, 1, 3, 6, 2, 7, 13, 20, 12, 21,
+                 11, 22, 10, 23, 9, 24, 8, 25, 43,
+                 62, 42, 63, 41, 18, 42, 17, 43, 16,
+                 44, 15, 45, 14, 46, 79, 113, 78, 114,
+                 77, 39, 78, 38, 79, 37, 80, 36, 81,
+                 35, 82, 34, 83, 33, 84, 32, 85, 31,
+                 86, 30, 87, 29, 88, 28, 89, 27, 90,
+                 26, 91, 157, 224, 156, 225, 155);
+
+my @alt_checks = (1, 1, 2, 6, 24, 120, 20, 140, 1120, 10080, 1008, 11088, 924,
+                  12012, 858, 12870, 205920, 3500640, 194480, 3695120,
+                  184756, 3879876, 176358, 4056234, 97349616, 2433740400,
+                  93605400, 2527345800, 90262350, 2617608150, 87253605,
+                  2704861755, 86555576160, 2856334013280);
+
+GetOptions(
+  'help|?'     => \$help,
+  'man'        => \$man,
+  'mode|m=s'   => \$mode,
+  'output|o=s' => \$output,
+  'alt|a'      => \$alt,
+) or pod2usage(2);
+
+pod2usage(1) if $help;
+pod2usage(-exitval => 0, -verbose => 2) if $man;
+
+my $target = shift @ARGV || 71;
+
+my $func = ($alt) ? \&recaman_a008336 : \&recaman;
+if (!defined $mode || lc($mode) eq 'default') {
+  do_default($target);
+} elsif (lc($mode) eq 'check') {
+  do_check();
+} elsif (lc($mode) eq 'newline' || lc($mode) eq 'nl') {
+  do_newline($target);
+} elsif (lc($mode) eq 'nth') {
+  do_nth($target);
+} elsif (lc($mode) eq 'max') {
+  do_max($target);
+} elsif (lc($mode) eq 'svg') {
+  do_svg($target, $output);
+} elsif (lc($mode) eq 'midi') {
+  do_midi($target, $output);
+} else {
+  die "Unknown mode '$mode'\n";
+}
+
+sub do_default {
+  my $target = shift;
+  print join(", ", $func->($target))."\n";
+}
+
+
+
+sub do_check {
+  do_default($alt ? 34 : 71);
+  my @checks = $alt ? @alt_checks : @reg_checks;
+  print join(", ", @checks)."\n";
+}
+
+sub do_newline {
+  my $target = shift;
+  $func->($target);
+}
+
+sub do_nth {
+  my $target = shift;
+  my ($last, $max) = _nth($target);
+  print "$last\n";
+}
+
+sub do_max{
+  my $target = shift;
+  my ($last, $max) = _nth($target);
+  print "$max\n";
+}
+
+sub _nth {
+  my $target = shift;
+  my $last = 0;
+  my $max  = 0;
+  $func->($target, sub { $last = shift; $max = $last if $last>$max });
+  return ($last, $max);
+}
+
+sub do_svg {
+  my $target = shift;
+  my $output = shift;
+  die "You must install the Perl module SVG from CPAN to use this feature\n" unless $SVG;
+
+  my $STRIDE = 15; # pixels between numbers
+
+  # Yes, technically this does the work twice
+  # ... but getting the 10 millionth number (it's 10,438,710 btw and the largest number seen is 61,998,984)
+  # takes 4s on my 2018 MacBook Pro and I don't suspect you're going to do an image that wide.
+  my ($last, $max_global) = _nth($target);
+
+  # Create Canvas
+  my $width = ($max_global+2)*$STRIDE;
+  my $height = $width/2; # TODO probably a better way to work this out
+  my $svg = SVG->new(width => $width, height => $height);
+
+  # Draw main line
+  $svg->line(
+      id => 'mainline',
+      x1 => $STRIDE,
+      y1 => $height/2,
+      x2 => $width-$STRIDE,
+      y2 => $height/2,
+      stroke => 'black',
+      fill   => 'none',
+      'stroke-width' => 2,
+  );
+
+  # Draw '$target' number of circles
+  $svg->circle(
+      id => "circle_$_",
+      cx => ($_+1)*$STRIDE,
+      cy => $height/2,
+      r  => 2
+  ) for (0..$max_global);
+
+  # Draw the arcs
+  my $prev = 0;
+  $func->($target, sub {
+    my $num     = shift;
+    my $count   = shift;
+    my $max_cur = shift;
+
+    my $low     = ($prev, $num)[$prev > $num];
+    my $high    = ($prev, $num)[$prev < $num];
+    my $start   = ($low+1)*$STRIDE;
+    my $end     = ($high+1)*$STRIDE;
+    my $dist    = $end-$start;
+    my $radius  = ($dist/2);
+    my $mid     = $start+$radius;
+    my $y       = $height/2;
+    # TODO there's a better, more aesthetic algorithm for this
+    # The illustrations on the wikipedia article are much nicer
+    my $over    = $num>=$max_cur;
+    my $top     = ($over) ? $y-$radius : $y+$radius;
+    # Draw an arc
+    my $path = "M $start,$y C $start $y, $mid $top, $end $y";
+    $svg->path(
+        id      => "arc_$count",
+        d       => $path,
+        # TODO this should be nicer and also more configurable
+        stroke  => ($prev>$num) ? 'black' : 'blue',
+        fill    => 'none',
+    );
+    # TODO how do we choose to go above or below?
+    $prev = $num;
+  });
+
+  # Print out the SVG
+  _dump($svg->xmlify, $output);
+}
+
+sub do_midi {
+  my $target = shift;
+  my $output = shift;
+  die "You must install the Perl modules MIDI::Simple and IO::String from CPAN to use this feature\n" unless $MIDI;
+
+  # Create the midi file
+  my $midi = MIDI::Simple->new_score();
+  # Set up
+  # The default tempo is 96
+  # Setting the tempo to 120 was interesting and matches what the oeis-to-midi script does
+  # https://github.com/synchronometry/OEIS-to-MIDI
+  # https://oeis.org/play?seq=A005132
+  # $midi->set_tempo(120);
+  $midi->text_event("Representation of Recamán's sequence for the first $target notes");
+  #$midi->noop("c1 f, o5");
+  # Set up the notes
+  $func->($target, sub {
+    my $num   = shift;
+    my $count = shift;
+    # Add note as $num % 127
+    $midi->n("n".($num%127));
+  });
+
+  # TODO don't love the reliance on IO::String
+  my $io = IO::String->new;
+  $midi->write_score($io);
+
+  # Print out the Midi file
+  _dump(${$io->string_ref}, $output);
+}
+
+sub _dump {
+  my $data   = shift;
+  my $output = shift;
+  if ($output) {
+    open(my $fh, '>', $output) || die "Couldn't open output file $output: $!\n";
+    binmode($fh);
+    print $fh $data;
+    close($fh);
+  } else {
+    binmode(STDOUT);
+    print $data;
+  }
+}
+
+=encoding utf8
+
+=head1 NAME
+
+recaman - generate Recamán's sequence in various formats
+
+=head1 USAGE
+
+  recaman [n]
+
+Will generate the first C<n> numbers of the sequence. The default is the first 71 numbers.
+
+  recaman --help
+  recaman --man
+
+Will print out help messages.
+
+You can also change the C<mode> to output in different styles.
+
+  recaman --mode check
+  recaman --mode nl 100
+  recaman --mode nth 1000
+  recaman --mode max 10000000
+
+=over 4
+
+=item default
+
+Prints out the requested numbers in the sequence on one line seperated by commas.
+
+=item check
+
+Prints out the first 71 numbers in the sequence plus, immediately, underneath, the same 71 numbers from a different source.
+
+=item newline or nl
+
+Prints out the requested numbers seperate by newlines. This prints each number out as it calculates it so it uses less memory for large sequences.
+
+=item nth
+
+Prints out only the nth number.
+
+=item max
+
+Prints out the largest number seen when calculating the nth number.
+
+=back
+
+=head1 AUTHOR
+
+Simon Wistow <simon@thegestalt.org>
+
+=cut
+

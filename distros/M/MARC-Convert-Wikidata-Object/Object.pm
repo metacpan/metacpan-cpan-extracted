@@ -6,12 +6,12 @@ use warnings;
 use Error::Pure qw(err);
 use List::MoreUtils qw(none);
 use Mo qw(build default is);
-use Mo::utils qw(check_array check_array_object check_number);
+use Mo::utils 0.26 qw(check_array check_array_object check_number);
 use Readonly;
 
 Readonly::Array our @COVERS => qw(hardback paperback);
 
-our $VERSION = 0.03;
+our $VERSION = 0.04;
 
 has authors => (
 	default => [],
@@ -824,12 +824,12 @@ L<http://skim.cz>
 
 =head1 LICENSE AND COPYRIGHT
 
-© Michal Josef Špaček 2021-2023
+© Michal Josef Špaček 2021-2024
 
 BSD 2-Clause License
 
 =head1 VERSION
 
-0.03
+0.04
 
 =cut

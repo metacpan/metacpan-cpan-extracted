@@ -7,11 +7,11 @@ with 'Dist::Zilla::Role::MintingProfile::ShareDir';
 
 use 5.008003;
 
-our $VERSION = '0.14';
+our $VERSION = '0.15';
 
 =head1 NAME
 
-Dist-Zilla-MintingProfile-RTx - Basic Minting Profile for RTx modules
+Dist::Zilla::MintingProfile::RTx - Basic Minting Profile for RTx modules
 
 =head1 USAGE
 
@@ -34,7 +34,7 @@ Kevin Falcone <falcone@bestpractical.com>
 
 =head1 LICENCE AND COPYRIGHT
 
-Copyright (c) 2011-2020, Best Practical Solutions, LLC.  All rights reserved.
+Copyright (c) 2011-2024, Best Practical Solutions, LLC.  All rights reserved.
 
 This module is free software; you can redistribute it and/or
 modify it under the terms of version 2 of the GNU General Public License.

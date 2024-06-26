@@ -7,7 +7,7 @@ Attean::QueryPlanner - Query planner
 
 =head1 VERSION
 
-This document describes Attean::QueryPlanner version 0.033
+This document describes Attean::QueryPlanner version 0.034
 
 =head1 SYNOPSIS
 
@@ -41,7 +41,7 @@ use Attean::Algebra;
 use Attean::Plan;
 use Attean::Expression;
 
-package Attean::QueryPlanner 0.033 {
+package Attean::QueryPlanner 0.034 {
 	use Moo;
 	use Encode qw(encode);
 	use Attean::RDF;
@@ -217,7 +217,7 @@ the supplied C<< $active_graph >>.
 					my @vars		= ($var);
 					my @inscope		= ($var, @{ $plan->in_scope_variables });
 					my @pvars		= map { Attean::Variable->new($_) } @{ $plan->in_scope_variables };
-					my $extend		= Attean::Plan::Extend->new(children => [$plan], expressions => \%exprs, distinct => 0, ordered => $ordered);
+					my $extend		= Attean::Plan::Extend->new(children => [$plan], expressions => \%exprs, distinct => 0, ordered => $ordered, active_graphs => $active_graphs);
 					my $filtered	= Attean::Plan::EBVFilter->new(children => [$extend], variable => $var, distinct => 0, ordered => $ordered);
 					my $proj		= $self->new_projection($filtered, $distinct, @{ $plan->in_scope_variables });
 					push(@plans, $proj);
@@ -244,7 +244,7 @@ the supplied C<< $active_graph >>.
 				} else {
 					my @vars	= (@{ $plan->in_scope_variables }, keys %$exprs);
 					my @pvars	= map { Attean::Variable->new($_) } @{ $plan->in_scope_variables };
-					my $extend	= Attean::Plan::Extend->new(children => [$plan], expressions => $exprs, distinct => 0, ordered => $plan->ordered);
+					my $extend	= Attean::Plan::Extend->new(children => [$plan], expressions => $exprs, distinct => 0, ordered => $plan->ordered, active_graphs => $active_graphs);
 					my $ordered	= Attean::Plan::OrderBy->new(children => [$extend], variables => $svars, ascending => $ascending, distinct => 0, ordered => \@cmps);
 					my $proj	= $self->new_projection($ordered, $distinct, @{ $plan->in_scope_variables });
 					push(@plans, $proj);
@@ -306,7 +306,7 @@ the supplied C<< $active_graph >>.
 					my %exprs	= ($gvar => Attean::ValueExpression->new(value => $graph));
 					# TODO: rewrite $child pattern here to replace any occurrences of the variable $gvar to $graph
 					my @plans	= map {
-						Attean::Plan::Extend->new(children => [$_], expressions => \%exprs, distinct => 0, ordered => $_->ordered);
+						Attean::Plan::Extend->new(children => [$_], expressions => \%exprs, distinct => 0, ordered => $_->ordered, active_graphs => $active_graphs);
 					} $self->plans_for_algebra($child, $model, [$graph], $default_graphs, %args);
 					push(@branches, \@plans);
 				}
@@ -375,7 +375,7 @@ the supplied C<< $active_graph >>.
 
 			my @plans;
 			foreach my $plan ($self->plans_for_algebra($child, $model, $active_graphs, $default_graphs, %args)) {
-				my $extend		= Attean::Plan::Extend->new(children => [$plan], expressions => \%exprs, distinct => 0, ordered => $plan->ordered);
+				my $extend		= Attean::Plan::Extend->new(children => [$plan], expressions => \%exprs, distinct => 0, ordered => $plan->ordered, active_graphs => $active_graphs);
 				push(@plans, $extend);
 			}
 			return @plans;
@@ -389,7 +389,7 @@ the supplied C<< $active_graph >>.
 			}
 			my @plans;
 			foreach my $plan ($self->plans_for_algebra($child, $model, $active_graphs, $default_graphs, %args)) {
-				my $extend		= Attean::Plan::Aggregate->new(children => [$plan], aggregates => \%exprs, groups => $groups, distinct => 0, ordered => []);
+				my $extend		= Attean::Plan::Aggregate->new(children => [$plan], aggregates => \%exprs, groups => $groups, distinct => 0, ordered => [], active_graphs => $active_graphs);
 				push(@plans, $extend);
 			}
 			return @plans;
@@ -638,6 +638,13 @@ the supplied C<< $active_graph >>.
 				push(@plans, $plan);
 			}
 			return Attean::Plan::Sequence->new( children => \@plans );
+		} elsif ($algebra->isa('Attean::Algebra::Unfold')) {
+			my @plans	= $self->plans_for_algebra($child, $model, $active_graphs, $default_graphs, %args);
+			my @unfold;
+			foreach my $p (@plans) {
+				push(@unfold, Attean::Plan::Unfold->new( children => [$p], expression => $algebra->expression, variables => $algebra->variables, active_graphs => $active_graphs ));
+			}
+			return @unfold;
 		}
 		die "Unimplemented algebra evaluation for: " . $algebra->as_string;
 	}
@@ -706,15 +713,37 @@ property path.
 			my $ra	= $self->_package($self->simplify_path($s, $r, $o));
 			return Attean::Algebra::Union->new( children => [$la, $ra] );
 		} elsif ($path->isa('Attean::Algebra::NegatedPropertySet')) {
+			my @branches;
+			
 			my @preds	= @{ $path->predicates };
-			my $pvar	= Attean::Variable->new(value => $self->new_temporary('nps'));
-			my $pvar_e	= Attean::ValueExpression->new( value => $pvar );
-			my $t		= Attean::TriplePattern->new($s, $pvar, $o);
-			my @vals	= map { Attean::ValueExpression->new( value => $_ ) } @preds;
-			my $expr	= Attean::FunctionExpression->new( children => [$pvar_e, @vals], operator => 'notin' );
-			my $bgp		= Attean::Algebra::BGP->new( triples => [$t] );
-			my $f		= Attean::Algebra::Filter->new( children => [$bgp], expression => $expr );
-			return $f;
+			if (scalar(@preds)) {
+				my $pvar	= Attean::Variable->new(value => $self->new_temporary('nps'));
+				my $pvar_e	= Attean::ValueExpression->new( value => $pvar );
+				my $t		= Attean::TriplePattern->new($s, $pvar, $o);
+				my @vals	= map { Attean::ValueExpression->new( value => $_ ) } @preds;
+				my $expr	= Attean::FunctionExpression->new( children => [$pvar_e, @vals], operator => 'notin' );
+				my $bgp		= Attean::Algebra::BGP->new( triples => [$t] );
+				my $f_fwd	= Attean::Algebra::Filter->new( children => [$bgp], expression => $expr );
+				push(@branches, $f_fwd);
+			}
+
+			my @rev		= @{ $path->reversed };
+			if (scalar(@rev)) {
+				my $pvar	= Attean::Variable->new(value => $self->new_temporary('nps_rev'));
+				my $pvar_e	= Attean::ValueExpression->new( value => $pvar );
+				my $t		= Attean::TriplePattern->new($o, $pvar, $s);
+				my @vals	= map { Attean::ValueExpression->new( value => $_ ) } @rev;
+				my $expr	= Attean::FunctionExpression->new( children => [$pvar_e, @vals], operator => 'notin' );
+				my $bgp		= Attean::Algebra::BGP->new( triples => [$t] );
+				my $f_rev	= Attean::Algebra::Filter->new( children => [$bgp], expression => $expr );
+				push(@branches, $f_rev);
+			}
+
+			if (scalar(@branches) == 1) {
+				return shift(@branches);
+			} else {
+				return Attean::Algebra::Union->new( children => \@branches );
+			}
 		} else {
 			return;
 		}

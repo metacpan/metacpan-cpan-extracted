@@ -7,7 +7,7 @@ AtteanX::Parser::Turtle::Token - Token objects used for parsing of Turtle
 
 =head1 VERSION
 
-This document describes AtteanX::Parser::Turtle::Token version 0.033
+This document describes AtteanX::Parser::Turtle::Token version 0.034
 
 =head1 SYNOPSIS
 
@@ -67,7 +67,7 @@ use AtteanX::Parser::Turtle::Constants;
 use Sub::Install;
 use namespace::clean;
 
-our $VERSION	= 0.033;
+our $VERSION	= 0.034;
 
 has type => ( is => 'ro', );
 has start_line => ( is => 'ro', );
@@ -102,6 +102,7 @@ sub fast_constructor {
 	);
 }
 
+my %token_strings;
 {
 	my %tokens	= (
 		a			=> [A, 'a'],
@@ -132,7 +133,57 @@ sub fast_constructor {
 			code	=> set_subname($name, $code),
 			as		=> $name
 		});
+		$token_strings{$type}	= $value;
 	}
+	
+}
+
+=item C<< token_as_string() >>
+
+Returns a string version of the token (without escaping).
+
+=cut
+
+sub token_as_string {
+	my $self	= shift;
+	my $type	= $self->type;
+	my @args	= @{ $self->args };
+	my $value	= $args[0];
+	if (defined(my $v = $token_strings{$type})) {
+		return $v;
+	} elsif ($type == STRING1D) {
+		return qq["$value"];
+	} elsif ($type == STRING1S) {
+		return qq["$value"];
+	} elsif ($type == STRING3D) {
+		return qq["""$value"""];
+	} elsif ($type == STRING3S) {
+		return qq['''$value'''];
+	} elsif ($type == IRI) {
+		return qq[<$value>];
+	} elsif ($type == BNODE) {
+		return qq[_:$value]
+	} elsif ($type == LANG) {
+		return qq[\@$value]
+	} else {
+		join(', ', @args);
+	}
+}
+
+=item C<< is_string() >>
+
+Returns true if the token is one of the quoted string types (STRING1D, STRING3D,
+STRING1S, or STRING3S), false otherwise.
+
+=cut
+
+sub is_string {
+	my $self	= shift;
+	my $type	= $self->type;
+	return 1 if ($type == STRING1D);
+	return 1 if ($type == STRING1S);
+	return 1 if ($type == STRING3D);
+	return 1 if ($type == STRING3S);
 }
 
 =item C<< as_string >>

@@ -16,6 +16,7 @@ examples/gzip_decompressor.pl
 examples/lz77.pl
 examples/lz77_ac_string.pl
 examples/lz77_adaptive_ac_string.pl
+examples/lz77_bwt_obh_string.pl
 examples/lz77_bwt_string.pl
 examples/lz77_mrl_string.pl
 examples/lz77_obh_string.pl
@@ -55,6 +56,7 @@ t/lz77.t
 t/lz77_abc_encode.t
 t/lz77_adaptive_arithmetic.t
 t/lz77_arithmetic.t
+t/lz77_bwt_obh.t
 t/lz77_delta_encode.t
 t/lz77_obh_encode.t
 t/lz77_symbolic.t

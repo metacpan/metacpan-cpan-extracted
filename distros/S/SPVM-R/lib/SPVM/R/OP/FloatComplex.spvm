@@ -1,0 +1,902 @@
+# Copyright (c) 2024 Yuki Kimoto
+# MIT License
+
+class R::OP::FloatComplex {
+  
+  use R::NDArray::Int;
+  use R::NDArray::Long;
+  use R::NDArray::Float;
+  use R::NDArray::Double;
+  use R::NDArray::FloatComplex;
+  use R::NDArray::DoubleComplex;
+  use R::NDArray::String;
+  use R::OP;
+  use R::OP::Int;
+  use R::OP::Long;
+  use R::OP::Float;
+  use R::OP::Double;
+  use R::OP::FloatComplex;
+  use R::OP::DoubleComplex;
+  use R::OP::String;
+  use Fn;
+  use Complex_2f;
+  use Complex_2d;
+  use Math;
+  
+  # Class Methods
+  static method c : R::NDArray::FloatComplex ($x_data : Complex_2f[], $x_dim : int[] = undef) {
+    
+    my $x_ndarray = R::NDArray::FloatComplex->new({dim => $x_dim, data => $x_data});
+    
+    return $x_ndarray;
+  }
+  
+  
+  static method add : R::NDArray::FloatComplex ($x_ndarray : R::NDArray::FloatComplex, $y_ndarray : R::NDArray::FloatComplex) {
+    
+    unless ($x_ndarray) {
+      die "The n-dimension array \$x_ndarray must be defined.";
+    }
+    
+    unless ($y_ndarray) {
+      die "The n-dimension array \$y_ndarray must be defined.";
+    }
+    
+    my $equals_dim = R::OP->equals_dim($x_ndarray, $y_ndarray);
+    
+    unless ($equals_dim) {
+      die "The dim field of \$x_ndarray must be the same as the dim field of \$y_ndarray.";
+    }
+    
+    my $length = $x_ndarray->length;
+    
+    my $x_dim = $x_ndarray->dim;
+    
+    my $ret_data = new Complex_2f[$length];
+    my $ret_ndarray = &c($ret_data, $x_dim);
+    
+    my $x_data = $x_ndarray->data;
+    my $y_data = $y_ndarray->data;
+    
+    for (my $i = 0; $i < $length; $i++) {
+      $ret_data->[$i] = Math->caddf($x_data->[$i], $y_data->[$i]);
+    }
+    
+    return $ret_ndarray;
+  }
+  
+  precompile static method sub : R::NDArray::FloatComplex ($x_ndarray : R::NDArray::FloatComplex, $y_ndarray : R::NDArray::FloatComplex) {
+    
+    unless ($x_ndarray) {
+      die "The n-dimension array \$x_ndarray must be defined.";
+    }
+    
+    unless ($y_ndarray) {
+      die "The n-dimension array \$y_ndarray must be defined.";
+    }
+    
+    my $equals_dim = R::OP->equals_dim($x_ndarray, $y_ndarray);
+    
+    unless ($equals_dim) {
+      die "The dim field of \$x_ndarray must be the same as the dim field of \$y_ndarray.";
+    }
+    
+    my $length = $x_ndarray->length;
+    
+    my $x_dim = $x_ndarray->dim;
+    
+    my $ret_data = new Complex_2f[$length];
+    my $ret_ndarray = &c($ret_data, $x_dim);
+    
+    my $x_data = $x_ndarray->data;
+    my $y_data = $y_ndarray->data;
+    
+    for (my $i = 0; $i < $length; $i++) {
+      $ret_data->[$i] = Math->csubf($x_data->[$i], $y_data->[$i]);
+    }
+    
+    return $ret_ndarray;
+  }
+  
+  precompile static method mul : R::NDArray::FloatComplex ($x_ndarray : R::NDArray::FloatComplex, $y_ndarray : R::NDArray::FloatComplex) {
+    
+    unless ($x_ndarray) {
+      die "The n-dimension array \$x_ndarray must be defined.";
+    }
+    
+    unless ($y_ndarray) {
+      die "The n-dimension array \$y_ndarray must be defined.";
+    }
+    
+    my $equals_dim = R::OP->equals_dim($x_ndarray, $y_ndarray);
+    
+    unless ($equals_dim) {
+      die "The dim field of \$x_ndarray must be the same as the dim field of \$y_ndarray.";
+    }
+    
+    my $length = $x_ndarray->length;
+    
+    my $x_dim = $x_ndarray->dim;
+    
+    my $ret_data = new Complex_2f[$length];
+    my $ret_ndarray = &c($ret_data, $x_dim);
+    
+    my $x_data = $x_ndarray->data;
+    my $y_data = $y_ndarray->data;
+    
+    for (my $i = 0; $i < $length; $i++) {
+      $ret_data->[$i] = Math->cmulf($x_data->[$i], $y_data->[$i]);
+    }
+    
+    return $ret_ndarray;
+  }
+  
+  precompile static method div : R::NDArray::FloatComplex ($x_ndarray : R::NDArray::FloatComplex, $y_ndarray : R::NDArray::FloatComplex) {
+    
+    unless ($x_ndarray) {
+      die "The n-dimension array \$x_ndarray must be defined.";
+    }
+    
+    unless ($y_ndarray) {
+      die "The n-dimension array \$y_ndarray must be defined.";
+    }
+    
+    my $equals_dim = R::OP->equals_dim($x_ndarray, $y_ndarray);
+    
+    unless ($equals_dim) {
+      die "The dim field of \$x_ndarray must be the same as the dim field of \$y_ndarray.";
+    }
+    
+    my $length = $x_ndarray->length;
+    
+    my $x_dim = $x_ndarray->dim;
+    
+    my $ret_data = new Complex_2f[$length];
+    my $ret_ndarray = &c($ret_data, $x_dim);
+    
+    my $x_data = $x_ndarray->data;
+    my $y_data = $y_ndarray->data;
+    
+    for (my $i = 0; $i < $length; $i++) {
+      $ret_data->[$i] = Math->cdivf($x_data->[$i], $y_data->[$i]);
+    }
+    
+    return $ret_ndarray;
+  }
+  
+  precompile static method clone : R::NDArray::FloatComplex ($x_ndarray : R::NDArray::FloatComplex) {
+    
+    unless ($x_ndarray) {
+      die "The n-dimension array \$x_ndarray must be defined.";
+    }
+    
+    my $length = $x_ndarray->length;
+    
+    my $x_dim = $x_ndarray->dim;
+    
+    my $ret_ndarray = R::OP::FloatComplex->c(undef, $x_dim);
+    
+    my $x_data = $x_ndarray->data;
+    my $ret_data = $ret_ndarray->data;
+    
+    for (my $i = 0; $i < $length; $i++) {
+      $ret_data->[$i]{re} = (float)$x_data->[$i]{re};
+      $ret_data->[$i]{im} = (float)$x_data->[$i]{im};
+    }
+    
+    return $ret_ndarray;
+  }
+  
+  precompile static method to_double_complex : R::NDArray::DoubleComplex ($x_ndarray : R::NDArray::FloatComplex) {
+    
+    unless ($x_ndarray) {
+      die "The n-dimension array \$x_ndarray must be defined.";
+    }
+    
+    my $length = $x_ndarray->length;
+    
+    my $x_dim = $x_ndarray->dim;
+    
+    my $ret_ndarray = R::OP::DoubleComplex->c(undef, $x_dim);
+    
+    my $x_data = $x_ndarray->data;
+    my $ret_data = $ret_ndarray->data;
+    
+    for (my $i = 0; $i < $length; $i++) {
+      $ret_data->[$i]{re} = (double)$x_data->[$i]{re};
+      $ret_data->[$i]{im} = (double)$x_data->[$i]{im};
+    }
+    
+    return $ret_ndarray;
+  }
+  
+  precompile static method abs : R::NDArray::Float ($x_ndarray : R::NDArray::FloatComplex) {
+    
+    unless ($x_ndarray) {
+      die "The n-dimension array \$x_ndarray must be defined.";
+    }
+    
+    my $length = $x_ndarray->length;
+    
+    my $x_dim = $x_ndarray->dim;
+    
+    my $ret_ndarray = R::OP::Float->c(undef, $x_dim);
+    
+    my $x_data = $x_ndarray->data;
+    my $ret_data = $ret_ndarray->data;
+    
+    for (my $i = 0; $i < $length; $i++) {
+      $ret_data->[$i] = Math->cabsf($x_data->[$i]);
+    }
+    
+    return $ret_ndarray;
+  }
+  
+  precompile static method neg : R::NDArray::FloatComplex ($x_ndarray : R::NDArray::FloatComplex) {
+    
+    unless ($x_ndarray) {
+      die "The n-dimension array \$x_ndarray must be defined.";
+    }
+    
+    my $length = $x_ndarray->length;
+    
+    my $x_dim = $x_ndarray->dim;
+    
+    my $ret_ndarray = &c(undef, $x_dim);
+    
+    my $x_data = $x_ndarray->data;
+    my $ret_data = $ret_ndarray->data;
+    
+    for (my $i = 0; $i < $length; $i++) {
+      $ret_data->[$i] = Math->cnegf($x_data->[$i]);
+    }
+    
+    return $ret_ndarray;
+  }
+  
+  precompile static method sin : R::NDArray::FloatComplex ($x_ndarray : R::NDArray::FloatComplex) {
+    
+    unless ($x_ndarray) {
+      die "The n-dimension array \$x_ndarray must be defined.";
+    }
+    
+    my $length = $x_ndarray->length;
+    
+    my $x_dim = $x_ndarray->dim;
+    
+    my $ret_ndarray = &c(undef, $x_dim);
+    
+    my $x_data = $x_ndarray->data;
+    my $ret_data = $ret_ndarray->data;
+    
+    for (my $i = 0; $i < $length; $i++) {
+      $ret_data->[$i] = Math->csinf($x_data->[$i]);
+    }
+    
+    return $ret_ndarray;
+  }
+
+  precompile static method cos : R::NDArray::FloatComplex ($x_ndarray : R::NDArray::FloatComplex) {
+    
+    unless ($x_ndarray) {
+      die "The n-dimension array \$x_ndarray must be defined.";
+    }
+    
+    my $length = $x_ndarray->length;
+    
+    my $x_dim = $x_ndarray->dim;
+    
+    my $ret_ndarray = &c(undef, $x_dim);
+    
+    my $x_data = $x_ndarray->data;
+    my $ret_data = $ret_ndarray->data;
+    
+    for (my $i = 0; $i < $length; $i++) {
+      $ret_data->[$i] = Math->ccosf($x_data->[$i]);
+    }
+    
+    return $ret_ndarray;
+  }
+  
+  precompile static method tan : R::NDArray::FloatComplex ($x_ndarray : R::NDArray::FloatComplex) {
+    
+    unless ($x_ndarray) {
+      die "The n-dimension array \$x_ndarray must be defined.";
+    }
+    
+    my $length = $x_ndarray->length;
+    
+    my $x_dim = $x_ndarray->dim;
+    
+    my $ret_ndarray = &c(undef, $x_dim);
+    
+    my $x_data = $x_ndarray->data;
+    my $ret_data = $ret_ndarray->data;
+    
+    for (my $i = 0; $i < $length; $i++) {
+      $ret_data->[$i] = Math->ctanf($x_data->[$i]);
+    }
+    
+    return $ret_ndarray;
+  }
+  
+  precompile static method sinh : R::NDArray::FloatComplex ($x_ndarray : R::NDArray::FloatComplex) {
+    
+    unless ($x_ndarray) {
+      die "The n-dimension array \$x_ndarray must be defined.";
+    }
+    
+    my $length = $x_ndarray->length;
+    
+    my $x_dim = $x_ndarray->dim;
+    
+    my $ret_ndarray = &c(undef, $x_dim);
+    
+    my $x_data = $x_ndarray->data;
+    my $ret_data = $ret_ndarray->data;
+    
+    for (my $i = 0; $i < $length; $i++) {
+      $ret_data->[$i] = Math->csinhf($x_data->[$i]);
+    }
+    
+    return $ret_ndarray;
+  }
+  
+  precompile static method cosh : R::NDArray::FloatComplex ($x_ndarray : R::NDArray::FloatComplex) {
+    
+    unless ($x_ndarray) {
+      die "The n-dimension array \$x_ndarray must be defined.";
+    }
+    
+    my $length = $x_ndarray->length;
+    
+    my $x_dim = $x_ndarray->dim;
+    
+    my $ret_ndarray = &c(undef, $x_dim);
+    
+    my $x_data = $x_ndarray->data;
+    my $ret_data = $ret_ndarray->data;
+    
+    for (my $i = 0; $i < $length; $i++) {
+      $ret_data->[$i] = Math->ccoshf($x_data->[$i]);
+    }
+    
+    return $ret_ndarray;
+  }
+  
+  precompile static method tanh : R::NDArray::FloatComplex ($x_ndarray : R::NDArray::FloatComplex) {
+    
+    unless ($x_ndarray) {
+      die "The n-dimension array \$x_ndarray must be defined.";
+    }
+    
+    my $length = $x_ndarray->length;
+    
+    my $x_dim = $x_ndarray->dim;
+    
+    my $ret_ndarray = &c(undef, $x_dim);
+    
+    my $x_data = $x_ndarray->data;
+    my $ret_data = $ret_ndarray->data;
+    
+    for (my $i = 0; $i < $length; $i++) {
+      $ret_data->[$i] = Math->ctanhf($x_data->[$i]);
+    }
+    
+    return $ret_ndarray;
+  }
+  
+  precompile static method acos : R::NDArray::FloatComplex ($x_ndarray : R::NDArray::FloatComplex) {
+    
+    unless ($x_ndarray) {
+      die "The n-dimension array \$x_ndarray must be defined.";
+    }
+    
+    my $length = $x_ndarray->length;
+    
+    my $x_dim = $x_ndarray->dim;
+    
+    my $ret_ndarray = &c(undef, $x_dim);
+    
+    my $x_data = $x_ndarray->data;
+    my $ret_data = $ret_ndarray->data;
+    
+    for (my $i = 0; $i < $length; $i++) {
+      $ret_data->[$i] = Math->cacosf($x_data->[$i]);
+    }
+    
+    return $ret_ndarray;
+  }
+  
+  precompile static method asin : R::NDArray::FloatComplex ($x_ndarray : R::NDArray::FloatComplex) {
+    
+    unless ($x_ndarray) {
+      die "The n-dimension array \$x_ndarray must be defined.";
+    }
+    
+    my $length = $x_ndarray->length;
+    
+    my $x_dim = $x_ndarray->dim;
+    
+    my $ret_ndarray = &c(undef, $x_dim);
+    
+    my $x_data = $x_ndarray->data;
+    my $ret_data = $ret_ndarray->data;
+    
+    for (my $i = 0; $i < $length; $i++) {
+      $ret_data->[$i] = Math->casinf($x_data->[$i]);
+    }
+    
+    return $ret_ndarray;
+  }
+  
+  precompile static method atan : R::NDArray::FloatComplex ($x_ndarray : R::NDArray::FloatComplex) {
+    
+    unless ($x_ndarray) {
+      die "The n-dimension array \$x_ndarray must be defined.";
+    }
+    
+    my $length = $x_ndarray->length;
+    
+    my $x_dim = $x_ndarray->dim;
+    
+    my $ret_ndarray = &c(undef, $x_dim);
+    
+    my $x_data = $x_ndarray->data;
+    my $ret_data = $ret_ndarray->data;
+    
+    for (my $i = 0; $i < $length; $i++) {
+      $ret_data->[$i] = Math->catanf($x_data->[$i]);
+    }
+    
+    return $ret_ndarray;
+  }
+  
+  precompile static method asinh : R::NDArray::FloatComplex ($x_ndarray : R::NDArray::FloatComplex) {
+    
+    unless ($x_ndarray) {
+      die "The n-dimension array \$x_ndarray must be defined.";
+    }
+    
+    my $length = $x_ndarray->length;
+    
+    my $x_dim = $x_ndarray->dim;
+    
+    my $ret_ndarray = &c(undef, $x_dim);
+    
+    my $x_data = $x_ndarray->data;
+    my $ret_data = $ret_ndarray->data;
+    
+    for (my $i = 0; $i < $length; $i++) {
+      $ret_data->[$i] = Math->casinhf($x_data->[$i]);
+    }
+    
+    return $ret_ndarray;
+  }
+  
+  precompile static method acosh : R::NDArray::FloatComplex ($x_ndarray : R::NDArray::FloatComplex) {
+    
+    unless ($x_ndarray) {
+      die "The n-dimension array \$x_ndarray must be defined.";
+    }
+    
+    my $length = $x_ndarray->length;
+    
+    my $x_dim = $x_ndarray->dim;
+    
+    my $ret_ndarray = &c(undef, $x_dim);
+    
+    my $x_data = $x_ndarray->data;
+    my $ret_data = $ret_ndarray->data;
+    
+    for (my $i = 0; $i < $length; $i++) {
+      $ret_data->[$i] = Math->cacoshf($x_data->[$i]);
+    }
+    
+    return $ret_ndarray;
+  }
+  
+  precompile static method atanh : R::NDArray::FloatComplex ($x_ndarray : R::NDArray::FloatComplex) {
+    
+    unless ($x_ndarray) {
+      die "The n-dimension array \$x_ndarray must be defined.";
+    }
+    
+    my $length = $x_ndarray->length;
+    
+    my $x_dim = $x_ndarray->dim;
+    
+    my $ret_ndarray = &c(undef, $x_dim);
+    
+    my $x_data = $x_ndarray->data;
+    my $ret_data = $ret_ndarray->data;
+    
+    for (my $i = 0; $i < $length; $i++) {
+      $ret_data->[$i] = Math->catanhf($x_data->[$i]);
+    }
+    
+    return $ret_ndarray;
+  }
+  
+  precompile static method exp : R::NDArray::FloatComplex ($x_ndarray : R::NDArray::FloatComplex) {
+    
+    unless ($x_ndarray) {
+      die "The n-dimension array \$x_ndarray must be defined.";
+    }
+    
+    my $length = $x_ndarray->length;
+    
+    my $x_dim = $x_ndarray->dim;
+    
+    my $ret_ndarray = &c(undef, $x_dim);
+    
+    my $x_data = $x_ndarray->data;
+    my $ret_data = $ret_ndarray->data;
+    
+    for (my $i = 0; $i < $length; $i++) {
+      $ret_data->[$i] = Math->cexpf($x_data->[$i]);
+    }
+    
+    return $ret_ndarray;
+  }
+  
+  precompile static method log : R::NDArray::FloatComplex ($x_ndarray : R::NDArray::FloatComplex) {
+    
+    unless ($x_ndarray) {
+      die "The n-dimension array \$x_ndarray must be defined.";
+    }
+    
+    my $length = $x_ndarray->length;
+    
+    my $x_dim = $x_ndarray->dim;
+    
+    my $ret_ndarray = &c(undef, $x_dim);
+    
+    my $x_data = $x_ndarray->data;
+    my $ret_data = $ret_ndarray->data;
+    
+    for (my $i = 0; $i < $length; $i++) {
+      $ret_data->[$i] = Math->clogf($x_data->[$i]);
+    }
+    
+    return $ret_ndarray;
+  }
+  
+  precompile static method sqrt : R::NDArray::FloatComplex ($x_ndarray : R::NDArray::FloatComplex) {
+    
+    unless ($x_ndarray) {
+      die "The n-dimension array \$x_ndarray must be defined.";
+    }
+    
+    my $length = $x_ndarray->length;
+    
+    my $x_dim = $x_ndarray->dim;
+    
+    my $ret_ndarray = &c(undef, $x_dim);
+    
+    my $x_data = $x_ndarray->data;
+    my $ret_data = $ret_ndarray->data;
+    
+    for (my $i = 0; $i < $length; $i++) {
+      $ret_data->[$i] = Math->csqrtf($x_data->[$i]);
+    }
+    
+    return $ret_ndarray;
+  }
+  
+  precompile static method conj : R::NDArray::FloatComplex ($x_ndarray : R::NDArray::FloatComplex) {
+    
+    unless ($x_ndarray) {
+      die "The n-dimension array \$x_ndarray must be defined.";
+    }
+    
+    my $length = $x_ndarray->length;
+    
+    my $x_dim = $x_ndarray->dim;
+    
+    my $ret_ndarray = &c(undef, $x_dim);
+    
+    my $x_data = $x_ndarray->data;
+    my $ret_data = $ret_ndarray->data;
+    
+    for (my $i = 0; $i < $length; $i++) {
+      $ret_data->[$i] = Math->conjf($x_data->[$i]);
+    }
+    
+    return $ret_ndarray;
+  }
+  
+  precompile static method arg : R::NDArray::Float ($x_ndarray : R::NDArray::FloatComplex) {
+    
+    unless ($x_ndarray) {
+      die "The n-dimension array \$x_ndarray must be defined.";
+    }
+    
+    my $length = $x_ndarray->length;
+    
+    my $x_dim = $x_ndarray->dim;
+    
+    my $ret_ndarray = R::OP::Float->c(undef, $x_dim);
+    
+    my $x_data = $x_ndarray->data;
+    my $ret_data = $ret_ndarray->data;
+    
+    for (my $i = 0; $i < $length; $i++) {
+      $ret_data->[$i] = Math->cargf($x_data->[$i]);
+    }
+    
+    return $ret_ndarray;
+  }
+  
+  precompile static method re : R::NDArray::Float ($x_ndarray : R::NDArray::FloatComplex) {
+    
+    unless ($x_ndarray) {
+      die "The n-dimension array \$x_ndarray must be defined.";
+    }
+    
+    my $length = $x_ndarray->length;
+    
+    my $x_dim = $x_ndarray->dim;
+    
+    my $ret_ndarray = R::OP::Float->c(undef, $x_dim);
+    
+    my $x_data = $x_ndarray->data;
+    my $ret_data = $ret_ndarray->data;
+    
+    for (my $i = 0; $i < $length; $i++) {
+      $ret_data->[$i] = $x_data->[$i]{re};
+    }
+    
+    return $ret_ndarray;
+  }
+  
+  precompile static method im : R::NDArray::Float ($x_ndarray : R::NDArray::FloatComplex) {
+    
+    unless ($x_ndarray) {
+      die "The n-dimension array \$x_ndarray must be defined.";
+    }
+    
+    my $length = $x_ndarray->length;
+    
+    my $x_dim = $x_ndarray->dim;
+    
+    my $ret_ndarray = R::OP::Float->c(undef, $x_dim);
+    
+    my $x_data = $x_ndarray->data;
+    my $ret_data = $ret_ndarray->data;
+    
+    for (my $i = 0; $i < $length; $i++) {
+      $ret_data->[$i] = $x_data->[$i]{im};
+    }
+    
+    return $ret_ndarray;
+  }
+  
+  precompile static method pow : R::NDArray::FloatComplex ($x_ndarray : R::NDArray::FloatComplex, $y_ndarray : R::NDArray::FloatComplex) {
+    
+    unless ($x_ndarray) {
+      die "The n-dimension array \$x_ndarray must be defined.";
+    }
+    
+    unless ($y_ndarray) {
+      die "The n-dimension array \$y_ndarray must be defined.";
+    }
+    
+    my $equals_dim = R::OP->equals_dim($x_ndarray, $y_ndarray);
+    
+    unless ($equals_dim) {
+      die "The dim field of \$x_ndarray must be the same as the dim field of \$y_ndarray.";
+    }
+    
+    my $length = $x_ndarray->length;
+    
+    my $x_dim = $x_ndarray->dim;
+    
+    my $ret_ndarray = &c(undef, $x_dim);
+    my $ret_data = $ret_ndarray->data;
+    
+    my $x_data = $x_ndarray->data;
+    my $y_data = $y_ndarray->data;
+    
+    for (my $i = 0; $i < $length; $i++) {
+      $ret_data->[$i] = Math->cpowf($x_data->[$i], $y_data->[$i]);
+    }
+    
+    return $ret_ndarray;
+  }
+  
+  precompile static method eq : R::NDArray::Int ($x_ndarray : R::NDArray::FloatComplex, $y_ndarray : R::NDArray::FloatComplex) {
+    
+    unless ($x_ndarray) {
+      die "The n-dimension array \$x_ndarray must be defined.";
+    }
+    
+    unless ($y_ndarray) {
+      die "The n-dimension array \$y_ndarray must be defined.";
+    }
+    
+    my $equals_dim = R::OP->equals_dim($x_ndarray, $y_ndarray);
+    
+    unless ($equals_dim) {
+      die "The dim field of \$x_ndarray must be the same as the dim field of \$y_ndarray.";
+    }
+    
+    my $length = $x_ndarray->length;
+    
+    my $x_dim = $x_ndarray->dim;
+    
+    my $ret_ndarray = R::OP::Int->c(undef, $x_dim);
+    my $ret_data = $ret_ndarray->data;
+    
+    my $x_data = $x_ndarray->data;
+    my $y_data = $y_ndarray->data;
+    
+    for (my $i = 0; $i < $length; $i++) {
+      $ret_data->[$i] = $x_data->[$i]{re} == $y_data->[$i]{re} && $x_data->[$i]{im} == $y_data->[$i]{im};
+    }
+    
+    return $ret_ndarray;
+  }
+  
+  precompile static method ne : R::NDArray::Int ($x_ndarray : R::NDArray::FloatComplex, $y_ndarray : R::NDArray::FloatComplex) {
+    
+    unless ($x_ndarray) {
+      die "The n-dimension array \$x_ndarray must be defined.";
+    }
+    
+    unless ($y_ndarray) {
+      die "The n-dimension array \$y_ndarray must be defined.";
+    }
+    
+    my $equals_dim = R::OP->equals_dim($x_ndarray, $y_ndarray);
+    
+    unless ($equals_dim) {
+      die "The dim field of \$x_ndarray must be the same as the dim field of \$y_ndarray.";
+    }
+    
+    my $length = $x_ndarray->length;
+    
+    my $x_dim = $x_ndarray->dim;
+    
+    my $ret_ndarray = R::OP::Int->c(undef, $x_dim);
+    my $ret_data = $ret_ndarray->data;
+    
+    my $x_data = $x_ndarray->data;
+    my $y_data = $y_ndarray->data;
+    
+    for (my $i = 0; $i < $length; $i++) {
+      $ret_data->[$i] = !($x_data->[$i]{re} == $y_data->[$i]{re} && $x_data->[$i]{im} == $y_data->[$i]{im});
+    }
+    
+    return $ret_ndarray;
+  }
+  
+  precompile static method sum : R::NDArray::FloatComplex ($x_ndarray : R::NDArray::FloatComplex) {
+    
+    unless ($x_ndarray) {
+      die "The n-dimension array \$x_ndarray must be defined.";
+    }
+    
+    my $length = $x_ndarray->length;
+    
+    my $x_dim = $x_ndarray->dim;
+    
+    my $ret_ndarray = &c(undef, [1]);
+    
+    my $x_data = $x_ndarray->data;
+    my $ret_data = $ret_ndarray->data;
+    
+    my $sum : Complex_2f;
+    for (my $i = 0; $i < $length; $i++) {
+      $sum = Math->caddf($sum, $x_data->[$i]);
+    }
+    $ret_data->[0] = $sum;
+    
+    return $ret_ndarray;
+  }
+  
+  precompile static method cumsum : R::NDArray::FloatComplex ($x_ndarray : R::NDArray::FloatComplex) {
+    
+    unless ($x_ndarray) {
+      die "The n-dimension array \$x_ndarray must be defined.";
+    }
+    
+    my $length = $x_ndarray->length;
+    
+    my $x_dim = $x_ndarray->dim;
+    
+    my $ret_ndarray = &c(undef, $x_dim);
+    
+    my $x_data = $x_ndarray->data;
+    my $ret_data = $ret_ndarray->data;
+    
+    my $sum : Complex_2f;
+    for (my $i = 0; $i < $length; $i++) {
+      $sum = Math->caddf($sum, $x_data->[$i]);
+      $ret_data->[$i] = $sum;
+    }
+    
+    return $ret_ndarray;
+  }
+  
+  precompile static method prod : R::NDArray::FloatComplex ($x_ndarray : R::NDArray::FloatComplex) {
+    
+    unless ($x_ndarray) {
+      die "The n-dimension array \$x_ndarray must be defined.";
+    }
+    
+    my $length = $x_ndarray->length;
+    
+    my $x_dim = $x_ndarray->dim;
+    
+    my $ret_ndarray = &c(undef, [1]);
+    
+    my $x_data = $x_ndarray->data;
+    my $ret_data = $ret_ndarray->data;
+    
+    my $prod = Math->complexf(1, 0);
+    for (my $i = 0; $i < $length; $i++) {
+      $prod = Math->cmulf($prod, $x_data->[$i]);
+    }
+    $ret_data->[0] = $prod;
+    
+    return $ret_ndarray;
+  }
+  
+  precompile static method cumprod : R::NDArray::FloatComplex ($x_ndarray : R::NDArray::FloatComplex) {
+    
+    unless ($x_ndarray) {
+      die "The n-dimension array \$x_ndarray must be defined.";
+    }
+    
+    my $length = $x_ndarray->length;
+    
+    my $x_dim = $x_ndarray->dim;
+    
+    my $ret_ndarray = &c(undef, $x_dim);
+    
+    my $x_data = $x_ndarray->data;
+    my $ret_data = $ret_ndarray->data;
+    
+    my $prod = Math->complexf(1, 0);
+    for (my $i = 0; $i < $length; $i++) {
+      $prod = Math->cmulf($prod, $x_data->[$i]);
+      $ret_data->[$i] = $prod;
+    }
+    
+    return $ret_ndarray;
+  }
+  
+  static method complex : R::NDArray::FloatComplex ($pairs : float[]) {
+    
+    unless ($pairs) {
+      die "The pairs \$pairs must be defined.";
+    }
+    
+    my $pairs_length = @$pairs;
+    
+    unless ($pairs_length % 2 == 0) {
+      die "The length of the pairs \$pairs must be even number.";
+    }
+    
+    my $length = $pairs_length / 2;
+    
+    my $ret_ndarray = &c(undef, [$length]);
+    my $ret_data = $ret_ndarray->data;
+    
+    for (my $i = 0; $i < $pairs_length; $i += 2) {
+      $ret_data->[$i]{re} = $pairs->[$i];
+      $ret_data->[$i]{im} = $pairs->[$i + 1];
+    }
+    
+    return $ret_ndarray;
+  }
+  
+  static method i : R::NDArray::FloatComplex () {
+    
+    my $i = &complex([0f,1f]);
+    
+    return $i;
+  }
+  
+}

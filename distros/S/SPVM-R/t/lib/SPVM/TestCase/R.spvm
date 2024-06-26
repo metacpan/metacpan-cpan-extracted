@@ -1,0 +1,37 @@
+class TestCase::R {
+  use R;
+  use R::NDArray;
+  use R::NDArray::Int;
+  use R::NDArray::Long;
+  use R::NDArray::Float;
+  use R::NDArray::Double;
+  use R::NDArray::FloatComplex;
+  use R::NDArray::DoubleComplex;
+  
+  use R::NDArray::Byte;
+  use R::NDArray::Short;
+  use R::NDArray::String;
+  use R::NDArray::StringBuffer;
+  use R::NDArray::Time::Piece;
+  
+  use R::OP;
+  use R::OP::Int;
+  use R::OP::Long;
+  use R::OP::Float;
+  use R::OP::Double;
+  use R::OP::FloatComplex;
+  use R::OP::DoubleComplex;
+  
+  use R::OP::Byte;
+  use R::OP::Short;
+  use R::OP::String;
+  use R::OP::StringBuffer;
+  use R::OP::Time::Piece;
+  
+  use R::DataFrame;
+  
+  static method test : int () {
+    
+    return 1;
+  }
+}

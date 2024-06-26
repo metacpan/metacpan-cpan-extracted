@@ -6,7 +6,7 @@ our $VERSION = '0.01';
 
 =head1 NAME
 
-{{$dist->name}} - [One line description of module's purpose here]
+{{$name}} - [One line description of module's purpose here]
 
 =head1 DESCRIPTION
 

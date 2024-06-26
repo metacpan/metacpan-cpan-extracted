@@ -4,7 +4,7 @@ AtteanX::Serializer::TurtleTokens - Turtle Serializer
 
 =head1 VERSION
 
-This document describes AtteanX::Serializer::TurtleTokens version 0.033
+This document describes AtteanX::Serializer::TurtleTokens version 0.034
 
 =head1 SYNOPSIS
 
@@ -39,9 +39,10 @@ This document describes AtteanX::Serializer::TurtleTokens version 0.033
 use v5.14;
 use warnings;
 
-package AtteanX::Serializer::TurtleTokens 0.033 {
+package AtteanX::Serializer::TurtleTokens 0.034 {
 	use Moo;
 	use Data::Dumper;
+	use Types::Standard qw(Bool ArrayRef HashRef ConsumerOf);
 	use Encode qw(encode);
 	use Attean::ListIterator;
 	use List::MoreUtils qw(any);
@@ -50,6 +51,8 @@ package AtteanX::Serializer::TurtleTokens 0.033 {
 	use namespace::clean;
 	with 'Attean::API::AbbreviatingSerializer';
 	with 'Attean::API::AppendableSerializer';
+
+	has suppress_whitespace => (is => 'rw', isa => Bool, default => 0);	
 	
 	sub canonical_media_type { return "text/turtle" }
 
@@ -63,6 +66,7 @@ package AtteanX::Serializer::TurtleTokens 0.033 {
 	}
 
 	sub file_extensions { return [qw(ttl)] }
+
 
 =item C<< serialize_iter_to_io( $fh, $iterator ) >>
 
@@ -115,12 +119,14 @@ L<IO::Handle> object C<< $fh >>.
 				}
 			}
 			
-			if ($newline) {
-				$io->print('    ' x $indent);
-				$newline	= 0;
-			} elsif ($need_space) {
-				$io->print(' ');
-				$need_space	= 0;
+			unless ($self->suppress_whitespace) {
+				if ($newline) {
+					$io->print('    ' x $indent);
+					$newline	= 0;
+				} elsif ($need_space) {
+					$io->print(' ');
+					$need_space	= 0;
+				}
 			}
 			
 			if ($type == PREFIX or $type == TURTLEPREFIX) {

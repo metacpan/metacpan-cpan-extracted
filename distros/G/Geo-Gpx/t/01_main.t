@@ -2,7 +2,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 31;
+use Test::More tests => 38;
 use Geo::Gpx;
 use File::Temp qw/ tempfile tempdir /;
 use Cwd qw(cwd abs_path);
@@ -109,6 +109,8 @@ is($o_ta->tracks_count, 2,             "    tracks_add(): test the number of tra
 # routes_add():
 $o_ta->routes_add( $aref2, name => 'My first route' );
 is($o_ta->routes_count, 1,             "    routes_add(): test the number of routes found");
+$o_wpt_only1->routes_add( $aref2 );
+is($o_wpt_only1->routes_count, 1,      "    routes_add(): test the number of routes found");
 
 # waypoints_search():
 my @search;
@@ -120,12 +122,6 @@ my $n_merged = $o->waypoints_merge( $o_wpt_only1, qr/LP[4-9]/ );
 is($n_merged, 2,                       "    waypoints_merge(): number of waypoints merged");
 is($o->waypoints_count, 6,             "    waypoints_merge(): number of waypoints found");
 
-# waypoint_closest_to();
-my $pt2 = Geo::Gpx::Point->new( lat => 45.405441, lon => -75.137497 );
-my ($closest, $dist) = $o_wpt_only1->waypoint_closest_to( $pt2 );
-isa_ok ($closest,  'Geo::Gpx::Point');
-is($dist, 241.593745,                  "    waypoints_closest_to(): check the distance to the closest waypoint");
-
 # waypoint_rename():
 is( $o_wpt_only1->waypoint_rename('LP1', 'LP1_renamed'), 'LP1_renamed', "    waypoint_rename(): check if rename is successful");
 is( $o_wpt_only1->waypoint_rename('LP1', 'Another name'), undef,        "    waypoint_rename(): check return value if unsuccessful");
@@ -135,6 +131,32 @@ is( $o_wpt_only1->waypoint_delete('LP1'), undef,    "    waypoint_delete(): chec
 $o_wpt_only1->waypoint_rename('LP1_renamed', 'LP1');
 is( $o_wpt_only1->waypoint_delete('LP1'), 1,        "    waypoint_delete(): check if waypoint deletion is successful");
 is( $o_wpt_only1->waypoints_count, 2,               "    waypoint_delete(): had 3 points, should now have 2");
+
+# test the various *_closest_to() methods:
+
+#   . point_closest_to();
+my $pt1 = Geo::Gpx::Point->new( lat => 45.405120, lon => -75.139360 );
+my ($closest_pt1, $dist1) = $o_wpt_only1->point_closest_to( $pt1 );
+isa_ok ($closest_pt1,  'Geo::Gpx::Point');
+is($dist1, 2.010698,                    "    point_closest_to(): check the distance to the closest point");
+
+#   . waypoint_closest_to();
+my $pt2 = Geo::Gpx::Point->new( lat => 45.405441, lon => -75.137497 );
+my ($closest_pt2, $dist2) = $o_wpt_only1->waypoint_closest_to( $pt2 );
+isa_ok ($closest_pt2,  'Geo::Gpx::Point');
+is($dist2, 241.593745,                  "    waypoint_closest_to(): check the distance to the closest waypoint");
+
+#   . trackpoint_closest_to();
+my $pt3 = Geo::Gpx::Point->new( lat => 45.405120, lon => -75.139360 );
+my ($closest_pt3, $dist3) = $o_wpt_only1->trackpoint_closest_to( $pt3 );
+isa_ok ($closest_pt3,  'Geo::Gpx::Point');
+is($dist3, 2.010698,                    "    trackpoint_closest_to(): check the distance to the closest trackpoint");
+
+#   . routepoint_closest_to();
+my $pt4 = Geo::Gpx::Point->new( lat => 45.405120, lon => -75.139360 );
+my ($closest_pt4, $dist4) = $o_wpt_only1->routepoint_closest_to( $pt4 );
+isa_ok ($closest_pt4,  'Geo::Gpx::Point');
+is($dist4, 48.328519,                   "    routepoint_closest_to(): check the distance to the closest routepoint");
 
 # track_rename():
 is( $o_ta->track_rename('A track with one segment', 'Single segment track'), 'Single segment track', "    track_rename(): check if rename is successful");

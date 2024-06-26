@@ -1,7 +1,10 @@
 package Kelp::Module::YAML;
-$Kelp::Module::YAML::VERSION = '1.00';
+$Kelp::Module::YAML::VERSION = '2.00';
 use Kelp::Base qw(Kelp::Module::Encoder);
 use YAML::PP;
+
+our $content_type = 'text/yaml';
+our $content_type_re = qr{^text/yaml}i;
 
 sub encoder_name { 'yaml' }
 
@@ -17,6 +20,10 @@ sub build_encoder
 sub build
 {
 	my ($self, %args) = @_;
+
+	require Kelp::Module::YAML::KelpExtensions
+		if delete $args{kelp_extensions};
+
 	$self->SUPER::build(%args);
 
 	$self->register(yaml => $self->get_encoder);
@@ -39,7 +46,7 @@ package Kelp::Module::YAML::Facade {
 		$self->engine->load_string(@_);
 	}
 }
-$Kelp::Module::YAML::Facade::VERSION = '1.00';
+$Kelp::Module::YAML::Facade::VERSION = '2.00';
 
 1;
 __END__
@@ -108,7 +115,43 @@ Returns the instance of L<YAML::PP>
 
 =head1 CONFIGURATION
 
-The entire configuration is fed to L<YAML::PP/new>.
+A single special flag exists, C<kelp_extensions> - if passed and true, YAML
+extensions for Kelp modules will be installed, adding some new methods to base
+Kelp packages:
+
+=over
+
+=item * Kelp::Request
+
+Adds C<is_yaml>, C<yaml_param> and C<yaml_content> methods, all working like
+json counterparts.
+
+=item * Kelp::Response
+
+Adds C<yaml> method and an ability for C<render> to turn a reference into YAML
+with proper content type.
+
+=item * Kelp::Test
+
+Adds C<yaml_cmp> and C<yaml_content> methods, working like their json counterparts.
+
+=back
+
+The rest of the configuration is fed to L<YAML::PP/new>.
+
+YAML content type for the extensions is deduced based on content of
+C<$Kelp::Module::YAML::content_type> and
+C<$Kelp::Module::YAML::content_type_re> variables and is C<text/yaml> by
+default.
+
+=head1 CAVEATS
+
+While C<encode> and C<decode> methods in the facade will handle call context
+and multiple YAML documents just fine, the installed extensions to Kelp
+components will work in a scalar (single-document) mode. To avoid mistakes,
+C<yaml_content> in request will return C<undef> if there is more than one
+document in the request, since in scalar context YAML::PP will return just the
+first one, ignoring the rest of the data.
 
 =head1 SEE ALSO
 

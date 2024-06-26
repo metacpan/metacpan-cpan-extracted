@@ -7,7 +7,7 @@ AtteanX::Parser::SPARQL - SPARQL 1.1 Parser.
 
 =head1 VERSION
 
-This document describes AtteanX::Parser::SPARQL version 0.033.
+This document describes AtteanX::Parser::SPARQL version 0.034.
 
 =head1 SYNOPSIS
 
@@ -70,7 +70,7 @@ L<Attean::API::AbbreviatingParser>.
 
 =cut
 
-package AtteanX::Parser::SPARQL 0.033;
+package AtteanX::Parser::SPARQL 0.034;
 
 use strict;
 use warnings;
@@ -83,7 +83,7 @@ use URI::NamespaceMap;
 use List::MoreUtils qw(zip);
 use AtteanX::Parser::SPARQLLex;
 use AtteanX::SPARQL::Constants;
-use Types::Standard qw(InstanceOf HashRef ArrayRef Bool Str Int);
+use Types::Standard qw(ConsumerOf InstanceOf HashRef ArrayRef Bool Str Int);
 use Scalar::Util qw(blessed looks_like_number reftype refaddr);
 
 ######################################################################
@@ -99,6 +99,7 @@ has '_stack'		=> (is => 'rw', isa => ArrayRef);
 has 'filters'		=> (is => 'rw', isa => ArrayRef);
 has 'counter'		=> (is => 'rw', isa => Int, default => 0);
 has '_pattern_container_stack'	=> (is => 'rw', isa => ArrayRef);
+has 'blank_nodes'	=> (is => 'ro', isa => HashRef[ConsumerOf['Attean::API::Blank']], predicate => 'has_blank_nodes_map', default => sub { +{} });
 
 sub file_extensions { return [qw(rq ru)] }
 
@@ -114,6 +115,7 @@ sub handled_type {
 }
 
 with 'Attean::API::AtOnceParser', 'Attean::API::Parser', 'Attean::API::AbbreviatingParser';
+with 'Attean::API::CDTBlankNodeMappingParser';
 with 'MooX::Log::Any';
 
 sub BUILDARGS {
@@ -965,16 +967,27 @@ sub __SelectVars {
 }
 
 sub _BrackettedAliasExpression {
-	my $self	= shift;
+	my $self				= shift;
+	my $allow_multiple_vars	= shift || 0;
 	$self->_expected_token(LPAREN);
 	$self->_Expression;
 	my ($expr)	= splice(@{ $self->{_stack} });
 	$self->_expected_token(KEYWORD, 'AS');
 	$self->_Var;
 	my ($var)	= splice(@{ $self->{_stack} });
-	$self->_expected_token(RPAREN);
 	
-	return ($var, $expr);
+	if ($allow_multiple_vars) {
+		my @vars	= ($var);
+		while ($self->_optional_token(COMMA)) {
+			$self->_Var;
+			push( @vars, splice(@{ $self->{_stack} }));
+		}
+		$self->_expected_token(RPAREN);
+		return (\@vars, $expr);
+	} else {
+		$self->_expected_token(RPAREN);
+		return ($var, $expr);
+	}
 }
 
 sub __SelectVar_test {
@@ -1587,7 +1600,26 @@ sub __handle_GraphPatternNotTriples {
 	} elsif ($class eq 'Attean::Algebra::Table') {
  		my ($table)	= @args;
 		$self->_add_patterns( $table );
-	} elsif ($class eq 'Attean::Algebra::Extend') {
+	} elsif ($class =~ /^Attean::Algebra::Unfold$/) {
+		my ($cont, $hints)	= $self->_pop_pattern_container;
+		my $ggp		= $self->_new_join(@$cont);
+		$ggp->hints($hints);
+		$self->_push_pattern_container;
+		# my $ggp	= $self->_remove_pattern();
+		unless ($ggp) {
+			$ggp	= Attean::Algebra::BGP->new();
+		}
+		my @vars	= @{ $args[0] };
+		my $expr	= $args[1];
+		foreach my $var (@vars) {
+			my %in_scope	= map { $_ => 1 } $ggp->in_scope_variables;
+			if (exists $in_scope{ $var->value }) {
+				croak "Syntax error: BIND used with variable already in scope";
+			}
+		}
+		my $bind	= $class->new( children => [$ggp], variables => \@vars, expression => $expr );
+		$self->_add_patterns( $bind );
+	} elsif ($class =~ /^Attean::Algebra::Extend$/) {
 		my ($cont, $hints)	= $self->_pop_pattern_container;
 		my $ggp		= $self->_new_join(@$cont);
 		$ggp->hints($hints);
@@ -1601,7 +1633,7 @@ sub __handle_GraphPatternNotTriples {
 		if (exists $in_scope{ $var->value }) {
 			croak "Syntax error: BIND used with variable already in scope";
 		}
-		my $bind	= Attean::Algebra::Extend->new( children => [$ggp], variable => $var, expression => $expr );
+		my $bind	= $class->new( children => [$ggp], variable => $var, expression => $expr );
 		$self->_add_patterns( $bind );
 	} elsif ($class eq 'Attean::Algebra::Service') {
 		my ($endpoint, $pattern, $silent)	= @args;
@@ -1805,7 +1837,7 @@ sub _GraphPatternNotTriples_test {
 	my $t	= $self->_peek_token;
 	return unless ($t);
 	return 0 unless ($t->type == KEYWORD);
-	return ($t->value =~ qr/^(VALUES|BIND|SERVICE|MINUS|OPTIONAL|GRAPH|HINT)$/i);
+	return ($t->value =~ qr/^(VALUES|BIND|UNFOLD|SERVICE|MINUS|OPTIONAL|GRAPH|HINT)$/i);
 }
 
 sub _GraphPatternNotTriples {
@@ -1818,6 +1850,8 @@ sub _GraphPatternNotTriples {
 		$self->_MinusGraphPattern;
 	} elsif ($self->_test_token(KEYWORD, 'BIND')) {
 		$self->_Bind;
+	} elsif ($self->_test_token(KEYWORD, 'UNFOLD')) {
+		$self->_Unfold;
 	} elsif ($self->_test_token(KEYWORD, 'HINT')) {
 		$self->_Hint;
 	} elsif ($self->_test_token(KEYWORD, 'OPTIONAL')) {
@@ -1877,7 +1911,12 @@ sub _InlineDataClause {
 	foreach my $row (@rows) {
 		my %d;
 		# Turn triple patterns into ground triples.
-		@d{ map { $_->value } @vars } = map { $_->does('Attean::API::TriplePattern') ? $_->as_triple : $_ } @$row;
+		@d{ map { $_->value } @vars } = map { (blessed($_) and $_->does('Attean::API::TriplePattern')) ? $_->as_triple : $_ } @$row;
+		foreach my $k (keys %d) {
+			unless (blessed($d{$k})) {
+				delete $d{$k};
+			}
+		}
 		my $result	= Attean::Result->new(bindings => \%d);
 		push(@vbs, $result);
 	}
@@ -1891,6 +1930,13 @@ sub _Bind {
 	$self->_expected_token(KEYWORD, 'BIND');
 	my ($var, $expr)	= $self->_BrackettedAliasExpression;
 	$self->_add_stack( ['Attean::Algebra::Extend', $var, $expr] );
+}
+
+sub _Unfold {
+	my $self	= shift;
+	$self->_expected_token(KEYWORD, 'UNFOLD');
+	my ($var, $expr)	= $self->_BrackettedAliasExpression(1);
+	$self->_add_stack( ['Attean::Algebra::Unfold', $var, $expr] );
 }
 
 sub _Hint {
@@ -2885,7 +2931,7 @@ sub _UnaryExpression {
 		### if it's just a literal, force the positive down into the literal
 		if (blessed($expr) and $expr->isa('Attean::ValueExpression') and $expr->value->does('Attean::API::NumericLiteral')) {
 			my $value	= '+' . $expr->value->value;
-			my $l		= Attean::Literal->new( value => $value, datatype => $expr->value->datatype );
+			my $l		= $self->new_literal( value => $value, datatype => $expr->value->datatype );
 			my $lexpr	= Attean::ValueExpression->new( value => $l );
 			$self->_add_stack( $lexpr );
 		} else {
@@ -2899,12 +2945,12 @@ sub _UnaryExpression {
 		### if it's just a literal, force the negative down into the literal instead of make an unnecessary multiplication.
 		if (blessed($expr) and $expr->isa('Attean::ValueExpression') and $expr->value->does('Attean::API::NumericLiteral')) {
 			my $value	= -1 * $expr->value->value;
-			my $l		= Attean::Literal->new( value => $value, datatype => $expr->value->datatype );
+			my $l		= $self->new_literal( value => $value, datatype => $expr->value->datatype );
 			my $lexpr	= Attean::ValueExpression->new( value => $l );
 			$self->_add_stack( $lexpr );
 		} else {
 			my $int		= 'http://www.w3.org/2001/XMLSchema#integer';
-			my $l		= Attean::Literal->new( value => '-1', datatype => $int );
+			my $l		= $self->new_literal( value => '-1', datatype => $int );
 			my $neg		= $self->new_binary_expression( '*', Attean::ValueExpression->new( value => $l ), $expr );
 			my $lexpr	= Attean::ValueExpression->new( value => $neg );
 			$self->_add_stack( $lexpr );
@@ -3016,40 +3062,52 @@ sub _Aggregate {
 	}
 	
 	my $star	= 0;
-	my (@expr, %options);
+	my (@expr, %scalar_args, %options);
 	if ($self->_optional_token(STAR)) {
 		$star	= 1;
 	} else {
 		$self->_Expression;
+		
 		push(@expr, splice(@{ $self->{_stack} }));
-		if ($op eq 'GROUP_CONCAT') {
+		if ($op =~ /^(GROUP_CONCAT|FOLD)$/) { # aggs that can take multiple arguments
 			while ($self->_optional_token(COMMA)) {
 				$self->_Expression;
 				push(@expr, splice(@{ $self->{_stack} }));
 			}
-			if ($self->_optional_token(SEMICOLON)) {
-				$self->_expected_token(KEYWORD, 'SEPARATOR');
+		}
+		
+		if ($self->_OrderClause_test()) {
+			local($self->{build}{__aggregate});
+			local($self->{__aggregate_call_ok});
+			local($self->{build}{options}{orderby});
+			$self->_OrderClause();
+			$options{ order }	= $self->{build}{options}{orderby};
+		}
+		if ($self->_optional_token(SEMICOLON)) {
+			if ($self->_optional_token(KEYWORD, 'SEPARATOR')) {
 				$self->_expected_token(EQUALS);
 				my $sep		= $self->_String;
-				$options{ seperator }	= $sep;
+				$scalar_args{ seperator }	= $sep;
 			}
 		}
 	}
+	$self->_expected_token(RPAREN);
+
 	my $arg	= join(',', map { blessed($_) ? $_->as_string : $_ } @expr);
 	if ($distinct) {
 		$arg	= 'DISTINCT ' . $arg;
 	}
 	my $name	= sprintf('%s(%s)', $op, $arg);
-	$self->_expected_token(RPAREN);
 	
 	my $var		= Attean::Variable->new( value => ".$name");
 	my $agg		= Attean::AggregateExpression->new(
 					distinct	=> $distinct,
 					operator	=> $op,
 					children	=> [@expr],
-					scalar_vars	=> \%options,
+					scalar_vars	=> \%scalar_args,
 					variable	=> $var,
-					custom_iri	=> $custom_agg_iri
+					custom_iri	=> $custom_agg_iri,
+					%options
 				);
 	$self->{build}{__aggregate}{ $name }	= [ $var, $agg ];
 	my $expr	= Attean::ValueExpression->new(value => $var);
@@ -3062,7 +3120,7 @@ sub _BuiltInCall_test {
 	my $t		= $self->_peek_token;
 	return unless ($t);
 	if ($self->{__aggregate_call_ok}) {
-		return 1 if ($self->_test_token(KEYWORD, qr/^(MIN|MAX|COUNT|AVG|SUM|SAMPLE|GROUP_CONCAT)$/io));
+		return 1 if ($self->_test_token(KEYWORD, qr/^(MIN|MAX|COUNT|AVG|SUM|SAMPLE|GROUP_CONCAT|FOLD)$/io));
 	}
 	return 1 if ($self->_test_token(KEYWORD, 'NOT'));
 	return 1 if ($self->_test_token(KEYWORD, 'EXISTS'));
@@ -3074,7 +3132,7 @@ sub _BuiltInCall_test {
 sub _BuiltInCall {
 	my $self	= shift;
 	my $t		= $self->_peek_token;
-	if ($self->{__aggregate_call_ok} and $self->_test_token(KEYWORD, qr/^(MIN|MAX|COUNT|AVG|SUM|SAMPLE|GROUP_CONCAT)\b/io)) {
+	if ($self->{__aggregate_call_ok} and $self->_test_token(KEYWORD, qr/^(MIN|MAX|COUNT|AVG|SUM|SAMPLE|GROUP_CONCAT|FOLD)\b/io)) {
 		$self->_Aggregate;
 	} elsif ($self->_test_token(KEYWORD, qr/^(NOT|EXISTS)/)) {
 		my $not	= $self->_optional_token(KEYWORD, 'NOT');
@@ -3208,14 +3266,14 @@ sub _RDFLiteral {
 	if ($self->_test_token(LANG)) {
 		my $t	= $self->_expected_token(LANG);
 		my $lang	= $t->value;
-		$obj	= Attean::Literal->new( value => $value, language => $lang );
+		$obj	= $self->new_literal( value => $value, language => $lang );
 	} elsif ($self->_test_token(HATHAT)) {
 		$self->_expected_token(HATHAT);
 		$self->_IRIref;
 		my ($iri)	= splice(@{ $self->{_stack} });
-		$obj	= Attean::Literal->new( value => $value, datatype => $iri );
+		$obj	= $self->new_literal( value => $value, datatype => $iri );
 	} else {
-		$obj	= Attean::Literal->new( value => $value );
+		$obj	= $self->new_literal( value => $value );
 	}
 	
 	return $obj;
@@ -3252,7 +3310,7 @@ sub _NumericLiteral {
 		$value	= $sign . $value;
 	}
 	
-	my $obj	= Attean::Literal->new( value => $value, datatype => $type );
+	my $obj	= $self->new_literal( value => $value, datatype => $type );
 # 	if ($self->{args}{canonicalize} and blessed($obj) and $obj->isa('RDF::Trine::Node::Literal')) {
 # 		$obj	= $obj->canonicalize;
 # 	}
@@ -3266,7 +3324,7 @@ sub _BooleanLiteral {
 	my $t		= $self->_expected_token(BOOLEAN);
 	my $bool	= $t->value;
 
-	my $obj	= Attean::Literal->new( value => $bool, datatype => 'http://www.w3.org/2001/XMLSchema#boolean' );
+	my $obj	= $self->new_literal( value => $bool, datatype => 'http://www.w3.org/2001/XMLSchema#boolean' );
 # 	if ($self->{args}{canonicalize} and blessed($obj) and $obj->isa('RDF::Trine::Node::Literal')) {
 # 		$obj	= $obj->canonicalize;
 # 	}
@@ -3390,7 +3448,9 @@ sub _BlankNode {
 	}
 	if (my $b = $self->_optional_token(BNODE)) {
 		my $label	= $b->value;
-		return Attean::Blank->new($label);
+		my $b	= Attean::Blank->new($label);
+		$self->blank_nodes->{$label}	= $b;
+		return $b;
 	} else {
 		$self->_expected_token(ANON);
 		return Attean::Blank->new();
@@ -3675,7 +3735,18 @@ sub __new_path_pred {
 	my @nodes	= @_;
 
 	if ($op eq '!') {
-		return Attean::Algebra::NegatedPropertySet->new( predicates => \@nodes );
+		my @preds;
+		my @reversed;
+		foreach my $p (@nodes) {
+			if (blessed($p)) {
+				push(@preds, $p);
+			} elsif (reftype($p) eq 'ARRAY' and $p->[1] eq '^' and blessed($p->[2])) {
+				push(@reversed, $p->[2]);
+			} else {
+				die "Unexpected NPS element: " . Dumper($p);
+			}
+		}
+		return Attean::Algebra::NegatedPropertySet->new( predicates => \@preds, reversed => \@reversed );
 	}
 	
 	foreach my $i (0 .. $#nodes) {
@@ -3868,7 +3939,7 @@ sub _token_error {
 	croak $message;
 }
 
-package AtteanX::Parser::SPARQL::ObjectWrapper 0.033;
+package AtteanX::Parser::SPARQL::ObjectWrapper 0.034;
 
 use strict;
 use warnings;

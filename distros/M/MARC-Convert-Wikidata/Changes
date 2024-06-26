@@ -1,3 +1,8 @@
+0.10 2024-06-25T19:59:41+02:00
+ - Add missing requires.
+ - Rewrite to new MARC::Convert::Wikidata::Object::Series with publisher
+   object.
+
 0.09 2024-06-25T08:35:41+02:00
  - Add another publishing places cleanup (Ve Praze, We Praze). Thanks Josef
    Moravec.

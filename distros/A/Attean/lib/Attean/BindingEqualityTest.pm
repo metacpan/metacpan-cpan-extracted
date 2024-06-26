@@ -7,7 +7,7 @@ Attean::BindingEqualityTest - Test for equality of binding sets with bnode isomo
 
 =head1 VERSION
 
-This document describes Attean::BindingEqualityTest version 0.033
+This document describes Attean::BindingEqualityTest version 0.034
 
 =head1 SYNOPSIS
 
@@ -59,7 +59,7 @@ package Attean::BindingEqualityTest::_Iter {
 	}
 }
 
-package Attean::BindingEqualityTest 0.033 {
+package Attean::BindingEqualityTest 0.034 {
 	use v5.14;
 	use warnings;
 	use Moo;
@@ -130,8 +130,9 @@ there exists a bijection between the RDF statements of the invocant and $graph).
 			return 0;
 		}
 		
+		my $mapper = Attean::TermMap->canonicalization_map;
 		for ($nba, $nbb) {
-			@$_	= sort map { $_->as_string } @$_;
+			@$_	= sort map { $_->apply_map($mapper)->as_string } @$_;
 		}
 		
 		foreach my $i (0 .. $#{ $nba }) {
@@ -315,7 +316,12 @@ solutions, the solution returned is arbitrary.
 # 		}
 		
 		my $canon_map	= Attean::TermMap->canonicalization_map;
-		my %bb_master	= map { $_->apply_map($canon_map)->as_string => 1 } @$bb;
+		my %bb_master;
+		foreach my $bb_item (@$bb) {
+			my $k	= $bb_item->apply_map($canon_map)->as_string;
+			$bb_master{ $k }++;
+		}
+# 		my %bb_master	= map { $_->apply_map($canon_map)->as_string => 1 } @$bb;
 	
 		my $count	= 0;
 		MAPPING: while (my $mapping = $kbp->next) {
@@ -336,7 +342,9 @@ solutions, the solution returned is arbitrary.
 				$self->log->trace("checking for '$mapped_st' in " . Dumper(\%bb));
 				if ($bb{ $mapped_st }) {
 					$self->log->trace("Found mapping for binding: " . Dumper($mapped_st));
-					delete $bb{ $mapped_st };
+					if (--$bb{ $mapped_st } == 0) {
+						delete $bb{ $mapped_st };
+					}
 				} else {
 					$self->log->trace("No mapping found for binding: " . Dumper($mapped_st));
 # 					warn "No mapping found for binding: " . Dumper($mapped_st);
@@ -373,6 +381,9 @@ containing blank nodes and bindings without any blank nodes, respectively.
 		my $iter	= shift;
 		my (@blanks, @nonblanks);
 		while (my $st = $iter->next) {
+			unless ($st->does('Attean::API::Binding')) {
+				die "Unexpected non-binding value found in BindingEqualityTest: " . $st->as_string;
+			}
 			if ($st->has_blanks) {
 				push(@blanks, $st);
 			} else {

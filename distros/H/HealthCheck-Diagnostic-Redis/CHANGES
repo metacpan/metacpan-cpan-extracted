@@ -1,6 +1,14 @@
 Changelog for HealthCheck-Diagnostic-Redis
 
-v0.0.5 2020-07-01T19:54:57
+v0.0.6 2024-06-25T17:15:51
+ - Update README and LICENSE (Andrew Hewus Fresh)
+ - Update Makefile from upstream (Andrew Hewus Fresh)
+ - Document internals for Pod::Coverage (Andrew Hewus Fresh)
+ - Pull request #5: SM-4906 (Mitch McCracken)
+ - Enable reconnecting & increase timeout values (Mitch McCracken)
+ - Update Makefile (Mitch McCracken)
+
+v0.0.5 2020-07-01T19:45:02
  - Update README (Brandon Messineo)
  - Use `set` instead of `setex` (Brandon Messineo)
  - Set expiration on key when setting value (Brandon Messineo)

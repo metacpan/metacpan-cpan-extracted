@@ -11,7 +11,7 @@ use String::Random;
 
 # ABSTRACT: Check for Redis connectivity and operations in HealthCheck
 use version;
-our $VERSION = 'v0.0.5'; # VERSION
+our $VERSION = 'v0.0.6'; # VERSION
 
 sub new {
     my ($class, @params) = @_;
@@ -60,13 +60,15 @@ sub run {
         $redis = Redis::Fast->new(
             server => $host,
 
-            # HealthCheck should not reconnect
-            reconnect => 0,
+            # Attempt to reconnect up to 5 times every 1 second. It is common to
+            # need to reconnect when in a hiredis environment in particular.
+            reconnect => 5,
+            every     => 1_000_000,
 
-            # Make this quick...
-            cnx_timeout => 0.5,
-            read_timeout => 0.5,
-            write_timeout => 0.5,
+            # 5 second connect/read/write timeouts.
+            cnx_timeout   => 5,
+            read_timeout  => 5,
+            write_timeout => 5,
         );
     };
     return {
@@ -165,7 +167,7 @@ HealthCheck::Diagnostic::Redis - Check for Redis connectivity and operations in 
 
 =head1 VERSION
 
-version v0.0.5
+version v0.0.6
 
 =head1 SYNOPSIS
 
@@ -203,6 +205,16 @@ by-default.
 
 Use a static key name instead of a randomly-generated one.
 
+=head2 INTERNALS
+
+=head2 test_read_only
+
+This method is used when L</read_only> is set.
+
+=head2 test_read_write
+
+This method is used when L</read_only> is not set.
+
 =head1 DEPENDENCIES
 
 L<Redis::Fast>
@@ -218,7 +230,7 @@ Grant Street Group <developers@grantstreet.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2019 - 2020 by Grant Street Group.
+This software is Copyright (c) 2019 - 2024 by Grant Street Group.
 
 This is free software, licensed under:
 

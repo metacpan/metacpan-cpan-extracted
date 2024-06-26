@@ -7,7 +7,7 @@ Attean::API::Binding - Name to term bindings
 
 =head1 VERSION
 
-This document describes Attean::API::Binding version 0.033
+This document describes Attean::API::Binding version 0.034
 
 =head1 DESCRIPTION
 
@@ -71,7 +71,7 @@ otherwise.
 
 use Type::Tiny::Role;
 
-package Attean::API::Binding 0.033 {
+package Attean::API::Binding 0.034 {
 	use Scalar::Util qw(blessed);
 	use List::MoreUtils qw(zip);
 
@@ -131,11 +131,7 @@ package Attean::API::Binding 0.033 {
 		foreach my $v (@variables) {
 			my $value		= $self->value($v);
 			my $other_value	= $other->value($v);
-			if ($value->does('Attean::API::Binding')) {
-				return 0 unless $value->sameTerms($other_value);
-			} else {
-				return 0 unless ($value->equals($other_value));
-			}
+			return 0 unless $value->sameTerms($other_value);
 		}
 		return 1;
 	}
@@ -289,7 +285,7 @@ C<< $binding >>.
 	}
 }
 
-package Attean::API::TripleOrQuadPattern 0.033 {
+package Attean::API::TripleOrQuadPattern 0.034 {
 	use Encode qw(encode);
 	use List::MoreUtils qw(zip);
 	use Scalar::Util qw(blessed);
@@ -469,7 +465,7 @@ parsed from C<< $string >> in SPARQL syntax.
 	}
 }
 
-package Attean::API::TripleOrQuad 0.033 {
+package Attean::API::TripleOrQuad 0.034 {
 	use List::MoreUtils qw(any);
 	use Carp;
 
@@ -485,7 +481,7 @@ package Attean::API::TripleOrQuad 0.033 {
 	}
 }
 
-package Attean::API::TriplePattern 0.033 {
+package Attean::API::TriplePattern 0.034 {
 	use List::MoreUtils qw(zip);
 	use Scalar::Util qw(blessed);
 
@@ -544,7 +540,7 @@ package Attean::API::TriplePattern 0.033 {
 	with 'Attean::API::TripleOrQuadPattern', 'Attean::API::Binding', 'Attean::API::TermOrVariableOrTriplePattern';
 }
 
-package Attean::API::Triple 0.033 {
+package Attean::API::Triple 0.034 {
 	use Scalar::Util qw(blessed);
 	use Moo::Role;
 	
@@ -564,7 +560,7 @@ package Attean::API::Triple 0.033 {
 				my $type	= Type::Tiny::Role->new( role => $role );
 				my $err		= $type->validate($term);
 				if ($err) {
-					die "${class}'s $method failed conformance check for role $role";
+					die "${class}'s $method failed conformance check for role $role: " . $term->as_string;
 				}
 				return $term;
 			};
@@ -583,7 +579,18 @@ package Attean::API::Triple 0.033 {
 		return join(' ', '<<', (map { $_->ntriples_string } @values), '>>');
 	}
 
+	sub order {
+		my $self	= shift;
+		return _compare('order', $self, @_);
+	}
+	
 	sub compare {
+		my $self	= shift;
+		return _compare('compare', $self, @_);
+	}
+	
+	sub _compare {
+		my $cmp_method	= shift;
 		my ($a, $b)	= @_;
 		return 1 unless blessed($b);
 		if (not $b->does('Attean::API::Triple')) {
@@ -594,7 +601,7 @@ package Attean::API::Triple 0.033 {
 		foreach my $pos ($a->variables) {
 			my $at	= $a->$pos();
 			my $bt	= $b->$pos();
-			my $c	= $at->compare($bt);
+			my $c	= $at->$cmp_method($bt);
 			
 			# If they are equal, continue. otherwise check if either term is an IRI.
 			# This is because term equality is defined for IRIs, but < and > isn't.
@@ -624,7 +631,7 @@ package Attean::API::Triple 0.033 {
 	with 'Attean::API::TermOrTriple';
 }
 
-package Attean::API::QuadPattern 0.033 {
+package Attean::API::QuadPattern 0.034 {
 	use Scalar::Util qw(blessed);
 	use List::MoreUtils qw(zip);
 
@@ -681,7 +688,7 @@ package Attean::API::QuadPattern 0.033 {
 	with 'Attean::API::TripleOrQuadPattern', 'Attean::API::Binding';
 }
 
-package Attean::API::Quad 0.033 {
+package Attean::API::Quad 0.034 {
 	use Moo::Role;
 	
 	if ($ENV{ATTEAN_TYPECHECK}) {
@@ -708,7 +715,7 @@ package Attean::API::Quad 0.033 {
 }
 
 
-package Attean::API::Result 0.033 {
+package Attean::API::Result 0.034 {
 	use Scalar::Util qw(refaddr);
 	use Types::Standard qw(HashRef);
 

@@ -1,5 +1,5 @@
 NAME
-    Dist-Zilla-MintingProfile-RTx - Basic Minting Profile for RTx modules
+    Dist::Zilla::MintingProfile::RTx - Basic Minting Profile for RTx modules
 
 USAGE
         dzil setup # it'll use your author and license info
@@ -20,7 +20,7 @@ AUTHOR
     Kevin Falcone <falcone@bestpractical.com>
 
 LICENCE AND COPYRIGHT
-    Copyright (c) 2011-2020, Best Practical Solutions, LLC. All rights
+    Copyright (c) 2011-2024, Best Practical Solutions, LLC. All rights
     reserved.
 
     This module is free software; you can redistribute it and/or modify it

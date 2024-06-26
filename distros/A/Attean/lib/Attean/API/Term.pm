@@ -7,7 +7,7 @@ Attean::API::Term - RDF Terms
 
 =head1 VERSION
 
-This document describes Attean::API::Term version 0.033
+This document describes Attean::API::Term version 0.034
 
 =head1 DESCRIPTION
 
@@ -41,7 +41,7 @@ Returns a string serialization of the term.
 
 =cut
 
-package Attean::API::Term 0.033 {
+package Attean::API::Term 0.034 {
 	use Moo::Role;
 	
 	with 'Attean::API::TermOrVariable', 'Attean::API::ResultOrTerm';
@@ -61,6 +61,18 @@ Returns true if the term has a true SPARQL "effective boolean value", false othe
 
 	requires 'ebv';
 	requires 'compare';
+	requires 'sameTerms';
+	
+=item C<< order ( $other ) >>
+
+Similar to C<< compare >>, but provides the ordering semantics of ORDER BY.
+
+=cut
+
+	sub order {
+		my $self	= shift;
+		return $self->compare(@_);
+	}
 	
 	sub __ntriples_string {
 		my $self	= shift;
@@ -108,7 +120,7 @@ Returns true if the term has a true SPARQL "effective boolean value", false othe
 	with 'Attean::API::TermOrTriple';
 }
 
-package Attean::API::Literal 0.033 {
+package Attean::API::Literal 0.034 {
 	use IRI;
 	use Scalar::Util qw(blessed);
 	use Types::Standard qw(Maybe Str ConsumerOf);
@@ -160,6 +172,8 @@ package Attean::API::Literal 0.033 {
 				Moo::Role->apply_roles_to_object($self, 'Attean::API::BooleanLiteral');
 			} elsif ($type eq 'http://www.w3.org/2001/XMLSchema#dateTime') {
 				Moo::Role->apply_roles_to_object($self, 'Attean::API::DateTimeLiteral');
+			} elsif (my $role = Attean->get_datatype_role($type)) {
+				Moo::Role->apply_roles_to_object($self, $role);
 			}
 		}
 	};
@@ -208,6 +222,19 @@ package Attean::API::Literal 0.033 {
 		return -1 if ($b->does('Attean::API::Binding'));
 		my $c	= ((($a->language // '') cmp ($b->language // '')) || ($a->datatype->value cmp $b->datatype->value) || ($a->value cmp $b->value));
 		return $c;
+	}
+	
+=item C<< sameTerms( $other ) >>
+
+=cut
+
+	sub sameTerms {
+		my $lhs	= shift;
+		my $rhs	= shift;
+		return 0 unless ($rhs->does('Attean::API::Literal'));
+		return 0 unless ($lhs->value eq $rhs->value);
+		return 0 unless ($lhs->datatype->value eq $rhs->datatype->value);
+		return 1;
 	}
 	
 	if ($ENV{ATTEAN_TYPECHECK}) {
@@ -296,7 +323,7 @@ package Attean::API::Literal 0.033 {
 	};
 }
 
-package Attean::API::DateTimeLiteral 0.033 {
+package Attean::API::DateTimeLiteral 0.034 {
 	use DateTime::Format::W3CDTF;
 
 	use Moo::Role;
@@ -308,17 +335,18 @@ package Attean::API::DateTimeLiteral 0.033 {
 	}
 }
 
-package Attean::API::CanonicalizingLiteral 0.033 {
+package Attean::API::CanonicalizingLiteral 0.034 {
 	use Moo::Role;
 	requires 'canonicalized_term';
+	requires 'canonicalized_term_strict';
 }
 
-package Attean::API::BooleanLiteral 0.033 {
+package Attean::API::BooleanLiteral 0.034 {
 	use Scalar::Util qw(blessed looks_like_number);
 
 	use Moo::Role;
 
-	sub canonicalized_term {
+	sub canonicalized_term_strict {
 		my $self	= shift;
 		my $value	= $self->value;
 		if ($value =~ m/^(true|false|0|1)$/) {
@@ -329,13 +357,31 @@ package Attean::API::BooleanLiteral 0.033 {
 			die "Bad lexical form for xsd:boolean: '$value'";
 		}
 	}
+
+	sub canonicalized_term {
+		my $self	= shift;
+		my $value	= $self->value;
+		if ($value =~ m/^(true|false|0|1)$/) {
+			return ($value eq 'true' or $value eq '1')
+				? Attean::Literal->true
+				: Attean::Literal->false;
+		} else {
+			return $self;
+		}
+	}
 	with 'Attean::API::Literal', 'Attean::API::CanonicalizingLiteral';
 }
 
-package Attean::API::NumericLiteral 0.033 {
+package Attean::API::NumericLiteral 0.034 {
 	use Scalar::Util qw(blessed looks_like_number);
 
 	use Moo::Role;
+
+	sub equals {
+		my ($a, $b)	= @_;
+		return 0 unless ($b->does('Attean::API::NumericLiteral'));
+		return $a->numeric_value == $b->numeric_value;
+	}
 
 	sub compare {
 		my ($a, $b)	= @_;
@@ -349,9 +395,20 @@ package Attean::API::NumericLiteral 0.033 {
 # 			Attean::API::Literal::compare($a, $b);
 		}
 	}
+
+	sub canonicalized_term_strict {
+		my $self	= shift;
+		return $self->_canonicalized_term(1, @_);
+	}
 	
 	sub canonicalized_term {
 		my $self	= shift;
+		return $self->_canonicalized_term(0, @_);
+	}
+	
+	sub _canonicalized_term {
+		my $self	= shift;
+		my $strict	= shift;
 		my $value	= $self->value;
 		my $type	= $self->datatype->value;
 		$type		=~ s/^.*#//;
@@ -363,7 +420,8 @@ package Attean::API::NumericLiteral 0.033 {
 				$num		=~ s/^0+(\d)/$1/;
 				return Attean::Literal->integer("${sign}${num}");
 			} else {
-				die "Bad lexical form for xsd:integer: '$value'";
+ 				die "Bad lexical form for xsd:integer: '$value'" if ($strict);
+				return $self;
 			}
 		} elsif ($type eq 'negativeInteger') {
 			if ($value =~ m/^-(\d+)$/) {
@@ -371,7 +429,8 @@ package Attean::API::NumericLiteral 0.033 {
 				$num		=~ s/^0+(\d)/$1/;
 				return Attean::Literal->new(value => "-${num}", datatype => 'http://www.w3.org/2001/XMLSchema#negativeInteger');
 			} else {
-				die "Bad lexical form for xsd:integer: '$value'";
+				die "Bad lexical form for xsd:integer: '$value'" if ($strict);
+				return $self;
 			}
 		} elsif ($type eq 'decimal') {
 			if ($value =~ m/^([-+])?((\d+)([.]\d*)?)$/) {
@@ -396,7 +455,8 @@ package Attean::API::NumericLiteral 0.033 {
 				$num		=~ s/^0+(.)/$1/;
 				return Attean::Literal->decimal("${sign}${num}");
 			} else {
-				die "Bad lexical form for xsd:deciaml: '$value'";
+				die "Bad lexical form for xsd:deciaml: '$value'" if ($strict);
+				return $self;
 			}
 		} elsif ($type eq 'float') {
 			if ($value =~ m/^(?:([-+])?(?:(\d+(?:\.\d*)?|\.\d+)([Ee][-+]?\d+)?|(INF)))|(NaN)$/) {
@@ -422,7 +482,8 @@ package Attean::API::NumericLiteral 0.033 {
 				$exp	=~ s/E(-?)0+$/E${1}0/;
 				return Attean::Literal->float("${sign}${num}${exp}");
 			} else {
-				die "Bad lexical form for xsd:float: '$value'";
+				die "Bad lexical form for xsd:float: '$value'" if ($strict);
+				return $self;
 			}
 		} elsif ($type eq 'boolean') {
 			if ($value =~ m/^(true|false|0|1)$/) {
@@ -430,7 +491,8 @@ package Attean::API::NumericLiteral 0.033 {
 					? Attean::Literal->true
 					: Attean::Literal->false;
 			} else {
-				die "Bad lexical form for xsd:boolean: '$value'";
+				die "Bad lexical form for xsd:boolean: '$value'" if ($strict);
+				return $self;
 			}
 		} elsif ($type eq 'double') {
 			if ($value =~ m/^(?:([-+])?(?:(\d+(?:\.\d*)?|\.\d+)([Ee][-+]?\d+)?|(INF)))|(NaN)$/) {
@@ -456,7 +518,8 @@ package Attean::API::NumericLiteral 0.033 {
 				$exp	=~ s/E(-?)0+$/E${1}0/;
 				return Attean::Literal->double("${sign}${num}${exp}");
 			} else {
-				die "Bad lexical form for xsd:double: '$value'";
+				die "Bad lexical form for xsd:double: '$value'" if ($strict);
+				return $self;
 			}
 		} else {
 			warn "No canonicalization for type $type";
@@ -542,7 +605,7 @@ package Attean::API::NumericLiteral 0.033 {
 	with 'Attean::API::Literal', 'Attean::API::CanonicalizingLiteral';
 }
 
-package Attean::API::Blank 0.033 {
+package Attean::API::Blank 0.034 {
 	use Scalar::Util qw(blessed);
 	use AtteanX::SPARQL::Constants;
 	use AtteanX::SPARQL::Token;
@@ -567,9 +630,21 @@ package Attean::API::Blank 0.033 {
 		return -1 unless ($b->does('Attean::API::Blank'));
 		return ($a->value cmp $b->value);
 	}
+
+=item C<< sameTerms( $other ) >>
+
+=cut
+
+	sub sameTerms {
+		my $lhs	= shift;
+		my $rhs	= shift;
+		return 0 unless ($rhs->does('Attean::API::Blank'));
+		return 0 unless ($lhs->value eq $rhs->value);
+		return 1;
+	}
 }
 
-package Attean::API::IRI 0.033 {
+package Attean::API::IRI 0.034 {
 	use IRI;
 	use Scalar::Util qw(blessed);
 	use AtteanX::SPARQL::Constants;
@@ -601,6 +676,18 @@ package Attean::API::IRI 0.033 {
 		return ($a->value cmp $b->value);
 	}
 	
+=item C<< sameTerms( $other ) >>
+
+=cut
+
+	sub sameTerms {
+		my $lhs	= shift;
+		my $rhs	= shift;
+		return 0 unless ($rhs->does('Attean::API::IRI'));
+		return 0 unless ($lhs->value eq $rhs->value);
+		return 1;
+	}
+
 	sub _ntriples_string {
 		my $self	= shift;
 		return sprintf('<%s>', $self->__ntriples_string);

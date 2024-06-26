@@ -5,6 +5,7 @@ author:
   - 'Gregory Todd Williams <gwilliams@cpan.org>'
 build_requires:
   ExtUtils::MakeMaker: 6.59
+  HTTP::Headers: 0
   HTTP::Message::PSGI: 0
   Regexp::Common: 0
   Test::Exception: 0
@@ -16,7 +17,7 @@ configure_requires:
   ExtUtils::MakeMaker: 6.59
 distribution_type: module
 dynamic_config: 1
-generated_by: 'Module::Install version 1.19'
+generated_by: 'Module::Install version 1.21'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -49,6 +50,7 @@ requires:
   Test::Modern: 0.012
   Test::Moose: 0
   Test::Roo: 0
+  Test::TypeTiny: 0
   Text::CSV: 0
   Text::Table: 0
   Try::Tiny: 0
@@ -65,4 +67,4 @@ resources:
   homepage: https://metacpan.org/release/Attean
   license: http://dev.perl.org/licenses/
   repository: https://github.com/kasei/attean/
-version: '0.033'
+version: '0.034'

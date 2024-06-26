@@ -1,5 +1,13 @@
 Revision history for Geo-Gpx
 
+1.11 [2024-06-25]
+    The encoding of entities in xml() and save() has a new default:
+        - only the <, >, &, and " characters are now encoded by default with HTML::Entities
+        - key implication is that most multi-byte unicode characters are left as-is and no longer encoded as entities
+        - users can revert to the previous default (which is equivalent to that of HTML::Entities) by explicitly setting unsafe_chars => undef
+
+    Version argument in xml() is now implemented as key/value pair instead of a positional parameter
+
 1.10 [2023-11-25]
     New methods for waypoints:
         - waypoint_rename(), waypoints_print(),

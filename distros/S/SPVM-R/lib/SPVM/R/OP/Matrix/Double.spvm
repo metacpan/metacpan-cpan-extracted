@@ -1,0 +1,78 @@
+# Copyright (c) 2024 Yuki Kimoto
+# MIT License
+
+class R::OP::Matrix::Double {
+  
+  use R::NDArray::Double;
+  use R::OP::Double;
+  
+  static method matrix : R::NDArray::Double ($x_data : double[], $row : int, $column : int) {
+    
+    my $ndarray = R::OP::Double->c($x_data, [$row, $column]);
+    
+    return $ndarray;
+  }
+  
+  static method mul : R::NDArray::Double ($x_ndarray : R::NDArray::Double, $y_ndarray : R::NDArray::Double) {
+    
+    unless ($x_ndarray) {
+      die "The n-dimension array \$x_ndarray must be defined.";
+    }
+    
+    unless ($x_ndarray->is_vector || $x_ndarray->is_matrix) {
+      die "The n-dimension array \$x_ndarray must be a vector or a matrix.";
+    }
+    
+    unless ($y_ndarray) {
+      die "The n-dimension array \$y_ndarray must be defined.";
+    }
+    
+    unless ($x_ndarray->is_vector || $y_ndarray->is_matrix) {
+      die "The n-dimension array \$y_ndarray must be a vector or a matrix.";
+    }
+    
+    my $x_dim = $x_ndarray->dim;
+    
+    my $x_row = $x_dim->[0];
+    
+    my $x_column = 1;
+    if ($x_ndarray->is_matrix) {
+      $x_column = $x_dim->[1];
+    }
+    
+    my $y_dim = $y_ndarray->dim;
+    
+    my $y_row = $y_dim->[0];
+    
+    my $y_column = 1;
+    if ($y_ndarray->is_matrix) {
+      $y_column = $y_dim->[1];
+    }
+    
+    unless ($x_column == $y_row) {
+      die "The column of the matrix \$x_ndarray must be equal to the row of the matrix \$y_ndarray.";
+    }
+    
+    my $x_data = (double[])$x_ndarray->data;
+    
+    my $y_data = (double[])$y_ndarray->data;
+    
+    my $ret_row = -1;
+    
+    my $ret_column = -1;
+    
+    my $ret_data_ref = new double[][1];
+    
+    &_mul($x_data, $x_row, $x_column, $y_data, $y_row, $y_column, $ret_data_ref, \$ret_row, \$ret_column);
+    
+    my $ret_dim = [$ret_row, $ret_column];
+    
+    my $ret_data = $ret_data_ref->[0];
+    
+    my $ret_ndarray = R::OP::Double->c($ret_data, $ret_dim);
+    
+    return $ret_ndarray;
+  }
+  
+  native static method _mul : void ($x_data : double[], $x_row :int, $x_column : int, $y_data : double[], $y_row : int, $y_column : int, $ret_data_ref : double[][], $ret_row_ref : int*, $ret_column_ref : int*);
+}

@@ -1,5 +1,12 @@
 Revision history for Compression-Util
 
+0.09    2024-06-26
+
+        - Generalized `make_deflate_tables()` to generate tables for arbitrarily large distances and match lengths.
+        - Generalized `deflate_encode()` to encode arbitrarily large distances and arbitrarily large match lengths.
+        - Better compression ratio when `$LZ_MAX_DIST` is set to a small value.
+        - Minor documentation and performance improvements.
+
 0.08    2024-06-03
 
         [ADDITIONS]

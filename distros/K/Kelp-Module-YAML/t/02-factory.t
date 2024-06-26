@@ -1,6 +1,4 @@
-use strict;
-use warnings;
-
+use Kelp::Base -strict;
 use Test::More;
 use Kelp;
 

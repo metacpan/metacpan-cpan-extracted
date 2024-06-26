@@ -6,13 +6,13 @@ use warnings;
 use Business::ISBN;
 use Error::Pure qw(err);
 use Mo qw(build is);
-use Mo::utils qw(check_isa check_required);
+use Mo::utils 0.08 qw(check_isa check_required);
 use List::Util qw(none);
 use Readonly;
 
 Readonly::Array our @COVERS => qw(hardback paperback);
 
-our $VERSION = 0.03;
+our $VERSION = 0.04;
 
 has cover => (
 	is => 'ro',
@@ -220,12 +220,12 @@ L<http://skim.cz>
 
 =head1 LICENSE AND COPYRIGHT
 
-© Michal Josef Špaček 2021-2023
+© Michal Josef Špaček 2021-2024
 
 BSD 2-Clause License
 
 =head1 VERSION
 
-0.03
+0.04
 
 =cut

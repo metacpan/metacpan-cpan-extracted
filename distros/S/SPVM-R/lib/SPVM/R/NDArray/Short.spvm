@@ -1,0 +1,81 @@
+# Copyright (c) 2024 Yuki Kimoto
+# MIT License
+
+class R::NDArray::Short extends R::NDArray {
+  
+  # Class Mehtods
+  static method new : R::NDArray::Short ($options : object[] = undef) {
+    
+    my $self = new R::NDArray::Short;
+    
+    $self->init($options);
+    
+    return $self;
+  }
+  
+  protected method init : void ($options : object[] = undef) {
+    
+    $options = Fn->merge_options($options, {element_size => 2, type => "short", is_numeric => 1});
+    
+    $self->SUPER::init($options);
+  }
+  
+  method data : short[] () {
+    
+    return (short[])$self->{data};
+  }
+  
+  protected method check : void () {
+    
+    my $data = (short[])$self->{data};
+    
+    my $length = $self->length;
+    
+    unless (@$data == $length) {
+      die "The length of data field must be the same as length field.";
+    }
+  }
+  
+  protected method create_default_data : short[] ($length : int) {
+    
+    unless ($length >= 0) {
+      die "The length \$length must be more than or equal to 0.";
+    }
+    
+    my $data = new short[$length];
+    
+    return $data;
+  }
+  
+  method clone : R::NDArray::Short () {
+    return (R::NDArray::Short)$self->SUPER::clone;
+  }
+  
+  method element_to_string : string ($data_index : int) {
+    my $data = $self->data;
+    
+    my $element = $data->[$data_index];
+    
+    my $string = (string)(short)$element;
+    
+    return $string;
+  }
+  
+  precompile method set_order : void ($indexes : int[]) {
+    
+    $self->check_set_order_args($indexes);
+    
+    my $data = (short[])$self->{data};
+    
+    my $tmp = $self->clone;
+    
+    my $tmp_data = $tmp->data;
+    
+    my $length = $self->length;
+    for (my $i = 0; $i < $length; $i++) {
+      my $order_index = $indexes->[$i];
+      
+      $data->[$i] = $tmp_data->[$order_index];
+    }
+  }
+}

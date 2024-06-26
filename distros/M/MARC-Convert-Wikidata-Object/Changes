@@ -1,3 +1,14 @@
+0.04 2024-06-25T19:56:28+02:00
+ - API change: Add id parameter to Publisher object.
+ - API change: Add work_period_start and work_period_end getter methods to
+   MARC::Convert::Wikidata::Object::People class
+ - API change: Rewrite publisher parameter in Series to Publisher object.
+ - Add tests for People.
+ - Add tests for Series.
+ - Fix minimal versions of Mo::utils*.
+ - Improve Series doc.
+ - Update copyright years.
+
 0.03 2023-11-14T15:21:19+01:00
  - Add doc for Kramerius object.
  - Add test for Kramerius url() method.

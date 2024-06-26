@@ -1,0 +1,131 @@
+# Copyright (c) 2024 Yuki Kimoto
+# MIT License
+
+class R::OP {
+  
+  use R::NDArray;
+  
+  # Class Methods
+  static method equals_dim : int ($x_ndarray : R::NDArray, $y_ndarray : R::NDArray) {
+    
+    unless ($x_ndarray) {
+      die "The n-dimention array \$x_ndarray must be defined.";
+    }
+    
+    unless ($y_ndarray) {
+      die "The n-dimention array \$y_ndarray must be defined.";
+    }
+    
+    my $x_dim = $x_ndarray->dim;
+    
+    my $y_dim = $y_ndarray->dim;
+    
+    my $equals_dim = R::Util->equals_dim($x_dim, $y_dim);
+    
+    return $equals_dim;
+  }
+  
+  static method equals_dropped_dim : int ($x_ndarray : R::NDArray, $y_ndarray : R::NDArray) {
+    
+    unless ($x_ndarray) {
+      die "The n-dimention array \$x_ndarray must be defined.";
+    }
+    
+    unless ($y_ndarray) {
+      die "The n-dimention array \$y_ndarray must be defined.";
+    }
+    
+    my $x_dim = $x_ndarray->dim;
+    
+    my $y_dim = $y_ndarray->dim;
+    
+    my $equals_dim = R::Util->equals_dropped_dim($x_dim, $y_dim);
+    
+    return $equals_dim;
+  }
+  
+  precompile static method rep : R::NDArray ($x_ndarray : R::NDArray, $times : int) {
+    
+    unless ($x_ndarray) {
+      die "The n-dimension array \$x_ndarray must be defined.";
+    }
+    
+    my $x_dim = $x_ndarray->dim;
+    
+    unless (@$x_dim == 1) {
+      die "The length of dim field of \$x_ndarray must be 1.";
+    }
+    
+    unless ($times > 0) {
+      die "The repeat count \$times must be greater than 0.";
+    }
+    
+    my $x_length = $x_ndarray->length;
+    
+    my $ret_length = $x_length * $times;
+    
+    my $ndarray_class_name = type_name $x_ndarray;
+    
+    my $ret_ndarray = R::NDArray->new_with_class_name($ndarray_class_name, {data => undef, dim => [$ret_length]});
+    
+    my $x_data = $x_ndarray->data;
+    my $ret_data = $ret_ndarray->data;
+    
+    for (my $i = 0; $i < $ret_length; $i += $x_length) {
+      my $x_index = $i % $x_length;
+      
+      if ($x_ndarray->is_numeric) {
+        my $element_size = $x_ndarray->element_size;
+        
+        Fn->memcpy($ret_data, $i, $x_data, $x_index, $element_size);
+      }
+      else {
+        $ret_data->(object[])->[$i] = $x_data->(object[])->[$x_index];
+      }
+    }
+    
+    return $ret_ndarray;
+  }
+  
+  precompile static method rep_length : R::NDArray ($x_ndarray : R::NDArray, $length : int) {
+    
+    unless ($x_ndarray) {
+      die "The n-dimension array \$x_ndarray must be defined.";
+    }
+    
+    my $x_dim = $x_ndarray->dim;
+    
+    unless (@$x_dim == 1) {
+      die "The length of dim field of \$x_ndarray must be 1.";
+    }
+    
+    unless ($length >= 0) {
+      die "The repeat count \$times must be greater than 0.";
+    }
+    
+    my $x_length = $x_ndarray->length;
+    
+    my $ndarray_class_name = type_name $x_ndarray;
+    
+    my $ret_ndarray = R::NDArray->new_with_class_name($ndarray_class_name, {data => undef, dim => [$length]});
+    
+    my $x_data = $x_ndarray->data;
+    my $ret_data = $ret_ndarray->data;
+    
+    for (my $i = 0; $i < $length; $i += $x_length) {
+      my $x_index = $i % $x_length;
+      
+      if ($x_ndarray->is_numeric) {
+        my $element_size = $x_ndarray->element_size;
+        
+        Fn->memcpy($ret_data, $i, $x_data, $x_index, $element_size);
+      }
+      else {
+        $ret_data->(object[])->[$i] = $x_data->(object[])->[$x_index];
+      }
+    }
+    
+    return $ret_ndarray;
+  }
+  
+}

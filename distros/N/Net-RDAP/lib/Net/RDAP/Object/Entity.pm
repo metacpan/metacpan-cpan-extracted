@@ -13,16 +13,17 @@ or organization).
 =head1 DESCRIPTION
 
 L<Net::RDAP::Object::Entity> represents persons or organizations in
-RDAP responses. An entity is a vCard object plus metadata.
-L<Net::RDAP::Object::Entity> inherits from L<Net::RDAP::Object> so has
-access to all that module's methods.
+RDAP responses. An entity is a L<jCard object|Net::RDAP::JCard> plus metadata.
+
+L<Net::RDAP::Object::Entity> inherits from L<Net::RDAP::Object> so has access to
+all that module's methods.
 
 Other methods include:
 
     @roles = $object->roles;
 
-Returns a (potentially empty) array listing this entity's roles.
-The possible values is defined by an IANA registry, see:
+Returns a (potentially empty) array listing this entity's roles. The possible
+values is defined by an IANA registry, see:
 
 =over
 
@@ -38,8 +39,8 @@ sub roles { $_[0]->{'roles'} ? @{$_[0]->{'roles'}} : () }
 
     my $jcard = $entity->jcard;
 
-Returns a L<Net::RDAP::JCard> for the entity. This is the recommended way
-to access the contents of the C<vcardArray> property of the entity object.
+Returns a L<Net::RDAP::JCard> object representing the C<vcardArray> property of
+the entity.
 
 =cut
 
@@ -52,10 +53,9 @@ sub jcard {
 
     $vcard = $entity->vcard;
 
-Returns a L<vCard> object for the entity. Support for all the miriad options in
-vCard files is limited: only the C<fn>, C<org>, C<email>, C<tel> and C<adr> node
-types (structured addresses only) are supported. The C<vcardArray()> method above
-is a better option of you need anything more than this.
+Returns a L<vCard> object for the entity. Only the C<fn>, C<org>, C<email>,
+C<tel> and C<adr> property types (structured addresses only) are supported. This
+method is B<DEPRECATED>.
 
 =cut
 

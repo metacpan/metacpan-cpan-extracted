@@ -7,7 +7,7 @@ AtteanX::Parser::NTuples - Shared functionality for N-Triples and N-Quads parser
 
 =head1 VERSION
 
-This document describes AtteanX::Parser::NTuples version 0.033
+This document describes AtteanX::Parser::NTuples version 0.034
 
 =head1 SYNOPSIS
 
@@ -23,13 +23,16 @@ This module provides a base class for RDF formats N-Triples and N-Quads.
 
 =cut
 
-package AtteanX::Parser::NTuples 0.033 {
+package AtteanX::Parser::NTuples 0.034 {
 	use utf8;
 	use Moo;
 	use Attean;
 	use Carp qw(carp);
 	use Encode qw(decode);
+	use Types::Standard qw(Bool HashRef ArrayRef HashRef Str Maybe InstanceOf ConsumerOf);
 	use namespace::clean;
+
+	has 'blank_nodes'	=> (is => 'ro', isa => HashRef[ConsumerOf['Attean::API::Blank']], predicate => 'has_blank_nodes_map', default => sub { +{} });
 
 =item C<< parse_term_from_bytes( $bytes ) >>
 
@@ -139,7 +142,9 @@ the data read from the L<IO::Handle> object C<< $fh >>.
 		} elsif ($char eq '_') {
 			my ($name)	= $_[0] =~ m/^_:([A-Za-z][A-Za-z0-9]*)/;
 			substr($_[0], 0, length($name)+2)	= '';
-			return Attean::Blank->new( $name );
+			my $b	= Attean::Blank->new($name);
+			$self->blank_nodes->{$name}	= $b;
+			return $b;
 		} elsif ($char eq '"') {
 			substr($_[0], 0, 1)	= '';
 			my $value	= decode('utf8', '');

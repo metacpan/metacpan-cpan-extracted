@@ -7,7 +7,7 @@ Attean::SimpleQueryEvaluator - Simple query evaluator
 
 =head1 VERSION
 
-This document describes Attean::SimpleQueryEvaluator version 0.033
+This document describes Attean::SimpleQueryEvaluator version 0.034
 
 =head1 SYNOPSIS
 
@@ -34,10 +34,12 @@ model, and returns a query result.
 use Attean::Algebra;
 use Attean::Expression;
 
-package Attean::SimpleQueryEvaluator 0.033 {
+package Attean::SimpleQueryEvaluator 0.034 {
 	use Moo;
 	use Encode qw(encode);
 	use Attean::RDF;
+	use AtteanX::Functions::CompositeLists;
+	use AtteanX::Functions::CompositeMaps;
 	use LWP::UserAgent;
 	use Scalar::Util qw(blessed);
 	use List::Util qw(all any reduce);
@@ -78,6 +80,12 @@ C<< $request_signer->sign( $request ) >>.
 	has 'request_signer' => (is => 'rw', isa => Object);
 	
 	has 'ground_blanks' => (is => 'rw', isa => Bool, default => 0);
+	
+	sub BUILD {
+		# Ensure that the CT extensions are registered
+		AtteanX::Functions::CompositeLists->register();
+		AtteanX::Functions::CompositeMaps->register();
+	}
 	
 =back
 
@@ -152,7 +160,7 @@ supplied C<< $active_graph >>.
 				foreach my $var (@extends) {
 					my $expr	= $extends{ $var };
 					my $val		= $expr_eval->evaluate_expression( $expr, $r, $active_graph, \%row_cache );
-					if ($val->does('Attean::API::Binding')) {
+					if (blessed($val) and $val->does('Attean::API::Binding')) {
 						# patterns need to be made ground to be bound as values (e.g. TriplePattern -> Triple)
 						$val	= $val->ground($r);
 					}
@@ -161,6 +169,77 @@ supplied C<< $active_graph >>.
 				}
 				return $r;
 			});
+		} elsif ($algebra->isa('Attean::Algebra::Unfold')) {
+			my $expr			= $algebra->expression;
+			my @vars			= map { $_->value } @{ $algebra->variables };
+			my ($first, $second);
+    		$first	= $vars[0];
+			if (scalar(@vars) == 2) {
+				$second	= $vars[1];
+			}
+
+			my ($child)			= @{ $algebra->children };
+			my $iter				= $self->evaluate( $child, $active_graph );
+			my @results;
+			while (my $r = $iter->next) {
+				my %extension;
+				my %row_cache;
+				my $val		= $expr_eval->evaluate_expression( $expr, $r, $active_graph, \%row_cache );
+				my $dt	= $val->datatype;
+				if ($dt->value eq $AtteanX::Functions::CompositeLists::LIST_TYPE_IRI) {
+					my @nodes	= AtteanX::Functions::CompositeLists::lex_to_list($val);
+					foreach my $i (0 .. $#nodes) {
+						my $val	= $nodes[$i];
+						my %bindings;
+						if (defined($val)) {
+							if ($val->does('Attean::API::Binding')) {
+								# patterns need to be made ground to be bound as values (e.g. TriplePattern -> Triple)
+								$val	= $val->ground($r);
+							}
+			# 					warn "Unfold error: $@" if ($@);
+							$bindings{$first}	= $val if ($val);
+						}
+					
+						if (defined($second)) {
+							$bindings{$second}	= Attean::Literal->integer(1+$i);
+						}
+						my $new	= Attean::Result->new( bindings => \%bindings )->join($r);
+						push(@results, $new);
+					}
+				} elsif ($dt->value eq $AtteanX::Functions::CompositeMaps::MAP_TYPE_IRI) {
+					my @nodes	= AtteanX::Functions::CompositeMaps::lex_to_map($val);
+					# The namespace map here is used to correctly parse maps with boolean keys like `{true:1}`
+					my $p		= AtteanX::Parser::Turtle->new();
+					while (my ($key_string, $val) = splice(@nodes, 0, 2)) {
+						my $key	= $p->parse_node($key_string); # TODO: this mistakes "true:4" as an attempted prefixname, not a key-value pair
+						my %bindings;
+						if (defined($first)) {
+							if ($key->does('Attean::API::Binding')) {
+								# patterns need to be made ground to be bound as values (e.g. TriplePattern -> Triple)
+								$key	= $key->ground($r);
+							}
+			# 					warn "Unfold error: $@" if ($@);
+							$bindings{$first}	= $key if ($key);
+						}
+
+						if (defined($second)) {
+							if (blessed($val) and $val->does('Attean::API::Binding')) {
+								# patterns need to be made ground to be bound as values (e.g. TriplePattern -> Triple)
+								$val	= $val->ground($r);
+							}
+			# 					warn "Unfold error: $@" if ($@);
+							$bindings{$second}	= $val if ($val);
+						}
+					
+						my $new	= Attean::Result->new( bindings => \%bindings )->join($r);
+						push(@results, $new);
+					}
+				}
+			}
+			my %vars = map { $_ => 1 } $iter->variables;
+			$vars{$first}++;
+			$vars{$second}++ if defined($second);
+			return Attean::ListIterator->new(variables => [keys %vars], values => \@results, item_type => 'Attean::API::Result');
 		} elsif ($algebra->isa('Attean::Algebra::Filter')) {
 			# TODO: Merge adjacent filter evaluation so that they can share a row_cache hash (as is done for Extend above)
 			my $expr	= $algebra->expression;
@@ -189,7 +268,7 @@ supplied C<< $active_graph >>.
 					} elsif (blessed($bv) and $bv->does('Attean::API::Binding') and (not(defined($av)) or not($av->does('Attean::API::Binding')))) {
 						$c	= -1;
 					} else {
-						$c		= eval { $av ? $av->compare($bv) : 1 };
+						$c		= eval { $av ? $av->order($bv) : 1 };
 						if ($@) {
 							$c	= 1;
 						}
@@ -488,7 +567,7 @@ supplied C<< $active_graph >>.
 			my $vars	= [map { $_->value } @{ $algebra->variables }];
 			return Attean::ListIterator->new(variables => $vars, values => $algebra->rows, item_type => 'Attean::API::Result');
 		}
-		die "Unimplemented algebra evaluation for: $algebra";
+		die "Unimplemented simple algebra evaluation for: $algebra";
 	}
 
 	
@@ -588,7 +667,7 @@ appended to C<< @new_vars >> as it is created.
 	}
 }
 
-package Attean::SimpleQueryEvaluator::ExpressionEvaluator 0.033 {
+package Attean::SimpleQueryEvaluator::ExpressionEvaluator 0.034 {
 	use Moo;
 	use Attean::RDF;
 	use Scalar::Util qw(blessed);
@@ -611,7 +690,8 @@ package Attean::SimpleQueryEvaluator::ExpressionEvaluator 0.033 {
 		my $active_graph	= shift;
 		my $row_cache		= shift || {};
 		my $impl			= $self->impl($expr, $active_graph);
-		return eval { $impl->($row, row_cache => $row_cache) };
+		my $result			= eval { $impl->($row, row_cache => $row_cache) };
+		return $result;
 	}
 	
 	sub impl {
@@ -719,8 +799,8 @@ package Attean::SimpleQueryEvaluator::ExpressionEvaluator 0.033 {
 			}
 			die "Unexpected operator evaluation: $op";
 		} elsif ($expr->isa('Attean::FunctionExpression')) {
-			my $func		= $expr->operator;
-			my @children	= map { $self->impl($_, $active_graph) } @{ $expr->children };
+			my $func			= $expr->operator;
+			my @children		= map { $self->impl($_, $active_graph) } @{ $expr->children };
 			my %type_roles		= qw(URI IRI IRI IRI BLANK Blank LITERAL Literal NUMERIC NumericLiteral TRIPLE Triple);
 			my %type_classes	= qw(URI Attean::IRI IRI Attean::IRI STR Attean::Literal);
 			return sub {
@@ -729,7 +809,8 @@ package Attean::SimpleQueryEvaluator::ExpressionEvaluator 0.033 {
 			
 				if ($func eq 'IF') {
 					my $term	= $children[0]->( $r, %args );
-					return ($term->ebv) ? $children[1]->( $r, %args ) : $children[2]->( $r, %args );
+					my $ebv		= $term->ebv;
+					return $ebv ? $children[1]->( $r, %args ) : $children[2]->( $r, %args );
 				} elsif ($func eq 'IN' or $func eq 'NOTIN') {
 					($true, $false)	= ($false, $true) if ($func eq 'NOTIN');
 					my $child	= shift(@children);
@@ -749,251 +830,267 @@ package Attean::SimpleQueryEvaluator::ExpressionEvaluator 0.033 {
 					return;
 				}
 			
-				my @operands	= map { $_->( $r, %args ) } @children;
-				if ($func =~ /^(STR)$/) {
-					return $type_classes{$1}->new($operands[0]->value);
-				} elsif ($func =~ /^(SUBJECT|PREDICATE|OBJECT)$/) {
-					my $pos	= lc($func);
-					my $term	= $operands[0]->$pos();
-					return $term;
-				} elsif ($func =~ /^([UI]RI)$/) {
-					my @base	= $expr->has_base ? (base => $expr->base) : ();
-					return $type_classes{$1}->new(value => $operands[0]->value, @base);
-				} elsif ($func eq 'BNODE') {
-					if (scalar(@operands)) {
-						my $name	= $operands[0]->value;
-						if (my $b = $row_cache->{bnodes}{$name}) {
-							return $b;
-						} else {
-							my $b	= Attean::Blank->new();
-							$row_cache->{bnodes}{$name}	= $b;
-							return $b;
-						}
-					}
-					return Attean::Blank->new();
-				} elsif ($func eq 'LANG') {
-					die "TypeError: LANG" unless ($operands[0]->does('Attean::API::Literal'));
-					return Attean::Literal->new($operands[0]->language // '');
-				} elsif ($func eq 'LANGMATCHES') {
-					my ($lang, $match)	= map { $_->value } @operands;
-					if ($match eq '*') {
-						# """A language-range of "*" matches any non-empty language-tag string."""
-						return ($lang ? $true : $false);
+				if ($func eq 'INVOKE') {
+					my $furi	= shift(@children)->( $r, %args )->value;
+					if (my $f = Attean->get_global_function($furi)) {
+						my @operands	= map { $_->( $r, %args ) } @children;
+						return $f->($self->evaluator->model, $active_graph, @operands);
+					} elsif (my $fform = Attean->get_global_functional_form($furi)) {
+						my @operands	= map { eval { $_->( $r, %args ) } || undef } @children;
+						return $fform->($self->evaluator->model, $active_graph, @operands);
 					} else {
-						return (I18N::LangTags::is_dialect_of( $lang, $match )) ? $true : $false;
-					}
-				} elsif ($func eq 'DATATYPE') {
-					return $operands[0]->datatype;
-				} elsif ($func eq 'BOUND') {
-					return $operands[0] ? $true : $false;
-				} elsif ($func eq 'RAND') {
-					return Attean::Literal->new( value => rand(), datatype => 'http://www.w3.org/2001/XMLSchema#double' );
-				} elsif ($func eq 'ABS') {
-					return Attean::Literal->new( value => abs($operands[0]->value), $operands[0]->construct_args );
-				} elsif ($func =~ /^(?:CEIL|FLOOR)$/) {
-					my $v	= $operands[0]->value;
-					return Attean::Literal->new( value => (($func eq 'CEIL') ? ceil($v) : floor($v)), $operands[0]->construct_args );
-				} elsif ($func eq 'ROUND') {
-					return Attean::Literal->new( value => sprintf('%.0f', (0.000000000000001 + $operands[0]->numeric_value)), $operands[0]->construct_args );
-				} elsif ($func eq 'CONCAT') {
-					my $all_lang	= 1;
-					my $all_str		= 1;
-					my $lang;
-					foreach my $n (@operands) {
-						die "CONCAT called with a non-literal argument" unless ($n->does('Attean::API::Literal'));
-						if ($n->datatype->value ne 'http://www.w3.org/2001/XMLSchema#string') {
-							die "CONCAT called with a datatyped-literal other than xsd:string";
-						} elsif ($n->language) {
-							$all_str	= 0;
-							if (defined($lang) and $lang ne $n->language) {
-								$all_lang	= 0;
-							} else {
-								$lang	= $n->language;
-							}
-						} else {
-							$all_lang	= 0;
-							$all_str	= 0;
-						}
-					}
-					my %strtype;
-					if ($all_lang and $lang) {
-						$strtype{language}	= $lang;
-					} elsif ($all_str) {
-						$strtype{datatype}	= 'http://www.w3.org/2001/XMLSchema#string'
-					}
-					return Attean::Literal->new( value => join('', map { $_->value } @operands), %strtype );
-				} elsif ($func eq 'SUBSTR') {
-					my $str		= shift(@operands);
-					my @args	= map { $_->numeric_value } @operands;
-					my $v		= scalar(@args == 1) ? substr($str->value, $args[0]-1) : substr($str->value, $args[0]-1, $args[1]);
-					return Attean::Literal->new( value => $v, $str->construct_args );
-				} elsif ($func eq 'STRLEN') {
-					return Attean::Literal->integer(length($operands[0]->value));
-				} elsif ($func eq 'REPLACE') {
-					my ($node, $pat, $rep)	= @operands;
-					die "TypeError: REPLACE called without a literal arg1 term" unless (blessed($node) and $node->does('Attean::API::Literal'));
-					die "TypeError: REPLACE called without a literal arg2 term" unless (blessed($pat) and $pat->does('Attean::API::Literal'));
-					die "TypeError: REPLACE called without a literal arg3 term" unless (blessed($rep) and $rep->does('Attean::API::Literal'));
-					die "TypeError: REPLACE called with a datatyped (non-xsd:string) literal" if ($node->datatype and $node->datatype->value ne 'http://www.w3.org/2001/XMLSchema#string');
-					my ($value, $pattern, $replace)	= map { $_->value } @operands;
-					die "EvaluationError: REPLACE called with unsafe ?{} match pattern" if (index($pattern, '(?{') != -1 or index($pattern, '(??{') != -1);
-					die "EvaluationError: REPLACE called with unsafe ?{} replace pattern" if (index($replace, '(?{') != -1 or index($replace, '(??{') != -1);
-	
-					$replace	=~ s/\\/\\\\/g;
-					$replace	=~ s/\$(\d+)/\$$1/g;
-					$replace	=~ s/"/\\"/g;
-					$replace	= qq["$replace"];
-					no warnings 'uninitialized';
-					$value	=~ s/$pattern/"$replace"/eeg;
-					return Attean::Literal->new(value => $value, $node->construct_args);
-				} elsif ($func =~ /^[UL]CASE$/) {
-					return Attean::Literal->new( value => ($func eq 'UCASE' ? uc($operands[0]->value) : lc($operands[0]->value) ), $operands[0]->construct_args );
-				} elsif ($func eq 'ENCODE_FOR_URI') {
-					return Attean::Literal->new( uri_escape_utf8($operands[0]->value) );
-				} elsif ($func eq 'CONTAINS') {
-					my ($node, $pat)	= @operands;
-					my ($lit, $plit)	= map { $_->value } @operands;
-					die "TypeError: CONTAINS" if ($node->language and $pat->language and $node->language ne $pat->language);
-					return (index($lit, $plit) >= 0) ? $true : $false;
-				} elsif ($func eq 'STRSTARTS' or $func eq 'STRENDS') {
-					my ($lit, $plit)	= map { $_->value } @operands;
-					if ($func eq 'STRENDS') {
-						my $pos		= length($lit) - length($plit);
-						return (rindex($lit, $plit) == $pos) ? $true : $false;
-					} else {
-						return (index($lit, $plit) == 0) ? $true : $false;
-					}
-				} elsif ($func eq 'STRBEFORE' or $func eq 'STRAFTER') {
-					my ($node, $substr)	= @operands;
-
-					die "$func called without a literal arg1 term" unless (blessed($node) and $node->does('Attean::API::Literal'));
-					die "$func called without a literal arg2 term" unless (blessed($substr) and $substr->does('Attean::API::Literal'));
-					die "$func called with a datatyped (non-xsd:string) literal" if ($node->datatype and $node->datatype->value ne 'http://www.w3.org/2001/XMLSchema#string');
-
-					my $lhs_simple	= (not($node->language) and ($node->datatype->value eq 'http://www.w3.org/2001/XMLSchema#string'));
-					my $rhs_simple	= (not($substr->language) and ($substr->datatype->value eq 'http://www.w3.org/2001/XMLSchema#string'));
-					if ($lhs_simple and $rhs_simple) {
-						# ok
-					} elsif ($node->language and $substr->language and $node->language eq $substr->language) {
-						# ok
-					} elsif ($node->language and $rhs_simple) {
-						# ok
-					} else {
-						die "$func called with literals that are not argument compatible";
-					}
-	
-					my $value	= $node->value;
-					my $match	= $substr->value;
-					my $i		= index($value, $match, 0);
-					if ($i < 0) {
-						return Attean::Literal->new('');
-					} else {
-						if ($func eq 'STRBEFORE') {
-							return Attean::Literal->new(value => substr($value, 0, $i), $node->construct_args);
-						} else {
-							return Attean::Literal->new(value => substr($value, $i+length($match)), $node->construct_args);
-						}
-					}
-				} elsif ($func =~ /^(?:YEAR|MONTH|DAY|HOURS|MINUTES)$/) {
-					my $method	= lc($func =~ s/^(HOUR|MINUTE)S$/$1/r);
-					my $dt		= $operands[0]->datetime;
-					return Attean::Literal->integer($dt->$method());
-				} elsif ($func eq 'SECONDS') {
-					my $dt	= $operands[0]->datetime;
-					return Attean::Literal->decimal($dt->second());
-				} elsif ($func eq 'TZ' or $func eq 'TIMEZONE') {
-					my $dt	= $operands[0]->datetime;
-					my $tz	= $dt->time_zone;
-					if ($tz->is_floating) {
-						return Attean::Literal->new('') if ($func eq 'TZ');
-						die "TIMEZONE called with a dateTime without a timezone";
-					}
-					return Attean::Literal->new('Z') if ($func eq 'TZ' and $tz->is_utc);
-					if ($tz) {
-						my $offset	= $tz->offset_for_datetime( $dt );
-						my $hours	= 0;
-						my $minutes	= 0;
-						my $minus	= ($func eq 'TZ') ? '+' : '';
-						if ($offset < 0) {
-							$minus	= '-';
-							$offset	= -$offset;
-						}
-
-						my $duration	= "${minus}PT";
-						if ($offset >= 60*60) {
-							my $h	= int($offset / (60*60));
-							$duration	.= "${h}H" if ($h > 0);
-							$hours	= int($offset / (60*60));
-							$offset	= $offset % (60*60);
-						}
-						if ($offset >= 60) {
-							my $m	= int($offset / 60);
-							$duration	.= "${m}M" if ($m > 0);
-							$minutes	= int($offset / 60);
-							$offset	= $offset % 60;
-						}
-						my $seconds	= int($offset);
-						my $s		= int($offset);
-						$duration	.= "${s}S" if ($s > 0 or $duration eq 'PT');
-			
-						return ($func eq 'TZ')
-							? Attean::Literal->new(sprintf('%s%02d:%02d', $minus, $hours, $minutes))
-							: Attean::Literal->new( value => $duration, datatype => "http://www.w3.org/2001/XMLSchema#dayTimeDuration");
-					} else {
-						return Attean::Literal->new('') if ($func eq 'TZ');
-						die "TIMEZONE called without a valid dateTime";
-					}
-				} elsif ($func eq 'NOW') {
-					my $value	= DateTime::Format::W3CDTF->new->format_datetime( DateTime->now );
-					return Attean::Literal->new( value => $value, datatype => 'http://www.w3.org/2001/XMLSchema#dateTime' );
-				} elsif ($func =~ /^(?:STR)?UUID$/) {
-					return Attean::Literal->new(uc(uuid_to_string(create_uuid()))) if ($func eq 'STRUUID');
-					return Attean::IRI->new('urn:uuid:' . uc(uuid_to_string(create_uuid())));
-				} elsif ($func =~ /^(MD5|SHA1|SHA256|SHA384|SHA512)$/) {
-					my $hash	= $func =~ s/SHA/SHA-/r;
-					my $digest	= eval { Digest->new($hash)->add(encode('UTF-8', $operands[0]->value, Encode::FB_CROAK))->hexdigest };
-					return Attean::Literal->new($digest);
-				} elsif ($func eq 'STRLANG') {
-					my ($str, $lang)	= @operands;
-					my @values	= map { $_->value } @operands;
-					die "TypeError: STRLANG must be called with two plain literals" unless (blessed($str) and $str->does('Attean::API::Literal') and blessed($lang) and $lang->does('Attean::API::Literal'));
-					die "TypeError: STRLANG not called with a simple literal" unless ($str->datatype->value eq 'http://www.w3.org/2001/XMLSchema#string' and not($str->language));
-					return Attean::Literal->new( value => $values[0], language => $values[1] );
-				} elsif ($func eq 'STRDT') {
-					die "TypeError: STRDT" unless ($operands[0]->does('Attean::API::Literal') and not($operands[0]->language));
-					if (my $dt = $operands[0]->datatype) {
-						die "TypeError: STRDT" unless ($dt->value eq 'http://www.w3.org/2001/XMLSchema#string');
-					}
-					die "TypeError: STRDT" unless ($operands[1]->does('Attean::API::IRI'));
-					my @values	= map { $_->value } @operands;
-					return Attean::Literal->new( value => $values[0], datatype => $values[1] );
-				} elsif ($func eq 'SAMETERM') {
-					my ($a, $b)	= @operands;
-					die "TypeError: SAMETERM" unless (blessed($operands[0]) and blessed($operands[1]));
-					if ($a->compare($b)) {
-						return $false;
-					}
-					if ($a->does('Attean::API::Binding')) {
-						my $ok	= ($a->sameTerms($b));
-						return $ok ? $true : $false;
-					} else {
-						my $ok	= ($a->value eq $b->value);
-						return $ok ? $true : $false;
-					}
-				} elsif ($func =~ /^IS([UI]RI|BLANK|LITERAL|NUMERIC|TRIPLE)$/) {
-					return $operands[0]->does("Attean::API::$type_roles{$1}") ? $true : $false;
-				} elsif ($func eq 'REGEX') {
-					my ($value, $pattern)	= map { $_->value } @operands;
-					return ($value =~ /$pattern/) ? $true : $false;
-				} elsif ($func eq 'INVOKE') {
-					my $furi		= shift(@operands)->value;
-					my $func		= Attean->get_global_function($furi);
-					unless (ref($func)) {
 						die "No extension registered for <$furi>";
 					}
-					return $func->(@operands);
+				} else {
+					my @operands	= map { $_->( $r, %args ) } @children;
+					if ($func =~ /^(STR)$/) {
+						return $type_classes{$1}->new($operands[0]->value);
+					} elsif ($func =~ /^(SUBJECT|PREDICATE|OBJECT)$/) {
+						my $pos	= lc($func);
+						my $term	= $operands[0]->$pos();
+						return $term;
+					} elsif ($func =~ /^([UI]RI)$/) {
+						my $operand	= $operands[0];
+						if ($operand->does('Attean::API::Literal')) {
+							if ($operand->datatype->value ne 'http://www.w3.org/2001/XMLSchema#string') {
+								die "TypeError: ${func} called with a datatyped-literal other than xsd:string";
+							}
+						}
+						my @base	= $expr->has_base ? (base => $expr->base) : ();
+						return $type_classes{$1}->new(value => $operands[0]->value, @base);
+					} elsif ($func eq 'BNODE') {
+						if (scalar(@operands)) {
+							my $name	= $operands[0]->value;
+							if (my $b = $row_cache->{bnodes}{$name}) {
+								return $b;
+							} else {
+								my $b	= Attean::Blank->new();
+								$row_cache->{bnodes}{$name}	= $b;
+								return $b;
+							}
+						}
+						return Attean::Blank->new();
+					} elsif ($func eq 'LANG') {
+						die "TypeError: LANG" unless ($operands[0]->does('Attean::API::Literal'));
+						return Attean::Literal->new($operands[0]->language // '');
+					} elsif ($func eq 'LANGMATCHES') {
+						my ($lang, $match)	= map { $_->value } @operands;
+						if ($match eq '*') {
+							# """A language-range of "*" matches any non-empty language-tag string."""
+							return ($lang ? $true : $false);
+						} else {
+							return (I18N::LangTags::is_dialect_of( $lang, $match )) ? $true : $false;
+						}
+					} elsif ($func eq 'DATATYPE') {
+						return $operands[0]->datatype;
+					} elsif ($func eq 'BOUND') {
+						return $operands[0] ? $true : $false;
+					} elsif ($func eq 'RAND') {
+						return Attean::Literal->new( value => rand(), datatype => 'http://www.w3.org/2001/XMLSchema#double' );
+					} elsif ($func eq 'ABS') {
+						return Attean::Literal->new( value => abs($operands[0]->value), $operands[0]->construct_args );
+					} elsif ($func =~ /^(?:CEIL|FLOOR)$/) {
+						my $v	= $operands[0]->value;
+						return Attean::Literal->new( value => (($func eq 'CEIL') ? ceil($v) : floor($v)), $operands[0]->construct_args );
+					} elsif ($func eq 'ROUND') {
+						return Attean::Literal->new( value => sprintf('%.0f', (0.000000000000001 + $operands[0]->numeric_value)), $operands[0]->construct_args );
+					} elsif ($func eq 'CONCAT') {
+						my $all_lang	= 1;
+						my $all_str		= 1;
+						my $lang;
+						if (scalar(@operands) == 0) {
+							return Attean::Literal->new(value => '');
+						}
+						foreach my $n (@operands) {
+							die "CONCAT called with a non-literal argument" unless ($n->does('Attean::API::Literal'));
+							if ($n->datatype->value ne 'http://www.w3.org/2001/XMLSchema#string') {
+								die "CONCAT called with a datatyped-literal other than xsd:string";
+							} elsif ($n->language) {
+								$all_str	= 0;
+								if (defined($lang) and $lang ne $n->language) {
+									$all_lang	= 0;
+								} else {
+									$lang	= $n->language;
+								}
+							} else {
+								$all_lang	= 0;
+								$all_str	= 0;
+							}
+						}
+						my %strtype;
+						if ($all_lang and $lang) {
+							$strtype{language}	= $lang;
+						} elsif ($all_str) {
+							$strtype{datatype}	= 'http://www.w3.org/2001/XMLSchema#string'
+						}
+						return Attean::Literal->new( value => join('', map { $_->value } @operands), %strtype );
+					} elsif ($func eq 'SUBSTR') {
+						my $str		= shift(@operands);
+						my @args	= map { $_->numeric_value } @operands;
+						my $v		= scalar(@args == 1) ? substr($str->value, $args[0]-1) : substr($str->value, $args[0]-1, $args[1]);
+						return Attean::Literal->new( value => $v, $str->construct_args );
+					} elsif ($func eq 'STRLEN') {
+						return Attean::Literal->integer(length($operands[0]->value));
+					} elsif ($func eq 'REPLACE') {
+						my ($node, $pat, $rep)	= @operands;
+						die "TypeError: REPLACE called without a literal arg1 term" unless (blessed($node) and $node->does('Attean::API::Literal'));
+						die "TypeError: REPLACE called without a literal arg2 term" unless (blessed($pat) and $pat->does('Attean::API::Literal'));
+						die "TypeError: REPLACE called without a literal arg3 term" unless (blessed($rep) and $rep->does('Attean::API::Literal'));
+						die "TypeError: REPLACE called with a datatyped (non-xsd:string) literal" if ($node->datatype and $node->datatype->value ne 'http://www.w3.org/2001/XMLSchema#string');
+						my ($value, $pattern, $replace)	= map { $_->value } @operands;
+						die "EvaluationError: REPLACE called with unsafe ?{} match pattern" if (index($pattern, '(?{') != -1 or index($pattern, '(??{') != -1);
+						die "EvaluationError: REPLACE called with unsafe ?{} replace pattern" if (index($replace, '(?{') != -1 or index($replace, '(??{') != -1);
+	
+						$replace	=~ s/\\/\\\\/g;
+						$replace	=~ s/\$(\d+)/\$$1/g;
+						$replace	=~ s/"/\\"/g;
+						$replace	= qq["$replace"];
+						no warnings 'uninitialized';
+						$value	=~ s/$pattern/"$replace"/eeg;
+						return Attean::Literal->new(value => $value, $node->construct_args);
+					} elsif ($func =~ /^[UL]CASE$/) {
+						return Attean::Literal->new( value => ($func eq 'UCASE' ? uc($operands[0]->value) : lc($operands[0]->value) ), $operands[0]->construct_args );
+					} elsif ($func eq 'ENCODE_FOR_URI') {
+						return Attean::Literal->new( uri_escape_utf8($operands[0]->value) );
+					} elsif ($func eq 'CONTAINS') {
+						my ($node, $pat)	= @operands;
+						my ($lit, $plit)	= map { $_->value } @operands;
+						die "TypeError: CONTAINS" if ($node->language and $pat->language and $node->language ne $pat->language);
+						return (index($lit, $plit) >= 0) ? $true : $false;
+					} elsif ($func eq 'STRSTARTS' or $func eq 'STRENDS') {
+						my ($lit, $plit)	= map { $_->value } @operands;
+						if ($func eq 'STRENDS') {
+							my $pos		= length($lit) - length($plit);
+							return (rindex($lit, $plit) == $pos) ? $true : $false;
+						} else {
+							return (index($lit, $plit) == 0) ? $true : $false;
+						}
+					} elsif ($func eq 'STRBEFORE' or $func eq 'STRAFTER') {
+						my ($node, $substr)	= @operands;
+
+						die "$func called without a literal arg1 term" unless (blessed($node) and $node->does('Attean::API::Literal'));
+						die "$func called without a literal arg2 term" unless (blessed($substr) and $substr->does('Attean::API::Literal'));
+						die "$func called with a datatyped (non-xsd:string) literal" if ($node->datatype and $node->datatype->value ne 'http://www.w3.org/2001/XMLSchema#string');
+
+						my $lhs_simple	= (not($node->language) and ($node->datatype->value eq 'http://www.w3.org/2001/XMLSchema#string'));
+						my $rhs_simple	= (not($substr->language) and ($substr->datatype->value eq 'http://www.w3.org/2001/XMLSchema#string'));
+						if ($lhs_simple and $rhs_simple) {
+							# ok
+						} elsif ($node->language and $substr->language and $node->language eq $substr->language) {
+							# ok
+						} elsif ($node->language and $rhs_simple) {
+							# ok
+						} else {
+							die "$func called with literals that are not argument compatible";
+						}
+	
+						my $value	= $node->value;
+						my $match	= $substr->value;
+						my $i		= index($value, $match, 0);
+						if ($i < 0) {
+							return Attean::Literal->new('');
+						} else {
+							if ($func eq 'STRBEFORE') {
+								return Attean::Literal->new(value => substr($value, 0, $i), $node->construct_args);
+							} else {
+								return Attean::Literal->new(value => substr($value, $i+length($match)), $node->construct_args);
+							}
+						}
+					} elsif ($func =~ /^(?:YEAR|MONTH|DAY|HOURS|MINUTES)$/) {
+						my $method	= lc($func =~ s/^(HOUR|MINUTE)S$/$1/r);
+						my $dt		= $operands[0]->datetime;
+						return Attean::Literal->integer($dt->$method());
+					} elsif ($func eq 'SECONDS') {
+						my $dt	= $operands[0]->datetime;
+						return Attean::Literal->decimal($dt->second());
+					} elsif ($func eq 'TZ' or $func eq 'TIMEZONE') {
+						my $dt	= $operands[0]->datetime;
+						my $tz	= $dt->time_zone;
+						if ($tz->is_floating) {
+							return Attean::Literal->new('') if ($func eq 'TZ');
+							die "TIMEZONE called with a dateTime without a timezone";
+						}
+						return Attean::Literal->new('Z') if ($func eq 'TZ' and $tz->is_utc);
+						if ($tz) {
+							my $offset	= $tz->offset_for_datetime( $dt );
+							my $hours	= 0;
+							my $minutes	= 0;
+							my $minus	= ($func eq 'TZ') ? '+' : '';
+							if ($offset < 0) {
+								$minus	= '-';
+								$offset	= -$offset;
+							}
+
+							my $duration	= "${minus}PT";
+							if ($offset >= 60*60) {
+								my $h	= int($offset / (60*60));
+								$duration	.= "${h}H" if ($h > 0);
+								$hours	= int($offset / (60*60));
+								$offset	= $offset % (60*60);
+							}
+							if ($offset >= 60) {
+								my $m	= int($offset / 60);
+								$duration	.= "${m}M" if ($m > 0);
+								$minutes	= int($offset / 60);
+								$offset	= $offset % 60;
+							}
+							my $seconds	= int($offset);
+							my $s		= int($offset);
+							$duration	.= "${s}S" if ($s > 0 or $duration eq 'PT');
+			
+							return ($func eq 'TZ')
+								? Attean::Literal->new(sprintf('%s%02d:%02d', $minus, $hours, $minutes))
+								: Attean::Literal->new( value => $duration, datatype => "http://www.w3.org/2001/XMLSchema#dayTimeDuration");
+						} else {
+							return Attean::Literal->new('') if ($func eq 'TZ');
+							die "TIMEZONE called without a valid dateTime";
+						}
+					} elsif ($func eq 'NOW') {
+						my $value	= DateTime::Format::W3CDTF->new->format_datetime( DateTime->now );
+						return Attean::Literal->new( value => $value, datatype => 'http://www.w3.org/2001/XMLSchema#dateTime' );
+					} elsif ($func =~ /^(?:STR)?UUID$/) {
+						return Attean::Literal->new(uc(uuid_to_string(create_uuid()))) if ($func eq 'STRUUID');
+						return Attean::IRI->new('urn:uuid:' . uc(uuid_to_string(create_uuid())));
+					} elsif ($func =~ /^(MD5|SHA1|SHA256|SHA384|SHA512)$/) {
+						my $hash	= $func =~ s/SHA/SHA-/r;
+						my $digest	= eval { Digest->new($hash)->add(encode('UTF-8', $operands[0]->value, Encode::FB_CROAK))->hexdigest };
+						return Attean::Literal->new($digest);
+					} elsif ($func eq 'STRLANG') {
+						my ($str, $lang)	= @operands;
+						my @values	= map { $_->value } @operands;
+						die "TypeError: STRLANG must be called with two plain literals" unless (blessed($str) and $str->does('Attean::API::Literal') and blessed($lang) and $lang->does('Attean::API::Literal'));
+						die "TypeError: STRLANG not called with a simple literal" unless ($str->datatype->value eq 'http://www.w3.org/2001/XMLSchema#string' and not($str->language));
+						return Attean::Literal->new( value => $values[0], language => $values[1] );
+					} elsif ($func eq 'STRDT') {
+						die "TypeError: STRDT" unless ($operands[0]->does('Attean::API::Literal') and not($operands[0]->language));
+						if (my $dt = $operands[0]->datatype) {
+							die "TypeError: STRDT" unless ($dt->value eq 'http://www.w3.org/2001/XMLSchema#string');
+						}
+						die "TypeError: STRDT" unless ($operands[1]->does('Attean::API::IRI'));
+						my @values	= map { $_->value } @operands;
+						return Attean::Literal->new( value => $values[0], datatype => $values[1] );
+					} elsif ($func eq 'SAMETERM') {
+						my ($a, $b)	= @operands;
+						die "TypeError: SAMETERM" unless (blessed($operands[0]) and blessed($operands[1]));
+						my $cmp = eval { $a->compare($b) };
+						if (not($@) and $cmp) {
+							return $false;
+						}
+						if ($a->does('Attean::API::Binding')) {
+							my $ok	= ($a->sameTerms($b));
+							return $ok ? $true : $false;
+						} else {
+							my $ok	= ($a->value eq $b->value);
+							return $ok ? $true : $false;
+						}
+					} elsif ($func =~ /^IS([UI]RI|BLANK|LITERAL|NUMERIC|TRIPLE)$/) {
+						return $operands[0]->does("Attean::API::$type_roles{$1}") ? $true : $false;
+					} elsif ($func eq 'REGEX') {
+						my ($value, $pattern)	= map { $_->value } @operands;
+						return ($value =~ /$pattern/) ? $true : $false;
+					}
+					die "Unimplemented FunctionExpression evaluation: " . $expr->operator;
 				}
-				die "Unimplemented FunctionExpression evaluation: " . $expr->operator;
 			};
 		} elsif ($expr->isa('Attean::AggregateExpression')) {
 			my $agg		= $expr->operator;
@@ -1016,7 +1113,7 @@ package Attean::SimpleQueryEvaluator::ExpressionEvaluator 0.033 {
 						return Attean::Literal->integer(scalar(@$rows));
 					};
 				}
-			} elsif ($agg =~ /^(?:SAMPLE|MIN|MAX|SUM|AVG|GROUP_CONCAT)$/) {
+			} elsif ($agg =~ /^(?:SAMPLE|MIN|MAX|SUM|AVG|GROUP_CONCAT|FOLD)$/) {
 				my $impl	= $self->impl($child, $active_graph);
 				if ($agg eq 'SAMPLE') {
 					return sub {
@@ -1074,6 +1171,76 @@ package Attean::SimpleQueryEvaluator::ExpressionEvaluator 0.033 {
 						}
 						return Attean::Literal->new(join($sep, sort @strings));
 					};
+				} elsif ($agg eq 'FOLD') {
+					return sub {
+						my ($rows, %args)	= @_;
+						my @children		= @{ $expr->children };
+						my @impls			= map { $self->impl($_, $active_graph) } @children;
+
+						my $order	= $expr->order || [];
+						if (scalar(@$order)) {
+							# sort $rows by the order condition
+							my @cmps	= @$order;
+							my @exprs	= map { $_->[1] } @cmps;
+							my @dirs	= map { $_->[0] eq 'ASC' } @cmps;
+							my @sorted	= map { $_->[0] } sort {
+								my ($ar, $avalues)	= @$a;
+								my ($br, $bvalues)	= @$b;
+								my $c	= 0;
+								foreach my $i (0 .. $#cmps) {
+									my ($av, $bv)	= map { $_->[$i] } ($avalues, $bvalues);
+									# Mirrors code in Attean::Plan::OrderBy->sort_rows
+									if (not(blessed($av))) {
+										$c = -1;
+									} elsif (not(blessed($av))) {
+										$c = 1;
+									} elsif (blessed($av) and $av->does('Attean::API::Binding') and (not(defined($bv)) or not($bv->does('Attean::API::Binding')))) {
+										$c	= 1;
+									} elsif (blessed($bv) and $bv->does('Attean::API::Binding') and (not(defined($av)) or not($av->does('Attean::API::Binding')))) {
+										$c	= -1;
+									} else {
+										$c		= eval { $av ? $av->compare($bv) : 1 };
+										if ($@) {
+											$c	= 1;
+										}
+									}
+									$c		*= -1 if ($dirs[$i] == 0);
+									last unless ($c == 0);
+								}
+								$c
+							} map { my $r = $_; [$r, [map { $self->evaluate_expression( $_, $r, $active_graph, {} ) } @exprs]] } @$rows;
+							$rows	= \@sorted;
+						}
+						
+						
+						if (scalar(@impls) > 1) {
+							my @values;
+							foreach my $r (@$rows) {
+								my ($key, $value)	= map { eval { $_->( $r, %args ) } || undef } @impls;
+								if (defined($key)) {
+									push(@values, $key, $value);
+								}
+							}
+							my $func	= Attean->get_global_functional_form($AtteanX::Functions::CompositeMaps::MAP_TYPE_IRI);
+							my $m		= $func->(undef, undef, @values);
+							return $m;
+						} else {
+							my %seen;
+							my @values;
+							foreach my $r (@$rows) {
+								my $term	= eval { $impl->( $r, %args ) };
+								if ($expr->distinct) {
+									next if ($seen{ blessed($term) ? $term->as_string : '' }++);
+								}
+								push(@values, $term);
+							}
+							my $func	= Attean->get_global_functional_form($AtteanX::Functions::CompositeLists::LIST_TYPE_IRI);
+							my $l		= $func->(undef, undef, @values);
+							return $l;
+						}
+					};
+				} else {
+					warn "Unexpected aggregate expression: $agg";
 				}
 			} elsif ($agg eq 'CUSTOM') {
 				my $iri	= $expr->custom_iri;
@@ -1088,7 +1255,7 @@ package Attean::SimpleQueryEvaluator::ExpressionEvaluator 0.033 {
 				my $impl	= $self->impl($child, $active_graph);
 				return sub {
 					my ($rows, %args)	= @_;
-					my $thunk	= $start->();
+					my $thunk	= $start->($self->evaluator->model, $active_graph);
 					foreach my $r (@$rows) {
 						my $t	= $impl->( $r, %args );
 						$process->($thunk, $t);
@@ -1106,7 +1273,7 @@ package Attean::SimpleQueryEvaluator::ExpressionEvaluator 0.033 {
 				my $term	= $impl->($r, %args);
 				# TODO: reformat syntax for xsd:double
 				my $cast	= Attean::Literal->new( value => $term->value, datatype => $type );
-				return $cast->canonicalized_term if ($cast->does('Attean::API::CanonicalizingLiteral'));
+				return $cast->canonicalized_term_strict() if ($cast->does('Attean::API::CanonicalizingLiteral'));
 				return $cast;
 			}
 		} else {

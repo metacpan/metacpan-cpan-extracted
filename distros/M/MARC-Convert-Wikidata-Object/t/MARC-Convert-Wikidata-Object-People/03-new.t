@@ -4,7 +4,7 @@ use warnings;
 use English;
 use Error::Pure::Utils qw(clean);
 use MARC::Convert::Wikidata::Object::People;
-use Test::More 'tests' => 5;
+use Test::More 'tests' => 8;
 use Test::NoWarnings;
 use Unicode::UTF8 qw(decode_utf8);
 
@@ -48,4 +48,35 @@ eval {
 };
 is($EVAL_ERROR, "Parameter 'date_of_birth' has date greater or same as parameter 'date_of_death' date.\n",
 	"Parameter 'date_of_birth' has date greater or same as parameter 'date_of_death' date.");
+clean();
+
+# Test.
+eval {
+	MARC::Convert::Wikidata::Object::People->new(
+		work_period_start => 'bad',
+	);
+};
+is($EVAL_ERROR, "Parameter 'work_period_start' is in bad format.\n",
+	"Parameter 'work_period_start' is in bad format (bad).");
+clean();
+
+# Test.
+eval {
+	MARC::Convert::Wikidata::Object::People->new(
+		work_period_end => 'bad',
+	);
+};
+is($EVAL_ERROR, "Parameter 'work_period_end' is in bad format.\n",
+	"Parameter 'work_period_end' is in bad format (bad).");
+clean();
+
+# Test.
+eval {
+	MARC::Convert::Wikidata::Object::People->new(
+		work_period_start => '1900',
+		work_period_end => '1883',
+	);
+};
+is($EVAL_ERROR, "Parameter 'work_period_start' has date greater or same as parameter 'work_period_end' date.\n",
+	"Parameter 'work_period_start' has date greater or same as parameter 'work_period_end' date.");
 clean();

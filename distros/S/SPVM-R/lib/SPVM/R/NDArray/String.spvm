@@ -1,0 +1,70 @@
+# Copyright (c) 2024 Yuki Kimoto
+# MIT License
+
+class R::NDArray::String extends R::NDArray::Object {
+  
+  use Fn;
+  use Array;
+  
+  # Class Mehtods
+  static method new : R::NDArray::String ($options : object[] = undef) {
+    
+    my $self = new R::NDArray::String;
+    
+    $self->init($options);
+    
+    return $self;
+  }
+  
+  protected method init : void ($options : object[] = undef) {
+    
+    my $element_size = Fn->sizeof_native_pointer;
+    
+    $options = Fn->merge_options($options, {element_size => $element_size, type => "string"});
+    
+    $self->SUPER::init($options);
+  }
+  
+  method data : string[] () {
+    
+    return (string[])$self->{data};
+  }
+  
+  protected method check : void () {
+    
+    my $data = (string[])$self->{data};
+    
+    my $length = $self->length;
+    
+    unless (@$data == $length) {
+      die "The length of data field must be the same as length field.";
+    }
+  }
+  
+  protected method create_default_data : string[] ($length : int) {
+    
+    unless ($length >= 0) {
+      die "The length \$length must be more than or equal to 0.";
+    }
+    
+    my $data = new string[$length];
+    
+    return $data;
+  }
+  
+  method clone : R::NDArray::String () {
+    return (R::NDArray::String)$self->SUPER::clone;
+  }
+  
+  method element_to_string : string ($data_index : int) {
+    
+    my $data = $self->data;
+    
+    my $element = $data->[$data_index];
+    
+    my $string = $element;
+    
+    return $string;
+  }
+  
+}

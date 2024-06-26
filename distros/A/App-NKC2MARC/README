@@ -1,0 +1,45 @@
+NAME
+    nkc-to-marc - Tool to fetch record from National library of the Czech
+    Republic to MARC file.
+
+SYNOPSIS
+     nkc-to-marc [-h] [--version] id_of_book
+
+ARGUMENTS
+    *       "-h"
+
+            Print help.
+
+    *       "--version"
+
+            Print version of script.
+
+    *       "id_of_book"
+
+            Identifier of book. Possible ids are: ISBN or Czech national
+            bibliography id.
+
+EXAMPLE1
+     # Adding book edition defined by ISBN number
+     nkc-to-marc 978-80-276-0470-8
+
+EXAMPLE2
+     # Adding book edition defined by Czech national bibliography id
+     nkc-to-marc cnb003322696
+
+REPOSITORY
+    <https://github.com/michal-josef-spacek/App-NKC2MARC>
+
+AUTHOR
+    Michal Josef Špaček <mailto:skim@cpan.org>
+
+    <http://skim.cz>
+
+LICENSE AND COPYRIGHT
+    © 2024 Michal Josef Špaček
+
+    BSD 2-Clause License
+
+VERSION
+    0.01
+

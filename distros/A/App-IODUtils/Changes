@@ -1,3 +1,11 @@
+0.164   2024-06-24  Released-By: PERLANCAR; Urgency: low
+
+        - No functional changes.
+
+        - [doc] Cross-mention parse-iod/dump-iod, mention
+          parse-ini/dump-ini.
+
+
 0.163   2022-05-03  Released-By: PERLANCAR; Urgency: medium
 
         - Adjust to Config::IOD::Base 0.353 (add attribute 'warn_perl').

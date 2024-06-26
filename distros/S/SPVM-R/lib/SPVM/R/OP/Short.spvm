@@ -1,0 +1,53 @@
+# Copyright (c) 2024 Yuki Kimoto
+# MIT License
+
+class R::OP::Short {
+  
+  use R::NDArray::Short;
+  use ShortList;
+  use R::OP;
+  
+  # Class Methods
+  static method c : R::NDArray::Short ($x_data : short[], $x_dim : int[] = undef) {
+    
+    my $x_ndarray = R::NDArray::Short->new({dim => $x_dim, data => $x_data});
+    
+    return $x_ndarray;
+  }
+  
+  static method seq : R::NDArray::Short ($x : short, $y : short, $by : short = 1) {
+    
+    my $ret_data_list = ShortList->new;
+    my $current = $x;
+    while (1) {
+      if ($by >= 0) {
+        if ($current <= $y) {
+          last;
+        }
+      }
+      else {
+        if ($current >= $y) {
+          last;
+        }
+      }
+      $current += $by;
+      $ret_data_list->push($current);
+    }
+    
+    my $ret_data = $ret_data_list->to_array;
+    
+    my $ret_ndarray = &c($ret_data);
+    
+    return $ret_ndarray;
+  }
+  
+  static method seq_length : R::NDArray::Short ($x : short, $y : short, $length : int) {
+    
+    my $by = (short)(($y - $x) / $length);
+    
+    my $ret_ndarray = &seq($x, $y, $by);
+    
+    return $ret_ndarray;
+  }
+  
+}

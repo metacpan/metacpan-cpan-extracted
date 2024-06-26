@@ -29,8 +29,8 @@ requires:
   List::MoreUtils: 0
   List::Util: 0
   Mo: 0
-  Mo::utils: 0.07
-  Mo::utils::Date: 0
+  Mo::utils: 0.26
+  Mo::utils::Date: 0.04
   Readonly: 0
   perl: 5.6.2
 resources:
@@ -38,4 +38,4 @@ resources:
   homepage: https://github.com/michal-josef-spacek/MARC-Convert-Wikidata-Object
   license: http://opensource.org/licenses/bsd-license.php
   repository: git://github.com/michal-josef-spacek/MARC-Convert-Wikidata-Object
-version: '0.03'
+version: '0.04'

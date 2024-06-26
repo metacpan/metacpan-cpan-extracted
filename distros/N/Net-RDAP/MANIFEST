@@ -7,7 +7,8 @@ lib/Net/RDAP/Event.pm
 lib/Net/RDAP/Help.pm
 lib/Net/RDAP/ID.pm
 lib/Net/RDAP/JCard.pm
-lib/Net/RDAP/JCard/Node.pm
+lib/Net/RDAP/JCard/Address.pm
+lib/Net/RDAP/JCard/Property.pm
 lib/Net/RDAP/Link.pm
 lib/Net/RDAP/Notice.pm
 lib/Net/RDAP/Object.pm
@@ -29,6 +30,8 @@ LICENSE
 Makefile.PL
 MANIFEST			This list of files
 README.md
+t/jcard.json
+t/jcard.t
 t/redacted.json
 t/redaction.t
 t/use.t

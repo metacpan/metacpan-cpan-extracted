@@ -62,7 +62,7 @@
          "web" : "https://github.com/Kelp-framework/Kelp"
       }
    },
-   "version" : "2.11",
+   "version" : "2.12",
    "x_contributors" : [
       "Stefan Geneshky <minimal@cpan.org>",
       "Bartosz Jarzyna <bbrtj.pro@gmail.com>",

@@ -43,7 +43,7 @@ $gpx->waypoints_add(
     }
 );
 
-my $xml = $gpx->xml( '1.1' );
+my $xml = $gpx->xml( version => '1.1' );
 
 ok $xml =~ m{ <wpt[^>]*> (.*?) </wpt> }xms, "has wpt";
 my $wpt = $1;

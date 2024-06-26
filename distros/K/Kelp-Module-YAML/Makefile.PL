@@ -17,10 +17,10 @@ my %WriteMakefileArgs = (
   "MIN_PERL_VERSION" => "5.014",
   "NAME" => "Kelp::Module::YAML",
   "PREREQ_PM" => {
-    "Kelp" => "2.10",
+    "Kelp" => "2.11",
     "YAML::PP" => 0
   },
-  "VERSION" => "1.00",
+  "VERSION" => "2.00",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -28,7 +28,7 @@ my %WriteMakefileArgs = (
 
 
 my %FallbackPrereqs = (
-  "Kelp" => "2.10",
+  "Kelp" => "2.11",
   "YAML::PP" => 0
 );
 

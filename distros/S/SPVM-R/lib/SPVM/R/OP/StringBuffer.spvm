@@ -1,0 +1,17 @@
+# Copyright (c) 2024 Yuki Kimoto
+# MIT License
+
+class R::OP::StringBuffer {
+  
+  use R::NDArray::StringBuffer;
+  use R::OP;
+  
+  # Class Methods
+  static method c : R::NDArray::StringBuffer ($x_data : string[], $x_dim : int[] = undef) {
+    
+    my $x_ndarray = R::NDArray::StringBuffer->new({dim => $x_dim, data => $x_data});
+    
+    return $x_ndarray;
+  }
+  
+}

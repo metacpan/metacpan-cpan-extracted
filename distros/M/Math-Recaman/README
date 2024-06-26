@@ -1,0 +1,56 @@
+Math-Recaman
+
+Recamán's sequence is a well known sequence defined by a recurrence relation.
+
+It is named after its inventor, Colombian mathematician Bernado Recamán Santos by Nel Sloane,
+creator of the On-Line Encyclopedia of Integer Sequences (OEIS). The OEIS entry for this sequence is A005132.
+
+The sequence is defined as
+
+  An = 0 if n = 0
+  An = An-1 - n if An-1 - n > 0 and is not already in the sequence
+  An = An-1 + n otherwise
+
+It is known to produce quite aethetically pleasing outputs if plotted as an image or as music.
+
+This module includes both a function for generating the sequence but also a command line tool for printing it out
+but also for generating images and sound files of the sequence.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc Math::Recaman
+
+You can also look for information at:
+
+    RT, CPAN's request tracker (report bugs here)
+        https://rt.cpan.org/NoAuth/Bugs.html?Dist=Math-Recaman
+
+    CPAN Ratings
+        https://cpanratings.perl.org/d/Math-Recaman
+
+    Search CPAN
+        https://metacpan.org/release/Math-Recaman
+
+    GitHub
+        https://github.com/simonwistoww/Math-Recaman
+        
+LICENSE AND COPYRIGHT
+
+This software is Copyright (c) 2024 by Simon Wistow.
+
+This is free software, licensed under:
+
+  The Artistic License 2.0 (GPL Compatible)
+

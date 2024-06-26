@@ -232,6 +232,7 @@ RDAP-related modules that all work together. They are:
         - [Net::RDAP::Notice](https://metacpan.org/pod/Net%3A%3ARDAP%3A%3ANotice)
 - [Net::RDAP::EPPStatusMap](https://metacpan.org/pod/Net%3A%3ARDAP%3A%3AEPPStatusMap)
 - [Net::RDAP::JCard](https://metacpan.org/pod/Net%3A%3ARDAP%3A%3AJCard)
+    - [Net::RDAP::JCard::Property](https://metacpan.org/pod/Net%3A%3ARDAP%3A%3AJCard%3A%3AProperty)
 - [Net::RDAP::Registry](https://metacpan.org/pod/Net%3A%3ARDAP%3A%3ARegistry)
 - [Net::RDAP::Registry::IANARegistry](https://metacpan.org/pod/Net%3A%3ARDAP%3A%3ARegistry%3A%3AIANARegistry)
 - [Net::RDAP::Registry::IANARegistry::Service](https://metacpan.org/pod/Net%3A%3ARDAP%3A%3ARegistry%3A%3AIANARegistry%3A%3AService)

@@ -88,9 +88,12 @@ Geo::Gpx - Create and parse GPX files
 
     Returns the number of points successfully merged (i.e. the difference in `$gps->waypoints_count` before and after the merge).
 
-- waypoint\_closest\_to( $point of $tcx\_trackpoint )
+- waypoint\_closest\_to( $point or $tcx\_trackpoint )
+- trackpoint\_closest\_to( … )
+- routepoint\_closest\_to( … )
+- point\_closest\_to( … )
 
-    From any [Geo::Gpx::Point](https://metacpan.org/pod/Geo%3A%3AGpx%3A%3APoint) or [Geo::TCX::Trackpoint](https://metacpan.org/pod/Geo%3A%3ATCX%3A%3ATrackpoint) object, return the waypoint that is closest to it. If called in list context, returns a two-element array consisting of that waypoint, and the distance from the coordinate (in meters).
+    From any [Geo::Gpx::Point](https://metacpan.org/pod/Geo%3A%3AGpx%3A%3APoint) or [Geo::TCX::Trackpoint](https://metacpan.org/pod/Geo%3A%3ATCX%3A%3ATrackpoint) object, return the [Geo::Gpx::Point](https://metacpan.org/pod/Geo%3A%3AGpx%3A%3APoint) that is closest to it. If called in list context, returns a two-element array consisting of that point, and the distance from the coordinate (in meters).
 
 - waypoints\_print()
 
@@ -185,11 +188,20 @@ Geo::Gpx - Create and parse GPX files
 
     `$iterator` defaults to `$self->iterate_points` if not specified.
 
-- xml( $version )
+- xml( key/values )
 
     Generate and return an XML string representation of the instance.
 
-    If the version is omitted it defaults to the value of the `version` attribute. Parsing a GPX document sets the version. If the `version` attribute is unset defaults to 1.0.
+    _key/values_ are (all optional):
+
+        `version`:        specifies the GPX XML version scheme to use (defaults to 1.0).
+        `unsafe_chars`:   the set of characters to be considered unsafe for the XML mark-up and encoded as an entity.
+
+    If `version` is omitted, it defaults to the value of the `version` attribute. Parsing a GPX document sets the version. If the `version` attribute is unset defaults to 1.0.
+
+    `unsafe_chars` can be provided to specify which characters to consider unsafe in generating the XML mark-up. This field is then passed through to [HTML::Entities](https://metacpan.org/pod/HTML%3A%3AEntities) function calls whose documentation describes that this field is "specified using the regular expression character class syntax (what you find within brackets in regular expressions)".
+
+    As of version _1.11_ of `Geo::Gpx`, the default set of characters are the `'<'`, `'&'`, `'>'`, `'"'` characters. To revert to the pre-version _1.11_ default, which is equivalent to that in <`HTML::Entities`, explicitely specify `unsafe_chars => undef`. This will encode as the latter module describes the "control chars, high-bit chars, and the `'<'`, `'&'`, `'>'`, `"'"`, `'"'` characters".
 
 - TO\_JSON
 
@@ -213,6 +225,7 @@ Geo::Gpx - Create and parse GPX files
         `force`:      overwrites existing files if true, otherwise it won't.
         `extensions`: save `<extensions>…</extension>` tags if true (defaults to false).
         `meta_time`:  save the `<time>…</time>` tag in the file's meta information tags if true (defaults to false). Some applications like MapSource return an error if this tags is present. (All other time tags elsewhere are kept.)
+        `unsafe_chars`:   see the documentation for `xml()` above.
 
 - set\_filename( $filename )
 
@@ -273,9 +286,9 @@ The `waypoints_clip()` method is only supported on unix-based systems that have 
 
 # BUGS AND LIMITATIONS
 
-No bugs have been reported.
+Prior to version 1.11, `xml()` and `save()` encoded "unsafe characters" as per the default in [HTML::Entities](https://metacpan.org/pod/HTML%3A%3AEntities) which resulted in erroneous codes for some multi-byte unicode characters. The current default is to only encode a short list of characters -- see `xml()` above. This change is motivated by the now prevalent use of unicode as the default encoding in many applications that read XML markup and \*.gpx files.
 
-Please report any bugs or feature requests to `bug-geo-gpx@rt.cpan.org`, or through the web interface at [http://rt.cpan.org](http://rt.cpan.org).
+Please report any bugs or feature requests on the github project page. Alternatively, you may submit them to `bug-geo-gpx@rt.cpan.org` or through the web interface at [http://rt.cpan.org](http://rt.cpan.org).
 
 # AUTHOR
 
@@ -287,7 +300,7 @@ Please visit the project page at: [https://github.com/patjoly/geo-gpx](https://g
 
 # VERSION
 
-1.10
+1.11
 
 # LICENSE AND COPYRIGHT
 

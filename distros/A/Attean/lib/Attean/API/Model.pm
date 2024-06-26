@@ -7,7 +7,7 @@ Attean::API::Model - RDF Model
 
 =head1 VERSION
 
-This document describes Attean::API::Model version 0.033
+This document describes Attean::API::Model version 0.034
 
 =head1 DESCRIPTION
 
@@ -166,7 +166,7 @@ in the model.
 
 use Attean::API::Binding;
 
-package Attean::API::Model 0.033 {
+package Attean::API::Model 0.034 {
 	use Sub::Install;
 	use Sub::Util qw(set_subname);
 	use URI::Namespace;
@@ -379,7 +379,7 @@ package Attean::API::Model 0.033 {
 }
 
 
-package Attean::API::MutableModel 0.033 {
+package Attean::API::MutableModel 0.034 {
 	use Attean::RDF;
 	use LWP::UserAgent;
 	use Encode qw(encode);
@@ -415,7 +415,10 @@ package Attean::API::MutableModel 0.033 {
 					my $p		= $pclass->new(base => iri($url));
 					my $str		= $resp->decoded_content;
 					my $bytes	= encode('UTF-8', $str, Encode::FB_CROAK);
-					my $iter	= $p->parse_iter_from_bytes( $bytes );
+					my $iter	= eval { $p->parse_iter_from_bytes( $bytes ) };
+					if ($@) {
+						die "Failed to parse URL $url: $@";
+					}
 					$self->add_iter($iter->as_quads($graph));
 				} else {
 					die "No parser found for content type $ct: $url";
@@ -485,21 +488,21 @@ package Attean::API::MutableModel 0.033 {
 }
 
 
-package Attean::API::ETagCacheableModel 0.033 {
+package Attean::API::ETagCacheableModel 0.034 {
 	use Moo::Role;
 	
 	requires 'etag_value_for_quads';
 }
 
 
-package Attean::API::TimeCacheableModel 0.033 {
+package Attean::API::TimeCacheableModel 0.034 {
 	use Moo::Role;
 	
 	requires 'mtime_for_quads';
 }
 
 
-package Attean::API::BulkUpdatableModel 0.033 {
+package Attean::API::BulkUpdatableModel 0.034 {
 	use Moo::Role;
 	
 	with 'Attean::API::MutableModel';
@@ -522,7 +525,7 @@ package Attean::API::BulkUpdatableModel 0.033 {
 	};
 }
 
-package Attean::API::RDFStarModel 0.033 {
+package Attean::API::RDFStarModel 0.034 {
 	use Moo::Role;
 
 	with 'Attean::API::Model';

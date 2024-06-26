@@ -4,9 +4,9 @@ use strict;
 use warnings;
 
 use Mo qw(build is);
-use Mo::utils::Date qw(check_date check_date_order);
+use Mo::utils::Date 0.04 qw(check_date check_date_order);
 
-our $VERSION = 0.03;
+our $VERSION = 0.04;
 
 has date_of_birth => (
 	is => 'ro',
@@ -28,6 +28,14 @@ has surname => (
 	is => 'ro',
 );
 
+has work_period_start => (
+	is => 'ro',
+);
+
+has work_period_end => (
+	is => 'ro',
+);
+
 sub BUILD {
 	my $self = shift;
 
@@ -35,6 +43,11 @@ sub BUILD {
 	check_date($self, 'date_of_death');
 
 	check_date_order($self, 'date_of_birth', 'date_of_death');
+
+	check_date($self, 'work_period_start');
+	check_date($self, 'work_period_end');
+
+	check_date_order($self, 'work_period_start', 'work_period_end');
 
 	return;
 }
@@ -61,6 +74,8 @@ MARC::Convert::Wikidata::Object::People - Bibliographic Wikidata object for peop
  my $name = $obj->name;
  my $nkcr_aut = $obj->nkcr_aut;
  my $surname = $obj->surname;
+ my $work_period_start = $obj->work_period_start;
+ my $work_period_end = $obj->work_period_end;
 
 =head1 METHODS
 
@@ -150,6 +165,22 @@ Get surname.
 
 Returns string.
 
+=head2 C<work_period_start>
+
+ my $work_period_start = $obj->work_period_start;
+
+Get start date of work period.
+
+Returns string.
+
+=head2 C<work_period_end>
+
+ my $work_period_end = $obj->work_period_end;
+
+Get end date of work period.
+
+Returns string.
+
 =head1 ERRORS
 
  new():
@@ -221,12 +252,12 @@ L<http://skim.cz>
 
 =head1 LICENSE AND COPYRIGHT
 
-© Michal Josef Špaček 2021-2023
+© Michal Josef Špaček 2021-2024
 
 BSD 2-Clause License
 
 =head1 VERSION
 
-0.03
+0.04
 
 =cut

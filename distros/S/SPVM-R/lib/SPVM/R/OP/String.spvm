@@ -1,0 +1,17 @@
+# Copyright (c) 2024 Yuki Kimoto
+# MIT License
+
+class R::OP::String {
+  
+  use R::NDArray::String;
+  use R::OP;
+  
+  # Class Methods
+  static method c : R::NDArray::String ($x_data : string[], $x_dim : int[] = undef) {
+    
+    my $x_ndarray = R::NDArray::String->new({dim => $x_dim, data => $x_data});
+    
+    return $x_ndarray;
+  }
+  
+}

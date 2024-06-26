@@ -3,11 +3,12 @@ package Geo::Gpx;
 use warnings;
 use strict;
 
-our $VERSION = '1.10';
+our $VERSION = '1.11';
 
 use Carp;
 use DateTime::Format::ISO8601;
 use DateTime;
+use Encode;
 use HTML::Entities qw( encode_entities encode_entities_numeric );
 use Scalar::Util qw( blessed looks_like_number );
 use XML::Descent;
@@ -69,6 +70,9 @@ my %XMLMAP = (                  # map hash keys to GPX names
         points   => 'trkpt'
         }
     );
+
+# my $unsafe_chars_default = '<>&\'"';
+my $unsafe_chars_default = '<>&"';      # single-quote character is not problematic
 
 my (@META, @ATTR);
 BEGIN {
@@ -161,6 +165,10 @@ sub _trim {
     $str =~ s/^\s+//;
     $str =~ s/\s+$//;
     $str =~ s/\s+/ /g;
+
+    $str = encode( 'utf-8', $str );
+    # ... because XML::TokeParser (called by the XML::Descent instance) encodes all entities indiscriminately and there is no way to turn that off
+
     return $str
 }
 
@@ -555,37 +563,71 @@ sub waypoints_merge {
 
 =over 4
 
-=item waypoint_closest_to( $point of $tcx_trackpoint )
+=item waypoint_closest_to( $point or $tcx_trackpoint )
 
-From any L<Geo::Gpx::Point> or L<Geo::TCX::Trackpoint> object, return the waypoint that is closest to it. If called in list context, returns a two-element array consisting of that waypoint, and the distance from the coordinate (in meters).
+=item trackpoint_closest_to( … )
+
+=item routepoint_closest_to( … )
+
+=item point_closest_to( … )
+
+From any L<Geo::Gpx::Point> or L<Geo::TCX::Trackpoint> object, return the L<Geo::Gpx::Point> that is closest to it. If called in list context, returns a two-element array consisting of that point, and the distance from the coordinate (in meters).
 
 =back
 
 =cut
 
 sub waypoint_closest_to {
-    my ($gpx, $to_pt) = (shift, shift);
-    my $croak_msg = 'waypoint_closest_to() expects a single argument in the form of Garmin::TCX::Trackpoint or Geo::Gpx::Point';
+    my $gpx = shift;
+    my ($closest_pt, $min_dist) = _iterate_and_find_closest_to( $gpx->iterate_waypoints, @_ );
+    return ($closest_pt, $min_dist) if wantarray;
+    return $closest_pt
+}
+
+sub trackpoint_closest_to {
+    my $gpx = shift;
+    my ($closest_pt, $min_dist) = _iterate_and_find_closest_to( $gpx->iterate_trackpoints, @_ );
+    return ($closest_pt, $min_dist) if wantarray;
+    return $closest_pt
+}
+
+sub routepoint_closest_to {
+    my $gpx = shift;
+    my ($closest_pt, $min_dist) = _iterate_and_find_closest_to( $gpx->iterate_routepoints, @_ );
+    return ($closest_pt, $min_dist) if wantarray;
+    return $closest_pt
+}
+
+sub point_closest_to {
+    my $gpx = shift;
+    my ($closest_pt, $min_dist) = _iterate_and_find_closest_to( $gpx->iterate_points, @_ );
+    return ($closest_pt, $min_dist) if wantarray;
+    return $closest_pt
+}
+
+sub _iterate_and_find_closest_to {
+    my ($iterator, $to_pt) = (shift, shift);
+    my ($method_name, @caller);
+    @caller = caller(1);
+    ($method_name = $caller[3]) =~ s/.*::(.*)/$1()/;
+
+    my $croak_msg = $method_name . ' expects a single argument in the form of a Geo::Gpx::Point or Geo::TCX::Trackpoint';
     if (ref $to_pt) {
-        croak $croak_msg unless $to_pt->isa('Geo::TCX::Trackpoint') or $to_pt->isa('Geo::Gpx::Point')
+        croak $croak_msg unless $to_pt->isa('Geo::Gpx::Point') or $to_pt->isa('Geo::TCX::Trackpoint')
     } else { croak $croak_msg }
     croak $croak_msg if @_;
 
     my ($closest_pt, $min_dist);
-    my $iter = $gpx->iterate_waypoints();
-    while ( my $pt = $iter->() ) {
+    while ( my $pt = $iterator->() ) {
         my $distance = $to_pt->distance_to( $pt );
-        $min_dist = $distance unless (defined $min_dist); # nb: $min_dist can be 0
+        $min_dist = $distance if ! defined $min_dist;       # $min_dist can be 0
         $closest_pt ||= $pt;
         if ($distance < $min_dist) {
-# print $pt->name, " distance is smaller at: ", $distance, "\n";
-# $DB::single=1;
             $closest_pt = $pt;
             $min_dist   = $distance
         }
     }
-    return ($closest_pt, $min_dist) if wantarray;
-    return $closest_pt
+    return ($closest_pt, $min_dist)
 }
 
 =over 4
@@ -1057,18 +1099,20 @@ sub bounds {
 }
 
 sub _enc {
-    return encode_entities_numeric( $_[0] )
+    return encode_entities_numeric( @_ )    # 2nd positional arg can either be undef or the string of unsafe chars to encode
 }
 
 sub _tag {
+    my $uc   = shift;           # unsafe_characters
     my $name = shift;
     my $attr = shift || {};
+
     my @tag  = ( '<', $name );
 
     # Sort keys so the tests can depend on hash output order
     for my $n ( sort keys %{$attr} ) {
         my $v = $attr->{$n};
-        push @tag, ' ', $n, '="', _enc( $v ), '"'
+        push @tag, ' ', $n, '="', _enc( $v, $uc ), '"'
     }
 
     if ( @_ ) { push @tag, '>', @_, '</', $name, ">\n"
@@ -1078,6 +1122,7 @@ sub _tag {
 
 sub _xml {
     my $self     = shift;
+    my $uc       = shift;       # unsafe_characters
     my $name     = shift;
     my $value    = shift;
     my $name_map = shift || {};
@@ -1099,15 +1144,15 @@ sub _xml {
                 if ( defined $as_attr && $k =~ $as_attr ) {
                     $attr->{$k} = $vv
                 } else {
-                    push @cont, $self->_xml( $k, $vv, $name_map )
+                    push @cont, $self->_xml( $uc, $k, $vv, $name_map )
                 }
             }
         }
-        return _tag( $tag, $attr, @cont )
+        return _tag( $uc, $tag, $attr, @cont )
     } elsif ( ref $value eq 'ARRAY' ) {
-        return join '', map { $self->_xml( $tag, $_, $name_map ) } @{$value}
+        return join '', map { $self->_xml( $uc, $tag, $_, $name_map ) } @{$value}
     } else {
-        return _tag( $tag, {}, _enc( $value ) )
+        return _tag( $uc, $tag, {}, _enc( $value, $uc ) )
     }
 }
 
@@ -1122,28 +1167,42 @@ sub _cmp_ver {
     return @v1 <=> @v2
 }
 
-=item xml( $version )
+=item xml( key/values )
 
 Generate and return an XML string representation of the instance.
 
-If the version is omitted it defaults to the value of the C<version> attribute. Parsing a GPX document sets the version. If the C<version> attribute is unset defaults to 1.0.
+I<key/values> are (all optional):
+
+Z<>    C<version>:        specifies the GPX XML version scheme to use (defaults to 1.0).
+Z<>    C<unsafe_chars>:   the set of characters to be considered unsafe for the XML mark-up and encoded as an entity.
+
+If C<version> is omitted, it defaults to the value of the C<version> attribute. Parsing a GPX document sets the version. If the C<version> attribute is unset defaults to 1.0.
+
+C<unsafe_chars> can be provided to specify which characters to consider unsafe in generating the XML mark-up. This field is then passed through to L<HTML::Entities> function calls whose documentation describes that this field is "specified using the regular expression character class syntax (what you find within brackets in regular expressions)".
+
+As of version I<1.11> of C<Geo::Gpx>, the default set of characters are the C<< '<' >>, C<'&'>, C<< '>' >>, C<'"'> characters. To revert to the pre-version I<1.11> default, which is equivalent to that in <C<HTML::Entities>, explicitely specify C<< unsafe_chars => undef >>. This will encode as the latter module describes the "control chars, high-bit chars, and the C<< '<' >>, C<'&'>, C<< '>' >>, C<< "'" >>, C<'"'> characters".
 
 =cut
 
 sub xml {
-    my $self = shift;
-    my $version = shift || $self->{version} || '1.0';
+    my ($self, %opts)  = @_;
+    my $version = $opts{version} || '1.0';
+
+    my $uc;       # can exist and set as undef to encode everything
+    if ( exists $opts{unsafe_chars} ) { $uc = $opts{unsafe_chars} }
+    else { $uc = $unsafe_chars_default }
+
     my @ret = ();
     push @ret, qq{<?xml version="1.0" encoding="utf-8"?>\n};
 
     $self->{encoder} = {
         time => sub {
             my ( $n, $v ) = @_;
-            return _tag( $n, {}, _enc( $self->{handler}->{time}->( $v ) ) )
+            return _tag( $uc, $n, {}, _enc( $self->{handler}->{time}->( $v ), $uc ) )
             },
         keywords => sub {
             my ( $n, $v ) = @_;
-            return _tag( $n, {}, _enc( join( ', ', @{$v} ) ) )
+            return _tag( $uc, $n, {}, _enc( join( ', ', @{$v} ), $uc ) )
              }
         };
 
@@ -1155,14 +1214,14 @@ sub xml {
         $self->{encoder}->{link} = sub {
             my ( $n, $v ) = @_;
             my @v = ();
-            push @v, $self->_xml( 'url', $v->{href} )     if exists( $v->{href} );
-            push @v, $self->_xml( 'urlname', $v->{text} ) if exists( $v->{text} );
+            push @v, $self->_xml( $uc, 'url', $v->{href} )     if exists( $v->{href} );
+            push @v, $self->_xml( $uc, 'urlname', $v->{text} ) if exists( $v->{text} );
             return join( '', @v )
             };
         $self->{encoder}->{email} = sub {
             my ( $n, $v ) = @_;
             if ( exists( $v->{id} ) && exists( $v->{domain} ) ) {
-                return _tag( 'email', {}, _enc( join( '@', $v->{id}, $v->{domain} ) ) )
+                return _tag( $uc, 'email', {}, _enc( join( '@', $v->{id}, $v->{domain} ), $uc ) )
             } else {
                 return ''
             }
@@ -1170,8 +1229,8 @@ sub xml {
         $self->{encoder}->{author} = sub {
             my ( $n, $v ) = @_;
             my @v = ();
-            push @v, _tag( 'author', {}, _enc( $v->{name} ) ) if exists( $v->{name} );
-            push @v, $self->_xml( 'email', $v->{email} )      if exists( $v->{email} );
+            push @v, _tag( $uc, 'author', {}, _enc( $v->{name}, $uc ) ) if exists( $v->{name} );
+            push @v, $self->_xml( $uc, 'email', $v->{email} )      if exists( $v->{email} );
             return join( '', @v )
             };
     }
@@ -1191,18 +1250,18 @@ sub xml {
 
     for my $fld ( @META ) {
         if ( exists( $self->{$fld} ) ) {
-            push @meta, $self->_xml( $fld, $self->{$fld} )
+            push @meta, $self->_xml( $uc, $fld, $self->{$fld} )
         }
     }
 
     my $bounds = $self->bounds( $self->iterate_points() );
     if ( %{$bounds} ) {
-        push @meta, _tag( 'bounds', $bounds )
+        push @meta, _tag( $uc, 'bounds', $bounds )
     }
 
     # Version 1.1 nests metadata in a metadata tag
     if ( _cmp_ver( $version, '1.1' ) >= 0 ) {
-        push @ret, _tag( 'metadata', {}, "\n", @meta )
+        push @ret, _tag( $uc, 'metadata', {}, "\n", @meta )
     } else {
         push @ret, @meta
     }
@@ -1215,7 +1274,7 @@ sub xml {
         }
     }
     for my $k ( @existing_keys ) {
-        push @ret, $self->_xml( $k, $self->{$k}, $XMLMAP{$k} )
+        push @ret, $self->_xml( $uc, $k, $self->{$k}, $XMLMAP{$k} )
     }
     push @ret, qq{</gpx>\n};
     return join( '', @ret )
@@ -1267,6 +1326,7 @@ I<key/values> are (all optional):
 Z<>    C<force>:      overwrites existing files if true, otherwise it won't.
 Z<>    C<extensions>: save C<< <extensions>…</extension> >> tags if true (defaults to false).
 Z<>    C<meta_time>:  save the C<< <time>…</time> >> tag in the file's meta information tags if true (defaults to false). Some applications like MapSource return an error if this tags is present. (All other time tags elsewhere are kept.)
+Z<>    C<unsafe_chars>:   see the documentation for C<xml()> above.
 
 =back
 
@@ -1279,7 +1339,11 @@ sub save {
     else { $fname = $o->set_filename() }
     croak "$fname already exists" if -f $fname and !$opts{force};
 
-    $xml_string = $o->xml;
+    my $uc;       # can exist and set as undef to encode everything
+    if ( exists $opts{unsafe_chars} ) { $uc = $opts{unsafe_chars} }
+    else { $uc = $unsafe_chars_default }
+
+    $xml_string = $o->xml( unsafe_chars => $uc );
     if ( ! $opts{extensions} ) {
         $xml_string =~ s/\n*\w*<extensions>[^<]*<\/extensions>//gs
     }
@@ -1290,7 +1354,7 @@ sub save {
     if (defined ($opts{encoding}) and ( $opts{encoding} eq 'latin1') ) {
         open( $fh, ">:encoding(latin1)", $fname) or  die "can't open file $fname: $!";
     } else {
-        open( $fh, ">:encoding(utf-8)", $fname)  or  die "can't open file $fname: $!";
+        open( $fh, ">", $fname)  or  die "can't open file $fname: $!";
     }
     print $fh $xml_string
 }
@@ -1449,9 +1513,9 @@ L<JSON>
 
 =head1 BUGS AND LIMITATIONS
 
-No bugs have been reported.
+Prior to version 1.11, C<xml()> and C<save()> encoded "unsafe characters" as per the default in L<HTML::Entities> which resulted in erroneous codes for some multi-byte unicode characters. The current default is to only encode a short list of characters -- see C<xml()> above. This change is motivated by the now prevalent use of unicode as the default encoding in many applications that read XML markup and *.gpx files.
 
-Please report any bugs or feature requests to C<bug-geo-gpx@rt.cpan.org>, or through the web interface at L<http://rt.cpan.org>.
+Please report any bugs or feature requests on the github project page. Alternatively, you may submit them to C<bug-geo-gpx@rt.cpan.org> or through the web interface at L<http://rt.cpan.org>.
 
 =head1 AUTHOR
 
@@ -1463,7 +1527,7 @@ Please visit the project page at: L<https://github.com/patjoly/geo-gpx>.
 
 =head1 VERSION
 
-1.10
+1.11
 
 =head1 LICENSE AND COPYRIGHT
 

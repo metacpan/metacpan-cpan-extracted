@@ -1,5 +1,8 @@
 Revision history for Perl extension Kelp::Module::YAML.
 
+2.00 Wed Jun 26 2024
+	- Added kelp_extensions configuration, adding YAML logic to Kelp packages
+
 1.00 Mon Jun 24 2024
 	- first version
 
