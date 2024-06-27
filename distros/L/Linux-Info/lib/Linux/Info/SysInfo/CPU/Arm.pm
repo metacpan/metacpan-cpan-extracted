@@ -2,18 +2,25 @@ package Linux::Info::SysInfo::CPU::Arm;
 use strict;
 use warnings;
 use Carp qw(confess);
-use Class::XSAccessor getters =>
-  { get_variant => 'variant', get_part => 'part', get_revision => 'revision' };
+use Class::XSAccessor getters => {
+    get_variant      => 'variant',
+    get_part         => 'part',
+    get_revision     => 'revision',
+    get_hardware     => 'hardware',
+    get_serial       => 'serial',
+    get_model_name   => 'model_name',
+    get_cpu_revision => 'cpu_revision',
+};
 
 use base 'Linux::Info::SysInfo::CPU';
 
-our $VERSION = '2.18'; # VERSION
+our $VERSION = '2.19'; # VERSION
 
 # ABSTRACT: Collects Arm based CPU information from /proc/cpuinfo
 
 
 # CPU architecture: 8
-my $processor_regex = qr/^CPU\sarchitecture\:\s8$/;
+my $processor_regex = qr/^CPU\sarchitecture\:\s\d+$/;
 
 sub processor_regex {
     return $processor_regex;
@@ -33,45 +40,59 @@ my %vendors = (
 );
 
 sub _parse {
-    my $self = shift;
-    my $file = $self->{source_file};
-
-# Features	: fp asimd evtstrm aes pmull sha1 sha2 crc32 atomics fphp asimdhp cpuid asimdrdm lrcpc dcpop
-    my $flags_regex   = qr/^Features\t\:\s+(.*)/;
-    my $flags_defined = 0;
-
-    # CPU implementer	: 0x41
-    my $vendor_regex = qr/CPU\simplementer\t\:\s(0x\d+)/;
-
-    # BogoMIPS	: 50.00
-    my $bogo_regex = qr/BogoMIPS\t\:\s(\d+\.\d+)/;
-
-    # processor	: 0
-    my $processor_regex = qr/^processor\t\:\s(\d)/;
-
-    # CPU variant	: 0x3
-    my $variant_regex = qr/^CPU\svariant\t\:\s(0x\w+)/;
-
-    # CPU part	: 0xd0c
-    my $part_regex = qr/^CPU\spart\t\:\s(0x\w+)/;
-
-    # CPU revision	: 1
-    my $revision_regex = qr/^CPU\srevision\t\:\s(\d+)/;
-
-    # CPU architecture: 8
-    my $arch_regex = qr/^CPU\sarchitecture\:\s(\d+)/;
-
-    # Processor       : ARMv7 Processor rev 10 (v7l)
-    # model name      : ARMv7 Processor rev 10 (v7l)
-    # Hardware        : Generic DT based system
-    my $model_regex = qr/^(Processor|model\sname|Hardware)\s+\:\s(.*)/;
-    my $processors  = 0;
+    my $self               = shift;
+    my $file               = $self->{source_file};
+    my $flags_regex        = qr/^Features\t\:\s+(.*)/;
+    my $flags_defined      = 0;
+    my $vendor_regex       = qr/CPU\simplementer\t\:\s(0x\d+)/;
+    my $bogo_regex         = qr/BogoMIPS\t\:\s(\d+\.\d+)/;
+    my $processor_regex    = qr/^processor\t\:\s(\d)/;
+    my $variant_regex      = qr/^CPU\svariant\t\:\s(0x\w+)/;
+    my $part_regex         = qr/^CPU\spart\t\:\s(0x\w+)/;
+    my $cpu_revision_regex = qr/^CPU\srevision\t\:\s(\d+)/;
+    my $arch_regex         = qr/^CPU\sarchitecture\:\s(\d+)/;
+    my $hardware_regex     = qr/^Hardware\s+\:\s(.*)/;
+    my $serial_regex       = qr/^Serial\s+\:\s(.*)/;
+    my $revision_regex     = qr/^Revision\s+\:\s(.*)/;
+    my $model_regex        = qr/^Model\s+\:\s(.*)/;
+    my $model_name_regex   = qr/^model\sname\s+\:\s(.*)/;
+    my $processors         = 0;
 
     open( my $fh, '<', $file ) or confess "Cannot read $file: $!";
 
   LINE: while ( my $line = <$fh> ) {
         chomp($line);
         next LINE if ( $line eq '' );
+
+        if ( $line =~ $serial_regex ) {
+            next LINE if ( defined $self->{serial} );
+            $self->{serial} = $1;
+            next LINE;
+        }
+
+        if ( $line =~ $hardware_regex ) {
+            next LINE if ( defined $self->{hardware} );
+            $self->{hardware} = $1;
+            next LINE;
+        }
+
+        if ( $line =~ $model_name_regex ) {
+            next LINE if ( defined $self->{model_name} );
+            $self->{model_name} = $1;
+            next LINE;
+        }
+
+        if ( $line =~ $model_regex ) {
+            next LINE if ( defined $self->{model} );
+            $self->{model} = $1;
+            next LINE;
+        }
+
+        if ( $line =~ $cpu_revision_regex ) {
+            next LINE if ( defined $self->{cpu_revision} );
+            $self->{cpu_revision} = $1;
+            next LINE;
+        }
 
         if ( $line =~ $revision_regex ) {
             next LINE if ( defined $self->{revision} );
@@ -146,7 +167,7 @@ sub _parse {
             ' ',
             (
                 $self->{vendor}, $self->{variant},
-                $self->{part},   $self->{revision}
+                $self->{part},   $self->{cpu_revision}
             )
         );
     }
@@ -164,10 +185,12 @@ sub _set_proc_bits {
 }
 
 sub _custom_attribs {
-    my $self = shift;
-    $self->{variant}  = undef;
-    $self->{part}     = undef;
-    $self->{revision} = undef;
+    my $self    = shift;
+    my @attribs = (
+        'variant',  'part',   'revision', 'model_name',
+        'hardware', 'serial', 'cpu_revision'
+    );
+    map { $self->{$_} = undef } @attribs;
 }
 
 sub _set_hyperthread { }
@@ -176,6 +199,11 @@ sub _set_hyperthread { }
 sub get_cores {
     return 0;
 }
+
+# get_hardware     => 'hardware',
+# get_serial       => 'serial',
+# get_model_name   => 'model_name',
+# get_cpu_revision => 'cpu_revision',
 
 
 sub get_threads {
@@ -197,7 +225,7 @@ Linux::Info::SysInfo::CPU::Arm - Collects Arm based CPU information from /proc/c
 
 =head1 VERSION
 
-version 2.18
+version 2.19
 
 =head1 SYNOPSIS
 
@@ -208,7 +236,10 @@ See L<Linux::Info::SysInfo> C<get_cpu> method.
 This is a subclass of L<Linux::Info::SysInfo::CPU>, with specific code to parse
 ARM format of L</proc/cpuinfo>.
 
-Finding information about a ARM processor can be quite difficult. Not all
+ARM processor information parsing is a pain in the ass. Manufactures basically
+add whatever information they want, and there are several manufactures.
+
+Finding information about a ARM processor can also be quite difficult. Not all
 vendors have model information available on the L</proc/cpuinfo> file, and
 sometimes is required to even search specifications for a processor using the
 following attributes in this class:
@@ -253,9 +284,29 @@ Returns a regular expression that identifies the processor that is being read.
 
 Returns the number of cores of the processor.
 
-=head2 get_threads
+=head2 get_hardware
 
-Returns the number of threads of the processor.
+Returns the content of C<Hardware> field on F</proc/cpuinfo> if available.
+
+Otherwise returns C<undef>.
+
+=head2 get_serial
+
+Returns the content of C<Serial> field on F</proc/cpuinfo> if available.
+
+Otherwise returns C<undef>.
+
+=head2 get_model_name
+
+Returns the content of C<model name> field on F</proc/cpuinfo> if available.
+
+Otherwise returns C<undef>.
+
+=head2 get_cpu_revision
+
+Returns the content of C<cpu revision> field on F</proc/cpuinfo> if available.
+
+Otherwise returns C<undef>.
 
 =head2 get_part
 
@@ -268,6 +319,10 @@ Return an hexadecimal of the CPU revision.
 =head2 get_variant
 
 Return an hexadecimal of the CPU variant.
+
+=head2 get_threads
+
+Returns the number of threads of the processor.
 
 =head1 SEE ALSO
 

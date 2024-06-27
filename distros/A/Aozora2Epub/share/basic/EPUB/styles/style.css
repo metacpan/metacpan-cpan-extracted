@@ -38,7 +38,13 @@ h1.tobira {
     font-size: 1.2em;
 }
 
-h1, h2 {
+h1 {
+    padding-top: 3em;
+    font-size: 1.2em;
+    padding-right: 1em;
+}
+
+h2 {
     padding-top: 4em;
     font-size: 1.1em;
     padding-right: 1em;

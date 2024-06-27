@@ -1,0 +1,28 @@
+Filter::Syntactic version 0.000002
+
+This module gives you a new "filter" declarator,
+with which you can declare one or more source code filters
+that respect standard Perl syntax (with possible extensions).
+
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+
+DEPENDENCIES
+
+None.
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2024, Damian Conway
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.

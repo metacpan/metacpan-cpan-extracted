@@ -1,0 +1,34 @@
+DWIM::Block version 0.000002
+
+ This module makes it easy to build code that sends a request to the OpenAI
+ API and then returns the response. Instead of writing all the infrastructure
+ code to accomplish that, you just write:
+
+    DWIM { Your $interpolated request here }
+
+ and your request is sent off to ChatGPT via the AI::Chat module.
+ The DWIM block returns ChatGPT's response.
+
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+
+DEPENDENCIES
+
+None.
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2024, Damian Conway
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+

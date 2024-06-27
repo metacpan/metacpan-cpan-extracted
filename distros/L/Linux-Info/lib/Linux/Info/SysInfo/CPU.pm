@@ -12,7 +12,7 @@ use Class::XSAccessor getters => {
     get_source_file => 'source_file',
 };
 
-our $VERSION = '2.18'; # VERSION
+our $VERSION = '2.19'; # VERSION
 
 # ABSTRACT: Collects CPU information from /proc/cpuinfo
 
@@ -120,7 +120,7 @@ Linux::Info::SysInfo::CPU - Collects CPU information from /proc/cpuinfo
 
 =head1 VERSION
 
-version 2.18
+version 2.19
 
 =head2 SYNOPSIS
 

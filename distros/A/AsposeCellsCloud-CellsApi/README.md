@@ -20,15 +20,12 @@ Enhance your Perl applications with the [Aspose.Cells Cloud](https://products.as
 - Import/Export: Facilitates importing data from various sources into spreadsheets and exporting spreadsheet data to other formats.
 - Security Management: Offers a range of security features like data encryption, access control, and permission management to safeguard the security and integrity of spreadsheet data.
 
-
-
-## Feature & Enhancements in Version 24.5.1
+## Feature & Enhancements in Version 24.6
 
 Full list of issues covering all changes in this release:
 
-- Add merge queries method for loading data of data transformation.
-- Optimize chart data model.
-
+- Optimize load data function of data transformation.
+- Optimize the data conversion applied steps.
 
 ## Support file format
 
@@ -68,7 +65,6 @@ Full list of issues covering all changes in this release:
 |[DOCX](https://docs.fileformat.com/word-processing/docx/)|A well-known format for Microsoft Word documents that is a combination of XML and binary files.||&radic;|
 |[PPTX](https://docs.fileformat.com/presentation/pptx/)|The PPTX format is based on the Microsoft PowerPoint open XML presentation file format.||&radic;|
 
-
 ## Quick Start Guide
 
 To begin with Aspose.Cells Cloud, here's what you need to do:
@@ -76,7 +72,6 @@ To begin with Aspose.Cells Cloud, here's what you need to do:
 1. Sign up for an account at [Aspose for Cloud](https://dashboard.aspose.cloud/#/apps) to obtain your application details.
 2. Install the Aspose.Cells Cloud Perl module from the [CPAN distribution](https://www.cpan.org/).
 3. Use the conversion code provided below as a reference to add or modify your application.
-
 
 ## Convert an Excel File Using Perl
 
@@ -109,6 +104,7 @@ $request->{file} =  $mapFiles;
 $request->{format} =  $format;
 $instance->put_convert_workbook(request=> $request);
 ```
+
 ## Aspose.Cells Cloud in Popular Languages
 
 | .NET | Java | PHP | Python | Ruby | Node.js | Android | Swift | GO |
@@ -118,8 +114,12 @@ $instance->put_convert_workbook(request=> $request);
 
 [Product Page](https://products.aspose.cloud/cells/perl) | [Documentation](https://docs.aspose.cloud/cells/) | [Live Demo](https://products.aspose.app/cells/family) | [API Reference](https://apireference.aspose.cloud/cells/) | [Code Samples](https://github.com/aspose-cells-cloud/aspose-cells-cloud-perl) | [Blog](https://blog.aspose.cloud/category/cells/) | [Free Support](https://forum.aspose.cloud/c/cells) | [Free Trial](https://dashboard.aspose.cloud/#/apps)
 
-
 # Release history version
+
+## Enhancements in Version 24.5
+
+- Add merge queries method for loading data of data transformation.
+- Optimize chart data model.
 
 ## Enhancements in Version 24.4
 

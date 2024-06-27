@@ -6,7 +6,7 @@ use base 'Linux::Info::Distribution::OSRelease';
 use Hash::Util qw(lock_hash unlock_hash);
 use Class::XSAccessor getters => { get_bug_report_url => 'bug_report_url' };
 
-our $VERSION = '2.18'; # VERSION
+our $VERSION = '2.19'; # VERSION
 # ABSTRACT: a subclass of Linux::Info::Distribution::OSRelease
 
 
@@ -42,7 +42,7 @@ Linux::Info::Distribution::OSRelease::Alpine - a subclass of Linux::Info::Distri
 
 =head1 VERSION
 
-version 2.18
+version 2.19
 
 =head1 DESCRIPTION
 

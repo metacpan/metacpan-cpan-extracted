@@ -6,7 +6,7 @@ use POSIX qw(strftime);
 use UNIVERSAL;
 use Linux::Info::Compilation;
 
-our $VERSION = '2.18'; # VERSION
+our $VERSION = '2.19'; # VERSION
 
 # ABSTRACT: API in Perl to recover information about the running Linux OS
 
@@ -159,7 +159,7 @@ Linux::Info - API in Perl to recover information about the running Linux OS
 
 =head1 VERSION
 
-version 2.18
+version 2.19
 
 =head1 SYNOPSIS
 

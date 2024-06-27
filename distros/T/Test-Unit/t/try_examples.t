@@ -69,7 +69,7 @@ foreach my $e (keys %guru_checked) {
 
 warn("\n > The STDERR redirection may not work or may behave differently under\n".
      " > your OS '$^O'. That will probably cause this test to fail.\n")
-    if grep { $^O =~ $_ } ( qr/win/i );
+    if grep { $^O eq $_ } (qw( cygwin MSWin32 ));
 # This will apply to various OSes. Is there a "capable of doing unix
 # redirections" flag somewhere?
 

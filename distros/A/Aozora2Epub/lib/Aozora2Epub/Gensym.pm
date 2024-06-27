@@ -5,6 +5,8 @@ use utf8;
 use base qw/Exporter/;
 our @EXPORT = qw(gensym);
 
+our $VERSION = '0.04';
+
 my $gensym_counter = 0;
 
 sub gensym { sprintf("g%09d", $gensym_counter++); }

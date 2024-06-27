@@ -1,3 +1,33 @@
+liblinux-info-perl (2.19) trusty; urgency=low
+  * Bugfix/arm 7 (#28)
+  * chore: required update
+  * refactor: small improvements
+  - compiling the regex to avoid recompilation at each line. - better
+    error message
+  * fix: different ARM cpuinfo format
+  - expands the attributes - fixes the regex to match ARM processor -
+    expands the getters - expands the unit tests to use two different
+    files
+  * doc: required
+  * chore: version bump 
+  * Update README.md (#27) 
+
+ -- Alceu Rodrigues de Freitas Junior <glasswalk3r@yahoo.com.br>  Wed, 26 Jun 2024 16:51:06 +0000
+
+liblinux-info-perl () trusty; urgency=low
+  * chore: version bump 
+  * doc: required 
+  * fix: different ARM cpuinfo format
+  - expands the attributes - fixes the regex to match ARM processor -
+    expands the getters - expands the unit tests to use two different
+    files 
+  * refactor: small improvements
+  - compiling the regex to avoid recompilation at each line. - better
+    error message 
+  * chore: required update 
+
+ -- Alceu Rodrigues de Freitas Junior <glasswalk3r@yahoo.com.br>  Wed, 26 Jun 2024 16:43:12 +0000
+
 liblinux-info-perl () trusty; urgency=low
   * Minor bugs fixes (#26)
   * fix: missing SysInfo::get_cpu testing

@@ -1,0 +1,166 @@
+{
+   "abstract" : "Perl FFI bindings for raylib",
+   "author" : [
+      "Chris Prather <chris@prather.org>",
+      "Based on the work of:",
+      "Ahmad Fatoum C<< <athreef@cpan.org> >>, L<http://a3f.at>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "App::ModuleBuildTiny version 0.044",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Raylib-FFI",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.039"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "App::ModuleBuildTiny" : "0.044"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Alien::raylib" : "0",
+            "Convert::Color" : "0",
+            "FFI::C" : "0",
+            "FFI::CheckLib" : "0",
+            "FFI::Platypus" : "0",
+            "File::Share" : "0",
+            "Module::Build::Tiny" : "0",
+            "builtin::Backport" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Raylib::App" : {
+         "file" : "lib/Raylib/App.pm"
+      },
+      "Raylib::Color" : {
+         "file" : "lib/Raylib/Color.pm"
+      },
+      "Raylib::FFI" : {
+         "file" : "lib/Raylib/FFI.pm",
+         "version" : "0.01"
+      },
+      "Raylib::FFI::AudioStream" : {
+         "file" : "lib/Raylib/FFI.pm"
+      },
+      "Raylib::FFI::BoneInfo" : {
+         "file" : "lib/Raylib/FFI.pm"
+      },
+      "Raylib::FFI::BoundingBox" : {
+         "file" : "lib/Raylib/FFI.pm"
+      },
+      "Raylib::FFI::Camera2D" : {
+         "file" : "lib/Raylib/FFI.pm"
+      },
+      "Raylib::FFI::Camera3D" : {
+         "file" : "lib/Raylib/FFI.pm"
+      },
+      "Raylib::FFI::Color" : {
+         "file" : "lib/Raylib/FFI.pm"
+      },
+      "Raylib::FFI::Font" : {
+         "file" : "lib/Raylib/FFI.pm"
+      },
+      "Raylib::FFI::GlyphInfo" : {
+         "file" : "lib/Raylib/FFI.pm"
+      },
+      "Raylib::FFI::Image" : {
+         "file" : "lib/Raylib/FFI.pm"
+      },
+      "Raylib::FFI::Material" : {
+         "file" : "lib/Raylib/FFI.pm"
+      },
+      "Raylib::FFI::MaterialMap" : {
+         "file" : "lib/Raylib/FFI.pm"
+      },
+      "Raylib::FFI::Matrix" : {
+         "file" : "lib/Raylib/FFI.pm"
+      },
+      "Raylib::FFI::Mesh" : {
+         "file" : "lib/Raylib/FFI.pm"
+      },
+      "Raylib::FFI::Model" : {
+         "file" : "lib/Raylib/FFI.pm"
+      },
+      "Raylib::FFI::ModelAnimation" : {
+         "file" : "lib/Raylib/FFI.pm"
+      },
+      "Raylib::FFI::Music" : {
+         "file" : "lib/Raylib/FFI.pm"
+      },
+      "Raylib::FFI::NPatchInfo" : {
+         "file" : "lib/Raylib/FFI.pm"
+      },
+      "Raylib::FFI::Ray" : {
+         "file" : "lib/Raylib/FFI.pm"
+      },
+      "Raylib::FFI::RayCollision" : {
+         "file" : "lib/Raylib/FFI.pm"
+      },
+      "Raylib::FFI::Rectangle" : {
+         "file" : "lib/Raylib/FFI.pm"
+      },
+      "Raylib::FFI::RenderTexture" : {
+         "file" : "lib/Raylib/FFI.pm"
+      },
+      "Raylib::FFI::Shader" : {
+         "file" : "lib/Raylib/FFI.pm"
+      },
+      "Raylib::FFI::Sound" : {
+         "file" : "lib/Raylib/FFI.pm"
+      },
+      "Raylib::FFI::Texture" : {
+         "file" : "lib/Raylib/FFI.pm"
+      },
+      "Raylib::FFI::Transform" : {
+         "file" : "lib/Raylib/FFI.pm"
+      },
+      "Raylib::FFI::Vector2D" : {
+         "file" : "lib/Raylib/FFI.pm"
+      },
+      "Raylib::FFI::Vector3D" : {
+         "file" : "lib/Raylib/FFI.pm"
+      },
+      "Raylib::FFI::Vector4D" : {
+         "file" : "lib/Raylib/FFI.pm"
+      },
+      "Raylib::FFI::VrDeviceInfo" : {
+         "file" : "lib/Raylib/FFI.pm"
+      },
+      "Raylib::FFI::VrStereoConfig" : {
+         "file" : "lib/Raylib/FFI.pm"
+      },
+      "Raylib::FFI::Wave" : {
+         "file" : "lib/Raylib/FFI.pm"
+      },
+      "Raylib::Image" : {
+         "file" : "lib/Raylib/Texture.pm"
+      },
+      "Raylib::Keyboard" : {
+         "file" : "lib/Raylib/Keyboard.pm"
+      },
+      "Raylib::Text" : {
+         "file" : "lib/Raylib/Text.pm"
+      },
+      "Raylib::Text::FPS" : {
+         "file" : "lib/Raylib/Text.pm"
+      },
+      "Raylib::Texture" : {
+         "file" : "lib/Raylib/Texture.pm"
+      }
+   },
+   "release_status" : "stable",
+   "version" : "0.01",
+   "x_serialization_backend" : "JSON::PP version 4.16",
+   "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"
+}

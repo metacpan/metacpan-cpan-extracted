@@ -9,7 +9,7 @@ use Class::XSAccessor getters => {
     get_build_number     => 'build_number',
 };
 
-our $VERSION = '2.18'; # VERSION
+our $VERSION = '2.19'; # VERSION
 
 # ABSTRACT: a subclass of Linux::Info::KernelRelease specific to parse Alpine kernel information
 
@@ -42,7 +42,7 @@ Linux::Info::KernelRelease::Raspbian - a subclass of Linux::Info::KernelRelease 
 
 =head1 VERSION
 
-version 2.18
+version 2.19
 
 =head1 METHODS
 

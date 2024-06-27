@@ -7,7 +7,7 @@ use strict;
 use warnings;
 use experimental 'signatures', 'postderef';
 
-our $VERSION = '0.14';
+our $VERSION = '0.15';
 
 use DBI ();
 use CXC::Exporter::Util ':all';
@@ -91,7 +91,7 @@ CXC::DB::DDL::Constants - Constants
 
 =head1 VERSION
 
-version 0.14
+version 0.15
 
 =head1 SYNOPSIS
 

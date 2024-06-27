@@ -1,0 +1,19 @@
+Changes
+lib/Switch/Right.pm
+Makefile.PL
+MANIFEST
+README
+t/00.load.t
+t/given_when.t
+t/given_when_junctive.t
+t/given_when_noncompatible.t
+t/smartmatch.t
+t/smartmatch_coretests.t
+t/smartmatch_junctives.t
+t/smartmatch_old_behaviors.t
+t/smartmatch_overload_objs.t
+t/when_0.t
+t/when_result.t
+t/smartmatch_refref.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

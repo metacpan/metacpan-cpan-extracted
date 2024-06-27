@@ -124,6 +124,7 @@ t/samples/cpu/info5
 t/samples/cpu/info6
 t/samples/cpu/info7
 t/samples/cpu/info8
+t/samples/cpu/info9
 t/samples/custom/amazon
 t/samples/custom/centos-stream
 t/samples/custom/cloudlinux

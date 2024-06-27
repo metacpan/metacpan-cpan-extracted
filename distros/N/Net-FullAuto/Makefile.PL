@@ -26,7 +26,7 @@
 ################################################################
 
 
-our $VERSION='1.0000657';
+our $VERSION='1.0000658';
 
 
 if ($ENV{'AUTOMATED_TESTING'}) {
@@ -290,7 +290,7 @@ our $system_type='';
 # wget --tries=1 --timeout=5 -qO- http://169.254.169.254/latest/dynamic/instance-identity/document 2>&1
 my $aws=`wget --tries=1 --timeout=5 -qO- http://169.254.169.254/latest/dynamic/instance-identity/document 2>&1`;
 $aws=(-1<index $aws,'signature')?1:0;
-if ($^O eq 'linux' || $^O eq 'freebsd') {
+if (($^O eq 'linux' || $^O eq 'freebsd') && !(grep { /SKIP/i } @ARGV)) {
    if ((-e "/etc/system-release-cpe") &&
          ((-1<index `cat /etc/system-release-cpe`,'amazon:linux') ||
          (-1<index `cat /etc/system-release-cpe`,'amazon_linux'))) {
@@ -303,7 +303,84 @@ if ($^O eq 'linux' || $^O eq 'freebsd') {
       $system_type='amazon_linux';
    } elsif ((-e "/etc/os-release") &&
          (-1<index `cat /etc/os-release`,'ubuntu')) {
-      $amazon{'ubuntu'}='' if $aws;
+      if (-1<index `sudo dmesg | grep -Ew 'DMI|Amazon|EC2'`,'amazon') {
+         my $message=<<END;
+
+   This message times out in two minutes so FullAuto Install can continue
+      _                            _   _ _             _
+     /_\\  _ __  __ _ ______ _ _   | | | | |__ _  _ _ _| |_ _  _
+    / _ \\| '  \\/ _` |_ / _ \\ ' \\  | |_| | '_ \\ || | ' \\  _| || |
+   /_/ \\_\\_|_|_\\__,_/__\\___/_||_|  \\___/|_.__/\\_,_|_||_\\__|\\_,_|
+
+   In order to install FullAuto on Amazon Ubuntu servers, a number of
+   prerequisite dependencies must be installed or present. Allow
+   FullAuto Setup to validate and install any missing dependencies?
+   (Default is 'yes')
+
+END
+
+         my $timeout=120;
+         my $fae="No   (FullAuto Setup will exit)";
+         {
+            local $SIG{__DIE__}; # No sigdie handler
+            eval {
+               local $SIG{ALRM} = sub { die "alarm\n" }; # NB: \n required
+               alarm $timeout;
+               my $menu1 = [
+                     $message,
+                     [ "Yes", sub{ return 'Yes' } ],
+                     [ $fae, sub{ return 'No' } ],
+                     ];
+               my $selection=&menu($menu1);
+               exit 0 if $selection eq ']quit[';
+               exit 0 if -1<index $selection, 'No';
+               alarm 0;
+            };
+         }
+      } print "\n\n   FullAuto install continues . . .\n\n";
+      fa_system('sudo apt-get -y install build-essential');
+      fa_system('sudo apt-get -y update;sudo apt-get -y install unzip');
+      fa_system('sudo apt-get -y install libssl-dev');
+      fa_system('sudo apt-get -y install zlib1g-dev');
+      my $message=<<END;
+
+   This message times out in two minutes so FullAuto Install can continue
+
+      _                             ___ _       ___ _ _         _
+     /_\\  _ __  __ _ ______ _ _    / __| |     / __| (_)___ _ _| |_
+    / _ \\| '  \\/ _` |_ / _ \\ ' \\  | (__| |__  | (__| | / -_) ' \\  _|
+   /_/ \\_\\_|_|_\\__,_/__\\___/_||_|  \\___|____|  \\___|_|_\\___|_||_\\__|
+
+   In order to automate Amazon AWS Cloud infrastructure, the Amazon
+   AWS Command Line Client (AWS CLI) needs to installed. Install 
+   AWS CLI?  (Default is 'yes')
+
+END
+
+      my $timeout=120;my $selection='';
+      my $fae="No   (FullAuto Setup will exit)";
+      {
+         local $SIG{__DIE__}; # No sigdie handler
+         eval {
+            local $SIG{ALRM} = sub { die "alarm\n" }; # NB: \n required
+            alarm $timeout;
+            my $menu1 = [
+                  $message,
+                  [ "Yes", sub{ return 'Yes' } ],
+                  [ $fae, sub{ return 'No' } ],
+                  ];
+            $selection=&menu($menu1);
+            exit 0 if $selection eq ']quit[';
+            alarm 0;
+         };
+      }
+      if ($selection eq 'Yes') {
+         my $cmd='curl "https://awscli.amazonaws.com/'.
+               'awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"';
+         fa_system($cmd);
+         fa_system('unzip awscliv2.zip;sudo ./aws/install');
+      } print "\n\n   FullAuto install continues . . .\n\n";
+      fa_system('sudo apt-get -y install build-essential');
       $system_type='ubuntu';
    } elsif ($^O eq 'freebsd') {
 
@@ -839,6 +916,8 @@ our $cygwin_root_dir=$cwd;
 my @drive_options=();
 my $perl_version=$^V;
 $perl_version=~s/^v//;
+my $fs='ftp://ftp.figlet.org/pub/figlet/program'.
+       '/unix/figlet-2.2.5.tar.gz';
 if ($^O eq 'cygwin') {
    my $cygcheck=`/bin/cygcheck -c` || fa_die($!);
    my $uname=`/bin/uname` || fa_die($!);
@@ -1187,9 +1266,12 @@ END
       fa_system("sudo yum -y install 'wget'");
    }
    unless (-e '/usr/local/bin/figlet') {
-      my $fs='ftp://ftp.figlet.org/pub/figlet/program'.
-             '/unix/figlet-2.2.5.tar.gz';
       fa_system("(wget $fs;tar zxvf fig*gz;cd figlet-2.2.5;make install)");
+      unless (-e "figlet-2.2.5.tar.gz") {
+         my $cmd="tar zxvf dependencies/FIGlet_fonts/fig*gz;".
+                 "cd figlet-2.2.5;make install";
+         fa_system($cmd);
+      }
    }
    unless (-1<index $yins,'nano') {
       fa_system("sudo yum -y install 'nano'");
@@ -1214,9 +1296,12 @@ END
       fa_system("sudo yum -y install 'wget'");
    }
    unless (-e '/usr/local/bin/figlet') {
-      my $fs='ftp://ftp.figlet.org/pub/figlet/program'.
-             '/unix/figlet-2.2.5.tar.gz';
       fa_system("(wget $fs;tar zxvf fig*gz;cd figlet-2.2.5;make install)");
+      unless (-e "figlet-2.2.5.tar.gz") {
+         my $cmd="tar zxvf dependencies/FIGlet_fonts/fig*gz;".
+                 "cd figlet-2.2.5;make install";
+         fa_system($cmd);
+      }
    }
    unless (-1<index $yins,'nano') {
       fa_system("sudo yum -y install 'nano'");
@@ -1346,11 +1431,22 @@ END
    # especially since Admin privileges are needed to do this.
 
    unless (-e '/usr/local/bin/figlet') {
-      my $fs='ftp://ftp.figlet.org/pub/figlet/program'.
-             '/unix/figlet-2.2.5.tar.gz';
       fa_system("(wget $fs;tar zxvf fig*gz;cd figlet-2.2.5;make install)");
+      unless (-e "figlet-2.2.5.tar.gz") {
+         my $cmd="tar zxvf dependencies/FIGlet_fonts/fig*gz;".
+                 "cd figlet-2.2.5;make install";
+         fa_system($cmd);
+      }
    }
 }
+if (grep { /-*(?:add|all)[-_]?dependencies/i } @ARGV) {
+   my $f=$fs;
+   $f=~s/^.*\/(.*)$/$1/;
+   unless (-e "dependencies/FIGlet_fonts/$f") {
+      fa_system("(cd dependencies/FIGlet_fonts;wget $fs)");
+   }
+}
+
 my $cpantest=0;
 $cpantest=1 unless $mycpantest;
 use if ($mycpantest), "CPAN::MyConfig";

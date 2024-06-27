@@ -20,6 +20,12 @@
 #######################################################################
 
 
+2024-06-26  Brian M. Kelly <Brian.Kelly@fullauto.com>
+
+        * Version 1.0000658 released
+
+        * Makefile.PL updated for Amazon Ubuntu
+
 2024-06-19  Brian M. Kelly <Brian.Kelly@fullauto.com>
 
         * Version 1.0000657 released

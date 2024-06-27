@@ -2,20 +2,99 @@ package Aozora2Epub::XHTML;
 use strict;
 use warnings;
 use utf8;
+use Aozora2Epub::CachedGet qw/http_get/;
 use Aozora2Epub::XHTML::Tree;
 use Aozora2Epub::Gensym;
 use Aozora2Epub::File;
 use HTML::Element;
+use Encode::JISX0213;
+use Encode qw/decode/;
 use base qw(Class::Accessor);
-__PACKAGE__->mk_accessors(qw/title author content bib_info notation_notes gaiji fig/);
+__PACKAGE__->mk_accessors(qw/title subtitle author
+                             contents
+                             bib_info notation_notes gaiji fig/);
 
-our $VERSION = "0.03";
+our $VERSION = "0.04";
+
+sub jisx0213_to_utf8 {
+    my ($men, $ku, $ten) = @_;
+    $ku += 0xa0;
+    $ten += 0xa0;
+    my $euc = join('', ($men == 2 ? chr(0x8f) : ()),
+                   chr($ku), chr($ten));
+    my $utf8 = decode('euc-jp-2004', $euc);
+    return $utf8;
+}
+
+sub kindle_jis2chr {
+    my ($men, $ku, $ten) = @_;
+
+    # 半濁点付きカタカナ フ kindleだと2文字に見えるのなんとかならんか？
+    return if $men == 1 && $ku == 6 && $ten == 88;
+
+    # kindle font of these characters are broken.
+    return if $men == 1 && $ku == 90 && $ten == 61;
+    return if $men == 2 && $ku == 15 && $ten == 73;
+    return jisx0213_to_utf8($men, $ku, $ten);
+}
+
+# kindle font of these characters are broken.
+our %kindle_broken_font_unicode = map { $_ => 1 } (
+    0x2152,
+    0x2189,
+    0x26bd,
+    0x26be,
+    0x3244,
+);
+
+our %kindle_ok_font_over0xffff = map { $_ => 1 } (
+    0x20d58, 0x20e97, 0x20ed7, 0x210e4, 0x2124f, 0x2296b,
+    0x22d07, 0x22e42, 0x22feb, 0x233fe, 0x23cbe, 0x249ad,
+    0x24e04, 0x24ff2, 0x2546e, 0x2567f, 0x259cc, 0x2688a,
+    0x279b4, 0x280e9, 0x28e17, 0x29170, 0x2a2b2,
+);
+
+sub kindle_unicode_hex2chr {
+    my $unicode_hex = shift;
+    my $unicode = hex($unicode_hex);
+
+    return if $kindle_broken_font_unicode{$unicode};
+
+    # kindle font is almost not avaliable in this range.
+    return if $unicode > 0xffff && !$kindle_ok_font_over0xffff{$unicode};
+
+    return chr($unicode);
+}
+
+sub _conv_gaiji_title_author {
+    my ($unicode, $men, $ku, $ten) = @_;
+    if ($unicode) {
+        my $ch = kindle_unicode_hex2chr($unicode);
+        return $ch if $ch;
+        return;
+    }
+    my $ch = kindle_jis2chr(0+$men, 0+$ku, 0+$ten);
+    return $ch if $ch;
+    return;
+}
+
+sub conv_gaiji_title_author {
+    my $s = shift;
+    return $s unless $s;
+    $s =~ s{(.［＃[^、］]*、(U\+([A-Fa-f0-9]+)|.*?(\d)-(\d+)-(\d+)).*?］)}
+           {
+               my $all = $1;
+               my $ch = _conv_gaiji_title_author($3, $4, $5, $6);
+               $ch ? $ch : $all;
+           }esg;
+    return $s
+}
 
 sub new {
     my ($class, $url) = @_;
     my $base = $url;
     $base =~ s{[^/]+\.html$}{}s;
-    return $class->new_from_string(get($url), $base);
+    return $class->new_from_string(http_get($url), $base);
 }
 
 sub new_from_string {
@@ -56,23 +135,29 @@ sub _process_img {
     my $img = shift;
 
     my $src = $img->attr('src');
-    if ($src =~ m{/(gaiji/.+\.png)$}) {
+    if ($src =~ m{/(gaiji/\d-\d+/(\d)-(\d\d)-(\d\d)\.png)$}) {
+        my $ch = kindle_jis2chr(0+$2, 0+$3, 0+$4);
+        if ($ch) {
+            $img->replace_with($ch);
+            return;
+        }
         $img->attr('src', "../$1");
-        return;
+        return $src;
     }
     # normal image
     $img->attr('src', "../images/$src");
     # find caption
     my $br = $img->right;
-    return unless $br->tag eq 'br';
+    return $src unless $br && $br->isa('HTML::Element') && $br->tag eq 'br';
     my $caption = $br->right;
-    return unless $caption;
-    return unless $caption->isa('HTML::Element');
-    return unless $caption->tag eq 'span' && $caption->attr('class') =~ /caption/;
+    return $src unless $caption;
+    return $src unless $caption->isa('HTML::Element');
+    return $src unless $caption->tag eq 'span' && $caption->attr('class') =~ /caption/;
     $br->detach;
     $caption->detach;
     $caption->tag('figcaption');
     $img->replace_with(['figure', $img, $caption]);
+    return $src;
 }
 
 sub _is_empty {
@@ -86,10 +171,14 @@ sub _is_empty {
 sub process_doc {
     my $self = shift;
 
-    my ($title, $author, $bib_info, $notation_notes, @images);
+    my ($title, $subtitle, $author,
+        $bib_info, $notation_notes, @images);
     my @contents = Aozora2Epub::XHTML::Tree->new($self->{raw_content})
         ->process('h1.title', sub {
             $title = shift->as_text;
+        })
+        ->process('h2.subtitle', sub {
+            $subtitle = shift->as_text;
         })
         ->process('h2.author', sub {
             $author = shift->as_text;
@@ -110,8 +199,8 @@ sub process_doc {
         ->children
         ->process('img', sub {
             my $img = shift;
-            push @images, $img->attr('src');
-            _process_img($img);
+            my $orig_src = _process_img($img);
+            $orig_src and push @images, $orig_src;
         })
         ->process('//div[contains(@style, "width")]', => sub {
             my $div = shift;
@@ -124,9 +213,45 @@ sub process_doc {
         ->process('h3', \&_process_header)
         ->process('h4', \&_process_header)
         ->process('h5', \&_process_header)
-        #->process('span.notes', sub {
-        #    print STDERR shift->as_HTML('&<>'),"\n";
-        #})
+        ->process('//div[contains(@style, "margin")]', => sub {
+            my $div = shift;
+            my $style = $div->attr('style');
+            $style =~ s/margin-left/margin-top/sg;
+            $style =~ s/margin-right/margin-bottom/sg;
+            $div->attr('style', $style);
+        })
+        ->process('span.notes', sub {
+            my $span = shift;
+            my $note = $span->as_text;
+            return unless $note =~ m{［＃[^\］]+?、([^\］]+)］};
+            my $desc = $1;
+            my $ch = do {
+                if ($desc =~ /U\+([A-fa-f0-9]+)/) {
+                    kindle_unicode_hex2chr($1);
+                } elsif ($desc =~ /第\d水準(\d)-(\d+)-(\d+)/) {
+                    kindle_jis2chr(0+$1, 0+$2, 0+$3);
+                }
+            };
+            return unless $ch;
+
+            # find nearest ※ and replace it to $ch
+            my $left = $span->left;
+            unless ($left->isa('HTML::Element')) {
+                if ($left =~ s/※$/$ch/) {
+                    $span->parent->splice_content($span->pindex - 1, 2, $left);
+                }
+                return;
+            }
+            if ($left->tag eq 'ruby') {
+                my $rb = $left->find_by_tag_name('rb');
+                my $s = $rb->as_text;
+                if ($s =~ s/※/$ch/) {
+                    $rb->replace_with(HTML::Element->new_from_lol([rb => $s]));
+                    $span->delete;
+                }
+                return;
+            }
+        })
         ->as_list;
 
     # 先頭の<br/>の連続は削除
@@ -140,13 +265,14 @@ sub process_doc {
             push @fig, $path;
         }
     }
-    $self->{title} = $title;
-    $self->{author} = $author;
-    $self->{contents} = \@contents;
-    $self->{bib_info} = $bib_info || '';
-    $self->{notation_notes} = $notation_notes || '';
-    $self->{gaiji} = \@gaiji;
-    $self->{fig} = \@fig;
+    $self->title(conv_gaiji_title_author($title));
+    $self->subtitle(conv_gaiji_title_author($subtitle));
+    $self->author(conv_gaiji_title_author($author));
+    $self->contents(\@contents);
+    $self->bib_info($bib_info || '');
+    $self->notation_notes($notation_notes || '');
+    $self->gaiji(\@gaiji);
+    $self->fig(\@fig);
 }
 
 sub _is_chuuki {
@@ -173,7 +299,7 @@ sub split {
     # <br/>*<h[123]>* / [#改ページ] / [#改丁]
     my @cur;
     my @files;
-    my @contents = @{$self->{contents}};
+    my @contents = @{$self->contents};
     while (my $c = shift @contents) {
         unless ($c->isa('HTML::Element')) {
             push @cur, $c;
@@ -204,16 +330,19 @@ sub split {
                     push @newcur, $c1;
                     last;
                 }
-                unless (_is_empty($c1)
-                        || $c->tag =~ m{h[123]}) {
-                    push @newcur, $c1;
-                    last;
-                }
+
                 if (_is_pagebreak($c1)) {
                     push @files, [@newcur] if @newcur;
                     @newcur = ();
                     last;
                 }
+
+                unless (_is_empty($c1)
+                        || $c1->tag =~ m{h[123]}) {
+                    push @newcur, $c1;
+                    last;
+                }
+
                 push @newcur, $c1;
             }
 

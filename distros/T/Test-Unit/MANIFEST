@@ -45,7 +45,7 @@ lib/Test/Unit/Tutorial.pm
 lib/Test/Unit/UnitHarness.pm
 lib/Test/Unit/Warning.pm
 Makefile.PL
-MANIFEST
+MANIFEST			This list of files
 README
 t/all_tests.t
 t/assert.t
@@ -81,4 +81,5 @@ t/try_examples.t
 TestLister.pl
 TestRunner.pl
 TkTestRunner.pl
-META.yml                                 Module meta-data (added by MakeMaker)
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

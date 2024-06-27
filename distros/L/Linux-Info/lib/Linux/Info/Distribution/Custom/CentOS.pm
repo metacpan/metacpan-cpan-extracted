@@ -5,7 +5,7 @@ use strict;
 use base 'Linux::Info::Distribution::Custom';
 use Class::XSAccessor getters => { get_type => 'type', };
 
-our $VERSION = '2.18'; # VERSION
+our $VERSION = '2.19'; # VERSION
 # ABSTRACT: a subclass of Linux::Info::Distribution::Custom
 
 
@@ -36,7 +36,7 @@ Linux::Info::Distribution::Custom::CentOS - a subclass of Linux::Info::Distribut
 
 =head1 VERSION
 
-version 2.18
+version 2.19
 
 =head1 METHODS
 

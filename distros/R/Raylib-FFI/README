@@ -1,0 +1,2185 @@
+NAME
+
+    Raylib::FFI - Perl FFI bindings for raylib
+
+SYNOPSIS
+
+        use 5.38.2;
+        use lib qw(lib);
+        use Raylib::FFI; # defaults to exporting all the functions
+        use constant Color => 'Raylib::FFI::Color';
+    
+        InitWindow( 800, 600, "Testing!" );
+        SetTargetFPS(60);
+        while ( !WindowShouldClose() ) {
+            my $x = GetScreenWidth() / 2;
+            my $y = GetScreenHeight() / 2;
+            BeginDrawing();
+            ClearBackground( Color->new( r => 0, g => 0, b => 0, a => 0 ) );
+            DrawFPS( 0, 0 );
+            DrawText( "Hello, world!",
+                $x, $y, 20, Color->new( r => 255, g => 255, b => 255, a => 255 ) );
+            EndDrawing();
+        }
+        CloseWindow();
+
+DESCRIPTION
+
+    This module provides Perl bindings for the raylib library using
+    FFI::Platyus. This is functional but very low level. You probably want
+    to use Raylib::App instead.
+
+    This module was based on the Raylib 5.0.0 API. See
+    http://www.raylib.com.
+
+TYPES
+
+ Raylib::FFI::Vector2D
+
+    X and Y coordinates
+
+ Raylib::FFI::Vector3D
+
+    X, Y and Z coordinates
+
+ Raylib::FFI::Vector4D
+
+    X, Y, Z and W coordinates
+
+ Raylib::FFI::Matrix
+
+    Matrix, 4x4 components, column major, OpenGL style, right-handed
+
+ Raylib::FFI::Color
+
+    Color, 4 components, R8G8B8A8 (32bit)
+
+ Raylib::FFI::Rectangle
+
+    Rectangle, 4 components
+
+ Raylib::FFI::Image
+
+    Image, pixel data stored in CPU memory (RAM)
+
+ Raylib::FFI::Texture
+
+    Texture, tex data stored in GPU memory (VRAM)
+
+ Raylib::FFI::RenderTexture
+
+    RenderTexture, fbo for texture rendering
+
+ Raylib::FFI::NPatchInfo
+
+    NPatchInfo, n-patch layout info
+
+ Raylib::FFI::GlyphInfo
+
+    GlyphInfo, font characters glyphs info
+
+ Raylib::FFI::Font
+
+    Font, font texture and characters glyphs info
+
+ Raylib::FFI::Camera3D
+
+    Camera3D, defines a camera position/orientation in 3D space
+
+ Raylib::FFI::Camera2D
+
+    Camera2D, defines a camera position and rotation in 2D space
+
+ Raylib::FFI::Mesh
+
+    Mesh, vertext data and vao/vbo
+
+ Raylib::FFI::Shader
+
+    Shader
+
+ Raylib::FFI::MaterialMap
+
+    MaterialMap
+
+ Raylib::FFI::Material
+
+    Material, includes shader and maps
+
+ Raylib::FFI::Transform
+
+    Transform, vertex transformation data
+
+ Raylib::FFI::BoneInfo
+
+    Bone, skeletal animation bone
+
+ Raylib::FFI::Model
+
+    Model, meshes, materials and animation data
+
+ Raylib::FFI::ModelAnimation
+
+    ModelAnimation, animation data
+
+ Raylib::FFI::Ray
+
+    Ray, ray for raycasting
+
+ Raylib::FFI::RayCollision
+
+    RayCollision, ray hit information
+
+ Raylib::FFI::BoundingBox
+
+    Bounding Box
+
+ Raylib::FFI::Wave
+
+    Wave, audio wave data
+
+ Raylib::FFI::AudioStream
+
+    AudioStream, custom audio stream
+
+ Raylib::FFI::Sound
+
+    Sound
+
+ Raylib::FFI::Music
+
+    Music, audio stream, anything longer than ~10 seconds should be
+    streamed
+
+ Raylib::FFI::VrDeviceInfo
+
+    VrDeviceInfo, Head-Mounted-Display device parameters
+
+ Raylib::FFI::VrStereoConfig
+
+    VrStereoConfig, VR stereo rendering configuration for simulator
+
+FUNCTIONS
+
+    All functions are exported lexically by default. To export only
+    specific functions simply liste them in the use statement.
+
+ InitWindow( $width, $height, $title )
+
+    Initialize window and OpenGL context.
+
+ CloseWindow()
+
+    Close window and unload OpenGL context.
+
+ WindowShouldClose() : bool
+
+    Check if application should close (KEY_ESCAPE pressed or windows close
+    icon clicked).
+
+ IsWindowReady() : bool
+
+    Check if window has been initialized successfully.
+
+ IsWindowFullscreen() : bool
+
+    Check if window is currently fullscreen.
+
+ IsWindowHidden() : bool
+
+    Check if window is currently hidden.
+
+ IsWindowMinimized() : bool
+
+    Check if window is currently minimized.
+
+ IsWindowMaximized() : bool
+
+    Check if window is currently maximized.
+
+ IsWindowFocused() : bool
+
+    Check if window is currently focused.
+
+ IsWindowResized() : bool
+
+    Check if window has been resized last frame.
+
+ IsWindowState( $flag ) : bool
+
+    Check if one specific window flag is enabled.
+
+ SetWindowState( $flags )
+
+    Set window configuration state using flags.
+
+ ClearWindowState( $flags )
+
+    Clear window configuration state flags.
+
+ ToggleFullscreen()
+
+    Toggle window state: fullscreen/windowed (only PLATFORM_DESKTOP).
+
+ ToggleBorderlessWindowed()
+
+    Toggle window state: borderless/fullscreen (only PLATFORM_DESKTOP).
+
+ MaximizeWindow()
+
+    Set window state: maximized, if resizable (only PLATFORM_DESKTOP).
+
+ MinimizeWindow()
+
+    Set window state: minimized, if resizable (only PLATFORM_DESKTOP).
+
+ RestoreWindow()
+
+    Restore window state: if resizable (only PLATFORM_DESKTOP).
+
+ SetWindowIcon( $image )
+
+    Set icon for window (single image, RBGA 32bit, only PLATFORM_DESKTOP).
+
+ SetWindowIcons( $images )
+
+    Set icons for window (multiple images, RGBA 32bit, only
+    PLATFORM_DESKTOP).
+
+ SetWindowTitle( $title )
+
+    Set title for window (only PLATFORM_DESKTOP).
+
+ SetWindowPosition( $x, $y )
+
+    Set window position on screen (only PLATFORM_DESKTOP).
+
+ SetWindowMonitor( $monitor )
+
+    Set monitor for the current window.
+
+ SetWindowMinSize( $width, $height )
+
+    Set window minimum dimensions (for FLAG_WINDOW_RESIZABLE).
+
+ SetWindowMaxSize( $width, $height )
+
+    Set window maximum dimensions (for FLAG_WINDOW_RESIZABLE).
+
+ SetWindowSize( $width, $height )
+
+    Set window dimensions.
+
+ SetWindowOpacity( $opacity )
+
+    Set window opacity [0.0f..1.0f]
+
+ GetScreenWidth() : int
+
+    Get current screen width.
+
+ GetScreenHeight() : int
+
+    Get current screen height.
+
+ GetRenderWidth() : int
+
+    Get current render width (it considers HiDPI).
+
+ GetRenderHeight() : int
+
+    Get current render height (it considers HiDPI).
+
+ GetMonitorCount() : int
+
+    Get number of connected monitors.
+
+ GetCurrentMonitor() : int
+
+    Get current connected monitor.
+
+ GetMonitorPosition( $monitor ) : Raylib::FFI::Vector2D
+
+    Get specified monitor position in screen space.
+
+ GetMonitorWidth( $monitor ) : int
+
+    Get specified monitor width (current video mode used by monitor).
+
+ GetMonitorHeight( $monitor ) : int
+
+    Get specified monitor height (current video mode used by monitor).
+
+ GetMonitorPhysicalWidth( $monitor ) : int
+
+    Get specified monitor physical width in millimetres.
+
+ GetMonitorPhysicalHeight( $monitor ) : int
+
+    Get specified monitor physical height in millimetres.
+
+ GetMonitorRefreshRate( $monitor ) : int
+
+    Get specified monitor refresh rate.
+
+ GetWindowPosition() : Raylib::FFI::Vector2D
+
+    Get window position XY on monitor.
+
+ GetWindowScaleDPI() : Raylib::FFI::Vector2D
+
+    Get window scale factor on HiDPI monitors.
+
+ GetMonitorName( $monitor ) : string
+
+    Get the human-readable, UTF-8 encoded name of the monitor.
+
+ SetClipboardText( $text )
+
+    Set clipboard text content.
+
+ GetClipboardText() : string
+
+    Get clipboard text content.
+
+ EnableEventWaiting()
+
+    Enable waiting for events on EndDrawing, automatic event polling.
+
+ DisableEventWaiting()
+
+    Disable waiting for events on EndDrawing, manual event polling.
+
+ ShowCursor()
+
+    Show cursor.
+
+ HideCursor()
+
+    Hide cursor.
+
+ IsCursorHidden() : bool
+
+    Check if cursor is not visible.
+
+ EnableCursor()
+
+    Enable cursor (unlock cursor).
+
+ DisableCursor()
+
+    Disable cursor (lock cursor).
+
+ IsCursorOnScreen() : bool
+
+    Check if cursor is on the screen.
+
+ ClearBackground( $color )
+
+    Set background color (framebuffer clear color).
+
+ BeginDrawing()
+
+    Setup canvas (framebuffer) to start drawing
+
+ EndDrawing()
+
+    End canvas drawing and swap buffers (double buffering).
+
+ BeginMode2D( $camera )
+
+    Begin 2D mode with custom camera (2D).
+
+ EndMode2D()
+
+    Ends 2D mode with custom camera.
+
+ BeginMode3D( $camera )
+
+    Begin 3D mode with custom camera (3D).
+
+ EndMode3D()
+
+    Ends 3D mode and returns to default 2D orthographic mode.
+
+ BeginTextureMode( $renderTexture )
+
+    Begin drawing to render texture.
+
+ EndTextureMode()
+
+    Ends drawing to render texture.
+
+ BeginShaderMode( $shader )
+
+    Begin custom shader drawing.
+
+ EndShaderMode()
+
+    End custom shader drawing (use default shader).
+
+ BeginBlendMode( $mode )
+
+    Begin blending mode (alpha, additive, multiplied, subtract, custom)
+
+ EndBlendMode()
+
+    End blending mode (reset to default: alpha blending)
+
+ BeginScissorMode( $x, $y, $width, $height )
+
+    Begin scissor mode (define screen area for following drawing
+    operations)
+
+ EndScissorMode()
+
+    End scissor mode.
+
+ BeginVrStereoMode( $config )
+
+    Begin stereo rendering (requires VR simulator)
+
+ EndVrStereoMode()
+
+    End stereo rendering.
+
+ LoadVrStereoConfig( $config )
+
+    Load VR stereo config for VR simulator.
+
+ UnloadVrStereoConfig( $config )
+
+    Unload VR stereo config for VR simulator.
+
+ LoadShader( $vsFileName, $fsFileName ) : Raylib::FFI::Shader
+
+    Load shader from files and bind default locations.
+
+ LoadShaderFromMemory( $vsCode, $fsCode ) : Raylib::FFI::Shader
+
+    Load shader from code strings and bind default locations.
+
+ IsShaderReady( $shader ) : bool
+
+    Check if a shader is ready.
+
+ GetShaderLocation( $shader, $uniformName ) : int
+
+    Get shader uniform location.
+
+ GetShaderLocationAttrib( $shader, $attribName ) : int
+
+    Get shader attribute location.
+
+ SetShaderValue( $shader, $locIndex, $value, $uniformType )
+
+    Set shader uniform value
+
+ SetShaderValueV( $shader, $locIndex, $value, $uniformType )
+
+    Set shader uniform value vector
+
+ SetShaderValueMatrix( $shader, $locIndex, $matrix )
+
+    Set shader uniform value matrix (matrix 4x4)
+
+ SetShaderValueTexture( $shader, $locIndex, $texture )
+
+    Set shader uniform value for texture (sampler2d)
+
+ UnloadShader( $shader )
+
+    Unload shader from GPU memory (VRAM).
+
+ GetMouseRay( $position, $camera ) : Raylib::FFI::Ray # DEPRECATED
+
+    Get a ray trace from screen space (i.e. mouse position)
+
+ GetWorldToScreenEx( $position, $camera, $width, $height ) :
+ Raylib::FFI::Vector2D
+
+    Get size position for a 3d world space position
+
+ GetWorldToScreen2D( $position, $camera) : Raylib::FFI::Vector2D
+
+    Get the screen space position for a 2d camera world space position
+
+ GetScreenToWorld2D( $position, $camera) : Raylib::FFI::Vector2D;
+
+    Get the world space position for a 2d camera screen space position
+
+ GetCameraMatrix( $camera ) : Raylib::FFI::Matrix;
+
+    Get camera transform matrix (view matrix)
+
+ GetCameraMatrix2D( $camera ) : Raylib::FFI::Matrix;
+
+    Get camera 2d transform matrix
+
+ SetTargetFPS( $fps )
+
+    Set target FPS (maximum)
+
+ GetFrameTime() : float
+
+    Get time in seconds for last frame drawn (delta time)
+
+ GetTime() : double
+
+    Get elapsed time in seconds since InitWindow()
+
+ GetFPS() : int
+
+    Get current FPS
+
+ SwapScreenBuffer()
+
+    NOTE: This function is intended for advanced users that want full
+    control over the frame processing. default EndDrawing() does this job:
+    draws everything + SwapScreenBuffer() + manage frame timing +
+    PollInputEvents(). To avoid that behaviour and control frame processes
+    manually, enable in config.h: SUPPORT_CUSTOM_FRAME_CONTROL
+
+    Swap backbuffer with frontbuffer (screen drawing)
+
+ PollInputEvents()
+
+    NOTE: This function is intended for advanced users that want full
+    control over the frame processing. default EndDrawing() does this job:
+    draws everything + SwapScreenBuffer() + manage frame timing +
+    PollInputEvents(). To avoid that behaviour and control frame processes
+    manually, enable in config.h: SUPPORT_CUSTOM_FRAME_CONTROL
+
+    Register all input events
+
+ WaitTime( $seconds )
+
+    NOTE: This function is intended for advanced users that want full
+    control over the frame processing. default EndDrawing() does this job:
+    draws everything + SwapScreenBuffer() + manage frame timing +
+    PollInputEvents(). To avoid that behaviour and control frame processes
+    manually, enable in config.h: SUPPORT_CUSTOM_FRAME_CONTROL
+
+    Wait for some time (halt program execution)
+
+ TakeScreenshot( $fileName )
+
+    Takes a screenshot of current screen (filename extension defines
+    format)
+
+ SetConfigFlags( $flags )
+
+    Setup init configuration flags (view FLAGS)
+
+ OpenURL( $url )
+
+    Open URL with default system browser (if available)
+
+ TraceLog( $logLevel, $text )
+
+    Show trace log messages (LOG_DEBUG, LOG_INFO, LOG_WARNING,
+    LOG_ERROR...)
+
+ SetTraceLogLevel( $logLevel )
+
+    Set the current threshold (minimum) log level
+
+ IsKeyPressed( $key ) : bool
+
+    Check if a key has been pressed once
+
+ IsKeyPressedRepeat( $key ) : bool
+
+    Check if a key has been pressed again (Only PLATFORM_DESKTOP)
+
+ IsKeyDown( $key ) : bool
+
+    Check if a key is being pressed
+
+ IsKeyReleased( $key ) : bool
+
+    Check if a key has been released once
+
+ IsKeyUp( $key ) : bool
+
+    Check if a key is NOT being pressed
+
+ GetKeyPressed() : int
+
+    Get latest key pressed. Returns 0 if no key was pressed during the last
+    frame
+
+ GetCharPressed() : int
+
+    Get char pressed (unicode), call it multiple times for chars queued,
+    returns 0 when the queue is empty
+
+ SetExitKey( $key )
+
+    Set a custom key to exit program (default is ESC)
+
+ IsGamepadAvailable( $gamepad ) : bool
+
+    Check if a gamepad is available
+
+ GetGamepadName( $gamepad ) : string
+
+    Get gamepad internal name id
+
+ IsGamepadButtonPressed( $gamepad, $button ) : bool
+
+    Check if a gamepad button has been pressed once
+
+ IsGamepadButtonDown( $gamepad, $button ) : bool
+
+    Check if a gamepad button is being pressed
+
+ IsGamepadButtonReleased( $gamepad, $button ) : bool
+
+    Check if a gamepad button has been released once
+
+ IsGamepadButtonUp( $gamepad, $button ) : bool
+
+    Check if a gamepad button is NOT being pressed
+
+ GetGamepadButtonPressed() : int
+
+    Get the last gamepad button pressed
+
+ GetGamepadAxisCount( $gamepad ) : int
+
+    Get gamepad axis count for a gamepad
+
+ GetGamepadAxisMovement( $gamepad, $axis ) : float
+
+    Get axis movement value for a gamepad axis
+
+ SetGamepadMappings( $mappings )
+
+    Set internal gamepad mappings
+
+ IsMouseButtonPressed( $button ) : bool
+
+    Check if a mouse button has been pressed once
+
+ IsMouseButtonDown( $button ) : bool
+
+    Check if a mouse button is being pressed
+
+ IsMouseButtonReleased( $button ) : bool
+
+    Check if a mouse button has been released once
+
+ IsMouseButtonUp( $button ) : bool
+
+    Check if a mouse button is NOT being pressed
+
+ GetMouseX() : int
+
+    Get mouse position X
+
+ GetMouseY() : int
+
+    Get mouse position Y
+
+ GetMousePosition() : Raylib::FFI::Vector2D
+
+    Get mouse position XY
+
+ GetMouseDelta() : Raylib::FFI::Vector2D
+
+    Get mouse delta between frames
+
+ SetMousePosition( $x, $y )
+
+    Set mouse position XY
+
+ SetMouseOffset( $offsetX, $offsetY )
+
+    Set mouse offset
+
+ SetMouseScale( $scaleX, $scaleY )
+
+    Set mouse scaling
+
+ GetMouseWheelMove() : int
+
+    Get mouse wheel movement for X or Y, whichever is larger
+
+ GetMouseWheelMoveV() : Raylib::FFI::Vector2D
+
+    Get mouse wheel movement for both X and Y
+
+ SetMouseCursor( $cursor )
+
+    Set mouse cursor
+
+ GetTouchX() : int
+
+    Get touch position X for touch point 0 (relative to screen size).
+
+ GetTouchY() : int
+
+    Get touch position Y for touch point 0 (relative to screen size).
+
+ GetTouchPosition( $index ) : Raylib::FFI::Vector2D
+
+    Get touch position XY for a touch point index (relative to screen
+    size).
+
+ GetTouchPointId( $index ) : int
+
+    Get touch point identifier for given index.
+
+ GetTouchPointCount() : int
+
+    Get number of touch points
+
+ SetGesturesEnabled( $flags )
+
+    Enable a set of gestures using flags
+
+ IsGestureDetected( $gesture ) : bool
+
+    Check if a gesture have been detected
+
+ GetGestureDetected() : int
+
+    Get latest detected gesture
+
+ GetGestureHoldDuration() : float
+
+    Get gesture hold time in milliseconds
+
+ GetGestureDragVector() : Raylib::FFI::Vector2D
+
+    Get gesture drag vector
+
+ GetGestureDragAngle() : float
+
+    Get gesture drag angle
+
+ GetGesturePinchVector() : Raylib::FFI::Vector2D
+
+    Get gesture pinch delta
+
+ GetGesturePinchAngle() : float
+
+    Get gesture pinch angle
+
+ UpdateCamera( $camera )
+
+    Update camera position for selected mode
+
+ UpdateCameraPro( $camera, $dest, $rotation, $zoom )
+
+    Uppdate camera movement/rotation
+
+ SetShapesTexture( $texture, $rec )
+
+    Set texture and rectangle to be used on shapes drawing
+
+ GetShapesTextureRec() : Raylib::FF::Rectangle
+
+    Get texture rectangle to be used on shapes drawing
+
+ DrawPixel( $posX, $posY, $color )
+
+    Draw a pixel
+
+ DrawPixelV( $position, $color )
+
+    Draw a pixel (Vector version)
+
+ DrawLine( $startPosX, $startPosY, $endPosX, $endPosY, $color )
+
+    Draw a line
+
+ DrawLineV( $startPos, $endPos, $color )
+
+    Draw a line (using gl lines)
+
+ DrawLineEx( $startPos, $endPos, $thick, $color )
+
+    Draw a line (using triangles/quads)
+
+ DrawLineStrip( $points, $pointCount, $color )
+
+    Draw lines sequence (using gl lines)
+
+ DrawLineBezier( $startPos, $endPos, $thick, $color )
+
+    Draw line segment cubic-bezier in-out interpolation
+
+ DrawCircle( $centerX, $centerY, $radius, $color )
+
+    Draw a color-filled circle
+
+ DrawCircleSector( $center, $radius, $startAngle, $endAngle, $segments,
+ $color )
+
+    Draw a piece of a circle
+
+ DrawCircleSectorLines( $center, $radius, $startAngle, $endAngle,
+ $segments, $color )
+
+    Draw circle sector outline
+
+ DrawCircleGradient( $centerX, $centerY, $radius, $color1, $color2 )
+
+    Draw a gradient-filled circle
+
+ DrawCircleV( $center, $radius, $color )
+
+    Draw a color-filled circle (Vector version)
+
+ DrawCircleLines( $centerX, $centerY, $radius, $color )
+
+    Draw circle outline
+
+ DrawCircleLinesV( $center, $radius, $color )
+
+    Draw circle outline (Vector version)
+
+ DrawEllipse( $centerX, $centerY, $radiusH, $radiusV, $color )
+
+    Draw ellipse
+
+ DrawEllipseLines( $centerX, $centerY, $radiusH, $radiusV, $color )
+
+    Draw ellipse outline
+
+ DrawRing( $center, $innerRadius, $outerRadius, $startAngle, $endAngle,
+ $segments, $color )
+
+    Draw ring
+
+ DrawRingLines( $center, $innerRadius, $outerRadius, $startAngle,
+ $endAngle, $segments, $color )
+
+    Draw ring outline
+
+ DrawRectangle( $posX, $posY, $width, $height, $color )
+
+    Draw a color-filled rectangle
+
+ DrawRectangleV( $position, $size, $color )
+
+    Draw a color-filled rectangle (Vector version)
+
+ DrawRectangleRec( $rec, $color )
+
+    Draw a color-filled rectangle
+
+ DrawRectanglePro( $rec, $origin, $rotation, $color )
+
+    Draw a color-filled rectangle with pro parameters
+
+ DrawRectangleGradientV( $posX, $posY, $width, $height, $color1, $color2 )
+
+    Draw a vertical-gradient-filled rectangle
+
+ DrawRectangleGradientH( $posX, $posY, $width, $height, $color1, $color2 )
+
+    Draw a horizontal-gradient-filled rectangle
+
+ DrawRectangleGradientEx( $rec, $col1, $col2, $col3, $col4 )
+
+    Draw a gradient-filled rectangle with custom vertex colors
+
+ DrawRectangleLines( $posX, $posY, $width, $height, $color )
+
+    Draw rectangle outline
+
+ DrawRectangleLinesEx( $rec, $lineThick, $color )
+
+    Draw rectangle outline with extended parameters
+
+ DrawRectangleRounded( $rec, $roundness, $segments, $color )
+
+    Draw rectangle with rounded edges
+
+ DrawRectangleRoundedLines( $rec, $roundness, $segments, $lineThick, $color
+ )
+
+    Draw rectangle lines with rounded edges
+
+ DrawTriangle( $v1, $v2, $v3 )
+
+    Draw a color-filled triangle (vertex in counter-clockwise order!)
+
+ DrawTriangleLines( $v1, $v2, $v3 )
+
+    Draw triangle outline (vertex in counter-clockwise order!)
+
+ DrawTriangleFan( $points, $pointCount )
+
+    Draw a triangle fan defined by points (first vertex is the center)
+
+ DrawTriangleStrip( $points, $pointCount )
+
+    Draw a triangle strip defined by points
+
+ DrawPoly( $center, $sides, $radius, $rotation, $color )
+
+    Draw a regular polygon (Vector version)
+
+ DrawPolyLines( $center, $sides, $radius, $rotation, $color )
+
+    Draw a polygon outline of n sides
+
+ DrawPolyLinesEx( $center, $sides, $radius, $rotation, $lineThick, $color )
+
+    Draw a polygon outline of n sides with extended parameters
+
+ DrawSplineLinear( $points, $pointCount, $color )
+
+    Draw spline: Linear, minimum 2 points
+
+ DrawSplineBasis( $points, $pointCount, $color )
+
+    Draw spline: B-Spline, minimum 4 points
+
+ DrawSplineCatmullRom( $points, $pointCount, $color )
+
+    Draw spline: Catmull-Rom, minimum 4 points
+
+ DrawSplineBezierQuadratic( $points, $pointCount, $color )
+
+    Draw spline: Quadratic Bezier, minimum 3 points (1 control point): [p1,
+    c2, p3, c4...]
+
+ DrawSplineBezierCubic( $points, $pointCount, $color )
+
+    Draw spline: Cubic Bezier, minimum 4 points (2 control points): [p1,
+    c2, c3, p4, c5, c6...]
+
+ DrawSplineSegmentLinear( $p1, $p2, $color )
+
+    Draw spline segment: Linear, 2 points
+
+ DrawSplineSegmentBasis( $p1, $p2, $color )
+
+    Draw spline segment: B-Spline, 4 points
+
+ DrawSplineSegmentCatmullRom( $p1, $p2, $color )
+
+    Draw spline segment: Catmull-Rom, 4 points
+
+ DrawSplineSegmentBezierQuadratic( $p1, $p2, $p3, $color )
+
+    Draw spline segment: Quadratic Bezier, 2 points, 1 control point
+
+ DrawSplineSegmentBezierCubic( $p1, $p2, $p3, $p4, $color )
+
+    Draw spline segment: Cubic Bezier, 2 points, 2 control points
+
+ GetSplinePointLinear( $points, $pointCount, $t ) : Raylib::FFI::Vector2D
+
+    Get (evaluate) spline point: Linear Spline segment point evaluation
+    functions, for a given t [0.0f .. 1.0f]
+
+ GetSplinePointBasis( $points, $pointCount, $t ) : Raylib::FFI::Vector2D
+
+    Get (evaluate) spline point: B-Spline Spline segment point evaluation
+    functions, for a given t [0.0f .. 1.0f]
+
+ GetSplinePointCatmullRom( $points, $pointCount, $t ) :
+ Raylib::FFI::Vector2D
+
+    Get (evaluate) spline point: Catmull-Rom Spline segment point
+    evaluation functions, for a given t [0.0f .. 1.0f]
+
+ GetSplinePointBezierQuad( $points, $pointCount, $t ) :
+ Raylib::FFI::Vector2D
+
+    Get (evaluate) spline point: Quadratic Bezier Spline segment point
+    evaluation functions, for a given t [0.0f .. 1.0f]
+
+ GetSplinePointBezierCubic( $points, $pointCount, $t ) :
+ Raylib::FFI::Vector2D
+
+    Get (evaluate) spline point: Cubic Bezier Spline segment point
+    evaluation functions, for a given t [0.0f .. 1.0f]
+
+ CheckCollisionRecs( $rec1, $rec2 ) : bool
+
+    Check collision between two rectangles
+
+ CheckCollisionCircles( $center1, $radius1, $center2, $radius2 ) : bool
+
+    Check collision between two circles
+
+ CheckCollisionCircleRec( $center, $radius, $rec ) : bool
+
+    Check collision between circle and rectangle
+
+ CheckCollisionPointRec( $point, $rec ) : bool
+
+    Check if point is inside rectangle
+
+ CheckCollisionPointCircle( $point, $center, $radius ) : bool
+
+    Check if point is inside circle
+
+ CheckCollisionPointTriangle( $point, $p1, $p2, $p3 ) : bool
+
+    Check if point is inside a triangle
+
+ CheckCollisionPointPoly( $point, $poly, $polyCount ) : bool
+
+    Check if point is within a polygon described by array of vertices
+
+ CheckCollisionLines( $startPos1, $endPos1, $startPos2, $endPos2,
+ $collisionPoint ) : bool
+
+    Check the collision between two lines defined by two points each,
+    returns collision point by reference
+
+ CheckCollisionPointLine( $point, $p1, $p2, $threshold ) : bool
+
+    Check if point belongs to line created between two points [p1] and [p2]
+    with defined margin in pixels [threshold]
+
+ GetCollisionRec( $rec1, $rec2 ) : Raylib::FFI::Rectangle
+
+    Get collision rectangle for two rectangles collision
+
+ LoadImage( $fileName ) : Raylib::FFI::Image
+
+    Load image from file into CPU memory (RAM) NOTE: This function does not
+    require GPU access
+
+ LoadImageRaw( $fileName, $width, $height, $format, $headerSize ) :
+ Raylib::FFI::Image
+
+    Load image from RAW file data NOTE: This function does not require GPU
+    access
+
+ LoadImageSvg( $string, $width, $height ) : Raylib::FFI::Image
+
+    Load image from SVG file data or string with specified size NOTE: This
+    function does not require GPU access
+
+ LoadImageAnim( $fileName, $frames ) : Raylib::FFI::Image
+
+    Load image sequence from file (frames appended to image.data) NOTE:
+    This function does not require GPU access
+
+ LoadImageFromMemory( $fileType, $fileData, $dataSize ) :
+ Raylib::FFI::Image
+
+    Load image from memory buffer, fileType refers to extension: i.e.
+    '.png' NOTE: This function does not require GPU access
+
+ LoadImageFromTexture( $texture ) : Raylib::FFI::Image
+
+    Load image from GPU texture data NOTE: This function requires GPU
+    access
+
+ LoadImageFromScreen() : Raylib::FFI::Image
+
+    Load image from screen buffer and (screenshot) NOTE: This function
+    requires GPU access
+
+ IsImageReady( $image ) : bool
+
+    Check if an image is ready
+
+ UnloadImage( $image )
+
+    Unload image from CPU memory (RAM)
+
+ ExportImage( $image, $fileName ) : bool
+
+    Export image data to file, returns true on success
+
+ GenImageColor( $width, $height, $color ) : Raylib::FFI::Image
+
+    Generate image: plain color
+
+ GenImageGradientLinear( $width, $height, $top, $bottom ) :
+ Raylib::FFI::Image
+
+    Generate image: linear gradient, direction in degrees [0..360],
+    0=Vertical gradient
+
+ GenImageGradientRadial( $width, $height, $density, $inner, $outer ) :
+ Raylib::FFI::Image
+
+    Generate image: radial gradient
+
+ GenImageGradientSquare( $width, $height, $left, $right, $top, $bottom ) :
+ Raylib::FFI::Image
+
+    Generate image: square gradient
+
+ GenImageChecked( $width, $height, $checksX, $checksY, $col1, $col2 ) :
+ Raylib::FFI::Image
+
+    Generate image: checked
+
+ GenImageWhiteNoise( $width, $height, $factor ) : Raylib::FFI::Image
+
+    Generate image: white noise
+
+ GenImagePerlinNoise( $width, $height, $offsetX, $offsetY, $scale ) :
+ Raylib::FFI::Image
+
+    Generate image: perlin noise
+
+ GenImageCellular( $width, $height, $tileSize ) : Raylib::FFI::Image
+
+    Generate image: cellular algorithm, bigger tileSize means bigger cells
+
+ GenImageText( $width, $height, $text ) : Raylib::FFI::Image
+
+    Generate image: grayscale image from text
+
+ ImageCopy( $image ) : Raylib::FFI::Image
+
+    Create an image duplicate (useful for transformations)
+
+ ImageFromImage( $image, $rec, $rec2 ) : Raylib::FFI::Image
+
+    Create an image from another image region
+
+ ImageText( $text, $fontSize, $color ) : Raylib::FFI::Image
+
+    Create an image from text (default font)
+
+ ImageTextEx($font, $text, $fontSize, $spacing, $tint) : Raylib::FFI::Image
+
+    Create an image from text (custom sprite font)
+
+ ImageFormat( $image, $format )
+
+    Convert image data to desired format
+
+ ImageToPOT( $image )
+
+    Convert image to POT (power-of-two)
+
+ ImageCrop( $image, $crop )
+
+    Crop an image to a defined rectangle
+
+ ImageAlphaCrop( $image, $threshold )
+
+    Crop image depending on alpha value
+
+ ImageAlphaClear( $image, $color, $threshold )
+
+    Clear alpha channel to desired color
+
+ ImageAlphaMask( $image, $mask )
+
+    Apply alpha mask to image
+
+ ImageAlphaPremultiply( $image )
+
+    Premultiply alpha channel
+
+ ImageBlurGaussian( $image, $blurSize, $threshold )
+
+    Apply Gaussian blur using a box blur approximation
+
+ ImageResize( $image, $newWidth, $newHeight )
+
+    Resize image (Bicubic scaling algorithm)
+
+ ImageResizeNN( $image, $newWidth, $newHeight )
+
+    Resize image (Nearest-Neighbor scaling algorithm)
+
+ ImageResizeCanvas( $image, $newWidth, $newHeight, $offsetX, $offsetY,
+ $fill )
+
+    Resize canvas and fill with color
+
+ ImageMipmaps( $image )
+
+    Compute all mipmap levels for a provided image
+
+ ImageDither( $image, $rBpp, $gBpp, $bBpp, $aBpp )
+
+    Dither image data to 16bpp or lower (Floyd-Steinberg dithering)
+
+ ImageFlipVertical( $image )
+
+    Flip image vertically
+
+ ImageFlipHorizontal( $image )
+
+    Flip image horizontally
+
+ ImageRotate( $image, $rotation )
+
+    Rotate image
+
+ ImageRotateCW( $image )
+
+    Rotate image clockwise 90deg
+
+ ImageRotateCCW( $image )
+
+    Rotate image counter-clockwise 90deg
+
+ ImageColorTint( $image, $color )
+
+    Modify image color: tint
+
+ ImageColorInvert( $image )
+
+    Modify image color: invert
+
+ ImageColorGrayscale( $image )
+
+    Modify image color: grayscale
+
+ ImageColorContrast( $image, $contrast )
+
+    Modify image color: contrast (-100 to 100)
+
+ ImageColorBrightness( $image, $brightness )
+
+    Modify image color: brightness (-255 to 255)
+
+ ImageColorReplace( $image, $color, $replace )
+
+    Modify image color: replace color
+
+ LoadImageColors( $image ) : Raylib::FFI::Color*
+
+    Load color data from image as a Color array (RGBA - 32bit)
+
+ LoadImagePalette( $image, $maxPaletteSize ) : Raylib::FFI::Color*
+
+    Load colors palette from image as a Color array (RGBA - 32bit)
+
+ UnloadImageColors( $colors )
+
+    Unload color data loaded with LoadImageColors()
+
+ UnloadImagePalette( $colors )
+
+    Unload colors palette loaded with LoadImagePalette()
+
+ GetImageAlphaBorder( $image, $threshold ) : Raylib::FFI::Rectangle
+
+    Get image alpha border rectangle
+
+ GetImageColor( $image, $x, $y ) : Raylib::FFI::Color
+
+    Get image pixel color at (x, y) position
+
+ ImageClearBackground( $image, $color )
+
+    Clear image background with given color
+
+ ImageDrawPixel( $image, $posX, $posY, $color )
+
+    Draw pixel within an image
+
+ ImageDrawPixelV( $image, $position, $color )
+
+    Draw pixel within an image (Vector version)
+
+ ImageDrawLine( $image, $startX, $startY, $endX, $endY, $color )
+
+    Draw line within an image
+
+ ImageDrawLineV( $image, $start, $end, $color )
+
+    aw line within an image (Vector version)
+
+ ImageDrawCircle( $image, $centerX, $centerY, $radius, $color )
+
+    Draw a filled circle within an image
+
+ ImageDrawCircleV( $image, $center, $radius, $color )
+
+    Draw a filled circle within an image (Vector version)
+
+ ImageDrawCircleLines( $image, $centerX, $centerY, $radius, $color )
+
+    Draw circle outline within an image
+
+ ImageDrawRectangle( $image, $posX, $posY, $width, $height, $color )
+
+    Draw circle outline within an image (Vector version)
+
+ ImageDrawRectangleV( $image, $position, $size, $color )
+
+    Draw rectangle within an image
+
+ ImageDrawRectangleV($image, $position, $size, $color)
+
+    Draw rectangle within an image (Vector version)
+
+ ImageDrawRectangleRec( $image, $rec, $color )
+
+    Draw rectangle within an image
+
+ ImageDrawRectangleLines( $image, $rec, $thick, $color )
+
+    Draw rectangle lines within an image
+
+ ImageDraw( $dst, $src, $srcRec, $dstRec, $tint )
+
+    Draw a source image within a destination image (tint applied to source)
+
+ ImageDrawText( $dst, $text, $posX, $posY, $fontSize, $color )
+
+    Draw text (using default font) within an image (destination)
+
+ ImageDrawTextEx( $dst, $text, $position, $fontSize, $spacing, $tint )
+
+    Draw text (custom sprite font) within an image (destination)
+
+ LoadTexture( $fileName ) : Raylib::FFI::Texture2D
+
+    Load texture from file into GPU memory (VRAM) NOTE: This function
+    requires GPU access
+
+ LoadTextureFromImage( $image ) : Raylib::FFI::Texture2D
+
+    Load texture from image data NOTE: This function requires GPU access
+
+ LoadTextureCubemap( $image, $layout ) : Raylib::FFI::TextureCubemap
+
+    Load cubemap from image, multiple image cubemap layouts supported NOTE:
+    This function requires GPU access
+
+ LoadRenderTexture( $width, $height ) : Raylib::FFI::RenderTexture2D
+
+    Load texture for rendering (framebuffer) NOTE: This function requires
+    GPU access
+
+ IsTextureReady( $texture ) : bool
+
+    Check if a texture is ready
+
+ UnloadTexture( $texture )
+
+    Unload texture from GPU memory (VRAM)
+
+ IsRenderTextureReady( $renderTexture ) : bool
+
+    Check if a render texture is ready
+
+ UnloadRenderTexture( $renderTexture )
+
+    Unload render texture from GPU memory (VRAM)
+
+ UpdateTexture( $texture, $pixels )
+
+    Update GPU texture with new data
+
+ UpdateTextureRec( $texture, $rec, $pixels )
+
+    Update GPU texture rectangle with new data
+
+ GenTextureMipmaps( $texture )
+
+    Generate GPU mipmaps for a texture
+
+ SetTextureFilter( $texture, $filter )
+
+    Set texture scaling filter mode
+
+ SetTextureWrap( $texture, $wrap )
+
+    Set texture wrapping mode
+
+ DrawTexture( $texture, $posX, $posY, $tint )
+
+    Draw a Texture2D
+
+ DrawTextureV( $texture, $position, $tint )
+
+    Draw a Texture2D with position defined as Vector2
+
+ DrawTextureEx( $texture, $position, $rotation, $tint )
+
+    Draw a Texture2D with extended parameters
+
+ DrawTextureRec( $texture, $source, $position, $tint )
+
+    Draw a part of a texture defined by a rectangle
+
+ DrawTexturePro( $texture, $source, $dest, $origin, $rotation, $tint )
+
+    Draw a part of a texture defined by a rectangle with 'pro' parameters
+
+ DrawTextureNPatch( $texture, $nPatchInfo, $dest, $origin, $rotation, $tint
+ )
+
+    Draws a texture (or part of it) that stretches or shrinks nicely
+
+ Fade( $color, $alpha ) : Raylib::FFI::Color
+
+    Get color with alpha applied
+
+ ColorToInt( $color ) : int
+
+    Get hexadecimal value for a Color
+
+ ColorNormalize( $color ) : Raylib::FFI::Vector4
+
+    Get Color normalized as float [0..1]
+
+ ColorToHSV( $color ) : Raylib::FFI::Vector3
+
+    Get HSV values for a Color
+
+ ColorFromHSV( $hsv ) : Raylib::FFI::Color
+
+    Get Color from HSV values. Hue [0..360], Saturation [0..1], Value
+    [0..1]
+
+ ColorTint( $color ) : int
+
+    Get Color multiplied with another color
+
+ ColorBrightness( $color, $factor ) : Raylib::FFI::Color
+
+    Get Color with brightness correction, brightness factor [0..1]
+
+ ColorContrast( $color, $contrast ) : Raylib::FFI::Color
+
+    Get Color with contrast correction, contrast factor [0..1]
+
+ ColorAlpha( $color, $alpha ) : Raylib::FFI::Color
+
+    Get src alpha-blended into dst color with tint
+
+ ColorAlphaBlend( $dst, $src, $tint ) : Raylib::FFI::Color
+
+    Get Color structure from hexadecimal value
+
+ GetColor( $hexValue ) : Raylib::FFI::Color
+
+    Get Color structure from hexadecimal value
+
+ GetPixelColor( $srcPtr, $format ) : Raylib::FFI::Color
+
+    Get Color from a source pixel pointer of certain format
+
+ SetPixelColor( $dstPtr, $color, $format )
+
+    Set color formatted into destination pixel pointer
+
+ GetPixelDataSize( $width, $height, $format ) : int
+
+    Get pixel data size in bytes for certain format
+
+ GetFontDefault() : Raylib::FFI::Font
+
+    Get the default Font
+
+ LoadFont( $fileName ) : Raylib::FFI::Font
+
+    Load font from file into GPU memory (VRAM)
+
+ LoadFontEx( $fileName, $fontSize, $fontChars, $glyphCount ) :
+ Raylib::FFI::Font
+
+    Load font from file with extended parameters, use undef for codepoints
+    and 0 for codepointCount to load the default character set
+
+ LoadFontFromImage( $image, $fontSize, $fontChars, $glyphCount ) :
+ Raylib::FFI::Font
+
+    Load font from Image (XNA style)
+
+ LoadFontFromMemory( $fileType, $fileData, $dataSize, $fontSize,
+ $fontChars, $glyphCount ) : Raylib::FFI::Font
+
+    Load font from memory buffer, fileType refers to extension: i.e. '.ttf'
+
+ IsFontReady( $font ) : bool
+
+    Check if a font is ready
+
+ LoadFontData( $fileData, $dataSize, $fontSize, $fontChars, $glyphCount,
+ $type ) : Raylib::FFI::GlyphInfo
+
+    Load font data for further use
+
+ GenImageFontAtlas( $glyphs, $glyphCount, $fontSize, $padding, $packMethod
+ ) : Raylib::FFI::Image
+
+    Generate image font atlas using chars info
+
+ UnloadFontData( $glyphs, $glyphCount )
+
+    Unload font chars info data (RAM)
+
+ UnloadFont( $font )
+
+    Unload font from GPU memory (VRAM)
+
+ DrawFPS( $posX, $posY )
+
+    Draw current FPS
+
+ DrawText( $text, $posX, $posY, $fontSize, $color )
+
+    Draw text (using default font)
+
+ DrawTextEx( $font, $text, $position, $fontSize, $spacing, $tint )
+
+    Draw text using font and additional parameters
+
+ DrawTextPro( $font, $text, $position, $origin, $rotation, $fontSize,
+ $spacing, $tint )
+
+    Draw text using Font and pro parameters (rotation)
+
+ DrawTextCodepoint( $font, $codepoint, $position, $fontSize, $tint )
+
+    Draw one character (codepoint)
+
+ DrawTextCodepoints( $font, $codepoints, $count, $position, $fontSize,
+ $spacing, $tint )
+
+    Draw multiple character (codepoint)
+
+ SetTextLineSpacing( $spacing )
+
+    Set vertical line spacing when drawing with line-breaks
+
+ MeasureText( $text, $fontSize ) : int
+
+    Measure string width for default font
+
+ MeasureTextEx( $font, $text, $fontSize, $spacing ) : Raylib::FFI::Vector2D
+
+    Measure string size for Font
+
+ GetGlyphIndex( $font, $codepoint ) : int
+
+    Get glyph index position in font for a codepoint (unicode character),
+    fallback to '?' if not found
+
+ GetGlyphInfo( $font, $codepoint ) : Raylib::FFI::GlyphInfo
+
+    Get glyph font info data for a codepoint (unicode character), fallback
+    to '?' if not found
+
+ GetGlyphAtlasRec( $font, $codepoint ) : Raylib::FFI::Rectangle
+
+    Get glyph rectangle in font atlas for a codepoint (unicode character),
+    fallback to '?' if not found
+
+ LoadCodepoints( $text, $count ) : int
+
+    Load all codepoints from a UTF-8 text string, codepoints count returned
+    by parameter
+
+ UnloadCodepoints( $codepoints, $count )
+
+    Unload codepoints data from memory
+
+ GetCodepointCount( $text ) : int
+
+    Get total number of codepoints in a UTF-8 encoded string
+
+ GetCodepoint( $text, $index ) : int
+
+    Get next codepoint in a UTF-8 encoded string, 0x3f('?') is returned on
+    failure
+
+ GetCodepointNext( $text, $index ) : int
+
+    Get next codepoint in a UTF-8 encoded string, 0x3f('?') is returned on
+    failure
+
+ GetCodepointPrevious( $text, $index ) : int
+
+    Get previous codepoint in a UTF-8 encoded string, 0x3f('?') is returned
+    on failure
+
+ CodepointToUtf8( $codepoint, $byteSize ) : string
+
+    Encode one codepoint into UTF-8 byte array (array length returned as
+    parameter)
+
+ TextToInteger( $text ) : int
+
+    Get integer value from text (negative values not supported)
+
+ DrawLine3D( $startPos, $endPos, $color )
+
+    Draw a line in 3D world space
+
+ DrawPoint3D( $position, $color )
+
+    Draw a point in 3D space, actually a small line
+
+ DrawCircle3D( $center, $radius, $rotationAxis, $rotationAngle, $color )
+
+    Draw a circle in 3D world space
+
+ DrawTriangle3D( $v1, $v2, $v3, $color )
+
+    Draw a triangle in 3D space
+
+ DrawTriangleStrip3D( $points, $pointCount, $color )
+
+    Draw a triangle strip defined by points
+
+ DrawCube( $position, $width, $height, $length, $color )
+
+    Draw cube
+
+ DrawCubeV( $position, $size, $color )
+
+    Draw cube (Vector version)
+
+ DrawCubeWires( $position, $width, $height, $length, $color )
+
+    Draw cube wires
+
+    Draw sphere
+
+    Draw sphere with extended parameters
+
+    Draw sphere wires
+
+ DrawCylinder( $position, $radiusTop, $radiusBottom, $height, $slices,
+ $color )
+
+    Draw a cylinder/cone
+
+ DrawCylinderEx( $position, $radiusTop, $radiusBottom, $height, $slices,
+ $color )
+
+    Draw cylinder with base at startPos and top at endPos
+
+ DrawCylinderWires( $position, $radiusTop, $radiusBottom, $height, $slices,
+ $color )
+
+    Draw cylinder/cone wires
+
+ DrawCylinderWiresEx($startPos, $endPos, $startRadius, $endRadius, $sides,
+ $color)
+
+    Draw a cylinder with base at startPos and top at endPos
+
+ DrawCapsule( $startPos, $endPos, $radius, $slices, $segments, $color )
+
+    Draw a capsule with the center of its sphere caps at startPos and
+    endPos
+
+ DrawCapsuleWires($startPos, $endPos, $radius, $slices, $rings, $color)
+
+    Draw capsule wireframe with the center of its sphere caps at startPos
+    and endPos
+
+ DrawPlane($centerPos, $size, $color)
+
+    Draw a plane XZ
+
+ DrawRay( $ray, $color )
+
+    Draw a ray line
+
+ DrawGrid( $slices, $color )
+
+    Draw a grid (centered at (0, 0, 0))
+
+ LoadModel( $fileName ) : Raylib::FFI::Model
+
+    Load model from files (meshes and materials)
+
+ LoadModelFromMesh( $mesh ) : Raylib::FFI::Model
+
+    Load model from generated mesh (default material)
+
+ IsModelReady( $model ) : bool
+
+    Check if an model is ready
+
+ UnloadModel( $model )
+
+    Unload model (including meshes) from memory (RAM and/or VRAM)
+
+ GetModelBoundingBox( $model ) : Raylib::FFI::BoundingBox
+
+    Compute model bounding box limits (considering all meshes)
+
+ DrawModel( $model, $position, $scale, $tint )
+
+    Draw a model (with texture if set)
+
+ DrawModelEx( $model, $position, $rotationAxis, $rotationAngle, $scale,
+ $tint )
+
+    Draw a model with extended parameters
+
+ DrawModelWires( $model, $position, $scale, $tint )
+
+    Draw model wires (with texture if set)
+
+ DrawModelWiresEx( $model, $position, $rotationAxis, $rotationAngle,
+ $scale, $tint )
+
+    Draw model wires (with texture if set) with extended parameters
+
+ DrawBoundingBox( $box, $color )
+
+    Draw bounding box (wires)
+
+ DrawBillboard( $camera, $texture, $position, $size, $tint )
+
+    Draw a billboard texture
+
+ DrawBillboardRec( $camera, $texture, $source, $position, $size, $tint )
+
+    Draw a billboard texture defined by source
+
+ DrawBillboardPro( $camera, $texture, $source, $position, $up, $size,
+ $origin, $rotation, $tint )
+
+    Draw a billboard texture defined by source and rotation
+
+ UploadMesh( $mesh, $dynamic )
+
+    Upload mesh vertex data in GPU and provide VAO/VBO ids
+
+ UnloadMesh( $mesh )
+
+    Unload mesh from CPU and GPU
+
+ DrawMesh( $mesh, $material, $transform )
+
+    Draw a 3d mesh with material and transform
+
+ GetMeshBoundingBox( $mesh ) : Raylib::FFI::BoundingBox
+
+    Compute mesh bounding box limits
+
+ GenMeshTangents( $mesh )
+
+    Compute mesh tangents
+
+ ExportMesh( $mesh, $fileName ) : bool
+
+    Export mesh data to file, returns true on success
+
+ GenMeshPoly( $sides, $radius ) : Raylib::FFI::Mesh
+
+    Generate polygonal mesh
+
+ GenMeshPlane( $width, $length, $resX, $resZ ) : Raylib::FFI::Mesh
+
+    Generate plane mesh (with subdivisions)
+
+ GenMeshCube( $width, $height, $length ) : Raylib::FFI::Mesh
+
+    Generate cuboid mesh
+
+ GenMeshSphere( $radius, $rings, $slices ) : Raylib::FFI::Mesh
+
+    Generate sphere mesh
+
+ GenMeshHemiSphere( $radius, $rings, $segments ) : Raylib::FFI::Mesh
+
+    Generate half-sphere mesh (no bottom cap)
+
+ GenMeshCylinder( $radius, $height, $slices ) : Raylib::FFI::Mesh
+
+    Generate cylinder mesh
+
+ GenMeshCone( $radius, $height, $slices ) : Raylib::FFI::Mesh
+
+    Generate cone/pyramid mesh
+
+ GenMeshTorus( $radius, $size, $radSeg, $sides ) : Raylib::FFI::Mesh
+
+    Generate torus mesh
+
+ GenMeshKnot( $radius, $size, $radSeg, $sides ) : Raylib::FFI::Mesh
+
+    Generate trefoil knot mesh
+
+ GenMeshHeightmap( $heightmap, $size ) : Raylib::FFI::Mesh
+
+    Generate heightmap mesh from image data ($heightmap)
+
+ GenMeshCubicmap( $cubicmap, $cubeSize ) : Raylib::FFI::Mesh
+
+    Generate cubes-based map mesh from image data
+
+ LoadMaterials( $fileName, $materialCount ) : Raylib::FFI::Material
+
+    Load materials from model file
+
+ LoadMaterialDefault() : Raylib::FFI::Material
+
+    Load default material (Supports: Diffuse Maps, Specular Maps, Normal
+    Maps)
+
+ IsMaterialReady( $material ) : bool
+
+    Check if a material is ready
+
+ UnloadMaterial( $material )
+
+    Unload material from GPU memory (VRAM)
+
+ SetMaterialTexture( $material, $mapType, $texture )
+
+    Set texture for a material map type (MAT_MAP_DIFFUSE,
+    MAT_MAP_SPECULAR...)
+
+ SetModelMeshMaterial( $model, $meshId, $materialId )
+
+    Set material for a mesh
+
+ LoadModelAnimations( $fileName, $animCount ) : Raylib::FFI::ModelAnimation
+
+    Load model animations from file
+
+ UpdateModelAnimation( $model, $anim, $frame )
+
+    Update model animation pose
+
+ UnloadModelAnimation( $anim )
+
+    Unload animation data
+
+ UnloadModelAnimations( $model, $animCount )
+
+    Unload animation array data
+
+ IsModelAnimationValid( $model, $anim ) : bool
+
+    Check model animation skeleton match
+
+ CheckCollisionSpheres( $centerA, $radiusA, $centerB, $radiusB ) : bool
+
+    Check collision between two spheres
+
+ CheckCollisionBoxes( $box1, $box2 ) : bool
+
+    Check collision between two bounding boxes
+
+ CheckCollisionBoxSphere( $box, $center, $radius ) : bool
+
+    Check collision between box and sphere
+
+ GetRayCollisionSphere( $ray, $center, $radius ) :
+ Raylib::FFI::RayCollision
+
+    Get collision info between ray and sphere
+
+ GetRayCollisionBox( $ray, $box ) : Raylib::FFI::RayCollision
+
+    Get collision info between ray and box
+
+ GetRayCollisionMesh( $ray, $mesh, $transform ) : Raylib::FFI::RayCollision
+
+    Get collision info between ray and mesh
+
+ GetRayCollisionTriangle( $ray, $p1, $p2, $p3 ) : Raylib::FFI::RayCollision
+
+    Get collision info between ray and triangle
+
+ GetRayCollisionQuad( $ray, $p1, $p2, $p3, $p4 ) :
+ Raylib::FFI::RayCollision
+
+    Get collision info between ray and quad
+
+ InitAudioDevice()
+
+    Initialize audio device and context
+
+ CloseAudioDevice()
+
+    Close the audio device and context
+
+ IsAudioDeviceReady() : bool
+
+    Check if audio device has been initialized successfully
+
+ SetMasterVolume( $volume )
+
+    Set master volume (listener)
+
+ GetMasterVolume() : float
+
+    Get master volume (listener)
+
+ LoadWave( $fileName ) : Raylib::FFI::Wave
+
+    Load wave data from file
+
+ LoadWaveFromMemory( $fileType, $fileData, $dataSize ) : Raylib::FFI::Wave
+
+    Load wave from memory buffer, fileType refers to extension: i.e. ".wav"
+
+ LoadSound( $fileName ) : Raylib::FFI::Sound
+
+    Load sound from file
+
+ LoadSoundFromWave( $wave ) : Raylib::FFI::Sound
+
+    Load sound from wave data
+
+ LoadSoundAlias( $sound, $fileName ) : Raylib::FFI::Sound
+
+    Create a new sound that shares the same sound data as another existing
+    sound
+
+ IsSoundReady( $sound ) : bool
+
+    Check if a sound is ready
+
+ UpdateSound( $sound, $data )
+
+    Update sound buffer with new data
+
+ UnloadWave( $wave )
+
+    Unload wave data
+
+ UnloadSound( $sound )
+
+    Unload sound
+
+ ExportWave( $wave, $fileName ) : bool
+
+    Export wave data to file, return true on success
+
+ PlaySound( $sound )
+
+    Play a sound
+
+ StopSound( $sound )
+
+    Stop playing a sound
+
+ PauseSound( $sound )
+
+    Pause a sound
+
+ ResumeSound( $sound )
+
+    Resume a paused sound
+
+ IsSoundPlaying( $sound ) : bool
+
+    Check if a sound is currently playing
+
+ SetSoundVolume( $sound, $volume )
+
+    Set volume for a sound (1.0 is max level)
+
+ SetSoundPitch( $sound, $pitch )
+
+    Set pitch for a sound (1.0 is base level)
+
+ SetSoundPan( $sound, $pan )
+
+    Set pan for a sound (0.5 is center)
+
+ WaveCopy( $wave ) : Raylib::FFI::Wave
+
+    Copy a wave to a new wave
+
+ WaveCrop( $wave, $initFrame, $finalFrame )
+
+    Crop a wave to defined samples range
+
+ WaveFormat( $wave, $sampleRate, $sampleSize, $channels )
+
+    Convert wave data to desired format
+
+ LoadWaveSamples( $wave ) : float*
+
+    Load samples data from wave as a 32bit float array
+
+ UnloadWaveSamples( $samples )
+
+    Unload samples data loaded with LoadWaveSamples()
+
+ LoadMusicStream( $fileName ) : Raylib::FFI::Music
+
+    Load music stream from file
+
+ LoadMusicStreamFromMemory( $fileType, $data, $dataSize ) :
+ Raylib::FFI::Music
+
+    Load music stream from data
+
+ IsMusicReady( $music ) : bool
+
+    Check if music stream is ready
+
+ UnloadMusicStream( $music )
+
+    Unload music stream
+
+ PlayMusicStream( $music )
+
+    Start music playing
+
+ IsMusicStreamPlaying( $music ) : bool
+
+    Check if music is playing
+
+ UpdateMusicStream( $music )
+
+    Update buffers for music streaming
+
+ StopMusicStream( $music )
+
+    Stop music playing
+
+ PauseMusicStream( $music )
+
+    Pause music playing
+
+ ResumeMusicStream( $music )
+
+    Resume music playing
+
+ SeekMusicStream( $music, $position )
+
+    Seek music to a position (in seconds)
+
+ SetMusicVolume( $music, $volume )
+
+    Set volume for music (1.0 is max level)
+
+ SetMusicPitch( $music, $pitch )
+
+    Set pitch for a music (1.0 is base level)
+
+ SetMusicPan( $music, $pan )
+
+    Set pan for a music (0.5 is center)
+
+ GetMusicTimeLength( $music ) : float
+
+    Get music time length (in seconds)
+
+ GetMusicTimePlayed( $music ) : float
+
+    Get current music time played (in seconds)
+
+ LoadAudioStream( $sampleRate, $sampleSize, $channels ) :
+ Raylib::FFI::AudioStream
+
+    Load audio stream (to stream raw audio pcm data)
+
+ IsAudioStreamReady( $audioStream ) : bool
+
+    Check if an audio stream is ready
+
+ UnloadAudioStream( $audioStream )
+
+    Unload audio stream
+
+ UpdateAudioStream( $audioStream, $data, $frameCount )
+
+    Update audio stream buffers with data
+
+ IsAudioStreamProcessed( $audioStream ) : bool
+
+    Check if any audio stream buffers requires refill
+
+ PlayAudioStream( $audioStream )
+
+    Play audio stream
+
+ PauseAudioStream( $audioStream )
+
+    Pause audio stream
+
+ ResumeAudioStream( $audioStream )
+
+    Resume audio stream
+
+ IsAudioStreamPlaying( $audioStream ) : bool
+
+    Check if audio stream is playing
+
+ StopAudioStream( $audioStream )
+
+    Stop audio stream
+
+ SetAudioStreamVolume( $audioStream, $volume )
+
+    Set volume for audio stream (1.0 is max level)
+
+ SetAudioStreamPitch( $audioStream, $pitch )
+
+    Set pitch for audio stream (1.0 is base level)
+
+ SetAudioStreamPan( $audioStream, $pan )
+
+    Set pan for audio stream (0.5 is center)
+
+ SetAudioStreamBufferSizeDefault( $size )
+
+    Default size for new audio streams
+
+KNOWN ISSUES
+
+    Also, this module was put together very quickly, and it's not very well
+    tested. There may be differences between the documentation and the
+    underlying library. The library is correct, please let me know if you
+    find any issues.
+
+SEE ALSO
+
+    http://www.raylib.com
+
+    Graphics::Raylib
+
+    Alien::raylib
+
+AUTHOR
+
+    Chris Prather <chris@prather.org>
+
+    Based on the work of:
+
+    Ahmad Fatoum <athreef@cpan.org>, http://a3f.at
+
+COPYRIGHT AND LICENSE
+
+    This software is copyright (c) 2024 by Chris Prather.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+
+RAYLIB LICENSE
+
+    This is an unofficial wrapper of http://www.raylib.com.
+
+    raylib is Copyright (c) 2013-2016 Ramon Santamaria and available under
+    the terms of the zlib/libpng license. Refer to LICENSE
+    <https://github.com/raysan5/raylib/blob/5.0/LICENSE> for full terms.
+
+POD ERRORS
+
+    Hey! The above document had some coding errors, which are explained
+    below:
+
+    Around line 2685:
+
+      Unknown directive: =head
+
+    Around line 2689:
+
+      Unknown directive: =head
+
+    Around line 2693:
+
+      Unknown directive: =head
+

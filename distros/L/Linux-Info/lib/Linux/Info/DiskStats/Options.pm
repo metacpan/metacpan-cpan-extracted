@@ -16,7 +16,7 @@ use Class::XSAccessor getters => {
 
 use Linux::Info::KernelRelease;
 
-our $VERSION = '2.18'; # VERSION
+our $VERSION = '2.19'; # VERSION
 
 # ABSTRACT: Configuration for Linux::Info::DiskStats instances.
 
@@ -135,7 +135,7 @@ Linux::Info::DiskStats::Options - Configuration for Linux::Info::DiskStats insta
 
 =head1 VERSION
 
-version 2.18
+version 2.19
 
 =head1 SYNOPSIS
 

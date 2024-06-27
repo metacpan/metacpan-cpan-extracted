@@ -1,0 +1,30 @@
+Multi::Dispatch version 0.000002
+
+This module provides two new keywords: 'multi' and 'multimethod'
+which allow you to define multiply dispatched subroutines and methods
+with sophisticated signatures that may include aliasing, context constraints,
+type constraints, value constraints, argument deconstruction, and literal
+value matching.
+
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+
+DEPENDENCIES
+
+None.
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2022, Damian Conway
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.

@@ -13,7 +13,7 @@ use Class::XSAccessor getters => {
 
 use constant DEFAULT_FILE => '/etc/os-release';
 
-our $VERSION = '2.18'; # VERSION
+our $VERSION = '2.19'; # VERSION
 
 # ABSTRACT: a subclass with data from /etc/os-release file
 
@@ -127,7 +127,7 @@ Linux::Info::Distribution::OSRelease - a subclass with data from /etc/os-release
 
 =head1 VERSION
 
-version 2.18
+version 2.19
 
 =head1 SYNOPSIS
 

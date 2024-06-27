@@ -1,17 +1,19 @@
 --- #YAML:1.0
  name: Captcha-Stateless-Text
  abstract: stateless, text-based CAPTCHAs
- version: 0.4
+ version: 0.5
  author:
    - Lester Hightower <hightowe@cpan.org>
  license: perl
  distribution_type: module
  requires:
-   - Sub::Util
-   - Lingua::EN::Nums2Words
-   - Try::Tiny
-   - Crypt::Mode::CBC
-   - JSON
+   # Perl >= v5.20 needed for feature "signatures"
+   perl: '5.020000'
+   Sub::Util: 0
+   Lingua::EN::Nums2Words: 0
+   Try::Tiny: 0
+   Crypt::Mode::CBC: 0
+   JSON: 0
  recommends:
  build_requires:
  urls:

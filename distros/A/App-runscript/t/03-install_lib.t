@@ -24,7 +24,7 @@ like exception { App::runscript::_prepend_install_lib( 'baz.pl' ) }, qr/\ACannot
   my $override    = Sub::Override->new(
     'App::runscript::_which' => sub ( $;$ ) { pass( 'mocked _which() called once' ); return $application } );
   like exception { App::runscript::_prepend_install_lib( 'baz.pl' ) },
-    "/\\ABasename of '" . dirname( $application ) . "' is not 'bin'/",
+    "/\\ABasename of '" . quotemeta( dirname( $application ) ) . "' is not 'bin'/",
     'application is not in bin directory';
 }
 

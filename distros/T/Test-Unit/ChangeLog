@@ -1,3 +1,15 @@
+2024-06-26  Ricardo Signes  <cpan@semiotic.systems>
+
+	* lib/Test/Unit.pm: version 0.26
+
+	* lib/Test/Unit/TestCase.pm: the "defined ARRAY" syntax, removed in v5.22.0,
+		has now been removed from this library
+
+	* t/try_examples.t: was adjusted to pass on Darwin
+
+	* t/tlib/AssertTest.pm: tests were updated to work with whatever qr//
+	stringification is in play
+
 2005-10-15  Matthew Astley  <mca1001@users.sourceforge.net>
 
 	* doc/release-checklist, doc/TODO, ChangeLog: updates for release
@@ -5,7 +17,7 @@
 	* lib/Test/Unit.pm: version 0.25
 
 	* MANIFEST: add licence and class-diagram files, remove old
-	exmample; keep in "make manifest" generated order
+	example; keep in "make manifest" generated order
 
 	* t/tlib/AssertTest.pm (test_fail_assert_not_null): extra check,
 	for SF bug #610499

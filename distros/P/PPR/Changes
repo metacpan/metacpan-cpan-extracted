@@ -359,3 +359,10 @@ Revision history for PPR
 
     * Added support for Perl 5.38 features:
       classes, methods, fields, optimistic regex evals, //= and ||= in signatures
+
+
+0.001009  Wed Jun 26 14:33:28 2024
+
+    * Added explicit -- and extensible -- rule for (?&PerlComment)
+
+    * Some minor doc fixes

@@ -1,5 +1,20 @@
 Revision history for CXC-DB-DDL
 
+0.15      2024-06-26 12:57:01-04:00 America/New_York
+
+  [BUG FIX]
+
+   * DBD types may share the same integer value as a standard SQL type;
+
+  [ENHANCEMENTS]
+
+   * more DBD type exports
+
+  [MISC]
+
+   * CXC::DB::DDL::Field::Pg has been moved to its own distribution to
+     keep this distribution DBD agnostic.
+
 0.14      2024-06-23 13:25:54-04:00 America/New_York
 
   [DEPRECATION]

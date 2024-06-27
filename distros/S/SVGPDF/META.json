@@ -44,7 +44,7 @@
    "provides" : {
       "SVGPDF" : {
          "file" : "lib/SVGPDF.pm",
-         "version" : "0.087"
+         "version" : "0.088"
       }
    },
    "release_status" : "stable",
@@ -59,6 +59,6 @@
          "url" : "https://github.com/sciurius/perl-SVGPDF"
       }
    },
-   "version" : "0.087",
+   "version" : "0.088",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

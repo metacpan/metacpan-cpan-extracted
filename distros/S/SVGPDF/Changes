@@ -1,5 +1,10 @@
 Revision history for SVGPDF
 
+0.088	2024-06-26
+
+	- Remove failing part of test 08_path1a3. This part fails on
+	  some systems with quadmath perl.
+
 0.087	2024-06-21
 
 	- Fix missing transparency (default background-color -> none).

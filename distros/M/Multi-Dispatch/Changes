@@ -1,0 +1,45 @@
+Revision history for Multi::Dispatch
+
+0.000001  Mon May 18 01:31:20 2020
+       Initial release.
+
+
+0.000002  Thu Jun 27 08:39:54 2024
+
+    * Fixed version requirements in demos and cleaned up their source.
+      (Thanks, Ovid)
+
+    * Improved SYNOPSIS examples
+      (Thanks, Ovid)
+
+    * Improved redefinition warnings for multis
+      and made them respond to: no warnings 'redefine'
+
+    * Added a compiler error when a multi and a multimethod of the same name
+      are declared in the same namespace
+
+    * Changed: use Multi::Dispatch -noncontiguous;
+      to:      use Multi::Dispatch; no warnings 'Multi::Dispatch::noncontiguous';
+      for extra disaffordance ;-)
+
+    * Removed documentation for unimplemented multisub export mechanism
+      in anticipation of an entirely different approach (see below)...
+
+    * Optimized error messages for single-variant multis
+
+    * Implemented internal workaround for change in regex capture behaviour
+      in Perl 5.38
+
+    * Implemented :from attribute to allow multisub imports
+
+    * Implemented :export attribute to allow multisub exports
+
+    * Fixed handling of nameless slurpies in destructures
+
+    * Added detection of unexpected named args in hash destructures
+
+    * Added OBJ pseudotype as a cheap way of testing blessedness
+
+    * Added :permute attribute
+
+    * Added -annotate flag

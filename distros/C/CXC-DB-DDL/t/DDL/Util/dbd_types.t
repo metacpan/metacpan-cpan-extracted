@@ -23,7 +23,7 @@ use CXC::DB::DDL::Util {
   },
   -type_funcs;
 
-is( \%base, \%add_dbd, "default symbol tables the same after adding new dbd" );
+is( \%base, \%add_dbd, 'default symbol tables the same after adding new dbd' );
 
 is(
     [ keys %mixed ],
@@ -33,7 +33,7 @@ is(
         item 'MTDB_REAL';
         end;
     },
-    'found DBI & new types'
+    'found DBI & new types',
 );
 
 my %my_field;
@@ -41,7 +41,7 @@ use CXC::DB::DDL::Util {
     dbd  => 'MyTestDBD',
     into => \%my_field,
   },
-  -type_funcs;
+  -type_funcs, -types;
 
 use CXC::DB::DDL::Util { dbd => 'MyTestDBD', }, 'xTYPE';
 
@@ -49,6 +49,7 @@ use CXC::DB::DDL::Util { dbd => 'MyTestDBD', }, 'xTYPE';
 for my $type ( qw( MTDB_INTEGER MTDB_REAL ) ) {
 
     subtest $type => sub {
+
 
         my $constant = do {
             ## no critic (TestingAndDebugging::ProhibitNoStrict)
@@ -58,14 +59,37 @@ for my $type ( qw( MTDB_INTEGER MTDB_REAL ) ) {
 
         subtest 'specific type function generator' => sub {
             my $field = $my_field{$type}->()->( 'foo' );
-            isa_ok( $field, ['My::Field'], 'object' );
-            is( $field->data_type, [$constant], 'type' );
+
+            is(
+                $field,
+                object {
+                    prop blessed => 'My::Field';
+                    call data_type => array {
+                        item object {
+                            prop blessed => 'My::Field::Type';
+                            call name => $type;
+                            call type => $constant;
+                        };
+                        end;
+                    };
+                },
+            );
         };
 
         subtest 'generic type function generator' => sub {
-            my $field = xTYPE( $constant )->( 'foo' );
-            isa_ok( $field, ['My::Field'], 'object' );
-            is( $field->data_type, [$constant], 'type' );
+            my $field = xTYPE( $my_field{"DBD_TYPE_$type"}->() )->( 'foo' );
+
+            is(
+                $field->data_type,
+                array {
+                    item object {
+                        prop blessed => 'My::Field::Type';
+                        call name => $type;
+                        call type => $constant;
+                    };
+                    end;
+                },
+            );
         };
 
 

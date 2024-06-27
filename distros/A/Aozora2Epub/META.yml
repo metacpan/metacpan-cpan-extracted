@@ -26,11 +26,13 @@ no_index:
     - xt
 requires:
   Archive::Zip: '0'
-  Cache::FileCache: '0'
+  Cache::Cache: '1.08'
   Carp: '0'
   Class::Accessor: '0'
   Encode: '0'
+  Encode::JISX0213: '0.04'
   File::Find: '0'
+  File::HomeDir: '1.004'
   File::ShareDir: '0'
   Getopt::Long: '0'
   HTML::Element: '0'
@@ -40,7 +42,7 @@ requires:
   HTTP::Date: '0'
   HTTP::Tiny: '0'
   IO::Socket::SSL: '0'
-  Path::Tiny: '0'
+  Path::Tiny: '0.125'
   Text::Xslate: '0'
   URI: '0'
   UUID: '0'
@@ -49,7 +51,7 @@ resources:
   bugtracker: https://github.com/saltyduck/Aozora2Epub/issues
   homepage: https://github.com/saltyduck/Aozora2Epub
   repository: https://github.com/saltyduck/Aozora2Epub.git
-version: '0.03'
+version: '0.04'
 x_generated_by_perl: v5.38.2
 x_serialization_backend: 'YAML::Tiny version 1.74'
 x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

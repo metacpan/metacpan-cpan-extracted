@@ -5,9 +5,9 @@ package CXC::DB::DDL::Util;
 use v5.26;
 use strict;
 use warnings;
-use experimental 'signatures', 'postderef';
+use experimental 'signatures', 'postderef', 'declared_refs';
 
-our $VERSION = '0.14';
+our $VERSION = '0.15';
 
 use List::Util      qw( pairs first );
 use Sub::Util       qw( set_subname );
@@ -59,10 +59,6 @@ my %CACHE = (
     },
 );
 
-# this is the base setup for DBI's sql_types, and initializes
-# $CACHE{DBI}{types}{symbols};
-# types( 'DBI' );
-
 my sub is_supported_dbd ( $dbd ) {
     my %supported;
     @supported{ 'DBI', SUPPORTED_DBDS, keys %CACHE } = ();
@@ -83,7 +79,9 @@ my sub init ( $globals ) {
     if ( my $request = $globals->{add_dbd} ) {
         Ref::Util::is_hashref( $request )
           or croak( "add_dbd: expected the DBD entry to be a hashref, got @{[ ref $request ]} " );
-        my ( $dbd, $tag, $field_class ) = $request->@{ 'dbd', 'tag', 'field_class' };
+        my ( $dbd, $tag, $field_class, $type_class )
+          = $request->@{ 'dbd', 'tag', 'field_class', 'type_class' };
+
         defined( $dbd ) && defined( $tag ) && defined( $field_class )
           or croak(
             sprintf( 'add_dbd: missing dbd (%s), tag(%s), or field_class(%s)',
@@ -97,12 +95,11 @@ my sub init ( $globals ) {
                     default => $field_class,
                 },
                 types => {
+                    class   => $type_class,
                     package => gen_package_name( $dbd ),
                 },
                 subs => {},
             };
-            # # initialize symbols
-            # types( $dbd );
         }
 
         # load the dbd types by default.
@@ -136,19 +133,14 @@ my sub init ( $globals ) {
 # packages and create a merged hash of names and subs
 # cached by a hash of the DBD names.
 
-sub types ( $dbd ) {
+sub types ( $dbd, $collection = 'all' ) {
 
     defined( my $cache = $CACHE{$dbd} )
       or croak( "types: unsupported dbd: $dbd" );
 
-    return $cache->{types}{symbols} if defined $cache->{types}{symbols};
+    return $cache->{types}{$collection} if defined $cache->{types}{$collection};
 
     my %symbol;
-
-    # if we're not setting up DBI, add DBI's symbols. Gather DBI's
-    # symbols if necessary.
-    %symbol = ( $CACHE{DBI}{types}{symbols} //= types( 'DBI' ) )->%*
-      if $dbd ne 'DBI';
 
     my $stash  = Package::Stash->new( $cache->{types}{package} );
     my $module = Module::Runtime::use_module( $dbd eq 'DBI' ? $dbd : "DBD::$dbd" );
@@ -162,10 +154,39 @@ sub types ( $dbd ) {
       ? map { s/^SQL_//r } @from_keys
       : @from_keys;
 
-    @symbol{@to_keys} = $lsymbol->@{@from_keys};
+    # if this is a DBD specific set of types, and an object is
+    # requested, make one.  This prevents collisions when the DBD
+    # type code is the same as a standard SQL_TYPE_xxxx code.
+    # The class MUST alread be loaded, so we don't have to
+    # worry about where it is defined (inner package, etc.)
+    if ( my $type_class = $cache->{types}{class} ) {
+        my %to_key;
+        @to_key{@from_keys} = @to_keys;
+
+        for my $from ( @from_keys ) {
+            my $to    = $to_key{$from};
+            my $value = $lsymbol->{$from}->();
+            $symbol{$to} = set_subname "DBD_TYPE_$to", sub { $type_class->new( $from, $value ) };
+        }
+    }
+
+    else {
+        @symbol{@to_keys} = $lsymbol->@{@from_keys};
+    }
+
+    # DBD specific symbols
+    Hash::Util::lock_hashref( $cache->{types}{dbd} = {%symbol} );
+
+    # add DBI's symbols.
+    if ( $dbd ne 'DBI' ) {
+        my $dbi   = types( 'DBI' );
+        my @types = keys $dbi->%*;
+        @symbol{@types} = $dbi->@{@types};
+    }
 
     Hash::Util::lock_hash( %symbol );
-    return $cache->{types}{symbols} = \%symbol;
+    $cache->{types}{all} = \%symbol;
+    return $cache->{types}{$collection};
 }
 
 
@@ -186,7 +207,8 @@ my sub _mk_field ( $name, $type, $attr, $field_class ) {
 
 }
 
-my sub expand_field_sub ( $cache, $field_class, $name, $type ) {
+
+sub _expand_field_sub ( $, $cache, $field_class, $name, $type ) {    ## no critic( Subroutines::ProhibitManyArgs )
 
     my $symbols = ( ( $cache->{fields} //= {} )->{$field_class} //= {} )->{symbols} //= {};
 
@@ -195,23 +217,31 @@ my sub expand_field_sub ( $cache, $field_class, $name, $type ) {
 
     Module::Runtime::use_module( $field_class );
 
-    my $sub = $symbols->{$name} = set_subname $name, sub ( %attr ) {
+    return "&$name", $symbols->{$name} = set_subname $name, sub ( %attr ) {
         _mk_field( $name, $type, \%attr, $field_class );
     };
-
-    return ( "&$name", $sub );
 }
 
+sub _expand_type_class_sub ( $class, $name, $cache, $dbd, $collection = 'all' ) {
 
+    if ( $name =~ qr/TYPE_NAMES$/ ) {
+        return "&$name", $cache->{subs}{$name} //= set_subname $name, do {
+            my @names = sort keys types( $dbd, $collection )->%*;
+            sub { @names };
+        };
+    }
 
+    # just the standard SQL ones from DBI
+    if ( $name =~ qr/TYPE_VALUES$/ ) {
+        return "&$name", $cache->{subs}{$name} //= set_subname $name, do {
+            my $types  = types( $dbd, $collection );
+            my @values = map { $types->{$_}->() } sort keys $types->%*;
+            sub { @values };
+        };
+    }
 
-
-
-
-
-
-
-
+    croak( "internal error: unexpected type sub name: $name" );
+}
 
 sub _exporter_validate_opts ( $class, $globals ) {
     init( $globals );
@@ -223,14 +253,25 @@ sub _exporter_expand_tag ( $class, $name, $value, $globals ) {
     # so init just in case
     init( $globals );
     my $stash = $globals->{ __PACKAGE__() };
+    my $dbd   = $stash->{dbd};
 
     # mindless copy from Exporter::Tiny::_exporter_expand_tag
-    return (
-        $class->_exporter_merge_opts( $value, $globals, @EXPORT_OK, keys types( $stash->{dbd} )->%*, ) )
+    return ( $class->_exporter_merge_opts( $value, $globals, @EXPORT_OK, keys types( $dbd )->%*, ) )
       if $name eq 'all';
 
-    return ( $class->_exporter_merge_opts( $value, $globals, keys types( $stash->{dbd} )->%*, ) )
+    return ( $class->_exporter_merge_opts( $value, $globals, keys types( $dbd )->%*, ) )
       if $name eq 'type_funcs';
+
+    if ( $name eq 'types' ) {
+        # first the standard ones
+        my @symbols = map { 'SQL_' . $_ } keys types( 'DBI' )->%*;
+
+        # and then the DBD specific ones
+        push @symbols, map { 'DBD_TYPE_' . $_ } keys types( $dbd, 'dbd' )->%*
+          if $dbd ne 'DBI';
+
+        return ( $class->_exporter_merge_opts( $value, $globals, @symbols ) );
+    }
 
     $class->SUPER::_exporter_expand_tag( $name, $value, $globals );
 }
@@ -241,20 +282,17 @@ sub _exporter_expand_sub ( $class, $name, $value, $globals, $permitted ) {
     my $cache = $stash->{cache};
     my $dbd   = $stash->{dbd};
 
-    if ( $name eq 'SQL_TYPE_NAMES' ) {
-        return "&$name", $cache->{subs}{$name} //= set_subname $name, do {
-            my @names = sort keys types( $dbd )->%*;
-            sub { @names };
-        };
-    }
+    # just the standard SQL ones from DBI
+    return $class->_expand_type_class_sub( $name, $cache, 'DBI', 'dbd' )
+      if $name eq 'SQL_TYPE_NAMES' or $name eq 'SQL_TYPE_VALUES';
 
-    if ( $name eq 'SQL_TYPE_VALUES' ) {
-        return "&$name", $cache->{subs}{$name} //= set_subname $name, do {
-            my $types  = types( $dbd );
-            my @values = map { $types->{$_}->() } sort keys $types->%*;
-            sub { @values };
-        };
-    }
+    # Just those from the DBD
+    return $class->_expand_type_class_sub( $name, $cache, $dbd, 'dbd' )
+      if $name eq 'DBD_TYPE_NAMES' or $name eq 'DBD_TYPE_VALUES';
+
+    # All of 'em from DBI & from the DBD
+    return $class->_expand_type_class_sub( $name, $cache, $dbd, 'all' )
+      if $name eq 'TYPE_NAMES' or $name eq 'TYPE_VALUES';
 
     if ( $name eq 'xTYPE' ) {
         # field class may be specific to this use of Util, rather than dbd specific,
@@ -264,29 +302,22 @@ sub _exporter_expand_sub ( $class, $name, $value, $globals, $permitted ) {
         };
     }
 
+    if ( $name =~ /^(?<pfx>DBD_TYPE|SQL)_(?<type>.*)/ ) {
+        $dbd = 'DBI' if $+{pfx} eq 'SQL';
+        my \%types = $CACHE{$dbd}{types}{dbd};
+        return "&$name", $types{ $+{type} }
+          if exists $types{ $+{type} };
+    }
+
     # $symbols is a locked hash, so can't just grab a value
     my $symbols = types( $dbd );
     if ( exists $symbols->{$name} && defined( my $sub = $symbols->{$name} ) ) {
-        return expand_field_sub( $cache, $stash->{field_class}, $name, $sub->() );
+        return $class->_expand_field_sub( $cache, $stash->{field_class}, $name, $sub->() );
     }
+
 
     $class->SUPER::_exporter_expand_sub( $name, $value, $globals, $permitted );
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
@@ -449,8 +480,8 @@ sub xCHECK ( $field, @values ) {
 
 
 sub sqlt_producer_map ( $dbd ) {
-    state %map = ( +( DBD_POSTGRESQL ) => 'PostgreSQL' );
-    return $map{$dbd} // $dbd;
+    state $map = { +( DBD_POSTGRESQL ) => 'PostgreSQL' };
+    return $map->{$dbd} // $dbd;
 }
 
 
@@ -479,7 +510,7 @@ CXC::DB::DDL::Util - CXC::DB::DDL utilities
 
 =head1 VERSION
 
-version 0.14
+version 0.15
 
 =head1 SYNOPSIS
 
@@ -491,37 +522,36 @@ version 0.14
   # import type function generators (e.g. INTEGER, DOUBLE )
   use CXC::DB::DDL::Util -type_funcs;
 
-  # import type function generators with a prefix
-  # (e.g. MK_INTEGER, MK_DOUBLE )
-  use CXC::DB::DDL::Util { prefix => 'MK_' }, -type_funcs;
-
+  # import types (e.g. SQL_TIMESTAMP )
+  use CXC::DB::DDL::Util -types;
 
   use DBI;
   $ddl = CXC::DB::DDL->new( [ {
               name => 'observation',
               xFIELDS(
-                  segment     => MK_INTEGER,
                   obsid       => INTEGER( is_primary_key => 1 ),
-                  cohort      => TEXT,
-                  date        => xTYPE( [DBI::SQL_TIMESTAMP] ),
-                  dec         => TEXT,
-                  object      => TEXT,
+                  date        => xTYPE( [SQL_TIMESTAMP] ),
                   event_count => INTEGER,
                   exposure    => REAL,
-                  instrument  => TEXT,
                   obs_cycle   => INTEGER,
                   prop_cycle  => INTEGER,
-                  ra          => TEXT,
               ),
           },
       ] );
 
 =head1 DESCRIPTION
 
-C<CXC::DB::DDL::Util> provides generators to ease creation of,
+C<CXC::DB::DDL::Util> provides a DSL  to ease creation of,
 amongst, others, L<CXC::DB::DDL::Field> objects.  It uses
 L<Exporter::Tiny> as its base exporter, allowing renaming of exported
 symbols and other things.
+
+The heart of system is L</xFIELDS>, which takes pairs of B<<
+($field_name, $type_generator) >> and returns a B<< fields => \%attr >>
+pair suitable to be passed to L<CXC::DB::DDL>'s constructor.
+
+The type generators accept any of the L<CXC::DB::DDL::Field> attribute
+specifications.
 
 =head2 DBD Specific Types
 
@@ -530,7 +560,7 @@ generic mechanism to add these see L</ADVANCED USES>.
 
 To access the PostgreSQL types, first load the L<DBD::Pg> specific
 subclass of L<CXC::DB::DDL::Field>, then pass the global B<< dbd =>
-'Pg' >> to B<CXC::DB::DDL::Util>:
+'Pg' >> option to B<CXC::DB::DDL::Util>:
 
   use CXC::DB::DDL::Field::Pg;
   use CXC::DB::DDL::Util { dbd => 'Pg' }, -type_funcs;
@@ -546,13 +576,48 @@ The PostgreSQL specific type function generators are now available as e.g., B<PG
 The generated field objects will be in the L<CXC::DB::DDL::Field::Pg>
 class.
 
+=head2 Type constants
+
+"Bare" type "constants" are used by L</xTYPE>; these are made available
+either via explicit export or via the L</-types> option passed during
+import.  The constants' values are specific to this package; do
+not use them in place of the standard constants when working directly
+with L<DBI>.
+
+The standard SQL types (e.g. those exported by L<DBI>) are
+available under the same names (e.g. B<SQL_INTEGER>).  The DBD specific
+types are available with an added prefix of B<DBD_TYPE_>, e.g.
+the L<DBD::Pg>'s B<PG_JSON> is made available as B<DBD_TYPE_PG_JSON>.
+
 =head1 SUBROUTINES
 
 =head2 SQL_TYPE_NAMES
 
-  @typenames = SQL_TYPE_NAMES;
+=head2 SQL_TYPE_VALUES
 
-returns all of the DBI supported types (without the C<SQL_> prefix)
+  @type_names = SQL_TYPE_NAMES;
+  @type_codes = SQL_TYPE_VALUES;
+
+returns (in collated order) names and values of all of the DBI supported types
+(without the C<SQL_> prefix)
+
+=head2 DBD_TYPE_NAMES
+
+=head2 DBD_TYPE_VALUES
+
+  @type_names = DBD_TYPE_NAMES;
+  @type_codes = DBD_TYPE_VALUES;
+
+returns (in collated order) names and values of all of the DBD supported types.
+
+=head2 TYPE_NAMES
+
+=head2 TYPE_VALUES
+
+  @type_names = DBD_TYPE_NAMES;
+  @type_codes = DBD_TYPE_VALUES;
+
+returns (in collated order) names and values of all of the supported types
 
 =head2 I<TYPENAME>
 
@@ -599,63 +664,13 @@ which is more painful to write and look at. So don't.
 
   xTYPE ( $type, %attr )
 
-A generic form of e.g., L</INTEGER>. Type is a numeric C<DATA_TYPE> made
-available from L<DBI> or a L<DBD> driver (e.g. L<DBD::Pg>).
+A generic form of e.g., L</INTEGER>. Type is a type constant exported
+by this module (not by L<DBI> or a L<DBD> driver). It is important to
+use the types provided by this package, e.g. do this:
 
-Be careful when importing the type functions from
-B<CXC::DB::DDL::Util> for driver specific types.
+  use CXC::DB::DDL::Util 'DBD_TYPE_PG_JSONB';
 
-For example, the type constants provided by L<DBI> all begin with
-B<SQL_>; the L<DBI> type functions provided by B<CXC::DB::DDL::Util>
-match those, but with the B<SQL_> prefix removed, so there is no
-collision between L<DBI> type constant names and B<CXC::DB::DDL::Util>
-type function names, e.g.:
-
-  use DBI 'SQL_INTEGER';
-  use CXC::DB::DDL:Util -type_funcs, 'xTYPE';
-
-  xTYPE( SQL_INTEGER, ... );
-  INTEGER( ... )
-
-However, because it is possible that a driver specific type might have
-a similar name to a L<DBI> provided type (e.g. for the fictitious
-B<DBD::MYDB> driver, B<MYDB_INTEGER> vs B<SQL_INTEGER>), when
-constructing the type functions for driver specific types, the leading
-prefix is I<not> removed.
-
-So,
-
-  # DONT DO THIS
-  use DBD::MYDB 'MYDB_INTEGER';
-  use CXC::DB::DDL:Util { dbd => 'MYDB' }, -type_funcs, 'xTYPE';
-
-  xTYPE( MYDB_INTEGER, ... );
-  MYDB_INTEGER( ... )
-
-will cause a collision between B<MYDB_INTEGER>, the type constant, and
-B<MYDB_INTEGER>, the type function.  To avoid this, either rename the type
-function generators upon import (see
-L<Exporter::Tiny::Manual::Importing>):
-
-  # DO THIS
-  use DBD::MYDB 'MYDB_INTEGER';
-  use CXC::DB::DDL:Util
-    { as => sub { $_[0] =~ s/MYDB_/MK_/r },
-      dbd => 'MYDB',
-    },
-    -type_funcs, 'xTYPE';
-
-  xTYPE( MYDB_INTEGER, ... );
-  MK_INTEGER( ... )
-
-or use the fully qualified type constant name:
-
-  # DO THIS
-  use DBD::MYDB ();
-  use CXC::DB::DDL:Util { dbd => 'MYDB'}, -type_funcs, 'xTYPE';
-
-  xTYPE( DBD::MYDB::MYDB_INTEGER, ... );
-  INTEGER( ... )
+  xTYPE( DBD_TYPE_PG_JSONB, ... );
 
 =head2 xFIELDS
 
@@ -724,6 +739,10 @@ Please see those modules/websites for more information related to this module.
 =item *
 
 L<CXC::DB::DDL|CXC::DB::DDL>
+
+=item *
+
+L<CXC::DB::DDL::Field::Pg|CXC::DB::DDL::Field::Pg>
 
 =back
 

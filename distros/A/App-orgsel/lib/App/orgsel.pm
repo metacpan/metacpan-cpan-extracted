@@ -1,15 +1,15 @@
 package App::orgsel;
 
-our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-07-03'; # DATE
-our $DIST = 'App-orgsel'; # DIST
-our $VERSION = '0.014'; # VERSION
-
 use 5.010001;
 use strict;
 use warnings;
 
 use App::CSelUtils;
+
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2024-06-26'; # DATE
+our $DIST = 'App-orgsel'; # DIST
+our $VERSION = '0.015'; # VERSION
 
 our %SPEC;
 
@@ -68,7 +68,7 @@ App::orgsel - Select Org document elements using CSel (CSS-selector-like) syntax
 
 =head1 VERSION
 
-This document describes version 0.014 of App::orgsel (from Perl distribution App-orgsel), released on 2021-07-03.
+This document describes version 0.015 of App::orgsel (from Perl distribution App-orgsel), released on 2024-06-26.
 
 =head1 SYNOPSIS
 
@@ -91,7 +91,11 @@ Arguments ('*' denotes required arguments):
 
 =item * B<expr> => I<str>
 
+(No description)
+
 =item * B<file> => I<filename> (default: "-")
+
+(No description)
 
 =item * B<node_actions> => I<array[str]> (default: ["print_as_string"])
 
@@ -183,6 +187,35 @@ Please visit the project's homepage at L<https://metacpan.org/release/App-orgsel
 
 Source repository is at L<https://github.com/perlancar/perl-App-orgsel>.
 
+=head1 AUTHOR
+
+perlancar <perlancar@cpan.org>
+
+=head1 CONTRIBUTING
+
+
+To contribute, you can send patches by email/via RT, or send pull requests on
+GitHub.
+
+Most of the time, you don't need to build the distribution yourself. You can
+simply modify the code, then test via:
+
+ % prove -l
+
+If you want to build the distribution (e.g. to try to install it locally on your
+system), you can install L<Dist::Zilla>,
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>,
+L<Pod::Weaver::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps required beyond
+that are considered a bug and can be reported to me.
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2024, 2021, 2020, 2019, 2016 by perlancar <perlancar@cpan.org>.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
 =head1 BUGS
 
 Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-orgsel>
@@ -190,16 +223,5 @@ Please report any bugs or feature requests on the bugtracker website L<https://r
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
 feature.
-
-=head1 AUTHOR
-
-perlancar <perlancar@cpan.org>
-
-=head1 COPYRIGHT AND LICENSE
-
-This software is copyright (c) 2021, 2020, 2019, 2016 by perlancar@cpan.org.
-
-This is free software; you can redistribute it and/or modify it under
-the same terms as the Perl 5 programming language system itself.
 
 =cut

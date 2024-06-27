@@ -35,7 +35,7 @@ use Module::Runtime qw(use_module);
 use Log::Any qw($log);
 use Date::Parse;
 use DateTime;
- 
+use AsposeCellsCloud::Object::AppliedOperate; 
 
 
 use base ("Class::Accessor", "Class::Data::Inheritable");
@@ -118,7 +118,7 @@ sub _deserialize {
 }
 
 
-__PACKAGE__->class_documentation({description => '',
+__PACKAGE__->class_documentation({description => 'Represents pivot column for data table.',
                                   class => 'PivotColumn',
                                   required => [], # TODO
 }                                 );
@@ -128,13 +128,20 @@ __PACKAGE__->method_documentation({
      'pivot_column_name' => {
      	datatype => 'string',
      	base_name => 'PivotColumnName',
-     	description => '',
+     	description => 'Represents pivot column name.',
      	format => '',
      	read_only => '',
      		},
      'value_column_names' => {
      	datatype => 'ARRAY[string]',
      	base_name => 'ValueColumnNames',
+     	description => 'Represents column name that sets the column`s value to the value of the pivot column.',
+     	format => '',
+     	read_only => '',
+     		},
+     'applied_operate_type' => {
+     	datatype => 'string',
+     	base_name => 'AppliedOperateType',
      	description => '',
      	format => '',
      	read_only => '',
@@ -143,12 +150,14 @@ __PACKAGE__->method_documentation({
 
 __PACKAGE__->swagger_types( {
     'pivot_column_name' => 'string',
-    'value_column_names' => 'ARRAY[string]' 
+    'value_column_names' => 'ARRAY[string]',
+    'applied_operate_type' => 'string' 
 } );
 
 __PACKAGE__->attribute_map( {
     'pivot_column_name' => 'PivotColumnName',
-    'value_column_names' => 'ValueColumnNames' 
+    'value_column_names' => 'ValueColumnNames',
+    'applied_operate_type' => 'AppliedOperateType' 
 } );
 
 __PACKAGE__->mk_accessors(keys %{__PACKAGE__->attribute_map});

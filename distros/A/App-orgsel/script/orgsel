@@ -1,15 +1,15 @@
 #!perl
 
-our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-07-03'; # DATE
-our $DIST = 'App-orgsel'; # DIST
-our $VERSION = '0.014'; # VERSION
-
 use 5.010001;
 use strict;
 use warnings;
 
 use Perinci::CmdLine::Any;
+
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2024-06-26'; # DATE
+our $DIST = 'App-orgsel'; # DIST
+our $VERSION = '0.015'; # VERSION
 
 Perinci::CmdLine::Any->new(
     url => '/App/orgsel/orgsel',
@@ -32,7 +32,7 @@ orgsel - Select Org document elements using CSel (CSS-selector-like) syntax
 
 =head1 VERSION
 
-This document describes version 0.014 of orgsel (from Perl distribution App-orgsel), released on 2021-07-03.
+This document describes version 0.015 of orgsel (from Perl distribution App-orgsel), released on 2024-06-26.
 
 =head1 SYNOPSIS
 
@@ -132,15 +132,15 @@ example C<dump-org-structure todo.org> will give:
            Text: "log"
            (children)
            Text: "\n"
-         List: U(+) indent=2
-           ListItem: +
-             (children)
-             Timestamp: 2021-06-22T00:00:00F "[2021-06-22]"
-             Text: " this is because currently \"raw value\" is set,..."
-           ListItem: +
-             (children)
-             Timestamp: 2021-06-21T00:00:00F "[2021-06-21]"
-             Text: " entry\n"
+           List: U(+) indent=2
+             ListItem: +
+               (children)
+               Timestamp: 2021-06-22T00:00:00F "[2021-06-22]"
+               Text: " this is because currently \"raw value\" is set,..."
+             ListItem: +
+               (children)
+               Timestamp: 2021-06-21T00:00:00F "[2021-06-21]"
+               Text: " entry\n"
      Headline: l=2 todo=WISHLIST
        (title)
        Text:
@@ -178,11 +178,11 @@ example C<dump-org-structure todo.org> will give:
            Text: "log"
            (children)
            Text: "\n"
-         List: U(+) indent=2
-           ListItem: +
-             (children)
-             Timestamp: 2020-06-03T00:00:00F "[2020-06-03 Wed]"
-             Text: " done on firefox-mua-modify-containers (can..."
+           List: U(+) indent=2
+             ListItem: +
+               (children)
+               Timestamp: 2020-06-03T00:00:00F "[2020-06-03 Wed]"
+               Text: " done on firefox-mua-modify-containers (can..."
      Headline: l=2 todo=TODO prio=C "** TODO [2020-05-29 Fri] [#C] csvutils: make..."
        (title)
        Text:
@@ -200,11 +200,11 @@ example C<dump-org-structure todo.org> will give:
            Text: "log"
            (children)
            Text: "\n"
-         List: U(+) indent=2
-           ListItem: +
-             (children)
-             Timestamp: 2020-08-16T00:00:00F "[2020-08-16 Sun]"
-             Text: " done\n"
+           List: U(+) indent=2
+             ListItem: +
+               (children)
+               Timestamp: 2020-08-16T00:00:00F "[2020-08-16 Sun]"
+               Text: " done\n"
 
 Now for some selecting examples on F<todo.org>:
 
@@ -296,7 +296,7 @@ shared file):
      she's married now.
    + [2019-01-02] entry
 
-Now for some selecting examples on F<todo.org>:
+Now for some selecting examples on F<addressbook.org>:
 
  # list contacts which have certain tag ("vet")
  % orgsel addressbook.org 'Headline[level=2][tags has "vet"]' --eval 'say $_->title->as_string'
@@ -363,6 +363,9 @@ Can be specified multiple times.
 
 =item B<--expr>=I<s>
 
+(No description)
+
+
 Can also be specified as the 2nd command-line argument.
 
 =item B<--file>=I<s>
@@ -383,35 +386,43 @@ Default value:
 
 Each action can be one of the following:
 
-* `count` will print the number of matching nodes.
+=over
 
-* `print_method` will call on or more of the node object's methods and print the
-  result. Example:
+=item * C<count> will print the number of matching nodes.
 
-    print_method:as_string
+=item * C<print_method> will call on or more of the node object's methods and print the
+result. Example:
 
-* `dump` will show a indented text representation of the node and its
-  descendants. Each line will print information about a single node: its class,
-  followed by the value of one or more attributes. You can specify which
-  attributes to use in a dot-separated syntax, e.g.:
+print_method:as_string
 
-    dump:tag.id.class
+=item * C<dump> will show a indented text representation of the node and its
+descendants. Each line will print information about a single node: its class,
+followed by the value of one or more attributes. You can specify which
+attributes to use in a dot-separated syntax, e.g.:
 
-  which will result in a node printed like this:
+dump:tag.id.class
 
-    HTML::Element tag=p id=undef class=undef
+which will result in a node printed like this:
 
-By default, if no attributes are specified, `id` is used. If the node class does
+HTML::Element tag=p id=undef class=undef
+
+=back
+
+By default, if no attributes are specified, C<id> is used. If the node class does
 not support the attribute, or if the value of the attribute is undef, then
-`undef` is shown.
+C<undef> is shown.
 
-* `eval` will execute Perl code for each matching node. The Perl code will be
-  called with arguments: `($node)`. For convenience, `$_` is also locally set to
-  the matching node. Example in <prog:htmlsel> you can add this action:
+=over
 
-    eval:'print $_->tag'
+=item * C<eval> will execute Perl code for each matching node. The Perl code will be
+called with arguments: C<($node)>. For convenience, C<$_> is also locally set to
+the matching node. Example in L<htmlsel> you can add this action:
 
-  which will print the tag name for each matching <pm:HTML::Element> node.
+eval:'print $_->tag'
+
+which will print the tag name for each matching L<HTML::Element> node.
+
+=back
 
 
 Can be specified multiple times.
@@ -434,14 +445,14 @@ Valid values:
 
  ["","descendants_depth_first"]
 
-This option sets how node action is performed (See `node_actions` option).
+This option sets how node action is performed (See C<node_actions> option).
 
 When set to '' (the default), then only matching nodes are actioned upon.
 
 When set to 'descendants_depth_first', then after each matching node is actioned
 upon by an action, the descendants of the matching node are also actioned, in
 depth-first order. This option is sometimes necessary e.g. when your node's
-`as_string()` method shows a node's string representation that does not include
+C<as_string()> method shows a node's string representation that does not include
 its descendants.
 
 
@@ -477,12 +488,20 @@ Valid values:
 
  ["csel","root"]
 
-The default is `csel`, which will select nodes from the tree using the CSel
+The default is C<csel>, which will select nodes from the tree using the CSel
 expression. Note that the root node itself is not included. For more details on
-CSel expression, refer to <pm:Data::CSel>.
+CSel expression, refer to L<Data::CSel>.
 
-`root` will return a single node which is the root node.
+C<root> will return a single node which is the root node.
 
+
+=item B<-e>=I<s@>
+
+-e E is shortcut for --action eval:E.
+
+See C<--node-action>.
+
+Can be specified multiple times.
 
 =item B<-R>
 
@@ -504,6 +523,12 @@ Default value:
 
  undef
 
+Output can be displayed in multiple formats, and a suitable default format is
+chosen depending on the application and/or whether output destination is
+interactive terminal (i.e. whether output is piped). This option specifically
+chooses an output format.
+
+
 =item B<--json>
 
 Set output format to json.
@@ -518,24 +543,33 @@ Default value:
 
 By default, when outputing as JSON, the full enveloped result is returned, e.g.:
 
-    [200,"OK",[1,2,3],{"func.extra"=>4}]
+ [200,"OK",[1,2,3],{"func.extra"=>4}]
 
 The reason is so you can get the status (1st element), status message (2nd
 element) as well as result metadata/extra result (4th element) instead of just
 the result (3rd element). However, sometimes you want just the result, e.g. when
 you want to pipe the result for more post-processing. In this case you can use
-`--naked-res` so you just get:
+C<--naked-res> so you just get:
 
-    [1,2,3]
+ [1,2,3]
 
 
 =item B<--page-result>
 
 Filter output through a pager.
 
+This option will pipe the output to a specified pager program. If pager program
+is not specified, a suitable default e.g. C<less> is chosen.
+
+
 =item B<--view-result>
 
 View output using a viewer.
+
+This option will first save the output to a temporary file, then open a viewer
+program to view the temporary file. If a viewer program is not chosen, a
+suitable default, e.g. the browser, is chosen.
+
 
 =back
 
@@ -595,14 +629,6 @@ Please visit the project's homepage at L<https://metacpan.org/release/App-orgsel
 
 Source repository is at L<https://github.com/perlancar/perl-App-orgsel>.
 
-=head1 BUGS
-
-Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-orgsel>
-
-When submitting a bug or request, please include a test-file or a
-patch to an existing test-file that illustrates the bug or desired
-feature.
-
 =head1 SEE ALSO
 
 If you want to select Org node elements from Perl, use L<Org::Parser> and
@@ -619,11 +645,37 @@ other types of documents.
 
 perlancar <perlancar@cpan.org>
 
+=head1 CONTRIBUTING
+
+
+To contribute, you can send patches by email/via RT, or send pull requests on
+GitHub.
+
+Most of the time, you don't need to build the distribution yourself. You can
+simply modify the code, then test via:
+
+ % prove -l
+
+If you want to build the distribution (e.g. to try to install it locally on your
+system), you can install L<Dist::Zilla>,
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>,
+L<Pod::Weaver::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps required beyond
+that are considered a bug and can be reported to me.
+
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2021, 2020, 2019, 2016 by perlancar@cpan.org.
+This software is copyright (c) 2024, 2021, 2020, 2019, 2016 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-orgsel>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
 
 =cut

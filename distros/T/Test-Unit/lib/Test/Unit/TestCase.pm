@@ -103,7 +103,7 @@ sub list_tests {
     my $class = ref($_[0]) || $_[0];
     my @tests = ();
     no strict 'refs';
-    if (defined(@{"$class\::TESTS"})) {
+    if (@{"$class\::TESTS"}) {
         push @tests, @{"$class\::TESTS"};
     }
     else {

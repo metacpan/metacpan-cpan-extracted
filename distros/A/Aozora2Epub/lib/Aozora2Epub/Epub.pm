@@ -14,7 +14,7 @@ use Aozora2Epub::Gensym;
 use base qw/Class::Accessor/;
 __PACKAGE__->mk_accessors(qw/assets/);
 
-our $VERSION = "0.03";
+our $VERSION = "0.04";
 
 sub new {
     my $class = shift;
@@ -136,7 +136,7 @@ sub build_from_doc {
         title => $self->{doc}->title,
         author => $self->{doc}->author,
         date => time2isoz(time),
-        sections => $toc,
+        sections => $self->{doc}->toc,
         has_sections => (@$toc ? 1 : 0),
         files => $self->{doc}->files,
         has_okuzuke => $doc->bib_info,

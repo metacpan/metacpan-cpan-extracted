@@ -7,7 +7,7 @@ API in Perl to recover information about the running Linux OS
 ## WARNING
 
 The version 2.0 and beyond brakes compatibility with the
-`Linux::Info::DiskStats module` in previous versions.
+`Linux::Info::DiskStats` module in previous versions.
 
 Be sure to read the related documentation to avoid issues when upgrading.
 
@@ -49,10 +49,13 @@ system, you should try it.
 
 `Linux::Info` has:
 
+- automatic identification of the Linux distribution and detailed information about it;
+- retrieval of Linux Kernel details;
+- support to retrieve metrics from more modern kernels;
 - a more modern Perl 5 code;
-- doesn't use `exec` syscall to acquire information;
+- doesn't use the `exec` system call to acquire information;
 - provides additional information about the processors;
-- higher Kwalitee;
+- higher [Kwalitee](https://qa.perl.org/phalanx/kwalitee.html);
 
 ## INSTALL
 

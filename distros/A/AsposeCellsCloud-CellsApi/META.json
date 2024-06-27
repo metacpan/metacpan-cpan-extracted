@@ -63,7 +63,7 @@
       },
       "AsposeCellsCloud::CellsApi" : {
          "file" : "lib/AsposeCellsCloud/CellsApi.pm",
-         "version" : "24.5.1"
+         "version" : "24.6"
       },    
       "AsposeCellsCloud::Configuration" : {
          "file" : "lib/AsposeCellsCloud/Configuration.pm"
@@ -980,6 +980,15 @@
       "AsposeCellsCloud::Object::RenderingWatermark" : {
          "file" : "lib/AsposeCellsCloud/Object/RenderingWatermark.pm"
       },
+      "AsposeCellsCloud::Object::AppliedOperate" : {
+         "file" : "lib/AsposeCellsCloud/Object/AppliedOperate.pm"
+      },
+      "AsposeCellsCloud::Object::AppliedStep" : {
+         "file" : "lib/AsposeCellsCloud/Object/AppliedStep.pm"
+      },
+      "AsposeCellsCloud::Object::DataQuery" : {
+         "file" : "lib/AsposeCellsCloud/Object/DataQuery.pm"
+      },
       "AsposeCellsCloud::Object::LoadData" : {
          "file" : "lib/AsposeCellsCloud/Object/LoadData.pm"
       },
@@ -991,15 +1000,6 @@
       },
       "AsposeCellsCloud::Object::PivotColumn" : {
          "file" : "lib/AsposeCellsCloud/Object/PivotColumn.pm"
-      },
-      "AsposeCellsCloud::Object::QueryDataSource" : {
-         "file" : "lib/AsposeCellsCloud/Object/QueryDataSource.pm"
-      },
-      "AsposeCellsCloud::Object::QueryTable" : {
-         "file" : "lib/AsposeCellsCloud/Object/QueryTable.pm"
-      },
-      "AsposeCellsCloud::Object::Transformation" : {
-         "file" : "lib/AsposeCellsCloud/Object/Transformation.pm"
       },
       "AsposeCellsCloud::Object::UnpivotColumn" : {
          "file" : "lib/AsposeCellsCloud/Object/UnpivotColumn.pm"
@@ -2311,6 +2311,6 @@
       }
    },
    "release_status" : "stable",
-   "version" : "24.5.1",
+   "version" : "24.6",
    "x_serialization_backend" : "JSON::PP version 2.27400"
 }

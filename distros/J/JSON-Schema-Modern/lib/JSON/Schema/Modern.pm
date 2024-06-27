@@ -1,11 +1,11 @@
 use strict;
 use warnings;
-package JSON::Schema::Modern; # git description: v0.585-5-g54541c6b
+package JSON::Schema::Modern; # git description: v0.586-4-g41a05094
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Validate data against a schema using a JSON Schema
 # KEYWORDS: JSON Schema validator data validation structure specification
 
-our $VERSION = '0.586';
+our $VERSION = '0.587';
 
 use 5.020;  # for fc, unicode_strings features
 use Moo;
@@ -1162,7 +1162,7 @@ JSON::Schema::Modern - Validate data against a schema using a JSON Schema
 
 =head1 VERSION
 
-version 0.586
+version 0.587
 
 =head1 SYNOPSIS
 
@@ -1718,6 +1718,41 @@ a L<Mojo::URL>. Returns C<undef> if the schema with that URI has not been loaded
 
 Fetches the L<JSON::Schema::Modern::Document> object that contains the provided identifier (uri or
 uri-reference). C<undef> if the schema with that URI has not been loaded (or cached).
+
+=head1 CACHING
+
+=for stopwords preforking
+
+Very large documents, particularly those used by L<OpenAPI::Modern>, may take a noticeable time to be
+loaded and parsed. You can reduce the impact to your preforking application by loading all necessary
+documents at startup, and impact can be further reduced by saving objects to cache and then
+reloading them (perhaps by using a timestamp or checksum to determine if a fresh reload is needed).
+
+Custom L<format validations|/add_format_validation>, L<media types|/add_media_type> or
+L<encodings|/add_encoding> are not serialized, as they are represented by subroutine references, and
+will need to be manually added after thawing.
+
+  sub get_evaluator (...) {
+    my $serialized_file = Path::Tiny::path($filename);
+    my $js;
+    if (some condition that checks if the schemas have changed...) {
+      $js = JSON::Schema::Modern->new;
+      $js->add_schema(decode_json(...));  # your application schema
+      my $frozen = Sereal::Encoder->new({ freeze_callbacks => 1 })->encode($js);
+      $serialized_file->spew_raw($frozen);
+    }
+    else {
+      my $frozen = $serialized_file->slurp_raw;
+      $js = Sereal::Decoder->new->decode($frozen);
+    }
+
+    # add custom format validations, media types and encodings here
+    $js->add_media_type(...);
+
+    return $js;
+  }
+
+See also L<OpenAPI::Modern/CACHING>.
 
 =head1 LIMITATIONS
 

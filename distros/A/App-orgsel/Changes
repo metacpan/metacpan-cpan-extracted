@@ -1,3 +1,10 @@
+0.015   2024-06-26  Released-By: PERLANCAR; Urgency: low
+
+        - No functional changes.
+
+        - [dist] Edit Changes metadata (Backward-{Compatible,Incompatible}).
+
+
 0.014   2021-07-03  Released-By: PERLANCAR; Urgency: low
 
 	- No functional changes.
@@ -50,7 +57,7 @@
 	- [ux] Simplify CLI scripts by disabling read_config & read_env.
 
 
-0.007   2019-07-29  Released-By: PERLANCAR; Urgency: medium; Backward-Compatible: no
+0.007   2019-07-29  Released-By: PERLANCAR; Urgency: medium; Backward-Incompatible: yes
 
 	- [incompatible change] Adjust to App::CSelUtils 0.082 (--actions
 	  renamed to --node-actions, add --select-action, add dump node

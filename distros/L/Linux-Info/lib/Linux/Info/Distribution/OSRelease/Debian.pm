@@ -10,7 +10,7 @@ use Class::XSAccessor getters => {
     get_version_codename => 'version_codename',
 };
 
-our $VERSION = '2.18'; # VERSION
+our $VERSION = '2.19'; # VERSION
 
 # ABSTRACT: a subclass of Linux::Info::Distribution::OSRelease
 
@@ -46,7 +46,7 @@ Linux::Info::Distribution::OSRelease::Debian - a subclass of Linux::Info::Distri
 
 =head1 VERSION
 
-version 2.18
+version 2.19
 
 =head1 DESCRIPTION
 

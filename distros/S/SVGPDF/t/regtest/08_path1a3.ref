@@ -49,23 +49,6 @@ xo fill_color black (initial)
     xo restore
   end handling path
   start handling path (SVGPDF::Path)
-  path d="M 80 230 A 45 45, 0,..."
-    xo save
-    path stroke=none fill=purple
-    xo move(80.00,230.00)
-    xo arc(45.00,45.00 0.00 0,1 125.00,275.00)
-    circular_arc(80.00,230.00 125.00,275.00 45.00 move=0 large=0 dir=1 rot=0.00)
-      xo curve( 85.91,230.00 91.76,231.16 97.22,233.43 )
-      xo curve( 102.68,235.69 107.64,239.00 111.82,243.18 )
-      xo curve( 116.00,247.36 119.31,252.32 121.57,257.78 )
-      xo curve( 123.84,263.24 125.00,269.09 125.00,275.00 )
-      xo curve( 125.00,275.00 125.00,275.00 125.00,275.00 )
-    xo line(125.00,230.00)
-    xo z
-    xo fill (none)
-    xo restore
-  end handling path
-  start handling path (SVGPDF::Path)
   path d="M 230 230 A 45 45, 0..."
     xo save
     path stroke=none fill=blue

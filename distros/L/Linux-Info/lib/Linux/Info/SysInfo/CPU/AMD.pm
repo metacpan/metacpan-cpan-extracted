@@ -11,7 +11,7 @@ use Class::XSAccessor getters => {
 
 use base 'Linux::Info::SysInfo::CPU';
 
-our $VERSION = '2.18'; # VERSION
+our $VERSION = '2.19'; # VERSION
 
 # ABSTRACT: Collects AMD based CPU information from /proc/cpuinfo
 
@@ -189,7 +189,7 @@ Linux::Info::SysInfo::CPU::AMD - Collects AMD based CPU information from /proc/c
 
 =head1 VERSION
 
-version 2.18
+version 2.19
 
 =head1 SYNOPSIS
 

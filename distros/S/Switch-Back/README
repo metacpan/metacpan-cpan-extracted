@@ -1,0 +1,28 @@
+Switch::Back version 0.000002
+
+This module provides a near-complete replacement for
+the given/when and smartmatching features that were
+added to Perl in v5.10 and removed from Perl in v5.42.
+
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+
+DEPENDENCIES
+
+None.
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2024, Damian Conway
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.

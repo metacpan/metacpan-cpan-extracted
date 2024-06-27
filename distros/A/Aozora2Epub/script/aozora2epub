@@ -6,16 +6,19 @@ use Aozora2Epub;
 use Getopt::Long;
 use Path::Tiny;
 
+our $VERSION = '0.04';
+
 binmode(STDERR, "utf8");
 binmode(STDOUT, "utf8");
 
 my $cmd_name = path($0)->basename;
 
-my ($output, $title, $author, $cover, $no_okuzuke);
+my ($output, $title, $author, $cover, $no_okuzuke, $use_subtitle);
 Getopt::Long::Configure ("bundling");
 GetOptions("o|output=s" => \$output,
            "t|title=s" => \$title,
            "a|author=s" => \$author,
+           "use-subtitle" => \$use_subtitle,
            "c|cover=s" => \$cover,
            "no-okuzuke" => \$no_okuzuke,
            "h|help" => sub { usage(0) },
@@ -23,19 +26,39 @@ GetOptions("o|output=s" => \$output,
        ) or usage(1, 1);
 
 sub show_version {
-    print "$cmd_name version $Aozora2Epub::VERSION ($0)\n";
+    print "$cmd_name version $VERSION ($0)\n";
     print "Running under Perl $^V ($^X)\n\n";
 }
 
+sub load_argv_from_stdin {
+
+    my @argv;
+    while(defined(my $line = <STDIN>)){
+        chomp $line;
+        $line =~ s/#.+$//; # comment
+        $line =~ s/^\s+//; # trim spaces
+        $line =~ s/\s+$//; # trim spaces
+
+        push @argv, $line if $line;
+    }
+    return @argv;
+}
+
 my @files = @ARGV;
+if (@files == 0 && !-t STDIN) {
+    @files = load_argv_from_stdin();
+}
+
 @files or usage(1, 1, "$cmd_name requires one or more arguments");
 
 my $ae = (@files > 1 ? Aozora2Epub->new() : Aozora2Epub->new(shift @files));
 $ae->title($title) if $title;
 $ae->author($author) if $author;
 
+my %append_options;
+$append_options{use_subtitle} = 1 if $use_subtitle;
 for my $f (@files) {
-    $ae->append($f);
+    $ae->append($f, %append_options);
 }
 
 if ($no_okuzuke) {
@@ -67,6 +90,7 @@ sub usage {
 Options:
  -t,--title      タイトル。デフォルトは本のタイトル
  -a,--author     著者。デフォルトは本の著者
+ --use-subtitle  合本を作成する際、章名に各本のタイトルではなくサブタイトルを使う
  -c,--cover      表紙ページのjpegファイル名。デフォルトは表紙ページ無し
  -o,--output     出力するEPUBファイル名。デフォルトは`タイトル'.epub
  --no-okuzuke    奥付を含めない
@@ -126,6 +150,9 @@ aozora2epub は青空文庫のXHTML形式の本をEPUBに変換するコマン�
 
 =back
 
+引数を省略した場合、かつ標準入力がターミナルでない場合は、本の指定を標準入力から読み込みます。
+このときは、各行が上記のいずれかの形式でなければなりません。各行のC<#>以降はコメントとして無視されます。また、各行の前後の空白文字および空行は無視されます。
+
 =head1 OPTIONS
 
 =over 4
@@ -141,6 +168,20 @@ aozora2epub は青空文庫のXHTML形式の本をEPUBに変換するコマン�
 出力するEPUBファイルの著者を指定します。
 デフォルトは、引数に指定した青空文庫の本の著者です。
 合本の場合は最初に指定した本の著者が使われます。
+
+=item B<--use-subtitle>
+
+合本の作成時に、章タイトルとして各本のタイトルではなくサブタイトルを使います。
+このオプションは以下の例の様な、タイトルがシリーズ名、サブタイトル作品名となっている本を
+合本にしたい場合に便利です。
+
+  銭形平次捕物控　001 金色の処女（新字新仮名、作品ID：56372）
+  銭形平次捕物控　002 振袖源太（新字新仮名、作品ID：56278）
+  銭形平次捕物控　003 大盗懺悔（新字新仮名、作品ID：56314）
+  銭形平次捕物控　004 呪いの銀簪（新字新仮名、作品ID：57231）
+  銭形平次捕物控　005 幽霊にされた女（新字新仮名、作品ID：56220）
+
+  L<青空文庫 作家別作品リスト：No.1670|https://www.aozora.gr.jp/index_pages/person1670.html>より引用
 
 =item B<-c>, B<--cover>
 

@@ -1,5 +1,9 @@
 Revision history for JSON-Schema-Modern
 
+0.587     2024-06-26 22:55:11Z
+          - fix multipleOf test that fails on some peculiar architectures
+          - document the use of Sereal for caching large evaluator objects
+
 0.586     2024-06-23 18:46:01Z
           - simplification of calculation for "multipleOf" keyword
 

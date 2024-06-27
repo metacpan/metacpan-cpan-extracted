@@ -20,7 +20,7 @@ provides:
     file: lib/AsposeCellsCloud/ApiFactory.pm
   AsposeCellsCloud::CellsApi:
     file: lib/AsposeCellsCloud/CellsApi.pm
-    version: 24.5.1
+    version: 24.6
   AsposeCellsCloud::Configuration:
     file: lib/AsposeCellsCloud/Configuration.pm
   AsposeCellsCloud::Role:
@@ -635,6 +635,12 @@ provides:
     file: lib/AsposeCellsCloud/Object/RenderingFont.pm
   AsposeCellsCloud::Object::RenderingWatermark:
     file: lib/AsposeCellsCloud/Object/RenderingWatermark.pm
+  AsposeCellsCloud::Object::AppliedOperate:
+    file: lib/AsposeCellsCloud/Object/AppliedOperate.pm
+  AsposeCellsCloud::Object::AppliedStep:
+    file: lib/AsposeCellsCloud/Object/AppliedStep.pm
+  AsposeCellsCloud::Object::DataQuery:
+    file: lib/AsposeCellsCloud/Object/DataQuery.pm
   AsposeCellsCloud::Object::LoadData:
     file: lib/AsposeCellsCloud/Object/LoadData.pm
   AsposeCellsCloud::Object::LoadTo:
@@ -643,12 +649,6 @@ provides:
     file: lib/AsposeCellsCloud/Object/MergeQueries.pm
   AsposeCellsCloud::Object::PivotColumn:
     file: lib/AsposeCellsCloud/Object/PivotColumn.pm
-  AsposeCellsCloud::Object::QueryDataSource:
-    file: lib/AsposeCellsCloud/Object/QueryDataSource.pm
-  AsposeCellsCloud::Object::QueryTable:
-    file: lib/AsposeCellsCloud/Object/QueryTable.pm
-  AsposeCellsCloud::Object::Transformation:
-    file: lib/AsposeCellsCloud/Object/Transformation.pm
   AsposeCellsCloud::Object::UnpivotColumn:
     file: lib/AsposeCellsCloud/Object/UnpivotColumn.pm
   AsposeCellsCloud::Object::PivotField:
@@ -1542,5 +1542,5 @@ requires:
   strict: '0'
   utf8: '0'
   warnings: '0'
-version: 24.5.1
+version: 24.6
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

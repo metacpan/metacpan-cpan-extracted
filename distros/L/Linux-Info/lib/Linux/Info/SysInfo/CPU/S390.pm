@@ -10,7 +10,7 @@ use Class::XSAccessor getters => {
 
 use base 'Linux::Info::SysInfo::CPU';
 
-our $VERSION = '2.18'; # VERSION
+our $VERSION = '2.19'; # VERSION
 
 # ABSTRACT: Collects s390 based CPU information from /proc/cpuinfo
 
@@ -194,7 +194,7 @@ Linux::Info::SysInfo::CPU::S390 - Collects s390 based CPU information from /proc
 
 =head1 VERSION
 
-version 2.18
+version 2.19
 
 =head1 SYNOPSIS
 

@@ -9,7 +9,7 @@ use Hash::Util qw(lock_keys);
 use Linux::Info::SysInfo;
 use Linux::Info::KernelRelease;
 
-our $VERSION = '2.18'; # VERSION
+our $VERSION = '2.19'; # VERSION
 
 use constant SPACES_REGEX => qr/\s+/;
 
@@ -403,7 +403,7 @@ Linux::Info::DiskStats - Collect Linux disks statistics.
 
 =head1 VERSION
 
-version 2.18
+version 2.19
 
 =head1 SYNOPSIS
 

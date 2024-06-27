@@ -7,16 +7,32 @@ use HTTP::Tiny;
 use Cache::FileCache;
 use Encode qw/decode/;
 use Path::Tiny;
+use File::HomeDir;
 use parent 'Exporter';
 
 our @EXPORT = qw(http_get);
 
-our $cache = Cache::FileCache->new({
-    namespace          => 'aozora',
-    default_expires_in => '30 days',
-    cache_root         => $ENV{AOZORA2EPUB_CACHE} || path($ENV{HOME}, '.aozora-epub'),
-    auto_purge_interval => '1 day',
-});
+our $VERSION = '0.04';
+
+our $CACHE;
+init_cache();
+
+sub init_cache {
+    my $cache_dir = $ENV{AOZORA2EPUB_CACHE};
+    unless ($cache_dir) {
+        my $home = File::HomeDir->my_home;
+        $home or die "Can't determin home directory. Please set an environment variable AOZORA2EPUB_CACHE\n";
+        $cache_dir = path($home, '.aozora-epub');
+    }
+
+    $CACHE = Cache::FileCache->new({
+        namespace          => 'aozora',
+        default_expires_in => '30 days',
+        cache_root         => $cache_dir,
+        directory_umask => 077,
+        auto_purge_interval => '1 day',
+    });
+}
 
 sub http_get {
     my $url = shift;
@@ -24,7 +40,7 @@ sub http_get {
     if ($url->isa('URI')) {
         $url = $url->as_string;
     }
-    my $content = $cache->get($url);
+    my $content = $CACHE->get($url);
     return $content if $content;
     my $r = HTTP::Tiny->new->get($url);
     croak "$url: $r->{status} $r->{reason}" unless $r->{success};
@@ -33,7 +49,7 @@ sub http_get {
     my $encoding = 'utf-8';
     my $content_type = $r->{headers}{'content-type'};
     unless ($content_type =~ m{text/}) {
-        $cache->set($url, $content);
+        $CACHE->set($url, $content);
         return $content; # binary
     }
     if ($content_type =~ /charset=([^;]+)/) {
@@ -42,7 +58,7 @@ sub http_get {
         $encoding = $1;
     }
     $content = Encode::decode($encoding, $content);
-    $cache->set($url, $content);
+    $CACHE->set($url, $content);
     return $content;
 }
 

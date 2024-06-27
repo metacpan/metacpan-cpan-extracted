@@ -35,11 +35,8 @@ use Module::Runtime qw(use_module);
 use Log::Any qw($log);
 use Date::Parse;
 use DateTime;
-use AsposeCellsCloud::Object::DataItem;
-use AsposeCellsCloud::Object::DataSource;
-use AsposeCellsCloud::Object::FileInfo;
-use AsposeCellsCloud::Object::LoadTo;
-use AsposeCellsCloud::Object::MergeQueries; 
+use AsposeCellsCloud::Object::DataQuery;
+use AsposeCellsCloud::Object::LoadTo; 
 
 
 use base ("Class::Accessor", "Class::Data::Inheritable");
@@ -136,31 +133,10 @@ __PACKAGE__->method_documentation({
      	format => '',
      	read_only => '',
      		},
-     'data_source' => {
-     	datatype => 'DataSource',
-     	base_name => 'DataSource',
-     	description => 'Indicates the source of the mount data.',
-     	format => '',
-     	read_only => '',
-     		},
-     'file_info' => {
-     	datatype => 'FileInfo',
-     	base_name => 'FileInfo',
-     	description => 'When data souce is request files, FileInfo store the contents of the file.',
-     	format => '',
-     	read_only => '',
-     		},
-     'data_item' => {
-     	datatype => 'DataItem',
-     	base_name => 'DataItem',
-     	description => 'The specific data object type and name.',
-     	format => '',
-     	read_only => '',
-     		},
-     'merge_queries' => {
-     	datatype => 'MergeQueries',
-     	base_name => 'MergeQueries',
-     	description => '',
+     'data_query' => {
+     	datatype => 'DataQuery',
+     	base_name => 'DataQuery',
+     	description => 'Indicates data query for data loading. ',
      	format => '',
      	read_only => '',
      		},    
@@ -168,18 +144,12 @@ __PACKAGE__->method_documentation({
 
 __PACKAGE__->swagger_types( {
     'load_to' => 'LoadTo',
-    'data_source' => 'DataSource',
-    'file_info' => 'FileInfo',
-    'data_item' => 'DataItem',
-    'merge_queries' => 'MergeQueries' 
+    'data_query' => 'DataQuery' 
 } );
 
 __PACKAGE__->attribute_map( {
     'load_to' => 'LoadTo',
-    'data_source' => 'DataSource',
-    'file_info' => 'FileInfo',
-    'data_item' => 'DataItem',
-    'merge_queries' => 'MergeQueries' 
+    'data_query' => 'DataQuery' 
 } );
 
 __PACKAGE__->mk_accessors(keys %{__PACKAGE__->attribute_map});

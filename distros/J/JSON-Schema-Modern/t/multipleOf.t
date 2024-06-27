@@ -28,6 +28,9 @@ my @tests = (
   [ 4.5, 2.25, true ],
   [ 4.5, 2.5, false ],
   [ 4.5, 2, false ],
+  [ -(~0 >> 1) -1, 0.5, true ], # min signed int
+  [ ~0 >> 1, 0.5, true ],       # max signed int
+  [ ~0, 0.5, true ],            # max unsigned int
 );
 
 
@@ -35,6 +38,7 @@ my $js = JSON::Schema::Modern->new;
 my $note = $ENV{AUTHOR_TESTING} || $ENV{AUTOMATED_TESTING} ? \&diag : \&note;
 
 sub run_test ($data, $schema_value, $expected) {
+  local $Test::Builder::Level = $Test::Builder::Level + 1;
   my $result = $js->evaluate($data, { multipleOf => $schema_value });
   my $pass = ok(!($result xor $expected), "$data is ".($expected ? '' : 'not ')."a multiple of $schema_value");
   $note->('got result: '.$result->dump) if not $pass;
@@ -66,21 +70,6 @@ subtest 'multipleOf, data and multipleOf are bignums' => sub {
     my ($data, $schema_value, $expected) = @$test;
     run_test(Math::BigFloat->new($data), Math::BigFloat->new($schema_value), $expected);
   };
-};
-
-subtest 'bignums too large for native representation' => sub {
-  my $maxint = 2**(8*$Config{ivsize} -1);
-  print "$maxint";
-  foreach (
-    -1,
-    0,
-    +1,
-  ) {
-    run_test(-$maxint*2 + $_, 1, true);
-    run_test(-$maxint*2 + $_, 0.5, true);
-    run_test(-$maxint*2 + $_, 1, true);
-    run_test(-$maxint*2 + $_, 0.5, true);
-  }
 };
 
 done_testing;

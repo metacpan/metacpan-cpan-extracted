@@ -35,7 +35,7 @@ use Module::Runtime qw(use_module);
 use Log::Any qw($log);
 use Date::Parse;
 use DateTime;
- 
+use AsposeCellsCloud::Object::AppliedOperate; 
 
 
 use base ("Class::Accessor", "Class::Data::Inheritable");
@@ -118,7 +118,7 @@ sub _deserialize {
 }
 
 
-__PACKAGE__->class_documentation({description => '',
+__PACKAGE__->class_documentation({description => 'Unpivot column.',
                                   class => 'UnpivotColumn',
                                   required => [], # TODO
 }                                 );
@@ -128,20 +128,27 @@ __PACKAGE__->method_documentation({
      'unpivot_column_names' => {
      	datatype => 'ARRAY[string]',
      	base_name => 'UnpivotColumnNames',
-     	description => '',
+     	description => 'Indicates unpivot column names.',
      	format => '',
      	read_only => '',
      		},
      'column_map_name' => {
      	datatype => 'string',
      	base_name => 'ColumnMapName',
-     	description => '',
+     	description => 'Indicates the column is used to store the name of unpivot columns.',
      	format => '',
      	read_only => '',
      		},
      'value_map_name' => {
      	datatype => 'string',
      	base_name => 'ValueMapName',
+     	description => 'Indicates the column is used to store the value of unpivot columns.',
+     	format => '',
+     	read_only => '',
+     		},
+     'applied_operate_type' => {
+     	datatype => 'string',
+     	base_name => 'AppliedOperateType',
      	description => '',
      	format => '',
      	read_only => '',
@@ -151,13 +158,15 @@ __PACKAGE__->method_documentation({
 __PACKAGE__->swagger_types( {
     'unpivot_column_names' => 'ARRAY[string]',
     'column_map_name' => 'string',
-    'value_map_name' => 'string' 
+    'value_map_name' => 'string',
+    'applied_operate_type' => 'string' 
 } );
 
 __PACKAGE__->attribute_map( {
     'unpivot_column_names' => 'UnpivotColumnNames',
     'column_map_name' => 'ColumnMapName',
-    'value_map_name' => 'ValueMapName' 
+    'value_map_name' => 'ValueMapName',
+    'applied_operate_type' => 'AppliedOperateType' 
 } );
 
 __PACKAGE__->mk_accessors(keys %{__PACKAGE__->attribute_map});

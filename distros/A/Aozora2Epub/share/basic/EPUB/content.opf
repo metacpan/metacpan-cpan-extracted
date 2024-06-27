@@ -17,7 +17,7 @@
     <meta property="schema:accessibilityFeature">tableOfContents</meta>
     <meta property="schema:accessibilityHazard">none</meta>
     : if $has_coverpage {
-    <meta name="cover" content="cover" />    
+    <meta name="cover" content="cover" />
     : }
   </metadata>
   <manifest>

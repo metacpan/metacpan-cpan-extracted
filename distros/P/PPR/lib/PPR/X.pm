@@ -10,12 +10,12 @@ BEGIN {
                  Due to an unresolved issue with compilation of large regexes
                  in this version of Perl, your code is likely to compile
                  extremely slowly (i.e. it may take more than a minute).
-                 PPR::X is being loaded at ${\join ' line ', (caller 2)[1,2]}.
+                 PPR::X is being loaded at ${\join ' line ', (caller(2))[1,2]}.
         END_WARNING
     }
 }
 use warnings;
-our $VERSION = '0.001007';
+our $VERSION = '0.001008';
 use utf8;
 use List::Util qw<min max>;
 
@@ -350,7 +350,7 @@ our $GRAMMAR = qr{
                     (?>(?&PerlParenthesesList))
 
                     # Can optionally do a [...] lookup straight after the parens,
-                    # followd by any number of other look-ups
+                    # followed by any number of other look-ups
                     (?:
                         (?>(?&PerlOWS)) (?&PerlArrayIndexer)
                         (?:
@@ -1132,17 +1132,9 @@ our $GRAMMAR = qr{
 
         (?<PerlString>   (?<PerlStdString>
             (?>
-                "  [^"\\]*+  (?: \\. [^"\\]*+ )*+ "
+                (?&PerlQuotelikeQ)
             |
-                '  [^'\\]*+  (?: \\. [^'\\]*+ )*+ '
-            |
-                q \b
-                (?> (?= [#] ) | (?! (?>(?&PerlOWS)) => ) )
-                (?&PPR_X_quotelike_body)
-            |
-                qq \b
-                (?> (?= [#] ) | (?! (?>(?&PerlOWS)) => ) )
-                (?&PPR_X_quotelike_body_always_interpolated)
+                (?&PerlQuotelikeQQ)
             |
                 (?&PerlHeredoc)
             |
@@ -1548,7 +1540,7 @@ our $GRAMMAR = qr{
             |
                 (?&PPR_X_newline_and_heredoc)
             |
-                [#] [^\n]*+
+                (?&PerlComment)
             |
                 __ (?> END | DATA ) __ \b .*+ \z
             )*+
@@ -1560,7 +1552,7 @@ our $GRAMMAR = qr{
             |
                 (?&PPR_X_newline_and_heredoc)
             |
-                [#] [^\n]*+
+                (?&PerlComment)
             )*+
     )) # End of rule
 
@@ -1570,8 +1562,12 @@ our $GRAMMAR = qr{
             |
                 (?&PPR_X_newline_and_heredoc)
             |
-                [#] [^\n]*+
+                (?&PerlComment)
             )++
+    )) # End of rule
+
+        (?<PerlComment>   (?<PerlStdComment>
+            [#] [^\n]*+
     )) # End of rule
 
         (?<PerlEndOfLine>   (?<PerlStdEndOfLine>
@@ -2922,7 +2918,7 @@ PPR::X - Pattern-based Perl Recognizer
 
 =head1 VERSION
 
-This document describes PPR::X version 0.001007
+This document describes PPR::X version 0.001008
 
 
 =head1 SYNOPSIS

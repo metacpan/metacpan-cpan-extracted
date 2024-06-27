@@ -1,0 +1,24 @@
+Changes
+lib/Filter/Syntactic.pm
+Makefile.PL
+MANIFEST
+README
+demo/demo_debug.pl
+demo/demo_nested.pl
+demo/demo_noreparse.pl
+demo/demo_reparse.pl
+demo/lib/Demo.pm
+demo/lib/Nested.pm
+demo/lib/NoReparse.pm
+demo/lib/Reparse.pm
+t/00.load.t
+t/comment.t
+t/fort_loop.t
+t/pod-coverage.t
+t/pod.t
+t/strings.t
+t/tlib/CommenTest.pm
+t/tlib/FortLoop.pm
+t/tlib/StringTests.pm
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

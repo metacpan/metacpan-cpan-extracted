@@ -106,6 +106,20 @@ __DATA__
 --- note
 連続する<h[123]では一度しかファイル分割しない
 
+=== h1 elem h2 h3
+--- html
+<h1 id="h1">header1</h1>
+<div style="margin-left: 4em">あああ</div>
+<h2 id="h11">header1-1</h2>
+<h3 id="h111">header1-1-1</h3>aaa<br />
+--- expected
+- |
+  <h1 id="h1">header1</h1>
+  <div style="margin-top: 4em">あああ</div>
+- |
+  <h2 id="h11">header1-1</h2>
+  <h3 id="h111">header1-1-1</h3>aaa<br />
+
 === dokuritu tobira
 --- html
 あ
@@ -145,9 +159,20 @@ __DATA__
   </figure>
   <br />
 
-=== gaiji
+=== jisage
 --- html
-<img src="../../../gaiji/1-84/1-84-77.png" alt="※(「てへん＋劣」、第3水準1-84-77)" class="gaiji" />
+<div style="margin-left: 3em">あいうえお</div>
 --- expected
-- <img alt="※(「てへん＋劣」、第3水準1-84-77)" class="gaiji" src="../gaiji/1-84/1-84-77.png" />
+- '<div style="margin-top: 3em">あいうえお</div>'
 
+=== chitsuki
+--- html
+<div style="margin-right: 3em">あいうえお</div>
+--- expected
+- '<div style="margin-bottom: 3em">あいうえお</div>'
+
+=== kei-kakomi
+--- html
+<div style="width: 8em">あああ</div>
+--- expected
+- '<div style="height: 8em">あああ</div>'

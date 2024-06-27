@@ -89,6 +89,7 @@ installer/runputty.ahk
 installer/puttycfg.ahk
 installer/puttyyes.ahk
 installer/standup.gif
+dependencies/FIGlet_fonts/figlet-2.2.5.tar.gz
 dependencies/FIGlet_fonts/LICENSE
 #dependencies/FIGlet_fonts/1943____.flf
 #dependencies/FIGlet_fonts/1row.flf

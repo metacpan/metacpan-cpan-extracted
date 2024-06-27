@@ -19,12 +19,12 @@ DDL
 Diab
 Failure
 Field
+FieldType
 Intro
 Jerius
 Manual
 NonEmptyStr
 Observatory
-Pg
 ScalarRef
 Smithsonian
 Str

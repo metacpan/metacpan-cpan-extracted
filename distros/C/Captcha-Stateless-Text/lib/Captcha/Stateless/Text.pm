@@ -6,6 +6,7 @@
 package Captcha::Stateless::Text;
 
 use strict;
+use v5.20; # Version needed for feature signatures
 use feature qw(signatures);
 no warnings qw(experimental::signatures);
 use Sub::Util qw(set_subname);   # core
@@ -19,7 +20,7 @@ use Lingua::EN::Nums2Words;      # From CPAN (cpanm Lingua::EN::Nums2Words)
 $Data::Dumper::Sortkeys = 1;
 Lingua::EN::Nums2Words::set_case('lower');
 
-our $VERSION = "0.4";
+our $VERSION = "0.5";
 sub Version { $VERSION; }
 
 my %QAfuncs = {}; # Holds our private __ANON__ subroutines

@@ -35,9 +35,10 @@ use Module::Runtime qw(use_module);
 use Log::Any qw($log);
 use Date::Parse;
 use DateTime;
+use AsposeCellsCloud::Object::AppliedStep;
+use AsposeCellsCloud::Object::DataSource;
 use AsposeCellsCloud::Object::FileInfo;
-use AsposeCellsCloud::Object::LoadData;
-use AsposeCellsCloud::Object::Transformation; 
+use AsposeCellsCloud::Object::LoadData; 
 
 
 use base ("Class::Accessor", "Class::Data::Inheritable");
@@ -120,7 +121,7 @@ sub _deserialize {
 }
 
 
-__PACKAGE__->class_documentation({description => '',
+__PACKAGE__->class_documentation({description => 'Data Transformation Request',
                                   class => 'DataTransformationRequest',
                                   required => [], # TODO
 }                                 );
@@ -130,21 +131,28 @@ __PACKAGE__->method_documentation({
      'file_info' => {
      	datatype => 'FileInfo',
      	base_name => 'FileInfo',
-     	description => '',
+     	description => 'Indicates the source of the mount data.',
      	format => '',
      	read_only => '',
      		},
-     'transformation' => {
-     	datatype => 'Transformation',
-     	base_name => 'Transformation',
-     	description => '',
+     'data_source' => {
+     	datatype => 'DataSource',
+     	base_name => 'DataSource',
+     	description => 'Indicates the source of the mount data.',
      	format => '',
      	read_only => '',
      		},
      'load_data' => {
      	datatype => 'LoadData',
      	base_name => 'LoadData',
-     	description => '',
+     	description => 'Indicates load data.',
+     	format => '',
+     	read_only => '',
+     		},
+     'applied_steps' => {
+     	datatype => 'ARRAY[AppliedStep]',
+     	base_name => 'AppliedSteps',
+     	description => 'Indicates applied step list. ',
      	format => '',
      	read_only => '',
      		},
@@ -158,7 +166,7 @@ __PACKAGE__->method_documentation({
      'out_format' => {
      	datatype => 'string',
      	base_name => 'OutFormat',
-     	description => '',
+     	description => 'Indicates output format ',
      	format => '',
      	read_only => '',
      		},    
@@ -166,16 +174,18 @@ __PACKAGE__->method_documentation({
 
 __PACKAGE__->swagger_types( {
     'file_info' => 'FileInfo',
-    'transformation' => 'Transformation',
+    'data_source' => 'DataSource',
     'load_data' => 'LoadData',
+    'applied_steps' => 'ARRAY[AppliedStep]',
     'region' => 'string',
     'out_format' => 'string' 
 } );
 
 __PACKAGE__->attribute_map( {
     'file_info' => 'FileInfo',
-    'transformation' => 'Transformation',
+    'data_source' => 'DataSource',
     'load_data' => 'LoadData',
+    'applied_steps' => 'AppliedSteps',
     'region' => 'Region',
     'out_format' => 'OutFormat' 
 } );

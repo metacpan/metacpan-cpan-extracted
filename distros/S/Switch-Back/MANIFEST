@@ -1,0 +1,14 @@
+Changes
+lib/Switch/Back.pm
+Makefile.PL
+MANIFEST
+README
+t/00.load.t
+t/given_when.t
+t/given_when_noncompatible.t
+t/line_numbers.t
+t/overload.t
+t/smartmatch.t
+t/smartmatch_complex.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

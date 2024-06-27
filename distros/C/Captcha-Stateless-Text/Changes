@@ -10,3 +10,6 @@ Version 0.3
 Version 0.4
   * Added Sub::Util to META.yml requires per rt.cpan.org issue 154107.
 
+Version 0.5
+  * Added "use v5.20" for cpantesters.org feature "signatures" errors.
+

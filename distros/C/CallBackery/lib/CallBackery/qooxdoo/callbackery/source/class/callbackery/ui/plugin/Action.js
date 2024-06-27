@@ -187,9 +187,12 @@ qx.Class.define("callbackery.ui.plugin.Action", {
                                 }
                             }
                             if (mbs) {
-                                mmButton.set(mbs);
+                                let mbsFiltered = Object.fromEntries(
+                                    ['visibility', 'enabled', 'label', 'icon'].filter(key => key in mbs).map(key => [key, mbs[key]])
+                                );
+                                mmButton.set(mbsFiltered);
                                 if (btCfg.key) {
-                                    this._menuButtonSetMap[btCfg.key] = mbs;
+                                    this._menuButtonSetMap[btCfg.key] = mbsFiltered;
                                 }
                             }
                             this.add(button);

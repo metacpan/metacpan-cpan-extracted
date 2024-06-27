@@ -7,6 +7,8 @@ use HTML::Element;
 use base qw(Class::Accessor);
 __PACKAGE__->mk_accessors(qw/content name/);
 
+our $VERSION = '0.04';
+
 sub new {
     my ($class, $content) = @_;
     return bless {
@@ -29,10 +31,8 @@ sub as_html {
 }
 
 sub insert_content {
-    my ($self, $lol) = @_;
-
-    my $c = HTML::Element->new_from_lol($lol);
-    unshift @{$self->{content}}, $c;
+    my ($self, @c) = @_;
+    unshift @{$self->{content}}, @c;
 }
 
 1;

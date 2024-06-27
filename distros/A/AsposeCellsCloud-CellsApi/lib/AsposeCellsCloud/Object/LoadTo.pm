@@ -118,7 +118,7 @@ sub _deserialize {
 }
 
 
-__PACKAGE__->class_documentation({description => '',
+__PACKAGE__->class_documentation({description => 'A description of the location to which the data is mounted.',
                                   class => 'LoadTo',
                                   required => [], # TODO
 }                                 );
@@ -128,21 +128,21 @@ __PACKAGE__->method_documentation({
      'worksheet' => {
      	datatype => 'string',
      	base_name => 'Worksheet',
-     	description => '',
+     	description => 'The worksheet name.',
      	format => '',
      	read_only => '',
      		},
      'begin_row_index' => {
      	datatype => 'int',
      	base_name => 'beginRowIndex',
-     	description => '',
+     	description => 'The begin row index of worksheet.',
      	format => '',
      	read_only => '',
      		},
      'begin_column_index' => {
      	datatype => 'int',
      	base_name => 'beginColumnIndex',
-     	description => '',
+     	description => 'The begin column index of worksheet.',
      	format => '',
      	read_only => '',
      		},    

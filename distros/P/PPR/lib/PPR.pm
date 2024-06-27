@@ -10,12 +10,12 @@ BEGIN {
                  Due to an unresolved issue with compilation of large regexes
                  in this version of Perl, your code is likely to compile
                  extremely slowly (i.e. it may take more than a minute).
-                 PPR is being loaded at ${\join ' line ', (caller 2)[1,2]}.
+                 PPR is being loaded at ${\join ' line ', (caller(2))[1,2]}.
         END_WARNING
     }
 }
 use warnings;
-our $VERSION = '0.001008';
+our $VERSION = '0.001009';
 use utf8;
 use List::Util qw<min max>;
 
@@ -438,7 +438,7 @@ our $GRAMMAR = qr{
                     (?>(?&PerlParenthesesList))
 
                     # Can optionally do a [...] lookup straight after the parens,
-                    # followd by any number of other look-ups
+                    # followed by any number of other look-ups
                     (?:
                         (?>(?&PerlOWS)) (?&PerlArrayIndexer)
                         (?:
@@ -1220,17 +1220,21 @@ our $GRAMMAR = qr{
 
         (?<PerlString>
             (?>
-                "  [^"\\]*+  (?: \\. [^"\\]*+ )*+ "
+                # Inlined (?&PerlQuotelikeQ)
+                    '  [^'\\]*+  (?: \\. [^'\\]*+ )*+ '
+                |
+                    q \b
+                    (?> (?= [#] ) | (?! (?>(?&PerlOWS)) => ) )
+                    (?&PPR_quotelike_body)
+                # End of inlining
             |
-                '  [^'\\]*+  (?: \\. [^'\\]*+ )*+ '
-            |
-                q \b
-                (?> (?= [#] ) | (?! (?>(?&PerlOWS)) => ) )
-                (?&PPR_quotelike_body)
-            |
-                qq \b
-                (?> (?= [#] ) | (?! (?>(?&PerlOWS)) => ) )
-                (?&PPR_quotelike_body_always_interpolated)
+                # Inlined (?&PerlQuotelikeQQ)
+                    "  [^"\\]*+  (?: \\. [^"\\]*+ )*+ "
+                |
+                    qq \b
+                    (?> (?= [#] ) | (?! (?>(?&PerlOWS)) => ) )
+                    (?&PPR_quotelike_body_always_interpolated)
+                # End of inlining
             |
                 (?&PerlHeredoc)
             |
@@ -1636,7 +1640,9 @@ our $GRAMMAR = qr{
             |
                 (?&PPR_newline_and_heredoc)
             |
+                # Inlined (?&PerlComment)
                 [#] [^\n]*+
+                # End of inlining
             |
                 __ (?> END | DATA ) __ \b .*+ \z
             )*+
@@ -1648,7 +1654,9 @@ our $GRAMMAR = qr{
             |
                 (?&PPR_newline_and_heredoc)
             |
+                # Inlined (?&PerlComment)
                 [#] [^\n]*+
+                # End of inlining
             )*+
         ) # End of rule (?<PerlOWS>)
 
@@ -1658,9 +1666,15 @@ our $GRAMMAR = qr{
             |
                 (?&PPR_newline_and_heredoc)
             |
+                # Inlined (?&PerlComment)
                 [#] [^\n]*+
+                # End of inlining
             )++
         ) # End of rule (?<PerlNWS>)
+
+        (?<PerlComment>
+            [#] [^\n]*+
+        ) # End of rule (?<PerlComment>)
 
         (?<PerlEndOfLine>
             \n
@@ -3010,7 +3024,7 @@ PPR - Pattern-based Perl Recognizer
 
 =head1 VERSION
 
-This document describes PPR version 0.001008
+This document describes PPR version 0.001009
 
 
 =head1 SYNOPSIS

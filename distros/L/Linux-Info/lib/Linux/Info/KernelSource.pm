@@ -4,7 +4,7 @@ use warnings;
 use strict;
 use Carp qw(confess);
 
-our $VERSION = '2.18'; # VERSION
+our $VERSION = '2.19'; # VERSION
 
 # ABSTRACT: defines the files that are source of kernel information
 
@@ -105,7 +105,7 @@ Linux::Info::KernelSource - defines the files that are source of kernel informat
 
 =head1 VERSION
 
-version 2.18
+version 2.19
 
 =head1 METHODS
 

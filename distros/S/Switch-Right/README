@@ -1,0 +1,33 @@
+Switch::Right version 0.000003
+
+This module redesigns the defunct smartmatching and given>/when mechanisms
+so that they're easier to use and easier to understand. It implements a version
+of smartmatching with only six rules to remember, eliminates all of the magical
+auto-distributivity of "when expressions", and provides clearer and more
+explicit ways to specify all those complicated and hard-to-remember special-case
+"match any of..." and "match all of..." behaviours.
+
+It's the switch feature re-imagined...and done right this time.
+
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+
+DEPENDENCIES
+
+None.
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2024, Damian Conway
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.

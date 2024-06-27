@@ -1,5 +1,9 @@
 Release history for App-runscript
 
+1.0.2        2024-06-26
+             - properly escape windows path separator (\)
+               in test script
+
 1.0.1        2024-06-26
              - make tests portable
 

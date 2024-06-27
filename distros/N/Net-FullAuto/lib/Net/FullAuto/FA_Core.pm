@@ -20499,7 +20499,7 @@ sub cwd
             $chdir=$self->{_homedir}.'/';
          } else { $chdir=$target_dir }
          if (exists $self->{_cmd_handle} && $self->{_cmd_handle}) {
-            ($output,$stderr)=$self->{_cmd_handle}->cmd("cd $chdir");
+            ($output,$stderr)=$self->{_cmd_handle}->cmd("cd \"$chdir\"");
          }
          $stderr=$output if -1<index $output,"Couldn't can";
          if ($stderr) {
@@ -20662,12 +20662,12 @@ sub cwd
                ($output,$stderr)=Rem_Command::cmd(
                      { _cmd_handle=>$self->{_cmd_handle},
                        _host_label=>[ $hostlabel,'' ] },
-                       "cd $target_dir",'__delay__=200');
+                       "cd \"$target_dir\"",'__delay__=200');
             } else {
 	       ($output,$stderr)=Rem_Command::cmd(
                      { _cmd_handle=>$self->{_cmd_handle},
                        _host_label=>[ $hostlabel,'' ] },
-                       "cd $target_dir");
+                       "cd \"$target_dir\"");
             }
             $stderr=$output if -1<index $output,"Couldn't can";
          } elsif ((exists $self->{_ftm_type}) &&

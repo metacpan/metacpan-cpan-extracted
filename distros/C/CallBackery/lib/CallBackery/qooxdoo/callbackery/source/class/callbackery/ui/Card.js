@@ -66,7 +66,7 @@ qx.Class.define("callbackery.ui.Card", {
                             fld[k].setValue('');
                         }
                         else {
-                            fld[k].setValue(String(this.xtr(data[k]) || ''));
+                            fld[k].setValue(this.xtr(data[k]).toString() || '');
                         }
                     }
                     last[k] = data[k];
@@ -126,7 +126,7 @@ qx.Class.define("callbackery.ui.Card", {
                     if (labelCfg.set) {
                         ['value','tooltip'].forEach(key => {
                             if (key in labelCfg.set){
-                                labelCfg.set[key] = this.xtr(labelCfg.set[key]);
+                                labelCfg.set[key] = this.xtr(labelCfg.set[key]).toString();
                             }
                         });
                         label.set(labelCfg.set);
@@ -147,7 +147,7 @@ qx.Class.define("callbackery.ui.Card", {
                     if (fieldCfg.set) {
                         ['placeholder','tooltip'].forEach(key => {
                             if (key in fieldCfg.set){
-                                fieldCfg.set[key] = this.xtr(fieldCfg.set[key]);
+                                fieldCfg.set[key] = this.xtr(fieldCfg.set[key]).toString();
                             }
                         });
                         field.set(fieldCfg.set);
@@ -160,7 +160,7 @@ qx.Class.define("callbackery.ui.Card", {
                     if (field.setModelSelection) { // SelectBox
                         if (fieldCfg.items) {
                             for (let item of fieldCfg.items) {
-                                field.add(new qx.ui.form.ListItem(this.xtr(item[1]), null, item[0]));
+                                field.add(new qx.ui.form.ListItem(this.xtr(item[1]).toString(), null, item[0]));
                             }
                         }
                         event = 'changeSelection';
@@ -222,7 +222,7 @@ qx.Class.define("callbackery.ui.Card", {
 
             // add action buttons
             this.__actions.forEach(action => {
-                var btn = this.__createButton(this.xtr(action.label), action.buttonSet.icon);
+                var btn = this.__createButton(this.xtr(action.label).toString(), action.buttonSet.icon);
                 btn.addListener('execute', function() {
                     this.__parentForm.setSelection(this.__dataCache);
                     this.__buttonMap[action.key].execute();
