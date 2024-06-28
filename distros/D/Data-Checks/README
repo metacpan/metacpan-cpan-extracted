@@ -55,40 +55,61 @@ CONSTRAINTS
     behave slightly differently. In particular, these constraints are
     generally happy to accept an object reference to a class that provides
     a conversion overload, whereas the ones in Types::Standard often are
-    not.
+    not. Additionally functions that are parametric take their parameters
+    in normal Perl function argument lists, not wrapped in additional array
+    references.
 
  Defined
 
        Defined()
 
-    Passes for any defined value, fails only for undef.
+    Accepts any defined value, rejects only undef.
 
  Object
 
        Object()
 
-    Passes for any blessed object reference, fails for non-references or
+    Accepts any blessed object reference, rejects non-references or
     references to unblessed data.
 
  Str
 
        Str()
 
-    Passes for any defined non-reference value, or a reference to an object
-    in a class that overloads stringification. Fails for undefined,
-    unblessed references, or references to objects in classes that do not
-    overload stringification.
+    Accepts any defined non-reference value, or a reference to an object in
+    a class that overloads stringification. rejects undefined, unblessed
+    references, or references to objects in classes that do not overload
+    stringification.
 
  Num
 
        Num()
 
-    Passes for any defined non-reference value that is either a plain
-    number, or a string that could be used as one without warning, or a
-    reference to an object in a class that overloads numification. Fails
-    for undefined, strings that would raise a warning if converted to a
-    number, unblessed references, or references to objects in classes that
-    do not overload numification.
+    Accepts any defined non-reference value that is either a plain number,
+    or a string that could be used as one without warning, or a reference
+    to an object in a class that overloads numification. rejects undefined,
+    strings that would raise a warning if converted to a number, unblessed
+    references, or references to objects in classes that do not overload
+    numification.
+
+ Isa
+
+       Isa($classname)
+
+    Since version 0.04.
+
+    Accepts any blessed object reference to an instance of the given class
+    name, or a subclass derived from it (i.e. anything accepted by the isa
+    operator).
+
+ Maybe
+
+       Maybe($C)
+
+    Since version 0.04.
+
+    Accepts undef in addition to anything else accepted by the given
+    constraint.
 
 XS FUNCTIONS
 
@@ -174,23 +195,23 @@ XS FUNCTIONS
 
     Given an optree fragment in scalar context that generates an argument
     value (argop), constructs a larger optree fragment that consumes it and
-    checks that the value passes the constraint check given by checker. The
-    returned optree fragment will operate in void context (i.e. it does not
-    yield the argument value itself).
+    checks that the value is accepted by the constraint check given by
+    checker. The returned optree fragment will operate in void context
+    (i.e. it does not yield the argument value itself).
 
  check_value
 
        bool check_value(struct DataChecks_Checker *checker, SV *value);
 
-    Checks whether a given SV passes the given constraint check, returning
-    true if so, or false if not.
+    Checks whether a given SV is accepted by the given constraint check,
+    returning true if so, or false if not.
 
  assert_value
 
        void assert_value(struct DataChecks_Checker *checker, SV *value);
 
-    Checks whether a given SV passes the given constraint check, throwing
-    its assertion message if it does not.
+    Checks whether a given SV is accepted by the given constraint check,
+    throwing its assertion message if it does not.
 
 AUTHOR
 

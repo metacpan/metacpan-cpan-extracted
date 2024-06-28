@@ -6,9 +6,9 @@ use warnings;
 use Test2::V0;
 
 BEGIN {
-   plan skip_all => "Data::Checks >= 0.02 is not available"
+   plan skip_all => "Data::Checks >= 0.03 is not available"
       unless eval { require Data::Checks;
-                    Data::Checks->VERSION( '0.02' ) };
+                    Data::Checks->VERSION( '0.03' ) };
    plan skip_all => "Signature::Attribute::Checked >= 0.04 is not available"
       unless eval { require Signature::Attribute::Checked;
                     Signature::Attribute::Checked->VERSION( '0.04' ) };
@@ -28,7 +28,7 @@ use experimental qw( signatures );
 extended sub func ( $x :Checked(Defined) ) { return $x }
 
 is( func(123), 123, 'func() accepts defined argument' );
-ok( dies { func(undef) }, 'fails with undefined argument' );
+ok( dies { func(undef) }, 'rejects undefined argument' );
 # Don't be overly sensitive on the format of the message, in case it changes.
 # It's just for human interest
 

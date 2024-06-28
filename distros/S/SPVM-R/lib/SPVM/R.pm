@@ -1,6 +1,6 @@
 package SPVM::R;
 
-our $VERSION = "0.001";
+our $VERSION = "0.002";
 
 1;
 
@@ -18,15 +18,16 @@ B<WARNINGS:Tests are not yet done. All of method and field definitions in all cl
 
 =head2 Math Examples
 
+  use R;
   use R::OP::Double as DOP;
   use R::OP::Matrix::Double as DMOP;
   
   # Scalar
-  my $sca1 = DOP->c(3);
+  my $sca1 = R->double([3.0]);
   
   # Vector
-  my $vec1 = DOP->c(1, 2);
-  my $vec2 = DOP->c(3, 4);
+  my $vec1 = R->double([1.0, 2.0]);
+  my $vec2 = R->double([3.0, 4.0]);
   
   # Addition
   my $add = DOP->add($vec1, $vec2);
@@ -48,7 +49,10 @@ B<WARNINGS:Tests are not yet done. All of method and field definitions in all cl
   my $cos = DOP->div($inner_vec1_vec2, DOP->mul($abs_vec1, $abs_vec2));
   
   # Matrix and liner conversion
-  my $mat1 = DMOP->matrix([1, 0, 0, 1], 2, 2);
+  my $mat1 = DMOP->matrix_by_row(
+    [1, 0,
+     0, 1], 2, 2
+  );
   my $ret_vec = DMOP->mul($mat1, $vec1);
   $ret_vec->drop_dim;
 
@@ -111,6 +115,8 @@ Use L<R::NDArray::DoubleComplex|SPVM::R::NDArray::DoubleComplex>, L<R::OP::Doubl
 =item * L<R::OP::Int|SPVM::R::OP::Int>
 
 =item * L<R::OP::Long|SPVM::R::OP::Long>
+
+=item * L<R::OP::Matrix|SPVM::R::OP::Matrix>
 
 =item * L<R::OP::Matrix::DoubleComplex|SPVM::R::OP::Matrix::DoubleComplex>
 

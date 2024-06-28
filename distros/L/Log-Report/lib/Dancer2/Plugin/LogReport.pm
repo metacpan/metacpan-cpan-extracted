@@ -1,4 +1,4 @@
-# Copyrights 2007-2023 by [Mark Overmeer <markov@cpan.org>].
+# Copyrights 2007-2024 by [Mark Overmeer <markov@cpan.org>].
 #  For other contributors see ChangeLog.
 # See the manual pages for details on the licensing terms.
 # Pod stripped from pm file by OODoc 2.03.
@@ -8,7 +8,7 @@
 
 package Dancer2::Plugin::LogReport;
 use vars '$VERSION';
-$VERSION = '1.36';
+$VERSION = '1.37';
 
 
 use warnings;
@@ -249,7 +249,7 @@ sub _forward_home($)
     # handling
     my $req = $dsl->app->request or return;
 
-    $dsl->send_as(plain => "$msg")
+    return $dsl->send_as(plain => "$msg")
         if $req->uri eq $page && $req->is_get;
 
     $dsl->redirect($page);

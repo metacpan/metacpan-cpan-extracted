@@ -1,5 +1,9 @@
 Revision history for SVGPDF
 
+0.088.1	2024-06-28
+
+	- Fix a failing test for perl longdouble.
+
 0.088	2024-06-26
 
 	- Remove failing part of test 08_path1a3. This part fails on

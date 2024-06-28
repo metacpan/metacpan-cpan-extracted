@@ -6,9 +6,9 @@ use warnings;
 use Test2::V0;
 
 BEGIN {
-   plan skip_all => "Data::Checks >= 0.02 is not available"
+   plan skip_all => "Data::Checks >= 0.03 is not available"
       unless eval { require Data::Checks;
-                    Data::Checks->VERSION( '0.02' ) };
+                    Data::Checks->VERSION( '0.03' ) };
    plan skip_all => "Object::Pad::FieldAttr::Checked >= 0.10 is not available"
       unless eval { require Object::Pad::FieldAttr::Checked;
                     Object::Pad::FieldAttr::Checked->VERSION( '0.10' ) };
@@ -29,7 +29,7 @@ class TestClass {
 }
 
 is( TestClass->new( x => 123 )->x, 123, 'Field $x accepts defined argument' );
-ok( dies { TestClass->new( x => undef ) }, 'fails with undefined argument' );
+ok( dies { TestClass->new( x => undef ) }, 'rejects undefined argument' );
 # Don't be overly sensitive on the format of the message, in case it changes.
 # It's just for human interest
 

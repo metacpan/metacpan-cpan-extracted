@@ -8,7 +8,7 @@ use Test2::V0;
 use lib "t";
 use testcase "t::test";
 
-use Data::Checks qw( Defined Object Str Num );
+use Data::Checks qw( Defined Object Str Num Isa Maybe );
 
 # Some test classes
 package ClassWithoutOverload {
@@ -22,13 +22,16 @@ package ClassWithNumOverload {
    use overload '0+' => sub { 123 };
    sub new { bless [], shift }
 }
+package DerivedClass {
+   use base qw( ClassWithoutOverload );
+}
 
 # Defined
 {
    my $checker = t::test::make_checkdata( Defined, "Value", "Defined" );
 
-   ok( t::test::check_value( $checker, "ok" ), 'Defined permits value' );
-   ok( !t::test::check_value( $checker, undef ), 'Defined forbids undef' );
+   ok( t::test::check_value( $checker, "ok" ), 'Defined accepts value' );
+   ok( !t::test::check_value( $checker, undef ), 'Defined rejects undef' );
 
    is( dies { t::test::assert_value( $checker, "ok" ) }, undef,
       'Defined assert_value OK' );
@@ -50,46 +53,46 @@ package ClassWithNumOverload {
 {
    my $checker = t::test::make_checkdata( Object, "Value", "Object" );
 
-   ok( t::test::check_value( $checker, bless [], "SomeClass" ), 'Object permits blessed object' );
-   ok( !t::test::check_value( $checker, [] ), 'Object forbids unblessed ref' );
-   ok( !t::test::check_value( $checker, "not-an-object" ), 'Object forbids non-ref' );
-   ok( !t::test::check_value( $checker, undef ), 'Object forbids undef' );
+   ok( t::test::check_value( $checker, bless [], "SomeClass" ), 'Object accepts blessed object' );
+   ok( !t::test::check_value( $checker, [] ), 'Object rejects unblessed ref' );
+   ok( !t::test::check_value( $checker, "not-an-object" ), 'Object rejects non-ref' );
+   ok( !t::test::check_value( $checker, undef ), 'Object rejects undef' );
 }
 
 # Str
 {
    my $checker = t::test::make_checkdata( Str, "Value", "Str" );
 
-   ok( t::test::check_value( $checker, "a string" ), 'Str permits plain string' );
-   ok( t::test::check_value( $checker, "" ),         'Str permits empty string' );
-   ok( t::test::check_value( $checker, 1234 ),       'Str permits plain number' );
+   ok( t::test::check_value( $checker, "a string" ), 'Str accepts plain string' );
+   ok( t::test::check_value( $checker, "" ),         'Str accepts empty string' );
+   ok( t::test::check_value( $checker, 1234 ),       'Str accepts plain number' );
    ok( t::test::check_value( $checker, ClassWithStrOverload->new ),
-      'Str permits object with str overload' );
+      'Str accepts object with str overload' );
 
-   ok( !t::test::check_value( $checker, undef ), 'Str forbids undef' );
-   ok( !t::test::check_value( $checker, [] ),    'Str forbids plain ref' );
+   ok( !t::test::check_value( $checker, undef ), 'Str rejects undef' );
+   ok( !t::test::check_value( $checker, [] ),    'Str rejects plain ref' );
    ok( !t::test::check_value( $checker, ClassWithoutOverload->new ),
-      'Str forbids object without overload' );
+      'Str rejects object without overload' );
    ok( !t::test::check_value( $checker, ClassWithNumOverload->new ),
-      'Str forbids object with num overload' );
+      'Str rejects object with num overload' );
 }
 
 # Num
 {
    my $checker = t::test::make_checkdata( Num, "Value", "Num" );
 
-   ok( t::test::check_value( $checker, 1234 ), 'Num permits plain integer' );
-   ok( t::test::check_value( $checker, 5.67 ), 'Num permits empty float' );
-   ok( t::test::check_value( $checker, "89" ), 'Num permits stringified number' );
+   ok( t::test::check_value( $checker, 1234 ), 'Num accepts plain integer' );
+   ok( t::test::check_value( $checker, 5.67 ), 'Num accepts empty float' );
+   ok( t::test::check_value( $checker, "89" ), 'Num accepts stringified number' );
    ok( t::test::check_value( $checker, ClassWithNumOverload->new ),
-      'Num permits object with num overload' );
+      'Num accepts object with num overload' );
 
-   ok( !t::test::check_value( $checker, undef ), 'Num forbids undef' );
-   ok( !t::test::check_value( $checker, [] ),    'Num forbids plain ref' );
+   ok( !t::test::check_value( $checker, undef ), 'Num rejects undef' );
+   ok( !t::test::check_value( $checker, [] ),    'Num rejects plain ref' );
    ok( !t::test::check_value( $checker, ClassWithoutOverload->new ),
-      'Num forbids object without overload' );
+      'Num rejects object without overload' );
    ok( !t::test::check_value( $checker, ClassWithStrOverload->new ),
-      'Num forbids object with str overload' );
+      'Num rejects object with str overload' );
 }
 
 # unit constraint functions don't take arguments
@@ -100,6 +103,29 @@ package ClassWithNumOverload {
    like( dies { Defined(123) },
       qr/^Too many arguments for subroutine 'Data::Checks::Defined'$argc_re at /,
       'unit constraint functions complain if given arguments' );
+}
+
+# Isa
+{
+   my $checker = t::test::make_checkdata( Isa("ClassWithoutOverload"), "Value", "Isa" );
+
+   ok( t::test::check_value( $checker, ClassWithoutOverload->new ), 'Isa accepts class' );
+   ok( t::test::check_value( $checker, DerivedClass->new ), 'Isa accepts subclass' );
+
+   ok( !t::test::check_value( $checker, undef ),                    'Isa rejects undef' );
+   ok( !t::test::check_value( $checker, "ClassWithoutOverload" ),   'Isa rejects string name' );
+   ok( !t::test::check_value( $checker, ClassWithStrOverload->new), 'Isa rejects other instance' );
+}
+
+# Maybe
+{
+   my $checker = t::test::make_checkdata( Maybe(Str), "Value", "Maybe(Str)" );
+
+   ok( t::test::check_value( $checker, undef ),      'Maybe(Str) accepts undef' );
+   ok( t::test::check_value( $checker, "a string" ), 'Maybe(Str) accepts plain string' );
+   ok( t::test::check_value( $checker, 1234 ),       'Maybe(Str) accepts plain number' );
+
+   ok( !t::test::check_value( $checker, [] ), 'Maybe(Str) rejects plain ref' );
 }
 
 done_testing;

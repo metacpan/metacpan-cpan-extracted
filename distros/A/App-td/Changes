@@ -1,3 +1,11 @@
+0.112   2024-06-26  Released-By: PERLANCAR; Urgency: low
+
+        - No functional changes.
+
+        - [dist] Edit Changes metadata
+          (Backward-{Compatible,Incompatible}).
+
+
 0.111   2023-02-11  Released-By: PERLANCAR; Urgency: low
 
         - [ux] [completion] Give summaries to action names.
@@ -86,7 +94,7 @@
         - [build] Rebuild with updated Perinci::CmdLine::POD to wrap usage line.
 
 
-0.097   2020-05-29  Released-By: PERLANCAR; Urgency: medium; Backward-Compatible: no
+0.097   2020-05-29  Released-By: PERLANCAR; Urgency: medium; Backward-Incompatible: yes
 
 	- Add action: grep-col, transpose.
 

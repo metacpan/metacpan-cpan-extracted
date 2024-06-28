@@ -1,10 +1,12 @@
 use Mojo::Base -strict;
 use lib 't/lib';
 
-use Test::More tests => 11;
+use Test::More tests => 12;
 
 use Bot::Telegram;
 use Bot::Telegram::Test;
+
+use Mojo::Util qw/steady_time/;
 
 my $bot = Bot::Telegram -> new -> api(bot_api);
 
@@ -143,6 +145,54 @@ subtest 'can sustain errors', sub {
   is $req_counter, 4, 'kept polling';
   is $err_counter, 2, 'all errors caught';
   is $upd_counter, 6, 'all valid responses correctly processed';
+};
+
+subtest 'rate limit awareness', sub {
+  my $api = bot_api
+    json_response { ok => \1, result => [update message => 1] },
+    json_response {
+      ok => \0,
+      description => 'rate limit test',
+      error_code => 429,
+      parameters => { retry_after => 1 }
+    },
+    json_response { ok => \1, result => [update message => 2] };
+
+  $bot = $bot = Bot::Telegram -> new -> api($api);
+  my $messages = $bot -> log -> capture('info');
+  my $polling_interval_after_rate_limit;
+
+  my $stop = sub {
+    $bot -> stop_polling;
+    Mojo::IOLoop -> stop;
+  };
+
+  my $t = Mojo::IOLoop -> timer(3, $stop);
+
+  $bot -> set_callbacks(message => sub {
+    return unless pop -> {update_id} == 2;
+
+    $polling_interval_after_rate_limit = $bot -> _polling_interval;
+
+    $stop -> ();
+    Mojo::IOLoop -> remove($t);
+  });
+
+  my $time_before = steady_time;
+
+  $bot -> start_polling(interval => 0.1);
+  Mojo::IOLoop -> start;
+
+  my $time_after = steady_time;
+
+  note explain \@$messages;
+  my ($message) = grep { /Rate limit exceeded/ } @$messages;
+  like $message, qr/Rate limit exceeded, waiting 1s before polling again/, 'rate limit log message exists';
+
+  is $polling_interval_after_rate_limit, 0.1, 'polling interval was not affected by the rate limit timer';
+
+  note "time_before: $time_before, time_after: $time_after";
+  ok $time_after - $time_before >= 1, 'was on standby for (roughly) one second';
 };
 
 # config persistence

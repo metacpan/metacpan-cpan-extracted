@@ -30,6 +30,7 @@ my %WriteMakefileArgs = (
     "Exporter" => 0,
     "Mojo::IOLoop" => 0,
     "Mojo::UserAgent" => 0,
+    "Mojo::Util" => 0,
     "Test::MockObject" => 0,
     "Test::MockObject::Extends" => 0,
     "Test::More" => 0,
@@ -37,7 +38,7 @@ my %WriteMakefileArgs = (
     "lib" => 0,
     "subs" => 0
   },
-  "VERSION" => "1.00",
+  "VERSION" => "1.10",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -54,6 +55,7 @@ my %FallbackPrereqs = (
   "Mojo::Promise" => 0,
   "Mojo::Transaction::HTTP" => 0,
   "Mojo::UserAgent" => 0,
+  "Mojo::Util" => 0,
   "Test::MockObject" => 0,
   "Test::MockObject::Extends" => 0,
   "Test::More" => 0,

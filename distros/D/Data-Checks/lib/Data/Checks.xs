@@ -13,9 +13,50 @@
 #define HAVE_DATA_CHECKS_IMPL
 #include "DataChecks.h"
 
-struct DataChecks_Checker {
+/* TODO: migrate this to optree-additions.c.inc */
+#define newUNOP_AUX_CUSTOM(func, flags, first, aux)  S_newUNOP_AUX_CUSTOM(aTHX_ func, flags, first, aux)
+static OP *S_newUNOP_AUX_CUSTOM(pTHX_ OP *(*func)(pTHX), U32 flags, OP *first, UNOP_AUX_item *aux)
+{
+  OP *o = newUNOP_AUX(OP_CUSTOM, flags, first, aux);
+  o->op_ppaddr = func;
+  return o;
+}
+
+struct Constraint;
+
+typedef bool ConstraintFunc(pTHX_ struct Constraint *c, SV *value);
+
+struct Constraint
+{
+  ConstraintFunc *func;
+  size_t n;
+  SV *args[0];
+};
+
+#define alloc_constraint(svp, constraintp, func, n)  S_alloc_constraint(aTHX_ svp, constraintp, func, n)
+static void S_alloc_constraint(pTHX_ SV **svp, struct Constraint **constraintp, ConstraintFunc *func, size_t n)
+{
+  HV *constraint_stash = gv_stashpvs("Data::Checks::Constraint", GV_ADD);
+
+  SV *sv = newSV(sizeof(struct Constraint) + 1*sizeof(SV *));
+  SvPOK_on(sv);
+  struct Constraint *constraint = (struct Constraint *)SvPVX(sv);
+  *constraint = (struct Constraint){
+    .func = func,
+    .n    = n,
+  };
+
+  for(int i = 0; i < n; i++)
+    constraint->args[i] = NULL;
+
+  *svp = sv_bless(newRV_noinc(sv), constraint_stash);
+  *constraintp = constraint;
+}
+
+struct DataChecks_Checker
+{
   CV *cv;
-  bool (*func)(pTHX_ SV *value);
+  struct Constraint *constraint;
   SV *arg0;
   SV *assertmess;
 };
@@ -26,11 +67,24 @@ struct DataChecks_Checker {
 #include "make_argcheck_ops.c.inc"
 #include "optree-additions.c.inc"
 
+#if !HAVE_PERL_VERSION(5, 32, 0)
+# define sv_isa_sv(sv, namesv)  S_sv_isa_sv(aTHX_ sv, namesv)
+static bool S_sv_isa_sv(pTHX_ SV *sv, SV *namesv)
+{
+  if(!SvROK(sv) || !SvOBJECT(SvRV(sv)))
+    return FALSE;
+
+  /* TODO: ->isa invocation */
+
+  return sv_derived_from_sv(sv, namesv, 0);
+}
+#endif
+
 static struct DataChecks_Checker *S_DataChecks_make_checkdata(pTHX_ SV *checkspec)
 {
   HV *stash = NULL;
   CV *checkcv = NULL;
-  bool (*checkfunc)(pTHX_ SV *value) = NULL;
+  struct Constraint *constraint = NULL;
 
   if(SvROK(checkspec) && SvOBJECT(SvRV(checkspec)))
     stash = SvSTASH(SvRV(checkspec));
@@ -45,7 +99,8 @@ static struct DataChecks_Checker *S_DataChecks_make_checkdata(pTHX_ SV *checkspe
       SVfARG(checkspec));
 
   if(stash && sv_isa(checkspec, "Data::Checks::Constraint")) {
-    checkfunc = (bool (*)(pTHX_ SV *))SvUV(SvRV(checkspec));
+    constraint = (struct Constraint *)SvPVX(SvRV(checkspec));
+    /* arg0 will store checkspec pointer, thus ensuring this SV is retained */
   }
   else if(!checkcv) {
     GV *methgv;
@@ -60,9 +115,9 @@ static struct DataChecks_Checker *S_DataChecks_make_checkdata(pTHX_ SV *checkspe
   Newx(checker, 1, struct DataChecks_Checker);
 
   *checker = (struct DataChecks_Checker){
-    .cv   = checkcv,
-    .func = checkfunc,
-    .arg0 = SvREFCNT_inc(checkspec),
+    .cv         = checkcv,
+    .constraint = constraint,
+    .arg0       = SvREFCNT_inc(checkspec),
   };
 
   return checker;
@@ -90,10 +145,10 @@ static void S_DataChecks_gen_assertmess(pTHX_ struct DataChecks_Checker *checker
 static OP *pp_invoke_checkfunc(pTHX)
 {
   dSP;
-  bool (*func)(pTHX_ SV *value) = (bool (*)(pTHX_ SV *value))cUNOP_AUX->op_aux;
+  struct Constraint *constraint = (struct Constraint *)cUNOP_AUX->op_aux;
   SV *value = POPs;
 
-  PUSHs(boolSV((*func)(aTHX_ value)));
+  PUSHs(boolSV((*constraint->func)(aTHX_ constraint, value)));
 
   RETURN;
 }
@@ -101,10 +156,10 @@ static OP *pp_invoke_checkfunc(pTHX)
 #define make_checkop(checker, argop)  S_DataChecks_make_checkop(aTHX_ checker, argop)
 static OP *S_DataChecks_make_checkop(pTHX_ struct DataChecks_Checker *checker, OP *argop)
 {
-  if(checker->func) {
-    OP *o = newUNOP_AUX(OP_CUSTOM, OPf_WANT_SCALAR, argop, (UNOP_AUX_item *)checker->func);
-    o->op_ppaddr = &pp_invoke_checkfunc;
-    return o;
+  if(checker->constraint) {
+    return newUNOP_AUX_CUSTOM(&pp_invoke_checkfunc, OPf_WANT_SCALAR,
+      argop,
+      (UNOP_AUX_item *)checker->constraint);
   }
 
   if(checker->cv && checker->arg0)
@@ -137,8 +192,8 @@ static OP *S_DataChecks_make_assertop(pTHX_ struct DataChecks_Checker *checker, 
 
 static bool S_DataChecks_check_value(pTHX_ struct DataChecks_Checker *checker, SV *value)
 {
-  if(checker->func) {
-    return (*checker->func)(aTHX_ value);
+  if(checker->constraint) {
+    return (*checker->constraint->func)(aTHX_ checker->constraint, value);
   }
 
   dSP;
@@ -201,17 +256,17 @@ static bool S_sv_has_overload(pTHX_ SV *sv, int method)
   return true;
 }
 
-static bool constraint_Defined(pTHX_ SV *value)
+static bool constraint_Defined(pTHX_ struct Constraint *c, SV *value)
 {
   return SvOK(value);
 }
 
-static bool constraint_Object(pTHX_ SV *value)
+static bool constraint_Object(pTHX_ struct Constraint *c, SV *value)
 {
   return SvROK(value) && SvOBJECT(SvRV(value));
 }
 
-static bool constraint_Str(pTHX_ SV *value)
+static bool constraint_Str(pTHX_ struct Constraint *c, SV *value)
 {
   if(!SvOK(value))
     return false;
@@ -231,7 +286,7 @@ static bool constraint_Str(pTHX_ SV *value)
   }
 }
 
-static bool constraint_Num(pTHX_ SV *value)
+static bool constraint_Num(pTHX_ struct Constraint *c, SV *value)
 {
   if(!SvOK(value))
     return false;
@@ -257,10 +312,51 @@ static bool constraint_Num(pTHX_ SV *value)
   }
 }
 
-static void S_make_constraint(pTHX_ const char *name, bool (*func)(pTHX_ SV *value))
+static bool constraint_Isa(pTHX_ struct Constraint *c, SV *value)
+{
+  return sv_isa_sv(value, c->args[0]);
+}
+
+static SV *mk_constraint_Isa(pTHX_ SV *arg0)
+{
+  SV *ret;
+  struct Constraint *c;
+  alloc_constraint(&ret, &c, &constraint_Isa, 1);
+
+  c->args[0] = newSVsv(arg0);
+
+  return sv_2mortal(ret);
+}
+
+static bool constraint_Maybe(pTHX_ struct Constraint *c, SV *value)
+{
+  if(!SvOK(value))
+    return true;
+
+  struct Constraint *inner = (struct Constraint *)SvPVX(c->args[0]);
+  return (*inner->func)(aTHX_ inner, value);
+}
+
+static SV *mk_constraint_Maybe(pTHX_ SV *arg0)
+{
+  if(!sv_isa(arg0, "Data::Checks::Constraint"))
+    croak("Expected a Constraint instance as argument to Maybe()");
+
+  SV *ret;
+  struct Constraint *c;
+  alloc_constraint(&ret, &c, &constraint_Maybe, 1);
+  sv_2mortal(ret);
+
+  /* Unwrap the RV */
+  c->args[0] = SvREFCNT_inc(SvRV(arg0));
+
+  return ret;
+}
+
+#define MAKE_UNIT_CONSTRAINT(name)   S_make_unit_constraint(aTHX_ #name, &constraint_##name)
+static void S_make_unit_constraint(pTHX_ const char *name, ConstraintFunc *func)
 {
   HV *stash = gv_stashpvs("Data::Checks", GV_ADD);
-  HV *constraint_stash = gv_stashpvs("Data::Checks::Constraint", GV_ADD);
   AV *exportok = get_av("Data::Checks::EXPORT_OK", GV_ADD);
 
   SV *namesv = newSVpvf("Data::Checks::%s", name);
@@ -271,19 +367,67 @@ static void S_make_constraint(pTHX_ const char *name, bool (*func)(pTHX_ SV *val
 
   I32 floor_ix = start_subparse(FALSE, 0);
 
-  SV *constval =
-    sv_bless(newRV_noinc(newSVuv(PTR2UV(func))), constraint_stash);
+  SV *sv;
+  struct Constraint *constraint;
+  alloc_constraint(&sv, &constraint, func, 0);
 
   OP *body = make_argcheck_ops(0, 0, 0, namesv);
   body = op_append_elem(OP_LINESEQ,
     body,
     newSTATEOP(0, NULL,
-      newSVOP(OP_CONST, 0, constval)));
+      newSVOP(OP_CONST, 0, sv)));
 
   newATTRSUB(floor_ix, newSVOP(OP_CONST, 0, namesv), NULL, NULL, body);
 
   av_push(exportok, newSVpv(name, 0));
 }
+
+static OP *pp_make_constraint(pTHX)
+{
+  dSP;
+  SV *(*mk_constraint)(pTHX_ SV *arg0) = (SV * (*)(pTHX_ SV *))cUNOP_AUX->op_aux;
+
+  SV *arg0 = POPs;
+
+  SV *sv = (*mk_constraint)(aTHX_ arg0);
+
+  PUSHs(sv);
+
+  RETURN;
+}
+
+#define MAKE_1ARG_CONSTRAINT(name)  S_make_1arg_constraint(aTHX_ #name, &mk_constraint_##name)
+static void S_make_1arg_constraint(pTHX_ const char *name, SV *(*mk_constraint)(pTHX_ SV *arg0))
+{
+  HV *stash = gv_stashpvs("Data::Checks", GV_ADD);
+  HV *constraint_stash = gv_stashpvs("Data::Checks::Constraint", GV_ADD);
+  AV *exportok = get_av("Data::Checks::EXPORT_OK", GV_ADD);
+
+  SV *namesv = newSVpvf("Data::Checks::%s", name);
+
+  I32 floor_ix = start_subparse(FALSE, 0);
+
+  OP *body = make_argcheck_ops(1, 0, 0, namesv);
+  body = op_append_elem(OP_LINESEQ,
+    body,
+    newSTATEOP(0, NULL,
+      newUNOP_AUX_CUSTOM(&pp_make_constraint, 0, newSLUGOP(0), (UNOP_AUX_item *)mk_constraint)));
+
+
+  newATTRSUB(floor_ix, newSVOP(OP_CONST, 0, namesv), NULL, NULL, body);
+
+  av_push(exportok, newSVpv(name, 0));
+}
+
+MODULE = Data::Checks    PACKAGE = Data::Checks::Constraint
+
+void DESTROY(SV *self)
+  CODE:
+  {
+    struct Constraint *c = (struct Constraint *)SvPVX(SvRV(self));
+    for(int i = c->n - 1; i >= 0; i--)
+      SvREFCNT_dec(c->args[i]);
+  }
 
 MODULE = Data::Checks    PACKAGE = Data::Checks
 
@@ -303,9 +447,11 @@ BOOT:
     PTR2UV(&S_DataChecks_check_value));
   sv_setuv(*hv_fetchs(PL_modglobal, "Data::Checks/assert_value()@0", GV_ADD),
     PTR2UV(&S_DataChecks_assert_value));
-#define MAKE_CONSTRAINT(name)   S_make_constraint(aTHX_ #name, &constraint_##name)
 
-  MAKE_CONSTRAINT(Defined);
-  MAKE_CONSTRAINT(Object);
-  MAKE_CONSTRAINT(Str);
-  MAKE_CONSTRAINT(Num);
+  MAKE_UNIT_CONSTRAINT(Defined);
+  MAKE_UNIT_CONSTRAINT(Object);
+  MAKE_UNIT_CONSTRAINT(Str);
+  MAKE_UNIT_CONSTRAINT(Num);
+
+  MAKE_1ARG_CONSTRAINT(Isa);
+  MAKE_1ARG_CONSTRAINT(Maybe);

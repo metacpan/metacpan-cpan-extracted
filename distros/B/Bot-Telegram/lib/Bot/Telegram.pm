@@ -1,6 +1,6 @@
 package Bot::Telegram;
 # ABSTRACT: a micro^W nano framework for creating Telegram bots based on L<WWW::Telegram::BotAPI>
-our $VERSION = '1.00'; # VERSION
+our $VERSION = '1.10'; # VERSION
 
 use v5.16.3;
 
@@ -274,6 +274,8 @@ sub _process_getUpdates_results {
 
   $self -> log -> trace('processing getUpdates results');
 
+  my $retry_after;
+
   if ($async) {
     my ($ua, $tx) = @_;
     $response = $tx -> res -> json // {};
@@ -300,6 +302,12 @@ sub _process_getUpdates_results {
     }
   }
 
+  # Handle rate limits
+  if (exists $response -> {parameters}{retry_after}) {
+    $retry_after = $response -> {parameters}{retry_after};
+    $self -> log -> info("Rate limit exceeded, waiting ${retry_after}s before polling again");
+  }
+
   # Process the updates we have retrieved (if any) and poll for more
   #  (unless someone or something has disabled the polling loop in the meantime)
   unless ($error) {
@@ -317,13 +325,13 @@ sub _process_getUpdates_results {
 
   if ($async) {
     my $tid = Mojo::IOLoop -> timer(
-      $self -> _polling_interval,
+      $retry_after // $self -> _polling_interval,
       sub { $self -> tap(sub { $self -> log -> trace("it's polling time!") })
                   -> _poll });
 
     $self -> _polling_timer($tid);
   } else {
-    my $d = $self -> _polling_interval;
+    my $d = $retry_after // $self -> _polling_interval;
 
     # Sleep
     $self -> ioloop -> timer($d, sub { $self -> ioloop -> stop });
@@ -371,7 +379,7 @@ Bot::Telegram - a micro^W nano framework for creating Telegram bots based on L<W
 
 =head1 VERSION
 
-version 1.00
+version 1.10
 
 =head1 SYNOPSIS
 

@@ -4,20 +4,25 @@
 class R::Util {
   
   # Class Methods
-  static method calc_length : int ($dim : int[]) {
+  static method calc_data_length : int ($dim : int[]) {
     
     unless ($dim) {
       die "The dimention \$dim must be defined.";
     }
     
     my $length = 1;
-    for my $dim_element (@$dim) {
-      
-      unless ($dim_element > 0) {
-        die "The element of the dimention \$dim must be greater than 0.";
+    if (@$dim) {
+      for my $dim_element (@$dim) {
+        
+        unless ($dim_element > 0) {
+          die "The element of the dimention \$dim must be greater than 0.";
+        }
+        
+        $length *= $dim_element;
       }
-      
-      $length *= $dim_element;
+    }
+    else {
+      $length = 0;
     }
     
     return $length;
@@ -123,6 +128,51 @@ class R::Util {
     my $equals_dropped_dim = &equals_dim($x_dropped_dim, $y_dropped_dim);
     
     return $equals_dropped_dim;
+  }
+  
+  # This method will be added to Fn class.
+  static method _get_array_length : int ($array : object) {
+    
+    unless ($array) {
+      die "The array \$array must be defined.";
+    }
+    
+    my $length = -1;
+    if (Fn->is_object_array($array)) {
+      my $array = (object[])$array;
+      $length = @$array;
+    }
+    else {
+      if ($array isa byte[]) {
+        $length = @(byte[])$array;
+      }
+      elsif ($array isa short[]) {
+        $length = @(short[])$array;
+      }
+      elsif ($array isa int[]) {
+        $length = @(int[])$array;
+      }
+      elsif ($array isa long[]) {
+        $length = @(long[])$array;
+      }
+      elsif ($array isa float[]) {
+        $length = @(float[])$array;
+      }
+      elsif ($array isa double[]) {
+        $length = @(double[])$array;
+      }
+      elsif ($array isa Complex_2f[]) {
+        $length = @(Complex_2f[])$array;
+      }
+      elsif ($array isa Complex_2d[]) {
+        $length = @(Complex_2d[])$array;
+      }
+      else {
+        die "The array is invalid type.";
+      }
+    }
+    
+    return $length;
   }
   
 }

@@ -4,6 +4,8 @@
 class R::OP {
   
   use R::NDArray;
+  use Fn;
+  use Array;
   
   # Class Methods
   static method equals_dim : int ($x_ndarray : R::NDArray, $y_ndarray : R::NDArray) {
@@ -128,4 +130,135 @@ class R::OP {
     return $ret_ndarray;
   }
   
+  static method cbind : R::NDArray ($x_ndarray : R::NDArray, $y_ndarray : R::NDArray) {
+    
+    unless ($x_ndarray) {
+      die "The n-dimention array \$x_ndarray must be defined.";
+    }
+    
+    unless ($x_ndarray->is_vector || $x_ndarray->is_matrix) {
+      die "The n-dimention array \$x_ndarray must be a vector or a matrix.";
+    }
+    
+    unless ($y_ndarray) {
+      die "The n-dimention array \$y_ndarray must be defined.";
+    }
+    
+    unless ($y_ndarray->is_vector || $y_ndarray->is_matrix) {
+      die "The n-dimention array \$y_ndarray must be a vector or a matrix.";
+    }
+    
+    unless (type_name $x_ndarray eq type_name $y_ndarray) {
+      die "The class name of the n-dimention array \$x_ndarray must be eqaul to the class name of the n-dimention array \$x_ndarray.";
+    }
+    my $x_row = $x_ndarray->nrow;
+    
+    my $x_column = $x_ndarray->ncol;
+    
+    my $y_row = $y_ndarray->nrow;
+    
+    my $y_column = $y_ndarray->ncol;
+    
+    unless ($x_row == $y_row) {
+      die "The row of the n-dimention array \$x_ndarray must be equal to the row of the n-dimention array \$y_ndarray.";
+    }
+    
+    my $ret_row = $x_row;
+    
+    my $ret_column = $x_column + $y_column;
+    
+    my $ndarray_class_name = type_name $x_ndarray;
+    
+    my $ret_ndarray = R::NDArray->new_with_class_name($ndarray_class_name, {data => undef, dim => [$ret_row, $ret_column]});
+    
+    my $ret_data = $ret_ndarray->data;
+    
+    my $x_data = $x_ndarray->data;
+    
+    my $y_data = $y_ndarray->data;
+    
+    my $element_size = $x_ndarray->element_size;
+    
+    if ($x_ndarray->is_numeric) {
+      Fn->memcpy($ret_data, 0, $x_data, 0, $element_size * ($x_row * $x_column));
+      
+      Fn->memcpy($ret_data, $x_row * $x_column, $y_data, 0, $element_size * ($y_row * $y_column));
+    }
+    else {
+      Array->memcpy_object_address((object[])$ret_data, 0, (object[])$x_data, 0, $x_row * $x_column);
+      
+      Array->memcpy_object_address((object[])$ret_data, $x_row * $x_column, (object[])$y_data, 0, $y_row * $y_column);
+    }
+    
+    return $ret_ndarray;
+  }
+  
+  static method rbind : R::NDArray ($x_ndarray : R::NDArray, $y_ndarray : R::NDArray) {
+    
+    unless ($x_ndarray) {
+      die "The n-dimention array \$x_ndarray must be defined.";
+    }
+    
+    unless ($x_ndarray->is_vector || $x_ndarray->is_matrix) {
+      die "The n-dimention array \$x_ndarray must be a vector or a matrix.";
+    }
+    
+    unless ($y_ndarray) {
+      die "The n-dimention array \$y_ndarray must be defined.";
+    }
+    
+    unless ($y_ndarray->is_vector || $y_ndarray->is_matrix) {
+      die "The n-dimention array \$y_ndarray must be a vector or a matrix.";
+    }
+    
+    unless (type_name $x_ndarray eq type_name $y_ndarray) {
+      die "The class name of the n-dimention array \$x_ndarray must be eqaul to the class name of the n-dimention array \$x_ndarray.";
+    }
+    my $x_row = $x_ndarray->nrow;
+    
+    my $x_column = $x_ndarray->ncol;
+    
+    my $y_row = $y_ndarray->nrow;
+    
+    my $y_column = $y_ndarray->ncol;
+    
+    unless ($x_column == $y_column) {
+      die "The column of the n-dimention array \$x_ndarray must be equal to the column of the n-dimention array \$y_ndarray.";
+    }
+    
+    my $ret_row = $x_row + $y_row;
+    
+    my $ret_column = $x_column;
+    
+    my $ndarray_class_name = type_name $x_ndarray;
+    
+    my $ret_ndarray = R::NDArray->new_with_class_name($ndarray_class_name, {data => undef, dim => [$ret_row, $ret_column]});
+    
+    my $ret_data = $ret_ndarray->data;
+    
+    my $x_data = $x_ndarray->data;
+    
+    my $y_data = $y_ndarray->data;
+    
+    my $ret_data_index = 0;
+    
+    my $element_size = $x_ndarray->element_size;
+    
+    for (my $column_index = 0; $column_index < $ret_column; $column_index++) {
+      if ($x_ndarray->is_numeric) {
+        Fn->memcpy($ret_data, $element_size * $ret_data_index, $x_data, 0, $element_size * $x_row);
+        
+        Fn->memcpy($ret_data, $element_size * ($ret_data_index + $x_row), $y_data, 0, $element_size * $y_row);
+      }
+      else {
+        Array->memcpy_object_address((object[])$ret_data, $ret_data_index, (object[])$x_data, 0, $x_row);
+        
+        Array->memcpy_object_address((object[])$ret_data, ($ret_data_index + $x_row), (object[])$y_data, 0, $y_row);
+      }
+      
+      $ret_data_index += $ret_column;
+    }
+    
+    return $ret_ndarray;
+  }
 }

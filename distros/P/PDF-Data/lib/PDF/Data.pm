@@ -6,7 +6,7 @@ use warnings;
 use utf8;
 
 # Declare module version.  (Also in pod documentation below.)
-use version; our $VERSION = version->declare('v1.0.1');
+use version; our $VERSION = version->declare('v1.1.0');
 
 # Initialize modules.
 use mro;
@@ -101,7 +101,7 @@ sub new_page {
   return {
     Type      => "/Page",
     MediaBox  => [0, 0, $x, $y],
-    Contents  => { -data  => "" },
+    Contents  => { -data => "" },
     Resources => {
       ProcSet => ["/PDF", "/Text"],
     },
@@ -176,9 +176,12 @@ sub parse_pdf {
   # Create a new instance using the provided arguments.
   $self = bless \%args, $class;
 
-  # Validate PDF file structure.
-  my ($pdf_version, $startxref) = $data =~ /\A(?:%PDF-(\d+\.\d+)$n.*$n)startxref$n(\d+)$n%%EOF$n?\z/s
-    or croak join(": ", $self->{-file} || (), "File is not a valid PDF document!\n");
+  # Validate minimal PDF file structure starting with %PDF and ending with %%EOF.
+  my ($pdf_version, $pdf_data) = $data =~ /%PDF-(\d+\.\d+)\s*?$n(.*)%%EOF/s
+    or croak join(": ", $self->{-file} || (), "File does not contain a valid PDF document!\n");
+
+  # Discard startxref value which should be present in any valid PDF, but don't require it.
+  $pdf_data =~ s/\bstartxref$ws?(\d+)$ws\z//s;
 
   # Check PDF version.
   warn join(": ", $self->{-file} || (), "Warning: PDF version $pdf_version not supported!\n")
@@ -188,7 +191,7 @@ sub parse_pdf {
   my $objects = {};
 
   # Parse PDF objects.
-  my @objects = $self->parse_objects($objects, $data, 0);
+  my @objects = $self->parse_objects($objects, $pdf_data, 0);
 
   # PDF trailer dictionary.
   my $trailer;
@@ -307,8 +310,14 @@ sub pdf_file_data {
 sub dump_pdf {
   my ($self, $file, $mode) = @_;
 
+  # Default to standard output.
+  $file = "-" if not defined $file or $file eq "";
+
+  # Default to dumping full PDF internal structure.
+  $mode //= "";
+
   # Use "<standard output>" instead of "-" to describe standard output.
-  my $filename = $file =~ s/^-$/<standard output>/r;
+  my $filename = ($file // "") =~ s/^-?$/<standard output>/r;
 
   # Open output file.
   open my $OUT, ">$file" or croak "$filename: $!\n";
@@ -348,6 +357,7 @@ sub merge_content_streams {
   # Remove extra trailing space from streams.
   foreach my $stream (@{$streams}) {
     die unless is_stream $stream;
+    $stream->{-data} //= "";
     $stream->{-data} =~ s/(?<=\s) \z//;
   }
 
@@ -364,7 +374,7 @@ sub find_bbox {
   my ($self, $content_stream, $new) = @_;
 
   # Get data from stream, if necessary.
-  $content_stream = $content_stream->{-data} if is_stream $content_stream;
+  $content_stream = $content_stream->{-data} // "" if is_stream $content_stream;
 
   # Split content stream into lines.
   my @lines = grep { $_ ne ""; } split /\n/, $content_stream;
@@ -560,7 +570,7 @@ sub validate_page_tree {
 
   # Fix leaf node count if wrong.
   if (($page_tree_node->{Count} || 0) != $count) {
-    warn join(": ", $self->{-file} || (), "Warning: Fixing: $path->{Count} = $count\n");
+    warn join(": ", $self->{-file} || (), "Warning: Fixing: $path\->{Count} = $count\n");
     $page_tree_node->{Count} = $count;
   }
 
@@ -575,6 +585,7 @@ sub validate_page {
   if (my $contents = $page->{Contents}) {
     $contents = $self->merge_content_streams($contents) if is_array($contents);
     is_stream($contents) or croak join(": ", $self->{-file} || (), "Error: $path\->{Contents} must be an array or stream!\n");
+    $contents->{-data} //= "";
     $self->validate_content_stream("$path\->{Contents}", $contents);
   }
 
@@ -600,18 +611,16 @@ sub validate_xobjects {
   }
 }
 
-# Validate a single form XObject.
+# Validate a single XObject.
 sub validate_xobject {
   my ($self, $path, $xobject) = @_;
 
-  # Make sure the form XObject is a stream.
+  # Make sure the XObject is a stream.
   is_stream($xobject) or croak join(": ", $self->{-file} || (), "Error: $path must be a content stream!\n");
+  $xobject->{-data} //= "";
 
-  # Make sure the Subtype is set to /Form.
-  $xobject->{Subtype} eq "/Form" or croak join(": ", $self->{-file} || (), "Error: $path\->{Subtype} must be /Form!\n");
-
-  # Validate the form XObject content stream.
-  $self->validate_content_stream($path, $xobject);
+  # Validate the content stream, if this is a form XObject.
+  $self->validate_content_stream($path, $xobject) if $xobject->{Subtype} eq "/Form";
 
   # Validate resources, if any.
   $self->validate_resources("$path\{Resources}", $xobject->{Resources}) if is_hash($xobject->{Resources});
@@ -622,7 +631,7 @@ sub validate_content_stream {
   my ($self, $path, $stream) = @_;
 
   # Make sure the content stream can be parsed.
-  my @objects = eval { $self->parse_objects({}, $stream->{-data}, 0); };
+  my @objects = eval { $self->parse_objects({}, $stream->{-data} // "", 0); };
   croak join(": ", $self->{-file} || (), "Error: $path: $@") if $@;
 
   # Minify content stream if requested.
@@ -634,7 +643,7 @@ sub minify_content_stream {
   my ($self, $stream, $objects) = @_;
 
   # Parse object stream if necessary.
-  $objects ||= [ $self->parse_objects({}, $stream->{-data}, 0) ];
+  $objects ||= [ $self->parse_objects({}, $stream->{-data} // "", 0) ];
 
   # Generate new content stream from objects.
   $stream->{-data} = $self->generate_content_stream($objects);
@@ -726,7 +735,7 @@ sub serialize_object {
   }
 
   # Wrap the line if line length would exceed 255 characters.
-  ${$stream} .= "\n" if length((${$stream} =~ /(.*)\z/)[0]) + length($object) >= 255;
+  ${$stream} .= "\n" if length(${$stream}) - (rindex(${$stream}, "\n") + 1) + length($object) >= 255;
 
   # Add a space if necessary.
   ${$stream} .= " " unless ${$stream} =~ /(^|[\s)>\[\]{}])$/ or $object =~ /^[\s()<>\[\]{}\/%]/;
@@ -833,8 +842,18 @@ sub parse_objects {
           or warn join(": ", $self->{-file} || (), "Byte offset $offset: Object #$id: Stream length not found in metadata!\n");
         s/\A\r?\n//;
 
+        # Check for unsupported stream types.
+        my $type = $stream->{Type} // "";
+        if ($type eq "/ObjStm") {
+          croak join(": ", $self->{-file} || (), "Byte offset $offset: PDF 1.5 object streams are not supported!\n");
+        } elsif ($type eq "/XRef") {
+          croak join(": ", $self->{-file} || (), "Byte offset $offset: PDF 1.5 cross-reference streams are not supported!\n");
+	} elsif ($type !~ /^(?:\/(?:Metadata|XObject))?$/) {
+          croak join(": ", $self->{-file} || (), "Byte offset $offset: Unrecognized stream type \"$type\"!\n");
+        }
+
         # If the declared stream length is missing or invalid, determine the shortest possible length to make the stream valid.
-        unless (defined($length) && substr($_, $length) =~ /\A(\s*endstream$ws)/) {
+        unless (defined($length) && !ref($length) && substr($_, $length) =~ /\A(\s*endstream$ws)/) {
           if (/\A((?>(?:[^e]+|(?!endstream\s)e)*))\s*endstream$ws/) {
             $length = length($1);
           } else {
@@ -980,6 +999,7 @@ sub resolve_references {
 
     # For streams, validate the length metadata.
     if (is_stream $object) {
+      $object->{-data} //= "";
       substr($object->{-data}, $object->{Length}) =~ s/\A\s+\z// if $object->{Length} and length($object->{-data}) > $object->{Length};
       my $len = length $object->{-data};
       $object->{Length} ||= $len;
@@ -1129,6 +1149,9 @@ sub add_indirect_objects {
 
   # Loop across specified objects.
   foreach my $object (@objects) {
+    # Make sure content streams are defined.
+    $object->{-data} //= "" if is_stream $object;
+
     # Check if object exists and is not in the lookup hash yet.
     if (defined $object and not $objects->[0]{$object}) {
       # Add the new indirect object to the array.
@@ -1153,6 +1176,7 @@ sub write_object {
   if (is_hash $object) {
     # For streams, compress the stream or update the length metadata.
     if (is_stream $object) {
+      $object->{-data} //= "";
       if (($self->{-compress} or $object->{-compress}) and not ($self->{-decompress} or $object->{-decompress})) {
         $object = $self->compress_stream($object);
       } else {
@@ -1179,6 +1203,7 @@ sub write_object {
 
     # For streams, write the stream data.
     if (is_stream $object) {
+      $object->{-data} //= "";
       croak join(": ", $self->{-file} || (), "Stream written as direct object!\n") if $indent;
       my $newline = substr($object->{-data}, -1) eq "\n" ? "" : "\n";
       ${$pdf_file_data} =~ s/\n?\z/\n/;
@@ -1229,6 +1254,20 @@ sub dump_object {
   # Dump output.
   my $output = "";
 
+  # Hash key sort priority.
+  my %priority = (
+    Type           => -2,
+    Version        => -1,
+    Root           => 1,
+    Pages          => 2,
+    PageLabels     => 3,
+    Names          => 4,
+    Dests          => 5,
+    Outlines       => 6,
+    Threads        => 7,
+    StructTreeRoot => 8,
+  );
+
   # Check mode and object type.
   if ($mode eq "outline") {
     if (ref $object and $seen->{$object}) {
@@ -1241,7 +1280,7 @@ sub dump_object {
         $output = "(STREAM)";
       } else {
         $label =~ s/(?<=\w)$/->/;
-        my @keys = sort { fc($a) cmp fc($b) || $a cmp $b; } keys %{$object};
+        my @keys = sort { ($priority{$a} // 0) <=> ($priority{$b} // 0) || fc($a) cmp fc($b) || $a cmp $b; } keys %{$object};
         my $key_len = max map length $_, @keys;
         foreach my $key (@keys) {
           my $obj = $object->{$key};
@@ -1285,7 +1324,7 @@ sub dump_object {
     $seen->{$object} = $label;
     $output = "{ # $label\n";
     $label =~ s/(?<=\w)$/->/;
-    my @keys = sort { fc($a) cmp fc($b) || $a cmp $b; } keys %{$object};
+    my @keys = sort { ($priority{$a} // 0) <=> ($priority{$b} // 0) || fc($a) cmp fc($b) || $a cmp $b; } keys %{$object};
     my $key_len = max map length $_, @keys;
     foreach my $key (@keys) {
       my $obj = $object->{$key};
@@ -1348,7 +1387,7 @@ PDF::Data - Manipulate PDF files and objects as data structures
 
 =head1 VERSION
 
-version v1.0.1
+version v1.1.0
 
 =head1 SYNOPSIS
 

@@ -3,7 +3,7 @@
 #
 #  (C) Paul Evans, 2024 -- leonerd@leonerd.org.uk
 
-package Data::Checks 0.03;
+package Data::Checks 0.04;
 
 use v5.22;
 use warnings;
@@ -88,39 +88,58 @@ I<lexically> into the calling scope.
 B<Note> to users familiar with C<Types::Standard>: some of these functions
 behave slightly differently. In particular, these constraints are generally
 happy to accept an object reference to a class that provides a conversion
-overload, whereas the ones in C<Types::Standard> often are not.
+overload, whereas the ones in C<Types::Standard> often are not. Additionally
+functions that are parametric take their parameters in normal Perl function
+argument lists, not wrapped in additional array references.
 
 =head2 Defined
 
    Defined()
 
-Passes for any defined value, fails only for C<undef>.
+Accepts any defined value, rejects only C<undef>.
 
 =head2 Object
 
    Object()
 
-Passes for any blessed object reference, fails for non-references or
-references to unblessed data.
+Accepts any blessed object reference, rejects non-references or references to
+unblessed data.
 
 =head2 Str
 
    Str()
 
-Passes for any defined non-reference value, or a reference to an object in a
-class that overloads stringification. Fails for undefined, unblessed
-references, or references to objects in classes that do not overload
-stringification.
+Accepts any defined non-reference value, or a reference to an object in a
+class that overloads stringification. rejects undefined, unblessed references,
+or references to objects in classes that do not overload stringification.
 
 =head2 Num
 
    Num()
 
-Passes for any defined non-reference value that is either a plain number, or a
+Accepts any defined non-reference value that is either a plain number, or a
 string that could be used as one without warning, or a reference to an object
-in a class that overloads numification. Fails for undefined, strings that
-would raise a warning if converted to a number, unblessed references, or
-references to objects in classes that do not overload numification.
+in a class that overloads numification. rejects undefined, strings that would
+raise a warning if converted to a number, unblessed references, or references
+to objects in classes that do not overload numification.
+
+=head2 Isa
+
+   Isa($classname)
+
+I<Since version 0.04.>
+
+Accepts any blessed object reference to an instance of the given class name,
+or a subclass derived from it (i.e. anything accepted by the C<isa> operator).
+
+=head2 Maybe
+
+   Maybe($C)
+
+I<Since version 0.04.>
+
+Accepts C<undef> in addition to anything else accepted by the given
+constraint.
 
 =cut
 
@@ -218,23 +237,23 @@ Creates an optree fragment for a value check assertion operation.
 
 Given an optree fragment in scalar context that generates an argument value
 (I<argop>), constructs a larger optree fragment that consumes it and checks
-that the value passes the constraint check given by I<checker>. The returned
-optree fragment will operate in void context (i.e. it does I<not> yield the
-argument value itself).
+that the value is accepted by the constraint check given by I<checker>. The
+returned optree fragment will operate in void context (i.e. it does I<not>
+yield the argument value itself).
 
 =head2 check_value
 
    bool check_value(struct DataChecks_Checker *checker, SV *value);
 
-Checks whether a given SV passes the given constraint check, returning true if
-so, or false if not.
+Checks whether a given SV is accepted by the given constraint check, returning
+true if so, or false if not.
 
 =head2 assert_value
 
    void assert_value(struct DataChecks_Checker *checker, SV *value);
 
-Checks whether a given SV passes the given constraint check, throwing its
-assertion message if it does not.
+Checks whether a given SV is accepted by the given constraint check, throwing
+its assertion message if it does not.
 
 =cut
 

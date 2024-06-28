@@ -10,9 +10,9 @@ use warnings;
 use Perinci::CmdLine::Any;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2023-02-11'; # DATE
+our $DATE = '2024-06-26'; # DATE
 our $DIST = 'App-td'; # DIST
-our $VERSION = '0.111'; # VERSION
+our $VERSION = '0.112'; # VERSION
 
 my $cmdline = Perinci::CmdLine::Any->new(
     url => "/App/td/td",
@@ -38,7 +38,7 @@ td - Manipulate table data
 
 =head1 VERSION
 
-This document describes version 0.111 of td (from Perl distribution App-td), released on 2023-02-11.
+This document describes version 0.112 of td (from Perl distribution App-td), released on 2024-06-26.
 
 =head1 SYNOPSIS
 
@@ -644,7 +644,7 @@ that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2023, 2022, 2021, 2020, 2019, 2017, 2016, 2015 by perlancar <perlancar@cpan.org>.
+This software is copyright (c) 2024, 2023, 2022, 2021, 2020, 2019, 2017, 2016, 2015 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -1,4 +1,4 @@
-# Copyrights 2007-2023 by [Mark Overmeer <markov@cpan.org>].
+# Copyrights 2007-2024 by [Mark Overmeer <markov@cpan.org>].
 #  For other contributors see ChangeLog.
 # See the manual pages for details on the licensing terms.
 # Pod stripped from pm file by OODoc 2.03.
@@ -8,7 +8,7 @@
 
 package Log::Report::Dispatcher::Syslog;
 use vars '$VERSION';
-$VERSION = '1.36';
+$VERSION = '1.37';
 
 use base 'Log::Report::Dispatcher';
 

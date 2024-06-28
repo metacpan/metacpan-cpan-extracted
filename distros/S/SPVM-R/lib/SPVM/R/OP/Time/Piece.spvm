@@ -5,9 +5,10 @@ class R::OP::Time::Piece {
   
   use R::NDArray::Time::Piece;
   use R::OP;
+  use Time::Piece;
   
   # Class Methods
-  static method c : R::NDArray::Time::Piece ($x_data : string[], $x_dim : int[] = undef) {
+  static method c : R::NDArray::Time::Piece ($x_data : Time::Piece[], $x_dim : int[] = undef) {
     
     my $x_ndarray = R::NDArray::Time::Piece->new({dim => $x_dim, data => $x_data});
     

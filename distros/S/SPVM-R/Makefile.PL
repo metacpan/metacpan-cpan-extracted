@@ -49,6 +49,7 @@ WriteMakefile(
     %configure_and_runtime_requires,
     'SPVM::Math' => '1.002',
     'SPVM::Time::Piece' => '0.003',
+    'SPVM::Sys' => '0.525',
   },
   TEST_REQUIRES => {
     

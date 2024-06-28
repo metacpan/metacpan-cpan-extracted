@@ -22,5 +22,5 @@ requires:
   Devel::Symdump: '0'
   Error: '0'
   base: '1'
-version: '0.26'
+version: '0.27'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

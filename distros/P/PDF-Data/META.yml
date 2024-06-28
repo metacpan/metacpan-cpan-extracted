@@ -14,7 +14,7 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.025, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Zilla version 6.032, CPAN::Meta::Converter version 2.150010'
 license: mit
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -31,7 +31,7 @@ no_index:
 provides:
   PDF::Data:
     file: lib/PDF/Data.pm
-    version: v1.0.1
+    version: v1.1.0
 requires:
   Carp: '0'
   Clone: '0'
@@ -54,10 +54,10 @@ requires:
   utf8: '0'
   version: '0'
   warnings: '0'
-version: v1.0.1
+version: v1.1.0
 x_Dist_Zilla:
   perl:
-    version: '5.035001'
+    version: '5.038002'
   plugins:
     -
       class: Dist::Zilla::Plugin::GatherDir
@@ -71,19 +71,19 @@ x_Dist_Zilla:
           prune_directory: []
           root: .
       name: '@Starter/GatherDir'
-      version: '6.025'
+      version: '6.032'
     -
       class: Dist::Zilla::Plugin::MetaYAML
       name: '@Starter/MetaYAML'
-      version: '6.025'
+      version: '6.032'
     -
       class: Dist::Zilla::Plugin::MetaJSON
       name: '@Starter/MetaJSON'
-      version: '6.025'
+      version: '6.032'
     -
       class: Dist::Zilla::Plugin::License
       name: '@Starter/License'
-      version: '6.025'
+      version: '6.032'
     -
       class: Dist::Zilla::Plugin::ReadmeAnyFromPod
       config:
@@ -94,16 +94,16 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::PodSyntaxTests
       name: '@Starter/PodSyntaxTests'
-      version: '6.025'
+      version: '6.032'
     -
       class: Dist::Zilla::Plugin::Test::ReportPrereqs
       name: '@Starter/Test::ReportPrereqs'
-      version: '0.028'
+      version: '0.029'
     -
       class: Dist::Zilla::Plugin::Test::Compile
       config:
         Dist::Zilla::Plugin::Test::Compile:
-          bail_out_on_fail: '0'
+          bail_out_on_fail: 0
           fail_on_warning: author
           fake_home: 0
           filename: xt/author/00-compile.t
@@ -123,19 +123,19 @@ x_Dist_Zilla:
         Dist::Zilla::Role::TestRunner:
           default_jobs: 1
       name: '@Starter/MakeMaker'
-      version: '6.025'
+      version: '6.032'
     -
       class: Dist::Zilla::Plugin::Manifest
       name: '@Starter/Manifest'
-      version: '6.025'
+      version: '6.032'
     -
       class: Dist::Zilla::Plugin::PruneCruft
       name: '@Starter/PruneCruft'
-      version: '6.025'
+      version: '6.032'
     -
       class: Dist::Zilla::Plugin::ManifestSkip
       name: '@Starter/ManifestSkip'
-      version: '6.025'
+      version: '6.032'
     -
       class: Dist::Zilla::Plugin::RunExtraTests
       config:
@@ -146,23 +146,23 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::TestRelease
       name: '@Starter/TestRelease'
-      version: '6.025'
+      version: '6.032'
     -
       class: Dist::Zilla::Plugin::ConfirmRelease
       name: '@Starter/ConfirmRelease'
-      version: '6.025'
+      version: '6.032'
     -
       class: Dist::Zilla::Plugin::UploadToCPAN
       name: '@Starter/UploadToCPAN'
-      version: '6.025'
+      version: '6.032'
     -
       class: Dist::Zilla::Plugin::MetaConfig
       name: '@Starter/MetaConfig'
-      version: '6.025'
+      version: '6.032'
     -
       class: Dist::Zilla::Plugin::MetaNoIndex
       name: '@Starter/MetaNoIndex'
-      version: '6.025'
+      version: '6.032'
     -
       class: Dist::Zilla::Plugin::MetaProvides::Package
       config:
@@ -171,13 +171,13 @@ x_Dist_Zilla:
             -
               class: Dist::Zilla::Plugin::FinderCode
               name: '@Starter/MetaProvides::Package/AUTOVIV/:InstallModulesPM'
-              version: '6.025'
+              version: '6.032'
           include_underscores: 0
         Dist::Zilla::Role::MetaProvider::Provider:
           $Dist::Zilla::Role::MetaProvider::Provider::VERSION: '2.002004'
-          inherit_missing: '1'
-          inherit_version: '1'
-          meta_noindex: '1'
+          inherit_missing: 1
+          inherit_version: 1
+          meta_noindex: 1
         Dist::Zilla::Role::ModuleMetadata:
           Module::Metadata: '1.000037'
           version: '0.006'
@@ -186,11 +186,11 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::ShareDir
       name: '@Starter/ShareDir'
-      version: '6.025'
+      version: '6.032'
     -
       class: Dist::Zilla::Plugin::ExecDir
       name: '@Starter/ExecDir'
-      version: '6.025'
+      version: '6.032'
     -
       class: Dist::Zilla::Plugin::Git::Check
       config:
@@ -203,17 +203,17 @@ x_Dist_Zilla:
           allow_dirty_match: []
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.32.0.rc3
+          git_version: '2.39.3 (Apple Git-146)'
           repo_root: .
       name: '@Git/Check'
-      version: '2.048'
+      version: '2.051'
     -
       class: Dist::Zilla::Plugin::Git::Commit
       config:
         Dist::Zilla::Plugin::Git::Commit:
           add_files_in: []
           commit_msg: v%V%n%n%c
-          signoff: '0'
+          signoff: 0
         Dist::Zilla::Role::Git::DirtyFiles:
           allow_dirty:
             - Changes
@@ -221,12 +221,12 @@ x_Dist_Zilla:
           allow_dirty_match: []
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.32.0.rc3
+          git_version: '2.39.3 (Apple Git-146)'
           repo_root: .
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
       name: '@Git/Commit'
-      version: '2.048'
+      version: '2.051'
     -
       class: Dist::Zilla::Plugin::Git::Tag
       config:
@@ -234,16 +234,16 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: v1.0.1
+          tag: v1.1.0
           tag_format: v%V
           tag_message: v%V
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.32.0.rc3
+          git_version: '2.39.3 (Apple Git-146)'
           repo_root: .
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
       name: '@Git/Tag'
-      version: '2.048'
+      version: '2.051'
     -
       class: Dist::Zilla::Plugin::Git::Push
       config:
@@ -252,18 +252,18 @@ x_Dist_Zilla:
             - origin
           remotes_must_exist: 1
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.32.0.rc3
+          git_version: '2.39.3 (Apple Git-146)'
           repo_root: .
       name: '@Git/Push'
-      version: '2.048'
+      version: '2.051'
     -
       class: Dist::Zilla::Plugin::AutoPrereqs
       name: AutoPrereqs
-      version: '6.025'
+      version: '6.032'
     -
       class: Dist::Zilla::Plugin::PruneFiles
       name: PruneFiles
-      version: '6.025'
+      version: '6.032'
     -
       class: Dist::Zilla::Plugin::ReadmeAnyFromPod
       config:
@@ -274,52 +274,52 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':InstallModules'
-      version: '6.025'
+      version: '6.032'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':IncModules'
-      version: '6.025'
+      version: '6.032'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':TestFiles'
-      version: '6.025'
+      version: '6.032'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':ExtraTestFiles'
-      version: '6.025'
+      version: '6.032'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':ExecFiles'
-      version: '6.025'
+      version: '6.032'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':PerlExecFiles'
-      version: '6.025'
+      version: '6.032'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':ShareFiles'
-      version: '6.025'
+      version: '6.032'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':MainModule'
-      version: '6.025'
+      version: '6.032'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':AllFiles'
-      version: '6.025'
+      version: '6.032'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':NoFiles'
-      version: '6.025'
+      version: '6.032'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: '@Starter/MetaProvides::Package/AUTOVIV/:InstallModulesPM'
-      version: '6.025'
+      version: '6.032'
   zilla:
     class: Dist::Zilla::Dist::Builder
     config:
-      is_trial: '0'
-    version: '6.025'
-x_generated_by_perl: v5.35.1
-x_serialization_backend: 'YAML::Tiny version 1.73'
+      is_trial: 0
+    version: '6.032'
+x_generated_by_perl: v5.38.2
+x_serialization_backend: 'YAML::Tiny version 1.74'
 x_spdx_expression: MIT

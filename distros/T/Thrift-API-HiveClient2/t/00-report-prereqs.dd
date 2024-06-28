@@ -24,6 +24,7 @@ do { my $x = {
                                       'Thrift::BinaryProtocol' => '0',
                                       'Thrift::BufferedTransport' => '0',
                                       'Thrift::SASL::Transport' => '0',
+                                      'Thrift::SSLSocket' => '0',
                                       'Thrift::Socket' => '0',
                                       'base' => '0',
                                       'constant' => '0',

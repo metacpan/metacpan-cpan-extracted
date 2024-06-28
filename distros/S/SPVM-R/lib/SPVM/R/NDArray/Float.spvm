@@ -27,11 +27,11 @@ class R::NDArray::Float extends R::NDArray {
   
   protected method check : void () {
     
-    my $x_data = (float[])$self->{data};
+    my $data = (float[])$self->{data};
     
     my $length = $self->length;
     
-    unless (@$x_data == $length) {
+    unless (@$data == $length) {
       die "The length of data field must be the same as length field.";
     }
   }
@@ -42,9 +42,9 @@ class R::NDArray::Float extends R::NDArray {
       die "The length \$length must be more than or equal to 0.";
     }
     
-    my $x_data = new float[$length];
+    my $data = new float[$length];
     
-    return $x_data;
+    return $data;
   }
   
   method clone : R::NDArray::Float () {
@@ -62,9 +62,11 @@ class R::NDArray::Float extends R::NDArray {
     return $string;
   }
   
-  precompile method set_order : void ($indexes : int[]) {
+  precompile method set_order : void ($indexes_ndarray : R::NDArray::Int) {
     
-    $self->check_set_order_args($indexes);
+    $self->check_set_order_args($indexes_ndarray);
+    
+    my $indexes = $indexes_ndarray->data;
     
     my $data = (float[])$self->{data};
     
@@ -79,4 +81,37 @@ class R::NDArray::Float extends R::NDArray {
       $data->[$i] = $tmp_data->[$order_index];
     }
   }
+  
+  protected method slice_data : object ($data_indexes : int[]) {
+    
+    unless ($data_indexes) {
+      die "The data indexes \$data_indexes must be defined.";
+    }
+    
+    my $data_indexes_length = @$data_indexes;
+    my $data = $self->data;
+    my $ret_data = new float[$data_indexes_length];
+    for (my $i = 0; $i < $data_indexes_length; $i++) {
+      $ret_data->(float[])->[$i] = $data->(float[])->[$i];
+    }
+    
+    return $ret_data;
+  }
+  
+  protected method slice_set_data : void ($data_indexes : int[], $data : object) {
+    
+    my $self_data = $self->{data};
+    
+    unless ($data_indexes) {
+      die "The data indexes \$data_indexes must be defined.";
+    }
+    
+    my $data_index = 0;
+    my $data_indexes_length = @$data_indexes;
+    for (my $i = 0; $i < $data_indexes_length; $i++) {
+      $self_data->(float[])->[$i] = $data->(float[])->[$data_index];
+      $data_index++;
+    }
+  }
+  
 }

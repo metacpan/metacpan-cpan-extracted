@@ -1,0 +1,157 @@
+# Copyright (c) 2024 Yuki Kimoto
+# MIT License
+
+class R::NDArray::Hash {
+  
+  use Hash;
+  use R::NDArray::Byte;
+  use R::NDArray::Short;
+  use R::NDArray::Int;
+  use R::NDArray::Long;
+  use R::NDArray::Float;
+  use R::NDArray::Double;
+  use R::NDArray::FloatComplex;
+  use R::NDArray::DoubleComplex;
+  use R::NDArray::String;
+  
+  # Fields
+  has hash : Hash of R::NDArray;
+  
+  # Class Methods
+  static method new : R::NDArray::Hash () {
+    
+    my $self = new R::NDArray::Hash;
+    
+    my $hash = Hash->new;
+    
+    $self->{hash} = $hash;
+    
+    return $self;
+  }
+  
+  method set : void ($name : string, $value : R::NDArray) {
+    
+    my $hash = $self->{hash};
+    
+    $hash->set($name, $value);
+  }
+  
+  method get : R::NDArray ($name : string) {
+    
+    my $hash = $self->{hash};
+    
+    $self->check($name);
+    
+    my $ndarray = (R::NDArray)$hash->get($name);
+    
+    return $ndarray;
+  }
+  
+  method get_byte : R::NDArray::Byte ($name : string) {
+    
+    my $hash = $self->{hash};
+    
+    $self->check($name);
+    
+    my $ndarray = (R::NDArray::Byte)$hash->get($name);
+    
+    return $ndarray;
+  }
+  
+  method get_short : R::NDArray::Short ($name : string) {
+    
+    my $hash = $self->{hash};
+    
+    $self->check($name);
+    
+    my $ndarray = (R::NDArray::Short)$hash->get($name);
+    
+    return $ndarray;
+  }
+  
+  method get_int : R::NDArray::Int ($name : string) {
+    
+    my $hash = $self->{hash};
+    
+    $self->check($name);
+    
+    my $ndarray = (R::NDArray::Int)$hash->get($name);
+    
+    return $ndarray;
+  }
+  
+  method get_long : R::NDArray::Long ($name : string) {
+    
+    my $hash = $self->{hash};
+    
+    $self->check($name);
+    
+    my $ndarray = (R::NDArray::Long)$hash->get($name);
+    
+    return $ndarray;
+  }
+  
+  method get_float : R::NDArray::Float ($name : string) {
+    
+    my $hash = $self->{hash};
+    
+    $self->check($name);
+    
+    my $ndarray = (R::NDArray::Float)$hash->get($name);
+    
+    return $ndarray;
+  }
+  
+  method get_float_complex : R::NDArray::FloatComplex ($name : string) {
+    
+    my $hash = $self->{hash};
+    
+    $self->check($name);
+    
+    my $ndarray = (R::NDArray::FloatComplex)$hash->get($name);
+    
+    return $ndarray;
+  }
+  
+  method get_double : R::NDArray::Double ($name : string) {
+    
+    my $hash = $self->{hash};
+    
+    $self->check($name);
+    
+    my $ndarray = (R::NDArray::Double)$hash->get($name);
+    
+    return $ndarray;
+  }
+  
+  method get_double_complex : R::NDArray::DoubleComplex ($name : string) {
+    
+    my $hash = $self->{hash};
+    
+    $self->check($name);
+    
+    my $ndarray = (R::NDArray::DoubleComplex)$hash->get($name);
+    
+    return $ndarray;
+  }
+  
+  method get_string : R::NDArray::String ($name : string) {
+    
+    my $hash = $self->{hash};
+    
+    $self->check($name);
+    
+    my $ndarray = (R::NDArray::String)$hash->get($name);
+    
+    return $ndarray;
+  }
+  
+  method check : void ($name : string) {
+    
+    my $hash = $self->{hash};
+    
+    unless ($hash->exists($name)) {
+      die "The name \$name is not found.";
+    }
+  }
+}

@@ -1,5 +1,8 @@
 Revision history for Thrift-API-HiveClient2
 
+0.025 2024-06-27 BURAK
+    Enable SSL support (Merge pull request #12 from Raj-18110/enable-ssl)
+
 0.024 2019-02-12 BURAK
     Include the patch by Alexey Lebedeff
         "Use predicate to test for session handle presence".

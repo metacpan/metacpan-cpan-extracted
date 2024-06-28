@@ -16,7 +16,7 @@ Bot::Telegram::X::InvalidStateError - invalid state error
 
 =head1 VERSION
 
-version 1.00
+version 1.10
 
 =head1 AUTHOR
 

@@ -26,7 +26,7 @@
 ################################################################
 
 
-our $VERSION='1.0000658';
+our $VERSION='1.0000659';
 
 
 if ($ENV{'AUTOMATED_TESTING'}) {
@@ -303,84 +303,9 @@ if (($^O eq 'linux' || $^O eq 'freebsd') && !(grep { /SKIP/i } @ARGV)) {
       $system_type='amazon_linux';
    } elsif ((-e "/etc/os-release") &&
          (-1<index `cat /etc/os-release`,'ubuntu')) {
-      if (-1<index `sudo dmesg | grep -Ew 'DMI|Amazon|EC2'`,'amazon') {
-         my $message=<<END;
 
-   This message times out in two minutes so FullAuto Install can continue
-      _                            _   _ _             _
-     /_\\  _ __  __ _ ______ _ _   | | | | |__ _  _ _ _| |_ _  _
-    / _ \\| '  \\/ _` |_ / _ \\ ' \\  | |_| | '_ \\ || | ' \\  _| || |
-   /_/ \\_\\_|_|_\\__,_/__\\___/_||_|  \\___/|_.__/\\_,_|_||_\\__|\\_,_|
-
-   In order to install FullAuto on Amazon Ubuntu servers, a number of
-   prerequisite dependencies must be installed or present. Allow
-   FullAuto Setup to validate and install any missing dependencies?
-   (Default is 'yes')
-
-END
-
-         my $timeout=120;
-         my $fae="No   (FullAuto Setup will exit)";
-         {
-            local $SIG{__DIE__}; # No sigdie handler
-            eval {
-               local $SIG{ALRM} = sub { die "alarm\n" }; # NB: \n required
-               alarm $timeout;
-               my $menu1 = [
-                     $message,
-                     [ "Yes", sub{ return 'Yes' } ],
-                     [ $fae, sub{ return 'No' } ],
-                     ];
-               my $selection=&menu($menu1);
-               exit 0 if $selection eq ']quit[';
-               exit 0 if -1<index $selection, 'No';
-               alarm 0;
-            };
-         }
-      } print "\n\n   FullAuto install continues . . .\n\n";
-      fa_system('sudo apt-get -y install build-essential');
-      fa_system('sudo apt-get -y update;sudo apt-get -y install unzip');
-      fa_system('sudo apt-get -y install libssl-dev');
-      fa_system('sudo apt-get -y install zlib1g-dev');
-      my $message=<<END;
-
-   This message times out in two minutes so FullAuto Install can continue
-
-      _                             ___ _       ___ _ _         _
-     /_\\  _ __  __ _ ______ _ _    / __| |     / __| (_)___ _ _| |_
-    / _ \\| '  \\/ _` |_ / _ \\ ' \\  | (__| |__  | (__| | / -_) ' \\  _|
-   /_/ \\_\\_|_|_\\__,_/__\\___/_||_|  \\___|____|  \\___|_|_\\___|_||_\\__|
-
-   In order to automate Amazon AWS Cloud infrastructure, the Amazon
-   AWS Command Line Client (AWS CLI) needs to installed. Install 
-   AWS CLI?  (Default is 'yes')
-
-END
-
-      my $timeout=120;my $selection='';
-      my $fae="No   (FullAuto Setup will exit)";
-      {
-         local $SIG{__DIE__}; # No sigdie handler
-         eval {
-            local $SIG{ALRM} = sub { die "alarm\n" }; # NB: \n required
-            alarm $timeout;
-            my $menu1 = [
-                  $message,
-                  [ "Yes", sub{ return 'Yes' } ],
-                  [ $fae, sub{ return 'No' } ],
-                  ];
-            $selection=&menu($menu1);
-            exit 0 if $selection eq ']quit[';
-            alarm 0;
-         };
-      }
-      if ($selection eq 'Yes') {
-         my $cmd='curl "https://awscli.amazonaws.com/'.
-               'awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"';
-         fa_system($cmd);
-         fa_system('unzip awscliv2.zip;sudo ./aws/install');
-      } print "\n\n   FullAuto install continues . . .\n\n";
-      fa_system('sudo apt-get -y install build-essential');
+      #if (-1<index `sudo dmesg | grep -Ew 'DMI|Amazon|EC2'`,'amazon') {}
+      $amazon{'ubuntu'}='' if $aws;   
       $system_type='ubuntu';
    } elsif ($^O eq 'freebsd') {
 
@@ -1235,6 +1160,42 @@ END
    # to install Net::FullAuto on an EC2 image have consented to this,
    # especially since Admin privileges are needed to do this.
 
+         my $message=<<END;
+
+   This message times out in two minutes so FullAuto Install can continue
+
+      _                            ___ ___ ___   _    _
+     /_\\  _ __  __ _ ______ _ _   | __/ __|_  ) | |  (_)_ _ _  ___ __
+    / _ \\| '  \\/ _` |_ / _ \\ ' \\  | _| (__ / /  | |__| | ' \\ || \\ \\ /
+   /_/ \\_\\_|_|_\\__,_/__\\___/_||_| |___\\___/___| |____|_|_||_\\_,_/_\\_\
+
+   In order to install FullAuto on Amazon EC2 Linux servers, a number of
+   prerequisite dependencies must be installed or present. Allow
+   FullAuto Setup to validate and install any missing dependencies?
+   (Default is 'yes')
+
+END
+
+   my $timeout=120;
+   my $fae="No   (FullAuto Setup will exit)";
+   {
+      local $SIG{__DIE__}; # No sigdie handler
+      eval {
+         local $SIG{ALRM} = sub { die "alarm\n" }; # NB: \n required
+         alarm $timeout;
+         my $menu1 = [
+               $message,
+               [ "Yes", sub{ return 'Yes' } ],
+               [ $fae, sub{ return 'No' } ],
+               ];
+         my $selection=&menu($menu1);
+         exit 0 if $selection eq ']quit[';
+         exit 0 if -1<index $selection, 'No';
+         alarm 0;
+      };
+   }
+   print "\n\n   FullAuto install continues . . .\n\n";
+
    my $grpi=`sudo yum grouplist`;
    if (-1<index $grpi,'no installed groups file') {
       my $out=`sudo yum groups mark convert`;
@@ -1355,8 +1316,46 @@ END
    # to install Net::FullAuto on an EC2 image have consented to this,
    # especially since Admin privileges are needed to do this.
 
+   my $message=<<END;
+
+   This message times out in two minutes so FullAuto Install can continue
+      _                            _   _ _             _
+     /_\\  _ __  __ _ ______ _ _   | | | | |__ _  _ _ _| |_ _  _
+    / _ \\| '  \\/ _` |_ / _ \\ ' \\  | |_| | '_ \\ || | ' \\  _| || |
+   /_/ \\_\\_|_|_\\__,_/__\\___/_||_|  \\___/|_.__/\\_,_|_||_\\__|\\_,_|
+
+   In order to install FullAuto on Amazon Ubuntu servers, a number of
+   prerequisite dependencies must be installed or present. Allow
+   FullAuto Setup to validate and install any missing dependencies?
+   (Default is 'yes')
+
+END
+
+   my $timeout=120;
+   my $fae="No   (FullAuto Setup will exit)";
+   {
+      local $SIG{__DIE__}; # No sigdie handler
+      eval {
+         local $SIG{ALRM} = sub { die "alarm\n" }; # NB: \n required
+         alarm $timeout;
+         my $menu1 = [
+               $message,
+               [ "Yes", sub{ return 'Yes' } ],
+               [ $fae, sub{ return 'No' } ],
+               ];
+         my $selection=&menu($menu1);
+         exit 0 if $selection eq ']quit[';
+         exit 0 if -1<index $selection, 'No';
+         alarm 0;
+      };
+   }
+   print "\n\n   FullAuto install continues . . .\n\n";
+
    my $dpkg=`/bin/dpckg -l`;
    my $update_flag=0;
+   if (-1==index $dpkg,'unzip') {
+      fa_system('sudo apt-get -y install unzip');
+   }
    if (-1==index $dpkg,'build-essential') {
       fa_system("sudo apt-get -y update");
       $update_flag==1;
@@ -1367,6 +1366,9 @@ END
          fa_system("sudo apt-get -y update");
       }
       fa_system("sudo apt-get -y install 'libssl-dev'");
+   }
+   if (-1==index $dpkg,'zlib1g-dev') {
+      fa_system("sudo apt-get -y install 'zlib1g-dev'");
    }
    if (-1==index $dpkg,'figlet') {
       fa_system("sudo apt-get -y install 'figlet'");
@@ -1439,6 +1441,49 @@ END
       }
    }
 }
+
+if (exists $amazon{'amazon_linux'} || exists $amazon{'ubuntu'} ||
+      exists $amazon{'centos'} || exists $amazon{'rhel'}) {
+   my $message=<<END;
+
+   This message times out in two minutes so FullAuto Install can continue
+
+      _                             ___ _       ___ _ _         _
+     /_\\  _ __  __ _ ______ _ _    / __| |     / __| (_)___ _ _| |_
+    / _ \\| '  \\/ _` |_ / _ \\ ' \\  | (__| |__  | (__| | / -_) ' \\  _|
+   /_/ \\_\\_|_|_\\__,_/__\\___/_||_|  \\___|____|  \\___|_|_\\___|_||_\\__|
+
+   In order to automate Amazon AWS Cloud infrastructure, the Amazon
+   AWS Command Line Client (AWS CLI) needs to installed. Install
+   AWS CLI?  (Default is 'yes')
+
+END
+
+   my $timeout=120;my $selection='';
+   my $fae="No   (FullAuto Setup will exit)";
+   {
+      local $SIG{__DIE__}; # No sigdie handler
+      eval {
+         local $SIG{ALRM} = sub { die "alarm\n" }; # NB: \n required
+         alarm $timeout;
+         my $menu1 = [
+               $message,
+               [ "Yes", sub{ return 'Yes' } ],
+               [ $fae, sub{ return 'No' } ],
+               ];
+         $selection=&menu($menu1);
+         exit 0 if $selection eq ']quit[';
+         alarm 0;
+      };
+   }
+   if ($selection eq 'Yes') {
+      my $cmd='curl "https://awscli.amazonaws.com/'.
+            'awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"';
+      fa_system($cmd);
+      fa_system('unzip awscliv2.zip;sudo ./aws/install');
+   } print "\n\n   FullAuto install continues . . .\n\n";
+}
+
 if (grep { /-*(?:add|all)[-_]?dependencies/i } @ARGV) {
    my $f=$fs;
    $f=~s/^.*\/(.*)$/$1/;
@@ -5309,8 +5354,8 @@ if (keys %amazon) {
          my %perms_menu=();
          unless ($^O eq 'cygwin') {
             @list=('Install with 777 Permissions on FullAuto Files Only (Default)',
-                   'Install with Setuid Permissions (Experimental)',
-                   'Install with Setgid Permissions (Experimental)',
+                   #'Install with Setuid Permissions (Experimental)',
+                   #'Install with Setgid Permissions (Experimental)',
                    'Install with 770 Permissions on FullAuto Files Only (Experimental)'
                   );
             my $banner="\n   *** THIS SCREEN WILL TIMEOUT AND CHOOSE ".

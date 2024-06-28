@@ -20,6 +20,12 @@
 #######################################################################
 
 
+2024-06-27  Brian M. Kelly <Brian.Kelly@fullauto.com>
+
+        * Version 1.0000659 released
+
+        * Makefile.PL updated for Amazon EC2 AWS CLI
+
 2024-06-26  Brian M. Kelly <Brian.Kelly@fullauto.com>
 
         * Version 1.0000658 released

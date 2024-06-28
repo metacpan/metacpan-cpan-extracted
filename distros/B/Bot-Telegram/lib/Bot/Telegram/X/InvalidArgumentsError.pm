@@ -16,7 +16,7 @@ Bot::Telegram::X::InvalidArgumentsError - invalid arguments error
 
 =head1 VERSION
 
-version 1.00
+version 1.10
 
 =head1 AUTHOR
 

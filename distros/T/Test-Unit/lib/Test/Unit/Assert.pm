@@ -315,7 +315,7 @@ sub _eq_hash {
 
     my $ok = 1;
     my $bigger = keys %$a1 > keys %$a2 ? $a1 : $a2;
-    foreach my $k (keys %$bigger) {
+    foreach my $k (sort keys %$bigger) {
         my $e1 = exists $a1->{$k} ? $a1->{$k} : $DNE;
         my $e2 = exists $a2->{$k} ? $a2->{$k} : $DNE;
 

@@ -3,6 +3,8 @@
 
 class R::OP::Double {
   
+  use R::NDArray::Byte;
+  use R::NDArray::Short;
   use R::NDArray::Int;
   use R::NDArray::Long;
   use R::NDArray::Float;
@@ -23,6 +25,7 @@ class R::OP::Double {
   use Complex_2d;
   use Math;
   use DoubleList;
+  use Sys;
   
   # Class Methods
   static method c : R::NDArray::Double ($x_data : double[], $x_dim : int[] = undef) {
@@ -225,140 +228,6 @@ class R::OP::Double {
     
     for (my $i = 0; $i < $length; $i++) {
       $ret_data->[$i] = Math->fmod($x_data->[$i], $y_data->[$i]);
-    }
-    
-    return $ret_ndarray;
-  }
-  
-  precompile static method to_int : R::NDArray::Int ($x_ndarray : R::NDArray::Double) {
-    
-    unless ($x_ndarray) {
-      die "The n-dimension array \$x_ndarray must be defined.";
-    }
-    
-    my $length = $x_ndarray->length;
-    
-    my $x_dim = $x_ndarray->dim;
-    
-    my $ret_ndarray = R::OP::Int->c(undef, $x_dim);
-    
-    my $x_data = $x_ndarray->data;
-    my $ret_data = $ret_ndarray->data;
-    
-    for (my $i = 0; $i < $length; $i++) {
-      $ret_data->[$i] = (int)$x_data->[$i];
-    }
-    
-    return $ret_ndarray;
-  }
-  
-  precompile static method to_long : R::NDArray::Long ($x_ndarray : R::NDArray::Double) {
-    
-    unless ($x_ndarray) {
-      die "The n-dimension array \$x_ndarray must be defined.";
-    }
-    
-    my $length = $x_ndarray->length;
-    
-    my $x_dim = $x_ndarray->dim;
-    
-    my $ret_ndarray = R::OP::Long->c(undef, $x_dim);
-    
-    my $x_data = $x_ndarray->data;
-    my $ret_data = $ret_ndarray->data;
-    
-    for (my $i = 0; $i < $length; $i++) {
-      $ret_data->[$i] = (long)$x_data->[$i];
-    }
-    
-    return $ret_ndarray;
-  }
-  
-  precompile static method to_float : R::NDArray::Float ($x_ndarray : R::NDArray::Double) {
-    
-    unless ($x_ndarray) {
-      die "The n-dimension array \$x_ndarray must be defined.";
-    }
-    
-    my $length = $x_ndarray->length;
-    
-    my $x_dim = $x_ndarray->dim;
-    
-    my $ret_ndarray = R::OP::Float->c(undef, $x_dim);
-    
-    my $x_data = $x_ndarray->data;
-    my $ret_data = $ret_ndarray->data;
-    
-    for (my $i = 0; $i < $length; $i++) {
-      $ret_data->[$i] = (float)$x_data->[$i];
-    }
-    
-    return $ret_ndarray;
-  }
-  
-  precompile static method clone : R::NDArray::Double ($x_ndarray : R::NDArray::Double) {
-    
-    unless ($x_ndarray) {
-      die "The n-dimension array \$x_ndarray must be defined.";
-    }
-    
-    my $length = $x_ndarray->length;
-    
-    my $x_dim = $x_ndarray->dim;
-    
-    my $ret_ndarray = &c(undef, $x_dim);
-    
-    my $x_data = $x_ndarray->data;
-    my $ret_data = $ret_ndarray->data;
-    
-    for (my $i = 0; $i < $length; $i++) {
-      $ret_data->[$i] = (double)$x_data->[$i];
-    }
-    
-    return $ret_ndarray;
-  }
-  
-  precompile static method to_float_complex : R::NDArray::FloatComplex ($x_ndarray : R::NDArray::Double) {
-    
-    unless ($x_ndarray) {
-      die "The n-dimension array \$x_ndarray must be defined.";
-    }
-    
-    my $length = $x_ndarray->length;
-    
-    my $x_dim = $x_ndarray->dim;
-    
-    my $ret_ndarray = R::OP::FloatComplex->c(undef, $x_dim);
-    
-    my $x_data = $x_ndarray->data;
-    my $ret_data = $ret_ndarray->data;
-    
-    for (my $i = 0; $i < $length; $i++) {
-      $ret_data->[$i]{re} = (float)$x_data->[$i];
-      $ret_data->[$i]{im} = 0f;
-    }
-    
-    return $ret_ndarray;
-  }
-  
-  precompile static method to_double_complex : R::NDArray::DoubleComplex ($x_ndarray : R::NDArray::Double) {
-    
-    unless ($x_ndarray) {
-      die "The n-dimension array \$x_ndarray must be defined.";
-    }
-    
-    my $length = $x_ndarray->length;
-    
-    my $x_dim = $x_ndarray->dim;
-    
-    my $ret_ndarray = R::OP::DoubleComplex->c(undef, $x_dim);
-    
-    my $x_data = $x_ndarray->data;
-    my $ret_data = $ret_ndarray->data;
-    
-    for (my $i = 0; $i < $length; $i++) {
-      $ret_data->[$i]{re} = (double)$x_data->[$i];
-      $ret_data->[$i]{im} = 0;
     }
     
     return $ret_ndarray;
@@ -1724,4 +1593,48 @@ class R::OP::Double {
     
     return $ret_ndarray;
   }
+  
+  static method rep : R::NDArray::Double ($x_ndarray : R::NDArray, $times : int) {
+    return (R::NDArray::Double)R::OP->rep($x_ndarray, $times);
+  }
+  
+  static method rep_length : R::NDArray::Double ($x_ndarray : R::NDArray, $length : int) {
+    return (R::NDArray::Double)R::OP->rep_length($x_ndarray, $length);
+  }
+  
+  static method runif : R::NDArray::Double($length : int, $options : object[]) {
+    
+    my $options_h = Hash->new($options);
+    
+    my $min = $options_h->get_or_default_int("min", 0);
+    
+    my $max = $options_h->get_or_default_int("max", 1);
+    
+    my $seed_ref = (int[])$options_h->get_or_default("seed_ref", undef);
+    
+    my $seed = -1;
+    if ($seed_ref) {
+      $seed = $seed_ref->[0];
+    }
+    else {
+      $seed = (int)(Sys->time * Sys->process_id);
+    }
+    
+    my $ret_ndarray = R::OP::Double->c(undef, [$length]);
+    
+    my $ret_data = $ret_ndarray->data;
+    
+    for (my $i = 0; $i < $length; $i++) {
+      my $range = $max - $min + 1;
+      my $rand = Fn->rand(\$seed, $range) + $min;
+      $ret_data->[$i] = $rand;
+    }
+    
+    if ($seed_ref) {
+      $seed_ref->[0] = $seed;
+    }
+    
+    return $ret_ndarray;
+  }
+  
 }

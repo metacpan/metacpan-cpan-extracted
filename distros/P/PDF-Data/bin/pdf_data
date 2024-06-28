@@ -8,7 +8,7 @@ use v5.16;
 use warnings;
 
 # Program version.
-use version; our $version = version->declare('v1.0.1');
+use version; our $version = version->declare('v1.1.0');
 
 # Initialize modules.
 use File::Basename qw[basename dirname];
@@ -50,7 +50,7 @@ our @option_list = (
 # Help message.
 our $help_message = <<EOF;
 
-Usage: $program [-v] [-i] [-o <output.pdf>] [<options>] [<input.pdf>]\n";
+Usage: $program [-v] [-i] [-o <output.pdf>] [<options>] [<input.pdf>]
 
 Utility script for PDF::Data module.
 
@@ -81,6 +81,12 @@ our ($usage) = $help_message =~ /\A\s*(Usage: .*?\n)\n/s or die "$program: Usage
 # Parse command-line options.
 GetOptions(@option_list) or die $usage;
 
+# Get input and output PDF filenames from command-line arguments.
+my $input_pdf = shift @ARGV || "-";
+
+# Print help if using standard input and it's a terminal.
+$print_help++ if $input_pdf eq "-" and -t;
+
 # For standard --help and --version options, print message and exit.
 if ($print_help or $print_version) {
   print "$program $version\n";
@@ -90,9 +96,6 @@ if ($print_help or $print_version) {
 
 # Don't buffer output.
 autoflush STDOUT;
-
-# Get input and output PDF filenames from command-line arguments.
-my $input_pdf = shift @ARGV || "-";
 
 # Override output filename if --inplace is specified.
 if ($inplace) {
@@ -107,7 +110,7 @@ my $time = time;
 
 # Attempt to get file modification timestamp.
 unless ($input_pdf eq "-") {
-  die "$input_pdf $!\n" unless -e $input_pdf;
+  die "$input_pdf: $!\n" unless -e $input_pdf;
   $time = (stat _)[9];
 }
 

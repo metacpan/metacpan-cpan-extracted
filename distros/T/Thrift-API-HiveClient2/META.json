@@ -4,7 +4,7 @@
       "David Morel <david.morel@amakuru.net>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.032, CPAN::Meta::Converter version 2.150010",
    "keywords" : [
       "apache",
       "thrift",
@@ -46,6 +46,7 @@
             "Thrift::BinaryProtocol" : "0",
             "Thrift::BufferedTransport" : "0",
             "Thrift::SASL::Transport" : "0",
+            "Thrift::SSLSocket" : "0",
             "Thrift::Socket" : "0",
             "base" : "0",
             "constant" : "0",
@@ -71,22 +72,20 @@
    },
    "release_status" : "stable",
    "resources" : {
-      "bugtracker" : {
-         "web" : "https://github.com/Perl-Hadoop/Thrift-API-HiveClient2/issues"
-      },
       "repository" : {
          "type" : "git",
-         "url" : "git://github.com/Perl-Hadoop/Thrift-API-HiveClient2.git",
-         "web" : "https://github.com/Perl-Hadoop/Thrift-API-HiveClient2"
+         "url" : "git://github.com/burak/Thrift-API-HiveClient2.git",
+         "web" : "https://github.com/burak/Thrift-API-HiveClient2"
       }
    },
-   "version" : "0.024",
+   "version" : "0.025",
    "x_contributors" : [
       "Burak Gursoy <burak@cpan.org>",
       "David Morel <dmor@cpan.org>",
       "Neil Bowers <neil@bowers.com>"
    ],
-   "x_generated_by_perl" : "v5.26.0",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.08"
+   "x_generated_by_perl" : "v5.38.0",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.38",
+   "x_spdx_expression" : "Apache-2.0"
 }
 

@@ -92766,3 +92766,17 @@ J/JV/JV/SVGPDF-0.088.tar.gz
 D/DC/DCONWAY/Switch-Back-0.000002.tar.gz
 D/DC/DCONWAY/Switch-Right-0.000003.tar.gz
 R/RJ/RJBS/Test-Unit-0.26.tar.gz
+U/UT/UTASHIRO/App-ansifold-1.27.tar.gz
+P/PE/PERLANCAR/App-td-0.112.tar.gz
+R/RE/REEDFISH/Net-FullAuto-1.0000659.tar.gz
+V/VA/VASYAN/Bot-Telegram-1.10.tar.gz
+D/DJ/DJERIUS/CXC-DB-DDL-Field-Pg-0.15.tar.gz
+M/MA/MARKOV/Log-Report-1.37.tar.gz
+P/PE/PEVANS/Data-Checks-0.04.tar.gz
+E/ET/ETJ/Graph-0.9729.tar.gz
+D/DE/DEVEN/PDF-Data-v1.1.0.tar.gz
+K/KI/KIMOTO/SPVM-R-0.002.tar.gz
+J/JV/JV/SVGPDF-0.088.1.tar.gz
+R/RJ/RJBS/Test-Unit-0.27.tar.gz
+B/BU/BURAK/Thrift-API-HiveClient2-0.025.tar.gz
+F/FA/FASTLY/WebService-Fastly-6.05.tar.gz

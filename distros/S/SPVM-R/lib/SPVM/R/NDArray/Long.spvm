@@ -61,9 +61,11 @@ class R::NDArray::Long extends R::NDArray {
     return $string;
   }
   
-  precompile method set_order : void ($indexes : int[]) {
+  precompile method set_order : void ($indexes_ndarray : R::NDArray::Int) {
     
-    $self->check_set_order_args($indexes);
+    $self->check_set_order_args($indexes_ndarray);
+    
+    my $indexes = $indexes_ndarray->data;
     
     my $data = (long[])$self->{data};
     
@@ -78,5 +80,150 @@ class R::NDArray::Long extends R::NDArray {
       $data->[$i] = $tmp_data->[$order_index];
     }
   }
+  
+  precompile method to_int : R::NDArray::Int () {
+    
+    unless ($self) {
+      die "The n-dimension array \$self must be defined.";
+    }
+    
+    my $length = $self->length;
+    
+    my $dim = $self->dim;
+    
+    my $ret_ndarray = R::OP::Int->c(undef, $dim);
+    
+    my $data = $self->data;
+    my $ret_data = $ret_ndarray->data;
+    
+    for (my $i = 0; $i < $length; $i++) {
+      $ret_data->[$i] = (int)$data->[$i];
+    }
+    
+    return $ret_ndarray;
+  }
+  
+  precompile method to_float : R::NDArray::Float () {
+    
+    unless ($self) {
+      die "The n-dimension array \$self must be defined.";
+    }
+    
+    my $length = $self->length;
+    
+    my $dim = $self->dim;
+    
+    my $ret_ndarray = R::OP::Float->c(undef, $dim);
+    
+    my $data = $self->data;
+    my $ret_data = $ret_ndarray->data;
+    
+    for (my $i = 0; $i < $length; $i++) {
+      $ret_data->[$i] = (float)$data->[$i];
+    }
+    
+    return $ret_ndarray;
+  }
+  
+  precompile method to_double : R::NDArray::Double () {
+    
+    unless ($self) {
+      die "The n-dimension array \$self must be defined.";
+    }
+    
+    my $length = $self->length;
+    
+    my $dim = $self->dim;
+    
+    my $ret_ndarray = R::OP::Double->c(undef, $dim);
+    
+    my $data = $self->data;
+    my $ret_data = $ret_ndarray->data;
+    
+    for (my $i = 0; $i < $length; $i++) {
+      $ret_data->[$i] = (double)$data->[$i];
+    }
+    
+    return $ret_ndarray;
+  }
+  
+  precompile method to_float_complex : R::NDArray::FloatComplex () {
+    
+    unless ($self) {
+      die "The n-dimension array \$self must be defined.";
+    }
+    
+    my $length = $self->length;
+    
+    my $dim = $self->dim;
+    
+    my $ret_ndarray = R::OP::FloatComplex->c(undef, $dim);
+    
+    my $data = $self->data;
+    my $ret_data = $ret_ndarray->data;
+    
+    for (my $i = 0; $i < $length; $i++) {
+      $ret_data->[$i]{re} = (float)$data->[$i];
+      $ret_data->[$i]{im} = 0f;
+    }
+    
+    return $ret_ndarray;
+  }
+  
+  precompile method to_double_complex : R::NDArray::DoubleComplex () {
+    
+    unless ($self) {
+      die "The n-dimension array \$self must be defined.";
+    }
+    
+    my $length = $self->length;
+    
+    my $dim = $self->dim;
+    
+    my $ret_ndarray = R::OP::DoubleComplex->c(undef, $dim);
+    
+    my $data = $self->data;
+    my $ret_data = $ret_ndarray->data;
+    
+    for (my $i = 0; $i < $length; $i++) {
+      $ret_data->[$i]{re} = (double)$data->[$i];
+      $ret_data->[$i]{im} = 0;
+    }
+    
+    return $ret_ndarray;
+  }
+  
+  protected method slice_data : object ($data_indexes : int[]) {
+    
+    unless ($data_indexes) {
+      die "The data indexes \$data_indexes must be defined.";
+    }
+    
+    my $data_indexes_length = @$data_indexes;
+    my $data = $self->data;
+    my $ret_data = new long[$data_indexes_length];
+    for (my $i = 0; $i < $data_indexes_length; $i++) {
+      $ret_data->(long[])->[$i] = $data->(long[])->[$i];
+    }
+    
+    return $ret_data;
+  }
+  
+  protected method slice_set_data : void ($data_indexes : int[], $data : object) {
+    
+    my $self_data = $self->{data};
+    
+    unless ($data_indexes) {
+      die "The data indexes \$data_indexes must be defined.";
+    }
+    
+    my $data_index = 0;
+    my $data_indexes_length = @$data_indexes;
+    for (my $i = 0; $i < $data_indexes_length; $i++) {
+      $self_data->(long[])->[$i] = $data->(long[])->[$data_index];
+      $data_index++;
+    }
+  }
+  
 }
 

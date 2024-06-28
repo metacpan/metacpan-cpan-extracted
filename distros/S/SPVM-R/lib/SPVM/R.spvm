@@ -2,5 +2,138 @@
 # MIT License
 
 class R {
-  version "0.001";
+  version "0.002";
+  
+  use StringBuffer;
+  use Time::Piece;
+  use Complex_2d;
+  use Complex_2f;
+  
+  use R::NDArray::Byte;
+  use R::NDArray::Short;
+  use R::NDArray::Int;
+  use R::NDArray::Long;
+  use R::NDArray::Float;
+  use R::NDArray::Double;
+  use R::NDArray::FloatComplex;
+  use R::NDArray::DoubleComplex;
+  use R::NDArray::Object;
+  use R::NDArray::String;
+  use R::NDArray::StringBuffer;
+  use R::NDArray::Time::Piece;
+  
+  use R::OP::Byte;
+  use R::OP::Short;
+  use R::OP::Int;
+  use R::OP::Long;
+  use R::OP::Float;
+  use R::OP::Double;
+  use R::OP::FloatComplex;
+  use R::OP::DoubleComplex;
+  use R::OP::Object;
+  use R::OP::String;
+  use R::OP::StringBuffer;
+  use R::OP::Time::Piece;
+  
+  static method byte : R::NDArray::Byte ($data : byte[], $dim : int[] = undef) {
+    return R::OP::Byte->c($data, $dim);
+  }
+  
+  static method short : R::NDArray::Short ($data : short[], $dim : int[] = undef) {
+    return R::OP::Short->c($data, $dim);
+  }
+  
+  static method int : R::NDArray::Int ($data : int[], $dim : int[] = undef) {
+    return R::OP::Int->c($data, $dim);
+  }
+  
+  static method long : R::NDArray::Long ($data : long[], $dim : int[] = undef) {
+    return R::OP::Long->c($data, $dim);
+  }
+  
+  static method float : R::NDArray::Float ($data : float[], $dim : int[] = undef) {
+    return R::OP::Float->c($data, $dim);
+  }
+  
+  static method double : R::NDArray::Double ($data : double[], $dim : int[] = undef) {
+    return R::OP::Double->c($data, $dim);
+  }
+  
+  static method float_complex : R::NDArray::FloatComplex ($data : Complex_2f[], $dim : int[] = undef) {
+    return R::OP::FloatComplex->c($data, $dim);
+  }
+  
+  static method double_complex : R::NDArray::DoubleComplex ($data : Complex_2d[], $dim : int[] = undef) {
+    return R::OP::DoubleComplex->c($data, $dim);
+  }
+  
+  static method complexf : R::NDArray::FloatComplex ($pairs : float[], $dim : int[] = undef) {
+    
+    unless ($pairs) {
+      die "The pairs \$pairs must be defined.";
+    }
+    
+    my $pairs_length = @$pairs;
+    
+    unless ($pairs_length % 2) {
+      die "The pairs \$pairs must be devided by even number.";
+    }
+    
+    my $length = $pairs_length / 2;
+    
+    my $data = new Complex_2f[$length];
+    
+    Fn->memcpy($data, 0, $pairs, 0, 4 * $length);
+    
+    return R::OP::FloatComplex->c($data, $dim);
+  }
+  
+  static method complex : R::NDArray::DoubleComplex ($pairs : double[], $dim : int[] = undef) {
+    
+    unless ($pairs) {
+      die "The pairs \$pairs must be defined.";
+    }
+    
+    my $pairs_length = @$pairs;
+    
+    unless ($pairs_length % 2) {
+      die "The pairs \$pairs must be devided by even number.";
+    }
+    
+    my $length = $pairs_length / 2;
+    
+    my $data = new Complex_2d[$length];
+    
+    Fn->memcpy($data, 0, $pairs, 0, 8 * $length);
+    
+    return R::OP::DoubleComplex->c($data, $dim);
+  }
+  
+  static method i : R::NDArray::DoubleComplex () {
+    
+    my $ret_ndarray = &complex([0.0,1.0]);
+    
+    return $ret_ndarray;
+  }
+  
+  static method object : R::NDArray::Object ($data : object[], $dim : int[] = undef) {
+    return R::OP::Object->c($data, $dim);
+  }
+  
+  static method string : R::NDArray::String ($data : string[], $dim : int[] = undef) {
+    return R::OP::String->c($data, $dim);
+  }
+  
+  static method string_buffer : R::NDArray::StringBuffer ($data : StringBuffer[], $dim : int[] = undef) {
+    return R::OP::StringBuffer->c($data, $dim);
+  }
+  
+  static method time_piece : R::NDArray::Time::Piece ($data : Time::Piece[], $dim : int[] = undef) {
+    return R::OP::Time::Piece->c($data, $dim);
+  }
+  
+  static method seq : R::NDArray::Int ($begin : int, $end : int, $by : int = 1) {
+    return R::OP::Int->seq($begin, $end, $by);
+  }
+  
 }

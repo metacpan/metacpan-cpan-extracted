@@ -4,7 +4,12 @@
 class R::OP::String {
   
   use R::NDArray::String;
+  use R::NDArray::StringBuffer;
+  use R::NDArray::Time::Piece;
+  use Time::Piece;
   use R::OP;
+  use R::OP::StringBuffer;
+  use R::OP::Time::Piece;
   
   # Class Methods
   static method c : R::NDArray::String ($x_data : string[], $x_dim : int[] = undef) {

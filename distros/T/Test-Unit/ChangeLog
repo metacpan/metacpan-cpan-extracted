@@ -1,3 +1,13 @@
+2024-06-27  Ricardo Signes  <cpan@semiotic.systems>
+
+	* lib/Test/Unit/Assert.pm: sort keys when deep-comparing hashes to avoid hash
+	randomization causing test failures sporadically
+
+	* lib/Test/Unit/Procedural.pm: fix a typo
+
+	* t/tlib/AssertTest.pm: fix a test that failed on perl v5.30 due to a bug in
+	perl v5.30!
+
 2024-06-26  Ricardo Signes  <cpan@semiotic.systems>
 
 	* lib/Test/Unit.pm: version 0.26

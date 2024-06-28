@@ -1,5 +1,11 @@
 Revision history for Data-Checks
 
+0.04    2024-06-27
+        [CHANGES]
+         * Added `Isa()` and `Maybe()` parametric constraints
+         * Declare `Data::Checks::Builder` version 0.43 to fix earlier version
+           numbering error - no actual code change
+
 0.03    2024-06-23
         [CHANGES]
          * Added a few basic constraints: `Defined`, `Str`, `Num`, `Object`

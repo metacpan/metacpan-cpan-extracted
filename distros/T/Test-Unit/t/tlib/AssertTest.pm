@@ -34,7 +34,7 @@ sub test_numericness {
     my %tests =
       ( 1	=> 't',
 	0	=> 't',
-  	'0xF00'	=> 'f', # controversial?  but if you +=10 then it's == 10
+
 	'15e7'	=> 't',
 	'15E7'	=> 't',
 	"not 0"	=> 'f',
@@ -47,6 +47,15 @@ sub test_numericness {
 	my $actual = Test::Unit::Assert::is_numeric($str) ? 't' : 'f';
 	$self->fail("For string '$str', expect $expect but got $actual")
 	  unless $expect eq $actual;
+    }
+
+    if ($] gt '5.029001' && $] lt '5.031004') {
+        # https://github.com/Perl/perl5/issues/17062
+        # skipping test, broken around v5.30 because of bug in perl
+    } else {
+        my $actual = Test::Unit::Assert::is_numeric('0xF00') ? 't' : 'f';
+        $self->fail("For string '0xF00', expect f but got $actual")
+          unless 'f' eq $actual;
     }
 }
 
@@ -407,10 +416,10 @@ sub test_assert_deep_equals {
     );
 
     my $differ = sub {
-        my ($a, $b) = @_;
+        my ($x, $y) = @_;
         qr/^Structures\ begin\ differing\ at: $ \n
-        \S*\s* \$a .* = .* (?-x:$a)      .* $ \n
-        \S*\s* \$b .* = .* (?-x:$b)/mx;
+        \S*\s* \$a .* = .* (?-x:$x)      .* $ \n
+        \S*\s* \$b .* = .* (?-x:$y)/mx;
     };
 
     my %families; # key=test-purpose, value=assorted circular structures

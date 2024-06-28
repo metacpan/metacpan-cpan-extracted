@@ -1,3 +1,7 @@
+0.002 2024-06-28
+  [Incompatibe Changes]
+    * There are many incompatible changes.
+  
 0.001 2024-06-26
   [Changes]
     * First developement release. Tests are not yet done. All of method and field definitions in all classes will be changed.

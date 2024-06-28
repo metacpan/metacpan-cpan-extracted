@@ -72,4 +72,18 @@ class R::NDArray::Time::Piece extends R::NDArray::Object {
     return $string;
   }
   
+  method element_clone : Time::Piece ($data_index : int) {
+    
+    my $data = $self->data;
+    
+    my $element = $data->[$data_index];
+    
+    my $clone = (Time::Piece)undef;
+    if ($element) {
+      $clone = $element->clone;
+    }
+    
+    return $clone;
+  }
+  
 }

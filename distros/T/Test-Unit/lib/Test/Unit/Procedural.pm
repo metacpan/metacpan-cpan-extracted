@@ -173,7 +173,7 @@ For convenience, C<create_suite()> will automatically build a test
 suite for a given package. This will build a test case for each
 subroutine in the package given that has a name starting with C<test>
 and pack them all together into one TestSuite object for easy testing.
-If you dont give a package name to C<create_suite()>, the current
+If you don't give a package name to C<create_suite()>, the current
 package is taken as default.
 
 Test output is one status line (a "." for every successful test run,
