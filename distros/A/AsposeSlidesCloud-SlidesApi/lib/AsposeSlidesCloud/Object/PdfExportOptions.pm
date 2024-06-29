@@ -229,6 +229,20 @@ __PACKAGE__->method_documentation({
     	format => '',
     	read_only => '',
     		},
+    'hide_ink' => {
+    	datatype => 'boolean',
+    	base_name => 'HideInk',
+    	description => 'True to hide Ink elements in exported document.',
+    	format => '',
+    	read_only => '',
+    		},
+    'interpret_mask_op_as_opacity' => {
+    	datatype => 'boolean',
+    	base_name => 'InterpretMaskOpAsOpacity',
+    	description => 'True to use ROP operation or Opacity for rendering brush.',
+    	format => '',
+    	read_only => '',
+    		},
 });
 
 __PACKAGE__->swagger_types( {
@@ -250,7 +264,9 @@ __PACKAGE__->swagger_types( {
     'slides_layout_options' => 'SlidesLayoutOptions',
     'image_transparent_color' => 'string',
     'apply_image_transparent' => 'boolean',
-    'access_permissions' => 'AccessPermissions'
+    'access_permissions' => 'AccessPermissions',
+    'hide_ink' => 'boolean',
+    'interpret_mask_op_as_opacity' => 'boolean'
 } );
 
 __PACKAGE__->attribute_map( {
@@ -272,7 +288,9 @@ __PACKAGE__->attribute_map( {
     'slides_layout_options' => 'SlidesLayoutOptions',
     'image_transparent_color' => 'ImageTransparentColor',
     'apply_image_transparent' => 'ApplyImageTransparent',
-    'access_permissions' => 'AccessPermissions'
+    'access_permissions' => 'AccessPermissions',
+    'hide_ink' => 'HideInk',
+    'interpret_mask_op_as_opacity' => 'InterpretMaskOpAsOpacity'
 } );
 
 __PACKAGE__->mk_accessors(keys %{__PACKAGE__->attribute_map});

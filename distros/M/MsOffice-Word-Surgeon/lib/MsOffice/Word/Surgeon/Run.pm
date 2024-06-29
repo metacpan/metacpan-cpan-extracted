@@ -7,7 +7,7 @@ use MsOffice::Word::Surgeon::Utils qw(maybe_preserve_spaces is_at_run_level);
 
 use namespace::clean -except => 'meta';
 
-our $VERSION = '2.06';
+our $VERSION = '2.07';
 
 #======================================================================
 # ATTRIBUTES
@@ -191,7 +191,7 @@ Replaces all occurrences of C<$pattern> within all text nodes by
 a new string computed by C<$replacement_callback>, and returns a new xml
 string corresponding to the result of all these replacements. This is the
 internal implementation for public method
-L<MsOffice::Word::Surgeon/replace>.
+L<MsOffice::Word::Surgeon::PackagePart/replace>.
 
 
 =head2 remove_caps_property

@@ -1,5 +1,8 @@
 Revision history for ExtUtils-Builder-Compiler
 
+0.008     2024-06-28 12:36:56+02:00 Europe/Brussels
+          - Simplify libperl linking logic on Windows
+
 0.007     2024-06-18 20:39:07+02:00 Europe/Brussels
           - Use split_like_shell instead of shellwords
           - Fix adding of libraries for MSVC

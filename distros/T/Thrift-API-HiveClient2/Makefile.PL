@@ -20,6 +20,7 @@ my %WriteMakefileArgs = (
     "Authen::SASL" => 0,
     "Carp" => 0,
     "Class::Accessor" => 0,
+    "IO::Socket::SSL" => 0,
     "List::MoreUtils" => 0,
     "Moo" => 0,
     "Scalar::Util" => 0,
@@ -43,7 +44,7 @@ my %WriteMakefileArgs = (
     "Test::More" => 0,
     "Thrift::XS::BinaryProtocol" => 0
   },
-  "VERSION" => "0.025",
+  "VERSION" => "0.026",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -57,6 +58,7 @@ my %FallbackPrereqs = (
   "ExtUtils::MakeMaker" => 0,
   "File::Spec" => 0,
   "IO::Handle" => 0,
+  "IO::Socket::SSL" => 0,
   "IPC::Open3" => 0,
   "List::MoreUtils" => 0,
   "Moo" => 0,

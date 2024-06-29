@@ -1,11 +1,11 @@
 use strict;
 use warnings;
-package JSON::Schema::Modern; # git description: v0.586-4-g41a05094
+package JSON::Schema::Modern; # git description: v0.587-6-g6131fa8b
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Validate data against a schema using a JSON Schema
 # KEYWORDS: JSON Schema validator data validation structure specification
 
-our $VERSION = '0.587';
+our $VERSION = '0.588';
 
 use 5.020;  # for fc, unicode_strings features
 use Moo;
@@ -1162,7 +1162,7 @@ JSON::Schema::Modern - Validate data against a schema using a JSON Schema
 
 =head1 VERSION
 
-version 0.587
+version 0.588
 
 =head1 SYNOPSIS
 
@@ -1577,7 +1577,9 @@ otherwise returns the L<JSON::Schema::Modern::Document> that contains the added 
 
 or
 
-  $js->add_format_validation(no_nines => { type => 'number', sub => sub ($value) { $value =~ m/^[0-8]$$/ });
+  $js->add_format_validation(no_nines => { type => 'number', sub => sub ($value) { $value =~ m/^[0-8]+$/ });
+
+  $js->add_format_validation(8bits => { type => 'string', sub => sub ($value) { $value =~ m/^[\x00-\xFF]+$/ });
 
 Adds support for a custom format. If not supplied, the data type(s) that this format applies to
 defaults to string; all values of any other type will automatically be deemed to be valid, and will
@@ -1588,6 +1590,9 @@ the data type(s) supported by that format may not be changed.
 
 Be careful to not mutate the type of the value while checking it -- for example, if it is a string,
 do not apply arithmetic operators to it -- or subsequent type checks on this value may fail.
+
+See L<https://spec.openapis.org/registry/format/> for a registry of known and useful formats; for
+compatibility reasons, avoid defining a format listed here with different semantics.
 
 =head2 add_vocabulary
 
@@ -1734,10 +1739,11 @@ will need to be manually added after thawing.
 
   sub get_evaluator (...) {
     my $serialized_file = Path::Tiny::path($filename);
+    my $schema_file = Path::Tiny::path($schema_filename);
     my $js;
-    if (some condition that checks if the schemas have changed...) {
+    if ($serialized_file->stat->mtime < $schema_file->stat->mtime)) {
       $js = JSON::Schema::Modern->new;
-      $js->add_schema(decode_json(...));  # your application schema
+      $js->add_schema(decode_json($schema_file->slurp_raw));  # your application schema
       my $frozen = Sereal::Encoder->new({ freeze_callbacks => 1 })->encode($js);
       $serialized_file->spew_raw($frozen);
     }

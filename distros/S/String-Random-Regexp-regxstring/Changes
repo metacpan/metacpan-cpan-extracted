@@ -1,0 +1,7 @@
+Revision history for String-Random-Regexp-regxstring
+
+0.01    26/06/2024-02:27
+        First version, released on an unsuspecting world.
+
+0.02    26/06/2024-02:45
+        Added Perl minimum version to be 5.16

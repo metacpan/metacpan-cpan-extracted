@@ -27,6 +27,11 @@ You may want to check out Aspose free [Powerpoint to PDF](https://products.aspos
 **Web:** HTML/HTML5
 **Other:** MPEG4, SWF (export whole presentations)
 
+## Enhancements in Version 24.6
+
+* Added **HideInk** and **InterpretMaskOpAsOpacity** properties to **PdfExportOptions** class.
+* Removed **Enqueued** from the list of allowed values for **Operation.Status** property.
+
 ## Enhancements in Version 24.5
 
 * Added **options** parameter to **ImportFromPdf** method. You can specify **options.DetectTables** property to control import behavior.

@@ -6,7 +6,7 @@ use MooseX::StrictConstructor;
 
 use namespace::clean -except => 'meta';
 
-our $VERSION = '2.06';
+our $VERSION = '2.07';
 
 #======================================================================
 # ATTRIBUTES
@@ -16,11 +16,18 @@ has 'xml_before'  => (is => 'ro', isa => 'Str', required => 1);
 has 'code'        => (is => 'rw', isa => 'Str', required => 1);
 has 'result'      => (is => 'rw', isa => 'Str', required => 1);
 has 'status'      => (is => 'rw', isa => enum([qw/begin separate end/]), default => "end");
-
+has 'type'        => (is => 'ro', isa => 'Str', builder => '_type', lazy => 1);
 
 #======================================================================
 # METHODS
 #======================================================================
+
+sub _type {
+  my ($self) = @_;
+  my ($type) = $self->code =~ /^\s*(\w+)/; 
+  return uc($type);
+}
+
 
 sub append_to_code {
   my ($self, $more_code) = @_;
@@ -95,6 +102,14 @@ While parsing fields, additional field instruction fragments are added through t
 =head2 add_to_result
 
 While parsing fields, additional XML fragments belonging to the field result are added through this method
+
+=head2 type
+
+The first instruction in the C<code> part, eg C<REF>, C<QUOTE>, C<ASK>, C<DOCPROPERTY>, etc.
+Note : in the Microsoft Word Object Model, the L<https://learn.microsoft.com/en-us/office/vba/api/word.field.type|Field.Type> attribute
+is an integer value in an enumerated type. Here the attribute is just an uppercase string. Lists of valild field types
+can be found in the Word documentation.
+
 
 
 =head1 AUTHOR

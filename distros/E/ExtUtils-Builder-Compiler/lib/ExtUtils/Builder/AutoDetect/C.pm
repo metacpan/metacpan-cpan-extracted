@@ -1,5 +1,5 @@
 package ExtUtils::Builder::AutoDetect::C;
-$ExtUtils::Builder::AutoDetect::C::VERSION = '0.007';
+$ExtUtils::Builder::AutoDetect::C::VERSION = '0.008';
 use strict;
 use warnings;
 
@@ -179,7 +179,7 @@ ExtUtils::Builder::AutoDetect::C - compiler configuration, derived from perl's c
 
 =head1 VERSION
 
-version 0.007
+version 0.008
 
 =head1 SYNOPSIS
 

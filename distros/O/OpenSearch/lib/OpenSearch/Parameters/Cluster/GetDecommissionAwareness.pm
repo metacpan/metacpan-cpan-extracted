@@ -1,16 +1,15 @@
 package OpenSearch::Parameters::Cluster::GetDecommissionAwareness;
-use Moose::Role;
-use Moose::Util::TypeConstraints;
+use strict;
+use warnings;
+use feature qw(state);
+use Types::Standard qw(Str Bool Int);
+use Moo::Role;
+
+with 'OpenSearch::Parameters';
 
 has 'attribute' => (
   is          => 'rw',
-  isa         => 'Str',
-  metaclass   => 'MooseX::MetaDescription::Meta::Attribute',
-  description => {
-    encode_func => 'as_is',
-    type        => 'path',
-    required    => 0,
-  }
+  isa         => Str,
 );
 
 around [qw/attribute/] => sub {
@@ -23,5 +22,14 @@ around [qw/attribute/] => sub {
   }
   return ( $self->$orig );
 };
+
+sub api_spec {
+  state $s = +{
+    attribute => {
+      encode_func => 'as_is',
+      type        => 'path',
+    }
+  };
+}
 
 1;

@@ -1,0 +1,12 @@
+Revision history for HATX
+
+0.0.1   28 Jun 2024
+        Initial release
+        Provides hatx(), map(), grep(), apply(), to_href(), to_obj()
+
+0.0.2   29 Jun 2024
+        Modify map() to accept user-provided @args
+
+0.0.3   29 Jun 2024
+        Add sort(), to_aref()
+

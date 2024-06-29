@@ -1,5 +1,5 @@
 package ExtUtils::Builder::Compiler;
-$ExtUtils::Builder::Compiler::VERSION = '0.007';
+$ExtUtils::Builder::Compiler::VERSION = '0.008';
 use strict;
 use warnings;
 
@@ -78,7 +78,7 @@ sub compile {
 
 1;
 
-# ABSTRACT: Portable compilation
+# ABSTRACT: An interface around different compilers.
 
 __END__
 
@@ -88,25 +88,29 @@ __END__
 
 =head1 NAME
 
-ExtUtils::Builder::Compiler - Portable compilation
+ExtUtils::Builder::Compiler - An interface around different compilers.
 
 =head1 VERSION
 
-version 0.007
+version 0.008
+
+=head1 DESCRIPTION
+
+This is an interface wrapping around different compilers. It's usually not used directly but by a portability layer like L<ExtUtils:Builder::Autodetect::C>.
 
 =head1 METHODS
 
-=head2 new(%options)
-
-=over 4
-
-=back
-
 =head2 add_include_dirs($dirs, %options)
+
+Add dirs the the include list.
 
 =head2 add_defines($defines, %options)
 
+Add defines (as a hash) to the define list.
+
 =head2 compile($source, $target, %options)
+
+Compile a C<$source> to C<$destination>.
 
 =head1 AUTHOR
 

@@ -10,9 +10,9 @@ use Exporter qw(import);
 use Perinci::Sub::Util qw(gen_modified_sub);
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2023-02-06'; # DATE
+our $DATE = '2024-06-26'; # DATE
 our $DIST = 'App-UniqFiles'; # DIST
-our $VERSION = '0.141'; # VERSION
+our $VERSION = '0.142'; # VERSION
 
 our @EXPORT_OK = qw(uniq_files);
 
@@ -75,20 +75,48 @@ our %argspecs_filter = (
 
 $SPEC{uniq_files} = {
     v => 1.1,
-    summary => 'Report duplicate or unique file contents',
+    summary => 'Report duplicate or unique files, optionally perform action on them',
     description => <<'_',
 
-Given a list of filenames, will check each file size and content for duplicate
-content. Interface is a bit like the `uniq` Unix command-line program.
+Given a list of filenames, will check each file's content (and/or size, and/or
+only name) to decide whether the file is a duplicate of another.
+
+There is a certain amount of flexibility on how duplicate is determined:
+- when comparing content, various hashing algorithm is supported;
+- when comparing size, a certain tolerance % is allowed;
+- when comparing filename, munging can first be done.
+
+There is flexibility on what to do with duplicate files:
+- just print unique/duplicate files (and let other utilities down the pipe deal
+  with them);
+- move duplicates to some location;
+- open the files first and prompt for action;
+- let a Perl code process the files.
+
+Interface is loosely based on the `uniq` Unix command-line program.
 
 _
     args    => {
+        actions => {
+            'x.name.is_plural' => 1,
+            'x.name.singular' => 'action',
+            summary => 'What action(s) to perform',
+            schema => ['array*', of=>['str*', in=>[qw/report/]], 'prefilters'=>['Array::check_uniq']],
+            default => ['report'],
+            description => <<'_',
+
+The following actions are available. More than one action can be
+_
+            tags => ['category:input'],
+        },
         files => {
             schema => ['array*' => {of=>'str*'}],
             req    => 1,
             pos    => 0,
             slurpy => 1,
+            tags => ['category:input'],
         },
+
         recurse => {
             schema => 'bool*',
             cmdline_aliases => {R=>{}},
@@ -97,6 +125,7 @@ _
 If set to true, will recurse into subdirectories.
 
 _
+            tags => ['category:input'],
         },
         group_by_digest => {
             summary => 'Sort files by its digest (or size, if not computing digest), separate each different digest',
@@ -588,7 +617,7 @@ gen_modified_sub(
     output_name => 'dupe_files',
     description => <<'_',
 
-This is a thin wrapper to <prog:uniq-files>. It defaults `report_unique` to 0
+This is a thin wrapper for <prog:uniq-files>. It defaults `report_unique` to 0
 and `report_duplicate` to 1.
 
 _
@@ -620,7 +649,7 @@ _
 );
 
 1;
-# ABSTRACT: Report duplicate or unique file contents
+# ABSTRACT: Report duplicate or unique files, optionally perform action on them
 
 __END__
 
@@ -630,11 +659,11 @@ __END__
 
 =head1 NAME
 
-App::UniqFiles - Report duplicate or unique file contents
+App::UniqFiles - Report duplicate or unique files, optionally perform action on them
 
 =head1 VERSION
 
-This document describes version 0.141 of App::UniqFiles (from Perl distribution App-UniqFiles), released on 2023-02-06.
+This document describes version 0.142 of App::UniqFiles (from Perl distribution App-UniqFiles), released on 2024-06-26.
 
 =head1 SYNOPSIS
 
@@ -651,9 +680,9 @@ Usage:
 
  dupe_files(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
-Report duplicate or unique file contents.
+Report duplicate or unique files, optionally perform action on them.
 
-This is a thin wrapper to L<uniq-files>. It defaults C<report_unique> to 0
+This is a thin wrapper for L<uniq-files>. It defaults C<report_unique> to 0
 and C<report_duplicate> to 1.
 
 This function is not exported.
@@ -661,6 +690,12 @@ This function is not exported.
 Arguments ('*' denotes required arguments):
 
 =over 4
+
+=item * B<actions> => I<array[str]> (default: ["report"])
+
+What action(s) to perform.
+
+The following actions are available. More than one action can be
 
 =item * B<algorithm> => I<str>
 
@@ -792,16 +827,36 @@ Usage:
 
  uniq_files(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
-Report duplicate or unique file contents.
+Report duplicate or unique files, optionally perform action on them.
 
-Given a list of filenames, will check each file size and content for duplicate
-content. Interface is a bit like the C<uniq> Unix command-line program.
+Given a list of filenames, will check each file's content (and/or size, and/or
+only name) to decide whether the file is a duplicate of another.
+
+There is a certain amount of flexibility on how duplicate is determined:
+- when comparing content, various hashing algorithm is supported;
+- when comparing size, a certain tolerance % is allowed;
+- when comparing filename, munging can first be done.
+
+There is flexibility on what to do with duplicate files:
+- just print unique/duplicate files (and let other utilities down the pipe deal
+  with them);
+- move duplicates to some location;
+- open the files first and prompt for action;
+- let a Perl code process the files.
+
+Interface is loosely based on the C<uniq> Unix command-line program.
 
 This function is not exported by default, but exportable.
 
 Arguments ('*' denotes required arguments):
 
 =over 4
+
+=item * B<actions> => I<array[str]> (default: ["report"])
+
+What action(s) to perform.
+
+The following actions are available. More than one action can be
 
 =item * B<algorithm> => I<str>
 
@@ -971,7 +1026,7 @@ that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2023, 2022, 2020, 2019, 2017, 2015, 2014, 2012, 2011 by perlancar <perlancar@cpan.org>.
+This software is copyright (c) 2024, 2023, 2022, 2020, 2019, 2017, 2015, 2014, 2012, 2011 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

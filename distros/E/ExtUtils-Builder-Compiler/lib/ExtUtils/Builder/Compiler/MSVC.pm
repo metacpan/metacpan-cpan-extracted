@@ -1,5 +1,5 @@
 package ExtUtils::Builder::Compiler::MSVC;
-$ExtUtils::Builder::Compiler::MSVC::VERSION = '0.007';
+$ExtUtils::Builder::Compiler::MSVC::VERSION = '0.008';
 use strict;
 use warnings;
 
@@ -44,7 +44,7 @@ ExtUtils::Builder::Compiler::MSVC - Class for compiling with Microsoft Visual C
 
 =head1 VERSION
 
-version 0.007
+version 0.008
 
 =head1 AUTHOR
 

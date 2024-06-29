@@ -1,81 +1,47 @@
 package OpenSearch::Parameters::Index::Exists;
-use Moose::Role;
+use strict;
+use warnings;
+use feature qw(state);
+use Types::Standard qw(Str Bool);
+use Types::Common::String qw(NonEmptyStr);
+use Moo::Role;
+
+with 'OpenSearch::Parameters';
 
 has 'index' => (
   is          => 'rw',
-  isa         => 'Str',
-  metaclass   => 'MooseX::MetaDescription::Meta::Attribute',
-  description => {
-    encode_func => 'as_is',
-    type        => 'path',
-    required    => 1,
-  }
+  isa         => NonEmptyStr,
+  required    => 1,
 );
 
 has 'allow_no_indices' => (
   is          => 'rw',
-  isa         => 'Bool',
-  metaclass   => 'MooseX::MetaDescription::Meta::Attribute',
-  description => {
-    encode_func => 'encode_bool',
-    type        => 'url',
-    required    => 0,
-  }
+  isa         => Bool,
 );
 
 has 'expand_wildcards' => (
   is          => 'rw',
-  isa         => 'Str',
-  metaclass   => 'MooseX::MetaDescription::Meta::Attribute',
-  description => {
-    encode_func => 'as_is',
-    type        => 'url',
-    required    => 0,
-  }
+  isa         => Str,
 );
 
 has 'flat_settings' => (
   is          => 'rw',
-  isa         => 'Bool',
-  metaclass   => 'MooseX::MetaDescription::Meta::Attribute',
-  description => {
-    encode_func => 'encode_bool',
-    type        => 'url',
-    required    => 0,
-  }
+  isa         => Bool,
 );
 
 has 'include_defaults' => (
   is          => 'rw',
-  isa         => 'Bool',
-  metaclass   => 'MooseX::MetaDescription::Meta::Attribute',
-  description => {
-    encode_func => 'encode_bool',
-    type        => 'url',
-    required    => 0,
-  }
+  isa         => Bool,
 );
 
 has 'ignore_unavailable' => (
   is          => 'rw',
-  isa         => 'Bool',
-  metaclass   => 'MooseX::MetaDescription::Meta::Attribute',
-  description => {
-    encode_func => 'encode_bool',
-    type        => 'url',
-    required    => 0,
-  }
+  isa         => Bool,
 );
 
 has 'local' => (
   is          => 'rw',
-  isa         => 'Bool',
-  metaclass   => 'MooseX::MetaDescription::Meta::Attribute',
-  description => {
-    encode_func => 'encode_bool',
-    type        => 'url',
-    required    => 0,
-  }
+  isa         => Bool,
 );
 
 around [qw/index allow_no_indices expand_wildcards flat_settings include_defaults ignore_unavailable local/] => sub {
@@ -88,5 +54,38 @@ around [qw/index allow_no_indices expand_wildcards flat_settings include_default
   }
   return ( $self->$orig );
 };
+
+sub api_spec {
+  state $s = +{
+    index => {
+      encode_func => 'as_is',
+      type        => 'path',
+    },
+    allow_no_indices => {
+      encode_func => 'encode_bool',
+      type        => 'url',
+    },
+    expand_wildcards => {
+      encode_func => 'as_is',
+      type        => 'url',
+    },
+    flat_settings => {
+      encode_func => 'encode_bool',
+      type        => 'url',
+    },
+    include_defaults => {
+      encode_func => 'encode_bool',
+      type        => 'url',
+    },
+    ignore_unavailable => {
+      encode_func => 'encode_bool',
+      type        => 'url',
+    },
+    local => {
+      encode_func => 'encode_bool',
+      type        => 'url',
+    }
+  };
+}
 
 1;

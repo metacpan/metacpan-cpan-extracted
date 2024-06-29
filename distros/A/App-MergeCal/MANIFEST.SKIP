@@ -1,0 +1,10 @@
+^App-MergeCal-.+/
+^.+\.ics
+^.+\.json
+^\.git/
+^\.github/
+^\.gitignore$
+^blib/
+^pm_to_lib/
+^Makefile$
+\.bak$

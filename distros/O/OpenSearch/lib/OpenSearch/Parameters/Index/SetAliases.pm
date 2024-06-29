@@ -1,37 +1,25 @@
 package OpenSearch::Parameters::Index::SetAliases;
-use Moose::Role;
+use strict;
+use warnings;
+use feature qw(state);
+use Types::Standard qw(Str ArrayRef);
+use Moo::Role;
+
+with 'OpenSearch::Parameters';
 
 has 'actions' => (
   is          => 'rw',
-  isa         => 'ArrayRef',
-  metaclass   => 'MooseX::MetaDescription::Meta::Attribute',
-  description => {
-    encode_func => 'as_is',
-    type        => 'body',
-    required    => 0,
-  }
+  isa         => ArrayRef,
 );
 
 has 'cluster_manager_timeout' => (
   is          => 'rw',
-  isa         => 'Str',
-  metaclass   => 'MooseX::MetaDescription::Meta::Attribute',
-  description => {
-    encode_func => 'as_is',
-    type        => 'url',
-    required    => 0,
-  }
+  isa         => Str,
 );
 
 has 'timeout' => (
   is          => 'rw',
-  isa         => 'Str',
-  metaclass   => 'MooseX::MetaDescription::Meta::Attribute',
-  description => {
-    encode_func => 'as_is',
-    type        => 'url',
-    required    => 0,
-  }
+  isa         => Str,
 );
 
 around [qw/actions cluster_manager_timeout timeout/] => sub {
@@ -44,5 +32,22 @@ around [qw/actions cluster_manager_timeout timeout/] => sub {
   }
   return ( $self->$orig );
 };
+
+sub api_spec {
+  state $s = +{
+    actions => {
+      encode_func => 'as_is',
+      type        => 'body',
+    },
+    cluster_manager_timeout => {
+      encode_func => 'as_is',
+      type        => 'url',
+    },
+    timeout => {
+      encode_func => 'as_is',
+      type        => 'url',
+    }
+  };
+}
 
 1;

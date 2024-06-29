@@ -1,3 +1,8 @@
+0.12 2024-06-28T20:06:23+02:00
+ - Add test for MetaCPAN->search with version.
+ - Fix minimal version of Test::Warn.
+ - Functional tests of MetaCPAN->search() to top of test file.
+
 0.11 2024-06-23T16:49:45+02:00
  - Add doc for App::CPAN::Get::MetaCPAN.
  - Add tests for Get::run().

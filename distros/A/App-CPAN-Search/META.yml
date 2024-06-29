@@ -10,7 +10,7 @@ build_requires:
   Test::More: 0
   Test::NoWarnings: 0
   Test::Output: 0
-  Test::Warn: 0
+  Test::Warn: 0.31
 configure_requires:
   ExtUtils::MakeMaker: 6.59
 distribution_type: module
@@ -36,4 +36,4 @@ resources:
   homepage: https://github.com/michal-josef-spacek/App-CPAN-Search
   license: http://opensource.org/licenses/bsd-license.php
   repository: git://github.com/michal-josef-spacek/App-CPAN-Search
-version: '0.10'
+version: '0.11'

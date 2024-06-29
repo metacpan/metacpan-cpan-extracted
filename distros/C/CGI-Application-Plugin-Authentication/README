@@ -615,10 +615,10 @@ METHODS
     times. This allows us to call initialize as late as possible in the
     request so that no unnecessary work is done.
 
-    The user will be logged out by calling the "logout()" method if the
-    login session has been idle for too long, if it has been too long since
-    the last login, or if the login has timed out. If you need to know if a
-    user was logged out because of a time out, you can call the
+    The user will be logged out by calling the logout() method if the login
+    session has been idle for too long, if it has been too long since the
+    last login, or if the login has timed out. If you need to know if a user
+    was logged out because of a time out, you can call the
     "is_login_timeout" method.
 
     If all goes well, a true value will be returned, although it is usually

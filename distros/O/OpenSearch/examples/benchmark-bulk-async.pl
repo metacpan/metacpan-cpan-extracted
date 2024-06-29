@@ -156,7 +156,7 @@ while ( !$done ) {
 
   my $res = $doc->bulk(
     index => $benchmark_index,
-    _body => $docs
+    docs  => $docs
   )->then( sub {
     my $res = shift;
   } )->catch( sub { die(shift) } );

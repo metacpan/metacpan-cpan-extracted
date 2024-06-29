@@ -1,14 +1,15 @@
 package OpenSearch::Filter::Source;
 use strict;
 use warnings;
+use Moo;
+use Types::Standard qw(Bool ArrayRef);
+use Data::Dumper;
 use feature qw(signatures);
 no warnings qw(experimental::signatures);
-use Moose;
-use Data::Dumper;
 
-has 'includes' => ( is => 'rw', isa => 'ArrayRef', default => sub { []; } );
-has 'excludes' => ( is => 'rw', isa => 'ArrayRef', default => sub { []; } );
-has 'source'   => ( is => 'rw', isa => 'Bool',     default => sub { 1; } );
+has 'includes' => ( is => 'rw', isa => ArrayRef, default => sub { []; } );
+has 'excludes' => ( is => 'rw', isa => ArrayRef, default => sub { []; } );
+has 'source'   => ( is => 'rw', isa => Bool,     default => sub { 1; } );
 
 around BUILDARGS => sub {
   my $orig  = shift;

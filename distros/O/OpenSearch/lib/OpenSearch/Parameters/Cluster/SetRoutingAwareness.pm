@@ -1,38 +1,25 @@
 package OpenSearch::Parameters::Cluster::SetRoutingAwareness;
-use Moose::Role;
-use Moose::Util::TypeConstraints;
+use strict;
+use warnings;
+use feature qw(state);
+use Types::Standard qw(Str HashRef);
+use Moo::Role;
+
+with 'OpenSearch::Parameters';
 
 has 'attribute' => (
   is          => 'rw',
-  isa         => 'Str',
-  metaclass   => 'MooseX::MetaDescription::Meta::Attribute',
-  description => {
-    encode_func => 'as_is',
-    type        => 'path',
-    required    => 0,
-  }
+  isa         => Str,
 );
 
 has '_version' => (
   is          => 'rw',
-  isa         => 'Str',
-  metaclass   => 'MooseX::MetaDescription::Meta::Attribute',
-  description => {
-    encode_func => 'as_is',
-    type        => 'body',
-    required    => 0,
-  }
+  isa         => Str,
 );
 
 has 'weights' => (
   is          => 'rw',
-  isa         => 'HashRef',
-  metaclass   => 'MooseX::MetaDescription::Meta::Attribute',
-  description => {
-    encode_func => 'as_is',
-    type        => 'body',
-    required    => 0,
-  }
+  isa         => HashRef,
 );
 
 around [qw/attribute weights _version/] => sub {
@@ -45,5 +32,22 @@ around [qw/attribute weights _version/] => sub {
   }
   return ( $self->$orig );
 };
+
+sub api_spec {
+  state $s = +{
+    attribute => {
+      encode_func => 'as_is',
+      type        => 'path',
+    },
+    _version => {
+      encode_func => 'as_is',
+      type        => 'body',
+    },
+    weights => {
+      encode_func => 'as_is',
+      type        => 'body',
+    }
+  };
+}
 
 1;

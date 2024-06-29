@@ -1,11 +1,12 @@
 package OpenSearch::Filter::Nodes;
 use strict;
 use warnings;
-use Moose::Util::TypeConstraints;
+use Types::Standard qw(Str Enum);
+use Moo;
 use feature qw(signatures);
 no warnings qw(experimental::signatures);
-use Moose;
 
+=head1 TODO
 subtype 'node_id',   as 'Str', where { $_ =~ /^[a-zA-Z0-9_]+$/ };
 subtype 'node_name', as 'Str', where { $_ =~ /^[a-zA-Z0-9_\-\.]+$/ };    # Dont actually know how it may look like?
 subtype 'node_ip', as 'Str',
@@ -69,5 +70,5 @@ sub to_string($self) {
   }
 
 }
-
+=cut
 1;

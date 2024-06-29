@@ -41,16 +41,18 @@
          }
       },
       "runtime" : {
+         "recommends" : {
+            "Class::XSAccessor" : "0",
+            "Type::Tiny::XS" : "0"
+         },
          "requires" : {
             "Data::Format::Pretty::JSON" : "0",
-            "Hash::AsObject" : "0",
             "IO::Socket::SSL" : "0",
             "JSON::XS" : "0",
             "Mojolicious" : "0",
-            "Moose" : "0",
-            "MooseX::MetaDescription::Meta::Attribute" : "0",
-            "MooseX::Singleton" : "0",
+            "Moo" : "0",
             "Net::SSLeay" : "0",
+            "Type::Tiny" : "0",
             "perl" : "5.008001"
          }
       },
@@ -64,7 +66,7 @@
    "provides" : {
       "OpenSearch" : {
          "file" : "lib/OpenSearch.pm",
-         "version" : "0.92"
+         "version" : "0.94"
       },
       "OpenSearch::Base" : {
          "file" : "lib/OpenSearch/Base.pm"
@@ -195,6 +197,9 @@
       "OpenSearch::Index::UpdateSettings" : {
          "file" : "lib/OpenSearch/Index/UpdateSettings.pm"
       },
+      "OpenSearch::Parameters" : {
+         "file" : "lib/OpenSearch/Parameters.pm"
+      },
       "OpenSearch::Parameters::Cluster::AllocationExplain" : {
          "file" : "lib/OpenSearch/Parameters/Cluster/AllocationExplain.pm"
       },
@@ -303,6 +308,33 @@
       "OpenSearch::Parameters::Search::Search" : {
          "file" : "lib/OpenSearch/Parameters/Search/Search.pm"
       },
+      "OpenSearch::Parameters::Security::ChangePassword" : {
+         "file" : "lib/OpenSearch/Parameters/Security/ChangePassword.pm"
+      },
+      "OpenSearch::Parameters::Security::CreateRole" : {
+         "file" : "lib/OpenSearch/Parameters/Security/CreateRole.pm"
+      },
+      "OpenSearch::Parameters::Security::CreateUser" : {
+         "file" : "lib/OpenSearch/Parameters/Security/CreateUser.pm"
+      },
+      "OpenSearch::Parameters::Security::DeleteRole" : {
+         "file" : "lib/OpenSearch/Parameters/Security/DeleteRole.pm"
+      },
+      "OpenSearch::Parameters::Security::DeleteUser" : {
+         "file" : "lib/OpenSearch/Parameters/Security/DeleteUser.pm"
+      },
+      "OpenSearch::Parameters::Security::GetRole" : {
+         "file" : "lib/OpenSearch/Parameters/Security/GetRole.pm"
+      },
+      "OpenSearch::Parameters::Security::GetUser" : {
+         "file" : "lib/OpenSearch/Parameters/Security/GetUser.pm"
+      },
+      "OpenSearch::Parameters::Security::PatchUser" : {
+         "file" : "lib/OpenSearch/Parameters/Security/PatchUser.pm"
+      },
+      "OpenSearch::Parameters::Security::PatchUsers" : {
+         "file" : "lib/OpenSearch/Parameters/Security/PatchUsers.pm"
+      },
       "OpenSearch::Remote" : {
          "file" : "lib/OpenSearch/Remote.pm"
       },
@@ -320,6 +352,66 @@
       },
       "OpenSearch::Search::Search" : {
          "file" : "lib/OpenSearch/Search/Search.pm"
+      },
+      "OpenSearch::Security" : {
+         "file" : "lib/OpenSearch/Security.pm"
+      },
+      "OpenSearch::Security::AuthInfo" : {
+         "file" : "lib/OpenSearch/Security/AuthInfo.pm"
+      },
+      "OpenSearch::Security::ChangePassword" : {
+         "file" : "lib/OpenSearch/Security/ChangePassword.pm"
+      },
+      "OpenSearch::Security::CreateRole" : {
+         "file" : "lib/OpenSearch/Security/CreateRole.pm"
+      },
+      "OpenSearch::Security::CreateUser" : {
+         "file" : "lib/OpenSearch/Security/CreateUser.pm"
+      },
+      "OpenSearch::Security::DeleteRole" : {
+         "file" : "lib/OpenSearch/Security/DeleteRole.pm"
+      },
+      "OpenSearch::Security::DeleteUser" : {
+         "file" : "lib/OpenSearch/Security/DeleteUser.pm"
+      },
+      "OpenSearch::Security::GetAccountDetails" : {
+         "file" : "lib/OpenSearch/Security/GetAccountDetails.pm"
+      },
+      "OpenSearch::Security::GetCerts" : {
+         "file" : "lib/OpenSearch/Security/GetCerts.pm"
+      },
+      "OpenSearch::Security::GetRole" : {
+         "file" : "lib/OpenSearch/Security/GetRole.pm"
+      },
+      "OpenSearch::Security::GetRoles" : {
+         "file" : "lib/OpenSearch/Security/GetRoles.pm"
+      },
+      "OpenSearch::Security::GetUser" : {
+         "file" : "lib/OpenSearch/Security/GetUser.pm"
+      },
+      "OpenSearch::Security::GetUsers" : {
+         "file" : "lib/OpenSearch/Security/GetUsers.pm"
+      },
+      "OpenSearch::Security::PatchUser" : {
+         "file" : "lib/OpenSearch/Security/PatchUser.pm"
+      },
+      "OpenSearch::Security::PatchUsers" : {
+         "file" : "lib/OpenSearch/Security/PatchUsers.pm"
+      },
+      "OpenSearch::Security::PermissionsInfo" : {
+         "file" : "lib/OpenSearch/Security/PermissionsInfo.pm"
+      },
+      "OpenSearch::Security::ReloadHTTPCerts" : {
+         "file" : "lib/OpenSearch/Security/ReloadHTTPCerts.pm"
+      },
+      "OpenSearch::Security::ReloadTransportCerts" : {
+         "file" : "lib/OpenSearch/Security/ReloadTransportCerts.pm"
+      },
+      "OpenSearch::Security::SSLInfo" : {
+         "file" : "lib/OpenSearch/Security/SSLInfo.pm"
+      },
+      "OpenSearch::Security::Whoami" : {
+         "file" : "lib/OpenSearch/Security/Whoami.pm"
       }
    },
    "release_status" : "stable",
@@ -334,8 +426,9 @@
          "web" : "https://github.com/localh0rst/OpenSearch-Perl"
       }
    },
-   "version" : "0.92",
+   "version" : "0.94",
    "x_contributors" : [
+      "Nicolas Franck <nicolas.franck@ugent.be>",
       "localh0rst <git@fail.ninja>",
       "localh0rst <localh0rst@users.noreply.github.com>"
    ],

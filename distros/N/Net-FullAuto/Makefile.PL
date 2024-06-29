@@ -26,7 +26,7 @@
 ################################################################
 
 
-our $VERSION='1.0000659';
+our $VERSION='1.0000662';
 
 
 if ($ENV{'AUTOMATED_TESTING'}) {
@@ -94,7 +94,7 @@ if ($ENV{'AUTOMATED_TESTING'}) {
 
       run cpan and at the cpan command prompt type "install Net::FullAuto".
 
-      Be sure $ENV{'AUTOMATED_TESTING'}==0.
+      Be sure $ENV{'AUTOMATED_TESTING'}=0.
 
       Net::FullAuto will install successfully on any Linux flavor or FreeBSD
       server in Amazon EC2. It will also install with Cygwin on Windows.
@@ -287,9 +287,9 @@ if ($ARGV[0]=~/\.pem/) {
 }
 our $system_type='';
 # Bullet Proof Test for AWS EC2
-# wget --tries=1 --timeout=5 -qO- http://169.254.169.254/latest/dynamic/instance-identity/document 2>&1
-my $aws=`wget --tries=1 --timeout=5 -qO- http://169.254.169.254/latest/dynamic/instance-identity/document 2>&1`;
-$aws=(-1<index $aws,'signature')?1:0;
+# https://serverfault.com/questions/462903/how-to-know-if-a-machine-is-an-ec2-instance
+my $aws=`/bin/bash -c 'if [ -f /sys/hypervisor/uuid ];then if [ \`/bin/head -c 3 /sys/hypervisor/uuid\`=="ec2" ];then echo yes;else echo no;fi;elif [ -r /sys/devices/virtual/dmi/id/product_uuid ];then if [ \`/bin/head -c 3 /sys/devices/virtual/dmi/id/product_uuid\` == "EC2" ]; then echo yes;else echo no;fi;else if \$(curl -s -m 5 http://169.254.169.254/latest/dynamic/instance-identity/document | grep -q availabilityZone);then echo yes;else echo no;fi;fi'`;
+$aws=(-1<index $aws,'yes')?1:0;
 if (($^O eq 'linux' || $^O eq 'freebsd') && !(grep { /SKIP/i } @ARGV)) {
    if ((-e "/etc/system-release-cpe") &&
          ((-1<index `cat /etc/system-release-cpe`,'amazon:linux') ||
@@ -304,8 +304,7 @@ if (($^O eq 'linux' || $^O eq 'freebsd') && !(grep { /SKIP/i } @ARGV)) {
    } elsif ((-e "/etc/os-release") &&
          (-1<index `cat /etc/os-release`,'ubuntu')) {
 
-      #if (-1<index `sudo dmesg | grep -Ew 'DMI|Amazon|EC2'`,'amazon') {}
-      $amazon{'ubuntu'}='' if $aws;   
+      $amazon{'ubuntu'}='' if $aws;
       $system_type='ubuntu';
    } elsif ($^O eq 'freebsd') {
 
@@ -1160,7 +1159,7 @@ END
    # to install Net::FullAuto on an EC2 image have consented to this,
    # especially since Admin privileges are needed to do this.
 
-         my $message=<<END;
+   my $message=<<END;
 
    This message times out in two minutes so FullAuto Install can continue
 
@@ -1241,10 +1240,46 @@ END
 } elsif ((exists $amazon{'amazon_linux'}) || (exists $amazon{'centos'}) ||
       $system_type eq 'centos') {
 
-   # Most Amazon images need a lot of helper software like compilers
+   # Most Linux systems need a lot of helper software like compilers
    # to install all module dependencies. It is assumed users attempting
-   # to install Net::FullAuto on an EC2 image have consented to this,
+   # to install Net::FullAuto on a Linux system have consented to this,
    # especially since Admin privileges are needed to do this.
+
+         my $message=<<END;
+
+   This message times out in two minutes so FullAuto Install can continue
+
+    ___     _ _   _       _                    _    _
+   | __|  _| | | /_\\ _  _| |_ ___   ___ _ _   | |  (_)_ _ _  ___ __
+   | _| || | | |/ _ \\ || |  _/ _ \\ / _ \\ ' \\  | |__| | ' \\ || \\ \\ /
+   |_| \\_,_|_|_/_/ \\_\\_,_|\\__\\___/ \\___/_||_| |____|_|_||_\\_,_/_\\_\\
+
+   In order to install FullAuto on Linux servers, a number of
+   prerequisite dependencies must be installed or present. Allow
+   FullAuto Setup to validate and install any missing dependencies?
+   (Default is 'yes')
+
+END
+
+   my $timeout=120;
+   my $fae="No   (FullAuto Setup will exit)";
+   {
+      local $SIG{__DIE__}; # No sigdie handler
+      eval {
+         local $SIG{ALRM} = sub { die "alarm\n" }; # NB: \n required
+         alarm $timeout;
+         my $menu1 = [
+               $message,
+               [ "Yes", sub{ return 'Yes' } ],
+               [ $fae, sub{ return 'No' } ],
+               ];
+         my $selection=&menu($menu1);
+         exit 0 if $selection eq ']quit[';
+         exit 0 if -1<index $selection, 'No';
+         alarm 0;
+      };
+   }
+   print "\n\n   FullAuto install continues . . .\n\n";
 
    my $yins=`yum list installed`;
    unless (-1<index $yins,'openssl-devel') {
@@ -1441,9 +1476,10 @@ END
       }
    }
 }
-
-if (exists $amazon{'amazon_linux'} || exists $amazon{'ubuntu'} ||
-      exists $amazon{'centos'} || exists $amazon{'rhel'}) {
+my $awscli=`aws 2>&1`;
+if ((-1==index $awscli,'usage') && (exists $amazon{'amazon_linux'} ||
+      exists $amazon{'ubuntu'} || exists $amazon{'centos'} ||
+      exists $amazon{'rhel'})) {
    my $message=<<END;
 
    This message times out in two minutes so FullAuto Install can continue
@@ -1460,7 +1496,7 @@ if (exists $amazon{'amazon_linux'} || exists $amazon{'ubuntu'} ||
 END
 
    my $timeout=120;my $selection='';
-   my $fae="No   (FullAuto Setup will exit)";
+   my $fae="No";
    {
       local $SIG{__DIE__}; # No sigdie handler
       eval {
@@ -2031,6 +2067,7 @@ if ($^O ne 'MSWin32' && $^O ne 'MSWin64') {
    &fa_install_module('ExtUtils::InstallPaths','install','Makefile');
    &fa_install_module('ExtUtils::Helpers','install','Makefile');
    &fa_install_module('Test::Harness','install','Makefile','','3.33');
+   &fa_install_module('CPAN::Requirements::Dynamic','install','Makefile');
    &fa_install_module('Module::Build::Tiny','install','Build');
    &fa_install_module('IO::Socket::IP','install','Build');
    &fa_install_module('Test::Needs','install','Makefile');

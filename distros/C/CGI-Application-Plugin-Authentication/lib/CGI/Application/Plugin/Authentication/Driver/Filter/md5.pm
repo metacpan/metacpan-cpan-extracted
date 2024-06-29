@@ -1,5 +1,5 @@
 package CGI::Application::Plugin::Authentication::Driver::Filter::md5;
-$CGI::Application::Plugin::Authentication::Driver::Filter::md5::VERSION = '0.24';
+$CGI::Application::Plugin::Authentication::Driver::Filter::md5::VERSION = '0.25';
 use strict;
 use warnings;
 

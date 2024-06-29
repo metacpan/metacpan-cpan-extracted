@@ -1,0 +1,155 @@
+# NAME
+
+String::Random::Regexp::regxstring - Generate random strings from a regular expression
+
+# VERSION
+
+Version 0.02
+
+# SYNOPSIS
+
+This module provides functionality for generating random strings from a
+regular expression by bridging
+to the [regxstring C++ library by daidodo](https://github.com/daidodo/regxstring)
+via XS.
+
+    use String::Random::Regexp::regxstring;
+
+    my $strings = generate_random_strings(
+        '^([A-Z]|[0-9]){10}\d{5}xxx(\d{3})?',
+        3
+    );
+    # generates 3 random strings based on the regexp
+    #   3F3YR2W22947580xxx
+    #   N5HHM8LW0K59719xxx957
+    #   G2DQL6JF1E91086xxx
+
+    # or provide it with a Regexp object
+    my $strings = generate_random_strings(
+        qr/^([A-Z]|[0-9]){10}\d{5}xxx(\d{3})?/,
+        3
+    );
+
+    # or enable debug
+    my $strings = generate_random_strings(
+        qr/^([A-Z]|[0-9]){10}\d{5}xxx(\d{3})?/,
+        3,
+        1
+    );
+
+# EXPORT
+
+- `generate_random_strings` : generates random strings
+- `:all` : tag for exporting all available export symbols
+
+# SUBROUTINES
+
+## `generate_random_strings`
+
+    my $strings = generate_random_strings($regexp, $N, [$debug])
+
+Arguments:
+
+- `$regexp` : a regular expression either as a string
+or as a Regexp object created via e.g. `qr/.../`
+- `$N` : the number of random strings to generate.
+- `$debug` : optionally enable debug, if set to 1. By default it is turned off.
+
+Given a regular expression, this subroutine will generate
+`$N` random strings which are guaranteed to be matched by
+the specified regular expression.
+
+The generated random strings will be returned back as an ARRAY ref.
+
+`undef` is returned on error, e.g. when no regular expression was
+specified or when the number of random strings to generate is not positive.
+
+# ALTERNATIVES
+
+There are at least two alternative modules at CPAN which I have tested.
+
+[String::Random](https://metacpan.org/pod/String%3A%3ARandom) and [Regexp::Genex](https://metacpan.org/pod/Regexp%3A%3AGenex). Both fail with rudimentary
+regular expressions.
+
+The former does not support groups and therefore
+all parentheses have to be removed from the regular expression first.
+But this is not a trivial task. For example:
+
+    use String::Random qw/random_regex/;
+    print random_regex('[A-HN-SW]\d{7}[A-J]ES[A-HN-SW]\d{7}[A-J](?:xx)?');
+    # '(' not implemented.  treating literally.
+
+The latter fails randomly on large regular expressions, e.g. `[A-HN-SW]\d{7}[A-J]xxx`
+but succeeds with the shorter `[A-HN-SW]\d{7}[A-J]`
+
+# AUTHOR
+
+Andreas Hadjiprocopis, `<bliako at cpan.org>`
+
+# DEDICATIONS
+
+!Almaz!
+
+# CAVEATS
+
+The XS function for generating random strings accepts
+the input regular expression as a string. This means
+that if a Regexp object was supplied to [generate\_random\_strings](https://metacpan.org/pod/generate_random_strings),
+the regular expression as a string must be extracted. And this
+is done by stringifying the Regexp object, e.g. `my $str = "".qr/abc/`
+However, the stringification encloses the regular expression within
+a `(?^:` and `)`. For example:
+
+    print "".qr/^(abc)/
+    # prints (?^:^(abc))
+
+Currently, the subroutine will remove this "enclosure".
+It remains to be seen whether this is 100% successful.
+
+I have not tested the statistical distribution of the results in
+regular expressions like `a|b|c|d`. They must appear equally often.
+
+# BUGS
+
+Please report any bugs or feature requests to `bug-string-random-regexp-regxstring at rt.cpan.org`, or through
+the web interface at [https://rt.cpan.org/NoAuth/ReportBug.html?Queue=String-Random-Regexp-regxstring](https://rt.cpan.org/NoAuth/ReportBug.html?Queue=String-Random-Regexp-regxstring).  I will be notified, and then you'll
+automatically be notified of progress on your bug as I make changes.
+
+# SUPPORT
+
+You can find documentation for this module with the perldoc command.
+
+    perldoc String::Random::Regexp::regxstring
+
+You can also look for information at:
+
+- RT: CPAN's request tracker (report bugs here)
+
+    [https://rt.cpan.org/NoAuth/Bugs.html?Dist=String-Random-Regexp-regxstring](https://rt.cpan.org/NoAuth/Bugs.html?Dist=String-Random-Regexp-regxstring)
+
+- Review this module at PerlMonks
+
+    not yet...
+
+- Search CPAN
+
+    [https://metacpan.org/release/String-Random-Regexp-regxstring](https://metacpan.org/release/String-Random-Regexp-regxstring)
+
+# ACKNOWLEDGEMENTS
+
+The core functionality to this module is provided by the C++
+library for generating random strings from regular expressions
+located at [https://github.com/daidodo](https://github.com/daidodo).
+The author is DoZerg / daidodo. The Licence is Apache v2.0.
+
+The source code of this library is included in the current module.
+
+I have provided C++ harness code, the XS interface and the Perl module.
+
+# LICENSE AND COPYRIGHT
+
+This software is Copyright (c) 2024 by Andreas Hadjiprocopis.
+
+This is free software, licensed under:
+
+    The Artistic License 2.0 (GPL Compatible)

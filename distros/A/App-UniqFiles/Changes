@@ -1,3 +1,11 @@
+0.142   2024-06-26  Released-By: PERLANCAR; Urgency: low
+
+        - No functional changes.
+
+        - [dist] Edit Changes metadata
+          (Backward-{Compatible,Incompatible}).
+
+
 0.141   2023-02-06  Released-By: PERLANCAR; Urgency: medium
 
         - No functional changes.
@@ -65,7 +73,7 @@
         - [build] Rebuild with updated tools for nicer POD.
 
 
-0.132   2020-06-01  Released-By: PERLANCAR; Urgency: medium; Backward-Compatible: no
+0.132   2020-06-01  Released-By: PERLANCAR; Urgency: medium; Backward-Incompatible: yes
 
 	- [incompatible change] For consistency, rename --count to --show-count.
 	  --count is still supported as alias; but if you use the function from

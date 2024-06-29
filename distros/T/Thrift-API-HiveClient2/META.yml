@@ -28,6 +28,7 @@ requires:
   Authen::SASL: '0'
   Carp: '0'
   Class::Accessor: '0'
+  IO::Socket::SSL: '0'
   List::MoreUtils: '0'
   Moo: '0'
   Scalar::Util: '0'
@@ -45,7 +46,7 @@ requires:
   warnings: '0'
 resources:
   repository: git://github.com/burak/Thrift-API-HiveClient2.git
-version: '0.025'
+version: '0.026'
 x_contributors:
   - 'Burak Gursoy <burak@cpan.org>'
   - 'David Morel <dmor@cpan.org>'

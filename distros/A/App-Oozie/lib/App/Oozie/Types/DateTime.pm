@@ -4,7 +4,7 @@ use 5.014;
 use strict;
 use warnings;
 
-our $VERSION = '0.019'; # VERSION
+our $VERSION = '0.020'; # VERSION
 
 use App::Oozie::Date;
 use App::Oozie::Constants qw(
@@ -88,7 +88,7 @@ App::Oozie::Types::DateTime
 
 =head1 VERSION
 
-version 0.019
+version 0.020
 
 =head1 SYNOPSIS
 

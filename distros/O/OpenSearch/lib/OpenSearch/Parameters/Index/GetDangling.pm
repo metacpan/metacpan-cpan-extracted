@@ -1,48 +1,30 @@
 package OpenSearch::Parameters::Index::GetDangling;
-use Moose::Role;
+use strict;
+use warnings;
+use feature qw(state);
+use Types::Standard qw(Str Bool);
+use Moo::Role;
+
+with 'OpenSearch::Parameters';
 
 has 'index_uuid' => (
   is          => 'rw',
-  isa         => 'Str',
-  metaclass   => 'MooseX::MetaDescription::Meta::Attribute',
-  description => {
-    encode_func => 'as_is',
-    type        => 'path',
-    required    => 0,
-  }
+  isa         => Str,
 );
 
 has 'accept_data_loss' => (
   is          => 'rw',
-  isa         => 'Bool',
-  metaclass   => 'MooseX::MetaDescription::Meta::Attribute',
-  description => {
-    encode_func => 'encode_bool',
-    type        => 'url',
-    required    => 0,
-  }
+  isa         => Bool,
 );
 
 has 'timeout' => (
   is          => 'rw',
-  isa         => 'Str',
-  metaclass   => 'MooseX::MetaDescription::Meta::Attribute',
-  description => {
-    encode_func => 'as_is',
-    type        => 'url',
-    required    => 0,
-  }
+  isa         => Str,
 );
 
 has 'cluster_manager_timeout' => (
   is          => 'rw',
-  isa         => 'Str',
-  metaclass   => 'MooseX::MetaDescription::Meta::Attribute',
-  description => {
-    encode_func => 'as_is',
-    type        => 'url',
-    required    => 0,
-  }
+  isa         => Str,
 );
 
 around [qw/index_uuid accept_data_loss timeout cluster_manager_timeout/] => sub {
@@ -55,5 +37,26 @@ around [qw/index_uuid accept_data_loss timeout cluster_manager_timeout/] => sub 
   }
   return ( $self->$orig );
 };
+
+sub api_spec {
+  state $s = +{
+    index_uuid => {
+      encode_func => 'as_is',
+      type        => 'path',
+    },
+    accept_data_loss => {
+      encode_func => 'encode_bool',
+      type        => 'url',
+    },
+    timeout => {
+      encode_func => 'as_is',
+      type        => 'url',
+    },
+    cluster_manager_timeout => {
+      encode_func => 'as_is',
+      type        => 'url',
+    }
+  };
+}
 
 1;

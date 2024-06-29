@@ -33,6 +33,8 @@ like $contents, qr/because documents edited in MsWord often have run boundaries 
   "XML after merging runs";
 
 
+
+
 like $contents,   qr/somme de 1'200/,                             "do not remove runs containing '0'";
 like $contents,   qr/SMALL &amp; CAPS LTD/,                       "w:caps preserves HTML entities";
 unlike $contents, qr/bookmarkStart/,                              "remove bookmarks (no markup)";
@@ -54,11 +56,25 @@ like $test_tabs, qr/starts\twith an\tinitial TAB, and also has\tmany internal TA
                                                                   "TABS were preserved";
 
 
+
+# check preservation of tabs through replacements
+$surgeon->document->replace(qr/\bDO_NOT_LOSE_THE_INITIAL_TAB\b/ => sub {
+     my %args = @_;
+     my $replacement_txt = "AFTER_REPLACE";
+     return $args{xml_before} ? "$args{xml_before}<w:t>$replacement_txt</w:t>" : $replacement_txt;
+   }
+ );
+$plain_text = $surgeon->plain_text;
+like $plain_text, qr/\tAFTER_REPLACE/, "tab just before a replaced text is preserved";
+
+
 is_deeply [$surgeon->headers], [qw/header1 header2 header3/],     "headers";
 is_deeply [$surgeon->footers], [qw/footer1 footer2 footer3/],     "footers";
 
-
+# replace contents also in headers and footers
 $surgeon->all_parts_do(replace => qr/\bSurgeon\b/ => sub {"Ph<y>sician"}, cleanup_XML => 0);
+
+
 
 
 

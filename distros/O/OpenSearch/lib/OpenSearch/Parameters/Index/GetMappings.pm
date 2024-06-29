@@ -1,26 +1,22 @@
 package OpenSearch::Parameters::Index::GetMappings;
-use Moose::Role;
+use strict;
+use warnings;
+use feature qw(state);
+use Types::Standard qw(Str);
+use Types::Common::String qw(NonEmptyStr);
+use Moo::Role;
+
+with 'OpenSearch::Parameters';
 
 has 'index' => (
   is          => 'rw',
-  isa         => 'Str',
-  metaclass   => 'MooseX::MetaDescription::Meta::Attribute',
-  description => {
-    encode_func => 'as_is',
-    type        => 'path',
-    required    => 1,
-  }
+  isa         => NonEmptyStr,
+  required    => 1,
 );
 
 has 'field' => (
   is          => 'rw',
-  isa         => 'Str',
-  metaclass   => 'MooseX::MetaDescription::Meta::Attribute',
-  description => {
-    encode_func => 'as_is',
-    type        => 'path',
-    required    => 0,
-  }
+  isa         => Str,
 );
 
 around [qw/index field/] => sub {
@@ -33,5 +29,18 @@ around [qw/index field/] => sub {
   }
   return ( $self->$orig );
 };
+
+sub api_spec {
+  state $s = +{
+    index => {
+      encode_func => 'as_is',
+      type        => 'path',
+    },
+    field => {
+      encode_func => 'as_is',
+      type        => 'path',
+    }
+  };
+}
 
 1;

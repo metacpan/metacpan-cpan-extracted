@@ -1,20 +1,20 @@
 package OpenSearch::Remote::Info;
 use strict;
 use warnings;
+use Moo;
+use Types::Standard qw(InstanceOf);
 use feature qw(signatures);
 no warnings qw(experimental::signatures);
-use Moose;
 
 has '_base' => (
   is       => 'rw',
-  isa      => 'OpenSearch::Base',
-  required => 0,
-  lazy     => 1,
-  default  => sub { OpenSearch::Base->instance; }
+  isa      => InstanceOf['OpenSearch::Base'],
+  required => 1,
 );
 
 sub execute($self) {
   my $res = $self->_base->_get( $self, [ '_remote', 'info' ] );
 }
+
 
 1;

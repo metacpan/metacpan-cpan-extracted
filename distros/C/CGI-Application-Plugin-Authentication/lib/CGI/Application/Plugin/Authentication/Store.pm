@@ -1,5 +1,5 @@
 package CGI::Application::Plugin::Authentication::Store;
-$CGI::Application::Plugin::Authentication::Store::VERSION = '0.24';
+$CGI::Application::Plugin::Authentication::Store::VERSION = '0.25';
 use strict;
 use warnings;
 

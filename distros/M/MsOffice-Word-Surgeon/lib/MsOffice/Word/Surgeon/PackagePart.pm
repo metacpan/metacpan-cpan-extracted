@@ -22,7 +22,7 @@ use constant XML_SIMPLE_INDENT => 1;
 
 use namespace::clean -except => 'meta';
 
-our $VERSION = '2.06';
+our $VERSION = '2.07';
 
 #======================================================================
 # ATTRIBUTES
@@ -249,13 +249,11 @@ sub cleanup_XML {
   # start the cleanup
   $self->reduce_all_noises;
 
-  # remember the names of ASK fields before erasing them
   my $contents            = $self->contents;
-  my @names_of_ASK_fields = $contents =~ m[<w:instrText[^>]+?>\s+ASK\s+(\w+)]g;
 
-  # unlink fields, suppress bookmarks (and suppress content of ASK bookmarks), merge runs
+  # unlink fields, suppress bookmarks, merge runs
   $self->unlink_fields;
-  $self->suppress_bookmarks(full_range => \@names_of_ASK_fields, markup_only => qr/./);
+  $self->suppress_bookmarks;
   $self->merge_runs(@merge_args);
 
   # flag the fact that the cleanup was done
@@ -581,8 +579,13 @@ sub reveal_fields {
 sub unlink_fields {
   my $self = shift;
 
-  # replace all fields by just their "result" part (in other words, ignore the "code" part)
-  my $unlinker = sub {my $result = shift->result; return $result};
+  # replace all fields by just their "result" part (in other words, ignore the "code" part).
+  # ASK fields return an empty string (because they have a special treatment in Word, where
+  # their 'result' part is hidden, unlike all other fields.
+  my $unlinker = sub {
+    my $field = shift;
+    return $field->type eq 'ASK' ? '' : $field->result;
+  };
   $self->replace_fields($unlinker);
 }
 

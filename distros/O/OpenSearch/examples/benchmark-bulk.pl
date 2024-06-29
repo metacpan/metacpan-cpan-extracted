@@ -126,7 +126,7 @@ while ( $duration < $run_for ) {
 
   my $res = $doc->bulk(
     index => $benchmark_index,
-    _body => $docs
+    docs  => $docs
   );
 
   $duration = time - $start;

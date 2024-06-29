@@ -1,5 +1,5 @@
 package ExtUtils::Builder::Profile::Perl;
-$ExtUtils::Builder::Profile::Perl::VERSION = '0.007';
+$ExtUtils::Builder::Profile::Perl::VERSION = '0.008';
 use strict;
 use warnings;
 
@@ -43,14 +43,9 @@ sub process_linker {
 	}
 	my $os = _get_var($config, $opts, 'osname');
 	if ($linker->type eq 'executable' or $linker->type eq 'shared-library' or ($linker->type eq 'loadable-object' and $needs_relinking{$os})) {
-		if ($os eq 'MSWin32') {
-			$linker->add_argument(value => _split_var($config, $opts, 'libperl'), ranking => $linker->default_library_ranking - 1);
-		}
-		else {
-			my ($libperl, $libext, $so) = map { _get_var($config, $opts, $_) } qw/libperl lib_ext so/;
-			my ($lib) = $libperl =~ / \A (?:lib)? ( \w* perl \w* ) (?: \. $so | $libext) \b /msx;
-			$linker->add_libraries([$lib]);
-		}
+		my ($libperl, $libext, $so) = map { _get_var($config, $opts, $_) } qw/libperl lib_ext so/;
+		my ($lib) = $libperl =~ / \A (?:lib)? ( \w* perl \w* ) (?: \. $so | $libext) \b /msx;
+		$linker->add_libraries([$lib], ranking => sub { $_[0] - 1 });
 
 		my $libdir = catdir(_get_var($config, $opts, 'archlibexp'), 'CORE');
 		$linker->add_library_dirs([$libdir]);
@@ -79,7 +74,7 @@ ExtUtils::Builder::Profile::Perl - A profile for compiling and linking against p
 
 =head1 VERSION
 
-version 0.007
+version 0.008
 
 =head1 SYNOPSIS
 

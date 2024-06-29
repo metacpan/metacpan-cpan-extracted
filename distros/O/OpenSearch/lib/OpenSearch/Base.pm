@@ -1,42 +1,40 @@
 package OpenSearch::Base;
 use strict;
 use warnings;
-use Moose;
-use feature qw(signatures say);
-no warnings qw(experimental::signatures);
-use MooseX::Singleton;
+use Moo;
+use Types::Standard qw(Str Bool Int ArrayRef InstanceOf);
 use Mojo::UserAgent;
 use Mojo::URL;
 use Data::Dumper;
 use OpenSearch::Response;
+use feature qw(signatures say);
+no warnings qw(experimental::signatures);
 
 with 'OpenSearch::Helper';
 
-# This is a singleton class. We only want one instance of this class.
-
-has 'user'            => ( is => 'rw', isa => 'Str', required => 0 );   # Not really required since we can use Cert-Auth
-has 'pass'            => ( is => 'rw', isa => 'Str', required => 0 );   # Not really required since we can use Cert-Auth
-has 'ca_cert'         => ( is => 'rw', isa => 'Str', required => 0 );   # Dunno if that will work right now...
-has 'client_cert'     => ( is => 'rw', isa => 'Str', required => 0 );   # Dunno if that will work right now...
-has 'client_key'      => ( is => 'rw', isa => 'Str', required => 0 );   # Dunno if that will work right now...
-has 'hosts'           => ( is => 'rw', isa => 'ArrayRef[Str]', required => 1 );
-has 'secure'          => ( is => 'rw', isa => 'Str',           required => 1 );
-has 'allow_insecure'  => ( is => 'rw', isa => 'Str',           required => 0, default => sub { 0; } );
-has 'async'           => ( is => 'rw', isa => 'Bool',          required => 0, default => sub { 0; } );
-has 'max_connections' => ( is => 'rw', isa => 'Int',           required => 0, default => sub { 5; } );
+has 'user'            => ( is => 'rw', isa => Str, required => 0 );    # Not really required since we can use Cert-Auth
+has 'pass'            => ( is => 'rw', isa => Str, required => 0 );    # Not really required since we can use Cert-Auth
+has 'ca_cert'         => ( is => 'rw', isa => Str, required => 0 );    # Dunno if that will work right now...
+has 'client_cert'     => ( is => 'rw', isa => Str, required => 0 );    # Dunno if that will work right now...
+has 'client_key'      => ( is => 'rw', isa => Str, required => 0 );    # Dunno if that will work right now...
+has 'hosts'           => ( is => 'rw', isa => ArrayRef [Str], required => 1 );
+has 'secure'          => ( is => 'rw', isa => Str,  required => 1 );
+has 'allow_insecure'  => ( is => 'rw', isa => Str,  required => 0, default => sub { 0; } );
+has 'async'           => ( is => 'rw', isa => Bool, required => 0, default => sub { 0; } );
+has 'max_connections' => ( is => 'rw', isa => Int,  required => 0, default => sub { 5; } );
 
 # Clean attributes after each request. This is a bit of a hack. We should probably use a
 # new instance of the class for each request.
-has 'clear_attrs' => ( is => 'rw', isa => 'Bool', required => 0, default => sub { 0; } );
+has 'clear_attrs' => ( is => 'rw', isa => Bool, required => 0, default => sub { 0; } );
 
 # If one host is down, we put it here. Dont know yet how to test if a host is back up again
-has 'disabled_hosts' => ( is => 'rw', isa => 'ArrayRef[Str]', default => sub { []; } );
+has 'disabled_hosts' => ( is => 'rw', isa => ArrayRef [Str], default => sub { []; } );
 
 # We pre-create a number of Mojo::UserAgent Objects (dont know if that works)
-has 'pool_count' => ( is => 'rw', isa => 'Int', default => sub { 1; } );
+has 'pool_count' => ( is => 'rw', isa => Int, default => sub { 1; } );
 
 # Without this the ua will get out of scope to early and result in a Premature connection close...
-has 'ua_pool' => ( is => 'rw', isa => 'ArrayRef[Mojo::UserAgent]', lazy => 1, default => sub { []; } );
+has 'ua_pool' => ( is => 'rw', isa => ArrayRef [ InstanceOf ['Mojo::UserAgent'] ], lazy => 1, default => sub { []; } );
 
 sub BUILD( $self, @rest ) {
 
@@ -83,13 +81,13 @@ sub do_request( $self, $method, $url, $body ) {
   my ( $promise, $res );
 
   $promise =
-    $self->ua->$method(
-    $url => ( ref($body) eq 'HASH' ? 'json' : ( { 'Content-Type' => 'application/json' } ) ) => $body )
-    ->then( sub($tx) {
+    $self->ua->$method( $url =>
+      ( ( ref($body) eq 'HASH' || ref($body) eq 'ARRAY' ) ? 'json' : ( { 'Content-Type' => 'application/json' } ) ) =>
+      $body )->then( sub($tx) {
     return ( $self->response($tx) );
-    } )->catch( sub($error) {
+      } )->catch( sub($error) {
     return ($error);
-    } );
+      } );
 
   return ($promise) if $self->async;
 
@@ -130,4 +128,5 @@ sub response( $self, $tx ) {
   return ( OpenSearch::Response->new( _response => $tx->result ) );
 }
 
+#
 1;

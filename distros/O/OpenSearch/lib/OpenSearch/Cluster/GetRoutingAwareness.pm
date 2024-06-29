@@ -1,22 +1,22 @@
 package OpenSearch::Cluster::GetRoutingAwareness;
 use strict;
 use warnings;
+use Moo;
+use Types::Standard qw(InstanceOf);
 use feature qw(signatures);
 no warnings qw(experimental::signatures);
-use Moose;
 
 with 'OpenSearch::Parameters::Cluster::GetRoutingAwareness';
 
 has '_base' => (
   is       => 'rw',
-  isa      => 'OpenSearch::Base',
-  required => 0,
-  lazy     => 1,
-  default  => sub { OpenSearch::Base->instance; }
+  isa      => InstanceOf['OpenSearch::Base'],
+  required => 1,
 );
 
 sub execute($self) {
   my $res = $self->_base->_get( $self, [ '_cluster', 'routing', 'awareness', $self->attribute, 'weights' ] );
 }
+
 
 1;

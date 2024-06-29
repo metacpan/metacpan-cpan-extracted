@@ -1,5 +1,8 @@
 Revision history for JSON-Schema-Modern
 
+0.588     2024-06-28 17:14:22Z
+          - bump required version of Math::BigInt for bdiv, bmod fixes
+
 0.587     2024-06-26 22:55:11Z
           - fix multipleOf test that fails on some peculiar architectures
           - document the use of Sereal for caching large evaluator objects

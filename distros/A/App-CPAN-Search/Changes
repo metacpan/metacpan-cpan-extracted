@@ -1,3 +1,6 @@
+0.11 2024-06-28T19:53:36+02:00
+ - Fix minimal version of Test::Warn.
+
 0.10 2024-06-23T11:56:53+02:00
  - Add tests.
  - Improve cpan-search doc.

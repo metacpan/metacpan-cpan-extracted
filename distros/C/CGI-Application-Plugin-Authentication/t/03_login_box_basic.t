@@ -74,7 +74,13 @@ subtest 'empty' => sub {
     isa_ok($display, 'CGI::Application::Plugin::Authentication::Display');
     isa_ok($display, 'CGI::Application::Plugin::Authentication::Display::Basic');
     is($display->login_title, 'Sign In', 'title');
-    ok_regression(sub {return $display->login_box}, 't/out/basic_login_box', 'login box');
+    my $login_box_output = $display->login_box;
+    my $selfurl = $cgiapp->authen->_detaint_selfurl;
+    # shim to support CGIs >= 4.66 that return urls with trailing slashes
+    if ($selfurl eq 'http://localhost/') {
+       $login_box_output =~ s|value="$selfurl"|value="http://localhost"|;
+    }
+    ok_regression(sub { $login_box_output }, 't/out/basic_login_box', 'login box');
     is($display->logout_form, '', 'logout_form');
     is($display->is_authenticated, 0, 'is_authenticated');
     is($display->username, undef, 'username');

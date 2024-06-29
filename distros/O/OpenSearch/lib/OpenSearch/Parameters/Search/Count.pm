@@ -1,159 +1,80 @@
 package OpenSearch::Parameters::Search::Count;
-use Moose::Role;
-use OpenSearch::Filter::Source;
+use strict;
+use warnings;
+use feature qw(state);
+use Types::Standard qw(Str Bool Int HashRef);
+use Moo::Role;
+
+with 'OpenSearch::Parameters';
 
 has 'index' => (
   is          => 'rw',
-  isa         => 'Str',
-  metaclass   => 'MooseX::MetaDescription::Meta::Attribute',
-  description => {
-    encode_func => 'as_is',
-    type        => 'path',
-    required    => 0,
-  }
+  isa         => Str,
 );
 
 has 'allow_no_indices' => (
   is          => 'rw',
-  isa         => 'Bool',
-  metaclass   => 'MooseX::MetaDescription::Meta::Attribute',
-  description => {
-    encode_func => 'encode_bool',
-    type        => 'url',
-    required    => 0,
-  }
+  isa         => Bool,
 );
 
 has 'analyzer' => (
   is          => 'rw',
-  isa         => 'Str',
-  metaclass   => 'MooseX::MetaDescription::Meta::Attribute',
-  description => {
-    encode_func => 'as_is',
-    type        => 'url',
-    required    => 0,
-  }
+  isa         => Str,
 );
 
 has 'analyze_wildcard' => (
   is          => 'rw',
-  isa         => 'Bool',
-  metaclass   => 'MooseX::MetaDescription::Meta::Attribute',
-  description => {
-    encode_func => 'encode_bool',
-    type        => 'url',
-    required    => 0,
-  }
+  isa         => Bool,
 );
 
 has 'default_operator' => (
   is          => 'rw',
-  isa         => 'Str',
-  metaclass   => 'MooseX::MetaDescription::Meta::Attribute',
-  description => {
-    encode_func => 'as_is',
-    type        => 'url',
-    required    => 0,
-  }
+  isa         => Str,
 );
 
 has 'df' => (
   is          => 'rw',
-  isa         => 'Str',
-  metaclass   => 'MooseX::MetaDescription::Meta::Attribute',
-  description => {
-    encode_func => 'as_is',
-    type        => 'url',
-    required    => 0,
-  }
+  isa         => Str,
 );
 
 has 'expand_wildcards' => (
   is          => 'rw',
-  isa         => 'Str',
-  metaclass   => 'MooseX::MetaDescription::Meta::Attribute',
-  description => {
-    encode_func => 'as_is',
-    type        => 'url',
-    required    => 0,
-  }
+  isa         => Str,
 );
 
 has 'ignore_unavailable' => (
   is          => 'rw',
-  isa         => 'Bool',
-  metaclass   => 'MooseX::MetaDescription::Meta::Attribute',
-  description => {
-    encode_func => 'encode_bool',
-    type        => 'url',
-    required    => 0,
-  }
+  isa         => Bool,
 );
 
 has 'lenient' => (
   is          => 'rw',
-  isa         => 'Bool',
-  metaclass   => 'MooseX::MetaDescription::Meta::Attribute',
-  description => {
-    encode_func => 'encode_bool',
-    type        => 'url',
-    required    => 0,
-  }
+  isa         => Bool,
 );
 
 has 'min_score' => (
   is          => 'rw',
-  isa         => 'Int',
-  metaclass   => 'MooseX::MetaDescription::Meta::Attribute',
-  description => {
-    encode_func => 'as_is',
-    type        => 'body',
-    required    => 0,
-  }
+  isa         => Int,
 );
 
 has 'routing' => (
   is          => 'rw',
-  isa         => 'Str',
-  metaclass   => 'MooseX::MetaDescription::Meta::Attribute',
-  description => {
-    encode_func => 'as_is',
-    type        => 'url',
-    required    => 0,
-  }
+  isa         => Str,
 );
 
 has 'preference' => (
   is          => 'rw',
-  isa         => 'Str',
-  metaclass   => 'MooseX::MetaDescription::Meta::Attribute',
-  description => {
-    encode_func => 'as_is',
-    type        => 'url',
-    required    => 0,
-  }
+  isa         => Str,
 );
 
 has 'terminate_after' => (
   is          => 'rw',
-  isa         => 'Int',
-  metaclass   => 'MooseX::MetaDescription::Meta::Attribute',
-  description => {
-    encode_func => 'as_is',
-    type        => 'body',
-    required    => 0,
-  }
+  isa         => Int,
 );
 
 has 'query' => (
   is          => 'rw',
-  isa         => 'HashRef',
-  metaclass   => 'MooseX::MetaDescription::Meta::Attribute',
-  description => {
-    encode_func => 'as_is',
-    type        => 'body',
-    required    => 0,
-  }
+  isa         => HashRef,
 );
 
 around [
@@ -172,5 +93,66 @@ around [
   }
   return ( $self->$orig );
 };
+
+sub api_spec {
+  state $s = +{
+    index => {
+      encode_func => 'as_is',
+      type        => 'path',
+    },
+    allow_no_indices => {
+      encode_func => 'encode_bool',
+      type        => 'url',
+    },
+    analyzer => {
+      encode_func => 'as_is',
+      type        => 'url',
+    },
+    analyze_wildcard => {
+      encode_func => 'encode_bool',
+      type        => 'url',
+    },
+    default_operator => {
+      encode_func => 'as_is',
+      type        => 'url',
+    },
+    df => {
+      encode_func => 'as_is',
+      type        => 'url',
+    },
+    expand_wildcards => {
+      encode_func => 'as_is',
+      type        => 'url',
+    },
+    ignore_unavailable => {
+      encode_func => 'encode_bool',
+      type        => 'url',
+    },
+    lenient => {
+      encode_func => 'encode_bool',
+      type        => 'url',
+    },
+    min_score => {
+      encode_func => 'as_is',
+      type        => 'body',
+    },
+    routing => {
+      encode_func => 'as_is',
+      type        => 'url',
+    },
+    preference => {
+      encode_func => 'as_is',
+      type        => 'url',
+    },
+    terminate_after => {
+      encode_func => 'as_is',
+      type        => 'body',
+    },
+    query => {
+      encode_func => 'as_is',
+      type        => 'body',
+    }
+  };
+}
 
 1;

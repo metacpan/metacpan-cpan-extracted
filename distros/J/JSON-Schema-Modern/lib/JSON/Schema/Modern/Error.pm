@@ -4,7 +4,7 @@ package JSON::Schema::Modern::Error;
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Contains a single error from a JSON Schema evaluation
 
-our $VERSION = '0.587';
+our $VERSION = '0.588';
 
 use 5.020;
 use Moo;
@@ -72,7 +72,7 @@ JSON::Schema::Modern::Error - Contains a single error from a JSON Schema evaluat
 
 =head1 VERSION
 
-version 0.587
+version 0.588
 
 =head1 SYNOPSIS
 

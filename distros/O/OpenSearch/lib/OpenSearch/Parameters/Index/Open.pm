@@ -1,103 +1,57 @@
 package OpenSearch::Parameters::Index::Open;
-use Moose::Role;
+use strict;
+use warnings;
+use feature qw(state);
+use Types::Standard qw(Str Bool);
+use Types::Common::String qw(NonEmptyStr);
+use Moo::Role;
+
+with 'OpenSearch::Parameters';
 
 has 'index' => (
   is          => 'rw',
-  isa         => 'Str',
-  metaclass   => 'MooseX::MetaDescription::Meta::Attribute',
-  description => {
-    encode_func => 'as_is',
-    type        => 'path',
-    required    => 1,
-  }
+  isa         => NonEmptyStr,
+  required    => 1,
 );
 
 has 'allow_no_indices' => (
   is          => 'rw',
-  isa         => 'Bool',
-  metaclass   => 'MooseX::MetaDescription::Meta::Attribute',
-  description => {
-    encode_func => 'encode_bool',
-    type        => 'url',
-    required    => 0,
-  }
+  isa         => Bool,
 );
 
 has 'expand_wildcards' => (
   is          => 'rw',
-  isa         => 'Str',
-  metaclass   => 'MooseX::MetaDescription::Meta::Attribute',
-  description => {
-    encode_func => 'as_is',
-    type        => 'url',
-    required    => 0,
-  }
+  isa         => Str,
 );
 
 has 'ignore_unavailable' => (
   is          => 'rw',
-  isa         => 'Bool',
-  metaclass   => 'MooseX::MetaDescription::Meta::Attribute',
-  description => {
-    encode_func => 'encode_bool',
-    type        => 'url',
-    required    => 0,
-  }
+  isa         => Bool,
 );
 
 has 'wait_for_active_shards' => (
   is          => 'rw',
-  isa         => 'Str',
-  metaclass   => 'MooseX::MetaDescription::Meta::Attribute',
-  description => {
-    encode_func => 'as_is',
-    type        => 'url',
-    required    => 0,
-  }
+  isa         => Str,
 );
 
 has 'cluster_manager_timeout' => (
   is          => 'rw',
-  isa         => 'Str',
-  metaclass   => 'MooseX::MetaDescription::Meta::Attribute',
-  description => {
-    encode_func => 'as_is',
-    type        => 'url',
-    required    => 0,
-  }
+  isa         => Str,
 );
 
 has 'timeout' => (
   is          => 'rw',
-  isa         => 'Str',
-  metaclass   => 'MooseX::MetaDescription::Meta::Attribute',
-  description => {
-    encode_func => 'as_is',
-    type        => 'url',
-    required    => 0,
-  }
+  isa         => Str,
 );
 
 has 'wait_for_completion' => (
   is          => 'rw',
-  isa         => 'Bool',
-  metaclass   => 'MooseX::MetaDescription::Meta::Attribute',
-  description => {
-    encode_func => 'encode_bool',
-    type        => 'url',
-    required    => 0,
-  }
+  isa         => Bool,
 );
 
 has 'task_execution_timeout' => (
   is          => 'rw',
-  isa         => 'Str',
-  metaclass   => 'MooseX::MetaDescription::Meta::Attribute',
-  description => {
-    encode_func => 'as_is',
-    type        => 'url',
-    required    => 0,
-  }
+  isa         => Str,
 );
 
 around [
@@ -112,5 +66,46 @@ around [
   }
   return ( $self->$orig );
 };
+
+sub api_spec {
+  state $s = +{
+    index => {
+      encode_func => 'as_is',
+      type        => 'path',
+    },
+    allow_no_indices => {
+      encode_func => 'encode_bool',
+      type        => 'url',
+    },
+    expand_wildcards => {
+      encode_func => 'as_is',
+      type        => 'url',
+    },
+    ignore_unavailable => {
+      encode_func => 'encode_bool',
+      type        => 'url',
+    },
+    wait_for_active_shards => {
+      encode_func => 'as_is',
+      type        => 'url',
+    },
+    cluster_manager_timeout => {
+      encode_func => 'as_is',
+      type        => 'url',
+    },
+    timeout => {
+      encode_func => 'as_is',
+      type        => 'url',
+    },
+    wait_for_completion => {
+      encode_func => 'encode_bool',
+      type        => 'url',
+    },
+    task_execution_timeout => {
+      encode_func => 'as_is',
+      type        => 'url',
+    }
+  };
+}
 
 1;

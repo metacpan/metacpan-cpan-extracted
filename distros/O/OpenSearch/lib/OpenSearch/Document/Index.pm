@@ -1,18 +1,17 @@
 package OpenSearch::Document::Index;
 use strict;
 use warnings;
+use Moo;
+use Types::Standard qw(InstanceOf);
 use feature qw(signatures);
 no warnings qw(experimental::signatures);
-use Moose;
 
 with 'OpenSearch::Parameters::Document::Index';
 
 has '_base' => (
   is       => 'rw',
-  isa      => 'OpenSearch::Base',
-  required => 0,
-  lazy     => 1,
-  default  => sub { OpenSearch::Base->instance; }
+  isa      => InstanceOf['OpenSearch::Base'],
+  required => 1,
 );
 
 sub execute($self) {
@@ -20,5 +19,6 @@ sub execute($self) {
   my $res    = $self->_base->$method( $self,
     [ $self->index, ( $self->create ? '_create' : '_doc' ), ( $self->id ? $self->id : () ) ] );
 }
+
 
 1;

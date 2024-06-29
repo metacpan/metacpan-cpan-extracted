@@ -1,5 +1,11 @@
 Revision history for Perl extension OpenSearch
 
+0.94 2024-06-28T12:17:23Z
+	- Switched from Moose to Moo and Type::Tiny (Thanks to https://github.com/nicolasfranck)
+	- Added (around half) of the Security Endpoints (https://opensearch.org/docs/latest/security/access-control/api/#access-control-for-the-api)
+	- (A little) More Documentation
+	- Bugfixes
+
 0.92 2024-06-04T10:16:01Z
 	- Added tests for Index-API endpoints requires ENV Vars: OS_HOST, OS_USER, OS_PASS, OS_INDEX
 	- Fixxed #3 in GitHub (https://github.com/localh0rst/OpenSearch-Perl/issues/3)

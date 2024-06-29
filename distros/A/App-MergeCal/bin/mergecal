@@ -1,0 +1,14 @@
+#!/usr/bin/perl -CS
+
+use strict;
+use warnings;
+use 5.010;
+
+use open ':std', ':encoding(UTF-8)';
+
+use App::MergeCal;
+
+my $app = App::MergeCal->new_from_json_file(shift || 'config.json');
+
+$app->run;
+

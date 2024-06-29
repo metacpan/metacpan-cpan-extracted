@@ -20,6 +20,24 @@
 #######################################################################
 
 
+2024-06-28  Brian M. Kelly <Brian.Kelly@fullauto.com>
+
+        * Version 1.0000662 released
+
+        * Repaired Makefile.PL bug to detect AWS EC2 host
+
+2024-06-28  Brian M. Kelly <Brian.Kelly@fullauto.com>
+
+        * Version 1.0000661 released
+
+        * Better Makefile.PL method to detect AWS EC2 host
+
+2024-06-28  Brian M. Kelly <Brian.Kelly@fullauto.com>
+
+        * Version 1.0000660 released
+
+        * Makefile.PL repaired update for Amazon EC2 AWS CLI
+
 2024-06-27  Brian M. Kelly <Brian.Kelly@fullauto.com>
 
         * Version 1.0000659 released

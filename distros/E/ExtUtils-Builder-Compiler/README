@@ -1,7 +1,7 @@
 This archive contains the distribution ExtUtils-Builder-Compiler,
-version 0.007:
+version 0.008:
 
-  Portable compilation
+  An interface around different compilers.
 
 This software is copyright (c) 2012 by Leon Timmermans.
 

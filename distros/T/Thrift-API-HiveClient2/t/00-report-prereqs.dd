@@ -17,6 +17,7 @@ do { my $x = {
                                       'Authen::SASL' => '0',
                                       'Carp' => '0',
                                       'Class::Accessor' => '0',
+                                      'IO::Socket::SSL' => '0',
                                       'List::MoreUtils' => '0',
                                       'Moo' => '0',
                                       'Scalar::Util' => '0',
