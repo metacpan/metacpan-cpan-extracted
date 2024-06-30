@@ -1,7 +1,0 @@
-- show help 
- - don't use pod2usage
- - ex) opts my $foo => { isa => 'Str', description => 'input bar|baz' };
-   => ./foo.pl --help
-      Usage: foo.pl --foo=[val]
-          foo: input bar|baz
-

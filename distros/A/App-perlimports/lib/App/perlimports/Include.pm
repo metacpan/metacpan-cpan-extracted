@@ -2,7 +2,7 @@ package App::perlimports::Include;
 
 use Moo;
 
-our $VERSION = '0.000053';
+our $VERSION = '0.000054';
 
 use Data::Dumper qw( Dumper );
 use List::Util   qw( any none uniq );
@@ -340,7 +340,8 @@ sub _build_imports {
                 $self->_document->my_own_inspector->explicit_export_names
             )
         ) {
-            if ( $self->_is_importable($symbol) ) {
+            if ( $self->_is_importable($symbol)
+                && !$self->_document->is_sub_name("$symbol") ) {
                 $found{$symbol} = 1;
             }
         }
@@ -761,7 +762,7 @@ App::perlimports::Include - Encapsulate one use statement in a document
 
 =head1 VERSION
 
-version 0.000053
+version 0.000054
 
 =head1 METHODS
 

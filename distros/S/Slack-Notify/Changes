@@ -1,5 +1,8 @@
 Revision history for Slack-Notify
 
+0.006     2024-06-30 12:26:31+10:00 Australia/Melbourne
+- add 'blocks' property to send BlockKit blocks in notifications (thanks, rjbs!)
+
 0.005     2022-03-31 08:28:54+11:00 Australia/Melbourne
 - pass "channel" param through to Slack (thanks, dsdee!)
 - use 5.10-compatible package block syntax (thanks, jwright!)

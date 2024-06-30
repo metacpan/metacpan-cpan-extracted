@@ -1,6 +1,6 @@
 # -*- cperl; cperl-indent-level: 4 -*-
-# Copyright (C) 2010-2021, Roland van Ipenburg
-package WWW::Wookie v1.1.4;
+# Copyright (C) 2010-2024, Roland van Ipenburg
+package WWW::Wookie v1.1.5;
 use strict;
 use warnings;
 
@@ -21,7 +21,7 @@ WWW::Wookie - Apache Wookie Connector Framework implementation
 
 =head1 VERSION
 
-This document describes WWW::Wookie version C<v1.1.4>, which is probably the
+This document describes WWW::Wookie version C<v1.1.5>, which is probably the
 latest version because the Wookie project is retired
 L<http://attic.apache.org/projects/wookie.html>
 
@@ -106,7 +106,7 @@ Roland van Ipenburg, E<lt>roland@rolandvanipenburg.comE<gt>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2010-2021 by Roland van Ipenburg
+Copyright 2010-2024 by Roland van Ipenburg
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself, either Perl version 5.14.0 or,

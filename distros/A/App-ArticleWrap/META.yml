@@ -22,5 +22,5 @@ requires:
   perl: '5.026000'
 resources:
   repository: https://src.alexschroeder.ch/article-wrap.git
-version: 1.01
+version: 1.02
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

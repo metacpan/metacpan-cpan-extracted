@@ -1,6 +1,6 @@
 # -*- cperl; cperl-indent-level: 4 -*-
-# Copyright (C) 2010-2021, Roland van Ipenburg
-package WWW::Wookie::Connector::Service v1.1.4;
+# Copyright (C) 2010-2024, Roland van Ipenburg
+package WWW::Wookie::Connector::Service v1.1.5;
 use strict;
 use warnings;
 
@@ -13,10 +13,10 @@ use HTTP::Headers;
 use HTTP::Request;
 use HTTP::Request::Common;
 use HTTP::Status qw(HTTP_CREATED HTTP_OK HTTP_UNAUTHORIZED HTTP_FORBIDDEN);
-use LWP::UserAgent qw/POST/;
-use Moose qw/around has with/;
+use LWP::UserAgent;
+use Moose          qw/around has with/;
 use Regexp::Common qw(URI);
-use URI::Escape qw(uri_escape);
+use URI::Escape    qw(uri_escape);
 use XML::Simple;
 use namespace::autoclean '-except' => 'meta', '-also' => qr/^__/sxm;
 
@@ -34,7 +34,7 @@ use Readonly;
 Readonly::Scalar my $DEFAULT_ICON =>
   q{http://www.oss-watch.ac.uk/images/logo2.gif};
 Readonly::Scalar my $TIMEOUT => 15;
-Readonly::Scalar my $AGENT   => q{WWW::Wookie/}
+Readonly::Scalar my $AGENT => q{WWW::Wookie/}
   . $WWW::Wookie::Connector::Service::VERSION;
 Readonly::Scalar my $TESTUSER => q{testuser};
 
@@ -587,8 +587,12 @@ sub _do_request {
         $method = $POST;
     }
 
-    if ( ( my $content = [ POST $url, [ %{$payload} ] ]->[0]->content ) ne
-        $EMPTY )
+    if (
+        (
+            my $content =
+            [ $self->_ua->POST($url), [ %{$payload} ] ]->[0]->content
+        ) ne $EMPTY
+      )
     {
         $url .= $QUERY . $content;
     }
@@ -666,7 +670,7 @@ data requests and responses
 
 =head1 VERSION
 
-This document describes WWW::Wookie::Connector::Service version C<v1.1.4>
+This document describes WWW::Wookie::Connector::Service version C<v1.1.5>
 
 =head1 SYNOPSIS
 
@@ -948,7 +952,7 @@ Roland van Ipenburg, E<lt>roland@rolandvanipenburg.comE<gt>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2010-2021 by Roland van Ipenburg
+Copyright 2010-2024 by Roland van Ipenburg
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself, either Perl version 5.14.0 or,

@@ -9,3 +9,15 @@ on build => sub {
     requires 'Test::Perl::Critic';
     requires 'Test::Exception';
 };
+
+on 'develop' => sub {
+    requires 'Minilla';
+    requires 'Pod::Markdown::Github';
+    requires 'Version::Next';
+    requires 'CPAN::Uploader';
+    requires 'Test::CPAN::Meta';
+    requires 'Test::MinimumVersion::Fast';
+    requires 'Test::PAUSE::Permissions';
+    requires 'Test::Pod';
+    requires 'Test::Spellunker';
+};

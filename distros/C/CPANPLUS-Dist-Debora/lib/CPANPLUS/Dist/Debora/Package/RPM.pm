@@ -6,7 +6,7 @@ use 5.016;
 use warnings;
 use utf8;
 
-our $VERSION = '0.012';
+our $VERSION = '0.013';
 
 use parent qw(CPANPLUS::Dist::Debora::Package);
 
@@ -375,12 +375,6 @@ for my $name (@{$package->obsoletes}) {
 
 $OUT .= "AutoProv:  1\n";
 
-# We have to use an updated perl.prov on CentOS 7.
-my $perl_prov = "$distdir/perl.prov";
-if (-x $perl_prov) {
-    $OUT .= "%global __perllib_provides $perl_prov\n";
-}
-
 # /usr/lib/rpm/perl.req finds too many circular, internal and optional
 # dependencies, but we have to add shared library dependencies to
 # architecture-dependent Perl distributions.
@@ -576,7 +570,7 @@ CPANPLUS::Dist::Debora::Package::RPM - Create binary RPM packages
 
 =head1 VERSION
 
-version 0.012
+version 0.013
 
 =head1 SYNOPSIS
 
@@ -726,7 +720,7 @@ Andreas Vögele E<lt>voegelas@cpan.orgE<gt>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (C) 2023 Andreas Vögele
+Copyright (C) 2024 Andreas Vögele
 
 This module is free software; you can redistribute it and/or modify it under
 the same terms as Perl itself.

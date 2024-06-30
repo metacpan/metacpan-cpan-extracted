@@ -487,9 +487,10 @@ sub load_font {
 	return $f;
     }
     my $ff;
-    if ( $font =~ /\.[ot]tf$/ ) {
+    my $actual = Text::Layout::FontConfig->remap($font) // $font;
+    if ( $actual =~ /\.[ot]tf$/ ) {
 	eval {
-	    $ff = $self->{_context}->ttfont( $font,
+	    $ff = $self->{_context}->ttfont( $actual,
 					     -dokern => 1,
 					     $fd->{nosubset}
 					     ? ( -nosubset => 1 )
@@ -499,11 +500,13 @@ sub load_font {
     }
     else {
 	eval {
-	    $ff = $self->{_context}->corefont( $font, -dokern => 1 );
+	    $ff = $self->{_context}->corefont( $actual, -dokern => 1 );
 	};
     }
 
-    croak( "Cannot load font: ", $font, "\n", $@ ) unless $ff;
+    croak( "Cannot load font: ", $actual,
+	   $actual ne $font ? " (remapped from $font)" : "",
+	   "\n", $@ ) unless $ff;
     # warn("Loaded font: $font\n");
     $self->{font} = $ff;
     $fd->{ascender}  //= $ff->ascender;

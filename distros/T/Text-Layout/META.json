@@ -58,15 +58,15 @@
    "provides" : {
       "Text::Layout" : {
          "file" : "lib/Text/Layout.pm",
-         "version" : "0.036"
+         "version" : "0.037"
       },
       "Text::Layout::FontConfig" : {
          "file" : "lib/Text/Layout/FontConfig.pm",
-         "version" : "0.036"
+         "version" : "0.037"
       },
       "Text::Layout::FontDescriptor" : {
          "file" : "lib/Text/Layout/FontDescriptor.pm",
-         "version" : "0.036"
+         "version" : "0.037"
       }
    },
    "release_status" : "stable",
@@ -80,6 +80,6 @@
          "web" : "https://github.com/sciurius/perl-Text-Layout"
       }
    },
-   "version" : "0.036",
+   "version" : "0.037",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

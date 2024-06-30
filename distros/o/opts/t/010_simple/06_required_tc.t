@@ -43,6 +43,6 @@ lives_and{
 throws_ok{
     @ARGV = qw(--x --y=3.14);
     $foo->bar;
-} qr/Value "3.14" invalid for option y \(number expected\)/;
+} qr/Value "3.14" invalid for option y \((integer )?number expected\)/;
 
 done_testing;

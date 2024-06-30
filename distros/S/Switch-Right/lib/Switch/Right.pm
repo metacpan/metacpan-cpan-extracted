@@ -1,7 +1,7 @@
 package Switch::Right;
 
 use 5.036;
-our $VERSION = '0.000003';
+our $VERSION = '0.000005';
 
 use experimental qw< builtin refaliasing try >;
 use builtin      qw< true false is_bool blessed created_as_number reftype >;
@@ -86,6 +86,10 @@ sub import {
     multi smartmatch :export;
 }
 
+# Error messages shared by *_given_impl()...
+my $WHENTRUEMSG  = q{BEGIN{warn q{"when (true) {...}" better written as "default {...}"}}};
+my $WHENFALSEMSG = q{BEGIN{warn q{Useless use of "when (false)"}}};
+
 sub _pure_given_impl { my ($source) = @_;
 
     # Recognize a valid "pure" given block (i.e. containing only when and default blocks)...
@@ -104,9 +108,15 @@ sub _pure_given_impl { my ($source) = @_;
                 (?<PureBlock>    # Distinguish "when", "default", and "given" from other statements...
                     \{  $OWS
                     (?:
-                        when $OWS \(
-                            (?<WHENJUNC> (?: $OWS (?> any | all | none ) $OWS => )?+ )
+                        when $OWS \( $OWS
+                        (?>
+                            (?<WHENEXPR> (?<WHENTRUE>  true  )
+                            |            (?<WHENFALSE> false )
+                            ) \b
+                        |
+                            (?<WHENJUNC> (?: (?> any | all | none ) $OWS => )?+ )
                                              $OWS (?<WHENEXPR> (?>(?&PerlExpression)))
+                        )
                              $OWS \) $OWS (?>(?<WHENBLOCK> (?&PerlBlock) ))  $OWS
                         (?{ push @pure_statements, { TYPE => 'when', %+ }; })
                     |
@@ -175,18 +185,20 @@ sub _pure_given_impl { my ($source) = @_;
             . join("\n", map {
                 my $PREFIX = $after_a_statement ? 'if(0){}' : q{};
                 if ($_->{TYPE} eq 'when') {
+                    my $BLOCK = $_->{WHENBLOCK};
+                       if ($_->{WHENTRUE})  { substr($BLOCK,1,0) = $WHENTRUEMSG;  }
+                    elsif ($_->{WHENFALSE}) { substr($BLOCK,1,0) = $WHENFALSEMSG; }
+                    my $JUNC = $_->{WHENJUNC} // q{};
                     $after_a_statement = 0;
-                      "$PREFIX elsif (smartmatch($matched{JUNC} \$_, $_->{WHENJUNC} scalar("
-                    . _apply_term_magic($_->{WHENEXPR}) . "))) $_->{WHENBLOCK}"
+                      "$PREFIX elsif (smartmatch($matched{JUNC} \$_, $JUNC scalar("
+                    . _apply_term_magic($_->{WHENEXPR}) . "))) $BLOCK"
                 }
                 elsif ($_->{TYPE} eq 'default') {
                     $after_a_statement = 0;
                     "$PREFIX elsif (1) $_->{DEFBLOCK}"
                 }
                 elsif ($_->{TYPE} eq 'given') {
-                    use Data::Dump 'ddx'; ddx $_;
                     my $nested = _pure_given_impl($_->{NESTEDGIVEN});
-                    use Data::Dump 'ddx'; ddx $nested;
                     if ($after_a_statement) {
                         $nested;
                     }
@@ -225,15 +237,16 @@ sub _given_impl { my ($source_ref) = @_;  # Has to be this way because of code b
     # Otherwise recognize a valid general-purpose given block (with a single scalar argument)...
     if (!defined $REPLACEMENT_CODE) {
         state $VALIDATE_GIVEN = qr{
-            \A  (?<GIVEN> $OWS  \(
+            \A  (?<GIVEN>
+                    $OWS  \(
                     (?<JUNC> (?: $OWS (?> any | all | none )  $OWS  => )?+ )
-                                $OWS (?>(?<EXPR> (?&PerlExpression)))
-                                $OWS \)
-                        (?>
-                            $OWS  (?>(?<BLOCK>  (?&PerlBlock)  ))
-                        |
-                            (?<INVALID_BLOCK>)
-                        )
+                                 $OWS (?>(?<EXPR> (?&PerlExpression)))
+                    $OWS \)
+                    (?>
+                        $OWS  (?>(?<BLOCK>  (?&PerlBlock)  ))
+                    |
+                        (?<INVALID_BLOCK>)
+                    )
                 )
                 (?>(?<TRAILING_CODE>  .*  ))
                 $PPR::GRAMMAR
@@ -247,6 +260,7 @@ sub _given_impl { my ($source_ref) = @_;  # Has to be this way because of code b
         if (exists $result{BLOCK}) {
             my ($GIVEN, $JUNC, $EXPR, $BLOCK, $TRAILING_CODE)
                 = @result{qw< GIVEN JUNC EXPR BLOCK TRAILING_CODE >};
+            $JUNC //= q{};
 
             # Augment the block with control flow and other necessary components...
             $BLOCK = _augment_block(given => "$BLOCK", $JUNC);
@@ -286,11 +300,16 @@ sub _when_impl ($source_ref) {
     # What various kinds of "when" look like...
     state $WHEN_CLASSIFIER = qr{
             \A  (?<WHEN> $OWS
-                         (  \(
-                               (?<JUNC> (?: $OWS (?> any | all | none ) $OWS => )?+ )
-                                            $OWS (?<EXPR> (?&PerlExpression))
-                                            $OWS
-                            \)
+                         (   \(
+                             (?:
+                                $OWS (?<EXPR> (?<WHENTRUE>  true  )
+                                     |        (?<WHENFALSE> false )
+                                     ) \b
+                             |
+                                (?<JUNC> (?: $OWS (?> any | all | none ) $OWS => )?+ )
+                                             $OWS (?<EXPR> (?&PerlExpression))
+                             )
+                             $OWS \)
                              $OWS (?>(?<BLOCK> (?&PerlBlock) )
                                   | (?<INVALID_BLOCK>)
                                   )
@@ -311,14 +330,17 @@ sub _when_impl ($source_ref) {
 
     # Handle a valid when block (with a list of scalar arguments)...
     if (defined $matched{BLOCK} && defined $matched{EXPR}) {
-        my ($WHEN, $JUNC, $EXPR, $BLOCK, $TRAILING_CODE)
-            = @matched{qw< WHEN JUNC EXPR BLOCK TRAILING_CODE>};
+        my ($WHEN, $JUNC, $EXPR, $WHENTRUE, $WHENFALSE, $BLOCK, $TRAILING_CODE)
+            = @matched{qw< WHEN JUNC EXPR WHENTRUE WHENFALSE BLOCK TRAILING_CODE>};
+        $JUNC //= q{};
 
         # Adjust when's expression appropriately...
         $EXPR = _apply_term_magic($EXPR);
 
         # Augment the block with control flow and other necessary components...
         $BLOCK = _augment_block(when => "$BLOCK");
+           if ($WHENTRUE)  { substr($BLOCK, 1, 0) = $WHENTRUEMSG;  }
+        elsif ($WHENFALSE) { substr($BLOCK, 1, 0) = $WHENFALSEMSG; }
 
         # Is the current "given" junctive???
         my $given_junc = $^H{'Switch::Right/GivenJunctive'} // q{};
@@ -831,7 +853,7 @@ Switch::Right -  Switch and smartmatch done right this time
 
 =head1 VERSION
 
-This document describes Switch::Right version 0.000003
+This document describes Switch::Right version 0.000005
 
 
 =head1 SYNOPSIS
@@ -1244,6 +1266,111 @@ Under this module, two references only smartmatch if:
 =item * The right-hand reference is a subref, which returns true when passed the left-hand reference.
 
 =back
+
+
+=head4 Boolean arguments are handled differently
+
+Since Perl v5.36, the language has offered L<distinguished true and false values|builtin#true>
+that can be detected at runtime using the L<C<is_bool()> builtin|builtin#is_bool>.
+All boolean operators and some built-in functions (such as C<exists()> and C<defined()>)
+return these special values, which can then be identified as originating from a boolean expression.
+
+The former C<~~> operator had no special behaviour when passed such values,
+but C<smartmatch()> does. When a distinguished boolean value is passed as the
+right-hand argument, C<smartmatch()> simply returns that value as the result of the match.
+Hence:
+
+    smartmatch( $anything, $count == 1 )          # returns true if $count is 1
+    smartmatch( $anything, exists %seen{$key} )   # returns true if key is present
+    smartmatch( $anything, !$expected)            # returns true is $expected is false
+
+This behaviour might seem odd, unintuitive, or even wrong, but it makes much more sense
+when C<smartmatch()> is used automatically to evaluate a C<when> expression:
+
+    given ($value) {
+        when ($_ == 1)              { say "value is 1"          }
+        when (exists $seen->{$_})   { say "value has been seen" }
+        when (!$_)                  { say "value is false"      }
+    }
+
+The former built-in C<when> block had L<eight special cases|https://perldoc.perl.org/5.40.0/perlsyn#Experimental-Details-on-given-and-when> where a C<when> behaved in this way
+(i.e. more like an C<if>).
+
+The module has only one special case: wherever the C<when> expression (or the
+right-hand argument of an explicit call to C<smartmatch()>) evaluates to a
+distinguished boolean. This means that you can use I<any> expression that produces
+C<builtin::true> or C<builtin::false> in a C<when> and have it act as expected:
+
+    given ($value) {
+        when (eof)                   { say "input is exhausted"         }
+        when (m/\s/)                 { say "value has a space"          }
+        when (defined)               { say "value is defined"           }
+        when (-r -w -x)              { say "value has file permissions" }
+        when (-1 < $_ < 1)           { say "value is in range"          }
+        when (looks_like_number $_)  { say "value is defined"           }
+        when (my_bool_test_func($_)) { say "value passed the test"      }
+    }
+
+Note, however, that there are many expressions which Perl can I<treat> as
+boolean, but which B<do not> actually produce the distinguished boolean values
+that enable this special smartmatching behaviour.
+
+For example, the following C<when> blocks don't work as intended:
+
+    given ($value) {
+        when (ref)                  { say "value is a reference"      }  # WRONG
+        when (tell)                 { say "not at start of input"     }  # WRONG
+        when ($_ % 2)               { say "value is odd"              }  # WRONG
+        when (length)               { say "value is not empty string" }  # WRONG
+        when (keys %$_)             { say "hashref is not empty "     }  # WRONG
+        when (blessed $_)           { say "value is an object"        }  # WRONG
+        when (my_int_test_func($_)) { say "value passed the test"     }  # WRONG
+    }
+
+To ensure that a C<when> treats its argument as a direct boolean test, you need
+to make that argument is explicitly boolean:
+
+    given ($value) {
+        when (ref ne "")    { say "value is a reference"      }
+        when (tell != 0)    { say "not at start of input"     }
+        when ($_ % 2 == 1)  { say "value is odd"              }
+        when (length > 0)   { say "value is not empty string" }
+        when (keys %$_ > 0) { say "hashref is not empty "     }
+    }
+
+...or E<mdash> if the argument is a subroutine call E<mdash> you can specify
+the argument directly as a subref:
+
+    given ($value) {
+        when (\&blessed)          { say "value is an object"        }
+        when (\&my_int_test_func) { say "value passed the test"     }
+    }
+
+There are two other special cases to be aware of:
+
+    given ($value) {
+        when (true)  { say "the value was true"  }   # WRONG
+        when (false) { say "the value was false" }   # WRONG
+    }
+
+A C<when (true)> doesn't test whether C<$_> is C<true>.
+Instead, it is B<always> executed (like an C<if (true)>).
+Likewise, a C<when (false)> doesn't test against C<false>;
+it is simply B<never> executed (like an C<if (false)>).
+
+If you want to test for general truth or falsehood in a C<when>, you need:
+
+    given ($value) {
+        when (!! $_) { say "the value was true"  }
+        when ( ! $_) { say "the value was false" }
+    }
+
+And, if you want to test for I<distinguished> truth or falsehood in a C<when>, you need:
+
+    given ($value) {
+        when (is_bool($_) &&  $_) { say "the value was distinguished true"  }
+        when (is_bool($_) && !$_) { say "the value was distinguished false" }
+    }
 
 
 =head4 Numeric matching is stricter
@@ -1800,6 +1927,47 @@ of C<smartmatch()> that handles that kind of object.
 See L<"Overloading C<smartmatch()> globally via the C<SMARTMATCH()> method">
 and L<"Overloading C<smartmatch()> locally via multisubs"> for details of
 these two different approaches for supporting objects in switches.
+
+
+=item C<< "when (true) {...}" better written as "default {...}" >>
+
+Smartmatching a distinguished C<true> value B<always> matches, regardless of the other value.
+So a S<C<when (true) {...}>> will always execute, just like a C<default> does.
+See L<"Boolean arguments are handled differently"> for details.
+
+If you really did want this behaviour, you can silence this warning by changing the C<when>
+to a C<default>, or else changing the C<when> value to anything other than a raw C<true>.
+For example:
+
+    when ( +true  ) {...}
+    when ( true() ) {...}
+    when ( (true) ) {...}
+    when ( !false ) {...}
+
+If you were intending to smartmatch when the other value is true,
+S<C<when (true)>> will never accomplish that. Instead, use something like:
+
+    when ( !!$_ ) {...}
+
+
+=item C<< Useless use of "when (false)" >>
+
+Smartmatching a distinguished C<false> value B<never> matches, so a S<C<when (false) {...}>>
+will never execute, regardless of the other value you're matching against.
+So it's pointless writing it. See L<"Boolean arguments are handled differently"> for details.
+
+If you really do want to disable the entire C<when>, you can silence this warning by changing
+the value to anything other than a raw C<false>. For example:
+
+    when ( +false  ) {...}
+    when ( false() ) {...}
+    when ( (false) ) {...}
+    when ( !true   ) {...}
+
+If you were intending to smartmatch a false boolean value, S<C<when (false)>>
+will never achieve that. Instead, use:
+
+    when ( !$_ ) {...}
 
 
 =item C<< Useless use of a constant in void context >>

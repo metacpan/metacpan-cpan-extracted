@@ -4,6 +4,9 @@ Build.PL
 MANIFEST
 MANIFEST.SKIP
 README
+inc/WWW/Wookie/Module/Build/LICENSE.txt
+inc/WWW/Wookie/Module/Build/Standard.pm
+inc/WWW/Wookie/Module/Build.pm
 lib/WWW/Wookie.pm
 lib/WWW/Wookie/Connector/Exceptions.pm
 lib/WWW/Wookie/Connector/Service/Interface.pm
@@ -15,6 +18,10 @@ lib/WWW/Wookie/Widget/Instance.pm
 lib/WWW/Wookie/Widget/Instances.pm
 lib/WWW/Wookie/Widget/Property.pm
 lib/WWW/Wookie/Widget.pm
+LICENSES/artistic.txt
+LICENSES/gpl-1.0.txt
+LICENSES/gpl-2.0.txt
+LICENSES/gpl-3.0.txt
 scripts/TestWookieService.pl
 t/00_base.t
 t/00_dependencies.t
@@ -22,15 +29,15 @@ t/00_signature.t
 t/01_live.t
 t/02_live_rest_api.t
 t/03_exceptions.t
-t/09_pod.t
-t/10_pod-coverage.t
-t/11_test-coverage.t
-t/12_manifest.t
-t/13_critic.t
-t/14_kwalitee.t
-t/15_spell.t
-t/perlcriticrc
 t/rt.t
+xt/91_pod.t
+xt/92_pod-coverage.t
+xt/93_test-coverage.t
+xt/94_manifest.t
+xt/95_critic.t
+xt/96_kwalitee.t
+xt/97_spell.t
+xt/perlcriticrc
 META.yml
 META.json
 SIGNATURE    Added here by Module::Build

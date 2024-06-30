@@ -1,132 +1,171 @@
+# -*- cperl; cperl-indent-level: 4 -*-
+## no critic (RequireExplicitPackage RequireEndWithOne)
+use 5.020;
+use strict;
+use warnings;
+use utf8;
 use Exception::Class;
-use Test::More tests => 26 + 2;
+use Test::More 'tests' => 26 + 1 + ( $ENV{'AUTHOR_TESTING'} ? 0 : 1 );
 use Test::NoWarnings;
+use Readonly;
 use WWW::Wookie::Connector::Service;
 use WWW::Wookie::Server::Connection;
 
-my $LOGIN              = q{ Login };
-my $LOGIN_TRIMMED      = q{Login};
-my $LOGIN_ALT          = q{ Alternate login };
-my $LOGIN_ALT_TRIMMED  = q{Alternate login};
-my $SCREEN             = q{ screen };
-my $SCREEN_TRIMMED     = q{screen};
-my $SCREEN_ALT         = q{ Alternate screen name };
-my $SCREEN_ALT_TRIMMED = q{Alternate screen name};
-my $PROPERTY_NAME      = q{Property name};
-my $PROPERTY_VALUE_ALT = q{Alternate property value};
-my $PROPERTY_NAME_ALT  = q{Alternate property name};
-my $PROPERTY_VALUE     = q{Property value};
-my $AVAILABLE_WIDGETS  = 16;
-my $PUBLIC             = 1;
-my $NOT_PUBLIC         = 0;
-my $API_KEY            = q{TEST};
-my $SHARED_DATA_KEY    = q{localhost_dev};
-my $SERVER = $ENV{WOOKIE_SERVER} || q{http://localhost:8080/wookie/};
-my $LOCALE = q{en_US};
-my $STRING =
-    qq{Wookie Server Connection - URL: $SERVER}
+our $VERSION = v1.1.5;
+
+## no critic (ProhibitCallsToUnexportedSubs)
+Readonly::Scalar my $TEST_WARNINGS => $ENV{'AUTHOR_TESTING'}
+## no critic (RequireCheckingReturnValueOfEval)
+  && eval { require Test::NoWarnings };
+Readonly::Scalar my $BASE_TESTS          => 26;
+Readonly::Scalar my $BROKEN_DELETE_TESTS => 3;
+Readonly::Scalar my $LOGIN               => q{ Login };
+Readonly::Scalar my $LOGIN_TRIMMED       => q{Login};
+Readonly::Scalar my $LOGIN_ALT           => q{ Alternate login };
+Readonly::Scalar my $LOGIN_ALT_TRIMMED   => q{Alternate login};
+Readonly::Scalar my $SCREEN              => q{ screen };
+Readonly::Scalar my $SCREEN_TRIMMED      => q{screen};
+Readonly::Scalar my $SCREEN_ALT          => q{ Alternate screen name };
+Readonly::Scalar my $SCREEN_ALT_TRIMMED  => q{Alternate screen name};
+Readonly::Scalar my $PROPERTY_NAME       => q{Property name};
+Readonly::Scalar my $PROPERTY_VALUE_ALT  => q{Alternate property value};
+Readonly::Scalar my $PROPERTY_NAME_ALT   => q{Alternate property name};
+Readonly::Scalar my $PROPERTY_VALUE      => q{Property value};
+Readonly::Scalar my $AVAILABLE_WIDGETS   => 16;
+Readonly::Scalar my $PUBLIC              => 1;
+Readonly::Scalar my $NOT_PUBLIC          => 0;
+Readonly::Scalar my $API_KEY             => q{TEST};
+Readonly::Scalar my $SHARED_DATA_KEY     => q{localhost_dev};
+Readonly::Scalar my $SERVER => $ENV{'WOOKIE_SERVER'}
+  || q{http://localhost:8080/wookie/};
+Readonly::Scalar my $LOCALE => q{en_US};
+Readonly::Scalar my $STRING => qq{Wookie Server Connection - URL: $SERVER}
   . qq{API Key: $API_KEY}
   . qq{Shared Data Key: $SHARED_DATA_KEY};
 
-$obj =
+my $connection =
   WWW::Wookie::Server::Connection->new( $SERVER, $API_KEY, $SHARED_DATA_KEY );
-my $up = $obj->test;
+my $up = $connection->test;
 
 TODO: {
-    todo_skip
-q{Need a live Wookie server for this test. Set the enviroment variable WOOKIE_SERVER if the server isn't in the default location.},
-      26
-      if !$up;
+    if ( !$up ) {
+        Test::More::todo_skip
+          q{Need a live Wookie server for this test. Set the enviroment }
+          . q{variable WOOKIE_SERVER if the server isn't in the default }
+          . q{location.},
+          $BASE_TESTS;
+    }
 
-    $obj =
+    my $service =
       WWW::Wookie::Connector::Service->new( $SERVER, $API_KEY, $SHARED_DATA_KEY,
         $LOGIN, $SCREEN );
-    my @widgets = $obj->getAvailableWidgets(q{all});
-    is( 0 + @widgets, $AVAILABLE_WIDGETS, q{getAvailableWidgets} );
+    my @widgets = $service->getAvailableWidgets(q{all});
+    Test::More::is( 0 + @widgets, $AVAILABLE_WIDGETS, q{getAvailableWidgets} );
     my $widget   = shift @widgets;
-    my $instance = $obj->getOrCreateInstance($widget);
-    is( $obj->getConnection->getURL,    $SERVER,  q{getURL} );
-    is( $obj->getConnection->getApiKey, $API_KEY, q{getApiKey} );
-    is( $obj->getConnection->getSharedDataKey,
+    my $instance = $service->getOrCreateInstance($widget);
+    Test::More::is( $service->getConnection->getURL, $SERVER, q{getURL} );
+    Test::More::is( $service->getConnection->getApiKey, $API_KEY,
+        q{getApiKey} );
+    Test::More::is( $service->getConnection->getSharedDataKey,
         $SHARED_DATA_KEY, q{getSharedDataKey} );
-    is( $obj->getConnection->as_string, $STRING, q{as_string} );
+    Test::More::is( $service->getConnection->as_string, $STRING, q{as_string} );
 
   TODO: {
-        todo_skip q{Stringification overload is broken somehow}, 1
-          if 1;
-        is( "@{[$obj->getConnection]}", $STRING, q{as_string overloaded} );
+        Test::More::todo_skip q{Stringification overload is broken somehow}, 1;
+        Test::More::is( "@{[$service->getConnection]}",
+            $STRING, q{as_string overloaded} );
     }
-    is( $obj->getConnection->test,    1,               q{test} );
-    is( $obj->getUser->getLoginName,  $LOGIN_TRIMMED,  q{getLoginName} );
-    is( $obj->getUser->getScreenName, $SCREEN_TRIMMED, q{getScreenName} );
-    is( $obj->getLocale,              undef,           q{getLocale} );
-    $obj->setLocale($LOCALE);
-    is( $obj->getLocale, $LOCALE, q{getLocale} );
-    my $user = $obj->getUser;
+    Test::More::is( $service->getConnection->test, 1, q{test} );
+    Test::More::is( $service->getUser->getLoginName,
+        $LOGIN_TRIMMED, q{getLoginName} );
+    Test::More::is( $service->getUser->getScreenName,
+        $SCREEN_TRIMMED, q{getScreenName} );
+    Test::More::is( $service->getLocale, undef, q{getLocale} );
+    $service->setLocale($LOCALE);
+    Test::More::is( $service->getLocale, $LOCALE, q{getLocale} );
+    my $user = $service->getUser;
 
-    my $users_amount = $obj->getUsers($instance);
+    my $users_amount = $service->getUsers($instance);
 
   TODO: {
-        todo_skip q{Multiuser is broken}, 2
-          if 1;
-        $obj->setUser( $LOGIN_ALT, $SCREEN_ALT );
-        is( $obj->getUser->getLoginName,
+        Test::More::todo_skip q{Multiuser is broken}, 2;
+        $service->setUser( $LOGIN_ALT, $SCREEN_ALT );
+        Test::More::is( $service->getUser->getLoginName,
             $LOGIN_ALT_TRIMMED, q{getLoginName after change} );
-        is( $obj->getUser->getScreenName,
+        Test::More::is( $service->getUser->getScreenName,
             $SCREEN_ALT_TRIMMED, q{getScreenName after change} );
     }
 
     my $property =
+## no critic (RequireExplicitInclusion)
       WWW::Wookie::Widget::Property->new( $PROPERTY_NAME, $PROPERTY_VALUE,
         $NOT_PUBLIC );
-    is( $property->getName,     $PROPERTY_NAME,  q{getName of property} );
-    is( $property->getValue,    $PROPERTY_VALUE, q{getValue of property} );
-    is( $property->getIsPublic, $NOT_PUBLIC,     q{getIsPublic of property} );
+    Test::More::is( $property->getName, $PROPERTY_NAME,
+        q{getName of property} );
+    Test::More::is( $property->getValue, $PROPERTY_VALUE,
+        q{getValue of property} );
+    Test::More::is( $property->getIsPublic, $NOT_PUBLIC,
+        q{getIsPublic of property} );
     $property->setName($PROPERTY_NAME_ALT);
-    is( $property->getName, $PROPERTY_NAME_ALT, q{setName of property} );
+    Test::More::is( $property->getName, $PROPERTY_NAME_ALT,
+        q{setName of property} );
     $property->setValue($PROPERTY_VALUE_ALT);
-    is( $property->getValue, $PROPERTY_VALUE_ALT, q{setValue of property} );
+    Test::More::is( $property->getValue, $PROPERTY_VALUE_ALT,
+        q{setValue of property} );
     $property->setIsPublic($PUBLIC);
-    is( $property->getIsPublic, $PUBLIC, q{setPublic of property} );
+    Test::More::is( $property->getIsPublic, $PUBLIC, q{setPublic of property} );
 
     # Delete public property has issues:
     $property->setIsPublic($NOT_PUBLIC);
 
-    $obj->addProperty( $instance, $property );
-    is( $obj->getProperty( $instance, $property )->getValue,
+    $service->addProperty( $instance, $property );
+    Test::More::is( $service->getProperty( $instance, $property )->getValue,
         $PROPERTY_VALUE_ALT, q{addProperty} );
     $property->setValue($PROPERTY_VALUE);
-    $obj->setProperty( $instance, $property );
-    is( $obj->getProperty( $instance, $property )->getValue,
+    $service->setProperty( $instance, $property );
+    Test::More::is( $service->getProperty( $instance, $property )->getValue,
         $PROPERTY_VALUE, q{setProperty} );
   TODO: {
-        todo_skip( q{Delete is broken on server}, 3 ) if 1;
-        is( $obj->deleteProperty( $instance, $property ),
+        Test::More::todo_skip( q{Delete is broken on server},
+            $BROKEN_DELETE_TESTS );
+        Test::More::is( $service->deleteProperty( $instance, $property ),
             1, q{deleteProperty on existing property} );
-        is( $obj->deleteProperty( $instance, $property ),
+        Test::More::is( $service->deleteProperty( $instance, $property ),
             0, q{deleteProperty on non-existing property} );
-        eval { $obj->getProperty( $instance, $property ); };
-        $e = Exception::Class->caught('WookieConnectorException');
-        like( $e->error, qr/\b404\b/, q{deleting private property} );
+## no critic (RequireCheckingReturnValueOfEval)
+        eval { $service->getProperty( $instance, $property ); };
+        my $e = Exception::Class->caught('WookieConnectorException');
+        Test::More::like( $e->error, qr/\b404\b/msx,
+            q{deleting private property} );
     }
 
+## no critic (RequireExplicitInclusion)
     $property = WWW::Wookie::Widget::Property->new( $PROPERTY_NAME_ALT,
         $PROPERTY_VALUE_ALT, $PUBLIC );
 
-    $users_amount = $obj->getUsers($instance);
+    $users_amount = $service->getUsers($instance);
+## no critic (RequireExplicitInclusion)
     $user = WWW::Wookie::User->new( $LOGIN_ALT, $SCREEN_ALT );
   TODO: {
-        todo_skip q{Participant management via REST is broken}, 2
-          if 1;
-        $obj->addParticipant( $instance, $user );
-        is( $obj->getUsers($instance), $users_amount + 1, q{addParticipant} );
-        $obj->deleteParticipant( $instance, $user );
-        is( $obj->getUsers($instance), $users_amount, q{addParticipant} );
+        Test::More::todo_skip q{Participant management via REST is broken}, 2;
+        $service->addParticipant( $instance, $user );
+        Test::More::is(
+            $service->getUsers($instance),
+            $users_amount + 1,
+            q{addParticipant},
+        );
+        $service->deleteParticipant( $instance, $user );
+        Test::More::is( $service->getUsers($instance),
+            $users_amount, q{addParticipant} );
     }
 }
 
-my $msg = 'Author test. Set $ENV{AUTHOR_TESTING} to a true value to run.';
+## no critic (RequireInterpolationOfMetachars)
+my $msg = q{Author test. Install Test::NoWarnings and set }
+  . q{$ENV{AUTHOR_TESTING} to a true value to run.};
 SKIP: {
-    skip $msg, 1 unless $ENV{AUTHOR_TESTING};
+    if ( !$TEST_WARNINGS ) {
+        Test::More::skip $msg, 1;
+    }
 }
-$ENV{AUTHOR_TESTING} && Test::NoWarnings::had_no_warnings();
+$TEST_WARNINGS && Test::NoWarnings::had_no_warnings();

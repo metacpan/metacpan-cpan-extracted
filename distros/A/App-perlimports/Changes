@@ -1,5 +1,9 @@
 Revision history for App-perlimports
 
+0.000054  2024-06-29 19:32:58Z
+    - Don't treat locally defined subs as importable symbols (GH#110) (Olaf
+      Alders). Reported by Glenn Rice.
+
 0.000053  2024-01-13 20:12:59Z
     - Don't log a non-JSON message to STDERR on linting success when --json is
       enabled (GH#107) (Olaf Alders)

@@ -4,7 +4,7 @@
       "Kan Fushihara <kan.fushihara at gmail.com>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Minilla/v0.11.0",
+   "generated_by" : "Minilla/v3.1.23",
    "license" : [
       "unknown"
    ],
@@ -36,17 +36,20 @@
       },
       "configure" : {
          "requires" : {
-            "CPAN::Meta" : "0",
-            "CPAN::Meta::Prereqs" : "0",
-            "Module::Build" : "0.38"
+            "Module::Build::Tiny" : "0.035"
          }
       },
       "develop" : {
          "requires" : {
+            "CPAN::Uploader" : "0",
+            "Minilla" : "0",
+            "Pod::Markdown::Github" : "0",
             "Test::CPAN::Meta" : "0",
-            "Test::MinimumVersion" : "0.10108",
+            "Test::MinimumVersion::Fast" : "0.04",
+            "Test::PAUSE::Permissions" : "0.07",
             "Test::Pod" : "1.41",
-            "Test::Spellunker" : "v0.2.7"
+            "Test::Spellunker" : "v0.2.7",
+            "Version::Next" : "0"
          }
       },
       "runtime" : {
@@ -61,7 +64,7 @@
    "provides" : {
       "opts" : {
          "file" : "lib/opts.pm",
-         "version" : "0.07"
+         "version" : "0.08"
       }
    },
    "release_status" : "stable",
@@ -71,18 +74,23 @@
       },
       "homepage" : "https://github.com/kan/p5-opts",
       "repository" : {
-         "url" : "git://github.com/kan/p5-opts.git",
+         "type" : "git",
+         "url" : "https://github.com/kan/p5-opts.git",
          "web" : "https://github.com/kan/p5-opts"
       }
    },
-   "version" : "0.07",
+   "version" : "0.08",
    "x_contributors" : [
-      "Kan Fushihara <kan@kan-loox.(none)>",
-      "Kan Fushihara <kan@mobilefactory.jp>",
       "Chris Weyl <cweyl@alumni.drew.edu>",
-      "Keiji, Yoshimi <walf443@gmail.com>",
+      "Geoff Franks <geoff@niftylogic.com>",
+      "Kan Fushihara <kan.fushihara@gmail.com>",
+      "Kan Fushihara <kan@kan-loox.(none)>",
       "Kan Fushihara <kan@mfac.jp>",
+      "Kan Fushihara <kan@mobilefactory.jp>",
+      "Keiji, Yoshimi <walf443@gmail.com>",
       "Neil Bowers <neil@bowers.com>",
-      "kan fushihara <kan.fushihara@gmail.com>"
-   ]
+      "Petr Písař <ppisar@redhat.com>"
+   ],
+   "x_serialization_backend" : "JSON::PP version 4.02",
+   "x_static_install" : 1
 }

@@ -3,7 +3,6 @@ Changes
 LICENSE
 META.json
 README.md
-TODO
 cpanfile
 lib/opts.pm
 minil.toml

@@ -1,0 +1,22 @@
+0.004   2024-06-21  Released-By: PERLANCAR; Urgency: medium
+
+        - Rename module/dist Sah-Schema{s,Bundle}-* for consistency with
+          others.
+
+
+0.003   2021-02-02  Released-By: PERLANCAR; Urgency: medium
+
+	- [ux] Use complete_recurse=1 schema parameter to show all
+	  available border syles during completion.
+
+
+0.002   2021-01-26  Released-By: PERLANCAR
+
+        - [build] Rebuild to update Sah::SchemaR::* (fix
+          Sah::SchemaP::perl::modname_with_optional_args in 0.005 which caused
+          completion to not be in ColorTheme::* namespace but under root).
+
+
+0.001   2021-01-20  Released-By: PERLANCAR
+
+        - First release.

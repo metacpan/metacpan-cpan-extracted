@@ -9,7 +9,7 @@ eval {
 };
 
 is $@, <<EOS, 'help message';
-usage: t/010_simple/10_help.t [options]
+usage: $0 [options]
 
 options:
    -p, --pi, -q                    

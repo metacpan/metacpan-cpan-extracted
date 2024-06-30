@@ -16,7 +16,10 @@ do { my $x = {
                     },
        'runtime' => {
                       'requires' => {
+                                      'BioX::Seq' => '0',
+                                      'Carp' => '0',
                                       'Exporter' => '0',
+                                      'autodie' => '0',
                                       'parent' => '0',
                                       'strict' => '0',
                                       'warnings' => '0'

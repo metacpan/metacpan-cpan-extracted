@@ -1,1 +1,6 @@
-author = "Kan Fushihara <kan.fushihara at gmail.com>"
+name = "opts"
+badges = ["travis", "coveralls"]
+module_maker = "ModuleBuildTiny"
+markdown_maker = "Pod::Markdown::Github"
+[FileGatherer]
+exclude_match = ["Dockerfile", "docker-compose.yml", ".pause", "TODO"]

@@ -1,13 +1,13 @@
 # -*- cperl; cperl-indent-level: 4 -*-
-# Copyright (C) 2010-2021, Roland van Ipenburg
-package WWW::Wookie::Server::Connection v1.1.4;
+# Copyright (C) 2010-2024, Roland van Ipenburg
+package WWW::Wookie::Server::Connection v1.1.5;
 use strict;
 use warnings;
 
 use utf8;
 use 5.020000;
 
-use Moose qw/around has/;
+use Moose                        qw/around has/;
 use Moose::Util::TypeConstraints qw/as coerce from where subtype via/;
 use URI;
 use LWP::UserAgent;
@@ -22,7 +22,7 @@ Readonly::Scalar my $EMPTY     => q{};
 Readonly::Scalar my $MORE_ARGS => 3;
 Readonly::Scalar my $ADVERTISE => q{advertise?all=true};
 Readonly::Scalar my $TIMEOUT   => 15;
-Readonly::Scalar my $AGENT     => q{WWW::Wookie/}
+Readonly::Scalar my $AGENT => q{WWW::Wookie/}
   . $WWW::Wookie::Server::Connection::VERSION;
 Readonly::Scalar my $SERVER_CONNECTION =>
   q{Wookie Server Connection - URL: %sAPI Key: %sShared Data Key: %s};
@@ -113,7 +113,7 @@ WWW::Wookie::Server::Connection - A connection to a Wookie server
 
 =head1 VERSION
 
-This document describes WWW::Wookie::Server::Connection version C<v1.1.4>
+This document describes WWW::Wookie::Server::Connection version C<v1.1.5>
 
 =head1 SYNOPSIS
 
@@ -216,7 +216,7 @@ Roland van Ipenburg, E<lt>roland@rolandvanipenburg.comE<gt>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2010-2021 by Roland van Ipenburg
+Copyright 2010-2024 by Roland van Ipenburg
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself, either Perl version 5.14.0 or,

@@ -1,5 +1,9 @@
 Revision history for Text::Layout
 
+0.037	2024-06-30
+
+	Add facilities to remap the PDF corefonts to decent font files.
+
 0.036	2024-04-22
 
 	Introducing struts.

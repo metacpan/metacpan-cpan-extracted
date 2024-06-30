@@ -6,7 +6,7 @@ sub test {
   my ($input, $expected, $description) = @_;
   local $/ = undef; # slurp
   # setup child process
-  my $pid = open2(my $chld_out, my $chld_in, catfile("blib", "script", "article-wrap"));
+  my $pid = open2(my $chld_out, my $chld_in, $^X, catfile("blib", "script", "article-wrap"));
   # print and read
   print $chld_in $input;
   close($chld_in);

@@ -1,81 +1,113 @@
+# -*- cperl; cperl-indent-level: 4 -*-
+## no critic (RequireExplicitPackage RequireEndWithOne)
+use 5.020;
+use strict;
+use warnings;
+use utf8;
 use Test::More;
 use Test::NoWarnings;
+use Readonly;
+
+our $VERSION = v1.1.5;
+
+## no critic (ProhibitCallsToUnexportedSubs)
+Readonly::Scalar my $TEST_WARNINGS => $ENV{'AUTHOR_TESTING'}
+## no critic (RequireCheckingReturnValueOfEval)
+  && eval { require Test::NoWarnings };
 
 BEGIN {
-    %MAIN::methods = (
+    Readonly::Scalar my $BASE_TESTS => 11;
+## no critic (RequireExplicitInclusion)
+    %MAIN::METHODS = (
+## use critic
         'WWW::Wookie::Widget' =>
           [qw(getIdentifier getTitle getDescription getIcon)],
         'WWW::Wookie::Widget::Category' => [qw(getName get put)],
         'WWW::Wookie::Widget::Instance' => [
-            qw(getUrl setUrl getIdentifier setIdentifier getTitle setTitle getHeight setHeight getWidth setHeight)
+            qw(getUrl setUrl getIdentifier setIdentifier getTitle setTitle
+              getHeight setHeight getWidth setHeight),
         ],
         'WWW::Wookie::Widget::Instances' => [qw(put get)],
-        'WWW::Wookie::Widget::Property' =>
+        'WWW::Wookie::Widget::Property'  =>
           [qw(getName setName getValue setValue getIsPublic setIsPublic)],
         'WWW::Wookie::Connector::Service' => [
-            qw(getConnection getProperty getOrCreateInstance getUsers getLocale setLocale getUser setUser addProperty deleteProperty getAvailableWidgets setProperty addParticipant deleteParticipant)
+            qw(getConnection getProperty getOrCreateInstance getUsers getLocale
+              setLocale getUser setUser addProperty deleteProperty
+              getAvailableWidgets setProperty addParticipant deleteParticipant),
         ],
         'WWW::Wookie::Server::Connection' =>
           [qw(getURL getApiKey getSharedDataKey as_string test)],
         'WWW::Wookie::User' => [
-            qw(getLoginName setLoginName getScreenName setScreenName getThumbnailUrl setThumbnailUrl)
+            qw(getLoginName setLoginName getScreenName setScreenName
+              getThumbnailUrl setThumbnailUrl),
         ],
     );
     my $total_methods = 0;
-    foreach my $methods ( values %MAIN::methods ) {
-        $total_methods += @$methods;
+## no critic (RequireExplicitInclusion)
+    foreach my $methods ( values %MAIN::METHODS ) {
+## use critic
+        $total_methods += @{$methods};
     }
-    plan tests => 1 + 11 + ( 8 * 2 ) + $total_methods + 1 + 1;
-    ok(1);    # If we made it this far, we're ok.
-    use_ok('WWW::Wookie');
-    use_ok('WWW::Wookie::Widget');
-    use_ok('WWW::Wookie::Widget::Category');
-    use_ok('WWW::Wookie::Widget::Instance');
-    use_ok('WWW::Wookie::Widget::Instances');
-    use_ok('WWW::Wookie::Widget::Property');
-    use_ok('WWW::Wookie::Connector::Exceptions');
-    use_ok('WWW::Wookie::Connector::Service');
-    use_ok('WWW::Wookie::Connector::Service::Interface');
-    use_ok('WWW::Wookie::Server::Connection');
-    use_ok('WWW::Wookie::User');
+    Test::More::plan 'tests' => 1 +
+      $BASE_TESTS +
+      ( keys(%MAIN::METHODS) * 2 ) +
+      $total_methods + 1 +
+      ( $ENV{'AUTHOR_TESTING'} ? 0 : 1 );
+    Test::More::ok(1);    # If we made it this far, we're ok.
+    Test::More::use_ok('WWW::Wookie');
+    Test::More::use_ok('WWW::Wookie::Widget');
+    Test::More::use_ok('WWW::Wookie::Widget::Category');
+    Test::More::use_ok('WWW::Wookie::Widget::Instance');
+    Test::More::use_ok('WWW::Wookie::Widget::Instances');
+    Test::More::use_ok('WWW::Wookie::Widget::Property');
+    Test::More::use_ok('WWW::Wookie::Connector::Exceptions');
+    Test::More::use_ok('WWW::Wookie::Connector::Service');
+    Test::More::use_ok('WWW::Wookie::Connector::Service::Interface');
+    Test::More::use_ok('WWW::Wookie::Server::Connection');
+    Test::More::use_ok('WWW::Wookie::User');
 }
-new_ok('WWW::Wookie::Widget');
-new_ok('WWW::Wookie::Widget::Category');
-new_ok('WWW::Wookie::Widget::Instance');
-new_ok('WWW::Wookie::Widget::Instances');
-new_ok('WWW::Wookie::Widget::Property');
-new_ok('WWW::Wookie::Connector::Service');
-new_ok('WWW::Wookie::Server::Connection');
-new_ok('WWW::Wookie::User');
+Test::More::new_ok('WWW::Wookie::Widget');
+Test::More::new_ok('WWW::Wookie::Widget::Category');
+Test::More::new_ok('WWW::Wookie::Widget::Instance');
+Test::More::new_ok('WWW::Wookie::Widget::Instances');
+Test::More::new_ok('WWW::Wookie::Widget::Property');
+Test::More::new_ok('WWW::Wookie::Connector::Service');
+Test::More::new_ok('WWW::Wookie::Server::Connection');
+Test::More::new_ok('WWW::Wookie::User');
 
 my $sub;
-@WWW::Wookie::Widget::Sub::ISA           = qw(WWW::Wookie::Widget);
-$sub                                     = new_ok('WWW::Wookie::Widget::Sub');
+## no critic (RequireExplicitInclusion)
+@WWW::Wookie::Widget::Sub::ISA = qw(WWW::Wookie::Widget);
+$sub                           = Test::More::new_ok('WWW::Wookie::Widget::Sub');
 @WWW::Wookie::Widget::Category::Sub::ISA = qw(WWW::Wookie::Widget::Category);
-$sub = new_ok('WWW::Wookie::Widget::Category::Sub');
+$sub = Test::More::new_ok('WWW::Wookie::Widget::Category::Sub');
 @WWW::Wookie::Widget::Instance::Sub::ISA = qw(WWW::Wookie::Widget::Instance);
-$sub = new_ok('WWW::Wookie::Widget::Instance::Sub');
+$sub = Test::More::new_ok('WWW::Wookie::Widget::Instance::Sub');
 @WWW::Wookie::Widget::Instances::Sub::ISA = qw(WWW::Wookie::Widget::Instances);
-$sub = new_ok('WWW::Wookie::Widget::Instances::Sub');
+$sub = Test::More::new_ok('WWW::Wookie::Widget::Instances::Sub');
 @WWW::Wookie::Widget::Property::Sub::ISA = qw(WWW::Wookie::Widget::Property);
-$sub = new_ok('WWW::Wookie::Widget::Property::Sub');
+$sub = Test::More::new_ok('WWW::Wookie::Widget::Property::Sub');
 @WWW::Wookie::Connector::Service::Sub::ISA =
   qw(WWW::Wookie::Connector::Service);
-$sub = new_ok('WWW::Wookie::Connector::Service::Sub');
+$sub = Test::More::new_ok('WWW::Wookie::Connector::Service::Sub');
 @WWW::Wookie::Server::Connection::Sub::ISA =
   qw(WWW::Wookie::Server::Connection);
-$sub                         = new_ok('WWW::Wookie::Server::Connection::Sub');
+$sub = Test::More::new_ok('WWW::Wookie::Server::Connection::Sub');
 @WWW::Wookie::User::Sub::ISA = qw(WWW::Wookie::User);
-$sub                         = new_ok('WWW::Wookie::User::Sub');
+$sub                         = Test::More::new_ok('WWW::Wookie::User::Sub');
 
-foreach my $module ( keys %MAIN::methods ) {
-    foreach my $method ( @{ $MAIN::methods{$module} } ) {
-        can_ok( $module, $method );
+foreach my $module ( keys %MAIN::METHODS ) {
+    foreach my $method ( @{ $MAIN::METHODS{$module} } ) {
+        Test::More::can_ok( $module, $method );
     }
 }
 
-my $msg = 'Author test. Set $ENV{AUTHOR_TESTING} to a true value to run.';
+## no critic (RequireInterpolationOfMetachars)
+my $msg = q{Author test. Install Test::NoWarnings and set }
+  . q{$ENV{AUTHOR_TESTING} to a true value to run.};
 SKIP: {
-    skip $msg, 1 unless $ENV{AUTHOR_TESTING};
+    if ( !$TEST_WARNINGS ) {
+        Test::More::skip $msg, 1;
+    }
 }
-$ENV{AUTHOR_TESTING} && Test::NoWarnings::had_no_warnings();
+$TEST_WARNINGS && Test::NoWarnings::had_no_warnings();

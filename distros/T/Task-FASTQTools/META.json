@@ -1,10 +1,10 @@
 {
-   "abstract" : "Provide native perl tools for manipulating FASTQ files",
+   "abstract" : "Provide native perl tools for manipulating FASTQ/A files",
    "author" : [
       "Christos Argyropoulos <chrisarg@gmail.com>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.030, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.032, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -41,7 +41,10 @@
       },
       "runtime" : {
          "requires" : {
+            "BioX::Seq" : "0",
+            "Carp" : "0",
             "Exporter" : "0",
+            "autodie" : "0",
             "parent" : "0",
             "strict" : "0",
             "warnings" : "0"
@@ -61,13 +64,13 @@
    "provides" : {
       "Task::FASTQTools" : {
          "file" : "lib/Task/FASTQTools.pm",
-         "version" : "0.01"
+         "version" : "0.02"
       }
    },
    "release_status" : "stable",
-   "version" : "0.01",
+   "version" : "0.02",
    "x_generated_by_perl" : "v5.38.0",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.37",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.38",
    "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"
 }
 

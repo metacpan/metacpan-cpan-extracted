@@ -1,5 +1,5 @@
 package Slack::Notify;
-$Slack::Notify::VERSION = '0.005';
+$Slack::Notify::VERSION = '0.006';
 {
 
 # ABSTRACT: Trigger Slack incoming webhooks
@@ -43,6 +43,7 @@ use Type::Utils qw(class_type);
 
 
 has text       => ( is => 'ro', isa => Str );
+has blocks     => ( is => 'ro', isa => ArrayRef );
 has username   => ( is => 'ro', isa => Str );
 has icon_url   => ( is => 'ro', isa => Str );
 has icon_emoji => ( is => 'ro', isa => Str );
@@ -198,6 +199,14 @@ A simple, multi-line message without special formatting.
 
 =item *
 
+C<blocks>
+
+A reference to an array containing
+L<BlockKit|https://api.slack.com/reference/block-kit> blocks.  (You don't need
+this if you're just sending C<text>.)
+
+=item *
+
 C<username>
 
 Value to use for the username, overriding the one set in the hook config.
@@ -254,13 +263,23 @@ L<https://github.com/robn/Slack-Notify>
 
 =item *
 
-Rob N ★ <robn@robn.io>
+Rob Norris <robn@despairlabs.com>
+
+=back
+
+=head1 CONTRIBUTORS
+
+=over 4
+
+=item *
+
+Ricardo Signes <rjbs@semiotic.systems>
 
 =back
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by Rob N ★
+This software is copyright (c) 2017 by Rob Norris
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

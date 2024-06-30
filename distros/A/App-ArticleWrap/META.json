@@ -45,6 +45,6 @@
          "web" : "https://src.alexschroeder.ch/article-wrap.git"
       }
    },
-   "version" : 1.01,
-   "x_serialization_backend" : "JSON::PP version 4.04"
+   "version" : 1.02,
+   "x_serialization_backend" : "JSON::PP version 4.16"
 }

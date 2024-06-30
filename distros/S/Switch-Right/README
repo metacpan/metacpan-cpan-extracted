@@ -1,4 +1,4 @@
-Switch::Right version 0.000003
+Switch::Right version 0.000005
 
 This module redesigns the defunct smartmatching and given>/when mechanisms
 so that they're easier to use and easier to understand. It implements a version

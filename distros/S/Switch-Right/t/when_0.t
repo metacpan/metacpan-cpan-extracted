@@ -36,8 +36,8 @@ my $fh        = *DATA;
 
 given (0) {
     # Distinguished booleans...
-    clear; when (true)  { pass 'true';  passed; continue } should_pass;
-    clear; when (false) { fail 'false'; passed; continue } should_fail;
+    clear; when (true())  { pass 'true';  passed; continue } should_pass;
+    clear; when (false()) { fail 'false'; passed; continue } should_fail;
 
     # Integers...
     clear; when (0)     { pass 0;       passed; continue } should_pass;

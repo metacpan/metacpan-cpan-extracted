@@ -8,7 +8,7 @@ package Text::Layout::FontConfig;
 
 use Carp;
 
- our $VERSION = "0.036";
+ our $VERSION = "0.037";
 
 use Text::Layout::FontDescriptor;
 
@@ -36,6 +36,7 @@ with new() will always return the same object.
 
 my %fonts;
 my @dirs;
+my %maps;
 my $loader;
 my $debug = 0;
 
@@ -101,6 +102,7 @@ sub reset {
     warn("FC: Reset\n") if $debug;
     %fonts = ();
     @dirs = ();
+    %maps = ();
 }
 
 sub debug { shift->{debug} }
@@ -275,7 +277,7 @@ sub register_aliases {
 
 =over
 
-=item register_corefonts( $noaliases )
+=item register_corefonts( %options )
 
 This is a convenience method that registers all built-in corefonts.
 
@@ -285,13 +287,47 @@ unless $noaliases is specified.
 You do not need to call this method if you provide your own font
 registrations.
 
+Options:
+
+=over
+
+=item aliases
+
+If true, register Serif, Sans and Mono as aliases for Times,
+Helvetica and Courier.
+
+This is enabled by default and can be cancelled with C<noaliases>.
+
+=item noaliases
+
+If true, do not register Serif, Sans and Mono as aliases for Times,
+Helvetica and Courier.
+
+=item remap
+
+Remap the core fonts to real TrueType or OpenType font files.
+
+Supported values are C<GNU_Free_Fonts> or C<free> to use the GNU Free Fonts
+(http://ftp.gnu.org/gnu/freefont/) and C<tex> or C<tex-gyre> for the
+TeX Gyre fonts (https://www.gust.org.pl/projects/e-foundry/tex-gyre/).
+
+=back
+
 =back
 
 =cut
 
 sub register_corefonts {
     shift if UNIVERSAL::isa( $_[0], __PACKAGE__ );
-    my ( $noaliases ) = @_;
+
+    my %options;
+    if ( @_ == 1 ) {
+	$options{noaliases} = shift;
+    }
+    else {
+	%options = @_;
+    }
+    my $noaliases = defined($options{aliases}) ? !$options{aliases} : $options{noaliases};
 
     warn("FC: Registering corefonts\n") if $debug;
 
@@ -337,6 +373,124 @@ sub register_corefonts {
     register_font( "WebDings",              "WebDings"                );
     register_font( "WingDings",             "WingDings"               );
     }
+
+    # Corefont remapping to real font files.
+    # Biggest problem is to make sure the fonts are installed, and with
+    # the file names used here...
+    $options{remap} //= "";
+
+    # GNU Free Fonts.
+    # http://ftp.gnu.org/gnu/freefont/freefont-ttf-20120503.zip
+    if ( $options{remap} =~ /^(?:gnu[-_]?)?free(?:[-_]?fonts)?$/i ) {
+	remap( 'Times-Roman'		 => "FreeSerif.ttf",
+	       'Times-BoldItalic'	 => "FreeSerifBoldItalic.ttf",
+	       'Times-Bold'		 => "FreeSerifBold.ttf",
+	       'Times-Italic'		 => "FreeSerifItalic.ttf",
+	       'Helvetica'		 => "FreeSans.ttf",
+	       'Helvetica-BoldOblique'	 => "FreeSansBoldOblique.ttf",
+	       'Helvetica-Bold'		 => "FreeSansBold.ttf",
+	       'Helvetica-Oblique'	 => "FreeSansOblique.ttf",
+	       'Courier'		 => "FreeMono.ttf",
+	       'Courier-BoldOblique'	 => "FreeMonoBoldOblique.ttf",
+	       'Courier-Bold'		 => "FreeMonoBold.ttf",
+	       'Courier-Oblique'	 => "FreeMonoOblique.ttf",
+	     );
+    }
+
+    # TeX Gyre fonts.
+    # https://www.gust.org.pl/projects/e-foundry/tex-gyre/whole/tg2_501otf.zip
+    elsif ( $options{remap} =~ /^tex(?:[-_]?gyre)?$/i ) {
+	remap( 'Times-Roman'		 => "texgyretermes-regular.otf",
+	       'Times-BoldItalic'	 => "texgyretermes-bolditalic.otf",
+	       'Times-Bold'		 => "texgyretermes-bold.otf",
+	       'Times-Italic'		 => "texgyretermes-italic.otf",
+	       'Helvetica'		 => "texgyreheros-regular.otf",
+	       'Helvetica-BoldOblique'	 => "texgyreheros-bolditalic.otf",
+	       'Helvetica-Bold'		 => "texgyreheros-bold.otf",
+	       'Helvetica-Oblique'	 => "texgyreheros-italic.otf",
+	       'Courier'		 => "texgyrecursor-regular.otf",
+	       'Courier-BoldOblique'	 => "texgyrecursor-bolditalic.otf",
+	       'Courier-Bold'		 => "texgyrecursor-bold.otf",
+	       'Courier-Oblique'	 => "texgyrecursor-italic.otf",
+	     );
+    }
+    elsif ( $options{remap} ) {
+	croak("Unrecognized core remap set");
+    }
+}
+
+=over
+
+=item remap($font)
+
+=item remap( $src => $dst, ... )
+
+Handles font remapping. The main purpose is to remap corefonts to real
+fonts.
+
+With a single argument, returns the remapped value, or undef if none.
+
+With a hash argument, maps each of the targets (keys) to a font file
+(value). This file must be present in one of the font directories.
+
+Alternatively, the key may be one of C<Times>, C<Helvetica> and
+C<Courier> and the value an already registered family.
+
+=back
+
+=cut
+
+sub remap {
+    shift if UNIVERSAL::isa( $_[0], __PACKAGE__ );
+
+    return $maps{$_[0]} if @_ == 1;
+
+    my %m = @_;
+    while ( my ($k, $v ) = each %m ) {
+
+	# Check for family map.
+	if ( $k =~ /^(Courier|Times|Helvetica)$/
+	     && defined $fonts{lc $v} ) {
+	    if ( $k eq 'Courier' ) {
+		$maps{'Courier'}	       = $fonts{lc $v}{normal}{normal}{loader_data};
+		$maps{'Courier-Bold'}	       = $fonts{lc $v}{normal}{bold}{loader_data};
+		$maps{'Courier-Oblique'}       = $fonts{lc $v}{italic}{normal}{loader_data};
+		$maps{'Courier-BoldOblique'}   = $fonts{lc $v}{italic}{bold}{loader_data};
+	    }
+	    elsif ( $k eq 'Helvetica' ) {
+		$maps{'Helvetica'}	       = $fonts{lc $v}{normal}{normal}{loader_data};
+		$maps{'Helvetica-Bold'}	       = $fonts{lc $v}{normal}{bold}{loader_data};
+		$maps{'Helvetica-Oblique'}     = $fonts{lc $v}{italic}{normal}{loader_data};
+		$maps{'Helvetica-BoldOblique'} = $fonts{lc $v}{italic}{bold}{loader_data};
+	    }
+	    elsif ( $k eq 'Times' ) {
+		$maps{'Times-Roman'}	       = $fonts{lc $v}{normal}{normal}{loader_data};
+		$maps{'Times-Bold'}	       = $fonts{lc $v}{normal}{bold}{loader_data};
+		$maps{'Times-Italic'}	       = $fonts{lc $v}{italic}{normal}{loader_data};
+		$maps{'Times-BoldItalic'}      = $fonts{lc $v}{italic}{bold}{loader_data};
+	    }
+	    next;
+	}
+
+	# Map font to corefont.
+	my $ff;
+	if ( $v =~ m;^/; ) {
+	    $ff = $v if -r -s $v;
+	}
+	else {
+	    foreach ( @dirs ) {
+		next unless -r -s "$_/$v";
+		$ff = "$_/$v";
+		last;
+	    }
+	}
+
+	$maps{$k} = $ff
+	  or carp("Invalid font mapping ($v: $!)")
+
+      }
+
+    1;
 }
 
 =over

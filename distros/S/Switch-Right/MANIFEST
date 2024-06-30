@@ -15,5 +15,6 @@ t/smartmatch_overload_objs.t
 t/when_0.t
 t/when_result.t
 t/smartmatch_refref.t
+t/when_true_false.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

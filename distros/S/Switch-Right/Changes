@@ -13,3 +13,14 @@ Revision history for Switch-Right
 
     Added the missing REF vs REF tests to smartmatch()
 
+
+
+0.000004  Sun Jun 30 13:00:43 2024
+
+    Added documentation for smartmatch($left, $BOOLEAN)
+
+
+
+0.000005  Sun Jun 30 16:06:49 2024
+
+    Added warnings for "when (true)" and "when (false)"

@@ -1,3 +1,8 @@
 Revision history for Task-FASTQTools
 
+0.02      2024-06-29 22:17:28-06:00 America/Denver
+- Added functions to read a file into an array of BioX::Seq objects
+- Restructured documentation
+- Restructured error handling, so that IO failures lead to autodeath
 0.01      2023-09-29 18:52:08-06:00 America/Denver
+- Initial build

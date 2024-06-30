@@ -4,16 +4,20 @@ Task::FASTQTools
 
 # VERSION
 
-version 0.01
+version 0.02
 
 # SYNOPSIS
 
 Facilities to process FASTQ files as returned from sequencing 
-instruments. Convert from FASTQ to FASTA or tabular formats.
+instruments. Convert from FASTQ to FASTA, tabular and 
+BioX::Seq formats.
 
 # DESCRIPTION
 
-A collection of tools to convert, filter and analyze FASTQ files.
+A collection of tools to convert, filter and analyze FASTQ/A files.
+This is mostly a playpen for me to experiment with the BioX::Seq
+and other biological sequence modules in Perl. Code may eventually
+find itself in the Bio::Seq::Alignment modules
 
 # NAME
 
@@ -21,27 +25,58 @@ Task::FASTQTools- manipulate FASTQ files from perl
 
 # SUBROUTINES
 
-## fastq2a ($input\_file, $output\_file)
+## fa2BioXSeq ($input\_file, $bioseq\_objects\_ref)
 
-Converts a FASTQ file to the equivalent FASTA file
-
-## fq2tab ($input\_file, $output\_file)
-
-Convert a FASTQ file to tab delimited file
+Convert a FASTA file to an array ref of BioX::Seq objects 
+and append them to the array ref that has been provided by the caller.
 
 ## fa2tab ($input\_file, $output\_file)
 
 Convert a FASTA file to tab delimited file
 
+## fastq2a ($input\_file, $output\_file)
+
+Converts a FASTQ file to the equivalent FASTA file
+
+## fq2BioXSeq ($input\_file, $bioseq\_objects\_ref)
+
+Convert a FASTQ file to an array ref of BioX::Seq objects
+and append them to the array ref that has been provided by the caller.
+
+## fq2tab ($input\_file, $output\_file)
+
+Convert a FASTQ file to tab delimited file
+
 # SEE ALSO
 
 - [BioPerl FASTQ](https://metacpan.org/pod/Bio::SeqIO::fastq)
 
-    BioPerl facilities for parsing FASTQ files using the SeqIO OO interface
+    BioPerl facilities for parsing FASTQ files using the SeqIO IO interface
+
+- [Bio::SeqAlignment](https://metacpan.org/pod/Bio::SeqAlignment)
+
+    A collection of tools and libraries for mapping biological sequences 
+    from within Perl using (pseudo) alignment methods.
+
+- [BioX::Seq](https://metacpan.org/pod/BioX::Seq)
+
+    BioX::Seq is a simple sequence class that can be used to represent biological 
+    sequences. It was designed as a compromise between using simple strings and 
+    hashes to hold sequences and using the rather bloated objects of Bioperl. 
+    Benchmarking by the author of the present module, shows that its performance 
+    for sequence IO under the fast mode is nearly x2 the speed of the BioPerl 
+    SeqIO modules and 1.5x the speed of the FAST modules. The speed is rather
+    comparable to the Biopython SeqIO module.
+
+- [FAST](https://metacpan.org/pod/FAST)
+
+    FAST is a collection of modules that provide a simple and fast interface to
+    sequence data. It is designed to be lightweight and fast and it is somewhat
+    faster than BioPerl itself.
 
 # AUTHOR
 
-Christos Argyropoulos <chrisarg@gmail.com>
+Christos Argyropoulos <chrisarg@cpan.org>
 
 # COPYRIGHT AND LICENSE
 

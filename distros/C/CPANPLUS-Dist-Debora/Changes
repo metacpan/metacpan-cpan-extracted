@@ -1,5 +1,9 @@
 Revision history for CPANPLUS-Dist-Debora
 
+0.013  2024-06-30 08:49:11 CEST 2024
+
+  - Remove a workaround for CentOS 7
+
 0.012  2023-11-09 14:50:07 CET
 
   - Remove .la files from the staging directory

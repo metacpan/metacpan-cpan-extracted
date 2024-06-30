@@ -1,13 +1,13 @@
 #!/usr/bin/env perl
 # -*- cperl; cperl-indent-level: 4 -*-
-# Copyright (C) 2010-2021, Roland van Ipenburg
+# Copyright (C) 2010-2024, Roland van Ipenburg
 use strict;
 use warnings;
 
 use utf8;
 use 5.020000;
 
-our $VERSION = 'v1.1.4';
+our $VERSION = 'v1.1.5';
 
 use lib qw(./lib ../lib);
 
@@ -205,7 +205,7 @@ Framework Perl implementation
 
 =head1 VERSION
 
-This document describes C<TestWookieService.pl> version C<v1.1.4>
+This document describes C<TestWookieService.pl> version C<v1.1.5>
 
 =head1 USAGE
 
@@ -282,7 +282,7 @@ Roland van Ipenburg, E<lt>roland@rolandvanipenburg.comE<gt>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2010-2021 by Roland van Ipenburg
+Copyright 2010-2024 by Roland van Ipenburg
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself, either Perl version 5.14.0 or,

@@ -60,6 +60,7 @@ my @files = (
     't/interpolation.t',
     't/is-ignored.t',
     't/lib/TestHelper.pm',
+    't/locally-defined-sub.t',
     't/lookalike-words.t',
     't/memoize.t',
     't/meta.t',

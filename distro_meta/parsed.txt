@@ -92798,3 +92798,13 @@ D/DA/DAMI/MsOffice-Word-Surgeon-2.07.tar.gz
 L/LH/LHRST/OpenSearch-0.94.tar.gz
 B/BL/BLIAKO/String-Random-Regexp-regxstring-0.02.tar.gz
 B/BU/BURAK/Thrift-API-HiveClient2-0.026.tar.gz
+S/SC/SCHROEDER/App-ArticleWrap-1.02.tar.gz
+O/OA/OALDERS/App-perlimports-0.000054.tar.gz
+V/VO/VOEGELAS/CPANPLUS-Dist-Debora-0.013.tar.gz
+M/MI/MIKIHOSHI/opts-0.08.tar.gz
+P/PE/PERLANCAR/Sah-SchemaBundle-ColorTheme-0.004.tar.gz
+R/RO/ROBN/Slack-Notify-0.006.tar.gz
+D/DC/DCONWAY/Switch-Right-0.000005.tar.gz
+C/CH/CHRISARG/Task-FASTQTools-0.02.tar.gz
+J/JV/JV/Text-Layout-0.037.tar.gz
+I/IP/IPENBURG/WWW-Wookie-v1.1.5.tar.gz

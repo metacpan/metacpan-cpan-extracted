@@ -7,7 +7,7 @@ use Test::Exception;
 @ARGV = qw(--foo=3);
 is foo(), 6;
 @ARGV = qw(--foo=3.14);
-throws_ok { foo() } qr/Value "3.14" invalid for option foo \(number expected\)/;
+throws_ok { foo() } qr/Value "3.14" invalid for option foo \((integer )?number expected\)/;
 done_testing;
 exit;
 
