@@ -1,19 +1,42 @@
 package Kelp::Util;
 
-use Kelp::Base -strict;
+# No Kelp::Base here, because Kelp::Base uses Kelp::Util;
+use v5.10;
+use strict;
+use warnings;
+
 use Carp;
+use Data::Dumper qw();
 use Encode qw();
 use Class::Inspector;
 use Plack::Util;
+use Test::Deep::NoTest qw(eq_deeply);
+use Scalar::Util qw(reftype);
 
 # improve error locations of croak
 our @CARP_NOT = (
     qw(
         Kelp
+        Kelp::Base
         Kelp::Routes
         Kelp::Context
     )
 );
+
+sub _DEBUG
+{
+    my ($stage, @messages) = @_;
+    my $env = $ENV{KELP_DEBUG};
+    return if !$env;
+    return if !grep { lc $env eq $_ } '1', 'all', lc $stage;
+
+    local $Data::Dumper::Sortkeys = 1;
+    my $message = join ' ', map {
+        ref $_ ? Data::Dumper::Dumper($_) : $_
+    } @messages;
+
+    print "DEBUG: $message\n";
+}
 
 sub camelize
 {
@@ -24,7 +47,9 @@ sub camelize
     $base = undef if $sigil;
 
     my @parts;
-    if ($string =~ /::/) {
+    if ($string !~ /#/) {
+
+        # do not camelize if it doesn't look like a camelize string
         @parts = ($string);
     }
     else {
@@ -157,6 +182,50 @@ sub load_package
     };
 }
 
+sub merge
+{
+    my ($a, $b, $allow_blessed, $sigil) = @_;
+    my $ref = $allow_blessed ? sub { reftype $_[0] // '' } : sub { ref $_[0] };
+
+    return $b
+        if !$ref->($a)
+        || !$ref->($b)
+        || $ref->($a) ne $ref->($b);
+
+    if ($ref->($a) eq 'ARRAY') {
+        return $b unless $sigil;
+        if ($sigil eq '+') {
+            for my $e (@$b) {
+                push @$a, $e unless grep { eq_deeply($_, $e) } @$a;
+            }
+        }
+        else {
+            $a = [
+                grep {
+                    my $e = $_;
+                    !grep { eq_deeply($_, $e) } @$b
+                } @$a
+            ];
+        }
+        return $a;
+    }
+    elsif ($ref->($a) eq 'HASH') {
+        for my $k (keys %$b) {
+
+            # If the key is an array then look for a merge sigil
+            my $s = $ref->($b->{$k}) eq 'ARRAY' && $k =~ s/^(\+|\-)// ? $1 : '';
+
+            $a->{$k} =
+                exists $a->{$k}
+                ? merge($a->{$k}, $b->{"$s$k"}, $allow_blessed, $s)
+                : $b->{$k};
+        }
+
+        return $a;
+    }
+    return $b;
+}
+
 1;
 
 __END__
@@ -207,6 +276,9 @@ The returned string will have leading C<+> removed and will be prepended with
 the second argument if there was no C<+>. An optional third argument can also
 be passed to treat the entire string as a class name.
 
+Will not do the camelizing if there is no C<#> sign in the string, even if
+the third argument is present.
+
 =head2 extract_class
 
 Extracts the class name from a C<Controller::action> string. Returns undef if
@@ -240,6 +312,14 @@ varying request path).
 =head2 load_package
 
 Takes a name of a package and loads it efficiently.
+
+=head2 merge
+
+    my $merged = Kelp::Util::merge($val1, $val2, $allow_blessed);
+
+Merges two structures. Used by config module to merge configuration files.
+Optionally, a third argument can be passed to allow merging values of blessed
+references as well.
 
 =cut
 

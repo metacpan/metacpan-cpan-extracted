@@ -37,6 +37,7 @@
             "Path::Tiny" : "0",
             "Plack" : "1.0041",
             "Template::Tiny" : "0",
+            "Test::Deep" : "0.091",
             "Try::Tiny" : "0",
             "URI" : "0",
             "namespace::autoclean" : "0",
@@ -45,7 +46,6 @@
       },
       "test" : {
          "requires" : {
-            "Test::Deep" : "0",
             "Test::Exception" : "0"
          }
       }
@@ -62,7 +62,7 @@
          "web" : "https://github.com/Kelp-framework/Kelp"
       }
    },
-   "version" : "2.12",
+   "version" : "2.13",
    "x_contributors" : [
       "Stefan Geneshky <minimal@cpan.org>",
       "Bartosz Jarzyna <bbrtj.pro@gmail.com>",

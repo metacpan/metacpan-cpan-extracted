@@ -19,18 +19,18 @@ name: App-wordlist
 provides:
   App::wordlist:
     file: lib/App/wordlist.pm
-    version: '0.292'
+    version: '0.293'
 recommends:
   App::lcpan::Call: '0.11'
   MetaCPAN::Client: '0'
 requires:
   Array::Pick::Scan: '0.005'
-  Complete::Util: '0.619'
+  Complete::Util: '0.620'
   Encode: '0'
   List::Util: '1.54'
   Log::ger: '0.038'
   Module::List: '0'
-  Module::Load::Util: '0.009'
+  Module::Load::Util: '0.011'
   PERLANCAR::Module::List: '0.004004'
   Perinci::Sub::Property::cmdline: '0'
   Perinci::Sub::Util: '0.472'
@@ -45,7 +45,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=App-wordlist
   homepage: https://metacpan.org/release/App-wordlist
   repository: git://github.com/perlancar/perl-App-wordlist.git
-version: '0.292'
+version: '0.293'
 x_Dist_Zilla:
   perl:
     version: '5.038002'
@@ -343,7 +343,7 @@ x_Dist_Zilla:
             -
               class: Pod::Weaver::Plugin::AppendPrepend
               name: '@Author::PERLANCAR/AppendPrepend'
-              version: '0.01'
+              version: '0.021'
             -
               class: Pod::Weaver::Plugin::EnsureUniqueSections
               name: '@Author::PERLANCAR/EnsureUniqueSections'

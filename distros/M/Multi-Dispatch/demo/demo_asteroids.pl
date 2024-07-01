@@ -2,8 +2,7 @@
 
 use 5.038;
 use warnings;
-use experimentals;
-use builtins;
+
 use Multi::Dispatch;
 use Object::Pad;
 
@@ -51,7 +50,6 @@ multi mcollide :permute (Ship $s->shielded,         $obj )  { $s->bounce,     $o
 multi mcollide :permute (Ship $s->shielded,  Missile  $m )  { $s->bounce,     $m->explode    }
 multi mcollide :permute (     $obj1,               $obj2 )  { $obj1->explode, $obj2->explode }
 
-use experimentals;
 
 my $as = Asteroid->new;
 my $sa = Saucer->new;

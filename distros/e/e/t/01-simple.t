@@ -95,6 +95,8 @@ is
   "\x{D7}\x{90}",
   "enc - alef code to bytes";
 
+is length "\x{5D0}", 1, "enc - single char";
+
 is
   enc( "\N{HEBREW LETTER ALEF}" ),
   "\x{D7}\x{90}",
@@ -104,6 +106,8 @@ is
   dec( "\x{D7}\x{90}" ),
   "\x{5D0}",
   "dec - bytes to alef code";
+
+is length "\x{D7}\x{90}", 2, "dec - 2 bytes ";
 
 is
   dec( enc( "\x{5D0}" ) ),
@@ -115,23 +119,21 @@ is
   "\x{D7}\x{90}",
   "dec,enc - same value";
 
-is
-  scalar enc( "\x{5D0}" ) =~ /\w/, "",
-  "enc - not word";
+is scalar enc( "\x{5D0}" ) =~ /\w/, "", "enc - not word";
 
-is
-  scalar dec( "\x{D7}\x{90}" ) =~ /\w/, 1,
-  "dec - is word";
+is scalar dec( "\x{D7}\x{90}" ) =~ /\w/, 1, "dec - is word";
 
-is
-    length(run( sub{ say dec "\x{D7}\x{90}" } )),
-    3,
-    "dec - no wide char warning";
+my $is_wide_warning = qr{ \b in \s+ say \s+ at \b }x;
 
-is
-    length(run( sub{ say "\x{5D0}" } )),
-    3,
-    "dec - no wide char warning";
+unlike
+  run( sub { say dec "\x{D7}\x{90}" } ),
+  $is_wide_warning,
+  "dec - no wide char warning";
+
+unlike
+  run( sub { say "\x{5D0}" } ),
+  $is_wide_warning,
+  "dec - no wide char warning";
 
 ######################################
 #          Enhanced Types

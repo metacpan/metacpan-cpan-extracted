@@ -5,7 +5,7 @@ use warnings;
 use Sisimai::RFC5322;
 
 sub DELIVERYSTATUS {
-    # Data structure for parsed bounce messages
+    # Data structure for decoded bounce messages
     # @private
     # @return [Hash] Data structure for delivery status
     return {
@@ -42,7 +42,7 @@ sub index {
     # @return   [Array] MTA list with order
     return [qw|
         Activehunter Amavis AmazonSES AmazonWorkMail Aol ApacheJames Barracuda Bigfoot Biglobe Courier
-        Domino EZweb EinsUndEins Exchange2003 Exchange2007 Exim FML Facebook GMX GSuite GoogleGroups
+        Domino DragonFly EZweb EinsUndEins Exchange2003 Exchange2007 Exim FML Facebook GMX GSuite GoogleGroups
         Gmail IMailServer InterScanMSS KDDI MXLogic MailFoundry MailMarshalSMTP MailRu McAfee MessageLabs
         MessagingServer Notes Office365 OpenSMTPD Outlook Postfix PowerMTA ReceivingSES SendGrid Sendmail
         SurfControl V5sendmail Verizon X1 X2 X3 X4 X5 X6 Yahoo Yandex Zoho mFILTER qmail
@@ -65,11 +65,11 @@ sub path {
 }
 
 sub inquire {
-    # Method of a parent class to parse a bounce message of each MTA
+    # Method of a parent class to decode a bounce message of each MTA
     # @param    [Hash] mhead    Message headers of a bounce email
     # @param    [String] mbody  Message body of a bounce email
     # @return   [Hash]          Bounce data list and message/rfc822 part
-    # @return   [undef]         failed to parse or the arguments are missing
+    # @return   [undef]         failed to decode or the arguments are missing
     return undef;
 }
 
@@ -84,11 +84,12 @@ Sisimai::Lhost - Base class for Sisimai::Lhost::*
 
 =head1 SYNOPSIS
 
-Do not use or require this class directly, use Sisimai::Lhost::*, such as Sisimai::Lhost::Sendmail, instead.
+B<Do not use or require this class directly>, call a class of C<Sisimai::Lhost::*>, such as
+C<Sisimai::Lhost::Sendmail>, instead.
 
 =head1 DESCRIPTION
 
-Sisimai::Lhost is a base class for all the MTA modules of Sisimai::Lhost::*.
+C<Sisimai::Lhost> is a base class for all the MTA modules of C<Sisimai::Lhost::*>.
 
 =head1 AUTHOR
 

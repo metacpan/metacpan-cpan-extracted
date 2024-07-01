@@ -30,7 +30,7 @@ package e;
            ⠹⡽⣾⣿⠹⣿⣆⣾⢯⣿⣿ ⡞ ⠻⣿⣿⣿⠁ ⢠⣿⢏  ⡀ ⡟  ⢀⣴⣿⠃⢁⡼⠁ ⠈
              ⠈⠛ ⢻⣿⣧⢸⢟⠶⢾⡇  ⣸⡿⠁ ⢠⣾⡟⢼  ⣷ ⡇ ⣰⠋⠙⠁
                 ⠈⣿⣻⣾⣦⣇⢸⣇⣀⣶⡿⠁⣀⣀⣾⢿⡇⢸  ⣟⡦⣧⣶⠏ unleashed
-                 ⠸⢿⡍⠛⠻⠿⠿⠿⠋⣠⡾⢋⣾⣏⣸⣷⡸⣇⢰⠟⠛⠻⡄  v1.23
+                 ⠸⢿⡍⠛⠻⠿⠿⠿⠋⣠⡾⢋⣾⣏⣸⣷⡸⣇⢰⠟⠛⠻⡄  v1.24
                    ⢻⡄   ⠐⠚⠋⣠⡾⣧⣿⠁⠙⢳⣽⡟
                    ⠈⠳⢦⣤⣤⣀⣤⡶⠛ ⠈⢿⡆  ⢿⡇
                          ⠈    ⠈⠓  ⠈
@@ -45,19 +45,19 @@ use 5.006;
 use strict;
 use warnings;
 
-our $VERSION = '1.23';
+our $VERSION = '1.24';
 
 =head1 SYNOPSIS
 
 Add a trace marker:
 
-   $ perl -Me -e 'sub f1 { trace } sub f2 { f1 } f2'
+    $ perl -Me -e 'sub f1 { trace } sub f2 { f1 } f2'
 
 Watch a reference for changes:
 
-   $ perl -Me -e 'my $v = {}; sub f1 { watch( $v ) } sub f2 { f1; $v->{a} = 1 } f2'
+    $ perl -Me -e 'my $v = {}; sub f1 { watch( $v ) } sub f2 { f1; $v->{a} = 1 } f2'
 
-   $ perl -Me -e '
+    $ perl -Me -e '
         package A {
             use e;
             my %h = ( aaa => 111 );
@@ -79,39 +79,39 @@ Watch a reference for changes:
 
 Benchmark two snippets of code:
 
-   $ perl -Me -e 'n { slow => sub{ ... }, fast => sub{ ... }}, 10000'
+    $ perl -Me -e 'n { slow => sub{ ... }, fast => sub{ ... }}, 10000'
 
 Launch the Runtime::Debugger:
 
-   $ perl -Me -e 'repl'
+    $ perl -Me -e 'repl'
 
 Invoke the Tiny::Prof:
 
-   $ perl -Me -e 'prof'
+    $ perl -Me -e 'prof'
 
 Convert a data structure to json:
 
-   $ perl -Me -e 'say j { a => [ 1..3] }'
+    $ perl -Me -e 'say j { a => [ 1..3] }'
 
 Convert a data structure to yaml:
 
-   $ perl -Me -e 'say yml { a => [ 1..3] }'
+    $ perl -Me -e 'say yml { a => [ 1..3] }'
 
 Pretty print a data structure:
 
-   $ perl -Me -e 'p { a => [ 1..3] }'
+    $ perl -Me -e 'p { a => [ 1..3] }'
 
 Data dump a data structure:
 
-   $ perl -Me -e 'd { a => [ 1..3] }'
+    $ perl -Me -e 'd { a => [ 1..3] }'
 
 Devel::Peek dump a data structure:
 
-   $ perl -Me -e 'dd { a => [ 1..3] }'
+    $ perl -Me -e 'dd { a => [ 1..3] }'
 
 Print data as a table:
 
-   $ perl -Me -e 'table( [qw(key value)], [qw(red 111)], [qw(blue 222)] )'
+    $ perl -Me -e 'table( [qw(key value)], [qw(red 111)], [qw(blue 222)] )'
     +------+-------+
     | key  | value |
     +------+-------+
@@ -121,12 +121,12 @@ Print data as a table:
 
 Encode/decode UTF-8:
 
-   $ perl -Me -e 'printf "%#X\n", ord for split //, enc "\x{5D0}"'
+    $ perl -Me -e 'printf "%#X\n", ord for split //, enc "\x{5D0}"'
     0XD7
     0X90
 
-   $ perl -C -Me -e 'say dec "\xD7\x90"'
-   $ perl -Me -e 'utf8; say dec "\xD7\x90"'
+    $ perl -C -Me -e 'say dec "\xD7\x90"'
+    $ perl -Me -e 'utf8; say dec "\xD7\x90"'
     א
 
 =cut
@@ -229,29 +229,29 @@ Benchmark and compare different pieces of code.
 
 JSON Parser.
 
-  my $bytes = j([1, 2, 3]);
-  my $bytes = j({foo => 'bar'});
-  my $value = j($bytes);
+    my $bytes = j([1, 2, 3]);
+    my $bytes = j({foo => 'bar'});
+    my $value = j($bytes);
 
 Encode Perl data structure or decode JSON with L<Mojo::JSON/"j">.
 
 Convert Perl object to JSON string:
 
-  $ perl -Me -e 'say j { a => [1..3]}'
+    $ perl -Me -e 'say j { a => [1..3]}'
 
 Convert JSON string to Perl object:
 
-  $ perl -Me -e 'p j q({"a":[1,2,3]})'
+    $ perl -Me -e 'p j q({"a":[1,2,3]})'
 
 =head3 x
 
 XML parser.
 
-  my $dom = x('<div>Hello!</div>');
+    my $dom = x('<div>Hello!</div>');
 
 Turn HTML/XML input into L<Mojo::DOM> object.
 
-  $ perl -Me -e 'say x("<div>hey</dev>")->at("div")->text'
+    $ perl -Me -e 'say x("<div>hey</dev>")->at("div")->text'
 
 =head3 yml
 
@@ -269,7 +269,7 @@ Convert YAML string to Perl object:
 
 Encode UTF-8 code point to a byte stream:
 
-    $ perl -C -Me -e 'printf "%#X\n", ord for enc("\x{5D0}") =~ /./g'
+    $ perl -Me -e 'printf "%#X\n", ord for split //, enc "\x{5D0}"'
     0XD7
     0X90
 
@@ -292,17 +292,17 @@ Set STDOUT and STDERR as UTF-8 encoded.
 
 Work with strings.
 
-  my $stream = b('lalala');
+    my $stream = b('lalala');
 
 Turn string into a L<Mojo::ByteStream> object.
 
-  $ perl -Me -e 'b(g("mojolicious.org")->body)->html_unescape->say'
+    $ perl -Me -e 'b(g("mojolicious.org")->body)->html_unescape->say'
 
 =head3 c
 
 Work with arrays.
 
-  my $collection = c(1, 2, 3);
+    my $collection = c(1, 2, 3);
 
 Turn list into a L<Mojo::Collection> object.
 
@@ -314,11 +314,11 @@ Turn list into a L<Mojo::Collection> object.
 
 Work with files.
 
-  my $path = f('/home/sri/foo.txt');
+    my $path = f('/home/sri/foo.txt');
 
 Turn string into a L<Mojo::File> object.
 
-  $ perl -Me -e 'say r j f("hello.json")->slurp'
+    $ perl -Me -e 'say r j f("hello.json")->slurp'
 
 =cut
 
@@ -329,6 +329,20 @@ Turn string into a L<Mojo::File> object.
 Print with newline.
 
     $ perl -Me -e 'say 123'
+    $ perl -Me -e 'say for 1..3'
+
+Always sends output to the terminal even
+when STDOUT and/or STDERR are redirected:
+
+    $ perl -Me -e '
+        close *STDOUT;
+        close *STDERR;
+        say 111;
+        print "999\n";
+        say 222;
+    '
+    111
+    222
 
 =head3 p
 
@@ -341,6 +355,15 @@ Pretty data printer.
 Return pretty printer data.
 
     $ perl -Me -e 'my $v = np [1..3]; say "got: $v"'
+
+Can be used with C<say> to output to the terminal
+(incase STDOUT/STDERR are redirected):
+
+    $ perl -Me -e '
+        close *STDOUT;
+        close *STDERR;
+        say np [ 1.. 3 ];
+    '
 
 =head3 d
 
@@ -364,7 +387,7 @@ Color a string.
 
 Print data as a table:
 
-   $ perl -Me -e 'table( [qw(key value)], [qw(red 111)], [qw(blue 222)] )'
+    $ perl -Me -e 'table( [qw(key value)], [qw(red 111)], [qw(blue 222)] )'
     +------+-------+
     | key  | value |
     +------+-------+
@@ -384,24 +407,24 @@ Context sensitive!
 
 =head3 g
 
-  my $res = g('example.com');
-  my $res = g('http://example.com' => {Accept => '*/*'} => 'Hi!');
-  my $res = g('http://example.com' => {Accept => '*/*'} => form => {a => 'b'});
-  my $res = g('http://example.com' => {Accept => '*/*'} => json => {a => 'b'});
+    my $res = g('example.com');
+    my $res = g('http://example.com' => {Accept => '*/*'} => 'Hi!');
+    my $res = g('http://example.com' => {Accept => '*/*'} => form => {a => 'b'});
+    my $res = g('http://example.com' => {Accept => '*/*'} => json => {a => 'b'});
 
 Perform C<GET> request with L<Mojo::UserAgent/"get"> and return resulting L<Mojo::Message::Response> object.
 
-  $ perl -Me -e 'say g("mojolicious.org")->dom("h1")->map("text")->join("\n")'
+    $ perl -Me -e 'say g("mojolicious.org")->dom("h1")->map("text")->join("\n")'
 
 =head3 l
 
 Work with URLs.
 
-  my $url = l('https://mojolicious.org');
+    my $url = l('https://mojolicious.org');
 
 Turn a string into a L<Mojo::URL> object.
 
-  $ perl -Me -e 'say l("/perldoc")->to_abs(l("https://mojolicious.org"))'
+    $ perl -Me -e 'say l("/perldoc")->to_abs(l("https://mojolicious.org"))'
 
 =cut
 
@@ -435,6 +458,26 @@ Work with perl pod.
 
 =head3 import
 
+[Internal] Imports the DSL into another package.
+
+Can be used in a sub class to import this class
+plus its own commands like this:
+
+    package e2;
+    use parent qw( e );
+
+    sub import {
+        my ( $class ) = @_;
+        my $class = caller;
+        $class->SUPER::import( $caller );
+        $class->can("monkey_patch")->(
+            $caller,
+            my_command_1 => sub {},
+            my_command_2 => sub {},
+            my_command_3 => sub {},
+        );
+    }
+
 =cut
 
 sub monkey_patch {
@@ -453,8 +496,9 @@ sub monkey_patch {
 }
 
 sub import {
+    my ( $class, $caller ) = @_;
     my %imported;
-    my $caller = caller();
+    $caller //= caller;
 
     monkey_patch(
         $caller,
@@ -569,8 +613,8 @@ sub import {
 
         # Set UTF-8 for STDOUT and STDERR.
         utf8 => sub {
-            binmode *STDOUT, "encoding(UTF-8)";
-            binmode *STDERR, "encoding(UTF-8)";
+            my @fh = @_ ? @_ : ( *STDOUT, *STDERR );
+            binmode $_, "encoding(UTF-8)" for @fh;
         },
 
         ######################################
@@ -611,7 +655,22 @@ sub import {
 
         # Print.
         say => sub {
-            CORE::say( @_ ? @_ : ( $_ ) );
+            my @args = @_ ? @_ : ( $_ );
+
+            # Send to terminal.
+            # Needs to be explicitly closed to avoid
+            # issues with next say() if still closed:
+            #   "say() on closed filehandle STDOUT"
+            if ( !-t STDOUT ) {
+                open my $tty, ">", "/dev/tty" or die $!;
+                caller->can( "utf8" )->( $tty );    # Method now in caller.
+                CORE::say $tty @args;
+                close $tty;
+            }
+
+            # Send to output incase something expects it there.
+            caller->can( "utf8" );
+            CORE::say @args;
         },
 
         # Pretty Print.
@@ -756,7 +815,7 @@ This software is Copyright (c) 2024 by Tim Potapov.
 
 This is free software, licensed under:
 
-  The Artistic License 2.0 (GPL Compatible)
+    The Artistic License 2.0 (GPL Compatible)
 
 =cut
 

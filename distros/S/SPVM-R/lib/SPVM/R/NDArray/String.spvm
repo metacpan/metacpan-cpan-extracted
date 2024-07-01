@@ -18,10 +18,6 @@ class R::NDArray::String extends R::NDArray::Object {
   
   protected method init : void ($options : object[] = undef) {
     
-    my $element_size = Fn->sizeof_native_pointer;
-    
-    $options = Fn->merge_options($options, {element_size => $element_size, type => "string"});
-    
     $self->SUPER::init($options);
   }
   
@@ -41,7 +37,7 @@ class R::NDArray::String extends R::NDArray::Object {
     }
   }
   
-  protected method create_default_data : string[] ($length : int) {
+  protected method create_default_data : string[] ($length : int = 0) {
     
     unless ($length >= 0) {
       die "The length \$length must be more than or equal to 0.";
@@ -56,29 +52,29 @@ class R::NDArray::String extends R::NDArray::Object {
     return (R::NDArray::String)$self->SUPER::clone;
   }
   
-  method element_to_string : string ($data_index : int) {
+  method elem_to_string : string ($data_index : int) {
     
     my $data = $self->data;
     
-    my $element = $data->[$data_index];
+    my $elem = $data->[$data_index];
     
-    my $string = $element;
+    my $string = $elem;
     
     return $string;
   }
   
-  method element_clone : string ($data_index : int) {
+  method elem_clone : string ($data_index : int) {
     
     my $data = $self->data;
     
-    my $element = $data->[$data_index];
+    my $elem = $data->[$data_index];
     
-    my $clone = copy $element;
+    my $clone = copy $elem;
     
     return $clone;
   }
   
-  precompile method to_int : R::NDArray::Int () {
+  precompile method to_int_ndarray : R::NDArray::Int () {
     
     unless ($self) {
       die "The n-dimension array \$self must be defined.";
@@ -100,7 +96,7 @@ class R::NDArray::String extends R::NDArray::Object {
     return $ret_ndarray;
   }
   
-  precompile method to_long : R::NDArray::Long () {
+  precompile method to_long_ndarray : R::NDArray::Long () {
     
     unless ($self) {
       die "The n-dimension array \$self must be defined.";
@@ -122,7 +118,7 @@ class R::NDArray::String extends R::NDArray::Object {
     return $ret_ndarray;
   }
   
-  precompile method to_float : R::NDArray::Float () {
+  precompile method to_float_ndarray : R::NDArray::Float () {
     
     unless ($self) {
       die "The n-dimension array \$self must be defined.";
@@ -144,7 +140,7 @@ class R::NDArray::String extends R::NDArray::Object {
     return $ret_ndarray;
   }
   
-  precompile method to_double : R::NDArray::Double () {
+  precompile method to_double_ndarray : R::NDArray::Double () {
     
     unless ($self) {
       die "The n-dimension array \$self must be defined.";
@@ -166,15 +162,15 @@ class R::NDArray::String extends R::NDArray::Object {
     return $ret_ndarray;
   }
   
-  precompile method to_float_complex : R::NDArray::FloatComplex () {
+  precompile method to_float_complex_ndarray : R::NDArray::FloatComplex () {
     die "This method will be implemented.";
   }
   
-  precompile method to_double_complex : R::NDArray::DoubleComplex () {
+  precompile method to_double_complex_ndarray : R::NDArray::DoubleComplex () {
     die "This method will be implemented.";
   }
   
-  precompile method to_string_buffer : R::NDArray::StringBuffer () {
+  precompile method to_string_buffer_ndarray : R::NDArray::StringBuffer () {
     
     unless ($self) {
       die "The n-dimension array \$self must be defined.";
@@ -196,7 +192,7 @@ class R::NDArray::String extends R::NDArray::Object {
     return $ret_ndarray;
   }
   
-  precompile method to_time_piece : R::NDArray::Time::Piece () {
+  precompile method to_time_piece_ndarray : R::NDArray::Time::Piece () {
     
     unless ($self) {
       die "The n-dimension array \$self must be defined.";

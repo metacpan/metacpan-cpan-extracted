@@ -4,7 +4,7 @@ package Test::Pod::CoverageChange;
 use strict;
 use warnings;
 
-our $VERSION = '0.003';
+our $VERSION = '0.004';
 our $AUTHORITY = 'cpan:DERIV'; # AUTHORITY
 
 use utf8;
@@ -249,6 +249,14 @@ sub _check_allowed_naked_packages {
         my $pc = Pod::Coverage->new(
             package => $package,
             private => []);
+
+        # Require before we run the coverage to pick up any errors loading that
+        # are getting hidden by the coverage check.
+        # Do not move to after $pc usage otherwise $@ will reflect the failure
+        # from coverage which won't be the same.
+        eval qq{ require $package };
+        die if ($@);
+
         my $fully_covered           = defined $pc->coverage && $pc->coverage == 1;
         my $coverage_percentage     = defined $pc->coverage ? $pc->coverage * 100 : 0;
         my $max_expected_naked_subs = $allowed_naked_packages->{$package};

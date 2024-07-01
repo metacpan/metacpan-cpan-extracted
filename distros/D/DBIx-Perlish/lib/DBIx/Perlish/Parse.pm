@@ -2079,13 +2079,10 @@ sub parse_table_label
 {
 	my ($S, $label, $lop, $op) = @_;
 
-	if ( $] >= 5.037 ) {
-		bailout $S, "label ", $lop->label, " must be followed by an assignment"
-			unless $op->name eq "padsv_store";
-	} else {
-		bailout $S, "label ", $lop->label, " must be followed by an assignment"
-			unless $op->name eq "sassign";
-	}
+	# prior to 5.37 it's sassign, prior to 5.41 it's padsv_store, later it's mixed
+	bailout $S, "label ", $lop->label, " must be followed by an assignment" unless
+		$op->name eq "padsv_store" || $op->name eq 'sassign';
+
 	my $attr = parse_simple_term($S, $op->first);
 	my $varn;
 	if ( $] >= 5.037 ) {

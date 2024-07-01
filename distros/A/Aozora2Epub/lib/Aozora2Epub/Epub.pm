@@ -14,7 +14,7 @@ use Aozora2Epub::Gensym;
 use base qw/Class::Accessor/;
 __PACKAGE__->mk_accessors(qw/assets/);
 
-our $VERSION = "0.04";
+our $VERSION = "0.05";
 
 sub new {
     my $class = shift;

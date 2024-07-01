@@ -58,6 +58,7 @@ lib/Kelp/templates/less/NAME.psgi.gen
 lib/Kelp/templates/less/template
 t/author-pod-syntax.t
 t/base.t
+t/base_attr.t
 t/bin_tests.t
 t/charset.t
 t/conf/a/config.pl

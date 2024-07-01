@@ -195,7 +195,7 @@ class TestCase::R {
           my $dim = [1];
           my $ndarray = R::NDArray::Int->new({dim => $dim});
           
-          if ($ndarray->is_matrix) {
+          unless ($ndarray->is_matrix) {
             return 0;
           }
         }
@@ -204,7 +204,7 @@ class TestCase::R {
           my $dim = [2];
           my $ndarray = R::NDArray::Int->new({dim => $dim});
           
-          if ($ndarray->is_matrix) {
+          unless ($ndarray->is_matrix) {
             return 0;
           }
         }
@@ -243,7 +243,7 @@ class TestCase::R {
           my $dim = [1];
           my $ndarray = R::NDArray::Int->new({dim => $dim});
           
-          if ($ndarray->is_square_matrix) {
+          unless ($ndarray->is_square_matrix) {
             return 0;
           }
         }
@@ -284,6 +284,131 @@ class TestCase::R {
           }
         }
       }
+      
+      # R::NDArray#nrow method and R::NDArray#ncol method
+      {
+        {
+          my $dim = [1];
+          my $ndarray = R::NDArray::Int->new({dim => $dim});
+          
+          unless ($ndarray->nrow == 1) {
+            return 0;
+          }
+          
+          unless ($ndarray->ncol == 1) {
+            return 0;
+          }
+        }
+        
+        {
+          my $dim = [2];
+          my $ndarray = R::NDArray::Int->new({dim => $dim});
+          
+          unless ($ndarray->nrow == 2) {
+            return 0;
+          }
+          
+          unless ($ndarray->ncol == 1) {
+            return 0;
+          }
+        }
+        
+        {
+          my $dim = [3, 2];
+          my $ndarray = R::NDArray::Int->new({dim => $dim});
+          
+          unless ($ndarray->nrow == 3) {
+            return 0;
+          }
+          
+          unless ($ndarray->ncol == 2) {
+            return 0;
+          }
+        }
+      }
+      
+      # R::NDArray#dim
+      {
+        {
+          my $dim = [2, 3];
+          my $ndarray = R::NDArray::Int->new({dim => $dim});
+          
+          unless (Array->equals_int($ndarray->dim, [2, 3])) {
+            return 0;
+          }
+          
+          unless ($ndarray->dim != $dim) {
+            return 0;
+          }
+        }
+      }
+      
+      # R::NDArray#set_dim
+      {
+        {
+          my $dim = [2, 3, 5];
+          my $ndarray = R::NDArray::Int->new({dim => $dim});
+          
+          $ndarray->set_dim([5, 3, 2]);
+          unless (Array->equals_int($ndarray->dim, [5, 3, 2])) {
+            return 0;
+          }
+          
+          $ndarray->set_dim([5, 6]);
+          unless (Array->equals_int($ndarray->dim, [5, 6])) {
+            return 0;
+          }
+          
+          $ndarray->set_dim([5, 6, 0]);
+          unless (Array->equals_int($ndarray->dim, [5, 6])) {
+            return 0;
+          }
+          
+          $ndarray->set_dim([2, 3, 5, 1]);
+          unless (Array->equals_int($ndarray->dim, [2, 3, 5, 1])) {
+            return 0;
+          }
+          
+          # Exceptions
+          {
+            eval { $ndarray->set_dim([2, 3, 4]); }
+          }
+          
+          unless ($@) {
+            return 0;
+          }
+        }
+      }
+      # R::NDArray#length
+      {
+        {
+          my $dim = new int[0];
+          my $ndarray = R::NDArray::Int->new({dim => $dim});
+          
+          unless ($ndarray->length == 0) {
+            return 0;
+          }
+        }
+        
+        {
+          my $dim = [1];
+          my $ndarray = R::NDArray::Int->new({dim => $dim});
+          
+          unless ($ndarray->length == 1) {
+            return 0;
+          }
+        }
+        
+        {
+          my $dim = [2, 3, 5];
+          my $ndarray = R::NDArray::Int->new({dim => $dim});
+          
+          unless ($ndarray->length == 30) {
+            return 0;
+          }
+        }
+      }
+      
     }
     
     # R::NDArray::Int
@@ -297,15 +422,27 @@ class TestCase::R {
             return 0;
           }
           
-          unless ($ndarray->element_size == 4) {
+          unless ($ndarray->elem_size == 4) {
             return 0;
           }
           
-          unless ($ndarray->is_numeric == 1) {
+          unless ($ndarray->is_numeric_ndarray == 1) {
             return 0;
           }
           
-          unless ($ndarray->type eq "int") {
+          unless ($ndarray->is_any_numeric_ndarray == 1) {
+            return 0;
+          }
+          
+          unless ($ndarray->is_mulnum_ndarray == 0) {
+            return 0;
+          }
+          
+          unless ($ndarray->is_object_ndarray == 0) {
+            return 0;
+          }
+          
+          unless ($ndarray->elem_type_name eq "int") {
             return 0;
           }
           

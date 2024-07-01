@@ -20,6 +20,7 @@ sub list {
             Lhost/Biglobe.pm
             Lhost/Courier.pm
             Lhost/Domino.pm
+            Lhost/DragonFly.pm
             Lhost/EinsUndEins.pm
             Lhost/Exchange2003.pm
             Lhost/Exchange2007.pm
@@ -114,6 +115,7 @@ sub list {
         RFC5322.pm
         RFC5965.pm
         Rhost.pm
+            Rhost/Apple.pm
             Rhost/Cox.pm
             Rhost/FrancePTT.pm
             Rhost/GoDaddy.pm
@@ -125,6 +127,7 @@ sub list {
             Rhost/NTTDOCOMO.pm
             Rhost/Spectrum.pm
             Rhost/Tencent.pm
+            Rhost/YahooInc.pm
         SMTP.pm
             SMTP/Command.pm
             SMTP/Error.pm

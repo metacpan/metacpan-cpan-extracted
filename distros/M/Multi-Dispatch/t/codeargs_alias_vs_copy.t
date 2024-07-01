@@ -1,7 +1,7 @@
 use 5.022;
 
 use warnings;
-use experimentals;
+use experimental 'refaliasing';
 use Multi::Dispatch;
 
 use Test::More;

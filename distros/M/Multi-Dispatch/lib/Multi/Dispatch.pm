@@ -7,7 +7,7 @@ use re 'eval';
 use mro;
 use Data::Dump;
 
-our $VERSION = '0.000002';
+our $VERSION = '0.000003';
 
 use Keyword::Simple;
 use PPR;
@@ -1510,7 +1510,7 @@ Multi::Dispatch - Multiple dispatch for Perl subs and methods
 
 =head1  VERSION
 
-This document describes Multi::Dispatch version 0.000002
+This document describes Multi::Dispatch version 0.000003
 
 
 =head1  SYNOPSIS

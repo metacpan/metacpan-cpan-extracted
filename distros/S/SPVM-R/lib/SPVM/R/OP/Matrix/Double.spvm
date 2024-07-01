@@ -28,9 +28,9 @@ class R::OP::Matrix::Double {
     
     for (my $column_index = 0; $column_index < $column; $column_index++) {
       for (my $row_index = 0; $row_index < $row; $row_index++) {
-        my $element = $x_data->[$column * $column_index + $row_index];
+        my $elem = $x_data->[$column * $column_index + $row_index];
         
-        $new_x_data->[$row * $row_index + $column] = $element;
+        $new_x_data->[$row * $row_index + $column] = $elem;
       }
     }
     
@@ -66,16 +66,16 @@ class R::OP::Matrix::Double {
       die "The n-dimension array \$x_ndarray must be defined.";
     }
     
-    unless ($x_ndarray->is_vector || $x_ndarray->is_matrix) {
-      die "The n-dimension array \$x_ndarray must be a vector or a matrix.";
+    unless ($x_ndarray->is_matrix) {
+      die "The n-dimension array \$x_ndarray must be a matrix.";
     }
     
     unless ($y_ndarray) {
       die "The n-dimension array \$y_ndarray must be defined.";
     }
     
-    unless ($x_ndarray->is_vector || $y_ndarray->is_matrix) {
-      die "The n-dimension array \$y_ndarray must be a vector or a matrix.";
+    unless ($y_ndarray->is_matrix) {
+      die "The n-dimension array \$y_ndarray must be a a matrix.";
     }
     
     my $x_dim = $x_ndarray->dim;
@@ -129,8 +129,8 @@ class R::OP::Matrix::Double {
       die "The n-dimension array \$x_ndarray must be defined.";
     }
     
-    unless ($x_ndarray->is_vector || $x_ndarray->is_matrix) {
-      die "The n-dimension array \$x_ndarray must be a vector or a matrix.";
+    unless ($x_ndarray->is_matrix) {
+      die "The n-dimension array \$x_ndarray must be a matrix.";
     }
     
     my $row = $x_ndarray->length;

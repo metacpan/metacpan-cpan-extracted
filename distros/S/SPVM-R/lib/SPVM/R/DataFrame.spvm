@@ -293,5 +293,25 @@ class R::DataFrame {
     
     return $ret_data_frame;
   }
+  
+  method ncol : int () {
+    
+    my $ncol = $self->get_fields_length;
+    
+    return $ncol;
+  }
+  
+  method nrow : int () {
+    
+    my $fields_length = $self->get_fields_length;
+    
+    my $nrow = 0;
+    if ($fields_length > 0) {
+      $nrow = $self->get_ndarray_by_index(0)->length;
+    }
+    
+    return $nrow;
+  }
+  
 }
 

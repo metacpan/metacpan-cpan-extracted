@@ -1526,13 +1526,13 @@ class R::OP::Double {
     my $x_length = $x_ndarray->length;
     
     unless ($x_length == 3) {
-      die "The length of elements of n-dimension array \$x_ndarray must be 3.";
+      die "The length of elems of n-dimension array \$x_ndarray must be 3.";
     }
     
     my $y_length = $y_ndarray->length;
     
     unless ($y_length == 3) {
-      die "The length of elements of n-dimension array \$y_ndarray must be 3.";
+      die "The length of elems of n-dimension array \$y_ndarray must be 3.";
     }
     
     my $length = $x_length;

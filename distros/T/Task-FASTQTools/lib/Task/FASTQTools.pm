@@ -1,12 +1,12 @@
 package Task::FASTQTools;
-$Task::FASTQTools::VERSION = '0.02';
+$Task::FASTQTools::VERSION = '0.03';
 use strict;
 use warnings;
 use parent  qw(Exporter);
 use autodie qw(:file);      ## takes care of open/close errors
 use BioX::Seq;
 use Carp qw(croak carp);
-our @EXPORT = qw(fastq2a fa2tab fq2tab fa2BioXSeq fq2BioXSeq);
+our @EXPORT = qw(fa2BioXSeq fa2hash fa2tab fastq2a fq2BioXSeq fq2hash fq2tab);
 
 sub fa2BioXSeq {
     my ( $input_file, $bioseq_objects_ref ) = @_;
@@ -64,6 +64,127 @@ sub fa2BioXSeq {
     }
     close $in_fh;
     push @{$bioseq_objects_ref}, @bioseq_objects;
+    return $retval;
+}
+
+sub fa2hash {
+    my ( $input_file, $bioseq_objects_ref ) = @_;
+    my ( $has_seqid, $has_seq )             = ( 0, 0 );
+    my ( $id, $seq )                        = ( '', '' );
+    my $is_badly_formed_fasta = 0;
+    my ( $out_fh, $in_fh );
+    local $/ = "\n";
+
+    my @bioseq_objects;
+    open $in_fh, '<', $input_file;
+    while (<$in_fh>) {
+        chomp;
+        my $line_header = substr( $_, 0, 1 );
+        unless ($has_seqid) {
+            if ( $line_header eq '>' ) {
+                $id        = substr( $_, 1 );
+                $has_seqid = 1;
+            }
+            else {
+                $is_badly_formed_fasta = 1;
+                last;
+            }
+        }
+        else {
+            if ( $line_header ne '>' ) {
+                $has_seq = 1;
+                $seq .= $_;
+            }
+            elsif ( $has_seq && $has_seqid ) {
+                if ( $line_header eq '>' ) {
+                    my %hash = ( id => $id, seq => $seq );
+                    push @bioseq_objects, \%hash;
+                    ( $has_seqid, $has_seq ) = ( 0,  0 );
+                    ( $id,        $seq )     = ( '', '' );
+                    redo;
+                }
+            }
+            else {
+                $is_badly_formed_fasta = 1;
+                last;
+            }
+        }
+
+    }
+
+    my $retval = 1;
+    if ($is_badly_formed_fasta) {
+        carp "Bad fasta format\n";
+        $retval = 0;    ## signify failure
+    }
+    else {
+        my %hash = ( id => $id, seq => $seq );
+        push @bioseq_objects, \%hash;    ## add the last sequence
+        $retval = 1;                     ## signify success
+    }
+    close $in_fh;
+    push @{$bioseq_objects_ref}, @bioseq_objects;
+    return $retval;
+}
+
+sub fa2tab {
+    my ( $input_file, $output_file ) = @_;
+    my ( $has_seqid, $has_seq )      = ( 0, 0 );
+    my ( $id, $seq )                 = ( '', '' );
+    my $is_badly_formed_fasta = 0;
+    my ( $out_fh, $in_fh );
+    local $/ = "\n";
+
+    open $in_fh,  '<', $input_file;
+    open $out_fh, '>', $output_file;
+
+    while (<$in_fh>) {
+        chomp;
+        my $line_header = substr( $_, 0, 1 );
+        unless ($has_seqid) {
+            if ( $line_header eq '>' ) {
+                $id        = substr( $_, 1 );
+                $has_seqid = 1;
+            }
+            else {
+                $is_badly_formed_fasta = 1;
+                last;
+            }
+        }
+        else {
+            if ( $line_header ne '>' ) {
+                $has_seq = 1;
+                $seq .= $_;
+            }
+            elsif ( $has_seq && $has_seqid ) {
+                if ( $line_header eq '>' ) {
+                    print {$out_fh} "$id\t$seq\n";
+                    ( $has_seqid, $has_seq ) = ( 0,  0 );
+                    ( $id,        $seq )     = ( '', '' );
+                    redo;
+                }
+            }
+            else {
+                $is_badly_formed_fasta = 1;
+                last;
+            }
+        }
+
+    }
+
+    my $retval;
+    if ($is_badly_formed_fasta) {
+        carp "Bad fasta format\n";
+
+        unlink $output_file if -e $output_file;
+        $retval = 0;    ## signify failure
+    }
+    else {
+        print {$out_fh} "$id\t$seq\n";
+        $retval = 1;    ## signify success
+    }
+    close $in_fh;
+    close $out_fh;
     return $retval;
 }
 
@@ -138,67 +259,6 @@ sub fastq2a {
     return $retval;
 }
 
-sub fa2tab {
-    my ( $input_file, $output_file ) = @_;
-    my ( $has_seqid, $has_seq )      = ( 0, 0 );
-    my ( $id, $seq )                 = ( '', '' );
-    my $is_badly_formed_fasta = 0;
-    my ( $out_fh, $in_fh );
-    local $/ = "\n";
-
-    open $in_fh,  '<', $input_file;
-    open $out_fh, '>', $output_file;
-
-    while (<$in_fh>) {
-        chomp;
-        my $line_header = substr( $_, 0, 1 );
-        unless ($has_seqid) {
-            if ( $line_header eq '>' ) {
-                $id        = substr( $_, 1 );
-                $has_seqid = 1;
-            }
-            else {
-                $is_badly_formed_fasta = 1;
-                last;
-            }
-        }
-        else {
-            if ( $line_header ne '>' ) {
-                $has_seq = 1;
-                $seq .= $_;
-            }
-            elsif ( $has_seq && $has_seqid ) {
-                if ( $line_header eq '>' ) {
-                    print {$out_fh} "$id\t$seq\n";
-                    ( $has_seqid, $has_seq ) = ( 0,  0 );
-                    ( $id,        $seq )     = ( '', '' );
-                    redo;
-                }
-            }
-            else {
-                $is_badly_formed_fasta = 1;
-                last;
-            }
-        }
-
-    }
-
-    my $retval;
-    if ($is_badly_formed_fasta) {
-        carp "Bad fasta format\n";
-
-        unlink $output_file if -e $output_file;
-        $retval = 0;    ## signify failure
-    }
-    else {
-        print {$out_fh} "$id\t$seq\n";
-        $retval = 1;    ## signify success
-    }
-    close $in_fh;
-    close $out_fh;
-    return $retval;
-}
-
 sub fq2BioXSeq {
     my ( $input_file, $bioseq_objects_ref )           = @_;
     my ( $has_seqid, $has_seq, $has_meta, $has_qual ) = ( 0, 0, 0, 0 );
@@ -263,6 +323,88 @@ sub fq2BioXSeq {
     }
     else {
         push @bioseq_objects, BioX::Seq->new( $seq, $id, $meta, $qual );
+        $retval = 1;    ## signify success
+    }
+    close $in_fh;
+    push @{$bioseq_objects_ref}, @bioseq_objects;
+    return $retval;
+}
+
+sub fq2hash {
+    my ( $input_file, $bioseq_objects_ref )           = @_;
+    my ( $has_seqid, $has_seq, $has_meta, $has_qual ) = ( 0, 0, 0, 0 );
+    my ( $id, $seq, $meta, $qual )                    = ( '', '', '', '' );
+    my $is_badly_formed_fastq = 0;
+    my ( $out_fh, $in_fh );
+    local $/ = "\n";
+
+    my @bioseq_objects;
+    open $in_fh, '<', $input_file;
+    while (<$in_fh>) {
+        chomp;
+        my $line_header = substr( $_, 0, 1 );
+        unless ($has_seqid) {
+            if ( $line_header eq '@' ) {
+                $id        = substr( $_, 1 );
+                $has_seqid = 1;
+            }
+            else {
+                $is_badly_formed_fastq = 1;
+                last;
+            }
+        }
+        else {
+            if ( $line_header ne '+' && !$has_meta ) {
+                $has_seq = 1;
+                $seq .= $_;
+            }
+            elsif ( $line_header eq '+' && !$has_meta && $has_seq ) {
+                $has_meta = 1;
+                $meta     = substr( $_, 1 );
+            }
+            elsif ( $has_meta && !$has_qual ) {
+                $qual .= $_;
+                $has_qual = 1;
+            }
+            elsif ( $has_seq && $has_seqid && $has_meta && $has_qual ) {
+                if ( length($seq) == length($qual) && $line_header eq '@' ) {
+                    my %hash = (
+                        id   => $id,
+                        seq  => $seq,
+                        meta => $meta,
+                        qual => $qual
+                    );
+                    push @bioseq_objects, \%hash;
+                    ( $has_seqid, $has_seq, $has_meta, $has_qual ) =
+                      ( 0, 0, 0, 0 );
+                    ( $id, $seq, $meta, $qual ) = ( '', '', '', '' );
+                    redo;
+                }
+                else {
+                    $qual .= $_;
+                }
+            }
+            else {
+                $is_badly_formed_fastq = 1;
+                last;
+            }
+        }
+
+    }
+
+    my $retval;
+    if ($is_badly_formed_fastq) {
+        carp "Bad fastq format\n";
+        $retval = 0;    ## signify failure
+    }
+    else {
+        my %hash = (
+            id   => $id,
+            seq  => $seq,
+            meta => $meta,
+            qual => $qual
+        );
+        push @bioseq_objects, \%hash;
         $retval = 1;    ## signify success
     }
     close $in_fh;
@@ -358,7 +500,7 @@ Task::FASTQTools
 
 =head1 VERSION
 
-version 0.02
+version 0.03
 
 =head1 SYNOPSIS
 

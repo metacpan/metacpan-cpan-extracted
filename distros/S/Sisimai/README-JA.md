@@ -1,7 +1,7 @@
 ![](https://libsisimai.org/static/images/logo/sisimai-x01.png)
 [![License](https://img.shields.io/badge/license-BSD%202--Clause-orange.svg)](https://github.com/sisimai/p5-sisimai/blob/master/LICENSE)
-[![Perl](https://img.shields.io/badge/perl-v5.26--v5.38-blue.svg)](https://www.perl.org)
-[![CPAN](https://img.shields.io/badge/cpan-v5.0.3-blue.svg)](https://metacpan.org/pod/Sisimai)
+[![Perl](https://img.shields.io/badge/perl-v5.26--v5.40-blue.svg)](https://www.perl.org)
+[![CPAN](https://img.shields.io/badge/cpan-v5.1.0-blue.svg)](https://metacpan.org/pod/Sisimai)
 [![codecov](https://codecov.io/github/sisimai/p5-sisimai/branch/5-stable/graph/badge.svg?token=8kvF4rWPM3)](https://codecov.io/github/sisimai/p5-sisimai)
 
 > [!IMPORTANT]
@@ -75,7 +75,7 @@ The key features of Sisimai
   * `cpan`, `cpanm`, `cpm install`
   * `git clone & make`
 * __高い解析精度__
-  * [70種類のMTAs/MDAs/ESPs](https://libsisimai.org/en/engine/)に対応
+  * [73種類のMTAs/MDAs/ESPs](https://libsisimai.org/en/engine/)に対応
   * Feedback Loop(ARF)にも対応
   * [34種類のバウンス理由](https://libsisimai.org/en/reason/)を検出
 
@@ -131,14 +131,14 @@ $ cd ./p5-sisimai
 $ make install-from-local
 ./cpanm --sudo . || ( make cpm && ./cpm install --sudo -v . )
 --> Working on .
-Configuring Sisimai-v5.0.3 ... OK
-Building and testing Sisimai-v5.0.3 ... Password: <sudo password here>
+Configuring Sisimai-v5.1.0 ... OK
+Building and testing Sisimai-v5.1.0 ... Password: <sudo password here>
 OK
-Successfully installed Sisimai-v5.0.3
+Successfully installed Sisimai-v5.1.0
 1 distribution installed
 
 $ perl -MSisimai -lE 'print Sisimai->version'
-5.0.3
+5.1.0
 ```
 
 Usage
@@ -350,11 +350,11 @@ Sisimai 5.0.0から**Perl 5.26.0以上**が必要になります。
 |------------------------------------------------------|--------------------|---------------------|
 | 動作環境(Perl)                                       | 5.10 - 5.38        | **5.26** - 5.38     |
 | 元メールファイルを操作可能なコールバック機能         | なし               | あり[^3]            |
-| 解析エンジン(MTA/ESPモジュール)の数                  | 68                 | 70                  |
+| 解析エンジン(MTA/ESPモジュール)の数                  | 68                 | 73                  |
 | 検出可能なバウンス理由の数                           | 29                 | 34                  |
 | 依存もジュール数(Perlのコアモジュールを除く)         | 2 モジュール       | 2 モジュール        |
-| ソースコードの行数                                   | 10,800 行          | 11,500 行           |
-| テスト件数(t/とxt/ディレクトリ)                      | 270,000 件         | 328,000 件          |
+| ソースコードの行数                                   | 10,800 行          | 11,800 行           |
+| テスト件数(t/とxt/ディレクトリ)                      | 270,000 件         | 335,000 件          |
 | 1秒間に解析できるバウンスメール数[^4]                | 541 通             | 660 通              |
 | ライセンス                                           | 2条項BSD           | 2条項BSD            |
 | 開発会社による商用サポート                           | 提供中             | 提供中              |
@@ -387,11 +387,14 @@ MTA/ESP Module Names
 Sisimai 5で3個のESPモジュール名(解析エンジン)が変更になりました。詳細はMTA/ESPモジュールの一覧/
 [LIBSISIMAI.ORG/JA/ENGINE](https://libsisimai.org/ja/engine/)を参照してください。
 
-| `Sisimai::Rhost::`                                   | Sisimai 4          | Sisimai 5           |
-|------------------------------------------------------|--------------------|---------------------|
-| Microsoft Exchange Online                            | `ExchangeOnline`   | `Microsoft`         |
-| Google Workspace                                     | `GoogleApps`       | `Google`            |
-| Tencent                                              | `TencentQQ`        | `Tencent`           |
+| `Sisimai::`                                     | Sisimai 4               | Sisimai 5           |
+|-------------------------------------------------|-------------------------|---------------------|
+| Apple iCloud Mail (added at v5.1.0)             | なし                    | `Rhost::Apple`      |
+| Microsoft Exchange Online                       | `Rhost::ExchangeOnline` | `Rhost::Microsoft`  |
+| Google Workspace                                | `Rhost::GoogleApps`     | `Rhost::Google`     |
+| Tencent                                         | `Rhost::TencentQQ`      | `Rhost::Tencent`    |
+| Yahoo Mail (added at v5.1.0)                    | なし                    | `Rhost::YahooInc`   |
+| DragonFly Mail Agent (added at v5.1.0)          | なし                    | `Lhost::DragonFly`  |
 
 Bounce Reasons
 ---------------------------------------------------------------------------------------------------

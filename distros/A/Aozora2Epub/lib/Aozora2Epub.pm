@@ -13,7 +13,7 @@ use HTML::Escape qw/escape_html/;
 use base qw(Class::Accessor);
 __PACKAGE__->mk_accessors(qw/files title author epub bib_info notation_notes/);
 
-our $VERSION = '0.04';
+our $VERSION = '0.05';
 
 our $AOZORA_GAIJI_URL = 'https://www.aozora.gr.jp/gaiji/';
 our $AOZORA_CARDS_URL = 'https://www.aozora.gr.jp/cards';

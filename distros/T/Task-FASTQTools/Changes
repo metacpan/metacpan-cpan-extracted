@@ -1,5 +1,7 @@
 Revision history for Task-FASTQTools
 
+0.03      2024-06-30 07:44:24-06:00 America/Denver
+- Added parsing functions to arrays of hash references
 0.02      2024-06-29 22:17:28-06:00 America/Denver
 - Added functions to read a file into an array of BioX::Seq objects
 - Restructured documentation

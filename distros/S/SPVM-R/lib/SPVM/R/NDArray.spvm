@@ -8,16 +8,11 @@ class R::NDArray {
   use Native::MethodCall;
   use StringBuffer;
   use R::Util;
+  use R::OP;
   
   # Fields
   has data : protected object;
   method data : object () { die "Not implemented."; }
-  
-  has element_size : ro protected int;
-  
-  has is_numeric : ro byte;
-  
-  has type : ro protected string;
   
   has dim : int[];
   
@@ -44,7 +39,7 @@ class R::NDArray {
       my $vector_index = $vector_indexes->[$vector_indexes_index];
       
       unless (!$vector_index || $vector_index->is_vector) {
-        die "The element of indexes for n-dimension array \$vector_indexes must be undef or vector.";
+        die "The elem of indexes for n-dimension array \$vector_indexes must be undef or vector.";
       }
       
       unless ($vector_index) {
@@ -141,32 +136,15 @@ class R::NDArray {
     
     my $options_h = Hash->new($options);
     
-    # element_size option
-    my $element_size = $options_h->get_or_default_int("element_size", -1);
-    unless ($element_size > 0) {
-      die "element_size option must be greter than 0.";
-    }
-    $self->{element_size} = $element_size;
-    
-    # is_numeric option
-    my $is_numeric = $options_h->get_or_default_int("is_numeric", 0);
-    unless ($is_numeric > 0) {
-      die "is_numeric option must be greter than 0.";
-    }
-    $self->{is_numeric} = (byte)$is_numeric;
-    
-    # type option
-    my $type = $options_h->get_or_default_string("type", undef);
-    unless ($type) {
-      die "type option must be defined.";
-    }
-    unless (length $type) {
-      die "The length of \"type\" option must greater than 0.";
-    }
-    $self->{type} = $type;
-    
     # data option
     my $data = $options_h->get_or_default("data", undef);
+    if ($data) {
+      my $default_data = $self->create_default_data;
+      unless (type_name $data eq type_name $default_data) {
+        my $type_name = type_name $default_data;
+        die "The type of the data \$data must be $type_name type.";
+      }
+    }
     
     # dim option
     my $dim = (int[])$options_h->get_or_default("dim", undef);
@@ -219,6 +197,49 @@ class R::NDArray {
     $self->check;
   }
   
+  method drop_dim : void () {
+    
+    my $dim = $self->{dim};
+    
+    my $dropped_dim = R::Util->drop_dim($dim);
+    
+    $self->set_dim($dropped_dim);
+  }
+  
+  method make_dim_read_only : void () {
+    $self->{is_dim_read_only} = 1;
+  }
+  
+  method nrow : int () {
+    
+    unless ($self->is_matrix) {
+      die "The n-dimension array \$self must be a matrix.";
+    }
+    
+    my $dim = $self->{dim};
+    
+    my $nrow = $dim->[0];
+    
+    return $nrow;
+  }
+  
+  method ncol : int () {
+    
+    unless ($self->is_matrix) {
+      die "The n-dimension array \$self must be a matrix.";
+    }
+    
+    my $dim = $self->{dim};
+    
+    my $ncol = 1;
+    
+    if (@$dim == 2) {
+      $ncol = $dim->[1];
+    }
+    
+    return $ncol;
+  }
+  
   method length : int () {
     
     my $dim = $self->{dim};
@@ -227,49 +248,6 @@ class R::NDArray {
     
     return $length;
   }
-  
-  protected method check : void () { die "Not implemented."; }
-  
-  protected method create_default_data : object ($length : int) { die "Not implemented."; }
-  
-  method clone : R::NDArray ($deep : int = 0) {
-    
-    my $element_size = $self->{element_size};
-    
-    my $is_numeric = $self->{is_numeric};
-    
-    my $length = $self->length;
-    
-    my $clone_data = $self->create_default_data($length);
-    
-    my $data = $self->{data};
-    
-    if ($is_numeric) {
-      Fn->memcpy($clone_data, 0, $data, 0, $element_size * $length);
-    }
-    else {
-      for (my $i = 0; $i < $length; $i++) {
-        if ($deep) {
-          $clone_data->(object[])->[$i] = $self->element_clone($i);
-        }
-        else {
-          $clone_data->(object[])->[$i] = $data->(object[])->[$i];
-        }
-      }
-    }
-    
-    my $clone_dim = $self->dim;
-    
-    my $class_name = type_name $self;
-    
-    my $clone = (R::NDArray)Native::MethodCall->call_class_method($class_name, "new", [{data => $clone_data, dim => $clone_dim}]);
-    
-    return $clone;
-  }
-  
-  method element_to_string : string ($data_index : int) { die "Not impelmented."; }
-  
-  method element_clone : object ($data_index : int) { die "Not impelmented."; }
   
   method is_empty : int () {
     
@@ -288,7 +266,7 @@ class R::NDArray {
     my $dim = $self->{dim};
     
     my $is_scalar = 0;
-    if ($self->is_vector && $dim->[0] == 1) {
+    if (@$dim == 1 && $dim->[0] == 1) {
       $is_scalar = 1;
     }
     
@@ -312,7 +290,7 @@ class R::NDArray {
     my $dim = $self->{dim};
     
     my $is_matrix = 0;
-    if (@$dim == 2) {
+    if (@$dim == 1 || @$dim == 2) {
       $is_matrix = 1;
     }
     
@@ -324,12 +302,53 @@ class R::NDArray {
     my $dim = $self->{dim};
     
     my $is_square_matrix = 0;
-    if ($self->is_matrix && $dim->[0] == $dim->[1]) {
+    if ($self->is_matrix && $self->nrow == $self->ncol) {
       $is_square_matrix = 1;
     }
     
     return $is_square_matrix;
   }
+  
+  protected method check : void () { die "Not implemented."; }
+  
+  protected method create_default_data : object ($length : int = 0) { die "Not implemented."; }
+  
+  method clone : R::NDArray ($deep : int = 0) {
+    
+    my $elem_size = $self->elem_size;
+    
+    my $length = $self->length;
+    
+    my $clone_data = $self->create_default_data($length);
+    
+    my $data = $self->{data};
+    
+    if ($self->is_any_numeric_ndarray) {
+      Fn->memcpy($clone_data, 0, $data, 0, $elem_size * $length);
+    }
+    else {
+      for (my $i = 0; $i < $length; $i++) {
+        if ($deep) {
+          $clone_data->(object[])->[$i] = $self->elem_clone($i);
+        }
+        else {
+          $clone_data->(object[])->[$i] = $data->(object[])->[$i];
+        }
+      }
+    }
+    
+    my $clone_dim = $self->dim;
+    
+    my $class_name = type_name $self;
+    
+    my $clone = (R::NDArray)Native::MethodCall->call_class_method($class_name, "new", [{data => $clone_data, dim => $clone_dim}]);
+    
+    return $clone;
+  }
+  
+  method elem_to_string : string ($data_index : int) { die "Not impelmented."; }
+  
+  method elem_clone : object ($data_index : int) { die "Not impelmented."; }
   
   method slice : R::NDArray ($vector_indexes : R::NDArray::Int[]) {
     
@@ -439,36 +458,6 @@ class R::NDArray {
     return $data_indexes;
   }
   
-  method drop_dim : void () {
-    
-    my $dim = $self->{dim};
-    
-    my $dropped_dim = R::Util->drop_dim($dim);
-    
-    $self->set_dim($dropped_dim);
-  }
-  
-  method equals_dropped_dim : int ($y_ndarray : R::NDArray) {
-    
-    my $x_ndarray = $self;
-    
-    unless ($x_ndarray) {
-      die "The n-dimention array \$x_ndarray must be defined.";
-    }
-    
-    unless ($y_ndarray) {
-      die "The n-dimention array \$y_ndarray must be defined.";
-    }
-    
-    my $x_dim = $x_ndarray->dim;
-    
-    my $y_dim = $y_ndarray->dim;
-    
-    my $equals_dropped_dim = R::Util->equals_dropped_dim($x_dim, $y_dim);
-    
-    return $equals_dropped_dim;
-  }
-  
   method dump : string () {
     
     my $dim = $self->{dim};
@@ -484,8 +473,8 @@ class R::NDArray {
       my $string_buffer = StringBuffer->new;
       $string_buffer->push("[0] ");
       for (my $i = 0; $i < $data_length; $i++) {
-        my $element_string = $self->element_to_string($i);
-        $string_buffer->push($element_string);
+        my $elem_string = $self->elem_to_string($i);
+        $string_buffer->push($elem_string);
       }
       $string_buffer->push("\n  ");
     }
@@ -512,9 +501,9 @@ class R::NDArray {
           
           my $data_index = &convert_coordinate_to_data_index($coordinate, $dim);
           
-          my $element_string = $self->element_to_string($data_index);
+          my $elem_string = $self->elem_to_string($data_index);
           
-          $string_buffer->push($element_string);
+          $string_buffer->push($elem_string);
         }
         
         $string_buffer->push("\n");
@@ -535,9 +524,9 @@ class R::NDArray {
   }
   
   private static method recursive_to_string : void ($self : R::NDArray, $dim_list : IntList, $string_buffer : StringBuffer, $dim_num_ref : int*, $poss_list : List of R::NDArray::Int) {
-    my $dim_element = $dim_list->pop;
+    my $dim_elem = $dim_list->pop;
     
-    for (my $i = 1; $i <= $dim_element; $i++) {
+    for (my $i = 1; $i <= $dim_elem; $i++) {
       $string_buffer->push(Fn->repeat(",", $$dim_num_ref) . "$i" . "\n");
       $poss_list->unshift(R::NDArray::Int->new({data => [$i]}));
       if ($dim_list->length > 2) {
@@ -560,7 +549,7 @@ class R::NDArray {
         for (my $d1 = 0; $d1 < $dim_list->get(0); $d1++) {
           $string_buffer->push("[$d1,] ");
           
-          my $element_strings_list = StringList->new;
+          my $elem_strings_list = StringList->new;
           for (my $d2 = 0; $d2 < $dim_list->get(1); $d2++) {
             
             my $poss_list_clone = List->new(new R::NDArray::Int[0]);
@@ -572,10 +561,10 @@ class R::NDArray {
             
             my $ret_ndarray = $self->slice((R::NDArray::Int[])$poss_list->to_array);
             
-            $element_strings_list->push($ret_ndarray->element_to_string(0));
+            $elem_strings_list->push($ret_ndarray->elem_to_string(0));
           }
           
-          $string_buffer->push(Fn->join(" ", $element_strings_list->to_array) . "\n");
+          $string_buffer->push(Fn->join(" ", $elem_strings_list->to_array) . "\n");
         }
       }
       $poss_list->shift;
@@ -587,32 +576,6 @@ class R::NDArray {
     my $ndarray = (R::NDArray)Native::MethodCall->call_class_method($class_name, "new", [$options]);
     
     return $ndarray;
-  }
-  
-  method nrow : int () {
-    
-    unless ($self->is_matrix) {
-      die "The invocant must be a matrix.";
-    }
-    
-    my $dim = $self->{dim};
-    
-    my $nrow = $dim->[0];
-    
-    return $nrow;
-  }
-  
-  method ncol : int () {
-    
-    unless ($self->is_matrix) {
-      die "The invocant must be a matrix.";
-    }
-    
-    my $dim = $self->{dim};
-    
-    my $ncol = $dim->[1];
-    
-    return $ncol;
   }
   
   method set_order : void ($indexes_ndarray : R::NDArray::Int) { die "Not impelmeneted."; }
@@ -640,57 +603,7 @@ class R::NDArray {
     }
   }
   
-  method make_dim_read_only : void () {
-    $self->{is_dim_read_only} = 1;
-  }
-  
-  method to_matrix : void () {
-    
-    unless ($self->is_vector || $self->is_matrix) {
-      die "The invocant must be a vector or a matrix";
-    }
-    
-    if ($self->is_matrix) {
-      return;
-    }
-    
-    my $dim = $self->{dim};
-    
-    my $row = $dim->[0];
-    
-    my $column = 1;
-    
-    my $new_dim = [$row, $column];
-    
-    $self->set_dim($new_dim);
-  }
-  
-  method to_vector : void () {
-    
-    unless ($self->is_vector || $self->is_matrix) {
-      die "The invocant must be a vector or a matrix";
-    }
-    
-    if ($self->is_vector) {
-      return;
-    }
-    
-    my $dim = $self->{dim};
-    
-    my $row = $dim->[0];
-    
-    my $column = $dim->[1];
-    
-    unless ($column == 1) {
-      die "The column must be 1.";
-    }
-    
-    my $new_dim = [$row];
-    
-    $self->set_dim($new_dim);
-  }
-  
-  precompile method to_string : R::NDArray::String () {
+  precompile method to_string_ndarray : R::NDArray::String () {
     
     unless ($self) {
       die "The n-dimension array \$self must be defined.";
@@ -698,19 +611,79 @@ class R::NDArray {
     
     my $length = $self->length;
     
-    my $x_dim = $self->dim;
+    my $dim = $self->dim;
     
-    my $ret_ndarray = R::OP::String->c(undef, $x_dim);
+    my $ret_ndarray = R::OP::String->c(undef, $dim);
     
-    my $x_data = $self->data;
+    my $data = $self->data;
     my $ret_data = $ret_ndarray->data;
     
     for (my $i = 0; $i < $length; $i++) {
-      $ret_data->[$i] = $self->element_to_string($i);
+      $ret_data->[$i] = $self->elem_to_string($i);
     }
     
     return $ret_ndarray;
   }
   
+  method is_numeric_ndarray : int () {
+    
+    my $data = $self->{data};
+    
+    my $is_numeric_ndarray = 0;
+    if (Fn->is_numeric_array($data)) {
+      $is_numeric_ndarray = 1;
+    }
+    
+    return $is_numeric_ndarray;
+  }
+  
+  method is_mulnum_ndarray : int () {
+    
+    my $data = $self->{data};
+    
+    my $is_mulnum_ndarray = 0;
+    if (Fn->is_mulnum_array($data)) {
+      $is_mulnum_ndarray = 1;
+    }
+    
+    return $is_mulnum_ndarray;
+  }
+  
+  method is_any_numeric_ndarray : int () {
+    
+    my $any_numeric_ndarray = $self->is_numeric_ndarray || $self->is_mulnum_ndarray;
+    
+    return $any_numeric_ndarray;
+  }
+  
+  method is_object_ndarray : int () {
+    
+    my $data = $self->{data};
+    
+    my $is_mulnum = 0;
+    if (Fn->is_object_array($data)) {
+      $is_mulnum = 1;
+    }
+    
+    return $is_mulnum;
+  }
+  
+  method elem_size : int () {
+    
+    my $data = $self->{data};
+    
+    my $elem_size = R::Util->_get_elem_size($data);
+    
+    return $elem_size;
+  }
+  
+  method elem_type_name : string () {
+    
+    my $data = $self->{data};
+    
+    my $elem_type_name = R::Util->_get_elem_type_name($data);
+    
+    return $elem_type_name;
+  }
 }
 

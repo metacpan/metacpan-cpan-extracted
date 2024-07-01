@@ -5,7 +5,7 @@ use warnings;
 use 5.014;
 use autodie;
 
-use Test::More tests => 6;
+use Test::More tests => 11;
 
 use Path::Tiny qw/ cwd path tempdir tempfile /;
 
@@ -62,7 +62,7 @@ sub _portable_lines_aref
     is_deeply(
         _portable_lines_aref($ofn),
         _portable_lines_aref($expected_results_fn),
-        "Expected from-start results ",
+        "Expected from-start results",
     )
 }
 
@@ -81,6 +81,43 @@ sub _portable_lines_aref
     is_deeply(
         _portable_lines_aref($ofn),
         _portable_lines_aref($expected_results_fn),
-        "Expected from-start with dash results ",
+        "Expected from-start with dash results",
     )
+}
+
+{
+    my $ofn = $dir->child("output_time.log.txt");
+    system( $^X, "-Mblib", cwd()->child( "bin", "timestamper-log-process", ),
+        "time", "--output", $ofn, $inputfn, );
+
+    # TEST
+    ok( scalar( -f $ofn ), "time app-mode produced a file", );
+
+    # TEST
+    like(
+        _portable_lines_aref($ofn)->[0],
+        qr#\A112\.86074400\s#ms, "Expected time-mode results",
+    );
+}
+
+{
+    my $ofn      = $dir->child("output_time2.log.txt");
+    my $inputfn2 = cwd()->child(
+        "t",                 "data",
+        "sample-input-logs", "abc-path-TypeScript-generator-mt-rand.log.txt"
+    );
+    system( $^X, "-Mblib", cwd()->child( "bin", "timestamper-log-process", ),
+        "time", "--output", $ofn, $inputfn, $inputfn2, );
+
+    # TEST
+    ok( scalar( -f $ofn ), "time app-mode produced a file", );
+    my $lines = _portable_lines_aref($ofn);
+
+    # TEST
+    like( $lines->[0], qr#\A112\.86074400\s#ms, "Expected time-mode results", );
+
+    # TEST
+    like( $lines->[1],
+        qr#\A150\.14364291\s#ms, "Expected multiple time-mode results 2nd line",
+    );
 }

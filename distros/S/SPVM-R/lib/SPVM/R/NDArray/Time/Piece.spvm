@@ -19,10 +19,6 @@ class R::NDArray::Time::Piece extends R::NDArray::Object {
   
   protected method init : void ($options : object[] = undef) {
     
-    my $element_size = Fn->sizeof_native_pointer;
-    
-    $options = Fn->merge_options($options, {element_size => $element_size, type => "Time::Piece"});
-    
     $self->SUPER::init($options);
   }
   
@@ -42,7 +38,7 @@ class R::NDArray::Time::Piece extends R::NDArray::Object {
     }
   }
   
-  protected method create_default_data : Time::Piece[] ($length : int) {
+  protected method create_default_data : Time::Piece[] ($length : int = 0) {
     
     unless ($length >= 0) {
       die "The length \$length must be more than or equal to 0.";
@@ -57,30 +53,30 @@ class R::NDArray::Time::Piece extends R::NDArray::Object {
     return (R::NDArray::Time::Piece)$self->SUPER::clone;
   }
   
-  method element_to_string : string ($data_index : int) {
+  method elem_to_string : string ($data_index : int) {
     
     my $data = $self->data;
     
-    my $element = $data->[$data_index];
+    my $elem = $data->[$data_index];
     
-    unless ($element) {
+    unless ($elem) {
       return "undef";
     }
     
-    my $string = $element->strftime("%Y-%m-%d %H:%M:%S");
+    my $string = $elem->strftime("%Y-%m-%d %H:%M:%S");
     
     return $string;
   }
   
-  method element_clone : Time::Piece ($data_index : int) {
+  method elem_clone : Time::Piece ($data_index : int) {
     
     my $data = $self->data;
     
-    my $element = $data->[$data_index];
+    my $elem = $data->[$data_index];
     
     my $clone = (Time::Piece)undef;
-    if ($element) {
-      $clone = $element->clone;
+    if ($elem) {
+      $clone = $elem->clone;
     }
     
     return $clone;

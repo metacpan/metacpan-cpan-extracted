@@ -26,7 +26,7 @@
               ⠹⡽⣾⣿⠹⣿⣆⣾⢯⣿⣿ ⡞ ⠻⣿⣿⣿⠁ ⢠⣿⢏  ⡀ ⡟  ⢀⣴⣿⠃⢁⡼⠁ ⠈
                 ⠈⠛ ⢻⣿⣧⢸⢟⠶⢾⡇  ⣸⡿⠁ ⢠⣾⡟⢼  ⣷ ⡇ ⣰⠋⠙⠁
                    ⠈⣿⣻⣾⣦⣇⢸⣇⣀⣶⡿⠁⣀⣀⣾⢿⡇⢸  ⣟⡦⣧⣶⠏ unleashed
-                    ⠸⢿⡍⠛⠻⠿⠿⠿⠋⣠⡾⢋⣾⣏⣸⣷⡸⣇⢰⠟⠛⠻⡄  v1.23
+                    ⠸⢿⡍⠛⠻⠿⠿⠿⠋⣠⡾⢋⣾⣏⣸⣷⡸⣇⢰⠟⠛⠻⡄  v1.24
                       ⢻⡄   ⠐⠚⠋⣠⡾⣧⣿⠁⠙⢳⣽⡟
                       ⠈⠳⢦⣤⣤⣀⣤⡶⠛ ⠈⢿⡆  ⢿⡇
                             ⠈    ⠈⠓  ⠈
@@ -46,24 +46,24 @@ Watch a reference for changes:
     $ perl -Me -e 'my $v = {}; sub f1 { watch( $v ) } sub f2 { f1; $v->{a} = 1 } f2'
 
     $ perl -Me -e '
-         package A {
-             use e;
-             my %h = ( aaa => 111 );
+        package A {
+            use e;
+            my %h = ( aaa => 111 );
 
-             watch(\%h);
+            watch(\%h);
 
-             sub f1 {
-                 $h{b} = 1;
-             }
+            sub f1 {
+                $h{b} = 1;
+            }
 
-             sub f2 {
-                 f1();
-                 delete $h{aaa};
-             }
-         }
+            sub f2 {
+                f1();
+                delete $h{aaa};
+            }
+        }
 
-         A::f2();
-     '
+        A::f2();
+    '
 
 Benchmark two snippets of code:
 
@@ -100,22 +100,22 @@ Devel::Peek dump a data structure:
 Print data as a table:
 
     $ perl -Me -e 'table( [qw(key value)], [qw(red 111)], [qw(blue 222)] )'
-     +------+-------+
-     | key  | value |
-     +------+-------+
-     | red  | 111   |
-     | blue | 222   |
-     +------+-------+
+    +------+-------+
+    | key  | value |
+    +------+-------+
+    | red  | 111   |
+    | blue | 222   |
+    +------+-------+
 
 Encode/decode UTF-8:
 
     $ perl -Me -e 'printf "%#X\n", ord for split //, enc "\x{5D0}"'
-     0XD7
-     0X90
+    0XD7
+    0X90
 
     $ perl -C -Me -e 'say dec "\xD7\x90"'
     $ perl -Me -e 'utf8; say dec "\xD7\x90"'
-     א
+    א
 
 # DESCRIPTION
 
@@ -249,7 +249,7 @@ Convert YAML string to Perl object:
 
 Encode UTF-8 code point to a byte stream:
 
-    $ perl -C -Me -e 'printf "%#X\n", ord for enc("\x{5D0}") =~ /./g'
+    $ perl -Me -e 'printf "%#X\n", ord for split //, enc "\x{5D0}"'
     0XD7
     0X90
 
@@ -303,6 +303,20 @@ Turn string into a [Mojo::File](https://metacpan.org/pod/Mojo%3A%3AFile) object.
 Print with newline.
 
     $ perl -Me -e 'say 123'
+    $ perl -Me -e 'say for 1..3'
+
+Always sends output to the terminal even
+when STDOUT and/or STDERR are redirected:
+
+    $ perl -Me -e '
+        close *STDOUT;
+        close *STDERR;
+        say 111;
+        print "999\n";
+        say 222;
+    '
+    111
+    222
 
 ### p
 
@@ -315,6 +329,15 @@ Pretty data printer.
 Return pretty printer data.
 
     $ perl -Me -e 'my $v = np [1..3]; say "got: $v"'
+
+Can be used with `say` to output to the terminal
+(incase STDOUT/STDERR are redirected):
+
+    $ perl -Me -e '
+        close *STDOUT;
+        close *STDERR;
+        say np [ 1.. 3 ];
+    '
 
 ### d
 
@@ -339,12 +362,12 @@ Color a string.
 Print data as a table:
 
     $ perl -Me -e 'table( [qw(key value)], [qw(red 111)], [qw(blue 222)] )'
-     +------+-------+
-     | key  | value |
-     +------+-------+
-     | red  | 111   |
-     | blue | 222   |
-     +------+-------+
+    +------+-------+
+    | key  | value |
+    +------+-------+
+    | red  | 111   |
+    | blue | 222   |
+    +------+-------+
 
 Context sensitive!
 
@@ -404,6 +427,26 @@ of this issue:
 Work with perl pod.
 
 ### import
+
+\[Internal\] Imports the DSL into another package.
+
+Can be used in a sub class to import this class
+plus its own commands like this:
+
+    package e2;
+    use parent qw( e );
+
+    sub import {
+        my ( $class ) = @_;
+        my $class = caller;
+        $class->SUPER::import( $caller );
+        $class->can("monkey_patch")->(
+            $caller,
+            my_command_1 => sub {},
+            my_command_2 => sub {},
+            my_command_3 => sub {},
+        );
+    }
 
 # AUTHOR
 

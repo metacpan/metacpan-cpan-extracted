@@ -3,7 +3,7 @@
 use 5.022;
 
 use warnings;
-use experimentals;
+use experimental qw< signatures postderef >;
 use Test::More;
 
 if (!-t *STDOUT) {

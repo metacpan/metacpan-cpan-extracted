@@ -10,9 +10,9 @@ use List::Util qw(shuffle);
 use Perinci::Sub::Util qw(gen_modified_sub);
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2024-01-05'; # DATE
+our $DATE = '2024-06-26'; # DATE
 our $DIST = 'App-wordlist'; # DIST
-our $VERSION = '0.292'; # VERSION
+our $VERSION = '0.293'; # VERSION
 
 our %SPEC;
 
@@ -1029,7 +1029,7 @@ App::wordlist - Grep words from (or test them against) WordList::*
 
 =head1 VERSION
 
-This document describes version 0.292 of App::wordlist (from Perl distribution App-wordlist), released on 2024-01-05.
+This document describes version 0.293 of App::wordlist (from Perl distribution App-wordlist), released on 2024-06-26.
 
 =head1 SYNOPSIS
 

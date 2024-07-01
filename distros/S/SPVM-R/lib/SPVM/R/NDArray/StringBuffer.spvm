@@ -19,10 +19,6 @@ class R::NDArray::StringBuffer extends R::NDArray::Object {
   
   protected method init : void ($options : object[] = undef) {
     
-    my $element_size = Fn->sizeof_native_pointer;
-    
-    $options = Fn->merge_options($options, {element_size => $element_size, type => "StringBuffer"});
-    
     $self->SUPER::init($options);
   }
   
@@ -42,7 +38,7 @@ class R::NDArray::StringBuffer extends R::NDArray::Object {
     }
   }
   
-  protected method create_default_data : StringBuffer[] ($length : int) {
+  protected method create_default_data : StringBuffer[] ($length : int = 0) {
     
     unless ($length >= 0) {
       die "The length \$length must be more than or equal to 0.";
@@ -57,30 +53,30 @@ class R::NDArray::StringBuffer extends R::NDArray::Object {
     return (R::NDArray::StringBuffer)$self->SUPER::clone;
   }
   
-  method element_to_string : string ($data_index : int) {
+  method elem_to_string : string ($data_index : int) {
     
     my $data = $self->data;
     
-    my $element = $data->[$data_index];
+    my $elem = $data->[$data_index];
     
-    unless ($element) {
+    unless ($elem) {
       return "undef";
     }
     
-    my $string = $element->to_string;
+    my $string = $elem->to_string;
     
     return $string;
   }
   
-  method element_clone : StringBuffer ($data_index : int) {
+  method elem_clone : StringBuffer ($data_index : int) {
     
     my $data = $self->data;
     
-    my $element = $data->[$data_index];
+    my $elem = $data->[$data_index];
     
     my $clone = (StringBuffer)undef;
-    if ($element) {
-      $clone = StringBuffer->new($element->to_string);
+    if ($elem) {
+      $clone = StringBuffer->new($elem->to_string);
     }
     
     return $clone;

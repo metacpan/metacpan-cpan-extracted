@@ -4,28 +4,6 @@
 class R::OP::DataFrame {
   
   # Class Methods
-  static method ncol : int ($x_data_frame : R::DataFrame) {
-    
-    unless ($x_data_frame) {
-      die "The data frame \$x_data_frame must be defined.";
-    }
-    
-    my $ncol = $x_data_frame->get_fields_length;
-    
-    return $ncol;
-  }
-  
-  static method nrow : int ($x_data_frame : R::DataFrame) {
-    
-    unless ($x_data_frame) {
-      die "The data frame \$x_data_frame must be defined.";
-    }
-    
-    my $nrow = $x_data_frame->get_ndarray_by_index(0)->length;
-    
-    return $nrow;
-  }
-  
   static method cbind : R::DataFrame ($x_data_frame : R::DataFrame, $y_data_frame : R::DataFrame) {
     
     my $ret_data_frame = R::DataFrame->new;

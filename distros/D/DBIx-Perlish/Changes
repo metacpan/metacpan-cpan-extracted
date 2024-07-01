@@ -1,4 +1,7 @@
 Revision history for DBIx-Perlish
+1.08 30 Jun 2024
+	Fixes for new opcodes in perl 5.41
+
 1.07 7 May 2023
 	Fixes for new opcodes in perl 5.37
 

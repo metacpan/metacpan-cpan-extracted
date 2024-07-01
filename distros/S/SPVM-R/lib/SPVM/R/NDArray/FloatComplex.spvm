@@ -17,8 +17,6 @@ class R::NDArray::FloatComplex extends R::NDArray {
   
   protected method init : void ($options : object[] = undef) {
     
-    $options = Fn->merge_options($options, {element_size => 8, type => "Complex_2f", is_numeric => 1});
-    
     $self->SUPER::init($options);
   }
   
@@ -38,7 +36,7 @@ class R::NDArray::FloatComplex extends R::NDArray {
     }
   }
   
-  protected method create_default_data : Complex_2f[] ($length : int) {
+  protected method create_default_data : Complex_2f[] ($length : int = 0) {
     
     unless ($length >= 0) {
       die "The length \$length must be more than or equal to 0.";
@@ -53,12 +51,12 @@ class R::NDArray::FloatComplex extends R::NDArray {
     return (R::NDArray::FloatComplex)$self->SUPER::clone;
   }
   
-  method element_to_string : string ($data_index : int) {
+  method elem_to_string : string ($data_index : int) {
     my $data = $self->data;
     
-    my $element = $data->[$data_index];
+    my $elem = $data->[$data_index];
     
-    my $string = (string)(float)$element->{re} . " + " . (string)(float)$element->{im};
+    my $string = (string)(float)$elem->{re} . " + " . (string)(float)$elem->{im};
     
     return $string;
   }
@@ -83,7 +81,7 @@ class R::NDArray::FloatComplex extends R::NDArray {
     }
   }
   
-  precompile method to_double_complex : R::NDArray::DoubleComplex () {
+  precompile method to_double_complex_ndarray : R::NDArray::DoubleComplex () {
     
     unless ($self) {
       die "The n-dimension array \$self must be defined.";

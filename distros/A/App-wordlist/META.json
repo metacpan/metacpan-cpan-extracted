@@ -39,12 +39,12 @@
          },
          "requires" : {
             "Array::Pick::Scan" : "0.005",
-            "Complete::Util" : "0.619",
+            "Complete::Util" : "0.620",
             "Encode" : "0",
             "List::Util" : "1.54",
             "Log::ger" : "0.038",
             "Module::List" : "0",
-            "Module::Load::Util" : "0.009",
+            "Module::Load::Util" : "0.011",
             "PERLANCAR::Module::List" : "0.004004",
             "Perinci::Sub::Property::cmdline" : "0",
             "Perinci::Sub::Util" : "0.472",
@@ -69,7 +69,7 @@
    "provides" : {
       "App::wordlist" : {
          "file" : "lib/App/wordlist.pm",
-         "version" : "0.292"
+         "version" : "0.293"
       }
    },
    "release_status" : "stable",
@@ -84,7 +84,7 @@
          "web" : "https://github.com/perlancar/perl-App-wordlist"
       }
    },
-   "version" : "0.292",
+   "version" : "0.293",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.038002"
@@ -461,7 +461,7 @@
                      {
                         "class" : "Pod::Weaver::Plugin::AppendPrepend",
                         "name" : "@Author::PERLANCAR/AppendPrepend",
-                        "version" : "0.01"
+                        "version" : "0.021"
                      },
                      {
                         "class" : "Pod::Weaver::Plugin::EnsureUniqueSections",

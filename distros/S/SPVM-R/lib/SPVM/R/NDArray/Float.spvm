@@ -15,8 +15,6 @@ class R::NDArray::Float extends R::NDArray {
   
   protected method init : void ($options : object[] = undef) {
     
-    $options = Fn->merge_options($options, {element_size => 4, type => "float"});
-    
     $self->SUPER::init($options);
   }
   
@@ -36,7 +34,7 @@ class R::NDArray::Float extends R::NDArray {
     }
   }
   
-  protected method create_default_data : float[] ($length : int) {
+  protected method create_default_data : float[] ($length : int = 0) {
     
     unless ($length >= 0) {
       die "The length \$length must be more than or equal to 0.";
@@ -51,13 +49,13 @@ class R::NDArray::Float extends R::NDArray {
     return (R::NDArray::Float)$self->SUPER::clone;
   }
   
-  method element_to_string : string ($data_index : int) {
+  method elem_to_string : string ($data_index : int) {
     
     my $data = $self->data;
     
-    my $element = $data->[$data_index];
+    my $elem = $data->[$data_index];
     
-    my $string = (string)(float)$element;
+    my $string = (string)(float)$elem;
     
     return $string;
   }

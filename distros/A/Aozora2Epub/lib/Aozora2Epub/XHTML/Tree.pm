@@ -5,7 +5,7 @@ use utf8;
 use HTML::TreeBuilder::XPath;
 use HTML::Selector::XPath qw/selector_to_xpath/;
 
-our $VERSION = '0.04';
+our $VERSION = '0.05';
 
 sub new {
     my ($class, $str) = @_;

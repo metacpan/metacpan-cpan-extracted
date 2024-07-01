@@ -8,7 +8,7 @@ my $Methods = {
     'class'  => ['new'],
     'object' => ['path', 'dir', 'file', 'size', 'offset', 'handle', 'read'],
 };
-my $MaildirSize = 529;
+my $MaildirSize = 589;
 my $SampleEmail = './set-of-emails/maildir/bsd';
 my $NewInstance = $Package->new($SampleEmail);
 
@@ -38,6 +38,8 @@ MAKETEST: {
             $emindex++;
         }
         ok $emindex > 1;
+
+        is $Package->new(undef), undef;
     }
 }
 

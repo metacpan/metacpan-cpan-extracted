@@ -1,5 +1,5 @@
 package App::Timestamper::Log::Process;
-$App::Timestamper::Log::Process::VERSION = '0.0.4';
+$App::Timestamper::Log::Process::VERSION = '0.2.0';
 use 5.014;
 use strict;
 use warnings;
@@ -7,8 +7,9 @@ use autodie;
 
 use bigint;
 
-use Carp         ();
-use Getopt::Long qw( GetOptionsFromArray  );
+use Carp                ();
+use File::ReadBackwards ();
+use Getopt::Long        qw( GetOptionsFromArray  );
 
 # use parent qw(ParentClass);
 
@@ -43,6 +44,20 @@ sub _init
     return;
 }
 
+my $NUM_DIGITS = 16;
+my $LOW_BASE   = 10;
+my $HIGH_BASE  = 1;
+foreach my $e ( 1 .. $NUM_DIGITS )
+{
+    $HIGH_BASE *= $LOW_BASE;
+}
+my $OUT_NUM_DIGITS = 8;
+my $TO_OUT_BASE    = 1;
+foreach my $e ( 1 .. ( $NUM_DIGITS - $OUT_NUM_DIGITS ) )
+{
+    $TO_OUT_BASE *= $LOW_BASE;
+}
+
 sub run
 {
     my ( $self, ) = @_;
@@ -55,12 +70,38 @@ sub run
     {
         return $self->_mode_from_start();
     }
+    elsif ( ( $mode eq "time" ) )
+    {
+        return $self->_mode_time();
+    }
     else
     {
         Carp::confess("Unknown mode '$mode'!");
     }
 
     return;
+}
+
+sub _calc_ticks_and_data_str
+{
+    my ( $self, $line ) = @_;
+    chomp $line;
+    if ( my ( $seconds, $dotdigits, $data_str ) =
+        ( $line =~ m#\A([0-9]+)((?:\.(?:[0-9]){0,16})?)\t([^\n]*\z)#ms ) )
+    {
+        my $ticks = $seconds * $HIGH_BASE;
+        if ( $dotdigits =~ s#\A\.##ms )
+        {
+            $dotdigits .=
+                scalar( "0" x ( $NUM_DIGITS - length($dotdigits) ) );
+            $ticks += ( 0 + $dotdigits );
+        }
+        return ( $ticks, $data_str );
+    }
+    else
+    {
+        die "The line is formatted wrong";
+    }
 }
 
 sub _mode_from_start
@@ -96,53 +137,94 @@ sub _mode_from_start
     }
     open my $in, "<", $input_fn;
     my $start;
-    my $NUM_DIGITS = 16;
-    my $LOW_BASE   = 10;
-    my $HIGH_BASE  = 1;
-    foreach my $e ( 1 .. $NUM_DIGITS )
-    {
-        $HIGH_BASE *= $LOW_BASE;
-    }
-    my $OUT_NUM_DIGITS = 8;
-    my $TO_OUT_BASE    = 1;
-    foreach my $e ( 1 .. ( $NUM_DIGITS - $OUT_NUM_DIGITS ) )
-    {
-        $TO_OUT_BASE *= $LOW_BASE;
-    }
 
     while ( my $line = <$in> )
     {
         chomp $line;
-        if ( my ( $seconds, $dotdigits, $data_str ) =
-            ( $line =~ m#\A([0-9]+)((?:\.(?:[0-9]){0,16})?)\t([^\n]*\z)#ms ) )
+        my ( $ticks, $data_str ) = $self->_calc_ticks_and_data_str($line);
+        if ( not defined($start) )
         {
-            my $ticks = $seconds * $HIGH_BASE;
-            if ( $dotdigits =~ s#\A\.##ms )
-            {
-                $dotdigits .=
-                    scalar( "0" x ( $NUM_DIGITS - length($dotdigits) ) );
-                $ticks += ( 0 + $dotdigits );
-            }
-            if ( not defined($start) )
-            {
-                $start = $ticks;
-            }
-            my $distance     = $ticks - $start;
-            my $dist_seconds = $distance / $HIGH_BASE;
-            my $dist_dot     = $distance % $HIGH_BASE;
-            $dist_dot /= $TO_OUT_BASE;
-            $out->printf(
-                "%d\.%0*d\t%s\n", $dist_seconds, $OUT_NUM_DIGITS,
-                $dist_dot,        $data_str
-            );
+            $start = $ticks;
         }
-        else
-        {
-            die "The line is formatted wrong";
-        }
+        my $distance     = $ticks - $start;
+        my $dist_seconds = $distance / $HIGH_BASE;
+        my $dist_dot     = $distance % $HIGH_BASE;
+        $dist_dot /= $TO_OUT_BASE;
+        $out->printf(
+            "%d\.%0*d\t%s\n", $dist_seconds, $OUT_NUM_DIGITS,
+            $dist_dot,        $data_str
+        );
     }
 
     close($in);
+    if ( not $USE_STDOUT )
+    {
+        close($out);
+    }
+
+    return;
+}
+
+sub _mode_time
+{
+    my ( $self, ) = @_;
+
+    my $argv = $self->_argv();
+    my $output_fn;
+    my $ret = GetOptionsFromArray( $argv, "output|o=s" => ( \$output_fn ), )
+        or Carp::confess($!);
+    my $USE_STDOUT = ( not( defined($output_fn) and ( $output_fn ne "-" ) ) );
+
+    my $out;
+    if ($USE_STDOUT)
+    {
+        ## no critic
+        open $out, ">&STDOUT";
+        ## use critic
+    }
+    else
+    {
+        open $out, ">", $output_fn;
+    }
+    while (@$argv)
+    {
+        my $input_fn = shift(@$argv);
+        if ( not defined($input_fn) )
+        {
+            die "Must specify an input file-path!";
+        }
+
+        open my $in, "<", $input_fn;
+        my $start;
+
+        {
+            my $line = <$in>;
+            my ( $ticks, $data_str ) = $self->_calc_ticks_and_data_str($line);
+            die if ( defined($start) );
+            $start = $ticks;
+        }
+
+        close($in);
+
+        my $end_ticks;
+        {
+            my $bw_in = File::ReadBackwards->new($input_fn)
+                or Carp::confess("can't open $input_fn backwards $!");
+            my $line = $bw_in->readline();
+            $bw_in->close();
+            my ( $ticks, $data_str ) = $self->_calc_ticks_and_data_str($line);
+            $end_ticks = $ticks;
+        }
+        my $distance     = $end_ticks - $start;
+        my $dist_seconds = $distance / $HIGH_BASE;
+        my $dist_dot     = $distance % $HIGH_BASE;
+        $dist_dot /= $TO_OUT_BASE;
+        $out->printf(
+            "%d\.%0*d\t%s\n", $dist_seconds, $OUT_NUM_DIGITS,
+            $dist_dot,        $input_fn,
+        );
+    }
+
     if ( not $USE_STDOUT )
     {
         close($out);
@@ -166,7 +248,7 @@ L<App::Timestamper> logs.
 
 =head1 VERSION
 
-version 0.0.4
+version 0.2.0
 
 =head1 SYNOPSIS
 
@@ -182,11 +264,21 @@ Instantiate a new application object.
 
 Run the application based on the Command-Line (“CLI”) arguments.
 
-=head2 MODES
+=head1 MODES
+
+=head2 from_start
 
     timestamper-log-process from_start --output zero-based.ts.log.txt absolute-timestamps.ts.log.txt
 
 Start the timestamps from 0 by negating the one on the first line.
+
+=head2 time
+
+    timestamper-log-process time --output run-times-of-log-files.txt [files]
+
+Calculate the wallclock times, from-start-to-finish, of one or more timestamper log files.
+
+( Added in v0.2.0 . ).
 
 =head1 COPYRIGHT AND LICENSE
 

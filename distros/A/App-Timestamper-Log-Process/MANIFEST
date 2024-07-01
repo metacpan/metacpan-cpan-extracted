@@ -15,6 +15,7 @@ lib/App/Timestamper/Log/Process.pm
 scripts/tag-release.pl
 t/00-compile.t
 t/data/expected-output/from-start/hp1.build.log.txt
+t/data/sample-input-logs/abc-path-TypeScript-generator-mt-rand.log.txt
 t/data/sample-input-logs/hp1.build.log.txt
 t/from-start.t
 weaver.ini

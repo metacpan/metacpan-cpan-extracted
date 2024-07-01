@@ -30265,9 +30265,11 @@ print "GOING TO INT SIX\n";
                   $output=~tr/\0-\10\13-\37\177-\377//d;
                   if (-1<index $output,'[A') {
                      $output=~s/^(.*2[>][&]1\s*)\[A\s*$/$1/s;
-                  } elsif (-1<index $output,'7[r') {
+                  } 
+                  if (-1<index $output,'7[r') {
                      $output=~s/7[[]r[[]999[;]999H[[]6n//s;
-                  } elsif (-1<index $output,'[?2004') {
+                  }
+                  if (-1<index $output,'[?2004') {
                      $output=~s/[[][?]2004[h|l]?//g;
                   }
                   print $Net::FullAuto::FA_Core::LOG
@@ -30892,6 +30894,8 @@ print $Net::FullAuto::FA_Core::LOG "LETS LOOK AT LINE=$line<== and LASTLINE=$las
                                        $fullerror.="\n";
                                     } $errflag=1;
                                     $fullerror.=$line;
+                                    $line=~s/\[/\\\[/g;
+                                    $line=~s/\]/\\\]/g;
                                     $growoutput=~s/$line//s;
                                  } elsif ($fulloutput || $line!~/^\s*$/s) {
                                     $fulloutput.=$line;

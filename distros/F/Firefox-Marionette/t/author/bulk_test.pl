@@ -27,9 +27,12 @@ system { 'ssh-add' } 'ssh-add', '-l' and die "The SSH agent needs to be loaded w
 my $background_failed;
 my $parent_pid = $PID;
 my $devel_cover_db_format = 'JSON';
+my $cover_db_path = '/tmp';
 my $cover_db_name = 'cover_db';
 my $devel_cover_inc = '-MDevel::Cover=-silent,1';
 my $devel_cover_inc_with_space = $devel_cover_inc ? " $devel_cover_inc" : q[];
+my $local_devel_cover_inc = $devel_cover_inc ? "$devel_cover_inc,-db,$cover_db_path/$cover_db_name" : q[];
+my $local_devel_cover_inc_with_space = $local_devel_cover_inc ? " $local_devel_cover_inc" : q[];
 my $test_marionette_file = 't/01-marionette.t';
 my $reset_time = 600; # 10 minutes
 my $max_attempts = 3;
@@ -37,7 +40,8 @@ my $reboot_sleep_time = 60;
 $ENV{RELEASE_TESTING} = 1;
 $ENV{FIREFOX_ALARM} = 900;
 $ENV{DEVEL_COVER_DB_FORMAT} = $devel_cover_db_format;
-system { 'cover' } 'cover', '-delete' and die "Failed to 'cover' for " . ($ENV{FIREFOX_BINARY} || 'firefox');
+system { 'cover' } 'cover', '-delete', $cover_db_name and die "Failed to 'cover' for " . ($ENV{FIREFOX_BINARY} || 'firefox');
+system { 'cover' } 'cover', '-delete', "$cover_db_path/$cover_db_name" and die "Failed to 'cover' for " . ($ENV{FIREFOX_BINARY} || 'firefox');
 MAIN: {
 	my $cwd = Cwd::cwd();
 	my $test_directory = File::Spec->catdir($cwd, 't');
@@ -131,12 +135,12 @@ MAIN: {
 								local $ENV{FIREFOX_HOST} = $server->{address};
 								$count += 1;
 								my $start_execute_time = time;
-								my $result = _execute($server, { alarm_after => $ENV{FIREFOX_ALARM}, return_result => 1 }, $^X, ($devel_cover_inc ? $devel_cover_inc : ()), '-Ilib', $test_marionette_file);
+								my $result = _execute($server, { alarm_after => $ENV{FIREFOX_ALARM}, return_result => 1 }, $^X, ($local_devel_cover_inc ? $local_devel_cover_inc : ()), '-Ilib', $test_marionette_file);
 								my $total_execute_time = time - $start_execute_time;
 								if ($result != 0) {
 									if ($count < $max_attempts) {
 										my $error_message = _error_message($^X, $CHILD_ERROR);
-										_log_stderr($server, "Failed '$^X$devel_cover_inc_with_space -Ilib $test_marionette_file' with FIREFOX_USER=$server->{user} and FIREFOX_HOST=$server->{address} at " . localtime . " exited with a '$error_message' after $total_execute_time seconds.  Sleeping for $reset_time seconds");
+										_log_stderr($server, "Failed '$^X$local_devel_cover_inc_with_space -Ilib $test_marionette_file' with FIREFOX_USER=$server->{user} and FIREFOX_HOST=$server->{address} at " . localtime . " exited with a '$error_message' after $total_execute_time seconds.  Sleeping for $reset_time seconds");
 										if (_restart_server($server, $count)) {
 											redo REMOTE_WIN32_FIREFOX;
 										} else {
@@ -157,12 +161,12 @@ MAIN: {
 									local $ENV{FIREFOX_HOST} = $server->{address};
 									$count += 1;
 									my $start_execute_time = time;
-									my $result = _execute($server, { alarm_after => $ENV{FIREFOX_ALARM}, return_result => 1 }, $^X, ($devel_cover_inc ? $devel_cover_inc : ()), '-Ilib', $test_marionette_file);
+									my $result = _execute($server, { alarm_after => $ENV{FIREFOX_ALARM}, return_result => 1 }, $^X, ($local_devel_cover_inc ? $local_devel_cover_inc : ()), '-Ilib', $test_marionette_file);
 									my $total_execute_time = time - $start_execute_time;
 									if ($result != 0) {
 										if ($count < $max_attempts) {
 											my $error_message = _error_message($^X, $CHILD_ERROR);
-											_log_stderr($server, "Failed '$^X$devel_cover_inc_with_space -Ilib $test_marionette_file' with FIREFOX_USER=$server->{user} and FIREFOX_HOST=$server->{address}:$port at " . localtime . " exited with a '$error_message' after $total_execute_time seconds.  Sleeping for $reset_time seconds");
+											_log_stderr($server, "Failed '$^X$local_devel_cover_inc_with_space -Ilib $test_marionette_file' with FIREFOX_USER=$server->{user} and FIREFOX_HOST=$server->{address}:$port at " . localtime . " exited with a '$error_message' after $total_execute_time seconds.  Sleeping for $reset_time seconds");
 											if (_restart_server($server, $count)) {
 												redo REMOTE_CYGWIN_FIREFOX;
 											} else {
@@ -174,7 +178,8 @@ MAIN: {
 									}
 								}
 							}
-							_execute($server, undef, 'scp', '-r', '-P', $server->{port}, Cwd::cwd(), $server->{user} . q[@] . $server->{address} . q[:/] . $remote_tmp_directory);
+							_remote_execute($server, {}, "mkdir $remote_tmp_directory/firefox-marionette");
+							_execute($server, undef, 'scp', '-r', '-P', $server->{port}, Cwd::cwd() . '/lib', Cwd::cwd() . '/t', $server->{user} . q[@] . $server->{address} . q[:] . $remote_tmp_directory . '/firefox-marionette');
 							$server->{initial_command} .= "\\firefox-marionette";
 							my $local_ip_address = _get_best_local_ip_match($server->{address});
 							$server->{cygwin_command} = "cd $cygwin_tmp_directory/firefox-marionette";
@@ -183,6 +188,7 @@ MAIN: {
 												{ cygwin => 1, alarm_after => $cygwin_local_alarm, command_line => "cd $cygwin_tmp_directory/firefox-marionette; RELEASE_TESTING=1 FIREFOX_NO_UPDATE=1 perl$devel_cover_inc_with_space -Ilib $test_marionette_file" },
 												{ alarm_after => $cygwin_local_alarm, command_line => "C:\\\\cygwin64\\\\bin\\\\bash --login -c 'cd $cygwin_tmp_directory/firefox-marionette; RELEASE_TESTING=1 FIREFOX_NO_NETWORK=1 FIREFOX_NO_RECONNECT=1 WATERFOX=1 FIREFOX_NO_UPDATE=1 perl$devel_cover_inc_with_space -Ilib $test_marionette_file" },
 												{ cygwin => 1, alarm_after => $cygwin_remote_alarm, command_line => "cd $cygwin_tmp_directory/firefox-marionette; FIREFOX_HOST=$local_ip_address FIREFOX_USER=$local_username RELEASE_TESTING=1 perl$devel_cover_inc_with_space -Ilib $test_marionette_file" },
+												{ cygwin => 1, alarm_after => $cygwin_remote_alarm, command_line => "cd $cygwin_tmp_directory/firefox-marionette; FIREFOX_HOST=$local_ip_address FIREFOX_USER=firefox RELEASE_TESTING=1 perl$devel_cover_inc_with_space -Ilib $test_marionette_file" },
 											) : (),
 											{ alarm_after => $win32_local_alarm, command_line => "set FIREFOX_NO_UPDATE=1 && set RELEASE_TESTING=1 && perl$devel_cover_inc_with_space -Ilib " . _win32_path($test_marionette_file) },
 											{ alarm_after => $win32_remote_alarm, force_pseudo_terminal => 1, command_line => "set FIREFOX_NO_UPDATE=1 && set FIREFOX_NO_RECONNECT=1 && set RELEASE_TESTING=1 && set FIREFOX_HOST=$local_ip_address && set FIREFOX_USER=firefox && perl$devel_cover_inc_with_space -Ilib " . _win32_path($test_marionette_file) },
@@ -220,15 +226,15 @@ MAIN: {
 								}
 							}
 							if ($devel_cover_inc) {
-								_execute($server, undef, 'scp', '-r', '-P', $server->{port}, $server->{user} . q[@] . $server->{address} . q[:/] . $remote_tmp_directory . q[/firefox-marionette/] . $cover_db_name, Cwd::cwd() . '/');
+								_execute($server, undef, 'scp', '-r', '-P', $server->{port}, $server->{user} . q[@] . $server->{address} . q[:/] . $remote_tmp_directory . q[/firefox-marionette/] . $cover_db_name, $cover_db_path . '/');
 							}
 							_cleanup_server($server);
 							_virsh_shutdown($server);
 							_sleep_until_shutdown($server);
 						} elsif ($server->{os} eq 'android') {
 							my $count = 0;
-							_execute($server, { alarm_after => $ENV{FIREFOX_ALARM}, return_result => 1 }, $^X, ($devel_cover_inc ? $devel_cover_inc : ()), '-Ilib', '-MFirefox::Marionette', '-e', "Firefox::Marionette->new(adb => '$server->{address}');");
-							_execute($server, { alarm_after => $ENV{FIREFOX_ALARM}, return_result => 1 }, $^X, ($devel_cover_inc ? $devel_cover_inc : ()), '-Ilib', '-MFirefox::Marionette', '-e', "Firefox::Marionette->new(adb => '$server->{address}', port => $server->{port});");
+							_execute($server, { alarm_after => $ENV{FIREFOX_ALARM}, return_result => 1 }, $^X, ($local_devel_cover_inc ? $local_devel_cover_inc : ()), '-Ilib', '-MFirefox::Marionette', '-e', "Firefox::Marionette->new(adb => '$server->{address}');");
+							_execute($server, { alarm_after => $ENV{FIREFOX_ALARM}, return_result => 1 }, $^X, ($local_devel_cover_inc ? $local_devel_cover_inc : ()), '-Ilib', '-MFirefox::Marionette', '-e', "Firefox::Marionette->new(adb => '$server->{address}', port => $server->{port});");
 							_execute($server, undef, 'adb', 'shell', 'poweroff');
 						}
 					} else {
@@ -238,8 +244,9 @@ MAIN: {
 					my $socket = _sleep_until_tcp_available($server);
 					if ($socket) {
 						my $remote_tmp_directory = join q[], _remote_contents($server, undef, 'echo $TMPDIR');
-						_execute($server, undef, 'ssh', '-p', $server->{port}, $server->{user} . q[@] . $server->{address}, 'rm', '-Rf', $remote_tmp_directory . 'firefox-marionette');
-						_execute($server, undef, 'scp', '-r', '-P', $server->{port}, Cwd::cwd(), $server->{user} . q[@] . $server->{address} . q[:] . $remote_tmp_directory);
+						_remote_execute($server, undef, "rm -Rf $remote_tmp_directory/firefox-marionette");
+						_remote_execute($server, undef, "mkdir $remote_tmp_directory/firefox-marionette");
+						_execute($server, undef, 'scp', '-r', '-P', $server->{port}, Cwd::cwd() . '/lib', Cwd::cwd() . '/t', $server->{user} . q[@] . $server->{address} . q[:] . $remote_tmp_directory . '/firefox-marionette');
 						$server->{initial_command} = "cd ${remote_tmp_directory}firefox-marionette";
 						my $count = 0;
 						REMOTE_PHYSICAL_FIREFOX: {
@@ -249,12 +256,12 @@ MAIN: {
 							local $ENV{FIREFOX_HOST} = $server->{address};
 							$count += 1;
 							my $start_execute_time = time;
-							my $result = _execute($server, { alarm_after => $ENV{FIREFOX_ALARM}, return_result => 1 }, $^X, ($devel_cover_inc ? $devel_cover_inc : ()), '-Ilib', $test_marionette_file);
+							my $result = _execute($server, { alarm_after => $ENV{FIREFOX_ALARM}, return_result => 1 }, $^X, ($local_devel_cover_inc ? $local_devel_cover_inc : ()), '-Ilib', $test_marionette_file);
 							my $total_execute_time = time - $start_execute_time;
 							if ($result != 0) {
 								if ($count < $max_attempts) {
 									my $error_message = _error_message($^X, $CHILD_ERROR);
-									_log_stderr($server, "Failed '$^X$devel_cover_inc_with_space -Ilib $test_marionette_file' with FIREFOX_USER=$server->{user} and FIREFOX_HOST=$server->{address} at " . localtime . " exited with a '$error_message' after $total_execute_time seconds.  Sleeping for $reset_time seconds");
+									_log_stderr($server, "Failed '$^X$local_devel_cover_inc_with_space -Ilib $test_marionette_file' with FIREFOX_USER=$server->{user} and FIREFOX_HOST=$server->{address} at " . localtime . " exited with a '$error_message' after $total_execute_time seconds.  Sleeping for $reset_time seconds");
 									redo REMOTE_PHYSICAL_FIREFOX;
 								} else {
 									die "Failed to make $count times";
@@ -309,7 +316,7 @@ MAIN: {
 							}
 						}
 						if ($devel_cover_inc) {
-							_execute($server, undef, 'scp', '-r', '-P', $server->{port}, $server->{user} . q[@] . $server->{address} . q[:] . $remote_tmp_directory . q[firefox-marionette/] . $cover_db_name, Cwd::cwd() . '/');
+							_execute($server, undef, 'scp', '-r', '-P', $server->{port}, $server->{user} . q[@] . $server->{address} . q[:] . $remote_tmp_directory . q[firefox-marionette/] . $cover_db_name, $cover_db_path . '/');
 						}
 					} else {
 						die "SSH server is not detected at $server->{address}";
@@ -417,18 +424,18 @@ MAIN: {
 		}
 		$old_versions{$entry} = $old_version;
 	}
-	if (@entries) {
-		_multiple_attempts_execute($^X, [ ($devel_cover_inc ? $devel_cover_inc : ()), '-Ilib', $test_marionette_file ], {});
+	{
+		_multiple_attempts_execute($^X, [ ($local_devel_cover_inc ? $local_devel_cover_inc : ()), '-Ilib', $test_marionette_file ], {});
 		{
 			local $ENV{FIREFOX_ALARM} = 2100;
-			_multiple_attempts_execute($^X, [ ($devel_cover_inc ? $devel_cover_inc : ()), '-Ilib', $test_marionette_file ], { FIREFOX_HOST => 'localhost', FIREFOX_FORCE_SCP => 1 });
+			_multiple_attempts_execute($^X, [ ($local_devel_cover_inc ? $local_devel_cover_inc : ()), '-Ilib', $test_marionette_file ], { FIREFOX_HOST => 'localhost', FIREFOX_FORCE_SCP => 1 });
 		}
 		{
 			local $ENV{FIREFOX_ALARM} = 2100;
-			_multiple_attempts_execute($^X, [ ($devel_cover_inc ? $devel_cover_inc : ()), '-Ilib', $test_marionette_file ], { FIREFOX_HOST => 'localhost:22' });
+			_multiple_attempts_execute($^X, [ ($local_devel_cover_inc ? $local_devel_cover_inc : ()), '-Ilib', $test_marionette_file ], { FIREFOX_HOST => 'localhost:22' });
 		}
 		{
-			_multiple_attempts_execute('xvfb-run', [ '-a', $^X, ($devel_cover_inc ? $devel_cover_inc : ()), '-Ilib', $test_marionette_file ]);
+			_multiple_attempts_execute('xvfb-run', [ '-a', $^X, ($local_devel_cover_inc ? $local_devel_cover_inc : ()), '-Ilib', $test_marionette_file ]);
 		}
 	}
 	_check_for_background_processes($background_pids, \@servers);
@@ -437,7 +444,7 @@ MAIN: {
 		if (defined $paths_to_binary{$entry}) {
 			{
 				local $ENV{FIREFOX_ALARM} = 2700;
-				_multiple_attempts_execute($^X, [ ($devel_cover_inc ? $devel_cover_inc : ()), '-Ilib', $test_marionette_file ], { FIREFOX_HOST => 'localhost', FIREFOX_BINARY => $paths_to_binary{$entry} });
+				_multiple_attempts_execute($^X, [ ($local_devel_cover_inc ? $local_devel_cover_inc : ()), '-Ilib', $test_marionette_file ], { FIREFOX_HOST => 'localhost', FIREFOX_BINARY => $paths_to_binary{$entry} });
 			}
 		}
 	}
@@ -457,19 +464,19 @@ MAIN: {
 		$ENV{FIREFOX_BINARY} = $path_to_binary;
 		if ($entry =~ /^waterfox/smx) {
 			warn "Disabling NETWORK and RECONNECT for Waterfox version $old_version\n";
-			_multiple_attempts_execute($^X, [ ($devel_cover_inc ? $devel_cover_inc : ()), '-Ilib', $test_marionette_file ], { FIREFOX_NO_RECONNECT => 1, FIREFOX_NO_NETWORK => 1, WATERFOX => 1, FIREFOX_BINARY => $paths_to_binary{$entry} });
-			_multiple_attempts_execute($^X, [ ($devel_cover_inc ? $devel_cover_inc : ()), '-Ilib', $test_marionette_file ], { FIREFOX_NO_RECONNECT => 1, FIREFOX_NO_NETWORK => 1, WATERFOX_VIA_FIREFOX => 1, FIREFOX_BINARY => $paths_to_binary{$entry} });
+			_multiple_attempts_execute($^X, [ ($local_devel_cover_inc ? $local_devel_cover_inc : ()), '-Ilib', $test_marionette_file ], { FIREFOX_NO_RECONNECT => 1, FIREFOX_NO_NETWORK => 1, WATERFOX => 1, FIREFOX_BINARY => $paths_to_binary{$entry} });
+			_multiple_attempts_execute($^X, [ ($local_devel_cover_inc ? $local_devel_cover_inc : ()), '-Ilib', $test_marionette_file ], { FIREFOX_NO_RECONNECT => 1, FIREFOX_NO_NETWORK => 1, WATERFOX_VIA_FIREFOX => 1, FIREFOX_BINARY => $paths_to_binary{$entry} });
 		} else {
 			$count = 0;
 			LOCAL: {
 				$count += 1;
 				my $start_execute_time = time;
-				my $result = system { $^X } $^X, ($devel_cover_inc ? $devel_cover_inc : ()), '-Ilib', $test_marionette_file;
+				my $result = system { $^X } $^X, ($local_devel_cover_inc ? $local_devel_cover_inc : ()), '-Ilib', $test_marionette_file;
 				my $total_execute_time = time - $start_execute_time;
 				if ($result != 0) {
 					if ($count < $max_attempts) {
 						my $error_message = _error_message($^X, $CHILD_ERROR);
-						warn "Failed '$^X$devel_cover_inc_with_space -Ilib $test_marionette_file with FIREFOX_BINARY=$ENV{FIREFOX_BINARY} at ' " . localtime . " exited with a '$error_message' after $total_execute_time seconds.  Sleeping for $reset_time seconds for $path_to_binary";
+						warn "Failed '$^X$local_devel_cover_inc_with_space -Ilib $test_marionette_file with FIREFOX_BINARY=$ENV{FIREFOX_BINARY} at ' " . localtime . " exited with a '$error_message' after $total_execute_time seconds.  Sleeping for $reset_time seconds for $path_to_binary";
 						if ($entry eq 'firefox-nightly') {
 							$firefox_nightly_failed = 1;
 							next ENTRY;
@@ -484,7 +491,7 @@ MAIN: {
 			if ($entry eq 'firefox-upgrade') {
 				setup_upgrade();
 			}
-			my $bash_command = 'cd ' . Cwd::cwd() . '; FIREFOX_ALARM=' . $ENV{FIREFOX_ALARM} . ' DEVEL_COVER_DB_FORMAT=' . $devel_cover_db_format . ($ENV{FIREFOX_NO_NETWORK} ? ' FIREFOX_NO_NETWORK=1' : q[]) . ' RELEASE_TESTING=1 FIREFOX_BINARY="' . $ENV{FIREFOX_BINARY} . "\" $^X$devel_cover_inc_with_space -Ilib $test_marionette_file";
+			my $bash_command = 'cd ' . Cwd::cwd() . '; FIREFOX_ALARM=' . $ENV{FIREFOX_ALARM} . ' DEVEL_COVER_DB_FORMAT=' . $devel_cover_db_format . ($ENV{FIREFOX_NO_NETWORK} ? ' FIREFOX_NO_NETWORK=1' : q[]) . ' RELEASE_TESTING=1 FIREFOX_BINARY="' . $ENV{FIREFOX_BINARY} . "\" $^X$local_devel_cover_inc_with_space -Ilib $test_marionette_file";
 			if ($entry eq 'firefox-nightly') {
 				if (!_multiple_attempts_execute('ssh', [ 'localhost', $bash_command ], undef, 1)) {
 					$firefox_nightly_failed = 1;
@@ -496,7 +503,7 @@ MAIN: {
 			if ($entry eq 'firefox-upgrade') {
 				setup_upgrade();
 			}
-			$bash_command = 'cd ' . Cwd::cwd() . '; FIREFOX_ALARM=' . $ENV{FIREFOX_ALARM} . ' DEVEL_COVER_DB_FORMAT=' . $devel_cover_db_format . ($ENV{FIREFOX_NO_NETWORK} ? ' FIREFOX_NO_NETWORK=1' : q[]) . ' RELEASE_TESTING=1 FIREFOX_VISIBLE=1 FIREFOX_BINARY="' . $ENV{FIREFOX_BINARY} . "\" $^X$devel_cover_inc_with_space -Ilib $test_marionette_file";
+			$bash_command = 'cd ' . Cwd::cwd() . '; FIREFOX_ALARM=' . $ENV{FIREFOX_ALARM} . ' DEVEL_COVER_DB_FORMAT=' . $devel_cover_db_format . ($ENV{FIREFOX_NO_NETWORK} ? ' FIREFOX_NO_NETWORK=1' : q[]) . ' RELEASE_TESTING=1 FIREFOX_VISIBLE=1 FIREFOX_BINARY="' . $ENV{FIREFOX_BINARY} . "\" $^X$local_devel_cover_inc_with_space -Ilib $test_marionette_file";
 			if ($entry eq 'firefox-nightly') {
 				if (!_multiple_attempts_execute('ssh', [ 'localhost', $bash_command ], undef, 1)) {
 					$firefox_nightly_failed = 1;
@@ -525,12 +532,13 @@ MAIN: {
 		_check_for_background_processes($background_pids, @servers);
 	}
 	foreach my $syscall_entry (@syscall_entries) {
-		_multiple_attempts_execute($^X, [ ($devel_cover_inc ? $devel_cover_inc : ()), '-Ilib', $syscall_entry ], {});
+		_multiple_attempts_execute($^X, [ ($local_devel_cover_inc ? $local_devel_cover_inc : ()), '-Ilib', $syscall_entry ], {});
 	}
-	_multiple_attempts_execute($^X, [ ($devel_cover_inc ? $devel_cover_inc : ()), '-Ilib', '-wT', 't/04-proxy.t' ], {});
-	_multiple_attempts_execute($^X, [ ($devel_cover_inc ? $devel_cover_inc : ()), '-Ilib', 't/04-webauthn.t' ], {});
-	_multiple_attempts_execute($^X, [ ($devel_cover_inc ? $devel_cover_inc : ()), '-Ilib', 't/04-botd.t' ], {});
-	_multiple_attempts_execute($^X, [ ($devel_cover_inc ? $devel_cover_inc : ()), '-Ilib', '-wT', 't/04-browserfeatcl.t' ], {});
+	_multiple_attempts_execute($^X, [ ($local_devel_cover_inc ? $local_devel_cover_inc : ()), '-Ilib', '-wT', 't/04-proxy.t' ], {});
+	_multiple_attempts_execute($^X, [ ($local_devel_cover_inc ? $local_devel_cover_inc : ()), '-Ilib', 't/04-webauthn.t' ], {});
+	_multiple_attempts_execute($^X, [ ($local_devel_cover_inc ? $local_devel_cover_inc : ()), '-Ilib', 't/04-botd.t' ], {});
+	_multiple_attempts_execute($^X, [ ($local_devel_cover_inc ? $local_devel_cover_inc : ()), '-Ilib', 't/04-browserfeatcl.t' ], {});
+	_multiple_attempts_execute($^X, [ ($local_devel_cover_inc ? $local_devel_cover_inc : ()), '-Ilib', 't/04-timezone.t' ], {});
 	while (_check_for_background_processes($background_pids, @servers)) {
 		sleep 10;
 	}
@@ -543,9 +551,10 @@ MAIN: {
 		}
 	}
 	chdir $cwd or die "Failed to chdir to '$cwd':$EXTENDED_OS_ERROR";
-	if (-d "$cwd/$cover_db_name") {
+	if (-d "$cover_db_path/$cover_db_name") {
 		$ENV{DEVEL_COVER_DB_FORMAT} = $devel_cover_db_format;
-		system { 'cover' } 'cover', '-ignore_re', '^t/*' and die "Failed to 'cover'";
+		system { 'cover' } 'cover', '-ignore_re', '^t/*', "$cover_db_path/$cover_db_name" and die "Failed to 'cover'";
+		system { 'mv' } 'mv', "$cover_db_path/$cover_db_name", "." and die "Failed to 'mv $cover_db_path/$cover_db_name .'";
 	} else {
 		warn "No coverage generated\n";
 	}
@@ -556,6 +565,45 @@ MAIN: {
 		warn "Firefox Nightly failed to complete successfully\n";
 	} else {
 		warn "Firefox Nightly PASSED successfully\n";
+	}
+	my $start_time_for_journalctl = POSIX::strftime('%Y-%m-%d %H:%M:%S', localtime $start_time);
+	my $ssh_auth_cmd = 'ssh-auth-cmd-marionette';
+	my $journalctl_handle = FileHandle->new();
+	if (my $pid = $journalctl_handle->open(q[-|])) {
+		my $count = 0;
+		while(my $line = <$journalctl_handle>) {
+			$count += 1;
+		}
+		close $journalctl_handle or die "Failed to successfully execute journalctl:$EXTENDED_OS_ERROR";
+		warn "Total number of syslog messages generated by $ssh_auth_cmd is $count\n";
+	} elsif (defined $pid) {
+		eval {
+			exec { 'journalctl' } 'journalctl', '-t', 'ssh-auth-cmd-marionette', '--since', $start_time_for_journalctl, '--quiet' or die "Failed to exec 'journalctl':$EXTENDED_OS_ERROR";
+		} or do {
+			warn "Failed to execute 'journalctl':$EVAL_ERROR";
+		};
+		exit 1;
+	} else {
+		die "Failed to fork:$EXTENDED_OS_ERROR";
+	}
+	$journalctl_handle = FileHandle->new();
+	if (my $pid = $journalctl_handle->open(q[-|])) {
+		my $count = 0;
+		while(my $line = <$journalctl_handle>) {
+			$count += 1;
+			warn $line;
+		}
+		close $journalctl_handle or die "Failed to successfully execute journalctl:$EXTENDED_OS_ERROR";
+		warn "$ssh_auth_cmd generated $count warning messages\n";
+	} elsif (defined $pid) {
+		eval {
+			exec { 'journalctl' } 'journalctl', '-t', 'ssh-auth-cmd-marionette', '-p', 'warning', '--since', $start_time_for_journalctl, '--quiet' or die "Failed to exec 'journalctl':$EXTENDED_OS_ERROR";
+		} or do {
+			warn "Failed to execute 'journalctl':$EVAL_ERROR";
+		};
+		exit 1;
+	} else {
+		die "Failed to fork:$EXTENDED_OS_ERROR";
 	}
 }
 

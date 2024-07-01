@@ -1,6 +1,13 @@
 Revision history for e
 
 =================
+1.24 - 2024-07-01
+=================
+
+Can be easily sub moduled.
+Command "say" will always redirect to the terminal.
+
+=================
 1.23 - 2024-06-22
 =================
 

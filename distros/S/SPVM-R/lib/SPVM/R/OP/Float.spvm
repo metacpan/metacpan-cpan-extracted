@@ -230,7 +230,7 @@ class R::OP::Float {
     return $ret_ndarray;
   }
   
-  precompile static method to_int : R::NDArray::Int ($x_ndarray : R::NDArray::Float) {
+  precompile static method to_int_ndarray : R::NDArray::Int ($x_ndarray : R::NDArray::Float) {
     
     unless ($x_ndarray) {
       die "The n-dimension array \$x_ndarray must be defined.";
@@ -252,7 +252,7 @@ class R::OP::Float {
     return $ret_ndarray;
   }
   
-  precompile static method to_long : R::NDArray::Long ($x_ndarray : R::NDArray::Float) {
+  precompile static method to_long_ndarray : R::NDArray::Long ($x_ndarray : R::NDArray::Float) {
     
     unless ($x_ndarray) {
       die "The n-dimension array \$x_ndarray must be defined.";
@@ -296,7 +296,7 @@ class R::OP::Float {
     return $ret_ndarray;
   }
   
-  precompile static method to_double : R::NDArray::Double ($x_ndarray : R::NDArray::Float) {
+  precompile static method to_double_ndarray : R::NDArray::Double ($x_ndarray : R::NDArray::Float) {
     
     unless ($x_ndarray) {
       die "The n-dimension array \$x_ndarray must be defined.";
@@ -318,7 +318,7 @@ class R::OP::Float {
     return $ret_ndarray;
   }
   
-  precompile static method to_float_complex : R::NDArray::FloatComplex ($x_ndarray : R::NDArray::Float) {
+  precompile static method to_float_complex_ndarray : R::NDArray::FloatComplex ($x_ndarray : R::NDArray::Float) {
     
     unless ($x_ndarray) {
       die "The n-dimension array \$x_ndarray must be defined.";
@@ -341,7 +341,7 @@ class R::OP::Float {
     return $ret_ndarray;
   }
   
-  precompile static method to_double_complex : R::NDArray::DoubleComplex ($x_ndarray : R::NDArray::Float) {
+  precompile static method to_double_complex_ndarray : R::NDArray::DoubleComplex ($x_ndarray : R::NDArray::Float) {
     
     unless ($x_ndarray) {
       die "The n-dimension array \$x_ndarray must be defined.";

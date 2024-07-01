@@ -1,7 +1,7 @@
 ![](https://libsisimai.org/static/images/logo/sisimai-x01.png)
 [![License](https://img.shields.io/badge/license-BSD%202--Clause-orange.svg)](https://github.com/sisimai/p5-sisimai/blob/master/LICENSE)
-[![Perl](https://img.shields.io/badge/perl-v5.26--v5.38-blue.svg)](https://www.perl.org)
-[![CPAN](https://img.shields.io/badge/cpan-v5.0.3-blue.svg)](https://metacpan.org/pod/Sisimai)
+[![Perl](https://img.shields.io/badge/perl-v5.26--v5.40-blue.svg)](https://www.perl.org)
+[![CPAN](https://img.shields.io/badge/cpan-v5.1.0-blue.svg)](https://metacpan.org/pod/Sisimai)
 [![codecov](https://codecov.io/github/sisimai/p5-sisimai/branch/5-stable/graph/badge.svg?token=8kvF4rWPM3)](https://codecov.io/github/sisimai/p5-sisimai)
 
 > [!IMPORTANT]
@@ -79,7 +79,7 @@ The key features of Sisimai
   * `cpan`, `cpanm`, or `cpm`
   * `git clone & make`
 * __High Precision of Analysis__
-  * Support [70 MTAs/MDAs/ESPs](https://libsisimai.org/en/engine/)
+  * Support [73 MTAs/MDAs/ESPs](https://libsisimai.org/en/engine/)
   * Support Feedback Loop Message(ARF)
   * Can detect [34 bounce reasons](https://libsisimai.org/en/reason/)
 
@@ -135,14 +135,14 @@ $ cd ./p5-sisimai
 $ make install-from-local
 ./cpanm --sudo . || ( make cpm && ./cpm install --sudo -v . )
 --> Working on .
-Configuring Sisimai-v5.0.3 ... OK
-Building and testing Sisimai-v5.0.3 ... Password: <sudo password here>
+Configuring Sisimai-v5.1.0 ... OK
+Building and testing Sisimai-v5.1.0 ... Password: <sudo password here>
 OK
-Successfully installed Sisimai-v5.0.3
+Successfully installed Sisimai-v5.1.0
 1 distribution installed
 
 $ perl -MSisimai -lE 'print Sisimai->version'
-5.0.3
+5.1.0
 ```
 
 Usage
@@ -356,11 +356,11 @@ Beginning with v5.0.0, Sisimai requires **Perl 5.26.0 or later.**
 |------------------------------------------------------|--------------------|---------------------|
 | System requirements (Perl)                           | 5.10 - 5.38        | **5.26** - 5.38     |
 | Callback feature for the original email file         | N/A                | Available[^3]       |
-| The number of MTA/ESP modules                        | 68                 | 70                  |
+| The number of MTA/ESP modules                        | 68                 | 73                  |
 | The number of detectable bounce reasons              | 29                 | 34                  |
 | Dependencies (Except core modules of Perl)           | 2 modules          | 2 modules           |
-| Source lines of code                                 | 10,800 lines       | 11,500 lines        |
-| The number of tests in t/, xt/ directory             | 270,000 tests      | 328,000 tests       | 
+| Source lines of code                                 | 10,800 lines       | 11,800 lines        |
+| The number of tests in t/, xt/ directory             | 270,000 tests      | 335,000 tests       | 
 | The number of bounce emails decoded per second[^4]   | 541 emails         | 660 emails          |
 | License                                              | 2 Clause BSD       | 2 Caluse BSD        |
 | Commercial support                                   | Available          | Available           |
@@ -394,12 +394,14 @@ MTA/ESP Module Names
 Three ESP module names have been changed at Sisimai 5. The list of the all MTA/ESP modules is
 available at [LIBSISIMAI.ORG/EN/ENGINE](https://libsisimai.org/en/engine/)
 
-| `Sisimai::Rhost::`                                   | Sisimai 4          | Sisimai 5           |
-|------------------------------------------------------|--------------------|---------------------|
-| Microsoft Exchange Online                            | `ExchangeOnline`   | `Microsoft`         |
-| Google Workspace                                     | `GoogleApps`       | `Google`            |
-| Tencent                                              | `TencentQQ`        | `Tencent`           |
-
+| `Sisimai::`                                     | Sisimai 4               | Sisimai 5           |
+|-------------------------------------------------|-------------------------|---------------------|
+| Apple iCloud Mail (added at v5.1.0)             | None                    | `Rhost::Apple`      |
+| Microsoft Exchange Online                       | `Rhost::ExchangeOnline` | `Rhost::Microsoft`  |
+| Google Workspace                                | `Rhost::GoogleApps`     | `Rhost::Google`     |
+| Tencent                                         | `Rhost::TencentQQ`      | `Rhost::Tencent`    |
+| Yahoo Mail (added at v5.1.0)                    | None                    | `Rhost::YahooInc`   |
+| DragonFly Mail Agent (added at v5.1.0)          | None                    | `Lhost::DragonFly`  |
 
 Bounce Reasons
 ---------------------------------------------------------------------------------------------------

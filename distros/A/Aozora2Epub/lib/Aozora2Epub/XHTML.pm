@@ -14,7 +14,7 @@ __PACKAGE__->mk_accessors(qw/title subtitle author
                              contents
                              bib_info notation_notes gaiji fig/);
 
-our $VERSION = "0.04";
+our $VERSION = "0.05";
 
 sub jisx0213_to_utf8 {
     my ($men, $ku, $ten) = @_;
@@ -168,6 +168,34 @@ sub _is_empty {
     return $elem->tag eq 'br';
 }
 
+sub _list_as_html {
+    my @c = @_;
+
+    return '' unless @c;
+    my $res = '';
+    for my $c (@c) {
+        if ($c->isa('HTML::Element')) {
+            $res .= $c->as_HTML('<>&', undef, {});
+            next;
+        }
+        $c =~ s/^ //;
+        $c =~ s/ $//;
+        $res .= $c;
+    }
+    return $res;
+}
+
+sub _process_bibinfo {
+    my $div = shift;
+
+    my @hr = $div->find_by_tag_name('hr');
+    $_->detach for @hr;
+    my @c = $div->content_list;
+    while (@c && _is_empty($c[0])) { shift @c }
+    while (@c && _is_empty($c[-1])) { pop @c }
+    return _list_as_html(@c);
+}
+
 sub process_doc {
     my $self = shift;
 
@@ -184,12 +212,7 @@ sub process_doc {
             $author = shift->as_text;
         })
         ->process('div.bibliographical_information', sub {
-            my $bio = shift;
-            my $hr = $bio->find_by_tag_name('hr');
-            $hr->detach if $hr;
-            $bib_info = $bio->as_HTML('<>&', undef, {});
-            $bib_info =~ s{^<div class="bibliographical_information"><br /> }{}s;
-            $bib_info =~ s{<br /><br /><br /></div>$}{}s;
+            $bib_info = _process_bibinfo(shift)
         })
         ->process('body > div.notation_notes', sub {
             my $nn = shift;

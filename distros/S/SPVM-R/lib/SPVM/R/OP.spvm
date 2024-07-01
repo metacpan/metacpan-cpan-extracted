@@ -76,10 +76,10 @@ class R::OP {
     for (my $i = 0; $i < $ret_length; $i += $x_length) {
       my $x_index = $i % $x_length;
       
-      if ($x_ndarray->is_numeric) {
-        my $element_size = $x_ndarray->element_size;
+      if ($x_ndarray->is_any_numeric_ndarray) {
+        my $elem_size = $x_ndarray->elem_size;
         
-        Fn->memcpy($ret_data, $i, $x_data, $x_index, $element_size);
+        Fn->memcpy($ret_data, $i, $x_data, $x_index, $elem_size);
       }
       else {
         $ret_data->(object[])->[$i] = $x_data->(object[])->[$x_index];
@@ -117,10 +117,10 @@ class R::OP {
     for (my $i = 0; $i < $length; $i += $x_length) {
       my $x_index = $i % $x_length;
       
-      if ($x_ndarray->is_numeric) {
-        my $element_size = $x_ndarray->element_size;
+      if ($x_ndarray->is_any_numeric_ndarray) {
+        my $elem_size = $x_ndarray->elem_size;
         
-        Fn->memcpy($ret_data, $i, $x_data, $x_index, $element_size);
+        Fn->memcpy($ret_data, $i, $x_data, $x_index, $elem_size);
       }
       else {
         $ret_data->(object[])->[$i] = $x_data->(object[])->[$x_index];
@@ -136,16 +136,16 @@ class R::OP {
       die "The n-dimention array \$x_ndarray must be defined.";
     }
     
-    unless ($x_ndarray->is_vector || $x_ndarray->is_matrix) {
-      die "The n-dimention array \$x_ndarray must be a vector or a matrix.";
+    unless ($x_ndarray->is_matrix) {
+      die "The n-dimention array \$x_ndarray must be a matrix.";
     }
     
     unless ($y_ndarray) {
       die "The n-dimention array \$y_ndarray must be defined.";
     }
     
-    unless ($y_ndarray->is_vector || $y_ndarray->is_matrix) {
-      die "The n-dimention array \$y_ndarray must be a vector or a matrix.";
+    unless ($y_ndarray->is_matrix) {
+      die "The n-dimention array \$y_ndarray must be a matrix.";
     }
     
     unless (type_name $x_ndarray eq type_name $y_ndarray) {
@@ -177,12 +177,12 @@ class R::OP {
     
     my $y_data = $y_ndarray->data;
     
-    my $element_size = $x_ndarray->element_size;
+    my $elem_size = $x_ndarray->elem_size;
     
-    if ($x_ndarray->is_numeric) {
-      Fn->memcpy($ret_data, 0, $x_data, 0, $element_size * ($x_row * $x_column));
+    if ($x_ndarray->is_any_numeric_ndarray) {
+      Fn->memcpy($ret_data, 0, $x_data, 0, $elem_size * ($x_row * $x_column));
       
-      Fn->memcpy($ret_data, $x_row * $x_column, $y_data, 0, $element_size * ($y_row * $y_column));
+      Fn->memcpy($ret_data, $x_row * $x_column, $y_data, 0, $elem_size * ($y_row * $y_column));
     }
     else {
       Array->memcpy_object_address((object[])$ret_data, 0, (object[])$x_data, 0, $x_row * $x_column);
@@ -199,16 +199,16 @@ class R::OP {
       die "The n-dimention array \$x_ndarray must be defined.";
     }
     
-    unless ($x_ndarray->is_vector || $x_ndarray->is_matrix) {
-      die "The n-dimention array \$x_ndarray must be a vector or a matrix.";
+    unless ($x_ndarray->is_matrix) {
+      die "The n-dimention array \$x_ndarray must be a matrix.";
     }
     
     unless ($y_ndarray) {
       die "The n-dimention array \$y_ndarray must be defined.";
     }
     
-    unless ($y_ndarray->is_vector || $y_ndarray->is_matrix) {
-      die "The n-dimention array \$y_ndarray must be a vector or a matrix.";
+    unless ($y_ndarray->is_matrix) {
+      die "The n-dimention array \$y_ndarray must be a matrix.";
     }
     
     unless (type_name $x_ndarray eq type_name $y_ndarray) {
@@ -242,13 +242,13 @@ class R::OP {
     
     my $ret_data_index = 0;
     
-    my $element_size = $x_ndarray->element_size;
+    my $elem_size = $x_ndarray->elem_size;
     
     for (my $column_index = 0; $column_index < $ret_column; $column_index++) {
-      if ($x_ndarray->is_numeric) {
-        Fn->memcpy($ret_data, $element_size * $ret_data_index, $x_data, 0, $element_size * $x_row);
+      if ($x_ndarray->is_any_numeric_ndarray) {
+        Fn->memcpy($ret_data, $elem_size * $ret_data_index, $x_data, 0, $elem_size * $x_row);
         
-        Fn->memcpy($ret_data, $element_size * ($ret_data_index + $x_row), $y_data, 0, $element_size * $y_row);
+        Fn->memcpy($ret_data, $elem_size * ($ret_data_index + $x_row), $y_data, 0, $elem_size * $y_row);
       }
       else {
         Array->memcpy_object_address((object[])$ret_data, $ret_data_index, (object[])$x_data, 0, $x_row);

@@ -6,14 +6,12 @@ use Sisimai::SMTP::Reply;
 
 sub get {
     # Detect bounce reason from https://www.mimecast.com/
-    # @param    [Sisimai::Fact] argvs   Parsed email object
+    # @param    [Sisimai::Fact] argvs   Decoded email object
     # @return   [String]                The bounce reason at Mimecast
     # @since v4.25.15
     my $class = shift;
     my $argvs = shift // return undef;
-
-    return undef unless length $argvs->{'diagnosticcode'};
-    return undef unless Sisimai::SMTP::Reply->test($argvs->{'replycode'});
+    return '' unless Sisimai::SMTP::Reply->test($argvs->{'replycode'});
 
     state $messagesof = {
         # https://community.mimecast.com/s/article/Mimecast-SMTP-Error-Codes-842605754
@@ -77,6 +75,15 @@ sub get {
             #   the associated IP address from the RBL.
             #[550, '< details of RBL >'], NEED AN ACTUAL ERROR MESSAGE STRING
         ],
+        'expired' => [
+            # - Journal messages past the expiration
+            # - Attempts are being made to journal mail past the set expiry threshold.
+            #   A retry response will replace the failure because the message is marked for retry
+            #   if rejected, causing the journal queue to grow.
+            # - Check to confirm there are no significant time discrepancies on the mail server.
+            #   Discontinue journaling old messages past the expiry threshold.
+            [550, 'Journal messages past the expiration'],
+        ],
         'mesgtoobig' => [
             # - The email size either exceeds an Email Size Limit policy or is larger than the
             #   Mimecast service limit. The default is 100 MB for the Legacy MTA, and 200 MB for
@@ -106,6 +113,7 @@ sub get {
             # - Mimecast customers should contact Mimecast Support to add the Authorized Outbound
             #   address, or to take other remedial action.
             [451, 'open relay not allowed'],
+            [451, 'open relay is not allowed'],
         ],
         'notaccept' => [
             # - The customer account Inbound emails are disabled in the Administration Console.
@@ -143,6 +151,7 @@ sub get {
             # - The message has triggered a Geographical Restriction policy.
             # - Delete or amend the policy.
             [554, 'host network not allowed'],
+            [554, 'host network, not allowed'],
         ],
         'rejected' => [
             # - The sender's email address or domain has triggered a Blocked Senders Policy or
@@ -170,6 +179,7 @@ sub get {
             #   sage on SMTP port 25.
             [535, 'incorrect authentication data'],
             [550, 'submitter failed to disabled'],
+            [550, 'submitter failed to authenticate'],
 
             # - This email has been sent using SMTP, but TLS is required by policy.
             # - Delete or change the Secure Receipt or Secure Delivery policy enforcing TLS.
@@ -304,19 +314,19 @@ Sisimai::Rhost::Mimecast - Detect the bounce reason returned from Mimecast
 
 =head1 SYNOPSIS
 
-    use Sisimai::Rhost;
+    use Sisimai::Rhost::Mimecast;
 
 =head1 DESCRIPTION
 
-Sisimai::Rhost detects the bounce reason from the content of Sisimai::Fact object as an argument of
-get() method when the value of C<rhost> or C<destination> of the object is "mimecast.com". This
-class is called only Sisimai::Fact class.
+C<Sisimai::Rhost::Mimecast> detects the bounce reason from the content of C<Sisimai::Fact> object
+as an argument of C<get()> method when the value of C<rhost> or C<destination> of the object is
+C<mimecast.com>. This class is called only C<Sisimai::Fact> class.
 
 =head1 CLASS METHODS
 
 =head2 C<B<get(I<Sisimai::Fact Object>)>>
 
-C<get()> detects the bounce reason.
+C<get()> method detects the bounce reason.
 
 =head1 AUTHOR
 

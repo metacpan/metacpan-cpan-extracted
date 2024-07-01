@@ -411,9 +411,9 @@ class R::OP::Int {
     my $x_data = $x_ndarray->data;
     
     for (my $i = 0; $i < $length; $i++) {
-      my $element = $x_data->[$i];
+      my $elem = $x_data->[$i];
       
-      if ($element) {
+      if ($elem) {
         $indexes_list->push($i);
       }
     }

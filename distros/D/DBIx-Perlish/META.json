@@ -4,7 +4,7 @@
       "Dmitry Karasik <dmitry@karasik.eu.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.62, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "bsd"
    ],
@@ -51,6 +51,6 @@
          "url" : "http://github.com/dk/DBIx-Perlish"
       }
    },
-   "version" : "1.07",
-   "x_serialization_backend" : "JSON::PP version 4.06"
+   "version" : "1.08",
+   "x_serialization_backend" : "JSON::PP version 4.16"
 }

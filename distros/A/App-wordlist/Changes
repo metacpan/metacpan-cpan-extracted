@@ -1,3 +1,11 @@
+0.293   2024-06-26  Released-By: PERLANCAR; Urgency: low
+
+        - No functional changes.
+
+        - [dist] Edit Changes metadata
+          (Backward-{Compatible,Incompatible}).
+
+
 0.292   2024-01-05  Released-By: PERLANCAR; Urgency: medium
 
         - [dist] Update dependencies: remove WordListMod::RandomSeekPick.
@@ -180,7 +188,7 @@
 	- Enable logging in CLI.
 
 
-0.268   2020-05-02  Released-By: PERLANCAR; Urgency: medium; Backward-Compatible: no
+0.268   2020-05-02  Released-By: PERLANCAR; Urgency: medium; Backward-Incompatible: yes
 
 	- [incompatible change] CLI now streams output; output starts
           immediately. This break code that calls App::wordlist::wordlist() and

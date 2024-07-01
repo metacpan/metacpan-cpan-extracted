@@ -38,6 +38,7 @@
       "runtime" : {
          "requires" : {
             "Carp" : "0",
+            "File::ReadBackwards" : "0",
             "Getopt::Long" : "0",
             "autodie" : "0",
             "bigint" : "0",
@@ -59,7 +60,7 @@
    "provides" : {
       "App::Timestamper::Log::Process" : {
          "file" : "lib/App/Timestamper/Log/Process.pm",
-         "version" : "v0.0.4"
+         "version" : "v0.2.0"
       }
    },
    "release_status" : "stable",
@@ -74,7 +75,7 @@
          "web" : "https://github.com/shlomif/App-Timestamper"
       }
    },
-   "version" : "0.0.4",
+   "version" : "0.2.0",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.038002"

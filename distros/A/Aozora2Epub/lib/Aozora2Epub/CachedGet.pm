@@ -12,7 +12,7 @@ use parent 'Exporter';
 
 our @EXPORT = qw(http_get);
 
-our $VERSION = '0.04';
+our $VERSION = '0.05';
 
 our $CACHE;
 init_cache();

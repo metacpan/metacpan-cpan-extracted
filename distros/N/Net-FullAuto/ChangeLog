@@ -20,6 +20,12 @@
 #######################################################################
 
 
+2024-06-30  Brian M. Kelly <Brian.Kelly@fullauto.com>
+
+        * Version 1.0000663 released
+
+	* Tighted display() filtering
+
 2024-06-28  Brian M. Kelly <Brian.Kelly@fullauto.com>
 
         * Version 1.0000662 released

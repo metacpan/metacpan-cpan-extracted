@@ -5,7 +5,7 @@ use Sisimai;
 use JSON;
 
 my $Package = 'Sisimai::Fact';
-my $Methods = { 'class' => ['rise'], 'object' => ['softbounce', 'dump', 'damn'] };
+my $Methods = { 'class' => ['rise'], 'object' => ['dump', 'damn'] };
 my $Results = {
     # INDEX => [['D.S.N.', 'replycode', 'REASON', 'hardbounce'], [...]]
     '00' => [
@@ -55,6 +55,10 @@ can_ok $Package, @{ $Methods->{'class'} };
 
 MAKETEST: {
     is $Package->rise, undef;
+    is $Package->rise({'data' => ''}), undef;
+    is $Package->rise({'data' => 'test', 'load' => ''}), undef;
+    is $Package->rise({'data' => 'test', 'load' => [], 'order' => ''}), undef;
+    is $Package->rise({'data' => 'test', 'load' => [], 'order' => []}), undef;
 
     my $json = JSON->new;
     my $call = sub {
@@ -95,7 +99,6 @@ MAKETEST: {
             is $e->replycode,      $cx->[1], sprintf("%s ->replycode = %s",      $ct, $cx->[1]);
             is $e->reason,         $cx->[2], sprintf("%s ->reason = %s",         $ct, $cx->[2]);
             is $e->hardbounce,     $cx->[3], sprintf("%s ->hardbounce = %s",     $ct, $cx->[3]);
-            is $e->softbounce,     $e->hardbounce ? 0 : 1;
 
             $cv = $e->catch;
             ok $cv->{'from'},        sprintf("%s ->catch(from) = %s", $ct, $cv->{'from'});
@@ -117,6 +120,7 @@ MAKETEST: {
 
             # JSON
             $cv = $e->dump('json');     ok length $cv, sprintf("%s ->dump(json) = %s", $ct, substr($cv, 0, 32));
+            $cv = $e->dump();           ok length $cv, sprintf("%s ->dump() = %s",     $ct, substr($cv, 0, 32));
             $cj = $json->decode($cv);   isa_ok $cj, 'HASH';
 
             is $cj->{'action'}, $e->action, sprintf("%s ->action = %s", $ct, $e->action);
@@ -144,6 +148,7 @@ MAKETEST: {
                 isa_ok $cj->{'catch'}, 'HASH';
                 is $cj->{'catch'}->{'from'}, $e->catch->{'from'}, sprintf("%s ->catch->from = %s", $ct, $e->catch->{'from'});
             };
+            is $e->dump('neko'), undef;
 
             $ce += 1;
         }

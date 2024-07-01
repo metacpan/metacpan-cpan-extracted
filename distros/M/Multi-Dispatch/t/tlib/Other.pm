@@ -2,7 +2,6 @@ package Other 0.000001;
 
 use 5.022;
 use warnings;
-use experimentals;
 
 use Multi::Dispatch;
 

@@ -18,12 +18,13 @@ my %module_build_args = (
     "Shlomi Fish <shlomif\@cpan.org>"
   ],
   "dist_name" => "App-Timestamper-Log-Process",
-  "dist_version" => "0.0.4",
+  "dist_version" => "0.2.0",
   "license" => "mit",
   "module_name" => "App::Timestamper::Log::Process",
   "recursive_test_files" => 1,
   "requires" => {
     "Carp" => 0,
+    "File::ReadBackwards" => 0,
     "Getopt::Long" => 0,
     "autodie" => 0,
     "bigint" => 0,

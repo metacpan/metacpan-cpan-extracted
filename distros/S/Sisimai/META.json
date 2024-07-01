@@ -60,7 +60,7 @@
    "provides" : {
       "Sisimai" : {
          "file" : "lib/Sisimai.pm",
-         "version" : "v5.0.3"
+         "version" : "v5.1.0"
       },
       "Sisimai::ARF" : {
          "file" : "lib/Sisimai/ARF.pm"
@@ -115,6 +115,9 @@
       },
       "Sisimai::Lhost::Domino" : {
          "file" : "lib/Sisimai/Lhost/Domino.pm"
+      },
+      "Sisimai::Lhost::DragonFly" : {
+         "file" : "lib/Sisimai/Lhost/DragonFly.pm"
       },
       "Sisimai::Lhost::EZweb" : {
          "file" : "lib/Sisimai/Lhost/EZweb.pm"
@@ -398,6 +401,9 @@
       "Sisimai::Rhost" : {
          "file" : "lib/Sisimai/Rhost.pm"
       },
+      "Sisimai::Rhost::Apple" : {
+         "file" : "lib/Sisimai/Rhost/Apple.pm"
+      },
       "Sisimai::Rhost::Cox" : {
          "file" : "lib/Sisimai/Rhost/Cox.pm"
       },
@@ -430,6 +436,9 @@
       },
       "Sisimai::Rhost::Tencent" : {
          "file" : "lib/Sisimai/Rhost/Tencent.pm"
+      },
+      "Sisimai::Rhost::YahooInc" : {
+         "file" : "lib/Sisimai/Rhost/YahooInc.pm"
       },
       "Sisimai::SMTP" : {
          "file" : "lib/Sisimai/SMTP.pm"
@@ -470,7 +479,7 @@
          "web" : "https://github.com/sisimai/p5-sisimai"
       }
    },
-   "version" : "v5.0.3",
+   "version" : "v5.1.0",
    "x_contributors" : [
       "0xcdcdcdcd <0xcdcdcdcd@gmail.com>",
       "Adrian Yee <adrian@gt.net>",

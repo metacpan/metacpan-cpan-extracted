@@ -41,6 +41,7 @@ if (defined $ENV{WATERFOX}) {
 	$class = 'Firefox::Marionette';
 	$class->import(qw(:all));
 }
+diag("Starting test at " . localtime);
 my $alarm;
 if (defined $ENV{FIREFOX_ALARM}) {
 	if ($ENV{FIREFOX_ALARM} =~ /^(\d{1,6})\s*$/smx) {
@@ -114,9 +115,9 @@ $SIG{INT} = sub { $terminated = 1; die "Caught an INT signal"; };
 $SIG{TERM} = sub { $terminated = 1; die "Caught a TERM signal"; };
 
 sub wait_for_server_on {
-	my ($daemon, $pid) = @_;
-	my $host = URI->new($daemon->url())->host();
-	my $port = URI->new($daemon->url())->port();
+	my ($daemon, $url, $pid) = @_;
+	my $host = URI->new($url)->host();
+	my $port = URI->new($url)->port();
 	undef $daemon;
 	CONNECT: while (!IO::Socket::IP->new(Type => Socket::SOCK_STREAM(), PeerPort => $port, PeerHost => $host)) {
 		diag("Waiting for server ($pid) to listen on $host:$port:$!");
@@ -172,6 +173,7 @@ sub out_of_time {
 
 my $launches = 0;
 my $ca_cert_handle;
+my $ca_private_key_handle;
 my $metacpan_ca_cert_handle;
 my $guid_regex = qr/[a-f\d]{8}\-[a-f\d]{4}\-[a-f\d]{4}\-[a-f\d]{4}\-[a-f\d]{12}/smx;
 my @old_binary_keys = (qw(firefox_binary firefox marionette));;
@@ -289,7 +291,7 @@ sub start_firefox {
 			}
 			$parameters{capabilities} = Firefox::Marionette::Capabilities->new(%new);
 		}
-		if ((($parameters{visible}) || ($require_visible)) && ($ENV{FIREFOX_NO_VISIBLE})) {
+		if (($parameters{visible}) || ($require_visible)) {
 			$skip_message = "Firefox visible tests are unreliable on a remote host";
 			return ($skip_message, undef);
 		}
@@ -492,6 +494,11 @@ sub start_firefox {
 	}
 	if (($firefox) && (!$skip_message)) {
 		$launches += 1;
+		if (defined $firefox->root_directory()) {
+			ok($firefox, "\$firefox->root_directory() is " . $firefox->root_directory());
+		} else {
+			ok($firefox, "\$firefox->root_directory() is not defined yet");
+		}
 	}
 	return ($skip_message, $firefox);
 }
@@ -669,14 +676,6 @@ if ($ENV{RELEASE_TESTING}) {
 		SSL_verify_mode => IO::Socket::SSL::SSL_VERIFY_NONE(),
 			) ) {
 		if ( IO::Socket::SSL->new(
-		PeerAddr => 'untrusted-root.badssl.com:443',
-		SSL_verify_mode => IO::Socket::SSL::SSL_VERIFY_NONE(),
-			) ) {
-		if ( !IO::Socket::SSL->new(
-		PeerAddr => 'untrusted-root.badssl.com:443',
-		SSL_verify_mode => IO::Socket::SSL::SSL_VERIFY_PEER(),
-			) ) {
-		if ( IO::Socket::SSL->new(
 		PeerAddr => 'metacpan.org:443',
 		SSL_verify_mode => IO::Socket::SSL::SSL_VERIFY_PEER(),
 			) ) {
@@ -685,17 +684,12 @@ if ($ENV{RELEASE_TESTING}) {
 		} else {
 			diag("TLS/Network are NOT okay:Failed to connect to metacpan.org:$IO::Socket::SSL::SSL_ERROR");
 		}
-		} else {
-			diag("TLS/Network are NOT okay:Successfully connected to untrusted-root.badssl.com");
-		}
-		} else {
-			diag("TLS/Network are NOT okay:Failed to connect to untrusted-root.badssl.com:$IO::Socket::SSL::SSL_ERROR");
-		}
 	} else {
 		diag("TLS/Network are NOT okay:Successfully connected to missing.example.org");
 	}
 }
 my $skip_message;
+my $profiles_work = 1;
 SKIP: {
 	if ($ENV{FIREFOX_BINARY}) {
 		skip("No profile testing when the FIREFOX_BINARY override is used", 6);
@@ -715,6 +709,7 @@ SKIP: {
 	my @names = Firefox::Marionette::Profile->names();
 	foreach my $name (@names) {
 		next unless ($name eq 'throw');
+		$profiles_work = 0;
 		($skip_message, $firefox) = start_firefox(0, debug => 1, profile_name => $name );
 		if (!$skip_message) {
 			$at_least_one_success = 1;
@@ -723,6 +718,20 @@ SKIP: {
 			skip($skip_message, 6);
 		}
 		ok($firefox, "Firefox loaded with the $name profile");
+		if ($major_version < 52) {
+		} elsif (($^O eq 'openbsd') && (Cwd::cwd() !~ /^($quoted_home_directory\/Downloads|\/tmp)/)) {
+		} else {
+			my $install_path = Cwd::abs_path('t/addons/test.xpi');
+			diag("Original install path is $install_path");
+			if ($^O eq 'MSWin32') {
+				$install_path =~ s/\//\\/smxg;
+			}
+			diag("Installing extension from $install_path");
+			my $temporary = 1;
+			my $install_id = $firefox->install($install_path, $temporary);
+			ok($install_id, "Successfully installed an extension:$install_id");
+			ok($firefox->uninstall($install_id), "Successfully uninstalled an extension");
+		}
 		ok($firefox->go('http://example.com'), "firefox with the $name profile loaded example.com");
 		ok($firefox->quit() == 0, "firefox with the $name profile quit successfully");
 		my $profile;
@@ -731,6 +740,7 @@ SKIP: {
 		} else {
 			$profile = Firefox::Marionette::Profile->existing($name);
 		}
+		$profile->set_value('security.webauth.webauthn_enable_softtoken', 'true', 0);
 		($skip_message, $firefox) = start_firefox(0, profile => $profile );
 		if (defined $ENV{FIREFOX_DEBUG}) {
 			ok($firefox->debug() eq $ENV{FIREFOX_DEBUG}, "\$firefox->debug() returns \$ENV{FIREFOX_DEBUG}:$ENV{FIREFOX_DEBUG}");
@@ -741,6 +751,7 @@ SKIP: {
 		ok($firefox, "Firefox loaded with a profile copied from $name");
 		ok($firefox->go('http://example.com'), "firefox with the copied profile from $name loaded example.com");
 		ok($firefox->quit() == 0, "firefox with the profile copied from $name quit successfully");
+		$profiles_work = 1;
 	}
 }
 if ($ENV{WATERFOX}) {
@@ -1122,12 +1133,12 @@ SKIP: {
 	}
 }
 
-if (($^O eq 'MSWin32') || ($^O eq 'cygwin')) {
+if ($^O eq 'MSWin32') {
 } elsif ($ENV{RELEASE_TESTING}) {
 	eval {
 		$ca_cert_handle = File::Temp->new( TEMPLATE => File::Spec->catfile( File::Spec->tmpdir(), 'firefox_test_ca_cert_XXXXXXXXXXX')) or Firefox::Marionette::Exception->throw( "Failed to open temporary file for writing:$!");
 		fcntl $ca_cert_handle, Fcntl::F_SETFD(), 0 or Carp::croak("Can't clear close-on-exec flag on temporary file:$!");
-		my $ca_private_key_handle = File::Temp->new( TEMPLATE => File::Spec->catfile( File::Spec->tmpdir(), 'firefox_test_ca_private_XXXXXXXXXXX')) or Firefox::Marionette::Exception->throw( "Failed to open temporary file for writing:$!");
+		$ca_private_key_handle = File::Temp->new( TEMPLATE => File::Spec->catfile( File::Spec->tmpdir(), 'firefox_test_ca_private_XXXXXXXXXXX')) or Firefox::Marionette::Exception->throw( "Failed to open temporary file for writing:$!");
 		system {'openssl'} 'openssl', 'genrsa', '-out' => $ca_private_key_handle->filename(), 4096 and Carp::croak("Failed to generate a private key:$!");
 		my $ca_config_handle = File::Temp->new( TEMPLATE => File::Spec->catfile( File::Spec->tmpdir(), 'firefox_test_ca_config_XXXXXXXXXXX')) or Firefox::Marionette::Exception->throw( "Failed to open temporary file for writing:$!");
 		$ca_config_handle->print(<<"_CONFIG_");
@@ -1338,7 +1349,7 @@ SKIP: {
 				if (my $pid = fork) {
 					my $url = 'http://wtf.example.org';
 					my $favicon_url = 'http://wtf.example.org/favicon.ico';
-					wait_for_server_on($daemon, $pid);
+					wait_for_server_on($daemon, $daemon->url(), $pid);
 					$daemon = undef;
 					my $try_count = 0;
 					GO: {
@@ -1888,7 +1899,7 @@ SKIP: {
 			$new_session_cookie = github_session_cookie($firefox);
 			ok(defined $new_session_cookie, "The session cookie was found after clearing cache");
 			TODO: {
-				local $TODO = ($uname eq 'darwin' || $arch =~ /$arch_32bit_re/smx) ? "Odd issues with clearing too many cookies on $uname ($arch)" : q[];
+				local $TODO = ($uname eq 'MSWin32' || $uname eq 'darwin' || $arch =~ /$arch_32bit_re/smx) ? "Odd issues with clearing too many cookies on $uname ($arch)" : q[];
 				ok($old_session_cookie eq $new_session_cookie, "The same session cookie found after clearing network cache");
 			}
 		}
@@ -1902,6 +1913,7 @@ SKIP: {
 			TODO: {
 				local $TODO = ($major_version < 113 && $name !~ /^(CLEAR_COOKIES|CLEAR_NETWORK_CACHE|CLEAR_IMAGE_CACHE)$/smx) ? "Older firefox (less than 113) can have different values for Firefox::Marionette::Cache constants" : q[];
 				local $TODO = $TODO || ($major_version < 128 && $name =~ /^(?:CLEAR_CREDENTIAL_MANAGER_STATE|CLEAR_COOKIE_BANNER_EXCEPTION|CLEAR_COOKIE_BANNER_EXECUTED_RECORD|CLEAR_FINGERPRINTING_PROTECTION_STATE|CLEAR_BOUNCE_TRACKING_PROTECTION_STATE|CLEAR_FORGET_ABOUT_SITE|CLEAR_STORAGE_PERMISSIONS|CLEAR_COOKIES_AND_SITE_DATA)$/) ? "Old firefox (less than 128) can have different values for Firefox::Marionette::Cache constants" : q[];
+				local $TODO = $TODO || ($major_version < 129 && $name =~ /^(?:CLEAR_PERMISSIONS|CLEAR_FORGET_ABOUT_SITE)$/) ? "Old firefox (less than 129) can have different values for Firefox::Marionette::Cache constants" : q[];
 				my $result = $firefox->check_cache_key($name);
 				if (($name eq 'CLEAR_FORGET_ABOUT_SITE') && ($major_version < 124)) {
 					ok($result <= &$name(), "\$firefox->check_cache_key($name) eq Firefox::Marionette::Cache::${name} which should less than or equal to $result and is " . &$name());
@@ -1927,10 +1939,7 @@ SKIP: {
 	if (!$ENV{RELEASE_TESTING}) {
 		skip("Skipping network tests", 3);
 	}
-	if (!$tls_tests_ok) {
-		skip("TLS test infrastructure seems compromised", 3);
-	}
-	ok($firefox->go(URI->new("https://untrusted-root.badssl.com/")), "https://untrusted-root.badssl.com/ has been loaded");
+	ok($firefox->go('about:mozilla'), 'about:mozilla has been loaded');
 	if (out_of_time()) {
 		skip("Running out of time.  Trying to shutdown tests as fast as possible", 2);
 	}
@@ -2438,15 +2447,53 @@ SKIP: {
 	if (!$ENV{RELEASE_TESTING}) {
 		skip("Skipping network tests", 2);
 	}
-	if (!$tls_tests_ok) {
-		skip("TLS test infrastructure seems compromised", 2);
-	}
 	if (grep /^accept_insecure_certs$/, $capabilities->enumerate()) {
 		ok(!$capabilities->accept_insecure_certs(), "\$capabilities->accept_insecure_certs() is false");
-		eval { $firefox->go(URI->new("https://untrusted-root.badssl.com/")) };
-		my $exception = "$@";
-		chomp $exception;
-		ok(ref $@ eq 'Firefox::Marionette::Exception::InsecureCertificate', "https://untrusted-root.badssl.com/ threw an exception:$exception");
+		if (($ENV{FIREFOX_HOST}) && ($ENV{FIREFOX_HOST} ne 'localhost')) {
+			diag("insecure cert test is not supported for remote hosts");
+		} elsif (($ENV{FIREFOX_HOST}) && ($ENV{FIREFOX_HOST} eq 'localhost') && ($ENV{FIREFOX_PORT})) {
+			diag("insecure cert test is not supported for remote hosts");
+		} elsif ((exists $Config::Config{'d_fork'}) && (defined $Config::Config{'d_fork'}) && ($Config::Config{'d_fork'} eq 'define')) {
+			my $ip_address = '127.0.0.1';
+			my $daemon = IO::Socket::SSL->new(
+				LocalAddr => $ip_address,
+				LocalPort => 0,
+				Listen => 20,
+				SSL_cert_file => $ca_cert_handle->filename(),
+				SSL_key_file => $ca_private_key_handle->filename(),
+			);
+			my $url = "https://$ip_address:" . $daemon->sockport();
+			if (my $pid = fork) {
+				wait_for_server_on($daemon, $url, $pid);
+				eval { $firefox->go(URI->new($url)) };
+				my $exception = "$@";
+				chomp $exception;
+				ok(ref $@ eq 'Firefox::Marionette::Exception::InsecureCertificate', $url . " threw an exception:$exception");
+				while(kill 0, $pid) {
+					kill $signals_by_name{TERM}, $pid;
+					sleep 1;
+					waitpid $pid, POSIX::WNOHANG();
+				}
+			} elsif (defined $pid) {
+				eval {
+					local $SIG{ALRM} = sub { die "alarm during insecure cert test\n" };
+					alarm 40;
+					$0 = "[Test insecure cert test for " . getppid . "]";
+					diag("Accepting connections on $url for $0");
+					foreach ((1 .. 3)) {
+						my $connection = $daemon->accept();
+					}
+					exit 0;
+				};
+				chomp $@;
+				diag("insecure cert test server failed:$@");
+				exit 1;
+			} else {
+				diag("insecure cert test fork failed:$@");
+			}
+		} else {
+			diag("No forking available for $^O");
+		}
 	} else {
 		diag("\$capabilities->accept_insecure_certs is not supported for " . $capabilities->browser_version());
 	}
@@ -4336,7 +4383,7 @@ SKIP: {
 			my $json_document = Encode::decode('UTF-8', '{ "id": "5", "value": "sömething"}');
 			my $txt_document = 'This is ordinary text';
 			if (my $pid = fork) {
-				wait_for_server_on($daemon, $pid);
+				wait_for_server_on($daemon, $daemon->url(), $pid);
 				my $base_url = $daemon->url();
 				undef $daemon;
 				$firefox->go($base_url . '?format=JSON');
@@ -4486,7 +4533,7 @@ SKIP: {
 				skip("\$capabilities->proxy is not supported for " . $^O, 3);
 			} elsif ((exists $Config::Config{'d_fork'}) && (defined $Config::Config{'d_fork'}) && ($Config::Config{'d_fork'} eq 'define')) {
 				if (my $pid = fork) {
-					wait_for_server_on($daemon, $pid);
+					wait_for_server_on($daemon, $daemon->url(), $pid);
 					my $base_url = $daemon->url();
 					undef $daemon;
 					$firefox->go($base_url . '?links_and_images');
@@ -5273,6 +5320,7 @@ SKIP: {
 	}
 
 }
+ok($profiles_work, "Specified profile names work");
 ok($at_least_one_success, "At least one firefox start worked");
 eval "no warnings; sub File::Temp::newdir { \$! = POSIX::EACCES(); return; } use warnings;";
 ok(!$@, "File::Temp::newdir is redefined to fail:$@");

@@ -3,40 +3,4 @@
 
 class R::OP::Matrix {
   
-  static method nrow : int ($x_ndarray : R::NDArray::Double) {
-    
-    unless ($x_ndarray) {
-      die "The n-dimension array \$x_ndarray must be defined.";
-    }
-    
-    unless ($x_ndarray->is_vector || $x_ndarray->is_matrix) {
-      die "The n-dimension array \$x_ndarray must be a vector or a matrix.";
-    }
-    
-    my $dim = $x_ndarray->dim;
-    
-    my $nrow = $dim->[0];
-    
-    return $nrow;
-  }
-  
-  static method ncol : int ($x_ndarray : R::NDArray::Double) {
-    
-    unless ($x_ndarray) {
-      die "The n-dimension array \$x_ndarray must be defined.";
-    }
-    
-    unless ($x_ndarray->is_vector || $x_ndarray->is_matrix) {
-      die "The n-dimension array \$x_ndarray must be a vector or a matrix.";
-    }
-    
-    my $dim = $x_ndarray->dim;
-    
-    my $ncol = 1;
-    if ($x_ndarray->is_matrix) {
-      $ncol = $dim->[1];
-    }
-    
-    return $ncol;
-  }
 }

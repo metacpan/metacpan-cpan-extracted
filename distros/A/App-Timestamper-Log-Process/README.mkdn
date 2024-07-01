@@ -5,7 +5,7 @@ App::Timestamper::Log::Process - various filters and queries for
 
 # VERSION
 
-version 0.0.4
+version 0.2.0
 
 # SYNOPSIS
 
@@ -21,11 +21,21 @@ Instantiate a new application object.
 
 Run the application based on the Command-Line (“CLI”) arguments.
 
-## MODES
+# MODES
+
+## from\_start
 
     timestamper-log-process from_start --output zero-based.ts.log.txt absolute-timestamps.ts.log.txt
 
 Start the timestamps from 0 by negating the one on the first line.
+
+## time
+
+    timestamper-log-process time --output run-times-of-log-files.txt [files]
+
+Calculate the wallclock times, from-start-to-finish, of one or more timestamper log files.
+
+( Added in v0.2.0 . ).
 
 # COPYRIGHT AND LICENSE
 

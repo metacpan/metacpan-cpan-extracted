@@ -2,7 +2,7 @@ NAME
     Task::FASTQTools
 
 VERSION
-    version 0.02
+    version 0.03
 
 SYNOPSIS
     Facilities to process FASTQ files as returned from sequencing

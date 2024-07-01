@@ -82,7 +82,7 @@
          "web" : "https://github.com/saltyduck/Aozora2Epub"
       }
    },
-   "version" : "0.04",
+   "version" : "0.05",
    "x_generated_by_perl" : "v5.38.2",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.37",
    "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later",

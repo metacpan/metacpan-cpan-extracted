@@ -21,9 +21,10 @@ name: App-Timestamper-Log-Process
 provides:
   App::Timestamper::Log::Process:
     file: lib/App/Timestamper/Log/Process.pm
-    version: v0.0.4
+    version: v0.2.0
 requires:
   Carp: '0'
+  File::ReadBackwards: '0'
   Getopt::Long: '0'
   autodie: '0'
   bigint: '0'
@@ -34,7 +35,7 @@ resources:
   bugtracker: https://github.com/shlomif/App-Timestamper/issues
   homepage: http://metacpan.org/release/App-Timestamper-Log-Process
   repository: git://github.com/shlomif/App-Timestamper.git
-version: 0.0.4
+version: 0.2.0
 x_Dist_Zilla:
   perl:
     version: '5.038002'

@@ -12,13 +12,13 @@ class R::Util {
     
     my $length = 1;
     if (@$dim) {
-      for my $dim_element (@$dim) {
+      for my $dim_elem (@$dim) {
         
-        unless ($dim_element > 0) {
-          die "The element of the dimention \$dim must be greater than 0.";
+        unless ($dim_elem > 0) {
+          die "The elem of the dimention \$dim must be greater than 0.";
         }
         
-        $length *= $dim_element;
+        $length *= $dim_elem;
       }
     }
     else {
@@ -37,20 +37,20 @@ class R::Util {
       my $dim_length = @$dim;
       my $check_tail_zero = 1;
       for (my $i = $dim_length - 1; $i >= 0; $i--) {
-        my $dim_element = $dim->[$i];
-        if ($check_tail_zero && $dim_element == 0) {
+        my $dim_elem = $dim->[$i];
+        if ($check_tail_zero && $dim_elem == 0) {
           next;
         }
         
-        if ($dim_element != 0) {
+        if ($dim_elem != 0) {
           $check_tail_zero = 0;
         }
         
-        unless ($dim_element > 0) {
-          die "The element of dim option or \$dim argument except for tail must be greater than 0.";
+        unless ($dim_elem > 0) {
+          die "The elem of dim option or \$dim argument except for tail must be greater than 0.";
         }
         
-        $normalized_dim_list->unshift($dim_element);
+        $normalized_dim_list->unshift($dim_elem);
       }
       
       $normalized_dim = $normalized_dim_list->to_array;
@@ -75,9 +75,9 @@ class R::Util {
     my $dropped_dim_list = IntList->new;
     
     for (my $i = 0; $i < @$dim; $i++) {
-      my $dim_element = $dim->[$i];
-      unless ($dim_element == 1) {
-        $dropped_dim_list->push($dim_element);
+      my $dim_elem = $dim->[$i];
+      unless ($dim_elem == 1) {
+        $dropped_dim_list->push($dim_elem);
       }
     }
     
@@ -99,17 +99,17 @@ class R::Util {
       my $y_dim_length = @$y_dim;
       
       if ($x_dim_length == $y_dim_length) {
-        my $equals_dim_elements = 1;
+        my $equals_dim_elems = 1;
         for (my $i = 0; $i < $x_dim_length; $i++) {
-          my $x_dim_element = $x_dim->[$i];
-          my $y_dim_element = $y_dim->[$i];
+          my $x_dim_elem = $x_dim->[$i];
+          my $y_dim_elem = $y_dim->[$i];
           
-          unless ($x_dim_element == $y_dim_element) {
-            $equals_dim_elements = 0;
+          unless ($x_dim_elem == $y_dim_elem) {
+            $equals_dim_elems = 0;
             last;
           }
         }
-        $equals_dim = $equals_dim_elements;
+        $equals_dim = $equals_dim_elems;
       }
     }
     elsif (!$x_dim && !$y_dim) {
@@ -168,11 +168,70 @@ class R::Util {
         $length = @(Complex_2d[])$array;
       }
       else {
-        die "The array is invalid type.";
+        die "The array is invalid elem_type.";
       }
     }
     
     return $length;
   }
   
+  # This method will be added to Fn class.
+  static method _get_elem_size : int ($array : object) {
+    
+    unless ($array) {
+      die "The array \$array must be defined.";
+    }
+    
+    my $elem_size = -1;
+    if (Fn->is_object_array($array)) {
+      $elem_size = Fn->sizeof_native_pointer;
+    }
+    else {
+      if ($array is_type byte[]) {
+        $elem_size = 1;
+      }
+      elsif ($array is_type short[]) {
+        $elem_size = 2;
+      }
+      elsif ($array is_type int[]) {
+        $elem_size = 4;
+      }
+      elsif ($array is_type long[]) {
+        $elem_size = 8;
+      }
+      elsif ($array is_type float[]) {
+        $elem_size = 4;
+      }
+      elsif ($array is_type double[]) {
+        $elem_size = 8;
+      }
+      elsif ($array is_type Complex_2f[]) {
+        $elem_size = 8;
+      }
+      elsif ($array is_type Complex_2d[]) {
+        $elem_size = 16;
+      }
+      else {
+        die "The array is invalid elem_type.";
+      }
+    }
+    
+    return $elem_size;
+  }
+  
+  # This method will be added to Fn class.
+  static method _get_elem_type_name : string ($array : object) {
+    
+    unless ($array) {
+      die "The array \$array must be defined.";
+    }
+    
+    my $type_name = type_name $array;
+    
+    my $type_name_length = length $type_name;
+    
+    my $elem_type_name = Fn->substr($type_name, 0, $type_name_length - 2);
+    
+    return $elem_type_name;
+  }
 }

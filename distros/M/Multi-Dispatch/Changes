@@ -43,3 +43,10 @@ Revision history for Multi::Dispatch
     * Added :permute attribute
 
     * Added -annotate flag
+
+
+0.000003  Mon Jul  1 09:34:14 2024
+
+    * Removed spurious and unrecorded dependency on experimentals.pm
+      (thanks, Slaven!)
+
