@@ -4,4 +4,15 @@ Revision history for String-Random-Regexp-regxstring
         First version, released on an unsuspecting world.
 
 0.02    26/06/2024-02:45
-        Added Perl minimum version to be 5.16
+        Added Perl minimum version to be 5.16 because of an XS in earlier versions.
+
+0.03    02/07/2024-11:00
+        XS code now frees received results array of strings.
+        Pod enhancements.
+
+0.04    02/07/2024-13:00
+        Now exporting the main sub by default.
+
+1.00    02/07/2024-13:00
+        Only one input parameter is required for sub generate_random_strings().
+

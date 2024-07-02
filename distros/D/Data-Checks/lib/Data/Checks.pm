@@ -3,7 +3,7 @@
 #
 #  (C) Paul Evans, 2024 -- leonerd@leonerd.org.uk
 
-package Data::Checks 0.04;
+package Data::Checks 0.05;
 
 use v5.22;
 use warnings;
@@ -113,6 +113,16 @@ Accepts any defined non-reference value, or a reference to an object in a
 class that overloads stringification. rejects undefined, unblessed references,
 or references to objects in classes that do not overload stringification.
 
+=head2 StrEq
+
+   StrEq($s)
+   StrEq($s1, $s2, ...)
+
+I<Since version 0.05.>
+
+Accepts any value that passes the L<Str> check, and additionally is exactly
+equal to I<any of> the given strings.
+
 =head2 Num
 
    Num()
@@ -122,6 +132,50 @@ string that could be used as one without warning, or a reference to an object
 in a class that overloads numification. rejects undefined, strings that would
 raise a warning if converted to a number, unblessed references, or references
 to objects in classes that do not overload numification.
+
+=head2 NumGT
+
+=head2 NumGE
+
+=head2 NumLE
+
+=head2 NumLT 
+
+   NumGT($bound)
+   NumGE($bound)
+   NumLE($bound)
+   NumLT($bound)
+
+I<Since version 0.05.>
+
+Accepts any value that passes the L<Num> check, and additionally is within
+the bound given. C<NumGT> and C<NumLT> exclude the bound value itself,
+C<NumGE> and C<NumLE> include it.
+
+=head2 NumRange
+
+   NumRange($boundge, $boundlt)
+
+I<Since version 0.05.>
+
+Accepts any value that passes the L<Num> check, and additionally is between
+the two bounds given. The lower bound is inclusive, and the upper bound is
+exclusive.
+
+This choice is made so that a set of C<NumRange> constraints can easily be
+created that cover distinct sets of numbers:
+
+   NumRange(0, 10), NumRange(10, 20), NumRange(20, 30), ...
+
+=head2 NumEq
+
+   NumEq($n)
+   NumEq($n1, $n2, ...)
+
+I<Since version 0.05.>
+
+Accepts any value that passes the L<Num> check, and additionally is exactly
+equal to I<any of> the given numbers.
 
 =head2 Isa
 
@@ -254,6 +308,27 @@ true if so, or false if not.
 
 Checks whether a given SV is accepted by the given constraint check, throwing
 its assertion message if it does not.
+
+=cut
+
+=head1 TODO
+
+=over 4
+
+=item *
+
+Unit constraints - maybe C<Int>, some plain-only variants of C<Str> and
+C<Num>, some reference types, etc...
+
+=item *
+
+Parametric constraints - C<StrMatch>
+
+=item *
+
+Structural constraints - C<HashOf>, C<ArrayOf>, etc...
+
+=back
 
 =cut
 

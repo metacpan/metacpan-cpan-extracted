@@ -8,7 +8,7 @@ configure_requires:
   ExtUtils::MakeMaker: 6.59
 distribution_type: module
 dynamic_config: 1
-generated_by: 'Module::Install version 1.19'
+generated_by: 'Module::Install version 1.21'
 license: bsd
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -25,13 +25,12 @@ requires:
   MooseX::Getopt: 0
   Net::IP::XS: 0
   Readonly: 0
-  Text::Reflow: 0
   Try::Tiny: 0
-  Zonemaster::Engine: 5
-  Zonemaster::LDNS: 4
+  Zonemaster::Engine: 6
+  Zonemaster::LDNS: 4.000002
   perl: 5.14.2
 resources:
   bugtracker: https://github.com/zonemaster/zonemaster-cli/issues
   license: http://opensource.org/licenses/bsd-license.php
   repository: https://github.com/zonemaster/zonemaster-cli
-version: '6.001000'
+version: '7.000000'

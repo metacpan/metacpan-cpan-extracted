@@ -368,6 +368,9 @@ sub test_basics {
         5,
         "The maximum is 5."
     );
+
+    is ($stat->sum_weights, 4, 'Sum of weights is 4');
+    is ($stat->sum_sqr_weights, 4, 'Sum of squared weights is 4');
 }
 
 
@@ -589,6 +592,8 @@ sub test_empty {
     foreach my $stat ($obj->available_stats) {
         is $obj->$stat, undef, "$stat has undefined result when no data have been added";
     }
+    is $obj->sum_weights, undef, "sum of weights is undef when no data have been added";
+    is $obj->sum_sqr_weights, undef, "sum of squared weights is undef when no data have been added";
 }
 
 #  what happens when we add new data?

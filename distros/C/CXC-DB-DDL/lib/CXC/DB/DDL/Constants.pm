@@ -7,7 +7,7 @@ use strict;
 use warnings;
 use experimental 'signatures', 'postderef';
 
-our $VERSION = '0.15';
+our $VERSION = '0.16';
 
 use DBI ();
 use CXC::Exporter::Util ':all';
@@ -51,8 +51,7 @@ BEGIN {
             CASCADE     => 'CASCADE',
         },
 
-        # why are we doing this, again?
-        # and this acess is documented in DBI, so it's legal
+        # this acess is documented in DBI, so it's legal
         SQL_TYPE_CONSTANTS => {
             map {
                 no strict 'refs';    ## no critic (TestingAndDebugging::ProhibitNoStrict)
@@ -91,7 +90,7 @@ CXC::DB::DDL::Constants - Constants
 
 =head1 VERSION
 
-version 0.15
+version 0.16
 
 =head1 SYNOPSIS
 

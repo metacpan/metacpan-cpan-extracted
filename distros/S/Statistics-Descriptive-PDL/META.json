@@ -4,7 +4,7 @@
       "Shawn Laffan <shawnlaffan@gmail.com>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.64, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "artistic_2"
    ],
@@ -52,6 +52,6 @@
          "url" : "https://github.com/shawnlaffan/Statistics-Descriptive-PDL"
       }
    },
-   "version" : "0.16",
-   "x_serialization_backend" : "JSON::PP version 4.07"
+   "version" : "0.17",
+   "x_serialization_backend" : "JSON::PP version 4.16"
 }

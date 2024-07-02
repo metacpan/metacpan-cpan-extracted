@@ -6,7 +6,7 @@ use Module::Build;
 use lib 'inc';
 use WWW::Wookie::Module::Build;
 
-our $VERSION = v1.1.5;
+our $VERSION = v1.1.6;
 
 WWW::Wookie::Module::Build->new(
     'module_name' => 'WWW::Wookie',
@@ -37,9 +37,10 @@ WWW::Wookie::Module::Build->new(
     'configure_requires' => { 'Module::Build' => 0.40, },
     'build_requires'     => { 'Module::Build' => 0.40, },
     'test_requires'      => {
-        'Test::More'   => 0.81,
+        'Test::More'             => 0.81,
+        'Test::NoWarnings'       => 0,
         'Test2::Require::Module' => 0,
-        'Test2::Suite' => 0,
+        'Test2::Suite'           => 0,
     },
     'recommends' => {
         'CGI'                     => 0,

@@ -1,9 +1,5 @@
 Changes
 cpanfile
-etc/bench.pl
-etc/experiment/Util/Makefile.PL
-etc/experiment/Util/util.pd
-etc/for_profiling.pl
 lib/Statistics/Descriptive/PDL.pm
 lib/Statistics/Descriptive/PDL/SampleWeighted.pm
 lib/Statistics/Descriptive/PDL/Weighted.pm
@@ -20,6 +16,8 @@ t/equal_weights.t
 t/lib/Utils.pm
 t/mode.t
 t/sample_weighted.t
+t/test_get_data.t
+t/test_returned_values_are_scalars.t
 xt/01-has_versions.t
 xt/03-has_pod.t
 xt/04-pod-coverage.t
@@ -31,5 +29,6 @@ xt/10-changes_format.t
 xt/boilerplate.t
 xt/cpan-changes.t
 xt/style-trailing-space.t
+xt/works_with_sereal.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

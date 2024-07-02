@@ -4,7 +4,7 @@ use v5.26;
 use strict;
 use warnings;
 
-our $VERSION = '0.15';
+our $VERSION = '0.16';
 
 # ABSTRACT: DDL for table creation, based on SQL::Translator::Schema
 
@@ -34,7 +34,10 @@ use namespace::clean;
 # use after namespace::clean to avoid cleaning out important bits.
 use MooX::StrictConstructor;
 
-sub _coerce_table_arrayref {
+my sub wrap_producers;
+
+
+my sub coerce_table_arrayref {
     Hash::Ordered->new(
         map {
             my $table = CXC::DB::DDL::Table->new( $_ );
@@ -48,9 +51,9 @@ has _tables => (
     init_arg => 'tables',
     isa      => InstanceOf( ['Hash::Ordered'] )->plus_coercions(
         ArrayRef [HashRef],
-        \&_coerce_table_arrayref,
+        \&coerce_table_arrayref,
         HashRef,
-        sub { local $_ = [$_]; _coerce_table_arrayref; },
+        sub { local $_ = [$_]; coerce_table_arrayref; },
         ArrayRef [ InstanceOf ['CXC::DB::DDL::Table'] ] => sub {
             Hash::Ordered->new( map { $_->name, $_ } $_->@* );
         },
@@ -250,12 +253,16 @@ sub sql ( $self, $dbh, $opt ) {
     # do the same.
     ## no critic (Community::Wantarray)
 
+    my $dbd      = $dbh->{Driver}->{Name};
+    my $guard    = wrap_producers( $dbd );                        ## no critic(Variables::ProhibitUnusedVarsStricter)
+    my $producer = sqlt_producer_map( $dbh->{Driver}->{Name} );
+
     if ( wantarray ) {
-        my @res = $tr->translate( to => sqlt_producer_map( $dbh->{Driver}->{Name} ) );
+        my @res = $tr->translate( to => $producer );
         return @res if defined $res[0];
     }
     else {
-        my $res = $tr->translate( to => sqlt_producer_map( $dbh->{Driver}->{Name} ) );
+        my $res = $tr->translate( to => $producer );
         return $res if defined $res;
     }
 
@@ -345,6 +352,31 @@ sub clone_simple ( $self ) {
     return blessed( $self )->new( tables => [ map $_->clone_simple, $self->tables->@* ] );
 }
 
+my %WrapProducer = (
+    +( DBD_SQLITE ) => {
+        'SQL::Translator::Producer::SQLite::create_table' => sub ( $orig, $table, $options ) {
+            $options->{temporary_table} = $table->extra->{temporary};
+            $orig->( $table, $options );
+        },
+    },
+);
+
+sub wrap_producers ( $dbd ) {
+
+    my $wrapper = $WrapProducer{$dbd} // return undef;
+
+    require Module::Runtime;
+    require Sub::Override;
+    my $override = Sub::Override->new;
+
+    for my $name ( keys %{$wrapper} ) {
+        Module::Runtime::require_module( $name =~ s/::[^:]+$//r );
+        $override->wrap( $name => $wrapper->{$name} );
+    }
+
+    return $override;
+}
+
 1;
 
 #
@@ -369,7 +401,7 @@ CXC::DB::DDL - DDL for table creation, based on SQL::Translator::Schema
 
 =head1 VERSION
 
-version 0.15
+version 0.16
 
 =head1 DESCRIPTION
 

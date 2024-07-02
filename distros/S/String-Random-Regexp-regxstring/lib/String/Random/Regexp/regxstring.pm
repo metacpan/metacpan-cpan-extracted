@@ -1,51 +1,34 @@
 package String::Random::Regexp::regxstring;
 
 # we rely on having T_AVREF_REFCOUNT_FIXED
-use 5.16.0;
+use 5.016;
 
 use strict;
 use warnings;
 
-use vars qw($VERSION @ISA);
+our $VERSION = '1.00';
 
+use Exporter;
+# export our only sub by default:
 our @ISA = qw(Exporter);
-# the EXPORT_OK and EXPORT_TAGS is code by [kcott] @ Perlmongs.org, thanks!
-# see https://perlmonks.org/?node_id=11115288
-our (@EXPORT_OK, %EXPORT_TAGS);
+our @EXPORT = ('generate_random_strings');
+# load XS functions
+use XSLoader;
+XSLoader::load(__PACKAGE__, $VERSION);
 
-our $VERSION = '0.02';
-
-BEGIN {
-	$VERSION = '0.02';
-	if ($] > 5.006) {
-		require XSLoader;
-		XSLoader::load(__PACKAGE__, $VERSION);
-	} else {
-		require DynaLoader;
-		@ISA = qw(DynaLoader);
-		__PACKAGE__->bootstrap;
-	}
-	@EXPORT_OK = qw/generate_random_strings/;
-	%EXPORT_TAGS = (
-		# the :all tag: so we can use this like
-		#  use String::Random::Regexp::regxstring qw/:all/;
-		all => [@EXPORT_OK]
-	);
-}
-
+# It generates $N random strings given a regular expression.
 # $regx is a string containing a regular expression
 #       or a Regexp object constructed, e.g., via qr/.../
-# $N    is the number of random strings to generate
+# $N    is optional, it is the number of random strings to generate, default is 1.
 # $debug is optional, it can be 0 or 1 denoting name-like behaviour.
 # The sub returns undef on failure (e.g. bad parameters)
 # On success, it returns an array of $N random strings 
 sub generate_random_strings {
 	my ($regx, $N, $debug) = @_;
 
-	$debug //= 0;
+	if( ! defined $regx ){ print STDERR "generate_random_strings() : error, at least an input regular expression (either as a string or as a Regexp object) is expected.\n"; return undef }
 
 	my $regx_str;
-
 	if( ref($regx) eq '' ){ $regx_str = $regx }
 	elsif( ref($regx) eq 'Regexp' ){
 		# stringifying a regexp object results in the string regexp
@@ -56,6 +39,10 @@ sub generate_random_strings {
 		$regx_str =~ s/^\(\?\^.*?\://;
 		$regx_str =~ s/\)$//;
 	} else { print STDERR "generate_random_strings() : error, input regular expression must either be a string or a Regexp object (created via qr/.../) and not '".ref($regx)."'.\n"; return undef }
+
+	# default values if optional params are not specified:
+	$N //= 1;
+	$debug //= 0;
 
 	my $ret = generate_random_strings_xs(
 		$regx_str,
@@ -75,7 +62,7 @@ String::Random::Regexp::regxstring - Generate random strings from a regular expr
 
 =head1 VERSION
 
-Version 0.02
+Version 1.00
 
 =head1 SYNOPSIS
 
@@ -112,9 +99,7 @@ via XS.
 
 =over 4
 
-=item * C<generate_random_strings> : generates random strings
-
-=item * C<:all> : tag for exporting all available export symbols
+=item * C<generate_random_strings> : generates random strings. This sub is exported by default.
 
 =back
 
@@ -123,7 +108,7 @@ via XS.
 
 =head2 C<generate_random_strings>
 
-    my $strings = generate_random_strings($regexp, $N, [$debug])
+    my $strings = generate_random_strings($regexp [, $N, $debug])
 
 
 Arguments:
@@ -133,7 +118,7 @@ Arguments:
 =item * C<$regexp> : a regular expression either as a string
 or as a Regexp object created via e.g. C<qr/.../>
 
-=item * C<$N> : the number of random strings to generate.
+=item * C<$N> : optionally specify the number of random strings to generate. Default is 1.
 
 =item * C<$debug> : optionally enable debug, if set to 1. By default it is turned off.
 
@@ -147,6 +132,51 @@ The generated random strings will be returned back as an ARRAY ref.
 
 C<undef> is returned on error, e.g. when no regular expression was
 specified or when the number of random strings to generate is not positive.
+
+=head1 THE C++ LIBRARY regxstring by daidodo
+
+This is a L<regxstring C++ library by daidodo|https://github.com/daidodo/regxstring>
+which produces random strings from a regular expresssion. According to the
+author, "I<... most Perl 5 supported regular expressions are also supported by regxstring, as showing bellow:>"
+
+    Meta-character(s)   Description
+    --------------------------------
+    \                   Quote the next meta-character
+    ^                   Match the beginning of the line
+    $                   Match the end of the line (or before newline at the end)
+    ?                   Match 1 or 0 times
+    +                   Match 1 or more times
+    *                   Match 0 or more times
+    {n}                 Match exactly n times
+    {n,}                Match at least n times
+    {n,m}               Match at least n but not more than m times
+    .                   Match any character (except newline)
+    (pattern)           Grouping
+    (?:pattern)         This is for clustering, not capturing; it groups sub-expressions like "()", but doesn't make back-references as "()" does
+    (?=pattern)         A zero-width positive look-ahead assertion, e.g., \w+(?=\t) matches a word followed by a tab, without including the tab
+    (?!pattern)         A zero-width negative look-ahead assertion, e.g., foo(?!bar) matches any occurrence of "foo" that isn't followed by "bar"
+    |                   Alternation
+    [xyz]               Matches a single character that is contained within the brackets
+    [^xyz]              Matches a single character that is not contained within the brackets
+    [a-z]               Matches a single character that is in a given range
+    [^a-z]              Matches a single character that is not in a given range
+    \f                  Form feed
+    \n                  Newline
+    \r                  Return
+    \t                  Tab
+    \v                  Vertical white space
+    \d                  Digits, [0-9]
+    \D                  Non-digits, [^0-9]
+    \s                  Space and tab, [ \t\r\n\f]
+    \S                  Non-white space characters, [^ \t\r\n\f]
+    \w                  Alphanumeric characters plus '_', [0-9a-zA-Z_]
+    \W                  Non-word characters, [^0-9a-zA-Z_]
+    \N                  Matches what the Nth marked sub-expression matched, where N is a digit from 1 to 9
+
+The library provides an executable which may be run from the command line.
+It takes a regular expression
+from the standard input
+and dumps the random strings.
 
 =head1 ALTERNATIVES
 
@@ -243,14 +273,15 @@ The source code of this library is included in the current module.
 I have provided C++ harness code, the XS interface and the Perl module.
 
 
-
 =head1 LICENSE AND COPYRIGHT
 
-This software is Copyright (c) 2024 by Andreas Hadjiprocopis.
+This software (except the C++ files) is Copyright (c) 2024 by Andreas Hadjiprocopis.
 
 This is free software, licensed under:
 
   The Artistic License 2.0 (GPL Compatible)
+
+The C++ files are Copyright (c) by L<daidodo|https://github.com/daidodo> and are L<licensed under Apache v2.0|https://github.com/daidodo/regxstring/blob/master/LICENSE>.
 
 
 =cut

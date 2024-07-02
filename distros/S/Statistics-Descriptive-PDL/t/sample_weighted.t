@@ -63,7 +63,8 @@ sub test_percentile_from_hash {
     is $weighted->percentile(40), 29,                  'interpolated pctl 75, weighted, after doubling data' . join ' ', @data;
     is $weighted->percentile(50), $weighted->median,   "median same as 50th percentile, " . join ' ', @data;
 
-    ok $weighted->values_are_unique, "unique flag set to true value after calculating percentiles";
+    #  no longer guaranteed
+    # ok $weighted->values_are_unique, "unique flag set to true value after calculating percentiles";
 
     #  data from R
     my %exp = (
@@ -97,11 +98,16 @@ sub test_wikipedia_percentile_example {
 
     $weighted->add_data(\@data, \@wts);
     $unweighted->add_data(\@data);
-    is $weighted->percentile(40), 29,                  'interpolated pctl 75, weighted, after doubling data' . join ' ', @data;
+    is $weighted->percentile(40), 29,                  'interpolated pctl 75, weighted, after doubling data: ' . join ' ', @data;
     is $weighted->percentile(50), $weighted->median,   "median same as 50th percentile, " . join ' ', @data;
     is $weighted->percentile(50), $unweighted->median, 'weighted and unweighted median';
 
-    ok $weighted->values_are_unique, "unique flag set to true value after calculating percentiles";
+    is $weighted->sum_sqr_sample_weights,
+        $unweighted->sum_sqr_sample_weights,
+        'weighted and unweighted sum of squared sample weights';
+
+    #  no longer guaranteed unless dedup is inplace
+    # ok $weighted->values_are_unique, "unique flag set to true value after calculating percentiles";
 
     #  data from R
     my %exp = (

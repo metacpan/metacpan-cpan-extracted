@@ -7,7 +7,7 @@ use strict;
 use warnings;
 use experimental 'signatures', 'postderef', 'declared_refs';
 
-our $VERSION = '0.15';
+our $VERSION = '0.16';
 
 use List::Util      qw( pairs first );
 use Sub::Util       qw( set_subname );
@@ -479,6 +479,7 @@ sub xCHECK ( $field, @values ) {
 
 
 
+
 sub sqlt_producer_map ( $dbd ) {
     state $map = { +( DBD_POSTGRESQL ) => 'PostgreSQL' };
     return $map->{$dbd} // $dbd;
@@ -510,7 +511,7 @@ CXC::DB::DDL::Util - CXC::DB::DDL utilities
 
 =head1 VERSION
 
-version 0.15
+version 0.16
 
 =head1 SYNOPSIS
 
@@ -711,8 +712,9 @@ generates a check constraint as a string which looks like
 
   $sqlt_producer = sqlt_producer_map( $dbd );
 
-Map C<$dbd> (typically from C<$dbh->{Driver}{NAME}>) to what L<SQL::Translator> wants.
-Actually, this just checks for known (to me) deviations; everything else is returned as.
+Map C<$dbd> (typically from C<$dbh->{Driver}{NAME}>) to what
+L<SQL::Translator> wants.  Actually, this just checks for known (to
+me) deviations; everything else is returned as is.
 
 =head1 SUPPORT
 

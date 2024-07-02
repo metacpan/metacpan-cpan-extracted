@@ -213,6 +213,44 @@ And you could access that text inside your templates with markup like this:
 
     <h1><% site.name %></h1>
 
+=head2 Special variables in site.yml
+
+There are a few special variables that you can define in your `site.yml` file
+which will be used by the program.
+
+=over 4
+
+=item uri, protocol, host, port
+
+These are used to construct the base URL for the site. If you don't define
+these, then the program will try to guess them. It will use the value of the
+`uri` variable if it is defined. If not, it will use the values of the
+`protocol`, `host` and `port` variables. If any of these aren't defined, it
+will use the values "https", the result of calling `hostname` and no port
+(which is, effectively, port 80) respectively.
+
+=item redirects
+
+This is a list of URLs that should be redirected to other URLs. Each entry in
+the list should be a hash containing the keys `from` and `to`. For example:
+
+    redirects:
+      - from: /old/page
+        to: /new/page
+
+The value of "from" should be the path part of the URL that you want to
+redirect and the value of "to" can be either a full URL or a path part of a
+URL. If it is a path part, then the base URL of the site will be prepended to
+it.
+
+Aphra implements these redirects by creating stub HTML files in the output
+directory which contain a meta refresh tag that redirects the browser to the
+new URL. Redirects are created before other files are processed, so any files
+that have the same URL as a redirect will overwrite the redirect stub HTML
+file.
+
+=back
+
 =head1 FRONT MATTER IN INDIVIDUAL PAGES
 
 At the start of the template for a page, you can add a data section which
@@ -245,7 +283,7 @@ Dave Cross <dave@perlhacks.com>
 
 =head1 COPYRIGHT AND LICENCE
 
-Copyright (c) 2017-2023, Magnum Solutions Ltd. All Rights Reserved.
+Copyright (c) 2017-2024, Magnum Solutions Ltd. All Rights Reserved.
 
 This library is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

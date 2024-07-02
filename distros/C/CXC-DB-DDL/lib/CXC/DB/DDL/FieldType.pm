@@ -8,7 +8,7 @@ use strict;
 use warnings;
 use experimental 'signatures', 'postderef';
 
-our $VERSION = '0.15';
+our $VERSION = '0.16';
 
 use constant { NAME => 0, TYPE => 1 };
 
@@ -56,7 +56,7 @@ CXC::DB::DDL::FieldType - Class for non-DBI types
 
 =head1 VERSION
 
-version 0.15
+version 0.16
 
 =head1 CONSTRUCTORS
 

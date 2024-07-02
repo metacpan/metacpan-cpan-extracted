@@ -8,7 +8,7 @@ use Test::More 'tests' => 2 + 1 + ( $ENV{'AUTHOR_TESTING'} ? 0 : 1 );
 use Test::NoWarnings;
 use Readonly;
 
-our $VERSION = v1.1.5;
+our $VERSION = v1.1.6;
 
 ## no critic (ProhibitCallsToUnexportedSubs)
 Readonly::Scalar my $TEST_WARNINGS => $ENV{'AUTHOR_TESTING'}

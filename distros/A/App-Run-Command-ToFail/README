@@ -4,6 +4,12 @@ NAME
 SYNOPSIS
      run-command-to-fail [-h] [-l] [-n cycles] [-p preset] [--version]
 
+DESCRIPTION
+    The debugging tool for the cyclic run of user command to detect random
+    fail.
+
+    The tool has some predefined behaviors like perl and perl with strace.
+
 ARGUMENTS
     *       "-h"
 
@@ -60,5 +66,5 @@ LICENSE AND COPYRIGHT
     BSD 2-Clause License
 
 VERSION
-    0.04
+    0.05
 

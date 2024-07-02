@@ -7,7 +7,7 @@ use utf8;
 
 use Test::More;
 
-our $VERSION = v1.1.5;
+our $VERSION = v1.1.6;
 if ( !eval { require Test::Pod::Coverage; 1 } ) {
     Test::More::plan 'skip_all' =>
       q{Test::Pod::Coverage required for testing POD coverage};

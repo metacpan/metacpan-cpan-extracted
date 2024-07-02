@@ -346,7 +346,7 @@ docs/LoggingSyslogAdditional.md
 docs/LoggingSyslogApi.md
 docs/LoggingSyslogResponse.md
 docs/LoggingTlsCommon.md
-docs/LoggingUseTls.md
+docs/LoggingUseTlsString.md
 docs/Metadata.md
 docs/ModelPackage.md
 docs/MutualAuthentication.md
@@ -1239,6 +1239,7 @@ lib/WebService/Fastly/Object/LoggingSyslogAllOf.pm
 lib/WebService/Fastly/Object/LoggingSyslogResponse.pm
 lib/WebService/Fastly/Object/LoggingTlsCommon.pm
 lib/WebService/Fastly/Object/LoggingUseTls.pm
+lib/WebService/Fastly/Object/LoggingUseTlsString.pm
 lib/WebService/Fastly/Object/Metadata.pm
 lib/WebService/Fastly/Object/ModelPackage.pm
 lib/WebService/Fastly/Object/MutualAuthentication.pm

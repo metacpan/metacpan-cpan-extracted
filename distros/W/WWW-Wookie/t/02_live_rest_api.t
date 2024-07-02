@@ -11,7 +11,7 @@ use Readonly;
 use WWW::Wookie::Connector::Service;
 use WWW::Wookie::Server::Connection;
 
-our $VERSION = v1.1.5;
+our $VERSION = v1.1.6;
 
 ## no critic (ProhibitCallsToUnexportedSubs)
 Readonly::Scalar my $TEST_WARNINGS => $ENV{'AUTHOR_TESTING'}

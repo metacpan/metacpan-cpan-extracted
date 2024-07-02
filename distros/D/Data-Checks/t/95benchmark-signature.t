@@ -11,8 +11,9 @@ use Test2::V0;
 # for interest.
 
 BEGIN {
-   eval { require Signature::Attribute::Checked } or
-      plan skip_all => "Signature::Attribute::Checked is not available";
+   eval { require Signature::Attribute::Checked;
+          Signature::Attribute::Checked->VERSION( '0.04' ) } or
+      plan skip_all => "Signature::Attribute::Checked >= 0.04 is not available";
 
    eval { require Types::Standard } or
       plan skip_all => "Types::Standard is not available";

@@ -4,7 +4,7 @@
       "Raphael Seebacher <raphael@seebachers.ch>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -45,6 +45,6 @@
          "web" : "https://github.com/raphiniert/AnyEvent-STOMP-Client"
       }
    },
-   "version" : "0.41",
-   "x_serialization_backend" : "JSON::PP version 4.02"
+   "version" : "0.42",
+   "x_serialization_backend" : "JSON::PP version 4.16"
 }

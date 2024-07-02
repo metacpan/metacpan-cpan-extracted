@@ -4,7 +4,7 @@ String::Random::Regexp::regxstring - Generate random strings from a regular expr
 
 # VERSION
 
-Version 0.02
+Version 1.00
 
 # SYNOPSIS
 
@@ -39,20 +39,19 @@ via XS.
 
 # EXPORT
 
-- `generate_random_strings` : generates random strings
-- `:all` : tag for exporting all available export symbols
+- `generate_random_strings` : generates random strings. This sub is exported by default.
 
 # SUBROUTINES
 
 ## `generate_random_strings`
 
-    my $strings = generate_random_strings($regexp, $N, [$debug])
+    my $strings = generate_random_strings($regexp [, $N, $debug])
 
 Arguments:
 
 - `$regexp` : a regular expression either as a string
 or as a Regexp object created via e.g. `qr/.../`
-- `$N` : the number of random strings to generate.
+- `$N` : optionally specify the number of random strings to generate. Default is 1.
 - `$debug` : optionally enable debug, if set to 1. By default it is turned off.
 
 Given a regular expression, this subroutine will generate
@@ -63,6 +62,51 @@ The generated random strings will be returned back as an ARRAY ref.
 
 `undef` is returned on error, e.g. when no regular expression was
 specified or when the number of random strings to generate is not positive.
+
+# THE C++ LIBRARY regxstring by daidodo
+
+This is a [regxstring C++ library by daidodo](https://github.com/daidodo/regxstring)
+which produces random strings from a regular expresssion. According to the
+author, "_... most Perl 5 supported regular expressions are also supported by regxstring, as showing bellow:_"
+
+    Meta-character(s)   Description
+    --------------------------------
+    \                   Quote the next meta-character
+    ^                   Match the beginning of the line
+    $                   Match the end of the line (or before newline at the end)
+    ?                   Match 1 or 0 times
+    +                   Match 1 or more times
+    *                   Match 0 or more times
+    {n}                 Match exactly n times
+    {n,}                Match at least n times
+    {n,m}               Match at least n but not more than m times
+    .                   Match any character (except newline)
+    (pattern)           Grouping
+    (?:pattern)         This is for clustering, not capturing; it groups sub-expressions like "()", but doesn't make back-references as "()" does
+    (?=pattern)         A zero-width positive look-ahead assertion, e.g., \w+(?=\t) matches a word followed by a tab, without including the tab
+    (?!pattern)         A zero-width negative look-ahead assertion, e.g., foo(?!bar) matches any occurrence of "foo" that isn't followed by "bar"
+    |                   Alternation
+    [xyz]               Matches a single character that is contained within the brackets
+    [^xyz]              Matches a single character that is not contained within the brackets
+    [a-z]               Matches a single character that is in a given range
+    [^a-z]              Matches a single character that is not in a given range
+    \f                  Form feed
+    \n                  Newline
+    \r                  Return
+    \t                  Tab
+    \v                  Vertical white space
+    \d                  Digits, [0-9]
+    \D                  Non-digits, [^0-9]
+    \s                  Space and tab, [ \t\r\n\f]
+    \S                  Non-white space characters, [^ \t\r\n\f]
+    \w                  Alphanumeric characters plus '_', [0-9a-zA-Z_]
+    \W                  Non-word characters, [^0-9a-zA-Z_]
+    \N                  Matches what the Nth marked sub-expression matched, where N is a digit from 1 to 9
+
+The library provides an executable which may be run from the command line.
+It takes a regular expression
+from the standard input
+and dumps the random strings.
 
 # ALTERNATIVES
 
@@ -148,8 +192,10 @@ I have provided C++ harness code, the XS interface and the Perl module.
 
 # LICENSE AND COPYRIGHT
 
-This software is Copyright (c) 2024 by Andreas Hadjiprocopis.
+This software (except the C++ files) is Copyright (c) 2024 by Andreas Hadjiprocopis.
 
 This is free software, licensed under:
 
     The Artistic License 2.0 (GPL Compatible)
+
+The C++ files are Copyright (c) by [daidodo](https://github.com/daidodo) and are [licensed under Apache v2.0](https://github.com/daidodo/regxstring/blob/master/LICENSE).

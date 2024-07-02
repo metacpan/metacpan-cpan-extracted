@@ -13,7 +13,7 @@ use PDL::Lite '2.012';
 
 ## no critic (ProhibitExplicitReturnUndef)
 
-our $VERSION = '0.16';
+our $VERSION = '0.17';
 
 use parent 'Statistics::Descriptive::PDL';
 
@@ -21,7 +21,7 @@ my @cache_methods = qw /
   count sum mode median
   mean standard_deviation skewness kurtosis
   geometric_mean harmonic_mean
-  sum_weights
+  sum_weights sum_sqr_weights
 /;
 __PACKAGE__->_make_caching_accessors( \@cache_methods );
 
@@ -52,7 +52,7 @@ sub add_data {
     my $data_from_hash;
     
     if (ref $data eq 'HASH') {
-        $data_piddle    = PDL->pdl ([keys %$data])->flat;
+        $data_piddle    = PDL->pdl ($self->{data_type}, [keys %$data])->flat;
         $weights_piddle = PDL->pdl ($self->_wt_type, [values %$data])->flat;
         $data_from_hash = 1;
     }
@@ -115,10 +115,10 @@ sub get_data_as_hash {
     return wantarray ? () : {}
       if !defined $piddle;
 
-    $self->_deduplicate_piddle;
+    my $deduped = $self->_deduplicate;
 
-    my $data = $self->_get_piddle->unpdl;
-    my $wts  = $self->_get_weights_piddle->unpdl;
+    my $data = $deduped->_get_piddle->unpdl;
+    my $wts  = $deduped->_get_weights_piddle->unpdl;
     my %h;
     @h{@$data} = @$wts;
 
@@ -161,6 +161,11 @@ sub _sum_weights {
     my $self = shift;
 
     return $self->_get_weights_piddle->sum;
+}
+
+sub _sum_sqr_weights {
+    my $self = shift;
+    return $self->_get_weights_piddle->power(2)->sum;
 }
 
 #sub min_weight {
@@ -243,21 +248,21 @@ sub _sort_piddle {
 #  de-duplicate if needed, aggregating weights
 #  there should be a sumover or which approach that will work better
 #  maybe yvals related
-sub _deduplicate_piddle {
-    my $self = shift;
+sub _deduplicate {
+    my ($self, %args) = @_;
     my $piddle = $self->_get_piddle;
     
     return undef
       if !defined $piddle;
 
-    return $piddle
+    return $self
       if $self->values_are_unique;
 
     my $unique = $piddle->uniq;
 
     if ($unique->nelem == $piddle->nelem) {
         $self->values_are_unique(1);
-        return $piddle
+        return $self
     }
 
     if (!$self->{sorted}) {
@@ -283,13 +288,21 @@ sub _deduplicate_piddle {
         }
         $wts[$j] += $wts_piddle->at($i);
     }
-    $self->_set_piddle($unique);
-    $self->_set_weights_piddle(\@wts);
 
-    $self->clear_cache;
-    $self->values_are_unique (1);
+    if ($args{inplace}) {
+        $self->_set_piddle($unique);
+        $self->_set_weights_piddle(\@wts);
+        $self->clear_cache;
+        $self->values_are_unique (1);
+        return $self;
+    }
 
-    return $self->_get_piddle;
+    my $new = $self->new($self->{data_type});
+    $new->_set_piddle($unique);
+    $new->_set_weights_piddle(\@wts);
+    $new->values_are_unique (1);
+
+    return $new;
 }
 
 sub _get_cumsum_weight_vector {
@@ -362,12 +375,13 @@ sub _geometric_mean {
 sub _mode {
     my $self = shift;
 
-    my $data = $self->_get_piddle;
-
     #  de-duplicate and aggregate weights if needed
-    $data = $self->_deduplicate_piddle;
+    my $deduped = $self->_deduplicate;
 
-    my $wts = $self->_get_weights_piddle;
+    my $data = $deduped->_get_piddle;
+
+
+    my $wts = $deduped->_get_weights_piddle;
     my $mode = $data->at($wts->maximum_ind);
     if ($mode > $data->max) {
         #  PDL returns strange numbers when distributions are flat
@@ -435,7 +449,7 @@ Version 0.11
 =head1 DESCRIPTION
 
 This module provides basic functions used in descriptive statistics
-using weighted values.  
+using weighted values.
 
 
 =head1 METHODS
@@ -444,7 +458,7 @@ using weighted values.
 
 =item new
 
-Create a new statistics object.  Takes no arguments.  
+Create a new statistics object.  Takes no arguments.
 
 =item add_data (\%data)
 
@@ -475,7 +489,7 @@ In scalar context returns an array of arrays, i.e. C<[\@data,\@wts]>.
 Returns the data as a perl hash, with the data values as the hash keys and weights as the hash values.
 Deduplicates the data if needed, incrementing the weights as appropriate.
 
-Data values are stringified so there is obviously potential for loss of precision.  
+Data values are stringified so there is obviously potential for loss of precision.
 
 Returns a hash ref in scalar context.
 
@@ -488,23 +502,31 @@ Pass a true value to indicate your data have no
 duplicate values, making the median and percentile
 calculations faster (at the risk of you not being correct).
 
-=item sum_wts
+=item sum_weights
 
 Sum of the weights vector.
+
+=item sum_sqr_weights
+
+Sum of the squared weights vector.  Each weight is squared and the sum of these values then calculated.
+
+=item sum_sqr_sample_weights
+
+Same as the C< sum_sqr_weights > method.
 
 =item Statistical methods
 
 Most of the methods should need no explanation here,
-except to note that the standard_deviation, skewness and kurtosis 
+except to note that the standard_deviation, skewness and kurtosis
 use the biased methods.  This is because one cannot guarantee the data are sample counts.
 The same applies to the median and percentiles.  The median uses a centre of mass calculation, and the
 percentiles using analogous approach.  This is because the weights are not guaranteed
 to be integers and so there is no sense interpolating.
 
 Use L<Statistics::Descriptive::PDL::SampleWeighted> when your weights are counts
-and you need the unbiased methods.  
+and you need the unbiased methods.
 
-The iqr is the inter-quartile range, calculated as the difference of the 75th and 25th percentiles. 
+The iqr is the inter-quartile range, calculated as the difference of the 75th and 25th percentiles.
 
 =item geometric_mean
 
@@ -528,7 +550,7 @@ The iqr is the inter-quartile range, calculated as the difference of the 75th an
 
 =item variance
 
-=item count 
+=item count
 
 =item skewness
 

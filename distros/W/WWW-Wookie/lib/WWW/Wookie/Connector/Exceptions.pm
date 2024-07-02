@@ -1,6 +1,6 @@
 # -*- cperl; cperl-indent-level: 4 -*-
 # Copyright (C) 2010-2024, Roland van Ipenburg
-package WWW::Wookie::Connector::Exceptions v1.1.5;
+package WWW::Wookie::Connector::Exceptions v1.1.6;
 use strict;
 use warnings;
 
@@ -26,7 +26,7 @@ WWW::Wookie::Connector::Exceptions - Handles exception information
 
 =head1 VERSION
 
-This document describes WWW::Wookie::Connector::Exceptions version C<v1.1.5>
+This document describes WWW::Wookie::Connector::Exceptions version C<v1.1.6>
 
 =head1 SYNOPSIS
 

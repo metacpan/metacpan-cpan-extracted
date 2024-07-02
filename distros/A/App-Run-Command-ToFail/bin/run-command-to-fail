@@ -5,7 +5,7 @@ use warnings;
 
 use App::Run::Command::ToFail;
 
-our $VERSION = 0.04;
+our $VERSION = 0.05;
 
 # Run.
 exit App::Run::Command::ToFail->new->run;
@@ -29,6 +29,12 @@ run-command-to-fail - Tool to run command in cycle to check fail.
 =head1 SYNOPSIS
 
  run-command-to-fail [-h] [-l] [-n cycles] [-p preset] [--version]
+
+=head1 DESCRIPTION
+
+The debugging tool for the cyclic run of user command to detect random fail.
+
+The tool has some predefined behaviors like perl and perl with strace.
 
 =head1 ARGUMENTS
 
@@ -104,6 +110,6 @@ BSD 2-Clause License
 
 =head1 VERSION
 
-0.04
+0.05
 
 =cut

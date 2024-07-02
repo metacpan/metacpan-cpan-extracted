@@ -1,5 +1,8 @@
 Revision history for Perl module AnyEvent::STOMP::Client.
 
+0.42  2024-06-18
+      - Bugfix to remove NULL character frame delimiter from frame body
+
 0.41  2022-02-14
       - Avoid memory leak by allowing to fully shutdown the client object (by @kbucheli)
       - Properly fish error message from the header of the stomp ERROR message (by @kbucheli)

@@ -22,6 +22,25 @@ static OP *S_newUNOP_AUX_CUSTOM(pTHX_ OP *(*func)(pTHX), U32 flags, OP *first, U
   return o;
 }
 
+#define newSVsv_num(osv)  S_newSVsv_num(aTHX_ osv)
+static SV *S_newSVsv_num(pTHX_ SV *osv)
+{
+  if(SvNOK(osv))
+    return newSVnv(SvNV(osv));
+  if(SvIOK(osv) && SvIsUV(osv))
+    return newSVuv(SvUV(osv));
+
+  return newSViv(SvIV(osv));
+}
+
+#define newSVsv_str(osv)  S_newSVsv_str(aTHX_ osv)
+static SV *S_newSVsv_str(pTHX_ SV *osv)
+{
+  SV *nsv = newSV(0);
+  sv_copypv(nsv, osv);
+  return nsv;
+}
+
 struct Constraint;
 
 typedef bool ConstraintFunc(pTHX_ struct Constraint *c, SV *value);
@@ -29,6 +48,7 @@ typedef bool ConstraintFunc(pTHX_ struct Constraint *c, SV *value);
 struct Constraint
 {
   ConstraintFunc *func;
+  int flags; /* avoids needing an entire SV just for a few numeric flag bits */
   size_t n;
   SV *args[0];
 };
@@ -61,11 +81,11 @@ struct DataChecks_Checker
   SV *assertmess;
 };
 
-#define HAVE_PERL_VERSION(R, V, S) \
-    (PERL_REVISION > (R) || (PERL_REVISION == (R) && (PERL_VERSION > (V) || (PERL_VERSION == (V) && (PERL_SUBVERSION >= (S))))))
-
+#include "perl-backcompat.c.inc"
 #include "make_argcheck_ops.c.inc"
 #include "optree-additions.c.inc"
+#include "sv_streq.c.inc"
+#include "sv_numcmp.c.inc"
 
 #if !HAVE_PERL_VERSION(5, 32, 0)
 # define sv_isa_sv(sv, namesv)  S_sv_isa_sv(aTHX_ sv, namesv)
@@ -77,6 +97,16 @@ static bool S_sv_isa_sv(pTHX_ SV *sv, SV *namesv)
   /* TODO: ->isa invocation */
 
   return sv_derived_from_sv(sv, namesv, 0);
+}
+#endif
+
+#ifndef op_force_list
+#  define op_force_list(o)  S_op_force_list(aTHX_ o)
+static OP *S_op_force_list(pTHX_ OP *o)
+/* Sufficiently good enough for our purposes */
+{
+  op_null(o);
+  return o;
 }
 #endif
 
@@ -142,6 +172,7 @@ static void S_DataChecks_gen_assertmess(pTHX_ struct DataChecks_Checker *checker
       SVfARG(name), SVfARG(constraint));
 }
 
+static XOP xop_invoke_checkfunc;
 static OP *pp_invoke_checkfunc(pTHX)
 {
   dSP;
@@ -286,6 +317,51 @@ static bool constraint_Str(pTHX_ struct Constraint *c, SV *value)
   }
 }
 
+static bool constraint_StrEq(pTHX_ struct Constraint *c, SV *value)
+{
+  if(!constraint_Str(aTHX_ c, value))
+    return false;
+
+  SV *strs = c->args[0];
+  if(SvTYPE(strs) != SVt_PVAV)
+    return sv_streq(value, strs);
+
+  /* TODO: If we were to sort the values initially we could binary-search
+   * these much faster
+   */
+  size_t n = av_count((AV *)strs);
+  SV **svp = AvARRAY(strs);
+  for(size_t i = 0; i < n; i++)
+    if(sv_streq(value, svp[i]))
+      return true;
+
+  return false;
+}
+
+static SV *mk_constraint_StrEq(pTHX_ size_t nargs, SV **args)
+{
+  SV *ret;
+  struct Constraint *c;
+  alloc_constraint(&ret, &c, &constraint_StrEq, 1);
+  sv_2mortal(ret);
+
+  if(!nargs)
+    croak("Require at least one string for StrEq()");
+
+  if(nargs == 1)
+    /* We can just store a single string directly */
+    c->args[0] = newSVsv_str(args[0]);
+  else {
+    AV *strs = newAV_alloc_x(nargs);
+    for(size_t i = 0; i < nargs; i++)
+      av_store(strs, i, newSVsv_str(args[i]));
+
+    c->args[0] = (SV *)strs;
+  }
+
+  return ret;
+}
+
 static bool constraint_Num(pTHX_ struct Constraint *c, SV *value)
 {
   if(!SvOK(value))
@@ -310,6 +386,145 @@ static bool constraint_Num(pTHX_ struct Constraint *c, SV *value)
 
     return false;
   }
+}
+
+enum {
+  NUMRANGE_LOWER_INCLUSIVE = (1<<0),
+  NUMRANGE_UPPER_INCLUSIVE = (1<<1),
+};
+
+static bool constraint_NumRange(pTHX_ struct Constraint *c, SV *value)
+{
+  /* First off it must be a Num */
+  if(!constraint_Num(aTHX_ c, value))
+    return false;
+
+  if(c->args[0]) {
+    int cmp = sv_numcmp(c->args[0], value);
+    if(cmp > 0 || (cmp == 0 && !(c->flags & NUMRANGE_LOWER_INCLUSIVE)))
+      return false;
+  }
+
+  if(c->args[1]) {
+    int cmp = sv_numcmp(value, c->args[1]);
+    if(cmp > 0 || (cmp == 0 && !(c->flags & NUMRANGE_UPPER_INCLUSIVE)))
+      return false;
+  }
+
+  return true;
+}
+
+static SV *mk_constraint_NumGT(pTHX_ SV *arg0)
+{
+  SV *ret;
+  struct Constraint *c;
+  alloc_constraint(&ret, &c, &constraint_NumRange, 2);
+  sv_2mortal(ret);
+
+  c->args[0] = newSVsv_num(arg0);
+  c->args[1] = NULL;
+
+  return ret;
+}
+
+static SV *mk_constraint_NumGE(pTHX_ SV *arg0)
+{
+  SV *ret;
+  struct Constraint *c;
+  alloc_constraint(&ret, &c, &constraint_NumRange, 2);
+  sv_2mortal(ret);
+
+  c->flags   = NUMRANGE_LOWER_INCLUSIVE;
+  c->args[0] = newSVsv_num(arg0);
+  c->args[1] = NULL;
+
+  return ret;
+}
+
+static SV *mk_constraint_NumLE(pTHX_ SV *arg0)
+{
+  SV *ret;
+  struct Constraint *c;
+  alloc_constraint(&ret, &c, &constraint_NumRange, 2);
+  sv_2mortal(ret);
+
+  c->flags   = NUMRANGE_UPPER_INCLUSIVE;
+  c->args[0] = NULL;
+  c->args[1] = newSVsv_num(arg0);
+
+  return ret;
+}
+
+static SV *mk_constraint_NumLT(pTHX_ SV *arg0)
+{
+  SV *ret;
+  struct Constraint *c;
+  alloc_constraint(&ret, &c, &constraint_NumRange, 2);
+  sv_2mortal(ret);
+
+  c->args[0] = NULL;
+  c->args[1] = newSVsv_num(arg0);
+
+  return ret;
+}
+
+static SV *mk_constraint_NumRange(pTHX_ SV *arg0, SV *arg1)
+{
+  SV *ret;
+  struct Constraint *c;
+  alloc_constraint(&ret, &c, &constraint_NumRange, 2);
+  sv_2mortal(ret);
+
+  c->flags   = NUMRANGE_LOWER_INCLUSIVE;
+  c->args[0] = newSVsv_num(arg0);
+  c->args[1] = newSVsv_num(arg1);
+
+  return ret;
+}
+
+static bool constraint_NumEq(pTHX_ struct Constraint *c, SV *value)
+{
+  if(!constraint_Num(aTHX_ c, value))
+    return false;
+
+  SV *nums = c->args[0];
+  if(SvTYPE(nums) != SVt_PVAV)
+    return sv_numcmp(value, nums) == 0;
+
+  /* TODO: If we were to sort the values initially we could binary-search
+   * these much faster
+   */
+  size_t n = av_count((AV *)nums);
+  SV **svp = AvARRAY(nums);
+  for(size_t i = 0; i < n; i++)
+    if(sv_numcmp(value, svp[i]) == 0)
+      return true;
+
+  return false;
+}
+
+static SV *mk_constraint_NumEq(pTHX_ size_t nargs, SV **args)
+{
+  SV *ret;
+  struct Constraint *c;
+  alloc_constraint(&ret, &c, &constraint_NumEq, 1);
+  sv_2mortal(ret);
+
+  if(!nargs)
+    croak("Require at least one number for NumEq()");
+
+  if(nargs == 1)
+    /* We can just store a single number directly */
+    c->args[0] = newSVsv_num(args[0]);
+  else {
+    AV *nums = newAV_alloc_x(nargs);
+    for(size_t i = 0; i < nargs; i++)
+      av_store(nums, i, newSVsv_num(args[i]));
+
+    c->args[0] = (SV *)nums;
+  }
+
+  return ret;
 }
 
 static bool constraint_Isa(pTHX_ struct Constraint *c, SV *value)
@@ -353,8 +568,8 @@ static SV *mk_constraint_Maybe(pTHX_ SV *arg0)
   return ret;
 }
 
-#define MAKE_UNIT_CONSTRAINT(name)   S_make_unit_constraint(aTHX_ #name, &constraint_##name)
-static void S_make_unit_constraint(pTHX_ const char *name, ConstraintFunc *func)
+#define MAKE_0ARG_CONSTRAINT(name)   S_make_0arg_constraint(aTHX_ #name, &constraint_##name)
+static void S_make_0arg_constraint(pTHX_ const char *name, ConstraintFunc *func)
 {
   HV *stash = gv_stashpvs("Data::Checks", GV_ADD);
   AV *exportok = get_av("Data::Checks::EXPORT_OK", GV_ADD);
@@ -382,16 +597,55 @@ static void S_make_unit_constraint(pTHX_ const char *name, ConstraintFunc *func)
   av_push(exportok, newSVpv(name, 0));
 }
 
+static XOP xop_make_constraint;
 static OP *pp_make_constraint(pTHX)
 {
   dSP;
-  SV *(*mk_constraint)(pTHX_ SV *arg0) = (SV * (*)(pTHX_ SV *))cUNOP_AUX->op_aux;
+  int nargs = PL_op->op_private;
 
-  SV *arg0 = POPs;
+  SV *ret;
+  switch(nargs) {
+    case 1:
+    {
+      SV *(*mk_constraint)(pTHX_ SV *arg0) =
+        (SV * (*)(pTHX_ SV *))cUNOP_AUX->op_aux;
 
-  SV *sv = (*mk_constraint)(aTHX_ arg0);
+      SV *arg0 = POPs;
 
-  PUSHs(sv);
+      ret = (*mk_constraint)(aTHX_ arg0);
+      break;
+    }
+
+    case 2:
+    {
+      SV *(*mk_constraint)(pTHX_ SV *arg0, SV *arg1) =
+        (SV * (*)(pTHX_ SV *, SV *))cUNOP_AUX->op_aux;
+
+      SV *arg1 = POPs;
+      SV *arg0 = POPs;
+
+      ret = (*mk_constraint)(aTHX_ arg0, arg1);
+      break;
+    }
+
+    case (U8)-1:
+    {
+      SV *(*mk_constraint)(pTHX_ size_t nargs, SV **args) =
+        (SV * (*)(pTHX_ size_t, SV **))cUNOP_AUX->op_aux;
+
+      SV **svp = PL_stack_base + POPMARK + 1;
+      size_t nargs = SP - svp + 1;
+      SP -= nargs;
+
+      ret = (*mk_constraint)(aTHX_ nargs, svp);
+      break;
+    }
+
+    default:
+      croak("ARGH unreachable nargs=%d", nargs);
+  }
+
+  PUSHs(ret);
 
   RETURN;
 }
@@ -407,12 +661,69 @@ static void S_make_1arg_constraint(pTHX_ const char *name, SV *(*mk_constraint)(
 
   I32 floor_ix = start_subparse(FALSE, 0);
 
+  OP *mkop = newUNOP_AUX_CUSTOM(&pp_make_constraint, 0,
+        newSLUGOP(0),
+        (UNOP_AUX_item *)mk_constraint);
+  mkop->op_private = 1;
+
   OP *body = make_argcheck_ops(1, 0, 0, namesv);
   body = op_append_elem(OP_LINESEQ,
     body,
-    newSTATEOP(0, NULL,
-      newUNOP_AUX_CUSTOM(&pp_make_constraint, 0, newSLUGOP(0), (UNOP_AUX_item *)mk_constraint)));
+    newSTATEOP(0, NULL, mkop));
 
+  newATTRSUB(floor_ix, newSVOP(OP_CONST, 0, namesv), NULL, NULL, body);
+
+  av_push(exportok, newSVpv(name, 0));
+}
+
+#define MAKE_2ARG_CONSTRAINT(name)  S_make_2arg_constraint(aTHX_ #name, &mk_constraint_##name)
+static void S_make_2arg_constraint(pTHX_ const char *name, SV *(*mk_constraint)(pTHX_ SV *arg0, SV *arg1))
+{
+  HV *stash = gv_stashpvs("Data::Checks", GV_ADD);
+  HV *constraint_stash = gv_stashpvs("Data::Checks::Constraint", GV_ADD);
+  AV *exportok = get_av("Data::Checks::EXPORT_OK", GV_ADD);
+
+  SV *namesv = newSVpvf("Data::Checks::%s", name);
+
+  I32 floor_ix = start_subparse(FALSE, 0);
+
+  OP *mkop = newUNOP_AUX_CUSTOM(&pp_make_constraint, 0,
+        newLISTOPn(OP_LIST, 0, newSLUGOP(0), newSLUGOP(1), NULL),
+        (UNOP_AUX_item *)mk_constraint);
+  mkop->op_private = 2;
+
+  OP *body = make_argcheck_ops(2, 0, 0, namesv);
+  body = op_append_elem(OP_LINESEQ,
+    body,
+    newSTATEOP(0, NULL, mkop));
+
+  newATTRSUB(floor_ix, newSVOP(OP_CONST, 0, namesv), NULL, NULL, body);
+
+  av_push(exportok, newSVpv(name, 0));
+}
+
+#define MAKE_nARG_CONSTRAINT(name)  S_make_narg_constraint(aTHX_ #name, &mk_constraint_##name)
+static void S_make_narg_constraint(pTHX_ const char *name, SV *(*mk_constraint)(pTHX_ size_t nargs, SV **args))
+{
+  HV *stash = gv_stashpvs("Data::Checks", GV_ADD);
+  HV *constraint_stash = gv_stashpvs("Data::Checks::Constraint", GV_ADD);
+  AV *exportok = get_av("Data::Checks::EXPORT_OK", GV_ADD);
+
+  SV *namesv = newSVpvf("Data::Checks::%s", name);
+
+  I32 floor_ix = start_subparse(FALSE, 0);
+
+  OP *mkop = newUNOP_AUX_CUSTOM(&pp_make_constraint, 0,
+        op_force_list(newLISTOPn(OP_LIST, OPf_WANT_LIST,
+          newUNOP(OP_RV2AV, OPf_WANT_LIST, newGVOP(OP_GV, 0, PL_defgv)),
+          NULL)),
+        (UNOP_AUX_item *)mk_constraint);
+  mkop->op_private = -1;
+
+  OP *body = make_argcheck_ops(0, 0, '@', namesv);
+  body = op_append_elem(OP_LINESEQ,
+    body,
+    newSTATEOP(0, NULL, mkop));
 
   newATTRSUB(floor_ix, newSVOP(OP_CONST, 0, namesv), NULL, NULL, body);
 
@@ -448,10 +759,29 @@ BOOT:
   sv_setuv(*hv_fetchs(PL_modglobal, "Data::Checks/assert_value()@0", GV_ADD),
     PTR2UV(&S_DataChecks_assert_value));
 
-  MAKE_UNIT_CONSTRAINT(Defined);
-  MAKE_UNIT_CONSTRAINT(Object);
-  MAKE_UNIT_CONSTRAINT(Str);
-  MAKE_UNIT_CONSTRAINT(Num);
+  MAKE_0ARG_CONSTRAINT(Defined);
+  MAKE_0ARG_CONSTRAINT(Object);
+  MAKE_0ARG_CONSTRAINT(Str);
+  MAKE_0ARG_CONSTRAINT(Num);
+
+  MAKE_nARG_CONSTRAINT(StrEq);
+
+  MAKE_1ARG_CONSTRAINT(NumGT);
+  MAKE_1ARG_CONSTRAINT(NumGE);
+  MAKE_1ARG_CONSTRAINT(NumLE);
+  MAKE_1ARG_CONSTRAINT(NumLT);
+  MAKE_2ARG_CONSTRAINT(NumRange);
+  MAKE_nARG_CONSTRAINT(NumEq);
 
   MAKE_1ARG_CONSTRAINT(Isa);
   MAKE_1ARG_CONSTRAINT(Maybe);
+
+  XopENTRY_set(&xop_invoke_checkfunc, xop_name, "invoke_checkfunc");
+  XopENTRY_set(&xop_invoke_checkfunc, xop_desc, "invoke checkfunc");
+  XopENTRY_set(&xop_invoke_checkfunc, xop_class, OA_UNOP_AUX);
+  Perl_custom_op_register(aTHX_ &pp_invoke_checkfunc, &xop_invoke_checkfunc);
+
+  XopENTRY_set(&xop_make_constraint, xop_name, "make_constraint");
+  XopENTRY_set(&xop_make_constraint, xop_desc, "make constraint");
+  XopENTRY_set(&xop_make_constraint, xop_class, OA_UNOP_AUX);
+  Perl_custom_op_register(aTHX_ &pp_make_constraint, &xop_make_constraint);

@@ -8,22 +8,17 @@ use Test2::V0;
 use lib "t";
 use testcase "t::test";
 
-use Data::Checks qw( Defined Object Str Num Isa Maybe );
+use Data::Checks qw( Defined Object Str Isa Maybe );
 
 # Some test classes
-package ClassWithoutOverload {
+package BaseClass {
    sub new { bless [], shift }
 }
-package ClassWithStrOverload {
-   use overload '""' => sub { "boo" };
-   sub new { bless [], shift }
-}
-package ClassWithNumOverload {
-   use overload '0+' => sub { 123 };
+package DifferentClass {
    sub new { bless [], shift }
 }
 package DerivedClass {
-   use base qw( ClassWithoutOverload );
+   use base qw( BaseClass );
 }
 
 # Defined
@@ -59,42 +54,6 @@ package DerivedClass {
    ok( !t::test::check_value( $checker, undef ), 'Object rejects undef' );
 }
 
-# Str
-{
-   my $checker = t::test::make_checkdata( Str, "Value", "Str" );
-
-   ok( t::test::check_value( $checker, "a string" ), 'Str accepts plain string' );
-   ok( t::test::check_value( $checker, "" ),         'Str accepts empty string' );
-   ok( t::test::check_value( $checker, 1234 ),       'Str accepts plain number' );
-   ok( t::test::check_value( $checker, ClassWithStrOverload->new ),
-      'Str accepts object with str overload' );
-
-   ok( !t::test::check_value( $checker, undef ), 'Str rejects undef' );
-   ok( !t::test::check_value( $checker, [] ),    'Str rejects plain ref' );
-   ok( !t::test::check_value( $checker, ClassWithoutOverload->new ),
-      'Str rejects object without overload' );
-   ok( !t::test::check_value( $checker, ClassWithNumOverload->new ),
-      'Str rejects object with num overload' );
-}
-
-# Num
-{
-   my $checker = t::test::make_checkdata( Num, "Value", "Num" );
-
-   ok( t::test::check_value( $checker, 1234 ), 'Num accepts plain integer' );
-   ok( t::test::check_value( $checker, 5.67 ), 'Num accepts empty float' );
-   ok( t::test::check_value( $checker, "89" ), 'Num accepts stringified number' );
-   ok( t::test::check_value( $checker, ClassWithNumOverload->new ),
-      'Num accepts object with num overload' );
-
-   ok( !t::test::check_value( $checker, undef ), 'Num rejects undef' );
-   ok( !t::test::check_value( $checker, [] ),    'Num rejects plain ref' );
-   ok( !t::test::check_value( $checker, ClassWithoutOverload->new ),
-      'Num rejects object without overload' );
-   ok( !t::test::check_value( $checker, ClassWithStrOverload->new ),
-      'Num rejects object with str overload' );
-}
-
 # unit constraint functions don't take arguments
 {
    # Perls before 5.34 did not include argument count in the message
@@ -107,14 +66,14 @@ package DerivedClass {
 
 # Isa
 {
-   my $checker = t::test::make_checkdata( Isa("ClassWithoutOverload"), "Value", "Isa" );
+   my $checker = t::test::make_checkdata( Isa("BaseClass"), "Value", "Isa" );
 
-   ok( t::test::check_value( $checker, ClassWithoutOverload->new ), 'Isa accepts class' );
+   ok( t::test::check_value( $checker, BaseClass->new ),    'Isa accepts class' );
    ok( t::test::check_value( $checker, DerivedClass->new ), 'Isa accepts subclass' );
 
-   ok( !t::test::check_value( $checker, undef ),                    'Isa rejects undef' );
-   ok( !t::test::check_value( $checker, "ClassWithoutOverload" ),   'Isa rejects string name' );
-   ok( !t::test::check_value( $checker, ClassWithStrOverload->new), 'Isa rejects other instance' );
+   ok( !t::test::check_value( $checker, undef ),               'Isa rejects undef' );
+   ok( !t::test::check_value( $checker, "BaseClass" ),         'Isa rejects string name' );
+   ok( !t::test::check_value( $checker, DifferentClass->new ), 'Isa rejects other instance' );
 }
 
 # Maybe

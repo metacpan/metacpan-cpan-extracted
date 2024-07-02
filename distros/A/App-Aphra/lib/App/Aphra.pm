@@ -39,7 +39,7 @@ use URI;
 
 use App::Aphra::File;
 
-our $VERSION = '0.1.3';
+our $VERSION = '0.2.0';
 
 has commands => (
   isa => 'HashRef',
@@ -210,6 +210,10 @@ sub build {
   -e $src or die "Cannot find $src\n";
   -d $src or die "$src is not a directory\n";
 
+  if ($self->site_vars->{redirects}) {
+    $self->make_redirects;
+  }
+
   find({ wanted => $self->_make_do_this, no_chdir => 1 },
        $self->config->{source});
 }
@@ -226,6 +230,40 @@ sub _make_do_this {
 
     $f->process;
   };
+}
+
+sub make_redirects {
+  my $self = shift;
+  my $redirects = $self->site_vars->{redirects};
+
+  return if !$redirects;
+  return if !@$redirects;
+
+  my $target = $self->config->{target};
+
+  for (@$redirects) {
+    my $from = $_->{from};
+    $from .= 'index.html' if $from =~ m|/$|;
+
+    my $to = $_->{to};
+
+    my $outdir = dirname "$target$from";
+    mkdir $outdir;
+
+    open my $out_fh, '>', "$target$from"
+      or die "Cannot open '$target$from' for writing: $!\n";
+
+    print $out_fh <<EOF;
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta http-equiv="refresh" content="0; url=$to">
+  </head>
+</html>
+EOF
+
+    close $out_fh;
+  }
 }
 
 sub serve {
@@ -266,7 +304,7 @@ Dave Cross <dave@perlhacks.com>
 
 =head1 COPYRIGHT AND LICENCE
 
-Copyright (c) 2017-2023, Magnum Solutions Ltd. All Rights Reserved.
+Copyright (c) 2017-2024, Magnum Solutions Ltd. All Rights Reserved.
 
 This library is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

@@ -12,7 +12,7 @@ sub tables_exist {
 
 sub get_test_schema {
     my ( $class, $dsn, $user, $pass, $opts ) = @_;
-    $dsn ||= 'dbi:SQLite:dbname=t/var/dvdzbr.db';
+    $dsn ||= 'dbi:SQLite:dbname=:memory:';
     warn "testing $dsn\n";
     my $schema = $class->connect( $dsn, $user, $pass, $opts || {} );
     my $deploy_attrs;

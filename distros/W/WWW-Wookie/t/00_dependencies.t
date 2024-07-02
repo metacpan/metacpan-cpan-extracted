@@ -9,7 +9,7 @@ use Test2::Bundle::More;
 use Test2::Require::Module 'Test::Dependencies';
 use Test2::Todo;
 
-our $VERSION = v1.1.5;
+our $VERSION = v1.1.6;
 
 if ( not $ENV{'AUTHOR_TESTING'} ) {
 ## no critic (RequireInterpolationOfMetachars)

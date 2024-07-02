@@ -6,7 +6,7 @@ use warnings;
 use utf8;
 use Test::More;
 
-our $VERSION = v1.1.5;
+our $VERSION = v1.1.6;
 
 if ( !$ENV{'TEST_SIGNATURE'} ) {
     Test::More::plan 'skip_all' =>

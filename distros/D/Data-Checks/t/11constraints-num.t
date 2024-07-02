@@ -1,0 +1,105 @@
+#!/usr/bin/perl
+
+use v5.22;
+use warnings;
+
+use Test2::V0;
+
+use lib "t";
+use testcase "t::test";
+
+use Data::Checks qw( Num NumGT NumGE NumLE NumLT NumRange NumEq );
+
+# Some test classes
+package ClassWithoutOverload {
+   sub new { bless [], shift }
+}
+package ClassWithStrOverload {
+   use overload '""' => sub { "boo" };
+   sub new { bless [], shift }
+}
+package ClassWithNumOverload {
+   use overload '0+' => sub { 123 };
+   sub new { bless [], shift }
+}
+
+# Num
+{
+   my $checker = t::test::make_checkdata( Num, "Value", "Num" );
+
+   ok( t::test::check_value( $checker, 1234 ), 'Num accepts plain integer' );
+   ok( t::test::check_value( $checker, 5.67 ), 'Num accepts empty float' );
+   ok( t::test::check_value( $checker, "89" ), 'Num accepts stringified number' );
+   ok( t::test::check_value( $checker, ClassWithNumOverload->new ),
+      'Num accepts object with num overload' );
+
+   ok( !t::test::check_value( $checker, undef ), 'Num rejects undef' );
+   ok( !t::test::check_value( $checker, [] ),    'Num rejects plain ref' );
+   ok( !t::test::check_value( $checker, ClassWithoutOverload->new ),
+      'Num rejects object without overload' );
+   ok( !t::test::check_value( $checker, ClassWithStrOverload->new ),
+      'Num rejects object with str overload' );
+}
+
+# Num bounded
+{
+   my $checker_gt = t::test::make_checkdata( NumGT(0), "Value", "NumGT 0");
+
+   ok(  t::test::check_value( $checker_gt,  123 ), 'NumGT accepts plain integer' );
+   ok( !t::test::check_value( $checker_gt,  0   ), 'NumGT rejects bound' );
+   ok( !t::test::check_value( $checker_gt, -123 ), 'NumGT rejects negative integer' );
+
+   my $checker_ge = t::test::make_checkdata( NumGE(0), "Value", "NumGE 0");
+
+   ok(  t::test::check_value( $checker_ge,  123 ), 'NumGE accepts plain integer' );
+   ok(  t::test::check_value( $checker_ge,  0   ), 'NumGE accepts bound' );
+   ok( !t::test::check_value( $checker_ge, -123 ), 'NumGE rejects negative integer' );
+
+   my $checker_le = t::test::make_checkdata( NumLE(100), "Value", "NumLE 100");
+
+   ok(  t::test::check_value( $checker_le, 25  ), 'NumLE accepts plain integer' );
+   ok(  t::test::check_value( $checker_le, 100 ), 'NumLE accepts bound' );
+   ok( !t::test::check_value( $checker_le, 200 ),   'NumLE rejects too large' );
+
+   my $checker_lt = t::test::make_checkdata( NumLT(100), "Value", "NumLT 100");
+
+   ok(  t::test::check_value( $checker_lt, 25  ), 'NumLT accepts plain integer' );
+   ok( !t::test::check_value( $checker_lt, 100 ), 'NumLT rejects bound' );
+   ok( !t::test::check_value( $checker_lt, 200 ),   'NumLT rejects too large' );
+}
+
+# Num range
+{
+   my $checker = t::test::make_checkdata( NumRange(10, 20), "Value", "NumRange 10, 20" );
+
+   ok( !t::test::check_value( $checker,   0 ), 'NumRange rejects below lower bound' );
+   ok(  t::test::check_value( $checker,  10 ), 'NumRange accepts lower bound' );
+   ok(  t::test::check_value( $checker,  15 ), 'NumRange accepts midway' );
+   ok( !t::test::check_value( $checker,  25 ), 'NumRange rejects upper bound' );
+   ok( !t::test::check_value( $checker,  40 ), 'NumRange rejects above upper bound' );
+}
+
+# Num eq set
+{
+   # Stack discipline test
+   my @vals = ( 2, 4, NumEq(1, 3, 5), 6, 8 );
+   is( scalar @vals, 5, '5 values in the array' );
+   ok( ref $vals[2], 'constraint is some kind of ref' );
+   my $checker = t::test::make_checkdata( $vals[2], "Value", "NumEq 1, 3, 5" );
+
+   ok(  t::test::check_value( $checker, 1 ), 'NumEq accepts a value' );
+   ok(  t::test::check_value( $checker, 5 ), 'NumEq accepts a value' );
+   ok( !t::test::check_value( $checker, 2 ), 'NumEq rejects a value not in the list' );
+
+   my $checker_10 = t::test::make_checkdata( NumEq(10), "Value", "NumEq 10" );
+
+   ok(  t::test::check_value( $checker_10, 10 ), 'NumEq singleton accepts the value' );
+   ok( !t::test::check_value( $checker_10, 20 ), 'NumEq singleton rejects a different value' );
+
+   my $checker_zero = t::test::make_checkdata( NumEq(0), "Value", "NumEq 0" );
+
+   ok(  t::test::check_value( $checker_zero, 0     ), 'NumEq zero accepts zero' );
+   ok( !t::test::check_value( $checker_zero, undef ), 'NumEq zero rejects undef' );
+}
+
+done_testing;

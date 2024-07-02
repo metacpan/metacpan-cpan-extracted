@@ -1,5 +1,17 @@
 Revision history for CXC-DB-DDL
 
+0.16      2024-07-01 16:42:32-04:00 America/New_York
+
+
+  [ENHANCEMENT]
+
+   * temporary tables are supported under SQLite & PostgreSQL
+
+  [TESTS]
+
+   * testing under PostgreSQL is now possible by setting
+     $ENV{CXC_DB_DDL_TEST_DBD} = 'Pg';
+
 0.15      2024-06-26 12:57:01-04:00 America/New_York
 
   [BUG FIX]

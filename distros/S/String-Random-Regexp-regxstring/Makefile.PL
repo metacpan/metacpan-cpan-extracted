@@ -27,9 +27,12 @@ my %WriteMakefileArgs = (
     LIBS => '',
     CCFLAGS => '',
     LDFLAGS => '',
-    CC      => 'g++',
-    LD      => 'g++',
     XSOPT   => '-C++',
+    # ideally we should not be specifying here the compiler executable
+    # because it reduces compatibility.
+    # XSOPT knows that this is C++ code I guess.
+    CC      => 'c++', # g++
+    LD      => 'c++', # g++
     #XSMULTI => 1, # many XS modules with different names, requires EUMM >= 7.12
 
     dist  => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },

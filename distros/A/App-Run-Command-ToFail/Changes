@@ -1,3 +1,7 @@
+0.05 2024-07-01T15:31:27+02:00
+ - Add DESCRIPTION section to doc.
+ - Fix minimal version of Test::Warn.
+
 0.04 2024-06-24T13:08:56+02:00
  - Add name of state file to arguments in test command.
  - Fix EXAMPLE in doc. Add cleanup of temp file.

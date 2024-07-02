@@ -11,7 +11,7 @@ use AnyEvent::Handle;
 use List::Util 'max';
 
 
-our $VERSION = '0.41';
+our $VERSION = '0.42';
 
 
 my $EOL = chr(10);
@@ -607,6 +607,15 @@ sub read_frame {
                                 }
                                 else {
                                     $self->event('MESSAGE', $header_hashref, $body);
+
+                                    # If frame end was determined by matching
+                                    # for a NULL character, then this character
+                                    # is not part of the frame body and thus
+                                    # removed
+                                    if (exists $args->{regex}) {
+                                        $body =~ s/\0$//g;
+                                    }
+
 
                                     if (defined $header_hashref->{subscription}) {
                                         $self->event(

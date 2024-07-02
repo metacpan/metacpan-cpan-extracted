@@ -1,6 +1,6 @@
 # -*- cperl; cperl-indent-level: 4 -*-
 # Copyright (C) 2010-2024, Roland van Ipenburg
-package WWW::Wookie::Connector::Service::Interface v1.1.5;
+package WWW::Wookie::Connector::Service::Interface v1.1.6;
 use strict;
 use warnings;
 
@@ -41,7 +41,7 @@ L<WWW::Wookie::Connector::Service|WWW::Wookie::Connector::Service>
 =head1 VERSION
 
 This document describes WWW::Wookie::Connector::Service::Interface version
-C<v1.1.5>
+C<v1.1.6>
 
 =head1 SYNOPSIS
 

@@ -7,7 +7,7 @@ use utf8;
 
 use Test::More 'tests' => 2;
 
-our $VERSION = v1.1.5;
+our $VERSION = v1.1.6;
 
 eval {
     require ExtUtils::Manifest;

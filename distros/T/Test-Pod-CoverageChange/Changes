@@ -1,5 +1,7 @@
 Revision history for test-pod-coverage-syntax
 
+0.005     2024-07-01 10:43:40+00:00 UTC
+    Re-release after upload with wrong account
 0.004     2024-07-01 03:44:04+00:00 UTC
     Load module before attempting check to avoid incorrect error message
 0.003     2022-08-17 20:49:32+08:00 Asia/Shanghai

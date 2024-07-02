@@ -1,6 +1,6 @@
 # -*- cperl; cperl-indent-level: 4 -*-
 # Copyright (C) 2010-2024, Roland van Ipenburg
-package WWW::Wookie::User v1.1.5;
+package WWW::Wookie::User v1.1.6;
 use strict;
 use warnings;
 
@@ -83,7 +83,7 @@ WWW::Wookie::User - represent a possible user of a widget
 
 =head1 VERSION
 
-This document describes WWW::Wookie::User version C<v1.1.5>
+This document describes WWW::Wookie::User version C<v1.1.6>
 
 =head1 SYNOPSIS
 

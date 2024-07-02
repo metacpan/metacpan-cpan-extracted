@@ -1,5 +1,11 @@
 # Change Log
 
+## [0.1.4] - 2024-07-01
+
+### Added
+
+- Support for redirection pages
+
 ## [0.1.3] - 2024-06-14
 
 ### Fixed

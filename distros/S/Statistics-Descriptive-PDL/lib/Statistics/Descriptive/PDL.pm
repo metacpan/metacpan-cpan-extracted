@@ -19,7 +19,7 @@ my $has_PDL_stats_basic = $@ ? undef : 1;
 #  to hide the piddle from the caller to avoid arbitrary changes
 #  being applied to it.
 
-our $VERSION = '0.16';
+our $VERSION = '0.17';
 
 our $Tolerance = 0.0;  #  for compatibility with Stats::Descr, but not used here
 
@@ -29,6 +29,7 @@ my @cache_methods = qw /
   geometric_mean harmonic_mean
   max min sample_range
   iqr
+  sum_sqr_sample_weights
 /;
 __PACKAGE__->_make_caching_accessors( \@cache_methods );
 
@@ -62,7 +63,7 @@ sub _make_caching_accessors {
             };
         };
     }
- 
+
     return;
 }
 
@@ -169,6 +170,20 @@ sub _sum {
     return $self->_get_piddle->sum;
 }
 
+sub sum_weights {
+    my $self = shift;
+    return $self->count;
+}
+
+sub sum_sqr_weights {
+    my $self = shift;
+    return $self->count;
+}
+
+sub _sum_sqr_sample_weights {
+    my $self = shift;
+    return $self->sum_sqr_weights;
+}
 
 sub _min {
     my $self = shift;
@@ -496,7 +511,6 @@ use the unbiased methods where appropriate, as per Statistics::Descriptive.
 
 Number of data items that have been added.
 
-
 =item skewness
 
 =item kurtosis
@@ -529,6 +543,12 @@ multiple values in one call.
 
 The inter-quartile range.  A convenience method to calculate the
 difference between the 75th and 25th percentile.
+
+=item sum_weights
+
+=item sum_sqr_weights
+
+These are both the same as the C<count>.  They are provided for compatibility with the weighted variants.
 
 =back
 

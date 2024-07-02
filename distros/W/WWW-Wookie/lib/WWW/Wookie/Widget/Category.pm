@@ -1,6 +1,6 @@
 # -*- cperl; cperl-indent-level: 4 -*-
 # Copyright (C) 2010-2024, Roland van Ipenburg
-package WWW::Wookie::Widget::Category v1.1.5;
+package WWW::Wookie::Widget::Category v1.1.6;
 use strict;
 use warnings;
 
@@ -64,7 +64,7 @@ category
 
 =head1 VERSION
 
-This document describes WWW::Wookie::Widget::Category version C<v1.1.5>
+This document describes WWW::Wookie::Widget::Category version C<v1.1.6>
 
 =head1 SYNOPSIS
 

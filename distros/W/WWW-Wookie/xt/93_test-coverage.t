@@ -8,7 +8,7 @@ use Readonly;
 
 use Test::More;
 
-our $VERSION = v1.1.5;
+our $VERSION = v1.1.6;
 if ( !eval { require Test::TestCoverage; 1 } ) {
     Test::More::plan 'skip_all' =>
       q{Test::TestCoverage required for testing test coverage};

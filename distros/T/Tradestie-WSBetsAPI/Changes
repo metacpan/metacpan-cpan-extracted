@@ -1,0 +1,5 @@
+Revision history for Tradestie-WSBetsAPI
+
+0.001     2024-07-01 13:56:21-06:00 America/Denver
+
+    - Initial release of the Tradeste::WSBetsAPI wrapper module.

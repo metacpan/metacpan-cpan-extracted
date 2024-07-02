@@ -7,6 +7,7 @@ build_requires:
   Test2::Require::Module: '0'
   Test2::Suite: '0'
   Test::More: '0.81'
+  Test::NoWarnings: '0'
 configure_requires:
   Module::Build: '0.4'
 dynamic_config: 1
@@ -19,37 +20,37 @@ name: WWW-Wookie
 provides:
   WWW::Wookie:
     file: lib/WWW/Wookie.pm
-    version: v1.1.5
+    version: v1.1.6
   WWW::Wookie::Connector::Exceptions:
     file: lib/WWW/Wookie/Connector/Exceptions.pm
-    version: v1.1.5
+    version: v1.1.6
   WWW::Wookie::Connector::Service:
     file: lib/WWW/Wookie/Connector/Service.pm
-    version: v1.1.5
+    version: v1.1.6
   WWW::Wookie::Connector::Service::Interface:
     file: lib/WWW/Wookie/Connector/Service/Interface.pm
-    version: v1.1.5
+    version: v1.1.6
   WWW::Wookie::Server::Connection:
     file: lib/WWW/Wookie/Server/Connection.pm
-    version: v1.1.5
+    version: v1.1.6
   WWW::Wookie::User:
     file: lib/WWW/Wookie/User.pm
-    version: v1.1.5
+    version: v1.1.6
   WWW::Wookie::Widget:
     file: lib/WWW/Wookie/Widget.pm
-    version: v1.1.5
+    version: v1.1.6
   WWW::Wookie::Widget::Category:
     file: lib/WWW/Wookie/Widget/Category.pm
-    version: v1.1.5
+    version: v1.1.6
   WWW::Wookie::Widget::Instance:
     file: lib/WWW/Wookie/Widget/Instance.pm
-    version: v1.1.5
+    version: v1.1.6
   WWW::Wookie::Widget::Instances:
     file: lib/WWW/Wookie/Widget/Instances.pm
-    version: v1.1.5
+    version: v1.1.6
   WWW::Wookie::Widget::Property:
     file: lib/WWW/Wookie/Widget/Property.pm
-    version: v1.1.5
+    version: v1.1.6
 recommends:
   CGI: '0'
   Getopt::Long: '0'
@@ -80,6 +81,6 @@ resources:
   bugtracker: https://bitbucket.org/rolandvanipenburg/www-wookie/issues
   license: http://dev.perl.org/licenses/
   repository: https://bitbucket.org/rolandvanipenburg/www-wookie
-version: v1.1.5
+version: v1.1.6
 x_authority: cpan:IPENBURG
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

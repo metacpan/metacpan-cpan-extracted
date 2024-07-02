@@ -1,6 +1,12 @@
 Release history for Zonemaster component Zonemaster-LDNS
 
 
+4.0.2 2024-07-01 (part of Zonemaster v2024.1 release)
+
+ [Fixes]
+ - Fixes broken links in README.md (#189)
+
+
 4.0.1 2024-03-28
 
  [Fixes]

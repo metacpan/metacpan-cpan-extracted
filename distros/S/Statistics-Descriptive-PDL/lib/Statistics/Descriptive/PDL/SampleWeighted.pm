@@ -16,7 +16,7 @@ use PDL::Lite '2.012';
 
 ## no critic (ProhibitExplicitReturnUndef)
 
-our $VERSION = '0.16';
+our $VERSION = '0.17';
 
 use parent 'Statistics::Descriptive::PDL::Weighted';
 
@@ -124,12 +124,16 @@ sub _percentile {
 
     $self->_sort_piddle;
 
-    $piddle = $self->_deduplicate_piddle;
+    #  possible slowdown here - users need to dedup before calling to avoid
+    # my $deduped = $self->_deduplicate;
+    #  there is actually no need to dedup
+    my $deduped = $self;
+    $piddle = $deduped->_get_piddle;
 
-    my $wt_piddle = $self->_get_weights_piddle;
+    # my $wt_piddle = $self->_get_weights_piddle;
 
-    my $cumsum = $self->_get_cumsum_weight_vector;
-    my $wt_sum = $self->sum_weights;
+    my $cumsum = $deduped->_get_cumsum_weight_vector;
+    my $wt_sum = $deduped->sum_weights;
 
     use POSIX qw /floor/;
 
@@ -157,6 +161,12 @@ sub _percentile {
     }
 
     return $piddle->at($idx);
+}
+
+#  weight for each sample is 1
+sub _sum_sqr_sample_weights {
+    my $self = shift;
+    return $self->sum_weights;
 }
 
 
@@ -201,9 +211,9 @@ This module provides basic functions used in descriptive statistics
 using weighted values.  Inherits from L<Statistics::Descriptive::PDL::Weighted>,
 with the key difference that the weights are forced to be integers.
 
-Variance, skewness and kurtosis all use the unbiased calculations.  
+Variance, skewness and kurtosis all use the unbiased calculations.
 The median and percentiles are calculated using interpolation,
-analogous to the unweighted case where values are repeated by the weights.  
+analogous to the unweighted case where values are repeated by the weights.
 
 
 =head1 METHODS
@@ -212,7 +222,7 @@ analogous to the unweighted case where values are repeated by the weights.
 
 =item new
 
-Create a new statistics object.  Takes no arguments.  
+Create a new statistics object.  Takes no arguments.
 
 =item add_data (\%data)
 
@@ -222,6 +232,12 @@ Add data to the stats object.  Appends to any existing data.
 
 Same as L<Statistics::Descriptive::PDL::Weighted> except that non-integer weights
 will be converted to integer using PDL's rules.
+
+=item sum_sqr_sample_weights
+
+Same as the C< sum_weights > method.  This is because one can consider each
+value as weighted by the number of samples, where each individual sample has
+a weight of 1.
 
 =back
 

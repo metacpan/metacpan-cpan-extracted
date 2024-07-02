@@ -1,6 +1,6 @@
 # -*- cperl; cperl-indent-level: 4 -*-
 # Copyright (C) 2010-2024, Roland van Ipenburg
-package WWW::Wookie::Widget::Property v1.1.5;
+package WWW::Wookie::Widget::Property v1.1.6;
 use strict;
 use warnings;
 
@@ -74,7 +74,7 @@ WWW::Wookie::Widget::Property - Property class
 
 =head1 VERSION
 
-This document describes WWW::Wookie::Widget::Property version C<v1.1.5>
+This document describes WWW::Wookie::Widget::Property version C<v1.1.6>
 
 =head1 SYNOPSIS
 

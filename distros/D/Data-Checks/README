@@ -81,6 +81,16 @@ CONSTRAINTS
     references, or references to objects in classes that do not overload
     stringification.
 
+ StrEq
+
+       StrEq($s)
+       StrEq($s1, $s2, ...)
+
+    Since version 0.05.
+
+    Accepts any value that passes the Str check, and additionally is
+    exactly equal to any of the given strings.
+
  Num
 
        Num()
@@ -91,6 +101,50 @@ CONSTRAINTS
     strings that would raise a warning if converted to a number, unblessed
     references, or references to objects in classes that do not overload
     numification.
+
+ NumGT
+
+ NumGE
+
+ NumLE
+
+ NumLT
+
+       NumGT($bound)
+       NumGE($bound)
+       NumLE($bound)
+       NumLT($bound)
+
+    Since version 0.05.
+
+    Accepts any value that passes the Num check, and additionally is within
+    the bound given. NumGT and NumLT exclude the bound value itself, NumGE
+    and NumLE include it.
+
+ NumRange
+
+       NumRange($boundge, $boundlt)
+
+    Since version 0.05.
+
+    Accepts any value that passes the Num check, and additionally is
+    between the two bounds given. The lower bound is inclusive, and the
+    upper bound is exclusive.
+
+    This choice is made so that a set of NumRange constraints can easily be
+    created that cover distinct sets of numbers:
+
+       NumRange(0, 10), NumRange(10, 20), NumRange(20, 30), ...
+
+ NumEq
+
+       NumEq($n)
+       NumEq($n1, $n2, ...)
+
+    Since version 0.05.
+
+    Accepts any value that passes the Num check, and additionally is
+    exactly equal to any of the given numbers.
 
  Isa
 
@@ -212,6 +266,15 @@ XS FUNCTIONS
 
     Checks whether a given SV is accepted by the given constraint check,
     throwing its assertion message if it does not.
+
+TODO
+
+      * Unit constraints - maybe Int, some plain-only variants of Str and
+      Num, some reference types, etc...
+
+      * Parametric constraints - StrMatch
+
+      * Structural constraints - HashOf, ArrayOf, etc...
 
 AUTHOR
 

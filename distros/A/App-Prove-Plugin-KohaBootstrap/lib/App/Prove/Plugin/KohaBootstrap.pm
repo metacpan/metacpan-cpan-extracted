@@ -14,16 +14,16 @@ App::Prove::Plugin::KohaBootstrap - prove plugin to run Koha tests on a separate
 
 =head1 VERSION
 
-Version 0.01
+Version 0.02
 
 =cut
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 
 =head1 SYNOPSIS
 
-    prove -P KohaBootstrap=database,koha_test,marcflavour=MARC21
+    prove -P KohaBootstrap=database,koha_test,marcflavour,MARC21
 
 =head1 SUBROUTINES/METHODS
 
@@ -135,10 +135,6 @@ You can also look for information at:
 =item * RT: CPAN's request tracker (report bugs here)
 
 L<https://rt.cpan.org/NoAuth/Bugs.html?Dist=App-Prove-Plugin-KohaBootstrap>
-
-=item * CPAN Ratings
-
-L<https://cpanratings.perl.org/d/App-Prove-Plugin-KohaBootstrap>
 
 =item * Search CPAN
 

@@ -1,5 +1,8 @@
 Revision history for DBIx::Class::ResultSet::RecursiveUpdate
 
+0.43      2024-07-01 15:08:07+02:00 Europe/Budapest
+    - Fix concurrent tests with HARNESS_OPTIONS=j<n> (GH #24)
+
 0.42      2020-08-25 22:26:58+02:00 Europe/Vienna
     - Fix side effects like change column_info and usage of each
     - Silence uninitialized value warnings

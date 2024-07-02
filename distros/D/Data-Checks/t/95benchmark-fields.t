@@ -10,8 +10,9 @@ use Test2::V0;
 # assertions on an object field.
 
 BEGIN {
-   eval { require Object::Pad::FieldAttr::Checked } or
-      plan skip_all => "Object::Pad::FieldAttr::Checked is not available";
+   eval { require Object::Pad::FieldAttr::Checked;
+          Object::Pad::FieldAttr::Checked->VERSION( '0.10' ) } or
+      plan skip_all => "Object::Pad::FieldAttr::Checked >= 0.10 is not available";
 
    eval { require Types::Standard } or
       plan skip_all => "Types::Standard is not available";

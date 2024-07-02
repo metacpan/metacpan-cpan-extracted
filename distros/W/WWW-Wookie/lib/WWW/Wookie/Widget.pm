@@ -1,6 +1,6 @@
 # -*- cperl; cperl-indent-level: 4 -*-
 # Copyright (C) 2010-2024, Roland van Ipenburg
-package WWW::Wookie::Widget v1.1.5;
+package WWW::Wookie::Widget v1.1.6;
 use strict;
 use warnings;
 
@@ -71,7 +71,7 @@ WWW::Wookie::Widget - A client side representation of a widget
 
 =head1 VERSION
 
-This document describes WWW::Wookie::Widget version C<v1.1.5>
+This document describes WWW::Wookie::Widget version C<v1.1.6>
 
 =head1 SYNOPSIS
 

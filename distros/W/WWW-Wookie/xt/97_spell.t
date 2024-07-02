@@ -6,7 +6,7 @@ use warnings;
 use English qw(-no_match_vars);
 use Test::More;
 
-our $VERSION = v1.1.5;
+our $VERSION = v1.1.6;
 if ( !eval { require Test::Spelling; } ) {
     Test::More::plan(
         'skip_all' => q{Test::Spelling required to check spelling of POD} );

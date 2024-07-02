@@ -28,7 +28,7 @@ my %WriteMakefileArgs = (
     "Path::Tiny" => 0,
     "Plack" => "1.0041",
     "Template::Tiny" => 0,
-    "Test::Deep" => "0.091",
+    "Test::Deep" => "1.129",
     "Try::Tiny" => 0,
     "URI" => 0,
     "namespace::autoclean" => 0
@@ -36,7 +36,7 @@ my %WriteMakefileArgs = (
   "TEST_REQUIRES" => {
     "Test::Exception" => 0
   },
-  "VERSION" => "2.13",
+  "VERSION" => "2.14",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -52,7 +52,7 @@ my %FallbackPrereqs = (
   "Path::Tiny" => 0,
   "Plack" => "1.0041",
   "Template::Tiny" => 0,
-  "Test::Deep" => "0.091",
+  "Test::Deep" => "1.129",
   "Test::Exception" => 0,
   "Try::Tiny" => 0,
   "URI" => 0,

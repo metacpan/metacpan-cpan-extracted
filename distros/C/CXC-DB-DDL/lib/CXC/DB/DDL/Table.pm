@@ -6,7 +6,7 @@ use v5.26;
 use strict;
 use warnings;
 
-our $VERSION = '0.15';
+our $VERSION = '0.16';
 
 use List::Util qw( any );
 use Ref::Util  qw( is_ref is_arrayref is_coderef);
@@ -24,6 +24,11 @@ use experimental 'signatures', 'postderef', 'declared_refs';
 use namespace::clean -except => 'has';
 
 with 'CXC::DB::DDL::CloneClear';
+
+my sub croak {
+    require Carp;
+    goto \&Carp::croak;
+}
 
 
 
@@ -68,6 +73,12 @@ has name => (
           ? join( q{.}, $self->schema, $self->_name )
           : $self->_name;
     },
+);
+
+has temporary => (
+    is      => 'ro',
+    isa     => Bool,
+    default => !!0,
 );
 
 
@@ -185,9 +196,27 @@ around BUILDARGS => sub ( $orig, $self, @args ) {
 
 
 
-sub to_sqlt ( $self, $dbh, $schema ) {
 
-    my $sqlt_table = $schema->add_table( name => $self->name );
+sub to_sqlt ( $self, $dbh, $schema ) {    ## no critic(Subroutines::ProhibitExcessComplexity)
+
+    my %extra;
+
+    if ( $self->temporary ) {
+
+        # this works for SQL::Translator::Producer::PostgreSQL, but not for
+        # SQL::Translator::Producer::SQLite; that gets monkey-patched in CXC::DB::DDL
+        $extra{temporary} = $self->temporary;
+
+        my $dbd = $dbh->{Driver}->{Name};
+
+        # SYNC THIS CODE WITH THE OVERRIDE FUNCTION IN CXC::DB::DDL.
+        croak(
+            "SQL::Translator either doesn't support temp tables for DBD::$dbd, or we don't know how to make it do so",
+        ) unless $dbd eq DBD_SQLITE || $dbd eq DBD_POSTGRESQL;
+    }
+
+
+    my $sqlt_table = $schema->add_table( name => $self->name, extra => \%extra );
 
     for my $field ( $self->fields->@* ) {
         $field->to_sqlt( $dbh, $sqlt_table )
@@ -370,7 +399,7 @@ CXC::DB::DDL::Table - CXC::DB::DDL Table class
 
 =head1 VERSION
 
-version 0.15
+version 0.16
 
 =head1 OBJECT ATTRIBUTES
 

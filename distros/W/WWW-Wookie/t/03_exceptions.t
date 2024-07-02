@@ -12,7 +12,7 @@ use Readonly;
 use WWW::Wookie::Widget::Instance;
 use WWW::Wookie::Connector::Service;
 
-our $VERSION = v1.1.5;
+our $VERSION = v1.1.6;
 
 ## no critic (ProhibitCallsToUnexportedSubs)
 Readonly::Scalar my $TEST_WARNINGS => $ENV{'AUTHOR_TESTING'}

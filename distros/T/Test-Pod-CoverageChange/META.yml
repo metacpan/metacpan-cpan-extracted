@@ -33,7 +33,7 @@ no_index:
 provides:
   Test::Pod::CoverageChange:
     file: lib/Test/Pod/CoverageChange.pm
-    version: '0.004'
+    version: '0.005'
 requires:
   Exporter: '0'
   File::Find::Rule: '0'
@@ -52,11 +52,11 @@ resources:
   bugtracker: https://github.com/katew-deriv/perl-Test-Pod-CoverageChange/issues
   homepage: https://github.com/katew-deriv/perl-Test-Pod-CoverageChange
   repository: https://github.com/katew-deriv/perl-Test-Pod-CoverageChange.git
-version: '0.004'
+version: '0.005'
 x_authority: cpan:DERIV
 x_contributors:
-  - 'Ramin Sadeghnasab <54239767+ramin-fs@users.noreply.github.com>'
   - 'Kate Wilkins <kate.wilkins@deriv.com>'
+  - 'Ramin Sadeghnasab <54239767+ramin-fs@users.noreply.github.com>'
   - 'kathleen-deriv <122329285+lim-deriv@users.noreply.github.com>'
   - 'chylli-binary <52912308+chylli-binary@users.noreply.github.com>'
   - 'mukesh-deriv <85932084+mukesh-deriv@users.noreply.github.com>'
