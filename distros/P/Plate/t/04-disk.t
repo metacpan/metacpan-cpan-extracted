@@ -1,7 +1,7 @@
 #!perl -T
 use 5.020;
 use warnings;
-use Test::More tests => 49;
+use Test::More tests => 51;
 
 BEGIN {
     if ($ENV{AUTHOR_TESTING}) {
@@ -57,7 +57,7 @@ chomp $output;
 
 is Plate::_path(''), '', 'Empty path remains empty';
 
-my $plate = new Plate path => 't', cache_path => '';
+my $plate = Plate->new(path => 't', cache_path => '');
 like $$plate{cache_path}, qr/^\./, 'Empty cache_path set to relative path';
 
 $plate->set(cache_path => 't/tmp_dir', umask => 027, cache_suffix => '.plate.pl');
@@ -75,7 +75,7 @@ ok -f 't/tmp_dir/data/test.plate.pl', 'Created cache file';
 unlink 't/tmp_dir/data/test.plate.pl' or diag "Can't delete t/tmp_dir/data/test.plate.pl: $!";
 rmdir or diag "Can't delete $_: $!" for qw(t/tmp_dir/data t/tmp_dir);
 
-$plate = new Plate path => 't/data', cache_path => 't/data', cache_code => undef;
+$plate = Plate->new(path => 't/data', cache_path => 't/data', cache_code => undef);
 
 ok !$plate->does_exist('missing'), "Plate 'missing' doesn't exist";
 ok !$plate->can_serve('missing'), "Plate 'missing' can't be served";
@@ -92,6 +92,11 @@ ok $plate->can_serve('defined'), "Defined plate can be served";
 $plate->undefine('defined');
 ok !$plate->does_exist('defined'), "Undefined plate doesn't exist";
 ok !$plate->can_serve('defined'), "Undefined plate can't be served";
+
+is $plate->serve(\'<% Plate::does_exist("test") ? "Yes" : "No" %>'), 'Yes',
+'Call Plate::does_exist from within a template';
+is $plate->serve(\'<% Plate::can_serve("test") ? "Yes" : "No" %>'), 'Yes',
+'Call Plate::can_serve from within a template';
 
 my $test_warnings = [
     qr"^inner-2-warn at t.data.inner\.plate line 2\.$",
@@ -128,7 +133,7 @@ isnt +(stat 't/data/test.pl')[9], 946684800, 'Cache was updated';
 $plate->set(cache_code => 1);
 is $plate->serve_with('outer', 'outer'), "[\n[\n\n]\n]", 'Serve with a layout';
 
-$plate = new Plate path => undef, cache_path => 't/data';
+$plate = Plate->new(path => undef, cache_path => 't/data');
 is $$plate{static}, 'auto', 'Static mode is automatic whithout path';
 ok $plate->does_exist('test'), "Disk cached plate 'data/test' does exist";
 
@@ -136,7 +141,7 @@ warnings_are {
     is $plate->serve('test', qw(this & that)), $output, 'Same output from disk cache only';
 } $test_warnings, 'Same warnings from disk cache only';
 
-$plate = new Plate path => 't/data', cache_code => undef;
+$plate = Plate->new(path => 't/data', cache_code => undef);
 is $$plate{static}, 'auto', 'Static mode is automatic whithout cache_path or cache_code';
 is $$plate{io_layers}, ':encoding(UTF-8)', 'Default encoding is UTF-8';
 
@@ -167,13 +172,13 @@ if (open my $fh, '>', 't/data/tmp.plate') {
     print $fh 'abc';
     close $fh;
 }
-$plate = new Plate path => './t', cache_path => './t', static => 1;
+$plate = Plate->new(path => './t', cache_path => './t', static => 1);
 is $plate->serve('data/tmp'), 'abc', 'Serve plate cached in memory';
 
 unlink 't/data/tmp.plate';
 is $plate->serve('data/tmp'), 'abc', 'Serve plate from memory cache without modification check';
 
-$plate = new Plate path => 't/data';
+$plate = Plate->new(path => 't/data');
 
 my $mod = time - 100;
 if (open my $fh, '>', 't/data/tmp.plate') {

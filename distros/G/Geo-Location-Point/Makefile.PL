@@ -22,7 +22,8 @@ WriteMakefile(
 		'Test::Compile' => 0,
 		'Test::Most' => 0,
 		'Test::NoWarnings' => 0,
-		'Test::Number::Delta' => 0,
+		'Test::Needs' => 0,
+		'Test::Number::Delta' => 0
 	}, PREREQ_PM => $prereq,
     dist		=> { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
     clean		=> { FILES => 'Geo-Location-Point-*' },

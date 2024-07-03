@@ -49,8 +49,8 @@ class R::NDArray::Time::Piece extends R::NDArray::Object {
     return $data;
   }
   
-  method clone : R::NDArray::Time::Piece () {
-    return (R::NDArray::Time::Piece)$self->SUPER::clone;
+  method clone : R::NDArray::Time::Piece ($elem_shallow_clone : int = 0) {
+    return (R::NDArray::Time::Piece)$self->SUPER::clone($elem_shallow_clone);
   }
   
   method elem_to_string : string ($data_index : int) {
@@ -80,6 +80,14 @@ class R::NDArray::Time::Piece extends R::NDArray::Object {
     }
     
     return $clone;
+  }
+  
+  method slice : R::NDArray::Time::Piece ($vector_indexes : R::NDArray::Int[]) {
+    return (R::NDArray::Time::Piece)$self->SUPER::slice($vector_indexes);
+  }
+  
+  method slice_set : void ($vector_indexes : R::NDArray::Int[], $ndarray : R::NDArray::Time::Piece) {
+    $self->SUPER::slice_set($vector_indexes, $ndarray);
   }
   
 }

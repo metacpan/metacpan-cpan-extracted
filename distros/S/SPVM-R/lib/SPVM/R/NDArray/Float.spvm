@@ -45,8 +45,8 @@ class R::NDArray::Float extends R::NDArray {
     return $data;
   }
   
-  method clone : R::NDArray::Float () {
-    return (R::NDArray::Float)$self->SUPER::clone;
+  method clone : R::NDArray::Float ($elem_shallow_clone : int = 0) {
+    return (R::NDArray::Float)$self->SUPER::clone($elem_shallow_clone);
   }
   
   method elem_to_string : string ($data_index : int) {
@@ -80,7 +80,7 @@ class R::NDArray::Float extends R::NDArray {
     }
   }
   
-  protected method slice_data : object ($data_indexes : int[]) {
+  protected method slice_data : float[] ($data_indexes : int[]) {
     
     unless ($data_indexes) {
       die "The data indexes \$data_indexes must be defined.";
@@ -90,26 +90,33 @@ class R::NDArray::Float extends R::NDArray {
     my $data = $self->data;
     my $ret_data = new float[$data_indexes_length];
     for (my $i = 0; $i < $data_indexes_length; $i++) {
-      $ret_data->(float[])->[$i] = $data->(float[])->[$i];
+      my $data_index = $data_indexes->[$i];
+      $ret_data->[$i] = $data->[$data_index];
     }
     
     return $ret_data;
   }
   
-  protected method slice_set_data : void ($data_indexes : int[], $data : object) {
+  protected precompile method slice_set_data : void ($data_indexes : int[], $data : float[]) {
     
-    my $self_data = $self->{data};
+    my $self_data = $self->data;
     
     unless ($data_indexes) {
       die "The data indexes \$data_indexes must be defined.";
     }
     
-    my $data_index = 0;
-    my $data_indexes_length = @$data_indexes;
-    for (my $i = 0; $i < $data_indexes_length; $i++) {
-      $self_data->(float[])->[$i] = $data->(float[])->[$data_index];
-      $data_index++;
+    for (my $i = 0; $i < @$data; $i++) {
+      my $data_index = $data_indexes->[$i];
+      $self_data->[$data_index] = $data->[$i];
     }
+  }
+  
+  method slice : R::NDArray::Float ($vector_indexes : R::NDArray::Int[]) {
+    return (R::NDArray::Float)$self->SUPER::slice($vector_indexes);
+  }
+  
+  method slice_set : void ($vector_indexes : R::NDArray::Int[], $ndarray : R::NDArray::Float) {
+    $self->SUPER::slice_set($vector_indexes, $ndarray);
   }
   
 }

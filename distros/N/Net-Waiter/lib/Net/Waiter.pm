@@ -16,7 +16,7 @@ use Sys::SigAction qw( set_sig_handler );
 use IPC::Shareable;
 use Time::HiRes qw( sleep );
 
-our $VERSION = '1.12';
+our $VERSION = '1.13';
 
 ##############################################################################
             
@@ -263,7 +263,7 @@ sub __run_forking
   # reinstall signal handlers in the kid
   $SIG{ 'INT'   } = sub { $self->break_main_loop(); };
   $SIG{ 'TERM'  } = sub { $self->break_main_loop(); };
-  $SIG{ 'CHLD'  } = 'DEFAULT';
+  $SIG{ 'CHLD'  } = 'IGNORE';
   $SIG{ 'HUP '  } = sub { $self->__child_sig_hup();   };
   $SIG{ 'USR1'  } = sub { $self->__child_sig_usr1();  };
   $SIG{ 'USR2'  } = sub { $self->__child_sig_usr2();  };
@@ -343,7 +343,7 @@ sub __run_prefork
 
         # reinstall signal handlers in the kid
         $SIG{ 'INT'   } = 'DEFAULT';
-        $SIG{ 'CHLD'  } = 'DEFAULT';
+        $SIG{ 'CHLD'  } = 'IGNORE';
         $SIG{ 'HUP '  } = sub { $self->__child_sig_hup();   };
         $SIG{ 'USR1'  } = sub { $self->__child_sig_usr1();  };
         $SIG{ 'USR2'  } = sub { $self->__child_sig_usr2();  };
@@ -971,8 +971,13 @@ Called when forked (child) process receives USR1 signal.
 
 =head2 on_child_sig_usr2()
 
-Called whenforked (child) process receives USR2 signal.
+Called when forked (child) process receives USR2 signal.
                                                                                         
+=head1 NOTES
+
+SIG_CHLD handler defaults to IGNORE in child processes. 
+whoever forks further here, should reinstall signal handler if needed. 
+
 =head1 TODO
 
   (more docs)

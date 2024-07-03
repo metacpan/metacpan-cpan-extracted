@@ -4,7 +4,7 @@ Geo::Coder::Abbreviations - Quick and Dirty Interface to https://github.com/mapb
 
 # VERSION
 
-Version 0.07
+Version 0.08
 
 # SYNOPSIS
 

@@ -1,0 +1,114 @@
+{
+  "features": [
+    {
+      "id": "bool-feature",
+      "description": "",
+      "archived": false,
+      "dateCreated": "2024-06-25T09:11:17.705Z",
+      "dateUpdated": "2024-06-25T09:11:17.705Z",
+      "defaultValue": "true",
+      "environments": {
+        "production": {
+          "enabled": true,
+          "defaultValue": "true",
+          "rules": [],
+          "definition": "{\"defaultValue\":true,\"project\":\"\"}"
+        }
+      },
+      "owner": "Chylli",
+      "project": "",
+      "tags": [],
+      "valueType": "boolean",
+      "revision": {
+        "comment": "",
+        "date": "2024-06-25T09:11:17.705Z",
+        "publishedBy": "",
+        "version": 1
+      }
+    },
+    {
+      "id": "string-feature",
+      "description": "",
+      "archived": false,
+      "dateCreated": "2024-06-25T09:12:03.806Z",
+      "dateUpdated": "2024-06-25T09:12:03.806Z",
+      "defaultValue": "OFF",
+      "environments": {
+        "production": {
+          "enabled": true,
+          "defaultValue": "OFF",
+          "rules": [],
+          "definition": "{\"defaultValue\":\"OFF\",\"project\":\"\"}"
+        }
+      },
+      "owner": "Chylli",
+      "project": "",
+      "tags": [],
+      "valueType": "string",
+      "revision": {
+        "comment": "",
+        "date": "2024-06-25T09:12:03.806Z",
+        "publishedBy": "",
+        "version": 1
+      }
+    },
+    {
+      "id": "number-feature",
+      "description": "",
+      "archived": false,
+      "dateCreated": "2024-06-25T09:12:34.817Z",
+      "dateUpdated": "2024-06-25T09:12:34.817Z",
+      "defaultValue": "123",
+      "environments": {
+        "production": {
+          "enabled": true,
+          "defaultValue": "123",
+          "rules": [],
+          "definition": "{\"defaultValue\":123,\"project\":\"\"}"
+        }
+      },
+      "owner": "Chylli",
+      "project": "",
+      "tags": [],
+      "valueType": "number",
+      "revision": {
+        "comment": "",
+        "date": "2024-06-25T09:12:34.817Z",
+        "publishedBy": "",
+        "version": 1
+      }
+    },
+    {
+      "id": "json-feature",
+      "description": "",
+      "archived": false,
+      "dateCreated": "2024-06-25T09:13:11.201Z",
+      "dateUpdated": "2024-06-25T09:13:11.201Z",
+      "defaultValue": "{\n  \"a\": 1,\n  \"b\": 2\n}",
+      "environments": {
+        "production": {
+          "enabled": true,
+          "defaultValue": "{\n  \"a\": 1,\n  \"b\": 2\n}",
+          "rules": [],
+          "definition": "{\"defaultValue\":{\"a\":1,\"b\":2},\"project\":\"\"}"
+        }
+      },
+      "owner": "Chylli",
+      "project": "",
+      "tags": [],
+      "valueType": "json",
+      "revision": {
+        "comment": "",
+        "date": "2024-06-25T09:13:11.201Z",
+        "publishedBy": "",
+        "version": 1
+      }
+    }
+  ],
+  "limit": 10,
+  "offset": 0,
+  "count": 4,
+  "total": 4,
+  "hasMore": false,
+  "nextOffset": null
+}

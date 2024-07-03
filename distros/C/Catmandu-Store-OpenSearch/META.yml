@@ -1,0 +1,46 @@
+---
+abstract: 'A searchable store backed by Opensearch'
+author:
+  - '=over 4'
+build_requires:
+  Module::Build: '0.28'
+  Test::More: '0.98'
+  Test::Pod::Coverage: '0'
+configure_requires:
+  Module::Build: '0.28'
+dynamic_config: 0
+generated_by: 'Dist::Milla version v1.0.22, Dist::Zilla version 6.031, CPAN::Meta::Converter version 2.150001'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Catmandu-Store-OpenSearch
+no_index:
+  directory:
+    - eg
+    - examples
+    - inc
+    - share
+    - t
+    - xt
+recommends:
+  Type::Tiny::XS: '0'
+requires:
+  CQL::Parser: '1.12'
+  Catmandu: '1.2004'
+  Cpanel::JSON::XS: '3.0213'
+  Moo: '1.004006'
+  OpenSearch: '== 0.94'
+  namespace::clean: '0.24'
+  perl: v5.10.1
+resources:
+  bugtracker: https://github.com/LibreCat/Catmandu-Store-OpenSearch/issues
+  homepage: https://github.com/LibreCat/Catmandu-Store-OpenSearch
+  repository: https://github.com/LibreCat/Catmandu-Store-OpenSearch.git
+version: '0.01'
+x_contributors:
+  - 'Nicolas Franck <nicolas.franck@ugent.be>'
+x_generated_by_perl: v5.22.1
+x_serialization_backend: 'YAML::Tiny version 1.73'
+x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'
+x_static_install: 0

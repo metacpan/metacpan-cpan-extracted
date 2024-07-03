@@ -1,0 +1,100 @@
+=encoding utf8
+
+=for comment POD_DERIVED_INDEX_GENERATED
+The following documentation is automatically generated.  Please do not edit
+this file, but rather the original, inline with WebService::GrowthBook
+at lib/WebService/GrowthBook.pm
+(on the system that originally ran this).
+If you do edit this file, and don't want your changes to be removed, make
+sure you change the first line.
+
+=cut
+
+=head1 NAME
+
+WebService::GrowthBook - sdk of growthbook
+
+=head1 SYNOPSIS
+
+    use WebService::GrowthBook;
+    my $instance = WebService::GrowthBook->new(client_key => 'my key');
+    $instance->load_features;
+    if($instance->is_on('feature_name')){
+        # do something
+    }
+    else {
+        # do something else
+    }
+    my $string_feature = $instance->get_feature_value('string_feature');
+    my $number_feature = $instance->get_feature_value('number_feature');
+    # get decoded json
+    my $json_feature = $instance->get_feature_value('json_feature');
+
+=head1 DESCRIPTION
+
+    This module is a sdk of growthbook, it provides a simple way to use growthbook features.
+
+=head1 INHERITED METHODS
+
+=over 4
+
+=item L<Object::Pad::UNIVERSAL>
+
+L<BUILDARGS|Object::Pad::UNIVERSAL/BUILDARGS>
+
+=back
+
+=head1 METHODS
+
+=head2 load_features
+
+load features from growthbook API
+
+    $instance->load_features;
+
+=head2 is_on
+
+check if a feature is on
+
+    $instance->is_on('feature_name');
+
+Please note it will return undef if the feature does not exist.
+
+=head2 is_off
+
+check if a feature is off
+
+    $instance->is_off('feature_name');
+
+Please note it will return undef if the feature does not exist.
+
+=head2 get_feature_value
+
+get the value of a feature
+
+    $instance->get_feature_value('feature_name');
+
+Please note it will return undef if the feature does not exist.
+
+=head2 set_features
+
+set features
+
+    $instance->set_features($features);
+
+=head2 eval_feature
+
+evaluate a feature to get the value
+
+    $instance->eval_feature('feature_name');
+
+=head1 SEE ALSO
+
+=over 4
+
+=item * L<https://docs.growthbook.io/>
+
+=item * L<PYTHON VERSION|https://github.com/growthbook/growthbook-python>
+
+=back
+

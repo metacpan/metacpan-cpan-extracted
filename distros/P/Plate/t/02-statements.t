@@ -18,7 +18,7 @@ $SIG{__WARN__} = sub {
     goto &diag;
 };
 
-my $plate = new Plate;
+my $plate = Plate->new;
 
 is $plate->serve(\<<''),
 % if (@_) {

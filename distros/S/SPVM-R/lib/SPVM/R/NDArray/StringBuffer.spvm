@@ -49,8 +49,8 @@ class R::NDArray::StringBuffer extends R::NDArray::Object {
     return $data;
   }
   
-  method clone : R::NDArray::StringBuffer () {
-    return (R::NDArray::StringBuffer)$self->SUPER::clone;
+  method clone : R::NDArray::StringBuffer ($elem_shallow_clone : int = 0) {
+    return (R::NDArray::StringBuffer)$self->SUPER::clone($elem_shallow_clone);
   }
   
   method elem_to_string : string ($data_index : int) {
@@ -81,4 +81,13 @@ class R::NDArray::StringBuffer extends R::NDArray::Object {
     
     return $clone;
   }
+  
+  method slice : R::NDArray::StringBuffer ($vector_indexes : R::NDArray::Int[]) {
+    return (R::NDArray::StringBuffer)$self->SUPER::slice($vector_indexes);
+  }
+  
+  method slice_set : void ($vector_indexes : R::NDArray::Int[], $ndarray : R::NDArray::StringBuffer) {
+    $self->SUPER::slice_set($vector_indexes, $ndarray);
+  }
+  
 }

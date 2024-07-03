@@ -21,15 +21,15 @@ Geo::Location::Point - Location information
 
 =head1 VERSION
 
-Version 0.11
+Version 0.12
 
 =cut
 
-our $VERSION = '0.11';
+our $VERSION = '0.12';
 
 =head1 SYNOPSIS
 
-Geo::Location::Point stores a place.
+Geo::Location::Point stores a place/location by latitude and longitude
 
     use Geo::Location::Point;
 
@@ -73,11 +73,21 @@ sub new {
 		Carp::carp(__PACKAGE__, ': latitude not given');
 		return;
 	}
+	if(abs($args{'lat'}) > 180) {
+		Carp::carp(__PACKAGE__, ': ', $args{'lat'}, ': invalid latitude');
+		return;
+	}
+
 	$args{'long'} //= $args{'longitude'} // $args{'Longitude'};
 	if(!defined($args{'long'})) {
 		Carp::carp(__PACKAGE__, ': longitude not given');
 		return;
 	}
+	if(abs($args{'long'}) > 180) {
+		Carp::carp(__PACKAGE__, ': ', $args{'long'}, ': invalid longitude');
+		return;
+	}
+	$args{'lng'} = $args{'long'};
 
 	return bless \%args, $class;
 }
@@ -115,6 +125,18 @@ sub latitude {
 =cut
 
 sub long {
+	my $self = shift;
+
+	return $self->{'long'};
+}
+
+=head2	lng
+
+Synonym for long().
+
+=cut
+
+sub lng {
 	my $self = shift;
 
 	return $self->{'long'};
@@ -309,6 +331,21 @@ sub _sortoutcase {
 	return $rc;
 }
 
+=head2	as_uri
+
+Prints the object as a URI string.
+See L<https://en.wikipedia.org/wiki/Geo_URI_scheme>.
+Arguably it should return a L<URI> object instead.
+
+=cut
+
+sub as_uri
+{
+	my $self = shift;
+
+	return 'geo:' . $self->{'latitude'} . ',' . $self->{'longitude'};
+}
+
 =head2	attr
 
 Get/set location attributes, e.g. city
@@ -317,9 +354,6 @@ Get/set location attributes, e.g. city
     $location->country('UK');
     print $location->as_string(), "\n";
     print "$location\n";	# Calls as_string
-
-Because of the way that the cache works, the location() value is cleared by this, so
-you may wish to manually all location() afterwards to set the value.
 
 =cut
 
@@ -358,7 +392,7 @@ L<TimeZone::TimeZoneDB>.
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2019-2023 Nigel Horne.
+Copyright 2019-2024 Nigel Horne.
 
 The program code is released under the following licence: GPL2 for personal use on a single computer.
 All other users (including Commercial, Charity, Educational, Government)

@@ -208,28 +208,7 @@ class R::DataFrame {
     return $ret_data_frame;
   }
   
-  method get : R::NDArray ($field_name : string, $coordinate : R::NDArray::Int) {
-    
-    unless ($coordinate) {
-      die "The coordinate \$coordinate must be defined.";
-    }
-    
-    my $coordinate_length = $coordinate->length;
-    
-    my $vector_indexes = new R::NDArray::Int[$coordinate_length];
-    
-    for (my $i = 0; $i < $coordinate_length; $i++) {
-      $vector_indexes->[$i] = R::OP::Int->c([$coordinate->data->[$i]]);
-    }
-    
-    my $data_frame = $self->slice([$field_name], $vector_indexes);
-    
-    my $ret_ndarray = $data_frame->get_ndarray(0);
-    
-    return $ret_ndarray;
-  }
-  
-  method dump : string () {
+  method to_string : string () {
     
     my $fields_length = $self->get_fields_length;
     
@@ -251,7 +230,7 @@ class R::DataFrame {
       
       $string_buffer->push("]]\n");
       
-      my $ndarray_string = $ndarray->dump;
+      my $ndarray_string = $ndarray->to_string;
       
       $string_buffer->push($ndarray_string);
     }

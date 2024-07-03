@@ -1,5 +1,5 @@
 package Tree::RB::XS;
-$Tree::RB::XS::VERSION = '0.07';
+$Tree::RB::XS::VERSION = '0.08';
 # VERSION
 # ABSTRACT: Red/Black Tree implemented in C, with similar API to Tree::RB
 
@@ -33,6 +33,7 @@ sub new {
 	$self->_init_tree(delete $self->{key_type}, delete $self->{compare_fn});
 	$self->allow_duplicates(1) if delete $self->{allow_duplicates};
 	$self->compat_list_get(1) if delete $self->{compat_list_get};
+	$self->track_recent(1) if delete $self->{track_recent};
 	$self;
 }
 
@@ -41,6 +42,8 @@ sub new {
 *min= *min_node;
 *max= *max_node;
 *nth= *nth_node;
+*oldest= *oldest_node;
+*newest= *newest_node;
 
 
 sub iter {
@@ -55,6 +58,16 @@ sub rev_iter {
 	$key_or_node= $self->get_node($key_or_node, @_ > 2? $mode : GET_LE_LAST())
 		if @_ > 1 && ref $key_or_node ne 'Tree::RB::XS::Node';
 	Tree::RB::XS::Iter->_new($key_or_node || $self, -1);
+}
+
+sub iter_newer {
+	my ($self, $node)= @_;
+	Tree::RB::XS::Iter->_new($node || $self, 2);
+}
+
+sub iter_older {
+	my ($self, $node)= @_;
+	Tree::RB::XS::Iter->_new($node || $self, -2);
 }
 
 
@@ -94,12 +107,20 @@ sub Tree::RB::XS::Node::rev_iter {
 	Tree::RB::XS::Iter->_new($_[0], -1);
 }
 
+sub Tree::RB::XS::Node::iter_newer {
+	Tree::RB::XS::Iter->_new($_[0], 2);
+}
+
+sub Tree::RB::XS::Node::iter_older {
+	Tree::RB::XS::Iter->_new($_[0], -2);
+}
+
 
 # I can't figure out how to do the closure in XS yet
 sub Tree::RB::XS::Iter::_new {
 	my $class= shift;
 	my ($self,$y);
-	$self= bless sub { Tree::XS::RB::Iter::next($y) }, $class;
+	$self= bless sub { Tree::RB::XS::Iter::next($y) }, $class;
 	Scalar::Util::weaken($y= $self);
 	$self->_init(@_);
 }
@@ -148,9 +169,6 @@ Tree::RB::XS - Red/Black Tree implemented in C, with similar API to Tree::RB
 
 =head1 SYNOPSIS
 
-B<NOTICE:> This module is very new and you should give it some thorough testing before
-trusting it with production data.
-
   use Tree::RB::XS qw/ :cmp :get /;
   
   my $tree= Tree::RB::XS->new;
@@ -176,10 +194,24 @@ trusting it with production data.
   $tree->put("test" => "x");
   
   say $tree->min->key;                  # inspect the node objects
-  say $tree->nth(0)->key;
+  say $tree->nth(0)->key;               # log(n) indexing
   my $node= $tree->min;
   my $next= $node->next;
   $node->prune;
+  
+  # LRU Cache feature
+  
+  $tree= Tree::RB::XS->new(
+    track_recent => 1,                  # Remember order of added keys
+  );
+  $tree->put($_,$_) for 1,3,2;
+  $x= $tree->newest->key;               # 2
+  $x= $tree->oldest->key;               # 1
+  @insertion_order=
+    $tree->iter_newer->next_keys('*');  # (1,3,2)
+  $tree->get_node(1)->mark_newest;      # simulate delete+put of same node
+  $tree->iter_newer->next_keys('*');    # (3,2,1)
+  @removed= $tree->truncate_recent(2);  # (3), leaving (2,1) in the tree
   
   # iterators
   
@@ -188,7 +220,7 @@ trusting it with production data.
   }
   
   my $i= $tree->rev_iter;
-  while (my $node= $i->next) {
+  while (my $node= &$i) {
     $node->prune if $node->key =~ ...;
   }
   
@@ -199,32 +231,30 @@ trusting it with production data.
 
 =head1 DESCRIPTION
 
-This module is a wrapper for a Red/Black Tree implemented in C.  It's primary features over
-other search trees on CPAN are optimized comparisons of keys (speed), C<< O(log N) >>
-node-by-index lookup (which allows the tree to act as an array), and the option to
-allow duplicate keys while preserving insertion order.
-
-The API is almost a complete superset of L<Tree::RB> with a few differences:
+This is a feature-rich Red/Black Tree implemented in C.  Special features (above and beyond the
+basics you'd expect from a treemap) include:
 
 =over
 
 =item *
 
-The C<get> method in this module is not affected by array context, unless you
-request L</compat_list_get>.
+Optimized storage and L<comparisons of keys|/compare_fn> (speed)
 
 =item *
 
-C<resort> is not implemented (would be lots of effort, and unlikely to be needed)
+C<< O(log N) >> L<Nth-node lookup|/nth_node> (which allows the tree to act as an array)
 
 =item *
 
-Tree structure is not mutable via the attributes of Node, nor can nodes be created
-independent from a tree.
+Smart bi-directional L<iterators|/ITERATOR OBJECTS> that advance when you delete the current node.
 
 =item *
 
-Many methods have official names changed, but aliases are provided for compatibility.
+Option to allow L<duplicate keys|/allow_duplicates> while preserving insertion order.
+
+=item *
+
+Optional linked-list of L<"recent" order|/track_recent>, to facilitate LRU or MRU caches.
 
 =back
 
@@ -241,25 +271,33 @@ Options:
 
 =over
 
-=item L</compare_fn>
+=item *
+
+C<compare_fn>
 
 Choose a custom key-compare function.  This can be the ID of an optimized function,
 a coderef, or the name of one of the optimized IDs like "int" for C<CMP_INT>.
 See below for details.
 
-=item L</allow_duplicates>
+=item *
+
+C<allow_duplicates>
 
 Whether to allow two nodes with the same key.  Defaults to false.
 
-=item L</compat_list_get>
+=item *
+
+C<compat_list_get>
 
 Whether to enable full compatibility with L<Tree::RB>'s list-context behavior for L</get>.
 Defaults to false.
 
-=item L</key_type>
+=item *
 
-This is an internal detail that probably shouldn't have been exposed, and might be removed
-in the future.  Choose one of the optimized C<compare_fn> instead.
+C<track_recent>
+
+Whether to keep track of the insertion order of nodes, by default.  Defaults to false.
+You may toggle this attribute after construction.
 
 =back
 
@@ -300,6 +338,18 @@ method like 'get' change its behavior in list context.  So, by deault, this attr
 false and C<get> always returns one value.  But if you set this to true, C<get> changes in
 list context to also return the Node, like is done in L<Tree::RB/lookup>.
 
+=head2 track_recent
+
+Boolean, read/write.  Enabling this causes all nodes added (afterward) with L</put> or
+L</insert> to be added to an insertion-order linked list.  You can then inspect or iterate them
+with related methods.  Note that each node can be tracked or un-tracked individually, and this
+setting just changes the default for new nodes.  This allows you to differentiate more permanent
+data points vs. temporary ones that you might want to expire over time.
+
+See also: L</oldest_node>, L</newest_node>, L</recent_count>, L</iter_newer>, L</iter_older>,
+L</truncate_recent>, and Node methods L</newer>, L</older>, L</mark_newest>,
+and L</recent_tracked>.
+
 =head2 key_type
 
 The key-storage strategy used by the tree.  Read-only; pass as an option to
@@ -309,6 +359,10 @@ version.
 =head2 size
 
 Returns the number of elements in the tree.
+
+=head2 recent_count
+
+Returns the number of nodes with insertion-order tracking enabled.  See L</track_recent>.
 
 =head2 root_node
 
@@ -334,6 +388,26 @@ Get the Nth node in the sequence from min to max.  N is a zero-based index.
 You may use negative numbers to count down form max.
 
 Alias: C<nth>
+
+=head2 oldest_node
+
+  $oldest= $tree->oldest_node;
+  $tree->oldest_node($node);
+
+The earliest node that was inserted with L</track_recent> enabled/applied.
+C<undef> if no nodes have insertion-order tracking.
+
+Alias: C<oldest>
+
+=head2 newest_node
+
+  $newest= $tree->newest_node;
+  $tree->newest_node($node);
+
+The most recent node that was inserted with L</track_recent> enabled/applied.
+C<undef> if no nodes have insertion-order tracking.
+
+Alias: C<newest>
 
 =head1 METHODS
 
@@ -423,6 +497,19 @@ If you want to delete a range *exclusive* of one or both ends of the range, just
 use the L</get_node> method with the desired mode to look up each end of the nodes
 that you do want removed.
 
+=head2 truncate_recent
+
+  my @nodes= $tree->truncate_recent($max_count);
+
+Reduce the number of "recent" nodes (those with insertion-order tracking enabled) to
+C<$max_count>.  (See L</track_recent>)  Every pruned node is returned as a list.
+
+The intent here is that you may have some "permanent" nodes that stay in the tree, but more
+transient ones that you add on demand, and then you might want to purge the oldest of those
+when they exceed a threshold.
+
+If there are fewer than C<$max_count> nodes with insertion-order tracking, this has no effect.
+
 =head2 clear
 
   my $count= $tree->clear();
@@ -443,6 +530,16 @@ or from the key or node you provide up to max.
 
 Like C<iter>, but the C<< ->next >> and C<< ->step >> methods walk backward to smaller key
 values, and the default C<$get_mode> is L</GET_LE_LAST>.
+
+=head2 iter_newer
+
+Return an iterator that iterates the insertion-order from oldest to newest.  This only iterates
+nodes with insertion-order tracking enabled.  See L</track_recent>.
+
+=head2 iter_older
+
+Return an iterator that iterates the insertion-order from newest to oldest.  This only iterates
+nodes with insertion-order tracking enabled.  See L</track_recent>.
 
 =head1 NODE OBJECTS
 
@@ -466,6 +563,34 @@ The previous node in the sequence of keys.  Alias C<predecessor> for C<Tree::RB:
 =item next
 
 The next node in the sequence of keys.  Alias C<successor> for C<Tree::RB::Node> compat.
+
+=item recent_tracked
+
+Returns whether node has its insertion order tracked, or not.  This attribute can also be
+written.  Disabling recent_tracked removes it from the list of insertion order.  Enabling
+recent_tracked causes the node to be placed as the newest inserted node, the same as
+L</mark_newest>.
+
+=item mark_newest
+
+Promote this node to the end of the insertion-order tracking list as if it has just been
+inserted.
+
+=item older
+
+  $older= $node->older;
+  $node->older($insert_before);
+
+The previous node in insertion-order.  Always C<undef> unless node is L</recent_tracked>.
+When written, it places that node before this node in the "recent" list.
+
+=item newer
+
+  $older= $node->newer;
+  $node->newer($insert_after);
+
+The next node in insertion-order.  Always C<undef> unless node is L</recent_tracked>.
+When written, it places that node after this node in the "recent" list.
 
 =item tree
 
@@ -529,6 +654,14 @@ Shortcut for C<< $node->tree->iter($node) >>.
 
 Shortcut for C<< $node->tree->rev_iter($node) >>.
 
+=item iter_newer
+
+Shortcut for C<< $node->tree->iter_old_to_new($node) >>.
+
+=item iter_older
+
+Shortcut for C<< $node->tree->iter_new_to_old($node) >>.
+
 =back
 
 =head1 ITERATOR OBJECTS
@@ -549,13 +682,17 @@ bit of a performance boost for large tree operations.
 
 =over
 
+=item node
+
+The current node.
+
 =item key
 
 The key of the current node.
 
 =item value
 
-The value of the current node.  Note that this returns the actual value, which in an aliased
+The value of the current node.  Note that this returns an lvalue, which in an aliased
 context allows you to modify the value stored in the tree.
 
   $_++ for $iter->value;
@@ -592,16 +729,16 @@ It will also return an empty list at the end of the sequence instead of returnin
 You can use the string C<'*'> for the count to indicate all the rest of the nodes in the
 sequence.
 
-=item next_keys
+=item next_key
 
 Same as C<next>, but return the keys of the nodes.
 
-=item next_values
+=item next_value
 
 Same as C<next>, but return the values of the nodes.  Like L</value>, these are also aliases,
 and can be modified.
 
-  $_++ for $iter->next_values('*');
+  $_++ for $iter->next_value('*');
 
 =item next_kv
 
@@ -676,7 +813,7 @@ to be the node at or after the C<$key>.  (or before, if you change to a reverse 
 This method differs from L<Tree::RB/hseek> in that C<Tree::RB> will change the logical first
 node of the iteration *indefinitely* such that repeated calls to C<keys> do not see any element
 less than C<$key>.  This C<hseek> only applies to the next iteration.  (which I'm guessing was
-th intent in Tree::RB?)
+the intent in Tree::RB?)
 
 =back
 
@@ -855,6 +992,30 @@ Has alias C<LUPREV> to match Tree::RB.
 The Red/Black module this one used as API inspiration.  The fastest pure-perl tree module on
 CPAN.  Implemented as blessed arrayrefs.
 
+The API of this module is almost a complete superset of C<Tree::RB> with a few differences:
+
+=over
+
+=item *
+
+The C<get> method in this module is not affected by array context, unless you
+request L</compat_list_get>.
+
+=item *
+
+C<resort> is not implemented (would be lots of effort, and unlikely to be needed)
+
+=item *
+
+Tree structure is not mutable via the attributes of Node, nor can nodes be created
+independent from a tree.
+
+=item *
+
+Many methods have official names changed, but aliases are provided for compatibility.
+
+=back
+
 =item L<AVLTree>
 
 Another XS-based tree module.  About 6%-70% slower than this one depending on whether you use
@@ -870,7 +1031,7 @@ However, it runs significantly slower than Tree::RB.
 
 =head1 VERSION
 
-version 0.07
+version 0.08
 
 =head1 AUTHOR
 
@@ -878,7 +1039,7 @@ Michael Conrad <mike@nrdvana.net>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2022 by Michael Conrad.
+This software is copyright (c) 2024 by Michael Conrad.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

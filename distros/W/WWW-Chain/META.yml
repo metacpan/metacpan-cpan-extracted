@@ -24,7 +24,7 @@ requires:
 resources:
   homepage: https://github.com/Getty/p5-www-chain
   repository: https://github.com/Getty/p5-www-chain.git
-version: '0.007'
+version: '0.100'
 x_Dist_Zilla:
   perl:
     version: '5.036000'
@@ -218,6 +218,10 @@ x_Dist_Zilla:
               name: '@GETTY/postlude'
               version: '4.019'
             -
+              class: Pod::Weaver::Section::Support
+              name: '@GETTY/Support'
+              version: '1.014'
+            -
               class: Pod::Weaver::Section::Bugs
               name: '@GETTY/Bugs'
               version: '4.019'
@@ -278,7 +282,7 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: '0.007'
+          tag: '0.100'
           tag_format: '%v'
           tag_message: v%V
         Dist::Zilla::Role::Git::Repo:

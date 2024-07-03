@@ -1,5 +1,10 @@
 Revision history for App-sdview
 
+0.15    2024-07-02
+        [CHANGES]
+         * Use the constraint checks from `Data::Checks` rather than
+           `Types::Standard`
+
 0.14    2023-12-13
         [CHANGES]
          * Handle non-breaking spaces in Markdown and Pod

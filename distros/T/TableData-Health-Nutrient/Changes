@@ -1,3 +1,11 @@
+0.005   2024-06-28  Released-By: PERLANCAR; Urgency: medium
+
+        - Add minerals: B, Mo, V (recognized in Indonesian BPOM supplement
+          regulation).
+
+        - Add nutrient: H2O (water) (mentioned in Indonesian Kemenkes RDA).
+
+
 0.004   2024-05-30  Released-By: PERLANCAR; Urgency: medium
 
         - [bugfix] Fix name of alpha-linolenic acid.

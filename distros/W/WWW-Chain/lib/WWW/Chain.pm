@@ -1,8 +1,7 @@
 package WWW::Chain;
 our $AUTHORITY = 'cpan:GETTY';
 # ABSTRACT: A web request chain
-$WWW::Chain::VERSION = '0.007';
-
+$WWW::Chain::VERSION = '0.100';
 use Moo;
 use MooX::Types::MooseLike::Base qw(:all);
 use Safe::Isa;
@@ -20,7 +19,6 @@ sub _build_stash {{}}
 has next_requests => (
   isa => ArrayRef,
   is => 'rwp',
-  lazy => 1,
   clearer => 1,
 );
 
@@ -124,7 +122,7 @@ sub BUILD {
   unless ($self->next_requests) {    
     die "".(ref $self)." has no start_chain function and no requests supplied on build" unless $self->can('start_chain');
     my ( $next_requests, $next_step, @others ) = $self->parse_chain($self->start_chain);
-    die "".(ref $self)."->__build_next_requests can't parse the start_chain return, more arguments after next step" if scalar @others > 0;
+    die "".(ref $self)." parse_chain can't parse the start_chain return, more arguments after next step" if scalar @others > 0;
     die "".(ref $self)." has no requests from start_chain" unless scalar @{$next_requests} > 0;
     $self->_set_next_step($next_step) if $next_step;
     $self->_set_next_requests($next_requests);
@@ -143,7 +141,7 @@ WWW::Chain - A web request chain
 
 =head1 VERSION
 
-version 0.007
+version 0.100
 
 =head1 SYNOPSIS
 
@@ -213,6 +211,22 @@ version 0.007
 =head1 DESCRIPTION
 
 More documentation to come, API stabilized.
+
+=cut
+
+=for :stopwords cpan testmatrix url bugtracker rt cpants kwalitee diff irc mailto metadata placeholders metacpan
+
+=head1 SUPPORT
+
+=head2 Source Code
+
+The code is open to the world, and available for you to hack on. Please feel free to browse it and play
+with it, or whatever. If you want to contribute patches, please send me a diff or prod me to pull
+from your repository :)
+
+L<https://github.com/Getty/p5-www-chain>
+
+  git clone https://github.com/Getty/p5-www-chain.git
 
 =head1 AUTHOR
 

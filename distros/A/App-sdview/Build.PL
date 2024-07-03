@@ -10,7 +10,7 @@ my $build = Module::Build->new(
       perl => '5.026',
       'Object::Pad' => '0.807',
       'Object::Pad::FieldAttr::Checked' => '0.04',
-      'Types::Standard' => 0,
+      'Data::Checks' => '0.05',
 
       'Config::Tiny' => 0,
       'Convert::Color' => 0,

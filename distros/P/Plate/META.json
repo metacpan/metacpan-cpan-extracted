@@ -4,7 +4,7 @@
       "Vernon Lyon <vlyon@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.017, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -34,17 +34,18 @@
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
-         "web" : "https://github.com/vlyon/plate/issues"
+         "web" : "https://github.com/vlyon/Plate/issues"
       },
-      "homepage" : "https://github.com/vlyon/plate",
+      "homepage" : "https://github.com/vlyon/Plate",
       "repository" : {
          "type" : "git",
-         "url" : "https://github.com/vlyon/plate.git",
-         "web" : "https://github.com/vlyon/plate"
+         "url" : "https://github.com/vlyon/Plate.git",
+         "web" : "https://github.com/vlyon/Plate"
       }
    },
-   "version" : "1.5",
-   "x_generated_by_perl" : "v5.28.1",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.26"
+   "version" : "1.6",
+   "x_generated_by_perl" : "v5.32.1",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.25",
+   "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"
 }
 

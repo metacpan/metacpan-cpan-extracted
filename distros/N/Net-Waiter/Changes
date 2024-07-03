@@ -1,6 +1,12 @@
 Revision history for Perl extension Net::Waiter
 
+1.13  2024-07-02
+
+    1. changed child CHLD signal default to IGNORE. whoever wants to fork 
+       further, should reinstall signal handler.
+
 1.12  2024-03-23
+
     1. added default SIGHUP handler
         
         fired in parent processes:

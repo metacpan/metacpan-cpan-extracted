@@ -10,19 +10,19 @@ BEGIN {
 
 TZ: {
 	SKIP: {
-		if($ENV{'TIMEZONEDB_KEY'}) {
+		if(my $key = $ENV{'TIMEZONEDB_KEY'}) {
 			eval {
 				require TimeZone::TimeZoneDB;
 			};
 			if($@) {
 				skip('TimeZone::TimeZoneDB not installed', 2);
 			} else {
-				import TimeZone::TimeZoneDB;
+				TimeZone::TimeZoneDB->import();
 				# Ramsgate
 				my $point = new_ok('Geo::Location::Point' => [
 					latitude => 51.34,
 					longitude => 1.42,
-					key => $ENV{'TIMEZONEDB_KEY'}
+					key => $key
 				]);
 
 				cmp_ok($point->tz(), 'eq', 'Europe/London', 'Ramsgate is in the UK timezone');

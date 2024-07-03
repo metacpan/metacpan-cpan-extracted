@@ -1344,10 +1344,8 @@ class R::OP::Double {
       die "The n-dimension array \$scalar_ndarray must be defined.";
     }
     
-    my $scalar_dim = $scalar_ndarray->dim;
-    
-    unless (@$scalar_dim == 1) {
-      die "The length of dim field of \$scalar_ndarray must be 1.";
+    unless ($scalar_ndarray->is_scalar) {
+      die "The n-dmension array \$scalar_ndarray must be a scalar.";
     }
     
     my $scalar_length = $scalar_ndarray->length;
@@ -1384,10 +1382,8 @@ class R::OP::Double {
       die "The n-dimension array \$scalar_ndarray must be defined.";
     }
     
-    my $scalar_dim = $scalar_ndarray->dim;
-    
-    unless (@$scalar_dim == 1) {
-      die "The length of dim field of \$scalar_ndarray must be 1.";
+    unless ($scalar_ndarray->is_scalar) {
+      die "The n-dmension array \$scalar_ndarray must be a scalar.";
     }
     
     my $scalar_length = $scalar_ndarray->length;

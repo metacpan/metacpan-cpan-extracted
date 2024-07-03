@@ -18,7 +18,7 @@ $SIG{__WARN__} = sub {
     goto &diag;
 };
 
-my $plate = new Plate;
+my $plate = Plate->new;
 
 my $sub = $plate->define(test => 'Test');
 is ref $sub, 'CODE', 'Plate::define returns a subroutine';

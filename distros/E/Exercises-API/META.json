@@ -1,0 +1,53 @@
+{
+   "abstract" : "API Ninja's Exercises API",
+   "author" : [
+      "Nobunaga <nobunaga@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.032, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "mit"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Exercises-API",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "JSON" : "0",
+            "LWP" : "0",
+            "Moose" : "0",
+            "Readonly" : "0",
+            "perl" : "v5.38.0",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/iamllcoolray/exercises-api.git",
+         "web" : "https://github.com/iamllcoolray/exercises-api"
+      }
+   },
+   "version" : "0.001",
+   "x_generated_by_perl" : "v5.38.2",
+   "x_serialization_backend" : "JSON::XS version 4.03",
+   "x_spdx_expression" : "MIT"
+}
+

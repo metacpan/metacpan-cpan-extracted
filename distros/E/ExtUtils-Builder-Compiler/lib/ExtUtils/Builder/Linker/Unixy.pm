@@ -1,5 +1,5 @@
 package ExtUtils::Builder::Linker::Unixy;
-$ExtUtils::Builder::Linker::Unixy::VERSION = '0.008';
+$ExtUtils::Builder::Linker::Unixy::VERSION = '0.009';
 use strict;
 use warnings;
 
@@ -28,7 +28,7 @@ ExtUtils::Builder::Linker::Unixy
 
 =head1 VERSION
 
-version 0.008
+version 0.009
 
 =head1 AUTHOR
 

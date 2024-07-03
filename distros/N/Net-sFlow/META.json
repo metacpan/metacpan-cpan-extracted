@@ -1,0 +1,83 @@
+{
+   "abstract" : "decode sFlow datagrams",
+   "author" : [
+      "Elisa Jasinska <elisa@bigwaveit.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v3.1.23",
+   "license" : [
+      "artistic_1"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Net-sFlow",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.035"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion::Fast" : "0.04",
+            "Test::PAUSE::Permissions" : "0.07",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Math::BigInt" : "2.003003",
+            "perl" : "5.008001"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.98"
+         }
+      }
+   },
+   "provides" : {
+      "Net::sFlow" : {
+         "file" : "lib/Net/sFlow.pm",
+         "version" : "0.13"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/fooelisa/perl-net-sflow/issues"
+      },
+      "homepage" : "https://github.com/fooelisa/perl-net-sflow",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/fooelisa/perl-net-sflow.git",
+         "web" : "https://github.com/fooelisa/perl-net-sflow"
+      }
+   },
+   "version" : "0.13",
+   "x_contributors" : [
+      "Andrew Feren <acferen@gmail.com>",
+      "Elisa Jasinska <elisa@jasinska.de>",
+      "Elisa Jasinska <“elisa@jasinska.de”>",
+      "Ryan Rawdon <ryarawdo@publicisgroupe.net>",
+      "elisa <elisa@f0c0b545-b121-db11-b787-00e081619514>"
+   ],
+   "x_serialization_backend" : "JSON::PP version 4.06",
+   "x_static_install" : 1
+}

@@ -62,26 +62,96 @@ class R::Util {
     return $normalized_dim;
   }
   
-  static method drop_dim : int[] ($dim : int[]) {
+  static method drop_dim : int[] ($dim : int[], $index : int = -1) {
     
     unless ($dim) {
       die "The definsion \$dim must be defined.";
     }
     
+    my $dim_length = @$dim;
+    
     unless (@$dim > 0) {
       die "The length of the dimension \$dim must be greater than 0.";
     }
     
+    unless ($index < $dim_length) {
+      die "The index \$index must be less than the length of the dimension \$dim.";
+    }
+    
     my $dropped_dim_list = IntList->new;
+    
+    my $drop_all = 0;
+    if ($index < 0) {
+      $drop_all = 1;
+    }
     
     for (my $i = 0; $i < @$dim; $i++) {
       my $dim_elem = $dim->[$i];
-      unless ($dim_elem == 1) {
-        $dropped_dim_list->push($dim_elem);
+      
+      if ($dim_elem == 1) {
+        if ($drop_all) {
+          # Do not push
+        }
+        elsif ($i == $index) {
+          # Do not push
+        }
+        else {
+          $dropped_dim_list->push($dim_elem);
+        }
+      }
+      else {
+        if ($i == $index) {
+          die "The element of the dimension \$dim at index $i must be 1.";
+        }
+        else {
+          $dropped_dim_list->push($dim_elem);
+        }
       }
     }
     
     if ($dropped_dim_list->length == 0) {
+      $dropped_dim_list->push(1);
+    }
+    
+    my $dropped_dim = $dropped_dim_list->to_array;
+    
+    return $dropped_dim;
+  }
+  
+  static method expand_dim : int[] ($dim : int[], $index : int = -1) {
+    
+    unless ($dim) {
+      die "The definsion \$dim must be defined.";
+    }
+    
+    my $dim_length = @$dim;
+    
+    unless (@$dim > 0) {
+      die "The length of the dimension \$dim must be greater than 0.";
+    }
+    
+    unless ($index <= $dim_length) {
+      die "The index \$index must be less than or equal to the length of the dimension \$dim.";
+    }
+    
+    my $dropped_dim_list = IntList->new;
+    
+    my $push_to_last = 0;
+    if ($index < 0) {
+      $push_to_last = 1;
+    }
+    
+    for (my $i = 0; $i < @$dim; $i++) {
+      my $dim_elem = $dim->[$i];
+      
+      if ($i == $index) {
+        $dropped_dim_list->push(1);
+      }
+      
+      $dropped_dim_list->push($dim_elem);
+    }
+    
+    if ($push_to_last || $index == $dim_length) {
       $dropped_dim_list->push(1);
     }
     
@@ -234,4 +304,14 @@ class R::Util {
     
     return $elem_type_name;
   }
+  
+  static method new_proto : object ($proto : object, $options : object[]) {
+    
+    my $class_name = type_name $proto;
+    
+    my $object = (R::NDArray)Native::MethodCall->call_class_method($class_name, "new", [(object)$options]);
+    
+    return $object;
+  }
+  
 }

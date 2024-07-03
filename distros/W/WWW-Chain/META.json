@@ -50,7 +50,7 @@
          "web" : "https://github.com/Getty/p5-www-chain"
       }
    },
-   "version" : "0.007",
+   "version" : "0.100",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.036000"
@@ -295,6 +295,11 @@
                         "version" : "4.019"
                      },
                      {
+                        "class" : "Pod::Weaver::Section::Support",
+                        "name" : "@GETTY/Support",
+                        "version" : "1.014"
+                     },
+                     {
                         "class" : "Pod::Weaver::Section::Bugs",
                         "name" : "@GETTY/Bugs",
                         "version" : "4.019"
@@ -376,7 +381,7 @@
                   "branch" : null,
                   "changelog" : "Changes",
                   "signed" : 0,
-                  "tag" : "0.007",
+                  "tag" : "0.100",
                   "tag_format" : "%v",
                   "tag_message" : "v%V"
                },
@@ -469,7 +474,7 @@
    },
    "x_authority" : "cpan:GETTY",
    "x_generated_by_perl" : "v5.36.0",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.36",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.38",
    "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"
 }
 

@@ -1,7 +1,7 @@
 package WWW::Chain::UA::LWP;
 our $AUTHORITY = 'cpan:GETTY';
 # ABSTRACT: Using LWP::UserAgent to execute WWW::Chain chains
-$WWW::Chain::UA::LWP::VERSION = '0.007';
+$WWW::Chain::UA::LWP::VERSION = '0.100';
 use Moo;
 extends 'LWP::UserAgent';
 
@@ -39,7 +39,21 @@ WWW::Chain::UA::LWP - Using LWP::UserAgent to execute WWW::Chain chains
 
 =head1 VERSION
 
-version 0.007
+version 0.100
+
+=for :stopwords cpan testmatrix url bugtracker rt cpants kwalitee diff irc mailto metadata placeholders metacpan
+
+=head1 SUPPORT
+
+=head2 Source Code
+
+The code is open to the world, and available for you to hack on. Please feel free to browse it and play
+with it, or whatever. If you want to contribute patches, please send me a diff or prod me to pull
+from your repository :)
+
+L<https://github.com/Getty/p5-www-chain>
+
+  git clone https://github.com/Getty/p5-www-chain.git
 
 =head1 AUTHOR
 

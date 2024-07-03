@@ -1,5 +1,8 @@
 Revision history for ExtUtils-Builder-Compiler
 
+0.009     2024-07-02 19:10:19+02:00 Europe/Brussels
+          - Eliminate references to no longer existing _libraries method
+
 0.008     2024-06-28 12:36:56+02:00 Europe/Brussels
           - Simplify libperl linking logic on Windows
 

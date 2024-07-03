@@ -1,10 +1,12 @@
+Build.PL
 CHANGES
-INSTALL
 LICENSE
+META.json
+Readme.md
+cpanfile
+lib/Net/sFlow.pm
+minil.toml
+script/sFluxDebug.pl
+t/00_compile.t
+META.yml
 MANIFEST
-Makefile.PL
-README
-examples/sFluxDebug.pl
-sFlow.pm
-test.pl
-META.yml                                 Module meta-data (added by MakeMaker)

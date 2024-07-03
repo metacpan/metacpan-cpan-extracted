@@ -1,0 +1,28 @@
+---
+abstract: 'Running system commands in a Tk::Text widget.'
+author:
+  - 'Hans Jeuken <hanje at cpan dot org>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Tk-Terminal
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  IO::Handle: '1.52'
+  Test::Tk: '3.03'
+  Tk: '804.031'
+  Tk::TextANSIColor: '0.16'
+resources:
+  repository: git://github.com/haje61/Tk-Terminal.git
+version: '0.01'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

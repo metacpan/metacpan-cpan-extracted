@@ -1,10 +1,45 @@
-# http://module-build.sourceforge.net/META-spec.html
-#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
-name:         Net-sFlow
-version:      0.11
-version_from: sFlow.pm
-installdirs:  site
+---
+abstract: 'decode sFlow datagrams'
+author:
+  - 'Elisa Jasinska <elisa@bigwaveit.org>'
+build_requires:
+  Test::More: '0.98'
+configure_requires:
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v3.1.23, CPAN::Meta::Converter version 2.150010'
+license: artistic
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Net-sFlow
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Net::sFlow:
+    file: lib/Net/sFlow.pm
+    version: '0.13'
 requires:
-
-distribution_type: module
-generated_by: ExtUtils::MakeMaker version 6.30_01
+  Math::BigInt: '2.003003'
+  perl: '5.008001'
+resources:
+  bugtracker: https://github.com/fooelisa/perl-net-sflow/issues
+  homepage: https://github.com/fooelisa/perl-net-sflow
+  repository: https://github.com/fooelisa/perl-net-sflow.git
+version: '0.13'
+x_contributors:
+  - 'Andrew Feren <acferen@gmail.com>'
+  - 'Elisa Jasinska <elisa@jasinska.de>'
+  - 'Elisa Jasinska <“elisa@jasinska.de”>'
+  - 'Ryan Rawdon <ryarawdo@publicisgroupe.net>'
+  - 'elisa <elisa@f0c0b545-b121-db11-b787-00e081619514>'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+x_static_install: 1

@@ -12,8 +12,8 @@ SYNOPSIS
             auto_filter => 'trim',
         );
         
-        $plate->filter(html => \&HTML::Escape::escape_html);
-        $plate->filter(trim => sub { $_[0] =~ s/^\s+|\s+$//gr });
+        $plate->set(filters => { html => \&HTML::Escape::escape_html });
+        $plate->set(filters => { trim => sub { $_[0] =~ s/^\s+|\s+$//gr } });
         
         # Render /path/to/plate/files/hello.plate cached as /tmp/cache/hello.pl
         my $output = $plate->serve('hello');
@@ -71,7 +71,7 @@ DESCRIPTION
 
         use Plate;
         
-        my $plate = new Plate;
+        my $plate = Plate->new;
         my $output = $plate->serve('job');
 
  Markup
@@ -335,18 +335,33 @@ SUBROUTINES/METHODS
  does_exist
 
         my $exists = $plate->does_exist($template_name);
+        
+        % my $exists = Plate::does_exist($template_name);
 
     Returns true if a template by that name is cached or exists on the
-    filesystem. No attempt will be made to compile the template.
+    filesystem. No attempt will be made to compile the template. The second
+    invocation only works from within a template.
 
  can_serve
 
         my $ok = $plate->can_serve($template);
+        
+        % my $ok = Plate::can_serve($template);
 
     Returns true if the template can be served (compiles successfully),
     otherwise it sets $@ to the reason for failure. If $template is a
     string then it is the name of a template to compile. If $template is a
-    SCALAR ref then it is the contents of a template to be compiled.
+    SCALAR ref then it is the contents of a template to be compiled. The
+    second invocation only works from within a template.
+
+ filter
+
+        $text = $plate->filter($text, 'html', 'bold');
+        
+        % $text = Plate::filter($text, 'trim');
+
+    Filters the text using the named filters and returns the result. The
+    second invocation only works from within a template.
 
  set
 

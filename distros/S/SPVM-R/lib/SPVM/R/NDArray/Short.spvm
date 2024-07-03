@@ -45,8 +45,8 @@ class R::NDArray::Short extends R::NDArray {
     return $data;
   }
   
-  method clone : R::NDArray::Short () {
-    return (R::NDArray::Short)$self->SUPER::clone;
+  method clone : R::NDArray::Short ($elem_shallow_clone : int = 0) {
+    return (R::NDArray::Short)$self->SUPER::clone($elem_shallow_clone);
   }
   
   method elem_to_string : string ($data_index : int) {
@@ -89,7 +89,8 @@ class R::NDArray::Short extends R::NDArray {
     my $data = $self->data;
     my $ret_data = new short[$data_indexes_length];
     for (my $i = 0; $i < $data_indexes_length; $i++) {
-      $ret_data->(short[])->[$i] = $data->(short[])->[$i];
+      my $data_index = $data_indexes->[$i];
+      $ret_data->(short[])->[$i] = $data->(short[])->[$data_index];
     }
     
     return $ret_data;
@@ -109,6 +110,14 @@ class R::NDArray::Short extends R::NDArray {
       $self_data->(short[])->[$i] = $data->(short[])->[$data_index];
       $data_index++;
     }
+  }
+  
+  method slice : R::NDArray::Short ($vector_indexes : R::NDArray::Int[]) {
+    return (R::NDArray::Short)$self->SUPER::slice($vector_indexes);
+  }
+  
+  method slice_set : void ($vector_indexes : R::NDArray::Int[], $ndarray : R::NDArray::Short) {
+    $self->SUPER::slice_set($vector_indexes, $ndarray);
   }
   
 }

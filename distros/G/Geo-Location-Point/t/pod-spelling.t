@@ -27,4 +27,5 @@ RT
 attr
 lat
 licence
+lng
 tz

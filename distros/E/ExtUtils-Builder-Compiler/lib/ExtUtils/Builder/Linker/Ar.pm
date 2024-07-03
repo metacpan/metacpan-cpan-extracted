@@ -1,5 +1,5 @@
 package ExtUtils::Builder::Linker::Ar;
-$ExtUtils::Builder::Linker::Ar::VERSION = '0.008';
+$ExtUtils::Builder::Linker::Ar::VERSION = '0.009';
 use strict;
 use warnings;
 
@@ -19,7 +19,6 @@ sub _init {
 sub add_libraries {
 	my ($self, $libs, %opts) = @_;
 	Carp::croak 'Can\'t add libraries to static link yet' if @{$libs};
-	push @{ $self->_libraries }, @{$libs};
 	return;
 };
 
@@ -46,7 +45,7 @@ ExtUtils::Builder::Linker::Ar
 
 =head1 VERSION
 
-version 0.008
+version 0.009
 
 =head1 AUTHOR
 

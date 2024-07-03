@@ -1,6 +1,6 @@
 ---
 name: QQ-weixin-work
-version: '0.10'
+version: '0.12'
 author:
   - 'yourself <admz@mail.scuec.edu.cn>'
 abstract: 'QQ::weixin::work - api for 腾讯企业微信'
@@ -160,6 +160,9 @@ provides:
   QQ::weixin::work::wedoc::document:
     file: lib/QQ/weixin/work/wedoc/document.pm
     version: 0.10
+  QQ::weixin::work::wedoc::smartsheet:
+    file: lib/QQ/weixin/work/wedoc/smartsheet.pm
+    version: 0.12
   QQ::weixin::work::wedoc::spreadsheet:
     file: lib/QQ/weixin/work/wedoc/spreadsheet.pm
     version: 0.10

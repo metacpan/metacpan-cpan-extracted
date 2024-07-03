@@ -1,5 +1,5 @@
 package ExtUtils::Builder::Linker::ELF::Any;
-$ExtUtils::Builder::Linker::ELF::Any::VERSION = '0.008';
+$ExtUtils::Builder::Linker::ELF::Any::VERSION = '0.009';
 use strict;
 use warnings;
 
@@ -46,7 +46,7 @@ ExtUtils::Builder::Linker::ELF::Any
 
 =head1 VERSION
 
-version 0.008
+version 0.009
 
 =head1 AUTHOR
 

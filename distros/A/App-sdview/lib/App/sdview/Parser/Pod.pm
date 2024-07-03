@@ -8,7 +8,7 @@ use warnings;
 
 use Object::Pad 0.807;
 
-package App::sdview::Parser::Pod 0.14;
+package App::sdview::Parser::Pod 0.15;
 class App::sdview::Parser::Pod :strict(params);
 
 inherit Pod::Simple;

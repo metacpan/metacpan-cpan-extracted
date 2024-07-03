@@ -8,7 +8,7 @@ configure_requires:
   Module::Build::Tiny: '0.034'
   perl: '5.020'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Zilla version 6.017, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -17,9 +17,10 @@ name: Plate
 requires:
   perl: '5.020'
 resources:
-  bugtracker: https://github.com/vlyon/plate/issues
-  homepage: https://github.com/vlyon/plate
-  repository: https://github.com/vlyon/plate.git
-version: '1.5'
-x_generated_by_perl: v5.28.1
+  bugtracker: https://github.com/vlyon/Plate/issues
+  homepage: https://github.com/vlyon/Plate
+  repository: https://github.com/vlyon/Plate.git
+version: '1.6'
+x_generated_by_perl: v5.32.1
 x_serialization_backend: 'YAML::Tiny version 1.73'
+x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

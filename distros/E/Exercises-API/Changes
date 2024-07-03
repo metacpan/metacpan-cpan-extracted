@@ -1,0 +1,5 @@
+Revision history for Exercises-API
+
+0.001     2024-07-02 13:49:11-06:00 America/Denver
+
+    - Initial release of the Exercises::API wrapper module.

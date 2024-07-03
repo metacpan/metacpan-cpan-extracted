@@ -2,15 +2,15 @@ NAME
     Acme::CPANModules::SmartMatch - List of modules to do smart matching
 
 VERSION
-    This document describes version 0.003 of Acme::CPANModules::SmartMatch
+    This document describes version 0.005 of Acme::CPANModules::SmartMatch
     (from Perl distribution Acme-CPANModules-SmartMatch), released on
-    2023-11-05.
+    2024-07-01.
 
 DESCRIPTION
     About smart match
 
     Smart matching, via the operator "~~", was introduced in perl 5.10
-    (released 2007). It's probably inspired by Perl 6 (now called Raku)'s
+    (released 2007). It's inspired by Perl 6 (now called Raku)'s
     "given/when" and/or Ruby's "case" and "===" operator that can "do the
     right/smart thing" in a "case" statement. Smart matching was indeed
     introduced along the new "switch" in perl 5.10.
@@ -57,37 +57,67 @@ DESCRIPTION
     the warning with "use experimental 'smartmatch'" and must replace the
     use of smart match with something else.
 
-    Perl 5.40 (planned 2024) will remove smart match, resulting in a syntax
+    Perl 5.40 (2024) finally removes smart match, resulting in a syntax
     error if you still use it.
 
     Modules
 
     However, if you still miss smart matching, some modules have been
-    written to give you somewhat similar feature.
+    written to give you the same/similar feature.
 
-    match::smart (as "|M|" operator or as function "match") gives you a
-    similar behaviour to perl's own "~~".
+    match::smart (by TOBYINK, first released 2013, pure-perl) gives you a
+    similar behaviour to perl's own "~~". It can be used as the "|M|"
+    operator or as the match() function.
 
-    match::simple, also by the author of "match::smart", offers a simplified
-    version of smart matching. Still it has 8 kinds of behavior depending on
-    the /right/ hand side.
+    Switch::Back (by DCONWAY, first released in June 2024, pure-perl).
+    Written by one of the designers of Perl 6, Switch::Back offers roughly
+    the same feature set as the old "switch" and smartmatching. Although
+    there's no longer "~~", just the smartmatch() function. So basically
+    what match::smart offers, but 11 years later.
+
+    match::simple (by TOBYINK which is also the author of "match::smart",
+    first released in 2013, in the same distribution as "match::smart",
+    available in XS as well as pure-perl) offers a simplified version of
+    smart matching. It has 8 kinds of behaviors depending only on the
+    /right/ hand side.
 
     Also see match::simple::sugar which gives you "when", "then", and
     "numeric" for use in a for() statement as a switch/use alternative.
 
-    Smart::Match offers a bunch of functions related to matching. Probably
-    too low-level to use if you just want a smart match replacement.
+    Switch::Right (by DCONWAY, first released in June 2024, pure-perl). Also
+    like TOBYINK with his duo of "match::smart" and "match::simple", DCONWAY
+    offers a companion to "Switch::Back", a simplified/reimagined version of
+    "switch" and smartmatching by simplifying the rules from 23 to just 6.
+    The rules still depend on a mix of left and right operands.
+
+    Personal take
+
+    I personally haven't used "switch" all that much in Perl, though I used
+    to use quite a bit of smartmatching in the 2010s, mostly the "SCALAR ~~
+    ARRAY-OF-SCALARS" variant. I won't use "match::smart" or "Switch::Back"
+    in any practical code, but which between "match::simple" and
+    "Switch::Right" are the best compromise? I guess we'll have to see. In
+    the mean time, see my benchmark in Bencher::ScenarioBundle::SmartMatch.
+
+    Other modules
+
+    Smart::Match (by LEONT, first released in 2011, pure-perl) offers a
+    bunch of functions related to matching. Probably too low-level to use if
+    you just want a smart match replacement.
 
 ACME::CPANMODULES ENTRIES
     match::smart
         Author: TOBYINK <https://metacpan.org/author/TOBYINK>
 
+    Switch::Back
     match::simple
         Author: TOBYINK <https://metacpan.org/author/TOBYINK>
 
     match::simple::sugar
         Author: TOBYINK <https://metacpan.org/author/TOBYINK>
 
+    Switch::Right
+    Bencher::ScenarioBundle::SmartMatch
     Smart::Match
         Author: LEONT <https://metacpan.org/author/LEONT>
 
@@ -133,6 +163,8 @@ SOURCE
     <https://github.com/perlancar/perl-Acme-CPANModules-SmartMatch>.
 
 SEE ALSO
+    Bencher::ScenarioBundle::SmartMatch
+
     Acme::CPANModules - about the Acme::CPANModules namespace
 
     cpanmodules - CLI tool to let you browse/view the lists
@@ -157,7 +189,8 @@ CONTRIBUTING
     required beyond that are considered a bug and can be reported to me.
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2023 by perlancar <perlancar@cpan.org>.
+    This software is copyright (c) 2024, 2023 by perlancar
+    <perlancar@cpan.org>.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.

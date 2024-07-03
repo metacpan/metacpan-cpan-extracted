@@ -295,7 +295,29 @@ our $data = [
         category => 'mineral',
         default_unit => 'mcg',
     },
+    {
+        symbol => 'B',
+        eng_name => 'Boron',
+        ind_name => 'Boron',
+        category => 'mineral',
+        default_unit => 'mg',
+    },
+    {
+        symbol => 'Mo',
+        eng_name => 'Molybdenum',
+        ind_name => 'Molibdenum',
+        category => 'mineral',
+        default_unit => 'mcg',
+    },
+    {
+        symbol => 'V',
+        eng_name => 'Vanadium',
+        ind_name => 'Vanadium',
+        category => 'mineral',
+        default_unit => 'mcg',
+    },
 
+    # other
     {
         symbol => 'Energy',
         eng_name => 'Energy',
@@ -387,6 +409,14 @@ our $data = [
         category => 'sugar',
         default_unit => 'mg',
     },
+    {
+        symbol => 'H2O',
+        aliases => 'Water',
+        eng_name => 'Water',
+        ind_name => 'Air',
+        category => 'other',
+        default_unit => 'ml',
+    },
 ];
 
 around new => sub {
@@ -437,11 +467,11 @@ sub get_table_def {
 }
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2024-05-30'; # DATE
+our $DATE = '2024-06-28'; # DATE
 our $DIST = 'TableData-Health-Nutrient'; # DIST
-our $VERSION = '0.004'; # VERSION
+our $VERSION = '0.005'; # VERSION
 
-our %STATS = ("num_rows",41,"num_columns",13); # STATS
+our %STATS = ("num_columns",13,"num_rows",45); # STATS
 
 1;
 # ABSTRACT: Nutrients
@@ -458,7 +488,7 @@ TableDataRole::Health::Nutrient0 - Nutrients
 
 =head1 VERSION
 
-This document describes version 0.004 of TableDataRole::Health::Nutrient0 (from Perl distribution TableData-Health-Nutrient), released on 2024-05-30.
+This document describes version 0.005 of TableDataRole::Health::Nutrient0 (from Perl distribution TableData-Health-Nutrient), released on 2024-06-28.
 
 =head1 SYNOPSIS
 
@@ -496,7 +526,7 @@ See the L<tabledata> CLI's documentation for other available actions and options
  | key         | value |
  +-------------+-------+
  | num_columns | 13    |
- | num_rows    | 41    |
+ | num_rows    | 45    |
  +-------------+-------+
 
 The statistics is available in the C<%STATS> package variable.

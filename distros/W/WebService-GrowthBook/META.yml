@@ -1,0 +1,81 @@
+---
+abstract: ...
+author:
+  - 'DERIV <DERIV@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  File::Spec: '0'
+  FindBin: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  Log::Any::Test: '0'
+  Path::Tiny: '0'
+  Test::CheckDeps: '0.010'
+  Test::Exception: '0'
+  Test::MockModule: '0'
+  Test::MockTime: '0'
+  Test::More: '0.98'
+  perl: '5.006'
+configure_requires:
+  ExtUtils::MakeMaker: '7.64'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.029, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: WebService-GrowthBook
+no_index:
+  directory:
+    - eg
+    - share
+    - shares
+    - t
+    - xt
+provides:
+  WebService::GrowthBook:
+    file: lib/WebService/GrowthBook.pm
+    version: '0.001'
+  WebService::GrowthBook::AbstractFeatureCache:
+    file: lib/WebService/GrowthBook/AbstractFeatureCache.pm
+    version: '0.001'
+  WebService::GrowthBook::CacheEntry:
+    file: lib/WebService/GrowthBook/CacheEntry.pm
+    version: '0.001'
+  WebService::GrowthBook::Feature:
+    file: lib/WebService/GrowthBook/Feature.pm
+    version: '0.001'
+  WebService::GrowthBook::FeatureRepository:
+    file: lib/WebService/GrowthBook/FeatureRepository.pm
+    version: '0.001'
+  WebService::GrowthBook::FeatureResult:
+    file: lib/WebService/GrowthBook/FeatureResult.pm
+    version: '0.001'
+  WebService::GrowthBook::InMemoryFeatureCache:
+    file: lib/WebService/GrowthBook/InMemoryFeatureCache.pm
+    version: '0.001'
+requires:
+  Digest::MD5: '0'
+  HTTP::Tiny: '0'
+  JSON::MaybeUTF8: '0'
+  Log::Any: '0'
+  Object::Pad: '0.805'
+  Scalar::Util: '0'
+  Syntax::Keyword::Try: '0'
+  feature: '0'
+  indirect: '0.37'
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/chylli-deriv/perl-WebService-GrowthBook/issues
+  homepage: https://github.com/chylli-deriv/perl-WebService-GrowthBook
+  repository: https://github.com/chylli-deriv/perl-WebService-GrowthBook.git
+version: '0.001'
+x_authority: cpan:DERIV
+x_contributors:
+  - 'chylli-deriv <chylli@deriv.com>'
+  - 'mukesh-deriv <85932084+mukesh-deriv@users.noreply.github.com>'
+  - 'chylli-deriv <52912308+chylli-deriv@users.noreply.github.com>'
+x_generated_by_perl: v5.26.2
+x_serialization_backend: 'YAML::Tiny version 1.73'
+x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

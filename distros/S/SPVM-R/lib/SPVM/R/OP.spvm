@@ -66,9 +66,7 @@ class R::OP {
     
     my $ret_length = $x_length * $times;
     
-    my $ndarray_class_name = type_name $x_ndarray;
-    
-    my $ret_ndarray = R::NDArray->new_with_class_name($ndarray_class_name, {data => undef, dim => [$ret_length]});
+    my $ret_ndarray = (R::NDArray)R::Util->new_proto($x_ndarray, {data => undef, dim => [$ret_length]});
     
     my $x_data = $x_ndarray->data;
     my $ret_data = $ret_ndarray->data;
@@ -107,9 +105,7 @@ class R::OP {
     
     my $x_length = $x_ndarray->length;
     
-    my $ndarray_class_name = type_name $x_ndarray;
-    
-    my $ret_ndarray = R::NDArray->new_with_class_name($ndarray_class_name, {data => undef, dim => [$length]});
+    my $ret_ndarray = (R::NDArray)R::Util->new_proto($x_ndarray, {data => undef, dim => [$length]});
     
     my $x_data = $x_ndarray->data;
     my $ret_data = $ret_ndarray->data;
@@ -167,9 +163,7 @@ class R::OP {
     
     my $ret_column = $x_column + $y_column;
     
-    my $ndarray_class_name = type_name $x_ndarray;
-    
-    my $ret_ndarray = R::NDArray->new_with_class_name($ndarray_class_name, {data => undef, dim => [$ret_row, $ret_column]});
+    my $ret_ndarray = (R::NDArray)R::Util->new_proto($x_ndarray, {data => undef, dim => [$ret_row, $ret_column]});
     
     my $ret_data = $ret_ndarray->data;
     
@@ -230,9 +224,7 @@ class R::OP {
     
     my $ret_column = $x_column;
     
-    my $ndarray_class_name = type_name $x_ndarray;
-    
-    my $ret_ndarray = R::NDArray->new_with_class_name($ndarray_class_name, {data => undef, dim => [$ret_row, $ret_column]});
+    my $ret_ndarray = (R::NDArray)R::Util->new_proto($x_ndarray, {data => undef, dim => [$ret_row, $ret_column]});
     
     my $ret_data = $ret_ndarray->data;
     

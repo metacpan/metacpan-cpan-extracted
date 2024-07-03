@@ -1,0 +1,61 @@
+---
+abstract: 'NYTProf, in your Dancer2 application!'
+author:
+  - 'Ruth Holloway <ruth@hiruthie.me>'
+build_requires:
+  File::Spec: '0'
+  File::Temp: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  Test2::V0: '0'
+  Test::More: '0.94'
+  ok: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: '0'
+generated_by: 'Dist::Zilla version 6.030, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Dancer2-Plugin-NYTProf
+provides:
+  Dancer2::Plugin::NYTProf:
+    file: lib/Dancer2/Plugin/NYTProf.pm
+    version: '0.0100'
+requires:
+  Dancer2::FileUtils: '0'
+  Dancer2::Plugin: '0'
+  Devel::NYTProf: '0'
+  Devel::NYTProf::Data: '0'
+  File::Which: '0'
+  File::stat: '0'
+version: '0.0100'
+x_BuiltWith:
+  modules:
+    Dancer2::FileUtils: '0.400001'
+    Dancer2::Plugin: '0.400001'
+    Devel::NYTProf: '6.14'
+    Devel::NYTProf::Data: '6.14'
+    ExtUtils::MakeMaker: '7.62'
+    File::Spec: '3.80'
+    File::Temp: '0.2311'
+    File::Which: '1.27'
+    File::stat: '1.09'
+    IO::Handle: '1.46'
+    IPC::Open3: '1.21'
+    Test2::V0: '0.000155'
+    Test::More: '1.302183'
+    ok: '1.302183'
+  perl:
+    original: v5.34.1
+    qv: 1
+    version:
+      - 5
+      - 34
+      - 1
+  platform: linux
+x_authority: cpan:GEEKRUTH
+x_generated_by_perl: v5.34.1
+x_serialization_backend: 'YAML::Tiny version 1.74'
+x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

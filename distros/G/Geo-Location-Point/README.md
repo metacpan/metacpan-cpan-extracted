@@ -4,11 +4,11 @@ Geo::Location::Point - Location information
 
 # VERSION
 
-Version 0.11
+Version 0.12
 
 # SYNOPSIS
 
-Geo::Location::Point stores a place.
+Geo::Location::Point stores a place/location by latitude and longitude
 
     use Geo::Location::Point;
 
@@ -35,6 +35,10 @@ Synonym for lat().
 
     print 'Latitude: ', $location->lat(), "\n";
     print 'Longitude: ', $location->long(), "\n";
+
+## lng
+
+Synonym for long().
 
 ## longitude
 
@@ -74,6 +78,12 @@ Synonym for tz().
 
 Prints the object in human-readable format.
 
+## as\_uri
+
+Prints the object as a URI string.
+See [https://en.wikipedia.org/wiki/Geo\_URI\_scheme](https://en.wikipedia.org/wiki/Geo_URI_scheme).
+Arguably it should return a [URI](https://metacpan.org/pod/URI) object instead.
+
 ## attr
 
 Get/set location attributes, e.g. city
@@ -82,9 +92,6 @@ Get/set location attributes, e.g. city
     $location->country('UK');
     print $location->as_string(), "\n";
     print "$location\n";        # Calls as_string
-
-Because of the way that the cache works, the location() value is cleared by this, so
-you may wish to manually all location() afterwards to set the value.
 
 # AUTHOR
 
@@ -103,7 +110,7 @@ it under the same terms as Perl itself.
 
 # LICENSE AND COPYRIGHT
 
-Copyright 2019-2023 Nigel Horne.
+Copyright 2019-2024 Nigel Horne.
 
 The program code is released under the following licence: GPL2 for personal use on a single computer.
 All other users (including Commercial, Charity, Educational, Government)

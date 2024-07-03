@@ -1,0 +1,32 @@
+---
+abstract: 'Send data between processes without blocking.'
+author:
+  - 'Chad Granum <exodist@cpan.org>'
+build_requires:
+  Test2::V0: '0.000127'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.032, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Consumer-NonBlock
+requires:
+  Carp: '0'
+  Fcntl: '0'
+  File::Path: '0'
+  File::Spec: '0'
+  File::Temp: '0'
+  IO::Handle: '1.27'
+  Object::HashBase: '0'
+  Time::HiRes: '0'
+  perl: '5.010000'
+resources:
+  bugtracker: https://github.com/exodist/Consumer-NonBlock/issues
+  repository: https://github.com/exodist/Consumer-NonBlock/
+version: '0.002'
+x_generated_by_perl: v5.40.0
+x_serialization_backend: 'YAML::Tiny version 1.74'
+x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

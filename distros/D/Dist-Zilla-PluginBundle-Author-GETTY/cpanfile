@@ -4,7 +4,6 @@ requires 'Dist::Zilla', '4.300030';
 requires 'Dist::Zilla::Plugin::Alien', '0.011';
 requires 'Dist::Zilla::Plugin::Authority', '1.006';
 requires 'Dist::Zilla::PluginBundle::Git', '2.009';
-requires 'Dist::Zilla::Plugin::ChangelogFromGit', '0.006';
 requires 'Dist::Zilla::Plugin::Deprecated', '0.007';
 requires 'Dist::Zilla::Plugin::Git::CheckFor::CorrectBranch', '0.006';
 requires 'Dist::Zilla::Plugin::GithubMeta', '0.28';
@@ -19,6 +18,7 @@ requires 'Dist::Zilla::Plugin::TaskWeaver', '0.101624';
 requires 'Pod::Elemental', '0.102362';
 requires 'Pod::Elemental::Transformer::List', '0.101620';
 requires 'Pod::Weaver', '3.101638';
+requires 'Pod::Weaver::Section::Support', '1.014';
 
 on test => sub {
   requires 'Test::More', '0.96';

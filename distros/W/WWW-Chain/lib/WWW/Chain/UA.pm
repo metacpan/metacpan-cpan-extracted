@@ -1,7 +1,7 @@
 package WWW::Chain::UA;
 our $AUTHORITY = 'cpan:GETTY';
 # ABSTRACT: Role for classes which have a request_chain function for a WWW::Chain object
-$WWW::Chain::UA::VERSION = '0.007';
+$WWW::Chain::UA::VERSION = '0.100';
 use Moo::Role;
 
 requires qw( request_chain );
@@ -18,7 +18,21 @@ WWW::Chain::UA - Role for classes which have a request_chain function for a WWW:
 
 =head1 VERSION
 
-version 0.007
+version 0.100
+
+=for :stopwords cpan testmatrix url bugtracker rt cpants kwalitee diff irc mailto metadata placeholders metacpan
+
+=head1 SUPPORT
+
+=head2 Source Code
+
+The code is open to the world, and available for you to hack on. Please feel free to browse it and play
+with it, or whatever. If you want to contribute patches, please send me a diff or prod me to pull
+from your repository :)
+
+L<https://github.com/Getty/p5-www-chain>
+
+  git clone https://github.com/Getty/p5-www-chain.git
 
 =head1 AUTHOR
 

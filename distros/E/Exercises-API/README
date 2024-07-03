@@ -1,0 +1,121 @@
+SYNOPSIS
+
+        use Exercises::API;
+    
+        # Set API Ninja Exercise API Key
+        my $ea = Exercises::API->new(apikey => $ENV{'AN_EXERCISES_APIKEY'});
+    
+        # A list of exercises
+        my @exercises = $ea->exercises;
+    
+        for my $exercise (@exercises){
+            print "Name: " . $exercise->name . "\n";
+            print "Type: " . $exercise->type . "\n";
+            print "Muscle: " . $exercise->muscle . "\n";
+            print "Equipment: " . $exercise->equipment . "\n";
+            print "Difficulty: " . $exercise->difficulty . "\n";
+            print "Instructions: " . $exercise->instructions . "\n";
+    
+        }
+    
+        # Specifying the parameters
+        my %args = (
+            name => 'press',
+            type => 'strength',
+            muscle => 'chest',
+            difficulty => 'beginner',
+            # offset => 0 (is a premium feature/parameter)
+        );
+    
+        # A list of exercises based on the specified parameters
+        my @exercisesParams = $ea->exercises(%args);
+    
+        for my $exercise (@exercises){
+            print "Name: " . $exercise->name . "\n";
+            print "Type: " . $exercise->type . "\n";
+            print "Muscle: " . $exercise->muscle . "\n";
+            print "Equipment: " . $exercise->equipment . "\n";
+            print "Difficulty: " . $exercise->difficulty . "\n";
+            print "Instructions: " . $exercise->instructions . "\n";
+        }
+
+DESCRIPTION
+
+    The Exercises API <https://www.api-ninjas.com/api/exercises> provides
+    access to a comprehensive list of thousands of exercises targeting
+    every major muscle group.
+
+    Returns up to 5 exercises that satisfy the given parameters.
+
+API Key (required)
+
+    You can get an API Key at API Ninjas <https://www.api-ninjas.com>.
+
+Parameters
+
+ name (optional)
+
+    Name of exercise. This value can be partial (e.g. press will match
+    Dumbbell Bench Press).
+
+ type (optional)
+
+    Exercise type. Possible values are:
+
+        cardio
+        olympic_weightlifting
+        plyometrics
+        powerlifting
+        strength
+        stretching
+        strongman
+        
+
+ muscle (optional)
+
+    Muscle group targeted by the exercise. Possible values are:
+
+        abdominals
+        abductors
+        adductors
+        biceps
+        calves
+        chest
+        forearms
+        glutes
+        hamstrings
+        lats
+        lower_back
+        middle_back
+        neck
+        quadriceps
+        traps
+        triceps
+        
+
+ difficulty (optional)
+
+    Difficulty level of the exercise. Possible values are:
+
+        beginner
+        intermediate
+        expert
+        
+
+ offset (optional) - premium
+
+    Number of results to offset for pagination. Default is 0.
+
+Installation
+
+ cpanm
+
+        cpanm Exercises::API
+
+ Project Directory
+
+        cpanm --installdeps .
+        perl Makefile.PL
+        make
+        make install
+

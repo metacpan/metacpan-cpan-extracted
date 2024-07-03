@@ -29,7 +29,7 @@ use HTTP::Response;
   }
 }
 
-my $chain = TestWWWChainMethods->new(HTTP::Request->new( GET => 'http://www.chain.internal/' ), 'first_request');
+my $chain = TestWWWChainMethods->new;
 isa_ok($chain,'TestWWWChainMethods');
 
 $chain->next_responses(HTTP::Response->new);

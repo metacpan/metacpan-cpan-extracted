@@ -19,12 +19,12 @@ STRING: {
 		country => 'US'
 	]);
 
-	is($loc->as_string(), '1600 Pennsylvania Ave NW, Washington, US', 'Test as_string');
+	cmp_ok($loc->as_string(), 'eq', '1600 Pennsylvania Ave NW, Washington, US', 'Test as_string');
 	$loc->state('DC');	# Not technically true!
 	cmp_ok($loc->number(), '==', 1600, 'House number is 1600');
 	is($loc->as_string(), '1600 Pennsylvania Ave NW, Washington, DC, US', 'Test as_string');
 
-	$loc = new_ok('Geo::Location::Point' => [
+	$loc = new_ok('Geo::Location::Point' => [{
 		# MaxMind
 		'Region' => 'IN',
 		'City' => 'new brunswick',
@@ -33,7 +33,7 @@ STRING: {
 		'Latitude' => '39.9441667',
 		'Population' => '',
 		'AccentCity' => 'New Brunswick'
-	]);
+	}]);
 
 	cmp_ok($loc->latitude(), '==', 39.9441667, 'Latitude is set');
 	cmp_ok($loc->longitude(), '==', -86.5227778, 'Longitude is set');

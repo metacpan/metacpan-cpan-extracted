@@ -1,7 +1,7 @@
 #!perl -T
 use 5.020;
 use warnings;
-use Test::More tests => 30;
+use Test::More tests => 32;
 
 BEGIN {
     if ($ENV{AUTHOR_TESTING}) {
@@ -18,7 +18,7 @@ $SIG{__WARN__} = sub {
     goto &diag;
 };
 
-my $plate = new Plate;
+my $plate = Plate->new;
 
 is $plate->serve(\'<% "<html> this & that" |%>'),
 '<html> this & that',
@@ -147,6 +147,14 @@ $plate->set(filters => { lower => sub { lcfirst $_[0] } });
 is $plate->serve(\'<% "Hello World" |lower %>'),
 'hello World',
 'Replace a filter';
+
+is $plate->filter('Hello World', 'upper', 'lower'),
+'hELLO WORLD',
+'Use the filter method';
+
+is $plate->serve(\'<% Plate::filter "Hello World", "upper", "lower" %>'),
+'hELLO WORLD',
+'Call filter directly';
 
 $plate->set(auto_filter => 'upper');
 is $plate->serve(\'<% "Hello World" %>'),

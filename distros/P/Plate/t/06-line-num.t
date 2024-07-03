@@ -43,7 +43,7 @@ sub warning_lines_are(&$;$) {
     &warnings_are;
 }
 
-my $plate = new Plate cache_code => undef;
+my $plate = Plate->new(cache_code => undef);
 
 warning_lines_are { $plate->serve(\<<'') } [4], 'Precompiled multi-line statements';
 %% my $zero

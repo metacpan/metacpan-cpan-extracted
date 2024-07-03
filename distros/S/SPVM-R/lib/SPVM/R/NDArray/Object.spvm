@@ -32,9 +32,11 @@ class R::NDArray::Object extends R::NDArray {
     }
   }
   
-  method clone :  R::NDArray () { die "Not implemented."; }
+  method clone : R::NDArray::Object ($elem_shallow_clone : int = 0) {
+    return (R::NDArray::Object)$self->SUPER::clone($elem_shallow_clone);
+  }
   
-  protected method slice_data : object ($data_indexes : int[]) {
+  protected method slice_data : object[] ($data_indexes : int[]) {
     
     unless ($data_indexes) {
       die "The data indexes \$data_indexes must be defined.";
@@ -44,26 +46,60 @@ class R::NDArray::Object extends R::NDArray {
     my $data = $self->data;
     my $ret_data = new object[$data_indexes_length];
     for (my $i = 0; $i < $data_indexes_length; $i++) {
-      $ret_data->(object[])->[$i] = $data->(object[])->[$i];
+      my $data_index = $data_indexes->[$i];
+      $ret_data->[$i] = $data->[$data_index];
     }
     
     return $ret_data;
   }
   
-  protected method slice_set_data : void ($data_indexes : int[], $data : object) {
+  protected precompile method slice_set_data : void ($data_indexes : int[], $data : object[]) {
     
-    my $self_data = $self->{data};
+    my $self_data = $self->data;
     
     unless ($data_indexes) {
       die "The data indexes \$data_indexes must be defined.";
     }
     
-    my $data_index = 0;
-    my $data_indexes_length = @$data_indexes;
-    for (my $i = 0; $i < $data_indexes_length; $i++) {
-      $self_data->(object[])->[$i] = $data->(object[])->[$data_index];
-      $data_index++;
+    for (my $i = 0; $i < @$data; $i++) {
+      my $data_index = $data_indexes->[$i];
+      $self_data->[$data_index] = $data->[$i];
     }
+  }
+  
+  protected method create_default_data : object[] ($length : int = 0) {
+    
+    unless ($length >= 0) {
+      die "The length \$length must be more than or equal to 0.";
+    }
+    
+    my $data = new object[$length];
+    
+    return $data;
+  }
+  
+  protected method check : void () {
+    
+    my $data = (object[])$self->{data};
+    
+    my $length = $self->length;
+    
+    unless (@$data == $length) {
+      die "The length of data field must be the same as length field.";
+    }
+  }
+  
+  method data : object[] () {
+    
+    return (object[])$self->{data};
+  }
+  
+  method slice : R::NDArray::Object ($vector_indexes : R::NDArray::Int[]) {
+    return (R::NDArray::Object)$self->SUPER::slice($vector_indexes);
+  }
+  
+  method slice_set : void ($vector_indexes : R::NDArray::Int[], $ndarray : R::NDArray::Object) {
+    $self->SUPER::slice_set($vector_indexes, $ndarray);
   }
   
 }

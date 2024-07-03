@@ -1,7 +1,7 @@
 package Dist::Zilla::PluginBundle::Author::GETTY;
 our $AUTHORITY = 'cpan:GETTY';
 # ABSTRACT: BeLike::GETTY when you build your dists
-$Dist::Zilla::PluginBundle::Author::GETTY::VERSION = '0.115';
+$Dist::Zilla::PluginBundle::Author::GETTY::VERSION = '0.116';
 use Moose;
 use Moose::Autobox;
 use Dist::Zilla;
@@ -377,7 +377,7 @@ Dist::Zilla::PluginBundle::Author::GETTY - BeLike::GETTY when you build your dis
 
 =head1 VERSION
 
-version 0.115
+version 0.116
 
 =head1 SYNOPSIS
 
@@ -599,6 +599,20 @@ L<Dist::Zilla::Plugin::Repository>
 L<Dist::Zilla::Plugin::Run>
 
 L<Dist::Zilla::Plugin::TaskWeaver>
+
+=for :stopwords cpan testmatrix url bugtracker rt cpants kwalitee diff irc mailto metadata placeholders metacpan
+
+=head1 SUPPORT
+
+=head2 Source Code
+
+The code is open to the world, and available for you to hack on. Please feel free to browse it and play
+with it, or whatever. If you want to contribute patches, please send me a diff or prod me to pull
+from your repository :)
+
+L<https://github.com/Getty/p5-dist-zilla-pluginbundle-author-getty>
+
+  git clone https://github.com/Getty/p5-dist-zilla-pluginbundle-author-getty.git
 
 =head1 AUTHOR
 

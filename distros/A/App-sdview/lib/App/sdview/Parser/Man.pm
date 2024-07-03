@@ -9,7 +9,7 @@ use utf8;
 
 use Object::Pad 0.807;
 
-package App::sdview::Parser::Man 0.14;
+package App::sdview::Parser::Man 0.15;
 class App::sdview::Parser::Man :strict(params);
 
 apply App::sdview::Parser;

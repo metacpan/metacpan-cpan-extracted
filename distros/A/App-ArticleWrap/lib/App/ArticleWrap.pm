@@ -1,7 +1,7 @@
 
 package App::ArticleWrap;
 
-our $VERSION = 1.02;
+our $VERSION = 1.03;
 
 =head1 NAME
 

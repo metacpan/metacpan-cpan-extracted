@@ -1,0 +1,128 @@
+# NAME
+
+Dancer2::Plugin::NYTProf - NYTProf, in your Dancer2 application!
+
+# VERSION
+
+version 0.0100
+
+# SYNOPSIS
+
+       package MyApp;
+       use Dancer2 appname => 'MyApp';
+    
+       # enables profiling and "/nytprof"
+       use Dancer2::Plugin::NYTProf;
+
+Or, if you want to enable it only under development environment (as you should!),
+you can do something like:
+
+       package MyApp;
+       use Dancer2 appname => 'MyApp';
+    
+       # enables profiling and "/nytprof"
+       if (setting('environment') eq 'development') {
+           eval 'use Dancer2::Plugin::NYTProf';
+       }
+
+# DESCRIPTION
+
+A plugin to provide easy profiling for Dancer applications, using the venerable
+[Devel::NYTProf](https://metacpan.org/pod/Devel%3A%3ANYTProf).
+
+By simply loading this plugin, you'll have the detailed, helpful profiling
+provided by Devel::NYTProf.
+
+Each individual request to your app is profiled.  Going to the URL
+`/nytprof` in your app will present a list of profiles; selecting one will
+invoke `nytprofhtml` to generate the HTML reports (unless they already exist),
+then serve them up.
+
+# CONFIGURATION
+
+The plugin will work by default without any configuration required - it will
+default to writing profiling data into a dir named `profdir` within your Dancer
+application's `appdir`, present profiling output at `/nytprof` (not yet
+configurable), and profile all requests.
+
+Below is an example of the options you can configure:
+
+    plugins:
+        NYTProf:
+            enabled: 1
+            profiling_enabled: 1
+            profdir: '/tmp/profiledata'
+            nytprofhtml_path: '/usr/local/bin/nytprofhtml'
+            show_durations: 1
+
+## profdir
+
+Where to store profiling data. Defaults to: `$appdir/nytprof`
+
+## nytprofhtml\_path
+
+Path to the `nytprofhtml` script that comes with [Devel::NYTProf](https://metacpan.org/pod/Devel%3A%3ANYTProf). Defaults to
+the first one we can find in your PATH environment. You should only need to
+change this in very specific environments, where `nytprofhtml` can't be found by
+this plugin.
+
+## enabled
+
+Whether the plugin as a whole is enabled; disabling this setting will disable
+profiling route executions, and also disable the route which serves up the
+results at `/nytprof`.  Enabled by default, so you only have to provide this
+setting if you wish to set it to a false value.
+
+## profiling\_enabled
+
+Whether route executions are profiled or not; if this is set to a false value,
+the before hook which would usually cause [Devel::NYTProf](https://metacpan.org/pod/Devel%3A%3ANYTProf) to profile that
+route execution will not do so.  This allows you to disable profiling but still
+be able to browse the results of existing profiled executions.  Enabled by
+default, so you only have to provide this setting if you wish to set it to a
+false value.
+
+## show\_durations
+
+When listing profile runs, show the duration of each run, extracted from the
+profiling data.  If you have a lot of profiled runs, this might get slow, so
+this option is provided if you don't need the profile durations displayed when
+listing profiles, preferring a faster list.  Defaults to 1.
+
+More configuration (such as the URL at which output is produced, and options to
+control which requests get profiled) will be added in a future version.
+
+# KEYWORDS
+
+This plugin does not add any keywords to [Dancer2](https://metacpan.org/pod/Dancer2).
+
+# ENHANCEMENT OPPORTUNITIES
+
+- You don't get any choice of the reports URL.
+
+    It's `/nytprof` for now, sorry. I may add a config variable later.
+
+- The profile run list at `/nytprof` is ugly as homemade sin.
+
+    I may switch that to a simple HTML table at a later date.
+
+# ACKNOWLEDGEMENTS
+
+This plugin relies heavily prior work on [Dancer::Plugin::NYTProf](https://metacpan.org/pod/Dancer%3A%3APlugin%3A%3ANYTProf).  Special thanks
+to my employer, Clearbuilt, for giving me time to work on this module.
+
+# SEE ALSO
+
+- [Dancer2](https://metacpan.org/pod/Dancer2)
+- [Devel::NYTProf](https://metacpan.org/pod/Devel%3A%3ANYTProf)
+
+# AUTHOR
+
+Ruth Holloway <ruth@hiruthie.me>
+
+# COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2024 by Ruth Holloway.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.

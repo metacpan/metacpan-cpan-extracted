@@ -48,8 +48,8 @@ class R::NDArray::String extends R::NDArray::Object {
     return $data;
   }
   
-  method clone : R::NDArray::String () {
-    return (R::NDArray::String)$self->SUPER::clone;
+  method clone : R::NDArray::String ($elem_shallow_clone : int = 0) {
+    return (R::NDArray::String)$self->SUPER::clone($elem_shallow_clone);
   }
   
   method elem_to_string : string ($data_index : int) {
@@ -235,6 +235,14 @@ class R::NDArray::String extends R::NDArray::Object {
     }
     
     return $ret_ndarray;
+  }
+  
+  method slice : R::NDArray::String ($vector_indexes : R::NDArray::Int[]) {
+    return (R::NDArray::String)$self->SUPER::slice($vector_indexes);
+  }
+  
+  method slice_set : void ($vector_indexes : R::NDArray::Int[], $ndarray : R::NDArray::String) {
+    $self->SUPER::slice_set($vector_indexes, $ndarray);
   }
   
 }

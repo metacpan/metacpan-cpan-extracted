@@ -3,7 +3,7 @@ use warnings;
 package Pod::Weaver::PluginBundle::Author::GETTY;
 our $AUTHORITY = 'cpan:GETTY';
 # ABSTRACT: GETTY's default Pod::Weaver config
-$Pod::Weaver::PluginBundle::Author::GETTY::VERSION = '0.115';
+$Pod::Weaver::PluginBundle::Author::GETTY::VERSION = '0.116';
 
 use Pod::Weaver::Config::Assembler;
 sub _exp { Pod::Weaver::Config::Assembler->expand_package($_[0]) }
@@ -33,11 +33,17 @@ sub mvp_bundle_config {
   }
 
   push @plugins, (
-    [ '@GETTY/Leftovers', _exp('Leftovers'), {} ],
-    [ '@GETTY/postlude',  _exp('Region'),    { region_name => 'postlude' } ],
-    [ '@GETTY/Bugs',      _exp('Bugs'),   {} ],
-    [ '@GETTY/Authors',   _exp('Authors'),   {} ],
-    [ '@GETTY/Legal',     _exp('Legal'),     {} ],
+    [ '@GETTY/Leftovers', _exp('Leftovers'),    {} ],
+    [ '@GETTY/postlude',  _exp('Region'),       { region_name => 'postlude' } ],
+    [ '@GETTY/Support',   _exp('Support'),      {
+      all_modules => 1,
+      perldoc => 0,
+      websites => 'none',
+      bugs => 'none',
+    } ],
+    [ '@GETTY/Bugs',      _exp('Bugs'),         {} ],
+    [ '@GETTY/Authors',   _exp('Authors'),      {} ],
+    [ '@GETTY/Legal',     _exp('Legal'),        {} ],
     [ '@GETTY/List',      _exp('-Transformer'), { 'transformer' => 'List' } ],
   );
 
@@ -56,7 +62,7 @@ Pod::Weaver::PluginBundle::Author::GETTY - GETTY's default Pod::Weaver config
 
 =head1 VERSION
 
-version 0.115
+version 0.116
 
 =head1 DESCRIPTION
 
@@ -77,6 +83,20 @@ C<@Default>
 C<-Transformer> with L<Pod::Elemental::Transformer::List>
 
 =back
+
+=for :stopwords cpan testmatrix url bugtracker rt cpants kwalitee diff irc mailto metadata placeholders metacpan
+
+=head1 SUPPORT
+
+=head2 Source Code
+
+The code is open to the world, and available for you to hack on. Please feel free to browse it and play
+with it, or whatever. If you want to contribute patches, please send me a diff or prod me to pull
+from your repository :)
+
+L<https://github.com/Getty/p5-dist-zilla-pluginbundle-author-getty>
+
+  git clone https://github.com/Getty/p5-dist-zilla-pluginbundle-author-getty.git
 
 =head1 AUTHOR
 

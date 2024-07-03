@@ -1,0 +1,50 @@
+_prefix:
+  store:
+
+search:
+    package: OpenSearch
+    options:
+        hosts: ["CHANGEME"]
+        user: "CHANGEME"
+        pass: "CHANGEME"
+        bags:
+            publication:
+                buffer_size: 500
+                on_error: throw
+                default_limit: 500
+                maximum_limit: 10000
+                maximum_offset: 9999
+                index: CHANGEME
+                settings:
+                    number_of_shards: 1
+                    number_of_replicas: 0
+                    analysis:
+                        normalizer:
+                            tag:
+                                type: custom
+                                filter: [lowercase]
+                        analyzer:
+                            default:
+                                type: custom
+                                tokenizer: standard
+                                filter: [lowercase, asciifolding, stop]
+                            name:
+                                type: custom
+                                tokenizer: keyword
+                                filter: [lowercase, asciifolding]
+                mapping:
+                    dynamic: 'false'
+                    numeric_detection: 'false'
+                    date_detection: 'false'
+                    properties:
+                        all: {type: text}
+                        biblio_id: {type: keyword, copy_to: all}
+                        title:
+                            type: text
+                            store: 'true'
+                            term_vector: with_positions_offsets
+                            copy_to: all
+                            fields:
+                                exact: {type: keyword, normalizer: tag}
+                        type: {type: keyword}
+                        year: {type: date, format: 8year, copy_to: all}
