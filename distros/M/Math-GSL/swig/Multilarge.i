@@ -25,7 +25,7 @@
 %include "gsl/gsl_matrix.h"
 %include "gsl/gsl_permutation.h"
 %include "gsl/gsl_multifit.h"
-#if MG_GSL_NUM_VERSION >= 002007
+#if MG_GSL_NUM_VERSION >= 2007
   %include "gsl/gsl_multilarge.h"
 #else
   %include "legacy/gsl-2.6/gsl_multilarge.h"

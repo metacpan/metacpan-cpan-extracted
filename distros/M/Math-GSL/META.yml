@@ -22,7 +22,7 @@ name: Math-GSL
 provides:
   Math::GSL:
     file: lib/Math/GSL.pm
-    version: '0.44'
+    version: '0.45'
   Math::GSL::BLAS:
     file: lib/Math/GSL/BLAS.pm
     version: '0'
@@ -324,6 +324,9 @@ provides:
     file: lib/Math/GSL/Integration.pm
     version: '0'
   Math::GSL::Integration::gsl_integration_glfixed_table:
+    file: lib/Math/GSL/Integration.pm
+    version: '0'
+  Math::GSL::Integration::gsl_integration_lebedev_workspace:
     file: lib/Math/GSL/Integration.pm
     version: '0'
   Math::GSL::Integration::gsl_integration_qawo_table:
@@ -994,6 +997,6 @@ requires:
   version: '0.77'
 resources:
   license: http://www.gnu.org/licenses/old-licenses/gpl-1.0.txt
-  repository: http://github.com/leto/math--gsl/tree/master
-version: '0.44'
+  repository: https://github.com/hakonhagland/perl-math-gsl/tree/master
+version: '0.45'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

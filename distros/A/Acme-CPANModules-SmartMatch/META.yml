@@ -19,7 +19,7 @@ name: Acme-CPANModules-SmartMatch
 provides:
   Acme::CPANModules::SmartMatch:
     file: lib/Acme/CPANModules/SmartMatch.pm
-    version: '0.005'
+    version: '0.007'
 requires:
   Acme::CPANModulesUtil::Misc: '0'
   strict: '0'
@@ -28,7 +28,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Acme-CPANModules-SmartMatch
   homepage: https://metacpan.org/release/Acme-CPANModules-SmartMatch
   repository: git://github.com/perlancar/perl-Acme-CPANModules-SmartMatch.git
-version: '0.005'
+version: '0.007'
 x_Dist_Zilla:
   perl:
     version: '5.038002'

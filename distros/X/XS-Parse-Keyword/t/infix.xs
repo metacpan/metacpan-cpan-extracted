@@ -215,6 +215,17 @@ static const struct XSParseInfixHooks hooks_LL = {
   .ppaddr = &pp_LL,
 };
 
+OP *pp_fqadd(pTHX)
+/* Like pp_add but we need a second address so as not to upset the deparse tests */
+{
+  return pp_add(aTHX);
+}
+
+static const struct XSParseInfixHooks hooks_fqadd = {
+  .cls = XPI_CLS_ADD_MISC,
+  .ppaddr = &pp_fqadd,
+};
+
 MODULE = t::infix  PACKAGE = t::infix
 
 BOOT:
@@ -231,3 +242,5 @@ BOOT:
 
   register_xs_parse_infix("cat", &hooks_cat, NULL);
   register_xs_parse_infix("LL", &hooks_LL, NULL);
+
+  register_xs_parse_infix("t::infix::fqadd", &hooks_fqadd, NULL);

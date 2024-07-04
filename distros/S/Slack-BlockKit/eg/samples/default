@@ -1,0 +1,11 @@
+#!perl
+use v5.36.0;
+use Slack::BlockKit::Sugar -all => { -prefix => 'bk_' };
+
+return bk_blocks(
+  bk_header("Behold, the BlockKit"),
+  "I imagine you will really like it.  But hey, I could be wrong.",
+  bk_divider(),
+  "Let us know, when you decode.",
+  "We'll be here.",
+);

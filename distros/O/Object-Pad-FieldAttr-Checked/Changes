@@ -1,5 +1,10 @@
 Revision history for Object-Pad-FieldAttr-Checked
 
+0.11    2024-07-03
+        [CHANGES]
+         * Adjust docs, examples, unit tests to prefer Data::Checks
+           constraints added in v0.04
+
 0.10    2024-06-21
         [CHANGES]
          * Updated for Data::Checks v0.02

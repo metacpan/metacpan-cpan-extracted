@@ -20,6 +20,9 @@ BEGIN { $^H{"t::pieces/permit"} = 1; }
    $ret = pieceinfix gt;
    is( $ret, "sgt", 'result of piecelexvarname' );
 
+   ok( !defined eval "pieceinfix gtx",
+      'pieceinfix does not accept gtx' );
+
    $ret = pieceinfixeq eq;
    is( $ret, "seq", 'result of piecelexvarname' );
 

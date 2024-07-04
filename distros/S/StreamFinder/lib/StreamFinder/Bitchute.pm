@@ -432,6 +432,10 @@ sub new
 				: 'https://www.bitchute.com/channel/';   #CHANNEL IDS DON'T *SEEM* TO HAVE UPPER-CASE LETTERS.
 		$url2fetch .= $url;
 	}
+	$url2fetch =~ s#\/www\.#\/api\.#;  #USE NEW api.bitchute.com (LESS JS'd & COOKIE'd UP!)
+	$url2fetch =~ s#\&.*$##  if ($url2fetch =~ s#^.+?\/oembed\/\?url\=(.+?)#$1#);
+	$url2fetch =~ s#\/embed\/#\/video\/#;
+	$url2fetch =~ s#\?.+$##;
 	print STDERR "-1 FETCHING URL=$url2fetch= ID=".$self->{'id'}."=\n"  if ($DEBUG);
 	$self->{'genre'} = 'Video';
 
@@ -462,6 +466,10 @@ sub new
 			if ($url2fetch) {
 				$self->{'id'} = $1  if ($url2fetch =~ m#\/([^\/]+)\/?$#);
 				$self->{'id'} =~ s/[\?\&].*$//;
+				$url2fetch =~ s#\/www\.#\/api\.#;  #USE NEW api.bitchute.com (LESS JS'd & COOKIE'd UP!)
+				$url2fetch =~ s#\&.*$##  if ($url2fetch =~ s#^.+?\/oembed\/\?url\=(.+?)#$1#);
+				$url2fetch =~ s#\/embed\/#\/video\/#;
+				$url2fetch =~ s#\?.+$##;
 				print "---FOUND 1ST VIDEO! FETCHING=$url2fetch= ID=".$self->{'id'}."=\n"  if ($DEBUG);
 				$response = $ua->get($url2fetch);
 				if ($response->is_success) {
@@ -476,26 +484,6 @@ sub new
 				}
 				return undef  unless ($html);
 			}
-		}
-	} elsif ($url2fetch =~ m#\/embed\/#) {  #WE'RE AN EMBEDDED BITCHUTE PAGE (https://www.bitchute.com/embed/<id>):
-		print STDERR "i:We're an embed url.\n"  if ($DEBUG);
-		if ($html =~ m#\<link\s+rel\=\"canonical\"\s+href\=\"([^\"]+)#) {
-			$url2fetch = $1;
-			$url2fetch = 'https://' . $url2fetch  unless ($url2fetch =~ /^https?\:/);
-			print STDERR "i:We got the canonical URL from it!\n"  if ($DEBUG);
-		} else {
-			$url2fetch =~ s#\/embed\/#\/video\/#;
-			print STDERR "w:No canonical URL found, try converting embed url to fallback video url.\n"  if ($DEBUG);
-		}
-		#WE CAN STILL GO AHEAD AND GRAB THE TITLE & COVER-ART ICON HERE:
-		$self->{'title'} = $1  if ($html =~ m#\<title\>([^\<]+)\<#s);
-		$self->{'iconurl'} = $1  if ($html =~ m#\bposter\=\"(https\:\/\/[^\"]+)#s);
-		print STDERR "i:Converted embed URL to ($url2fetch).\n"  if ($DEBUG);
-		my $response = $ua->get($url2fetch);
-		if ($response->is_success) {
-			$html = $response->decoded_content;
-		} else {
-			print STDERR $response->status_line . "\ne:Invalid embed URL reference, but scrape what we have.\n"  if ($DEBUG);
 		}
 	}
 
@@ -568,9 +556,9 @@ sub new
 		$self->{'albumartist'} = 'https://www.bitchute.com' . $1;
 		$self->{'artist'} = $2;
 	}
-	if ($html =~ m#First\s+published([^\<]+)#s) {
-		my $publishedtime = $1;
-		$self->{'year'} = $1  if ($publishedtime =~ /(\d\d\d\d)\.?\s*$/);
+	if ($html =~ m#First\s+published\s+(?:at\s+)?([^\<]+)#s) {
+		$self->{'created'} = $1;
+		$self->{'year'} = $1  if ($self->{'created'} =~ /(\d\d\d\d)\.?\s*$/);
 	}
 	if ($html =~ m#\<tr\>\<td\>Category\<\/td\>\<td\>\<a\s+(.+?)</a>#) {
 		my $genredata = $1;
@@ -580,8 +568,8 @@ sub new
 	$self->{'title'} = $1  if ($html =~ m#\<title\>([^\<]+)\<#s);
 	$self->{'title'} ||= $1  if ($html =~ m#\<h1\s+id\=\"video\-title\"\s+class\=\"page\-title\"\>([^\<]+)\<#i);
 	$self->{'title'} ||= $1  if ($html =~ m#\<meta\s+name\=\"description\"\s+content\=\"([^\"]+)\"#);
-	$self->{'description'} = $1  if ($html =~ m#\<div\s+class\=\"full\s+hidden\"\>(.+?)\<\/div\>#s);
-	$self->{'description'} ||= $1  if ($html =~ m#\<meta\s+name\=\"description\"\s+content\=\"([^\"]+)\"#);
+	$self->{'description'} = $1  if ($html =~ m#\<meta\s+name\=\"description\"\s+content\=\"([^\"]+)#s);
+	$self->{'description'} ||= $1  if ($html =~ m#\<div\s+class\=\"full\s+hidden\"\>(.+?)\<\/div\>#s);
 	$self->{'description'} ||= $self->{'title'};
 
 	$self->{'iconurl'} = $1  if ($html =~ m#\"og\:image\:secure_url\"\s+content\=\"([^\"]+)#);

@@ -80,6 +80,6 @@
          "x_repository" : "https://github.com/nigelhorne/Genealogy-Wills"
       }
    },
-   "version" : "0.04",
+   "version" : "0.05",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

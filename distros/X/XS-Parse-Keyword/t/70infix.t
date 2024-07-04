@@ -38,6 +38,26 @@ BEGIN { $^H{"t::infix/permit"} = 1; }
       [ 3, 5, 7 ], 'addpairs infix operator' );
 }
 
+# fully-qualified + lexical alias
+{
+   BEGIN { t::infix->XS::Parse::Infix::apply_infix( 1, [ "fqadd" ], qw( fqadd ) ); }
+
+   my $result = 5 fqadd 10;
+   is( $result, 15, 'fqadd infix operator' );
+}
+
+{
+   my @importargs;
+   BEGIN { 
+      @importargs = ( 123, fqadd => { -as => "localname" }, 456 );
+      t::infix->XS::Parse::Infix::apply_infix( 1, \@importargs, qw( fqadd ) ); }
+
+   my $result = 6 localname 12;
+   is( $result, 18, 'infix operator renamed' );
+
+   is( \@importargs, [ 123, 456 ], 'apply_infix correctly mutated import args' );
+}
+
 sub _getoptree
 {
    my ( $sub ) = @_;

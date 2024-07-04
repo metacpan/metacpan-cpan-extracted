@@ -1,5 +1,11 @@
 Revision history for CXC-DB-DDL-Field-Pg
 
+0.16      2024-07-03 11:10:54-04:00 America/New_York
+
+   [BUG FIX]
+
+    * type_name method was broken.
+
 0.15      2024-06-27 10:27:20-04:00 America/New_York
 
     * Split out of CXC::DB::DDL       

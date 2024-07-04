@@ -64,20 +64,20 @@ if(-r $filename) {
 	unlink $filename;
 }
 
-my $cachedir = $ENV{'CACHEDIR'};
-if($cachedir) {
-	mkdir $cachedir, 0700 if(!-d $cachedir);
-	$cachedir = File::Spec->catfile($cachedir, 'http-cache-transparent');
+my $cache_dir = $ENV{'CACHE_DIR'};
+if($cache_dir) {
+	mkdir $cache_dir, 0700 if(!-d $cache_dir);
+	$cache_dir = File::Spec->catfile($cache_dir, 'http-cache-transparent');
 } else {
-	$cachedir = File::Spec->catfile(File::HomeDir->my_home(), '.cache', 'http-cache-transparent');
+	$cache_dir = File::Spec->catfile(File::HomeDir->my_home(), '.cache', 'http-cache-transparent');
 }
 
 HTTP::Cache::Transparent::init({
-	BasePath => $cachedir,
+	BasePath => $cache_dir,
 	Verbose => 0,
 	NoUpdate => 60 * 60 * 24 * 7 * 31,	# The archive never changes
 	MaxAge => 30 * 24
-}) || die "$0: $cachedir: $!";
+}) || die "$0: $cache_dir: $!";
 
 # print "This will take some time. It'd be best to go and make yourself a cup of tea.\n";
 

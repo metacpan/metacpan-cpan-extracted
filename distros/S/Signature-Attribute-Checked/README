@@ -5,12 +5,12 @@ NAME
 
 SYNOPSIS
 
-    With Types::Standard
+    With Data::Checks:
 
        use v5.26;
        use Sublike::Extended;
        use Signature::Attribute::Checked;
-       use Types::Standard qw( Num );
+       use Data::Checks qw( Num );
     
        extended sub add ($x :Checked(Num), $y :Checked(Num)) {
           return $x + $y;
@@ -58,14 +58,35 @@ PARAMETER ATTRIBUTES
 
     At compiletime, the string given by EXPRESSION is eval()'ed in scalar
     context, and its result is stored as part of the subroutine's
-    definition. The expression must yield either an object reference, a
-    code reference, or a string containing the name of a package. In the
-    case of an object or package, a method called check must exist on it.
+    definition. The expression must yield a value usable by Data::Checks.
+    Namely, one of:
 
-    If using a plain package name as a checker, be sure to quote package
-    names so it will not upset use strict.
+      * Any of the constraint checkers provided by the Data::Checks module
+      itself.
 
-       extended sub xyz ($x :Checked('CheckerPackage')) { ... }
+      * An object reference with a check method:
+
+         $ok = $checkerobj->check( $value );
+
+      * A code reference:
+
+         $ok = $checkersub->( $value );
+
+      * A plain string giving the name of a package with a check method:
+
+         $ok = $checkerpkg->check( $value );
+
+      If using a plain package name as a checker, be sure to quote package
+      names so it will not upset use strict.
+
+         extended sub xyz ($x :Checked('CheckerPackage')) { ... }
+
+    As this is the interface supported by Types::Standard, any constraint
+    object provided by that module is already supported here as well.
+
+       use Types::Standard qw( Str Num );
+    
+       extended sub ghi ($x :Checked(Str), $y :Checked(Num)) { ... }
 
     At runtime, this constraint checker is used every time an attempt is
     made to call the function. The checker is used as the invocant for
@@ -73,24 +94,11 @@ PARAMETER ATTRIBUTES
     an argument. If the method returns true, the call is allowed. If false,
     it is rejected with an exception and the function body is not invoked.
 
-       $ok = $checkerobj->check( $value );  # if an object
-    
-       $ok = $checkersub->( $value );       # if a code reference
-    
-       $ok = $checkerpkg->check( $value );  # if a package name
-
     (For performance reasons, the check method is actually resolved into a
     function at compiletime when the :Checked attribute is applied, and
     this stored function is the one that is called at assignment time. If
     the method itself is replaced later by globref assignment or other
     trickery, this updated function will not be used.)
-
-    As this is the interface supported by Types::Standard, any constraint
-    object provided by that module is already supported here.
-
-       use Types::Standard qw( Str Num );
-    
-       extended sub ghi ($x :Checked(Str), $y :Checked(Num)) { ... }
 
     It is not specified what order these checks are performed in. In
     particular, if any parameter default expressions invoke any

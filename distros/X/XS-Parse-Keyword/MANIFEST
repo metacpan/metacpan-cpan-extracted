@@ -23,6 +23,8 @@ MANIFEST			This list of files
 META.json
 META.yml
 README
+share/include/XSParseInfix.h
+share/include/XSParseKeyword.h
 src/infix.c
 src/infix.h
 src/keyword.c
@@ -60,5 +62,3 @@ t/probing.xs
 t/stages.xs
 t/structures.xs
 t/testcase.pm
-XSParseInfix.h
-XSParseKeyword.h

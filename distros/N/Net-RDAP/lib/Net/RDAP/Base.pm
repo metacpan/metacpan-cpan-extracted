@@ -15,8 +15,11 @@ use strict;
 # Constructor method. Expects a hashref as an argument.
 #
 sub new {
-    my ($package, $args) = @_;
+    my ($package, $args, $document_url) = @_;
     my %self = %{$args};
+
+    $self{_document_url} = $document_url if ($document_url);
+
     return bless(\%self, $package);
 }
 
@@ -32,9 +35,11 @@ sub objects {
 
     my @list;
 
+    my $document_url = $self->document_url;
+
     if (defined($ref) && 'ARRAY' eq ref($ref)) {
         foreach my $item (@{$ref}) {
-            push(@list, $class->new($item));
+            push(@list, $class->new($item, $document_url));
         }
     }
 
@@ -91,6 +96,26 @@ sub self { (grep { 'self' eq $_->rel } $_[0]->links)[0] }
 
 =pod
 
+=head2 DOCUMENT URL
+
+    $url = $object->document_url;
+
+This method returns a L<URI> object representing the URL of the document that
+this object appears in. This is helpful when converting relative URLs (which
+might appear in links) into absolute URLs.
+
+=cut
+
+sub document_url {
+    my $self = shift;
+
+    my $url = $self->{_document_url};
+
+    return ($url->isa('URI') ? $url : URI->new($url)) if ($url);
+}
+
+=pod
+
 =head1 C<TO_JSON()>
 
 C<Net::RDAP::Base> provides a C<TO_JSON()> so that any RDAP object can be
@@ -102,6 +127,9 @@ is configured with the C<convert_blessed> option.
 sub TO_JSON {
     my $self = shift;
     my %hash = %{$self};
+
+    delete($hash{_document_url});
+
     return \%hash;
 }
 

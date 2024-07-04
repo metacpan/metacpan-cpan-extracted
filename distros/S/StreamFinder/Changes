@@ -653,3 +653,8 @@ Revision history for StreamFinder
         in Json format (at least for now).
         - StreamFinder::EpochTV - Few minor tweaks to try harder to fetch 
         streams, the artist, the artist's channel icon, and the year.
+2.34    2024/07/03
+        - StreamFinder::Bitchute - Refactor due to Bitchute's major recent 
+        redo of their site (more Javascript & crap), but they have a second 
+        site URL (api.bitchute.com) which still works well, so we autoconvert 
+        non-working URLs from www.bitchute.com to api.bitchute.com.

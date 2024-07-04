@@ -7,6 +7,7 @@ use MIDI::RtMidi::FFI::Device;
 use MIDI::RtMidi::FFI ':all';
 use MIDI::Event;
 use Proc::Find qw/ proc_exists /;
+use Test2::V0;
 
 use Time::HiRes qw/ usleep /;
 
@@ -27,7 +28,7 @@ sub newdevice {
 
 sub connect_devices {
     my ( $in, $out ) = @_;
-    my $port_name = "rtmidi-ffi-port-out-$time";
+    my $port_name = "rtmidi-ffi-port-in-$time";
     $in->open_virtual_port( $port_name );
     $out->open_port_by_name( qr/$port_name/ );
 }
@@ -70,6 +71,36 @@ sub sanity_check {
     1;
 }
 
+sub test_cc {
+    my ( $in, $out, $tests ) = @_;
+    my $mode = $out->get_rpn_14bit_mode //
+               $out->get_nrpn_14bit_mode //
+               $out->get_14bit_mode //
+                'disabled';
+    my $testnum = 0;
+    for my $test ( @{ $tests } ) {
+        ++$testnum;
+        for my $outmsg ( @{ $test->{ out } } ) {
+            $out->cc( @{ $outmsg } );
+        }
+        my $t = time;
+        while ( 1 ) {
+            if ( time - $t > .5 ) {
+                ok 0, "Timed out waiting for message $mode:$testnum";
+                last;
+            }
+            my $inmsg = $in->get_message_decoded;
+            if ( $inmsg ) {
+                my $intest = shift @{ $test->{ in } };
+                is( $inmsg, [ control_change => @{ $intest } ], "$mode:$testnum" );
+                last unless @{ $test->{ in } };
+            }
+            usleep 500;
+        }
+    }
+}
+
+
 our @EXPORT = (qw/
     newdevice
     connect_devices
@@ -78,4 +109,5 @@ our @EXPORT = (qw/
     drain_msgs
     no_virtual
     sanity_check
+    test_cc
 /);

@@ -1,0 +1,36 @@
+package Whelk::Resource::[% name %];
+
+use Kelp::Base 'Whelk::Resource';
+use Whelk::Schema;
+
+sub api
+{
+    my ($self) = @_;
+
+    Whelk::Schema->build(
+        my_model => {
+            type => 'object',
+            properties => {
+                field => {
+                    type => 'integer',
+                },
+            },
+        }
+    );
+
+    $self->add_endpoint(
+        [GET => '/'] => 'action_show',
+        description => 'Returns a single instance of my_model',
+        response => \'my_model',
+    );
+}
+
+sub action_show
+{
+    return {
+        field => 313,
+    };
+}
+
+1;
+

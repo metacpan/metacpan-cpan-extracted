@@ -117,6 +117,7 @@ t/params.t
 t/pattern_build.t
 t/pattern_cache.t
 t/pattern_match.t
+t/persistent_controllers.t
 t/psgi.t
 t/redefine_attrs.t
 t/request.t

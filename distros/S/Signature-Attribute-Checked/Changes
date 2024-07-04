@@ -1,5 +1,10 @@
 Revision history for Signature-Attribute-Checked
 
+0.05    2024-07-03
+        [CHANGES]
+         * Adjust docs, examples, unit tests to prefer Data::Checks
+           constraints added in v0.04
+
 0.04    2024-06-21
         [CHANGES]
          * Updated for Data::Checks v0.02

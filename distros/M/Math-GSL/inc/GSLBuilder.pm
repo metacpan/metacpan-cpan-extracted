@@ -207,6 +207,12 @@ sub compile_swig {
     my @swig_flags = defined($p->{swig_flags}) ? $self->split_like_shell($p->{swig_flags}) : ();
     push @swig_flags, "-I./include";
     my ($major, $minor, $numerical_ver) = reformat_version($ver);
+    if ($numerical_ver =~ /^0+$/) {
+        die "Unexpected swig version: $ver";
+    }
+    else {
+        $numerical_ver =~ s/^0+//;  # Swig seems to have problems with leading zeros
+    }
     push @swig_flags, "-DMG_GSL_MAJOR_VERSION=$major",
       "-DMG_GSL_MINOR_VERSION=$minor",
       "-DMG_GSL_VERSION=\"$major.$minor\"",

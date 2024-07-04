@@ -3,7 +3,7 @@
 #
 #  (C) Paul Evans, 2021-2023 -- leonerd@leonerd.org.uk
 
-package Syntax::Keyword::Match 0.14;
+package Syntax::Keyword::Match 0.15;
 
 use v5.14;
 use warnings;
@@ -19,7 +19,7 @@ C<Syntax::Keyword::Match> - a C<match/case> syntax for perl
 
 =head1 SYNOPSIS
 
-   use v5.14;
+   use v5.16;
    use Syntax::Keyword::Match;
 
    my $n = ...;

@@ -198,7 +198,7 @@ sub getURL   #LIKE GET, BUT ONLY RETURN THE SINGLE ONE W/BEST BANDWIDTH AND RELI
 								$lines[$line] =~ s#^\/##o;
 								$bestStream = $urlpath . $lines[$line];
 							}
-							print STDERR "----($bw): found stream=$bestStream=...\n"  if ($DEBUG);
+							print STDERR "----($bw): found stream=$bestStream= bw=$bw=...\n"  if ($DEBUG);
 						}
 					}
 				}

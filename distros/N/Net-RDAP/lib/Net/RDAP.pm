@@ -23,7 +23,7 @@ use vars qw($VERSION);
 use constant DEFAULT_CACHE_TTL => 3600;
 use strict;
 
-$VERSION = 0.26;
+$VERSION = 0.27;
 
 =pod
 
@@ -506,25 +506,25 @@ sub object_from_response {
     #
     # lookup results
     #
-    if    ('domain'     eq $data->{'objectClassName'})  { return Net::RDAP::Object::Domain->new($data, $url)    }
-    elsif ('ip network' eq $data->{'objectClassName'})  { return Net::RDAP::Object::IPNetwork->new($data, $url) }
-    elsif ('autnum'     eq $data->{'objectClassName'})  { return Net::RDAP::Object::Autnum->new($data, $url)    }
-    elsif ('nameserver' eq $data->{'objectClassName'})  { return Net::RDAP::Object::Nameserver->new($data, $url)}
-    elsif ('entity'     eq $data->{'objectClassName'})  { return Net::RDAP::Object::Entity->new($data, $url)    }
+    if    ('domain'     eq $data->{'objectClassName'})  { return Net::RDAP::Object::Domain->new($data,     $url) }
+    elsif ('ip network' eq $data->{'objectClassName'})  { return Net::RDAP::Object::IPNetwork->new($data,  $url) }
+    elsif ('autnum'     eq $data->{'objectClassName'})  { return Net::RDAP::Object::Autnum->new($data,     $url) }
+    elsif ('nameserver' eq $data->{'objectClassName'})  { return Net::RDAP::Object::Nameserver->new($data, $url) }
+    elsif ('entity'     eq $data->{'objectClassName'})  { return Net::RDAP::Object::Entity->new($data,     $url) }
 
     #
     # 'help' is not a real object type, but Net::RDAP::Service uses the
     # 'class_override' option to fetch() to ensure we return the right object
     # type here
     #
-    elsif ('help'       eq $data->{'objectClassName'})  { return Net::RDAP::Help->new($data, $url)              }
+    elsif ('help'       eq $data->{'objectClassName'})  { return Net::RDAP::Help->new($data, $url) }
 
     #
     # search results
     #
-    elsif (defined($data->{'domainSearchResults'}))        { return Net::RDAP::SearchResult->new($data, $url) }
-    elsif (defined($data->{'nameserverSearchResults'}))    { return Net::RDAP::SearchResult->new($data, $url) }
-    elsif (defined($data->{'entitySearchResults'}))        { return Net::RDAP::SearchResult->new($data, $url) }
+    elsif (defined($data->{'domainSearchResults'}))     { return Net::RDAP::SearchResult->new($data, $url) }
+    elsif (defined($data->{'nameserverSearchResults'})) { return Net::RDAP::SearchResult->new($data, $url) }
+    elsif (defined($data->{'entitySearchResults'}))     { return Net::RDAP::SearchResult->new($data, $url) }
 
     #
     # unprocessable response

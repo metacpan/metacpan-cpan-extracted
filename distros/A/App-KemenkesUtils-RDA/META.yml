@@ -19,10 +19,10 @@ name: App-KemenkesUtils-RDA
 provides:
   App::AKG:
     file: lib/App/AKG.pm
-    version: '0.002'
+    version: '0.003'
   App::KemenkesUtils::RDA:
     file: lib/App/KemenkesUtils/RDA.pm
-    version: '0.002'
+    version: '0.003'
 requires:
   Data::Sah::Coerce::perl::To_float::From_str::percent: '0'
   Data::Sah::Compiler::perl::TH::bool: '0.914'
@@ -40,7 +40,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=App-KemenkesUtils-RDA
   homepage: https://metacpan.org/release/App-KemenkesUtils-RDA
   repository: git://github.com/perlancar/perl-App-KemenkesUtils-RDA.git
-version: '0.002'
+version: '0.003'
 x_Dist_Zilla:
   perl:
     version: '5.038002'

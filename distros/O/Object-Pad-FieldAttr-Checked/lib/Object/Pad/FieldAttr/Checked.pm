@@ -3,7 +3,7 @@
 #
 #  (C) Paul Evans, 2023-2024 -- leonerd@leonerd.org.uk
 
-package Object::Pad::FieldAttr::Checked 0.10;
+package Object::Pad::FieldAttr::Checked 0.11;
 
 use v5.14;
 use warnings;
@@ -19,11 +19,11 @@ C<Object::Pad::FieldAttr::Checked> - apply value constraint checks to C<Object::
 
 =head1 SYNOPSIS
 
-With L<Types::Standard>:
+With L<Data::Checks>:
 
    use Object::Pad;
    use Object::Pad::FieldAttr::Checked;
-   use Types::Standard qw( Num );
+   use Data::Checks qw( Num );
 
    class Point {
       field $x :param :reader :Checked(Num);
@@ -33,23 +33,6 @@ With L<Types::Standard>:
    Point->new( x => 123, y => "456" );         # this is fine
 
    Point->new( x => "hello", y => "world" );   # throws an exception
-
-Or, standalone:
-
-   use Object::Pad;
-   use Object::Pad::FieldAttr::Checked;
-
-   package Numerical {
-      use Scalar::Util qw( looks_like_number );
-      sub check { looks_like_number $_[1]; }
-   }
-
-   class Point {
-      field $x :param :reader :Checked('Numerical');
-      field $y :param :reader :Checked('Numerical');
-   }
-
-   ...
 
 =head1 DESCRIPTION
 
@@ -83,14 +66,46 @@ supported.
 
 At compiletime, the string given by I<EXPRESSION> is C<eval()>'ed in scalar
 context, and its result is stored as part of the field's definition. The
-expression must yield either an object reference, a code reference, or a
-string containing the name of a package. In the case of an object or package,
-a method called C<check> must exist on it.
+expression must yield a value usable by L<Data::Checks>. Namely, one of:
+
+=over 4
+
+=item *
+
+Any of the constraint checkers provided by the L<Data::Checks> module itself.
+
+=item *
+
+An B<object> reference with a C<check> method:
+
+   $ok = $checkerobj->check( $value );
+
+=item *
+
+A B<code> reference:
+
+   $ok = $checkersub->( $value );
+
+=item *
+
+A B<plain string> giving the name of a package with a C<check> method:
+
+   $ok = $checkerpkg->check( $value );
 
 If using a plain package name as a checker, be sure to quote package names so
 it will not upset C<use strict>.
 
    field $x :Checked('CheckerPackage');
+
+=back
+
+As this is the interface supported by L<Types::Standard>, any constraint
+object provided by that module is already supported here.
+
+   use Types::Standard qw( Str Num );
+
+   field $name :Checked(Str);
+   field $age  :Checked(Num);
 
 At runtime, this constraint checker is used every time an attempt is made to
 assign a value to the field I<from outside the object class>, whether that is
@@ -100,25 +115,11 @@ method, and the new value for  the field is passed as an argument. If the
 method returns true, the assignment is allowed. If false, it is rejected with
 an exception and the field itself remains unmodified.
 
-   $ok = $checkerobj->check( $value );  # if an object
-
-   $ok = $checkersub->( $value );       # if a code reference
-
-   $ok = $checkerpkg->check( $value );  # if a package name
-
 (For performance reasons, the C<check> method is actually resolved into a
 function at compiletime when the C<:Checked> attribute is applied, and this
 stored function is the one that is called at assignment time. If the method
 itself is replaced later by globref assignment or other trickery, this updated
 function will not be used.)
-
-As this is the interface supported by L<Types::Standard>, any constraint
-object provided by that module is already supported here.
-
-   use Types::Standard qw( Str Num );
-
-   field $name :Checked(Str);
-   field $age  :Checked(Num);
 
 B<Note carefully> that direct assignment into the field variable by code
 within the class is not checked. This is partly because of design

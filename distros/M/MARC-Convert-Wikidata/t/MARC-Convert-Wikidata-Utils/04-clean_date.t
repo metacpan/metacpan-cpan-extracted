@@ -2,7 +2,7 @@ use strict;
 use warnings;
 
 use MARC::Convert::Wikidata::Utils qw(clean_date);
-use Test::More 'tests' => 8;
+use Test::More 'tests' => 13;
 use Test::NoWarnings;
 use Unicode::UTF8 qw(decode_utf8 encode_utf8);
 
@@ -15,6 +15,11 @@ is($ret, 2020, "Date '$input_date' after cleanup.");
 $input_date = decode_utf8('2020 př. Kr.');
 $ret = clean_date($input_date);
 is($ret, -2020, encode_utf8("Date '$input_date' after cleanup."));
+
+# Test.
+$input_date = decode_utf8('20 po. Kr.');
+$ret = clean_date($input_date);
+is($ret, 20, encode_utf8("Date '$input_date' after cleanup."));
 
 # Test.
 $input_date = decode_utf8('2020 březen 03.');
@@ -41,4 +46,28 @@ is_deeply(
 		'circa' => 1,
 	},
 	"Date '$input_date' has option 'circa'."
+);
+
+# Test.
+$input_date = 'asi 2002';
+($ret, $options_hr) = clean_date($input_date);
+is($ret, 2002, encode_utf8("Date '$input_date' after cleanup."));
+is_deeply(
+	$options_hr,
+	{
+		'circa' => 1,
+	},
+	"Date '$input_date' has option 'circa'."
+);
+
+# Test.
+$input_date = decode_utf8('asi 2510 př. Kr.');
+($ret, $options_hr) = clean_date($input_date);
+is($ret, -2510, encode_utf8("Date '$input_date' after cleanup."));
+is_deeply(
+	$options_hr,
+	{
+		'circa' => 1,
+	},
+	encode_utf8("Date '$input_date' has option 'circa'.")
 );

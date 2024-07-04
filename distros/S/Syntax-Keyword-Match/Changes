@@ -1,5 +1,14 @@
 Revision history for Syntax-Keyword-Match
 
+0.15    2024-07-04
+        [CHANGES]
+         * Don't claim a misleading `use VERSION` declaration in synopsis
+           example
+
+        [BUGFIXES]
+         * Fix `Build.PL` to add `-I.` to CFLAGS to account for latest
+           XS-Parse-Keyword which no longer does
+
 0.14    2024-04-30
         [CHANGES]
          * Added an initial attempt at B::Deparse logic

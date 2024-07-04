@@ -3,7 +3,7 @@
 #
 #  (C) Paul Evans, 2021 -- leonerd@leonerd.org.uk
 
-package XS::Parse::Infix::Builder 0.42;
+package XS::Parse::Infix::Builder 0.43;
 
 use v5.14;
 use warnings;
@@ -48,19 +48,12 @@ require XS::Parse::Infix::Builder_data;
 
    XS::Parse::Infix::Builder->write_XSParseInfix_h;
 
-Writes the F<XSParseInfix.h> file to the current working directory. To cause
-the compiler to actually find this file, see L</extra_compiler_flags>.
+This method no longer does anything I<since version 0.43>.
 
 =cut
 
 sub write_XSParseInfix_h
 {
-   shift;
-
-   open my $out, ">", "XSParseInfix.h" or
-      die "Cannot open XSParseInfix.h for writing - $!\n";
-
-   $out->print( XS::Parse::Infix::Builder_data->XSPARSEINFIX_H );
 }
 
 =head2 extra_compiler_flags
@@ -76,7 +69,11 @@ F<XSParseInfix.h> file.
 sub extra_compiler_flags
 {
    shift;
-   return "-I.", XS::Parse::Infix::Builder_data->BUILDER_CFLAGS;
+
+   require File::ShareDir;
+   require File::Spec;
+   return "-I" . File::Spec->catdir( File::ShareDir::dist_dir( "XS-Parse-Keyword" ), "include" ),
+      XS::Parse::Infix::Builder_data->BUILDER_CFLAGS;
 }
 
 =head2 extend_module_build
@@ -92,11 +89,6 @@ sub extend_module_build
 {
    my $self = shift;
    my ( $build ) = @_;
-
-   eval { $self->write_XSParseInfix_h } or do {
-      warn $@;
-      return;
-   };
 
    # preserve existing flags
    my @flags = @{ $build->extra_compiler_flags };

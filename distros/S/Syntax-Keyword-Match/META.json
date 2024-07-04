@@ -41,11 +41,11 @@
    "provides" : {
       "Syntax::Keyword::Match" : {
          "file" : "lib/Syntax/Keyword/Match.pm",
-         "version" : "0.14"
+         "version" : "0.15"
       },
       "Syntax::Keyword::Match::Deparse" : {
          "file" : "lib/Syntax/Keyword/Match/Deparse.pm",
-         "version" : "0.14"
+         "version" : "0.15"
       }
    },
    "release_status" : "stable",
@@ -55,6 +55,6 @@
       ],
       "x_IRC" : "irc://irc.perl.org/#io-async"
    },
-   "version" : "0.14",
+   "version" : "0.15",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

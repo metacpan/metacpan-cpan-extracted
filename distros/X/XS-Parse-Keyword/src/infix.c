@@ -161,7 +161,8 @@ struct Registration {
   int opname_is_ident : 1;
 };
 
-static struct Registration *registrations;
+static struct Registration *registrations,   /* for legacy-style global key-enabled ones */
+                           *fqregistrations; /* for new lexically named ones */
 
 static OP *new_op(pTHX_ const struct HooksAndData hd, U32 flags, OP *lhs, OP *rhs, SV **parsedata)
 {
@@ -279,6 +280,90 @@ static OP *S_unwrap_list(pTHX_ OP *o, bool may_unwrap_anonlist)
   return force_list_keeping_pushmark(newUNOP(OP_RV2AV, 0, o));
 }
 
+enum {
+  FINDREG_SKIP_BUILTIN = (1<<0),
+};
+
+#define find_reg(op, oplen, regp, flags)  S_find_reg(aTHX_ op, oplen, regp, flags)
+static STRLEN S_find_reg(pTHX_ const char *op, STRLEN oplen, struct Registration **regp, U32 flags)
+{
+  HV *hints = GvHV(PL_hintgv);
+
+  /* New-style lexically named operators */
+  {
+    bool opname_is_ident = isIDFIRST_utf8_safe(op, op + oplen);
+
+    SV *keysv = sv_newmortal();
+    for(int len = oplen; len > 0; len--) {
+      sv_setpvf(keysv, "XS::Parse::Infix/%.*s", len, op);
+      HE *ophe = hv_fetch_ent(hints, keysv, 0, 0);
+      if(!ophe && opname_is_ident)
+        break;
+      if(!ophe)
+        continue;
+
+      /* We found something suitable. Commit to this or fail */
+
+      char *fqop     = SvPVX(HeVAL(ophe));
+      STRLEN fqoplen = SvCUR(HeVAL(ophe));
+
+      for(struct Registration *reg = fqregistrations; reg; reg = reg->next) {
+        if(!reg->hd.hooks)
+          continue;
+
+        if(reg->oplen != fqoplen || !strEQ(reg->info.opname, fqop))
+          continue;
+
+        if(reg->hd.hooks->permit &&
+          !(*reg->hd.hooks->permit)(aTHX_ reg->hd.data))
+          continue;
+
+        *regp = reg;
+        return len;
+      }
+
+      croak("XS::Parse::Infix does not know of a registered infix operator named '%" SVf "'",
+            SVfARG(HeVAL(ophe)));
+    }
+  }
+
+  /* Legacy hinthash-enabled global operators */
+  struct Registration *reg, *bestreg = NULL;
+  for(reg = registrations; reg; reg = reg->next) {
+    /* custom registrations have hooks, builtin ones do not */
+    if((flags & FINDREG_SKIP_BUILTIN) && !reg->hd.hooks)
+      continue;
+
+    if(reg->oplen > oplen || !strnEQ(reg->info.opname, op, reg->oplen))
+      continue;
+    /* names like identifiers must match the whole length */
+    if(reg->opname_is_ident && reg->oplen != oplen)
+      continue;
+
+    if(reg->hd.hooks && reg->hd.hooks->permit_hintkey &&
+        (!hints || !hv_fetch(hints, reg->hd.hooks->permit_hintkey, reg->permit_hintkey_len, 0)))
+      continue;
+
+    if(reg->hd.hooks && reg->hd.hooks->permit &&
+        !(*reg->hd.hooks->permit)(aTHX_ reg->hd.data))
+      continue;
+
+    /* This is a candidate and the best one, unless we already have something
+     * longer
+     */
+    if(bestreg && bestreg->oplen > reg->oplen)
+      continue;
+
+    bestreg = reg;
+  }
+
+  if(!bestreg)
+    return 0;
+
+  *regp = bestreg;
+  return bestreg->oplen;
+}
+
 #ifdef HAVE_PL_INFIX_PLUGIN
 
 static void parse(pTHX_ SV **parsedata, struct Perl_custom_infix *def)
@@ -324,39 +409,13 @@ static STRLEN my_infix_plugin(pTHX_ char *op, STRLEN oplen, struct Perl_custom_i
   if(PL_parser && PL_parser->error_count)
     return (*next_infix_plugin)(aTHX_ op, oplen, def);
 
-  HV *hints = GvHV(PL_hintgv);
-
-  struct Registration *reg, *bestreg = NULL;
-  for(reg = registrations; reg; reg = reg->next) {
-    /* custom registrations have hooks, builtin ones do not */
-    if(!reg->hd.hooks)
-      continue;
-
-    if(reg->oplen > oplen || !strnEQ(reg->info.opname, op, reg->oplen))
-      continue;
-
-    if(reg->hd.hooks->permit_hintkey &&
-      (!hints || !hv_fetch(hints, reg->hd.hooks->permit_hintkey, reg->permit_hintkey_len, 0)))
-      continue;
-
-    if(reg->hd.hooks->permit &&
-      !(*reg->hd.hooks->permit)(aTHX_ reg->hd.data))
-      continue;
-
-    /* This is a candidate and the best one, unless we already have something
-     * longer
-     */
-    if(bestreg && bestreg->oplen > reg->oplen)
-      continue;
-
-    bestreg = reg;
-  }
-
-  if(!bestreg)
+  struct Registration *reg = NULL;
+  STRLEN consumed = find_reg(op, oplen, &reg, FINDREG_SKIP_BUILTIN);
+  if(!consumed)
     return (*next_infix_plugin)(aTHX_ op, oplen, def);
 
-  *def = &bestreg->def;
-  return bestreg->oplen;
+  *def = &reg->def;
+  return consumed;
 }
 #endif
 
@@ -383,43 +442,33 @@ bool XSParseInfix_parse(pTHX_ enum XSParseInfixSelection select, struct XSParseI
 
   HV *hints = GvHV(PL_hintgv);
 
-  const char *buf = PL_parser->bufptr;
-  const STRLEN buflen = PL_parser->bufend - PL_parser->bufptr;
+  const char *op = PL_parser->bufptr, *opend;
 
-  struct Registration *reg;
-  for(reg = registrations; reg; reg = reg->next) {
-    if(reg->oplen > buflen)
-      continue;
-    if(!strnEQ(buf, reg->info.opname, reg->oplen))
-      continue;
+  if(isIDFIRST_utf8_safe(op, PL_parser->bufend)) {
     /* If the operator name is an identifer then we don't want to capture a
      * longer identifier from the incoming source of which this is just a
      * prefix
      */
-    if(reg->opname_is_ident && isIDCONT_utf8_safe(buf + reg->oplen, PL_parser->bufend))
-      continue;
-
-    if(reg->hd.hooks && reg->hd.hooks->permit_hintkey &&
-      (!hints || !hv_fetch(hints, reg->hd.hooks->permit_hintkey, reg->permit_hintkey_len, 0)))
-      continue;
-
-    if(reg->hd.hooks && reg->hd.hooks->permit &&
-      !(*reg->hd.hooks->permit)(aTHX_ reg->hd.data))
-      continue;
-
-    /* At this point we're committed to this being the best match of operator.
-     * Is it selected by the filter?
-     */
-    if(!(selection & (1 << reg->info.cls)))
-      return FALSE;
-
-    *infop = &reg->info;
-
-    lex_read_to(PL_parser->bufptr + reg->oplen);
-    return TRUE;
+    opend = op + UTF8SKIP(op);
+    while(opend < PL_parser->bufend && isIDCONT_utf8_safe(opend, PL_parser->bufend))
+      opend += UTF8SKIP(opend);
+  }
+  else {
+    opend = PL_parser->bufend;
   }
 
-  return FALSE;
+  struct Registration *reg = NULL;
+  STRLEN consumed = find_reg(op, opend - op, &reg, 0);
+  if(!consumed)
+    return FALSE;
+
+  if(!(selection & (1 << reg->info.cls)))
+    return FALSE;
+
+  *infop = &reg->info;
+
+  lex_read_to(PL_parser->bufptr + consumed);
+  return TRUE;
 }
 
 OP *XSParseInfix_new_op(pTHX_ const struct XSParseInfixInfo *info, U32 flags, OP *lhs, OP *rhs)
@@ -897,6 +946,7 @@ static void reg_builtin(pTHX_ const char *opname, enum XSParseInfixClassificatio
   reg->info.cls    = cls;
 
   reg->oplen  = strlen(opname);
+  reg->opname_is_ident = isIDFIRST_utf8_safe(opname, opname + strlen(opname));
 
   reg->hd.hooks = NULL;
   reg->hd.data  = NULL;
@@ -913,9 +963,10 @@ void XSParseInfix_register(pTHX_ const char *opname, const struct XSParseInfixHo
 {
   STRLEN oplen = strlen(opname);
   const char *opname_end = opname + oplen;
-  bool opname_is_ident = isIDFIRST_utf8_safe(opname, opname_end);
+  bool opname_is_fq = strstr(opname, "::") != NULL;
+  bool opname_is_ident = !opname_is_fq && isIDFIRST_utf8_safe(opname, opname_end);
 
-  {
+  if(!opname_is_fq) {
     const char *s = opname;
     s += UTF8SKIP(s);
 
@@ -1059,7 +1110,11 @@ void XSParseInfix_register(pTHX_ const char *opname, const struct XSParseInfixHo
   else
     reg->permit_hintkey_len = 0;
 
-  {
+  if(opname_is_fq) {
+    reg->next = fqregistrations;
+    fqregistrations = reg;
+  }
+  else {
     reg->next = registrations;
     registrations = reg;
   }
@@ -1076,6 +1131,12 @@ void XSParseInfix_register(pTHX_ const char *opname, const struct XSParseInfixHo
      * ppfunc for disambiguating in case of name clashes
      */
     SV *namesv = newSVpvf("B::Deparse::pp_infix_%s_0x%p", opname, hooks->ppaddr);
+    {
+      char *doublecolon;
+      while((doublecolon = strstr(SvPVX(namesv)+sizeof("B::Deparse::pp::"), "::")))
+        /* Turn '::' into '__', a length-preserving operation */
+        doublecolon[0] = '_', doublecolon[1] = '_';
+    }
     if(reg->opname_is_WIDE)
       SvUTF8_on(namesv);
     SAVEFREESV(namesv);

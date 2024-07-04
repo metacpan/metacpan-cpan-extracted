@@ -11,9 +11,9 @@ use Log::ger;
 use Perinci::CmdLine::Any;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2024-06-13'; # DATE
+our $DATE = '2024-06-28'; # DATE
 our $DIST = 'App-KemenkesUtils-RDA'; # DIST
-our $VERSION = '0.002'; # VERSION
+our $VERSION = '0.003'; # VERSION
 
 my $cmdline = Perinci::CmdLine::Any->new(
     url => "/App/KemenkesUtils/RDA/kemenkes_get_rda",
@@ -41,7 +41,7 @@ kemenkes-get-rda - Get one or more values from Indonesian Ministry of Health's R
 
 =head1 VERSION
 
-This document describes version 0.002 of kemenkes-get-rda (from Perl distribution App-KemenkesUtils-RDA), released on 2024-06-13.
+This document describes version 0.003 of kemenkes-get-rda (from Perl distribution App-KemenkesUtils-RDA), released on 2024-06-28.
 
 =head1 SYNOPSIS
 
@@ -282,10 +282,10 @@ For fish and zsh, install L<shcompgen> as described above.
  Cl
  Cr
  Cu
- ... 32 more lines ...
- group
- height
- weight
+ ... 29 more lines ...
+ VK
+ Water
+ Zn
 
 =head2 List all groups (symbols)
 
@@ -320,16 +320,16 @@ For fish and zsh, install L<shcompgen> as described above.
 =head2 List all AKG values
 
  % kemenkes-get-rda
- +--------------------+--------------------------+--------+--------+--------------------------+
- | symbol             | group                    | height | weight | ref                      |
- +--------------------+--------------------------+--------+--------+--------------------------+
- | Ca                 | 0to5mo                   | 60     | 6      | 200                      |
- | Cl                 | 0to5mo                   | 60     | 6      | 180                      |
- ... 1009 more lines ...
- | group              | add_breastfeeding_6to12m |        |        | add_breastfeeding_6to12m |
- | height             | add_breastfeeding_6to12m |        |        |                          |
- | weight             | add_breastfeeding_6to12m |        |        |                          |
- +--------------------+--------------------------+--------+--------+--------------------------+
+ +--------------------+--------------------------+--------+--------+------+
+ | symbol             | group                    | height | weight | ref  |
+ +--------------------+--------------------------+--------+--------+------+
+ | Ca                 | 0to5mo                   | 60     | 6      | 200  |
+ | Cl                 | 0to5mo                   | 60     | 6      | 180  |
+ ... 931 more lines ...
+ | VK                 | add_breastfeeding_6to12m |        |        | 0    |
+ | Water              | add_breastfeeding_6to12m |        |        | 650  |
+ | Zn                 | add_breastfeeding_6to12m |        |        | 5    |
+ +--------------------+--------------------------+--------+--------+------+
 
 =head2 List AKG for vitamin D, for all groups
 

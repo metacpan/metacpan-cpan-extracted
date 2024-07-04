@@ -1,5 +1,9 @@
 =head1 Math::GSL Changes
 
+=head v.045 - July 2024
+    - Added support for GSL 2.8 (hakonhagland)
+    - Update to distribution metadata (mohawk2)
+
 =head1 v.044 - December 2023
     - Added support for GSL 2.7.1 (yewtc)
 

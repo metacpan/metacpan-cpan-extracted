@@ -1,5 +1,7 @@
 #!/usr/bin/env perl
-use Test2::V0;
+use FindBin;
+use lib "$FindBin::RealBin/lib";
+use Test2WithExplain;
 use Tree::RB::XS;
 use Time::HiRes 'time';
 
@@ -82,10 +84,10 @@ subtest iterators => sub {
    $t->put(4,4); note 'put(4,4)';
    is( $t->recent_count, 4, 'recent_count = 4' );
    is( [$t->iter_newer->next_keys('*')], [1,2,3,4], 'iter_old_to_new' );
-   is( [$t->iter_older->next_keys('*')], [4,3,2,1], 'iter_new_to_old' );
+   is( [$t->iter_older->next_keys(9**9**9)], [4,3,2,1], 'iter_new_to_old' );
    $t->delete(2); note 'delete(2)';
    is( $t->recent_count, 3, 'recent_count = 3' );
-   is( [$t->iter_newer->next_keys('*')], [1,3,4], 'iter_old_to_new' );
+   is( [$t->iter_newer->next_keys(1e90)], [1,3,4], 'iter_old_to_new' );
    is( [$t->iter_older->next_keys('*')], [4,3,1], 'iter_new_to_old' );
    $t->put(2,2); note 'put(2,2)';
    is( $t->recent_count, 4, 'recent_count = 4' );

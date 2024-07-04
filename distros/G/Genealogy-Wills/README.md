@@ -4,7 +4,7 @@ Genealogy::Wills - Lookup in a database of wills
 
 # VERSION
 
-Version 0.04
+Version 0.05
 
 # SYNOPSIS
 

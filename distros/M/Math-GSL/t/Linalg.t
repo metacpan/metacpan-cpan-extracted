@@ -51,7 +51,22 @@ sub GSL_LINALG_LU_DECOMP : Tests {
     gsl_matrix_memcpy($first->raw, $base->raw);
 
     my ($result, $signum) = gsl_linalg_LU_decomp($base->raw, $permutation);
-    is_deeply( [ $result, $signum ], [ 0, 1] );
+    my $version= gsl_version();
+    my ($major, $minor) = split /\./, $version;
+    if ($major >= 2 && $minor >= 8) {
+        # From version 2.8 onwards, the result value for a singular matrix is an integer
+        #  such that U(i,i) = 0
+        # TODO: For some reason this is not the case on macOS yet
+        if ($^O eq 'darwin') {
+            is_deeply( [ $result, $signum ], [ 0, 1] );
+        }
+        else {
+            is_deeply( [ $result, $signum ], [ 4, 1] );
+        }
+    }
+    else {
+        is_deeply( [ $result, $signum ], [ 0, 1] );
+    }
 
     my $U = Math::GSL::Matrix->new(4,4);
     my $R = Math::GSL::Matrix->new(4,4);

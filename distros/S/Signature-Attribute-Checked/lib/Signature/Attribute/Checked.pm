@@ -1,9 +1,9 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2023 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2023-2024 -- leonerd@leonerd.org.uk
 
-package Signature::Attribute::Checked 0.04;
+package Signature::Attribute::Checked 0.05;
 
 use v5.14;
 use warnings;
@@ -17,12 +17,12 @@ C<Signature::Attribute::Checked> - apply value constraint checks to subroutine p
 
 =head1 SYNOPSIS
 
-With L<Types::Standard>
+With L<Data::Checks>:
 
    use v5.26;
    use Sublike::Extended;
    use Signature::Attribute::Checked;
-   use Types::Standard qw( Num );
+   use Data::Checks qw( Num );
 
    extended sub add ($x :Checked(Num), $y :Checked(Num)) {
       return $x + $y;
@@ -68,14 +68,45 @@ supported.
 
 At compiletime, the string given by I<EXPRESSION> is C<eval()>'ed in scalar
 context, and its result is stored as part of the subroutine's definition. The
-expression must yield either an object reference, a code reference, or a
-string containing the name of a package. In the case of an object or package,
-a method called C<check> must exist on it.
+expression must yield a value usable by L<Data::Checks>. Namely, one of:
+
+=over 4
+
+=item *
+
+Any of the constraint checkers provided by the L<Data::Checks> module itself.
+
+=item *
+
+An B<object> reference with a C<check> method:
+
+   $ok = $checkerobj->check( $value );
+
+=item *
+
+A B<code> reference:
+
+   $ok = $checkersub->( $value );
+
+=item *
+
+A B<plain string> giving the name of a package with a C<check> method:
+
+   $ok = $checkerpkg->check( $value );
 
 If using a plain package name as a checker, be sure to quote package names so
 it will not upset C<use strict>.
 
    extended sub xyz ($x :Checked('CheckerPackage')) { ... }
+
+=back
+
+As this is the interface supported by L<Types::Standard>, any constraint
+object provided by that module is already supported here as well.
+
+   use Types::Standard qw( Str Num );
+
+   extended sub ghi ($x :Checked(Str), $y :Checked(Num)) { ... }
 
 At runtime, this constraint checker is used every time an attempt is made to
 call the function. The checker is used as the invocant for invoking a C<check>
@@ -83,24 +114,11 @@ method, and the value for the parameter is passed as an argument. If the
 method returns true, the call is allowed. If false, it is rejected with an
 exception and the function body is not invoked.
 
-   $ok = $checkerobj->check( $value );  # if an object
-
-   $ok = $checkersub->( $value );       # if a code reference
-
-   $ok = $checkerpkg->check( $value );  # if a package name
-
 (For performance reasons, the C<check> method is actually resolved into a
 function at compiletime when the C<:Checked> attribute is applied, and this
 stored function is the one that is called at assignment time. If the method
 itself is replaced later by globref assignment or other trickery, this updated
 function will not be used.)
-
-As this is the interface supported by L<Types::Standard>, any constraint
-object provided by that module is already supported here.
-
-   use Types::Standard qw( Str Num );
-
-   extended sub ghi ($x :Checked(Str), $y :Checked(Num)) { ... }
 
 It is not specified what order these checks are performed in. In particular,
 if any parameter default expressions invoke any side-effects, it is

@@ -1,0 +1,112 @@
+=pod
+
+=encoding utf8
+
+=head1 NAME
+
+Whelk::Manual::Kelp - Setting up Whelk inside Kelp
+
+=head1 SYNOPSIS
+
+	########################
+	# File: conf/config.pl #
+	########################
+
+	{
+		modules => [qw(JSON YAML Whelk)],
+		modules_init => {
+			Routes => {
+				base => 'MyApp/Controller',
+				rebless => 1,
+			},
+			Whelk => {
+				resources => {
+					Res => '/',
+				},
+				openapi => '/openapi.json',
+			},
+		},
+	}
+
+	######################
+	# File: lib/MyApp.pm #
+	######################
+	package MyApp;
+
+	use Kelp::Base 'Kelp';
+
+	sub build {
+		my ($self) = @_;
+
+		$self->whelk->init;
+	}
+
+	#################################
+	# File: lib/MyApp/Controller.pm #
+	#################################
+	package MyApp::Controller;
+
+	use Kelp::Base 'MyApp';
+
+	#####################################
+	# File: lib/MyApp/Controller/Res.pm #
+	#####################################
+
+	package MyApp::Controller::Res;
+
+	use Kelp::Base 'MyApp::Controller';
+	use Role::Tiny::With;
+
+	with 'Whelk::Role::Resource';
+
+	sub api
+	{
+		# implement the API as usual
+		...
+	}
+
+=head1 DESCRIPTION
+
+Whelk is easily set up to work as a regular L<Kelp> module. This document
+explains the differences between standalone Whelk and nested Whelk. Most
+information from L<Whelk::Manual> is still valid, but there are a couple of
+differences.
+
+=head2 Configuration: Whelk module and reblessing router
+
+C<Kelp::Module::Whelk> is a module which must be loaded in app's configuration.
+It can be loaded at any place, since it does not fully init itself during
+initial module load.
+
+Whelk works exclusively in the controller mode, so C<Router> module must have
+correct setting of C<base> and C<rebless>. Whelk is not guaranteed to work with
+custom Kelp routers.
+
+Unlike standalone Whelk, all configuration listed in
+L<Whelk::Manual/Configuration> is not taken from root hash but instead from
+C<modules_init.Whelk> hash.
+
+=head2 Calling C<finalize> inside application's C<build>
+
+To correctly set up Whelk, you have to manually call C<<
+$app->whelk->finalize(); >> in your application's C<build> method. You can use
+it to your advantage by defining some global schemas before calling
+C<finalize>, so that all resources will have access to them. After calling
+C<finalize> the api is finalized and can no longer be modified.
+
+If you forget to call C<finalize>, the api will not be built and installed in
+your app.
+
+=head2 Consuming C<Whelk::Role::Resource> role
+
+Each controller which is supposed to be a Whelk resource must consume
+C<Whelk::Role::Resource> (L<Role::Tiny> role). It can be done with C<with> from
+C<Role::Tiny::With> or C<Moo>.
+
+Don't consume this role in your base controller, unless you plan to have all
+controllers as Whelk resources.
+
+=head1 SEE ALSO
+
+L<Whelk::Manual>
+

@@ -1,0 +1,569 @@
+=pod
+
+=encoding utf8
+
+=head1 NAME
+
+Whelk::Manual - Reference to APIs with Whelk
+
+=head1 SYNOPSIS
+
+	##############################
+	# File: conf/whelk_config.pl #
+	##############################
+
+	{
+		resources => {
+			'MyApi' => {
+				path => '/',
+				name => 'Demo',
+				description => 'Demo Whelk resource, grouping multiple endpoints',
+			},
+		},
+
+		openapi => {
+			path => '/openapi.yaml',
+			format => 'yaml',
+			info => {
+				title => 'My Whelk API',
+				description => 'Testing Whelk API framework',
+				contact => {
+					email => 'me@mydomain.com',
+				},
+				version => '1.2.3',
+			}
+		},
+	}
+
+	#####################################
+	# File: lib/Whelk/Resource/MyApi.pm #
+	#####################################
+
+	package Whelk::Resource::MyApi;
+
+	use Kelp::Base 'Whelk::Resource';
+	use Whelk::Schema;
+
+	sub api
+	{
+		my ($self) = @_;
+
+		Whelk::Schema->build(
+			language => {
+				type => 'object',
+				properties => {
+					language => {
+						type => 'string',
+					},
+					pangram => {
+						type => 'string',
+					},
+				},
+			}
+		);
+
+		$self->add_endpoint(
+			[GET => '/pangrams'] => 'action_list',
+			description => 'Returns a list of language names with a pangram in each language',
+			response => {
+				type => 'array',
+				description => 'List of languages',
+				items => \'language',
+			}
+		);
+	}
+
+	sub action_list
+	{
+		return [
+			{
+				language => 'English',
+				pangram => 'a quick brown fox jumped over a lazy dog',
+			},
+			{
+				language => 'Francais',
+				pangram => 'voix ambiguë d’un cœur qui au zéphyr préfère les jattes de kiwis',
+			},
+			{
+				language => 'Polski',
+				pangram => 'mężny bądź, chroń pułk twój i sześć flag',
+			},
+		];
+	}
+
+	##################
+	# File: app.psgi #
+	##################
+
+	use Kelp::Base -strict;
+	use Whelk;
+	use lib 'lib';
+
+	Whelk->new->run;
+
+
+=head1 DESCRIPTION
+
+Whelk is an API framework created on top of L<Kelp> web framework, which adds
+new capabilities to Kelp specific to web APIs. In particular, Whelk keeps track
+of your routes and forces you to define schemas for the data on API's input and
+output. This extra data is then used to generate an L<OpenAPI
+document|https://swagger.io/specification/> describing the API.
+
+Whelk can be setup either standalone as a L<Plack> application or under an
+existing Kelp application. This document intends to get the reader up to speed
+in creating standalone Whelk APIs. To see the guide for Kelp integration, see
+L<Whelk::Manual::Kelp>.
+
+This manual assumes some level of Kelp proficiency. Consult the awesome
+L<Kelp::Manual> if you need guidance in that area.
+
+=head2 Whelk basics
+
+Whelk is neither an API generator (from an OpenAPI document), nor OpenAPI
+document generator. Instead, it can be thought of as a framework for
+implementing both API code and specification at the same time. OpenAPI is not
+an afterthought in Whelk, but rather welded into its very core. Each time you
+declare how your data should look, it serve both as documentation through
+OpenAPI as well as runtime validation scheme.
+
+Data types are defined in Whelk's own format, very similar to JSON schema but
+simpler and not as strict when it comes to validation. Reusable, named schemas
+can be created and easily referenced or extended. These named definitions are
+global and will end up as schemas in the OpenAPI document. See L<Whelk::Schema>
+for a full reference on schema syntax.
+
+Whelk uses a set of custom entities to deliver its functionality. The most
+basic entity in Whelk is a I<resource>, which is a specialized Kelp controller.
+APIs consist of one or more resources, each extending L<Whelk::Resource> and
+implementing the C<api> method. This method will be automatically run once per
+resource during app's construction and its job is to define all the
+subentities. Resources are represented as a tag in the API's specification.
+
+Instead of defining standard Kelp routes, resources should instead define
+I<endpoints> through C<add_endpoint> method. Endpoint can be though of a
+decorated Kelp route with its destination wrapped for ensuring data
+correctness. It must contain the description of all the data on input and
+output. Whelk keeps track of the endpoints and the resource they are defined
+in. You will never have to interact with endpoint objects directly after their
+creation unless you're extending the framework. Endpoints will end up as paths
+in the OpenAPI document, each tagged with the resource they were defined in.
+
+Whelk manages request and response content types through I<formatters>. A formatter
+defines one response format, multiple request formats, and some utility
+functions to handle formats on Kelp request and response objects. By default,
+a JSON formatter is used. See L<Whelk::Formatter> for more information.
+
+Lastly, Whelk uses I<wrappers> to define how requests and responses are treated
+before and after they reach the endpoint's destination. Wrappers are
+interchangeable and extendable to the core, allowing you to introduce custom
+behavior to your resource with little effort. See L<Whelk::Wrapper> for
+details.
+
+=head3 Quickstart - generate the app
+
+Whelk allows you to quickly generate all the files it needs by C<whelk>
+template usable in C<kelp-generator> script:
+
+	kelp-generator --type=whelk MyResource
+
+This script will generate this structure of files:
+
+	conf/
+		whelk_config.pl
+		whelk_development.pl
+	lib/
+		Whelk/
+			Resource/
+				MyResource.pm
+	t/
+		whelk_MyResource.t
+		whelk_openapi.t
+	app.psgi
+
+Note that you can use this script to incrementally generate more resources
+later. You will have to manually add the new resources into
+C<conf/whelk_config.pl> to have them exposed, but the script will not replace
+the existing files unless you use C<--force> flag.
+
+After setting up the app, you can immediatelly execute C<plackup> and navigate
+to C<localhost:5000/openapi.json> to get an OpenAPI document describing the
+generated resource. Tools like L<Swagger Editor|https://editor.swagger.io/> can
+be used to see it in a human-friendly form.
+
+=head3 Configuration
+
+Whelk shares the same configuration mechanism as Kelp - it is configured in
+C<.pl> files, most commonly put into the C<conf/> directory. It only takes
+configuration from files prefixed with C<whelk_>. Most of your configuration
+should be defined in C<whelk_config.pl> file, in addition to per-environment
+configuration in C<whelk_test.pl>, C<whelk_development.pl> and
+C<whelk_deployment.pl>.
+
+Since Whelk is a Kelp app, you can use all the regular Kelp configuration fields.
+In addition, you can define these Whelk-specific fields:
+
+=head4 formatter
+
+A default class for request / response formatters. It will be prefixed with
+C<Whelk::Formatter>. It has to start with C<+> to avoid prefixing. By default,
+value C<JSON> is used, which constructs L<Whelk::Formatter::JSON>. Can be
+configured to C<YAML> available in Whelk's core, or any custom formatter.
+
+=head4 wrapper
+
+A default class for endpoint formatters. It will be prefixed with
+C<Whelk::Wrapper>. It has to start with C<+> to avoid prefixing. By default,
+value C<Simple> is used, which constructs L<Whelk::Wrapper::Simple>. Can be
+configured to C<WithStatus> available in Whelk's core, or any custom wrapper.
+
+=head4 resources
+
+A hash containing all the resources for this app.
+
+Each key in this hash must be a string package name, which will be prefixed
+with C<Whelk::Resource> (the value of L<Kelp::Routes/base>).
+
+Each value must be either a string or a hash with the following keys:
+
+=over
+
+=item path
+
+B<Mandatory>. A base path under which each endpoint in this resource will be mounted.
+
+=item wrapper
+
+Same as L</wrapper>, but specialized for this resource only.
+
+=item formatter
+
+Same as L</formatter>, but specialized for this resource only.
+
+=item description
+
+A description used for the resource tag in OpenAPI.
+
+=back
+
+If the value is string, it is used as if it was passed as C<path>.
+
+=head4 openapi
+
+A string or hash containing OpenAPI data, with the following keys:
+
+=over
+
+=item path
+
+B<Mandatory>. A path under which OpenAPI endpoint will be mounted.
+
+=item formatter
+
+Same as L</formatter>, but specialized for OpenAPI endpont only.
+
+=item class
+
+Class to be used to generate OpenAPI data. This is not prefixed with
+anything. C<Whelk::OpenAPI> by default.
+
+=item info
+
+Data which will be inserted directly into C<info> field of OpenAPI endpoint.
+This is technically not mandatory, but OpenAPI spec requires you to at least
+include keys C<title> and C<version>.
+
+=item extra
+
+Any extra keys to be added to the root of the OpenAPI document. They will not
+take precedence over other keys.
+
+=back
+
+If the value is string, it is used as if it was passed as C<path>.
+
+=head4 inhale_response
+
+A boolean value - whether to I<inhale> (validate) response before serializing
+it. Default value is C<true>. It is strongly recommended that this stays
+C<true>, but setting C<false> can be the last resort to improving performance.
+
+=head3 Adding endpoints
+
+After you have your resource package set up, you can add some endpoints in its
+C<api> method:
+
+	sub api
+	{
+		my ($self) = @_;
+
+		$self->add_endpoint(
+			'/somewhere' => $destination,
+			%whelk_metadata
+		);
+	}
+
+This works very similar to L<Kelp::Routes/add>, with some caveats:
+
+=over
+
+=item
+
+If the pattern is not in form of C<< [METHOD => $path] >> and no C<method> key
+is specified, C<GET> is assumed. Whelk does not support endpoints which match
+for every HTTP method.
+
+=item
+
+Regex patterns are disallowed. If your pattern contains placeholders, it can
+only contain regular C<:> placeholders - there is no support for other variants
+(C<< ?*> >>).
+
+=item
+
+The pattern is not absolute (as it is in Kelp), but rather it will be appended
+to path from resource's configuration.
+
+=item
+
+The destination, when passed as a string, is also localized to the current
+resource, as long as it does not contain package name in it. Even if it has a
+package name (or is a subroutine reference), the passed application object will
+always be the resource object (not the object of that class).
+
+=back
+
+The extra C<%whelk_metadata> hash is where you define all the extra
+Whelk-specific bits and pieces. It can cointain these keys:
+
+=over
+
+=item response
+
+	response => {
+		type => 'boolean',
+		description => 'Success?',
+	}
+
+A schema definition for the response. Not setting this will not raise an
+exception, but the application won't be able to correctly respond with success
+status.
+
+=item parameters
+
+	parameters => {
+		query => {
+			field_name => {
+				type => 'integer',
+			}
+		}
+	}
+
+Parameters which are expected of the request. It can contain keys C<path>,
+C<query>, C<header> and C<cookie>. Each key must have a hashref of names
+followed by schema definitions for that parameter name.
+
+Only C<string>, C<integer>, C<number> and C<boolean> types are supported in
+parameters. Exceptions are C<query> and C<header> parameter types, which also
+allow for C<array> type.
+
+Parameters will only perform validation of the type but will not adjust the
+parameters in Kelp request. Exception is C<query>, which will adjust the
+request query to match the schema - types will be coerced, defaults will be
+filled and extra parameters will be removed - calling C<<
+$app->req->query_param >> and other similar methods will fetch the sanitized
+values.
+
+=item request
+
+	request => {
+		type => 'object',
+		properties => {
+			name => {
+				type => 'string',
+			},
+			value => {
+				type => 'number',
+			},
+		},
+	},
+
+A schema definition for the request content. This data will be accepted in
+every C<Content-Type> format deemed supported by the formatter. After
+validation, decoded and sanitized data will be available in two places: C<<
+$app->stash->{request} >> and C<< $app->request_body >>. It is B<strongly>
+recommended you use this cleaned data instead of regular framework methods like
+C<json_content>.
+
+=item summary
+
+A short summary used in endpoint's OpenAPI representation.
+
+=item description
+
+A longer description used in endpoint's OpenAPI representation.
+
+=back
+
+Here is showcase of a rich endpoint definition - it multiplies some numbers
+found in all possible request locations. It also shows how to define named
+schemas and extend them with extra parameters:
+
+	Whelk::Schema->build(
+		my_num => {
+			type => 'number',
+		}
+	);
+
+	# extend my_num schema to add default
+	Whelk::Schema->build(
+		my_num_optional => [
+			\'my_num',
+			default => 1,
+		]
+	);
+
+	$self->add_endpoint(
+		'/multiply/:number' => {
+			name => 'multiply',
+			method => 'POST',
+			to => sub {
+				my ($self, $number) = @_;
+
+				$number = $number
+					* ($self->req->header('X-Number') // 1)
+					* ($self->req->cookies->{number} // 1)
+					* $self->req->query_param('number')
+					* $self->request_body->{number};
+
+				return { number => $number };
+			},
+		},
+		parameters => {
+			path => {
+				number => \'my_num',
+			},
+			header => {
+				'X-Number' => \'my_num_optional',
+			},
+			cookie => {
+				number => \'my_num_optional',
+			},
+			query => {
+				number => \'my_num_optional'
+			},
+		},
+		request => {
+			type => 'object',
+			properties => {
+				number => \'my_num_optional',
+			}
+		},
+		response => {
+			type => 'object',
+			properties => {
+				number => \'my_num'
+			}
+		}
+	)
+
+One caveat here is that even though C<header> and C<cookie> values are marked
+as optional (with a default), their values still have to be defined-or'ed in
+the code. This is not true for C<query> and C<request>, which are correctly
+adjusted to the default if not present. Make sure to take that into account if
+you're using defaults on C<header> or C<cookie>.
+
+=head2 Advanced topics
+
+All what we discussed so far should be enough to create a simple API. However,
+much like Kelp, Whelk is hackable to the core and can be customized by
+extending its base classes.
+
+=head3 Subclassing the controller
+
+It should be quite easy to add some extra methods to all resources at once by
+modifying the base controller:
+
+	package Whelk::MyResource;
+
+	use Kelp::Base 'Whelk::Resource';
+
+	sub new_method
+	{
+		... # do something useful
+	}
+
+After doing that, you will have to modify the config as well:
+
+	{
+		modules_init => {
+			Routes => {
+				base => 'Whelk::MyResource',
+			},
+		},
+	}
+
+All of your resources must from now on extend C<Whelk::MyResource>. If you want
+to keep them in C<Whelk::Resource> namespace, they will have to be specified
+with full class name and prefixed with C<+>:
+
+	{
+		resources => {
+			'+Whelk::Resource::SomeResource' => '/some_resource',
+		}
+	}
+
+=head3 Subclassing Whelk::Wrapper
+
+L<Whelk::Wrapper> contains a lot of logic which controlls how the requests and
+responses are treated. It defines error codes and their schemas, parses input,
+wraps data and handles errors. All of that can be changed by subclassing it and
+overriding the required methods.
+
+Whelk comes with an alternative wrapper, L<Whelk::Wrapper::WithStatus>, which
+can be used as an example for small modifications to the wrapper. It modifies
+the schemas so that a boolean status code is returned in all responses.
+Wrapping code is also adjusted to match the schemas. This is a very minor
+modification, but wrapper is written in such a way that it should not be much
+work to completely overhaul how it works. For example, overriding C<execute>
+method will allow changing how the actual route-handling code will be called.
+
+=head3 Subclassing Whelk::Formatter
+
+L<Whelk::Formatter> is an utility class which encapsulates logic related to
+formats (content types). It's used to define supported content types, response
+content type, how to get data from request and how to put data into the
+response.
+
+Whelk comes with a L<Whelk::Formatter::YAML> formatter, which simply sets
+response format to C<yaml>. The ability to write custom formatter can come
+handy when you want to handle a format not supported by base Whelk, for example
+C<xml>.
+
+=head3 Subclassing Whelk::OpenAPI
+
+If you're having a nit to pick about how the default OpenAPI looks, it's
+absolutely possible to extend L<Whelk::OpenAPI>. A simple example may be
+supporting a different OpenAPI spec version, as the default class only
+supports version 3 (C<3.0.3> to be accurate).
+
+=head3 Subclassing Whelk
+
+Subclassing Whelk itself is not as easy task, as it is basically writing a new
+Kelp app with C<Whelk> as a base class. It will also require adding a new base
+controller class, similar to L</Subclassing the controller> but with different
+base cass, and possibly a couple other modifications.
+
+Whelk usually does not need to be subclassed, as it will happily function as a
+Kelp module in a regular Kelp app. We suggest you simply load C<Whelk> module
+into a plain Kelp app instead - docs from L<Whelk::Manual::Kelp> will come
+useful to do that.
+
+=head1 SEE ALSO
+
+L<Kelp::Manual>
+
+L<Whelk::Manual::Kelp>
+
+L<Whelk::Schema>
+

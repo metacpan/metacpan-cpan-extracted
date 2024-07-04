@@ -29,7 +29,7 @@ my $build = Module::Build->new(
       },
    },
 
-   extra_compiler_flags => [qw( -Iinclude )],
+   extra_compiler_flags => [qw( -Iinclude -I. )],
 );
 
 XS::Parse::Keyword::Builder->extend_module_build( $build );

@@ -12,5 +12,7 @@ README
 t/00use.t
 t/01positional.t
 t/02named.t
-t/10types-standard.t
+t/10checks.t
+t/20types-standard.t
+t/80checks+signature.t
 t/99pod.t

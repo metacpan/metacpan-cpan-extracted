@@ -62,11 +62,15 @@ my %WriteMakefileArgs = (
     "warnings" => 0
   },
   "TEST_REQUIRES" => {
+    "FindBin" => 0,
     "Test2::Suite" => "0.000139",
+    "Test2::Tools::Subtest" => 0,
     "Test2::V0" => 0,
-    "Time::HiRes" => 0
+    "Time::HiRes" => 0,
+    "lib" => 0,
+    "parent" => 0
   },
-  "VERSION" => "0.08",
+  "VERSION" => "0.09",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -80,11 +84,15 @@ my %WriteMakefileArgs = (
 my %FallbackPrereqs = (
   "Carp" => 0,
   "Exporter" => 0,
+  "FindBin" => 0,
   "Scalar::Util" => 0,
   "Test2::Suite" => "0.000139",
+  "Test2::Tools::Subtest" => 0,
   "Test2::V0" => 0,
   "Time::HiRes" => 0,
   "XSLoader" => 0,
+  "lib" => 0,
+  "parent" => 0,
   "strict" => 0,
   "warnings" => 0
 );

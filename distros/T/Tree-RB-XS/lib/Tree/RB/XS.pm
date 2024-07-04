@@ -1,5 +1,5 @@
 package Tree::RB::XS;
-$Tree::RB::XS::VERSION = '0.08';
+$Tree::RB::XS::VERSION = '0.09';
 # VERSION
 # ABSTRACT: Red/Black Tree implemented in C, with similar API to Tree::RB
 
@@ -720,14 +720,15 @@ current Node.
 
   my $nodes= $iter->next;
   my @nodes= $iter->next($count);
-  my @nodes= $iter->next('*');
+  my @nodes= $iter->next('*' || inf);
 
 Return the current node (as a L<node object|/NODE OBJECTS>) and advance to the following node
 in the sequence.  After the end of the sequence, calls to C<next> return C<undef>.
 If you pass the optional C<$count>, it will return up to that many nodes, as a list.
 It will also return an empty list at the end of the sequence instead of returning C<undef>.
 You can use the string C<'*'> for the count to indicate all the rest of the nodes in the
-sequence.
+sequence.  Likewise, any numeric value larger than the number of nodes in the tree
+(like builtin::inf) will return them all.
 
 =item next_key
 
@@ -1031,7 +1032,7 @@ However, it runs significantly slower than Tree::RB.
 
 =head1 VERSION
 
-version 0.08
+version 0.09
 
 =head1 AUTHOR
 

@@ -122,7 +122,7 @@ my $builder = GSLBuilder->new(
     license             => 'gpl',
     meta_merge     => {
         resources => {
-            repository  => 'http://github.com/leto/math--gsl/tree/master'
+            repository  => 'https://github.com/hakonhagland/perl-math-gsl/tree/master'
         },
     },
     build_requires => {

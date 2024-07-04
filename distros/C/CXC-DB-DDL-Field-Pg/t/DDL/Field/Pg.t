@@ -25,16 +25,18 @@ subtest 'PG_JSONB' => sub {
     my $field = PG_JSONB()->( 'foo' );
     isa_ok( $field, ['CXC::DB::DDL::Field::Pg'], 'object' );
     is(
-        $field->data_type,
-        array {
-            item object {
-                prop blessed => 'CXC::DB::DDL::Field::PgType';
-                call name => 'PG_JSONB';
-                call type => DBD::Pg::PG_JSONB;
+        $field => object {
+            call data_type => array {
+                item object {
+                    prop blessed => 'CXC::DB::DDL::Field::PgType';
+                    call name => 'PG_JSONB';
+                    call type => DBD::Pg::PG_JSONB;
+                };
+                end;
             };
-            end;
+            call [ type_name => undef ] => 'JSONB';
         },
-        'type'
+        'type',
     );
 };
 

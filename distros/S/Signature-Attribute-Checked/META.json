@@ -28,7 +28,7 @@
       },
       "runtime" : {
          "requires" : {
-            "Data::Checks" : "0.02",
+            "Data::Checks" : "0.04",
             "XS::Parse::Sublike" : "0.19",
             "perl" : "5.026"
          }
@@ -42,7 +42,7 @@
    "provides" : {
       "Signature::Attribute::Checked" : {
          "file" : "lib/Signature/Attribute/Checked.pm",
-         "version" : "0.04"
+         "version" : "0.05"
       }
    },
    "release_status" : "stable",
@@ -51,6 +51,6 @@
          "http://dev.perl.org/licenses/"
       ]
    },
-   "version" : "0.04",
+   "version" : "0.05",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

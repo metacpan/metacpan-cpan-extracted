@@ -1,0 +1,23 @@
+#!perl
+use v5.36.0;
+use Slack::BlockKit::Sugar -all => { -prefix => 'bk_' };
+use utf8;
+
+my $channel_id = q{C079XSBFV0F};
+
+return bk_blocks(
+  bk_richblock(
+    bk_preformatted(
+      bk_richtext("This is preformatted text with a link to "),
+      "[", bk_link("https://rjbs.cloud/", "Rik's blog"), "]",
+      " as discussed on <channel objects not supported>",
+      bk_link(
+        "https://rjbs.cloud/",
+        "Rik's other blog",
+        { style => { strike => 1 } }
+      ),
+      # bk_channel($channel_id), # Slack says this is legal, but actually rejects it
+      # bk_emoji("smile"),       # Slack says this is legal, but actually rejects it
+    ),
+  )
+);

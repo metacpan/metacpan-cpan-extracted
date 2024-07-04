@@ -1,0 +1,63 @@
+#!perl
+use v5.36.0;
+use Slack::BlockKit;
+
+# This is equivalent to the "example_rich" in sugartest.  This code is about
+# sixty lines long.  (Exactly 57, at time of writing.)  The sugared form is 14.
+my $blocks = Slack::BlockKit::BlockCollection->new({
+  blocks => [
+    Slack::BlockKit::Block::RichText->new({
+      elements => [
+        Slack::BlockKit::Block::RichText::Section->new({
+          elements => [
+            Slack::BlockKit::Block::RichText::Text->new({
+              text => "Here is a ",
+            }),
+            Slack::BlockKit::Block::RichText::Text->new({
+              text  => "safe",
+              style => { italic => 1 },
+            }),
+            Slack::BlockKit::Block::RichText::Text->new({
+              text => " link: ",
+            }),
+            Slack::BlockKit::Block::RichText::Link->new({
+              text  => "click me",
+              unsafe => 1,
+              url   => "https://fastmail.com/",
+              style => { bold => 1 },
+            }),
+          ],
+        }),
+        Slack::BlockKit::Block::RichText::List->new({
+          style => 'bullet',
+          elements => [
+            Slack::BlockKit::Block::RichText::Section->new({
+              elements => [
+                Slack::BlockKit::Block::RichText::Text->new({
+                  text => "it will be fun",
+                }),
+              ]
+            }),
+            Slack::BlockKit::Block::RichText::Section->new({
+              elements => [
+                Slack::BlockKit::Block::RichText::Text->new({
+                  text => "it will be cool",
+                }),
+                Slack::BlockKit::Block::RichText::Emoji->new({
+                  name => 'smile',
+                }),
+              ]
+            }),
+            Slack::BlockKit::Block::RichText::Section->new({
+              elements => [
+                Slack::BlockKit::Block::RichText::Text->new({
+                  text => "it will be enough",
+                }),
+              ],
+            }),
+          ],
+        }),
+      ],
+    })
+  ]
+});

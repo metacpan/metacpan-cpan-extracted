@@ -34,9 +34,23 @@ objects.
 =cut
 
 sub new {
-    my ($package, $args) = @_;
+    my ($package, $args, $document_url) = @_;
     my %self = %{$args};
+
+    $self{_document_url} = $document_url if ($document_url);
+
     return bless(\%self, $package);
+}
+
+#
+# returns a URI corresponding to the context URI for this object.
+#
+sub document_url {
+    my $self = shift;
+
+    my $url = $self->{_document_url};
+
+    return ($url->isa('URI') ? $url : URI->new($url)) if ($url);
 }
 
 =pod
@@ -47,15 +61,39 @@ sub new {
 
     $value = $link->value;
 
-Returns the "value" of the link. This corresponds to the text
-content of the C<E<lt>aE<gt>> element if the link if it were
-represented in HTML.
+Returns a string containing the value of the C<value> property of the link
+object, if any.
 
 =cut
 
 sub value { $_[0]->{'value'} }
 
 =pod
+
+=head2 Context URI
+
+    $uri = $link->context;
+
+Returns a L<URI> object representing the context URI of the link, as described
+in L<Section 3.2 of RFC 8288|https://datatracker.ietf.org/doc/html/rfc8288#autoid-13>.
+
+This URI object is constructed from the value of the C<value> property
+(described above). If the value of this property is a relative URL, then an
+absolute URL will be computed using the URI of the RDAP response that contains
+the link object.
+
+=cut
+
+sub context {
+    my $self = shift;
+    if ($self->value) {
+        return URI->new_abs($self->value, $self->document_url);
+
+    } else {
+        return $self->document_url;
+
+    }
+}
 
 =head2 Relationship
 
@@ -84,7 +122,10 @@ Returns a L<URI> object corresponding to the target of the link.
 
 =cut
 
-sub href { URI->new($_[0]->{'href'}) }
+sub href {
+    my $self = shift;
+    return URI->new_abs($self->{href}, $self->context);
+}
 
 =pod
 
@@ -92,8 +133,8 @@ sub href { URI->new($_[0]->{'href'}) }
 
     @languages = $link->hreflang;
 
-Returns a (potentially empty) array containing the ISO-639-2 codes
-which describe the language that the target is available in.
+Returns a (potentially empty) array containing the ISO-639-2 codes which
+describe the language that the target is available in.
 
 =cut
 
@@ -105,9 +146,9 @@ sub hreflang { $_[0]->{'hreflang'} ? @{$_[0]->{'hreflang'}} : undef }
 
     $title = $link->title;
 
-Returns the "title" attribute of the link. This corresponds to the
-mousover tooltip content of the C<E<lt>aE<gt>> element if the link if
-it were represented in HTML.
+Returns the "title" attribute of the link. This labels the destination of a link
+such that it can be used as a human-readable identifier in the language of the
+context in which the link appears.
 
 =cut
 
@@ -119,8 +160,8 @@ sub title { $_[0]->{'title'} }
 
     $media = $link->media;
 
-Returns the "media" attribute of the link. This corresponds to the
-media/device the target resource is optimized for.
+Returns the "media" attribute of the link. This corresponds to the media/device
+the target resource is optimized for.
 
 =cut
 
@@ -132,8 +173,8 @@ sub media { $_[0]->{'media'} }
 
     $type = $link->type;
 
-Returns a L<MIME::Type> object corresponding to the media type of the
-target resource.
+Returns a L<MIME::Type> object corresponding to the media type of the target
+resource.
 
 =cut
 
@@ -149,6 +190,15 @@ RDAP resource.
 =cut
 
 sub is_rdap { $_[0]->{'type'} =~ /^application\/rdap/i }
+
+sub TO_JSON {
+    my $self = shift;
+    my %hash = %{$self};
+
+    delete($hash{_document_url});
+
+    return \%hash;
+}
 
 =pod
 

@@ -4,6 +4,14 @@ use strict;
 use warnings;
 use ExtUtils::MakeMaker 6.64;	# 6.64 for TEST_REQUIRES
 
+# Test for broken smokers that don't set AUTOMATED_TESTING
+if(my $reporter = $ENV{'PERL_CPAN_REPORTER_CONFIG'}) {
+	if($reporter =~ /smoker/i) {
+		warn 'AUTOMATED_TESTING added for you';
+		$ENV{'AUTOMATED_TESTING'} = 1;
+	}
+}
+
 my @dirs = (
 	'lib/Genealogy/Wills/data'
 );

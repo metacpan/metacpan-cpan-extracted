@@ -1,0 +1,7 @@
+conf-whelk_config.pl.gen
+conf-whelk_development.pl.gen
+lib-Whelk-Resource-PATH-FILE.pm.gen
+t-whelk_FILE.t.gen
+t-whelk_openapi.t.gen
+app.psgi.gen
+

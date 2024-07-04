@@ -1,0 +1,83 @@
+#!/usr/bin/env perl
+use v5.36.0;
+
+use experimental 'builtin';
+
+use lib 'lib';
+
+use Data::Dumper::Concise;
+use Defined::KV;
+use Getopt::Long::Descriptive;
+use JSON::XS qw(encode_json);
+
+binmode *STDOUT, ':encoding(UTF-8)';
+
+my ($opt, $usage) = describe_options(
+  '%c %o',
+  [ 'example|X=s',  'what example to run', { default => 'default' } ],
+  [ 'perl',         'dumper the blocks struct as Perl, not JSON' ],
+  [ 'pretty',       'prettify JSON output' ],
+  [],
+  [ 'post',         'actually post' ],
+);
+
+die "--perl and --pretty are mutually exclusive\n"
+  if $opt->perl and $opt->pretty;
+
+my $filename = "./eg/samples/" . $opt->example;
+die "no such demo file: $filename\n"
+  unless -e $filename;
+
+# Samplers can set these for fun.
+$Slack::BlockKit::Demo::emoji    = undef;
+$Slack::BlockKit::Demo::username = undef;
+
+my $blocks = do {
+  package Slack::BlockKit::Sample;
+  my $blocks = do $filename;
+
+  if ($@) {
+    die "problem evaluating sample file $filename: $@";
+  }
+
+  unless ($blocks && builtin::blessed($blocks) && $blocks->can('as_struct')) {
+    $blocks //= '(undef)';
+    die "sample file didn't evaluate to object with as_struct method: $blocks\n";
+  }
+
+  $blocks;
+};
+
+if ($opt->perl) {
+  print Dumper($blocks->as_struct);
+} else {
+  my $JSON = JSON::XS->new->canonical;
+  $JSON = $JSON->pretty if $opt->pretty;
+  say $JSON->encode($blocks->as_struct);
+}
+
+if ($opt->post) {
+  die "can't post if 1Password (op://) URL not in \$SLACK_BLOCKKIT_WEBHOOK\n"
+    unless $ENV{SLACK_BLOCKKIT_WEBHOOK} && $ENV{SLACK_BLOCKKIT_WEBHOOK} =~ /^op:/;
+
+  die "can't load Password::OnePassword::OPCLI, needed to post"
+    unless eval { require Password::OnePassword::OPCLI };
+
+  die "can't load Slack::Notify needed to post"
+    unless eval { require Slack::Notify };
+
+  my $webhook = Password::OnePassword::OPCLI->new->get_field(
+    $ENV{SLACK_BLOCKKIT_WEBHOOK},
+  );
+
+  my $n = Slack::Notify->new(hook_url => $webhook);
+
+  my $res = $n->post(
+    defined_kv(icon_emoji => $Slack::BlockKit::Demo::emoji),
+    defined_kv(username   => $Slack::BlockKit::Demo::username),
+    channel => 'blockkit',
+    blocks  => $blocks->as_struct,
+  );
+
+  print Dumper($res);
+}

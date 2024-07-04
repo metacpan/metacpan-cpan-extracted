@@ -1,3 +1,8 @@
+Version 0.09 - 2024-07-04
+  - Fix XS bug in iter->next when iterating 'recent' and count > 1.
+  - Count greater than INT_MAX passed to iter->next now returns all nodes
+    instead of zero nodes.
+
 Version 0.08 - 2024-07-02
   - New feature of insertion-order tracking:
      - Tree attributes: track_recent (and ctor option), newest_node,

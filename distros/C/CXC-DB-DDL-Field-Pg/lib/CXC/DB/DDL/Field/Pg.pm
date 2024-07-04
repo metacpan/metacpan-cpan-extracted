@@ -3,7 +3,7 @@ package CXC::DB::DDL::Field::Pg;
 # ABSTRACT: DBD::Pg specific Field class
 
 use v5.26;
-our $VERSION = '0.15';
+our $VERSION = '0.16';
 use experimental 'signatures';
 
 use Scalar::Util ();
@@ -12,6 +12,8 @@ use Ref::Util    ();
 package    ## no critic (Modules::ProhibitMultiplePackages)
   CXC::DB::DDL::Field::PgType {
     use base 'CXC::DB::DDL::FieldType';
+
+    sub pg_type_name ( $self ) { $self->name =~ s/^PG_//ri; }
 }
 
 use CXC::DB::DDL::Util 0.15 {
@@ -54,8 +56,8 @@ sub type_name ( $self, $dbh ) {
 
     # if the type is an object, it's guaranteed to be one of ours, so
     # use it directly
-    for my $type ( $self->data_type->$* ) {
-        return $type->name if Scalar::Util::blessed( $type );
+    for my $type ( $self->data_type->@* ) {
+        return $type->pg_type_name if Scalar::Util::blessed( $type );
     }
 
     return $self->next::method( $dbh );
@@ -85,7 +87,7 @@ CXC::DB::DDL::Field::Pg - DBD::Pg specific Field class
 
 =head1 VERSION
 
-version 0.15
+version 0.16
 
 =head1 METHODS
 

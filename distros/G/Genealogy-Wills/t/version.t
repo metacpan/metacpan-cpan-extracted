@@ -14,4 +14,3 @@ BEGIN {
 		plan(skip_all => 'Author tests not required for installation');
 	}
 }
-

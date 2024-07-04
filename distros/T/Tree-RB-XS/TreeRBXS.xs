@@ -2243,14 +2243,15 @@ next(iter, count_sv= NULL)
 		Tree::RB::XS::Iter::next_values  = 2
 		Tree::RB::XS::Iter::next_kv      = 3
 	INIT:
-		size_t pos, n, nret, i, tree_count= TreeRBXS_get_count(iter->tree);
+		size_t pos, n, nret, i, max_count= iter->recent? iter->tree->recent_count : TreeRBXS_get_count(iter->tree);
 		IV request;
 		rbtree_node_t *node;
 		rbtree_node_t *(*step)(rbtree_node_t *)= iter->reverse? &rbtree_node_prev : rbtree_node_next;
 	PPCODE:
 		if (iter->item) {
 			request= !count_sv? 1
-				: SvPOK(count_sv) && *SvPV_nolen(count_sv) == '*'? tree_count
+				: ((SvPOK(count_sv) && *SvPV_nolen(count_sv) == '*')
+					|| (SvNOK(count_sv) && SvNV(count_sv) > (NV)PERL_INT_MAX))? max_count
 				: SvIV(count_sv);
 			if (request < 1) {
 				nret= 0;
@@ -2265,8 +2266,8 @@ next(iter, count_sv= NULL)
 			}
 			else if (request == 1 || iter->recent) { // un-optimized loop
 				nret= ix == 3? request<<1 : request;
+				EXTEND(SP, nret);
 				for (i= 0; i < nret && iter->item; ) {
-					EXTEND(SP, 2);
 					ST(i++)= ix == 0? sv_2mortal(TreeRBXS_wrap_item(iter->item))
 						: ix == 2? iter->item->value
 						: sv_2mortal(TreeRBXS_item_wrap_key(iter->item));
@@ -2279,7 +2280,7 @@ next(iter, count_sv= NULL)
 			else { // optimized loop, for iterating batches of tree nodes quickly
 				pos= rbtree_node_index(&iter->item->rbnode);
 				// calculate how many nodes will be returned
-				n= iter->reverse? 1 + pos : tree_count - pos;
+				n= iter->reverse? 1 + pos : max_count - pos;
 				if (n > request) n= request;
 				node= &iter->item->rbnode;
 				nret= (ix == 3)? n<<1 : n;
@@ -2298,8 +2299,10 @@ next(iter, count_sv= NULL)
 				}
 				else {
 					for (i= 0; i < nret && node; node= step(node)) {
-						ST(i++)= sv_2mortal(TreeRBXS_item_wrap_key(GET_TreeRBXS_item_FROM_rbnode(node)));
-						ST(i++)= GET_TreeRBXS_item_FROM_rbnode(node)->value;
+						ST(i)= sv_2mortal(TreeRBXS_item_wrap_key(GET_TreeRBXS_item_FROM_rbnode(node)));
+						i++;
+						ST(i)= GET_TreeRBXS_item_FROM_rbnode(node)->value;
+						i++;
 					}
 				}
 				if (i != nret)

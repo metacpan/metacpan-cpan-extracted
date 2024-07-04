@@ -1,5 +1,12 @@
 Revision history for XS-Parse-Keyword
 
+0.43    2024-07-03
+        [CHANGES]
+         * Use `File::ShareDir` for storing .h include files, rather than
+           storing the contents in the `__DATA__` section of the build helpers
+         * Support a new naming model for infix operators that supports
+           lexical-aliases and renaming at import time
+
 0.42    2024-04-30
         [BUGFIXES]
          * Don't crash on zero-argument calls to list-associative wrapper

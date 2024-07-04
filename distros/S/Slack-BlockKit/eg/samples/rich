@@ -1,0 +1,17 @@
+#!perl
+use v5.36.0;
+use Slack::BlockKit::Sugar -all => { -prefix => 'bk_' };
+
+return bk_blocks(
+  bk_richblock(
+    bk_richsection(
+      "Here is a ", bk_italic("safe"), " link: ",
+      bk_link("https://fastmail.com/", "click me", { style => { bold => 1 } }),
+    ),
+    bk_ulist(
+      "it will be fun",
+      bk_richsection("it will be cool", bk_emoji('smile')),
+      "it will be enough",
+    ),
+  )
+);

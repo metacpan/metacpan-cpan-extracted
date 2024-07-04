@@ -26,9 +26,9 @@ available to that module.
 # object was loaded from
 #
 sub new {
-    my ($package, $args, $url) = @_;
+    my ($package, $args, $document_url) = @_;
 
-    my $self = $package->SUPER::new($args);
+    my $self = $package->SUPER::new($args, $document_url);
 
     return $self;
 }

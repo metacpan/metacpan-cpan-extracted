@@ -1,10 +1,21 @@
 Revision history for perl module Net::RDAP:
 
+0.27 - 2024-07-03
+  - all RDAP objects will keep track of the URL of the enclosing RDAP record,
+    which can be accessed using the document_url() method.
+  - the Net::RDAP::Link class now has a context() method, which returns a URI
+    object representing the context URI (in the `value` property). This method
+    uses the document URL as the base URL so that relative URLs resolve
+    properly.
+  - the href() method of Net::RDAP::Link will use the context URI as the base
+    URL when constructing the link URL.
+
 0.26 - 2024-06-25
   - add is_rdap() method to Net::RDAP::Link.
   - renamed Net::RDAP::JCard::Node to Net::RDAP::JCard::Property.
   - ensure case-insensitivity of JCard property elements is handled properly.
-  - added Net::RDAP::JCard::Address to provide an ergonomic interface to addresses.
+  - added Net::RDAP::JCard::Address to provide an ergonomic interface to
+    addresses.
 
 0.25 - 2024-06-07
   - add a new object (Net::RDAP::JCard) that provides a way to access
@@ -17,7 +28,9 @@ Revision history for perl module Net::RDAP:
   - fix an issue when reading cached responses
 
 0.22 - 2024-03-18
-  - add TO_JSON() method to Net::RDAP::Base so all RDAP objects can be reserialized back into JSON (see https://github.com/gbxyz/perl-net-rdap/issues/3).
+  - add TO_JSON() method to Net::RDAP::Base so all RDAP objects can be
+    reserialized back into JSON (see
+    https://github.com/gbxyz/perl-net-rdap/issues/3).
 
 0.21 - 2024-03-15
   - add special case for the root zone entry (see RFC 9224 § 4)

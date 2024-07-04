@@ -5,9 +5,9 @@ use strict;
 use warnings;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2024-06-13'; # DATE
+our $DATE = '2024-06-28'; # DATE
 our $DIST = 'App-KemenkesUtils-RDA'; # DIST
-our $VERSION = '0.002'; # VERSION
+our $VERSION = '0.003'; # VERSION
 
 our @EXPORT_OK = qw(
                        kemenkes_get_rda
@@ -148,7 +148,7 @@ App::KemenkesUtils::RDA - Get one or more values from Indonesian Ministry of Hea
 
 =head1 VERSION
 
-This document describes version 0.002 of App::KemenkesUtils::RDA (from Perl distribution App-KemenkesUtils-RDA), released on 2024-06-13.
+This document describes version 0.003 of App::KemenkesUtils::RDA (from Perl distribution App-KemenkesUtils-RDA), released on 2024-06-28.
 
 =head1 SYNOPSIS
 
@@ -194,11 +194,11 @@ Result:
      "Ca",
      "Cl",
      "Cr",
- # ...snipped 27 lines for brevity...
+ # ...snipped 24 lines for brevity...
+     "VE",
+     "VK",
+     "Water",
      "Zn",
-     "group",
-     "height",
-     "weight",
    ],
    {},
  ]
@@ -257,9 +257,9 @@ Result:
      { symbol => "Cl", group => "0to5mo", height => 60, weight => 6, ref => 180 },
      { symbol => "Cr", group => "0to5mo", height => 60, weight => 6, ref => 0.2 },
      { symbol => "Cu", group => "0to5mo", height => 60, weight => 6, ref => 200 },
- # ...snipped 5477 lines for brevity...
+ # ...snipped 4997 lines for brevity...
        weight => "",
-       ref    => "",
+       ref    => 5,
      },
    ],
    {

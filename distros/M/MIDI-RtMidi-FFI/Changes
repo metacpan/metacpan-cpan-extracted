@@ -1,5 +1,17 @@
 Revision history for perl module MIDI::RtMidi::FFI
 
+0.06 2024-07-02
+
+  - Support for RtMidi v6
+  - Support for send / receive of 14-bit control changes
+  - Support for sending RPN / NRPN parameters
+  - Support for encode / decode of timecode, clock, start, continue, stop and more
+  - Methods to retrieve all available device info (->get_all_port_{nums,names})
+  - "Shortcut" methods for send_message_encoded: ->note_on, ->note_off, ->cc ...
+  - MIDI-panic methods
+  - New example : drum circle - thanks to Gene Boggs (GENE), lfo.pl
+  - Expanded docs
+    
 0.05 2023-09-18
 
   - Removed Linux-only tests from release - thanks to Lukas Mai (MAUKE)

@@ -1,15 +1,17 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2021-2023 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2021-2024 -- leonerd@leonerd.org.uk
 
-package XS::Parse::Infix 0.42;
+package XS::Parse::Infix 0.43;
 
 use v5.14;
 use warnings;
 
 # No actual .xs file; the code is implemented in XS::Parse::Keyword
 require XS::Parse::Keyword;
+
+use Carp;
 
 =head1 NAME
 
@@ -35,6 +37,25 @@ In addition, the various C<XPK_INFIX_*> token types of L<XS::Parse::Keyword>
 support querying on this module, so some syntax provided by other modules may
 be able to make use of these new infix operators.
 
+=head2 Lexically-named vs. Globally-named Operators
+
+At version 0.43, the way this module operates has changed. Since this version,
+the preferred method of operation for infix operators is that the module that
+registers them creates them with a fully-qualified name (i.e. including the
+name of the package that implements them). Other code which wishes to import
+the operator can then provide a local name for it visible within a scope. This
+acts as an alias for the fully-qualified registered one. The imported name
+needs not be the same in various scopes - this allows imported operators to be
+renamed in specific scopes to avoid name clashes.
+
+Prior versions of this module only supported operators that have one global
+name that may or may not be enabled in lexical scopes. With this model, while
+the visiblity of an operator can be controlled per scope, if it is visible it
+must always have the same name and cannot be renamed to avoid a name clash.
+
+At some future version of this module the older method may be removed, once
+all of the existing CPAN modules have been updated to the new model.
+
 =cut
 
 =head1 CONSTANTS
@@ -51,6 +72,98 @@ No actual production releases of perl yet support this feature, but see above
 for details of development versions which do.
 
 =cut
+
+=head1 PERL FUNCTIONS
+
+=head2 apply_infix
+
+   $pkg->apply_infix( $on, $args, @infix );
+
+I<Since version 0.43.>
+
+Intended to be called by the C<import> and C<unimport> methods of a module
+that implements infix operators. This sets up the various keys required in the
+lexical hints hash to create a lexical alias for the requested operator(s).
+
+I<$on> should be a true value for C<import> or a false value for C<unimport>.
+I<$args> should be an array reference to the arguments array, which will be
+modified to splice out recognised values, leaving behind anything else
+unrecognised. I<@infix> should be a list of names of operators implemented by
+the importing package, named by I<$pkg>.
+
+After invoking this method, the caller should inspect for any remaining values
+in the arguments array, either to handle them in some other way, or just
+complain about them.
+
+   package Some::Infix::Module;
+
+   sub import
+   {
+      my $pkg = shift;
+      $pkg->XS::Parse::Infix::apply_infix( 1, \@_, qw( operator names here ) );
+      die "Unrecognised symbols: @_" if @_;
+   }
+
+When this module is C<use>d, named operators are aliased from the
+fully-qualified names.
+
+   use Some::Infix::Module qw( operator );
+
+   my $z = $x operator $y;
+
+At this point, the name C<operator> becomes a lexical alias to
+C<Some::Infix::Module::operator>.
+
+Each imported operator name can optionally be followed by import options,
+given in a hash reference. Currently the only named option recognised is
+C<-as>, which allows the importing scope to provide a different name for the
+imported operator, perhaps to avoid name clashes, or for neatness.
+
+   use Some::Infix::Module operator => { -as => "myname" };
+
+   my $z = $x myname $y;  # invokes Some::Infix::Module::operator
+
+=cut
+
+# helper functions for infix operator modules
+sub apply_infix
+{
+   my $pkg = shift;
+   my ( $on, $args, @infix ) = @_;
+
+   my %infix = map { $_ => 1 } @infix;
+
+   for ( my $idx = 0; 1; $idx++ ) {
+      $idx < @$args or last;
+
+      my $name = $args->[$idx];
+      $infix{$name} or next;
+
+      splice @$args, $idx, 1, ();
+
+      my %opts;
+      %opts = %{ splice @$args, $idx, 1, () } if "HASH" eq ref $args->[$idx];
+
+      my $localname = $name;
+      $localname = delete $opts{-as} if exists $opts{-as};
+
+      croak "Unrecognised apply_infix options " . join( ", ", sort keys %opts )
+         if %opts;
+
+      # localname must either be an identifier, or entirely non-identifier
+      # characters
+      $localname =~ m/\A\p{ID_Start}\p{ID_Continue}*\Z/ or $localname !~ m/\p{ID_Start}/ or
+         croak "Local name '$localname' for imported operator $name is invalid";
+
+      my $hintkey = "XS::Parse::Infix/$localname";
+      my $fqname  = "${pkg}::${name}";
+
+      $on ? $^H{$hintkey} = $fqname
+          : delete $^H{$hintkey};
+
+      redo;
+   }
+}
 
 =head1 XS FUNCTIONS
 
@@ -115,6 +228,10 @@ These tokens will all yield an info structure, with the following fields:
 
 If the operator name contains any non-ASCII characters they are presumed to be
 in UTF-8 encoding. This will matter for deparse purposes.
+
+If I<opname> contains a double-colon (C<::>) sequence, it is presumed to be a
+fully-qualified operator name in the new interface style. If not, it is
+presumed to be an older globally-named one.
 
 =cut
 

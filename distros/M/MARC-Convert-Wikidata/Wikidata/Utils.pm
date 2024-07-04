@@ -15,7 +15,7 @@ Readonly::Array our @EXPORT_OK => qw(clean_cover clean_date clean_edition_number
 	clean_title);
 Readonly::Array our @COVERS => qw(hardback paperback);
 
-our $VERSION = 0.10;
+our $VERSION = 0.11;
 our $DEBUG = 0;
 
 sub clean_cover {
@@ -79,7 +79,7 @@ sub clean_date {
 	my $ret_date = $date;
 
 	# Date is circa.
-	if ($ret_date =~ s/^c(.*)$/$1/ms) {
+	if ($ret_date =~ s/^c(.*)$/$1/ms || $ret_date =~ s/^asi (.*)$/$1/ms) {
 		$options_hr->{'circa'} = 1;
 	}
 
@@ -88,6 +88,8 @@ sub clean_date {
 	}
 	my $bk = decode_utf8('př. Kr.');
 	$ret_date =~ s/^(\d+)\s*$bk/-$1/ms;
+	my $ak = decode_utf8('po. Kr.');
+	$ret_date =~ s/^(\d+)\s*$ak/$1/ms;
 	$ret_date =~ s/\s*\.$//ms;
 
 	if ($ret_date !~ m/^\-?\d+(\-\d+)?(\-\d+)?$/ms) {
@@ -760,6 +762,6 @@ BSD 2-Clause License
 
 =head1 VERSION
 
-0.10
+0.11
 
 =cut

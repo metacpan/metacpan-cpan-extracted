@@ -1,3 +1,16 @@
+0.007   2024-07-01  Released-By: PERLANCAR; Urgency: medium
+
+        - [bugfix] Fix information of removal of smartmatch (5.42 not
+          5.40).
+
+
+0.006   2024-07-01  Released-By: PERLANCAR; Urgency: low
+
+        - No functional changes.
+
+        - Some rewording.
+
+
 0.005   2024-07-01  Released-By: PERLANCAR; Urgency: medium
 
         - Add entry: Switch::Back.

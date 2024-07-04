@@ -9,7 +9,7 @@ use FFI::Platypus::Buffer qw/ scalar_to_buffer buffer_to_scalar /;
 use FFI::CheckLib 0.25 qw/ find_lib_or_exit /;
 use Carp;
 
-our $VERSION = '0.05';
+our $VERSION = '0.06';
 
 # ABSTRACT: Bindings for librtmidi - Realtime MIDI library
 
@@ -33,7 +33,7 @@ sub _load_rtmidi {
     $ffi = FFI::Platypus->new(
         api => 2,
         lib => [
-            $ENV{__PERL5_RTMIDI_FFI_TEST_LIBRARY_PATH__} # facilitate testing across versions
+            $ENV{__PERL5_RTMIDI_FFI_TEST_LIBRARY_PATH__} # facilitate testing across rtmidi versions
               ? $ENV{__PERL5_RTMIDI_FFI_TEST_LIBRARY_PATH__}
               : find_lib_or_exit(
                   lib   => 'rtmidi',
@@ -57,13 +57,13 @@ sub _init_api {
 }
 
 my $rtmidi_version;
-# Guesswork to derive major version - RtMidi::getVersion is not exposed in C API
+# Guesswork to derive major version - RtMidi::getVersion is not exposed
+# in C API in versions < 6
 sub rtmidi_get_version {
     return $rtmidi_version if $rtmidi_version;
 
     return $rtmidi_version = '3.0.0' unless $ffi->find_symbol('rtmidi_api_display_name');
 
-    # specalutive, PR open ...
     return $rtmidi_version = $ffi->function( rtmidi_get_version => [] => 'string' )->()
         if ( $ffi->find_symbol('rtmidi_get_version') );
 
@@ -86,9 +86,12 @@ BEGIN {
         RTMIDI_API_WINDOWS_MM   => 4,
         RTMIDI_API_RTMIDI_DUMMY => 5,
         RTMIDI_API_NUM          => 6,
+        RTMIDI_API_WEB_MIDI_API => 5,
+        RTMIDI_API_WINDOWS_UWP  => 5,
+        RTMIDI_API_ANDROID      => 5,
     };
 
-    # These changes are not reflected in the RtMidi C header
+    # These changes are not reflected in the RtMidi C header in v5
     # This ordering reflects the C++ enum order
     my $enum_RtMidiApi_5 = {
         %{ $enum_RtMidiApi_4 },
@@ -97,9 +100,17 @@ BEGIN {
         RTMIDI_API_NUM          => 7,
     };
 
-    $enum_RtMidiApi = $version ge '5.0.0'
-        ? $enum_RtMidiApi_5
-        : $enum_RtMidiApi_4;
+    my $enum_RtMidiApi_6 = {
+        %{ $enum_RtMidiApi_4 },
+        RTMIDI_API_WEB_MIDI_API => 6,
+        RTMIDI_API_WINDOWS_UWP  => 7,
+        RTMIDI_API_ANDROID      => 8,
+        RTMIDI_API_NUM          => 9,
+    };
+
+    $enum_RtMidiApi = $enum_RtMidiApi_4;
+    $enum_RtMidiApi = $enum_RtMidiApi_5 if $version ge '5.0.0';
+    $enum_RtMidiApi = $enum_RtMidiApi_6 if $version ge '6.0.0';
 
     $enum_RtMidiErrorType = {
         RTMIDI_ERROR_WARNING           => 0,
@@ -235,7 +246,7 @@ MIDI::RtMidi::FFI - Bindings for librtmidi - Realtime MIDI library
 
 =head1 VERSION
 
-version 0.05
+version 0.06
 
 =head1 SYNOPSIS
 
@@ -274,7 +285,8 @@ Check out L<MIDI::RtMidi::FFI::Device> for an OO interface to this module.
 
 RTMIDI_API_UNSPECIFIED, RTMIDI_API_MACOSX_CORE, RTMIDI_API_LINUX_ALSA,
 RTMIDI_API_UNIX_JACK, RTMIDI_API_WINDOWS_MM, RTMIDI_API_RTMIDI_DUMMY,
-RTMIDI_API_WEB_MIDI_API, RTMIDI_API_NUM
+RTMIDI_API_WEB_MIDI_API, RTMIDI_API_WINDOWS_UWP, RTMIDI_API_ANDROID,
+RTMIDI_API_NUM
 
 =head2 RtMidiErrorType
 
@@ -465,7 +477,7 @@ John Barrett <john@jbrt.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2023 by John Barrett.
+This software is copyright (c) 2024 by John Barrett.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

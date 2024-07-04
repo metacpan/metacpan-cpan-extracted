@@ -3,9 +3,10 @@ use warnings;
 
 use File::Object;
 use MARC::Convert::Wikidata::Transform;
+use MARC::File::XML;
 use MARC::Record;
 use Perl6::Slurp qw(slurp);
-use Test::More 'tests' => 68;
+use Test::More 'tests' => 82;
 use Test::NoWarnings;
 use Test::Warn;
 use Unicode::UTF8 qw(decode_utf8 encode_utf8);
@@ -51,9 +52,16 @@ is($translator->surname, decode_utf8('Stromšík'), 'Masa a moc: Get translator 
 is($translator->date_of_birth, 1939, 'Masa a moc: Get translator date of birth.');
 is($translator->date_of_death, undef, 'Masa a moc: Get translator date of death.');
 is($translator->nkcr_aut, 'jk01121492', 'Masa a moc: Get translator NKČR AUT id.');
-# TODO book series
-# TODO book series series ordinal
-# TODO Kramerius link
+my $kramerius_link = $ret->krameriuses->[0];
+is($kramerius_link->kramerius_id, 'mzk', 'Masa a moc: Get Kramerius system id.');
+is($kramerius_link->object_id, 'dec885c0-51fc-11e5-bf4b-005056827e51', 'Masa a moc: Get Kramerius uuid.');
+is($kramerius_link->url, 'http://kramerius.mzk.cz/search/handle/uuid:dec885c0-51fc-11e5-bf4b-005056827e51', 'Masa a moc: Get Kramerius URL.');
+my $serie = $ret->series->[0];
+is($serie->name, 'Studio klasik', 'Masa a moc: Get series name.');
+is($serie->series_ordinal, 1, 'Masa a moc: Get series ordinal.');
+my $pub = $serie->publisher;
+is($serie->publisher->name, 'Arcadia', 'Masa a moc: Get series publisher name.');
+is($serie->publisher->place, 'Praha', 'Masa a moc: Get series publisher place.');
 
 # Test.
 $marc_data = slurp($data->file('cnb000750997.mrc')->s);
@@ -120,3 +128,18 @@ is($ret->publishers->[0]->place, 'Praha', 'Broučci: Get publisher place.');
 is_deeply($ret->subtitles, [decode_utf8('pro malé i veliké děti')], 'Broučci: Get subtitles.');
 is($ret->title, decode_utf8('Broučci'), 'Broučci: Get title.');
 is_deeply($ret->translators, [], 'Broučci: Get translators.');
+
+# Test
+$marc_data = slurp($data->file('cnb001756719.xml')->s);
+$obj = MARC::Convert::Wikidata::Transform->new(
+	'marc_record' => MARC::Record->new_from_xml($marc_data, 'UTF-8'),
+);
+$ret = $obj->object;
+$author = $ret->authors->[0];
+is($author->name, '', 'Učebnice práva ve čtyřech knihách: Get author name.');
+is($author->surname, 'Gaius', 'Učebnice práva ve čtyřech knihách: Get author surname.');
+is($author->date_of_birth, undef, 'Učebnice práva ve čtyřech knihách: Get author date of birth.');
+is($author->date_of_death, undef, 'Učebnice práva ve čtyřech knihách: Get author date of death.');
+is($author->work_period_start, 110, 'Učebnice práva ve čtyřech knihách: Get author work period start.');
+is($author->work_period_end, 180, 'Učebnice práva ve čtyřech knihách: Get author work period end.');
+is($author->nkcr_aut, 'jn19990002527', 'Učebnice práva ve čtyřech knihách: Get author NKČR AUT id.');

@@ -3,8 +3,8 @@ NAME
     Ministry of Health's RDA (AKG, angka kecukupan gizi, from Kemenkes)
 
 VERSION
-    This document describes version 0.002 of App::KemenkesUtils::RDA (from
-    Perl distribution App-KemenkesUtils-RDA), released on 2024-06-13.
+    This document describes version 0.003 of App::KemenkesUtils::RDA (from
+    Perl distribution App-KemenkesUtils-RDA), released on 2024-06-28.
 
 SYNOPSIS
 DESCRIPTION
@@ -41,11 +41,11 @@ FUNCTIONS
              "Ca",
              "Cl",
              "Cr",
-         # ...snipped 27 lines for brevity...
+         # ...snipped 24 lines for brevity...
+             "VE",
+             "VK",
+             "Water",
              "Zn",
-             "group",
-             "height",
-             "weight",
            ],
            {},
          ]
@@ -104,9 +104,9 @@ FUNCTIONS
              { symbol => "Cl", group => "0to5mo", height => 60, weight => 6, ref => 180 },
              { symbol => "Cr", group => "0to5mo", height => 60, weight => 6, ref => 0.2 },
              { symbol => "Cu", group => "0to5mo", height => 60, weight => 6, ref => 200 },
-         # ...snipped 5477 lines for brevity...
+         # ...snipped 4997 lines for brevity...
                weight => "",
-               ref    => "",
+               ref    => 5,
              },
            ],
            {

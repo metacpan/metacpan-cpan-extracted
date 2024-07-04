@@ -19,12 +19,12 @@ name: Object-Pad-FieldAttr-Checked
 provides:
   Object::Pad::FieldAttr::Checked:
     file: lib/Object/Pad/FieldAttr/Checked.pm
-    version: '0.10'
+    version: '0.11'
 requires:
-  Data::Checks: '0.02'
+  Data::Checks: '0.04'
   Object::Pad: '0.802'
   perl: '5.022'
 resources:
   license: http://dev.perl.org/licenses/
-version: '0.10'
+version: '0.11'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -526,8 +526,34 @@ my @ver2func = (
 
               /
         ]
-    }
-
+    },
+    "2.8" => {
+        new => [
+            qw/
+              ^gsl_matrix_complex_conjugate$
+              ^gsl_vector_complex_conj_memcpy$
+              ^gsl_vector_complex_div_real$
+              ^gsl_linalg_QR_lssolvem_r$
+              ^gsl_linalg_complex_QR_lssolvem_r$
+              ^gsl_linalg_complex_QR_QHmat_r$
+              ^gsl_linalg_QR_UR_lssolve$
+              ^gsl_linalg_QR_UR_lssvx$
+              ^gsl_linalg_QR_UR_QTvec$
+              ^gsl_linalg_QR_UU_lssvx$
+              ^gsl_linalg_QR_UD_lssvx$
+              ^gsl_linalg_QR_UD_QTvec$
+              ^gsl_linalg_complex_cholesky_decomp2$
+              ^gsl_linalg_complex_cholesky_svx2$
+              ^gsl_linalg_complex_cholesky_solve2$
+              ^gsl_linalg_complex_cholesky_scale$
+              ^gsl_linalg_complex_cholesky_scale_apply$
+              ^gsl_linalg_SV_solve2$
+              ^gsl_linalg_SV_lssolve$
+              ^gsl_rstat_norm$
+              ^gsl_multifit_linear_lcurvature_menger$
+              /
+        ]
+    },
 );
 
 my ( %index, @info, @versions );

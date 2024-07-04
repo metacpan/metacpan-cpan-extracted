@@ -1,0 +1,48 @@
+#!perl
+use v5.36.0;
+use Slack::BlockKit::Sugar -all => { -prefix => 'bk_' };
+use utf8;
+
+$Slack::BlockKit::Demo::emoji     = 'rocket';
+$Slack::BlockKit::Demo::username  = 'Mother';
+
+return bk_blocks(
+  bk_header("Starship Logs: Nostromo"),
+  bk_divider,
+  bk_section({
+    fields => [ map { bk_mrkdwn($_) }
+      "*Date*: 2122-02-04",
+      "*Priority*: Aquamarine",
+      "*Sender*: E. Ripley",
+      "*Target*: Crisis Response",
+    ],
+  }),
+  bk_divider,
+  bk_richblock(
+    bk_richsection(
+      "USCSS Nostromo requesting immediate rescue.\n\n",
+      "All criteria for request have been met:",
+    ),
+    bk_olist(
+      bk_richsection(
+        "loss of ", bk_italic("at least"), " two crew (actual: ", bk_bold("3"), ")",
+      ),
+      bk_richsection("failure of engine ", bk_strike("or life support"), " systems"),
+      "less than 25% of Peng™ rations remain",
+    ),
+    "Authorization code:",
+    bk_preformatted( <<~'END' ),
+      +---[XSA 8192]----+
+      |       .++       |
+      |       .+..     .|
+      |     . .   . . ..|
+      |    . .     .E.. |
+      |     ...S     .  |
+      |      o+.        |
+      |     +..o        |
+      |  o B .o.        |
+      | . + +..         |
+      +------[WYC]------+
+      END
+  )
+);

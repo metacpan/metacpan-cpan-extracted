@@ -1,3 +1,6 @@
+2.086 2024/07/03
+- internal optimzation: implement _touch_entry in session cache instead
+   of using del+add.
 2.085 2024/01/22
 - #147 fix test which failed due to behavior changes in OpenSSL 3.2
 - update PublicSuffix
@@ -192,10 +195,10 @@
     which now no longer works
 2.052 2017/10/22
 - disable NPN support if LibreSSL>=2.6.1 is detected since they've replaced the
-  functions with dummies instead of removing NPN completly or setting
+  functions with dummies instead of removing NPN completely or setting
   OPENSSL_NO_NEXTPROTONEG
 - t/01loadmodule.t shows more output helpful in debugging problems
-- update fingerprints for extenal tests
+- update fingerprints for external tests
 - update documentation to make behavior of syswrite more clear
 2.051 2017/09/05
 - syswrite: if SSL_write sets SSL_ERROR_SYSCALL but no $! (as seen with

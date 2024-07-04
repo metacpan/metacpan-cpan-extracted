@@ -13,11 +13,11 @@ Genealogy::Wills - Lookup in a database of wills
 
 =head1 VERSION
 
-Version 0.04
+Version 0.05
 
 =cut
 
-our $VERSION = '0.04';
+our $VERSION = '0.05';
 
 =head1 SYNOPSIS
 

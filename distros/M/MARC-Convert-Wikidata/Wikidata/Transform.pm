@@ -36,7 +36,7 @@ Readonly::Hash our %PEOPLE_TYPE => {
 	'trl' => 'translators',
 };
 
-our $VERSION = 0.10;
+our $VERSION = 0.11;
 
 # Constructor.
 sub new {
@@ -346,11 +346,18 @@ sub _process_people {
 	my $nkcr_aut = $field->subfield('7');
 
 	my $dates = $field->subfield('d');
-	my ($date_of_birth, $date_of_death);
+	my ($date_of_birth, $date_of_death, $work_period_start, $work_period_end);
 	if (defined $dates) {
-		($date_of_birth, $date_of_death) = split m/-/ms, $dates;
-		$date_of_birth = clean_date($date_of_birth);
-		$date_of_death = clean_date($date_of_death);
+		my $active_re = decode_utf8('činný');
+		if ($dates =~ m/^$active_re\s*(.*)/ms) {
+			my ($start_date, $end_date) = split m/-/ms, $1;
+			$work_period_start = clean_date($start_date);
+			$work_period_end = clean_date($end_date);
+		} else {
+			my ($start_date, $end_date) = split m/-/ms, $dates;
+			$date_of_birth = clean_date($start_date);
+			$date_of_death = clean_date($end_date);
+		}
 	}
 
 	foreach my $type_key (@type_keys) {
@@ -358,6 +365,8 @@ sub _process_people {
 			MARC::Convert::Wikidata::Object::People->new(
 				'date_of_birth' => $date_of_birth,
 				'date_of_death' => $date_of_death,
+				'work_period_start' => $work_period_start,
+				'work_period_end' => $work_period_end,
 				'name' => $name,
 				'nkcr_aut' => $nkcr_aut,
 				'surname' => $surname,
@@ -476,9 +485,7 @@ sub _series {
 			push @series, MARC::Convert::Wikidata::Object::Series->new(
 				'name' => $series_name,
 				defined $publisher ? (
-					'publisher' => MARC::Convert::Wikidata::Object::Publisher->new(
-						'name' => clean_publisher_name($publisher),
-					),
+					'publisher' => $publisher,
 				) : (),
 				'series_ordinal' => $series_ordinal,
 			);

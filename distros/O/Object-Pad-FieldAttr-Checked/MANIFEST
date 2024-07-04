@@ -12,6 +12,8 @@ META.yml
 README
 t/00use.t
 t/01checked.t
-t/10types-standard.t
+t/10checks.t
 t/20croak-apply.t
+t/20types-standard.t
+t/80checks+field.t
 t/99pod.t

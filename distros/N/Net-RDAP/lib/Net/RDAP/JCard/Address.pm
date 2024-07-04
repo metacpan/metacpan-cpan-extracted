@@ -65,7 +65,7 @@ therefore inherits all that module's methods, in addition to the following:
     $structured = $adr->structured;
 
 Returns true if the address is "structured" (see L<Section 3.3.1.3 of RFC
-7095|https://datatracker.ietf.org/doc/html/rfc7095#section-3.3.1.3).
+7095|https://datatracker.ietf.org/doc/html/rfc7095#section-3.3.1.3>).
 
 =cut
 

@@ -1,0 +1,22 @@
+{
+    resources => {
+        '[% name %]' => {
+            path => '/[% module_file %]',
+            name => 'Whelk resource',
+            description => 'A fresh-generated Whelk resource',
+        },
+    },
+
+    openapi => {
+        path => '/openapi.json',
+        info => {
+            title => 'My Whelk API',
+            description => 'A new instance of Whelk API framework',
+            contact => {
+                email => 'me@mydomain.com',
+            },
+            version => '1.2.3',
+        }
+    },
+}
+

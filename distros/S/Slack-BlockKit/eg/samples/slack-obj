@@ -1,0 +1,16 @@
+#!perl
+use v5.36.0;
+use Slack::BlockKit::Sugar -all => { -prefix => 'bk_' };
+
+# Obviously you will need to put your own test data in here.
+my $channel_id   = q{C079XSBFV0F};
+my $user_id      = q{U0C2VSNG0};
+my $usergroup_id = q{S6JT9UZGE};
+
+return bk_blocks(
+  bk_richblock(
+    bk_richsection(bk_user({ style => { highlight => 0 } }, $user_id)),
+    bk_richsection(bk_user({ style => { unlink => 1 } }, $user_id)),
+    bk_richsection(bk_user($user_id)),
+  )
+);

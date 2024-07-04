@@ -1,0 +1,15 @@
+use Kelp::Base -strict;
+use Kelp::Test;
+use Test::More;
+use HTTP::Request::Common;
+use Whelk;
+
+my $app = Whelk->new(mode => 'test');
+my $t = Kelp::Test->new(app => $app);
+
+$t->request(GET '/[% module_file %]')
+    ->code_is(200)
+    ->json_cmp({field => 313});
+
+done_testing;
+
