@@ -14,6 +14,8 @@ my %WriteMakefileArgs = (
   },
   "DISTNAME" => "App-MineralUtils",
   "EXE_FILES" => [
+    "script/convert-calcium-unit",
+    "script/convert-iron-unit",
     "script/convert-magnesium-unit",
     "script/convert-potassium-unit",
     "script/convert-sodium-unit"
@@ -28,6 +30,7 @@ my %WriteMakefileArgs = (
     "Perinci::CmdLine::Lite" => "1.924",
     "Physics::Unit" => 0,
     "strict" => 0,
+    "utf8" => 0,
     "warnings" => 0
   },
   "TEST_REQUIRES" => {
@@ -36,7 +39,7 @@ my %WriteMakefileArgs = (
     "IPC::Open3" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.012",
+  "VERSION" => "0.013",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -54,6 +57,7 @@ my %FallbackPrereqs = (
   "Physics::Unit" => 0,
   "Test::More" => 0,
   "strict" => 0,
+  "utf8" => 0,
   "warnings" => 0
 );
 

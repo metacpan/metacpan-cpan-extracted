@@ -3,16 +3,22 @@ package MARC::Convert::Wikidata::Object::People;
 use strict;
 use warnings;
 
-use Mo qw(build is);
+use Mo qw(build default is);
+use Mo::utils 0.21 qw(check_array_object);
 use Mo::utils::Date 0.04 qw(check_date check_date_order);
 
-our $VERSION = 0.04;
+our $VERSION = 0.05;
 
 has date_of_birth => (
 	is => 'ro',
 );
 
 has date_of_death => (
+	is => 'ro',
+);
+
+has external_ids => (
+	default => [],
 	is => 'ro',
 );
 
@@ -44,6 +50,8 @@ sub BUILD {
 
 	check_date_order($self, 'date_of_birth', 'date_of_death');
 
+	check_array_object($self, 'external_ids', 'MARC::Convert::Wikidata::Object::ExternalId', 'External id');
+
 	check_date($self, 'work_period_start');
 	check_date($self, 'work_period_end');
 
@@ -71,6 +79,7 @@ MARC::Convert::Wikidata::Object::People - Bibliographic Wikidata object for peop
  my $obj = MARC::Convert::Wikidata::Object::People->new(%params);
  my $date_of_birth = $obj->date_of_birth;
  my $date_of_death = $obj->date_of_death;
+ my $external_ids_ar = $obj->external_ids;
  my $name = $obj->name;
  my $nkcr_aut = $obj->nkcr_aut;
  my $surname = $obj->surname;
@@ -104,6 +113,14 @@ Date of death of people.
 Parameter is string with date. See L<Mo::utils::Date/check_date> for more information.
 
 Default value is undef.
+
+=item * C<external_ids>
+
+External ids.
+
+Need to be a reference to array with L<MARC::Convert::Wikidata::Object::ExternalId> instances.
+
+Default value is [].
 
 =item * C<name>
 
@@ -141,6 +158,14 @@ Get date of death.
 
 Returns string.
 
+=head2 C<external_ids>
+
+ my $external_ids_ar = $obj->external_ids;
+
+Get list of external ids.
+
+Returns reference to array with L<MARC::Convert::Wikidata::Object::ExternalId> instances.
+
 =head2 C<name>
 
  my $name = $obj->name;
@@ -150,6 +175,8 @@ Get given name.
 Returns string.
 
 =head2 C<nkcr_aut>
+
+I<It is deprecated. It will be removed in future.>
 
  my $nkcr_aut = $obj->nkcr_aut;
 
@@ -184,6 +211,13 @@ Returns string.
 =head1 ERRORS
 
  new():
+         From Mo::utils::check_array_object():
+                 External id isn't 'MARC::Convert::Wikidata::Object::ExternalId' object.
+                         Value: %s
+                         Reference: %s
+                 Parameter 'external_ids' must be a array.
+                         Value: %s
+                         Reference: %s
          From Mo::utils::Date::check_date():
                  Parameter 'date_of_birth' for date is in bad format.
                  Parameter 'date_of_birth' has year greater than actual year.
@@ -200,13 +234,19 @@ Returns string.
  use warnings;
 
  use Data::Printer;
+ use MARC::Convert::Wikidata::Object::ExternalId;
  use MARC::Convert::Wikidata::Object::People;
  use Unicode::UTF8 qw(decode_utf8);
  
  my $obj = MARC::Convert::Wikidata::Object::People->new(
          'date_of_birth' => '1952-12-08',
+         'external_ids' => [
+                 MARC::Convert::Wikidata::Object::ExternalId->new(
+                         'name' => 'nkcr_aut',
+                         'value' => 'jn20000401266',
+                 ),
+         ],
          'name' => decode_utf8('Jiří'),
-         'nkcr_aut' => 'jn20000401266',
          'surname' => 'Jurok',
  );
  
@@ -214,13 +254,20 @@ Returns string.
 
  # Output:
  # MARC::Convert::Wikidata::Object::People  {
- #     Parents       Mo::Object
- #     public methods (7) : BUILD, can (UNIVERSAL), DOES (UNIVERSAL), err (Error::Pure), check_date (Mo::utils::Date), isa (UNIVERSAL), VERSION (UNIVERSAL)
- #     private methods (1) : __ANON__ (Mo::build)
+ #     parents: Mo::Object
+ #     public methods (4):
+ #         BUILD
+ #         Mo::utils:
+ #             check_array_object
+ #         Mo::utils::Date:
+ #             check_date, check_date_order
+ #     private methods (0)
  #     internals: {
- #         date_of_birth   "1952-12-08",
+ #         date_of_birth   "1952-12-08" (dualvar: 1952),
+ #         external_ids    [
+ #             [0] MARC::Convert::Wikidata::Object::ExternalId
+ #         ],
  #         name            "Jiří",
- #         nkcr_aut        "jn20000401266",
  #         surname         "Jurok"
  #     }
  # }
@@ -228,6 +275,7 @@ Returns string.
 =head1 DEPENDENCIES
 
 L<Mo>,
+L<Mo::utils>,
 L<Mo::utils::Date>.
 
 =head1 SEE ALSO
@@ -258,6 +306,6 @@ BSD 2-Clause License
 
 =head1 VERSION
 
-0.04
+0.05
 
 =cut

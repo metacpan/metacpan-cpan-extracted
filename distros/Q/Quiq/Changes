@@ -1,3 +1,9 @@
+1.217 2024-07-04
+================
+
+[Quiq:: Path]
+* delete(): rm-Option --interactive=never entfernt
+
 1.216 2024-06-09
 ================
 

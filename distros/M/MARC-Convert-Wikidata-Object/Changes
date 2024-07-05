@@ -1,3 +1,10 @@
+0.05 2024-07-04T21:29:18+02:00
+ - API change: Add 'external_ids' parameter to Object object.
+ - API change: Add 'external_ids' parameter to People object.
+ - Add ExternalId object.
+ - Deprecation of ccnb() and oclc() methods in Object object.
+ - Deprecation of nkcr_aut() method in People object.
+
 0.04 2024-06-25T19:56:28+02:00
  - API change: Add id parameter to Publisher object.
  - API change: Add work_period_start and work_period_end getter methods to

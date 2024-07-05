@@ -1,6 +1,12 @@
 Revision history for e
 
 =================
+1.25 - 2024-07-04
+=================
+
+Table command now does not escape newline characters.
+
+=================
 1.24 - 2024-07-01
 =================
 

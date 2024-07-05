@@ -20,9 +20,9 @@ no_index:
 provides:
   Asm::X86:
     file: lib/Asm/X86.pm
-    version: '0.65'
+    version: '0.70'
 requires:
   Test::More: '0'
   perl: '5.006'
-version: '0.65'
+version: '0.70'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

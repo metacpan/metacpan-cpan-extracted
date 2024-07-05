@@ -1,3 +1,18 @@
+#!perl
+# Asm::X86 - Makefile builder.
+#
+#	Copyright (C) 2008-2024 Bogdan 'bogdro' Drozdowski,
+#	  bogdro (at) users . sourceforge . net
+#	  bogdro /at\ cpan . org
+#
+# This file is part of Project Asmosis, a set of tools related to assembly
+#  language programming.
+# Project Asmosis homepage: https://asmosis.sourceforge.io/
+#
+# This program is free software; you can redistribute it and/or modify it
+# under the same terms as Perl itself.
+#
+
 #!/usr/bin/perl -w
 
 use strict;
@@ -46,7 +61,7 @@ WriteMakefile(
 	MIN_PERL_VERSION	=> '5.006',	# just because of 'Exporter'
 	META_ADD		=> { provides => { $mod_name => {
 					file => $mod_file,
-					version => '0.65'
+					version => '0.70'
 					}
 				} },
 

@@ -1,3 +1,19 @@
+#!perl
+# Asm::X86 - List of instructions and registers of x86-compatible processors,
+#   validating and converting instructions and memory references.
+#
+#	Copyright (C) 2008-2024 Bogdan 'bogdro' Drozdowski,
+#	  bogdro (at) users . sourceforge . net
+#	  bogdro /at\ cpan . org
+#
+# This file is part of Project Asmosis, a set of tools related to assembly
+#  language programming.
+# Project Asmosis homepage: https://asmosis.sourceforge.io/
+#
+# This program is free software; you can redistribute it and/or modify it
+# under the same terms as Perl itself.
+#
+
 package Asm::X86;
 
 use warnings;
@@ -7,20 +23,20 @@ require Exporter;
 @EXPORT = qw();
 @EXPORT_OK = qw(
 	@regs8_intel @regs16_intel @segregs_intel @regs32_intel @regs64_intel @regs_mm_intel
-	@regs_intel @regs_fpu_intel @regs_opmask_intel
+	@regs_intel @regs_fpu_intel @regs_opmask_intel @regs_bound_intel
 	@regs8_att @regs16_att @segregs_att @regs32_att @regs64_att @regs_mm_att
-	@regs_att @regs_fpu_att @regs_opmask_att
+	@regs_att @regs_fpu_att @regs_opmask_att @regs_bound_att
 
 	@instr_intel @instr_att @instr
 
 	is_reg_intel is_reg8_intel is_reg16_intel is_reg32_intel
 		is_reg64_intel is_reg_mm_intel is_segreg_intel is_reg_fpu_intel
-		is_reg_opmask_intel
+		is_reg_opmask_intel is_reg_bound_intel
 	is_reg_att is_reg8_att is_reg16_att is_reg32_att
 		is_reg64_att is_reg_mm_att is_segreg_att is_reg_fpu_att
-		is_reg_opmask_att
+		is_reg_opmask_att is_reg_bound_att
 	is_reg is_reg8 is_reg16 is_reg32 is_reg64 is_reg_mm is_segreg is_reg_fpu
-		is_reg_opmask
+		is_reg_opmask is_reg_bound
 
 	is_instr_intel is_instr_att is_instr
 
@@ -44,11 +60,11 @@ Asm::X86 - List of instructions and registers of x86-compatible processors, vali
 
 =head1 VERSION
 
-Version 0.65
+Version 0.70
 
 =cut
 
-our $VERSION = '0.65';
+our $VERSION = '0.70';
 
 =head1 DESCRIPTION
 
@@ -78,6 +94,7 @@ between AT&T and Intel syntaxes.
 	is_segreg_intel
 	is_reg_fpu_intel
 	is_reg_opmask_intel
+	is_reg_bound_intel
 	is_addressable32_intel
 	is_r32_in64_intel
 
@@ -90,6 +107,7 @@ between AT&T and Intel syntaxes.
 	is_segreg_att
 	is_reg_fpu_att
 	is_reg_opmask_att
+	is_reg_bound_att
 	is_addressable32_att
 	is_r32_in64_att
 
@@ -102,6 +120,7 @@ between AT&T and Intel syntaxes.
 	is_segreg
 	is_reg_fpu
 	is_reg_opmask
+	is_reg_bound
 	is_addressable32
 	is_r32_in64
 
@@ -134,7 +153,7 @@ between AT&T and Intel syntaxes.
 	add_att_suffix_instr
 
  These check if the given string parameter belongs to the specified
- class of registers or instructions or is a vaild addressing mode.
+ class of registers or instructions or is a valid addressing mode.
  The "convert*" functions can be used to convert the given instruction
   (including the operands)/addressing mode between AT&T and Intel syntaxes.
  The "_intel" and "_att" suffixes mean the Intel and AT&T syntaxes,
@@ -442,6 +461,23 @@ our @regs_opmask_intel = ('k0', 'k1', 'k2', 'k3', 'k4', 'k5', 'k6', 'k7');
 
 our @regs_opmask_att = _add_percent @regs_opmask_intel;
 
+=head2 @regs_bound_intel
+
+ A list of bound registers (as strings) in Intel syntax.
+
+=cut
+
+our @regs_bound_intel = ('bnd0', 'bnd1', 'bnd2', 'bnd3');
+
+
+=head2 @regs_bound_att
+
+ A list of bound registers (as strings) in AT&T syntax.
+
+=cut
+
+our @regs_bound_att = _add_percent @regs_bound_intel;
+
 =head2 @regs_intel
 
  A list of all x86 registers (as strings) in Intel syntax.
@@ -450,7 +486,7 @@ our @regs_opmask_att = _add_percent @regs_opmask_intel;
 
 our @regs_intel = ( @regs8_intel, @regs16_intel, @regs32_intel,
 			@regs64_intel, @regs_mm_intel, @regs_fpu_intel,
-			@regs_opmask_intel );
+			@regs_opmask_intel, @regs_bound_intel );
 
 =head2 @regs_att
 
@@ -460,7 +496,7 @@ our @regs_intel = ( @regs8_intel, @regs16_intel, @regs32_intel,
 
 our @regs_att = ( @regs8_att, @regs16_att, @regs32_att,
 			@regs64_att, @regs_mm_att, @regs_fpu_att,
-			@regs_opmask_att );
+			@regs_opmask_att, @regs_bound_att );
 
 
 =head2 @instr_intel
@@ -510,7 +546,7 @@ our @instr_intel = (
 	'cvttpd2pi', 'cvttps2dq', 'cvttps2pi', 'cvttsd2si', 'cvttss2si', 'cwd', 'cwde', 'daa', 'das',
 	'dec', 'div', 'divpd', 'divps', 'divsd', 'divss', 'dmint', 'dppd',
 	'dpps', 'emms', 'endbr32', 'endbr64', 'encls', 'enclu', 'enclv', 'enqcmd', 'enqcmds', 'enter',
-	'equ', 'extractps', 'extrq', 'f2xm1', 'fabs', 'fadd', 'faddp', 'fbld', 'fbstp', 'fchs', 'fclex',
+	'erets', 'eretu', 'extractps', 'extrq', 'f2xm1', 'fabs', 'fadd', 'faddp', 'fbld', 'fbstp', 'fchs', 'fclex',
 	'fcmovb', 'fcmovbe', 'fcmove', 'fcmovnb', 'fcmovnbe', 'fcmovne', 'fcmovnu', 'fcmovu', 'fcom',
 	'fcomi', 'fcomip', 'fcomp', 'fcompp', 'fcos', 'fdecstp', 'fdisi', 'fdiv', 'fdivp', 'fdivr',
 	'fdivrp', 'femms', 'feni', 'ffree', 'ffreep', 'fiadd', 'ficom', 'ficomp', 'fidiv', 'fidivr',
@@ -549,7 +585,7 @@ our @instr_intel = (
 	'kunpck', 'kunpckbw', 'kunpckdq', 'kunpckwd', 'kxnor', 'kxnorb', 'kxnord', 'kxnorq', 'kxnorw',
 	'kxor', 'kxorb', 'kxord', 'kxorq', 'kxorw',
 	'lahf', 'lar', 'lddqu', 'ldmxcsr', 'lds', 'ldtilecfg', 'lea', 'leave', 'les', 'lfence', 'lfs', 'lgdt',
-	'lgs', 'lidt', 'lldt', 'llwpcb', 'lmsw', 'loadall', 'loadall286', 'loadall386', 'lock', 'lodsb', 'lodsd',
+	'lgs', 'lidt', 'lkgs', 'lldt', 'llwpcb', 'lmsw', 'loadall', 'loadall286', 'loadall386', 'lock', 'lodsb', 'lodsd',
 	'lodsq', 'lodsw', 'loop', 'loopd', 'loope', 'looped', 'loopeq', 'loopew', 'loopne', 'loopned',
 	'loopneq', 'loopnew', 'loopnz', 'loopnzd', 'loopnzq', 'loopnzw', 'loopq', 'loopw', 'loopz',
 	'loopzd', 'loopzq', 'loopzw', 'lsl', 'lss', 'ltr', 'lwpins', 'lwpval', 'lzcnt', 'maskmovdqu',
@@ -835,8 +871,10 @@ our @instr_intel = (
 	'vscatterdpd', 'vscatterdps', 'vscatterpf0dpd',
 	'vscatterpf0dps', 'vscatterpf0qpd', 'vscatterpf0qps', 'vscatterpf1dpd',
 	'vscatterpf1dps', 'vscatterpf1qpd', 'vscatterpf1qps', 'vscatterqpd',
-	'vscatterqps', 'vshuff32x4', 'vshuff64x2', 'vshufi32x4', 'vshufi64x2','vshufpd',
-	'vshufps', 'vsqrtpd', 'vsqrtph', 'vsqrtps', 'vsqrtsd', 'vsqrtsh', 'vsqrtss', 'vstmxcsr', 'vsubpd',
+	'vscatterqps', 'vsha512msg1', 'vsha512msg2', 'vsha512rnds2',
+	'vshuff32x4', 'vshuff64x2', 'vshufi32x4', 'vshufi64x2','vshufpd',
+	'vshufps', 'vsm3msg1', 'vsm3msg2', 'vsm3rnds2', 'vsm4key4', 'vsm4rnds4',
+	'vsqrtpd', 'vsqrtph', 'vsqrtps', 'vsqrtsd', 'vsqrtsh', 'vsqrtss', 'vstmxcsr', 'vsubpd',
 	'vsubph', 'vsubps', 'vsubsd', 'vsubsh', 'vsubss',
 	'vtestpd', 'vtestps', 'vucomisd', 'vucomish', 'vucomiss', 'vunpckhpd',
 	'vunpckhps', 'vunpcklpd', 'vunpcklps', 'vxorpd', 'vxorps', 'vzeroall', 'vzeroupper',
@@ -1270,6 +1308,40 @@ sub is_reg_opmask($) {
 	return is_reg_opmask_intel ($elem) | is_reg_opmask_att ($elem);
 }
 
+=head2 is_reg_bound_intel
+
+ Checks if the given string parameter is a valid x86 bound register in Intel syntax.
+ Returns 1 if yes.
+
+=cut
+
+sub is_reg_bound_intel($) {
+	return _is_in_array (shift, \@regs_bound_intel);
+}
+
+=head2 is_reg_bound_att
+
+ Checks if the given string parameter is a valid x86 bound register in AT&T syntax.
+ Returns 1 if yes.
+
+=cut
+
+sub is_reg_bound_att($) {
+	return _is_in_array_att (shift, \@regs_bound_att);
+}
+
+=head2 is_reg_bound
+
+ Checks if the given string parameter is a valid x86 bound register.
+ Returns 1 if yes.
+
+=cut
+
+sub is_reg_bound($) {
+	my $elem = shift;
+	return is_reg_bound_intel ($elem) | is_reg_bound_att ($elem);
+}
+
 =head2 is_instr_intel
 
  Checks if the given string parameter is a valid x86 instruction in Intel syntax.
@@ -1352,7 +1424,7 @@ sub _is_same_type_16bit_addr_reg_intel($$) {
 #
 sub _validate_16bit_addr_parts_intel($$$$$$$) {
 
-	my $segreg = shift;
+	my $seg_reg = shift;
 	my $reg1_sign = shift;
 	my $reg1 = shift;
 	my $reg2_sign = shift;
@@ -1360,7 +1432,7 @@ sub _validate_16bit_addr_parts_intel($$$$$$$) {
 	my $disp_sign = shift;
 	my $disp = shift;
 
-	return 0 if defined $segreg && ! is_segreg_intel($segreg);
+	return 0 if defined $seg_reg && ! is_segreg_intel($seg_reg);
 	return 0 if #defined $reg1 && # always defined
 		is_reg_intel($reg1)
 		&& (! _is_valid_16bit_addr_reg_intel ($reg1));
@@ -1553,44 +1625,44 @@ sub _is_same_type_16bit_addr_reg_att($$) {
 #
 sub _validate_16bit_addr_parts_att($$$$$$) {
 
-	my $segreg = shift;
-	#my $basereg_sign = shift; # not allowed in the syntax at all
-	my $basereg = shift;
-	#my $indexreg_sign = shift; # not allowed in the syntax at all
-	my $indexreg = shift;
+	my $seg_reg = shift;
+	#my $base_reg_sign = shift; # not allowed in the syntax at all
+	my $base_reg = shift;
+	#my $index_reg_sign = shift; # not allowed in the syntax at all
+	my $index_reg = shift;
 	my $scale = shift;
 	my $disp_sign = shift;
 	my $disp = shift;
 
-	return 0 if defined $segreg && ! is_segreg_att($segreg);
-	if ( defined $basereg ) {
-		return 0 if $basereg =~ /%/o && ! is_reg16_att($basereg);
-		return 0 if is_reg_att($basereg) && ! _is_valid_16bit_addr_reg_att ($basereg);
-		return 0 if defined $disp && ! is_reg_att($basereg); # disallow 'var(var)'
+	return 0 if defined $seg_reg && ! is_segreg_att($seg_reg);
+	if ( defined $base_reg ) {
+		return 0 if $base_reg =~ /%/o && ! is_reg16_att($base_reg);
+		return 0 if is_reg_att($base_reg) && ! _is_valid_16bit_addr_reg_att ($base_reg);
+		return 0 if defined $disp && ! is_reg_att($base_reg); # disallow 'var(var)'
 	}
-	if ( defined $indexreg ) {
-		return 0 if $indexreg =~ /%/o && ! is_reg16_att($indexreg);
-		return 0 if is_reg_att($indexreg) && ! _is_valid_16bit_addr_reg_att ($indexreg);
+	if ( defined $index_reg ) {
+		return 0 if $index_reg =~ /%/o && ! is_reg16_att($index_reg);
+		return 0 if is_reg_att($index_reg) && ! _is_valid_16bit_addr_reg_att ($index_reg);
 		# '(, index, scale)' is not allowed in 16-bit addresses and eliminated by regexes,
 		# so $scale should not be defined here
-		if ( ! defined $basereg #&& ! defined $scale
+		if ( ! defined $base_reg #&& ! defined $scale
 		) {
 			# just one value inside - check for "(,1)"
-			return 0 if $indexreg ne '1' || is_reg_att($disp);
+			return 0 if $index_reg ne '1' || is_reg_att($disp);
 		}
 	}
 	return 0 if defined $disp && is_reg_att($disp);
 	return 0 if defined $scale && $scale ne '1';
-	if ( defined $basereg && defined $indexreg ) {
+	if ( defined $base_reg && defined $index_reg ) {
 
-		return 0 if ! _is_valid_16bit_addr_reg_att($basereg)
-			|| ! _is_valid_16bit_addr_reg_att($indexreg);
-		return 0 if _is_same_type_16bit_addr_reg_att ($basereg, $indexreg);
+		return 0 if ! _is_valid_16bit_addr_reg_att($base_reg)
+			|| ! _is_valid_16bit_addr_reg_att($index_reg);
+		return 0 if _is_same_type_16bit_addr_reg_att ($base_reg, $index_reg);
 	}
-	#return 0 if defined $basereg #&& defined $basereg_sign
-	#	&& is_reg_att($basereg);# && $basereg_sign =~ /-/o;
-	#return 0 if defined $indexreg #&& defined $indexreg_sign
-	#	&& is_reg_att($indexreg);# && $indexreg_sign =~ /-/o;
+	#return 0 if defined $base_reg #&& defined $base_reg_sign
+	#	&& is_reg_att($base_reg);# && $base_reg_sign =~ /-/o;
+	#return 0 if defined $index_reg #&& defined $index_reg_sign
+	#	&& is_reg_att($index_reg);# && $index_reg_sign =~ /-/o;
 
 	return 1;
 }
@@ -1714,7 +1786,7 @@ sub is_valid_16bit_addr($) {
 # =cut
 sub _validate_32bit_addr_parts_intel($$$$$$$$) {
 
-	my $segreg = shift;
+	my $seg_reg = shift;
 	my $base_reg_sign = shift;
 	my $base_reg = shift;
 	my $index_reg_sign = shift;
@@ -1723,7 +1795,7 @@ sub _validate_32bit_addr_parts_intel($$$$$$$$) {
 	my $disp_sign = shift;
 	my $disp = shift;
 
-	return 0 if defined $segreg && ! is_segreg_intel($segreg);
+	return 0 if defined $seg_reg && ! is_segreg_intel($seg_reg);
 	return 0 if defined $base_reg && is_reg_intel($base_reg) && ! is_addressable32_intel($base_reg);
 	return 0 if defined $index_reg && is_reg_intel($index_reg) && ! is_addressable32_intel($index_reg);
 	return 0 if defined $scale && is_reg_intel($scale) && ! is_addressable32_intel($scale);
@@ -1865,7 +1937,7 @@ sub is_valid_32bit_addr_intel($) {
 # =cut
 sub _validate_32bit_addr_parts_att($$$$$$) {
 
-	my $segreg = shift;
+	my $seg_reg = shift;
 	#my $base_reg_sign = shift; # not allowed in the syntax at all
 	my $base_reg = shift;
 	#my $index_reg_sign = shift; # not allowed in the syntax at all
@@ -1874,7 +1946,7 @@ sub _validate_32bit_addr_parts_att($$$$$$) {
 	my $disp_sign = shift;
 	my $disp = shift;
 
-	return 0 if defined $segreg && ! is_segreg_att ($segreg);
+	return 0 if defined $seg_reg && ! is_segreg_att ($seg_reg);
 	if ( defined $index_reg && ! defined $base_reg && ! defined $scale ) {
 		# just one value inside - check for "(,1)"
 		return 1 if $index_reg eq '1' && ! is_reg_att($disp);
@@ -2038,7 +2110,7 @@ sub _is_valid_64bit_addr_reg_intel($) {
 # =cut
 sub _validate_64bit_addr_parts_intel($$$$$$$$) {
 
-	my $segreg = shift;
+	my $seg_reg = shift;
 	my $base_reg_sign = shift;
 	my $base_reg = shift;
 	my $index_reg_sign = shift;
@@ -2049,7 +2121,7 @@ sub _validate_64bit_addr_parts_intel($$$$$$$$) {
 	my $was64 = 0;
 	my $nregs = 0;
 
-	return 0 if defined $segreg && ! is_segreg_intel($segreg);
+	return 0 if defined $seg_reg && ! is_segreg_intel($seg_reg);
 	if ( defined $base_reg && is_reg_intel($base_reg) ) {
 
 		return 0 if ! _is_valid_64bit_addr_reg_intel($base_reg);
@@ -2228,7 +2300,7 @@ sub _is_valid_64bit_addr_reg_att($) {
 # =cut
 sub _validate_64bit_addr_parts_att($$$$$$) {
 
-	my $segreg = shift;
+	my $seg_reg = shift;
 	#my $base_reg_sign = shift; # not allowed in the syntax at all
 	my $base_reg = shift;
 	#my $index_reg_sign = shift; # not allowed in the syntax at all
@@ -2239,7 +2311,7 @@ sub _validate_64bit_addr_parts_att($$$$$$) {
 	my $was64 = 0;
 	my $nregs = 0;
 
-	return 0 if defined $segreg && ! is_segreg_att($segreg);
+	return 0 if defined $seg_reg && ! is_segreg_att($seg_reg);
 	if ( defined $base_reg ) {
 
 		if ( ! defined $index_reg #&& ! defined $scale # no index reg - no scale in is_valid_64bit_addr_att()
@@ -2997,7 +3069,7 @@ sub conv_intel_addr_to_att($) {
 sub _change_to_intel_addr_if_applicable($) {
 
 	my $par = shift;
-	# (we mustn't change digits and %st(n))
+	# (we mustn't change digits and %st(n), skip also labels)
 	if ( $par !~ /\$/o && $par !~ /\%/o && $par !~ /_L\d+/o && $par =~ /[a-zA-Z_\.]/o ) {
 
 		return "[$par]";
@@ -3017,6 +3089,12 @@ sub _change_to_intel_addr_if_applicable($) {
 sub conv_att_instr_to_intel($) {
 
 	my $par = shift;
+
+	# process "jmp cs,sth" early so that it doesn't get substituted
+	my $jmp_2arg = qr/^\s*l?(jmp|call)\s*(\w+)\s*,\s*(\w+)\s*$/io;
+	if ( $par =~ /$jmp_2arg/ ) {
+		$par =~ s/$jmp_2arg/\t$1\t$2:$3/;
+	}
 	# (changing "xxx" to "[xxx]", if there's no '$' or '%')
 
 	# (elements of memory operands mustn't be taken as instruction operands, so there are no '()'s here)
@@ -3090,28 +3168,33 @@ sub conv_att_instr_to_intel($) {
 	# (changing "st" to "st0")
 	$par =~ s/(\s)st(\s|,)/$1 st0$2/go;
 
-	# (changing operands' order):
-	my $i_3op = qr/^\s*(\w+)\s+(\[?[:\.\w\*\+\-\(\)]+\]?)\s*,\s*(\[?[:\.\w\*\+\-\(\)]+\]?)\s*,\s*(\[?[:\.\w\*\+\-\(\)]+\]?)/o;
-	my $i_2op = qr/^\s*(\w+)\s+(\[?[:\.\w\*\+\-\(\)]+\]?)\s*,\s*(\[?[:\.\w\*\+\-\(\)]+\]?)([^,]*(;.*)?)$/o;
-	my $i_1op = qr/^\s*(\w+)\s+(\[?[:\.\w\*\+\-\(\)]+\]?)([^,]*(;.*)?)$/o;
-	if ( $par =~ /$i_3op/ ) {
-		if ( is_instr($1) ) {
-			$par =~ s/$i_3op/\t$1\t$4, $3, $2/;
+	# (changing operands' order, but not for jump/call):
+	if ( $par!~ /^\s*l?(jmp|call)/io ) {
+		my $i_3op = qr/^\s*(\w+)\s+(\[?[:\.\w\*\+\-\(\)]+\]?)\s*,\s*(\[?[:\.\w\*\+\-\(\)]+\]?)\s*,\s*(\[?[:\.\w\*\+\-\(\)]+\]?)/o;
+		my $i_2op = qr/^\s*(\w+)\s+(\[?[:\.\w\*\+\-\(\)]+\]?)\s*,\s*(\[?[:\.\w\*\+\-\(\)]+\]?)([^,]*(;.*)?)$/o;
+		my $i_1op = qr/^\s*(\w+)\s+(\[?[:\.\w\*\+\-\(\)]+\]?)([^,]*(;.*)?)$/o;
+		if ( $par =~ /$i_3op/ ) {
+			if ( is_instr($1) ) {
+				$par =~ s/$i_3op/\t$1\t$4, $3, $2/;
+			}
 		}
-	}
-	if ( $par =~ /$i_2op/) {
-		if ( is_instr($1) ) {
-			$par =~ s/$i_2op/\t$1\t$3, $2$4/;
+		if ( $par =~ /$i_2op/) {
+			if ( is_instr($1) ) {
+				$par =~ s/$i_2op/\t$1\t$3, $2$4/;
+			}
 		}
-	}
-	if ( $par =~ /$i_1op/ ) {
-		if ( is_instr($1) ) {
-			$par =~ s/$i_1op/\t$1\t$2$3/;
+		if ( $par =~ /$i_1op/ ) {
+			if ( is_instr($1) ) {
+				$par =~ s/$i_1op/\t$1\t$2$3/;
+			}
 		}
 	}
 
 	foreach my $i (@instr) {
 
+		next unless $par =~ /^\s*$i[bwl]\s*.*$/i
+			&& $par !~ /^\s*f\w+l\s+.*$/
+			&& $par !~ /^\s*mov[sz][bwl][bwl]\s+.*$/;
 		$par =~ s/^\s*$i[b]\s*(.*)$/\t$i\tbyte $1/i;
 		$par =~ s/^\s*$i[w]\s*(.*)$/\t$i\tword $1/i;
 		$par =~ s/^\s*$i[l]\s*(.*)$/\t$i\tdword $1/i;
@@ -3124,9 +3207,14 @@ sub conv_att_instr_to_intel($) {
 	$par =~ s/^\s*movzbl\s+(.*)\s*,\s*(.*)$/\tmovzx\t$1, byte $2\n/io;
 	$par =~ s/^\s*movzwl\s+(.*)\s*,\s*(.*)$/\tmovzx\t$1, word $2\n/io;
 
-	$par =~ s/^\s*l?(jmp|call)\s*(\[[\w\*\+\-\s]+\])/\t$1\tdword $2/io;
-	$par =~ s/^\s*l?(jmp|call)\s*([\w\*\+\-]+)/\t$1\tdword $2/io;
-	$par =~ s/^\s*l?(jmp|call)\s*(\w+)\s*,\s*(\w+)/\t$1\t$2:$3/io;
+	my $jmp_mem = qr/^\s*l?(jmp|call)\s*(\[[\w\*\+\-\s]+\])\s*$/io;
+	my $jmp_nomem = qr/^\s*l?(jmp|call)\s*([\w\*\+\-]+)\s*$/io;
+	if ( $par =~ /$jmp_mem/ ) {
+		$par =~ s/$jmp_mem/\t$1\tdword $2/;
+	}
+	elsif ( $par =~ /$jmp_nomem/ ) {
+		$par =~ s/$jmp_nomem/\t$1\tdword $2/;
+	}
 	$par =~ s/^\s*lret\s*(.*)$/\tret\t$1\t/i;
 
 	$par =~ s/^\s*cbtw\s*/\tcbw\t/io;
@@ -3159,7 +3247,7 @@ sub _remove_size_qualifiers_add_dollar($) {
 
 	my $par = shift;
 	$par =~ s/\s+$//o;
-	$par =~ s/(t?byte|[dqpft]?word)//io;
+	$par =~ s/(t?byte|[dqpftoyz]?word)//io;
 	$par =~ s/^\s+//o;
 	if ( $par !~ /\[/o && !is_reg($par) )
 	{
@@ -3192,22 +3280,22 @@ sub conv_intel_instr_to_att($) {
 			if ( $par =~ /[^;]+\bbyte\b/io )     {
 
 				$par =~ s/^\s*$i\b/\t${i}b/i;
-				$par =~ s/\b(t?byte|[dqpft]?word)\b//io;
+				$par =~ s/\b(t?byte|[dqpftoyz]?word)\b//io;
 
 			} elsif ( $par =~ /[^;]+\bword\b/io )  {
 
 				$par =~ s/^\s*$i\b/\t${i}w/i;
-				$par =~ s/\b(t?byte|[dqpft]?word)\b//io;
+				$par =~ s/\b(t?byte|[dqpftoyz]?word)\b//io;
 
 			} elsif ( $par =~ /[^;]+\bdword\b/io ) {
 
 				$par =~ s/^\s*$i\b/\t${i}l/i;
-				$par =~ s/\b(t?byte|[dqpft]?word)\b//io;
+				$par =~ s/\b(t?byte|[dqpftoyz]?word)\b//io;
 
 			} elsif ( $par =~ /[^;]+\bqword\b/io ) {
 
 				$par =~ s/^\s*$i\b/\t${i}q/i;
-				$par =~ s/\b(t?byte|[dqpft]?word)\b//io;
+				$par =~ s/\b(t?byte|[dqpftoyz]?word)\b//io;
 
 			} elsif ( $par =~ /^\s*$i\s+([^,]+)\s*,\s*([^,]+)\s*,\s*([^,]+)/i ) {
 
@@ -3399,9 +3487,9 @@ sub conv_intel_instr_to_att($) {
 	}
 
 	# (changing operands' order):
-	my $i_3op = qr/^\s*(\w+)\s+((t?byte|[dqpft]?word)?\s*\[?[\.\w\*\+\-\s\(\)\[\]]+\]?)\s*,\s*((t?byte|[dqpft]?word)?\s*\[?[\.\w\*\+\-\s\(\)\[\]]+\]?)\s*,\s*((t?byte|[dqpft]?word)?\s*\[?[\.\w\*\+\-\s\(\)\[\]]+\]?)/o;
-	my $i_2op = qr/^\s*(\w+)\s+((t?byte|[dqpft]?word)?\s*\[?[\.\w\*\+\-\s\(\)\[\]]+\]?)\s*,\s*((t?byte|[dqpft]?word)?\s*\[?[\.\w\*\+\-\s\(\)\[\]]+\]?)([^,]*(;.*)?)$/o;
-	my $i_1op = qr/^\s*(\w+)\s+((t?byte|[dqpft]?word)?\s*\[?[\.\w\*\+\-\s\(\)\[\]]+\]?)([^,]*(;.*)?)$/o;
+	my $i_3op = qr/^\s*(\w+)\s+((t?byte|[dqpftoyz]?word)?\s*\[?[\.\w\*\+\-\s\(\)\[\]]+\]?)\s*,\s*((t?byte|[dqpftoyz]?word)?\s*\[?[\.\w\*\+\-\s\(\)\[\]]+\]?)\s*,\s*((t?byte|[dqpftoyz]?word)?\s*\[?[\.\w\*\+\-\s\(\)\[\]]+\]?)/o;
+	my $i_2op = qr/^\s*(\w+)\s+((t?byte|[dqpftoyz]?word)?\s*\[?[\.\w\*\+\-\s\(\)\[\]]+\]?)\s*,\s*((t?byte|[dqpftoyz]?word)?\s*\[?[\.\w\*\+\-\s\(\)\[\]]+\]?)([^,]*(;.*)?)$/o;
+	my $i_1op = qr/^\s*(\w+)\s+((t?byte|[dqpftoyz]?word)?\s*\[?[\.\w\*\+\-\s\(\)\[\]]+\]?)([^,]*(;.*)?)$/o;
 	if ( $par =~ /$i_3op/ ) {
 		if ( is_instr($1) ) {
 			$par =~ s/$i_3op/\t$1\t$6, $4, $2/;
@@ -3503,16 +3591,10 @@ After installing, you can find documentation for this module with the perldoc co
 You can also look for information at:
 
     Search CPAN
-        https://metacpan.org/release/Asm-X86
-        http://search.cpan.org/dist/Asm-X86
+        https://metacpan.org/dist/Asm-X86
 
     CPAN Request Tracker:
         https://rt.cpan.org/Public/Dist/Display.html?Name=Asm-X86
-        http://rt.cpan.org/NoAuth/Bugs.html?Dist=Asm-X86
-
-    CPAN Ratings:
-        https://cpanratings.perl.org/dist/Asm-X86
-        http://cpanratings.perl.org/d/Asm-X86
 
 =head1 AUTHOR
 
@@ -3520,7 +3602,7 @@ Bogdan Drozdowski, C<< <bogdro at cpan.org> >>
 
 =head1 COPYRIGHT
 
-Copyright 2008-2023 Bogdan Drozdowski, all rights reserved.
+Copyright 2008-2024 Bogdan Drozdowski, all rights reserved.
 
 =head1 LICENSE
 

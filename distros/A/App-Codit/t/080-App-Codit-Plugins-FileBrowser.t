@@ -23,6 +23,7 @@ createapp(
 
 my $pext;
 if (defined $app) {
+	$app->geometry('800x600+0+0');
 	$pext = $app->extGet('Plugins');
 }
 push @tests, (

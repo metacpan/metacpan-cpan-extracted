@@ -53,7 +53,7 @@ Tk-GtkSettings*NoteBook.borderWidth: 1
 *font: {Noto Sans} 10 
 *foreground: #000000
 *highlightBackground: #dec9a9
-*highlightColor: #75511a
+*highlightColor: #8f6b32
 *iconTheme: oxygen
 *inactiveBackground: #C0AB8B
 *insertBackground: #000000
@@ -61,25 +61,23 @@ Tk-GtkSettings*NoteBook.borderWidth: 1
 *selectForeground: #ffffff
 *troughColor: #C0AB8B
 *Member1.background: #fffbe2
-*Member1.highlightColor: #dec9a9
 *Member2.background: #fffbe2
-*Member2.highlightColor: #dec9a9
 *Dirlist.background: #fffbe2
-*Dirlist.highlightColor: #dec9a9
+*Dirlist.highlightThickness: 1
 *DirTree.background: #fffbe2
-*DirTree.highlightColor: #dec9a9
+*DirTree.highlightThickness: 1
 *HList.background: #fffbe2
-*HList.highlightColor: #dec9a9
+*HList.highlightThickness: 1
 *ITree.background: #fffbe2
-*ITree.highlightColor: #dec9a9
+*ITree.highlightThickness: 1
 *IconList.background: #fffbe2
-*IconList.highlightColor: #dec9a9
+*IconList.highlightThickness: 1
 *Listbox.background: #fffbe2
-*Listbox.highlightColor: #dec9a9
+*Listbox.highlightThickness: 1
 *Tlist.background: #fffbe2
-*Tlist.highlightColor: #dec9a9
+*Tlist.highlightThickness: 1
 *Tree.background: #fffbe2
-*Tree.highlightColor: #dec9a9
+*Tree.highlightThickness: 1
 *Menu.borderWidth: 1
 *NoteBook.borderWidth: 1
 ! Tk::GtkSettings section

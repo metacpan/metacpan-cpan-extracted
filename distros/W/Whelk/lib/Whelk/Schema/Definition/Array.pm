@@ -1,6 +1,6 @@
 package Whelk::Schema::Definition::Array;
-$Whelk::Schema::Definition::Array::VERSION = '0.02';
-use Kelp::Base 'Whelk::Schema::Definition';
+$Whelk::Schema::Definition::Array::VERSION = '0.03';
+use Whelk::StrictBase 'Whelk::Schema::Definition';
 
 attr items => undef;
 attr lax => !!0;

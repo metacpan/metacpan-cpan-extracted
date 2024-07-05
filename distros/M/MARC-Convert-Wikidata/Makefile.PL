@@ -23,7 +23,8 @@ requires 'Data::Kramerius' => 0;
 requires 'DateTime' => 0;
 requires 'English' => 0;
 requires 'Error::Pure' => 0;
-requires 'MARC::Convert::Wikidata::Object' => 0;
+requires 'MARC::Convert::Wikidata::Object' => 0.05;
+requires 'MARC::Convert::Wikidata::Object::ExternalId' => 0;
 requires 'MARC::Convert::Wikidata::Object::ISBN' => 0;
 requires 'MARC::Convert::Wikidata::Object::Kramerius' => 0;
 requires 'MARC::Convert::Wikidata::Object::People' => 0;
@@ -48,7 +49,7 @@ test_requires 'Test::NoWarnings' => 0;
 test_requires 'Test::Warn' => 0;
 test_requires 'Unicode::UTF8' => 0;
 tests_recursive;
-version '0.11';
+version '0.13';
 
 # Run.
 WriteAll();

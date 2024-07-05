@@ -1,7 +1,12 @@
 Revision history for Perl extension App::Codit.
 
+0.07 Thu Jul 04 2024
+	- fixed segfault in plugin PodViewer when testing on machines without the correct icon libraries.
+	- plugin console now functional.
+	- updated manual.	
+
 0.06 Tue Jun 18 2024
-	-fixed bugs in SessionManager module.
+	- fixed bugs in SessionManager module.
 
 0.05 Mon Jun 17 2024
 	- fixed POD errors

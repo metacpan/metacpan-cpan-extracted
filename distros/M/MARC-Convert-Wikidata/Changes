@@ -1,3 +1,15 @@
+0.13 2024-07-05T00:26:05+02:00
+ - Add look_for_external_id() method to Wikidata.
+ - Rename internal subroutine _oclc() to _lccn().
+ - Rewrite Transform to store people external ids in 'external_ids'
+   parameter.
+ - Sort subroutines in Item.
+
+0.12 2024-07-04T23:15:01+02:00
+ - Fix subfield processing for multiple values.
+ - Rewrite Item to use external_ids() method to generate external ids.
+ - Rewrite Transform to store external ids in 'external_ids' parameter.
+
 0.11 2024-07-03T16:36:27+02:00
  - Add another date cleanup (asi 2010 and po Kr.). Thanks Josef Moravec.
  - Add tests for Transform.

@@ -1,6 +1,6 @@
 package Whelk::Schema::Definition::Number;
-$Whelk::Schema::Definition::Number::VERSION = '0.02';
-use Kelp::Base 'Whelk::Schema::Definition::_Scalar';
+$Whelk::Schema::Definition::Number::VERSION = '0.03';
+use Whelk::StrictBase 'Whelk::Schema::Definition::_Scalar';
 use Scalar::Util qw(looks_like_number);
 
 sub openapi_dump

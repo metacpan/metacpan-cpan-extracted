@@ -3,7 +3,7 @@ use strict;
 use Carp qw( croak );
 
 use vars qw( $VERSION );
-$VERSION = '0.21';
+$VERSION = '0.22';
 
 use vars qw(%forbidden);
 
@@ -152,7 +152,7 @@ of a module.
 
 =head1 AUTHOR
 
-Copyright (c) 2003-2014 Max Maischein, E<lt>corion@cpan.orgE<gt>
+Copyright (c) 2003-2024 Max Maischein, E<lt>corion@cpan.orgE<gt>
 
 =head1 LICENSE
 

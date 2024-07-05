@@ -1,5 +1,5 @@
 package Whelk;
-$Whelk::VERSION = '0.02';
+$Whelk::VERSION = '0.03';
 use Kelp::Base 'Kelp';
 
 attr 'config_module' => '+Whelk::Config';
@@ -43,8 +43,8 @@ documentation can be beautifully visualized using OpenAPI tools like Swagger
 UI.
 
 Whelk is currently in beta. It's not production ready and some changes in
-interface are possible. Beta phase will end no later than Q3 2024 with version
-C<1.00>.
+interface are possible. Beta phase will end no later than early Q4 2024 with
+version C<1.00>.
 
 To get started, take a look at L<Whelk::Manual>.
 

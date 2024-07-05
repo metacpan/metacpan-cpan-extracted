@@ -12,10 +12,10 @@ use Unicode::UTF8 qw(decode_utf8 encode_utf8);
 Readonly::Array our @EXPORT_OK => qw(clean_cover clean_date clean_edition_number
 	clean_number_of_pages clean_oclc clean_publication_date clean_publisher_name
 	clean_publisher_place clean_series_name clean_series_ordinal clean_subtitle
-	clean_title);
+	clean_title look_for_external_id);
 Readonly::Array our @COVERS => qw(hardback paperback);
 
-our $VERSION = 0.11;
+our $VERSION = 0.13;
 our $DEBUG = 0;
 
 sub clean_cover {
@@ -503,6 +503,23 @@ sub clean_title {
 	return $ret_title;
 }
 
+sub look_for_external_id {
+	my ($object, $external_id_name, $deprecation_flag) = @_;
+
+	$deprecation_flag ||= 0;
+
+	my @ret;
+	foreach my $external_id (@{$object->external_ids}) {
+		if ($external_id->name eq $external_id_name
+			&& $external_id->deprecated == $deprecation_flag) {
+
+			push @ret, $external_id->value;
+		}
+	}
+
+	return wantarray ? @ret : $ret[0];
+}
+
 sub _remove_trailing_whitespace {
 	my $string = shift;
 
@@ -536,7 +553,7 @@ MARC::Convert::Wikidata::Utils - Utilities for MARC::Convert::Wikidata.
 
 =head1 SYNOPSIS
 
- use MARC::Convert::Wikidata::Utils qw(clean_cover clean_date clean_edition_number clean_number_of_pages clean_oclc clean_publication_date clean_publisher_name clean_publisher_place clean_series_name clean_series_ordinal clean_subtitle clean_title);
+ use MARC::Convert::Wikidata::Utils qw(clean_cover clean_date clean_edition_number clean_number_of_pages clean_oclc clean_publication_date clean_publisher_name clean_publisher_place clean_series_name clean_series_ordinal clean_subtitle clean_title look_for_external_id);
 
  my $cleaned_cover = clean_cover($cover);
  my $cleaned_date = clean_date($date);
@@ -551,6 +568,8 @@ MARC::Convert::Wikidata::Utils - Utilities for MARC::Convert::Wikidata.
  my $cleaned_series_ordinal = clean_series_ordinal($series_ordinal);
  my $cleaned_subtitle = clean_subitle($subtitle);
  my $cleaned_title = clean_title($title);
+ my $value = look_for_external_id($object, $external_id_name, $deprecation_flag);
+ my @values = look_for_external_id($object, $external_id_name, $deprecation_flag);
 
 =head1 SUBROUTINES
 
@@ -652,6 +671,15 @@ Returns string or undef.
 Clean title.
 
 Returns string or undef.
+
+=head2 C<look_for_external_id>
+
+ my $value = look_for_external_id($object, $external_id_name, $deprecation_flag);
+ my @values = look_for_external_id($object, $external_id_name, $deprecation_flag);
+
+Look for external id values defined by name and deprecation flag.
+
+Returns strings.
 
 =head1 EXAMPLE1
 
@@ -762,6 +790,6 @@ BSD 2-Clause License
 
 =head1 VERSION
 
-0.11
+0.13
 
 =cut

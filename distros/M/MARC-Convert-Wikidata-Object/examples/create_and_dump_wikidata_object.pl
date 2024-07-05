@@ -5,6 +5,7 @@ use warnings;
 
 use Data::Printer;
 use MARC::Convert::Wikidata::Object;
+use MARC::Convert::Wikidata::Object::ExternalId;
 use MARC::Convert::Wikidata::Object::ISBN;
 use MARC::Convert::Wikidata::Object::People;
 use MARC::Convert::Wikidata::Object::Publisher;
@@ -12,8 +13,13 @@ use Unicode::UTF8 qw(decode_utf8);
 
 my $aut = MARC::Convert::Wikidata::Object::People->new(
         'date_of_birth' => '1952-12-08',
+        'external_ids' => [
+                MARC::Convert::Wikidata::Object::ExternalId->new(
+                        'name' => 'nkcr_aut',
+                        'value' => 'jn20000401266',
+                ),
+        ],
         'name' => decode_utf8('Jiří'),
-        'nkcr_aut' => 'jn20000401266',
         'surname' => 'Jurok',
 );
 
@@ -29,9 +35,18 @@ my $isbn = MARC::Convert::Wikidata::Object::ISBN->new(
 
 my $obj = MARC::Convert::Wikidata::Object->new(
         'authors' => [$aut],
-        'ccnb' => 'cnb001188266',
         'date_of_publication' => 2002,
         'edition_number' => 2,
+        'external_ids' => [
+                MARC::Convert::Wikidata::Object::ExternalId->new(
+                        'name' => 'cnb',
+                        'value' => 'cnb001188266',
+                ),
+                MARC::Convert::Wikidata::Object::ExternalId->new(
+                        'name' => 'lccn',
+                        'value' => '53860313',
+                ),
+        ],
         'isbns' => [$isbn],
         'number_of_pages' => 414,
         'publishers' => [$publisher],
@@ -41,29 +56,34 @@ p $obj;
 
 # Output:
 # MARC::Convert::Wikidata::Object  {
-#     Parents       Mo::Object
-#     public methods (11) : BUILD, can (UNIVERSAL), DOES (UNIVERSAL), err (Error::Pure), full_name, check_array (Mo::utils), check_array_object (Mo::utils), isa (UNIVERSAL), none (List::MoreUtils::XS), Readonly (Readonly), VERSION (UNIVERSAL)
-#     private methods (1) : __ANON__ (Mo::is)
+#     parents: Mo::Object
+#     public methods (8):
+#         BUILD, full_name
+#         Error::Pure:
+#             err
+#         List::MoreUtils::XS:
+#             none
+#         Mo::utils:
+#             check_array, check_array_object, check_number
+#         Readonly:
+#             Readonly
+#     private methods (0)
 #     internals: {
-#         authors                   [
+#         authors               [
 #             [0] MARC::Convert::Wikidata::Object::People
 #         ],
-#         authors_of_introduction   [],
-#         ccnb                      "cnb001188266",
-#         compilers                 [],
-#         date_of_publication       2002,
-#         edition_number            2,
-#         editors                   [],
-#         illustrators              [],
-#         isbns                     [
+#         date_of_publication   2002,
+#         edition_number        2,
+#         external_ids          [
+#             [0] MARC::Convert::Wikidata::Object::ExternalId,
+#             [1] MARC::Convert::Wikidata::Object::ExternalId
+#         ],
+#         isbns                 [
 #             [0] MARC::Convert::Wikidata::Object::ISBN
 #         ],
-#         krameriuses               [],
-#         number_of_pages           414,
-#         publishers                [
+#         number_of_pages       414,
+#         publishers            [
 #             [0] MARC::Convert::Wikidata::Object::Publisher
-#         ],
-#         series                    [],
-#         translators               []
+#         ]
 #     }
 # }

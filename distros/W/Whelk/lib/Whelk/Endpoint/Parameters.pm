@@ -1,5 +1,5 @@
 package Whelk::Endpoint::Parameters;
-$Whelk::Endpoint::Parameters::VERSION = '0.02';
+$Whelk::Endpoint::Parameters::VERSION = '0.03';
 use Kelp::Base;
 
 use Carp;

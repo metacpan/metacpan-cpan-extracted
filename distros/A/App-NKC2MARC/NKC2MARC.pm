@@ -8,10 +8,15 @@ use English;
 use Error::Pure qw(err);
 use Getopt::Std;
 use IO::Barf qw(barf);
+use List::Util 1.33 qw(none);
+use MARC::File::XML;
 use MARC::Record;
+use Readonly;
 use ZOOM;
 
-our $VERSION = 0.01;
+Readonly::Array our @OUTPUT_FORMATS => qw(usmarc xml);
+
+our $VERSION = 0.02;
 
 $| = 1;
 
@@ -33,18 +38,27 @@ sub run {
 	# Process arguments.
 	$self->{'_opts'} = {
 		'h' => 0,
+		'o' => 'xml',
 	};
-	if (! getopts('h', $self->{'_opts'}) || @ARGV < 1
-		|| $self->{'_opts'}->{'h'}) {
+	if (! getopts('ho:', $self->{'_opts'})
+		|| $self->{'_opts'}->{'h'}
+		|| @ARGV < 1) {
 
-		print STDERR "Usage: $0 [-h] [--version] id_of_book\n";
+		print STDERR "Usage: $0 [-h] [-o output_format] [--version] id_of_book\n";
 		print STDERR "\t-h\t\t\tPrint help.\n";
+		print STDERR "\t-o output_format\tOutput format (usmarc, xml - default).\n";
 		print STDERR "\t--version\t\tPrint version.\n";
 		print STDERR "\tid_of_book\t\tIdentifier of book e.g. Czech ".
 			"national bibliography id or ISBN\n";
 		return 1;
 	}
 	$self->{'_id_of_book'} = shift @ARGV;
+
+	if (none { $self->{'_opts'}->{'o'} eq $_ } @OUTPUT_FORMATS) {
+		err 'Bad output format.',
+			'Output format', $self->{'_opts'}->{'o'},
+		;
+	}
 
 	# Configuration of National library of the Czech Republic service.
 	my $c = {
@@ -92,9 +106,17 @@ sub run {
 	if (! defined $ccnb) {
 		$ccnb = $self->_subfield($usmarc, '015', 'a');
 	}
-	barf($ccnb.'.mrc', $raw_record);
+	my $output_file;
+	if ($self->{'_opts'}->{'o'} eq 'xml') {
+		$output_file = $ccnb.'.xml';
+		my $marc_xml = encode_utf8($usmarc->as_xml);
+		barf($output_file, $marc_xml);
+	} else {
+		$output_file = $ccnb.'.mrc';
+		barf($output_file, $raw_record);
+	}
 
-	print "MARC record for '".$self->{'_id_of_book'}."' was saved to $ccnb.mrc.\n";
+	print "MARC record for '".$self->{'_id_of_book'}."' was saved to '$output_file'.\n";
 
 	return 0;
 }
@@ -166,7 +188,7 @@ Returns 1 for error, 0 for success.
  exit App::NKC2MARC->new->run;
 
  # Output:
- # MARC record for '978-80-7370-353-0' was saved to cnb002751696.mrc.
+ # MARC record for '978-80-7370-353-0' was saved to 'cnb002751696.mrc'.
 
 =head1 DEPENDENCIES
 
@@ -175,7 +197,10 @@ L<English>,
 L<Error::Pure>,
 L<Getopt::Std>,
 L<IO::Barf>,
+L<List::Util>,
+L<MARC::File::XML>,
 L<MARC::Record>,
+L<Readonly>,
 L<ZOOM>.
 
 =head1 REPOSITORY
@@ -196,6 +221,6 @@ BSD 2-Clause License
 
 =head1 VERSION
 
-0.01
+0.02
 
 =cut

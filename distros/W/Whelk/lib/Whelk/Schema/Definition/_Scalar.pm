@@ -1,6 +1,6 @@
 package Whelk::Schema::Definition::_Scalar;
-$Whelk::Schema::Definition::_Scalar::VERSION = '0.02';
-use Kelp::Base 'Whelk::Schema::Definition';
+$Whelk::Schema::Definition::_Scalar::VERSION = '0.03';
+use Whelk::StrictBase 'Whelk::Schema::Definition';
 
 attr required => sub { !defined $_[0]->default };
 attr default => undef;

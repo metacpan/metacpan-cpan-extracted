@@ -1,6 +1,6 @@
 package Whelk::Schema::Definition::Object;
-$Whelk::Schema::Definition::Object::VERSION = '0.02';
-use Kelp::Base 'Whelk::Schema::Definition';
+$Whelk::Schema::Definition::Object::VERSION = '0.03';
+use Whelk::StrictBase 'Whelk::Schema::Definition';
 
 attr properties => undef;
 attr strict => !!0;

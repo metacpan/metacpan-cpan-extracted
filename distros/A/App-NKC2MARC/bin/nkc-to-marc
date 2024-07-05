@@ -5,7 +5,7 @@ use warnings;
 
 use App::NKC2MARC;
 
-our $VERSION = 0.01;
+our $VERSION = 0.02;
 
 # Run.
 exit App::NKC2MARC->new->run;
@@ -28,7 +28,7 @@ nkc-to-marc - Tool to fetch record from National library of the Czech Republic t
 
 =head1 SYNOPSIS
 
- nkc-to-marc [-h] [--version] id_of_book
+ nkc-to-marc [-h] [-o output_format] [--version] id_of_book
 
 =head1 ARGUMENTS
 
@@ -37,6 +37,26 @@ nkc-to-marc - Tool to fetch record from National library of the Czech Republic t
 =item * C<-h>
 
 Print help.
+
+=item * C<-o output_format>
+
+Output format.
+
+Default value is 'xml'.
+
+Possible formats are:
+
+=over
+
+=item * usmarc
+
+USMARC format.
+
+=item * xml
+
+MARC XML format.
+
+=back
 
 =item * C<--version>
 
@@ -51,12 +71,12 @@ Possible ids are: ISBN or Czech national bibliography id.
 
 =head1 EXAMPLE1
 
- # Adding book edition defined by ISBN number
+ # Fetch book edition defined by ISBN number.
  nkc-to-marc 978-80-276-0470-8
 
 =head1 EXAMPLE2
 
- # Adding book edition defined by Czech national bibliography id
+ # Fetch book edition defined by Czech national bibliography id
  nkc-to-marc cnb003322696
 
 =head1 REPOSITORY
@@ -77,6 +97,6 @@ BSD 2-Clause License
 
 =head1 VERSION
 
-0.01
+0.02
 
 =cut

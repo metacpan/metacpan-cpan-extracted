@@ -1,4 +1,17 @@
-#!/usr/bin/perl -T -w
+#!/usr/bin/perl -w
+# Asm::X86 - a test for duplicate values.
+#
+#	Copyright (C) 2008-2024 Bogdan 'bogdro' Drozdowski,
+#	  bogdro (at) users . sourceforge . net
+#	  bogdro /at\ cpan . org
+#
+# This file is part of Project Asmosis, a set of tools related to assembly
+#  language programming.
+# Project Asmosis homepage: https://asmosis.sourceforge.io/
+#
+# This program is free software; you can redistribute it and/or modify it
+# under the same terms as Perl itself.
+#
 
 use strict;
 use warnings;

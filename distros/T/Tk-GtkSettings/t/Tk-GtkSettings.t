@@ -101,13 +101,13 @@ SKIP: {
 	ok (($groupsize2 eq 2), 'Replacing members');
 
 	my $optionsize1 = groupOptionAll('content');
-	ok (($optionsize1 eq 2), 'Groupt content options 1');
+	ok (($optionsize1 eq 1), 'Groupt content options 1');
 
 	groupOption('content', 'blobber', 'blubber');
 	ok ((groupOption('content', 'blobber') eq 'blubber'), 'Setting option');
 
 	my $optionsize2 = groupOptionAll('content');
-	ok (($optionsize2 eq 3), 'Group content options 2');
+	ok (($optionsize2 eq 2), 'Group content options 2');
 
 	groupOptionDelete('content', 'blobber');
 	ok ((not defined groupOption('content', 'blobber')), 'Deleting option');

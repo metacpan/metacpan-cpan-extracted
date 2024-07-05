@@ -1,5 +1,5 @@
 package Whelk::Schema;
-$Whelk::Schema::VERSION = '0.02';
+$Whelk::Schema::VERSION = '0.03';
 use Kelp::Base -strict;
 use Whelk::Schema::Definition;
 use Carp;
@@ -169,11 +169,11 @@ Each new schema must have a C<type> defined. All types share these common config
 
 =over
 
-=item required
+=item * required
 
 Boolean - whether the value is required to be present. C<true> by default.
 
-=item description
+=item * description
 
 String - an optional description used for the schema in the OpenAPI document.
 
@@ -202,11 +202,11 @@ Extra configuration fields:
 
 =over
 
-=item default
+=item * default
 
 A default value to be used when there is no value. Also assumes C<< required => !!0 >>.
 
-=item example
+=item * example
 
 An optional example used for the schema in the OpenAPI document.
 
@@ -239,13 +239,13 @@ Extra configuration fields:
 
 =over
 
-=item items
+=item * items
 
 An optional type to use for each of the array elements. This is a nested
 schema, and all ways to define a schema discussed in L</Defining a schema> will
 work.
 
-=item lax
+=item * lax
 
 This is a special boolean flag used to accept array C<parameters> of type
 C<query> and C<header>. If present and true, the type will also accept a
@@ -264,13 +264,13 @@ Extra configuration fields:
 
 =over
 
-=item properties
+=item * properties
 
 An optional dictionary to use for the keys in the object. If it's not
 specified, the object can contain anything. This is a nested schema, and all
 ways to define a schema discussed in L</Defining a schema> will work.
 
-=item strict
+=item * strict
 
 This is a special boolean flag used to make any schema which does contain extra
 keys as those specified in C<properties> incorrect. By default, the hash can

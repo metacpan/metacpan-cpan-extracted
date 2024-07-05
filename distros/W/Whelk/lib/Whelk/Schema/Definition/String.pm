@@ -1,6 +1,6 @@
 package Whelk::Schema::Definition::String;
-$Whelk::Schema::Definition::String::VERSION = '0.02';
-use Kelp::Base 'Whelk::Schema::Definition::_Scalar';
+$Whelk::Schema::Definition::String::VERSION = '0.03';
+use Whelk::StrictBase 'Whelk::Schema::Definition::_Scalar';
 
 sub openapi_dump
 {

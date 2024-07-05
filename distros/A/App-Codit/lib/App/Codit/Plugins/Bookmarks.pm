@@ -20,7 +20,6 @@ What's an editor without bookmarks?.
 Not yet implemented
 
 =cut
-
 sub new {
 	my $class = shift;
 	my $self = $class->SUPER::new(@_);

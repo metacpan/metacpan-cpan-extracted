@@ -43,20 +43,14 @@ After installing, you can find documentation for this module with the
 You can also look for information at:
 
     Search CPAN
-        https://metacpan.org/release/Asm-X86
-        http://search.cpan.org/dist/Asm-X86
+        https://metacpan.org/dist/Asm-X86
 
     CPAN Request Tracker:
         https://rt.cpan.org/Public/Dist/Display.html?Name=Asm-X86
-        http://rt.cpan.org/NoAuth/Bugs.html?Dist=Asm-X86
-
-    CPAN Ratings:
-        https://cpanratings.perl.org/dist/Asm-X86
-        http://cpanratings.perl.org/d/Asm-X86
 
 COPYRIGHT AND LICENCE
 
-Copyright (C) 2008-2023 Bogdan Drozdowski <bogdro AT cpan . org>
+Copyright (C) 2008-2024 Bogdan Drozdowski <bogdro AT cpan . org>
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

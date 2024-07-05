@@ -206,16 +206,17 @@ In addition, you can define these Whelk-specific fields:
 =head4 formatter
 
 A default class for request / response formatters. It will be prefixed with
-C<Whelk::Formatter>. It has to start with C<+> to avoid prefixing. By default,
-value C<JSON> is used, which constructs L<Whelk::Formatter::JSON>. Can be
-configured to C<YAML> available in Whelk's core, or any custom formatter.
+C<Whelk::Formatter> - it has to start with C<+> to avoid that prefixing. By
+default, value C<JSON> is used, which constructs L<Whelk::Formatter::JSON>. Can
+be configured to C<YAML> available in Whelk's core, or any custom formatter.
 
 =head4 wrapper
 
-A default class for endpoint formatters. It will be prefixed with
-C<Whelk::Wrapper>. It has to start with C<+> to avoid prefixing. By default,
-value C<Simple> is used, which constructs L<Whelk::Wrapper::Simple>. Can be
-configured to C<WithStatus> available in Whelk's core, or any custom wrapper.
+A default class for endpoint wrappers. It will be prefixed with
+C<Whelk::Wrapper> - it has to start with C<+> to avoid that prefixing. By
+default, value C<Simple> is used, which constructs L<Whelk::Wrapper::Simple>.
+Can be configured to C<WithStatus> available in Whelk's core, or any custom
+wrapper.
 
 =head4 resources
 
@@ -228,19 +229,19 @@ Each value must be either a string or a hash with the following keys:
 
 =over
 
-=item path
+=item * path
 
 B<Mandatory>. A base path under which each endpoint in this resource will be mounted.
 
-=item wrapper
+=item * wrapper
 
 Same as L</wrapper>, but specialized for this resource only.
 
-=item formatter
+=item * formatter
 
 Same as L</formatter>, but specialized for this resource only.
 
-=item description
+=item * description
 
 A description used for the resource tag in OpenAPI.
 
@@ -254,26 +255,26 @@ A string or hash containing OpenAPI data, with the following keys:
 
 =over
 
-=item path
+=item * path
 
 B<Mandatory>. A path under which OpenAPI endpoint will be mounted.
 
-=item formatter
+=item * formatter
 
 Same as L</formatter>, but specialized for OpenAPI endpont only.
 
-=item class
+=item * class
 
 Class to be used to generate OpenAPI data. This is not prefixed with
 anything. C<Whelk::OpenAPI> by default.
 
-=item info
+=item * info
 
 Data which will be inserted directly into C<info> field of OpenAPI endpoint.
 This is technically not mandatory, but OpenAPI spec requires you to at least
 include keys C<title> and C<version>.
 
-=item extra
+=item * extra
 
 Any extra keys to be added to the root of the OpenAPI document. They will not
 take precedence over other keys.
@@ -334,11 +335,13 @@ always be the resource object (not the object of that class).
 =back
 
 The extra C<%whelk_metadata> hash is where you define all the extra
-Whelk-specific bits and pieces. It can cointain these keys:
+Whelk-specific bits and pieces. The system will check all your metadata and
+schemas to make sure you did not make a typo in key names. It can cointain
+these keys:
 
 =over
 
-=item response
+=item * response
 
 	response => {
 		type => 'boolean',
@@ -349,7 +352,7 @@ A schema definition for the response. Not setting this will not raise an
 exception, but the application won't be able to correctly respond with success
 status.
 
-=item parameters
+=item * parameters
 
 	parameters => {
 		query => {
@@ -374,7 +377,7 @@ filled and extra parameters will be removed - calling C<<
 $app->req->query_param >> and other similar methods will fetch the sanitized
 values.
 
-=item request
+=item * request
 
 	request => {
 		type => 'object',
@@ -395,11 +398,11 @@ $app->stash->{request} >> and C<< $app->request_body >>. It is B<strongly>
 recommended you use this cleaned data instead of regular framework methods like
 C<json_content>.
 
-=item summary
+=item * summary
 
 A short summary used in endpoint's OpenAPI representation.
 
-=item description
+=item * description
 
 A longer description used in endpoint's OpenAPI representation.
 

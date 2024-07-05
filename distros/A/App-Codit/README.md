@@ -35,6 +35,7 @@ The following Perl modules must be installed:
     * Tk::AppWindow
     * Tk::CodeText
     * Tk::FileBrowser
+    * Tk::Terminal
 
 # Installation
 

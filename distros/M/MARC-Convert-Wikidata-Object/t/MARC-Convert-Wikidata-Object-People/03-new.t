@@ -3,6 +3,7 @@ use warnings;
 
 use English;
 use Error::Pure::Utils qw(clean);
+use MARC::Convert::Wikidata::Object::ExternalId;
 use MARC::Convert::Wikidata::Object::People;
 use Test::More 'tests' => 8;
 use Test::NoWarnings;
@@ -16,6 +17,12 @@ isa_ok($obj, 'MARC::Convert::Wikidata::Object::People');
 $obj = MARC::Convert::Wikidata::Object::People->new(
 	date_of_birth => '1814',
 	date_of_death => '1883',
+	external_ids => [
+		MARC::Convert::Wikidata::Object::ExternalId->new(
+			'name' => 'nkcr_aut',
+			'value' => 'jk01033252',
+		),
+	],
 	name => decode_utf8('Antonín'),
 	nkcr_aut => 'jk01033252',
 	surname => 'Halouzka',

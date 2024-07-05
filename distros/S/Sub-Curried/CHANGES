@@ -1,6 +1,10 @@
-2014-06-26
-    0.13    Maintenance release, removing random duplicate bundle of Module::Install
-
+2024-07-04
+    0.14    Tidy up stack traces
+            Allow argument aliasing
+            Use Dist::Zilla
+            Update text
+            Use Keyword::Pluggable
+            Use CORE::__SUB__ when available
 2013-07-28
     0.12    Fix for the << operator, and new operators >> and | (prj++)
 

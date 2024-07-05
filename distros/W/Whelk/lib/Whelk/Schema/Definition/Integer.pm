@@ -1,6 +1,6 @@
 package Whelk::Schema::Definition::Integer;
-$Whelk::Schema::Definition::Integer::VERSION = '0.02';
-use Kelp::Base 'Whelk::Schema::Definition::Number';
+$Whelk::Schema::Definition::Integer::VERSION = '0.03';
+use Whelk::StrictBase 'Whelk::Schema::Definition::Number';
 
 sub openapi_dump
 {

@@ -3,16 +3,18 @@ use Test::More;
 use File::Spec;
 use File::Find;
 use File::Temp 'tempfile';
-use Getopt::Long;
 
-GetOptions(
-    'verbose' => \my $verbose,
-);
+require './Makefile.PL';
+# Loaded from Makefile.PL
+our %module = get_module_info();
 
 my @files;
-
 my $blib = File::Spec->catfile(qw(blib lib));
-find(\&wanted, grep { -d } ($blib, 'bin', 'scripts', 'examples'));
+find(\&wanted, grep { -d } ($blib));
+
+#if( my $exe = $module{EXE_FILES}) {
+#    push @files, @$exe;
+#};
 
 plan tests => scalar @files;
 foreach my $file (@files) {
@@ -20,7 +22,8 @@ foreach my $file (@files) {
 }
 
 sub wanted {
-    push @files, $File::Find::name if /\.p(l|m|od)$/;
+    push @files, $File::Find::name if /\.p(l|m|od)$/
+        and $_ !~ /\bDSL\.pm$/; # we skip that one as it initializes immediately
 }
 
 sub synopsis_file_ok {
@@ -28,21 +31,12 @@ sub synopsis_file_ok {
     my $name = "SYNOPSIS in $file compiles";
     open my $fh, '<', $file
         or die "Couldn't read '$file': $!";
-    my $start;
-    my $line = 0;
     my @synopsis = map  { s!^\s\s!!; $_ } # outdent all code for here-docs
                    grep { /^\s\s/ } # extract all verbatim (=code) stuff
                    grep { /^=head1\s+SYNOPSIS$/.../^=/ } # extract Pod synopsis
-                   map  { $line++;
-                          /^=head1\s+SYNOPSIS$/ and $start = $line+1;
-                          $_ } # remember start of synopsis
                    <$fh>;
-    if( $verbose ) {
-        diag $_ for @synopsis 
-    };
     if( @synopsis ) {
         my($tmpfh,$tempname) = tempfile();
-        print {$tmpfh} qq(#line $start "$file"\n);
         print {$tmpfh} join '', @synopsis;
         close $tmpfh; # flush it
         my $output = `$^X -Ilib -c $tempname 2>&1`;
@@ -60,5 +54,5 @@ sub synopsis_file_ok {
             skip "$file has no SYNOPSIS section", 1;
         };
     };
-    
+
 }

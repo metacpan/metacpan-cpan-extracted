@@ -6,7 +6,7 @@ use Paws::Credential::None;
 
 with 'Paws::Credential';
 
-our $VERSION = "0.0.3";
+our $VERSION = "1.0.0";
 
 has expiration => (
     is      => 'rw',
@@ -41,7 +41,8 @@ has sts => (
     lazy    => 1, 
     default => sub {
         my $self = shift;
-        Paws->service('STS', 
+        Paws->service('STS',
+            credentials => Paws::Credential::None->new,
             region      => $self->sts_region
         );
     }

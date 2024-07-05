@@ -1,2 +1,9 @@
+0.02 2024-07-04T17:19:02+02:00
+ - Add -o option for output format.
+ - Add tests for run().
+ - Fix doc.
+ - Remove obsolete tab from help.
+ - Rewrite arguments process to more intuitive way.
+
 0.01 2024-06-26T09:14:01+02:00
  - First version.

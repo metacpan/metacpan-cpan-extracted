@@ -1,10 +1,16 @@
 Revision history for Whelk
 
-0.02 - 2023-07-03
+0.03 - 2024-07-04
+	- Framework now detects typos made in configuration of schemas and endpoints
+	- Renamed request_schema to request and response_schema to response in Endpoint
+	- Removed example libraries from the index
+	- Documentation fixes
+
+0.02 - 2024-07-03
 	- Added a TodoApp example
 	- Now uses persistent_controllers from Kelp 2.15
 	- Documentation fixes
 
-0.01 - 2023-07-03
+0.01 - 2024-07-03
 	- First version
 

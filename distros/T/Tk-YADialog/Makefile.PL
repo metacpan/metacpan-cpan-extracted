@@ -4,7 +4,7 @@ WriteMakefile(
 	NAME					=> 'Tk::YADialog',
 	VERSION_FROM		=> 'lib/Tk/YADialog.pm',
 	PREREQ_PM			=> {
-		'Test::Tk'		=> '0.03',
+		'Test::Tk'		=> '3.03',
 		'Tk'				=> '804.033',
 	},
 	ABSTRACT_FROM		=> 'lib/Tk/YADialog.pm',

@@ -29,6 +29,15 @@ plugging in "holes" in arguments at arbitrary positions.  Currying is more
 specifically the application of arguments progressively from left to right
 until you have enough of them.
 
+=head1 DEPENDENCIES
+
+Beyond those listed in META.yml/META.json, there is an optional dependency on
+PPR: if you have it installed, then your curry definitions can include POD
+syntax anywhere whitespace can occur between C<curry> and C<{>.  Without PPR,
+that will trigger a syntax error.
+
+If your Perl is older than 5.16, you'll also need Sub::Current.
+
 =head1 USAGE
 
 Define a curried subroutine using the C<curry> keyword.  You should list the
@@ -57,7 +66,7 @@ as it goes until all the arguments are ready, at which point the sub returns its
     three(1)      # a new subroutine, with $one bound to the number 1
         ->(2,3)   # call the new sub with these arguments
 
-    three(1)->(2)->(3) # You could call the curried sub like this, 
+    three(1)->(2)->(3) # You could call the curried sub like this,
                        # instead of commas (1,2,3)
 
 What about calling with I<no> arguments?  By extension that would return a function exactly
@@ -97,202 +106,164 @@ Finally, we can create a shell-like pipeline:
 
     say 'Bella' | prepend('Ciao ') | append('!'); # Ciao Bella!
 
-The overloaded syntax is provided by C<Sub::Composable> which is distributed with 
+The overloaded syntax is provided by C<Sub::Composable> which is distributed with
 this module as a base class.
+
+=head2 Argument aliasing
+
+When all the arguments are supplied and the function body is executed, the
+arguments values are available in both the named parameters and the C<@_>
+array.  Just as in a normal subroutine call, the elements of C<@_> (but
+I<not> the named parameters) are aliased to the variables supplied by the
+caller, so you can use pass-by-reference semantics.
+
+    curry set ($a, $b) {
+      foreach my $arg (@_) { $arg = 1; } # affects the caller
+      $a = $b = 2;                       # doesn't affect the caller
+    }
+    my ($x, $y) = (0, 0);
+    set($x)->($y); # $x == 1, $y == 1
+
+=head2 Stack traces
+
+The innermost stack frame has the function name you defined, with all the
+accumulated arguments.  Any intermediate stack frames have the same or
+similar function names; currently there is a C<__curried> suffix, but that
+may change in the future.  Currently there is only one intermediate stack
+frame, showing just the arguments that were passed in the final call that
+reached the required number of arguments, but that may change in the future.
+If you supply all the arguments in one call, there are no intermediate stack
+frames.
+
+    use Carp 'confess';
+    curry func ($a, $b, $c, $d) {
+      confess('ERROR MESSAGE');
+    }
+    sub call {
+      func(1)->(2)->(3, 4);
+    }
+    call();
+
+    ERROR MESSAGE at script.pl line 3
+           main::func(1, 2, 3, 4) called at .../Sub/Curried.pm line 202
+           main::func__curried(3, 4) called at script.pl line 6
+           main::call() called at script.pl line 8
 
 =cut
 
-package Sub::Curried;
-use base 'Sub::Composable';
 use strict; use warnings;
-use Carp 'croak';
+package Sub::Curried;
+$Sub::Curried::VERSION = '0.14';
+use parent 'Sub::Composable';
 
-use Devel::Declare;
 use Sub::Name;
-use Sub::Current;
-use B::Hooks::EndOfScope;
-use Devel::BeginLift;
+use Keyword::Pluggable 1.05;
+use Attribute::Handlers;
 
-our $VERSION = '0.13';
-
-# cargo culted
 sub import {
-    my $class = shift;
-    my $caller = caller;
-
-    Devel::Declare->setup_for(
-        $caller,
-        { curry => { const => \&parser } }
-    );
-
-    # would be nice to sugar this
-    no strict 'refs';
-    *{$caller.'::curry'} = sub (&) {};
+    Keyword::Pluggable::define('keyword'    => 'curry',
+                               'code'       => \&injector,
+                               'expression' => 'dynamic');
 }
 
-sub mk_my_var {
-    my ($name) = @_;
-    my ($vsigil, $vname) = /^([\$%@])(\w+)$/
-        or die "Bad sigil: $_!"; # not croak, this is in compilation phase
-    my $shift = $vsigil eq '$' ?
-        'shift'
-      : "${vsigil}{+shift}";
-    return qq[my $vsigil$vname = $shift;];
+sub unimport {
+    Keyword::Pluggable::undefine('keyword' => 'curry');
 }
 
-sub trim {
-    s/^\s*//;
-    s/\s*$//;
-    $_;
-}
-sub get_decl {
-    my $decl = shift || '';
-    map trim, split /,/ => $decl;
+sub UNIVERSAL::Sub__Curried :ATTR(CODE) {
+    my ($package, $symbol, $ref, $attr, $arg) = @_;
+    bless($ref, __PACKAGE__);
 }
 
-# Stolen from Devel::Declare's t/method-no-semi.t / Method::Signatures
-{
-    our ($Declarator, $Offset);
-    sub skip_declarator {
-        $Offset += Devel::Declare::toke_move_past_token($Offset);
-    }
-
-    sub skipspace {
-        $Offset += Devel::Declare::toke_skipspace($Offset);
-    }
-
-    sub strip_name {
-        skipspace;
-        if (my $len = Devel::Declare::toke_scan_word($Offset, 1)) {
-            my $linestr = Devel::Declare::get_linestr();
-            my $name = substr($linestr, $Offset, $len);
-            substr($linestr, $Offset, $len) = '';
-            Devel::Declare::set_linestr($linestr);
-            return $name;
-        }
-        return;
-    }
-
-    sub strip_proto {
-        skipspace;
-    
-        my $linestr = Devel::Declare::get_linestr();
-        if (substr($linestr, $Offset, 1) eq '(') {
-            my $length = Devel::Declare::toke_scan_str($Offset);
-            my $proto = Devel::Declare::get_lex_stuff();
-            Devel::Declare::clear_lex_stuff();
-            $linestr = Devel::Declare::get_linestr();
-            substr($linestr, $Offset, $length) = '';
-            Devel::Declare::set_linestr($linestr);
-            return $proto;
-        }
-        return;
-    }
-
-    sub shadow {
-        my $pack = Devel::Declare::get_curstash_name;
-        Devel::Declare::shadow_sub("${pack}::${Declarator}", $_[0]);
-    }
-
-    sub inject_if_block {
-        my $inject = shift;
-        skipspace;
-        my $linestr = Devel::Declare::get_linestr;
-        if (substr($linestr, $Offset, 1) eq '{') {
-            substr($linestr, $Offset+1, 0) = $inject;
-            Devel::Declare::set_linestr($linestr);
-        }
-    }
-
-    sub check_args {
-        my ($name, $exp, $actual) = @_;
-        die "$name, expected $exp args but got $actual" if $actual>$exp;
-    }
-
-    sub parser {
-        local ($Declarator, $Offset) = @_;
-        skip_declarator;
-        my $name = strip_name;
-        my $proto = strip_proto;
-
-        my @decl = get_decl($proto);
-
-        # We nest each layer of currying in its own sub.
-        # if we were passed more than one argument, then we call more than one layer.
-        # We use the closing brace '}' trick as per monads, but also place the calling
-        # logic here.
-
-        my $exp_check = sub {
-            my $exp= scalar @decl;
-            sub {
-                my $name = $name ? qq('$name') : 'undef';
-                my $ret = qq[ Sub::Curried::check_args($name,$exp,scalar \@_); ];
-                $exp--; return $ret;
-              }
-          }->();
-
-        my $installer = sub (&) {
-            my $f = shift;
-            bless $f, __PACKAGE__;
-            if ($name) {
-                no strict 'refs';
-                *{$name} = subname $name => $f;
-                ()
-            } else {
-                $f;
-            }
-          };
-        my $si = scope_injector_call(', "Sub::Curried"; ($f,@r)=$f->($_) for @_; wantarray ? ($f,@r) : $f}');
-            
-        my $inject = (@decl ? 'return Sub::Current::ROUTINE unless @_;' : '') 
-              . join qq[ my \@r; my \$f = bless sub { $si; ],
-                map { 
-                    $exp_check->() . mk_my_var($_);
-                } @decl;
-
-        if (defined $name) {
-            my $lift_id = Devel::BeginLift->setup_for_cv($installer) if $name;
-
-            $inject = scope_injector_call(";Devel::BeginLift->teardown_for_cv($lift_id);").$inject;
-        }
-
-        inject_if_block($inject);
-
-        if (defined $name) {
-            $name = join('::', Devel::Declare::get_curstash_name(), $name)
-              unless ($name =~ /::/);
-        }
-
-        shadow($installer);
-    }
-
-    # Set up the parser scoping hacks that allow us to omit the final
-    # semicolon
-    sub scope_injector_call {
-        my $pkg  = __PACKAGE__;
-        my $what = shift || ';';
-        return " BEGIN { B::Hooks::EndOfScope::on_scope_end { ${pkg}::add_at_end_of_scope('$what') } }; ";
-    }
-    sub add_at_end_of_scope {
-        my $what = shift || ';';
-        my $linestr = Devel::Declare::get_linestr;
-        my $offset = Devel::Declare::get_linestr_offset;
-        substr($linestr, $offset, 0) = $what;
-        Devel::Declare::set_linestr($linestr);
+my $current_sub;
+BEGIN {
+    if ($^V lt v5.16.0) {
+        require Sub::Current;
+        $current_sub = 'Sub::Current::ROUTINE';
+    } else {
+        $current_sub = 'CORE::__SUB__';
     }
 }
 
+# PPR is the easiest way to parse POD.  But POD between "curry" and "{" was
+# never supported before, and PPR may be slow depending on the Perl version,
+# so make it optional.
+eval { require PPR; };
+my $space  = qr/(?:\s|#[^\n]*\n)/;
+my $ppr    = exists($INC{"PPR/pm"})? $PPR::GRAMMAR: '';
+my $nspace = exists($INC{"PPR/pm"})? '(?&PerlNWS)': qr/$space+/;
+my $ospace = exists($INC{"PPR/pm"})? '(?&PerlOWS)': qr/$space*/;
+my $sigil  = qr/[\$\%\@]/;
+my $ident  = qr/(?:\p{XIDS}\p{XIDC}*)/;
+my $param  = qr/$ospace $sigil $ident/x;
+
+sub injector {
+    my ($text) = @_;
+    if ($$text !~ s/\A
+                    (?<spacename> $nspace (?<name>$ident))?
+                    (?<spaceparams> $ospace \(
+                      (?<params> $param (?: $ospace , $param)* )?
+                      $ospace \) )?
+                    (?<space> $ospace ) \{ $ppr
+                   /injection(%+)/xe) {
+        die('invalid Sub::Curried syntax: '.substr($$text, 0, 80).'...');
+    }
+    return !defined($+{'name'});
+}
+
+sub injection {
+    my (%match) = @_;
+    my $esc_name = $match{'name'};
+    if (defined($esc_name)) { $esc_name =~ s/([\\'])/\\$1/g; }
+    my $curried_name = (defined($match{'name'})
+                        ? $match{'name'} . '__curried'
+                        : undef);
+    my $esc_curried_name = $curried_name;
+    if (defined($esc_curried_name)) { $esc_curried_name =~ s/([\\'])/\\$1/g; }
+    my @name_wrapper = (defined($curried_name)
+                        ? ("Sub::Name::subname('".$esc_curried_name."', ", ")")
+                        : ('', ''));
+    my @params = (defined($match{'params'})
+                  ? @{[ ($match{'params'}.',') =~
+                        m/$ospace ($sigil $ident) $ospace,$ppr/gx ]}
+                  : ());
+    return join('',
+                'sub', grep(defined($_), $match{'spacename'}),
+                ' :Sub__Curried', $match{'space'}, '{',
+                ' if (@_ > ', scalar(@params), ') {',
+                  " die('", (defined($esc_name)
+                            ? $esc_name
+                            : '<anonymous function>'),
+                       ", expected ", scalar(@params),
+                       " args but got '.\@_);",
+                ' }',
+                (@params == 0
+                 ? () # We never need to return a closure
+                 : (
+                 ' if (@_ < ', scalar(@params), ') {',
+                   ' my $func = ', $current_sub, ';',
+                   ' my $args = \@_;',
+                   ' return ',
+                      $name_wrapper[0],
+                      'bless(sub { $func->(@$args, @_) }, "Sub::Curried")',
+                      $name_wrapper[1],
+                    ';',
+                 ' }')),
+                map({ my @param = ('$_[', $_, ']');
+                      (' my ', $params[$_], ' = ',
+                       ($params[$_]=~/^([\%\@])/
+                        ? ($1, '{', @param, '}')
+                        : @param), ';') }
+                    0..$#params));
+}
 
 =head1 BUGS
 
-No major bugs currently open.  Please report any bugs via RT or email, or ping
-me on IRC (osfameron on irc.perl.org and freenode)
+No major bugs currently open.  Please report any bugs via RT or email.
 
 =head1 SEE ALSO
 
-L<Devel::Declare> provides the magic (yes, there's a teeny bit of code
-generation involved, but it's not a global filter, rather a localised
-parsing hack).
+L<Keyword::Pluggable> provides the syntactic magic.
 
 There are several modules on CPAN that already do currying or partial evaluation:
 
@@ -302,7 +273,7 @@ There are several modules on CPAN that already do currying or partial evaluation
 
 L<Perl6::Currying> - Filter based module prototyping the Perl 6 system
 
-=item * 
+=item *
 
 L<Sub::Curry> - seems rather complex, with concepts like blackholes and antispices.  Odd.
 
@@ -323,11 +294,12 @@ to declare how many arguments it's expecting)
 
 =back
 
-=head1 AUTHOR and LICENSE
+=head1 AUTHOR
 
  (c)2008-2013 osfameron@cpan.org
+ (c)2024 Paul Jarc <purge@cpan.org>
 
-=head2 CONTRIBUTORS
+=head1 CONTRIBUTORS
 
 =over 4
 
@@ -335,17 +307,17 @@ to declare how many arguments it's expecting)
 
 Florian (rafl) Ragwitz
 
-=item *
-
-Paul (prj) Jarc
-
 =back
+
+=head1 LICENSE
 
 This module is distributed under the same terms and conditions as Perl itself.
 
-Please submit bugs to RT or shout at me on IRC (osfameron on #london.pm on irc.perl.org)
+=head1 CONTRIBUTING
 
-A git repo is available at L<http://github.com/osfameron/Sub--Curried/tree/master>
+Please submit bugs to RT or email.
+
+A git repo is available at L<https://github.com/pauljarc/Sub--Curried>
 
 =cut
 

@@ -1,5 +1,5 @@
 package Kelp::Module::Whelk;
-$Kelp::Module::Whelk::VERSION = '0.02';
+$Kelp::Module::Whelk::VERSION = '0.03';
 use Kelp::Base 'Kelp::Module';
 use Kelp::Util;
 use Carp;

@@ -1,6 +1,6 @@
 package Whelk::Schema::Definition::Empty;
-$Whelk::Schema::Definition::Empty::VERSION = '0.02';
-use Kelp::Base 'Whelk::Schema::Definition';
+$Whelk::Schema::Definition::Empty::VERSION = '0.03';
+use Whelk::StrictBase 'Whelk::Schema::Definition';
 
 sub inhale
 {

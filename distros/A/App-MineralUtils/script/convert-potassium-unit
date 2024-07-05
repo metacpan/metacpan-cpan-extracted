@@ -10,9 +10,9 @@ use warnings;
 use Perinci::CmdLine::Any;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2024-03-22'; # DATE
+our $DATE = '2024-07-05'; # DATE
 our $DIST = 'App-MineralUtils'; # DIST
-our $VERSION = '0.012'; # VERSION
+our $VERSION = '0.013'; # VERSION
 
 my $cmdline = Perinci::CmdLine::Any->new(
     url => "/App/MineralUtils/convert_potassium_unit",
@@ -39,7 +39,7 @@ convert-potassium-unit - Convert a potassium quantity from one unit to another
 
 =head1 VERSION
 
-This document describes version 0.012 of convert-potassium-unit (from Perl distribution App-MineralUtils), released on 2024-03-22.
+This document describes version 0.013 of convert-potassium-unit (from Perl distribution App-MineralUtils), released on 2024-07-05.
 
 =head1 SYNOPSIS
 
@@ -77,7 +77,7 @@ Can also be specified as the 1st command-line argument.
 
 Valid values:
 
- ["mg","mg-k-elem","mg-k-chloride","mg-k-cl","mg-k-citrate"]
+ ["mg","mg-k-elem","mg-k-chloride-anhydrous","mg-k-chloride-dihydrate","mg-k-citrate-anhydrous","mg-k-citrate-monohydrate","mg-k-carbonate-anhydrous","mg-k-carbonate-dihydrate","mg-k-bicarbonate-anhydrous","mg-k-acetate-anhydrous","mg-k-acetate-monohydrate","mg-k-acetate-trihydrate"]
 
 Can also be specified as the 2nd command-line argument.
 
@@ -198,33 +198,40 @@ For fish and zsh, install L<shcompgen> as described above.
 =head2 Show all possible conversions
 
  % convert-potassium-unit
- +--------+---------------+---------------------------------------------+
- | amount | unit          | summary                                     |
- +--------+---------------+---------------------------------------------+
- |  1.000 | mg-k-elem     | Elemental potassium, in milligrams          |
- |  1.908 | mg-k-chloride | Potassium chloride (KCl), in milligrams     |
- |  1.908 | mg-k-cl       | Potassium chloride (KCl), in milligrams     |
- |  2.611 | mg-k-citrate  | Potassium citrate (K3C6H5O7), in milligrams |
- +--------+---------------+---------------------------------------------+
+ +--------+----------------------------+---------------------------------------------------------------------------------------------------------------------+
+ | amount | unit                       | summary                                                                                                             |
+ +--------+----------------------------+---------------------------------------------------------------------------------------------------------------------+
+ |  1.000 | mg-k-elem                  | Elemental potassium, in milligrams                                                                                  |
+ |  1.908 | mg-k-chloride-anhydrous    | Potassium chloride (KCl) anhydrous [most common hydrate form of KCl at room temp], in milligrams                    |
+ |  2.825 | mg-k-chloride-dihydrate    | Potassium chloride dihydrate (KCl.2H2O) [unstable at room temp], in milligrams                                      |
+ |  2.611 | mg-k-citrate-anhydrous     | Tripotassium citrate anhydrous (K3C6H5O7), in milligrams                                                            |
+ |  2.762 | mg-k-citrate-monohydrate   | Tripotassium citrate monohydrate (K3C6H5O7.H2O) [most common hydrate form of K-citrate at room temp], in milligrams |
+ |  1.767 | mg-k-carbonate-anhydrous   | Potassium carbonate anhydrous (K2CO3), in milligrams                                                                |
+ |  2.227 | mg-k-carbonate-dihydrate   | Potassium carbonate dihydrate (K2CO3.2H2O) [most common hydrate form of K-carbonate at room temp], in milligrams    |
+ |  2.558 | mg-k-bicarbonate-anhydrous | Potassium bicarbonate anhydrous (KHCO3) [most common hydrate form of K-bicarbonate at room temp], in milligrams     |
+ |  2.513 | mg-k-acetate-anhydrous     | Potassium acetate anhydrous (C2H3O2K), in milligrams                                                                |
+ |  2.967 | mg-k-acetate-monohydrate   | Potassium acetate monohydrate (C2H9KO5) [most common hydrate form of K-acetate at room temp], in milligrams         |
+ |  3.891 | mg-k-acetate-trihydrate    | Potassium acetate trihydrate (C2H9KO5), in milligrams                                                               |
+ +--------+----------------------------+---------------------------------------------------------------------------------------------------------------------+
 
 =head2 How much of potassium chloride provides 1000 mg of elemental potassium?
 
- % convert-potassium-unit '1000 mg-k-elem' mg-k-cl
+ % convert-potassium-unit '1000 mg-k-elem' mg-k-chloride-anhydrous
  1908.39694656489
 
 =head2 How much elemental potassium is in 1000mg (1g) of potassium chloride powder in capsule form?
 
- % convert-potassium-unit '1000 mg-k-chloride' mg-k-chloride
- 1000
+ % convert-potassium-unit '1000 mg-k-chloride-anhydrous' mg-k-elem
+ 524
 
 =head2 A tablet supplement called KSR contains 600mg of potassium chloride; how much elemental potassium is that?
 
- % convert-potassium-unit '600 mg-k-chloride' mg-k-elem
+ % convert-potassium-unit '600 mg-k-chloride-anhydrous' mg-k-elem
  314.4
 
 =head2 Recommended daily intake (DV) of (elemental) potassium for adults and children 4 years or older is 4,700mg according to US FDA; how much is that equivalent to in KCl? Note that it is *NOT* recommended (and most probably dangerous) to take KCl supplement that much as potassium is contained in other sources too
 
- % convert-potassium-unit '4700 mg-k-elem' mg-k-chloride
+ % convert-potassium-unit '4700 mg-k-elem' mg-k-chloride-anhydrous
  8969.46564885496
 
 =head1 HOMEPAGE

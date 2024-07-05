@@ -9,7 +9,7 @@ Tk::YADialog - Yet another dialog
 use strict;
 use warnings;
 use vars qw($VERSION);
-$VERSION = '0.03';
+$VERSION = '0.04';
 
 use Tk;
 use base qw(Tk::Derived Tk::Toplevel);
@@ -32,7 +32,7 @@ Construct Tk::Widget 'YADialog';
 Provides a basic, less noisy, replacement for L<Tk::Dialog>.
 Inherits L<Tk::Toplevel>.
 
-=head1 B<CONFIG VARIABLES>
+=head1 CONFIG VARIABLES
 
 =over 4
 
@@ -40,6 +40,25 @@ Inherits L<Tk::Toplevel>.
 
 Default value ['Close'].
 Specify a list of buttons to be shown.
+
+Buttons can be specified in two ways:
+
+=over 4
+
+=item As a string
+
+ -buttons => ['Ok', 'Do not'],
+
+=item As a list
+
+ -buttons => [
+     ['Ok', $okcallback],
+     ['Do not', $donotcallback],
+ ]
+
+You can specify the callbacks as standard Tk callbacks.
+
+=back
 
 =item Switch: B<-command>
 
@@ -49,6 +68,12 @@ Callback, is called when a button is pressed.
 
 Default value not defined.
 Specify which button has the focus on popup.
+
+=item Switch: B<-nowithdraw>
+
+Default value 0.
+When this value is set the dialog will not withdraw whatever you do.
+Make sure you reset it in some callback.
 
 =item Switch: B<-padding>
 
@@ -104,6 +129,7 @@ sub Populate {
 	$self->withdraw;
 	$self->ConfigSpecs(
 		-command => ['CALLBACK', undef, undef, sub {}],
+		-nowithdraw => ['PASSIVE', undef, undef, 0],
 		DEFAULT => ['SELF'],
 	);
 
@@ -140,6 +166,7 @@ sub get { return $_[0]->{PRESSED} }
 sub Pressed {
 	my $self = shift;
 	if (@_) {
+		return if $self->cget('-nowithdraw');
 		$self->{PRESSED} = shift;
 		$self->withdraw;
 	}

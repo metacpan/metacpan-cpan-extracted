@@ -1,5 +1,36 @@
 Revision history for Asm-X86
 
+2024-06-26	Bogdan Drozdowski <bogdro \at\ cpan . org>
+
+	* Version 0.70
+	  Updated the instruction list. Updated the register list. Fixed
+	  converting some instructions. Added support for new data size
+	  suffixes. Performance optimizations. Fixed tests for Perl
+	  interpreters without taint support. Other small updates.
+	* lib/Asm/X86.pm (@instr_intel): Updated the instruction list from
+	  NASM version 2.16.02. Removed 'equ' from the instruction list.
+	* lib/Asm/X86.pm (@regs_bound_intel, @regs_bound_att, @regs_intel,
+	  @regs_att, is_reg_bound_intel, is_reg_bound_att, is_reg_bound),
+	  t/zz_regs_att.t, t/zz_regs_intel.t: Added support for the bound
+	  registers.
+	* lib/Asm/X86.pm: Changed names of some variables. Fixed a typo in
+	  the documentation. Updated the copyright and version. Updated the
+	  links and deleted the inactive cpanratings.perl.org link (thanks to
+	  Peter John Acklam for reporting).
+	* lib/Asm/X86.pm (_remove_size_qualifiers_add_dollar,
+	  conv_intel_instr_to_att): Added new size suffixes.
+	* lib/Asm/X86.pm (conv_att_instr_to_intel): Convert the instructions
+	  only if necessary (better performance). Fixed converting jmp/call,
+	  FPU and MOV[S/Z]X instructions.
+	* t/zz_conv.t: Added tests for the jmp/call, FPU and size conversion
+	  (like "cbw", etc.) instructions.
+	* t/*.t: Removed "-T" from the command line for Perl interpreters
+	  without taint support.
+	* lib/Asm/X86.pm, t/zz*.t, Makefile.PL: Added license blocks and
+	  mentioned Project Asmosis in them.
+	* README: Updated the links and deleted the inactive link pointing to
+	  cpanratings.perl.org.
+
 2023-01-08	Bogdan Drozdowski <bogdro \at\ cpan . org>
 
 	* Version 0.65

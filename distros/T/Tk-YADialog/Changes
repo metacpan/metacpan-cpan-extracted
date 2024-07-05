@@ -1,5 +1,9 @@
 Revision history for Perl extension Tk::ListEntry.
 
+0.04  Thu Jul 4 2024
+	Added option -nowithdraw
+	Fixed documentation
+
 0.03  Mon Jun 6 2023
 	Fixed bug in method Show
 

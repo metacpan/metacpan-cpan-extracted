@@ -14,4 +14,4 @@ use App::NKC2MARC;
 exit App::NKC2MARC->new->run;
 
 # Output:
-# MARC record for '978-80-7370-353-0' was saved to cnb002751696.mrc.
+# MARC record for '978-80-7370-353-0' was saved to 'cnb002751696.mrc'.

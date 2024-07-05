@@ -1,4 +1,17 @@
-#!/usr/bin/perl -T -w
+#!/usr/bin/perl -w
+# Asm::X86 - a test for conversion routines.
+#
+#	Copyright (C) 2008-2024 Bogdan 'bogdro' Drozdowski,
+#	  bogdro (at) users . sourceforge . net
+#	  bogdro /at\ cpan . org
+#
+# This file is part of Project Asmosis, a set of tools related to assembly
+#  language programming.
+# Project Asmosis homepage: https://asmosis.sourceforge.io/
+#
+# This program is free software; you can redistribute it and/or modify it
+# under the same terms as Perl itself.
+#
 
 use strict;
 use warnings;
@@ -241,6 +254,23 @@ $intel_instr_to_att{'zzz rcx, eax'} = qr/^\s*zzz\s*%rcx\s*,\s*%eax\s*$/io;
 $intel_instr_to_att{'zzz rcx'} = qr/^\s*zzz\s*%rcx\s*/io;
 $intel_instr_to_att{'jmp [zzz]'} = qr/^\s*jmp\s*\*zzz\s*/io;
 $intel_instr_to_att{'call [zzz]'} = qr/^\s*call\s*\*zzz\s*/io;
+$intel_instr_to_att{'jmp zzz'} = qr/^\s*jmp\s*zzz\s*/io;
+$intel_instr_to_att{'call 0x123'} = qr/^\s*call\s*\*0x123\s*/io;
+$intel_instr_to_att{'jmp	cs:zzz'} = qr/^\s*ljmp\s*%cs\s*,\s*zzz\s*/io;
+$intel_instr_to_att{'retf x'} = qr/^\s*lret\s*\$x\s*/io;
+
+$intel_instr_to_att{'cbw'} = qr/^\s*cbtw\s*$/io;
+$intel_instr_to_att{'cwde'} = qr/^\s*cwtl\s*$/io;
+$intel_instr_to_att{'cwd'} = qr/^\s*cwtd\s*$/io;
+$intel_instr_to_att{'cdq'} = qr/^\s*cltd\s*$/io;
+
+$intel_instr_to_att{'fild word [eax]'} = qr/^\s*filds\s*\(\s*%eax\s*\)\s*$/io;
+$intel_instr_to_att{'fild dword [eax + ebx*2]'} = qr/^\s*fildl\s*\(\s*%eax\s*,\s*%ebx\s*,\s*2\s*\)\s*$/io;
+$intel_instr_to_att{'fild qword [eax]'} = qr/^\s*fildq\s*\(\s*%eax\s*\)\s*$/io;
+
+$intel_instr_to_att{'fld dword [ebx]'} = qr/^\s*flds\s*\(\s*%ebx\s*\)\s*$/io;
+$intel_instr_to_att{'fld qword [ebx + ecx*2]'} = qr/^\s*fldl\s*\(\s*%ebx\s*,\s*%ecx\s*,\s*2\s*\)\s*$/io;
+$intel_instr_to_att{'fld tword [ebx]'} = qr/^\s*fldt\s*\(\s*%ebx\s*\)\s*$/io;
 
 my %intel_addr_to_att;
 
@@ -571,6 +601,13 @@ $att_instr_to_intel{'imul	$2, %esi, %bl'} = qr/^\s*imul\s*(dword)?\s*bl,\s*esi\s
 $att_instr_to_intel{'imul	zz, %esi, %bl'} = qr/^\s*imul\s*(dword)?\s*bl,\s*esi\s*,\s*\[zz\]\s*$/io;
 $att_instr_to_intel{'imul	_L1, %esi, %bl'} = qr/^\s*imul\s*(dword)?\s*bl,\s*esi\s*,\s*_L1\s*$/io;
 
+$att_instr_to_intel{'movsbw (%ecx), %edx'} = qr/^\s*movsx\s*edx\s*,\s*byte\s*\[ecx\]\s*$/io;
+$att_instr_to_intel{'movsbl (%ecx), %eax'} = qr/^\s*movsx\s*eax\s*,\s*byte\s*\[ecx\]\s*$/io;
+$att_instr_to_intel{'movswl (%ebx), %eax'} = qr/^\s*movsx\s*eax\s*,\s*word\s*\[ebx\]\s*$/io;
+$att_instr_to_intel{'movzbw (%eax), %ebx'} = qr/^\s*movzx\s*ebx\s*,\s*byte\s*\[eax\]\s*$/io;
+$att_instr_to_intel{'movzbl (%ebx), %ecx'} = qr/^\s*movzx\s*ecx\s*,\s*byte\s*\[ebx\]\s*$/io;
+$att_instr_to_intel{'movzwl (%ecx), %edx'} = qr/^\s*movzx\s*edx\s*,\s*word\s*\[ecx\]\s*$/io;
+
 $att_instr_to_intel{'zzzz	(%esi), %bl, 2'} = qr/^\s*zzzz\s*(dword)?\s*\[esi\]\s*,\s*bl\s*,\s*2\s*$/io;
 $att_instr_to_intel{'zzzz	(%esi), %bl'} = qr/^\s*zzzz\s*(dword)?\s*\[esi\]\s*,\s*bl\s*$/io;
 $att_instr_to_intel{'zzzz	(%esi)'} = qr/^\s*zzzz\s*(dword)?\s*\[esi\]\s*$/io;
@@ -581,6 +618,20 @@ $att_instr_to_intel{'zzzz	%esi'} = qr/^\s*zzzz\s*(dword)?\s*esi\s*$/io;
 $att_instr_to_intel{'fchs st(0)'} = qr/^\s*fchs\s*st\(0\)\s*$/io;
 $att_instr_to_intel{'fmul st(0)'} = qr/^\s*fmul\s*st\(0\)\s*$/io;
 $att_instr_to_intel{'fst st(0)'} = qr/^\s*fst\s*st\(0\)\s*$/io;
+$att_instr_to_intel{'flds (%eax)'} = qr/^\s*fld\s*dword\s*\[\s*eax\s*\]\s*$/io;
+$att_instr_to_intel{'fldl (%eax, %ebx, 2)'} = qr/^\s*fld\s*qword\s*\[\s*eax\s*\+\s*ebx\s*\*\s*2\]\s*$/io;
+$att_instr_to_intel{'fldq zzz(,1)'} = qr/^\s*fld\s*qword\s*\[\s*zzz\s*\]\s*$/io;
+$att_instr_to_intel{'fldt (%ecx)'} = qr/^\s*fld\s*tword\s*\[\s*ecx\s*\]\s*$/io;
+
+$att_instr_to_intel{'ljmp [zzz]'} = qr/^\s*jmp\s*dword\s*\[\s*zzz\s*\]\s*$/io;
+$att_instr_to_intel{'lcall zzz'} = qr/^\s*call\s*dword\s*zzz\s*$/io;
+$att_instr_to_intel{'jmp a, b'} = qr/^\s*jmp\s*a:b\s*$/io;
+$att_instr_to_intel{'lret 123'} = qr/^\s*ret\s*123\s*$/io;
+
+$att_instr_to_intel{'cbtw'} = qr/^\s*cbw\s*$/io;
+$att_instr_to_intel{'cwtl'} = qr/^\s*cwde\s*$/io;
+$att_instr_to_intel{'cwtd'} = qr/^\s*cwd\s*$/io;
+$att_instr_to_intel{'cltd'} = qr/^\s*cdq\s*$/io;
 
 my %att_addr_to_intel;
 

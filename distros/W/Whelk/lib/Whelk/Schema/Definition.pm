@@ -1,6 +1,6 @@
 package Whelk::Schema::Definition;
-$Whelk::Schema::Definition::VERSION = '0.02';
-use Kelp::Base;
+$Whelk::Schema::Definition::VERSION = '0.03';
+use Whelk::StrictBase;
 use Carp;
 use Kelp::Util;
 use Scalar::Util qw(blessed);

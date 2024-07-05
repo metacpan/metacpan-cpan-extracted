@@ -10,7 +10,7 @@ use Wikibase::Datatype::Snak;
 use Wikibase::Datatype::Statement;
 use Wikibase::Datatype::Value::Item;
 
-our $VERSION = 0.11;
+our $VERSION = 0.13;
 
 sub wikidata {
 	my $self = shift;
@@ -32,19 +32,18 @@ sub wikidata {
 
 			$self->wikidata_authors,
 			$self->wikidata_authors_of_introduction,
-			$self->wikidata_ccnb,
 			$self->wikidata_compilers,
 			$self->wikidata_directors,
 			$self->wikidata_dml,
 			$self->wikidata_edition_number,
 			$self->wikidata_editors,
+			$self->wikidata_external_ids,
 			$self->wikidata_narrators,
 			$self->wikidata_isbn_10,
 			$self->wikidata_isbn_13,
 			$self->wikidata_krameriuses,
 			$self->wikidata_language,
 			$self->wikidata_number_of_pages,
-			$self->wikidata_oclc,
 			$self->wikidata_place_of_publication,
 			$self->wikidata_publication_date,
 			$self->wikidata_publishers,

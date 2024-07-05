@@ -9,11 +9,12 @@ use MARC::Convert::Wikidata::Item::AudioBook;
 use MARC::Convert::Wikidata::Item::BookEdition;
 use MARC::Convert::Wikidata::Item::Periodical;
 use MARC::Convert::Wikidata::Transform;
+use MARC::Convert::Wikidata::Utils;
 use MARC::Leader;
 use Mo::utils 0.08 qw(check_isa check_required);
 use Scalar::Util qw(blessed);
 
-our $VERSION = 0.11;
+our $VERSION = 0.13;
 
 # Constructor.
 sub new {
@@ -60,6 +61,14 @@ sub new {
 	)->object;
 
 	return $self;
+}
+
+sub look_for_external_id {
+	my ($self, $external_id_name, $deprecation_flag) = @_;
+
+	return MARC::Convert::Wikidata::Utils::look_for_external_id(
+		$self->{'_transform_object'}, $external_id_name, $deprecation_flag,
+	);
 }
 
 sub object {
@@ -147,6 +156,7 @@ MARC::Convert::Wikidata - Conversion class between MARC file to Wikibase::Dataty
  use MARC::Convert::Wikidata;
 
  my $obj = MARC::Convert::Wikidata->new(%params);
+ my @values = $obj->look_for_external_id($external_id_name, $deprecation_flag);
  my $object = $obj->object;
  my $type = $obj->type;
  my $wikidata = $obj->wikidata;
@@ -226,6 +236,14 @@ Default value is 0.
 =back
 
 Returns instance of object.
+
+=head2 C<look_for_external_id>
+
+ my @values = $obj->look_for_external_id($external_id_name, $deprecation_flag);
+
+Get external id values defined by name and deprecation flag (default is 0).
+
+Returns string.
 
 =head2 C<object>
 
@@ -505,6 +523,6 @@ BSD 2-Clause License
 
 =head1 VERSION
 
-0.11
+0.13
 
 =cut

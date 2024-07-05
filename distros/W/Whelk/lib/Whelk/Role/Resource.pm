@@ -1,5 +1,5 @@
 package Whelk::Role::Resource;
-$Whelk::Role::Resource::VERSION = '0.02';
+$Whelk::Role::Resource::VERSION = '0.03';
 use Kelp::Base -attr;
 use Role::Tiny;
 
@@ -64,6 +64,10 @@ sub add_endpoint
 {
 	my ($self, $pattern, $args, %meta) = @_;
 
+	# remove meta we don't want to be passed to the constructor and which are
+	# not replaced by something else
+	delete $meta{response_schemas};
+
 	# make sure we have hash (same as in Kelp)
 	$args = {
 		to => $args,
@@ -81,15 +85,11 @@ sub add_endpoint
 	my $route = $self->add_route($pattern, $args)->parent;
 
 	my $endpoint = Whelk::Endpoint->new(
+		%meta,
 		resource => $self->_whelk_config('resource'),
 		formatter => $self->_whelk_config('formatter'),
 		route => $route,
 		code => $route->dest->[1],
-		request_schema => Whelk::Schema->build_if_defined($meta{request}),
-		response_schema => Whelk::Schema->build_if_defined($meta{response}),
-		parameters => Whelk::Endpoint::Parameters->new(%{$meta{parameters} // {}}),
-		summary => $meta{summary},
-		description => $meta{description},
 	);
 
 	$endpoint->wrap($self);

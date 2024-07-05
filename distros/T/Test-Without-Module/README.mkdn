@@ -1,5 +1,7 @@
 
-[![Build Status](https://travis-ci.org/Corion/test-without-module.svg?branch=master)](https://github.com/Corion/test-without-module)
+[![Windows](https://github.com/Corion/Test-Without-Module/workflows/windows/badge.svg)](https://github.com/Corion/Test-Without-Module/actions?query=workflow%3Awindows)
+[![MacOS](https://github.com/Corion/Test-Without-Module/workflows/macos/badge.svg)](https://github.com/Corion/Test-Without-Module/actions?query=workflow%3Amacos)
+[![Linux](https://github.com/Corion/Test-Without-Module/workflows/linux/badge.svg)](https://github.com/Corion/Test-Without-Module/actions?query=workflow%3Alinux)
 
 # NAME
 
@@ -67,7 +69,7 @@ of a module.
 
 # AUTHOR
 
-Copyright (c) 2003-2014 Max Maischein, <corion@cpan.org>
+Copyright (c) 2003-2024 Max Maischein, <corion@cpan.org>
 
 # LICENSE
 

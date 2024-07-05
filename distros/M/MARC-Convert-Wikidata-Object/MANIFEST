@@ -1,4 +1,5 @@
 Changes
+examples/create_and_dump_external_id.pl
 examples/create_and_dump_isbn.pl
 examples/create_and_dump_kramerius.pl
 examples/create_and_dump_people.pl
@@ -21,6 +22,7 @@ Makefile.PL
 MANIFEST			This list of files
 META.yml
 Object.pm
+Object/ExternalId.pm
 Object/ISBN.pm
 Object/Kramerius.pm
 Object/People.pm
@@ -28,6 +30,12 @@ Object/Publisher.pm
 Object/Series.pm
 README
 SIGNATURE
+t/MARC-Convert-Wikidata-Object-ExternalId/01-use.t
+t/MARC-Convert-Wikidata-Object-ExternalId/02-version.t
+t/MARC-Convert-Wikidata-Object-ExternalId/03-new.t
+t/MARC-Convert-Wikidata-Object-ExternalId/04-deprecated.t
+t/MARC-Convert-Wikidata-Object-ExternalId/05-name.t
+t/MARC-Convert-Wikidata-Object-ExternalId/06-value.t
 t/MARC-Convert-Wikidata-Object-ISBN/01-use.t
 t/MARC-Convert-Wikidata-Object-ISBN/02-version.t
 t/MARC-Convert-Wikidata-Object-ISBN/03-new.t
@@ -45,11 +53,12 @@ t/MARC-Convert-Wikidata-Object-People/02-version.t
 t/MARC-Convert-Wikidata-Object-People/03-new.t
 t/MARC-Convert-Wikidata-Object-People/04-date_of_birth.t
 t/MARC-Convert-Wikidata-Object-People/05-date_of_death.t
-t/MARC-Convert-Wikidata-Object-People/06-name.t
-t/MARC-Convert-Wikidata-Object-People/07-nkcr_aut.t
-t/MARC-Convert-Wikidata-Object-People/08-surname.t
-t/MARC-Convert-Wikidata-Object-People/09-work_period_start.t
-t/MARC-Convert-Wikidata-Object-People/10-work_period_end.t
+t/MARC-Convert-Wikidata-Object-People/06-external_ids.t
+t/MARC-Convert-Wikidata-Object-People/07-name.t
+t/MARC-Convert-Wikidata-Object-People/08-nkcr_aut.t
+t/MARC-Convert-Wikidata-Object-People/09-surname.t
+t/MARC-Convert-Wikidata-Object-People/10-work_period_start.t
+t/MARC-Convert-Wikidata-Object-People/11-work_period_end.t
 t/MARC-Convert-Wikidata-Object-Publisher/01-use.t
 t/MARC-Convert-Wikidata-Object-Publisher/02-version.t
 t/MARC-Convert-Wikidata-Object-Publisher/03-new.t
@@ -76,6 +85,7 @@ t/MARC-Convert-Wikidata-Object/11-dml.t
 t/MARC-Convert-Wikidata-Object/11-end_time.t
 t/MARC-Convert-Wikidata-Object/12-edition_number.t
 t/MARC-Convert-Wikidata-Object/13-editors.t
+t/MARC-Convert-Wikidata-Object/14-external_ids.t
 t/MARC-Convert-Wikidata-Object/15-full_name.t
 t/MARC-Convert-Wikidata-Object/16-illustrators.t
 t/MARC-Convert-Wikidata-Object/17-isbns.t
@@ -93,6 +103,8 @@ t/MARC-Convert-Wikidata-Object/28-start_time.t
 t/MARC-Convert-Wikidata-Object/29-subtitles.t
 t/MARC-Convert-Wikidata-Object/30-title.t
 t/MARC-Convert-Wikidata-Object/31-translators.t
+xt/MARC-Convert-Wikidata-Object-ExternalId/01-pod_coverage.t
+xt/MARC-Convert-Wikidata-Object-ExternalId/02-pod.t
 xt/MARC-Convert-Wikidata-Object-ISBN/01-pod_coverage.t
 xt/MARC-Convert-Wikidata-Object-ISBN/02-pod.t
 xt/MARC-Convert-Wikidata-Object-Kramerius/01-pod_coverage.t

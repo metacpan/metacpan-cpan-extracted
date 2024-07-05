@@ -30,7 +30,7 @@ package e;
            ⠹⡽⣾⣿⠹⣿⣆⣾⢯⣿⣿ ⡞ ⠻⣿⣿⣿⠁ ⢠⣿⢏  ⡀ ⡟  ⢀⣴⣿⠃⢁⡼⠁ ⠈
              ⠈⠛ ⢻⣿⣧⢸⢟⠶⢾⡇  ⣸⡿⠁ ⢠⣾⡟⢼  ⣷ ⡇ ⣰⠋⠙⠁
                 ⠈⣿⣻⣾⣦⣇⢸⣇⣀⣶⡿⠁⣀⣀⣾⢿⡇⢸  ⣟⡦⣧⣶⠏ unleashed
-                 ⠸⢿⡍⠛⠻⠿⠿⠿⠋⣠⡾⢋⣾⣏⣸⣷⡸⣇⢰⠟⠛⠻⡄  v1.24
+                 ⠸⢿⡍⠛⠻⠿⠿⠿⠋⣠⡾⢋⣾⣏⣸⣷⡸⣇⢰⠟⠛⠻⡄  v1.25
                    ⢻⡄   ⠐⠚⠋⣠⡾⣧⣿⠁⠙⢳⣽⡟
                    ⠈⠳⢦⣤⣤⣀⣤⡶⠛ ⠈⢿⡆  ⢿⡇
                          ⠈    ⠈⠓  ⠈
@@ -45,7 +45,7 @@ use 5.006;
 use strict;
 use warnings;
 
-our $VERSION = '1.24';
+our $VERSION = '1.25';
 
 =head1 SYNOPSIS
 
@@ -733,8 +733,9 @@ sub import {
 
             my ( $header, @rows ) = @_;
             my @lines = Term::Table->new(
-                header => $header,
-                rows   => \@rows,
+                header   => $header,
+                rows     => \@rows,
+                sanitize => 0,          # To not show \n
             )->render;
 
             return @lines if wantarray;

@@ -31,7 +31,7 @@ use strict;
 use warnings;
 use utf8;
 
-our $VERSION = '1.216';
+our $VERSION = '1.217';
 
 use Quiq::Option;
 use Quiq::FileHandle;
@@ -2753,8 +2753,9 @@ sub delete {
     elsif (-d $path) {
         # Verzeichnis löschen
         (my $dir = $path) =~ s/'/\\'/g; # ' quoten
-        eval {Quiq::Shell->exec("/bin/rm -r --interactive=never".
-            " '$dir' >/dev/null 2>&1")};
+        # eval {Quiq::Shell->exec("/bin/rm -r --interactive=never".
+        #     " '$dir' >/dev/null 2>&1")};
+        eval {Quiq::Shell->exec("/bin/rm -r '$dir' >/dev/null 2>&1")};
         if ($@ && !$sloppy) {
             $this->throw(
                 'PATH-00002: Can\'t delete directory',
@@ -4216,7 +4217,7 @@ sub uid {
 
 =head1 VERSION
 
-1.216
+1.217
 
 =head1 AUTHOR
 

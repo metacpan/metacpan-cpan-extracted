@@ -1,5 +1,9 @@
 Revision history for Perl extension Tk::GtkSettings.
 
+0.08  Jul 05 2024
+	- adjusted some default settings
+	- updated README.md
+
 0.07  Feb 26 2024
 	- adjusted some default settings
 	- fixed a coupleof bugs

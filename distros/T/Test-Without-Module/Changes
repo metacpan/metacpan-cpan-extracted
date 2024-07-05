@@ -3,6 +3,9 @@ Revision history for Perl extension Test::Without::Module.
 Todo:
   - Add way to allow only core modules (suggested by SREZIC)
 
+0.22 2024-07-05
+  - Fix test suite to not skip a failing test
+
 0.21 2022-12-10
   - Harden test suite against changed error message coming with 5.38
 

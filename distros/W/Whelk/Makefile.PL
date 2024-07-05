@@ -21,7 +21,10 @@ my %WriteMakefileArgs = (
     "Kelp::Module::YAML" => "2.00",
     "Role::Tiny" => 0
   },
-  "VERSION" => "0.02",
+  "TEST_REQUIRES" => {
+    "Test::Exception" => 0
+  },
+  "VERSION" => "0.03",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -31,7 +34,8 @@ my %WriteMakefileArgs = (
 my %FallbackPrereqs = (
   "Kelp" => "2.15",
   "Kelp::Module::YAML" => "2.00",
-  "Role::Tiny" => 0
+  "Role::Tiny" => 0,
+  "Test::Exception" => 0
 );
 
 

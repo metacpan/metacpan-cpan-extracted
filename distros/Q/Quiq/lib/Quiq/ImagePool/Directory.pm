@@ -21,7 +21,7 @@ use v5.10;
 use strict;
 use warnings;
 
-our $VERSION = '1.216';
+our $VERSION = '1.217';
 
 use Quiq::TimeLapse::Directory;
 use Quiq::Option;
@@ -209,7 +209,7 @@ sub image {
 
 =head1 VERSION
 
-1.216
+1.217
 
 =head1 AUTHOR
 

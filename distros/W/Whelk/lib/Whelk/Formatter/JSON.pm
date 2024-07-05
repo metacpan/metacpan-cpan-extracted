@@ -1,5 +1,5 @@
 package Whelk::Formatter::JSON;
-$Whelk::Formatter::JSON::VERSION = '0.02';
+$Whelk::Formatter::JSON::VERSION = '0.03';
 use Kelp::Base 'Whelk::Formatter';
 
 attr response_format => sub { 'json' };

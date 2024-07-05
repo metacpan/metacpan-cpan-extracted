@@ -49,6 +49,7 @@ lib/Whelk/Schema/Definition/Number.pm
 lib/Whelk/Schema/Definition/Object.pm
 lib/Whelk/Schema/Definition/String.pm
 lib/Whelk/Schema/Definition/_Scalar.pm
+lib/Whelk/StrictBase.pm
 lib/Whelk/Wrapper.pm
 lib/Whelk/Wrapper/Simple.pm
 lib/Whelk/Wrapper/WithStatus.pm
@@ -64,6 +65,7 @@ t/conf/whelk_manual.pl
 t/conf/whelk_multi.pl
 t/conf/whelk_openapi.pl
 t/conf/whelk_requests.pl
+t/conf/whelk_typo.pl
 t/deep.t
 t/eager_resource.t
 t/exhale.t
@@ -79,6 +81,7 @@ t/lib/Whelk/Resource/Requests.pm
 t/lib/Whelk/Resource/ShowcaseOpenAPI.pm
 t/lib/Whelk/Resource/Test.pm
 t/lib/Whelk/Resource/Test/Deep.pm
+t/lib/Whelk/Resource/Typo.pm
 t/lib/Whelk/Wrapper/Buggy.pm
 t/manual.t
 t/multi.t
@@ -94,3 +97,4 @@ t/request_query.t
 t/schema.t
 t/schema_buggy.t
 t/schema_error.t
+t/strict_base.t

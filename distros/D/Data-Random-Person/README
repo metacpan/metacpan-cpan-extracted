@@ -1,0 +1,143 @@
+NAME
+    Data::Random::Person - Random person objects.
+
+SYNOPSIS
+     use Data::Random::Person;
+
+     my $obj = Data::Random::Person->new(%params);
+     my @people = $obj->random;
+
+METHODS
+  "new"
+     my $obj = Data::Random::Person->new(%params);
+
+    Constructor.
+
+    *       "cb_id"
+
+            Callback to adding of id.
+
+            Default value is subroutine which returns "$self-"{'id'}++>.
+
+    *       "cb_name"
+
+            Callback to create person name.
+
+            Default value is subroutine which returns
+            "Mock::Person::CZ::name()".
+
+    *       "domain"
+
+            Domain for email.
+
+            Default value is 'example.com'.
+
+    *       "id"
+
+            Minimal id for adding. Only if "mode_id" is set to 1.
+
+            Default value is 1.
+
+    *       "mode_id"
+
+            Boolean value if we are generating id in hash type object.
+
+            Default value is 0.
+
+    *       "num_people"
+
+            Number of generated person records.
+
+            Default value is 10.
+
+    Returns instance of object.
+
+  "random"
+     my @people = $obj->random;
+
+    Get random person records.
+
+    Returns instance of Data::Person.
+
+ERRORS
+     new():
+             From Mo::utils::check_bool():
+                     Parameter 'mode_id' must be a bool (0/1).
+                             Value: %s
+             Parameter 'domain' is not valid.
+
+EXAMPLE
+     use strict;
+     use warnings;
+
+     use Data::Printer;
+     use Data::Random::Person;
+
+     my $obj = Data::Random::Person->new(
+             'mode_id' => 1,
+             'num_people' => 2,
+     );
+
+     my @people = $obj->random;
+
+     # Dump person records to out.
+     p @people;
+
+     # Output like:
+     # [
+     #     [0] Data::Person  {
+     #             parents: Mo::Object
+     #             public methods (6):
+     #                 BUILD
+     #                 Mo::utils:
+     #                     check_length, check_number_id, check_strings
+     #                 Mo::utils::Email:
+     #                     check_email
+     #                 Readonly:
+     #                     Readonly
+     #             private methods (0)
+     #             internals: {
+     #                 email   "jiri.sykora@example.com",
+     #                 id      1,
+     #                 name    "Jiří Sýkora"
+     #             }
+     #         },
+     #     [1] Data::Person  {
+     #             parents: Mo::Object
+     #             public methods (6):
+     #                 BUILD
+     #                 Mo::utils:
+     #                     check_length, check_number_id, check_strings
+     #                 Mo::utils::Email:
+     #                     check_email
+     #                 Readonly:
+     #                     Readonly
+     #             private methods (0)
+     #             internals: {
+     #                 email   "bedrich.pavel.stepanek@example.com",
+     #                 id      2,
+     #                 name    "Bedřich Pavel Štěpánek"
+     #             }
+     #         }
+     # ]
+
+DEPENDENCIES
+    Class::Utils, Data::Person, Error::Pure, List::Util, Mo::utils,
+    Mock::Person::CZ, Text::Unidecode.
+
+REPOSITORY
+    <https://github.com/michal-josef-spacek/Data-Random-Person>
+
+AUTHOR
+    Michal Josef Špaček <mailto:skim@cpan.org>
+
+    <http://skim.cz>
+
+LICENSE AND COPYRIGHT
+    © 2024 Michal Josef Špaček
+
+    BSD 2-Clause License
+
+VERSION
+    0.02
+

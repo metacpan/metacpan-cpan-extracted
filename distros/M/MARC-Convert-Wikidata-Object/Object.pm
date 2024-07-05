@@ -11,7 +11,7 @@ use Readonly;
 
 Readonly::Array our @COVERS => qw(hardback paperback);
 
-our $VERSION = 0.04;
+our $VERSION = 0.05;
 
 has authors => (
 	default => [],
@@ -60,6 +60,11 @@ has editors => (
 );
 
 has end_time => (
+	is => 'ro',
+);
+
+has external_ids => (
+	default => [],
 	is => 'ro',
 );
 
@@ -185,6 +190,9 @@ sub BUILD {
 	# Check end_time.
 	check_number($self, 'end_time');
 
+	# Check external_ids.
+	check_array_object($self, 'external_ids', 'MARC::Convert::Wikidata::Object::ExternalId', 'External id');
+
 	# Check illustrators.
 	check_array_object($self, 'illustrators',
 		'MARC::Convert::Wikidata::Object::People', 'Illustrator');
@@ -257,6 +265,7 @@ MARC::Convert::Wikidata::Object - Bibliographic Wikidata object defined by MARC 
  my $edition_number = $obj->edition_number;
  my $editors_ar = $obj->editors;
  my $end_time = $obj->end_time;
+ my $external_ids_ar = $obj->external_ids;
  my $full_name = $obj->full_name;
  my $illustrators_ar = $obj->illustrators;
  my $isbns_ar = $obj->isbns;
@@ -361,6 +370,14 @@ Default value is reference to blank array.
 End time.
 
 Default value is undef.
+
+=item * C<external_ids>
+
+External ids.
+
+Need to be a reference to array with L<MARC::Convert::Wikidata::Object::ExternalId> instances.
+
+Default value is [].
 
 =item * C<illustrators>
 
@@ -495,6 +512,8 @@ Returns reference to array of MARC::Convert::Wikidata::Object::People instances.
 
 =head2 C<ccnb>
 
+I<It is deprecated. It will be removed in future.>
+
  my $ccnb = $obj->ccnb;
 
 Get ČČNB (Česká národní bibliografie) ID.
@@ -557,6 +576,14 @@ Get end time.
 
 Returns number.
 
+=head2 C<external_ids>
+
+ my $external_ids_ar = $obj->external_ids;
+
+Get list of external ids.
+
+Returns reference to array with L<MARC::Convert::Wikidata::Object::ExternalId> instances.
+
 =head2 C<full_name>
 
  my $full_name = $obj->full_name;
@@ -618,6 +645,8 @@ Returns reference to array of MARC::Convert::Wikidata::Object::People instances.
 TODO
 
 =head2 C<oclc>
+
+I<It is deprecated. It will be removed in future.>
 
  my $oclc = $obj->oclc;
 
@@ -699,6 +728,7 @@ Returns reference to array of MARC::Convert::Wikidata::Object::People instances.
                  Compiler isn't 'MARC::Convert::Wikidata::Object::People' object.
                  Director isn't 'MARC::Convert::Wikidata::Object::People' object.
                  Editor isn't 'MARC::Convert::Wikidata::Object::People' object.
+                 External id isn't 'MARC::Convert::Wikidata::Object::ExternalId' object.
                  Illustrator isn't 'MARC::Convert::Wikidata::Object::People' object.
                  Narrator isn't 'MARC::Convert::Wikidata::Object::People' object.
                  Parameter 'authors' must be a array.
@@ -708,6 +738,7 @@ Returns reference to array of MARC::Convert::Wikidata::Object::People instances.
                  Parameter 'directors' must be a array.
                  Parameter 'editors' must be a array.
                  Parameter 'end_time' must be a number.
+                 Parameter 'external_ids' must be a array.
                  Parameter 'illustrators' must be a array.
                  Parameter 'languages' must be a array.
                  Parameter 'narrators' must be a array.
@@ -717,7 +748,6 @@ Returns reference to array of MARC::Convert::Wikidata::Object::People instances.
                  Parameter 'translators' must be a array.
                  Publisher isn't 'MARC::Convert::Wikidata::Object::Publisher' object.
                  Translator isn't 'MARC::Convert::Wikidata::Object::People' object.
-
          From Mo::utils::check_number():
                  Parameter '%s' must a number.
                          Value: %s
@@ -731,6 +761,7 @@ Returns reference to array of MARC::Convert::Wikidata::Object::People instances.
 
  use Data::Printer;
  use MARC::Convert::Wikidata::Object;
+ use MARC::Convert::Wikidata::Object::ExternalId;
  use MARC::Convert::Wikidata::Object::ISBN;
  use MARC::Convert::Wikidata::Object::People;
  use MARC::Convert::Wikidata::Object::Publisher;
@@ -738,8 +769,13 @@ Returns reference to array of MARC::Convert::Wikidata::Object::People instances.
  
  my $aut = MARC::Convert::Wikidata::Object::People->new(
          'date_of_birth' => '1952-12-08',
+         'external_ids' => [
+                 MARC::Convert::Wikidata::Object::ExternalId->new(
+                         'name' => 'nkcr_aut',
+                         'value' => 'jn20000401266',
+                 ),
+         ],
          'name' => decode_utf8('Jiří'),
-         'nkcr_aut' => 'jn20000401266',
          'surname' => 'Jurok',
  );
 
@@ -755,9 +791,18 @@ Returns reference to array of MARC::Convert::Wikidata::Object::People instances.
 
  my $obj = MARC::Convert::Wikidata::Object->new(
          'authors' => [$aut],
-         'ccnb' => 'cnb001188266',
          'date_of_publication' => 2002,
          'edition_number' => 2,
+         'external_ids' => [
+                 MARC::Convert::Wikidata::Object::ExternalId->new(
+                         'name' => 'cnb',
+                         'value' => 'cnb001188266',
+                 ),
+                 MARC::Convert::Wikidata::Object::ExternalId->new(
+                         'name' => 'lccn',
+                         'value' => '53860313',
+                 ),
+         ],
          'isbns' => [$isbn],
          'number_of_pages' => 414,
          'publishers' => [$publisher],
@@ -767,30 +812,35 @@ Returns reference to array of MARC::Convert::Wikidata::Object::People instances.
 
  # Output:
  # MARC::Convert::Wikidata::Object  {
- #     Parents       Mo::Object
- #     public methods (11) : BUILD, can (UNIVERSAL), DOES (UNIVERSAL), err (Error::Pure), full_name, check_array (Mo::utils), check_array_object (Mo::utils), isa (UNIVERSAL), none (List::MoreUtils::XS), Readonly (Readonly), VERSION (UNIVERSAL)
- #     private methods (1) : __ANON__ (Mo::is)
+ #     parents: Mo::Object
+ #     public methods (8):
+ #         BUILD, full_name
+ #         Error::Pure:
+ #             err
+ #         List::MoreUtils::XS:
+ #             none
+ #         Mo::utils:
+ #             check_array, check_array_object, check_number
+ #         Readonly:
+ #             Readonly
+ #     private methods (0)
  #     internals: {
- #         authors                   [
+ #         authors               [
  #             [0] MARC::Convert::Wikidata::Object::People
  #         ],
- #         authors_of_introduction   [],
- #         ccnb                      "cnb001188266",
- #         compilers                 [],
- #         date_of_publication       2002,
- #         edition_number            2,
- #         editors                   [],
- #         illustrators              [],
- #         isbns                     [
+ #         date_of_publication   2002,
+ #         edition_number        2,
+ #         external_ids          [
+ #             [0] MARC::Convert::Wikidata::Object::ExternalId,
+ #             [1] MARC::Convert::Wikidata::Object::ExternalId
+ #         ],
+ #         isbns                 [
  #             [0] MARC::Convert::Wikidata::Object::ISBN
  #         ],
- #         krameriuses               [],
- #         number_of_pages           414,
- #         publishers                [
+ #         number_of_pages       414,
+ #         publishers            [
  #             [0] MARC::Convert::Wikidata::Object::Publisher
- #         ],
- #         series                    [],
- #         translators               []
+ #         ]
  #     }
  # }
 
@@ -830,6 +880,6 @@ BSD 2-Clause License
 
 =head1 VERSION
 
-0.04
+0.05
 
 =cut

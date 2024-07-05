@@ -3,12 +3,28 @@ NAME
     Republic to MARC file.
 
 SYNOPSIS
-     nkc-to-marc [-h] [--version] id_of_book
+     nkc-to-marc [-h] [-o output_format] [--version] id_of_book
 
 ARGUMENTS
     *       "-h"
 
             Print help.
+
+    *       "-o output_format"
+
+            Output format.
+
+            Default value is 'xml'.
+
+            Possible formats are:
+
+            *   usmarc
+
+                USMARC format.
+
+            *   xml
+
+                MARC XML format.
 
     *       "--version"
 
@@ -20,11 +36,11 @@ ARGUMENTS
             bibliography id.
 
 EXAMPLE1
-     # Adding book edition defined by ISBN number
+     # Fetch book edition defined by ISBN number.
      nkc-to-marc 978-80-276-0470-8
 
 EXAMPLE2
-     # Adding book edition defined by Czech national bibliography id
+     # Fetch book edition defined by Czech national bibliography id
      nkc-to-marc cnb003322696
 
 REPOSITORY
@@ -41,5 +57,5 @@ LICENSE AND COPYRIGHT
     BSD 2-Clause License
 
 VERSION
-    0.01
+    0.02
 

@@ -1,6 +1,6 @@
 package Whelk::Endpoint;
-$Whelk::Endpoint::VERSION = '0.02';
-use Kelp::Base;
+$Whelk::Endpoint::VERSION = '0.03';
+use Whelk::StrictBase;
 use Carp;
 use Whelk::Schema;
 
@@ -10,11 +10,11 @@ attr -description => undef;
 attr -resource => sub { croak 'resource is required in endpoint' };
 attr -route => sub { croak 'route is required in endpoint' };
 attr -code => sub { croak 'code is required in endpoint' };
-attr -path => \&_build_path;
 attr -formatter => sub { croak 'formatter is required in endpoint' };
-attr -request_schema => undef;
-attr -response_schema => sub { croak 'response_schema is required in endpoint' };
-attr -parameters => sub { croak 'parameters are required in endpoint' };
+attr path => undef;
+attr request => undef;
+attr response => undef;
+attr parameters => undef;
 
 # to be built in wrapers
 attr -response_schemas => sub { {} };
@@ -24,7 +24,15 @@ sub new
 	my $class = shift;
 	my $self = $class->SUPER::new(@_);
 
-	$self->path;    # builds path
+	# build request and response schemas
+	$self->request(Whelk::Schema->build_if_defined($self->request));
+	$self->response(Whelk::Schema->build_if_defined($self->response));
+
+	# initial build of the parameters
+	$self->parameters(Whelk::Endpoint::Parameters->new(%{$self->parameters // {}}));
+
+	# build path
+	$self->path($self->_build_path);
 
 	# build schemas to get any errors reported early
 	$self->parameters->path_schema;

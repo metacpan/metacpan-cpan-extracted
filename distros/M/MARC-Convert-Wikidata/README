@@ -6,6 +6,7 @@ SYNOPSIS
      use MARC::Convert::Wikidata;
 
      my $obj = MARC::Convert::Wikidata->new(%params);
+     my @values = $obj->look_for_external_id($external_id_name, $deprecation_flag);
      my $object = $obj->object;
      my $type = $obj->type;
      my $wikidata = $obj->wikidata;
@@ -79,6 +80,14 @@ METHODS
             Default value is 0.
 
     Returns instance of object.
+
+  "look_for_external_id"
+     my @values = $obj->look_for_external_id($external_id_name, $deprecation_flag);
+
+    Get external id values defined by name and deprecation flag (default is
+    0).
+
+    Returns string.
 
   "object"
      my $object = $obj->object;
@@ -335,5 +344,5 @@ LICENSE AND COPYRIGHT
     BSD 2-Clause License
 
 VERSION
-    0.11
+    0.13
 

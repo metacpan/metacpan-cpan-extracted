@@ -30,7 +30,9 @@ Manuel
 Mendoza
 Nicolas
 Olaf
+Oliver
 PPI
+Peter
 Raspass
 Rodríguez
 Role
@@ -38,6 +40,7 @@ Sandbox
 choroba
 dependabot
 dump
+git
 ishigaki
 jose93rd
 jraspass

@@ -19,7 +19,7 @@ name: App-MineralUtils
 provides:
   App::MineralUtils:
     file: lib/App/MineralUtils.pm
-    version: '0.012'
+    version: '0.013'
 requires:
   Complete::Sequence: '0.002'
   Data::Sah::Compiler::perl::TH::str: '0.914'
@@ -28,16 +28,25 @@ requires:
   Physics::Unit: '0'
   perl: '5.010001'
   strict: '0'
+  utf8: '0'
   warnings: '0'
 resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=App-MineralUtils
   homepage: https://metacpan.org/release/App-MineralUtils
   repository: git://github.com/perlancar/perl-App-MineralUtils.git
-version: '0.012'
+version: '0.013'
 x_Dist_Zilla:
   perl:
     version: '5.038002'
   plugins:
+    -
+      class: Dist::Zilla::Plugin::GenPericmdScript
+      name: 'GenPericmdScript convert-calcium-unit'
+      version: '0.425'
+    -
+      class: Dist::Zilla::Plugin::GenPericmdScript
+      name: 'GenPericmdScript convert-iron-unit'
+      version: '0.425'
     -
       class: Dist::Zilla::Plugin::GenPericmdScript
       name: 'GenPericmdScript convert-magnesium-unit'

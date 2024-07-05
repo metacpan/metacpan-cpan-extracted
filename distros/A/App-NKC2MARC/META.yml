@@ -3,9 +3,14 @@ abstract: 'Tool to fetch record from National library of the Czech Republic to M
 author:
   - 'Michal Josef Spacek <skim@cpan.org>'
 build_requires:
+  English: 0
   ExtUtils::MakeMaker: 6.59
+  File::Object: 0
+  File::Spec::Functions: 0
   Test::More: 0
   Test::NoWarnings: 0
+  Test::Output: 0
+  Test::Warn: 0.31
 configure_requires:
   ExtUtils::MakeMaker: 6.59
 distribution_type: module
@@ -28,7 +33,10 @@ requires:
   Error::Pure: 0
   Getopt::Std: 0
   IO::Barf: 0
+  List::Util: 1.33
+  MARC::File::XML: 0
   MARC::Record: 0
+  Readonly: 0
   ZOOM: 0
   perl: 5.6.0
 resources:
@@ -36,4 +44,4 @@ resources:
   homepage: https://github.com/michal-josef-spacek/App-NKC2MARC
   license: http://opensource.org/licenses/bsd-license.php
   repository: git://github.com/michal-josef-spacek/App-NKC2MARC
-version: '0.01'
+version: '0.02'

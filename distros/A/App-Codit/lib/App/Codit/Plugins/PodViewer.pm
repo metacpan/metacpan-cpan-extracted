@@ -9,7 +9,7 @@ App::Codit::Plugins::PodViewer - plugin for App::Codit
 use strict;
 use warnings;
 use vars qw( $VERSION );
-$VERSION = 0.05;
+$VERSION = 0.07;
 
 use base qw( App::Codit::BaseClasses::TextModPlugin );
 
@@ -105,55 +105,30 @@ sub PodAdd {
 		-borderwidth => 2,
 	)->pack(-fill => 'x');
 
-	my $pr = $bframe->Button(
-		-image => $art->createCompound(
-			-image => $self->getArt('go-previous', 22),
-			-text => 'Previous'
-		),
-		-relief => 'flat',
-		-command => sub { $pod->history_move(-1) }
-	)->pack(-side => 'left', -padx => 2, -pady => 2);
-	$self->StatusAttach($pr, -statusmsg => 'Previous document');
-
-	my $nxt = $bframe->Button(
-		-image => $art->createCompound(
-			-image => $self->getArt('go-next', 22),
-			-text => 'Next'
-		),
-		-relief => 'flat',
-		-command => sub { $pod->history_move }
-	)->pack(-side => 'left', -padx => 2, -pady => 2);
-	$self->StatusAttach($nxt, -statusmsg => 'Next document');
-
-	my $zi = $bframe->Button(
-		-image => $art->createCompound(
-			-image => $self->getArt('zoom-in', 22),
-			-text => 'Zoom in'
-		),
-		-relief => 'flat',
-		-command => sub { $pod->zoom_in }
-	)->pack(-side => 'left', -padx => 2, -pady => 2);
-	$self->StatusAttach($zi, -statusmsg => 'Zoom in');
-
-	my $zo = $bframe->Button(
-		-image => $art->createCompound(
-			-image => $self->getArt('zoom-out', 22),
-			-text => 'Zoom out'
-		),
-		-relief => 'flat',
-		-command => sub { $pod->zoom_out }
-	)->pack(-side => 'left', -padx => 2, -pady => 2);
-	$self->StatusAttach($zo, -statusmsg => 'Zoom out');
-
-	my $zr = $bframe->Button(
-		-image => $art->createCompound(
-			-image => $self->getArt('zoom-original', 22),
-			-text => 'Reset zoom'
-		),
-		-relief => 'flat',
-		-command => sub { $pod->zoom_normal }
-	)->pack(-side => 'left', -padx => 2, -pady => 2);
-	$self->StatusAttach($zr, -statusmsg => 'Reset zoom');
+	for (
+		['Previous', 'go-previous', 'Previous document', sub { $pod->history_move(-1) }],
+		['Next', 'go-next', 'Next document', sub { $pod->history_move }],
+		['Zoom in', 'zoom-in', 'Zoom in', sub { $pod->zoom_in }],
+		['Zoom out', 'zoom-out', 'Zoom out', sub { $pod->zoom_out }],
+		['Reset zoom', 'zoom-original', 'Reset zoom', sub { $pod->zoom_normal }],
+	) {
+		my ($lab, $icon, $status, $sub) = @$_;
+		my @opt = ();
+		my $img = $self->getArt($icon, 22);
+		if (defined $img) {
+			push @opt, -image => $art->createCompound(
+				-image => $img,
+				-text => $lab,
+			)
+		} else {
+			push @opt, -text => $lab
+		}
+		my $b = $bframe->Button(@opt,
+			-relief => 'flat',
+			-command => $sub,
+		)->pack(-side => 'left', -padx => 2, -pady => 2);
+		$self->StatusAttach($b, -statusmsg => $status);
+	}
 
 	$pod = $podframe->PodText(
 		-file => $self->PodFile,

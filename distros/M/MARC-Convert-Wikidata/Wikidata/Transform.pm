@@ -7,7 +7,8 @@ use Class::Utils qw(set_params);
 use Data::Kramerius;
 use Error::Pure qw(err);
 use List::Util qw(any);
-use MARC::Convert::Wikidata::Object;
+use MARC::Convert::Wikidata::Object 0.05;
+use MARC::Convert::Wikidata::Object::ExternalId 0.05;
 use MARC::Convert::Wikidata::Object::ISBN;
 use MARC::Convert::Wikidata::Object::Kramerius;
 use MARC::Convert::Wikidata::Object::People;
@@ -36,7 +37,7 @@ Readonly::Hash our %PEOPLE_TYPE => {
 	'trl' => 'translators',
 };
 
-our $VERSION = 0.11;
+our $VERSION = 0.13;
 
 # Constructor.
 sub new {
@@ -93,12 +94,26 @@ sub object {
 sub _ccnb {
 	my $self = shift;
 
+	my @ret;
+
 	my $ccnb = $self->_subfield('015', 'a');
-	if (! defined $ccnb) {
-		$ccnb = $self->_subfield('015', 'z');
+	if (defined $ccnb) {
+		push @ret, MARC::Convert::Wikidata::Object::ExternalId->new(
+			'name' => 'cnb',
+			'value' => $ccnb,
+		);
 	}
 
-	return $ccnb;
+	my $depr_ccnb = $self->_subfield('015', 'z');
+	if (defined $depr_ccnb) {
+		push @ret, MARC::Convert::Wikidata::Object::ExternalId->new(
+			'deprecated' => 1,
+			'name' => 'cnb',
+			'value' => $depr_ccnb,
+		);
+	}
+
+	return @ret;
 }
 
 sub _construct_kramerius {
@@ -253,6 +268,22 @@ sub _languages {
 	return @lang;
 }
 
+sub _lccn {
+	my $self = shift;
+
+	my @ret;
+
+	my @lccn = $self->_subfield('035', 'a');
+	foreach my $lccn (@lccn) {
+		$lccn = clean_oclc($lccn);
+		push @ret, MARC::Convert::Wikidata::Object::ExternalId->new(
+			'name' => 'lccn',
+			'value' => $lccn,
+		);
+	}
+
+	return @ret;
+}
 
 sub _number_of_pages {
 	my $self = shift;
@@ -261,20 +292,6 @@ sub _number_of_pages {
 	$number_of_pages = clean_number_of_pages($number_of_pages);
 
 	return $number_of_pages;
-}
-
-sub _oclc {
-	my $self = shift;
-
-	my @oclc = $self->_subfield('035', 'a');
-	foreach my $oclc (@oclc) {
-		$oclc = clean_oclc($oclc);
-	}
-	if (@oclc > 1) {
-		err 'Multiple OCLC control number.';
-	}
-
-	return $oclc[0];
 }
 
 sub _process_object {
@@ -295,7 +312,6 @@ sub _process_object {
 		'authors' => $self->{'_people'}->{'authors'},
 		'authors_of_afterword' => $self->{'_people'}->{'authors_of_afterword'},
 		'authors_of_introduction' => $self->{'_people'}->{'authors_of_introduction'},
-		'ccnb' => $self->_ccnb,
 		'compilers' => $self->{'_people'}->{'compilers'},
 		'cover' => $self->_cover,
 		'directors' => $self->{'_people'}->{'directors'},
@@ -303,6 +319,10 @@ sub _process_object {
 		$self->_edition_number ? ('edition_number' => $self->_edition_number) : (),
 		'editors' => $self->{'_people'}->{'editors'},
 		'end_time' => $end_time,
+		'external_ids' => [
+			$self->_ccnb,
+			$self->_lccn,
+		],
 		'isbns' => [$self->_isbns],
 		'issn' => $self->_issn,
 		'illustrators' => $self->{'_people'}->{'illustrators'},
@@ -310,7 +330,6 @@ sub _process_object {
 		'languages' => [$self->_languages],
 		'narrators' => $self->{'_people'}->{'narrators'},
 		'number_of_pages' => $self->_number_of_pages,
-		'oclc' => $self->_oclc,
 		'photographers' => $self->{'_people'}->{'photographers'},
 		'publication_date' => $publication_date,
 		'publishers' => [$self->_publishers],
@@ -365,10 +384,15 @@ sub _process_people {
 			MARC::Convert::Wikidata::Object::People->new(
 				'date_of_birth' => $date_of_birth,
 				'date_of_death' => $date_of_death,
+				'external_ids' => [
+					MARC::Convert::Wikidata::Object::ExternalId->new(
+						'name' => 'nkcr_aut',
+						'value' => $nkcr_aut,
+					),
+				],
 				'work_period_start' => $work_period_start,
 				'work_period_end' => $work_period_end,
 				'name' => $name,
-				'nkcr_aut' => $nkcr_aut,
 				'surname' => $surname,
 			);
 	}
@@ -498,12 +522,17 @@ sub _series {
 sub _subfield {
 	my ($self, $field, $subfield) = @_;
 
-	my $field_value = $self->{'marc_record'}->field($field);
-	if (! defined $field_value) {
-		return;
+	my @ret;
+
+	my @field_values = $self->{'marc_record'}->field($field);
+	foreach my $field_value (@field_values) {
+		my $subfield_value = $field_value->subfield($subfield);
+		if (defined $subfield_value) {
+			push @ret, $subfield_value;
+		}
 	}
 
-	return $field_value->subfield($subfield);
+	return wantarray ? @ret : $ret[0];
 }
 
 sub _subtitles {

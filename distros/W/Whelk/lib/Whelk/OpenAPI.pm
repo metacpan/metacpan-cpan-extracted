@@ -1,5 +1,5 @@
 package Whelk::OpenAPI;
-$Whelk::OpenAPI::VERSION = '0.02';
+$Whelk::OpenAPI::VERSION = '0.03';
 use Kelp::Base;
 use List::Util qw(uniq);
 
@@ -61,7 +61,7 @@ sub _build_path
 	}
 
 	# build requests
-	if (my $schema = $endpoint->request_schema) {
+	if (my $schema = $endpoint->request) {
 		foreach my $format (values %{$endpoint->formatter->supported_formats}) {
 			$requests{content}{$format}{schema} = $schema->openapi_schema($self);
 		}

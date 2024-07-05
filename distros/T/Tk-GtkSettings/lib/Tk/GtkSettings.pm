@@ -10,7 +10,7 @@ use strict;
 use warnings;
 use File::Basename;
 use Config;
-our $VERSION = '0.07';
+our $VERSION = '0.08';
 
 use Exporter;
 our @ISA = qw(Exporter);
@@ -185,7 +185,7 @@ my %mainoptions = qw(
 	activeForeground     theme_fg_color
 	backPageColor        tk-through-color
 	highlightBackground  theme_bg_color
-	highlightColor			theme_hovering_selected_bg_color
+	highlightColor			    theme_selected_bg_color
 	inactiveBackground   tk-through-color
 	insertBackground     theme_fg_color
 	selectBackground     theme_selected_bg_color
@@ -195,12 +195,10 @@ my %mainoptions = qw(
 
 my %contentoptions = qw(
 	background           content_view_bg
-	highlightColor			theme_bg_color
 );
 
 my %listoptions = qw(
-	background       content_view_bg
-	highlightColor			theme_bg_color
+	background           content_view_bg
 );
 
 appName('');
@@ -816,38 +814,6 @@ sub gtkKeyDelete {
 	} 
 }
 
-=item B<initDefaults>
-
-=over 4
-
-Initializes some sensible defaults. Also does a full reset and loads Gtk configuration files.
-
-=back
-
-=cut
-
-sub initDefaults {
-	return unless platformPermitted;
-	resetAll;
-	loadGtkInfo;
-	gtkKey('tk-active-background', alterColor(gtkKey('theme_bg_color'), 30));
-	gtkKey('tk-through-color', alterColor(gtkKey('theme_bg_color'), 30));
-
-	for (keys %mainoptions) {
-		groupOption('main', $_, $mainoptions{$_})
-	}
-	my $iconlib = gtkKey('gtk-icon-theme-name');
-	groupOption('main', 'iconTheme', $iconlib) if defined $iconlib;
-
-	my @cw = @contentwidgets;
-	my %co = %contentoptions;
-	groupAdd('content', \@cw, \%co);
-	my @lw = @listwidgets;
-	my %lo = %listoptions;
-	groupAdd('list', \@lw, \%lo);
-	groupAdd('menu', ['Menu', 'NoteBook'], {borderWidth => 1});
-}
-
 =item B<hex2rgb>(I<$hex_color>)
 
 =over 4
@@ -885,6 +851,39 @@ sub hexstring {
 	my $hex = substr(sprintf("0x%X", $num), 2);
 	if (length($hex) < 2) { $hex = "0$hex" }
 	return $hex
+}
+
+=item B<initDefaults>
+
+=over 4
+
+Initializes some sensible defaults. Also does a full reset and loads Gtk configuration files.
+
+=back
+
+=cut
+
+sub initDefaults {
+	return unless platformPermitted;
+	resetAll;
+	loadGtkInfo;
+	gtkKey('tk-active-background', alterColor(gtkKey('theme_bg_color'), 30));
+	gtkKey('tk-through-color', alterColor(gtkKey('theme_bg_color'), 30));
+
+	for (keys %mainoptions) {
+		groupOption('main', $_, $mainoptions{$_})
+	}
+	my $iconlib = gtkKey('gtk-icon-theme-name');
+	groupOption('main', 'iconTheme', $iconlib) if defined $iconlib;
+
+	my @cw = @contentwidgets;
+	my %co = %contentoptions;
+	groupAdd('content', \@cw, \%co);
+	my @lw = @listwidgets;
+	my %lo = %listoptions;
+	groupAdd('list', \@lw, \%lo);
+	groupOption('list', 'highlightThickness', 1);
+	groupAdd('menu', ['Menu', 'NoteBook'], {borderWidth => 1});
 }
 
 =item B<loadGtkInfo>

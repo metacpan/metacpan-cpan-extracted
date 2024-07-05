@@ -1,5 +1,6 @@
 use strict; use warnings;
 package Sub::Composable;
+$Sub::Composable::VERSION = '0.14';
 use Sub::Name;
 
 # use Sub::Compose qw( chain ); # doesn't fucking work, due to scalar/list context shenanigans
@@ -34,6 +35,8 @@ sub applyto {
 
 use overload '<<' => \&compose,
              '>>' => \&backcompose,
-             '|'  => \&applyto;
+             '|'  => \&applyto,
+             # fallback is needed to avoid an error from Attribute::Handlers
+             'fallback' => 1;
 
 1;

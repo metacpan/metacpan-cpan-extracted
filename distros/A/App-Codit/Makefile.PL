@@ -10,6 +10,7 @@ my %prereq = (
 	'Tk::AppWindow'       => '0.10',
 	'Tk::CodeText'        => '0.51',
 	'Tk::FileBrowser'     =>	'0.04',
+	'Tk::Terminal'        =>	'0.01',
 );
 
 WriteMakefile(

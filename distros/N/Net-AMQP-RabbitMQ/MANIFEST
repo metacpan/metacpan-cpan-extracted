@@ -18,21 +18,15 @@ inc/Devel/CheckLib.pm
 LICENSE
 LICENSE-MIT
 Makefile.PL
-MANIFEST
+MANIFEST			This list of files
 manual_tests/001_dead_letter_headers.t
 perl_math_int64.c
 perl_math_int64.h
 ppport.h
-rabbitmq-include/amqp.h
-rabbitmq-include/amqp_framing.h
-rabbitmq-include/amqp_hostcheck.h
 rabbitmq-include/amqp_openssl_bio.h
-rabbitmq-include/amqp_openssl_hostname_validation.h
 rabbitmq-include/amqp_private.h
 rabbitmq-include/amqp_socket.h
-rabbitmq-include/amqp_ssl_socket.h
 rabbitmq-include/amqp_table.h
-rabbitmq-include/amqp_tcp_socket.h
 rabbitmq-include/amqp_time.h
 rabbitmq-include/rabbitmq-c/amqp.h
 rabbitmq-include/rabbitmq-c/export.h
@@ -79,11 +73,9 @@ t/032_cancel_consume_ack_exception.t
 t/033_fork.t
 t/034_connect_client_properties.t
 t/035_rpc-timeouts.t
+t/036_purge.t
 t/lib/NAR/Blessed.pm
 t/lib/NAR/Helper.pm
-t/ssl/api-cloudamqp-com-chain.pem
-t/ssl/cloudamqp.cacert.pem
-t/ssl/vagrant.cacert.pem
 threads.c
 typemap
 xt/017_changes.t

@@ -29,7 +29,7 @@ sub test_append : Test(2) {
     $data = Quiq::Path->read($file);
     $self->is($data,"A\nB\n");
 
-    Quiq::Path->delete($file,-sloppy=>1);
+    Quiq::Path->delete($file,-sloppy=>0);
 }
 
 # -----------------------------------------------------------------------------
@@ -74,7 +74,7 @@ sub test_compareData : Test(2) {
     $bool = Quiq::Path->compareData($file,'b');
     $self->is($bool,1);
 
-    Quiq::Path->delete($file,-sloppy=>1);
+    Quiq::Path->delete($file,-sloppy=>0);
 }
 
 # -----------------------------------------------------------------------------
@@ -91,8 +91,8 @@ sub test_copy : Test(1) {
     my $destData = Quiq::Path->read($dest);
     $self->is($srcData,$destData);
 
-    Quiq::Path->delete($src,-sloppy=>1);
-    Quiq::Path->delete($dest,-sloppy=>1);
+    Quiq::Path->delete($src,-sloppy=>0);
+    Quiq::Path->delete($dest,-sloppy=>0);
 }
 
 # -----------------------------------------------------------------------------
@@ -116,7 +116,7 @@ sub test_newlineStr : Test(3) {
         my $nlStr2 = Quiq::Path->newlineStr($testFile);
         $self->is($nlStr2,$nlStr);
     }
-    Quiq::Path->delete($testFile,-sloppy=>1);
+    Quiq::Path->delete($testFile,-sloppy=>0);
 }
 
 # -----------------------------------------------------------------------------
@@ -143,7 +143,7 @@ sub test_read : Test(4) {
     $self->is($data,"1\n2\n3\n");
 
     # aufräumen
-    Quiq::Path->delete($file,-sloppy=>1);
+    Quiq::Path->delete($file,-sloppy=>0);
 }
 
 # -----------------------------------------------------------------------------
@@ -217,7 +217,7 @@ sub test_write : Test(3) {
     Quiq::Path->write($file,'y',-append=>1);
     $self->is(Quiq::Path->read($file),'xy');
 
-    Quiq::Path->delete($file,-sloppy=>1);
+    Quiq::Path->delete($file,-sloppy=>0);
 }
 
 # -----------------------------------------------------------------------------
@@ -259,7 +259,7 @@ sub test_find : Test(5) {
     eval {Quiq::Path->find("$root/x")};
     $self->like($@,qr/PATH-00011/);
 
-    Quiq::Path->delete($root,-sloppy=>1);
+    Quiq::Path->delete($root,-sloppy=>0);
 }
 
 # -----------------------------------------------------------------------------
@@ -376,7 +376,7 @@ sub test_chmod : Test(3) {
     Quiq::Path->chmod($file,0644);
     $self->is(0644,Quiq::Path->mode($file));
 
-    Quiq::Path->delete($file,-sloppy=>1);
+    Quiq::Path->delete($file,-sloppy=>0);
 
     eval {Quiq::Path->chmod($file,0444) };
     $self->like($@,qr/PATH-00003/);
@@ -486,7 +486,7 @@ sub test_glob : Test(5) {
     eval {Quiq::Path->glob("$dir/*")};
     $self->like($@,qr/PATH-00015/);
 
-    Quiq::Path->delete($dir,-sloppy=>1);
+    Quiq::Path->delete($dir,-sloppy=>0);
 }
 
 # -----------------------------------------------------------------------------
@@ -505,7 +505,7 @@ sub test_isEmpty_file : Test(3) {
 
     # aufräumen
 
-    Quiq::Path->delete($file,-sloppy=>1);
+    Quiq::Path->delete($file,-sloppy=>0);
     $self->ok(!-e $file);
 }
 
@@ -526,7 +526,7 @@ sub test_isEmpty_dir : Test(3) {
 
     # aufräumen
 
-    Quiq::Path->delete($dir,-sloppy=>1);
+    Quiq::Path->delete($dir,-sloppy=>0);
     $self->ok(!-d $dir);
 }
 
@@ -538,7 +538,7 @@ sub test_mtime : Test(4) {
     my $time = time;
 
     my $file = '/tmp/mtime.txt';
-    Quiq::Path->delete($file,-sloppy=>1);
+    Quiq::Path->delete($file,-sloppy=>0);
 
     # Nicht-existenter Pfad
 
@@ -559,7 +559,7 @@ sub test_mtime : Test(4) {
     $mtime = Quiq::Path->mtime($file);
     $self->is($mtime,$time-3600);
 
-    Quiq::Path->delete($file.-sloppy=>1);
+    Quiq::Path->delete($file.-sloppy=>0);
 }
 
 # -----------------------------------------------------------------------------
@@ -580,8 +580,8 @@ sub test_newer : Test(2) {
     $bool = Quiq::Path->newer($file2,$file1);
     $self->is($bool,0);
 
-    Quiq::Path->delete($file1,-sloppy=>1);
-    Quiq::Path->delete($file2,-sloppy=>1);
+    Quiq::Path->delete($file1,-sloppy=>0);
+    Quiq::Path->delete($file2,-sloppy=>0);
 }
 
 # -----------------------------------------------------------------------------
@@ -628,7 +628,7 @@ sub test_rename : Test(1) {
     Quiq::Path->rename($file,$newName);
     $self->ok(-e $newName);
 
-    Quiq::Path->delete($newName,-sloppy=>1);
+    Quiq::Path->delete($newName,-sloppy=>0);
 }
 
 sub test_rename_except : Test(1) {
@@ -702,8 +702,8 @@ sub test_symlink : Test(1) {
     Quiq::Path->symlink($file,$symlink);
     $self->ok(-l $symlink);
 
-    Quiq::Path->delete($symlink,-sloppy=>1);
-    Quiq::Path->delete($file,-sloppy=>1);
+    Quiq::Path->delete($symlink,-sloppy=>0);
+    Quiq::Path->delete($file,-sloppy=>0);
 }
 
 # -----------------------------------------------------------------------------
@@ -728,8 +728,8 @@ sub test_symlinkRelative : Test(5) {
         (my $pathTop = $path) =~ s|/.*||;
         (my $symlinkTop = $symlink) =~ s|/.*||;
 
-        Quiq::Path->delete($pathTop,-sloppy=>1);
-        Quiq::Path->delete($symlinkTop,-sloppy=>1);
+        Quiq::Path->delete($pathTop,-sloppy=>0);
+        Quiq::Path->delete($symlinkTop,-sloppy=>0);
 
         if ($path =~ m|/|) {
             # my $pathParent = Quiq::Path->parent($path);
@@ -751,8 +751,8 @@ sub test_symlinkRelative : Test(5) {
         $self->is($data,$$);
     }
 
-    Quiq::Path->delete('a',-sloppy=>1);
-    Quiq::Path->delete('x',-sloppy=>1);
+    Quiq::Path->delete('a',-sloppy=>0);
+    Quiq::Path->delete('x',-sloppy=>0);
 }
 
 # -----------------------------------------------------------------------------
