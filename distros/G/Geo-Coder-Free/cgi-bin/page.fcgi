@@ -35,7 +35,9 @@ use File::Spec;
 use Log::WarnDie 0.09;
 use CGI::ACL;
 use HTTP::Date;
-use Taint::Runtime qw($TAINT taint_env);
+# FIXME: Gives Insecure dependency in require while running with -T switch in Module/Runtime.pm
+# use Taint::Runtime qw($TAINT taint_env);
+use POSIX qw(strftime);
 use autodie qw(:all);
 
 # use lib '/usr/lib';	# This needs to point to the Geo::Coder::Free directory lives,
@@ -46,24 +48,31 @@ use lib '../lib';
 use Geo::Coder::Free;
 use Geo::Coder::Free::Config;
 
-$TAINT = 1;
-taint_env();
+# $TAINT = 1;
+# taint_env();
+
+my $info = CGI::Info->new();
+my @suffixlist = ('.pl', '.fcgi');
+my $script_name = basename($info->script_name(), @suffixlist);
+my $tmpdir = $info->tmpdir();
+
+if($ENV{'HTTP_USER_AGENT'}) {
+	# open STDERR, ">&STDOUT";
+	close STDERR;
+	open(STDERR, '>>', File::Spec->catfile($tmpdir, "$script_name.stderr"));
+}
 
 Log::WarnDie->filter(\&filter);
 
-my $info = CGI::Info->new();
-my $tmpdir = $info->tmpdir();
-my $script_dir = $info->script_dir();
-
-my @suffixlist = ('.pl', '.fcgi');
-my $script_name = basename($info->script_name(), @suffixlist);
+my $vwflog = File::Spec->catfile($info->logdir(), 'vwf.log');
 
 my $infocache;
 my $linguacache;
 my $buffercache;
 my $geocoder;
 
-Log::Log4perl->init("$script_dir/../conf/$script_name.l4pconf");
+my $script_dir = $info->script_dir();
+Log::Log4perl::init("$script_dir/../conf/$script_name.l4pconf");
 my $logger = Log::Log4perl->get_logger($script_name);
 Log::WarnDie->dispatcher($logger);
 
@@ -84,22 +93,18 @@ Database::Abstraction::init({ directory => $database_dir, logger => $logger });
 my $openaddresses = Geo::Coder::Free::DB::openaddresses->new(openaddr => $config->OPENADDR_HOME());
 if($@) {
 	$logger->error($@);
+	Log::WarnDie->dispatcher(undef);
 	die $@;
 }
-
-# open STDERR, ">&STDOUT";
-close STDERR;
-open(STDERR, '>>', "$tmpdir/$script_name.stderr");
 
 # http://www.fastcgi.com/docs/faq.html#PerlSignals
 my $requestcount = 0;
 my $handling_request = 0;
 my $exit_requested = 0;
 
-my @blacklist_country_list = (
-	'RU', 'CN',
-);
-my $acl = CGI::ACL->new()->deny_country(country => \@blacklist_country_list)->allow_ip('131.161.0.0/16');
+# CHI->stats->enable();
+
+my $acl = CGI::ACL->new()->deny_country(country => ['RU', 'CN'])->allow_ip('131.161.0.0/16')->allow_ip('127.0.0.1');
 
 sub sig_handler {
 	$exit_requested = 1;
@@ -118,6 +123,9 @@ sub sig_handler {
 $SIG{USR1} = \&sig_handler;
 $SIG{TERM} = \&sig_handler;
 $SIG{PIPE} = 'IGNORE';
+$ENV{'PATH'} = '/usr/local/bin:/bin:/usr/bin';	# For insecurity
+
+$SIG{__WARN__} = sub { Log::WarnDie->dispatcher(undef); die @_ };
 
 my $request = FCGI::Request();
 
@@ -137,15 +145,15 @@ while($handling_request = ($request->Accept() >= 0)) {
 		Log::Any::Adapter->set('Stdout', log_level => 'trace');
 		$logger = Log::Any->get_logger(category => $script_name);
 		Log::WarnDie->dispatcher($logger);
-		# print Data::Dumper->new([\$openaddresses])->Dump();
 		$openaddresses->set_logger($logger);
 		$info->set_logger($logger);
 		$Error::Debug = 1;
+		# CHI->stats->enable();
 		try {
 			doit(debug => 1);
 		} catch Error with {
 			my $msg = shift;
-			warn "$msg\n", $msg->stacktrace;
+			warn "$msg\n", $msg->stacktrace();
 			$logger->error($msg);
 		};
 		last;
@@ -158,11 +166,16 @@ while($handling_request = ($request->Accept() >= 0)) {
 	$openaddresses->set_logger($logger);
 	$info->set_logger($logger);
 
+	my $start = [Time::HiRes::gettimeofday()];
+
 	try {
 		doit(debug => 0);
+		my $timetaken = Time::HiRes::tv_interval($start);
+
+		$logger->info("$script_name completed in $timetaken seconds");
 	} catch Error with {
 		my $msg = shift;
-		$logger->error($msg);
+		$logger->error("$msg: ", $msg->stacktrace());
 		if($buffercache) {
 			$buffercache->clear();
 			$buffercache = undef;
@@ -195,7 +208,7 @@ sub doit
 
 	$logger->debug('In doit - domain is ', $info->domain_name());
 
-	my %args = (ref($_[0]) eq 'HASH') ? %{$_[0]} : @_;
+	my %params = (ref($_[0]) eq 'HASH') ? %{$_[0]} : @_;
 	$infocache ||= create_memory_cache(config => $config, logger => $logger, namespace => 'CGI::Info');
 
 	my $options = {
@@ -224,11 +237,23 @@ sub doit
 		cache => $linguacache,
 		info => $info,
 		logger => $logger,
-		debug => $args{'debug'},
+		debug => $params{'debug'},
 		syslog => $syslog,
 	});
 
-	if($ENV{'REMOTE_ADDR'} && ($acl->all_denied(lingua => $lingua))) {
+	if($vwflog && open(my $fout, '>>', $vwflog)) {
+		print $fout
+			'"', $info->domain_name(), '",',
+			'"', strftime('%F %T', localtime), '",',
+			'"', ($ENV{REMOTE_ADDR} ? $ENV{REMOTE_ADDR} : ''), '",',
+			'"', $lingua->country(), '",',
+			'"', $info->browser_type(), '",',
+			'"', $lingua->language(), '",',
+			'"', $info->as_string(), "\"\n";
+		close($fout);
+	}
+
+	if($ENV{'REMOTE_ADDR'} && $acl->all_denied(lingua => $lingua)) {
 		print "Status: 403 Forbidden\n",
 			"Content-type: text/plain\n",
 			"Pragma: no-cache\n\n";
@@ -236,18 +261,18 @@ sub doit
 		unless($ENV{'REQUEST_METHOD'} && ($ENV{'REQUEST_METHOD'} eq 'HEAD')) {
 			print "Access Denied\n";
 		}
-		# $logger->info($ENV{'REMOTE_ADDR'} . ': access denied');
-		$logger->warn($ENV{'REMOTE_ADDR'}, ': access denied');
+		$logger->info($ENV{'REMOTE_ADDR'}, ': access denied');
 		return;
 	}
 
 	my $args = {
 		info => $info,
 		optimise_content => 1,
-		lint_content => $info->param('lint_content') // $args{'debug'},
 		logger => $logger,
+		lint_content => $info->param('lint_content') // $params{'debug'},
 		lingua => $lingua
 	};
+
 	if(!$info->is_search_engine() && $config->root_dir() && ((!defined($info->param('action'))) || ($info->param('action') ne 'send'))) {
 		$args->{'save_to'} = {
 			directory => File::Spec->catfile($config->root_dir(), 'save_to'),
@@ -258,13 +283,14 @@ sub doit
 
 	my $fb = FCGI::Buffer->new()->init($args);
 
-	my $cachedir = $args{'cachedir'} || $config->{disc_cache}->{root_dir} || "$tmpdir/cache";
+	my $cachedir = $params{'cachedir'} || $config->{disc_cache}->{root_dir} || File::Spec->catfile($tmpdir, 'cache');
+
 	if($fb->can_cache()) {
 		$buffercache ||= create_disc_cache(config => $config, logger => $logger, namespace => $script_name, root_dir => $cachedir);
 		$fb->init(
 			cache => $buffercache,
 			# generate_304 => 0,
-			cache_age => '1 day',
+			cache_duration => '1 day',
 		);
 		if($fb->is_cached()) {
 			return;
@@ -285,6 +311,7 @@ sub doit
 		lingua => $lingua,
 		config => $config,
 	};
+
 	eval {
 		my $page = $info->param('page');
 		$page =~ s/#.*$//;
@@ -329,6 +356,7 @@ sub doit
 				print "I don't know what you want me to display.\n";
 			}
 		} elsif($error =~ /Can\'t locate .* in \@INC/) {
+			$logger->error($error);
 			print "Status: 500 Internal Server Error\n",
 				"Content-type: text/plain\n",
 				"Pragma: no-cache\n\n";
@@ -344,7 +372,7 @@ sub doit
 				"Pragma: no-cache\n\n";
 
 			unless($ENV{'REQUEST_METHOD'} && ($ENV{'REQUEST_METHOD'} eq 'HEAD')) {
-				print $error;
+				print "Access Denied\n";
 			}
 		}
 		throw Error::Simple($error ? $error : $info->as_string());
@@ -355,7 +383,17 @@ sub choose
 {
 	$logger->info('Called with no page to display');
 
-	return unless($info->status() == 200);
+	my $status = $info->status();
+
+	if($status != 200) {
+		require HTTP::Status;
+		HTTP::Status->import();
+
+		print "Status: $status ",
+			HTTP::Status::status_message($status),
+			"\n\n";
+		return;
+	}
 
 	print "Status: 300 Multiple Choices\n",
 		"Content-type: text/plain\n";

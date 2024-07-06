@@ -46,6 +46,7 @@ sub _parse_nacional {
     foreach my $arg (@args) {
         my $tipo = $arg->{tipo} eq 'caixa'    ? 2
                  : $arg->{tipo} eq 'envelope' ? 1
+                 : $arg->{tipo} eq 'carta'    ? 1
                  : $arg->{tipo} eq 'rolo'     ? 3
                  : $arg->{tipo};
 
@@ -70,15 +71,17 @@ sub _parse_nacional {
                 tpObjeto     => $tipo,
                 ($arg->{data} ? (dtEvento => $arg->{data}) : ()),
             };
-            if ($arg->{valor_declarado}) {
-                $params->{vlDeclarado} = $arg->{valor_declarado};
-                my $vd = $servico eq '03220' ? '019'
-                       : $servico eq '03298' ? '064'
-                       : '019';
-                push @{$params->{servicosAdicionais}}, { coServAdicional => $vd };
-            }
-            if ($arg->{aviso_recebimento}) {
-                push @{$params->{servicosAdicionais}}, { coServAdicional => '001' };
+            if ($servico ne '04227') { # "mini envios" nao pode ter valor declarado
+                if ($arg->{valor_declarado}) {
+                    $params->{vlDeclarado} = $arg->{valor_declarado};
+                    my $vd = $servico eq '03220' ? '019'
+                        : $servico eq '03298' ? '064'
+                        : '019';
+                    push @{$params->{servicosAdicionais}}, { coServAdicional => $vd };
+                }
+                if ($arg->{aviso_recebimento}) {
+                    push @{$params->{servicosAdicionais}}, { coServAdicional => '001' };
+                }
             }
             push @{$req{parametrosProduto}}, $params;
         }

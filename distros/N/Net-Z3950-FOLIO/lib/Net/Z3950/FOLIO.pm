@@ -8,6 +8,7 @@ use Cpanel::JSON::XS qw(decode_json encode_json);
 use Net::Z3950::SimpleServer;
 use ZOOM; # For ZOOM::Exception
 use LWP::UserAgent;
+use HTTP::Cookies;
 use MARC::Record;
 use MARC::File::XML (BinaryEncoding => 'utf8', RecordFormat => 'USMARC');
 use Data::Dumper; $Data::Dumper::Indent = 1;
@@ -17,7 +18,7 @@ use Net::Z3950::FOLIO::OPACXMLRecord qw(makeOPACXMLRecord);
 use Net::Z3950::FOLIO::RPN;;
 
 
-our $VERSION = 'v3.3.5';
+our $VERSION = 'v4.0.0';
 
 
 sub FORMAT_USMARC { '1.2.840.10003.5.10' }
@@ -68,11 +69,9 @@ sub new {
 
     my $this = bless {
 	cfgbase => $cfgbase || 'config',
-	ua => new LWP::UserAgent(),
 	sessions => {}, # Maps database name to session object
     }, $class;
 
-    $this->{ua}->agent("z2folio $VERSION");
     $this->{server} = Net::Z3950::SimpleServer->new(
 	GHANDLE => $this,
 	INIT =>    \&_init_handler_wrapper,
@@ -158,6 +157,7 @@ sub _search_handler {
 
     my $session = $ghandle->getSession($base);
     $args->{HANDLE} = $session;
+    $session->maybeRefreshToken();
 
     if ($args->{CQL}) {
 	$session->{cql} = $args->{CQL};
@@ -175,6 +175,7 @@ sub _search_handler {
 sub _fetch_handler {
     my($args) = @_;
     my $session = $args->{HANDLE};
+    $session->maybeRefreshToken();
 
     my $rs = $session->{resultsets}->{$args->{SETNAME}};
     _throw(30, $args->{SETNAME}) if !$rs; # Result set does not exist
@@ -238,6 +239,7 @@ sub _fetch_handler {
 sub _delete_handler {
     my($args) = @_;
     my $session = $args->{HANDLE};
+    $session->maybeRefreshToken();
 
     my $setname = $args->{SETNAME};
     if ($session->{resultsets}->{$setname}) {
@@ -252,8 +254,8 @@ sub _delete_handler {
 
 sub _sort_handler {
     my($args) = @_;
-    my $ghandle = $args->{GHANDLE};
     my $session = $args->{HANDLE};
+    $session->maybeRefreshToken();
 
     my $setnames = $args->{INPUT};
     _throw(230, '1') if @$setnames > 1; # Sort: too many input results

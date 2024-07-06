@@ -1,5 +1,5 @@
 package Whelk::Schema::Definition::String;
-$Whelk::Schema::Definition::String::VERSION = '0.03';
+$Whelk::Schema::Definition::String::VERSION = '0.04';
 use Whelk::StrictBase 'Whelk::Schema::Definition::_Scalar';
 
 sub openapi_dump
@@ -15,11 +15,11 @@ sub openapi_dump
 	}
 
 	if ($self->has_default) {
-		$res->{default} = $self->exhale;
+		$res->{default} = $self->inhale_exhale;
 	}
 
 	if (defined $self->example) {
-		$res->{example} = $self->example;
+		$res->{example} = $self->inhale_exhale($self->example);
 	}
 
 	return $res;

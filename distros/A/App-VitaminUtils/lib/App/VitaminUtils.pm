@@ -7,19 +7,31 @@ use warnings;
 use Capture::Tiny 'capture_stderr';
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-09-14'; # DATE
+our $DATE = '2024-07-06'; # DATE
 our $DIST = 'App-VitaminUtils'; # DIST
-our $VERSION = '0.006'; # VERSION
+our $VERSION = '0.007'; # VERSION
 
 our %SPEC;
 
-our %args_common = (
+our %argspec_quantity_default1mg = (
     quantity => {
         # schema => 'physical::mass*', # XXX Perinci::Sub::GetArgs::Argv is not smart enough to coerce from string
         schema => 'str*',
-        req => 1,
+        default => '1 mg',
         pos => 0,
     },
+);
+
+our %argspec_quantity_default1mcg = (
+    quantity => {
+        # schema => 'physical::mass*', # XXX Perinci::Sub::GetArgs::Argv is not smart enough to coerce from string
+        schema => 'str*',
+        default => '1 mcg',
+        pos => 0,
+    },
+);
+
+our %argspecs_common = (
     to_unit => {
         # schema => 'physical::unit', # IU hasn't been added
         schema => 'str*',
@@ -30,16 +42,17 @@ our %args_common = (
 $SPEC{convert_vitamin_a_unit} = {
     v => 1.1,
     summary => 'Convert a vitamin A quantity from one unit to another',
-    description => <<'_',
+    description => <<'MARKDOWN',
 
 If target unit is not specified, will show all known conversions.
 
-_
+MARKDOWN
     args => {
-        %args_common,
+        %argspecs_common,
+        %argspec_quantity_default1mcg,
     },
     examples => [
-        {args=>{quantity=>'mcg'}, summary=>'Show all possible conversions'},
+        {args=>{}, summary=>'Show all possible conversions'},
         {args=>{quantity=>'1500 mcg', to_unit=>'IU'}, summary=>'Convert from mcg to IU (retinol)'},
         {args=>{quantity=>'1500 mcg', to_unit=>'IU-retinol'}, summary=>'Convert from mcg to IU (retinol)'},
         {args=>{quantity=>'1500 mcg', to_unit=>'IU-beta-carotene'}, summary=>'Convert from mcg to IU (beta-carotene)'},
@@ -98,16 +111,17 @@ sub convert_vitamin_a_unit {
 $SPEC{convert_vitamin_b5_unit} = {
     v => 1.1,
     summary => 'Convert a vitamin B5 (pantothenic acid) quantity from one unit to another',
-    description => <<'_',
+    description => <<'MARKDOWN',
 
 If target unit is not specified, will show all known conversions.
 
-_
+MARKDOWN
     args => {
-        %args_common,
+        %argspecs_common,
+        %argspec_quantity_default1mg,
     },
     examples => [
-        {args=>{quantity=>'mg'}, summary=>'Show all possible conversions'},
+        {args=>{}, summary=>'Show all possible conversions'},
     ],
 };
 sub convert_vitamin_b5_unit {
@@ -144,16 +158,17 @@ sub convert_vitamin_b5_unit {
 $SPEC{convert_vitamin_b6_unit} = {
     v => 1.1,
     summary => 'Convert a vitamin B6 (pyridoxine) quantity from one unit to another',
-    description => <<'_',
+    description => <<'MARKDOWN',
 
 If target unit is not specified, will show all known conversions.
 
-_
+MARKDOWN
     args => {
-        %args_common,
+        %argspecs_common,
+        %argspec_quantity_default1mg,
     },
     examples => [
-        {args=>{quantity=>'mg'}, summary=>'Show all possible conversions'},
+        {args=>{}, summary=>'Show all possible conversions'},
     ],
 };
 sub convert_vitamin_b6_unit {
@@ -190,16 +205,17 @@ sub convert_vitamin_b6_unit {
 $SPEC{convert_vitamin_b12_unit} = {
     v => 1.1,
     summary => 'Convert a vitamin B12 (cobalamin) quantity from one unit to another',
-    description => <<'_',
+    description => <<'MARKDOWN',
 
 If target unit is not specified, will show all known conversions.
 
-_
+MARKDOWN
     args => {
-        %args_common,
+        %argspecs_common,
+        %argspec_quantity_default1mcg,
     },
     examples => [
-        {args=>{quantity=>'mcg'}, summary=>'Show all possible conversions'},
+        {args=>{}, summary=>'Show all possible conversions'},
     ],
 };
 sub convert_vitamin_b12_unit {
@@ -238,16 +254,17 @@ sub convert_vitamin_b12_unit {
 $SPEC{convert_choline_unit} = {
     v => 1.1,
     summary => 'Convert a choline quantity from one unit to another',
-    description => <<'_',
+    description => <<'MARKDOWN',
 
 If target unit is not specified, will show all known conversions.
 
-_
+MARKDOWN
     args => {
-        %args_common,
+        %argspecs_common,
+        %argspec_quantity_default1mcg,
     },
     examples => [
-        {args=>{quantity=>'mcg'}, summary=>'Show all possible conversions'},
+        {args=>{}, summary=>'Show all possible conversions'},
     ],
 };
 sub convert_choline_unit {
@@ -286,16 +303,17 @@ sub convert_choline_unit {
 $SPEC{convert_vitamin_d_unit} = {
     v => 1.1,
     summary => 'Convert a vitamin D quantity from one unit to another',
-    description => <<'_',
+    description => <<'MARKDOWN',
 
 If target unit is not specified, will show all known conversions.
 
-_
+MARKDOWN
     args => {
-        %args_common,
+        %argspecs_common,
+        %argspec_quantity_default1mcg,
     },
     examples => [
-        {args=>{quantity=>'mcg'}, summary=>'Show all possible conversions'},
+        {args=>{}, summary=>'Show all possible conversions'},
         {args=>{quantity=>'2 mcg', to_unit=>'IU'}, summary=>'Convert from mcg to IU'},
         {args=>{quantity=>'5000 IU', to_unit=>'mg'}, summary=>'Convert from IU to mg'},
     ],
@@ -333,16 +351,17 @@ sub convert_vitamin_d_unit {
 $SPEC{convert_vitamin_e_unit} = {
     v => 1.1,
     summary => 'Convert a vitamin E quantity from one unit to another',
-    description => <<'_',
+    description => <<'MARKDOWN',
 
 If target unit is not specified, will show all known conversions.
 
-_
+MARKDOWN
     args => {
-        %args_common,
+        %argspecs_common,
+        %argspec_quantity_default1mg,
     },
     examples => [
-        {args=>{quantity=>'mg'}, summary=>'Show all possible conversions'},
+        {args=>{}, summary=>'Show all possible conversions'},
         {args=>{quantity=>'67 mg', to_unit=>'IU'}, summary=>'Convert from mg to IU (d-alpha-tocopherol/natural vitamin E)'},
         {args=>{quantity=>'67 mg', to_unit=>'IU-natural'}, summary=>'Convert from mg to IU (d-alpha-tocopherol/natural vitamin E)'},
         {args=>{quantity=>'90 mg', to_unit=>'IU-synthetic'}, summary=>'Convert from mg to IU (dl-alpha-tocopherol/synthetic vitamin E)'},
@@ -420,7 +439,7 @@ App::VitaminUtils - Utilities related to vitamins
 
 =head1 VERSION
 
-This document describes version 0.006 of App::VitaminUtils (from Perl distribution App-VitaminUtils), released on 2022-09-14.
+This document describes version 0.007 of App::VitaminUtils (from Perl distribution App-VitaminUtils), released on 2024-07-06.
 
 =head1 DESCRIPTION
 
@@ -428,25 +447,25 @@ This distributions provides the following command-line utilities:
 
 =over
 
-=item * L<convert-choline-unit>
+=item 1. L<convert-choline-unit>
 
-=item * L<convert-cobalamin-unit>
+=item 2. L<convert-cobalamin-unit>
 
-=item * L<convert-pantothenic-acid-unit>
+=item 3. L<convert-pantothenic-acid-unit>
 
-=item * L<convert-pyridoxine-unit>
+=item 4. L<convert-pyridoxine-unit>
 
-=item * L<convert-vitamin-a-unit>
+=item 5. L<convert-vitamin-a-unit>
 
-=item * L<convert-vitamin-b12-unit>
+=item 6. L<convert-vitamin-b12-unit>
 
-=item * L<convert-vitamin-b5-unit>
+=item 7. L<convert-vitamin-b5-unit>
 
-=item * L<convert-vitamin-b6-unit>
+=item 8. L<convert-vitamin-b6-unit>
 
-=item * L<convert-vitamin-d-unit>
+=item 9. L<convert-vitamin-d-unit>
 
-=item * L<convert-vitamin-e-unit>
+=item 10. L<convert-vitamin-e-unit>
 
 =back
 
@@ -467,7 +486,7 @@ Examples:
 
 =item * Show all possible conversions:
 
- convert_choline_unit(quantity => "mcg");
+ convert_choline_unit();
 
 Result:
 
@@ -493,9 +512,13 @@ Arguments ('*' denotes required arguments):
 
 =over 4
 
-=item * B<quantity>* => I<str>
+=item * B<quantity> => I<str> (default: "1 mcg")
+
+(No description)
 
 =item * B<to_unit> => I<str>
+
+(No description)
 
 
 =back
@@ -527,7 +550,7 @@ Examples:
 
 =item * Show all possible conversions:
 
- convert_vitamin_a_unit(quantity => "mcg");
+ convert_vitamin_a_unit();
 
 Result:
 
@@ -590,9 +613,13 @@ Arguments ('*' denotes required arguments):
 
 =over 4
 
-=item * B<quantity>* => I<str>
+=item * B<quantity> => I<str> (default: "1 mcg")
+
+(No description)
 
 =item * B<to_unit> => I<str>
+
+(No description)
 
 
 =back
@@ -624,7 +651,7 @@ Examples:
 
 =item * Show all possible conversions:
 
- convert_vitamin_b12_unit(quantity => "mcg");
+ convert_vitamin_b12_unit();
 
 Result:
 
@@ -650,9 +677,13 @@ Arguments ('*' denotes required arguments):
 
 =over 4
 
-=item * B<quantity>* => I<str>
+=item * B<quantity> => I<str> (default: "1 mcg")
+
+(No description)
 
 =item * B<to_unit> => I<str>
+
+(No description)
 
 
 =back
@@ -684,7 +715,7 @@ Examples:
 
 =item * Show all possible conversions:
 
- convert_vitamin_b5_unit(quantity => "mg");
+ convert_vitamin_b5_unit();
 
 Result:
 
@@ -709,9 +740,13 @@ Arguments ('*' denotes required arguments):
 
 =over 4
 
-=item * B<quantity>* => I<str>
+=item * B<quantity> => I<str> (default: "1 mg")
+
+(No description)
 
 =item * B<to_unit> => I<str>
+
+(No description)
 
 
 =back
@@ -743,7 +778,7 @@ Examples:
 
 =item * Show all possible conversions:
 
- convert_vitamin_b6_unit(quantity => "mg");
+ convert_vitamin_b6_unit();
 
 Result:
 
@@ -768,9 +803,13 @@ Arguments ('*' denotes required arguments):
 
 =over 4
 
-=item * B<quantity>* => I<str>
+=item * B<quantity> => I<str> (default: "1 mg")
+
+(No description)
 
 =item * B<to_unit> => I<str>
+
+(No description)
 
 
 =back
@@ -802,7 +841,7 @@ Examples:
 
 =item * Show all possible conversions:
 
- convert_vitamin_d_unit(quantity => "mcg");
+ convert_vitamin_d_unit();
 
 Result:
 
@@ -835,9 +874,13 @@ Arguments ('*' denotes required arguments):
 
 =over 4
 
-=item * B<quantity>* => I<str>
+=item * B<quantity> => I<str> (default: "1 mcg")
+
+(No description)
 
 =item * B<to_unit> => I<str>
+
+(No description)
 
 
 =back
@@ -869,7 +912,7 @@ Examples:
 
 =item * Show all possible conversions:
 
- convert_vitamin_e_unit(quantity => "mg");
+ convert_vitamin_e_unit();
 
 Result:
 
@@ -922,9 +965,13 @@ Arguments ('*' denotes required arguments):
 
 =over 4
 
-=item * B<quantity>* => I<str>
+=item * B<quantity> => I<str> (default: "1 mg")
+
+(No description)
 
 =item * B<to_unit> => I<str>
+
+(No description)
 
 
 =back
@@ -982,7 +1029,7 @@ that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2022, 2021, 2020 by perlancar <perlancar@cpan.org>.
+This software is copyright (c) 2024, 2022, 2021, 2020 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

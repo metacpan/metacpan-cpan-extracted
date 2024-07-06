@@ -1,6 +1,25 @@
 Revision history for Dancer2-Plugin-Minion
 
-0.3.3     2020-12-20 11:04:25-05:00 America/New_York
+1.0.0     2024-07-05 23:46:17-04:00 America/New_York
+
+* Fix broken POD (Julien Fiegehenn)
+* Remove garbage file from repo (Julien Fiegehenn)
+* Numerous packaging cleanups
+* Improved README and documentation
+
+0.3.3     2020-12-18 16:38:54-05:00 America/New_York
+
+* Set minimum Perl version to 5.16 to make Minion happy
+* Make sure dependencies are correct
+* Pass correct arguments to test task
+* Make tests less spammy
+
+0.3.2     2020-12-18 16:37:39-05:00 America/New_York
+
+* Default to in-memory SQLite DB
+* Fix documentation errors
+
+0.3.1     2020-12-15 16:45:07-05:00 America/New_York
 
 * Add minion_app keyword (Joel Berger) (for real this time)
 

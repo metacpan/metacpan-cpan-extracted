@@ -1,5 +1,5 @@
 package Whelk::Schema::Definition::Integer;
-$Whelk::Schema::Definition::Integer::VERSION = '0.03';
+$Whelk::Schema::Definition::Integer::VERSION = '0.04';
 use Whelk::StrictBase 'Whelk::Schema::Definition::Number';
 
 sub openapi_dump
@@ -15,11 +15,11 @@ sub openapi_dump
 	}
 
 	if ($self->has_default) {
-		$res->{default} = $self->exhale;
+		$res->{default} = $self->inhale_exhale;
 	}
 
 	if (defined $self->example) {
-		$res->{example} = $self->example;
+		$res->{example} = $self->inhale_exhale($self->example);
 	}
 
 	return $res;

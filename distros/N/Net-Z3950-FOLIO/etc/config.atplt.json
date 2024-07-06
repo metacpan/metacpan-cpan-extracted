@@ -1,0 +1,7 @@
+{
+  "fieldDefinitions": {
+    "circulation": {
+      "availableThru": "permanentLoanType"
+    }
+  }
+}

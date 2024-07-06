@@ -1,6 +1,16 @@
 # Revision history for Perl extension Net::Z3950::FOLIO.
 
-## [3.3.5](https://github.com/folio-org/Net-Z3950-FOLIO/tree/v3.3.5) (IN PROGRESS)
+## 4.0.0 (Thu  4 Jul 17:34:07 BST 2024)
+
+* **Breaking change**: uses new-style FOLIO authentication with expiring-and-refreshing tokens instead of old-style authentication, which is deprecated. This version of the Z39.50 server is fine to use with any FOLIO back-end based on release Poppy or later; prior versions (v3.4.0 and earlier) **will no longer work** with FOLIO back-ends based on release Ramsons or later. Fixes ZF-91.
+
+## 3.4.0 (Fri  9 Feb 2024 16:47:17 GMT)
+
+* Make source of availableThru value in OPAC record configurable. Fixes ZF-90.
+* Add support for stripping ligatures and modifier letters to stripDiacritics. Fixes ZF-92.
+* Include holdings "holdings statement" data in OPAC and OPACXML records. Fixes ZF-84.
+
+## [3.3.5](https://github.com/folio-org/Net-Z3950-FOLIO/tree/v3.3.5)(Tue Oct 20 19:52:37 EDT 2023)
 
 * `Dockerfile` specifies versions of Debian and Perl.
 
@@ -177,5 +187,5 @@
 
 ## To do
 
-* Determine FOLIO tenant from database name, and postpone initialisation and authentication until we know that (ZF-2).
 * Automatic generation of MARC records (ZF-14). Thi will need a non-trivial version of `etc/folio2marcxml.xsl` (ZF-8).
+

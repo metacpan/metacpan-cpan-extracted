@@ -40,10 +40,9 @@ my %WriteMakefileArgs = (
     "vars" => 0
   },
   "TEST_REQUIRES" => {
-    "Devel::Confess" => 0,
-    "Test" => 0
+    "Test::More" => 0
   },
-  "VERSION" => "0.04",
+  "VERSION" => "0.05",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -52,7 +51,6 @@ my %WriteMakefileArgs = (
 
 my %FallbackPrereqs = (
   "Carp" => 0,
-  "Devel::Confess" => 0,
   "Digest::SHA" => 0,
   "Encode" => 0,
   "Exporter" => 0,
@@ -66,7 +64,7 @@ my %FallbackPrereqs = (
   "LWP::UserAgent" => 0,
   "List::Util" => 0,
   "POSIX" => 0,
-  "Test" => 0,
+  "Test::More" => 0,
   "Text::CSV_XS" => 0,
   "XML::LibXML" => 0,
   "YAML::XS" => 0,

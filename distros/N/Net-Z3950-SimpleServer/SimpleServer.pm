@@ -1,5 +1,5 @@
 ## This file is part of simpleserver
-## Copyright (C) 2000-2016 Index Data.
+## Copyright (C) 2000-2017 Index Data.
 ## All rights reserved.
 ## Redistribution and use in source and binary forms, with or without
 ## modification, are permitted provided that the following conditions are met:
@@ -36,7 +36,7 @@ require AutoLoader;
 
 @ISA = qw(Exporter AutoLoader DynaLoader);
 @EXPORT = qw( );
-$VERSION = '1.21';
+$VERSION = '1.27';
 
 bootstrap Net::Z3950::SimpleServer $VERSION;
 
@@ -98,6 +98,9 @@ sub launch_server {
 	}
 	if (defined($self->{START})) {
 		set_start_handler($self->{START});
+	}
+	if (defined($self->{ESREQUEST})) {
+		set_esrequest_handler($self->{ESREQUEST});
 	}
 	start_server(@args);
 }
@@ -178,9 +181,11 @@ package Net::Z3950::SimpleServer;
 __END__
 # Below is the stub of documentation for your module. You better edit it!
 
+=encoding utf8
+
 =head1 NAME
 
-Net::Z3950::SimpleServer - Simple Perl API for building Z39.50 servers. 
+Net::Z3950::SimpleServer - Simple Perl API for building Z39.50 servers.
 
 =head1 SYNOPSIS
 
@@ -216,10 +221,10 @@ Net::Z3950::SimpleServer - Simple Perl API for building Z39.50 servers.
 
   ## Register custom event handlers:
   my $z = new Net::Z3950::SimpleServer(GHANDLE = $someObject,
-				       INIT   =>  \&my_init_handler,
-				       CLOSE  =>  \&my_close_handler,
-				       SEARCH =>  \&my_search_handler,
-				       FETCH  =>  \&my_fetch_handler);
+				       INIT   =>  "main::my_init_handler",
+				       CLOSE  =>  "main::my_close_handler",
+				       SEARCH =>  "main::my_search_handler",
+				       FETCH  =>  "main::my_fetch_handler");
 
   ## Launch server:
   $z->launch_server("ztest.pl", @ARGV);
@@ -255,7 +260,7 @@ of events:
   - Search request
   - Present request
   - Fetching of records
-  - Scan request (browsing) 
+  - Scan request (browsing)
   - Closing down connection
 
 Note that only the Search and Fetch handler functions are required.
@@ -273,36 +278,22 @@ The Perl programmer specifies the event handlers for the server by
 means of the SimpleServer object constructor
 
   my $z = new Net::Z3950::SimpleServer(
-                        START   =>      \&my_start_handler,
-			INIT	=>	\&my_init_handler,
-			CLOSE	=>	\&my_close_handler,
-			SEARCH	=>	\&my_search_handler,
-			PRESENT	=>	\&my_present_handler,
-			SCAN	=>	\&my_scan_handler,
-			FETCH	=>	\&my_fetch_handler,
-  			EXPLAIN =>	\&my_explain_handler,
-  			DELETE  =>	\&my_delete_handler,
-  			SORT    =>	\&my_sort_handler);
+                        START   =>      "main::my_start_handler",
+			INIT	=>	"main::my_init_handler",
+			CLOSE	=>	"main::my_close_handler",
+			SEARCH	=>	"main::my_search_handler",
+			PRESENT	=>	"main::my_present_handler",
+			SCAN	=>	"main::my_scan_handler",
+			FETCH	=>	"main::my_fetch_handler",
+			EXPLAIN =>	"main::my_explain_handler",
+			DELETE  =>	"main::my_delete_handler",
+			ESREQUEST =>    "main::my_esrequest_handler",
+			SORT    =>	"main::my_sort_handler");
 
 In addition, the arguments to the constructor may include GHANDLE, a
 global handle which is made available to each invocation of every
 callback function.  This is typically a reference to either a hash or
-an object.
-
-If you want your SimpleServer to start a thread (threaded mode) to
-handle each incoming Z39.50 request instead of forking a process
-(forking mode), you need to register the handlers by symbol rather
-than by code reference. Thus, in threaded mode, you will need to
-register your handlers this way:
-
-  my $z = new Net::Z3950::SimpleServer(
-  			INIT	=>	"my_package::my_init_handler",
-			CLOSE	=>	"my_package::my_close_handler",
-			....
-			....          );
-
-where my_package is the Perl package in which your handler is
-located.
+an object. (replace main with your package, if not main).
 
 After the custom event handlers are declared, the server is launched
 by means of the method
@@ -358,6 +349,8 @@ The argument hash passed to the init handler has the form
 	     			    ## this member contains user name
 	     PASS      =>  "yyy"    ## Under same conditions, this member
 	     			    ## contains the password in clear text
+	     GROUP     =>  "zzz"    ## Under same conditions, this member
+				    ## contains the group in clear text
 	     GHANDLE   =>  $obj     ## Global handle specified at creation
 	     HANDLE    =>  undef    ## Handler of Perl data structure
 	  };
@@ -428,7 +421,7 @@ The QUERY parameter presented this tree to the search function in the
 Prefix Query Format (PQF) which is used in many applications based on
 the YAZ toolkit. The full grammar is described in the YAZ manual.
 
-The following are all examples of valid queries in the PQF. 
+The following are all examples of valid queries in the PQF.
 
 	dylan
 
@@ -779,6 +772,7 @@ The information exchanged between client and present handle is:
 	     SETNAME   =>  "id",    ## Result set ID
 	     START     =>  xxx,     ## Start position
 	     COMP      =>  "",	    ## Desired record composition
+	     SCHEMA_OID => "",      ## Z39.50 schema (OID), if any
 	     NUMBER    =>  yyy,	    ## Number of requested records
 
 
@@ -807,7 +801,8 @@ The parameters exchanged between the server and the fetch handler are:
 	     OFFSET    =>  nnn      ## Record offset number
 	     REQ_FORM  =>  "n.m.k.l"## Client requested format OID
 	     COMP      =>  "xyz"    ## Formatting instructions
-	     SCHEMA    =>  "abc"    ## Requested schema, if any
+	     SCHEMA_OID => "",      ## Z39.50 schema (OID), if any
+	     SCHEMA    =>  "abc"    ## Requested schema (string), if any
 
 				    ## Handler response:
 
@@ -856,6 +851,7 @@ an index of a book, you always find something! The parameters exchanged are:
 						## bases to search
 		TERM		=> 'start',	## The start term
 		RPN		=>  $obj,       ## Reference to a Net::Z3950::RPN::Term
+		attributeSet	=> OID,		## OID String (optional)
 
 		NUMBER		=> xx,		## Number of requested terms
 		POS		=> yy,		## Position of starting point
@@ -959,7 +955,7 @@ be deleted.  In either case, the callback function should report on
 success or failure by setting the STATUS element either to zero, on
 success, or to an integer from 1 to 10, to indicate one of the ten
 possible failure codes described in section 3.2.4.1.4 of the Z39.50
-standard -- see 
+standard -- see
 http://www.loc.gov/z3950/agency/markup/05.html#Delete-list-statuses1
 
 =head2 Sort handler
@@ -1102,12 +1098,12 @@ http://search.cpan.org/~esummers/CQL-Parser/
 =head1 AUTHORS
 
 Anders Sønderberg (sondberg@indexdata.dk),
-Sebastian Hammer (quinn@indexdata.dk),
+Sebastian Hammer (quinn@indexdata.com),
 Mike Taylor (indexdata.com).
 
 =head1 COPYRIGHT AND LICENCE
 
-Copyright (C) 2000-2016 by Index Data.
+Copyright (C) 2000-2017 by Index Data.
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself, either Perl version 5.8.4 or,

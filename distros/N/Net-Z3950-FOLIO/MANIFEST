@@ -27,6 +27,7 @@ doc/release-procedure.md
 doc/source-code-overview.md
 doc/srs/using-srs.md
 etc/config.able.json
+etc/config.atplt.json
 etc/config.bugfest_nolana.json
 etc/config.bugfest_orchid.json
 etc/config.chicago.json
@@ -61,6 +62,7 @@ lib/Net/Z3950/FOLIO/RPN.pm
 lib/Net/Z3950/FOLIO/Record.pm
 lib/Net/Z3950/FOLIO/ResultSet.pm
 lib/Net/Z3950/FOLIO/Session.pm
+lib/Net/Z3950/FOLIO/lodashGet.pm
 t/01-pqf-to-cql.t
 t/02-sortspec.t
 t/03-folio-to-opac.t
@@ -69,7 +71,9 @@ t/05-postproc.t
 t/06-marc-holdings.t
 t/07-fetch.t
 t/08-short-session.t
+t/09-lodashGet.t
 t/data/config/dummy.graphql-query
+t/data/config/foo.atplt.json
 t/data/config/foo.bar.json
 t/data/config/foo.baz.json
 t/data/config/foo.fieldPerItem.json
@@ -90,6 +94,7 @@ t/data/records/expectedMarc1byItem.marc
 t/data/records/expectedOutput1.xml
 t/data/records/expectedOutput2.xml
 t/data/records/expectedOutput3.xml
+t/data/records/expectedOutput4.xml
 t/data/records/input1.json
 t/data/records/input2.json
 t/data/records/input3.json

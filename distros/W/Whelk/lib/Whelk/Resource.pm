@@ -1,5 +1,5 @@
 package Whelk::Resource;
-$Whelk::Resource::VERSION = '0.03';
+$Whelk::Resource::VERSION = '0.04';
 use Kelp::Base 'Whelk';
 use Role::Tiny::With;
 

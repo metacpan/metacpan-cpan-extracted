@@ -1,7 +1,7 @@
 #!perl
 
 # Note: This script is a CLI for Riap function /App/VitaminUtils/convert_vitamin_d_unit
-# and generated automatically using Perinci::CmdLine::Gen version 0.501
+# and generated automatically using Perinci::CmdLine::Gen version 0.502
 
 use 5.010001;
 use strict;
@@ -10,9 +10,9 @@ use warnings;
 use Perinci::CmdLine::Any;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-09-14'; # DATE
+our $DATE = '2024-07-06'; # DATE
 our $DIST = 'App-VitaminUtils'; # DIST
-our $VERSION = '0.006'; # VERSION
+our $VERSION = '0.007'; # VERSION
 
 my $cmdline = Perinci::CmdLine::Any->new(
     url => "/App/VitaminUtils/convert_vitamin_d_unit",
@@ -39,11 +39,15 @@ convert-vitamin-d-unit - Convert a vitamin D quantity from one unit to another
 
 =head1 VERSION
 
-This document describes version 0.006 of convert-vitamin-d-unit (from Perl distribution App-VitaminUtils), released on 2022-09-14.
+This document describes version 0.007 of convert-vitamin-d-unit (from Perl distribution App-VitaminUtils), released on 2024-07-06.
 
 =head1 SYNOPSIS
 
-B<convert-vitamin-d-unit> [B<--format>=I<name>|B<--json>] [B<--(no)naked-res>] [B<--page-result>[=I<program>]|B<--view-result>[=I<program>]] -- E<lt>I<quantity>E<gt> [I<to_unit>]
+B<convert-vitamin-d-unit> B<L<--help|/"--help, -h, -?">> (or B<L<-h|/"--help, -h, -?">>, B<L<-?|/"--help, -h, -?">>)
+
+B<convert-vitamin-d-unit> B<L<--version|/"--version, -v">> (or B<L<-v|/"--version, -v">>)
+
+B<convert-vitamin-d-unit> [B<L<--format|/"--format=s">>=I<name>|B<L<--json|/"--json">>] [B<L<--(no)naked-res|/"--naked-res">>] [B<L<--page-result|/"--page-result">>[=I<program>]|B<L<--view-result|/"--view-result">>[=I<program>]] -- [I<L<quantity|/"--quantity=s">>] [I<L<to_unit|/"--to-unit=s">>]
 
 
 
@@ -61,11 +65,18 @@ C<*> marks required options.
 
 =over
 
-=item B<--quantity>=I<s>*
+=item B<--quantity>=I<s>
+
+Default value:
+
+ "1 mcg"
 
 Can also be specified as the 1st command-line argument.
 
 =item B<--to-unit>=I<s>
+
+(No description)
+
 
 Can also be specified as the 2nd command-line argument.
 
@@ -185,7 +196,7 @@ For fish and zsh, install L<shcompgen> as described above.
 
 =head2 Show all possible conversions
 
- % convert-vitamin-d-unit mcg
+ % convert-vitamin-d-unit
  +--------+------+
  | amount | unit |
  +--------+------+
@@ -236,7 +247,7 @@ that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2022, 2021, 2020 by perlancar <perlancar@cpan.org>.
+This software is copyright (c) 2024, 2022, 2021, 2020 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

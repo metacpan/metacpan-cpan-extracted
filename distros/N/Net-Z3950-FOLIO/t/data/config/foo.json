@@ -6,5 +6,10 @@
   "indexMap": {
     "1": "author",
     "4": "title"
+  },
+  "fieldDefinitions": {
+    "circulation": {
+      "dummy": "someField"
+    }
   }
 }

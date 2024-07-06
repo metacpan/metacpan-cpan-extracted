@@ -199,6 +199,9 @@ struct dllist_node {
 	struct dllist_node *prev, *next;
 };
 
+#define INSERT_TREND_TRIGGER 3
+#define INSERT_TREND_CAP 5
+
 // Struct attached to each instance of Tree::RB::XS
 struct TreeRBXS {
 	SV *owner;                     // points to Tree::RB::XS internal HV (not ref)
@@ -207,14 +210,20 @@ struct TreeRBXS {
 	int key_type;                  // must always be set and never changed
 	int compare_fn_id;             // indicates which compare is in use, for debugging
 	bool allow_duplicates;         // flag to affect behavior of insert.  may be changed.
+	bool allowed_duplicates;       // was allow_duplicates ever true?  helps optimize put()
 	bool compat_list_get;          // flag to enable full compat with Tree::RB's list context behavior
 	bool track_recent;             // flag to automatically add new nodes to the recent-list
+	bool lookup_updates_recent;    // whether 'lookup' and 'get' move a node to the front of the recent-list
 	rbtree_node_t root_sentinel;   // parent-of-root, used by rbtree implementation.
 	rbtree_node_t leaf_sentinel;   // dummy node used by rbtree implementation.
 	struct TreeRBXS_iter *hashiter;// iterator used for TIEHASH
 	struct dllist_node recent;     // insertion order tracking
 	size_t recent_count;           // number of nodes being LRU-tracked
 	bool hashiterset;              // true if the hashiter has been set manually with hseek
+	struct TreeRBXS_item
+	    *prev_inserted_item;       // optimize adjacent inserts by tracking previous insert
+	int  prev_inserted_trend;      // number of consecutive adjacent inserts
+	bool prev_inserted_dup;        // whether previous insert was an allow_duplicate case
 };
 
 static void TreeRBXS_init(struct TreeRBXS *tree, SV *owner);
@@ -296,6 +305,10 @@ static void TreeRBXS_init(struct TreeRBXS *tree, SV *owner) {
 }
 
 static void TreeRBXS_clear(struct TreeRBXS *tree) {
+	tree->prev_inserted_item= NULL;
+	tree->prev_inserted_trend= 0;
+	tree->prev_inserted_dup= false;
+	tree->allowed_duplicates= tree->allow_duplicates;
 	rbtree_clear(&tree->root_sentinel, (void (*)(void *, void *)) &TreeRBXS_item_clear,
 		-OFS_TreeRBXS_item_FIELD_rbnode, tree);
 	tree->recent.prev= &tree->recent;
@@ -694,6 +707,8 @@ static void TreeRBXS_item_detach_tree(struct TreeRBXS_item* item, struct TreeRBX
 	//warn("TreeRBXS_item_detach_tree");
 	//warn("detach tree %p %p key %d", item, tree, (int) item->keyunion.ikey);
 	if (rbtree_node_is_in_tree(&item->rbnode)) {
+		if (tree->prev_inserted_item == item)
+			tree->prev_inserted_item= NULL;
 		// If any iterator points to this node, move it to the following node.
 		if (item->iter)
 			TreeRBXS_item_advance_all_iters(item, 0);
@@ -794,6 +809,136 @@ static struct TreeRBXS_item *TreeRBXS_find_item(struct TreeRBXS *tree, struct Tr
 		}
 	}
 	return node? GET_TreeRBXS_item_FROM_rbnode(node) : NULL;
+}
+
+struct TreeRBXS_item *
+TreeRBXS_insert_item(struct TreeRBXS *tree, struct TreeRBXS_item *stack_item, bool overwrite, SV **oldval_out) {
+	struct TreeRBXS_item *item;
+	rbtree_node_t *hint, *tmpnode, *first, *last;
+	int cmp;
+	// If newly inserted items have been adjacent to prev_inserted_item 3 or more times in a row,
+	// It is worth comparing them with that first.
+	if (tree->prev_inserted_trend >= INSERT_TREND_TRIGGER) {
+		if (tree->prev_inserted_trend > INSERT_TREND_CAP)
+			tree->prev_inserted_trend= INSERT_TREND_CAP;
+		hint= &tree->prev_inserted_item->rbnode;
+		cmp= tree->compare(tree, stack_item, tree->prev_inserted_item);
+		if (cmp == 0) {
+			++tree->prev_inserted_trend;
+			if (overwrite) {
+				if (tree->prev_inserted_dup)
+					goto overwrite_multi;
+				else
+					goto overwrite_single;
+			} else if (tree->allow_duplicates)
+				goto insert_new_duplicate;
+			else
+				return NULL;
+		}
+		else if (cmp > 0) {
+			tmpnode= rbtree_node_next(hint);
+			if (!tmpnode || tree->compare(tree, stack_item, GET_TreeRBXS_item_FROM_rbnode(tmpnode)) < 0) {
+				++tree->prev_inserted_trend;
+				goto insert_relative;
+			}
+			// else it broke the trend and needs inserted normally.
+		}
+		else {
+			tmpnode= rbtree_node_prev(hint);
+			if (!tmpnode || tree->compare(tree, stack_item, GET_TreeRBXS_item_FROM_rbnode(tmpnode)) > 0) {
+				++tree->prev_inserted_trend;
+				goto insert_relative;
+			}
+			// else it broke the trend and needs inserted normally.
+		}
+		--tree->prev_inserted_trend;
+	}
+	hint= rbtree_find_nearest(
+		&tree->root_sentinel,
+		stack_item, // The item *is* the key that gets passed to the compare function
+		(int(*)(void*,void*,void*)) tree->compare,
+		tree, -OFS_TreeRBXS_item_FIELD_rbnode,
+		&cmp);
+	if (hint && cmp == 0) {
+		if (overwrite) {
+			// In case of multiple matches, find all
+			if (tree->allowed_duplicates) {
+				overwrite_multi:
+				if (!rbtree_find_all(
+					hint, stack_item,
+					(int(*)(void*,void*,void*)) tree->compare,
+					tree, -OFS_TreeRBXS_item_FIELD_rbnode,
+					&first, &last, NULL)
+					)
+					croak("BUG");
+				//warn("replacing %d matching keys with new value", (int)count);
+				// prune every node that follows 'first'
+				while (last != first) {
+					item= GET_TreeRBXS_item_FROM_rbnode(last);
+					last= rbtree_node_prev(last);
+					TreeRBXS_item_detach_tree(item, tree);
+				}
+				hint= first;
+			}
+			/* overwrite the value of the node */
+			overwrite_single:
+			item= GET_TreeRBXS_item_FROM_rbnode(hint);
+			sv_2mortal(item->value);
+			if (oldval_out)
+				*oldval_out= item->value; // return the old value
+			item->value= newSVsv(stack_item->value); // store new copy of supplied param
+			if (tree->track_recent || item->recent.next)
+				TreeRBXS_recent_insert_before(tree, item, &tree->recent);
+			tree->prev_inserted_dup= false;
+		} else if (tree->allow_duplicates) {
+			if (!rbtree_find_all(
+				hint, stack_item,
+				(int(*)(void*,void*,void*)) tree->compare,
+				tree, -OFS_TreeRBXS_item_FIELD_rbnode,
+				NULL, &hint, NULL)
+				)
+				croak("BUG");
+			insert_new_duplicate:
+			item= TreeRBXS_new_item_from_tmp_item(stack_item);
+			rbtree_node_insert_after(hint, &item->rbnode);
+			if (tree->track_recent)
+				TreeRBXS_recent_insert_before(tree, item, &tree->recent);
+			tree->prev_inserted_dup= true;
+		} else {
+			item= GET_TreeRBXS_item_FROM_rbnode(hint);
+			if (item == tree->prev_inserted_item)
+				++tree->prev_inserted_trend;
+			return NULL; // nothing inserted
+		}
+	}
+	else {
+		insert_relative:
+		// return false means first is the preceeding node and last is the following node.
+		item= TreeRBXS_new_item_from_tmp_item(stack_item);
+		if (!hint) // empty tree
+			rbtree_node_insert_before(&tree->root_sentinel, &item->rbnode);
+		else if (cmp > 0)
+			rbtree_node_insert_after(hint, &item->rbnode);
+		else
+			rbtree_node_insert_before(hint, &item->rbnode);
+		if (tree->track_recent)
+			TreeRBXS_recent_insert_before(tree, item, &tree->recent);
+		tree->prev_inserted_dup= false;
+	}
+	// If trend logic is triggered above, this is already calculated.  Else check adjacency.
+	if (tree->prev_inserted_trend < INSERT_TREND_TRIGGER && tree->prev_inserted_item) {
+		// Check trend.  Is item adjacent to 'prev'?
+		if (item == tree->prev_inserted_item
+			|| item->rbnode.parent == &tree->prev_inserted_item->rbnode
+			|| item->rbnode.left   == &tree->prev_inserted_item->rbnode
+			|| item->rbnode.right  == &tree->prev_inserted_item->rbnode
+		) {
+			++tree->prev_inserted_trend;
+		} else if (tree->prev_inserted_trend)
+			--tree->prev_inserted_trend;
+	}
+	tree->prev_inserted_item= item;
+	return item;
 }
 
 /* Mark the current tree item as the most recent, regardless of whether it was previously tracked.
@@ -1357,6 +1502,10 @@ allow_duplicates(tree, allow= NULL)
 	PPCODE:
 		if (items > 1) {
 			tree->allow_duplicates= SvTRUE(allow);
+			if (tree->allow_duplicates)
+				tree->allowed_duplicates= true;
+			else if (!TreeRBXS_get_count(tree))
+				tree->allowed_duplicates= false;
 			// ST(0) is $self, so let it be the return value
 		} else {
 			ST(0)= sv_2mortal(newSViv(tree->allow_duplicates? 1 : 0));
@@ -1372,7 +1521,7 @@ compat_list_get(tree, allow= NULL)
 			tree->compat_list_get= SvTRUE(allow);
 			// ST(0) is $self, so let it be the return value
 		} else {
-			ST(0)= sv_2mortal(newSViv(tree->compat_list_get? 1 : 0));
+			ST(0)= tree->compat_list_get? &PL_sv_yes : &PL_sv_no;
 		}
 		XSRETURN(1);
 
@@ -1385,7 +1534,20 @@ track_recent(tree, enable= NULL)
 			tree->track_recent= SvTRUE(enable);
 			// ST(0) is $self, so let it be the return value
 		} else {
-			ST(0)= sv_2mortal(newSViv(tree->track_recent? 1 : 0));
+			ST(0)= tree->track_recent? &PL_sv_yes : &PL_sv_no;
+		}
+		XSRETURN(1);
+
+void
+lookup_updates_recent(tree, enable= NULL)
+	struct TreeRBXS *tree
+	SV *enable
+	PPCODE:
+		if (items > 1) {
+			tree->lookup_updates_recent= SvTRUE(enable);
+			//ST(0) is $self, so let it be the return value
+		} else {
+			ST(0)= tree->lookup_updates_recent? &PL_sv_yes : &PL_sv_no;
 		}
 		XSRETURN(1);
 
@@ -1405,123 +1567,130 @@ recent_count(tree)
 	OUTPUT:
 		RETVAL
 
-IV
-insert(tree, key, val)
+void
+_insert_optimization_debug(tree)
+	struct TreeRBXS *tree;
+	PPCODE:
+		EXTEND(SP, 5);
+		PUSHs(sv_2mortal(newSViv(tree->prev_inserted_trend)));
+		PUSHs(sv_2mortal(newSViv(INSERT_TREND_TRIGGER)));
+		PUSHs(sv_2mortal(newSViv(INSERT_TREND_CAP)));
+		PUSHs(sv_2mortal(newSViv(tree->prev_inserted_dup? 1 : 0)));
+
+void
+insert(tree, key, val=&PL_sv_undef)
 	struct TreeRBXS *tree
 	SV *key
 	SV *val
+	ALIAS:
+		Tree::RB::XS::put         = 1
 	INIT:
-		struct TreeRBXS_item stack_item, *item;
-		rbtree_node_t *hint= NULL;
+		struct TreeRBXS_item stack_item, *inserted;
+		SV *oldval= NULL;
 		int cmp= 0;
-	CODE:
+	PPCODE:
 		//TreeRBXS_assert_structure(tree);
 		if (!SvOK(key))
 			croak("Can't use undef as a key");
 		TreeRBXS_init_tmp_item(&stack_item, tree, key, val);
-		/* check for duplicates, unless they are allowed */
-		//warn("Insert %p into %p", item, tree);
-		if (!tree->allow_duplicates) {
-			hint= rbtree_find_nearest(
-				&tree->root_sentinel,
-				&stack_item, // The item *is* the key that gets passed to the compare function
-				(int(*)(void*,void*,void*)) tree->compare,
-				tree, -OFS_TreeRBXS_item_FIELD_rbnode,
-				&cmp);
-		}
-		if (hint && cmp == 0) {
-			RETVAL= -1;
+		inserted= TreeRBXS_insert_item(tree, &stack_item, ix == 1, &oldval);
+		ST(0)= ix == 0? sv_2mortal(newSViv(inserted? rbtree_node_index(&inserted->rbnode) : -1))
+			: (oldval? oldval : &PL_sv_undef);
+		XSRETURN(1);
+
+IV
+insert_multi(tree, ...)
+	struct TreeRBXS *tree
+	ALIAS:
+		Tree::RB::XS::put_multi        = 1
+	INIT:
+		struct TreeRBXS_item stack_item, *inserted;
+		AV *av= NULL;
+		SV *key, *val, *oldval, **el;
+		int added= 0, i, lim;
+	CODE:
+		// Is there exactly one element which is an un-blessed arrayref?
+		if (items == 2 && SvROK(ST(1)) && SvTYPE(SvRV(ST(1))) == SVt_PVAV && !sv_isobject(ST(1))) {
+			av= (AV*) SvRV(ST(1));
+			i= 0;
+			lim= av_len(av)+1;
 		} else {
-			item= TreeRBXS_new_item_from_tmp_item(&stack_item);
-			if (!rbtree_node_insert(
-				hint? hint : &tree->root_sentinel,
-				&item->rbnode,
-				(int(*)(void*,void*,void*)) tree->compare,
-				tree, -OFS_TreeRBXS_item_FIELD_rbnode
-			)) {
-				TreeRBXS_item_free(item);
-				croak("BUG: insert failed");
-			}
-			if (tree->track_recent)
-				TreeRBXS_recent_insert_before(tree, item, &tree->recent);
-			RETVAL= rbtree_node_index(&item->rbnode);
+			i= 1;
+			lim= items;
 		}
-		//TreeRBXS_assert_structure(tree);
+		// Iterate either the array or the stack
+		while (i < lim) {
+			val= &PL_sv_undef;
+			// either iterating an array, or iterating the stack
+			if (av) {
+				el= av_fetch(av, i, 0);
+				if (!el) croak("Tree->insert_multi does not support tied or sparse arrays");
+				key= *el;
+				i++;
+				if (i < lim) {
+					el= av_fetch(av, i, 0);
+					if (!el) croak("Tree->insert_multi does not support tied or sparse arrays");
+					val= *el;
+					i++;
+				}
+			} else {
+				key= ST(i);
+				if (++i < lim) {
+					val= ST(i);
+					i++;
+				}
+			}
+			if (!SvOK(key))
+				croak("Can't use undef as a key");
+			TreeRBXS_init_tmp_item(&stack_item, tree, key, val);
+			oldval= NULL;
+			inserted= TreeRBXS_insert_item(tree, &stack_item, ix == 1, &oldval);
+			// Count the newly added nodes.  For insert, that is the number of non-null 'inserted'.
+			// For put, that is the number of inserts that did not return an old value.
+			if (ix == 0? (inserted != NULL) : (oldval == NULL))
+				++added;
+		}
+		RETVAL= added;
 	OUTPUT:
 		RETVAL
 
-void
-put(tree, key, val)
+IV
+exists(tree, ...)
 	struct TreeRBXS *tree
-	SV *key
-	SV *val
-	INIT:
-		struct TreeRBXS_item stack_item, *item;
-		rbtree_node_t *first= NULL, *last= NULL;
-		size_t count;
-	PPCODE:
-		if (!SvOK(key))
-			croak("Can't use undef as a key");
-		TreeRBXS_init_tmp_item(&stack_item, tree, key, val);
-		ST(0)= &PL_sv_undef;
-		if (rbtree_find_all(
-			&tree->root_sentinel,
-			&stack_item, // The item *is* the key that gets passed to the compare function
-			(int(*)(void*,void*,void*)) tree->compare,
-			tree, -OFS_TreeRBXS_item_FIELD_rbnode,
-			&first, &last, &count)
-		) {
-			//warn("replacing %d matching keys with new value", (int)count);
-			// prune every node that follows 'first'
-			while (last != first) {
-				item= GET_TreeRBXS_item_FROM_rbnode(last);
-				last= rbtree_node_prev(last);
-				rbtree_node_prune(&item->rbnode);
-				TreeRBXS_item_detach_tree(item, tree);
-			}
-			/* overwrite the value of the node */
-			item= GET_TreeRBXS_item_FROM_rbnode(first);
-			val= newSVsv(val);
-			ST(0)= sv_2mortal(item->value); // return the old value
-			item->value= val; // store new copy of supplied param
-		}
-		else {
-			item= TreeRBXS_new_item_from_tmp_item(&stack_item);
-			if (!rbtree_node_insert(
-				first? first : last? last : &tree->root_sentinel,
-				&item->rbnode,
-				(int(*)(void*,void*,void*)) tree->compare,
-				tree, -OFS_TreeRBXS_item_FIELD_rbnode
-			)) {
-				TreeRBXS_item_free(item);
-				croak("BUG: insert failed");
-			}
-		}
-		if (tree->track_recent || item->recent.next)
-			TreeRBXS_recent_insert_before(tree, item, &tree->recent);
-		XSRETURN(1);
-
-void
-EXISTS(tree, key)
-	struct TreeRBXS *tree
-	SV *key
+	ALIAS:
+		Tree::RB::XS::EXISTS = 1
 	INIT:
 		struct TreeRBXS_item stack_item;
-		rbtree_node_t *node= NULL;
-		int cmp;
-	PPCODE:
-		if (!SvOK(key))
-			croak("Can't use undef as a key");
-		// create a fake item to act as a search key
-		TreeRBXS_init_tmp_item(&stack_item, tree, key, &PL_sv_undef);
-		node= rbtree_find_nearest(
-			&tree->root_sentinel,
-			&stack_item,
-			(int(*)(void*,void*,void*)) tree->compare,
-			tree, -OFS_TreeRBXS_item_FIELD_rbnode,
-			&cmp);
-		ST(0)= (node && cmp == 0)? &PL_sv_yes : &PL_sv_no;
-		XSRETURN(1);
+		rbtree_node_t *node;
+		SV *key;
+		int i, cmp;
+		size_t count, total= 0;
+	CODE:
+		for (i= 1; i < items; i++) {
+			key= ST(i);
+			TreeRBXS_init_tmp_item(&stack_item, tree, key, &PL_sv_undef);
+			if (tree->allowed_duplicates) {
+				count= 0;
+				rbtree_find_all(&tree->root_sentinel,
+					&stack_item,
+					(int(*)(void*,void*,void*)) tree->compare,
+					tree, -OFS_TreeRBXS_item_FIELD_rbnode,
+					NULL, NULL, &count);
+				total += count;
+			} else {
+				node= rbtree_find_nearest(
+					&tree->root_sentinel,
+					&stack_item,
+					(int(*)(void*,void*,void*)) tree->compare,
+					tree, -OFS_TreeRBXS_item_FIELD_rbnode,
+					&cmp);
+				if (node && cmp == 0)
+					++total;
+			}
+		}
+		RETVAL= total;
+	OUTPUT:
+		RETVAL
 
 void
 get(tree, key, mode_sv= NULL)
@@ -1573,6 +1742,8 @@ get(tree, key, mode_sv= NULL)
 		TreeRBXS_init_tmp_item(&stack_item, tree, key, &PL_sv_undef);
 		item= TreeRBXS_find_item(tree, &stack_item, mode);
 		if (item) {
+			if (tree->lookup_updates_recent)
+				TreeRBXS_recent_insert_before(tree, item, &tree->recent);
 			if (ix == 0) { // lookup in list context
 				ST(0)= item->value;
 				ST(1)= sv_2mortal(TreeRBXS_wrap_item(item));
@@ -1617,6 +1788,8 @@ get_all(tree, key)
 			for (i= 0; i < count; i++) {
 				item= GET_TreeRBXS_item_FROM_rbnode(first);
 				ST(i)= item->value;
+				if (tree->lookup_updates_recent)
+					TreeRBXS_recent_insert_before(tree, item, &tree->recent);
 				first= rbtree_node_next(first);
 			}
 		} else

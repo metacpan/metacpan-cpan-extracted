@@ -3602,6 +3602,9 @@ sub create_md5
 	# $digests_added{$digest} = 1;
 
 	my $rc;
+	$digest =~ tr/ž/z/;	# Remove wide characters
+	$digest =~ s/\N{U+017E}/z/g;
+	$digest =~ s/\xc5\xbe/z/g;
 	if(length($digest) <= 16) {
 		$rc = $digest;
 	} else {

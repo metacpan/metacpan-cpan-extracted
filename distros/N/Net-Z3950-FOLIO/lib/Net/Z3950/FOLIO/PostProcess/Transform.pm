@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use utf8;
 
-use Unicode::Diacritic::Strip 'fast_strip';
+use Unicode::Diacritic::Strip 'strip_diacritics';
 
 
 sub transform {
@@ -42,20 +42,32 @@ sub applyStripDiacritics {
 
     my $result = $value;
 
-    # Extra special case: needs handling first, as fast_strip converts ipper-case thorn to "th"
-    $result =~ s/Þ/TH/g;
+    $result = strip_diacritics($result);
 
-    # It seems that the regular strip_diacritics function just plain no-ops, hence fast_strip instead
-    $result = fast_strip($result);
-
-    # Special cases required in ZF-31, but apparently not implemented by fast_strip
+    # Special cases required in ZF-31, but apparently not implemented by strip_diacritics
     $result =~ s/ß/ss/g;
     $result =~ s/ẞ/SS/g;
+    $result =~ s/þ/th/g;
+    $result =~ s/Þ/TH/g;
     $result =~ s/Đ/D/g;
     $result =~ s/ð/d/g;
     $result =~ s/Æ/AE/g;
     $result =~ s/æ/ae/g;
-    $result =~ s/Œ/OE/g; # For some reason, fast_strip handle the lower-case version but not the upper-case
+    $result =~ s/Œ/OE/g;
+    $result =~ s/œ/oe/g;
+    $result =~ s/Ł/L/g;
+    $result =~ s/ł/l/g;
+    $result =~ s/t︠s︡/ts/g;
+    $result =~ s/i︠u︡/iu/g;
+    $result =~ s/i︠a︡/ia/g;
+    # Half a dozen different Unicode characters that get abused as apostrophes
+    $result =~ s/ʹ/'/g;
+    $result =~ s/ʻ/'/g;
+    $result =~ s/ʼ/'/g;
+    $result =~ s/ʽ/'/g;
+    $result =~ s/ʾ/'/g;
+    $result =~ s/ʿ/'/g;
+
 
     # warn "stripping diacritics: '$value' -> '$result'";
     return $result;

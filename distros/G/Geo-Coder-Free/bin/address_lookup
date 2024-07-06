@@ -18,18 +18,26 @@ if(scalar(@ARGV) == 0) {
 }
 
 my %opts;
-getopts('v', \%opts);
-Geo::Coder::Free::DB::init(logger => MyLogger->new()) if($opts{'v'});
+getopts('vd', \%opts);
+# Watch what's going on in debug mode
+Database::Abstraction::init(logger => MyLogger->new()) if($opts{'d'});
 
-# print join(' ', @ARGV), "\n";
+print join(' ', @ARGV), ': ' if($opts{'v'});
 if(my $rc = Geo::Coder::Free::Local::geocode(join(' ', @ARGV))) {
 	print 'Local: ', Data::Dumper->new([$rc])->Dump();
+} elsif($ENV{'OPENADDR_HOME'}) {
+	if($rc = Geo::Coder::Free::OpenAddresses->new(openaddr => $ENV{'OPENADDR_HOME'})->geocode(location => join(' ', @ARGV), exact => 1)) {
+		print Data::Dumper->new([$rc])->Dump();
+	} elsif($rc = Geo::Coder::Free::MaxMind::geocode(join(' ', @ARGV))) {
+		print Data::Dumper->new([$rc])->Dump();
+	} else {
+		print "Not found\n" if($opts{'v'});
+		exit(1);
+	}
 } elsif($rc = Geo::Coder::Free::geocode(join(' ', @ARGV))) {
-# if(my $rc = Geo::Coder::Free::geocode(join(' ', @ARGV))) {
-	print Data::Dumper->new([$rc])->Dump();
-} elsif($ENV{'OPENADDR_HOME'} && ($rc = Geo::Coder::Free::OpenAddresses->new(openaddr => $ENV{'OPENADDR_HOME'})->geocode(location => join(' ', @ARGV)))) {
 	print Data::Dumper->new([$rc])->Dump();
 } else {
+	print "Not found\n" if($opts{'v'});
 	exit(1);
 }
 

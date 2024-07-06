@@ -92904,3 +92904,17 @@ C/CO/CORION/Test-Without-Module-0.22.tar.gz
 H/HA/HANJE/Tk-GtkSettings-0.08.tar.gz
 H/HA/HANJE/Tk-YADialog-0.04.tar.gz
 D/DE/DERF/Travel-Status-DE-IRIS-1.98.tar.gz
+P/PE/PERLANCAR/App-VitaminUtils-0.007.tar.gz
+C/CR/CROMEDOME/Dancer2-Plugin-Minion-1.0.0.tar.gz
+G/GB/GBROWN/Data-Mirror-0.05.tar.gz
+M/MI/MIRK/Net-Z3950-FOLIO-v4.0.0.tar.gz
+N/NH/NHORNE/Geo-Coder-Free-0.36.tar.gz
+H/HO/HOEKIT/HATX-0.0.4.tar.gz
+B/BR/BRTASTIC/Kelp-2.17.tar.gz
+B/BR/BRTASTIC/Whelk-0.04.tar.gz
+D/DC/DCONWAY/Multi-Dispatch-0.000004.tar.gz
+G/GA/GARU/Net-Correios-0.002.tar.gz
+M/MI/MIRK/Net-Z3950-SimpleServer-1.27.tar.gz
+N/NE/NERDVANA/Tree-RB-XS-0.10.tar.gz
+R/RE/REEDFISH/Term-Menus-3.028.tar.gz
+J/JV/JV/Text-Template-Tiny-1.000.tar.gz

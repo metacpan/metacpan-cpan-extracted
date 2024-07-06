@@ -1,5 +1,5 @@
 /* This file is part of simpleserver.
- * Copyright (C) 2000-2016 Index Data.
+ * Copyright (C) 2000-2017 Index Data.
  * All rights reserved.
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -24,6 +24,12 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
+
+// This pragma inhibits 436 vacuous warnings
+// See https://blogs.perl.org/users/tom_wyant/2022/03/xs-versus-clang-infinite-warnings.html
+#if defined(__clang__) && defined(__clang_major__) && __clang_major__ > 11
+#pragma clang diagnostic ignored "-Wcompound-token-split-by-macro"
+#endif
 
 #include "EXTERN.h"
 #include "perl.h"
@@ -749,7 +755,7 @@ static SV *f_FacetField_to_SV(Z_FacetField *facet_field)
 	    Z_Term *z_term = facet_field->terms[i]->term;
             HV *hv;
 	    SV *sv_count = newSViv(*facet_field->terms[i]->count);
-            SV *sv_term;
+	    SV *sv_term = 0;
 	    SV *tmp;
 	    if (z_term->which == Z_Term_general) {
 	        sv_term = newSVpv((char*) z_term->u.general->buf,
@@ -761,8 +767,9 @@ static SV *f_FacetField_to_SV(Z_FacetField *facet_field)
 	    tmp = newObject("Net::Z3950::FacetTerm", (SV *) (hv = newHV()));
 
 	    setMember(hv, "count", sv_count);
-	    setMember(hv, "term", sv_term);
-
+	    if (sv_term) {
+	        setMember(hv, "term", sv_term);
+	    }
 	    av_push(av, tmp);
 	}
 	setMember(hv, "terms", terms);
@@ -1111,6 +1118,36 @@ int bend_delete(void *handle, bend_delete_rr *rr)
 	return 0;
 }
 
+static int comp(HV *href, Z_RecordComposition *composition)
+{
+	if (composition->which == Z_RecordComp_simple) {
+		Z_ElementSetNames *simple = composition->u.simple;
+		if (simple->which == Z_ElementSetNames_generic) {
+			hv_store(href, "COMP", 4, newSVpv(simple->u.generic, 0), 0);
+		} else {
+			return 26;
+		}
+	} else if (composition->which == Z_RecordComp_complex) {
+		Z_CompSpec *c = composition->u.complex;
+		if (c && c->generic && c->generic->elementSpec &&
+		    c->generic->elementSpec->which ==
+		    Z_ElementSpec_elementSetName) {
+			hv_store(href, "COMP", 4,
+				 newSVpv(c->generic->elementSpec->u.elementSetName, 0), 0);
+		}
+		if (c->generic->which ==  Z_Schema_oid &&
+		    c->generic->schema.oid) {
+			WRBUF w = oid2dotted(c->generic->schema.oid);
+			hv_store(href,
+				 "SCHEMA_OID", 10,
+				 newSVpv(wrbuf_buf(w), wrbuf_len(w)), 0);
+			wrbuf_destroy(w);
+		}
+	} else {
+		return 26;
+	}
+	return 0;
+}
 
 int bend_fetch(void *handle, bend_fetch_rr *rr)
 {
@@ -1129,9 +1166,6 @@ int bend_fetch(void *handle, bend_fetch_rr *rr)
 	Zfront_handle *zhandle = (Zfront_handle *)handle;
 	CV* handler_cv = 0;
 
-	Z_RecordComposition *composition;
-	Z_ElementSetNames *simple;
-	Z_CompSpec *complex;
 	STRLEN length;
 
 	dSP;
@@ -1164,49 +1198,11 @@ int bend_fetch(void *handle, bend_fetch_rr *rr)
 	hv_store(href, "GHANDLE", 7, newSVsv(zhandle->ghandle), 0);
 	hv_store(href, "HANDLE", 6, zhandle->handle, 0);
 	hv_store(href, "PID", 3, newSViv(getpid()), 0);
-	if (rr->comp)
-	{
-		composition = rr->comp;
-		if (composition->which == Z_RecordComp_simple)
-		{
-			simple = composition->u.simple;
-			if (simple->which == Z_ElementSetNames_generic)
-			{
-				hv_store(href, "COMP", 4, newSVpv(simple->u.generic, 0), 0);
-			}
-			else
-			{
-				rr->errcode = 26;
-				rr->errstring = odr_strdup(rr->stream, "non-generic 'simple' composition");
-				return 0;
-			}
-		}
-		else if (composition->which == Z_RecordComp_complex)
-		{
-		        if (composition->u.complex->generic &&
 
-					composition->u.complex->generic &&
-					composition->u.complex->generic->elementSpec &&
-					composition->u.complex->generic->elementSpec->which ==
-					Z_ElementSpec_elementSetName)
-			{
-				complex = composition->u.complex;
-				hv_store(href, "COMP", 4,
-					newSVpv(complex->generic->elementSpec->u.elementSetName, 0), 0);
-			}
-			else
-			{
-#if 0	/* For now ignore this error, which is ubiquitous in SRU */
-				rr->errcode = 26;
-				rr->errstring = odr_strdup(rr->stream, "'complex' composition is not generic ESN");
-				return 0;
-#endif /*0*/
-			}
-		}
-		else
-		{
-			rr->errcode = 26;
-			rr->errstring = odr_strdup(rr->stream, "composition neither simple nor complex");
+	if (rr->comp) {
+		rr->errcode = comp(href, rr->comp);
+		if (rr->errcode) {
+			rr->errstring = "unhandled compspec";
 			return 0;
 		}
 	}
@@ -1318,6 +1314,7 @@ int bend_fetch(void *handle, bend_fetch_rr *rr)
 }
 
 
+
 int bend_present(void *handle, bend_present_rr *rr)
 {
 	HV *href;
@@ -1326,14 +1323,9 @@ int bend_present(void *handle, bend_present_rr *rr)
 	SV *err_string;
 	SV *point;
 	STRLEN len;
-	Z_RecordComposition *composition;
-	Z_ElementSetNames *simple;
-	Z_CompSpec *complex;
 	char *ptr;
 	Zfront_handle *zhandle = (Zfront_handle *)handle;
 	CV* handler_cv = 0;
-
-/*	WRBUF oid_dotted; */
 
 	dSP;
 	ENTER;
@@ -1347,50 +1339,11 @@ int bend_present(void *handle, bend_present_rr *rr)
 	hv_store(href, "START", 5, newSViv(rr->start), 0);
 	hv_store(href, "SETNAME", 7, newSVpv(rr->setname, 0), 0);
 	hv_store(href, "NUMBER", 6, newSViv(rr->number), 0);
-	/*oid_dotted = oid2dotted(rr->request_format_raw);
-        hv_store(href, "REQ_FORM", 8, newSVpv((char *)oid_dotted->buf, oid_dotted->pos), 0);*/
 	hv_store(href, "PID", 3, newSViv(getpid()), 0);
-	if (rr->comp)
-	{
-		composition = rr->comp;
-		if (composition->which == Z_RecordComp_simple)
-		{
-			simple = composition->u.simple;
-			if (simple->which == Z_ElementSetNames_generic)
-			{
-				hv_store(href, "COMP", 4, newSVpv(simple->u.generic, 0), 0);
-			}
-			else
-			{
-				rr->errcode = 26;
-				rr->errstring = odr_strdup(rr->stream, "non-generic 'simple' composition");
-				return 0;
-			}
-		}
-		else if (composition->which == Z_RecordComp_complex)
-		{
-		        if (composition->u.complex->generic &&
-
-					composition->u.complex->generic &&
-					composition->u.complex->generic->elementSpec &&
-					composition->u.complex->generic->elementSpec->which ==
-					Z_ElementSpec_elementSetName)
-			{
-				complex = composition->u.complex;
-				hv_store(href, "COMP", 4,
-					newSVpv(complex->generic->elementSpec->u.elementSetName, 0), 0);
-			}
-			else
-			{
-				rr->errcode = 26;
-				rr->errstring = odr_strdup(rr->stream, "'complex' composition is not generic ESN");
-				return 0;
-			}
-		}
-		else
-		{
-			rr->errcode = 26;
-			rr->errstring = odr_strdup(rr->stream, "composition neither simple nor complex");
+	if (rr->comp) {
+		rr->errcode = comp(href, rr->comp);
+		if (rr->errcode) {
+			rr->errstring = "unhandled compspec";
 			return 0;
 		}
 	}
@@ -1435,9 +1388,181 @@ int bend_present(void *handle, bend_present_rr *rr)
 }
 
 
+static Z_IOOriginPartToKeep *decodeItemOrderRequest(HV *href, Z_ItemOrder *it)
+{
+	if (it->which == Z_IOItemOrder_esRequest) {
+		Z_IORequest *ir = it->u.esRequest;
+		Z_IOOriginPartToKeep *k = ir->toKeep;
+		Z_IOOriginPartNotToKeep *n = ir->notToKeep;
+
+		if (n->itemRequest) {
+			Z_External *r = n->itemRequest;
+			if (r->direct_reference
+			    && !oid_oidcmp(r->direct_reference, yaz_oid_recsyn_xml)
+			    && r->which == Z_External_octet)
+				hv_store(href, "XML_ILL", 7,
+					 newSVpvn(r->u.octet_aligned->buf,
+						  r->u.octet_aligned->len), 0);
+		}
+		return k;
+	} else {
+		return 0;
+	}
+}
+
+static Z_TaskPackage *createItemOrderTaskPackage(HV *href,
+						 Z_IOOriginPartToKeep *k,
+						 bend_esrequest_rr *rr)
+{
+	SV **temp;
+	ODR stream = rr->stream;
+	Z_TaskPackage *tp = (Z_TaskPackage *) odr_malloc(stream, sizeof(*tp));
+	Z_External *ext = (Z_External *)
+		odr_malloc(stream, sizeof(*ext));
+	Z_IUOriginPartToKeep *keep = (Z_IUOriginPartToKeep *)
+		odr_malloc(stream, sizeof(*keep));
+	Z_IOTargetPart *targetPart = (Z_IOTargetPart *)
+		odr_malloc(stream, sizeof(*targetPart));
+
+	tp->packageType =
+		odr_oiddup(stream, rr->esr->packageType);
+	tp->packageName = 0;
+	tp->userId = 0;
+	tp->retentionTime = 0;
+	tp->permissions = 0;
+	tp->description = 0;
+	tp->targetReference = 0;
+	tp->creationDateTime = 0;
+	tp->taskStatus = odr_intdup(stream, 0);
+	tp->packageDiagnostics = 0;
+	tp->taskSpecificParameters = ext;
+	ext->direct_reference =
+		odr_oiddup(stream, rr->esr->packageType);
+	ext->indirect_reference = 0;
+	ext->descriptor = 0;
+	ext->which = Z_External_itemOrder;
+	ext->u.itemOrder = (Z_ItemOrder *)
+		odr_malloc(stream, sizeof(*ext->u.update));
+	ext->u.itemOrder->which = Z_IOItemOrder_taskPackage;
+	ext->u.itemOrder->u.taskPackage =  (Z_IOTaskPackage *)
+		odr_malloc(stream, sizeof(Z_IOTaskPackage));
+	ext->u.itemOrder->u.taskPackage->originPart = k;
+	ext->u.itemOrder->u.taskPackage->targetPart = targetPart;
+
+	temp = hv_fetch(href, "XML_ILL", 7, 1);
+	if (temp) {
+		SV *err_str = newSVsv(*temp);
+		STRLEN len;
+		char *ptr;
+		ptr = SvPV(err_str, len);
+		targetPart->itemRequest = z_ext_record_xml(stream, ptr, len);
+	} else {
+		targetPart->itemRequest = 0;
+	}
+	targetPart->statusOrErrorReport = 0;
+	targetPart->auxiliaryStatus = 0;
+	return tp;
+}
+
 int bend_esrequest(void *handle, bend_esrequest_rr *rr)
 {
-	perl_call_sv(esrequest_ref, G_VOID | G_DISCARD | G_NOARGS);
+	Z_IOOriginPartToKeep *k = 0;
+	HV *href;
+	Zfront_handle *zhandle = (Zfront_handle *)handle;
+	SV **temp;
+	Z_ExtendedServicesRequest *esr = rr->esr;
+	Z_External *ext = esr->taskSpecificParameters;
+
+	dSP;
+	ENTER;
+	SAVETMPS;
+
+	href = newHV();
+	hv_store(href, "GHANDLE", 7, newSVsv(zhandle->ghandle), 0);
+        hv_store(href, "HANDLE", 6, zhandle->handle, 0);
+        hv_store(href, "ERR_CODE", 8, newSViv(0), 0);
+        hv_store(href, "ERR_STR", 7, newSVpv("", 0), 0);
+	if (esr->function) {
+		hv_store(href, "FUNCTION", 8,
+			 newSViv(*esr->function), 0);
+	}
+	if (esr->packageType) {
+		hv_store(href, "PACKAGE_TYPE", 12,
+			 translateOID(esr->packageType), 0);
+	}
+	if (esr->packageName) {
+		hv_store(href, "PACKAGE_NAME", 12,
+			 newSVpv(esr->packageName, 0), 0);
+	}
+	if (esr->userId) {
+		hv_store(href, "USER_ID", 7,
+			 newSVpv(esr->userId, 0), 0);
+	}
+	if (esr->waitAction) {
+		hv_store(href, "WAIT_ACTION", 11,
+			 newSViv(*esr->waitAction), 0);
+	}
+	if (esr->elements) {
+		hv_store(href, "ELEMENTS", 8,
+			 newSVpv(esr->elements, 0), 0);
+	}
+
+	if (ext && ext->which == Z_External_itemOrder) {
+		k = decodeItemOrderRequest(href, ext->u.itemOrder);
+	}
+	if (ext && !oid_oidcmp(yaz_oid_extserv_xml_es, esr->packageType)
+	    && ext->which ==  Z_External_octet) {
+	  hv_store(href, "XML_ILL", 7,
+		   newSVpvn(ext->u.octet_aligned->buf,
+			    ext->u.octet_aligned->len), 0);
+	}
+	PUSHMARK(SP);
+
+	XPUSHs(sv_2mortal(newRV( (SV*) href)));
+
+	PUTBACK;
+
+	perl_call_sv(esrequest_ref, G_SCALAR | G_DISCARD);
+
+	SPAGAIN;
+
+	temp = hv_fetch(href, "ERR_CODE", 8, 1);
+	if (temp) {
+		SV *err_code = newSVsv(*temp);
+		rr->errcode = SvIV(err_code);
+	}
+
+	temp = hv_fetch(href, "ERR_STR", 7, 1);
+	if (temp) {
+		SV *err_str = newSVsv(*temp);
+		STRLEN len;
+		char *ptr;
+		ptr = SvPV(err_str, len);
+		rr->errstring = odr_strdupn(rr->stream, ptr, len);
+	}
+	if (rr->errcode == 0 && k) {
+		rr->taskPackage = createItemOrderTaskPackage(href, k, rr);
+	}
+        temp = hv_fetch(href, "XML_ILL", 7, 1);
+	if (rr->errcode == 0 &&
+	    ext && !oid_oidcmp(yaz_oid_extserv_xml_es, esr->packageType)
+	    && temp) {
+	    SV *err_str = newSVsv(*temp);
+	    STRLEN len;
+	    char *ptr;
+	    Z_External *ext = (Z_External *)
+	      odr_malloc(rr->stream, sizeof(*ext));
+	    rr->taskPackageExt = ext;
+	    ext->direct_reference = esr->packageType;
+	    ext->descriptor = 0;
+	    ext->indirect_reference = 0;
+	    ext->which = Z_External_octet;
+	    ptr = SvPV(err_str, len);
+	    ext->u.octet_aligned = odr_create_Odr_oct(rr->stream, ptr, len);
+	}
+	PUTBACK;
+	FREETMPS;
+	LEAVE;
 	return 0;
 }
 
@@ -1451,7 +1576,6 @@ int bend_scan(void *handle, bend_scan_rr *rr)
 	HV *scan_item;
 	struct scan_entry *buffer;
 	int *step_size = rr->step_size;
-	int scan_list_size = rr->num_entries;
 	int i;
 	char **basenames;
 	SV **temp;
@@ -1487,6 +1611,10 @@ int bend_scan(void *handle, bend_scan_rr *rr)
 		rr->errcode = 229;	/* Unsupported term type */
 		return 0;
 	}
+	if (rr->attributeset)
+		setMember(href, "attributeSet",
+			  translateOID(rr->attributeset));
+
 	hv_store(href, "STEP", 4, newSViv(*step_size), 0);
 	hv_store(href, "NUMBER", 6, newSViv(rr->num_entries), 0);
 	hv_store(href, "POS", 3, newSViv(rr->term_position), 0);
@@ -1682,7 +1810,10 @@ bend_initresult *bend_init(bend_initrequest *q)
 	{
 		q->bend_present = bend_present;
 	}
-	/*q->bend_esrequest = bend_esrequest;*/
+	if (esrequest_ref)
+	{
+		q->bend_esrequest = bend_esrequest;
+	}
 	if (delete_ref)
 	{
 		q->bend_delete = bend_delete;
@@ -1716,6 +1847,7 @@ bend_initresult *bend_init(bend_initrequest *q)
 	if (q->auth) {
 	    char *user = NULL;
 	    char *passwd = NULL;
+	    char *group = NULL;
 	    if (q->auth->which == Z_IdAuthentication_open) {
                 char *cp;
 		user = nmem_strdup (odr_getmem (q->stream), q->auth->u.open);
@@ -1724,16 +1856,26 @@ bend_initresult *bend_init(bend_initrequest *q)
                     /* password after / given */
 		    *cp = '\0';
 		    passwd = cp+1;
+		    cp = strchr(passwd, '/');
+		    if (cp) {
+			/* user/group/passwd */
+			*cp = '\0';
+			group = passwd;
+			passwd = cp+1;
+		    }
 		}
 	    } else if (q->auth->which == Z_IdAuthentication_idPass) {
 		user = q->auth->u.idPass->userId;
 		passwd = q->auth->u.idPass->password;
+		group = q->auth->u.idPass->groupId;
 	    }
 	    /* ### some code paths have user/password unassigned here */
             if (user)
 	        hv_store(href, "USER", 4, newSVpv(user, 0), 0);
             if (passwd)
 	        hv_store(href, "PASS", 4, newSVpv(passwd, 0), 0);
+            if (group)
+	        hv_store(href, "GROUP", 5, newSVpv(group, 0), 0);
 	}
 
 	PUSHMARK(sp);

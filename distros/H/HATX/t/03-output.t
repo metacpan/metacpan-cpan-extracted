@@ -31,6 +31,12 @@ $got = join(' ',@$h);
 $exp = '65 66 67';
 is($got, $exp, $msg);
 
+$msg = 'hatx()->to_obj() returns undef';
+$h = hatx()->to_obj;
+$got = defined $h ? 'Defined' : 'Not Defined';
+$exp = 'Not Defined';
+is($got, $exp, $msg);
+
 }
 
 done_testing;

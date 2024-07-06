@@ -47,11 +47,11 @@ Provides a geocoding functionality to a local SQLite database containing geo-cod
 
 =head1 VERSION
 
-Version 0.35
+Version 0.36
 
 =cut
 
-our $VERSION = '0.35';
+our $VERSION = '0.36';
 
 =head1 SYNOPSIS
 
@@ -127,10 +127,13 @@ street is found, a place in the street is given.
 So "106 Wells Street, Fort Wayne, Allen, Indiana, USA" isn't found, a match for
 "Wells Street, Fort Wayne, Allen, Indiana, USA" will be given instead.
 Arguably that's incorrect, but it is the behaviour I want.
+If "exact" is not given,
+it will go on to look just for the town if the street isn't found.
 
 =cut
 
-sub geocode {
+sub geocode
+{
 	my $self = shift;
 
 	my %param;
@@ -147,7 +150,7 @@ sub geocode {
 	if(my $scantext = $param{'scantext'}) {
 		return if(length($scantext) < 6);
 		# FIXME:  wow this is inefficient
-		$scantext =~ s/\W+/ /g;
+		$scantext =~ s/[^\w']+/ /g;
 		my @words = split(/\s/, $scantext);
 		my $count = scalar(@words);
 		my $offset = 0;
@@ -204,7 +207,7 @@ sub geocode {
 				if(($l = $self->geocode(location => $addr)) && ref($l)) {
 					$l->confidence(0.1);
 					$l->location($addr);
-					::diag(__LINE__, ": $addr");
+					# ::diag(__LINE__, ": $addr");
 					push @rc, $l;
 				}
 				if($offset < $count - 2) {
@@ -252,6 +255,7 @@ sub geocode {
 		return Geo::Location::Point->new({
 			'lat' => $rc->{'latitude'},
 			'long' => $rc->{'longitude'},
+			'lng' => $rc->{'longitude'},
 			'location' => $location,
 			'database' => 'OpenAddresses'
 		});
@@ -357,8 +361,10 @@ sub geocode {
 					return $rc;
 				}
 			}
-			if(my $rc = $self->_search(\%addr, ('road', 'city', 'state', 'country'))) {
-				return $rc;
+			if((!$addr{'house_number'}) || !$param{'exact'}) {
+				if(my $rc = $self->_search(\%addr, ('road', 'city', 'state', 'country'))) {
+					return $rc;
+				}
 			}
 		}
 	}
@@ -738,7 +744,7 @@ sub geocode {
 				}
 				if($city =~ /^(\w[\w\s]+),\s*([,\w\s]+)/) {
 					# City includes a street name
-					my $street = uc($1);
+					$street = uc($1);
 					$city = uc($2);
 					my $number;
 					if($street =~ /^(\d+)\s+(.+)/) {
@@ -761,16 +767,18 @@ sub geocode {
 						return $rc;
 					}
 				}
-				if(my $rc = $self->_get("$city$state$c")) {
-					# return {
-						# 'number' => undef,
-						# 'street' => undef,
-						# 'city' => $city,
-						# 'state' => $state,
-						# 'country' => $country,
-						# %{$rc}
-					# };
-					return $rc;
+				if((!$street) || !$param{'exact'}) {
+					if(my $rc = $self->_get("$city$state$c")) {
+						# return {
+							# 'number' => undef,
+							# 'street' => undef,
+							# 'city' => $city,
+							# 'state' => $state,
+							# 'country' => $country,
+							# %{$rc}
+						# };
+						return $rc;
+					}
 				}
 			}
 		}
@@ -881,6 +889,9 @@ sub _get {
 	my $location = join('', @location);
 	$location =~ s/^\s+//;
 	$location =~ s/,\s*//g;
+	$location =~ tr/ž/z/;	# Remove wide characters
+	$location =~ s/\xc5\xbe/z/g;
+	$location =~ s/\N{U+017E}/z/g;
 
 	# ::diag(__PACKAGE__, ': ', __LINE__, ": _get: $location");
 	my $digest;
@@ -926,6 +937,7 @@ sub _get {
 		$rc = Geo::Location::Point->new({
 			'lat' => $rc->{'latitude'},
 			'long' => $rc->{'longitude'},
+			'lng' => $rc->{'longitude'},
 			'location' => $location,
 			'database' => 'OpenAddresses'
 		});

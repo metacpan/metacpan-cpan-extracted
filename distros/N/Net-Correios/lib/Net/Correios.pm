@@ -11,7 +11,7 @@ $Carp::Internal{ 'Net::Correios' }++;
 
 package Net::Correios;
 
-our $VERSION = '0.001';
+our $VERSION = '0.002';
 
 my %libs = (
   token        => 'Token',
@@ -23,6 +23,7 @@ my %libs = (
   prepostagens => 'Prepostagens',
   faturas      => 'Faturas',
   agencias     => 'Agencias',
+  manifestacao => 'Manifestacao',
 );
 
 # create lazy accessors.

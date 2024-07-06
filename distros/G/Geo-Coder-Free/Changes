@@ -1,5 +1,13 @@
 Revision history for Geo-Coder-Free
 
+0.36	Fri Jul  5 08:56:52 EDT 2024
+	Handle wide characters
+	Latest VWF
+	Added "exact" to OpenAddresses.pm
+	Local.pm - remove empty fields
+	Install bin/address_lookup
+	Set lng as well as long in the output
+
 0.35	Wed Mar  6 20:48:43 EST 2024
 	Fix scantext.t when OSM is installed
 	Fix openaddr.t test for not/there

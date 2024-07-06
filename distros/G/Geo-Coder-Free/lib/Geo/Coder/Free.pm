@@ -9,11 +9,13 @@ use warnings;
 
 # use lib '.';
 
+use Array::Iterator;
 use Config::Auto;
 use Geo::Coder::Abbreviations;
 use Geo::Coder::Free::MaxMind;
 use Geo::Coder::Free::OpenAddresses;
 use List::MoreUtils;
+use Locale::US;
 use Carp;
 
 =head1 NAME
@@ -22,11 +24,11 @@ Geo::Coder::Free - Provides a Geo-Coding functionality using free databases
 
 =head1 VERSION
 
-Version 0.35
+Version 0.36
 
 =cut
 
-our $VERSION = '0.35';
+our $VERSION = '0.36';
 
 our $alternatives;
 our $abbreviations;
@@ -197,10 +199,37 @@ sub geocode {
 		if(wantarray) {
 			my @rc = $self->{'openaddr'}->geocode(\%params);
 			if((my $scantext = $params{'scantext'}) && (my $region = $params{'region'})) {
-				$scantext =~ s/\W+/ /g;
+				$scantext =~ s/[^\w']+/ /g;
+				my @a = List::MoreUtils::uniq(split(/\s/, $scantext));
+				my $iterator = Array::Iterator->new({ __array__ => \@a });
+				while(my $w = $iterator->get_next()) {
+					next if(exists($common_words{lc($w)}));
+					if($w =~ /^[a-z]{2,}$/i) {
+						my $peek = $iterator->peek();
+						last if(!defined($peek));
+						my $offset;
+						if(exists($common_words{lc($peek)})) {
+							$peek = $iterator->peek(2);
+							last if(!defined($peek));
+							$offset = 3;
+						} else {
+							$offset = 2;
+						}
+						my $s;
+						if((length($peek) == 2) && (Locale::US->new()->{code2state}{uc($peek)})) {
+							$s = "$w $peek US";
+						} else {
+							my $peekpeek = $iterator->peek($offset);
+							last if(!defined($peekpeek));
+							$s = "$w $peek $peekpeek";
+						}
+						# ::diag($s);
+					}
+				}
+
 				foreach my $word(List::MoreUtils::uniq(split(/\s/, $scantext))) {
 					# FIXME:  There are a *lot* of false positives
-					next if(exists($common_words{lc$word}));
+					next if(exists($common_words{lc($word)}));
 					if($word =~ /^[a-z]{2,}$/i) {
 						my $key = "$word/$region";
 						my @matches;

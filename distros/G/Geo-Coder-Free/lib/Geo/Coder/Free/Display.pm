@@ -3,6 +3,14 @@ package Geo::Coder::Free::Display;
 # Display a page. Certain variables are available to all templates, such as
 # the stuff in the configuration file
 
+=head1 VERSION
+
+Version 0.36
+
+=cut
+
+our $VERSION = '0.36';
+
 use strict;
 use warnings;
 use Config::Auto;
@@ -13,6 +21,8 @@ use Template::Filters;
 use Template::Plugin::EnvHash;
 use HTML::SocialMedia;
 use Geo::Coder::Free::Utils;
+use Error;
+use Fatal qw(:void open);
 use File::pfopen;
 
 my %blacklist = (
@@ -93,35 +103,35 @@ sub new {
 			}
 		}
 	}
-	my $path;
-	if($ENV{'CONFIG_DIRECTORY'}) {
-		$path = $ENV{'CONFIG_DIRECTORY'};
+	my $config_dir;
+	if($ENV{'CONFIG_DIR'}) {
+		$config_dir = $ENV{'CONFIG_DIR'};
 	} else {
-		$path = File::Spec->catdir(
+		$config_dir = File::Spec->catdir(
 				$info->script_dir(),
 				File::Spec->updir(),
 				File::Spec->updir(),
 				'conf'
 			);
 
-		if(!-d $path) {
-			$path = File::Spec->catdir(
+		if(!-d $config_dir) {
+			$config_dir = File::Spec->catdir(
 					$info->script_dir(),
 					File::Spec->updir(),
 					'conf'
 				);
 		}
 
-		if(!-d $path) {
+		if(!-d $config_dir) {
 			if($ENV{'DOCUMENT_ROOT'}) {
-				$path = File::Spec->catdir(
+				$config_dir = File::Spec->catdir(
 					$ENV{'DOCUMENT_ROOT'},
 					File::Spec->updir(),
 					'lib',
 					'conf'
 				);
 			} else {
-				$path = File::Spec->catdir(
+				$config_dir = File::Spec->catdir(
 					$ENV{'HOME'},
 					'lib',
 					'conf'
@@ -129,28 +139,37 @@ sub new {
 			}
 		}
 
-		if(!-d $path) {
-			if($args{default_config_directory}) {
-				$path = $args{default_config_directory};
+		if(!-d $config_dir) {
+			if($args{config_directory}) {
+				$config_dir = $args{config_directory};
 			} elsif($args{logger}) {
-				while(my ($key,$value) = each %ENV) {
-					$args{logger}->debug("$key=$value");
+				while(my ($k, $v) = each %ENV) {
+					$args{logger}->debug("$k=$v");
 				}
 			}
 		}
 	}
+	if($args{'logger'}) {
+		$args{'logger'}->debug(__PACKAGE__, ': ', __LINE__, " path = $config_dir");
+	}
 	my $config;
 	eval {
-		if(-r File::Spec->catdir($path, $info->domain_name())) {
-			$config = Config::Auto::parse($info->domain_name(), path => $path);
-		} elsif (-r File::Spec->catdir($path, 'default')) {
-			$config = Config::Auto::parse('default', path => $path);
+		if(-r File::Spec->catdir($config_dir, $info->domain_name())) {
+			$config = Config::Auto::parse($info->domain_name(), path => $config_dir);
+		} elsif (-r File::Spec->catdir($config_dir, 'default')) {
+			$config = Config::Auto::parse('default', path => $config_dir);
 		} else {
 			die 'no suitable config file found';
 		}
 	};
 	if($@ || !defined($config)) {
-		die "Configuration error: $@: $path/", $info->domain_name();
+		die "Configuration error: $@: $config_dir/", $info->domain_name();
+	}
+
+	# The values in config are defaults which can be overridden by
+	# the values in args{config}
+	if(defined($args{'config'})) {
+		$config = { %{$config}, %{$args{'config'}} };
 	}
 
 	Template::Filters->use_html_entities();
@@ -158,14 +177,19 @@ sub new {
 	my $self = {
 		_config => $config,
 		_info => $info,
-		_lingua => $args{lingua},
 		_logger => $args{logger},
 		_cachedir => $args{cachedir},
-		# _page => $info->param('page'),
+		%args,
 	};
 
+	if(my $lingua = $args{'lingua'}) {
+		$self->{'_lingua'} = $lingua;
+	}
 	if(my $key = $info->param('key')) {
 		$self->{'_key'} = $key;
+	}
+	if(my $page = $info->param('page')) {
+		$self->{'_page'} = $page;
 	}
 
 	if(my $twitter = $config->{'twitter'}) {
@@ -177,14 +201,58 @@ sub new {
 		$sm = HTML::SocialMedia->new({ cache => $smcache, lingua => $args{lingua}, logger => $args{logger} });
 	}
 	$self->{'_social_media'}->{'facebook_share_button'} = $sm->as_string(facebook_share_button => 1);
-	$self->{'_social_media'}->{'google_plusone'} = $sm->as_string(google_plusone => 1);
+	# $self->{'_social_media'}->{'google_plusone'} = $sm->as_string(google_plusone => 1);
 
 	return bless $self, $class;
+}
+
+# Call this to display the page
+# It calls http() to create the HTTP headers, then html() to create the body
+sub as_string {
+	my ($self, $args) = @_;
+
+	# TODO: Get all cookies and send them to the template.
+	# 'cart' is an example
+	unless($args && $args->{cart}) {
+		my $purchases = $self->{_info}->get_cookie(cookie_name => 'cart');
+		if($purchases) {
+			my %cart = split(/:/, $purchases);
+			$args->{cart} = \%cart;
+		}
+	}
+	unless($args && $args->{itemsincart}) {
+		if($args->{cart}) {
+			my $itemsincart;
+			foreach my $key(keys %{$args->{cart}}) {
+				if(defined($args->{cart}{$key}) && ($args->{cart}{$key} ne '')) {
+					$itemsincart += $args->{cart}{$key};
+				} else {
+					delete $args->{cart}{$key};
+				}
+			}
+			$args->{itemsincart} = $itemsincart;
+		}
+	}
+
+	# my $html = $self->html($args);
+	# unless($html) {
+		# return;
+	# }
+	# return $self->http() . $html;
+	my $rc = $self->http();
+	if($rc =~ /^Location:\s/ms) {
+		return $rc;
+	}
+	return $rc . $self->html($args);
 }
 
 sub get_template_path {
 	my $self = shift;
 	my %args = (ref($_[0]) eq 'HASH') ? %{$_[0]} : @_;
+
+	if($self->{_logger}) {
+		$self->{_logger}->trace('Entering get_template_path');
+	}
 
 	if($self->{_filename}) {
 		return $self->{_filename};
@@ -192,7 +260,7 @@ sub get_template_path {
 
 	my $dir = $self->{_config}->{root_dir} || $self->{_info}->root_dir();
 	if($self->{_logger}) {
-		$self->{_logger}->debug("Rootdir: $dir");
+		$self->{_logger}->debug(__PACKAGE__, ': ', __LINE__, ": root_dir $dir");
 		$self->{_logger}->debug(Data::Dumper->new([$self->{_config}])->Dump());
 	}
 	$dir .= '/templates';
@@ -239,9 +307,16 @@ sub get_template_path {
 	my $modulepath = $args{'modulepath'} || ref($self);
 	$modulepath =~ s/::/\//g;
 
+	if($prefix =~ /\.\.\//) {
+		throw Error::Simple("Prefix must not contain ../ ($prefix)");
+	}
+
+	# Untaint the prefix value which may have been read in from a configuration file
+	($prefix) = ($prefix =~ m/^([A-Z0-9_\.\-\/:]+)$/ig);
+
 	my ($fh, $filename) = File::pfopen::pfopen($prefix, $modulepath, 'tmpl:tt:html:htm:txt');
 	if((!defined($filename)) || (!defined($fh))) {
-		die "Can't find suitable $modulepath html or tmpl file in $prefix in $dir or a subdir";
+		throw Error::Simple("Can't find suitable $modulepath html or tmpl file in $prefix in $dir or a subdir");
 	}
 	close($fh);
 	$self->_debug({ message => "using $filename" });
@@ -249,13 +324,15 @@ sub get_template_path {
 	return $filename;
 }
 
-sub set_cookie {
+sub set_cookie
+{
 	my $self = shift;
 	my %params = (ref($_[0]) eq 'HASH') ? %{$_[0]} : @_;
 
 	foreach my $key(keys(%params)) {
 		$self->{_cookies}->{$key} = $params{$key};
 	}
+	return $self;
 }
 
 sub http {
@@ -301,9 +378,11 @@ sub http {
 
 	# https://www.owasp.org/index.php/Clickjacking_Defense_Cheat_Sheet
 	# https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/X-Content-Type-Options
-	return $rc . "X-Frame-Options: SAMEORIGIN\nX-Content-Type-Options: nosniff\n\n";
+	return $rc . "X-Frame-Options: SAMEORIGIN\nX-Content-Type-Options: nosniff\nReferrer-Policy: strict-origin-when-cross-origin\n\n";
 }
 
+# Override this routine in a subclass if you wish to create special arguments to
+# send to the template
 sub html {
 	my $self = shift;
 	my %params = (ref($_[0]) eq 'HASH') ? %{$_[0]} : @_;
@@ -349,12 +428,12 @@ sub html {
 
 		if(!$template->process($filename, $vals, \$rc)) {
 			if(my $err = $template->error()) {
-                                die $err;
-                        }
-                        die "Unknown error in template: $filename";
-                }
+				throw Error::Simple($err);
+			}
+			throw Error::Simple("Unknown error in template: $filename");
+		}
 	} elsif($filename =~ /\.(html?|txt)$/) {
-		open(my $fin, '<', $filename) || die "$filename: $!";
+		open(my $fin, '<', $filename) || throw Error::Simple("$filename: $!");
 
 		my @lines = <$fin>;
 
@@ -362,57 +441,18 @@ sub html {
 
 		$rc = join('', @lines);
 	} else {
-		warn "Unhandled file type $filename";
+		throw Error::Simple("Unhandled file type $filename");
 	}
 
-	if(($filename !~ /.txt$/) && ($rc =~ /\smailto:(.+?)>/)) {
-		unless($1 =~ /^&/) {
-			$self->_debug({ message => "Found mailto link $1, you should remove it or use " . obfuscate($1) . ' instead' });
-		}
+	if(($filename !~ /.txt$/) && ($rc =~ /\smailto:(.+?)>/) && ($1 !~ /^&/)) {
+		$self->_debug({ message => "Found mailto link $1, you should remove it or use " . obfuscate($1) . ' instead' });
 	}
 
 	return $rc;
 }
 
-sub as_string {
-	my ($self, $args) = @_;
-
-	# TODO: Get all cookies and send them to the template.
-	# 'cart' is an example
-	unless($args && $args->{cart}) {
-		my $purchases = $self->{_info}->get_cookie(cookie_name => 'cart');
-		if($purchases) {
-			my %cart = split(/:/, $purchases);
-			$args->{cart} = \%cart;
-		}
-	}
-	unless($args && $args->{itemsincart}) {
-		if($args->{cart}) {
-			my $itemsincart;
-			foreach my $key(keys %{$args->{cart}}) {
-				if(defined($args->{cart}{$key}) && ($args->{cart}{$key} ne '')) {
-					$itemsincart += $args->{cart}{$key};
-				} else {
-					delete $args->{cart}{$key};
-				}
-			}
-			$args->{itemsincart} = $itemsincart;
-		}
-	}
-
-	# my $html = $self->html($args);
-	# unless($html) {
-		# return;
-	# }
-	# return $self->http() . $html;
-	my $rc = $self->http();
-	if($rc =~ /^Location:\s/ms) {
-		return $rc;
-	}
-	return $rc . $self->html($args);
-}
-
-sub _debug {
+sub _debug
+{
 	my $self = shift;
 
 	if($self->{_logger}) {
@@ -423,6 +463,7 @@ sub _debug {
 			$self->{_logger}->debug($params{'message'});
 		}
 	}
+	return $self;
 }
 
 sub obfuscate {
@@ -444,8 +485,8 @@ sub _append_browser_type {
 	if($self->{_logger}) {
 		$self->{_logger}->debug("_append_browser_type: directory = $directory");
 	}
-	my $rc;
 
+	my $rc;
 	if(-d $directory) {
 		if($self->{_info}->is_search_engine()) {
 			$rc = "$directory/search:$directory/robot:";
@@ -461,7 +502,6 @@ sub _append_browser_type {
 	}
 
 	return '';	# Don't return undef or else the caller may use an uninit variable
-
 }
 
 1;

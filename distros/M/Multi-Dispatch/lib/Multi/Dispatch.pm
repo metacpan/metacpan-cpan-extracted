@@ -7,7 +7,7 @@ use re 'eval';
 use mro;
 use Data::Dump;
 
-our $VERSION = '0.000003';
+our $VERSION = '0.000004';
 
 use Keyword::Simple;
 use PPR;
@@ -977,7 +977,7 @@ sub _build_dispatcher_sub {
                     </DEBUG>
 
                     # Add the redispatch mechanism to the argument list...
-                    push @_, __SUB__;
+                    push @_, __SUB__();
 
                     # And then execute the variant...
                     goto &{$handler};
@@ -1510,7 +1510,7 @@ Multi::Dispatch - Multiple dispatch for Perl subs and methods
 
 =head1  VERSION
 
-This document describes Multi::Dispatch version 0.000003
+This document describes Multi::Dispatch version 0.000004
 
 
 =head1  SYNOPSIS

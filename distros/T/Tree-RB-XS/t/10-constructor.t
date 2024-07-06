@@ -80,6 +80,15 @@ subtest custom_tree => sub {
 subtest type_by_name => sub {
 	my $tree= Tree::RB::XS->new(key_type => 'KEY_TYPE_BSTR');
 	is( $tree->key_type, KEY_TYPE_BSTR, 'key_type' );
-};	
+};
+
+subtest initial_kv_list => sub {
+	my $tree= Tree::RB::XS->new(kv => [1..10]);
+	is( $tree->size, 5, 'added 5 nodes' );
+	$tree= Tree::RB::XS->new(kv => [1,2,1,3]);
+	is( $tree, object { call size => 1; call min => object { call value => 3; }; }, 'overwrite value' );
+	$tree= Tree::RB::XS->new(kv => [1,2,1,3], allow_duplicates => 1);
+	is( $tree, object { call size => 2; call min => object { call value => 2; }; }, 'dup keys' );
+};
 
 done_testing;

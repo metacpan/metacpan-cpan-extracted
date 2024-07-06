@@ -1,10 +1,11 @@
 package Whelk::Schema::Definition;
-$Whelk::Schema::Definition::VERSION = '0.03';
+$Whelk::Schema::Definition::VERSION = '0.04';
 use Whelk::StrictBase;
 use Carp;
 use Kelp::Util;
 use Scalar::Util qw(blessed);
 use Storable qw(dclone);
+use Data::Dumper;
 use JSON::PP;
 
 # no import loop, load Whelk::Schema for child classes
@@ -110,8 +111,12 @@ sub inhale_or_error
 
 	my $inhaled = $self->inhale($data);
 	if (defined $inhaled) {
-		$error_sub->($inhaled);
-		die 'inhale_or_error error subroutine did not throw an exception';
+		$error_sub->($inhaled)
+			if ref $error_sub eq 'CODE';
+
+		# generic error in case $error_sub was not passed or did not throw
+		my $class = ref $self;
+		die "incorrect data for $class ($inhaled): " . Dumper($data);
 	}
 
 	return undef;

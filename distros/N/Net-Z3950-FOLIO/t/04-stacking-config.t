@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-use Test::More tests => 20;
+use Test::More tests => 26;
 BEGIN { use_ok('Net::Z3950::FOLIO::Config') };
 
 my $cfg = new Net::Z3950::FOLIO::Config('t/data/config/foo', 'bar');
@@ -23,9 +23,17 @@ is($cfg->{quux}, 99, "Present only in second override");
 $cfg = new Net::Z3950::FOLIO::Config('t/data/config/foo', 'marcHoldings');
 ok(defined $cfg, 'parsed stacked foo->marcHoldings config');
 is($cfg->{marcHoldings}->{field}, "952", "Base value, not overriden");
-is($cfg->{marcHoldings}->{fieldPerItem}, undef, "Absent base value");
+is($cfg->{marcHoldings}->{fieldPerItem}, undef, "Absent base value (fieldPerItem)");
 
 $cfg = new Net::Z3950::FOLIO::Config('t/data/config/foo', 'marcHoldings', 'fieldPerItem');
 ok(defined $cfg, 'parsed stacked foo->marcHoldings->fieldPerItem config');
 is($cfg->{marcHoldings}->{field}, "952", "Base value, not overriden");
 is($cfg->{marcHoldings}->{fieldPerItem}, 1, "fieldPerItem overriden");
+is($cfg->{fieldDefinitions}->{circulation}->{dummy}, "someField", "Present base value (dummy)");
+is($cfg->{fieldDefinitions}->{circulation}->{availableThru}, undef, "Absent base value (availableThru)");
+
+$cfg = new Net::Z3950::FOLIO::Config('t/data/config/foo', 'marcHoldings', 'fieldPerItem', 'atplt');
+ok(defined $cfg, 'parsed stacked foo->marcHoldings->fieldPerItem->atplt config');
+is($cfg->{marcHoldings}->{field}, "952", "Base value, not overriden");
+is($cfg->{fieldDefinitions}->{circulation}->{dummy}, "someField", "Present base value (dummy)");
+is($cfg->{fieldDefinitions}->{circulation}->{availableThru}, "permanentLoanType", "availableThru overriden");

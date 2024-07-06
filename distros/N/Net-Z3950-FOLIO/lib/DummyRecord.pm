@@ -5,13 +5,16 @@ package DummyResultSet;
 
 sub new {
     my $class = shift();    
+    my($cfg) = @_;
     return bless {
+	cfg => $cfg,
     }, $class;
 }
 
 sub session {
+    my $this = shift();
     return {
-	cfg => {} # XXX fill this in
+	cfg => $this->{cfg},
     };
 }
 
@@ -22,10 +25,10 @@ use Net::Z3950::FOLIO::HoldingsRecords qw(makeHoldingsRecords);
 
 sub new {
     my $class = shift();
-    my($folioHoldings, $marc) = @_;
+    my($folioHoldings, $marc, $cfg) = @_;
 
     return bless {
-	rs => new DummyResultSet(),
+	rs => new DummyResultSet($cfg),
 	folioHoldings => $folioHoldings,
 	marc => $marc,
     }, $class;

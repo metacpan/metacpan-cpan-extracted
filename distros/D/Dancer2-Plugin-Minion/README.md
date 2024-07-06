@@ -1,62 +1,103 @@
-# NAME
+<p align="center">
+    <img src="https://c.tenor.com/Yz9re4omkaQAAAAC/minions-dance.gif" alt="Dancing Minion">
+</p>
 
-Dancer2::Plugin::Minion - Easy access to Minion job queue in your Dancer2 
-applications
+# Dancer2::Plugin::Minion - Make your minions dance!
 
-# SYNOPSIS
-
-    package MyApp;
-    use Dancer2;
-    use Dancer2::Plugin::Minion;
-    use Plack::Builder;
-
-    get '/' => sub {
-        add_task( add => sub {
-            my ($job, $first, $second) = @_;
-            $job->finish($first + $second);
-        });
-    };
-
-    get '/another-route' => sub {
-        my $id = enqueue(add => [1, 1]);
-        # Do something with $id
-    };
-
-    get '/yet-another-route' => sub {
-        # Get a job ID, then...
-        my $result = minion->job($id)->info->{result};
-    };
-
-    build {
-      mount '/dashboard/' => minion_app->start;
-      mount '/' => start;
-    }
-
-    # In config.yml
-    plugins:
-        Minion:
-            dsn: sqlite:test.db
-            backend: SQLite
-
-# DESCRIPTION
+<p align="center">
+  This plugin provides easy access to a Minion job queue
+  in your Dancer2 applications.
+  <br>
+  <a href="https://metacpan.org/pod/Dancer2%3A%3AManual">Dancer2 Documentation</a>
+  ·
+  <a href="https://metacpan.org/pod/Minion">Minion Documentation</a>
+  ·
+  <a href="https://github.com/cromedome/Dancer2-Plugin-Minion/wiki">Public Wiki</a>
+  ·
+  <a href="https://github.com/cromedome/Dancer2-Plugin-Minion/issues">Issues</a>
+</p><br>
 
 `Dancer2::Plugin::Minion` makes it easy to add a job queue to any of your
-[Dancer2](https://metacpan.org/pod/Dancer2) applications. The queue is powered by [Minion](https://metacpan.org/pod/Minion) and uses a 
-backend of your choosing, such as PostgreSQL or SQLite.
+[Dancer2](https://metacpan.org/pod/Dancer2) applications. The queue is powered by [Minion](https://metacpan.org/pod/Minion)
+and a backend of your choosing, such as [PostgreSQL](https://postgresql.org) or
+[SQLite](https://sqlite.org).
 
 The plugin lazily instantiates a Minion object, which is accessible via the
-`minion` keyword. Any method, attribute, or event you need in Minion is 
+`minion` keyword. Any method, attribute, or event you need in Minion is
 available via this keyword. Additionally, `add_task` and `enqueue` keywords
 are available to make it convenient to add and start new queued jobs.
 
-See the [Minion](https://metacpan.org/pod/Minion) documentation for more complete documentation on the methods
-and functionality available.
+Add Minion to your `config.yml`:
+```
+plugins:
+  Minion:
+    dsn: sqlite:test.db
+    backend: SQLite
+```
+And then implement queuing in your Dancer2 application:
+
+```
+package MyApp;
+use Dancer2;
+use Dancer2::Plugin::Minion;
+use Plack::Builder;
+
+get '/' => sub {
+    add_task( add => sub {
+        my ( $job, $first, $second ) = @_;
+        $job->finish( $first + $second );
+    });
+};
+
+get '/start-job' => sub {
+    my $id = enqueue( add => [1, 1] );
+    return "Started job ID $id";
+};
+
+get '/job-results/:job_id' => sub {
+    my $id     = route_parameters->get( 'job_id' ) // 0;
+    my $result = minion->job( $id )->info->{ result };
+};
+
+build {
+    mount '/dashboard/' => minion_app->start;
+    mount '/' => start;
+}
+```
+The above application:
+- Adds a route (`/`) that defines a job (`add`)
+- Adds a route (`/start-job`) to start the `add` job
+- Adds a route (`/job-results`) to show information about a job
+- Enables the Minion admin dashboard on `/dashboard`
+
+Finally, create a Minion worker to run your queued jobs:
+```
+#!/usr/bin/env perl
+
+use Dancer2;
+use Dancer2::Plugin::Minion;
+
+minion->add_task( add => sub {
+    my ( $job, $first, $second ) = @_;
+    $job->finish( $first + $second );
+});
+
+my $worker = minion->worker;
+$worker->run;
+```
+(you can even refactor the definition of `add` into another module to
+eliminate duplicated code too!)
+
+By using `Dancer2::Plugin::Minion` in your worker, it will have
+access to the settings defined in your Dancer2 application's
+`config.yml` file. See [Minion::Worker](https://metacpan.org/pod/Minion%3A%3AWorker)
+for more information.
 
 # ATTRIBUTES
 
 ## minion
 
-The [Minion](https://metacpan.org/pod/Minion)-based object. See the [Minion](https://metacpan.org/pod/Minion) documentation for a list of
+A [Minion](https://metacpan.org/pod/Minion)-based object. See the [Minion](https://metacpan.org/pod/Minion) documentation for a list of
 additional methods provided.
 
 If no backend is specified, Minion will default to an in-memory temporary
@@ -68,13 +109,13 @@ for details
 
 ## add\_task()
 
-Keyword/shortcut for `minion->add_task()`. See 
+Keyword/shortcut for `minion->add_task()`. See
 [Minion's add\_task() documentation](https://metacpan.org/pod/Minion#add_task) for
 more information.
 
 ## enqueue()
 
-Keyword/shortcut for `minion->enqueue()`. 
+Keyword/shortcut for `minion->enqueue()`.
 See [Minion's enqueue() documentation](https://metacpan.org/pod/Minion#enqueue1)
 for more information.
 
@@ -87,38 +128,8 @@ slash in your mount path!
 
 You can optionally pass in an absolute URL to act as the "return to" link. The url must
 be absolute or else it will be made relative to the admin UI, which is probably
-not what you want. For example: 
+not what you want. For example:
 `mount '/dashboard/' => minion_app( 'http://localhost:5000/foo' )->start;`
-
-# RUNNING JOBS
-
-You will need to create a Minion worker if you want to be able to run your 
-queued jobs. Thankfully, you can write a minimal worker with just a few
-lines of code:
-
-    #!/usr/bin/env perl
-
-    use Dancer2;
-    use Dancer2::Plugin::Minion;
-    use MyJobLib;
-
-    minion->add_task( my_job_1 => MyJobLib::job1());
-
-    my $worker = minion->worker;
-    $worker->run;
-
-By using `Dancer2::Plugin::Minion`, your worker will be configured with 
-the settings provided in your `config.yml` file. See [Minion::Worker](https://metacpan.org/pod/Minion%3A%3AWorker) 
-for more information.
-
-# SEE ALSO
-
-- [Dancer2](https://metacpan.org/pod/Dancer2)
-- [Minion](https://metacpan.org/pod/Minion)
-
-# AUTHOR
-
-Jason A. Crome ` cromedome AT cpan DOT org `
 
 # ACKNOWLEDGEMENTS
 
@@ -130,20 +141,13 @@ The following contributors have sent patches, suggestions, or bug reports that
 led to the improvement of this plugin:
 
 - Gabor Szabo
-=item \* Joel Berger
-=item \* Slaven Rezić
+- Joel Berger
+- Slaven Rezić
+- Julien Fiegehenn
 
 # COPYRIGHT AND LICENSE
 
-Copyright (c) 2020, Clearbuilt Technologies.
+Copyright (c) 2024, Jason A. Crome
 
-This is free software; you can redistribute it and/or modify it under 
+This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
-
-# POD ERRORS
-
-Hey! **The above document had some coding errors, which are explained below:**
-
-- Around line 211:
-
-    Non-ASCII character seen before =encoding in 'Rezić'. Assuming UTF-8

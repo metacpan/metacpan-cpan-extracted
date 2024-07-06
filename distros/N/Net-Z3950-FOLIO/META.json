@@ -4,7 +4,7 @@
       "Mike Taylor <mike@indexdata.com>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.64, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "unknown"
    ],
@@ -32,6 +32,8 @@
       "runtime" : {
          "requires" : {
             "Cpanel::JSON::XS" : "4.08",
+            "DateTime" : "1.65",
+            "HTTP::Cookies" : "6.1",
             "LWP::Protocol::https" : "6.04",
             "LWP::UserAgent" : "6.05",
             "MARC::File::XML" : "v1.0.5",
@@ -57,6 +59,6 @@
          "web" : "https://github.com/folio-org/Net-Z3950-FOLIO"
       }
    },
-   "version" : "v3.3.5",
-   "x_serialization_backend" : "JSON::PP version 4.02"
+   "version" : "v4.0.0",
+   "x_serialization_backend" : "JSON::PP version 4.07"
 }

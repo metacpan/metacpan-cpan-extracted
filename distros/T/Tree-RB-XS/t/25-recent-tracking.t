@@ -43,6 +43,10 @@ subtest re_insert => sub {
 
    is( $t->newest($t->get_node(1))->key, 1, 'newest = 1' );
    is( $t->oldest($t->get_node(1))->key, 1, 'oldest = 1' );
+   
+   $t->lookup_updates_recent(1);
+   my $n= $t->get_node(6);
+   is( $t->newest, $n, 'accessing 6 makes it the newest' );
 };
 
 subtest delete => sub {

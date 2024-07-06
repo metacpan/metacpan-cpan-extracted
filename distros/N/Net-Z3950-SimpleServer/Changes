@@ -1,5 +1,32 @@
 Revision history for Perl extension Net::Z3950::SimpleServer
 
+1.27  Fri  5 Jul 2024 20:35:58 BST
+	* Rework configuration to use Debian's yaz-config when
+	  pkg-config is absent. Fixes ZOOM-30.
+	* Tests now work on platforms (such as MacOS 12.7.5) where the
+	  program is hardened and will not accept dynamic libraries
+	  from relative paths. Fixes ZOOM-31.
+
+1.26  Mon Oct  8 13:47:43 CEST 2018
+        * SIM-29: Handle extended service XML-ES response
+
+1.25  Wed Sep 26 15:19:30 CEST 2018
+        * SIM-28: Handle extended service XML-ES (pass XML_ILL document)
+
+1.24  Tue Mar  7 11:05:56 CET 2017
+	* Extended Service: no fake targetReference in Task Package
+	* Few doc updates; bump copyright year
+	* Use thread-safe notation for callbacks
+
+1.23  Mon Nov 14 15:54:36 UTC 2016
+	* GROUP passed to init handler
+
+1.22  Tue Nov  1 11:23:56 UTC 2016
+	* Extended service Item Order with XML body
+	* SCHEMA_OID to fetch+present handler
+	* Include Travis files in MANIFEST.
+	* Fix a couple of compiler warnings
+
 1.21  Tue Sep 27 09:40:12 UTC 2016
 	* Better support for facets. Cope with absent terms.
 	* Sample server ztest.pl demonstrates facets implemention.

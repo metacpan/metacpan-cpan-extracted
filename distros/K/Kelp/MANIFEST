@@ -83,6 +83,9 @@ t/encoders.t
 t/exceptions.t
 t/json-encode-error.t
 t/less.t
+t/lib/CustomContext/Context.pm
+t/lib/CustomContext/Controller.pm
+t/lib/CustomContext/Controller/Foo.pm
 t/lib/JsonError.pm
 t/lib/Kelp/Module/Config/Injected.pm
 t/lib/Kelp/Module/Plus.pm
@@ -96,6 +99,7 @@ t/lib/MyApp/Routes2.pm
 t/lib/MyApp2.pm
 t/lib/MyApp2/Controller.pm
 t/lib/MyApp2/Controller/Bar.pm
+t/lib/MyApp3.pm
 t/lib/StringifyingException.pm
 t/lib/UtilPackage.pm
 t/loaded_modules.t
@@ -128,6 +132,7 @@ t/response_finalize.t
 t/response_redirect.t
 t/routes_add.t
 t/routes_controller.t
+t/routes_custom_controller.t
 t/routes_invalid.t
 t/routes_match.t
 t/routes_url.t

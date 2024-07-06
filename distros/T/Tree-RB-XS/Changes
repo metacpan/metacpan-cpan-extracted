@@ -1,3 +1,13 @@
+Version 0.10 - 2024-07-05
+  - New method 'exists', takes list of keys and returns node count
+  - New methods put_multi and insert_multi
+  - Optimization for insertions of adjacent nodes, can build new tree
+     in N+1 comparisons
+  - New configuration attribute 'lookup_updates_recent' finishes the feature
+     set needed for a typical LRU cache.
+  - Constructor option 'kv' to initialize the tree
+  - Fix bug when replacing multiple nodes with a 'put'
+
 Version 0.09 - 2024-07-04
   - Fix XS bug in iter->next when iterating 'recent' and count > 1.
   - Count greater than INT_MAX passed to iter->next now returns all nodes

@@ -4,6 +4,7 @@ lib/Net/Correios/Agencias.pm
 lib/Net/Correios/CEP.pm
 lib/Net/Correios/Empresas.pm
 lib/Net/Correios/Faturas.pm
+lib/Net/Correios/Manifestacao.pm
 lib/Net/Correios/Prazo.pm
 lib/Net/Correios/Preco.pm
 lib/Net/Correios/Prepostagens.pm

@@ -20,7 +20,9 @@ use warnings;
 use IO::File;
 use MARC::Record;
 use Cpanel::JSON::XS qw(decode_json);
-use Test::More tests => 4;
+use Test::More tests => 5;
+use Test::Differences;
+oldstyle_diff;
 BEGIN { use_ok('Net::Z3950::FOLIO') };
 use Net::Z3950::FOLIO::OPACXMLRecord;
 use DummyRecord;
@@ -28,13 +30,22 @@ use DummyRecord;
 # Values taken from some random USMARC record
 my $dummyMarc = makeDummyMarc();
 
-for (my $i = 1; $i <= 3; $i++) {
-    my $expected = readFile("t/data/records/expectedOutput$i.xml");
+for (my $testNo = 1; $testNo <= 4; $testNo++) {
+    my $i = $testNo eq 4 ? 3 : $testNo;
+    my $dummyCfg = $testNo ne 4 ? undef : {
+	fieldDefinitions => {
+	    circulation => {
+		availableThru => 'temporaryLocation.servicePoints[0].discoveryDisplayName',
+	    }
+	},
+    };
+    my $expected = readFile("t/data/records/expectedOutput$testNo.xml");
     my $folioJson = readFile("t/data/records/input$i.json");
     my $folioHoldings = decode_json(qq[{ "holdingsRecords2": $folioJson }]);
-    my $rec = new DummyRecord($folioHoldings, $dummyMarc);
+    my $rec = new DummyRecord($folioHoldings, $dummyMarc, $dummyCfg);
+    # use Data::Dumper; $Data::Dumper::INDENT = 2; warn "Config =", Dumper($rec->rs()->session()->{cfg});
     my $holdingsXml = Net::Z3950::FOLIO::OPACXMLRecord::makeOPACXMLRecord($rec, $dummyMarc);
-    is($holdingsXml, $expected, "generated holdings $i match expected XML");
+    eq_or_diff($holdingsXml, $expected, "generated holdings $i match expected XML");
 }
 
 

@@ -22,11 +22,12 @@ or by using the app GPSCF which are included here.
 
 =head1 VERSION
 
-Version 0.35
+Version 0.36
 
 =cut
 
-our $VERSION = '0.35';
+our $VERSION = '0.36';
+
 use constant	LIBPOSTAL_UNKNOWN => 0;
 use constant	LIBPOSTAL_INSTALLED => 1;
 use constant	LIBPOSTAL_NOT_INSTALLED => -1;
@@ -154,6 +155,11 @@ sub geocode {
 		# ::diag("Compare $str->$lc");
 		# print "Compare $str->$lc\n";
 		if($str eq $lc) {
+			foreach my $column ('name', 'state_district') {
+				if((!defined($rc->{$column})) && exists($rc->{$column})) {
+					delete $rc->{$column};
+				}
+			}
 			return $rc;
 		}
 		if($str =~ /, us$/) {
@@ -510,7 +516,8 @@ sub geocode {
 
 # $data is a hashref to data such as returned by Geo::libpostal::parse_address
 # @columns is the key names to use in $data
-sub _search {
+sub _search
+{
 	my ($self, $data, @columns) = @_;
 
 	# FIXME: linear search is slow
@@ -526,7 +533,7 @@ sub _search {
 		# print Data::Dumper->new([$self->{data}])->Dump();
 
 		foreach my $column(@columns) {
-			if($data->{$column}) {
+			if(defined($data->{$column})) {
 				# ::diag("$column: ", $row->{$column}, '/', $data->{$column});
 				# print "$column: ", $row->{$column}, '/', $data->{$column}, "\n";
 				if(!defined($row->{$column})) {
@@ -538,6 +545,8 @@ sub _search {
 					last;
 				}
 				$number_of_columns_matched++;
+			} elsif(exists $data->{$column}) {
+				delete $data->{$column};
 			}
 		}
 		# ::diag("match: $match");

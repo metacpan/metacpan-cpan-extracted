@@ -94,10 +94,10 @@ if (!defined($pid = fork() )) {
 	die "Cannot fork: $!\n";
 } elsif ($pid) {                                        ## Parent launches server
 	my $handler = Net::Z3950::SimpleServer->new(
-		INIT		=>	\&my_init_handler,
-		CLOSE		=>	\&my_close_handler,
-		SEARCH		=>      \&my_search_handler,
-		FETCH		=>	\&my_fetch_handler);
+		INIT		=>      "main::my_init_handler",
+		CLOSE		=>	"main::my_close_handler",
+		SEARCH		=>      "main::my_search_handler",
+		FETCH		=>	"main::my_fetch_handler");
 
 	$handler->launch_server("test.pl", "-1", $socket);
 } else {						## Child starts the client

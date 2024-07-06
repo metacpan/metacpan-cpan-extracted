@@ -23,6 +23,7 @@
       "build" : {
          "requires" : {
             "App::csv2sqlite" : "0",
+            "Array::Iterator" : "0",
             "CHI" : "0",
             "CHI::Driver::RawMemory" : "0",
             "Config::Auto" : "0",
@@ -106,6 +107,6 @@
          "web" : "https://github.com/nigelhorne/Geo-Coder-Free"
       }
    },
-   "version" : "0.35",
+   "version" : "0.36",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

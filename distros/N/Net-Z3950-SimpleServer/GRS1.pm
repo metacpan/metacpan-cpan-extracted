@@ -258,6 +258,7 @@ sub Raw			{ 3 }
 
 __END__
 
+=encoding iso8859-1
 
 =head1 NAME
 

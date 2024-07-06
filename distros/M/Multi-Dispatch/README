@@ -1,4 +1,4 @@
-Multi::Dispatch version 0.000003
+Multi::Dispatch version 0.000004
 
 This module provides two new keywords: 'multi' and 'multimethod'
 which allow you to define multiply dispatched subroutines and methods

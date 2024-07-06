@@ -3,6 +3,7 @@ package Net::Z3950::FOLIO::Session;
 use strict;
 use warnings;
 
+use DateTime;
 use Cpanel::JSON::XS qw(decode_json encode_json);
 use Net::Z3950::FOLIO::Config;
 use Net::Z3950::FOLIO::ResultSet;
@@ -15,8 +16,14 @@ sub new {
     my $class = shift();
     my($ghandle, $name) = @_;
 
+    my $ua = new LWP::UserAgent();
+    my $jar = HTTP::Cookies->new();
+    $ua->cookie_jar($jar);
+    $ua->agent("z2folio $Net::Z3950::FOLIO::VERSION");
+
     return bless {
 	ghandle => $ghandle,
+	ua => $ua,
 	name => $name,
 	resultsets => {}, # indexed by setname
     }, $class;
@@ -33,7 +40,6 @@ sub reloadConfigFile {
 
 sub login {
     my $this = shift(); 
-    my $ghandle = $this->{ghandle};
     my($user, $pass) = @_;
 
     my $cfg = $this->{cfg};
@@ -43,16 +49,82 @@ sub login {
     _throw(1014, "credentials not supplied")
 	if !defined $username || !defined $password;
 
-    my $url = $cfg->{okapi}->{url} . '/bl-users/login';
+    my $url = $cfg->{okapi}->{url} . '/authn/login-with-expiry';
     my $req = $this->_makeHTTPRequest(POST => $url);
     $req->content(qq[{ "username": "$username", "password": "$password" }]);
     # warn "req=", $req->content();
-    my $res = $ghandle->{ua}->request($req);
+    my $res = $this->{ua}->request($req);
     # warn "res=", $res->content();
     _throw(1014, $res->content())
 	if !$res->is_success();
 
-    $this->{token} = $res->header('X-Okapi-token');
+    $this->_setRefreshTokenExpiration($res);
+}
+
+
+sub _setRefreshTokenExpiration {
+    my $this = shift();    
+    my($res) = @_;
+
+    my $json = decode_json($res->content());
+    my $refreshTokenEpoch = _isoStringToEpoch($json->{refreshTokenExpiration});
+    my $accessTokenEpoch = _isoStringToEpoch($json->{accessTokenExpiration});
+    my $minEpoch = $refreshTokenEpoch < $accessTokenEpoch ? $refreshTokenEpoch : $accessTokenEpoch;
+    my $nowEpoch = DateTime->now()->epoch();
+    my $secs = $minEpoch - $nowEpoch;
+    warn 'refresh token expires in ', $refreshTokenEpoch-$nowEpoch, ' seconds, access token in ', $accessTokenEpoch-$nowEpoch;
+
+    # Choose when to get a new token, based on when the shorter-lived
+    # of the two tokens expires. One simple option would be when half
+    # of the allocated time has expired. Another would be a constant
+    # time (e.g. one minute) before the expiry is due. For now, we'll
+    # go with the second.
+    $this->{refreshTokenExpiration} = $minEpoch - 60;
+}
+
+
+sub _isoStringToEpoch {
+    my($isoString) = @_;
+    
+    # Format: 2024-07-02T16:48:56Z
+    my $match = ($isoString =~ /(\d\d\d\d)-(\d\d)-(\d\d)T(\d\d):(\d\d):(\d\d)Z/);
+    _throw(2, "Non-ISO date returned as refreshTokenExpiration: $isoString")
+	if !$match;
+
+    my($year, $mon, $mday, $hour, $min, $sec) = ($1, $2, $3, $4, $5, $6);
+    my $dt = new DateTime(
+	year       => $year,
+	month      => $mon,
+	day        => $mday,
+	hour       => $hour,
+	minute     => $min,
+	second     => $sec,
+    );
+
+    return $dt->epoch();
+}
+
+sub maybeRefreshToken {
+    my $this = shift();
+
+    my $ua = $this->{ua};
+    my $cj = $ua->cookie_jar();
+    if ($cj->as_string()) {
+	# We have some cookies, so initial login must have succeeded
+	my $now = DateTime->now();
+	my $nowEpoch = $now->epoch();
+	if ($nowEpoch > $this->{refreshTokenExpiration}) {
+	    warn "update required";
+	    my $url = $this->{cfg}->{okapi}->{url} . '/authn/refresh';
+	    my $req = $this->_makeHTTPRequest(POST => $url);
+	    # No content required
+	    my $res = $this->{ua}->request($req);
+	    _throw(1014, $res->content())
+		if !$res->is_success();
+
+	    $this->_setRefreshTokenExpiration($res);
+	}
+    }
 }
 
 
@@ -72,7 +144,6 @@ sub rerunSearch {
 
 sub doSearch {
     my $this = shift();
-    my $ghandle = $this->{ghandle};
     my($rs, $offset, $limit) = @_;
 
     my $okapiCfg = $this->{cfg}->{okapi};
@@ -102,7 +173,7 @@ sub doSearch {
 	variables => \%variables,
     );
     $req->content(encode_json(\%body));
-    my $res = $ghandle->{ua}->request($req);
+    my $res = $this->{ua}->request($req);
     _throw(3, $res->content()) if !$res->is_success();
 
     my $obj = decode_json($res->content());
@@ -134,7 +205,7 @@ sub _getSRSRecords {
 
     my $req = $this->_makeHTTPRequest(POST => $okapiCfg->{url} . '/source-storage/source-records?idType=INSTANCE');
     $req->content(encode_json(\@ids));
-    my $res = $this->{ghandle}->{ua}->request($req);
+    my $res = $this->{ua}->request($req);
     my $content = $res->content();
     _throw(3, $content) if !$res->is_success();
 
@@ -274,7 +345,6 @@ sub _makeHTTPRequest() {
     $req->header('X-Okapi-tenant' => $this->{cfg}->{okapi}->{tenant});
     $req->header('Content-type' => 'application/json');
     $req->header('Accept' => 'application/json');
-    $req->header('X-Okapi-token' => $this->{token}) if $this->{token};
     return $req;
 }
 

@@ -24,6 +24,21 @@ query($cql: String, $offset: Int, $limit: Int) {
           holdingsNoteType { name }
           note
         }
+        holdingsStatements {
+          statement
+          note
+          staffNote
+        }
+        holdingsStatementsForIndexes {
+          statement
+          note
+          staffNote
+        }
+        holdingsStatementsForSupplements {
+          statement
+          note
+          staffNote
+        }
         bareHoldingsItems {
           discoverySuppress
           status { name }

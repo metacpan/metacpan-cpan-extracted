@@ -10,3 +10,6 @@ Revision history for HATX
 0.0.3   29 Jun 2024
         Add sort(), to_aref()
 
+0.0.4   07 Jul 2024
+        Update docs, to_obj() and apply() is better specified
+

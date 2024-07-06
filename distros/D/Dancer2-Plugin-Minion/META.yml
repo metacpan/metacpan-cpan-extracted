@@ -1,30 +1,30 @@
 ---
 abstract: 'Use the Minion job queue in your Dancer2 apps.'
 author:
-  - 'Jason A. Crome <cromedome@cpan.org>'
+  - 'Jason A. Crome <cpan@jason.cromedome.dev>'
 build_requires:
   Minion::Backend::SQLite: '0'
-  Mojolicious::Plugin::Minion::Admin: '0'
   Test::More: '0.92'
   Test::WWW::Mechanize::PSGI: '0'
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Zilla version 6.032, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: '1.4'
 name: Dancer2-Plugin-Minion
 requires:
-  Dancer2: '0.200000'
-  Minion: '0'
-  perl: '5.016'
+  Dancer2: v1.0.0
+  Minion: '10.0'
+  Mojolicious::Plugin::Minion::Admin: '0'
+  perl: '5.02'
 resources:
   IRC: irc://irc.perl.org/#dancer
-  WebIRC: https://chat.mibbit.com/#dancer@irc.perl.org
   bugtracker: https://github.com/cromedome/Dancer2-Plugin-Minion/issues
   repository: https://github.com/cromedome/Dancer2-Plugin-Minion
-version: 0.3.3
-x_generated_by_perl: v5.28.2
-x_serialization_backend: 'YAML::Tiny version 1.73'
+version: 1.0.0
+x_generated_by_perl: v5.40.0
+x_serialization_backend: 'YAML::Tiny version 1.74'
+x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

@@ -1,5 +1,12 @@
 Revision history for Whelk
 
+0.04 - 2024-07-06
+	- Default and example values are now validated before they are put into OpenAPI document
+	- Typo detection now suggests a closest valid alternative if one exists
+	- Whelk::OpenAPI has been refactored
+	- Added documentation for Whelk::Exception
+	- Set minimum YAML::PP version
+
 0.03 - 2024-07-04
 	- Framework now detects typos made in configuration of schemas and endpoints
 	- Renamed request_schema to request and response_schema to response in Endpoint

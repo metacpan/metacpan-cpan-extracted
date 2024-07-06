@@ -1,0 +1,24 @@
+language: perl 
+sudo: required
+perl:
+  - "5.22"
+  - "5.20"
+  - "5.18"
+  - "5.16"
+  - "5.14"
+  - "5.12"
+  - "5.10"
+  - "5.8"
+
+before_install:
+  - ./travis-init.sh
+  - sudo apt-get install -yq libyaz5-dev yaz
+
+before_script:
+ - perl Makefile.PL
+
+script:
+ - make
+ - make test
+ - make install
+

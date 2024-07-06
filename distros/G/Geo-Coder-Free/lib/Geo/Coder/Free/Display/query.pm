@@ -1,10 +1,18 @@
 package Geo::Coder::Free::Display::query;
 
+# Run a query on the database
+
 use strict;
 use warnings;
 use JSON::MaybeXS;
 
-# Run a query on the database
+=head1 VERSION
+
+Version 0.36
+
+=cut
+
+our $VERSION = '0.36';
 
 use Geo::Coder::Free::Display;
 
@@ -61,27 +69,27 @@ sub html {
 	} elsif(my $scantext = $params{'scantext'}) {
 		my @rc = $geocoder->geocode(scantext => $scantext);
 
-		return '{}' if(scalar(@rc) == 0);
-
-		# foreach my $l(@rc) {
-			# delete $l->{'md5'};
-			# delete $l->{'sequence'};
-			# foreach my $key(keys %{$l}) {
-				# if(!defined($l->{$key})) {
-					# delete $l->{$key};
+		if(scalar(@rc) > 0) {
+			# foreach my $l(@rc) {
+				# delete $l->{'md5'};
+				# delete $l->{'sequence'};
+				# foreach my $key(keys %{$l}) {
+					# if(!defined($l->{$key})) {
+						# delete $l->{$key};
+					# }
 				# }
 			# }
-		# }
-		# return encode_json \@rc;
+			# return encode_json \@rc;
 
-		my @locations;
-		foreach my $l(@rc) {
-			push @locations, {
-				'latitude' => $l->lat(),
-				'longitude' => $l->long()
+			my @locations;
+			foreach my $l(@rc) {
+				push @locations, {
+					'latitude' => $l->lat(),
+					'longitude' => $l->long()
+				};
 			};
-		};
-		return encode_json \@locations;
+			return encode_json \@locations;
+		}
 	}
 
 	return '{}';

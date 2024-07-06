@@ -15,7 +15,7 @@ package Term::Menus;
 ## See user documentation at the end of this file.  Search for =head
 
 
-our $VERSION = '3.027';
+our $VERSION = '3.028';
 
 
 use 5.006;
@@ -2291,6 +2291,7 @@ sub transform_mbii
                my $length_of_front_and_macro=$frlen+$length_of_macro;
                if ($#newtext==-1 || $#newtext==0) {
                   $box_top_line=sprintf "%-${frlen}s",'';
+		  $box_top_line=~s/^.(.*).$/.$1./;
                   $box_top_line.=$box_top_bottom;
                } else {
                   my $front_of_box_top=unpack("a$frlen",$newtext[$#newtext-1]);
@@ -2302,6 +2303,7 @@ sub transform_mbii
                      $back_of_box_top=unpack("x$length_of_front_and_macro a*",
                         $newtext[$#newtext-1]);
                   }
+		  $box_top_bottom=~s/^.(.*).$/.$1./;
                   $box_top_line=$front_of_box_top.
                      $box_top_bottom.$back_of_box_top;
                }
@@ -2324,6 +2326,7 @@ sub transform_mbii
                   $box_mid_line=$front_of_box_mid.
                      $insert.$back_of_box_mid;
                }
+	       $box_top_bottom=~s/^.(.*).$/'$1'/;
                $box_bot_line=$front_of_line.$box_top_bottom.$back_of_line;
                if ($#newtext==-1) {
                   push @newtext,$box_top_line;

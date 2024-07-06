@@ -9,7 +9,7 @@ use File::Spec;
 use File::stat;
 use HTTP::Date;
 use JSON::XS;
-use List::Util qw(max);
+use List::Util qw(any max);
 use LWP::UserAgent;
 use POSIX qw(getlogin);
 use Text::CSV_XS qw(csv);
@@ -65,33 +65,29 @@ sub mirror_file {
 
     my $file = filename($url);
 
-    my $now = time();
-
-    #
-    # local copy within TTL, so return it
-    #
-    return $file if (-e $file && stat($file)->mtime > $now - $ttl);
+    return $file unless (stale($url));
 
     #
     # update the local file
     #
     my $result = $UA->mirror($url, $file);
 
-    if (304 == $result->code || 200 == $result->code) {
+    if (any { $_ == $result->code } (304, 200)) {
         #
         # if the response had the Expires: header, use that, otherwise use
         # the later of the current mtime or now
         #
-        my $expires = str2time($result->header('expires')) || max(stat($file)->mtime, $now);
+        my $expires = str2time($result->header('expires')) || max(stat($file)->mtime, time());
 
-        utime($expires, $expires, $file);
+        utime($expires, $expires, $file) if (-e $file);
     }
-
-    chmod(0600, $file);
 
     carp($result->status_line) if ($result->code >= 400);
 
-    return $file if (-e $file);
+    if (-e $file) {
+        chmod(0600, $file);
+        return $file;
+    }
 
     return undef;
 }
@@ -184,8 +180,32 @@ sub filename {
     #
     return File::Spec->catfile(
         File::Spec->tmpdir,
-        join('.', __PACKAGE__, sha256_hex(getlogin().':'.($url->isa('URI') ? $url->as_string : $url)), 'dat')
+        join('.', (
+            __PACKAGE__,
+            sha256_hex(
+                getlogin(),
+                ':',
+                ($url->isa('URI') ? $url->as_string : $url),
+            ),
+            'dat'
+        ))
     );
+}
+
+
+sub mirrored { -e filename(@_) }
+
+
+sub stale {
+    my ($url, $ttl) = @_;
+
+    my $file = filename($url);
+
+    return 1 unless (-e $file);
+
+    return 1 unless stat($file)->mtime > time() - ($ttl || $TTL_SECONDS);
+
+    return undef;
 }
 
 
@@ -203,7 +223,7 @@ Data::Mirror - a simple way to efficiently retrieve data from the World Wide Web
 
 =head1 VERSION
 
-version 0.04
+version 0.05
 
 =head1 SYNOPSIS
 
@@ -352,6 +372,17 @@ in the resource.
     $file = Data::Mirror::filename($url);
 
 Returns the local filename that L<Data::Mirror> would use for the given URL.
+
+    $exists = Data::Mirror::mirrored($url);
+
+Returns true if a copy of the resource identified by C<$url> exists locally.
+This function is equivalent to running C<-e Data::Mirror-E<gt>filename($url)>.
+
+    $stale = Data::Mirror::stale($url, $ttl);
+
+Returns true if the resource identified by C<$url> (a) does not exist locally or
+(b) its modification time is more then C<$ttl> seconds in the past. If C<$ttl>
+is not specified then C<$Data::Mirror::TTL_SECONDS> will be used instead.
 
 =head1 REPORTING BUGS, CONTRIBUTING ENHANCEMENTS
 

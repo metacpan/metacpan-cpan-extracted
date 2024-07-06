@@ -1,7 +1,9 @@
 package Whelk::OpenAPI;
-$Whelk::OpenAPI::VERSION = '0.03';
+$Whelk::OpenAPI::VERSION = '0.04';
 use Kelp::Base;
 use List::Util qw(uniq);
+
+attr openapi_version => '3.0.3';
 
 attr info => sub { {} };
 attr extra => sub { {} };
@@ -10,7 +12,7 @@ attr paths => sub { {} };
 attr schemas => sub { {} };
 attr servers => sub { [] };
 
-sub default_res_desc
+sub default_response_description
 {
 	my ($self, $code) = @_;
 
@@ -29,7 +31,7 @@ sub default_res_desc
 	return 'Response.';
 }
 
-sub _build_path
+sub build_path
 {
 	my ($self, $endpoint) = @_;
 	my %requests;
@@ -45,12 +47,12 @@ sub _build_path
 
 			# special case for no content response
 			$responses{204} = {
-				description => $schema->description // $self->default_res_desc(204),
+				description => $schema->description // $self->default_response_description(204),
 			};
 		}
 		else {
 			$responses{$code} = {
-				description => $schema->description // $self->default_res_desc($code),
+				description => $schema->description // $self->default_response_description($code),
 				content => {
 					$endpoint->formatter->full_response_format => {
 						schema => $schema->openapi_schema($self),
@@ -87,26 +89,14 @@ sub _build_path
 	};
 }
 
-sub parse
+sub build_paths
 {
-	my ($self, %data) = @_;
-
-	$self->info($data{info} // {});
-	$self->extra($data{extra} // {});
-
-	$self->servers(
-		[
-			{
-				description => 'API for ' . $data{app}->name,
-				url => $data{app}->config('app_url'),
-			},
-		]
-	);
+	my ($self, $endpoints) = @_;
 
 	my %paths;
 	my @tags;
-	foreach my $endpoint (@{$data{endpoints} // []}) {
-		$paths{$endpoint->path}{lc $endpoint->route->method} = $self->_build_path($endpoint);
+	foreach my $endpoint (@{$endpoints // []}) {
+		$paths{$endpoint->path}{lc $endpoint->route->method} = $self->build_path($endpoint);
 
 		push @tags, $endpoint->resource;
 	}
@@ -119,13 +109,45 @@ sub parse
 			($_->config->{description} ? (description => $_->config->{description}) : ()),
 		}
 	} uniq @tags;
+
 	$self->tags(\@tags);
+}
+
+sub build_servers
+{
+	my ($self, $app) = @_;
+
+	$self->servers(
+		[
+			{
+				description => 'API for ' . $app->name,
+				url => $app->config('app_url'),
+			},
+		]
+	);
+}
+
+sub build_schemas
+{
+	my ($self, $schemas) = @_;
 
 	my %schemas = map {
 		$_->name => $_->openapi_schema($self, full => 1)
-	} @{$data{schemas} // []};
+	} @{$schemas // []};
 
 	$self->schemas(\%schemas);
+}
+
+sub parse
+{
+	my ($self, %data) = @_;
+
+	$self->info($data{info} // {});
+	$self->extra($data{extra} // {});
+
+	$self->build_paths($data{endpoints});
+	$self->build_servers($data{app});
+	$self->build_schemas($data{schemas});
 }
 
 sub location_for_schema
@@ -144,7 +166,7 @@ sub generate
 		# extra at the start, to make sure it's not overshadowing keys
 		%{$self->extra},
 
-		openapi => '3.0.3',
+		openapi => $self->openapi_version,
 		info => $self->info,
 		servers => $self->servers,
 		tags => $self->tags,

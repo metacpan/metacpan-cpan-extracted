@@ -134,11 +134,21 @@ sub _expandScalarVariableReference {
 sub _mergeConfig {
     my($base, $overlay) = @_;
 
-    my @known_keys = qw(okapi login indexMap marcHoldings);
-    foreach my $key (@known_keys) {
+    my %complex_keys = (
+	okapi => 1,
+	login => 1,
+	indexMap => 1,
+	marcHoldings => 1,
+	fieldDefinitions => {
+	    holding => 1,
+	    circulation => 1,
+	},
+    );
+
+    foreach my $key (keys (%complex_keys)) {
 	if (defined $overlay->{$key}) {
 	    if (ref $base->{$key} eq 'HASH') {
-		_mergeHash($base->{$key}, $overlay->{$key});
+		_mergeHash($base->{$key}, $overlay->{$key}, $complex_keys{$key});
 	    } else {
 		$base->{$key} = $overlay->{$key};
 	    }
@@ -146,7 +156,7 @@ sub _mergeConfig {
     }
 
     foreach my $key (sort keys %$overlay) {
-	if (!grep { $key eq $_ } @known_keys) {
+	if (!$complex_keys{$key}) {
 	    $base->{$key} = $overlay->{$key};
 	}
     }
@@ -154,10 +164,14 @@ sub _mergeConfig {
 
 
 sub _mergeHash {
-    my($base, $overlay) = @_;
+    my($base, $overlay, $keysOfsubStructures) = @_;
 
     foreach my $key (sort keys %$overlay) {
-	$base->{$key} = $overlay->{$key};
+	if (ref $keysOfsubStructures eq 'HASH' && $keysOfsubStructures->{$key}) {
+	    _mergeHash($base->{$key}, $overlay->{$key}, $keysOfsubStructures->{$key});
+	} else {
+	    $base->{$key} = $overlay->{$key};
+	}
     }
 }
 
@@ -193,6 +207,11 @@ Net::Z3950::FOLIO::Config - configuration file for the FOLIO Z39.50 gateway
     "queryFilter": "source=marc",
     "graphqlQuery": "instances.graphql-query",
     "chunkSize": 5,
+    "fieldDefinitions": {
+      "circulation": {
+	"availableThru": "permanentLoanType"
+      }
+    },
     "marcHoldings": {
       "restrictToItem": 0,
       "field": "952",
@@ -226,7 +245,7 @@ Net::Z3950::FOLIO::Config - configuration file for the FOLIO Z39.50 gateway
 	    "pattern": "(.*)",
 	    "replacement": "%{_callNumberPrefix}$1%{_callNumberSuffix}"
 	  }
-	},
+	}
       }
     }
   }
@@ -382,6 +401,34 @@ search. This can be tweaked to tune performance. Setting it too low
 will result in many requests with small numbers of records returned
 each time; setting it too high will result in fetching and decoding
 more records than are actually wanted.
+
+=head2 C<fieldDefinitions>
+
+An optional object specifying how the sources from which some
+particular holdings fields should draw their data, overriding the
+default sources.
+
+The keys of this object specify domains in which the fields can be
+found: supported domains are C<holding> and C<circulation>}.
+
+Within the C<holdings> domain, no fields are presently supported;
+within the C<circulation> domain, only the C<availableThru> field is
+presently supported. Support for further fields may be added as
+required.
+
+Each field within a domain is specified by its name as key, and the
+corresponding value is a string specifying a path from which to fetch
+the data. These strings follow the same syntax as L<the get function
+in JavaScript's lodash library|https://docs-lodash.com/v4/get/>. It is
+a dot-separate sequence of source field-names to navigate down, with
+bracketed numbers indicating the selection of one element of an
+array. For example, the path
+C<temporaryLocation.servicePoints[0].discoveryDisplayName> fetches the
+C<discoveryDisplayName> field from the first element of the
+C<servicePoints> array within the C<temporaryLocation> structure. It
+will work when running on data with the shape C<{ temporaryLocation: {
+servicePoints: [ { discoveryDisplayName: "Main" } ] } }>.
+
 
 =head2 C<marcHoldings>
 

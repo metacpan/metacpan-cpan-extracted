@@ -3,6 +3,14 @@ package main;
 # VWF is licensed under GPL2.0 for personal use only
 # njh@bandsman.co.uk
 
+=head1 VERSION
+
+Version 0.36
+
+=cut
+
+our $VERSION = '0.36';
+
 use strict;
 use warnings;
 
@@ -25,7 +33,7 @@ sub create_disc_cache {
 	my $logger = $args{'logger'};
 	my $driver = $config->{disc_cache}->{driver};
 	unless(defined($driver)) {
-		my $root_dir = $args{'root_dir'} || $config->{disc_cache}->{root_dir};
+		my $root_dir = $ENV{'root_dir'} || $args{'root_dir'} || $config->{disc_cache}->{root_dir} || $config->{'root_dir'};
 		throw Error::Simple('root_dir is not optional') unless($root_dir);
 
 		if($logger) {
@@ -45,10 +53,11 @@ sub create_disc_cache {
 		namespace => $args{'namespace'}
 	);
 
-	if($logger) {
-		$chi_args{'on_set_error'} = 'log';
-		$chi_args{'on_get_error'} = 'log';
-	}
+	# Don't do this because it takes a lot of complex configuration
+	# if($logger) {
+		# $chi_args{'on_set_error'} = 'log';
+		# $chi_args{'on_get_error'} = 'log';
+	# }
 
 	if($config->{disc_cache}->{server}) {
 		my @servers;
@@ -67,29 +76,28 @@ sub create_disc_cache {
 			}
 		}
 		$chi_args{'servers'} = \@servers;
-	} elsif(($driver ne 'DBI') && ($driver ne 'Null')) {
-		$chi_args{'root_dir'} = $args{'root_dir'} || $config->{disc_cache}->{root_dir};
-		throw Error::Simple('root_dir is not optional') unless($chi_args{'root_dir'});
-		if($logger) {
-			$logger->debug("root_dir: $chi_args{root_dir}");
+	} elsif($driver eq 'DBI') {
+		# Use the cache connection details in the configuration file
+		$chi_args{'dbh'} = DBI->connect($config->{disc_cache}->{connect});
+		if(!defined($chi_args{'dbh'})) {
+			if($logger) {
+				$logger->error($DBI::errstr);
+			}
+			throw Error::Simple($DBI::errstr);
 		}
-	}
-	if($driver eq 'Redis') {
+		$chi_args{'create_table'} = 1;
+	} elsif($driver eq 'Redis') {
 		my %redis_options = (
 			reconnect => 60,
 			every => 1_000_000
 		);
 		$chi_args{'redis_options'} = \%redis_options;
-	} elsif($driver eq 'DBI') {
-		# Use the cache connection details in the configuration file
-                $chi_args{'dbh'} = DBI->connect($config->{disc_cache}->{connect});
-                if(!defined($chi_args{'dbh'})) {
-                        if($logger) {
-                                $logger->error($DBI::errstr);
-                        }
-                        throw Error::Simple($DBI::errstr);
-                }
-		$chi_args{'create_table'} = 1;
+	} elsif($driver ne 'Null') {
+		$chi_args{'root_dir'} = $ENV{'root_dir'} || $args{'root_dir'} || $config->{disc_cache}->{root_dir};
+		throw Error::Simple('root_dir is not optional') unless($chi_args{'root_dir'});
+		if($logger) {
+			$logger->debug("root_dir: $chi_args{root_dir}");
+		}
 	}
 	return CHI->new(%chi_args);
 }
@@ -108,7 +116,7 @@ sub create_memory_cache {
 		}
 		# return CHI->new(driver => 'Memcached', servers => [ '127.0.0.1:11211' ], namespace => $args{'namespace'});
 		# return CHI->new(driver => 'File', root_dir => '/tmp/cache', namespace => $args{'namespace'});
-		return CHI->new(driver => 'SharedMem', size => 16 * 1024, max_size => 16 * 1024, shmkey => 98766789, namespace => $args{'namespace'});
+		return CHI->new(driver => 'SharedMem', max_size => 1024, shm_size => 16 * 1024, shm_key => 98766789, namespace => $args{'namespace'});
 }
 	if($logger) {
 		$logger->debug('memory cache via ', $config->{memory_cache}->{driver}, ', namespace: ', $args{'namespace'});
@@ -144,18 +152,20 @@ sub create_memory_cache {
 		}
 		$chi_args{'servers'} = \@servers;
 	} elsif($driver eq 'SharedMem') {
-		$chi_args{'shmkey'} = $args{'shmkey'} || $config->{memory_cache}->{shmkey};
-		if(my $size = ($args{'size'} || $config->{'memory_cache'}->{'size'})) {
-			$chi_args{'max_size'} = $chi_args{'size'} = $size;
+		$chi_args{'shm_key'} = $args{'shm_key'} || $config->{memory_cache}->{shm_key};
+		if(my $shm_size = ($args{'shm_size'} || $config->{'memory_cache'}->{'shm_size'})) {
+			$chi_args{'shm_size'} = $shm_size;
 		}
-	} elsif(($driver ne 'Null') && ($driver ne 'Memory') && ($driver ne 'SharedMem')) {
-		$chi_args{'root_dir'} = $args{'root_dir'} || $config->{memory_cache}->{root_dir};
+		if(my $max_size = ($args{'max_size'} || $config->{'memory_cache'}->{'max_size'})) {
+			$chi_args{'max_size'} = $max_size;
+		}
+	} elsif(($driver ne 'Null') && ($driver ne 'Memory')) {
+		$chi_args{'root_dir'} = $ENV{'root_dir'} || $args{'root_dir'} || $config->{memory_cache}->{root_dir} || $config->{'root_dir'};
 		throw Error::Simple('root_dir is not optional') unless($chi_args{'root_dir'});
 		if($logger) {
 			$logger->debug("root_dir: $chi_args{root_dir}");
 		}
-	}
-	if($driver eq 'Redis') {
+	} elsif($driver eq 'Redis') {
 		my %redis_options = (
 			reconnect => 60,
 			every => 1_000_000
@@ -163,6 +173,50 @@ sub create_memory_cache {
 		$chi_args{'redis_options'} = \%redis_options;
 	}
 	return CHI->new(%chi_args);
+}
+
+# From http://www.geodatasource.com/developers/perl
+# FIXME:  use Math::Trig
+sub distance {
+	my ($lat1, $lon1, $lat2, $lon2, $unit) = @_;
+	my $theta = $lon1 - $lon2;
+	my $dist = sin(_deg2rad($lat1)) * sin(_deg2rad($lat2)) + cos(_deg2rad($lat1)) * cos(_deg2rad($lat2)) * cos(_deg2rad($theta));
+	$dist = _acos($dist);
+	$dist = _rad2deg($dist);
+	$dist = $dist * 60 * 1.1515;
+	if ($unit eq "K") {
+		$dist = $dist * 1.609344;
+	} elsif ($unit eq "N") {
+		$dist = $dist * 0.8684;
+	}
+	return ($dist);
+}
+
+my $pi = atan2(1,1) * 4;
+
+#::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+#:::  This function get the arccos function using arctan function   :::
+#::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+sub _acos {
+	my ($rad) = @_;
+	my $ret = atan2(sqrt(1 - $rad**2), $rad);
+	return $ret;
+}
+
+#::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+#:::  This function converts decimal degrees to radians             :::
+#::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+sub _deg2rad {
+	my ($deg) = @_;
+	return ($deg * $pi / 180);
+}
+
+#::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+#:::  This function converts radians to decimal degrees             :::
+#::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+sub _rad2deg {
+	my ($rad) = @_;
+	return ($rad * 180 / $pi);
 }
 
 1;

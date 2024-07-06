@@ -5,7 +5,7 @@ use Exporter 'import';
 use Carp;
 use Clone qw/clone/;
 
-our $VERSION = '0.0.3';
+our $VERSION = '0.0.4';
 our @EXPORT_OK = qw/hatx/;
 
 =head1 NAME
@@ -106,28 +106,92 @@ sub new {
     return $self;
 }
 
-# Helper to quickly create a hatx object
+=head2 hatx( $objref )
+
+DESCRIPTION
+
+    Clone the given $objref to create a 'hatx' object instance. The
+    'hatx' object has an internal structure which is:
+
+        One of: hashref | arrayref | undef
+
+    This internal structure shall be called 'haref' in the rest of this
+    document.
+
+ARGUMENTS
+
+    $objref - Reference to either a hash or an array
+
+RETURNS
+
+    An instance of the HATX object.
+
+=cut
 sub hatx {
     return HATX->new(@_);
 }
 
-# Converts object into underlying href or aref
+=head2 to_obj()
+
+DESCRIPTION
+
+    Converts the internal haref and returns it.
+
+ARGUMENTS
+
+    None.
+
+RETURNS
+
+    One of: hashref | arrayref | undef
+
+=cut
 sub to_obj {
     my $o = shift;
-    return clone($o->{H}) if defined $o->{H};
-    return clone($o->{A}) if defined $o->{A};
+
+    return $o->{H} if defined $o->{H};
+    return $o->{A} if defined $o->{A};
+
+    # If neither H or A is defined, return undef
+    return undef;
 }
 
-=head2 map
+=head2 map( $fn, [,@args] )
 
-Apply the given function to each item in the href/aref.
+DESCRIPTION
 
-The given function has the following signature:
+    Apply the given function, $fn, to each element of the internal
+    haref, replacing the entire haref.
 
-    fn($k,$v) -> ($k,$v)    # Applied to href
-    fn($v)    -> ($v)       # Applied to aref
+ARGUMENTS
 
-The internal href/aref IS modified.
+    $fn - A user-provided function with a suitable signature.
+
+      If internal haref is a hashref, $fn should have signature:
+
+        $fn->($hkey_s, $hval_s [,@args]) returning ($hkey_t, $hval_t)
+
+        WHERE
+          $hkey_s   Key of source hashref pair
+          $hval_s   Value of source hashref pair
+          @args     Optional user variables
+          $hkey_t   Key of target hashref pair
+          $hval_t   Value of target hashref pair
+
+      If the internal haref is an arrayref, $fn should have the signature:
+
+        $fn->($val_s [,@args]) returning ($val_t)
+
+        WHERE
+          $val_s    An element of the source arrayref
+          @args     Optional user variables
+          $val_t    An element of the target arrayref
+
+    @args - Optional arguments that are passed to $fn
+
+RETURNS
+
+    The hatx object with the target haref.
 
 =cut
 sub map {
@@ -155,22 +219,41 @@ sub map {
     return $o;
 }
 
-=head2 grep
+=head2 grep( $fn [,@args] )
 
-Apply the given function to each item in the href/aref.
+DESCRIPTION
 
-The given function has the following signature:
+    Retain only elements of the haref where $fn returns true.
 
-    fn->($k,$v[,@args]) -> BOOLEAN     # Applied to hashref
-    fn->($v[,@args])    -> BOOLEAN     # Applied to arrayref
+ARGUMENTS
 
-    WHERE
-      fn     A function reference that returns a boolean value
-      $k,$v  The key-value pair of a hash
-      $v     An item of an array
-      @args  An optional list of user variables
+    $fn - A user-provided function with a suitable signature.
 
-Items where the fn returns a True value are kept.
+      If internal haref is a hashref, $fn should have signature:
+
+        $fn->($hkey_s, $hval_s [,@args]) returning ($hkey_t, $hval_t)
+
+        WHERE
+          $hkey_s   Key of source hashref pair
+          $hval_s   Value of source hashref pair
+          @args     Optional user variables
+          $hkey_t   Key of target hashref pair
+          $hval_t   Value of target hashref pair
+
+      If the internal haref is an arrayref, $fn should have the signature:
+
+        $fn->($val_s [,@args]) returning ($val_t)
+
+        WHERE
+          $val_s    An element of the source arrayref
+          @args     Optional user variables
+          $val_t    An element of the target arrayref
+
+    @args - Optional arguments that are passed to $fn
+
+RETURNS
+
+    The hatx object with elements containing only 'grepped' elements.
 
 =cut
 sub grep {
@@ -204,18 +287,18 @@ DESCRIPTION
 
 ARGUMENTS
 
-    $fn - A function reference with prototype ($$). See https://perldoc.perl.org/functions/sort.
+    $fn - A function reference with prototype ($$) i.e. taking two
+    arguments. See https://perldoc.perl.org/functions/sort.
 
-EXAMPLES
+    Examples of $fn:
 
-    # Sort descending alphabetically
-    hatx($aref)->sort(sub ($$) { $_[1] cmp $_[0] });
+      sub ($$) { $_[1] cmp $_[0] }    # Sort descending alphabetically
+      sub ($$) { $_[0] <=> $_[1] }    # Sort ascending numerically
+      sub ($$) { $_[1] <=> $_[0] }    # Sort descending numerically
 
-    # Sort ascending numerically
-    hatx($aref)->sort(sub ($$) { $_[0] <=> $_[1] });
+RETURNS
 
-    # Sort descending numerically
-    hatx($aref)->sort(sub ($$) { $_[1] <=> $_[0] });
+    The sorted hatx object.
 
 =cut
 sub sort ($&) {
@@ -233,12 +316,31 @@ sub sort ($&) {
     return $o;
 }
 
-=head2 to_href
+=head2 to_href( $fn [,@args] )
 
-Convert internal aref to href using the given function.
+DESCRIPTION
 
-    $fn->($val) -> ($key, $val)
-    $fn is a FUNCTIONREF that takes a single value and returns two values
+    Convert internal arrayref to hashref using the given function, $fn,
+    fn and optionally additional arguments, @args, as needed.
+
+ARGUMENTS
+
+    $fn - A user-provided function reference with signature:
+
+      $fn->($val [,@args]) returning ($hkey, $hval)
+
+      WHERE
+        $val    An element of the source arrayref
+        @args   Optional user variables
+        $hkey   Key of target hashref pair
+        $hval   Value of target hashref pair
+
+    @args - Optional arguments that are passed to $fn
+
+RETURNS
+
+    The hatx object where the internal structure is a hashref.
+
 =cut
 sub to_href {
     my ($o,$fn) = @_;
@@ -254,13 +356,14 @@ sub to_href {
 
 DESCRIPTION
 
-    Convert internal hashref to an arrayref.
+    Convert internal hashref to arrayref using the given function, $fn
+    and optionally additional arguments, @args, as needed.
 
 ARGUMENTS
 
     $fn - A user-provided function reference with signature:
 
-      $fn->($hkey, $hval [,@args]) return ($val)
+      $fn->($hkey, $hval [,@args]) returning ($val)
 
       WHERE
         $hkey   Key of source hashref pair
@@ -268,7 +371,11 @@ ARGUMENTS
         @args   Optional user variables
         $val    An element of the target arrayref
 
-    @args - Optional arguments that are passed through to $fn
+    @args - Optional arguments that are passed to $fn
+
+RETURNS
+
+    The hatx object where the internal structure is a hashref.
 
 =cut
 sub to_aref {
@@ -288,28 +395,56 @@ sub to_aref {
     return $o;
 }
 
-=head2 apply
+=head2 apply( $fn [,@args] )
 
-Apply the given function to each item in the href/aref. Arguments can be
-provided to store results of the function application e.g. finding the
-max value.
+DESCRIPTION
 
-The internal href/aref is not modified.
+    Apply the given function, $fn to each item in the haref. The haref
+    is unchanged. Typically used to find aggregate values e.g. max/min or
+    totals which are then stored into @args.
 
-    fn($k,$v,@args) -> ()
-    fn($v,@args)    -> ()
+ARGUMENTS
+
+    $fn - A user-provided function with a suitable signature.
+
+      If internal haref is a hashref, $fn should have signature:
+
+        $fn->($hkey_s, $hval_s [,@args]) with no return values
+
+        WHERE
+          $hkey_s   Key of source hashref pair
+          $hval_s   Value of source hashref pair
+          @args     Optional user variables
+
+      If the internal haref is an arrayref, $fn should have the signature:
+
+        $fn->($val_s [,@args]) with no return values
+
+        WHERE
+          $val_s    An element of the source arrayref
+          @args     Optional user variables
+
+    @args - Optional arguments that are passed to $fn
+
+RETURNS
+
+    The same hatx object.
 
 =cut
 sub apply {
     my ($o,$fn,@args) = @_;
 
     if (defined($o->{H})) {
-        foreach my $k (keys %{$o->{H}}) {
-            $fn->($k,$o->{H}{$k},@args);
+        # Clone prevents modification to $o->{H}
+        my $href = clone($o->{H});
+        foreach my $k (keys %$href) {
+            $fn->($k,$href->{$k},@args);
         }
     }
     if (defined($o->{A})) {
-        foreach my $v (@{$o->{A}}) {
+        # Clone prevents modification to $o->{A}
+        my $aref = clone($o->{A});
+        foreach my $v (@$aref) {
             $fn->($v,@args);
         }
     }
@@ -335,6 +470,3 @@ Copyright 2024- Hoe Kit CHEW
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.
 
-=head1 SEE ALSO
-
-=cut

@@ -8,10 +8,8 @@ Whelk::Manual::Kelp - Setting up Whelk inside Kelp
 
 =head1 SYNOPSIS
 
+	# File: conf/config.pl
 	########################
-	# File: conf/config.pl #
-	########################
-
 	{
 		modules => [qw(JSON YAML Whelk)],
 		modules_init => {
@@ -28,8 +26,7 @@ Whelk::Manual::Kelp - Setting up Whelk inside Kelp
 		},
 	}
 
-	######################
-	# File: lib/MyApp.pm #
+	# File: lib/MyApp.pm
 	######################
 	package MyApp;
 
@@ -41,17 +38,14 @@ Whelk::Manual::Kelp - Setting up Whelk inside Kelp
 		$self->whelk->init;
 	}
 
-	#################################
-	# File: lib/MyApp/Controller.pm #
+	# File: lib/MyApp/Controller.pm
 	#################################
 	package MyApp::Controller;
 
 	use Kelp::Base 'MyApp';
 
+	# File: lib/MyApp/Controller/Res.pm
 	#####################################
-	# File: lib/MyApp/Controller/Res.pm #
-	#####################################
-
 	package MyApp::Controller::Res;
 
 	use Kelp::Base 'MyApp::Controller';
@@ -101,7 +95,7 @@ your app.
 
 Each controller which is supposed to be a Whelk resource must consume
 C<Whelk::Role::Resource> (L<Role::Tiny> role). It can be done with C<with> from
-C<Role::Tiny::With> or C<Moo>.
+L<Role::Tiny::With> or L<Moo>.
 
 Don't consume this role in your base controller, unless you plan to have all
 controllers as Whelk resources.

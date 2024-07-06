@@ -28,5 +28,5 @@ resources:
   bugtracker: https://github.com/garu/Net-Correios/issues/
   license: http://dev.perl.org/licenses/
   repository: https://github.com/garu/Net-Correios
-version: '0.001'
+version: '0.002'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

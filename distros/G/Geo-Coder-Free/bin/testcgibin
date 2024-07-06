@@ -7,6 +7,10 @@ use autodie qw(:all);
 use FindBin qw($Bin);
 use lib "$Bin/../lib";
 
+my $path = $Bin;
+$path =~ s/^(.+)\/.+/$1/;	# Remove the final directory, probably "/bin"
+$ENV{'root_dir'} = $path;
+
 eval {
 	my $testnumber = $ARGV[0];
 	if($testnumber =~ /^(\d+)$/) {

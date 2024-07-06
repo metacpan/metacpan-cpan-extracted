@@ -1,5 +1,5 @@
 package Tree::RB::XS;
-$Tree::RB::XS::VERSION = '0.09';
+$Tree::RB::XS::VERSION = '0.10';
 # VERSION
 # ABSTRACT: Red/Black Tree implemented in C, with similar API to Tree::RB
 
@@ -34,6 +34,11 @@ sub new {
 	$self->allow_duplicates(1) if delete $self->{allow_duplicates};
 	$self->compat_list_get(1) if delete $self->{compat_list_get};
 	$self->track_recent(1) if delete $self->{track_recent};
+	$self->lookup_updates_recent(1) if delete $self->{lookup_updates_recent};
+	if (my $kv= $self->{kv}) {
+		$self->allow_duplicates? $self->insert_multi($kv)
+			: $self->put_multi($kv);
+	}
 	$self;
 }
 
@@ -299,6 +304,20 @@ C<track_recent>
 Whether to keep track of the insertion order of nodes, by default.  Defaults to false.
 You may toggle this attribute after construction.
 
+=item *
+
+C<lookup_updates_recent>
+
+Whether L</lookup> and L</get> methods automatically mark a node as the most recent.
+
+=item *
+
+C<kv>
+
+An initial list of C<key,value> pairs to initialize the tree with.  If allow_duplicates
+is requested, this uses L</insert_multi>, else it uses L</put_multi> (so later duplicate
+keys replace the values of earlier ones).
+
 =back
 
 =head1 ATTRIBUTES
@@ -349,6 +368,14 @@ data points vs. temporary ones that you might want to expire over time.
 See also: L</oldest_node>, L</newest_node>, L</recent_count>, L</iter_newer>, L</iter_older>,
 L</truncate_recent>, and Node methods L</newer>, L</older>, L</mark_newest>,
 and L</recent_tracked>.
+
+=head2 lookup_updates_recent
+
+Whether L</lookup> and L</get> methods automatically mark a node as the most recent.
+This defaults to false, so only 'put' methods (including insert) mark a node recent.
+Even when true, 'exists' does not mark a node as recent, nor do iterators, min_node, max_node,
+nth_node, newest_node or oldest_node, as it is assumed using those methods are more about
+inspecting the state of the tree than representing access patterns of important keys.
 
 =head2 key_type
 
@@ -463,6 +490,14 @@ Provided for compatibility with Tree::RB.  Same as L</get> in scalar context, bu
 if called in list context it returns both the value and the node from L</get_node>.
 You can also use Tree::RB's lookup-mode constants of "LUEQUAL", etc.
 
+=head2 exists
+
+  $count= $tree->exists($key);
+  $count= $tree->exists(@keys);
+
+Check whether a key exists (or multiple keys exist) in the tree, returning the
+total count of nodes having these keys.
+
 =head2 put
 
   my $old_val= $tree->put($key, $new_val);
@@ -472,12 +507,35 @@ the old value, and updates the tree to reference the new value.  If the tree
 allows duplicate keys, this will remove all but one node having this key and
 then set its value.  Only the first old value will be returned.
 
+=head2 put_multi
+
+  $added_count= $tree->put_multi($k, $v, $k, $v, ...);
+  $added_count= $tree->put_multi([ $k, $v, $k, $v, ... ]);
+
+Put multiple keys and values into the tree.  If duplicate keys are supplied and
+L</allow_duplicates> is false, earlier (k,v) will be overwritten by later conflicting
+(k,v) in the list, the same way that happens when assigning this list to a perl hash.
+If C<allow_duplicates> is true, all key/value pairs will get added to the tree.
+
+The return value is the number of new keys added to the tree, not counting overwrites.
+
 =head2 insert
+
+  my $idx= $tree->insert($key, $value);
 
 Insert a new node into the tree, and return the index at which it was inserted.
 If L</allow_duplicates> is not enabled, and the node already existed, this returns -1
 and does not change the tree.  If C<allow_duplicates> is enabled, this adds the new
 node after all nodes of the same key, preserving the insertion order.
+
+=head2 insert_multi
+
+  $added_count= $tree->insert_multi($k, $v, $k, $v, ...);
+  $added_count= $tree->insert_multi([ $k, $v, $k, $v, ... ]);
+
+Perform multiple insertions, and return the number of items which got added.  Like
+L</insert> when L</allow_duplicates> is false, this does not replace existing values
+if the key already exists.
 
 =head2 delete
 
@@ -1032,7 +1090,7 @@ However, it runs significantly slower than Tree::RB.
 
 =head1 VERSION
 
-version 0.09
+version 0.10
 
 =head1 AUTHOR
 

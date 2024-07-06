@@ -1,7 +1,9 @@
 #!/usr/bin/perl -w
 
+#use Carp qw(cluck); $SIG{__WARN__} = sub { cluck @_ };
+
 ## This file is part of simpleserver
-## Copyright (C) 2000-2016 Index Data.
+## Copyright (C) 2000-2017 Index Data.
 ## All rights reserved.
 ## Redistribution and use in source and binary forms, with or without
 ## modification, are permitted provided that the following conditions are met:
@@ -52,12 +54,13 @@ sub my_init_handler {
 	print("ERR_CODE = '", $args->{ERR_CODE}, "'\n");
 	print("ERR_STR = '", $args->{ERR_STR}, "'\n");
 	print("PEER_NAME = '", $args->{PEER_NAME}, "'\n");
-	print("GHANDLE = '", $args->{GHANDLE}, "'\n");
-	print("HANDLE = '", $args->{HANDLE}, "'\n");
 	print("PID = '", $args->{PID}, "'\n");
 
 	if (defined($args->{USER})) {
 	    printf("Received USER=%s\n", $args->{USER});
+	}
+	if (defined($args->{GROUP})) {
+	    printf("Received GROUP=%s\n", $args->{GROUP});
 	}
 	if (defined($args->{PASS})) {
 	    printf("Received PASS=%s\n", $args->{PASS});
@@ -256,20 +259,33 @@ sub my_fetch_handler {
 	my $set_id = $args->{SETNAME};
 	my $data = $session->{$set_id};
 	my $offset = $args->{OFFSET};
-	my $record = "<xml>";
+	my $comp = $args->{COMP};
 	my $field;
 	my $hits = $session->{__HITS};
 	my $href = $data->[$offset - 1];
 
 	$args->{REP_FORM} = Net::Z3950::OID::xml;
-	foreach $field (keys %$href) {
-		$record .= "<" . $field . ">" . $href->{$field} . "</" . $field . ">";
-	}
-
-	$record .= "</xml>";
-	$args->{RECORD} = $record;
 	if ($offset == $session->{__HITS}) {
 		$args->{LAST} = 1;
+	} elsif ($comp eq "OP") {
+	    $args->{RECORD} = return_opacxml();
+	} elsif ($comp eq "marcxml") {
+	    $args->{RECORD} = return_marcxml();
+	} else {
+	    my $record = "<xml>";
+	    foreach $field (keys %$href) {
+		$record .= "<" . $field . ">" . $href->{$field} . "</" . $field . ">";
+	    }
+	    $record .= "</xml>";
+	    $args->{RECORD} = $record;
+	}
+}
+
+sub my_esrequest_handler {
+	my $args = shift;
+	print Dumper($args);
+	if (defined($args->{XML_ILL})) {
+		$args->{XML_ILL} = "<response>1234</response>\n";
 	}
 }
 
@@ -278,7 +294,134 @@ sub my_start_handler {
     my $config = $args->{CONFIG};
 }
 
-Net::Z3950::SimpleServer::yazlog("hello");
+# Return fake MARC record
+sub return_marcxml {
+	my $record = q@
+<record xmlns="http://www.loc.gov/MARC21/slim">
+  <leader>01212nam a2200157 i 4500</leader>
+  <controlfield tag="001">9910367181303811</controlfield>
+  <controlfield tag="005">20180618101041.0</controlfield>
+  <controlfield tag="008">170620s        xx            000 0 eng d</controlfield>
+  <datafield tag="035" ind1=" " ind2=" ">
+    <subfield code="a">bw90000408-01tuli_inst</subfield>
+  </datafield>
+  <datafield tag="245" ind1="0" ind2="0">
+    <subfield code="a">Host bibliographic record for boundwith item barcode 39074015913874</subfield>
+  </datafield>
+  <datafield tag="774" ind1="1" ind2=" ">
+    <subfield code="t">How fiscal (mis)-management may impede trade reform : lessons from an intertemporal, multi-sector general equilibrium model for Turkey / Xinshen Diao, Terry L. Roe and A. Erin&#xE7; Yeldan.</subfield>
+    <subfield code="w">991011711849703811</subfield>
+    <subfield code="9">ExL</subfield>
+  </datafield>
+  <datafield tag="774" ind1="1" ind2=" ">
+    <subfield code="t">Educational achievement and sectoral transition in the Indonesian labor force / Anna Maria Siti Kawuryan.</subfield>
+    <subfield code="w">991011711799703811</subfield>
+    <subfield code="9">ExL</subfield>
+  </datafield>
+  <datafield tag="774" ind1="1" ind2=" ">
+    <subfield code="t">Growth economics and development economics : what should development economists learn (if anything) from the new growth theory? / Vernon W. Ruttan.</subfield>
+    <subfield code="w">991011711709703811</subfield>
+    <subfield code="9">ExL</subfield>
+  </datafield>
+  <datafield tag="774" ind1="1" ind2=" ">
+    <subfield code="t">The effect of sequencing trade and water market reform on interest groups in irrigated agriculture : an intertemporal economy-wide analysis of the Moroccan case / Xinshen Diao and Terry Roe.</subfield>
+    <subfield code="w">991011712049703811</subfield>
+    <subfield code="9">ExL</subfield>
+  </datafield>
+  <datafield tag="774" ind1="1" ind2=" ">
+    <subfield code="t">Monetary instability and economic growth / Willis Peterson.</subfield>
+    <subfield code="w">991011711759703811</subfield>
+    <subfield code="9">ExL</subfield>
+  </datafield>
+  <datafield tag="852" ind1="0" ind2=" ">
+    <subfield code="b">KARDON</subfield>
+    <subfield code="c">p_remote</subfield>
+    <subfield code="h">HD1401</subfield>
+    <subfield code="i">.B95x no.98-6</subfield>
+  </datafield>
+</record>
+@;
+	return $record;
+}
+
+# Return fake OPACXML record
+sub return_opacxml {
+	my $record = q@
+<opacRecord>
+  <bibliographicRecord>
+<record xmlns="http://www.loc.gov/MARC21/slim">
+  <leader>01212nam a2200157 i 4500</leader>
+  <controlfield tag="001">9910367181303811</controlfield>
+  <controlfield tag="005">20180618101041.0</controlfield>
+  <controlfield tag="008">170620s        xx            000 0 eng d</controlfield>
+  <datafield tag="035" ind1=" " ind2=" ">
+    <subfield code="a">bw90000408-01tuli_inst</subfield>
+  </datafield>
+  <datafield tag="245" ind1="0" ind2="0">
+    <subfield code="a">Host bibliographic record for boundwith item barcode 39074015913874</subfield>
+  </datafield>
+  <datafield tag="774" ind1="1" ind2=" ">
+    <subfield code="t">How fiscal (mis)-management may impede trade reform : lessons from an intertemporal, multi-sector general equilibrium model for Turkey / Xinshen Diao, Terry L. Roe and A. Erin&#xE7; Yeldan.</subfield>
+    <subfield code="w">991011711849703811</subfield>
+    <subfield code="9">ExL</subfield>
+  </datafield>
+  <datafield tag="774" ind1="1" ind2=" ">
+    <subfield code="t">Educational achievement and sectoral transition in the Indonesian labor force / Anna Maria Siti Kawuryan.</subfield>
+    <subfield code="w">991011711799703811</subfield>
+    <subfield code="9">ExL</subfield>
+  </datafield>
+  <datafield tag="774" ind1="1" ind2=" ">
+    <subfield code="t">Growth economics and development economics : what should development economists learn (if anything) from the new growth theory? / Vernon W. Ruttan.</subfield>
+    <subfield code="w">991011711709703811</subfield>
+    <subfield code="9">ExL</subfield>
+  </datafield>
+  <datafield tag="774" ind1="1" ind2=" ">
+    <subfield code="t">The effect of sequencing trade and water market reform on interest groups in irrigated agriculture : an intertemporal economy-wide analysis of the Moroccan case / Xinshen Diao and Terry Roe.</subfield>
+    <subfield code="w">991011712049703811</subfield>
+    <subfield code="9">ExL</subfield>
+  </datafield>
+  <datafield tag="774" ind1="1" ind2=" ">
+    <subfield code="t">Monetary instability and economic growth / Willis Peterson.</subfield>
+    <subfield code="w">991011711759703811</subfield>
+    <subfield code="9">ExL</subfield>
+  </datafield>
+  <datafield tag="852" ind1="0" ind2=" ">
+    <subfield code="b">KARDON</subfield>
+    <subfield code="c">p_remote</subfield>
+    <subfield code="h">HD1401</subfield>
+    <subfield code="i">.B95x no.98-6</subfield>
+  </datafield>
+</record>
+  </bibliographicRecord>
+<holdings>
+ <holding>
+  <encodingLevel>3</encodingLevel>
+  <localLocation>Remote Storage</localLocation>
+  <shelvingLocation>Main Remote Stacks</shelvingLocation>
+  <callNumber>HD1401 .B95x no.98-6</callNumber>
+  <volumes>
+   <volume>
+    <enumeration>       </enumeration>
+    <chronology>     </chronology>
+   </volume>
+  </volumes>
+  <circulations>
+   <circulation>
+    <availableNow value="1"/>
+    <availableThru>0</availableThru>
+    <itemId>39074015913874</itemId>
+    <renewable value="0"/>
+    <onHold value="0"/>
+   </circulation>
+  </circulations>
+ </holding>
+</holdings>
+</opacRecord>
+@;
+	print $record;
+	return $record;
+}
+
 
 my $handler = new Net::Z3950::SimpleServer(
                 START   =>      "main::my_start_handler",
@@ -286,7 +429,9 @@ my $handler = new Net::Z3950::SimpleServer(
 		SEARCH	=>	"main::my_search_handler",
 		SCAN	=>	"main::my_scan_handler",
                 SORT    =>      "main::my_sort_handler",
-		FETCH	=>	"main::my_fetch_handler" );
+		FETCH	=>	"main::my_fetch_handler",
+		ESREQUEST =>	"main::my_esrequest_handler"
+);
 
 if (@ARGV >= 2 && $ARGV[0] eq "-n") {
     $_fail_frequency = $ARGV[1];

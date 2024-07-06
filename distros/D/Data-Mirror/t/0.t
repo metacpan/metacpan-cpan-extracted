@@ -1,14 +1,12 @@
 #!perl -w
-use Devel::Confess;
-use Data::Mirror qw(:all);
-use Test;
+use Test::More;
 use vars qw($result);
 use strict;
 
-BEGIN { plan tests => 7 }
+BEGIN { use_ok(q{Data::Mirror}, qw(:all)) }
 
 #
-# let's speed up repeated runs by caching everything for a day
+# speed up repeated runs by caching everything for a day
 #
 $Data::Mirror::TTL_SECONDS = 86400;
 
@@ -22,7 +20,7 @@ ok(length($result) > 0 ? 1 : 0);
 # file mirror
 #
 $result = mirror_file('https://raw.githubusercontent.com/gbxyz/perl-data-mirror-test-files/main/README.md');
-ok(-e $result ? 1 : 0);
+ok(-e $result);
 
 ok($result eq Data::Mirror::filename('https://raw.githubusercontent.com/gbxyz/perl-data-mirror-test-files/main/README.md'));
 
@@ -54,5 +52,16 @@ ok('HASH' eq ref($result) ? 1 : 0);
 #
 # CSV mirror
 #
-$result = mirror_csv('https://raw.githubusercontent.com/gbxyz/perl-data-mirror-test-files/main/example.csv');
+my $url = 'https://raw.githubusercontent.com/gbxyz/perl-data-mirror-test-files/main/example.csv?t='.time();
+
+ok(!Data::Mirror::mirrored($url));
+
+$result = mirror_csv($url);
+
 ok('ARRAY' eq ref($result) ? 1 : 0);
+
+ok(Data::Mirror::mirrored($url));
+
+ok(!Data::Mirror::stale($url));
+
+done_testing;

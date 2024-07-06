@@ -2,31 +2,22 @@ NAME
     App::VitaminUtils - Utilities related to vitamins
 
 VERSION
-    This document describes version 0.006 of App::VitaminUtils (from Perl
-    distribution App-VitaminUtils), released on 2022-09-14.
+    This document describes version 0.007 of App::VitaminUtils (from Perl
+    distribution App-VitaminUtils), released on 2024-07-06.
 
 DESCRIPTION
     This distributions provides the following command-line utilities:
 
-    *   convert-choline-unit
-
-    *   convert-cobalamin-unit
-
-    *   convert-pantothenic-acid-unit
-
-    *   convert-pyridoxine-unit
-
-    *   convert-vitamin-a-unit
-
-    *   convert-vitamin-b12-unit
-
-    *   convert-vitamin-b5-unit
-
-    *   convert-vitamin-b6-unit
-
-    *   convert-vitamin-d-unit
-
-    *   convert-vitamin-e-unit
+    1. convert-choline-unit
+    2. convert-cobalamin-unit
+    3. convert-pantothenic-acid-unit
+    4. convert-pyridoxine-unit
+    5. convert-vitamin-a-unit
+    6. convert-vitamin-b12-unit
+    7. convert-vitamin-b5-unit
+    8. convert-vitamin-b6-unit
+    9. convert-vitamin-d-unit
+    10. convert-vitamin-e-unit
 
 FUNCTIONS
   convert_choline_unit
@@ -40,7 +31,7 @@ FUNCTIONS
 
     *   Show all possible conversions:
 
-         convert_choline_unit(quantity => "mcg");
+         convert_choline_unit();
 
         Result:
 
@@ -62,9 +53,13 @@ FUNCTIONS
 
     Arguments ('*' denotes required arguments):
 
-    *   quantity* => *str*
+    *   quantity => *str* (default: "1 mcg")
+
+        (No description)
 
     *   to_unit => *str*
+
+        (No description)
 
     Returns an enveloped result (an array).
 
@@ -91,7 +86,7 @@ FUNCTIONS
 
     *   Show all possible conversions:
 
-         convert_vitamin_a_unit(quantity => "mcg");
+         convert_vitamin_a_unit();
 
         Result:
 
@@ -150,9 +145,13 @@ FUNCTIONS
 
     Arguments ('*' denotes required arguments):
 
-    *   quantity* => *str*
+    *   quantity => *str* (default: "1 mcg")
+
+        (No description)
 
     *   to_unit => *str*
+
+        (No description)
 
     Returns an enveloped result (an array).
 
@@ -179,7 +178,7 @@ FUNCTIONS
 
     *   Show all possible conversions:
 
-         convert_vitamin_b12_unit(quantity => "mcg");
+         convert_vitamin_b12_unit();
 
         Result:
 
@@ -201,9 +200,13 @@ FUNCTIONS
 
     Arguments ('*' denotes required arguments):
 
-    *   quantity* => *str*
+    *   quantity => *str* (default: "1 mcg")
+
+        (No description)
 
     *   to_unit => *str*
+
+        (No description)
 
     Returns an enveloped result (an array).
 
@@ -231,7 +234,7 @@ FUNCTIONS
 
     *   Show all possible conversions:
 
-         convert_vitamin_b5_unit(quantity => "mg");
+         convert_vitamin_b5_unit();
 
         Result:
 
@@ -252,9 +255,13 @@ FUNCTIONS
 
     Arguments ('*' denotes required arguments):
 
-    *   quantity* => *str*
+    *   quantity => *str* (default: "1 mg")
+
+        (No description)
 
     *   to_unit => *str*
+
+        (No description)
 
     Returns an enveloped result (an array).
 
@@ -281,7 +288,7 @@ FUNCTIONS
 
     *   Show all possible conversions:
 
-         convert_vitamin_b6_unit(quantity => "mg");
+         convert_vitamin_b6_unit();
 
         Result:
 
@@ -302,9 +309,13 @@ FUNCTIONS
 
     Arguments ('*' denotes required arguments):
 
-    *   quantity* => *str*
+    *   quantity => *str* (default: "1 mg")
+
+        (No description)
 
     *   to_unit => *str*
+
+        (No description)
 
     Returns an enveloped result (an array).
 
@@ -331,7 +342,7 @@ FUNCTIONS
 
     *   Show all possible conversions:
 
-         convert_vitamin_d_unit(quantity => "mcg");
+         convert_vitamin_d_unit();
 
         Result:
 
@@ -360,9 +371,13 @@ FUNCTIONS
 
     Arguments ('*' denotes required arguments):
 
-    *   quantity* => *str*
+    *   quantity => *str* (default: "1 mcg")
+
+        (No description)
 
     *   to_unit => *str*
+
+        (No description)
 
     Returns an enveloped result (an array).
 
@@ -389,7 +404,7 @@ FUNCTIONS
 
     *   Show all possible conversions:
 
-         convert_vitamin_e_unit(quantity => "mg");
+         convert_vitamin_e_unit();
 
         Result:
 
@@ -438,9 +453,13 @@ FUNCTIONS
 
     Arguments ('*' denotes required arguments):
 
-    *   quantity* => *str*
+    *   quantity => *str* (default: "1 mg")
+
+        (No description)
 
     *   to_unit => *str*
+
+        (No description)
 
     Returns an enveloped result (an array).
 
@@ -494,7 +513,7 @@ CONTRIBUTING
     required beyond that are considered a bug and can be reported to me.
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2022, 2021, 2020 by perlancar
+    This software is copyright (c) 2024, 2022, 2021, 2020 by perlancar
     <perlancar@cpan.org>.
 
     This is free software; you can redistribute it and/or modify it under

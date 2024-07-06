@@ -1,3 +1,8 @@
+0.007   2024-07-06  Released-By: PERLANCAR; Urgency: medium
+
+        - [ux] Allow optional quantity argument.
+
+
 0.006   2022-09-14  Released-By: PERLANCAR; Urgency: medium
 
         - Revert previous change, as 'ng' is uncommon and can be confused with

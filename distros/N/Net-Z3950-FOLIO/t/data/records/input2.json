@@ -76,9 +76,47 @@
         "yearCaption": []
       }
     ],
-    "holdingsStatements": [],
-    "holdingsStatementsForIndexes": [],
-    "holdingsStatementsForSupplements": [],
+    "holdingsStatements": [
+      {
+        "note": "Added by Mike",
+        "staffNote": "For Z39.50 testing",
+        "statement": "First statement"
+      },
+      {
+        "note": "Mike again",
+        "staffNote": "",
+        "statement": "Second statement"
+      },
+      {
+        "note": "",
+        "staffNote": "Most people should ignore this note",
+        "statement": "Third statement"
+      },
+      {
+        "note": "",
+        "staffNote": "",
+        "statement": "Fourth statement"
+      }
+    ],
+    "holdingsStatementsForIndexes": [
+      {
+        "note": "What even IS an HS for indexes?",
+        "staffNote": "",
+        "statement": "First HS for indexes"
+      }
+    ],
+    "holdingsStatementsForSupplements": [
+      {
+        "note": "Why do we want this?",
+        "staffNote": "",
+        "statement": "First holdings statement for supplements"
+      },
+      {
+        "note": "",
+        "staffNote": "Staff should enjoy this",
+        "statement": "Second supplementary HS"
+      }
+    ],
     "holdingsTypeId": null,
     "hrid": "b2245518-elere",
     "id": "697448a8-a428-11ea-b7fc-94e55e224816",
@@ -86,16 +124,6 @@
     "instanceId": "2ff48cb6-a41c-11ea-8d99-9ee25e224816",
     "metadata": null,
     "notes": [
-      {
-        "holdingsNoteType": {
-          "id": "a336ce03-f68a-4875-b82a-4f21df8139c5",
-          "name": "Bound with",
-          "source": "local"
-        },
-        "holdingsNoteTypeId": "a336ce03-f68a-4875-b82a-4f21df8139c5",
-        "note": "This is a holdings note",
-        "staffOnly": false
-      },
       {
         "holdingsNoteType": {
           "id": "6a41b714-8574-4084-8d64-a9373c3fbb59",

@@ -8,10 +8,8 @@ Whelk::Manual - Reference to APIs with Whelk
 
 =head1 SYNOPSIS
 
+	# File: conf/whelk_config.pl
 	##############################
-	# File: conf/whelk_config.pl #
-	##############################
-
 	{
 		resources => {
 			'MyApi' => {
@@ -35,10 +33,8 @@ Whelk::Manual - Reference to APIs with Whelk
 		},
 	}
 
+	# File: lib/Whelk/Resource/MyApi.pm
 	#####################################
-	# File: lib/Whelk/Resource/MyApi.pm #
-	#####################################
-
 	package Whelk::Resource::MyApi;
 
 	use Kelp::Base 'Whelk::Resource';
@@ -91,10 +87,8 @@ Whelk::Manual - Reference to APIs with Whelk
 		];
 	}
 
+	# File: app.psgi
 	##################
-	# File: app.psgi #
-	##################
-
 	use Kelp::Base -strict;
 	use Whelk;
 	use lib 'lib';
@@ -126,6 +120,14 @@ implementing both API code and specification at the same time. OpenAPI is not
 an afterthought in Whelk, but rather welded into its very core. Each time you
 declare how your data should look, it serve both as documentation through
 OpenAPI as well as runtime validation scheme.
+
+Whelk is designed to be dead-easy but hard to misuse. Even though all the
+configuration is in form of plain Perl hashes, most of them are immediately
+translated to internal objects with built-in typo detection on construction.
+Even the data you return from the endpoint subroutine may get rejected if it
+does not conform with the declared schema. You don't have to learn the ins and
+outs of a fancy DSL language to use it efficiently, but it's extremely easy to
+come up with your own to help you build the required hashes.
 
 Data types are defined in Whelk's own format, very similar to JSON schema but
 simpler and not as strict when it comes to validation. Reusable, named schemas

@@ -21,6 +21,14 @@ BEGIN {
 		}
 	}
 
+	# Test for broken smokers that don't set AUTOMATED_TESTING
+	if(my $reporter = $ENV{'PERL_CPAN_REPORTER_CONFIG'}) {
+		if($reporter =~ /smoker/i) {
+			warn 'AUTOMATED_TESTING added for you';
+			$ENV{'AUTOMATED_TESTING'} = 1;
+		}
+	}
+
 	if(scalar(@needfull)) {
 		my $list = join(' ', @needfull);
 		if($ENV{'AUTOMATED_TESTING'} &&
@@ -95,28 +103,28 @@ my %urls = (
 # unlink('lib/Geo/Coder/Free/MaxMind/databases/cities.sql');
 if(eval { require HTTP::Cache::Transparent; }) {
 	HTTP::Cache::Transparent->import();
-	my $cachedir;
-	if(my $e = $ENV{'CACHEDIR'}) {
-		$cachedir = File::Spec->catfile($e, 'http-cache-transparent');
+	my $cache_dir;
+	if(my $e = $ENV{'CACHE_DIR'}) {
+		$cache_dir = File::Spec->catfile($e, 'http-cache-transparent');
 	} else {
 		require File::HomeDir;
 		File::HomeDir->import();
 
-		# $cachedir = File::Spec->catfile(File::Spec->tmpdir(), 'cache', 'http-cache-transparent');
-		$cachedir = File::Spec->catfile(File::HomeDir->my_home(), '.cache', 'http-cache-transparent');
+		# $cache_dir = File::Spec->catfile(File::Spec->tmpdir(), 'cache', 'http-cache-transparent');
+		$cache_dir = File::Spec->catfile(File::HomeDir->my_home(), '.cache', 'http-cache-transparent');
 	}
 
-	if(!-d $cachedir) {
-		print "Creating the cache directory $cachedir\n";
-		mkdir $cachedir, 02755 || die "$cachedir: $@";
+	if(!-d $cache_dir) {
+		print "Creating the cache directory $cache_dir\n";
+		mkdir $cache_dir, 02755 || die "$cache_dir: $@";
 	}
 	HTTP::Cache::Transparent::init({
-		BasePath => $cachedir,
+		BasePath => $cache_dir,
 		# Verbose => $opts{'v'} ? 1 : 0,
 		Verbose => 1,
 		NoUpdate => 60 * 60 * 24,
 		MaxAge => 30 * 24
-	}) || die "$0: $cachedir: $!";
+	}) || die "$0: $cache_dir: $!";
 } else {
 	print "Consider installing HTTP::Cache::Transparent to reduce downloads\n";
 }
@@ -232,6 +240,7 @@ if(open(my $admin2, '>>', 'lib/Geo/Coder/Free/MaxMind/databases/admin2.db')) {
 # For bin/create_sqlite
 my $build_requires = {
 	'App::csv2sqlite' => 0,
+	'Array::Iterator' => 0,
 	'CHI' => 0,
 	'CHI::Driver::RawMemory' => 0,
 	'Cwd' => 0,
@@ -277,6 +286,7 @@ my $test_requires = {
 
 if($ENV{'AUTHOR_TESTING'}) {
 	$test_requires->{'CGI::ACL'} = 0;
+	$test_requires->{'CGI::Carp'} = 0;
 	$test_requires->{'FCGI'} = 0;
 	$test_requires->{'FCGI::Buffer'} = 0;
 	$test_requires->{'HTML::SocialMedia'} = 0;
@@ -329,6 +339,7 @@ WriteMakefile(
 	},
 	dist		=> { COMPRESS => 'gzip -9f', SUFFIX => 'gz' },
 	clean		=> { FILES => 'Geo-Coder-Free-*' },
+	EXE_FILES => [ 'bin/address_lookup' ],
 	# META_ADD => {
 		# provides => {
 			# 'Geo::Coder::Free' => {

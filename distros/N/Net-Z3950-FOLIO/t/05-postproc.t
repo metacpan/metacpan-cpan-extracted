@@ -96,6 +96,15 @@ BEGIN {
 	[ 'ł', 'l', 'small letter L with stroke' ],
 	[ 'ßẞÞþĐðÆæŒœŁł', 'ssSSTHthDdAEaeOEoeLl', 'all of the above' ],
 	[ 'ßẞÞþĐðÆæŒœŁłßẞÞþĐðÆæŒœŁł', 'ssSSTHthDdAEaeOEoeLlssSSTHthDdAEaeOEoeLl', 'twice' ],
+	[ 'Kont︠s︡ept)', 'Kontsept)', 'ts ligature' ],
+	[ 'bli︠u︡stiteli', 'bliustiteli', 'iu ligature' ],
+	[ 'samoderzhavii︠a︡', 'samoderzhaviia', 'ia ligature' ],
+	[ "canʹt", "can't", "MODIFIER LETTER PRIME" ],
+	[ "wonʻt", "won't", "MODIFIER LETTER TURNED COMMA" ],
+	[ "shanʼt", "shan't", "MODIFIER LETTER APOSTROPHE" ],
+	[ "couldnʽt", "couldn't", "MODIFIER LETTER REVERSED COMMA" ],
+	[ "wouldnʾt", "wouldn't", "MODIFIER LETTER RIGHT HALF RING" ],
+	[ "shouldnʿt", "shouldn't", "MODIFIER LETTER LEFT HALF RING" ],
     );
     @regsubTests = (
 	# value, pattern, replacement, flags, expected, caption

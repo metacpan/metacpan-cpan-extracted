@@ -12,7 +12,7 @@ Geo::Coder::Free - Provides a Geo-Coding functionality using free databases
 
 # VERSION
 
-Version 0.35
+Version 0.36
 
 # SYNOPSIS
 

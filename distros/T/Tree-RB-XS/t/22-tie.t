@@ -19,6 +19,7 @@ ok( %example ) if $] > 5.025000;
 is( $example{x}, 1, 'fetch' );
 $_= 8 for values %example;
 is( delete $example{x}, 8, 'delete' );
+ok( exists $example{y}, 'exists' );
 
 $example{x}= 9;
 $example{c}= 3;

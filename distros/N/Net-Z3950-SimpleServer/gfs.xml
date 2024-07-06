@@ -1,0 +1,36 @@
+<?xml version="1.0"?>
+<!-- generic frontend server configuration
+  https://software.indexdata.com/yaz/doc/server.vhosts.html
+
+  this configuration is passed to simpleserver with option -f, eg
+
+  ./ztest.pl -f gfs.xml
+
+  The retrievalInfo sections makes YAZ responsible for converting
+  from XML to MARC / OPAC
+
+  The Perl code just need to consider comp/element-set-name "marcxml" / "OP"
+  to distinguish between the two cases.
+-->
+<yazgfs>
+  <listen id="public1">tcp:@:9999</listen>
+  <server id="server1" listenref="public1">
+    <retrievalinfo>
+      <retrieval syntax="xml"/>
+      <retrieval syntax="usmarc">
+        <backend syntax="xml" name="marcxml">
+          <marc inputformat="xml" outputformat="marc" outputcharset="utf-8"/>
+        </backend>
+      </retrieval>
+      <!--
+       Provide conversion from OPACXML to plain opac in Z39.50
+       Make sure the server script can return xml/OP, then this
+       entry triggers the conversion to "opac" if requested
+      -->
+      <retrieval syntax="opac">
+        <backend syntax="xml" name="OP">
+        </backend>
+      </retrieval>
+    </retrievalinfo>
+  </server>
+</yazgfs>

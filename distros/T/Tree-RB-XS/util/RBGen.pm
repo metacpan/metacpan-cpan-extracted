@@ -108,6 +108,9 @@ $api $nd *${ns}node_rootsentinel( $nd *node );
 
 /* Add a node to a tree */
 $api bool ${ns}node_insert( $nd *hint, $nd *node, ${ns}compare_fn cmp_fn, ${cmp_ctx_decl}int cmp_pointer_ofs );
+/* Manually alter tree assuming you've compared the keys already */
+$api void ${ns}node_insert_before( $nd *parent, $nd *node );
+$api void ${ns}node_insert_after( $nd *parent, $nd *node );
 
 $api $nd * ${ns}find_nearest( $nd *node, void *goal,
 	int(*cmp_fn)(${cmp_ctx_decl}void *a, void *b), ${cmp_ctx_decl}int cmp_pointer_ofs,
@@ -237,6 +240,20 @@ $nd *${ns}node_right_leaf( $nd *node ) {
 	while (NOT_SENTINEL(node->right))
 		node= node->right;
 	return node;
+}
+
+$nd *${ns}node_prev_leaf( $nd *node ) {
+	node= node->left;
+	while (NOT_SENTINEL(node->right))
+		node= node->right;
+	return IS_SENTINEL(node)? NULL : node;
+}
+
+$nd *${ns}node_next_leaf( $nd *node ) {
+	node= node->right;
+	while (NOT_SENTINEL(node->left))
+		node= node->left;
+	return IS_SENTINEL(node)? NULL : node;
 }
 
 $nd *${ns}node_rootsentinel( $nd *node ) {
@@ -467,6 +484,64 @@ bool ${ns}node_insert( $nd *hint, $nd *node, int(*compare)(${cmp_ctx_decl}void *
 	// Set the tree's root to black
 	SET_COLOR_BLACK(parent->left);
 	return true;
+}
+
+/* Insert a new node into the tree immediately before a given node.
+ * This does not perform any comparisons, and will break the tree if given bad parameters.
+ */
+void ${ns}node_insert_before( $nd *parent, $nd *node) {
+	$nd *sentinel, *tmp;
+	if (IS_SENTINEL(parent->left)) {
+		sentinel= parent->left;
+		parent->left= node;
+	}
+	else {
+		parent= parent->left;
+		while (!IS_SENTINEL(parent->right))
+			parent= parent->right;
+		sentinel= parent->right;
+		parent->right= node;
+	}
+	node->parent= parent;
+	node->left= sentinel;
+	node->right= sentinel;
+	SET_COUNT(node, 1);
+	SET_COLOR_RED(node);
+	for (tmp= parent; NOT_ROOTSENTINEL(tmp); tmp= tmp->parent)
+		ADD_COUNT(tmp, 1);
+	Balance(parent);
+	// We've iterated to the root sentinel- so node->left is the head of the tree.
+	// Set the tree's root to black
+	SET_COLOR_BLACK(tmp->left);
+}
+
+/* Insert a new node into the tree immediately after a given node.
+ * This does not perform any comparisons, and will break the tree if given bad parameters.
+ */
+void ${ns}node_insert_after( $nd *parent, $nd *node) {
+	$nd *sentinel, *tmp;
+	if (IS_SENTINEL(parent->right)) {
+		sentinel= parent->right;
+		parent->right= node;
+	}
+	else {
+		parent= parent->right;
+		while (!IS_SENTINEL(parent->left))
+			parent= parent->left;
+		sentinel= parent->left;
+		parent->left= node;
+	}
+	node->parent= parent;
+	node->left= sentinel;
+	node->right= sentinel;
+	SET_COUNT(node, 1);
+	SET_COLOR_RED(node);
+	for (tmp= parent; NOT_ROOTSENTINEL(tmp); tmp= tmp->parent)
+		ADD_COUNT(tmp, 1);
+	Balance(parent);
+	// We've iterated to the root sentinel- so node->left is the head of the tree.
+	// Set the tree's root to black
+	SET_COLOR_BLACK(tmp->left);
 }
 
 void RotateRight( $nd *node ) {

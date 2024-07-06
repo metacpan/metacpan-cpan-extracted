@@ -28,6 +28,11 @@ Net::Z3950::FOLIO::Config - configuration file for the FOLIO Z39.50 gateway
       "queryFilter": "source=marc",
       "graphqlQuery": "instances.graphql-query",
       "chunkSize": 5,
+      "fieldDefinitions": {
+        "circulation": {
+          "availableThru": "permanentLoanType"
+        }
+      },
       "marcHoldings": {
         "restrictToItem": 0,
         "field": "952",
@@ -61,7 +66,7 @@ Net::Z3950::FOLIO::Config - configuration file for the FOLIO Z39.50 gateway
               "pattern": "(.*)",
               "replacement": "%{_callNumberPrefix}$1%{_callNumberSuffix}"
             }
-          },
+          }
         }
       }
     }
@@ -204,6 +209,33 @@ search. This can be tweaked to tune performance. Setting it too low
 will result in many requests with small numbers of records returned
 each time; setting it too high will result in fetching and decoding
 more records than are actually wanted.
+
+## `fieldDefinitions`
+
+An optional object specifying how the sources from which some
+particular holdings fields should draw their data, overriding the
+default sources.
+
+The keys of this object specify domains in which the fields can be
+found: supported domains are `holding` and `circulation`}.
+
+Within the `holdings` domain, no fields are presently supported;
+within the `circulation` domain, only the `availableThru` field is
+presently supported. Support for further fields may be added as
+required.
+
+Each field within a domain is specified by its name as key, and the
+corresponding value is a string specifying a path from which to fetch
+the data. These strings follow the same syntax as [the get function
+in JavaScript's lodash library](https://docs-lodash.com/v4/get/). It is
+a dot-separate sequence of source field-names to navigate down, with
+bracketed numbers indicating the selection of one element of an
+array. For example, the path
+`temporaryLocation.servicePoints[0].discoveryDisplayName` fetches the
+`discoveryDisplayName` field from the first element of the
+`servicePoints` array within the `temporaryLocation` structure. It
+will work when running on data with the shape `{ temporaryLocation: {
+servicePoints: [ { discoveryDisplayName: "Main" } ] } }`.
 
 ## `marcHoldings`
 
