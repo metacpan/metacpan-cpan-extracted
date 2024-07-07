@@ -1,10 +1,11 @@
+!ru:en
 # NAME
 
-Aion::Query - functional interface for accessing database mysql and mariadb
+Aion::Query - функциональный интерфейс для доступа к базам данных SQL (MySQL, MariaDB, Postgres и SQLite)
 
 # VERSION
 
-0.0.3
+0.0.4
 
 # SYNOPSIS
 
@@ -53,17 +54,17 @@ $Aion::Query::DEBUG[1]  # => query: INSERT INTO author (name) VALUES ('Pushkin A
 
 # DESCRIPTION
 
-When constructing queries, many disparate conditions are used, usually separated by different methods.
+`Aion::Query` позволяет строить SQL-запрос используя простой механизм шаблонов.
 
-`Aion::Query` uses a different approach, which allows you to construct an SQL query in a query using a simple template engine.
+Обычно SQL-запросы строятся с помощью условий, что нагружает код.
 
-The second problem is placing unicode characters into single-byte encodings, which reduces the size of the database. So far it has been solved only for the **cp1251** encoding. It is controlled by the parameter `BQ = 1`.
+Вторая проблема — размещение символов Юникода в однобайтовых кодировках, что уменьшает размер базы данных. Пока проблема решена только для кодировки **cp1251**. Это контролируется параметром `use config BQ => 1`.
 
 # SUBROUTINES
 
 ## query ($query, %params)
 
-It provide SQL (DCL, DDL, DQL and DML) queries to DBMS with quoting params.
+Предоставляет SQL-запросы (DCL, DDL, DQL и DML) к СУБД с квотированием параметров.
 
 ```perl
 query "SELECT * FROM author WHERE name=:name", name => 'Pushkin A.S.' # --> [{id=>1, name=>"Pushkin A.S."}]
@@ -71,7 +72,7 @@ query "SELECT * FROM author WHERE name=:name", name => 'Pushkin A.S.' # --> [{id
 
 ## LAST_INSERT_ID ()
 
-Returns last insert id.
+Возвращает идентификатор последней вставки.
 
 ```perl
 query "INSERT INTO author (name) VALUES (:name)", name => "Alice"  # -> 1
@@ -80,7 +81,7 @@ LAST_INSERT_ID  # -> 3
 
 ## quote ($scalar)
 
-Quoted scalar for SQL-query.
+Квотирует скаляр для SQL-запроса.
 
 ```perl
 quote undef     # => NULL
@@ -116,7 +117,11 @@ quote {name => 'A.S.', id => 12}   # => id = 12, name = 'A.S.'
 
 ## query_prepare ($query, %param)
 
-Replace the parameters in `$query`. Parameters quotes by the `quote`.
+Заменяет параметры (`%param`) в запросе (`$query`) и возвращает его. Параметры заключаются в кавычки через подпрограмму `quote`.
+
+Параметры вида `:x` будут квотироваться с учётом флагов скаляра, которые укажут, что в нём находится: строка, целое или число с плавающей запятой.
+
+Чтобы явно указать тип скаляра используйте префиксы: `:^x` – целое, `:.x` – строка, `:~x` – плавающее.
 
 ```perl
 query_prepare "INSERT author SET name IN (:name)", name => ["Alice", 1, 1.0]  # => INSERT author SET name IN ('Alice', 1, 1.0)
@@ -148,7 +153,7 @@ $query # -> $res
 
 ## query_do ($query)
 
-Execution query and returns it result.
+Выполняет запрос и возвращает его результат.
 
 ```perl
 query_do "SELECT count(*) as n FROM author"  # --> [{n=>3}]
@@ -157,7 +162,7 @@ query_do "SELECT id FROM author WHERE id=2"  # --> [{id=>2}]
 
 ## query_ref ($query, %kw)
 
-As `query`, but always returns a reference.
+Как `query`, но всегда возвращает скаляр.
 
 ```perl
 my @res = query_ref "SELECT id FROM author WHERE id=:id", id => 2;
@@ -166,7 +171,7 @@ my @res = query_ref "SELECT id FROM author WHERE id=:id", id => 2;
 
 ## query_sth ($query, %kw)
 
-As `query`, but returns `$sth`.
+Как `query`, но возвращает `$sth`.
 
 ```perl
 my $sth = query_sth "SELECT * FROM author";
@@ -179,18 +184,112 @@ $sth->finish;
 0+@rows  # -> 3
 ```
 
-## query_slice ($key, $val, @args)
+## query_slice ($key, $val, $query, %kw)
 
-As query, plus converts the result into the desired data structure.
+Как query, плюс преобразует результат в нужную структуру данных.
+
+Если нужен хеш вида идентификатор – значение:
 
 ```perl
 my %author = query_slice name => "id", "SELECT id, name FROM author";
 \%author  # --> {"Pushkin A.S." => 1, "Pushkin A." => 2, "Alice" => 3}
 ```
 
+Если нужен хеш вида идентификатор – строка:
+
+```perl
+my %author = query_slice id => {}, "SELECT id, name FROM author";
+
+my $rows = {
+    1 => {name => "Pushkin A.S.", id => 1},
+    2 => {name => "Pushkin A.",   id => 2},
+    3 => {name => "Alice",        id => 3},
+};
+
+\%author  # --> $rows
+```
+
+Если одному идентификатору соответствует несколько строк, то логично собрать их в массивы:
+
+```perl
+query "CREATE TABLE book (
+	id SERIAL PRIMARY KEY,
+    author_id INT NOT NULL REFERENCES author(id),
+    title TEXT NOT NULL
+)";
+
+stores book => [
+    {author_id => 1, title => "Mir"},
+    {author_id => 1, title => "Kiss in night"},
+    {author_id => 3, title => "Mips as cpu"},
+];
+
+my %author = query_slice author_id => ["title"], "SELECT author_id, title FROM book ORDER BY title";
+
+my $rows = {
+    1 => ["Kiss in night", "Mir"],
+    3 => ["Mips as cpu"],
+};
+
+\%author  # --> $rows
+```
+
+Ну и строки со всеми полями:
+
+```perl
+my %author = query_slice author_id => [], "SELECT author_id, title FROM book ORDER BY title";
+
+my $rows = {
+    1 => [
+        {title => "Kiss in night", author_id => 1},
+        {title => "Mir",           author_id => 1},
+    ],
+    3 => [
+        {title => "Mips as cpu",   author_id => 3}
+    ],
+};
+
+\%author  # --> $rows
+```
+
+## query_attach ($rows, $attach, $query, %kw)
+
+Подсоединяет в результат запроса результат другого запроса.
+
+`$attach` содержит три ключа через двоеточие: ключ для присоединяемых данных, столбец из `$rows` и столбец из `$query`. По столбцам происходит объединение строк.
+
+```perl
+my $authors = query "SELECT id, name FROM author";
+
+my $res = [
+    {name => "Pushkin A.S.", id => 1},
+    {name => "Pushkin A.",   id => 2},
+    {name => "Alice",        id => 3},
+];
+
+$authors # --> $res
+
+query_attach $authors => "books:id:author_id" => "SELECT author_id, title FROM book ORDER BY title";
+
+my $attaches = [
+    {name => "Pushkin A.S.", id => 1, books => [
+        {title => "Kiss in night", author_id => 1},
+        {title => "Mir",           author_id => 1},
+    ]},
+    {name => "Pushkin A.",   id => 2},
+    {name => "Alice",        id => 3, books => [
+        {title => "Mips as cpu", author_id => 3},
+    ]},
+];
+
+$authors # --> $attaches
+```
+
+Если нужно указать другие ключи, то это делается через двоеточия в `$attach`: `attach:id:attach_id`.
+
 ## query_col ($query, %params)
 
-Returns one column.
+Возвращает один столбец.
 
 ```perl
 query_col "SELECT name FROM author ORDER BY name" # --> ["Alice", "Pushkin A.", "Pushkin A.S."]
@@ -200,7 +299,7 @@ eval {query_col "SELECT id, name FROM author"}; $@  # ~> Only one column is acce
 
 ## query_row ($query, %params)
 
-Returns one row.
+Возвращает одну строку.
 
 ```perl
 query_row "SELECT name FROM author WHERE id=2" # --> {name => "Pushkin A."}
@@ -208,11 +307,13 @@ query_row "SELECT name FROM author WHERE id=2" # --> {name => "Pushkin A."}
 my ($id, $name) = query_row "SELECT id, name FROM author WHERE id=2";
 $id    # -> 2
 $name  # => Pushkin A.
+
+eval { query_row "SELECT id, name FROM author" }; $@ # ~> A few lines! 
 ```
 
 ## query_row_ref ($query, %params)
 
-As `query_row`, but retuns array reference always.
+Как `query_row`, но всегда возвращает скаляр.
 
 ```perl
 my @x = query_row_ref "SELECT name FROM author WHERE id=2";
@@ -223,7 +324,7 @@ eval {query_row_ref "SELECT name FROM author"}; $@  # ~> A few lines!
 
 ## query_scalar ($query, %params)
 
-Returns scalar.
+Возвращает первое значение. Запрос должен возвращать одну строку, иначе – выбрасывает исключение.
 
 ```perl
 query_scalar "SELECT name FROM author WHERE id=2" # => Pushkin A.
@@ -231,9 +332,9 @@ query_scalar "SELECT name FROM author WHERE id=2" # => Pushkin A.
 
 ## make_query_for_order ($order, $next)
 
-Creates a condition for requesting a page not by offset, but by **cursor pagination**.
+Создает условие запроса страницы не по смещению, а по **пагинации курсора**.
 
-To do this, it receives `$order` of the SQL query and `$next` - a link to the next page.
+Для этого он получает `$order` SQL-запроса и `$next` — ссылку на следующую страницу.
 
 ```perl
 my ($select, $where, $order_sel) = make_query_for_order "name DESC, id ASC", undef;
@@ -252,14 +353,15 @@ $where      # => (name < 'Pushkin A.'\nOR name = 'Pushkin A.' AND id >= '2')
 $order_sel  # --> [qw/name id/]
 ```
 
-See also:
+Смотрите также:
+
 1. Article [Paging pages on social networks
 ](https://habr.com/ru/articles/674714/).
 2. [SQL::SimpleOps->SelectCursor](https://metacpan.org/dist/SQL-SimpleOps/view/lib/SQL/SimpleOps.pod#SelectCursor)
 
 ## settings ($id, $value)
 
-Sets or returns a key from a table `settings`.
+Устанавливает или возвращает ключ из таблицы `settings`.
 
 ```perl
 query "CREATE TABLE settings(
@@ -274,7 +376,7 @@ settings "x1"       # -> 10
 
 ## load_by_id ($tab, $pk, $fields, @options)
 
-Returns the entry by its id.
+Возвращает запись по ее идентификатору.
 
 ```perl
 load_by_id author => 2  # --> {id=>2, name=>"Pushkin A."}
@@ -284,7 +386,7 @@ load_by_id author => 2, "id+:x as n", x => 10  # --> {n=>12}
 
 ## insert ($tab, %x)
 
-Adds a record and returns its id.
+Добавляет запись и возвращает ее идентификатор.
 
 ```perl
 insert 'author', name => 'Masha'  # -> 4
@@ -292,7 +394,7 @@ insert 'author', name => 'Masha'  # -> 4
 
 ## update ($tab, $id, %params)
 
-Updates a record by its id, and returns this id.
+Обновляет запись по её идентификатору и возвращает этот идентификатор.
 
 ```perl
 update author => 3, name => 'Sasha'  # -> 3
@@ -301,7 +403,7 @@ eval { update author => 5, name => 'Sasha' }; $@  # ~> Row author.id=5 is not!
 
 ## remove ($tab, $id)
 
-Remove row from table by it id, and returns this id.
+Удалить строку из таблицы по её идентификатору и вернуть этот идентификатор.
 
 ```perl
 remove "author", 4  # -> 4
@@ -310,7 +412,7 @@ eval { remove author => 4 }; $@  # ~> Row author.id=4 does not exist!
 
 ## query_id ($tab, %params)
 
-Returns the id based on other fields.
+Возвращает идентификатор на основе других полей.
 
 ```perl
 query_id 'author', name => 'Pushkin A.' # -> 2
@@ -318,7 +420,7 @@ query_id 'author', name => 'Pushkin A.' # -> 2
 
 ## stores ($tab, $rows, %opt)
 
-Saves data (update or insert). Returns count successful operations.
+Сохраняет данные (обновляет или вставляет). Возвращает подсчет успешных операций.
 
 ```perl
 my @authors = (
@@ -355,7 +457,7 @@ query "SELECT * FROM author ORDER BY id" # --> \@authors
 
 ## store ($tab, %params)
 
-Saves data (update or insert). But one row.
+Сохраняет данные (обновляет или вставляет) одну строку.
 
 ```perl
 store 'author', name => 'Bishop M.' # -> 1
@@ -363,7 +465,7 @@ store 'author', name => 'Bishop M.' # -> 1
 
 ## touch ($tab, %params)
 
-Super-powerful function: returns id of row, and if it doesn’t exist, creates or updates a row and still returns.
+Супермощная функция: возвращает идентификатор строки, а если он не существует, создает или обновляет строку и всё равно возвращает.
 
 ```perl
 touch 'author', name => 'Pushkin A.' # -> 2
@@ -372,7 +474,7 @@ touch 'author', name => 'Pushkin X.' # -> 7
 
 ## START_TRANSACTION ()
 
-Returns the variable on which to set commit, otherwise the rollback occurs.
+Возвращает переменную на которой необходимо выполнить фиксацию, иначе происходит откат.
 
 ```perl
 my $transaction = START_TRANSACTION;
@@ -398,7 +500,7 @@ query_scalar "SELECT name FROM author where id=7"  # => Pushkin N.
 
 ## default_dsn ()
 
-Default DSN for `DBI->connect`.
+DSN по умолчанию для `DBI->connect`.
 
 ```perl
 default_dsn  # => DBI:SQLite:dbname=test-base.sqlite
@@ -406,7 +508,7 @@ default_dsn  # => DBI:SQLite:dbname=test-base.sqlite
 
 ## default_connect_options ()
 
-DSN, USER, PASSWORD and commands after connect.
+DSN, пользователь, пароль и команды после подключения.
 
 ```perl
 [default_connect_options]  # --> ['DBI:SQLite:dbname=test-base.sqlite', 'root', 123, []]
@@ -414,7 +516,7 @@ DSN, USER, PASSWORD and commands after connect.
 
 ## base_connect ($dsn, $user, $password, $conn)
 
-Connect to base and returns connect and it identify.
+Подключаемся к базе и возвращаем соединение и идентифицируем.
 
 ```perl
 my ($dbh, $connect_id) = base_connect("DBI:SQLite:dbname=base-2.sqlite", "toor", "toorpasswd", []);
@@ -425,7 +527,7 @@ $connect_id  # -> -1
 
 ## connect_respavn ($base)
 
-Connection check and reconnection.
+Проверка подключения и повторное подключение.
 
 ```perl
 my $old_base = $Aion::Query::base;
@@ -438,7 +540,7 @@ $old_base  # -> $Aion::Query::base
 
 ## connect_restart ($base)
 
-Connection restart.
+Перезапуск соединения.
 
 ```perl
 my $connection_id = $Aion::Query::base_connection_id;
@@ -452,13 +554,11 @@ $Aion::Query::base->ping  # -> 1
 
 ## query_stop ()
 
-A request may be running - you need to kill it.
+Создает дополнительное соединение с базой и убивает основное.
 
-Creates an additional connection to the base and kills the main one.
+Для этого используется `$Aion::Query::base_connection_id`.
 
-It using `$Aion::Query::base_connection_id` for this.
-
-SQLite runs in the same process, so `$Aion::Query::base_connection_id` has `-1`. In this case, this method does nothing.
+SQLite работает в том же процессе, поэтому `$Aion::Query::base_connection_id` имеет `-1`. То есть для SQLite этот метод ничего не делает.
 
 ```perl
 my @x = query_stop;
@@ -467,7 +567,7 @@ my @x = query_stop;
 
 ## sql_debug ($fn, $query)
 
-Stores queries to the database in `@Aion::Query::DEBUG`. Called from `query_do`.
+Сохраняет запросы к базе данных в `@Aion::Query::DEBUG`. Вызывается из `query_do`.
 
 ```perl
 sql_debug label => "SELECT 123";

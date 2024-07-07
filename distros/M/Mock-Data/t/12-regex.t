@@ -61,6 +61,11 @@ subtest parse_regex => sub {
 		[ qr/\w/m,           is_charset('\w') ],
 		[ qr/\w+\d+/,        is_seq([ is_charset('\w', [1,]), is_charset('\d', [1,]) ]) ],
 		[ qr/(abc\w+)?/,     is_seq([ 'abc', is_charset('\w', [1,]) ],[0,1]) ],
+		[ qr/(\w+)@(\w+)(\.com|\.org|\.net|\.co\.uk)/,
+		  is_seq([ is_charset('\w', [1,]), '@', is_charset('\w', [1,]), is_or([
+		    is_seq(['.com']), is_seq(['.org']), is_seq(['.net']), is_seq(['.co.uk'])
+		  ]) ])
+		]
 	);
 	for (@tests) {
 		my ($regex, $expected)= @$_;

@@ -1,6 +1,7 @@
-use common::sense; use open qw/:std :utf8/; use Test::More 0.98; sub _mkpath_ { my ($p) = @_; length($`) && !-e $`? mkdir($`, 0755) || die "mkdir $`: $!": () while $p =~ m!/!g; $p } BEGIN { use Scalar::Util qw//; use Carp qw//; $SIG{__DIE__} = sub { my ($s) = @_; if(ref $s) { $s->{STACKTRACE} = Carp::longmess "?" if "HASH" eq Scalar::Util::reftype $s; die $s } else {die Carp::longmess defined($s)? $s: "undef" }}; my $t = `pwd`; chop $t; $t .= '/' . __FILE__; my $s = '/tmp/.liveman/perl-aion-query!aion!query/'; `rm -fr '$s'` if -e $s; chdir _mkpath_($s) or die "chdir $s: $!"; open my $__f__, "<:utf8", $t or die "Read $t: $!"; read $__f__, $s, -s $__f__; close $__f__; while($s =~ /^#\@> (.*)\n((#>> .*\n)*)#\@< EOF\n/gm) { my ($file, $code) = ($1, $2); $code =~ s/^#>> //mg; open my $__f__, ">:utf8", _mkpath_($file) or die "Write $file: $!"; print $__f__ $code; close $__f__; } } # # NAME
+use common::sense; use open qw/:std :utf8/;  use Carp qw//; use File::Basename qw//; use File::Slurper qw//; use File::Spec qw//; use File::Path qw//; use Scalar::Util qw//;  use Test::More 0.98;  BEGIN {     $SIG{__DIE__} = sub {         my ($s) = @_;         if(ref $s) {             $s->{STACKTRACE} = Carp::longmess "?" if "HASH" eq Scalar::Util::reftype $s;             die $s;         } else {             die Carp::longmess defined($s)? $s: "undef"         }     };      my $t = File::Slurper::read_text(__FILE__);     my $s =  '/tmp/.liveman/perl-aion-query/aion!query'    ;     File::Path::rmtree($s) if -e $s;     File::Path::mkpath($s);     chdir $s or die "chdir $s: $!";      while($t =~ /^#\@> (.*)\n((#>> .*\n)*)#\@< EOF\n/gm) {         my ($file, $code) = ($1, $2);         $code =~ s/^#>> //mg;         File::Path::mkpath(File::Basename::dirname($file));         File::Slurper::write_text($file, $code);     }  } # 
+# # NAME
 # 
-# Aion::Query - functional interface for accessing database mysql and mariadb
+# Aion::Query - функциональный интерфейс для доступа к базам данных SQL (MySQL, MariaDB, Postgres и SQLite)
 # 
 # # VERSION
 # 
@@ -53,17 +54,17 @@ WHERE 1
 # 
 # # DESCRIPTION
 # 
-# When constructing queries, many disparate conditions are used, usually separated by different methods.
+# `Aion::Query` позволяет строить SQL-запрос используя простой механизм шаблонов.
 # 
-# `Aion::Query` uses a different approach, which allows you to construct an SQL query in a query using a simple template engine.
+# Обычно SQL-запросы строятся с помощью условий, что нагружает код.
 # 
-# The second problem is placing unicode characters into single-byte encodings, which reduces the size of the database. So far it has been solved only for the **cp1251** encoding. It is controlled by the parameter `BQ = 1`.
+# Вторая проблема — размещение символов Юникода в однобайтовых кодировках, что уменьшает размер базы данных. Пока проблема решена только для кодировки **cp1251**. Это контролируется параметром `use config BQ => 1`.
 # 
 # # SUBROUTINES
 # 
 # ## query ($query, %params)
 # 
-# It provide SQL (DCL, DDL, DQL and DML) queries to DBMS with quoting params.
+# Предоставляет SQL-запросы (DCL, DDL, DQL и DML) к СУБД с квотированием параметров.
 # 
 done_testing; }; subtest 'query ($query, %params)' => sub { 
 ::is_deeply scalar do {query "SELECT * FROM author WHERE name=:name", name => 'Pushkin A.S.'}, scalar do {[{id=>1, name=>"Pushkin A.S."}]}, 'query "SELECT * FROM author WHERE name=:name", name => \'Pushkin A.S.\' # --> [{id=>1, name=>"Pushkin A.S."}]';
@@ -71,7 +72,7 @@ done_testing; }; subtest 'query ($query, %params)' => sub {
 # 
 # ## LAST_INSERT_ID ()
 # 
-# Returns last insert id.
+# Возвращает идентификатор последней вставки.
 # 
 done_testing; }; subtest 'LAST_INSERT_ID ()' => sub { 
 ::is scalar do {query "INSERT INTO author (name) VALUES (:name)", name => "Alice"}, scalar do{1}, 'query "INSERT INTO author (name) VALUES (:name)", name => "Alice"  # -> 1';
@@ -80,7 +81,7 @@ done_testing; }; subtest 'LAST_INSERT_ID ()' => sub {
 # 
 # ## quote ($scalar)
 # 
-# Quoted scalar for SQL-query.
+# Квотирует скаляр для SQL-запроса.
 # 
 done_testing; }; subtest 'quote ($scalar)' => sub { 
 ::is scalar do {quote undef}, "NULL", 'quote undef     # => NULL';
@@ -116,7 +117,11 @@ done_testing; }; subtest 'quote ($scalar)' => sub {
 # 
 # ## query_prepare ($query, %param)
 # 
-# Replace the parameters in `$query`. Parameters quotes by the `quote`.
+# Заменяет параметры (`%param`) в запросе (`$query`) и возвращает его. Параметры заключаются в кавычки через подпрограмму `quote`.
+# 
+# Параметры вида `:x` будут квотироваться с учётом флагов скаляра, которые укажут, что в нём находится: строка, целое или число с плавающей запятой.
+# 
+# Чтобы явно указать тип скаляра используйте префиксы: `:^x` – целое, `:.x` – строка, `:~x` – плавающее.
 # 
 done_testing; }; subtest 'query_prepare ($query, %param)' => sub { 
 ::is scalar do {query_prepare "INSERT author SET name IN (:name)", name => ["Alice", 1, 1.0]}, "INSERT author SET name IN ('Alice', 1, 1.0)", 'query_prepare "INSERT author SET name IN (:name)", name => ["Alice", 1, 1.0]  # => INSERT author SET name IN (\'Alice\', 1, 1.0)';
@@ -148,7 +153,7 @@ END
 # 
 # ## query_do ($query)
 # 
-# Execution query and returns it result.
+# Выполняет запрос и возвращает его результат.
 # 
 done_testing; }; subtest 'query_do ($query)' => sub { 
 ::is_deeply scalar do {query_do "SELECT count(*) as n FROM author"}, scalar do {[{n=>3}]}, 'query_do "SELECT count(*) as n FROM author"  # --> [{n=>3}]';
@@ -157,7 +162,7 @@ done_testing; }; subtest 'query_do ($query)' => sub {
 # 
 # ## query_ref ($query, %kw)
 # 
-# As `query`, but always returns a reference.
+# Как `query`, но всегда возвращает скаляр.
 # 
 done_testing; }; subtest 'query_ref ($query, %kw)' => sub { 
 my @res = query_ref "SELECT id FROM author WHERE id=:id", id => 2;
@@ -166,7 +171,7 @@ my @res = query_ref "SELECT id FROM author WHERE id=:id", id => 2;
 # 
 # ## query_sth ($query, %kw)
 # 
-# As `query`, but returns `$sth`.
+# Как `query`, но возвращает `$sth`.
 # 
 done_testing; }; subtest 'query_sth ($query, %kw)' => sub { 
 my $sth = query_sth "SELECT * FROM author";
@@ -179,18 +184,112 @@ $sth->finish;
 ::is scalar do {0+@rows}, scalar do{3}, '0+@rows  # -> 3';
 
 # 
-# ## query_slice ($key, $val, @args)
+# ## query_slice ($key, $val, $query, %kw)
 # 
-# As query, plus converts the result into the desired data structure.
+# Как query, плюс преобразует результат в нужную структуру данных.
 # 
-done_testing; }; subtest 'query_slice ($key, $val, @args)' => sub { 
+# Если нужен хеш вида идентификатор – значение:
+# 
+done_testing; }; subtest 'query_slice ($key, $val, $query, %kw)' => sub { 
 my %author = query_slice name => "id", "SELECT id, name FROM author";
 ::is_deeply scalar do {\%author}, scalar do {{"Pushkin A.S." => 1, "Pushkin A." => 2, "Alice" => 3}}, '\%author  # --> {"Pushkin A.S." => 1, "Pushkin A." => 2, "Alice" => 3}';
 
 # 
+# Если нужен хеш вида идентификатор – строка:
+# 
+
+my %author = query_slice id => {}, "SELECT id, name FROM author";
+
+my $rows = {
+    1 => {name => "Pushkin A.S.", id => 1},
+    2 => {name => "Pushkin A.",   id => 2},
+    3 => {name => "Alice",        id => 3},
+};
+
+::is_deeply scalar do {\%author}, scalar do {$rows}, '\%author  # --> $rows';
+
+# 
+# Если одному идентификатору соответствует несколько строк, то логично собрать их в массивы:
+# 
+
+query "CREATE TABLE book (
+	id SERIAL PRIMARY KEY,
+    author_id INT NOT NULL REFERENCES author(id),
+    title TEXT NOT NULL
+)";
+
+stores book => [
+    {author_id => 1, title => "Mir"},
+    {author_id => 1, title => "Kiss in night"},
+    {author_id => 3, title => "Mips as cpu"},
+];
+
+my %author = query_slice author_id => ["title"], "SELECT author_id, title FROM book ORDER BY title";
+
+my $rows = {
+    1 => ["Kiss in night", "Mir"],
+    3 => ["Mips as cpu"],
+};
+
+::is_deeply scalar do {\%author}, scalar do {$rows}, '\%author  # --> $rows';
+
+# 
+# Ну и строки со всеми полями:
+# 
+
+my %author = query_slice author_id => [], "SELECT author_id, title FROM book ORDER BY title";
+
+my $rows = {
+    1 => [
+        {title => "Kiss in night", author_id => 1},
+        {title => "Mir",           author_id => 1},
+    ],
+    3 => [
+        {title => "Mips as cpu",   author_id => 3}
+    ],
+};
+
+::is_deeply scalar do {\%author}, scalar do {$rows}, '\%author  # --> $rows';
+
+# 
+# ## query_attach ($rows, $attach, $query, %kw)
+# 
+# Подсоединяет в результат запроса результат другого запроса.
+# 
+# `$attach` содержит три ключа через двоеточие: ключ для присоединяемых данных, столбец из `$rows` и столбец из `$query`. По столбцам происходит объединение строк.
+# 
+done_testing; }; subtest 'query_attach ($rows, $attach, $query, %kw)' => sub { 
+my $authors = query "SELECT id, name FROM author";
+
+my $res = [
+    {name => "Pushkin A.S.", id => 1},
+    {name => "Pushkin A.",   id => 2},
+    {name => "Alice",        id => 3},
+];
+
+::is_deeply scalar do {$authors}, scalar do {$res}, '$authors # --> $res';
+
+query_attach $authors => "books:id:author_id" => "SELECT author_id, title FROM book ORDER BY title";
+
+my $attaches = [
+    {name => "Pushkin A.S.", id => 1, books => [
+        {title => "Kiss in night", author_id => 1},
+        {title => "Mir",           author_id => 1},
+    ]},
+    {name => "Pushkin A.",   id => 2},
+    {name => "Alice",        id => 3, books => [
+        {title => "Mips as cpu", author_id => 3},
+    ]},
+];
+
+::is_deeply scalar do {$authors}, scalar do {$attaches}, '$authors # --> $attaches';
+
+# 
+# Если нужно указать другие ключи, то это делается через двоеточия в `$attach`: `attach:id:attach_id`.
+# 
 # ## query_col ($query, %params)
 # 
-# Returns one column.
+# Возвращает один столбец.
 # 
 done_testing; }; subtest 'query_col ($query, %params)' => sub { 
 ::is_deeply scalar do {query_col "SELECT name FROM author ORDER BY name"}, scalar do {["Alice", "Pushkin A.", "Pushkin A.S."]}, 'query_col "SELECT name FROM author ORDER BY name" # --> ["Alice", "Pushkin A.", "Pushkin A.S."]';
@@ -200,7 +299,7 @@ done_testing; }; subtest 'query_col ($query, %params)' => sub {
 # 
 # ## query_row ($query, %params)
 # 
-# Returns one row.
+# Возвращает одну строку.
 # 
 done_testing; }; subtest 'query_row ($query, %params)' => sub { 
 ::is_deeply scalar do {query_row "SELECT name FROM author WHERE id=2"}, scalar do {{name => "Pushkin A."}}, 'query_row "SELECT name FROM author WHERE id=2" # --> {name => "Pushkin A."}';
@@ -209,10 +308,12 @@ my ($id, $name) = query_row "SELECT id, name FROM author WHERE id=2";
 ::is scalar do {$id}, scalar do{2}, '$id    # -> 2';
 ::is scalar do {$name}, "Pushkin A.", '$name  # => Pushkin A.';
 
+::like scalar do {eval { query_row "SELECT id, name FROM author" }; $@}, qr!A few lines\!!, 'eval { query_row "SELECT id, name FROM author" }; $@ # ~> A few lines!';
+
 # 
 # ## query_row_ref ($query, %params)
 # 
-# As `query_row`, but retuns array reference always.
+# Как `query_row`, но всегда возвращает скаляр.
 # 
 done_testing; }; subtest 'query_row_ref ($query, %params)' => sub { 
 my @x = query_row_ref "SELECT name FROM author WHERE id=2";
@@ -223,7 +324,7 @@ my @x = query_row_ref "SELECT name FROM author WHERE id=2";
 # 
 # ## query_scalar ($query, %params)
 # 
-# Returns scalar.
+# Возвращает первое значение. Запрос должен возвращать одну строку, иначе – выбрасывает исключение.
 # 
 done_testing; }; subtest 'query_scalar ($query, %params)' => sub { 
 ::is scalar do {query_scalar "SELECT name FROM author WHERE id=2"}, "Pushkin A.", 'query_scalar "SELECT name FROM author WHERE id=2" # => Pushkin A.';
@@ -231,9 +332,9 @@ done_testing; }; subtest 'query_scalar ($query, %params)' => sub {
 # 
 # ## make_query_for_order ($order, $next)
 # 
-# Creates a condition for requesting a page not by offset, but by **cursor pagination**.
+# Создает условие запроса страницы не по смещению, а по **пагинации курсора**.
 # 
-# To do this, it receives `$order` of the SQL query and `$next` - a link to the next page.
+# Для этого он получает `$order` SQL-запроса и `$next` — ссылку на следующую страницу.
 # 
 done_testing; }; subtest 'make_query_for_order ($order, $next)' => sub { 
 my ($select, $where, $order_sel) = make_query_for_order "name DESC, id ASC", undef;
@@ -252,14 +353,15 @@ my $last = pop @rows;
 ::is_deeply scalar do {$order_sel}, scalar do {[qw/name id/]}, '$order_sel  # --> [qw/name id/]';
 
 # 
-# See also:
+# Смотрите также:
+# 
 # 1. Article [Paging pages on social networks
 # ](https://habr.com/ru/articles/674714/).
 # 2. [SQL::SimpleOps->SelectCursor](https://metacpan.org/dist/SQL-SimpleOps/view/lib/SQL/SimpleOps.pod#SelectCursor)
 # 
 # ## settings ($id, $value)
 # 
-# Sets or returns a key from a table `settings`.
+# Устанавливает или возвращает ключ из таблицы `settings`.
 # 
 done_testing; }; subtest 'settings ($id, $value)' => sub { 
 query "CREATE TABLE settings(
@@ -274,7 +376,7 @@ query "CREATE TABLE settings(
 # 
 # ## load_by_id ($tab, $pk, $fields, @options)
 # 
-# Returns the entry by its id.
+# Возвращает запись по ее идентификатору.
 # 
 done_testing; }; subtest 'load_by_id ($tab, $pk, $fields, @options)' => sub { 
 ::is_deeply scalar do {load_by_id author => 2}, scalar do {{id=>2, name=>"Pushkin A."}}, 'load_by_id author => 2  # --> {id=>2, name=>"Pushkin A."}';
@@ -284,7 +386,7 @@ done_testing; }; subtest 'load_by_id ($tab, $pk, $fields, @options)' => sub {
 # 
 # ## insert ($tab, %x)
 # 
-# Adds a record and returns its id.
+# Добавляет запись и возвращает ее идентификатор.
 # 
 done_testing; }; subtest 'insert ($tab, %x)' => sub { 
 ::is scalar do {insert 'author', name => 'Masha'}, scalar do{4}, 'insert \'author\', name => \'Masha\'  # -> 4';
@@ -292,7 +394,7 @@ done_testing; }; subtest 'insert ($tab, %x)' => sub {
 # 
 # ## update ($tab, $id, %params)
 # 
-# Updates a record by its id, and returns this id.
+# Обновляет запись по её идентификатору и возвращает этот идентификатор.
 # 
 done_testing; }; subtest 'update ($tab, $id, %params)' => sub { 
 ::is scalar do {update author => 3, name => 'Sasha'}, scalar do{3}, 'update author => 3, name => \'Sasha\'  # -> 3';
@@ -301,7 +403,7 @@ done_testing; }; subtest 'update ($tab, $id, %params)' => sub {
 # 
 # ## remove ($tab, $id)
 # 
-# Remove row from table by it id, and returns this id.
+# Удалить строку из таблицы по её идентификатору и вернуть этот идентификатор.
 # 
 done_testing; }; subtest 'remove ($tab, $id)' => sub { 
 ::is scalar do {remove "author", 4}, scalar do{4}, 'remove "author", 4  # -> 4';
@@ -310,7 +412,7 @@ done_testing; }; subtest 'remove ($tab, $id)' => sub {
 # 
 # ## query_id ($tab, %params)
 # 
-# Returns the id based on other fields.
+# Возвращает идентификатор на основе других полей.
 # 
 done_testing; }; subtest 'query_id ($tab, %params)' => sub { 
 ::is scalar do {query_id 'author', name => 'Pushkin A.'}, scalar do{2}, 'query_id \'author\', name => \'Pushkin A.\' # -> 2';
@@ -318,7 +420,7 @@ done_testing; }; subtest 'query_id ($tab, %params)' => sub {
 # 
 # ## stores ($tab, $rows, %opt)
 # 
-# Saves data (update or insert). Returns count successful operations.
+# Сохраняет данные (обновляет или вставляет). Возвращает подсчет успешных операций.
 # 
 done_testing; }; subtest 'stores ($tab, $rows, %opt)' => sub { 
 my @authors = (
@@ -355,7 +457,7 @@ my $sql = "query: INSERT INTO author (id, name) VALUES (NULL, 'Locatelli'),
 # 
 # ## store ($tab, %params)
 # 
-# Saves data (update or insert). But one row.
+# Сохраняет данные (обновляет или вставляет) одну строку.
 # 
 done_testing; }; subtest 'store ($tab, %params)' => sub { 
 ::is scalar do {store 'author', name => 'Bishop M.'}, scalar do{1}, 'store \'author\', name => \'Bishop M.\' # -> 1';
@@ -363,7 +465,7 @@ done_testing; }; subtest 'store ($tab, %params)' => sub {
 # 
 # ## touch ($tab, %params)
 # 
-# Super-powerful function: returns id of row, and if it doesn’t exist, creates or updates a row and still returns.
+# Супермощная функция: возвращает идентификатор строки, а если он не существует, создает или обновляет строку и всё равно возвращает.
 # 
 done_testing; }; subtest 'touch ($tab, %params)' => sub { 
 ::is scalar do {touch 'author', name => 'Pushkin A.'}, scalar do{2}, 'touch \'author\', name => \'Pushkin A.\' # -> 2';
@@ -372,7 +474,7 @@ done_testing; }; subtest 'touch ($tab, %params)' => sub {
 # 
 # ## START_TRANSACTION ()
 # 
-# Returns the variable on which to set commit, otherwise the rollback occurs.
+# Возвращает переменную на которой необходимо выполнить фиксацию, иначе происходит откат.
 # 
 done_testing; }; subtest 'START_TRANSACTION ()' => sub { 
 my $transaction = START_TRANSACTION;
@@ -398,7 +500,7 @@ eval {
 # 
 # ## default_dsn ()
 # 
-# Default DSN for `DBI->connect`.
+# DSN по умолчанию для `DBI->connect`.
 # 
 done_testing; }; subtest 'default_dsn ()' => sub { 
 ::is scalar do {default_dsn}, "DBI:SQLite:dbname=test-base.sqlite", 'default_dsn  # => DBI:SQLite:dbname=test-base.sqlite';
@@ -406,7 +508,7 @@ done_testing; }; subtest 'default_dsn ()' => sub {
 # 
 # ## default_connect_options ()
 # 
-# DSN, USER, PASSWORD and commands after connect.
+# DSN, пользователь, пароль и команды после подключения.
 # 
 done_testing; }; subtest 'default_connect_options ()' => sub { 
 ::is_deeply scalar do {[default_connect_options]}, scalar do {['DBI:SQLite:dbname=test-base.sqlite', 'root', 123, []]}, '[default_connect_options]  # --> [\'DBI:SQLite:dbname=test-base.sqlite\', \'root\', 123, []]';
@@ -414,7 +516,7 @@ done_testing; }; subtest 'default_connect_options ()' => sub {
 # 
 # ## base_connect ($dsn, $user, $password, $conn)
 # 
-# Connect to base and returns connect and it identify.
+# Подключаемся к базе и возвращаем соединение и идентифицируем.
 # 
 done_testing; }; subtest 'base_connect ($dsn, $user, $password, $conn)' => sub { 
 my ($dbh, $connect_id) = base_connect("DBI:SQLite:dbname=base-2.sqlite", "toor", "toorpasswd", []);
@@ -425,7 +527,7 @@ my ($dbh, $connect_id) = base_connect("DBI:SQLite:dbname=base-2.sqlite", "toor",
 # 
 # ## connect_respavn ($base)
 # 
-# Connection check and reconnection.
+# Проверка подключения и повторное подключение.
 # 
 done_testing; }; subtest 'connect_respavn ($base)' => sub { 
 my $old_base = $Aion::Query::base;
@@ -438,7 +540,7 @@ connect_respavn $Aion::Query::base, $Aion::Query::base_connection_id;
 # 
 # ## connect_restart ($base)
 # 
-# Connection restart.
+# Перезапуск соединения.
 # 
 done_testing; }; subtest 'connect_restart ($base)' => sub { 
 my $connection_id = $Aion::Query::base_connection_id;
@@ -452,13 +554,11 @@ connect_restart $Aion::Query::base, $Aion::Query::base_connection_id;
 # 
 # ## query_stop ()
 # 
-# A request may be running - you need to kill it.
+# Создает дополнительное соединение с базой и убивает основное.
 # 
-# Creates an additional connection to the base and kills the main one.
+# Для этого используется `$Aion::Query::base_connection_id`.
 # 
-# It using `$Aion::Query::base_connection_id` for this.
-# 
-# SQLite runs in the same process, so `$Aion::Query::base_connection_id` has `-1`. In this case, this method does nothing.
+# SQLite работает в том же процессе, поэтому `$Aion::Query::base_connection_id` имеет `-1`. То есть для SQLite этот метод ничего не делает.
 # 
 done_testing; }; subtest 'query_stop ()' => sub { 
 my @x = query_stop;
@@ -467,7 +567,7 @@ my @x = query_stop;
 # 
 # ## sql_debug ($fn, $query)
 # 
-# Stores queries to the database in `@Aion::Query::DEBUG`. Called from `query_do`.
+# Сохраняет запросы к базе данных в `@Aion::Query::DEBUG`. Вызывается из `query_do`.
 # 
 done_testing; }; subtest 'sql_debug ($fn, $query)' => sub { 
 sql_debug label => "SELECT 123";

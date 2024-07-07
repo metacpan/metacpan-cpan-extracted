@@ -1,0 +1,276 @@
+#!perl
+
+# Note: This script is a CLI for Riap function /App/GeometryUtils/calc_box_fit
+# and generated automatically using Perinci::CmdLine::Gen version 0.502
+
+use 5.010001;
+use strict;
+use warnings;
+
+use Perinci::CmdLine::Any;
+
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2024-06-25'; # DATE
+our $DIST = 'App-GeometryUtils'; # DIST
+our $VERSION = '0.001'; # VERSION
+
+my $cmdline = Perinci::CmdLine::Any->new(
+    url => "/App/GeometryUtils/calc_box_fit",
+    program_name => "calc-box-fit",
+    read_config => 0,
+    read_env => 0,
+);
+
+$cmdline->run;
+
+# ABSTRACT: Calculate how many small boxes fit inside a larger box
+# PODNAME: calc-box-fit
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+calc-box-fit - Calculate how many small boxes fit inside a larger box
+
+=head1 VERSION
+
+This document describes version 0.001 of calc-box-fit (from Perl distribution App-GeometryUtils), released on 2024-06-25.
+
+=head1 SYNOPSIS
+
+B<calc-box-fit> B<L<--help|/"--help, -h, -?">> (or B<L<-h|/"--help, -h, -?">>, B<L<-?|/"--help, -h, -?">>)
+
+B<calc-box-fit> B<L<--version|/"--version, -v">> (or B<L<-v|/"--version, -v">>)
+
+B<calc-box-fit> [B<L<--allow-multiple-orientation|/"--disallow-multiple-orientation">>|B<L<-M|/"--disallow-multiple-orientation">>|B<L<--disallow-multiple-orientation|/"--disallow-multiple-orientation">>] [B<L<--allow-rotation|/"--disallow-rotation">>|B<L<-R|/"--disallow-rotation">>|B<L<--disallow-rotation|/"--disallow-rotation">>] [B<L<--format|/"--format=s">>=I<name>|B<L<--json|/"--json">>] [B<L<--(no)naked-res|/"--naked-res">>] [B<L<--page-result|/"--page-result">>[=I<program>]|B<L<--view-result|/"--view-result">>[=I<program>]] -- E<lt>I<L<smaller_dimension|/"--smaller-dimension=s*">>E<gt> E<lt>I<L<larger_dimension|/"--larger-dimension=s*">>E<gt>
+
+
+
+See examples in the L</EXAMPLES> section.
+
+=head1 DESCRIPTION
+
+Keywords: packing algorithm, bin packing
+
+=head1 OPTIONS
+
+C<*> marks required options.
+
+=head2 Main options
+
+=over
+
+=item B<--disallow-multiple-orientation>
+
+(No description)
+
+
+=item B<--disallow-rotation>
+
+(No description)
+
+
+=item B<--larger-dimension>=I<s>*
+
+Dimension (LxWxH) of the smaller box.
+
+Can also be specified as the 2nd command-line argument.
+
+=item B<--smaller-dimension>=I<s>*
+
+Dimension (LxWxH) of the smaller box.
+
+Can also be specified as the 1st command-line argument.
+
+=item B<-M>
+
+Short for for --disallow-multiple-orientation.
+
+See C<--disallow-multiple-orientation>.
+
+=item B<-R>
+
+Short for for --disallow-rotation.
+
+See C<--disallow-rotation>.
+
+=back
+
+=head2 Output options
+
+=over
+
+=item B<--format>=I<s>
+
+Choose output format, e.g. json, text.
+
+Default value:
+
+ undef
+
+Output can be displayed in multiple formats, and a suitable default format is
+chosen depending on the application and/or whether output destination is
+interactive terminal (i.e. whether output is piped). This option specifically
+chooses an output format.
+
+
+=item B<--json>
+
+Set output format to json.
+
+=item B<--naked-res>
+
+When outputing as JSON, strip result envelope.
+
+Default value:
+
+ 0
+
+By default, when outputing as JSON, the full enveloped result is returned, e.g.:
+
+ [200,"OK",[1,2,3],{"func.extra"=>4}]
+
+The reason is so you can get the status (1st element), status message (2nd
+element) as well as result metadata/extra result (4th element) instead of just
+the result (3rd element). However, sometimes you want just the result, e.g. when
+you want to pipe the result for more post-processing. In this case you can use
+C<--naked-res> so you just get:
+
+ [1,2,3]
+
+
+=item B<--page-result>
+
+Filter output through a pager.
+
+This option will pipe the output to a specified pager program. If pager program
+is not specified, a suitable default e.g. C<less> is chosen.
+
+
+=item B<--view-result>
+
+View output using a viewer.
+
+This option will first save the output to a temporary file, then open a viewer
+program to view the temporary file. If a viewer program is not chosen, a
+suitable default, e.g. the browser, is chosen.
+
+
+=back
+
+=head2 Other options
+
+=over
+
+=item B<--help>, B<-h>, B<-?>
+
+Display help message and exit.
+
+=item B<--version>, B<-v>
+
+Display program's version and exit.
+
+=back
+
+=head1 COMPLETION
+
+This script has shell tab completion capability with support for several
+shells.
+
+=head2 bash
+
+To activate bash completion for this script, put:
+
+ complete -C calc-box-fit calc-box-fit
+
+in your bash startup (e.g. F<~/.bashrc>). Your next shell session will then
+recognize tab completion for the command. Or, you can also directly execute the
+line above in your shell to activate immediately.
+
+It is recommended, however, that you install modules using L<cpanm-shcompgen>
+which can activate shell completion for scripts immediately.
+
+=head2 tcsh
+
+To activate tcsh completion for this script, put:
+
+ complete calc-box-fit 'p/*/`calc-box-fit`/'
+
+in your tcsh startup (e.g. F<~/.tcshrc>). Your next shell session will then
+recognize tab completion for the command. Or, you can also directly execute the
+line above in your shell to activate immediately.
+
+It is also recommended to install L<shcompgen> (see above).
+
+=head2 other shells
+
+For fish and zsh, install L<shcompgen> as described above.
+
+=head1 EXAMPLES
+
+=head2 Example #1
+
+ % calc-box-fit 5x3x2 35x19x18
+ 378 (94.74% full)
+
+=head1 HOMEPAGE
+
+Please visit the project's homepage at L<https://metacpan.org/release/App-GeometryUtils>.
+
+=head1 SOURCE
+
+Source repository is at L<https://github.com/perlancar/perl-App-GeometryUtils>.
+
+=head1 SEE ALSO
+
+L<Box::Calc>. Given one or more of "smaller boxes" ("items" in Box::Calc lingo) of different
+sizes, what kind and how many "larger boxes" ("boxes" in Box::Calc lingo) are
+needed for shipping?
+
+
+L<Algorithm::BinPack>. This is a one-dimensional packing problem instead of 3D one. Given multiple
+items of different size, and a container (bin) size, how many containers are
+needed?
+
+=head1 AUTHOR
+
+perlancar <perlancar@cpan.org>
+
+=head1 CONTRIBUTING
+
+
+To contribute, you can send patches by email/via RT, or send pull requests on
+GitHub.
+
+Most of the time, you don't need to build the distribution yourself. You can
+simply modify the code, then test via:
+
+ % prove -l
+
+If you want to build the distribution (e.g. to try to install it locally on your
+system), you can install L<Dist::Zilla>,
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>,
+L<Pod::Weaver::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps required beyond
+that are considered a bug and can be reported to me.
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2024 by perlancar <perlancar@cpan.org>.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-GeometryUtils>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
+
+=cut

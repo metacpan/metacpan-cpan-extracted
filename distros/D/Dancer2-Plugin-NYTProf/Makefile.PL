@@ -26,13 +26,16 @@ my %WriteMakefileArgs = (
   "TEST_REQUIRES" => {
     "File::Spec" => 0,
     "File::Temp" => 0,
+    "FindBin" => 0,
     "IO::Handle" => 0,
     "IPC::Open3" => 0,
+    "Test2::Plugin::ExitSummary" => 0,
+    "Test2::Plugin::NoWarnings" => 0,
+    "Test2::Plugin::Times" => 0,
     "Test2::V0" => 0,
-    "Test::More" => "0.94",
-    "ok" => 0
+    "Test::More" => "0.94"
   },
-  "VERSION" => "0.0100",
+  "VERSION" => "0.0101",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -48,11 +51,14 @@ my %FallbackPrereqs = (
   "File::Temp" => 0,
   "File::Which" => 0,
   "File::stat" => 0,
+  "FindBin" => 0,
   "IO::Handle" => 0,
   "IPC::Open3" => 0,
+  "Test2::Plugin::ExitSummary" => 0,
+  "Test2::Plugin::NoWarnings" => 0,
+  "Test2::Plugin::Times" => 0,
   "Test2::V0" => 0,
-  "Test::More" => "0.94",
-  "ok" => 0
+  "Test::More" => "0.94"
 );
 
 

@@ -2,7 +2,7 @@ package Liveman;
 use 5.22.0;
 use common::sense;
 
-our $VERSION = "3.1";
+our $VERSION = "3.2";
 
 use Cwd::utf8 qw/getcwd/;
 use File::Basename qw/dirname/;
@@ -204,7 +204,7 @@ sub trans {
     my $trans_to = File::Spec->catfile($dir, $self->{to});
     write_text($trans_from, $text);
 
-    if(system "trans -b $self->{from}:$self->{to} < $trans_from > $trans_to") {
+    if(system "trans -no-auto -b $self->{from}:$self->{to} < $trans_from > $trans_to") {
         die "trans: failed to execute: $!" if $? == -1;
         die printf "trans: child died with signal %d, %s coredump",
             ($? & 127), ($? & 128) ? 'with' : 'without'
@@ -437,7 +437,7 @@ Liveman - compiler from markdown to tests and documentation
 
 =head1 VERSION
 
-3.1
+3.2
 
 =head1 SYNOPSIS
 

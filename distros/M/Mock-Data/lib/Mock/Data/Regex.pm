@@ -11,7 +11,7 @@ require Mock::Data::Generator;
 our @ISA= ( 'Mock::Data::Generator' );
 
 # ABSTRACT: Generator that uses a Regex as a template to generate strings
-our $VERSION = '0.03'; # VERSION
+our $VERSION = '0.04'; # VERSION
 
 
 sub new {
@@ -133,9 +133,9 @@ sub _parse_regex {
 	my @or;
 	while (1) {
 		# begin parenthetical sub-expression?
-		if (/\G \( (\?)? /gcx) {
+		if (/\G \( /gcx) {
 			my $sub_flags= $flags;
-			if (defined $1) {
+			if (/\G \? /gcx) {
 				# leading question mark means regex flags.  This only supports the ^...: one:
 				if (/\G \^ ( \w* ) : /gcx) {
 					$sub_flags= {};
@@ -147,19 +147,17 @@ sub _parse_regex {
 					Carp::croak("Unsupported regex feature '(?".substr($_,pos,1)."'");
 				}
 			}
-			my $pos= pos;
+			my $pos= -1+pos;
 			push @$expr, $self->_parse_regex($sub_flags);
 			/\G \) /gcx
-				or die "Missing end-parenthesee, started at '"._parse_context($pos)."'";
+				or die "Missing end-parenthesee, started at "._parse_context($pos);
 		}
-		# end sub-expression or next alternation?
-		if (/\G ( [|)] ) /gcx) {
-			# end of sub-expression, return.
-			if ($1 eq ')') {
-				# back it up so the caller knows why we exited
-				--pos;
-				last;
-			}
+		# end sub-expression?
+		elsif (/\G(?= \) )/gcx) {
+			last;
+		}
+		# next alternation of 'or'?
+		elsif (/\G \| /gcx) {
 			# else begin next piece of @or
 			push @or, $self->_node($expr, $flags);
 			$expr= [];
@@ -677,17 +675,31 @@ If the regular expression is nothing more than a charset (or repetition of one c
 returns that charset.  If the regular expression is more complicated than a simple charset,
 this returns C<undef>.
 
+=head1 SEE ALSO
+
+=over
+
+=item L<String::Random::Regexp::regxstring>
+
+Probably a better implementation, but depends on a C++ compiler.
+
+=item L<String::Random>
+
+=item L<Regexp::Genex>
+
+=back
+
 =head1 AUTHOR
 
 Michael Conrad <mike@nrdvana.net>
 
 =head1 VERSION
 
-version 0.03
+version 0.04
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2021 by Michael Conrad.
+This software is copyright (c) 2024 by Michael Conrad.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -1,0 +1,258 @@
+msgid "# NAME"
+msgstr "#NAME"
+
+msgid "Aion::Query - функциональный интерфейс для доступа к базам данных SQL (MySQL, MariaDB, Postgres и SQLite)"
+msgstr "Aion::Query - a functional interface for accessing SQL databases (MySQL, MariaDB, Postgres and SQLite)"
+
+msgid "0.0.3"
+msgstr "0.0.3"
+
+msgid "File .config.pm:"
+msgstr "File .config.pm:"
+
+msgid "# DESCRIPTION"
+msgstr "# DESCRIPTION"
+
+msgid "`Aion::Query` позволяет строить SQL-запрос используя простой механизм шаблонов."
+msgstr "`Aion::Query` allows you to build an SQL query using a simple template mechanism."
+
+msgid "Обычно SQL-запросы строятся с помощью условий, что нагружает код."
+msgstr "Typically, SQL queries are built using conditions, which loads the code."
+
+msgid "Вторая проблема — размещение символов Юникода в однобайтовых кодировках, что уменьшает размер базы данных. Пока проблема решена только для кодировки **cp1251**. Это контролируется параметром `use config BQ => 1`."
+msgstr "The second problem is placing Unicode characters in single-byte encodings, which reduces the size of the database. So far the problem has been resolved only for the **cp1251** encoding. This is controlled by the `use config BQ => 1` parameter."
+
+msgid "Предоставляет SQL-запросы (DCL, DDL, DQL и DML) к СУБД с квотированием параметров."
+msgstr "Provides SQL queries (DCL, DDL, DQL and DML) to the DBMS with parameter quotas."
+
+msgid "## LAST_INSERT_ID ()"
+msgstr "## LAST_INSERT_ID()"
+
+msgid "Возвращает идентификатор последней вставки."
+msgstr "Returns the ID of the last insert."
+
+msgid "## quote ($scalar)"
+msgstr "## quote ($scalar)"
+
+msgid "Квотирует скаляр для SQL-запроса."
+msgstr "Quotes a scalar for an SQL query."
+
+msgid "## query_prepare ($query, %param)"
+msgstr "## query_prepare ($query, %param)"
+
+msgid "Заменяет параметры (`%param`) в запросе (`$query`) и возвращает его. Параметры заключаются в кавычки через подпрограмму `quote`."
+msgstr "Replaces the parameters (`%param`) in a query (`$query`) and returns it. Parameters are enclosed in quotes via the `quote` routine."
+
+msgid "Параметры вида `:x` будут квотироваться с учётом флагов скаляра, которые укажут, что в нём находится: строка, целое или число с плавающей запятой."
+msgstr "Parameters of the form `:x` will be quoted taking into account the scalar flags, which indicate whether it contains a string, an integer or a floating point number."
+
+msgid "Чтобы явно указать тип скаляра используйте префиксы: `:^x` – целое, `:.x` – строка, `:~x` – плавающее."
+msgstr "To explicitly indicate the type of a scalar, use the prefixes: `:^x` – integer, `:.x` – string, `:~x` – floating."
+
+msgid "## query_do ($query)"
+msgstr "## query_do ($query)"
+
+msgid "Выполняет запрос и возвращает его результат."
+msgstr "Executes a request and returns its result."
+
+msgid "## query_ref ($query, %kw)"
+msgstr "## query_ref ($query, %kw)"
+
+msgid "Как `query`, но всегда возвращает скаляр."
+msgstr "Like `query`, but always returns a scalar."
+
+msgid "## query_sth ($query, %kw)"
+msgstr "## query_sth ($query, %kw)"
+
+msgid "Как `query`, но возвращает `$sth`."
+msgstr "Like `query`, but returns `$sth`."
+
+msgid "## query_slice ($key, $val, $query, %kw)"
+msgstr "## query_slice ($key, $val, $query, %kw)"
+
+msgid "Как query, плюс преобразует результат в нужную структуру данных."
+msgstr "Like query, plus converts the result into the desired data structure."
+
+msgid "Если нужен хеш вида идентификатор – значение:"
+msgstr "If you need a hash of the form identifier - value:"
+
+msgid "Если нужен хеш вида идентификатор – строка:"
+msgstr "If you need a hash of the form identifier - string:"
+
+msgid "Если одному идентификатору соответствует несколько строк, то логично собрать их в массивы:"
+msgstr "If several lines correspond to one identifier, then it is logical to collect them into arrays:"
+
+msgid "Ну и строки со всеми полями:"
+msgstr "Well, the lines with all the fields:"
+
+msgid "## query_attach ($rows, $attach, $query, %kw)"
+msgstr "## query_attach ($rows, $attach, $query, %kw)"
+
+msgid "Подсоединяет в результат запроса результат другого запроса."
+msgstr "Includes the result of another query into the result of a query."
+
+msgid "`$attach` содержит три ключа через двоеточие: ключ для присоединяемых данных, столбец из `$rows` и столбец из `$query`. По столбцам происходит объединение строк."
+msgstr "`$attach` contains three keys separated by a colon: the key for the data to be attached, a column from `$rows` and a column from `$query`. Rows are merged across columns."
+
+msgid "Если нужно указать другие ключи, то это делается через двоеточия в `$attach`: `attach:id:attach_id`."
+msgstr "If you need to specify other keys, this is done using colons in `$attach`: `attach:id:attach_id`."
+
+msgid "Возвращает один столбец."
+msgstr "Returns one column."
+
+msgid "## query_row ($query, %params)"
+msgstr "## query_row ($query, %params)"
+
+msgid "Возвращает одну строку."
+msgstr "Returns one row."
+
+msgid "## query_row_ref ($query, %params)"
+msgstr "## query_row_ref ($query, %params)"
+
+msgid "Как `query_row`, но всегда возвращает скаляр."
+msgstr "Like `query_row`, but always returns a scalar."
+
+msgid "## query_scalar ($query, %params)"
+msgstr "## query_scalar ($query, %params)"
+
+msgid "Возвращает первое значение. Запрос должен возвращать одну строку, иначе – выбрасывает исключение."
+msgstr "Returns the first value. The query must return one row, otherwise it throws an exception."
+
+msgid "## make_query_for_order ($order, $next)"
+msgstr "## make_query_for_order ($order, $next)"
+
+msgid "Создает условие запроса страницы не по смещению, а по **пагинации курсора**."
+msgstr "Creates a page request condition not by offset, but by **cursor pagination**."
+
+msgid "Для этого он получает `$order` SQL-запроса и `$next` — ссылку на следующую страницу."
+msgstr "To do this, it receives `$order` of the SQL query and `$next` - a link to the next page."
+
+msgid "Смотрите также:"
+msgstr "See also:"
+
+msgid ""
+"1. Article [Paging pages on social networks\n"
+"](https://habr.com/ru/articles/674714/).\n"
+"2. [SQL::SimpleOps->SelectCursor](https://metacpan.org/dist/SQL-SimpleOps/view/lib/SQL/SimpleOps.pod#SelectCursor)"
+msgstr ""
+"1. Article [Paging pages on social networks\n"
+"sch(https://habr.com/ru/articles/674714/).\n"
+"2. [SQL::SimpleOps->SelectCursor](https://metacpan.org/dist/SQL-SimpleOps/view/lib/SQL/SimpleOps.pod#SelectCursor)"
+
+msgid "Устанавливает или возвращает ключ из таблицы `settings`."
+msgstr "Sets or returns a key from the `settings` table."
+
+msgid "## load_by_id ($tab, $pk, $fields, @options)"
+msgstr "## load_by_id ($tab, $pk, $fields, @options)"
+
+msgid "Возвращает запись по ее идентификатору."
+msgstr "Returns a record by its ID."
+
+msgid "## insert ($tab, %x)"
+msgstr "## insert ($tab, %x)"
+
+msgid "Добавляет запись и возвращает ее идентификатор."
+msgstr "Adds an entry and returns its ID."
+
+msgid "## update ($tab, $id, %params)"
+msgstr "## update ($tab, $id, %params)"
+
+msgid "Обновляет запись по её идентификатору и возвращает этот идентификатор."
+msgstr "Updates a record by its ID and returns that ID."
+
+msgid "## remove ($tab, $id)"
+msgstr "## remove ($tab, $id)"
+
+msgid "Удалить строку из таблицы по её идентификатору и вернуть этот идентификатор."
+msgstr "Delete a row from a table by its identifier and return this identifier."
+
+msgid "## query_id ($tab, %params)"
+msgstr "## query_id ($tab, %params)"
+
+msgid "Возвращает идентификатор на основе других полей."
+msgstr "Returns an identifier based on other fields."
+
+msgid "## stores ($tab, $rows, %opt)"
+msgstr "## stores ($tab, $rows, %opt)"
+
+msgid "Сохраняет данные (обновляет или вставляет). Возвращает подсчет успешных операций."
+msgstr "Saves data (updates or inserts). Returns a count of successful operations."
+
+msgid "## store ($tab, %params)"
+msgstr "## store ($tab, %params)"
+
+msgid "Сохраняет данные (обновляет или вставляет) одну строку."
+msgstr "Saves data (updates or inserts) one row."
+
+msgid "## touch ($tab, %params)"
+msgstr "## touch ($tab, %params)"
+
+msgid "Супермощная функция: возвращает идентификатор строки, а если он не существует, создает или обновляет строку и всё равно возвращает."
+msgstr "Super powerful function: returns the row identifier, and if it doesn't exist, creates or updates the row and returns anyway."
+
+msgid "## START_TRANSACTION ()"
+msgstr "## START_TRANSACTION()"
+
+msgid "Возвращает переменную на которой необходимо выполнить фиксацию, иначе происходит откат."
+msgstr "Returns the variable on which the commit must be performed, otherwise a rollback occurs."
+
+msgid "## default_dsn ()"
+msgstr "## default_dsn()"
+
+msgid "DSN по умолчанию для `DBI->connect`."
+msgstr "Default DSN for `DBI->connect`."
+
+msgid "## default_connect_options ()"
+msgstr "## default_connect_options()"
+
+msgid "DSN, пользователь, пароль и команды после подключения."
+msgstr "DSN, user, password and commands after connection."
+
+msgid "## base_connect ($dsn, $user, $password, $conn)"
+msgstr "## base_connect ($dsn, $user, $password, $conn)"
+
+msgid "Подключаемся к базе и возвращаем соединение и идентифицируем."
+msgstr "We connect to the database and return the connection and identify it."
+
+msgid "## connect_respavn ($base)"
+msgstr "## connect_respavn ($base)"
+
+msgid "Проверка подключения и повторное подключение."
+msgstr "Checking the connection and reconnecting."
+
+msgid "## connect_restart ($base)"
+msgstr "## connect_restart ($base)"
+
+msgid "Перезапуск соединения."
+msgstr "Restarting the connection."
+
+msgid "## query_stop ()"
+msgstr "## query_stop()"
+
+msgid "Создает дополнительное соединение с базой и убивает основное."
+msgstr "Creates an additional connection to the base and kills the main one."
+
+msgid "Для этого используется `$Aion::Query::base_connection_id`."
+msgstr "To do this, use `$Aion::Query::base_connection_id`."
+
+msgid "SQLite работает в том же процессе, поэтому `$Aion::Query::base_connection_id` имеет `-1`. То есть для SQLite этот метод ничего не делает."
+msgstr "SQLite runs in the same process, so `$Aion::Query::base_connection_id` has `-1`. That is, for SQLite this method does nothing."
+
+msgid "## sql_debug ($fn, $query)"
+msgstr "## sql_debug ($fn, $query)"
+
+msgid "Сохраняет запросы к базе данных в `@Aion::Query::DEBUG`. Вызывается из `query_do`."
+msgstr "Stores database queries in `@Aion::Query::DEBUG`. Called from `query_do`."
+
+msgid "# AUTHOR"
+msgstr "#AUTHOR"
+
+msgid "Yaroslav O. Kosmina [dart@cpan.org](dart@cpan.org)"
+msgstr "Yaroslav O. Kosmina [dart@cpan.org](dart@cpan.org)"
+
+msgid "⚖ **GPLv3**"
+msgstr "⚖ **GPLv3**"
+
+msgid "The Aion::Surf module is copyright © 2023 Yaroslav O. Kosmina. Rusland. All rights reserved."
+msgstr "The Aion::Surf module is copyright © 2023 Yaroslav O. Kosmina. Rusland. All rights reserved."
+

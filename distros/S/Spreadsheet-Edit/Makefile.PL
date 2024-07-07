@@ -68,8 +68,6 @@ my %WriteMakefileArgs = (
     "FindBin" => 0,
     "Getopt::Long" => 0,
     "JSON" => 0,
-    "ODF::lpOD" => 0,
-    "ODF::lpOD_Helper" => 0,
     "Test2::Plugin::BailOnFail" => 0,
     "Test2::Tools::Subtest" => 0,
     "Test2::V0" => 0,
@@ -81,7 +79,7 @@ my %WriteMakefileArgs = (
     "multidimensional" => 0,
     "open" => 0
   },
-  "VERSION" => "1000.014",
+  "VERSION" => "1000.015",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -120,8 +118,6 @@ my %FallbackPrereqs = (
   "Import::Into" => 0,
   "JSON" => 0,
   "List::Util" => 0,
-  "ODF::lpOD" => 0,
-  "ODF::lpOD_Helper" => 0,
   "POSIX" => 0,
   "Path::Tiny" => 0,
   "Scalar::Util" => 0,

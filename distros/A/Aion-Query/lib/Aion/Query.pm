@@ -3,7 +3,7 @@ use 5.22.0;
 no strict; no warnings; no diagnostics;
 use common::sense;
 
-our $VERSION = "0.0.3";
+our $VERSION = "0.0.4";
 
 use Aion::Format qw//;
 use Aion::Format::Json qw//;
@@ -11,8 +11,6 @@ use B qw//;
 use DBI qw//;
 use Scalar::Util qw//;
 use List::Util qw//;
-use Aion::Format qw//;
-use Aion::Format::Json qw//;
 
 use Exporter qw/import/;
 our @EXPORT = our @EXPORT_OK = grep {
@@ -370,6 +368,29 @@ sub query_slice(@) {
 	}
 }
 
+# Подсоединить в результат запроса результат другого запроса
+# 
+# $authors = query "SELECT id, name FROM author";
+# # $authors as [{id => 1, name => "..."}, ...];
+#
+# query_attach $authors => 'books:id:author_id' => "SELECT author_id, title FROM book"
+#
+sub query_attach {
+	my ($rows, $attach, $query, %kw) = @_;
+	
+	($attach, my $key1, my $key2) = split /:/, $attach;
+
+	my %row = map { ($_->{$key1} => $_) } @$rows;
+
+	for my $row (query $query, %kw) {
+		my $id = $row->{$key2} // die "Not $key2 in query!";
+		my $main_row = $row{$id} // die "Not $key1=$id in main rows!";
+		push @{$main_row->{$attach}}, $row;
+	}
+
+	$rows
+}
+
 # Выбрать один колумн
 #
 #   query_col "SELECT id FROM word WHERE word in (1,2,3)" 	-> 	[1,2,3]
@@ -652,11 +673,11 @@ __END__
 
 =head1 NAME
 
-Aion::Query - functional interface for accessing database mysql and mariadb
+Aion::Query - a functional interface for accessing SQL databases (MySQL, MariaDB, Postgres and SQLite)
 
 =head1 VERSION
 
-0.0.3
+0.0.4
 
 =head1 SYNOPSIS
 
@@ -704,30 +725,30 @@ File .config.pm:
 
 =head1 DESCRIPTION
 
-When constructing queries, many disparate conditions are used, usually separated by different methods.
+C<Aion::Query> allows you to build an SQL query using a simple template mechanism.
 
-C<Aion::Query> uses a different approach, which allows you to construct an SQL query in a query using a simple template engine.
+Typically, SQL queries are built using conditions, which loads the code.
 
-The second problem is placing unicode characters into single-byte encodings, which reduces the size of the database. So far it has been solved only for the B<cp1251> encoding. It is controlled by the parameter C<BQ = 1>.
+The second problem is placing Unicode characters in single-byte encodings, which reduces the size of the database. So far the problem has been resolved only for the B<cp1251> encoding. This is controlled by the C<< use config BQ =E<gt> 1 >> parameter.
 
 =head1 SUBROUTINES
 
 =head2 query ($query, %params)
 
-It provide SQL (DCL, DDL, DQL and DML) queries to DBMS with quoting params.
+Provides SQL queries (DCL, DDL, DQL and DML) to the DBMS with parameter quotas.
 
 	query "SELECT * FROM author WHERE name=:name", name => 'Pushkin A.S.' # --> [{id=>1, name=>"Pushkin A.S."}]
 
-=head2 LAST_INSERT_ID ()
+=head2 LAST_INSERT_ID()
 
-Returns last insert id.
+Returns the ID of the last insert.
 
 	query "INSERT INTO author (name) VALUES (:name)", name => "Alice"  # -> 1
 	LAST_INSERT_ID  # -> 3
 
 =head2 quote ($scalar)
 
-Quoted scalar for SQL-query.
+Quotes a scalar for an SQL query.
 
 	quote undef     # => NULL
 	quote "abc"     # => 'abc'
@@ -761,7 +782,11 @@ Quoted scalar for SQL-query.
 
 =head2 query_prepare ($query, %param)
 
-Replace the parameters in C<$query>. Parameters quotes by the C<quote>.
+Replaces the parameters (C<%param>) in a query (C<$query>) and returns it. Parameters are enclosed in quotes via the C<quote> routine.
+
+Parameters of the form C<:x> will be quoted taking into account the scalar flags, which indicate whether it contains a string, an integer or a floating point number.
+
+To explicitly indicate the type of a scalar, use the prefixes: C<:^x> – integer, C<:.x> – string, C<:~x> – floating.
 
 	query_prepare "INSERT author SET name IN (:name)", name => ["Alice", 1, 1.0]  # => INSERT author SET name IN ('Alice', 1, 1.0)
 	
@@ -791,21 +816,21 @@ Replace the parameters in C<$query>. Parameters quotes by the C<quote>.
 
 =head2 query_do ($query)
 
-Execution query and returns it result.
+Executes a request and returns its result.
 
 	query_do "SELECT count(*) as n FROM author"  # --> [{n=>3}]
 	query_do "SELECT id FROM author WHERE id=2"  # --> [{id=>2}]
 
 =head2 query_ref ($query, %kw)
 
-As C<query>, but always returns a reference.
+Like C<query>, but always returns a scalar.
 
 	my @res = query_ref "SELECT id FROM author WHERE id=:id", id => 2;
 	\@res  # --> [[ {id=>2} ]]
 
 =head2 query_sth ($query, %kw)
 
-As C<query>, but returns C<$sth>.
+Like C<query>, but returns C<$sth>.
 
 	my $sth = query_sth "SELECT * FROM author";
 	my @rows;
@@ -816,12 +841,98 @@ As C<query>, but returns C<$sth>.
 	
 	0+@rows  # -> 3
 
-=head2 query_slice ($key, $val, @args)
+=head2 query_slice ($key, $val, $query, %kw)
 
-As query, plus converts the result into the desired data structure.
+Like query, plus converts the result into the desired data structure.
+
+If you need a hash of the form identifier - value:
 
 	my %author = query_slice name => "id", "SELECT id, name FROM author";
 	\%author  # --> {"Pushkin A.S." => 1, "Pushkin A." => 2, "Alice" => 3}
+
+If you need a hash of the form identifier - string:
+
+	my %author = query_slice id => {}, "SELECT id, name FROM author";
+	
+	my $rows = {
+	    1 => {name => "Pushkin A.S.", id => 1},
+	    2 => {name => "Pushkin A.",   id => 2},
+	    3 => {name => "Alice",        id => 3},
+	};
+	
+	\%author  # --> $rows
+
+If several lines correspond to one identifier, then it is logical to collect them into arrays:
+
+	query "CREATE TABLE book (
+		id SERIAL PRIMARY KEY,
+	    author_id INT NOT NULL REFERENCES author(id),
+	    title TEXT NOT NULL
+	)";
+	
+	stores book => [
+	    {author_id => 1, title => "Mir"},
+	    {author_id => 1, title => "Kiss in night"},
+	    {author_id => 3, title => "Mips as cpu"},
+	];
+	
+	my %author = query_slice author_id => ["title"], "SELECT author_id, title FROM book ORDER BY title";
+	
+	my $rows = {
+	    1 => ["Kiss in night", "Mir"],
+	    3 => ["Mips as cpu"],
+	};
+	
+	\%author  # --> $rows
+
+Well, the lines with all the fields:
+
+	my %author = query_slice author_id => [], "SELECT author_id, title FROM book ORDER BY title";
+	
+	my $rows = {
+	    1 => [
+	        {title => "Kiss in night", author_id => 1},
+	        {title => "Mir",           author_id => 1},
+	    ],
+	    3 => [
+	        {title => "Mips as cpu",   author_id => 3}
+	    ],
+	};
+	
+	\%author  # --> $rows
+
+=head2 query_attach ($rows, $attach, $query, %kw)
+
+Includes the result of another query into the result of a query.
+
+C<$attach> contains three keys separated by a colon: the key for the data to be attached, a column from C<$rows> and a column from C<$query>. Rows are merged across columns.
+
+	my $authors = query "SELECT id, name FROM author";
+	
+	my $res = [
+	    {name => "Pushkin A.S.", id => 1},
+	    {name => "Pushkin A.",   id => 2},
+	    {name => "Alice",        id => 3},
+	];
+	
+	$authors # --> $res
+	
+	query_attach $authors => "books:id:author_id" => "SELECT author_id, title FROM book ORDER BY title";
+	
+	my $attaches = [
+	    {name => "Pushkin A.S.", id => 1, books => [
+	        {title => "Kiss in night", author_id => 1},
+	        {title => "Mir",           author_id => 1},
+	    ]},
+	    {name => "Pushkin A.",   id => 2},
+	    {name => "Alice",        id => 3, books => [
+	        {title => "Mips as cpu", author_id => 3},
+	    ]},
+	];
+	
+	$authors # --> $attaches
+
+If you need to specify other keys, this is done using colons in C<$attach>: C<attach:id:attach_id>.
 
 =head2 query_col ($query, %params)
 
@@ -840,10 +951,12 @@ Returns one row.
 	my ($id, $name) = query_row "SELECT id, name FROM author WHERE id=2";
 	$id    # -> 2
 	$name  # => Pushkin A.
+	
+	eval { query_row "SELECT id, name FROM author" }; $@ # ~> A few lines! 
 
 =head2 query_row_ref ($query, %params)
 
-As C<query_row>, but retuns array reference always.
+Like C<query_row>, but always returns a scalar.
 
 	my @x = query_row_ref "SELECT name FROM author WHERE id=2";
 	\@x # --> [{name => "Pushkin A."}]
@@ -852,13 +965,13 @@ As C<query_row>, but retuns array reference always.
 
 =head2 query_scalar ($query, %params)
 
-Returns scalar.
+Returns the first value. The query must return one row, otherwise it throws an exception.
 
 	query_scalar "SELECT name FROM author WHERE id=2" # => Pushkin A.
 
 =head2 make_query_for_order ($order, $next)
 
-Creates a condition for requesting a page not by offset, but by B<cursor pagination>.
+Creates a page request condition not by offset, but by B<cursor pagination>.
 
 To do this, it receives C<$order> of the SQL query and C<$next> - a link to the next page.
 
@@ -878,12 +991,19 @@ To do this, it receives C<$order> of the SQL query and C<$next> - a link to the 
 	$order_sel  # --> [qw/name id/]
 
 See also:
-1. Article LL<https://habr.com/ru/articles/674714/>.
-2. LL<https://metacpan.org/dist/SQL-SimpleOps/view/lib/SQL/SimpleOps.pod#SelectCursor>
+
+=over
+
+=item 1. Article [Paging pages on social networks
+sch(https://habr.com/ru/articles/674714/).
+
+=item 2. LLL<https://metacpan.org/dist/SQL-SimpleOps/view/lib/SQL/SimpleOps.pod#SelectCursor>
+
+=back
 
 =head2 settings ($id, $value)
 
-Sets or returns a key from a table C<settings>.
+Sets or returns a key from the C<settings> table.
 
 	query "CREATE TABLE settings(
 	    id TEXT PRIMARY KEY,
@@ -896,7 +1016,7 @@ Sets or returns a key from a table C<settings>.
 
 =head2 load_by_id ($tab, $pk, $fields, @options)
 
-Returns the entry by its id.
+Returns a record by its ID.
 
 	load_by_id author => 2  # --> {id=>2, name=>"Pushkin A."}
 	load_by_id author => 2, "name as n"  # --> {n=>"Pushkin A."}
@@ -904,33 +1024,33 @@ Returns the entry by its id.
 
 =head2 insert ($tab, %x)
 
-Adds a record and returns its id.
+Adds an entry and returns its ID.
 
 	insert 'author', name => 'Masha'  # -> 4
 
 =head2 update ($tab, $id, %params)
 
-Updates a record by its id, and returns this id.
+Updates a record by its ID and returns that ID.
 
 	update author => 3, name => 'Sasha'  # -> 3
 	eval { update author => 5, name => 'Sasha' }; $@  # ~> Row author.id=5 is not!
 
 =head2 remove ($tab, $id)
 
-Remove row from table by it id, and returns this id.
+Delete a row from a table by its identifier and return this identifier.
 
 	remove "author", 4  # -> 4
 	eval { remove author => 4 }; $@  # ~> Row author.id=4 does not exist!
 
 =head2 query_id ($tab, %params)
 
-Returns the id based on other fields.
+Returns an identifier based on other fields.
 
 	query_id 'author', name => 'Pushkin A.' # -> 2
 
 =head2 stores ($tab, $rows, %opt)
 
-Saves data (update or insert). Returns count successful operations.
+Saves data (updates or inserts). Returns a count of successful operations.
 
 	my @authors = (
 	    {id => 1, name => 'Pushkin A.S.'},
@@ -965,20 +1085,20 @@ Saves data (update or insert). Returns count successful operations.
 
 =head2 store ($tab, %params)
 
-Saves data (update or insert). But one row.
+Saves data (updates or inserts) one row.
 
 	store 'author', name => 'Bishop M.' # -> 1
 
 =head2 touch ($tab, %params)
 
-Super-powerful function: returns id of row, and if it doesn’t exist, creates or updates a row and still returns.
+Super powerful function: returns the row identifier, and if it doesn't exist, creates or updates the row and returns anyway.
 
 	touch 'author', name => 'Pushkin A.' # -> 2
 	touch 'author', name => 'Pushkin X.' # -> 7
 
-=head2 START_TRANSACTION ()
+=head2 START_TRANSACTION()
 
-Returns the variable on which to set commit, otherwise the rollback occurs.
+Returns the variable on which the commit must be performed, otherwise a rollback occurs.
 
 	my $transaction = START_TRANSACTION;
 	
@@ -1000,21 +1120,21 @@ Returns the variable on which to set commit, otherwise the rollback occurs.
 	
 	query_scalar "SELECT name FROM author where id=7"  # => Pushkin N.
 
-=head2 default_dsn ()
+=head2 default_dsn()
 
 Default DSN for C<< DBI-E<gt>connect >>.
 
 	default_dsn  # => DBI:SQLite:dbname=test-base.sqlite
 
-=head2 default_connect_options ()
+=head2 default_connect_options()
 
-DSN, USER, PASSWORD and commands after connect.
+DSN, user, password and commands after connection.
 
 	[default_connect_options]  # --> ['DBI:SQLite:dbname=test-base.sqlite', 'root', 123, []]
 
 =head2 base_connect ($dsn, $user, $password, $conn)
 
-Connect to base and returns connect and it identify.
+We connect to the database and return the connection and identify it.
 
 	my ($dbh, $connect_id) = base_connect("DBI:SQLite:dbname=base-2.sqlite", "toor", "toorpasswd", []);
 	
@@ -1023,7 +1143,7 @@ Connect to base and returns connect and it identify.
 
 =head2 connect_respavn ($base)
 
-Connection check and reconnection.
+Checking the connection and reconnecting.
 
 	my $old_base = $Aion::Query::base;
 	
@@ -1034,7 +1154,7 @@ Connection check and reconnection.
 
 =head2 connect_restart ($base)
 
-Connection restart.
+Restarting the connection.
 
 	my $connection_id = $Aion::Query::base_connection_id;
 	my $base = $Aion::Query::base;
@@ -1044,22 +1164,20 @@ Connection restart.
 	$base->ping  # -> 0
 	$Aion::Query::base->ping  # -> 1
 
-=head2 query_stop ()
-
-A request may be running - you need to kill it.
+=head2 query_stop()
 
 Creates an additional connection to the base and kills the main one.
 
-It using C<$Aion::Query::base_connection_id> for this.
+To do this, use C<$Aion::Query::base_connection_id>.
 
-SQLite runs in the same process, so C<$Aion::Query::base_connection_id> has C<-1>. In this case, this method does nothing.
+SQLite runs in the same process, so C<$Aion::Query::base_connection_id> has C<-1>. That is, for SQLite this method does nothing.
 
 	my @x = query_stop;
 	\@x  # --> []
 
 =head2 sql_debug ($fn, $query)
 
-Stores queries to the database in C<@Aion::Query::DEBUG>. Called from C<query_do>.
+Stores database queries in C<@Aion::Query::DEBUG>. Called from C<query_do>.
 
 	sql_debug label => "SELECT 123";
 	

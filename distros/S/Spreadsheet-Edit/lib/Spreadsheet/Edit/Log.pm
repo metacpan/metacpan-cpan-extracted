@@ -11,8 +11,8 @@ package Spreadsheet::Edit::Log;
 
 # Allow "use <thismodule. VERSION ..." in development sandbox to not bomb
 { no strict 'refs'; ${__PACKAGE__."::VER"."SION"} = 1999.999; }
-our $VERSION = '1000.014'; # VERSION from Dist::Zilla::Plugin::OurPkgVersion
-our $DATE = '2024-02-18'; # DATE from Dist::Zilla::Plugin::OurDate
+our $VERSION = '1000.015'; # VERSION from Dist::Zilla::Plugin::OurPkgVersion
+our $DATE = '2024-07-06'; # DATE from Dist::Zilla::Plugin::OurDate
 
 use Carp;
 
@@ -67,7 +67,8 @@ sub _btwTN($$@) {
     next unless defined $lno;
     (my $fname = $path) =~ s/.*[\\\/]//;
     $fname =~ s/\.pm$//;
-    (my $pkg = $package) =~ s/.*:://;
+    my $pkg = ($package =~ s/.*:://r);
+    my $pkg_space = $package eq "main" ? "" : "$pkg ";
     my $s = eval qq< qq<${pfxexpr}> >;
     croak "ERROR IN btw prefix '$pfxexpr': $@" if $@;
     $pfx .= $sep if $pfx;
@@ -85,8 +86,10 @@ sub _genbtw_funcs($$) {
   no strict 'refs';
   my $btwN  = eval{ sub($@) { unshift @_,$pfxexpr; goto &_btwTN } } // die $@;
   my $btw   = eval{ sub(@)  { unshift @_,0 ; goto &{"${pkg}::btwN"} } } // die $@;
+  my $btwbt = eval{ sub(@)  { unshift @_,\99 ; goto &{"${pkg}::btwN"} } } // die $@;
   *{"${pkg}::btwN"} = \&$btwN;
   *{"${pkg}::btw"}  = \&$btw;
+  *{"${pkg}::btwbt"}  = \&$btwbt;
 }
 BEGIN {
   # Generate the functions used when imported the usual way.
@@ -103,7 +106,7 @@ sub import {
   foreach (@_) {
     local $_ = $_; # mutable copy
     if (/btw/ && ($prev_pkg//=$pkg) ne $pkg) {
-      $default_pfx = '$pkg $lno'; # show package if imported from multiple
+      $default_pfx = '${pkg_space}$lno'; # show package if used in multiple
     }
     # Generate customized version of btwN() (called by btw) which uses an
     # arbitrary prefix expression.  The expression is eval'd each time,
@@ -124,7 +127,7 @@ sub import {
   goto &Exporter::import
 }
 
-our @EXPORT_OK = qw/btw btwN oops set_logdest/;
+our @EXPORT_OK = qw/btw btwN btwbt oops set_logdest/;
 
 
 use Scalar::Util qw/reftype refaddr blessed weaken openhandle/;
@@ -145,7 +148,7 @@ sub oops(@) {
   push @_,"\n" unless $_[-1] =~ /\R\z/;
   STDOUT->flush if openhandle(*STDOUT);
   STDERR->flush if openhandle(*STDERR);
-  goto &Carp::confess
+  goto &Carp::confess;
 }
 
 use Data::Dumper::Interp qw/dvis vis visq avis hvis visnew addrvis u/;
@@ -337,13 +340,15 @@ sub log_methcall {
 __END__
 =pod
 
+=encoding UTF-8
+
 =head1 NAME
 
 Spreadsheet::Edit::Log - log method/function calls, args, and return values
 
 =head1 SYNOPSIS
 
-  use Spreadsheet::Edit::Log qw/:DEFAULT btw oops/;
+  use Spreadsheet::Edit::Log qw/:DEFAULT btw btwN oops/;
 
   sub public_method {
     my $self = shift;
@@ -352,8 +357,13 @@ Spreadsheet::Edit::Log - log method/function calls, args, and return values
   sub _internal_method {
     my $self = shift;
 
-    oops "zort not set!" unless defined $self->{zort};
+    # Debug printing; shows location of call
     btw "By the way, the zort is $self->{zort}" if $self->{debug};
+    btwN 2, "message";  # With location of caller's caller'caller
+    btwbt "message";    # With 1-line mini traceback
+
+    # Wrapper for Carp::Confess
+    oops "zort not set!" unless defined $self->{zort};
 
     my @result = (42, $_[0]*1000);
 
@@ -509,12 +519,17 @@ overridden by C<{OPTIONS}> passed in individual calls).
 
 =head1 DEBUG UTILITIES
 
+(Not related to the log functions above).
+
+NOTE: None of these are exported by default.
 
 =head2 btw STRING,STRING,...
 
 =head2 btwN LEVELSBACK,STRING,STRING,...
 
-These print internal debug messages (not related to the log functions above).
+=head2 btwbt STRING,STRING,...
+
+Print debug trace messages.  I<btw> stands for "by the way...".
 
 C<btw> prints a message to STDERR (or as specified via C<set_logdest>)
 preceeded by "linenum:"
@@ -522,32 +537,31 @@ giving the line number I<of the call to btw>.
 A newline is appended to the message unless the last STRING already
 ends with a newline.
 
-This is like C<warn> when the message omits a final newline,
+This is similar C<warn> when the message omits a final newline
 but with a different presentation.
 
 C<btwN> displays the line number of the call LEVELSBACK
 in the call stack (0 is the same as C<btw>, 1 for your caller's location etc.)
 
-LEVELSBACK may also be a scalar ref \MAXDEPTH to show multiple levels,
-i.e. a mini traceback.
+C<btwbt> displays an inline mini traceback before the message, like this:
 
-Not exported by default.
+  PkgA 565 ⇐ PkgB 330 ⇐ 456 ⇐ 413 : message...
 
-By default, only the line numbers of calling locations are shown.
-If a tag B<:btw=PFX> is imported then customized C<btw()> and C<btwN()>
-functions will be imported which use an arbitrary prefix B<PFX> string,
-which may contain
-I<$lno> I<$path> I<$fname> I<$package> or I<$pkg>
+By default, only the line numbers of calling locations are shown if the call
+was from package 'main' or Spreadsheet::Edit::Log was imported by only a single module.
+
+If a tag B<:btw=PFX> is imported then customized C<btw()>, C<btwN()> and C<btwbt()>
+functions will be imported which prefix line numbers with an arbitrary prefix B<PFX>,
+which may contain I<$lno> I<$path> I<$fname> I<$package> I<$pkg> or I<$pkg_space>
 to interpolate respectively
 the calling line number, file path, file basename,
-package name, or S<abbreviated package name (*:: removed).>
+package name, S<abbreviated package name (*:: removed).>
+or abbrev. package name followed by a space, or nothing if the package is "main".
 
 =head2 oops STRING,STRING,...
 
 Prepends "\n<your package name> oops:\n" to the message and then
 chains to Carp::confess for backtrace and death.
-
-Not exported by default.
 
 =head2 set_logdest($filehandle or *FILEHANDLE)
 

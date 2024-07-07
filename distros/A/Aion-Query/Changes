@@ -1,5 +1,11 @@
 Revision history for Perl extension Aion::Query
 
+0.0.4 2024-07-06T17:18:44Z
+
+    - add subroutine query_attach
+    - writes test-cases for subroutine query_slice
+    - requires license GPL_3 in cpanfile
+
 0.0.3 2023-11-30T15:23:52Z
 
     - add query param-masks :^x, :~x, and :.x for set typed value

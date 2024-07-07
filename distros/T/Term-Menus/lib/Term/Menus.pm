@@ -15,7 +15,7 @@ package Term::Menus;
 ## See user documentation at the end of this file.  Search for =head
 
 
-our $VERSION = '3.028';
+our $VERSION = '3.030';
 
 
 use 5.006;
@@ -1808,8 +1808,10 @@ sub Menu
                   (ref $topmenu eq 'HASH') &&
                   (grep { /Item_/ } keys %{$topmenu})) {
                return [ $topmenu ];
-            } else {
+            } elsif (0==$#{$pick}) {
                return $pick->[0];
+            } else {
+               return $pick;
             }
          } else {
             if ($picks_from_parent) {
@@ -6177,11 +6179,7 @@ END
                   if (-1<$#resu) {
                      if ($resu[0] eq '<') { %picks=();next }
                      if (0<$#resu && wantarray && !$no_wantarray) {
-                        if (1==$recurse_level) {
-                           return \@resu;
-                        } else {
-                           return @resu;
-                        }
+                        return \@resu;
                      } elsif (ref $resu[0] eq 'HASH') {
                         if (grep { /Item_/ } keys %{$resu[0]} && $parent_menu) {
                            if (exists $FullMenu->{$parent_menu}[2]

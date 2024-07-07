@@ -7,7 +7,7 @@
 #=============================================================================
 use     5.010_001;
 use     strict;
-use     experimental    'smartmatch';
+use     feature qw/current_sub/;
 #=============================================================================
 #       Common lpOD/Perl parameters and utility functions
 #=============================================================================
@@ -15,7 +15,9 @@ package ODF::lpOD::Common;
 our	$VERSION	        	= '1.013';
 use constant PACKAGE_DATE   => '2014-04-30T08:32:52';
 #-----------------------------------------------------------------------------
-use Scalar::Util;
+use Scalar::Util ();
+use List::Util qw/any/;
+use Carp qw/carp confess cluck/;
 use Encode;
 use base 'Exporter';
 our @EXPORT     = qw
@@ -87,6 +89,7 @@ our @EXPORT     = qw
     is_numeric iso_date numeric_date check_odf_value odf_value
     file_parse file_type load_file image_size input_2d_value
     alert not_implemented
+    fake_smartmatch
 
     XML_PRETTY_PRINT PRETTY_PRINT EMPTY_TAGS
 
@@ -891,6 +894,54 @@ sub     not_implemented
         {
         alert("NOT IMPLEMENTED");
         return FALSE;
+        }
+
+# Perl 5.38 loudly deprecates 'when' and the ~~ operator, and 5.40 will
+# supposedly remove them entirely.  To preserve existing semantics of
+# existing code including user-visible functions, I'm emulating (a subset of) 
+# the ~~ operator here.  -Jim Avera 6/10/2024
+sub     fake_smartmatch
+        {
+          my ($L, $R) = @_;
+          my $err;
+          if (@_ != 2) {
+            $err = "expects two args";
+          }
+          elsif (! defined($L)) {
+            return ! defined($R);
+          }
+          elsif (ref($L) ne "") {
+            $err = "only handles a simple left operand";
+          }
+          elsif (! defined($R)) {
+            return ! defined($L);
+          }
+          elsif ((my $rtype = ref($R)) ne "") {
+            if ($rtype eq "ARRAY") {
+              return any { __SUB__->($L,$_) } @$R;
+            }
+            elsif ($rtype eq "HASH") {
+              return exists($R->{$L});
+            }
+            elsif ($rtype eq "CODE") {
+              return $R->($L);
+            }
+            elsif ($rtype eq "RegExp") {
+              return $L =~ /$R/;
+            }
+            else {
+              $err = "does not handle operand of type $rtype"
+            }
+          }
+          else {
+            if (Scalar::Util::looks_like_number($R) || 
+                               Scalar::Util::looks_like_number($L)) {
+              return $L == $R;
+            } else {
+              return $L eq $R;
+            }
+          }
+          confess "fake_smartmatch $err";
         }
 
 #=============================================================================

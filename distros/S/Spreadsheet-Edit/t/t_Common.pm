@@ -81,8 +81,9 @@ sub import {
   #warnings->import::into($target);
   warnings->import::into($target, FATAL => 'all'); # blowing up a test is ok
 
+  #As of perl 5.39.8 multiple 'use' specifying Perl version is deprecated
   #use 5.010;  # say, state
-  use 5.011;  # cpantester gets warning that 5.11 is the minimum acceptable
+  #use 5.011;  # cpantester gets warning that 5.11 is the minimum acceptable
   use 5.018;  # lexical_subs
   require feature;
   # Perl 5.18.0 seems to require the "no experimental..." before the "use feature"

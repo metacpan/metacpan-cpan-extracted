@@ -1,14 +1,72 @@
 #!/usr/bin/perl -CS
 
+=head1 NAME
+
+mergecal - Merge multiple iCal files into one
+
+=head1 SYNOPSIS
+
+  mergecal [config.json]
+
+=head1 DESCRIPTION
+
+C<mergecal> is a simple script to merge multiple iCal files into one.
+
+=head1 COMMAND LINE OPTIONS
+
+C<mergecal> takes one optional argument, which is the path to a JSON file. If
+not provided, it will look for a file named C<config.json> in the current
+directory.
+
+The JSON file should have the following structure:
+
+  {
+    "output": "output.ics",
+    "input": [
+      "input1.ics",
+      "input2.ics",
+      ...
+    ]
+  }
+
+The value for "output" is optional. If it is omitted, then the output is
+written to STDOUT.
+
+=cut
+
 use strict;
 use warnings;
-use 5.010;
-
+use 5.024;
 use open ':std', ':encoding(UTF-8)';
 
+use Getopt::Long;
+use File::Basename;
 use App::MergeCal;
+
+GetOptions(
+  'help' => \my $help,
+);
+
+if ($help) {
+  my $me = basename $0;
+    say "\n$me, version $App::MergeCal::VERSION\n\n",
+        "Usage: $me [config.json]\n";
+    exit;
+}
 
 my $app = App::MergeCal->new_from_json_file(shift || 'config.json');
 
 $app->run;
 
+=head1 AUTHOR
+
+Dave Cross <dave@perlhacks.com>
+
+=head1 COPYRIGHT AND LICENCE
+
+Copyright (c) 2024, Magnum Solutions Ltd. All Rights Reserved.
+
+This library is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+
+=cut

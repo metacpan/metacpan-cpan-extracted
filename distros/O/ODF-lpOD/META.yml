@@ -1,7 +1,7 @@
 ---
 abstract: 'An OpenDocument management interface'
 author:
-  - 'Andy Beverley <andy@andybev.com>'
+  - 'Jean-Marie Gouarne <jean-marie.gouarne@online.fr>'
 build_requires:
   ExtUtils::MakeMaker: '0'
 configure_requires:
@@ -30,6 +30,10 @@ requires:
   Time::Local: '1.07'
   XML::Twig: '3.34'
   experimental: '0'
-  perl: '5.010001'
-version: '1.200'
+  perl: '5.016000'
+resources:
+  bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=ODF-lpOD
+  homepage: https://github.com/ctrlo/ODF-lpOD/
+  repository: https://github.com/ctrlo/ODF-lpOD/
+version: '2.001'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

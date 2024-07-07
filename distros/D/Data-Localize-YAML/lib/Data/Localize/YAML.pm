@@ -1,5 +1,5 @@
 package Data::Localize::YAML;
-$Data::Localize::YAML::VERSION = '0.001';
+$Data::Localize::YAML::VERSION = '0.002';
 use v5.10;
 use strict;
 use warnings;
@@ -8,7 +8,7 @@ use Moo;
 use File::Basename;
 use Data::Localize;
 use Data::Localize::Storage::Hash;
-use YAML::Tiny;
+use YAML::PP qw(LoadFile);
 use Carp qw(croak);
 
 BEGIN {
@@ -92,12 +92,12 @@ sub load_from_file
 		debugf("load_from_file - loading from file %s", $file);
 	}
 
-	my $lexicon = YAML::Tiny->read($file);
+	my @lexicon = LoadFile($file);
 	my %hash_lexicon;
 
 	if ($self->is_array) {
 		my ($keykey, $valuekey) = @{$self->array_key_value};
-		foreach my $item (@{$lexicon}) {
+		foreach my $item (@lexicon) {
 			if (!exists $item->{$keykey} || !exists $item->{$valuekey}) {
 				croak
 					"Array element from YAML file does not contain $keykey or $valuekey - forgot to set array_key_value?";
@@ -107,7 +107,7 @@ sub load_from_file
 		}
 	}
 	else {
-		%hash_lexicon = %{$lexicon->[0]};
+		%hash_lexicon = %{$lexicon[0]};
 	}
 
 	my $lang = File::Basename::basename($file);

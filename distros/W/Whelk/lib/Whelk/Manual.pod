@@ -291,6 +291,19 @@ A boolean value - whether to I<inhale> (validate) response before serializing
 it. Default value is C<true>. It is strongly recommended that this stays
 C<true>, but setting C<false> can be the last resort to improving performance.
 
+=head3 Adding resource packages
+
+To define a resource, you must create a controller class which extends
+L<Whelk::Resource>. This class must have an C<api> method reimplemented
+(without calling C<SUPER::api>). It's best created in C<Whelk::Resource::>
+namespace for easier configuration inside L</resources> hash.
+
+Whelk resources are regular Kelp controllers and have access to all Kelp
+methods by default. They may define normal routes using C<add_route> in
+addition to endpoints using C<add_endpoint>. Note that normal route adding will
+not implement the special behavior for C<add_endpoint> discussed below, and
+normal routes will not show up in the OpenAPI document for the application.
+
 =head3 Adding endpoints
 
 After you have your resource package set up, you can add some endpoints in its

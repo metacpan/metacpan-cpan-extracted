@@ -1,5 +1,5 @@
 package Whelk;
-$Whelk::VERSION = '0.04';
+$Whelk::VERSION = '0.06';
 use Kelp::Base 'Kelp';
 
 attr 'config_module' => '+Whelk::Config';
@@ -29,6 +29,13 @@ Whelk - A friendly API framework based on Kelp
 	$ plackup
 
 =head1 DESCRIPTION
+
+=begin html
+
+<p style="text-align: center"><img width="80%" src="https://raw.githubusercontent.com/Kelp-framework/Art/master/whelk/logo_wide.png" alt="logo"></p>
+<p style="text-align: center"><b>A friendly web API framework</b></p>
+
+=end html
 
 Whelk is an API framework which helps you create correct, fast,
 self-documenting APIs. It's easy to learn, fun to work with and extremely

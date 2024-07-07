@@ -1,5 +1,5 @@
 package Whelk::Schema::Definition::Number;
-$Whelk::Schema::Definition::Number::VERSION = '0.04';
+$Whelk::Schema::Definition::Number::VERSION = '0.06';
 use Whelk::StrictBase 'Whelk::Schema::Definition::_Scalar';
 use Scalar::Util qw(looks_like_number);
 

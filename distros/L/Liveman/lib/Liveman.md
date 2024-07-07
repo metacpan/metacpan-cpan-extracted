@@ -5,7 +5,7 @@ Liveman - компиллятор из markdown в тесты и документ
 
 # VERSION
 
-3.1
+3.2
 
 # SYNOPSIS
 
@@ -160,7 +160,7 @@ hi!
 
 **Внимание!** Пустая строка между префиксом и кодом не допускается!
 
-Эти префиксы могут быть как на английском, так и на русском.
+Эти префиксы могут быть как на английском, так и на русском (`File <path>:` и `File <path> is:`).
 
 # METHODS
 
@@ -217,6 +217,33 @@ __END__
 Запустить тесты (`t/**.t`-файлы).
 
 Все, если `$self->{files}` не установлен, или `$self->{files}` только.
+
+# DEPENDENCIES IN CPANFILE
+
+В своей библиотеке, которую вы будете тестировать Liveman-ом, нужно будет указать дополнительные зависимости для тестов в **cpanfile**:
+
+```cpanfile
+on 'test' => sub {
+    requires 'Test::More', '0.98';
+
+    requires 'Carp';
+    requires 'File::Basename';
+    requires 'File::Path';
+    requires 'File::Slurper';
+    requires 'File::Spec';
+    requires 'Scalar::Util';
+};
+```
+
+Так же неплохо будет указать и сам **Liveman** в разделе для разработки:
+
+```cpanfile
+on 'develop' => sub {
+    requires 'Minilla', 'v3.1.19';
+    requires 'Data::Printer', '1.000004';
+    requires 'Liveman', '1.0';
+};
+```
 
 # AUTHOR
 

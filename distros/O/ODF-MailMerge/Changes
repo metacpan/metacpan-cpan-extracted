@@ -1,3 +1,4 @@
+1.007 - Require ODF::lpOD 2.001 which removes use of deprecated smartmatch
 1.006 - Updated docs; Added build dependencies; test tweaks.
 1.005 - Portabilty fixes; odfedit mail-merge syntax changes.
 1.003 - Export & document $token_re and parse_token()

@@ -13,8 +13,6 @@ build_requires:
   FindBin: '0'
   Getopt::Long: '0'
   JSON: '0'
-  ODF::lpOD: '0'
-  ODF::lpOD_Helper: '0'
   Test2::Plugin::BailOnFail: '0'
   Test2::Tools::Subtest: '0'
   Test2::V0: '0'
@@ -79,7 +77,7 @@ resources:
   bugtracker: https://github.com/jimav/Spreadsheet-Edit/issues
   homepage: https://github.com/jimav/Spreadsheet-Edit
   repository: https://github.com/jimav/Spreadsheet-Edit.git
-version: '1000.014'
-x_generated_by_perl: v5.36.0
+version: '1000.015'
+x_generated_by_perl: v5.38.2
 x_serialization_backend: 'YAML::Tiny version 1.74'
 x_spdx_expression: CC0-1.0

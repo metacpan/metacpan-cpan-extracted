@@ -51,7 +51,7 @@
          "web" : "https://github.com/ap/Catalyst-Plugin-Flash"
       }
    },
-   "version" : "0.001",
+   "version" : "0.002",
    "x_copyright" : {
       "holder" : "Aristotle Pagaltzis",
       "year" : 2024

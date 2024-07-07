@@ -13,7 +13,7 @@ use Module::Pluggable search_path => "XML::Feed::Format",
                       require     => 1,
                       sub_name    => 'formatters';
 
-our $VERSION = '0.63';
+our $VERSION = '0.64';
 our $MULTIPLE_ENCLOSURES = 0;
 our @formatters;
 BEGIN {
@@ -48,7 +48,11 @@ sub parse {
     } else {
         $xml = $class->get_file($stream);
     }
-    return $class->error("Can't get feed XML content from $stream")
+    my $errstr = "Can't get feed XML content from $stream";
+    if ($class->errstr) {
+        $errstr .= ": " . $class->errstr;
+    }
+    return $class->error($errstr)
         unless $xml;
     my $format;
     if ($specified_format) {

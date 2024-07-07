@@ -1,4 +1,4 @@
-package Whelk::Resource::Typo;
+package Whelk::Resource::Typo::Endpoint;
 
 use Kelp::Base 'Whelk::Resource';
 use Whelk::Exception;
@@ -9,7 +9,7 @@ sub api
 
 	$self->add_endpoint(
 		'/' => sub { },
-		respnose => {
+		ersponse => {
 			type => 'array',
 		}
 	);

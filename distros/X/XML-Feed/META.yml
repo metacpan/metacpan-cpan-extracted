@@ -1,47 +1,22 @@
 ---
-abstract: 'XML Syndication Feed Support'
+abstract: unknown
 author:
-  - 'Six Apart'
+  - unknown
 build_requires:
-  URI: '0'
-  XML::XPath: '0'
+  ExtUtils::MakeMaker: '0'
 configure_requires:
-  Module::Build: '0.42'
+  ExtUtils::MakeMaker: '0'
 dynamic_config: 1
-generated_by: 'Module::Build version 0.4231, CPAN::Meta::Converter version 2.150010'
-license: perl
+generated_by: 'ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010'
+license: unknown
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: '1.4'
 name: XML-Feed
-provides:
-  XML::Feed:
-    file: lib/XML/Feed.pm
-    version: '0.63'
-  XML::Feed::Content:
-    file: lib/XML/Feed/Content.pm
-    version: '0.63'
-  XML::Feed::Enclosure:
-    file: lib/XML/Feed/Enclosure.pm
-    version: '0.63'
-  XML::Feed::Entry:
-    file: lib/XML/Feed/Entry.pm
-    version: '0.63'
-  XML::Feed::Entry::Format::Atom:
-    file: lib/XML/Feed/Entry/Format/Atom.pm
-    version: '0.63'
-  XML::Feed::Entry::Format::RSS:
-    file: lib/XML/Feed/Entry/Format/RSS.pm
-    version: '0.63'
-  XML::Feed::Format::Atom:
-    file: lib/XML/Feed/Format/Atom.pm
-    version: '0.63'
-  XML::Feed::Format::RSS:
-    file: lib/XML/Feed/Format/RSS.pm
-    version: '0.63'
-  XML::Feed::Util:
-    file: lib/XML/Feed/Util.pm
-    version: '0.63'
+no_index:
+  directory:
+    - t
+    - inc
 requires:
   Class::ErrorHandler: '0'
   DateTime: '0'
@@ -58,24 +33,11 @@ requires:
   Module::Pluggable: '0'
   Scalar::Util: '0'
   Test::More: '0'
+  URI: '0'
   URI::Fetch: '0'
   XML::Atom: '0.38'
   XML::LibXML: '1.66'
   XML::RSS: '1.47'
-  perl: v5.10.0
-resources:
-  bugtracker: https://github.com/davorg/xml-feed/issues
-  license: http://dev.perl.org/licenses/
-  repository: https://github.com/davorg/xml-feed.git
-version: '0.63'
-x_contributors:
-  - 'Dave Cross <davecross@cpan.org>'
-  - 'Jakob Voss <voss@gbv.de>'
-  - 'Tatsuhiko Miyagawa <miyagawa@bulknews.net>'
-  - 'Simon Wistow <simon@thegestalt.org>'
-  - 'Gabor Szabo <szabgab@cpan.org>'
-  - 'Minty Walker <mintywalker@gmail.com>'
-  - 'Karen Etheridge <ether@cpan.org>'
-  - 'Gerard Ribugent Navarro <ribugent@cpan.org>'
-  - 'Matthew D. Miller <matthew.miller@okbu.edu>'
+  XML::XPath: '0'
+version: '0.64'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -41,7 +41,7 @@ my %WriteMakefileArgs = (
     "Guard" => 0,
     "List::MoreUtils" => 0,
     "List::Util" => 0,
-    "ODF::lpOD" => 0,
+    "ODF::lpOD" => "2.001",
     "ODF::lpOD_Helper" => "6.006",
     "Path::Tiny" => "0.144",
     "Pod::Usage" => 0,
@@ -84,7 +84,7 @@ my %WriteMakefileArgs = (
     "multidimensional" => 0,
     "parent" => 0
   },
-  "VERSION" => "1.006",
+  "VERSION" => "1.007",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -120,7 +120,7 @@ my %FallbackPrereqs = (
   "JSON" => 0,
   "List::MoreUtils" => 0,
   "List::Util" => 0,
-  "ODF::lpOD" => 0,
+  "ODF::lpOD" => "2.001",
   "ODF::lpOD_Helper" => "6.006",
   "POSIX" => 0,
   "Path::Tiny" => "0.144",

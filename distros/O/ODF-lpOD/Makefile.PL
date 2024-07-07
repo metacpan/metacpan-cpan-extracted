@@ -97,7 +97,14 @@ WriteMakefile
         'ABSTRACT_FROM'     => 'lib/ODF/lpOD.pod',
     	'AUTHOR'            => $author,
 		'LICENSE'   => 'GPL',
-        'MIN_PERL_VERSION'  => '5.010001',
+        'MIN_PERL_VERSION'  => '5.016000', # Needed for feature current_sub
+        META_MERGE => {
+            resources => {
+                repository => 'https://github.com/ctrlo/ODF-lpOD/',
+                bugtracker => 'https://rt.cpan.org/Public/Dist/Display.html?Name=ODF-lpOD',
+                homepage   => 'https://github.com/ctrlo/ODF-lpOD/',
+            },
+        },
     	'PREREQ_PM'         =>
                 {
                 'XML::Twig'         => '3.34',
@@ -115,7 +122,7 @@ WriteMakefile
                 },
         'EXE_FILES'         =>
                 [
-                'lpod_test'
+                'bin/lpod_test'
                 ]
         );
 

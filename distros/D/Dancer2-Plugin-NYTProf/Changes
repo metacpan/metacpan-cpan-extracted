@@ -1,5 +1,9 @@
 Revision history for Dancer2-Plugin-NYTProf
 
+0.0101 2024-07-06T12:18:56-04:00 America/New_York
+ [REVISION]
+ - Dummy-fy the tests, for now.
+
 0.0100 2024-07-02T09:00:41-04:00 America/New_York
  [MINOR]
  - Initial release

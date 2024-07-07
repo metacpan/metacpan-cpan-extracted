@@ -1601,6 +1601,16 @@ document:
             }
         say "Found $amount in $count numeric cells";
 
+[ 2024 Note: The ~~ operator was deprecated in Perl 5.38.1 and will be removed in the future,
+so the examples should be coded differently.  For example the above might be
+
+                    if ($cell->get_type =~ /^(float|currency)$/) { ... }
+or
+                    my $t = $cell->get_type;
+                    if ( grep{ $t eq  $_ } @$filter ) { ... }  # or List::Util::any
+
+]
+  
 This introductory tutorial is not focused on performances. However some code
 optimization is not useless with large spreadsheets. In the last examples,
 we get each individual cell from the context of a table, with 2D coordinates.

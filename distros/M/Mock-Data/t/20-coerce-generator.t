@@ -4,10 +4,12 @@ use Mock::Data::Util 'coerce_generator';
 use Scalar::Util 'reftype';
 
 my @tests= (
-	[ q( "a"        ), 'a' ],
-	[ q( '{a}'      ), 'a_val' ],
-	[ q( ['a']      ), 'a' ],
-	[ q( sub {'a'}  ), 'a' ],
+	[ q( "a"                   ), 'a' ],
+	[ q( '{a}'                 ), 'a_val' ],
+	[ q( ['a']                 ), 'a' ],
+	[ q( sub {'a'}             ), 'a' ],
+	[ q( qr/(\w+)@(\w+)\.com/  ), qr/(\w+)@(\w+)\.com/ ],
+	[ q( qr/(\w+)@(\w+)(\.com|\.org|\.net|\.co\.uk)/ ), qr/(\w+)@(\w+)(\.com|\.org|\.net|\.co\.uk)/ ],
 );
 
 plan scalar @tests;
@@ -27,10 +29,11 @@ my $mockdata= Mock::Mock::Data->new;
 for (@tests) {
 	my ($spec, $result)= @$_;
 	subtest "test $spec" => sub {
+		# eval is just so I can see the original code in the test name
 		my $arg= eval $spec or die $@;
 		my $gen= coerce_generator($arg);
-		is( $gen->generate($mockdata), $result, "generates '$result'" );
+		like( my $val= $gen->generate($mockdata), $result, "generates '$result'" );
 		is( reftype($gen->compile), 'CODE', 'compiles to coderef' );
-		is( $gen->compile->($mockdata), $result, "compiled generates '$result'" );
+		like( $gen->compile->($mockdata), $result, "compiled generates '$result'" );
 	};
 }

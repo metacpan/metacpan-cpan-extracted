@@ -11,7 +11,7 @@ use base qw(Net::DNS::Resolver::Base DynaLoader), OS_CONF;
 our $VERSION;
 
 BEGIN {
-	$VERSION = '1.22';
+	$VERSION = '1.23';
 	eval { __PACKAGE__->bootstrap($VERSION) };
 }
 
@@ -58,6 +58,11 @@ It is not possible to send a pre-constructed packet to a nameserver.
 A best-effort attempt is made instead using (qname,qtype,qclass)
 extracted from the presented packet.
 
+=item *
+
+Result packet is synthesised in libunbound and not the "real thing".
+In particular, the ireturned queryID is zero.
+
 =back
 
 
@@ -71,23 +76,25 @@ extracted from the presented packet.
 	dnsrch,	    => 1,
 	domain	    => 'domain',
 	ndots	    => 1,
-	searchlist  => ['domain' ... ],
+	option	    => [ 'tls-cert-bundle', '/etc/ssl/cert.pem' ],
 	nameservers => [ ... ],
-	option => ['logfile', 'mylog.txt'] );
+	searchlist  => ['domain' ... ],
+	);
 
 Returns a new Net::DNS::Resolver::Unbound resolver object.
 
 =cut
 
 sub new {
-	my ( $class, %args ) = @_;
-	my @pass = map { ( $_, delete $args{$_} ) } qw(config_file);
-	my $self = $class->SUPER::new(@pass);
-	$self->{ub_ctx} = Net::DNS::Resolver::Unbound::Context->new();
-	while ( my ( $attr, $value ) = each %args ) {
-		my $ref = ref($value);
-		$self->$attr( $ref ? @$value : $value );
+	my ( $class, @args ) = @_;
+	my $self = $class->SUPER::new();
+	$self->nameservers( $self->SUPER::nameservers );
+	$self->_finalise_config;				# default configuration
+	while ( my $attr = shift @args ) {
+		my $value = shift @args;
+		$self->$attr( ref($value) ? @$value : $value );
 	}
+	$self->_finalise_config;
 	return $self;
 }
 
@@ -107,18 +114,26 @@ sub new {
 	add_ta_file => '/var/lib/unbound/root.key'
 	);
 
-    my @nameservers = $stub_resolver->nameservers;
+    $stub_resolver->nameservers( '127.0.0.53', ... );
 
 By default, DNS queries are sent to the IP addresses listed in
 /etc/resolv.conf or similar platform-specific sources.
 
 =cut
 
-sub xnameservers {
-	my $self = shift;
-	local $self->{debug};		## "no nameservers" ok in this context
-	return $self->SUPER::nameservers(@_);
+sub nameservers {
+	my ( $self, @nameservers ) = @_;
+	if ( defined wantarray ) {
+		$self->_finalise_config;
+		my %config = %{$self->{config}};
+		return @{$config{set_fwd}};
+	}
+	$self->set_fwd() unless @nameservers;
+	$self->set_fwd($_) foreach @nameservers;
+	return;
 }
+
+sub nameserver { &nameservers; }
 
 
 =head2 search, query, send, bgsend, bgbusy, bgread
@@ -142,9 +157,7 @@ sub send {
 		$result = $self->{ub_ctx}->ub_resolve( $q->name, $q->{qtype}, $q->{qclass} );
 	}
 
-	my $reply = $self->_decode_result($result);
-	$query->header->id( $reply->header->id );
-	return $reply;
+	return $self->_decode_result($result);
 }
 
 sub bgsend {
@@ -183,18 +196,23 @@ sub bgread {
 
 =head2 option
 
-    $filename = $resolver->option( 'logfile' );
-    $resolver->option( 'logfile', $filename );
+    $resolver->option( 'tls-cert-bundle', '/etc/ssl/cert.pem' );
 
-Get or set Unbound resolver (name,value) context options.
+Set Unbound resolver (name,value) context option.
 
 =cut
 
 sub option {
 	my ( $self, $name, @value ) = @_;
-	return $self->{ub_ctx}->set_option( "$name:", @value ) if @value;
-	my $value = $self->{ub_ctx}->get_option($name);
-	return wantarray ? split /\r*\n/, $value : $value;
+	unless (@value) {
+		$self->_finalise_config;
+		return eval {
+			my $value = $self->{ub_ctx}->get_option($name);
+			wantarray ? split /\r*\n/, $value : $value;
+		};
+	}
+
+	return $self->_option( $name, @value );
 }
 
 
@@ -209,7 +227,7 @@ Unbound configuration options.
 
 sub config {
 	my ( $self, $filename ) = @_;
-	return $self->{ub_ctx}->config($filename);
+	return $self->_config( 'config', $filename );
 }
 
 
@@ -226,8 +244,8 @@ as backup servers.
 =cut
 
 sub set_fwd {
-	my ( $self, $fwd ) = @_;
-	return $self->{ub_ctx}->set_fwd($fwd);
+	my ( $self, @fwd ) = @_;
+	return $self->_config( 'set_fwd', [@fwd] );
 }
 
 
@@ -241,8 +259,8 @@ Use DNS over TLS for queries to nameservers specified using set_fwd().
 =cut
 
 sub set_tls {
-	my ( $self, $do_tls ) = @_;
-	return $self->{ub_ctx}->set_tls($do_tls);
+	my ( $self, $tls ) = @_;
+	return $self->_config( 'set_tls', $tls );
 }
 
 
@@ -258,7 +276,7 @@ and the 'DHCP DNS' IP address, use set_fwd().
 
 sub set_stub {
 	my ( $self, $zone, $address, $prime ) = @_;
-	return $self->{ub_ctx}->set_stub( $zone, $address, $prime );
+	return $self->_config( 'set_stub', [[$zone, $address, $prime]] );
 }
 
 
@@ -276,7 +294,7 @@ or other platform-specific sources.
 
 sub resolv_conf {
 	my ( $self, $filename ) = @_;
-	return $self->{ub_ctx}->resolv_conf($filename);
+	return $self->_config( 'resolv_conf', $filename );
 }
 
 
@@ -291,7 +309,7 @@ These addresses are not flagged as DNSSEC secure when queried.
 
 sub hosts {
 	my ( $self, $filename ) = @_;
-	return $self->{ub_ctx}->hosts($filename);
+	return $self->_config( 'hosts', $filename );
 }
 
 
@@ -306,7 +324,8 @@ in RFC1035 zonefile format.
 
 sub add_ta {
 	my ( $self, @argument ) = @_;
-	return $self->{ub_ctx}->add_ta( Net::DNS::RR->new(@argument)->plain );
+	my $ta = Net::DNS::RR->new(@argument)->plain;
+	return $self->_config( 'add_ta', $ta );
 }
 
 
@@ -321,7 +340,7 @@ Pass the name of a file containing DS and DNSKEY records
 
 sub add_ta_file {
 	my ( $self, $filename ) = @_;
-	return $self->{ub_ctx}->add_ta_file($filename);
+	return $self->_config( 'add_ta_file', $filename );
 }
 
 
@@ -337,7 +356,7 @@ trust anchor is changed.
 
 sub add_ta_autr {
 	my ( $self, $filename ) = @_;
-	return $self->{ub_ctx}->add_ta_autr($filename);
+	return $self->_config( 'add_ta_autr', $filename );
 }
 
 
@@ -351,7 +370,7 @@ Pass the name of a BIND-style config file containing trusted-keys{}.
 
 sub trusted_keys {
 	my ( $self, $filename ) = @_;
-	return $self->{ub_ctx}->trusted_keys($filename);
+	return $self->_config( 'trusted_keys', $filename );
 }
 
 
@@ -365,8 +384,8 @@ Pass a null argument to disable. Default is stderr.
 =cut
 
 sub debug_out {
-	my ( $self, $out ) = @_;
-	return $self->{ub_ctx}->debug_out($out);
+	my ( $self, $stream ) = @_;
+	return $self->_config( 'debug_out', $stream );
 }
 
 
@@ -382,7 +401,7 @@ Set verbosity of the debug output directed to stderr.  Level 0 is off,
 sub debug_level {
 	my ( $self, $verbosity ) = @_;
 	$self->debug($verbosity);
-	return $self->{ub_ctx}->debug_level($verbosity);
+	return $self->_config( 'debug_level', $verbosity );
 }
 
 
@@ -398,8 +417,8 @@ If false (by default), a process is forked to perform the work.
 =cut
 
 sub async_thread {
-	my ( $self, $dothread ) = @_;
-	return $self->{ub_ctx}->async($dothread);
+	my ( $self, $threaded ) = @_;
+	return $self->_config( 'async', $threaded );
 }
 
 
@@ -414,19 +433,37 @@ Prints the resolver state on the standard output.
 
 sub string {
 	my $self = shift;
-	$self = $self->_defaults unless ref($self);
+	$self = $self->new() unless ref($self);
 
-	my @nslist   = $self->nameservers();
-	my ($force)  = ( grep( { $self->{$_} } qw(force_v6 force_v4) ),	  'force_v4' );
-	my ($prefer) = ( grep( { $self->{$_} } qw(prefer_v6 prefer_v4) ), 'prefer_v4' );
-	return <<END;
+	my $image = <<END;
 ;; RESOLVER state:
-;; nameservers	= @nslist
-;; searchlist	= @{$self->{searchlist}}
-;; defnames	= $self->{defnames}	dnsrch		= $self->{dnsrch}
-;; ${prefer}	= $self->{$prefer}	${force}	= $self->{$force}
-;; debug	= $self->{debug}	ndots		= $self->{ndots}
+;; debug	$self->{debug}	ndots	$self->{ndots}
+;; defnames	$self->{defnames}	dnsrch	$self->{dnsrch}
+;; searchlist	@{$self->{searchlist}}
 END
+	$self->_finalise_config;
+	my %config = %{$self->{config}};
+	my $optref = $config{set_option};			# expand option list
+	my %option = @{$optref || []};
+	my @option;
+	foreach my $opt ( sort keys %option ) {
+		push @option, [$opt, $_] for @{$option{$opt}};
+	}
+	local $config{set_option} = \@option;
+
+	my $format = ";; %s\t%s\n";
+	foreach my $name ( sort keys %config ) {
+		my $value = $config{$name};
+		if ( ref $value ) {
+			foreach my $arg (@$value) {
+				my @arg = map { ref($_) ? @$_ : $_ } $arg;
+				$image .= sprintf( $format, $name, join ' ', @arg );
+			}
+		} else {
+			$image .= sprintf( $format, $name, $value );
+		}
+	}
+	return $image;
 }
 
 
@@ -449,29 +486,90 @@ sub _decode_result {
 }
 
 
-sub _finalise_config {
-	my $self = shift;
-	return if $self->{ub_frozen}++;
-
-	my %IP_conf = (
-		force_v4  => ['do-ip6'	   => 'no'],
-		force_v6  => ['do-ip4'	   => 'no'],
-		prefer_v4 => ['prefer-ip4' => 'yes'],
-		prefer_v6 => ['prefer-ip6' => 'yes'] );
-
-	for ( grep { $self->{$_} } qw(prefer_v4 prefer_v6 force_v4 force_v6) ) {
-		my $argref = $IP_conf{$_};
-		eval { $self->option(@$argref) };		# unimplemented in old versions
-	}
-
-	my $count = 3;
-	local $self->{debug};		## "no nameservers" ok in this context
-	foreach ( grep { $count-- > 0 } $self->nameservers ) {
-		$self->set_fwd($_);
+sub _config {
+	my ( $self, $name, $arg ) = @_;
+	$self->{ub_ctx} = Net::DNS::Resolver::Unbound::Context->new() unless $self->{update};
+	my $update = $self->{update} ||= {};			# collect context changes
+	if ( ref $arg ) {
+		my @arg = map { ref($_) ? @$_ : $_ } @$arg;
+		$self->{ub_ctx}->$name(@arg) if @arg;		# error check only
+		my $list = $update->{$name} ||= [];
+		push @$list, @$arg if @arg;			# append non-empty
+		$update->{$name} = [] unless @arg;		# explicit empty list
+	} else {
+		$self->{ub_ctx}->$name($arg) if $arg;		# error check only
+		$update->{$name} = $arg;			# [re]define scalar
+		delete $update->{$name} unless defined $arg;
 	}
 	return;
 }
 
+
+sub _option {
+	my ( $self, $name, $arg ) = @_;
+	$self->{ub_ctx} = Net::DNS::Resolver::Unbound::Context->new() unless $self->{update};
+	my $setopt = $self->{config}->{set_option};
+	my $optref = $self->{update}->{set_option} || $setopt;
+	my %option = @{$optref || []};
+
+	my $opt = "${name}:";
+	if ($arg) {
+		my $list = $option{$opt} ||= [];
+		$self->{ub_ctx}->set_option( $opt, $arg );
+		push @$list, $arg;
+		$self->{update}->{set_option} = [%option];
+	}
+
+	return;
+}
+
+
+my %IP_conf = (
+	force_v4  => ['do-ip6'	   => 'no'],
+	force_v6  => ['do-ip4'	   => 'no'],
+	prefer_v4 => ['prefer-ip4' => 'yes'],
+	prefer_v6 => ['prefer-ip6' => 'yes'] );
+
+sub _finalise_config {
+	my $self = shift;
+
+	return unless $self->{update};
+
+	foreach my $key ( keys %IP_conf ) {
+		my ( $name, $arg ) = @{$IP_conf{$key}};
+		my @arg = $self->$key ? $arg : ();
+		eval { $self->_option( $name, @arg ); 1 }	# if implemented
+	}
+
+	my $config = $self->{config};
+	my $update = delete $self->{update};
+	my %config = ( %$config, %$update );
+
+	my $optref = $config{set_option};			# expand option list
+	my %option = @{$optref || []};
+	my @option;
+	foreach my $opt ( keys %option ) {
+		push @option, [$opt, $_] for @{$option{$opt}};
+	}
+
+	my $ctx = $self->{ub_ctx};				# build unbound context
+
+	foreach my $name ( keys %config ) {
+		local $config{set_option} = \@option;
+		my $value = $config{$name};
+		if ( ref $value ) {
+			foreach my $arg (@$value) {
+				my @arg = map { ref($_) ? @$_ : $_ } $arg;
+				$ctx->$name(@arg);
+			}
+		} else {
+			$ctx->$name($value);
+		}
+	}
+
+	$self->{config} = \%config;
+	return;
+}
 
 1;
 __END__

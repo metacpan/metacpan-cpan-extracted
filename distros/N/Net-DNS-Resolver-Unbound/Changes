@@ -1,6 +1,15 @@
 Revision history for Perl extension Net::DNS::Resolver::Unbound.
 
 
+**** 1.23  Jun 20, 2024
+	Implement support for DNS over TLS.
+	Remove restriction on Unbound context updates.
+
+
+**** 1.22  Jun 11, 2024
+	Restructure resolver method inheritance tree.
+
+
 **** 1.21  Jun 9, 2023
 	Emulate Net::DNS::Resolver send($packet).
 

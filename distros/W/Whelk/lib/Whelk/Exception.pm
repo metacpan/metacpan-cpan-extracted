@@ -1,5 +1,5 @@
 package Whelk::Exception;
-$Whelk::Exception::VERSION = '0.04';
+$Whelk::Exception::VERSION = '0.06';
 use Kelp::Base 'Kelp::Exception';
 
 # hint (string) to send to the user. App won't create a log if hint is present.
@@ -26,7 +26,8 @@ Whelk::Exception - Exceptions for your API
 	# no log will be created, but the hint will be returned in the API response
 	Whelk::Exception->throw(403, hint => 'Access denied, not authorized');
 
-	# fatal API error, will not return an API error page but rather regular text / html error page
+	# fatal API error, will not return an API error page but rather regular
+	# text / html error page
 	Kelp::Exception->throw(500, body => 'Something went very, very wrong');
 
 =head1 DESCRIPTION

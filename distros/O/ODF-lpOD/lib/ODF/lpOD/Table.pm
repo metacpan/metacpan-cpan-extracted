@@ -722,7 +722,8 @@ sub     get_rows_by_index
                         }
                 else
                         {
-                        $match = TRUE if $v ~~ $filter;
+                        #$match = TRUE if $v ~~ $filter;
+                        $match = TRUE if fake_smartmatch($v, $filter);
                         }
                 if ($match)
                         {

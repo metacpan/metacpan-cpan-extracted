@@ -1,5 +1,20 @@
 Revision history for Whelk
 
+0.06 - 2024-07-07
+	- Fixed typos not being detected for endpoint parameters
+	- Added Text::Levenshtein dependency and improved suggestions for unknown keys
+	- Added documentation for Whelk::Schema::Definition
+	- Added documentation for Whelk::OpenAPI
+	- Added documentation for Kelp::Module::Whelk
+
+0.05 - 2024-07-06
+	- Framework no longer assumes resource is a subclass of Kelp, allowing custom base controllers
+	- Added documentation for Whelk::Wrapper
+	- Added documentation for Whelk::Formatter
+	- Added documentation for Whelk::Role::Resource
+	- Added documentation for Whelk::Resource
+	- Set minimum List::Util version
+
 0.04 - 2024-07-06
 	- Default and example values are now validated before they are put into OpenAPI document
 	- Typo detection now suggests a closest valid alternative if one exists

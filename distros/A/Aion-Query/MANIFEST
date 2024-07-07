@@ -4,6 +4,7 @@ LICENSE
 META.json
 README.md
 cpanfile
+i18n/Aion/Query.ru-en.po
 lib/Aion/Query.md
 lib/Aion/Query.pm
 minil.toml

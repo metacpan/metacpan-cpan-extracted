@@ -9,7 +9,7 @@ use Net::DNS::Resolver::Unbound;
 
 my $resolver = Net::DNS::Resolver::Unbound->new( debug_level => 0 );
 
-plan skip_all => 'no local nameserver' unless $resolver->nameservers;
+plan skip_all => 'no local nameserver' unless $resolver->nameserver;
 plan tests    => 7;
 
 

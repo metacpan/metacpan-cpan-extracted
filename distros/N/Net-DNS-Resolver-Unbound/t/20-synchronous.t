@@ -13,8 +13,8 @@ my $resolver = Net::DNS::Resolver::Unbound->new(
 	debug_level => 0
 	);
 
-plan skip_all => 'no local nameserver' unless $resolver->nameservers;
-plan tests    => 5;
+plan skip_all => 'no local nameserver' unless $resolver->nameserver;
+plan tests    => 4;
 
 my ( $name, $domain ) = qw(www net-dns.org);
 
@@ -32,7 +32,6 @@ ok( $resolver->search($name), "resolver->search('$name')" );
 my $packet = $resolver->_make_query_packet("$name.$domain");
 my $reply  = $resolver->send($packet);
 ok( $reply, 'resolver->send( $packet )' );
-is( $reply->header->id, $packet->header->id, 'reply header ID matches query' );
 
 
 exit;

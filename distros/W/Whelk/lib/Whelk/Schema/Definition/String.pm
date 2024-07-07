@@ -1,5 +1,5 @@
 package Whelk::Schema::Definition::String;
-$Whelk::Schema::Definition::String::VERSION = '0.04';
+$Whelk::Schema::Definition::String::VERSION = '0.06';
 use Whelk::StrictBase 'Whelk::Schema::Definition::_Scalar';
 
 sub openapi_dump

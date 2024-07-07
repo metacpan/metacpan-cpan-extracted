@@ -1,5 +1,10 @@
 Revision history for Perl extension Liveman
 
+3.2 2024-07-06T17:24:55Z
+
+    - add -no-auto for trans-utility
+    - add dependencies for tests in cpanfile
+
 3.1 2024-02-15T09:25:10Z
 
     - translate md by paragraphs

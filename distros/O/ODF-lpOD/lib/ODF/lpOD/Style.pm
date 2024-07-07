@@ -1389,7 +1389,8 @@ sub is_numeric_family
 		{
 		my $self	= shift;
 		my $f		= shift		or return undef;
-		return ($f ~~ @NUMERIC_FAMILIES) ? TRUE : FALSE;
+		#return ($f ~~ @NUMERIC_FAMILIES) ? TRUE : FALSE;
+		return fake_smartmatch($f, \@NUMERIC_FAMILIES) ? TRUE : FALSE;
 		}
 
 #-----------------------------------------------------------------------------
@@ -1423,7 +1424,8 @@ sub     classify
                 if ($arg =~ /^number:(.*)-style$/)
                         {
                         my $family = $1;
-                        if ($family ~~ [@FAMILIES])
+                        #if ($family ~~ [@FAMILIES])
+                        if (fake_smartmatch($family, [@FAMILIES]))
                                 {
                                 return __PACKAGE__;
                                 }

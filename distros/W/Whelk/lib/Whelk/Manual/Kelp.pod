@@ -68,7 +68,7 @@ differences.
 
 =head2 Configuration: Whelk module and reblessing router
 
-C<Kelp::Module::Whelk> is a module which must be loaded in app's configuration.
+L<Kelp::Module::Whelk> is a module which must be loaded in app's configuration.
 It can be loaded at any place, since it does not fully init itself during
 initial module load.
 
@@ -94,8 +94,9 @@ your app.
 =head2 Consuming C<Whelk::Role::Resource> role
 
 Each controller which is supposed to be a Whelk resource must consume
-C<Whelk::Role::Resource> (L<Role::Tiny> role). It can be done with C<with> from
-L<Role::Tiny::With> or L<Moo>.
+L<Whelk::Role::Resource> (L<Role::Tiny> role) instead of extending
+L<Whelk::Resource>. It can be done with C<with> from L<Role::Tiny::With> or
+L<Moo>.
 
 Don't consume this role in your base controller, unless you plan to have all
 controllers as Whelk resources.
@@ -103,4 +104,6 @@ controllers as Whelk resources.
 =head1 SEE ALSO
 
 L<Whelk::Manual>
+
+L<Kelp::Module::Whelk>
 

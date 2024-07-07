@@ -2,7 +2,7 @@ package Dancer2::Plugin::NYTProf;
 use strict;
 use warnings;
 
-our $VERSION = '0.0100'; # VERSION
+our $VERSION = '0.0101'; # VERSION
 our $AUTHORITY = 'cpan:GEEKRUTH'; # AUTHORITY
 # ABSTRACT:  NYTProf, in your Dancer2 application!
 
@@ -321,7 +321,7 @@ Dancer2::Plugin::NYTProf - NYTProf, in your Dancer2 application!
 
 =head1 VERSION
 
-version 0.0100
+version 0.0101
 
 =head1 SYNOPSIS
 

@@ -55,6 +55,7 @@ lib/Whelk/Wrapper/Simple.pm
 lib/Whelk/Wrapper/WithStatus.pm
 t/author-pod-syntax.t
 t/base.t
+t/conf/kelpcustom.pl
 t/conf/kelpmoo.pl
 t/conf/whelk_base.pl
 t/conf/whelk_buggy.pl
@@ -65,13 +66,17 @@ t/conf/whelk_manual.pl
 t/conf/whelk_multi.pl
 t/conf/whelk_openapi.pl
 t/conf/whelk_requests.pl
-t/conf/whelk_typo.pl
 t/deep.t
 t/eager_resource.t
 t/exhale.t
 t/generated_template.t
 t/inhale.t
+t/kelp_custom.t
 t/kelp_moo.t
+t/lib/CustomContext.pm
+t/lib/CustomController.pm
+t/lib/CustomController/Test.pm
+t/lib/KelpCustom.pm
 t/lib/KelpMoo.pm
 t/lib/KelpMoo/Controller.pm
 t/lib/KelpMoo/SomeResource.pm
@@ -81,7 +86,8 @@ t/lib/Whelk/Resource/Requests.pm
 t/lib/Whelk/Resource/ShowcaseOpenAPI.pm
 t/lib/Whelk/Resource/Test.pm
 t/lib/Whelk/Resource/Test/Deep.pm
-t/lib/Whelk/Resource/Typo.pm
+t/lib/Whelk/Resource/Typo/Endpoint.pm
+t/lib/Whelk/Resource/Typo/Parameters.pm
 t/lib/Whelk/Wrapper/Buggy.pm
 t/manual.t
 t/multi.t

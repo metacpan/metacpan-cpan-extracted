@@ -1,7 +1,7 @@
 {
    "abstract" : "An OpenDocument management interface",
    "author" : [
-      "Andy Beverley <andy@andybev.com>"
+      "Jean-Marie Gouarne <jean-marie.gouarne@online.fr>"
    ],
    "dynamic_config" : 1,
    "generated_by" : "ExtUtils::MakeMaker version 7.62, CPAN::Meta::Converter version 2.150010",
@@ -44,11 +44,20 @@
             "Time::Local" : "1.07",
             "XML::Twig" : "3.34",
             "experimental" : "0",
-            "perl" : "5.010001"
+            "perl" : "5.016000"
          }
       }
    },
    "release_status" : "stable",
-   "version" : "1.200",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://rt.cpan.org/Public/Dist/Display.html?Name=ODF-lpOD"
+      },
+      "homepage" : "https://github.com/ctrlo/ODF-lpOD/",
+      "repository" : {
+         "url" : "https://github.com/ctrlo/ODF-lpOD/"
+      }
+   },
+   "version" : "2.001",
    "x_serialization_backend" : "JSON::PP version 4.06"
 }

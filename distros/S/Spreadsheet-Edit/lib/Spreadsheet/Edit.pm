@@ -15,8 +15,8 @@ package Spreadsheet::Edit;
 # Allow "use <thismodule> <someversion>;" in development sandbox to not bomb
 { no strict 'refs'; ${__PACKAGE__."::VER"."SION"} = 1999.999; }
 
-our $VERSION = '1000.014'; # VERSION from Dist::Zilla::Plugin::OurPkgVersion
-our $DATE = '2024-02-18'; # DATE from Dist::Zilla::Plugin::OurDate
+our $VERSION = '1000.015'; # VERSION from Dist::Zilla::Plugin::OurPkgVersion
+our $DATE = '2024-07-06'; # DATE from Dist::Zilla::Plugin::OurDate
 
 # FIXME: cmd_nesting does nothing except prefix >s to log messages.
 #        Shouldn't it skip that many "public" call frames???
@@ -75,7 +75,8 @@ our @EXPORT = qw(
   first_data_rx transpose join_cols join_cols_sep last_data_rx move_col
   move_cols insert_col insert_cols insert_row insert_rows new_sheet only_cols
   options read_spreadsheet rename_cols reverse_cols
-  sheet sheetname sort_rows split_col tie_column_vars title2ident title_row
+  sheet sheetname sort_rows sort_indicies
+  split_col tie_column_vars title2ident title_row
   title_rx unalias write_csv write_spreadsheet );
 
 my @stdvars = qw( $title_rx $first_data_rx $last_data_rx $num_cols
@@ -759,7 +760,8 @@ sub __self_ifexists {
 sub __selfmust { # sheet must exist, otherwise throw
   &__self_ifexists || do{
     my $pkg = caller(1);
-    croak __methname()," : No sheet is defined in $pkg\n"
+    #croak __methname()," : No sheet is defined in $pkg\n"
+    confess __methname()," : No sheet is defined in $pkg\n"
   };
 }
 
@@ -2119,15 +2121,16 @@ sub insert_cols($@) {
 }
 sub insert_col($$) { goto &insert_cols }
 
-# sort_rows {compare function}
-# sort_rows {compare function} $first_rx, $last_rx
-sub sort_rows(&) {
-  my $self = &__selfmust;
-  croak "bad args" unless @_ == 1;
+# Internal function which looks back two levels to get caller's package
+# Returns [list of row indicies] but does not actually change anything.
+# In list context, returns ( [list of row indicies], $first_rx, $last_rx )
+sub _internal_sort_indicies {
+  my $self = shift;
+  croak "bad args" unless @_ == 1 or @_ == 3;
   my ($cmpfunc, $first_rx, $last_rx) = @_;
 
-  my ($rows, $linenums, $title_rx, $first_data_rx, $last_data_rx)
-       = @$$self{qw/rows linenums title_rx first_data_rx last_data_rx/};
+  my ($rows, $title_rx, $first_data_rx, $last_data_rx)
+       = @$$self{qw/rows title_rx first_data_rx last_data_rx/};
 
   $first_rx //= $first_data_rx
                  // (defined($title_rx) ? $title_rx+1 : 0);
@@ -2137,7 +2140,7 @@ sub sort_rows(&) {
 
   oops unless defined($first_rx);
   oops unless defined($last_rx);
-  my $pkg = caller;
+  my $pkg = (caller(1))[0];
   my @indicies = sort {
       my @row_indicies = ($a, $b);
       no strict 'refs';
@@ -2145,11 +2148,39 @@ sub sort_rows(&) {
       local ${ "$pkg\::b" } = $rows->[$b];
       $cmpfunc->(@row_indicies)
   } ($first_rx..$last_rx);
+  oops unless wantarray;
+  return( \@indicies, $first_rx, $last_rx );
+}
 
-  @$rows[$first_rx..$#$rows] = @$rows[@indicies];
-  @$linenums[$first_rx..$#$rows] = @$linenums[@indicies];
+# sort_row_indicies {compare function}
+# sort_row_indicies {compare function} $first_rx, $last_rx
+#
+# Returns [list of row indicies] but does not actually change anything.
+# In list context, returns ( [list of row indicies], $first_rx, $last_rx )
+sub sort_indicies(&;$$) {
+  my $self = &__selfmust;
+  my ($indicies, $first_rx, $last_rx) = $self->_internal_sort_indicies(@_);
+  if (wantarray) {
+    return( $indicies, $first_rx, $last_rx );
+  }
+  elsif (defined wantarray) {
+    return $indicies;
+  }
+  else { croak __methname, " returns [rx list], first_rx, last_rx"; }
+}
 
-  __validate_not_scalar_context(0..$first_rx-1, @indicies, $last_rx+1..$#$rows)
+
+# sort_rows {compare function}
+# sort_rows {compare function} $first_rx, $last_rx
+sub sort_rows(&;$$) {
+  my $self = &__selfmust;
+  my ($indicies, $first_rx, $last_rx) = $self->_internal_sort_indicies(@_);
+
+  my ($rows, $linenums) = @$$self{qw/rows linenums/};
+  @$rows[$first_rx..$#$rows] = @$rows[@$indicies];
+  @$linenums[$first_rx..$#$rows] = @$linenums[@$indicies];
+
+  __validate_not_scalar_context(0..$first_rx-1, @$indicies, $last_rx+1..$#$rows)
 }
 
 sub delete_cols(@) {
@@ -2861,8 +2892,16 @@ sub write_csv(*;@) {
 # {col_formats} is required
 # Unless {sheetname} is specified, the sheet name is the outpath basename
 #   sans any suffix
+#
+# If the specified output file is a csv this is the same as write_csv().
+#
 sub write_spreadsheet(*;@) {
   my ($self, $opts, $outpath) = &__self_opthash_1arg;
+
+  if ($outpath =~ /\.csv$/i) {
+    goto &write_csv;
+  }
+
   my $colx = $$self->{colx};
 
   log_methcall $self, [$opts, $outpath] if $$self->{verbose};
@@ -3024,14 +3063,14 @@ sub TIEARRAY {
 sub FETCH {
   my ($this, $index) = @_;
   my $aref = $this->[0];
-  croak "Index ",u($index)," is invalid or out of range"
+  croak "Row index ",u($index)," is invalid or out of range"
     unless $index >= 0 && $index <= $#$aref;
   $aref->[$index];
 }
 sub STORE {
   my ($this, $index, $val) = @_;
   my ($aref, $sheet) = @$this;
-  croak "Index ",u($index)," is invalid or out of range"
+  croak "Row index ",u($index)," is invalid or out of range"
     unless $index >= 0 && $index <= $#$aref+1;
   croak "Value must be a ref to array of cell values (not $val)"
     if ! Spreadsheet::Edit::__looks_like_aref($val);
@@ -3786,6 +3825,13 @@ RETURNS: A list of the previous row indicies of all rows in the sheet.
     sort_rows { my ($rxa, $rxb) = @_;
                 $rows[$rxa]{LName} cmp $rows[$rxb]{LName}
               };
+
+=head2 sort_indicies {rx cmp function}
+
+=head2 sort_indicies {rx cmp function} $first_rx, $last_rx
+
+Like C<sort_rows> but returns [ref to array of rx values] indicating
+the sorted row order without actually chaning the sheet (rows are not moved).
 
 =head2 rename_cols COLSPEC, "new title", ... ;
 

@@ -5,11 +5,14 @@ author:
 build_requires:
   File::Spec: '0'
   File::Temp: '0'
+  FindBin: '0'
   IO::Handle: '0'
   IPC::Open3: '0'
+  Test2::Plugin::ExitSummary: '0'
+  Test2::Plugin::NoWarnings: '0'
+  Test2::Plugin::Times: '0'
   Test2::V0: '0'
   Test::More: '0.94'
-  ok: '0'
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: '0'
@@ -22,7 +25,7 @@ name: Dancer2-Plugin-NYTProf
 provides:
   Dancer2::Plugin::NYTProf:
     file: lib/Dancer2/Plugin/NYTProf.pm
-    version: '0.0100'
+    version: '0.0101'
 requires:
   Dancer2::FileUtils: '0'
   Dancer2::Plugin: '0'
@@ -30,7 +33,7 @@ requires:
   Devel::NYTProf::Data: '0'
   File::Which: '0'
   File::stat: '0'
-version: '0.0100'
+version: '0.0101'
 x_BuiltWith:
   modules:
     Dancer2::FileUtils: '0.400001'
@@ -42,11 +45,14 @@ x_BuiltWith:
     File::Temp: '0.2311'
     File::Which: '1.27'
     File::stat: '1.09'
+    FindBin: '1.52'
     IO::Handle: '1.46'
     IPC::Open3: '1.21'
+    Test2::Plugin::ExitSummary: '0.000155'
+    Test2::Plugin::NoWarnings: '0.09'
+    Test2::Plugin::Times: '0.000155'
     Test2::V0: '0.000155'
     Test::More: '1.302183'
-    ok: '1.302183'
   perl:
     original: v5.34.1
     qv: 1

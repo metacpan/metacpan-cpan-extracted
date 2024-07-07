@@ -92,7 +92,15 @@ on 'develop' => sub {
 };
 
 on 'test' => sub {
-	requires 'Test::More', '0.98';
+    requires 'Test::More', '0.98';
+
+    requires 'Carp';
+    requires 'common::sense';
+    requires 'File::Basename';
+    requires 'File::Path';
+    requires 'File::Slurper';
+    requires 'File::Spec';
+    requires 'Scalar::Util';
 };
 
 requires 'common::sense', '3.75';

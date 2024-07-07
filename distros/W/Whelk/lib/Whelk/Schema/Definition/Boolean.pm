@@ -1,5 +1,5 @@
 package Whelk::Schema::Definition::Boolean;
-$Whelk::Schema::Definition::Boolean::VERSION = '0.04';
+$Whelk::Schema::Definition::Boolean::VERSION = '0.06';
 use Whelk::StrictBase 'Whelk::Schema::Definition::_Scalar';
 use JSON::PP;
 use List::Util qw(none);

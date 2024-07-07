@@ -1,13 +1,14 @@
 ---
-abstract: 'functional interface for accessing database mysql and mariadb'
+abstract: 'a functional interface for accessing SQL databases (MySQL, MariaDB, Postgres and SQLite)'
 author:
   - 'Yaroslav O. Kosmina LL<mailto:dart@cpan.org>'
 build_requires:
+  DBD::SQLite: '1.74'
   Test::More: '0.98'
 configure_requires:
   Module::Build::Tiny: '0.035'
 dynamic_config: 0
-generated_by: 'Minilla/v3.1.19, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Minilla/v3.1.23, CPAN::Meta::Converter version 2.150010'
 license: gpl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -26,12 +27,11 @@ no_index:
 provides:
   Aion::Query:
     file: lib/Aion/Query.pm
-    version: v0.0.3
+    version: v0.0.4
   Aion::Query::Transaction:
     file: lib/Aion/Query.pm
 requires:
   Aion::Format: v0.0.3
-  DBD::SQLite: '1.74'
   common::sense: '0'
   config: '1.3'
   perl: v5.22.0
@@ -39,7 +39,7 @@ resources:
   bugtracker: https://github.com/darviarush/perl-aion-query/issues
   homepage: https://github.com/darviarush/perl-aion-query
   repository: https://github.com/darviarush/perl-aion-query.git
-version: 0.0.3
+version: 0.0.4
 x_authority: cpan:DART
 x_contributors:
   - 'Yaroslav O. Kosmina <dart@cpan.org>'

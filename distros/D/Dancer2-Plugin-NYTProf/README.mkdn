@@ -4,7 +4,7 @@ Dancer2::Plugin::NYTProf - NYTProf, in your Dancer2 application!
 
 # VERSION
 
-version 0.0100
+version 0.0101
 
 # SYNOPSIS
 

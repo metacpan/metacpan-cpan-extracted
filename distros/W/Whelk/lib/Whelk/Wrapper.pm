@@ -1,5 +1,5 @@
 package Whelk::Wrapper;
-$Whelk::Wrapper::VERSION = '0.04';
+$Whelk::Wrapper::VERSION = '0.06';
 use Kelp::Base;
 
 use Try::Tiny;
@@ -65,7 +65,7 @@ sub inhale_request
 	}
 
 	if ($endpoint->request) {
-		$app->stash->{request} = $endpoint->request->inhale_exhale(
+		$req->stash->{request} = $endpoint->request->inhale_exhale(
 			$endpoint->formatter->get_request_body($app),
 			sub {
 				Whelk::Exception->throw(400, hint => "Content error at: $_[0]");
@@ -137,7 +137,7 @@ sub execute
 	my ($success, $data);
 	try {
 		$self->inhale_request($app, $endpoint);
-		$data = $endpoint->code->($app, @args);
+		$data = $endpoint->code->($app->context->current, @args);
 		$success = 1;
 	}
 	catch {
@@ -215,7 +215,7 @@ sub wrap
 	$self->build_response_schemas($endpoint);
 
 	return sub {
-		my $app = shift;
+		my $app = shift->context->app;
 
 		my $prepared = $self->prepare_response(
 			$app,
@@ -256,4 +256,145 @@ sub build_response_schemas
 }
 
 1;
+
+__END__
+
+=pod
+
+=head1 NAME
+
+Whelk::Wrapper - Base class for wrappers
+
+=head1 SYNOPSIS
+
+	package Whelk::Wrapper::MyWrapper;
+
+	use Kelp::Base 'Whelk::Wrapper';
+
+	# at the very least, there three methods must be implemented
+
+	sub wrap_server_error
+	{
+		my ($self, $error) = @_;
+
+		...;
+	}
+
+	sub wrap_success
+	{
+		my ($self, $data) = @_;
+
+		...;
+	}
+
+	sub build_response_schemas
+	{
+		my ($self, $endpoint) = @_;
+
+		...;
+	}
+
+=head1 DESCRIPTION
+
+Whelk::Wrapper is a base class for wrappers. Wrapper's job is to wrap the
+endpoint handler in necessary logic: validating request and response data,
+adding extra data to responses and error handling. Wrappers do not handle
+encoding requests and responses (for example with C<JSON>), that's a job for
+L<Whelk::Formatter>.
+
+In addition, wrapper decides how to treat failures. It defines schemas for
+errors with status classes 400 and 500 and uses those instead of response
+schema defined for the endpoint in case an error occurs.
+
+Whelk implements two basic wrappers which can be used out of the box:
+L<Whelk::Wrapper::Simple> (the default) and L<Whelk::Wrapper::WithStatus>. They
+are very similar and differ in how they wrap the response data - C<WithStatus>
+wrapper introduces an extra boolean C<status> field to every response.
+
+It should be pretty easy to subclass a wrapper if needed. Take a look at the
+built in subclasses and at the code of this class to get the basic idea.
+
+=head1 METHODS
+
+The only wrapper method called from outside is C<wrap>. All the other methods
+are helpers which make it easier to adjust the behavior without rewriting it
+from scratch.
+
+The base C<Whelk::Wrapper> class does not implement C<wrap_server_error>,
+C<wrap_success> and C<build_response_schemas> methods - they have to be
+implemented in a subclass.
+
+=head2 wrap
+
+	my $wrapped_sub = $wrapper->wrap($sub);
+
+Takes a reference to a subroutine and returns a reference to another
+subroutine. The returned subroutine is an outer code to be called by Kelp as
+route handler. It does all the Whelk-specific behavior and calls the inner
+subroutine to get the actual result of the API call.
+
+=head2 wrap_response
+
+	my $response = $wrapper->wrap_response($response, $http_code);
+
+This method is used to wrap C<$response> returned by Kelp route handler. The
+default implementation takes a look at the C<$http_code> and fires one of
+C<wrap_success> (for codes 2XX), C<wrap_server_error> (for codes 5XX) or
+C<wrap_client_error> (for codes 4XX). The wrapped response must be matching the
+respone schema defined in L</build_response_schemas> or else an exception will
+be thrown.
+
+=head2 build_response_schemas
+
+	$wrapper->build_response_schemas($endpoint)
+
+Takes an object of L<Whelk::Endpoint> class and should set C<response_schemas>
+field of that object. That field must contain a hash reference where each key
+will be response code and each value will be a schema built using
+L<Whelk::Schema/build>. Regular success schema should nest the value of C<<
+$endpoint->response >> schema inside of it.
+
+The status codes need not to be exact. By default, only their class is
+important (C<200>, C<400> or C<500>). The exact semantics of that mapping is
+defined in another method, L</map_code_to_schema>.
+
+If the schema from C<< $endpoint->response >> is empty via C<<
+$endpoint->response->empty >> then it must be added to C<response_schemas> as
+is to correctly be mapped to C<204 No Body> HTTP status.
+
+=head2 inhale_request
+
+This is a helper method which validates the request. It may be overridden for
+extra behavior.
+
+To ensure C<request_body> method works, it must set C<<
+$app->req->stash->{request} >> after validating and cleaning the request body.
+
+=head2 execute
+
+This is a helper method which runs the actual route handler in a try/catch
+block. It may be overridden for extra behavior.
+
+=head2 prepare_response
+
+This is a helper method which prepares a response to be passed to
+L</exhale_response>. It may be overridden for extra behavior.
+
+=head2 exhale_response
+
+This is a helper method which validates and returns a response. It may be
+overridden for extra behavior.
+
+=head2 map_code_to_schema
+
+This is a helper method which decides which key from C<response_schemas> of the
+endpoint to use based on HTTP code of the response. It may be overridden for
+extra behavior.
+
+=head2 on_error
+
+This is a helper method which decides what to do when an unexpected error
+occurs. By default, it creates an application log and modifies the result
+message to return a stock HTTP message like C<Internal Server Error>. It may be
+overridden for extra behavior.
 

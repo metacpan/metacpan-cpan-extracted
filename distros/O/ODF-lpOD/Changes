@@ -1,3 +1,7 @@
+2.001   2024-07-06
+  - Remove use of deprecated smartmatch operator (thanks Jim Avera)
+    (Note: this will affect functions that used the smartmatch
+    operator directly, see lpOD::Tutorial for more info)
 1.200   2024-04-06
   - Remove given/when constructs (thanks Jim Avera)
   - Silence "Unknown method DESTROY" warnings

@@ -1,9 +1,9 @@
 package Whelk::Schema::Definition::Array;
-$Whelk::Schema::Definition::Array::VERSION = '0.04';
+$Whelk::Schema::Definition::Array::VERSION = '0.06';
 use Whelk::StrictBase 'Whelk::Schema::Definition';
 
-attr items => undef;
-attr lax => !!0;
+attr '?items' => undef;
+attr '?lax' => !!0;
 
 sub openapi_dump
 {

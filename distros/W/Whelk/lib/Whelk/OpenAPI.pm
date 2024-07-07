@@ -1,5 +1,5 @@
 package Whelk::OpenAPI;
-$Whelk::OpenAPI::VERSION = '0.04';
+$Whelk::OpenAPI::VERSION = '0.06';
 use Kelp::Base;
 use List::Util qw(uniq);
 
@@ -180,4 +180,74 @@ sub generate
 }
 
 1;
+
+__END__
+
+=pod
+
+=head1 NAME
+
+Whelk::OpenAPI - Whelk's default OpenAPI generator class
+
+=head1 SYNOPSIS
+
+	# whelk_config.pl
+	###################
+	{
+		openapi => {
+			path => '/openapi',
+			class => 'MyOpenAPI',
+		}
+	}
+
+	# MyOpenAPI.pm
+	################
+	package MyOpenAPI;
+
+	use Kelp::Base 'Whelk::OpenAPI';
+
+	sub parse {
+		my ($self, %data) = @_;
+
+		# do the parsing differently
+		...
+	}
+
+	1;
+
+=head1 DESCRIPTION
+
+This class generates an OpenAPI document based on the API definition gathered
+by Whelk. It requires pretty specific setup and should probably not be
+manipulated by hand. It can be subclassed to change how the document looks.
+
+This documentation page describes just the methods which are called from
+outside of the class. The rest of methods and all attributes are just
+implementation details.
+
+=head1 METHODS
+
+=head2 parse
+
+	$openapi->parse(%data);
+
+It's called at build time, after Whelk is finalized. It gets passed a hash
+C<%data> with a couple of keys containing full data Whelk gathered. It should
+build most of the parts of the OpenAPI document, so that it will not be
+terribly slow to generate the document at runtime.
+
+=head2 location_for_schema
+
+	my $location = $openapi->location_for_schema($schema_name);
+
+This helper should just return a string which will be put into C<'$ref'> keys
+of the OpenAPI document to reference named schemas.
+
+=head2 generate
+
+	my $openapi_document_data = $openapi->generate;
+
+This method should take all the data prepared by L</parse> and return a hash
+reference with all the data of the OpenAPI document. This data will be then
+serialized using formatter declared in C<openapi> configuration.
 

@@ -1,14 +1,14 @@
 package Whelk::Endpoint::Parameters;
-$Whelk::Endpoint::Parameters::VERSION = '0.04';
-use Kelp::Base;
+$Whelk::Endpoint::Parameters::VERSION = '0.06';
+use Whelk::StrictBase;
 
 use Carp;
 use Whelk::Schema;
 
-attr -path => sub { {} };
-attr -query => sub { {} };
-attr -header => sub { {} };
-attr -cookie => sub { {} };
+attr '?-path' => sub { {} };
+attr '?-query' => sub { {} };
+attr '?-header' => sub { {} };
+attr '?-cookie' => sub { {} };
 
 attr -path_schema => sub { $_[0]->build_schema($_[0]->path, required => 1) };
 attr -query_schema => sub { $_[0]->build_schema($_[0]->query, array => 1) };

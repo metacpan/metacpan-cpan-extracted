@@ -11,8 +11,8 @@ package Spreadsheet::Edit::IO;
 
 # Allow "use <thismodule. VERSION ..." in development sandbox to not bomb
 { no strict 'refs'; ${__PACKAGE__."::VER"."SION"} = 1999.999; }
-our $VERSION = '1000.014'; # VERSION from Dist::Zilla::Plugin::OurPkgVersion
-our $DATE = '2024-02-18'; # DATE from Dist::Zilla::Plugin::OurDate
+our $VERSION = '1000.015'; # VERSION from Dist::Zilla::Plugin::OurPkgVersion
+our $DATE = '2024-07-06'; # DATE from Dist::Zilla::Plugin::OurDate
 
 # This module is derived from the old never-released Text:CSV::Spreadsheet
 

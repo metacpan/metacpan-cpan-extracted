@@ -1,4 +1,7 @@
 Release history for Catalyst-Plugin-Flash
 
+0.002 Sat 07 Jul 2024
+	- Silenced warning on empty cookies
+
 0.001 Tue 09 Apr 2024
 	- Initial release.

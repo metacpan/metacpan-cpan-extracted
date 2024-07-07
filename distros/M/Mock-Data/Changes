@@ -1,3 +1,6 @@
+0.04 - 2024-07-06
+  - Fix bug in Mock::Data::Regex parsing adjacent capture groups
+
 0.03 - 2021-09-25
   - New plugins: Number, Net, SQLTypes
   - Mock::Data::load_plugin now accepts a list of plugin names

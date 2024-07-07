@@ -1,20 +1,22 @@
 package Whelk::Endpoint;
-$Whelk::Endpoint::VERSION = '0.04';
+$Whelk::Endpoint::VERSION = '0.06';
 use Whelk::StrictBase;
 use Carp;
 use Whelk::Schema;
+use Whelk::Endpoint::Parameters;
 
-attr -id => sub { $_[0]->route->has_name ? $_[0]->route->name : undef };
-attr -summary => undef;
-attr -description => undef;
+attr '?-id' => sub { $_[0]->route->has_name ? $_[0]->route->name : undef };
+attr '?-summary' => undef;
+attr '?-description' => undef;
 attr -resource => sub { croak 'resource is required in endpoint' };
 attr -route => sub { croak 'route is required in endpoint' };
-attr -code => sub { croak 'code is required in endpoint' };
 attr -formatter => sub { croak 'formatter is required in endpoint' };
+attr -wrapper => sub { croak 'wrapper is required in endpoint' };
+attr code => undef;
 attr path => undef;
-attr request => undef;
-attr response => undef;
-attr parameters => undef;
+attr '?request' => undef;
+attr '?response' => undef;
+attr '?parameters' => undef;
 
 # to be built in wrapers
 attr -response_schemas => sub { {} };
@@ -39,6 +41,10 @@ sub new
 	$self->parameters->query_schema;
 	$self->parameters->header_schema;
 	$self->parameters->cookie_schema;
+
+	# wrap the endpoint sub
+	$self->code($self->route->dest->[1]);
+	$self->route->dest->[1] = $self->wrapper->wrap($self);
 
 	return $self;
 }
@@ -68,14 +74,6 @@ sub _build_path
 	$path =~ s/\0//g;
 
 	return $path;
-}
-
-sub wrap
-{
-	my ($self, $controller) = @_;
-
-	$self->route->dest->[0] //= ref $controller;    # make sure plain subs work
-	$self->route->dest->[1] = $controller->_whelk_config('wrapper')->wrap($self);
 }
 
 1;

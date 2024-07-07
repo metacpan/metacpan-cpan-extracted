@@ -7,7 +7,7 @@ build_requires:
 configure_requires:
   Module::Build::Tiny: '0.035'
 dynamic_config: 0
-generated_by: 'Minilla/v3.1.19, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Minilla/v3.1.23, CPAN::Meta::Converter version 2.150010'
 license: gpl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -26,7 +26,7 @@ no_index:
 provides:
   Liveman:
     file: lib/Liveman.pm
-    version: '3.1'
+    version: '3.2'
   Liveman::Append:
     file: lib/Liveman/Append.pm
   Liveman::MinillaPod2Markdown:
@@ -57,7 +57,7 @@ resources:
   bugtracker: https://github.com/darviarush/perl-liveman/issues
   homepage: https://github.com/darviarush/perl-liveman
   repository: https://github.com/darviarush/perl-liveman.git
-version: '3.1'
+version: '3.2'
 x_authority: cpan:DART
 x_contributors:
   - 'Yaroslav O. Kosmina <dart@cpan.org>'

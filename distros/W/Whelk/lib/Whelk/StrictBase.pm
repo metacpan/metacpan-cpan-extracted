@@ -1,11 +1,13 @@
 package Whelk::StrictBase;
-$Whelk::StrictBase::VERSION = '0.04';
+$Whelk::StrictBase::VERSION = '0.06';
 use strict;
 use warnings;
 
 use parent 'Kelp::Base';
 use Kelp::Util;
 use Carp;
+use List::Util ();
+use Text::Levenshtein ();
 
 my %class_attributes;
 
@@ -13,10 +15,14 @@ sub attr
 {
 	my ($class, $name, $default) = @_;
 
+	# names starting with a question mark will be used to suggest proper key to
+	# the user
+	my $for_user = $name =~ s/^\?//;
+
 	my $ret = Kelp::Base::attr($class, $name, $default);
 
 	$name =~ s/^-//;
-	$class_attributes{$class}{$name} = 1;
+	$class_attributes{$class}{$name} = $for_user;
 
 	return $ret;
 }
@@ -54,30 +60,12 @@ sub import
 my $find_closest = sub {
 	my ($class, $key) = @_;
 
-	my @all = keys %{$class_attributes{$class}};
-	@all = sort @all, $key;
+	my @options = grep { $class_attributes{$class}{$_} } keys %{$class_attributes{$class}};
+	my @distances = Text::Levenshtein::distance($key, @options);
+	my $min = List::Util::min(@distances);
+	return () unless defined $min && $min < 4;
 
-	# in case $key ended up as index 0 or last
-	unshift @all, undef;
-	push @all, undef;
-
-	shift @all while $all[1] ne $key;
-	my @options = grep { defined } @all[0, 2];
-
-	return undef if @options == 0;
-	return $options[0] if @options == 1;
-
-	# decide which option to present by checking the longest substring, but
-	# only if at least two letters match.
-	for my $len (reverse 2 .. length $key) {
-		my $substr = lc substr $key, 0, $len;
-		foreach my $other (@options) {
-			return $other
-				if $substr eq lc substr $other, 0, $len;
-		}
-	}
-
-	return undef;
+	return map { $options[$_] } grep { $distances[$_] == $min } keys @options;
 };
 
 sub new
@@ -85,11 +73,11 @@ sub new
 	my ($class, %params) = @_;
 
 	foreach my $key (keys %params) {
-		if (!$class_attributes{$class}{$key}) {
-			my $closest = $find_closest->($class, $key);
-			my $closest_sentence = defined $closest ? ". Did you mean $closest?" : '';
+		if (!defined $class_attributes{$class}{$key}) {
+			my @closest = $find_closest->($class, $key);
+			my $hint = join ' or ', map { "'$_'" } @closest;
 
-			croak "attribute $key is not valid for class $class" . $closest_sentence;
+			croak "attribute '$key' is not valid for class $class" . ($hint ? ". Did you mean $hint?" : '');
 		}
 	}
 
