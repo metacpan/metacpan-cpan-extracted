@@ -47,8 +47,8 @@
 %# END BPS TAGGED BLOCK }}}
 <div class="help" id="rt-help-text">
 <&| /Widgets/TitleBox, title => loc('FormTools Configuration') &>
-<p>Build your form using the tools below. To create new pages for a multi-page form, click the plus (+). To change the order of pages, click the gear and update the Sort order. To remove a page, click the gear and click Delete. Make sure to Save Changes at the bottom of the form after any updates.<p>
+<p><&|/l&>Build your form using the tools below. To create new pages for a multi-page form, click the plus (+). To change the order of pages, click the gear and update the Sort order. To remove a page, click the gear and click Delete. Make sure to Save Changes at the bottom of the form after any updates.</&><p>
 
-<p>To create your form, drag components from the Components box on the left to the Content area on the right. Click the pencil to edit components. Click the X to remove them. Click Save Changes to save the new page.</p>
+<p><&|/l&>To create your form, drag components from the Components box on the left to the Content area on the right. Click the pencil to edit components. Click the X to remove them. Click Save Changes to save the new page.</&></p>
 </&>
 </div>

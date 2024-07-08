@@ -24,11 +24,41 @@ class R::OP::DoubleComplex {
   use Math;
   
   # Class Methods
-  static method c : R::NDArray::DoubleComplex ($x_data : Complex_2d[], $x_dim : int[] = undef) {
+  static method c : R::NDArray::DoubleComplex ($data : object of double[]|Complex_2d[]|R::NDArray::DoubleComplex, $dim : int[] = undef) {
     
-    my $x_ndarray = R::NDArray::DoubleComplex->new({dim => $x_dim, data => $x_data});
+    if ($data) {
+      if ($data is_type double[]) {
+        my $pairs = (double[])$data;
+        
+        my $pairs_length = @$pairs;
+        
+        unless ($pairs_length % 2 == 0) {
+          die "The pairs \$data must be devided by even number.";
+        }
+        
+        my $length = $pairs_length / 2;
+        
+        $data = new Complex_2d[$length];
+        
+        Fn->memcpy($data, 0, $pairs, 0, 8 * 2 * $length);
+      }
+      elsif ($data is_type Complex_2d[]) {
+        # Do nothing
+      }
+      elsif ($data is_type R::NDArray::DoubleComplex) {
+        unless ($dim) {
+          $dim = $data->(R::NDArray::DoubleComplex)->dim;
+        }
+        $data = $data->(R::NDArray::DoubleComplex)->data;
+      }
+      else {
+        die "The type of the data \data must be Complex_2d[] or R::NDArray::DoubleComplex.";
+      }
+    }
     
-    return $x_ndarray;
+    my $ndarray = R::NDArray::DoubleComplex->new({dim => $dim, data => $data});
+    
+    return $ndarray;
   }
   
   static method add : R::NDArray::DoubleComplex ($x_ndarray : R::NDArray::DoubleComplex, $y_ndarray : R::NDArray::DoubleComplex) {
@@ -821,38 +851,6 @@ class R::OP::DoubleComplex {
     return $ret_ndarray;
   }
   
-  static method complex : R::NDArray::DoubleComplex ($pairs : double[]) {
-    
-    unless ($pairs) {
-      die "The pairs \$pairs must be defined.";
-    }
-    
-    my $pairs_length = @$pairs;
-    
-    unless ($pairs_length % 2 == 0) {
-      die "The length of the pairs \$pairs must be even number.";
-    }
-    
-    my $length = $pairs_length / 2;
-    
-    my $ret_ndarray = &c(undef, [$length]);
-    my $ret_data = $ret_ndarray->data;
-    
-    for (my $i = 0; $i < $pairs_length; $i += 2) {
-      $ret_data->[$i]{re} = $pairs->[$i];
-      $ret_data->[$i]{im} = $pairs->[$i + 1];
-    }
-    
-    return $ret_ndarray;
-  }
-  
-  static method i : R::NDArray::DoubleComplex () {
-    
-    my $i = &complex([0.0,1.0]);
-    
-    return $i;
-  }
-  
   static method mean : R::NDArray::DoubleComplex ($x_ndarray : R::NDArray::DoubleComplex) {
     
     unless ($x_ndarray) {
@@ -981,6 +979,15 @@ class R::OP::DoubleComplex {
     for (my $i = 0; $i < $length; $i++) {
       $ret_data->[$i] = Math->cdiv($scalar, $x_data->[$i]);
     }
+    
+    return $ret_ndarray;
+  }
+  
+  static method i : R::NDArray::DoubleComplex () {
+    
+    my $x = Math->complex(0, 1);
+    
+    my $ret_ndarray = &c([$x]);
     
     return $ret_ndarray;
   }

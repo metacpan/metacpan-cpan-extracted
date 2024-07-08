@@ -10,7 +10,7 @@
 # Modules and declarations
 ##############################################################################
 
-package App::DocKnot::Generate 7.01;
+package App::DocKnot::Generate v8.0.0;
 
 use 5.024;
 use autodie;
@@ -24,12 +24,10 @@ use Template;
 use Text::Wrap qw(wrap);
 
 # Default output files for specific templates.
-#<<<
 my %DEFAULT_OUTPUT = (
     'readme'    => 'README',
     'readme-md' => 'README.md',
 );
-#>>>
 
 ##############################################################################
 # Generator functions
@@ -450,7 +448,7 @@ sub new {
     # Create and return the object.
     my $self = {
         config => $config,
-        width => $args_ref->{width} // 74,
+        width  => $args_ref->{width} // 74,
     };
     bless($self, $class);
     return $self;

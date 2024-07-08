@@ -2,7 +2,7 @@
 #
 # Tests for the spin part of the App::DocKnot::Update module API.
 #
-# Copyright 2022 Russ Allbery <rra@cpan.org>
+# Copyright 2022, 2024 Russ Allbery <rra@cpan.org>
 #
 # SPDX-License-Identifier: MIT
 
@@ -36,7 +36,7 @@ dircopy($input, "$tempdir")
 my $repo = Git::Repository->new(work_tree => "$tempdir");
 $repo->run(config => '--add', 'user.name', 'Test');
 $repo->run(config => '--add', 'user.email', 'test@example.com');
-$repo->run(add => '-A', q{.});
+$repo->run(add    => '-A', q{.});
 $repo->run(commit => '-q', '-m', 'Initial commit');
 
 # Update the tree.
@@ -48,10 +48,16 @@ my $expected = path('t', 'data', 'spin', 'update', 'output');
 my $count = is_spin_output_tree("$tempdir", "$expected", 'Tree updated');
 my @status = sort $repo->run('status', '-s');
 my @changes = (
+    'A  changes.spin',
+    'A  license.spin',
     'A  module.spin',
+    'A  racc.spin',
     'A  readme.spin',
     'A  script.spin',
+    'D  changes.faq',
+    'D  license.faq',
     'D  module.rpod',
+    'D  racc.faq',
     'D  readme.rpod',
     'D  script.rpod',
 );

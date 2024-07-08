@@ -2,7 +2,7 @@
 #
 # Tests for the App::DocKnot::Release module API.
 #
-# Copyright 2022 Russ Allbery <rra@cpan.org>
+# Copyright 2022, 2024 Russ Allbery <rra@cpan.org>
 #
 # SPDX-License-Identifier: MIT
 
@@ -15,7 +15,7 @@ use lib 't/lib';
 use Git::Repository ();
 use Path::Tiny qw(path);
 
-use Test::More tests => 34;
+use Test::More tests => 51;
 
 # Isolate from the environment.
 local $ENV{XDG_CONFIG_HOME} = '/nonexistent';
@@ -43,8 +43,8 @@ for my $ext (@extensions) {
 my $metadata = path('t', 'data', 'dist', 'package', 'docs', 'docknot.yaml');
 my %options = (
     archivedir => $archive_path,
-    distdir => $dist_path,
-    metadata => $metadata,
+    distdir    => $dist_path,
+    metadata   => $metadata,
 );
 my $release = App::DocKnot::Release->new(\%options);
 $release->release();
@@ -68,14 +68,14 @@ my $spin_path = $tempdir->child('spin');
 $spin_path->mkpath();
 my $versions_path = $spin_path->child('.versions');
 $versions_path->spew_utf8(
-    "foo    1.0  2021-12-14 17:31:32  software/foo/index.th\n",
-    "empty  1.9  2022-01-01 16:00:00  software/empty/index.th\n",
+    "foo    1.0     2021-12-14 17:31:32  software/foo/index.th\n",
+    "empty  1.9     2022-01-01 16:00:00  software/empty/index.th\n",
 );
 Git::Repository->run('init', { cwd => "$spin_path", quiet => 1 });
 my $repo = Git::Repository->new(work_tree => "$spin_path");
 $repo->run(config => '--add', 'user.name', 'Test');
 $repo->run(config => '--add', 'user.email', 'test@example.com');
-$repo->run(add => '-A', q{.});
+$repo->run(add    => '-A', q{.});
 $repo->run(commit => '-q', '-m', 'Initial commit');
 
 # Construct a configuration file.
@@ -126,3 +126,31 @@ is($versions[4], 'software/empty/index.th', '...dependency unchanged');
 # Check that the change was staged.
 my $status = $repo->run('status', '-s');
 is($status, ' M .versions', '.versions change was staged');
+
+# Make an additional release with a v-based version number.
+for my $ext (@extensions) {
+    $dist_path->child('Empty-v2.0.0.' . $ext)->touch();
+}
+$release = App::DocKnot::Release->new({ metadata => $metadata });
+$release->release();
+
+# Check that the files were copied correctly, the symlinks were created, and
+# the old files were moved.  Check that the old files were copied to the
+# archive directory.
+for my $ext (@extensions) {
+    my $file = 'Empty-v2.0.0.' . $ext;
+    ok($archive_path->child('devel', $file)->is_file(), "Copied $file");
+    my $old = 'Empty-1.10.' . $ext;
+    ok(!$archive_path->child('devel', $old)->is_file(), "Removed $old");
+    ok(
+        $archive_path->child('ARCHIVE', 'Empty', $old)->is_file(),
+        "Archived $old",
+    );
+    my $link = 'Empty.' . $ext;
+    is(readlink($archive_path->child('devel', $link)), $file, "Updated $link");
+}
+
+# Check that the version file was updated.
+(undef, $versions_line) = $versions_path->lines_utf8();
+@versions = split(q{ }, $versions_line);
+is($versions[1], 'v2.0.0', '...version updated');

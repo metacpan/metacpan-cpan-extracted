@@ -8,7 +8,7 @@ version](https://img.shields.io/cpan/v/App-DocKnot)](https://metacpan.org/releas
 [![Debian
 package](https://img.shields.io/debian/v/docknot/unstable)](https://tracker.debian.org/pkg/docknot)
 
-Copyright 1999-2022 Russ Allbery <rra@cpan.org>.  This software is
+Copyright 1999-2024 Russ Allbery <rra@cpan.org>.  This software is
 distributed under a BSD-style license.  Please see the section
 [License](#license) below for more information.
 
@@ -66,7 +66,7 @@ The following additional Perl modules are required to use it:
 * IO::Uncompress::Gunzip (part of IO-Compress)
 * IPC::Run
 * IPC::System::Simple
-* JSON::MaybeXS
+* JSON::MaybeXS 1.004000 or later
 * Kwalify
 * List::SomeUtils 0.07 or later
 * Path::Iterator::Rule
@@ -137,9 +137,9 @@ will always have the current version of this package, the current
 documentation, and pointers to any additional resources.
 
 For bug tracking, use the [issue tracker on
-GitHub](https://github.com/rra/docknot/issues).  However, please be aware
-that I tend to be extremely busy and work projects often take priority.
-I'll save your report and get to it as soon as I can, but it may take me a
+GitHub](https://github.com/rra/docknot/issues).  Please be aware that I
+tend to be extremely busy and work projects often take priority.  I'll
+save your report and get to it as soon as I can, but it may take me a
 couple of months.
 
 ## Source Repository
@@ -161,7 +161,7 @@ requests are gratefully reviewed and normally accepted.
 The DocKnot package as a whole is covered by the following copyright
 statement and license:
 
-> Copyright 1999-2022
+> Copyright 1999-2024
 >     Russ Allbery <rra@cpan.org>
 >
 > Permission is hereby granted, free of charge, to any person obtaining a

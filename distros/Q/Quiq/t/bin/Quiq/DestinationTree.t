@@ -73,11 +73,11 @@ sub unit_teardown : Teardown(2) Group(^unit_) {
     my $self = shift;
 
     my $dir = $self->get('fixDir');
-    Quiq::Path->delete($dir,-sloppy=>0);
+    Quiq::Path->delete($dir);
     $self->ok(!-e $dir,'Fixture-Verzeichnis gelöscht');
 
     $dir = $self->testDir;
-    Quiq::Path->delete($dir,-sloppy=>0);
+    Quiq::Path->delete($dir);
     $self->ok(!-e $dir,'Test-Verzeichnis gelöscht');
 }
 

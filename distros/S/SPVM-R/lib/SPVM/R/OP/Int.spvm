@@ -24,11 +24,29 @@ class R::OP::Int {
   use IntList;
   
   # Class Methods
-  static method c : R::NDArray::Int ($x_data : int[], $x_dim : int[] = undef) {
+  static method c : R::NDArray::Int ($data : object of Int|int[]|R::NDArray::Int, $dim : int[] = undef) {
     
-    my $x_ndarray = R::NDArray::Int->new({dim => $x_dim, data => $x_data});
+    if ($data) {
+      if ($data is_type Int) {
+        $data = [(int)$data->(Int)];
+      }
+      elsif ($data is_type int[]) {
+        # Do nothing
+      }
+      elsif ($data is_type R::NDArray::Int) {
+        unless ($dim) {
+          $dim = $data->(R::NDArray::Int)->dim;
+        }
+        $data = $data->(R::NDArray::Int)->data;
+      }
+      else {
+        die "The type of the data \data must be Int, int[], or R::NDArray::Int.";
+      }
+    }
     
-    return $x_ndarray;
+    my $ndarray = R::NDArray::Int->new({dim => $dim, data => $data});
+    
+    return $ndarray;
   }
   
   precompile static method add : R::NDArray::Int ($x_ndarray : R::NDArray::Int, $y_ndarray : R::NDArray::Int) {
@@ -394,37 +412,6 @@ class R::OP::Int {
     return $ret_ndarray;
   }
   
-  precompile static method to_indexes : R::NDArray::Int ($x_ndarray : R::NDArray::Int) {
-    
-    unless ($x_ndarray) {
-      die "The n-dimension array \$x_ndarray must be defined.";
-    }
-    
-    unless ($x_ndarray->is_vector) {
-      die "The n-dimension array \$x_ndarray must be a vector.";
-    }
-    
-    my $length = $x_ndarray->length;
-    
-    my $indexes_list = IntList->new;
-    
-    my $x_data = $x_ndarray->data;
-    
-    for (my $i = 0; $i < $length; $i++) {
-      my $elem = $x_data->[$i];
-      
-      if ($elem) {
-        $indexes_list->push($i);
-      }
-    }
-    
-    my $ret_data = $indexes_list->to_array;
-    
-    my $ret_ndarray = R::OP::Int->c($ret_data);
-    
-    return $ret_ndarray;
-  }
-  
   precompile static method eq : R::NDArray::Int ($x_ndarray : R::NDArray::Int, $y_ndarray : R::NDArray::Int) {
     
     unless ($x_ndarray) {
@@ -759,13 +746,16 @@ class R::OP::Int {
     return $ret_ndarray;
   }
   
-  static method seq_length : R::NDArray::Int ($begin : int, $end : int, $length : int) {
-    
-    my $by = (int)(($end - $begin) / $length);
-    
-    my $ret_ndarray = &seq($begin, $end, $by);
-    
-    return $ret_ndarray;
+  static method undef : R::NDArray::Int () {
+    return (R::NDArray::Int)undef;
+  }
+  
+  static method rep : R::NDArray::Int ($x_ndarray : R::NDArray, $times : int) {
+    return (R::NDArray::Int)R::OP->rep($x_ndarray, $times);
+  }
+  
+  static method rep_length : R::NDArray::Int ($x_ndarray : R::NDArray, $length : int) {
+    return (R::NDArray::Int)R::OP->rep_length($x_ndarray, $length);
   }
   
 }

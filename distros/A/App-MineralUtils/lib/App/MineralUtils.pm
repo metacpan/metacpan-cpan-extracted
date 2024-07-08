@@ -6,9 +6,9 @@ use utf8;
 use warnings;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2024-07-05'; # DATE
+our $DATE = '2024-07-08'; # DATE
 our $DIST = 'App-MineralUtils'; # DIST
-our $VERSION = '0.013'; # VERSION
+our $VERSION = '0.014'; # VERSION
 
 our %SPEC;
 
@@ -732,6 +732,16 @@ our @calcium_forms = (
         summary => 'Calcium lactate (C6H10CaO6), in milligrams',
         tags => ['water-soluble'],
     },
+    { # source: pubchem
+        name => 'mg-ca-citrate-anhydrous',
+        iron_ratio => 40.078 / 498.4, # 8.04%
+        summary => 'Calcium citrate anhydrous (C12H10Ca3O14), in milligrams',
+    },
+    { # source: pubchem
+        name => 'mg-ca-citrate-tetrahydrate',
+        iron_ratio => 40.078 / 570.5, # 7.03%
+        summary => 'Calcium citrate tetrahydrate (C12H18Ca3O18) [most common hydrate form of Ca-citrate], in milligrams',
+    },
 );
 
 our %argspecs_calcium = (
@@ -836,7 +846,7 @@ App::MineralUtils - Utilities related to mineral supplements
 
 =head1 VERSION
 
-This document describes version 0.013 of App::MineralUtils (from Perl distribution App-MineralUtils), released on 2024-07-05.
+This document describes version 0.014 of App::MineralUtils (from Perl distribution App-MineralUtils), released on 2024-07-08.
 
 =head1 DESCRIPTION
 
@@ -900,6 +910,16 @@ Result:
        amount  => 5.43478260869565,
        unit    => "mg-ca-lactate",
        summary => "Calcium lactate (C6H10CaO6), in milligrams",
+     },
+     {
+       amount  => 12.5,
+       unit    => "mg-ca-citrate-anhydrous",
+       summary => "Calcium citrate anhydrous (C12H10Ca3O14), in milligrams",
+     },
+     {
+       amount  => 14.2857142857143,
+       unit    => "mg-ca-citrate-tetrahydrate",
+       summary => "Calcium citrate tetrahydrate (C12H18Ca3O18) [most common hydrate form of Ca-citrate], in milligrams",
      },
    ],
    {
@@ -981,13 +1001,13 @@ Result:
      },
    ],
    {
+     "table.field_aligns"  => ["number", "left", "left"],
      "table.field_formats" => [
-                                ["number", { precision => 3, thousands_sep => "" }],
+                                ["number", { thousands_sep => "", precision => 3 }],
                                 undef,
                                 undef,
                               ],
      "table.fields"        => ["amount", "unit", "summary"],
-     "table.field_aligns"  => ["number", "left", "left"],
    },
  ]
 
@@ -1214,8 +1234,8 @@ Result:
      },
    ],
    {
-     "table.field_aligns"  => ["number", "left", "left"],
      "table.fields"        => ["amount", "unit", "summary"],
+     "table.field_aligns"  => ["number", "left", "left"],
      "table.field_formats" => [
                                 ["number", { thousands_sep => "", precision => 3 }],
                                 undef,
@@ -1345,12 +1365,12 @@ Result:
      },
    ],
    {
-     "table.field_aligns"  => ["number", "left", "left"],
      "table.field_formats" => [
-                                ["number", { thousands_sep => "", precision => 3 }],
+                                ["number", { precision => 3, thousands_sep => "" }],
                                 undef,
                                 undef,
                               ],
+     "table.field_aligns"  => ["number", "left", "left"],
      "table.fields"        => ["amount", "unit", "summary"],
    },
  ]
@@ -1465,10 +1485,10 @@ Result:
      },
    ],
    {
-     "table.field_aligns"  => ["number", "left", "left"],
      "table.fields"        => ["amount", "unit", "summary"],
+     "table.field_aligns"  => ["number", "left", "left"],
      "table.field_formats" => [
-                                ["number", { thousands_sep => "", precision => 3 }],
+                                ["number", { precision => 3, thousands_sep => "" }],
                                 undef,
                                 undef,
                               ],

@@ -9,7 +9,7 @@
 # Modules and declarations
 ##############################################################################
 
-package App::DocKnot::Spin::RSS 7.01;
+package App::DocKnot::Spin::RSS v8.0.0;
 
 use 5.024;
 use autodie;
@@ -429,7 +429,6 @@ sub _rss_output {
         }{ $1 . _absolute_url($2, $entry_ref->{link}) . qq{\"} }xmsge;
 
         # Convert this into an object suitable for the output template.
-        #<<<
         my $formatted_ref = {
             date        => $date,
             description => $description,
@@ -437,12 +436,10 @@ sub _rss_output {
             link        => $entry_ref->{link},
             title       => $entry_ref->{title},
         };
-        #>>>
         push(@formatted_entries, $formatted_ref);
     }
 
     # Generate the RSS output using the template.
-    #<<<
     my %vars = (
         base            => $metadata_ref->{base},
         description     => $metadata_ref->{description},
@@ -454,7 +451,6 @@ sub _rss_output {
         title           => $metadata_ref->{title},
         url             => $url,
     );
-    #>>>
     my $result;
     $self->{template}->process($self->{templates}{rss}, \%vars, \$result)
       or croak($self->{template}->error());
@@ -488,14 +484,12 @@ sub _thread_output {
         my $description = $entry_ref->{description};
         $description =~ s{ ^ }{    }xmsg;
         $description =~ s{ \\ }{\\\\}xmsg;
-        #<<<
         my $formatted_ref = {
             date        => $date,
             description => $description,
             link        => $entry_ref->{link},
             title       => $entry_ref->{title},
         };
-        #<<<
 
         # Add the entry to the appropriate month.
         if (!$last_month || $month ne $last_month) {
@@ -508,12 +502,10 @@ sub _thread_output {
     }
 
     # Generate the RSS output using the template.
-    #<<<
     my %vars = (
         prefix  => $metadata_ref->{'thread-prefix'},
         entries => \@entries_by_month,
     );
-    #>>>
     my $result;
     $self->{template}->process($self->{templates}{changes}, \%vars, \$result)
       or croak($self->{template}->error());
@@ -656,7 +648,6 @@ sub _index_output {
         }{$1 . _relative_url($2, $metadata_ref->{'index-base'}) . ']' }xmsge;
 
         # Add the entry to the list.
-        #<<<
         my $formatted_ref = {
             date  => $date,
             day   => $day,
@@ -664,18 +655,15 @@ sub _index_output {
             title => $entry_ref->{title},
             text  => $text,
         };
-        #>>>
         push(@formatted_entries, $formatted_ref);
     }
 
     # Generate the RSS output using the template.
-    #<<<
     my %vars = (
         prefix  => $metadata_ref->{'index-prefix'},
         suffix  => $metadata_ref->{'index-suffix'},
         entries => \@formatted_entries,
     );
-    #>>>
     my $result;
     $self->{template}->process($self->{templates}{index}, \%vars, \$result)
       or croak($self->{template}->error());
@@ -702,7 +690,6 @@ sub new {
     my $base = defined($args_ref->{base}) ? path($args_ref->{base}) : undef;
     my $tt = Template->new({ ABSOLUTE => 1, ENCODING => 'utf8' })
       or croak(Template->error());
-    #<<<
     my $self = {
         base     => $base,
         spin     => App::DocKnot::Spin::Thread->new(),
@@ -714,7 +701,6 @@ sub new {
         index   => $self->appdata_path('templates', 'index.tmpl'),
         rss     => $self->appdata_path('templates', 'rss.tmpl'),
     };
-    #>>>
     return $self;
 }
 

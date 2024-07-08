@@ -16,7 +16,7 @@ use Capture::Tiny qw(capture capture_stdout);
 use File::Copy::Recursive qw(dircopy);
 use Path::Tiny qw(path);
 use POSIX qw(LC_ALL setlocale);
-use Test::DocKnot::Spin qw(is_spin_output is_spin_output_tree);
+use Test::DocKnot::Spin qw(fix_pointers is_spin_output is_spin_output_tree);
 
 use Test::More;
 
@@ -54,18 +54,12 @@ $output->spew($stdout);
 is_spin_output($output, $expected, 'spin-thread (standard output)');
 
 # Copy the input tree to a new temporary directory since .rss files generate
-# additional thread files.  Replace the .spin pointer since it points to a
-# relative path in the source tree.
+# additional thread files.
 my $indir = Path::Tiny->tempdir();
 $input = $datadir->child('input');
 dircopy($input, $indir)
   or die "Cannot copy $input to $indir: $!\n";
-my $pod_source = path('lib', 'App', 'DocKnot.pm')->realpath();
-my $pointer_path = $indir->child(
-    'software', 'docknot', 'api', 'app-docknot.spin',
-);
-$pointer_path->chmod(0644);
-$pointer_path->spew_utf8("format: pod\n", "path: $pod_source\n");
+fix_pointers($indir, $input);
 
 # Spin a tree of files.
 $expected = $datadir->child('output');

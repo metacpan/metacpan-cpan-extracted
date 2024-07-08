@@ -25,11 +25,29 @@ class R::OP::Float {
   use FloatList;
   
   # Class Methods
-  static method c : R::NDArray::Float ($x_data : float[], $x_dim : int[] = undef) {
+  static method c : R::NDArray::Float ($data : object of Float|float[]|R::NDArray::Float, $dim : int[] = undef) {
     
-    my $x_ndarray = R::NDArray::Float->new({dim => $x_dim, data => $x_data});
+    if ($data) {
+      if ($data is_type Float) {
+        $data = [(float)$data->(Float)];
+      }
+      elsif ($data is_type float[]) {
+        # Do nothing
+      }
+      elsif ($data is_type R::NDArray::Float) {
+        unless ($dim) {
+          $dim = $data->(R::NDArray::Float)->dim;
+        }
+        $data = $data->(R::NDArray::Float)->data;
+      }
+      else {
+        die "The type of the data \data must be Float, float[], or R::NDArray::Float.";
+      }
+    }
     
-    return $x_ndarray;
+    my $ndarray = R::NDArray::Float->new({dim => $dim, data => $data});
+    
+    return $ndarray;
   }
   
   static method add : R::NDArray::Float ($x_ndarray : R::NDArray::Float, $y_ndarray : R::NDArray::Float) {
@@ -1353,37 +1371,51 @@ class R::OP::Float {
     return $ret_ndarray;
   }
   
-  static method seq : R::NDArray::Float ($x : float, $y : float, $by : float = 1) {
+  static method seq : R::NDArray::Float ($begin : float, $end : float, $by : float = 1) {
+    
+    if ($by == 0) {
+      die "\$by must not be 0.";
+    }
+    elsif ($by > 0) {
+      unless ($end >= $begin) {
+        die "\$end must be greater than or equal to \$begin if \$by is greater than 0.";
+      }
+    }
+    else {
+      unless ($end <= $begin) {
+        die "\$end must be less than or equal to \$begin if \$by is less than 0.";
+      }
+    }
     
     my $ret_data_list = FloatList->new;
-    my $current = $x;
+    my $current = $begin;
     while (1) {
       if ($by >= 0) {
-        if ($current <= $y) {
+        if ($current > $end) {
           last;
         }
       }
       else {
-        if ($current >= $y) {
+        if ($current < $end) {
           last;
         }
       }
-      $current += $by;
       $ret_data_list->push($current);
+      $current += $by;
     }
     
     my $ret_data = $ret_data_list->to_array;
     
-    my $ret_ndarray = &c($ret_data);
+    my $ret_ndarray = R::OP::Float->c($ret_data);
     
     return $ret_ndarray;
   }
   
-  static method seq_length : R::NDArray::Float ($x : float, $y : float, $length : int) {
+  static method seq_length : R::NDArray::Float ($begin : float, $end : float, $length : int) {
     
-    my $by = (float)(($y - $x) / $length);
+    my $by = (float)(($end - $begin) / $length);
     
-    my $ret_ndarray = &seq($x, $y, $by);
+    my $ret_ndarray = &seq($begin, $end, $by);
     
     return $ret_ndarray;
   }

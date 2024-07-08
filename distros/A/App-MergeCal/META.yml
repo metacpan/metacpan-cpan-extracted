@@ -27,5 +27,5 @@ requires:
 resources:
   bugtracker: https://github.com/davorg-cpan/app-mergecal/issues
   repository: https://github.com/davorg-cpan/app-mergecal.git
-version: v0.0.3
+version: v0.0.4
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

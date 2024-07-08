@@ -4,8 +4,8 @@ msgstr "#NAME"
 msgid "Aion::Query - функциональный интерфейс для доступа к базам данных SQL (MySQL, MariaDB, Postgres и SQLite)"
 msgstr "Aion::Query - a functional interface for accessing SQL databases (MySQL, MariaDB, Postgres and SQLite)"
 
-msgid "0.0.3"
-msgstr "0.0.3"
+msgid "0.0.5"
+msgstr "0.0.5"
 
 msgid "File .config.pm:"
 msgstr "File .config.pm:"
@@ -94,8 +94,11 @@ msgstr "Includes the result of another query into the result of a query."
 msgid "`$attach` содержит три ключа через двоеточие: ключ для присоединяемых данных, столбец из `$rows` и столбец из `$query`. По столбцам происходит объединение строк."
 msgstr "`$attach` contains three keys separated by a colon: the key for the data to be attached, a column from `$rows` and a column from `$query`. Rows are merged across columns."
 
-msgid "Если нужно указать другие ключи, то это делается через двоеточия в `$attach`: `attach:id:attach_id`."
-msgstr "If you need to specify other keys, this is done using colons in `$attach`: `attach:id:attach_id`."
+msgid "Возвращает функция массив с результатом запроса (`$query`), в который можно приаттачить ещё что-то."
+msgstr "The function returns an array with the result of the query (`$query`), into which you can attach something else."
+
+msgid "## query_col ($query, %params)"
+msgstr "## query_col ($query, %params)"
 
 msgid "Возвращает один столбец."
 msgstr "Returns one column."

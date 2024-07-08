@@ -56,3 +56,12 @@ Revision history for Multi::Dispatch
 
     * Fixed warning about __SUB__ when using Object::Pad
       (Thanks Ven!)
+
+
+0.000005  Mon Jul  8 10:39:05 2024
+
+    * Fixed warning about uninitialized value in array deref under role composition
+      (Thanks Ven!)
+
+    * Furher documented limitations (and workaround) for multimethods in roles.
+

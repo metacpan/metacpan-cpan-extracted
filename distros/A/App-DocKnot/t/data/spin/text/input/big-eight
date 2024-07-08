@@ -1,0 +1,273 @@
+$Id: big-eight,v 1.16 2020/12/06 00:43:12 eagle Exp $
+
+From: news.announce.newgroups Moderation Team <newgroups-request@isc.org>
+Subject: Guidelines for Big Eight Newsgroup Creation
+Newsgroups: news.announce.newgroups,news.groups
+Followup-To: news.groups
+Approved: newgroups-request@isc.org
+Expires: 35d
+
+Archive-name: usenet/creating-newsgroups/big-eight
+URL: https://www.eyrie.org/~eagle/faqs/big-eight.html
+Posting-frequency: monthly
+
+                 THE BIG EIGHT NEWSGROUP CREATION PROCESS
+
+NOTE: This document is now obsolete.  It is maintained solely for
+historical reference, but this process is no longer being used for the
+creation or modification of newsgroups in the Big Eight hierarchy.
+See <https://www.big-8.org/wiki/Main_Page> for information on how
+proposals are currently being handled.
+
+The text below is the unmodified text of the final version of this
+document.
+
+INTRODUCTION
+
+These guidelines document the process to create, rename, remove, or change
+the moderation status of newsgroups in the Big Eight hierarchies (those
+newsgroups with names starting with comp.*, humanities.*, misc.*, news.*,
+rec.*, sci.*, soc.*, and talk.*).  Proposals under this process must go
+through a discussion phase, a voting phase, and a verification phase as
+described below.
+
+For information on how to submit a proposal and advice on working within
+this process, please see the FAQs posted to news.announce.newgroups and
+news.groups.
+
+New group proponents should be aware that the entire process typically
+takes three months, and must be followed precisely.  Those who have not
+proposed a group before may wish to ask group-mentors at lists.eyrie.org
+for assistance.  Processes for creating groups in other hierarchies, such
+as alt.*, are often quite different and sometimes much less formal; please
+see the appropriate groups within those hierarchies for details.
+
+The goal of this process is to reach consensus on a relatively stable list
+of widely useful newsgroups that can be used without change at many Usenet
+sites.  A Usenet site should be able to use the results of this process to
+determine the list of newsgroups to carry and their moderation status
+without needing to separately evaluate at each site whether a given
+newsgroup should be added or dropped.  The process is biased in favor of
+stability and requires that new newsgroups meet a minimum standard of
+demonstrated interest.  The process also attempts to ensure new newsgroups
+are reasonably named, have an acceptable moderation policy if moderated,
+and would not have damaging effects on Usenet as a whole.
+
+Most of this procedure is at the discretion of the news.announce.newgroups
+(hereafter referred to as n.a.n) moderation team, who can be reached at
+newgroups-request@isc.org.  All subjective determinations, particularly in
+points 5-10, 12, 13, 24, 27, and 29 below, will be made by the n.a.n
+moderation team.
+
+These guidelines have been accepted by the n.a.n moderation team and may be
+changed at the sole discretion of the n.a.n moderation team.
+
+GENERAL RULE
+
+ 1. Only postings to news.announce.newgroups authorized by the n.a.n
+    moderation team are considered official in this process.  All time
+    limits and deadlines will be based on the Date headers of those posts.
+
+THE DISCUSSION
+
+ 2. A proposal officially begins with the posting of a Request for
+    Discussion (RFD) in news.announce.newgroups.  A valid RFD must contain
+    a rationale for the proposal, charters for all newsgroups which would
+    be created or changed, and moderator information sections for all
+    created or changed groups that are proposed to be moderated.  The RFD
+    must be crossposted to news.groups, should be crossposted to groups
+    likely to be affected by the proposal, and may be crossposted to other
+    related newsgroups.
+    
+    Crossposts to poorly propagated or regional newsgroups may be
+    disallowed at the discretion of the n.a.n moderation team.  Proposals
+    will only be posted or crossposted to moderated groups with the
+    explicit permission of the moderators of those groups.  The total
+    length of the Newsgroups header in the RFD (and CFV) must not exceed
+    200 characters, including "Newsgroups: ". The Followup-To header will
+    be set to news.groups only (but see point 11).  The RFD, after it has
+    been posted, may be redistributed freely.
+
+    Due to the crosspost filters of some large ISPs, it is recommended
+    (but not required) that proposals be crossposted to no more than five
+    groups (including n.a.n and news.groups).
+
+ 3. A proposal must consist of one or more of the following changes to Big
+    Eight newsgroups:  Create a new newsgroup, remove an existing
+    newsgroup (by subsuming it into an existing group), change the
+    moderation status of an existing newsgroup, or rename a newsgroup.  No
+    other types of proposals will be accepted, nor will proposals to
+    create, change, or remove newsgroups outside the Big Eight.  There is
+    currently a moratorium on converting unmoderated newsgroups to
+    moderated newsgroups, and proposals of that type will not be accepted.
+
+ 4. All proposed group names must be within the Big Eight hierarchies.  A
+    group name is made up of name components separated by '.' (period or
+    dot).  Each component must consist solely of lowercase ASCII letters,
+    digits, '+' (plus), or '-' (dash), must contain at least one letter
+    (a-z), and must be no more than twenty characters long.
+
+ 5. A proposal may include multiple changes if they are closely related,
+    but each individual change (as defined in point 3) will be voted on
+    separately.  The n.a.n moderation team may require closely-related
+    proposals submitted at the same time to be combined into a single RFD.
+    The n.a.n moderation team may also require that unrelated proposals
+    combined in a single RFD be split into multiple RFDs.  Once a proposal
+    has been posted as an RFD, the n.a.n moderation team will not require
+    that it be combined with another proposal, and instead overlapping
+    proposals will be dealt with according to point 8.
+
+ 6. A proposal that is substantially similar to a previous failed proposal
+    may not be made until at least six months after the close of voting on
+    the last such failed proposal.
+
+ 7. A proposal that significantly affects the same groups as a previous
+    successful proposal may not be made until at least three months after
+    the implementation (point 30) of the last such successful proposal.
+
+ 8. Two proposals with overlapping purposes, newsgroup names, or effects
+    may not proceed at the same time.  Precedence is normally given to the
+    first group to present a formal proposal, but repeat proposals under
+    point 6 above may be handled differently at the discretion of the
+    n.a.n moderation team (to prevent monopolization of a proposal).
+
+ 9. Proposals that unmoderate or change the moderator(s) of an actively
+    moderated group against the desire of the moderator(s) will be
+    rejected.
+
+10. Proposals may be rejected by the n.a.n moderation team in the
+    extremely rare circumstance that the proposal would be opposed by
+    the vast majority of news administrators or have a sufficiently
+    deleterious effect on the Big Eight as a whole as to make it
+    dangerously unworkable or extremely ill-advised (for example, a
+    proposal for a newsgroup where the act of posting on charter would be
+    almost universally illegal).
+
+11. All discussion of active proposals should be posted to news.groups.
+    If desired by the readership of closely affected groups, it may be
+    crossposted to those groups, but care must be taken to ensure that all
+    discussion appears in news.groups.
+
+12. Additional RFDs for a proposal may be posted as needed, as the
+    proposal changes in response to discussion.  An additional RFD is
+    needed if there have been major changes to the proposal or if 60 days
+    have passed since the previous RFD.  Examples of major changes include
+    any change to a group's name or moderation status or a significant
+    alteration to the charter.  Examples of minor changes not requiring an
+    additional RFD include the addition or removal of a proponent or
+    tidying up some wording in the rationale or charter.
+
+13. The discussion period must be a minimum of 21 days.  If a proposal
+    remains in the RFD phase for more than 120 days, the proposal may be
+    suspended and a competing proposal allowed to go forward.  If it has
+    been more than 120 days since the latest RFD for a proposal and a
+    Proponent Questionnaire (see point 14) was not submitted within 60
+    days of the latest RFD, the proposal will be considered withdrawn.
+
+THE VOTE
+
+14. Success or failure of a proposal will be determined by the results
+    of a general interest poll conducted by a member of the Usenet
+    Volunteer Votetakers (UVV).  Before the poll begins, the proponent
+    must submit a Proponent Questionnaire (PQ) to the UVV.  The votetaker
+    will post a CFV (Call for Votes) based on the PQ, generally to the
+    same newsgroups to which the RFD was posted.  Each proposed change
+    from the list in point 3 above will be voted on separately and will
+    pass or fail independently.
+
+15. The first CFV may be posted between 10 and 60 days after the latest
+    RFD for the proposal.  At least 21 days must have elapsed between the
+    first RFD and the first CFV.
+
+16. The voting period will last 21 days.  The votetaker will post a second
+    copy of the CFV near the middle of that period, identical to the first
+    copy, except possibly for procedural or votetaker notes that do not
+    modify the body of the proposal.  Only votes that arrive at the
+    votetaker's machine prior to the close of voting will be considered
+    valid.
+
+17. The votetaker may reject votes not cast precisely according to the
+    instructions in the CFV.
+
+18. Only one vote per person is permitted.  If multiple votes are received
+    from a single account, only the last vote will be counted, even if the
+    account is used by more than one person.  Multiple votes which are, in
+    the judgment of the votetaker, attempts to bypass these restrictions
+    may all be rejected.
+
+19. Votes from undeliverable addresses (including transformations of valid
+    addresses intended to avoid spam) are not valid.  The votetaker will
+    e-mail an acknowledgment of the vote in response to each vote, and if
+    this acknowledgment bounces, the corresponding vote will not count
+    towards the total.  Voters are responsible for investigating what
+    happened if their votes are not acknowledged.
+
+20. Anonymous, forwarded, or proxy votes are not valid.  Votes mailed by
+    WWW/HTML/CGI forms are considered proxy votes and are not valid.  The
+    precise definition of anonymous is at the discretion of the votetaker
+    but should not be interpreted as requiring all voters to use their
+    real name; votes from well-established pseudonyms should be accepted.
+
+21. The explicit voting instructions in the CFV may not be distributed, in
+    whole or in part, to any forum, by anyone except the votetaker.
+    People wishing to vote should be referred to the CFV posted in
+    news.announce.newgroups or told to contact the votetaker for a copy.
+    Violations may result in invalidation of votes by the votetaker or
+    long-term suspension of the proposal by the n.a.n moderation team.
+
+22. Whether or not the CFV may be sent to mailing lists is at the
+    discretion of the votetaker, and if done should only be done by the
+    votetaker directly.
+
+23. The validity of any given vote is determined by the votetaker.  Votes
+    may be disqualified for violation of the above points or for any other
+    actions seriously detrimental to the integrity of the vote, at the
+    discretion of the votetaker.  The decision of the votetaker may be
+    appealed to the n.a.n moderation team.  The decision of the n.a.n
+    moderation team is final.
+
+24. If there are significant problems with the vote, if the votetaker is
+    unable to collect the votes, or if there are other serious flaws in
+    the voting procedure, the n.a.n moderation team will normally cancel
+    the vote and hold an immediate revote without disclosing the results
+    of the first vote.
+
+THE RESULT
+
+25. After the completion of the vote, the votetaker will tally the result
+    and post it to the same newsgroups to which the votetaker posted the
+    CFV.  The posted result will contain the name, a form of the e-mail
+    address, and the vote of everyone who voted except for those people
+    who subsequently cancelled their vote.
+
+26. Each separate proposed change will be considered to have passed if and
+    only if it received at least 100 more YES than NO votes and received
+    at least twice as many YES as NO votes.
+
+27. After the result posting, there will be a five day period when any
+    objections to the vote may be raised in news.groups.  The n.a.n
+    moderation team should also be informed (at newgroups-request@isc.org)
+    of any objections or inaccuracies that could change the outcome.
+
+28. At the conclusion of this waiting period, the n.a.n moderation team
+    will either validate the results or will put the proposal on hold
+    while objections are considered.  The final determination of whether a
+    vote has passed or failed will be made by the n.a.n moderation team;
+    the n.a.n moderation team may also call for a revote or take other
+    appropriate action to deal with severely flawed votes.
+
+29. The results of a vote may be accepted despite flaws in the voting
+    process.  If the voting period lasted at least 21 days with at least
+    one posted CFV and the flaws are, in the determination of the n.a.n
+    moderator, extremely unlikely to have caused a change in the outcome,
+    the n.a.n moderator may accept the voting results even if the above
+    procedure is not followed exactly.
+
+30. All portions of the proposal that passed will be implemented by
+    control messages issued by the n.a.n moderation team.  Control
+    messages will generally be sent shortly after the waiting period
+    (point 27) and final validation of the results, but may be delayed
+    due to major holidays, initial setup of moderation, or transition
+    periods (for example, during renames, removal of an existing group
+    may be delayed until creation of its replacement has had time to
+    propagate).

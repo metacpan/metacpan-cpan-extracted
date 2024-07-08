@@ -1,7 +1,7 @@
 # Text::Template::Tiny
 
-![Version](https://img.shields.io/github/v/release/sciurius//perl-Text-Template-Tiny)
-![GitHub issues](https://img.shields.io/github/issues/sciurius//perl-Text-Template-Tiny)
+![Version](https://img.shields.io/github/v/release/sciurius/perl-Text-Template-Tiny)
+![GitHub issues](https://img.shields.io/github/issues/sciurius/perl-Text-Template-Tiny)
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](http://makeapullrequest.com)
 ![Language Perl](https://img.shields.io/badge/Language-Perl-blue)
 
@@ -50,9 +50,8 @@ To install this module, run the following commands:
 
 # SUPPORT AND DOCUMENTATION
 
-
 Development of this module takes place on GitHub:
-https://github.com/sciurius//perl-Text-Template-Tiny.
+https://github.com/sciurius/perl-Text-Template-Tiny.
 
 You can find documentation for this module with the perldoc command.
 
@@ -65,7 +64,7 @@ GitHub.
         http://search.cpan.org/dist/Text-Template-Tiny
 
 
-COPYRIGHT AND LICENCE
+# COPYRIGHT AND LICENCE
 
 Copyright (C) 2008,2024 Johan Vromans
 

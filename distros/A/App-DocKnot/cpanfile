@@ -9,7 +9,7 @@ requires 'IO::Compress::Xz';
 requires 'IO::Uncompress::Gunzip';
 requires 'IPC::Run';
 requires 'IPC::System::Simple';
-requires 'JSON::MaybeXS';
+requires 'JSON::MaybeXS', '1.004000';
 requires 'Kwalify';
 requires 'List::SomeUtils', '0.07';
 requires 'Path::Iterator::Rule';

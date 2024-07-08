@@ -31,7 +31,6 @@ use warnings;
 use Module::Build;
 
 # Basic package configuration.
-#<<<
 my $build = Module::Build->new(
     dist_abstract        => 'Package documentation generator',
     dist_author          => 'Russ Allbery <rra@cpan.org>',
@@ -71,7 +70,7 @@ my $build = Module::Build->new(
         'IO::Compress::Xz'       => 0,
         'IPC::Run'               => 0,
         'IPC::System::Simple'    => 0,
-        'JSON::MaybeXS'          => 0,
+        'JSON::MaybeXS'          => '1.004000',
         'Kwalify'                => 0,
         'List::SomeUtils'        => '0.07',
         'Path::Iterator::Rule'   => 0,
@@ -88,7 +87,6 @@ my $build = Module::Build->new(
         'File::Copy::Recursive' => 0,
     },
 );
-#>>>
 
 # Generate the build script.
 $build->create_build_script;

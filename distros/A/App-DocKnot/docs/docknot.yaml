@@ -15,14 +15,14 @@ format: v1
 
 name: DocKnot
 maintainer: Russ Allbery <rra@cpan.org>
-version: '7.01'
+version: 'v8.0.0'
 synopsis: Static web site and documentation generator
 
 license:
   name: Expat
 copyrights:
   - holder: Russ Allbery <rra@cpan.org>
-    years: 1999-2022
+    years: 1999-2024
 
 build:
   type: Module::Build
@@ -140,7 +140,7 @@ requirements: |
   * IO::Uncompress::Gunzip (part of IO-Compress)
   * IPC::Run
   * IPC::System::Simple
-  * JSON::MaybeXS
+  * JSON::MaybeXS 1.004000 or later
   * Kwalify
   * List::SomeUtils 0.07 or later
   * Path::Iterator::Rule

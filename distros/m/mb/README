@@ -31,22 +31,24 @@ SYNOPSIS
         qw/ DAMEMOJI å˜ê∫èÊÉ\ /
         qx/ DAMEMOJI å˜ê∫èÊÉ\ /
 
-  MBCS subroutines:
+  Useful MBCS subroutines:
     mb::chop(...);
     mb::chr(...);
-    mb::do 'file';
     mb::dosglob(...);
-    mb::eval 'string';
     mb::getc(...);
-    mb::index(...);
-    mb::index_byte(...);
     mb::length(...);
     mb::ord(...);
-    mb::require 'file';
+    mb::substr(...);
+  Not so useful MBCS subroutines:
+    mb::index(...);
+    mb::index_byte(...);
     mb::reverse(...);
     mb::rindex(...);
     mb::rindex_byte(...);
-    mb::substr(...);
+  Subroutines that handle MBCS program:
+    mb::do 'file';
+    mb::eval 'string';
+    mb::require 'file';
     mb::use Module;
     mb::no Module;
 
@@ -54,10 +56,18 @@ SYNOPSIS
     $mb::PERL
     $mb::ORIG_PROGRAM_NAME
 
-  supported encodings:
-    Big5, Big5-HKSCS, EUC-JP, GB18030, GBK, Sjis(also CP932), UHC, UTF-8, WTF-8
+  Supported encodings:
+    Big5
+    Big5-HKSCS
+    EUC-JP
+    GB18030
+    GBK
+    Sjis(also CP932)
+    UHC
+    UTF-8
+    WTF-8
 
-  supported operating systems:
+  Supported operating systems:
     Apple Inc. Mac OS X, OS X, macOS,
     Hewlett-Packard Development Company, L.P. HP-UX,
     International Business Machines Corporation AIX,
@@ -65,7 +75,7 @@ SYNOPSIS
     Oracle Corporation Solaris,
     and Other Systems
 
-  supported perl versions:
+  Supported perl versions:
     perl version 5.005_03 to newest perl
 
 DESCRIPTION
@@ -83,26 +93,28 @@ DESCRIPTION
   This software escapes DAMEMOJI in your script, generate a new script and
   run it.
 
-Larry Wall san's Style
+Larry Wall-san's Way
 
   If you're using the utf8 pragma and you have a big headache, probably, you're
-  on the wrong way. You should back to the Larry Street where is a sign that
-  says ver.5.00503, once.
+  on the wrong way. You should back to the Larry Wall Street (that is known as
+  Wall street, and there are still many Perl scripts running on it today) where
+  is a sign that says ver.5.00503, once.
 
-  There is another path there. Follow that path. Soon, your headache will be
-  improve.
+  There is another path there. Follow that path.
+  Soon, your headache will be improve.
 
-  The "length()" described in the script universally functions as "bytes::length()",
-  and the "substr()" in the script universally functions as "bytes::substr()".
+  The "length()" described in the script always functions as "bytes::length()",
+  and the "substr()" in the script always functions as "bytes::substr()".
   If you want to know the number of code points of multibyte characters contained
-  in a scalar value, you have to write "mb::length()". If you want to execute
-  "substr()" in code point context, you have to write "mb::substr()".
+  in a scalar value, you have to write "mb::length()".
+  If you want to execute "substr()" in code point context, you have to write
+  "mb::substr()".
 
   Once, Larry Wall san said like this;
 
   "Easy jobs must be easy."
 
-  Welcome to world of Larry Wall san's Style!!
+  Welcome to world of Larry Wall-san's Way!!
 
 SEE ALSO
 

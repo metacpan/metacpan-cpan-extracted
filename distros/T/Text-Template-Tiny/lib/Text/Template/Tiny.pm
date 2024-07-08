@@ -11,7 +11,7 @@ Text::Template::Tiny - Variable substituting template processor
 
 =cut
 
-our $VERSION = '1.000';
+our $VERSION = '1.000.1';
 
 =head1 SYNOPSIS
 

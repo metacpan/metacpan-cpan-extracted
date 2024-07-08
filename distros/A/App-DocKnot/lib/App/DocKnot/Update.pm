@@ -9,7 +9,7 @@
 # Modules and declarations
 ##############################################################################
 
-package App::DocKnot::Update 7.01;
+package App::DocKnot::Update v8.0.0;
 
 use 5.024;
 use autodie;
@@ -121,7 +121,8 @@ sub _config_from_json {
 
     # If the package is marked orphaned, load the explanation.
     if ($data_ref->{orphaned}) {
-        $data_ref->{orphaned} = $self->_load_metadata('orphaned');
+        $data_ref->{unmaintained} = $self->_load_metadata('orphaned');
+        delete($data_ref->{orphaned});
     }
 
     # If the package has a quote, load the text of the quote.
@@ -162,6 +163,41 @@ sub _config_from_json {
 # Spin helper methods
 ##############################################################################
 
+# Given an old-format *.faq pointer file, read the master file name and any
+# options.  Return them in the structure used for *.spin pointer files.
+#
+# $path - Path::Tiny for the file to read
+#
+# Returns: Hash in the format of a *.spin pointer file
+#  Throws: Text exception if no master file is present in the pointer
+#          autodie exception if the pointer file could not be read
+sub _read_faq_pointer {
+    my ($self, $path) = @_;
+
+    # Read the pointer file.
+    my ($master, $options, $style) = $path->lines_utf8();
+    if (!$master) {
+        die "no master file specified in $path\n";
+    }
+    chomp($master);
+
+    # Put the results into the correct format.
+    my %results = (format => 'text', path => $master);
+    if (defined($style)) {
+        chomp($style);
+        $results{style} = $style;
+    }
+    if (defined($options)) {
+        if ($options =~ m{ -l ( \s | \z ) }xms) {
+            $results{options} = { modified => JSON::MaybeXS::true };
+        }
+        if ($options =~ m{ -t \s+ (?: '(.*)' | ( [^\'] \S+ ) ) }xms) {
+            $results{title} = $1 || $2;
+        }
+    }
+    return \%results;
+}
+
 # Given an old-format *.rpod pointer file, read the master file name and any
 # options.  Return them in the structure used for *.spin pointer files.
 #
@@ -190,7 +226,7 @@ sub _read_rpod_pointer {
         if ($options =~ m{ -c ( \s | \z ) }xms) {
             $results{options} = {
                 contents => JSON::MaybeXS::true,
-                navbar => JSON::MaybeXS::false,
+                navbar   => JSON::MaybeXS::false,
             };
         }
         if ($options =~ m{ -t \s+ (?: '(.*)' | ( [^\'] \S+ ) ) }xms) {
@@ -219,7 +255,30 @@ sub _write_spin_pointer {
     return;
 }
 
-# Convert an *.rpod file to a *.spin file.  Intended to be run via
+# Convert an *.faq file to a *.spin pointer.  Intended to be run via
+# Path::Iterator::Rule.
+#
+# $rpod_path - Path to *.rpod file
+# $repo      - Optional Git::Repository object for input tree
+sub _convert_faq_pointer {
+    my ($self, $faq_path, $repo) = @_;
+
+    # Convert the file.
+    my $data_ref = $self->_read_faq_pointer($faq_path);
+    my $basename = $faq_path->basename('.faq');
+    my $spin_path = $faq_path->sibling($basename . '.spin');
+    $self->_write_spin_pointer($data_ref, $spin_path);
+
+    # If we have a Git repository, update Git.
+    if (defined($repo)) {
+        my $root = path($repo->work_tree());
+        $repo->run('add', $spin_path->relative($root)->stringify());
+        $repo->run('rm', $faq_path->relative($root)->stringify());
+    }
+    return;
+}
+
+# Convert an *.rpod file to a *.spin pointer.  Intended to be run via
 # Path::Iterator::Rule.
 #
 # $rpod_path - Path to *.rpod file
@@ -259,7 +318,7 @@ sub new {
     my ($class, $args_ref) = @_;
     my $self = {
         metadata => path($args_ref->{metadata} // 'docs/metadata'),
-        output => path($args_ref->{output} // 'docs/docknot.yaml'),
+        output   => path($args_ref->{output} // 'docs/docknot.yaml'),
     };
     bless($self, $class);
     return $self;
@@ -374,9 +433,16 @@ sub update_spin {
         $repo = Git::Repository->new(work_tree => "$path");
     }
 
-    # Convert all *.rpod files to *.spin files.
-    my $rule = Path::Iterator::Rule->new()->name(qr{ [.] rpod \z }xms);
+    # Convert all *.faq files to *.spin files.
+    my $rule = Path::Iterator::Rule->new()->name(qr{ [.] faq \z }xms);
     my $iter = $rule->iter($path, { follow_symlinks => 0 });
+    while (defined(my $file = $iter->())) {
+        $self->_convert_faq_pointer(path($file), $repo);
+    }
+
+    # Convert all *.rpod files to *.spin files.
+    $rule = Path::Iterator::Rule->new()->name(qr{ [.] rpod \z }xms);
+    $iter = $rule->iter($path, { follow_symlinks => 0 });
     while (defined(my $file = $iter->())) {
         $self->_convert_rpod_pointer(path($file), $repo);
     }
@@ -472,7 +538,7 @@ Russ Allbery <rra@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright 2013-2022 Russ Allbery <rra@cpan.org>
+Copyright 2013-2022, 2024 Russ Allbery <rra@cpan.org>
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal

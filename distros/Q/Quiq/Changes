@@ -1,8 +1,15 @@
+1.218 2024-07-07
+================
+
+[Makefile.PL]
+* Net::IMAP::Simple zu den benötigten Modulen (PREREQ_PM) hinzugefügt
+
 1.217 2024-07-04
 ================
 
 [Quiq:: Path]
-* delete(): rm-Option --interactive=never entfernt
+* delete(): rm-Option "--interactive=never" entfernt (da auf FreeBSD
+  nicht bekannt)
 
 1.216 2024-06-09
 ================

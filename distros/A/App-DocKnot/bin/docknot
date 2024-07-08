@@ -23,6 +23,7 @@ __END__
 =for stopwords
 Allbery DocKnot docknot MERCHANTABILITY NONINFRINGEMENT sublicense subcommand
 subcommands distdir pgp-key cl2xhtml cvs2xhtml faq2html spin-rss archivedir
+XHTML -lu
 
 =head1 NAME
 
@@ -44,6 +45,9 @@ B<docknot> spin [B<-d>] [B<-e> I<pattern> ...] [B<-s> I<url>] I<source>
 I<output>
 
 B<docknot> spin-rss [B<-b> I<base>] I<file>
+
+B<docknot> spin-text [B<-lu>] [B<-s> I<url>] [B<-t> I<title>] [I<source>
+[I<output>]]
 
 B<docknot> spin-thread [B<-f>] [B<-s> I<url>] [I<source> [I<output>]]
 
@@ -97,6 +101,10 @@ details of the site generation.
 Process a single F<.rss> file with L<App::DocKnot::Spin::RSS> (normally done
 as part of using C<spin> to process a tree of files).  See that module's
 documentation for more details.
+
+=item spin-text
+
+Convert a text file to HTML.
 
 =item spin-thread
 
@@ -285,6 +293,30 @@ Output files specified as absolute paths will not be affected.
 
 The F<.rss> file to process.  See L<App::DocKnot::Spin::RSS> for the details
 of the file format.
+
+=back
+
+=head2 spin-text
+
+=over 4
+
+=item B<-m>, B<--modified>
+
+Add a last modified subheading to the converted document based on the last
+modification timestamp of the source file.  This is only done if no RCS/CVS Id
+string is found in the file.  If there is one, it is used in preference.  This
+option is ignored if the input is not a file.
+
+=item B<-s> I<style>, B<--style>=I<style>
+
+Use I<style> as the URL of a style sheet for the generated web page.  Unless
+this argument is given, no style sheet will be referred to in the generated
+web page.
+
+=item B<-t> I<title>, B<--title>=I<title>
+
+Use I<title> as the page title rather than whatever may be determined from
+looking at the input file.
 
 =back
 

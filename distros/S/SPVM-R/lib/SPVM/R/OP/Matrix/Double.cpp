@@ -12,29 +12,29 @@ static const char* FILE_NAME = "R/OP/Matrix/Double.cpp";
 
 int32_t SPVM__R__OP__Matrix__Double___mul(SPVM_ENV* env, SPVM_VALUE* stack) {
   
-  void* ret_ndarray_ref = stack[0].oval;
+  void* obj_ret_data_ref = stack[0].oval;
   
-  int32_t* ret_row_ref = stack[1].iref;
+  int32_t* ret_nrow_ref = stack[1].iref;
   
-  int32_t* ret_column_ref = stack[2].iref;
+  int32_t* ret_ncol_ref = stack[2].iref;
   
   void* obj_x_data = stack[3].oval;
   double* x_data = env->get_elems_double(env, stack, obj_x_data);
   
-  int32_t x_row = stack[4].ival;
+  int32_t x_nrow = stack[4].ival;
   
-  int32_t x_column = stack[5].ival;
+  int32_t x_ncol = stack[5].ival;
   
   void* obj_y_data = stack[6].oval;
   double* y_data = env->get_elems_double(env, stack, obj_y_data);
   
-  int32_t y_row = stack[7].ival;
+  int32_t y_nrow = stack[7].ival;
   
-  int32_t y_column = stack[8].ival;
+  int32_t y_ncol = stack[8].ival;
   
-  Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic> x_matrix = Eigen::Map<Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic>>(x_data, x_row, x_column);
+  Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic> x_matrix = Eigen::Map<Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic>>(x_data, x_nrow, x_ncol);
   
-  Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic> y_matrix = Eigen::Map<Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic>>(y_data, y_row, y_column);
+  Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic> y_matrix = Eigen::Map<Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic>>(y_data, y_nrow, y_ncol);
   
   Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic> ret_matrix = x_matrix * y_matrix;
   
@@ -45,31 +45,31 @@ int32_t SPVM__R__OP__Matrix__Double___mul(SPVM_ENV* env, SPVM_VALUE* stack) {
   
   memcpy(ret_data, ret_matrix.data(), sizeof(double) * ret_length);
   
-  env->set_elem_object(env, stack, ret_ndarray_ref, 0, ret_data);
+  env->set_elem_object(env, stack, obj_ret_data_ref, 0, obj_ret_data);
   
-  *ret_row_ref = ret_matrix.rows();
+  *ret_nrow_ref = ret_matrix.rows();
   
-  *ret_column_ref = ret_matrix.cols();
+  *ret_ncol_ref = ret_matrix.cols();
   
   return 0;
 }
 
 int32_t SPVM__R__OP__Matrix__Double___solve(SPVM_ENV* env, SPVM_VALUE* stack) {
   
-  void* ret_ndarray_ref = stack[0].oval;
+  void* obj_ret_data_ref = stack[0].oval;
   
-  int32_t* ret_row_ref = stack[1].iref;
+  int32_t* ret_nrow_ref = stack[1].iref;
   
-  int32_t* ret_column_ref = stack[2].iref;
+  int32_t* ret_ncol_ref = stack[2].iref;
   
   void* obj_x_data = stack[3].oval;
   double* x_data = env->get_elems_double(env, stack, obj_x_data);
   
-  int32_t x_row = stack[4].ival;
+  int32_t x_nrow = stack[4].ival;
   
-  int32_t x_column = stack[5].ival;
+  int32_t x_ncol = stack[5].ival;
   
-  Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic> x_matrix = Eigen::Map<Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic>>(x_data, x_row, x_column);
+  Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic> x_matrix = Eigen::Map<Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic>>(x_data, x_nrow, x_ncol);
   
   Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic> ret_matrix = x_matrix;
   
@@ -82,31 +82,31 @@ int32_t SPVM__R__OP__Matrix__Double___solve(SPVM_ENV* env, SPVM_VALUE* stack) {
   
   memcpy(ret_data, ret_matrix.data(), sizeof(double) * ret_length);
   
-  env->set_elem_object(env, stack, ret_ndarray_ref, 0, ret_data);
+  env->set_elem_object(env, stack, obj_ret_data_ref, 0, obj_ret_data);
   
-  *ret_row_ref = ret_matrix.rows();
+  *ret_nrow_ref = ret_matrix.rows();
   
-  *ret_column_ref = ret_matrix.cols();
+  *ret_ncol_ref = ret_matrix.cols();
   
   return 0;
 }
 
 int32_t SPVM__R__OP__Matrix__Double___t(SPVM_ENV* env, SPVM_VALUE* stack) {
   
-  void* ret_ndarray_ref = stack[0].oval;
+  void* obj_ret_data_ref = stack[0].oval;
   
-  int32_t* ret_row_ref = stack[1].iref;
+  int32_t* ret_nrow_ref = stack[1].iref;
   
-  int32_t* ret_column_ref = stack[2].iref;
+  int32_t* ret_ncol_ref = stack[2].iref;
   
   void* obj_x_data = stack[3].oval;
   double* x_data = env->get_elems_double(env, stack, obj_x_data);
   
-  int32_t x_row = stack[4].ival;
+  int32_t x_nrow = stack[4].ival;
   
-  int32_t x_column = stack[5].ival;
+  int32_t x_ncol = stack[5].ival;
   
-  Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic> x_matrix = Eigen::Map<Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic>>(x_data, x_row, x_column);
+  Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic> x_matrix = Eigen::Map<Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic>>(x_data, x_nrow, x_ncol);
   
   Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic> ret_matrix = x_matrix;
   
@@ -119,31 +119,31 @@ int32_t SPVM__R__OP__Matrix__Double___t(SPVM_ENV* env, SPVM_VALUE* stack) {
   
   memcpy(ret_data, ret_matrix.data(), sizeof(double) * ret_length);
   
-  env->set_elem_object(env, stack, ret_ndarray_ref, 0, ret_data);
+  env->set_elem_object(env, stack, obj_ret_data_ref, 0, obj_ret_data);
   
-  *ret_row_ref = ret_matrix.rows();
+  *ret_nrow_ref = ret_matrix.rows();
   
-  *ret_column_ref = ret_matrix.cols();
+  *ret_ncol_ref = ret_matrix.cols();
   
   return 0;
 }
 
 int32_t SPVM__R__OP__Matrix__Double___det(SPVM_ENV* env, SPVM_VALUE* stack) {
   
-  void* ret_ndarray_ref = stack[0].oval;
+  void* obj_ret_data_ref = stack[0].oval;
   
-  int32_t* ret_row_ref = stack[1].iref;
+  int32_t* ret_nrow_ref = stack[1].iref;
   
-  int32_t* ret_column_ref = stack[2].iref;
+  int32_t* ret_ncol_ref = stack[2].iref;
   
   void* obj_x_data = stack[3].oval;
   double* x_data = env->get_elems_double(env, stack, obj_x_data);
   
-  int32_t x_row = stack[4].ival;
+  int32_t x_nrow = stack[4].ival;
   
-  int32_t x_column = stack[5].ival;
+  int32_t x_ncol = stack[5].ival;
   
-  Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic> x_matrix = Eigen::Map<Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic>>(x_data, x_row, x_column);
+  Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic> x_matrix = Eigen::Map<Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic>>(x_data, x_nrow, x_ncol);
   
   double ret = x_matrix.determinant();
   
@@ -154,33 +154,33 @@ int32_t SPVM__R__OP__Matrix__Double___det(SPVM_ENV* env, SPVM_VALUE* stack) {
   
   memcpy(ret_data, &ret, sizeof(double) * ret_length);
   
-  env->set_elem_object(env, stack, ret_ndarray_ref, 0, ret_data);
+  env->set_elem_object(env, stack, obj_ret_data_ref, 0, obj_ret_data);
   
-  *ret_row_ref = 1;
+  *ret_nrow_ref = 1;
   
-  *ret_column_ref = 1;
+  *ret_ncol_ref = 1;
   
   return 0;
 }
 
 int32_t SPVM__R__OP__Matrix__Double___eigen(SPVM_ENV* env, SPVM_VALUE* stack) {
   
-  void* ret_ndarray_ref = stack[0].oval;
+  void* obj_ret_data_ref = stack[0].oval;
   
-  int32_t* ret_row_ref = stack[1].iref;
+  int32_t* ret_nrow_ref = stack[1].iref;
   
-  int32_t* ret_column_ref = stack[2].iref;
+  int32_t* ret_ncol_ref = stack[2].iref;
   
   void* obj_x_data = stack[3].oval;
   double* x_data = env->get_elems_double(env, stack, obj_x_data);
   
-  int32_t x_row = stack[4].ival;
+  int32_t x_nrow = stack[4].ival;
   
-  int32_t x_column = stack[5].ival;
+  int32_t x_ncol = stack[5].ival;
   
   void* obj_eigen_values_data_ref = stack[6].oval;
   
-  Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic> x_matrix = Eigen::Map<Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic>>(x_data, x_row, x_column);
+  Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic> x_matrix = Eigen::Map<Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic>>(x_data, x_nrow, x_ncol);
   
   Eigen::SelfAdjointEigenSolver<Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic>> eigen_solver(x_matrix);
   
@@ -195,11 +195,11 @@ int32_t SPVM__R__OP__Matrix__Double___eigen(SPVM_ENV* env, SPVM_VALUE* stack) {
   
   memcpy(ret_data, eigen_vectors.data(), sizeof(double) * ret_length);
   
-  env->set_elem_object(env, stack, ret_ndarray_ref, 0, ret_data);
+  env->set_elem_object(env, stack, obj_ret_data_ref, 0, obj_ret_data);
   
-  *ret_row_ref = eigen_vectors.rows();
+  *ret_nrow_ref = eigen_vectors.rows();
   
-  *ret_column_ref = eigen_vectors.cols();
+  *ret_ncol_ref = eigen_vectors.cols();
   
   void* eigen_values_data = env->new_double_array(env, stack, eigen_values.size());
   

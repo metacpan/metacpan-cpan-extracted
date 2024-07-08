@@ -114,7 +114,7 @@ use v5.10;
 use strict;
 use warnings;
 
-our $VERSION = '1.217';
+our $VERSION = '1.218';
 
 use Quiq::Option;
 use Quiq::Array;
@@ -301,7 +301,7 @@ sub zMax {
 
 =head1 VERSION
 
-1.217
+1.218
 
 =head1 AUTHOR
 

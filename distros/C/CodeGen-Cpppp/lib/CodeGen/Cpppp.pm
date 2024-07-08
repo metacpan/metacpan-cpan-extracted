@@ -7,9 +7,17 @@ use version;
 use Cwd 'abs_path';
 use Scalar::Util 'blessed', 'looks_like_number';
 use CodeGen::Cpppp::Template;
+use CodeGen::Cpppp::Output;
 
-our $VERSION= '0.003'; # VERSION
+our $VERSION= '0.004'; # VERSION
 # ABSTRACT: The C Perl-Powered Pre-Processor
+
+# These can be inspected by code generators to find out the current
+# context the code is being inserted into.  They are localized by
+# the template engine.
+our $CURRENT_INDENT_PREFIX= '';
+our $CURRENT_IS_INLINE= 0;
+our $INDENT= '   ';
 
 
 sub autoindent($self, $newval=undef) {
@@ -163,7 +171,8 @@ sub parse_cpppp($self, $in, $filename=undef, $line=undef) {
       colmarker         => {},
       coltrack          => { },
    };
-   my ($perl, $block_group, $tpl_start_line, $cur_tpl)= ('', 1);
+   my ($perl, $perl_line, $block_group, $tpl_start_line, $cur_tpl, $pod_start, @pod)
+      = ('', 0, 1);
    my sub end_tpl {
       if (defined $cur_tpl && $cur_tpl =~ /\S/) {
          my $parsed= $self->_parse_code_block($cur_tpl, $filename, $tpl_start_line);
@@ -174,15 +183,35 @@ sub parse_cpppp($self, $in, $filename=undef, $line=undef) {
       $cur_tpl= undef;
    };
    for (@lines) {
-      if (/^#!/) { # ignore #!
+      if (/^=(\w+)/) {
+         if (!defined $pod_start) {
+            $pod_start= $line;
+            if (defined $cur_tpl) {
+               # trim off any blank line that occurs right before the pod.
+               chomp $cur_tpl;
+               end_tpl();
+            }
+         }
+         push @pod, $_;
+         if (@pod > 1 && $1 eq 'cut') {
+            my $current_indent= $perl =~ /\n([ \t]*).*\n\Z/? $1 : '';
+            $current_indent .= '  ' if $perl =~ /\{ *\n\Z/;
+            $perl .= $self->_gen_perl_emit_pod_block(join('', @pod), $filename, $pod_start, $current_indent);
+            @pod= ();
+            $pod_start= undef;
+         }
+      }
+      elsif (defined $pod_start) {
+         push @pod, $_;
+      }
+      elsif (/^#!/) { # ignore #!
       }
       elsif (/^##/) { # full-line of perl code
-         if (defined $cur_tpl || !length $perl) {
-            end_tpl();
-            $perl .= qq{# line $line "$filename"\n};
-         }
+         end_tpl() if defined $cur_tpl;
+         $perl .= qq{# line $line "$filename"\n} unless $perl_line == $line;
          (my $pl= $_) =~ s/^##\s?//;
          $perl .= $self->_transform_template_perl($pl, $line);
+         $perl_line= $line+1;
       }
       elsif (/^(.*?) ## ?((?:if|unless|for|while|unless) .*)/) { # perl conditional suffix, half tpl/half perl
          my ($tpl, $pl)= ($1, $2);
@@ -193,6 +222,7 @@ sub parse_cpppp($self, $in, $filename=undef, $line=undef) {
          $perl =~ s/;\s*$//; # remove semicolon
          $pl .= ';' unless $pl =~ /;\s*$/; # re-add it if user didn't
          $perl .= qq{\n# line $line "$filename"\n    $pl\n};
+         $perl_line= $line + 1;
       }
       else { # default is to assume a line of template
          if (!defined $cur_tpl) {
@@ -208,14 +238,52 @@ sub parse_cpppp($self, $in, $filename=undef, $line=undef) {
    my $ct= delete $self->{cpppp_parse}{coltrack};
    _finish_coltrack($ct, $_) for grep looks_like_number($_), keys %$ct;
 
+   # Finish detecting indent, if not specified
+   if (!defined $self->{cpppp_parse}{indent}) {
+      $self->{cpppp_parse}{indent}
+         = $self->_guess_indent(delete $self->{cpppp_parse}{indent_seen} || []);
+   }
+
    $self->{cpppp_parse}{code}= $perl;
    delete $self->{cpppp_parse};
+}
+
+sub _guess_indent($self, $indent_seen) {
+   my %evidence;
+   my $prev;
+   for (@$indent_seen) {
+      if (!defined $prev || length($_) <= length($prev)) {
+         $evidence{/^\t+$/? "\t" : /\t/? 'mixed_tabs' : $_}++;
+      }
+      elsif (length($prev) < length($_)) {
+         if ($prev =~ /\t/ || $_ =~ /\t/) {
+            if ($prev =~ /^\t+$/ && $_ =~ /^\t+$/) {
+               $evidence{"\t"}++;
+            } else {
+               $evidence{mixed_tabs}++;
+            }
+         } else {
+            my $step= length($_) - length($prev);
+            if (0 == length($prev) % $step) {
+               $evidence{' 'x$step}++;
+            }
+         }
+      }
+      $prev= $_;
+   }
+   my $guess;
+   for (keys %evidence) {
+      $guess= $_ if !defined $guess
+         || $evidence{$_} > $evidence{$guess}
+         || ($evidence{$_} == $evidence{$guess} && $_ lt $guess);
+   }
+   return defined $guess && $guess eq 'mixed_tabs'? undef : $guess;
 }
 
 sub _transform_template_perl($self, $pl, $line) {
    # If user declares "sub NAME(", convert that to "my sub NAME" so that it can
    # capture refs to the variables of new template instances.
-   if ($pl =~ /(my)? \s* \b sub \s* ([\w_]+) \b \s* /x) {
+   if ($pl =~ /^ \s* (my \s+)? sub \s* ([\w_]+) \b \s* /x) {
       my $name= $2;
       $self->{cpppp_parse}{template_method}{$name}= { line => $line };
       my $ofs= $-[0];
@@ -237,7 +305,7 @@ sub _transform_template_perl($self, $pl, $line) {
       $self->{cpppp_parse}{template_parameter}{$name}= substr($var_name,0,1);
    }
    # If user declares "define name(", convert that to both a method and a define
-   elsif ($pl =~ /^ \s* (define) \s* ([\w_]+) (\s*) \(/x) {
+   elsif ($pl =~ /^ \s* (define) \s+ ([\w_]+) (\s*) \(/x) {
       my $name= $2;
       $self->{cpppp_parse}{template_macro}{$name}= 'CODE';
       substr($pl, $-[1], $-[2]-$-[1], qq{my sub $name; \$self->define_template_macro($name => \\&$name); sub });
@@ -277,6 +345,12 @@ sub _gen_perl_call_code_block($self, $parsed, $indent='') {
    $code . ");\n";
 }
 
+sub _gen_perl_emit_pod_block($self, $pod, $file, $line, $indent='') {
+   my $pod_blocks= $self->{cpppp_parse}{pod_blocks} ||= [];
+   push @$pod_blocks, { pod => $pod, file => $file, line => $line };
+   return $indent.'$self->_render_pod_block('.$#$pod_blocks.");\n";
+}
+
 sub _finish_coltrack($coltrack, $col) {
    # did it eventually have an eval to the left?
    if (grep $_->{follows_eval}, $coltrack->{$col}{members}->@*) {
@@ -295,9 +369,16 @@ sub _parse_code_block($self, $text, $file=undef, $orig_line=undef) {
       $file= $2;
    }
    local our $line= $orig_line || 1;
-   local our $parse= $self->{cpppp_parse};
+   local our $parse= $self->{cpppp_parse} //= {};
    local our $start;
    local our @subst;
+   # Check if we can auto-detect the indent
+   unless (defined $parse->{indent}) {
+      # Find all total indents used in this code, but only count lines that
+      # were preceeded by ';' or '{' or ')' followed by lines starting with a
+      # word or variable substitution.
+      push @{$parse->{indent_seen}}, $1 while $text =~ /(?<=[;{)]\s{0,200})\n([ \t]+)[\w\$\@]/g;
+   }
    # Everything in coltrack that survived the last _parse_code_block call
    # ended on the final line of the template.  Set the line numbers to
    # continue into this template.
@@ -421,8 +502,9 @@ sub backup_and_overwrite_file($self, $fname, $new_content) {
 }
 
 
-sub get_filtered_output($self, $sections) {
-   my $content= $self->output->get($sections);
+sub get_filtered_output($self, @sections) {
+   @sections= grep defined, @sections; # allow a single undef to mean 'all'
+   my $content= $self->output->get(@sections);
    if ($self->convert_linecomment_to_c89) {
       # rewrite '//' comments as '/*' comments
       require CodeGen::Cpppp::CParser;
@@ -715,7 +797,7 @@ filename, choosing the first available "N" counting upward from 0.
 
 =head2 get_filtered_output
 
-  my $text= $cpppp->get_filtered_output($sections);
+  my $text= $cpppp->get_filtered_output(@sections);
 
 Like C<< $cpppp->output->get >>, but also apply filters to the output, like
 L</convert_linecomment_to_c89>.
@@ -735,11 +817,11 @@ Michael Conrad <mike@nrdvana.net>
 
 =head1 VERSION
 
-version 0.003
+version 0.004
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2023 by Michael Conrad.
+This software is copyright (c) 2024 by Michael Conrad.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

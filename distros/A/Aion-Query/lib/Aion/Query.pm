@@ -3,7 +3,7 @@ use 5.22.0;
 no strict; no warnings; no diagnostics;
 use common::sense;
 
-our $VERSION = "0.0.4";
+our $VERSION = "0.0.6";
 
 use Aion::Format qw//;
 use Aion::Format::Json qw//;
@@ -380,15 +380,17 @@ sub query_attach {
 	
 	($attach, my $key1, my $key2) = split /:/, $attach;
 
-	my %row = map { ($_->{$key1} => $_) } @$rows;
+	my %row1 = map { $_->{$attach} = []; ($_->{$key1} => $_) } @$rows;
 
-	for my $row (query $query, %kw) {
-		my $id = $row->{$key2} // die "Not $key2 in query!";
-		my $main_row = $row{$id} // die "Not $key1=$id in main rows!";
-		push @{$main_row->{$attach}}, $row;
+	my $rows2 = query $query, %kw;
+
+	for my $row2 (@$rows2) {
+		my $id = $row2->{$key2} // die "Not $key2 in query!";
+		my $row1 = $row1{$id} // die "Not $key1=$id in main rows!";
+		push @{$row1->{$attach}}, $row2;
 	}
 
-	$rows
+	wantarray? @$rows2: $rows2
 }
 
 # Выбрать один колумн
@@ -677,7 +679,7 @@ Aion::Query - a functional interface for accessing SQL databases (MySQL, MariaDB
 
 =head1 VERSION
 
-0.0.4
+0.0.6
 
 =head1 SYNOPSIS
 
@@ -907,6 +909,8 @@ Includes the result of another query into the result of a query.
 
 C<$attach> contains three keys separated by a colon: the key for the data to be attached, a column from C<$rows> and a column from C<$query>. Rows are merged across columns.
 
+The function returns an array with the result of the query (C<$query>), into which you can attach something else.
+
 	my $authors = query "SELECT id, name FROM author";
 	
 	my $res = [
@@ -917,22 +921,28 @@ C<$attach> contains three keys separated by a colon: the key for the data to be 
 	
 	$authors # --> $res
 	
-	query_attach $authors => "books:id:author_id" => "SELECT author_id, title FROM book ORDER BY title";
+	my @books = query_attach $authors => "books:id:author_id" => "SELECT author_id, title FROM book ORDER BY title";
 	
 	my $attaches = [
 	    {name => "Pushkin A.S.", id => 1, books => [
 	        {title => "Kiss in night", author_id => 1},
 	        {title => "Mir",           author_id => 1},
 	    ]},
-	    {name => "Pushkin A.",   id => 2},
+	    {name => "Pushkin A.",   id => 2, books => []},
 	    {name => "Alice",        id => 3, books => [
 	        {title => "Mips as cpu", author_id => 3},
 	    ]},
 	];
 	
 	$authors # --> $attaches
-
-If you need to specify other keys, this is done using colons in C<$attach>: C<attach:id:attach_id>.
+	
+	my $books = [
+	    {title => "Kiss in night", author_id => 1},
+	    {title => "Mips as cpu",   author_id => 3},
+	    {title => "Mir",           author_id => 1},
+	];
+	
+	\@books  # --> $books
 
 =head2 query_col ($query, %params)
 

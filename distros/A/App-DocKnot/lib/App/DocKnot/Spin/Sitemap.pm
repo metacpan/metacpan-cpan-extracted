@@ -12,7 +12,7 @@
 # Modules and declarations
 ##############################################################################
 
-package App::DocKnot::Spin::Sitemap 7.01;
+package App::DocKnot::Spin::Sitemap v8.0.0;
 
 use 5.024;
 use autodie;
@@ -213,13 +213,11 @@ sub new {
     # links maps partial URLs to a list of other partial URLs (previous, next,
     # and then the full upwards hierarchy to the top of the site) used for
     # interpage links.
-    #<<<
     my $self = {
         links    => {},
         pagedesc => {},
         sitemap  => [],
     };
-    #>>>
     bless($self, $class);
 
     # Parse the file into the newly-created object.

@@ -4,13 +4,13 @@ OpenAPI::Client::OpenAI - A client for the OpenAI API
 
 # SYNOPSIS
 
-    use OpenAPI::Client::OpenAI;
+      use OpenAPI::Client::OpenAI;
 
-    # The OPENAI_API_KEY environment variable must be set
-    # See https://platform.openai.com/api-keys and ENVIRONMENT VARIABLES below
-    my $client = OpenAPI::Client::OpenAI->new();
+      # The OPENAI_API_KEY environment variable must be set
+      # See https://platform.openai.com/api-keys and ENVIRONMENT VARIABLES below
+      my $client = OpenAPI::Client::OpenAI->new();
 
-      my $tx = $client->create_completion(
+      my $tx = $client->createCompletion(
           {
               body => {
                   model       => 'gpt-3.5-turbo-instruct',
@@ -33,6 +33,9 @@ key authentication according to the provided environment.
 
 Note that the OpenAI API is a paid service. You will need to sign up for an
 account.
+
+See the `examples/` directory in the distribution for more examples, along
+with the tests.
 
 # WARNING
 
@@ -64,9 +67,42 @@ Create a new OpenAI API client. The following options can be provided:
 Additional options are passed to the parent class, OpenAPI::Client, with the
 exception of the following extra options:
 
+## Other Methods
+
 Other methods are documented in [OpenAPI::Client::OpenAI::Methods](https://metacpan.org/pod/OpenAPI%3A%3AClient%3A%3AOpenAI%3A%3AMethods).
 
 The schema is documented in [OpenAPI::Client::OpenAI::Schema](https://metacpan.org/pod/OpenAPI%3A%3AClient%3A%3AOpenAI%3A%3ASchema).
+
+# DEPRECATED METHODS
+
+The following methods are deprecated and will be removed in a future release:
+
+- create\_chat\_completion
+
+    Replaced with `createChatCompletion`.
+
+- create\_completion
+
+    Replaced with `createCompletion`.
+
+- create\_embedding
+
+    Replaced with `createEmbedding`.
+
+- create\_image
+
+    Replaced with `createImage`.
+
+- create\_moderation
+
+    Replaced with `createModeration`.
+
+- list\_models
+
+    Replaced with `listModels`.
+
+Originally, these methods were named using `snake_case`, but to simplify the
+code, we retained the `camelCase` names in the main module.
 
 # ENVIRONMENT VARIABLES
 

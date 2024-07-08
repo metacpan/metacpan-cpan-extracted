@@ -8,11 +8,30 @@ class R::OP::Time::Piece {
   use Time::Piece;
   
   # Class Methods
-  static method c : R::NDArray::Time::Piece ($x_data : Time::Piece[], $x_dim : int[] = undef) {
+  static method c : R::NDArray::Time::Piece ($data : object of Time::Piece|Time::Piece[]|R::NDArray::Time::Piece, $dim : int[] = undef) {
     
-    my $x_ndarray = R::NDArray::Time::Piece->new({dim => $x_dim, data => $x_data});
+    if ($data) {
+      if ($data is_type Time::Piece) {
+        $data = [(Time::Piece)$data];
+      }
+      elsif ($data is_type Time::Piece[]) {
+        # Do nothing
+      }
+      elsif ($data is_type R::NDArray::Time::Piece) {
+        unless ($dim) {
+          $dim = $data->(R::NDArray::Time::Piece)->dim;
+        }
+        
+        $data = $data->(R::NDArray::Time::Piece)->data;
+      }
+      else {
+        die "The type of the data \data must be Time::Piece, Time::Piece[], or R::NDArray::Time::Piece.";
+      }
+    }
     
-    return $x_ndarray;
+    my $ndarray = R::NDArray::Time::Piece->new({dim => $dim, data => $data});
+    
+    return $ndarray;
   }
   
 }

@@ -67,11 +67,11 @@
     \link[https://tracker.debian.org/pkg/[% distribution.packaging.debian.package %]]
          [Debian package tracker] \break[% END %]
 ]
-[% IF orphaned %]
+[% IF unmaintained %]
 \h2[Warning]
 
-\class(alert)[This package is orphaned.]
-[% orphaned %]
+\class(alert)[This package is not maintained.]
+[% unmaintained %]
 [% END %]
 \h2[Blurb]
 
@@ -125,14 +125,16 @@ repository].
 [% END %]
 [% IF distribution.packaging.extra %]
 [% to_thread(distribution.packaging.extra) %]
-[% END %][% name %] is maintained using the [% vcs.type %] version control
-system.  To check out the current development tree, [% IF vcs.github %]see
+[% END %][% name %] [% IF unmaintained %]was[% ELSE %]is[% END %]
+maintained using the [% vcs.type %] version control system.  To check out
+the current development tree, [% IF vcs.github %]see
 \link[https://github.com/[% vcs.github %]][GitHub] or [% END %]clone:
 
 \pre[    [% vcs.url %]]
 
-[% IF vcs.github %]Pull requests on GitHub are welcome.  [% END %]You can
-also \link[[% vcs.browse %]][browse the current development source].
+[% IF vcs.github && !unmaintained %]Pull requests on GitHub are welcome.
+[% END %]You can also \link[[% vcs.browse %]][browse the current
+development source].
 
 \h2[Documentation]
 [% IF docs.api %]

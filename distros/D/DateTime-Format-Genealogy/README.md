@@ -4,7 +4,7 @@ DateTime::Format::Genealogy - Create a DateTime object from a Genealogy Date
 
 # VERSION
 
-Version 0.06
+Version 0.08
 
 # SYNOPSIS
 

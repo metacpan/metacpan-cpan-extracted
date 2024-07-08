@@ -25,10 +25,12 @@ my %WriteMakefileArgs = (
         'Markdown::Pod'        => '0',
         'Feature::Compat::Try' => '0',
         'Perl::Tidy'           => '0',
+        'Pod::Markdown'        => '0',
         'Template'             => '0',
     },
     CONFIGURE_REQUIRES => {
         'ExtUtils::MakeMaker'     => '0',
+        'IO::Socket::SSL'         => '2',
         'File::ShareDir::Install' => '0',
     },
     TEST_REQUIRES => {
@@ -36,6 +38,7 @@ my %WriteMakefileArgs = (
         'Test::RequiresInternet' => '0',
         'Perl::Tidy'             => '20240511',    # not sure where to put this
         'Import::Base'           => '1.004',
+        'JSON'                   => '4.10',
     },
     PREREQ_PM => {
         'File::ShareDir'        => '0',

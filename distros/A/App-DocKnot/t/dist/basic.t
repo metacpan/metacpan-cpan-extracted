@@ -2,7 +2,7 @@
 #
 # Basic tests for App::DocKnot::Dist.
 #
-# Copyright 2019-2022 Russ Allbery <rra@cpan.org>
+# Copyright 2019-2022, 2024 Russ Allbery <rra@cpan.org>
 #
 # SPDX-License-Identifier: MIT
 
@@ -47,7 +47,7 @@ Git::Repository->run('init', { cwd => "$sourcedir", quiet => 1 });
 my $repo = Git::Repository->new(work_tree => "$sourcedir");
 $repo->run(config => '--add', 'user.name', 'Test');
 $repo->run(config => '--add', 'user.email', 'test@example.com');
-$repo->run(add => '-A', q{.});
+$repo->run(add    => '-A', q{.});
 $repo->run(commit => '-q', '-m', 'Initial commit');
 
 # Check whether we have all the necessary tools to run the test.
@@ -83,16 +83,16 @@ my $dist = App::DocKnot::Dist->new({ distdir => $distdir, perl => $^X });
 capture_stdout {
     eval { $dist->make_distribution() };
 };
-ok($distdir->child('Empty-1.00.tar.gz')->exists(), 'dist exists');
-ok($distdir->child('Empty-1.00.tar.xz')->exists(), 'xz dist exists');
-ok(!$distdir->child('Empty-1.00.tar')->exists(), 'tarball missing');
-ok(!$distdir->child('Empty-1.00.tar.gz.asc')->exists(), 'no signature');
-ok(!$distdir->child('Empty-1.00.tar.xz.asc')->exists(), 'no signature');
+ok($distdir->child('Empty-v2.0.0.tar.gz')->exists(), 'dist exists');
+ok($distdir->child('Empty-v2.0.0.tar.xz')->exists(), 'xz dist exists');
+ok(!$distdir->child('Empty-v2.0.0.tar')->exists(), 'tarball missing');
+ok(!$distdir->child('Empty-v2.0.0.tar.gz.asc')->exists(), 'no signature');
+ok(!$distdir->child('Empty-v2.0.0.tar.xz.asc')->exists(), 'no signature');
 is($@, q{}, 'no errors');
 
 # Switch to using a configuration file and enable signing.
-$distdir->child('Empty-1.00.tar.gz')->remove();
-$distdir->child('Empty-1.00.tar.xz')->remove();
+$distdir->child('Empty-v2.0.0.tar.gz')->remove();
+$distdir->child('Empty-v2.0.0.tar.xz')->remove();
 $dir->child('docknot')->mkpath();
 $dir->child('docknot', 'config.yaml')->spew_utf8(
     "distdir: $distdir\n",
@@ -102,7 +102,7 @@ local $ENV{XDG_CONFIG_HOME} = "$dir";
 $dist = App::DocKnot::Dist->new({ gpg => $gpg_path, perl => $^X });
 
 # Create a dummy signature, which should be overwritten.
-$distdir->child('Empty-1.00.tar.gz.asc')->spew_utf8("bogus signature\n");
+$distdir->child('Empty-v2.0.0.tar.gz.asc')->spew_utf8("bogus signature\n");
 
 # If we add an ignored file to the source tree, this should not trigger any
 # errors.
@@ -113,13 +113,13 @@ capture_stdout {
 is($@, q{}, 'no errors with ignored file');
 
 # And now there should be signatures.
-ok($distdir->child('Empty-1.00.tar.gz')->exists(), 'dist exists');
-ok($distdir->child('Empty-1.00.tar.xz')->exists(), 'xz dist exists');
-ok($distdir->child('Empty-1.00.tar.gz.asc')->exists(), 'gz signature');
-ok($distdir->child('Empty-1.00.tar.xz.asc')->exists(), 'xz signature');
+ok($distdir->child('Empty-v2.0.0.tar.gz')->exists(), 'dist exists');
+ok($distdir->child('Empty-v2.0.0.tar.xz')->exists(), 'xz dist exists');
+ok($distdir->child('Empty-v2.0.0.tar.gz.asc')->exists(), 'gz signature');
+ok($distdir->child('Empty-v2.0.0.tar.xz.asc')->exists(), 'xz signature');
 is(
     "some signature\n",
-    $distdir->child('Empty-1.00.tar.gz.asc')->slurp_utf8(),
+    $distdir->child('Empty-v2.0.0.tar.gz.asc')->slurp_utf8(),
     'fake-gpg was run',
 );
 
@@ -134,7 +134,7 @@ is($@, "1 file missing from distribution\n", 'correct error for extra file');
 like($stdout, qr{ some-file }xms, 'output mentions the right file');
 
 # Verify that check_dist produces the same output.
-my $tarball = $distdir->child('Empty-1.00.tar.gz');
+my $tarball = $distdir->child('Empty-v2.0.0.tar.gz');
 my @missing = $dist->check_dist($sourcedir, $tarball);
 is_deeply(['some-file'], \@missing, 'check_dist matches');
 

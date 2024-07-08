@@ -252,4 +252,77 @@ class R::NDArray::Int extends R::NDArray {
     $self->SUPER::slice_set($vector_indexes, $ndarray);
   }
   
+  precompile method to_indexes : R::NDArray::Int () {
+    
+    unless ($self->is_vector) {
+      die "The n-dimension array \$self must be a vector.";
+    }
+    
+    my $length = $self->length;
+    
+    my $indexes_list = IntList->new;
+    
+    my $data = $self->data;
+    
+    for (my $i = 0; $i < $length; $i++) {
+      my $elem = $data->[$i];
+      
+      if ($elem) {
+        $indexes_list->push($i);
+      }
+    }
+    
+    my $ret_data = $indexes_list->to_array;
+    
+    my $ret_ndarray = R::OP::Int->c($ret_data);
+    
+    return $ret_ndarray;
+  }
+  
 }
+
+=pod TODO
+
+sub order {
+  my $r = shift;
+  my $opt = ref $_[-1] eq 'HASH' ? pop @_ : {};
+  my @xs = map { to_object($r, $_) } @_;
+  
+  my @xs_values;
+  for my $x (@xs) {
+    push @xs_values, $x->values;
+  }
+
+  my $decreasing = $opt->{decreasing} || Rstats::Func::FALSE($r);
+  
+  my @pos_vals;
+  for my $i (0 .. @{$xs_values[0]} - 1) {
+    my $pos_val = {pos => $i + 1};
+    $pos_val->{val} = [];
+    push @{$pos_val->{val}}, $xs_values[$_][$i] for (0 .. @xs_values);
+    push @pos_vals, $pos_val;
+  }
+  
+  my @sorted_pos_values = !$decreasing
+    ? sort {
+        my $comp;
+        for (my $i = 0; $i < @xs_values; $i++) {
+          $comp = $a->{val}[$i] <=> $b->{val}[$i];
+          last if $comp != 0;
+        }
+        $comp;
+      } @pos_vals
+    : sort {
+        my $comp;
+        for (my $i = 0; $i < @xs_values; $i++) {
+          $comp = $b->{val}[$i] <=> $a->{val}[$i];
+          last if $comp != 0;
+        }
+        $comp;
+      } @pos_vals;
+  my @orders = map { $_->{pos} } @sorted_pos_values;
+  
+  return Rstats::Func::c_($r, @orders);
+}
+
+=cut

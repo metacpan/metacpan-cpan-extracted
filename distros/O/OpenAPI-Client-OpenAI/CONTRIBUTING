@@ -14,7 +14,8 @@ When updating the openapi spec in the `share` directory, be sure to run
 `devel/build_docs.pl` to update the documentation.
 
 If you prefer, you can run the `bash` script, `devel/rebuild` to cleanly
-rebuild the project after changes are made.
+rebuild the project after changes are made. See `devel/rebuild -h` for more
+information.
 
 # Examples
 

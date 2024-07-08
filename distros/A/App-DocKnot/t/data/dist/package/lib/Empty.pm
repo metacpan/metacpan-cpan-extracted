@@ -3,18 +3,14 @@
 # This module exists only to trigger the test suite, contain some
 # documentation, and be something to distribute.
 #
-# Copyright 2018-2019 Russ Allbery <rra@cpan.org>
+# Copyright 2018-2019, 2024 Russ Allbery <rra@cpan.org>
 #
 # SPDX-License-Identifier: MIT
 
-package Empty;
+package Empty v2.0.0;
 
-use 5.006;
-use strict;
+use 5.012;
 use warnings;
-
-# Declare variables that should be set in BEGIN for robustness.
-our $VERSION = '1.00';
 
 # Empty function for testing purposes.
 sub empty_function {

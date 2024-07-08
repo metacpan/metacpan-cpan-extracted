@@ -4,7 +4,7 @@
       "Russ Allbery <rra@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.4231",
+   "generated_by" : "Module::Build version 0.4234",
    "license" : [
       "mit"
    ],
@@ -30,7 +30,7 @@
             "IPC::Run" : "0",
             "IPC::System::Simple" : "0",
             "Image::Size" : "0",
-            "JSON::MaybeXS" : "0",
+            "JSON::MaybeXS" : "1.004000",
             "Kwalify" : "0",
             "List::SomeUtils" : "0.07",
             "Path::Iterator::Rule" : "0",
@@ -53,59 +53,63 @@
    "provides" : {
       "App::DocKnot" : {
          "file" : "lib/App/DocKnot.pm",
-         "version" : "7.01"
+         "version" : "v8.0.0"
       },
       "App::DocKnot::Command" : {
          "file" : "lib/App/DocKnot/Command.pm",
-         "version" : "7.01"
+         "version" : "v8.0.0"
       },
       "App::DocKnot::Config" : {
          "file" : "lib/App/DocKnot/Config.pm",
-         "version" : "7.01"
+         "version" : "v8.0.0"
       },
       "App::DocKnot::Dist" : {
          "file" : "lib/App/DocKnot/Dist.pm",
-         "version" : "7.01"
+         "version" : "v8.0.0"
       },
       "App::DocKnot::Generate" : {
          "file" : "lib/App/DocKnot/Generate.pm",
-         "version" : "7.01"
+         "version" : "v8.0.0"
       },
       "App::DocKnot::Release" : {
          "file" : "lib/App/DocKnot/Release.pm",
-         "version" : "7.01"
+         "version" : "v8.0.0"
       },
       "App::DocKnot::Spin" : {
          "file" : "lib/App/DocKnot/Spin.pm",
-         "version" : "7.01"
+         "version" : "v8.0.0"
       },
       "App::DocKnot::Spin::Pointer" : {
          "file" : "lib/App/DocKnot/Spin/Pointer.pm",
-         "version" : "7.01"
+         "version" : "v8.0.0"
       },
       "App::DocKnot::Spin::RSS" : {
          "file" : "lib/App/DocKnot/Spin/RSS.pm",
-         "version" : "7.01"
+         "version" : "v8.0.0"
       },
       "App::DocKnot::Spin::Sitemap" : {
          "file" : "lib/App/DocKnot/Spin/Sitemap.pm",
-         "version" : "7.01"
+         "version" : "v8.0.0"
+      },
+      "App::DocKnot::Spin::Text" : {
+         "file" : "lib/App/DocKnot/Spin/Text.pm",
+         "version" : "v8.0.0"
       },
       "App::DocKnot::Spin::Thread" : {
          "file" : "lib/App/DocKnot/Spin/Thread.pm",
-         "version" : "7.01"
+         "version" : "v8.0.0"
       },
       "App::DocKnot::Spin::Versions" : {
          "file" : "lib/App/DocKnot/Spin/Versions.pm",
-         "version" : "7.01"
+         "version" : "v8.0.0"
       },
       "App::DocKnot::Update" : {
          "file" : "lib/App/DocKnot/Update.pm",
-         "version" : "7.01"
+         "version" : "v8.0.0"
       },
       "App::DocKnot::Util" : {
          "file" : "lib/App/DocKnot/Util.pm",
-         "version" : "7.01"
+         "version" : "v8.0.0"
       }
    },
    "release_status" : "stable",
@@ -123,6 +127,6 @@
          "web" : "https://github.com/rra/docknot"
       }
    },
-   "version" : "7.01",
-   "x_serialization_backend" : "JSON::PP version 4.04"
+   "version" : "v8.0.0",
+   "x_serialization_backend" : "JSON::PP version 4.16"
 }

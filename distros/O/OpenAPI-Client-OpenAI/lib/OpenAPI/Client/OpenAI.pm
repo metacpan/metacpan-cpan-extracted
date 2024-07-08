@@ -10,7 +10,7 @@ use File::Spec::Functions qw(catfile);
 use Mojo::Base 'OpenAPI::Client';
 use Mojo::URL;
 
-our $VERSION = '0.06';
+our $VERSION = '0.07';
 
 sub new {
     my ( $class, $specification ) = ( shift, shift );
@@ -97,13 +97,13 @@ OpenAPI::Client::OpenAI - A client for the OpenAI API
 
 =head1 SYNOPSIS
 
-  use OpenAPI::Client::OpenAI;
+    use OpenAPI::Client::OpenAI;
 
-  # The OPENAI_API_KEY environment variable must be set
-  # See https://platform.openai.com/api-keys and ENVIRONMENT VARIABLES below
-  my $client = OpenAPI::Client::OpenAI->new();
+    # The OPENAI_API_KEY environment variable must be set
+    # See https://platform.openai.com/api-keys and ENVIRONMENT VARIABLES below
+    my $client = OpenAPI::Client::OpenAI->new();
 
-    my $tx = $client->create_completion(
+    my $tx = $client->createCompletion(
         {
             body => {
                 model       => 'gpt-3.5-turbo-instruct',
@@ -126,6 +126,9 @@ key authentication according to the provided environment.
 
 Note that the OpenAI API is a paid service. You will need to sign up for an
 account.
+
+See the C<examples/> directory in the distribution for more examples, along
+with the tests.
 
 =head1 WARNING
 
@@ -161,9 +164,46 @@ distribution.
 Additional options are passed to the parent class, OpenAPI::Client, with the
 exception of the following extra options:
 
+=head2 Other Methods
+
 Other methods are documented in L<OpenAPI::Client::OpenAI::Methods>.
 
 The schema is documented in L<OpenAPI::Client::OpenAI::Schema>.
+
+=head1 DEPRECATED METHODS
+
+The following methods are deprecated and will be removed in a future release:
+
+=over
+
+=item * create_chat_completion
+
+Replaced with C<createChatCompletion>.
+
+=item * create_completion
+
+Replaced with C<createCompletion>.
+
+=item * create_embedding
+
+Replaced with C<createEmbedding>.
+
+=item * create_image
+
+Replaced with C<createImage>.
+
+=item * create_moderation
+
+Replaced with C<createModeration>.
+
+=item * list_models
+
+Replaced with C<listModels>.
+
+=back
+
+Originally, these methods were named using C<snake_case>, but to simplify the
+code, we retained the C<camelCase> names in the main module.
 
 =head1 ENVIRONMENT VARIABLES
 

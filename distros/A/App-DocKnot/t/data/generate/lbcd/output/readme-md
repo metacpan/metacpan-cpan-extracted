@@ -12,10 +12,11 @@ distributed under a BSD-style license.  Please see the section
 
 ## Warning
 
-**This package is orphaned.** Although I believe it is still useful, I no
-longer use this method of DNS load balancing and am no longer maintaining
-this package.  If you would like to pick up maintenance of it, please feel
-free.  Contact me if you would like this page to redirect to its new home.
+**This package is not maintained.** Although I believe it is still useful,
+I no longer use this method of DNS load balancing and am no longer
+maintaining this package.  If you would like to pick up maintenance of it,
+please feel free.  Contact me if you would like this page to redirect to
+its new home.
 
 ## Blurb
 
@@ -140,33 +141,23 @@ value.
 
 ## Support
 
-The [lbcd web page](https://www.eyrie.org/~eagle/software/lbcd/) will
-always have the current version of this package, the current
-documentation, and pointers to any additional resources.
+This package is not currently maintained and will not get further releases
+or bug fixes.  I do not recommend using it unless you're willing to take
+over maintenance.
 
-New lbcd releases are announced on the lbnamed-users mailing list.  To
-subscribe or see the list archives, go to the [lbnamed-users list
-information
-page](https://mailman.stanford.edu/mailman/listinfo/lbnamed-users).
-
-I welcome bug reports and patches for this package at eagle@eyrie.org.
-However, please be aware that I tend to be extremely busy and work
-projects often take priority.  I'll save your report and get to it as soon
-as I can, but it may take me a couple of months.
+The [lbcd web page](https://www.eyrie.org/~eagle/software/lbcd/) has the
+last released version, its documentation, and pointers to any additional
+resources.
 
 ## Source Repository
 
-lbcd is maintained using Git.  You can access the current source on
+lbcd was maintained using Git.  You can access the current source on
 [GitHub](https://github.com/rra/lbcd) or by cloning the repository at:
 
 https://git.eyrie.org/git/system/lbcd.git
 
 or [view the repository on the
 web](https://git.eyrie.org/?p=system/lbcd.git).
-
-The eyrie.org repository is the canonical one, maintained by the author,
-but using GitHub is probably more convenient for most purposes.  Pull
-requests are gratefully reviewed and normally accepted.
 
 ## License
 

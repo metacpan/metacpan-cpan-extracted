@@ -1,5 +1,9 @@
 Revision history for DateTime::Format::Genealogy
 
+0.08	Sun Jul  7 20:11:22 EDT 2024
+	Handle entries with Juli (unless strict is enabled)
+	Handle 29-Aug-1938
+
 0.07	Thu Jun 20 07:29:46 EDT 2024
 	Handle entries with Janv (unless strict is enabled)
 

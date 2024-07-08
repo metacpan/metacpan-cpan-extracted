@@ -10,7 +10,7 @@
 # Modules and declarations
 ##############################################################################
 
-package App::DocKnot::Command 7.01;
+package App::DocKnot::Command v8.0.0;
 
 use 5.024;
 use autodie;
@@ -61,59 +61,67 @@ use Pod::Usage qw(pod2usage);
 #     are not set, an error will be thrown.
 our %COMMANDS = (
     dist => {
-        method => 'make_distribution',
-        module => 'App::DocKnot::Dist',
+        method  => 'make_distribution',
+        module  => 'App::DocKnot::Dist',
         options => ['distdir|d=s', 'metadata|m=s', 'pgp-key|p=s'],
         maximum => 0,
     },
     generate => {
-        method => 'generate_output',
-        module => 'App::DocKnot::Generate',
+        method  => 'generate_output',
+        module  => 'App::DocKnot::Generate',
         options => ['metadata|m=s', 'width|w=i'],
         maximum => 2,
         minimum => 1,
     },
     'generate-all' => {
-        method => 'generate_all',
-        module => 'App::DocKnot::Generate',
+        method  => 'generate_all',
+        module  => 'App::DocKnot::Generate',
         options => ['metadata|m=s', 'width|w=i'],
         maximum => 0,
     },
     release => {
-        method => 'release',
-        module => 'App::DocKnot::Release',
+        method  => 'release',
+        module  => 'App::DocKnot::Release',
         options => ['archivedir|a=s', 'distdir|d=s', 'metadata|m=s'],
         maximum => 0,
     },
     spin => {
-        method => 'spin',
-        module => 'App::DocKnot::Spin',
+        method  => 'spin',
+        module  => 'App::DocKnot::Spin',
         options => ['delete|d', 'exclude|e=s@', 'style-url|s=s'],
         minimum => 2,
         maximum => 2,
     },
     'spin-rss' => {
-        method => 'generate',
-        module => 'App::DocKnot::Spin::RSS',
+        method  => 'generate',
+        module  => 'App::DocKnot::Spin::RSS',
         options => ['base|b=s'],
         minimum => 1,
         maximum => 1,
     },
+    'spin-text' => {
+        method  => 'spin_text_file',
+        module  => 'App::DocKnot::Spin::Text',
+        options => [
+            'modified|m', 'style|s=s', 'title|t=s', 'use-value|u',
+        ],
+        maximum => 2,
+    },
     'spin-thread' => {
-        method => 'spin_thread_file',
-        module => 'App::DocKnot::Spin::Thread',
+        method  => 'spin_thread_file',
+        module  => 'App::DocKnot::Spin::Thread',
         options => ['style-url|s=s'],
         maximum => 2,
     },
     update => {
-        method => 'update',
-        module => 'App::DocKnot::Update',
+        method  => 'update',
+        module  => 'App::DocKnot::Update',
         options => ['metadata|m=s', 'output|o=s'],
         maximum => 0,
     },
     'update-spin' => {
-        method => 'update_spin',
-        module => 'App::DocKnot::Update',
+        method  => 'update_spin',
+        module  => 'App::DocKnot::Update',
         maximum => 1,
     },
 );

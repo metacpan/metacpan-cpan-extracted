@@ -1,5 +1,9 @@
 Revision history for this software.
 
+0.58  2024-07-07 00:00:00
+  - supports ^^ logical xor operator
+  - created by INABA Hitoshi
+
 0.57  2023-07-07 00:00:00
   - supports finally { block }
   - supports mb::finally { block }

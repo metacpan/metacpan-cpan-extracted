@@ -1,0 +1,714 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html
+    PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+  <title>Using Majordomo with qmail FAQ</title>
+  <link rel="stylesheet" href="/~eagle/styles/faq.css" type="text/css" />
+  <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+</head>
+
+<!-- Converted by DocKnot %VERSION% on %DATE% -->
+
+<body>
+
+<h1>Using Majordomo with qmail</h1>
+<p class="subheading">
+  Maintained by Russ Allbery &lt;eagle@eyrie.org&gt;<br />
+  Last modified %DATE%
+</p>
+
+<p>
+If you're reading this on Usenet, this FAQ is formatted as a minimal
+digest, so if your news or mail reader has digest handling capabilities
+you can use them to navigate between sections.  In rn variants, you can
+use Ctrl-G to skip to the next section; in Gnus, press Ctrl-D to break
+each section into a separate article.
+</p>
+
+<p>
+The latest version of this FAQ is available on the web at
+&lt;<a href="https://www.eyrie.org/~eagle/faqs/mjqmail.html">https://www.eyrie.org/~eagle/faqs/mjqmail.html</a>&gt;.  Please send any
+comments, suggestions, or updates to eagle@eyrie.org.
+</p>
+
+
+<h2>Contents</h2>
+
+<ol>
+<li value="1">
+<p>
+    <a href="#S1">Introduction and Overview</a><br />
+    1.1.  <a href="#S1.1">Why qmail is different</a><br />
+    1.2.  <a href="#S1.2">Potential problems</a><br />
+    1.3.  <a href="#S1.3">Stages of setup</a>
+</p>
+</li>
+
+<li value="2">
+<p>
+    <a href="#S2">Handling incoming list mail</a><br />
+    2.1.  <a href="#S2.1">The simple approach</a><br />
+    2.2.  <a href="#S2.2">Eliminating Majordomo's wrapper program</a><br />
+    2.3.  <a href="#S2.3">Using virtual domains</a><br />
+    2.4.  <a href="#S2.4">Using qmail-users</a><br />
+    2.5.  <a href="#S2.5">Cutting down on .qmail files</a>
+</p>
+</li>
+
+<li value="3">
+<p>
+    <a href="#S3">Sending outgoing list mail</a><br />
+    3.1.  <a href="#S3.1">The simple approach</a><br />
+    3.2.  <a href="#S3.2">Privacy concerns with the simple approach</a><br />
+    3.3.  <a href="#S3.3">Talking to qmail directly</a><br />
+    3.4.  <a href="#S3.4">Handling digests and archives</a>
+</p>
+</li>
+
+<li value="4">
+<p>
+    <a href="#S4">Other resources</a>
+</p>
+</li>
+</ol>
+
+
+<h2><a name="S1" id="S1">1. Introduction and Overview</a></h2>
+
+<p>
+This FAQ is no longer actively maintained.  Its author no longer uses
+either qmail or Majordomo.  It is preserved in case anyone still finds it
+useful, but further updates are not being made and some of the information
+below is probably out of date.
+</p>
+
+<p>
+This FAQ describes how to get Majordomo 1.94 working under a pure qmail
+system (one without qmsmac or some other emulation of sendmail's
+/etc/alias handling).  A standard Majordomo installation relies heavily on
+sendmail aliases, and while it is possible to do the obvious thing and set
+up Majordomo using .qmail files in ~alias instead, there are actually
+considerably better ways.
+</p>
+
+<p>
+This FAQ assumes that you understand how to do a stock installation of
+Majordomo.  This FAQ is not aimed at the Majordomo novice, but rather at
+someone who has set up Majordomo before under non-qmail systems and now
+wants to set it up on a qmail system (or upgrade an existing non-qmail
+system running Majordomo to qmail).  For basic questions on how to install
+Majordomo, see the documentation that comes with it.
+</p>
+
+<p>
+It is expected that Majordomo 2.x will handle qmail directly, so this FAQ
+is only interim documentation.  A release date for for Majordomo 2.x has
+not yet been set.
+</p>
+
+<p>
+This FAQ owes a great deal to the documentation and scripts written by
+Giles Lean and Chael Hall, which I used as a starting point for my own
+experimentation.  Giles also provided valuable feedback, corrections, and
+rewordings.  Information on digests is largely from Lindsay Haisley.
+</p>
+
+
+<h2><a name="S1.1" id="S1.1">1.1. Why qmail is different</a></h2>
+
+<p>
+In setting up Majordomo with qmail, there are two classes of things to
+think about:
+</p>
+
+<ul>
+<li>
+<p>
+   minimal changes from a stock (sendmail) installation to make
+   Majordomo work, and
+</p>
+</li>
+
+<li>
+<p>
+   further changes to adjust majordomo to better fit qmail's philosophy.
+   Making these additional changes is highly recommended.
+</p>
+</li>
+</ul>
+
+<p>
+qmail is more than just a different MTA (mail transport agent).  It also
+has a fundamentally different philosophy than sendmail in a lot of
+respects.  It's possible, using the information contained in this FAQ, to
+adjust Majordomo to fit into qmail's philosophy, which in my opinion will
+result in a much better overall list management system than just making a
+few minor changes to a Majordomo installation to get it working.
+</p>
+
+
+<h2><a name="S1.2" id="S1.2">1.2. Potential problems</a></h2>
+
+<p>
+Before getting into the technical details of setting up Majordomo, you
+should be aware of some general potential problems with using qmail and
+Majordomo together.
+</p>
+
+<p>
+One of the advantages that qmail has over sendmail is that it's a much
+faster and more efficient MTA.  It receives mail faster and, more to the
+point, it sends mail faster.  Furthermore, in order to support VERP (where
+every mail message sent to the list has a different envelope sender so
+that bounces can be easily associated with a subscribed address), it may
+send each list message as a separate mail message.  sendmail under some
+circumstances does more blocking, sending one message with multiple
+envelope recipients if all recipients are at the same host.
+</p>
+
+<p>
+This can result in qmail putting a much higher load on remote mail
+servers, particularly if you have a large number of list subscribers at
+one remote host, and particularly if that remote host is not also running
+qmail.  If you're running large lists on a qmail mail server, you may wish
+to seriously consider decreasing control/concurrencyremote to something
+lower than the default of 20 so that qmail won't open 20 simultaneous
+connections to that remote host.  (On the other hand, if the remote hosts
+can handle it, you may want to consider <strong>increasing</strong> concurrencyremote so
+that list mail goes out faster.)
+</p>
+
+
+<h2><a name="S1.3" id="S1.3">1.3. Stages of setup</a></h2>
+
+<p>
+There are basically two things one has to worry about to get Majordomo
+working:  routing incoming mail to the correct Majordomo program, and
+letting Majordomo send outgoing mail to the mailing lists.  The remainder
+of this document describes how to set up each part.
+</p>
+
+<p>
+The routing of incoming email to the majordomo programs requires changes,
+since qmail doesn't use the /etc/aliases method described in the Majordomo
+installation instructions.  The minimal changes required to get Majordomo
+working are to create .qmail files in ~alias for every list and
+administrative address.  (At this point, experienced Majordomo installers
+will be wondering how to hide the outgoing alias; how to either do this or
+protect it from external mail is described later.)
+</p>
+
+<p>
+A stock Majordomo installation can send outgoing mail just fine under
+qmail (with the addition of a .qmail file linked to the list address file
+so that resend has an address to send to).  For reasons of speed, bounce
+handling and loop detection, you may wish to have Majordomo send mail
+using a program that talks more directly to the qmail system rather than
+through qmail's sendmail emulation.
+</p>
+
+
+<h2><a name="S2" id="S2">2. Handing incoming list mail</a></h2>
+
+<p>
+For each mailing list run on your system, you need to be able to accept
+mail at the list address and an associated owner address (either
+list-owner or owner-list) at a bare minimum.  You may also want to accept
+mail at list-request (for administrative requests) and list-approval (for
+subscription and unsubscription notification and approval).  The standard
+Majordomo addresses (majordomo and majordomo-owner) should also work as
+expected.
+</p>
+
+<p>
+This section deals with configuring qmail so that mail to those addresses
+is routed to the correct Majordomo program.
+</p>
+
+<p>
+A default installation of Majordomo uses a wrapper program (written in C
+and installed setuid root) to change users to the Majordomo user.
+</p>
+
+
+<h2><a name="S2.1" id="S2.1">2.1. The simple approach</a></h2>
+
+<p>
+The easiest method to use is qmail's alias mechanism.  Just create .qmail
+files for each of the list administrative and submission addresses for
+each of your lists in ~alias.  The files needed for each list are:
+</p>
+
+<pre>    .qmail-LIST
+    .qmail-owner-LIST
+    .qmail-LIST-approval</pre>
+
+<p>
+where LIST is the name of the mailing list.  These files should contain
+the standard Majordomo aliases; in other words, .qmail-LIST should have:
+</p>
+
+<pre>    |/path/to/majordomo/wrapper resend -l LIST LIST-outgoing</pre>
+
+<p>
+.qmail-owner-LIST should contain the e-mail address of the owner of the
+mailing list, and so forth.  This is the direct qmail analog of setting up
+the standard Majordomo aliases in /etc/aliases.  (Keep in mind that qmail
+specifies that all e-mail addresses in .qmail files should be fully
+qualified.)  You may also want to add a .qmail-LIST-request file
+containing the standard request program invocation.
+</p>
+
+<p>
+Finally, create ~alias/.qmail-majordomo containing the standard Majordomo
+invocation and ~alias/.qmail-majordomo-owner containing the Majordomo
+administrator's e-mail address.
+</p>
+
+
+<h2><a name="S2.2" id="S2.2">2.2. Eliminating Majordomo's wrapper program</a></h2>
+
+<p>
+While the above method will certainly work, it still uses Majordomo's
+wrapper program to switch users from alias to the Majordomo user.  One
+could just not use the wrapper program and let Majordomo run as alias, but
+this is probably a bad idea from a security standpoint (the alias user may
+be doing a variety of other things).
+</p>
+
+<p>
+qmail already has a facility built in for changing UIDs to the user whose
+mail is being delivered, and in fact probably does so more robustly than
+Majordomo's wrapper does.  It makes a great deal of sense to eliminate
+Majordomo's wrapper program entirely under qmail and let qmail do the user
+switching.
+</p>
+
+<p>
+There are two basic ways to do this.  The simplest is with the virtual
+domain system, described in section 2.3, but this requires that you have
+the ability to set up a DNS MX record for a separate host name that will
+only be handling mailing list mail.  A more complicated solution that
+doesn't require that is to use the qmail-users mechanism as described in
+section 2.4.
+</p>
+
+<p>
+Under either approach, you'll need to set up .qmail files to handle the
+incoming mail, which will now be delivered according to .qmail files in
+the Majordomo user's home directory and with the UID and GID of the
+delivery program already set to the appropriate user and group.  The
+simplest way to handle this is to create .qmail files in the Majordomo
+user's home directory similar to those described in section 2.1, except
+leaving off the wrapper.  For example, if Majordomo were installed in
+/var/qmail/majordomo, .qmail-LIST would just contain:
+</p>
+
+<pre>    |/var/qmail/majordomo/resend -l LIST LIST-outgoing</pre>
+
+<p>
+Also create a .qmail file containing:
+</p>
+
+<pre>    |/var/qmail/majordomo/majordomo</pre>
+
+<p>
+and a .qmail-owner file containing the e-mail address of the Majordomo
+administrator.
+</p>
+
+<p>
+There are two ways to deal with the fact that the standard Majordomo
+sender address for list mail is owner-LIST instead of the more natural (at
+least for qmail) LIST-owner.  One is to create then create
+.qmail-owner-LIST files for each list (and add a line to users/append as
+mentioned in the previous section if you're using qmail-users).  Another,
+more natural approach is to change Majordomo to use LIST-owner.  To do
+that, go through the .config files for each of your mailing lists and
+change the "sender" setting to LIST-owner instead of the default.  You'll
+also want to install a small to majordomo to make that the default for new
+lists and for times when the configuration file couldn't be read.  You can
+get that patch from:
+</p>
+
+<blockquote>
+<p>
+    &lt;<a href="https://www.eyrie.org/~eagle/software/mjqmail/">https://www.eyrie.org/~eagle/software/mjqmail/</a>&gt;
+</p>
+</blockquote>
+
+<p>
+The last issue to be aware of in eliminating the wrapper is that the
+wrapper sets a variety of environment variables which will now no longer
+be set.  The only one that actually causes problems is MAJORDOMO_CF.
+Since it won't be set, all of the Majordomo programs will fall back on
+/etc/majordomo.cf, which probably isn't correct.  If it's not, edit all
+Majordomo programs you're running from aliases (resend, majordomo,
+request-answer, etc.), search for MAJORDOMO_CF, and change the fallback
+path to the correct path for majordomo.cf.
+</p>
+
+
+<h2><a name="S2.3" id="S2.3">2.3. Using virtual domains</a></h2>
+
+<p>
+A virtual domain allows you to delegate an entire domain to a particular
+user.  Using virtual domains requires that you have sufficient control
+over your DNS to set up a particular hostname just for your mailing lists.
+You'll need to be able to pick an address, like lists.example.com, and set
+up an MX record for it pointing to your mail server.  If you're not able
+to do this, use the qmail-users mechanism described in the next section.
+</p>
+
+<p>
+Choose the subdomain that you're going to give to Majordomo (such as
+lists.example.com).  Add a line to /var/qmail/control/virtualdomains that
+looks like:
+</p>
+
+<pre>    lists.example.com:lists</pre>
+
+<p>
+replacing lists.example.com with your virtual domain and lists with your
+Majordomo user.  All addresses in that domain will now be handled by
+.qmail files in the Majordomo user's home directory (well, after qmail is
+restarted or qmail-send gets a HUP signal).  See the qmail-send man page
+for more details.
+</p>
+
+<p>
+It's possible to use the virtual domain system under qmail 1.03 or later
+to delegate individual addresses rather than whole domains to a particular
+user.  This would potentially allow one to use virtual domains even
+without a separate hostname and MX record for mailing lists.  That would
+require listing every individual list address in the virtualdomains file,
+though, so using the qmail-users mechanism is probably simpler for that
+case.
+</p>
+
+
+<h2><a name="S2.4" id="S2.4">2.4. Using qmail-users</a></h2>
+
+<p>
+The qmail-users man page, along with the documentation for qmail-pw2u and
+qmail-newu, contains the full details on how the qmail-users mechanism
+works, but basically qmail-pw2u is run on the password file to generate a
+list of addresses mail is accepted at, what UID and GID to switch to when
+delivering mail for a user, and where to deliver the mail (the user's home
+directory).
+</p>
+
+<p>
+Assuming that Majordomo is installed in /var/qmail/majordomo, create
+/var/qmail/users/mailnames if it doesn't exist and add the following:
+</p>
+
+<pre>    lists:lists:majordomo</pre>
+
+<p>
+(replacing lists with the name of your Majordomo user).  This will be used
+for the standard majordomo and majordomo-owner addresses.  Then, for each
+list, add a line to /var/qmail/users/subusers of the form:
+</p>
+
+<pre>    LIST:lists:LIST:</pre>
+
+<p>
+(again, replacing lists with the name of your Majordomo user and replacing
+LIST by the name of the list).  After this is done and you run qmail-pw2u,
+all incoming mail to LIST and LIST-anything will be controlled by .qmail
+files in Majordomo's home directory.
+</p>
+
+<p>
+(Note that you may not want the home directory of the Majordomo user to be
+the same as the Majordomo installation directory, for various reasons.
+One reason to make them different is that qmail-pw2u likes to have the
+home directory of a user be owned by that user and you may not want to
+have the directory containing the main Majordomo scripts owned by the
+Majordomo user for security reasons.)
+</p>
+
+<p>
+If you're not going to patch Majordomo to use LIST-owner addresses instead
+of owner-LIST addresses, you may also want to add the line:
+</p>
+
+<pre>    +owner-:lists:401:201:/var/qmail/majordomo:-:owner-:</pre>
+
+<p>
+to /var/qmail/users/append, replacing the user, UID, GID, and home
+directory as appropriate for your installation, so that all mail addressed
+to owner-anything will be handled by the Majordomo user.
+</p>
+
+<p>
+Note that you may be able to avoid using the qmail-users mechanism for all
+of your addresses by not including the alias lines in users/assign and
+letting qmail-lspawn fall back on reading /etc/passwd.  If you choose to
+do this, you can just put the lines for Majordomo in users/assign directly
+and don't need to use qmail-pw2u.  See the man page for more details.
+</p>
+
+
+<h2><a name="S2.5" id="S2.5">2.5. Cutting down on .qmail files</a></h2>
+
+<p>
+Using the above instructions for setting up the incoming mail addresses,
+one ends up with three or four .qmail files per list, most of whose
+contents are algorithmically determinable from the name of the list.  If
+you're like me, that seems like a lot of clutter, and it may be worthwhile
+to use a program to resend incoming mail to the right place depending on
+the address rather than using .qmail files and having qmail do it.
+</p>
+
+<p>
+One script for doing this for the common cases of -owner, -request,
+-approval, and the list submission address itself is available from:
+</p>
+
+<blockquote>
+<p>
+    &lt;<a href="https://www.eyrie.org/~eagle/software/mjqmail/">https://www.eyrie.org/~eagle/software/mjqmail/</a>&gt;
+</p>
+</blockquote>
+
+<p>
+Patches and pointers to additional scripts that can handle more cases are
+welcome.
+</p>
+
+<p>
+Using a script like this, one simply creates a .qmail-default file in the
+Majordomo directory that pipes incoming mail to the script.  Note that by
+doing it that way, if there are any particular addresses which <strong>shouldn't</strong>
+go to the script, it's trivial to override them just by creating a
+separate .qmail file for those special cases.  .qmail-default is only
+checked if no more specific .qmail files exist.
+</p>
+
+
+<h2><a name="S3" id="S3">3. Sending outgoing list mail</a></h2>
+
+<p>
+Once the Majordomo system has received the mail, it has to send it out
+again to the mailing list.  Normally this is done using the Majordomo
+program resend.  (It's possible to have the list submission alias point
+directly at the file of addresses, but it's not recommended since the
+envelope sender isn't changed and none of the other things resend does can
+be done.)
+</p>
+
+<p>
+resend by default uses /usr/lib/sendmail to send outgoing mail, which
+actually works just fine on a qmail system due to qmail's sendmail
+emulation.  resend sends mail to another alias on the system, though, so
+an address for resend to send mail to has to be created or the way resend
+sends mail has to be changed.
+</p>
+
+
+<h2><a name="S3.1" id="S3.1">3.1. The simple approach</a></h2>
+
+<p>
+The easiest way to get resend working under qmail is to create a
+.qmail-LIST-outgoing file and link it to the list file that Majordomo
+maintains (you have to use a symbolic link, since Majordomo will break
+hard links in the process of updating the address file).  In order for
+this to work, your lists have to be set to strip comments from subscribed
+addresses (because qmail will complain about addresses with comments).
+Note also that qmail won't like any addresses which begin with
+non-alphanumeric characters, which may be a problem in some circumstances.
+</p>
+
+<p>
+A patch to Majordomo that causes it to reject any addresses that don't
+start with alphanumeric characters was available as part of Chael Hall's
+mj+qmail package, but it's not clear whether that's still available
+anywhere.
+</p>
+
+
+<h2><a name="S3.2" id="S3.2">3.2. Privacy concerns with the simple approach</a></h2>
+
+<p>
+The problem with doing things this way is that qmail will insert a
+Delivered-To header pointing at the address for the raw list file into
+each outgoing message, and someone will be able to send mail directly to
+the raw list address and that mail will bypass resend.  This is just an
+annoyance if you're running fairly open lists; this is a fatal problem for
+lists that are moderated or which use extensive spam filtering.
+</p>
+
+<p>
+There are a couple of ways to deal with this problem.  One is to add a
+filter as the first subscriber to every mailing list that checks incoming
+mail and rejects it if it wasn't sent by Majordomo.  A good filter which
+does this is available from Giles Lean's majordomo-inject page (see the
+reference below).
+</p>
+
+<p>
+Another, perhaps better, solution is to tell Majordomo to use something
+other than qmail's sendmail emulation to send outgoing mail.  Details on
+how to do that are in the next section.
+</p>
+
+<p>
+In addition to the problem with the exposed raw list address, one may wish
+to use something other than the sendmail emulation so that VERP envelope
+senders can be added to outgoing mail.  It's possible to convince qmail to
+add VERP using the simple approach by creating .qmail-LIST-outgoing-owner
+and .qmail-LIST-outgoing-owner-default, but using a script to do it is
+cleaner in some ways and ensures that the envelope sender is set to what
+resend wants, just with VERP added, rather than LIST-outgoing-owner.
+</p>
+
+<p>
+Another reason to use a separate mailing script is so that you aren't
+forced into having Majordomo strip comments from the list files; a
+sufficiently intelligent injection script could do that.
+</p>
+
+
+<h2><a name="S3.3" id="S3.3">3.3. Talking to qmail directly</a></h2>
+
+<p>
+I have an mjinject script which can be used as the outgoing mailer for
+resend.  It talks to qmail-queue directly (which is considerably more
+efficient than talking to the sendmail emulation or to qmail-inject), and
+optionally adds VERP to outgoing messages.  It also adds a Delivered-To
+header to outgoing messages pointing to the submission address for the
+list, which should hopefully be effective in preventing loops.
+It's available at:
+</p>
+
+<blockquote>
+<p>
+    &lt;<a href="https://www.eyrie.org/~eagle/software/mjqmail/">https://www.eyrie.org/~eagle/software/mjqmail/</a>&gt;
+</p>
+</blockquote>
+
+<p>
+This script is a merger of Giles Lean's and my work, and he contributed
+substantially to it.
+</p>
+
+<p>
+As an aside, while VERP can be extremely handy in tracking down where
+mailing list bounces are coming from, some defective MTAs can't handle
+VERP addresses.  In particular, I've received a report that WatchGuard
+firewalls reject them with "mailbox name not allowed."  So if you try
+turning on VERP and suddenly start getting bounces from your mailing list,
+you may want to see if any of your subscribers are behind one of those
+broken MTAs.
+</p>
+
+
+<h2><a name="S3.4" id="S3.4">3.4. Handling digests and archives</a></h2>
+
+<p>
+First of all, when doing digests under qmail, you will almost certainly
+want to handle digests as another Majordomo list.  The stand-alone method
+of configuration would require a lot of porting to qmail, and why go to
+the effort when you've already ported Majordomo proper?
+</p>
+
+<p>
+Digests and archives are both usually created just by adding another
+recipient to outgoing list mail, so one obvious way of dealing with them
+is to add them as additional addresses subscribed to the mailing list.  To
+avoid confusing Majordomo (and mjinject), however, you want them to be
+simple addresses, which means that you would have to have potentially
+exposed addresses on your system going into the digest and archive scripts
+which would have to be protected.
+</p>
+
+<p>
+If that isn't likely to be a problem, then creating .qmail-LIST-archive
+and .qmail-LIST-digestify files in Majordomo's home directory and then
+adding LIST-archive and LIST-digestify to the mailing list will cause
+digests and archives to work about the same as they would work under a
+sendmail Majordomo setup.
+</p>
+
+<p>
+Another option is to add the invocation of digest to a .qmail-LIST file in
+majordomo's home directory (creating one to override mjdispatch or a
+similar program if you're using one), in addition to the invocation of
+resend.  This will cause incoming messages as seen by digest to have not
+gone through resend, which may or may not be what you want.  (It almost
+certainly isn't what you want if you have a moderated list.)
+</p>
+
+<p>
+A third option is to use the digest and archive support in mjinject (see
+above).  If you're using it, and create a LIST.programs file in the lists
+directory containing the command lines to run archive and/or digest,
+mjinject will pipe the message (coming from resend) through those programs
+as well as mailing it out to the list.  You can then use your standard way
+of periodically sending out digests.
+</p>
+
+<p>
+Note that the digest script itself uses the mailer setting from
+majordomo.cf, so if you've modified that to use qmail-inject, digest will
+as well, which in practice will require that digest be sending to a
+regular Majordomo list.
+</p>
+
+
+<h2><a name="S4" id="S4">4. Other resources</a></h2>
+
+<p>
+qmail itself, as well as links to many other packages that work with it or
+add onto it and quite possibly links to other ways of making it work with
+Majordomo, is at:
+</p>
+
+<blockquote>
+<p>
+    &lt;<a href="https://cr.yp.to/qmail.html">https://cr.yp.to/qmail.html</a>&gt;
+</p>
+</blockquote>
+
+<p>
+I've benefited much from the discussions of qmail and how to make it work
+in various situations and with various packages that have taken place on
+the qmail mailing list.  It's fairly high volume, but has a lot of good
+information.  You can subscribe by sending mail to:
+</p>
+
+<blockquote>
+<p>
+    &lt;<a href="mailto:qmail-subscribe@list.cr.yp.to">qmail-subscribe@list.cr.yp.to</a>&gt;
+</p>
+</blockquote>
+
+<p>
+If you're starting fresh and setting up a mailing list manager for the
+first time, you may wish to use a system that's more "native" to qmail.
+ezmlm (written by the same person who wrote qmail) is available at:
+</p>
+
+<blockquote>
+<p>
+    &lt;<a href="https://cr.yp.to/ezmlm.html">https://cr.yp.to/ezmlm.html</a>&gt;
+</p>
+</blockquote>
+
+<p>
+with an extended version, ezmlm-idx, available from:
+</p>
+
+<blockquote>
+<p>
+    &lt;<a href="https://untroubled.org/ezmlm/">https://untroubled.org/ezmlm/</a>&gt;
+</p>
+</blockquote>
+
+</body>
+</html>

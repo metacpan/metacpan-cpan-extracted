@@ -27,25 +27,21 @@ my $dataroot = path('t', 'data', 'generate');
 
 # Module::Build distribution (use App::DocKnot itself and default paths).
 my $docknot = App::DocKnot::Dist->new({ distdir => q{.} });
-#<<<
 my @expected = (
     ['perl', 'Build.PL'],
     ['./Build', 'disttest'],
     ['./Build', 'dist'],
 );
-#>>>
 my @seen = $docknot->commands();
 is_deeply(\@seen, \@expected, 'Module::Build');
 
 # Test configuring an alternate path to Perl.
 $docknot = App::DocKnot::Dist->new({ distdir => q{.}, perl => '/a/perl' });
-#<<<
 @expected = (
     ['/a/perl', 'Build.PL'],
     ['./Build', 'disttest'],
     ['./Build', 'dist'],
 );
-#>>>
 @seen = $docknot->commands();
 is_deeply(\@seen, \@expected, 'Module::Build');
 
@@ -54,13 +50,11 @@ my $metadata_path = $dataroot->child('ansicolor', 'docknot.yaml');
 $docknot = App::DocKnot::Dist->new(
     { distdir => q{.}, metadata => "$metadata_path" },
 );
-#<<<
 @expected = (
     ['perl', 'Makefile.PL'],
     ['make', 'disttest'],
     ['make', 'dist'],
 );
-#>>>
 @seen = $docknot->commands();
 is_deeply(\@seen, \@expected, 'ExtUtils::MakeMaker');
 
@@ -69,7 +63,6 @@ $metadata_path = $dataroot->child('lbcd', 'docknot.yaml');
 $docknot = App::DocKnot::Dist->new(
     { distdir => q{.}, metadata => "$metadata_path" },
 );
-#<<<
 @expected = (
     ['./bootstrap'],
     ['./configure', 'CC=clang'],
@@ -83,7 +76,6 @@ $docknot = App::DocKnot::Dist->new(
     ['make', 'check-cppcheck'],
     ['make', 'distcheck'],
 );
-#>>>
 @seen = $docknot->commands();
 is_deeply(\@seen, \@expected, 'Autoconf');
 
@@ -92,7 +84,6 @@ $metadata_path = $dataroot->child('c-tap-harness', 'docknot.yaml');
 $docknot = App::DocKnot::Dist->new(
     { distdir => q{.}, metadata => "$metadata_path" },
 );
-#<<<
 @expected = (
     ['./bootstrap'],
     ['./configure', 'CC=g++'],
@@ -110,7 +101,6 @@ $docknot = App::DocKnot::Dist->new(
     ['make', 'check-cppcheck'],
     ['make', 'distcheck'],
 );
-#>>>
 @seen = $docknot->commands();
 is_deeply(\@seen, \@expected, 'Autoconf with C++');
 

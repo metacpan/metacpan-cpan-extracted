@@ -1,0 +1,325 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html
+    PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+  <title>DocKnot %VERSION%</title>
+  <link rel="stylesheet" href="/~eagle/styles/faq.css" type="text/css" />
+  <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+  <link rel="up" href="./" title="DocKnot" />
+  <link rel="top" href="../../" />
+</head>
+
+<!-- Converted by DocKnot %VERSION% on %DATE% -->
+
+<body>
+
+<table class="navbar"><tr>
+  <td class="navleft"></td>
+  <td>
+    <a href="../../">Russ Allbery</a>
+    &gt; <a href="../">Software</a>
+    &gt; <a href="./">DocKnot</a>
+  </td>
+  <td class="navright"></td>
+</tr></table>
+
+<h1>DocKnot %VERSION%</h1>
+<p class="subheading">
+  (Static web site and documentation generator)<br />
+  Maintained by Russ Allbery &lt;rra@cpan.org&gt;
+</p>
+
+<p>
+  Copyright 1999-2022 Russ Allbery &lt;rra@cpan.org&gt;.  This software is
+  distributed under a BSD-style license.  Please see the section LICENSE
+  below for more information.
+</p>
+
+<h2>BLURB</h2>
+
+<p>
+  DocKnot is a static web site generator built around a macro language
+  called thread, with special support for managing software releases.  In
+  addition to building a web site, it can generate distribution tarballs
+  and consistent human-readable software package documentation from a YAML
+  metadata file and templates.  The goal is to generate both web pages and
+  distributed documentation files (such as README) from the same source,
+  using templates for consistency across multiple packages.
+</p>
+
+<h2>DESCRIPTION</h2>
+
+<p>
+  In 1999, I wrote a program named spin that implemented an idiosyncratic
+  macro language called thread.  It slowly expanded into a static web site
+  generator and gained additional features to manage the journal entries,
+  book reviews, RSS feeds, and software releases.  DocKnot is the latest
+  incarnation.
+</p>
+
+<p>
+  In addition to its static web site generator, DocKnot can use one
+  metadata file as its source information and generate all the various
+  bits of documentation for a software package.  This allows me to make
+  any changes in one place and then regenerate the web page, included
+  documentation, and other files to incorporate those changes.  It also
+  lets me make changes to the templates to improve shared wording and push
+  that out to every package I maintain without having to remember track
+  those changes in each package.
+</p>
+
+<p>
+  DocKnot is also slowly absorbing other tools that I use for software
+  distribution and web site maintenance, such as generating distribution
+  tarballs for software packages.
+</p>
+
+<p>
+  DocKnot was designed and written for my personal needs, and I'm not sure
+  it will be useful for anyone else.  At the least, the template files are
+  rather specific to my preferences about how to write package
+  documentation, and the thread macro language is highly specialized for
+  my personal web site.  I'm not sure if I'll have the time to make it a
+  more general tool.  But you're certainly welcome to use it if you find
+  it useful, send pull requests to make it more general, or take ideas
+  from it for your own purposes.
+</p>
+
+<h2>REQUIREMENTS</h2>
+
+<p>
+  Perl 5.24 or later and Module::Build are required to build this module.
+  The following additional Perl modules are required to use it:
+</p>
+
+<ul>
+<li>
+    Date::Language (part of TimeDate)</li>
+<li>
+    Date::Parse (part of TimeDate)</li>
+<li>
+    File::BaseDir</li>
+<li>
+    File::ShareDir</li>
+<li>
+    Git::Repository</li>
+<li>
+    Image::Size</li>
+<li>
+    IO::Compress::Xz (part of IO-Compress-Lzma)</li>
+<li>
+    IO::Uncompress::Gunzip (part of IO-Compress)</li>
+<li>
+    IPC::Run</li>
+<li>
+    IPC::System::Simple</li>
+<li>
+    JSON::MaybeXS 1.004000 or later</li>
+<li>
+    Kwalify</li>
+<li>
+    List::SomeUtils 0.07 or later</li>
+<li>
+    Path::Iterator::Rule</li>
+<li>
+    Path::Tiny 0.101 or later</li>
+<li>
+    Perl6::Slurp</li>
+<li>
+    Pod::Thread 3.01 or later</li>
+<li>
+    Sort::Versions</li>
+<li>
+    Template (part of Template Toolkit)</li>
+<li>
+    YAML::XS 0.81 or later</li>
+</ul>
+
+<h2>BUILDING AND INSTALLATION</h2>
+
+<p>
+  DocKnot uses Module::Build and can be installed using the same process
+  as any other Module::Build module:
+</p>
+
+<pre>    perl Build.PL
+    ./Build
+    ./Build install</pre>
+
+<p>
+  You will have to run the last command as root unless you're installing
+  into a local Perl module tree in your home directory.
+</p>
+
+<h2>TESTING</h2>
+
+<p>
+  DocKnot comes with a test suite, which you can run after building with:
+</p>
+
+<pre>    ./Build test</pre>
+
+<p>
+  If a test fails, you can run a single test with verbose output via:
+</p>
+
+<pre>    ./Build test --test_files &lt;path-to-test&gt;</pre>
+
+<p>
+  Capture::Tiny and File::Copy::Recursive are required to run the test
+  suite.  The following additional Perl modules will be used by the test
+  suite if present:
+</p>
+
+<ul>
+<li>
+    Devel::Cover</li>
+<li>
+    Perl::Critic::Freenode</li>
+<li>
+    Test::CPAN::Changes (part of CPAN-Changes)</li>
+<li>
+    Test::MinimumVersion</li>
+<li>
+    Test::Perl::Critic</li>
+<li>
+    Test::Pod</li>
+<li>
+    Test::Pod::Coverage</li>
+<li>
+    Test::Spelling</li>
+<li>
+    Test::Strict</li>
+<li>
+    Test::Synopsis</li>
+</ul>
+
+<p>
+  All are available on CPAN.  Those tests will be skipped if the modules
+  are not available.
+</p>
+
+<p>
+  To enable tests that don't detect functionality problems but are used to
+  sanity-check the release, set the environment variable RELEASE_TESTING
+  to a true value.  To enable tests that may be sensitive to the local
+  environment or that produce a lot of false positives without uncovering
+  many problems, set the environment variable AUTHOR_TESTING to a true
+  value.
+</p>
+
+<h2>SUPPORT</h2>
+
+<p>
+  The DocKnot web page at:
+</p>
+
+<pre>    https://www.eyrie.org/~eagle/software/docknot/</pre>
+
+<p>
+  will always have the current version of this package, the current
+  documentation, and pointers to any additional resources.
+</p>
+
+<p>
+  For bug tracking, use the issue tracker on GitHub:
+</p>
+
+<pre>    https://github.com/rra/docknot/issues</pre>
+
+<p>
+  Please be aware that I tend to be extremely busy and work projects often
+  take priority.  I'll save your report and get to it as soon as I can,
+  but it may take me a couple of months.
+</p>
+
+<h2>SOURCE REPOSITORY</h2>
+
+<p>
+  DocKnot is maintained using Git.  You can access the current source on
+  GitHub at:
+</p>
+
+<pre>    https://github.com/rra/docknot</pre>
+
+<p>
+  or by cloning the repository at:
+</p>
+
+<pre>    https://git.eyrie.org/git/web/docknot.git</pre>
+
+<p>
+  or view the repository via the web at:
+</p>
+
+<pre>    https://git.eyrie.org/?p=web/docknot.git</pre>
+
+<p>
+  The eyrie.org repository is the canonical one, maintained by the author,
+  but using GitHub is probably more convenient for most purposes.  Pull
+  requests are gratefully reviewed and normally accepted.
+</p>
+
+<h2>LICENSE</h2>
+
+<p>
+  The DocKnot package as a whole is covered by the following copyright
+  statement and license:
+</p>
+
+<pre>  Copyright 1999-2022 Russ Allbery &lt;rra@cpan.org&gt;</pre>
+
+<pre>  Permission is hereby granted, free of charge, to any person obtaining
+  a copy of this software and associated documentation files (the
+  "Software"), to deal in the Software without restriction, including
+  without limitation the rights to use, copy, modify, merge, publish,
+  distribute, sublicense, and/or sell copies of the Software, and to
+  permit persons to whom the Software is furnished to do so, subject to
+  the following conditions:</pre>
+
+<pre>  The above copyright notice and this permission notice shall be
+  included in all copies or substantial portions of the Software.</pre>
+
+<pre>  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+  EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+  MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+  IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY
+  CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
+  TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
+  SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.</pre>
+
+<p>
+  Some files in this distribution are individually released under
+  different licenses, all of which are compatible with the above general
+  package license but which may require preservation of additional
+  notices.  All required notices, and detailed information about the
+  licensing of each file, are recorded in the LICENSE file.
+</p>
+
+<p>
+  Files covered by a license with an assigned SPDX License Identifier
+  include SPDX-License-Identifier tags to enable automated processing of
+  license information.  See https://spdx.org/licenses/ for more
+  information.
+</p>
+
+<p>
+  For any copyright range specified by files in this package as YYYY-ZZZZ,
+  the range specifies every single year in that closed interval.
+</p>
+
+<table class="navbar"><tr>
+  <td class="navleft"></td>
+  <td>
+    <a href="../../">Russ Allbery</a>
+    &gt; <a href="../">Software</a>
+    &gt; <a href="./">DocKnot</a>
+  </td>
+  <td class="navright"></td>
+</tr></table>
+
+</body>
+</html>

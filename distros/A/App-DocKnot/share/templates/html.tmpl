@@ -14,9 +14,10 @@
 [% END %][% html %][% IF navbar %]
 [% navbar %][% END %]
 <address>[% IF modified == now %]
-    Last modified and
-    <a href="[% docknot_url %]">spun</a> [% modified %][% ELSE %]
-    Last <a href="[% docknot_url %]">spun</a>
-    [% now %] from Markdown modified [% modified %][% END %]
+  Last modified and
+  <a href="[% docknot_url %]">spun</a> [% modified %][% ELSE %]
+  Last <a href="[% docknot_url %]">spun</a>
+  [% now %] from Markdown modified [% modified %][% END %]
+</address>
 </body>
 </html>

@@ -1,5 +1,13 @@
 Revision history for RT-Extension-FormTools
 
+1.09 2024-07-08
+ - Use module name in the abstract
+ - Support to localize Help text
+ - Add french translation
+ - Generate POT file using RT extract-message-catalog
+ - Update minimum required RT version
+ - Add dot to @INC for perl 5.26+
+
 1.08 2024-03-07
  - Fix form action to include WebPath
 

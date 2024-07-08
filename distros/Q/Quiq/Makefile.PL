@@ -27,6 +27,7 @@ WriteMakefile(
         JSON => 0,
         LWP::UserAgent => 0,
         Mojolicious::Plugin => 0,
+        Net::IMAP::Simple => 0,
         Net::LDAP => 0,
         Net::SFTP::Foreign => 0,
         Net::SSH::Perl => 0,
@@ -62,959 +63,959 @@ WriteMakefile(
         provides => {
             Quiq => {
                 file => 'lib/Quiq.pm',
-                version => '1.217',
+                version => '1.218',
             },
             Quiq::AnsiColor => {
                 file => 'lib/Quiq/AnsiColor.pm',
-                version => '1.217',
+                version => '1.218',
             },
             Quiq::ApplicationPaths => {
                 file => 'lib/Quiq/ApplicationPaths.pm',
-                version => '1.217',
+                version => '1.218',
             },
             Quiq::Array => {
                 file => 'lib/Quiq/Array.pm',
-                version => '1.217',
+                version => '1.218',
             },
             Quiq::AsciiTable => {
                 file => 'lib/Quiq/AsciiTable.pm',
-                version => '1.217',
+                version => '1.218',
             },
             Quiq::Assert => {
                 file => 'lib/Quiq/Assert.pm',
-                version => '1.217',
+                version => '1.218',
             },
             Quiq::Axis => {
                 file => 'lib/Quiq/Axis.pm',
-                version => '1.217',
+                version => '1.218',
             },
             Quiq::Axis::Numeric => {
                 file => 'lib/Quiq/Axis/Numeric.pm',
-                version => '1.217',
+                version => '1.218',
             },
             Quiq::Axis::Time => {
                 file => 'lib/Quiq/Axis/Time.pm',
-                version => '1.217',
+                version => '1.218',
             },
             Quiq::AxisTick => {
                 file => 'lib/Quiq/AxisTick.pm',
-                version => '1.217',
+                version => '1.218',
             },
             Quiq::Cache => {
                 file => 'lib/Quiq/Cache.pm',
-                version => '1.217',
+                version => '1.218',
             },
             Quiq::Cascm => {
                 file => 'lib/Quiq/Cascm.pm',
-                version => '1.217',
+                version => '1.218',
             },
             Quiq::ChartJs::TimeSeries => {
                 file => 'lib/Quiq/ChartJs/TimeSeries.pm',
-                version => '1.217',
+                version => '1.218',
             },
             Quiq::ClassConfig => {
                 file => 'lib/Quiq/ClassConfig.pm',
-                version => '1.217',
+                version => '1.218',
             },
             Quiq::ClassLoader => {
                 file => 'lib/Quiq/ClassLoader.pm',
-                version => '1.217',
+                version => '1.218',
             },
             Quiq::Color => {
                 file => 'lib/Quiq/Color.pm',
-                version => '1.217',
+                version => '1.218',
             },
             Quiq::CommandLine => {
                 file => 'lib/Quiq/CommandLine.pm',
-                version => '1.217',
+                version => '1.218',
             },
             Quiq::Config => {
                 file => 'lib/Quiq/Config.pm',
-                version => '1.217',
+                version => '1.218',
             },
             Quiq::Confluence::Client => {
                 file => 'lib/Quiq/Confluence/Client.pm',
-                version => '1.217',
+                version => '1.218',
             },
             Quiq::Confluence::Markup => {
                 file => 'lib/Quiq/Confluence/Markup.pm',
-                version => '1.217',
+                version => '1.218',
             },
             Quiq::Confluence::Page => {
                 file => 'lib/Quiq/Confluence/Page.pm',
-                version => '1.217',
+                version => '1.218',
             },
             Quiq::ContentProcessor => {
                 file => 'lib/Quiq/ContentProcessor.pm',
-                version => '1.217',
+                version => '1.218',
             },
             Quiq::ContentProcessor::BaseType => {
                 file => 'lib/Quiq/ContentProcessor/BaseType.pm',
-                version => '1.217',
+                version => '1.218',
             },
             Quiq::ContentProcessor::File => {
                 file => 'lib/Quiq/ContentProcessor/File.pm',
-                version => '1.217',
+                version => '1.218',
             },
             Quiq::ContentProcessor::SubType => {
                 file => 'lib/Quiq/ContentProcessor/SubType.pm',
-                version => '1.217',
+                version => '1.218',
             },
             Quiq::ContentProcessor::Type => {
                 file => 'lib/Quiq/ContentProcessor/Type.pm',
-                version => '1.217',
+                version => '1.218',
             },
             Quiq::Converter => {
                 file => 'lib/Quiq/Converter.pm',
-                version => '1.217',
+                version => '1.218',
             },
             Quiq::Css => {
                 file => 'lib/Quiq/Css.pm',
-                version => '1.217',
+                version => '1.218',
             },
             Quiq::Css::Snippets => {
                 file => 'lib/Quiq/Css/Snippets.pm',
-                version => '1.217',
+                version => '1.218',
             },
             Quiq::DataStructure => {
                 file => 'lib/Quiq/DataStructure.pm',
-                version => '1.217',
+                version => '1.218',
             },
             Quiq::Database::Api => {
                 file => 'lib/Quiq/Database/Api.pm',
-                version => '1.217',
+                version => '1.218',
             },
             Quiq::Database::Api::Dbi::Connection => {
                 file => 'lib/Quiq/Database/Api/Dbi/Connection.pm',
-                version => '1.217',
+                version => '1.218',
             },
             Quiq::Database::Api::Dbi::Cursor => {
                 file => 'lib/Quiq/Database/Api/Dbi/Cursor.pm',
-                version => '1.217',
+                version => '1.218',
             },
             Quiq::Database::Config => {
                 file => 'lib/Quiq/Database/Config.pm',
-                version => '1.217',
+                version => '1.218',
             },
             Quiq::Database::Connection => {
                 file => 'lib/Quiq/Database/Connection.pm',
-                version => '1.217',
+                version => '1.218',
             },
             Quiq::Database::Cursor => {
                 file => 'lib/Quiq/Database/Cursor.pm',
-                version => '1.217',
+                version => '1.218',
             },
             Quiq::Database::DataAnalysis => {
                 file => 'lib/Quiq/Database/DataAnalysis.pm',
-                version => '1.217',
+                version => '1.218',
             },
             Quiq::Database::Patch => {
                 file => 'lib/Quiq/Database/Patch.pm',
-                version => '1.217',
+                version => '1.218',
             },
             Quiq::Database::ResultSet => {
                 file => 'lib/Quiq/Database/ResultSet.pm',
-                version => '1.217',
+                version => '1.218',
             },
             Quiq::Database::ResultSet::Array => {
                 file => 'lib/Quiq/Database/ResultSet/Array.pm',
-                version => '1.217',
+                version => '1.218',
             },
             Quiq::Database::ResultSet::Object => {
                 file => 'lib/Quiq/Database/ResultSet/Object.pm',
-                version => '1.217',
+                version => '1.218',
             },
             Quiq::Database::Row => {
                 file => 'lib/Quiq/Database/Row.pm',
-                version => '1.217',
+                version => '1.218',
             },
             Quiq::Database::Row::Array => {
                 file => 'lib/Quiq/Database/Row/Array.pm',
-                version => '1.217',
+                version => '1.218',
             },
             Quiq::Database::Row::Object => {
                 file => 'lib/Quiq/Database/Row/Object.pm',
-                version => '1.217',
+                version => '1.218',
             },
             Quiq::Database::Row::Object::Join => {
                 file => 'lib/Quiq/Database/Row/Object/Join.pm',
-                version => '1.217',
+                version => '1.218',
             },
             Quiq::Database::Row::Object::Table => {
                 file => 'lib/Quiq/Database/Row/Object/Table.pm',
-                version => '1.217',
+                version => '1.218',
             },
             Quiq::Database::Tree => {
                 file => 'lib/Quiq/Database/Tree.pm',
-                version => '1.217',
+                version => '1.218',
             },
             Quiq::Dbms => {
                 file => 'lib/Quiq/Dbms.pm',
-                version => '1.217',
+                version => '1.218',
             },
             Quiq::Debug => {
                 file => 'lib/Quiq/Debug.pm',
-                version => '1.217',
+                version => '1.218',
             },
             Quiq::DestinationTree => {
                 file => 'lib/Quiq/DestinationTree.pm',
-                version => '1.217',
+                version => '1.218',
             },
             Quiq::Diff => {
                 file => 'lib/Quiq/Diff.pm',
-                version => '1.217',
+                version => '1.218',
             },
             Quiq::Digest => {
                 file => 'lib/Quiq/Digest.pm',
-                version => '1.217',
+                version => '1.218',
             },
             Quiq::DirHandle => {
                 file => 'lib/Quiq/DirHandle.pm',
-                version => '1.217',
+                version => '1.218',
             },
             Quiq::Dumper => {
                 file => 'lib/Quiq/Dumper.pm',
-                version => '1.217',
+                version => '1.218',
             },
             Quiq::Duration => {
                 file => 'lib/Quiq/Duration.pm',
-                version => '1.217',
+                version => '1.218',
             },
             Quiq::Eog => {
                 file => 'lib/Quiq/Eog.pm',
-                version => '1.217',
+                version => '1.218',
             },
             Quiq::Epoch => {
                 file => 'lib/Quiq/Epoch.pm',
-                version => '1.217',
+                version => '1.218',
             },
             Quiq::ExampleCode => {
                 file => 'lib/Quiq/ExampleCode.pm',
-                version => '1.217',
+                version => '1.218',
             },
             Quiq::Excel::Writer => {
                 file => 'lib/Quiq/Excel/Writer.pm',
-                version => '1.217',
+                version => '1.218',
             },
             Quiq::Exit => {
                 file => 'lib/Quiq/Exit.pm',
-                version => '1.217',
+                version => '1.218',
             },
             Quiq::ExportFile => {
                 file => 'lib/Quiq/ExportFile.pm',
-                version => '1.217',
+                version => '1.218',
             },
             Quiq::FFmpeg => {
                 file => 'lib/Quiq/FFmpeg.pm',
-                version => '1.217',
+                version => '1.218',
             },
             Quiq::File::Audio => {
                 file => 'lib/Quiq/File/Audio.pm',
-                version => '1.217',
+                version => '1.218',
             },
             Quiq::File::Image => {
                 file => 'lib/Quiq/File/Image.pm',
-                version => '1.217',
+                version => '1.218',
             },
             Quiq::File::Video => {
                 file => 'lib/Quiq/File/Video.pm',
-                version => '1.217',
+                version => '1.218',
             },
             Quiq::FileHandle => {
                 file => 'lib/Quiq/FileHandle.pm',
-                version => '1.217',
+                version => '1.218',
             },
             Quiq::Formatter => {
                 file => 'lib/Quiq/Formatter.pm',
-                version => '1.217',
+                version => '1.218',
             },
             Quiq::Gd::Component => {
                 file => 'lib/Quiq/Gd/Component.pm',
-                version => '1.217',
+                version => '1.218',
             },
             Quiq::Gd::Component::Axis => {
                 file => 'lib/Quiq/Gd/Component/Axis.pm',
-                version => '1.217',
+                version => '1.218',
             },
             Quiq::Gd::Component::BlockDiagram => {
                 file => 'lib/Quiq/Gd/Component/BlockDiagram.pm',
-                version => '1.217',
+                version => '1.218',
             },
             Quiq::Gd::Component::ColorBar => {
                 file => 'lib/Quiq/Gd/Component/ColorBar.pm',
-                version => '1.217',
+                version => '1.218',
             },
             Quiq::Gd::Component::ColorLegend => {
                 file => 'lib/Quiq/Gd/Component/ColorLegend.pm',
-                version => '1.217',
+                version => '1.218',
             },
             Quiq::Gd::Component::Graph => {
                 file => 'lib/Quiq/Gd/Component/Graph.pm',
-                version => '1.217',
+                version => '1.218',
             },
             Quiq::Gd::Component::Grid => {
                 file => 'lib/Quiq/Gd/Component/Grid.pm',
-                version => '1.217',
+                version => '1.218',
             },
             Quiq::Gd::Component::ScatterGraph => {
                 file => 'lib/Quiq/Gd/Component/ScatterGraph.pm',
-                version => '1.217',
+                version => '1.218',
             },
             Quiq::Gd::Font => {
                 file => 'lib/Quiq/Gd/Font.pm',
-                version => '1.217',
+                version => '1.218',
             },
             Quiq::Gd::Image => {
                 file => 'lib/Quiq/Gd/Image.pm',
-                version => '1.217',
+                version => '1.218',
             },
             Quiq::Gimp => {
                 file => 'lib/Quiq/Gimp.pm',
-                version => '1.217',
+                version => '1.218',
             },
             Quiq::Gnuplot::Arrow => {
                 file => 'lib/Quiq/Gnuplot/Arrow.pm',
-                version => '1.217',
+                version => '1.218',
             },
             Quiq::Gnuplot::Graph => {
                 file => 'lib/Quiq/Gnuplot/Graph.pm',
-                version => '1.217',
+                version => '1.218',
             },
             Quiq::Gnuplot::Label => {
                 file => 'lib/Quiq/Gnuplot/Label.pm',
-                version => '1.217',
+                version => '1.218',
             },
             Quiq::Gnuplot::Plot => {
                 file => 'lib/Quiq/Gnuplot/Plot.pm',
-                version => '1.217',
+                version => '1.218',
             },
             Quiq::Gnuplot::Process => {
                 file => 'lib/Quiq/Gnuplot/Process.pm',
-                version => '1.217',
+                version => '1.218',
             },
             Quiq::Hash => {
                 file => 'lib/Quiq/Hash.pm',
-                version => '1.217',
+                version => '1.218',
             },
             Quiq::Hash::Db => {
                 file => 'lib/Quiq/Hash/Db.pm',
-                version => '1.217',
+                version => '1.218',
             },
             Quiq::Hash::Ordered => {
                 file => 'lib/Quiq/Hash/Ordered.pm',
-                version => '1.217',
+                version => '1.218',
             },
             Quiq::Hash::Persistent => {
                 file => 'lib/Quiq/Hash/Persistent.pm',
-                version => '1.217',
+                version => '1.218',
             },
             Quiq::Html::Base => {
                 file => 'lib/Quiq/Html/Base.pm',
-                version => '1.217',
+                version => '1.218',
             },
             Quiq::Html::Component => {
                 file => 'lib/Quiq/Html/Component.pm',
-                version => '1.217',
+                version => '1.218',
             },
             Quiq::Html::Component::Bundle => {
                 file => 'lib/Quiq/Html/Component/Bundle.pm',
-                version => '1.217',
+                version => '1.218',
             },
             Quiq::Html::Construct => {
                 file => 'lib/Quiq/Html/Construct.pm',
-                version => '1.217',
+                version => '1.218',
             },
             Quiq::Html::Form::Layout => {
                 file => 'lib/Quiq/Html/Form/Layout.pm',
-                version => '1.217',
+                version => '1.218',
             },
             Quiq::Html::Form::Matrix => {
                 file => 'lib/Quiq/Html/Form/Matrix.pm',
-                version => '1.217',
+                version => '1.218',
             },
             Quiq::Html::HorizontalMenu => {
                 file => 'lib/Quiq/Html/HorizontalMenu.pm',
-                version => '1.217',
+                version => '1.218',
             },
             Quiq::Html::Image => {
                 file => 'lib/Quiq/Html/Image.pm',
-                version => '1.217',
+                version => '1.218',
             },
             Quiq::Html::List => {
                 file => 'lib/Quiq/Html/List.pm',
-                version => '1.217',
+                version => '1.218',
             },
             Quiq::Html::Listing => {
                 file => 'lib/Quiq/Html/Listing.pm',
-                version => '1.217',
+                version => '1.218',
             },
             Quiq::Html::Page => {
                 file => 'lib/Quiq/Html/Page.pm',
-                version => '1.217',
+                version => '1.218',
             },
             Quiq::Html::Producer => {
                 file => 'lib/Quiq/Html/Producer.pm',
-                version => '1.217',
+                version => '1.218',
             },
             Quiq::Html::Pygments => {
                 file => 'lib/Quiq/Html/Pygments.pm',
-                version => '1.217',
+                version => '1.218',
             },
             Quiq::Html::Resources => {
                 file => 'lib/Quiq/Html/Resources.pm',
-                version => '1.217',
+                version => '1.218',
             },
             Quiq::Html::Table::Base => {
                 file => 'lib/Quiq/Html/Table/Base.pm',
-                version => '1.217',
+                version => '1.218',
             },
             Quiq::Html::Table::List => {
                 file => 'lib/Quiq/Html/Table/List.pm',
-                version => '1.217',
+                version => '1.218',
             },
             Quiq::Html::Table::Simple => {
                 file => 'lib/Quiq/Html/Table/Simple.pm',
-                version => '1.217',
+                version => '1.218',
             },
             Quiq::Html::Tag => {
                 file => 'lib/Quiq/Html/Tag.pm',
-                version => '1.217',
+                version => '1.218',
             },
             Quiq::Html::Util => {
                 file => 'lib/Quiq/Html/Util.pm',
-                version => '1.217',
+                version => '1.218',
             },
             Quiq::Html::Verbatim => {
                 file => 'lib/Quiq/Html/Verbatim.pm',
-                version => '1.217',
+                version => '1.218',
             },
             Quiq::Html::Widget => {
                 file => 'lib/Quiq/Html/Widget.pm',
-                version => '1.217',
+                version => '1.218',
             },
             Quiq::Html::Widget::Button => {
                 file => 'lib/Quiq/Html/Widget/Button.pm',
-                version => '1.217',
+                version => '1.218',
             },
             Quiq::Html::Widget::CheckBox => {
                 file => 'lib/Quiq/Html/Widget/CheckBox.pm',
-                version => '1.217',
+                version => '1.218',
             },
             Quiq::Html::Widget::CheckBoxBar => {
                 file => 'lib/Quiq/Html/Widget/CheckBoxBar.pm',
-                version => '1.217',
+                version => '1.218',
             },
             Quiq::Html::Widget::FileUpload => {
                 file => 'lib/Quiq/Html/Widget/FileUpload.pm',
-                version => '1.217',
+                version => '1.218',
             },
             Quiq::Html::Widget::Hidden => {
                 file => 'lib/Quiq/Html/Widget/Hidden.pm',
-                version => '1.217',
+                version => '1.218',
             },
             Quiq::Html::Widget::RadioButton => {
                 file => 'lib/Quiq/Html/Widget/RadioButton.pm',
-                version => '1.217',
+                version => '1.218',
             },
             Quiq::Html::Widget::RadioButtonBar => {
                 file => 'lib/Quiq/Html/Widget/RadioButtonBar.pm',
-                version => '1.217',
+                version => '1.218',
             },
             Quiq::Html::Widget::ReadOnly => {
                 file => 'lib/Quiq/Html/Widget/ReadOnly.pm',
-                version => '1.217',
+                version => '1.218',
             },
             Quiq::Html::Widget::SelectMenu => {
                 file => 'lib/Quiq/Html/Widget/SelectMenu.pm',
-                version => '1.217',
+                version => '1.218',
             },
             Quiq::Html::Widget::SelectMenuColor => {
                 file => 'lib/Quiq/Html/Widget/SelectMenuColor.pm',
-                version => '1.217',
+                version => '1.218',
             },
             Quiq::Html::Widget::TextArea => {
                 file => 'lib/Quiq/Html/Widget/TextArea.pm',
-                version => '1.217',
+                version => '1.218',
             },
             Quiq::Html::Widget::TextField => {
                 file => 'lib/Quiq/Html/Widget/TextField.pm',
-                version => '1.217',
+                version => '1.218',
             },
             Quiq::Http::Client => {
                 file => 'lib/Quiq/Http/Client.pm',
-                version => '1.217',
+                version => '1.218',
             },
             Quiq::Http::Client::Lwp => {
                 file => 'lib/Quiq/Http/Client/Lwp.pm',
-                version => '1.217',
+                version => '1.218',
             },
             Quiq::Http::Cookie => {
                 file => 'lib/Quiq/Http/Cookie.pm',
-                version => '1.217',
+                version => '1.218',
             },
             Quiq::Http::Message => {
                 file => 'lib/Quiq/Http/Message.pm',
-                version => '1.217',
+                version => '1.218',
             },
             Quiq::If => {
                 file => 'lib/Quiq/If.pm',
-                version => '1.217',
+                version => '1.218',
             },
             Quiq::Image => {
                 file => 'lib/Quiq/Image.pm',
-                version => '1.217',
+                version => '1.218',
             },
             Quiq::ImageMagick => {
                 file => 'lib/Quiq/ImageMagick.pm',
-                version => '1.217',
+                version => '1.218',
             },
             Quiq::ImagePool => {
                 file => 'lib/Quiq/ImagePool.pm',
-                version => '1.217',
+                version => '1.218',
             },
             Quiq::ImagePool::Directory => {
                 file => 'lib/Quiq/ImagePool/Directory.pm',
-                version => '1.217',
+                version => '1.218',
             },
             Quiq::ImagePool::Sequence => {
                 file => 'lib/Quiq/ImagePool/Sequence.pm',
-                version => '1.217',
+                version => '1.218',
             },
             Quiq::Imap::Client => {
                 file => 'lib/Quiq/Imap/Client.pm',
-                version => '1.217',
+                version => '1.218',
             },
             Quiq::Ipc => {
                 file => 'lib/Quiq/Ipc.pm',
-                version => '1.217',
+                version => '1.218',
             },
             Quiq::JQuery => {
                 file => 'lib/Quiq/JQuery.pm',
-                version => '1.217',
+                version => '1.218',
             },
             Quiq::JQuery::Accordion => {
                 file => 'lib/Quiq/JQuery/Accordion.pm',
-                version => '1.217',
+                version => '1.218',
             },
             Quiq::JQuery::ContextMenu => {
                 file => 'lib/Quiq/JQuery/ContextMenu.pm',
-                version => '1.217',
+                version => '1.218',
             },
             Quiq::JQuery::ContextMenu::Ajax => {
                 file => 'lib/Quiq/JQuery/ContextMenu/Ajax.pm',
-                version => '1.217',
+                version => '1.218',
             },
             Quiq::JQuery::DataTable => {
                 file => 'lib/Quiq/JQuery/DataTable.pm',
-                version => '1.217',
+                version => '1.218',
             },
             Quiq::JQuery::Form::ViewEdit => {
                 file => 'lib/Quiq/JQuery/Form/ViewEdit.pm',
-                version => '1.217',
+                version => '1.218',
             },
             Quiq::JQuery::Function => {
                 file => 'lib/Quiq/JQuery/Function.pm',
-                version => '1.217',
+                version => '1.218',
             },
             Quiq::JQuery::MenuBar => {
                 file => 'lib/Quiq/JQuery/MenuBar.pm',
-                version => '1.217',
+                version => '1.218',
             },
             Quiq::JQuery::Tabs => {
                 file => 'lib/Quiq/JQuery/Tabs.pm',
-                version => '1.217',
+                version => '1.218',
             },
             Quiq::JavaScript => {
                 file => 'lib/Quiq/JavaScript.pm',
-                version => '1.217',
+                version => '1.218',
             },
             Quiq::Json => {
                 file => 'lib/Quiq/Json.pm',
-                version => '1.217',
+                version => '1.218',
             },
             Quiq::LaTeX::Code => {
                 file => 'lib/Quiq/LaTeX/Code.pm',
-                version => '1.217',
+                version => '1.218',
             },
             Quiq::LaTeX::Document => {
                 file => 'lib/Quiq/LaTeX/Document.pm',
-                version => '1.217',
+                version => '1.218',
             },
             Quiq::LaTeX::Figure => {
                 file => 'lib/Quiq/LaTeX/Figure.pm',
-                version => '1.217',
+                version => '1.218',
             },
             Quiq::LaTeX::LongTable => {
                 file => 'lib/Quiq/LaTeX/LongTable.pm',
-                version => '1.217',
+                version => '1.218',
             },
             Quiq::Ldap::Client => {
                 file => 'lib/Quiq/Ldap/Client.pm',
-                version => '1.217',
+                version => '1.218',
             },
             Quiq::LineProcessor => {
                 file => 'lib/Quiq/LineProcessor.pm',
-                version => '1.217',
+                version => '1.218',
             },
             Quiq::LineProcessor::Line => {
                 file => 'lib/Quiq/LineProcessor/Line.pm',
-                version => '1.217',
+                version => '1.218',
             },
             Quiq::List => {
                 file => 'lib/Quiq/List.pm',
-                version => '1.217',
+                version => '1.218',
             },
             Quiq::LockedContent => {
                 file => 'lib/Quiq/LockedContent.pm',
-                version => '1.217',
+                version => '1.218',
             },
             Quiq::LockedCounter => {
                 file => 'lib/Quiq/LockedCounter.pm',
-                version => '1.217',
+                version => '1.218',
             },
             Quiq::Logger => {
                 file => 'lib/Quiq/Logger.pm',
-                version => '1.217',
+                version => '1.218',
             },
             Quiq::MailTo => {
                 file => 'lib/Quiq/MailTo.pm',
-                version => '1.217',
+                version => '1.218',
             },
             Quiq::Math => {
                 file => 'lib/Quiq/Math.pm',
-                version => '1.217',
+                version => '1.218',
             },
             Quiq::Mechanize => {
                 file => 'lib/Quiq/Mechanize.pm',
-                version => '1.217',
+                version => '1.218',
             },
             Quiq::MediaWiki::Client => {
                 file => 'lib/Quiq/MediaWiki/Client.pm',
-                version => '1.217',
+                version => '1.218',
             },
             Quiq::MediaWiki::Markup => {
                 file => 'lib/Quiq/MediaWiki/Markup.pm',
-                version => '1.217',
+                version => '1.218',
             },
             Quiq::ModelCache => {
                 file => 'lib/Quiq/ModelCache.pm',
-                version => '1.217',
+                version => '1.218',
             },
             Quiq::Mojolicious::Plugin::Log::Parameters => {
                 file => 'lib/Quiq/Mojolicious/Plugin/Log/Parameters.pm',
-                version => '1.217',
+                version => '1.218',
             },
             Quiq::Net => {
                 file => 'lib/Quiq/Net.pm',
-                version => '1.217',
+                version => '1.218',
             },
             Quiq::Object => {
                 file => 'lib/Quiq/Object.pm',
-                version => '1.217',
+                version => '1.218',
             },
             Quiq::Option => {
                 file => 'lib/Quiq/Option.pm',
-                version => '1.217',
+                version => '1.218',
             },
             Quiq::Parallel => {
                 file => 'lib/Quiq/Parallel.pm',
-                version => '1.217',
+                version => '1.218',
             },
             Quiq::Parameters => {
                 file => 'lib/Quiq/Parameters.pm',
-                version => '1.217',
+                version => '1.218',
             },
             Quiq::Path => {
                 file => 'lib/Quiq/Path.pm',
-                version => '1.217',
+                version => '1.218',
             },
             Quiq::Perl => {
                 file => 'lib/Quiq/Perl.pm',
-                version => '1.217',
+                version => '1.218',
             },
             Quiq::PerlModule => {
                 file => 'lib/Quiq/PerlModule.pm',
-                version => '1.217',
+                version => '1.218',
             },
             Quiq::PhotoStorage => {
                 file => 'lib/Quiq/PhotoStorage.pm',
-                version => '1.217',
+                version => '1.218',
             },
             Quiq::PlotlyJs => {
                 file => 'lib/Quiq/PlotlyJs.pm',
-                version => '1.217',
+                version => '1.218',
             },
             Quiq::PlotlyJs::Reference => {
                 file => 'lib/Quiq/PlotlyJs/Reference.pm',
-                version => '1.217',
+                version => '1.218',
             },
             Quiq::PlotlyJs::TimeSeries => {
                 file => 'lib/Quiq/PlotlyJs/TimeSeries.pm',
-                version => '1.217',
+                version => '1.218',
             },
             Quiq::PlotlyJs::XY::Diagram => {
                 file => 'lib/Quiq/PlotlyJs/XY/Diagram.pm',
-                version => '1.217',
+                version => '1.218',
             },
             Quiq::PlotlyJs::XY::DiagramGroup => {
                 file => 'lib/Quiq/PlotlyJs/XY/DiagramGroup.pm',
-                version => '1.217',
+                version => '1.218',
             },
             Quiq::Pod::Generator => {
                 file => 'lib/Quiq/Pod/Generator.pm',
-                version => '1.217',
+                version => '1.218',
             },
             Quiq::PostgreSql::Catalog => {
                 file => 'lib/Quiq/PostgreSql/Catalog.pm',
-                version => '1.217',
+                version => '1.218',
             },
             Quiq::PostgreSql::CopyFormat => {
                 file => 'lib/Quiq/PostgreSql/CopyFormat.pm',
-                version => '1.217',
+                version => '1.218',
             },
             Quiq::PostgreSql::PgDump => {
                 file => 'lib/Quiq/PostgreSql/PgDump.pm',
-                version => '1.217',
+                version => '1.218',
             },
             Quiq::PostgreSql::Psql => {
                 file => 'lib/Quiq/PostgreSql/Psql.pm',
-                version => '1.217',
+                version => '1.218',
             },
             Quiq::Process => {
                 file => 'lib/Quiq/Process.pm',
-                version => '1.217',
+                version => '1.218',
             },
             Quiq::Program => {
                 file => 'lib/Quiq/Program.pm',
-                version => '1.217',
+                version => '1.218',
             },
             Quiq::Progress => {
                 file => 'lib/Quiq/Progress.pm',
-                version => '1.217',
+                version => '1.218',
             },
             Quiq::Properties => {
                 file => 'lib/Quiq/Properties.pm',
-                version => '1.217',
+                version => '1.218',
             },
             Quiq::Range => {
                 file => 'lib/Quiq/Range.pm',
-                version => '1.217',
+                version => '1.218',
             },
             Quiq::Record => {
                 file => 'lib/Quiq/Record.pm',
-                version => '1.217',
+                version => '1.218',
             },
             Quiq::Reference => {
                 file => 'lib/Quiq/Reference.pm',
-                version => '1.217',
+                version => '1.218',
             },
             Quiq::Rsync => {
                 file => 'lib/Quiq/Rsync.pm',
-                version => '1.217',
+                version => '1.218',
             },
             Quiq::SQLite => {
                 file => 'lib/Quiq/SQLite.pm',
-                version => '1.217',
+                version => '1.218',
             },
             Quiq::Schedule => {
                 file => 'lib/Quiq/Schedule.pm',
-                version => '1.217',
+                version => '1.218',
             },
             Quiq::Sdoc::Producer => {
                 file => 'lib/Quiq/Sdoc/Producer.pm',
-                version => '1.217',
+                version => '1.218',
             },
             Quiq::Section::Object => {
                 file => 'lib/Quiq/Section/Object.pm',
-                version => '1.217',
+                version => '1.218',
             },
             Quiq::Section::Parser => {
                 file => 'lib/Quiq/Section/Parser.pm',
-                version => '1.217',
+                version => '1.218',
             },
             Quiq::Sendmail => {
                 file => 'lib/Quiq/Sendmail.pm',
-                version => '1.217',
+                version => '1.218',
             },
             Quiq::Sftp::Client => {
                 file => 'lib/Quiq/Sftp/Client.pm',
-                version => '1.217',
+                version => '1.218',
             },
             Quiq::Shell => {
                 file => 'lib/Quiq/Shell.pm',
-                version => '1.217',
+                version => '1.218',
             },
             Quiq::Smb::Client => {
                 file => 'lib/Quiq/Smb/Client.pm',
-                version => '1.217',
+                version => '1.218',
             },
             Quiq::SoapWsdlServiceCgi => {
                 file => 'lib/Quiq/SoapWsdlServiceCgi.pm',
-                version => '1.217',
+                version => '1.218',
             },
             Quiq::SoapWsdlServiceCgi::Demo => {
                 file => 'lib/Quiq/SoapWsdlServiceCgi/Demo.pm',
-                version => '1.217',
+                version => '1.218',
             },
             Quiq::Socket => {
                 file => 'lib/Quiq/Socket.pm',
-                version => '1.217',
+                version => '1.218',
             },
             Quiq::Sql => {
                 file => 'lib/Quiq/Sql.pm',
-                version => '1.217',
+                version => '1.218',
             },
             Quiq::Sql::Analyzer => {
                 file => 'lib/Quiq/Sql/Analyzer.pm',
-                version => '1.217',
+                version => '1.218',
             },
             Quiq::Sql::Composer => {
                 file => 'lib/Quiq/Sql/Composer.pm',
-                version => '1.217',
+                version => '1.218',
             },
             Quiq::Sql::Script::Reader => {
                 file => 'lib/Quiq/Sql/Script/Reader.pm',
-                version => '1.217',
+                version => '1.218',
             },
             Quiq::SqlPlus => {
                 file => 'lib/Quiq/SqlPlus.pm',
-                version => '1.217',
+                version => '1.218',
             },
             Quiq::Ssh => {
                 file => 'lib/Quiq/Ssh.pm',
-                version => '1.217',
+                version => '1.218',
             },
             Quiq::Stacktrace => {
                 file => 'lib/Quiq/Stacktrace.pm',
-                version => '1.217',
+                version => '1.218',
             },
             Quiq::Stopwatch => {
                 file => 'lib/Quiq/Stopwatch.pm',
-                version => '1.217',
+                version => '1.218',
             },
             Quiq::Storable => {
                 file => 'lib/Quiq/Storable.pm',
-                version => '1.217',
+                version => '1.218',
             },
             Quiq::String => {
                 file => 'lib/Quiq/String.pm',
-                version => '1.217',
+                version => '1.218',
             },
             Quiq::Svg::Tag => {
                 file => 'lib/Quiq/Svg/Tag.pm',
-                version => '1.217',
+                version => '1.218',
             },
             Quiq::System => {
                 file => 'lib/Quiq/System.pm',
-                version => '1.217',
+                version => '1.218',
             },
             Quiq::Table => {
                 file => 'lib/Quiq/Table.pm',
-                version => '1.217',
+                version => '1.218',
             },
             Quiq::TableRow => {
                 file => 'lib/Quiq/TableRow.pm',
-                version => '1.217',
+                version => '1.218',
             },
             Quiq::Tag => {
                 file => 'lib/Quiq/Tag.pm',
-                version => '1.217',
+                version => '1.218',
             },
             Quiq::TeX::Code => {
                 file => 'lib/Quiq/TeX/Code.pm',
-                version => '1.217',
+                version => '1.218',
             },
             Quiq::TempDir => {
                 file => 'lib/Quiq/TempDir.pm',
-                version => '1.217',
+                version => '1.218',
             },
             Quiq::TempFile => {
                 file => 'lib/Quiq/TempFile.pm',
-                version => '1.217',
+                version => '1.218',
             },
             Quiq::Template => {
                 file => 'lib/Quiq/Template.pm',
-                version => '1.217',
+                version => '1.218',
             },
             Quiq::Terminal => {
                 file => 'lib/Quiq/Terminal.pm',
-                version => '1.217',
+                version => '1.218',
             },
             Quiq::Test::Class => {
                 file => 'lib/Quiq/Test/Class.pm',
-                version => '1.217',
+                version => '1.218',
             },
             Quiq::Test::Class::Method => {
                 file => 'lib/Quiq/Test/Class/Method.pm',
-                version => '1.217',
+                version => '1.218',
             },
             Quiq::Time => {
                 file => 'lib/Quiq/Time.pm',
-                version => '1.217',
+                version => '1.218',
             },
             Quiq::Time::RFC822 => {
                 file => 'lib/Quiq/Time/RFC822.pm',
-                version => '1.217',
+                version => '1.218',
             },
             Quiq::TimeLapse::Directory => {
                 file => 'lib/Quiq/TimeLapse/Directory.pm',
-                version => '1.217',
+                version => '1.218',
             },
             Quiq::TimeLapse::File => {
                 file => 'lib/Quiq/TimeLapse/File.pm',
-                version => '1.217',
+                version => '1.218',
             },
             Quiq::TimeLapse::Filename => {
                 file => 'lib/Quiq/TimeLapse/Filename.pm',
-                version => '1.217',
+                version => '1.218',
             },
             Quiq::TimeLapse::RangeDef => {
                 file => 'lib/Quiq/TimeLapse/RangeDef.pm',
-                version => '1.217',
+                version => '1.218',
             },
             Quiq::TimeLapse::Sequence => {
                 file => 'lib/Quiq/TimeLapse/Sequence.pm',
-                version => '1.217',
+                version => '1.218',
             },
             Quiq::Timeseries::Synchronizer => {
                 file => 'lib/Quiq/Timeseries/Synchronizer.pm',
-                version => '1.217',
+                version => '1.218',
             },
             Quiq::Trash => {
                 file => 'lib/Quiq/Trash.pm',
-                version => '1.217',
+                version => '1.218',
             },
             Quiq::TreeFormatter => {
                 file => 'lib/Quiq/TreeFormatter.pm',
-                version => '1.217',
+                version => '1.218',
             },
             Quiq::Udl => {
                 file => 'lib/Quiq/Udl.pm',
-                version => '1.217',
+                version => '1.218',
             },
             Quiq::Unindent => {
                 file => 'lib/Quiq/Unindent.pm',
-                version => '1.217',
+                version => '1.218',
             },
             Quiq::Url => {
                 file => 'lib/Quiq/Url.pm',
-                version => '1.217',
+                version => '1.218',
             },
             Quiq::UrlObj => {
                 file => 'lib/Quiq/UrlObj.pm',
-                version => '1.217',
+                version => '1.218',
             },
             Quiq::Web::Navigation => {
                 file => 'lib/Quiq/Web/Navigation.pm',
-                version => '1.217',
+                version => '1.218',
             },
             Quiq::XTerm => {
                 file => 'lib/Quiq/XTerm.pm',
-                version => '1.217',
+                version => '1.218',
             },
             Quiq::Xml::LibXml => {
                 file => 'lib/Quiq/Xml/LibXml.pm',
-                version => '1.217',
+                version => '1.218',
             },
         },
     },

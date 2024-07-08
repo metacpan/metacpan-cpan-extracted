@@ -76,6 +76,10 @@ sub MY::postamble {
     $make_rule .= SPVM::Builder::Util::API::create_make_rule_precompile('R::OP::Double');
     $make_rule .= SPVM::Builder::Util::API::create_make_rule_precompile('R::OP::FloatComplex');
     $make_rule .= SPVM::Builder::Util::API::create_make_rule_precompile('R::OP::DoubleComplex');
+    $make_rule .= SPVM::Builder::Util::API::create_make_rule_precompile('R::OP::Matrix::Float');
+    $make_rule .= SPVM::Builder::Util::API::create_make_rule_precompile('R::OP::Matrix::FloatComplex');
+    $make_rule .= SPVM::Builder::Util::API::create_make_rule_precompile('R::OP::Matrix::Double');
+    $make_rule .= SPVM::Builder::Util::API::create_make_rule_precompile('R::OP::Matrix::DoubleComplex');
   }
   
   return $make_rule;

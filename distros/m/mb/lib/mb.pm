@@ -7,13 +7,13 @@ package mb;
 #
 # https://metacpan.org/release/mb
 #
-# Copyright (c) 2008, 2009, 2010, 2011, 2012, 2013, 2014, 2015, 2016, 2018, 2019, 2020, 2021, 2022, 2023 INABA Hitoshi <ina@cpan.org> in a CPAN
+# Copyright (c) 2008, 2009, 2010, 2011, 2012, 2013, 2014, 2015, 2016, 2018, 2019, 2020, 2021, 2022, 2023, 2024 INABA Hitoshi <ina@cpan.org> in a CPAN
 ######################################################################
 
 use 5.00503;    # Universal Consensus 1998 for primetools
 # use 5.008001; # Lancaster Consensus 2013 for toolchains
 
-$VERSION = '0.57';
+$VERSION = '0.58';
 $VERSION = $VERSION;
 
 # internal use
@@ -1894,22 +1894,17 @@ sub parse_ambiguous_char {
     # --------------------------------------------------------
 
     # any term then operator
-    # "\x25" [%] PERCENT SIGN (U+0025)
-    # "\x26" [&] AMPERSAND (U+0026)
-    # "\x2A" [*] ASTERISK (U+002A)
-    # "\x2E" [.] FULL STOP (U+002E)
-    # "\x2F" [/] SOLIDUS (U+002F)
-    # "\x3C" [<] LESS-THAN SIGN (U+003C)
-    # "\x3F" [?] QUESTION MARK (U+003F)
-    if (/\G ( \s* (?:
-        %=     | %    |
-        &&=    | &&   | &\.= | &\. | &= | & |
-        \*\*=  | \*\* | \*=  | \*  |
-        \.\.\. | \.\. | \.=  | \.  |
-        \/\/=  | \/\/ | \/=  | \/  |
-        <=>    | <<   | <=   | <   |
-        \?
-    )) /xmsgc) {
+    if (m{\G ( \s* (?:
+
+    #   12345 | 12345 | 12345 | 12345 | 12345 | 12345 |
+        %=    | %     |                                 # "\x25" [%] PERCENT SIGN   (U+0025)
+        &&=   | &&    | &\.=  | &\.   | &=    | &     | # "\x26" [&] AMPERSAND      (U+0026)
+        \*\*= | \*\*  | \*=   | \*    |                 # "\x2A" [*] ASTERISK       (U+002A)
+        \.\.\.| \.\.  | \.=   | \.    |                 # "\x2E" [.] FULL STOP      (U+002E)
+        \/\/= | \/\/  | \/=   | \/    |                 # "\x2F" [/] SOLIDUS        (U+002F)
+        <=>   | <<    | <=    | <     |                 # "\x3C" [<] LESS-THAN SIGN (U+003C)
+        \?                                              # "\x3F" [?] QUESTION MARK  (U+003F)
+    )) }xmsgc) {
         $parsed .= $1;
     }
 
@@ -1970,8 +1965,8 @@ sub parse_expr {
     }
 
     # balanced brackets
-    # "\x28" [(] LEFT PARENTHESIS (U+0028)
-    # "\x7B" [{] LEFT CURLY BRACKET (U+007B)
+    # "\x28" [(] LEFT PARENTHESIS    (U+0028)
+    # "\x7B" [{] LEFT CURLY BRACKET  (U+007B)
     # "\x5B" [[] LEFT SQUARE BRACKET (U+005B)
     elsif (/\G ( [(\{\[] ) /xmsgc) {
         $parsed .= parse_expr_balanced($1);
@@ -1999,16 +1994,16 @@ sub parse_expr {
 
     # numbers
     # "\x2E" [.] [0-9]
-    # "\x30" [0] DIGIT ZERO (U+0030)
-    # "\x31" [1] DIGIT ONE (U+0031)
-    # "\x32" [2] DIGIT TWO (U+0032)
+    # "\x30" [0] DIGIT ZERO  (U+0030)
+    # "\x31" [1] DIGIT ONE   (U+0031)
+    # "\x32" [2] DIGIT TWO   (U+0032)
     # "\x33" [3] DIGIT THREE (U+0033)
-    # "\x34" [4] DIGIT FOUR (U+0034)
-    # "\x35" [5] DIGIT FIVE (U+0035)
-    # "\x36" [6] DIGIT SIX (U+0036)
+    # "\x34" [4] DIGIT FOUR  (U+0034)
+    # "\x35" [5] DIGIT FIVE  (U+0035)
+    # "\x36" [6] DIGIT SIX   (U+0036)
     # "\x37" [7] DIGIT SEVEN (U+0037)
     # "\x38" [8] DIGIT EIGHT (U+0038)
-    # "\x39" [9] DIGIT NINE (U+0039)
+    # "\x39" [9] DIGIT NINE  (U+0039)
     elsif (m{\G (
 
 # since Perl v5.22 adds hexadecimal floating point literals
@@ -2099,17 +2094,27 @@ sub parse_expr {
         $parsed .= $1;
     }
 
-    # any operators
-    # "\x21" [!] EXCLAMATION MARK (U+0021)
-    # "\x2B" [+] PLUS SIGN (U+002B)
-    # "\x2C" [,] COMMA (U+002C)
-    # "\x3D" [=] EQUALS SIGN (U+003D)
-    # "\x3E" [>] GREATER-THAN SIGN (U+003E)
-    # "\x5C" [\] REVERSE SOLIDUS (U+005C)
-    # "\x5E" [^] CIRCUMFLEX ACCENT (U+005E)
-    # "\x7C" [|] VERTICAL LINE (U+007C)
-    # "\x7E" [~] TILDE (U+007E)
-    elsif (/\G ( != | !~ | ! | \+\+ | \+= | \+ | , | -- | -= | -> | - | == | => | =~ | = | >> | >= | > | \\ | \^\.= | \^\. | \^= | \^ | (?: and | cmp | eq | ge | gt | isa | le | lt | ne | not | or | x | x= | xor ) \b | \|\|= | \|\| | \|\.= | \|\. | \|= | \| | ~~ | ~\. | ~= | ~ ) /xmsgc) {
+    # symbolic operators
+    elsif (/\G (
+
+    #   12345 | 12345 | 12345 | 12345 | 12345 | 12345 |
+        !=    | !~    | !     |                         # "\x21" [!] EXCLAMATION MARK  (U+0021)
+        \+\+  | \+=   | \+    |                         # "\x2B" [+] PLUS SIGN         (U+002B)
+        ,     |                                         # "\x2C" [,] COMMA             (U+002C)
+        --    | -=    | ->    | -     |                 # "\x2D" [-] HYPHEN-MINUS      (U+002D)
+        ==    | =>    | =~    | =     |                 # "\x3D" [=] EQUALS SIGN       (U+003D)
+        >>    | >=    | >     |                         # "\x3E" [>] GREATER-THAN SIGN (U+003E)
+        \\    |                                         # "\x5C" [\] REVERSE SOLIDUS   (U+005C)
+        \^\^= | \^\^  | \^\.= | \^\.  | \^=   | \^    | # "\x5E" [^] CIRCUMFLEX ACCENT (U+005E)
+        \|\|= | \|\|  | \|\.= | \|\.  | \|=   | \|    | # "\x7C" [|] VERTICAL LINE     (U+007C)
+        ~~    | ~\.   | ~=    | ~                       # "\x7E" [~] TILDE             (U+007E)
+
+    ) /xmsgc) {
+        $parsed .= $1;
+    }
+
+    # named operators
+    elsif (/\G ( (?: and | cmp | eq | ge | gt | isa | le | lt | ne | not | or | x | x= | xor ) \b ) /xmsgc) {
         $parsed .= $1;
     }
 
@@ -2194,9 +2199,9 @@ sub parse_expr {
         $parsed .= parse_ambiguous_char();
     }
 
-    # CORE::do { block }      --> CORE::do { block }
-    # CORE::eval { block }    --> CORE::eval { block }
-    # CORE::try { block }     --> CORE::try { block }
+    # CORE::do      { block } --> CORE::do      { block }
+    # CORE::eval    { block } --> CORE::eval    { block }
+    # CORE::try     { block } --> CORE::try     { block }
     # CORE::finally { block } --> CORE::finally { block }
     elsif (/\G ( CORE:: (?: do | eval | try | finally ) \s* ) ( \{ ) /xmsgc) {
         $parsed .= $1;
@@ -2204,14 +2209,14 @@ sub parse_expr {
         $parsed .= parse_ambiguous_char();
     }
 
-    # mb::do { block }      --> do { block }
-    # mb::eval { block }    --> eval { block }
-    # mb::try { block }     --> try { block }
+    # mb::do      { block } --> do      { block }
+    # mb::eval    { block } --> eval    { block }
+    # mb::try     { block } --> try     { block }
     # mb::finally { block } --> finally { block }
-    # do { block }          --> do { block }
-    # eval { block }        --> eval { block }
-    # try { block }         --> try { block }
-    # finally { block }     --> finally { block }
+    # do          { block } --> do      { block }
+    # eval        { block } --> eval    { block }
+    # try         { block } --> try     { block }
+    # finally     { block } --> finally { block }
     elsif (/\G (?: mb:: | $old_package )? ( (?: do | eval | try | finally ) \s* ) ( \{ ) /xmsgc) {
         $parsed .= $1;
         $parsed .= parse_expr_balanced($2);
@@ -2290,7 +2295,7 @@ sub parse_expr {
 
     # "...", `...`
     # "\x22" ["] QUOTATION MARK (U+0022)
-    # "\x60" [`] GRAVE ACCENT (U+0060)
+    # "\x60" [`] GRAVE ACCENT   (U+0060)
     elsif (m{\G ( ["`] ) }xmsgc) {
         $parsed .= parse_qq_like_endswith($1);
         $parsed .= parse_ambiguous_char();
@@ -3230,40 +3235,40 @@ sub parse_expr {
     # "\x58" [X] LATIN CAPITAL LETTER X (U+0058)
     # "\x59" [Y] LATIN CAPITAL LETTER Y (U+0059)
     # "\x5A" [Z] LATIN CAPITAL LETTER Z (U+005A)
-    # "\x61" [a] LATIN SMALL LETTER A (U+0061)
-    # "\x62" [b] LATIN SMALL LETTER B (U+0062)
-    # "\x63" [c] LATIN SMALL LETTER C (U+0063)
-    # "\x64" [d] LATIN SMALL LETTER D (U+0064)
-    # "\x65" [e] LATIN SMALL LETTER E (U+0065)
-    # "\x66" [f] LATIN SMALL LETTER F (U+0066)
-    # "\x67" [g] LATIN SMALL LETTER G (U+0067)
-    # "\x68" [h] LATIN SMALL LETTER H (U+0068)
-    # "\x69" [i] LATIN SMALL LETTER I (U+0069)
-    # "\x6A" [j] LATIN SMALL LETTER J (U+006A)
-    # "\x6B" [k] LATIN SMALL LETTER K (U+006B)
-    # "\x6C" [l] LATIN SMALL LETTER L (U+006C)
-    # "\x6D" [m] LATIN SMALL LETTER M (U+006D)
-    # "\x6E" [n] LATIN SMALL LETTER N (U+006E)
-    # "\x6F" [o] LATIN SMALL LETTER O (U+006F)
-    # "\x70" [p] LATIN SMALL LETTER P (U+0070)
-    # "\x71" [q] LATIN SMALL LETTER Q (U+0071)
-    # "\x72" [r] LATIN SMALL LETTER R (U+0072)
-    # "\x73" [s] LATIN SMALL LETTER S (U+0073)
-    # "\x74" [t] LATIN SMALL LETTER T (U+0074)
-    # "\x75" [u] LATIN SMALL LETTER U (U+0075)
-    # "\x76" [v] LATIN SMALL LETTER V (U+0076)
-    # "\x77" [w] LATIN SMALL LETTER W (U+0077)
-    # "\x78" [x] LATIN SMALL LETTER X (U+0078)
-    # "\x79" [y] LATIN SMALL LETTER Y (U+0079)
-    # "\x7A" [z] LATIN SMALL LETTER Z (U+007A)
+    # "\x61" [a] LATIN SMALL LETTER A   (U+0061)
+    # "\x62" [b] LATIN SMALL LETTER B   (U+0062)
+    # "\x63" [c] LATIN SMALL LETTER C   (U+0063)
+    # "\x64" [d] LATIN SMALL LETTER D   (U+0064)
+    # "\x65" [e] LATIN SMALL LETTER E   (U+0065)
+    # "\x66" [f] LATIN SMALL LETTER F   (U+0066)
+    # "\x67" [g] LATIN SMALL LETTER G   (U+0067)
+    # "\x68" [h] LATIN SMALL LETTER H   (U+0068)
+    # "\x69" [i] LATIN SMALL LETTER I   (U+0069)
+    # "\x6A" [j] LATIN SMALL LETTER J   (U+006A)
+    # "\x6B" [k] LATIN SMALL LETTER K   (U+006B)
+    # "\x6C" [l] LATIN SMALL LETTER L   (U+006C)
+    # "\x6D" [m] LATIN SMALL LETTER M   (U+006D)
+    # "\x6E" [n] LATIN SMALL LETTER N   (U+006E)
+    # "\x6F" [o] LATIN SMALL LETTER O   (U+006F)
+    # "\x70" [p] LATIN SMALL LETTER P   (U+0070)
+    # "\x71" [q] LATIN SMALL LETTER Q   (U+0071)
+    # "\x72" [r] LATIN SMALL LETTER R   (U+0072)
+    # "\x73" [s] LATIN SMALL LETTER S   (U+0073)
+    # "\x74" [t] LATIN SMALL LETTER T   (U+0074)
+    # "\x75" [u] LATIN SMALL LETTER U   (U+0075)
+    # "\x76" [v] LATIN SMALL LETTER V   (U+0076)
+    # "\x77" [w] LATIN SMALL LETTER W   (U+0077)
+    # "\x78" [x] LATIN SMALL LETTER X   (U+0078)
+    # "\x79" [y] LATIN SMALL LETTER Y   (U+0079)
+    # "\x7A" [z] LATIN SMALL LETTER Z   (U+007A)
     elsif (/\G ( [A-Za-z_][A-Za-z_0-9]*(?:(?:'|::)[A-Za-z_][A-Za-z_0-9]*)* ) /xmsgc) {
         $parsed .= $1;
         $parsed .= parse_ambiguous_char();
     }
 
     # any right parenthesis
-    # "\x29" [)] RIGHT PARENTHESIS (U+0029)
-    # "\x7D" [}] RIGHT CURLY BRACKET (U+007D)
+    # "\x29" [)] RIGHT PARENTHESIS    (U+0029)
+    # "\x7D" [}] RIGHT CURLY BRACKET  (U+007D)
     # "\x5D" []] RIGHT SQUARE BRACKET (U+005D)
     elsif (/\G ([\)\}\]]) /xmsgc) {
         $parsed .= $1;
@@ -5368,22 +5373,24 @@ mb - Can easy script in Big5, Big5-HKSCS, GBK, Sjis(also CP932), UHC, UTF-8, ...
         qw/ DAMEMOJI 功声乗ソ /
         qx/ DAMEMOJI 功声乗ソ /
 
-  MBCS subroutines:
+  Useful MBCS subroutines:
     mb::chop(...);
     mb::chr(...);
-    mb::do 'file';
     mb::dosglob(...);
-    mb::eval 'string';
     mb::getc(...);
-    mb::index(...);
-    mb::index_byte(...);
     mb::length(...);
     mb::ord(...);
-    mb::require 'file';
+    mb::substr(...);
+  Not so useful MBCS subroutines:
+    mb::index(...);
+    mb::index_byte(...);
     mb::reverse(...);
     mb::rindex(...);
     mb::rindex_byte(...);
-    mb::substr(...);
+  Subroutines that handle MBCS program:
+    mb::do 'file';
+    mb::eval 'string';
+    mb::require 'file';
     mb::use Module;
     mb::no Module;
 
@@ -5391,10 +5398,18 @@ mb - Can easy script in Big5, Big5-HKSCS, GBK, Sjis(also CP932), UHC, UTF-8, ...
     $mb::PERL
     $mb::ORIG_PROGRAM_NAME
 
-  supported encodings:
-    Big5, Big5-HKSCS, EUC-JP, GB18030, GBK, Sjis(also CP932), UHC, UTF-8, WTF-8
+  Supported encodings:
+    Big5
+    Big5-HKSCS
+    EUC-JP
+    GB18030
+    GBK
+    Sjis(also CP932)
+    UHC
+    UTF-8
+    WTF-8
 
-  supported operating systems:
+  Supported operating systems:
     Apple Inc. Mac OS X, OS X, macOS,
     Hewlett-Packard Development Company, L.P. HP-UX,
     International Business Machines Corporation AIX,
@@ -5402,7 +5417,7 @@ mb - Can easy script in Big5, Big5-HKSCS, GBK, Sjis(also CP932), UHC, UTF-8, ...
     Oracle Corporation Solaris,
     and Other Systems
 
-  supported perl versions:
+  Supported perl versions:
     perl version 5.005_03 to newest perl
 
 =head1 INSTALLATION BY MAKE-COMMAND
@@ -5422,6 +5437,8 @@ To install this software without make, type the following:
    pmake.bat install
 
 =head1 DESCRIPTION
+
+This software is an implementation of JPerl in Perl.
 
 MBCS has been said to be an acronym for Multi Byte "Character" Set.
 (However, these days, it should be considered an acronym for Multi Byte "Codepoint" Set.)
@@ -5542,10 +5559,10 @@ codepoint range by hyphen of tr/// and y/// support US-ASCII only
 
 =back
 
-=head1 Larry Wall-san's Style
+=head1 Larry Wall-san's way
 
 If you're using the utf8 pragma and you have a big headache, probably, you're on the wrong way.
-You should back to the Larry Street where is a sign that says ver.5.00503, once.
+You should back to the Larry Wall Street (that is known as Wall street, and there are still many Perl scripts running on it today) where is a sign that says ver.5.00503.
 
 There is another path there. Follow that path.
 Soon, your headache will be improve.
@@ -5558,7 +5575,7 @@ Once, Larry Wall san said like this;
 
 "Easy jobs must be easy."
 
-Welcome to world of Larry Wall-san's Style!!
+Welcome to world of Larry Wall-san's way!!
 
 =head1 TERMINOLOGY
 
@@ -5661,6 +5678,124 @@ ZENKAKU(fullwidth)
 HANKAKU(halfwidth)
 
 =back
+
+=head1 Differences and History between jcode.pl and JPerl
+
+jcode.pl and JPerl are often confused because of their similar names.
+However, these software have completely different purposes and functions.
+jcode.pl converts the I/O encoding of Perl scripts, whereas JPerl does not convert the encoding at all.
+JPerl is a modified Perl interpreter that allows you to write MBCS literals in Perl scripts.
+This feature is not in jcode.pl.
+
+=head2 General Model of Information Processing
+
+The diagram below is a general model of information processing.
+
+  +------------+     +--------------+     +-------------+
+  |            |     |              |     |             |
+  | INPUT data | ==> |   Program    | ==> | OUTPUT data |
+  |            |     |              |     |             |
+  +------------+     +--------------+     +-------------+
+
+=head2 History of Supporting MBCS I/O on Perl
+
+The members of jcode.pl, which converts the input/output encoding of Perl scripts, and their history are as follows.
+
+=over 2
+
+=item *
+
+Since 1992, jcode.pl
+
+=item *
+
+Since 1999, Jcode.pm
+
+=item *
+
+Since 2002, Encode.pm
+
+=item *
+
+Since 2010, jacode.pl
+
+=item *
+
+Since 2018, Jacode4e.pm -- Jacode4e module
+
+=item *
+
+Since 2018, Jacode.pm -- Jacode module
+
+=item *
+
+Since 2018, Jacode4e/RoundTrip.pm -- Jacode4e::RoundTrip module
+
+=back
+
+  **************     +--------------+     ***************
+  * MBCS       *     |   Perl       |     * MBCS        *
+  * INPUT data * ==> |   script     | ==> * OUTPUT data *
+  *            *     |              |     *             *
+  **************     +--------------+     ***************
+  by encoding-A                           by encoding-B
+
+=head2 History of Supporting MBCS Literal in Perl Script
+
+The members of JPerl, which enables MBCS literal in Perl scripts, and their history are as follows.
+
+=over 2
+
+=item *
+
+Since 1993, JPerl -- Japanese and Japanized Perl
+
+=item *
+
+Since 2002, utf8.pm -- utf8 pragma
+
+=item *
+
+Since 2002, encoding.pm -- encoding pragma
+
+=item *
+
+Since 2008, Sjis.pm -- Sjis software
+
+=item *
+
+Since 2019, UTF8/R2.pm -- UTF8::R2 module
+
+=item *
+
+Since 2020, mb.pm -- mb.pm modulino
+
+=back
+
+  +------------+     ****************     +-------------+
+  |            |     * Perl         *     |             |
+  | INPUT data | ==> * script with  * ==> | OUTPUT data |
+  |            |     * MBCS literal *     |             |
+  +------------+     ****************     +-------------+
+                     by encoding-C
+
+=head1 Which US-ASCII code makes DAMEMOJI?
+
+The following US-ASCII code makes DAMEMOJI of MBCS characters.
+
+  ------------------------------------------------------------------
+  hex   character as US-ASCII
+  ------------------------------------------------------------------
+  40    [@]    sigil of array variable
+  5B    [[]    regexp bracketed character class
+  5C    [\]    backslashed escapes
+  5D    []]    regexp bracketed character class
+  5E    [^]    regexp true at beginning of string
+  60    [`]    command execution
+  7B    [{]    regexp quantifier
+  7C    [|]    regexp alternation
+  7D    [}]    regexp quantifier
+  ------------------------------------------------------------------
 
 =head1 MBCS Encodings supported by this software
 
@@ -6434,27 +6569,6 @@ In double quote, DAMEMOJI are double-byte characters that include the following 
   ------------------------------------------------------------------
   hex   character as US-ASCII
   ------------------------------------------------------------------
-  21    [!]
-  22    ["]
-  23    [#]    regexp comment
-  24    [$]    sigil of scalar variable
-  25    [%]
-  26    [&]
-  27    [']
-  28    [(]    regexp group and capture
-  29    [)]    regexp group and capture
-  2A    [*]    regexp matches zero or more times
-  2B    [+]    regexp matches one or more times
-  2C    [,]
-  2D    [-]
-  2E    [.]    regexp matches any octet
-  2F    [/]
-  3A    [:]
-  3B    [;]
-  3C    [<]
-  3D    [=]
-  3E    [>]
-  3F    [?]    regexp matches zero or one times
   40    [@]    sigil of array variable
   5B    [[]    regexp bracketed character class
   5C    [\]    backslashed escapes
@@ -6464,7 +6578,6 @@ In double quote, DAMEMOJI are double-byte characters that include the following 
   7B    [{]    regexp quantifier
   7C    [|]    regexp alternation
   7D    [}]    regexp quantifier
-  7E    [~]
   ------------------------------------------------------------------
 
 =head1 How to escape 2nd octet of DAMEMOJI
@@ -8383,7 +8496,7 @@ CPAN shows us there are mb.pm modulino and UTF8::R2 module.
 mb.pm modulino is a source code filter for MBCS encoding, and UTF8::R2 module is a utility for UTF-8 support.
 We can use each advantages using following hints.
 
-=head2 Advantages Of mb.pm Modulino
+=head2 Advantages of mb.pm Modulino
 
 =over 2
 
@@ -8409,7 +8522,7 @@ regexp ("m//", "qr//", and "s///") works as codepoint
 
 =back
 
-=head2 Disadvantages Of mb.pm Modulino
+=head2 Disadvantages of mb.pm Modulino
 
 =over 2
 
@@ -8423,7 +8536,7 @@ have obtrusive files(your_script.oo.pl)
 
 =back
 
-=head2 Advantages Of UTF8::R2 Module
+=head2 Advantages of UTF8::R2 Module
 
 =over 2
 
@@ -8437,7 +8550,7 @@ no obtrusive files(your_script.oo.pl)
 
 =back
 
-=head2 Disadvantages Of UTF8::R2 Module
+=head2 Disadvantages of UTF8::R2 Module
 
 =over 2
 

@@ -1,6 +1,6 @@
 package CodeGen::Cpppp::Output;
 
-our $VERSION = '0.003'; # VERSION
+our $VERSION = '0.004'; # VERSION
 # ABSTRACT: Collect text output into named sections
 
 use v5.20;
@@ -217,11 +217,11 @@ Michael Conrad <mike@nrdvana.net>
 
 =head1 VERSION
 
-version 0.003
+version 0.004
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2023 by Michael Conrad.
+This software is copyright (c) 2024 by Michael Conrad.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

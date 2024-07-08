@@ -11,7 +11,7 @@ use File::Slurp   qw(read_file);
 use Path::Tiny    qw(path);
 use Text::Wrap    qw(wrap);
 use YAML::XS      qw(LoadFile Dump);
-use Markdown::Pod qw(markdown_to_pod);
+use Markdown::Pod;
 use Feature::Compat::Try;
 use Getopt::Long;
 use Perl::Tidy;

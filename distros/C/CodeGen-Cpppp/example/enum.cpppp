@@ -1,0 +1,34 @@
+#! /usr/bin/env cpppp
+## use CodeGen::Cpppp::Enum;
+## my $enum= CodeGen::Cpppp::Enum->new(
+##   prefix => 'MYENUM_', type => 'int', values => [
+##     [ VAL_1 => 1 ],
+##     'VAL_2',
+##     'ALT_VAL',
+##     'SOME_VAL',
+##     [ OTHER_VAL  =>  1<<10 ],
+##     [ NONE       => -1 ]
+## ]);
+## section PUBLIC;
+
+#include <stdbool.h>
+#include <stddef.h>
+#include <stdint.h>
+#include <string.h>
+
+${{ $enum->generate_declaration }}
+
+extern const char * myenum_name(int value);
+extern bool myenum_parse(const char *str, size_t len, int *value_out);
+
+## section PRIVATE;
+
+${{ $enum->generate_static_tables }}
+
+const char * myenum_name(int value) {
+  ${{ $enum->generate_lookup_by_value }}
+}
+
+bool myenum_parse(const char *str, size_t len, int *value_out) {
+  ${{ $enum->generate_lookup_by_name }}
+}

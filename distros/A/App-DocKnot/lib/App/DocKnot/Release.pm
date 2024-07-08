@@ -10,7 +10,7 @@
 # Modules and declarations
 ##############################################################################
 
-package App::DocKnot::Release 7.01;
+package App::DocKnot::Release v8.0.0;
 
 use 5.024;
 use autodie;
@@ -80,7 +80,6 @@ sub new {
     }
 
     # Create and return the object.
-    #<<<
     my $self = {
         archivedir   => path($archivedir),
         distdir      => path($distdir),
@@ -90,7 +89,6 @@ sub new {
         version_name => $config_ref->{distribution}{version},
         versions     => $versions,
     };
-    #>>>
     bless($self, $class);
     return $self;
 }
@@ -134,7 +132,7 @@ sub release {
         utime($atime, $mtime, $dest)
           or die "cannot reset timestamps of $dest: $!\n";
         my $generic_name = $file;
-        $generic_name =~ s{ \A (\Q$self->{tarname}\E) - [\d.]+ [.] }{$1.}xms;
+        $generic_name =~ s{ \A (\Q$self->{tarname}\E) - v?[\d.]+ [.] }{$1.}xms;
         my $generic_path = $current_path->child($generic_name);
         $generic_path->remove();
         symlink($file, $generic_path);
@@ -240,7 +238,7 @@ Russ Allbery <rra@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright 2022 Russ Allbery <rra@cpan.org>
+Copyright 2022, 2024 Russ Allbery <rra@cpan.org>
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal

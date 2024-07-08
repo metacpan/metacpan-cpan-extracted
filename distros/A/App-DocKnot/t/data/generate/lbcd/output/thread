@@ -51,7 +51,7 @@
 
 \h2[Warning]
 
-\class(alert)[This package is orphaned.]
+\class(alert)[This package is not maintained.]
 Although I believe it is still useful, I no longer use this method of DNS
 load balancing and am no longer maintaining this package.  If you would
 like to pick up maintenance of it, please feel free.  Contact me if you
@@ -130,15 +130,14 @@ Thanks to Guido Guenther for doing the initial upload to Debian.  See the
 \link[https://tracker.debian.org/pkg/lbcd][Debian package tracker] for
 more information.
 
-lbcd is maintained using the Git version control system.  To check out the
-current development tree, see \link[https://github.com/rra/lbcd][GitHub]
-or clone:
+lbcd was maintained using the Git version control system.  To check out
+the current development tree, see
+\link[https://github.com/rra/lbcd][GitHub] or clone:
 
 \pre[    https://git.eyrie.org/git/system/lbcd.git]
 
-Pull requests on GitHub are welcome.  You can also
-\link[https://git.eyrie.org/?p=system/lbcd.git][browse the current
-development source].
+You can also \link[https://git.eyrie.org/?p=system/lbcd.git][browse the
+current development source].
 
 \h2[Documentation]
 

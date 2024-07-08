@@ -9,7 +9,7 @@
 # Modules and declarations
 ##############################################################################
 
-package App::DocKnot::Config 7.01;
+package App::DocKnot::Config v8.0.0;
 
 use 5.024;
 use autodie;
@@ -267,7 +267,7 @@ SOFTWARE.
 
 =head1 SEE ALSO
 
-L<docknot(1)>, L<App::DocKnot::Dist>, L<App:DocKnot::Release>,
+L<docknot(1)>, L<App::DocKnot::Dist>, L<App::DocKnot::Release>,
 L<App::DocKnot::Spin::Versions>
 
 This module is part of the App-DocKnot distribution.  The current version of

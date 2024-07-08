@@ -229,6 +229,16 @@ The request body is complicated. See L<OpenAPI::Client::OpenAI::Schema> for deta
 
 Creates a completion for the provided prompt and parameters.
 
+=head3 Examples
+
+See the following files in the distribution for examples:
+
+=over 4
+
+=item *	examples/translate.pl
+
+=back
+
 
 This method does not take any path or URL parameters.
 

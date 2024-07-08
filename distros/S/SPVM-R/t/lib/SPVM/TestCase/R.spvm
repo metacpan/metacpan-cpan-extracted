@@ -15,24 +15,348 @@ class TestCase::R {
   use R::NDArray::Time::Piece;
   
   use R::OP;
-  use R::OP::Int;
-  use R::OP::Long;
-  use R::OP::Float;
-  use R::OP::Double;
-  use R::OP::FloatComplex;
-  use R::OP::DoubleComplex;
+  use R::OP::Int as IOP;
+  use R::OP::Long as LOP;
+  use R::OP::Float as FOP;
+  use R::OP::Double as DOP;
+  use R::OP::FloatComplex as FCOP;
+  use R::OP::DoubleComplex as DCOP;
   
-  use R::OP::Byte;
-  use R::OP::Short;
-  use R::OP::String;
-  use R::OP::StringBuffer;
-  use R::OP::Time::Piece;
+  use R::OP::Byte as BOP;
+  use R::OP::Short as SOP;
+  use R::OP::String as STROP;
+  use R::OP::StringBuffer as STRBOP;
+  use R::OP::Time::Piece as TPOP;
   
   use R::DataFrame;
   use R::OP::Matrix;
   use R::OP::DataFrame;
+  use R::OP::Matrix::Double as MDOP;
+  use R::OP::Object;
   
   static method test : int () {
+    
+    # R::DataFrame
+    {
+      # set_col, insert_col, remove_col, exists_col, colnames
+      {
+        my $data_frame = R::DataFrame->new;
+        
+        $data_frame->set_col("Name1", IOP->c([1, 2, 3]));
+        $data_frame->set_col("Name2", IOP->c([1, 2, 3]));
+        $data_frame->set_col("Name3", IOP->c([1, 2, 3]));
+        
+        unless (Array->equals_string($data_frame->colnames, ["Name1", "Name2", "Name3"])) {
+          return 0;
+        }
+        
+        unless (Array->equals_string($data_frame->colnames, ["Name1", "Name2", "Name3"])) {
+          return 0;
+        }
+        
+        unless ($data_frame->exists_col("Name1")) {
+          return 0;
+        }
+        
+        unless ($data_frame->exists_col("Name2")) {
+          return 0;
+        }
+        
+        unless ($data_frame->exists_col("Name3")) {
+          return 0;
+        }
+        
+        unless (Array->equals_string($data_frame->colnames, ["Name1", "Name2", "Name3"])) {
+          return 0;
+        }
+        
+        $data_frame->insert_col("Name4", IOP->c([1, 2, 3]));
+        
+        unless (Array->equals_string($data_frame->colnames, ["Name1", "Name2", "Name3", "Name4"])) {
+          return 0;
+        }
+        
+        $data_frame->insert_col("Name0", IOP->c([1, 2, 3]), "Name1");
+        
+        unless (Array->equals_string($data_frame->colnames, ["Name0", "Name1", "Name2", "Name3", "Name4"])) {
+          return 0;
+        }
+        
+        $data_frame->remove_col("Name0");
+        
+        unless (Array->equals_string($data_frame->colnames, ["Name1", "Name2", "Name3", "Name4"])) {
+          return 0;
+        }
+        
+        $data_frame->remove_col("Name4");
+        
+        unless (Array->equals_string($data_frame->colnames, ["Name1", "Name2", "Name3"])) {
+          return 0;
+        }
+        
+        $data_frame->set_col("Name2", IOP->c([1, 2, 3]));
+        
+        unless (Array->equals_string($data_frame->colnames, ["Name1", "Name2", "Name3"])) {
+          return 0;
+        }
+      }
+      
+      {
+        my $data_frame = R::DataFrame->new;
+        
+        $data_frame->set_col("Name1", IOP->c([1, 2, 3]));
+        $data_frame->set_col("Name2", IOP->c([4, 5, 6]));
+        
+        unless ($data_frame->to_string eq "Name1\x{09}Name2\x{0A}1\x{09}4\x{0A}2\x{09}5\x{0A}3\x{09}6\x{0A}") {
+          return 0;
+        }
+        
+      }
+      
+      {
+        my $data_frame = R::DataFrame->new;
+        
+        $data_frame->set_col("Name1", IOP->c([1, 2, 3], [1, 3]));
+        $data_frame->set_col("Name2", IOP->c([4, 5, 6], [1, 3]));
+        
+        unless ($data_frame->to_string eq "Name1\x{0A}\x{09}[,0][,1]\x{09}[,2]\x{09}\x{0A}[0]\x{09}1\x{09}2\x{09}3\x{0A}\x{0A}Name2\x{0A}\x{09}[,0][,1]\x{09}[,2]\x{09}\x{0A}[0]\x{09}4\x{09}5\x{09}6\x{0A}\x{0A}") {
+          return 0;
+        }
+        
+      }
+      
+      {
+        my $data_frame = R::DataFrame->new;
+        
+        $data_frame->set_col("Name1", IOP->c([1, 2, 3]));
+        $data_frame->set_col("Name2", my $col2 = IOP->c([4, 5, 6]));
+        $data_frame->set_col("Name3", my $col3 = IOP->c([7, 8, 9]));
+        
+        my $ret_col = $data_frame->col("Name2");
+        
+        unless ($ret_col == $col2) {
+          return 0;
+        }
+        
+        my $slice_data_frame = $data_frame->slice(["Name2", "Name3"], [IOP->c([1, 2])]);
+        
+        unless ($slice_data_frame is_type R::DataFrame) {
+          return 0;
+        }
+        
+        unless (Array->equals_string($slice_data_frame->colnames, ["Name2", "Name3"])) {
+          return 0;
+        }
+        
+        unless (Array->equals_int($slice_data_frame->col("Name2")->(R::NDArray::Int)->data, [5, 6])) {
+          return 0;
+        }
+        
+        unless (Array->equals_int($slice_data_frame->col("Name3")->(R::NDArray::Int)->data, [8, 9])) {
+          return 0;
+        }
+      }
+      
+      {
+        my $data_frame = R::DataFrame->new;
+        
+        $data_frame->set_col("Name1", IOP->c([1, 2, 3]));
+        $data_frame->set_col("Name2", my $col2 = IOP->c([4, 5, 6]));
+        $data_frame->set_col("Name3", my $col3 = IOP->c([7, 8, 9]));
+        
+        $data_frame->set_order(IOP->c([2, 0, 1]));
+        
+        unless (Array->equals_int($data_frame->col("Name1")->(R::NDArray::Int)->data, [3, 1, 2])) {
+          return 0;
+        }
+        
+        unless (Array->equals_int($data_frame->col("Name2")->(R::NDArray::Int)->data, [6, 4, 5])) {
+          return 0;
+        }
+        
+      }
+      
+    }
+    
+    # R::OP::Int
+    {
+      # R::OP::Int#eq
+      {
+        my $x_ndarray = IOP->c([1, 2, 3]);
+        
+        my $y_ndarray = IOP->c([1, 2, 4]);
+        
+        my $ret_ndarray = IOP->eq($x_ndarray, $y_ndarray);
+        
+        unless ($ret_ndarray is_type R::NDArray::Int) {
+          return 0;
+        }
+        
+        unless (Array->equals_int($ret_ndarray->data, [1, 1, 0])) {
+          return 0;
+        }
+        
+        unless (Array->equals_int($ret_ndarray->dim, [3])) {
+          return 0;
+        }
+      }
+      
+      # R::OP::Int#rep
+      {
+        {
+          my $x_ndarray = IOP->c([1, 2, 3]);
+          
+          my $times = 3;
+          
+          my $ret_ndarray = IOP->rep($x_ndarray, $times);
+          
+          unless ($ret_ndarray is_type R::NDArray::Int) {
+            return 0;
+          }
+          
+          unless (Array->equals_int($ret_ndarray->data, [1, 2, 3, 1, 2, 3, 1, 2, 3])) {
+            return 0;
+          }
+          
+          unless (Array->equals_int($ret_ndarray->dim, [9])) {
+            return 0;
+          }
+        }
+      }
+      
+      # R::OP::Int#rep_length
+      {
+        {
+          my $x_ndarray = IOP->c([1, 2, 3]);
+          
+          my $length = 9;
+          
+          my $ret_ndarray = IOP->rep_length($x_ndarray, $length);
+          
+          unless ($ret_ndarray is_type R::NDArray::Int) {
+            return 0;
+          }
+          
+          unless (Array->equals_int($ret_ndarray->data, [1, 2, 3, 1, 2, 3, 1, 2, 3])) {
+            return 0;
+          }
+          
+          unless (Array->equals_int($ret_ndarray->dim, [9])) {
+            return 0;
+          }
+        }
+        
+        {
+          my $x_ndarray = IOP->c(1);
+          
+          my $length = 9;
+          
+          my $ret_ndarray = IOP->rep_length($x_ndarray, $length);
+          
+          unless ($ret_ndarray is_type R::NDArray::Int) {
+            return 0;
+          }
+          
+          unless (Array->equals_int($ret_ndarray->data, [1, 1, 1, 1, 1, 1, 1, 1, 1])) {
+            return 0;
+          }
+          
+          unless (Array->equals_int($ret_ndarray->dim, [9])) {
+            return 0;
+          }
+        }
+      }
+    }
+    
+    # R::OP::Matrix::Double
+    {
+      # R::OP::Matrix::Double#matrix
+      {
+        {
+          my $seq_ndarray = DOP->seq(1, 6);
+          
+          my $nrow = 3;
+          my $ncol = 2;
+          my $ret_ndarray = MDOP->matrix($seq_ndarray, $nrow, $ncol);
+          
+          unless ($ret_ndarray is_type R::NDArray::Double) {
+            return 0;
+          }
+          
+          unless ($ret_ndarray->data == $seq_ndarray->data) {
+            return 0;
+          }
+          
+          unless (Array->equals_int($ret_ndarray->dim, [$nrow, $ncol])) {
+            return 0;
+          }
+        }
+        
+        {
+          my $data = [(double)1, 2, 3, 4, 5, 6];
+          my $nrow = 3;
+          my $ncol = 2;
+          my $ret_ndarray = MDOP->matrix($data, $nrow, $ncol);
+          
+          unless ($ret_ndarray is_type R::NDArray::Double) {
+            return 0;
+          }
+          
+          unless ($ret_ndarray->data == $data) {
+            return 0;
+          }
+          
+          unless (Array->equals_int($ret_ndarray->dim, [$nrow, $ncol])) {
+            return 0;
+          }
+        }
+      }
+      
+      # R::OP::Matrix::Double#matrix_byrow
+      {
+        my $seq_ndarray = DOP->seq(1, 6);
+        
+        my $nrow = 3;
+        my $ncol = 2;
+        my $ret_ndarray = MDOP->matrix_byrow($seq_ndarray, $nrow, $ncol);
+        
+        unless ($ret_ndarray is_type R::NDArray::Double) {
+          return 0;
+        }
+        
+        unless (Array->equals_double($ret_ndarray->data, [(double)1, 3, 5, 2, 4, 6])) {
+          return 0;
+        }
+        
+        unless (Array->equals_int($ret_ndarray->dim, [$nrow, $ncol])) {
+          return 0;
+        }
+        
+      }
+      
+      # R::OP::Matrix::Double#mul
+      {
+        my $seq_ndarray = DOP->seq(1, 6);
+        
+        my $x_ndarray = MDOP->matrix(DOP->seq(1, 6), 2, 3);
+        my $y_ndarray = MDOP->matrix(DOP->seq(1, 6), 3, 2);
+        
+        my $ret_ndarray = MDOP->mul($x_ndarray, $y_ndarray);
+        
+        unless ($ret_ndarray is_type R::NDArray::Double) {
+          return 0;
+        }
+        
+        unless (Array->equals_double($ret_ndarray->data, [(double)22, 28, 49, 64])) {
+          return 0;
+        }
+        
+        unless (Array->equals_int($ret_ndarray->dim, [2, 2])) {
+          return 0;
+        }
+        
+      }
+    }
     
     # R
     {
@@ -41,7 +365,7 @@ class TestCase::R {
         {
           my $data = [(byte)1, 2, 3, 4, 5, 6];
           my $dim = [2, 3];
-          my $ret_ndarray = R->byte($data, $dim);
+          my $ret_ndarray = BOP->c($data, $dim);
           
           unless ($ret_ndarray is_type R::NDArray::Byte) {
             return 0;
@@ -59,7 +383,7 @@ class TestCase::R {
         {
           my $data = [(byte)1, 2, 3, 4, 5, 6];
           my $data_length = @$data;
-          my $ret_ndarray = R->byte($data);
+          my $ret_ndarray = BOP->c($data);
           
           unless ($ret_ndarray is_type R::NDArray::Byte) {
             return 0;
@@ -76,7 +400,7 @@ class TestCase::R {
         
         {
           my $data = (byte)1;
-          my $ret_ndarray = R->byte($data);
+          my $ret_ndarray = BOP->c($data);
           
           unless ($ret_ndarray is_type R::NDArray::Byte) {
             return 0;
@@ -93,7 +417,7 @@ class TestCase::R {
         
         {
           my $data = [(byte)1, 2, 3, 4, 5, 6];
-          my $ret_ndarray = R->byte(R::OP::Byte->c($data));
+          my $ret_ndarray = BOP->c(R::OP::Byte->c($data));
           
           unless ($ret_ndarray is_type R::NDArray::Byte) {
             return 0;
@@ -114,7 +438,7 @@ class TestCase::R {
         {
           my $data = [(short)1, 2, 3, 4, 5, 6];
           my $dim = [2, 3];
-          my $ret_ndarray = R->short($data, $dim);
+          my $ret_ndarray = SOP->c($data, $dim);
           
           unless ($ret_ndarray is_type R::NDArray::Short) {
             return 0;
@@ -132,7 +456,7 @@ class TestCase::R {
         {
           my $data = [(short)1, 2, 3, 4, 5, 6];
           my $data_length = @$data;
-          my $ret_ndarray = R->short($data);
+          my $ret_ndarray = SOP->c($data);
           
           unless ($ret_ndarray is_type R::NDArray::Short) {
             return 0;
@@ -149,7 +473,7 @@ class TestCase::R {
         
         {
           my $data = (short)1;
-          my $ret_ndarray = R->short($data);
+          my $ret_ndarray = SOP->c($data);
           
           unless ($ret_ndarray is_type R::NDArray::Short) {
             return 0;
@@ -166,7 +490,7 @@ class TestCase::R {
         
         {
           my $data = [(short)1, 2, 3, 4, 5, 6];
-          my $ret_ndarray = R->short(R::OP::Short->c($data));
+          my $ret_ndarray = SOP->c(R::OP::Short->c($data));
           
           unless ($ret_ndarray is_type R::NDArray::Short) {
             return 0;
@@ -187,7 +511,7 @@ class TestCase::R {
         {
           my $data = [(int)1, 2, 3, 4, 5, 6];
           my $dim = [2, 3];
-          my $ret_ndarray = R->int($data, $dim);
+          my $ret_ndarray = IOP->c($data, $dim);
           
           unless ($ret_ndarray is_type R::NDArray::Int) {
             return 0;
@@ -205,7 +529,7 @@ class TestCase::R {
         {
           my $data = [(int)1, 2, 3, 4, 5, 6];
           my $data_length = @$data;
-          my $ret_ndarray = R->int($data);
+          my $ret_ndarray = IOP->c($data);
           
           unless ($ret_ndarray is_type R::NDArray::Int) {
             return 0;
@@ -222,7 +546,7 @@ class TestCase::R {
         
         {
           my $data = (int)1;
-          my $ret_ndarray = R->int($data);
+          my $ret_ndarray = IOP->c($data);
           
           unless ($ret_ndarray is_type R::NDArray::Int) {
             return 0;
@@ -239,7 +563,7 @@ class TestCase::R {
         
         {
           my $data = [(int)1, 2, 3, 4, 5, 6];
-          my $ret_ndarray = R->int(R::OP::Int->c($data));
+          my $ret_ndarray = IOP->c(R::OP::Int->c($data));
           
           unless ($ret_ndarray is_type R::NDArray::Int) {
             return 0;
@@ -260,7 +584,7 @@ class TestCase::R {
         {
           my $data = [(long)1, 2, 3, 4, 5, 6];
           my $dim = [2, 3];
-          my $ret_ndarray = R->long($data, $dim);
+          my $ret_ndarray = LOP->c($data, $dim);
           
           unless ($ret_ndarray is_type R::NDArray::Long) {
             return 0;
@@ -278,7 +602,7 @@ class TestCase::R {
         {
           my $data = [(long)1, 2, 3, 4, 5, 6];
           my $data_length = @$data;
-          my $ret_ndarray = R->long($data);
+          my $ret_ndarray = LOP->c($data);
           
           unless ($ret_ndarray is_type R::NDArray::Long) {
             return 0;
@@ -295,7 +619,7 @@ class TestCase::R {
         
         {
           my $data = (long)1;
-          my $ret_ndarray = R->long($data);
+          my $ret_ndarray = LOP->c($data);
           
           unless ($ret_ndarray is_type R::NDArray::Long) {
             return 0;
@@ -312,7 +636,7 @@ class TestCase::R {
         
         {
           my $data = [(long)1, 2, 3, 4, 5, 6];
-          my $ret_ndarray = R->long(R::OP::Long->c($data));
+          my $ret_ndarray = LOP->c(R::OP::Long->c($data));
           
           unless ($ret_ndarray is_type R::NDArray::Long) {
             return 0;
@@ -333,7 +657,7 @@ class TestCase::R {
         {
           my $data = [(float)1, 2, 3, 4, 5, 6];
           my $dim = [2, 3];
-          my $ret_ndarray = R->float($data, $dim);
+          my $ret_ndarray = FOP->c($data, $dim);
           
           unless ($ret_ndarray is_type R::NDArray::Float) {
             return 0;
@@ -351,7 +675,7 @@ class TestCase::R {
         {
           my $data = [(float)1, 2, 3, 4, 5, 6];
           my $data_length = @$data;
-          my $ret_ndarray = R->float($data);
+          my $ret_ndarray = FOP->c($data);
           
           unless ($ret_ndarray is_type R::NDArray::Float) {
             return 0;
@@ -368,7 +692,7 @@ class TestCase::R {
         
         {
           my $data = (float)1;
-          my $ret_ndarray = R->float($data);
+          my $ret_ndarray = FOP->c($data);
           
           unless ($ret_ndarray is_type R::NDArray::Float) {
             return 0;
@@ -385,7 +709,7 @@ class TestCase::R {
         
         {
           my $data = [(float)1, 2, 3, 4, 5, 6];
-          my $ret_ndarray = R->float(R::OP::Float->c($data));
+          my $ret_ndarray = FOP->c(R::OP::Float->c($data));
           
           unless ($ret_ndarray is_type R::NDArray::Float) {
             return 0;
@@ -406,7 +730,7 @@ class TestCase::R {
         {
           my $data = [(double)1, 2, 3, 4, 5, 6];
           my $dim = [2, 3];
-          my $ret_ndarray = R->double($data, $dim);
+          my $ret_ndarray = DOP->c($data, $dim);
           
           unless ($ret_ndarray is_type R::NDArray::Double) {
             return 0;
@@ -424,7 +748,7 @@ class TestCase::R {
         {
           my $data = [(double)1, 2, 3, 4, 5, 6];
           my $data_length = @$data;
-          my $ret_ndarray = R->double($data);
+          my $ret_ndarray = DOP->c($data);
           
           unless ($ret_ndarray is_type R::NDArray::Double) {
             return 0;
@@ -441,7 +765,7 @@ class TestCase::R {
         
         {
           my $data = (double)1;
-          my $ret_ndarray = R->double($data);
+          my $ret_ndarray = DOP->c($data);
           
           unless ($ret_ndarray is_type R::NDArray::Double) {
             return 0;
@@ -458,7 +782,7 @@ class TestCase::R {
         
         {
           my $data = [(double)1, 2, 3, 4, 5, 6];
-          my $ret_ndarray = R->double(R::OP::Double->c($data));
+          my $ret_ndarray = DOP->c(R::OP::Double->c($data));
           
           unless ($ret_ndarray is_type R::NDArray::Double) {
             return 0;
@@ -479,7 +803,7 @@ class TestCase::R {
         {
           my $data = [(Complex_2f)Math->complexf(1, 1), Math->complexf(2, 1), Math->complexf(3, 1), Math->complexf(4, 1), Math->complexf(5, 1), Math->complexf(6, 1)];
           my $dim = [2, 3];
-          my $ret_ndarray = R->float_complex($data, $dim);
+          my $ret_ndarray = FCOP->c($data, $dim);
           
           unless ($ret_ndarray is_type R::NDArray::FloatComplex) {
             return 0;
@@ -497,7 +821,7 @@ class TestCase::R {
         {
           my $data = [(Complex_2f)Math->complexf(1, 1), Math->complexf(2, 1), Math->complexf(3, 1), Math->complexf(4, 1), Math->complexf(5, 1), Math->complexf(6, 1)];
           my $data_length = @$data;
-          my $ret_ndarray = R->float_complex($data);
+          my $ret_ndarray = FCOP->c($data);
           
           unless ($ret_ndarray is_type R::NDArray::FloatComplex) {
             return 0;
@@ -518,7 +842,7 @@ class TestCase::R {
         {
           my $data = [(Complex_2d)Math->complex(1, 1), Math->complex(2, 1), Math->complex(3, 1), Math->complex(4, 1), Math->complex(5, 1), Math->complex(6, 1)];
           my $dim = [2, 3];
-          my $ret_ndarray = R->double_complex($data, $dim);
+          my $ret_ndarray = DCOP->c($data, $dim);
           
           unless ($ret_ndarray is_type R::NDArray::DoubleComplex) {
             return 0;
@@ -536,7 +860,7 @@ class TestCase::R {
         {
           my $data = [(Complex_2d)Math->complex(1, 1), Math->complex(2, 1), Math->complex(3, 1), Math->complex(4, 1), Math->complex(5, 1), Math->complex(6, 1)];
           my $data_length = @$data;
-          my $ret_ndarray = R->double_complex($data);
+          my $ret_ndarray = DCOP->c($data);
           
           unless ($ret_ndarray is_type R::NDArray::DoubleComplex) {
             return 0;
@@ -557,7 +881,7 @@ class TestCase::R {
         {
           my $data = [(float)1,1,  2,1,  3,1,  4,1,  5,1,  6,1];
           my $dim = [2, 3];
-          my $ret_ndarray = R->complexf($data, $dim);
+          my $ret_ndarray = FCOP->c($data, $dim);
           
           unless ($ret_ndarray is_type R::NDArray::FloatComplex) {
             return 0;
@@ -578,7 +902,7 @@ class TestCase::R {
         {
           my $data = [(float)1,1,  2,1,  3,1,  4,1,  5,1,  6,1];
           my $data_length = @$data / 2;
-          my $ret_ndarray = R->complexf($data);
+          my $ret_ndarray = FCOP->c($data);
           
           unless ($ret_ndarray is_type R::NDArray::FloatComplex) {
             return 0;
@@ -602,7 +926,7 @@ class TestCase::R {
         {
           my $data = [(double)1,1,  2,1,  3,1,  4,1,  5,1,  6,1];
           my $dim = [2, 3];
-          my $ret_ndarray = R->complex($data, $dim);
+          my $ret_ndarray = DCOP->c($data, $dim);
           
           unless ($ret_ndarray is_type R::NDArray::DoubleComplex) {
             return 0;
@@ -623,7 +947,7 @@ class TestCase::R {
         {
           my $data = [(double)1,1,  2,1,  3,1,  4,1,  5,1,  6,1];
           my $data_length = @$data / 2;
-          my $ret_ndarray = R->complex($data);
+          my $ret_ndarray = DCOP->c($data);
           
           unless ($ret_ndarray is_type R::NDArray::DoubleComplex) {
             return 0;
@@ -645,7 +969,7 @@ class TestCase::R {
       # R#i method
       {
         {
-          my $ret_ndarray = R->i;
+          my $ret_ndarray = DCOP->i;
           
           unless ($ret_ndarray is_type R::NDArray::DoubleComplex) {
             return 0;
@@ -671,7 +995,7 @@ class TestCase::R {
         {
           my $data = [(object)"1", "2", "3", "4", "5", "6"];
           my $dim = [2, 3];
-          my $ret_ndarray = R->object($data, $dim);
+          my $ret_ndarray = R::OP::Object->c($data, $dim);
           
           unless ($ret_ndarray is_type R::NDArray::Object) {
             return 0;
@@ -689,7 +1013,7 @@ class TestCase::R {
         {
           my $data = [(object)"1", "2", "3", "4", "5", "6"];
           my $data_length = @$data;
-          my $ret_ndarray = R->object($data);
+          my $ret_ndarray = R::OP::Object->c($data);
           
           unless ($ret_ndarray is_type R::NDArray::Object) {
             return 0;
@@ -710,7 +1034,7 @@ class TestCase::R {
         {
           my $data = [(string)"1", "2", "3", "4", "5", "6"];
           my $dim = [2, 3];
-          my $ret_ndarray = R->string($data, $dim);
+          my $ret_ndarray = R::OP::String->c($data, $dim);
           
           unless ($ret_ndarray is_type R::NDArray::String) {
             return 0;
@@ -728,7 +1052,7 @@ class TestCase::R {
         {
           my $data = [(string)"1", "2", "3", "4", "5", "6"];
           my $data_length = @$data;
-          my $ret_ndarray = R->string($data);
+          my $ret_ndarray = R::OP::String->c($data);
           
           unless ($ret_ndarray is_type R::NDArray::String) {
             return 0;
@@ -749,7 +1073,7 @@ class TestCase::R {
         {
           my $data = [(StringBuffer)StringBuffer->new("1"), StringBuffer->new("2"), StringBuffer->new("3"), StringBuffer->new("4"), StringBuffer->new("5"), StringBuffer->new("6")];
           my $dim = [2, 3];
-          my $ret_ndarray = R->string_buffer($data, $dim);
+          my $ret_ndarray = R::OP::StringBuffer->c($data, $dim);
           
           unless ($ret_ndarray is_type R::NDArray::StringBuffer) {
             return 0;
@@ -767,7 +1091,7 @@ class TestCase::R {
         {
           my $data = [(StringBuffer)StringBuffer->new("1"), StringBuffer->new("2"), StringBuffer->new("3"), StringBuffer->new("4"), StringBuffer->new("5"), StringBuffer->new("6")];
           my $data_length = @$data;
-          my $ret_ndarray = R->string_buffer($data);
+          my $ret_ndarray = R::OP::StringBuffer->c($data);
           
           unless ($ret_ndarray is_type R::NDArray::StringBuffer) {
             return 0;
@@ -788,7 +1112,7 @@ class TestCase::R {
         {
           my $data = [(Time::Piece)Time::Piece->localtime, Time::Piece->localtime, Time::Piece->localtime, Time::Piece->localtime, Time::Piece->localtime, Time::Piece->localtime];
           my $dim = [2, 3];
-          my $ret_ndarray = R->time_piece($data, $dim);
+          my $ret_ndarray = R::OP::Time::Piece->c($data, $dim);
           
           unless ($ret_ndarray is_type R::NDArray::Time::Piece) {
             return 0;
@@ -806,7 +1130,7 @@ class TestCase::R {
         {
           my $data = [(Time::Piece)Time::Piece->localtime, Time::Piece->localtime, Time::Piece->localtime, Time::Piece->localtime, Time::Piece->localtime, Time::Piece->localtime];
           my $data_length = @$data;
-          my $ret_ndarray = R->time_piece($data);
+          my $ret_ndarray = R::OP::Time::Piece->c($data);
           
           unless ($ret_ndarray is_type R::NDArray::Time::Piece) {
             return 0;
@@ -827,7 +1151,7 @@ class TestCase::R {
         {
           my $begin = 1;
           my $end = 5;
-          my $ret_ndarray = R->seq($begin, $end);
+          my $ret_ndarray = IOP->seq($begin, $end);
           
           unless ($ret_ndarray is_type R::NDArray::Int) {
             return 0;
@@ -846,7 +1170,7 @@ class TestCase::R {
           my $begin = 1;
           my $end = 5;
           my $by = 2;
-          my $ret_ndarray = R->seq($begin, $end, $by);
+          my $ret_ndarray = IOP->seq($begin, $end, $by);
           
           unless ($ret_ndarray is_type R::NDArray::Int) {
             return 0;
@@ -865,7 +1189,7 @@ class TestCase::R {
           my $begin = 5;
           my $end = 1;
           my $by = -1;
-          my $ret_ndarray = R->seq($begin, $end, $by);
+          my $ret_ndarray = IOP->seq($begin, $end, $by);
           
           unless ($ret_ndarray is_type R::NDArray::Int) {
             return 0;
@@ -883,7 +1207,7 @@ class TestCase::R {
       
       # R#undef method
       {
-        my $undef = R->undef;
+        my $undef = IOP->undef;
         
         unless ($undef is_compile_type R::NDArray::Int) {
           return 0;
@@ -1527,9 +1851,9 @@ class TestCase::R {
       {
 
         {
-          my $ndarray = R->int([1, 2, 3, 4, 5, 6], [3, 2]);
+          my $ndarray = IOP->c([1, 2, 3, 4, 5, 6], [3, 2]);
           
-          my $ret_ndarray = $ndarray->slice([R->int(0), R->int(0)]);
+          my $ret_ndarray = $ndarray->slice([IOP->c(0), IOP->c(0)]);
           
           unless ($ret_ndarray is_type R::NDArray::Int) {
             return 0;
@@ -1545,9 +1869,9 @@ class TestCase::R {
         }
         
         {
-          my $ndarray = R->int([1, 2, 3, 4, 5, 6], [3, 2]);
+          my $ndarray = IOP->c([1, 2, 3, 4, 5, 6], [3, 2]);
           
-          my $ret_ndarray = $ndarray->slice([R->int(1), R->int(0)]);
+          my $ret_ndarray = $ndarray->slice([IOP->c(1), IOP->c(0)]);
           
           unless ($ret_ndarray is_type R::NDArray::Int) {
             return 0;
@@ -1563,9 +1887,9 @@ class TestCase::R {
         }
         
         {
-          my $ndarray = R->int([1, 2, 3, 4, 5, 6], [3, 2]);
+          my $ndarray = IOP->c([1, 2, 3, 4, 5, 6], [3, 2]);
           
-          my $ret_ndarray = $ndarray->slice([R->int(2), R->int(0)]);
+          my $ret_ndarray = $ndarray->slice([IOP->c(2), IOP->c(0)]);
           
           unless ($ret_ndarray is_type R::NDArray::Int) {
             return 0;
@@ -1581,9 +1905,9 @@ class TestCase::R {
         }
         
         {
-          my $ndarray = R->int([1, 2, 3, 4, 5, 6], [3, 2]);
+          my $ndarray = IOP->c([1, 2, 3, 4, 5, 6], [3, 2]);
           
-          my $ret_ndarray = $ndarray->slice([R->int(0), R->int(1)]);
+          my $ret_ndarray = $ndarray->slice([IOP->c(0), IOP->c(1)]);
           
           unless ($ret_ndarray is_type R::NDArray::Int) {
             return 0;
@@ -1599,9 +1923,9 @@ class TestCase::R {
         }
         
         {
-          my $ndarray = R->int([1, 2, 3, 4, 5, 6], [3, 2]);
+          my $ndarray = IOP->c([1, 2, 3, 4, 5, 6], [3, 2]);
           
-          my $ret_ndarray = $ndarray->slice([R->int(1), R->int(1)]);
+          my $ret_ndarray = $ndarray->slice([IOP->c(1), IOP->c(1)]);
           
           unless ($ret_ndarray is_type R::NDArray::Int) {
             return 0;
@@ -1617,9 +1941,9 @@ class TestCase::R {
         }
         
         {
-          my $ndarray = R->int([1, 2, 3, 4, 5, 6], [3, 2]);
+          my $ndarray = IOP->c([1, 2, 3, 4, 5, 6], [3, 2]);
           
-          my $ret_ndarray = $ndarray->slice([R->int(2), R->int(1)]);
+          my $ret_ndarray = $ndarray->slice([IOP->c(2), IOP->c(1)]);
           
           unless ($ret_ndarray is_type R::NDArray::Int) {
             return 0;
@@ -1635,9 +1959,9 @@ class TestCase::R {
         }
         
         {
-          my $ndarray = R->int(R->seq(1, 24), [4, 3, 2]);
+          my $ndarray = IOP->c(IOP->seq(1, 24), [4, 3, 2]);
           
-          my $ret_ndarray = $ndarray->slice([R->int(3), R->int(2), R->int(1)]);
+          my $ret_ndarray = $ndarray->slice([IOP->c(3), IOP->c(2), IOP->c(1)]);
           
           unless ($ret_ndarray is_type R::NDArray::Int) {
             return 0;
@@ -1653,9 +1977,9 @@ class TestCase::R {
         }
         
         {
-          my $ndarray = R->int(R->seq(1, 24), [4, 3, 2]);
+          my $ndarray = IOP->c(IOP->seq(1, 24), [4, 3, 2]);
           
-          my $ret_ndarray = $ndarray->slice([R->int(1), R->int(1), R->int(1)]);
+          my $ret_ndarray = $ndarray->slice([IOP->c(1), IOP->c(1), IOP->c(1)]);
           
           unless ($ret_ndarray is_type R::NDArray::Int) {
             return 0;
@@ -1671,9 +1995,9 @@ class TestCase::R {
         }
         
         {
-          my $ndarray = R->int([1, 2, 3, 4, 5, 6], [3, 2]);
+          my $ndarray = IOP->c([1, 2, 3, 4, 5, 6], [3, 2]);
           
-          my $ret_ndarray = $ndarray->slice([R->seq(0, 1), R->int(0)]);
+          my $ret_ndarray = $ndarray->slice([IOP->seq(0, 1), IOP->c(0)]);
           
           unless ($ret_ndarray is_type R::NDArray::Int) {
             return 0;
@@ -1689,9 +2013,9 @@ class TestCase::R {
         }
         
         {
-          my $ndarray = R->int([1, 2, 3, 4, 5, 6], [3, 2]);
+          my $ndarray = IOP->c([1, 2, 3, 4, 5, 6], [3, 2]);
           
-          my $ret_ndarray = $ndarray->slice([R->seq(0, 2), R->int(0)]);
+          my $ret_ndarray = $ndarray->slice([IOP->seq(0, 2), IOP->c(0)]);
           
           unless ($ret_ndarray is_type R::NDArray::Int) {
             return 0;
@@ -1707,9 +2031,9 @@ class TestCase::R {
         }
         
         {
-          my $ndarray = R->int([1, 2, 3, 4, 5, 6], [3, 2]);
+          my $ndarray = IOP->c([1, 2, 3, 4, 5, 6], [3, 2]);
           
-          my $ret_ndarray = $ndarray->slice([R->int(0), R->seq(0, 1)]);
+          my $ret_ndarray = $ndarray->slice([IOP->c(0), IOP->seq(0, 1)]);
           
           unless ($ret_ndarray is_type R::NDArray::Int) {
             return 0;
@@ -1725,9 +2049,9 @@ class TestCase::R {
         }
         
         {
-          my $ndarray = R->int([1, 2, 3, 4, 5, 6], [3, 2]);
+          my $ndarray = IOP->c([1, 2, 3, 4, 5, 6], [3, 2]);
           
-          my $ret_ndarray = $ndarray->slice([R->seq(1, 2), R->seq(0, 1)]);
+          my $ret_ndarray = $ndarray->slice([IOP->seq(1, 2), IOP->seq(0, 1)]);
           
           unless ($ret_ndarray is_type R::NDArray::Int) {
             return 0;
@@ -1743,9 +2067,9 @@ class TestCase::R {
         }
         
         {
-          my $ndarray = R->int([1, 2, 3, 4, 5, 6], [3, 2]);
+          my $ndarray = IOP->c([1, 2, 3, 4, 5, 6], [3, 2]);
           
-          my $ret_ndarray = $ndarray->slice([R->seq(0, 2), R->seq(0, 1)]);
+          my $ret_ndarray = $ndarray->slice([IOP->seq(0, 2), IOP->seq(0, 1)]);
           
           unless ($ret_ndarray is_type R::NDArray::Int) {
             return 0;
@@ -1761,9 +2085,9 @@ class TestCase::R {
         }
         
         {
-          my $ndarray = R->int([1, 2, 3, 4, 5, 6], [3, 2]);
+          my $ndarray = IOP->c([1, 2, 3, 4, 5, 6], [3, 2]);
           
-          my $ret_ndarray = $ndarray->slice([R->undef, R->int(1)]);
+          my $ret_ndarray = $ndarray->slice([IOP->undef, IOP->c(1)]);
           
           unless ($ret_ndarray is_type R::NDArray::Int) {
             return 0;
@@ -1779,9 +2103,9 @@ class TestCase::R {
         }
         
         {
-          my $ndarray = R->int([1, 2, 3, 4, 5, 6], [3, 2]);
+          my $ndarray = IOP->c([1, 2, 3, 4, 5, 6], [3, 2]);
           
-          my $ret_ndarray = $ndarray->slice([R->int(1)]);
+          my $ret_ndarray = $ndarray->slice([IOP->c(1)]);
           
           unless ($ret_ndarray is_type R::NDArray::Int) {
             return 0;
@@ -1799,9 +2123,9 @@ class TestCase::R {
         # Exceptions
         {
           {
-            my $ndarray = R->int([1, 2, 3, 4, 5, 6], [3, 2]);
+            my $ndarray = IOP->c([1, 2, 3, 4, 5, 6], [3, 2]);
             
-            eval { $ndarray->slice([R->int(3), R->int(0)]); }
+            eval { $ndarray->slice([IOP->c(3), IOP->c(0)]); }
             
             unless ($@) {
               return 0;
@@ -1809,9 +2133,9 @@ class TestCase::R {
           }
           
           {
-            my $ndarray = R->int([1, 2, 3, 4, 5, 6], [3, 2]);
+            my $ndarray = IOP->c([1, 2, 3, 4, 5, 6], [3, 2]);
             
-            eval { $ndarray->slice([R->int(0), R->int(2)]); }
+            eval { $ndarray->slice([IOP->c(0), IOP->c(2)]); }
             
             unless ($@) {
               return 0;
@@ -1824,9 +2148,9 @@ class TestCase::R {
       {
 
         {
-          my $ret_ndarray = R->int([1, 2, 3, 4, 5, 6], [3, 2]);
+          my $ret_ndarray = IOP->c([1, 2, 3, 4, 5, 6], [3, 2]);
           
-          $ret_ndarray->slice_set([R->int(0), R->int(0)], R->int(100));
+          $ret_ndarray->slice_set([IOP->c(0), IOP->c(0)], IOP->c(100));
           
           unless ($ret_ndarray is_type R::NDArray::Int) {
             return 0;
@@ -1842,9 +2166,9 @@ class TestCase::R {
         }
         
         {
-          my $ret_ndarray = R->int([1, 2, 3, 4, 5, 6], [3, 2]);
+          my $ret_ndarray = IOP->c([1, 2, 3, 4, 5, 6], [3, 2]);
           
-          $ret_ndarray->slice_set([R->seq(0, 2), R->int(0)], R->int([100, 101, 102]));
+          $ret_ndarray->slice_set([IOP->seq(0, 2), IOP->c(0)], IOP->c([100, 101, 102]));
           
           unless ($ret_ndarray is_type R::NDArray::Int) {
             return 0;
@@ -1860,27 +2184,9 @@ class TestCase::R {
         }
         
         {
-          my $ret_ndarray = R->int([1, 2, 3, 4, 5, 6], [3, 2]);
+          my $ret_ndarray = IOP->c([1, 2, 3, 4, 5, 6], [3, 2]);
           
-          $ret_ndarray->slice_set([R->int(1), R->seq(0, 1)], R->int([100, 101], [1, 2]));
-          
-          unless ($ret_ndarray is_type R::NDArray::Int) {
-            return 0;
-          }
-          
-          unless (Array->equals_int($ret_ndarray->data, [1, 100, 3, 4, 101, 6])) {
-            return 0;
-          }
-          
-          unless (Array->equals_int($ret_ndarray->dim, [3, 2])) {
-            return 0;
-          }
-        }
-        
-        {
-          my $ret_ndarray = R->int([1, 2, 3, 4, 5, 6], [3, 2]);
-          
-          $ret_ndarray->slice_set([R->int(1), R->seq(0, 1)], R->int([100, 101], [2, 1]));
+          $ret_ndarray->slice_set([IOP->c(1), IOP->seq(0, 1)], IOP->c([100, 101], [1, 2]));
           
           unless ($ret_ndarray is_type R::NDArray::Int) {
             return 0;
@@ -1896,9 +2202,27 @@ class TestCase::R {
         }
         
         {
-          my $ret_ndarray = R->int(R->seq(1, 24), [4, 3, 2]);
+          my $ret_ndarray = IOP->c([1, 2, 3, 4, 5, 6], [3, 2]);
           
-          $ret_ndarray->slice_set([R->seq(0, 2), R->seq(0, 1)], R->int(R->seq(101, 112), [3, 2, 2]));
+          $ret_ndarray->slice_set([IOP->c(1), IOP->seq(0, 1)], IOP->c([100, 101], [2, 1]));
+          
+          unless ($ret_ndarray is_type R::NDArray::Int) {
+            return 0;
+          }
+          
+          unless (Array->equals_int($ret_ndarray->data, [1, 100, 3, 4, 101, 6])) {
+            return 0;
+          }
+          
+          unless (Array->equals_int($ret_ndarray->dim, [3, 2])) {
+            return 0;
+          }
+        }
+        
+        {
+          my $ret_ndarray = IOP->c(IOP->seq(1, 24), [4, 3, 2]);
+          
+          $ret_ndarray->slice_set([IOP->seq(0, 2), IOP->seq(0, 1)], IOP->c(IOP->seq(101, 112), [3, 2, 2]));
           
           unless ($ret_ndarray is_type R::NDArray::Int) {
             return 0;
@@ -1911,6 +2235,85 @@ class TestCase::R {
           unless (Array->equals_int($ret_ndarray->dim, [4, 3, 2])) {
             return 0;
           }
+        }
+        
+        # Exceptions
+        {
+          # Invalid dimension
+          {
+            my $ret_ndarray = IOP->c(IOP->seq(1, 24), [4, 3, 2]);
+            
+            eval { $ret_ndarray->slice_set([IOP->seq(0, 2), IOP->seq(0, 1)], IOP->c(IOP->seq(101, 112), [2, 3, 2])); }
+            
+            unless ($@) {
+              return 0;
+            }
+          }
+        }
+      }
+      
+      # R::NDArray#to_string method
+      {
+        {
+          my $ret_ndarray = IOP->c(new int[0]);
+          
+          unless ($ret_ndarray->to_string eq "Empty") {
+            return 0;
+          }
+        }
+        
+        {
+          my $ret_ndarray = IOP->c([1, 2]);
+          
+          unless ($ret_ndarray->to_string eq "[0]\t1\n[1]\t2") {
+            return 0;
+          }
+        }
+        
+        {
+          my $ret_ndarray = IOP->c(IOP->seq(1, 6), [3, 2]);
+          
+          unless ($ret_ndarray->to_string eq "\x{09}[,0]\x{09}[,1]\x{09}\x{0A}[0]\x{09}1\x{09}4\x{0A}[1]\x{09}2\x{09}5\x{0A}[2]\x{09}3\x{09}6") {
+            return 0;
+          }
+          
+        }
+        
+        {
+          my $ret_ndarray = IOP->c(IOP->seq(1, 24), [4, 3, 2]);
+          
+          unless ($ret_ndarray->to_string eq "[,,0]\x{0A}\x{09}[,0]\x{09}[,1]\x{09}[,2]\x{09}\x{0A}[0]\x{09}1\x{09}5\x{09}9\x{0A}[1]\x{09}2\x{09}6\x{09}10\x{0A}[2]\x{09}3\x{09}7\x{09}11\x{0A}[3]\x{09}4\x{09}8\x{09}12\x{0A}\x{0A}[,,1]\x{0A}\x{09}[,0]\x{09}[,1]\x{09}[,2]\x{09}\x{0A}[0]\x{09}13\x{09}17\x{09}21\x{0A}[1]\x{09}14\x{09}18\x{09}22\x{0A}[2]\x{09}15\x{09}19\x{09}23\x{0A}[3]\x{09}16\x{09}20\x{09}24") {
+            return 0;
+          }
+        }
+        
+        {
+          my $ret_ndarray = IOP->c(IOP->seq(1, 120), [5, 4, 3, 2]);
+          
+          unless ($ret_ndarray->to_string eq "[,,,0]\x{0A}[,,0]\x{0A}\x{09}[,0]\x{09}[,1]\x{09}[,2]\x{09}[,3]\x{09}\x{0A}[0]\x{09}1\x{09}6\x{09}11\x{09}16\x{0A}[1]\x{09}2\x{09}7\x{09}12\x{09}17\x{0A}[2]\x{09}3\x{09}8\x{09}13\x{09}18\x{0A}[3]\x{09}4\x{09}9\x{09}14\x{09}19\x{0A}[4]\x{09}5\x{09}10\x{09}15\x{09}20\x{0A}\x{0A}[,,1]\x{0A}\x{09}[,0]\x{09}[,1]\x{09}[,2]\x{09}[,3]\x{09}\x{0A}[0]\x{09}21\x{09}26\x{09}31\x{09}36\x{0A}[1]\x{09}22\x{09}27\x{09}32\x{09}37\x{0A}[2]\x{09}23\x{09}28\x{09}33\x{09}38\x{0A}[3]\x{09}24\x{09}29\x{09}34\x{09}39\x{0A}[4]\x{09}25\x{09}30\x{09}35\x{09}40\x{0A}\x{0A}[,,2]\x{0A}\x{09}[,0]\x{09}[,1]\x{09}[,2]\x{09}[,3]\x{09}\x{0A}[0]\x{09}41\x{09}46\x{09}51\x{09}56\x{0A}[1]\x{09}42\x{09}47\x{09}52\x{09}57\x{0A}[2]\x{09}43\x{09}48\x{09}53\x{09}58\x{0A}[3]\x{09}44\x{09}49\x{09}54\x{09}59\x{0A}[4]\x{09}45\x{09}50\x{09}55\x{09}60\x{0A}\x{0A}\x{0A}[,,,1]\x{0A}[,,0]\x{0A}\x{09}[,0]\x{09}[,1]\x{09}[,2]\x{09}[,3]\x{09}\x{0A}[0]\x{09}61\x{09}66\x{09}71\x{09}76\x{0A}[1]\x{09}62\x{09}67\x{09}72\x{09}77\x{0A}[2]\x{09}63\x{09}68\x{09}73\x{09}78\x{0A}[3]\x{09}64\x{09}69\x{09}74\x{09}79\x{0A}[4]\x{09}65\x{09}70\x{09}75\x{09}80\x{0A}\x{0A}[,,1]\x{0A}\x{09}[,0]\x{09}[,1]\x{09}[,2]\x{09}[,3]\x{09}\x{0A}[0]\x{09}81\x{09}86\x{09}91\x{09}96\x{0A}[1]\x{09}82\x{09}87\x{09}92\x{09}97\x{0A}[2]\x{09}83\x{09}88\x{09}93\x{09}98\x{0A}[3]\x{09}84\x{09}89\x{09}94\x{09}99\x{0A}[4]\x{09}85\x{09}90\x{09}95\x{09}100\x{0A}\x{0A}[,,2]\x{0A}\x{09}[,0]\x{09}[,1]\x{09}[,2]\x{09}[,3]\x{09}\x{0A}[0]\x{09}101\x{09}106\x{09}111\x{09}116\x{0A}[1]\x{09}102\x{09}107\x{09}112\x{09}117\x{0A}[2]\x{09}103\x{09}108\x{09}113\x{09}118\x{0A}[3]\x{09}104\x{09}109\x{09}114\x{09}119\x{0A}[4]\x{09}105\x{09}110\x{09}115\x{09}120") {
+            return 0;
+          }
+          
+        }
+        
+      }
+      
+      # R::NDArray#set_order method
+      {
+        {
+          my $data = [1, 2, 3];
+          my $ret_ndarray = IOP->c($data);
+          
+          $ret_ndarray->set_order(IOP->c([2, 0, 1]));
+          
+          unless (Array->equals_int($ret_ndarray->data, [3, 1, 2])) {
+            return 0;
+          }
+          
+          unless (Array->equals_int($ret_ndarray->dim, [3])){
+            return 0;
+          }
+          
         }
       }
       
@@ -2077,6 +2480,61 @@ class TestCase::R {
           
         }
         
+      }
+      
+      # R::NDArray::Int#to_indexes
+      {
+        {
+          my $ndarray = IOP->c([0, 1, 0, 1]);
+          
+          my $ret_ndarray = $ndarray->to_indexes;
+          
+          unless ($ret_ndarray is_type R::NDArray::Int) {
+            return 0;
+          }
+          
+          unless (Array->equals_int($ret_ndarray->data, [1, 3])) {
+            return 0;
+          }
+          
+          unless (Array->equals_int($ret_ndarray->dim, [2])) {
+            return 0;
+          }
+        }
+        
+        {
+          my $x_ndarray = IOP->c([1, 2, 3, 4]);
+          
+          my $gt_ndarray = IOP->gt($x_ndarray, IOP->rep_length(IOP->c(2), $x_ndarray->length));
+          
+          my $indexes_ndarray = $gt_ndarray->to_indexes;
+          
+          unless ($indexes_ndarray is_type R::NDArray::Int) {
+            return 0;
+          }
+          
+          unless (Array->equals_int($indexes_ndarray->data, [2, 3])) {
+            return 0;
+          }
+          
+          unless (Array->equals_int($indexes_ndarray->dim, [2])) {
+            return 0;
+          }
+          
+          my $slice_ndarray = $x_ndarray->slice([$indexes_ndarray]);
+          
+          unless ($slice_ndarray is_type R::NDArray::Int) {
+            return 0;
+          }
+          
+          unless (Array->equals_int($slice_ndarray->data, [3, 4])) {
+            return 0;
+          }
+          
+          unless (Array->equals_int($slice_ndarray->dim, [2])) {
+            return 0;
+          }
+        }
       }
     }
     

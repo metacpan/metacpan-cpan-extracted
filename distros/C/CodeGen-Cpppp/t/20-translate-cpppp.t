@@ -47,6 +47,35 @@ C
       }
 pl
    },
+   {  name => 'remove POD',
+      code => unindent(<<'C'), file => __FILE__, line => __LINE__,
+      =head1 INFO
+      
+      Some details
+      
+      =cut
+      ## for (3..4) {
+      =head2 SUB_INFO
+      
+      More details
+      
+      =cut
+      struct Vector$_ { float values[$_] };
+      ## }
+C
+      expect => unindent(<<'pl'),
+      $self->_render_pod_block(0);
+      # line 57 "t/20-translate-cpppp.t"
+      for (3..4) {
+         $self->_render_pod_block(1);
+         $self->_render_code_block(0,
+      # line 63 "t/20-translate-cpppp.t"
+            sub{ $_ }
+         );
+      # line 64 "t/20-translate-cpppp.t"
+      }
+pl
+   },
 );
 
 for my $t (@tests) {

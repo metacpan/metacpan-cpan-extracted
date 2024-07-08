@@ -5,7 +5,7 @@ Aion::Query - функциональный интерфейс для досту�
 
 # VERSION
 
-0.0.4
+0.0.6
 
 # SYNOPSIS
 
@@ -258,6 +258,8 @@ my $rows = {
 
 `$attach` содержит три ключа через двоеточие: ключ для присоединяемых данных, столбец из `$rows` и столбец из `$query`. По столбцам происходит объединение строк.
 
+Возвращает функция массив с результатом запроса (`$query`), в который можно приаттачить ещё что-то.
+
 ```perl
 my $authors = query "SELECT id, name FROM author";
 
@@ -269,23 +271,29 @@ my $res = [
 
 $authors # --> $res
 
-query_attach $authors => "books:id:author_id" => "SELECT author_id, title FROM book ORDER BY title";
+my @books = query_attach $authors => "books:id:author_id" => "SELECT author_id, title FROM book ORDER BY title";
 
 my $attaches = [
     {name => "Pushkin A.S.", id => 1, books => [
         {title => "Kiss in night", author_id => 1},
         {title => "Mir",           author_id => 1},
     ]},
-    {name => "Pushkin A.",   id => 2},
+    {name => "Pushkin A.",   id => 2, books => []},
     {name => "Alice",        id => 3, books => [
         {title => "Mips as cpu", author_id => 3},
     ]},
 ];
 
 $authors # --> $attaches
-```
 
-Если нужно указать другие ключи, то это делается через двоеточия в `$attach`: `attach:id:attach_id`.
+my $books = [
+    {title => "Kiss in night", author_id => 1},
+    {title => "Mips as cpu",   author_id => 3},
+    {title => "Mir",           author_id => 1},
+];
+
+\@books  # --> $books
+```
 
 ## query_col ($query, %params)
 

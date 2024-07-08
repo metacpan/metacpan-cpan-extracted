@@ -1,4 +1,4 @@
-package SPVM::R::DataFrame::Field;
+package SPVM::R::DataFrame::Column;
 
 
 
@@ -6,15 +6,15 @@ package SPVM::R::DataFrame::Field;
 
 =head1 Name
 
-SPVM::R::DataFrame::Field - Short Description
+SPVM::R::DataFrame::Column - Short Description
 
 =head1 Description
 
-The R::DataFrame::Field class in L<SPVM> has methods to do someting.
+The R::DataFrame::Column class in L<SPVM> has methods to do someting.
 
 =head1 Usage
 
-  use R::DataFrame::Field;
+  use R::DataFrame::Column;
 
 =head1 Details
 

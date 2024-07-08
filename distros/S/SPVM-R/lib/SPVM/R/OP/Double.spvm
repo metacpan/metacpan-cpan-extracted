@@ -28,11 +28,29 @@ class R::OP::Double {
   use Sys;
   
   # Class Methods
-  static method c : R::NDArray::Double ($x_data : double[], $x_dim : int[] = undef) {
+  static method c : R::NDArray::Double ($data : object of Double|double[]|R::NDArray::Double, $dim : int[] = undef) {
     
-    my $x_ndarray = R::NDArray::Double->new({dim => $x_dim, data => $x_data});
+    if ($data) {
+      if ($data is_type Double) {
+        $data = [(double)$data->(Double)];
+      }
+      elsif ($data is_type double[]) {
+        # Do nothing
+      }
+      elsif ($data is_type R::NDArray::Double) {
+        unless ($dim) {
+          $dim = $data->(R::NDArray::Double)->dim;
+        }
+        $data = $data->(R::NDArray::Double)->data;
+      }
+      else {
+        die "The type of the data \data must be Double or double[].";
+      }
+    }
     
-    return $x_ndarray;
+    my $ndarray = R::NDArray::Double->new({dim => $dim, data => $data});
+    
+    return $ndarray;
   }
   
   static method add : R::NDArray::Double ($x_ndarray : R::NDArray::Double, $y_ndarray : R::NDArray::Double) {
@@ -1414,37 +1432,51 @@ class R::OP::Double {
     return $ret_ndarray;
   }
   
-  static method seq : R::NDArray::Double ($x : double, $y : double, $by : double = 1) {
+  static method seq : R::NDArray::Double ($begin : double, $end : double, $by : double = 1) {
+    
+    if ($by == 0) {
+      die "\$by must not be 0.";
+    }
+    elsif ($by > 0) {
+      unless ($end >= $begin) {
+        die "\$end must be greater than or equal to \$begin if \$by is greater than 0.";
+      }
+    }
+    else {
+      unless ($end <= $begin) {
+        die "\$end must be less than or equal to \$begin if \$by is less than 0.";
+      }
+    }
     
     my $ret_data_list = DoubleList->new;
-    my $current = $x;
+    my $current = $begin;
     while (1) {
       if ($by >= 0) {
-        if ($current <= $y) {
+        if ($current > $end) {
           last;
         }
       }
       else {
-        if ($current >= $y) {
+        if ($current < $end) {
           last;
         }
       }
-      $current += $by;
       $ret_data_list->push($current);
+      $current += $by;
     }
     
     my $ret_data = $ret_data_list->to_array;
     
-    my $ret_ndarray = &c($ret_data);
+    my $ret_ndarray = R::OP::Double->c($ret_data);
     
     return $ret_ndarray;
   }
   
-  static method seq_length : R::NDArray::Double ($x : double, $y : double, $length : int) {
+  static method seq_length : R::NDArray::Double ($begin : double, $end : double, $length : int) {
     
-    my $by = (double)(($y - $x) / $length);
+    my $by = (double)(($end - $begin) / $length);
     
-    my $ret_ndarray = &seq($x, $y, $by);
+    my $ret_ndarray = &seq($begin, $end, $by);
     
     return $ret_ndarray;
   }

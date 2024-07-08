@@ -2,7 +2,7 @@
 use strict;
 use warnings;
 
-use 5.018;
+use 5.022000;
 
 use ExtUtils::MakeMaker;
 
@@ -24,7 +24,7 @@ my %WriteMakefileArgs = (
     "bin/odfedit"
   ],
   "LICENSE" => "unrestricted",
-  "MIN_PERL_VERSION" => "5.018",
+  "MIN_PERL_VERSION" => "5.022000",
   "NAME" => "ODF::MailMerge",
   "PREREQ_PM" => {
     "Carp" => 0,
@@ -84,7 +84,7 @@ my %WriteMakefileArgs = (
     "multidimensional" => 0,
     "parent" => 0
   },
-  "VERSION" => "1.007",
+  "VERSION" => "1.008",
   "test" => {
     "TESTS" => "t/*.t"
   }

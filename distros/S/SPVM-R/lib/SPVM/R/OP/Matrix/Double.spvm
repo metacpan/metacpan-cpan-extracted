@@ -9,55 +9,38 @@ class R::OP::Matrix::Double {
   use Hash;
   use R::NDArray::Hash;
   
-  static method matrix : R::NDArray::Double ($x_data : double[], $row : int, $column : int) {
+  static method matrix : R::NDArray::Double ($data : object of Double|double[]|R::NDArray::Double, $nrow : int, $ncol : int) {
     
-    &check_matrix($x_data, $row, $column);
-    
-    my $ndarray = R::OP::Double->c($x_data, [$row, $column]);
+    my $ndarray = R::OP::Double->c($data, [$nrow, $ncol]);
     
     return $ndarray;
   }
   
-  static method matrix_byrow : R::NDArray::Double ($x_data : double[], $row : int, $column : int) {
+  static method matrix_byrow : R::NDArray::Double ($data : object of Double|double[]|R::NDArray::Double, $nrow : int, $ncol : int) {
     
-    &check_matrix($x_data, $row, $column);
+    my $ndarray = &matrix($data, $nrow, $ncol);
     
-    my $x_length = @$x_data;
+    $data = $ndarray->data;
     
-    my $new_x_data = new double[$x_length];
+    my $length = @(double[])$data;
     
-    for (my $column_index = 0; $column_index < $column; $column_index++) {
-      for (my $row_index = 0; $row_index < $row; $row_index++) {
-        my $elem = $x_data->[$column * $column_index + $row_index];
-        
-        $new_x_data->[$row * $row_index + $column] = $elem;
-      }
+    my $new_data = new double[$length];
+    
+    for (my $data_index = 0; $data_index < $length; $data_index++) {
+      my $elem = $data->(double[])->[$data_index];
+      
+      my $new_row_index = $data_index / $ncol;
+      
+      my $new_column_index = $data_index - $ncol * $new_row_index;
+      
+      my $new_data_index = $nrow * $new_column_index + $new_row_index;
+      
+      $new_data->[$new_data_index] = $elem;
     }
     
-    my $ndarray = &matrix($new_x_data, $row, $column);
+    my $ret_ndarray = &matrix($new_data, $nrow, $ncol);
     
-    return $ndarray;
-  }
-  
-  private static method check_matrix : void ($x_data : double[], $row : int, $column : int) {
-    
-    unless ($x_data) {
-      die "The data \$x_data must be defined.";
-    }
-    
-    unless ($row > 0) {
-      die "The row \$row must be greater than 0.";
-    }
-    
-    unless ($row > 0) {
-      die "The column \$column must be greater than 0.";
-    }
-    
-    my $x_length = @$x_data;
-    
-    unless ($x_length == $row * $column) {
-      die "The length of data \$x_data must be equal to the row \$row * the column \$column.";
-    }
+    return $ret_ndarray;
   }
   
   static method mul : R::NDArray::Double ($x_ndarray : R::NDArray::Double, $y_ndarray : R::NDArray::Double) {
@@ -75,40 +58,30 @@ class R::OP::Matrix::Double {
     }
     
     unless ($y_ndarray->is_matrix) {
-      die "The n-dimension array \$y_ndarray must be a a matrix.";
+      die "The n-dimension array \$y_ndarray must be a matrix.";
     }
     
-    my $x_dim = $x_ndarray->dim;
+    my $x_data = (double[])$x_ndarray->data;
     
-    my $x_row = $x_dim->[0];
+    my $x_row = $x_ndarray->nrow;
     
-    my $x_column = 1;
-    if ($x_ndarray->is_matrix) {
-      $x_column = $x_dim->[1];
-    }
+    my $x_column = $x_ndarray->ncol;
     
-    my $y_dim = $y_ndarray->dim;
+    my $y_data = (double[])$y_ndarray->data;
     
-    my $y_row = $y_dim->[0];
+    my $y_row = $y_ndarray->nrow;
     
-    my $y_column = 1;
-    if ($y_ndarray->is_matrix) {
-      $y_column = $y_dim->[1];
-    }
+    my $y_column = $y_ndarray->ncol;
     
     unless ($x_column == $y_row) {
       die "The column of the matrix \$x_ndarray must be equal to the row of the matrix \$y_ndarray.";
     }
     
-    my $x_data = (double[])$x_ndarray->data;
-    
-    my $y_data = (double[])$y_ndarray->data;
+    my $ret_data_ref = new double[][1];
     
     my $ret_row = -1;
     
     my $ret_column = -1;
-    
-    my $ret_data_ref = new double[][1];
     
     &_mul($ret_data_ref, \$ret_row, \$ret_column, $x_data, $x_row, $x_column, $y_data, $y_row, $y_column);
     
@@ -133,42 +106,42 @@ class R::OP::Matrix::Double {
       die "The n-dimension array \$x_ndarray must be a matrix.";
     }
     
-    my $row = $x_ndarray->length;
+    my $x_data = (double[])$x_ndarray->data;
     
-    my $column = $row;
+    my $x_row = $x_ndarray->nrow;
     
-    my $x_data = $x_ndarray->data;
+    my $x_column = $x_ndarray->ncol;
     
-    my $ret_dim = [$row, $column];
+    my $ret_dim = [$x_row, $x_column];
     
     my $ret_ndarray = R::OP::Double->c(undef, $ret_dim);
     
     my $ret_data = $ret_ndarray->data;
     
     my $x_index = 0;
-    for (my $row_index = 0; $row_index < $row; $row_index++) {
-      $ret_data->[$column * $row_index + $row_index] = $x_data->[$row_index];
+    for (my $row = 0; $row < $x_row; $row++) {
+      $ret_data->[$x_column * $row + $row] = $x_data->[$row];
     }
     
     return $ret_ndarray;
   }
   
-  static method diag_identity : R::NDArray::Double ($row : int) {
+  static method diag_identity : R::NDArray::Double ($nrow : int) {
     
-    unless ($row > 0) {
-      die "The row \$row must be greater than 0.";
+    unless ($nrow > 0) {
+      die "The row \$nrow must be greater than 0.";
     }
     
-    my $column = $row;
+    my $ncol = $nrow;
     
-    my $ret_dim = [$row, $column];
+    my $ret_dim = [$nrow, $ncol];
     
     my $ret_ndarray = R::OP::Double->c(undef, $ret_dim);
     
     my $ret_data = $ret_ndarray->data;
     
-    for (my $row_index = 0; $row_index < $row; $row_index++) {
-      $ret_data->[$column * $row_index + $row_index] = 1;
+    for (my $row = 0; $row < $nrow; $row++) {
+      $ret_data->[$ncol * $row + $row] = 1;
     }
     
     return $ret_ndarray;
@@ -184,28 +157,23 @@ class R::OP::Matrix::Double {
       die "The n-dimension array \$x_ndarray must be a squre matrix.";
     }
     
-    my $x_dim = $x_ndarray->dim;
-    
-    my $x_row = $x_dim->[0];
-    
-    my $x_column = 1;
-    if ($x_ndarray->is_matrix) {
-      $x_column = $x_dim->[1];
-    }
-    
     my $x_data = (double[])$x_ndarray->data;
+    
+    my $x_row = $x_ndarray->nrow;
+    
+    my $x_column = $x_ndarray->ncol;
+    
+    my $ret_data_ref = new double[][1];
     
     my $ret_row = -1;
     
     my $ret_column = -1;
     
-    my $ret_data_ref = new double[][1];
-    
     &_solve($ret_data_ref, \$ret_row, \$ret_column, $x_data, $x_row, $x_column);
     
-    my $ret_dim = [$ret_row, $ret_column];
-    
     my $ret_data = $ret_data_ref->[0];
+    
+    my $ret_dim = [$ret_row, $ret_column];
     
     my $ret_ndarray = R::OP::Double->c($ret_data, $ret_dim);
     
@@ -224,28 +192,23 @@ class R::OP::Matrix::Double {
       die "The n-dimension array \$x_ndarray must be a squre matrix.";
     }
     
-    my $x_dim = $x_ndarray->dim;
-    
-    my $x_row = $x_dim->[0];
-    
-    my $x_column = 1;
-    if ($x_ndarray->is_matrix) {
-      $x_column = $x_dim->[1];
-    }
-    
     my $x_data = (double[])$x_ndarray->data;
+    
+    my $x_row = $x_ndarray->nrow;
+    
+    my $x_column = $x_ndarray->ncol;
+    
+    my $ret_data_ref = new double[][1];
     
     my $ret_row = -1;
     
     my $ret_column = -1;
     
-    my $ret_data_ref = new double[][1];
-    
     &_t($ret_data_ref, \$ret_row, \$ret_column, $x_data, $x_row, $x_column);
     
-    my $ret_dim = [$ret_row, $ret_column];
-    
     my $ret_data = $ret_data_ref->[0];
+    
+    my $ret_dim = [$ret_row, $ret_column];
     
     my $ret_ndarray = R::OP::Double->c($ret_data, $ret_dim);
     
@@ -264,28 +227,23 @@ class R::OP::Matrix::Double {
       die "The n-dimension array \$x_ndarray must be a squre matrix.";
     }
     
-    my $x_dim = $x_ndarray->dim;
-    
-    my $x_row = $x_dim->[0];
-    
-    my $x_column = 1;
-    if ($x_ndarray->is_matrix) {
-      $x_column = $x_dim->[1];
-    }
-    
     my $x_data = (double[])$x_ndarray->data;
+    
+    my $x_row = $x_ndarray->nrow;
+    
+    my $x_column = $x_ndarray->ncol;
+    
+    my $ret_data_ref = new double[][1];
     
     my $ret_row = -1;
     
     my $ret_column = -1;
     
-    my $ret_data_ref = new double[][1];
-    
     &_det($ret_data_ref, \$ret_row, \$ret_column, $x_data, $x_row, $x_column);
     
-    my $ret_dim = [$ret_row, $ret_column];
-    
     my $ret_data = $ret_data_ref->[0];
+    
+    my $ret_dim = [$ret_row, $ret_column];
     
     my $ret_ndarray = R::OP::Double->c($ret_data, $ret_dim);
     
@@ -304,29 +262,25 @@ class R::OP::Matrix::Double {
       die "The n-dimension array \$x_ndarray must be a squre matrix.";
     }
     
-    my $x_dim = $x_ndarray->dim;
-    
-    my $x_row = $x_dim->[0];
-    
-    my $x_column = 1;
-    if ($x_ndarray->is_matrix) {
-      $x_column = $x_dim->[1];
-    }
-    
     my $x_data = (double[])$x_ndarray->data;
+    
+    my $x_row = $x_ndarray->nrow;
+    
+    my $x_column = $x_ndarray->ncol;
+    
+    my $eigen_vectors_data_ref = new double[][1];
+    
+    my $eigen_values_data_ref = new double[][1];
     
     my $eigen_vectors_row = -1;
     
     my $eigen_vectors_column = -1;
     
-    my $eigen_vectors_data_ref = new double[][1];
-    
-    my $eigen_values_data_ref = new double[][1];
     &_eigen($eigen_vectors_data_ref, \$eigen_vectors_row, \$eigen_vectors_column, $x_data, $x_row, $x_column, $eigen_values_data_ref);
     
-    my $eigen_vectors_dim = [$eigen_vectors_row, $eigen_vectors_column];
-    
     my $eigen_vectors_data = $eigen_vectors_data_ref->[0];
+    
+    my $eigen_vectors_dim = [$eigen_vectors_row, $eigen_vectors_column];
     
     my $eigen_vectors_ndarray = R::OP::Double->c($eigen_vectors_data, $eigen_vectors_dim);
     

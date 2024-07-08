@@ -2,7 +2,7 @@ format: v1
 
 name: Empty
 maintainer: Russ Allbery <rra@cpan.org>
-version: '1.00'
+version: v2.0.0
 synopsis: An empty package
 
 license:

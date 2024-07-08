@@ -24,12 +24,13 @@ package App::MergeCal; # For PAUSE
 
 class App::MergeCal {
 
-  our $VERSION = '0.0.3';
+  our $VERSION = '0.0.4';
 
   use Encode 'encode_utf8';
   use Text::vFile::asData;
   use LWP::Simple;
   use JSON;
+  use URI;
 
   field $vfile_parser :param = Text::vFile::asData->new;
   field $title :param;
@@ -67,8 +68,9 @@ Access all of the calendars and gather their contents into $objects.
 =cut
 
   method gather {
+    $self->clean_calendars;
     for (@$calendars) {
-      my $ics = get($_) or die "Can't get $_";
+      my $ics = get($_) or die "Can't get " . $_->as_string . "\n";
       $ics = encode_utf8($ics);
       open my $fh, '<', \$ics or die $!;
       my $data = $vfile_parser->parse( $fh );
@@ -100,6 +102,22 @@ Take all of the objects in $objects and write them to an output file.
     }
 
     say "$_\r" for Text::vFile::asData->generate_lines($combined);
+  }
+
+=head2 $app->clean_calendars
+
+Ensure that all of the calendars are URIs. If a calendar doesn't have a scheme
+then it is assumed to be a file URI.
+
+=cut
+
+  method clean_calendars {
+    for (@$calendars) {
+      $_ = URI->new($_) unless ref $_;
+      if (! $_->scheme) {
+        $_ = URI->new('file://' . $_);
+      }
+    }
   }
 
 =head2 App::MergeCal->new, App::MergeCal->new_from_json, App::MergeCal->new_from_json_file

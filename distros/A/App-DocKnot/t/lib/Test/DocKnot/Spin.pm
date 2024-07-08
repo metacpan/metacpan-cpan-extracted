@@ -6,7 +6,7 @@
 # Modules and declarations
 ##############################################################################
 
-package Test::DocKnot::Spin 2.00;
+package Test::DocKnot::Spin v3.0.0;
 
 use 5.024;
 use autodie;
@@ -20,14 +20,38 @@ use File::Find qw(find);
 use Path::Iterator::Rule ();
 use Path::Tiny qw(path);
 use Test::RRA qw(is_file_contents);
+use YAML::XS ();
 
 use Test::More;
 
-our @EXPORT_OK = qw(is_spin_output is_spin_output_tree);
+our @EXPORT_OK = qw(fix_pointers is_spin_output is_spin_output_tree);
 
 ##############################################################################
 # Test functions
 ##############################################################################
+
+# Replace pointers in a spin input tree containing relative paths with
+# absolute paths.  This is used after copying an input tree to a temporary
+# directory when it contains references to other files in the same source
+# tree.  Fix permissions as we go to allow writes since when building a
+# distribution the original file may be read-only.
+#
+# $tree - Path::Tiny pointing to a tree of files containing pointers
+# $base - Base path of the original input tree as a Path::Tiny object
+sub fix_pointers {
+    my ($tree, $base) = @_;
+    my $rule = Path::Iterator::Rule->new()->name('*.spin')->file();
+    my $iter = $rule->iter("$tree", { follow_symlinks => 0 });
+    while (defined(my $file = $iter->())) {
+        chmod(0644, $file);
+        my $data_ref = YAML::XS::LoadFile($file);
+        my $path = path($data_ref->{path});
+        my $top = path($file)->parent()->relative($tree)->absolute($base);
+        $data_ref->{path} = $path->absolute($top)->realpath()->stringify();
+        YAML::XS::DumpFile($file, $data_ref);
+    }
+    return;
+}
 
 # Compare an output file with expected file contents, with modifications for
 # things that are expected to vary on each run, such as timestamps and version
@@ -49,8 +73,11 @@ sub is_spin_output {
         \w{3}, [ ] \d\d [ ] \w{3} [ ] \d{4} [ ] \d\d:\d\d:\d\d [ ] [-+]\d{4}
     }{%DATE%}gxms;
     $results =~ s{
+        Last [ ] modified [ ] \w+ [ ] \d{1,2}, [ ] \d{4}
+    }{Last modified %DATE%}gxms;
+    $results =~ s{
         Last [ ] modified [ ] and \s+ (<a[^>]+>spun</a>) [ ] [%]DATE[%]
-    }{Last $1\n    %DATE% from thread modified %DATE%}gxms;
+    }{Last $1\n  %DATE% from thread modified %DATE%}gxms;
     $results =~ s{
         %DATE% [ ] from [ ] (Markdown|POD) [ ] modified [ ] %DATE%
     }{%DATE% from thread modified %DATE%}gxms;
@@ -59,7 +86,7 @@ sub is_spin_output {
     }{$1%DATE%$2}gxms;
 
     # Map the DocKnot version number to %VERSION%.
-    $results =~ s{ DocKnot [ ] \d+ [.] \d+ }{DocKnot %VERSION%}xms;
+    $results =~ s{ DocKnot [ ] v? [\d.]+ }{DocKnot %VERSION%}xmsg;
 
     # Check the results against the expected file.
     is_file_contents(encode('utf-8', $results), $expected, $message);
@@ -153,6 +180,14 @@ should be explicitly imported.
 
 =over 4
 
+=item fix_pointers(TREE, BASE)
+
+Find all F<*.spin> pointer files in TREE, treat any relative paths found in
+those pointer files as if they were relative to BASE, convert them to absolute
+paths, and write out the modified pointer file.  This is intended to be used
+after copying an input tree for App::DocKnot::Spin to a temporary directory,
+which would otherwise break any relative paths in pointer files.
+
 =item is_spin_output(OUTPUT, EXPECTED, MESSAGE)
 
 Given OUTPUT, which should be a Path::Tiny object pointing to the output from
@@ -176,7 +211,7 @@ Russ Allbery <rra@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright 2021-2022 Russ Allbery <rra@cpan.org>
+Copyright 2021-2024 Russ Allbery <rra@cpan.org>
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal

@@ -9,7 +9,7 @@
 # Modules and declarations
 ##############################################################################
 
-package App::DocKnot::Spin::Thread 7.01;
+package App::DocKnot::Spin::Thread v8.0.0;
 
 use 5.024;
 use autodie;
@@ -27,7 +27,7 @@ use Text::Balanced qw(extract_bracketed);
 
 # The URL to the software page for all of my web page generation software,
 # used to embed a link to the software that generated the page.
-my $URL = 'https://www.eyrie.org/~eagle/software/web/';
+my $URL = 'https://www.eyrie.org/~eagle/software/docknot/';
 
 # The table of available commands.  The columns are:
 #
@@ -1304,10 +1304,10 @@ sub _cmd_signature {
     $output .= "<address>\n";
     my $link = qq{<a href="$URL">spun</a>};
     if ($modified eq $now) {
-        $output .= "    Last modified and\n    $link $modified\n";
+        $output .= "  Last modified and\n  $link $modified\n";
     } else {
-        $output .= "    Last $link\n";
-        $output .= "    $now from $self->{input_type} modified $modified\n";
+        $output .= "  Last $link\n";
+        $output .= "  $now from $self->{input_type} modified $modified\n";
     }
 
     # Close out the document.
@@ -1444,7 +1444,6 @@ sub new {
     }
 
     # Create and return the object.
-    #<<<
     my $self = {
         output     => $output,
         repository => $repository,
@@ -1453,7 +1452,6 @@ sub new {
         style_url  => $style_url,
         versions   => $args_ref->{versions},
     };
-    #>>>
     bless($self, $class);
     return $self;
 }
@@ -2098,7 +2096,7 @@ Russ Allbery <rra@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright 1999-2011, 2013, 2021-2022 Russ Allbery <rra@cpan.org>
+Copyright 1999-2011, 2013, 2021-2023 Russ Allbery <rra@cpan.org>
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal

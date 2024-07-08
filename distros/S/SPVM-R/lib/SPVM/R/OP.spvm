@@ -54,12 +54,12 @@ class R::OP {
     
     my $x_dim = $x_ndarray->dim;
     
-    unless (@$x_dim == 1) {
-      die "The length of dim field of \$x_ndarray must be 1.";
+    unless ($x_ndarray->is_vector) {
+      die "The n-dimension array \$x_ndarray must be a vector.";
     }
     
-    unless ($times > 0) {
-      die "The repeat count \$times must be greater than 0.";
+    unless ($times >= 0) {
+      die "The repeat count \$times must be greater than or equal to 0.";
     }
     
     my $x_length = $x_ndarray->length;
@@ -72,15 +72,13 @@ class R::OP {
     my $ret_data = $ret_ndarray->data;
     
     for (my $i = 0; $i < $ret_length; $i += $x_length) {
-      my $x_index = $i % $x_length;
-      
       if ($x_ndarray->is_any_numeric_ndarray) {
         my $elem_size = $x_ndarray->elem_size;
         
-        Fn->memcpy($ret_data, $i, $x_data, $x_index, $elem_size);
+        Fn->memcpy($ret_data, $elem_size * $i, $x_data, 0, $elem_size * $x_length);
       }
       else {
-        $ret_data->(object[])->[$i] = $x_data->(object[])->[$x_index];
+        Array->memcpy_object_address((object[])$ret_data, $i, (object[])$x_data, 0, $x_length);
       }
     }
     
@@ -93,35 +91,24 @@ class R::OP {
       die "The n-dimension array \$x_ndarray must be defined.";
     }
     
-    my $x_dim = $x_ndarray->dim;
-    
-    unless (@$x_dim == 1) {
-      die "The length of dim field of \$x_ndarray must be 1.";
-    }
-    
-    unless ($length >= 0) {
-      die "The repeat count \$times must be greater than 0.";
-    }
-    
     my $x_length = $x_ndarray->length;
     
-    my $ret_ndarray = (R::NDArray)R::Util->new_proto($x_ndarray, {data => undef, dim => [$length]});
-    
-    my $x_data = $x_ndarray->data;
-    my $ret_data = $ret_ndarray->data;
-    
-    for (my $i = 0; $i < $length; $i += $x_length) {
-      my $x_index = $i % $x_length;
-      
-      if ($x_ndarray->is_any_numeric_ndarray) {
-        my $elem_size = $x_ndarray->elem_size;
-        
-        Fn->memcpy($ret_data, $i, $x_data, $x_index, $elem_size);
-      }
-      else {
-        $ret_data->(object[])->[$i] = $x_data->(object[])->[$x_index];
-      }
+    unless ($length >= 0) {
+      die "The length \$length must be greater than 0.";
     }
+    
+    my $times = 0;
+    if ($length > 0) {
+      unless ($length % $x_length == 0) {
+        die "The length \$length must be devided by the length of n-dimension array \$x_ndarray.";
+      }
+      
+      $times = $length / $x_length;
+    }
+    
+    my $ret_length = $x_length * $length;
+    
+    my $ret_ndarray = &rep($x_ndarray, $times);
     
     return $ret_ndarray;
   }
@@ -236,7 +223,7 @@ class R::OP {
     
     my $elem_size = $x_ndarray->elem_size;
     
-    for (my $column_index = 0; $column_index < $ret_column; $column_index++) {
+    for (my $col = 0; $col < $ret_column; $col++) {
       if ($x_ndarray->is_any_numeric_ndarray) {
         Fn->memcpy($ret_data, $elem_size * $ret_data_index, $x_data, 0, $elem_size * $x_row);
         

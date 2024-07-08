@@ -5,16 +5,18 @@ use Test2WithExplain;
 use v5.20;
 use autodie;
 use File::Temp;
+use Cwd 'abs_path';
 
 my $tmp= File::Temp->newdir();
 my $in_cpppp= "$tmp/source.cp";
 my $out_c= "$tmp/out.c";
 my $out_h= "$tmp/out.h";
+my $bin_cpppp= abs_path("$FindBin::RealBin/../bin/cpppp");
 sub slurp { open my $fh, '<', $_[0]; $/= undef; <$fh> }
 sub spew { open my $fh, '>', $_[0]; $fh->print($_[1]); $fh->close; }
 sub run_cpppp {
    my ($args, $data)= @_;
-   open(my $cmd, '|-', $^X, "$FindBin::RealBin/../bin/cpppp", @$args);
+   open(my $cmd, '|-', $^X, $bin_cpppp, @$args);
    $cmd->print($data);
    $cmd->close;
    $?
@@ -96,6 +98,43 @@ int main() { /* main function */
    int i= 0; /* unaffected */
    return i; /* second line */
 }
+END
+};
+
+subtest format_commandline => sub {
+   -e $_ && unlink $_ for $out_c, $out_h;
+   is( run_cpppp([ '--convert-linecomment-to-c89', '-o', $out_c ], <<'END'), 0 );
+## use CodeGen::Cpppp::Template 'format_commandline';
+/*
+${{ format_commandline() }}
+*/
+END
+   is( slurp($out_c), <<END, 'out.c' );
+/*
+$bin_cpppp --convert-linecomment-to-c89 \\
+      -o $out_c
+*/
+END
+};
+
+subtest re_exec => sub {
+   $^O eq 'Win32' and skip_all("re_exec doesn't work on Win32");
+   -e $_ && unlink $_ for $in_cpppp, $out_c, $out_h;
+   spew($in_cpppp, <<END);
+#! $^X $bin_cpppp
+## main::re_exec("-o", "$out_c", __FILE__)
+##  if \@main::original_argv == 1 && \$main::original_argv[0] eq __FILE__;
+## use CodeGen::Cpppp::Template 'format_commandline';
+/*
+\${{ format_commandline() }}
+*/
+END
+   is( run_cpppp([ $in_cpppp ]), 0, 'run_cpppp' );
+   is( slurp($out_c), <<END, 'out.c' );
+/*
+$bin_cpppp -o $out_c \\
+      $in_cpppp
+*/
 END
 };
 

@@ -1,6 +1,6 @@
 package CodeGen::Cpppp::CParser;
 
-our $VERSION = '0.003'; # VERSION
+our $VERSION = '0.004'; # VERSION
 # ABSTRACT: C Parser Utility Library
 
 use v5.20;
@@ -49,6 +49,9 @@ our %named_escape= (
    a => "\a", b => "\b", e => "\e", f => "\f",
    n => "\n", r => "\r", t => "\t", v => "\x0B"
 );
+our %tokens_before_infix_minus= map +($_ => 1), (
+   ']', ')', 'integer','real','ident',
+);
 sub _get_tokens {
    my ($class, $textref, $tok_lim)= @_;
    pos($$textref)= 0 unless defined pos($$textref);
@@ -59,7 +62,7 @@ sub _get_tokens {
    while ((!defined $tok_lim || --$tok_lim >= 0)
       && $$textref =~ m{
          \G
-         \s* \K # ignore whitespace
+         (?> \s* ) \K # ignore whitespace
          (?|
             # single-line comment
             // ( [^\r\n]* )
@@ -114,18 +117,29 @@ sub _get_tokens {
 
          |  # punctuation and operators
             ( \+\+ | -- | -> | \+=? | -=? | \*=? | /=? | %=? | >>=? | >=? | <<=? | <=?
-            | \&\&=? | &=? | \|\|=? | \|=? | ^=? | ==? | !=? | \? | ~
-            | [\[\](){};,.:]
+            | \&\&=? | \&=? | \|\|=? | \|=? | \^=? | ==? | !=? | \? | ~
+            | [\[\]\(\)\{\};,.:]
             )
             (?{ $_type= $1 })
-
+         
          |  # all other characters
             (.) (?{ $_type= 'unknown'; $_error= q{parse error} })
          )
       }xcg
    ) {
       my @token= ($_type, $_value // $1, $-[0], $+[0] - $-[0], defined $_error? ($_error) : ());
-      push @tokens, bless \@token, 'CodeGen::Cpppp::CParser::Token';
+      # disambiguate negative number from minus operator
+      if (($_type eq 'integer' || $_type eq 'real')
+         && @tokens && $tokens[-1][0] eq '-'
+         && (@tokens == 1 || !$tokens_before_infix_minus{$tokens[-2]->type})
+      ) {
+         $token[1]= -$token[1];
+         $token[2]= $tokens[-1][2];
+         $token[3]= $+[0] - $tokens[-1][2];
+         @{$tokens[-1]}= @token;
+      } else {
+         push @tokens, bless \@token, 'CodeGen::Cpppp::CParser::Token';
+      }
       ($_error, $_value)= (undef, undef);
    }
    return @tokens;
@@ -193,11 +207,11 @@ Michael Conrad <mike@nrdvana.net>
 
 =head1 VERSION
 
-version 0.003
+version 0.004
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2023 by Michael Conrad.
+This software is copyright (c) 2024 by Michael Conrad.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

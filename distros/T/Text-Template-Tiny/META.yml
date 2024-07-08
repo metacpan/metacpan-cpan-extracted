@@ -27,5 +27,5 @@ resources:
   homepage: https://github.com/sciurius/perl-Text-Template-Tiny
   license: https://dev.perl.org/licenses/
   repository: git://github.com/sciurius/perl-Text-Template-Tiny.git
-version: '1.000'
+version: v1.000.1
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

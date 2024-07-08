@@ -5,6 +5,10 @@ class R::NDArray::String extends R::NDArray::Object {
   
   use Fn;
   use Array;
+  use R::NDArray::StringBuffer;
+  use R::NDArray::Time::Piece;
+  use R::OP::StringBuffer;
+  use R::OP::Time::Piece;
   
   # Class Mehtods
   static method new : R::NDArray::String ($options : object[] = undef) {

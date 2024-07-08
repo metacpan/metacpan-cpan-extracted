@@ -5,7 +5,7 @@ use common::sense; use open qw/:std :utf8/;  use Carp qw//; use File::Basename q
 # 
 # # VERSION
 # 
-# 0.0.3
+# 0.0.5
 # 
 # # SYNOPSIS
 # 
@@ -258,6 +258,8 @@ my $rows = {
 # 
 # `$attach` содержит три ключа через двоеточие: ключ для присоединяемых данных, столбец из `$rows` и столбец из `$query`. По столбцам происходит объединение строк.
 # 
+# Возвращает функция массив с результатом запроса (`$query`), в который можно приаттачить ещё что-то.
+# 
 done_testing; }; subtest 'query_attach ($rows, $attach, $query, %kw)' => sub { 
 my $authors = query "SELECT id, name FROM author";
 
@@ -269,14 +271,14 @@ my $res = [
 
 ::is_deeply scalar do {$authors}, scalar do {$res}, '$authors # --> $res';
 
-query_attach $authors => "books:id:author_id" => "SELECT author_id, title FROM book ORDER BY title";
+my @books = query_attach $authors => "books:id:author_id" => "SELECT author_id, title FROM book ORDER BY title";
 
 my $attaches = [
     {name => "Pushkin A.S.", id => 1, books => [
         {title => "Kiss in night", author_id => 1},
         {title => "Mir",           author_id => 1},
     ]},
-    {name => "Pushkin A.",   id => 2},
+    {name => "Pushkin A.",   id => 2, books => []},
     {name => "Alice",        id => 3, books => [
         {title => "Mips as cpu", author_id => 3},
     ]},
@@ -284,8 +286,14 @@ my $attaches = [
 
 ::is_deeply scalar do {$authors}, scalar do {$attaches}, '$authors # --> $attaches';
 
-# 
-# Если нужно указать другие ключи, то это делается через двоеточия в `$attach`: `attach:id:attach_id`.
+my $books = [
+    {title => "Kiss in night", author_id => 1},
+    {title => "Mips as cpu",   author_id => 3},
+    {title => "Mir",           author_id => 1},
+];
+
+::is_deeply scalar do {\@books}, scalar do {$books}, '\@books  # --> $books';
+
 # 
 # ## query_col ($query, %params)
 # 

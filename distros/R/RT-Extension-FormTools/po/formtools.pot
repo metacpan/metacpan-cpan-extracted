@@ -1,0 +1,377 @@
+#. (uc($item))
+#: html/Admin/FormTools/Modify.html:22
+msgid "%1 Element"
+msgstr ""
+
+#: html/Admin/FormTools/Modify.html:212 html/Admin/FormTools/Modify.html:221 html/Admin/FormTools/Modify.html:499 html/Admin/FormTools/Modify.html:508
+msgid "(no value)"
+msgstr ""
+
+#: html/Admin/FormTools/Modify.html:327 html/Admin/FormTools/Modify.html:327
+msgid "Add Page"
+msgstr ""
+
+#: html/Admin/FormTools/index.html:1
+msgid "Admin FormTools"
+msgstr ""
+
+#: html/Callbacks/FormTools/Elements/Tabs/Privileged:37
+msgid "Advanced"
+msgstr ""
+
+#: html/Admin/FormTools/Modify.html:444 html/Admin/FormTools/Modify.html:56
+msgid "Alignment"
+msgstr ""
+
+#: html/Admin/FormTools/Modify.html:367
+msgid "Basics"
+msgstr ""
+
+#: html/Admin/Elements/FormToolsHelp:50
+msgid "Build your form using the tools below. To create new pages for a multi-page form, click the plus (+). To change the order of pages, click the gear and update the Sort order. To remove a page, click the gear and click Delete. Make sure to Save Changes at the bottom of the form after any updates."
+msgstr ""
+
+#: html/Admin/FormTools/Modify.html:447 html/Admin/FormTools/Modify.html:59
+msgid "Center"
+msgstr ""
+
+#: html/FormTools/Field:226
+msgid "Choose file"
+msgstr ""
+
+#: html/Admin/FormTools/Modify.html:266 html/Admin/FormTools/Modify.html:379
+msgid "Component"
+msgstr ""
+
+#: html/Admin/FormTools/Advanced.html:10 html/Admin/FormTools/Modify.html:368 html/Admin/FormTools/Modify.html:434 html/Admin/FormTools/Modify.html:45
+msgid "Content"
+msgstr ""
+
+#: html/Admin/FormTools/Modify.html:383 html/Admin/FormTools/Modify.html:79
+msgid "Core Field"
+msgstr ""
+
+#. ($msg)
+#: html/Admin/FormTools/Describe.html:72
+msgid "Could not update description: %1"
+msgstr ""
+
+#. ($msg)
+#: html/Admin/FormTools/Create.html:62
+msgid "Couldn't create the form: %1"
+msgstr ""
+
+#: html/Admin/FormTools/Advanced.html:95 html/Admin/FormTools/Modify.html:688
+msgid "Couldn't decode JSON"
+msgstr ""
+
+#. ($name, $msg)
+#: html/Admin/FormTools/index.html:88
+msgid "Couldn't disable %1: %2"
+msgstr ""
+
+#. ($name, $msg)
+#: html/Admin/FormTools/index.html:91
+msgid "Couldn't enable %1: %2"
+msgstr ""
+
+#. ($msg)
+#: html/Admin/FormTools/Advanced.html:105 html/Admin/FormTools/Modify.html:673 html/Admin/FormTools/Modify.html:722
+msgid "Couldn't update content: %1"
+msgstr ""
+
+#. ($msg)
+#: html/Admin/FormTools/Advanced.html:84
+msgid "Couldn't update name: %1"
+msgstr ""
+
+#: html/Admin/FormTools/Create.html:15 html/Callbacks/FormTools/Elements/Tabs/Privileged:12 html/Callbacks/FormTools/Elements/Tabs/Privileged:20 html/Callbacks/FormTools/Elements/Tabs/Privileged:23
+msgid "Create"
+msgstr ""
+
+#: html/Admin/FormTools/Create.html:26
+msgid "Create form"
+msgstr ""
+
+#: lib/RT/Extension/FormTools.pm:11
+msgid "Create, modify and disable forms"
+msgstr ""
+
+#. ($Description)
+#: html/Admin/FormTools/Create.html:56
+msgid "Created form %1"
+msgstr ""
+
+#: html/Admin/FormTools/index.html:11
+msgid "Creates Tickets in Queue"
+msgstr ""
+
+#: html/Admin/FormTools/Modify.html:157 html/Admin/FormTools/Modify.html:385
+msgid "Custom Field"
+msgstr ""
+
+#: html/Admin/FormTools/Modify.html:105 html/Admin/FormTools/Modify.html:183 html/Admin/FormTools/Modify.html:460 html/Admin/FormTools/Modify.html:468
+msgid "Default Value"
+msgstr ""
+
+#: html/Admin/FormTools/Modify.html:355
+msgid "Delete Page"
+msgstr ""
+
+#: html/Admin/FormTools/Describe.html:25 html/Callbacks/FormTools/Elements/Tabs/Privileged:36
+msgid "Description"
+msgstr ""
+
+#. ($form_attribute->Description)
+#: html/Admin/FormTools/Describe.html:59
+msgid "Description for form %1"
+msgstr ""
+
+#. ($name)
+#: html/Admin/FormTools/index.html:80
+msgid "Disabled %1"
+msgstr ""
+
+#: html/Admin/FormTools/Modify.html:160 html/Admin/FormTools/Modify.html:160 html/Admin/FormTools/Modify.html:25 html/Admin/FormTools/Modify.html:25 html/Admin/FormTools/Modify.html:270 html/Admin/FormTools/Modify.html:270 html/Admin/FormTools/Modify.html:406 html/Admin/FormTools/Modify.html:406 html/Admin/FormTools/Modify.html:82 html/Admin/FormTools/Modify.html:82
+msgid "Edit"
+msgstr ""
+
+#: html/Admin/FormTools/index.html:12
+msgid "Enabled"
+msgstr ""
+
+#. ($name)
+#: html/Admin/FormTools/index.html:83
+msgid "Enabled %1"
+msgstr ""
+
+#: html/Callbacks/FormTools/Elements/Tabs/Privileged:18
+msgid "Form Tools"
+msgstr ""
+
+#: html/Callbacks/FormTools/Elements/Tabs/Privileged:7
+msgid "FormTools"
+msgstr ""
+
+#: html/Admin/FormTools/Modify.html:8
+msgid "FormTools Components"
+msgstr ""
+
+#: html/Admin/Elements/FormToolsHelp:49
+msgid "FormTools Configuration"
+msgstr ""
+
+#: html/Admin/FormTools/Modify.html:310
+msgid "FormTools Pages"
+msgstr ""
+
+#: html/Callbacks/FormTools/Elements/Tabs/Privileged:45 html/Callbacks/FormTools/Elements/Tabs/SelfService:4
+msgid "Forms"
+msgstr ""
+
+#: html/Forms.html:1 html/SelfService/Forms.html:2
+msgid "Forms Home"
+msgstr ""
+
+#: html/Callbacks/FormTools/Elements/Tabs/Privileged:38
+msgid "Group Rights"
+msgstr ""
+
+#: html/Admin/FormTools/Modify.html:266 html/Admin/FormTools/Modify.html:381
+msgid "Hidden"
+msgstr ""
+
+#: html/Admin/FormTools/Modify.html:129 html/Admin/FormTools/Modify.html:239 html/Admin/FormTools/Modify.html:528
+msgid "Hide"
+msgstr ""
+
+#: html/Admin/FormTools/Describe.html:9
+msgid "Icon"
+msgstr ""
+
+#: html/Admin/FormTools/index.html:35
+msgid "Include disabled forms in listing."
+msgstr ""
+
+#: html/Admin/FormTools/Advanced.html:16
+msgid "Invalid JSON"
+msgstr ""
+
+#. ($Queue)
+#: html/Admin/FormTools/Create.html:42
+msgid "Invalid queue %1"
+msgstr ""
+
+#: html/Admin/FormTools/Modify.html:101 html/Admin/FormTools/Modify.html:178 html/Admin/FormTools/Modify.html:454
+msgid "Label"
+msgstr ""
+
+#: html/Admin/FormTools/Modify.html:446 html/Admin/FormTools/Modify.html:58
+msgid "Left"
+msgstr ""
+
+#: html/Admin/FormTools/Advanced.html:90 html/Admin/FormTools/Create.html:29
+msgid "Missing Name"
+msgstr ""
+
+#: html/Admin/FormTools/Create.html:30
+msgid "Missing Queue"
+msgstr ""
+
+#: html/Callbacks/FormTools/Elements/Tabs/Privileged:35
+msgid "Modify"
+msgstr ""
+
+#: html/Admin/FormTools/Modify.html:339
+msgid "Modify Basics"
+msgstr ""
+
+#: html/Admin/FormTools/Modify.html:172 html/Admin/FormTools/Modify.html:284 html/Admin/FormTools/Modify.html:39 html/Admin/FormTools/Modify.html:427 html/Admin/FormTools/Modify.html:94
+msgid "Modify Element"
+msgstr ""
+
+#. ($form_attribute->Description)
+#: html/Admin/FormTools/Advanced.html:64 html/Admin/FormTools/Modify.html:734
+msgid "Modify form %1"
+msgstr ""
+
+#. ($form_attribute->Description)
+#: html/Admin/FormTools/GroupRights.html:29
+msgid "Modify group rights for Form %1"
+msgstr ""
+
+#. ($form_attribute->Description)
+#: html/Admin/FormTools/UserRights.html:29
+msgid "Modify user rights for Form %1"
+msgstr ""
+
+#: html/Admin/FormTools/Advanced.html:7 html/Admin/FormTools/Create.html:7 html/Admin/FormTools/Modify.html:290 html/Admin/FormTools/Modify.html:543 html/Admin/FormTools/index.html:10
+msgid "Name"
+msgstr ""
+
+#. ($ARGS{Description})
+#. ($Description)
+#: html/Admin/FormTools/Advanced.html:76 html/Admin/FormTools/Create.html:36
+msgid "Name %1 already exists"
+msgstr ""
+
+#: html/Admin/FormTools/Modify.html:312
+msgid "New changes pending. Click \"Save Changes\" to update the form."
+msgstr ""
+
+#: html/Forms/dhandler:12
+msgid "Next"
+msgstr ""
+
+#: html/Admin/FormTools/Modify.html:345
+msgid "Page Name"
+msgstr ""
+
+#: html/Admin/FormTools/Advanced.html:67 html/Admin/FormTools/Create.html:22 html/Admin/FormTools/Describe.html:62 html/Admin/FormTools/Modify.html:658 html/Admin/FormTools/Modify.html:683 html/Forms/dhandler:206
+msgid "Permission Denied"
+msgstr ""
+
+#: html/Admin/FormTools/Modify.html:155 html/Admin/FormTools/Modify.html:19 html/Admin/FormTools/Modify.html:264 html/Admin/FormTools/Modify.html:373 html/Admin/FormTools/Modify.html:416 html/Admin/FormTools/Modify.html:77
+msgid "Place here"
+msgstr ""
+
+#: html/Admin/FormTools/Create.html:11
+msgid "Queue"
+msgstr ""
+
+#: html/Admin/FormTools/Modify.html:138 html/Admin/FormTools/Modify.html:247 html/Admin/FormTools/Modify.html:537
+msgid "Readonly"
+msgstr ""
+
+#: html/Admin/FormTools/Modify.html:163 html/Admin/FormTools/Modify.html:163 html/Admin/FormTools/Modify.html:274 html/Admin/FormTools/Modify.html:274 html/Admin/FormTools/Modify.html:29 html/Admin/FormTools/Modify.html:29 html/Admin/FormTools/Modify.html:410 html/Admin/FormTools/Modify.html:410 html/Admin/FormTools/Modify.html:85 html/Admin/FormTools/Modify.html:85
+msgid "Remove"
+msgstr ""
+
+#: html/Admin/FormTools/Modify.html:121 html/Admin/FormTools/Modify.html:200 html/Admin/FormTools/Modify.html:486
+msgid "Require"
+msgstr ""
+
+#: html/Admin/FormTools/Modify.html:209 html/Admin/FormTools/Modify.html:496
+msgid "Require if"
+msgstr ""
+
+#: html/FormTools/Field:165 html/FormTools/Field:354
+msgid "Required"
+msgstr ""
+
+#: html/Admin/FormTools/Modify.html:448 html/Admin/FormTools/Modify.html:60
+msgid "Right"
+msgstr ""
+
+#: html/Admin/FormTools/Describe.html:37
+msgid "Save"
+msgstr ""
+
+#: html/Admin/FormTools/Advanced.html:22 html/Admin/FormTools/GroupRights.html:11 html/Admin/FormTools/Modify.html:572 html/Admin/FormTools/UserRights.html:11
+msgid "Save Changes"
+msgstr ""
+
+#: html/Admin/FormTools/Modify.html:12
+msgid "Search..."
+msgstr ""
+
+#: html/Callbacks/FormTools/Elements/Tabs/Privileged:11 html/Callbacks/FormTools/Elements/Tabs/Privileged:19 html/Callbacks/FormTools/Elements/Tabs/Privileged:22
+msgid "Select"
+msgstr ""
+
+#: html/Admin/FormTools/Modify.html:348
+msgid "Sort Order"
+msgstr ""
+
+#: html/Forms/dhandler:29
+msgid "Submit"
+msgstr ""
+
+#: html/Admin/FormTools/Create.html:11
+msgid "Tickets will be created in this queue"
+msgstr ""
+
+#: html/Admin/Elements/FormToolsHelp:52
+msgid "To create your form, drag components from the Components box on the left to the Content area on the right. Click the pencil to edit components. Click the X to remove them. Click Save Changes to save the new page."
+msgstr ""
+
+#: html/Admin/FormTools/Modify.html:113 html/Admin/FormTools/Modify.html:193 html/Admin/FormTools/Modify.html:478
+msgid "Tooltip"
+msgstr ""
+
+#: html/Admin/FormTools/Describe.html:102
+msgid "Unable to set form icon"
+msgstr ""
+
+#: html/Admin/FormTools/Modify.html:145 html/Admin/FormTools/Modify.html:253 html/Admin/FormTools/Modify.html:298 html/Admin/FormTools/Modify.html:360 html/Admin/FormTools/Modify.html:552 html/Admin/FormTools/Modify.html:66 html/Admin/FormTools/index.html:42
+msgid "Update"
+msgstr ""
+
+#: html/Admin/FormTools/Advanced.html:102 html/Admin/FormTools/Modify.html:670 html/Admin/FormTools/Modify.html:719
+msgid "Updated content"
+msgstr ""
+
+#: html/Admin/FormTools/Describe.html:69
+msgid "Updated description"
+msgstr ""
+
+#: html/Admin/FormTools/Advanced.html:81
+msgid "Updated name"
+msgstr ""
+
+#: html/Admin/FormTools/Describe.html:20
+msgid "Upload an icon for this form"
+msgstr ""
+
+#: html/Callbacks/FormTools/Elements/Tabs/Privileged:39
+msgid "User Rights"
+msgstr ""
+
+#: html/Admin/FormTools/Modify.html:293 html/Admin/FormTools/Modify.html:546
+msgid "Value"
+msgstr ""
+
+#: lib/RT/Extension/FormTools.pm:105
+msgid "View forms"
+msgstr ""
+

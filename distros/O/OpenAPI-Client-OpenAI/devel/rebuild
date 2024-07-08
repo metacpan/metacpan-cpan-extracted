@@ -2,10 +2,12 @@
 
 function show_help() {
     less <<END
-$(basename "$0") [-?|-h|--help] [-f|--force]
+$(basename "$0") [-?|-h|--help] [-f|--force] [-u|--update]
 
+    -u --update   Update OpenAI OpenAPI spec from github
     -? -h --help  Show this help and exit
     -f --force    Force the rebuild, even if there are uncommitted changes
+    -n --notest   Skip the tests
 
 Attempts to rebuild this project, including running tests and rebuilding the
 documentation. If you have uncommitted changes, this script will refuse to
@@ -14,6 +16,10 @@ END
 }
 
 force=false
+notest=false
+update=false
+openai_url="https://raw.githubusercontent.com/openai/openai-openapi/master/openapi.yaml"
+target_dir="share/openapi.yaml"
 
 POSITIONAL=()
 while [[ $# -gt 0 ]]
@@ -22,6 +28,14 @@ key="$1"
 case $key in
     -f|--force)
     force=true
+    shift
+    ;;
+    -n|--notest)
+    notest=true
+    shift
+    ;;
+    -u|--update)
+    update=true
     shift
     ;;
     -?|-h|--help)
@@ -53,6 +67,18 @@ else
     fi
 fi
 
+if [ "$update" = true]; then
+    echo "Updating OpenAI OpenAPI spec from github"
+    if command -v curl &> /dev/null; then
+        curl -o $target_dir $openai_url
+    elif command -v wget &> /dev/null; then
+        wget -O $target_dir $openai_url
+    else
+        echo "Error: Neither curl nor wget is available."
+        exit 1
+    fi
+fi
+
 # Check if Makefile exists in the current directory
 if [ -f Makefile ]; then
     # Run make realclean
@@ -69,10 +95,19 @@ perl Makefile.PL
 
 make
 
-RELEASE_TESTING=1 make test
+if [ "$notest" = false ]; then
+    RELEASE_TESTING=1 make test
+else
+    echo Skipping tests due to -n|--notest flag
+fi
 
 # Obviously, this builds the documentation
 perl devel/build_docs.pl
 
 # And we rebuild our README.md from the POD
-pod2markdown < lib/OpenAPI/Client/OpenAI.pm > README.md
+if command -v pod2markdown &> /dev/null; then
+    pod2markdown < lib/OpenAPI/Client/OpenAI.pm > README.md
+else
+    echo "Error: pod2markdown is not available."
+    exit 1
+fi

@@ -11,7 +11,7 @@
 # Modules and declarations
 ##############################################################################
 
-package App::DocKnot::Spin 7.01;
+package App::DocKnot::Spin v8.0.0;
 
 use 5.024;
 use autodie;
@@ -83,8 +83,9 @@ sub _footer {
             $modified = sprintf('%d-%02d-%02d', $1, $2, $3);
         }
     } elsif ($self->{repository} && $in_tree) {
-        $modified
-          = $self->{repository}->run('log', '-1', '--format=%ct', "$source");
+        $modified = $self->{repository}->run(
+            'log', '-1', '--format=%ct', "$source",
+        );
         if ($modified) {
             $modified = strftime('%Y-%m-%d', gmtime($modified));
         }
@@ -487,13 +488,11 @@ sub new {
     }
 
     # Create and return the object.
-    #<<<
     my $self = {
         delete    => $args_ref->{delete},
         excludes  => [@excludes],
         style_url => $style_url,
     };
-    #>>>
     bless($self, $class);
     return $self;
 }
@@ -553,7 +552,6 @@ sub spin {
     }
 
     # Create a new thread converter object.
-    #<<<
     $self->{thread} = App::DocKnot::Spin::Thread->new(
         {
             output      => $output,
@@ -563,10 +561,8 @@ sub spin {
             versions    => $self->{versions},
         },
     );
-    #>>>
 
     # Create the processor for pointers.
-    #<<<
     $self->{pointer} = App::DocKnot::Spin::Pointer->new(
         {
             output      => "$output",
@@ -575,7 +571,6 @@ sub spin {
             thread      => $self->{thread},
         },
     );
-    #>>>
 
     # Process the input tree.
     my %options = (follow_symlinks => 0, report_symlinks => 1);
@@ -606,7 +601,7 @@ __END__
 
 =for stopwords
 Allbery DocKnot MERCHANTABILITY NONINFRINGEMENT sublicense cvs2xhtml faq2html
-cl2xhtml spin-rss
+cl2xhtml RSS
 
 =head1 NAME
 
@@ -622,10 +617,11 @@ App::DocKnot::Spin - Static site builder supporting thread macro language
 =head1 REQUIREMENTS
 
 Perl 5.24 or later and the modules Git::Repository, Image::Size,
-List::SomeUtils, Path::Iterator::Rule, Path::Tiny, Pod::Thread, Template (part
-of Template Toolkit), and YAML::XS, all of which are available from CPAN.
-Also expects to find B<faq2html>, B<cvs2xhtml>, and B<cl2xhtml> on the user's
-PATH to convert certain types of files.
+List::SomeUtils, Path::Iterator::Rule, Path::Tiny, Pod::Thread,
+Sort::Versions, Template (part of Template Toolkit), and YAML::XS, all of
+which are available from CPAN.  Also expects to find B<faq2html>,
+B<cvs2xhtml>, and B<cl2xhtml> on the user's PATH to convert certain types of
+files.
 
 =head1 DESCRIPTION
 
@@ -649,6 +645,11 @@ quicker.
 Most files in the input tree will normally be thread files ending in C<.th>.
 These are processed into HTML using L<App::DocKnot::Spin::Thread>.  See that
 module's documentation for the details of the thread macro language.
+
+Files that end in C<.spin> are pointers to external files that should be
+converted to HTML and then written to the output tree.  These pointers are
+interpreted by L<App::DocKnot::Spin::Pointer>.  See that module's
+documentation for their format and effects.
 
 Files that end in various other extensions are taken to be instructions to run
 an external converter on a file.  The first line of such a pointer file should
@@ -676,11 +677,10 @@ parsed with L<App::DocKnot::Spin::Versions> and used to determine when to
 regenerate certain pages and for the C<\release> and C<\version> thread
 commands.  See that module's documentation for the format of this file.
 
-If there is a file named F<.rss> in any directory of the input tree,
-B<spin-rss> will be run on that file, passing the B<-b> option to point to the
-directory about to be processed.  This is done before processing the files in
-that directory, so B<spin-rss> can create or update files that will then be
-processed as normal.
+If there is a file named F<.rss> in any directory of the input tree, it will
+be processed with L<App::DocKnot::Spin::RSS> to generate RSS and possibly
+other files.  This is done before processing the files in that directory so
+that the generated files will then be processed as normal.
 
 If there is a directory named F<.git> at the top of the input tree,
 App::DocKnot::Spin will assume that the input tree is a Git repository and
@@ -738,7 +738,7 @@ Russ Allbery <rra@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright 1999-2011, 2013, 2021-2022 Russ Allbery <rra@cpan.org>
+Copyright 1999-2011, 2013, 2021-2023 Russ Allbery <rra@cpan.org>
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -761,7 +761,8 @@ SOFTWARE.
 =head1 SEE ALSO
 
 L<cl2xhtml(1)>, L<cvs2xhtml(1)>, L<docknot(1)>, L<faq2html(1)>,
-L<spin-rss(1)>, L<App::DocKnot::Spin::Sitemap>, L<App::DocKnot::Spin::Thread>,
+L<App::DocKnot::Spin::Pointer>, L<App::DocKnot::Spin::RSS>,
+L<App::DocKnot::Spin::Sitemap>, L<App::DocKnot::Spin::Thread>,
 L<App::DocKnot::Spin::Versions>, L<Pod::Thread>
 
 This module is part of the App-DocKnot distribution.  The current version of

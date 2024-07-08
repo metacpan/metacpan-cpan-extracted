@@ -6,8 +6,8 @@ lib/SPVM/R.pm
 lib/SPVM/R.spvm
 lib/SPVM/R/DataFrame.pm
 lib/SPVM/R/DataFrame.spvm
-lib/SPVM/R/DataFrame/Field.pm
-lib/SPVM/R/DataFrame/Field.spvm
+lib/SPVM/R/DataFrame/Column.pm
+lib/SPVM/R/DataFrame/Column.spvm
 lib/SPVM/R/NDArray.pm
 lib/SPVM/R/NDArray.spvm
 lib/SPVM/R/NDArray/Byte.pm

@@ -10,7 +10,7 @@
 # Modules and declarations
 ##############################################################################
 
-package App::DocKnot::Spin::Pointer 7.01;
+package App::DocKnot::Spin::Pointer v8.0.0;
 
 use 5.024;
 use autodie;
@@ -18,6 +18,7 @@ use parent qw(App::DocKnot);
 use warnings FATAL => 'utf8';
 
 use App::DocKnot::Config;
+use App::DocKnot::Spin::Text;
 use App::DocKnot::Util qw(is_newer);
 use Carp qw(croak);
 use Encode qw(decode);
@@ -29,9 +30,9 @@ use POSIX qw(strftime);
 use Template ();
 use YAML::XS ();
 
-# The URL to the software page for all of my web page generation software,
-# used to embed a link to the software that generated the page.
-my $URL = 'https://www.eyrie.org/~eagle/software/web/';
+# The URL to the software page for this package, used to embed a link to the
+# software that generated the page.
+my $URL = 'https://www.eyrie.org/~eagle/software/docknot/';
 
 ##############################################################################
 # Format conversions
@@ -42,6 +43,7 @@ my $URL = 'https://www.eyrie.org/~eagle/software/web/';
 # $data_ref - Data from the pointer file
 #   path  - Path to the Markdown file to convert
 #   style - Style sheet to use
+#   title - Title of the page
 # $base     - Base path of pointer file (for relative paths)
 # $output   - Path to the output file
 #
@@ -78,7 +80,6 @@ sub _spin_markdown {
     if ($data_ref->{style}) {
         $style = $self->{style_url} . $data_ref->{style};
     }
-    #<<<
     my %vars = (
         docknot_url => $URL,
         html        => decode('utf-8', $html),
@@ -89,7 +90,6 @@ sub _spin_markdown {
         style       => $style,
         title       => $title,
     );
-    #>>>
 
     # Construct the output page from those template variables.
     my $result;
@@ -109,6 +109,7 @@ sub _spin_markdown {
 #     navbar   - Whether to add a navigation bar
 #   path    - Path to the POD file to convert
 #   style   - Style sheet to use
+#   title   - Title of the page
 # $base     - Base path of pointer file (for relative paths)
 # $output   - Path to the output file
 #
@@ -118,13 +119,11 @@ sub _spin_pod {
     my $source = path($data_ref->{path})->absolute($base);
 
     # Construct the Pod::Thread formatter object.
-    #<<<
     my %options = (
         contents => $data_ref->{options}{contents},
         style    => $data_ref->{style} // 'pod',
         title    => $data_ref->{title},
     );
-    #<<<
     if (exists($data_ref->{options}{navbar})) {
         $options{navbar} = $data_ref->{options}{navbar};
     } else {
@@ -140,6 +139,43 @@ sub _spin_pod {
 
     # Spin that page into HTML.
     $self->{thread}->spin_thread_output($data, $source, 'POD', $output);
+    return;
+}
+
+# Convert a text file to HTML.
+#
+# $data_ref - Data form the pointer file
+#   options - Hash of conversion options
+#     modified - Whether to add a last modified subheader
+#   path    - Path to the text file to convert
+#   style   - Style sheet to use
+#   title   - Title of the page
+# $base     - Base path of pointer file (for relative paths)
+# $output   - Path to the output file
+#
+# Throws: Text exception on conversion failure
+sub _spin_text {
+    my ($self, $data_ref, $base, $output) = @_;
+    my $source = path($data_ref->{path})->absolute($base);
+
+    # Determine the style URL.
+    my $style = ($data_ref->{style} // 'faq') . '.css';
+    if ($self->{style_url}) {
+        $style = $self->{style_url} . $style;
+    }
+
+    # Create the formatter object.
+    my %options = (
+        modified => $data_ref->{options}{modified},
+        output   => $self->{output},
+        sitemap  => $self->{sitemap},
+        style    => $style,
+        title    => $data_ref->{title},
+    );
+    my $text = App::DocKnot::Spin::Text->new(\%options);
+
+    # Generate the output page.
+    $text->spin_text_file($source, $output);
     return;
 }
 
@@ -175,7 +211,6 @@ sub new {
     # Create and return the object.
     my $tt = Template->new({ ABSOLUTE => 1, ENCODING => 'utf8' })
       or croak(Template->error());
-    #<<<
     my $self = {
         output      => $args_ref->{output},
         pandoc_path => $pandoc,
@@ -184,7 +219,6 @@ sub new {
         template    => $tt,
         thread      => $args_ref->{thread},
     };
-    #>>>
     bless($self, $class);
     $self->{template_path} = $self->appdata_path('templates', 'html.tmpl');
     return $self;
@@ -227,6 +261,8 @@ sub spin_pointer {
         $self->_spin_markdown($data_ref, $pointer->parent(), $output);
     } elsif ($data_ref->{format} eq 'pod') {
         $self->_spin_pod($data_ref, $pointer->parent(), $output);
+    } elsif ($data_ref->{format} eq 'text') {
+        $self->_spin_text($data_ref, $pointer->parent(), $output);
     } else {
         die "$pointer: unknown output format $data_ref->{format}\n";
     }
@@ -349,8 +385,8 @@ conversion.  The valid keys for a pointer file are:
 
 =item format
 
-The format of the source file.  Supported values are C<markdown> and C<pod>.
-Required.
+The format of the source file.  Supported values are C<markdown>, C<pod>, and
+C<text>.  Required.
 
 =item path
 
@@ -379,6 +415,18 @@ The default is true.
 
 =back
 
+The supported options for a format of C<text> are:
+
+=over 4
+
+=item modified
+
+Boolean saying whether to add a last modified header.  This will always be
+done if the file contains a CVS-style C<$Id$> string, but otherwise will only
+be done if this option is set to true.  The default is false.
+
+=back
+
 =item style
 
 The style sheet to use for the converted output.  Optional.  If not set,
@@ -401,7 +449,7 @@ Russ Allbery <rra@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright 2021 Russ Allbery <rra@cpan.org>
+Copyright 2021, 2024 Russ Allbery <rra@cpan.org>
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -433,3 +481,4 @@ L<https://www.eyrie.org/~eagle/software/docknot/>.
 
 # Local Variables:
 # copyright-at-end-flag: t
+# End:

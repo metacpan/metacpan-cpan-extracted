@@ -97,7 +97,7 @@ with:
     make test
 ```
 
-If a test vails, you can run a single test with verbose output via:
+If a test fails, you can run a single test with verbose output via:
 
 ```
     prove -vb <path-to-test>
@@ -118,10 +118,10 @@ the current version of this package, the current documentation, and
 pointers to any additional resources.
 
 For bug tracking, use the [issue tracker on
-GitHub](https://github.com/rra/ansicolor/issues).  However, please be
-aware that I tend to be extremely busy and work projects often take
-priority.  I'll save your report and get to it as soon as I can, but it
-may take me a couple of months.
+GitHub](https://github.com/rra/ansicolor/issues).  Please be aware that I
+tend to be extremely busy and work projects often take priority.  I'll
+save your report and get to it as soon as I can, but it may take me a
+couple of months.
 
 ## Source Repository
 

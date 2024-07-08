@@ -9,8 +9,8 @@
 
 WARNING
 
-  This package is orphaned.  Although I believe it is still useful, I no
-  longer use this method of DNS load balancing and am no longer
+  This package is not maintained.  Although I believe it is still useful,
+  I no longer use this method of DNS load balancing and am no longer
   maintaining this package.  If you would like to pick up maintenance of
   it, please feel free.  Contact me if you would like this page to
   redirect to its new home.
@@ -133,26 +133,20 @@ TESTING
 
 SUPPORT
 
+  This package is not currently maintained and will not get further
+  releases or bug fixes.  I do not recommend using it unless you're
+  willing to take over maintenance.
+
   The lbcd web page at:
 
       https://www.eyrie.org/~eagle/software/lbcd/
 
-  will always have the current version of this package, the current
-  documentation, and pointers to any additional resources.
-
-  New lbcd releases are announced on the lbnamed-users mailing list.  To
-  subscribe or see the list archives, go to:
-
-      https://mailman.stanford.edu/mailman/listinfo/lbnamed-users
-
-  I welcome bug reports and patches for this package at eagle@eyrie.org.
-  However, please be aware that I tend to be extremely busy and work
-  projects often take priority.  I'll save your report and get to it as
-  soon as I can, but it may take me a couple of months.
+  has the last released version, its documentation, and pointers to any
+  additional resources.
 
 SOURCE REPOSITORY
 
-  lbcd is maintained using Git.  You can access the current source on
+  lbcd was maintained using Git.  You can access the current source on
   GitHub at:
 
       https://github.com/rra/lbcd
@@ -164,10 +158,6 @@ SOURCE REPOSITORY
   or view the repository via the web at:
 
       https://git.eyrie.org/?p=system/lbcd.git
-
-  The eyrie.org repository is the canonical one, maintained by the author,
-  but using GitHub is probably more convenient for most purposes.  Pull
-  requests are gratefully reviewed and normally accepted.
 
 LICENSE
 

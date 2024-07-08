@@ -7,7 +7,7 @@
 # output data using the local instance of App::DocKnot.  It should be run from
 # the root of the DocKnot distribution directory.
 #
-# Copyright 2018-2022 Russ Allbery <rra@cpan.org>
+# Copyright 2018-2023 Russ Allbery <rra@cpan.org>
 #
 # SPDX-License-Identifier: MIT
 
@@ -80,8 +80,8 @@ my $navbar = <<'EOD';
 EOD
 my $address = <<'EOD';
 <address>
-    Last <a href="https://www.eyrie.org/~eagle/software/web/">spun</a>
-    %DATE% from thread modified %DATE%
+  Last <a href="https://www.eyrie.org/~eagle/software/docknot/">spun</a>
+  %DATE% from thread modified %DATE%
 </address>
 EOD
 $html =~ s{ (</head>) }{$links$1}xms;

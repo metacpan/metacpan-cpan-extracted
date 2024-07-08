@@ -10,7 +10,7 @@
 # which can be found at <https://www.eyrie.org/~eagle/software/rra-c-util/>.
 #
 # Written by Russ Allbery <eagle@eyrie.org>
-# Copyright 2018-2021 Russ Allbery <eagle@eyrie.org>
+# Copyright 2018-2022 Russ Allbery <eagle@eyrie.org>
 # Copyright 2011-2013
 #     The Board of Trustees of the Leland Stanford Junior University
 #
@@ -42,6 +42,16 @@ verbose  = %f:%l:%c: [%p] %m (%e, Severity: %s)\n
 # group coding style.
 [-CodeLayout::ProhibitParensWithBuiltins]
 
+# This conflicts with Subroutines::ProhibitExplicitReturnUndef and
+# Subroutines::RequireFinalReturn, and I prefer the brevity of the simple
+# return statement.  I don't think the empty list versus undef behavior is
+# that confusing.
+#
+# This should be Community::EmptyReturn, which is the new name of the module,
+# but currently ignores have to use the Freenode::EmptyReturn name instead.
+[-Community::EmptyReturn]
+[-Freenode::EmptyReturn]
+
 # This recommends using given/when, but Perl has marked those as experimental
 # and cautions against using when.
 [-ControlStructures::ProhibitCascadingIfElse]
@@ -63,16 +73,6 @@ allow = unless
 # This problem was fixed in Perl 5.14, which now properly preserves the value
 # of $@ even if destructors run at exit from the eval block.
 [-ErrorHandling::RequireCheckingReturnValueOfEval]
-
-# This conflicts with Subroutines::ProhibitExplicitReturnUndef and
-# Subroutines::RequireFinalReturn, and I prefer the brevity of the simple
-# return statement.  I don't think the empty list versus undef behavior is
-# that confusing.
-#
-# This has been renamed to Community::EmptyReturn, but excluding it by that
-# name produces a warning on systems that only have the older version of the
-# package.  This is handled in t/style/critic.t specially.
-[-Freenode::EmptyReturn]
 
 # The default of 9 is too small and forces weird code contortions.  After some
 # experimentation, I've never found this helpful in driving useful refactors.

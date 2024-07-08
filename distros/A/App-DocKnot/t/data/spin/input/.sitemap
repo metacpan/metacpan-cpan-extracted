@@ -2,6 +2,10 @@
   /software/: Software
     /software/cvslog/: "cvslog"
     /software/docknot/: DocKnot
+      /software/docknot/readme.html: DocKnot README
+      ---
+      /software/docknot/changes.html: DocKnot Changes
+      ---
       /software/docknot/api/app-docknot.html: App::DocKnot
       /software/docknot/api/app-docknot-command.html: App::DocKnot::Command
     /software/rra-c-util/: rra-c-util>

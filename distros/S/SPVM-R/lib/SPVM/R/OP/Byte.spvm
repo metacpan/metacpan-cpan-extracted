@@ -4,50 +4,32 @@
 class R::OP::Byte {
   
   use R::NDArray::Byte;
-  use ByteList;
-  use R::OP;
   
   # Class Methods
-  static static method c : R::NDArray::Byte ($x_data : byte[], $x_dim : int[] = undef) {
+  static method c : R::NDArray::Byte ($data : object of Byte|byte[]|R::NDArray::Byte, $dim : int[] = undef) {
     
-    my $x_ndarray = R::NDArray::Byte->new({dim => $x_dim, data => $x_data});
-    
-    return $x_ndarray;
-  }
-  
-  static method seq : R::NDArray::Byte ($x : byte, $y : byte, $by : byte = 1) {
-    
-    my $ret_data_list = ByteList->new;
-    my $current = $x;
-    while (1) {
-      if ($by >= 0) {
-        if ($current <= $y) {
-          last;
+    if ($data) {
+      if ($data is_type Byte) {
+        $data = [(byte)$data->(Byte)];
+      }
+      elsif ($data is_type byte[]) {
+        # Do nothing
+      }
+      elsif ($data is_type R::NDArray::Byte) {
+        unless ($dim) {
+          $dim = $data->(R::NDArray::Byte)->dim;
         }
+        
+        $data = $data->(R::NDArray::Byte)->data;
       }
       else {
-        if ($current >= $y) {
-          last;
-        }
+        die "The type of the data \data must be Byte, byte[], or R::NDArray::Byte.";
       }
-      $current += $by;
-      $ret_data_list->push($current);
     }
     
-    my $ret_data = $ret_data_list->to_array;
+    my $ndarray = R::NDArray::Byte->new({dim => $dim, data => $data});
     
-    my $ret_ndarray = &c($ret_data);
-    
-    return $ret_ndarray;
-  }
-  
-  static method seq_length : R::NDArray::Byte ($x : byte, $y : byte, $length : int) {
-    
-    my $by = (byte)(($y - $x) / $length);
-    
-    my $ret_ndarray = &seq($x, $y, $by);
-    
-    return $ret_ndarray;
+    return $ndarray;
   }
   
 }

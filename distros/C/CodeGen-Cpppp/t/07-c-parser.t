@@ -7,6 +7,17 @@ use v5.20;
 use CodeGen::Cpppp::CParser;
 
 for (
+   [  'Empty string', '', [] ],
+   [  'Whitespace only', ' ', [] ],
+   [  'Whitespace only 2', "\n \n", [] ],
+   [  'Simple expr', '( 0x40 + 0 )',
+      [ [ '(' => '(', 0, 1 ],
+        [ integer => 64, 2, 4 ],
+        [ '+' => '+', 7, 1 ],
+        [ integer => 0, 9, 1 ],
+        [ ')' => ')', 11, 1 ],
+      ]
+   ],
    [  'For loop',
       'for(int i=0; i<1; i++){}',
       [ [ keyword => 'for', 0, 3 ],
@@ -53,6 +64,14 @@ END
         [ '/'     => '/', D, D ],
       ]
    ],
+   [ 'Minus vs Negative constant', q{ a + -1 -1 },
+      [ [ ident => 'a', D, D ],
+        [ '+' => '+', D, D ],
+        [ integer => -1, D, D ],
+        [ '-' => '-', D, D ],
+        [ integer => 1, D, D ],
+      ]
+   ],
    [ 'Parse errors str', q{"test},
       [ [ string => 'test', 0, 5, D ],
       ]
@@ -71,7 +90,7 @@ END
    my ($name, $code, $expected)= @$_;
    my @tokens;
    @tokens= CodeGen::Cpppp::CParser->tokenize($code);
-   is( \@tokens, $expected, $name );
+   is( \@tokens, $expected, $name )
 }
 
 done_testing;

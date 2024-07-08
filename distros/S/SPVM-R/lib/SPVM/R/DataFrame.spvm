@@ -6,203 +6,212 @@ class R::DataFrame {
   use StringList;
   use List;
   use R::NDArray;
-  use R::DataFrame::Field;
+  use R::DataFrame::Column;
   
   # Fields
-  has fields_list : List of R::DataFrame::Field;
+  has colobjs_list : List of R::DataFrame::Column;
   
-  has fields_h : Hash of R::DataFrame::Field;
+  has colobjs_indexes_h : Hash of Int;
   
   # Class Methods
   static method new : R::DataFrame () {
     
     my $self = new R::DataFrame;
     
-    my $fields_list = List->new(new R::DataFrame::Field[0]);
-    $self->{fields_list} = $fields_list;
+    my $colobjs_list = List->new(new R::DataFrame::Column[0]);
+    $self->{colobjs_list} = $colobjs_list;
     
-    my $fields_h = Hash->new;
-    $self->{fields_h} = $fields_h;
+    my $colobjs_indexes_h = Hash->new;
+    $self->{colobjs_indexes_h} = $colobjs_indexes_h;
     
     return $self;
   }
   
   # Instance Methods
-  method get_fields_length : int () {
+  method colnames : string[] () {
     
-    my $fields_list = $self->{fields_list};
+    my $ncol = $self->ncol;
     
-    my $fields_length = $fields_list->length;
+    my $colnames = new string[$ncol];
     
-    return $fields_length;
-  }
-  
-  method get_field_names : string[] () {
-    
-    my $fields_list = $self->{fields_list};
-    
-    my $fields_length = $fields_list->length;
-    
-    my $field_names = new string[$fields_length];
-    
-    for (my $i = 0; $i < $fields_length; $i++) {
-      $field_names->[$i] = $self->get_field_name($i);
+    for (my $i = 0; $i < $ncol; $i++) {
+      $colnames->[$i] = $self->colname($i);
     }
     
-    return $field_names;
+    return $colnames;
   }
   
-  method exists_field : int ($field_name : string) {
+  method exists_col : int ($colname : string) {
     
-    my $fields_h = $self->{fields_h};
+    my $colobjs_indexes_h = $self->{colobjs_indexes_h};
     
-    my $field = (R::DataFrame::Field)$fields_h->get($field_name);
-    
-    my $exists = 0;
-    if ($field) {
-      $exists = 1;
-    }
+    my $exists = $colobjs_indexes_h->exists($colname);
     
     return $exists;
   }
   
-  method get_field_name : string ($field_index : int) {
+  method colname : string ($col : int) {
     
-    my $fields_list = $self->{fields_list};
+    my $colobjs_list = $self->{colobjs_list};
     
-    unless ($field_index >= 0 && $field_index < $fields_list->length) {
-      die "The field at index $field_index is not found.";
+    unless ($col >= 0 && $col < $colobjs_list->length) {
+      die "The column at index $col is not found.";
     }
     
-    my $field = (R::DataFrame::Field)$fields_list->get($field_index);
+    my $colobj = (R::DataFrame::Column)$colobjs_list->get($col);
     
-    my $field_name = $field->{name};
+    my $colname = $colobj->{name};
     
-    return $field_name;
+    return $colname;
   }
   
-  method get_field_index : int ($field_name : string) {
+  method colindex : int ($colname : string) {
     
-    my $fields_length = $self->get_fields_length;
+    my $ncol = $self->ncol;
     
     my $match = 0;
-    for (my $field_index = 0; $field_index < $fields_length; $field_index++) {
-      my $field_name_cmp = $self->get_field_name($field_index);
+    for (my $col = 0; $col < $ncol; $col++) {
+      my $colname_cmp = $self->colname($col);
       
-      if ($field_name eq $field_name_cmp) {
-        return $field_index;
+      if ($colname eq $colname_cmp) {
+        return $col;
       }
     }
     
-    die "The field specified by the field name \$field_name does not found.";
+    die "The column specified by the column name \"$colname\" does not found.";
   }
   
-  method get_ndarray_by_index : R::NDArray ($field_index : int) {
+  method col_by_index : R::NDArray ($col : int) {
     
-    my $fields_list = $self->{fields_list};
+    my $colobjs_list = $self->{colobjs_list};
     
-    unless ($field_index >= 0 && $field_index < $fields_list->length) {
-      die "The field at index $field_index is not found.";
+    unless ($col >= 0 && $col < $colobjs_list->length) {
+      die "The column at index $col is not found.";
     }
     
-    my $field = (R::DataFrame::Field)$fields_list->get($field_index);
+    my $colobj = (R::DataFrame::Column)$colobjs_list->get($col);
     
-    my $ndarray = $field->{ndarray};
+    my $ndarray = $colobj->{ndarray};
     
     return $ndarray;
   }
   
-  method get_ndarray : R::NDArray ($field_name : string) {
+  method col : R::NDArray ($colname : string) {
     
-    my $fields_h = $self->{fields_h};
-    
-    my $field = (R::DataFrame::Field)$fields_h->get($field_name);
-    
-    unless ($field) {
-      die "The field which name is \"$field_name\" is not found.";
+    unless ($self->exists_col($colname)) {
+      die "The column which name is \"$colname\" is not found.";
     }
     
-    my $ndarray = $field->{ndarray};
+    my $col = $self->colindex($colname);
+    
+    my $ndarray = $self->col_by_index($col);
     
     return $ndarray;
   }
   
-  method push_field : void ($field_name : string, $ndarray : R::NDArray) {
+  method set_col : void ($colname : string, $ndarray : R::NDArray) {
     
-    my $fields_length = $self->get_fields_length;
+    my $exists_col = $self->exists_col($colname);
     
-    $self->insert_field($field_name, $ndarray);
-  }
-  
-  method insert_field : void ($field_name : string, $ndarray : R::NDArray, $before_field_name : string = undef) {
-    
-    $self->check_field($field_name, $ndarray);
-    
-    my $field = new R::DataFrame::Field;
-    $field->{name} = $field_name;
-    $ndarray->make_dim_read_only;
-    $field->{ndarray} = $ndarray;
-    
-    my $field_index = -1;
-    if ($before_field_name) {
-      $field_index = $self->get_field_index($before_field_name);
+    if ($exists_col) {
+      my $col = $self->colindex($colname);
+      
+      my $colobjs_list = $self->{colobjs_list};
+      
+      my $colobj = (R::DataFrame::Column)$colobjs_list->get($col);
+      
+      $colobj->{ndarray} = $ndarray;
+      $ndarray->make_dim_read_only;
     }
     else {
-      $field_index = $self->get_fields_length;
+      $self->insert_col($colname, $ndarray);
     }
-    
-    my $fields_list = $self->{fields_list};
-    
-    $fields_list->insert($field_index, $field);
   }
   
-  method remove_field : void ($field_name : string) {
+  method insert_col : void ($colname : string, $ndarray : R::NDArray, $before_colname : string = undef) {
     
-    my $field_index = $self->get_field_index($field_name);
-    
-    $self->remove_field($field_index);
-  }
-  
-  private method check_field : void ($field_name : string, $ndarray : R::NDArray) {
-    
-    my $fields_h = $self->{fields_h};
-    
-    my $field = $fields_h->get($field_name);
-    
-    if ($field) {
-      die "The field name \$field_name is already used.";
+    unless (length $colname) {
+      die "The column name \$colname must be a non-empty string.";
     }
     
     unless ($ndarray) {
       die "The n-dimension array \$ndarray must be defined.";
     }
     
-    my $fields_length = $self->get_fields_length;
+    my $exists_col = $self->exists_col($colname);
     
-    if ($fields_length != 0) {
-      my $ndarray_length = $ndarray->length;
+    if ($exists_col) {
+      die "The column with the name \$colname already exists.";
+    }
+    
+    if ($self->ncol > 0) {
+      my $nrow = $self->nrow;
       
-      unless ($ndarray_length == $self->get_ndarray_by_index(0)->length) {
-        die "The length of n-dimension array \$ndarray must be the same as the return value of ndarray_length method given the invocant.";
+      unless (R::OP->equals_dim($ndarray, $self->col_by_index(0))) {
+        die "The dimension of the n-dimension array \$ndarray must be equal to the dimension of the n-dimension array which is the invocant.";
       }
+    }
+    
+    my $colobj = new R::DataFrame::Column;
+    $colobj->{name} = $colname;
+    $colobj->{ndarray} = $ndarray;
+    $ndarray->make_dim_read_only;
+    
+    my $col = -1;
+    if ($before_colname) {
+      $col = $self->colindex($before_colname);
+    }
+    else {
+      $col = $self->ncol;
+    }
+    
+    my $colobjs_list = $self->{colobjs_list};
+    
+    $colobjs_list->insert($col, $colobj);
+    
+    $self->update_colobjs_indexes_h($col);
+  }
+  
+  private method update_colobjs_indexes_h : void ($begin_col : int) {
+    
+    my $colobjs_list = $self->{colobjs_list};
+    
+    my $colobjs_indexes_h = $self->{colobjs_indexes_h};
+    for (my $i = $begin_col; $i < $colobjs_list->length; $i++) {
+      my $colobj = (R::DataFrame::Column)$colobjs_list->get($i);
+      my $colname = $colobj->{name};
+      $colobjs_indexes_h->set($colname, $i);
     }
   }
   
-  method slice : R::DataFrame ($field_names : string[], $vector_indexes : R::NDArray::Int[]) {
+  method remove_col : void ($colname : string) {
     
-    my $fields_length = $self->get_fields_length;
+    my $col = $self->colindex($colname);
     
-    my $fields_h = $self->{fields_h};
+    my $colobjs_list = $self->{colobjs_list};
+    
+    $colobjs_list->remove($col);
+    
+    my $colobjs_indexes_h = $self->{colobjs_indexes_h};
+    
+    $colobjs_indexes_h->delete($colname);
+    
+    $self->update_colobjs_indexes_h($col);
+  }
+  
+  method slice : R::DataFrame ($colnames : string[], $vector_indexes : R::NDArray::Int[]) {
+    
+    my $ncol = $self->ncol;
+    
+    my $colobjs_indexes_h = $self->{colobjs_indexes_h};
     
     my $ret_data_frame = R::DataFrame->new;
-    for my $field_name (@$field_names) {
-      my $field = (R::DataFrame::Field)$fields_h->get($field_name);
-      
-      my $ndarray = $field->{ndarray};
+    for my $colname (@$colnames) {
+      my $ndarray = $self->col($colname);
       
       my $ret_ndarray = $ndarray->slice($vector_indexes);
       
-      $ret_data_frame->push_field($field_name, $ndarray);
+      $ret_data_frame->insert_col($colname, $ret_ndarray);
     }
     
     return $ret_data_frame;
@@ -210,29 +219,69 @@ class R::DataFrame {
   
   method to_string : string () {
     
-    my $fields_length = $self->get_fields_length;
+    my $ncol = $self->ncol;
     
     my $string_buffer = StringBuffer->new;
-    for (my $field_index = 0; $field_index < $fields_length; $field_index++) {
+    
+    if ($ncol == 0) {
+      $string_buffer->push("Empty");
+    }
+    else {
+      my $first_ndarray = $self->col_by_index(0);
       
-      my $field_name = $self->get_field_name($field_index);
+      my $first_dim = $first_ndarray->dim;
       
-      my $ndarray = $self->get_ndarray($field_index);
+      my $first_dim_length = @$first_dim;
       
-      $string_buffer->push("[[");
-      
-      if ($field_name) {
-        $string_buffer->push($field_name);
+      if ($first_dim_length <= 1) {
+        for (my $col = 0; $col < $ncol; $col++) {
+          my $colname = $self->colname($col);
+          
+          $string_buffer->push("$colname");
+          
+          unless ($col == $ncol - 1) {
+            $string_buffer->push("\t");
+          }
+        }
+        
+        $string_buffer->push("\n");
+            
+        my $nrow = $self->nrow;
+        
+        for (my $row = 0; $row < $nrow; $row++) {
+          for (my $col = 0; $col < $ncol; $col++) {
+            my $ndarray = $self->col_by_index($col);
+            
+            my $elem_string = $ndarray->elem_to_string($row);
+            $string_buffer->push($elem_string);
+            
+            unless ($col == $ncol - 1) {
+              $string_buffer->push("\t");
+            }
+          }
+          $string_buffer->push("\n");
+        }
       }
       else {
-        $string_buffer->push($field_index);
+        for (my $col = 0; $col < $ncol; $col++) {
+          
+          my $colname = $self->colname($col);
+          
+          my $ndarray = $self->col_by_index($col);
+          
+          my $dim = $ndarray->dim;
+          
+          my $dim_length = @$dim;
+          
+          $string_buffer->push("$colname\n");
+          
+          my $ndarray_string = $ndarray->to_string;
+          
+          $string_buffer->push($ndarray_string);
+          
+          $string_buffer->push("\n\n");
+        }
       }
-      
-      $string_buffer->push("]]\n");
-      
-      my $ndarray_string = $ndarray->to_string;
-      
-      $string_buffer->push($ndarray_string);
     }
     
     my $string = $string_buffer->to_string;
@@ -242,32 +291,28 @@ class R::DataFrame {
   
   method set_order : void ($indexes_ndarray : R::NDArray::Int) {
     
-    my $fields_length = $self->get_fields_length;
+    my $ncol = $self->ncol;
     
-    for (my $field_index = 0; $field_index < $fields_length; $field_index++) {
-      my $ndarray = $self->get_ndarray($field_index);
+    for (my $col = 0; $col < $ncol; $col++) {
+      my $ndarray = $self->col_by_index($col);
       
       $ndarray->set_order($indexes_ndarray);
     }
   }
   
-  method clone : R::DataFrame ($deep : int = 0) {
+  method clone : R::DataFrame ($elem_shallow_clone : int = 0) {
     
-    my $fields_length = $self->get_fields_length;
+    my $ncol = $self->ncol;
     
-    my $fields_h = $self->{fields_h};
-    
-    my $field_names = $self->get_field_names;
+    my $colnames = $self->colnames;
     
     my $ret_data_frame = R::DataFrame->new;
-    for my $field_name (@$field_names) {
-      my $field = (R::DataFrame::Field)$fields_h->get($field_name);
+    for my $colname (@$colnames) {
+      my $ndarray = $self->col($colname);
       
-      my $ndarray = $field->{ndarray};
+      my $ret_ndarray = $ndarray->clone($elem_shallow_clone);
       
-      my $ret_ndarray = $ndarray->clone($deep);
-      
-      $ret_data_frame->push_field($field_name, $ndarray);
+      $ret_data_frame->insert_col($colname, $ndarray);
     }
     
     return $ret_data_frame;
@@ -275,18 +320,20 @@ class R::DataFrame {
   
   method ncol : int () {
     
-    my $ncol = $self->get_fields_length;
+    my $colobjs_list = $self->{colobjs_list};
+    
+    my $ncol = $colobjs_list->length;
     
     return $ncol;
   }
   
   method nrow : int () {
     
-    my $fields_length = $self->get_fields_length;
+    my $ncol = $self->ncol;
     
     my $nrow = 0;
-    if ($fields_length > 0) {
-      $nrow = $self->get_ndarray_by_index(0)->length;
+    if ($ncol > 0) {
+      $nrow = $self->col_by_index(0)->length;
     }
     
     return $nrow;

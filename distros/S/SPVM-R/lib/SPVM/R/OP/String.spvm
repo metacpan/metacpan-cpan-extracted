@@ -4,19 +4,32 @@
 class R::OP::String {
   
   use R::NDArray::String;
-  use R::NDArray::StringBuffer;
-  use R::NDArray::Time::Piece;
-  use Time::Piece;
-  use R::OP;
-  use R::OP::StringBuffer;
-  use R::OP::Time::Piece;
   
   # Class Methods
-  static method c : R::NDArray::String ($x_data : string[], $x_dim : int[] = undef) {
+  static method c : R::NDArray::String ($data : object of string|string[]|R::NDArray::String, $dim : int[] = undef) {
     
-    my $x_ndarray = R::NDArray::String->new({dim => $x_dim, data => $x_data});
+    if ($data) {
+      if ($data is_type string) {
+        $data = [(string)$data];
+      }
+      elsif ($data is_type string[]) {
+        # Do nothing
+      }
+      elsif ($data is_type R::NDArray::String) {
+        unless ($dim) {
+          $dim = $data->(R::NDArray::String)->dim;
+        }
+        
+        $data = $data->(R::NDArray::String)->data;
+      }
+      else {
+        die "The type of the data \data must be string, string[], or R::NDArray::String.";
+      }
+    }
     
-    return $x_ndarray;
+    my $ndarray = R::NDArray::String->new({dim => $dim, data => $data});
+    
+    return $ndarray;
   }
   
 }

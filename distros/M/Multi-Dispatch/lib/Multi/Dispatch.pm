@@ -7,7 +7,7 @@ use re 'eval';
 use mro;
 use Data::Dump;
 
-our $VERSION = '0.000004';
+our $VERSION = '0.000005';
 
 use Keyword::Simple;
 use PPR;
@@ -582,7 +582,7 @@ sub gen_handler_for {
 
             # Construct the code that detects and allows for the possibility of Object::Pad roles...
             my $add_role_variants = $keyword eq 'multimethod' && exists $INC{'Object/Pad.pm'}
-                ? qq{map {\@{\$Multi::Dispatch::impl{$name}{\$_->name}}} eval {use Object::Pad::MOP::Class ':experimental(mop)'; Object::Pad::MOP::Class->for_class(__PACKAGE__())->direct_roles() }}
+                ? qq{map {\@{\$Multi::Dispatch::impl{$name}{\$_->name}//[]}} eval {use Object::Pad::MOP::Class ':experimental(mop)'; Object::Pad::MOP::Class->for_class(__PACKAGE__())->direct_roles() }}
                 : q{};
 
             # Implement this as a sub or a method???
@@ -699,7 +699,7 @@ sub gen_handler_for {
                 if (\$redefining) {
                     no warnings 'redefine';
                     my \$impl = $declarator $common {
-                                my \@variants = \@{\$Multi::Dispatch::impl{'$name'}{$target_package}};
+                                my \@variants = \@{\$Multi::Dispatch::impl{'$name'}{$target_package}//[]};
                                 $dispatcher_code;
                              };
                     *$target_name = \$impl;
@@ -1510,7 +1510,7 @@ Multi::Dispatch - Multiple dispatch for Perl subs and methods
 
 =head1  VERSION
 
-This document describes Multi::Dispatch version 0.000004
+This document describes Multi::Dispatch version 0.000005
 
 
 =head1  SYNOPSIS
@@ -4320,8 +4320,27 @@ and handles correctly.
 
 =head1  LIMITATIONS
 
-Multimethod variants cannot at present be composed in from an Object::Pad C<role>.
-There is currently no satisfactory workaround for this.
+Multimethod variants cannot at present be successfully composed in
+from an Object::Pad C<role>.
+
+The problem seems to stem from the fact that both Object::Pad and
+Multi::Dispatch are competing to parse the source code and extract their
+keywords in the same compiler pass. So, even though Multi::Dispatch does set up
+an Object::Pad method corresponding to each Multi::Dispatch multimethod that is
+declared within a given role, Object::Pad does not add that method into any
+subsequent classes that compose the role.
+
+Note that, if the class that is composing the role also declares its own variant
+of the same-named multimethod (even if that variant takes different arguments),
+then Multi::Dispatch B<can> detect the variants from the previous role composition
+and B<does> correctly compose them into the class's multimethod of the same name.
+
+So you can reliably overcome the problem with the (admittedly unsatisfactory) workaround
+of explicitly declaring an explicit "do-nothing" variant in the composing class:
+
+    class C :does(R) {
+        multimethod foo () { goto &next::variant }
+    }
 
 
 =head1  BUGS

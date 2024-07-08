@@ -1,10 +1,28 @@
 # -*- conf -*-
+#
+# Files to ignore when generating a Perl module manifest.
+#
+# The canonical version of this file is maintained in the rra-c-util package,
+# which can be found at <https://www.eyrie.org/~eagle/software/rra-c-util/>.
+#
+# Copyright 2018, 2022 Russ Allbery <eagle@eyrie.org>
+#
+# Copying and distribution of this file, with or without modification, are
+# permitted in any medium without royalty provided the copyright notice and
+# this notice are preserved.  This file is offered as-is, without any
+# warranty.
+#
+# SPDX-License-Identifier: FSFAP
 
 # Avoid version control files.
 ^\.git/
 
 # Avoid generated build files.
 \bblib/
+
+# Avoid ExtUtils::MakeMaker generated files.
+\bMakefile$
+\bpm_to_blib$
 
 # Avoid Module::Build generated and utility files.
 \bBuild$
@@ -34,8 +52,17 @@
 \bcover_db\b
 \bcovered\b
 
-# Avoid MYMETA files
-^MYMETA\.
-
 # Avoid archives of this distribution
-\bdocknot-[\d\.\_]+
+\b[\w-]+-[\d\.\_]+\.tar\..z$
+\b[\w-]+-[\d\.\_]+\.zip$
+
+# MYMETA.json and MYMETA.yml are intentionally not ignored because otherwise
+# Test::Kwalitee fails (https://rt.cpan.org/Ticket/Display.html?id=143514).
+# They will be added back in by Module::Build during ./Build manifest, and
+# have to (unfortunately) be removed by hand.
+#
+# This is not entirely correct, since they should indeed be ignored when
+# creating the distribution, but it happens to work for me.  See the bug for
+# more details.
+^MYMETA\.yml$
+^MYMETA\.json$

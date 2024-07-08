@@ -3,7 +3,7 @@ use strict;
 
 package RT::Extension::FormTools;
 
-our $VERSION = '1.08';
+our $VERSION = '1.09';
 
 RT->AddStyleSheets('rt-extension-formtools.css');
 RT->AddJavaScript('rt-extension-formtools.js');
@@ -107,7 +107,7 @@ sub _ParseContent {
 
 =head1 NAME
 
-RT-Extension-FormTools - Create multi-page ticket creation wizards for RT
+RT::Extension::FormTools - Create multi-page ticket creation wizards for RT
 
 =head1 DESCRIPTION
 
@@ -119,7 +119,7 @@ information and create a ticket.
 
 =head1 RT VERSION
 
-Works with RT 5.
+Works with RT 5.0.5 and newer.
 
 =head1 INSTALLATION
 

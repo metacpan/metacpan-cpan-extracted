@@ -24,13 +24,42 @@ class R::OP::FloatComplex {
   use Math;
   
   # Class Methods
-  static method c : R::NDArray::FloatComplex ($x_data : Complex_2f[], $x_dim : int[] = undef) {
+  static method c : R::NDArray::FloatComplex ($data : object of float[]|Complex_2f[]|R::NDArray::FloatComplex, $dim : int[] = undef) {
     
-    my $x_ndarray = R::NDArray::FloatComplex->new({dim => $x_dim, data => $x_data});
+    if ($data) {
+      if ($data is_type float[]) {
+        my $pairs = (float[])$data;
+        
+        my $pairs_length = @$pairs;
+        
+        unless ($pairs_length % 2 == 0) {
+          die "The pairs \$data must be devided by even number.";
+        }
+        
+        my $length = $pairs_length / 2;
+        
+        $data = new Complex_2f[$length];
+        
+        Fn->memcpy($data, 0, $pairs, 0, 4 * 2 * $length);
+      }
+      elsif ($data is_type Complex_2f[]) {
+        # Do nothing
+      }
+      elsif ($data is_type R::NDArray::FloatComplex) {
+        unless ($dim) {
+          $dim = $data->(R::NDArray::FloatComplex)->dim;
+        }
+        $data = $data->(R::NDArray::FloatComplex)->data;
+      }
+      else {
+        die "The type of the data \data must be Complex_2f[] or R::NDArray::FloatComplex.";
+      }
+    }
     
-    return $x_ndarray;
+    my $ndarray = R::NDArray::FloatComplex->new({dim => $dim, data => $data});
+    
+    return $ndarray;
   }
-  
   
   static method add : R::NDArray::FloatComplex ($x_ndarray : R::NDArray::FloatComplex, $y_ndarray : R::NDArray::FloatComplex) {
     
@@ -821,36 +850,13 @@ class R::OP::FloatComplex {
     return $ret_ndarray;
   }
   
-  static method complex : R::NDArray::FloatComplex ($pairs : float[]) {
-    
-    unless ($pairs) {
-      die "The pairs \$pairs must be defined.";
-    }
-    
-    my $pairs_length = @$pairs;
-    
-    unless ($pairs_length % 2 == 0) {
-      die "The length of the pairs \$pairs must be even number.";
-    }
-    
-    my $length = $pairs_length / 2;
-    
-    my $ret_ndarray = &c(undef, [$length]);
-    my $ret_data = $ret_ndarray->data;
-    
-    for (my $i = 0; $i < $pairs_length; $i += 2) {
-      $ret_data->[$i]{re} = $pairs->[$i];
-      $ret_data->[$i]{im} = $pairs->[$i + 1];
-    }
-    
-    return $ret_ndarray;
-  }
-  
   static method i : R::NDArray::FloatComplex () {
     
-    my $i = &complex([0f,1f]);
+    my $x = Math->complexf(0f, 1f);
     
-    return $i;
+    my $ret_ndarray = &c([$x]);
+    
+    return $ret_ndarray;
   }
   
 }

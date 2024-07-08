@@ -1,5 +1,5 @@
 NAME
-    RT-Extension-FormTools - Create multi-page ticket creation wizards for
+    RT::Extension::FormTools - Create multi-page ticket creation wizards for
     RT
 
 DESCRIPTION
@@ -8,7 +8,7 @@ DESCRIPTION
     and create a ticket.
 
 RT VERSION
-    Works with RT 5.
+    Works with RT 5.0.5 and newer.
 
 INSTALLATION
     perl Makefile.PL

@@ -19,7 +19,7 @@ use Test::More tests => 2;
 # not entirely correct because line tracking is very complicated and still not
 # entirely correct.
 my $EXPECTED_ERRORS = <<'ERRORS';
-errors.th:1: cannot find argument 2: Did not find opening bracket after prefix: "\s*", detected at offset 2
+errors.th:1: cannot find argument 2: Did not find opening bracket after prefix: <PREFIX>, detected at offset 2
 errors.th:3: invalid macro placeholder \2 (greater than 1)
 errors.th:5: invalid macro argument count for \badcount
 errors.th:9: unknown variable \=UNKNOWN
@@ -40,7 +40,9 @@ my ($stdout, $stderr) = capture {
     $spin->spin_thread_file($input);
 };
 
-# Simplify the file name, and then check against the expected output.
+# Simplify the file name and search prefix, and then check against the
+# expected output.
 $stderr =~ s{ ^ [^:]+/errors[.]th: }{errors.th:}xmsg;
 $stderr =~ s{ (cannot [ ] stat [ ] file [ ]) /[^:]+/([^/:]+) : .* }{$1$2\n}xms;
+$stderr =~ s{ (prefix: [ ]) \"[^\"]+\", }{$1<PREFIX>,}xms;
 is($stderr, $EXPECTED_ERRORS, 'errors are correct');

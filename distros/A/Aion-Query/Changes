@@ -1,5 +1,13 @@
 Revision history for Perl extension Aion::Query
 
+0.0.6 2024-07-07T12:38:14Z
+
+    - query_attach add empty array to attach row if not exists result to it
+
+0.0.5 2024-07-07T12:32:27Z
+
+    - query_attach returns array or array_ref with it query results
+
 0.0.4 2024-07-06T17:18:44Z
 
     - add subroutine query_attach

@@ -9,7 +9,7 @@
 # Modules and declarations
 ##############################################################################
 
-package App::DocKnot::Util 7.01;
+package App::DocKnot::Util v8.0.0;
 
 use 5.024;
 use autodie;
@@ -57,24 +57,25 @@ sub latest_tarball {
 
     # Collect the list of matching files and extract their version numbers.
     return if !$path->is_dir();
-    my $regex = qr{ \A \Q$tarname\E - ([\d.]+) [.] }xms;
+    my $regex = qr{ \A \Q$tarname\E - (v?[\d.]+) [.] }xms;
     my @files = map { $_->basename() } $path->children($regex);
     my @versions = map { m{ $regex }xms ? [$1, $_] : () } @files;
     return if !@versions;
 
     # Find the latest version and filter the list of files down to only that
-    # version.
+    # version.  This will sort versions starting with v later than any version
+    # that doesn't start with v.  This is fine for my purposes right now,
+    # since the conversion of Perl modules to semantic versions starting with
+    # v is one-way, but is not generally correct.
     @versions = reverse(sort { versioncmp($a->[0], $b->[0]) } @versions);
     my $latest = $versions[0][0];
     @files = map { $_->[1] } grep { $_->[0] eq $latest } @versions;
 
     # Return the results.
-    #<<<
     return {
         version => $latest,
         files   => \@files,
     };
-    #<<<
 }
 
 # print with error checking.  autodie unfortunately can't help us because
@@ -202,7 +203,7 @@ Russ Allbery <rra@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright 1999-2011, 2013, 2021-2022 Russ Allbery <rra@cpan.org>
+Copyright 1999-2011, 2013, 2021-2022, 2024 Russ Allbery <rra@cpan.org>
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal

@@ -1,5 +1,5 @@
 ---
-abstract: 'RT-Extension-FormTools Extension'
+abstract: 'Create multi-page ticket creation wizards for RT'
 author:
   - 'Best Practical Solutions, LLC'
 build_requires:
@@ -19,12 +19,13 @@ no_index:
     - etc
     - html
     - inc
+    - po
     - static
 requires:
   perl: 5.10.1
 resources:
   license: http://opensource.org/licenses/gpl-license.php
   repository: https://github.com/bestpractical/rt-extension-formtools
-version: '1.08'
+version: '1.09'
 x_module_install_rtx_version: '0.43'
-x_requires_rt: 5.0.0
+x_requires_rt: 5.0.5

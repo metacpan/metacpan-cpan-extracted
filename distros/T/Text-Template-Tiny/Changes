@@ -1,5 +1,9 @@
 Revision history for Text-Template-Tiny
 
+1.000.1	2024-07-08
+
+	Fix test for perls compiled without taint support.
+	
 1.000	2024-07-06
 
 	Add nested keys.

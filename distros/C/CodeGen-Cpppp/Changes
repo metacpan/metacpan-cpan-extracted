@@ -1,3 +1,19 @@
+0.004 - 2024-07-07
+  - New ::Enum for building optimal C switch statements for name-to-number
+     lookups of an enum.
+  - New available ::Template exports 'format_commandline', 'format_timestamp'
+  - POD is suppressed from output by default, now.
+    (Breaks back-compat)
+  - Friendly message to user if reading template from tty
+  - New "action" commandline options allow sequence of operations
+     on command line: --eval, --call, --out
+  - commandline option --out now handles syntax of --section-out,
+     and --section-out is kept as a back-compat alias.
+    (Breaks back-compat, slightly)
+  - Passing undef to Cpppp->get_filtered_output is now the same as
+     an empty list (meaning all output)
+  - Lots of bug fixes in parsing and rendering.
+
 0.003 - 2023-11-08
   - Ability to define Template as perl package with code in __DATA__
   - New utility ::CParser

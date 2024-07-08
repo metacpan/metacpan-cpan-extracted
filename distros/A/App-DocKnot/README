@@ -1,8 +1,8 @@
-                               DocKnot 7.01
+                              DocKnot v8.0.0
               (Static web site and documentation generator)
                 Maintained by Russ Allbery <rra@cpan.org>
 
-  Copyright 1999-2022 Russ Allbery <rra@cpan.org>.  This software is
+  Copyright 1999-2024 Russ Allbery <rra@cpan.org>.  This software is
   distributed under a BSD-style license.  Please see the section LICENSE
   below for more information.
 
@@ -61,7 +61,7 @@ REQUIREMENTS
   * IO::Uncompress::Gunzip (part of IO-Compress)
   * IPC::Run
   * IPC::System::Simple
-  * JSON::MaybeXS
+  * JSON::MaybeXS 1.004000 or later
   * Kwalify
   * List::SomeUtils 0.07 or later
   * Path::Iterator::Rule
@@ -132,9 +132,9 @@ SUPPORT
 
       https://github.com/rra/docknot/issues
 
-  However, please be aware that I tend to be extremely busy and work
-  projects often take priority.  I'll save your report and get to it as
-  soon as I can, but it may take me a couple of months.
+  Please be aware that I tend to be extremely busy and work projects often
+  take priority.  I'll save your report and get to it as soon as I can,
+  but it may take me a couple of months.
 
 SOURCE REPOSITORY
 
@@ -160,7 +160,7 @@ LICENSE
   The DocKnot package as a whole is covered by the following copyright
   statement and license:
 
-    Copyright 1999-2022 Russ Allbery <rra@cpan.org>
+    Copyright 1999-2024 Russ Allbery <rra@cpan.org>
 
     Permission is hereby granted, free of charge, to any person obtaining
     a copy of this software and associated documentation files (the

@@ -17,7 +17,7 @@ isa_ok($app, 'App::MergeCal');
 
 can_ok($app, qw[run gather render]);
 
-is(@{ $app->calendars }, 2, 'Correct number of calendars');
+is($app->calendars->@*, 2, 'Correct number of calendars');
 is($app->title, 'Test', 'Correct title');
 
 done_testing;

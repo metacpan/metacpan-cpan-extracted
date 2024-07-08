@@ -1,27 +1,56 @@
 #! /usr/bin/env perl
 # PODNAME: cpppp
-our $VERSION = '0.003'; # VERSION
+our $VERSION = '0.004'; # VERSION
 # ABSTRACT: Command line tool to process cpppp templates
 use v5.20;
 use warnings;
+use FindBin;
 use experimental 'signatures';
 use CodeGen::Cpppp;
 use autouse 'Pod::Usage' => 'pod2usage';
 use Getopt::Long;
 
 
+our @original_argv= @ARGV;
+our @script;
 my %param;
-GetOptions(
-   '--param|p=s'             => sub { set_param(split /=/, $_[1], 2) },
-   '--features=s'            => sub { set_feature($_) for split ',', $_[1] },
-   '--dump-pl'               => \my $opt_dump_pl,
-   '--out|o=s'               => \(my $opt_out= '-'),
-   '--section-out=s'         => \my @opt_section_out,
-   '--list-sections'         => \my $opt_list_sections,
-   '--convert-linecomment-to-c89' => \my $convert_linecomment_to_c89,
-   '--help'                  => sub { pod2usage(1) },
-   '--version'               => sub { say CodeGen::Cpppp->VERSION; exit 0 },
-) or pod2usage(2);
+our %option_spec= (
+   'param|p=s'             => sub { set_param(split /=/, $_[1], 2) },
+   'features=s'            => sub { set_feature($_) for split ',', $_[1] },
+   'dump-pl'               => \my $opt_dump_pl,
+   'list-sections'         => \my $opt_list_sections,
+   'convert-linecomment-to-c89' => \my $convert_linecomment_to_c89,
+   'call=s'                => sub { push @script, [ 'call_method', $_[1] ] },
+   'eval=s'                => sub { push @script, [ 'do_eval', $_[1] ] },
+   'out|section-out|o=s'   => sub { push @script, [ 'output', $_[1] ] },
+   '<>'                    => sub { push @script, [ 'process_tpl', $_[0] ] },
+   'help'                  => sub { pod2usage(1) },
+   'version'               => sub { say CodeGen::Cpppp->VERSION; exit 0 },
+);
+GetOptions(%option_spec) or pod2usage(2);
+
+# If no 'process_tpl' item exists, create one from STDIN.
+unless (grep $_->[0] eq 'process_tpl', @script) {
+   unshift @script, [ 'process_tpl', \*STDIN, 'stdin' ];
+   # warn unsuspecting users
+   STDERR->print("(reading template from stdin)\n")
+      if -t STDIN && -t STDERR;
+}
+# 'process_tpl' needs to happen before any other action in the @script
+# but the user may have specified the file name last.
+if ($script[0][0] ne 'process_tpl') {
+   my $i= 0;
+   ++$i while $script[$i][0] ne 'process_tpl';
+   unshift @script, splice(@script, $i, 1);
+}
+# --list-sections suppresses output
+if ($opt_list_sections) {
+   @script= grep $_->[0] ne 'output', @script;
+}
+elsif (!grep $_->[0] eq 'output') {
+   # If there was no 'out' specified, add one to STDOUT
+   push @script, [ 'output', '-' ];
+}
 
 sub set_param($var, $value) {
    $var =~ /^( [\$\@\%]? ) [\w_]+ $/x
@@ -56,25 +85,46 @@ my $cpppp= CodeGen::Cpppp->new(
    convert_linecomment_to_c89 => $convert_linecomment_to_c89,
 );
 
-sub dump_template_perl(@input_args) {
-   my $parse= $cpppp->parse_cpppp(@input_args);
-   my $code= $cpppp->_gen_perl_template_package($parse, with_data => 1);
-   my $sec= $input_args[1] // $input_args[0];
-   $cpppp->output->declare_section($sec);
-   $cpppp->output->append($sec, $code)
+my $tpl;
+sub process_tpl(@input_args) {
+   if ($opt_dump_pl) {
+      my $parse= $cpppp->parse_cpppp(@input_args);
+      my $code= $cpppp->_gen_perl_template_package($parse, with_data => 1);
+      my $sec= $input_args[1] // $input_args[0];
+      $cpppp->output->declare_sections($sec);
+      $cpppp->output->append($sec, $code)
+   } else {
+      my $tpl_class= $cpppp->compile_cpppp(@input_args);
+      my $tpl_params= $tpl_class->coerce_parameters(\%param);
+      $tpl= $cpppp->new_template($tpl_class, $tpl_params);
+   }
 }
 
-sub render(@input_args) {
-   my $tpl_class= $cpppp->compile_cpppp(@input_args);
-   my $tpl_params= $tpl_class->coerce_parameters(\%param);
-   $cpppp->new_template($tpl_class, $tpl_params)->flush;
+sub do_eval($code) {
+   eval $code or die "Eval '$code' failed: $@\n";
 }
 
-my $action= $opt_dump_pl? \&dump_template_perl : \&render;
-if (@ARGV) {
-   $action->($_) for @ARGV;
-} else {
-   $action->(\*STDIN, 'stdin');
+sub call_method($code) {
+   defined $tpl or die "No template is defined, for --call";
+   do_eval("\$tpl->$code");
+}
+
+sub output($spec) {
+   my ($filespec, $sections)= reverse split /=/, $spec, 2;
+   if ($filespec eq '-' || !length $filespec) {
+      print $cpppp->get_filtered_output($sections);
+   } else {
+      $cpppp->write_sections_to_file($sections, split('@', $filespec, 2));
+   }
+   $cpppp->output->consume(defined $sections? ($sections) : ());
+}
+
+# All the global options are taken care of.  Now execute the "script options"
+# in the order they were given.
+for (@script) {
+   my ($method, @args)= @$_;
+   $method= main->can($method) or die 'bug';
+   $method->(@args);
 }
 
 if ($opt_list_sections) {
@@ -86,23 +136,43 @@ if ($opt_list_sections) {
    exit 0;
 }
 
-sub print_sections($slist, $filespec) {
-   if ($filespec eq '-' || !length $filespec) {
-      print $cpppp->output->get($slist);
-   } else {
-      $cpppp->write_sections_to_file($slist, split('@', $filespec, 2));
+# This utility function returns a string which could be passed to the
+# shell to re-run the current command.
+sub format_commandline {
+   # Make a map of which options have arguments
+   my %have_arg;
+   for (keys %option_spec) {
+      /^([^=]+)=/ or next;
+      $have_arg{$_}= 1 for split '|', $1;
    }
+   my @lines;
+   for (@original_argv) {
+      my $escaped= shellquote($_);
+      if (@lines && $lines[-1] =~ /^-+(.*)/ && $have_arg{$1}) {
+         $lines[-1] .= ' ' . $escaped;
+      } else {
+         push @lines, $escaped;
+      }
+   }
+   return $0 . ' ' . join(" \\\n      ", @lines);
 }
 
-my %seen;
-for (@opt_section_out) {
-   my ($sections, $file)= split '=', $_, 2;
-   my @s= $cpppp->output->expand_section_selector($sections);
-   $seen{$_}++ for @s;
-   print_sections(\@s, $file) if @s;
+# could use String::ShellQuote, but aiming for fewer deps
+sub shellquote {
+   return "''" unless length $_[0];
+   return $_[0] unless $_[0] =~ m|[^-\w!%+,./:@^]|;
+   (my $x= $_[0]) =~ s/'/'\\''/g;
+   $x= "'$x'";
+   $x =~ s/^''//;
+   $x =~ s/''$//;
+   $x;
 }
-my @remaining= grep !$seen{$_}, $cpppp->output->section_list;
-print_sections(\@remaining, $opt_out) if @remaining;
+
+# Lets a template main::re_exec(@different_args)
+sub re_exec(@new_argv) {
+   exec($^X, "$FindBin::RealBin/$FindBin::RealScript", @new_argv)
+      or die "exec: $!";
+}
 
 __END__
 
@@ -116,15 +186,17 @@ cpppp - Command line tool to process cpppp templates
 
 =head1 USAGE
 
-  cpppp [OPTIONS] [TEMPLATE_FILES] > file.c
-  cpppp [OPTIONS] [TEMPLATE_FILES] --list-sections
+  cpppp [OPTIONS] [TEMPLATE_FILE ACTIONS...]... > file.c
+  cpppp [OPTIONS] [TEMPLATE_FILE ACTIONS...]... --list-sections
   cpppp --version
   
   Common Options:  (see --help for more)
     -p --param NAME=VALUE
        --features ENABLE1,ENABLE2,DISABLE=0
-    -o --out FILE[@MARK]
-       --section-out SEC_LIST=FILE[@MARK]
+  Common Actions:
+    --call 'TEMPLATE_METHOD(...)'
+    --eval 'PERL CODE'
+    -o --out [SECTION_LIST=]FILENAME[@MARK]
 
 Transform perl+C source into C.  See --help for a list of options.
 
@@ -134,9 +206,9 @@ Warning: this evaluates arbitrary perl from the template files.
 
 =over
 
-=item C<-p>
+=item -p
 
-=item C<--param NAME=VALUE>
+=item --param NAME=VALUE
 
 Specify a parameter to the template.  If NAME includes the Perl sigil, the
 value will be evaluated as a perl expression.  If NAME lacks a sigil, the VALUE
@@ -149,7 +221,7 @@ will be parsed with a more convenient syntax:
   cpppp -p '%typemap={int => "int32",float => "double"}'
   cpppp -p typemap=int=int32,float=double
 
-=item C<--features LIST>
+=item --features LIST
 
 This is a shorthand to specify lots of --param options for parameters whose
 names start with "feature_".  The bare name is equivalent to "=1", which would
@@ -159,40 +231,54 @@ generally enable some feature.
   cpppp -p feature_debug=1 -p feature_assert=1 -p feature_comments=0
   cpppp --features 'debug,assert,comments=0'
 
-=item C<-o>
-
-=item C<--out FILENAME>
-
-Write output to FILENAME instead of C<stdout> (unless FILENAME is "-" then do
-still write C<stdout> )  A backup of FILENAME will be created if it exists.
-
-FILENAME may contain a '@marker' suffix.  In this case, the content will be
-written within the existing content of file file between lines that match
-C<< BEGIN marker >> and C<< END marker >>.  If those lines are not found, the
-operations aborts.
-
-=item C<--section-out SECTION=FILENAME>
-
-This option diverts the contents of the named output section to a different
-FILENAME than the C<-o> option.  (the FILENAME may also contain an '@' marker)
-
-The SECTION is either the name of one section, or a comma-delimited list of
-section names, or a range C<A..B> of section names.
-All sections diverted to this FILENAME will be omitted from the regular output.
-
-=item C<--list-sections>
-
-List the sections of output (in order they would be written) and exit without
-writing any files.  The output is TSV.  More columns may be added in the future.
-
-=item C<--convert-linecomment-to-c89>
+=item --convert-linecomment-to-c89
 
 Convert all '//' comments to '/*' comments.
 
-=item C<--dump-pl>
+=item --dump-pl
 
 Output the generated perl sourcecode for the top-level perl script and don't
 execute it.
+
+=back
+
+The following "action" options are processed sequentially, like a script,
+acting on the first template filename to the left of the action on the command
+line, or the first filename overall if an action option appears first.
+
+=over
+
+=item --eval 'PERL CODE'
+
+After loading the template, evaluate a string of perl code.  The template
+object is named C<$tpl> and the Cpppp object is C<$cpppp>.
+
+=item --call 'METHOD(...)'
+
+Shortcut for C<--eval> to call a method of C<$tpl>.
+
+=item -o
+
+=item --out [SECTION=]FILENAME[@MARKER]
+
+Write output to FILENAME instead of C<stdout> (unless FILENAME is "-" then do
+still write C<stdout> )  If FILENAME already exists, a backup will be created,
+unless you specified a @MARKER.
+
+If a @MARKER is specified, the content will be written within the existing
+content of the file (without a backup) between lines that match
+C<< BEGIN marker >> and C<< END marker >>.  If those lines are not found, the
+operations aborts.
+
+An equal sign indicates that only specific sections should be sent to this file.
+The SECTION is either the name of one section, or a comma-delimited list of
+section names, or a range C<A..B> of section names.  All content diverted to
+this FILENAME will be omitted from further output.
+
+=item --list-sections
+
+List the sections of output (in order they would be written) and exit without
+writing any files.  The output is TSV.  More columns may be added in the future.
 
 =back
 
@@ -205,11 +291,11 @@ Michael Conrad <mike@nrdvana.net>
 
 =head1 VERSION
 
-version 0.003
+version 0.004
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2023 by Michael Conrad.
+This software is copyright (c) 2024 by Michael Conrad.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

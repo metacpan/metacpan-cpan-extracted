@@ -2,8 +2,8 @@ NAME
     App::MineralUtils - Utilities related to mineral supplements
 
 VERSION
-    This document describes version 0.013 of App::MineralUtils (from Perl
-    distribution App-MineralUtils), released on 2024-07-05.
+    This document describes version 0.014 of App::MineralUtils (from Perl
+    distribution App-MineralUtils), released on 2024-07-08.
 
 DESCRIPTION
     This distributions provides the following command-line utilities:
@@ -57,6 +57,16 @@ FUNCTIONS
                amount  => 5.43478260869565,
                unit    => "mg-ca-lactate",
                summary => "Calcium lactate (C6H10CaO6), in milligrams",
+             },
+             {
+               amount  => 12.5,
+               unit    => "mg-ca-citrate-anhydrous",
+               summary => "Calcium citrate anhydrous (C12H10Ca3O14), in milligrams",
+             },
+             {
+               amount  => 14.2857142857143,
+               unit    => "mg-ca-citrate-tetrahydrate",
+               summary => "Calcium citrate tetrahydrate (C12H18Ca3O18) [most common hydrate form of Ca-citrate], in milligrams",
              },
            ],
            {
@@ -129,13 +139,13 @@ FUNCTIONS
              },
            ],
            {
+             "table.field_aligns"  => ["number", "left", "left"],
              "table.field_formats" => [
-                                        ["number", { precision => 3, thousands_sep => "" }],
+                                        ["number", { thousands_sep => "", precision => 3 }],
                                         undef,
                                         undef,
                                       ],
              "table.fields"        => ["amount", "unit", "summary"],
-             "table.field_aligns"  => ["number", "left", "left"],
            },
          ]
 
@@ -353,8 +363,8 @@ FUNCTIONS
              },
            ],
            {
-             "table.field_aligns"  => ["number", "left", "left"],
              "table.fields"        => ["amount", "unit", "summary"],
+             "table.field_aligns"  => ["number", "left", "left"],
              "table.field_formats" => [
                                         ["number", { thousands_sep => "", precision => 3 }],
                                         undef,
@@ -475,12 +485,12 @@ FUNCTIONS
              },
            ],
            {
-             "table.field_aligns"  => ["number", "left", "left"],
              "table.field_formats" => [
-                                        ["number", { thousands_sep => "", precision => 3 }],
+                                        ["number", { precision => 3, thousands_sep => "" }],
                                         undef,
                                         undef,
                                       ],
+             "table.field_aligns"  => ["number", "left", "left"],
              "table.fields"        => ["amount", "unit", "summary"],
            },
          ]
@@ -593,10 +603,10 @@ FUNCTIONS
              },
            ],
            {
-             "table.field_aligns"  => ["number", "left", "left"],
              "table.fields"        => ["amount", "unit", "summary"],
+             "table.field_aligns"  => ["number", "left", "left"],
              "table.field_formats" => [
-                                        ["number", { thousands_sep => "", precision => 3 }],
+                                        ["number", { precision => 3, thousands_sep => "" }],
                                         undef,
                                         undef,
                                       ],

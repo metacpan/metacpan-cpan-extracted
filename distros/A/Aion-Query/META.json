@@ -62,7 +62,7 @@
    "provides" : {
       "Aion::Query" : {
          "file" : "lib/Aion/Query.pm",
-         "version" : "v0.0.4"
+         "version" : "v0.0.6"
       },
       "Aion::Query::Transaction" : {
          "file" : "lib/Aion/Query.pm"
@@ -80,7 +80,7 @@
          "web" : "https://github.com/darviarush/perl-aion-query"
       }
    },
-   "version" : "0.0.4",
+   "version" : "0.0.6",
    "x_authority" : "cpan:DART",
    "x_contributors" : [
       "Yaroslav O. Kosmina <dart@cpan.org>",

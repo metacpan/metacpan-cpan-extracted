@@ -28,6 +28,7 @@
             "Markdown::Pod" : "0",
             "Path::Tiny" : "0",
             "Perl::Tidy" : "0",
+            "Pod::Markdown" : "0",
             "Template" : "0",
             "Text::Wrap" : "0",
             "YAML::XS" : "0"
@@ -36,7 +37,8 @@
       "configure" : {
          "requires" : {
             "ExtUtils::MakeMaker" : "0",
-            "File::ShareDir::Install" : "0"
+            "File::ShareDir::Install" : "0",
+            "IO::Socket::SSL" : "2"
          }
       },
       "runtime" : {
@@ -50,6 +52,7 @@
       "test" : {
          "requires" : {
             "Import::Base" : "1.004",
+            "JSON" : "4.10",
             "Perl::Tidy" : "20240511",
             "Test::Most" : "0",
             "Test::RequiresInternet" : "0"
@@ -67,6 +70,6 @@
          "web" : "https://github.com/nferraz/perl-openapi-client-openai"
       }
    },
-   "version" : "0.06",
+   "version" : "0.07",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

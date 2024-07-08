@@ -10,7 +10,7 @@
 # Modules and declarations
 ##############################################################################
 
-package App::DocKnot::Dist 7.01;
+package App::DocKnot::Dist v8.0.0;
 
 use 5.024;
 use autodie;
@@ -282,7 +282,6 @@ sub new {
     }
 
     # Create and return the object.
-    #<<<
     my $self = {
         config  => $config_reader->config(),
         distdir => path($distdir),
@@ -290,7 +289,6 @@ sub new {
         perl    => $args_ref->{perl},
         pgp_key => $args_ref->{pgp_key} // $global_config_ref->{pgp_key},
     };
-    #>>>
     bless($self, $class);
     return $self;
 }

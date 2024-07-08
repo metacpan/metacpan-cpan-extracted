@@ -38,7 +38,6 @@ DocKnot itself:
 * Pull the synopsis for a Perl module from the Perl build system
 * Document the metadata format
 * Incorporate cvs2xhtml into this package
-* Incorporate faq2html into this package (and rewrite as a Perl module)
 * Incorporate build-license into this package (and rewrite as a Perl module)
 * Automatically run build-license during the release process
 * Add metadata files and overrides to build-license

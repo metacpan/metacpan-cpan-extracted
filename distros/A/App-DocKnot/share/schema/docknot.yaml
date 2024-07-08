@@ -152,8 +152,6 @@ mapping:
   name:
     type: text
     required: true
-  orphaned:
-    type: text
   quote:
     type: map
     mapping:
@@ -216,6 +214,8 @@ mapping:
         type: text
       suffix:
         type: text
+  unmaintained:
+    type: text
   vcs:
     type: map
     mapping:

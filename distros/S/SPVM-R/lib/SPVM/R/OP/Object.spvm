@@ -6,11 +6,11 @@ class R::OP::Object {
   use R::OP;
   
   # Class Methods
-  static method c : R::NDArray::Object ($x_data : object[], $x_dim : int[] = undef) {
+  static method c : R::NDArray::Object ($data : object[], $dim : int[] = undef) {
     
-    my $x_ndarray = R::NDArray::Object->new({dim => $x_dim, data => $x_data});
+    my $ndarray = R::NDArray::Object->new({dim => $dim, data => $data});
     
-    return $x_ndarray;
+    return $ndarray;
   }
   
 }

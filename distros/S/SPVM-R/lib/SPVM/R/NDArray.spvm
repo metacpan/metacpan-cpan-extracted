@@ -93,6 +93,7 @@ class R::NDArray {
         for (my $k = 0; $k < $i; $k++) {
           $tmp *= $dim->[$k];
         }
+        
         $data_index += $tmp * $coordinate->[$i];
       }
       else {
@@ -400,11 +401,7 @@ class R::NDArray {
     
     my $data_indexes = $self->create_data_indexes($vector_indexes, $dim);
     
-    # warn dump $data_indexes;
-    
     my $ret_data = $self->slice_data($data_indexes);
-    
-    # warn dump $ret_data;
     
     my $ret_ndarray = (R::NDArray)R::Util->new_proto($self, {data => $ret_data, dim => $ret_dim});
     
@@ -450,15 +447,6 @@ class R::NDArray {
       
       my $ret_coordinate = &convert_data_index_to_coordinate($ret_data_index, $ret_dim);
       
-      # warn "[\$ret_data_index]\n";
-      # warn $ret_data_index;
-      
-      # warn "[\$ret_dim]\n";
-      # warn dump $ret_dim;
-      
-      # warn "[\$ret_coordinate]\n";
-      # warn dump $ret_coordinate;
-      
       my $coordinate = new int[$ret_dim_length];
       
       for (my $coordinate_index = 0; $coordinate_index < @$coordinate; $coordinate_index++) {
@@ -474,12 +462,8 @@ class R::NDArray {
       
       my $data_index = &convert_coordinate_to_data_index($coordinate, $dim);
       
-      # warn $data_index;
-      
       $data_indexes->[$ret_data_index] = $data_index;
     }
-    
-    # warn dump $data_indexes;
     
     return $data_indexes;
   }
@@ -488,113 +472,146 @@ class R::NDArray {
     
     my $dim = $self->{dim};
     
+    my $dim_length = @$dim;
+    
     my $data = $self->{data};
     
     my $string_buffer = StringBuffer->new;
-    if ($self->is_empty) {
+    if ($dim_length == 0) {
       $string_buffer->push("Empty");
     }
-    elsif ($self->is_vector) {
+    elsif ($dim_length == 1) {
       my $data_length = $self->length;
-      my $string_buffer = StringBuffer->new;
-      $string_buffer->push("[0] ");
+      
       for (my $i = 0; $i < $data_length; $i++) {
+        $string_buffer->push("[$i]\t");
         my $elem_string = $self->elem_to_string($i);
         $string_buffer->push($elem_string);
-      }
-      $string_buffer->push("\n  ");
-    }
-    elsif ($self->is_matrix) {
-      
-      $string_buffer->push("     ");
-      
-      for (my $d2 = 0; $d2 < $dim->[0]; $d2++) {
-        $string_buffer->push(",$d2]");
-        if ($d2 == $dim->[0]) {
+        
+        unless ($i == $data_length - 1) {
           $string_buffer->push("\n");
         }
-        else {
-          $string_buffer->push(" ");
+      }
+    }
+    elsif ($dim_length == 2) {
+      
+      my $nrow = $self->nrow;
+      
+      $string_buffer->push("\t");
+      for (my $row = 0; $row < $dim->[1]; $row++) {
+        $string_buffer->push("[,$row]");
+        unless ($row == $nrow - 1) {
+          $string_buffer->push("\t");
         }
       }
+      $string_buffer->push("\n");
       
-      for (my $d1 = 0; $d1 < $dim->[0]; $d1++) {
-        $string_buffer->push("[$d1,] ");
+      my $ncol = $self->ncol;
+      
+      for (my $row = 0; $row < $nrow; $row++) {
+        $string_buffer->push("[$row]\t");
         
-        for (my $d2 = 0; $d2 < $dim->[0]; $d2++) {
+        for (my $col = 0; $col < $ncol; $col++) {
           
-          my $coordinate = [$d1, $d2];
+          my $coordinate = [$row, $col];
           
           my $data_index = &convert_coordinate_to_data_index($coordinate, $dim);
           
           my $elem_string = $self->elem_to_string($data_index);
           
           $string_buffer->push($elem_string);
+          
+          unless ($col == $ncol - 1) {
+            $string_buffer->push("\t");
+          }
         }
         
-        $string_buffer->push("\n");
+        unless ($row == $nrow - 1) {
+          $string_buffer->push("\n");
+        }
       }
     }
     else {
       my $dim_length = @$dim;
       my $dim_num = $dim_length - 1;
       my $dim_list = IntList->new($dim);
-      my $poss_list = List->new(new R::NDArray::Int[0]);
+      my $coordinate_list = IntList->new;
       
-      &recursive_to_string($self, $dim_list, $string_buffer, \$dim_num, $poss_list);
+      &recursive_to_string($self, $dim_list, $string_buffer, \$dim_num, $coordinate_list);
     }
     
-    my $string = $string_buffer->to_string;
+    my $string = (mutable string)$string_buffer->to_string;
+    
+    while (length $string > 0 && $string->[length $string - 1] == '\n') {
+      Fn->chomp($string);
+    }
     
     return $string;
   }
   
-  private static method recursive_to_string : void ($self : R::NDArray, $dim_list : IntList, $string_buffer : StringBuffer, $dim_num_ref : int*, $poss_list : List of R::NDArray::Int) {
+  private static method recursive_to_string : void ($self : R::NDArray, $dim_list : IntList, $string_buffer : StringBuffer, $dim_num_ref : int*, $coordinate_list : IntList) {
+    
     my $dim_elem = $dim_list->pop;
     
-    for (my $i = 1; $i <= $dim_elem; $i++) {
-      $string_buffer->push(Fn->repeat(",", $$dim_num_ref) . "$i" . "\n");
-      $poss_list->unshift(R::NDArray::Int->new({data => [$i]}));
+    for (my $i = 0; $i < $dim_elem; $i++) {
+      $string_buffer->push("[");
+      $string_buffer->push(Fn->repeat(",", $$dim_num_ref) . "$i");
+      $string_buffer->push("]\n");
+      $coordinate_list->unshift($i);
       if ($dim_list->length > 2) {
         $$dim_num_ref--;
-        &recursive_to_string($self, $dim_list, $string_buffer, $dim_num_ref, $poss_list);
+        &recursive_to_string($self, $dim_list, $string_buffer, $dim_num_ref, $coordinate_list);
         $$dim_num_ref++;
       }
       else {
-        $string_buffer->push("     ");
+        $string_buffer->push("\t");
         
-        for (my $d2 = 0; $d2 < $dim_list->get(1); $d2++) {
-          if ($d2 == $dim_list->get(1)) {
-            $string_buffer->push("[,$d2]\n");
+        for (my $dim1 = 0; $dim1 < $dim_list->get(1); $dim1++) {
+          if ($dim1 == $dim_list->get(1)) {
+            $string_buffer->push("[,$dim1]\n");
           }
           else {
-            $string_buffer->push("[,$d2] ");
+            $string_buffer->push("[,$dim1]\t");
           }
         }
         
-        for (my $d1 = 0; $d1 < $dim_list->get(0); $d1++) {
-          $string_buffer->push("[$d1,] ");
+        $string_buffer->push("\n");
+          
+        for (my $dim0 = 0; $dim0 < $dim_list->get(0); $dim0++) {
+          $string_buffer->push("[$dim0]\t");
           
           my $elem_strings_list = StringList->new;
-          for (my $d2 = 0; $d2 < $dim_list->get(1); $d2++) {
+          for (my $dim1 = 0; $dim1 < $dim_list->get(1); $dim1++) {
             
-            my $poss_list_clone = List->new(new R::NDArray::Int[0]);
-            $poss_list_clone->push(R::NDArray::Int->new({data => [$d1]}));
-            $poss_list_clone->push(R::NDArray::Int->new({data => [$d2]}));
-            for (my $poss_index = 0; $poss_index < $poss_list->length; $poss_index++) {
-              $poss_list_clone->push($poss_list->get($poss_index));
+            my $coordinate_list_clone = IntList->new;
+            $coordinate_list_clone->push($dim0);
+            $coordinate_list_clone->push($dim1);
+            for (my $coordinate_index = 0; $coordinate_index < $coordinate_list->length; $coordinate_index++) {
+              $coordinate_list_clone->push($coordinate_list->get($coordinate_index));
             }
             
-            my $ret_ndarray = $self->slice((R::NDArray::Int[])$poss_list->to_array);
+            my $dim = $self->dim;
             
-            $elem_strings_list->push($ret_ndarray->elem_to_string(0));
+            for (my $tmp_dim_index = $coordinate_list_clone->length - 1; $tmp_dim_index < @$dim; $tmp_dim_index++) {
+              $coordinate_list_clone->push(0);
+            }
+            
+            my $coordinate = $coordinate_list_clone->to_array;
+            
+            my $data_index = &convert_coordinate_to_data_index($coordinate, $dim);
+            
+            $elem_strings_list->push($self->elem_to_string($data_index));
           }
           
-          $string_buffer->push(Fn->join(" ", $elem_strings_list->to_array) . "\n");
+          $string_buffer->push(Fn->join("\t", $elem_strings_list->to_array) . "\n");
         }
       }
-      $poss_list->shift;
+      $coordinate_list->shift;
+      
+      $string_buffer->push("\n");
     }
+    
+    $dim_list->push($dim_elem);
   }
   
   method set_order : void ($indexes_ndarray : R::NDArray::Int) { die "Not impelmeneted."; }

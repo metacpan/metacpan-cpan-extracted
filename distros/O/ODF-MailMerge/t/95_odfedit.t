@@ -12,6 +12,11 @@ use Spreadsheet::Edit 1000.011 (); # In 1000.011 btw writes to stderr
 use ODF::lpOD;
 use ODF::lpOD_Helper;
 
+# 7/7/2024: perl 5.20.x *hangs* while compiling certain uses of lexical subs,
+# including 'my sub mydie...' used below.  It was too difficult to figure out how
+# work around this, but 5.20 is really old...
+use 5.22.0;
+
 #diag "WARNING: :silent temp disabled";
 
 my @dash_dv = ($debug ? ("-v","-d") : $verbose ? ("-v") : ());
@@ -33,13 +38,6 @@ my $Addrspath = path($Bin)->child("../tlib/Addrlist.csv");
 
 
 my $skel_text = get_body_text($Skelpath);
-
-{ my $spath = path($Bin)->child("../bin/tt");
-  my ($out, $err, $wstat) = my_capture {
-    #system "perl", "-Ilib", $spath->canonpath, "foo";
-    run_perlscript($spath->canonpath);
-  };
-}
 
 ################################## TEST COMMAND PARSER ################
 { my ($out, $err, $wstat) = my_capture {

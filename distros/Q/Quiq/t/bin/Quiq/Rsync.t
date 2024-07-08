@@ -31,8 +31,8 @@ sub test_unitTest_root: Test(2) {
     $self->ok(-d $destDir);
     $self->ok(-f "$destDir/file1");
     
-    Quiq::Path->delete($srcDir,-sloppy=>0);
-    Quiq::Path->delete($destDir,-sloppy=>0);
+    Quiq::Path->delete($srcDir);
+    Quiq::Path->delete($destDir);
 }
 
 # -----------------------------------------------------------------------------
