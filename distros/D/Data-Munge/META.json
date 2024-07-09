@@ -60,6 +60,6 @@
          "web" : "https://github.com/mauke/Data-Munge"
       }
    },
-   "version" : "0.101",
+   "version" : "0.111",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

@@ -1,5 +1,5 @@
-package Slack::BlockKit::Block::RichText::User 0.001;
-# ABSTRACT: a BlockKit rich text element that mentions a @user
+package Slack::BlockKit::Block::RichText::User 0.002;
+# ABSTRACT: a Block Kit rich text element that mentions a @user
 
 use Moose;
 use MooseX::StrictConstructor;
@@ -54,11 +54,11 @@ __END__
 
 =head1 NAME
 
-Slack::BlockKit::Block::RichText::User - a BlockKit rich text element that mentions a @user
+Slack::BlockKit::Block::RichText::User - a Block Kit rich text element that mentions a @user
 
 =head1 VERSION
 
-version 0.001
+version 0.002
 
 =head1 OVERVIEW
 

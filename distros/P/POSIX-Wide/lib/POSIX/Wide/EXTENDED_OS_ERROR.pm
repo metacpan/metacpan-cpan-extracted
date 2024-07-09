@@ -1,4 +1,4 @@
-# Copyright 2009, 2010, 2012, 2014 Kevin Ryde
+# Copyright 2009, 2010, 2012, 2014, 2024 Kevin Ryde
 
 # This file is part of POSIX-Wide.
 #
@@ -24,7 +24,7 @@ use Scalar::Util;
 # uncomment this to run the ### lines
 #use Smart::Comments;
 
-our $VERSION = 11;
+our $VERSION = 12;
 
 sub TIESCALAR {
   my ($class) = @_;
@@ -102,7 +102,7 @@ L<http://user42.tuxfamily.org/posix-wide/index.html>
 
 =head1 LICENSE
 
-POSIX-Wide is Copyright 2009, 2010, 2012, 2014 Kevin Ryde
+POSIX-Wide is Copyright 2009, 2010, 2012, 2014, 2024 Kevin Ryde
 
 POSIX-Wide is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by the

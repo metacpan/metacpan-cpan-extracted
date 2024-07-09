@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2011, 2012 Kevin Ryde
+# Copyright 2011, 2012, 2024 Kevin Ryde
 
 # This file is part of Test-VariousBits.
 #
@@ -27,7 +27,10 @@ use lib 't';
 use MyTestHelpers;
 BEGIN { MyTestHelpers::nowarnings() }
 
-my $test_count = (tests => 8)[1];
+# uncomment this to run the ### lines
+# use Smart::Comments;
+
+my $test_count = (tests => 9)[1];
 plan tests => $test_count;
 
 my $have_GD = eval { require GD; 1 };
@@ -38,13 +41,23 @@ if (! $have_GD) {
   }
   exit 0;
 }
+MyTestHelpers::diag ("GD vesion: ",GD->VERSION);
+MyTestHelpers::diag ("  newFromXpm exists: ",
+                     exists(&GD::Image::newFromXpm) ? 'yes' : 'no',
+                     ", prototype: ",prototype('GD::Image::newFromXpm'));
 
 require Test::Without::GD;
 
 #------------------------------------------------------------------------------
 
 {
+  my $warn_handler_before = $SIG{'__WARN__'};
+  ### $warn_handler_before
   Test::Without::GD->without_xpm;
+  my $warn_handler_after = $SIG{'__WARN__'};
+  ok ($warn_handler_before == $warn_handler_after, 1,
+      'without_xpm() leaves SIG __WARN__ unchanged');
+
   my $image = GD::Image->newFromXpm('t/GD.xpm');
   my $err = $@;
   MyTestHelpers::diag ("expected error newFromXpm() -- $err");

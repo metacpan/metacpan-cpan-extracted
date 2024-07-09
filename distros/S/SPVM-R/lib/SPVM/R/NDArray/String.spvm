@@ -67,6 +67,17 @@ class R::NDArray::String extends R::NDArray::Object {
     return $string;
   }
   
+  method elem_to_object : string ($data_index : int) {
+    
+    my $data = $self->data;
+    
+    my $elem = $data->[$data_index];
+    
+    my $object = $elem;
+    
+    return $object;
+  }
+  
   method elem_clone : string ($data_index : int) {
     
     my $data = $self->data;
@@ -249,4 +260,42 @@ class R::NDArray::String extends R::NDArray::Object {
     $self->SUPER::slice_set($vector_indexes, $ndarray);
   }
   
+  method elem_cmp_old : int ($a_elem : string, $b_elem : string) {
+    
+    my $cmp = $a_elem cmp $b_elem;
+    
+    return $cmp;
+  }
+  
+  method elem_cmp : int ($a_data_index : int, $b_data_index : int) {
+    
+    my $data = $self->data;
+    
+    my $cmp = $data->[$a_data_index] cmp $data->[$b_data_index];
+    
+    return $cmp;
+  }
+  
+  method sort_asc : void () {
+    
+    unless ($self->is_vector) {
+      die "The instance must be a vector.";
+    }
+    
+    my $data = $self->data;
+    
+    Sort->sort_string_asc($data);
+  }
+  
+  method sort_desc : void () {
+    
+    unless ($self->is_vector) {
+      die "The instance must be a vector.";
+    }
+    
+    my $data = $self->data;
+    
+    Sort->sort_string_desc($data);
+  }
+
 }

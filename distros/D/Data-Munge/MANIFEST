@@ -6,6 +6,7 @@ MANIFEST
 MANIFEST.SKIP
 t/01-compile.t
 t/eval.t
+t/is_callable.t
 t/torgox.t
 xt/pod.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)

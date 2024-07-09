@@ -7,7 +7,7 @@ use 5.036000;
 use ExtUtils::MakeMaker 6.78;
 
 my %WriteMakefileArgs = (
-  "ABSTRACT" => "a toolkit for building BlockKit blocks for Slack",
+  "ABSTRACT" => "a toolkit for building Block Kit blocks for Slack",
   "AUTHOR" => "Ricardo SIGNES <rjbs\@semiotic.systems>",
   "CONFIGURE_REQUIRES" => {
     "ExtUtils::MakeMaker" => "6.78"
@@ -40,7 +40,7 @@ my %WriteMakefileArgs = (
     "strict" => 0,
     "warnings" => 0
   },
-  "VERSION" => "0.001",
+  "VERSION" => "0.002",
   "test" => {
     "TESTS" => "t/*.t"
   }

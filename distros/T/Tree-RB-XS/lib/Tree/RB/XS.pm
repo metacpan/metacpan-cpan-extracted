@@ -1,5 +1,5 @@
 package Tree::RB::XS;
-$Tree::RB::XS::VERSION = '0.10';
+$Tree::RB::XS::VERSION = '0.11';
 # VERSION
 # ABSTRACT: Red/Black Tree implemented in C, with similar API to Tree::RB
 
@@ -13,8 +13,8 @@ use Exporter 'import';
 our @_key_types= qw( KEY_TYPE_ANY KEY_TYPE_INT KEY_TYPE_FLOAT KEY_TYPE_BSTR KEY_TYPE_USTR );
 our @_cmp_enum= qw( CMP_PERL CMP_INT CMP_FLOAT CMP_MEMCMP CMP_UTF8 CMP_NUMSPLIT );
 our @_lookup_modes= qw( GET_EQ GET_EQ_LAST GET_GT GET_LT GET_GE GET_LE GET_LE_LAST GET_NEXT GET_PREV
-                        LUEQUAL LUGTEQ LULTEQ LUGREAT LULESS LUNEXT LUPREV );
-our @EXPORT_OK= (@_key_types, @_cmp_enum, @_lookup_modes);
+                        GET_OR_ADD LUEQUAL LUGTEQ LULTEQ LUGREAT LULESS LUNEXT LUPREV );
+our @EXPORT_OK= (@_key_types, @_cmp_enum, @_lookup_modes, 'cmp_numsplit');
 our %EXPORT_TAGS= (
 	key_type => \@_key_types,
 	cmp      => \@_cmp_enum,
@@ -174,65 +174,100 @@ Tree::RB::XS - Red/Black Tree implemented in C, with similar API to Tree::RB
 
 =head1 SYNOPSIS
 
-  use Tree::RB::XS qw/ :cmp :get /;
-  
+Basic dictionary features:
+
   my $tree= Tree::RB::XS->new;
-  $tree->put($_ => $_) for 'a'..'z';    # store key/value, overwrite
-  say $tree->get('a');                  # get value by key, or undef
-  $tree->delete('a');                   # delete by key
-  say $tree->get('a', GET_GT);          # find relative to the key, finds 'b'
-  $tree->delete('a','z');               # delete a range, inclusive
-  $tree->delete($tree->min_node);       # delete using nodes or iterators
-  $tree->clear;                         # efficiently delete all nodes
+  $tree->put($_ => 0) for 'a'..'z';      # store key/value, overwrite
+  say $tree->get('a');                   # get value by key
+  $tree->get('a')++                      # 'get' returns lvalues
+    if $tree->exists('a');
+  $tree->delete('a');                    # delete by key
+  $tree->clear;                          # efficiently delete all nodes
+
+Tree-specific features:
+
+  use Tree::RB::XS qw/ :get /;
   
-  $tree= Tree::RB::XS->new(CMP_INT);    # optimize for integer comparisons
-  $tree->put(1 => "x");
+  $tree->put(a => 1);
+  $tree->put(m => 13);
+  $tree->put(z => 26);
+  $nd= $tree->get_node('f', GET_GE);     # returns node of 'm'
+  $nd= $tree->get_node('f', GET_LT);     # returns node of 'a'
+  $nd= $tree->nth_node(2);               # returns node of 'z', O(log N) time
+  $tree->max_node->index;                # returns 2, also O(log N) time
+  my $iter= $tree->iter;                 # iterates in key order
+  
+  $tree->delete('f','w');                # delete a range, deletes 'm'
+  $tree->delete($iter, $tree->max_node); # delete using nodes or iterators
+  
+  $tree->put(b => 2);
+  $tree->min_node->prune;                # manipulate tree via node methods
+
+Support duplicate keys:
+
+  use Tree::RB::XS qw/ :cmp /;
 
   $tree= Tree::RB::XS->new(
-    compare_fn => 'float',              # optimize for floating-point
-    allow_duplicates => 1
+    compare_fn => CMP_NUMSPLIT,          # string-of-numbers comparison
+    allow_duplicates => 1,
   );
-  $tree->put(rand() => 1) for 1..1000;
-  $tree->delete(0, $tree->get_node_lt(.5));
+  $tree->insert('192.168.0.1'  => time); # 'insert' instead of 'put'
+  $tree->insert('192.168.0.40' => time);
+  $tree->insert('192.168.0.1'  => time);
   
-  $tree= Tree::RB::XS->new(CMP_MEMCMP); # optimize for byte strings
-  $tree->put("test" => "x");
-  
-  say $tree->min->key;                  # inspect the node objects
-  say $tree->nth(0)->key;               # log(n) indexing
-  my $node= $tree->min;
-  my $next= $node->next;
-  $node->prune;
-  
-  # LRU Cache feature
-  
+  # analyze subnet
+  $first= $tree->get_node_ge('192.168.0.0');
+  $last=  $tree->get_node_le('192.168.0.255');
+  say $last->index - $first->index + 1;  # 3 in subnet
+
+LRU Cache feature:
+
   $tree= Tree::RB::XS->new(
-    track_recent => 1,                  # Remember order of added keys
+    track_recent => 1,                   # Remember order of added nodes
   );
   $tree->put($_,$_) for 1,3,2;
-  $x= $tree->newest->key;               # 2
-  $x= $tree->oldest->key;               # 1
+  say $tree->newest->key;                # 2
+  say $tree->oldest->key;                # 1
   @insertion_order=
-    $tree->iter_newer->next_keys('*');  # (1,3,2)
-  $tree->get_node(1)->mark_newest;      # simulate delete+put of same node
-  $tree->iter_newer->next_keys('*');    # (3,2,1)
-  @removed= $tree->truncate_recent(2);  # (3), leaving (2,1) in the tree
-  
-  # iterators
-  
+    $tree->iter_newer->next_keys(1e99);  # (1,3,2)
+  $tree->get_node(1)->mark_newest;       # 'touch' a node to end of list
+  $tree->iter_newer->next_keys(1e99);    # (3,2,1)
+  $tree->iter_older->next_keys(1e99);    # (1,2,3)
+  @removed= $tree->truncate_recent(2);   # returns (3), leaves (2,1) in tree
+
+Fancy iterators:
+
+  # iterator has 'current position'. inspect it, then step
   for (my $i= $tree->iter; !$i->done; $i->step) {
     if ($i->key ...) { $i->value .... }
   }
   
+  # Call iterator as a function that returns the next node
   my $i= $tree->rev_iter;
   while (my $node= &$i) {
     $node->prune if $node->key =~ ...;
   }
   
+  # Return batches of values from iterator, to reduce loop overhead
   my $i= $tree->iter;
   while (my @batch= $i->next_values(100)) {
     ...
   }
+  
+  # If you delete the node an iterator is on, it moves to the next
+  $tree= Tree::RB::XS->new(
+    track_recent => 1,
+    kv => [ a => 1, c => 3, b => 2 ],
+  );
+  $middle_node= $tree->nth(1);           # node of 'b'
+  $forward= $middle_node->iter;          # iterate to higher keys
+  $reverse= $middle_node->rev_iter;      # iterate to lower keys
+  $newer= $middle_node->iter_newer;      # iterate to more recent keys
+  $older= $middle_node->iter_older;      # iterate to less recent keys
+  $middle_node->prune;                   # remove node from tree
+  
+  say $_->key for $forward, $reverse;    # c, a
+  say $_->key for $newer, $older;        # undef, c
 
 =head1 DESCRIPTION
 
@@ -449,7 +484,16 @@ an alias for C<lookup>.
 
 Mode can be used to indicate something other than an exact match:
 L</GET_EQ>, L</GET_EQ_LAST>, L</GET_LE>, L</GET_LE_LAST>, L</GET_LT>, L</GET_GE>, L</GET_GT>.
-(described below)
+(described below)  It can also be L</GET_OR_ADD> to automatically create a node with the key
+if one didn't exist.
+
+Aliases with built-in mode constants:
+
+=over 20
+
+=item get_or_add
+
+=back
 
 =head2 get_node
 
@@ -472,6 +516,26 @@ Aliases with built-in mode constants:
 =item get_node_ge
 
 =item get_node_gt
+
+=back
+
+=head2 get_key
+
+Returns the key closest to the comparison criteria.  This is a shortcut for
+C<< get_node(...)->key >> but avoids the C<undef> check and avoids inflating the tree node
+to a perl object.
+
+Aliases with built-in mode constants:
+
+=over 20
+
+=item get_key_le
+
+=item get_key_lt
+
+=item get_key_ge
+
+=item get_key_gt
 
 =back
 
@@ -942,6 +1006,14 @@ or
 If the C<key_type> is C<KEY_TYPE_BSTR> this will sort the string portions using
 C<memcmp>, else they are sorted with Perl's unicode-aware sort.
 
+=item cmp_numsplit
+
+  use Tree::RB::XS 'cmp_numsplit';
+  $cmp= cmp_numsplit('192.168.10.1', '192.168.4.255');
+
+You can export the comparison function I<itself>, for use elsewhere.  It's rather useful.
+Maybe it should be its own module?
+
 =back
 
 =head2 Key Types
@@ -996,6 +1068,14 @@ Has alias C<LUEQUAL> to match Tree::RB.
 
 Same as C<GET_EQ>, but if duplicate keys are enabled, this specifies the right-most match
 (most recently inserted).
+
+=item GET_OR_ADD
+
+Look up the key, and if it doesn't exist, insert a node for it into the tree.
+When getting the value, this provides an lvalue which you can assign to.
+
+  ++($tree->get("a", GET_OR_ADD) //= 0);
+  ($tree->get("b", GET_OR_ADD) //= '') .= "example";
 
 =item GET_GE
 
@@ -1090,7 +1170,7 @@ However, it runs significantly slower than Tree::RB.
 
 =head1 VERSION
 
-version 0.10
+version 0.11
 
 =head1 AUTHOR
 

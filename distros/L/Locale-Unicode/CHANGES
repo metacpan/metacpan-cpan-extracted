@@ -1,5 +1,12 @@
 Revision history for Perl module Locale::Unicode
 
+v0.1.9 2024-07-08T22:03:30+0900
+    - Added the method 'territory'
+    - Added a sanity check to ensure proper locale is provided upon object instantiation.
+    - Added mechanism to unset country code when region code is set and vice versa
+    - Added mechanism to unset language code when 3-characters language code is set and vice versa
+    - Changed the regular expression to use the component name 'language' and 'language3' instead of 'locale' and 'locale3' respectively
+
 v0.1.8 2024-06-12T15:10:36+0900
     - Added the method 'language' as an alias to 'lang'
 

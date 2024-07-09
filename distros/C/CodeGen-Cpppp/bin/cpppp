@@ -1,6 +1,6 @@
 #! /usr/bin/env perl
 # PODNAME: cpppp
-our $VERSION = '0.004'; # VERSION
+our $VERSION = '0.005'; # VERSION
 # ABSTRACT: Command line tool to process cpppp templates
 use v5.20;
 use warnings;
@@ -136,38 +136,6 @@ if ($opt_list_sections) {
    exit 0;
 }
 
-# This utility function returns a string which could be passed to the
-# shell to re-run the current command.
-sub format_commandline {
-   # Make a map of which options have arguments
-   my %have_arg;
-   for (keys %option_spec) {
-      /^([^=]+)=/ or next;
-      $have_arg{$_}= 1 for split '|', $1;
-   }
-   my @lines;
-   for (@original_argv) {
-      my $escaped= shellquote($_);
-      if (@lines && $lines[-1] =~ /^-+(.*)/ && $have_arg{$1}) {
-         $lines[-1] .= ' ' . $escaped;
-      } else {
-         push @lines, $escaped;
-      }
-   }
-   return $0 . ' ' . join(" \\\n      ", @lines);
-}
-
-# could use String::ShellQuote, but aiming for fewer deps
-sub shellquote {
-   return "''" unless length $_[0];
-   return $_[0] unless $_[0] =~ m|[^-\w!%+,./:@^]|;
-   (my $x= $_[0]) =~ s/'/'\\''/g;
-   $x= "'$x'";
-   $x =~ s/^''//;
-   $x =~ s/''$//;
-   $x;
-}
-
 # Lets a template main::re_exec(@different_args)
 sub re_exec(@new_argv) {
    exec($^X, "$FindBin::RealBin/$FindBin::RealScript", @new_argv)
@@ -291,7 +259,7 @@ Michael Conrad <mike@nrdvana.net>
 
 =head1 VERSION
 
-version 0.004
+version 0.005
 
 =head1 COPYRIGHT AND LICENSE
 

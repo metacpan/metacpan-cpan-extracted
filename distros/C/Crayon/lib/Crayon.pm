@@ -1,5 +1,5 @@
 package Crayon;
-our $VERSION = '1.02';
+our $VERSION = '1.03';
 use 5.006;
 use strict;
 use warnings;
@@ -341,7 +341,7 @@ Crayon - dedupe, minify and extend CSS
 
 =head1 VERSION
 
-Version 1.02 
+Version 1.03 
 
 =cut
 

@@ -339,5 +339,125 @@ class R::DataFrame {
     return $nrow;
   }
   
+  method sort_asc : void ($colnames : string[]) {
+    
+    my $order_ndarray = $self->order($colnames);
+    
+    $self->set_order($order_ndarray);
+  }
+  
+  method sort_desc : void ($colnames : string[]) {
+    
+    my $order_ndarray = $self->order($colnames);
+    
+    &reverse_int($order_ndarray->data);
+    
+    $self->set_order($order_ndarray);
+  }
+  
+  method order : R::NDArray::Int ($colnames_with_order_by : string[]) {
+    
+    unless ($colnames_with_order_by) {
+      die "The column names \$colnames_with_order_by must be defined.";
+    }
+    
+    my $ncol = $self->ncol;
+    
+    unless ($ncol > 0) {
+      die "The length of columns must be greater than 0.";
+    }
+    
+    my $first_ndarray = $self->col_by_index(0);
+    
+    unless ($first_ndarray->is_vector) {
+      die "The n-dimension array of the instance must be a vector.";
+    }
+    
+    my $nrow = $self->nrow;
+    
+    my $order_ndarray = R::OP::Int->seq(0, $nrow - 1);
+    
+    my $order_data = $order_ndarray->data;
+    
+    my $colnames_length = @$colnames_with_order_by;
+    
+    my $colnames = new string[$colnames_length];
+    
+    my $order_by_desc_h = Hash->new;
+    
+    for (my $col = 0; $col < $colnames_length; $col++) {
+      my $colname_with_order_by = $colnames_with_order_by->[$col];
+      
+      my $ret = Fn->split(" ", $colname_with_order_by);
+      
+      my $colname = $ret->[0];
+      
+      my $order_by = (string)undef;
+      if (@$ret > 1) {
+        $order_by = $ret->[1];
+      }
+      else {
+        $order_by = "asc";
+      }
+      
+      unless ($self->exists_col($colname)) {
+        die "The column which name is \"$colname\" does not eixsts.";
+      }
+      
+      unless (@$ret >= 1 && @$ret <= 2 && ($order_by eq "asc" || $order_by eq "desc")) {
+        die "The column name \"$colname_with_order_by\" is invalid format.";
+      }
+      
+      $colnames->[$col] = $colname;
+      
+      if ($order_by eq "desc") {
+        $order_by_desc_h->set($colname, 1);
+      }
+      else {
+        $order_by_desc_h->set($colname, 0);
+      }
+    }
+    
+    Sort->sort_int($order_data, [has that : R::DataFrame = $self, $colnames : string[], $order_by_desc_h : Hash] method : int ($a_data_index : int, $b_data_index : int) {
+      
+      my $cmp = 0;
+      for my $colname (@$colnames) {
+        
+        my $ndarray = $self->{that}->col($colname);
+        
+        my $desc = $order_by_desc_h->get_int($colname);
+        
+        if ($desc) {
+          $cmp = $ndarray->elem_cmp($b_data_index, $a_data_index);
+        }
+        else {
+          $cmp = $ndarray->elem_cmp($a_data_index, $b_data_index);
+        }
+        
+        unless ($cmp == 0) {
+          last;
+        }
+      }
+      
+      return $cmp;
+    });
+    
+    return $order_ndarray;
+  }
+
+  private static method reverse_int : void ($array : int[]) {
+    
+    unless ($array) {
+      die "The array \$array must be defined.";
+    }
+    
+    my $length = @$array;
+    
+    for (my $i = 0; $i < $length / 2; $i++) {
+      my $temp = $array->[$i];
+      $array->[$i] = $array->[$length - $i - 1];
+      $array->[$length - $i - 1] = $temp;
+    }
+  }
 }
 

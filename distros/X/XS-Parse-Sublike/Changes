@@ -1,5 +1,10 @@
 Revision history for XS-Parse-Sublike
 
+0.22    2024-07-08
+        [CHANGES]
+         * Use `File::ShareDir` for storing .h include file, rather than
+           storing the contents in the `__DATA__` section of the build helper
+
 0.21    2023-10-11
         [BUGFIXES]
          * Ensure that exceptions thrown from runtime signature handling

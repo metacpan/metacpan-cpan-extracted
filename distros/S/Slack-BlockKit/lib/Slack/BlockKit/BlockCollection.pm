@@ -1,12 +1,12 @@
-package Slack::BlockKit::BlockCollection 0.001;
-# ABSTRACT: a collection of BlockKit blocks
+package Slack::BlockKit::BlockCollection 0.002;
+# ABSTRACT: a collection of Block Kit blocks
 use Moose;
 
 #pod =head1 OVERVIEW
 #pod
-#pod This is the very top level "array of BlockKit blocks" object that exists mostly
-#pod to serve as a container for the blocks that are your real message.  You don't
-#pod exactly need it, but its C<< ->as_struct >> method will collect all the
+#pod This is the very top level "array of Block Kit blocks" object that exists
+#pod mostly to serve as a container for the blocks that are your real message.  You
+#pod don't exactly need it, but its C<< ->as_struct >> method will collect all the
 #pod structs created by its contained blocks, so it's easy to pass around as "the
 #pod thing that gets sent to Slack".
 #pod
@@ -53,17 +53,17 @@ __END__
 
 =head1 NAME
 
-Slack::BlockKit::BlockCollection - a collection of BlockKit blocks
+Slack::BlockKit::BlockCollection - a collection of Block Kit blocks
 
 =head1 VERSION
 
-version 0.001
+version 0.002
 
 =head1 OVERVIEW
 
-This is the very top level "array of BlockKit blocks" object that exists mostly
-to serve as a container for the blocks that are your real message.  You don't
-exactly need it, but its C<< ->as_struct >> method will collect all the
+This is the very top level "array of Block Kit blocks" object that exists
+mostly to serve as a container for the blocks that are your real message.  You
+don't exactly need it, but its C<< ->as_struct >> method will collect all the
 structs created by its contained blocks, so it's easy to pass around as "the
 thing that gets sent to Slack".
 

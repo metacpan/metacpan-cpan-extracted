@@ -9,7 +9,7 @@ use Scalar::Util 'blessed', 'looks_like_number';
 use CodeGen::Cpppp::Template;
 use CodeGen::Cpppp::Output;
 
-our $VERSION= '0.004'; # VERSION
+our $VERSION= '0.005'; # VERSION
 # ABSTRACT: The C Perl-Powered Pre-Processor
 
 # These can be inspected by code generators to find out the current
@@ -377,7 +377,7 @@ sub _parse_code_block($self, $text, $file=undef, $orig_line=undef) {
       # Find all total indents used in this code, but only count lines that
       # were preceeded by ';' or '{' or ')' followed by lines starting with a
       # word or variable substitution.
-      push @{$parse->{indent_seen}}, $1 while $text =~ /(?<=[;{)]\s{0,200})\n([ \t]+)[\w\$\@]/g;
+      push @{$parse->{indent_seen}}, $1 while $text =~ /[;{)]\s*\n([ \t]+)[\w\$\@]/g;
    }
    # Everything in coltrack that survived the last _parse_code_block call
    # ended on the final line of the template.  Set the line numbers to
@@ -817,7 +817,7 @@ Michael Conrad <mike@nrdvana.net>
 
 =head1 VERSION
 
-version 0.004
+version 0.005
 
 =head1 COPYRIGHT AND LICENSE
 

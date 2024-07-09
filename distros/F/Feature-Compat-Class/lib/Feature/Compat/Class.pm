@@ -1,15 +1,15 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2022-2023 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2022-2024 -- leonerd@leonerd.org.uk
 
-package Feature::Compat::Class 0.06;
+package Feature::Compat::Class 0.07;
 
 use v5.14;
 use warnings;
 use feature ();
 
-use constant HAVE_FEATURE_CLASS => defined $feature::feature{class};
+use constant HAVE_FEATURE_CLASS => $^V ge v5.40;
 
 =head1 NAME
 
@@ -20,8 +20,8 @@ C<Feature::Compat::Class> - make C<class> syntax available
    use Feature::Compat::Class;
 
    class Point {
-      field $x :param = 0;
-      field $y :param = 0;
+      field $x :param :reader = 0;
+      field $y :param :reader = 0;
 
       method move_to ($new_x, $new_y) {
          $x = $new_x;
@@ -43,6 +43,9 @@ C<field> and C<ADJUST>) in a forward-compatible way.
 Perl added such syntax at version 5.38.0, which is enabled by
 
    use feature 'class';
+
+This syntax was further expanded in 5.40, adding the C<__CLASS__> keyword and
+C<:reader> attribute on fields.
 
 On that version of perl or later, this module simply enables the core feature
 equivalent of using it directly. On such perls, this module will install with
@@ -70,11 +73,11 @@ sub import
    }
    else {
       require Object::Pad;
-      Object::Pad->VERSION( '0.78' );
+      Object::Pad->VERSION( '0.806' );
       Object::Pad->import(qw( class method field ADJUST ),
          ':experimental(init_expr)',
          ':config(' .
-            'always_strict only_class_attrs=isa only_field_attrs=param ' .
+            'always_strict only_class_attrs=isa only_field_attrs=param,reader ' .
             'no_field_block no_adjust_attrs no_implicit_pragmata' .
          ')',
       );
@@ -179,6 +182,12 @@ Initialiser blocks are not supported.
 
    field $five = 5;
 
+I<Since version 0.07> field initialiser expressions can see earlier fields
+that have already been declared, and use their values:
+
+   field $fullname  :param;
+   field $shortname :param = ( split m/ +/, $fullname )[0];
+
 The following field attributes are supported:
 
 =head3 :param
@@ -214,6 +223,31 @@ C<undef> would not be a valid value for a field parameter.
    C->new( timeout => $args{timeout} );
    # default applies if %args has no 'timeout' key, or if its value is undef
 
+=head3 :reader, :reader(NAME)
+
+I<Since version 0.07.>
+
+Generates a reader method to return the current value of the field. If no name
+is given, the name of the field is used. A single prefix character C<_> will
+be removed if present.
+
+   field $x :reader;
+
+   # equivalent to
+   field $x;  method x { return $x }
+
+These are permitted on an field type, not just scalars. The reader method
+behaves identically to how a lexical variable would behave in the same
+context; namely returning a list of values from an array or key/value pairs
+from a hash when in list context, or the number of items or keys when in
+scalar context.
+
+   field @items :reader;
+
+   foreach my $item ( $obj->items ) { ... }   # iterates the list of items
+
+   my $count = $obj->items;                   # yields count of items
+
 =head2 ADJUST
 
    ADJUST { ... }
@@ -222,6 +256,49 @@ See also L<Object::Pad/ADJUST>.
 
 Attributes are not supported; in particular the C<:params> attribute of
 C<Object::Pad> v0.70.
+
+=head2 __CLASS__
+
+   my $classname = __CLASS__;
+
+I<Since version 0.07.>
+
+Only valid within the body (or signature) of a C<method>, an C<ADJUST> block,
+or the initialising expression of a C<field>. Yields the class name of the
+instance that the method, block or expression is invoked on.
+
+This is similar to the core perl C<__PACKAGE__> constant, except that it cares
+about the dynamic class of the actual instance, not the static class the code
+belongs to. When invoked by a subclass instance that inherited code from its
+superclass it yields the name of the class of the instance regardless of which
+class defined the code.
+
+For example,
+
+   class BaseClass {
+      ADJUST { say "Constructing an instance of " . __CLASS__; }
+   }
+
+   class DerivedClass :isa(BaseClass) { }
+
+   my $obj = DerivedClass->new;
+
+Will produce the following output
+
+   Constructing an instance of DerivedClass
+
+This is particularly useful in field initialisers for invoking (constant)
+methods on the invoking class to provide default values for fields. This way a
+subclass could provide a different value.
+
+   class Timer {
+      use constant DEFAULT_DURATION => 60;
+      field $duration = __CLASS__->DEFAULT_DURATION;
+   }
+
+   class ThreeMinuteTimer :isa(Timer) {
+      use constant DEFAULT_DURATION => 3 * 60;
+   }
 
 =head2 Other Keywords
 
@@ -246,17 +323,7 @@ the description given above, the following differences should be noted.
 
 =over 4
 
-=item Fields in later field expressions
-
-The core perl C<class> feature makes every field variable visible to the
-initialising expression of later fields. For example,
-
-   field $one = 1;
-   field $two = $one + 1;
-
-This is not currently supported by C<Object::Pad>. As a result, it is possible
-to write code that works fine with the core perl feature but older perls
-cannot support by using C<Object::Pad>.
+=item I<No known issues at this time>
 
 =back
 

@@ -1,4 +1,4 @@
-# Copyright 2008, 2009, 2010, 2011, 2012, 2015 Kevin Ryde
+# Copyright 2008, 2009, 2010, 2011, 2012, 2015, 2017 Kevin Ryde
 
 # This file is part of Test-VariousBits.
 #
@@ -20,7 +20,7 @@ use 5.004;
 use strict;
 
 use vars '$VERSION', '@ISA', '@EXPORT_OK';
-$VERSION = 7;
+$VERSION = 8;
 
 use Exporter;
 @ISA = ('Exporter');
@@ -284,7 +284,7 @@ L<http://user42.tuxfamily.org/test-variousbits/index.html>
 
 =head1 COPYRIGHT
 
-Copyright 2008, 2009, 2010, 2011, 2012, 2015 Kevin Ryde
+Copyright 2008, 2009, 2010, 2011, 2012, 2015, 2017 Kevin Ryde
 
 Test-VariousBits is free software; you can redistribute it and/or
 modify it under the terms of the GNU General Public License as published

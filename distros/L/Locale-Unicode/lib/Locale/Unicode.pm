@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Unicode Locale Identifier - ~/lib/Locale/Unicode.pm
-## Version v0.1.8
+## Version v0.1.9
 ## Copyright(c) 2024 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2024/05/11
-## Modified 2024/06/12
+## Modified 2024/07/08
 ## All rights reserved
 ## 
 ## 
@@ -35,9 +35,9 @@ BEGIN
     our $LOCALE_BCP47_RE = qr/
     (?:
         (?:
-            (?<locale>[a-z]{2})
+            (?<language>[a-z]{2})
             |
-            (?<locale3>[a-z]{3})
+            (?<language3>[a-z]{3})
         )
         # "Up to three optional extended language subtags composed of three letters each, separated by hyphens"
         # "There is currently no extended language subtag registered in the Language Subtag Registry without an equivalent and preferred primary language subtag"
@@ -55,7 +55,7 @@ BEGIN
     (?:
         (?:
             -
-            (?:
+            (?<territory>
                 (?<country_code>[A-Z]{2})
                 |
                 # BCP47, section 2.2.4.4: the UN Standard Country or Area Codes for Statistical Use
@@ -307,7 +307,7 @@ BEGIN
     our $PROP_TO_SUB = {};
     # False, by default
     our $EXPLICIT_BOOLEAN = 0;
-    our $VERSION = 'v0.1.8';
+    our $VERSION = 'v0.1.9';
 };
 
 use strict;
@@ -343,6 +343,8 @@ sub new
     $self->{hybrid}             = undef;
     # t-i0
     $self->{input}              = undef;
+    $self->{language}           = undef;
+    $self->{language3}          = undef;
     # u-lb
     $self->{line_break}         = undef;
     # u-lw
@@ -353,8 +355,6 @@ sub new
     $self->{number}             = undef;
     # u-mu
     $self->{unit}               = undef;
-    $self->{locale}             = undef;
-    $self->{locale3}            = undef;
     # t-m0
     $self->{mechanism}          = undef;
     # x-something
@@ -365,6 +365,7 @@ sub new
     # t-s0
     $self->{source}             = undef;
     $self->{script}             = undef;
+    $self->{territory}          = undef;
     # t-t0
     $self->{translation}        = undef;
     # u-sd
@@ -397,14 +398,11 @@ sub new
         index( $locale, '_' ) != -1 )
     {
         $locale =~ tr/_/-/;
-        my $ref = $self->parse( $locale ) ||
-            return( $self->pass_error );
-        $self->apply( $ref ) || return( $self->pass_error );
     }
-    else
-    {
-        $self->{locale} = $locale;
-    }
+    my $ref = $self->parse( $locale ) ||
+        return( $self->pass_error );
+    return( $self->error( "Invalid locale value \"${locale}\" provided." ) ) if( !scalar( keys( %$ref ) ) );
+    $self->apply( $ref ) || return( $self->pass_error );
 
     # Then, if the user provided with an hash or hash reference of options, we apply them
     for( my $i = 0; $i < scalar( @args ); $i++ )
@@ -688,13 +686,13 @@ sub core
 {
     my $self = shift( @_ );
     my @locale_parts = ();
-    if( my $locale = $self->locale )
+    if( my $lang = $self->language )
     {
-        push( @locale_parts, $locale );
+        push( @locale_parts, $lang );
     }
-    elsif( my $locale3 = $self->locale3 )
+    elsif( my $lang3 = $self->language3 )
     {
-        push( @locale_parts, $locale3 );
+        push( @locale_parts, $lang3 );
     }
     # 'und' for 'undefined'
     else
@@ -720,7 +718,10 @@ sub core
     return( join( '-', @locale_parts ) );
 }
 
-sub country_code { return( shift->reset(@_)->_set_get_prop( 'country_code', @_ ) ); }
+sub country_code { return( shift->reset(@_)->_set_get_prop({
+    field => 'country_code',
+    on_update => sub{ $_[0]->{region} = undef; },
+}, @_ ) ); }
 
 # u-cf
 sub cu_format { return( shift->reset(@_)->_set_get_prop( 'cu_format', @_ ) ); }
@@ -828,9 +829,19 @@ sub ks { return( shift->colStrength( @_ ) ); }
 # u-kv
 sub kv { return( shift->colValue( @_ ) ); }
 
-sub lang { return( shift->reset(@_)->_set_get_prop( 'locale', @_ ) ); }
+sub lang { return( shift->reset(@_)->_set_get_prop( {
+    field => 'language',
+    on_update => sub{ $_[0]->{language3} = undef; },
+}, @_ ) ); }
+
+sub lang3 { return( shift->reset(@_)->_set_get_prop( {
+    field => 'language3',
+    on_update => sub{ $_[0]->{language} = undef; },
+}, @_ ) ); }
 
 sub language { return( shift->lang( @_ ) ); }
+
+sub language3 { return( shift->lang3( @_ ) ); }
 
 # u-lb
 sub lb { return( shift->reset(@_)->_set_get_prop( 'line_break', @_ ) ); }
@@ -841,9 +852,10 @@ sub line_break { return( shift->reset(@_)->_set_get_prop( 'line_break', @_ ) ); 
 # u-lw
 sub line_break_word { return( shift->reset(@_)->_set_get_prop( 'line_break_word', @_ ) ); }
 
-sub locale { return( shift->reset(@_)->_set_get_prop( 'locale', @_ ) ); }
+# NOTE: the term 'locale' is abusive, since a locale is the entire string, and the language is just this part
+sub locale { return( shift->reset(@_)->_set_get_prop( 'language', @_ ) ); }
 
-sub locale3 { return( shift->reset(@_)->_set_get_prop( 'locale3', @_ ) ); }
+sub locale3 { return( shift->reset(@_)->_set_get_prop( 'language3', @_ ) ); }
 
 # u-lw
 sub lw { return( shift->reset(@_)->_set_get_prop( 'line_break_word', @_ ) ); }
@@ -899,7 +911,9 @@ sub parse
     return( $self->pass_error ) if( !defined( $opts ) );
 
     my $info = {};
-    foreach my $prop ( qw( locale locale3 extended script country_code region variant ) )
+    # Value provided failed to match the locale regular expression
+    return( $info ) if( !$re );
+    foreach my $prop ( qw( language language3 extended script country_code region variant ) )
     {
         # the property provided as an option can be undef by design to remove the value
         if( exists( $opts->{ $prop } ) )
@@ -1044,7 +1058,10 @@ sub pass_error
 # x-something
 sub private { return( shift->reset(@_)->_set_get_prop( 'private', @_ ) ); }
 
-sub region { return( shift->reset(@_)->_set_get_prop( 'region', @_ ) ); }
+sub region { return( shift->reset(@_)->_set_get_prop({
+    field => 'region',
+    on_update => sub{ $_[0]->{country_code} = undef; },
+}, @_ ) ); }
 
 # u-rg
 sub region_override { return( shift->reset(@_)->_set_get_prop( 'region_override', @_ ) ); }
@@ -1090,6 +1107,36 @@ sub t0 { return( shift->translation( @_ ) ); }
 
 # t-x0
 sub t_private { return( shift->reset(@_)->_set_get_prop( 't_private', @_ ) ); }
+
+sub territory
+{
+    my $self = shift( @_ );
+    if( @_ )
+    {
+        my $val = shift( @_ );
+        if( defined( $val ) )
+        {
+            if( $val =~ /^([a-zA-Z]{2})$/ )
+            {
+                $self->country_code( uc( $1 ) );
+            }
+            elsif( $val =~ /^(\d{3})$/ )
+            {
+                $self->region( $1 );
+            }
+            else
+            {
+                return( $self->error( "Invalid value for territory. It must be either a 2-characters ISO3166 code or a 3-digits region code." ) );
+            }
+        }
+        else
+        {
+            $self->country_code( undef );
+            $self->region( undef );
+        }
+    }
+    return( $self->country_code || $self->region );
+}
 
 # u-tz
 sub time_zone { return( shift->reset(@_)->_set_get_prop( 'time_zone', @_ ) ); }
@@ -1210,7 +1257,7 @@ sub _set_get_prop
     my $self = shift( @_ );
     my $field = shift( @_ ) ||
         return( $self->error( "No field was provided." ) );
-    my( $re, $type, $isa );
+    my( $re, $type, $isa, $on_update );
     if( ref( $field ) eq 'HASH' )
     {
         my $def = $field;
@@ -1232,6 +1279,12 @@ sub _set_get_prop
             length( $def->{isa} ) )
         {
             $isa = $def->{isa};
+        }
+        if( exists( $def->{on_update} ) &&
+            defined( $def->{on_update} ) &&
+            ref( $def->{on_update} ) eq 'CODE' )
+        {
+            $on_update = $def->{on_update};
         }
     }
     if( @_ )
@@ -1276,6 +1329,16 @@ sub _set_get_prop
                     ( Scalar::Util::blessed( $val ) && !$val->isa( $isa ) ) )
                 {
                     return( $self->error( "Value provided is not an ${isa} object." ) );
+                }
+            }
+
+            if( defined( $on_update ) )
+            {
+                local $@;
+                eval{ $on_update->( $self, $val ) };
+                if( $@ )
+                {
+                    return( $self->error( "Error setting value \"${val}\" for \"{field}\": $@" ) );
                 }
             }
         }
@@ -3354,13 +3417,15 @@ In Scalar or in list context, the value returned is the last value set.
 
 =head1 VERSION
 
-    v0.1.8
+    v0.1.9
 
 =head1 DESCRIPTION
 
 This module implements the L<Unicode LDML (Locale Data Markup Language) extensions|https://unicode.org/reports/tr35/#u_Extension>
 
 It does not enforce the standard, and is merely an API to construct, access and modify locales. It is your responsibility to set the right values.
+
+The only requirement is to provide a proper C<language>, which is a 2 or 3-characters code.
 
 For your convenience, summary of key elements of the standard can be found in this documentation.
 
@@ -3372,8 +3437,11 @@ The object stringifies, and once its string value is computed, it is cached and 
 
 =head2 new
 
+    # Sets the language 'en'
     my $locale = Locale::Unicode->new( 'en' );
+    # Sets the language 'en' with territory 'GB'
     my $locale = Locale::Unicode->new( 'en-GB' );
+    # Sets the language 'en' with script 'Latn' and territory 'AU'
     my $locale = Locale::Unicode->new( 'en-Latn-AU' );
     my $locale = Locale::Unicode->new( 'he-IL-u-ca-hebrew-tz-jeruslm' );
     my $locale = Locale::Unicode->new( 'ja-Kana-t-it' );
@@ -3422,7 +3490,7 @@ Returns the Locale object as a string, based on its latest attributes set.
 
 The string value returned is computed only once and further call to C<as_string> returns a cached value unless changes were made to the Locale attributes.
 
-Boolean values are expressed as C<true> for tue values and C<false> for false values. However, if a value is true for a given C<locale> component, it is not explicitly stated by default, since the LDML specifications indicate, it is true implicitly. If, however, you want the true boolean value to be displayed nevertheless, make sure to set the global variable C<$EXPLICIT_BOOLEAN> to a true value.
+Boolean values are expressed as C<true> for tue values and C<false> for false values. However, if a value is true for a given C<locale> component, it is not explicitly stated by default, since the C<LDML> specifications indicate, it is true implicitly. If, however, you want the true boolean value to be displayed nevertheless, make sure to set the global variable C<$EXPLICIT_BOOLEAN> to a true value.
 
 For example:
 
@@ -3699,7 +3767,17 @@ It returns the core part of the C<locale>, which is composed of a 2 to 3-charact
 
 Sets or gets the country code part of the C<locale>.
 
-A country code should be an ISO 3166 2-letters code, but keep in mind that the LDML (Locale Data Markup Language) accepts old data to ensure stability.
+A country code should be an ISO 3166 2-letters code, but keep in mind that the C<LDML> (Locale Data Markup Language) accepts old data to ensure stability.
+
+Note that when you set a country code, it will automatically unset any L<region|/region> code.
+
+    my $locale = Locale::Unicode->new( 'en-001' );
+    say $locale->region; # 001
+    $locale->country_code( 'US' );
+    say $locale->region; # undef
+    say $locale; # en-US
+
+You can use L</territory> alternatively.
 
 =head2 cu
 
@@ -3774,7 +3852,7 @@ The C<Locale::Unicode::NullObject> class prevents the perl error of C<Can't call
 
 For example:
 
-    my $locale =Locale::Unicode->new( 'ja' );
+    my $locale = Locale::Unicode->new( 'ja' );
     $locale->translation( 'my-software' )->transform_locale( $bad_value )->tz( 'jptyo' ) ||
         die( $locale->error );
 
@@ -3912,13 +3990,42 @@ This is an alias for L</colValue>
     $obj->lang( 'de' );
     # Now: de-FR
 
-Sets or gets the C<locale> part of this Local object.
+Sets or gets the C<language> part of this C<locale> object.
 
-See also L</locale>
+Note that when you set a 2-letters C<language> code, it automatically will unset any 3-characters C<language> code you would have previously set.
+
+For example:
+
+    $obj->lang( 'ja' );
+    # locale is now set with language code 'ja'
+    $obj->lang3( 'jpn' );
+    # locale is now set with 3-characters language code 'jpn'
+    say $obj->lang; # undef
+
+See also L</language>
+
+Note that you can alternatively use the method L<locale|/locale>, although strictly speaking a C<locale> is the whole string, while the C<language> is a component of it.
+
+=head2 lang3
+
+    my $locale = Locale::Unicode->new( 'ja' );
+    say $locale; # ja
+    $locale->language3( 'jpn' );
+    say $locale->language; # undef
+    $locale->script( 'Kana' );
+    # Now: jpn-Kana
+
+Sets or gets the L<3-letter ISO 639-2 code|https://www.loc.gov/standards/iso639-2/php/code_list.php/>. Keep in mind, however, that to ensure stability, the C<LDML> (Locale Data Markup Language) also uses old data.
+
+If you set the 3-characters C<language> code, it will replace any previously set 2-characters C<language> code.
 
 =head2 language
 
 This is an alias for L<lang|/lang>
+
+=head2 language3
+
+This is an alias for L<lang3|/lang3>
 
 =head2 lb
 
@@ -3938,15 +4045,11 @@ Sets or gets the Unicode extension C<lw>.
 
 =head2 locale
 
-This is an alias for L</lang>
+This is an alias for L<lang|/lang>
 
 =head2 locale3
 
-    my $locale = Locale::Unicode->new( 'jpn' );
-    $locale->script( 'Kana' );
-    # Now: jpn-Kana
-
-Sets or gets the L<3-letter ISO 639-2 code|https://www.loc.gov/standards/iso639-2/php/code_list.php/>. Keep in mind, however, that to ensure stability, the LDML (Locale Data Markup Language) also uses old data.
+This is an alias for L<lang3|/lang3>
 
 =head2 lw
 
@@ -4013,7 +4116,17 @@ Sets or gets the C<region> part of a Unicode locale.
 
 This is a world region represented by a 3-digits code.
 
-Below are the known regions:
+Note that when you set a region code, it will automatically unset any L<country code|/country_code> code.
+
+    my $locale = Locale::Unicode->new( 'en-US' );
+    say $locale->country_code; # US
+    $locale->region( '001' );
+    say $locale->country_code; # undef
+    say $locale; # en-001
+
+Also, be careful that since the region code a padded with leading zeroes, not to turn them inadvertently into integer so that C<001> would not become C<1>. This is particularly true if you store it in a SQL database, where the L<DBI> driver might treat it as a number. You would then have to use L<bind_param|DBI/bind_param>
+
+Below are the known region codes:
 
 =over 4
 
@@ -4172,7 +4285,7 @@ This is an alias for L</source>
     $locale->script( 'Hant' );
     # Now: zh-Hant
 
-Sets or gets the C<script> part of the Locale identifier.
+Sets or gets the C<script> part of the C<locale> identifier.
 
 =head2 sd
 
@@ -4208,7 +4321,7 @@ This is an alias for L</sentence_break>
     $locale->sd( 'usca' );
     # Now: en-US-u-sd-usca
 
-This is a Unicode Subdivision Identifier that specifies a regional subdivision used for locale. This is typically the States in the U.S., or prefectures in France or Japan, or provinces in Canada.
+This is a Unicode Subdivision Identifier that specifies a regional subdivision used for C<locale>. This is typically the States in the U.S., or prefectures in France or Japan, or provinces in Canada.
 
 Sets or gets the Unicode extension C<sd>.
 
@@ -4228,6 +4341,29 @@ This is an alias for L</translation>
 This is a private transformation subtag.
 
 Sets or gets the Transformation private subtag C<x0>.
+
+=head2 territory
+
+    my $locale = Locale::Unicode->new( 'en' );
+    # Sets the country code to 'US'
+    $locale->territory( 'US' );
+    # Now: en-US
+    $locale->territory( 'GB' );
+    # Now: en-GB
+    # Sets the region to 150
+    $locale->territory( 150 );
+
+Sets or gets the country code or the region code part of the C<locale>.
+
+A country code should be an ISO 3166 2-letters code, but keep in mind that the C<LDML> (Locale Data Markup Language) accepts old data to ensure stability.
+
+A world C<region> is represented by a 3-digits code.
+
+In mutator mode, depending on the value, this method C<territory> will set one or the other.
+
+In accessor mode, this will return the country code, if any, or the region code.
+
+See also L<country_code|/country_code> and L<region|/region>
 
 =head2 time_zone
 
@@ -4333,7 +4469,7 @@ This is an alias for L</t_private>
 
 =head2 matches
 
-Provided with a BCP47 locale, and this returns an hash reference of its components if it matches the BCP47 regular expression, which can be accessed as global class variable C<$LOCALE_RE>.
+Provided with a BCP47 C<locale>, and this returns an hash reference of its components if it matches the BCP47 regular expression, which can be accessed as global class variable C<$LOCALE_RE>.
 
 If nothing matches, it returns an empty string in scalar context, or an empty list in list context.
 
@@ -4346,7 +4482,7 @@ If an error occurs, its sets an L<error object|Module::Generic::Exception> and r
     # {
     #     ext_transform => "t-it",
     #     ext_transform_subtag => "it",
-    #     locale => "ja",
+    #     language => "ja",
     #     script => "Kana",
     # }
     my $hash_ref = Locale::Unicode->parse( 'he-IL-u-ca-hebrew-tz-jeruslm' );
@@ -4356,10 +4492,10 @@ If an error occurs, its sets an L<error object|Module::Generic::Exception> and r
     #     country_code => "IL",
     #     ext_unicode => "u-ca-hebrew-tz-jeruslm",
     #     ext_unicode_subtag => "ca-hebrew-tz-jeruslm",
-    #     locale => "he",
+    #     language => "he",
     # }
 
-Provided with a BCP47 locale, and an optional hash reference like the one returned by L<matches|/matches>, and this will return an hash reference with detailed broken down of the locale embedded information, as per the Unicode BCP47 standard.
+Provided with a BCP47 C<locale>, and an optional hash reference like the one returned by L<matches|/matches>, and this will return an hash reference with detailed broken down of the C<locale> embedded information, as per the Unicode BCP47 standard.
 
 =head2 tz_id2name
 
@@ -4413,7 +4549,7 @@ If an error occurs, its sets an L<error object|Module::Generic::Exception> and r
 
 =head1 OVERLOADING
 
-Any object from this class is overloaded and stringifies to its locale representation.
+Any object from this class is overloaded and stringifies to its C<locale> representation.
 
 For example:
 
@@ -4806,7 +4942,7 @@ Prioritise keeping natural phrases (of multiple words) together when breaking, u
 
 =item * C<ms>
 
-A L<Unicode Measurement System Identifier|https://unicode.org/reports/tr35/#UnicodeMeasurementSystemIdentifier> defines a preferred measurement system. Specifying "ms" in a locale identifier overrides the default value specified by supplemental measurement system data for the region
+A L<Unicode Measurement System Identifier|https://unicode.org/reports/tr35/#UnicodeMeasurementSystemIdentifier> defines a preferred measurement system. Specifying "ms" in a C<locale> identifier overrides the default value specified by supplemental measurement system data for the region
 
 Possible L<values|https://github.com/unicode-org/cldr/blob/main/common/bcp47/measure.xml> are:
 
@@ -4978,7 +5114,7 @@ Traditional numerals
 
 A L<Region Override|https://unicode.org/reports/tr35/#RegionOverride> specifies an alternate region to use for obtaining certain region-specific default values
 
-For example: C<en-GB-u-rg-uszzzz> representing a locale for British English but with region-specific defaults set to US.
+For example: C<en-GB-u-rg-uszzzz> representing a C<locale> for British English but with region-specific defaults set to US.
 
 =item * C<sd>
 
@@ -8577,6 +8713,8 @@ L<RFC6497 on the transformation extension|https://datatracker.ietf.org/doc/html/
 See L<HTML::Object::Locale> for an implementation of Web API class L<Intl.Locale|https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Intl/Locale>
 
 L<Unicode::Collate>, L<Unicode::Collate::Locale>, L<Unicode::Unihan>
+
+L<Locale::Unicode::Data> for the entire C<CLDR> data accessible as a SQLite database.
 
 =head1 COPYRIGHT & LICENSE
 

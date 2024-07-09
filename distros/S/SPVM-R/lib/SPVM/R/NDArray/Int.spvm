@@ -3,6 +3,8 @@
 
 class R::NDArray::Int extends R::NDArray {
   
+  use Sort;
+  
   # Class Mehtods
   static method new : R::NDArray::Int ($options : object[] = undef) {
     
@@ -57,6 +59,17 @@ class R::NDArray::Int extends R::NDArray {
     my $string = (string)(int)$elem;
     
     return $string;
+  }
+  
+  method elem_to_object : Int ($data_index : int) {
+    
+    my $data = $self->data;
+    
+    my $elem = $data->[$data_index];
+    
+    my $object = (Int)$elem;
+    
+    return $object;
   }
   
   precompile method set_order : void ($indexes_ndarray : R::NDArray::Int) {
@@ -277,6 +290,26 @@ class R::NDArray::Int extends R::NDArray {
     my $ret_ndarray = R::OP::Int->c($ret_data);
     
     return $ret_ndarray;
+  }
+  
+  method order_asc : R::NDArray::Int () {
+    
+  }
+  
+  method elem_cmp_old : int ($a_elem : Int, $b_elem : Int) {
+    
+    my $cmp = (int)$a_elem <=> (int)$b_elem;
+    
+    return $cmp;
+  }
+  
+  method elem_cmp : int ($a_data_index : int, $b_data_index : int) {
+    
+    my $data = $self->data;
+    
+    my $cmp = $data->[$a_data_index] <=> $data->[$b_data_index];
+    
+    return $cmp;
   }
   
 }

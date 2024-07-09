@@ -20,7 +20,7 @@ require 5;
 use strict;
 
 use vars qw($VERSION);
-$VERSION = 7;
+$VERSION = 8;
 
 # uncomment this to run the ### lines
 # use Smart::Comments;

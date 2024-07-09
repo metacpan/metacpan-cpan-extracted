@@ -1,5 +1,5 @@
 package Cache::CodeBlock;
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 use 5.006; use strict; use warnings; use feature qw/state/;
 use CHI;
 
@@ -40,7 +40,7 @@ Cache::CodeBlock - caching via a code block
 
 =head1 VERSION
 
-Version 0.02
+Version 0.03
 
 =cut
 
@@ -93,10 +93,6 @@ You can also look for information at:
 
 L<https://rt.cpan.org/NoAuth/Bugs.html?Dist=Cache-CodeBlock>
 
-=item * CPAN Ratings
-
-L<https://cpanratings.perl.org/d/Cache-CodeBlock>
-
 =item * Search CPAN
 
 L<https://metacpan.org/release/Cache-CodeBlock>
@@ -107,7 +103,7 @@ L<https://metacpan.org/release/Cache-CodeBlock>
 
 =head1 LICENSE AND COPYRIGHT
 
-This software is Copyright (c) 2022 by LNATION.
+This software is Copyright (c) 2022->2024 by LNATION.
 
 This is free software, licensed under:
 

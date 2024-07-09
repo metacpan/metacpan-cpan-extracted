@@ -6,6 +6,8 @@
 
 class R::NDArray::Byte extends R::NDArray {
   
+  use Sort;
+  
   # Class Mehtods
   static method new : R::NDArray::Byte ($options : object[] = undef) {
     
@@ -61,6 +63,17 @@ class R::NDArray::Byte extends R::NDArray {
     my $string = (string)(byte)$elem;
     
     return $string;
+  }
+  
+  method elem_to_object : Byte ($data_index : int) {
+    
+    my $data = $self->data;
+    
+    my $elem = $data->[$data_index];
+    
+    my $object = (Byte)$elem;
+    
+    return $object;
   }
   
   precompile method set_order : void ($indexes_ndarray : R::NDArray::Int) {
@@ -122,4 +135,42 @@ class R::NDArray::Byte extends R::NDArray {
     $self->SUPER::slice_set($vector_indexes, $ndarray);
   }
   
+  method elem_cmp_old : int ($a_elem : Byte, $b_elem : Byte) {
+    
+    my $cmp = (byte)$a_elem <=> (byte)$b_elem;
+    
+    return $cmp;
+  }
+  
+  method elem_cmp : int ($a_data_index : int, $b_data_index : int) {
+    
+    my $data = $self->data;
+    
+    my $cmp = $data->[$a_data_index] <=> $data->[$b_data_index];
+    
+    return $cmp;
+  }
+  
+  method sort_asc : void () {
+    
+    unless ($self->is_vector) {
+      die "The instance must be a vector.";
+    }
+    
+    my $data = $self->data;
+    
+    Sort->sort_byte_asc($data);
+  }
+  
+  method sort_desc : void () {
+    
+    unless ($self->is_vector) {
+      die "The instance must be a vector.";
+    }
+    
+    my $data = $self->data;
+    
+    Sort->sort_byte_desc($data);
+  }
+
 }

@@ -68,6 +68,17 @@ class R::NDArray::StringBuffer extends R::NDArray::Object {
     return $string;
   }
   
+  method elem_to_object : StringBuffer ($data_index : int) {
+    
+    my $data = $self->data;
+    
+    my $elem = $data->[$data_index];
+    
+    my $object = $elem;
+    
+    return $object;
+  }
+  
   method elem_clone : StringBuffer ($data_index : int) {
     
     my $data = $self->data;
@@ -88,6 +99,22 @@ class R::NDArray::StringBuffer extends R::NDArray::Object {
   
   method slice_set : void ($vector_indexes : R::NDArray::Int[], $ndarray : R::NDArray::StringBuffer) {
     $self->SUPER::slice_set($vector_indexes, $ndarray);
+  }
+  
+  method elem_cmp_old : int ($a_elem : StringBuffer, $b_elem : StringBuffer) {
+    
+    my $cmp = $a_elem->to_string cmp $b_elem->to_string;
+    
+    return $cmp;
+  }
+  
+  method elem_cmp : int ($a_data_index : int, $b_data_index : int) {
+    
+    my $data = $self->data;
+    
+    my $cmp = $data->[$a_data_index]->to_string cmp $data->[$b_data_index]->to_string;
+    
+    return $cmp;
   }
   
 }

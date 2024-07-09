@@ -1,12 +1,12 @@
-package Slack::BlockKit::Block::RichText::Emoji 0.001;
-# ABSTRACT: a BlockKit rich text element for a :colon_code: emoji
+package Slack::BlockKit::Block::RichText::Emoji 0.002;
+# ABSTRACT: a Block Kit rich text element for a :colon_code: emoji
 
 use Moose;
 use MooseX::StrictConstructor;
 
 #pod =head1 OVERVIEW
 #pod
-#pod This represents an C<emoji> element in BlockKit, which are generally put in
+#pod This represents an C<emoji> element in Block Kit, which are generally put in
 #pod place of or between L<text|Slack::BlockKit::Block::RichText::Text> elements in
 #pod rich text sections.
 #pod
@@ -50,15 +50,15 @@ __END__
 
 =head1 NAME
 
-Slack::BlockKit::Block::RichText::Emoji - a BlockKit rich text element for a :colon_code: emoji
+Slack::BlockKit::Block::RichText::Emoji - a Block Kit rich text element for a :colon_code: emoji
 
 =head1 VERSION
 
-version 0.001
+version 0.002
 
 =head1 OVERVIEW
 
-This represents an C<emoji> element in BlockKit, which are generally put in
+This represents an C<emoji> element in Block Kit, which are generally put in
 place of or between L<text|Slack::BlockKit::Block::RichText::Text> elements in
 rich text sections.
 

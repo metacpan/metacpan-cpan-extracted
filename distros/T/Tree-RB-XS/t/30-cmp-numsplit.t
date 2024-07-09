@@ -67,6 +67,9 @@ sub numsplit {
 my @perl_sorted= sort { numsplit() } @strings;
 #my @perl_fc_sorted= sort { numsplit_fc() } @strings;
 
+my @xs_sorted= sort { Tree::RB::XS::cmp_numsplit($a, $b) } @strings;
+is( \@xs_sorted, \@perl_sorted, 'xs cmp_numsplit' );
+
 subtest scalars => sub {
 	my $tree= Tree::RB::XS->new(compare_fn => 'numsplit', key_type => KEY_TYPE_ANY, allow_duplicates => 1);
 	is( $tree->compare_fn, CMP_NUMSPLIT );

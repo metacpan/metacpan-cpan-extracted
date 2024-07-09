@@ -1,5 +1,5 @@
-package Slack::BlockKit::Role::Block 0.001;
-# ABSTRACT: a BlockKit block object
+package Slack::BlockKit::Role::Block 0.002;
+# ABSTRACT: a Block Kit block object
 
 use Moose::Role;
 
@@ -7,8 +7,8 @@ use v5.36.0;
 
 #pod =head1 OVERVIEW
 #pod
-#pod This role is composed by any "block" in BlockKit.  The definition of what is or
-#pod isn't a block is not well defined, but here it means "anything that can be
+#pod This role is composed by any "block" in Block Kit.  The definition of what is
+#pod or isn't a block is not well defined, but here it means "anything that can be
 #pod turned into a struct and has an optional C<block_id> attribute".
 #pod
 #pod =attr block_id
@@ -55,16 +55,16 @@ __END__
 
 =head1 NAME
 
-Slack::BlockKit::Role::Block - a BlockKit block object
+Slack::BlockKit::Role::Block - a Block Kit block object
 
 =head1 VERSION
 
-version 0.001
+version 0.002
 
 =head1 OVERVIEW
 
-This role is composed by any "block" in BlockKit.  The definition of what is or
-isn't a block is not well defined, but here it means "anything that can be
+This role is composed by any "block" in Block Kit.  The definition of what is
+or isn't a block is not well defined, but here it means "anything that can be
 turned into a struct and has an optional C<block_id> attribute".
 
 =head1 PERL VERSION

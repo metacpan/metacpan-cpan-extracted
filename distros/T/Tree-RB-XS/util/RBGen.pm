@@ -121,6 +121,13 @@ $api $nd * ${ns}find_nearest( $nd *node, void *goal,
  */
 $api bool ${ns}find_all( $nd *node, void *goal, ${ns}compare_fn cmp_fn, ${cmp_ctx_decl}int cmp_pointer_ofs,
 	$nd **result_first, $nd **result_last, size_t *result_count );
+
+/* In a tree with duplicate keys, find the left-most node with the same key as 'node', returning 'node' if no other. */
+$nd * ${ns}find_leftmost_samekey($nd *node, int(*compare)(${cmp_ctx_decl}void *a, void *b), ${cmp_ctx_decl}int cmp_ptr_ofs);
+
+/* In a tree with duplicate keys, find the right-most node with the same key as 'node', returning 'node' if no other. */
+$nd * ${ns}find_rightmost_samekey($nd *node, int(*compare)(${cmp_ctx_decl}void *a, void *b), ${cmp_ctx_decl}int cmp_ptr_ofs);
+
 END
 
 	$src .= <<"END" if $self->with_index;
@@ -406,6 +413,34 @@ bool ${ns}find_all($nd *node, void* goal,
 		if (result_count) *result_count= count;
 	}
 	return true;
+}
+
+$nd * ${ns}find_leftmost_samekey($nd *node, int(*compare)(${cmp_ctx_decl}void *a, void *b), ${cmp_ctx_decl}int cmp_ptr_ofs) {
+	// Search the left tree for the first match
+	$nd *first= node, *test= node->left;
+	while (NOT_SENTINEL(test)) {
+		if (0 == compare(${cmp_ctx_arg}PTR_OFS(test,cmp_ptr_ofs), PTR_OFS(node,cmp_ptr_ofs) )) {
+			first= test;
+			test= test->left;
+		}
+		else
+			test= test->right;
+	}
+	return first;
+}
+
+$nd * ${ns}find_rightmost_samekey($nd *node, int(*compare)(${cmp_ctx_decl}void *a, void *b), ${cmp_ctx_decl}int cmp_ptr_ofs) {
+	// Search the left tree for the first match
+	$nd *last= node, *test= node->right;
+	while (NOT_SENTINEL(test)) {
+		if (0 == compare(${cmp_ctx_arg}PTR_OFS(test,cmp_ptr_ofs), PTR_OFS(node,cmp_ptr_ofs) )) {
+			last= test;
+			test= test->right;
+		}
+		else
+			test= test->left;
+	}
+	return last;
 }
 
 /* Insert a new object into the tree.  The initial node is called 'hint' because if the new node

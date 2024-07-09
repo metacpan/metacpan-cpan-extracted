@@ -59,6 +59,17 @@ class R::NDArray::Short extends R::NDArray {
     return $string;
   }
   
+  method elem_to_object : Short ($data_index : int) {
+    
+    my $data = $self->data;
+    
+    my $elem = $data->[$data_index];
+    
+    my $object = (Short)$elem;
+    
+    return $object;
+  }
+  
   precompile method set_order : void ($indexes_ndarray : R::NDArray::Int) {
     
     $self->check_set_order_args($indexes_ndarray);
@@ -120,4 +131,42 @@ class R::NDArray::Short extends R::NDArray {
     $self->SUPER::slice_set($vector_indexes, $ndarray);
   }
   
+  method elem_cmp_old : int ($a_elem : Short, $b_elem : Short) {
+    
+    my $cmp = (short)$a_elem <=> (short)$b_elem;
+    
+    return $cmp;
+  }
+  
+  method elem_cmp : int ($a_data_index : int, $b_data_index : int) {
+    
+    my $data = $self->data;
+    
+    my $cmp = $data->[$a_data_index] <=> $data->[$b_data_index];
+    
+    return $cmp;
+  }
+  
+  method sort_asc : void () {
+    
+    unless ($self->is_vector) {
+      die "The instance must be a vector.";
+    }
+    
+    my $data = $self->data;
+    
+    Sort->sort_short_asc($data);
+  }
+  
+  method sort_desc : void () {
+    
+    unless ($self->is_vector) {
+      die "The instance must be a vector.";
+    }
+    
+    my $data = $self->data;
+    
+    Sort->sort_short_desc($data);
+  }
+
 }

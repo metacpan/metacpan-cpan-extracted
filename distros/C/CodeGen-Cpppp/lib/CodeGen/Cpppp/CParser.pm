@@ -1,6 +1,6 @@
 package CodeGen::Cpppp::CParser;
 
-our $VERSION = '0.004'; # VERSION
+our $VERSION = '0.005'; # VERSION
 # ABSTRACT: C Parser Utility Library
 
 use v5.20;
@@ -207,7 +207,7 @@ Michael Conrad <mike@nrdvana.net>
 
 =head1 VERSION
 
-version 0.004
+version 0.005
 
 =head1 COPYRIGHT AND LICENSE
 

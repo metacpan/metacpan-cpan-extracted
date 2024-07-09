@@ -15,7 +15,7 @@ package Term::Menus;
 ## See user documentation at the end of this file.  Search for =head
 
 
-our $VERSION = '3.030';
+our $VERSION = '3.031';
 
 
 use 5.006;
@@ -5026,9 +5026,9 @@ sub pick # USAGE: &pick( ref_to_choices_array,
                   last;
                }
             }
-         } chomp $numbor;
+         } chomp $numbor;my $test_numbor=$numbor;$test_numbor=~s/\//\\\//sg;
          if (!((keys %picks) && $numbor=~/^[Ff]$/) &&
-               $numbor!~/^\d+|admin$/ && !$return_from_child_menu) {
+               $test_numbor!~/^\d+|admin$/ && !$return_from_child_menu) {
             delete $main::maintain_scroll_flag->{$MenuUnit_hash_ref}
                if defined $main::maintain_scroll_flag;
             $numbor=$start+$choose_num+1;

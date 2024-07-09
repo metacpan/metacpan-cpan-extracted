@@ -1,5 +1,5 @@
-libposix-wide-perl (11-0.1) unstable; urgency=low
+libposix-wide-perl (12-0.1) unstable; urgency=low
 
   * Packaged version.
 
- -- Kevin Ryde <user42_kevin@yahoo.com.au>  Sun, 09 Jun 2024 17:17:50 +1000
+ -- Kevin Ryde <user42_kevin@yahoo.com.au>  Mon, 08 Jul 2024 22:05:51 +1000

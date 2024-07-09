@@ -30,7 +30,7 @@ BEGIN { MyTestHelpers::nowarnings(); }
 # doesn't provoke a "used once" warning
 use POSIX::Wide;
 
-my $want_version = 11;
+my $want_version = 12;
 is ($POSIX::Wide::VERSION, $want_version, 'VERSION variable');
 is (POSIX::Wide->VERSION,  $want_version, 'VERSION class method');
 { ok (eval { POSIX::Wide->VERSION($want_version); 1 },
@@ -69,7 +69,7 @@ sub my_printable_string {
 # variation from testing.
 #
 $ENV{'TZ'} = 'GMT';
-POSIX::tzset();
+eval { POSIX::tzset(); };  # tzset() doesn't always exist
 
 
 #------------------------------------------------------------------------------

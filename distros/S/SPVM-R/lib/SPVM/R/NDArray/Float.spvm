@@ -3,6 +3,8 @@
 
 class R::NDArray::Float extends R::NDArray {
   
+  use Sort;
+  
   # Class Mehtods
   static method new : R::NDArray::Float ($options : object[] = undef) {
     
@@ -58,6 +60,17 @@ class R::NDArray::Float extends R::NDArray {
     my $string = (string)(float)$elem;
     
     return $string;
+  }
+  
+  method elem_to_object : Float ($data_index : int) {
+    
+    my $data = $self->data;
+    
+    my $elem = $data->[$data_index];
+    
+    my $object = (Float)$elem;
+    
+    return $object;
   }
   
   precompile method set_order : void ($indexes_ndarray : R::NDArray::Int) {
@@ -117,6 +130,22 @@ class R::NDArray::Float extends R::NDArray {
   
   method slice_set : void ($vector_indexes : R::NDArray::Int[], $ndarray : R::NDArray::Float) {
     $self->SUPER::slice_set($vector_indexes, $ndarray);
+  }
+  
+  method elem_cmp_old : int ($a_elem : Float, $b_elem : Float) {
+    
+    my $cmp = (float)$a_elem <=> (float)$b_elem;
+    
+    return $cmp;
+  }
+  
+  method elem_cmp : int ($a_data_index : int, $b_data_index : int) {
+    
+    my $data = $self->data;
+    
+    my $cmp = $data->[$a_data_index] <=> $data->[$b_data_index];
+    
+    return $cmp;
   }
   
 }

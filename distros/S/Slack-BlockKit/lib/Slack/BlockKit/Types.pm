@@ -1,5 +1,5 @@
-package Slack::BlockKit::Types 0.001;
-# ABSTRACT: Moose type constraints used internally by Slack::BlockKit
+package Slack::BlockKit::Types 0.002;
+# ABSTRACT: Moose type constraints used internally by Slack::Block Kit
 use v5.36.0;
 
 #pod =head1 OVERVIEW
@@ -32,7 +32,7 @@ subtype RichTextBlocks, as ArrayRef[
 subtype ExpansiveElementList, as ArrayRef[
   union([
     map {; class_type("Slack::BlockKit::Block::RichText::$_") }
-      (qw( Channel Emoji Link Text User UserGroup ))
+      (qw( Channel Date Emoji Link Text User UserGroup ))
   ])
 ];
 
@@ -55,11 +55,11 @@ __END__
 
 =head1 NAME
 
-Slack::BlockKit::Types - Moose type constraints used internally by Slack::BlockKit
+Slack::BlockKit::Types - Moose type constraints used internally by Slack::Block Kit
 
 =head1 VERSION
 
-version 0.001
+version 0.002
 
 =head1 OVERVIEW
 

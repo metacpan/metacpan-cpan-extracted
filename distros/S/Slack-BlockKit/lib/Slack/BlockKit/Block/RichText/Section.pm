@@ -1,4 +1,4 @@
-package Slack::BlockKit::Block::RichText::Section 0.001;
+package Slack::BlockKit::Block::RichText::Section 0.002;
 # ABSTRACT: a collection of rich text elements
 
 use Moose;
@@ -19,7 +19,7 @@ use v5.36.0;
 #pod =attr elements
 #pod
 #pod This must be an arrayref of RichText element objects, from the approved list
-#pod according to the BlockKit docs.
+#pod according to the Block Kit docs.
 #pod
 #pod =cut
 
@@ -52,7 +52,7 @@ Slack::BlockKit::Block::RichText::Section - a collection of rich text elements
 
 =head1 VERSION
 
-version 0.001
+version 0.002
 
 =head1 OVERVIEW
 
@@ -78,7 +78,7 @@ lower the minimum required perl.
 =head2 elements
 
 This must be an arrayref of RichText element objects, from the approved list
-according to the BlockKit docs.
+according to the Block Kit docs.
 
 =head1 AUTHOR
 

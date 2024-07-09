@@ -1,5 +1,5 @@
-package Slack::BlockKit::Role::HasMentionStyle 0.001;
-# ABSTRACT: a BlockKit element with a bunch of styles
+package Slack::BlockKit::Role::HasMentionStyle 0.002;
+# ABSTRACT: a Block Kit element with a bunch of styles
 
 use Moose::Role;
 
@@ -40,11 +40,11 @@ __END__
 
 =head1 NAME
 
-Slack::BlockKit::Role::HasMentionStyle - a BlockKit element with a bunch of styles
+Slack::BlockKit::Role::HasMentionStyle - a Block Kit element with a bunch of styles
 
 =head1 VERSION
 
-version 0.001
+version 0.002
 
 =head1 OVERVIEW
 

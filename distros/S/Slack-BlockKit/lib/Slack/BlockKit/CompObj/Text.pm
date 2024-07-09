@@ -1,5 +1,5 @@
-package Slack::BlockKit::CompObj::Text 0.001;
-# ABSTRACT: a BlockKit "composition object" for text
+package Slack::BlockKit::CompObj::Text 0.002;
+# ABSTRACT: a Block Kit "composition object" for text
 use Moose;
 use MooseX::StrictConstructor;
 
@@ -10,7 +10,7 @@ with 'Slack::BlockKit::Role::Block';
 #pod =head1 OVERVIEW
 #pod
 #pod This is the text "composition object", which is used for non-rich text values
-#pod in several places in BlockKit.
+#pod in several places in Block Kit.
 #pod
 #pod =cut
 
@@ -99,16 +99,16 @@ __END__
 
 =head1 NAME
 
-Slack::BlockKit::CompObj::Text - a BlockKit "composition object" for text
+Slack::BlockKit::CompObj::Text - a Block Kit "composition object" for text
 
 =head1 VERSION
 
-version 0.001
+version 0.002
 
 =head1 OVERVIEW
 
 This is the text "composition object", which is used for non-rich text values
-in several places in BlockKit.
+in several places in Block Kit.
 
 =head1 PERL VERSION
 

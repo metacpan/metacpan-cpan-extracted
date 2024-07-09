@@ -76,6 +76,7 @@ can_ok( $loc, 'kr' );
 can_ok( $loc, 'ks' );
 can_ok( $loc, 'kv' );
 can_ok( $loc, 'lang' );
+can_ok( $loc, 'lang3' );
 can_ok( $loc, 'lb' );
 can_ok( $loc, 'line_break' );
 can_ok( $loc, 'line_break_word' );
@@ -107,6 +108,7 @@ can_ok( $loc, 'ss' );
 can_ok( $loc, 'subdivision' );
 can_ok( $loc, 't0' );
 can_ok( $loc, 't_private' );
+can_ok( $loc, 'territory' );
 can_ok( $loc, 'time_zone' );
 can_ok( $loc, 'timezone' );
 can_ok( $loc, 'transform_locale' );
@@ -146,19 +148,19 @@ my @tests = (
                 ext_subdivision => "sd",
                 ext_unicode => "u-sd-chzh",
                 ext_unicode_subtag => "sd-chzh",
-                locale3 => "gsw",
+                language3 => "gsw",
                 locale_bcp47 => "gsw",
                 locale_extensions => "u-sd-chzh",
             },
             parse =>
             {
-                locale3 => "gsw",
+                language3 => "gsw",
                 sd => "chzh",
                 unicode_ext => ["sd"],
             },
             subs =>
             {
-                locale3 => "gsw",
+                language3 => "gsw",
                 sd => "chzh",
             },
         },
@@ -170,7 +172,7 @@ my @tests = (
                 ext_calendar => "ca",
                 ext_unicode => "u-ca-hebrew-tz-jeruslm",
                 ext_unicode_subtag => "ca-hebrew-tz-jeruslm",
-                locale => "he",
+                language => "he",
                 locale_bcp47 => "he-IL",
                 locale_extensions => "u-ca-hebrew-tz-jeruslm",
             },
@@ -178,7 +180,7 @@ my @tests = (
             {
                 ca => "hebrew",
                 country_code => "IL",
-                locale => "he",
+                language => "he",
                 tz => "jeruslm",
                 unicode_ext => [qw( ca tz )],
             },
@@ -186,7 +188,7 @@ my @tests = (
             {
                 ca => "hebrew",
                 country_code => "IL",
-                locale => "he",
+                language => "he",
                 tz => "jeruslm",
             },
         },
@@ -196,19 +198,19 @@ my @tests = (
             {
                 ext_transform => "t-it",
                 ext_transform_locale => "it",
-                locale => "ja",
+                language => "ja",
                 locale_bcp47 => "ja",
                 locale_extensions => "t-it",
             },
             parse =>
             {
-                locale => "ja",
+                language => "ja",
                 transform_ext => [],
                 transform_locale => 'it',
             },
             subs =>
             {
-                locale => "ja",
+                language => "ja",
                 transform_locale => 'it',
             },
         },
@@ -218,21 +220,21 @@ my @tests = (
             {
                 ext_transform => "t-it",
                 ext_transform_locale => "it",
-                locale => "ja",
+                language => "ja",
                 locale_bcp47 => "ja-Kana",
                 locale_extensions => "t-it",
                 script => "Kana",
             },
             parse =>
             {
-                locale => "ja",
+                language => "ja",
                 script => "Kana",
                 transform_ext => [],
                 transform_locale => 'it',
             },
             subs =>
             {
-                locale => "ja",
+                language => "ja",
                 script => "Kana",
                 transform_locale => 'it',
             },
@@ -243,21 +245,21 @@ my @tests = (
             {
                 ext_transform => "t-und-cyrl",
                 ext_transform_locale => "und-cyrl",
-                locale3 => "und",
+                language3 => "und",
                 locale_bcp47 => "und-Latn",
                 locale_extensions => "t-und-cyrl",
                 script => "Latn",
             },
             parse =>
             {
-                locale3 => "und",
+                language3 => "und",
                 script => "Latn",
                 transform_ext => [],
                 transform_locale => 'und-cyrl',
             },
             subs =>
             {
-                locale3 => "und",
+                language3 => "und",
                 script => "Latn",
                 transform_locale => 'und-cyrl',
             },
@@ -270,14 +272,14 @@ my @tests = (
                 ext_transform => "t-und-latn-m0-ungegn-2007",
                 ext_transform_locale => "und-latn",
                 ext_transform_subtag => "m0-ungegn-2007",
-                locale3 => "und",
+                language3 => "und",
                 locale_bcp47 => "und-Cyrl",
                 locale_extensions => "t-und-latn-m0-ungegn-2007",
                 script => "Cyrl",
             },
             parse =>
             {
-                locale3 => "und",
+                language3 => "und",
                 m0 => "ungegn-2007",
                 script => "Cyrl",
                 transform_ext => ["m0"],
@@ -285,7 +287,7 @@ my @tests = (
             },
             subs =>
             {
-                locale3 => "und",
+                language3 => "und",
                 m0 => "ungegn-2007",
                 script => "Cyrl",
                 transform_locale => 'und-latn',
@@ -299,7 +301,7 @@ my @tests = (
                 ext_collation => "co",
                 ext_unicode => "u-co-phonebk-ka-shifted",
                 ext_unicode_subtag => "co-phonebk",
-                locale => "de",
+                language => "de",
                 locale_bcp47 => "de",
                 locale_extensions => "u-co-phonebk-ka-shifted",
             },
@@ -307,14 +309,14 @@ my @tests = (
             {
                 co => "phonebk",
                 ka => "shifted",
-                locale => "de",
+                language => "de",
                 unicode_ext => [qw( co ka )],
             },
             subs =>
             {
                 co => "phonebk",
                 ka => "shifted",
-                locale => "de",
+                language => "de",
             },
         },
     'ja-t-de-t0-und' =>
@@ -325,20 +327,20 @@ my @tests = (
                 ext_transform_locale => "de",
                 ext_transform_subtag => "t0-und",
                 ext_translation => "t0",
-                locale => "ja",
+                language => "ja",
                 locale_bcp47 => "ja",
                 locale_extensions => "t-de-t0-und",
             },
             parse =>
             {
-                locale => "ja",
+                language => "ja",
                 t0 => "und",
                 transform_ext => ["t0"],
                 transform_locale => 'de',
             },
             subs =>
             {
-                locale => "ja",
+                language => "ja",
                 t0 => "und",
                 transform_locale => 'de',
             },
@@ -351,14 +353,14 @@ my @tests = (
                 ext_transform_locale => "de",
                 ext_transform_subtag => "t0-und",
                 ext_translation => "t0",
-                locale => "ja",
+                language => "ja",
                 locale_bcp47 => "ja",
                 locale_extensions => "t-de-t0-und-x0-medical",
                 transform_options => "x0-medical",
             },
             parse =>
             {
-                locale => "ja",
+                language => "ja",
                 t0 => "und",
                 transform_ext => [qw( t0 x0 )],
                 transform_locale => 'de',
@@ -366,7 +368,7 @@ my @tests = (
             },
             subs =>
             {
-                locale => "ja",
+                language => "ja",
                 t0 => "und",
                 transform_locale => 'de',
                 x0 => "medical",
@@ -383,7 +385,7 @@ my @tests = (
                 ext_translation => "t0",
                 ext_unicode => "u-ca-japanese-tz-jptyo-nu-jpanfin",
                 ext_unicode_subtag => "ca-japanese-tz-jptyo-nu-jpanfin",
-                locale => "ja",
+                language => "ja",
                 locale_bcp47 => "ja",
                 locale_extensions => "t-de-AT-t0-und-x0-medical-u-ca-japanese-tz-jptyo-nu-jpanfin",
                 private_extension => 'x-private-subtag',
@@ -393,7 +395,7 @@ my @tests = (
             parse =>
             {
                 ca => "japanese",
-                locale => "ja",
+                language => "ja",
                 nu => "jpanfin",
                 private => "private-subtag",
                 t0 => "und",
@@ -406,7 +408,7 @@ my @tests = (
             subs =>
             {
                 ca => "japanese",
-                locale => "ja",
+                language => "ja",
                 nu => "jpanfin",
                 private => "private-subtag",
                 t0 => "und",

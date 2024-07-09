@@ -14,6 +14,7 @@ t/03create.t
 t/05subclass.t
 t/11method-signatures.t
 t/12fields-capture.t
+t/22fields-accesssors.t
 t/24fields-constructor.t
 t/31pad-outside.t
 t/50croak-method.t

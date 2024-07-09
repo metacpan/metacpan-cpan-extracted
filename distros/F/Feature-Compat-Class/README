@@ -7,8 +7,8 @@ SYNOPSIS
        use Feature::Compat::Class;
     
        class Point {
-          field $x :param = 0;
-          field $y :param = 0;
+          field $x :param :reader = 0;
+          field $y :param :reader = 0;
     
           method move_to ($new_x, $new_y) {
              $x = $new_x;
@@ -30,6 +30,9 @@ DESCRIPTION
     Perl added such syntax at version 5.38.0, which is enabled by
 
        use feature 'class';
+
+    This syntax was further expanded in 5.40, adding the __CLASS__ keyword
+    and :reader attribute on fields.
 
     On that version of perl or later, this module simply enables the core
     feature equivalent of using it directly. On such perls, this module
@@ -146,6 +149,12 @@ KEYWORDS
 
        field $five = 5;
 
+    Since version 0.07 field initialiser expressions can see earlier fields
+    that have already been declared, and use their values:
+
+       field $fullname  :param;
+       field $shortname :param = ( split m/ +/, $fullname )[0];
+
     The following field attributes are supported:
 
   :param
@@ -183,6 +192,31 @@ KEYWORDS
        C->new( timeout => $args{timeout} );
        # default applies if %args has no 'timeout' key, or if its value is undef
 
+  :reader, :reader(NAME)
+
+    Since version 0.07.
+
+    Generates a reader method to return the current value of the field. If
+    no name is given, the name of the field is used. A single prefix
+    character _ will be removed if present.
+
+       field $x :reader;
+    
+       # equivalent to
+       field $x;  method x { return $x }
+
+    These are permitted on an field type, not just scalars. The reader
+    method behaves identically to how a lexical variable would behave in
+    the same context; namely returning a list of values from an array or
+    key/value pairs from a hash when in list context, or the number of
+    items or keys when in scalar context.
+
+       field @items :reader;
+    
+       foreach my $item ( $obj->items ) { ... }   # iterates the list of items
+    
+       my $count = $obj->items;                   # yields count of items
+
  ADJUST
 
        ADJUST { ... }
@@ -191,6 +225,49 @@ KEYWORDS
 
     Attributes are not supported; in particular the :params attribute of
     Object::Pad v0.70.
+
+ __CLASS__
+
+       my $classname = __CLASS__;
+
+    Since version 0.07.
+
+    Only valid within the body (or signature) of a method, an ADJUST block,
+    or the initialising expression of a field. Yields the class name of the
+    instance that the method, block or expression is invoked on.
+
+    This is similar to the core perl __PACKAGE__ constant, except that it
+    cares about the dynamic class of the actual instance, not the static
+    class the code belongs to. When invoked by a subclass instance that
+    inherited code from its superclass it yields the name of the class of
+    the instance regardless of which class defined the code.
+
+    For example,
+
+       class BaseClass {
+          ADJUST { say "Constructing an instance of " . __CLASS__; }
+       }
+    
+       class DerivedClass :isa(BaseClass) { }
+    
+       my $obj = DerivedClass->new;
+
+    Will produce the following output
+
+       Constructing an instance of DerivedClass
+
+    This is particularly useful in field initialisers for invoking
+    (constant) methods on the invoking class to provide default values for
+    fields. This way a subclass could provide a different value.
+
+       class Timer {
+          use constant DEFAULT_DURATION => 60;
+          field $duration = __CLASS__->DEFAULT_DURATION;
+       }
+    
+       class ThreeMinuteTimer :isa(Timer) {
+          use constant DEFAULT_DURATION => 3 * 60;
+       }
 
  Other Keywords
 
@@ -212,17 +289,7 @@ COMPATIBILITY NOTES
     conform to the description given above, the following differences
     should be noted.
 
-    Fields in later field expressions
-
-      The core perl class feature makes every field variable visible to the
-      initialising expression of later fields. For example,
-
-         field $one = 1;
-         field $two = $one + 1;
-
-      This is not currently supported by Object::Pad. As a result, it is
-      possible to write code that works fine with the core perl feature but
-      older perls cannot support by using Object::Pad.
+    No known issues at this time
 
 AUTHOR
 

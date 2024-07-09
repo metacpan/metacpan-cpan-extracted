@@ -7,7 +7,7 @@ use Mo qw(build default is);
 use Mo::utils 0.21 qw(check_array_object);
 use Mo::utils::Date 0.04 qw(check_date check_date_order);
 
-our $VERSION = 0.05;
+our $VERSION = 0.06;
 
 has date_of_birth => (
 	is => 'ro',
@@ -26,10 +26,6 @@ has name => (
 	is => 'ro',
 );
 
-has nkcr_aut => (
-	is => 'ro',
-);
-
 has surname => (
 	is => 'ro',
 );
@@ -41,6 +37,20 @@ has work_period_start => (
 has work_period_end => (
 	is => 'ro',
 );
+
+sub full_name {
+	my $self = shift;
+
+	my $full_name = $self->name;
+	if (defined $self->surname) {
+		if ($full_name) {
+			$full_name .= ' ';
+		}
+		$full_name .= $self->surname;
+	}
+
+	return $full_name;
+}
 
 sub BUILD {
 	my $self = shift;
@@ -80,8 +90,8 @@ MARC::Convert::Wikidata::Object::People - Bibliographic Wikidata object for peop
  my $date_of_birth = $obj->date_of_birth;
  my $date_of_death = $obj->date_of_death;
  my $external_ids_ar = $obj->external_ids;
+ my $full_name = $obj->full_name;
  my $name = $obj->name;
- my $nkcr_aut = $obj->nkcr_aut;
  my $surname = $obj->surname;
  my $work_period_start = $obj->work_period_start;
  my $work_period_end = $obj->work_period_end;
@@ -128,12 +138,6 @@ Given name of people.
 
 Default value is undef.
 
-=item * C<nkcr_aut>
-
-ID in National library of the Czech Republic authority database.
-
-Default value is undef.
-
 =item * C<surname>
 
 Surname of people.
@@ -166,21 +170,19 @@ Get list of external ids.
 
 Returns reference to array with L<MARC::Convert::Wikidata::Object::ExternalId> instances.
 
+=head2 C<full_name>
+
+ my $full_name = $obj->full_name;
+
+Get full name.
+
+Returns string.
+
 =head2 C<name>
 
  my $name = $obj->name;
 
 Get given name.
-
-Returns string.
-
-=head2 C<nkcr_aut>
-
-I<It is deprecated. It will be removed in future.>
-
- my $nkcr_aut = $obj->nkcr_aut;
-
-Get ID from National Library of the Czech Republic authority database.
 
 Returns string.
 
@@ -306,6 +308,6 @@ BSD 2-Clause License
 
 =head1 VERSION
 
-0.05
+0.06
 
 =cut

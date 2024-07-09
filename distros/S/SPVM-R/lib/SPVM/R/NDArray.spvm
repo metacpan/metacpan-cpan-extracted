@@ -389,6 +389,8 @@ class R::NDArray {
   
   method elem_to_string : string ($data_index : int) { die "Not impelmented."; }
   
+  method elem_to_object : object ($data_index : int) { die "Not impelmented."; }
+  
   method elem_clone : object ($data_index : int) { die "Not impelmented."; }
   
   method slice : R::NDArray ($vector_indexes : R::NDArray::Int[]) {
@@ -721,5 +723,60 @@ class R::NDArray {
     
     return $elem_type_name;
   }
+  
+  method elem_cmp_old : int ($a_elem : object, $b_elem : object) { die "Not implemented."; }
+  
+  method elem_cmp : int ($a_data_index : int, $b_data_index : int) { die "Not implemented."; }
+  
+  method sort_asc : void () {
+    
+    my $order_ndarray = $self->order;
+    
+    $self->set_order($order_ndarray);
+  }
+  
+  method sort_desc : void () {
+    
+    my $order_ndarray = $self->order;
+    
+    &reverse_int($order_ndarray->data);
+    
+    $self->set_order($order_ndarray);
+  }
+  
+  method order : R::NDArray::Int () {
+    
+    unless ($self->is_vector) {
+      die "The instance must be a vector.";
+    }
+    
+    my $length = $self->length;
+    
+    my $order_ndarray = R::OP::Int->seq(0, $length - 1);
+    
+    my $order_data = $order_ndarray->data;
+    
+    Sort->sort_int($order_data, [has that : R::NDArray = $self] method : int ($a_data_index : int, $b_data_index : int) {
+      return $self->{that}->elem_cmp($a_data_index, $b_data_index);
+    });
+    
+    return $order_ndarray;
+  }
+
+  private static method reverse_int : void ($array : int[]) {
+    
+    unless ($array) {
+      die "The array \$array must be defined.";
+    }
+    
+    my $length = @$array;
+    
+    for (my $i = 0; $i < $length / 2; $i++) {
+      my $temp = $array->[$i];
+      $array->[$i] = $array->[$length - $i - 1];
+      $array->[$length - $i - 1] = $temp;
+    }
+  }
+
 }
 

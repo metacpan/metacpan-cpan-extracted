@@ -21,7 +21,6 @@
 # Try Module::Util::Masked mangling of Module::Util with Devel::Unplug
 # removing available modules.
 
-
 use 5.004;
 use strict;
 use Test;

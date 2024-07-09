@@ -6,6 +6,7 @@ use v5.20;
 use autodie;
 use File::Temp;
 use Cwd 'abs_path';
+use CodeGen::Cpppp::Platform;
 
 my $tmp= File::Temp->newdir();
 my $in_cpppp= "$tmp/source.cp";
@@ -109,16 +110,18 @@ subtest format_commandline => sub {
 ${{ format_commandline() }}
 */
 END
-   is( slurp($out_c), <<END, 'out.c' );
+   # Test specifically on Unix, but just ensure that Win32 doesn't crash and burn
+   # because it's a hassle and the output is basically identical to Win32::ShellQuote
+   like( slurp($out_c), $^O eq 'MSWin32'? qr/\Q$bin_cpppp\E/ : <<END, 'out.c' );
 /*
 $bin_cpppp --convert-linecomment-to-c89 \\
-      -o $out_c
+    -o ${\CodeGen::Cpppp::Platform::_unix_shellquote($out_c)}
 */
 END
 };
 
 subtest re_exec => sub {
-   $^O eq 'Win32' and skip_all("re_exec doesn't work on Win32");
+   $^O eq 'MSWin32' and skip_all("re_exec doesn't work on Win32");
    -e $_ && unlink $_ for $in_cpppp, $out_c, $out_h;
    spew($in_cpppp, <<END);
 #! $^X $bin_cpppp
@@ -133,7 +136,7 @@ END
    is( slurp($out_c), <<END, 'out.c' );
 /*
 $bin_cpppp -o $out_c \\
-      $in_cpppp
+    $in_cpppp
 */
 END
 };

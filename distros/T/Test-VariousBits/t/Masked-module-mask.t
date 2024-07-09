@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2011, 2015 Kevin Ryde
+# Copyright 2011, 2015, 2017 Kevin Ryde
 
 # This file is part of Test-VariousBits.
 #
@@ -16,6 +16,10 @@
 #
 # You should have received a copy of the GNU General Public License along
 # with Test-VariousBits.  If not, see <http://www.gnu.org/licenses/>.
+
+
+# Try Module::Util::Masked mangling of Module::Util with Module::Mask
+# removing available modules.
 
 use 5.004;
 use strict;

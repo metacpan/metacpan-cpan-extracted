@@ -1,3 +1,11 @@
+Version 0.11 - 2024-07-09
+  - New comparison flag GET_OR_ADD, inserts an empty node if one didn't exist
+  - New get_key function returns nearest key to one requested.
+  - New get shortcuts get_or_add, get_key_lt, get_key_le, get_key_gt, get_key_ge
+  - Methods get, lookup, get_or_add, FETCH, and node method 'value' are now
+     flagged as lvalue subs.
+  - New exportable function 'cmp_numsplit' can be used independent of tree nodes
+
 Version 0.10 - 2024-07-05
   - New method 'exists', takes list of keys and returns node count
   - New methods put_multi and insert_multi

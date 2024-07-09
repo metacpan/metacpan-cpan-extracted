@@ -34,7 +34,12 @@ subtest no_duplicates => sub {
 		[ GET_NEXT, 0 => 1 ],
 		[ GET_PREV, 0 => undef ],
 	) {
-		is( scalar $tree->lookup($_->[1], $_->[0]), $_->[2], "$_->[0] $_->[1]" );
+		my ($mode, $key, $val)= @$_;
+		is( scalar $tree->lookup($key, $mode), $val, "$mode $key" );
+		is( [ $tree->lookup($key, $mode) ],
+		    [ defined $val? ($val, object { call key => $val; call value => $val }) : () ],
+		    "$mode $key list context"
+		);
 	}
 };
 

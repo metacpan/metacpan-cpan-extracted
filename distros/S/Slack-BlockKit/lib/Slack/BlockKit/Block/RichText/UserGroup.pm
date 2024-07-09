@@ -1,5 +1,5 @@
-package Slack::BlockKit::Block::RichText::UserGroup 0.001;
-# ABSTRACT: a BlockKit rich text element that mentions a @usergroup
+package Slack::BlockKit::Block::RichText::UserGroup 0.002;
+# ABSTRACT: a Block Kit rich text element that mentions a @usergroup
 
 use Moose;
 use MooseX::StrictConstructor;
@@ -8,8 +8,9 @@ with 'Slack::BlockKit::Role::HasMentionStyle';
 
 #pod =head1 OVERVIEW
 #pod
-#pod This represents the mention of a specific Slack user group in a hunk of rich text.
-#pod The group name will be styled and linked-to.  So, to send something like:
+#pod This represents the mention of a specific Slack user group in a hunk of rich
+#pod text.  The group name will be styled and linked-to.  So, to send something
+#pod like:
 #pod
 #pod     I will ask @team-tam.
 #pod
@@ -54,16 +55,17 @@ __END__
 
 =head1 NAME
 
-Slack::BlockKit::Block::RichText::UserGroup - a BlockKit rich text element that mentions a @usergroup
+Slack::BlockKit::Block::RichText::UserGroup - a Block Kit rich text element that mentions a @usergroup
 
 =head1 VERSION
 
-version 0.001
+version 0.002
 
 =head1 OVERVIEW
 
-This represents the mention of a specific Slack user group in a hunk of rich text.
-The group name will be styled and linked-to.  So, to send something like:
+This represents the mention of a specific Slack user group in a hunk of rich
+text.  The group name will be styled and linked-to.  So, to send something
+like:
 
     I will ask @team-tam.
 

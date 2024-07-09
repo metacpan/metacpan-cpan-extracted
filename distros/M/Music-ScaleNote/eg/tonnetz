@@ -2,6 +2,7 @@
 use strict;
 use warnings;
 
+use if $ENV{USER} eq "gene", lib => map { "$ENV{HOME}/sandbox/$_/lib" } qw(Music-ScaleNote);
 use Music::ScaleNote ();
 
 my $row_offset = shift || 4; # major 3rd
@@ -51,3 +52,11 @@ for my $note (@notes) {
     print "\n";
     print ' ' x ($row * $width);
 }
+
+__END__
+G#  D#  A#  F   C   G   D   A   E   
+  C   G   D   A   E   B   F#  C#  G#  
+    E   B   F#  C#  G#  D#  A#  F   C   
+      G#  D#  A#  F   C   G   D   A   E   
+        C   G   D   A   E   B   F#  C#  G#  
+          E   B   F#  C#  G#  D#  A#  F   C

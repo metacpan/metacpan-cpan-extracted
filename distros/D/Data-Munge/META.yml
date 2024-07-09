@@ -27,5 +27,5 @@ requires:
   warnings: '0'
 resources:
   repository: git://github.com/mauke/Data-Munge
-version: '0.101'
+version: '0.111'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

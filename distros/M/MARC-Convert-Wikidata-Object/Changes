@@ -1,3 +1,9 @@
+0.06 2024-07-08T17:33:38+02:00
+ - API change: Add full_name() method to People.
+ - API change: Remove ccnb() and oclc() methods in Object.
+ - API change: Remove nkcr_aut() method from People.
+ - Add PublicationDate object.
+
 0.05 2024-07-04T21:29:18+02:00
  - API change: Add 'external_ids' parameter to Object object.
  - API change: Add 'external_ids' parameter to People object.

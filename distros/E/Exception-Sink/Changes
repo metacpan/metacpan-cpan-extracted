@@ -1,5 +1,9 @@
 Revision history for Perl extension Exception::Sink.
 
+3.08  2024.07.08
+
+    1. added book_skip($$) and optional skip argument to get_stack_trace()
+
 3.07  2016.07.04
 
     1. split file name from the line number in stack trace output.

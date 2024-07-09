@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2011, 2012, 2015 Kevin Ryde
+# Copyright 2011, 2012, 2015, 2017 Kevin Ryde
 
 # This file is part of Test-VariousBits.
 #
@@ -28,7 +28,7 @@ ok (1, 1, 'Test::Without::Shm load as first thing');
 #------------------------------------------------------------------------------
 # VERSION
 
-my $want_version = 7;
+my $want_version = 8;
 ok ($Test::Without::Shm::VERSION,
     $want_version,
     'VERSION variable');

@@ -1,5 +1,5 @@
-package Slack::BlockKit::Sugar 0.001;
-# ABSTRACT: sugar for building BlockKit structures easily (start here!)
+package Slack::BlockKit::Sugar 0.002;
+# ABSTRACT: sugar for building Block Kit structures easily (start here!)
 
 use v5.36.0;
 
@@ -31,16 +31,16 @@ use experimental 'builtin'; # blessed
 #pod
 #pod =head1 OVERVIEW
 #pod
-#pod This module exports a bunch of functions that can be composed to build BlockKit
-#pod block collections, which can then be easily turned into a data structure that
-#pod can be serialized.
+#pod This module exports a bunch of functions that can be composed to build Block
+#pod Kit block collections, which can then be easily turned into a data structure
+#pod that can be serialized.
 #pod
 #pod If you learn to use I<this> library, you can generally ignore the other dozen
 #pod (more!) modules in this distribution.  On the other hand, you B<must> more or
-#pod less understand how BlockKit works, which means reading the L<BlockKit
+#pod less understand how Block Kit works, which means reading the L<BlockKit
 #pod documentation|https://api.slack.com/block-kit> at Slack's API site.
 #pod
-#pod The key is to have a decent idea of the BlockKit structure you want.  Knowing
+#pod The key is to have a decent idea of the Block Kit structure you want.  Knowing
 #pod that, you can look at the list of functions provided by this library and
 #pod compose them together.  Start with a call to C<blocks>, passing the result of
 #pod calling other generators to it.  In the end, you'll have an object on which you
@@ -92,7 +92,7 @@ use Sub::Exporter -setup => {
     qw( richblock ),
     qw( richsection list preformatted quote ), # top-level
     qw( olist ulist ), # specialized list()
-    qw( channel emoji link richtext user usergroup ), # deeper
+    qw( channel date emoji link richtext user usergroup ), # deeper
     qw( bold code italic strike ), # specialized richtext()
 
     # Other Things
@@ -309,7 +309,7 @@ sub quote (@elements) {
 #pod   my $rich_text_channel = channel($channel_id);
 #pod   # or
 #pod   my $rich_text_channel = channel(\%arg, $channel_id);
-#pod   
+#pod
 #pod This function returns a L<channel mention
 #pod object|Slack::BlockKit::Block::RichText::Channel>, which can be used among
 #pod other rich text elements to "mention" a channel.  The C<$channel_id> should be
@@ -329,6 +329,35 @@ sub channel {
   Slack::BlockKit::Block::RichText::Channel->new({
     %$arg,
     channel_id => $id,
+  });
+}
+
+#pod =func date
+#pod
+#pod   my $rich_text_date = date($timestamp, \%arg);
+#pod
+#pod This returns a L<rich text date object|Slack::BlockKit::Block::RichText::Date>
+#pod for the given time (a unix timestamp).  If given, the referenced C<%arg> can
+#pod contain additional arguments to the Date constructor.
+#pod
+#pod Date formatting objects have a mandatory C<format> property.  If none is given
+#pod in C<%arg>, the default is:
+#pod
+#pod   \x{200b}{date_short_pretty} at {time}
+#pod
+#pod Why that weird first character?  It's a zero-width space, and suppresses the
+#pod capitalization of "yesterday" (or other words) at the start.  This
+#pod capitalization seems like a bug (or bad design) in Slack.
+#pod
+#pod =cut
+
+sub date ($timestamp, $arg=undef) {
+  $arg //= {};
+
+  Slack::BlockKit::Block::RichText::Date->new({
+    format => "\x{200b}{date_short_pretty} at {time}",
+    %$arg,
+    timestamp => $timestamp,
   });
 }
 
@@ -450,7 +479,7 @@ sub strike ($text) { richtext(['strike'], $text) }
 #pod   my $rich_text_user = user($user_id);
 #pod   # or
 #pod   my $rich_text_user = user(\%arg, $user_id);
-#pod   
+#pod
 #pod This function returns a L<user mention
 #pod object|Slack::BlockKit::Block::RichText::User>, which can be used among
 #pod other rich text elements to "mention" a user.  The C<$user_id> should be
@@ -567,7 +596,7 @@ sub header ($arg) {
 #pod
 #pod Otherwise, you'll have to pass a reference to a hash of argument that will be
 #pod passed to the section constructor.  If this function feels weird, it might just
-#pod be because the C<section> element in BlockKit is a bit weird.  Sorry!
+#pod be because the C<section> element in Block Kit is a bit weird.  Sorry!
 #pod
 #pod =cut
 
@@ -646,24 +675,24 @@ __END__
 
 =head1 NAME
 
-Slack::BlockKit::Sugar - sugar for building BlockKit structures easily (start here!)
+Slack::BlockKit::Sugar - sugar for building Block Kit structures easily (start here!)
 
 =head1 VERSION
 
-version 0.001
+version 0.002
 
 =head1 OVERVIEW
 
-This module exports a bunch of functions that can be composed to build BlockKit
-block collections, which can then be easily turned into a data structure that
-can be serialized.
+This module exports a bunch of functions that can be composed to build Block
+Kit block collections, which can then be easily turned into a data structure
+that can be serialized.
 
 If you learn to use I<this> library, you can generally ignore the other dozen
 (more!) modules in this distribution.  On the other hand, you B<must> more or
-less understand how BlockKit works, which means reading the L<BlockKit
+less understand how Block Kit works, which means reading the L<BlockKit
 documentation|https://api.slack.com/block-kit> at Slack's API site.
 
-The key is to have a decent idea of the BlockKit structure you want.  Knowing
+The key is to have a decent idea of the Block Kit structure you want.  Knowing
 that, you can look at the list of functions provided by this library and
 compose them together.  Start with a call to C<blocks>, passing the result of
 calling other generators to it.  In the end, you'll have an object on which you
@@ -840,6 +869,23 @@ the alphanumeric Slack channel id, not a channel name.
 If given, the C<%arg> hash is extra parameters to pass to the Channel
 constructor.
 
+=head2 date
+
+  my $rich_text_date = date($timestamp, \%arg);
+
+This returns a L<rich text date object|Slack::BlockKit::Block::RichText::Date>
+for the given time (a unix timestamp).  If given, the referenced C<%arg> can
+contain additional arguments to the Date constructor.
+
+Date formatting objects have a mandatory C<format> property.  If none is given
+in C<%arg>, the default is:
+
+  \x{200b}{date_short_pretty} at {time}
+
+Why that weird first character?  It's a zero-width space, and suppresses the
+capitalization of "yesterday" (or other words) at the start.  This
+capitalization seems like a bug (or bad design) in Slack.
+
 =head2 emoji
 
   my $rich_text_emoji = emoji($emoji_name);
@@ -970,7 +1016,7 @@ object and then used the same way.
 
 Otherwise, you'll have to pass a reference to a hash of argument that will be
 passed to the section constructor.  If this function feels weird, it might just
-be because the C<section> element in BlockKit is a bit weird.  Sorry!
+be because the C<section> element in Block Kit is a bit weird.  Sorry!
 
 =head2 mrkdwn
 

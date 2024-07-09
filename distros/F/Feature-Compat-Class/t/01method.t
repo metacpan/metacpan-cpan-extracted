@@ -15,12 +15,16 @@ use Feature::Compat::Class;
 {
    class Test1 {
       method hello { return "Hello, world!" }
+
+      method classname { return __CLASS__; }
    }
 
    my $obj = Test1->new;
    isa_ok( $obj, "Test1", '$obj' );
 
    is( $obj->hello, "Hello, world!", '$obj->hello' );
+
+   is( $obj->classname, "Test1", '$obj->classname yields __CLASS__' );
 }
 
 # $self in method

@@ -138,7 +138,8 @@ static const char * get_cmp_name(int cmp_id) {
 #define GET_PREV 6
 #define GET_EQ_LAST 7
 #define GET_LE_LAST 8
-#define GET_MAX  8
+#define GET_OR_ADD 9
+#define GET_MAX  9
 
 static int parse_lookup_mode(SV *mode_sv) {
 	int mode;
@@ -181,18 +182,10 @@ static int parse_lookup_mode(SV *mode_sv) {
 		          break;
 		case 'P': case 'p': mode= foldEQ(mode_str, "PREV", 4)? GET_PREV : -1; break;
 		case 'N': case 'n': mode= foldEQ(mode_str, "NEXT", 4)? GET_NEXT : -1; break;
+		case 'o': case 'O': mode= foldEQ(mode_str, "OR_ADD", 6)? GET_OR_ADD : -1; break;
 		}
 	}
 	return mode;
-}
-
-#define EXPORT_ENUM(x) newCONSTSUB(stash, #x, new_enum_dualvar(x, newSVpvs_share(#x)))
-static SV * new_enum_dualvar(IV ival, SV *name) {
-	SvUPGRADE(name, SVt_PVNV);
-	SvIV_set(name, ival);
-	SvIOK_on(name);
-	SvREADONLY_on(name);
-	return name;
 }
 
 struct dllist_node {
@@ -767,44 +760,87 @@ static void TreeRBXS_destroy(struct TreeRBXS *tree) {
 		TreeRBXS_iter_free(tree->hashiter);
 }
 
-static struct TreeRBXS_item *TreeRBXS_find_item(struct TreeRBXS *tree, struct TreeRBXS_item *key, int mode) {
-	rbtree_node_t *first, *last;
+// This gets used in two places, but I don't want to make it a function.
+#define TREERBXS_INSERT_ITEM_AT_NODE(tree, item, parent_node, direction) \
+	do { \
+		if (!(parent_node)) /* empty tree */ \
+			rbtree_node_insert_before(&(tree)->root_sentinel, &(item)->rbnode); \
+		else if ((direction) > 0) \
+			rbtree_node_insert_after((parent_node), &(item)->rbnode); \
+		else \
+			rbtree_node_insert_before((parent_node), &(item)->rbnode); \
+		if ((tree)->track_recent) \
+			TreeRBXS_recent_insert_before((tree), (item), &(tree)->recent); \
+	} while (0)
+
+static struct TreeRBXS_item *TreeRBXS_find_item(struct TreeRBXS *tree, struct TreeRBXS_item *stack_item, int mode) {
+	struct TreeRBXS_item *item;
 	rbtree_node_t *node= NULL;
+	int cmp;
+	bool step= false;
 
 	// Need to ensure we find the *first* matching node for a key,
 	// to deal with the case of duplicate keys.
-	if (rbtree_find_all(
+	node= rbtree_find_nearest(
 		&tree->root_sentinel,
-		key,
+		stack_item, // The item *is* the key that gets passed to the compare function
 		(int(*)(void*,void*,void*)) tree->compare,
 		tree, -OFS_TreeRBXS_item_FIELD_rbnode,
-		&first, &last, NULL)
-	) {
+		&cmp);
+	if (node && cmp == 0) {
 		// Found an exact match.  First and last are the range of nodes matching.
 		switch (mode) {
-		case GET_EQ:
-		case GET_GE:
-		case GET_LE: node= first; break;
-		case GET_EQ_LAST:
-		case GET_LE_LAST: node= last; break;
 		case GET_LT:
-		case GET_PREV: node= rbtree_node_prev(first); break;
+		case GET_PREV:
+			step= true;
+		case GET_EQ:
+		case GET_OR_ADD:
+		case GET_GE:
+		case GET_LE:
+			// make sure it is the first of nodes with same key
+			if (tree->allowed_duplicates)
+				node= rbtree_find_leftmost_samekey(node, (int(*)(void*,void*,void*)) tree->compare,
+					tree, -OFS_TreeRBXS_item_FIELD_rbnode);
+			if (step)
+				node= rbtree_node_prev(node);
+			break;
 		case GET_GT:
-		case GET_NEXT: node= rbtree_node_next(last); break;
+		case GET_NEXT:
+			step= true;
+		case GET_EQ_LAST:
+		case GET_LE_LAST:
+			// make sure it is the last of nodes with same key
+			if (tree->allowed_duplicates)
+				node= rbtree_find_rightmost_samekey(node, (int(*)(void*,void*,void*)) tree->compare,
+					tree, -OFS_TreeRBXS_item_FIELD_rbnode);
+			if (step)
+				node= rbtree_node_next(node);
+			break;
 		default: croak("BUG: unhandled mode");
 		}
 	} else {
 		// Didn't find an exact match.  First and last are the bounds of what would have matched.
 		switch (mode) {
 		case GET_EQ:
-		case GET_EQ_LAST: node= NULL; break;
+		case GET_EQ_LAST:
+		case GET_PREV:
+		case GET_NEXT:
+			node= NULL; break;
 		case GET_GE:
-		case GET_GT: node= last; break;
+		case GET_GT:
+			if (node && cmp > 0)
+				node= rbtree_node_next(node);
+			break;
 		case GET_LE:
 		case GET_LE_LAST:
-		case GET_LT: node= first; break;
-		case GET_PREV:
-		case GET_NEXT: node= NULL; break;
+		case GET_LT:
+			if (node && cmp < 0)
+				node= rbtree_node_prev(node);
+			break;
+		case GET_OR_ADD:
+			item= TreeRBXS_new_item_from_tmp_item(stack_item);
+			TREERBXS_INSERT_ITEM_AT_NODE(tree, item, node, cmp);
+			return item;
 		default: croak("BUG: unhandled mode");
 		}
 	}
@@ -891,13 +927,8 @@ TreeRBXS_insert_item(struct TreeRBXS *tree, struct TreeRBXS_item *stack_item, bo
 				TreeRBXS_recent_insert_before(tree, item, &tree->recent);
 			tree->prev_inserted_dup= false;
 		} else if (tree->allow_duplicates) {
-			if (!rbtree_find_all(
-				hint, stack_item,
-				(int(*)(void*,void*,void*)) tree->compare,
-				tree, -OFS_TreeRBXS_item_FIELD_rbnode,
-				NULL, &hint, NULL)
-				)
-				croak("BUG");
+			hint= rbtree_find_rightmost_samekey(hint, (int(*)(void*,void*,void*)) tree->compare,
+				tree, -OFS_TreeRBXS_item_FIELD_rbnode);
 			insert_new_duplicate:
 			item= TreeRBXS_new_item_from_tmp_item(stack_item);
 			rbtree_node_insert_after(hint, &item->rbnode);
@@ -913,16 +944,8 @@ TreeRBXS_insert_item(struct TreeRBXS *tree, struct TreeRBXS_item *stack_item, bo
 	}
 	else {
 		insert_relative:
-		// return false means first is the preceeding node and last is the following node.
 		item= TreeRBXS_new_item_from_tmp_item(stack_item);
-		if (!hint) // empty tree
-			rbtree_node_insert_before(&tree->root_sentinel, &item->rbnode);
-		else if (cmp > 0)
-			rbtree_node_insert_after(hint, &item->rbnode);
-		else
-			rbtree_node_insert_before(hint, &item->rbnode);
-		if (tree->track_recent)
-			TreeRBXS_recent_insert_before(tree, item, &tree->recent);
+		TREERBXS_INSERT_ITEM_AT_NODE(tree, item, hint, cmp);
 		tree->prev_inserted_dup= false;
 	}
 	// If trend logic is triggered above, this is already calculated.  Else check adjacency.
@@ -1011,43 +1034,14 @@ static int TreeRBXS_cmp_memcmp(struct TreeRBXS *tree, struct TreeRBXS_item *a, s
 
 //#define DEBUG_NUMSPLIT(args...) warn(args)
 #define DEBUG_NUMSPLIT(args...)
-static int TreeRBXS_cmp_numsplit(struct TreeRBXS *tree, struct TreeRBXS_item *a, struct TreeRBXS_item *b) {
-	const char *apos, *alim, *amark;
-	const char *bpos, *blim, *bmark;
-	size_t alen, blen;
-	bool a_utf8= false, b_utf8= false;
-	int cmp;
 
-	switch (tree->key_type) {
-	case KEY_TYPE_USTR:
-		a_utf8= b_utf8= true;
-	case KEY_TYPE_BSTR:
-		apos= a->keyunion.ckey; alim= apos + a->ckeylen;
-		bpos= b->keyunion.ckey; blim= bpos + b->ckeylen;
-		break;
-	case KEY_TYPE_ANY:
-	case KEY_TYPE_CLAIM:
-#if PERL_VERSION_LT(5,14,0)
-		// before 5.14, need to force both to utf8 if either are utf8
-		if (SvUTF8(a->keyunion.svkey) || SvUTF8(b->keyunion.svkey)) {
-			apos= SvPVutf8(a->keyunion.svkey, alen);
-			bpos= SvPVutf8(b->keyunion.svkey, blen);
-			a_utf8= b_utf8= true;
-		} else
-#else
-		// After 5.14, can compare utf8 with bytes without converting the buffer
-		a_utf8= SvUTF8(a->keyunion.svkey);
-		b_utf8= SvUTF8(b->keyunion.svkey);
-#endif		
-		{
-			apos= SvPV(a->keyunion.svkey, alen);
-			bpos= SvPV(b->keyunion.svkey, blen);
-		}
-		alim= apos + alen;
-		blim= bpos + blen;
-		break;
-	default: croak("BUG");
-	}
+static int cmp_numsplit(
+	const char *apos, const char *alim, bool a_utf8,
+	const char *bpos, const char *blim, bool b_utf8
+) {
+	const char *amark, *bmark;
+	size_t alen, blen;
+	int cmp;
 
 	DEBUG_NUMSPLIT("compare '%.*s' | '%.*s'", (int)(alim-apos), apos, (int)(blim-bpos), bpos);
 	while (apos < alim && bpos < blim) {
@@ -1119,6 +1113,46 @@ static int TreeRBXS_cmp_numsplit(struct TreeRBXS *tree, struct TreeRBXS_item *a,
 	if (apos < alim) { DEBUG_NUMSPLIT("a is longer '%.*s' = 1", (int)(alim-apos), apos); return 1; }
 	DEBUG_NUMSPLIT("identical");
 	return 0;
+}
+
+static int TreeRBXS_cmp_numsplit(struct TreeRBXS *tree, struct TreeRBXS_item *a, struct TreeRBXS_item *b) {
+	const char *apos, *alim, *amark;
+	const char *bpos, *blim, *bmark;
+	size_t alen, blen;
+	bool a_utf8= false, b_utf8= false;
+	int cmp;
+
+	switch (tree->key_type) {
+	case KEY_TYPE_USTR:
+		a_utf8= b_utf8= true;
+	case KEY_TYPE_BSTR:
+		apos= a->keyunion.ckey; alim= apos + a->ckeylen;
+		bpos= b->keyunion.ckey; blim= bpos + b->ckeylen;
+		break;
+	case KEY_TYPE_ANY:
+	case KEY_TYPE_CLAIM:
+#if PERL_VERSION_LT(5,14,0)
+		// before 5.14, need to force both to utf8 if either are utf8
+		if (SvUTF8(a->keyunion.svkey) || SvUTF8(b->keyunion.svkey)) {
+			apos= SvPVutf8(a->keyunion.svkey, alen);
+			bpos= SvPVutf8(b->keyunion.svkey, blen);
+			a_utf8= b_utf8= true;
+		} else
+#else
+		// After 5.14, can compare utf8 with bytes without converting the buffer
+		a_utf8= SvUTF8(a->keyunion.svkey);
+		b_utf8= SvUTF8(b->keyunion.svkey);
+#endif		
+		{
+			apos= SvPV(a->keyunion.svkey, alen);
+			bpos= SvPV(b->keyunion.svkey, blen);
+		}
+		alim= apos + alen;
+		blim= bpos + blen;
+		break;
+	default: croak("BUG");
+	}
+	return cmp_numsplit(apos, alim, a_utf8, bpos, blim, b_utf8);
 }
 
 // Compare SV items using Perl's 'cmp' operator
@@ -1389,6 +1423,25 @@ static struct TreeRBXS_iter* TreeRBXS_get_magic_iter(SV *obj, int flags) {
 	return NULL;
 }
 
+#define FUNCTION_IS_LVALUE(x) function_is_lvalue(aTHX_ stash, #x)
+static void function_is_lvalue(pTHX_ HV *stash, const char *name) {
+	CV *method_cv;
+	GV *method_gv;
+	if (!(method_gv= gv_fetchmethod(stash, name))
+		|| !(method_cv= GvCV(method_gv)))
+		croak("Missing method %s", name);
+	CvLVALUE_on(method_cv);
+}
+
+#define EXPORT_ENUM(x) newCONSTSUB(stash, #x, new_enum_dualvar(aTHX_ x, newSVpvs_share(#x)))
+static SV * new_enum_dualvar(pTHX_ IV ival, SV *name) {
+	SvUPGRADE(name, SVt_PVNV);
+	SvIV_set(name, ival);
+	SvIOK_on(name);
+	SvREADONLY_on(name);
+	return name;
+}
+
 /*----------------------------------------------------------------------------
  * Tree Methods
  */
@@ -1482,7 +1535,7 @@ key_type(tree)
 	INIT:
 		int kt= tree->key_type;
 	PPCODE:
-		ST(0)= sv_2mortal(new_enum_dualvar(kt, newSVpv(get_key_type_name(kt), 0)));
+		ST(0)= sv_2mortal(new_enum_dualvar(aTHX_ kt, newSVpv(get_key_type_name(kt), 0)));
 		XSRETURN(1);
 
 void
@@ -1492,7 +1545,7 @@ compare_fn(tree)
 		int id= tree->compare_fn_id;
 	PPCODE:
 		ST(0)= id == CMP_SUB? tree->compare_callback
-			: sv_2mortal(new_enum_dualvar(id, newSVpv(get_cmp_name(id), 0)));
+			: sv_2mortal(new_enum_dualvar(aTHX_ id, newSVpv(get_cmp_name(id), 0)));
 		XSRETURN(1);
 
 void
@@ -1698,72 +1751,78 @@ get(tree, key, mode_sv= NULL)
 	SV *key
 	SV *mode_sv
 	ALIAS:
-		Tree::RB::XS::lookup           = 0
-		Tree::RB::XS::get              = 1
-		Tree::RB::XS::get_node         = 2
-		Tree::RB::XS::get_node_last    = 3
-		Tree::RB::XS::get_node_le      = 4
-		Tree::RB::XS::get_node_le_last = 5
-		Tree::RB::XS::get_node_lt      = 6
-		Tree::RB::XS::get_node_gt      = 7
-		Tree::RB::XS::get_node_ge      = 8
-		Tree::RB::XS::FETCH            = 9
+		Tree::RB::XS::get_node         = 0x00
+		Tree::RB::XS::get_key          = 0x01
+		Tree::RB::XS::FETCH            = 0x02
+		Tree::RB::XS::lookup           = 0x03
+		Tree::RB::XS::get              = 0x04
+		Tree::RB::XS::get_node_ge      = 0x10
+		Tree::RB::XS::get_key_ge       = 0x11
+		Tree::RB::XS::get_node_le      = 0x20
+		Tree::RB::XS::get_key_le       = 0x21
+		Tree::RB::XS::get_node_gt      = 0x30
+		Tree::RB::XS::get_key_gt       = 0x31
+		Tree::RB::XS::get_node_lt      = 0x40
+		Tree::RB::XS::get_key_lt       = 0x41
+		Tree::RB::XS::get_node_last    = 0x70
+		Tree::RB::XS::get_node_le_last = 0x80
+		Tree::RB::XS::get_or_add       = 0x92
 	INIT:
 		struct TreeRBXS_item stack_item, *item;
-		int mode= 0;
+		int mode= 0, n= 0;
 	PPCODE:
 		if (!SvOK(key))
 			croak("Can't use undef as a key");
-		switch (ix) {
-		// In "full compatibility mode", 'get' is identical to 'lookup'
-		case 1:
-			if (tree->compat_list_get) {
-				ix= 0;
-		// In scalar context, lookup is identical to 'get'
-		case 0: if (GIMME_V == G_SCALAR) ix= 1;
-			}
-		case 2:
+		// Extract the comparison enum from ix, or read it from mode_sv
+		if (ix >> 4) {
+			mode= (ix >> 4);
+			ix &= 0xF;
+			if (mode_sv)
+				croak("extra get-mode argument");
+		} else {
 			mode= mode_sv? parse_lookup_mode(mode_sv) : GET_EQ;
 			if (mode < 0)
 				croak("Invalid lookup mode %s", SvPV_nolen(mode_sv));
-			break;
-		case 3: mode= GET_EQ_LAST; if (0)
-		case 4: mode= GET_LE;      if (0)
-		case 5: mode= GET_LE_LAST; if (0)
-		case 6: mode= GET_LT;      if (0)
-		case 7: mode= GET_GT;      if (0)
-		case 8: mode= GET_GE;
-			if (mode_sv) croak("extra get-mode argument");
-			ix= 2;
-			break;
-		case 9: ix= 1; break; // FETCH should always return a single value
 		}
+		// In "full compatibility mode", 'get' is identical to 'lookup' and depends on list context.
+		// In scalar context, they both become the same as FETCH
+		if (ix >= 3)
+			ix= (GIMME_V == G_SCALAR || (ix == 4 && !tree->compat_list_get))? 2 : 3;
+		// From here,
+		//  ix = 0 : return node
+		//  ix = 1 : return key
+		//  ix = 2 : return value
+		//  ix = 3 : return (value, node)
+
 		// create a fake item to act as a search key
 		TreeRBXS_init_tmp_item(&stack_item, tree, key, &PL_sv_undef);
 		item= TreeRBXS_find_item(tree, &stack_item, mode);
 		if (item) {
 			if (tree->lookup_updates_recent)
 				TreeRBXS_recent_insert_before(tree, item, &tree->recent);
-			if (ix == 0) { // lookup in list context
+			if (GIMME_V == G_VOID)
+				n= 0;
+			else if (ix <= 1) {
+				if (ix == 0) { // return node
+					ST(0)= sv_2mortal(TreeRBXS_wrap_item(item));
+					n= 1;
+				} else {       // return key
+					ST(0)= sv_2mortal(TreeRBXS_item_wrap_key(item));
+					n= 1;
+				}
+			} else if (ix == 2) { // return value
+				ST(0)= item->value;
+				n= 1;
+			} else {              // return (value, node)
 				ST(0)= item->value;
 				ST(1)= sv_2mortal(TreeRBXS_wrap_item(item));
-				XSRETURN(2);
-			} else if (ix == 1) { // get, or lookup in scalar context
-				ST(0)= item->value;
-				XSRETURN(1);
-			} else { // get_node
-				ST(0)= sv_2mortal(TreeRBXS_wrap_item(item));
-				XSRETURN(1);
+				n= 2;
 			}
 		} else {
-			if (ix == 0) { // lookup in list context
-				XSRETURN(0);
-			}
-			else {
-				ST(0)= &PL_sv_undef;
-				XSRETURN(1);
-			}
+			ST(0)= &PL_sv_undef;
+			n= (ix == 3)? 0 : 1; // empty list, else single undef
 		}
+		XSRETURN(n);
 
 void
 get_all(tree, key)
@@ -2073,6 +2132,35 @@ DELETE(tree, key)
 			ST(0)= &PL_sv_undef;
 		}
 		XSRETURN(1);
+
+IV
+cmp_numsplit(key_a, key_b)
+	SV *key_a
+	SV *key_b
+	INIT:
+		const char *apos, *bpos;
+		STRLEN alen, blen;
+		bool a_utf8= false, b_utf8= false;
+	CODE:
+#if PERL_VERSION_LT(5,14,0)
+		// before 5.14, need to force both to utf8 if either are utf8
+		if (SvUTF8(key_a) || SvUTF8(key_b)) {
+			apos= SvPVutf8(key_a, alen);
+			bpos= SvPVutf8(key_b, blen);
+			a_utf8= b_utf8= true;
+		} else
+#else
+		// After 5.14, can compare utf8 with bytes without converting the buffer
+		a_utf8= SvUTF8(key_a);
+		b_utf8= SvUTF8(key_b);
+#endif		
+		{
+			apos= SvPV(key_a, alen);
+			bpos= SvPV(key_b, blen);
+		}
+		RETVAL= cmp_numsplit(apos, apos+alen, a_utf8, bpos, bpos+blen, b_utf8);
+	OUTPUT:
+		RETVAL
 
 #-----------------------------------------------------------------------------
 #  Node Methods
@@ -2520,7 +2608,17 @@ delete(iter)
 #
 
 BOOT:
-	HV* stash= gv_stashpvn("Tree::RB::XS", 12, 1);
+	CV *method_cv;
+	GV *method_gv;
+	int i;
+	HV *stash= gv_stashpvn("Tree::RB::XS::Node", 18, 1);
+	FUNCTION_IS_LVALUE(value);
+	
+	stash= gv_stashpvn("Tree::RB::XS", 12, 1);
+	FUNCTION_IS_LVALUE(get);
+	FUNCTION_IS_LVALUE(get_or_add);
+	FUNCTION_IS_LVALUE(FETCH);
+	FUNCTION_IS_LVALUE(lookup);
 	EXPORT_ENUM(KEY_TYPE_ANY);
 	EXPORT_ENUM(KEY_TYPE_INT);
 	EXPORT_ENUM(KEY_TYPE_FLOAT);
@@ -2534,6 +2632,7 @@ BOOT:
 	EXPORT_ENUM(CMP_MEMCMP);
 	EXPORT_ENUM(CMP_NUMSPLIT);
 	EXPORT_ENUM(GET_EQ);
+	EXPORT_ENUM(GET_OR_ADD);
 	EXPORT_ENUM(GET_EQ_LAST);
 	EXPORT_ENUM(GET_GE);
 	EXPORT_ENUM(GET_LE);

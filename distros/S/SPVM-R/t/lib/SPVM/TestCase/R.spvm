@@ -176,6 +176,114 @@ class TestCase::R {
         
       }
       
+      {
+        my $data_frame = R::DataFrame->new;
+        
+        $data_frame->set_col("Name1", IOP->c([3, 3, 1, 1, 2, 2]));
+        $data_frame->set_col("Name2", my $col2 = IOP->c([5, 6, 3, 4, 1, 2]));
+        
+        my $order_ndarray = $data_frame->order(["Name2"]);
+        
+        unless (Array->equals_int($order_ndarray->data, [4, 5, 2, 3, 0, 1])) {
+          return 0;
+        }
+        
+        $data_frame->set_order($order_ndarray);
+        
+        unless (Array->equals_int($data_frame->col("Name1")->(R::NDArray::Int)->data, [2, 2, 1, 1, 3, 3])) {
+          return 0;
+        }
+        
+        unless (Array->equals_int($data_frame->col("Name2")->(R::NDArray::Int)->data, [1, 2, 3, 4, 5, 6])) {
+          return 0;
+        }
+        
+      }
+      
+      {
+        my $data_frame = R::DataFrame->new;
+        
+        $data_frame->set_col("Name1", IOP->c([3, 3, 1, 1, 2, 2]));
+        $data_frame->set_col("Name2", my $col2 = IOP->c([5, 6, 3, 4, 1, 2]));
+        
+        my $order_ndarray = $data_frame->order(["Name2 desc"]);
+        
+        unless (Array->equals_int($order_ndarray->data, [1, 0, 3, 2, 5, 4])) {
+          return 0;
+        }
+        
+        $data_frame->set_order($order_ndarray);
+        
+        unless (Array->equals_int($data_frame->col("Name1")->(R::NDArray::Int)->data, [3, 3, 1, 1, 2, 2])) {
+          return 0;
+        }
+        
+        unless (Array->equals_int($data_frame->col("Name2")->(R::NDArray::Int)->data, [6, 5, 4, 3, 2, 1])) {
+          return 0;
+        }
+        
+      }
+      
+      {
+        my $data_frame = R::DataFrame->new;
+        
+        $data_frame->set_col("Name1", IOP->c([3, 3, 1, 1, 2, 2]));
+        $data_frame->set_col("Name2", my $col2 = IOP->c([5, 6, 3, 4, 1, 2]));
+        
+        $data_frame->sort_asc(["Name2"]);
+        
+        unless (Array->equals_int($data_frame->col("Name1")->(R::NDArray::Int)->data, [2, 2, 1, 1, 3, 3])) {
+          return 0;
+        }
+        
+        unless (Array->equals_int($data_frame->col("Name2")->(R::NDArray::Int)->data, [1, 2, 3, 4, 5, 6])) {
+          return 0;
+        }
+        
+      }
+      
+      {
+        my $data_frame = R::DataFrame->new;
+        
+        $data_frame->set_col("Name1", IOP->c([3, 3, 1, 1, 2, 2]));
+        $data_frame->set_col("Name2", my $col2 = IOP->c([5, 6, 3, 4, 1, 2]));
+        
+        $data_frame->sort_desc(["Name2"]);
+        
+        unless (Array->equals_int($data_frame->col("Name1")->(R::NDArray::Int)->data, [3, 3, 1, 1, 2, 2])) {
+          return 0;
+        }
+        
+        unless (Array->equals_int($data_frame->col("Name2")->(R::NDArray::Int)->data, [6, 5, 4, 3, 2, 1])) {
+          return 0;
+        }
+        
+      }
+      
+      {
+        my $data_frame = R::DataFrame->new;
+        
+        $data_frame->set_col("Name1", IOP->c([3, 3, 1, 1, 2, 2]));
+        $data_frame->set_col("Name2", my $col2 = IOP->c([5, 6, 3, 4, 1, 2]));
+        
+        my $order_ndarray = $data_frame->order(["Name1", "Name2 desc"]);
+        
+        unless (Array->equals_int($order_ndarray->data, [3, 2, 5, 4, 1, 0])) {
+          return 0;
+        }
+        
+        $data_frame->set_order($order_ndarray);
+        
+        unless (Array->equals_int($data_frame->col("Name1")->(R::NDArray::Int)->data, [1, 1, 2, 2, 3, 3])) {
+          return 0;
+        }
+        
+        unless (Array->equals_int($data_frame->col("Name2")->(R::NDArray::Int)->data, [4, 3, 2, 1, 6, 5])) {
+          return 0;
+        }
+        
+      }
+      
     }
     
     # R::OP::Int
@@ -2316,6 +2424,123 @@ class TestCase::R {
           
         }
       }
+      
+      # R::NDArray#order method
+      {
+        {
+          my $data = [1, 2, 3, 4, 5];
+          
+          my $ndarray = IOP->c($data);
+          
+          my $ret_ndarray = $ndarray->order;
+          
+          unless (Array->equals_int($ret_ndarray->data, [0, 1, 2, 3, 4])) {
+            return 0;
+          }
+        }
+        
+        {
+          my $data = [5, 4, 3, 2, 1];
+          
+          my $ndarray = IOP->c($data);
+          
+          my $ret_ndarray = $ndarray->order;
+          
+          unless (Array->equals_int($ret_ndarray->data, [4, 3, 2, 1, 0])) {
+            return 0;
+          }
+        }
+        
+        {
+          my $data = [2, 1, 3, 4, 5];
+          
+          my $ndarray = IOP->c($data);
+          
+          my $ret_ndarray = $ndarray->order;
+          
+          unless (Array->equals_int($ret_ndarray->data, [1, 0, 2, 3, 4])) {
+            return 0;
+          }
+        }
+        
+        {
+          my $data = [3, 1, 2];
+          
+          my $ndarray = IOP->c($data);
+          
+          my $ret_ndarray = $ndarray->order;
+          
+          unless (Array->equals_int($ret_ndarray->data, [1, 2, 0])) {
+            return 0;
+          }
+        }
+        
+        {
+          my $data = [3, 1, 2];
+          
+          my $ndarray = IOP->c($data);
+          
+          my $ret_ndarray = $ndarray->order;
+          
+          unless (Array->equals_int($ret_ndarray->data, [1, 2, 0])) {
+            return 0;
+          }
+        }
+
+        {
+          my $data = [2, 1, 3];
+          
+          my $ndarray = IOP->c($data);
+          
+          my $ret_ndarray = $ndarray->order;
+          
+          unless (Array->equals_int($ret_ndarray->data, [1, 0, 2])) {
+            return 0;
+          }
+        }
+        
+        {
+          my $data = [30, 10, 20];
+          
+          my $ndarray = IOP->c($data);
+          
+          my $ret_ndarray = $ndarray->order;
+          
+          unless (Array->equals_int($ret_ndarray->data, [1, 2, 0])) {
+            return 0;
+          }
+          
+          $ndarray->set_order($ret_ndarray);
+          
+          unless (Array->equals_int($ndarray->data, [10, 20, 30])) {
+            return 0;
+          }
+        }
+        
+        {
+          my $data = [30, 10, 20];
+          
+          my $ret_ndarray = IOP->c($data);
+          
+          $ret_ndarray->sort_asc;
+          
+          unless (Array->equals_int($ret_ndarray->data, [10, 20, 30])) {
+            return 0;
+          }
+        }
+        
+        {
+          my $data = [30, 10, 20];
+          
+          my $ret_ndarray = IOP->c($data);
+          
+          $ret_ndarray->sort_desc;
+          
+          unless (Array->equals_int($ret_ndarray->data, [30, 20, 10])) {
+            return 0;
+          }
+        }
+     }
       
     }
     

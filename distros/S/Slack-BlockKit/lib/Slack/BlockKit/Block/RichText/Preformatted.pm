@@ -1,5 +1,5 @@
-package Slack::BlockKit::Block::RichText::Preformatted 0.001;
-# ABSTRACT: a BlockKit preformatted rich text element
+package Slack::BlockKit::Block::RichText::Preformatted 0.002;
+# ABSTRACT: a Block Kit preformatted rich text element
 
 use Moose;
 use MooseX::StrictConstructor;
@@ -18,7 +18,7 @@ use v5.36.0;
 #pod =attr border
 #pod
 #pod This property is meant to be the number of pixels wide the border is.  In
-#pod practice, the author has only found this to cause Slack to reject BlockKit
+#pod practice, the author has only found this to cause Slack to reject Block Kit
 #pod structures.
 #pod
 #pod =cut
@@ -31,7 +31,7 @@ has border => (
 #pod =attr elements
 #pod
 #pod This is an arrayref of rich text elements.  For more information, see the slack
-#pod BlockKit documentation.
+#pod Block Kit documentation.
 #pod
 #pod =cut
 
@@ -67,11 +67,11 @@ __END__
 
 =head1 NAME
 
-Slack::BlockKit::Block::RichText::Preformatted - a BlockKit preformatted rich text element
+Slack::BlockKit::Block::RichText::Preformatted - a Block Kit preformatted rich text element
 
 =head1 VERSION
 
-version 0.001
+version 0.002
 
 =head1 OVERVIEW
 
@@ -96,13 +96,13 @@ lower the minimum required perl.
 =head2 border
 
 This property is meant to be the number of pixels wide the border is.  In
-practice, the author has only found this to cause Slack to reject BlockKit
+practice, the author has only found this to cause Slack to reject Block Kit
 structures.
 
 =head2 elements
 
 This is an arrayref of rich text elements.  For more information, see the slack
-BlockKit documentation.
+Block Kit documentation.
 
 =head1 AUTHOR
 

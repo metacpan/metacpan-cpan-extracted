@@ -1,5 +1,12 @@
 Revision history for Feature-Compat-Class
 
+0.07    2024-07-08
+        [CHANGES]
+         * Updated for Perl v5.40 to support the `:reader` field attribute and
+           `__CLASS__` keyword
+         * Use `Object::Pad` v0.806 on older perls, in order to support field
+           initialiser expressions that can see earlier fields
+
 0.06    2023-07-03
         [CHANGES]
          * Updated documentation for Perl v5.38 release which now includes

@@ -20,7 +20,10 @@ subtest throws => sub {
 };
 
 subtest offsets => sub {
-    my $msn = new_ok 'Music::ScaleNote' => [ scale_name => 'pminor' ];
+    my $msn = new_ok 'Music::ScaleNote' => [
+        scale_name => 'pminor',
+        # verbose    => 1,
+    ];
 
     my $format = 'midinum';
     my $note = $msn->get_offset(
@@ -76,7 +79,10 @@ subtest offsets => sub {
 };
 
 subtest steps => sub {
-    my $msn = new_ok 'Music::ScaleNote' => [ scale_name => 'pminor' ];
+    my $msn = new_ok 'Music::ScaleNote' => [
+        scale_name => 'pminor',
+        # verbose    => 1,
+    ];
 
     my $format = 'midi';
 

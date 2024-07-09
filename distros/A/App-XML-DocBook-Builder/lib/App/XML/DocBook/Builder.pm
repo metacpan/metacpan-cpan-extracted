@@ -1,5 +1,5 @@
 package App::XML::DocBook::Builder;
-$App::XML::DocBook::Builder::VERSION = '0.1100';
+$App::XML::DocBook::Builder::VERSION = '0.1101';
 use 5.014;
 use strict;
 use warnings;
@@ -62,7 +62,7 @@ App::XML::DocBook::Builder - Build DocBook/XML files.
 
 =head1 VERSION
 
-version 0.1100
+version 0.1101
 
 =head1 SYNOPSIS
 
@@ -188,7 +188,7 @@ feature.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2022 by Shlomi Fish.
+This software is Copyright (c) 2024 by Shlomi Fish.
 
 This is free software, licensed under:
 

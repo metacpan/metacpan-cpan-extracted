@@ -21,12 +21,12 @@ lib/Sublike/Extended.xs
 lib/XS/Parse/Sublike.pm
 lib/XS/Parse/Sublike.xs
 lib/XS/Parse/Sublike/Builder.pm
-lib/XS/Parse/Sublike/Builder_data.pm.PL
 LICENSE
 MANIFEST			This list of files
 META.json
 META.yml
 README
+share/include/XSParseSublike.h
 src/parse_subsignature_ex.c
 t/00use.t
 t/01func.t
@@ -62,4 +62,3 @@ t/prefix.xs
 t/registrations.xs
 t/stages.xs
 t/testcase.pm
-XSParseSublike.h

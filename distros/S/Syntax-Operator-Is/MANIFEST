@@ -1,0 +1,14 @@
+.editorconfig
+Build.PL
+Changes
+lib/Syntax/Operator/Is.pm
+lib/Syntax/Operator/Is.xs
+MANIFEST			This list of files
+t/00use.t
+t/01is.t
+t/80match-is.t
+t/99pod.t
+README
+LICENSE
+META.yml
+META.json

@@ -1,5 +1,5 @@
-package Slack::BlockKit::Block::Divider 0.001;
-# ABSTRACT: a BlockKit "divider" block
+package Slack::BlockKit::Block::Divider 0.002;
+# ABSTRACT: a Block Kit "divider" block
 use Moose;
 use MooseX::StrictConstructor;
 
@@ -7,7 +7,7 @@ with 'Slack::BlockKit::Role::Block';
 
 #pod =head1 OVERVIEW
 #pod
-#pod This is possibly the simplest block in BlockKit.  It's a divider.  It has no
+#pod This is possibly the simplest block in Block Kit.  It's a divider.  It has no
 #pod attributes other than its type and optionally its block id.
 #pod
 #pod =cut
@@ -31,15 +31,15 @@ __END__
 
 =head1 NAME
 
-Slack::BlockKit::Block::Divider - a BlockKit "divider" block
+Slack::BlockKit::Block::Divider - a Block Kit "divider" block
 
 =head1 VERSION
 
-version 0.001
+version 0.002
 
 =head1 OVERVIEW
 
-This is possibly the simplest block in BlockKit.  It's a divider.  It has no
+This is possibly the simplest block in Block Kit.  It's a divider.  It has no
 attributes other than its type and optionally its block id.
 
 =head1 PERL VERSION

@@ -62,6 +62,20 @@ class R::NDArray::DoubleComplex extends R::NDArray {
     return $string;
   }
   
+  method elem_to_object : Complex_2d[] ($data_index : int) {
+    
+    my $data = $self->data;
+    
+    my $elem = $data->[$data_index];
+    
+    my $object = new Complex_2d[1];
+    
+    $object->[0]{re} = $elem->{re};
+    $object->[0]{im} = $elem->{im};
+    
+    return $object;
+  }
+  
   precompile method set_order : void ($indexes_ndarray : R::NDArray::Int) {
     
     $self->check_set_order_args($indexes_ndarray);

@@ -72,11 +72,11 @@ An error code
 
 =item * C<file>
 
-The location where the error occurred. This is populated using the L<Devel::StackTrace/"filename">
+The location where the error occurred.
 
 =item * C<line>
 
-The line number in the file where the error occurred.This is populated using the L<Devel::StackTrace/"line">
+The line number in the file where the error occurred.
 
 =item * C<message>
 
@@ -84,7 +84,7 @@ The error message. It can be provided as a list of arguments that will be concat
 
 =item * C<package>
 
-The package name where the error occurred.  This is populated using the L<Devel::StackTrace/"package">
+The package name where the error occurred.
 
 =item * C<retry_after>
 

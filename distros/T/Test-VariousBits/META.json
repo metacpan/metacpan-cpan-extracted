@@ -4,13 +4,13 @@
       "Kevin Ryde <user42_kevin@yahoo.com.au>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.1002, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "gpl_3"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Test-VariousBits",
    "no_index" : {
@@ -47,7 +47,7 @@
       "runtime" : {
          "requires" : {
             "lib" : "0",
-            "perl" : "5",
+            "perl" : "5.000",
             "vars" : "0"
          },
          "suggests" : {
@@ -70,23 +70,23 @@
    "provides" : {
       "Module::Util::Masked" : {
          "file" : "lib/Module/Util/Masked.pm",
-         "version" : "7"
+         "version" : "8"
       },
       "Test::VariousBits" : {
          "file" : "META.yml",
-         "version" : "7"
+         "version" : "8"
       },
       "Test::Weaken::ExtraBits" : {
          "file" : "lib/Test/Weaken/ExtraBits.pm",
-         "version" : "7"
+         "version" : "8"
       },
       "Test::Without::GD" : {
          "file" : "lib/Test/Without/GD.pm",
-         "version" : "7"
+         "version" : "8"
       },
       "Test::Without::Shm" : {
          "file" : "lib/Test/Without/Shm.pm",
-         "version" : "7"
+         "version" : "8"
       }
    },
    "release_status" : "stable",
@@ -96,6 +96,6 @@
          "http://www.gnu.org/licenses/gpl.html"
       ]
    },
-   "version" : "7",
-   "x_serialization_backend" : "JSON::PP version 2.27300_01"
+   "version" : 8,
+   "x_serialization_backend" : "JSON::PP version 4.16"
 }

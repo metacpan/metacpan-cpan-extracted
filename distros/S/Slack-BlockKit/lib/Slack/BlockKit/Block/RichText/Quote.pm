@@ -1,5 +1,5 @@
-package Slack::BlockKit::Block::RichText::Quote 0.001;
-# ABSTRACT: a BlockKit rich text "quoted text" block
+package Slack::BlockKit::Block::RichText::Quote 0.002;
+# ABSTRACT: a Block Kit rich text "quoted text" block
 
 use Moose;
 use MooseX::StrictConstructor;
@@ -18,7 +18,7 @@ use v5.36.0;
 #pod =attr border
 #pod
 #pod This property is meant to be the number of pixels wide the border is.  In
-#pod practice, the author has only found this to cause Slack to reject BlockKit
+#pod practice, the author has only found this to cause Slack to reject Block Kit
 #pod structures.
 #pod
 #pod =cut
@@ -60,11 +60,11 @@ __END__
 
 =head1 NAME
 
-Slack::BlockKit::Block::RichText::Quote - a BlockKit rich text "quoted text" block
+Slack::BlockKit::Block::RichText::Quote - a Block Kit rich text "quoted text" block
 
 =head1 VERSION
 
-version 0.001
+version 0.002
 
 =head1 OVERVIEW
 
@@ -89,7 +89,7 @@ lower the minimum required perl.
 =head2 border
 
 This property is meant to be the number of pixels wide the border is.  In
-practice, the author has only found this to cause Slack to reject BlockKit
+practice, the author has only found this to cause Slack to reject Block Kit
 structures.
 
 =head2 elements

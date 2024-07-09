@@ -9,7 +9,6 @@ SYNOPSIS
      my $authors_ar = $obj->authors;
      my $authors_of_afterword_ar = $obj->authors_of_afterword;
      my $authors_of_introduction_ar = $obj->authors_of_introduction;
-     my $ccnb = $obj->ccnb;
      my $compilers = $obj->compilers;
      my $cover = $obj->cover;
      my $directors_ar = $obj->directors;
@@ -26,7 +25,6 @@ SYNOPSIS
      my $languages_ar = $obj->languages;
      my $narrators_ar = $obj->narrators;
      my $number_of_pages = $obj->number_of_pages;
-     my $oclc = $obj->oclc;
      my $photographers_ar = $obj->photographers;
      my $publication_date = $obj->publication_date;
      my $publishers_ar = $obj->publishers;
@@ -64,12 +62,6 @@ METHODS
             MARC::Convert::Wikidata::Object::People instances.
 
             Default value is reference to blank array.
-
-    *       "ccnb"
-
-            ČČNB (Česká národní bibliografie) id.
-
-            Default value is undef.
 
     *       "compilers"
 
@@ -171,12 +163,6 @@ METHODS
 
             Default value is undef.
 
-    *       "oclc"
-
-            OCLC control number.
-
-            Default value is undef.
-
     *       "photographers"
 
             List of photographers. Reference to array with
@@ -252,15 +238,6 @@ METHODS
 
     Returns reference to array of MARC::Convert::Wikidata::Object::People
     instances.
-
-  "ccnb"
-    *It is deprecated. It will be removed in future.*
-
-     my $ccnb = $obj->ccnb;
-
-    Get ČČNB (Česká národní bibliografie) ID.
-
-    Returns string.
 
   "compilers"
      my $compilers_ar = $obj->compilers;
@@ -377,15 +354,6 @@ METHODS
      my $number_of_pages = $obj->number_of_pages;
 
     TODO
-
-  "oclc"
-    *It is deprecated. It will be removed in future.*
-
-     my $oclc = $obj->oclc;
-
-    Get OCLC control number.
-
-    Returns string.
 
   "photographers"
      my $photographers_ar = $obj->photographers;
@@ -590,5 +558,5 @@ LICENSE AND COPYRIGHT
     BSD 2-Clause License
 
 VERSION
-    0.05
+    0.06
 

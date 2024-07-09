@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2011, 2012, 2014, 2015 Kevin Ryde
+# Copyright 2011, 2012, 2014, 2015, 2017 Kevin Ryde
 
 # This file is part of Test-VariousBits.
 #
@@ -49,19 +49,19 @@ WriteMakefile
      # Test::VariousBits gets the dist name, no actual module of that name
      provides =>
      { 'Test::VariousBits'       => { file => 'META.yml',
-                                      version => 7,
+                                      version => 8,
                                     },
        'Module::Util::Masked'    => { file => 'lib/Module/Util/Masked.pm',
-                                      version => 7,
+                                      version => 8,
                                     },
        'Test::Weaken::ExtraBits' => { file => 'lib/Test/Weaken/ExtraBits.pm',
-                                      version => 7,
+                                      version => 8,
                                     },
        'Test::Without::GD'       => { file => 'lib/Test/Without/GD.pm',
-                                      version => 7,
+                                      version => 8,
                                     },
        'Test::Without::Shm'      => { file => 'lib/Test/Without/Shm.pm',
-                                      version => 7,
+                                      version => 8,
                                     },
      },
 

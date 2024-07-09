@@ -2,7 +2,7 @@ bin/marc-count
 Changes
 CONCEPT
 Count.pm
-examples/ex1.pl
+examples/example_count.pl
 inc/Module/Install.pm
 inc/Module/Install/AuthorRequires.pm
 inc/Module/Install/AuthorTests.pm

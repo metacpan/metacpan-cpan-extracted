@@ -1,5 +1,5 @@
-package Slack::BlockKit::Block::RichText::Link 0.001;
-# ABSTRACT: a BlockKit rich text hyperlink element
+package Slack::BlockKit::Block::RichText::Link 0.002;
+# ABSTRACT: a Block Kit rich text hyperlink element
 
 use Moose;
 use MooseX::StrictConstructor;
@@ -8,7 +8,7 @@ with 'Slack::BlockKit::Role::HasBasicStyle';
 
 #pod =head1 OVERVIEW
 #pod
-#pod This represents a hyperlink element in rich text in BlockKit.
+#pod This represents a hyperlink element in rich text in Block Kit.
 #pod
 #pod =cut
 
@@ -31,7 +31,7 @@ has url => (
 #pod This is the text displayed for the link.  It's optional, and Slack will display
 #pod the URL if no text was given.
 #pod
-#pod This attribute stores a string, not any form of BlockKit text object.
+#pod This attribute stores a string, not any form of Block Kit text object.
 #pod
 #pod =cut
 
@@ -75,15 +75,15 @@ __END__
 
 =head1 NAME
 
-Slack::BlockKit::Block::RichText::Link - a BlockKit rich text hyperlink element
+Slack::BlockKit::Block::RichText::Link - a Block Kit rich text hyperlink element
 
 =head1 VERSION
 
-version 0.001
+version 0.002
 
 =head1 OVERVIEW
 
-This represents a hyperlink element in rich text in BlockKit.
+This represents a hyperlink element in rich text in Block Kit.
 
 =head1 PERL VERSION
 
@@ -109,7 +109,7 @@ This is the URL to which the link links.
 This is the text displayed for the link.  It's optional, and Slack will display
 the URL if no text was given.
 
-This attribute stores a string, not any form of BlockKit text object.
+This attribute stores a string, not any form of Block Kit text object.
 
 =head2 unsafe
 

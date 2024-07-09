@@ -1,5 +1,8 @@
 Revision history for Data-Munge
 
+0.111   2024-07-08
+        * Add is_callable.
+
 0.101   2024-04-04
         * Work around a warning in the development version of perl (thanks,
           Shlomi Fish). [RT#152677]

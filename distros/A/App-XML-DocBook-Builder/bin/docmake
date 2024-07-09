@@ -20,7 +20,7 @@ docmake - a tool to render DocBook/XML into various output formats.
 
 =head1 VERSION
 
-version 0.1100
+version 0.1101
 
 =head1 SYNOPSIS
 
@@ -31,7 +31,7 @@ version 0.1100
     docmake -v ---ns o output.xhtml xhtml input.xml
 
     # Avoid trailing slash when emitting to a dummy file in a dir
-    docmake ---ns -trailing-slash=0 -o output/notneeded.xhtml xhtml5 input.xml
+    docmake ---ns -trailing-slash=0 -o output/index.xhtml xhtml5 input.xml
 
     # Render into pdf
     docmake -v --ns -o output.pdf pdf input.xml
@@ -73,6 +73,10 @@ To get help.
 
 Convert to XSL-FO.
 
+=item * manpages
+
+Convert to Unix man pages.
+
 =item * rtf
 
 Convert to Word/RTF.
@@ -80,6 +84,14 @@ Convert to Word/RTF.
 =item * xhtml
 
 Convert to XHTML.
+
+=item * xhtml-1_1
+
+Convert to XHTML-1.1.
+
+=item * xhtml5
+
+Convert to XHTML5.
 
 =item * pdf
 
@@ -263,7 +275,7 @@ feature.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2022 by Shlomi Fish.
+This software is Copyright (c) 2024 by Shlomi Fish.
 
 This is free software, licensed under:
 

@@ -1,5 +1,5 @@
-package Slack::BlockKit::Block::RichText::Channel 0.001;
-# ABSTRACT: a BlockKit rich text element that mentions a #channel
+package Slack::BlockKit::Block::RichText::Channel 0.002;
+# ABSTRACT: a Block Kit rich text element that mentions a #channel
 
 use Moose;
 use MooseX::StrictConstructor;
@@ -54,11 +54,11 @@ __END__
 
 =head1 NAME
 
-Slack::BlockKit::Block::RichText::Channel - a BlockKit rich text element that mentions a #channel
+Slack::BlockKit::Block::RichText::Channel - a Block Kit rich text element that mentions a #channel
 
 =head1 VERSION
 
-version 0.001
+version 0.002
 
 =head1 OVERVIEW
 

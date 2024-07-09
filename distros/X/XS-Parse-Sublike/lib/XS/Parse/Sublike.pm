@@ -3,7 +3,7 @@
 #
 #  (C) Paul Evans, 2020-2021 -- leonerd@leonerd.org.uk
 
-package XS::Parse::Sublike 0.21;
+package XS::Parse::Sublike 0.22;
 
 use v5.14;
 use warnings;

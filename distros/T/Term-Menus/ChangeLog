@@ -1,3 +1,9 @@
+2024-07-08  Brian M. Kelly  <Brian.Kelly@fullauto.com>
+
+        * Version 3.031
+
+        * Fixed not number error for banner input
+
 2024-07-06  Brian M. Kelly  <Brian.Kelly@fullauto.com>
 
         * Version 3.030

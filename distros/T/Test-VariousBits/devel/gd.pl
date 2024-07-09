@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2011, 2012, 2013 Kevin Ryde
+# Copyright 2011, 2012, 2013, 2024 Kevin Ryde
 
 # This file is part of Test-VariousBits.
 #
@@ -19,15 +19,33 @@
 
 
 use FindBin;
-use GD;
-use Test::Without::GD;
+# use GD;
+# use Test::Without::GD;
 
 # uncomment this to run the ### lines
-use Smart::Comments;
-
+# use Smart::Comments;
 
 {
-# Sub::Delete
+  # $^W = 0 doesn't suppress prototype change warnings
+  package ProtoChange;
+  sub foo ($$) {
+    print "this is ProtoChange foo\n";
+  }
+  package main;
+  my $new_coderef = sub {
+    print "this is new_coderef\n";
+  };
+  my $name = 'ProtoChange::foo';
+  { no strict 'refs';
+    local $SIG{'__WARN__'} = sub {};
+    *$name = $new_coderef;
+  }
+  exit 0;
+}
+
+__END__
+{
+  # Sub::Delete
   package Foo;
   sub foo { }
   package main;
@@ -35,7 +53,7 @@ use Smart::Comments;
   # undef &Foo::foo;
   # my $globref = \*Foo::foo;
   # undef $globref->{CODE};
-  delete *Foo::foo{CODE};
+  # delete *Foo::foo{CODE};
   print "can ", Foo->can('foo'), "\n";
   exit 0;
 }

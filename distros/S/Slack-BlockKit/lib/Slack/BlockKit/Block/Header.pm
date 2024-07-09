@@ -1,5 +1,5 @@
-package Slack::BlockKit::Block::Header 0.001;
-# ABSTRACT: a BlockKit header block
+package Slack::BlockKit::Block::Header 0.002;
+# ABSTRACT: a Block Kit header block
 
 use Moose;
 use MooseX::StrictConstructor;
@@ -55,11 +55,11 @@ __END__
 
 =head1 NAME
 
-Slack::BlockKit::Block::Header - a BlockKit header block
+Slack::BlockKit::Block::Header - a Block Kit header block
 
 =head1 VERSION
 
-version 0.001
+version 0.002
 
 =head1 OVERVIEW
 

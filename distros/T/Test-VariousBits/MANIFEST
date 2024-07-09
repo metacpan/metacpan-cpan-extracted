@@ -29,9 +29,9 @@ t/lib/Module_Util_Masked_test.pm
 t/lib/Module_Util_Masked_test/One.pm
 t/lib/Module_Util_Masked_test/Two.pm
 t/Masked-coderef.t
-t/Masked-mmask.t
-t/Masked-unplug.t
-t/Masked-without.t
+t/Masked-devel-unplug.t
+t/Masked-module-mask.t
+t/Masked-test-module-without.t
 t/MyTestHelpers.pm
 t/Shm-use-empty.t
 t/Shm-use.t

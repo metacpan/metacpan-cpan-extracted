@@ -9,7 +9,7 @@ use Getopt::Std;
 use MARC::File::XML (BinaryEncoding => 'utf8', RecordFormat => 'MARC21');
 use Unicode::UTF8 qw(encode_utf8);
 
-our $VERSION = 0.02;
+our $VERSION = 0.03;
 
 # Constructor.
 sub new {
@@ -33,8 +33,9 @@ sub run {
 	$self->{'_opts'} = {
 		'h' => 0,
 	};
-	if (! getopts('h', $self->{'_opts'}) || @ARGV < 1
-		|| $self->{'_opts'}->{'h'}) {
+	if (! getopts('h', $self->{'_opts'})
+		|| $self->{'_opts'}->{'h'}
+		|| @ARGV < 1) {
 
 		print STDERR "Usage: $0 [-h] [--version] marc_xml_file\n";
 		print STDERR "\t-h\t\tPrint help.\n";
@@ -121,6 +122,8 @@ Returns 1 for error, 0 for success.
                  Unknown parameter '%s'.
 
 =head1 EXAMPLE
+
+=for comment filename=example_count.pl
 
  use strict;
  use warnings;
@@ -294,12 +297,12 @@ L<http://skim.cz>
 
 =head1 LICENSE AND COPYRIGHT
 
-© 2022 Michal Josef Špaček
+© 2022-2024 Michal Josef Špaček
 
 BSD 2-Clause License
 
 =head1 VERSION
 
-0.02
+0.03
 
 =cut

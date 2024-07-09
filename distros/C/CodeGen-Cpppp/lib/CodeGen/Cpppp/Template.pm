@@ -1,6 +1,6 @@
 package CodeGen::Cpppp::Template;
 
-our $VERSION = '0.004'; # VERSION
+our $VERSION = '0.005'; # VERSION
 # ABSTRACT: Base class for template classes created by compiling cpppp
 
 use v5.20;
@@ -66,8 +66,8 @@ package CodeGen::Cpppp::Template::Exports {
          $pkg->cpppp_version, $parse->{code}, $filename, $line);
    }
    sub format_commandline {
-      return '' unless main->can('format_commandline');
-      return main->format_commandline;
+      require CodeGen::Cpppp::Platform;
+      CodeGen::Cpppp::Platform::format_commandline(@_);
    }
    sub format_timestamp {
       my @t= gmtime;
@@ -558,7 +558,7 @@ Michael Conrad <mike@nrdvana.net>
 
 =head1 VERSION
 
-version 0.004
+version 0.005
 
 =head1 COPYRIGHT AND LICENSE
 

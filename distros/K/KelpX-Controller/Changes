@@ -1,0 +1,8 @@
+Revision history for Perl extension KelpX::Controller.
+
+1.01 - 2024-07-08
+	- Attributes context and app are now readonly
+
+1.00 - 2024-07-08
+	- First version
+

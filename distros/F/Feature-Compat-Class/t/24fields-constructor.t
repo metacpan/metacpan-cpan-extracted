@@ -75,4 +75,20 @@ my $QUOT = qr/["]?/;
       'AllTheOps for missing values' );
 }
 
+# field initialiser expressions permit a __CLASS__
+{
+   class ClassInInitialiser {
+      field $classname :reader = __CLASS__;
+   }
+
+   is( ClassInInitialiser->new->classname, "ClassInInitialiser",
+      '__CLASS__ in field initialisers' );
+
+   class SubclassNamedHere :isa( ClassInInitialiser ) {
+   }
+
+   is( SubclassNamedHere->new->classname, "SubclassNamedHere",
+      '__CLASS__ sees subclass name correctly' );
+}
+
 done_testing;

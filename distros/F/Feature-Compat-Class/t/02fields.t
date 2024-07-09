@@ -105,4 +105,17 @@ class Counter {
    is( $counter->count, 2, '->count after invoking incrmeth x 2' );
 }
 
+# fields are visible during initialiser expressions of later fields
+{
+   class FieldFromField {
+      field $one   = 1;
+      field $two   = $one + 1;
+      field $three = $two + 1;
+
+      method three { return $three; }
+   }
+
+   is( FieldFromField->new->three, 3, 'Scalar fields can be initialised from earlier fields' );
+}
+
 done_testing;

@@ -1,17 +1,17 @@
-package Slack::BlockKit::Role::HasStyle 0.001;
+package Slack::BlockKit::Role::HasStyle 0.002;
 # ABSTRACT: a parameterized role for objects with styles
 
 use MooseX::Role::Parameterized;
 
 #pod =head1 OVERVIEW 
 #pod
-#pod This role exists to help write classes for BlockKit objects that have text
+#pod This role exists to help write classes for Block Kit objects that have text
 #pod styles applied.  Because not all objects with styles permit all the same
 #pod styles, this is a I<parameterized> role, and must be included by providing a
 #pod C<styles> parameter, which is an arrayref of style names that may be enabled or
 #pod disabled on an object.
 #pod
-#pod When a BlockKit object class that composes this role is converted into a data
+#pod When a Block Kit object class that composes this role is converted into a data
 #pod structure with C<as_struct>, the styled defined in that instance's C<style>
 #pod hash will be added as JSON boolean objects.
 #pod
@@ -78,7 +78,7 @@ Slack::BlockKit::Role::HasStyle - a parameterized role for objects with styles
 
 =head1 VERSION
 
-version 0.001
+version 0.002
 
 =head1 PERL VERSION
 
@@ -95,13 +95,13 @@ lower the minimum required perl.
 
 =head1 OVERVIEW 
 
-This role exists to help write classes for BlockKit objects that have text
+This role exists to help write classes for Block Kit objects that have text
 styles applied.  Because not all objects with styles permit all the same
 styles, this is a I<parameterized> role, and must be included by providing a
 C<styles> parameter, which is an arrayref of style names that may be enabled or
 disabled on an object.
 
-When a BlockKit object class that composes this role is converted into a data
+When a Block Kit object class that composes this role is converted into a data
 structure with C<as_struct>, the styled defined in that instance's C<style>
 hash will be added as JSON boolean objects.
 

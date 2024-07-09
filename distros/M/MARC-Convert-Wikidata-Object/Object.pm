@@ -11,7 +11,7 @@ use Readonly;
 
 Readonly::Array our @COVERS => qw(hardback paperback);
 
-our $VERSION = 0.05;
+our $VERSION = 0.06;
 
 has authors => (
 	default => [],
@@ -25,10 +25,6 @@ has authors_of_afterword => (
 
 has authors_of_introduction => (
 	default => [],
-	is => 'ro',
-);
-
-has ccnb => (
 	is => 'ro',
 );
 
@@ -98,10 +94,6 @@ has narrators => (
 );
 
 has number_of_pages => (
-	is => 'ro',
-);
-
-has oclc => (
 	is => 'ro',
 );
 
@@ -257,7 +249,6 @@ MARC::Convert::Wikidata::Object - Bibliographic Wikidata object defined by MARC 
  my $authors_ar = $obj->authors;
  my $authors_of_afterword_ar = $obj->authors_of_afterword;
  my $authors_of_introduction_ar = $obj->authors_of_introduction;
- my $ccnb = $obj->ccnb;
  my $compilers = $obj->compilers;
  my $cover = $obj->cover;
  my $directors_ar = $obj->directors;
@@ -274,7 +265,6 @@ MARC::Convert::Wikidata::Object - Bibliographic Wikidata object defined by MARC 
  my $languages_ar = $obj->languages;
  my $narrators_ar = $obj->narrators;
  my $number_of_pages = $obj->number_of_pages;
- my $oclc = $obj->oclc;
  my $photographers_ar = $obj->photographers;
  my $publication_date = $obj->publication_date;
  my $publishers_ar = $obj->publishers;
@@ -316,12 +306,6 @@ List of authors of introduction.
 Reference to array with MARC::Convert::Wikidata::Object::People instances.
 
 Default value is reference to blank array.
-
-=item * C<ccnb>
-
-ČČNB (Česká národní bibliografie) id.
-
-Default value is undef.
 
 =item * C<compilers>
 
@@ -425,12 +409,6 @@ Number of pages.
 
 Default value is undef.
 
-=item * C<oclc>
-
-OCLC control number.
-
-Default value is undef.
-
 =item * C<photographers>
 
 List of photographers.
@@ -509,16 +487,6 @@ Returns reference to array of MARC::Convert::Wikidata::Object::People instances.
 Get reference to array with author of introduction objects.
 
 Returns reference to array of MARC::Convert::Wikidata::Object::People instances.
-
-=head2 C<ccnb>
-
-I<It is deprecated. It will be removed in future.>
-
- my $ccnb = $obj->ccnb;
-
-Get ČČNB (Česká národní bibliografie) ID.
-
-Returns string.
 
 =head2 C<compilers>
 
@@ -643,16 +611,6 @@ Returns reference to array of MARC::Convert::Wikidata::Object::People instances.
  my $number_of_pages = $obj->number_of_pages;
 
 TODO
-
-=head2 C<oclc>
-
-I<It is deprecated. It will be removed in future.>
-
- my $oclc = $obj->oclc;
-
-Get OCLC control number.
-
-Returns string.
 
 =head2 C<photographers>
 
@@ -880,6 +838,6 @@ BSD 2-Clause License
 
 =head1 VERSION
 
-0.05
+0.06
 
 =cut

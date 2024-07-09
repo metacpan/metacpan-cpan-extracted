@@ -1,6 +1,6 @@
 package CodeGen::Cpppp::Enum;
 
-our $VERSION = '0.004'; # VERSION
+our $VERSION = '0.005'; # VERSION
 # ABSTRACT: Helper for enumerations and generating related utility functions
 
 use v5.20;
@@ -8,7 +8,8 @@ use warnings;
 use Carp;
 use experimental 'signatures', 'lexical_subs', 'postderef';
 use Scalar::Util 'looks_like_number';
-use List::Util 'any', 'min', 'max', 'uniqstr';
+use List::Util 'any', 'min', 'max';
+BEGIN { *uniqstr= List::Util->can('uniqstr') // sub { my %seen; grep !$seen{$_}++, @_ } }
 use CodeGen::Cpppp::CParser;
 
 
@@ -585,7 +586,7 @@ Michael Conrad <mike@nrdvana.net>
 
 =head1 VERSION
 
-version 0.004
+version 0.005
 
 =head1 COPYRIGHT AND LICENSE
 

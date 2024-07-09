@@ -1,5 +1,5 @@
-package Slack::BlockKit::Block::RichText::Text 0.001;
-# ABSTRACT: a BlockKit rich text object for the text in the rich text
+package Slack::BlockKit::Block::RichText::Text 0.002;
+# ABSTRACT: a Block Kit rich text object for the text in the rich text
 
 use Moose;
 use MooseX::StrictConstructor;
@@ -10,7 +10,7 @@ with 'Slack::BlockKit::Role::HasBasicStyle';
 #pod
 #pod When building a hunk of rich text with Slack::BlockKit, it's this object that
 #pod contains most of the actual text.  These objects represent the objects in
-#pod BlockKit with a C<type> of "text".
+#pod Block Kit with a C<type> of "text".
 #pod
 #pod This class includes L<Slack::BlockKit::Role::HasBasicStyle>, so these objects
 #pod can have C<bold>, C<code>, C<italic>, and C<strike> styles.
@@ -52,17 +52,17 @@ __END__
 
 =head1 NAME
 
-Slack::BlockKit::Block::RichText::Text - a BlockKit rich text object for the text in the rich text
+Slack::BlockKit::Block::RichText::Text - a Block Kit rich text object for the text in the rich text
 
 =head1 VERSION
 
-version 0.001
+version 0.002
 
 =head1 OVERVIEW
 
 When building a hunk of rich text with Slack::BlockKit, it's this object that
 contains most of the actual text.  These objects represent the objects in
-BlockKit with a C<type> of "text".
+Block Kit with a C<type> of "text".
 
 This class includes L<Slack::BlockKit::Role::HasBasicStyle>, so these objects
 can have C<bold>, C<code>, C<italic>, and C<strike> styles.

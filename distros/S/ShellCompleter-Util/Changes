@@ -1,3 +1,9 @@
+0.032   2024-07-09  Released-By: PERLANCAR; Urgency: medium
+
+        - [bugfix] Do not pass unknown argument 'ci' to
+          complete_array_elem().
+
+
 0.031   2019-08-17  Released-By: PERLANCAR; Urgency: medium
 
 	- Avoid undef warning ('ospec' argument can be undef when there's

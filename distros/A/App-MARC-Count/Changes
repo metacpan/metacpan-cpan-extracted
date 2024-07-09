@@ -1,3 +1,11 @@
+0.03 2024-07-08T19:24:37+02:00
+ - Add test for run().
+ - Rename example file to better name.
+ - Rewrite arguments process to more intuitive way.
+ - Rewrite run() tests to use of help() helper.
+ - Update Module::Install to 1.21 version.
+ - Update copyright years.
+
 0.02 2022-05-17T11:12:34+02:00
  - Add test with error.
  - Fix minimal dependency to MARC::File::XML (fixing of warning in tests).

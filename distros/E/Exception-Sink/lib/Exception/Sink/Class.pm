@@ -1,9 +1,11 @@
 ##############################################################################
 #
 #  Exception::Sink::Class
-#  (c) Vladi Belperchinov-Shabanski "Cade" 2006-2010
-#  <cade@bis.net> <cade@datamax.bg> <cade@cpan.org>
-#  http://cade.datamax.bg
+#  Copyright (c) 2006-2024 Vladi Belperchinov-Shabanski "Cade" 
+#        <cade@noxrun.com> <cade@bis.bg> <cade@cpan.org>
+#  http://cade.noxrun.com/  
+#
+#  GPLv2
 #
 ##############################################################################
 #

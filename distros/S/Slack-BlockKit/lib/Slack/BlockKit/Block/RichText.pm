@@ -1,5 +1,5 @@
-package Slack::BlockKit::Block::RichText 0.001;
-# ABSTRACT: the top-level rich text block in BlockKit
+package Slack::BlockKit::Block::RichText 0.002;
+# ABSTRACT: the top-level rich text block in Block Kit
 
 use Moose;
 use MooseX::StrictConstructor;
@@ -24,7 +24,7 @@ use Slack::BlockKit::Types qw(RichTextBlocks);
 #pod
 #pod As usual, these classes are I<lightly> documented in the Slack::BlockKit
 #pod distribution, but to really understand how they're meant to be used, see the
-#pod Slack BlockKit documentation on Slack.
+#pod Slack Block Kit documentation on Slack.
 #pod
 #pod =cut
 
@@ -70,11 +70,11 @@ __END__
 
 =head1 NAME
 
-Slack::BlockKit::Block::RichText - the top-level rich text block in BlockKit
+Slack::BlockKit::Block::RichText - the top-level rich text block in Block Kit
 
 =head1 VERSION
 
-version 0.001
+version 0.002
 
 =head1 OVERVIEW
 
@@ -127,7 +127,7 @@ L<Text        |Slack::BlockKit::Block::RichText::Text>
 
 As usual, these classes are I<lightly> documented in the Slack::BlockKit
 distribution, but to really understand how they're meant to be used, see the
-Slack BlockKit documentation on Slack.
+Slack Block Kit documentation on Slack.
 
 =head1 PERL VERSION
 

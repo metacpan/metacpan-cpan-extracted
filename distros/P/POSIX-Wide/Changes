@@ -17,6 +17,9 @@ with POSIX-Wide.  If not, see <http://www.gnu.org/licenses/>.
 
 
 
+Version 12, July 2024
+    - tests allow for tzset() not existing
+
 Version 11, June 2024
     - tests force timezone to avoid apparent daylight saving
       variation on strftime %H

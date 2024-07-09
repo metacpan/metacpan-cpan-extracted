@@ -6,8 +6,10 @@ META.json
 META.yml
 Makefile.PL
 README
+README.md
 dist.ini
 eg/demo
+eg/samples/date
 eg/samples/default
 eg/samples/rich
 eg/samples/rt-pre-sampler
@@ -20,6 +22,7 @@ lib/Slack/BlockKit/Block/Divider.pm
 lib/Slack/BlockKit/Block/Header.pm
 lib/Slack/BlockKit/Block/RichText.pm
 lib/Slack/BlockKit/Block/RichText/Channel.pm
+lib/Slack/BlockKit/Block/RichText/Date.pm
 lib/Slack/BlockKit/Block/RichText/Emoji.pm
 lib/Slack/BlockKit/Block/RichText/Link.pm
 lib/Slack/BlockKit/Block/RichText/List.pm

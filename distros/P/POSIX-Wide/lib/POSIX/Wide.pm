@@ -1,4 +1,4 @@
-# Copyright 2009, 2010, 2011, 2014 Kevin Ryde
+# Copyright 2009, 2010, 2011, 2014, 2024 Kevin Ryde
 
 # This file is part of POSIX-Wide.
 #
@@ -34,7 +34,7 @@ use POSIX ();
 use Encode;
 use Encode::Locale;  # has 'locale' from its initial 0.01 release
 
-our $VERSION = 11;
+our $VERSION = 12;
 
 use Exporter;
 our @ISA = ('Exporter');
@@ -269,7 +269,7 @@ L<http://user42.tuxfamily.org/posix-wide/index.html>
 
 =head1 LICENSE
 
-POSIX-Wide is Copyright 2008, 2009, 2010, 2011, 2014 Kevin Ryde
+POSIX-Wide is Copyright 2008, 2009, 2010, 2011, 2014, 2024 Kevin Ryde
 
 POSIX-Wide is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by the

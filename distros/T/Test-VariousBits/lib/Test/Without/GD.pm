@@ -1,4 +1,4 @@
-# Copyright 2011, 2012, 2015 Kevin Ryde
+# Copyright 2011, 2012, 2015, 2017, 2024 Kevin Ryde
 
 # This file is part of Test-VariousBits.
 #
@@ -21,7 +21,7 @@ use 5.004;  # for ->can()
 use strict;
 
 use vars '$VERSION';
-$VERSION = 7;
+$VERSION = 8;
 
 # uncomment this to run the ### lines
 #use Smart::Comments;
@@ -147,7 +147,7 @@ sub _change_func {
   unless ($replaced{$name}) {
     $replaced{$name} = \&$name;
     no strict 'refs';
-    local $^W = 0;
+    local $SIG{'__WARN__'} = sub {};
     *$name = $new_coderef;
   }
 }
@@ -279,7 +279,7 @@ L<http://user42.tuxfamily.org/test-variousbits/index.html>
 
 =head1 COPYRIGHT
 
-Copyright 2011, 2012, 2015 Kevin Ryde
+Copyright 2011, 2012, 2015, 2017, 2024 Kevin Ryde
 
 Test-VariousBits is free software; you can redistribute it and/or
 modify it under the terms of the GNU General Public License as published

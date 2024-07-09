@@ -3,6 +3,8 @@
 
 class R::NDArray::Double extends R::NDArray {
   
+  use Sort;
+  
   # Class Mehtods
   static method new : R::NDArray::Double ($options : object[] = undef) {
     
@@ -58,6 +60,17 @@ class R::NDArray::Double extends R::NDArray {
     my $string = (string)(double)$elem;
     
     return $string;
+  }
+  
+  method elem_to_object : Double ($data_index : int) {
+    
+    my $data = $self->data;
+    
+    my $elem = $data->[$data_index];
+    
+    my $object = (Double)$elem;
+    
+    return $object;
   }
   
   precompile method set_order : void ($indexes_ndarray : R::NDArray::Int) {
@@ -229,6 +242,22 @@ class R::NDArray::Double extends R::NDArray {
   
   method slice_set : void ($vector_indexes : R::NDArray::Int[], $ndarray : R::NDArray::Short) {
     $self->SUPER::slice_set($vector_indexes, $ndarray);
+  }
+  
+  method elem_cmp_old : int ($a_elem : Double, $b_elem : Double) {
+    
+    my $cmp = (double)$a_elem <=> (double)$b_elem;
+    
+    return $cmp;
+  }
+  
+  method elem_cmp : int ($a_data_index : int, $b_data_index : int) {
+    
+    my $data = $self->data;
+    
+    my $cmp = $data->[$a_data_index] <=> $data->[$b_data_index];
+    
+    return $cmp;
   }
   
 }
