@@ -7,10 +7,8 @@ lib/Tk/AppWindow/aw_logo.png
 lib/Tk/AppWindow/BaseClasses/Callback.pm
 lib/Tk/AppWindow/BaseClasses/ContentManager.pm
 lib/Tk/AppWindow/BaseClasses/Extension.pm
-lib/Tk/AppWindow/BaseClasses/PanelExtension.pm
 lib/Tk/AppWindow/BaseClasses/Plugin.pm
 lib/Tk/AppWindow/BaseClasses/PluginJobs.pm
-lib/Tk/AppWindow/BaseClasses/SidePanel.pm
 lib/Tk/AppWindow/CookBook.pod
 lib/Tk/AppWindow/CookBook/ContentManager.pod
 lib/Tk/AppWindow/CookBook/Extension.pod
@@ -28,6 +26,7 @@ lib/Tk/AppWindow/Ext/Panels.pm
 lib/Tk/AppWindow/Ext/Plugins.pm
 lib/Tk/AppWindow/Ext/SDI.pm
 lib/Tk/AppWindow/Ext/Settings.pm
+lib/Tk/AppWindow/Ext/SideBars.pm
 lib/Tk/AppWindow/Ext/StatusBar.pm
 lib/Tk/AppWindow/Ext/StatusBar/SBaseItem.pm
 lib/Tk/AppWindow/Ext/StatusBar/SImageItem.pm
@@ -48,12 +47,11 @@ t/020-Tk-AppWindow-BaseClasses-ContentManager.t
 t/030-Tk-AppWindow-BaseClasses-Extension.t
 t/040-Tk-AppWindow-BaseClasses-Plugin.t
 t/050-Tk-AppWindow-BaseClasses-PluginJobs.t
-t/060-Tk-AppWindow-BaseClasses-PanelExtension.t
-t/070-Tk-AppWindow-BaseClasses-SidePanel.t
 t/080-Tk-AppWindow.t
 t/090-Tk-AppWindow-Ext-Art.t
 t/100-Tk-AppWindow-Ext-Daemons.t
 t/110-Tk-AppWindow-Ext-Panels.t
+t/115-Tk-AppWindow-Ext-SideBars.t
 t/120-Tk-AppWindow-Ext-ConfigFolder.t
 t/130-Tk-AppWindow-Ext-Keyboard.t
 t/140-Tk-AppWindow-Ext-MenuBar.t

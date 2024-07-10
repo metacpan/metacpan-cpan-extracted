@@ -27,6 +27,7 @@
       },
       "configure" : {
          "requires" : {
+            "Config" : "0",
             "ExtUtils::MakeMaker" : "6.48"
          }
       },
@@ -35,7 +36,12 @@
             "Carp" : "1.1",
             "DynaLoader" : "1.09",
             "Net::DNS" : "1.19",
-            "perl" : "5.008009"
+            "base" : "2.13",
+            "constant" : "1.17",
+            "integer" : "1",
+            "perl" : "5.008009",
+            "strict" : "1.03",
+            "warnings" : "1.0501"
          }
       },
       "test" : {
@@ -49,6 +55,6 @@
       }
    },
    "release_status" : "stable",
-   "version" : "1.23",
+   "version" : "1.24",
    "x_serialization_backend" : "JSON::PP version 2.27200"
 }

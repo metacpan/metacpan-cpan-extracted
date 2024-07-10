@@ -43,7 +43,7 @@ Tk:CodeText::TagsEditor - Edit highlighting tags for L<Tk::CodeText>
 use strict;
 use warnings;
 use vars qw($VERSION);
-$VERSION = '0.51';
+$VERSION = '0.52';
 
 use base qw(Tk::Derived Tk::Frame);
 
@@ -202,21 +202,25 @@ sub Populate {
 		$list->itemCreate($tag, 2, -itemtype => 'window', -widget => $bg);
 
 		my $b = '';
+		my $i = '';
 		$self->Advertise($tag . "W", \$b);
 		my $bold = $list->Checkbutton(
 			-offvalue => '',
 			-onvalue => 'bold',
-			-command => ['updateFont', $self, $tag, -weight => $b],
+			-command => sub { 
+				$self->updateFont($tag, -weight => $b, -slant => $i);
+			},
 			-variable => \$b,
 		);
 		$list->itemCreate($tag, 3, -itemtype => 'window', -widget => $bold);
 
-		my $i = '';
 		$self->Advertise($tag . "S", \$i);
 		my $italic = $list->Checkbutton(
 			-offvalue => '',
 			-onvalue => 'italic',
-			-command => ['updateFont', $self, $tag, -slant => $i],
+			-command => sub { 
+				$self->updateFont($tag, -weight => $b, -slant => $i);
+			},
 			-variable => \$i,
 		);
 		$list->itemCreate($tag, 4, -itemtype => 'window', -widget => $italic);

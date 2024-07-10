@@ -138,7 +138,7 @@ use strict;
 use warnings;
 use Carp;
 use vars qw($VERSION);
-$VERSION="0.07";
+$VERSION="0.08";
 use Tk;
 require App::Codit::CodeTextManager;
 
@@ -157,6 +157,7 @@ sub Populate {
 		-documentinterface => 'CoditMDI',
 		-namespace => 'App::Codit',
 		-savegeometry => 1,
+		-updatesmenuitem => 1,
 
 		-aboutinfo => {
 #			version => $VERSION,
@@ -215,18 +216,17 @@ sub Populate {
 			'*page' => 'GUI',
 			'*section' => 'Icon sizes',
 			-iconsize => ['spin', 'General', -width => 4],
+			-sidebariconsize => ['spin', 'Side bars', -width => 4],
+			'*column',
 			-menuiconsize => ['spin', 'Menu bar', -width => 4],
 			-tooliconsize => ['spin', 'Tool bar', -width => 4],
-			'*column',
-			-navigatorpaneliconsize => ['spin', 'Navigator panel', -width => 4],
-			-toolpaneliconsize => ['spin', 'Tool panel', -width => 4],
 			'*end',
 			'*section' => 'Visibility at lauch',
-			-toolbarvisible => ['boolean', 'Tool bar'],
-			-statusbarvisible => ['boolean', 'Status bar'],
+			'-tool barvisible' => ['boolean', 'Tool bar'],
+			'-status barvisible' => ['boolean', 'Status bar'],
 			'*column',
-			-navigatorpanelvisible => ['boolean', 'Navigator panel'],
-			-toolpanelvisible => ['boolean', 'Tool panel'],
+			'-navigator panelvisible' => ['boolean', 'Navigator panel'],
+			'-tool panelvisible' => ['boolean', 'Tool panel'],
 			'*end',
 			'*section' => 'Geometry',
 			-savegeometry => ['boolean', 'Save on exit',],

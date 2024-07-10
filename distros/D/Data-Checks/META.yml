@@ -17,7 +17,7 @@ name: Data-Checks
 provides:
   Data::Checks:
     file: lib/Data/Checks.pm
-    version: '0.05'
+    version: '0.06'
   Data::Checks::Builder:
     file: lib/Data/Checks/Builder.pm
     version: '0.43'
@@ -26,5 +26,5 @@ requires:
   perl: '5.022'
 resources:
   license: http://dev.perl.org/licenses/
-version: '0.05'
+version: '0.06'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -9,7 +9,7 @@ Tk::AppWindow::Ext::StatusBar - adding a status bar
 use strict;
 use warnings;
 use vars qw($VERSION);
-$VERSION="0.07";
+$VERSION="0.11";
 use Tk;
 require Tk::Frame;
 require Tk::Balloon;
@@ -18,7 +18,7 @@ require Tk::AppWindow::Ext::StatusBar::SMessageItem;
 require Tk::AppWindow::Ext::StatusBar::SProgressItem;
 require Tk::AppWindow::Ext::StatusBar::STextItem;
 
-use base qw( Tk::AppWindow::BaseClasses::PanelExtension );
+use base qw( Tk::AppWindow::BaseClasses::Extension );
 
 my %types = (
 	image => {
@@ -90,6 +90,15 @@ sub new {
 	my $class = shift;
 
 	my $self = $class->SUPER::new(@_);
+
+	$self->Require('Panels');
+
+	my $args = $self->GetArgsRef;
+	my $panel = delete $args->{'-statusbarpanel'};
+	$panel = 'BOTTOM' unless defined $panel;
+	my $pn = $self->extGet('Panels');
+	$pn->panelAssign('status bar', $panel);
+
 	$self->addPreConfig(
 		-errorcolor => ['PASSIVE', 'errorColor', 'ErrorColor', '#FF0000'],
 		-warningcolor => ['PASSIVE', 'warningColor', 'WarningColor', '#0000FF'],
@@ -104,10 +113,6 @@ sub new {
 	$self->{ITEMS} = {};
 
 	
-	$self->configInit(
-		-statusbarpanel => ['Panel', $self, 'BOTTOM'],
-		-statusbarvisible => ['PanelVisible', $self, 1],
-	);
 	$self->addPostConfig('InitMsgItem', $self);
 	$self->addPostConfig('Cycle', $self);
 	return $self;
@@ -161,12 +166,15 @@ sub Add {
 	my $class = $types{$type}->{class};
 	my $pack = $types{$type}->{pack};
 	my $itempadding = $self->configGet('-statusitempadding');
+
+	my $pn = $self->extGet('Panels');
+	my $panel = $pn->panelAssign('status bar');
 	if (defined $pos) {
-		my @items = $self->Subwidget($self->Panel)->children;
+		my @items = $self->Subwidget($panel)->children;
 		my $b = $items[$pos];
 		push @$pack, -before => $b if defined $b;
 	}
-	my $i = $self->Subwidget($self->Panel)->$class(%params, 
+	my $i = $self->Subwidget($panel)->$class(%params, 
 		-relief => $self->configGet('-statusitemrelief'),
 		-borderwidth => $self->configGet('-statusitemborderwidth'),
 	)->pack(@$pack, -padx => $itempadding, -pady => $itempadding, -side => 'left');
@@ -280,6 +288,14 @@ sub Delete {
 
 sub InitMsgItem {
 	my $self = shift;
+
+	#show the statusbar if it should be visible
+	if ($self->configGet('-status barvisible')) {
+		my $pn = $self->extGet('Panels');
+		my $panel = $pn->panelAssign('status bar');
+		$pn->panelShow($panel);
+	}
+
 	if ($self->configGet('-statusmsgitemoninit')) {
 		unless (exists $self->{MI}) {
 			my $mi = $self->AddMessageItem('msg', -position => 0);
@@ -313,15 +329,6 @@ Returnes true if $name exists.
 sub ItemExists {
 	my ($self, $name) = @_;
 	return exists $self->{ITEMS}->{$name}
-}
-
-sub MenuItems {
-	my $self = shift;
-	return (
-#This table is best viewed with tabsize 3.
-#			 type					menupath			label						Icon		config variable
-		[	'menu_check',		'View::',		"Show ~statusbar",	undef,	'-statusbarvisible',	undef, 0,   1], 
-	)
 }
 
 =item B<Message>I<($text)>

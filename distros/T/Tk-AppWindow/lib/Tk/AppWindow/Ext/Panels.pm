@@ -122,6 +122,8 @@ sub new {
 	$self->{ADJUSTERS} = {};
 	$self->{ADJUSTINFO} = {};
 	$self->{LAYOUT} = undef;
+	$self->{PANELS} = {};
+	$self->{VISIBLE} = {};
 
 	$self->configInit(
 		-panellayout => ['PanelLayOut', $self, [
@@ -194,6 +196,18 @@ sub adjusterActive {
 	return $active; 
 }
 
+=item adjusterAssign
+
+=cut
+
+sub adjusterAssign {
+	my ($self , $name, $panel, $adjuster) = @_;
+	$self->{ADJUSTINFO}->{$name} = {
+		-widget => $panel,
+		-side => $adjuster,
+	};
+}
+
 sub adjusterClear {
 	my ($self, $panel) = @_;
 	my $adj = $self->{ADJUSTERS}->{$panel};
@@ -236,6 +250,63 @@ sub adjusterWidget {
 
 sub layout { return $_[0]->{LAYOUT}}
 
+sub MenuItems {
+	my $self = shift;
+	my @items = (
+#			 type        menupath   label						cmd						icon					keyb			config variable
+ 		[	'menu', 				undef,      "~View"], 
+	);
+	my @list = $self->panelList;
+	for (@list) {
+		push @items, [	'menu_check',	'View::', "Show ~$_",	undef,	$self->panelOptName($_), undef, 	0,   1], 
+	}
+	return @items
+}
+
+sub menuRefresh {
+	my $self = shift;
+	my $mnu = $self->extGet('MenuBar');
+	$mnu->ReConfigure if (defined $mnu) and (not $self->configMode);
+}
+
+=item panelAssignI<($name, ?$panel?)>
+
+Returns the panel assigned to I<$name>.
+
+If I<$panel> is specified assigns I<$name> to <$panel>
+and creates a menu entry for I<$name>> in the View menu.
+
+=cut
+
+sub panelAssign {
+	my ($self, $name, $panel) = @_;
+	my $p = $self->{PANELS};
+	if (defined $panel) {
+		$p->{$name} = $panel;
+		$self->{VISIBLE}->{$name} = 1;
+		my $opt = $self->panelOptName($name);
+		$self->configInit($opt => ['panelVisible', $self, $panel, 1]);
+		$self->menuRefresh;
+	}
+	return $p->{$name};
+}
+
+=item B<panelDelete>I<($name)>
+
+Deletes I<$name> from the list of assigned panels and
+removes its menu entry in the View menu.
+
+=cut
+
+sub panelDelete {
+	my ($self, $name) = @_;
+	delete $self->{PANELS}->{$name};
+	delete $self->{VISIBLE}->{$name};
+	my $opt = $self->panelOptName($name);
+	$self->configDelete($opt);
+	$self->menuRefresh;
+}
+
 =item B<panelHide>I<($panel)>
 
 panelHide $panel and its adjuster if any.
@@ -262,14 +333,6 @@ sub panelIsHidden {
 	return not $mapped ;
 }
 
-sub MenuItems {
-	my $self = shift;
-	return (
-#			 type        menupath   label						cmd						icon					keyb			config variable
- 		[	'menu', 				undef,      "~View"], 
-	)
-}
-
 sub PanelLayOut {
 	my ($self, $layout) = @_;
 	return unless defined $layout;
@@ -280,7 +343,7 @@ sub PanelLayOut {
 		my $options = shift @l;
 
 		my $in = delete $options->{'-in'};
-		die "Option -in must be specified" unless defined $in;
+		die "Error in '$name'. Option -in must be specified" unless defined $in;
 		
 		my $canhide = delete $options->{'-canhide'};
 		$canhide = 0 unless defined $canhide;
@@ -291,19 +354,19 @@ sub PanelLayOut {
 		} else {
 			$parent = $self->Subwidget($in)
 		}
-		die "Panel $in does not exist" unless defined $parent;
+		die "Error in '$name'. Panel $in does not exist" unless defined $parent;
 
 		my $before = delete $options->{'-before'};
 		if (defined $before) {
 			my $neighbor = $self->Subwidget($before);
-			die "Panel $neighbor does not exist" unless defined $neighbor;
+			die "Error in '$name'. Panel $neighbor does not exist" unless defined $neighbor;
 			$options->{'-before'} = $neighbor;
 		}
 
 		my $after = delete $options->{'-after'};
 		if (defined $after) {
 			my $neighbor = $self->Subwidget($after);
-			die "Panel $neighbor does not exist" unless defined $neighbor;
+			die "Error in '$name'. Panel $neighbor does not exist" unless defined $neighbor;
 			$options->{'-after'} = $neighbor;
 		}
 
@@ -316,12 +379,7 @@ sub PanelLayOut {
 		
 		$self->Advertise($name, $panel);
 		
-		if (defined $adjuster) {
-			$self->{ADJUSTINFO}->{$name} = {
-				-widget => $panel,
-				-side => $adjuster,
-			};
-		}
+		$self->adjusterAssign($name, $panel, $adjuster) if defined $adjuster;
 		
 		if ($canhide) {
 			$self->{PACKINFO}->{$name} = $options;
@@ -329,6 +387,23 @@ sub PanelLayOut {
 			$panel->pack(%$options);
 		}
 	}
+}
+
+=item B<panelList>
+
+Returns a list of assigned panels
+
+=cut
+
+sub panelList {
+	my $self = shift;
+	my $p = $self->{PANELS};
+	return sort keys %$p
+}
+
+sub panelOptName {
+	my ($self, $name) = @_;
+	return "-$name" . 'visible';
 }
 
 =item B<panelShow>I<($panel)>
@@ -345,6 +420,22 @@ sub panelShow {
 		$panel->pack(%$packinfo);
 		$self->adjusterSet($name) if $self->adjusterActive($name);
 	}
+}
+
+sub panelVisible {
+	my $self = shift;
+	my $panel = shift;
+	if (@_) {
+		my $status = shift;
+		if ($self->configMode) {
+		} elsif ($status eq 1) {
+			$self->panelShow($panel);
+		} elsif ($status eq 0) {
+			$self->panelHide($panel);
+		}
+		$self->{VISIBLE}->{$panel} = $status;
+	}
+	return $self->{VISIBLE}->{$panel}
 }
 
 =back

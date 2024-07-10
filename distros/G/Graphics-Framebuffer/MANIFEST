@@ -46,5 +46,6 @@ README.md
 src/Framebuffer.c
 src/Framebuffer.pm.template
 t/01-primitives.t
+t/Environment_Variables.txt
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

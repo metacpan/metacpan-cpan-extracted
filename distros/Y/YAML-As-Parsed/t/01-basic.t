@@ -9,8 +9,6 @@ Foo: Bar
 empty: ~
 |;
 
-use YAML::Tiny;
-
 # Open the config
 my $yaml = YAML::As::Parsed->read_string( $string );
 

@@ -700,8 +700,10 @@ static void TreeRBXS_item_detach_tree(struct TreeRBXS_item* item, struct TreeRBX
 	//warn("TreeRBXS_item_detach_tree");
 	//warn("detach tree %p %p key %d", item, tree, (int) item->keyunion.ikey);
 	if (rbtree_node_is_in_tree(&item->rbnode)) {
-		if (tree->prev_inserted_item == item)
+		if (tree->prev_inserted_item == item) {
 			tree->prev_inserted_item= NULL;
+			tree->prev_inserted_trend= 0;
+		}
 		// If any iterator points to this node, move it to the following node.
 		if (item->iter)
 			TreeRBXS_item_advance_all_iters(item, 0);

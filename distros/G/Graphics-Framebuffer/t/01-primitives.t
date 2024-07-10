@@ -13,20 +13,23 @@ use Test::More qw(no_plan); # tests => 51;
 # use Data::Dumper;$Data::Dumper::Sortkeys=1; $Data::Dumper::Purity=1; $Data::Dumper::Deepcopy=1;
 
 BEGIN {
-	our $VERSION = '1.01';
+	our $VERSION = '1.02';
 };
 
 our $F;
+
+# This test is adapted from the examples script.  Therefore, some leftover code may remain.
+# To pass in commands, use the environment variables.
 
 my $new_x;
 my $new_y;
 my $dev      = 0;
 my $psize    = 1;
-my $noaccel  = FALSE; # not used for testing, but here to make sure nothing breaks
-my $nosplash = FALSE;
-my $delay    = 0.25;
-my $ignore_x = FALSE;
-my $small    = FALSE;
+my $noaccel  = $ENV{'GFB_NOACCEL'} || FALSE; # not used for testing, but here to make sure nothing breaks
+my $nosplash = $ENV{'GFB_NOSPLASH'} || FALSE;
+my $delay    = $ENV{'GFB_DELAY'} || 0.25;
+my $ignore_x = $ENV{'GFB_IGNORE_X'} || FALSE;
+my $small    = $ENV{'GFB_SMALL'} || FALSE;
 my $show_func; # = 'Color Replace Non-Clipped,Color Replace Clipped';
 
 $noaccel = ($noaccel) ? TRUE : FALSE;    # Only 1 or 0 please

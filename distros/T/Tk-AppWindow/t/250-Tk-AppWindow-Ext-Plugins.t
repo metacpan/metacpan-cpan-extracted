@@ -5,7 +5,7 @@ use lib './t/lib';
 use Test::More tests => 21;
 use Test::Tk;
 $mwclass = 'Alternative::NameSpace';
-# $delay = 1500;
+$delay = 1500;
 
 BEGIN { 
 	use_ok('Tk::AppWindow::Ext::Plugins');

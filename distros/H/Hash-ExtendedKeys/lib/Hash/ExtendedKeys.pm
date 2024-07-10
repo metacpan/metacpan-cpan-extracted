@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use Hash::ExtendedKeys::Tie;
 
-our $VERSION = '0.04';
+our $VERSION = '1.00';
 
 use overload '%{}' => sub { ${$_[0]}->{hash}; }, fallback => 1;
 
@@ -27,7 +27,7 @@ Hash::ExtendedKeys - Hash Keys
 
 =head1 VERSION
 
-Version 0.04
+Version 1.00
 
 =cut
 
@@ -94,28 +94,22 @@ You can also look for information at:
 
 L<https://rt.cpan.org/NoAuth/Bugs.html?Dist=Hash-ExtendedKeys>
 
-=item * CPAN Ratings
-
-L<https://cpanratings.perl.org/d/Hash-ExtendedKeys>
-
 =item * Search CPAN
 
 L<https://metacpan.org/release/Hash-ExtendedKeys>
 
 =back
 
-
 =head1 ACKNOWLEDGEMENTS
 
 
 =head1 LICENSE AND COPYRIGHT
 
-This software is Copyright (c) 2021 by LNATION.
+This software is Copyright (c) 2021->2024 by LNATION.
 
 This is free software, licensed under:
 
   The Artistic License 2.0 (GPL Compatible)
-
 
 =cut
 

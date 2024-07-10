@@ -9,32 +9,34 @@ NAME
 
  SYNOPSIS
 
-        my $a = Array::Circular->new(qw/once upon a time there was/);
+        my $l = Array::Circular->new(qw/once upon a time there was/);
         my $current = $l->next;
-        say "They are the same" if $current == $l->current;
+        say "They are the same" if $current eq $l->current;
         my $first = $l->previous;
-        say "Also the same" if $first == $l->current;
+        say "Also the same" if $first eq $l->current;
         say "We went around the loop " . $l->loops . " times";
 
  METHODS
 
   new
 
-        my $a = Array::Circular->new(qw/this is a test/);
+        my $l = Array::Circular->new(qw/this is a test/);
 
   clone
 
-        my $new = $a->clone;
+        my $new = $l->clone;
 
   next
 
         my $element     = $l->next;
         my $two_forward = $l->next(2);
+        my $two_back    = $l->next(-2);
 
   previous / prev
 
-        my $element = $l->previous;
-        my $two_back = $l->previous(2);
+        my $element     = $l->previous;
+        my $two_back    = $l->previous(2);
+        my $two_forward = $l->previous(-2);
 
   current / curr
 

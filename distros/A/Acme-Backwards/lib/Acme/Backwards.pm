@@ -1,5 +1,5 @@
 package Acme::Backwards; 
-our $VERSION = '0.05';
+our $VERSION = '1.00';
 use Keyword::Declare;
 sub import {
 	keytype OKAY is m{(?:fisle (?&PerlNWS)(?&PerlExpression).*?;|esle (?&PerlNWS).*?;)?+}xms;
@@ -13,6 +13,7 @@ sub _fisle {shift=~m/\s*((?&PerlExpression))\s*(.*?;) $PPR::GRAMMAR/gxm;_backwar
 sub _backwards {scalar@_>3?sprintf"%s %s %s { %s }",@_:sprintf"%s %s { %s }",@_;}
 
 1;
+
 __END__
 
 =head1 NAME
@@ -21,7 +22,7 @@ Acme::Backwards - One line fi, esle, fisle, sselnu, rof
 
 =head1 VERSION
 
-Version 0.05
+Version 1.00
 
 =cut
 
@@ -46,6 +47,28 @@ Perhaps a little code snippet.
 	rof (qw/1 2 3/) $int += $_;
 	rof my $var (qw/4 5 6/) $int += $var;
 	rof my $nest (qw/7 8/) fi ($nest == 7) print "one"; esle print "line";
+
+=head1 EXPORTS
+
+=head2 fi
+
+if
+
+=head2 fisle
+
+elsif
+
+=head2 esle
+
+else
+
+=head2 sselnu
+
+unless
+
+=head2 rof
+
+for
 
 =head1 AUTHOR
 
@@ -72,20 +95,11 @@ You can also look for information at:
 
 L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=Acme-Backwards>
 
-=item * AnnoCPAN: Annotated CPAN documentation
-
-L<http://annocpan.org/dist/Acme-Backwards>
-
-=item * CPAN Ratings
-
-L<http://cpanratings.perl.org/d/Acme-Backwards>
-
 =item * Search CPAN
 
 L<http://search.cpan.org/dist/Acme-Backwards/>
 
 =back
-
 
 =head1 ACKNOWLEDGEMENTS
 

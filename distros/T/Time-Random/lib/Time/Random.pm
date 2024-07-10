@@ -1,5 +1,5 @@
 package Time::Random;
-use 5.006; use strict; use warnings; our $VERSION = '1.00';
+use 5.006; use strict; use warnings; our $VERSION = '1.01';
 use Time::Piece;
 use base 'Import::Export';
 our %EX = (
@@ -30,7 +30,7 @@ Time::Random - Generate a random time in time.
 
 =head1 VERSION
 
-Version 1.00
+Version 1.01
 
 =cut
 
@@ -91,7 +91,7 @@ This should be a valid strftime pattern and when passed time_random will use thi
 
 Internally this module uses Time::Piece::strftime so please refer here for further documentation.
 
-=cut
+=back
 
 =head3 returns
 
@@ -112,8 +112,6 @@ If you would like any custom format I would look at passing the strftime param o
 	..............
 
 	time_random()->strftime('%Y-%m-%d');
-
-=cut
 
 =cut
 
@@ -155,13 +153,12 @@ L<http://search.cpan.org/dist/Time-Random/>
 
 =back
 
-
 =head1 ACKNOWLEDGEMENTS
 
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2018->2021 lnation.
+Copyright 2018->2024 lnation.
 
 This program is free software; you can redistribute it and/or modify it
 under the terms of the the Artistic License (2.0). You may obtain a

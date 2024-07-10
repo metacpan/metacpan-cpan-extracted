@@ -139,6 +139,11 @@ subtest comparison_counts => sub {
 	is( $tree->put_multi(6..1005), 500, 'add 500 sequential keys' );
 	is( $called, 500, 'using 500 comparisons' );
 
+	ok( $tree->delete(1004) );
+	$called= 0;
+	$tree->put(1004, 0);
+	is( $called, 14, 'reset optimization after deleted recent node' );
+
 	$tree->clear;
 	$called= 0;
 	$tree->put(50);

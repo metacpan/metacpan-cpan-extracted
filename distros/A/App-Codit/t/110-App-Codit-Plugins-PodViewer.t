@@ -10,7 +10,7 @@ use Config;
 my $mswin = $Config{'osname'} eq 'MSWin32';
 $mwclass = 'App::Codit';
 
-#$delay = 2000;
+$delay = 2000;
 #$quitdelay = 1000 if $mswin;
 
 BEGIN { use_ok('App::Codit::Plugins::PodViewer') };

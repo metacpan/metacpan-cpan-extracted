@@ -3,7 +3,7 @@
 #
 #  (C) Paul Evans, 2024 -- leonerd@leonerd.org.uk
 
-package Data::Checks 0.05;
+package Data::Checks 0.06;
 
 use v5.22;
 use warnings;
@@ -66,6 +66,22 @@ With L<Object::Pad::FieldAttr::Checked>:
    my $x = Datum->new( name => "something" );  # is fine
    my $y = Datum->new( name => undef );        # throws an exception
 
+With L<Syntax::Operator::Is> on Perl v5.38 or later:
+
+   use v5.38;
+   use Syntax::Operator::Is;
+
+   use Data::Checks qw( Num Object );
+
+   my $x = ...;
+
+   if($x is Num) {
+      say "x can be used as a number";
+   }
+   elsif($x is Object) {
+      say "x can be used as an object";
+   }
+
 =head1 DESCRIPTION
 
 This module provides functions that implement various value constraint
@@ -76,6 +92,9 @@ It also provides the underlying common framework XS functions to assist in
 writing modules that actually implement such constraint checking. These parts
 are not visible in Perl code, but instead made visible at the XS level by the
 C<#include "DataChecks.h"> directive.
+
+See the L</SYNOPSIS> section above for several examples of other CPAN modules
+that make direct use of these constraint checks.
 
 =cut
 
@@ -185,6 +204,15 @@ I<Since version 0.04.>
 
 Accepts any blessed object reference to an instance of the given class name,
 or a subclass derived from it (i.e. anything accepted by the C<isa> operator).
+
+=head2 Callable
+
+   Callable()
+
+I<Since version 0.06.>
+
+Accepts any plain reference to a subroutine, or any object reference to an
+instance of a class that provides a subroutine dereference overload.
 
 =head2 Maybe
 
@@ -327,6 +355,10 @@ Parametric constraints - C<StrMatch>
 =item *
 
 Structural constraints - C<HashOf>, C<ArrayOf>, etc...
+
+=item *
+
+Look into making const-folding work with the C<MIN .. MAX> flip-flop operator
 
 =back
 

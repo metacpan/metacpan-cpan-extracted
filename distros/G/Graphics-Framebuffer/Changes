@@ -1677,3 +1677,15 @@ Revision history for Graphics-Framebuffer
        More aliased commands added to cater to taste.
 
        Documentation updated and improved, typos corrected.
+
+6.61   July 10, 2024
+
+       While the ignore X-Windows check option was already coded into the
+	   module, the tests still did not give the option to ignore the check.
+
+       Now "make test" will pay attention to any environment variables that
+	   act as options.  A list of these variables is in the text file
+	   t/Environment_Variables.txt
+
+       As a reminder, the option "IGNORE_X_WINDOWS" => 1 is available for
+	   when creating a GFB object.

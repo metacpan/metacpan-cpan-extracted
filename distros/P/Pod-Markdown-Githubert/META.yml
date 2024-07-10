@@ -3,6 +3,7 @@ abstract: 'convert POD to Github-flavored Markdown'
 author:
   - 'Lukas Mai <l.mai@web.de>'
 build_requires:
+  HTML::Entities: '0'
   Test2::V0: '0'
 configure_requires:
   ExtUtils::MakeMaker: '0'
@@ -29,5 +30,5 @@ requires:
   warnings: '0'
 resources:
   repository: git://github.com/mauke/Pod-Markdown-Githubert
-version: '0.02'
+version: '0.03'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

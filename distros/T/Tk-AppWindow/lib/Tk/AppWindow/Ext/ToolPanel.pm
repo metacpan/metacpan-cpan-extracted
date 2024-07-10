@@ -9,11 +9,9 @@ Tk::AppWindow::Ext::Navigator - Navigate opened documents and files
 use strict;
 use warnings;
 use vars qw($VERSION);
-$VERSION="0.02";
+$VERSION="0.11";
 
-use base qw( Tk::AppWindow::BaseClasses::SidePanel );
-
-require Tk::YANoteBook;
+use base qw( Tk::AppWindow::BaseClasses::Extension );
 
 =head1 SYNOPSIS
 
@@ -28,7 +26,7 @@ Adds a tool panel to your application. By default
 it sits on the right side of your application. You
 can add items to it's notebook.
 
-Inherits L<Tk::AppWindow::BaseClasses::SidePanel>.
+Inherits L<Tk::AppWindow::BaseClasses::Extension>.
 
 =head1 CONFIG VARIABLES
 
@@ -36,19 +34,9 @@ Inherits L<Tk::AppWindow::BaseClasses::SidePanel>.
 
 =item B<-toolpanel>
 
-Default value 'RIGHT'. Sets the name of the panel home to B<Navigator>.
+Default value 'RIGHT'. Sets the name of the panel home to B<ToolPanel>.
 
-=item B<-toolpaneliconsize>
-
-Default value 32.
-
-=item B<-toolpaneltabside>
-
-Default value 'right'. At which side of the notebook do you place your tabs.
-
-=item B<-toolpanelvisible>
-
-Default value 1. Show or hide tool panel.
+Only available at create time.
 
 =back
 
@@ -57,24 +45,79 @@ Default value 1. Show or hide tool panel.
 sub new {
 	my $class = shift;
 	my $self = $class->SUPER::new(@_);
+	$self->Require('SideBars');
 
-	$self->configInit(
-		-toolpaneliconsize => ['IconSize', $self, 32],
-		-toolpanel => ['Panel', $self, 'RIGHT'],
-		-toolpaneltabside	=> ['Tabside', $self, 'right'],
-		-toolpanelvisible	=> ['PanelVisible', $self, 1],
-	);
+	my $args = $self->GetArgsRef;
+	my $panel = delete $args->{'-toolpanel'};
+	$panel = 'RIGHT' unless defined $panel;
+	my $sb = $self->extGet('SideBars');
+
+	$sb->nbAdd('tool panel', $panel, 'right');
+	$self->addPostConfig('DoPostConfig', $self);
 	return $self;
 }
 
-sub MenuItems {
+=head1 METHODS
+
+=over 4
+
+=item B<addPage>
+
+Deprecated. Use B<pageAdd>.
+
+=cut
+
+sub addPage {
 	my $self = shift;
-	return (
-#This table is best viewed with tabsize 3.
-#			 type					menupath			label			Icon		config variable	off on
-		[	'menu_check',		'View::',		"Show ~tool panel",	undef,	'-toolpanelvisible', undef, 	0,   1], 
-	)
+	return $self->pageAdd(@_)
 }
+
+=item B<deletePage>I<($name)>
+
+Deprecated. Use B<pageDelete>.
+
+=cut
+
+sub deletePage {
+	my $self = shift;
+	return $self->pageDelete(@_)
+}
+
+=item B<pageAdd>I<($name, $image, $text, $statustext, $initialsize)>
+
+Adds a page to the tool panel.
+
+=cut
+
+sub pageAdd {
+	my $self = shift;
+	my $sb = $self->extGet('SideBars');
+	return $sb->pageAdd('tool panel', @_);
+}
+
+=item B<pageDelete>I<($name)>
+
+Deletes a page from the tool panel.
+
+=cut
+
+sub pageDelete {
+	my $self = shift;
+	my $sb = $self->extGet('SideBars');
+	return $sb->pageDelete('tool panel', @_);
+}
+
+sub DoPostConfig {
+	my $self = shift;
+	#show the navigator panel if it should be visible
+	if ($self->configGet('-tool panelvisible')) {
+		my $pn = $self->extGet('Panels');
+		my $panel = $pn->panelAssign('tool panel');
+		$pn->panelShow($panel);
+	}
+}
+
+=back
 
 =head1 AUTHOR
 

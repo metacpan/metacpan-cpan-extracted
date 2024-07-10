@@ -20,21 +20,9 @@ The R::NDArray::String class in L<SPVM> has methods to do someting.
 
 
 
-=head1 Inheritance
+=head1 Super Class
 
-
-
-=head1 Interfaces
-
-
-
-=head1 Enumerations
-
-
-
-=head1 Fields
-
-
+L<R::NDArray|SPVM::R::NDArray>
 
 =head1 Class Methods
 
@@ -43,15 +31,6 @@ The R::NDArray::String class in L<SPVM> has methods to do someting.
 =head1 Instance Methods
 
 
-
-
-=head1 Repository
-
-
-
-=head1 Author
-
-Yuki Kimoto C<kimoto.yuki@gmail.com>
 
 =head1 Copyright & License
 

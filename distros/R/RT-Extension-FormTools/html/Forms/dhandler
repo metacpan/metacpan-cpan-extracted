@@ -340,7 +340,6 @@ if ( $create_ticket ) {
     ($ticket_obj) = CreateTicket(
         Subject => 'Ticket created from FormTools form ' . $form_name,
         Queue   => $queue_obj->Id,
-        Status => 'new',
         Requestors => $session{'CurrentUser'}->EmailAddress,
         %ARGS,
     );

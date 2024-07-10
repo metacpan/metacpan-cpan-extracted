@@ -10,7 +10,7 @@ use strict;
 use warnings;
 use Carp;
 use vars qw($VERSION);
-$VERSION="0.10";
+$VERSION="0.11";
 
 use base qw(Tk::Derived Tk::MainWindow);
 Construct Tk::Widget 'AppWindow';
@@ -521,11 +521,14 @@ sub configHookBefore {
 =item B<configInit>I<(@options)>
 
  $app->configInit(
-    -option1 => ['method', $obj, @options],
-    -option2 => [sub { do something }, @options],
+    -option1 => ['method', $obj, @options, $default],
+    -option2 => [sub { do something }, @options, $default],
  );
 
 Add options to the options table. Usually called at create time. But worth experimenting with.
+
+Always specify I<$default>. The last thing you specify is always the default value. set it undef
+if you want it to be ignored.
 
 =cut
 
@@ -536,11 +539,13 @@ sub configInit {
 	while (@_) {
 		my $option = shift;
 		my $i = shift;
-		my ($call, $owner, $default) = @$i;
-		my $value = delete $args->{$option};
-		unless (defined $value) { $value = $default };
+		my ($call, $owner, @options) = @$i;
+		my $default = pop @options;
+		my $value;
+		$value = delete $args->{$option} if defined $args;
+		$value = $default unless defined $value;
 		unless (exists $table->{$option}) {
-			$table->{$option} = $self->CreateCallback($call, $owner);
+			$table->{$option} = $self->CreateCallback($call, $owner, @options);
 			$self->configPut($option, $value) if defined $value;
 		} else {
 			croak "Config option $option already defined\n";
@@ -574,6 +579,11 @@ sub configPut {
 	} else {
 		$self->configure($option, $value);
 	}
+}
+
+sub configRemove {
+	my ($self, $option) = @_;
+	delete $self->{CONFIGTABLE}->{$option};
 }
 
 =item B<configUnhookAfter>(I<'-configvariable'>, I<@callback>)

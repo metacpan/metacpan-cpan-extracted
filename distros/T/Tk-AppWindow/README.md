@@ -8,6 +8,10 @@ It inherits Tk::MainWindow and adds a lot of features to it like:
     * Add custom config variables
     * Extensions so you load only functionality you need
     * Simplified menu definitions
+    * Toolbar
+    * Statusbar
+    * Side panels
+    * Single and multiple document interface
     * A plugin system
     * All you need for a config folder
 
@@ -24,7 +28,6 @@ Following Perl modules must be installed:
     * Imager
     * Imager::File::PNG
     * MIME::Base64
-    * Module::Load::Conditional
     * Pod::Usage
     * Scalar::Util
     * Scalar::Util::Numeric

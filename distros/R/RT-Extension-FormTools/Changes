@@ -1,5 +1,8 @@
 Revision history for RT-Extension-FormTools
 
+1.10 2024-07-10
+ - Allow RT::Ticket::Create to set the default initial status
+
 1.09 2024-07-08
  - Use module name in the abstract
  - Support to localize Help text

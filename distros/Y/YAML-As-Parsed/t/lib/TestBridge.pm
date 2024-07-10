@@ -14,7 +14,7 @@ BEGIN {
         for qw/output failure_output todo_output/;
 }
 
-use YAML::Tiny;
+use YAML::As::Parsed;
 
 use Exporter   ();
 our @ISA    = qw{ Exporter };
@@ -36,14 +36,14 @@ our @EXPORT = qw{
 # regular expressions for checking error messages; incomplete, but more
 # can be added as more error messages get test coverage
 my %ERROR = (
-    E_CIRCULAR => qr{\QYAML::Tiny does not support circular references},
-    E_FEATURE  => qr{\QYAML::Tiny does not support a feature},
-    E_PLAIN    => qr{\QYAML::Tiny found illegal characters in plain scalar},
-    E_CLASSIFY => qr{\QYAML::Tiny failed to classify the line},
+    E_CIRCULAR => qr{\QYAML::As::Parsed does not support circular references},
+    E_FEATURE  => qr{\QYAML::As::Parsed does not support a feature},
+    E_PLAIN    => qr{\QYAML::As::Parsed found illegal characters in plain scalar},
+    E_CLASSIFY => qr{\QYAML::As::Parsed failed to classify the line},
 );
 
 my %WARN = (
-    E_DUPKEY   => qr{\QYAML::Tiny found a duplicate key},
+    E_DUPKEY   => qr{\QYAML::As::Parsed found a duplicate key},
 );
 
 # use XXX -with => 'YAML::XS';
@@ -103,7 +103,7 @@ sub _testml_has_points {
 # Tests that a YAML string loads to the expected perl data.  Also, tests
 # roundtripping from perl->YAML->perl.
 #
-# We can't compare the YAML for roundtripping because YAML::Tiny doesn't
+# We can't compare the YAML for roundtripping because YAML::As::Parsed doesn't
 # preserve order and comments.  Therefore, all we can test is that given input
 # YAML we can produce output YAML that produces the same Perl data as the
 # input.
@@ -130,19 +130,19 @@ sub test_yaml_roundtrip {
     }
 
     my $expected = eval $perl; die $@ if $@;
-    bless $expected, 'YAML::Tiny';
+    bless $expected, 'YAML::As::Parsed';
 
     subtest $label, sub {
         # Does the string parse to the structure
         my $yaml_copy = $yaml;
-        my $got       = eval { YAML::Tiny->read_string( $yaml_copy ); };
-        is( $@, '', "YAML::Tiny parses without error" );
-        is( $yaml_copy, $yaml, "YAML::Tiny does not modify the input string" );
+        my $got       = eval { YAML::As::Parsed->read_string( $yaml_copy ); };
+        is( $@, '', "YAML::As::Parsed parses without error" );
+        is( $yaml_copy, $yaml, "YAML::As::Parsed does not modify the input string" );
         SKIP: {
             skip( "Shortcutting after failure", 2 ) if $@;
-            isa_ok( $got, 'YAML::Tiny' );
-            cmp_deeply( $got, $expected, "YAML::Tiny parses correctly" )
-                or diag "ERROR: $YAML::Tiny::errstr\n\nYAML:$yaml";
+            isa_ok( $got, 'YAML::As::Parsed' );
+            cmp_deeply( $got, $expected, "YAML::As::Parsed parses correctly" )
+                or diag "ERROR: $YAML::As::Parsed::errstr\n\nYAML:$yaml";
         }
 
         # Does the structure serialize to the string.
@@ -150,18 +150,18 @@ sub test_yaml_roundtrip {
         # whitespace or comments would be lost.
         # So instead we parse back in.
         my $output = eval { $expected->write_string };
-        is( $@, '', "YAML::Tiny serializes without error" );
+        is( $@, '', "YAML::As::Parsed serializes without error" );
         SKIP: {
             skip( "Shortcutting after failure", 5 ) if $@;
             ok(
                 !!(defined $output and ! ref $output),
-                "YAML::Tiny serializes to scalar",
+                "YAML::As::Parsed serializes to scalar",
             );
-            my $roundtrip = eval { YAML::Tiny->read_string( $output ) };
-            is( $@, '', "YAML::Tiny round-trips without error" );
+            my $roundtrip = eval { YAML::As::Parsed->read_string( $output ) };
+            is( $@, '', "YAML::As::Parsed round-trips without error" );
             skip( "Shortcutting after failure", 2 ) if $@;
-            isa_ok( $roundtrip, 'YAML::Tiny' );
-            cmp_deeply( $roundtrip, $expected, "YAML::Tiny round-trips correctly" );
+            isa_ok( $roundtrip, 'YAML::As::Parsed' );
+            cmp_deeply( $roundtrip, $expected, "YAML::As::Parsed round-trips correctly" );
 
             # Testing the serialization
             skip( "Shortcutting perfect serialization tests", 1 ) unless $options{serializes};
@@ -192,7 +192,7 @@ sub test_perl_to_yaml {
     my $input = eval "no strict; $perl"; die $@ if $@;
 
     subtest $label, sub {
-        my $result = eval { YAML::Tiny->new( @$input )->write_string };
+        my $result = eval { YAML::As::Parsed->new( @$input )->write_string };
         is( $@, '', "write_string lives" );
         is( $result, $yaml, "dumped YAML correct" );
     };
@@ -223,7 +223,7 @@ sub test_dump_error {
     my $expected = $ERROR{$error};
 
     subtest $label, sub {
-        my $result = eval { YAML::Tiny->new( @$input )->write_string };
+        my $result = eval { YAML::As::Parsed->new( @$input )->write_string };
         ok( !$result, "returned false" );
         error_like( $expected, "Got expected error" );
     };
@@ -249,7 +249,7 @@ sub test_load_error {
     my $expected = $ERROR{$error};
 
     subtest $label, sub {
-        my $result = eval { YAML::Tiny->read_string( $yaml ) };
+        my $result = eval { YAML::As::Parsed->read_string( $yaml ) };
         is( $result, undef, 'read_string returns undef' );
         error_like( $expected, "Got expected error" )
             or diag "YAML:\n$yaml";
@@ -280,7 +280,7 @@ sub test_load_warning {
         my @warnings;
         local $SIG{__WARN__} = sub { push @warnings, shift; };
 
-        my $result = eval { YAML::Tiny->read_string( $yaml ) };
+        my $result = eval { YAML::As::Parsed->read_string( $yaml ) };
 
         is(scalar(@warnings), 1, 'got exactly one warning');
         like(
@@ -311,7 +311,7 @@ sub test_yaml_json {
     subtest "$label", sub {
         # test YAML Load
         my $object = eval {
-            YAML::Tiny::Load($yaml);
+            YAML::As::Parsed::Load($yaml);
         };
         my $err = $@;
         ok !$err, "YAML loads";
@@ -350,15 +350,15 @@ sub test_code_point {
 
     subtest "$label - Unicode map key/value test" => sub {
         my $data = { chr($code) => chr($code) };
-        my $dump = YAML::Tiny::Dump($data);
+        my $dump = YAML::As::Parsed::Dump($data);
         $dump =~ s/^---\n//;
         is $dump, $yaml, "Dump key and value of code point char $code";
 
-        my $yny = YAML::Tiny::Dump(YAML::Tiny::Load($yaml));
+        my $yny = YAML::As::Parsed::Dump(YAML::As::Parsed::Load($yaml));
         $yny =~ s/^---\n//;
         is $yny, $yaml, "YAML for code point $code YNY roundtrips";
 
-        my $nyn = YAML::Tiny::Load(YAML::Tiny::Dump($data));
+        my $nyn = YAML::As::Parsed::Load(YAML::As::Parsed::Dump($data));
         cmp_deeply( $nyn, $data, "YAML for code point $code NYN roundtrips" );
     }
 }
@@ -366,7 +366,7 @@ sub test_code_point {
 #--------------------------------------------------------------------------#
 # error_like
 #
-# Test YAML::Tiny->errstr against a regular expression and clear the
+# Test YAML::As::Parsed->errstr against a regular expression and clear the
 # errstr afterwards
 #--------------------------------------------------------------------------#
 

@@ -9,7 +9,7 @@ Tk::CodeText - Programmer's Swiss army knife Text widget.
 use strict;
 use warnings;
 use vars qw($VERSION);
-$VERSION = '0.51';
+$VERSION = '0.52';
 
 use base qw(Tk::Derived Tk::Frame);
 

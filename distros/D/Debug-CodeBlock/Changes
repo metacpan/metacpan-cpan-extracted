@@ -1,5 +1,12 @@
 Revision history for Debug-CodeBlock
 
+0.04    2022/05/25
+	- Improve test coverage to 100%
+
+
+0.03    2022/05/24
+	- Import a Dump(Data::Dumper::Dumper) function to use inside of the DEBUG codebloack if debug mode is true.
+
 0.02    2022/05/22
 	- Update dependencies 
 

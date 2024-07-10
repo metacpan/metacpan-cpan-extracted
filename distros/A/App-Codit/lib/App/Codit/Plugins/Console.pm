@@ -9,7 +9,7 @@ App::Codit::Plugins::Console - plugin for App::Codit
 use strict;
 use warnings;
 use vars qw( $VERSION );
-$VERSION = 0.07;
+$VERSION = 0.08;
 
 use Config;
 my $mswin = $Config{'osname'} eq 'MSWin32';
@@ -227,7 +227,7 @@ sub linkSelect {
 		my $file = $1;
 		my $line = $2;
 		$file =~ s/blib\///;
-		my $folder = $self->{TXT}->cget('-workfolder');
+		my $folder = $self->{TXT}->cget('-workdir');
 		my $test = "$folder/$file";
 		$file = $test if -e $test;
 		if (-e $file) {

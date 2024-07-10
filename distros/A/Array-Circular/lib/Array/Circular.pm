@@ -55,12 +55,13 @@ sub next {
     my ($self, $num) = @_;
     return unless @$self;
     return $self->current if defined $num && $num == 0; # undefined just goes next.  zero gives current.
-    if ($num) {
-	croak "Calls to next with a count of how many to go forward must be a positive number" if $num < 0;
+    if ($num && $num < 0) {
+  $self->previous(1 + abs $num);
+    }
+    elsif ($num) {
 	$num--;
 	$self->next for 1 .. $num; # This is inefficient but simple.  Could use $self->me to compute where we are as optimisation
     }
-
 
     my $last_index = $#{$self};
     if ( $self->me->{current} == $last_index ) {
@@ -74,8 +75,10 @@ sub previous {
     my ($self, $num) = @_;
     return unless @$self;
 
-    if ($num) {
-	croak "Calls to next with a count of how many to go forward must be a positive number" if $num < 0;
+    if ($num && $num < 0) {
+  $self->next(1 + abs $num);
+    }
+    elsif ($num) {
 	$num--;
 	$self->previous for 1 .. $num; # This is inefficient but simple.  Could use $self->me to compute where we are as optimisation
     }
@@ -155,32 +158,34 @@ Circular array, tracks how many times it's been round.
 
 =head2 SYNOPSIS
 
-    my $a = Array::Circular->new(qw/once upon a time there was/);
+    my $l = Array::Circular->new(qw/once upon a time there was/);
     my $current = $l->next;
-    say "They are the same" if $current == $l->current;
+    say "They are the same" if $current eq $l->current;
     my $first = $l->previous;
-    say "Also the same" if $first == $l->current;
+    say "Also the same" if $first eq $l->current;
     say "We went around the loop " . $l->loops . " times";
 
 =head2 METHODS
 
 =head3 new
 
-    my $a = Array::Circular->new(qw/this is a test/);
+    my $l = Array::Circular->new(qw/this is a test/);
 
 =head3 clone
 
-    my $new = $a->clone;
+    my $new = $l->clone;
 
 =head3 next
 
     my $element     = $l->next;
     my $two_forward = $l->next(2);
+    my $two_back    = $l->next(-2);
 
 =head3 previous / prev
 
-    my $element = $l->previous;
-    my $two_back = $l->previous(2);
+    my $element     = $l->previous;
+    my $two_back    = $l->previous(2);
+    my $two_forward = $l->previous(-2);
 
 =head3 current / curr
 

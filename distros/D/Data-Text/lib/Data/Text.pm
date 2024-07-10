@@ -13,11 +13,11 @@ Data::Text - Class to handle text in an OO way
 
 =head1 VERSION
 
-Version 0.13
+Version 0.14
 
 =cut
 
-our $VERSION = '0.13';
+our $VERSION = '0.14';
 
 use overload (
         '==' => \&equal,
@@ -348,7 +348,7 @@ Nigel Horne, C<< <njh at bandsman.co.uk> >>
 
 =head1 SEE ALSO
 
-L<String::Clean>, L<String::Util>
+L<String::Clean>, L<String::Util>, L<Lingua::String>
 
 =head1 SUPPORT
 

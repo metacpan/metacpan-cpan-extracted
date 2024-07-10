@@ -13,15 +13,6 @@
 #define HAVE_DATA_CHECKS_IMPL
 #include "DataChecks.h"
 
-/* TODO: migrate this to optree-additions.c.inc */
-#define newUNOP_AUX_CUSTOM(func, flags, first, aux)  S_newUNOP_AUX_CUSTOM(aTHX_ func, flags, first, aux)
-static OP *S_newUNOP_AUX_CUSTOM(pTHX_ OP *(*func)(pTHX), U32 flags, OP *first, UNOP_AUX_item *aux)
-{
-  OP *o = newUNOP_AUX(OP_CUSTOM, flags, first, aux);
-  o->op_ppaddr = func;
-  return o;
-}
-
 #define newSVsv_num(osv)  S_newSVsv_num(aTHX_ osv)
 static SV *S_newSVsv_num(pTHX_ SV *osv)
 {
@@ -82,10 +73,14 @@ struct DataChecks_Checker
 };
 
 #include "perl-backcompat.c.inc"
+
 #include "make_argcheck_ops.c.inc"
+#include "newOP_CUSTOM.c.inc"
 #include "optree-additions.c.inc"
 #include "sv_streq.c.inc"
 #include "sv_numcmp.c.inc"
+
+#include "ckcall_constfold.c.inc"
 
 #if !HAVE_PERL_VERSION(5, 32, 0)
 # define sv_isa_sv(sv, namesv)  S_sv_isa_sv(aTHX_ sv, namesv)
@@ -266,6 +261,8 @@ static void S_DataChecks_assert_value(pTHX_ struct DataChecks_Checker *checker, 
 #define sv_has_overload(sv, method)  S_sv_has_overload(aTHX_ sv, method)
 static bool S_sv_has_overload(pTHX_ SV *sv, int method)
 {
+  assert(SvROK(sv));
+
   HV *stash = SvSTASH(SvRV(sv));
   if(!stash || !Gv_AMG(stash))
     return false;
@@ -543,6 +540,20 @@ static SV *mk_constraint_Isa(pTHX_ SV *arg0)
   return sv_2mortal(ret);
 }
 
+static bool constraint_Callable(pTHX_ struct Constraint *c, SV *value)
+{
+  if(!SvOK(value) || !SvROK(value))
+    return false;
+
+  SV *rv = SvRV(value);
+
+  if(!SvOBJECT(rv))
+    /* plain ref */
+    return SvTYPE(rv) == SVt_PVCV;
+  else
+    return sv_has_overload(value, to_cv_amg);
+}
+
 static bool constraint_Maybe(pTHX_ struct Constraint *c, SV *value)
 {
   if(!SvOK(value))
@@ -592,7 +603,8 @@ static void S_make_0arg_constraint(pTHX_ const char *name, ConstraintFunc *func)
     newSTATEOP(0, NULL,
       newSVOP(OP_CONST, 0, sv)));
 
-  newATTRSUB(floor_ix, newSVOP(OP_CONST, 0, namesv), NULL, NULL, body);
+  CV *cv = newATTRSUB(floor_ix, newSVOP(OP_CONST, 0, namesv), NULL, NULL, body);
+  cv_set_call_checker(cv, &ckcall_constfold, &PL_sv_undef);
 
   av_push(exportok, newSVpv(name, 0));
 }
@@ -671,7 +683,8 @@ static void S_make_1arg_constraint(pTHX_ const char *name, SV *(*mk_constraint)(
     body,
     newSTATEOP(0, NULL, mkop));
 
-  newATTRSUB(floor_ix, newSVOP(OP_CONST, 0, namesv), NULL, NULL, body);
+  CV *cv = newATTRSUB(floor_ix, newSVOP(OP_CONST, 0, namesv), NULL, NULL, body);
+  cv_set_call_checker(cv, &ckcall_constfold, &PL_sv_undef);
 
   av_push(exportok, newSVpv(name, 0));
 }
@@ -688,7 +701,7 @@ static void S_make_2arg_constraint(pTHX_ const char *name, SV *(*mk_constraint)(
   I32 floor_ix = start_subparse(FALSE, 0);
 
   OP *mkop = newUNOP_AUX_CUSTOM(&pp_make_constraint, 0,
-        newLISTOPn(OP_LIST, 0, newSLUGOP(0), newSLUGOP(1), NULL),
+        newLISTOPn(OP_LIST, OPf_WANT_LIST, newSLUGOP(0), newSLUGOP(1), NULL),
         (UNOP_AUX_item *)mk_constraint);
   mkop->op_private = 2;
 
@@ -697,7 +710,8 @@ static void S_make_2arg_constraint(pTHX_ const char *name, SV *(*mk_constraint)(
     body,
     newSTATEOP(0, NULL, mkop));
 
-  newATTRSUB(floor_ix, newSVOP(OP_CONST, 0, namesv), NULL, NULL, body);
+  CV *cv = newATTRSUB(floor_ix, newSVOP(OP_CONST, 0, namesv), NULL, NULL, body);
+  cv_set_call_checker(cv, &ckcall_constfold, &PL_sv_undef);
 
   av_push(exportok, newSVpv(name, 0));
 }
@@ -725,7 +739,8 @@ static void S_make_narg_constraint(pTHX_ const char *name, SV *(*mk_constraint)(
     body,
     newSTATEOP(0, NULL, mkop));
 
-  newATTRSUB(floor_ix, newSVOP(OP_CONST, 0, namesv), NULL, NULL, body);
+  CV *cv = newATTRSUB(floor_ix, newSVOP(OP_CONST, 0, namesv), NULL, NULL, body);
+  cv_set_call_checker(cv, &ckcall_constfold, &PL_sv_undef);
 
   av_push(exportok, newSVpv(name, 0));
 }
@@ -774,6 +789,7 @@ BOOT:
   MAKE_nARG_CONSTRAINT(NumEq);
 
   MAKE_1ARG_CONSTRAINT(Isa);
+  MAKE_0ARG_CONSTRAINT(Callable);
   MAKE_1ARG_CONSTRAINT(Maybe);
 
   XopENTRY_set(&xop_invoke_checkfunc, xop_name, "invoke_checkfunc");

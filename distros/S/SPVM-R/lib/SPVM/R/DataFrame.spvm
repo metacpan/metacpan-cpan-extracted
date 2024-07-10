@@ -252,7 +252,7 @@ class R::DataFrame {
           for (my $col = 0; $col < $ncol; $col++) {
             my $ndarray = $self->col_by_index($col);
             
-            my $elem_string = $ndarray->elem_to_string($row);
+            my $elem_string = $ndarray->elem_to_string($ndarray->data, $row);
             $string_buffer->push($elem_string);
             
             unless ($col == $ncol - 1) {
@@ -428,10 +428,10 @@ class R::DataFrame {
         my $desc = $order_by_desc_h->get_int($colname);
         
         if ($desc) {
-          $cmp = $ndarray->elem_cmp($b_data_index, $a_data_index);
+          $cmp = $ndarray->elem_cmp($ndarray->data, $b_data_index, $a_data_index);
         }
         else {
-          $cmp = $ndarray->elem_cmp($a_data_index, $b_data_index);
+          $cmp = $ndarray->elem_cmp($ndarray->data, $a_data_index, $b_data_index);
         }
         
         unless ($cmp == 0) {

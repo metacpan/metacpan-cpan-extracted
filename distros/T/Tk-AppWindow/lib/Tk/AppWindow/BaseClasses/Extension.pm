@@ -152,8 +152,9 @@ sub SettingsPage {
 
 =item B<ToolItems>
 
-Returns and empty list. It is there for you to overwrite. It is called by the B<ToolBar> extension. You can return a list
-with menu items here. For details on the format see L<Tk::AppWindow::Ext::ToolBar>
+Returns and empty list. It is there for you to overwrite. It is called by the 
+B<ToolBar> extension. You can return a list with menu items here. For details 
+on the format see L<Tk::AppWindow::Ext::ToolBar>
 
 =cut
 

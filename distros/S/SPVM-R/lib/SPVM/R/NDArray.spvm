@@ -9,127 +9,40 @@ class R::NDArray {
   use StringBuffer;
   use R::Util;
   use R::OP;
+  use Sort;
   
   # Fields
-  has data : protected object;
-  method data : object () { die "Not implemented."; }
+  has data : protected ro object;
   
   has dim : int[];
   
+  method dim : int[] () {
+    
+    my $dim = $self->{dim};
+    
+    my $dim_clone = copy $dim;
+    
+    return $dim_clone;
+  }
+  
+  method set_dim : void ($dim : int[]) {
+    
+    my $is_dim_read_only = $self->{is_dim_read_only};
+    
+    if ($is_dim_read_only) {
+      die "dim field is read only.";
+    }
+    
+    my $nomalized_dim = R::Util->normalize_dim($dim);
+    
+    my $data = $self->{data};
+    
+    R::Util->check_length($data, $nomalized_dim);
+    
+    $self->{dim} = $nomalized_dim;
+  }
+  
   has is_dim_read_only : ro byte;
-  
-  # Class Methods
-  private static method normalize_vector_indexes : R::NDArray::Int[] ($vector_indexes : R::NDArray::Int[], $dim : int[]) {
-    
-    unless ($vector_indexes) {
-      die "The indexes for n-dimension array \$vector_indexes must be defined.";
-    }
-    
-    my $vector_indexes_length = @$vector_indexes;
-    
-    my $dim_length = @$dim;
-    
-    unless ($vector_indexes_length <= $dim_length) {
-      die "The length of indexes for n-dimension array \$vector_indexes must be less than or equal to the length of dim field.";
-    }
-    
-    my $normalized_vector_indexes = new R::NDArray::Int[$dim_length];
-    
-    for (my $vector_indexes_index = 0; $vector_indexes_index < $dim_length; $vector_indexes_index++) {
-      
-      my $vector_index = (R::NDArray::Int)undef;
-      
-      if ($vector_indexes_index < $vector_indexes_length) {
-        $vector_index = $vector_indexes->[$vector_indexes_index];
-      }
-      
-      unless (!$vector_index || $vector_index->is_vector) {
-        die "The elem of indexes for n-dimension array \$vector_indexes must be undef or vector.";
-      }
-      
-      unless ($vector_index) {
-        my $vector_index_data = new int[$dim->[$vector_indexes_index]];
-        
-        for (my $i = 0; $i < $dim->[$vector_indexes_index]; $i++) {
-          $vector_index_data->[$i] = $i;
-        }
-        
-        $vector_index = R::NDArray::Int->new({data => $vector_index_data});
-      }
-      
-      $normalized_vector_indexes->[$vector_indexes_index] = $vector_index;
-    }
-    
-    return $normalized_vector_indexes;
-  }
-  
-  private static method create_ret_dim : int[] ($vector_indexes : R::NDArray::Int[]) {
-    
-    my $vector_indexes_length = @$vector_indexes;
-    
-    my $ret_dim = new int[$vector_indexes_length];
-    
-    for (my $i = 0; $i < $vector_indexes_length; $i++) {
-      my $vector_index = $vector_indexes->[$i];
-      
-      if ($vector_index) {
-        $ret_dim->[$i] = $vector_index->length;
-      }
-      else {
-        die "[Unexpected]\$vector_index must be defined.";
-      }
-    }
-    
-    return $ret_dim;
-  }
-  
-  precompile private static method convert_coordinate_to_data_index : int ($coordinate : int[], $dim : int[]) {
-    
-    my $data_index = 0;
-    my $dim_length = @$dim;
-    for (my $i = 0; $i < $dim_length; $i++) {
-      if ($i > 0) {
-        my $tmp = 1;
-        for (my $k = 0; $k < $i; $k++) {
-          $tmp *= $dim->[$k];
-        }
-        
-        $data_index += $tmp * $coordinate->[$i];
-      }
-      else {
-        $data_index += $coordinate->[$i];
-      }
-    }
-    
-    return $data_index;
-  }
-  
-  precompile static private method convert_data_index_to_coordinate : int[] ($data_index : int, $dim : int[]) {
-    
-    my $dim_length = @$dim;
-    
-    my $coordinate = new int[$dim_length];
-    
-    my $before_dim_product = 1;
-    for (my $i = 0; $i < $dim_length; $i++) {
-      $before_dim_product *= $dim->[$i];
-    }
-    
-    for (my $i = $dim_length - 1; $i >= 0; $i--) {
-      my $dim_product = 1;
-      for (my $k = 0; $k < $i; $k++) {
-        $dim_product *= $dim->[$k];
-      }
-      
-      my $reminder = $data_index % $before_dim_product;
-      my $quotient = $reminder / $dim_product;
-      
-      $coordinate->[$i] = $quotient;
-      $before_dim_product = $dim_product;
-    }
-    
-    return $coordinate;
-  }
   
   # Class Mehtods
   static method new : R::NDArray ($options : object[] = undef) {
@@ -176,35 +89,12 @@ class R::NDArray {
       $data = $self->create_default_data($data_length);
     }
     
-    $self->{dim} = $dim;
+    R::Util->check_length($data, $dim);
     
     $self->{data} = $data;
     
-    $self->check;
-  }
-  
-  method dim : int[] () {
+    $self->{dim} = $dim;
     
-    my $dim = $self->{dim};
-    
-    my $dim_clone = copy $dim;
-    
-    return $dim_clone;
-  }
-  
-  method set_dim : void ($dim : int[]) {
-    
-    my $is_dim_read_only = $self->{is_dim_read_only};
-    
-    if ($is_dim_read_only) {
-      die "dim field is read only.";
-    }
-    
-    my $nomalized_dim = R::Util->normalize_dim($dim);
-    
-    $self->{dim} = $nomalized_dim;
-    
-    $self->check;
   }
   
   method make_dim_read_only : void () {
@@ -352,9 +242,98 @@ class R::NDArray {
     $self->set_dim($expandped_dim);
   }
   
-  protected method check : void () { die "Not implemented."; }
+  method create_default_data : object ($length : int = 0) { die "Not implemented."; }
   
-  protected method create_default_data : object ($length : int = 0) { die "Not implemented."; }
+  method elem_to_string : string ($data : object, $data_index : int) { die "Not impelmented."; }
+  
+  method elem_assign : void ($dist_data : object, $dist_data_index : int, $src_data : object, $src_data_index : int) { die "Not impelmented."; }
+  
+  method elem_clone : void ($dist_data : object, $dist_data_index : int, $src_data : object, $src_data_index : int) { die "Not impelmented."; }
+  
+  method elem_cmp : int ($data : object, $a_data_index : int, $b_data_index : int) { die "Not implemented."; }
+  
+  precompile method to_string_ndarray : R::NDArray::String () {
+    
+    unless ($self) {
+      die "The n-dimension array \$self must be defined.";
+    }
+    
+    my $length = $self->length;
+    
+    my $dim = $self->dim;
+    
+    my $ret_ndarray = R::OP::String->c(undef, $dim);
+    
+    my $data = $self->data;
+    my $ret_data = $ret_ndarray->data;
+    
+    for (my $i = 0; $i < $length; $i++) {
+      $ret_data->[$i] = $self->elem_to_string($data, $i);
+    }
+    
+    return $ret_ndarray;
+  }
+  
+  method elem_size : int () {
+    
+    my $data = $self->{data};
+    
+    my $elem_size = R::Util->_get_elem_size($data);
+    
+    return $elem_size;
+  }
+  
+  method elem_type_name : string () {
+    
+    my $data = $self->{data};
+    
+    my $elem_type_name = R::Util->_get_elem_type_name($data);
+    
+    return $elem_type_name;
+  }
+  
+  method is_numeric_ndarray : int () {
+    
+    my $data = $self->{data};
+    
+    my $is_numeric_ndarray = 0;
+    if (Fn->is_numeric_array($data)) {
+      $is_numeric_ndarray = 1;
+    }
+    
+    return $is_numeric_ndarray;
+  }
+  
+  method is_mulnum_ndarray : int () {
+    
+    my $data = $self->{data};
+    
+    my $is_mulnum_ndarray = 0;
+    if (Fn->is_mulnum_array($data)) {
+      $is_mulnum_ndarray = 1;
+    }
+    
+    return $is_mulnum_ndarray;
+  }
+  
+  method is_any_numeric_ndarray : int () {
+    
+    my $any_numeric_ndarray = $self->is_numeric_ndarray || $self->is_mulnum_ndarray;
+    
+    return $any_numeric_ndarray;
+  }
+  
+  method is_object_ndarray : int () {
+    
+    my $data = $self->{data};
+    
+    my $is_mulnum = 0;
+    if (Fn->is_object_array($data)) {
+      $is_mulnum = 1;
+    }
+    
+    return $is_mulnum;
+  }
   
   method clone : R::NDArray ($elem_shallow_clone : int = 0) {
     
@@ -366,17 +345,12 @@ class R::NDArray {
     
     my $data = $self->{data};
     
-    if ($self->is_any_numeric_ndarray) {
-      Fn->memcpy($clone_data, 0, $data, 0, $elem_size * $length);
-    }
-    else {
-      for (my $i = 0; $i < $length; $i++) {
-        if ($elem_shallow_clone) {
-          $clone_data->(object[])->[$i] = $data->(object[])->[$i];
-        }
-        else {
-          $clone_data->(object[])->[$i] = $self->elem_clone($i);
-        }
+    for (my $i = 0; $i < $length; $i++) {
+      if ($elem_shallow_clone) {
+        $self->elem_assign($clone_data, $i, $data, $i);
+      }
+      else {
+        $self->elem_clone($clone_data, $i, $data, $i);
       }
     }
     
@@ -386,12 +360,6 @@ class R::NDArray {
     
     return $clone;
   }
-  
-  method elem_to_string : string ($data_index : int) { die "Not impelmented."; }
-  
-  method elem_to_object : object ($data_index : int) { die "Not impelmented."; }
-  
-  method elem_clone : object ($data_index : int) { die "Not impelmented."; }
   
   method slice : R::NDArray ($vector_indexes : R::NDArray::Int[]) {
     
@@ -429,47 +397,6 @@ class R::NDArray {
     $self->slice_set_data($data_indexes, $ndarray->data);
   }
   
-  protected method slice_data : object ($data_indexes : int[]) { die "Not implemented."; }
-  
-  protected method slice_set_data : void ($data_indexes : int[], $data : object) { die "Not implemented."; }
-  
-  private precompile method create_data_indexes : int[] ($vector_indexes : R::NDArray::Int[], $dim : int[]) {
-    
-    my $ret_dim = &create_ret_dim($vector_indexes);
-    
-    my $ret_dim_length = @$ret_dim;
-    
-    my $ret_length = R::Util->calc_data_length($ret_dim);
-    
-    my $ret_data = $self->create_default_data($ret_length);
-    
-    my $data_indexes = new int[$ret_length];
-    
-    for (my $ret_data_index = 0; $ret_data_index < $ret_length; $ret_data_index++) {
-      
-      my $ret_coordinate = &convert_data_index_to_coordinate($ret_data_index, $ret_dim);
-      
-      my $coordinate = new int[$ret_dim_length];
-      
-      for (my $coordinate_index = 0; $coordinate_index < @$coordinate; $coordinate_index++) {
-        
-        my $ret_coordinate_x = $ret_coordinate->[$coordinate_index];
-        
-        $coordinate->[$coordinate_index] = $vector_indexes->[$coordinate_index]->data->[$ret_coordinate_x];
-        
-        if ($coordinate->[$coordinate_index] >= $dim->[$coordinate_index]) {
-          die "Invalid coordinate.";
-        }
-      }
-      
-      my $data_index = &convert_coordinate_to_data_index($coordinate, $dim);
-      
-      $data_indexes->[$ret_data_index] = $data_index;
-    }
-    
-    return $data_indexes;
-  }
-  
   method to_string : string () {
     
     my $dim = $self->{dim};
@@ -487,7 +414,7 @@ class R::NDArray {
       
       for (my $i = 0; $i < $data_length; $i++) {
         $string_buffer->push("[$i]\t");
-        my $elem_string = $self->elem_to_string($i);
+        my $elem_string = $self->elem_to_string($data, $i);
         $string_buffer->push($elem_string);
         
         unless ($i == $data_length - 1) {
@@ -519,7 +446,7 @@ class R::NDArray {
           
           my $data_index = &convert_coordinate_to_data_index($coordinate, $dim);
           
-          my $elem_string = $self->elem_to_string($data_index);
+          my $elem_string = $self->elem_to_string($data, $data_index);
           
           $string_buffer->push($elem_string);
           
@@ -551,7 +478,192 @@ class R::NDArray {
     return $string;
   }
   
+  method order : R::NDArray::Int () {
+    
+    unless ($self->is_vector) {
+      die "The instance must be a vector.";
+    }
+    
+    my $length = $self->length;
+    
+    my $order_ndarray = R::OP::Int->seq(0, $length - 1);
+    
+    my $order_data = $order_ndarray->data;
+    
+    Sort->sort_int($order_data, [has that : R::NDArray = $self] method : int ($a_data_index : int, $b_data_index : int) {
+      return $self->{that}->elem_cmp($self->{that}->data, $a_data_index, $b_data_index);
+    });
+    
+    return $order_ndarray;
+  }
+  
+  method set_order : void ($indexes_ndarray : R::NDArray::Int) {
+    
+    $self->check_set_order_args($indexes_ndarray);
+    
+    my $indexes = $indexes_ndarray->data;
+    
+    my $data = $self->{data};
+    
+    my $tmp = $self->clone;
+    
+    my $tmp_data = $tmp->data;
+    
+    my $length = $self->length;
+    for (my $i = 0; $i < $length; $i++) {
+      my $order_index = $indexes->[$i];
+      
+      $self->elem_assign($data, $i, $tmp_data, $order_index);
+    }
+  }
+  
+  method sort_asc : void () {
+    
+    my $order_ndarray = $self->order;
+    
+    $self->set_order($order_ndarray);
+  }
+  
+  method sort_desc : void () {
+    
+    my $order_ndarray = $self->order;
+    
+    &reverse_int($order_ndarray->data);
+    
+    $self->set_order($order_ndarray);
+  }
+  
+  # Private Class Methods
+  private static method reverse_int : void ($array : int[]) {
+    
+    unless ($array) {
+      die "The array \$array must be defined.";
+    }
+    
+    my $length = @$array;
+    
+    for (my $i = 0; $i < $length / 2; $i++) {
+      my $temp = $array->[$i];
+      $array->[$i] = $array->[$length - $i - 1];
+      $array->[$length - $i - 1] = $temp;
+    }
+  }
+
+  private static method normalize_vector_indexes : R::NDArray::Int[] ($vector_indexes : R::NDArray::Int[], $dim : int[]) {
+    
+    unless ($vector_indexes) {
+      die "The indexes for n-dimension array \$vector_indexes must be defined.";
+    }
+    
+    my $vector_indexes_length = @$vector_indexes;
+    
+    my $dim_length = @$dim;
+    
+    unless ($vector_indexes_length <= $dim_length) {
+      die "The length of indexes for n-dimension array \$vector_indexes must be less than or equal to the length of dim field.";
+    }
+    
+    my $normalized_vector_indexes = new R::NDArray::Int[$dim_length];
+    
+    for (my $vector_indexes_index = 0; $vector_indexes_index < $dim_length; $vector_indexes_index++) {
+      
+      my $vector_index = (R::NDArray::Int)undef;
+      
+      if ($vector_indexes_index < $vector_indexes_length) {
+        $vector_index = $vector_indexes->[$vector_indexes_index];
+      }
+      
+      unless (!$vector_index || $vector_index->is_vector) {
+        die "The elem of indexes for n-dimension array \$vector_indexes must be undef or vector.";
+      }
+      
+      unless ($vector_index) {
+        my $vector_index_data = new int[$dim->[$vector_indexes_index]];
+        
+        for (my $i = 0; $i < $dim->[$vector_indexes_index]; $i++) {
+          $vector_index_data->[$i] = $i;
+        }
+        
+        $vector_index = R::NDArray::Int->new({data => $vector_index_data});
+      }
+      
+      $normalized_vector_indexes->[$vector_indexes_index] = $vector_index;
+    }
+    
+    return $normalized_vector_indexes;
+  }
+  
+  private static method create_ret_dim : int[] ($vector_indexes : R::NDArray::Int[]) {
+    
+    my $vector_indexes_length = @$vector_indexes;
+    
+    my $ret_dim = new int[$vector_indexes_length];
+    
+    for (my $i = 0; $i < $vector_indexes_length; $i++) {
+      my $vector_index = $vector_indexes->[$i];
+      
+      if ($vector_index) {
+        $ret_dim->[$i] = $vector_index->length;
+      }
+      else {
+        die "[Unexpected]\$vector_index must be defined.";
+      }
+    }
+    
+    return $ret_dim;
+  }
+  
+  precompile private static method convert_coordinate_to_data_index : int ($coordinate : int[], $dim : int[]) {
+    
+    my $data_index = 0;
+    my $dim_length = @$dim;
+    for (my $i = 0; $i < $dim_length; $i++) {
+      if ($i > 0) {
+        my $tmp = 1;
+        for (my $k = 0; $k < $i; $k++) {
+          $tmp *= $dim->[$k];
+        }
+        
+        $data_index += $tmp * $coordinate->[$i];
+      }
+      else {
+        $data_index += $coordinate->[$i];
+      }
+    }
+    
+    return $data_index;
+  }
+  
+  precompile static private method convert_data_index_to_coordinate : int[] ($data_index : int, $dim : int[]) {
+    
+    my $dim_length = @$dim;
+    
+    my $coordinate = new int[$dim_length];
+    
+    my $before_dim_product = 1;
+    for (my $i = 0; $i < $dim_length; $i++) {
+      $before_dim_product *= $dim->[$i];
+    }
+    
+    for (my $i = $dim_length - 1; $i >= 0; $i--) {
+      my $dim_product = 1;
+      for (my $k = 0; $k < $i; $k++) {
+        $dim_product *= $dim->[$k];
+      }
+      
+      my $reminder = $data_index % $before_dim_product;
+      my $quotient = $reminder / $dim_product;
+      
+      $coordinate->[$i] = $quotient;
+      $before_dim_product = $dim_product;
+    }
+    
+    return $coordinate;
+  }
+  
   private static method recursive_to_string : void ($self : R::NDArray, $dim_list : IntList, $string_buffer : StringBuffer, $dim_num_ref : int*, $coordinate_list : IntList) {
+    
+    my $data = $self->{data};
     
     my $dim_elem = $dim_list->pop;
     
@@ -602,7 +714,7 @@ class R::NDArray {
             
             my $data_index = &convert_coordinate_to_data_index($coordinate, $dim);
             
-            $elem_strings_list->push($self->elem_to_string($data_index));
+            $elem_strings_list->push($self->elem_to_string($data, $data_index));
           }
           
           $string_buffer->push(Fn->join("\t", $elem_strings_list->to_array) . "\n");
@@ -616,9 +728,78 @@ class R::NDArray {
     $dim_list->push($dim_elem);
   }
   
-  method set_order : void ($indexes_ndarray : R::NDArray::Int) { die "Not impelmeneted."; }
+  # Private Instance Methods
+  private precompile method slice_data : object ($data_indexes : int[]) {
+    
+    unless ($data_indexes) {
+      die "The data indexes \$data_indexes must be defined.";
+    }
+    
+    my $data_indexes_length = @$data_indexes;
+    my $data = $self->data;
+    my $ret_data = $self->create_default_data($data_indexes_length);
+    for (my $i = 0; $i < $data_indexes_length; $i++) {
+      my $data_index = $data_indexes->[$i];
+      $self->elem_assign($ret_data, $i, $data, $data_index);
+    }
+    
+    return $ret_data;
+  }
   
-  method check_set_order_args : void ($indexes_ndarray : R::NDArray::Int) {
+  private precompile method slice_set_data : void ($data_indexes : int[], $data : object) {
+    
+    my $self_data = $self->data;
+    
+    unless ($data_indexes) {
+      die "The data indexes \$data_indexes must be defined.";
+    }
+    
+    my $data_length = R::Util->_get_array_length($data);
+    
+    for (my $i = 0; $i < $data_length; $i++) {
+      my $data_index = $data_indexes->[$i];
+      $self->elem_assign($self_data, $data_index, $data, $i);
+    }
+  }
+  
+  private precompile method create_data_indexes : int[] ($vector_indexes : R::NDArray::Int[], $dim : int[]) {
+    
+    my $ret_dim = &create_ret_dim($vector_indexes);
+    
+    my $ret_dim_length = @$ret_dim;
+    
+    my $ret_length = R::Util->calc_data_length($ret_dim);
+    
+    my $ret_data = $self->create_default_data($ret_length);
+    
+    my $data_indexes = new int[$ret_length];
+    
+    for (my $ret_data_index = 0; $ret_data_index < $ret_length; $ret_data_index++) {
+      
+      my $ret_coordinate = &convert_data_index_to_coordinate($ret_data_index, $ret_dim);
+      
+      my $coordinate = new int[$ret_dim_length];
+      
+      for (my $coordinate_index = 0; $coordinate_index < @$coordinate; $coordinate_index++) {
+        
+        my $ret_coordinate_x = $ret_coordinate->[$coordinate_index];
+        
+        $coordinate->[$coordinate_index] = $vector_indexes->[$coordinate_index]->data->[$ret_coordinate_x];
+        
+        if ($coordinate->[$coordinate_index] >= $dim->[$coordinate_index]) {
+          die "Invalid coordinate.";
+        }
+      }
+      
+      my $data_index = &convert_coordinate_to_data_index($coordinate, $dim);
+      
+      $data_indexes->[$ret_data_index] = $data_index;
+    }
+    
+    return $data_indexes;
+  }
+  
+  private method check_set_order_args : void ($indexes_ndarray : R::NDArray::Int) {
     
     unless ($indexes_ndarray) {
       die "The indexes \$indexes_ndarray must be defined.";
@@ -641,142 +822,5 @@ class R::NDArray {
     }
   }
   
-  precompile method to_string_ndarray : R::NDArray::String () {
-    
-    unless ($self) {
-      die "The n-dimension array \$self must be defined.";
-    }
-    
-    my $length = $self->length;
-    
-    my $dim = $self->dim;
-    
-    my $ret_ndarray = R::OP::String->c(undef, $dim);
-    
-    my $data = $self->data;
-    my $ret_data = $ret_ndarray->data;
-    
-    for (my $i = 0; $i < $length; $i++) {
-      $ret_data->[$i] = $self->elem_to_string($i);
-    }
-    
-    return $ret_ndarray;
-  }
-  
-  method is_numeric_ndarray : int () {
-    
-    my $data = $self->{data};
-    
-    my $is_numeric_ndarray = 0;
-    if (Fn->is_numeric_array($data)) {
-      $is_numeric_ndarray = 1;
-    }
-    
-    return $is_numeric_ndarray;
-  }
-  
-  method is_mulnum_ndarray : int () {
-    
-    my $data = $self->{data};
-    
-    my $is_mulnum_ndarray = 0;
-    if (Fn->is_mulnum_array($data)) {
-      $is_mulnum_ndarray = 1;
-    }
-    
-    return $is_mulnum_ndarray;
-  }
-  
-  method is_any_numeric_ndarray : int () {
-    
-    my $any_numeric_ndarray = $self->is_numeric_ndarray || $self->is_mulnum_ndarray;
-    
-    return $any_numeric_ndarray;
-  }
-  
-  method is_object_ndarray : int () {
-    
-    my $data = $self->{data};
-    
-    my $is_mulnum = 0;
-    if (Fn->is_object_array($data)) {
-      $is_mulnum = 1;
-    }
-    
-    return $is_mulnum;
-  }
-  
-  method elem_size : int () {
-    
-    my $data = $self->{data};
-    
-    my $elem_size = R::Util->_get_elem_size($data);
-    
-    return $elem_size;
-  }
-  
-  method elem_type_name : string () {
-    
-    my $data = $self->{data};
-    
-    my $elem_type_name = R::Util->_get_elem_type_name($data);
-    
-    return $elem_type_name;
-  }
-  
-  method elem_cmp_old : int ($a_elem : object, $b_elem : object) { die "Not implemented."; }
-  
-  method elem_cmp : int ($a_data_index : int, $b_data_index : int) { die "Not implemented."; }
-  
-  method sort_asc : void () {
-    
-    my $order_ndarray = $self->order;
-    
-    $self->set_order($order_ndarray);
-  }
-  
-  method sort_desc : void () {
-    
-    my $order_ndarray = $self->order;
-    
-    &reverse_int($order_ndarray->data);
-    
-    $self->set_order($order_ndarray);
-  }
-  
-  method order : R::NDArray::Int () {
-    
-    unless ($self->is_vector) {
-      die "The instance must be a vector.";
-    }
-    
-    my $length = $self->length;
-    
-    my $order_ndarray = R::OP::Int->seq(0, $length - 1);
-    
-    my $order_data = $order_ndarray->data;
-    
-    Sort->sort_int($order_data, [has that : R::NDArray = $self] method : int ($a_data_index : int, $b_data_index : int) {
-      return $self->{that}->elem_cmp($a_data_index, $b_data_index);
-    });
-    
-    return $order_ndarray;
-  }
-
-  private static method reverse_int : void ($array : int[]) {
-    
-    unless ($array) {
-      die "The array \$array must be defined.";
-    }
-    
-    my $length = @$array;
-    
-    for (my $i = 0; $i < $length / 2; $i++) {
-      my $temp = $array->[$i];
-      $array->[$i] = $array->[$length - $i - 1];
-      $array->[$length - $i - 1] = $temp;
-    }
-  }
-
 }
 

@@ -1,5 +1,8 @@
 Tk::CodeText module changes log
 
+0.52 10 Jul 2024
+	Fixed bug in TagsEditor.
+
 0.51 03 Jun 2024
 	Fixed header background color of the TagsEditor.
 	Fixed double call of modified callback in method clear of XText.

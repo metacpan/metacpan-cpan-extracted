@@ -4,7 +4,7 @@
       "Kieren Diment <zarquon@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150005",
+   "generated_by" : "Dist::Zilla version 6.030, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -37,15 +37,17 @@
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
-         "web" : "https://github.com/singingfish/p5-array-circular/issues"
+         "web" : "https://github.com/dr-kd/p5-array-circular/issues"
       },
       "repository" : {
          "type" : "git",
-         "url" : "git://github.com/singingfish/p5-array-circular.git",
-         "web" : "https://github.com/singingfish/p5-array-circular"
+         "url" : "git://github.com/dr-kd/p5-array-circular.git",
+         "web" : "https://github.com/dr-kd/p5-array-circular"
       }
    },
-   "version" : "0.007",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0237"
+   "version" : "0.008",
+   "x_generated_by_perl" : "v5.36.0",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.35",
+   "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"
 }
 

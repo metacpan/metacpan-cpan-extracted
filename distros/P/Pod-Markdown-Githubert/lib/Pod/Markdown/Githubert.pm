@@ -5,7 +5,7 @@ use warnings;
 use Pod::Markdown ();
 our @ISA = 'Pod::Markdown';
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 sub new {
     my $class = shift;
@@ -16,6 +16,7 @@ sub new {
             $str =~ tr/A-Z /a-z-/;
             $str
         },
+        html_encode_chars => '\$',
         @_
     );
     $self->accept_targets('highlighter', 'github-markdown');
@@ -95,6 +96,11 @@ sub end_item_number {
         return $self->SUPER::end_item_number(@_);
     }
     $self->_end_item($self->_private->{item_number} . '. <!-- -->');
+}
+
+sub start_I {
+    my $self = shift;
+    $self->_save('*');
 }
 
 1
@@ -212,6 +218,18 @@ produces the following Markdown code:
     <p>Hello!</p>
     ```
 
+=item *
+
+C<$> characters are escaped in plain text segments because otherwise Github
+will try to render any random text that happens to sit between two dollar signs
+as TeX-style math.
+
+=item *
+
+Text in italics is rendered using C<*>, not C<_>. This is because Github
+displays C<_N_th> verbatim as "_N_th", but C<*N*th> as "I<N>th". The latter is
+what we want for POD like C<IE<lt>NE<gt>th>.
+
 =back
 
 =begin :README
@@ -249,7 +267,7 @@ Lukas Mai, C<< <lmai at web.de> >>
 
 =head1 COPYRIGHT & LICENSE
 
-Copyright 2023 Lukas Mai.
+Copyright 2023-2024 Lukas Mai.
 
 This module is free software; you can redistribute it and/or modify it under
 the terms of either: the GNU General Public License as published by the Free

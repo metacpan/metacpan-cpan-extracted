@@ -2,6 +2,7 @@ package Net::DNS::Resolver::Unbound;
 
 use strict;
 use warnings;
+use integer;
 use Net::DNS;
 
 use constant OS_SPEC => defined eval "require Net::DNS::Resolver::$^O";	## no critic
@@ -11,7 +12,7 @@ use base qw(Net::DNS::Resolver::Base DynaLoader), OS_CONF;
 our $VERSION;
 
 BEGIN {
-	$VERSION = '1.23';
+	$VERSION = '1.24';
 	eval { __PACKAGE__->bootstrap($VERSION) };
 }
 
@@ -44,8 +45,8 @@ As of this writing, the implementation has some significant limitations:
 
 =item *
 
-Selection of transport protocol and associated parameters is entirely
-at the discretion of Unbound.
+Selection of transport protocol and associated parameters is almost
+entirely at the discretion of Unbound.
 
 =item *
 
@@ -61,7 +62,7 @@ extracted from the presented packet.
 =item *
 
 Result packet is synthesised in libunbound and not the "real thing".
-In particular, the ireturned queryID is zero.
+In particular, the returned queryID is always zero.
 
 =back
 
@@ -449,10 +450,10 @@ END
 	foreach my $opt ( sort keys %option ) {
 		push @option, [$opt, $_] for @{$option{$opt}};
 	}
-	local $config{set_option} = \@option;
 
 	my $format = ";; %s\t%s\n";
 	foreach my $name ( sort keys %config ) {
+		local $config{set_option} = \@option;
 		my $value = $config{$name};
 		if ( ref $value ) {
 			foreach my $arg (@$value) {
@@ -496,10 +497,9 @@ sub _config {
 		my $list = $update->{$name} ||= [];
 		push @$list, @$arg if @arg;			# append non-empty
 		$update->{$name} = [] unless @arg;		# explicit empty list
-	} else {
-		$self->{ub_ctx}->$name($arg) if $arg;		# error check only
+	} elsif ( defined $arg ) {
+		$self->{ub_ctx}->$name($arg);			# error check only
 		$update->{$name} = $arg;			# [re]define scalar
-		delete $update->{$name} unless defined $arg;
 	}
 	return;
 }
@@ -552,9 +552,9 @@ sub _finalise_config {
 		push @option, [$opt, $_] for @{$option{$opt}};
 	}
 
-	my $ctx = $self->{ub_ctx};				# build unbound context
+	my $ctx = $self->{ub_ctx} = Net::DNS::Resolver::Unbound::Context->new();
 
-	foreach my $name ( keys %config ) {
+	foreach my $name ( keys %config ) {			# rebuild unbound context
 		local $config{set_option} = \@option;
 		my $value = $config{$name};
 		if ( ref $value ) {

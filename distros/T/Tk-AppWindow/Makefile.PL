@@ -24,7 +24,7 @@ my %prereq = (
 	'Tk::FontDialog'	   				=> '0.18',
 	'Tk::Pod'               => '5.41',
 	'Tk::QuickForm'         => '0.04',
-	'Tk::YADialog'          => '0.03',
+	'Tk::YADialog'          => '0.04',
 	'Tk::YANoteBook'        => '0.06',
 );
 

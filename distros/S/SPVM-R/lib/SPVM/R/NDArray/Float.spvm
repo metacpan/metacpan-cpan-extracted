@@ -3,7 +3,11 @@
 
 class R::NDArray::Float extends R::NDArray {
   
-  use Sort;
+  # Fields
+  method data : float[] () {
+    
+    return (float[])$self->{data};
+  }
   
   # Class Mehtods
   static method new : R::NDArray::Float ($options : object[] = undef) {
@@ -15,28 +19,13 @@ class R::NDArray::Float extends R::NDArray {
     return $self;
   }
   
+  # Instance Methods
   protected method init : void ($options : object[] = undef) {
     
     $self->SUPER::init($options);
   }
   
-  method data : float[] () {
-    
-    return (float[])$self->{data};
-  }
-  
-  protected method check : void () {
-    
-    my $data = (float[])$self->{data};
-    
-    my $length = $self->length;
-    
-    unless (@$data == $length) {
-      die "The length of data field must be the same as length field.";
-    }
-  }
-  
-  protected method create_default_data : float[] ($length : int = 0) {
+  method create_default_data : float[] ($length : int = 0) {
     
     unless ($length >= 0) {
       die "The length \$length must be more than or equal to 0.";
@@ -47,13 +36,7 @@ class R::NDArray::Float extends R::NDArray {
     return $data;
   }
   
-  method clone : R::NDArray::Float ($elem_shallow_clone : int = 0) {
-    return (R::NDArray::Float)$self->SUPER::clone($elem_shallow_clone);
-  }
-  
-  method elem_to_string : string ($data_index : int) {
-    
-    my $data = $self->data;
+  method elem_to_string : string ($data : float[], $data_index : int) {
     
     my $elem = $data->[$data_index];
     
@@ -62,90 +45,29 @@ class R::NDArray::Float extends R::NDArray {
     return $string;
   }
   
-  method elem_to_object : Float ($data_index : int) {
+  method elem_assign : void ($dist_data : float[], $dist_data_index : int, $src_data : float[], $src_data_index : int) {
     
-    my $data = $self->data;
-    
-    my $elem = $data->[$data_index];
-    
-    my $object = (Float)$elem;
-    
-    return $object;
+    $dist_data->[$dist_data_index] = $src_data->[$src_data_index];
   }
   
-  precompile method set_order : void ($indexes_ndarray : R::NDArray::Int) {
+  method elem_clone : void ($dist_data : float[], $dist_data_index : int, $src_data : float[], $src_data_index : int) {
     
-    $self->check_set_order_args($indexes_ndarray);
-    
-    my $indexes = $indexes_ndarray->data;
-    
-    my $data = (float[])$self->{data};
-    
-    my $tmp = $self->clone;
-    
-    my $tmp_data = $tmp->data;
-    
-    my $length = $self->length;
-    for (my $i = 0; $i < $length; $i++) {
-      my $order_index = $indexes->[$i];
-      
-      $data->[$i] = $tmp_data->[$order_index];
-    }
+    $dist_data->[$dist_data_index] = $src_data->[$src_data_index];
   }
   
-  protected method slice_data : float[] ($data_indexes : int[]) {
-    
-    unless ($data_indexes) {
-      die "The data indexes \$data_indexes must be defined.";
-    }
-    
-    my $data_indexes_length = @$data_indexes;
-    my $data = $self->data;
-    my $ret_data = new float[$data_indexes_length];
-    for (my $i = 0; $i < $data_indexes_length; $i++) {
-      my $data_index = $data_indexes->[$i];
-      $ret_data->[$i] = $data->[$data_index];
-    }
-    
-    return $ret_data;
-  }
-  
-  protected precompile method slice_set_data : void ($data_indexes : int[], $data : float[]) {
-    
-    my $self_data = $self->data;
-    
-    unless ($data_indexes) {
-      die "The data indexes \$data_indexes must be defined.";
-    }
-    
-    for (my $i = 0; $i < @$data; $i++) {
-      my $data_index = $data_indexes->[$i];
-      $self_data->[$data_index] = $data->[$i];
-    }
-  }
-  
-  method slice : R::NDArray::Float ($vector_indexes : R::NDArray::Int[]) {
-    return (R::NDArray::Float)$self->SUPER::slice($vector_indexes);
-  }
-  
-  method slice_set : void ($vector_indexes : R::NDArray::Int[], $ndarray : R::NDArray::Float) {
-    $self->SUPER::slice_set($vector_indexes, $ndarray);
-  }
-  
-  method elem_cmp_old : int ($a_elem : Float, $b_elem : Float) {
-    
-    my $cmp = (float)$a_elem <=> (float)$b_elem;
-    
-    return $cmp;
-  }
-  
-  method elem_cmp : int ($a_data_index : int, $b_data_index : int) {
-    
-    my $data = $self->data;
+  method elem_cmp : int ($data : float[], $a_data_index : int, $b_data_index : int) {
     
     my $cmp = $data->[$a_data_index] <=> $data->[$b_data_index];
     
     return $cmp;
+  }
+  
+  method clone : R::NDArray::Float ($elem_shallow_clone : int = 0) {
+    return (R::NDArray::Float)$self->SUPER::clone($elem_shallow_clone);
+  }
+  
+  method slice : R::NDArray::Float ($vector_indexes : R::NDArray::Int[]) {
+    return (R::NDArray::Float)$self->SUPER::slice($vector_indexes);
   }
   
 }

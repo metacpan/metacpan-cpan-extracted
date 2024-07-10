@@ -6,6 +6,12 @@ use Test::Tk;
 
 require_ok ('Tk::DynaMouseWheelBind');
 
+sub getref {
+	my $class = shift;
+	my $name = ref $class;
+	return $name
+}
+
 createapp;
 my ($t, $c, $p, $e);
 if (defined $app) {
@@ -56,7 +62,7 @@ for (['<5>'],['<4>'],['<MouseWheel>',-delta => -120]){
 			$e->eventGenerate(@$ev);
 			my $delta = abs ($y - ($w->yview)[0]);
 			return $delta > 0.01
-		}, 1, "$w scrolling delta"]
+		}, 1, getref($w) . " scrolling delta " . $ev->[0]]
     }
 }
 

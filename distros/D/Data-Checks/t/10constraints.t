@@ -8,7 +8,7 @@ use Test2::V0;
 use lib "t";
 use testcase "t::test";
 
-use Data::Checks qw( Defined Object Str Isa Maybe );
+use Data::Checks qw( Defined Object Str Isa Callable Maybe );
 
 # Some test classes
 package BaseClass {
@@ -19,6 +19,10 @@ package DifferentClass {
 }
 package DerivedClass {
    use base qw( BaseClass );
+}
+package ClassWithCodeRefify {
+   sub new { bless [], shift }
+   use overload '&{}' => sub {};
 }
 
 # Defined
@@ -74,6 +78,19 @@ package DerivedClass {
    ok( !t::test::check_value( $checker, undef ),               'Isa rejects undef' );
    ok( !t::test::check_value( $checker, "BaseClass" ),         'Isa rejects string name' );
    ok( !t::test::check_value( $checker, DifferentClass->new ), 'Isa rejects other instance' );
+}
+
+# Callable
+{
+   my $checker = t::test::make_checkdata( Callable, "Value", "Callable" );
+
+   ok( t::test::check_value( $checker, sub {} ),       'Callable accepts sub {}' );
+   ok( t::test::check_value( $checker, \&CORE::join ), 'Callable accepts ref to CORE::join' );
+   ok( t::test::check_value( $checker, ClassWithCodeRefify->new ), 'Callable accepts object with &{}' );
+
+   ok( !t::test::check_value( $checker, undef ), 'Callable rejects undef' );
+   ok( !t::test::check_value( $checker, [] ),    'Callable rejects plain arrayref' );
+   ok( !t::test::check_value( $checker, BaseClass->new ), 'Callable rejects object' );
 }
 
 # Maybe

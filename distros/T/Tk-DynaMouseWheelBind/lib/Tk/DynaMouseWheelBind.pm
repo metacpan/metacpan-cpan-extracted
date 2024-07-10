@@ -13,7 +13,7 @@ package # hide from PAUSE indexer
 use strict;
 use warnings;
 use vars qw( $VERSION );
-$VERSION = 0.03;
+$VERSION = 0.04;
 
 # keep Tk::Widgets namespace clean
 my ($motion, $do_scroll, $mousewheel_event, $setup );

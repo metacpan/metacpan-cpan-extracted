@@ -18,6 +18,7 @@ my %WriteMakefileArgs = (
     },
     PREREQ_PM => {
 	'Import::Export' => '1.00',
+	'Data::Dumper' => '0',
     },
     dist  => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
     clean => { FILES => 'Debug-CodeBlock-*' },

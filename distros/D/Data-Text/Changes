@@ -1,5 +1,8 @@
 Revision history for Data::Text
 
+0.14	Tue Jul  9 10:01:32 EDT 2024
+	Fix https://www.cpantesters.org/cpan/report/f993e0d0-de29-11ee-8176-03e06d8775ea
+
 0.13	Sat Mar  9 09:21:16 EST 2024
 	Added appendconjunction()
 

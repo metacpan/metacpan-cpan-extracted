@@ -7,6 +7,12 @@ class R::NDArray::Time::Piece extends R::NDArray::Object {
   use Array;
   use Time::Piece;
   
+  # Fields
+  method data : Time::Piece[] () {
+    
+    return (Time::Piece[])$self->{data};
+  }
+  
   # Class Mehtods
   static method new : R::NDArray::Time::Piece ($options : object[] = undef) {
     
@@ -17,28 +23,13 @@ class R::NDArray::Time::Piece extends R::NDArray::Object {
     return $self;
   }
   
+  # Instance Methods
   protected method init : void ($options : object[] = undef) {
     
     $self->SUPER::init($options);
   }
   
-  method data : Time::Piece[] () {
-    
-    return (Time::Piece[])$self->{data};
-  }
-  
-  protected method check : void () {
-    
-    my $data = (Time::Piece[])$self->{data};
-    
-    my $length = $self->length;
-    
-    unless (@$data == $length) {
-      die "The length of data field must be the same as length field.";
-    }
-  }
-  
-  protected method create_default_data : Time::Piece[] ($length : int = 0) {
+  method create_default_data : Time::Piece[] ($length : int = 0) {
     
     unless ($length >= 0) {
       die "The length \$length must be more than or equal to 0.";
@@ -49,13 +40,7 @@ class R::NDArray::Time::Piece extends R::NDArray::Object {
     return $data;
   }
   
-  method clone : R::NDArray::Time::Piece ($elem_shallow_clone : int = 0) {
-    return (R::NDArray::Time::Piece)$self->SUPER::clone($elem_shallow_clone);
-  }
-  
-  method elem_to_string : string ($data_index : int) {
-    
-    my $data = $self->data;
+  method elem_to_string : string ($data : Time::Piece[], $data_index : int) {
     
     my $elem = $data->[$data_index];
     
@@ -68,53 +53,31 @@ class R::NDArray::Time::Piece extends R::NDArray::Object {
     return $string;
   }
   
-  method elem_to_object : Time::Piece ($data_index : int) {
+  method elem_clone : void ($dist_data : Time::Piece[], $dist_data_index : int, $src_data : Time::Piece[], $src_data_index : int) {
     
-    my $data = $self->data;
+    my $src_elem = $src_data->[$src_data_index];
     
-    my $elem = $data->[$data_index];
-    
-    my $object = $elem;
-    
-    return $object;
-  }
-  
-  method elem_clone : Time::Piece ($data_index : int) {
-    
-    my $data = $self->data;
-    
-    my $elem = $data->[$data_index];
-    
-    my $clone = (Time::Piece)undef;
-    if ($elem) {
-      $clone = $elem->clone;
+    if ($src_elem) {
+      $dist_data->[$dist_data_index] = $src_elem->clone;
     }
-    
-    return $clone;
+    else {
+      $dist_data->[$dist_data_index] = undef;
+    }
   }
   
-  method slice : R::NDArray::Time::Piece ($vector_indexes : R::NDArray::Int[]) {
-    return (R::NDArray::Time::Piece)$self->SUPER::slice($vector_indexes);
-  }
-  
-  method slice_set : void ($vector_indexes : R::NDArray::Int[], $ndarray : R::NDArray::Time::Piece) {
-    $self->SUPER::slice_set($vector_indexes, $ndarray);
-  }
-  
-  method elem_cmp_old : int ($a_elem : Time::Piece, $b_elem : Time::Piece) {
-    
-    my $cmp = $a_elem->epoch <=> $b_elem->epoch;
-    
-    return $cmp;
-  }
-  
-  method elem_cmp : int ($a_data_index : int, $b_data_index : int) {
-    
-    my $data = $self->data;
+  method elem_cmp : int ($data : Time::Piece[], $a_data_index : int, $b_data_index : int) {
     
     my $cmp = $data->[$a_data_index]->epoch <=> $data->[$b_data_index]->epoch;
     
     return $cmp;
+  }
+  
+  method clone : R::NDArray::Time::Piece ($elem_shallow_clone : int = 0) {
+    return (R::NDArray::Time::Piece)$self->SUPER::clone($elem_shallow_clone);
+  }
+  
+  method slice : R::NDArray::Time::Piece ($vector_indexes : R::NDArray::Int[]) {
+    return (R::NDArray::Time::Piece)$self->SUPER::slice($vector_indexes);
   }
   
 }

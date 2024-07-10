@@ -11,6 +11,7 @@ my $mswin = $Config{'osname'} eq 'MSWin32';
 $mwclass = 'App::Codit';
 
 $quitdelay = 1000 if $mswin;
+$delay = 1500;
 
 BEGIN { use_ok('App::Codit::Plugins::PerlSubs') };
 

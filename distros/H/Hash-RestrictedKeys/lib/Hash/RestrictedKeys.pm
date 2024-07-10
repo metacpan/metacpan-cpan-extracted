@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use Hash::RestrictedKeys::Tie;
 
-our $VERSION = '0.03';
+our $VERSION = '1.00';
 
 use overload '%{}' => sub { ${$_[0]}->{hash}; }, fallback => 1;
 
@@ -31,7 +31,7 @@ Hash::RestrictedKeys - restricted hash keys
 
 =head1 VERSION
 
-Version 0.03
+Version 1.00
 
 =cut
 
@@ -95,10 +95,6 @@ You can also look for information at:
 
 L<https://rt.cpan.org/NoAuth/Bugs.html?Dist=Hash-RestrictedKeys>
 
-=item * CPAN Ratings
-
-L<https://cpanratings.perl.org/d/Hash-RestrictedKeys>
-
 =item * Search CPAN
 
 L<https://metacpan.org/release/Hash-RestrictedKeys>
@@ -109,11 +105,10 @@ L<https://metacpan.org/release/Hash-RestrictedKeys>
 
 =head1 LICENSE AND COPYRIGHT
 
-This software is Copyright (c) 2021 by LNATION.
+This software is Copyright (c) 2021->2024 by LNATION.
 
 This is free software, licensed under:
 
   The Artistic License 2.0 (GPL Compatible)
-
 
 =cut

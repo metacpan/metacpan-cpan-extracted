@@ -1,4 +1,4 @@
-# 6.60:Jun 10, 2024:Richard Kelsch <rich@rk-internet.com>
+# 6.61:Jul 10, 2024:Richard Kelsch <rich@rk-internet.com>
 package Graphics::Framebuffer;
 
 ## TEMP COPYRIGHT ##

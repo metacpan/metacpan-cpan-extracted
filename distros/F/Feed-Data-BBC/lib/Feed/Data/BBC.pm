@@ -3,7 +3,7 @@ package Feed::Data::BBC;
 use 5.006;
 use strict;
 use warnings;
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 use Rope;
 use Rope::Autoload;
@@ -52,11 +52,11 @@ __END__
 
 =head1 NAME
 
-Feed::Data::BBC - Waiting for comedians to present the news
+Feed::Data::BBC - BBC rss feeds
 
 =head1 VERSION
 
-Version 0.01
+Version 0.02
 
 =cut
 

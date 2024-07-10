@@ -1,0 +1,115 @@
+#!perl
+
+# FRAGMENT id=shcompgen-hint command=_yt-dlp
+
+use 5.010001;
+use strict;
+use warnings;
+
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2024-07-09'; # DATE
+our $DIST = 'App-YtDlpUtils'; # DIST
+our $VERSION = '0.001'; # VERSION
+
+system "yt-dlp", "-o", '%(upload_date)s-%(title)s-%(id)s.%(ext)s', @ARGV;
+
+# PODNAME: yt-dlp-timestamp
+# ABSTRACT: Download video with yt-dlp, prefix filename with upload date
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+yt-dlp-timestamp - Download video with yt-dlp, prefix filename with upload date
+
+=head1 VERSION
+
+This document describes version 0.001 of yt-dlp-timestamp (from Perl distribution App-YtDlpUtils), released on 2024-07-09.
+
+=head1 SYNOPSIS
+
+ % yt-dlp-timestamp https://www.youtube.com/playlist?list=PL8dPuuaLjXtPAJr1ysd5yGIyiSFuh0mIL
+
+=head1 DESCRIPTION
+
+This is a wrapper for B<yt-dlp> which does the following:
+
+=over
+
+=item * add upload date prefix (YYYYMMDD) to the filename
+
+The wrapper adds this option:
+C
+ -o '%(upload_date)s-%(title)s-%(id)s.%(ext)s'
+
+So instead of the default '%(title)s-%(id)s.%(ext)s' filename pattern like
+these:
+
+ Introduction to Astronomy: Crash Course Astronomy #1-0rHUDWjR5gg.mp4
+ Naked Eye Observations: Crash Course Astronomy #2-L-Wtlev6suc.mp4
+ Cycles in the Sky: Crash Course Astronomy #3-01QWC-rZcfE.mp4
+ ...
+
+you get:
+
+ 20150115-Introduction to Astronomy: Crash Course Astronomy #1-0rHUDWjR5gg.mp4
+ 20150122-Naked Eye Observations: Crash Course Astronomy #2-L-Wtlev6suc.mp4
+ 20150129-Cycles in the Sky: Crash Course Astronomy #3-01QWC-rZcfE.mp4
+ ...
+
+=back
+
+=head1 HOMEPAGE
+
+Please visit the project's homepage at L<https://metacpan.org/release/App-YtDlpUtils>.
+
+=head1 SOURCE
+
+Source repository is at L<https://github.com/perlancar/perl-App-YtDlpUtils>.
+
+=head1 SEE ALSO
+
+Other yt-dlp wrappers in L<App::YtDlpUtils>.
+
+=head1 AUTHOR
+
+perlancar <perlancar@cpan.org>
+
+=head1 CONTRIBUTING
+
+
+To contribute, you can send patches by email/via RT, or send pull requests on
+GitHub.
+
+Most of the time, you don't need to build the distribution yourself. You can
+simply modify the code, then test via:
+
+ % prove -l
+
+If you want to build the distribution (e.g. to try to install it locally on your
+system), you can install L<Dist::Zilla>,
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>,
+L<Pod::Weaver::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps required beyond
+that are considered a bug and can be reported to me.
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2024 by perlancar <perlancar@cpan.org>.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-YtDlpUtils>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
+
+=cut

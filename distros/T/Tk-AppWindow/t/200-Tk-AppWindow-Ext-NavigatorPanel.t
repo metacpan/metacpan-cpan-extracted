@@ -9,22 +9,19 @@ $delay = 1500;
 
 use Test::More tests => 4;
 BEGIN { 
-	use_ok('Tk::AppWindow::Ext::ToolPanel');
+	use_ok('Tk::AppWindow::Ext::NavigatorPanel');
 };
 
-require TestTextManager;
 
 createapp(
 	-appname => 'Navigator',
-	-extensions => [qw[Art MenuBar ToolBar StatusBar MDI Navigator ToolPanel]],
-	-configfolder => 't/settings',
-	-contentmanagerclass => 'TestTextManager',
+	-extensions => [qw[Art MenuBar NavigatorPanel]],
 );
 
 my $ext;
 if (defined $app) {
 	$app->geometry('640x400+100+100') if defined $app;
-	$ext = $app->extGet('ToolPanel');
+	$ext = $app->extGet('NavigatorPanel');
 	$app->after(300, sub {
 		my $page1 = $ext->addPage('Sample1', 'configure-toolbars', 'Sample page 1');
 		$page1->Label(-text => 'Sample page 1')->pack(-expand => 1, -fill => 'both');
@@ -34,7 +31,7 @@ if (defined $app) {
 }
 
 @tests = (
-	[sub { return $ext->Name }, 'ToolPanel', 'extension ToolPanel loaded']
+	[sub { return $ext->Name }, 'NavigatorPanel', 'extension NavigatorPanel loaded']
 );
 
 starttesting;

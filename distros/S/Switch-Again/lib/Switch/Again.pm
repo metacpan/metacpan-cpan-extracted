@@ -1,5 +1,5 @@
 package Switch::Again;
-use 5.006; use strict; use warnings; our $VERSION = '1.00';
+use 5.006; use strict; use warnings; our $VERSION = '1.01';
 use Struct::Match qw/struct/;
 use base qw/Import::Export/;
 
@@ -27,7 +27,7 @@ sub switch {
 	my $evil = sub {
 		my ($val, @result) = ($_[0]);
 		eval {
-			@result = $STRUCT{$_->{ref}}($_->{case}, $val);
+			@result = ($STRUCT{$_->{ref}}($_->{case}, $val));
 			@result = () if @result && $result[0] eq '';
 			@result;
 		} and do {
@@ -36,12 +36,12 @@ sub switch {
 		@result ? wantarray ? @result : shift @result : $default && $default->($val);
 	};
 
-	$value ? $evil->($value) : $evil;
+	defined $value ? $evil->($value) : $evil;
 }
 
 sub sr {
 	my ($search, $replace) = @_;
-	return sub {my $v589 = shift; $v589 =~ s/$search/$replace/g; $v589;};
+	return sub {my $v589 = shift; return '' unless $v589 =~ m/$search/; $v589 =~ s/$search/$replace/g; $v589;};
 }
 
 1;
@@ -54,7 +54,7 @@ Switch::Again - Switch`ing
 
 =head1 VERSION
 
-Version 1.00
+Version 1.01
 
 =cut
 

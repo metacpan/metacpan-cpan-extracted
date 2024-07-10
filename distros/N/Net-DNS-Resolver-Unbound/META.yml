@@ -9,6 +9,7 @@ build_requires:
   IO::File: '1.14'
   Test::More: '0.8'
 configure_requires:
+  Config: '0'
   ExtUtils::MakeMaker: '6.48'
 dynamic_config: 1
 generated_by: 'ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010'
@@ -25,6 +26,11 @@ requires:
   Carp: '1.1'
   DynaLoader: '1.09'
   Net::DNS: '1.19'
+  base: '2.13'
+  constant: '1.17'
+  integer: '1'
   perl: '5.008009'
-version: '1.23'
+  strict: '1.03'
+  warnings: '1.0501'
+version: '1.24'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

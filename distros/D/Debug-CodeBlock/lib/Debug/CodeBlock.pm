@@ -1,13 +1,18 @@
 package Debug::CodeBlock;
-use 5.006; use strict; use warnings; our $VERSION = '0.02';
+use 5.006; use strict; use warnings; our $VERSION = '1.00';
 use base 'Import::Export';
-
+use Data::Dumper qw//;
 our %EX = ( DEBUG => [qw/all/] );
 
+our %PACKAGES;
 sub DEBUG (&) {
 	my $code = shift;
 	my ($package) = caller;
 	if (($package->can('DEBUG_ENABLED') && $package->DEBUG_ENABLED) or $ENV{DEBUG_PERL}) {
+		unless ($PACKAGES{$package}++) {
+			no strict 'refs';
+			*{"${package}::Dump"} = \&{"Data::Dumper::Dumper"};
+		}
 		$code->();
 	}
 }
@@ -18,7 +23,7 @@ Debug::CodeBlock - Add DEBUG codeblocks to your code.
 
 =head1 VERSION
 
-Version 0.02
+Version 1.00
 
 =cut
 
@@ -33,6 +38,7 @@ Use %ENV and set DEBUG_PERL=1
 	sub rooms {
 		my $rooms = model('House')->get_rooms();
 		DEBUG {
+			print Dump({ struct => { ... } });
 			print "The house has ${rooms} rooms.";
 		}
 		return $rooms;
@@ -50,6 +56,7 @@ Use %ENV and set DEBUG_PERL=1
 	sub rooms {
 		my $rooms = model('House')->get_rooms();
 		DEBUG {
+			print Dump({ struct => { ... } });
 			print "The house has ${rooms} rooms.";
 		}
 		return $rooms;
@@ -59,6 +66,10 @@ Use %ENV and set DEBUG_PERL=1
 =head1 EXPORT
 
 =head2 DEBUG 
+
+A codeblock that is only called if DEBUG_PERL is set in %ENV or you have a DEBUG_ENABLED function which returns true. It's pupose is to add debugging logic to your code without it being executed in production.
+
+A Dump function, which is an alias for Data::Dumper::Dumper, is also imported IF debug is enabled and a DEBUG codeblock is found. NOTE: you must use parenthesis as it is imported at runtime.
 
 =cut
 
@@ -85,10 +96,6 @@ You can also look for information at:
 =item * RT: CPAN's request tracker (report bugs here)
 
 L<https://rt.cpan.org/NoAuth/Bugs.html?Dist=Debug-CodeBlock>
-
-=item * CPAN Ratings
-
-L<https://cpanratings.perl.org/d/Debug-CodeBlock>
 
 =item * Search CPAN
 

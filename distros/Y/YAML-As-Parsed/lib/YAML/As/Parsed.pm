@@ -3,7 +3,7 @@ use strict;
 use warnings;
 package YAML::As::Parsed; # git description: v1.72-7-g8682f63
 
-our $VERSION = '0.06';
+our $VERSION = '0.07';
 
 use Tie::IxHash;
 
@@ -17,7 +17,6 @@ use Exporter;
 our @ISA       = qw{ Exporter  };
 our @EXPORT    = qw{ Load Dump };
 our @EXPORT_OK = qw{ LoadFile DumpFile freeze thaw };
-
 
 sub Dump {
     return __PACKAGE__->new(@_)->_dump_string;
@@ -767,7 +766,7 @@ YAML::As::Parsed - Read/Write YAML predictably
 
 =head1 VERSION
 
-version 0.06
+version 0.07
 
 =head1 SYNOPSIS
 

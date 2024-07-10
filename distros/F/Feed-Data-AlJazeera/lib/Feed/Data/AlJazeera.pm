@@ -1,6 +1,6 @@
 package Feed::Data::AlJazeera;
 
-use 5.006; use strict; use warnings; our $VERSION = '0.02';
+use 5.006; use strict; use warnings; our $VERSION = '0.03';
 use Rope; use Rope::Autoload;
 
 use Feed::Data::AlJazeera::English;
@@ -47,11 +47,11 @@ __END__
 
 =head1 NAME
 
-Feed::Data::AlJazeera - Stay patient
+Feed::Data::AlJazeera - AlJazeera rss feeds
 
 =head1 VERSION
 
-Version 0.02
+Version 0.03
 
 =head1 SYNOPSIS
 

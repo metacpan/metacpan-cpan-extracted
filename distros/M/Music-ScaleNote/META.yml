@@ -22,7 +22,7 @@ meta-spec:
   version: '1.4'
 name: Music-ScaleNote
 requires:
-  Array::Circular: '0'
+  Array::Circular: '0.008'
   Carp: '0'
   List::SomeUtils: '0'
   Moo: '2'
@@ -34,7 +34,7 @@ requires:
 resources:
   homepage: https://github.com/ology/Music-ScaleNote
   repository: https://github.com/ology/Music-ScaleNote.git
-version: '0.0800'
+version: '0.0801'
 x_Dist_Zilla:
   perl:
     version: '5.032001'

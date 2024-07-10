@@ -129,7 +129,7 @@ you wrote code that you didn't.
 
 Enjoy,
 
-brian d foy, bdfoy@cpan.org
+brian d foy, briandfoy@pobox.com
 Steffen Mueller, smueller@cpan.org
 
 =cut

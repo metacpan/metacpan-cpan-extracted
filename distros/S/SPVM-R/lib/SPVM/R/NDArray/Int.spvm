@@ -3,7 +3,11 @@
 
 class R::NDArray::Int extends R::NDArray {
   
-  use Sort;
+  # Fields
+  method data : int[] () {
+    
+    return (int[])$self->{data};
+  }
   
   # Class Mehtods
   static method new : R::NDArray::Int ($options : object[] = undef) {
@@ -15,25 +19,10 @@ class R::NDArray::Int extends R::NDArray {
     return $self;
   }
   
+  # Instance Methods
   protected method init : void ($options : object[] = undef) {
     
     $self->SUPER::init($options);
-  }
-  
-  method data : int[] () {
-    
-    return (int[])$self->{data};
-  }
-  
-  protected method check : void () {
-    
-    my $data = (int[])$self->{data};
-    
-    my $length = $self->length;
-    
-    unless (@$data == $length) {
-      die "The length of data field must be the same as length field.";
-    }
   }
   
   protected method create_default_data : int[] ($length : int = 0) {
@@ -47,12 +36,7 @@ class R::NDArray::Int extends R::NDArray {
     return $data;
   }
   
-  method clone : R::NDArray::Int ($elem_shallow_clone : int = 0) {
-    return (R::NDArray::Int)$self->SUPER::clone($elem_shallow_clone);
-  }
-  
-  method elem_to_string : string ($data_index : int) {
-    my $data = $self->data;
+  method elem_to_string : string ($data : int[], $data_index : int) {
     
     my $elem = $data->[$data_index];
     
@@ -61,35 +45,29 @@ class R::NDArray::Int extends R::NDArray {
     return $string;
   }
   
-  method elem_to_object : Int ($data_index : int) {
+  method elem_assign : void ($dist_data : int[], $dist_data_index : int, $src_data : int[], $src_data_index : int) {
     
-    my $data = $self->data;
-    
-    my $elem = $data->[$data_index];
-    
-    my $object = (Int)$elem;
-    
-    return $object;
+    $dist_data->[$dist_data_index] = $src_data->[$src_data_index];
   }
   
-  precompile method set_order : void ($indexes_ndarray : R::NDArray::Int) {
+  method elem_clone : void ($dist_data : int[], $dist_data_index : int, $src_data : int[], $src_data_index : int) {
     
-    $self->check_set_order_args($indexes_ndarray);
+    $dist_data->[$dist_data_index] = $src_data->[$src_data_index];
+  }
+  
+  method elem_cmp : int ($data : int[], $a_data_index : int, $b_data_index : int) {
     
-    my $indexes = $indexes_ndarray->data;
+    my $cmp = $data->[$a_data_index] <=> $data->[$b_data_index];
     
-    my $data = (int[])$self->{data};
-    
-    my $tmp = $self->clone;
-    
-    my $tmp_data = $tmp->data;
-    
-    my $length = $self->length;
-    for (my $i = 0; $i < $length; $i++) {
-      my $order_index = $indexes->[$i];
-      
-      $data->[$i] = $tmp_data->[$order_index];
-    }
+    return $cmp;
+  }
+  
+  method clone : R::NDArray::Int ($elem_shallow_clone : int = 0) {
+    return (R::NDArray::Int)$self->SUPER::clone($elem_shallow_clone);
+  }
+  
+  method slice : R::NDArray::Int ($vector_indexes : R::NDArray::Int[]) {
+    return (R::NDArray::Int)$self->SUPER::slice($vector_indexes);
   }
   
   precompile method to_long_ndarray : R::NDArray::Long () {
@@ -226,45 +204,6 @@ class R::NDArray::Int extends R::NDArray {
     return $ret_ndarray;
   }
   
-  protected method slice_data : int[] ($data_indexes : int[]) {
-    
-    unless ($data_indexes) {
-      die "The data indexes \$data_indexes must be defined.";
-    }
-    
-    my $data_indexes_length = @$data_indexes;
-    my $data = $self->data;
-    my $ret_data = new int[$data_indexes_length];
-    for (my $i = 0; $i < $data_indexes_length; $i++) {
-      my $data_index = $data_indexes->[$i];
-      $ret_data->[$i] = $data->[$data_index];
-    }
-    
-    return $ret_data;
-  }
-  
-  protected precompile method slice_set_data : void ($data_indexes : int[], $data : int[]) {
-    
-    my $self_data = $self->data;
-    
-    unless ($data_indexes) {
-      die "The data indexes \$data_indexes must be defined.";
-    }
-    
-    for (my $i = 0; $i < @$data; $i++) {
-      my $data_index = $data_indexes->[$i];
-      $self_data->[$data_index] = $data->[$i];
-    }
-  }
-  
-  method slice : R::NDArray::Int ($vector_indexes : R::NDArray::Int[]) {
-    return (R::NDArray::Int)$self->SUPER::slice($vector_indexes);
-  }
-  
-  method slice_set : void ($vector_indexes : R::NDArray::Int[], $ndarray : R::NDArray::Int) {
-    $self->SUPER::slice_set($vector_indexes, $ndarray);
-  }
-  
   precompile method to_indexes : R::NDArray::Int () {
     
     unless ($self->is_vector) {
@@ -292,70 +231,4 @@ class R::NDArray::Int extends R::NDArray {
     return $ret_ndarray;
   }
   
-  method order_asc : R::NDArray::Int () {
-    
-  }
-  
-  method elem_cmp_old : int ($a_elem : Int, $b_elem : Int) {
-    
-    my $cmp = (int)$a_elem <=> (int)$b_elem;
-    
-    return $cmp;
-  }
-  
-  method elem_cmp : int ($a_data_index : int, $b_data_index : int) {
-    
-    my $data = $self->data;
-    
-    my $cmp = $data->[$a_data_index] <=> $data->[$b_data_index];
-    
-    return $cmp;
-  }
-  
 }
-
-=pod TODO
-
-sub order {
-  my $r = shift;
-  my $opt = ref $_[-1] eq 'HASH' ? pop @_ : {};
-  my @xs = map { to_object($r, $_) } @_;
-  
-  my @xs_values;
-  for my $x (@xs) {
-    push @xs_values, $x->values;
-  }
-
-  my $decreasing = $opt->{decreasing} || Rstats::Func::FALSE($r);
-  
-  my @pos_vals;
-  for my $i (0 .. @{$xs_values[0]} - 1) {
-    my $pos_val = {pos => $i + 1};
-    $pos_val->{val} = [];
-    push @{$pos_val->{val}}, $xs_values[$_][$i] for (0 .. @xs_values);
-    push @pos_vals, $pos_val;
-  }
-  
-  my @sorted_pos_values = !$decreasing
-    ? sort {
-        my $comp;
-        for (my $i = 0; $i < @xs_values; $i++) {
-          $comp = $a->{val}[$i] <=> $b->{val}[$i];
-          last if $comp != 0;
-        }
-        $comp;
-      } @pos_vals
-    : sort {
-        my $comp;
-        for (my $i = 0; $i < @xs_values; $i++) {
-          $comp = $b->{val}[$i] <=> $a->{val}[$i];
-          last if $comp != 0;
-        }
-        $comp;
-      } @pos_vals;
-  my @orders = map { $_->{pos} } @sorted_pos_values;
-  
-  return Rstats::Func::c_($r, @orders);
-}
-
-=cut

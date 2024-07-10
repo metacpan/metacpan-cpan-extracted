@@ -1,5 +1,8 @@
 Revision history for Music-ScaleNote
 
+0.0801 2024-07-09 20:26:41
+    - Simplify prev()/next() logic.
+
 0.0800 2024-07-08 23:34:11
     - Use Array::Circular instead of ugly position gynmastics.
 

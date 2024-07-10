@@ -3,7 +3,7 @@ our $AUTHORITY = 'cpan:GENE';
 
 # ABSTRACT: Manipulate the position of a note in a scale
 
-our $VERSION = '0.0800';
+our $VERSION = '0.0801';
 
 use Moo;
 use strictures 2;
@@ -11,7 +11,7 @@ use Carp qw(croak);
 use Array::Circular ();
 use List::SomeUtils qw( first_index );
 use Music::Note ();
-use Music::Scales qw(get_scale_notes);
+use Music::Scales qw( get_scale_notes );
 use namespace::clean;
 
 
@@ -95,14 +95,9 @@ sub get_offset {
         croak 'Scale position not defined!';
     }
 
-    my $octave = $note->octave;
+    $ac->next( $offset );
 
-    if ( $offset > 0 ) {
-        $ac->next($offset);
-    }
-    elsif ( $offset < 0 ) {
-        $ac->prev(abs $offset);
-    }
+    my $octave = $note->octave;
     $octave += $ac->loops;
 
     $note = Music::Note->new( $ac->current . $octave, 'ISO' );
@@ -157,7 +152,7 @@ Music::ScaleNote - Manipulate the position of a note in a scale
 
 =head1 VERSION
 
-version 0.0800
+version 0.0801
 
 =head1 SYNOPSIS
 

@@ -10,6 +10,14 @@ bold_8(0, "This is a test for bold_8\n");
 underline_8(0, "This is a test for underline_8\n");
 italic_8(0, "This is a test for italic_8\n");
 
+
+background_text_8(30, 41, "Hello\n");
+background_text_16(30, 0, 101, "Hello\n");
+background_bold_16(30, 0, 101, "Hello\n");
+background_underline_16(30, 0, 101, "Hello\n");
+background_italic_16(30, 0, 101, "Hello\n");
+
+
 background_text_256(208, 33, "This is a test for background_text_256\n");
 background_bold_256(208, 33, "This is a test for background_bold_256\n");
 background_underline_256(208, 33, "This is a test for background_underline_256\n");

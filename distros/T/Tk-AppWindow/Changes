@@ -1,5 +1,13 @@
 Revision history for Perl extension Tk::AppWindow.
 
+0.11 Wed Jul 10 2024
+	- Extension Help: components tab in About box is now a HList widget.
+	- Extension Help: added menu option to check for updates.
+	- Extension Panels: revised
+	- Extension SideBars: added
+	- Baseclasses PanelExtension and SidePanel now obsolete and removed.
+	- Extensions NavigatorPanel, Statusbar, ToolBar and ToolPanel now inherit Extension.
+
 0.10 Mon Jun 17 2024
 	- fixed bug in message item module of extension StatusBar
 	- the components tab in the About dialog now has a copy button

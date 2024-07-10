@@ -16,6 +16,9 @@ use Test::More;
 		DEBUG {
 			$variable = 2;
 		};
+		DEBUG {
+			warn Dump($variable);
+		};
 		return $variable;
 	}
 

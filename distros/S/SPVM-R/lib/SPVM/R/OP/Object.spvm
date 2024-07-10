@@ -6,7 +6,31 @@ class R::OP::Object {
   use R::OP;
   
   # Class Methods
-  static method c : R::NDArray::Object ($data : object[], $dim : int[] = undef) {
+  static method c : R::NDArray::Object ($data : object of object[]|R::NDArray::Object, $dim : int[] = undef) {
+    
+    if ($data) {
+      if (Fn->is_object_array($data)) {
+        # Do nothing
+      }
+      elsif ($data is_type R::NDArray::Object) {
+        unless ($dim) {
+          $dim = $data->(R::NDArray::Object)->dim;
+        }
+        
+        $data = $data->(R::NDArray::Object)->data;
+      }
+      else {
+        my $is_type_ok = $data is_type object[];
+        my $isa_ok = $data isa object[];
+        
+        warn $is_type_ok;
+        warn $isa_ok;
+        
+        warn type_name $data;
+        
+        die "The type of the data \data must be an object array or R::NDArray::Object.";
+      }
+    }
     
     my $ndarray = R::NDArray::Object->new({dim => $dim, data => $data});
     

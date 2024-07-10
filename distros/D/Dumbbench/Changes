@@ -1,5 +1,11 @@
 Revision history for Perl module Dumbbench
 
+0.504 2024-07-09T15:31:31Z
+	* use the 'name' parameter in examples, from Alceu Rodrigues de Freitas Junior (#21)
+	* make the SOOT features depend on the availability of SOOT, in the xt/ tests
+	* make a couple of xt/ tests TODO since comparative timings are too close to be
+	compared stably.
+
 0.503 2022-04-21T08:47:35Z
 	* xenu replaced time() with clock_gettime(CLOCK_MONOTONIC) GitHub #11
 

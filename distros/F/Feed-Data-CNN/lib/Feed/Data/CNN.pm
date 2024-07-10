@@ -4,7 +4,7 @@ use 5.006;
 use strict;
 use warnings;
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 use Rope;
 use Rope::Autoload;
@@ -50,16 +50,13 @@ __END__
 
 =head1 NAME
 
-Feed::Data::CNN - The rest of the world will follow.
+Feed::Data::CNN - CNN rss feeds.
 
 =head1 VERSION
 
-Version 0.01
+Version 0.02
 
 =cut
-
-our $VERSION = '0.01';
-
 
 =head1 SYNOPSIS
 

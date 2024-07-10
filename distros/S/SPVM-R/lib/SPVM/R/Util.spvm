@@ -62,6 +62,30 @@ class R::Util {
     return $normalized_dim;
   }
   
+  static method check_length : void ($data : object, $dim : int[]) {
+    
+    unless ($data) {
+      die "The data \$data must be defined.";
+    }
+    
+    unless (Fn->is_array($data)) {
+      die "The data \$data must be an array.";
+    }
+    
+    unless ($dim) {
+      die "The dimensions \$dim must be defined.";
+    }
+    
+    my $length_from_data = R::Util->_get_array_length($data);
+    
+    my $length_from_dim = R::Util->calc_data_length($dim);
+    
+    unless ($length_from_data == $length_from_dim) {
+      die "The length got from the data \$data must be equal to the length calcurated from the dimensions \$dim.";
+    }
+    
+  }
+  
   static method drop_dim : int[] ($dim : int[], $index : int = -1) {
     
     unless ($dim) {
@@ -305,6 +329,7 @@ class R::Util {
     return $elem_type_name;
   }
   
+  # This method will be added to Fn class.
   static method new_proto : object ($proto : object, $options : object[]) {
     
     my $class_name = type_name $proto;

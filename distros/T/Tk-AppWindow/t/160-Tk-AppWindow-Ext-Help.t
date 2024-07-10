@@ -21,6 +21,7 @@ createapp(
 		components => [ 'Tk', 'Imager' ],
 	},
 	-helpfile => 't/sample_help.pod',
+	-updatesmenuitem => 1,
 #	-helpfile => 'https://www.google.com',
 );
 

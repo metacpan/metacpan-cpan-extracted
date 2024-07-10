@@ -1,4 +1,5 @@
 use Test2::V0;
+use HTML::Entities ();  # to get consistent behavior from internal encode_entities()
 use Pod::Markdown::Githubert ();
 
 local $/ = "-----\n";
@@ -83,3 +84,15 @@ my $car = "cdr";
     ```
     uh-oh
     ```
+-----
+# github oddities with $ and _
+=over
+
+=item $$
+
+=item the I<N>th
+
+=back
+>>>>>
+- &#36;&#36;
+- the *N*th

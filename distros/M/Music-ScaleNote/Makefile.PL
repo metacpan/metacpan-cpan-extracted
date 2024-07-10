@@ -17,7 +17,7 @@ my %WriteMakefileArgs = (
   "MIN_PERL_VERSION" => "5.006",
   "NAME" => "Music::ScaleNote",
   "PREREQ_PM" => {
-    "Array::Circular" => 0,
+    "Array::Circular" => "0.008",
     "Carp" => 0,
     "List::SomeUtils" => 0,
     "Moo" => 2,
@@ -35,7 +35,7 @@ my %WriteMakefileArgs = (
     "strict" => 0,
     "warnings" => 0
   },
-  "VERSION" => "0.0800",
+  "VERSION" => "0.0801",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -43,7 +43,7 @@ my %WriteMakefileArgs = (
 
 
 my %FallbackPrereqs = (
-  "Array::Circular" => 0,
+  "Array::Circular" => "0.008",
   "Carp" => 0,
   "File::Spec" => 0,
   "IO::Handle" => 0,

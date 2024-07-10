@@ -9,7 +9,7 @@ use File::Spec;
 use Config;
 my $mswin = $Config{'osname'} eq 'MSWin32';
 $mwclass = 'App::Codit';
-
+$delay = 1500;
 $quitdelay = 1000 if $mswin;
 
 BEGIN { use_ok('App::Codit::Plugins::Bookmarks') };

@@ -25,8 +25,11 @@ my %metadata = (
 	AUTHOR		   => $author,
 	LICENSE		   => 'mit',
 	MIN_PERL_VERSION   => 5.008009,
-	CONFIGURE_REQUIRES => {'ExtUtils::MakeMaker' => 6.48},
-	TEST_REQUIRES	   => {
+	CONFIGURE_REQUIRES => {
+		'Config'	      => 0,
+		'ExtUtils::MakeMaker' => 6.48,
+		},
+	TEST_REQUIRES => {
 		'ExtUtils::MakeMaker' => 0,
 		'File::Find'	      => 1.13,
 		'File::Spec'	      => 3.29,
@@ -39,6 +42,11 @@ my %prerequisite = (
 	'Carp'	     => 1.10,
 	'DynaLoader' => 1.09,
 	'Net::DNS'   => 1.19,
+	'base'	     => 2.13,
+	'constant'   => 1.17,
+	'integer'    => 1.00,
+	'strict'     => 1.03,
+	'warnings'   => 1.0501,
 	);
 
 
@@ -68,15 +76,17 @@ $lib = $ENV{UNBOUND_LIB}     if $ENV{UNBOUND_LIB};
 chomp $_ for ( $inc, $lib );
 
 
+my @cppflags = grep /^-I/, split /\s+(?=\-)/, $Config{cppflags} || '';
+$inc = join ' ', $inc, @cppflags;
+
 my @header = qw(unbound.h);					# library headers
 
 if ( my $cpp = $Config{cppstdin} ) {
-	my @flag = grep /^-I/, split /\s+(?=\-)/, $Config{cppflags};
 	my $last = $Config{cppminus};
 	my $echo = $Config{echo} || 'echo';
 	foreach my $header (@header) {
-		my $scriptlet = qq[$echo "#include <$header>" | $cpp @flag $inc -o - $last];
-		$scriptlet = qq[$echo | $cpp @flag $inc -include $header $last] if MSWin32;
+		my $scriptlet = qq[$echo "#include <$header>" | $cpp $inc -o - $last];
+		$scriptlet = qq[$echo | $cpp $inc -include $header $last] if MSWin32;
 		next unless scalar( my @text = `$scriptlet 2>$nul` );
 		die "$header  file not found" unless grep /$header/i, @text;
 	}

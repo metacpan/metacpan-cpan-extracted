@@ -3,6 +3,12 @@
 
 class R::NDArray::Short extends R::NDArray {
   
+  # Fields
+  method data : short[] () {
+    
+    return (short[])$self->{data};
+  }
+  
   # Class Mehtods
   static method new : R::NDArray::Short ($options : object[] = undef) {
     
@@ -13,28 +19,13 @@ class R::NDArray::Short extends R::NDArray {
     return $self;
   }
   
+  # Instance Methods
   protected method init : void ($options : object[] = undef) {
     
     $self->SUPER::init($options);
   }
   
-  method data : short[] () {
-    
-    return (short[])$self->{data};
-  }
-  
-  protected method check : void () {
-    
-    my $data = (short[])$self->{data};
-    
-    my $length = $self->length;
-    
-    unless (@$data == $length) {
-      die "The length of data field must be the same as length field.";
-    }
-  }
-  
-  protected method create_default_data : short[] ($length : int = 0) {
+  method create_default_data : short[] ($length : int = 0) {
     
     unless ($length >= 0) {
       die "The length \$length must be more than or equal to 0.";
@@ -45,12 +36,7 @@ class R::NDArray::Short extends R::NDArray {
     return $data;
   }
   
-  method clone : R::NDArray::Short ($elem_shallow_clone : int = 0) {
-    return (R::NDArray::Short)$self->SUPER::clone($elem_shallow_clone);
-  }
-  
-  method elem_to_string : string ($data_index : int) {
-    my $data = $self->data;
+  method elem_to_string : string ($data : short[], $data_index : int) {
     
     my $elem = $data->[$data_index];
     
@@ -59,114 +45,29 @@ class R::NDArray::Short extends R::NDArray {
     return $string;
   }
   
-  method elem_to_object : Short ($data_index : int) {
+  method elem_assign : void ($dist_data : short[], $dist_data_index : int, $src_data : short[], $src_data_index : int) {
     
-    my $data = $self->data;
-    
-    my $elem = $data->[$data_index];
-    
-    my $object = (Short)$elem;
-    
-    return $object;
+    $dist_data->[$dist_data_index] = $src_data->[$src_data_index];
   }
   
-  precompile method set_order : void ($indexes_ndarray : R::NDArray::Int) {
+  method elem_clone : void ($dist_data : short[], $dist_data_index : int, $src_data : short[], $src_data_index : int) {
     
-    $self->check_set_order_args($indexes_ndarray);
-    
-    my $indexes = $indexes_ndarray->data;
-    
-    my $data = (short[])$self->{data};
-    
-    my $tmp = $self->clone;
-    
-    my $tmp_data = $tmp->data;
-    
-    my $length = $self->length;
-    for (my $i = 0; $i < $length; $i++) {
-      my $order_index = $indexes->[$i];
-      
-      $data->[$i] = $tmp_data->[$order_index];
-    }
+    $dist_data->[$dist_data_index] = $src_data->[$src_data_index];
   }
   
-  protected method slice_data : object ($data_indexes : int[]) {
-    
-    unless ($data_indexes) {
-      die "The data indexes \$data_indexes must be defined.";
-    }
-    
-    my $data_indexes_length = @$data_indexes;
-    my $data = $self->data;
-    my $ret_data = new short[$data_indexes_length];
-    for (my $i = 0; $i < $data_indexes_length; $i++) {
-      my $data_index = $data_indexes->[$i];
-      $ret_data->(short[])->[$i] = $data->(short[])->[$data_index];
-    }
-    
-    return $ret_data;
-  }
-  
-  protected method slice_set_data : void ($data_indexes : int[], $data : object) {
-    
-    my $self_data = $self->{data};
-    
-    unless ($data_indexes) {
-      die "The data indexes \$data_indexes must be defined.";
-    }
-    
-    my $data_index = 0;
-    my $data_indexes_length = @$data_indexes;
-    for (my $i = 0; $i < $data_indexes_length; $i++) {
-      $self_data->(short[])->[$i] = $data->(short[])->[$data_index];
-      $data_index++;
-    }
-  }
-  
-  method slice : R::NDArray::Short ($vector_indexes : R::NDArray::Int[]) {
-    return (R::NDArray::Short)$self->SUPER::slice($vector_indexes);
-  }
-  
-  method slice_set : void ($vector_indexes : R::NDArray::Int[], $ndarray : R::NDArray::Short) {
-    $self->SUPER::slice_set($vector_indexes, $ndarray);
-  }
-  
-  method elem_cmp_old : int ($a_elem : Short, $b_elem : Short) {
-    
-    my $cmp = (short)$a_elem <=> (short)$b_elem;
-    
-    return $cmp;
-  }
-  
-  method elem_cmp : int ($a_data_index : int, $b_data_index : int) {
-    
-    my $data = $self->data;
+  method elem_cmp : int ($data : short[], $a_data_index : int, $b_data_index : int) {
     
     my $cmp = $data->[$a_data_index] <=> $data->[$b_data_index];
     
     return $cmp;
   }
   
-  method sort_asc : void () {
-    
-    unless ($self->is_vector) {
-      die "The instance must be a vector.";
-    }
-    
-    my $data = $self->data;
-    
-    Sort->sort_short_asc($data);
+  method clone : R::NDArray::Short ($elem_shallow_clone : int = 0) {
+    return (R::NDArray::Short)$self->SUPER::clone($elem_shallow_clone);
   }
   
-  method sort_desc : void () {
-    
-    unless ($self->is_vector) {
-      die "The instance must be a vector.";
-    }
-    
-    my $data = $self->data;
-    
-    Sort->sort_short_desc($data);
+  method slice : R::NDArray::Short ($vector_indexes : R::NDArray::Int[]) {
+    return (R::NDArray::Short)$self->SUPER::slice($vector_indexes);
   }
-
+  
 }

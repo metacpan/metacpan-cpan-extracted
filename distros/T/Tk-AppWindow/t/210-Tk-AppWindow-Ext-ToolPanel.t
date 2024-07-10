@@ -17,9 +17,9 @@ require TestTextManager;
 
 createapp(
 	-appname => 'Navigator',
-	-extensions => [qw[Art MenuBar ToolBar StatusBar MDI Navigator ToolPanel]],
-	-configfolder => 't/settings',
-	-contentmanagerclass => 'TestTextManager',
+	-extensions => [qw[Art MenuBar ToolPanel]],
+#	-configfolder => 't/settings',
+#	-contentmanagerclass => 'TestTextManager',
 );
 
 my $ext;

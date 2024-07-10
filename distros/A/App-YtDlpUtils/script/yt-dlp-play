@@ -1,0 +1,164 @@
+#!perl
+
+# FRAGMENT id=shcompgen-hint command=_yt-dlp
+
+use 5.010001;
+use strict;
+use warnings;
+use Log::ger;
+use Log::ger::Screen;
+
+use CLI::Meta::YoutubeDl;
+use Getopt::Long qw(:config gnu_getopt no_ignore_case);
+use IPC::System::Options 'system', -log=>1, -die=>1;
+
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2024-07-09'; # DATE
+our $DIST = 'App-YtDlpUtils'; # DIST
+our $VERSION = '0.001'; # VERSION
+
+my $opts = $CLI::Meta::YoutubeDl::META->{opts};
+my @opts_for_youtube_dl;
+my @urls;
+Getopt::Long::GetOptions(
+    (map { my $optspec = $_; (my $opt = $optspec) =~ s#[|=].+##; $opt = length($opt) > 1 ? "--$opt" : "-$opt"; ($optspec => sub { push @opts_for_youtube_dl, $opt, ($optspec =~ /=/ ? ($_[1]) : ()) }); } keys %$opts),
+    '<>' => sub { push @urls, $_[0] },
+);
+
+unless (@urls) {
+    die "yt-dlp-play: Please specify one or more URLs\n";
+}
+
+for my $url (@urls) {
+    log_info "yt-dlp-play: Getting output filename for URL '%s' ...", $url;
+    my $filename;
+    system({capture_stdout=>\$filename}, "yt-dlp", @opts_for_youtube_dl, "--get-filename", $url);
+    chomp($filename);
+    system({shell=>1},
+           "yt-dlp", @opts_for_youtube_dl, "-o", "-", $url, \"|",
+           "tee", $filename, \"|",
+           "mpv", "-");
+}
+
+# PODNAME: yt-dlp-play
+# ABSTRACT: Download videos with yt-dlp *and* play them while downloading
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+yt-dlp-play - Download videos with yt-dlp *and* play them while downloading
+
+=head1 VERSION
+
+This document describes version 0.001 of yt-dlp-play (from Perl distribution App-YtDlpUtils), released on 2024-07-09.
+
+=head1 SYNOPSIS
+
+Usage:
+
+ % yt-dlp-play [OPTS] <URL_OR_VIDEO_ID>...
+
+Examples:
+
+ % yt-dlp-play       https://www.youtube.com/watch?v=hoKvtNawdS8
+ % yt-dlp-play -f 18 https://www.youtube.com/watch?v=hoKvtNawdS8 ;# force 360p mp4 format
+ % yt-dlp-play -f 22 https://www.youtube.com/watch?v=hoKvtNawdS8 ;# force 720p mp4 format
+
+=head1 DESCRIPTION
+
+You want to download a video but want to see it while it downloads (and of
+course do not want to download it twice)? This is a wrapper for B<yt-dlp>
+which does the following for each argument:
+
+=over
+
+=item * Run yt-dlp with --get-filename
+
+To get the output filename, first this is executed:
+
+ % yt-dlp [OPTS] --get-filename <URL_OR_VIDEO_ID>
+
+=item * Run yt-dlp that outputs to stdout and pipe it to mpv
+
+ % yt-dlp [OPTS] -o - <URL_OR_VIDEO_ID> | tee <OUTPUTFILENAME> | mpv -
+
+=back
+
+Some caveats:
+
+=over
+
+=item * The media-player program C<mpv> as well as the C<tee> utility are required
+
+=item * Each command-line argument must be a video ID or video URL, not a playlist URL
+
+=item * You should not request a format that does not stream
+
+For example, if you specify C<< -f 135+140 >> (merging of video-only 720p MP4
+and audio-only AAC stream) you will have to wait for C<yt-dlp> to download
+the whole video & audio streams and merge them before getting the video to play.
+
+=item * If you specify multiple URL's, you cannot go forward to the next video or backward to the previous
+
+In mpv you can use ">" or "ENTER" to go to the next video in the playlist, or
+"<" to go backward to the previous. You cannot do this using this script because
+the URLs are streamed individually one-by-one with separate invocation of
+yt-dlp and mpv.
+
+=back
+
+=head1 HOMEPAGE
+
+Please visit the project's homepage at L<https://metacpan.org/release/App-YtDlpUtils>.
+
+=head1 SOURCE
+
+Source repository is at L<https://github.com/perlancar/perl-App-YtDlpUtils>.
+
+=head1 SEE ALSO
+
+Other yt-dlp wrappers in L<App::YtDlpUtils>.
+
+=head1 AUTHOR
+
+perlancar <perlancar@cpan.org>
+
+=head1 CONTRIBUTING
+
+
+To contribute, you can send patches by email/via RT, or send pull requests on
+GitHub.
+
+Most of the time, you don't need to build the distribution yourself. You can
+simply modify the code, then test via:
+
+ % prove -l
+
+If you want to build the distribution (e.g. to try to install it locally on your
+system), you can install L<Dist::Zilla>,
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>,
+L<Pod::Weaver::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps required beyond
+that are considered a bug and can be reported to me.
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2024 by perlancar <perlancar@cpan.org>.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-YtDlpUtils>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
+
+=cut

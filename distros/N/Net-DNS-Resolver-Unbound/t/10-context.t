@@ -38,16 +38,14 @@ is( $bogus, undef, 'nonexistent resolver option' );
 
 my $filename = "file$$";
 END { unlink $filename }
-close( IO::File->new( $filename, '>' ) or die "Can't touch $filename $!" );
+close( IO::File->new( $filename, '>' ) or die "Can't create $filename $!" );
 
 
 ## exercise config options
 $resolver->prefer_v4(1);
-eval { $resolver->option( 'prefer_ip4',		 'yes' ) };
 eval { $resolver->option( 'outgoing-port-avoid', '3200-3204' ) };
 eval { $resolver->option( 'outgoing-port-avoid', '3205-3208' ) };
 eval { $resolver->add_ta('zone DS') };
-eval { $resolver->add_ta_autr($filename) };
 eval { $resolver->add_ta_file($filename) };
 eval { $resolver->async_thread(1) };
 eval { $resolver->config($filename) };
@@ -57,13 +55,14 @@ eval { $resolver->hosts($filename) };
 eval { $resolver->resolv_conf($filename) };
 eval { $resolver->set_fwd('::1') };
 eval { $resolver->set_fwd('127.0.0.1') };
-eval { $resolver->set_stub( 'zone', '10.1.2.3', 0 ) };
-eval { $resolver->set_tls(0) };
 eval { $resolver->trusted_keys($filename) };
-eval { $resolver->trusted_keys() };
 
 $resolver->print;
 
+eval { $resolver->add_ta_autr($filename) };			# Unbound 1.9.0+
+eval { $resolver->set_stub( 'zone', '10.1.2.3', 0 ) };
+eval { $resolver->set_tls(0) };
+eval { $resolver->set_tls(undef) };
 
 exit;
 

@@ -1,8 +1,10 @@
 .editorconfig
 Build.PL
 Changes
+hax/ckcall_constfold.c.inc
 hax/make_argcheck_aux.c.inc
 hax/make_argcheck_ops.c.inc
+hax/newOP_CUSTOM.c.inc
 hax/optree-additions.c.inc
 hax/perl-backcompat.c.inc
 hax/sv_numcmp.c.inc
@@ -24,8 +26,10 @@ t/03check-sub.t
 t/10constraints.t
 t/11constraints-num.t
 t/12constraints-str.t
+t/20inline-constraints.t
 t/80checks+field.t
 t/80checks+signature.t
+t/80match-is.t
 t/95benchmark-fields.t
 t/95benchmark-signature.t
 t/99pod.t

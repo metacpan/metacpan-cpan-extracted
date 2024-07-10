@@ -9,7 +9,8 @@ return {
     CONFIGURE_REQUIRES => {},
     BUILD_REQUIRES => {},
     TEST_REQUIRES => {
-        'Test2::V0' => 0,
+        'Test2::V0'      => 0,
+        'HTML::Entities' => 0,
     },
     PREREQ_PM => {
         'Pod::Markdown' => 0,

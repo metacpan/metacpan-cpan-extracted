@@ -9,11 +9,9 @@ Tk::AppWindow::Ext::Navigator - Navigate opened documents and files
 use strict;
 use warnings;
 use vars qw($VERSION);
-$VERSION="0.02";
+$VERSION="0.11";
 
-use base qw( Tk::AppWindow::BaseClasses::SidePanel );
-
-require Tk::YANoteBook;
+use base qw( Tk::AppWindow::BaseClasses::Extension );
 
 =head1 SYNOPSIS
 
@@ -28,7 +26,7 @@ Adds a navigator panel to your application. By default
 it sits on the left side of your application. You
 can add items to it's notebook.
 
-Inherits L<Tk::AppWindow::BaseClasses::SidePanel>.
+Inherits L<Tk::AppWindow::BaseClasses::Extension>.
 
 =head1 CONFIG VARIABLES
 
@@ -38,43 +36,86 @@ Inherits L<Tk::AppWindow::BaseClasses::SidePanel>.
 
 Default value 'LEFT'. Sets the name of the panel home to B<NavigatorPanel>.
 
-=item B<-navigatorpaneliconsize>
-
-Default value 32.
-
-=item B<-navigatorpaneltabside>
-
-Default value 'left'. At which side of the notebook do you place your tabs.
-
-=item B<-navigatorpanelvisible>
-
-Default value 1. Show or hide navigator panel.
-
-=back
+Only available at create time.
 
 =cut
 
 sub new {
 	my $class = shift;
 	my $self = $class->SUPER::new(@_);
+	$self->Require('SideBars');
 
-	$self->configInit(
-		-navigatorpaneliconsize => ['IconSize', $self, 32],
-		-navigatorpanel => ['Panel', $self, 'LEFT'],
-		-navigatorpaneltabside	=> ['Tabside', $self, 'left'],
-		-navigatorpanelvisible	=> ['PanelVisible', $self, 1],
-	);
+	my $args = $self->GetArgsRef;
+	my $panel = delete $args->{'-navigatorpanel'};
+	$panel = 'LEFT' unless defined $panel;
+	my $sb = $self->extGet('SideBars');
+
+	$sb->nbAdd('navigator panel', $panel, 'left');
+	$self->addPostConfig('DoPostConfig', $self);
 	return $self;
 }
 
-sub MenuItems {
+=head1 METHODS
+
+=over 4
+
+=item B<addPage>
+
+Deprecated. Use B<pageAdd>.
+
+=cut
+
+sub addPage {
 	my $self = shift;
-	return (
-#This table is best viewed with tabsize 3.
-#			 type					menupath			label			Icon		config variable	off on
-		[	'menu_check',		'View::',		"Show ~navigator panel",	undef,	'-navigatorpanelvisible', undef, 	0,   1], 
-	)
+	return $self->pageAdd(@_)
 }
+
+=item B<deletePage>I<($name)>
+
+Deprecated. Use B<pageDelete>.
+
+=cut
+
+sub deletePage {
+	my $self = shift;
+	return $self->pageDelete(@_)
+}
+
+=item B<pageAdd>I<($name, $image, $text, $statustext, $initialsize)>
+
+Adds a page to the navigator panel.
+
+=cut
+
+sub pageAdd {
+	my $self = shift;
+	my $sb = $self->extGet('SideBars');
+	return $sb->pageAdd('navigator panel', @_);
+}
+
+=item B<pageDelete>I<($name)>
+
+Deletes a page from the navigator panel.
+
+=cut
+
+sub pageDelete {
+	my $self = shift;
+	my $sb = $self->extGet('SideBars');
+	return $sb->pageDelete('navigator panel', @_);
+}
+
+sub DoPostConfig {
+	my $self = shift;
+	#show the navigator panel if it should be visible
+	if ($self->configGet('-navigator panelvisible')) {
+		my $pn = $self->extGet('Panels');
+		my $panel = $pn->panelAssign('navigator panel');
+		$pn->panelShow($panel);
+	}
+}
+
+=back
 
 =head1 AUTHOR
 

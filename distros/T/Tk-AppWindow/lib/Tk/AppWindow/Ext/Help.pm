@@ -9,16 +9,17 @@ Tk::AppWindow::Ext::Help - about box and help facilities
 use strict;
 use warnings;
 use vars qw($VERSION);
-$VERSION="0.08";
+$VERSION="0.11";
 
 use base qw( Tk::AppWindow::BaseClasses::Extension );
 
 use Tk;
 use File::Basename;
-require Tk::YADialog;
+require Tk::HList;
 require Tk::NoteBook;
-require Tk::ROText;
 require Tk::Pod::Text;
+require Tk::ROText;
+require Tk::YADialog;
 
 
 =head1 SYNOPSIS
@@ -90,6 +91,12 @@ Point to your help file. Can be a weblink.
 If it is a I<.pod> file it will launch a dialog box with
 a I<PodText> widget.
 
+=item Switch: B<-updatesmenuitem>
+
+Default value 0;
+
+If set a menu entrie 'Check for updates' is added to the menu.
+
 =back
 
 =head1 B<COMMANDS>
@@ -105,6 +112,10 @@ Pops the about box.
 =item B<help>
 
 Loads the helpfile in your system's default application or browser.
+
+=item B<updates>
+
+Pops the updates box and starts checking for updates.
 
 =back
 
@@ -122,10 +133,12 @@ sub new {
 	$self->addPreConfig(
 		-aboutinfo => ['PASSIVE', undef, undef, {	}],
 		-helpfile => ['PASSIVE'],
+		-updatesmenuitem => ['PASSIVE', undef, undef, 0],
 	);
 
 	$self->cmdConfig(
 		about => ['CmdAbout', $self],
+		updates => ['CmdUpdates', $self],
 		help => ['CmdHelp', $self],
 	);
 	return $self;
@@ -146,8 +159,8 @@ sub CmdAbout {
 	}
 
 	my $db = $self->YADialog(
-		-buttons => ['Ok'],
-		-defaultbutton => 'Ok',
+		-buttons => ['Close'],
+		-defaultbutton => 'Close',
 		-title => 'About ' . $self->appName,
 	);
 
@@ -184,15 +197,33 @@ sub CmdAbout {
 	if (exists $inf->{components}) {
 		&$addnb;
 		my $lp = $nb->add('components', -label => 'Components');
-		my $cf = $lp->Frame->pack(-fill => 'x', @padding);
+		my $cl = $lp->Scrolled('HList',
+			-width => 4,
+			-height => 4,
+			-columns => 2,
+			-header => 1,
+			-scrollbars => 'osoe',
+		)->pack(-expand => 1, -fill => 'both', @padding);
+		my $count = 0;
+		for ('Module', 'Version') {
+			my $header = $cl->Frame;
+			$header->Label(-text => $_)->pack(-side => 'left');
+			$cl->headerCreate($count,
+				-headerbackground => $self->configGet('-background'),
+				-itemtype => 'window', 
+				-widget => $header
+			);
+			$count ++;
+		}
 		my $components = $inf->{components};
 		my $row = 0;
 		for (@$components) {
 			my $module = $_;
 			my $version = $self->moduleVersion($module);
 			if (defined $version) {
-				$cf->Label(-text => "$module :")->grid(-row => $row, @col0);
-				$cf->Label(-text => $version)->grid(-row => $row, @col1);
+				$cl->add($row, -data => "$module: $version\n");
+				$cl->itemCreate($row, 0, -text => $module);
+				$cl->itemCreate($row, 1, -text => $version);
 				$row++
 			}
 		}
@@ -200,10 +231,8 @@ sub CmdAbout {
 			-text => 'Copy',
 			-command => sub {
 				my $text = '';
-				for (@$components) {
-					my $module = $_;
-					my $version = $self->moduleVersion($module);
-					$text = $text . "$module: $version\n";
+				for (0 .. $row - 1) {
+					$text = $text . $cl->infoData($_);
 				}
 				$self->clipboardClear;
 				$self->clipboardAppend($text);
@@ -286,24 +315,87 @@ sub CmdHelp {
 	}
 }
 
+sub CmdUpdates {
+	my $self = shift;
+
+	my $db = $self->YADialog(
+		-buttons => ['Close'],
+		-defaultbutton => 'Close',
+		-nowithdraw => 1,
+		-title => 'Updates check',
+	);
+	my $txt = $db->Scrolled('ROText',
+		-tabs => '8m',
+		-width => 36,
+		-wrap => 'none',
+		-height => 12,
+		-scrollbars => 'osoe',
+	)->pack(-padx => 2, -pady => 2, -expand => 1, -fill => 'both');
+
+	my $app = $self->GetAppWindow;
+
+	my @modules = (ref $app);
+	my $inf = $self->configGet('-aboutinfo');
+	if (exists $inf->{components}) {
+		my $c = $inf->{components};
+		push @modules, @$c;
+	}
+	$self->after(200, sub {
+		$db->Subwidget('Close')->configure(-state => 'disabled');
+		for (@modules) {
+			my $mod = $_;
+			$txt->insert('end', "Please wait ...");
+			$db->update;
+			my $output = "$mod\n";
+			my $string = `cpan -D $mod`;
+			while ($string ne '') {
+				if ($string =~ s/^(\s+Installed:.*\n)//) {
+					$output = $output . $1
+				} elsif ($string =~ s/^(\s+CPAN:.*\n)//) {
+					$output = $output . $1;
+					last;
+				} else {
+					$string =~ s/^.*\n|$//
+				}
+			}
+			my $end = $txt->index('end -1c');
+			$txt->delete("$end linestart", $end);
+			$txt->insert('end', $output);
+			$txt->see('end');
+			$db->update;
+		}
+		$txt->insert('end', "Done checking.\n");
+		$txt->see('end');
+		$db->Subwidget('Close')->configure(-state => 'normal');
+		$db->configure(-nowithdraw => 0);
+	});
+	$db->show(-popover => $app);
+	$db->destroy;
+}
+
 sub ConnectURL {
 	my ($self, $widget, $url) = @_;
 	$widget->configure(-cursor => 'hand2');
 	$widget->bind('<Enter>', sub { $widget->configure(-foreground => 'blue') });
-	$widget->bind('<Leave>', sub { $widget->configure(-foreground => $self->configGet('-foreground')) });
+	$widget->bind('<Leave>', sub { $widget->configure(
+		-foreground => $self->configGet('-foreground')
+	) });
 	$widget->bind('<Button-1>', sub { $self->openURL($url) });
 }
 
 sub MenuItems {
 	my $self = shift;
-	return (
+	my @items = (
 #This table is best viewed with tabsize 3.
 #			 type					menupath				label					cmd			icon					keyb			config variable
 		[	'menu_normal',		'appname::Quit',	"~About", 			'about',		'help-about',		'SHIFT+F1'	], 
-		[	'menu_normal',		'appname::Quit',	"~Help", 			'help',		'help-browser',	'F1',			], 
-		[	'menu_separator',	'appname::Quit',	'h1'], 
-
-	)
+		[	'menu_normal',		'appname::Quit',	"~Help", 			'help',		'help-browser',	'F1',			],
+	);
+	
+	push @items, 	[	'menu_normal',		'appname::Quit',	"~Check for updates", 'updates'	] 
+		if $self->configGet('-updatesmenuitem'); 
+	push @items, [	'menu_separator',	'appname::Quit',	'h1'];
+	return @items
 }
 
 =item B<moduleVersion>I<($module)>

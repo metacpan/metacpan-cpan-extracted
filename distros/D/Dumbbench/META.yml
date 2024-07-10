@@ -8,7 +8,7 @@ configure_requires:
   ExtUtils::MakeMaker: '6.64'
   File::Spec::Functions: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.64, CPAN::Meta::Converter version 2.150010'
+generated_by: 'ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -36,6 +36,6 @@ requires:
 resources:
   bugtracker: https://github.com/briandfoy/dumbbench/issues
   homepage: https://github.com/briandfoy/dumbbench
-  repository: https://github.com/briandfoy/dumbbench.git
-version: '0.503'
+  repository: https://github.com/briandfoy/dumbbench
+version: '0.504'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

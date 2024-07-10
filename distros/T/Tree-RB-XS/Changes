@@ -1,3 +1,6 @@
+Version 0.12 - 2024-07-09
+  - Fix fatal bug in prev_inserted_trend optimization
+
 Version 0.11 - 2024-07-09
   - New comparison flag GET_OR_ADD, inserts an empty node if one didn't exist
   - New get_key function returns nearest key to one requested.

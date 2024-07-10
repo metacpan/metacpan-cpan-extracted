@@ -17,6 +17,7 @@ class R::NDArray::StringBuffer extends R::NDArray::Object {
     return $self;
   }
   
+  # Instance Methods
   protected method init : void ($options : object[] = undef) {
     
     $self->SUPER::init($options);
@@ -27,18 +28,7 @@ class R::NDArray::StringBuffer extends R::NDArray::Object {
     return (StringBuffer[])$self->{data};
   }
   
-  protected method check : void () {
-    
-    my $data = (StringBuffer[])$self->{data};
-    
-    my $length = $self->length;
-    
-    unless (@$data == $length) {
-      die "The length of data field must be the same as length field.";
-    }
-  }
-  
-  protected method create_default_data : StringBuffer[] ($length : int = 0) {
+  method create_default_data : StringBuffer[] ($length : int = 0) {
     
     unless ($length >= 0) {
       die "The length \$length must be more than or equal to 0.";
@@ -49,13 +39,7 @@ class R::NDArray::StringBuffer extends R::NDArray::Object {
     return $data;
   }
   
-  method clone : R::NDArray::StringBuffer ($elem_shallow_clone : int = 0) {
-    return (R::NDArray::StringBuffer)$self->SUPER::clone($elem_shallow_clone);
-  }
-  
-  method elem_to_string : string ($data_index : int) {
-    
-    my $data = $self->data;
+  method elem_to_string : string ($data : StringBuffer[], $data_index : int) {
     
     my $elem = $data->[$data_index];
     
@@ -68,53 +52,31 @@ class R::NDArray::StringBuffer extends R::NDArray::Object {
     return $string;
   }
   
-  method elem_to_object : StringBuffer ($data_index : int) {
+  method elem_clone : void ($dist_data : StringBuffer[], $dist_data_index : int, $src_data : StringBuffer[], $src_data_index : int) {
     
-    my $data = $self->data;
+    my $src_elem = $src_data->[$src_data_index];
     
-    my $elem = $data->[$data_index];
-    
-    my $object = $elem;
-    
-    return $object;
-  }
-  
-  method elem_clone : StringBuffer ($data_index : int) {
-    
-    my $data = $self->data;
-    
-    my $elem = $data->[$data_index];
-    
-    my $clone = (StringBuffer)undef;
-    if ($elem) {
-      $clone = StringBuffer->new($elem->to_string);
+    if ($src_elem) {
+      $dist_data->[$dist_data_index] = StringBuffer->new($src_elem->to_string);
     }
-    
-    return $clone;
+    else {
+      $dist_data->[$dist_data_index] = undef;
+    }
   }
   
-  method slice : R::NDArray::StringBuffer ($vector_indexes : R::NDArray::Int[]) {
-    return (R::NDArray::StringBuffer)$self->SUPER::slice($vector_indexes);
-  }
-  
-  method slice_set : void ($vector_indexes : R::NDArray::Int[], $ndarray : R::NDArray::StringBuffer) {
-    $self->SUPER::slice_set($vector_indexes, $ndarray);
-  }
-  
-  method elem_cmp_old : int ($a_elem : StringBuffer, $b_elem : StringBuffer) {
-    
-    my $cmp = $a_elem->to_string cmp $b_elem->to_string;
-    
-    return $cmp;
-  }
-  
-  method elem_cmp : int ($a_data_index : int, $b_data_index : int) {
-    
-    my $data = $self->data;
+  method elem_cmp : int ($data : StringBuffer[], $a_data_index : int, $b_data_index : int) {
     
     my $cmp = $data->[$a_data_index]->to_string cmp $data->[$b_data_index]->to_string;
     
     return $cmp;
+  }
+  
+  method clone : R::NDArray::StringBuffer ($elem_shallow_clone : int = 0) {
+    return (R::NDArray::StringBuffer)$self->SUPER::clone($elem_shallow_clone);
+  }
+  
+  method slice : R::NDArray::StringBuffer ($vector_indexes : R::NDArray::Int[]) {
+    return (R::NDArray::StringBuffer)$self->SUPER::slice($vector_indexes);
   }
   
 }

@@ -10,6 +10,12 @@ class R::NDArray::String extends R::NDArray::Object {
   use R::OP::StringBuffer;
   use R::OP::Time::Piece;
   
+  # Fields
+  method data : string[] () {
+    
+    return (string[])$self->{data};
+  }
+  
   # Class Mehtods
   static method new : R::NDArray::String ($options : object[] = undef) {
     
@@ -20,28 +26,13 @@ class R::NDArray::String extends R::NDArray::Object {
     return $self;
   }
   
+  # Instance Methods
   protected method init : void ($options : object[] = undef) {
     
     $self->SUPER::init($options);
   }
   
-  method data : string[] () {
-    
-    return (string[])$self->{data};
-  }
-  
-  protected method check : void () {
-    
-    my $data = (string[])$self->{data};
-    
-    my $length = $self->length;
-    
-    unless (@$data == $length) {
-      die "The length of data field must be the same as length field.";
-    }
-  }
-  
-  protected method create_default_data : string[] ($length : int = 0) {
+  method create_default_data : string[] ($length : int = 0) {
     
     unless ($length >= 0) {
       die "The length \$length must be more than or equal to 0.";
@@ -52,41 +43,44 @@ class R::NDArray::String extends R::NDArray::Object {
     return $data;
   }
   
-  method clone : R::NDArray::String ($elem_shallow_clone : int = 0) {
-    return (R::NDArray::String)$self->SUPER::clone($elem_shallow_clone);
-  }
-  
-  method elem_to_string : string ($data_index : int) {
-    
-    my $data = $self->data;
+  method elem_to_string : string ($data : string[], $data_index : int) {
     
     my $elem = $data->[$data_index];
     
-    my $string = $elem;
+    unless ($elem) {
+      return "undef";
+    }
+    
+    my $string = copy $elem;
     
     return $string;
   }
   
-  method elem_to_object : string ($data_index : int) {
+  method elem_clone : void ($dist_data : string[], $dist_data_index : int, $src_data : string[], $src_data_index : int) {
     
-    my $data = $self->data;
+    my $src_elem = $src_data->[$src_data_index];
     
-    my $elem = $data->[$data_index];
-    
-    my $object = $elem;
-    
-    return $object;
+    if ($src_elem) {
+      $dist_data->[$dist_data_index] = copy $src_elem;
+    }
+    else {
+      $dist_data->[$dist_data_index] = undef;
+    }
   }
   
-  method elem_clone : string ($data_index : int) {
+  method elem_cmp : int ($data : string[], $a_data_index : int, $b_data_index : int) {
     
-    my $data = $self->data;
+    my $cmp = $data->[$a_data_index] cmp $data->[$b_data_index];
     
-    my $elem = $data->[$data_index];
-    
-    my $clone = copy $elem;
-    
-    return $clone;
+    return $cmp;
+  }
+  
+  method clone : R::NDArray::String ($elem_shallow_clone : int = 0) {
+    return (R::NDArray::String)$self->SUPER::clone($elem_shallow_clone);
+  }
+  
+  method slice : R::NDArray::String ($vector_indexes : R::NDArray::Int[]) {
+    return (R::NDArray::String)$self->SUPER::slice($vector_indexes);
   }
   
   precompile method to_int_ndarray : R::NDArray::Int () {
@@ -252,50 +246,4 @@ class R::NDArray::String extends R::NDArray::Object {
     return $ret_ndarray;
   }
   
-  method slice : R::NDArray::String ($vector_indexes : R::NDArray::Int[]) {
-    return (R::NDArray::String)$self->SUPER::slice($vector_indexes);
-  }
-  
-  method slice_set : void ($vector_indexes : R::NDArray::Int[], $ndarray : R::NDArray::String) {
-    $self->SUPER::slice_set($vector_indexes, $ndarray);
-  }
-  
-  method elem_cmp_old : int ($a_elem : string, $b_elem : string) {
-    
-    my $cmp = $a_elem cmp $b_elem;
-    
-    return $cmp;
-  }
-  
-  method elem_cmp : int ($a_data_index : int, $b_data_index : int) {
-    
-    my $data = $self->data;
-    
-    my $cmp = $data->[$a_data_index] cmp $data->[$b_data_index];
-    
-    return $cmp;
-  }
-  
-  method sort_asc : void () {
-    
-    unless ($self->is_vector) {
-      die "The instance must be a vector.";
-    }
-    
-    my $data = $self->data;
-    
-    Sort->sort_string_asc($data);
-  }
-  
-  method sort_desc : void () {
-    
-    unless ($self->is_vector) {
-      die "The instance must be a vector.";
-    }
-    
-    my $data = $self->data;
-    
-    Sort->sort_string_desc($data);
-  }
-
 }

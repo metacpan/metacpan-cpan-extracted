@@ -9,7 +9,7 @@ Tk::AppWindow::Ext::ToolBar - add a tool bar
 use strict;
 use warnings;
 use vars qw($VERSION);
-$VERSION="0.07";
+$VERSION="0.11";
 use Tk;
 require Tk::Compound;
 require Tk::Poplevel;
@@ -22,7 +22,7 @@ static unsigned char down_bits[] = {
 ';
 
 
-use base qw( Tk::AppWindow::BaseClasses::PanelExtension );
+use base qw( Tk::AppWindow::BaseClasses::Extension );
 
 =head1 SYNOPSIS
 
@@ -95,11 +95,13 @@ sub new {
 	my $class = shift;
 	my $self = $class->SUPER::new(@_);
 
-	$self->Require('Art');
-	$self->configInit(
-		-toolbarpanel => ['Panel', $self, 'TOP'],
-		-toolbarvisible => ['PanelVisible', $self, 1],
-	);
+	$self->Require('Art', 'Panels');
+	
+	my $args = $self->GetArgsRef;
+	my $panel = delete $args->{'-toolbarpanel'};
+	$panel = 'TOP' unless defined $panel;
+	my $pn = $self->extGet('Panels');
+	$pn->panelAssign('tool bar', $panel);
 
 	$self->addPreConfig(
 		-autotool => ['PASSIVE', undef, undef, 1],
@@ -136,7 +138,9 @@ sub _base {
 	$self->{BASE} = shift if @_;
 	my $b = $self->{BASE};
 	return $b if defined $b;
-	return $self->Subwidget($self->Panel);
+	my $pn = $self->extGet('Panels');
+	my $panel = $pn->panelAssign('tool bar');
+	return $self->Subwidget($panel);
 }
 
 sub _mode {
@@ -375,6 +379,13 @@ sub DoPostConfig {
 	my $size = $self->configGet('-tooliconsize');
 	$size = $art->getAlternateSize($size) if defined $art;
 	$self->configPut(-tooliconsize => $size);
+	
+	#show the toolbar if it should be visible
+	if ($self->configGet('-tool barvisible')) {
+		my $pn = $self->extGet('Panels');
+		my $panel = $pn->panelAssign('tool bar');
+		$pn->panelShow($panel);
+	}
 
 	$self->CreateItems;
 }
@@ -382,15 +393,6 @@ sub DoPostConfig {
 sub GetItem {
 	my ($self, $item) = @_;
 	return $self->{WIDGETS}->{$item}
-}
-
-sub MenuItems {
-	my $self = shift;
-	return (
-#This table is best viewed with tabsize 3.
-#			 type					menupath			label					Icon		config variable	   off  on
-		[	'menu_check',		'View::',		"Show ~toolbar",	undef,	'-toolbarvisible', undef,	0,   1], 
-	)
 }
 
 sub PopDown {

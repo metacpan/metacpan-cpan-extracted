@@ -6,6 +6,9 @@ use Test::Most tests => 6;
 use Test::Carp;
 
 BEGIN {
+	delete $ENV{'LANG'};
+	delete $ENV{'LC_ALL'};
+
 	use_ok('Data::Text');
 }
 

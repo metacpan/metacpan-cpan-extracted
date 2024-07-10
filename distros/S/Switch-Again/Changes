@@ -1,5 +1,9 @@
 Revision history for Switch-Again
 
+1.01    2024/07/09
+	- Fix bug around sr always returning true
+	- Fix bug with passing false-able values 0 and ""
+
 1.00    2022/05/20
 	- version bump + write some documentation.
 
