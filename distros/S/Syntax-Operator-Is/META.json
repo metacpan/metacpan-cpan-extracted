@@ -21,12 +21,14 @@
       },
       "configure" : {
          "requires" : {
+            "Data::Checks::Builder" : "0.06",
             "Module::Build" : "0.4004",
             "XS::Parse::Infix::Builder" : "0.43"
          }
       },
       "runtime" : {
          "requires" : {
+            "Data::Checks" : "0.06",
             "XS::Parse::Infix" : "0.43",
             "perl" : "5.014"
          }
@@ -40,7 +42,7 @@
    "provides" : {
       "Syntax::Operator::Is" : {
          "file" : "lib/Syntax/Operator/Is.pm",
-         "version" : "0.01"
+         "version" : "0.02"
       }
    },
    "release_status" : "stable",
@@ -50,6 +52,6 @@
       ],
       "x_IRC" : "irc://irc.perl.org/#io-async"
    },
-   "version" : "0.01",
+   "version" : "0.02",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

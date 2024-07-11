@@ -1,7 +1,7 @@
 # Copyright (c) 2024 Yuki Kimoto
 # MIT License
 
-class R::NDArray::StringBuffer extends R::NDArray::Object {
+class R::NDArray::StringBuffer extends R::NDArray {
   
   use Fn;
   use Array;
@@ -18,11 +18,6 @@ class R::NDArray::StringBuffer extends R::NDArray::Object {
   }
   
   # Instance Methods
-  protected method init : void ($options : object[] = undef) {
-    
-    $self->SUPER::init($options);
-  }
-  
   method data : StringBuffer[] () {
     
     return (StringBuffer[])$self->{data};
@@ -52,6 +47,11 @@ class R::NDArray::StringBuffer extends R::NDArray::Object {
     return $string;
   }
   
+  method elem_assign : void ($dist_data : StringBuffer[], $dist_data_index : int, $src_data : StringBuffer[], $src_data_index : int) {
+    
+    $dist_data->[$dist_data_index] = $src_data->[$src_data_index];
+  }
+  
   method elem_clone : void ($dist_data : StringBuffer[], $dist_data_index : int, $src_data : StringBuffer[], $src_data_index : int) {
     
     my $src_elem = $src_data->[$src_data_index];
@@ -66,17 +66,30 @@ class R::NDArray::StringBuffer extends R::NDArray::Object {
   
   method elem_cmp : int ($data : StringBuffer[], $a_data_index : int, $b_data_index : int) {
     
-    my $cmp = $data->[$a_data_index]->to_string cmp $data->[$b_data_index]->to_string;
+    my $a_elem = $data->[$a_data_index];
+    
+    my $a_string = (string)undef;
+    if ($a_elem) {
+      $a_string = $a_elem->to_string;
+    }
+    
+    my $b_elem = $data->[$b_data_index];
+    my $b_string = (string)undef;
+    if ($b_elem) {
+      $b_string = $b_elem->to_string;
+    }
+    
+    my $cmp = $a_string cmp $b_string;
     
     return $cmp;
   }
   
-  method clone : R::NDArray::StringBuffer ($elem_shallow_clone : int = 0) {
-    return (R::NDArray::StringBuffer)$self->SUPER::clone($elem_shallow_clone);
+  method clone : R::NDArray::StringBuffer ($shallow : int = 0) {
+    return (R::NDArray::StringBuffer)$self->SUPER::clone($shallow);
   }
   
-  method slice : R::NDArray::StringBuffer ($vector_indexes : R::NDArray::Int[]) {
-    return (R::NDArray::StringBuffer)$self->SUPER::slice($vector_indexes);
+  method slice : R::NDArray::StringBuffer ($asix_indexes_product : R::NDArray::Int[]) {
+    return (R::NDArray::StringBuffer)$self->SUPER::slice($asix_indexes_product);
   }
   
 }

@@ -23,5 +23,5 @@ requires:
   SPVM::Sys: '0.525'
   SPVM::Time::Piece: '0.003'
 resources: {}
-version: '0.007'
+version: '0.008'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

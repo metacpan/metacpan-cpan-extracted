@@ -2,7 +2,7 @@ package DBIx::QuickDB::Driver::MySQL::Base;
 use strict;
 use warnings;
 
-our $VERSION = '0.000034';
+our $VERSION = '0.000035';
 
 use Carp qw/confess croak/;
 use IPC::Cmd qw/can_run/;

@@ -26,7 +26,7 @@
 ################################################################
 
 
-our $VERSION='1.0000663';
+our $VERSION='1.0000664';
 
 
 if ($ENV{'AUTOMATED_TESTING'}) {
@@ -4407,9 +4407,8 @@ if ($get_BerkeleyDB && $^O ne 'cygwin') {
          }
          unless (exists $ENV{'BERKELEYDB_INCLUDE'} &&
                $ENV{'BERKELEYDB_INCLUDE'}) {
-            my $BerkDownload='https://www.oracle.com/technetwork/database/'.
-                             'database-technologies/berkeleydb/downloads/'.
-                             'index.html';
+            my $BerkDownload='https://www.oracle.com/database/'.
+                             'technologies/related/berkeleydb-downloads.html';
             my $PackManagers='https://en.wikipedia.org/wiki/'.
                              'List_of_software_package_management_systems';
             my $w='      ';

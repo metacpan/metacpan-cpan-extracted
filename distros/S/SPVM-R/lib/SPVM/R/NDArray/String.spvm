@@ -1,7 +1,7 @@
 # Copyright (c) 2024 Yuki Kimoto
 # MIT License
 
-class R::NDArray::String extends R::NDArray::Object {
+class R::NDArray::String extends R::NDArray {
   
   use Fn;
   use Array;
@@ -27,11 +27,6 @@ class R::NDArray::String extends R::NDArray::Object {
   }
   
   # Instance Methods
-  protected method init : void ($options : object[] = undef) {
-    
-    $self->SUPER::init($options);
-  }
-  
   method create_default_data : string[] ($length : int = 0) {
     
     unless ($length >= 0) {
@@ -56,6 +51,11 @@ class R::NDArray::String extends R::NDArray::Object {
     return $string;
   }
   
+  method elem_assign : void ($dist_data : string[], $dist_data_index : int, $src_data : string[], $src_data_index : int) {
+    
+    $dist_data->[$dist_data_index] = $src_data->[$src_data_index];
+  }
+  
   method elem_clone : void ($dist_data : string[], $dist_data_index : int, $src_data : string[], $src_data_index : int) {
     
     my $src_elem = $src_data->[$src_data_index];
@@ -75,19 +75,15 @@ class R::NDArray::String extends R::NDArray::Object {
     return $cmp;
   }
   
-  method clone : R::NDArray::String ($elem_shallow_clone : int = 0) {
-    return (R::NDArray::String)$self->SUPER::clone($elem_shallow_clone);
+  method clone : R::NDArray::String ($shallow : int = 0) {
+    return (R::NDArray::String)$self->SUPER::clone($shallow);
   }
   
-  method slice : R::NDArray::String ($vector_indexes : R::NDArray::Int[]) {
-    return (R::NDArray::String)$self->SUPER::slice($vector_indexes);
+  method slice : R::NDArray::String ($asix_indexes_product : R::NDArray::Int[]) {
+    return (R::NDArray::String)$self->SUPER::slice($asix_indexes_product);
   }
   
   precompile method to_int_ndarray : R::NDArray::Int () {
-    
-    unless ($self) {
-      die "The n-dimension array \$self must be defined.";
-    }
     
     my $length = $self->length;
     
@@ -99,17 +95,13 @@ class R::NDArray::String extends R::NDArray::Object {
     my $ret_data = $ret_ndarray->data;
     
     for (my $i = 0; $i < $length; $i++) {
-      $ret_data->[$i] = (int)$data->[$i];
+      $ret_data->[$i] = Fn->to_int($data->[$i]);
     }
     
     return $ret_ndarray;
   }
   
   precompile method to_long_ndarray : R::NDArray::Long () {
-    
-    unless ($self) {
-      die "The n-dimension array \$self must be defined.";
-    }
     
     my $length = $self->length;
     
@@ -121,17 +113,13 @@ class R::NDArray::String extends R::NDArray::Object {
     my $ret_data = $ret_ndarray->data;
     
     for (my $i = 0; $i < $length; $i++) {
-      $ret_data->[$i] = (long)$data->[$i];
+      $ret_data->[$i] = Fn->to_long($data->[$i]);
     }
     
     return $ret_ndarray;
   }
   
   precompile method to_float_ndarray : R::NDArray::Float () {
-    
-    unless ($self) {
-      die "The n-dimension array \$self must be defined.";
-    }
     
     my $length = $self->length;
     
@@ -143,17 +131,13 @@ class R::NDArray::String extends R::NDArray::Object {
     my $ret_data = $ret_ndarray->data;
     
     for (my $i = 0; $i < $length; $i++) {
-      $ret_data->[$i] = (float)$data->[$i];
+      $ret_data->[$i] =Fn->to_float($data->[$i]);
     }
     
     return $ret_ndarray;
   }
   
   precompile method to_double_ndarray : R::NDArray::Double () {
-    
-    unless ($self) {
-      die "The n-dimension array \$self must be defined.";
-    }
     
     my $length = $self->length;
     
@@ -165,25 +149,13 @@ class R::NDArray::String extends R::NDArray::Object {
     my $ret_data = $ret_ndarray->data;
     
     for (my $i = 0; $i < $length; $i++) {
-      $ret_data->[$i] = (double)$data->[$i];
+      $ret_data->[$i] = Fn->to_double($data->[$i]);
     }
     
     return $ret_ndarray;
   }
   
-  precompile method to_float_complex_ndarray : R::NDArray::FloatComplex () {
-    die "This method will be implemented.";
-  }
-  
-  precompile method to_double_complex_ndarray : R::NDArray::DoubleComplex () {
-    die "This method will be implemented.";
-  }
-  
   precompile method to_string_buffer_ndarray : R::NDArray::StringBuffer () {
-    
-    unless ($self) {
-      die "The n-dimension array \$self must be defined.";
-    }
     
     my $length = $self->length;
     
@@ -195,17 +167,20 @@ class R::NDArray::String extends R::NDArray::Object {
     my $ret_data = $ret_ndarray->data;
     
     for (my $i = 0; $i < $length; $i++) {
-      $ret_data->[$i] = StringBuffer->new($data->[$i]);
+      my $elem = $data->[$i];
+      
+      if ($elem) {
+        StringBuffer->new($data->[$i]);
+      }
+      else {
+        $ret_data->[$i] = undef;
+      }
     }
     
     return $ret_ndarray;
   }
   
   precompile method to_time_piece_ndarray : R::NDArray::Time::Piece () {
-    
-    unless ($self) {
-      die "The n-dimension array \$self must be defined.";
-    }
     
     my $length = $self->length;
     
@@ -217,8 +192,10 @@ class R::NDArray::String extends R::NDArray::Object {
     my $ret_data = $ret_ndarray->data;
     
     for (my $i = 0; $i < $length; $i++) {
-      if ($data->[$i]) {
-        if (length $data->[$i] == 10) {
+      my $elem = $data->[$i];
+      
+      if ($elem) {
+        if (length $elem == 10) {
           
           my $tp = (Time::Piece)undef;
           
@@ -226,7 +203,7 @@ class R::NDArray::String extends R::NDArray::Object {
           
           $ret_data->[$i] = $tp;
         }
-        elsif (length $data->[$i] == 19) {
+        elsif (length $elem == 19) {
           
           my $tp = (Time::Piece)undef;
           
@@ -235,7 +212,7 @@ class R::NDArray::String extends R::NDArray::Object {
           $ret_data->[$i] = $tp;
         }
         else {
-          $ret_data->[$i] = undef;
+          die "The string \"$elem\" is invalid date or datetime format.";
         }
       }
       else {

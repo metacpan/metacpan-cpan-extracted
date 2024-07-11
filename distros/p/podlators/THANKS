@@ -177,7 +177,7 @@ undefined strings and numeric registers.
 
 James E. Keenan, for reporting an issue with formatting L<> links
 containing only URLs when the URL receives some formatting (such as
-escaping of hyphens).
+escaping of hyphens) and for analysis of other bugs.
 
 Brian Gottreu, for fixing excessively long lines across all of the Perl
 core documentation, including perlpodstyle.
@@ -197,9 +197,10 @@ title of a simple module and for how best to suppress Encode warnings
 during Perl core builds.
 
 Guillem Jover, for the formatting change for manual page references and
-function names to match the Linux manual page standard, and reporting a
+function names to match the Linux manual page standard, reporting a
 diagnostic bug when pod2man or pod2text gets empty input on standard
-input.
+input, and reporting a groff 1.23.0 regression with ragged-right
+justification.
 
 Zefram, for analyzing and fixing a problem with the UTF-8 layer detection
 code in Pod::Man.
@@ -234,6 +235,16 @@ failed to convert the internal spaces to non-breaking.
 
 Julien ÉLIE, for catching a long-standing bug where bold and italics
 continued farther than they should in Pod::Man output if they were
-combined with C<> and fixed-width fonts.
+combined with C<> and fixed-width fonts, and for finding a subtle spacing
+bug with nested =items without bodies.
 
-G. Branden Robinson, for his assistance in understanding *roff syntax.
+G. Branden Robinson, for his assistance in understanding *roff syntax and
+analysis of groff justification changes.
+
+youpong, for reporting a double-encoding bug with a :utf8 output layer.
+
+Graham Knop, for fixing a tricky bug in detecting output PerlIO UTF-8
+layers.
+
+Jim Avera, for finding a bug in wrapping in Pod::Text subclasses when S<>
+is used in combination with a UTF-8 input encoding.

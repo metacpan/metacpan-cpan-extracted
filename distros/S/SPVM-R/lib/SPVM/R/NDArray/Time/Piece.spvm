@@ -1,7 +1,7 @@
 # Copyright (c) 2024 Yuki Kimoto
 # MIT License
 
-class R::NDArray::Time::Piece extends R::NDArray::Object {
+class R::NDArray::Time::Piece extends R::NDArray {
   
   use Fn;
   use Array;
@@ -24,11 +24,6 @@ class R::NDArray::Time::Piece extends R::NDArray::Object {
   }
   
   # Instance Methods
-  protected method init : void ($options : object[] = undef) {
-    
-    $self->SUPER::init($options);
-  }
-  
   method create_default_data : Time::Piece[] ($length : int = 0) {
     
     unless ($length >= 0) {
@@ -53,6 +48,11 @@ class R::NDArray::Time::Piece extends R::NDArray::Object {
     return $string;
   }
   
+  method elem_assign : void ($dist_data : Time::Piece[], $dist_data_index : int, $src_data : Time::Piece[], $src_data_index : int) {
+    
+    $dist_data->[$dist_data_index] = $src_data->[$src_data_index];
+  }
+  
   method elem_clone : void ($dist_data : Time::Piece[], $dist_data_index : int, $src_data : Time::Piece[], $src_data_index : int) {
     
     my $src_elem = $src_data->[$src_data_index];
@@ -67,17 +67,48 @@ class R::NDArray::Time::Piece extends R::NDArray::Object {
   
   method elem_cmp : int ($data : Time::Piece[], $a_data_index : int, $b_data_index : int) {
     
-    my $cmp = $data->[$a_data_index]->epoch <=> $data->[$b_data_index]->epoch;
+    my $a_elem = $data->[$a_data_index];
+    
+    my $a_epoch = Fn->LONG_MIN;
+    if ($a_elem) {
+      $a_epoch = $a_elem->epoch;
+    }
+    
+    my $b_elem = $data->[$b_data_index];
+    my $b_epoch = Fn->LONG_MIN;
+    if ($b_elem) {
+      $b_epoch = $b_elem->epoch;
+    }
+    
+    my $cmp = $a_epoch <=> $b_epoch;
     
     return $cmp;
   }
   
-  method clone : R::NDArray::Time::Piece ($elem_shallow_clone : int = 0) {
-    return (R::NDArray::Time::Piece)$self->SUPER::clone($elem_shallow_clone);
+  method clone : R::NDArray::Time::Piece ($shallow : int = 0) {
+    return (R::NDArray::Time::Piece)$self->SUPER::clone($shallow);
   }
   
-  method slice : R::NDArray::Time::Piece ($vector_indexes : R::NDArray::Int[]) {
-    return (R::NDArray::Time::Piece)$self->SUPER::slice($vector_indexes);
+  method slice : R::NDArray::Time::Piece ($asix_indexes_product : R::NDArray::Int[]) {
+    return (R::NDArray::Time::Piece)$self->SUPER::slice($asix_indexes_product);
+  }
+  
+  precompile method to_long_ndarray : R::NDArray::Long () {
+    
+    my $length = $self->length;
+    
+    my $dim = $self->dim;
+    
+    my $ret_ndarray = R::OP::Long->c(undef, $dim);
+    
+    my $data = $self->data;
+    my $ret_data = $ret_ndarray->data;
+    
+    for (my $i = 0; $i < $length; $i++) {
+      $ret_data->[$i] = $data->[$i]->epoch;
+    }
+    
+    return $ret_ndarray;
   }
   
 }

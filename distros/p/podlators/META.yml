@@ -7,7 +7,7 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.64, CPAN::Meta::Converter version 2.150010'
+generated_by: 'ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -20,28 +20,28 @@ no_index:
 provides:
   Pod::Man:
     file: lib/Pod/Man.pm
-    version: '5.01'
+    version: v6.0.0
   Pod::ParseLink:
     file: lib/Pod/ParseLink.pm
-    version: '5.01'
+    version: v6.0.0
   Pod::Text:
     file: lib/Pod/Text.pm
-    version: '5.01'
+    version: v6.0.0
   Pod::Text::Color:
     file: lib/Pod/Text/Color.pm
-    version: '5.01'
+    version: v6.0.0
   Pod::Text::Overstrike:
     file: lib/Pod/Text/Overstrike.pm
-    version: '5.01'
+    version: v6.0.0
   Pod::Text::Termcap:
     file: lib/Pod/Text/Termcap.pm
-    version: '5.01'
+    version: v6.0.0
 requires:
   Pod::Simple: '3.26'
-  perl: '5.010'
+  perl: '5.012'
 resources:
   bugtracker: https://github.com/rra/podlators/issues
   homepage: https://www.eyrie.org/~eagle/software/podlators/
   repository: https://github.com/rra/podlators.git
-version: '5.01'
+version: v6.0.0
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

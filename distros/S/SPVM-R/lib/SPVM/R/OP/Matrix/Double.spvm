@@ -46,19 +46,19 @@ class R::OP::Matrix::Double {
   static method mul : R::NDArray::Double ($x_ndarray : R::NDArray::Double, $y_ndarray : R::NDArray::Double) {
     
     unless ($x_ndarray) {
-      die "The n-dimension array \$x_ndarray must be defined.";
+      die "The n-dimensional array \$x_ndarray must be defined.";
     }
     
     unless ($x_ndarray->is_matrix) {
-      die "The n-dimension array \$x_ndarray must be a matrix.";
+      die "The n-dimensional array \$x_ndarray must be a matrix.";
     }
     
     unless ($y_ndarray) {
-      die "The n-dimension array \$y_ndarray must be defined.";
+      die "The n-dimensional array \$y_ndarray must be defined.";
     }
     
     unless ($y_ndarray->is_matrix) {
-      die "The n-dimension array \$y_ndarray must be a matrix.";
+      die "The n-dimensional array \$y_ndarray must be a matrix.";
     }
     
     my $x_data = (double[])$x_ndarray->data;
@@ -99,11 +99,11 @@ class R::OP::Matrix::Double {
   static method diag : R::NDArray::Double ($x_ndarray : R::NDArray::Double) {
     
     unless ($x_ndarray) {
-      die "The n-dimension array \$x_ndarray must be defined.";
+      die "The n-dimensional array \$x_ndarray must be defined.";
     }
     
     unless ($x_ndarray->is_matrix) {
-      die "The n-dimension array \$x_ndarray must be a matrix.";
+      die "The n-dimensional array \$x_ndarray must be a matrix.";
     }
     
     my $x_data = (double[])$x_ndarray->data;
@@ -150,11 +150,11 @@ class R::OP::Matrix::Double {
   static method solve : R::NDArray::Double ($x_ndarray : R::NDArray::Double) {
     
     unless ($x_ndarray) {
-      die "The n-dimension array \$x_ndarray must be defined.";
+      die "The n-dimensional array \$x_ndarray must be defined.";
     }
     
     unless ($x_ndarray->is_square_matrix) {
-      die "The n-dimension array \$x_ndarray must be a squre matrix.";
+      die "The n-dimensional array \$x_ndarray must be a squre matrix.";
     }
     
     my $x_data = (double[])$x_ndarray->data;
@@ -185,11 +185,11 @@ class R::OP::Matrix::Double {
   static method t : R::NDArray::Double ($x_ndarray : R::NDArray::Double) {
     
     unless ($x_ndarray) {
-      die "The n-dimension array \$x_ndarray must be defined.";
+      die "The n-dimensional array \$x_ndarray must be defined.";
     }
     
     unless ($x_ndarray->is_square_matrix) {
-      die "The n-dimension array \$x_ndarray must be a squre matrix.";
+      die "The n-dimensional array \$x_ndarray must be a squre matrix.";
     }
     
     my $x_data = (double[])$x_ndarray->data;
@@ -220,11 +220,11 @@ class R::OP::Matrix::Double {
   static method det : R::NDArray::Double ($x_ndarray : R::NDArray::Double) {
     
     unless ($x_ndarray) {
-      die "The n-dimension array \$x_ndarray must be defined.";
+      die "The n-dimensional array \$x_ndarray must be defined.";
     }
     
     unless ($x_ndarray->is_square_matrix) {
-      die "The n-dimension array \$x_ndarray must be a squre matrix.";
+      die "The n-dimensional array \$x_ndarray must be a squre matrix.";
     }
     
     my $x_data = (double[])$x_ndarray->data;
@@ -255,11 +255,11 @@ class R::OP::Matrix::Double {
   static method eigen : R::NDArray::Hash ($x_ndarray : R::NDArray::Double) {
     
     unless ($x_ndarray) {
-      die "The n-dimension array \$x_ndarray must be defined.";
+      die "The n-dimensional array \$x_ndarray must be defined.";
     }
     
     unless ($x_ndarray->is_square_matrix) {
-      die "The n-dimension array \$x_ndarray must be a squre matrix.";
+      die "The n-dimensional array \$x_ndarray must be a squre matrix.";
     }
     
     my $x_data = (double[])$x_ndarray->data;

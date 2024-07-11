@@ -5,6 +5,8 @@ requires_rt('5.0.5');
 
 repository('https://github.com/bestpractical/rt-extension-formtools');
 
+no_index 'directory' => 'lib/RT/Interface';
+
 my ($lp) = ($INC{'RT.pm'} =~ /^(.*)[\\\/]/);
 my $lib_path = join( ' ', "$RT::LocalPath/lib", $lp );
 my $bin_path = $RT::BinPath || "$RT::BasePath/bin" || "/opt/rt5/bin";

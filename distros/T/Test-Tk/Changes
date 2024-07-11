@@ -1,7 +1,10 @@
 Revision history for Perl extension Test::Tk.
 
+3.04 Wed Jul 10 2024
+	- Updated documentation to reflect best practices.
+
 3.03 Thu Apr 18 2024
-	-Added sub pause
+	- Added sub pause
 
 3.02 Sat Aug 19 2023
 	- Switched result and expected in cmp_deeply to reflect fails better

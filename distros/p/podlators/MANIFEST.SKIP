@@ -1,14 +1,38 @@
 # -*- conf -*-
+#
+# Files to ignore when generating a Perl module manifest.
+#
+# The canonical version of this file is maintained in the rra-c-util package,
+# which can be found at <https://www.eyrie.org/~eagle/software/rra-c-util/>.
+#
+# Copyright 2018, 2022-2024 Russ Allbery <eagle@eyrie.org>
+#
+# Copying and distribution of this file, with or without modification, are
+# permitted in any medium without royalty provided the copyright notice and
+# this notice are preserved.  This file is offered as-is, without any
+# warranty.
+#
+# SPDX-License-Identifier: FSFAP
 
 # Avoid version control files.
 ^\.git/
 
 # Avoid generated build files.
-^Makefile$
 \bblib/
-^pm_to_blib$
 ^scripts/pod2man$
 ^scripts/pod2text$
+
+# Avoid ExtUtils::MakeMaker generated files.
+\bMakefile$
+\bpm_to_blib$
+
+# Avoid Module::Build generated and utility files.
+\bBuild$
+\b_build/
+\bBuild.bat$
+\bBuild.COM$
+\bBUILD.COM$
+\bbuild.com$
 
 # Avoid temp and backup files.
 ~$
@@ -34,8 +58,9 @@
 ^MYMETA\.
 
 # Avoid archives of this distribution
-\bpodlators-[\d\.\_]+
+\b[\w-]+-[\d\.\_]+\.tar\..z$
+\b[\w-]+-[\d\.\_]+\.zip$
 
 # CI configuration.  Do not include in the distribution so that it doesn't
 # make its way into Perl core.
-^\.github/workflow/
+^\.github/

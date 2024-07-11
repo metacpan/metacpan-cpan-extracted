@@ -1,5 +1,3 @@
-.github/dependabot.yml
-.github/workflows/build.yaml
 .gitignore
 Changes
 cpanfile
@@ -34,6 +32,7 @@ t/data/perlcriticrc
 t/data/perltidyrc
 t/data/regenerate-data
 t/data/snippets/color/escape-wrapping
+t/data/snippets/color/nonbreaking-wrap
 t/data/snippets/color/tag-width
 t/data/snippets/color/tag-wrapping
 t/data/snippets/color/width
@@ -62,18 +61,19 @@ t/data/snippets/man/guesswork-no-quoting
 t/data/snippets/man/guesswork-none
 t/data/snippets/man/guesswork-partial
 t/data/snippets/man/guesswork-quoting
-t/data/snippets/man/hyphen-in-s
 t/data/snippets/man/iso-8859-1
 t/data/snippets/man/iso-8859-1-error-die
 t/data/snippets/man/iso-8859-1-error-pod
 t/data/snippets/man/iso-8859-1-roff
 t/data/snippets/man/item-fonts
+t/data/snippets/man/item-spacing
 t/data/snippets/man/language
 t/data/snippets/man/link-quoting
 t/data/snippets/man/link-to-url
 t/data/snippets/man/long-quote
 t/data/snippets/man/lquote-and-quote
 t/data/snippets/man/lquote-rquote
+t/data/snippets/man/man-l
 t/data/snippets/man/markup-in-name
 t/data/snippets/man/multiline-x
 t/data/snippets/man/naive
@@ -99,10 +99,12 @@ t/data/snippets/man/utf8-verbatim
 t/data/snippets/man/x-whitespace
 t/data/snippets/man/x-whitespace-entry
 t/data/snippets/man/zero-width-space
+t/data/snippets/overstrike/nonbreaking-wrap
 t/data/snippets/overstrike/tag-width
 t/data/snippets/overstrike/wrapping
 t/data/snippets/README.md
 t/data/snippets/termcap/escape-wrapping
+t/data/snippets/termcap/nonbreaking-wrap
 t/data/snippets/termcap/tag-width
 t/data/snippets/termcap/tag-wrapping
 t/data/snippets/termcap/term-unknown
@@ -136,6 +138,7 @@ t/data/snippets/text/name-quotes-none
 t/data/snippets/text/non-latin
 t/data/snippets/text/nonbreaking-space
 t/data/snippets/text/nonbreaking-space-l
+t/data/snippets/text/nonbreaking-wrap
 t/data/snippets/text/nourls
 t/data/snippets/text/periods
 t/data/snippets/text/quotes-opt

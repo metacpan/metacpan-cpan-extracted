@@ -1,5 +1,17 @@
 2024-07-08  Brian M. Kelly  <Brian.Kelly@fullauto.com>
 
+        * Version 3.033
+
+        * Fixed ||= to just || for abs_path
+
+2024-07-08  Brian M. Kelly  <Brian.Kelly@fullauto.com>
+
+        * Version 3.032
+
+	* Applied not number error in other places
+
+2024-07-08  Brian M. Kelly  <Brian.Kelly@fullauto.com>
+
         * Version 3.031
 
         * Fixed not number error for banner input

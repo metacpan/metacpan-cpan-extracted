@@ -19,6 +19,11 @@
 #
 #######################################################################
 
+2024-07-10  Brian M. Kelly <Brian.Kelly@fullauto.com>
+
+        * Version 1.0000664 released
+
+	* Fixed display() issue
 
 2024-06-30  Brian M. Kelly <Brian.Kelly@fullauto.com>
 

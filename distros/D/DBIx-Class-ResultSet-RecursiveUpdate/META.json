@@ -46,11 +46,12 @@
             "DBD::SQLite" : "1.21",
             "DBIx::Class" : "0.08103",
             "DBIx::Class::IntrospectableM2M" : "0",
-            "Data::Dumper::Concise" : "2.020",
+            "Data::Dumper::Concise" : "2.02",
             "DateTime" : "0",
             "List::MoreUtils" : "0.22",
             "SQL::Translator" : "0.11016",
-            "Try::Tiny" : "0.30"
+            "Try::Tiny" : "0.3",
+            "perl" : "5.014"
          }
       },
       "test" : {
@@ -59,7 +60,7 @@
             "Test::Exception" : "0.43",
             "Test::More" : "0.88",
             "Test::Trap" : "v0.2.2",
-            "Test::Warn" : "0.20"
+            "Test::Warn" : "0.2"
          }
       }
    },
@@ -74,7 +75,7 @@
          "web" : "http://github.com/gshank/dbix-class-resultset-recursiveupdate"
       }
    },
-   "version" : "0.43",
+   "version" : "0.44",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.040000"
@@ -140,7 +141,7 @@
             "class" : "Dist::Zilla::Plugin::MakeMaker",
             "config" : {
                "Dist::Zilla::Role::TestRunner" : {
-                  "default_jobs" : "16"
+                  "default_jobs" : 1
                }
             },
             "name" : "@Basic/MakeMaker",
@@ -387,7 +388,7 @@
                   "branch" : null,
                   "changelog" : "Changes",
                   "signed" : 0,
-                  "tag" : "0.43",
+                  "tag" : "0.44",
                   "tag_format" : "%v",
                   "tag_message" : "%v"
                },
@@ -420,26 +421,9 @@
             "version" : "2.051"
          },
          {
-            "class" : "Dist::Zilla::Plugin::Prereqs",
-            "config" : {
-               "Dist::Zilla::Plugin::Prereqs" : {
-                  "phase" : "runtime",
-                  "type" : "requires"
-               }
-            },
-            "name" : "Prereqs",
-            "version" : "6.032"
-         },
-         {
-            "class" : "Dist::Zilla::Plugin::Prereqs",
-            "config" : {
-               "Dist::Zilla::Plugin::Prereqs" : {
-                  "phase" : "test",
-                  "type" : "requires"
-               }
-            },
-            "name" : "TestRequires",
-            "version" : "6.032"
+            "class" : "Dist::Zilla::Plugin::Prereqs::FromCPANfile",
+            "name" : "Prereqs::FromCPANfile",
+            "version" : "0.08"
          },
          {
             "class" : "Dist::Zilla::Plugin::FinderCode",

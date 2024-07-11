@@ -13,7 +13,7 @@ msgstr "%1 Elément"
 
 #: html/Admin/FormTools/Modify.html:212 html/Admin/FormTools/Modify.html:221 html/Admin/FormTools/Modify.html:499 html/Admin/FormTools/Modify.html:508
 msgid "(no value)"
-msgstr ""
+msgstr "(sans information)"
 
 #: html/Admin/FormTools/Modify.html:327 html/Admin/FormTools/Modify.html:327
 msgid "Add Page"
@@ -29,7 +29,7 @@ msgstr "Avancé"
 
 #: html/Admin/FormTools/Modify.html:444 html/Admin/FormTools/Modify.html:56
 msgid "Alignment"
-msgstr "Aligement"
+msgstr "Alignement"
 
 #: html/Admin/FormTools/Modify.html:367
 msgid "Basics"
@@ -37,11 +37,11 @@ msgstr "Essentiel"
 
 #: html/Admin/Elements/FormToolsHelp:50
 msgid "Build your form using the tools below. To create new pages for a multi-page form, click the plus (+). To change the order of pages, click the gear and update the Sort order. To remove a page, click the gear and click Delete. Make sure to Save Changes at the bottom of the form after any updates."
-msgstr ""
+msgstr "Créer votre formulaire avec les outils ci-dessous. Pour ajouter une page dans un formulaire, cliquez sur le plus (+). Pour changer l'ordre des pages, cliquez sur l'engrenage et modifier l'ordre de tri. Pour supprimer une page, cliquez sur l'engrenage et sur Supprimer la page. Assurez-vous d'Enregistrer les modifications en bas de la page après chaque mise à jour."
 
 #: html/Admin/FormTools/Modify.html:447 html/Admin/FormTools/Modify.html:59
 msgid "Center"
-msgstr "iCentrer"
+msgstr "Centrer"
 
 #: html/FormTools/Field:226
 msgid "Choose file"
@@ -86,7 +86,7 @@ msgstr "Impossible d'activer %1: %2"
 #. ($msg)
 #: html/Admin/FormTools/Advanced.html:105 html/Admin/FormTools/Modify.html:673 html/Admin/FormTools/Modify.html:722
 msgid "Couldn't update content: %1"
-msgstr "Impossibl de mettre à jour le contenu: %1"
+msgstr "Impossible de mettre à jour le contenu: %1"
 
 #. ($msg)
 #: html/Admin/FormTools/Advanced.html:84
@@ -151,7 +151,7 @@ msgstr "Activé"
 #. ($name)
 #: html/Admin/FormTools/index.html:83
 msgid "Enabled %1"
-msgstr ""
+msgstr "Activé %1"
 
 #: html/Callbacks/FormTools/Elements/Tabs/Privileged:18
 msgid "Form Tools"
@@ -232,7 +232,7 @@ msgstr "Modifier"
 
 #: html/Admin/FormTools/Modify.html:339
 msgid "Modify Basics"
-msgstr "Modifier les éléments de bases"
+msgstr "Modifier les éléments de base"
 
 #: html/Admin/FormTools/Modify.html:172 html/Admin/FormTools/Modify.html:284 html/Admin/FormTools/Modify.html:39 html/Admin/FormTools/Modify.html:427 html/Admin/FormTools/Modify.html:94
 msgid "Modify Element"
@@ -341,7 +341,7 @@ msgstr "Les tickets seront créés dans cette file"
 
 #: html/Admin/Elements/FormToolsHelp:52
 msgid "To create your form, drag components from the Components box on the left to the Content area on the right. Click the pencil to edit components. Click the X to remove them. Click Save Changes to save the new page."
-msgstr ""
+msgstr "Pour créer votre formulaire, faites glisser les éléments depuis la boite Composants à gauche vers la boite Contenu à droite. Cliquez sur le crayon pour modifier les composants. Cliquez sur le X pour les supprimer. Cliquez sur Enregistrer les modifications pour enregistrer la nouvelle page."
 
 #: html/Admin/FormTools/Modify.html:113 html/Admin/FormTools/Modify.html:193 html/Admin/FormTools/Modify.html:478
 msgid "Tooltip"

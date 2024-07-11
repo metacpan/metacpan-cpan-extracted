@@ -4,7 +4,7 @@ use 5.006;
 use strict;
 use warnings;
 use utf8;
-our $VERSION = '1.02';
+our $VERSION = '1.03';
 use open ":std", ":encoding(UTF-8)";
 use base 'Import::Export';
 
@@ -341,7 +341,7 @@ Smaz - compression for very small strings!
 
 =head1 VERSION
 
-Version 1.02
+Version 1.03
 
 =cut
 
@@ -350,7 +350,7 @@ Version 1.02
 	use Smaz qw/all/;
 
 	my $comp = smaz_compress($str);
-	my $decomp = smaz_decompress($str);
+	my $decomp = smaz_decompress($comp);
 
 =head1 DESCRIPTION
 
@@ -408,10 +408,6 @@ You can also look for information at:
 =item * RT: CPAN's request tracker (report bugs here)
 
 L<https://rt.cpan.org/NoAuth/Bugs.html?Dist=Smaz>
-
-=item * CPAN Ratings
-
-L<https://cpanratings.perl.org/d/Smaz>
 
 =item * Search CPAN
 

@@ -3,6 +3,9 @@
 
 class R::NDArray::Int extends R::NDArray {
   
+  use R::OP::Byte;
+  use R::OP::Short;
+  
   # Fields
   method data : int[] () {
     
@@ -20,11 +23,6 @@ class R::NDArray::Int extends R::NDArray {
   }
   
   # Instance Methods
-  protected method init : void ($options : object[] = undef) {
-    
-    $self->SUPER::init($options);
-  }
-  
   protected method create_default_data : int[] ($length : int = 0) {
     
     unless ($length >= 0) {
@@ -62,19 +60,51 @@ class R::NDArray::Int extends R::NDArray {
     return $cmp;
   }
   
-  method clone : R::NDArray::Int ($elem_shallow_clone : int = 0) {
-    return (R::NDArray::Int)$self->SUPER::clone($elem_shallow_clone);
+  method clone : R::NDArray::Int ($shallow : int = 0) {
+    return (R::NDArray::Int)$self->SUPER::clone($shallow);
   }
   
-  method slice : R::NDArray::Int ($vector_indexes : R::NDArray::Int[]) {
-    return (R::NDArray::Int)$self->SUPER::slice($vector_indexes);
+  method slice : R::NDArray::Int ($asix_indexes_product : R::NDArray::Int[]) {
+    return (R::NDArray::Int)$self->SUPER::slice($asix_indexes_product);
+  }
+  
+  precompile method to_byte_ndarray : R::NDArray::Byte () {
+    
+    my $length = $self->length;
+    
+    my $dim = $self->dim;
+    
+    my $ret_ndarray = R::OP::Byte->c(undef, $dim);
+    
+    my $data = $self->data;
+    my $ret_data = $ret_ndarray->data;
+    
+    for (my $i = 0; $i < $length; $i++) {
+      $ret_data->[$i] = (byte)$data->[$i];
+    }
+    
+    return $ret_ndarray;
+  }
+  
+  precompile method to_short_ndarray : R::NDArray::Short () {
+    
+    my $length = $self->length;
+    
+    my $dim = $self->dim;
+    
+    my $ret_ndarray = R::OP::Short->c(undef, $dim);
+    
+    my $data = $self->data;
+    my $ret_data = $ret_ndarray->data;
+    
+    for (my $i = 0; $i < $length; $i++) {
+      $ret_data->[$i] = (short)$data->[$i];
+    }
+    
+    return $ret_ndarray;
   }
   
   precompile method to_long_ndarray : R::NDArray::Long () {
-    
-    unless ($self) {
-      die "The n-dimension array \$self must be defined.";
-    }
     
     my $length = $self->length;
     
@@ -94,10 +124,6 @@ class R::NDArray::Int extends R::NDArray {
   
   precompile method to_float_ndarray : R::NDArray::Float () {
     
-    unless ($self) {
-      die "The n-dimension array \$self must be defined.";
-    }
-    
     my $length = $self->length;
     
     my $dim = $self->dim;
@@ -116,10 +142,6 @@ class R::NDArray::Int extends R::NDArray {
   
   precompile method to_double_ndarray : R::NDArray::Double () {
     
-    unless ($self) {
-      die "The n-dimension array \$self must be defined.";
-    }
-    
     my $length = $self->length;
     
     my $dim = $self->dim;
@@ -136,78 +158,10 @@ class R::NDArray::Int extends R::NDArray {
     return $ret_ndarray;
   }
   
-  precompile method to_float_complex_ndarray : R::NDArray::FloatComplex () {
-    
-    unless ($self) {
-      die "The n-dimension array \$self must be defined.";
-    }
-    
-    my $length = $self->length;
-    
-    my $dim = $self->dim;
-    
-    my $ret_ndarray = R::OP::FloatComplex->c(undef, $dim);
-    
-    my $data = $self->data;
-    my $ret_data = $ret_ndarray->data;
-    
-    for (my $i = 0; $i < $length; $i++) {
-      $ret_data->[$i]{re} = (float)$data->[$i];
-      $ret_data->[$i]{im} = 0f;
-    }
-    
-    return $ret_ndarray;
-  }
-  
-  precompile method to_double_complex_ndarray : R::NDArray::DoubleComplex () {
-    
-    unless ($self) {
-      die "The n-dimension array \$self must be defined.";
-    }
-    
-    my $length = $self->length;
-    
-    my $dim = $self->dim;
-    
-    my $ret_ndarray = R::OP::DoubleComplex->c(undef, $dim);
-    
-    my $data = $self->data;
-    my $ret_data = $ret_ndarray->data;
-    
-    for (my $i = 0; $i < $length; $i++) {
-      $ret_data->[$i]{re} = (double)$data->[$i];
-      $ret_data->[$i]{im} = 0;
-    }
-    
-    return $ret_ndarray;
-  }
-  
-  precompile method to_string_ndarray : R::NDArray::String () {
-    
-    unless ($self) {
-      die "The n-dimension array \$self must be defined.";
-    }
-    
-    my $length = $self->length;
-    
-    my $dim = $self->dim;
-    
-    my $ret_ndarray = R::OP::String->c(undef, $dim);
-    
-    my $data = $self->data;
-    my $ret_data = $ret_ndarray->data;
-    
-    for (my $i = 0; $i < $length; $i++) {
-      $ret_data->[$i] = (string)$data->[$i];
-    }
-    
-    return $ret_ndarray;
-  }
-  
   precompile method to_indexes : R::NDArray::Int () {
     
     unless ($self->is_vector) {
-      die "The n-dimension array \$self must be a vector.";
+      die "This n-dimensional array must be a vector.";
     }
     
     my $length = $self->length;

@@ -10,7 +10,7 @@ build_requires:
   Test::Exception: '0.43'
   Test::More: '0.88'
   Test::Trap: v0.2.2
-  Test::Warn: '0.20'
+  Test::Warn: '0.2'
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 0
@@ -29,15 +29,16 @@ requires:
   DBD::SQLite: '1.21'
   DBIx::Class: '0.08103'
   DBIx::Class::IntrospectableM2M: '0'
-  Data::Dumper::Concise: '2.020'
+  Data::Dumper::Concise: '2.02'
   DateTime: '0'
   List::MoreUtils: '0.22'
   SQL::Translator: '0.11016'
-  Try::Tiny: '0.30'
+  Try::Tiny: '0.3'
+  perl: '5.014'
 resources:
   bugtracker: https://github.com/gshank/dbix-class-resultset-recursiveupdate/issues
   repository: git://github.com/gshank/dbix-class-resultset-recursiveupdate
-version: '0.43'
+version: '0.44'
 x_Dist_Zilla:
   perl:
     version: '5.040000'
@@ -91,7 +92,7 @@ x_Dist_Zilla:
       class: Dist::Zilla::Plugin::MakeMaker
       config:
         Dist::Zilla::Role::TestRunner:
-          default_jobs: '16'
+          default_jobs: 1
       name: '@Basic/MakeMaker'
       version: '6.032'
     -
@@ -282,7 +283,7 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: '0.43'
+          tag: '0.44'
           tag_format: '%v'
           tag_message: '%v'
         Dist::Zilla::Role::Git::Repo:
@@ -305,21 +306,9 @@ x_Dist_Zilla:
       name: '@Git/Push'
       version: '2.051'
     -
-      class: Dist::Zilla::Plugin::Prereqs
-      config:
-        Dist::Zilla::Plugin::Prereqs:
-          phase: runtime
-          type: requires
-      name: Prereqs
-      version: '6.032'
-    -
-      class: Dist::Zilla::Plugin::Prereqs
-      config:
-        Dist::Zilla::Plugin::Prereqs:
-          phase: test
-          type: requires
-      name: TestRequires
-      version: '6.032'
+      class: Dist::Zilla::Plugin::Prereqs::FromCPANfile
+      name: Prereqs::FromCPANfile
+      version: '0.08'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':InstallModules'

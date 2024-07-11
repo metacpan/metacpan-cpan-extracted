@@ -4,7 +4,7 @@ use strict;
 use warnings;
 
 use XSLoader;
-our $VERSION = '0.002000';
+our $VERSION = '0.003000';
 XSLoader::load(__PACKAGE__, $VERSION);
 
 1;
@@ -21,7 +21,7 @@ Cache::utLRU - A Perl LRU cache using the uthash library
 
 =head1 VERSION
 
-Version 0.002000
+Version 0.003000
 
 =head1 DESCRIPTION
 

@@ -1,14 +1,16 @@
 .editorconfig
 Build.PL
 Changes
+hax/newOP_CUSTOM.c.inc
 lib/Syntax/Operator/Is.pm
 lib/Syntax/Operator/Is.xs
+LICENSE
 MANIFEST			This list of files
+META.json
+META.yml
+README
 t/00use.t
 t/01is.t
+t/10inline-is.t
 t/80match-is.t
 t/99pod.t
-README
-LICENSE
-META.yml
-META.json

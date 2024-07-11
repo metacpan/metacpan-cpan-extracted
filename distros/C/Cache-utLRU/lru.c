@@ -59,7 +59,8 @@ SV* cache_find(pTHX_ Cache* cache, SV* key)
     CacheEntry* entry;
     HASH_FIND(hh, cache->data, kptr, klen, entry);
     if (!entry) {
-        return NULL;
+        /* return NULL; */
+        return &PL_sv_undef;
     }
 
     /*

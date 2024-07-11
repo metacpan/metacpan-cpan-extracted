@@ -46,11 +46,11 @@ DateTime::Format::Genealogy - Create a DateTime object from a Genealogy Date
 
 =head1 VERSION
 
-Version 0.08
+Version 0.09
 
 =cut
 
-our $VERSION = '0.08';
+our $VERSION = '0.09';
 
 =head1 SYNOPSIS
 
@@ -172,7 +172,7 @@ sub parse_datetime {
 			} elsif($date =~ /^(\d{1,2})\s+Mai\s+(\d{3,4})$/i) {
 				# I've seen a tree that uses some French months
 				$date = "$1 May $2";
-			} elsif($date =~ /^(\d{1,2})\-([A-Z]{3}+)\-(\d{3,4})$/i) {
+			} elsif($date =~ /^(\d{1,2})\-([A-Z]{3})\-(\d{3,4})$/i) {
 				# 29-Aug-1938
 				$date = "$1 $2 $3";
 			}

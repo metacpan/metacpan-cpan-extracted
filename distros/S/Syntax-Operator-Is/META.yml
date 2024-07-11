@@ -6,6 +6,7 @@ build_requires:
   ExtUtils::CBuilder: '0'
   Test2::V0: '0'
 configure_requires:
+  Data::Checks::Builder: '0.06'
   Module::Build: '0.4004'
   XS::Parse::Infix::Builder: '0.43'
 dynamic_config: 1
@@ -18,12 +19,13 @@ name: Syntax-Operator-Is
 provides:
   Syntax::Operator::Is:
     file: lib/Syntax/Operator/Is.pm
-    version: '0.01'
+    version: '0.02'
 requires:
+  Data::Checks: '0.06'
   XS::Parse::Infix: '0.43'
   perl: '5.014'
 resources:
   IRC: irc://irc.perl.org/#io-async
   license: http://dev.perl.org/licenses/
-version: '0.01'
+version: '0.02'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -7,7 +7,7 @@ Comment: This file documents the copyright statements and licenses for
  range specifies every single year in that closed interval.
 
 Files: *
-Copyright: 1999-2010, 2012-2020, 2022 Russ Allbery <rra@cpan.org>
+Copyright: 1999-2020, 2022-2024 Russ Allbery <rra@cpan.org>
   2000 Joe Smith <Joe.Smith@inwap.com>
   2016 Niko Tyni <ntyni@iki.fi>
 License: Perl
@@ -17,6 +17,20 @@ License: Perl
  Artistic License.  Please see your Perl distribution for the details and
  copies of the licenses.
 
+Files: MANIFEST.SKIP pod/perlpodstyle.pod t/data/basic.cap t/data/basic.clr
+ t/data/basic.man t/data/basic.ovr t/data/basic.pod t/data/basic.txt
+ t/data/man/encoding.groff t/data/man/encoding.pod t/data/man/encoding.roff
+ t/data/man/encoding.utf8 t/data/perltidyrc t/data/snippets/README.md
+Copyright: 1999-2001, 2004, 2006, 2008, 2010, 2015-2016, 2018, 2022
+    Russ Allbery <rra@cpan.org>
+  2012-2013 The Board of Trustees of the Leland Stanford Junior University
+  2018, 2021-2024 Russ Allbery <eagle@eyrie.org>
+License: all-permissive
+ Copying and distribution of this file, with or without modification, are
+ permitted in any medium without royalty provided the copyright notice and
+ this notice are preserved.  This file is offered as-is, without any
+ warranty.
+
 Files: docs/docknot.yaml t/data/perlcriticrc t/docs/changes.t
  t/docs/pod-spelling.t t/docs/pod.t t/docs/spdx-license.t t/docs/synopsis.t
  t/lib/Test/RRA.pm t/lib/Test/RRA/Config.pm t/lib/Test/RRA/ModuleVersion.pm
@@ -24,7 +38,7 @@ Files: docs/docknot.yaml t/data/perlcriticrc t/docs/changes.t
  t/style/module-version.t t/style/obsolete-strings.t t/style/strict.t
 Copyright: 1999-2010, 2012-2022 Russ Allbery <rra@cpan.org>
   2011-2014 The Board of Trustees of the Leland Stanford Junior University
-  2014-2016, 2018-2022 Russ Allbery <eagle@eyrie.org>
+  2014-2016, 2018-2024 Russ Allbery <eagle@eyrie.org>
 License: Expat
  Permission is hereby granted, free of charge, to any person obtaining a
  copy of this software and associated documentation files (the
@@ -44,18 +58,3 @@ License: Expat
  CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT
  OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR
  THE USE OR OTHER DEALINGS IN THE SOFTWARE.
-
-Files: pod/perlpodstyle.pod t/data/basic.cap t/data/basic.clr
- t/data/basic.man t/data/basic.ovr t/data/basic.pod t/data/basic.txt
- t/data/man/encoding.groff t/data/man/encoding.pod t/data/man/encoding.roff
- t/data/man/encoding.utf8 t/data/perltidyrc t/data/snippets/README.md
-Copyright: 1999-2001, 2004, 2006, 2008, 2010, 2015-2016, 2018, 2022
-    Russ Allbery <rra@cpan.org>
-  2012-2013 The Board of Trustees of the Leland Stanford Junior University
-  2021-2022 Russ Allbery <eagle@eyrie.org>
-License: all-permissive
- Copying and distribution of this file, with or without modification, are
- permitted in any medium without royalty provided the copyright notice and
- this notice are preserved.  This file is offered as-is, without any
- warranty.
-

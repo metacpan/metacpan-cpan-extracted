@@ -1,23 +1,23 @@
 # Copyright (c) 2024 Yuki Kimoto
 # MIT License
 
-class R::OP::Object {
+class R::OP::AnyObject {
   
   use R::OP;
   
   # Class Methods
-  static method c : R::NDArray::Object ($data : object of object[]|R::NDArray::Object, $dim : int[] = undef) {
+  static method c : R::NDArray::AnyObject ($data : object of object[]|R::NDArray::AnyObject, $dim : int[] = undef) {
     
     if ($data) {
       if (Fn->is_object_array($data)) {
         # Do nothing
       }
-      elsif ($data is_type R::NDArray::Object) {
+      elsif ($data is_type R::NDArray::AnyObject) {
         unless ($dim) {
-          $dim = $data->(R::NDArray::Object)->dim;
+          $dim = $data->(R::NDArray::AnyObject)->dim;
         }
         
-        $data = $data->(R::NDArray::Object)->data;
+        $data = $data->(R::NDArray::AnyObject)->data;
       }
       else {
         my $is_type_ok = $data is_type object[];
@@ -28,11 +28,11 @@ class R::OP::Object {
         
         warn type_name $data;
         
-        die "The type of the data \data must be an object array or R::NDArray::Object.";
+        die "The type of the data \data must be an object array or R::NDArray::AnyObject.";
       }
     }
     
-    my $ndarray = R::NDArray::Object->new({dim => $dim, data => $data});
+    my $ndarray = R::NDArray::AnyObject->new({dim => $dim, data => $data});
     
     return $ndarray;
   }

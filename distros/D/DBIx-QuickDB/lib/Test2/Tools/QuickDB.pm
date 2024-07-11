@@ -2,7 +2,7 @@ package Test2::Tools::QuickDB;
 use strict;
 use warnings;
 
-our $VERSION = '0.000034';
+our $VERSION = '0.000035';
 
 use Carp qw/croak/;
 use Test2::API qw/context/;
@@ -111,7 +111,7 @@ This is a test library build around DBIx::QuickDB.
 
     skipall_unless_can_db(driver => 'PostgreSQL');
 
-    my $db = get_db(driver => 'PostgreSQL', load_sql => 't/schema/postgresql.sql'});
+    my $db = get_db({driver => 'PostgreSQL', load_sql => 't/schema/postgresql.sql'});
 
     ...
 

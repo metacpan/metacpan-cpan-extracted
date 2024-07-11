@@ -1,6 +1,6 @@
 package SPVM::R;
 
-our $VERSION = "0.007";
+our $VERSION = "0.008";
 
 1;
 
@@ -82,7 +82,7 @@ L<SPVM::R Tutorial|https://github.com/yuki-kimoto/SPVM-R/wiki/SPVM%3A%3AR-Tutori
 
 =item * L<R::NDArray::Long|SPVM::R::NDArray::Long>
 
-=item * L<R::NDArray::Object|SPVM::R::NDArray::Object>
+=item * L<R::NDArray::AnyObject|SPVM::R::NDArray::AnyObject>
 
 =item * L<R::NDArray::String|SPVM::R::NDArray::String>
 
@@ -114,7 +114,7 @@ L<SPVM::R Tutorial|https://github.com/yuki-kimoto/SPVM-R/wiki/SPVM%3A%3AR-Tutori
 
 =item * L<R::OP::DoubleComplex|SPVM::R::OP::DoubleComplex>
 
-=item * L<R::OP::Object|SPVM::R::OP::Object>
+=item * L<R::OP::AnyObject|SPVM::R::OP::AnyObject>
 
 =item * L<R::OP::String|SPVM::R::OP::String>
 

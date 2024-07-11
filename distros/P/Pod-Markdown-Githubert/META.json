@@ -35,15 +35,15 @@
       },
       "develop" : {
          "requires" : {
-            "Pod::Markdown" : "3.005",
+            "Pod::Markdown::Githubert" : "0.03",
             "Pod::Text" : "4.09",
             "Test::Pod" : "1.22"
          }
       },
       "runtime" : {
          "requires" : {
-            "Pod::Markdown" : "0",
-            "perl" : "5.010000",
+            "Pod::Markdown" : "3.200",
+            "perl" : "5.012000",
             "strict" : "0",
             "warnings" : "0"
          }
@@ -63,6 +63,6 @@
          "web" : "https://github.com/mauke/Pod-Markdown-Githubert"
       }
    },
-   "version" : "0.03",
+   "version" : "0.04",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

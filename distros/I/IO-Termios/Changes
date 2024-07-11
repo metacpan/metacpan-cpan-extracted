@@ -1,5 +1,11 @@
 Revision history for IO-Termios
 
+0.10    2024-07-10
+        [CHANGES]
+         * Module style updates:
+            + Use perl 5.14 `package NAME VER` syntax
+            + Use Test2::V0 instead of Test::More + Test::LongString
+
 0.09    2020-09-03 22:48
         [CHANGES]
          * Added ->setflags convenience function for setting multiple flags at

@@ -49,13 +49,13 @@ class R::OP {
   precompile static method rep : R::NDArray ($x_ndarray : R::NDArray, $times : int) {
     
     unless ($x_ndarray) {
-      die "The n-dimension array \$x_ndarray must be defined.";
+      die "The n-dimensional array \$x_ndarray must be defined.";
     }
     
     my $x_dim = $x_ndarray->dim;
     
     unless ($x_ndarray->is_vector) {
-      die "The n-dimension array \$x_ndarray must be a vector.";
+      die "The n-dimensional array \$x_ndarray must be a vector.";
     }
     
     unless ($times >= 0) {
@@ -88,7 +88,7 @@ class R::OP {
   precompile static method rep_length : R::NDArray ($x_ndarray : R::NDArray, $length : int) {
     
     unless ($x_ndarray) {
-      die "The n-dimension array \$x_ndarray must be defined.";
+      die "The n-dimensional array \$x_ndarray must be defined.";
     }
     
     my $x_length = $x_ndarray->length;
@@ -100,7 +100,7 @@ class R::OP {
     my $times = 0;
     if ($length > 0) {
       unless ($length % $x_length == 0) {
-        die "The length \$length must be devided by the length of n-dimension array \$x_ndarray.";
+        die "The length \$length must be devided by the length of n-dimensional array \$x_ndarray.";
       }
       
       $times = $length / $x_length;

@@ -1,7 +1,7 @@
 {
    "abstract" : "The great new Acme::MyFirstModule::BDFOY!",
    "author" : [
-      "brian d foy <bdfoy@cpan.org>"
+      "brian d foy <briandfoy@pobox.com>"
    ],
    "dynamic_config" : 1,
    "generated_by" : "ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010",
@@ -70,6 +70,6 @@
          "web" : "https://github.com/briandfoy/Acme-MyFirstModule-BDFOY"
       }
    },
-   "version" : "0.012",
+   "version" : "0.019",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

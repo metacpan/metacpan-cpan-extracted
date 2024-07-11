@@ -23,11 +23,6 @@ class R::NDArray::Byte extends R::NDArray {
   }
   
   # Instance Methods
-  protected method init : void ($options : object[] = undef) {
-    
-    $self->SUPER::init($options);
-  }
-  
   method create_default_data : byte[] ($length : int = 0) {
     
     unless ($length >= 0) {
@@ -65,12 +60,30 @@ class R::NDArray::Byte extends R::NDArray {
     return $cmp;
   }
   
-  method clone : R::NDArray::Byte ($elem_shallow_clone : int = 0) {
-    return (R::NDArray::Byte)$self->SUPER::clone($elem_shallow_clone);
+  method clone : R::NDArray::Byte ($shallow : int = 0) {
+    return (R::NDArray::Byte)$self->SUPER::clone($shallow);
   }
   
-  method slice : R::NDArray::Byte ($vector_indexes : R::NDArray::Int[]) {
-    return (R::NDArray::Byte)$self->SUPER::slice($vector_indexes);
+  method slice : R::NDArray::Byte ($asix_indexes_product : R::NDArray::Int[]) {
+    return (R::NDArray::Byte)$self->SUPER::slice($asix_indexes_product);
+  }
+  
+  precompile method to_int_ndarray : R::NDArray::Int () {
+    
+    my $length = $self->length;
+    
+    my $dim = $self->dim;
+    
+    my $ret_ndarray = R::OP::Int->c(undef, $dim);
+    
+    my $data = $self->data;
+    my $ret_data = $ret_ndarray->data;
+    
+    for (my $i = 0; $i < $length; $i++) {
+      $ret_data->[$i] = (int)$data->[$i];
+    }
+    
+    return $ret_ndarray;
   }
   
 }

@@ -15,10 +15,14 @@ my $build = Module::Build->new(
    },
    configure_requires => {
       'Module::Build' => '0.4004', # test_requires
+
+      'Data::Checks::Builder' => '0.06',
       'XS::Parse::Infix::Builder' => '0.43',
    },
    requires => {
       'perl' => '5.014', # pluggable keywords, XOP
+
+      'Data::Checks' => '0.06',
       'XS::Parse::Infix' => '0.43',
    },
    license => 'perl',

@@ -2,7 +2,7 @@ use strict;
 use warnings;
 
 package DBIx::Class::ResultSet::RecursiveUpdate;
-$DBIx::Class::ResultSet::RecursiveUpdate::VERSION = '0.43';
+$DBIx::Class::ResultSet::RecursiveUpdate::VERSION = '0.44';
 # ABSTRACT: like update_or_create - but recursive
 
 use base qw(DBIx::Class::ResultSet);
@@ -36,7 +36,8 @@ sub recursive_update {
 }
 
 package DBIx::Class::ResultSet::RecursiveUpdate::Functions;
-$DBIx::Class::ResultSet::RecursiveUpdate::Functions::VERSION = '0.43';
+$DBIx::Class::ResultSet::RecursiveUpdate::Functions::VERSION = '0.44';
+use v5.14; # for non-destructive substitution regex modifier
 use Carp::Clan qw/^DBIx::Class|^HTML::FormHandler|^Try::Tiny/;
 use Scalar::Util qw( blessed );
 use List::MoreUtils qw/ any all none /;
@@ -964,7 +965,7 @@ DBIx::Class::ResultSet::RecursiveUpdate - like update_or_create - but recursive
 
 =head1 VERSION
 
-version 0.43
+version 0.44
 
 =head1 SYNOPSIS
 

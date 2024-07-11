@@ -15,7 +15,7 @@ package Term::Menus;
 ## See user documentation at the end of this file.  Search for =head
 
 
-our $VERSION = '3.031';
+our $VERSION = '3.033';
 
 
 use 5.006;
@@ -808,13 +808,13 @@ BEGIN { ##  Begin  Net::FullAuto  Settings
                             "From CMD arg: fa --fa_conf $A{$e}"];
                }
             }
-            my $abspath=abs_path($0);
+            my $abspath=abs_path($0)||'';
             $abspath=~s/\.exe$//;
             $abspath.='.pl';
             if (defined $main::fa_code && $main::fa_code) {
                $new_user_flag=0;
                $fa_code=$main::fa_code;
-               my $p=abs_path($0);
+               my $p=abs_path($0)||'';
                $fa_code=[$fa_code,
                          "From \$fa_code variable in $abspath"];
             }
@@ -839,7 +839,7 @@ BEGIN { ##  Begin  Net::FullAuto  Settings
          }
       } else {
          $new_user_flag=0;
-         my $abspath=abs_path($0);
+         my $abspath=abs_path($0)||'';
          $abspath=~s/\.exe$//;
          $abspath.='.pl';
          $fa_code=[$fa_code,

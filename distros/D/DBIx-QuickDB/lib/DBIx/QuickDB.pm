@@ -2,7 +2,7 @@ package DBIx::QuickDB;
 use strict;
 use warnings;
 
-our $VERSION = '0.000034';
+our $VERSION = '0.000035';
 
 use Carp;
 use List::Util qw/first/;
@@ -161,6 +161,10 @@ run-time and you have to store them in variables.
 =item QDB_TMPDIR
 
 Set this env var if you want QDB to use a temp dir other than the default.
+
+=item DB_VERBOSE
+
+Set this env var to get STDOUT from the database server.
 
 =back
 

@@ -1,5 +1,8 @@
 Revision history for Perl extension Tk::ColorEntry.
 
+0.08  Wed Jun 10 2024
+	- Removed annoying print statements
+
 0.07  Sun Jun 09 2024
 	- updated and corrected documentation
 
@@ -24,19 +27,12 @@ Revision history for Perl extension Tk::ColorEntry.
 	-made the Recent tab into a scrolled Pane
 	-fixed and updated documentation
 
+0.01  Tue Mar 21 2023
+	- initial release
+
 0.01  Fri Mar 17 14:02:40 2023
 	- original version; created by h2xs 1.23 with options
 		-X Tk::ColorEntry
-0.01  Tue Mar 21
-	- initial release
 
-0.02  Fri Mar 24 2023
-	-added -command option to ColorEntry.pm
-	-added -variable option to ColorEntry.pm
-	-added -balloon option to ColorPicker.pm
-	-added popCancel method to ColorPop and ColorEntry
-	-fixed history storing/retrieving
-	-made the Recent tab into a scrolled Pane
-	-fixed and updated documentation
 
 	

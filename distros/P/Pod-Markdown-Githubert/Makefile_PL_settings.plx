@@ -13,7 +13,7 @@ return {
         'HTML::Entities' => 0,
     },
     PREREQ_PM => {
-        'Pod::Markdown' => 0,
+        'Pod::Markdown' => '3.200',
         'warnings'      => 0,
         'strict'        => 0,
     },

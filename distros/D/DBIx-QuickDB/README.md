@@ -43,6 +43,10 @@ run-time and you have to store them in variables.
 
     Set this env var if you want QDB to use a temp dir other than the default.
 
+- DB\_VERBOSE
+
+    Set this env var to get STDOUT from the database server.
+
 # METHODS
 
 - $db = DBIx::QuickDB->build\_db();

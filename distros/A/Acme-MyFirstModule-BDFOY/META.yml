@@ -1,7 +1,7 @@
 ---
 abstract: 'The great new Acme::MyFirstModule::BDFOY!'
 author:
-  - 'brian d foy <bdfoy@cpan.org>'
+  - 'brian d foy <briandfoy@pobox.com>'
 build_requires:
   Test::Builder: '1.001006'
   Test::Builder::Tester: '1.04'
@@ -38,5 +38,5 @@ resources:
   bugtracker: https://github.com/briandfoy/Acme-MyFirstModule-BDFOY/issues
   homepage: https://github.com/briandfoy/Acme-MyFirstModule-BDFOY
   repository: https://github.com/briandfoy/Acme-MyFirstModule-BDFOY
-version: '0.012'
+version: '0.019'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

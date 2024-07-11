@@ -1,5 +1,62 @@
                       Revision history for podlators
 
+v6.0.0 - 2024-07-10
+
+ - Drop support for Perl 5.10.  podlators now requires Perl 5.12 or later.
+
+ - podlators now uses semantic versioning for the package and module
+   versions, with a v prefix to work with Perl's packaging system.
+
+ - Pod::Man now translates all "-" characters in the input into *roff "\-"
+   escapes (normally rendered as an ASCII hyphen-minus, U+002D) rather
+   than using fragile heuristics to decide which characters represent true
+   hyphens and which represent ASCII hyphen-minus.  The previous
+   heuristics misrendered command names such as apt-get, causing search
+   and cut-and-paste issues.  This change may cause line-break issues with
+   long hyphenated phrases.  In cases where the intent is a true hyphen,
+   consider using UTF-8 as the POD character set (declared with =encoding)
+   and using true Unicode hyphens instead of the ASCII "-" character.
+
+ - Pod::Man now disables the special *roff interpretation of "`" and "'"
+   characters as paired quotes everywhere, not just in verbatim text, thus
+   forcing them to be interpreted as the regular ASCII characters.  This
+   also disables the use of "``" and "''" for paired double-quotes.  The
+   rationale is similar to that for hyphens: there is no way to tell from
+   the POD source that the special interpretation as quotes is intended.
+   To produce paired typographic quotes in the output, use UTF-8 and
+   Unicode paired quote characters.
+
+ - Man page references in L<> that are detected as such by Pod::Simple are
+   now always formatted as man page references even if our normal
+   heuristic would not detect them.  This fixes the formatting of
+   constructions such as @@RXVT_NAME@@perl(3), which are used by packages
+   that format a man page with POD and then substitute variables into it
+   at build time.  Thanks to Marco Sirabella for the analysis and an
+   initial patch.  (GitHub #21)
+
+ - Add a workaround to Pod::Man to force persistent ragged-right
+   justification under nroff with groff 1.23.0.  Thanks to Guillem Jover
+   for the report and G. Branden Robinson for the analysis.  (GitHub #23)
+
+ - Fix wrapping of text with S<> markup in all subclasses of Pod::Text.
+   Thanks to Jim Avera for the report.  (GitHub #24)
+
+ - Pod::Man now forces a blank line after a nested list contains only
+   =item tags without bodies.  In previous versions, the blank line before
+   the next item in the surrounding =over block was not included.  Thanks
+   to Julien ÉLIE for the report.  (GitHub #26)
+
+ - Import PerlIO before checking for layers so that PerlIO::F_UTF8 is
+   available, which fixes double-encoding of output when a :utf8 layer is
+   in place and PerlIO is not imported.  Thanks to youpong for the bug
+   report, James Keenan for the elaboration, and Graham Knop for the fix.
+   (GitHub #25)
+
+ - pod2text --help now exits with status 0, not 1, matching normal UNIX
+   command behavior and the behavior of pod2man.  (GitHub #19)
+
+ - Fix tests when NO_COLOR is set in the environment.  (GitHub #20)
+
 5.01 - 2022-12-25
 
  - Guesswork (formatting rules based on heuristics intended for Perl

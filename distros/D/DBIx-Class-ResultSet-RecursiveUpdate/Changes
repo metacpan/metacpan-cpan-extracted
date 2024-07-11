@@ -1,5 +1,8 @@
 Revision history for DBIx::Class::ResultSet::RecursiveUpdate
 
+0.44      2024-07-10 14:33:33+02:00 Europe/Vienna
+    - Fix missing Perl v5.14 requirement (GH #22)
+
 0.43      2024-07-01 15:08:07+02:00 Europe/Budapest
     - Fix concurrent tests with HARNESS_OPTIONS=j<n> (GH #24)
 

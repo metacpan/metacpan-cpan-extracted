@@ -22,11 +22,6 @@ class R::NDArray::FloatComplex extends R::NDArray {
   }
   
   # Instance Methods
-  protected method init : void ($options : object[] = undef) {
-    
-    $self->SUPER::init($options);
-  }
-  
   method create_default_data : Complex_2f[] ($length : int = 0) {
     
     unless ($length >= 0) {
@@ -54,10 +49,6 @@ class R::NDArray::FloatComplex extends R::NDArray {
   
   precompile method to_double_complex_ndarray : R::NDArray::DoubleComplex () {
     
-    unless ($self) {
-      die "The n-dimension array \$self must be defined.";
-    }
-    
     my $length = $self->length;
     
     my $dim = $self->dim;
@@ -75,12 +66,12 @@ class R::NDArray::FloatComplex extends R::NDArray {
     return $ret_ndarray;
   }
   
-  method slice : R::NDArray::FloatComplex ($vector_indexes : R::NDArray::Int[]) {
-    return (R::NDArray::FloatComplex)$self->SUPER::slice($vector_indexes);
+  method slice : R::NDArray::FloatComplex ($asix_indexes_product : R::NDArray::Int[]) {
+    return (R::NDArray::FloatComplex)$self->SUPER::slice($asix_indexes_product);
   }
   
-  method clone : R::NDArray::FloatComplex ($elem_shallow_clone : int = 0) {
-    return (R::NDArray::FloatComplex)$self->SUPER::clone($elem_shallow_clone);
+  method clone : R::NDArray::FloatComplex ($shallow : int = 0) {
+    return (R::NDArray::FloatComplex)$self->SUPER::clone($shallow);
   }
   
 }

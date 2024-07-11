@@ -21,8 +21,9 @@ share {
 
     # then copy back to blib so that .packlist gets files, and
     # allows use of File::ShareDir to locate binary cross-platform
-    [ q{ cp -a %{alien.runtime.prefix}/{bin,venv,VERSION} \
-               %{alien.install.prefix}/ } ],
+    [ q{ cp -a %{alien.runtime.prefix}/bin     %{alien.install.prefix}/ } ],
+    [ q{ cp -a %{alien.runtime.prefix}/venv    %{alien.install.prefix}/ } ],
+    [ q{ cp -a %{alien.runtime.prefix}/VERSION %{alien.install.prefix}/ } ],
   ];
 };
 

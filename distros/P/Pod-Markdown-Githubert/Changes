@@ -1,3 +1,7 @@
+0.04 2024-07-11
+    - This module requires a somewhat recent Pod::Markdown. Now it also
+      formally declares a dependency on Pod::Markdown 3.200 in its metadata.
+
 0.03 2024-07-09
     - Fix rendering of $$ and I<N>th.
 

@@ -3,7 +3,7 @@ package Test::Tk;
 
 use strict;
 use warnings;
-our $VERSION = '3.03';
+our $VERSION = '3.04';
 
 use Config;
 use Test::More;
@@ -156,18 +156,17 @@ Test::Tk - Testing Tk widgets.
  
  BEGIN { use_ok('Tk::MyWidget') };
  
- createapp(
- );
+ createapp(@options);
  
  my $widget;
  if (defined $app) {
     $widget = $app->MyWidget->pack;
  }
  
- @tests = (
+ push @tests,
     [sub { return defined $widget }, 1, 'Created MyWidget'],
     [sub { return 1 }, 1, 'A demo test'],
- );
+ ;
  
  starttesting;
 
@@ -299,11 +298,10 @@ for Tcl::pTk is thinkable.
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2023 by Hans Jeuken
+Copyright (C) 2023 - 2024 by Hans Jeuken
 
 This library is free software; you can redistribute it and/or modify
-it under the same terms as Perl itself, either Perl version 5.34.0 or,
-at your option, any later version of Perl 5 you may have available.
+it under the same terms as Perl itself.
 
 =cut
 

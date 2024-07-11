@@ -1,0 +1,64 @@
+# Copyright (c) 2024 Yuki Kimoto
+# MIT License
+
+# Copyright (c) 2024 Yuki Kimoto
+# MIT License
+
+class R::NDArray::AnyObject extends R::NDArray {
+  
+  # Fields
+  method data : object[] () {
+    
+    return (object[])$self->{data};
+  }
+  
+  # Class Mehtods
+  static method new : R::NDArray::AnyObject ($options : object[] = undef) {
+    
+    my $self = new R::NDArray::AnyObject;
+    
+    $self->init($options);
+    
+    return $self;
+  }
+  
+  # Instance Methods
+  method create_default_data : object[] ($length : int = 0) {
+    
+    unless ($length >= 0) {
+      die "The length \$length must be more than or equal to 0.";
+    }
+    
+    my $data = new object[$length];
+    
+    return $data;
+  }
+  
+  method elem_to_string : string ($data : object[], $data_index : int) {
+    
+    my $elem = $data->[$data_index];
+    
+    my $string = (string)(object)$elem;
+    
+    return $string;
+  }
+  
+  method elem_assign : void ($dist_data : object[], $dist_data_index : int, $src_data : object[], $src_data_index : int) {
+    
+    $dist_data->[$dist_data_index] = $src_data->[$src_data_index];
+  }
+  
+  method elem_clone : void ($dist_data : object[], $dist_data_index : int, $src_data : object[], $src_data_index : int) {
+    
+    $dist_data->[$dist_data_index] = $src_data->[$src_data_index]->(Cloneable)->clone;
+  }
+  
+  method clone : R::NDArray::AnyObject ($shallow : int = 0) {
+    return (R::NDArray::AnyObject)$self->SUPER::clone($shallow);
+  }
+  
+  method slice : R::NDArray::AnyObject ($asix_indexes_product : R::NDArray::Int[]) {
+    return (R::NDArray::AnyObject)$self->SUPER::slice($asix_indexes_product);
+  }
+  
+}

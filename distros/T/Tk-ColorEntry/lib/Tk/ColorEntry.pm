@@ -3,7 +3,7 @@ package Tk::ColorEntry;
 use strict;
 use warnings;
 use vars qw($VERSION);
-$VERSION = '0.07';
+$VERSION = '0.08';
 use Tk;
 
 use base qw(Tk::Derived Tk::Frame);
@@ -197,7 +197,6 @@ sub popBlock {
 
 sub popDown {
 	my $self = shift;
-	print "popdown\n";
 	delete $self->{'e_save'};
 	my $color = $self->Subwidget('Entry')->get;
 	$self->Callback('-command', $color) if $self->validate($color);
@@ -215,7 +214,6 @@ sub popFlip {
 
 sub popUp {
 	my $self = shift;
-	print "popup\n";
 	my $save = $self->Subwidget('Entry')->get;
 	$self->{'e_save'} = $save;
 	my $pop = $self->cget('-popcolor');

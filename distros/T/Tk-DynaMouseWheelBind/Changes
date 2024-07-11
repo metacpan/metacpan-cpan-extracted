@@ -1,5 +1,8 @@
 Revision history for Tk::DynaMouseWheelBind
 
+0.05 Wed Jul 10 2024
+	-possible solution to failing tests. pause statement in scroll tests.
+
 0.04 Wed Jul 10 2024
 	-modified testing so testers reports are more detailed. At this moment we do not know exactly which tests fail.
 

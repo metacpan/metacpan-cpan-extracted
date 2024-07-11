@@ -10,6 +10,8 @@ lib/SPVM/R/DataFrame/Column.pm
 lib/SPVM/R/DataFrame/Column.spvm
 lib/SPVM/R/NDArray.pm
 lib/SPVM/R/NDArray.spvm
+lib/SPVM/R/NDArray/AnyObject.pm
+lib/SPVM/R/NDArray/AnyObject.spvm
 lib/SPVM/R/NDArray/Byte.pm
 lib/SPVM/R/NDArray/Byte.spvm
 lib/SPVM/R/NDArray/Double.pm
@@ -26,8 +28,6 @@ lib/SPVM/R/NDArray/Int.pm
 lib/SPVM/R/NDArray/Int.spvm
 lib/SPVM/R/NDArray/Long.pm
 lib/SPVM/R/NDArray/Long.spvm
-lib/SPVM/R/NDArray/Object.pm
-lib/SPVM/R/NDArray/Object.spvm
 lib/SPVM/R/NDArray/Short.pm
 lib/SPVM/R/NDArray/Short.spvm
 lib/SPVM/R/NDArray/String.pm
@@ -38,6 +38,8 @@ lib/SPVM/R/NDArray/Time/Piece.pm
 lib/SPVM/R/NDArray/Time/Piece.spvm
 lib/SPVM/R/OP.pm
 lib/SPVM/R/OP.spvm
+lib/SPVM/R/OP/AnyObject.pm
+lib/SPVM/R/OP/AnyObject.spvm
 lib/SPVM/R/OP/Byte.pm
 lib/SPVM/R/OP/Byte.spvm
 lib/SPVM/R/OP/DataFrame.pm
@@ -72,8 +74,6 @@ lib/SPVM/R/OP/Matrix/FloatComplex.config
 lib/SPVM/R/OP/Matrix/FloatComplex.cpp
 lib/SPVM/R/OP/Matrix/FloatComplex.pm
 lib/SPVM/R/OP/Matrix/FloatComplex.spvm
-lib/SPVM/R/OP/Object.pm
-lib/SPVM/R/OP/Object.spvm
 lib/SPVM/R/OP/Short.pm
 lib/SPVM/R/OP/Short.spvm
 lib/SPVM/R/OP/String.pm

@@ -1,11 +1,11 @@
 #!/usr/bin/perl
 
-use v5;
-use strict;
+use v5.14;
 use warnings;
 
-use Test::More;
+use Test2::V0;
 
-use_ok( "IO::Termios" );
+require IO::Termios;
 
+pass( "Modules loaded" );
 done_testing;

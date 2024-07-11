@@ -7,6 +7,7 @@ class TestCase::R {
   use R::NDArray::Double;
   use R::NDArray::FloatComplex;
   use R::NDArray::DoubleComplex;
+  use R::NDArray::Object;
   
   use R::NDArray::Byte;
   use R::NDArray::Short;

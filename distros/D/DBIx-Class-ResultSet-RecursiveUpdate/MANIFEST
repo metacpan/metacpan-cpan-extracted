@@ -6,6 +6,7 @@ META.json
 META.yml
 Makefile.PL
 README
+cpanfile
 dist.ini
 lib/DBIx/Class/ResultSet/RecursiveUpdate.pm
 t/00load.t

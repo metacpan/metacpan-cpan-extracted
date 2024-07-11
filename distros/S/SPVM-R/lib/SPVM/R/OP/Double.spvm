@@ -56,11 +56,11 @@ class R::OP::Double {
   static method add : R::NDArray::Double ($x_ndarray : R::NDArray::Double, $y_ndarray : R::NDArray::Double) {
     
     unless ($x_ndarray) {
-      die "The n-dimension array \$x_ndarray must be defined.";
+      die "The n-dimensional array \$x_ndarray must be defined.";
     }
     
     unless ($y_ndarray) {
-      die "The n-dimension array \$y_ndarray must be defined.";
+      die "The n-dimensional array \$y_ndarray must be defined.";
     }
     
     my $equals_dim = R::OP->equals_dim($x_ndarray, $y_ndarray);
@@ -89,11 +89,11 @@ class R::OP::Double {
   precompile static method sub : R::NDArray::Double ($x_ndarray : R::NDArray::Double, $y_ndarray : R::NDArray::Double) {
     
     unless ($x_ndarray) {
-      die "The n-dimension array \$x_ndarray must be defined.";
+      die "The n-dimensional array \$x_ndarray must be defined.";
     }
     
     unless ($y_ndarray) {
-      die "The n-dimension array \$y_ndarray must be defined.";
+      die "The n-dimensional array \$y_ndarray must be defined.";
     }
     
     my $equals_dim = R::OP->equals_dim($x_ndarray, $y_ndarray);
@@ -122,11 +122,11 @@ class R::OP::Double {
   precompile static method mul : R::NDArray::Double ($x_ndarray : R::NDArray::Double, $y_ndarray : R::NDArray::Double) {
     
     unless ($x_ndarray) {
-      die "The n-dimension array \$x_ndarray must be defined.";
+      die "The n-dimensional array \$x_ndarray must be defined.";
     }
     
     unless ($y_ndarray) {
-      die "The n-dimension array \$y_ndarray must be defined.";
+      die "The n-dimensional array \$y_ndarray must be defined.";
     }
     
     my $equals_dim = R::OP->equals_dim($x_ndarray, $y_ndarray);
@@ -155,11 +155,11 @@ class R::OP::Double {
   precompile static method div : R::NDArray::Double ($x_ndarray : R::NDArray::Double, $y_ndarray : R::NDArray::Double) {
     
     unless ($x_ndarray) {
-      die "The n-dimension array \$x_ndarray must be defined.";
+      die "The n-dimensional array \$x_ndarray must be defined.";
     }
     
     unless ($y_ndarray) {
-      die "The n-dimension array \$y_ndarray must be defined.";
+      die "The n-dimensional array \$y_ndarray must be defined.";
     }
     
     my $equals_dim = R::OP->equals_dim($x_ndarray, $y_ndarray);
@@ -188,11 +188,11 @@ class R::OP::Double {
   precompile static method remainder : R::NDArray::Double ($x_ndarray : R::NDArray::Double, $y_ndarray : R::NDArray::Double) {
     
     unless ($x_ndarray) {
-      die "The n-dimension array \$x_ndarray must be defined.";
+      die "The n-dimensional array \$x_ndarray must be defined.";
     }
     
     unless ($y_ndarray) {
-      die "The n-dimension array \$y_ndarray must be defined.";
+      die "The n-dimensional array \$y_ndarray must be defined.";
     }
     
     my $equals_dim = R::OP->equals_dim($x_ndarray, $y_ndarray);
@@ -221,11 +221,11 @@ class R::OP::Double {
   precompile static method fmod : R::NDArray::Double ($x_ndarray : R::NDArray::Double, $y_ndarray : R::NDArray::Double) {
     
     unless ($x_ndarray) {
-      die "The n-dimension array \$x_ndarray must be defined.";
+      die "The n-dimensional array \$x_ndarray must be defined.";
     }
     
     unless ($y_ndarray) {
-      die "The n-dimension array \$y_ndarray must be defined.";
+      die "The n-dimensional array \$y_ndarray must be defined.";
     }
     
     my $equals_dim = R::OP->equals_dim($x_ndarray, $y_ndarray);
@@ -254,7 +254,7 @@ class R::OP::Double {
   precompile static method abs : R::NDArray::Double ($x_ndarray : R::NDArray::Double) {
     
     unless ($x_ndarray) {
-      die "The n-dimension array \$x_ndarray must be defined.";
+      die "The n-dimensional array \$x_ndarray must be defined.";
     }
     
     my $length = $x_ndarray->length;
@@ -276,7 +276,7 @@ class R::OP::Double {
   precompile static method neg : R::NDArray::Double ($x_ndarray : R::NDArray::Double) {
     
     unless ($x_ndarray) {
-      die "The n-dimension array \$x_ndarray must be defined.";
+      die "The n-dimensional array \$x_ndarray must be defined.";
     }
     
     my $length = $x_ndarray->length;
@@ -298,7 +298,7 @@ class R::OP::Double {
   precompile static method sin : R::NDArray::Double ($x_ndarray : R::NDArray::Double) {
     
     unless ($x_ndarray) {
-      die "The n-dimension array \$x_ndarray must be defined.";
+      die "The n-dimensional array \$x_ndarray must be defined.";
     }
     
     my $length = $x_ndarray->length;
@@ -320,7 +320,7 @@ class R::OP::Double {
   precompile static method cos : R::NDArray::Double ($x_ndarray : R::NDArray::Double) {
     
     unless ($x_ndarray) {
-      die "The n-dimension array \$x_ndarray must be defined.";
+      die "The n-dimensional array \$x_ndarray must be defined.";
     }
     
     my $length = $x_ndarray->length;
@@ -342,7 +342,7 @@ class R::OP::Double {
   precompile static method tan : R::NDArray::Double ($x_ndarray : R::NDArray::Double) {
     
     unless ($x_ndarray) {
-      die "The n-dimension array \$x_ndarray must be defined.";
+      die "The n-dimensional array \$x_ndarray must be defined.";
     }
     
     my $length = $x_ndarray->length;
@@ -364,7 +364,7 @@ class R::OP::Double {
   precompile static method sinh : R::NDArray::Double ($x_ndarray : R::NDArray::Double) {
     
     unless ($x_ndarray) {
-      die "The n-dimension array \$x_ndarray must be defined.";
+      die "The n-dimensional array \$x_ndarray must be defined.";
     }
     
     my $length = $x_ndarray->length;
@@ -386,7 +386,7 @@ class R::OP::Double {
   precompile static method cosh : R::NDArray::Double ($x_ndarray : R::NDArray::Double) {
     
     unless ($x_ndarray) {
-      die "The n-dimension array \$x_ndarray must be defined.";
+      die "The n-dimensional array \$x_ndarray must be defined.";
     }
     
     my $length = $x_ndarray->length;
@@ -408,7 +408,7 @@ class R::OP::Double {
   precompile static method tanh : R::NDArray::Double ($x_ndarray : R::NDArray::Double) {
     
     unless ($x_ndarray) {
-      die "The n-dimension array \$x_ndarray must be defined.";
+      die "The n-dimensional array \$x_ndarray must be defined.";
     }
     
     my $length = $x_ndarray->length;
@@ -430,7 +430,7 @@ class R::OP::Double {
   precompile static method acos : R::NDArray::Double ($x_ndarray : R::NDArray::Double) {
     
     unless ($x_ndarray) {
-      die "The n-dimension array \$x_ndarray must be defined.";
+      die "The n-dimensional array \$x_ndarray must be defined.";
     }
     
     my $length = $x_ndarray->length;
@@ -452,7 +452,7 @@ class R::OP::Double {
   precompile static method asin : R::NDArray::Double ($x_ndarray : R::NDArray::Double) {
     
     unless ($x_ndarray) {
-      die "The n-dimension array \$x_ndarray must be defined.";
+      die "The n-dimensional array \$x_ndarray must be defined.";
     }
     
     my $length = $x_ndarray->length;
@@ -474,7 +474,7 @@ class R::OP::Double {
   precompile static method atan : R::NDArray::Double ($x_ndarray : R::NDArray::Double) {
     
     unless ($x_ndarray) {
-      die "The n-dimension array \$x_ndarray must be defined.";
+      die "The n-dimensional array \$x_ndarray must be defined.";
     }
     
     my $length = $x_ndarray->length;
@@ -496,7 +496,7 @@ class R::OP::Double {
   precompile static method asinh : R::NDArray::Double ($x_ndarray : R::NDArray::Double) {
     
     unless ($x_ndarray) {
-      die "The n-dimension array \$x_ndarray must be defined.";
+      die "The n-dimensional array \$x_ndarray must be defined.";
     }
     
     my $length = $x_ndarray->length;
@@ -518,7 +518,7 @@ class R::OP::Double {
   precompile static method acosh : R::NDArray::Double ($x_ndarray : R::NDArray::Double) {
     
     unless ($x_ndarray) {
-      die "The n-dimension array \$x_ndarray must be defined.";
+      die "The n-dimensional array \$x_ndarray must be defined.";
     }
     
     my $length = $x_ndarray->length;
@@ -540,7 +540,7 @@ class R::OP::Double {
   precompile static method atanh : R::NDArray::Double ($x_ndarray : R::NDArray::Double) {
     
     unless ($x_ndarray) {
-      die "The n-dimension array \$x_ndarray must be defined.";
+      die "The n-dimensional array \$x_ndarray must be defined.";
     }
     
     my $length = $x_ndarray->length;
@@ -562,7 +562,7 @@ class R::OP::Double {
   precompile static method exp : R::NDArray::Double ($x_ndarray : R::NDArray::Double) {
     
     unless ($x_ndarray) {
-      die "The n-dimension array \$x_ndarray must be defined.";
+      die "The n-dimensional array \$x_ndarray must be defined.";
     }
     
     my $length = $x_ndarray->length;
@@ -584,7 +584,7 @@ class R::OP::Double {
   precompile static method expm1 : R::NDArray::Double ($x_ndarray : R::NDArray::Double) {
     
     unless ($x_ndarray) {
-      die "The n-dimension array \$x_ndarray must be defined.";
+      die "The n-dimensional array \$x_ndarray must be defined.";
     }
     
     my $length = $x_ndarray->length;
@@ -606,7 +606,7 @@ class R::OP::Double {
   precompile static method log : R::NDArray::Double ($x_ndarray : R::NDArray::Double) {
     
     unless ($x_ndarray) {
-      die "The n-dimension array \$x_ndarray must be defined.";
+      die "The n-dimensional array \$x_ndarray must be defined.";
     }
     
     my $length = $x_ndarray->length;
@@ -628,7 +628,7 @@ class R::OP::Double {
   precompile static method logb : R::NDArray::Double ($x_ndarray : R::NDArray::Double) {
     
     unless ($x_ndarray) {
-      die "The n-dimension array \$x_ndarray must be defined.";
+      die "The n-dimensional array \$x_ndarray must be defined.";
     }
     
     my $length = $x_ndarray->length;
@@ -650,7 +650,7 @@ class R::OP::Double {
   precompile static method log2 : R::NDArray::Double ($x_ndarray : R::NDArray::Double) {
     
     unless ($x_ndarray) {
-      die "The n-dimension array \$x_ndarray must be defined.";
+      die "The n-dimensional array \$x_ndarray must be defined.";
     }
     
     my $length = $x_ndarray->length;
@@ -672,7 +672,7 @@ class R::OP::Double {
   precompile static method log10 : R::NDArray::Double ($x_ndarray : R::NDArray::Double) {
     
     unless ($x_ndarray) {
-      die "The n-dimension array \$x_ndarray must be defined.";
+      die "The n-dimensional array \$x_ndarray must be defined.";
     }
     
     my $length = $x_ndarray->length;
@@ -694,7 +694,7 @@ class R::OP::Double {
   precompile static method sqrt : R::NDArray::Double ($x_ndarray : R::NDArray::Double) {
     
     unless ($x_ndarray) {
-      die "The n-dimension array \$x_ndarray must be defined.";
+      die "The n-dimensional array \$x_ndarray must be defined.";
     }
     
     my $length = $x_ndarray->length;
@@ -716,7 +716,7 @@ class R::OP::Double {
   precompile static method isinf : R::NDArray::Int ($x_ndarray : R::NDArray::Double) {
     
     unless ($x_ndarray) {
-      die "The n-dimension array \$x_ndarray must be defined.";
+      die "The n-dimensional array \$x_ndarray must be defined.";
     }
     
     my $length = $x_ndarray->length;
@@ -738,7 +738,7 @@ class R::OP::Double {
   precompile static method isnan : R::NDArray::Int ($x_ndarray : R::NDArray::Double) {
     
     unless ($x_ndarray) {
-      die "The n-dimension array \$x_ndarray must be defined.";
+      die "The n-dimensional array \$x_ndarray must be defined.";
     }
     
     my $length = $x_ndarray->length;
@@ -760,11 +760,11 @@ class R::OP::Double {
   precompile static method pow : R::NDArray::Double ($x_ndarray : R::NDArray::Double, $y_ndarray : R::NDArray::Double) {
     
     unless ($x_ndarray) {
-      die "The n-dimension array \$x_ndarray must be defined.";
+      die "The n-dimensional array \$x_ndarray must be defined.";
     }
     
     unless ($y_ndarray) {
-      die "The n-dimension array \$y_ndarray must be defined.";
+      die "The n-dimensional array \$y_ndarray must be defined.";
     }
     
     my $equals_dim = R::OP->equals_dim($x_ndarray, $y_ndarray);
@@ -793,11 +793,11 @@ class R::OP::Double {
   precompile static method atan2 : R::NDArray::Double ($y_ndarray : R::NDArray::Double, $x_ndarray : R::NDArray::Double) {
     
     unless ($x_ndarray) {
-      die "The n-dimension array \$x_ndarray must be defined.";
+      die "The n-dimensional array \$x_ndarray must be defined.";
     }
     
     unless ($y_ndarray) {
-      die "The n-dimension array \$y_ndarray must be defined.";
+      die "The n-dimensional array \$y_ndarray must be defined.";
     }
     
     my $equals_dim = R::OP->equals_dim($x_ndarray, $y_ndarray);
@@ -826,11 +826,11 @@ class R::OP::Double {
   precompile static method eq : R::NDArray::Int ($x_ndarray : R::NDArray::Double, $y_ndarray : R::NDArray::Double) {
     
     unless ($x_ndarray) {
-      die "The n-dimension array \$x_ndarray must be defined.";
+      die "The n-dimensional array \$x_ndarray must be defined.";
     }
     
     unless ($y_ndarray) {
-      die "The n-dimension array \$y_ndarray must be defined.";
+      die "The n-dimensional array \$y_ndarray must be defined.";
     }
     
     my $equals_dim = R::OP->equals_dim($x_ndarray, $y_ndarray);
@@ -859,11 +859,11 @@ class R::OP::Double {
   precompile static method ne : R::NDArray::Int ($x_ndarray : R::NDArray::Double, $y_ndarray : R::NDArray::Double) {
     
     unless ($x_ndarray) {
-      die "The n-dimension array \$x_ndarray must be defined.";
+      die "The n-dimensional array \$x_ndarray must be defined.";
     }
     
     unless ($y_ndarray) {
-      die "The n-dimension array \$y_ndarray must be defined.";
+      die "The n-dimensional array \$y_ndarray must be defined.";
     }
     
     my $equals_dim = R::OP->equals_dim($x_ndarray, $y_ndarray);
@@ -892,11 +892,11 @@ class R::OP::Double {
   precompile static method gt : R::NDArray::Int ($x_ndarray : R::NDArray::Double, $y_ndarray : R::NDArray::Double) {
     
     unless ($x_ndarray) {
-      die "The n-dimension array \$x_ndarray must be defined.";
+      die "The n-dimensional array \$x_ndarray must be defined.";
     }
     
     unless ($y_ndarray) {
-      die "The n-dimension array \$y_ndarray must be defined.";
+      die "The n-dimensional array \$y_ndarray must be defined.";
     }
     
     my $equals_dim = R::OP->equals_dim($x_ndarray, $y_ndarray);
@@ -925,11 +925,11 @@ class R::OP::Double {
   precompile static method ge : R::NDArray::Int ($x_ndarray : R::NDArray::Double, $y_ndarray : R::NDArray::Double) {
     
     unless ($x_ndarray) {
-      die "The n-dimension array \$x_ndarray must be defined.";
+      die "The n-dimensional array \$x_ndarray must be defined.";
     }
     
     unless ($y_ndarray) {
-      die "The n-dimension array \$y_ndarray must be defined.";
+      die "The n-dimensional array \$y_ndarray must be defined.";
     }
     
     my $equals_dim = R::OP->equals_dim($x_ndarray, $y_ndarray);
@@ -958,11 +958,11 @@ class R::OP::Double {
   precompile static method lt : R::NDArray::Int ($x_ndarray : R::NDArray::Double, $y_ndarray : R::NDArray::Double) {
     
     unless ($x_ndarray) {
-      die "The n-dimension array \$x_ndarray must be defined.";
+      die "The n-dimensional array \$x_ndarray must be defined.";
     }
     
     unless ($y_ndarray) {
-      die "The n-dimension array \$y_ndarray must be defined.";
+      die "The n-dimensional array \$y_ndarray must be defined.";
     }
     
     my $equals_dim = R::OP->equals_dim($x_ndarray, $y_ndarray);
@@ -991,11 +991,11 @@ class R::OP::Double {
   precompile static method le : R::NDArray::Int ($x_ndarray : R::NDArray::Double, $y_ndarray : R::NDArray::Double) {
     
     unless ($x_ndarray) {
-      die "The n-dimension array \$x_ndarray must be defined.";
+      die "The n-dimensional array \$x_ndarray must be defined.";
     }
     
     unless ($y_ndarray) {
-      die "The n-dimension array \$y_ndarray must be defined.";
+      die "The n-dimensional array \$y_ndarray must be defined.";
     }
     
     my $equals_dim = R::OP->equals_dim($x_ndarray, $y_ndarray);
@@ -1024,7 +1024,7 @@ class R::OP::Double {
   precompile static method sum : R::NDArray::Double ($x_ndarray : R::NDArray::Double) {
     
     unless ($x_ndarray) {
-      die "The n-dimension array \$x_ndarray must be defined.";
+      die "The n-dimensional array \$x_ndarray must be defined.";
     }
     
     my $length = $x_ndarray->length;
@@ -1048,7 +1048,7 @@ class R::OP::Double {
   precompile static method cumsum : R::NDArray::Double ($x_ndarray : R::NDArray::Double) {
     
     unless ($x_ndarray) {
-      die "The n-dimension array \$x_ndarray must be defined.";
+      die "The n-dimensional array \$x_ndarray must be defined.";
     }
     
     my $length = $x_ndarray->length;
@@ -1072,7 +1072,7 @@ class R::OP::Double {
   precompile static method prod : R::NDArray::Double ($x_ndarray : R::NDArray::Double) {
     
     unless ($x_ndarray) {
-      die "The n-dimension array \$x_ndarray must be defined.";
+      die "The n-dimensional array \$x_ndarray must be defined.";
     }
     
     my $length = $x_ndarray->length;
@@ -1096,7 +1096,7 @@ class R::OP::Double {
   precompile static method cumprod : R::NDArray::Double ($x_ndarray : R::NDArray::Double) {
     
     unless ($x_ndarray) {
-      die "The n-dimension array \$x_ndarray must be defined.";
+      die "The n-dimensional array \$x_ndarray must be defined.";
     }
     
     my $length = $x_ndarray->length;
@@ -1120,15 +1120,15 @@ class R::OP::Double {
   precompile static method modf : R::NDArray::Double ($x_ndarray : R::NDArray::Double, $intpart_ndarray_ref : R::NDArray::Double[]) {
     
     unless ($x_ndarray) {
-      die "The n-dimension array \$x_ndarray must be defined.";
+      die "The n-dimensional array \$x_ndarray must be defined.";
     }
     
     unless ($intpart_ndarray_ref) {
-      die "The integer part n-dimension array \$intpart_ndarray_ref must be defined.";
+      die "The integer part n-dimensional array \$intpart_ndarray_ref must be defined.";
     }
     
     unless (@$intpart_ndarray_ref == 1) {
-      die "The length of integer part n-dimension array \$intpart_ndarray_ref must be 1.";
+      die "The length of integer part n-dimensional array \$intpart_ndarray_ref must be 1.";
     }
     
     my $length = $x_ndarray->length;
@@ -1155,7 +1155,7 @@ class R::OP::Double {
   precompile static method ceil : R::NDArray::Double ($x_ndarray : R::NDArray::Double) {
     
     unless ($x_ndarray) {
-      die "The n-dimension array \$x_ndarray must be defined.";
+      die "The n-dimensional array \$x_ndarray must be defined.";
     }
     
     my $length = $x_ndarray->length;
@@ -1177,7 +1177,7 @@ class R::OP::Double {
   precompile static method floor : R::NDArray::Double ($x_ndarray : R::NDArray::Double) {
     
     unless ($x_ndarray) {
-      die "The n-dimension array \$x_ndarray must be defined.";
+      die "The n-dimensional array \$x_ndarray must be defined.";
     }
     
     my $length = $x_ndarray->length;
@@ -1199,7 +1199,7 @@ class R::OP::Double {
   precompile static method round : R::NDArray::Double ($x_ndarray : R::NDArray::Double) {
     
     unless ($x_ndarray) {
-      die "The n-dimension array \$x_ndarray must be defined.";
+      die "The n-dimensional array \$x_ndarray must be defined.";
     }
     
     my $length = $x_ndarray->length;
@@ -1221,7 +1221,7 @@ class R::OP::Double {
   precompile static method lround : R::NDArray::Long ($x_ndarray : R::NDArray::Double) {
     
     unless ($x_ndarray) {
-      die "The n-dimension array \$x_ndarray must be defined.";
+      die "The n-dimensional array \$x_ndarray must be defined.";
     }
     
     my $length = $x_ndarray->length;
@@ -1243,11 +1243,11 @@ class R::OP::Double {
   precompile static method max : R::NDArray::Double ($x_ndarray : R::NDArray::Double) {
     
     unless ($x_ndarray) {
-      die "The n-dimension array \$x_ndarray must be defined.";
+      die "The n-dimensional array \$x_ndarray must be defined.";
     }
     
     unless ($x_ndarray->length > 0) {
-      die "The length of n-dimension array \$x_ndarray must be greater than 0.";
+      die "The length of n-dimensional array \$x_ndarray must be greater than 0.";
     }
     
     my $length = $x_ndarray->length;
@@ -1275,11 +1275,11 @@ class R::OP::Double {
   precompile static method min : R::NDArray::Double ($x_ndarray : R::NDArray::Double) {
     
     unless ($x_ndarray) {
-      die "The n-dimension array \$x_ndarray must be defined.";
+      die "The n-dimensional array \$x_ndarray must be defined.";
     }
     
     unless ($x_ndarray->length > 0) {
-      die "The length of n-dimension array \$x_ndarray must be greater than 0.";
+      die "The length of n-dimensional array \$x_ndarray must be greater than 0.";
     }
     
     my $length = $x_ndarray->length;
@@ -1307,11 +1307,11 @@ class R::OP::Double {
   static method mean : R::NDArray::Double ($x_ndarray : R::NDArray::Double) {
     
     unless ($x_ndarray) {
-      die "The n-dimension array \$x_ndarray must be defined.";
+      die "The n-dimensional array \$x_ndarray must be defined.";
     }
     
     unless ($x_ndarray->length > 0) {
-      die "The length of n-dimension array \$x_ndarray must be greater than 0.";
+      die "The length of n-dimensional array \$x_ndarray must be greater than 0.";
     }
     
     my $sum_ndarray = &sum($x_ndarray);
@@ -1329,7 +1329,7 @@ class R::OP::Double {
   precompile static method diff : R::NDArray::Double ($x_ndarray : R::NDArray::Double) {
     
     unless ($x_ndarray) {
-      die "The n-dimension array \$x_ndarray must be defined.";
+      die "The n-dimensional array \$x_ndarray must be defined.";
     }
     
     my $x_dim = $x_ndarray->dim;
@@ -1359,7 +1359,7 @@ class R::OP::Double {
   precompile static method scamul : R::NDArray::Double ($scalar_ndarray : R::NDArray::Double, $x_ndarray : R::NDArray::Double) {
     
     unless ($scalar_ndarray) {
-      die "The n-dimension array \$scalar_ndarray must be defined.";
+      die "The n-dimensional array \$scalar_ndarray must be defined.";
     }
     
     unless ($scalar_ndarray->is_scalar) {
@@ -1373,7 +1373,7 @@ class R::OP::Double {
     }
     
     unless ($x_ndarray) {
-      die "The n-dimension array \$x_ndarray must be defined.";
+      die "The n-dimensional array \$x_ndarray must be defined.";
     }
     
     my $length = $x_ndarray->length;
@@ -1397,7 +1397,7 @@ class R::OP::Double {
   precompile static method scadiv : R::NDArray::Double ($scalar_ndarray : R::NDArray::Double, $x_ndarray : R::NDArray::Double) {
     
     unless ($scalar_ndarray) {
-      die "The n-dimension array \$scalar_ndarray must be defined.";
+      die "The n-dimensional array \$scalar_ndarray must be defined.";
     }
     
     unless ($scalar_ndarray->is_scalar) {
@@ -1411,7 +1411,7 @@ class R::OP::Double {
     }
     
     unless ($x_ndarray) {
-      die "The n-dimension array \$x_ndarray must be defined.";
+      die "The n-dimensional array \$x_ndarray must be defined.";
     }
     
     my $length = $x_ndarray->length;
@@ -1484,25 +1484,25 @@ class R::OP::Double {
   precompile static method inner : R::NDArray::Double ($x_ndarray : R::NDArray::Double, $y_ndarray : R::NDArray::Double) {
     
     unless ($x_ndarray) {
-      die "The n-dimension array \$x_ndarray must be defined.";
+      die "The n-dimensional array \$x_ndarray must be defined.";
     }
     
     unless ($x_ndarray->is_vector) {
-      die "The n-dimension array \$x_ndarray must be a vector.";
+      die "The n-dimensional array \$x_ndarray must be a vector.";
     }
     
     unless ($y_ndarray) {
-      die "The n-dimension array \$y_ndarray must be defined.";
+      die "The n-dimensional array \$y_ndarray must be defined.";
     }
     
     unless ($y_ndarray->is_vector) {
-      die "The n-dimension array \$y_ndarray must be a vector.";
+      die "The n-dimensional array \$y_ndarray must be a vector.";
     }
     
     my $equals_dropped_dim = R::OP->equals_dim($x_ndarray, $y_ndarray);
     
     unless ($equals_dropped_dim) {
-      die "The dimension of n-dimension array \$x_ndarray must be equal to the dimension of n-dimension array \$y_ndarray.";
+      die "The dimension of n-dimensional array \$x_ndarray must be equal to the dimension of n-dimensional array \$y_ndarray.";
     }
     
     my $length = $x_ndarray->length;
@@ -1530,37 +1530,37 @@ class R::OP::Double {
   precompile static method cross : R::NDArray::Double ($x_ndarray : R::NDArray::Double, $y_ndarray : R::NDArray::Double) {
     
     unless ($x_ndarray) {
-      die "The n-dimension array \$x_ndarray must be defined.";
+      die "The n-dimensional array \$x_ndarray must be defined.";
     }
     
     unless ($x_ndarray->is_vector) {
-      die "The n-dimension array \$x_ndarray must be a vector.";
+      die "The n-dimensional array \$x_ndarray must be a vector.";
     }
     
     unless ($y_ndarray) {
-      die "The n-dimension array \$y_ndarray must be defined.";
+      die "The n-dimensional array \$y_ndarray must be defined.";
     }
     
     unless ($y_ndarray->is_vector) {
-      die "The n-dimension array \$y_ndarray must be a vector.";
+      die "The n-dimensional array \$y_ndarray must be a vector.";
     }
     
     my $equals_dropped_dim = R::OP->equals_dim($x_ndarray, $y_ndarray);
     
     unless ($equals_dropped_dim) {
-      die "The dimension of n-dimension array \$x_ndarray must be equal to the dimension of n-dimension array \$y_ndarray.";
+      die "The dimension of n-dimensional array \$x_ndarray must be equal to the dimension of n-dimensional array \$y_ndarray.";
     }
     
     my $x_length = $x_ndarray->length;
     
     unless ($x_length == 3) {
-      die "The length of elems of n-dimension array \$x_ndarray must be 3.";
+      die "The length of elems of n-dimensional array \$x_ndarray must be 3.";
     }
     
     my $y_length = $y_ndarray->length;
     
     unless ($y_length == 3) {
-      die "The length of elems of n-dimension array \$y_ndarray must be 3.";
+      die "The length of elems of n-dimensional array \$y_ndarray must be 3.";
     }
     
     my $length = $x_length;
@@ -1583,19 +1583,19 @@ class R::OP::Double {
   precompile static method outer : R::NDArray::Double ($x_ndarray : R::NDArray::Double, $y_ndarray : R::NDArray::Double) {
     
     unless ($x_ndarray) {
-      die "The n-dimension array \$x_ndarray must be defined.";
+      die "The n-dimensional array \$x_ndarray must be defined.";
     }
     
     unless ($x_ndarray->is_vector) {
-      die "The n-dimension array \$x_ndarray must be a vector.";
+      die "The n-dimensional array \$x_ndarray must be a vector.";
     }
     
     unless ($y_ndarray) {
-      die "The n-dimension array \$y_ndarray must be defined.";
+      die "The n-dimensional array \$y_ndarray must be defined.";
     }
     
     unless ($y_ndarray->is_vector) {
-      die "The n-dimension array \$y_ndarray must be a vector.";
+      die "The n-dimensional array \$y_ndarray must be a vector.";
     }
     
     my $x_length = $x_ndarray->length;

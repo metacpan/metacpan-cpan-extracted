@@ -20,11 +20,6 @@ class R::NDArray::Long extends R::NDArray {
   }
   
   # Instance Methods
-  protected method init : void ($options : object[] = undef) {
-    
-    $self->SUPER::init($options);
-  }
-  
   method create_default_data : long[] ($length : int = 0) {
     
     unless ($length >= 0) {
@@ -62,19 +57,15 @@ class R::NDArray::Long extends R::NDArray {
     return $cmp;
   }
   
-  method clone : R::NDArray::Long ($elem_shallow_clone : int = 0) {
-    return (R::NDArray::Long)$self->SUPER::clone($elem_shallow_clone);
+  method clone : R::NDArray::Long ($shallow : int = 0) {
+    return (R::NDArray::Long)$self->SUPER::clone($shallow);
   }
   
-  method slice : R::NDArray::Long ($vector_indexes : R::NDArray::Int[]) {
-    return (R::NDArray::Long)$self->SUPER::slice($vector_indexes);
+  method slice : R::NDArray::Long ($asix_indexes_product : R::NDArray::Int[]) {
+    return (R::NDArray::Long)$self->SUPER::slice($asix_indexes_product);
   }
   
   precompile method to_int_ndarray : R::NDArray::Int () {
-    
-    unless ($self) {
-      die "The n-dimension array \$self must be defined.";
-    }
     
     my $length = $self->length;
     
@@ -94,10 +85,6 @@ class R::NDArray::Long extends R::NDArray {
   
   precompile method to_float_ndarray : R::NDArray::Float () {
     
-    unless ($self) {
-      die "The n-dimension array \$self must be defined.";
-    }
-    
     my $length = $self->length;
     
     my $dim = $self->dim;
@@ -116,10 +103,6 @@ class R::NDArray::Long extends R::NDArray {
   
   precompile method to_double_ndarray : R::NDArray::Double () {
     
-    unless ($self) {
-      die "The n-dimension array \$self must be defined.";
-    }
-    
     my $length = $self->length;
     
     my $dim = $self->dim;
@@ -131,52 +114,6 @@ class R::NDArray::Long extends R::NDArray {
     
     for (my $i = 0; $i < $length; $i++) {
       $ret_data->[$i] = (double)$data->[$i];
-    }
-    
-    return $ret_ndarray;
-  }
-  
-  precompile method to_float_complex_ndarray : R::NDArray::FloatComplex () {
-    
-    unless ($self) {
-      die "The n-dimension array \$self must be defined.";
-    }
-    
-    my $length = $self->length;
-    
-    my $dim = $self->dim;
-    
-    my $ret_ndarray = R::OP::FloatComplex->c(undef, $dim);
-    
-    my $data = $self->data;
-    my $ret_data = $ret_ndarray->data;
-    
-    for (my $i = 0; $i < $length; $i++) {
-      $ret_data->[$i]{re} = (float)$data->[$i];
-      $ret_data->[$i]{im} = 0f;
-    }
-    
-    return $ret_ndarray;
-  }
-  
-  precompile method to_double_complex_ndarray : R::NDArray::DoubleComplex () {
-    
-    unless ($self) {
-      die "The n-dimension array \$self must be defined.";
-    }
-    
-    my $length = $self->length;
-    
-    my $dim = $self->dim;
-    
-    my $ret_ndarray = R::OP::DoubleComplex->c(undef, $dim);
-    
-    my $data = $self->data;
-    my $ret_data = $ret_ndarray->data;
-    
-    for (my $i = 0; $i < $length; $i++) {
-      $ret_data->[$i]{re} = (double)$data->[$i];
-      $ret_data->[$i]{im} = 0;
     }
     
     return $ret_ndarray;

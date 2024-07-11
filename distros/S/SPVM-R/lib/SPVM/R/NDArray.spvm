@@ -104,7 +104,7 @@ class R::NDArray {
   method nrow : int () {
     
     unless ($self->is_matrix) {
-      die "The n-dimension array \$self must be a matrix.";
+      die "The n-dimensional array \$self must be a matrix.";
     }
     
     my $dim = $self->{dim};
@@ -117,7 +117,7 @@ class R::NDArray {
   method ncol : int () {
     
     unless ($self->is_matrix) {
-      die "The n-dimension array \$self must be a matrix.";
+      die "The n-dimensional array \$self must be a matrix.";
     }
     
     my $dim = $self->{dim};
@@ -255,7 +255,7 @@ class R::NDArray {
   precompile method to_string_ndarray : R::NDArray::String () {
     
     unless ($self) {
-      die "The n-dimension array \$self must be defined.";
+      die "The n-dimensional array \$self must be defined.";
     }
     
     my $length = $self->length;
@@ -335,7 +335,7 @@ class R::NDArray {
     return $is_mulnum;
   }
   
-  method clone : R::NDArray ($elem_shallow_clone : int = 0) {
+  method clone : R::NDArray ($shallow : int = 0) {
     
     my $elem_size = $self->elem_size;
     
@@ -346,7 +346,7 @@ class R::NDArray {
     my $data = $self->{data};
     
     for (my $i = 0; $i < $length; $i++) {
-      if ($elem_shallow_clone) {
+      if ($shallow) {
         $self->elem_assign($clone_data, $i, $data, $i);
       }
       else {
@@ -361,15 +361,15 @@ class R::NDArray {
     return $clone;
   }
   
-  method slice : R::NDArray ($vector_indexes : R::NDArray::Int[]) {
+  method slice : R::NDArray ($asix_indexes_product : R::NDArray::Int[]) {
     
     my $dim = $self->{dim};
     
-    $vector_indexes = &normalize_vector_indexes($vector_indexes, $dim);
+    $asix_indexes_product = &normalize_asix_indexes_product($asix_indexes_product, $dim);
     
-    my $ret_dim = &create_ret_dim($vector_indexes);
+    my $ret_dim = &create_ret_dim($asix_indexes_product);
     
-    my $data_indexes = $self->create_data_indexes($vector_indexes, $dim);
+    my $data_indexes = $self->create_data_indexes($asix_indexes_product, $dim);
     
     my $ret_data = $self->slice_data($data_indexes);
     
@@ -378,20 +378,20 @@ class R::NDArray {
     return $ret_ndarray;
   }
   
-  method slice_set : void ($vector_indexes : R::NDArray::Int[], $ndarray : R::NDArray) {
+  method slice_set : void ($asix_indexes_product : R::NDArray::Int[], $ndarray : R::NDArray) {
     
     my $dim = $self->{dim};
     
-    $vector_indexes = &normalize_vector_indexes($vector_indexes, $dim);
+    $asix_indexes_product = &normalize_asix_indexes_product($asix_indexes_product, $dim);
     
-    my $ret_dim = &create_ret_dim($vector_indexes);
+    my $ret_dim = &create_ret_dim($asix_indexes_product);
     
-    my $data_indexes = $self->create_data_indexes($vector_indexes, $dim);
+    my $data_indexes = $self->create_data_indexes($asix_indexes_product, $dim);
     
     my $equals_dropped_dim = R::Util->equals_dropped_dim($ndarray->dim, $ret_dim);
     
     unless ($equals_dropped_dim) {
-      die "The dim field of \$ndarray must be compatible with dim created by \$vector_indexes.";
+      die "The dim field of \$ndarray must be compatible with dim created by \$asix_indexes_product.";
     }
     
     $self->slice_set_data($data_indexes, $ndarray->data);
@@ -549,64 +549,64 @@ class R::NDArray {
     }
   }
 
-  private static method normalize_vector_indexes : R::NDArray::Int[] ($vector_indexes : R::NDArray::Int[], $dim : int[]) {
+  private static method normalize_asix_indexes_product : R::NDArray::Int[] ($asix_indexes_product : R::NDArray::Int[], $dim : int[]) {
     
-    unless ($vector_indexes) {
-      die "The indexes for n-dimension array \$vector_indexes must be defined.";
+    unless ($asix_indexes_product) {
+      die "The indexes for n-dimensional array \$asix_indexes_product must be defined.";
     }
     
-    my $vector_indexes_length = @$vector_indexes;
+    my $asix_indexes_product_length = @$asix_indexes_product;
     
     my $dim_length = @$dim;
     
-    unless ($vector_indexes_length <= $dim_length) {
-      die "The length of indexes for n-dimension array \$vector_indexes must be less than or equal to the length of dim field.";
+    unless ($asix_indexes_product_length <= $dim_length) {
+      die "The length of indexes for n-dimensional array \$asix_indexes_product must be less than or equal to the length of dim field.";
     }
     
-    my $normalized_vector_indexes = new R::NDArray::Int[$dim_length];
+    my $normalized_asix_indexes_product = new R::NDArray::Int[$dim_length];
     
-    for (my $vector_indexes_index = 0; $vector_indexes_index < $dim_length; $vector_indexes_index++) {
+    for (my $asix_indexes_product_index = 0; $asix_indexes_product_index < $dim_length; $asix_indexes_product_index++) {
       
-      my $vector_index = (R::NDArray::Int)undef;
+      my $asix_indexes = (R::NDArray::Int)undef;
       
-      if ($vector_indexes_index < $vector_indexes_length) {
-        $vector_index = $vector_indexes->[$vector_indexes_index];
+      if ($asix_indexes_product_index < $asix_indexes_product_length) {
+        $asix_indexes = $asix_indexes_product->[$asix_indexes_product_index];
       }
       
-      unless (!$vector_index || $vector_index->is_vector) {
-        die "The elem of indexes for n-dimension array \$vector_indexes must be undef or vector.";
+      unless (!$asix_indexes || $asix_indexes->is_vector) {
+        die "The elem of indexes for n-dimensional array \$asix_indexes_product must be undef or vector.";
       }
       
-      unless ($vector_index) {
-        my $vector_index_data = new int[$dim->[$vector_indexes_index]];
+      unless ($asix_indexes) {
+        my $asix_indexes_data = new int[$dim->[$asix_indexes_product_index]];
         
-        for (my $i = 0; $i < $dim->[$vector_indexes_index]; $i++) {
-          $vector_index_data->[$i] = $i;
+        for (my $i = 0; $i < $dim->[$asix_indexes_product_index]; $i++) {
+          $asix_indexes_data->[$i] = $i;
         }
         
-        $vector_index = R::NDArray::Int->new({data => $vector_index_data});
+        $asix_indexes = R::NDArray::Int->new({data => $asix_indexes_data});
       }
       
-      $normalized_vector_indexes->[$vector_indexes_index] = $vector_index;
+      $normalized_asix_indexes_product->[$asix_indexes_product_index] = $asix_indexes;
     }
     
-    return $normalized_vector_indexes;
+    return $normalized_asix_indexes_product;
   }
   
-  private static method create_ret_dim : int[] ($vector_indexes : R::NDArray::Int[]) {
+  private static method create_ret_dim : int[] ($asix_indexes_product : R::NDArray::Int[]) {
     
-    my $vector_indexes_length = @$vector_indexes;
+    my $asix_indexes_product_length = @$asix_indexes_product;
     
-    my $ret_dim = new int[$vector_indexes_length];
+    my $ret_dim = new int[$asix_indexes_product_length];
     
-    for (my $i = 0; $i < $vector_indexes_length; $i++) {
-      my $vector_index = $vector_indexes->[$i];
+    for (my $i = 0; $i < $asix_indexes_product_length; $i++) {
+      my $asix_indexes = $asix_indexes_product->[$i];
       
-      if ($vector_index) {
-        $ret_dim->[$i] = $vector_index->length;
+      if ($asix_indexes) {
+        $ret_dim->[$i] = $asix_indexes->length;
       }
       else {
-        die "[Unexpected]\$vector_index must be defined.";
+        die "[Unexpected]\$asix_indexes must be defined.";
       }
     }
     
@@ -762,9 +762,9 @@ class R::NDArray {
     }
   }
   
-  private precompile method create_data_indexes : int[] ($vector_indexes : R::NDArray::Int[], $dim : int[]) {
+  private precompile method create_data_indexes : int[] ($asix_indexes_product : R::NDArray::Int[], $dim : int[]) {
     
-    my $ret_dim = &create_ret_dim($vector_indexes);
+    my $ret_dim = &create_ret_dim($asix_indexes_product);
     
     my $ret_dim_length = @$ret_dim;
     
@@ -784,7 +784,7 @@ class R::NDArray {
         
         my $ret_coordinate_x = $ret_coordinate->[$coordinate_index];
         
-        $coordinate->[$coordinate_index] = $vector_indexes->[$coordinate_index]->data->[$ret_coordinate_x];
+        $coordinate->[$coordinate_index] = $asix_indexes_product->[$coordinate_index]->data->[$ret_coordinate_x];
         
         if ($coordinate->[$coordinate_index] >= $dim->[$coordinate_index]) {
           die "Invalid coordinate.";

@@ -1,11 +1,9 @@
 #!/usr/bin/perl
 
-use v5;
-use strict;
+use v5.14;
 use warnings;
 
-use Test::More;
-use Test::LongString;
+use Test2::V0;
 
 use IO::Termios;
 use IO::Pty;
@@ -23,8 +21,8 @@ my $term = IO::Termios->new( $pty->slave );
    ok( $term->getflag_echo, '$term->getflag_echo is on' );
 
    $pty->syswrite( "With ECHO\n" );
-   is_string( scalar <$term>, "With ECHO\n", '$term syswrite' );
-   is_string( scalar <$pty>, "With ECHO\r\n", 'Echoed back' );
+   is( scalar <$term>, "With ECHO\n", '$term syswrite' );
+   is( scalar <$pty>, "With ECHO\r\n", 'Echoed back' );
 
    $term->setflag_echo( 0 );
    ok( !$term->getflag_echo, '$term->getflag_echo is off' );
@@ -36,7 +34,7 @@ my $term = IO::Termios->new( $pty->slave );
    my $b;
 
    $pty->syswrite( "Without ECHO\n" );
-   is_string( scalar <$term>, "Without ECHO\n", '$term syswrite' );
+   is( scalar <$term>, "Without ECHO\n", '$term syswrite' );
    ok( !defined $pty->sysread( $b, 8192 ), '$pty not readable' );
    is( $!+0, EAGAIN, '$pty not readable (EAGAIN)' );
 }
@@ -54,11 +52,11 @@ my $term = IO::Termios->new( $pty->slave );
    $pty->syswrite( "Without " );
    select( $rout = $rvec, undef, undef, 0.1 );
    ok( defined $term->sysread( $b, 8192 ), '$term is readable' );
-   is_string( $b, "Without ", '$pty reads partial line' );
+   is( $b, "Without ", '$pty reads partial line' );
    $pty->syswrite( "ICANON\n" );
    select( $rout = $rvec, undef, undef, 0.1 );
    ok( defined $term->sysread( $b, 8192 ), '$term is readable' );
-   is_string( $b, "ICANON\n", '$pty reads remainder of line' );
+   is( $b, "ICANON\n", '$pty reads remainder of line' );
 
    $term->setflag_icanon( 1 );
    ok( $term->getflag_icanon, '$term->getflag_icanon is on' );
@@ -69,7 +67,7 @@ my $term = IO::Termios->new( $pty->slave );
    $pty->syswrite( "ICANON\n" );
    select( $rout = $rvec, undef, undef, 0.1 );
    ok( defined $term->sysread( $b, 8192 ), '$term is readable' );
-   is_string( $b, "With ICANON\n", '$pty reads remainder of line' );
+   is( $b, "With ICANON\n", '$pty reads remainder of line' );
 }
 
 # setflags wrapper

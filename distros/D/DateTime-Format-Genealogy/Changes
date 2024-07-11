@@ -1,5 +1,8 @@
 Revision history for DateTime::Format::Genealogy
 
+0.09	Wed Jul 10 08:53:31 EDT 2024
+	Fix https://www.cpantesters.org/cpan/report/a12f8d3a-3d93-11ef-8086-6cc8c30391f4
+
 0.08	Sun Jul  7 20:11:22 EDT 2024
 	Handle entries with Juli (unless strict is enabled)
 	Handle 29-Aug-1938

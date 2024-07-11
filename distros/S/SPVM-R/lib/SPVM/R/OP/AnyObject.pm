@@ -1,4 +1,4 @@
-package SPVM::R::OP::Object;
+package SPVM::R::OP::AnyObject;
 
 
 
@@ -6,15 +6,15 @@ package SPVM::R::OP::Object;
 
 =head1 Name
 
-SPVM::R::OP::Object - Short Description
+SPVM::R::OP::AnyObject - Short Description
 
 =head1 Description
 
-The R::OP::Object class in L<SPVM> has methods to do someting.
+The R::OP::AnyObject class in L<SPVM> has methods to do someting.
 
 =head1 Usage
 
-  use R::OP::Object;
+  use R::OP::AnyObject;
 
 =head1 Details
 

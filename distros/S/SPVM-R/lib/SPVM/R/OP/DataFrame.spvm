@@ -60,7 +60,7 @@ class R::OP::DataFrame {
       }
       
       unless (type_name $x_ndarray eq type_name $y_ndarray) {
-        die "The n-dimension array class name at col index $i of the data frame \$x_data_frame must be equal to the n-dimension array class name at col index $i of the data frame \$y_data_frame.";
+        die "The n-dimensional array class name at col index $i of the data frame \$x_data_frame must be equal to the n-dimensional array class name at col index $i of the data frame \$y_data_frame.";
       }
       
       my $colname = $x_colname;

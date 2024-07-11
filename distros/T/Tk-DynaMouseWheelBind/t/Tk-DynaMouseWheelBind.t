@@ -60,6 +60,7 @@ for (['<5>'],['<4>'],['<MouseWheel>',-delta => -120]){
 			$w->eventGenerate('<Enter>');
 			my $y = ($w->yview)[0];
 			$e->eventGenerate(@$ev);
+			pause(50);
 			my $delta = abs ($y - ($w->yview)[0]);
 			return $delta > 0.01
 		}, 1, getref($w) . " scrolling delta " . $ev->[0]]

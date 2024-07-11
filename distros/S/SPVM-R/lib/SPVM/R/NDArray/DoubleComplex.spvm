@@ -22,11 +22,6 @@ class R::NDArray::DoubleComplex extends R::NDArray {
   }
   
   # Instance Methods
-  protected method init : void ($options : object[] = undef) {
-    
-    $self->SUPER::init($options);
-  }
-  
   method create_default_data : Complex_2d[] ($length : int = 0) {
     
     unless ($length >= 0) {
@@ -38,8 +33,8 @@ class R::NDArray::DoubleComplex extends R::NDArray {
     return $data;
   }
   
-  method clone : R::NDArray::DoubleComplex ($elem_shallow_clone : int = 0) {
-    return (R::NDArray::DoubleComplex)$self->SUPER::clone($elem_shallow_clone);
+  method clone : R::NDArray::DoubleComplex ($shallow : int = 0) {
+    return (R::NDArray::DoubleComplex)$self->SUPER::clone($shallow);
   }
   
   method elem_to_string : string ($data : Complex_2d[], $data_index : int) {
@@ -61,15 +56,11 @@ class R::NDArray::DoubleComplex extends R::NDArray {
     $dist_data->[$dist_data_index] = $src_data->[$src_data_index];
   }
   
-  method slice : R::NDArray::DoubleComplex ($vector_indexes : R::NDArray::Int[]) {
-    return (R::NDArray::DoubleComplex)$self->SUPER::slice($vector_indexes);
+  method slice : R::NDArray::DoubleComplex ($asix_indexes_product : R::NDArray::Int[]) {
+    return (R::NDArray::DoubleComplex)$self->SUPER::slice($asix_indexes_product);
   }
   
   precompile method to_float_complex_ndarray : R::NDArray::FloatComplex () {
-    
-    unless ($self) {
-      die "The n-dimension array \$self must be defined.";
-    }
     
     my $length = $self->length;
     

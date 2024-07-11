@@ -1,7 +1,12 @@
+1.000002 - 2024-07-11
+
+  [BUG FIXES]
+
+  * avoid shell expansion
+
 1.000001 - 2024-05-13
 
   [BUG FIXES]
 
   * fix typo and presentation of source license in POD
-
 

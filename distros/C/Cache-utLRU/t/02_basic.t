@@ -36,10 +36,18 @@ sub main {
         $cache->add($lastname, $firstname);
     }
     is($cache->size, $size, "cache grows to $size elements");
+
     foreach my $lastname (sort keys %composers) {
         my $wanted = $composers{$lastname};
         my $got = $cache->find($lastname);
         is($got, $wanted, "got '$got' for '$lastname'");
+    }
+    is($cache->size, $size, "cache still has $size elements");
+
+    foreach my $lastname (sort keys %composers) {
+        my $key = "XX_${lastname}_XX";
+        my $got = $cache->find($key);
+        is($got, undef, "got undef for '$key'");
     }
     is($cache->size, $size, "cache still has $size elements");
 

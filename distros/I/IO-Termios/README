@@ -62,7 +62,7 @@ CONSTRUCTORS
 
  new
 
-       $term = IO::Termios->new()
+       $term = IO::Termios->new();
 
     Construct a new IO::Termios object around the terminal for the program.
     This is found by checking if any of STDIN, STDOUT or STDERR are a
@@ -71,13 +71,13 @@ CONSTRUCTORS
 
  new (handle)
 
-       $term = IO::Termios->new( $handle )
+       $term = IO::Termios->new( $handle );
 
     Construct a new IO::Termios object around the given filehandle.
 
  open
 
-       $term = IO::Termios->open( $path, $modestr, $flags )
+       $term = IO::Termios->open( $path, $modestr, $flags );
 
     Open the given path, and return a new IO::Termios object around the
     filehandle. If the open call fails, undef is returned.
@@ -101,7 +101,7 @@ METHODS
 
  getattr
 
-       $attrs = $term->getattr
+       $attrs = $term->getattr;
 
     Makes a tcgetattr() call on the underlying filehandle, and returns a
     IO::Termios::Attrs object.
@@ -110,7 +110,7 @@ METHODS
 
  setattr
 
-       $term->setattr( $attrs )
+       $term->setattr( $attrs );
 
     Makes a tcsetattr() call on the underlying file handle, setting
     attributes from the given IO::Termios::Attrs object.
@@ -122,9 +122,9 @@ METHODS
 
  get_mode
 
-       $term->set_mode( $modestr )
+       $term->set_mode( $modestr );
     
-       $modestr = $term->get_mode
+       $modestr = $term->get_mode;
 
     Accessor for the derived "mode string", which is a comma-joined
     concatenation of the baud rate, character size, parity mode, and stop
@@ -139,9 +139,9 @@ METHODS
 
  tiocmset
 
-       $bits = $term->tiocmget
+       $bits = $term->tiocmget;
     
-       $term->tiocmset( $bits )
+       $term->tiocmset( $bits );
 
     Accessor for the modem line control bits. Takes or returns a bitmask of
     values.
@@ -150,9 +150,9 @@ METHODS
 
  tiocmbis
 
-       $term->tiocmbic( $bits )
+       $term->tiocmbic( $bits );
     
-       $term->tiocmbis( $bits )
+       $term->tiocmbis( $bits );
 
     Bitwise mutator methods for the modem line control bits. tiocmbic will
     clear just the bits provided and leave the others unchanged; tiocmbis
@@ -160,7 +160,7 @@ METHODS
 
  get_modem
 
-       $flags = $term->get_modem
+       $flags = $term->get_modem;
 
     Returns a hash reference containing named flags corresponding to the
     modem line control bits. Any bit that is set will yield a key in the
@@ -170,7 +170,7 @@ METHODS
 
  set_modem
 
-       $term->set_modem( $flags )
+       $term->set_modem( $flags );
 
     Changes the modem line control bit flags as given by the hash
     reference. Each bit to be changed should be represented by a key in the
@@ -181,9 +181,9 @@ METHODS
 
  setmodem_BIT
 
-       $set = $term->getmodem_BIT
+       $set = $term->getmodem_BIT;
     
-       $term->setmodem_BIT( $set )
+       $term->setmodem_BIT( $set );
 
     Accessor methods for each of the modem line control bits. A set of
     methods exists for each of the named modem control bits given above.
@@ -232,15 +232,15 @@ FLAG-ACCESSOR METHODS
 
  setbaud
 
-       $baud = $term->getibaud
+       $baud = $term->getibaud;
     
-       $baud = $term->getobaud
+       $baud = $term->getobaud;
     
-       $term->setibaud( $baud )
+       $term->setibaud( $baud );
     
-       $term->setobaud( $baud )
+       $term->setobaud( $baud );
     
-       $term->setbaud( $baud )
+       $term->setbaud( $baud );
 
     Convenience accessors for the ispeed and ospeed. $baud is an integer
     directly giving the line rate, instead of one of the Bnnn constants.
@@ -249,9 +249,9 @@ FLAG-ACCESSOR METHODS
 
  setcsize
 
-       $bits = $term->getcsize
+       $bits = $term->getcsize;
     
-       $term->setcsize( $bits )
+       $term->setcsize( $bits );
 
     Convenience accessor for the CSIZE bits of c_cflag. $bits is an integer
     5 to 8.
@@ -260,9 +260,9 @@ FLAG-ACCESSOR METHODS
 
  setparity
 
-       $parity = $term->getparity
+       $parity = $term->getparity;
     
-       $term->setparity( $parity )
+       $term->setparity( $parity );
 
     Convenience accessor for the PARENB and PARODD bits of c_cflag. $parity
     is n, o or e.
@@ -271,15 +271,15 @@ FLAG-ACCESSOR METHODS
 
  setstop
 
-       $stop = $term->getstop
+       $stop = $term->getstop;
     
-       $term->setstop( $stop )
+       $term->setstop( $stop );
 
     Convenience accessor for the CSTOPB bit of c_cflag. $stop is 1 or 2.
 
  cfmakeraw
 
-       $term->cfmakeraw
+       $term->cfmakeraw;
 
     Since version 0.07.
 
@@ -291,9 +291,9 @@ FLAG-ACCESSOR METHODS
 
  setflag_FLAG
 
-       $mode = $term->getflag_FLAG
+       $mode = $term->getflag_FLAG;
     
-       $term->setflag_FLAG( $mode )
+       $term->setflag_FLAG( $mode );
 
     Accessors for various control flags. The following methods are defined
     for specific flags:
@@ -374,7 +374,7 @@ FLAG-ACCESSOR METHODS
 
  setflags
 
-       $term->setflags( @flags )
+       $term->setflags( @flags );
 
     Since version 0.09.
 

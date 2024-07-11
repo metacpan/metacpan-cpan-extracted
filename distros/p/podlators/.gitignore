@@ -18,6 +18,12 @@
 /podlators-*.tar.gz.asc
 /scripts/pod2man
 /scripts/pod2text
+/t/tmp/
+
+# Some plenv/carton cruft
+.perl-version
+cpanfile.snapshot
+/local/
 
 # Not needed in the stand-alone podlators package, but necessary when
 # included in Perl core.

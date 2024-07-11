@@ -10,14 +10,14 @@ my $build = Module::Build->new(
       'Module::Build' => '0.4004', # test_requires
    },
    requires => {
+      'perl' => '5.014',
+
       'IO::Tty' => 0,
-      'perl' => '5.010', # //
    },
    test_requires => {
       'IO::Tty' => 0,
       'IO::Pty' => 0,
-      'Test::LongString' => 0,
-      'Test::More' => '0.88', # done_testing
+      'Test2::V0' => 0,
    },
    license => 'perl',
    create_license => 1,

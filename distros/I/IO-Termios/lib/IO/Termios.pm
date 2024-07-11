@@ -1,18 +1,15 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2008-2018 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2008-2024 -- leonerd@leonerd.org.uk
 
-package IO::Termios;
+package IO::Termios 0.10;
 
-use v5.10;
-use strict;
+use v5.14;
 use warnings;
 use base qw( IO::Handle );
 
 use Carp;
-
-our $VERSION = '0.09';
 
 use Exporter ();
 
@@ -111,7 +108,7 @@ sub import
 
 =head2 new
 
-   $term = IO::Termios->new()
+   $term = IO::Termios->new();
 
 Construct a new C<IO::Termios> object around the terminal for the program.
 This is found by checking if any of C<STDIN>, C<STDOUT> or C<STDERR> are a
@@ -120,7 +117,7 @@ can be found by this method.
 
 =head2 new (handle)
 
-   $term = IO::Termios->new( $handle )
+   $term = IO::Termios->new( $handle );
 
 Construct a new C<IO::Termios> object around the given filehandle.
 
@@ -149,7 +146,7 @@ sub new
 
 =head2 open
 
-   $term = IO::Termios->open( $path, $modestr, $flags )
+   $term = IO::Termios->open( $path, $modestr, $flags );
 
 Open the given path, and return a new C<IO::Termios> object around the
 filehandle. If the C<open> call fails, C<undef> is returned.
@@ -192,7 +189,7 @@ sub open
 
 =head2 getattr
 
-   $attrs = $term->getattr
+   $attrs = $term->getattr;
 
 Makes a C<tcgetattr()> call on the underlying filehandle, and returns a
 C<IO::Termios::Attrs> object.
@@ -213,7 +210,7 @@ sub getattr
 
 =head2 setattr
 
-   $term->setattr( $attrs )
+   $term->setattr( $attrs );
 
 Makes a C<tcsetattr()> call on the underlying file handle, setting attributes
 from the given C<IO::Termios::Attrs> object.
@@ -235,9 +232,9 @@ sub setattr
 
 =head2 get_mode
 
-   $term->set_mode( $modestr )
+   $term->set_mode( $modestr );
 
-   $modestr = $term->get_mode
+   $modestr = $term->get_mode;
 
 Accessor for the derived "mode string", which is a comma-joined concatenation
 of the baud rate, character size, parity mode, and stop size in a format such
@@ -283,9 +280,9 @@ sub get_mode
 
 =head2 tiocmset
 
-   $bits = $term->tiocmget
+   $bits = $term->tiocmget;
 
-   $term->tiocmset( $bits )
+   $term->tiocmset( $bits );
 
 Accessor for the modem line control bits. Takes or returns a bitmask of
 values.
@@ -317,9 +314,9 @@ sub tiocmset
 
 =head2 tiocmbis
 
-   $term->tiocmbic( $bits )
+   $term->tiocmbic( $bits );
 
-   $term->tiocmbis( $bits )
+   $term->tiocmbis( $bits );
 
 Bitwise mutator methods for the modem line control bits. C<tiocmbic> will
 clear just the bits provided and leave the others unchanged; C<tiocmbis> will
@@ -372,7 +369,7 @@ foreach (qw( dtr dsr rts cts cd ri )) {
 
 =head2 get_modem
 
-   $flags = $term->get_modem
+   $flags = $term->get_modem;
 
 Returns a hash reference containing named flags corresponding to the modem
 line control bits. Any bit that is set will yield a key in the returned hash
@@ -394,7 +391,7 @@ sub get_modem
 
 =head2 set_modem
 
-   $term->set_modem( $flags )
+   $term->set_modem( $flags );
 
 Changes the modem line control bit flags as given by the hash reference. Each
 bit to be changed should be represented by a key in the C<$flags> hash of the
@@ -423,9 +420,9 @@ sub set_modem
 
 =head2 setmodem_BIT
 
-   $set = $term->getmodem_BIT
+   $set = $term->getmodem_BIT;
 
-   $term->setmodem_BIT( $set )
+   $term->setmodem_BIT( $set );
 
 Accessor methods for each of the modem line control bits. A set of methods
 exists for each of the named modem control bits given above.
@@ -476,15 +473,15 @@ time. This is C<set_mode>:
 
 =head2 setbaud
 
-   $baud = $term->getibaud
+   $baud = $term->getibaud;
 
-   $baud = $term->getobaud
+   $baud = $term->getobaud;
 
-   $term->setibaud( $baud )
+   $term->setibaud( $baud );
 
-   $term->setobaud( $baud )
+   $term->setobaud( $baud );
 
-   $term->setbaud( $baud )
+   $term->setbaud( $baud );
 
 Convenience accessors for the C<ispeed> and C<ospeed>. C<$baud> is an integer
 directly giving the line rate, instead of one of the C<BI<nnn>> constants.
@@ -493,9 +490,9 @@ directly giving the line rate, instead of one of the C<BI<nnn>> constants.
 
 =head2 setcsize
 
-   $bits = $term->getcsize
+   $bits = $term->getcsize;
 
-   $term->setcsize( $bits )
+   $term->setcsize( $bits );
 
 Convenience accessor for the C<CSIZE> bits of C<c_cflag>. C<$bits> is an
 integer 5 to 8.
@@ -504,9 +501,9 @@ integer 5 to 8.
 
 =head2 setparity
 
-   $parity = $term->getparity
+   $parity = $term->getparity;
 
-   $term->setparity( $parity )
+   $term->setparity( $parity );
 
 Convenience accessor for the C<PARENB> and C<PARODD> bits of C<c_cflag>.
 C<$parity> is C<n>, C<o> or C<e>.
@@ -515,15 +512,15 @@ C<$parity> is C<n>, C<o> or C<e>.
 
 =head2 setstop
 
-   $stop = $term->getstop
+   $stop = $term->getstop;
 
-   $term->setstop( $stop )
+   $term->setstop( $stop );
 
 Convenience accessor for the C<CSTOPB> bit of C<c_cflag>. C<$stop> is 1 or 2.
 
 =head2 cfmakeraw
 
-   $term->cfmakeraw
+   $term->cfmakeraw;
 
 I<Since version 0.07.>
 
@@ -565,9 +562,9 @@ foreach my $method (qw( setbaud cfmakeraw )) {
 
 =head2 setflag_I<FLAG>
 
-   $mode = $term->getflag_FLAG
+   $mode = $term->getflag_FLAG;
 
-   $term->setflag_FLAG( $mode )
+   $term->setflag_FLAG( $mode );
 
 Accessors for various control flags. The following methods are defined for
 specific flags:
@@ -689,7 +686,7 @@ foreach ( @flags ) {
 
 =head2 setflags
 
-   $term->setflags( @flags )
+   $term->setflags( @flags );
 
 I<Since version 0.09.>
 

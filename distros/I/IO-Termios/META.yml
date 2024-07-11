@@ -5,12 +5,11 @@ author:
 build_requires:
   IO::Pty: '0'
   IO::Tty: '0'
-  Test::LongString: '0'
-  Test::More: '0.88'
+  Test2::V0: '0'
 configure_requires:
   Module::Build: '0.4004'
 dynamic_config: 1
-generated_by: 'Module::Build version 0.4231, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Module::Build version 0.4234, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -19,11 +18,11 @@ name: IO-Termios
 provides:
   IO::Termios:
     file: lib/IO/Termios.pm
-    version: '0.09'
+    version: '0.10'
 requires:
   IO::Tty: '0'
-  perl: '5.010'
+  perl: '5.014'
 resources:
   license: http://dev.perl.org/licenses/
-version: '0.09'
+version: '0.10'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

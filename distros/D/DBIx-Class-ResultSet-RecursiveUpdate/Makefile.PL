@@ -2,7 +2,7 @@
 use strict;
 use warnings;
 
-
+use 5.014;
 
 use ExtUtils::MakeMaker;
 
@@ -14,26 +14,27 @@ my %WriteMakefileArgs = (
   },
   "DISTNAME" => "DBIx-Class-ResultSet-RecursiveUpdate",
   "LICENSE" => "perl",
+  "MIN_PERL_VERSION" => "5.014",
   "NAME" => "DBIx::Class::ResultSet::RecursiveUpdate",
   "PREREQ_PM" => {
     "Carp::Clan" => "6.04",
     "DBD::SQLite" => "1.21",
     "DBIx::Class" => "0.08103",
     "DBIx::Class::IntrospectableM2M" => 0,
-    "Data::Dumper::Concise" => "2.020",
+    "Data::Dumper::Concise" => "2.02",
     "DateTime" => 0,
     "List::MoreUtils" => "0.22",
     "SQL::Translator" => "0.11016",
-    "Try::Tiny" => "0.30"
+    "Try::Tiny" => "0.3"
   },
   "TEST_REQUIRES" => {
     "Test::DBIC::ExpectedQueries" => "2.001",
     "Test::Exception" => "0.43",
     "Test::More" => "0.88",
     "Test::Trap" => "0.2.2",
-    "Test::Warn" => "0.20"
+    "Test::Warn" => "0.2"
   },
-  "VERSION" => "0.43",
+  "VERSION" => "0.44",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -45,7 +46,7 @@ my %FallbackPrereqs = (
   "DBD::SQLite" => "1.21",
   "DBIx::Class" => "0.08103",
   "DBIx::Class::IntrospectableM2M" => 0,
-  "Data::Dumper::Concise" => "2.020",
+  "Data::Dumper::Concise" => "2.02",
   "DateTime" => 0,
   "List::MoreUtils" => "0.22",
   "SQL::Translator" => "0.11016",
@@ -53,8 +54,8 @@ my %FallbackPrereqs = (
   "Test::Exception" => "0.43",
   "Test::More" => "0.88",
   "Test::Trap" => "0.2.2",
-  "Test::Warn" => "0.20",
-  "Try::Tiny" => "0.30"
+  "Test::Warn" => "0.2",
+  "Try::Tiny" => "0.3"
 );
 
 
