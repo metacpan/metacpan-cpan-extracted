@@ -1,5 +1,21 @@
 Revision history for MIDI-RtMidi-ScorePlayer
 
+0.0110 2024-07-11 22:25:03
+    - Enable optional MIDI file saving after each loop.
+		- Add a verbose option to show our progress and looping.
+
+0.0109 2024-07-11 20:57:17
+    - Awe crap. Moo was listed as a prereq. Whoops
+
+0.0108 2024-07-11 20:31:02
+    - Improve documentation again. :)
+
+0.0107 2024-07-11 17:58:47
+    - Improve documentation slightly.
+
+0.0106 2024-07-11 17:29:00
+    - Improve documentation.
+
 0.0105 2024-07-10 19:02:09
     - Bah! Typos!
 

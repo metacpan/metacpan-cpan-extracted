@@ -1,10 +1,18 @@
+0.092   2024-07-11  Released-By: PERLANCAR; Urgency: low
+
+        - No functional changes.
+
+        - [dist] Edit Changes (replace Backward-Compatible: no with
+          Backward-Incompatible: yes).
+
+
 0.091   2023-10-04  Released-By: PERLANCAR; Urgency: high
 
         - Update to latest version of Locale::ID::Province (renamed
           functions).
 
 
-0.090   2019-11-21  Released-By: PERLANCAR; Urgency: medium; Backward-Compatible: no
+0.090   2019-11-21  Released-By: PERLANCAR; Urgency: medium; Backward-Incompatible: yes
 
 	- [incompatible change] No longer export validate_nop_pbb() by
 	  default.
@@ -61,4 +69,3 @@
 0.01    2011-12-14  Released-By: SHARYANTO
 
         - First release.
-

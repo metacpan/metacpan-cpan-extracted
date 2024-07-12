@@ -1,7 +1,7 @@
 use v5.36;
 
 use App::Gimei::Generator;
-use Test::More;
+use Test2::Bundle::More;
 
 # test caching
 {

@@ -17,9 +17,10 @@ my %WriteMakefileArgs = (
   "MIN_PERL_VERSION" => "5.010",
   "NAME" => "MIDI::RtMidi::ScorePlayer",
   "PREREQ_PM" => {
+    "File::Basename" => 0,
     "MIDI::RtMidi::FFI::Device" => 0,
     "MIDI::Util" => "0.1302",
-    "Moo" => 2,
+    "Path::Tiny" => 0,
     "Time::HiRes" => 0,
     "strict" => 0,
     "warnings" => 0
@@ -31,7 +32,7 @@ my %WriteMakefileArgs = (
     "Test::Exception" => 0,
     "Test::More" => "0.88"
   },
-  "VERSION" => "0.0105",
+  "VERSION" => "0.0110",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -39,12 +40,13 @@ my %WriteMakefileArgs = (
 
 
 my %FallbackPrereqs = (
+  "File::Basename" => 0,
   "File::Spec" => 0,
   "IO::Handle" => 0,
   "IPC::Open3" => 0,
   "MIDI::RtMidi::FFI::Device" => 0,
   "MIDI::Util" => "0.1302",
-  "Moo" => 2,
+  "Path::Tiny" => 0,
   "Test::Exception" => 0,
   "Test::More" => "0.88",
   "Time::HiRes" => 0,

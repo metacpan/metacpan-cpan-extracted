@@ -8,7 +8,7 @@ my @tests = (
         Name                   => 'number expected',
         args                   => [ '-n', 'Alice' ],
         expected_error_message =>
-          "Error: Value \"Alice\" invalid for option n (number expected)\n",
+          qr/Error: Value "Alice" invalid for option n \((integer )?number expected\)\n/,
         expected_stdout => '',
         expected_stderr => '',
     },

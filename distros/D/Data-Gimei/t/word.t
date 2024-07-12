@@ -4,7 +4,7 @@ use warnings;
 use utf8;
 
 use Data::Gimei;
-use Test::More;
+use Test2::Bundle::More;
 
 {    # to_s
     my $w = Data::Gimei::Word->new( [ '佐藤', 'さとう', 'サトウ', 'sato' ] );

@@ -5,7 +5,7 @@ use strict;
 use warnings;
 
 use Data::Gimei;
-use Test::More;
+use Test2::Bundle::More;
 
 my @expected;
 Data::Gimei::set_random_seed(42);

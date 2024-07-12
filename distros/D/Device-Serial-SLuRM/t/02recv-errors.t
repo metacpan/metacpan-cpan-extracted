@@ -10,13 +10,13 @@ use constant HAVE_TEST_METRICS_ANY => eval { require Test::Metrics::Any };
 
 use Future::AsyncAwait;
 
-use Device::Serial::SLuRM;
+use Device::Serial::SLuRM::Protocol;
 
 use Digest::CRC qw( crc8 );
 
 my $controller = Test::Future::IO->controller;
 
-my $slurm = Device::Serial::SLuRM->new( fh => "DummyFH" );
+my $proto = Device::Serial::SLuRM::Protocol->new( fh => "DummyFH" );
 
 sub with_crc8
 {
@@ -29,7 +29,7 @@ sub with_crc8
 # still arrives OK
 my $emptybytes = "\x55" . with_crc8( with_crc8( "\x1F\x00" ) );
 my $OKbytes    = "\x55" . with_crc8( with_crc8( "\x11\x02" ) . "OK" );
-my $expect = [ 0x11, "OK" ];
+my $expect = [ 0x11, 0, "OK" ];
 
 # Test logic is simpler if we *don't* use_sysread_buffer for this one
 
@@ -41,10 +41,10 @@ my $expect = [ 0x11, "OK" ];
          $OKbytes
       );
 
-   is( [ await $slurm->recv_packet ], $expect,
-      'Packet received by ->recv_packet after missing SYNC byte' );
+   is( [ await $proto->recv ], $expect,
+      'Packet received by ->recv after missing SYNC byte' );
 
-   $controller->check_and_clear( '->recv_packet after missing SYNC byte' );
+   $controller->check_and_clear( '->recv after missing SYNC byte' );
 }
 
 # Corrupted SYNC byte
@@ -55,10 +55,10 @@ my $expect = [ 0x11, "OK" ];
          $OKbytes
       );
 
-   is( [ await $slurm->recv_packet ], $expect,
-      'Packet received by ->recv_packet after corrupted SYNC byte' );
+   is( [ await $proto->recv ], $expect,
+      'Packet received by ->recv after corrupted SYNC byte' );
 
-   $controller->check_and_clear( '->recv_packet after corrupted SYNC byte' );
+   $controller->check_and_clear( '->recv after corrupted SYNC byte' );
 }
 
 # Corrupted header CRC
@@ -69,8 +69,8 @@ my $expect = [ 0x11, "OK" ];
    $controller->expect_sysread( "DummyFH", 8192 )
       ->will_done( $badbytes . $OKbytes );
 
-   is( [ await $slurm->recv_packet ], $expect,
-      'Packet received by ->recv_packet after corrupted header' );
+   is( [ await $proto->recv ], $expect,
+      'Packet received by ->recv after corrupted header' );
 
    if( HAVE_TEST_METRICS_ANY ) {
       Test::Metrics::Any::is_metrics( {
@@ -78,7 +78,7 @@ my $expect = [ 0x11, "OK" ];
       }, 'Corrupted header CRC increments metrics' );
    }
 
-   $controller->check_and_clear( '->recv_packet after corrupted header' );
+   $controller->check_and_clear( '->recv after corrupted header' );
 }
 
 # Corrupted payload CRC
@@ -89,8 +89,8 @@ my $expect = [ 0x11, "OK" ];
    $controller->expect_sysread( "DummyFH", 8192 )
       ->will_done( $badbytes . $OKbytes );
 
-   is( [ await $slurm->recv_packet ], $expect,
-      'Packet received by ->recv_packet after corrupted payload CRC' );
+   is( [ await $proto->recv ], $expect,
+      'Packet received by ->recv after corrupted payload CRC' );
 
    if( HAVE_TEST_METRICS_ANY ) {
       Test::Metrics::Any::is_metrics( {
@@ -98,7 +98,7 @@ my $expect = [ 0x11, "OK" ];
       }, 'Corrupted body CRC increments metrics' );
    }
 
-   $controller->check_and_clear( '->recv_packet after corrupted payload CRC' );
+   $controller->check_and_clear( '->recv after corrupted payload CRC' );
 }
 
 # Noisy byte in between packets
@@ -106,12 +106,12 @@ my $expect = [ 0x11, "OK" ];
    $controller->expect_sysread( "DummyFH", 8192 )
       ->will_done( $emptybytes . "X" . $OKbytes );
 
-   is( [ await $slurm->recv_packet ], [ 0x1F, "" ],
+   is( [ await $proto->recv ], [ 0x1F, 0, "" ],
       'First packet received before spurious noise byte' );
-   is( [ await $slurm->recv_packet ], $expect,
-      'Packet received by ->recv_packet after spurious noise byte' );
+   is( [ await $proto->recv ], $expect,
+      'Packet received by ->recv after spurious noise byte' );
 
-   $controller->check_and_clear( '->recv_packet after spurious noise byte' );
+   $controller->check_and_clear( '->recv after spurious noise byte' );
 }
 
 # Byte missing in payload
@@ -122,10 +122,10 @@ my $expect = [ 0x11, "OK" ];
    $controller->expect_sysread( "DummyFH", 8192 )
       ->will_done( $badbytes . $OKbytes );
 
-   is( [ await $slurm->recv_packet ], $expect,
-      'Packet received by ->recv_packet after missing payload byte' );
+   is( [ await $proto->recv ], $expect,
+      'Packet received by ->recv after missing payload byte' );
 
-   $controller->check_and_clear( '->recv_packet after missing payload byte' );
+   $controller->check_and_clear( '->recv after missing payload byte' );
 }
 
 done_testing;

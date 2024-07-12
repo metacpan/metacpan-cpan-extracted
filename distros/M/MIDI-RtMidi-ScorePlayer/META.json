@@ -34,9 +34,10 @@
       },
       "runtime" : {
          "requires" : {
+            "File::Basename" : "0",
             "MIDI::RtMidi::FFI::Device" : "0",
             "MIDI::Util" : "0.1302",
-            "Moo" : "2",
+            "Path::Tiny" : "0",
             "Time::HiRes" : "0",
             "perl" : "5.010",
             "strict" : "0",
@@ -63,7 +64,7 @@
          "web" : "https://github.com/ology/MIDI-RtMidi-ScorePlayer"
       }
    },
-   "version" : "0.0105",
+   "version" : "0.0110",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.032001"
@@ -293,7 +294,12 @@
                   ],
                   "spell_cmd" : "aspell list",
                   "stopwords" : [
-                     "foo"
+                     "DLSMusicDevice",
+                     "FluidSynth",
+                     "Garageband",
+                     "distro",
+                     "soundfont",
+                     "synch'd"
                   ],
                   "wordlist" : "Pod::Wordlist"
                }

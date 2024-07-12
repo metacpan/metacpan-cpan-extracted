@@ -4,7 +4,7 @@ use warnings;
 
 use Data::Gimei::Random;
 
-use Test::More;
+use Test2::Bundle::More;
 
 {    # default seed
     my @results;

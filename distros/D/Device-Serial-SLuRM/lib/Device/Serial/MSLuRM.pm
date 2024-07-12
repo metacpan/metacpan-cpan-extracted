@@ -7,7 +7,7 @@ use v5.26;
 use warnings;
 use Object::Pad 0.800;
 
-package Device::Serial::MSLuRM 0.06;
+package Device::Serial::MSLuRM 0.07;
 class Device::Serial::MSLuRM
    :isa(Device::Serial::SLuRM);
 

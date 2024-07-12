@@ -1,0 +1,30 @@
+#!env perl
+
+use v5.20;
+
+use utf8;
+use open ':std', ':encoding(UTF-8)';
+
+use Encode 'encode_utf8';
+use Getopt::Long::Descriptive;
+use Text::Schmutz;
+
+my ( $opt, $usage ) = describe_options(
+    '%c %o',
+    [],
+    [ 'small|feinstaub'           => 'spray dust on your text' ],
+    [ 'large|grobe-mettwurst'     => 'a cookie got mangled in your typewriter' ],
+    [ 'strike-out|nein-nein-nein' => 'this is unacceptable' ],
+    [ 'p=f', 'probability between 0.0 and 1.0', { default => 0.1 } ],
+);
+
+my $s = Text::Schmutz->new(
+    use_small  => $opt->small || !( $opt->large || $opt->strike_out ),
+    use_large  => $opt->large,
+    strike_out => $opt->strike_out,
+    prob       => $opt->p,
+);
+
+while ( my $line = <> ) {
+    print $s->mangle( encode_utf8($line) );
+}

@@ -1,5 +1,13 @@
 Revision history for Perl extension App-Gimei
 
+v0.2.8 2024-07-12T05:04:22Z
+    - support Getopt::Long-2.58
+
+v0.2.7 2024-07-11T18:29:47Z
+    - update cpanfile
+    - update perl version on GitHub Actions
+    - use Test2::Bundle::More instead of Test::More
+
 v0.2.6 2024-02-27T17:11:58Z
     - fix garbled text in help option
 

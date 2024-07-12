@@ -5,7 +5,8 @@ use warnings;
 
 use Moose; # Catalyst::View;
 extends 'Catalyst::View::TT';
-our $VERSION = '0.01';
+our $VERSION = '0.03';
+use JSON;
 
 around 'render' => sub {
 	my ($meth, $orig, $c, $template, $args) = (@_, $_[2]->stash());
@@ -20,6 +21,49 @@ around 'render' => sub {
 	$orig->$meth($c, $template, $args);
 };
 
+
+sub process {
+	my ( $self, $c ) = @_;
+
+	my $template = $c->stash->{template}
+	  ||  $c->action . $self->config->{TEMPLATE_EXTENSION};
+
+	unless (defined $template) {
+		$c->log->debug('No template specified for rendering') if $c->debug;
+		return 0;
+	}
+
+	local $@;
+	my $output = eval { $self->render($c, $template) };
+	if (my $err = $@) {
+		return $self->_rendering_error($c, $template . ': ' . $err);
+	}
+	if (blessed($output) && $output->isa('Template::Exception')) {
+		$self->_rendering_error($c, $output);
+	}
+
+	if ($c->stash->{JSON}) {
+		my $body = $self->build_json($c, $c->stash->{JSON});
+		$body->{html} = $output;
+		$output = JSON->new->encode($body);
+		$c->response->content_type("application/json; charset=UTF-8");
+	} else {
+		unless ( $c->response->content_type ) {
+			my $default = $self->content_type || 'text/html; charset=UTF-8';
+			$c->response->content_type($default);
+		}
+	}
+
+	$c->response->body($output);
+
+	return 1;
+}
+
+sub build_json {
+	my ($self, $c, $json) = @_;
+	return ref $json ? $json : {};
+}
+
 1;
 
 __END__
@@ -30,7 +74,7 @@ Catalyst::View::TT::Progressive - Control the wrapper
 
 =head1 VERSION
 
-Version 0.01
+Version 0.03
 
 =cut
 
@@ -61,37 +105,32 @@ Version 0.01
 		<head>
 			<meta charset="utf-8">
 			<meta name="viewport" content="width=device-width, initial-scale=1.0">
-			<meta name="description" content="A layout example with a side menu that hides on mobile, just like the Pure website.">
-			<title>Responsive Side Menu &ndash; Layout Examples &ndash; Pure</title>
-
-			<link rel="stylesheet" href="/static/css/pure-min.css" integrity="sha384-" crossorigin="anonymous">
-				<!--[if lte IE 8]>
-					<link rel="stylesheet" href="css/layouts/side-menu-old-ie.css">
-				<![endif]-->
-				<!--[if gt IE 8]><!-->
-					<link rel="stylesheet" href="/static/css/layouts/side-menu.css">
-				<!--<![endif]-->
+			<meta name="description" content="A basic test application.">
+			<title>Test Application</title>
+			<link rel="stylesheet" href="/static/css/app.css" integrity="sha384-" crossorigin="anonymous">
 		</head>
 		<body>
 			<div id="layout">
-				<!-- Menu toggle -->
 				<a href="#menu" id="menuLink" class="menu-link">
-					<!-- Hamburger icon -->
 					<span></span>
 				</a>
 				<div id="menu">
-					<div class="pure-menu">
-						<a class="pure-menu-heading" href="#">Company</a>
+					<a class="menu-heading" href="#">Company</a>
 
-						<ul class="pure-menu-list">
-							<li class="pure-menu-item pure-menu-selected"><a href="[% c.uri_for('/') %]" class="pure-menu-link">Home</a></li>
-							<li class="pure-menu-item"><a href="[% c.uri_for('/one') %]" class="pure-menu-link">One</a></li>
-							<li class="pure-menu-item menu-item-divided">
-								<a href="[% c.uri_for('/two') %]" class="pure-menu-link">Two</a>
-							</li>
-							<li class="pure-menu-item"><a href="[% c.uri_for('/three') %]" class="pure-menu-link">Three</a></li>
-						</ul>
-					</div>
+					<ul class="menu-list">
+						<li class="menu-item menu-selected">
+							<a href="[% c.uri_for('/') %]" class="menu-link">Home</a>
+						</li>
+						<li class="menu-item">
+							<a href="[% c.uri_for('/one') %]" class="menu-link">One</a>
+						</li>
+						<li class="menu-item menu-item-divided">
+							<a href="[% c.uri_for('/two') %]" class="menu-link">Two</a>
+						</li>
+						<li class="menu-item">
+							<a href="[% c.uri_for('/three') %]" class="menu-link">Three</a>
+						</li>
+					</ul>
 				</div>
 				<div id="main" progressive>
 					[% content %]
@@ -100,6 +139,10 @@ Version 0.01
 			<script src="/static/js/app.js"></script>
 		</body>
 	</html>
+
+=== new_wrapper.tt ===
+	
+	[% content %]
 
 === Your app.js === 
 
@@ -116,7 +159,7 @@ Version 0.01
 				request.open('GET', url);
 				request.setRequestHeader('WRAPPER', 'new_wrapper.tt');
 				request.send();
-			}
+			},
 			render: function (res) {
 				var wrapper = document.querySelector('[progressive]');
 				wrapper.innerHTML = res;
@@ -131,18 +174,59 @@ Version 0.01
 			}
 		});
 
-		document.querySelectorAll('.pure-menu-link').forEach(function (link) {
+		document.querySelectorAll('.menu-link').forEach(function (link) {
 			link.addEventListener('click', function (event) {
-				progressive.menu.querySelector('.pure-menu-selected').classList.remove('pure-menu-selected');
-				event.target.parentNode.classList.add('pure-menu-selected');
+				progressive.menu.querySelector('.menu-selected').classList.remove('menu-selected');
+				event.target.parentNode.classList.add('menu-selected');
 			});
 		});
 
-		....
+		...
 
 	})();
-		
-L<https://developers.google.com/web/progressive-web-apps/>
+
+
+=== Alternative app.js when handling a json response ===
+
+	$c->stash(JSON => {
+		abc => 1
+	});
+ 
+	(function () {
+		var progressive = {	
+			menu: document.getElementById('menu'),
+			request: function (url, cb, ecb) {
+				if (url.match('^#')) return;
+				var request = new XMLHttpRequest();
+				request.onreadystatechange = function () {
+					if (request.readyState === XMLHttpRequest.DONE) request.status === 200 
+						? cb(JSON.parse(request.response)) 
+						: ecb(request); 
+				};
+				request.open('GET', url);
+				request.setRequestHeader('api', 1);
+				request.setRequestHeader('WRAPPER', 'new_wrapper.tt');
+				request.send();
+			},
+			render: function (res) {
+				var wrapper = document.querySelector('[progressive]');
+				wrapper.innerHTML = res.html;
+				if (res.abc) {
+					... instantiate some JS ...
+				}
+			},
+			error: function (req) {}
+		};
+
+		...
+	})();
+
+when using this approach you may want to prevent accessing of endpoints directly from a browser an easy way of achieving this is checking for a header in Root->auto and then redirecting.
+
+        unless ($c->req->header('api')) {
+                $c->response->redirect($c->uri_for('/invalid_url'));
+                return;
+        }
 
 =head1 AUTHOR
 

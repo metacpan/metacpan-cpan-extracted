@@ -52,14 +52,14 @@
       },
       "test" : {
          "requires" : {
-            "Test::More" : "0"
+            "Test2::Bundle::More" : "0"
          }
       }
    },
    "provides" : {
       "Data::Gimei" : {
          "file" : "lib/Data/Gimei.pm",
-         "version" : "v0.4.2"
+         "version" : "v0.4.3"
       },
       "Data::Gimei::Address" : {
          "file" : "lib/Data/Gimei/Address.pm"
@@ -86,7 +86,7 @@
          "web" : "https://github.com/youpong/Data-Gimei"
       }
    },
-   "version" : "v0.4.2",
+   "version" : "v0.4.3",
    "x_authority" : "cpan:YOUPONG",
    "x_contributors" : [
       "NAKAJIMA Yusaku <yupong7@gmail.com>",

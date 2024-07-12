@@ -19,6 +19,12 @@
 #
 #######################################################################
 
+2024-07-11  Brian M. Kelly <Brian.Kelly@fullauto.com>
+
+        * Version 1.0000665 released
+
+        * Updated Amazon methods in fa_amazon.pm
+
 2024-07-10  Brian M. Kelly <Brian.Kelly@fullauto.com>
 
         * Version 1.0000664 released

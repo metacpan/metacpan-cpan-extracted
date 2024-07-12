@@ -15,7 +15,7 @@ package Term::Menus;
 ## See user documentation at the end of this file.  Search for =head
 
 
-our $VERSION = '3.033';
+our $VERSION = '3.035';
 
 
 use 5.006;
@@ -236,7 +236,7 @@ use vars qw(@EXPORT @EXPORT_OK %term_input %test %Dump %tosspass %b
             %DB_ENV_TXN_WRITE_NOSYNC %DB_ENV_LOCKING
             %DB_IMMUTABLE_KEY %DB_MUTEX_SHARED %DB_HEAP
             %DB_CHKSUM_SHA1 %DB_ENV_TXN_SNAPSHOT
-            %DB_VERSION_MAJOR %DB_ENV_HOTBACKUP %transform_mbio
+            %DB_VERSION_MAJOR %DB_ENV_HOTBACKUP %transform_mboi
             %DB_TEST_POSTDESTROY %DB_FORCESYNC %DB_DUP
             %DB_NOSERVER_HOME %DB_SEQ_INC %DB_FIXEDLEN
             %DB_LOG_VERIFY_CAF %DB_TXN_TOKEN_SIZE
@@ -1378,7 +1378,7 @@ sub banner
       }
       $banner=join '',@banner;
    }
-   return transform_mbio(transform_mbii(transform_mbir(
+   return transform_mboi(transform_mbii(transform_mbir(
              $banner,$Conveyed,$MenuUnit_hash_ref,
              $log_handle),$numbor,$ikey,$input,
              $MenuUnit_hash_ref,$Conveyed,$log_handle),$MenuUnit_hash_ref,
@@ -2080,9 +2080,10 @@ sub transform_sicm
 
 }
 
-sub transform_mbio
+sub transform_mboi
 {
 
+   ## mboi - [m]enu [b]anner [o]output [i]tems
    my $text=$_[0]||'';
    my $input=$_[1]||{};
    my $MenuUnit_hash_ref=$_[2]||{};
@@ -2090,10 +2091,10 @@ sub transform_mbio
    my $SaveMMap=$_[4]||'';
    my $picks_from_parent=$_[5]||'';
    my $log_handle=$_[6]||'';
-   my $tobi_regex=qr/\](!)?o(?:u+tput[-_]*)*b*(?:a+nner[-_]*)
+   my $mboi_regex=qr/\](!)?o(?:u+tput[-_]*)*b*(?:a+nner[-_]*)
          *m*(?:e+nu[-_]*)*i*(?:t+ems[-_]*)*\[/xi;
    my $test_regx_flag=0;
-   FE: foreach my $regx ($tobi_regex) {
+   FE: foreach my $regx ($mboi_regex) {
       last if $test_regx_flag;
       while ($text=~m/($regx(?:\{[^}]+\})*)/sg) {
          $test_regx_flag=1 if -1<index $regx,'(!)?t(?:';
@@ -2104,6 +2105,12 @@ sub transform_mbio
          $esc_two=~s/\]/\\\]/;$esc_two=~s/\[/\\\[/;
          $esc_one=~s/^\]/\[\]\]/;$esc_one=~s/^(.*?)\[\{/$1\[\[\]{/;
          $esc_one=~s/^(.*?[]])[{](.*)[}]$/$1\[\{\]$2\[\}\]/;
+         $esc_one=~s/\\/\\\\/g;
+         $esc_one=~s/[+]/\[+\]/g;$esc_one=~s/[*]/\[*\]/g;
+         $esc_one=~s/(?:(?:\d\s*,\s*"|"\s*,\s*\d)(*SKIP)(*FAIL)|")/\\\"/g;
+         $esc_two=~s/(?:(?:\d\s*,\s*"|"\s*,\s*\d)(*SKIP)(*FAIL)|")/\\\"/g;
+         $esc_one=~s/\$/\\\$/g;$esc_two=~s/\$/\\\$/g;
+         $esc_two=~s/(?:(?:\\[]]|\\[[]|\\["]|\\[\$])(*SKIP)(*FAIL)|\\)/\\\\/g;
          my $instructions=$esc_two;
          $instructions=~s/^\\[]][^[]+\\[[]\s*[{](.*?)[}]$/$1/;
          $instructions=~/^(.*?),(.*?)$/;
@@ -2207,11 +2214,18 @@ sub transform_mbii
          $test_regx_flag=1 if -1<index $regx,'(!)?t(?:';
          my $esc_one=$1;my $bang=$2;
          my $length_of_macro=length $esc_one;
+
          $esc_one=~s/["]\s*[.]\s*["]//s;
          my $esc_two=$esc_one;
          $esc_two=~s/\]/\\\]/;$esc_two=~s/\[/\\\[/;
          $esc_one=~s/^\]/\[\]\]/;$esc_one=~s/^(.*?)\[\{/$1\[\[\]{/;
          $esc_one=~s/^(.*?[]])[{](.*)[}]$/$1\[\{\]$2\[\}\]/;
+         $esc_one=~s/\\/\\\\/g;
+         $esc_one=~s/[+]/\[+\]/g;$esc_one=~s/[*]/\[*\]/g;
+         $esc_one=~s/(?:(?:\d\s*,\s*"|"\s*,\s*\d)(*SKIP)(*FAIL)|")/\\\"/g;
+         $esc_two=~s/(?:(?:\d\s*,\s*"|"\s*,\s*\d)(*SKIP)(*FAIL)|")/\\\"/g;
+         $esc_one=~s/\$/\\\$/g;$esc_two=~s/\$/\\\$/g;
+         $esc_two=~s/(?:(?:\\[]]|\\[[]|\\["]|\\[\$])(*SKIP)(*FAIL)|\\)/\\\\/g;
          my $instructions=$esc_two;
          $instructions=~s/^\\[]][^[]+\\[[]\s*[{](.*?)[}]$/$1/;
          $instructions='('.$instructions.')';

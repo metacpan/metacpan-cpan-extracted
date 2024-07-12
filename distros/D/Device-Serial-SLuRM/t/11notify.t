@@ -46,14 +46,25 @@ sub notifications_received_for
    return @notifications;
 }
 
-# Basic notification
+# Auto-reset
 {
-   # Auto-reset
-   $controller->expect_syswrite( "DummyFH", "\x55" . with_crc8( with_crc8( "\x01\x01" ) . "\x00" ) );
+   $controller->expect_sysread( "DummyFH", 8192 )
+      ->will_return( my $read1_f = Future->new );
+   $controller->expect_syswrite( "DummyFH", "\x55" . with_crc8( with_crc8( "\x01\x01" ) . "\x00" ) )
+      ->will_also_later( sub { $read1_f->done( "\x55" . with_crc8( with_crc8( "\x02\x01" ) . "\x00" ) ); } );
    $controller->expect_syswrite( "DummyFH", "\x55" . with_crc8( with_crc8( "\x01\x01" ) . "\x00" ) );
    $controller->expect_sysread( "DummyFH", 8192 )
-      ->will_done( "\x55" . with_crc8( with_crc8( "\x02\x01" ) . "\x00" ) );
+      ->will_return( my $read2_f = Future->new )
+      ->will_also_later( sub { $slurm->stop; } );
 
+   my $run_f = $slurm->run;
+   $run_f->await;
+
+   ok( $read2_f->is_cancelled, 'Second read future is cancelled after ->stop' );
+}
+
+# Basic notification
+{
    my ( $notification ) = notifications_received_for
       "\x55" . with_crc8( with_crc8( "\x11\x01" ) . "A" );
    is( $notification, "A", 'Received NOTIFY packet' );

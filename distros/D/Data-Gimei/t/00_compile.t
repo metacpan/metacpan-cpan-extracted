@@ -1,10 +1,10 @@
 use 5.010;
 use strict;
 use warnings;
-use Test::More;
+use Test2::Bundle::More;
 
-use_ok $_ for qw(
-  Data::Gimei
-);
+use Data::Gimei;
+
+ok 1; # dummy
 
 done_testing;

@@ -19,10 +19,15 @@ add_stopwords(<DATA>);
 all_pod_files_spelling_ok( qw( bin lib ) );
 __DATA__
 Boggs
+DLSMusicDevice
+FluidSynth
+Garageband
 Gene
 MIDI
 RtMidi
 ScorePlayer
-foo
+distro
 gene
 lib
+soundfont
+synch'd

@@ -6,7 +6,7 @@ use utf8;
 use Data::Gimei;
 Data::Gimei::Name::load('t/names.yml');
 
-use Test::More;
+use Test2::Bundle::More;
 
 {    # test Name#to_s
     my $name = Data::Gimei::Name->new( gender => 'male' );

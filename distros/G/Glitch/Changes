@@ -3,3 +3,5 @@ Revision history for Glitch
 0.01    Date/time
         First version, released on an unsuspecting world.
 
+0.08	2024-07-11
+	- Set minimum perl to 5.10

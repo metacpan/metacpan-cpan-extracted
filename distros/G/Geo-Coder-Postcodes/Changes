@@ -1,5 +1,9 @@
 Revision history for Geo-Coder-Postcodes
 
+0.08	Thu Jul 11 14:32:42 EDT 2024
+	Use JSON::MaybeXS instead of JSON
+	Calling new on an object now returns a clone rather than setting the defaults in the new object
+
 0.07	Wed Feb  9 10:15:24 EST 2022
 	Handle compression option in the UserAgent within geocode()
 

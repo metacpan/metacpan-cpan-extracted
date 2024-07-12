@@ -36,7 +36,7 @@ use Module::Load::Conditional qw[can_load];
 require Exporter;
 our @ISA = qw(Exporter);
 our @EXPORT = qw(new_user_amazon run_aws_cmd get_aws_security_id
-                 launch_server $configure_aws1 $pem_file $credpath
+                 launch_server $configure_aws $pem_file $credpath
                  $aws_configure $aws connect_shell cmd_raw
 		 fullauto_builddir setup_aws_security is_host_aws);
 our $pem_file='';
@@ -124,7 +124,7 @@ END
             unless (-1<index $choice,'Add Permanent') {
                Net::FullAuto::FA_Core::cleanup();
             } else {
-              $Net::FullAuto::Cloud::fa_amazon::configure_aws1->();
+              $Net::FullAuto::Cloud::fa_amazon::configure_aws->();
               next
             }
          }
@@ -526,6 +526,10 @@ our $aws_configure=sub {
 my $configure_aws2=sub {
 
    package configure_aws2;
+
+   my $aws_access_key_id = $_[0]||'';
+   my $aws_secret_access_key = $_[1]||'';
+
    my $banner=<<'END';
 
      ___              _            _                      _  __
@@ -533,20 +537,22 @@ my $configure_aws2=sub {
    | (__| '_/ -_) _` |  _/ -_)   / _ \/ _/ _/ -_|_-<_-<  | ' </ -_) || (_-<
     \___|_| \___\__,_|\__\___|  /_/ \_\__\__\___/__/__/  |_|\_\___|\_, /__/
                                                                    |__/
-                   ___________________ 
+END
+   $banner.=<<END;
+                  .-------------------. 
    When you click | Create access key | and the Access key ID and Secret
-                   -------------------
+                  '-------------------'
    access key strings will be displayed. You will not have access to the
    secret access key again after the dialog box closes.
 
-   Copy and Paste or type the Access key ID and Secret access key here:
+   Copy & Paste [SHIFT]+[INS] the Access key ID & Secret access key here:
 
 
-   Access key ID                    Use [TAB] key to switch
-                      ]I[{1,'',30}  focus of input boxes
+   Access key ID                                       Use [TAB] key to switch
+                      ]I[{1,"$aws_access_key_id",30} focus of input boxes
 
    Secret access key
-                      ]I[{2,'',55}
+                      ]I[{2,"$aws_secret_access_key",55}
 
 END
 
@@ -562,8 +568,11 @@ END
 
 };
 
-our $configure_aws1=sub {
+our $configure_aws=sub {
 
+   my $aws_access_key_id = $_[0]||'';
+   my $aws_secret_access_key = $_[1]||'';
+ 
    my $banner=<<'END';
 
      ___           __ _                        ___      _____
@@ -578,21 +587,21 @@ our $configure_aws1=sub {
 
    2. Click the username next to the gray checkbox of the name of the
          user you want to create an access key for:
-       _
+      ._.
       |_| username     (If you are a new AWS user, you can use 'admin')
-                    ______________________
+                   .----------------------. 
    3. Click on the | Security credentials | tab
-                    ----------------------
-                    ___________________
+                   '----------------------'
+                   .-------------------.
    4. Click on the | Create access key | button
-                    -------------------
+                   '-------------------'
          (Delete old key if button grayed out and limit exceeded.)
 END
 
    my %configure_aws1=(
 
       Name => 'configure_aws1',
-      Result => $configure_aws2,
+      Result => $configure_aws2->($aws_access_key_id,$aws_secret_access_key),
       Banner => $banner,
 
    );
@@ -842,7 +851,7 @@ my $get_ec2_api=sub {
    ($hash,$output,$error)=Net::FullAuto::Cloud::fa_amazon::run_aws_cmd(
       "aws iam list-access-keys");
    &exit_on_error($error) if $error;
-   $Net::FullAuto::Cloud::fa_amazon::configure_aws1->()
+   $Net::FullAuto::Cloud::fa_amazon::configure_aws->()
       if (-1<index $output,'configure credentials') ||
       (-1<index $output,'Partial credentials found');
    my $choose_is_banner=<<'END';

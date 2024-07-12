@@ -49,7 +49,9 @@ License: perl
 
 use strict;
 
-# globals
+use Getopt::Std;
+
+our $VERSION = '1.001';
 use vars qw($Me $Errors $Grand_Total $Mult %Compress $Matches);
 
 my ( $matcher, $opt );    # matcher - anon. sub to check for matches
@@ -60,8 +62,6 @@ init();                   # initialize globals
 ( $opt, $matcher ) = parse_args();    # get command line options and patterns
 
 matchfile( $opt, $matcher, @ARGV );   # process files
-
-our $VERSION = '1.001';
 
 exit(2) if $Errors;
 exit(0) if $Grand_Total;
@@ -86,36 +86,42 @@ sub init {
 
 ###################################
 
+sub VERSION_MESSAGE {
+	print "$Me version $VERSION\n";
+	exit 0;
+}
+
 sub usage {
 	die <<EOF;
-usage: $Me [flags] [files]
+usage: $Me [-incCwsxvhlF1HurtpaqT] [-e pattern]
+        [-f pattern-file] [-P sep] [pattern] [file...]
 
 Standard grep options:
-	i   case insensitive
-	n   number lines
-	c   give count of lines matching
-	C   ditto, but >1 match per line possible
-	w   word boundaries only
-	s   silent mode
-	x   exact matches only
-	v   invert search sense (lines that DON'T match)
-	h   hide filenames
-	e   expression (for exprs beginning with -)
-	f   file with expressions
-	l   list filenames matching
-	F   search for fixed strings (disable regular expressions)
+	-i   case insensitive
+	-n   number lines
+	-c   give count of lines matching
+	-C   ditto, but >1 match per line possible
+	-w   word boundaries only
+	-s   silent mode
+	-x   exact matches only
+	-v   invert search sense (lines that DON'T match)
+	-h   hide filenames
+	-e   expression (for exprs beginning with -)
+	-f   file with expressions
+	-l   list filenames matching
+	-F   search for fixed strings (disable regular expressions)
 
 Specials:
-	1   1 match per file
-	H   highlight matches
-	u   underline matches
-	r   recursive on directories or dot if none
-	t   process directories in `ls -t` order
-	p   paragraph mode (default: line mode)
-	P   ditto, but specify separator, e.g. -P '%%\\n'
-	a   all files, not just plain text files
-	q   quiet about failed file and dir opens
-	T   trace files as opened
+	-1   1 match per file
+	-H   highlight matches
+	-u   underline matches
+	-r   recursive on directories or dot if none
+	-t   process directories in `ls -t` order
+	-p   paragraph mode (default: line mode)
+	-P   ditto, but specify separator, e.g. -P '%%\\n'
+	-a   all files, not just plain text files
+	-q   quiet about failed file and dir opens
+	-T   trace files as opened
 
 May use GREP_OPTIONS environment variable to set default options.
 EOF
@@ -124,9 +130,7 @@ EOF
 ###################################
 
 sub parse_args {
-	use Getopt::Std;
-
-	my ( $optstring, $zeros, $nulls, %opt, $pattern, @patterns, $match_code );
+	my ( $zeros, $nulls, %opt, $pattern, @patterns, $match_code );
 	my ( $SO, $SE );
 
 	if ( defined( $_ = $ENV{'GREP_OPTIONS'} ) ) {
@@ -134,19 +138,20 @@ sub parse_args {
 		unshift @ARGV, $_;
 		}
 
-	$optstring = "incCwsxvhe:f:l1HurtpP:aqTF";
-
-	$zeros = 'inCwxvhelut';    # options to init to 0 (prevent warnings)
-	$nulls = 'pP';             # options to init to "" (prevent warnings)
+	$zeros = 'inCwxvhlut';    # options to init to 0 (prevent warnings)
+	$nulls = 'epP';             # options to init to "" (prevent warnings)
 
 	@opt{ split //, $zeros } = (0) x length($zeros);
 	@opt{ split //, $nulls } = ('') x length($nulls);
 
-	getopts( $optstring, \%opt ) or usage();
+	getopts('incCwsxvhe:f:l1HurtpP:aqTF', \%opt) or usage();
+	$opt{'s'} = 1 if $opt{'c'};
+	$Mult = 1 if ($opt{'r'} || @ARGV > 1 || @ARGV > 0 && -d $ARGV[0]) && !$opt{'h'};
 
 	my $no_re = $opt{F} || ( $Me =~ /\bfgrep\b/ );
+	$match_code = '';
 
-	if ( $opt{f} ) {           # -f patfile
+	if (defined $opt{'f'}) {           # -f patfile
 		die("$Me: $opt{f}: is a directory\n") if ( -d $opt{f} );
 		open PATFILE, '<', $opt{f} or die qq($Me: Can't open '$opt{f}': $!);
 
@@ -162,26 +167,16 @@ sub parse_args {
 		close PATFILE;
 		}
 	else {    # make sure pattern is valid
-		$pattern = $opt{e} || shift(@ARGV) || usage();
+		$pattern = $opt{'e'};
+		$pattern = shift(@ARGV) unless length $pattern;
+		usage() unless defined $pattern;
 		unless ($no_re) {
 			eval { 'foo' =~ /$pattern/, 1 }
 				or die "$Me: bad pattern: $@";
 			}
 		@patterns = ($pattern);
 		}
-
-	if ($no_re) {
-		for (@patterns) {
-
-			# XXX: quotemeta?
-			s/(\W)/\\$1/g;
-			}
-		}
-
-	# mumble mumble DeMorgan mumble mumble
-	if ( $opt{v} ) {
-		@patterns = join '|', map "(?:$_)", @patterns;
-		}
+	@ARGV = ($opt{'r'} ? '.' : '-') unless @ARGV;
 
 	if ( $opt{H} || $opt{u} ) {    # highlight or underline
 		my $term = $ENV{TERM} || 'vt100';
@@ -212,6 +207,27 @@ sub parse_args {
 			}
 		}
 
+	if ($no_re) {
+		if ($opt{'w'} || $opt{'x'} || $opt{'H'} || $opt{'u'}) {
+			die("$Me: -H, -u, -w and -x are incompatible with -F\n");
+		}
+		my $testop = $opt{'v'} ? '==' : '!=';
+		if ($opt{'i'}) {
+			$match_code = "for my \$pat (\@patterns) { \$Matches++ if (index(lc \$_, lc \$pat) $testop -1) }";
+		}
+		else { # case sensitive
+			$match_code = "for my \$pat (\@patterns) { \$Matches++ if (index(\$_, \$pat) $testop -1) }";
+		}
+		$matcher = eval "sub { $match_code }";
+		die if $@;
+		return (\%opt, $matcher);
+	}
+
+	# mumble mumble DeMorgan mumble mumble
+	if ( $opt{v} ) {
+		@patterns = join '|', map "(?:$_)", @patterns;
+		}
+
 	if ( $opt{i} ) {
 		@patterns = map {"(?i)$_"} @patterns;
 		}
@@ -224,16 +240,11 @@ sub parse_args {
 	$opt{P}   && ( $/        = eval(qq("$opt{P}")) );                                         # for -P '%%\n'
 	$opt{w}   && ( @patterns = map { '(?:\b|(?!\w))' . $_ . '(?:\b|(?<!\w))' } @patterns );
 	$opt{'x'} && ( @patterns = map {"^$_\$"} @patterns );
-	$Mult = 1 if ( $opt{r} || @ARGV > 1 || @ARGV > 0 && -d $ARGV[0] ) && !$opt{h};
 	$opt{1}   += $opt{l};                                                                     # that's a one and an ell
 	$opt{H}   += $opt{u};
 	$opt{c}   += $opt{C};
-	$opt{'s'} += $opt{c};
 	$opt{1}   += $opt{'s'} && !$opt{c};                                                       # that's a one
 
-	@ARGV = ( $opt{r} ? '.' : '-' ) unless @ARGV;
-
-	$match_code = '';
 	$match_code .= 'study;' if @patterns > 5;    # might speed things up a bit
 
 	foreach (@patterns) {s(/)(\\/)g}

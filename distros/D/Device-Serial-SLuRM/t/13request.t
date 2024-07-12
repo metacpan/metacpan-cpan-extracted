@@ -38,10 +38,9 @@ sub with_crc8
    $controller->use_sysread_buffer( "DummyFH" );
 
    # Auto-reset
+   $controller->expect_syswrite( "DummyFH", "\x55" . with_crc8( with_crc8( "\x01\x01" ) . "\x00" ) )
+      ->will_write_sysread_buffer_later( "DummyFH", "\x55" . with_crc8( with_crc8( "\x02\x01" ) . "\x00" ) );
    $controller->expect_syswrite( "DummyFH", "\x55" . with_crc8( with_crc8( "\x01\x01" ) . "\x00" ) );
-   $controller->expect_syswrite( "DummyFH", "\x55" . with_crc8( with_crc8( "\x01\x01" ) . "\x00" ) );
-   $controller->expect_sysread( "DummyFH", 8192 )
-      ->will_done( "\x55" . with_crc8( with_crc8( "\x02\x01" ) . "\x00" ) );
    $controller->expect_sleep( 0.05 * 3 )
       ->remains_pending;
 

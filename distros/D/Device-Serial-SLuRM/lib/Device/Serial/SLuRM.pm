@@ -7,7 +7,7 @@ use v5.26;
 use warnings;
 use Object::Pad 0.800 ':experimental(adjust_params)';
 
-package Device::Serial::SLuRM 0.06;
+package Device::Serial::SLuRM 0.07;
 class Device::Serial::SLuRM;
 
 use Carp;
@@ -15,13 +15,16 @@ use Carp;
 use Syntax::Keyword::Match;
 
 use Future::AsyncAwait;
-use Future::Buffer 0.03;
 use Future::IO;
+use Future::Selector 0.02; # ->run_until_ready
 
-use Digest::CRC qw( crc8 );
 use Time::HiRes qw( gettimeofday tv_interval );
 
 use constant DEBUG => $ENV{SLURM_DEBUG} // 0;
+
+require Device::Serial::SLuRM::Protocol;
+no warnings 'once';
+our $METRICS = $Device::Serial::SLuRM::Protocol::METRICS;
 
 use constant {
    SLURM_PKTCTRL_META   => 0x00,
@@ -148,62 +151,6 @@ eventually succeeded after intermediate timeouts and retransmissions.
 
 =cut
 
-# Metrics support is entirely optional
-our $METRICS;
-eval {
-   require Metrics::Any and Metrics::Any->VERSION( '0.05' ) and
-      Metrics::Any->import( '$METRICS', name_prefix => [ 'slurm' ] );
-};
-
-my %PKTTYPE_NAME;
-
-if( defined $METRICS ) {
-   $METRICS->make_counter( discards =>
-      description => "Number of received packets discarded due to CRC check",
-   );
-
-   $METRICS->make_counter( packets =>
-      description => "Number of packets sent and received, by type",
-      labels => [qw( dir type )],
-   );
-
-   $METRICS->make_distribution( request_success_attempts =>
-      description => "How many requests eventually succeeded after a given number of transmissions",
-      units => "",
-      buckets => [ 1 .. 3 ],
-   );
-
-   $METRICS->make_timer( request_duration =>
-      description => "How long it took to get a response to each request",
-      buckets => [ 0.001, 0.002, 0.005, 0.01, 0.02, 0.05, 0.1, 0.2, 0.5 ],
-   );
-
-   $METRICS->make_counter( retransmits =>
-      description => "Number of retransmits of packets",
-   );
-
-   $METRICS->make_counter( serial_bytes =>
-      description => "Total number of bytes sent and received on the serial link",
-      labels => [qw( dir )],
-   );
-
-   $METRICS->make_counter( timeouts =>
-      description => "Number of transactions that were abandoned due to eventual timeout",
-   );
-
-   %PKTTYPE_NAME = map { __PACKAGE__->can( "SLURM_PKTCTRL_$_" )->() => $_ }
-      qw( META NOTIFY REQUEST RESPONSE ERR ACK );
-
-   # Keep prometheus increase() happy by initialising all the counters to zero
-   $METRICS->inc_counter_by( discards => 0 );
-   foreach my $dir (qw( rx tx )) {
-      $METRICS->inc_counter_by( packets => 0, [ dir => $dir, type => $_ ] ) for values %PKTTYPE_NAME;
-      $METRICS->inc_counter_by( serial_bytes => 0, [ dir => $dir ] );
-   }
-   $METRICS->inc_counter_by( retransmits => 0 );
-   $METRICS->inc_counter_by( timeouts => 0 );
-}
-
 =head1 PARAMETERS
 
 =head2 dev
@@ -254,30 +201,15 @@ C<request> method will make up to 3 attempts).
 
 =cut
 
-field $_fh :param = undef;
-
 use constant is_multidrop => 0;
 
-field $_multidrop :param = __CLASS__->is_multidrop;
-
-ADJUST :params (
-   :$dev    = undef,
-   :$baud //= 115200,
-) {
-   if( defined $_fh ) {
-      # fine
-   }
-   elsif( defined $dev ) {
-      require IO::Termios;
-
-      $_fh = IO::Termios->open( $dev, "$baud,8,n,1" ) or
-         croak "Cannot open device $dev - $!";
-
-      $_fh->cfmakeraw;
-   }
-   else {
-      croak "Require either a 'dev' or 'fh' parameter";
-   }
+field $_protocol; # TODO
+ADJUST :params ( %params )
+{
+   $_protocol = Device::Serial::SLuRM::Protocol->new(
+      multidrop => __CLASS__->is_multidrop,
+      delete %params{qw( fh dev baud )},
+   );
 }
 
 field $_retransmit_delay :param //= 0.05;
@@ -299,8 +231,6 @@ class Device::Serial::SLuRM::_NodeState {
 }
 
 field @_nodestate; # keyed per peer node ID
-# For unit tests
-method _nodestate ( $node_id ) { return $_nodestate[ $node_id ]; }
 
 =head1 METHODS
 
@@ -314,67 +244,7 @@ Waits for and returns the next packet to be received from the serial port.
 
 =cut
 
-field $_recv_buffer;
-
 field $_next_resetack_f;
-
-async method _recv
-{
-   $_recv_buffer //= Future::Buffer->new(
-      fill => $METRICS
-         ? sub {
-            Future::IO->sysread( $_fh, 8192 )
-               ->on_done( sub { $METRICS->inc_counter_by( serial_bytes => length $_[0], [ dir => "rx" ] ) } );
-            }
-         : sub { Future::IO->sysread( $_fh, 8192 ) },
-   );
-
-   my $headerlen = 3 + !!$_multidrop;
-
-   PACKET: {
-      await $_recv_buffer->read_until( qr/\x55/ );
-
-      defined( my $pkt = await $_recv_buffer->read_exactly( $headerlen ) )
-         or return; # EOF
-
-      my ( $pktctrl, $addr, $len );
-      $_multidrop ? ( ( $pktctrl, $addr, $len ) = unpack "C C C", $pkt )
-                  : ( ( $addr, $pktctrl, $len ) = ( 0, unpack "C C", $pkt ) );
-
-      if( crc8( $pkt ) != 0 ) {
-         # Header checksum failed
-         $METRICS and
-            $METRICS->inc_counter( discards => );
-
-         $pkt =~ m/\x55/ and
-            $_recv_buffer->unread( substr $pkt, $-[0] );
-         redo PACKET;
-      }
-
-      $pkt .= await $_recv_buffer->read_exactly( $len + 1 );
-
-      if( crc8( $pkt ) != 0 ) {
-         # Body checksum failed
-         $METRICS and
-            $METRICS->inc_counter( discards => );
-
-         $pkt =~ m/\x55/ and
-            $_recv_buffer->unread( substr $pkt, $-[0] );
-         redo PACKET;
-      }
-
-      my $payload = substr( $pkt, $headerlen, $len );
-
-      printf STDERR "SLuRM <-RX%s {%02X/%v02X}\n",
-         ( $_multidrop ? sprintf "(%d)", $addr : "" ), $pktctrl, $payload
-            if DEBUG > 1;
-
-      $METRICS and
-         $METRICS->inc_counter( packets => [ dir => "rx", type => $PKTTYPE_NAME{ $pktctrl & 0xF0 } // "UNKNOWN" ] );
-
-      return $pktctrl, $addr, $payload;
-   }
-}
 
 async method recv_packet ()
 {
@@ -387,7 +257,7 @@ field $_run_f;
 async method _run
 {
    while(1) {
-      my ( $pktctrl, $addr, $payload ) = await $self->_recv
+      my ( $pktctrl, $addr, $payload ) = await $_protocol->recv
          or return; # EOF
 
       redo if $addr & 0x80; # controller reflection
@@ -435,7 +305,7 @@ async method _run
             printf STDERR "SLuRM rx-NOTIFY(%d): %v02X\n", $seqno, $payload
                if DEBUG;
 
-            $_on_notify ? $_on_notify->( ( $_multidrop ? ( $node_id ) : () ), $payload )
+            $_on_notify ? $_on_notify->( ( __CLASS__->is_multidrop ? ( $node_id ) : () ), $payload )
                         : warn "Received NOTIFY packet with no handler\n";
          }
 
@@ -475,7 +345,7 @@ async method _run
             printf STDERR "SLuRM tx-ACK(%d)\n", $seqno
                if DEBUG;
 
-            await $self->_send_twice( SLURM_PKTCTRL_ACK | $seqno, $node_id, "" );
+            await $_protocol->send_twice( SLURM_PKTCTRL_ACK | $seqno, $node_id, "" );
          }
          default {
             warn sprintf "Received unrecognised packet type=%02X\n", $pktctrl;
@@ -484,12 +354,19 @@ async method _run
    }
 }
 
-# undocumented but useful for unit tests
-method _start
+field $_selector;
+method _selector
 {
-   $_run_f //= $self->_run->on_fail( sub { die "Device::Serial::SLuRM runloop failed: $_[0]" } );
+   return $_selector if $_selector;
 
-   return $_run_f;
+   $_selector = Future::Selector->new;
+   $_selector->add(
+      data => "runloop",
+      f    => $_run_f = $self->_run
+         ->on_fail( sub { die "Device::Serial::SLuRM runloop failed: $_[0]" } ),
+   );
+
+   return $_selector;
 }
 
 =head2 run
@@ -530,10 +407,12 @@ async method run ( %args )
 {
    $_on_notify = $args{on_notify}; # TODO: save old, restore on exit?
 
+   my $s = $self->_selector;
+   my $f = $_run_f;
+
    await $self->_autoreset;
 
-   await $self->_start
-      ->on_cancel( sub { undef $_on_notify } );
+   await $s->run_until_ready( $f );
 }
 
 =head2 stop
@@ -552,6 +431,7 @@ method stop
 
    eval { $_run_f->cancel } or warn "Failed to ->cancel the runloop future - $@";
    undef $_run_f;
+   undef $_selector;
 }
 
 =head2 send_packet
@@ -562,36 +442,7 @@ Sends a packet to the serial port.
 
 =cut
 
-async method send_packet ( $pktctrl, $payload ) { await $self->_send( $pktctrl, undef, $payload ); }
-
-async method _send ( $pktctrl, $addr, $payload )
-{
-   printf STDERR "SLuRM TX%s-> {%02X/%v02X}\n",
-      ( $_multidrop ? sprintf "(%d)", $addr & 0x7F : "" ), $pktctrl, $payload
-         if DEBUG > 1;
-
-   my $bytes = $_multidrop
-      ? pack( "C C C", $pktctrl, $addr // die( "ADDR must be defined for multidrop" ), length $payload )
-      : pack( "C C", $pktctrl, length $payload );
-   $bytes .= pack( "C", crc8( $bytes ) );
-
-   $bytes .= $payload;
-   $bytes .= pack( "C", crc8( $bytes ) );
-
-   $METRICS and
-      $METRICS->inc_counter( packets => [ dir => "tx", type => $PKTTYPE_NAME{ $pktctrl & 0xF0 } // "UNKNOWN" ] );
-   $METRICS and
-      $METRICS->inc_counter_by( serial_bytes => 1 + length $bytes, [ dir => "tx" ] );
-
-   return await Future::IO->syswrite_exactly( $_fh, "\x55" . $bytes );
-}
-
-async method _send_twice ( $pktctrl, $node_id, $payload )
-{
-   await $self->_send( $pktctrl, $node_id | 0x80, $payload );
-   # TODO: Send again after a short delay
-   await $self->_send( $pktctrl, $node_id | 0x80, $payload );
-}
+async method send_packet ( $pktctrl, $payload ) { await $_protocol->send( $pktctrl, undef, $payload ); }
 
 =head2 reset
 
@@ -608,20 +459,23 @@ method reset () { $self->_reset( 0 ); }
 
 async method _reset ( $node_id )
 {
+   my $s = $self->_selector;
+
    my $nodestate = $_nodestate[ $node_id ] //= Device::Serial::SLuRM::_NodeState->new;
 
    $nodestate->seqno_tx = 0;
 
-   await $self->_send_twice( SLURM_PKTCTRL_META_RESET, $node_id, pack "C", $nodestate->seqno_tx );
+   # Need to create this before sending because of unit testing
+   $_next_resetack_f = $_run_f->new;
+
+   await $_protocol->send_twice( SLURM_PKTCTRL_META_RESET, $node_id, pack "C", $nodestate->seqno_tx );
    $nodestate->did_reset = 1;
 
-   $self->_start;
-
    # TODO: These might collide, do we need a Queue?
-   await Future->wait_any(
-      $_next_resetack_f = $_run_f->new,
+   await $s->run_until_ready( Future->wait_any(
+      $_next_resetack_f,
       Future::IO->sleep( $_retransmit_delay * 3 ),
-   );
+   ) );
    die "Timed out waiting for reset\n"
       unless $_next_resetack_f->is_done;
    undef $_next_resetack_f;
@@ -647,9 +501,14 @@ async method _send_notify ( $node_id, $payload )
       await $self->_reset( $node_id );
 
    ( $nodestate->seqno_tx += 1 ) &= 0x0F;
-   my $pktctrl = SLURM_PKTCTRL_NOTIFY | $nodestate->seqno_tx;
+   my $seqno = $nodestate->seqno_tx;
 
-   await $self->_send_twice( $pktctrl, $node_id, $payload );
+   printf STDERR "SLuRM tx-NOTIFY(%d): %v02X\n", $seqno, $payload
+      if DEBUG;
+
+   my $pktctrl = SLURM_PKTCTRL_NOTIFY | $seqno;
+
+   await $_protocol->send_twice( $pktctrl, $node_id | 0x80, $payload );
 }
 
 =head2 request
@@ -678,6 +537,8 @@ method request ( $payload ) { $self->_request( 0, $payload ); }
 
 async method _request ( $node_id, $payload )
 {
+   my $s = $self->_selector;
+
    my $nodestate = $_nodestate[ $node_id ] //= Device::Serial::SLuRM::_NodeState->new;
 
    $nodestate->did_reset or
@@ -693,9 +554,7 @@ async method _request ( $node_id, $payload )
 
    my $pktctrl = SLURM_PKTCTRL_REQUEST | $seqno;
 
-   await $self->_send( $pktctrl, $node_id | 0x80, $payload );
-
-   $self->_start;
+   await $_protocol->send( $pktctrl, $node_id | 0x80, $payload );
 
    $nodestate->set_pending_slot( $seqno,
       {
@@ -724,7 +583,7 @@ method _set_retransmit ( $node_id, $seqno )
                if DEBUG;
 
             my $pktctrl = SLURM_PKTCTRL_REQUEST | $seqno;
-            $slot->{retransmit_f} = $self->_send( $pktctrl, $node_id, $slot->{payload} )
+            $slot->{retransmit_f} = $_protocol->send( $pktctrl, $node_id, $slot->{payload} )
                ->on_fail( sub {
                   warn "Retransmit failed: @_";
                   $slot->{response_f}->fail( @_ );

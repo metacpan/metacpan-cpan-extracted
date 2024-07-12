@@ -24,8 +24,6 @@ License: gpl
 # Why?:
 #        - Because ed is "always there" (or supposed to be anyways)
 #        - Because I violently dislike vi (on Unix) and NOTEPAD on WinDoze
-#        - Also see the "Perl Power Tools: The Unix Reconstruction Project"
-#           at http://language.perl.com/ppt/
 #        - Because working on this is more fun than Y2K testing !
 #
 # Who:
@@ -55,7 +53,6 @@ License: gpl
 #                k - mark
 #                u - undo
 #                v - global command "inVerted"
-#                x - get encryption key
 #
 #        - Create regression test suite...test against "real" ed.
 #        - add a "-e" flag to allow it to be used in sed(1) like fashion.
@@ -93,8 +90,8 @@ my $Error = undef;              # saved error string for h command
 my $Prompt = undef;             # saved prompt string for -p option
 my $SupressCounts = 0;          # byte counts are printed by default
 my @lines;                      # buffer for file being edited.
-my $command = "";               # single letter command entered by user
-my $commandsuf = "";            # single letter modifier of command
+my $command;                    # single letter command entered by user
+my $commandsuf;                 # single letter modifier of command
 my @adrs;                       # 1 or 2 line numbers for commands to operate on
 my @args;                       # command arguments (filenames, search patterns...)
 
@@ -111,7 +108,7 @@ my $NO_QUESTIONS_MODE = 0;
 my $PRINT_NUM = 1;
 my $PRINT_BIN = 2;
 
-my $VERSION = '0.3';
+our $VERSION = '0.4';
 
 my %ESC = (
     7  => '\a',
@@ -133,6 +130,35 @@ my %WANT_FILE = (
     'W' => 1,
 );
 
+my %cmdtab = (
+    '!' => \&edPipe,
+    '=' => \&edPrintLineNum,
+    'f' => \&edFilename,
+    'd' => \&edDelete,
+    'P' => \&edPrompt,
+    'p' => \&edPrint,
+    's' => \&edSubstitute,
+    'j' => \&edJoin,
+    't' => \&edMove,
+    'H' => \&edSetHelp,
+    'h' => \&edHelp,
+    'm' => \&edMoveDel,
+    'n' => \&edPrintNum,
+    'l' => \&edPrintBin,
+    'Q' => \&edQuit,
+    'q' => \&edQuitAsk,
+    'i' => \&edInsert,
+    'a' => \&edAppend,
+    'w' => \&edWrite,
+    'W' => \&edWriteAppend,
+    'c' => \&edChangeLines,
+    'E' => \&edEdit,
+    'e' => \&edEditAsk,
+    'r' => \&edRead,
+    '_' => \&edSetCurrentLine,
+    'nop' => sub {},
+);
+
 $SIG{HUP} = sub {
     if ($NeedToSave) {
         my $fh;
@@ -144,148 +170,69 @@ $SIG{HUP} = sub {
     }
     exit 1;
 };
-#
-# Parse command line ...
-#
-#
-
 
 my %opt;
-getopts('dp:sv', \%opt) or Usage();
+getopts('dp:s', \%opt) or Usage();
 if (defined $opt{'p'}) {
     $Prompt = $opt{'p'};
 }
-if ($opt{'v'}) {
-    warn "perl ed version $VERSION\n";
-    $EXTENDED_MESSAGES = 1;
-}
-
 $args[0] = shift;
 $args[0] = undef if (defined($args[0]) && $args[0] eq '-');
 Usage() if @ARGV;
 $SupressCounts = 1 if ($opt{'s'} || !defined($args[0]));
 
-&edEdit($NO_QUESTIONS_MODE,$NO_APPEND_MODE);
+edEdit($NO_QUESTIONS_MODE, $NO_APPEND_MODE);
+input() while 1;
 
-#
-# parse commands and execute them...
-#
+sub input {
+    $command = $commandsuf = '';
+    @adrs = ();
+    @args = ();
 
-while (1) {
     print $Prompt if defined $Prompt;
-    last unless ($_ = <>);
+    unless ($_ = <>) {
+        edQuitAsk() or return;
+    }
     chomp;
 
-    if (&edParse) {
-
-        if ($opt{'d'}) {
-            print "command: /$command/ ";
-            print "adrs[0]: /$adrs[0]/ " if defined($adrs[0]);
-            print "adrs[1]: /$adrs[1]/ " if defined($adrs[1]);
-            print "args[0]: /$args[0]/ " if defined($args[0]);
-            print "\n";
-        }
-
-        # sanity check addresses
-
-        if (defined($adrs[0])) {
-            if ($adrs[0] > maxline() || $adrs[0] < 0) {
-                edWarn(E_ADDRBAD);
-                next;
-            }
-        }
-        if (defined($adrs[1])) {
-            if ($adrs[1] > maxline() || $adrs[1] < 0) {
-                edWarn(E_ADDRBAD);
-                next;
-            }
-        }
-        if (defined($adrs[0]) and defined($adrs[1])) {
-            if ($adrs[1] < $adrs[0]) {
-                edWarn(E_ADDRBAD);
-                next;
-            }
-        }
-
-        #
-        # To add a new command:
-        #   - add to the following if...elsif... list,
-        #   - add to the command parsing regexp in edParse
-        #   - add a new routine to implement the command
-        #   - do command specific checks of adrs and args in the routine
-        #   - have command operate on important globals (see top of file),
-        #     such as @lines, $CurrentLineNum, $NeedToSave...
-        #
-
-        # navigation operations
-
-        if (!length($command)) {
-            &edSetCurrentLine;
-        } elsif ($command eq '!') {
-            edPipe();
-        } elsif ($command eq '=') {
-            &edPrintLineNum;
-
-        # file operations
-
-        } elsif ($command eq 'w') {
-            &edWrite($NO_APPEND_MODE);
-        } elsif ($command eq 'W') {
-            &edWrite($APPEND_MODE);
-        } elsif ($command eq 'e') {
-            &edEdit($QUESTIONS_MODE,$NO_INSERT_MODE);
-        } elsif ($command eq 'E') {
-            &edEdit($NO_QUESTIONS_MODE,$NO_INSERT_MODE);
-        } elsif ($command eq 'r') {
-            &edEdit($QUESTIONS_MODE,$INSERT_MODE);
-        } elsif ($command eq 'f') {
-            &edFilename;
-
-        # text manipulation commands
-
-        } elsif ($command eq 'd') {
-            &edDelete;
-        } elsif ($command eq 'i') {
-            &edInsert($INSERT_MODE);
-        } elsif ($command eq 'a') {
-            &edInsert($APPEND_MODE);
-        } elsif ($command eq 'c') {
-            if (edDelete()) {
-                $adrs[1] = undef;
-                edInsert($INSERT_MODE);
-            }
-        } elsif ($command eq 's') {
-            &edSubstitute;
-
-        # misc commands
-
-        } elsif ($command eq 'p') {
-            &edPrint;
-        } elsif ($command eq 'P') {
-            edPrompt();
-        } elsif ($command eq 'q') {
-            &edQuit($QUESTIONS_MODE);
-        } elsif ($command eq 'Q') {
-            &edQuit($NO_QUESTIONS_MODE);
-        } elsif ($command eq 'h') {
-            edHelp();
-        } elsif ($command eq 'H') {
-            edHelp(1);
-        } elsif ($command eq 'j') {
-            &edJoin;
-        } elsif ($command eq 'l') {
-            edPrint($PRINT_BIN);
-        } elsif ($command eq 'm') {
-            edMove(1);
-        } elsif ($command eq 'n') {
-            edPrint($PRINT_NUM);
-        } elsif ($command eq 't') {
-            &edMove;
-        }
-
-    } else {
+    if (!edParse()) {
         edWarn(E_CMDBAD);
+        return;
     }
+    if ($opt{'d'}) {
+        print "command: /$command/ ";
+        print "adrs[0]: /$adrs[0]/ " if defined($adrs[0]);
+        print "adrs[1]: /$adrs[1]/ " if defined($adrs[1]);
+        print "args[0]: /$args[0]/ " if defined($args[0]);
+        print "\n";
+    }
+
+    # sanity check addresses
+    foreach my $ad (@adrs) {
+        next unless defined $ad;
+        if ($ad > maxline() || $ad < 0) {
+            edWarn(E_ADDRBAD);
+            return;
+        }
+    }
+    if (defined($adrs[0]) and defined($adrs[1])) {
+        if ($adrs[1] < $adrs[0]) {
+            edWarn(E_ADDRBAD);
+            return;
+        }
+    }
+
+    my $func = $cmdtab{$command};
+    if (!defined($func)) {
+        edWarn(E_CMDBAD);
+        return;
+    }
+    $func->();
+}
+
+sub VERSION_MESSAGE {
+    print "ed version $VERSION\n";
+    exit 0;
 }
 
 sub maxline {
@@ -294,6 +241,13 @@ sub maxline {
         $n = 0;
     }
     return $n;
+}
+
+sub edChangeLines {
+    if (edDelete()) {
+        $adrs[1] = undef;
+        edInsert();
+    }
 }
 
 sub edPrompt {
@@ -490,6 +444,16 @@ sub edMove {
     $CurrentLineNum = $dst + scalar(@copy)
 }
 
+sub edMoveDel { edMove(1); }
+sub edSetHelp { edHelp(1); }
+sub edPrintNum { edPrint($PRINT_NUM); }
+sub edPrintBin { edPrint($PRINT_BIN); }
+sub edQuitAsk { edQuit(1); }
+sub edAppend { edInsert(1); }
+sub edWriteAppend { edWrite(1); }
+sub edEditAsk { edEdit($QUESTIONS_MODE,$NO_INSERT_MODE); }
+sub edRead { edEdit($QUESTIONS_MODE,$INSERT_MODE); }
+
 #
 # Perform text substitution
 #
@@ -620,6 +584,10 @@ sub edWrite {
     } elsif (defined($adrs[0]) && !defined($adrs[1])) {
         $adrs[1] = $adrs[0];
     }
+    if ($adrs[0] == 0) {
+        edWarn(E_ADDRBAD);
+        return;
+    }
     if (length $commandsuf) {
         if ($commandsuf eq 'q') {
             $qflag = 1;
@@ -687,6 +655,11 @@ sub edEdit {
             edWarn(E_ADDREXT);
             return 0;
         }
+        if ($NeedToSave && $QuestionsMode && !$UserHasBeenWarned) {
+            $UserHasBeenWarned = 1;
+            edWarn(E_UNSAVED);
+            return 0;
+        }
     }
 
     if (defined $args[0]) {
@@ -726,6 +699,8 @@ sub edEdit {
     }
     if ($chars == 0) {
         $UserHasBeenWarned = 0;
+        $CurrentLineNum = 0;
+        @lines = (0);
         print "0\n" unless $SupressCounts;
         return 1;
     }
@@ -748,12 +723,6 @@ sub edEdit {
         $CurrentLineNum = $adrs[0] + scalar(@tmp_lines);
         $NeedToSave = 1;
     } else {
-        if ($NeedToSave && $QuestionsMode && !$UserHasBeenWarned) {
-            $UserHasBeenWarned = 1;
-            edWarn(E_UNSAVED);
-            return;
-        }
-
         @lines = (undef, @tmp_lines);
         $NeedToSave = 0;
         $CurrentLineNum = maxline();
@@ -769,16 +738,15 @@ sub edEdit {
 #
 
 sub edInsert {
-    my($Mode) = @_;
+    my $append = shift;
     my(@tmp_lines);
 
-    if (defined($adrs[1])) {
-        edWarn(E_ADDREXT);
-        return;
-    }
     if (defined($args[0])) {
         edWarn(E_ARGEXT);
         return;
+    }
+    if (defined($adrs[1])) {
+        $adrs[0] = $adrs[1];
     }
     if (!defined($adrs[0])) {
         $adrs[0] = $CurrentLineNum;
@@ -794,7 +762,7 @@ sub edInsert {
     }
 
     my $src = $adrs[0];
-    $src++ if ($src && $Mode == $APPEND_MODE);
+    $src++ if ($src && $append);
     $src++ if $src == 0; # 0a == 0i == 1i
 
     splice @lines, $src, 0, @tmp_lines;
@@ -906,9 +874,6 @@ sub edSetCurrentLine {
 #
 
 sub edParse {
-
-    @adrs = ();
-
     s/\A\s+//;
     my @fields =
              (/^(
@@ -936,8 +901,7 @@ sub edParse {
     if (defined($fields[27])) {
         $command = $fields[27];
     } else {
-        $command = "";
-
+        $command = '_';
     }
     if (defined $fields[28]) {
         $commandsuf = $fields[28];
@@ -952,17 +916,23 @@ sub edParse {
 
     $args[0] = $fields[30];
 
-    $adrs[0] = &CalculateLine(splice(@fields,1,13));
+    $adrs[0] = CalculateLine(splice(@fields, 1, 13));
     if ($adrs[0] == -1) {
         edWarn(E_NOMATCH);
-        $command = '/';
+        $command = 'nop';
         undef $adrs[0];
     }
-    $adrs[1] = &CalculateLine(splice(@fields,1,13));
+    my $commarange = $fields[1] =~ /,/;
+
+    $adrs[1] = CalculateLine(splice(@fields, 1, 13));
     if ($adrs[1] == -1) {
         edWarn(E_NOMATCH);
-        $command = '/';
+        $command = 'nop';
         undef $adrs[1];
+    }
+    if ($commarange && !defined($adrs[0])) {
+        $adrs[0] = 1;
+        $adrs[1] = maxline() unless defined $adrs[1];
     }
     if (defined($args[0]) && $WANT_FILE{$command} && !$space_sep) {
         return 0;
@@ -1095,7 +1065,7 @@ sub edSearchBackward {
 #
 
 sub Usage {
-    die "Usage: ed [-p prompt] [-dsv] [file]\n";
+    die "Usage: ed [-p prompt] [-ds] [file]\n";
 }
 
 #
@@ -1124,7 +1094,7 @@ ed - text editor
 
 =head1 SYNOPSIS
 
-ed [-p prompt] [-dsv] [file]
+ed [-p prompt] [-ds] [file]
 
 =head1 DESCRIPTION
 
@@ -1177,10 +1147,6 @@ By default no prompt is displayed.
 =item -s
 
 Suppress byte counts
-
-=item -v
-
-Print full error messages; equivalent to the "H" command
 
 =back
 

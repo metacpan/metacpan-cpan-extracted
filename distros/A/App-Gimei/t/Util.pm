@@ -8,7 +8,7 @@ our @EXPORT_OK = qw(run);
 use lib ".";
 use t::CLI;
 
-use Test::More;
+use Test2::Bundle::More;
 
 sub run (@tests) {
     foreach my $t (@tests) {

@@ -18,8 +18,9 @@ WriteMakefile(
         'Test::More' => '0',
     },
     PREREQ_PM => {
-     	'Catalyst::View::TT' => '0',
-		'Moose' => '0',
+        'Catalyst::View::TT' => '0',
+        'Moose' => '0',
+        'JSON' => '0',
     },
     dist  => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
     clean => { FILES => 'Catalyst-View-TT-Progressive-*' },

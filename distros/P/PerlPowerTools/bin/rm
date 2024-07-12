@@ -134,6 +134,12 @@ sub preprocess_options {
 		@rest = @new_args[ $args{'--'} .. $#new_args ];
 		@new_args = @new_args[0 .. ($args{'--'} - 1)];
 		}
+	foreach (@new_args) {
+		if (m/\A\-\-/) {
+			warn "unknown option: '$_'\n";
+			usage();
+		}
+	}
 
 	# Expand clustering
 	@new_args = map {
@@ -189,6 +195,7 @@ sub process_options {
 		'r' => \$opts{'r'},
 		'v' => \$opts{'v'},
 		);
+	usage() unless $ret;
 
 	$opts{'R'} = 1 if $opts{'r'};
 
@@ -276,7 +283,7 @@ sub usage {
 	require Pod::Usage;
 	Pod::Usage::pod2usage({
 		-exitval => EX_USAGE,
-		-verbose => 2,
+		-verbose => 1,
 		});
 	}
 

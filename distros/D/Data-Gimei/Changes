@@ -1,5 +1,9 @@
 Revision history for Perl extension Data-Gimei
 
+v0.4.3 2024-07-12T07:10:34Z
+    - update cpanfile
+    - update Perl version in GitHub Actions
+
 v0.4.2 2024-01-04T06:43:57Z
     - update pod
 
@@ -7,28 +11,23 @@ v0.4.1 2023-12-27T08:18:40Z
     - support old version of perl
 
 v0.4.0 2022-09-30T12:19:39Z
-
     - clean up old random number generator
     - change first, last -> forename, surname
     - Add test for Address#romaji()
 
 v0.3.0 2022-09-16T03:38:25Z
-
     - use faster random number generator
 
 v0.2.0 2022-06-19T08:48:05Z
-
     - add method to_s() to Word/Name/Address
     - add arg separater to Name#kanji/hiragana/katakana/romaji
     - del the way to call constructor with keyword args. 
 
 v0.1.1 2022-06-02T03:04:17Z
-
     - update cpanfile
     - format by perltidy
 
 v0.1.0 2022-05-24T20:07:31Z
-
     - change OO systems Moo -> Class::Tiny
     - organize modules
     - update cpanfile
@@ -38,35 +37,28 @@ v0.1.0 2022-05-24T20:07:31Z
     - delete Data::Gimei::random()
 
 v0.0.7 2022-05-06T05:47:29Z
-
     - remove unused modules
 
 v0.0.6 2022-04-07T05:28:50Z
-
     - remove requirements of perl version on develop
     - Add test case to t/address.t
     - Add handling of load error
 
 v0.0.5 2022-02-04T08:29:01Z
-
     - change requirements of perl version
 
 v0.0.4 2022-01-11T08:29:51Z
-
     - Introduce Address
     - Introduce Deteministic random
     - Change License
 
 v0.0.3
-
     - Support Romaji
     - Introduce param 'gender' to new()
     - Split .pm files by package
 
 v0.0.2
-
     - Change YAML module to YAML::XS.
 
 v0.0.1
-
     - original version

@@ -61,14 +61,14 @@ The ADDR field is broken into a single bit indicating direction, and a 7-bit fie
 
 The ADDR field gives a simple way for endpoints to filter received packets for interest; as on a shared bus system such as RS-485 each node will receive messages destined for others, and may also receive reflections of its own transmissions. The controller must ignore any incoming packet with the direction bit high, and other nodes must ignore any packet with the direction bit low, or whose ID number does not match its own.
 
-On a multi-drop system, after packets are filtered, the remaining packet semantics work the same as for the direct two-endopoint case described below.
+On a multi-drop system, after packets are filtered, the remaining packet semantics work the same as for the direct two-endopoint case described below. Some applications may wish to reserve a node ID number for broadcast purposes; typically zero or all-bits-high (0x7F). A message sent to the broadcast address would be received by all nodes. Only NOTIFY messages make sense as broadcast messages, as they do not require a response.
 
 Messages
 --------
 
 The packet type field indicates the type of message being conveyed. Regular messages use a non-zero packet type. In this case, the sequence number field contains an integer that is incremented for each new message. Transmitters may wish to transmit packets more than once for reliability; receivers should discard duplicates based on the sequence number. Reply packets (those with packet type 0x80 or above) use the sequence number of the originating message they reply to, and *not* the next sequence number the transmitting party would have sent.
 
-When implementing the controller of a multi-drop system, remember that sequence numbers apply per node ID and each must be handled independently.
+When implementing the controller of a multi-drop system, remember that sequence numbers apply per node ID and each must be handled independently. Additionally, if nodes are expected to receive broadcast messages, they will have their own sequence numbers independent of the main per-node unicast address.
 
 Packets whose packet type is zero are protocol-control messages, not for delivery to the application. Instead they are interpreted internally within the protocol. They use the sequence number field of the PKTCTRL byte 
 

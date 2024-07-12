@@ -15,6 +15,7 @@ my $build = Module::Build->new(
       'Digest::CRC' => 0,
       'Future::Buffer' => '0.03',
       'Future::IO' => 0,
+      'Future::Selector' => '0.02',
       'IO::Termios' => 0,
    },
    test_requires => {

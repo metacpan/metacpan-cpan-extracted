@@ -24,12 +24,13 @@ sub with_crc8
 
 # Initiate reset
 {
+   use Object::Pad::MetaFunctions qw( get_field );
+
    $controller->use_sysread_buffer( "DummyFH" );
 
+   $controller->expect_syswrite( "DummyFH", "\x55" . with_crc8( with_crc8( "\x01\x01" ) . "\x00" ) )
+      ->will_write_sysread_buffer_later( "DummyFH", "\x55" . with_crc8( with_crc8( "\x02\x01" ) . "\x04" ) );
    $controller->expect_syswrite( "DummyFH", "\x55" . with_crc8( with_crc8( "\x01\x01" ) . "\x00" ) );
-   $controller->expect_syswrite( "DummyFH", "\x55" . with_crc8( with_crc8( "\x01\x01" ) . "\x00" ) );
-   $controller->expect_sysread( "DummyFH", 8192 )
-      ->will_done( "\x55" . with_crc8( with_crc8( "\x02\x01" ) . "\x04" ) );
    $controller->expect_sleep( 0.05 * 3 )
       ->remains_pending;
 
@@ -37,7 +38,7 @@ sub with_crc8
 
    $controller->check_and_clear( '->reset' );
 
-   is( $slurm->_nodestate( 0 )->seqno_rx, 4, 'seqno_rx reset for RESETACK packet' );
+   is( ( get_field( '@_nodestate', $slurm ) )[0]->seqno_rx, 4, 'seqno_rx reset for RESETACK packet' );
 
    $slurm->stop;
 }
@@ -49,9 +50,10 @@ sub with_crc8
    $controller->expect_syswrite( "DummyFH", "\x55" . with_crc8( with_crc8( "\x02\x01" ) . "\x00" ) );
    $controller->expect_sysread( "DummyFH", 8192 )
       ->remains_pending
-      ->will_also( sub { $slurm->stop } );
+      ->will_also_later( sub { $slurm->stop } );
 
-   $slurm->_start->await; # it gets cancelled
+   my $f = $slurm->run;
+   $f->await; # it gets cancelled
 
    $controller->check_and_clear( 'Accepted RESET' );
 }

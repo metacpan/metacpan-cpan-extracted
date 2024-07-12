@@ -2,8 +2,6 @@
 use strict;
 use warnings;
 
-use if $ENV{USER} eq 'gene', lib => map { "$ENV{HOME}/sandbox/$_/lib" } qw(MIDI-Util MIDI-Drummer-Tiny Music-Duration-Partition MIDI-RtMidi-ScorePlayer);
-
 use Data::Dumper::Compact qw(ddc);
 use Getopt::Long qw(GetOptions);
 use MIDI::Drummer::Tiny ();

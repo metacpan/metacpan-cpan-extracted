@@ -1,9 +1,9 @@
 use v5.36;
-use Test::More;
+use Test2::Bundle::More;
 
-use_ok $_ for qw(
-  App::Gimei
-);
+# test for loading the module
+use App::Gimei;
+
+ok 1; # dummy
 
 done_testing;
-

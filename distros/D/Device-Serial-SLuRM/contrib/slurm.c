@@ -255,6 +255,27 @@ static void on_recv(uint8_t pktctrl, uint8_t b[], uint8_t len)
   }
 }
 
+#ifdef SLURM_MULTIDROP_BCAST
+static void on_recv_bcast(uint8_t pktctrl, uint8_t b[], uint8_t len)
+{
+  uint8_t seqno = pktctrl & 0x0F;
+  pktctrl &= 0xF0;
+
+  static uint8_t last_seqno;
+  if(last_seqno && (seqno == (last_seqno & 0x0F)))
+    // duplicate
+    return;
+
+  switch(pktctrl) {
+    case SLURM_PKT_NOTIFY:
+      on_slurm_notify(b, len);
+      break;
+
+    // ignore others
+  }
+}
+#endif
+
 void isr_slurm_recv(uint8_t b)
 {
   switch(rx.state) {
@@ -290,13 +311,13 @@ void isr_slurm_recv(uint8_t b)
         goto abort;
 
 #ifdef SLURM_MULTIDROP
-      if(!(rx.buf[1] & 0x80) || (rx.buf[1] & 0x7F) != node_id) {
-        rx.state = STATE_IDLE;
-        break;
-      }
+      if((rx.buf[1] & 0x80) && ((rx.buf[1] & 0x7F) == node_id))
 #endif
-
-      on_recv(rx.buf[0], rx.buf + HEADERLEN, rx.buf[IDX_LEN]);
+        on_recv(rx.buf[0], rx.buf + HEADERLEN, rx.buf[IDX_LEN]);
+#ifdef SLURM_MULTIDROP_BCAST
+      else if((rx.buf[1] & 0x80) && ((rx.buf[1] & 0x7F) == SLURM_MULTIDROP_BCAST))
+        on_recv_bcast(rx.buf[0], rx.buf + HEADERLEN, rx.buf[IDX_LEN]);
+#endif
 
       rx.state = STATE_IDLE;
       break;

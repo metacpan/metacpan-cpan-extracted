@@ -6,7 +6,7 @@ use utf8;
 use Data::Gimei;
 Data::Gimei::Address::load('t/addresses.yml');
 
-use Test::More;
+use Test2::Bundle::More;
 
 {    # to_s
     my $addr = Data::Gimei::Address->new();

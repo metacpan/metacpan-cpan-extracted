@@ -2,8 +2,6 @@
 use strict;
 use warnings;
 
-use if $ENV{USER} eq 'gene', lib => map { "$ENV{HOME}/sandbox/$_/lib" } qw(MIDI-Util MIDI-RtMidi-ScorePlayer);
-
 use MIDI::RtMidi::ScorePlayer ();
 use MIDI::Util qw( setup_score set_chan_patch );
 use Music::Scales qw( get_scale_MIDI );

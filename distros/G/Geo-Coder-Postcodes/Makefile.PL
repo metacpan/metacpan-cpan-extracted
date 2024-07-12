@@ -23,6 +23,7 @@ if($ENV{AUTHOR_TESTING}) {
 my $test_requires = {
 	'Test::Compile' => 0,
 	'Test::Most' => 0,
+	'Test::Needs' => 0,
 	'Test::NoWarnings' => 0,
 };
 
@@ -49,7 +50,7 @@ WriteMakefile(
 	TEST_REQUIRES => $test_requires,
 	PREREQ_PM => {
 		'Encode' => 0,
-		'JSON' => 0,
+		'JSON::MaybeXS' => 0,
 		'HTTP::Request' => 0,
 		'LWP::UserAgent' => 0,
 		'LWP::Protocol::https' => 0,
@@ -77,9 +78,8 @@ WriteMakefile(
 
 sub are_online
 {
-	# return 0 if($ENV{'AUTOMATED_TESTING'});
-	return 0 if($ENV{'NO_NETWORK_TESTING'});
-	return 0 if(!-t STDIN);
+	return 0 if($ENV{'NO_NETWORK_TESTING'} || $ENV{'TRAVIS_PERL_VERSION'}) || $ENV{'AUTOMATED_TESTING'} || (!-t STDIN);
+
 	my $s = IO::Socket::INET->new(
 		PeerAddr => 'postcodes.io:443',
 		Timeout => 10

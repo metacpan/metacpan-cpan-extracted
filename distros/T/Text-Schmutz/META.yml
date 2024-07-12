@@ -1,0 +1,46 @@
+---
+abstract: 'You̇r screen is quiṭe dirty, please cleȧn it.'
+author:
+  - 'Robert Rothenberg <rrwo@cpan.org>'
+build_requires:
+  File::Spec: '0'
+  Module::Metadata: '0'
+  Test2::V0: '0'
+  Test::More: '0'
+  strict: '0'
+  warnings: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.032, CPAN::Meta::Converter version 2.150010'
+keywords:
+  - acme
+  - toy
+  - text
+  - mangle
+  - unicode
+license: gpl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Text-Schmutz
+provides:
+  Text::Schmutz:
+    file: lib/Text/Schmutz.pm
+    version: v0.1.1
+recommends:
+  Type::Tiny::XS: '0'
+requires:
+  Moo: '0'
+  Types::Common: '0'
+  experimental: '0'
+  perl: v5.20.0
+  utf8: '0'
+resources:
+  bugtracker: https://github.com/robrwo/perl-Text-Schmutz/issues
+  repository: git://github.com/robrwo/perl-Text-Schmutz.git
+version: v0.1.1
+x_authority: cpan:RRWO
+x_generated_by_perl: v5.34.3
+x_serialization_backend: 'YAML::Tiny version 1.74'
+x_spdx_expression: GPL-3.0-only
