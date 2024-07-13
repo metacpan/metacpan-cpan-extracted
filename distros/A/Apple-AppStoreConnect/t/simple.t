@@ -185,11 +185,12 @@ subtest 'Optional parameters' => sub {
 
     $asc = Apple::AppStoreConnect->new(
         %params,
-        key_file   => $filename,
-        timeout    => 10,
-        expiration => 1000,
-        scope      => ["GET /v1/apps?filter[platform]=IOS"],
-        ua         => $ua
+        key_file    => $filename,
+        timeout     => 10,
+        expiration  => 1000,
+        scope       => ["GET /v1/apps?filter[platform]=IOS"],
+        ua          => $ua,
+        jwt_payload => {bid => 'com.Id.Bundle'}
     );
 
     my $out = $asc->get(url => 'apps', raw => 1);

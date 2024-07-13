@@ -26,6 +26,7 @@ t/03check-sub.t
 t/10constraints.t
 t/11constraints-num.t
 t/12constraints-str.t
+t/13constraints-structural.t
 t/20inline-constraints.t
 t/80checks+field.t
 t/80checks+signature.t

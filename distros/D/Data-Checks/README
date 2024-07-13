@@ -175,6 +175,24 @@ CONSTRAINTS
     name, or a subclass derived from it (i.e. anything accepted by the isa
     operator).
 
+ ArrayRef
+
+       ArrayRef()
+
+    Since version 0.07.
+
+    Accepts any plain reference to an array, or any object reference to an
+    instance of a class that provides an array dereference overload.
+
+ HashRef
+
+       HashRef()
+
+    Since version 0.07.
+
+    Accepts any plain reference to a hash, or any object reference to an
+    instance of a class that provides a hash dereference overload.
+
  Callable
 
        Callable()
@@ -192,6 +210,34 @@ CONSTRAINTS
 
     Accepts undef in addition to anything else accepted by the given
     constraint.
+
+ Any
+
+       Any($C1, $C2, ...)
+
+    Since version 0.07.
+
+    Accepts a value that is accepted by at least one of the given
+    constraints. Rejects if none of them accept it.
+
+    At least one constraint is required; it is an error to try to call
+    Any() with no arguments. If you need a constraint that accepts any
+    value at all, see "All".
+
+ All
+
+       All($C1, $C2, ...)
+       All()
+
+    Since version 0.07.
+
+    Accepts a value that is accepted by every one of the givn constraints.
+    Rejects if at least one of them rejects it.
+
+    Note that if no constraints are given, this accepts all possible
+    values. This may be useful as an "accept-all" fallback case for
+    generated code, or other situations where it is required to provide a
+    constraint check but you do not wish to constraint allowed values.
 
 XS FUNCTIONS
 

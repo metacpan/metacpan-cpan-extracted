@@ -3,7 +3,7 @@
 #
 #  (C) Paul Evans, 2024 -- leonerd@leonerd.org.uk
 
-package Data::Checks 0.06;
+package Data::Checks 0.07;
 
 use v5.22;
 use warnings;
@@ -205,6 +205,24 @@ I<Since version 0.04.>
 Accepts any blessed object reference to an instance of the given class name,
 or a subclass derived from it (i.e. anything accepted by the C<isa> operator).
 
+=head2 ArrayRef
+
+   ArrayRef()
+
+I<Since version 0.07.>
+
+Accepts any plain reference to an array, or any object reference to an
+instance of a class that provides an array dereference overload.
+
+=head2 HashRef
+
+   HashRef()
+
+I<Since version 0.07.>
+
+Accepts any plain reference to a hash, or any object reference to an instance
+of a class that provides a hash dereference overload.
+
 =head2 Callable
 
    Callable()
@@ -222,6 +240,34 @@ I<Since version 0.04.>
 
 Accepts C<undef> in addition to anything else accepted by the given
 constraint.
+
+=head2 Any
+
+   Any($C1, $C2, ...)
+
+I<Since version 0.07.>
+
+Accepts a value that is accepted by at least one of the given constraints.
+Rejects if none of them accept it.
+
+At least one constraint is required; it is an error to try to call C<Any()>
+with no arguments. If you need a constraint that accepts any value at all, see
+L</All>.
+
+=head2 All
+
+   All($C1, $C2, ...)
+   All()
+
+I<Since version 0.07.>
+
+Accepts a value that is accepted by every one of the givn constraints. Rejects
+if at least one of them rejects it.
+
+Note that if no constraints are given, this accepts all possible values. This
+may be useful as an "accept-all" fallback case for generated code, or other
+situations where it is required to provide a constraint check but you do not
+wish to constraint allowed values.
 
 =cut
 

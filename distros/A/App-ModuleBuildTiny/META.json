@@ -1,10 +1,10 @@
 {
-   "abstract" : "A standalone authoring tool for Module::Build::Tiny",
+   "abstract" : "A standalone authoring tool for Module::Build::Tiny and Dist::Build",
    "author" : [
       "Leon Timmermans <leont@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "App::ModuleBuildTiny version 0.044",
+   "generated_by" : "App::ModuleBuildTiny version 0.047",
    "license" : [
       "perl_5"
    ],
@@ -21,7 +21,7 @@
       },
       "develop" : {
          "requires" : {
-            "App::ModuleBuildTiny" : "0.044"
+            "App::ModuleBuildTiny" : "0.047"
          }
       },
       "runtime" : {
@@ -54,6 +54,7 @@
             "POSIX" : "0",
             "Parse::CPAN::Meta" : "0",
             "Perl::PrereqScanner" : "0",
+            "Perl::PrereqScanner::Scanner::DistBuild" : "0",
             "Pod::Escapes" : "0",
             "Pod::Simple::Methody" : "0",
             "Pod::Simple::Text" : "3.23",
@@ -77,11 +78,11 @@
    "provides" : {
       "App::ModuleBuildTiny" : {
          "file" : "lib/App/ModuleBuildTiny.pm",
-         "version" : "0.044"
+         "version" : "0.047"
       },
       "App::ModuleBuildTiny::Dist" : {
          "file" : "lib/App/ModuleBuildTiny/Dist.pm",
-         "version" : "0.044"
+         "version" : "0.047"
       }
    },
    "release_status" : "stable",
@@ -96,7 +97,7 @@
       },
       "x_IRC" : "irc://irc.perl.org/#toolchain"
    },
-   "version" : "0.044",
+   "version" : "0.047",
    "x_serialization_backend" : "JSON::PP version 4.16",
    "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"
 }

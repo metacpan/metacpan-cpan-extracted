@@ -56,6 +56,18 @@ foreach (qw/ red green blue magenta yellow cyan bold underline /) {
   ok(1, "colored text");
 }
 
+# Test setting a color and clearing with default and alternative sequence
+
+doprint( $text,
+  'Test of '
+  . color('blue')
+  . 'blue'
+  . color('clear')
+  . ' normal, '
+  . color('blue')
+  . 'blue'
+  . "\e[m and normal text again\n" );
+
 # Now try a tie
 use vars qw/ *HDL /;
 my $tie = tie(*HDL, ref($text), $text);

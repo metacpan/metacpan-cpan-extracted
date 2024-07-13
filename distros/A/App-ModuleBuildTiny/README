@@ -1,7 +1,7 @@
 NAME
 
     App::ModuleBuildTiny - A standalone authoring tool for
-    Module::Build::Tiny
+    Module::Build::Tiny and Dist::Build
 
 DESCRIPTION
 

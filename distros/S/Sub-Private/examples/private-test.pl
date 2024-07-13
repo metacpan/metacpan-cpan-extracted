@@ -1,5 +1,6 @@
 #!/usr/bin/perl
 
+use strict;
 use feature qw(say);
 use Foo;
 

@@ -13,6 +13,8 @@ subtest throws => sub {
         qr/score object is required/, 'no score given';
     throws_ok { MIDI::RtMidi::ScorePlayer->new(score => 'score') }
         qr/parts is required/, 'no parts given';
+    throws_ok { MIDI::RtMidi::ScorePlayer->new(score => 'score', parts => ['parts'], deposit => 'bogus/foo-') }
+        qr/Invalid path/, 'invalid deposit';
 };
 
 subtest defaults => sub {

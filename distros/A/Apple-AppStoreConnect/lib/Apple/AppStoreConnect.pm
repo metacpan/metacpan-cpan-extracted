@@ -14,11 +14,11 @@ Apple::AppStoreConnect - Apple App Store Connect API client
 
 =head1 VERSION
 
-Version 0.11
+Version 0.12
 
 =cut
 
-our $VERSION = '0.11';
+our $VERSION = '0.12';
 
 =head1 SYNOPSIS
 
@@ -46,20 +46,23 @@ Apple::AppStoreConnect provides basic access to the Apple App Store Connect API.
 Please see the L<official API documentation|https://developer.apple.com/documentation/appstoreconnectapi>
 for usage and all possible requests.
 
+You can also use it with the L<Apple Store Server API>.
+
 =head1 CONSTRUCTOR
 
 =head2 C<new>
 
     my $asc = Apple::AppStoreConnect->new(
-        key_id     => $key_id,
-        key        => $private_key?,
-        key_file   => $private_key_pem?,
-        issuer     => "57246542-96fe-1a63-e053-0824d011072a",
-        scope      => \@scope?,
-        timeout    => $timeout_sec?,
-        expiration => $expire_secs?,
-        ua         => $lwp_ua?,
-        curl       => $use_curl?
+        key_id      => $key_id,
+        key         => $private_key?,
+        key_file    => $private_key_pem?,
+        issuer      => "57246542-96fe-1a63-e053-0824d011072a",
+        scope       => \@scope?,
+        timeout     => $timeout_sec?,
+        expiration  => $expire_secs?,
+        ua          => $lwp_ua?,
+        curl        => $use_curl?,
+        jwt_payload => {%extra_payload}
     );
   
 Required parameters:
@@ -102,6 +105,12 @@ is the default method for the API requests.
 =item * C<expiration> : Token expiration time in seconds. Tokens are cached until
 there are less than 10 minutes left to expiration. Default: C<900> - the API will
 not accept more than 20 minutes expiration time for most requests.
+
+=item * C<jwt_payload> : Extra items to append to the JWT payload. Allows extending
+the module to support more/newer versions of Apple APIs. For example, for the Apple
+Store Server API you'd need to add:
+
+ jwt_payload => {bid => $bundle_id}
 
 =back
 
@@ -218,9 +227,7 @@ sub new {
     $self->{key}        = \$args{key};
     $self->{timeout}    = $args{timeout} || 30;
     $self->{expiration} = $args{expiration} || 900;
-    $self->{ua}         = $args{ua};
-    $self->{curl}       = $args{curl};
-    $self->{scope}      = $args{scope};
+    $self->{$_}         = $args{$_} for qw/ua curl scope jwt_payload/;
     $self->{base_url}   = "https://api.appstoreconnect.apple.com/v1/";
 
     return $self;
@@ -298,6 +305,11 @@ sub _new_jwt {
     };
 
     $data->{scope} = $self->{scope} if $self->{scope};
+    $data = {
+        %$data,
+        %{$self->{jwt_payload}}
+    } if $self->{jwt_payload};
+
     $self->{jwt}   = encode_jwt(
         payload       => $data,
         alg           => 'ES256',
@@ -349,6 +361,35 @@ sub _process_data {
     }
     return $hash;
 }
+
+=head1 NOTES
+
+=head2 Apple Store Server API
+
+You can use this module with the L<Apple Store Server API|https://developer.apple.com/documentation/appstoreserverapi>
+by passing your app's bundle ID to the JWT payload. So there is just one addition to the constructor call:
+
+    my $assa = Apple::AppStoreConnect->new(
+        issuer      => $API_key_issuer,
+        key_id      => $key_id,
+        key         => $private_key,
+        jwt_payload => {bid => $bundle_id}
+    );
+
+You can then pass custon Store Server API requests:
+
+    my $res = $assa->get(url => "https://api.storekit.itunes.apple.com/inApps/v2/history/$transactionId");
+
+=head2 POST/PATCH/DELETE requests
+
+Note that currently only GET requests are implemented, as that is what I needed.
+However, POST/PATCH/DELETE can be added upon request.
+
+=head2 403 Unauthorized etc errors
+
+If you suddenly start getting unauthorized errors with a token that should be valid,
+log onto App Store Connect and see if you have any documents pending approval (e.g
+tax documents, new terms etc).
 
 =head1 AUTHOR
 

@@ -2,7 +2,7 @@ package Data::LnArray;
 use strict;
 no warnings;
 use base 'Import::Export';
-our $VERSION = '0.04';
+our $VERSION = '0.05';
 
 our %EX = (
         arr => [qw/all/],
@@ -245,7 +245,7 @@ sub slice {
 
 	my ( $begin, $end ) = @_;
 	my @de = @{$self};
-	return $self->new( @de[ $begin, $end ] );
+	return $self->new( @de[ $begin .. $end ] );
 }
 
 sub toString {
@@ -389,7 +389,7 @@ Data::LnArray - The great new Data::LnArray!
 
 =head1 VERSION
 
-Version 0.04
+Version 0.05
 
 =cut
 

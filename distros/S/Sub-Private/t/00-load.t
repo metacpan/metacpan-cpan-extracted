@@ -1,9 +1,13 @@
 #!perl -T
 
-use Test::More tests => 1;
+use strict;
+
+use Test::Most tests => 2;
 
 BEGIN {
-	use_ok( 'Sub::Private' );
+	use_ok('Sub::Private') || print 'Bail out!';
 }
 
-diag( "Testing Sub::Private $Sub::Private::VERSION, Perl $], $^X" );
+require_ok('Sub::Private') || print 'Bail out!';
+
+diag("Testing Sub::Private $Sub::Private::VERSION, Perl $], $^X");

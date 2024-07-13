@@ -1,0 +1,11 @@
+Build.PL
+Changes
+LICENSE
+MANIFEST
+MANIFEST.SKIP
+META.json
+META.yml
+README
+dist.json
+lib/Perl/PrereqScanner/Scanner/DistBuild.pm
+t/basic.t

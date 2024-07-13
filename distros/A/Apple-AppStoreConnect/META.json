@@ -35,7 +35,7 @@
             "Crypt::JWT" : "0",
             "JSON" : "0",
             "LWP::UserAgent" : "0",
-            "perl" : "5.008"
+            "perl" : "5.008001"
          }
       },
       "test" : {
@@ -58,6 +58,6 @@
          "web" : "https://github.com/dkechag/Apple-AppStoreConnect"
       }
    },
-   "version" : "0.11",
+   "version" : "0.12",
    "x_serialization_backend" : "JSON::PP version 4.04"
 }

@@ -1,5 +1,13 @@
 Revision history for MIDI-RtMidi-ScorePlayer
 
+0.0112 2024-07-12 21:44:06
+    - Clean-up things a bit.
+    - Add the eg/rpsls-game.pl program.
+    - Improve documentation.
+
+0.0111 2024-07-12 16:56:30
+    - Die if the deposit path does not exist.
+
 0.0110 2024-07-11 22:25:03
     - Enable optional MIDI file saving after each loop.
 		- Add a verbose option to show our progress and looping.

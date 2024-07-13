@@ -4,7 +4,7 @@ use 5.006;
 use strict;
 use warnings;
 use smallnum;
-our $VERSION = '0.25';
+our $VERSION = '0.26';
 
 our (%TOOL, $ANOBJECT);
 
@@ -46,7 +46,7 @@ BEGIN {
 		scaled => sub {
 			my ( $n, $size ) = @_;
 			return ( $n =~ s/%// )
-				? sprintf( '%.f2', (($n * $size) / 100 ))
+				? sprintf( '%.f', (($n * $size) / 100 ))
 				: return sprintf( "%d", $n );
 		},
 		convertColour => sub {
@@ -412,7 +412,7 @@ Colouring::In - color or colour.
 
 =head1 VERSION
 
-Version 0.25
+Version 0.26
 
 =cut
 

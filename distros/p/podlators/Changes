@@ -1,5 +1,11 @@
                       Revision history for podlators
 
+v6.0.1 - 2024-07-12
+
+ - Remove autodie from the module build process.  When built as part of
+   Perl core, podlators is built before autodie is available.  Thanks to
+   James E Keenan for the report and a draft patch.  (GitHub #33)
+
 v6.0.0 - 2024-07-10
 
  - Drop support for Perl 5.10.  podlators now requires Perl 5.12 or later.

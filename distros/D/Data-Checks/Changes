@@ -1,5 +1,12 @@
 Revision history for Data-Checks
 
+0.07    2024-07-12
+        [CHANGES]
+         * Added `ArrayRef` and `HashRef` constraints
+         * Added `Any` and `All` hyper-constraints
+         * More extensive unit testing of constraints by automatically
+           generating reject cases
+
 0.06    2024-07-09
         [CHANGES]
          * Added `Callable` constraint

@@ -1,0 +1,55 @@
+{
+   "abstract" : "Tk::Text widget with support for ANSI color escape codes",
+   "author" : [
+      "Tim Jenness (E<lt>F<tjenness@cpan.org>E<gt>)"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4231",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Tk-TextANSIColor",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::More" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.42"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "File::Spec" : "0.8",
+            "Term::ANSIColor" : "1",
+            "Tk" : "804"
+         }
+      }
+   },
+   "provides" : {
+      "Tk::ROTextANSIColor" : {
+         "file" : "lib/Tk/ROTextANSIColor.pm",
+         "version" : "0.17"
+      },
+      "Tk::TextANSIColor" : {
+         "file" : "lib/Tk/TextANSIColor.pm",
+         "version" : "0.17"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "url" : "https://github.com/timj/perl-Tk-TextANSIColor.git"
+      }
+   },
+   "version" : "0.17"
+}

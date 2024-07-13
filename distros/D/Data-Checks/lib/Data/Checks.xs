@@ -49,7 +49,7 @@ static void S_alloc_constraint(pTHX_ SV **svp, struct Constraint **constraintp, 
 {
   HV *constraint_stash = gv_stashpvs("Data::Checks::Constraint", GV_ADD);
 
-  SV *sv = newSV(sizeof(struct Constraint) + 1*sizeof(SV *));
+  SV *sv = newSV(sizeof(struct Constraint) + n*sizeof(SV *));
   SvPOK_on(sv);
   struct Constraint *constraint = (struct Constraint *)SvPVX(sv);
   *constraint = (struct Constraint){
@@ -62,6 +62,15 @@ static void S_alloc_constraint(pTHX_ SV **svp, struct Constraint **constraintp, 
 
   *svp = sv_bless(newRV_noinc(sv), constraint_stash);
   *constraintp = constraint;
+}
+
+#define extract_constraint(sv)  S_extract_constraint(aTHX_ sv)
+static SV *S_extract_constraint(pTHX_ SV *sv)
+{
+  if(!sv_isa(sv, "Data::Checks::Constraint"))
+    croak("Expected a Constraint instance as argument");
+
+  return SvRV(sv);
 }
 
 struct DataChecks_Checker
@@ -540,6 +549,34 @@ static SV *mk_constraint_Isa(pTHX_ SV *arg0)
   return sv_2mortal(ret);
 }
 
+static bool constraint_ArrayRef(pTHX_ struct Constraint *c, SV *value)
+{
+  if(!SvOK(value) || !SvROK(value))
+    return false;
+
+  SV *rv = SvRV(value);
+
+  if(!SvOBJECT(rv))
+    /* plain ref */
+    return SvTYPE(rv) == SVt_PVAV;
+  else
+    return sv_has_overload(value, to_av_amg);
+}
+
+static bool constraint_HashRef(pTHX_ struct Constraint *c, SV *value)
+{
+  if(!SvOK(value) || !SvROK(value))
+    return false;
+
+  SV *rv = SvRV(value);
+
+  if(!SvOBJECT(rv))
+    /* plain ref */
+    return SvTYPE(rv) == SVt_PVHV;
+  else
+    return sv_has_overload(value, to_hv_amg);
+}
+
 static bool constraint_Callable(pTHX_ struct Constraint *c, SV *value)
 {
   if(!SvOK(value) || !SvROK(value))
@@ -565,16 +602,90 @@ static bool constraint_Maybe(pTHX_ struct Constraint *c, SV *value)
 
 static SV *mk_constraint_Maybe(pTHX_ SV *arg0)
 {
-  if(!sv_isa(arg0, "Data::Checks::Constraint"))
-    croak("Expected a Constraint instance as argument to Maybe()");
+  SV *inner = extract_constraint(arg0);
 
   SV *ret;
   struct Constraint *c;
   alloc_constraint(&ret, &c, &constraint_Maybe, 1);
   sv_2mortal(ret);
 
-  /* Unwrap the RV */
-  c->args[0] = SvREFCNT_inc(SvRV(arg0));
+  c->args[0] = SvREFCNT_inc(inner);
+
+  return ret;
+}
+
+static bool constraint_Any(pTHX_ struct Constraint *c, SV *value)
+{
+  AV *inners = (AV *)c->args[0];
+  SV **innersvs = AvARRAY(inners);
+  size_t n = av_count(inners);
+
+  for(size_t i = 0; i < n; i++) {
+    struct Constraint *inner = (struct Constraint *)SvPVX(innersvs[i]);
+    if((*inner->func)(aTHX_ inner, value))
+      return true;
+  }
+
+  return false;
+}
+
+static SV *mk_constraint_Any(pTHX_ size_t nargs, SV **args)
+{
+  if(!nargs)
+    croak("Any() requires at least one inner constraint");
+
+  AV *inners = newAV();
+  sv_2mortal((SV *)inners); // in case of croak during construction
+
+  for(size_t i = 0; i < nargs; i++)
+    av_push(inners, SvREFCNT_inc(extract_constraint(args[i])));
+
+  SV *ret;
+  struct Constraint *c;
+  alloc_constraint(&ret, &c, &constraint_Any, 1);
+  sv_2mortal(ret);
+
+  c->args[0] = SvREFCNT_inc(inners);
+
+  return ret;
+}
+
+static bool constraint_All(pTHX_ struct Constraint *c, SV *value)
+{
+  AV *inners = (AV *)c->args[0];
+  if(!inners)
+    return true;
+
+  SV **innersvs = AvARRAY(inners);
+  size_t n = av_count(inners);
+
+  for(size_t i = 0; i < n; i++) {
+    struct Constraint *inner = (struct Constraint *)SvPVX(innersvs[i]);
+    if(!(*inner->func)(aTHX_ inner, value))
+      return false;
+  }
+
+  return true;
+}
+
+static SV *mk_constraint_All(pTHX_ size_t nargs, SV **args)
+{
+  /* nargs == 0 is valid */
+  AV *inners = NULL;
+  if(nargs) {
+    inners = newAV();
+    sv_2mortal((SV *)inners); // in case of croak during construction
+
+    for(size_t i = 0; i < nargs; i++)
+      av_push(inners, SvREFCNT_inc(extract_constraint(args[i])));
+  }
+
+  SV *ret;
+  struct Constraint *c;
+  alloc_constraint(&ret, &c, &constraint_All, 1);
+  sv_2mortal(ret);
+
+  c->args[0] = SvREFCNT_inc(inners);
 
   return ret;
 }
@@ -648,6 +759,9 @@ static OP *pp_make_constraint(pTHX)
       SV **svp = PL_stack_base + POPMARK + 1;
       size_t nargs = SP - svp + 1;
       SP -= nargs;
+
+      if(!nargs)
+        EXTEND(SP, 1);
 
       ret = (*mk_constraint)(aTHX_ nargs, svp);
       break;
@@ -789,8 +903,12 @@ BOOT:
   MAKE_nARG_CONSTRAINT(NumEq);
 
   MAKE_1ARG_CONSTRAINT(Isa);
+  MAKE_0ARG_CONSTRAINT(ArrayRef);
+  MAKE_0ARG_CONSTRAINT(HashRef);
   MAKE_0ARG_CONSTRAINT(Callable);
   MAKE_1ARG_CONSTRAINT(Maybe);
+  MAKE_nARG_CONSTRAINT(Any);
+  MAKE_nARG_CONSTRAINT(All);
 
   XopENTRY_set(&xop_invoke_checkfunc, xop_name, "invoke_checkfunc");
   XopENTRY_set(&xop_invoke_checkfunc, xop_desc, "invoke checkfunc");

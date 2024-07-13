@@ -6,40 +6,21 @@ use warnings;
 use Test2::V0;
 
 use lib "t";
-use testcase "t::test";
+use testcase "t::test", qw( test_constraint );
 
 use Data::Checks qw( Str StrEq );
 
-# Some test classes
-package ClassWithoutOverload {
-   sub new { bless [], shift }
-}
-package ClassWithStrOverload {
-   use overload '""' => sub { "boo" };
-   sub new { bless [], shift }
-}
-package ClassWithNumOverload {
-   use overload '0+' => sub { 123 };
-   sub new { bless [], shift }
-}
-
 # Str
-{
-   my $checker = t::test::make_checkdata( Str, "Value", "Str" );
-
-   ok( t::test::check_value( $checker, "a string" ), 'Str accepts plain string' );
-   ok( t::test::check_value( $checker, "" ),         'Str accepts empty string' );
-   ok( t::test::check_value( $checker, 1234 ),       'Str accepts plain number' );
-   ok( t::test::check_value( $checker, ClassWithStrOverload->new ),
-      'Str accepts object with str overload' );
-
-   ok( !t::test::check_value( $checker, undef ), 'Str rejects undef' );
-   ok( !t::test::check_value( $checker, [] ),    'Str rejects plain ref' );
-   ok( !t::test::check_value( $checker, ClassWithoutOverload->new ),
-      'Str rejects object without overload' );
-   ok( !t::test::check_value( $checker, ClassWithNumOverload->new ),
-      'Str rejects object with num overload' );
-}
+test_constraint Str => Str,
+   [
+      'plain string'           => "a string",
+      'empty string'           => "",
+      'plain integer'          => 1234,
+      'object with stringifty' => ClassWithStrOverload->new,
+   ],
+   [
+      'object with numify' => ClassWithNumOverload->new,
+   ];
 
 # Str eq set
 {

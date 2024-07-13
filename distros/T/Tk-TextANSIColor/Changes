@@ -1,0 +1,42 @@
+Revision history for Tk::TextANSIColor
+
+0.17 2024-07-05
+
+  - Attempt to use current font for bold text, to avoid it being
+    displayed in a different size.  (CPAN bug: #125702)
+
+  - Allow "\e[m" as an alternative reset sequence. (CPAN bug: #125702)
+
+0.16 2010-12-03
+
+  - Fix CPAN Testers failure with no X display.
+
+  - Use Module::Build and Test::More.
+
+0.15 2003-08-18
+
+  - Tweak the way that fonts are specified in TextANSIColor
+    such that the Tk::Font system is used.
+
+0.14 2001-10-20
+
+  - Add getansi() method from Jim Turner <turnerjw2@netscape.net>
+    and related test. This allows the ANSI escape codes to be retrieved
+    from the Text widget.
+
+0.13 2001-01-02
+
+  - Include Tk::ROTextANSIColor in the MANIFEST.
+
+0.12 2000-11-24
+
+  - Add Read-only widget Tk::ROTextANSIColor at request of
+    Piotr Synowiec <mysiar@krakow.sky.pl>.
+
+0.11 2000-05-02
+
+  - Add proper test routine.
+
+0.10 1999-05-18
+
+  - Initial release.

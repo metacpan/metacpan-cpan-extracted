@@ -12,7 +12,7 @@
 # Modules and declarations
 ##############################################################################
 
-package Pod::Text v6.0.0;
+package Pod::Text v6.0.1;
 
 use 5.012;
 use parent qw(Pod::Simple);

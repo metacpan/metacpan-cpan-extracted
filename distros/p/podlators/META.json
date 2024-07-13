@@ -40,27 +40,27 @@
    "provides" : {
       "Pod::Man" : {
          "file" : "lib/Pod/Man.pm",
-         "version" : "v6.0.0"
+         "version" : "v6.0.1"
       },
       "Pod::ParseLink" : {
          "file" : "lib/Pod/ParseLink.pm",
-         "version" : "v6.0.0"
+         "version" : "v6.0.1"
       },
       "Pod::Text" : {
          "file" : "lib/Pod/Text.pm",
-         "version" : "v6.0.0"
+         "version" : "v6.0.1"
       },
       "Pod::Text::Color" : {
          "file" : "lib/Pod/Text/Color.pm",
-         "version" : "v6.0.0"
+         "version" : "v6.0.1"
       },
       "Pod::Text::Overstrike" : {
          "file" : "lib/Pod/Text/Overstrike.pm",
-         "version" : "v6.0.0"
+         "version" : "v6.0.1"
       },
       "Pod::Text::Termcap" : {
          "file" : "lib/Pod/Text/Termcap.pm",
-         "version" : "v6.0.0"
+         "version" : "v6.0.1"
       }
    },
    "release_status" : "stable",
@@ -75,6 +75,6 @@
          "web" : "https://github.com/rra/podlators"
       }
    },
-   "version" : "v6.0.0",
+   "version" : "v6.0.1",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

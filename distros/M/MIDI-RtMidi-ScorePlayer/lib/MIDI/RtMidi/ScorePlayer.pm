@@ -3,7 +3,7 @@ our $AUTHORITY = 'cpan:GENE';
 
 # ABSTRACT: Play a MIDI score in real-time
 
-our $VERSION = '0.0110';
+our $VERSION = '0.0112';
 
 use strict;
 use warnings;
@@ -30,6 +30,7 @@ sub new {
     $opts{deposit}  ||= '';
     if ($opts{deposit}) {
         ($opts{prefix}, $opts{path}) = fileparse($opts{deposit});
+        die "Invalid path: $opts{path}\n" unless -d $opts{path};
     }
 
     $opts{device} = RtMidiOut->new;
@@ -118,7 +119,7 @@ MIDI::RtMidi::ScorePlayer - Play a MIDI score in real-time
 
 =head1 VERSION
 
-version 0.0110
+version 0.0112
 
 =head1 SYNOPSIS
 
@@ -176,20 +177,22 @@ the B<new> parameters that are described in the example above.
 
 =head2 Hints
 
-B<Linux>: If your distro does not install a service, you can use
-timidity in daemon mode: C<timidity -iAD>. Also, FluidSynth is an
-alternative.
+B<Linux>:
+If your distro does not install a service, you can use timidity in
+daemon mode: C<timidity -iAD>. Also, FluidSynth is an alternative.
 
-B<MacOS>: You can get General MIDI via DLSMusicDevice within Logic or
-Garageband. You will need a soundfont containing drum patches in
-'~/Library/Audio/Sounds/Banks/' and DLSMusicDevice open in Garageband
-or Logic with this soundfont selected. See the
-L<MIDI::RtMidi::FFI::Device> docs for more info. Alternatively you can
-use FluidSynth:
-C<fluidsynth -a coreaudio -m coremidi -g 1.0 ~/Music/some-soundfont.sf2>.
-Also, you can use C<timidity> too.
+B<MacOS>:
+You can use FluidSynth like this:
+C<fluidsynth -a coreaudio -m coremidi -g 1.0 some-soundfont.sf2>
+Also, you can use Timidity. You can also use a digital audio
+workstation (DAW) like Logic, with a software synth track selected.
+If you wish, you can get General MIDI via "DLSMusicDevice" within a
+DAW.  To do this, you will need a soundfont in
+C<~/Library/Audio/Sounds/Banks/> and DLSMusicDevice open in your DAW
+with the soundfont selected.
 
-For B<Windows>, this should I<just work> out of the box.
+B<Windows>:
+This should I<just work> out of the box.
 
 =head1 METHODS
 
@@ -203,7 +206,9 @@ Play a given MIDI score in real-time.
 
 =head1 SEE ALSO
 
-Examples can be found in the F<eg/*> files in this distribution.
+Examples are the F<eg/*> files in this distribution.
+
+Also check out the F<t/01-methods.t> file for basic usage.
 
 L<MIDI::RtMidi::FFI::Device>
 

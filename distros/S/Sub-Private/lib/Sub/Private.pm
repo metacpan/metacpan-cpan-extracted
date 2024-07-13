@@ -15,11 +15,11 @@ Sub::Private - Private subroutines and methods
 
 =head1 VERSION
 
-Version 0.02
+Version 0.03
 
 =cut
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 =head1 SYNOPSIS
 
@@ -46,17 +46,16 @@ sub UNIVERSAL::Private :ATTR(CODE,BEGIN) {
 
 =head1 DESCRIPTION
 
-This module provide a C<:Private> attribute for subroutines. By using the
-attribut you get truly private methods.
-
+This module provide a C<:Private> attribute for subroutines.
+By using the attribute you get truly private methods.
 
 =head1 AUTHOR
 
+Original Author:
 Peter Makholm, C<< <peter at makholm.net> >>
 
-=head1 MAINTAINER
-
-Nigel Horne, C<< <njh@bandman.co.uk> >>
+Current maintainer:
+Nigel Horne, C<< <njh@bandsman.co.uk> >>
 
 =head1 BUGS
 
@@ -66,14 +65,13 @@ automatically be notified of progress on your bug as I make changes.
 
 =head1 SEE ALSO
 
-namespace::clean
+L<namespace::clean>
 
 =head1 SUPPORT
 
 You can find documentation for this module with the perldoc command.
 
     perldoc Sub::Private
-
 
 You can also look for information at:
 
@@ -82,10 +80,6 @@ You can also look for information at:
 =item * RT: CPAN's request tracker
 
 L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=Sub-Private>
-
-=item * AnnoCPAN: Annotated CPAN documentation
-
-L<http://annocpan.org/dist/Sub-Private>
 
 =item * CPAN Ratings
 
@@ -97,9 +91,7 @@ L<http://search.cpan.org/dist/Sub-Private>
 
 =back
 
-
 =head1 ACKNOWLEDGEMENTS
-
 
 =head1 COPYRIGHT & LICENSE
 

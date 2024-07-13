@@ -2,7 +2,7 @@ package App::ModuleBuildTiny;
 
 use 5.014;
 use warnings;
-our $VERSION = '0.044';
+our $VERSION = '0.047';
 
 use Exporter 5.57 'import';
 our @EXPORT = qw/modulebuildtiny/;
@@ -315,7 +315,7 @@ my %actions = (
 
 		my $sure = prompt_yn('Do you want to continue the release process?', !!0);
 		if ($sure) {
-			my $file = $dist->write_tarball($dist->fullname);
+			my $file = $dist->write_tarball($dist->archivename);
 			require CPAN::Upload::Tiny;
 			CPAN::Upload::Tiny->VERSION('0.009');
 			my $uploader = CPAN::Upload::Tiny->new_from_config_or_stdin($opts{config});
@@ -560,7 +560,7 @@ sub modulebuildtiny {
 
 =head1 NAME
 
-App::ModuleBuildTiny - A standalone authoring tool for Module::Build::Tiny
+App::ModuleBuildTiny - A standalone authoring tool for Module::Build::Tiny and Dist::Build
 
 =head1 DESCRIPTION
 

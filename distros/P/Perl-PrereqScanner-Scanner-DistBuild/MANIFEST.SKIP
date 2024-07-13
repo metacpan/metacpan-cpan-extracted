@@ -1,0 +1,3 @@
+#!include_default
+Perl-PrereqScanner-Scanner-DistBuild-.*
+README.pod

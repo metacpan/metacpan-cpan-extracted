@@ -1,0 +1,218 @@
+NAME
+    Acme::CPANModules::ModifiedHashes - List of modules that provide hashes
+    with modified behaviors
+
+VERSION
+    This document describes version 0.001 of
+    Acme::CPANModules::ModifiedHashes (from Perl distribution
+    Acme-CPANModules-ModifiedHashes), released on 2024-07-10.
+
+DESCRIPTION
+    These modules allow you to create hashes that don't behave like a normal
+    Perl hash.
+
+    Accessing hash values using approximate keys (fuzzy hash)
+
+    Tie::Hash::Approx
+
+    Allowing key aliases (multiple keys that refer to the same value)
+
+    Tie::Alias::Hash
+
+    Tie::Hash::Abbrev
+
+    Allowing multiple keys (list of keys)
+
+    Tie::Hash::MultiKey
+
+    Allowing references as keys
+
+    Hash::ExtendedKeys
+
+    Case-insensitive hash keys
+
+    Tie::CPHash
+
+    Encrypting values
+
+    Tie::EncryptedHash
+
+    Ordered
+
+    There are several modules that provide ordered hash, see separate list
+    mentioned in SEE ALSO section.
+
+    Remembering keys only temporarily
+
+    Keywords: cache
+
+    Tie::Hash::Expire
+
+    Remembering only a certain number of keys
+
+    Keywords: cache
+
+    Tie::CacheHash
+
+    Tie::Cache
+
+    Tie::Cache::LRU
+
+    Restricted keys
+
+    Hashes that only allow certain keys and not others.
+
+    Hash::RestrictedKeys
+
+    Using regular expressions as hash keys
+
+    Tie::RegexpHash
+
+    Tie::Hash::Regex
+
+    Tie::Hash::RegexKeys
+
+    Others
+
+    Tie::Hash::Log
+
+    Tie::Hash::NoOp
+
+ACME::CPANMODULES ENTRIES
+    Tie::Hash::Approx
+        Author: BRIAC <https://metacpan.org/author/BRIAC>
+
+    Tie::Alias::Hash
+        Author: DAVIDNICO <https://metacpan.org/author/DAVIDNICO>
+
+    Tie::Hash::Abbrev
+        Author: FANY <https://metacpan.org/author/FANY>
+
+    Tie::Hash::MultiKey
+        Author: MIKER <https://metacpan.org/author/MIKER>
+
+    Hash::ExtendedKeys
+        Author: LNATION <https://metacpan.org/author/LNATION>
+
+    Tie::CPHash
+        Author: CJM <https://metacpan.org/author/CJM>
+
+    Tie::EncryptedHash
+        Author: VIPUL <https://metacpan.org/author/VIPUL>
+
+    Tie::Hash::Expire
+        Author: JEFFY <https://metacpan.org/author/JEFFY>
+
+    Tie::CacheHash
+        Author: JAMCC <https://metacpan.org/author/JAMCC>
+
+    Tie::Cache
+        Author: CHAMAS <https://metacpan.org/author/CHAMAS>
+
+    Tie::Cache::LRU
+        Author: MSCHWERN <https://metacpan.org/author/MSCHWERN>
+
+    Hash::RestrictedKeys
+        Author: LNATION <https://metacpan.org/author/LNATION>
+
+    Tie::RegexpHash
+        Author: ALTREUS <https://metacpan.org/author/ALTREUS>
+
+    Tie::Hash::Regex
+        Author: DAVECROSS <https://metacpan.org/author/DAVECROSS>
+
+    Tie::Hash::RegexKeys
+        Author: FDULAU <https://metacpan.org/author/FDULAU>
+
+    Tie::Hash::Log
+        Author: PERLANCAR <https://metacpan.org/author/PERLANCAR>
+
+    Tie::Hash::NoOp
+        Author: PERLANCAR <https://metacpan.org/author/PERLANCAR>
+
+BENCHMARK NOTES
+    Hash::Ordered has strong performance in iterating and returning keys,
+    while List::Unique::DeterministicOrder is strong in insertion and
+    deletion (or Tie::Hash::Indexed if you're looking for actual hash type).
+
+FAQ
+  What is an Acme::CPANModules::* module?
+    An Acme::CPANModules::* module, like this module, contains just a list
+    of module names that share a common characteristics. It is a way to
+    categorize modules and document CPAN. See Acme::CPANModules for more
+    details.
+
+  What are ways to use this Acme::CPANModules module?
+    Aside from reading this Acme::CPANModules module's POD documentation,
+    you can install all the listed modules (entries) using cpanm-cpanmodules
+    script (from App::cpanm::cpanmodules distribution):
+
+     % cpanm-cpanmodules -n ModifiedHashes
+
+    Alternatively you can use the cpanmodules CLI (from App::cpanmodules
+    distribution):
+
+        % cpanmodules ls-entries ModifiedHashes | cpanm -n
+
+    or Acme::CM::Get:
+
+        % perl -MAcme::CM::Get=ModifiedHashes -E'say $_->{module} for @{ $LIST->{entries} }' | cpanm -n
+
+    or directly:
+
+        % perl -MAcme::CPANModules::ModifiedHashes -E'say $_->{module} for @{ $Acme::CPANModules::ModifiedHashes::LIST->{entries} }' | cpanm -n
+
+    This Acme::CPANModules module also helps lcpan produce a more meaningful
+    result for "lcpan related-mods" command when it comes to finding related
+    modules for the modules listed in this Acme::CPANModules module. See
+    App::lcpan::Cmd::related_mods for more details on how "related modules"
+    are found.
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Acme-CPANModules-ModifiedHashes>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Acme-CPANModules-ModifiedHashes>.
+
+SEE ALSO
+    Acme::CPANModules::OrderedHash
+
+    Acme::CPANModules - about the Acme::CPANModules namespace
+
+    cpanmodules - CLI tool to let you browse/view the lists
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+CONTRIBUTING
+    To contribute, you can send patches by email/via RT, or send pull
+    requests on GitHub.
+
+    Most of the time, you don't need to build the distribution yourself. You
+    can simply modify the code, then test via:
+
+     % prove -l
+
+    If you want to build the distribution (e.g. to try to install it locally
+    on your system), you can install Dist::Zilla,
+    Dist::Zilla::PluginBundle::Author::PERLANCAR,
+    Pod::Weaver::PluginBundle::Author::PERLANCAR, and sometimes one or two
+    other Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps
+    required beyond that are considered a bug and can be reported to me.
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2024 by perlancar <perlancar@cpan.org>.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Acme-CPANModules-Modi
+    fiedHashes>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+

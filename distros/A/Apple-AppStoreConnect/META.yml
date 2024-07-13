@@ -28,8 +28,8 @@ requires:
   Crypt::JWT: '0'
   JSON: '0'
   LWP::UserAgent: '0'
-  perl: '5.008'
+  perl: '5.008001'
 resources:
   repository: git://github.com/dkechag/Apple-AppStoreConnect.git
-version: '0.11'
+version: '0.12'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

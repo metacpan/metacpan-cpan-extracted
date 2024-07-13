@@ -31,7 +31,7 @@ requires:
 resources:
   homepage: https://github.com/ology/MIDI-RtMidi-ScorePlayer
   repository: https://github.com/ology/MIDI-RtMidi-ScorePlayer.git
-version: '0.0110'
+version: '0.0112'
 x_Dist_Zilla:
   perl:
     version: '5.032001'
@@ -212,6 +212,7 @@ x_Dist_Zilla:
             - lib
           spell_cmd: 'aspell list'
           stopwords:
+            - DAW
             - DLSMusicDevice
             - FluidSynth
             - Garageband

@@ -9,6 +9,7 @@ README
 README.md
 dist.ini
 eg/drum-circle.pl
+eg/rpsls-game.pl
 eg/treble-bass.pl
 lib/MIDI/RtMidi/ScorePlayer.pm
 t/00-compile.t

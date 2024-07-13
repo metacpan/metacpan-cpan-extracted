@@ -4,6 +4,8 @@
 # required for proper start-up code on non-UNIX platforms, and is used inside
 # Perl core.
 
+# Do not use autodie here.  When podlators is built as part of Perl core, it
+# is built before autodie is available.
 use 5.012;
 use warnings;
 
@@ -26,11 +28,8 @@ if ($^O eq 'VMS') {
 }
 
 # Create the generated script.
-## no critic (InputOutput::RequireBriefOpen)
-## no critic (InputOutput::RequireCheckedSyscalls)
 open(my $out, '>', $file) or die "Cannot create $file: $!\n";
 print "Extracting $file (with variable substitutions)\n";
-## use critic
 
 # In this section, Perl variables will be expanded during extraction.  You can
 # use $Config{...} to use Configure variables.

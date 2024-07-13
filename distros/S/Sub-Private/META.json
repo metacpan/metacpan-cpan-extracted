@@ -4,7 +4,7 @@
       "Nigel Horne <njh@bandsman.co.uk>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.4231",
+   "generated_by" : "Module::Build version 0.4234",
    "license" : [
       "perl_5"
    ],
@@ -32,23 +32,31 @@
             "Sub::Identify" : "0",
             "namespace::clean" : "0"
          }
+      },
+      "test" : {
+         "requires" : {
+            "Test::Needs" : "0"
+         }
       }
    },
    "provides" : {
       "Sub::Private" : {
          "file" : "lib/Sub/Private.pm",
-         "version" : "0.02"
+         "version" : "0.03"
       }
    },
    "release_status" : "stable",
    "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/nigelhorne/Sub-Private/issues"
+      },
       "license" : [
          "http://dev.perl.org/licenses/"
       ],
       "repository" : {
-         "url" : "http://github.com/nigelhorne/sub-private-perl/tree/master"
+         "url" : "https://github.com/nigelhorne/Sub-Private"
       }
    },
-   "version" : "0.02",
-   "x_serialization_backend" : "JSON::PP version 4.05"
+   "version" : "0.03",
+   "x_serialization_backend" : "JSON::PP version 4.16"
 }

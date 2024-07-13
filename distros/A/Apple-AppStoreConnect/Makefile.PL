@@ -1,4 +1,4 @@
-use 5.006;
+use 5.008001;
 use strict;
 use warnings;
 use ExtUtils::MakeMaker;
@@ -9,7 +9,7 @@ my %WriteMakefileArgs = (
     VERSION_FROM       => 'lib/Apple/AppStoreConnect.pm',
     ABSTRACT_FROM      => 'lib/Apple/AppStoreConnect.pm',
     LICENSE            => 'perl_5',
-    MIN_PERL_VERSION   => '5.008',
+    MIN_PERL_VERSION   => '5.008001',
     CONFIGURE_REQUIRES => {
         'ExtUtils::MakeMaker' => '0',
     },

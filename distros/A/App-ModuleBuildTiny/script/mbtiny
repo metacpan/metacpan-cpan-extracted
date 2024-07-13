@@ -5,7 +5,7 @@ use warnings;
 use App::ModuleBuildTiny;
 use File::Basename 'basename';
 
-our $VERSION = '0.044';
+our $VERSION = '0.047';
 
 print_help() if ($ARGV[0] // 'help') eq 'help';
 
@@ -129,7 +129,9 @@ The following files can be generated:
 
 =item * Build.PL
 
-The code needed to build the dist using L<Module::Build::Tiny|Module::Build::Tiny>.
+The code needed to build the dist using L<Module::Build::Tiny|Module::Build::Tiny> or L<Dist::Build|Dist::Build>.
+
+It will use the former unless a C<planner/> directory is present.
 
 =item * MANIFEST
 

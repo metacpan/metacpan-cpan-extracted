@@ -6,40 +6,21 @@ use warnings;
 use Test2::V0;
 
 use lib "t";
-use testcase "t::test";
+use testcase "t::test", qw( test_constraint );
 
 use Data::Checks qw( Num NumGT NumGE NumLE NumLT NumRange NumEq );
 
-# Some test classes
-package ClassWithoutOverload {
-   sub new { bless [], shift }
-}
-package ClassWithStrOverload {
-   use overload '""' => sub { "boo" };
-   sub new { bless [], shift }
-}
-package ClassWithNumOverload {
-   use overload '0+' => sub { 123 };
-   sub new { bless [], shift }
-}
-
 # Num
-{
-   my $checker = t::test::make_checkdata( Num, "Value", "Num" );
-
-   ok( t::test::check_value( $checker, 1234 ), 'Num accepts plain integer' );
-   ok( t::test::check_value( $checker, 5.67 ), 'Num accepts empty float' );
-   ok( t::test::check_value( $checker, "89" ), 'Num accepts stringified number' );
-   ok( t::test::check_value( $checker, ClassWithNumOverload->new ),
-      'Num accepts object with num overload' );
-
-   ok( !t::test::check_value( $checker, undef ), 'Num rejects undef' );
-   ok( !t::test::check_value( $checker, [] ),    'Num rejects plain ref' );
-   ok( !t::test::check_value( $checker, ClassWithoutOverload->new ),
-      'Num rejects object without overload' );
-   ok( !t::test::check_value( $checker, ClassWithStrOverload->new ),
-      'Num rejects object with str overload' );
-}
+test_constraint Num => Num,
+   [
+      'plain integer'      => 1234,
+      'plain float'        => 5.67,
+      'stringified number' => "89",
+      'object with numify' => ClassWithNumOverload->new,
+   ],
+   [
+      'object with stringifty' => ClassWithStrOverload->new,
+   ];
 
 # Num bounded
 {

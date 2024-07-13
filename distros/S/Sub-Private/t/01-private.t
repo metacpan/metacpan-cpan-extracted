@@ -1,8 +1,9 @@
 #!perl -T
 
+use strict;
 use lib 't/';
 
-use Test::More tests => 5;
+use Test::Most tests => 5;
 use Test::NoWarnings;
 use Foo;
 

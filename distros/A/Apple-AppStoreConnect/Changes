@@ -1,7 +1,10 @@
 Revision history for Apple-AppStoreConnect
 
+0.12    2024-07-12
+        'jwt_payload' option.
+
 0.11    2023-08-21
         Test suite fixes.
 
-0.1     2023-08-06
+0.10    2023-08-06
         First public release.

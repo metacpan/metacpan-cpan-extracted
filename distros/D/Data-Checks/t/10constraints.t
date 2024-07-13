@@ -6,24 +6,9 @@ use warnings;
 use Test2::V0;
 
 use lib "t";
-use testcase "t::test";
+use testcase "t::test", qw( test_constraint );
 
-use Data::Checks qw( Defined Object Str Isa Callable Maybe );
-
-# Some test classes
-package BaseClass {
-   sub new { bless [], shift }
-}
-package DifferentClass {
-   sub new { bless [], shift }
-}
-package DerivedClass {
-   use base qw( BaseClass );
-}
-package ClassWithCodeRefify {
-   sub new { bless [], shift }
-   use overload '&{}' => sub {};
-}
+use Data::Checks qw( Defined Object Str Isa ArrayRef HashRef Callable );
 
 # Defined
 {
@@ -49,14 +34,10 @@ package ClassWithCodeRefify {
 }
 
 # Object
-{
-   my $checker = t::test::make_checkdata( Object, "Value", "Object" );
-
-   ok( t::test::check_value( $checker, bless [], "SomeClass" ), 'Object accepts blessed object' );
-   ok( !t::test::check_value( $checker, [] ), 'Object rejects unblessed ref' );
-   ok( !t::test::check_value( $checker, "not-an-object" ), 'Object rejects non-ref' );
-   ok( !t::test::check_value( $checker, undef ), 'Object rejects undef' );
-}
+test_constraint Object => Object,
+   [
+      'object' => BaseClass->new,
+   ];
 
 # unit constraint functions don't take arguments
 {
@@ -69,39 +50,36 @@ package ClassWithCodeRefify {
 }
 
 # Isa
-{
-   my $checker = t::test::make_checkdata( Isa("BaseClass"), "Value", "Isa" );
+test_constraint Isa => Isa("BaseClass"),
+   [
+      'object'   => BaseClass->new,
+      'subclass' => DerivedClass->new,
+   ],
+   [
+      'class name'     => "BaseClass",
+      'other instance' => DifferentClass->new,
+   ];
 
-   ok( t::test::check_value( $checker, BaseClass->new ),    'Isa accepts class' );
-   ok( t::test::check_value( $checker, DerivedClass->new ), 'Isa accepts subclass' );
+# ArrayRef
+test_constraint ArrayRef => ArrayRef,
+   [
+      'plain arrayref'  => [],
+      'object with @{}' => ClassWithArrayRefify->new,
+   ];
 
-   ok( !t::test::check_value( $checker, undef ),               'Isa rejects undef' );
-   ok( !t::test::check_value( $checker, "BaseClass" ),         'Isa rejects string name' );
-   ok( !t::test::check_value( $checker, DifferentClass->new ), 'Isa rejects other instance' );
-}
+# HashRef
+test_constraint HashRef => HashRef,
+   [
+      'plain hashref'   => {},
+      'object with %{}' => ClassWithHashRefify->new,
+   ];
 
 # Callable
-{
-   my $checker = t::test::make_checkdata( Callable, "Value", "Callable" );
-
-   ok( t::test::check_value( $checker, sub {} ),       'Callable accepts sub {}' );
-   ok( t::test::check_value( $checker, \&CORE::join ), 'Callable accepts ref to CORE::join' );
-   ok( t::test::check_value( $checker, ClassWithCodeRefify->new ), 'Callable accepts object with &{}' );
-
-   ok( !t::test::check_value( $checker, undef ), 'Callable rejects undef' );
-   ok( !t::test::check_value( $checker, [] ),    'Callable rejects plain arrayref' );
-   ok( !t::test::check_value( $checker, BaseClass->new ), 'Callable rejects object' );
-}
-
-# Maybe
-{
-   my $checker = t::test::make_checkdata( Maybe(Str), "Value", "Maybe(Str)" );
-
-   ok( t::test::check_value( $checker, undef ),      'Maybe(Str) accepts undef' );
-   ok( t::test::check_value( $checker, "a string" ), 'Maybe(Str) accepts plain string' );
-   ok( t::test::check_value( $checker, 1234 ),       'Maybe(Str) accepts plain number' );
-
-   ok( !t::test::check_value( $checker, [] ), 'Maybe(Str) rejects plain ref' );
-}
+test_constraint Callable => Callable,
+   [
+      'plain coderef'     => sub {},
+      'ref to CORE::join' => \&CORE::join,
+      'object with &{}'   => ClassWithCodeRefify->new,
+   ];
 
 done_testing;

@@ -64,7 +64,7 @@
          "web" : "https://github.com/ology/MIDI-RtMidi-ScorePlayer"
       }
    },
-   "version" : "0.0110",
+   "version" : "0.0112",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.032001"
@@ -294,6 +294,7 @@
                   ],
                   "spell_cmd" : "aspell list",
                   "stopwords" : [
+                     "DAW",
                      "DLSMusicDevice",
                      "FluidSynth",
                      "Garageband",

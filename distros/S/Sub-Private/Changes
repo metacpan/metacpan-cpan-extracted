@@ -1,5 +1,10 @@
 Revision history for Sub-Private
 
+0.03	Fri Jul 12 08:29:42 EDT 2024
+	Added SEE ALSO link to Sub::Deprecated (thanks to neilb)
+        fixed typo in doc (thanks to neilb)
+	http=>https (GitHub PR#1, thanks to szabgab)
+
 0.02	Thu Sep 17 10:38:31 EDT 2020
 	New maintainer
 
