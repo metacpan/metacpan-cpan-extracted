@@ -7,6 +7,7 @@
   is_windows: true
   is_chromeos: false
   version: '9.52'
+
 - ua: 'Mozilla/5.0 (Windows NT 6.3; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/33.0.1750.117 Safari/537.36 OPR/20.0.1387.64'
   name: 'Opera'
   is_bot: false
@@ -16,6 +17,7 @@
   is_windows: true
   is_chromeos: false
   version: '20.0.1387.64'
+
 - ua: 'Mozilla/5.0 (iPhone; CPU iPhone OS 13_3 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) OPT/2.1.0 Mobile/15E148'
   name: 'Opera Touch'
   is_bot: false

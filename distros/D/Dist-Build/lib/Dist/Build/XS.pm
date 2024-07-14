@@ -1,5 +1,5 @@
 package Dist::Build::XS;
-$Dist::Build::XS::VERSION = '0.003';
+$Dist::Build::XS::VERSION = '0.004';
 use strict;
 use warnings;
 
@@ -33,10 +33,7 @@ sub add_methods {
 		$planner = $planner->new_scope;
 
 		$planner->load_module("ExtUtils::Builder::ParseXS");
-		$planner->load_module("ExtUtils::Builder::AutoDetect::C",
-			type    => 'loadable-object',
-			profile => '@Perl',
-		);
+		$planner->load_module("ExtUtils::Builder::AutoDetect::C");
 
 		my $xs_file = catfile('lib', split /::/, $module_name) . '.xs';
 		my $c_file = $planner->c_file_for_xs($xs_file, 'lib');
@@ -56,6 +53,8 @@ sub add_methods {
 
 		my $compiler_flags = get_flags($args{extra_compiler_flags});
 		$planner->compile($c_file, $o_file,
+			type         => 'loadable-object',
+			profile      => '@Perl',
 			defines      => \%defines,
 			include_dirs => \@include_dirs,
 			extra_args   => $compiler_flags,
@@ -66,6 +65,8 @@ sub add_methods {
 		for my $source (@{ $args{extra_sources} }) {
 			my $object = $planner->obj_file(basename($source, '.c'));
 			$planner->compile($source, $object,
+				type         => 'loadable-object',
+				profile      => '@Perl',
 				defines      => $args{defines},
 				include_dirs => \@include_dirs,
 				extra_args   => $compiler_flags,
@@ -75,6 +76,8 @@ sub add_methods {
 
 		my $lib_file = $planner->extension_filename($module_name);
 		$planner->link(\@objects, $lib_file,
+			type         => 'loadable-object',
+			profile      => '@Perl',
 			module_name  => $module_name,
 			mkdir        => 1,
 			extra_args   => get_flags($args{extra_linker_args}),
@@ -102,7 +105,7 @@ Dist::Build::XS - An XS implementation for Dist::Build
 
 =head1 VERSION
 
-version 0.003
+version 0.004
 
 =head1 SYNOPSIS
 

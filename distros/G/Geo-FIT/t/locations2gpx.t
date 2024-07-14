@@ -1,5 +1,5 @@
 # t/locations2gpx.t - script to convert locations.fit file
-use Test::More tests => 2;
+use Test::More tests => 3;
 
 use strict;
 use warnings;
@@ -19,5 +19,11 @@ my ($fh, $tmp_fname) = tempfile();
 @args = ('--force', '--indent=4', "--outfile=$tmp_fname", 't/Locations.fit' );
 system($^X, 'script/locations2gpx.pl', @args);
 is(-f $tmp_fname, 1, "    locations2gpx.pl: results in new gpx file");
+
+# Fit file with accents (unicode) in waypoint names
+my ($fh2, $tmp_fname2) = tempfile();
+@args = ('--force', '--indent=4', "--outfile=$tmp_fname2", 't/Locations_accents.fit' );
+system($^X, 'script/locations2gpx.pl', @args);
+is(-f $tmp_fname2, 1, "    locations2gpx.pl: results in new gpx file");
 
 print "so debugger doesn't exit\n";

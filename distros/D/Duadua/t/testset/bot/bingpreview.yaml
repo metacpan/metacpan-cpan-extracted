@@ -8,6 +8,7 @@
   is_windows: true
   is_chromeos: false
   version: '1.0b'
+
 - ua: 'Mozilla/5.0 (Windows Phone 8.1; ARM; Trident/7.0; Touch; rv:11.0; IEMobile/11.0; NOKIA; Lumia 530) like Gecko BingPreview/1.0b'
   name: BingPreview
   is_bot: true

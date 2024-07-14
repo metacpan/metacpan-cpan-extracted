@@ -34,6 +34,7 @@ my @files = (
     't/author-pod-syntax.t',
     't/author-portability.t',
     't/author-vars.t',
+    't/etc/perlcritic.rc',
     't/release-dist-manifest.t',
     't/release-fixme.t',
     't/release-kwalitee.t',

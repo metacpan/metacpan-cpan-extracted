@@ -5,7 +5,7 @@ use warnings;
 sub try {
     my ($class, $d) = @_;
 
-    if ( index($d->ua, 'Mozilla/5.0 Feedeen ') > -1 ) {
+    if ( $d->_contain('Mozilla/5.0 Feedeen ') ) {
         return {
             name   => 'Feedeen',
             is_bot => 1,

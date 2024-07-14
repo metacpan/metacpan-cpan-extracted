@@ -8,6 +8,7 @@
   is_windows: true
   is_chromeos: false
   version: '1.0'
+
 - ua: 'Mozilla/5.0 (iPhone; CPU iPhone OS 6_0 like Mac OS X) AppleWebKit/536.26 (KHTML, like Gecko) Version/6.0 Mobile/10A5376e Safari/8536.25 (compatible; SMTBot/1.0; +http://www.similartech.com/smtbot)'
   name: 'SMTBot'
   is_bot: true
@@ -17,6 +18,7 @@
   is_windows: false
   is_chromeos: false
   version: '1.0'
+
 - ua: 'Mozilla/5.0 (Windows NT 6.1) (compatible; SMTBot/1.0; +http://www.similartech.com/smtbot)'
   name: 'SMTBot'
   is_bot: true
@@ -26,6 +28,7 @@
   is_windows: true
   is_chromeos: false
   version: '1.0'
+
 - ua: 'Mozilla/5.0 (compatible; SMTBot/1.0; +http://www.similartech.com/smtbot)'
   name: 'SMTBot'
   is_bot: true

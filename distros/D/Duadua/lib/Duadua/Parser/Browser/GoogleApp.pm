@@ -6,7 +6,7 @@ use Duadua::Util qw//;
 sub try {
     my ($class, $d) = @_;
 
-    if ( index($d->ua, ' AppleWebKit/') > -1 && index($d->ua, ') GSA/') > -1 ) {
+    if ( $d->_contain(' AppleWebKit/') && $d->_contain(') GSA/') ) {
         my $h = {
             name => 'Google App',
         };

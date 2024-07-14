@@ -7,6 +7,7 @@
   is_windows: true
   is_chromeos: false
   version: '16.16299'
+
 - ua: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/74.0.3729.48 Safari/537.36 Edg/74.1.96.24'
   name: 'Microsoft Edge'
   is_bot: false
@@ -16,6 +17,7 @@
   is_windows: true
   is_chromeos: false
   version: '74.1.96.24'
+
 - ua: 'Mozilla/5.0 (iPhone; CPU iPhone OS 13_3 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/13.0 EdgiOS/44.10.19 Mobile/15E148 Safari/605.1.15'
   name: 'Microsoft Edge'
   is_bot: false

@@ -6,7 +6,7 @@ use Duadua::Util;
 sub try {
     my ($class, $d) = @_;
 
-    if ( index($d->ua, 'DoCoMo/2.0') > -1 && $d->ua =~ m!^DoCoMo/2\.0 ([^\(]+)\(!) {
+    if ( $d->_contain('DoCoMo/2.0') && $d->ua =~ m!^DoCoMo/2\.0 ([^\(]+)\(!) {
         my $name = $1;
         $name =~ s/MST_v_//;
         my $h = {
@@ -15,7 +15,7 @@ sub try {
 
         return $h;
     }
-    elsif ( index($d->ua, 'FOMA;') > -1 && index($d->ua, 'Mozilla/') > -1
+    elsif ( $d->_contain('FOMA;') && $d->_contain_mozilla
             && $d->ua =~ m! \(([^;]+);FOMA;!) {
         my $h = {
             name => 'DoCoMo ' . $1,
@@ -23,7 +23,7 @@ sub try {
 
         return $h;
     }
-    elsif ( index($d->ua, 'SoftBank/') > -1 ) {
+    elsif ( $d->_contain('SoftBank/') ) {
         my @elements = split '/', $d->ua;
         my $h = {
             name   => 'SoftBank ' . ($elements[2] || ''),
@@ -31,7 +31,7 @@ sub try {
 
         return $h;
     }
-    elsif ( index($d->ua, 'Vodafone/') > -1 ) {
+    elsif ( $d->_contain('Vodafone/') ) {
         my @elements = split '/', $d->ua;
         my $h = {
             name   => 'SoftBank ' . ($elements[2] || ''),
@@ -39,7 +39,7 @@ sub try {
 
         return $h;
     }
-    elsif ( index($d->ua, ';SoftBank') > -1 && index($d->ua, 'Mozilla/') > -1
+    elsif ( $d->_contain(';SoftBank') && $d->_contain_mozilla
             && $d->ua =~ m!\(([^;]+);SoftBank!) {
         my $h = {
             name   => 'SoftBank ' . $1,
@@ -47,7 +47,7 @@ sub try {
 
         return $h;
     }
-    elsif ( index($d->ua, 'KDDI-') > -1 && $d->ua =~ m!^KDDI-([^\s]+)\s!) {
+    elsif ( $d->_contain('KDDI-') && $d->ua =~ m!^KDDI-([^\s]+)\s!) {
         my $h = {
             name   => 'AU KDDI ' . $1,
         };

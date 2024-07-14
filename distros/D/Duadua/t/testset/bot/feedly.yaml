@@ -8,6 +8,7 @@
   is_windows: false
   is_chromeos: false
   version: '1.0'
+
 - ua: 'MetaFeedly/1.0 (http://www.feedly.com)'
   name: 'Feedly'
   is_bot: true

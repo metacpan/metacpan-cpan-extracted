@@ -6,7 +6,7 @@ use Duadua::Util;
 sub try {
     my ($class, $d) = @_;
 
-    if ( index($d->ua, 'Mozilla/') == 0 && index($d->ua, ' YJApp-') > -1 ) {
+    if ( $d->_contain_mozilla_top && $d->_contain(' YJApp-') ) {
         my $h = {
             name => 'Browser of Yahoo! JAPAN App',
         };

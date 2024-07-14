@@ -6,7 +6,7 @@ use Duadua::Util;
 sub try {
     my ($class, $d) = @_;
 
-    if ( index($d->ua, ' DuckDuckGo/') > -1 && index($d->ua, ' Mobile/') > -1 && index($d->ua, 'Mozilla/') > -1 ) {
+    if ( $d->_contain(' DuckDuckGo/') && $d->_contain(' Mobile/') && $d->_contain_mozilla ) {
         my $h = {
             name => 'DuckDuckGo',
         };

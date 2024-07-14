@@ -35,7 +35,7 @@ static SV * reduce (AV * array, SV * red, SV * cb) {
 		XPUSHs(red);
 		XPUSHs(val);
 		PUTBACK;
-		call_sv(cb, G_SCALAR);
+		call_sv(cb, 1);
 		SPAGAIN;
 		red = POPs;
 		PUTBACK;
@@ -137,7 +137,7 @@ from (...)
 				dSP;
 				GvSV(PL_defgv) = *av_fetch(array, i, 0);
 				PUSHMARK(SP);
-				call_sv(cb, G_SCALAR);
+				call_sv(cb, 1);
 				SPAGAIN;
 				SV * ret = POPs;
 				PUTBACK;
@@ -272,7 +272,7 @@ push(self, value)
 	SV * self
 	SV * value
 	CODE:
-		av_push((AV*)SvRV(self), value);
+		av_push((AV*)SvRV(self), newSVsv(value));
 		RETVAL = newSVsv(self);
 	OUTPUT:
 		RETVAL
@@ -314,14 +314,15 @@ sort(self, cb)
 			for (int j=0; j < len; j++) {
 				dSP;
 				SV * a = GvSV(aa) = newSVsv(*av_fetch(new_array, j, 0));
-				SV * b = GvSV(bb) = *av_fetch(new_array, j + 1, 0);
+				SV * b = GvSV(bb) = newSVsv(*av_fetch(new_array, j + 1, 0));
 				PUSHMARK(SP);
-				call_sv(cb, G_SCALAR);
+				call_sv(cb, 1);
 				SPAGAIN;
-				double ret = SvIV(POPs);
+				PUTBACK;
+				double ret = SvNV(POPs);
 				if (ret > 0) {
 					av_store(new_array, j, newSVsv(b));
-					av_store(new_array, j + 1, a);
+					av_store(new_array, j + 1, newSVsv(a));
 				}
 			}
 		}
@@ -370,7 +371,7 @@ filter(self, cb)
                         PUSHMARK(SP);
                         XPUSHs(val);
                         PUTBACK;
-                        call_sv(cb, G_SCALAR);
+                        call_sv(cb, 1);
 			if (SvTRUEx(*PL_stack_sp)) {
 				av_push(new_array, newSVsv(val));
 			}
@@ -523,7 +524,7 @@ every(self, cb)
                         PUSHMARK(SP);
                         XPUSHs(val);
                         PUTBACK;
-                        call_sv(cb, G_SCALAR);
+                        call_sv(cb, 1);
 			if (!SvTRUEx(*PL_stack_sp)) {
 				PUTBACK;
 				RETVAL = newRV_inc((SV*)newSViv(0));
@@ -546,7 +547,7 @@ find(self, cb)
 			PUSHMARK(SP);
                         XPUSHs(val);
                         PUTBACK;
-                        call_sv(cb, G_SCALAR);
+                        call_sv(cb, 1);
 			if (SvTRUEx(*PL_stack_sp)) {
 				RETVAL = newSVsv(val);
 				break;
@@ -568,7 +569,7 @@ findIndex(self, cb)
 			PUSHMARK(SP);
                         XPUSHs(val);
                         PUTBACK;
-                        call_sv(cb, G_SCALAR);
+                        call_sv(cb, 1);
 			if (SvTRUEx(*PL_stack_sp)) {
 				RETVAL = newSViv(i);
 				break;
@@ -694,7 +695,7 @@ some(self, cb)
                         PUSHMARK(SP);
                         XPUSHs(val);
                         PUTBACK;
-                        call_sv(cb, G_SCALAR);
+                        call_sv(cb, 1);
 			if (SvTRUEx(*PL_stack_sp)) {
 				PUTBACK;
 				RETVAL = newRV_inc((SV*)newSViv(1));

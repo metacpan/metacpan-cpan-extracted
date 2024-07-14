@@ -1,5 +1,5 @@
 package KelpX::Symbiosis::Engine;
-$KelpX::Symbiosis::Engine::VERSION = '2.10';
+$KelpX::Symbiosis::Engine::VERSION = '2.11';
 use Kelp::Base;
 use Carp;
 use Scalar::Util qw(blessed refaddr);
@@ -17,8 +17,13 @@ sub run_app
 		croak 'Symbiosis: class ' . ref($app) . ' cannot run()'
 			unless $app->can("run");
 
-		# cache the ran application so that it won't be ran twice
-		$app = $self->app_runners->{$addr} //= $app->run(@_);
+		# cache the ran application so that it won't be ran twice. Also run the
+		# application lazily to maintain backwards compatibility
+		my $app_obj = $app;
+		$app = $self->app_runners->{$addr} //= sub {
+			state $real_app = $app_obj->run;
+			goto $real_app;
+		};
 	}
 	elsif (ref $app ne 'CODE') {
 		croak "Symbiosis: mount point is neither an object nor a coderef: $app";

@@ -3,7 +3,7 @@
 
 use strict;
 use warnings;
-use Test::More tests => 41;
+use Test::More tests => 38;
 BEGIN { use_ok('ZOOM') };
 
 #ZOOM::Log::init_level(ZOOM::Log::mask_str("zoom"));
@@ -49,7 +49,7 @@ ok(1, "destroyed complex query");
 # no other uses of query objects -- but we need to establish a
 # connection for it to work on first.
 
-my $host = "z3950.indexdata.com/gils";
+my $host = "localhost:9996";
 my $conn;
 eval { $conn = new ZOOM::Connection($host, 0,
 				    preferredRecordSyntax => "usmarc") };
@@ -59,19 +59,22 @@ ok(!$@, "connection to '$host'");
 ok(1, "[no need to create empty query]");
 eval { $q = new ZOOM::Query::PQF('@and @attr 1=4 utah @attr 1=62 epicenter') };
 ok(!$@, "created PQF query");
-check_record($conn, $q);
+check_record($conn, $q, 17);
 $q->destroy();
 
-# Now try a CQL query: this will fail due to lack of server support
-ok(1, "[no need to create empty query]");
-eval { $q = new ZOOM::Query::CQL('title=utah and description=epicenter') };
-ok(!$@, "created CQL query");
-my $rs;
-eval { $rs = $conn->search($q) };
-ok($@ && $@->isa("ZOOM::Exception") &&
-   $@->code() == 107 && $@->diagset() eq "Bib-1",
-   "query rejected: error " . $@->code());
-$q->destroy();
+# There is no way to send a query that will result yaz-ztest returning an error: see
+# https://github.com/indexdata/yaz/blob/5263d57757507c73c7fdb32f388bc2cd98ba857f/ztest/ztest.c#L437
+# So we cannot test rejection of bad queries.
+#
+# eval { $q = new ZOOM::Query::CQL('title=utah and description=epicenter') };
+# ok(!$@, "created CQL query");
+# my $rs;
+# eval { $rs = $conn->search($q) };
+# ok($@ && $@->isa("ZOOM::Exception") &&
+#    $@->code() == 107 && $@->diagset() eq "Bib-1",
+#    "query rejected: error " . $@->code());
+# $q->destroy();
+
 
 # Client-side compiled CQL: this will fail due to lack of config-file
 ok(1, "[no need to create empty query]");
@@ -86,8 +89,8 @@ ok(1, "[no need to create empty query]");
 $conn->option(cqlfile => "samples/cql/pqf.properties");
 eval { $q = new ZOOM::Query::CQL2RPN('title=utah and description=epicenter',
 				     $conn) };
-ok(!$@, "created CQL2RPN query");
-check_record($conn, $q);
+ok(!$@, "created CQL2RPN query $@");
+check_record($conn, $q, 17);
 $q->destroy();
 
 # Client-side compiled CCL: this will fail due to lack of config-file
@@ -102,7 +105,7 @@ ok(1, "[no need to create empty query]");
 $conn->option(cclfile => "samples/ccl/default.bib");
 eval { $q = new ZOOM::Query::CCL2RPN('ti=utah and ab=epicenter', $conn) };
 ok(!$@, "created CCL2RPN query");
-check_record($conn, $q);
+check_record($conn, $q, 17);
 $q->destroy();
 
 $conn->destroy();
@@ -110,7 +113,7 @@ ok(1, "destroyed all objects");
 
 
 sub check_record {
-    my($conn, $q) = @_;
+    my($conn, $q, $nexpected) = @_;
 
     my $rs;
     eval { $rs = $conn->search($q) };
@@ -118,14 +121,14 @@ sub check_record {
     die $@ if $@;
 
     my $n = $rs->size();
-    ok($n == 1, "found 1 record as expected");
+    ok($n == $nexpected, "found $n records (expected $nexpected)");
 
     my $rec = $rs->record(0);
     ok(1, "got record idenfified by query");
 
     my $data = $rec->render();
     ok(1, "rendered record");
-    ok($data =~ /^035 +\$a ESDD0006$/m, "record is the expected one");
+    ok($data =~ /^008 910710c19910701nju/m, "record is the expected one");
 
     $rs->destroy();
 }

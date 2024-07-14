@@ -1,5 +1,5 @@
 package KelpX::Symbiosis::Adapter;
-$KelpX::Symbiosis::Adapter::VERSION = '2.10';
+$KelpX::Symbiosis::Adapter::VERSION = '2.11';
 use Kelp::Base;
 use Carp;
 use Plack::Middleware::Conditional;

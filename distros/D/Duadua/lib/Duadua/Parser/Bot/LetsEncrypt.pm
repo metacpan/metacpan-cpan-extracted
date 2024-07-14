@@ -5,7 +5,7 @@ use warnings;
 sub try {
     my ($class, $d) = @_;
 
-    if ( index($d->ua, q|Let's Encrypt validation server; +https://www.letsencrypt.org|) > -1 ) {
+    if ( $d->_contain(q|Let's Encrypt validation server; +https://www.letsencrypt.org|) ) {
         my $h = {
             name   => q|Let's Encrypt|,
             is_bot => 1,

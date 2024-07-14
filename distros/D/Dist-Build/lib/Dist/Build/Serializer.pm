@@ -1,5 +1,5 @@
 package Dist::Build::Serializer;
-$Dist::Build::Serializer::VERSION = '0.003';
+$Dist::Build::Serializer::VERSION = '0.004';
 use strict;
 use warnings;
 
@@ -76,7 +76,7 @@ Dist::Build::Serializer - A Serializer for a Dist::Build plan
 
 =head1 VERSION
 
-version 0.003
+version 0.004
 
 =head1 DESCRIPTION
 

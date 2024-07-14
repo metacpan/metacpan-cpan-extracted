@@ -6,7 +6,7 @@ use Duadua::Util qw//;
 sub try {
     my ($class, $d) = @_;
 
-    if ( index($d->ua, ' theoldreader.com;') > -1 ) {
+    if ( $d->_contain(' theoldreader.com;') ) {
         return {
             name   => 'The Old Reader',
             is_bot => 1,

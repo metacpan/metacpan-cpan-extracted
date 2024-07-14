@@ -6,7 +6,7 @@ use Duadua::Util qw//;
 sub try {
     my ($class, $d) = @_;
 
-    if ( index($d->ua, 'SAKURA Cloud Simplemon') > -1 ) {
+    if ( $d->_contain('SAKURA Cloud Simplemon') ) {
         my $h = {
             name   => 'SAKURA Cloud Simplemon',
             is_bot => 1,

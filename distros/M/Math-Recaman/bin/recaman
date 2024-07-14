@@ -8,6 +8,7 @@ use Pod::Usage;
 
 our $SVG;
 our $MIDI;
+our %SVG_COLORS = map { split ' ' } <DATA>; # read standard SVG colors from the DATA section
 BEGIN {
     eval { require SVG };
     unless ($@ ) {
@@ -25,6 +26,8 @@ BEGIN {
         MIDI::Simple->import();
         IO::String->import();
         $MIDI = 1;
+    } else {
+        $MIDI = 0;
     }
 }
 
@@ -33,33 +36,21 @@ my $man  = 0;
 my $alt  = 0;
 my $mode;
 my $output;
-
-my @reg_checks = (0, 1, 3, 6, 2, 7, 13, 20, 12, 21,
-                 11, 22, 10, 23, 9, 24, 8, 25, 43,
-                 62, 42, 63, 41, 18, 42, 17, 43, 16,
-                 44, 15, 45, 14, 46, 79, 113, 78, 114,
-                 77, 39, 78, 38, 79, 37, 80, 36, 81,
-                 35, 82, 34, 83, 33, 84, 32, 85, 31,
-                 86, 30, 87, 29, 88, 28, 89, 27, 90,
-                 26, 91, 157, 224, 156, 225, 155);
-
-my @alt_checks = (1, 1, 2, 6, 24, 120, 20, 140, 1120, 10080, 1008, 11088, 924,
-                  12012, 858, 12870, 205920, 3500640, 194480, 3695120,
-                  184756, 3879876, 176358, 4056234, 97349616, 2433740400,
-                  93605400, 2527345800, 90262350, 2617608150, 87253605,
-                  2704861755, 86555576160, 2856334013280);
+my $flags;
 
 GetOptions(
   'help|?'     => \$help,
   'man'        => \$man,
   'mode|m=s'   => \$mode,
   'output|o=s' => \$output,
+  'flags|f=s'  => \$flags,
   'alt|a'      => \$alt,
 ) or pod2usage(2);
 
 pod2usage(1) if $help;
 pod2usage(-exitval => 0, -verbose => 2) if $man;
 
+my %flags = map { split '=' } split(' ', $flags || ""); # Split up key=value pairs
 my $target = shift @ARGV || 71;
 
 my $func = ($alt) ? \&recaman_a008336 : \&recaman;
@@ -74,9 +65,9 @@ if (!defined $mode || lc($mode) eq 'default') {
 } elsif (lc($mode) eq 'max') {
   do_max($target);
 } elsif (lc($mode) eq 'svg') {
-  do_svg($target, $output);
+  do_svg($target, $output, %flags);
 } elsif (lc($mode) eq 'midi') {
-  do_midi($target, $output);
+  do_midi($target, $output, %flags);
 } else {
   die "Unknown mode '$mode'\n";
 }
@@ -90,7 +81,7 @@ sub do_default {
 
 sub do_check {
   do_default($alt ? 34 : 71);
-  my @checks = $alt ? @alt_checks : @reg_checks;
+  my @checks = $alt ? @Math::Recaman::a008336_checks : @Math::Recaman::checks;
   print join(", ", @checks)."\n";
 }
 
@@ -122,18 +113,35 @@ sub _nth {
 sub do_svg {
   my $target = shift;
   my $output = shift;
+  my %flags  = @_;
   die "You must install the Perl module SVG from CPAN to use this feature\n" unless $SVG;
 
-  my $STRIDE = 15; # pixels between numbers
+  my $STRIDE     = $flags{stride} || 15; # pixels between numbers
+  my $prev       = 0;
+  my $max_num    = 0;
+  my $max_radius = 0;
+  my @arcs;
+  $func->($target, sub {
+    my $num     = shift;
+    my $count   = shift;
 
-  # Yes, technically this does the work twice
-  # ... but getting the 10 millionth number (it's 10,438,710 btw and the largest number seen is 61,998,984)
-  # takes 4s on my 2018 MacBook Pro and I don't suspect you're going to do an image that wide.
-  my ($last, $max_global) = _nth($target);
+    my $low     = ($prev, $num)[$prev > $num];
+    my $high    = ($prev, $num)[$prev < $num];
+    my $start   = ($low+1)*$STRIDE;
+    my $end     = ($high+1)*$STRIDE;
+    my $dist    = $end-$start;
+    my $radius  = ($dist/2);
+
+    push @arcs, { num => $num, max_cur => $max_num, start => $start, end => $end, radius => $radius };
+
+    $max_num    = $num if $num>$max_num;
+    $max_radius = $radius if $radius>$max_radius;
+    $prev       = $num;
+  });
 
   # Create Canvas
-  my $width = ($max_global+2)*$STRIDE;
-  my $height = $width/2; # TODO probably a better way to work this out
+  my $width  = ($max_num+2)*$STRIDE;
+  my $height = ($max_radius+$STRIDE)*2;
   my $svg = SVG->new(width => $width, height => $height);
 
   # Draw main line
@@ -154,40 +162,41 @@ sub do_svg {
       cx => ($_+1)*$STRIDE,
       cy => $height/2,
       r  => 2
-  ) for (0..$max_global);
+  ) for (0..$max_num);
 
   # Draw the arcs
-  my $prev = 0;
-  $func->($target, sub {
-    my $num     = shift;
-    my $count   = shift;
-    my $max_cur = shift;
-
-    my $low     = ($prev, $num)[$prev > $num];
-    my $high    = ($prev, $num)[$prev < $num];
-    my $start   = ($low+1)*$STRIDE;
-    my $end     = ($high+1)*$STRIDE;
-    my $dist    = $end-$start;
-    my $radius  = ($dist/2);
-    my $mid     = $start+$radius;
+  my $count = 0;
+  foreach my $arc (@arcs) {
+    my $prev    = $arc->{max_cur};
+    my $num     = $arc->{num};
+    my $start   = $arc->{start};
+    my $end     = $arc->{end};
+    my $radius  = $arc->{radius};
     my $y       = $height/2;
-    # TODO there's a better, more aesthetic algorithm for this
-    # The illustrations on the wikipedia article are much nicer
-    my $over    = $num>=$max_cur;
+    my $over    = (($flags{'side-choice'} || "") eq 'backwards') ? $num>=$prev : $num%2; #
     my $top     = ($over) ? $y-$radius : $y+$radius;
+    my $mid     = $start+$radius;
     # Draw an arc
-    my $path = "M $start,$y C $start $y, $mid $top, $end $y";
+    my $path = (($flags{'arc-style'} || "") eq 'streamlined') ?
+      "M $start,$y C $start $y, $mid $top, $end $y" :       # old style
+      "M $start,$y A $radius, $radius 180 1 $over $end,$y"; # semi circle
+    my $first_color  = $flags{'first-color'}  || 'black';
+    my $second_color = $flags{'second-color'} || 'blue';
+
+    $first_color  = $SVG_COLORS{$first_color}  || $first_color;
+    $second_color = $SVG_COLORS{$second_color} || $second_color;
+    my $color     = ($prev>$num) ?  $first_color : $second_color;
+    $color        = _gradient_color($first_color, $second_color, $radius/$y) if (($flags{'color-mode'} || "") eq 'gradient');
+
     $svg->path(
         id      => "arc_$count",
         d       => $path,
-        # TODO this should be nicer and also more configurable
-        stroke  => ($prev>$num) ? 'black' : 'blue',
+        stroke  => $color,
         fill    => 'none',
+        'stroke-width' => ($flags{'stroke-width'} || 3),
     );
-    # TODO how do we choose to go above or below?
-    $prev = $num;
-  });
-
+    $count++;
+  }
   # Print out the SVG
   _dump($svg->xmlify, $output);
 }
@@ -195,6 +204,7 @@ sub do_svg {
 sub do_midi {
   my $target = shift;
   my $output = shift;
+  my %flags  = @_;
   die "You must install the Perl modules MIDI::Simple and IO::String from CPAN to use this feature\n" unless $MIDI;
 
   # Create the midi file
@@ -204,7 +214,7 @@ sub do_midi {
   # Setting the tempo to 120 was interesting and matches what the oeis-to-midi script does
   # https://github.com/synchronometry/OEIS-to-MIDI
   # https://oeis.org/play?seq=A005132
-  # $midi->set_tempo(120);
+  $midi->set_tempo($flags{tempo}) if $flags{tempo};
   $midi->text_event("Representation of Recamán's sequence for the first $target notes");
   #$midi->noop("c1 f, o5");
   # Set up the notes
@@ -237,6 +247,21 @@ sub _dump {
   }
 }
 
+sub _gradient_color {
+  my $start = shift;
+  my $end   = shift;
+  my $frac  = shift;
+
+  my ($sr,$sg,$sb) = map { hex } ($start =~ m!#?([a-z\d]{2})([a-z\d]{2})([a-z\d]{2})!i);
+  my ($er,$eg,$eb) = map { hex } ($end   =~ m!#?([a-z\d]{2})([a-z\d]{2})([a-z\d]{2})!i);
+
+  my $r = int($sr+(($er-$sr)*$frac)+0.5);
+  my $g = int($sg+(($eg-$sg)*$frac)+0.5);
+  my $b = int($sb+(($eb-$sb)*$frac)+0.5);
+
+  return sprintf("#%.2x%.2x%.2x", $r, $g, $b);
+}
+
 =encoding utf8
 
 =head1 NAME
@@ -261,11 +286,44 @@ You can also change the C<mode> to output in different styles.
   recaman --mode nth 1000
   recaman --mode max 10000000
 
+And use C<flags> to set various options
+
+  recaman --mode svg --flags "first-color=#0000ff second-color=gold stroke-width=10 stride=20 color-mode=gradient" 75
+
+=head1 OPTIONS
+
+=over 4
+
+=item --help
+=item --man
+
+Print out help and usage.
+
+=item --mode | -m
+
+Choose the output mode (see L</MODES> below).
+
+=item --output | -o
+
+Output file for C<MIDI> and C<SVG> modes.
+
+=item --flags | -f
+
+Optional flags for different modes (see L</FLAGS> below).
+
+=item --alt | -a
+
+Whether to use the standard Recamán's sequence or the alternative A008336 version.
+
+=back
+
+=head1 MODES
+
 =over 4
 
 =item default
 
-Prints out the requested numbers in the sequence on one line seperated by commas.
+Prints out the requested numbers in the sequence on one line separated by commas.
 
 =item check
 
@@ -273,7 +331,7 @@ Prints out the first 71 numbers in the sequence plus, immediately, underneath, t
 
 =item newline or nl
 
-Prints out the requested numbers seperate by newlines. This prints each number out as it calculates it so it uses less memory for large sequences.
+Prints out the requested numbers separate by newlines. This prints each number out as it calculates it so it uses less memory for large sequences.
 
 =item nth
 
@@ -285,9 +343,229 @@ Prints out the largest number seen when calculating the nth number.
 
 =back
 
+=head1 FLAGS
+
+=head2 SVG mode
+
+=over 4
+
+=item stride
+
+Distance between numbers n the number line.
+
+Default is C<15>.
+
+=item first-color
+
+The first color to use.
+
+Default is C<black>.
+
+=item second-color
+
+The second color to use. Can be any HTML style hex color (e.g C<#ffd700>) or one of the standard L<SVG named colors|https://developer.mozilla.org/en-US/docs/Web/CSS/named-color>.
+
+Default is C<blue>.
+
+=item color-mode
+
+If C<color-mode> is set to C<gradient> then the colors of the arcs will gradually fade from C<first-color> to C<second-color>.
+
+Default is C<choice> which switch between C<first-color> to C<second-color>.
+
+=item stroke-width
+
+The width of the lines of arcs.
+
+Default is C<3>.
+
+=item side-choice
+
+Which side to draw arcs on.
+
+Default is C<mod> which alternates between top and bottom.
+
+If you choose C<backwards> then it will draw arcs going backwards under the number line and those going forwards on top.
+
+=item arc-style
+
+How to draw the arcs.
+
+Default is C<semicircle> which draws, err, a semi-circle.
+
+You can also choose C<streamlined> which draws a sleeker, lower profile arc. This was the default in C<v1.0>.
+
+=back
+
+=head2 MIDI mode
+
+=over 4
+
+=item tempo
+
+Default is C<96>.
+
+C<120> is also interesting and matches what OEIS-to-Midi does.
+
+See L<https://github.com/synchronometry/OEIS-to-MIDI> and L<https://oeis.org/play?seq=A005132>.
+
+=back
+
 =head1 AUTHOR
 
 Simon Wistow <simon@thegestalt.org>
 
+=head1 COPYRIGHT
+
+Copyright (C) Simon Wistow, 2024
+
 =cut
 
+__DATA__
+aliceblue #F0F8FF
+antiquewhite #FAEBD7
+aqua #00FFFF
+aquamarine #7FFFD4
+azure #F0FFFF
+beige #F5F5DC
+bisque #FFE4C4
+black #000000
+blanchedalmond #FFEBCD
+blue #0000FF
+blueviolet #8A2BE2
+brown #A52A2A
+burlywood #DEB887
+cadetblue #5F9EA0
+chartreuse #7FFF00
+chocolate #D2691E
+coral #FF7F50
+cornflowerblue #6495ED
+cornsilk #FFF8DC
+crimson #DC143C
+cyan #00FFFF
+darkblue #00008B
+darkcyan #008B8B
+darkgoldenrod #B8860B
+darkgray #A9A9A9
+darkgreen #006400
+darkgrey #A9A9A9
+darkkhaki #BDB76B
+darkmagenta #8B008B
+darkolivegreen #556B2F
+darkorange #FF8C00
+darkorchid #9932CC
+darkred #8B0000
+darksalmon #E9967A
+darkseagreen #8FBC8F
+darkslateblue #483D8B
+darkslategray #2F4F4F
+darkslategrey #2F4F4F
+darkturquoise #00CED1
+darkviolet #9400D3
+deeppink #FF1493
+deepskyblue #00BFFF
+dimgray #696969
+dimgrey #696969
+dodgerblue #1E90FF
+firebrick #B22222
+floralwhite #FFFAF0
+forestgreen #228B22
+fuchsia #FF00FF
+gainsboro #DCDCDC
+ghostwhite #F8F8FF
+gold #FFD700
+goldenrod #DAA520
+gray #808080
+green #008000
+greenyellow #ADFF2F
+grey #808080
+honeydew #F0FFF0
+hotpink #FF69B4
+indianred #CD5C5C
+indigo #4B0082
+ivory #FFFFF0
+khaki #F0E68C
+lavender #E6E6FA
+lavenderblush #FFF0F5
+lawngreen #7CFC00
+lemonchiffon #FFFACD
+lightblue #ADD8E6
+lightcoral #F08080
+lightcyan #E0FFFF
+lightgoldenrodyellow #FAFAD2
+lightgray #D3D3D3
+lightgreen #90EE90
+lightgrey #D3D3D3
+lightpink #FFB6C1
+lightsalmon #FFA07A
+lightseagreen #20B2AA
+lightskyblue #87CEFA
+lightslategray #778899
+lightslategrey #778899
+lightsteelblue #B0C4DE
+lightyellow #FFFFE0
+lime #00FF00
+limegreen #32CD32
+linen #FAF0E6
+magenta #FF00FF
+maroon #800000
+mediumaquamarine #66CDAA
+mediumblue #0000CD
+mediumorchid #BA55D3
+mediumpurple #9370DB
+mediumseagreen #3CB371
+mediumslateblue #7B68EE
+mediumspringgreen #00FA9A
+mediumturquoise #48D1CC
+mediumvioletred #C71585
+midnightblue #191970
+mintcream #F5FFFA
+mistyrose #FFE4E1
+moccasin #FFE4B5
+navajowhite #FFDEAD
+navy #000080
+oldlace #FDF5E6
+olive #808000
+olivedrab #6B8E23
+orange #FFA500
+orangered #FF4500
+orchid #DA70D6
+palegoldenrod #EEE8AA
+palegreen #98FB98
+paleturquoise #AFEEEE
+palevioletred #DB7093
+papayawhip #FFEFD5
+peachpuff #FFDAB9
+peru #CD853F
+pink #FFC0CB
+plum #DDA0DD
+powderblue #B0E0E6
+purple #800080
+red #FF0000
+rosybrown #BC8F8F
+royalblue #4169E1
+saddlebrown #8B4513
+salmon #FA8072
+sandybrown #F4A460
+seagreen #2E8B57
+seashell #FFF5EE
+sienna #A0522D
+silver #C0C0C0
+skyblue #87CEEB
+slateblue #6A5ACD
+slategray #708090
+slategrey #708090
+snow #FFFAFA
+springgreen #00FF7F
+steelblue #4682B4
+tan #D2B48C
+teal #008080
+thistle #D8BFD8
+tomato #FF6347
+turquoise #40E0D0
+violet #EE82EE
+wheat #F5DEB3
+white #FFFFFF
+whitesmoke #F5F5F5
+yellow #FFFF00
+yellowgreen #9ACD32

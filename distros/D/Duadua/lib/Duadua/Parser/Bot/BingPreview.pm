@@ -5,8 +5,8 @@ use warnings;
 sub try {
     my ($class, $d) = @_;
 
-    if ( index($d->ua, 'BingPreview/') > -1
-                && index($d->ua, 'Mozilla/') > -1 ) {
+    if ( $d->_contain('BingPreview/')
+                && $d->_contain_mozilla ) {
         my $h = _set_property($d, 'BingPreview');
 
         if ($d->opt_version) {
@@ -26,7 +26,7 @@ sub _set_property {
         is_bot => 1,
     };
 
-    if ( index($d->ua, 'Windows') > -1 ) {
+    if ( $d->_contain('Windows') ) {
         $h->{is_windows} = 1;
     }
 

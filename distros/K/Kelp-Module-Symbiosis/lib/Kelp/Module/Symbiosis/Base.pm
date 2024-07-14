@@ -1,5 +1,5 @@
 package Kelp::Module::Symbiosis::Base;
-$Kelp::Module::Symbiosis::Base::VERSION = '2.10';
+$Kelp::Module::Symbiosis::Base::VERSION = '2.11';
 use Kelp::Base qw(Kelp::Module);
 use KelpX::Symbiosis::Util;
 

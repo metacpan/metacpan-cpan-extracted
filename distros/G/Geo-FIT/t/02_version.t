@@ -2,7 +2,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 26;
+use Test::More tests => 40;
 use Geo::FIT;
 
 my $o = Geo::FIT->new();
@@ -14,7 +14,7 @@ isa_ok($o, 'Geo::FIT');
 # A -- called with arguments
 
 my @versions;
-@versions = qw( 21.72 21.94 21.126 );
+@versions = qw( 21.72 21.94 21.126 21.133 21.141 );
 for my $version (@versions) {
 
     # expected values
@@ -24,6 +24,8 @@ for my $version (@versions) {
     $expected_integer = 2207 if $version eq '21.107';
     $expected_integer = 2215 if $version eq '21.115';
     $expected_integer = 2226 if $version eq '21.126';
+    $expected_integer = 2233 if $version eq '21.133';
+    $expected_integer = 2241 if $version eq '21.141';
     # ... gets tricky with 3-digit minor versions
     # ....we can generalize the above line but let's just do that for now:
 
@@ -61,7 +63,7 @@ for my $version (@versions) {
 
 # B -- called w/o arguments
 
-my $version = '21.126';
+my $version = '21.141';
 # ... update this one each time we update $profile_current in FIT.pm
 
 # expected values
@@ -71,6 +73,8 @@ my $expected_string  = sprintf '%u.%03u', @expected_maj_min;
 $expected_integer = 2207 if $version eq '21.107';
 $expected_integer = 2215 if $version eq '21.115';
 $expected_integer = 2226 if $version eq '21.126';
+$expected_integer = 2233 if $version eq '21.133';
+$expected_integer = 2241 if $version eq '21.141';
 
 # profile_version() -- undocumented -- meant to accept both integer and string
 

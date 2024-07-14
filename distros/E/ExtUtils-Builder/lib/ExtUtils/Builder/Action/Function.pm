@@ -1,5 +1,5 @@
 package ExtUtils::Builder::Action::Function;
-$ExtUtils::Builder::Action::Function::VERSION = '0.006';
+$ExtUtils::Builder::Action::Function::VERSION = '0.007';
 use strict;
 use warnings;
 
@@ -87,7 +87,7 @@ ExtUtils::Builder::Action::Function - Actions for perl function calls
 
 =head1 VERSION
 
-version 0.006
+version 0.007
 
 =head1 SYNOPSIS
 

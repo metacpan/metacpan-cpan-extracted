@@ -33,7 +33,6 @@
       },
       "runtime" : {
          "requires" : {
-            "Mozilla::CA" : "0",
             "Net::SSLeay" : "1.46",
             "Scalar::Util" : "0"
          }
@@ -52,6 +51,6 @@
          "url" : "https://github.com/noxxi/p5-io-socket-ssl"
       }
    },
-   "version" : "2.087",
+   "version" : "2.088",
    "x_serialization_backend" : "JSON::PP version 4.06"
 }

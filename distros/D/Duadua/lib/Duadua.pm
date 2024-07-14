@@ -3,7 +3,7 @@ use strict;
 use warnings;
 use Duadua::Parser;
 
-our $VERSION = '0.32';
+our $VERSION = '0.34';
 
 my @PARSER_PROC_LIST = qw/
     Duadua::Parser::Browser::MicrosoftEdge
@@ -12,16 +12,22 @@ my @PARSER_PROC_LIST = qw/
 
     Duadua::Parser::Bot::Googlebot
     Duadua::Parser::Bot::GooglebotMobile
-    Duadua::Parser::Bot::GooglebotAd
-    Duadua::Parser::Bot::GoogleRead
     Duadua::Parser::Bot::Bingbot
-    Duadua::Parser::Bot::AdIdxBot
+
+    Duadua::Parser::Browser::MozillaFirefox
+
+    Duadua::Parser::Bot::Twitterbot
+    Duadua::Parser::Bot::FacebookCrawler
+    Duadua::Parser::Bot::Slackbot
     Duadua::Parser::Bot::BingPreview
 
     Duadua::Parser::Browser::Opera
-    Duadua::Parser::Browser::MozillaFirefox
 
+    Duadua::Parser::Bot::GooglebotAd
+    Duadua::Parser::Bot::GoogleRead
+    Duadua::Parser::Bot::AdIdxBot
     Duadua::Parser::Browser::YahooJapanAppBrowser
+    Duadua::Parser::Bot::ChatGPTUser
 
     Duadua::Parser::Browser::AppleSafari
     Duadua::Parser::Browser::Vivaldi
@@ -30,11 +36,6 @@ my @PARSER_PROC_LIST = qw/
     Duadua::Parser::Bot::Sakura
     Duadua::Parser::HTTPClient::HTTPClient
 
-    Duadua::Parser::Bot::Twitterbot
-    Duadua::Parser::Bot::FacebookCrawler
-    Duadua::Parser::Bot::Slackbot
-
-    Duadua::Parser::Bot::ChatGPTUser
     Duadua::Parser::Bot::YahooSlurp
     Duadua::Parser::Bot::Baiduspider
     Duadua::Parser::Bot::Bytespider
@@ -87,17 +88,22 @@ for my $parser (@PARSER_PROC_LIST) {
 }
 
 sub new {
-    my $class = shift;
-    my $ua    = shift;
-    my $opt   = shift || {};
+    my $opt = $_[2] || {};
+
+    my $ua = $_[1];
+    if (!defined $ua) {
+        $ua = exists $ENV{HTTP_USER_AGENT} && defined $ENV{HTTP_USER_AGENT} ? $ENV{HTTP_USER_AGENT} : '';
+    } elsif (ref($ua) =~ m!^HTTP::Headers!) {
+        $ua = $ua->header('User-Agent');
+    }
 
     bless {
-        _ua          => $class->_get_ua_string($ua),
+        _ua          => $ua,
         _parsed      => 0,
         _result      => {},
-        _parsers     => $class->_build_parsers($opt),
+        _parsers     => $_[0]->_build_parsers($opt),
         _opt_version => $opt->{version},
-    }, $class;
+    }, $_[0];
 }
 
 sub _build_parsers {
@@ -122,25 +128,29 @@ sub parsers { shift->{_parsers} }
 sub ua { shift->{_ua} }
 
 sub reparse {
-    my ($self, $ua) = @_;
+    my $self = shift;
 
-    $self->{_ua}     = $self->_get_ua_string($ua);
+    my $ua = $_[0];
+    if (!defined $ua) {
+        $ua = exists $ENV{HTTP_USER_AGENT} && defined $ENV{HTTP_USER_AGENT} ? $ENV{HTTP_USER_AGENT} : '';
+    } elsif (ref($ua) =~ m!^HTTP::Headers!) {
+        $ua = $ua->header('User-Agent');
+    }
+
+    $self->{_ua}     = $ua;
     $self->{_result} = {};
 
     return $self->_parse;
 }
 
 sub _result {
-    my ($self, $value) = @_;
+    if (@_ == 1) {
+        $_[0]->parse unless $_[0]->{_parsed};
+        return $_[0]->{_result};
+    }
 
-    if ($value) {
-        $self->{_result} = $value;
-        return $self;
-    }
-    else {
-        $self->parse unless $self->{_parsed};
-        return $self->{_result};
-    }
+    $_[0]->{_result} = $_[1];
+    return $_[0];
 }
 
 sub parse {
@@ -168,20 +178,6 @@ sub _parse {
     $self->{_parsed} = 1;
 
     return $self;
-}
-
-sub _get_ua_string {
-    my ($self, $ua_raw) = @_;
-
-    if (!defined $ua_raw) {
-        return exists $ENV{HTTP_USER_AGENT} && defined $ENV{HTTP_USER_AGENT} ? $ENV{HTTP_USER_AGENT} : '';
-    }
-
-    if (ref($ua_raw) =~ m!^HTTP::Headers!) {
-        return $ua_raw->header('User-Agent');
-    }
-
-    return $ua_raw;
 }
 
 sub name {
@@ -214,6 +210,22 @@ sub is_chromeos {
 
 sub version {
     shift->_result->{version} || '';
+}
+
+sub _contain_mozilla {
+    return 1 if shift->{_contain_mozilla}
+}
+
+sub _contain_mozilla_top {
+    return 1 if shift->{_contain_mozilla_top}
+}
+
+sub _prefix {
+    return 1 if index(shift->{_ua}, shift) == 0;
+}
+
+sub _contain {
+    return 1 if index(shift->{_ua}, shift) != -1;
 }
 
 1;
@@ -278,8 +290,14 @@ If you need to get version info, then you should set true value to version optio
 
 =head1 DESCRIPTION
 
-Duadua is a User-Agent detector.
+`Duadua` is a User-Agent detector.
 
+* Detect over 160 User-Agents
+    * Browsers, Bots and CLI clients
+* Detect name, OS and version
+* Optimized performance for recent actual logs on a Web site
+
+Send an issue or PR on Github to add a User-Agent you want to detect if it's not supported.
 
 =head1 METHODS
 
@@ -359,13 +377,14 @@ Returns version from user agent string
 
 The list of User Agent Parser
 
+
 =back
 
 =head1 REPOSITORY
 
 =begin html
 
-<a href="https://github.com/bayashi/Duadua/blob/main/lib/Duadua.pm"><img src="https://img.shields.io/badge/Version-0.32-green?style=flat"></a> <a href="https://github.com/bayashi/Duadua/blob/main/LICENSE"><img src="https://img.shields.io/badge/LICENSE-Artistic%202.0-GREEN.png?style=flat"></a> <a href="https://github.com/bayashi/Duadua/actions"><img src="https://github.com/bayashi/Duadua/workflows/main/badge.svg?_t=1719104270"/></a> <a href="https://coveralls.io/r/bayashi/Duadua"><img src="https://coveralls.io/repos/bayashi/Duadua/badge.png?_t=1719104270&branch=main"/></a>
+<a href="https://github.com/bayashi/Duadua/blob/main/lib/Duadua.pm"><img src="https://img.shields.io/badge/Version-0.34-green?style=flat"></a> <a href="https://github.com/bayashi/Duadua/blob/main/LICENSE"><img src="https://img.shields.io/badge/LICENSE-Artistic%202.0-GREEN.png?style=flat"></a> <a href="https://github.com/bayashi/Duadua/actions"><img src="https://github.com/bayashi/Duadua/workflows/main/badge.svg?_t=1720941083"/></a> <a href="https://coveralls.io/r/bayashi/Duadua"><img src="https://coveralls.io/repos/bayashi/Duadua/badge.png?_t=1720941083&branch=main"/></a>
 
 =end html
 

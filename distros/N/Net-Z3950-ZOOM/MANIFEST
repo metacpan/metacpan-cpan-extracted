@@ -1,20 +1,9 @@
 Changes
 Makefile.PL
 MANIFEST
-README
+README.md
 typemap
 ZOOM.xs
-t/1-Net-Z3950-ZOOM.t
-t/10-options.t
-t/11-option-callback.t
-t/12-query.t
-t/13-resultset.t
-t/14-sorting.t
-t/15-scan.t
-t/16-packages.t
-t/17-logging.t
-t/18-charset.t
-t/19-events.t
 t/2-ZOOM.t
 t/20-options.t
 t/21-option-callback.t
@@ -26,6 +15,7 @@ t/26-packages.t
 t/27-logging.t
 t/28-charset.t
 t/29-events.t
+t/dummy-words
 lib/Net/Z3950/ZOOM.pm
 lib/ZOOM.pm
 lib/ZOOM.pod
@@ -49,4 +39,5 @@ samples/zoom/zoomscan.pl
 samples/zoom/zoomtst1.pl
 samples/zoom/zoomtst3.pl
 samples/zoom/zselect
-META.yml                                 Module meta-data (added by MakeMaker)
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

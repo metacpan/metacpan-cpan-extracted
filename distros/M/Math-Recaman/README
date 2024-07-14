@@ -7,9 +7,9 @@ creator of the On-Line Encyclopedia of Integer Sequences (OEIS). The OEIS entry 
 
 The sequence is defined as
 
-  An = 0 if n = 0
-  An = An-1 - n if An-1 - n > 0 and is not already in the sequence
-  An = An-1 + n otherwise
+  aₙ = 0         if n = 0
+  aₙ = aₙ₋₁ - n  if aₙ₋₁ - n > 0 and is not already in the sequence
+  aₙ = aₙ₋₁ + n  otherwise
 
 It is known to produce quite aethetically pleasing outputs if plotted as an image or as music.
 

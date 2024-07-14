@@ -8,6 +8,7 @@
   is_windows: false
   is_chromeos: false
   version: '2.0'
+
 - ua: 'Mozilla/5.0 (iPhone; CPU iPhone OS 7_0 like Mac OS X) AppleWebKit/537.51.1 (KHTML, like Gecko) Version/7.0 Mobile/11A465 Safari/9537.53 (compatible; adidxbot/2.0; +http://www.bing.com/bingbot.htm)'
   name: AdIdxBot
   is_bot: true
@@ -17,6 +18,7 @@
   is_windows: false
   is_chromeos: false
   version: '2.0'
+
 - ua: 'Mozilla/5.0 (Windows Phone 8.1; ARM; Trident/7.0; Touch; rv:11.0; IEMobile/11.0; NOKIA; Lumia 530) like Gecko (compatible; adidxbot/2.0; +http://www.bing.com/bingbot.htm)'
   name: AdIdxBot
   is_bot: true

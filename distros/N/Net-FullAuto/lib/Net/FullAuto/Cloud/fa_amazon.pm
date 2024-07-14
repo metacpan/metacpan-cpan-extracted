@@ -435,9 +435,11 @@ sub launch_server {
 our $aws_configure=sub {
 
    my $username=&Net::FullAuto::FA_Core::username();
+   my $handle=(defined $main::handle)?$main::handle:'';
    if (-1<$#_) {
       $main::aws->{access_id}=$_[0];
       $main::aws->{secret_key}=$_[1];
+      $handle=$_[2]||'';
    } else {
       $main::aws->{access_id}="]I[{'configure_aws2',1}";
       $main::aws->{secret_key}="]I[{'configure_aws2',2}";
@@ -447,6 +449,22 @@ our $aws_configure=sub {
    $region=`$region`;
    chop $region;
    my $homedir='.';
+   my $handle_homedir='';
+   my $handle_username='';
+   if ($handle) {
+      $handle->cwd('~');
+      $handle_homedir=$handle->cmd('pwd');
+      my $tdir="$handle_homedir/.aws";
+      my $shell_cmd="if [[ -d $tdir ]]; then ".
+         "if [[ -w $tdir ]]; then echo WRITE; ".
+         "else echo READ; fi; else echo NODIR; fi";
+      $tdir=$handle->cmd($shell_cmd,'__delay__=200');
+      unless ($tdir eq 'NODIR') {
+         $handle->cmd("rm -rvf $handle_homedir/.aws",'__display__');
+         $handle->cmd('sudo rm -rvf /root/.aws','__display__');
+      }
+      $handle_username=$handle->cmd('id -un');
+   }
    if (can_load(modules => { "File::HomeDir" => 0 })) {
       $homedir=File::HomeDir->my_home;
    } elsif (-r "/home/$username") {
@@ -455,7 +473,7 @@ our $aws_configure=sub {
    if (-e "/home/$username/.aws") {
       eval {
          `rm -rf /home/$username/.aws`;
-         `rm -rf /root/.aws`;
+         `sudo rm -rf /root/.aws`;
       };
    }
    {
@@ -518,6 +536,16 @@ our $aws_configure=sub {
       $group='Administrators' if $username eq 'Administrator';
       system("${sudo}chown -R $username:$group /home/$username/.aws");
       system("${sudo}chmod 755 /home/$username/.aws");
+      if ($handle) {
+	 $group=$handle_username;
+         $handle->cmd($sudo.
+            "cp -R $homedir/.aws /home/$handle_username");
+         $handle->cmd($sudo.
+            "chown -Rv $handle_username:$group /home/$handle_username/.aws",
+            '__display__');
+         $handle->cmd($sudo.
+            "chmod -v 755 /home/$handle_username/.aws",'__display__');
+      } 
 
    };
 
@@ -572,6 +600,8 @@ our $configure_aws=sub {
 
    my $aws_access_key_id = $_[0]||'';
    my $aws_secret_access_key = $_[1]||'';
+   my $handle = $_[2]||'';
+   if ($handle) { $main::handle=$handle };
  
    my $banner=<<'END';
 

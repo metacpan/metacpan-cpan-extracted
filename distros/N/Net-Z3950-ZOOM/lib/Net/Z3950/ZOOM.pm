@@ -4,7 +4,7 @@ use 5.008;
 use strict;
 use warnings;
 
-our $VERSION = '1.30';
+our $VERSION = '1.32';
 
 require XSLoader;
 XSLoader::load('Net::Z3950::ZOOM', $VERSION);
@@ -94,7 +94,7 @@ http://zoom.z3950.org/api/
 To enforce the don't-use-this-module prohibition, I am not even going
 to document it.  If you really, really, really want to use it, then it
 pretty much follows the API described in the ZOOM-C documentation at
-http://www.indexdata.dk/yaz/doc/zoom.tkl
+http://www.indexdata.com/yaz/doc/zoom.html
 
 The only additional (non-ZOOM-C) function provided by this module is
 C<event_str()>, which takes as its argument an event code such as
@@ -134,14 +134,14 @@ sub event_str {
 
 
 # Switch API variant depending on $type.  This works because the
-# get_string() and get_binary() functions have different returns
+# get_string() and get_binary() functions have different return
 # types, one of which is implemented as a NUL-terminated string and
 # the other as a pointer-and-length structure.
 #
 # Some Z39.50 servers, when asked for an OPAC-format record in the
 # case where no circulation information is available, will return a
 # USMARC record rather than an OPAC record containing only a
-# bibliographic part.  This non-OPAC records is not recognised by the
+# bibliographic part.  This non-OPAC record is not recognised by the
 # underlying record_get() code in ZOOM-C, which ends up returning a
 # null pointer.  To make life a little less painful when dealing with
 # such servers until ZOOM-C is fixed, this code recognises the
@@ -182,7 +182,7 @@ Mike Taylor, E<lt>mike@indexdata.comE<gt>
 
 =head1 COPYRIGHT AND LICENCE
 
-Copyright (C) 2005-2014 by Index Data.
+Copyright (C) 2005-2017 by Index Data.
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself, either Perl version 5.8.4 or,

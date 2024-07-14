@@ -7,6 +7,7 @@
   is_windows: false
   is_chromeos: false
   version: '11.7.0.953'
+
 - ua: 'Mozilla/5.0 (iPhone; CPU iPhone OS 13_3 like Mac OS X; en-US) AppleWebKit/537.51.1 (KHTML, like Gecko) Mobile/17C54 UCBrowser/11.3.5.1203 Mobile'
   name: 'UC Browser'
   is_bot: false

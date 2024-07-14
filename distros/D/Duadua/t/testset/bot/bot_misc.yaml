@@ -6,6 +6,7 @@
   is_linux: false
   is_windows: false
   is_chromeos: false
+
 - ua: 'Yeti/1.0 (+http://help.naver.com/robots/)'
   name: 'Naver Yeti'
   is_bot: true
@@ -15,6 +16,7 @@
   is_windows: false
   is_chromeos: false
   version: '1.0'
+
 - ua: 'Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/63.0.3239.0 Safari/537.36 (compatible; Yeti/1.1; +http://naver.me/spd)'
   name: 'Naver Yeti'
   is_bot: true
@@ -24,6 +26,7 @@
   is_windows: false
   is_chromeos: false
   version: '1.1'
+
 - ua: 'ichiro/3.0 (http://search.goo.ne.jp/option/use/sub4/sub4-1/)'
   name: 'ichiro'
   is_bot: true
@@ -33,6 +36,7 @@
   is_windows: false
   is_chromeos: false
   version: '3.0'
+
 - ua: 'Mozilla/5.0 (compatible; proximic; +https://www.comscore.com/Web-Crawler)'
   name: 'Comscore crawler'
   is_bot: true
@@ -41,6 +45,7 @@
   is_linux: false
   is_windows: false
   is_chromeos: false
+
 - ua: 'Mozilla/5.0 (compatible; proximic; +http://www.proximic.com/info/spider.php)'
   name: 'Comscore crawler'
   is_bot: true
@@ -49,6 +54,7 @@
   is_linux: false
   is_windows: false
   is_chromeos: false
+
 - ua: 'Mozilla/5.0 (compatible; Daum/4.1; +http://cs.daum.net/faq/15/4118.html?faqId=28966)'
   name: 'Daum'
   is_bot: true
@@ -58,6 +64,7 @@
   is_windows: false
   is_chromeos: false
   version: '4.1'
+
 - ua: "'Mozilla/5.0 (Unknown; Linux x86_64) AppleWebKit/538.1 (KHTML, like Gecko) Safari/538.1 Daum/4.1'"
   name: 'Daum'
   is_bot: true
@@ -67,6 +74,7 @@
   is_windows: false
   is_chromeos: false
   version: '4.1'
+
 - ua: "rogerbot/1.0 (http://www.moz.com/dp/rogerbot, rogerbot-crawler@moz.com)"
   name: 'rogerbot'
   is_bot: true
@@ -76,6 +84,7 @@
   is_windows: false
   is_chromeos: false
   version: '1.0'
+
 - ua: "Mozilla/5.0 (compatible; Cliqzbot/3.0; +http://cliqz.com/company/cliqzbot)"
   name: 'Cliqzbot'
   is_bot: true
@@ -85,6 +94,7 @@
   is_windows: false
   is_chromeos: false
   version: '3.0'
+
 - ua: "MixnodeCache/1.8(+https://cache.mixnode.com/)"
   name: 'mixnode.com'
   is_bot: true
@@ -94,6 +104,7 @@
   is_windows: false
   is_chromeos: false
   version: '1.8'
+
 - ua: "Mozilla/5.0 (compatible; SeznamBot/3.2; +http://napoveda.seznam.cz/en/seznambot-intro/)"
   name: 'SeznamBot'
   is_bot: true
@@ -103,6 +114,7 @@
   is_windows: false
   is_chromeos: false
   version: '3.2'
+
 - ua: "SearchAtlas.com SEO Crawler"
   name: 'SearchAtlas.com'
   is_bot: true
@@ -111,6 +123,7 @@
   is_linux: false
   is_windows: false
   is_chromeos: false
+
 - ua: "ltx71 - (http://ltx71.com/)"
   name: 'ltx71'
   is_bot: true
@@ -119,6 +132,7 @@
   is_linux: false
   is_windows: false
   is_chromeos: false
+
 - ua: "The Knowledge AI"
   name: 'The Knowledge AI'
   is_bot: true
@@ -127,6 +141,7 @@
   is_linux: false
   is_windows: false
   is_chromeos: false
+
 - ua: "Mozilla/5.0 (compatible; FlipboardProxy/1.2; +http://flipboard.com/browserproxy)"
   name: 'FlipboardProxy'
   is_bot: true
@@ -136,6 +151,7 @@
   is_windows: false
   is_chromeos: false
   version: '1.2'
+
 - ua: "Mozilla/5.0 (X11; Ubuntu; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko; compatible; BuiltWith/1.0; +http://builtwith.com/biup) Chrome/60.0.3112.101 Safari/537.36"
   name: 'BuiltWith'
   is_bot: true
@@ -145,6 +161,7 @@
   is_windows: false
   is_chromeos: false
   version: '1.0'
+
 - ua: 'Mozilla/5.0 zgrab/0.x'
   name: 'ZGrab'
   is_bot: true
@@ -154,6 +171,7 @@
   is_windows: false
   is_chromeos: false
   version: '0.x'
+
 - ua: 'Mozilla/5.0 (compatible; RyowlEngine/1.0; +https://ryowl.org)'
   name: 'RyowlEngine'
   is_bot: true
@@ -163,6 +181,7 @@
   is_windows: false
   is_chromeos: false
   version: '1.0'
+
 - ua: 'Mozilla/5.0 (compatible; DataXu/1.0; +http://dataxu.com)'
   name: 'DataXu'
   is_bot: true
@@ -172,6 +191,7 @@
   is_windows: false
   is_chromeos: false
   version: '1.0'
+
 - ua: 'istellabot/t.1.13'
   name: 'istellabot'
   is_bot: true
@@ -181,6 +201,7 @@
   is_windows: false
   is_chromeos: false
   version: 't.1.13'
+
 - ua: 'Mozilla/5.0 (compatible; Cincraw/1.0; +http://cincrawdata.net/bot/)'
   name: 'Cincraw'
   is_bot: true
@@ -190,6 +211,7 @@
   is_windows: false
   is_chromeos: false
   version: '1.0'
+
 - ua: 'KOCMOHABT (https://kozmonavt.tk/) Mozilla/5.0 (Web Explorer)'
   name: 'KOCMOHABT'
   is_bot: true
@@ -198,6 +220,7 @@
   is_linux: false
   is_windows: false
   is_chromeos: false
+
 - ua: 'Hexometer'
   name: 'Hexometer'
   is_bot: true

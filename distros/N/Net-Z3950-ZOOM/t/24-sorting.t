@@ -3,12 +3,12 @@
 
 use strict;
 use warnings;
-use Test::More tests => 29;
+use Test::More tests => 7;
 use MARC::Record;
 
 BEGIN { use_ok('ZOOM') };
 
-my $host = "z3950.indexdata.com/gils";
+my $host = "localhost:9996";
 my $conn;
 eval { $conn = new ZOOM::Connection($host, 0) };
 ok(!$@, "connection to '$host'");
@@ -21,8 +21,13 @@ my $rs;
 eval { $rs = $conn->search($query) };
 ok(!$@, "search for '$qstr'");
 my $n = $rs->size();
-ok($n == 5, "found $n records (expected 5)");
+ok($n == 18, "found $n records (expected 18)");
 
+# Unfortunately, yaz-ztest simply does not do sorting at all: it just vacuously claims success of thee sorting operation.
+# https://github.com/indexdata/yaz/blob/5263d57757507c73c7fdb32f388bc2cd98ba857f/ztest/ztest.c#L816-L821
+# So all the code below that tests for correct ordering can't run. See
+
+if (0) {
 $rs->option(preferredRecordSyntax => "usmarc");
 my $previous = "";		# Sorts before all legitimate titles
 foreach my $i (1 .. $n) {
@@ -51,6 +56,7 @@ foreach my $i (1 .. $n) {
     ok($title le $previous, "title '$title' le previous '$previous'");
     $previous = $title;
 }
+} # if (0)
 
 $rs->destroy();
 ok(1, "destroyed result-set");

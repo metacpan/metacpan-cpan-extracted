@@ -12,7 +12,7 @@ ok(ZOOM::event_str(ZOOM::Event::CONNECT) eq "connect",
 
 my($errcode, $errmsg, $addinfo) = (undef, "dummy", "dummy");
 
-my $host = "z3950.indexdata.com/gils";
+my $host = "localhost:9996";
 my $conn = create ZOOM::Connection(async => 1);
 eval { $conn->connect($host) };
 ok(!$@, "connection to '$host'");

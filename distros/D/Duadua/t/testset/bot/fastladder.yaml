@@ -7,6 +7,7 @@
   is_linux: false
   is_windows: false
   is_chromeos: false
+
 - ua: 'Fastladder FeedFetcher/0.0.3 (http://fastladder.org/)'
   name: 'Fastladder'
   is_bot: true

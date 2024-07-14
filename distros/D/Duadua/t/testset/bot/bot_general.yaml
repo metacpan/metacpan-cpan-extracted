@@ -7,6 +7,7 @@
   is_windows: false
   is_chromeos: false
   version: '1.1'
+
 - ua: 'Mozilla/5.0 (compatible; SemrushBot/1.2~bl; +http://www.semrush.com/bot.html)'
   name: 'SemrushBot'
   is_bot: true
@@ -16,6 +17,7 @@
   is_windows: false
   is_chromeos: false
   version: '1.2'
+
 - ua: 'Kyoto-Tohoku-Crawler/v1 (Mozilla-compatible; kyoto-crawler-contact@nlp.ist.i.kyoto-u.ac.jp; http://nlp.ist.i.kyoto-u.ac.jp/?crawling-kt)'
   name: 'Kyoto-Tohoku-Crawler'
   is_bot: true
@@ -25,6 +27,7 @@
   is_windows: false
   is_chromeos: false
   version: 'v1'
+
 - ua: 'ICC-Crawler/2.0 (Mozilla-compatible; ; http://ucri.nict.go.jp/en/icccrawler.html)'
   name: 'ICC-Crawler'
   is_bot: true
@@ -34,6 +37,7 @@
   is_windows: false
   is_chromeos: false
   version: '2.0'
+
 - ua: 'SafeDNSBot (https://www.safedns.com/searchbot)'
   name: 'SafeDNSBot'
   is_bot: true

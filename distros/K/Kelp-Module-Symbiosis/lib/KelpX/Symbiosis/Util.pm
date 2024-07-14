@@ -1,5 +1,5 @@
 package KelpX::Symbiosis::Util;
-$KelpX::Symbiosis::Util::VERSION = '2.10';
+$KelpX::Symbiosis::Util::VERSION = '2.11';
 use Kelp::Base -strict;
 use Plack::Util;
 use Kelp::Util;

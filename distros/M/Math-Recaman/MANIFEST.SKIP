@@ -5,3 +5,5 @@ pm_to_blib
 blib
 Makefile
 MYMETA.
+.tar.gz
+.DS_Store

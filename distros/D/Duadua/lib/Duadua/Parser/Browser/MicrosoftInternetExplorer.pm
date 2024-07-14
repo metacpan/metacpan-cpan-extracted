@@ -6,10 +6,10 @@ use Duadua::Util qw//;
 sub try {
     my ($class, $d) = @_;
 
-    return if index($d->ua, 'http') > -1;
-    return if index($d->ua, ' BingPreview') > -1;
+    return if $d->_contain('http');
+    return if $d->_contain(' BingPreview');
 
-    if ( index($d->ua, 'MSIE ') > -1 && index($d->ua, 'Mozilla/') > -1 && index($d->ua, 'Windows ') > -1 ) {
+    if ( $d->_contain('MSIE ') && $d->_contain_mozilla && $d->_contain('Windows ') ) {
         my $h = {
             name       => 'Internet Explorer',
             is_windows => 1,
@@ -23,7 +23,7 @@ sub try {
         return $h;
     }
 
-    if ( index($d->ua, 'Trident/') > -1 && index($d->ua, ' rv:1') > -1 && index($d->ua, 'Mozilla/') > -1 && index($d->ua, 'Windows ') > -1 ) {
+    if ( $d->_contain('Trident/') && $d->_contain(' rv:1') && $d->_contain_mozilla && $d->_contain('Windows ') ) {
         my $h = {
             name       => 'Internet Explorer',
             is_windows => 1,
@@ -37,7 +37,7 @@ sub try {
         return $h;
     }
 
-    if ( index($d->ua, 'Windows-RSS-Platform/') > -1 ) {
+    if ( $d->_contain('Windows-RSS-Platform/') ) {
         my $h = {
             name => 'Windows RSS Platform',
         };

@@ -7,6 +7,7 @@
   is_windows: false
   is_chromeos: false
   version: '2.0'
+
 - ua: 'Mozilla/5.0 (compatible; Linux x86_64; Mail.RU_Bot/Fast/2.0; +//go.mail.ru/help/robots)'
   name: 'Mail.RU_Bot'
   is_bot: true

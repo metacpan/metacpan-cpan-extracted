@@ -35,8 +35,9 @@ do { my $x = {
                                       'Ref::Util' => '0',
                                       'Time::HiRes' => '0',
                                       'Try::Tiny' => '0',
+                                      'experimental' => '0',
                                       'parent' => '0',
-                                      'perl' => 'v5.14.0',
+                                      'perl' => 'v5.20.0',
                                       'warnings' => '0'
                                     }
                     },

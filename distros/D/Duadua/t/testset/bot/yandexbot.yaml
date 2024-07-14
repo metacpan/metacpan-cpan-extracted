@@ -7,6 +7,7 @@
   is_windows: false
   is_chromeos: false
   version: '3.0'
+
 - ua: 'Mozilla/5.0 (compatible; YandexBot/3.0; +http://yandex.com/bots) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/51.0.2704.106'
   name: 'Yandex Bot'
   is_bot: true
@@ -16,6 +17,7 @@
   is_windows: false
   is_chromeos: false
   version: '3.0'
+
 - ua: 'Mozilla/5.0 (compatible; YandexMetrika/2.0; +http://yandex.com/bots)'
   name: 'Yandex Bot'
   is_bot: true

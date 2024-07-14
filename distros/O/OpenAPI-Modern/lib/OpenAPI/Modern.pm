@@ -1,10 +1,10 @@
 use strictures 2;
-package OpenAPI::Modern; # git description: v0.064-10-g061d164
+package OpenAPI::Modern; # git description: v0.065-14-gce382cd
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Validate HTTP requests and responses against an OpenAPI v3.1 document
 # KEYWORDS: validation evaluation JSON Schema OpenAPI v3.1 Swagger HTTP request response
 
-our $VERSION = '0.065';
+our $VERSION = '0.066';
 
 use 5.020;
 use utf8;
@@ -102,7 +102,6 @@ sub validate_request ($self, $request, $options = {}) {
     $state->{data_path} = '/request';
     $request = $options->{request};   # now guaranteed to be a Mojo::Message::Request
 
-    my $path_captures = $options->{path_captures};
     my $method = lc $request->method;
     my $path_item = delete $options->{_path_item};  # after following path-item $refs
     my $operation = $path_item->{$method};
@@ -113,7 +112,9 @@ sub validate_request ($self, $request, $options = {}) {
 
     # first, consider parameters at the operation level.
     # parameters at the path-item level are also considered, if not already seen at the operation level
+    SECTION:
     foreach my $section ($method, 'path-item') {
+      ENTRY:
       foreach my $idx (0 .. (($section eq $method ? $operation : $path_item)->{parameters}//[])->$#*) {
         my $state = { %$state, schema_path => jsonp($state->{schema_path},
           ($section eq $method ? $method : ()), 'parameters', $idx) };
@@ -126,9 +127,9 @@ sub validate_request ($self, $request, $options = {}) {
 
         abort($state, 'duplicate %s parameter "%s"', $param_obj->{in}, $param_obj->{name})
           if (($request_parameters_processed->{$param_obj->{in}}//{})->{$fc_name} // '') eq $section;
-        next if exists(($request_parameters_processed->{$param_obj->{in}}//{})->{$fc_name});
-        {
-          use autovivification 'store';
+
+        { use autovivification qw(exists store);
+          next ENTRY if exists $request_parameters_processed->{$param_obj->{in}}{$fc_name};
           $request_parameters_processed->{$param_obj->{in}}{$fc_name} = $section;
         }
 
@@ -136,7 +137,7 @@ sub validate_request ($self, $request, $options = {}) {
           ((grep $param_obj->{in} eq $_, qw(path query)) ? 'uri' : ()), $param_obj->{in},
           $param_obj->{name});
         my $valid =
-            $param_obj->{in} eq 'path' ? $self->_validate_path_parameter({ %$state, depth => $state->{depth}+1 }, $param_obj, $path_captures)
+            $param_obj->{in} eq 'path' ? $self->_validate_path_parameter({ %$state, depth => $state->{depth}+1 }, $param_obj, $options->{path_captures})
           : $param_obj->{in} eq 'query' ? $self->_validate_query_parameter({ %$state, depth => $state->{depth}+1 }, $param_obj, $request->url)
           : $param_obj->{in} eq 'header' ? $self->_validate_header_parameter({ %$state, depth => $state->{depth}+1 }, $param_obj->{name}, $param_obj, $request->headers)
           : $param_obj->{in} eq 'cookie' ? $self->_validate_cookie_parameter({ %$state, depth => $state->{depth}+1 }, $param_obj, $request)
@@ -149,7 +150,7 @@ sub validate_request ($self, $request, $options = {}) {
     # We could validate this at document parse time, except the path-item can also be reached via a
     # $ref and the referencing path could be from another document and is therefore unknowable until
     # runtime.
-    foreach my $path_name (sort keys $path_captures->%*) {
+    foreach my $path_name (sort keys $options->{path_captures}->%*) {
       abort({ %$state, data_path => jsonp($state->{data_path}, qw(uri path), $path_name) },
           'missing path parameter specification for "%s"', $path_name)
         if not exists(($request_parameters_processed->{path}//{})->{$path_name});
@@ -426,10 +427,13 @@ sub find_path ($self, $options, $state = {}) {
       my @capture_names = ($path_template =~ m!\{([^/?#}]+)\}!g);
       my %path_captures; @path_captures{@capture_names} = @capture_values;
 
-      return E({ %$state, schema_path => '/paths' }, 'provided path_captures values do not match request URI')
-        if $options->{path_captures} and not is_equal($options->{path_captures}, \%path_captures);
-
-      $options->{path_captures} = \%path_captures;
+      if (exists $options->{path_captures}) {
+        return E({ %$state, schema_path => '/paths' }, 'provided path_captures values do not match request URI')
+          if not is_equal($options->{path_captures}, \%path_captures, { stringy_numbers => 1 });
+      }
+      else {
+        $options->{path_captures} = \%path_captures;
+      }
 
       return E({ %$state, data_path => '/request/method', keyword => $method,
           recommended_response => [ 405, 'Method Not Allowed' ] },
@@ -494,20 +498,26 @@ sub find_path ($self, $options, $state = {}) {
   my @capture_values = map
     Encode::decode('UTF-8', URI::Escape::uri_unescape(substr($uri_path, $-[$_], $+[$_]-$-[$_])),
       Encode::FB_CROAK | Encode::LEAVE_SRC), 1 .. $#-;
-  return E({ %$state, keyword => 'paths', _schema_path_suffix => $path_template },
-      'provided path_captures values do not match request URI')
-    if exists $options->{path_captures}
-      and not is_equal([ map $_.'', $options->{path_captures}->@{@capture_names} ], \@capture_values);
+
+  if (exists $options->{path_captures}) {
+    my %provided_captures = $options->{path_captures}->%*;
+    return E({ %$state, keyword => 'paths', _schema_path_suffix => $path_template },
+        'provided path_captures values do not match request URI')
+      if not is_equal([ map $_.'', @provided_captures{@capture_names} ], \@capture_values);
+  }
+  else {
+    my %path_captures; @path_captures{@capture_names} = @capture_values;
+    $options->{path_captures} = \%path_captures;
+  }
 
   # TODO: validate request uri against the nearest 'servers' object and extract server variables
   # Since we didn't take a servers uri prefix into consideration earlier, we may have a mismatch
   # now, which should constitute an error
 
-  my %path_captures; @path_captures{@capture_names} = @capture_values;
-
   # FIXME: follow $ref chain in path-item using path_template
-  $options->@{qw(path_template path_captures _path_item)} =
-    ($path_template, \%path_captures, $self->openapi_document->schema->{paths}{$path_template}{$method});
+  $options->@{qw(path_template _path_item)} =
+    ($path_template, $self->openapi_document->schema->{paths}{$path_template}{$method});
+
   $options->{operation_id} = $options->{_path_item}{operationId};
   delete $options->{operation_id} if not defined $options->{operation_id};
 
@@ -551,7 +561,10 @@ sub _validate_path_parameter ($self, $state, $param_obj, $path_captures) {
   return E({ %$state, keyword => 'required' }, 'missing path parameter: %s', $param_obj->{name})
     if not exists $path_captures->{$param_obj->{name}};
 
-  return $self->_validate_parameter_content({ %$state, depth => $state->{depth}+1 }, $param_obj, \ $path_captures->{$param_obj->{name}})
+  my $value = $path_captures->{$param_obj->{name}};
+  $value .= '';
+
+  return $self->_validate_parameter_content({ %$state, depth => $state->{depth}+1 }, $param_obj, \$value)
     if exists $param_obj->{content};
 
   return E({ %$state, keyword => 'style' }, 'only style: simple is supported in path parameters')
@@ -562,7 +575,7 @@ sub _validate_path_parameter ($self, $state, $param_obj, $path_captures) {
     return E($state, 'deserializing to non-primitive types is not yet supported in path parameters');
   }
 
-  $self->_evaluate_subschema(\ $path_captures->{$param_obj->{name}}, $param_obj->{schema}, { %$state, schema_path => jsonp($state->{schema_path}, 'schema'), stringy_numbers => 1, depth => $state->{depth}+1 });
+  $self->_evaluate_subschema(\$value, $param_obj->{schema}, { %$state, schema_path => jsonp($state->{schema_path}, 'schema'), stringy_numbers => 1, depth => $state->{depth}+1 });
 }
 
 sub _validate_query_parameter ($self, $state, $param_obj, $uri) {
@@ -916,7 +929,7 @@ OpenAPI::Modern - Validate HTTP requests and responses against an OpenAPI v3.1 d
 
 =head1 VERSION
 
-version 0.065
+version 0.066
 
 =head1 SYNOPSIS
 
@@ -1185,14 +1198,17 @@ populated if they can be successfully calculated.
 
 In addition, these values are populated in the options hash (when available):
 
-* C<operation_uri>: a URI indicating the document location of the operation object for the
-  request, after following any references (usually something under C</paths/>, but may be in another
-  document). Use C<< $openapi->evaluator->get($uri) >> to fetch this content (see
-  L<JSON::Schema::Modern/get>). Note that this is the same as
-  C<< $openapi->recursive_get(Mojo::URL->new->fragment(JSON::Schema::Modern::Utilities::jsonp('/paths', $options->{path_template}{$options->{method}}))) >>.
-  (See the documentation for an operation at L<https://learn.openapis.org/specification/paths.html#the-endpoints-list> or in the specification at
-  L<§4.8.10 of the specification|https://spec.openapis.org/oas/v3.1.0#operation-object>.)
-* C<request> (not necessarily what was passed in: this is always a L<Mojo::Message::Request>)
+=over 4
+
+=item *
+
+C<operation_uri>: a URI indicating the document location of the operation object for the request, after following any references (usually something under C</paths/>, but may be in another document). Use C<< $openapi->evaluator->get($uri) >> to fetch this content (see L<JSON::Schema::Modern/get>). Note that this is the same as C<< $openapi->recursive_get(Mojo::URL->new->fragment(JSON::Schema::Modern::Utilities::jsonp('/paths', $options->{path_template}{$options->{method}}))) >>. (See the documentation for an operation at L<https://learn.openapis.org/specification/paths.html#the-endpoints-list> or in the specification at L<§4.8.10 of the specification|https://spec.openapis.org/oas/v3.1.0#operation-object>.)
+
+=item *
+
+C<request> (not necessarily what was passed in: this is always a L<Mojo::Message::Request>)
+
+=back
 
 You can find the associated operation object by using either C<operation_uri>,
 or by calling C<< $openapi->openapi_document->get_operationId_path($operation_id) >>
@@ -1240,6 +1256,41 @@ An accessor that delegates to L<JSON::Schema::Modern/get_media_type>.
 =head2 add_media_type
 
 A setter that delegates to L<JSON::Schema::Modern/add_media_type>.
+
+=head1 CACHING
+
+=for stopwords preforking
+
+Very large OpenAPI documents may take a noticeable time to be
+loaded and parsed. You can reduce the impact to your preforking application by loading all necessary
+documents at startup, and impact can be further reduced by saving objects to cache and then
+reloading them (perhaps by using a timestamp or checksum to determine if a fresh reload is needed).
+
+  sub get_openapi (...) {
+    my $serialized_file = Path::Tiny::path($serialized_filename);
+    my $openapi_file = Path::Tiny::path($openapi_filename);
+    my $openapi;
+    if ($serialized_file->stat->mtime < $openapi_file->stat->mtime)) {
+      $openapi = OpenAPI::Modern->new(
+        openapi_uri => '/api',
+        openapi_schema => decode_json($openapi_file->slurp_raw), # your openapi document
+      );
+      $openapi->evaluator->add_schema(decode_json(...));  # any other needed schemas
+      my $frozen = Sereal::Encoder->new({ freeze_callbacks => 1 })->encode($openapi);
+      $serialized_file->spew_raw($frozen);
+    }
+    else {
+      my $frozen = $serialized_file->slurp_raw;
+      $openapi = Sereal::Decoder->new->decode($frozen);
+    }
+
+    # add custom format validations, media types and encodings here
+    $openapi->evaluator->add_media_type(...);
+
+    return $openapi;
+  }
+
+See also L<JSON::Schema::Modern/CACHING>.
 
 =head1 ON THE USE OF JSON SCHEMAS
 

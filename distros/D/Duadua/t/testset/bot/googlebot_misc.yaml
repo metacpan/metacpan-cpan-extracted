@@ -8,6 +8,7 @@
   is_windows: false
   is_chromeos: false
   version: '1.0'
+
 - ua: 'Googlebot-News'
   name: Googlebot-News
   is_bot: true
@@ -16,6 +17,7 @@
   is_linux: false
   is_windows: false
   is_chromeos: false
+
 - ua: 'Googlebot-Video/1.0'
   name: Googlebot-Video
   is_bot: true
@@ -25,6 +27,92 @@
   is_windows: false
   is_chromeos: false
   version: '1.0'
+
+- ua: 'Mozilla/5.0 (X11; Linux x86_64; Storebot-Google/1.0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/65.0.3325.181 Safari/537.36'
+  name: Storebot-Google
+  is_bot: true
+  is_ios: false
+  is_android: false
+  is_linux: true
+  is_windows: false
+  is_chromeos: false
+  version: '1.0'
+
+- ua: 'Mozilla/5.0 (Linux; Android 8.0; Pixel 2 Build/OPD3.170816.012; Storebot-Google/1.0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/65.0.3325.181 Mobile Safari/537.36'
+  name: Storebot-Google
+  is_bot: true
+  is_ios: false
+  is_android: true
+  is_linux: true
+  is_windows: false
+  is_chromeos: false
+  version: '1.0'
+
+- ua: 'Mozilla/5.0 (Linux; Android 6.0.1; Nexus 5X Build/MMB29P) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/65.0.3325.181 Mobile Safari/537.36 (compatible; Google-InspectionTool/1.0;)'
+  name: Google-InspectionTool
+  is_bot: true
+  is_ios: false
+  is_android: true
+  is_linux: true
+  is_windows: false
+  is_chromeos: false
+  version: '1.0'
+
+- ua: 'Mozilla/5.0 (compatible; Google-InspectionTool/1.0;)'
+  name: Google-InspectionTool
+  is_bot: true
+  is_ios: false
+  is_android: false
+  is_linux: false
+  is_windows: false
+  is_chromeos: false
+  version: '1.0'
+
+- ua: 'GoogleOther'
+  name: GoogleOther
+  is_bot: true
+  is_ios: false
+  is_android: false
+  is_linux: false
+  is_windows: false
+  is_chromeos: false
+
+- ua: 'Mozilla/5.0 (Linux; Android 6.0.1; Nexus 5X Build/MMB29P) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/65.0.3325.181 Mobile Safari/537.36 (compatible; GoogleOther)'
+  name: GoogleOther
+  is_bot: true
+  is_ios: false
+  is_android: true
+  is_linux: true
+  is_windows: false
+  is_chromeos: false
+
+- ua: 'Mozilla/5.0 AppleWebKit/537.36 (KHTML, like Gecko; compatible; GoogleOther) Chrome/65.0.3325.181 Safari/537.36'
+  name: GoogleOther
+  is_bot: true
+  is_ios: false
+  is_android: false
+  is_linux: false
+  is_windows: false
+  is_chromeos: false
+
+- ua: 'GoogleOther-Image/1.0'
+  name: GoogleOther-Image
+  is_bot: true
+  is_ios: false
+  is_android: false
+  is_linux: false
+  is_windows: false
+  is_chromeos: false
+
+- ua: 'GoogleOther-Video/1.0'
+  name: GoogleOther-Video
+  is_bot: true
+  is_ios: false
+  is_android: false
+  is_linux: false
+  is_windows: false
+  is_chromeos: false
+
 - ua: 'APIs-Google (+https://developers.google.com/webmasters/APIs-Google.html)'
   name: APIs-Google
   is_bot: true
@@ -33,6 +121,7 @@
   is_linux: false
   is_windows: false
   is_chromeos: false
+
 - ua: 'FeedFetcher-Google; (+http://www.google.com/feedfetcher.html)'
   name: FeedFetcher-Google
   is_bot: true
@@ -41,6 +130,16 @@
   is_linux: false
   is_windows: false
   is_chromeos: false
+
+- ua: 'GoogleProducer; (+http://goo.gl/7y4SX)'
+  name: GoogleProducer
+  is_bot: true
+  is_ios: false
+  is_android: false
+  is_linux: false
+  is_windows: false
+  is_chromeos: false
+
 - ua: 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_13_4) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/65.0.3325.181 Safari/537.36 AppEngine-Google; (+http://code.google.com/appengine; appid: s~foo)'
   name: 'AppEngine-Google'
   is_bot: true
@@ -49,6 +148,7 @@
   is_linux: false
   is_windows: false
   is_chromeos: false
+
 - ua: 'AppEngine-Google; (+http://code.google.com/appengine; appid: s~foobarbaz)'
   name: 'AppEngine-Google'
   is_bot: true
@@ -57,6 +157,7 @@
   is_linux: false
   is_windows: false
   is_chromeos: false
+
 - ua: 'Mozilla/5.0 (compatible; Google-Site-Verification/1.0)'
   name: 'Google-Site-Verification'
   is_bot: true
@@ -66,6 +167,7 @@
   is_windows: false
   is_chromeos: false
   version: '1.0'
+
 - ua: 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko; Google Page Speed Insights) Chrome/41.0.2272.118 Safari/537.36'
   name: 'Google Page Speed Insights'
   is_bot: true

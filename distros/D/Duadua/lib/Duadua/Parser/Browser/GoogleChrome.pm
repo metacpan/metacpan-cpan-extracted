@@ -6,13 +6,13 @@ use Duadua::Util;
 sub try {
     my ($class, $d) = @_;
 
-    return if index($d->ua, 'http') > -1;
-    return if index($d->ua, 'oogle') > -1;
-    return if index($d->ua, ' OPR/') > -1 || index($d->ua, ' Vivaldi/') > -1;
-    return if index($d->ua, 'Browser/') > -1;
-    return if index($d->ua, 'QtWebEngine') > -1;
+    return if $d->_contain('http');
+    return if $d->_contain('oogle');
+    return if $d->_contain(' OPR/') || $d->_contain(' Vivaldi/');
+    return if $d->_contain('Browser/');
+    return if $d->_contain('QtWebEngine');
 
-    if ( index($d->ua, 'Chrome/') > -1 && index($d->ua, 'AppleWebKit/') > -1 && index($d->ua, 'Safari/') > -1 ) {
+    if ( $d->_contain('Chrome/') && $d->_contain('AppleWebKit/') && $d->_contain('Safari/') ) {
         my $h = {
             name => 'Google Chrome',
         };
@@ -25,8 +25,8 @@ sub try {
         return Duadua::Util->set_os($d, $h);
     }
 
-    if ( index($d->ua, 'Mozilla/') > -1 && index($d->ua, 'AppleWebKit/') > -1
-        && (index($d->ua, 'CrMo/') > -1 || index($d->ua, 'CriOS/') > -1) ) {
+    if ( $d->_contain_mozilla && $d->_contain('AppleWebKit/')
+        && ($d->_contain('CrMo/') || $d->_contain('CriOS/')) ) {
         my $h = {
             name => 'Google Chrome',
         };

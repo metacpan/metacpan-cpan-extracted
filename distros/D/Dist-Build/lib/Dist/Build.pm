@@ -1,5 +1,5 @@
 package Dist::Build;
-$Dist::Build::VERSION = '0.003';
+$Dist::Build::VERSION = '0.004';
 use strict;
 use warnings;
 
@@ -16,7 +16,7 @@ use File::Spec::Functions qw/catfile catdir abs2rel /;
 use Getopt::Long 2.36 qw/GetOptionsFromArray/;
 use Parse::CPAN::Meta;
 
-use ExtUtils::Builder::Planner;
+use ExtUtils::Builder::Planner 0.007;
 use Dist::Build::Serializer;
 
 my $json_backend = Parse::CPAN::Meta->json_backend;
@@ -121,7 +121,7 @@ sub Build_PL {
 	$planner->create_phony('pure_all', 'code', 'manify', 'dynamic');
 	$planner->create_phony('build', 'pure_all');
 
-	$planner->tap_harness('test', dependencies => [ 'pure_all' ], test_files => [ find(qr/\.t$/, 't')]);
+	$planner->tap_harness('test', dependencies => [ 'pure_all' ], test_files => [ sort +find(qr/\.t$/, 't')]);
 	$planner->install('install', dependencies => [ 'pure_all' ], install_map => $options{install_paths}->install_map);
 
 	$planner->add_delegate('meta', sub { $meta });
@@ -136,6 +136,7 @@ sub Build_PL {
 
 	for my $file (glob 'planner/*.pl') {
 		my $inner = $planner->new_scope;
+		$inner->add_delegate('self', sub { $inner });
 		$inner->add_delegate('outer', sub { $planner });
 		$inner->run_dsl($file);
 	}
@@ -149,9 +150,9 @@ sub Build_PL {
 	if (my $dynamic = $meta->custom('x_dynamic_prereqs')) {
 		my %meta = (%{ $meta->as_struct }, dynamic_config => 0);
 		require CPAN::Requirements::Dynamic;
-		my $dynamic_parser = CPAN::Requirements::Dynamic->new(%options);
+		my $dynamic_parser = CPAN::Requirements::Dynamic->new(%options, prereqs => $meta->effective_prereqs);
 		my $prereq = $dynamic_parser->evaluate($dynamic);
-		$meta{prereqs} = $meta->effective_prereqs->with_merged_prereqs($prereq)->as_string_hash;
+		$meta{prereqs} = $prereq->as_string_hash;
 		$meta = CPAN::Meta->new(\%meta);
 	}
 	$meta->save('MYMETA.json');
@@ -195,7 +196,7 @@ Dist::Build - A modern module builder, author tools not included!
 
 =head1 VERSION
 
-version 0.003
+version 0.004
 
 =head1 SYNOPSIS
 

@@ -4,7 +4,7 @@ Net::Statsd::Lite - A lightweight StatsD client that supports multimetric packet
 
 # VERSION
 
-version v0.7.1
+version v0.8.0
 
 # SYNOPSIS
 
@@ -210,7 +210,7 @@ This is an internal method for sending the data to the server.
 $stats->record_metric( $suffix, $metric, $value, $opts );
 ```
 
-This was renamed and documented in v0.5.0 to to simplify subclassing
+This was renamed and documented in v0.5.0 to simplify subclassing
 that supports extensions to statsd, such as tagging.
 
 See the discussion of tagging extensions below.
@@ -251,13 +251,9 @@ around record_metric => sub {
 
 # SUPPORT FOR OLDER PERL VERSIONS
 
-Since v0.7.0, the this module requires Perl v5.14 or later.
+Since v0.8.0, the this module requires Perl v5.20 or later.
 
 Future releases may only support Perl versions released in the last ten years.
-
-If you need this module on Perl v5.10, please use one of the v0.6.x
-versions of this module.  Significant bug or security fixes may be
-backported to those versions.
 
 # SEE ALSO
 
@@ -295,7 +291,7 @@ Library [https://www.sciencephoto.com](https://www.sciencephoto.com).
 
 # COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2018-2023 by Robert Rothenberg.
+This software is Copyright (c) 2018-2024 by Robert Rothenberg.
 
 This is free software, licensed under:
 

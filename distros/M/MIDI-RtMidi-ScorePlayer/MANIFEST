@@ -9,6 +9,13 @@ README
 README.md
 dist.ini
 eg/drum-circle.pl
+eg/gol-4x-2.dat
+eg/gol-4x.dat
+eg/gol-5-13x.dat
+eg/gol-5-flicker.dat
+eg/gol-blink.dat
+eg/gol-corral.dat
+eg/gol.pl
 eg/rpsls-game.pl
 eg/treble-bass.pl
 lib/MIDI/RtMidi/ScorePlayer.pm

@@ -5,16 +5,26 @@ use 5.008;
 use ExtUtils::MakeMaker;
 use strict;
 
-my $yazconf = "yaz-config";
-my $yazver = `$yazconf --version`;
-my $yazinc = `$yazconf --cflags threads`;
-my $yazlibs = `$yazconf --libs threads`;
-if (!$yazver || !$yazinc || !$yazlibs) {
-    die qq[
+my $yazver;
+my $yazinc;
+my $yazlibs;
+system("pkg-config --exists yaz");
+if ($? == 0) {
+    $yazver = `pkg-config --modversion yaz` or die $!;
+    $yazinc = `pkg-config --cflags yaz` or die $!;
+    $yazlibs = `pkg-config --libs yaz` or die $!;
+} else {
+    $yazver = `yaz-config --version`;
+    $yazinc = `yaz-config --cflags servers`;
+    $yazlibs = `yaz-config --libs server`;
+    if (!$yazver || (!$yazinc && !$yazlibs)) {
+       die qq[
 ERROR: Unable to call script: yaz-config
 If you are using a YAZ installation from the Debian package "yaz", you
-will also need to install "libyaz-dev" in order to build this module.
+will also need to install "libyaz-dev" in order to build the
+SimpleServer module.
 ];
+   }
 }
 
 chomp($yazver);
@@ -46,6 +56,11 @@ WriteMakefile(
 );
 
 
+# Fix up the generated Makefile by deleting the standard `test` rule.
+system(q[perl -ni -e 'print unless /^\t/ and $discard or $discard = /^test ::/' Makefile]);
+
+
+
 sub check_version {
     my($got, $want) = @_;
 
@@ -63,7 +78,9 @@ __EOT__
     }
 }
 
-sub MY::postamble { "debian: debian/output
+
+sub MY::postamble { <<__EOT__
+debian: debian/output
 
 debian/output:
 	dpkg-buildpackage -us -uc -rfakeroot -d
@@ -73,5 +90,9 @@ debian/output:
 
 debclean:
 	rm -rf debian/libnet-z3950-zoom-perl debian/output
-";
+
+test:
+	\@echo '*** Starting yaz-ztest server for tests'
+	\@yaz-ztest -w t -v none \@:9996 & PID=\$\$!; set -x; \$(MAKE) \$(TEST_TYPE); kill \$\$PID
+__EOT__
 }

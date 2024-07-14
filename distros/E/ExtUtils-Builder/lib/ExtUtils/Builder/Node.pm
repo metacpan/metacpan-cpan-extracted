@@ -1,5 +1,5 @@
 package ExtUtils::Builder::Node;
-$ExtUtils::Builder::Node::VERSION = '0.006';
+$ExtUtils::Builder::Node::VERSION = '0.007';
 use strict;
 use warnings;
 
@@ -32,7 +32,7 @@ sub dependencies {
 
 sub phony {
 	my $self = shift;
-	return $self->{phone};
+	return !!$self->{phony};
 }
 
 sub mergeable {
@@ -56,7 +56,7 @@ ExtUtils::Builder::Node - An ExtUtils::Builder Node
 
 =head1 VERSION
 
-version 0.006
+version 0.007
 
 =head1 SYNOPSIS
 

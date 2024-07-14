@@ -2,6 +2,7 @@ use Test::More;
 
 use Data::LnArray::XS;
 
+
 my $array = Data::LnArray::XS->new(qw/one two three four/);
 
 my $first = $array->sort(sub {
@@ -15,10 +16,9 @@ is_deeply($first, [qw/
 	two
 /]);
 
+$array = Data::LnArray::XS->new(qw/one two three four/);
 
-my $array = Data::LnArray::XS->new(qw/one two three four/);
-
-my $first = $array->sort(sub {
+$first = $array->sort(sub {
 	$b cmp $a
 });
 

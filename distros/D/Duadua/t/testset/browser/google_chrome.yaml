@@ -7,6 +7,7 @@
   is_windows: true
   is_chromeos: false
   version: '79.0.3945.79'
+
 - ua: 'Mozilla/5.0 (Linux; U; Android-4.0.3; en-us; Galaxy Nexus Build/IML74K) AppleWebKit/535.7 (KHTML, like Gecko) CrMo/16.0.912.75 Mobile Safari/535.7'
   name: 'Google Chrome'
   is_bot: false
@@ -16,6 +17,7 @@
   is_windows: false
   is_chromeos: false
   version: '16.0.912.75'
+
 - ua: 'Mozilla/5.0 (X11; CrOS x86_64 12607.58.0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/79.0.3945.86 Safari/537.36'
   name: 'Google Chrome'
   is_bot: false

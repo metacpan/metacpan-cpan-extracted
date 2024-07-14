@@ -1,5 +1,5 @@
 package KelpX::Symbiosis::Engine::URLMap;
-$KelpX::Symbiosis::Engine::URLMap::VERSION = '2.10';
+$KelpX::Symbiosis::Engine::URLMap::VERSION = '2.11';
 use Kelp::Base 'KelpX::Symbiosis::Engine';
 use Plack::App::URLMap;
 use Carp;

@@ -1,0 +1,58 @@
+0.010   2024-06-26  Released-By: PERLANCAR; Urgency: medium
+
+        - Rename module/dist Sah-Schema{s,Bundle}-* for consistency with
+          others.
+
+
+0.009   2023-08-07  Released-By: PERLANCAR; Urgency: medium
+
+        - [ux] Add summary of country name for country code completion
+          answer.
+
+
+0.008   2020-03-08  Released-By: PERLANCAR; Urgency: medium
+
+        - No functional changes.
+
+	- [build] Rebuild with updated Pod::Weaver plugin [-Sah::Schemas] to
+          correctly show examples.
+
+
+0.007   2020-03-04  Released-By: PERLANCAR; Urgency: medium
+
+	- Update property names in examples (data -> value, res ->
+	  validated_value).
+
+
+0.006   2020-03-04  Released-By: PERLANCAR; Urgency: medium
+
+	- Update examples, use 'value' instead of 'data'.
+
+
+0.005   2020-03-02  Released-By: PERLANCAR; Urgency: low
+
+	- No functional changes
+
+        - [build] Render examples in Synopsis, using
+          Pod::Weaver::Plugin::Sah::Schemas 0.060+.
+
+
+0.004   2020-03-02  Released-By: PERLANCAR; Urgency: medium
+
+	- Add examples (tests).
+
+
+0.003   2019-11-29  Released-By: PERLANCAR; Urgency: medium
+
+	- Update coerce rule names in Sah schemas (Data::Sah::Coerce
+	  0.034+).
+
+
+0.002   2018-04-08  Released-By: PERLANCAR
+
+	- [ux] Convert codes to lowercase.
+
+
+0.001   2018-03-25  Released-By: PERLANCAR
+
+        - First release.

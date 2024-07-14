@@ -7,7 +7,7 @@ use Test::More tests => 9;
 
 BEGIN { use_ok('ZOOM') };
 
-my $host = "z3950.loc.gov:7090/voyager";
+my $host = "lx2.loc.gov:210/LCDB_MARC8";
 my $conn;
 eval { $conn = new ZOOM::Connection($host) };
 ok(!$@, "connection to '$host'");

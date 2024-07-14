@@ -23,7 +23,7 @@ const __sigset_t *				T_PTROBJ
 # This prevented the return value of ZOOM_record_get() from being
 # translated into a Perl string.  Instead, I am using T_PV, which
 # works properly.  This also has the pleasant side-effect that I no
-# longer have to discard the "const" qualfiers from the arguments to
+# longer have to discard the "const" qualifiers from the arguments to
 # the functions in the .xs file.
 const char *					T_PV
 opaquechar *					T_OPAQUECHAR

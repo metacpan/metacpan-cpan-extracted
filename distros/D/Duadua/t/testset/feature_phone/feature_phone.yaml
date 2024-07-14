@@ -7,6 +7,7 @@
   is_linux: false
   is_windows: false
   is_chromeos: false
+
 - ua: 'DoCoMo/2.0 MST_v_SH2101V(c100)'
   name: 'DoCoMo SH2101V'
   is_bot: false
@@ -15,6 +16,7 @@
   is_linux: false
   is_windows: false
   is_chromeos: false
+
 - ua: 'Mozilla/4.08 (N901iS;FOMA;c300;TB;W24H12)'
   name: 'DoCoMo N901iS'
   is_bot: false
@@ -23,6 +25,7 @@
   is_linux: false
   is_windows: false
   is_chromeos: false
+
 # https://www.au.com/ezfactory/tec/spec/new_win/ezkishu.html
 - ua: 'KDDI-SH3E UP.Browser/6.2_7.2.7.1.K.3.358 (GUI) MMP/2.0'
   name: 'AU KDDI SH3E'
@@ -33,6 +36,7 @@
   is_windows: false
   is_chromeos: false
   version: '6.2_7.2.7.1.K.3.358'
+
 # http://creation.mb.softbank.jp/mc/terminal/terminal_info/terminal_useragent.html
 - ua: 'SoftBank/2.0/301SH/SHJ001[/Serial] Browser/NetFront/3.5 Profile/MIDP-2.0 Configuration/CLDC-1.1'
   name: 'SoftBank 301SH'
@@ -42,6 +46,7 @@
   is_linux: false
   is_windows: false
   is_chromeos: false
+
 - ua: 'Vodafone/1.0/V803T/TJ001[/Serial] Browser/VF-Browser/1.0 Profile/MIDP-2.0 Configuration/CLDC-1.1 Ext-J-Profile/JSCL-1.2.2 Ext-V-Profile/VSCL-2.0.0'
   name: 'SoftBank V803T'
   is_bot: false
@@ -50,6 +55,7 @@
   is_linux: false
   is_windows: false
   is_chromeos: false
+
 - ua: 'Mozilla/4.08 (912SH;SoftBank) NetFront/3.4'
   name: 'SoftBank 912SH'
   is_bot: false

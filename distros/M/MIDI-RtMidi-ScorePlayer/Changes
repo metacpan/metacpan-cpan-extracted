@@ -1,5 +1,12 @@
 Revision history for MIDI-RtMidi-ScorePlayer
 
+0.0114 2024-07-13 21:31:36
+    - Enhance the eg/gol.pl program.
+
+0.0113 2024-07-13 16:26:25
+    - Add the mostly hideous, eg/gol.pl program.
+    - Improve documentation.
+
 0.0112 2024-07-12 21:44:06
     - Clean-up things a bit.
     - Add the eg/rpsls-game.pl program.

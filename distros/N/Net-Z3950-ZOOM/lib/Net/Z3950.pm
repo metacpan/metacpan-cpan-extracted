@@ -9,7 +9,7 @@ our $VERSION = '0.99';	# Supersedes "proper" Net::Z3950 v0.51
 
 # ----------------------------------------------------------------------------
 # Enumerations are copied from the old Net::Z3950 module.
-# It's not entirely clear yet which of these we actually need, for for
+# It's not entirely clear yet which of these we actually need, so for
 # now I am commenting them all out, and faulting in the ones we need.
 # ----------------------------------------------------------------------------
 

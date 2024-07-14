@@ -1,7 +1,7 @@
 # See ../README for a description of this program.
 # perl -I../../blib/lib -I../../blib/arch zoomtst3.pl <t1> [...] <tN> <query>
 # for example:
-# perl -I../../blib/lib -I../../blib/arch zoomtst3.pl z3950.loc.gov:7090/Voyager z3950.indexdata.com:210/gils endeavor.flo.org:7090/Voyager mineral
+# perl -I../../blib/lib -I../../blib/arch zoomtst3.pl lx2.loc.gov:210/LCDB_MARC8 z3950.indexdata.com:210/gils endeavor.flo.org:7090/Voyager mineral
 
 use strict;
 use warnings;

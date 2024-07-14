@@ -25,7 +25,7 @@ ZOOM - Perl extension implementing the ZOOM API for Information Retrieval
 This module provides a nice, Perlish implementation of the ZOOM
 Abstract API described and documented at http://zoom.z3950.org/api/
 
-the ZOOM module is implemented as a set of thin classes on top of the
+The ZOOM module is implemented as a set of thin classes on top of the
 non-OO functions provided by this distribution's C<Net::Z3950::ZOOM>
 module, which in 
 turn is a thin layer on top of the ZOOM-C code supplied as part of
@@ -62,7 +62,7 @@ Many useful ZOOM applications can be built using only the Connection,
 ResultSet, Record and Exception classes, as in the example
 code-snippet above.
 
-A typical application will begin by creating an Connection object,
+A typical application will begin by creating a Connection object,
 then using that to execute searches that yield ResultSet objects, then
 fetching records from the result-sets to yield Record objects.  If an
 error occurs, an Exception object is thrown and can be dealt with.
@@ -71,10 +71,10 @@ More sophisticated applications might also browse the server's indexes
 to create a ScanSet, from which indexed terms may be retrieved; others
 might send ``Extended Services'' Packages to the server, to achieve
 non-standard tasks such as database creation and record update.
-Searching using a query syntax other than PQF can be done using an
+Searching using a query syntax other than PQF can be done using a
 query object of one of the Query subclasses.  Finally, sets of options
 may be manipulated independently of the objects they are associated
-with using an Options object.
+with, by using an Options object.
 
 In general, method calls throw an exception if anything goes wrong, so
 you don't need to test for success after each call.  See the section
@@ -190,7 +190,7 @@ single argument is a YAZ service-specifier string of the form
 When the two-option form is used (which may be done using a vacuous
 second argument of zero), any number of additional argument pairs may
 be provided, which are interpreted as key-value pairs to be set as
-options after the Connection object is created but before it is
+options after the Connection object is created, but before it is
 connected to the server.  This is a convenient way to set options,
 including those that must be set before connecting such as
 authentication tokens.
@@ -340,7 +340,7 @@ carry with them a set of named options which affect their behaviour in
 certain ways.  See the ZOOM-C options documentation for details:
 
 Connection options are listed at
-http://indexdata.com/yaz/doc/zoom.tkl#zoom.connections
+http://www.indexdata.com/yaz/doc/zoom.html#zoom-connections
 
 These options are set and fetched using the C<option()> method, which
 may be called with either one or two arguments.  In the two-argument
@@ -424,7 +424,7 @@ titles.
 
 This takes a bit of getting used to.
 
-The behaviour is C<scan()> is affected by the following options, which
+The behaviour of C<scan()> is affected by the following options, which
 may be set on the Connection through which the scan is done:
 
 =over 4
@@ -499,14 +499,14 @@ a Connection that has been C<destroy()>ed.
 
 A ResultSet object represents the set of zero or more records
 resulting from a search, and is the means whereby these records can be
-retrieved.  A ResultSet object may maintain client side cache or some,
+retrieved.  A ResultSet object may maintain client side cache of some,
 less, none, all or more of the server's records: in general, this is
-supposed to an implementaton detail of no interest to a typical
+supposed to be an implementation detail of no interest to a typical
 application, although more sophisticated applications do have
 facilities for messing with the cache.  Most applications will only
 need the C<size()>, C<record()> and C<sort()> methods.
 
-There is no C<new()> method nor any other explicit constructor.  The
+There is no C<new()> method, nor any other explicit constructor.  The
 only way to create a new ResultSet is by using C<search()> (or
 C<search_pqf()>) on a Connection.
 
@@ -525,7 +525,7 @@ the Connection class's C<option()> method.  There is no
 C<option_binary()> method for ResultSet objects.
 
 ResultSet options are listed at
-http://indexdata.com/yaz/doc/zoom.resultsets.tkl
+http://www.indexdata.com/yaz/doc/zoom.resultsets.html
 
 =head4 size()
 
@@ -566,7 +566,7 @@ efficient strategy for this is.  It might fetch each record, alone
 when asked for: that's optimal in an application that's only
 interested in the top hit from each search, but pessimal for one that
 wants to display a whole list of results.  Conversely, the software's
-strategy might be always to ask for blocks of a twenty records:
+strategy might be always to ask for blocks of twenty records:
 that's great for assembling long lists of things, but wasteful when
 only one record is wanted.  The problem is that the ZOOM module can't
 tell, when you call C<$rs-E<gt>record()>, what your intention is.
@@ -641,10 +641,10 @@ reuse a ResultSet that has been C<destroy()>ed.
  $marc = new_from_usmarc MARC::Record($raw);
  print "Record title is: ", $marc->title(), "\n";
 
-A Record object represents a record that has been retrived from the
+A Record object represents a record that has been retrieved from the
 server.
 
-There is no C<new()> method nor any other explicit constructor.  The
+There is no C<new()> method, nor any other explicit constructor.  The
 only way to create a new Record is by using C<record()> (or
 C<record_immediate()>, or C<records()>) on a ResultSet.
 
@@ -737,7 +737,7 @@ joined with a semi-colon to make a single argument, so the third and
 fourth example invocations above are equivalent.  The second argument
 (or portion of the first argument following the semicolon) is used in
 the C<type> argument of C<ZOOM_record_get()>, as described in
-http://www.indexdata.com/yaz/doc/zoom.records.tkl
+http://www.indexdata.com/yaz/doc/zoom.records.html
 This is useful primarily for invoking the character-set transformation
 - in the examples above, from ISO Latin-1 to UTF-8 Unicode.
 
@@ -754,7 +754,7 @@ ResultSets and go away when the ResultSet is destroyed; but
 occasionally you need a Record to outlive its parent and destroy it
 later, explicitly.  To do this, C<clone()> the record, keep the new
 Record object that is returned, and C<destroy()> it when it's no
-longer needed.  This is B<only> situation in which a Record needs to
+longer needed.  This is the B<only> situation in which a Record needs to
 be destroyed.
 
 =head2 ZOOM::Exception
@@ -799,7 +799,7 @@ example, when the error-code is the BIB-1 diagnostic 109 ("Database
 unavailable"), the additional information is the name of the database
 that the application tried to use.  For some error-codes, there is no
 additional information at all; for some others, the additional
-information is undefined and may just be an human-readable string.
+information is undefined, and may just be a human-readable string.
 
 =item diagnostic set [optional]
 
@@ -860,11 +860,11 @@ before exiting.
  assert($rs->size() == $occ);
 
 A ScanSet represents a set of candidate search-terms returned from an
-index scan.  Its sole purpose is to provide access to those term, to
+index scan.  Its sole purpose is to provide access to those terms, to
 the corresponding display terms, and to the occurrence-counts of the
 terms.
 
-There is no C<new()> method nor any other explicit constructor.  The
+There is no C<new()> method, nor any other explicit constructor.  The
 only way to create a new ScanSet is by using C<scan()> on a
 Connection.
 
@@ -895,7 +895,7 @@ the scan is close to the end of the index.
  }
 
 These methods return the scanned terms themselves.  C<term()> returns
-the term is a form suitable for submitting as part of a query, whereas
+the term in a form suitable for submitting as part of a query, whereas
 C<display_term()> returns it in a form suitable for displaying to a
 user.  Both versions also return the number of occurrences of the term
 in the index, i.e. the number of hits that will be found if the term
@@ -916,7 +916,7 @@ C<option_binary()> method for ScanSet objects.
 
 ScanSet options are also described, though not particularly
 informatively, at
-http://indexdata.com/yaz/doc/zoom.scan.tkl
+http://www.indexdata.com/yaz/doc/zoom.scan.html
 
 =head4 destroy()
 
@@ -948,7 +948,7 @@ thrown if the server cannot execute the requested operations; and
 finally, destroy the package.
 
 Package options are listed at
-http://indexdata.com/yaz/doc/zoom.ext.tkl
+http://www.indexdata.com/yaz/doc/zoom.extendedservices.html
 
 The particular options that have meaning are determined by the
 top-level operation string specified as the argument to C<send()>.
@@ -988,7 +988,7 @@ the Connection class's C<option()> method.  There is no
 C<option_binary()> method for Package objects.
 
 Package options are listed at
-http://indexdata.com/yaz/doc/zoom.ext.tkl
+http://www.indexdata.com/yaz/doc/zoom.extendedservices.html
 
 =head4 send()
 
@@ -1036,7 +1036,7 @@ Although the module is capable of I<making> all these requests, not
 all servers are capable of I<executing> them.  Refusal is indicated by
 throwing an exception.  Problems may also be caused by lack of
 privileges; so C<send()> must be used with caution, and is perhaps
-best wrapped in a clause that checks for execptions, like so:
+best wrapped in a clause that checks for exceptions, like so:
 
  eval { $p->send("create") };
  if ($@ && $@->isa("ZOOM::Exception")) {
@@ -1074,7 +1074,7 @@ same set of methods described below:
 Implements Prefix Query Format (PQF), also sometimes known as Prefix
 Query Notation (PQN).  This esoteric but rigorous and expressive
 format is described in the YAZ Manual at
-http://indexdata.com/yaz/doc/tools.tkl#PQF
+http://www.indexdata.com/yaz/doc/tools.html#PQF
 
 =item ZOOM::Query::CQL
 
@@ -1082,9 +1082,9 @@ Implements the Common Query Language (CQL) of SRU, the Search/Retrieve
 URL.  CQL is a much friendlier notation than PQF, using a simple infix
 notation.  The queries are passed ``as is'' to the server rather than
 being compiled into a Z39.50 Type-1 query, so only CQL-compliant
-servers can support such querier.  CQL is described at
+servers can support such queries.  CQL is described at
 http://www.loc.gov/standards/sru/cql/
-and in a slight out-of-date but nevertheless useful tutorial at
+and in a slightly out-of-date but nevertheless useful tutorial at
 http://zing.z3950.org/cql/intro.html
 
 =item ZOOM::Query::CQL2RPN
@@ -1142,7 +1142,7 @@ must also be passed into the constructor.  This is used for two
 purposes: first, its C<cqlfile> option is used to find the CQL
 configuration file that directs the translations into RPN; and second,
 if compilation fails, then diagnostic information is cached in the
-Connection and be retrieved using C<$conn-E<gt>errcode()> and related
+Connection and may be retrieved using C<$conn-E<gt>errcode()> and related
 methods.
 
  $conn->option(cclfile => "samples/ccl/default.bib");
@@ -1288,7 +1288,7 @@ system mean that the function must currently be specified as a string
 containing the fully-qualified name, e.g. C<"main::cb">.>
 
 B<Warning.>
-The current implementation of the this method leaks memory, not only
+The current implementation of this method leaks memory, not only
 when the callback is installed, but on every occasion that it is
 consulted to look up an option value.
 
@@ -1473,7 +1473,7 @@ previously established by C<init_level()>, this function emits a
 log-message made up of a timestamp, the prefix supplied to
 C<init_prefix()>, if any, and the concatenation of all arguments after
 the first.  The message is written to the standard output stream, or
-to the file previous specified by C<init_file()> if this has been
+to the file previously specified by C<init_file()> if this has been
 called.
 
 The log-level argument may be either a numeric value, as returned from
@@ -1518,11 +1518,11 @@ immediately obtained.
 
 Here is a very short program (omitting all error-checking!) which
 demonstrates this process.  It parallel-searches three servers (or more
-of you add them the list), displaying the first record in the
+if you add them the list), displaying the first record in the
 result-set of each server as soon as it becomes available.
 
  use ZOOM;
- @servers = ('z3950.loc.gov:7090/Voyager',
+ @servers = ('lx2.loc.gov:210/LCDB_MARC8',
              'z3950.indexdata.com:210/gils',
              'agricola.nal.usda.gov:7190/Voyager');
  for ($i = 0; $i < @servers; $i++) {
@@ -1555,7 +1555,7 @@ http://perl.z3950.org/
 
 The documentation for the ZOOM-C module of the YAZ Toolkit, which this
 module is built on.  Specifically, its lists of options are useful.
-http://indexdata.com/yaz/doc/zoom.tkl
+http://www.indexdata.com/yaz/doc/zoom.html
 
 The BIB-1 diagnostic set of Z39.50,
 http://www.loc.gov/z3950/agency/defns/bib1diag.html
@@ -1566,7 +1566,7 @@ Mike Taylor, E<lt>mike@indexdata.comE<gt>
 
 =head1 COPYRIGHT AND LICENCE
 
-Copyright (C) 2005-2014 by Index Data.
+Copyright (C) 2005-2017 by Index Data.
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself, either Perl version 5.8.4 or,

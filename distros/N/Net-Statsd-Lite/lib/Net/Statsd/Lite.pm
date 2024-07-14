@@ -2,7 +2,7 @@ package Net::Statsd::Lite;
 
 # ABSTRACT: A lightweight StatsD client that supports multimetric packets
 
-use v5.14;
+use v5.20;
 
 use Moo 1.000000;
 
@@ -19,10 +19,12 @@ use Types::Common 2.000000 qw/ Bool Enum InstanceOf Int IntRange NonEmptySimpleS
 
 use namespace::autoclean;
 
+use experimental qw/ signatures /;
+
 # RECOMMEND PREREQ: Ref::Util::XS
 # RECOMMEND PREREQ: Type::Tiny::XS
 
-our $VERSION = 'v0.7.1';
+our $VERSION = 'v0.8.0';
 
 
 has host => (
@@ -71,8 +73,7 @@ has max_buffer_size => (
 has _socket => (
     is      => 'lazy',
     isa     => InstanceOf ['IO::Socket::INET'],
-    builder => sub {
-        my ($self) = shift;
+    builder => sub($self) {
         my $sock = IO::Socket::INET->new(
             PeerAddr => $self->host,
             PeerPort => $self->port,
@@ -155,19 +156,16 @@ BEGIN {
 
 }
 
-sub increment {
-    my ( $self, $metric, $opts ) = @_;
+sub increment( $self, $metric, $opts = undef ) {
     $self->counter( $metric, 1, $opts );
 }
 
-sub decrement {
-    my ( $self, $metric, $opts ) = @_;
+sub decrement( $self, $metric, $opts = undef ) {
     $self->counter( $metric, -1, $opts );
 }
 
 
-sub record_metric {
-    my ( $self, $suffix, $metric, $value ) = @_;
+sub record_metric( $self, $suffix, $metric, $value, $ ) {
 
     my $data = $self->prefix . $metric . ':' . $value . $suffix . "\n";
 
@@ -186,9 +184,7 @@ sub record_metric {
 }
 
 
-sub flush {
-    my ($self) = @_;
-
+sub flush($self) {
     my $index = refaddr $self;
     if ( $Buffers{$index} ne '' ) {
         send( $self->_socket, $Buffers{$index}, 0 );
@@ -196,14 +192,11 @@ sub flush {
     }
 }
 
-sub BUILD {
-    my ($self) = @_;
-
+sub BUILD($self, $) {
     $Buffers{ refaddr $self } = '';
 }
 
-sub DEMOLISH {
-    my ( $self, $is_global ) = @_;
+sub DEMOLISH( $self, $is_global ) {
 
     return if $is_global;
 
@@ -227,7 +220,7 @@ Net::Statsd::Lite - A lightweight StatsD client that supports multimetric packet
 
 =head1 VERSION
 
-version v0.7.1
+version v0.8.0
 
 =head1 SYNOPSIS
 
@@ -421,7 +414,7 @@ This is an internal method for sending the data to the server.
 
   $stats->record_metric( $suffix, $metric, $value, $opts );
 
-This was renamed and documented in v0.5.0 to to simplify subclassing
+This was renamed and documented in v0.5.0 to simplify subclassing
 that supports extensions to statsd, such as tagging.
 
 See the discussion of tagging extensions below.
@@ -460,13 +453,9 @@ tagging can be added using something like
 
 =head1 SUPPORT FOR OLDER PERL VERSIONS
 
-Since v0.7.0, the this module requires Perl v5.14 or later.
+Since v0.8.0, the this module requires Perl v5.20 or later.
 
 Future releases may only support Perl versions released in the last ten years.
-
-If you need this module on Perl v5.10, please use one of the v0.6.x
-versions of this module.  Significant bug or security fixes may be
-backported to those versions.
 
 =head1 SEE ALSO
 
@@ -515,7 +504,7 @@ Toby Inkster <tobyink@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2018-2023 by Robert Rothenberg.
+This software is Copyright (c) 2018-2024 by Robert Rothenberg.
 
 This is free software, licensed under:
 

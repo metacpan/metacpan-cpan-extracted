@@ -6,9 +6,9 @@ use Duadua::Util;
 sub try {
     my ($class, $d) = @_;
 
-    return if index($d->ua, 'Hatena') == -1;
+    return if !$d->_contain('Hatena');
 
-    if ( index($d->ua, 'Hatena Antenna/') > -1 ) {
+    if ( $d->_contain('Hatena Antenna/') ) {
         my $h = {
             name   => 'Hatena Antenna',
             is_bot => 1,
@@ -21,7 +21,7 @@ sub try {
 
         return $h;
     }
-    elsif ( index($d->ua, 'Hatena Pagetitle Agent/') > -1 ) {
+    elsif ( $d->_contain('Hatena Pagetitle Agent/') ) {
         my $h = {
             name   => 'Hatena Pagetitle Agent',
             is_bot => 1,
@@ -34,7 +34,7 @@ sub try {
 
         return $h;
     }
-    elsif ( index($d->ua, 'Hatena Star UserAgent/') > -1 ) {
+    elsif ( $d->_contain('Hatena Star UserAgent/') ) {
         my $h = {
             name   => 'Hatena Star UserAgent',
             is_bot => 1,
@@ -47,7 +47,7 @@ sub try {
 
         return $h;
     }
-    elsif ( index($d->ua, 'Hatena-Favicon/') > -1 ) {
+    elsif ( $d->_contain('Hatena-Favicon/') ) {
         my $h = {
             name   => 'Hatena-Favicon',
             is_bot => 1,
@@ -60,7 +60,7 @@ sub try {
 
         return $h;
     }
-    elsif ( index($d->ua, 'Hatena::') > -1 && $d->ua =~ m!^(Hatena::[a-zA-Z:]+)/!) {
+    elsif ( $d->_contain('Hatena::') && $d->ua =~ m!^(Hatena::[a-zA-Z:]+)/!) {
         my $h = {
             name   => $1,
             is_bot => 1,
@@ -73,7 +73,7 @@ sub try {
 
         return $h;
     }
-    elsif ( index($d->ua, 'HatenaBookmark/') > -1 ) {
+    elsif ( $d->_contain('HatenaBookmark/') ) {
         my $h = {
             name   => "HatenaBookmark",
             is_bot => 1,

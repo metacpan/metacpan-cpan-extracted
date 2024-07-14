@@ -11,7 +11,7 @@ no if "$]" >= 5.033006, feature => 'bareword_filehandles';
 use utf8;
 use open ':std', ':encoding(UTF-8)'; # force stdin, stdout, stderr into utf8
 
-use JSON::Schema::Modern::Utilities 'jsonp';
+use JSON::Schema::Modern::Utilities qw(jsonp get_type);
 use Test::Warnings 0.033 qw(:no_end_test allow_patterns);
 
 use lib 't/lib';
@@ -51,7 +51,7 @@ paths:
 YAML
 
   cmp_result(
-    (my $result = $openapi->validate_request(request('GET', 'http://example.com/foo/bar'), { path_template => '/foo/baz', path_captures => {} }))->TO_JSON,
+    $openapi->validate_request(request('GET', 'http://example.com/foo/bar'), { path_template => '/foo/baz', path_captures => {} })->TO_JSON,
     {
       valid => false,
       errors => [
@@ -67,7 +67,7 @@ YAML
   );
 
   cmp_result(
-    ($result = $openapi->validate_request(request('GET', 'http://example.com/foo'), { path_template => '/foo', path_captures => {} }))->TO_JSON,
+    $openapi->validate_request(request('GET', 'http://example.com/foo'), { path_template => '/foo', path_captures => {} })->TO_JSON,
     {
       valid => false,
       errors => [
@@ -98,7 +98,7 @@ paths:
 YAML
 
   cmp_result(
-    ($result = $openapi->validate_request(request('GET', 'http://example.com/foo/bar'), { path_template => '/foo/{foo_id}', path_captures => { foo_id => 'bar' } }))->TO_JSON,
+    $openapi->validate_request(request('GET', 'http://example.com/foo/bar'), { path_template => '/foo/{foo_id}', path_captures => { foo_id => 'bar' } })->TO_JSON,
     {
       valid => false,
       errors => [
@@ -135,8 +135,8 @@ paths:
 YAML
 
   cmp_result(
-    ($result = $openapi->validate_request(request('GET', 'http://example.com/foo/corrupt_json'),
-      { path_template => '/foo/{foo_id}', path_captures => { foo_id => 'corrupt_json' } }))->TO_JSON,
+    $openapi->validate_request(request('GET', 'http://example.com/foo/corrupt_json'),
+      { path_template => '/foo/{foo_id}', path_captures => { foo_id => 'corrupt_json' } })->TO_JSON,
     {
       valid => false,
       errors => [
@@ -152,8 +152,8 @@ YAML
   );
 
   cmp_result(
-    ($result = $openapi->validate_request(request('GET', 'http://example.com/foo/{}', [ Bar => 1 ]),
-      { path_template => '/foo/{foo_id}', path_captures => { foo_id => '{}' } }))->TO_JSON,
+    $openapi->validate_request(request('GET', 'http://example.com/foo/{}', [ Bar => 1 ]),
+      { path_template => '/foo/{foo_id}', path_captures => { foo_id => '{}' } })->TO_JSON,
     { valid => true },
     'valid encoded content is always valid when there is no schema, and unknown media types are okay',
   );
@@ -177,8 +177,8 @@ paths:
 YAML
 
   cmp_result(
-    ($result = $openapi->validate_request(request('GET', 'http://example.com/foo/corrupt_json'),
-      { path_template => '/foo/{foo_id}', path_captures => { foo_id => 'corrupt_json' } }))->TO_JSON,
+    $openapi->validate_request(request('GET', 'http://example.com/foo/corrupt_json'),
+      { path_template => '/foo/{foo_id}', path_captures => { foo_id => 'corrupt_json' } })->TO_JSON,
     {
       valid => false,
       errors => [
@@ -194,8 +194,8 @@ YAML
   );
 
   cmp_result(
-    ($result = $openapi->validate_request(request('GET', 'http://example.com/foo/{"hello":"there"}'),
-      { path_template => '/foo/{foo_id}', path_captures => { foo_id => '{"hello":"there"}'}}))->TO_JSON,
+    $openapi->validate_request(request('GET', 'http://example.com/foo/{"hello":"there"}'),
+      { path_template => '/foo/{foo_id}', path_captures => { foo_id => '{"hello":"there"}'}})->TO_JSON,
     {
       valid => false,
       errors => [
@@ -243,8 +243,8 @@ paths:
 YAML
 
   cmp_result(
-    ($result = $openapi->validate_request(request('GET', 'http://example.com/foo/foo/bar/bar'),
-      { path_template => '/foo/{foo_id}/bar/{bar_id}', path_captures => { foo_id => 'foo', bar_id => 'bar' } }))->TO_JSON,
+    $openapi->validate_request(request('GET', 'http://example.com/foo/foo/bar/bar'),
+      { path_template => '/foo/{foo_id}/bar/{bar_id}', path_captures => { foo_id => 'foo', bar_id => 'bar' } })->TO_JSON,
     {
       valid => false,
       errors => [
@@ -269,7 +269,7 @@ YAML
   $openapi = OpenAPI::Modern->new(
     openapi_uri => '/api',
     openapi_schema => do {
-      YAML::PP->new( boolean => 'JSON::PP' )->load_string(<<YAML);
+      YAML::PP->new(boolean => 'JSON::PP')->load_string(<<YAML);
 $openapi_preamble
 paths:
   /foo/{foo_id}:
@@ -279,8 +279,8 @@ YAML
   );
 
   cmp_result(
-    ($result = $openapi->validate_request(request('GET', 'http://example.com/foo/foo'),
-      { path_template => '/foo/{foo_id}', path_captures => { foo_id => 'foo' } }))->TO_JSON,
+    $openapi->validate_request(request('GET', 'http://example.com/foo/foo'),
+      { path_template => '/foo/{foo_id}', path_captures => { foo_id => 'foo' } })->TO_JSON,
     {
       valid => false,
       errors => [
@@ -297,7 +297,6 @@ YAML
 };
 
 subtest 'validation errors in requests' => sub {
-  my $request = request('POST', 'http://example.com/foo');
   my $openapi = OpenAPI::Modern->new(
     openapi_uri => '/api',
     openapi_schema => $yamlpp->load_string(<<YAML));
@@ -307,8 +306,9 @@ paths:
     post: {}
 YAML
 
+  my $request = request('POST', 'http://example.com/foo');
   cmp_result(
-    (my $result = $openapi->validate_request($request, { path_template => '/foo', path_captures => {} }))->TO_JSON,
+    $openapi->validate_request($request, { path_template => '/foo', path_captures => {} })->TO_JSON,
     { valid => true },
     'operation can be empty',
   );
@@ -325,7 +325,7 @@ paths:
 YAML
 
   cmp_result(
-    ($result = $openapi->validate_request($request, { path_template => '/foo', path_captures => {} }))->TO_JSON,
+    $openapi->validate_request($request, { path_template => '/foo', path_captures => {} })->TO_JSON,
     {
       valid => false,
       errors => [
@@ -353,7 +353,7 @@ paths:
 YAML
 
   cmp_result(
-    ($result = $openapi->validate_request($request, { path_template => '/foo', path_captures => {} }))->TO_JSON,
+    $openapi->validate_request($request, { path_template => '/foo', path_captures => {} })->TO_JSON,
     {
       valid => false,
       errors => [
@@ -385,7 +385,7 @@ paths:
 YAML
 
   cmp_result(
-    ($result = $openapi->validate_request($request, { path_template => '/foo', path_captures => {} }))->TO_JSON,
+    $openapi->validate_request($request, { path_template => '/foo', path_captures => {} })->TO_JSON,
     {
       valid => false,
       errors => [
@@ -417,7 +417,7 @@ paths:
 YAML
 
   cmp_result(
-    ($result = $openapi->validate_request($request, { path_template => '/foo', path_captures => {} }))->TO_JSON,
+    $openapi->validate_request($request, { path_template => '/foo', path_captures => {} })->TO_JSON,
     {
       valid => false,
       errors => [
@@ -505,7 +505,7 @@ YAML
   # note that bar_id is not listed as a path parameter
 
   cmp_result(
-    ($result = $openapi->validate_request($request, { path_template => '/foo', path_captures => {} }))->TO_JSON,
+    $openapi->validate_request($request, { path_template => '/foo', path_captures => {} })->TO_JSON,
     {
       valid => false,
       errors => [
@@ -534,7 +534,7 @@ YAML
 
   $request = request('POST', 'http://example.com/foo?alpha=1&gamma=foo&delta=bar', [ Alpha => 1, Beta => 1 ]);
   cmp_result(
-    ($result = $openapi->validate_request($request, { path_template => '/foo', path_captures => {} }))->TO_JSON,
+    $openapi->validate_request($request, { path_template => '/foo', path_captures => {} })->TO_JSON,
     {
       valid => false,
       errors => [
@@ -552,7 +552,7 @@ YAML
   $openapi->add_media_type('unknown/*' => sub ($value) { $value });
 
   cmp_result(
-    ($result = $openapi->validate_request($request, { path_template => '/foo', path_captures => {} }))->TO_JSON,
+    $openapi->validate_request($request, { path_template => '/foo', path_captures => {} })->TO_JSON,
     {
       valid => false,
       errors => [
@@ -570,7 +570,7 @@ YAML
   $request = request('POST', 'http://example.com/foo', [ Alpha => 1, Beta => 1 ]);
   query_params($request, [alpha => 1, epsilon => '{"foo":42}']);
   cmp_result(
-    ($result = $openapi->validate_request($request, { path_template => '/foo', path_captures => {} }))->TO_JSON,
+    $openapi->validate_request($request, { path_template => '/foo', path_captures => {} })->TO_JSON,
     {
       valid => false,
       errors => [
@@ -589,7 +589,7 @@ YAML
 
   $request = request('POST', 'http://example.com/foo?alpha=1&zeta=binary', [ Alpha => 1, Beta => 1 ]);
   cmp_result(
-    ($result = $openapi->validate_request($request, { path_template => '/foo', path_captures => {} }))->TO_JSON,
+    $openapi->validate_request($request, { path_template => '/foo', path_captures => {} })->TO_JSON,
     {
       valid => false,
       errors => [
@@ -607,7 +607,7 @@ YAML
   $request = request('POST', 'http://example.com/foo?alpha=hello&beta=3.1415',
     [ 'alpha' => 'header value', Beta => 1 ]);    # exactly matches query parameter
   cmp_result(
-    ($result = $openapi->validate_request($request, { path_template => '/foo', path_captures => {} }))->TO_JSON,
+    $openapi->validate_request($request, { path_template => '/foo', path_captures => {} })->TO_JSON,
     {
       valid => false,
       errors => [
@@ -662,7 +662,7 @@ YAML
   $request = request('GET', 'http://example.com/foo', [ 'Header1' => '{corrupt json' ]); # } for vim
   query_params($request, [query1 => '{corrupt json']); # } for vim
   cmp_result(
-    ($result = $openapi->validate_request($request, { path_template => '/foo', path_captures => {} }))->TO_JSON,
+    $openapi->validate_request($request, { path_template => '/foo', path_captures => {} })->TO_JSON,
     {
       valid => false,
       errors => [
@@ -686,7 +686,7 @@ YAML
   $request = request('GET', 'http://example.com/foo', [ 'Header1' => '{"hello":"there"}' ]);
   query_params($request, [query1 => '{"hello":"there"}']);
   cmp_result(
-    ($result = $openapi->validate_request($request, { path_template => '/foo', path_captures => {} }))->TO_JSON,
+    $openapi->validate_request($request, { path_template => '/foo', path_captures => {} })->TO_JSON,
     {
       valid => false,
       errors => [
@@ -751,7 +751,7 @@ YAML
 
   $request = request('GET', 'http://example.com/foo?alpha=hihihi&beta=hihihi', [ Alpha => 'hihihi', Beta => 'hihihi' ]);
   cmp_result(
-    ($result = $openapi->validate_request($request, { path_template => '/foo', path_captures => {} }))->TO_JSON,
+    $openapi->validate_request($request, { path_template => '/foo', path_captures => {} })->TO_JSON,
     {
       valid => false,
       errors => [
@@ -797,7 +797,7 @@ paths:
 YAML
 
   cmp_result(
-    ($result = $openapi->validate_request($request, { path_template => '/foo', path_captures => {} }))->TO_JSON,
+    $openapi->validate_request($request, { path_template => '/foo', path_captures => {} })->TO_JSON,
     {
       valid => false,
       errors => [
@@ -854,7 +854,7 @@ YAML
   # note: no content!
   $request = request('POST', 'http://example.com/foo');
   cmp_result(
-    ($result = $openapi->validate_request($request, { path_template => '/foo', path_captures => {} }))->TO_JSON,
+    $openapi->validate_request($request, { path_template => '/foo', path_captures => {} })->TO_JSON,
     {
       valid => false,
       errors => [
@@ -877,7 +877,7 @@ YAML
     remove_header($request, 'Content-Length');
 
     cmp_result(
-      ($result = $openapi->validate_request($request, { path_template => '/foo', path_captures => {} }))->TO_JSON,
+      $openapi->validate_request($request, { path_template => '/foo', path_captures => {} })->TO_JSON,
       {
         valid => false,
         errors => [
@@ -895,7 +895,7 @@ YAML
 
   $request = request('POST', 'http://example.com/foo', [ 'Content-Type' => 'text/bloop' ], 'plain text');
   cmp_result(
-    ($result = $openapi->validate_request($request, { path_template => '/foo', path_captures => {} }))->TO_JSON,
+    $openapi->validate_request($request, { path_template => '/foo', path_captures => {} })->TO_JSON,
     {
       valid => false,
       errors => [
@@ -912,7 +912,7 @@ YAML
 
   $request = request('POST', 'http://example.com/foo', [ 'Content-Type' => 'text/plain; charset=us-ascii' ], 'ascii plain text');
   cmp_result(
-    ($result = $openapi->validate_request($request, { path_template => '/foo', path_captures => {} }))->TO_JSON,
+    $openapi->validate_request($request, { path_template => '/foo', path_captures => {} })->TO_JSON,
     {
       valid => false,
       errors => [
@@ -929,7 +929,7 @@ YAML
 
   $request = request('POST', 'http://example.com/foo', [ 'Content-Type' => 'blOOp/HTML' ], 'html text (bloop style)');
   cmp_result(
-    ($result = $openapi->validate_request($request, { path_template => '/foo', path_captures => {} }))->TO_JSON,
+    $openapi->validate_request($request, { path_template => '/foo', path_captures => {} })->TO_JSON,
     {
       valid => false,
       errors => [
@@ -949,7 +949,7 @@ YAML
   $openapi->add_media_type('bloop/html' => sub ($content_ref) { $content_ref });
 
   cmp_result(
-    ($result = $openapi->validate_request($request, { path_template => '/foo', path_captures => {} }))->TO_JSON,
+    $openapi->validate_request($request, { path_template => '/foo', path_captures => {} })->TO_JSON,
     {
       valid => false,
       errors => [
@@ -969,7 +969,7 @@ YAML
 
   $request = request('POST', 'http://example.com/foo', [ 'Content-Type' => 'unknown/encodingtype' ], 'binary');
   cmp_result(
-    ($result = $openapi->validate_request($request, { path_template => '/foo', path_captures => {} }))->TO_JSON,
+    $openapi->validate_request($request, { path_template => '/foo', path_captures => {} })->TO_JSON,
     {
       valid => false,
       errors => [
@@ -990,7 +990,7 @@ YAML
   $openapi->add_media_type('image/jpeg' => sub ($value) { $value });
   $request = request('POST', 'http://example.com/foo', [ 'Content-Type' => 'image/jpeg' ], 'binary');
   cmp_result(
-    ($result = $openapi->validate_request($request, { path_template => '/foo', path_captures => {} }))->TO_JSON,
+    $openapi->validate_request($request, { path_template => '/foo', path_captures => {} })->TO_JSON,
     {
       valid => false,
       errors => [
@@ -1008,7 +1008,7 @@ YAML
   $request = request('POST', 'http://example.com/foo', [ 'Content-Type' => 'text/plain; charset=UTF-8' ],
     chr(0xe9).'clair"}');
   cmp_result(
-    ($result = $openapi->validate_request($request, { path_template => '/foo', path_captures => {} }))->TO_JSON,
+    $openapi->validate_request($request, { path_template => '/foo', path_captures => {} })->TO_JSON,
     {
       valid => false,
       errors => [
@@ -1026,7 +1026,7 @@ YAML
   $request = request('POST', 'http://example.com/foo', [ 'Content-Type' => 'text/plain; charset=ISO-8859-1' ],
     chr(0xe9).'clair');
   cmp_result(
-    ($result = $openapi->validate_request($request, { path_template => '/foo', path_captures => {} }))->TO_JSON,
+    $openapi->validate_request($request, { path_template => '/foo', path_captures => {} })->TO_JSON,
     { valid => true },
     'latin1 content can be successfully decoded',
   );
@@ -1034,7 +1034,7 @@ YAML
   $request = request('POST', 'http://example.com/foo', [ 'Content-Type' => 'text/plain; charset=UTF-8' ],
     chr(0xe9).'clair');
   cmp_result(
-    ($result = $openapi->validate_request($request, { path_template => '/foo', path_captures => {} }))->TO_JSON,
+    $openapi->validate_request($request, { path_template => '/foo', path_captures => {} })->TO_JSON,
     {
       valid => false,
       errors => [
@@ -1052,7 +1052,7 @@ YAML
   $request = request('POST', 'http://example.com/foo', [ 'Content-Type' => 'application/json; charset=UTF-8' ],
     '{"alpha": "123", "beta": "'.chr(0xe9).'clair"}');
   cmp_result(
-    ($result = $openapi->validate_request($request, { path_template => '/foo', path_captures => {} }))->TO_JSON,
+    $openapi->validate_request($request, { path_template => '/foo', path_captures => {} })->TO_JSON,
     {
       valid => false,
       errors => [
@@ -1070,7 +1070,7 @@ YAML
   $request = request('POST', 'http://example.com/foo', [ 'Content-Type' => 'application/json; charset=UTF-8' ],
     '{corrupt json'); # } to mollify vim
   cmp_result(
-    ($result = $openapi->validate_request($request, { path_template => '/foo', path_captures => {} }))->TO_JSON,
+    $openapi->validate_request($request, { path_template => '/foo', path_captures => {} })->TO_JSON,
     {
       valid => false,
       errors => [
@@ -1088,7 +1088,7 @@ YAML
   $request = request('POST', 'http://example.com/foo', [ 'Content-Type' => 'application/json' ],
     '{"alpha": "123", "beta": "'."\x{c3}\x{a9}".'clair"}');
   cmp_result(
-    ($result = $openapi->validate_request($request, { path_template => '/foo', path_captures => {} }))->TO_JSON,
+    $openapi->validate_request($request, { path_template => '/foo', path_captures => {} })->TO_JSON,
     { valid => true },
     'application/json is utf-8 encoded',
   );
@@ -1096,7 +1096,7 @@ YAML
   $request = request('POST', 'http://example.com/foo', [ 'Content-Type' => 'application/json; charset=UTF-8' ],
     '{"alpha": "123", "beta": "'."\x{c3}\x{a9}".'clair"}');
   cmp_result(
-    ($result = $openapi->validate_request($request, { path_template => '/foo', path_captures => {} }))->TO_JSON,
+    $openapi->validate_request($request, { path_template => '/foo', path_captures => {} })->TO_JSON,
     { valid => true },
     'charset is ignored for application/json',
   );
@@ -1104,7 +1104,7 @@ YAML
   $request = request('POST', 'http://example.com/foo', [ 'Content-Type' => 'application/json; charset=UTF-8' ],
     '{"alpha": "foo", "gamma": "o.o"}');
   cmp_result(
-    ($result = $openapi->validate_request($request, { path_template => '/foo', path_captures => {} }))->TO_JSON,
+    $openapi->validate_request($request, { path_template => '/foo', path_captures => {} })->TO_JSON,
     {
       valid => false,
       errors => [
@@ -1136,7 +1136,7 @@ YAML
   $request = request('POST', 'http://example.com/foo', [ 'Content-Type' => 'application/json; charset=UTF-8' ],
     '{"alpha": "123", "gamma": "'.$disapprove.'"}');
   cmp_result(
-    ($result = $openapi->validate_request($request, { path_template => '/foo', path_captures => {} }))->TO_JSON,
+    $openapi->validate_request($request, { path_template => '/foo', path_captures => {} })->TO_JSON,
     { valid => true },
     'decoded content matches the schema',
   );
@@ -1158,7 +1158,7 @@ paths:
 YAML
   $request = request('POST', 'http://example.com/foo', [ 'Content-Type' => 'unsupported/unsupported' ], '!!!');
   cmp_result(
-    ($result = $openapi->validate_request($request, { path_template => '/foo', path_captures => {} }))->TO_JSON,
+    $openapi->validate_request($request, { path_template => '/foo', path_captures => {} })->TO_JSON,
     {
       valid => false,
       errors => [
@@ -1175,7 +1175,7 @@ YAML
 
   $request = request('POST', 'http://example.com/foo', [ 'Content-Type' => 'a/b' ], '0');
   cmp_result(
-    ($result = $openapi->validate_request($request, { path_template => '/foo', path_captures => {} }))->TO_JSON,
+    $openapi->validate_request($request, { path_template => '/foo', path_captures => {} })->TO_JSON,
     {
       valid => false,
       errors => [
@@ -1207,7 +1207,7 @@ YAML
 
   $request = request('POST', 'http://example.com/foo', [ 'Content-Type' => 'application/json' ], 'corrupt_json');
   cmp_result(
-    ($result = $openapi->validate_request($request, { path_template => '/foo', path_captures => {} }))->TO_JSON,
+    $openapi->validate_request($request, { path_template => '/foo', path_captures => {} })->TO_JSON,
     {
       valid => false,
       errors => [
@@ -1224,13 +1224,13 @@ YAML
 
   $request = request('POST', 'http://example.com/foo', [ 'Content-Type' => 'application/json' ], '{}');
   cmp_result(
-    ($result = $openapi->validate_request($request, { path_template => '/foo', path_captures => {} }))->TO_JSON,
+    $openapi->validate_request($request, { path_template => '/foo', path_captures => {} })->TO_JSON,
     { valid => true },
     'valid encoded content is always valid when there is no schema',
   );
 
   cmp_result(
-    ($result = $openapi->validate_request(request('POST', 'http://example.com/foo', [ 'Content-Type' => 'electric/boogaloo' ], 'blah'), { path_template => '/foo', path_captures => {} }))->TO_JSON,
+    $openapi->validate_request(request('POST', 'http://example.com/foo', [ 'Content-Type' => 'electric/boogaloo' ], 'blah'), { path_template => '/foo', path_captures => {} })->TO_JSON,
     { valid => true },
     '..even when the media-type is unknown',
   );
@@ -1258,7 +1258,7 @@ paths:
 YAML
 
   cmp_result(
-    (my $result = $openapi->validate_request($request, { path_template => '/foo', path_captures => {} }))->TO_JSON,
+    $openapi->validate_request($request, { path_template => '/foo', path_captures => {} })->TO_JSON,
     {
       valid => false,
       errors => [
@@ -1293,7 +1293,7 @@ paths:
 YAML
 
   cmp_result(
-    ($result = $openapi->validate_request($request, { path_template => '/foo', path_captures => {} }))->TO_JSON,
+    $openapi->validate_request($request, { path_template => '/foo', path_captures => {} })->TO_JSON,
     {
       valid => false,
       errors => [
@@ -1327,7 +1327,7 @@ YAML
   # bypass auto-initialization of Content-Length, Content-Type
   $request = request('POST', 'http://example.com/foo', [ 'Content-Length' => 1 ], '!');
   cmp_result(
-    ($result = $openapi->validate_request($request, { path_template => '/foo', path_captures => {} }))->TO_JSON,
+    $openapi->validate_request($request, { path_template => '/foo', path_captures => {} })->TO_JSON,
     {
       valid => false,
       errors => [
@@ -1345,7 +1345,7 @@ YAML
   # bypass auto-initialization of Content-Length, Content-Type; leave Content-Length empty
   $request = request('POST', 'http://example.com/foo', [ 'Content-Type' => 'text/plain' ], '!');
   cmp_result(
-    ($result = $openapi->validate_request($request, { path_template => '/foo', path_captures => {} }))->TO_JSON,
+    $openapi->validate_request($request, { path_template => '/foo', path_captures => {} })->TO_JSON,
     {
       valid => false,
       errors => [
@@ -1363,7 +1363,7 @@ YAML
 
   $request = request('POST', 'http://example.com/foo', [ 'Content-Type' => 'text/plain' ]);
   cmp_result(
-    ($result = $openapi->validate_request($request, { path_template => '/foo', path_captures => {} }))->TO_JSON,
+    $openapi->validate_request($request, { path_template => '/foo', path_captures => {} })->TO_JSON,
     { valid => true },
     'request body is missing but not required',
   );
@@ -1381,6 +1381,7 @@ paths:
       in: path
       required: true
       schema:
+        maximum: 10
         pattern: ^[a-z]\$
     post:
       parameters:
@@ -1388,33 +1389,48 @@ paths:
         in: query
         required: false
         schema:
+          maximum: 10
           pattern: ^[a-z]\$
       - name: Foo-Bar
         in: header
         required: false
         schema:
+          maximum: 10
           pattern: ^[a-z]\$
       requestBody:
         required: true
         content:
           text/plain:
             schema:
+              maximum: 10
               pattern: ^[a-z]\$
 YAML
 
   my $request = request('POST', 'http://example.com/foo/123?bar=456',
     [ 'Foo-Bar' => 789, 'Content-Type' => 'text/plain' ], 666);
   cmp_result(
-    (my $result = $openapi->validate_request($request,
-      { path_template => '/foo/{foo_id}', path_captures => { foo_id => 123 } }))->TO_JSON,
-    {
+    $openapi->validate_request($request,
+      my $options = { path_template => '/foo/{foo_id}', path_captures => { foo_id => 123 } })->TO_JSON,
+    my $expected = {
       valid => false,
       errors => [
+        {
+          instanceLocation => '/request/uri/query/bar',
+          keywordLocation => jsonp(qw(/paths /foo/{foo_id} post parameters 0 schema maximum)),
+          absoluteKeywordLocation => $doc_uri->clone->fragment(jsonp(qw(/paths /foo/{foo_id} post parameters 0 schema maximum)))->to_string,
+          error => 'value is larger than 10',
+        },
         {
           instanceLocation => '/request/uri/query/bar',
           keywordLocation => jsonp(qw(/paths /foo/{foo_id} post parameters 0 schema pattern)),
           absoluteKeywordLocation => $doc_uri->clone->fragment(jsonp(qw(/paths /foo/{foo_id} post parameters 0 schema pattern)))->to_string,
           error => 'pattern does not match',
+        },
+        {
+          instanceLocation => '/request/header/Foo-Bar',
+          keywordLocation => jsonp(qw(/paths /foo/{foo_id} post parameters 1 schema maximum)),
+          absoluteKeywordLocation => $doc_uri->clone->fragment(jsonp(qw(/paths /foo/{foo_id} post parameters 1 schema maximum)))->to_string,
+          error => 'value is larger than 10',
         },
         {
           instanceLocation => '/request/header/Foo-Bar',
@@ -1424,10 +1440,18 @@ YAML
         },
         {
           instanceLocation => '/request/uri/path/foo_id',
+          keywordLocation => jsonp(qw(/paths /foo/{foo_id} parameters 0 schema maximum)),
+          absoluteKeywordLocation => $doc_uri->clone->fragment(jsonp(qw(/paths /foo/{foo_id} parameters 0 schema maximum)))->to_string,
+          error => 'value is larger than 10',
+        },
+        # at least for now, passed-in numbers are validated as numbers...
+        {
+          instanceLocation => '/request/uri/path/foo_id',
           keywordLocation => jsonp(qw(/paths /foo/{foo_id} parameters 0 schema pattern)),
           absoluteKeywordLocation => $doc_uri->clone->fragment(jsonp(qw(/paths /foo/{foo_id} parameters 0 schema pattern)))->to_string,
           error => 'pattern does not match',
         },
+        # maximum is ignored -- types are not loose in bodies
         {
           instanceLocation => '/request/body',
           keywordLocation => jsonp(qw(/paths /foo/{foo_id} post requestBody content text/plain schema pattern)),
@@ -1436,7 +1460,118 @@ YAML
         },
       ],
     },
-    'numeric values are treated as strings by default',
+    'numeric values are treated as both strings and numbers, when no explicit type is requested',
+  );
+  is(get_type($options->{path_captures}{foo_id}), 'integer', 'passed-in path value is preserved as a number');
+
+  cmp_result(
+    $openapi->validate_request($request, $options = {})->TO_JSON,
+    $expected,
+    'parsed numeric values are treated as both strings and numbers, when no explicit type is requested',
+  );
+   is(get_type($options->{path_captures}{foo_id}), 'string', 'captured path value is parsed as a string');
+
+
+  $openapi = OpenAPI::Modern->new(
+    openapi_uri => '/api',
+    openapi_schema => $yamlpp->load_string(<<YAML));
+$openapi_preamble
+paths:
+  /foo/{foo_id}:
+    parameters:
+    - name: foo_id
+      in: path
+      required: true
+      schema:
+        type: string
+    post:
+      parameters:
+      - name: bar
+        in: query
+        required: false
+        schema:
+          type: string
+      - name: Foo-Bar
+        in: header
+        required: false
+        schema:
+          type: string
+      requestBody:
+        required: true
+        content:
+          text/plain:
+            schema:
+              type: string
+YAML
+
+  $request = request('POST', 'http://example.com/foo/123?bar=456',
+    [ 'Foo-Bar' => 789, 'Content-Type' => 'text/plain' ], 666);
+  cmp_result(
+    $openapi->validate_request($request,
+      { path_template => '/foo/{foo_id}', path_captures => { foo_id => 123 } })->TO_JSON,
+    { valid => true },
+    'all parameter and body values are treated as strings',
+  );
+
+  cmp_result(
+    $openapi->validate_request($request)->TO_JSON,
+    { valid => true },
+    'all parameter and body values are parsed from the request as strings',
+  );
+
+  $openapi = OpenAPI::Modern->new(
+    openapi_uri => '/api',
+    openapi_schema => $yamlpp->load_string(<<YAML));
+$openapi_preamble
+paths:
+  /foo/{foo_id}:
+    parameters:
+    - name: foo_id
+      in: path
+      required: true
+      schema:
+        type: number
+    post:
+      parameters:
+      - name: bar
+        in: query
+        required: false
+        schema:
+          type: number
+      - name: Foo-Bar
+        in: header
+        required: false
+        schema:
+          type: number
+      requestBody:
+        required: true
+        content:
+          text/plain:
+            schema:
+              type: number
+YAML
+
+  cmp_result(
+    $openapi->validate_request($request,
+      { path_template => '/foo/{foo_id}', path_captures => { foo_id => 123 } })->TO_JSON,
+    $expected = {
+      valid => false,
+      errors => [
+        {
+          instanceLocation => '/request/body',
+          keywordLocation => jsonp(qw(/paths /foo/{foo_id} post requestBody content text/plain schema type)),
+          absoluteKeywordLocation => $doc_uri->clone->fragment(jsonp(qw(/paths /foo/{foo_id} post requestBody content text/plain schema type)))->to_string,
+          error => 'got string, not number',
+        },
+      ],
+    },
+    'numeric values are seen as numeric types when requested, but only in parameters and not bodies',
+  );
+
+  cmp_result(
+    $openapi->validate_request($request)->TO_JSON,
+    $expected,
+    'parsed numeric values are seen as numeric types when requested, but only in parameters and not bodies',
   );
 
 
@@ -1503,7 +1638,7 @@ YAML
   $request = request('POST', 'http://example.com/foo/11/bar/12?query_plain=13&query_encoded=14',
     [ 'Header-Plain' => 15, 'Header-Encoded' => 16, 'Content-Type' => 'text/plain' ], 17);
   cmp_result(
-    ($result = $openapi->validate_request($request, { path_template => '/foo/{path_plain}/bar/{path_encoded}', path_captures => { path_plain => 11, path_encoded => 12 } }))->TO_JSON,
+    $openapi->validate_request($request, { path_template => '/foo/{path_plain}/bar/{path_encoded}', path_captures => { path_plain => 11, path_encoded => 12 } })->TO_JSON,
     {
       valid => false,
       errors => [
@@ -1558,8 +1693,8 @@ YAML
   my $val = 20; my $str = sprintf("%s\n", $val);
   $request = request('POST', 'http://example.com/foo/20/bar/hi', [ 'Content-Type' => 'text/plain' ], $val);
   cmp_result(
-    ($result = $openapi->validate_request($request,
-      { path_template => '/foo/{path_plain}/bar/{path_encoded}', path_captures => { path_plain => $val, path_encoded => 'hi' } }))->TO_JSON,
+    $openapi->validate_request($request,
+      { path_template => '/foo/{path_plain}/bar/{path_encoded}', path_captures => { path_plain => $val, path_encoded => 'hi' } })->TO_JSON,
     {
       valid => false,
       errors => [
@@ -1663,14 +1798,14 @@ YAML
 
   my $request = request('GET', 'http://example.com/foo', [ SingleValue => '  mystring  ']);
   cmp_result(
-    (my $result = $openapi->validate_request($request, { path_template => '/foo', path_captures => {} }))->TO_JSON,
+    $openapi->validate_request($request, { path_template => '/foo', path_captures => {} })->TO_JSON,
     { valid => true },
     'a single header value has its leading and trailing whitespace stripped',
   );
 
   $request = request('GET', 'http://example.com/foo', [ MultipleValuesAsRawString => '  one , two  , three  ']);
   cmp_result(
-    ($result = $openapi->validate_request($request, { path_template => '/foo', path_captures => {} }))->TO_JSON,
+    $openapi->validate_request($request, { path_template => '/foo', path_captures => {} })->TO_JSON,
     { valid => true },
     'multiple values in a single header are validated as a string, with only leading and trailing whitespace stripped',
   );
@@ -1684,7 +1819,7 @@ YAML
   local $TODO = 'HTTP::Message::to_psgi fetches all headers as a single concatenated string'
     if $::TYPE eq 'plack' or $::TYPE eq 'catalyst';
   cmp_result(
-    ($result = $openapi->validate_request($request, { path_template => '/foo', path_captures => {} }))->TO_JSON,
+    $openapi->validate_request($request, { path_template => '/foo', path_captures => {} })->TO_JSON,
     { valid => true },
     'multiple headers on separate lines are validated as a string, with leading and trailing whitespace stripped',
   );
@@ -1692,7 +1827,7 @@ YAML
 
   $request = request('GET', 'http://example.com/foo', [ MultipleValuesAsArray => '  one, two, three  ']);
   cmp_result(
-    ($result = $openapi->validate_request($request, { path_template => '/foo', path_captures => {} }))->TO_JSON,
+    $openapi->validate_request($request, { path_template => '/foo', path_captures => {} })->TO_JSON,
     { valid => true },
     'headers can be parsed into an array in order to test multiple values without sorting',
   );
@@ -1703,7 +1838,7 @@ YAML
     MultipleValuesAsArray => ' three ',
   ]);
   cmp_result(
-    ($result = $openapi->validate_request($request, { path_template => '/foo', path_captures => {} }))->TO_JSON,
+    $openapi->validate_request($request, { path_template => '/foo', path_captures => {} })->TO_JSON,
     {
       valid => false,
       errors => [
@@ -1726,7 +1861,7 @@ YAML
       MultipleValuesAsObjectExplodeTrue => '  G=200 ',
     ]);
   cmp_result(
-    ($result = $openapi->validate_request($request, { path_template => '/foo', path_captures => {} }))->TO_JSON,
+    $openapi->validate_request($request, { path_template => '/foo', path_captures => {} })->TO_JSON,
     { valid => true },
     'headers can be parsed into an object, represented in two ways depending on explode value',
   );
@@ -1737,7 +1872,7 @@ YAML
       ArrayWithBrokenRef => 'hi',
     ]);
   cmp_result(
-    ($result = $openapi->validate_request($request, { path_template => '/foo', path_captures => {} }))->TO_JSON,
+    $openapi->validate_request($request, { path_template => '/foo', path_captures => {} })->TO_JSON,
     {
       valid => false,
       errors => [
@@ -1792,7 +1927,7 @@ YAML
 
   my $request = request('POST', 'http://example.com/foo');
   cmp_result(
-    (my $result = $openapi->validate_request($request, { path_template => '/foo', path_captures => {} }))->TO_JSON,
+    $openapi->validate_request($request, { path_template => '/foo', path_captures => {} })->TO_JSON,
     {
       valid => false,
       errors => [
@@ -1829,7 +1964,7 @@ YAML
 
   my $request = request('POST', 'http://example.com/foo', [ 'Content-Type' => 'application/json' ], '{"foo":1}');
   cmp_result(
-    (my $result = $openapi->validate_request($request))->TO_JSON,
+    $openapi->validate_request($request)->TO_JSON,
     {
       valid => false,
       errors => [
@@ -1890,13 +2025,13 @@ YAML
   my $request = request('POST', 'http://example.com/foo?a=1&b=2',
     [ 'Content-Type' => 'application/json' ], '{"c":1,"d":2}');
   cmp_result(
-    (my $result = $openapi->validate_request($request))->TO_JSON,
+    $openapi->validate_request($request)->TO_JSON,
     { valid => true },
     'readOnly values are still valid in a request',
   );
 
   cmp_result(
-    ($result = $openapi->validate_request(request('POST', 'http://example.com/foo', [ 'Content-Type' => 'text/plain' ], 'hi')))->TO_JSON,
+    $openapi->validate_request(request('POST', 'http://example.com/foo', [ 'Content-Type' => 'text/plain' ], 'hi'))->TO_JSON,
     { valid => true },
     'no errors when processing an empty body schema',
   );
@@ -1915,9 +2050,8 @@ paths:
     post: {}
 YAML
 
-  my $result;
   cmp_result(
-    ($result = $openapi->validate_request(request($_, 'http://example.com/foo', [], 'content')))->TO_JSON,
+    $openapi->validate_request(request($_, 'http://example.com/foo', [], 'content'))->TO_JSON,
     {
       valid => false,
       errors => [
@@ -1933,7 +2067,7 @@ YAML
   ) foreach qw(GET HEAD);
 
   cmp_result(
-    ($result = $openapi->validate_request(request('POST', 'http://example.com/foo', [], 'content')))->TO_JSON,
+    $openapi->validate_request(request('POST', 'http://example.com/foo', [], 'content'))->TO_JSON,
     { valid => true },
     'no errors from POST with body',
   );
@@ -1942,10 +2076,10 @@ SKIP: {
   # "Bad Content-Length: maybe client disconnect? (1 bytes remaining)"
   skip 'plack dies on this input', 3 if $::TYPE eq 'plack' or $::TYPE eq 'catalyst';
   cmp_result(
-    ($result = do {
+    do {
       my $x = allow_patterns(qr/^parse error when converting HTTP::Request/) if $::TYPE eq 'lwp';
       $openapi->validate_request(request($_, 'http://example.com/foo', [ 'Content-Length' => 1]));
-    })->TO_JSON,
+    }->TO_JSON,
     {
       valid => false,
       errors => [
@@ -1961,10 +2095,10 @@ SKIP: {
   ) foreach qw(GET HEAD);
 
   cmp_result(
-    ($result = do {
+    do {
       my $x = allow_patterns(qr/^parse error when converting HTTP::Request/) if $::TYPE eq 'lwp';
       $openapi->validate_request(request('POST', 'http://example.com/foo', [ 'Content-Length' => 1]));
-    })->TO_JSON,
+    }->TO_JSON,
     { valid => true },
     'no errors from POST with Content-Length',
   );
@@ -1998,8 +2132,8 @@ paths:
 YAML
 
   cmp_result(
-    (my $result = $openapi->validate_request(request('POST', 'http://example.com/foo/1?foo=1',
-          [ Foo => 1, 'Content-Type' => 'text/plain' ], 'hi')))->TO_JSON,
+    $openapi->validate_request(request('POST', 'http://example.com/foo/1?foo=1',
+          [ Foo => 1, 'Content-Type' => 'text/plain' ], 'hi'))->TO_JSON,
     {
       valid => false,
       errors => [

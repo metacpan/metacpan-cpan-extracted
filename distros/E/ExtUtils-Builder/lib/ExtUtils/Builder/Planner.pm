@@ -1,5 +1,5 @@
 package ExtUtils::Builder::Planner;
-$ExtUtils::Builder::Planner::VERSION = '0.006';
+$ExtUtils::Builder::Planner::VERSION = '0.007';
 use strict;
 use warnings;
 
@@ -79,8 +79,9 @@ sub add_delegate {
 }
 
 sub load_module {
-	my ($self, $plannable, %options) = @_;
+	my ($self, $plannable, $version, %options) = @_;
 	ExtUtils::Builder::Util::require_module($plannable);
+	$plannable->VERSION($version) if $version;
 	return $plannable->add_methods($self, %options);
 }
 
@@ -156,7 +157,7 @@ ExtUtils::Builder::Planner - An ExtUtils::Builder Plan builder
 
 =head1 VERSION
 
-version 0.006
+version 0.007
 
 =head1 SYNOPSIS
 

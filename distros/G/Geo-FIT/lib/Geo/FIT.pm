@@ -2,7 +2,7 @@ package Geo::FIT;
 use strict;
 use warnings;
 
-our $VERSION = '1.12';
+our $VERSION = '1.13';
 
 =encoding utf-8
 
@@ -395,19 +395,35 @@ my %named_type = (
         'spo2_data' => 269,
         'sleep_level' => 275,
         'jump' => 285,
+        'aad_accel_features' => 289,
         'beat_intervals' => 290,
         'respiration_rate' => 297,
+        'hsa_accelerometer_data' => 302,
+        'hsa_step_data' => 304,
+        'hsa_spo2_data' => 305,
+        'hsa_stress_data' => 306,
+        'hsa_respiration_data' => 307,
+        'hsa_heart_rate_data' => 308,
         'split' => 312,
         'split_summary' => 313,
+        'hsa_body_battery_data' => 314,
+        'hsa_event' => 315,
         'climb_pro' => 317,
         'tank_update' => 319,
         'tank_summary' => 323,
         'sleep_assessment' => 346,
         'hrv_status_summary' => 370,
         'hrv_value' => 371,
+        'raw_bbi' => 372,
         'device_aux_battery_info' => 375,
+        'hsa_gyroscope_data' => 376,
+        'chrono_shot_session' => 387,
+        'chrono_shot_data' => 388,
+        'hsa_configuration_data' => 389,
         'dive_apnea_alarm' => 393,
-        'mfg_range_min' => 0xFF00,
+        'skin_temp_overnight' => 398,
+        'hsa_wrist_temperature_data' => 409, # Message number for the HSA wrist temperature data message
+        'mfg_range_min' => 0xFF00, # 0xFF00 - 0xFFFE reserved for manufacturer specific messages
         'mfg_range_max' => 0xFFFE,
     },
 
@@ -805,15 +821,26 @@ my %named_type = (
         'jumpmaster' => 46,
         'boxing' => 47,
         'floor_climbing' => 48,
+        'baseball' => 49,
         'diving' => 53,
         'hiit' => 62,
         'racket' => 64,
         'wheelchair_push_walk' => 65,
         'wheelchair_push_run' => 66,
         'meditation' => 67,
+        'disc_golf' => 69,
+        'cricket' => 71,
+        'rugby' => 72,
+        'hockey' => 73,
+        'lacrosse' => 74,
+        'volleyball' => 75,
         'water_tubing' => 76,
         'wakesurfing' => 77,
-        'all' => 254,
+        'mixed_martial_arts' => 80,
+        'snorkeling' => 82,
+        'dance' => 83,
+        'jump_rope' => 84,
+        'all' => 254, # All is for goals only to include all sports.
     },
 
     'sport_bits_0' => +{
@@ -969,6 +996,10 @@ my %named_type = (
         'indoor_wheelchair_walk' => 86,
         'indoor_wheelchair_run' => 87,
         'indoor_hand_cycling' => 88,
+        'squash' => 94,
+        'badminton' => 95,
+        'racquetball' => 96,
+        'table_tennis' => 97,
         'fly_canopy' => 110,        # Flying
         'fly_paraglide' => 111,     # Flying
         'fly_paramotor' => 112,     # Flying
@@ -1527,6 +1558,8 @@ my %named_type = (
         'aero_sensor' => 325,
         'nike' => 326,
         'magicshine' => 327,
+        'ictrainer' => 328,
+        'absolute_cycling' => 329,
         'actigraphcorp' => 5759,
     },
 
@@ -1548,6 +1581,7 @@ my %named_type = (
         'fr225_single_byte_product_id' => 14, # fr225 model for HRM ANT+ messaging
         'gen3_bsm_single_byte_product_id' => 15, # gen3_bsm model for Bike Speed ANT+ messaging
         'gen3_bcm_single_byte_product_id' => 16, # gen3_bcm model for Bike Cadence ANT+ messaging
+        'hrm_fit_single_byte_product_id' => 22,
         'OHR' => 255, # Garmin Wearable Optical Heart Rate Sensor for ANT+ HR Profile Broadcasting
         'fr301_china' => 473,
         'fr301_japan' => 474,
@@ -1916,6 +1950,8 @@ my %named_type = (
         'tactix7' => 4135,
         'instinct_crossover' => 4155,
         'edge_explore2' => 4169,
+        'descent_mk3' => 4222,
+        'descent_mk3i' => 4223,
         'approach_s70' => 4233,
         'fr265_large' => 4257,
         'fr265_small' => 4258,
@@ -1942,9 +1978,13 @@ my %named_type = (
         'fenix7s_pro_solar' => 4374,
         'fenix7_pro_solar' => 4375,
         'fenix7x_pro_solar' => 4376,
+        'lily2' => 4380,
         'instinct_2x' => 4394,
         'vivoactive5' => 4426,
+        'fr165' => 4432,
+        'fr165_music' => 4433,
         'descent_t2' => 4442,
+        'hrm_fit' => 4446,
         'marq_gen2_commander' => 4472,
         'd2_mach1_pro' => 4556,
         'sdm4' => 10007, # SDM4 footpod
@@ -2425,8 +2465,12 @@ my %named_type = (
         'qom' => 6,
         'pr' => 7,
         'goal' => 8,
-        'rival' => 9,
+        'carrot' => 9,
         'club_leader' => 10,
+        'rival' => 11,
+        'last' => 12,
+        'recent_best' => 13,
+        'course_record' => 14,
     },
 
     'segment_delete_status' => +{
@@ -4479,6 +4523,16 @@ my %named_type = (
         'closed_circuit_diluent' => 1,
     },
 
+    'projectile_type' => +{
+        '_base_type' => FIT_ENUM,
+        'arrow' => 0,               # Arrow projectile type
+        'rifle_cartridge' => 1,     # Rifle cartridge projectile type
+        'pistol_cartridge' => 2,    # Pistol cartridge projectile type
+        'shotshell' => 3,           # Shotshell projectile type
+        'air_rifle_pellet' => 4,    # Air rifle pellet projectile type
+        'other' => 5,               # Other projectile type
+    },
+
     'favero_product' => +{
         '_base_type' => FIT_UINT16,
         'assioma_uno' => 10,
@@ -5253,6 +5307,8 @@ my %msgtype_by_name = (
         183 => +{'name' => 'jump_count'},
         186 => +{'name' => 'avg_grit', 'unit' => 'kGrit'},
         187 => +{'name' => 'avg_flow', 'unit' => 'Flow'},
+        192 => +{'name' => 'workout_feel'},                     # A 0-100 scale representing how a user felt while performing a workout. Low values are considered feeling bad, while high values are good.
+        193 => +{'name' => 'workout_rpe'},                      # Common Borg CR10 / 0-10 RPE scale, multiplied 10x.. Aggregate score for all workouts in a single session.
         194 => +{'name' => 'avg_spo2',   'unit' => 'percent'},  # Average SPO2 for the monitoring session
         195 => +{'name' => 'avg_stress', 'unit' => 'percent'},  # Average stress for the monitoring session
         197 => +{'name' => 'sdrr_hrv',   'unit' => 'mS'},       # Standard deviation of R-R interval (SDRR) - Heart rate variability measure most useful for wellness users.
@@ -6444,6 +6500,83 @@ my %msgtype_by_name = (
         13 => +{'name' => 'speed_source',     'type_name' => 'max_met_speed_source'},      # Indidcates if the estimate was obtained using onboard GPS or connected GPS
     },
 
+    'hsa_body_battery_data' => +{       # Body battery data used for HSA custom data logging
+        253 => +{'name' => 'timestamp', 'type_name' => 'date_time'},
+        0 => +{'name' => 'processing_interval', 'unit' => 's'}, # Processing interval length in seconds
+        1 => +{'name' => 'level', 'unit' => 'percent'},         # Body battery level
+        2 => +{'name' => 'charged' },                           # Body battery charged value
+        3 => +{'name' => 'uncharged' },                         # Body battery uncharged value
+    },
+
+    'hsa_event' => +{                   # HSA events
+        253 => +{'name' => 'timestamp', 'type_name' => 'date_time'},
+        0 => +{'name' => 'event_id'},   # Event ID
+    },
+
+    'hsa_accelerometer_data' => +{      # Raw accelerometer data used for HSA custom data logging
+        253 => +{'name' => 'timestamp', 'type_name' => 'date_time'},
+        0 => +{'name' => 'timestamp_ms', 'unit' => 'ms'},               # Millisecond resolution of the timestamp
+        1 => +{'name' => 'sampling_interval', 'unit' => 'ms'},          # Sampling Interval in Milliseconds
+        2 => +{'name' => 'accel_x', 'scale' => 1.024, 'unit' => 'mG'},  # X-Axis Measurement
+        3 => +{'name' => 'accel_y', 'scale' => 1.024, 'unit' => 'mG'},  # Y-Axis Measurement
+        4 => +{'name' => 'accel_z', 'scale' => 1.024, 'unit' => 'mG'},  # Z-Axis Measurement
+        5 => +{'name' => 'timestamp_32k'},                              # 32 kHz timestamp
+    },
+
+    'hsa_gyroscope_data' => +{
+        253 => +{'name' => 'timestamp', 'type_name' => 'date_time'},
+        0 => +{'name' => 'timestamp_ms', 'unit' => 'ms'},                   # Millisecond resolution of the timestamp
+        1 => +{'name' => 'sampling_interval', 'unit' => '1/32768 s'},       # Sampling Interval in 32 kHz timescale
+        2 => +{'name' => 'gyro_x', 'scale' => 28.57143, 'unit' => 'deg/s'}, # X-Axis Measurement
+        3 => +{'name' => 'gyro_y', 'scale' => 28.57143, 'unit' => 'deg/s'}, # Y-Axis Measurement
+        4 => +{'name' => 'gyro_z', 'scale' => 28.57143, 'unit' => 'deg/s'}, # Z-Axis Measurement
+        5 => +{'name' => 'timestamp_32k', 'unit' => '1/32768 s'},           # 32 kHz timestamp
+    },
+
+    'hsa_step_data' => +{               # User's current daily step data used for HSA custom data logging
+        253 => +{'name' => 'timestamp', 'type_name' => 'date_time'},
+        0 => +{'name' => 'processing_interval', 'unit' => 's'}, # Processing interval length in seconds
+        1 => +{'name' => 'steps', 'unit' => 'steps'},           # Total step sum
+    },
+
+    'hsa_spo2_data' => +{               # User's current SpO2 data used for HSA custom data logging
+        253 => +{'name' => 'timestamp', 'type_name' => 'date_time'},
+        0 => +{'name' => 'processing_interval', 'unit' => 's'}, # Processing interval length in seconds
+        1 => +{'name' => 'reading_spo2', 'unit' => 'percent'},  # SpO2 Reading
+        2 => +{'name' => 'confidence'},                         # SpO2 Confidence
+    },
+
+    'hsa_stress_data' => +{             # User's current stress data used for HSA custom data logging
+        253 => +{'name' => 'timestamp', 'type_name' => 'date_time'},
+        0 => +{'name' => 'processing_interval', 'unit' => 's'}, # Processing interval length in seconds
+        1 => +{'name' => 'stress_level', 'unit' => 's'},        # Stress Level ( 0 - 100 ) -300 indicates invalid -200 indicates large motion -100 indicates off wrist
+    },
+
+    'hsa_respiration_data' => +{        # User's current respiration data used for HSA custom data logging
+        253 => +{'name' => 'timestamp', 'type_name' => 'date_time'},
+        0 => +{'name' => 'processing_interval', 'unit' => 's'},                         # Processing interval length in seconds
+        1 => +{'name' => 'respiration_rate', 'scale' => 100, 'unit' => 'breaths/min'},  # Breaths * 100 /min -300 indicates invalid -200 indicates large motion -100 indicates off wrist
+    },
+
+    'hsa_heart_rate_data' => +{         # User's current heart rate data used for HSA custom data logging
+        253 => +{'name' => 'timestamp', 'type_name' => 'date_time'},
+        0 => +{'name' => 'processing_interval', 'unit' => 's'}, # Processing interval length in seconds
+        1 => +{'name' => 'status'},                             # Status of measurements in buffer - 0 indicates SEARCHING 1 indicates LOCKED
+        2 => +{'name' => 'heart_rate', 'unit' => 'bpm'},        # Beats / min
+    },
+
+    'hsa_configuration_data' => +{      # Configuration data for HSA custom data logging
+        253 => +{'name' => 'timestamp', 'type_name' => 'date_time'}, # Encoded configuration data
+        0 => +{'name' => 'data'},
+        1 => +{'name' => 'data_size'},   # Size in bytes of data field
+    },
+
+    'hsa_wrist_temperature_data' => +{  # Wrist temperature data used for HSA custom data logging
+        253 => +{'name' => 'timestamp', 'type_name' => 'date_time'},
+        0 => +{'name' => 'processing_interval', 'unit' => 's'},         # Processing interval length in seconds
+        1 => +{'name' => 'value', 'scale' => 1000, 'unit' => 'degC'},   # Wrist temperature reading
+    },
+
     'memo_glob' => +{                   # begins === Other messages === section
         250 => +{'name' => 'part_index'},
         0 => +{'name' => 'memo'},
@@ -6539,6 +6672,15 @@ my %msgtype_by_name = (
         25 => +{ 'name' => 'hang_time',        'unit' => 's', 'scale' => 1000 },     # Time spent neither ascending nor descending
     },
 
+    'aad_accel_features' => +{    # Number of acclerometer zero crossings summed over the specified time interval
+        253 => +{'name' => 'timestamp', 'type_name' => 'date_time'},
+        0 => +{'name' => 'time', 'unit' => 's'},    # Time interval length in seconds
+        1 => +{'name' => 'energy_total'},           # Total accelerometer energy in the interval
+        2 => +{'name' => 'zero_cross_cnt'},         # Count of zero crossings
+        3 => +{'name' => 'instance'},               # Instance ID of zero crossing algorithm
+        4 => +{'name' => 'time_above_threshold', 'scale' => 25, 'unit' => 's'}, # Total accelerometer time above threshold in the interval
+    },
+
     'hrv' => +{ # heart rate variability
         0 => +{'name' => 'time', 'scale' => 1000, 'unit' => 's'},
     },
@@ -6565,9 +6707,34 @@ my %msgtype_by_name = (
         0 => +{'name' => 'value', 'scale' => 128, 'unit' => 'ms'},      # 5 minute RMSSD
     },
 
+    'raw_bbi' => +{                     # Raw Beat-to-Beat Interval values
+        253 => +{'name' => 'timestamp', 'type_name' => 'date_time'},
+        0 => +{'name' => 'timestamp_ms', 'unit' => 'ms'},   # ms since last overnight_raw_bbi message
+        1 => +{'name' => 'data'},                           # Complex decoding!
+        2 => +{'name' => 'time', 'unit' => 'ms'},           # Array of millisecond times between beats
+        3 => +{'name' => 'quality'},
+        4 => +{'name' => 'gap'},
+    },
+
     'respiration_rate' => +{
         253 => +{ 'name' => 'timestamp', 'type_name' => 'date_time' },
         0 => +{ 'name' => 'respiration_rate', 'unit' => 'breaths/min', 'scale' => 100 },    # Breaths * 100 /min, -300 indicates invalid, -200 indicates large motion, -100 indicates off wrist
+    },
+
+    'chrono_shot_session' => +{         # Specifically used for XERO products.
+        253 => +{'name' => 'timestamp', 'type_name' => 'date_time'},
+        0 => +{'name' => 'min_speed', 'scale' => 1000, 'unit' => 'm/s'},
+        1 => +{'name' => 'max_speed', 'scale' => 1000, 'unit' => 'm/s'},
+        2 => +{'name' => 'avg_speed', 'scale' => 1000, 'unit' => 'm/s'},
+        3 => +{'name' => 'shot_count'},
+        4 => +{'name' => 'projectile_type', 'type_name' => 'projectile_type'},
+        5 => +{'name' => 'grain_weight', 'scale' => 10, 'unit' => 'gr'},
+    },
+
+    'chrono_shot_data' => +{         # Specifically used for XERO products.
+        253 => +{'name' => 'timestamp', 'type_name' => 'date_time'},
+        0 => +{'name' => 'shot_speed', 'scale' => 1000, 'unit' => 'm/s'},
+        1 => +{'name' => 'shot_num'},
     },
 
     'tank_update' => +{
@@ -6599,6 +6766,14 @@ my %msgtype_by_name = (
         11 => +{ 'name' => 'awakenings_count' },            # The number of awakenings during sleep.
         14 => +{ 'name' => 'interruptions_score' },         # Score that evaluates the sleep interruptions. If valid: 0 (worst) to 100 (best). If unknown: FIT_UINT8_INVALID.
         15 => +{ 'name' => 'average_stress_during_sleep' }, # Excludes stress during awake periods in the sleep window
+    },
+
+    'skin_temp_overnight' => +{
+        253 => +{'name' => 'timestamp', 'type_name' => 'date_time'},
+        0 => +{'name' => 'local_timestamp', 'type_name' => 'local_date_time'},
+        1 => +{'name' => 'average_deviation'},       # The average overnight deviation from baseline temperature in degrees C
+        2 => +{'name' => 'average_7_day_deviation'}, # The average 7 day overnight deviation from baseline temperature in degrees C
+        4 => +{'name' => 'nightly_value'},           # Final overnight temperature value
     },
 
     'pad' => +{
@@ -6953,7 +7128,7 @@ returns a string representing the .FIT profile version on which this class based
 
 =cut
 
-my $profile_current  = '21.126';
+my $profile_current  = '21.141';
 my $protocol_current = '2.3';       # is there such a thing as current protocol for the class?
                                     # don't think so, pod was removed for protocol_* above
 
@@ -9164,7 +9339,7 @@ Please visit the project page at: L<https://github.com/patjoly/geo-fit>.
 
 =head1 VERSION
 
-1.12
+1.13
 
 =head1 LICENSE AND COPYRIGHT
 

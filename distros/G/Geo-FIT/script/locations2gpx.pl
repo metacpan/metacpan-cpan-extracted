@@ -2,7 +2,7 @@
 use strict;
 use warnings;
 
-our $VERSION = '1.12';
+our $VERSION = '1.13';
 
 =encoding utf-8
 
@@ -39,6 +39,10 @@ GetOptions( "outfile=s"      =>  \$outfile,
 
 die usage() if $help;
 $indent = " " x $indent_n;
+
+my $unsafe_chars_default = '<>&"';
+my $uc = $unsafe_chars_default;         # a lexical with a shorter name to use as argument in calls to _enc() and encode_entities_numeric()
+# consider an option to change the default but tricky since 'undef' is the setting to encode all chars in HTML::Entities
 
 my ($file, $gpx_file);
 for (@ARGV) {
@@ -180,7 +184,7 @@ sub _message {
 }
 
 sub _enc {
-    return encode_entities_numeric( $_[0] );
+    return encode_entities_numeric( @_ )    # 2nd positional arg can either be undef or the string of unsafe chars to encode
 }
 
 # https://www.topografix.com/GPX/1/1/#element_gpx
@@ -208,18 +212,18 @@ sub _write_header {
 sub _write_meta {
     my $name;   # none for now but declaring so it can be easily assigned
     printf "%s<metadata>\n",          $indent;
-    printf "%s<name>%s</name>\n",     $indent x 2, _enc( $name ) if defined $name;
-    printf "%s<desc>%s</desc>\n",     $indent x 2, _enc( $desc );
+    printf "%s<name>%s</name>\n",     $indent x 2, _enc( $name, $uc ) if defined $name;
+    printf "%s<desc>%s</desc>\n",     $indent x 2, _enc( $desc, $uc );
 
     my $author_name = 'Converted from Locations.fit by locations2gpx.pl';
     printf "%s<author>\n",            $indent x 2;
-    printf "%s<name>%s</name>\n",     $indent x 3, _enc( $author_name );
+    printf "%s<name>%s</name>\n",     $indent x 3, _enc( $author_name, $uc );
     printf "%s</author>\n",           $indent x 2;
 
     my ($url, $text, $type);     # none for now but declaring so they can be easily assigned
     if (defined $url) {
         printf "%s<link href=\"%s\">\n",  $indent x 2, _enc( $url  ) ;
-        printf "%s<text>%s</text>\n",     $indent x 3, _enc( $text ) if defined $text;
+        printf "%s<text>%s</text>\n",     $indent x 3, _enc( $text, $uc ) if defined $text;
         printf "%s<type>%s</type>\n",     $indent x 3, $type if defined $type;
         printf "%s</link>\n",             $indent x 2;
     }
@@ -261,8 +265,8 @@ sub _print_wpt {
     if (defined $time) {
         printf "%s<time>%s</time>\n", $indent x 2, $fit->date_string($time);
     }
-    printf "%s<name>%s</name>\n", $indent x 2, _enc( $name ) if defined $name;
-    printf "%s<desc>%s</desc>\n", $indent x 2, _enc( $desc ) if defined $desc;
+    printf "%s<name>%s</name>\n", $indent x 2, _enc( $name, $uc ) if defined $name;
+    printf "%s<desc>%s</desc>\n", $indent x 2, _enc( $desc, $uc ) if defined $desc;
     printf "%s</wpt>\n", $indent
 }
 
@@ -286,7 +290,7 @@ Patrick Joly
 
 =head1 VERSION
 
-1.12
+1.13
 
 =head1 LICENSE AND COPYRIGHT
 

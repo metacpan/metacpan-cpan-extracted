@@ -1,5 +1,10 @@
 Revision history for Geo-FIT
 
+1.13 [2024-07-13]
+    Updated to FIT 21.141 profile
+
+    Only encode unsafe characters as XML/HTML entities for the desc, name, and text fields in locations2gpx.pl
+
 1.12 [2024-06-09]
     Updated to FIT 21.126 profile
 

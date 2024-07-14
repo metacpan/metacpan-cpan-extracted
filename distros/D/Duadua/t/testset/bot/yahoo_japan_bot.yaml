@@ -6,6 +6,7 @@
   is_linux: false
   is_windows: false
   is_chromeos: false
+
 - ua: 'Y!J-BUZZ/1.0 ifetcher'
   name: 'Yahoo!Japan Crawler'
   is_bot: true

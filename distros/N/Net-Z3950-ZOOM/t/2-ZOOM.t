@@ -1,5 +1,7 @@
 # Before `make install' is performed this script should be runnable with
 # `make test'. After `make install' it should work as `perl 2-ZOOM.t'
+#
+# Requires yaz-ztest to be running on @:9996
 
 use strict;
 use warnings;
@@ -21,7 +23,7 @@ ok($@ && $@->isa("ZOOM::Exception") &&
     ($@->code() == ZOOM::Error::TIMEOUT && $@->addinfo() eq "")),
    "connection to non-existent host '$host' fails: \$\@=$@");
 
-$host = "z3950.indexdata.com/gils";
+$host = "localhost:9996";
 eval { $conn = new ZOOM::Connection($host, 0) };
 ok(!$@, "connection to '$host'");
 
@@ -71,14 +73,15 @@ eval { $rs = $conn->search_pqf($query) };
 ok(!$@, "search for '$query'");
 
 my $n = $rs->size($rs);
-ok($n == 1, "found 1 record as expected");
+ok($n == 23, "found 23 records as expected ($n)");
 
 my $rec = $rs->record(0);
-my $data = $rec->render();
-ok($data =~ /^245 +\$a ISOTOPIC DATES OF ROCKS AND MINERALS$/m,
-   "rendered record has expected title");
-my $raw = $rec->raw();
-ok($raw =~ /^00966n/, "raw record contains expected header");
+my $title = $rec->render();
+$title =~ s/.*245 10 \$a (.*?)\n.*/$1/s;
+ok($title eq 'How to program a computer', "rendered record has expected title ($title)");
+my $header = $rec->raw();
+$header =~ s/ .*//;
+ok($header eq '00366nam', "raw record contains expected header ($header)");
 
 $rs->destroy();
 ok(1, "destroyed result-set");

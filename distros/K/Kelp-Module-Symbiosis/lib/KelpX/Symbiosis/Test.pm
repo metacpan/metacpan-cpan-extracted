@@ -1,5 +1,5 @@
 package KelpX::Symbiosis::Test;
-$KelpX::Symbiosis::Test::VERSION = '2.10';
+$KelpX::Symbiosis::Test::VERSION = '2.11';
 use Kelp::Base;
 use Kelp::Test;
 use Carp;

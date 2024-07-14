@@ -5,7 +5,7 @@ package Plack::Middleware::Greylist;
 # RECOMMEND PREREQ: Cache::FastMmap
 # RECOMMEND PREREQ: Ref::Util::XS
 
-use v5.12;
+use v5.20;
 use warnings;
 
 use parent qw( Plack::Middleware );
@@ -19,11 +19,12 @@ use Plack::Util::Accessor qw/ default_rate rules cache file _match greylist retr
 use Ref::Util             qw/ is_plain_arrayref is_coderef /;
 use Time::Seconds         qw/ ONE_MINUTE /;
 
-our $VERSION = 'v0.7.2';
+use experimental qw/ postderef signatures /;
+
+our $VERSION = 'v0.8.0';
 
 
-sub prepare_app {
-    my ($self) = @_;
+sub prepare_app($self) {
 
     $self->default_rate(-1) unless defined $self->default_rate;
 
@@ -52,12 +53,10 @@ sub prepare_app {
         my $cache = Cache::FastMmap->new(%$config);
 
         $self->cache(
-            sub {
-                my ($ip) = @_;
+            sub($ip) {
                 return $cache->get_and_set(
                     $ip,
-                    sub {
-                        my ( $key, $count, $opts ) = @_;
+                    sub( $, $count, $opts ) {
                         $count //= 0;
                         return ( $count + 1, { expire_on => $opts->{expire_on} } );
                     }
@@ -69,12 +68,12 @@ sub prepare_app {
 
     my $match = Net::IP::LPM->new;
 
-    $self->_match( sub { $match->lookup(@_) } );
+    $self->_match( sub($ip) { $match->lookup($ip) } );
 
     my @blocks;
 
     if ( my $greylist = $self->greylist ) {
-        push @blocks, ( %{$greylist} );
+        push @blocks, ( $greylist->%* );
     }
 
     $self->rules( my $rules = {} );
@@ -84,10 +83,10 @@ sub prepare_app {
 
     for my $line ( pairs @blocks ) {
 
-        my ( $block, $rule ) = @{$line};
+        my ( $block, $rule ) = $line->@*;
         $rule = [ split /\s+/, $rule ] unless is_plain_arrayref($rule);
 
-        my ( $rate, $type ) = @{$rule};
+        my ( $rate, $type ) = $rule->@*;
 
         $type //= "ip";
         my $mask = $types{$type} // $type;
@@ -109,8 +108,7 @@ sub prepare_app {
     else {
 
         $self->callback(
-            sub {
-                my ($info) = @_;
+            sub($info) {
                 my $env    = $info->{env};
                 my $msg    = $info->{message};
                 if ( my $log = $env->{'psgix.logger'} ) {
@@ -126,8 +124,7 @@ sub prepare_app {
 
 }
 
-sub call {
-    my ( $self, $env ) = @_;
+sub call( $self, $env ) {
 
     my $ip   = $env->{REMOTE_ADDR};
     my $name = $self->_match->($ip);
@@ -203,7 +200,7 @@ Plack::Middleware::Greylist - throttle requests with different rates based on ne
 
 =head1 VERSION
 
-version v0.7.2
+version v0.8.0
 
 =head1 SYNOPSIS
 
@@ -461,7 +458,7 @@ requests. This is probably not something that you want.
 
 =head1 SUPPORT FOR OLDER PERL VERSIONS
 
-This module requires Perl v5.12 or later.
+This module requires Perl v5.20 or later.
 
 Future releases may only support Perl versions released in the last ten years.
 
@@ -494,7 +491,7 @@ Gabor Szabo <gabor@szabgab.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2022-2023 by Robert Rothenberg.
+This software is Copyright (c) 2022-2024 by Robert Rothenberg.
 
 This is free software, licensed under:
 

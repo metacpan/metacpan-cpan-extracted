@@ -4,7 +4,7 @@ Plack::Middleware::Greylist - throttle requests with different rates based on ne
 
 # VERSION
 
-version v0.7.2
+version v0.8.0
 
 # SYNOPSIS
 
@@ -254,7 +254,7 @@ requests. This is probably not something that you want.
 
 # SUPPORT FOR OLDER PERL VERSIONS
 
-This module requires Perl v5.12 or later.
+This module requires Perl v5.20 or later.
 
 Future releases may only support Perl versions released in the last ten years.
 
@@ -285,7 +285,7 @@ Gabor Szabo <gabor@szabgab.com>
 
 # COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2022-2023 by Robert Rothenberg.
+This software is Copyright (c) 2022-2024 by Robert Rothenberg.
 
 This is free software, licensed under:
 

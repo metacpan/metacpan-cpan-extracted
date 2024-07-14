@@ -10,6 +10,14 @@ my $BLANK_UA = {
 sub parse {
     my ($class, $d) = @_;
 
+    my $index_mozilla = index($d->ua, 'Mozilla/');
+    if ($index_mozilla == 0) {
+        $d->{_contain_mozilla_top} = 1;
+        $d->{_contain_mozilla} = 1;
+    } elsif ($index_mozilla > 0) {
+        $d->{_contain_mozilla} = 1;
+    }
+
     for my $m (@{$d->parsers}) {
         if ( my $res = $m->try($d) ) {
             return $res;
@@ -35,10 +43,9 @@ sub parse {
 sub _detect_general_browser {
     my ($class, $d) = @_;
 
-    my %h = %{$BLANK_UA};
-
-    if ( index($d->ua, 'Mozilla/') == 0 && index($d->ua, 'rowser') > 0 ) {
+    if ( index($d->ua, 'rowser') > 0 && $d->_prefix('Mozilla/') ) {
         if ( $d->ua =~ m![^a-zA-Z]([a-zA-Z]+[bB]rowser)/([\d.]+)! ) {
+            my %h = %{$BLANK_UA};
             ($h{name}, $h{version}) = ($1, $2);
             return Duadua::Util->set_os($d, \%h);
         }
@@ -50,9 +57,9 @@ sub _detect_general_bot {
 
     my %h = %{$BLANK_UA};
 
-    if ( index($d->ua, 'https://') > -1 || index($d->ua, 'http://') > -1 ) {
+    if ( $d->_contain('https://') || $d->_contain('http://') ) {
         $h{is_bot} = 1;
-        if ( index($d->ua, 'Mozilla/') == -1 && $d->ua =~ m!^([^/;]+)/(v?[\d.]+)! ) {
+        if ( !$d->_contain('Mozilla/') && $d->ua =~ m!^([^/;]+)/(v?[\d.]+)! ) {
             my ($name, $version) = ($1, $2);
             $h{name}    = $name;
             $h{version} = $version;

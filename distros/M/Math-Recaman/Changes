@@ -1,5 +1,22 @@
 Revision history for Math-Recaman
 
-1.0    2023-06-24
+1.6    2024-07-12
+        Fix a bug if you don't pass any flags in.
+
+1.5    2024-07-13
+        Fix the date of 1.0 in the Changes file.
+        Work out the size of the SVG canvas properly.
+        Update the POD to be more useful.
+        Standardize where the sequence checks are sourced from.
+        Add the ability to pass in flags to the various modes. This allows:
+        - Changing the tempo of the midi file.
+        - Changing the stride size of the number line in SVG.
+        - Change the width of the arcs.
+        - Change the colors of the arcs.
+        - Change how the arcs are drawn above and below the line.
+        - Arcs to be drawn as semi circles and make that the default.
+        - Arcs to be colored in a gradient.
+
+1.0    2024-06-24
         First version, released on an unsuspecting and uncaring world.
 

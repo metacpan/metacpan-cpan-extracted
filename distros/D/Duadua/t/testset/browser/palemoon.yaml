@@ -7,6 +7,7 @@
   is_windows: false
   is_chromeos: false
   version: '26.2.1'
+
 - ua: 'Mozilla/5.0 (Windows NT 6.3; Win64; x64; rv:52.9) Gecko/20100101 Goanna/3.4 Firefox/52.9 PaleMoon/27.9.0'
   name: 'Pale Moon'
   is_bot: false
@@ -16,6 +17,7 @@
   is_windows: true
   is_chromeos: false
   version: '27.9.0'
+
 - ua: 'Mozilla/5.0 (Windows NT 6.1; rv:3.4) Goanna/20180327 PaleMoon/27.8.3'
   name: 'Pale Moon'
   is_bot: false
@@ -25,6 +27,7 @@
   is_windows: true
   is_chromeos: false
   version: '27.8.3'
+
 - ua: 'Mozilla/5.0 (Windows NT 6.1; rv:38.9) Gecko/20100101 Goanna/2.0 Firefox/38.9 PaleMoon/26.1.1'
   name: 'Pale Moon'
   is_bot: false

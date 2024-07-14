@@ -1,5 +1,8 @@
 Revision history for Perl extension Kelp::Module::Symbiosis.
 
+2.11 Sun Jul 14 2024
+	- fix backward compatibility by running the apps lazily
+
 2.10 Mon Jun 24 2024
 	- plack_to_kelp was moved to Kelp::Util::adapt_psgi
 	- add a note about Kelp 2.10 solving plack app mounting natively

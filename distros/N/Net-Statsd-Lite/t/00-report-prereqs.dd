@@ -39,8 +39,9 @@ do { my $x = {
                                       'Sub::Quote' => '0',
                                       'Sub::Util' => '1.40',
                                       'Types::Common' => '2.000000',
+                                      'experimental' => '0',
                                       'namespace::autoclean' => '0',
-                                      'perl' => 'v5.14.0',
+                                      'perl' => 'v5.20.0',
                                       'strict' => '0'
                                     }
                     },

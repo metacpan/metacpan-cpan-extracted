@@ -1,5 +1,5 @@
 package KelpX::Symbiosis::Engine::Kelp;
-$KelpX::Symbiosis::Engine::Kelp::VERSION = '2.10';
+$KelpX::Symbiosis::Engine::Kelp::VERSION = '2.11';
 use Kelp::Base 'KelpX::Symbiosis::Engine';
 use Carp;
 

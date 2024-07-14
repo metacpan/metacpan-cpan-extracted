@@ -7,6 +7,7 @@
   is_windows: false
   is_chromeos: false
   version: '2.0b'
+
 - ua: 'msnbot-media/1.1 (+http://search.msn.com/msnbot.htm)'
   name: 'msnbot'
   is_bot: true

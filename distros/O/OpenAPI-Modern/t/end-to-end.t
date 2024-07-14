@@ -63,8 +63,8 @@ YAML
   my $app = Mojolicious->new;
   $app->routes->post('/foo/:foo_id' => sub ($c) {
     if ($c->stash('foo_id') =~ /^[a-z]+$/) {
-      cmp_deeply(
-        (my $result = $openapi->validate_request($c->req))->TO_JSON,
+      cmp_result(
+        $openapi->validate_request($c->req)->TO_JSON,
         { valid => true },
         'a valid request is received',
       );
@@ -74,7 +74,7 @@ YAML
       my $host = $c->req->headers->host;
 
       cmp_deeply(
-        (my $result = $openapi->validate_request($c->req))->TO_JSON,
+        $openapi->validate_request($c->req)->TO_JSON,
         {
           valid => false,
           errors => [
@@ -105,7 +105,7 @@ YAML
     ->json_is('/status', 'ok');
 
   cmp_deeply(
-    (my $result = $openapi->validate_response($t->tx->res, { request => $t->tx->req }))->TO_JSON,
+    $openapi->validate_response($t->tx->res, { request => $t->tx->req })->TO_JSON,
     { valid => true },
     '...and results in a valid 200 response',
   );
@@ -117,7 +117,7 @@ YAML
   my $doc_uri_full = $doc_uri->host($t->tx->req->headers->host);
 
   cmp_deeply(
-    ($result = $openapi->validate_response($t->tx->res, { request => $t->tx->req }))->TO_JSON,
+    $openapi->validate_response($t->tx->res, { request => $t->tx->req })->TO_JSON,
     {
       valid => false,
       errors => [

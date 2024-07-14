@@ -22,6 +22,7 @@ t/03_value.t
 t/04_record.t
 t/10004793344_ACTIVITY.fit
 t/Locations.fit
+t/Locations_accents.fit
 t/fit2tcx.t
 t/fitdump.t
 t/fitdump.txt

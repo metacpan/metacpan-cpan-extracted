@@ -17,6 +17,9 @@ use Duadua;
     ok !$d->is_windows;
     ok !$d->is_chromeos;
     ok !$d->version;
+
+    ok !$d->_contain_mozilla;
+    ok !$d->_contain_mozilla_top;
 }
 
 {
@@ -69,6 +72,9 @@ use Duadua;
     ok !$d->is_linux;
     ok !$d->is_windows;
     ok !$d->is_chromeos;
+
+    ok $d->_contain_mozilla;
+    ok $d->_contain_mozilla_top;
 }
 
 {
@@ -183,6 +189,26 @@ use Duadua;
     ok !$d->is_windows;
     ok !$d->is_chromeos;
     is $d->version, '2.1';
+}
+
+{
+    my $headers = HTTP::Headers->new(
+        User_Agent => 'KOCMOHABT (https://kozmonavt.tk/) Mozilla/5.0 (Web Explorer)',
+    );
+    my $d = Duadua->new($headers);
+
+    is $d->name, 'KOCMOHABT';
+    ok $d->is_bot;
+    ok !$d->is_ios;
+    ok !$d->is_android;
+    ok !$d->is_linux;
+    ok !$d->is_windows;
+    ok !$d->is_chromeos;
+
+    ok $d->_contain('kozmonavt.tk');
+    ok $d->_prefix('KOCMOHABT');
+    ok $d->_contain_mozilla;
+    ok !$d->_contain_mozilla_top;
 }
 
 done_testing;

@@ -1,5 +1,9 @@
 Revision history for Dist-Build
 
+0.004     2024-07-13 13:49:39+02:00 Europe/Brussels
+          - Sort test files
+          - Add self delegate for DSL
+
 0.003     2024-04-27 22:55:07+02:00 Europe/Brussels
           - Allow extra compiler and linker flags to be a string
 

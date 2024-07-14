@@ -3,10 +3,10 @@
 
 use strict;
 use warnings;
-use Test::More tests => 24;
+use Test::More tests => 27;
 BEGIN { use_ok('ZOOM') };
 
-my $host = "z3950.indexdata.com/gils";
+my $host = "localhost:9996";
 my $conn;
 eval { $conn = new ZOOM::Connection($host, 0) };
 ok(!$@, "connection to '$host'");
@@ -15,19 +15,27 @@ my $query = '@attr 1=4 mineral';
 my $rs;
 eval { $rs = $conn->search_pqf($query) };
 ok(!$@, "search for '$query'");
-ok($rs->size() == 2, "found 2 records");
+ok($rs->size() == 20, "expected 20 records (got " .  $rs->size() . ")");
 
 my $syntax = "canmarc";		# not supported
 $rs->option(preferredRecordSyntax => $syntax);
+ok(1, "preferred record syntax was set to '$syntax'");
 my $val = $rs->option("preferredRecordSyntax");
-ok($val eq $syntax, "preferred record syntax set to '$val'");
+ok($val eq $syntax, "preferred record syntax is '$val'");
+$val = $rs->option("preferredRecordSyntax");
+ok($val eq $syntax, "preferred record syntax is still '$val'");
 
-my $rec = $rs->record(0);
-my($errcode, $errmsg) = $rec->error();
-ok($errcode == 238, "can't fetch CANMARC ($errmsg)");
+# At this point, we used to try to fetch a record in CANMARC and note
+# that it fails, as it should, with BIB-1 diagnostic 238. But now
+# we're testing against yaz-ztest instead of Zebra, it just blithely
+# returns an XML record instead. So there's no point doing that test.
+# 
+# my $rec = $rs->record(0);
+# my($errcode, $errmsg) = $rec->error();
+# ok($errcode == 238, "can't fetch CANMARC ($errmsg)");
 
 $rs->option(preferredRecordSyntax => "usmarc");
-$rec = $rs->record(0);
+my $rec = $rs->record(0);
 my $data1 = $rec->render();
 $rs->option(elementSetName => "b");
 my $data2 = $rec->render();
@@ -35,14 +43,27 @@ ok($data2 eq $data1, "record doesn't know about RS options");
 # Now re-fetch record from result-set with new option
 $rec = $rs->record(0);
 $data2 = $rec->render();
-ok(length($data2) < length($data1), "re-fetched record is brief, old was full");
+
+# We would like to test that the brief record is shorter than the full
+# one, but yaz-ztest returns the same data for both. So the best we
+# can do is test that the brief record is not LONGER than the full.
+
+ok(length($data2) <= length($data1), "brief record is not larger than full");
+
+# If you ask yaz-ztest for an XML record with _any_ element-set
+# specified, it fails with a surrogate diagnostic [14] System error in
+# presenting records. So we need to reset to no element-set.
+$rs->option(elementSetName => "");
 
 $rs->option(preferredRecordSyntax => "xml");
 $rec = $rs->record(0);
+ok(defined $rec, "fetched XML record");
+$data1 = $rec->render();
+ok($data1 =~ /<controlfield tag="008">/i, "option for XML syntax is honoured");
 my $cloned = $rec->clone();
 ok(defined $cloned, "cloned record");
-$data2 = $rec->render();
-ok($data2 =~ /<title>/i, "option for XML syntax is honoured");
+$data2 = $cloned->render();
+ok($data2 =~ /<controlfield tag="008">/i, "cloned record XML is good");
 
 # Now we test ZOOM_resultset_record_immediate(), which should only
 # work for records that have already been placed in the cache, and

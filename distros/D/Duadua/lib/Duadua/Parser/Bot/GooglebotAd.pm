@@ -6,9 +6,9 @@ use Duadua::Util;
 sub try {
     my ($class, $d) = @_;
 
-    return unless index($d->ua, 'Google') > -1;
+    return unless $d->_contain('Google');
 
-    if ( index($d->ua, 'Mediapartners-Google') > -1 ) {
+    if ( $d->_contain('Mediapartners-Google') ) {
         my $h = {
             name   => 'Mediapartners-Google',
             is_bot => 1,
@@ -17,7 +17,7 @@ sub try {
         return Duadua::Util->set_os($d, $h);
     }
 
-    if ( index($d->ua, 'AdsBot-Google') > -1 ) {
+    if ( $d->_contain('AdsBot-Google') ) {
         return {
             name   => 'AdsBot-Google',
             is_bot => 1,

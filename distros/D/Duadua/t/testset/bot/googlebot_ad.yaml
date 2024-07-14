@@ -7,6 +7,7 @@
   is_linux: true
   is_windows: false
   is_chromeos: false
+
 - ua: 'Mediapartners-Google'
   name: Mediapartners-Google
   is_bot: true
@@ -15,6 +16,7 @@
   is_linux: false
   is_windows: false
   is_chromeos: false
+
 - ua: 'Mozilla/5.0 (Linux; Android 4.0.4; Galaxy Nexus Build/IMM76B) AppleWebKit/[WEBKIT_VERSION] (KHTML, like Gecko; Mediapartners-Google) Chrome/[CHROME_VERSION] Mobile Safari/[WEBKIT_VERSION]'
   name: Mediapartners-Google
   is_bot: true
@@ -23,6 +25,7 @@
   is_linux: true
   is_windows: false
   is_chromeos: false
+
 - ua: 'AdsBot-Google (+http://www.google.com/adsbot.html)'
   name: AdsBot-Google
   is_bot: true

@@ -1,5 +1,10 @@
 Revision history for OpenAPI-Modern
 
+0.066     2024-07-13 23:27:00Z
+          - now preserving the numeric/string type of any path capture values
+            passed in via the $options hash, while still evaluating path
+            parameter values as both strings and numbers
+
 0.065     2024-05-25 23:56:08Z
           - BREAKING CHANGE: path_item_uri is dropped from the populated
             $options hash in validate_request, validate_response, and

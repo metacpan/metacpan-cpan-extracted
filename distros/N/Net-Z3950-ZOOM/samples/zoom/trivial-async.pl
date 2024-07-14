@@ -1,5 +1,5 @@
 use ZOOM;
-@servers = ('z3950.loc.gov:7090/Voyager',
+@servers = ('lx2.loc.gov:210/LCDB_MARC8',
 	    'z3950.indexdata.com:210/gils',
 	    'agricola.nal.usda.gov:7190/Voyager');
 for ($i = 0; $i < @servers; $i++) {

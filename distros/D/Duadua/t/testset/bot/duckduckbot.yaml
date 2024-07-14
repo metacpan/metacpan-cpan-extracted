@@ -7,6 +7,7 @@
   is_windows: false
   is_chromeos: false
   version: '1.0'
+
 - ua: 'Mozilla/5.0 (compatible; DuckDuckBot-Https/1.1; https://duckduckgo.com/duckduckbot)'
   name: 'DuckDuckGo Bot'
   is_bot: true
@@ -16,6 +17,7 @@
   is_windows: false
   is_chromeos: false
   version: '1.1'
+
 - ua: 'Mozilla/5.0 (compatible; DuckDuckGo-Favicons-Bot/1.0; +http://duckduckgo.com)'
   name: 'DuckDuckGo Bot'
   is_bot: true

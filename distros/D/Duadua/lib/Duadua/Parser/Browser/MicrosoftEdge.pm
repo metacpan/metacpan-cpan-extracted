@@ -5,10 +5,10 @@ use warnings;
 sub try {
     my ($class, $d) = @_;
 
-    return if index($d->ua, 'Edg') == -1;
+    return if !$d->_contain('Edg');
 
-    if ( ( index($d->ua, 'Edge/') > -1 || index($d->ua, 'Edg/') > -1 )
-            && index($d->ua, 'Windows') > -1 && index($d->ua, 'Mozilla/') > -1 ) {
+    if ( ( $d->_contain('Edge/') || $d->_contain('Edg/') )
+            && $d->_contain('Windows') && $d->_contain_mozilla ) {
         my $h = {
             name   => 'Microsoft Edge',
             is_windows => 1,
@@ -21,7 +21,7 @@ sub try {
 
         return $h;
     }
-    elsif ( index($d->ua, 'EdgiOS/') > -1 && index($d->ua, 'Mozilla/') > -1 ) {
+    elsif ( $d->_contain('EdgiOS/') && $d->_contain_mozilla ) {
         my $h = {
             name   => 'Microsoft Edge',
             is_ios => 1,

@@ -1,3 +1,9 @@
+// This pragma inhibits 436 vacuous warnings
+// See https://blogs.perl.org/users/tom_wyant/2022/03/xs-versus-clang-infinite-warnings.html
+#if defined(__clang__) && defined(__clang_major__) && __clang_major__ > 11
+#pragma clang diagnostic ignored "-Wcompound-token-split-by-macro"
+#endif
+
 #include "EXTERN.h"
 #include "perl.h"
 #include "XSUB.h"
@@ -139,7 +145,7 @@ ZOOM_connection_option_setl(c, key, val, len)
 # values when this function is called, otherwise an "uninitialised
 # value" warning is generated.  As far as I can see, there is no way
 # around this: no way to specify in a prototype that an argument is
-# allowed to be undefined, for example.  Since these function will
+# allowed to be undefined, for example.  Since this function will
 # never be called directly by well-behaved client code, but only by
 # our own wrapper classes, I think we can live with that.
 #

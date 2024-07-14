@@ -1,5 +1,15 @@
 Revision history for Perl extension Net::Z3950::ZOOM.
 
+1.32  Sat 13 Jul 2024 15:19:44 BST
+	- Rework ZOOM-Perl configuration to use Debian's yaz-config
+	  when pkg-config is absent. Fixes ZOOM-29.
+	- Rework ZOOM-Perl tests not to depend on z3950.indexdata.com
+	  (which is defunct). Fixes ZOOM-28.
+
+1.31  Tue Feb 21 08:46:39 UTC 2017
+	- Build for current supported Ubuntu distributions
+	- Fix some URLs in documentation
+
 1.30  Wed Mar 12 14:08:26 CET 2014
         - Update test 19-events.t and 29-events.t
           Events check: allow for multiple Connect events
@@ -21,7 +31,7 @@ Revision history for Perl extension Net::Z3950::ZOOM.
 	  scan identity test (display term == term) fails.
 	- The displayTerm==term assertion is now case-insensitive, as
 	  it ought always to have been: previously, the test-suite
-	  relied on a specific implementaton detail of the
+	  relied on a specific implementation detail of the
 	  test-server, which has recently changed causing extraneous
 	  test-suite failures.
 	- Also in the test-suite for scan, remove the test that all
@@ -125,7 +135,7 @@ Revision history for Perl extension Net::Z3950::ZOOM.
 1.18  Mon Feb 26 14:57:48 GMT 2007
 	- When a connection is in asynchronous mode, failing
 	  operations (search, scan, etc.) no longer throw exceptions.
-	  This is because the event-loop in asychronous applications
+	  This is because the event-loop in asynchronous applications
 	  needs to check for errors anyway, in case the server has
 	  returned high-level diagnostics such as "unsupported use
 	  attribute".  So this check within the event-loop is now the
@@ -275,7 +285,7 @@ Revision history for Perl extension Net::Z3950::ZOOM.
 
 1.03  Thu Mar  9 12:55:23 GMT 2006
 	- Allow additional key => value pairs as arguments to the
-	  ZOOM::Connectoion constructor; these are added as Connection
+	  ZOOM::Connection constructor; these are added as Connection
 	  options before the protocol connection is forged.
 
 1.02  Thu Mar  9 11:36:55 GMT 2006
@@ -292,7 +302,7 @@ Revision history for Perl extension Net::Z3950::ZOOM.
 1.01  Thu Dec 22 14:13:34 GMT 2005
 	- Place some CODE: chunks in "ZOOM.xs" inside curly brackets
 	  so that the declarations they begin with are at the start of
-	  the block.  This avoid mixed code/declarations.  (The
+	  the block.  This avoids mixed code/declarations.  (The
 	  "correct" solution is to use INIT: clauses in the XS file,
 	  but they don't seem to work: the code in them is slapped
 	  down right next to the CODE:, so declarations are not

@@ -7,6 +7,7 @@
   is_windows: false
   is_chromeos: false
   version: '0.5'
+
 - ua: 'Hatena Pagetitle Agent/1.0'
   name: 'Hatena Pagetitle Agent'
   is_bot: true
@@ -16,6 +17,7 @@
   is_windows: false
   is_chromeos: false
   version: '1.0'
+
 - ua: 'Hatena Star UserAgent/2'
   name: 'Hatena Star UserAgent'
   is_bot: true
@@ -25,6 +27,7 @@
   is_windows: false
   is_chromeos: false
   version: '2'
+
 - ua: 'Hatena-Favicon/2 (http://www.hatena.ne.jp/faq/)'
   name: 'Hatena-Favicon'
   is_bot: true
@@ -34,6 +37,7 @@
   is_windows: false
   is_chromeos: false
   version: '2'
+
 - ua: 'Hatena::Fetcher/0.01 (master) Furl/3.06'
   name: 'Hatena::Fetcher'
   is_bot: true
@@ -43,6 +47,7 @@
   is_windows: false
   is_chromeos: false
   version: '0.01'
+
 - ua: 'HatenaBookmark/0.03 (Hatena::Bookmark; master;) Furl/3.13'
   name: 'HatenaBookmark'
   is_bot: true
@@ -52,6 +57,7 @@
   is_windows: false
   is_chromeos: false
   version: '0.03'
+
 - ua: 'Mozilla/5.0 (Linux; U; Android 4.1.2; ja-jp; SC-06D Build/JZO54K) AppleWebKit/534.30 (KHTML, like Gecko) Version/4.0 Mobile Safari/534.30 HatenaBookmark/Android (2.7.2)'
   name: 'HatenaBookmark'
   is_bot: true

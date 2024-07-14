@@ -17,7 +17,7 @@ use Test::Needs;
 
 use Test::More 0.96;
 use if $ENV{AUTHOR_TESTING}, 'Test::Warnings';
-use Test::Deep;
+use Test::Deep; # import symbols: ignore, re etc
 use JSON::Schema::Modern;
 use JSON::Schema::Modern::Document::OpenAPI;
 use OpenAPI::Modern;
@@ -232,13 +232,15 @@ sub cmp_result ($got, $expected, $test_name) {
   context_do {
     my $ctx = shift;
     my ($got, $expected, $test_name) = @_;
-    my $equal = Test::Deep::cmp_deeply($got, $expected, $test_name);
+    my ($equal, $stack) = Test::Deep::cmp_details($got, $expected);
     if ($equal) {
       $ctx->pass($test_name);
     }
     else {
       $ctx->fail($test_name);
-      $ctx->${$ENV{AUTOMATED_TESTING} ? \'diag' : \'note'}("got result:\n".$encoder->encode($got));
+      my $method = $ENV{AUTOMATED_TESTING} ? 'diag' : 'note';
+      $ctx->$method(Test::Deep::deep_diag($stack));
+      $ctx->$method("got result:\n".$encoder->encode($got));
     }
     return $equal;
   } $got, $expected, $test_name;

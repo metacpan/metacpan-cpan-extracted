@@ -6,6 +6,7 @@
   is_linux: false
   is_windows: false
   is_chromeos: false
+
 - ua: 'Mozilla/5.0 (compatible; inoreader.com; 1 subscribers)'
   name: 'Inoreader'
   is_bot: true

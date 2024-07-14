@@ -14,8 +14,8 @@ sub try {
             is_bot => 1,
         };
     }
-    elsif ( index($d->ua, 'Yeti/') > -1
-            && index($d->ua, '+http://') > -1 && index($d->ua, 'naver.') > -1 ) {
+    elsif ( $d->_contain('Yeti/')
+            && $d->_contain('+http://') && $d->_contain('naver.') ) {
         $h = {
             name   => 'Naver Yeti',
             is_bot => 1,
@@ -26,13 +26,13 @@ sub try {
             $h->{version} = $version if $version;
         }
     }
-    elsif ( index($d->ua, ' proximic;') > -1 ) {
+    elsif ( $d->_contain(' proximic;') ) {
         $h = {
             name   => 'Comscore crawler',
             is_bot => 1,
         };
     }
-    elsif ( index($d->ua, ' Daum/') > -1 ) {
+    elsif ( $d->_contain(' Daum/') ) {
         $h = {
             name   => 'Daum',
             is_bot => 1,
@@ -45,7 +45,7 @@ sub try {
 
         $h = Duadua::Util->set_os($d, $h);
     }
-    elsif ( index($d->ua, 'MixnodeCache/') > -1 ) {
+    elsif ( $d->_contain('MixnodeCache/') ) {
         $h = {
             name   => 'mixnode.com',
             is_bot => 1,
@@ -56,13 +56,13 @@ sub try {
             $h->{version} = $version if $version;
         }
     }
-    elsif ( index($d->ua, 'SearchAtlas.com ') > -1 ) {
+    elsif ( $d->_contain('SearchAtlas.com ') ) {
         $h = {
             name   => 'SearchAtlas.com',
             is_bot => 1,
         };
     }
-    elsif ( index($d->ua, 'ltx71') > -1 ) {
+    elsif ( $d->_contain('ltx71') ) {
         $h = {
             name   => 'ltx71',
             is_bot => 1,
@@ -74,7 +74,7 @@ sub try {
             is_bot => 1,
         };
     }
-    elsif ( index($d->ua, ' FlipboardProxy/') > -1 ) {
+    elsif ( $d->_contain(' FlipboardProxy/') ) {
         $h = {
             name   => 'FlipboardProxy',
             is_bot => 1,
@@ -85,7 +85,7 @@ sub try {
             $h->{version} = $version if $version;
         }
     }
-    elsif ( index($d->ua, ' BuiltWith/') > -1 ) {
+    elsif ( $d->_contain(' BuiltWith/') ) {
         $h = {
             name   => 'BuiltWith',
             is_bot => 1,
@@ -98,7 +98,7 @@ sub try {
 
         $h = Duadua::Util->set_os($d, $h);
     }
-    elsif ( index($d->ua, ' zgrab/') > -1 ) {
+    elsif ( $d->_contain(' zgrab/') ) {
         $h = {
             name   => 'ZGrab',
             is_bot => 1,
@@ -111,7 +111,7 @@ sub try {
 
         $h = Duadua::Util->set_os($d, $h);
     }
-    elsif ( index($d->ua, ' RyowlEngine/') > -1 ) {
+    elsif ( $d->_contain(' RyowlEngine/') ) {
         $h = {
             name   => 'RyowlEngine',
             is_bot => 1,
@@ -124,7 +124,7 @@ sub try {
 
         $h = Duadua::Util->set_os($d, $h);
     }
-    elsif ( index($d->ua, ' DataXu/') > -1 ) {
+    elsif ( $d->_contain(' DataXu/') ) {
         $h = {
             name   => 'DataXu',
             is_bot => 1,
@@ -137,7 +137,7 @@ sub try {
 
         $h = Duadua::Util->set_os($d, $h);
     }
-    elsif ( index($d->ua, 'istellabot/') > -1 ) {
+    elsif ( $d->_contain('istellabot/') ) {
         $h = {
             name   => 'istellabot',
             is_bot => 1,
@@ -150,7 +150,7 @@ sub try {
 
         $h = Duadua::Util->set_os($d, $h);
     }
-    elsif ( index($d->ua, ' Cincraw/') > -1 ) {
+    elsif ( $d->_contain(' Cincraw/') ) {
         $h = {
             name   => 'Cincraw',
             is_bot => 1,
@@ -161,13 +161,13 @@ sub try {
             $h->{version} = $version if $version;
         }
     }
-    elsif ( index($d->ua, 'KOCMOHABT ') > -1 ) {
+    elsif ( $d->_contain('KOCMOHABT ') ) {
         $h = {
             name   => 'KOCMOHABT',
             is_bot => 1,
         };
     }
-    elsif ( index($d->ua, 'Hexometer') > -1 ) {
+    elsif ( $d->_contain('Hexometer') ) {
         $h = {
             name   => 'Hexometer',
             is_bot => 1,

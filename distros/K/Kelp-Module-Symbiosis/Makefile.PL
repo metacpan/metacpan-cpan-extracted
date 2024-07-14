@@ -23,7 +23,7 @@ my %WriteMakefileArgs = (
   "TEST_REQUIRES" => {
     "HTTP::Request::Common" => 0
   },
-  "VERSION" => "2.10",
+  "VERSION" => "2.11",
   "test" => {
     "TESTS" => "t/*.t t/kelp/*.t t/urlmap/*.t"
   }

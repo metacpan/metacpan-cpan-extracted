@@ -44,15 +44,15 @@ YAML
 
   test_needs 'HTTP::Request', 'HTTP::Response';
   cmp_result(
-    (my $result = $openapi->validate_response(HTTP::Response->new(404),
-      { request => HTTP::Request->new(GET => 'http://example.com/', [ Host => 'example.com' ]) }))->TO_JSON,
+    $openapi->validate_response(HTTP::Response->new(404),
+      { request => HTTP::Request->new(GET => 'http://example.com/', [ Host => 'example.com' ]) })->TO_JSON,
     {
       valid => false,
       errors => [
         {
           instanceLocation => '/request',
           keywordLocation => '',
-          absoluteKeywordLocation => $doc_uri->clone->to_string,
+          absoluteKeywordLocation => $doc_uri->to_string,
           error => 'Bad request start-line',
         },
       ],
@@ -64,7 +64,7 @@ YAML
   $req->headers->header('Host', 'example.com');
   cmp_result(
     # start line is missing "HTTP/1.1"
-    ($result = $openapi->validate_response(HTTP::Response->new(404), { request => $req }))->TO_JSON,
+    $openapi->validate_response(HTTP::Response->new(404), { request => $req })->TO_JSON,
     {
       valid => false,
       errors => [
@@ -99,8 +99,8 @@ paths:
 YAML
 
   cmp_result(
-    (my $result = $openapi->validate_response(response(404),
-      { request => request('GET', 'http://example.com/foo/bar') }))->TO_JSON,
+    $openapi->validate_response(response(404),
+      { request => request('GET', 'http://example.com/foo/bar') })->TO_JSON,
     {
       valid => false,
       errors => [
@@ -120,7 +120,7 @@ YAML
     $response->request(request('POST', 'http://example.com/foo/bar'));
 
     cmp_result(
-      (my $result = $openapi->validate_response($response))->TO_JSON,
+      $openapi->validate_response($response)->TO_JSON,
       {
         valid => false,
         errors => [
@@ -137,27 +137,27 @@ YAML
 
     $response->request(request('POST', 'http://example.com/foo'));
     cmp_result(
-      ($result = $openapi->validate_response($response))->TO_JSON,
+      $openapi->validate_response($response)->TO_JSON,
       { valid => true },
       'operation is successfully found using the request on the response',
     );
   }
 
   cmp_result(
-    ($result = $openapi->validate_response(response(404),
-      { path_template => '/foo', request => request('POST', 'http://example.com/foo') }))->TO_JSON,
+    $openapi->validate_response(response(404),
+      { path_template => '/foo', request => request('POST', 'http://example.com/foo') })->TO_JSON,
     { valid => true },
     'operation is successfully found using the request in options',
   );
 
   cmp_result(
-    ($result = $openapi->validate_response(response(404), { path_template => '/foo', method => 'PoSt' }))->TO_JSON,
+    $openapi->validate_response(response(404), { path_template => '/foo', method => 'PoSt' })->TO_JSON,
     { valid => true },
     'operation is successfully found using the method in options',
   );
 
   cmp_result(
-    ($result = $openapi->validate_response(response(404), { path_template => '/foo', method => 'POST' }))->TO_JSON,
+    $openapi->validate_response(response(404), { path_template => '/foo', method => 'POST' })->TO_JSON,
     { valid => true },
     'no responses object - nothing to validate against',
   );
@@ -178,7 +178,7 @@ paths:
 YAML
 
   cmp_result(
-    ($result = $openapi->validate_response(response(404), { path_template => '/foo', method => 'post' }))->TO_JSON,
+    $openapi->validate_response(response(404), { path_template => '/foo', method => 'post' })->TO_JSON,
     {
       valid => false,
       errors => [
@@ -194,13 +194,13 @@ YAML
   );
 
   cmp_result(
-    ($result = $openapi->validate_response(response(200), { path_template => '/foo', method => 'post' }))->TO_JSON,
+    $openapi->validate_response(response(200), { path_template => '/foo', method => 'post' })->TO_JSON,
     { valid => true },
     'response code matched exactly',
   );
 
   cmp_result(
-    ($result = $openapi->validate_response(response(202), { path_template => '/foo', method => 'post' }))->TO_JSON,
+    $openapi->validate_response(response(202), { path_template => '/foo', method => 'post' })->TO_JSON,
     { valid => true },
     'response code matched wildcard',
   );
@@ -227,7 +227,7 @@ paths:
 YAML
 
   cmp_result(
-    ($result = $openapi->validate_response(response(200), { path_template => '/foo', method => 'post' }))->TO_JSON,
+    $openapi->validate_response(response(200), { path_template => '/foo', method => 'post' })->TO_JSON,
     {
       valid => false,
       errors => [
@@ -276,7 +276,7 @@ paths:
 YAML
 
   cmp_result(
-    ($result = $openapi->validate_response(response(303), { path_template => '/foo', method => 'post' }))->TO_JSON,
+    $openapi->validate_response(response(303), { path_template => '/foo', method => 'post' })->TO_JSON,
     {
       valid => false,
       errors => [
@@ -292,7 +292,7 @@ YAML
   );
 
   cmp_result(
-    ($result = $openapi->validate_response(response(500), { path_template => '/foo', method => 'post' }))->TO_JSON,
+    $openapi->validate_response(response(500), { path_template => '/foo', method => 'post' })->TO_JSON,
     {
       valid => false,
       errors => [
@@ -308,7 +308,7 @@ YAML
   );
 
   cmp_result(
-    ($result = $openapi->validate_response(response(500, [ 'FOO-BAR' => 'header value' ]), { path_template => '/foo', method => 'post' }))->TO_JSON,
+    $openapi->validate_response(response(500, [ 'FOO-BAR' => 'header value' ]), { path_template => '/foo', method => 'post' })->TO_JSON,
     {
       valid => false,
       errors => [
@@ -354,7 +354,7 @@ YAML
     MultipleValuesAsArray => ' three ',
   ]);
   cmp_result(
-    ($result = $openapi->validate_response($response, { path_template => '/foo', path_captures => {}, method => 'get' }))->TO_JSON,
+    $openapi->validate_response($response, { path_template => '/foo', path_captures => {}, method => 'get' })->TO_JSON,
     {
       valid => false,
       errors => [
@@ -382,7 +382,7 @@ paths:
 YAML
 
   cmp_result(
-    ($result = $openapi->validate_response(response($_, [ 'Transfer-Encoding' => 'blah' ]), { path_template => '/foo', method => 'get' }))->TO_JSON,
+    $openapi->validate_response(response($_, [ 'Transfer-Encoding' => 'blah' ]), { path_template => '/foo', method => 'get' })->TO_JSON,
     {
       valid => false,
       errors => [
@@ -441,7 +441,7 @@ YAML
 
   # response has no content-type, content-length or body.
   cmp_result(
-    ($result = $openapi->validate_response(response(200), { path_template => '/foo', method => 'post' }))->TO_JSON,
+    $openapi->validate_response(response(200), { path_template => '/foo', method => 'post' })->TO_JSON,
     { valid => true },
     'missing Content-Type does not cause an exception',
   );
@@ -450,10 +450,10 @@ YAML
   remove_header($response, 'Content-Length');
 
   cmp_result(
-    ($result = do {
+    do {
       my $x = allow_patterns(qr/^parse error when converting HTTP::Response/) if $::TYPE eq 'lwp';
       $openapi->validate_response($response, { path_template => '/foo', method => 'post' });
-    })->TO_JSON,
+    }->TO_JSON,
     {
       valid => false,
       errors => [
@@ -475,8 +475,8 @@ YAML
   );
 
   cmp_result(
-    ($result = $openapi->validate_response(response(200, [ 'Content-Type' => 'text/bloop' ], 'plain text'),
-      { path_template => '/foo', method => 'post' }))->TO_JSON,
+    $openapi->validate_response(response(200, [ 'Content-Type' => 'text/bloop' ], 'plain text'),
+      { path_template => '/foo', method => 'post' })->TO_JSON,
     {
       valid => false,
       errors => [
@@ -492,8 +492,8 @@ YAML
   );
 
   cmp_result(
-    ($result = $openapi->validate_response(response(200, [ 'Content-Type' => 'bloop/html' ], 'html text'),
-      { path_template => '/foo', method => 'post' }))->TO_JSON,
+    $openapi->validate_response(response(200, [ 'Content-Type' => 'bloop/html' ], 'html text'),
+      { path_template => '/foo', method => 'post' })->TO_JSON,
     {
       valid => false,
       errors => [
@@ -509,17 +509,17 @@ YAML
   );
 
   cmp_result(
-    ($result = $openapi->validate_response(response(200, [ 'Content-Type' => 'text/plain; charset=ISO-8859-1' ],
+    $openapi->validate_response(response(200, [ 'Content-Type' => 'text/plain; charset=ISO-8859-1' ],
         chr(0xe9).'clair'),
-      { path_template => '/foo', method => 'post' }))->TO_JSON,
+      { path_template => '/foo', method => 'post' })->TO_JSON,
     { valid => true },
     'latin1 content can be successfully decoded',
   );
 
   cmp_result(
-    ($result = $openapi->validate_response(response(200, [ 'Content-Type' => 'application/json' ],
+    $openapi->validate_response(response(200, [ 'Content-Type' => 'application/json' ],
         '{"alpha": "foo", "gamma": "o.o"}'),
-      { path_template => '/foo', method => 'post' }))->TO_JSON,
+      { path_template => '/foo', method => 'post' })->TO_JSON,
     {
       valid => false,
       errors => [
@@ -549,9 +549,9 @@ YAML
 
   my $disapprove = v224.178.160.95.224.178.160; # utf-8-encoded "ಠ_ಠ"
   cmp_result(
-    ($result = $openapi->validate_response(response(200, [ 'Content-Type' => 'application/json' ],
+    $openapi->validate_response(response(200, [ 'Content-Type' => 'application/json' ],
         '{"alpha": "123", "gamma": "'.$disapprove.'"}'),
-      { path_template => '/foo', method => 'post' }))->TO_JSON,
+      { path_template => '/foo', method => 'post' })->TO_JSON,
     { valid => true },
     'decoded content matches the schema',
   );
@@ -610,10 +610,9 @@ paths:
                 minLength: 10
 YAML
 
-
   cmp_result(
-    ($result = $openapi->validate_response(response(400, [ 'Content-Length' => 10 ], 'plain text'),
-      { path_template => '/foo', method => 'post' }))->TO_JSON,
+    $openapi->validate_response(response(400, [ 'Content-Length' => 10 ], 'plain text'),
+      { path_template => '/foo', method => 'post' })->TO_JSON,
     {
       valid => false,
       errors => [
@@ -628,14 +627,13 @@ YAML
     'missing Content-Type does not cause an exception',
   );
 
-
   cmp_result(
-    ($result = do {
+    do {
       my $x = allow_patterns(qr/^parse error when converting HTTP::Response/) if $::TYPE eq 'lwp';
       $openapi->validate_response(
         response(400, [ 'Content-Length' => 12, 'Content-Type' => 'text/plain' ], ''), # Content-Length lies!
           { path_template => '/foo', method => 'post' });
-    })->TO_JSON,
+    }->TO_JSON,
     {
       valid => false,
       errors => [
@@ -651,8 +649,8 @@ YAML
   );
 
   cmp_result(
-    ($result = $openapi->validate_response(
-      response(400, [ 'Content-Type' => 'text/plain' ], '0'), { path_template => '/foo', method => 'post' }))->TO_JSON,
+    $openapi->validate_response(
+      response(400, [ 'Content-Type' => 'text/plain' ], '0'), { path_template => '/foo', method => 'post' })->TO_JSON,
     {
       valid => false,
       errors => [
@@ -672,10 +670,10 @@ YAML
   remove_header($response, 'Content-Length');
 
   cmp_result(
-    ($result = do {
+    do {
       my $x = allow_patterns(qr/^parse error when converting HTTP::Response/) if $::TYPE eq 'lwp';
       $openapi->validate_response($response, { path_template => '/foo', method => 'post' });
-    })->TO_JSON,
+    }->TO_JSON,
     {
       valid => false,
       errors => [
@@ -702,10 +700,9 @@ YAML
     'Content-Length is required in responses with a message body',
   );
 
-
   cmp_result(
-    ($result = $openapi->validate_response(response(200, [ 'Content-Type' => 'text/plain', 'Content-Length' => 25 ], 'I should not have content'),
-      { path_template => '/foo', method => 'post' }))->TO_JSON,
+    $openapi->validate_response(response(200, [ 'Content-Type' => 'text/plain', 'Content-Length' => 25 ], 'I should not have content'),
+      { path_template => '/foo', method => 'post' })->TO_JSON,
     {
       valid => false,
       errors => [
@@ -733,8 +730,8 @@ YAML
   TODO: {
   local $TODO = 'Mojolicious will strip Content-Length for 204 responses' if $::TYPE eq 'mojo';
   cmp_result(
-    ($result = $openapi->validate_response(response(204, [ 'Content-Type' => 'text/plain', 'Content-Length' => 20 ], 'I should not have content'),
-      { path_template => '/foo', method => 'post' }))->TO_JSON,
+    $openapi->validate_response(response(204, [ 'Content-Type' => 'text/plain', 'Content-Length' => 20 ], 'I should not have content'),
+      { path_template => '/foo', method => 'post' })->TO_JSON,
     {
       valid => false,
       errors => [
@@ -774,9 +771,9 @@ paths:
 YAML
 
   cmp_result(
-    ($result = $openapi->validate_response(
+    $openapi->validate_response(
       response(400, [ 'Content-Length' => 1, 'Content-Type' => 'unknown/unknown' ], '!!!'),
-      { path_template => '/foo', method => 'post' }))->TO_JSON,
+      { path_template => '/foo', method => 'post' })->TO_JSON,
     {
       valid => false,
       errors => [
@@ -814,9 +811,9 @@ paths:
 YAML
 
   cmp_result(
-    (my $result = $openapi->validate_response(
+    $openapi->validate_response(
       response(200, [ 'Content-Type' => 'application/json' ], '{"foo":1}'),
-      { path_template => '/foo', method => 'post' }))->TO_JSON,
+      { path_template => '/foo', method => 'post' })->TO_JSON,
     {
       valid => false,
       errors => [
@@ -873,9 +870,9 @@ paths:
 YAML
 
   cmp_result(
-    (my $result = $openapi->validate_response(
+    $openapi->validate_response(
       response(200, [ 'Content-Type' => 'application/json', A => 1, B => 2 ], '{"c":1,"d":2}'),
-      { path_template => '/foo', method => 'post' }))->TO_JSON,
+      { path_template => '/foo', method => 'post' })->TO_JSON,
     { valid => true },
     'writeOnly values are still valid in a response',
   );
@@ -902,9 +899,9 @@ paths:
 YAML
 
   cmp_result(
-    (my $result = $openapi->validate_response(
+    $openapi->validate_response(
       response(200, [ Foo => 1, 'Content-Type' => 'text/plain' ], 'hi'),
-      { path_template => '/foo', method => 'post' }))->TO_JSON,
+      { path_template => '/foo', method => 'post' })->TO_JSON,
     {
       valid => false,
       errors => [

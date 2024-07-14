@@ -5,9 +5,9 @@ use warnings;
 sub try {
     my ($class, $d) = @_;
 
-    if ( index($d->ua, 'adidxbot/') > -1
-            && index($d->ua, '+http://www.bing.com/bingbot.htm') > -1
-                && index($d->ua, 'Mozilla/') > -1 ) {
+    if ( $d->_contain('adidxbot/')
+            && $d->_contain('+http://www.bing.com/bingbot.htm')
+                && $d->_contain_mozilla ) {
         my $h = _set_property($d, 'AdIdxBot');
 
         if ($d->opt_version) {
@@ -27,10 +27,10 @@ sub _set_property {
         is_bot => 1,
     };
 
-    if ( index($d->ua, 'Windows') > -1 ) {
+    if ( $d->_contain('Windows') ) {
         $h->{is_windows} = 1;
     }
-    elsif ( index($d->ua, 'iPhone') > -1 ) {
+    elsif ( $d->_contain('iPhone') ) {
         $h->{is_ios} = 1;
     }
 

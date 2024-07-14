@@ -3,7 +3,7 @@ our $AUTHORITY = 'cpan:GENE';
 
 # ABSTRACT: Play a MIDI score in real-time
 
-our $VERSION = '0.0112';
+our $VERSION = '0.0114';
 
 use strict;
 use warnings;
@@ -119,7 +119,7 @@ MIDI::RtMidi::ScorePlayer - Play a MIDI score in real-time
 
 =head1 VERSION
 
-version 0.0112
+version 0.0114
 
 =head1 SYNOPSIS
 
@@ -175,6 +175,9 @@ gets a handy, increasing B<_part> number, starting at one, which can
 be used in the part functions. These parts are synch'd together, given
 the B<new> parameters that are described in the example above.
 
+If you wish to set the patch or channel for a part, do so B<inside>
+the scope of the coderef that is returned by the part.
+
 =head2 Hints
 
 B<Linux>:
@@ -187,7 +190,7 @@ C<fluidsynth -a coreaudio -m coremidi -g 1.0 some-soundfont.sf2>
 Also, you can use Timidity. You can also use a digital audio
 workstation (DAW) like Logic, with a software synth track selected.
 If you wish, you can get General MIDI via "DLSMusicDevice" within a
-DAW.  To do this, you will need a soundfont in
+DAW. To do this, you will need a soundfont in
 C<~/Library/Audio/Sounds/Banks/> and DLSMusicDevice open in your DAW
 with the soundfont selected.
 

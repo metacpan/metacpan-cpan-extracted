@@ -1,4 +1,4 @@
-use v5.12;
+use v5.20;
 use warnings;
 
 use Test2::V0;
@@ -10,6 +10,8 @@ use Plack::Builder;
 use Plack::Response;
 use Plack::Test;
 use Plack::Middleware::ReverseProxy;
+
+use experimental qw/ signatures /;
 
 my $file = Path::Tiny->tempfile;
 
@@ -28,10 +30,8 @@ my @logs;
 my $handler = builder {
 
     # Capture log messages
-    enable sub {
-        my $app = shift;
-        sub {
-            my $env = shift;
+    enable sub($app) {
+        sub($env) {
             $env->{'psgix.logger'} = sub {
                 push @logs, $_[0];
             };
@@ -49,8 +49,7 @@ my $handler = builder {
       cache_config => { init_file => 1, unlink_on_exit => 1 },
       greylist     => \%greylist;
 
-    sub {
-        my ($env) = @_;
+    sub($env) {
         my $res = Plack::Response->new( HTTP_OK, [ 'Content-Type' => 'text/plain' ], [ status_message(HTTP_OK) ] );
         return $res->finalize;
     }
@@ -62,8 +61,7 @@ subtest "rate limiting" => sub {
 
     test_psgi
       app    => $handler,
-      client => sub {
-        my $cb = shift;
+      client => sub($cb) {
 
         my $req = HEAD "/";
 
@@ -98,8 +96,7 @@ subtest "rate limiting (netblock)" => sub {
 
     test_psgi
       app    => $handler,
-      client => sub {
-        my $cb = shift;
+      client => sub($cb) {
 
         for my $suff ( 1 .. 5 ) {
             my $req = HEAD "/", "X-Forwarded-For" => "172.16.0.${suff}";
@@ -123,8 +120,7 @@ subtest "rate limiting (shared blocks)" => sub {
 
     test_psgi
       app    => $handler,
-      client => sub {
-        my $cb = shift;
+      client => sub($cb) {
 
         for my $suff ( 1 .. 5 ) {
             my $req = HEAD "/", "X-Forwarded-For" => "13.96.0.${suff}";
@@ -148,8 +144,7 @@ subtest "whitelisted" => sub {
 
     test_psgi
       app    => $handler,
-      client => sub {
-        my $cb = shift;
+      client => sub($cb) {
 
         my $req = HEAD "/", "X-Forwarded-For" => "172.16.1.1";
 
@@ -170,8 +165,7 @@ subtest "greylist (lower limit)" => sub {
 
     test_psgi
       app    => $handler,
-      client => sub {
-        my $cb = shift;
+      client => sub($cb) {
 
         my $req = HEAD "/", "X-Forwarded-For" => "107.20.17.110";
 
@@ -202,8 +196,7 @@ subtest "greylist (blocked)" => sub {
 
     test_psgi
       app    => $handler,
-      client => sub {
-        my $cb = shift;
+      client => sub($cb) {
 
         my $req = HEAD "/", "X-Forwarded-For" => "13.67.224.13";
 
@@ -229,8 +222,7 @@ subtest "greylist (higher limit)" => sub {
 
     test_psgi
       app    => $handler,
-      client => sub {
-        my $cb = shift;
+      client => sub($cb) {
 
         my $req = HEAD "/", "X-Forwarded-For" => "66.249.64.1";
 

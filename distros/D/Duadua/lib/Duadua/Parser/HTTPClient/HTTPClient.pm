@@ -21,7 +21,7 @@ sub try {
 sub _cli {
     my ($class, $d) = @_;
 
-    if ( index($d->ua, 'curl/') == 0 ) {
+    if ( $d->_prefix('curl/') ) {
         my $h = {
             name => 'Curl',
         };
@@ -33,14 +33,14 @@ sub _cli {
 
         return $h;
     }
-    elsif ( index($d->ua, 'Wget/') > -1 ) {
+    elsif ( $d->_contain('Wget/') ) {
         my $h = {
             name => 'Wget',
         };
-        if ( index($d->ua, 'linux-') > -1 ) {
+        if ( $d->_contain('linux-') ) {
             $h->{is_linux} = 1;
         }
-        elsif ( index($d->ua, 'mingw32') > -1 ) {
+        elsif ( $d->_contain('mingw32') ) {
             $h->{is_windows} = 1;
         }
 
@@ -58,7 +58,7 @@ sub _perl {
 
     my $h;
 
-    if ( index($d->ua, 'libwww-perl/') > -1 ) {
+    if ( $d->_contain('libwww-perl/') ) {
         $h = {
             name => 'libwww-perl',
         };
@@ -68,7 +68,7 @@ sub _perl {
             $h->{version} = $version if $version;
         }
     }
-    elsif ( index($d->ua, 'WWW-Mechanize/') > -1 ) {
+    elsif ( $d->_contain('WWW-Mechanize/') ) {
         $h = {
             name => 'WWW-Mechanize',
         };
@@ -78,7 +78,7 @@ sub _perl {
             $h->{version} = $version if $version;
         }
     }
-    elsif ( index($d->ua, 'LWP::Simple/') > -1 || index($d->ua, 'lwp-trivial/') > -1 ) {
+    elsif ( $d->_contain('LWP::Simple/') || $d->_contain('lwp-trivial/') ) {
         $h = {
             name => 'LWP::Simple',
         };
@@ -88,7 +88,7 @@ sub _perl {
             $h->{version} = $version if $version;
         }
     }
-    elsif ( index($d->ua, 'Furl::HTTP/') > -1 ) {
+    elsif ( $d->_contain('Furl::HTTP/') ) {
         $h = {
             name => 'Furl',
         };
@@ -98,7 +98,7 @@ sub _perl {
             $h->{version} = $version if $version;
         }
     }
-    elsif ( index($d->ua, 'SOAP::Lite/Perl/') > -1 ) {
+    elsif ( $d->_contain('SOAP::Lite/Perl/') ) {
         $h = {
             name => 'SOAP::Lite Perl',
         };
@@ -108,7 +108,7 @@ sub _perl {
             $h->{version} = $version if $version;
         }
     }
-    elsif ( index($d->ua, 'MT::Plugin::BadLinkFinder/') > -1 ) {
+    elsif ( $d->_contain('MT::Plugin::BadLinkFinder/') ) {
         $h = {
             name => 'MT::Plugin::BadLinkFinder',
         };
@@ -127,7 +127,7 @@ sub _python {
 
     my $h;
 
-    if ( index($d->ua, 'Python-urllib/') > -1 ) {
+    if ( $d->_contain('Python-urllib/') ) {
         $h = {
             name => 'Python-urllib',
         };
@@ -137,7 +137,7 @@ sub _python {
             $h->{version} = $version if $version;
         }
     }
-    elsif ( index($d->ua, 'PycURL/') > -1 ) {
+    elsif ( $d->_contain('PycURL/') ) {
         $h = {
             name => 'PycURL',
         };
@@ -147,7 +147,7 @@ sub _python {
             $h->{version} = $version if $version;
         }
     }
-    elsif ( index($d->ua, 'HTTPie/') > -1 ) {
+    elsif ( $d->_contain('HTTPie/') ) {
         $h = {
             name => 'HTTPie',
         };
@@ -157,7 +157,7 @@ sub _python {
             $h->{version} = $version if $version;
         }
     }
-    elsif ( index($d->ua, 'AdsTxtCrawler/') > -1 ) {
+    elsif ( $d->_contain('AdsTxtCrawler/') ) {
         $h = {
             name => 'AdsTxtCrawler',
         };
@@ -167,7 +167,7 @@ sub _python {
             $h->{version} = $version if $version;
         }
     }
-    elsif ( index($d->ua, 'python-requests/') > -1 ) {
+    elsif ( $d->_contain('python-requests/') ) {
         $h = {
             name => 'python-requests',
         };
@@ -177,7 +177,7 @@ sub _python {
             $h->{version} = $version if $version;
         }
     }
-    elsif ( index($d->ua, ' aiohttp/') > -1 ) {
+    elsif ( $d->_contain(' aiohttp/') ) {
         $h = {
             name => 'aiohttp',
         };
@@ -196,7 +196,7 @@ sub _php {
 
     my $h;
 
-    if ( index($d->ua, 'GuzzleHttp/') > -1 ) {
+    if ( $d->_contain('GuzzleHttp/') ) {
         $h = {
             name => 'Guzzle',
         };
@@ -206,7 +206,7 @@ sub _php {
             $h->{version} = $version if $version;
         }
     }
-    elsif ( index($d->ua, 'WordPress/') == 0 || index($d->ua, 'The Incutio XML-RPC PHP Library -- WordPress/') > -1 ) {
+    elsif ( $d->_prefix('WordPress/') || $d->_contain('The Incutio XML-RPC PHP Library -- WordPress/') ) {
         $h = {
             name => 'WordPress',
         };
@@ -216,7 +216,7 @@ sub _php {
             $h->{version} = $version if $version;
         }
     }
-    elsif ( index($d->ua, ' PHP/') > -1 ) {
+    elsif ( $d->_contain(' PHP/') ) {
         $h = {
             name => 'PHP',
         };
@@ -240,7 +240,7 @@ sub _java {
 
     my $h;
 
-    if ( index($d->ua, 'okhttp/') > -1 ) {
+    if ( $d->_contain('okhttp/') ) {
         $h = {
             name => 'OkHttp',
         };
@@ -250,7 +250,7 @@ sub _java {
             $h->{version} = $version if $version;
         }
     }
-    elsif ( index($d->ua, 'Jakarta Commons-HttpClient/') > -1 ) {
+    elsif ( $d->_contain('Jakarta Commons-HttpClient/') ) {
         $h = {
             name => 'Jakarta Commons-HttpClient',
         };
@@ -260,7 +260,7 @@ sub _java {
             $h->{version} = $version if $version;
         }
     }
-    elsif ( index($d->ua, 'Apache-HttpClient/') > -1 ) {
+    elsif ( $d->_contain('Apache-HttpClient/') ) {
         $h = {
             name => 'Apache-HttpClient',
         };
@@ -270,7 +270,7 @@ sub _java {
             $h->{version} = $version if $version;
         }
     }
-    elsif ( index($d->ua, 'Jersey/') > -1 ) {
+    elsif ( $d->_contain('Jersey/') ) {
         $h = {
             name => 'Jersey',
         };
@@ -280,7 +280,7 @@ sub _java {
             $h->{version} = $version if $version;
         }
     }
-    elsif ( index($d->ua, 'Java/') > -1 ) {
+    elsif ( $d->_contain('Java/') ) {
         $h = {
             name => 'Java',
         };
@@ -290,7 +290,7 @@ sub _java {
             $h->{version} = $version if $version;
         }
     }
-    elsif ( index($d->ua, 'Dalvik/') > -1 ) {
+    elsif ( $d->_contain('Dalvik/') ) {
         $h = {
             name       => 'HttpURLConnection Dalvik',
             is_android => 1,
@@ -309,7 +309,7 @@ sub _java {
 sub _golang {
     my ($class, $d) = @_;
 
-    if ( index($d->ua, 'Go-http-client/') > -1 ) {
+    if ( $d->_contain('Go-http-client/') ) {
         my $h = {
             name => 'Go-http-client',
         };
@@ -321,7 +321,7 @@ sub _golang {
 
         return $h;
     }
-    elsif ( index($d->ua, 'Go ') > -1 && index($d->ua, ' package http') > -1 ) {
+    elsif ( $d->_contain('Go ') && $d->_contain(' package http') ) {
         my $h = {
             name => 'Go http-client',
         };
@@ -333,7 +333,7 @@ sub _golang {
 
         return $h;
     }
-    elsif ( index($d->ua, 'Go http package') == 0 ) {
+    elsif ( $d->_prefix('Go http package') ) {
         my $h = {
             name => 'Go http-client',
         };
@@ -350,7 +350,7 @@ sub _ruby {
             name => 'Ruby',
         };
     }
-    elsif ( index($d->ua, 'http.rb/') > -1 ) {
+    elsif ( $d->_contain('http.rb/') ) {
         my $h = {
             name => 'http.rb',
         };
@@ -362,11 +362,11 @@ sub _ruby {
 
         return $h;
     }
-    elsif ( index($d->ua, 'Atig::Http/') > -1 ) {
+    elsif ( $d->_contain('Atig::Http/') ) {
         my $h = {
             name => 'Atig',
         };
-        if ( index($d->ua, 'linux') > -1 ) {
+        if ( $d->_contain('linux') ) {
             $h->{is_linux} = 1;
         }
 
@@ -377,7 +377,7 @@ sub _ruby {
 
         return $h;
     }
-    elsif ( index($d->ua, 'EventMachine ') > -1 ) {
+    elsif ( $d->_contain('EventMachine ') ) {
         return {
             name => 'EventMachine',
         };
@@ -387,7 +387,7 @@ sub _ruby {
 sub _vb {
     my ($class, $d) = @_;
 
-    if ( index($d->ua, ' WinHttp.WinHttpRequest') > -1 ) {
+    if ( $d->_contain(' WinHttp.WinHttpRequest') ) {
         my $h = {
             name => 'WinHttpRequest',
             is_windows => 1,
@@ -405,7 +405,7 @@ sub _vb {
 sub _javascript {
     my ($class, $d) = @_;
 
-    if ( index($d->ua, 'axios/') == 0 ) {
+    if ( $d->_prefix('axios/') ) {
         my $h = {
             name => 'axios',
         };
@@ -422,7 +422,7 @@ sub _javascript {
 sub _tool {
     my ($class, $d) = @_;
 
-    if ( index($d->ua, 'PostmanRuntime') > -1 ) {
+    if ( $d->_contain('PostmanRuntime') ) {
         my $h = {
             name => 'Postman',
         };
