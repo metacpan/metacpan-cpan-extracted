@@ -1,5 +1,10 @@
 Revision history for Perl module Mac::PropertyList
 
+1.505 2024-07-14T17:52:31Z
+	* Don't read binary files in text mode, which has problems on Windows
+	(from joz-k, GitHub #26)
+	* First release to use GitHub Attestations (see README.pod)
+
 1.504 2022-07-08T03:16:18Z
 	* @trwyant fixed some stray debugging output (#14 and #15)
 

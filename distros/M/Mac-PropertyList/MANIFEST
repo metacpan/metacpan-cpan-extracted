@@ -2,6 +2,7 @@ Changes
 CITATION.cff
 DTDs/PropertyList-0.9.dtd
 DTDs/PropertyList-1.0.dtd
+examples/binary_to_perl.pl
 examples/convert_to_perl.pl
 examples/plist-visitor.pl
 examples/README

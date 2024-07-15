@@ -148,6 +148,38 @@ class R::OP::Long {
     return $ret_ndarray;
   }
   
+  precompile static method scamul : R::NDArray::Long ($scalar_ndarray : R::NDArray::Long, $x_ndarray : R::NDArray::Long) {
+    
+    unless ($scalar_ndarray) {
+      die "The n-dimensional array \$scalar_ndarray must be defined.";
+    }
+    
+    unless ($scalar_ndarray->is_scalar) {
+      die "The n-dmension array \$scalar_ndarray must be a scalar.";
+    }
+    
+    unless ($x_ndarray) {
+      die "The n-dimensional array \$x_ndarray must be defined.";
+    }
+    
+    my $length = $x_ndarray->length;
+    
+    my $x_dim = $x_ndarray->dim;
+    
+    my $ret_ndarray = &c(undef, $x_dim);
+    my $ret_data = $ret_ndarray->data;
+    
+    my $scalar_data = $scalar_ndarray->data;
+    my $x_data = $x_ndarray->data;
+    
+    my $scalar = $scalar_data->[0];
+    for (my $i = 0; $i < $length; $i++) {
+      $ret_data->[$i] = $scalar * $x_data->[$i];
+    }
+    
+    return $ret_ndarray;
+  }
+  
   precompile static method div : R::NDArray::Long ($x_ndarray : R::NDArray::Long, $y_ndarray : R::NDArray::Long) {
     
     unless ($x_ndarray) {
@@ -181,7 +213,39 @@ class R::OP::Long {
     return $ret_ndarray;
   }
   
-  precompile static method div_unsinged : R::NDArray::Long ($x_ndarray : R::NDArray::Long, $y_ndarray : R::NDArray::Long) {
+  precompile static method scadiv : R::NDArray::Long ($scalar_ndarray : R::NDArray::Long, $x_ndarray : R::NDArray::Long) {
+    
+    unless ($scalar_ndarray) {
+      die "The n-dimensional array \$scalar_ndarray must be defined.";
+    }
+    
+    unless ($scalar_ndarray->is_scalar) {
+      die "The n-dmension array \$scalar_ndarray must be a scalar.";
+    }
+    
+    unless ($x_ndarray) {
+      die "The n-dimensional array \$x_ndarray must be defined.";
+    }
+    
+    my $length = $x_ndarray->length;
+    
+    my $x_dim = $x_ndarray->dim;
+    
+    my $ret_ndarray = &c(undef, $x_dim);
+    my $ret_data = $ret_ndarray->data;
+    
+    my $scalar_data = $scalar_ndarray->data;
+    my $x_data = $x_ndarray->data;
+    
+    my $scalar = $scalar_data->[0];
+    for (my $i = 0; $i < $length; $i++) {
+      $ret_data->[$i] = $scalar / $x_data->[$i];
+    }
+    
+    return $ret_ndarray;
+  }
+  
+  precompile static method div_u : R::NDArray::Long ($x_ndarray : R::NDArray::Long, $y_ndarray : R::NDArray::Long) {
     
     unless ($x_ndarray) {
       die "The n-dimensional array \$x_ndarray must be defined.";
@@ -247,7 +311,7 @@ class R::OP::Long {
     return $ret_ndarray;
   }
   
-  precompile static method mod_unsinged : R::NDArray::Long ($x_ndarray : R::NDArray::Long, $y_ndarray : R::NDArray::Long) {
+  precompile static method mod_u : R::NDArray::Long ($x_ndarray : R::NDArray::Long, $y_ndarray : R::NDArray::Long) {
     
     unless ($x_ndarray) {
       die "The n-dimensional array \$x_ndarray must be defined.";
@@ -280,6 +344,28 @@ class R::OP::Long {
     return $ret_ndarray;
   }
   
+  precompile static method neg : R::NDArray::Long ($x_ndarray : R::NDArray::Long) {
+    
+    unless ($x_ndarray) {
+      die "The n-dimensional array \$x_ndarray must be defined.";
+    }
+    
+    my $length = $x_ndarray->length;
+    
+    my $x_dim = $x_ndarray->dim;
+    
+    my $ret_ndarray = &c(undef, $x_dim);
+    
+    my $x_data = $x_ndarray->data;
+    my $ret_data = $ret_ndarray->data;
+    
+    for (my $i = 0; $i < $length; $i++) {
+      $ret_data->[$i] = -$x_data->[$i];
+    }
+    
+    return $ret_ndarray;
+  }
+  
   precompile static method abs : R::NDArray::Long ($x_ndarray : R::NDArray::Long) {
     
     unless ($x_ndarray) {
@@ -302,24 +388,50 @@ class R::OP::Long {
     return $ret_ndarray;
   }
   
-  precompile static method neg : R::NDArray::Long ($x_ndarray : R::NDArray::Long) {
+  static method rep : R::NDArray::Long ($x_ndarray : R::NDArray::Long, $times : int) {
+    return (R::NDArray::Long)R::OP->rep($x_ndarray, $times);
+  }
+  
+  static method rep_length : R::NDArray::Long ($x_ndarray : R::NDArray::Long, $length : int) {
+    return (R::NDArray::Long)R::OP->rep_length($x_ndarray, $length);
+  }
+  
+  static method seq : R::NDArray::Long ($begin : long, $end : long, $by : long = 1) {
     
-    unless ($x_ndarray) {
-      die "The n-dimensional array \$x_ndarray must be defined.";
+    if ($by == 0) {
+      die "\$by must not be 0.";
+    }
+    elsif ($by > 0) {
+      unless ($end >= $begin) {
+        die "\$end must be greater than or equal to \$begin if \$by is greater than 0.";
+      }
+    }
+    else {
+      unless ($end <= $begin) {
+        die "\$end must be less than or equal to \$begin if \$by is less than 0.";
+      }
     }
     
-    my $length = $x_ndarray->length;
-    
-    my $x_dim = $x_ndarray->dim;
-    
-    my $ret_ndarray = &c(undef, $x_dim);
-    
-    my $x_data = $x_ndarray->data;
-    my $ret_data = $ret_ndarray->data;
-    
-    for (my $i = 0; $i < $length; $i++) {
-      $ret_data->[$i] = -$x_data->[$i];
+    my $ret_data_list = LongList->new;
+    my $current = $begin;
+    while (1) {
+      if ($by >= 0) {
+        if ($current > $end) {
+          last;
+        }
+      }
+      else {
+        if ($current < $end) {
+          last;
+        }
+      }
+      $ret_data_list->push($current);
+      $current += $by;
     }
+    
+    my $ret_data = $ret_data_list->to_array;
+    
+    my $ret_ndarray = R::OP::Long->c($ret_data);
     
     return $ret_ndarray;
   }
@@ -618,45 +730,99 @@ class R::OP::Long {
     return $ret_ndarray;
   }
   
-  static method seq : R::NDArray::Long ($begin : long, $end : long, $by : long = 1) {
+  precompile static method diff : R::NDArray::Long ($x_ndarray : R::NDArray::Long) {
     
-    if ($by == 0) {
-      die "\$by must not be 0.";
-    }
-    elsif ($by > 0) {
-      unless ($end >= $begin) {
-        die "\$end must be greater than or equal to \$begin if \$by is greater than 0.";
-      }
-    }
-    else {
-      unless ($end <= $begin) {
-        die "\$end must be less than or equal to \$begin if \$by is less than 0.";
-      }
+    unless ($x_ndarray) {
+      die "The n-dimensional array \$x_ndarray must be defined.";
     }
     
-    my $ret_data_list = LongList->new;
-    my $current = $begin;
-    while (1) {
-      if ($by >= 0) {
-        if ($current > $end) {
-          last;
-        }
-      }
-      else {
-        if ($current < $end) {
-          last;
-        }
-      }
-      $ret_data_list->push($current);
-      $current += $by;
+    my $x_dim = $x_ndarray->dim;
+    
+    unless (@$x_dim == 1) {
+      die "The length of dim field of \$x_ndarray must be 1.";
     }
     
-    my $ret_data = $ret_data_list->to_array;
+    my $length = $x_ndarray->length;
     
-    my $ret_ndarray = R::OP::Long->c($ret_data);
+    unless ($length > 0) {
+      die "The length of \$x_ndarray must be greater than 0.";
+    }
+    
+    my $ret_ndarray = &c(undef, [$length - 1]);
+    
+    my $x_data = $x_ndarray->data;
+    my $ret_data = $ret_ndarray->data;
+    
+    for (my $i = 0; $i < $length - 1; $i++) {
+      $ret_data->[$i] = $x_data->[$i + 1] - $x_data->[$i];
+    }
     
     return $ret_ndarray;
   }
   
+  precompile static method max : R::NDArray::Long ($x_ndarray : R::NDArray::Long) {
+    
+    unless ($x_ndarray) {
+      die "The n-dimensional array \$x_ndarray must be defined.";
+    }
+    
+    unless ($x_ndarray->length > 0) {
+      die "The length of n-dimensional array \$x_ndarray must be greater than 0.";
+    }
+    
+    my $length = $x_ndarray->length;
+    
+    my $x_dim = $x_ndarray->dim;
+    
+    my $ret_ndarray = &c(undef, [1]);
+    
+    my $x_data = $x_ndarray->data;
+    my $ret_data = $ret_ndarray->data;
+    
+    my $max = $x_data->[0];
+    for (my $i = 0; $i < $length; $i++) {
+      my $current = $x_data->[$i];
+      
+      if ($current > $max) {
+        $max = $current;
+      }
+    }
+    $ret_data->[0] = $max;
+    
+    return $ret_ndarray;
+  }
+  
+  precompile static method min : R::NDArray::Long ($x_ndarray : R::NDArray::Long) {
+    
+    unless ($x_ndarray) {
+      die "The n-dimensional array \$x_ndarray must be defined.";
+    }
+    
+    unless ($x_ndarray->length > 0) {
+      die "The length of n-dimensional array \$x_ndarray must be greater than 0.";
+    }
+    
+    my $length = $x_ndarray->length;
+    
+    my $x_dim = $x_ndarray->dim;
+    
+    my $ret_ndarray = &c(undef, [1]);
+    
+    my $x_data = $x_ndarray->data;
+    my $ret_data = $ret_ndarray->data;
+    
+    my $min = $x_data->[0];
+    for (my $i = 0; $i < $length; $i++) {
+      my $current = $x_data->[$i];
+      
+      if ($current < $min) {
+        $min = $current;
+      }
+    }
+    $ret_data->[0] = $min;
+    
+    return $ret_ndarray;
+  }
+
 }
 

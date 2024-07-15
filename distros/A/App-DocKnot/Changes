@@ -1,5 +1,18 @@
                        Revision history for DocKnot
 
+v8.0.1 - 2024-07-14
+
+ - Fix formatting of Perl Changes files and possibly other text documents
+   when formatting multiple documents with App::DocKnot::Spin::Text in the
+   same process.  Some data about the documents had leaked from one
+   document to the next.
+
+ - Add the ".css" suffix to the style specified in *.spin pointers for
+   Markdown files, matching the behavior of text and pod files.
+
+ - Fix conversion of partial style sheet URLs in *.rpod and *.faq pointers
+   to style sheet names in *.spin files during docknot update-spin.
+
 v8.0.0 - 2024-07-07
 
  - DocKnot now uses semantic versioning for the package and modules, with

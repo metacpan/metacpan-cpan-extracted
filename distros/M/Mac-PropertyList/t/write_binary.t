@@ -105,6 +105,7 @@ sub testrep {
 &testrep( integer => 256,    "\x11\x01\x00" );
 &testrep( integer => 65535,  "\x11\xFF\xFF" );
 &testrep( integer => 65536,  "\x12\x00\x01\x00\x00" );
+
 &testrep( integer => -1,     "\x13\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF" );
 &testrep( integer => -255,   "\x13\xFF\xFF\xFF\xFF\xFF\xFF\xFF\x01" );
 

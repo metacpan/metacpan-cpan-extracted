@@ -26,7 +26,7 @@
 ################################################################
 
 
-our $VERSION='1.0000666';
+our $VERSION='1.0000669';
 
 
 if ($ENV{'AUTOMATED_TESTING'}) {
@@ -5369,8 +5369,12 @@ print FH '/* program: fullauto'."\n".
 "            Any modifications made to this source file will be lost!\n".
 '*/'."\n".
 "\n".
-'#define REAL_PL '.'"'.$perlsitebin."/fullauto.pl\"\n".
-"main(int argc, char *argv[])\n".
+'#define REAL_PL '.'"'.$perlsitebin."/fullauto.pl\"\n\n".
+"#include <stdio.h>\n".
+"#include <sys/types.h>\n".
+"#include <unistd.h>\n".
+"#include <stdlib.h>\n\n".
+"int main(int argc, char *argv[])\n".
 '{'."\n".
 "\tsetuid(0);\n".
 "\tseteuid(0);\n".

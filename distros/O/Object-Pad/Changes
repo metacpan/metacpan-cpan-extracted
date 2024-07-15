@@ -1,10 +1,29 @@
 Revision history for Object-Pad
 
+0.809   2024-07-14
+        [CHANGES]
+         * Experimental attempt at supporting anonymous `class` syntax
+         * Add an extra debugging aid in the form of "linnets", canary-like
+           values added to every struct and checked on pointer casts
+
+        [BUGFIXES]
+         * Do not create a `new` constructor method for roles, only classes
+         * Ensure perl doesn't attempt to free() a non-malloced pointer when
+           deleting a method of an invokable role (RT152793)
+         * Ensure that `Object::Pad::MOP::Class->for_class` is not confused by
+           non-OP subclasses
+         * Make sure not to embed CVs of `:common` methods because that will
+           upset any lexical or pad temporary at pad index 3
+
 0.808   2023-12-28
         [CHANGES]
          * Added `Object::Pad::MOP::Class->try_for_class`
          * Nicer error message when calling `->for_class` on a package not
            implemented using Object::Pad
+
+        [BUGFIXES]
+         * Avoid adding `Object::Pad::UNIVERSAL` to the `@ISA` array more than
+           once (RT150794)
 
 0.807   2023-12-11
         [CHANGES]

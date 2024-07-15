@@ -3,8 +3,13 @@
 
 #include "suspended_compcv.h"
 
+#include "linnet.h"
+
 /* Metadata about a class or role */
+#define LINNET_VAL_CLASSMETA  0x4F50434D     /* "OPCM" */
+#define MUST_CLASSMETA(ptr)   LINNET_CHECK_CAST(ptr, ClassMeta *, LINNET_VAL_CLASSMETA)
 struct ClassMeta {
+  LINNET_FIELD
   enum MetaType type : 8;
   enum ReprType repr : 8;
 
@@ -72,14 +77,20 @@ struct ClassMeta {
 };
 
 /* Metadata about the embedding of a role into a class */
+#define LINNET_VAL_ROLEEMBEDDING  0x4F505245  /* "OPRE" */
+#define MUST_ROLEEMBEDDING(ptr)   LINNET_CHECK_CAST(ptr, RoleEmbedding *, LINNET_VAL_ROLEEMBEDDING)
 typedef struct RoleEmbedding {
+  LINNET_FIELD
   SV *embeddingsv;
   struct ClassMeta *rolemeta;
   struct ClassMeta *classmeta;
   PADOFFSET offset;
 } RoleEmbedding;
 
+#define LINNET_VAL_METHODMETA  0x4F504D4D  /* "OPMM" */
+#define MUST_METHODMETA(ptr)   LINNET_CHECK_CAST(ptr, MethodMeta *, LINNET_VAL_METHODMETA)
 struct MethodMeta {
+  LINNET_FIELD
   SV *name;
   ClassMeta *class;
   ClassMeta *role;   /* set if inherited from a role */
@@ -87,7 +98,10 @@ struct MethodMeta {
   unsigned int is_common : 1;
 };
 
+#define LINNET_VAL_PARAMMETA  0x4F50504D  /* "OPPM" */
+#define MUST_PARAMMETA(ptr)   LINNET_CHECK_CAST(ptr, ParamMeta *, LINNET_VAL_PARAMMETA)
 typedef struct ParamMeta {
+  LINNET_FIELD
   SV *name;
   ClassMeta *class;
   enum {

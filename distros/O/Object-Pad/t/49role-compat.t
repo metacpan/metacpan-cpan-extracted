@@ -30,4 +30,14 @@ package AClass {
    is( $obj->redir, 2, 'AClass has a ->redir method' );
 }
 
+# RT152793
+{
+   role RT152793 :compat(invokable) {
+      method f { return 42; }
+   }
+
+   undef &RT152793::f;
+   pass( 'Did not crash when deleting method of invokable role (RT152793)' );
+}
+
 done_testing;

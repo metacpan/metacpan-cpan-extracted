@@ -325,6 +325,35 @@ KEYWORDS
     later version of this module will likely perform this behaviour
     unconditionally whenever no BUILD blocks are present.
 
+ class (anon)
+
+       my $class = class :ATTRS... { ... };
+
+    Since version 0.809.
+
+    If a class keyword is not followed by a package name, it creates an
+    anonymous class expression. This is an expression that yields a value
+    suitable to use as a constructor invocant for creating instances of
+    that class, without specifying what its package name will actually be.
+
+    This is useful for creating small one-off instances inline in
+    expressions, such as in unit tests. Since it still accepts the usual
+    attributes and inner body statements, it can be useful for creating
+    one-off instances of roles, with required methods being applied.
+
+       my $testobj = (class {
+          apply Role::Under::Test;
+          method required { return "a useful value"; }
+       })->new;
+
+    Due to limitations on how classes work in Perl, anonymous classes are
+    still backed by long-lived named classes in the global symbol table,
+    unlike true anonymous functions which can go out of scope and be
+    reclaimed once no references to them remain in existence. This means
+    that anonymous classes will retain references to any variables captured
+    within them, even if the class expression itself goes out of scope and
+    any instances created by it no longer remain.
+
  role
 
        role Name :ATTRS... {

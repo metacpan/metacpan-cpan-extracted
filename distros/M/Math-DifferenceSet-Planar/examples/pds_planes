@@ -8,18 +8,21 @@ use constant PDS => Math::DifferenceSet::Planar::;
 
 $| = 1;
 
-my $USAGE = "usage: pds_planes [-l|-g|-z] [-D database] (p n|order|-)\n";
+my $USAGE = "usage: pds_planes [-l|-L|-g|-z|-Z] [-D database] (p n|order|-)\n";
 
 my $type = 1;
+my $prin = 0;
 my $db   = undef;
 my $read = 0;
 while (@ARGV && $ARGV[0] =~ /^-(.+)/s) {
     my $opt = $1;
     shift @ARGV;
     last                       if '-' eq $opt;
-    $type = 1,            next if 'l' eq $opt;
-    $type = 2,            next if 'g' eq $opt;
-    $type = 0,            next if 'z' eq $opt;
+    $type = 1, $prin = 0, next if 'l' eq $opt;
+    $type = 2, $prin = 0, next if 'g' eq $opt;
+    $type = 0, $prin = 0, next if 'z' eq $opt;
+    $type = 1, $prin = 1, next if 'L' eq $opt;
+    $type = 0, $prin = 1, next if 'Z' eq $opt;
     $db   = shift(@ARGV), next if 'D' eq $opt && @ARGV;
     $db   = $1,           next if $opt =~ /^D(.+)s/;
     die $USAGE;
@@ -53,7 +56,13 @@ else {
 sub process {
     my ($s0) = @_;
 
-    my $it = $type? $s0->iterate_planes: $s0->iterate_planes_zc;
+    my $it =
+        $prin?
+            ($type?
+                $s0->iterate_principal_planes:
+                $s0->iterate_principal_planes_zc
+            ):
+            ($type? $s0->iterate_planes: $s0->iterate_planes_zc);
     while (my $s = $it->()) {
         my $t = $type == 2? $s->gap_canonize: $s;
         my @e = $t->elements_sorted;
@@ -69,9 +78,9 @@ pds_planes - enumerate planar difference set planes of a same order
 
 =head1 SYNOPSIS
 
-  pds_planes [-l|-g|-z] [-D database] p n
-  pds_planes [-l|-g|-z] [-D database] order
-  pds_planes [-l|-g|-z] [-D database] -
+  pds_planes [-l|-L|-g|-z|-Z] [-D database] p n
+  pds_planes [-l|-L|-g|-z|-Z] [-D database] order
+  pds_planes [-l|-L|-g|-z|-Z] [-D database] -
 
 =head1 DESCRIPTION
 
@@ -84,13 +93,19 @@ A single dash argument instead of an order makes the tool read planar
 difference sets from standard input and generate all planes of their
 respective order.
 
-Option C<-l> specifies canonical (i.e. lexically smallest) sets as
+Option C<-l> specifies lex-canonical (i.e. lexically smallest) sets as
 plane representatives.  This is the default.
+
+Option C<-L> specifies lex-canonical sets as plane representatives and
+limits the output to principal planes.
 
 Option C<-g> specifies gap-canonical (i.e. lexically smallest when large
 take priority over small elements) sets as plane representatives.
 
 Option C<-z> specifies zeta-canonical sets as plane representatives.
+
+Option C<-Z> specifies zeta-canonical sets as plane representatives and
+limits the output to principal planes.
 
 Parameter C<-D> specifies an alternate sample database.
 
@@ -108,10 +123,15 @@ Martin Becker, E<lt>becker-cpan-mp I<at> cozap.comE<gt>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (c) 2019-2023 by Martin Becker, Blaubeuren.
+Copyright (c) 2019-2024 by Martin Becker, Blaubeuren.
 
 This library is free software; you can distribute it and/or modify it
 under the terms of the Artistic License 2.0 (see the LICENSE file).
+
+The licence grants freedom for related software development but does
+not cover incorporating code or documentation into AI training material.
+Please contact the copyright holder if you want to use the library whole
+or in part for other purposes than stated in the licence.
 
 =head1 DISCLAIMER OF WARRANTY
 

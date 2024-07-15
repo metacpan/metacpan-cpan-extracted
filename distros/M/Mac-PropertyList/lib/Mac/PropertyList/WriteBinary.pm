@@ -102,7 +102,7 @@ use constant {
     havePack64   => ( eval { pack('Q>', 1153202979583557643) eq "\x10\x01\0\0\0\0\0\x0B" } ? 1 : 0 ),
 };
 
-our $VERSION = '1.504';
+our $VERSION = '1.505';
 our @EXPORT_OK = qw( as_string );
 
 sub as_string {
@@ -308,6 +308,11 @@ sub _counted_header {
     }
 }
 
+sub _neg_integer {
+    my($count) = @_;
+   	return pack('Cq>',  tagInteger + 3, $count);
+}
+
 sub _pos_integer {
     my($count) = @_;
 
@@ -396,15 +401,9 @@ sub _as_bplist_fragment {
     # Therefore all negative numbers must be written as 8-byte
     # integers.
 
-    if ($value < 0) {
-        if (Mac::PropertyList::WriteBinary::havePack64) {
-            return pack('Cq>', tagInteger + 3, $value);
-        } else {
-            return pack('CSSl>', tagInteger + 3, 65535, 65535, $value);
-        }
-    } else {
-        return Mac::PropertyList::WriteBinary::_pos_integer($value);
-    }
+	my $method = $value < 0 ? '_neg_integer' : '_pos_integer';
+	my $sub = Mac::PropertyList::WriteBinary->can($method);
+	$sub->($value);
 }
 
 package Mac::PropertyList::uid;
@@ -454,7 +453,7 @@ sub _as_bplist_fragment { return "\x08"; }
 
 Wim Lewis, C<< <wiml@cpan.org> >>
 
-Copyright © 2012-2021 Wim Lewis. All rights reserved.
+Copyright © 2012-2024 Wim Lewis. All rights reserved.
 
 Tom Wyant added support for UID types.
 

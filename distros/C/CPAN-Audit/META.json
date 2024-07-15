@@ -40,7 +40,6 @@
             "Module::CoreList" : "5.20181020",
             "Module::Extract::VERSION" : "0",
             "PerlIO::gzip" : "0",
-            "Pod::Usage" : "1.69",
             "perl" : "5.010"
          }
       },
@@ -65,6 +64,6 @@
          "web" : "https://github.com/briandfoy/cpan-audit"
       }
    },
-   "version" : "20240626.001",
+   "version" : "20240715.001",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

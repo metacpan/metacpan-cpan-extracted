@@ -19,7 +19,7 @@ name: Business-ID-NPWP
 provides:
   Business::ID::NPWP:
     file: lib/Business/ID/NPWP.pm
-    version: '0.091'
+    version: '0.092'
 requires:
   Business::ID::NIK: '0'
   Exporter: '5.57'
@@ -30,7 +30,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Business-ID-NPWP
   homepage: https://metacpan.org/release/Business-ID-NPWP
   repository: git://github.com/perlancar/perl-Business-ID-NPWP.git
-version: '0.091'
+version: '0.092'
 x_Dist_Zilla:
   perl:
     version: '5.038002'
@@ -320,7 +320,7 @@ x_Dist_Zilla:
             -
               class: Pod::Weaver::Plugin::AppendPrepend
               name: '@Author::PERLANCAR/AppendPrepend'
-              version: '0.01'
+              version: '0.021'
             -
               class: Pod::Weaver::Plugin::EnsureUniqueSections
               name: '@Author::PERLANCAR/EnsureUniqueSections'

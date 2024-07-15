@@ -8,26 +8,28 @@ use MIDI::Util qw(setup_score);
 
 use_ok 'MIDI::RtMidi::ScorePlayer';
 
+my $score = setup_score(lead_in => 0);
+my $part  = sub { return sub { $score->r('qn') } };
+
 subtest throws => sub {
     throws_ok { MIDI::RtMidi::ScorePlayer->new }
         qr/score object is required/, 'no score given';
-    throws_ok { MIDI::RtMidi::ScorePlayer->new(score => 'score') }
+    throws_ok { MIDI::RtMidi::ScorePlayer->new(score => $score) }
         qr/parts is required/, 'no parts given';
-    throws_ok { MIDI::RtMidi::ScorePlayer->new(score => 'score', parts => ['parts'], deposit => 'bogus/foo-') }
+    throws_ok { MIDI::RtMidi::ScorePlayer->new(score => $score, parts => [$part], deposit => 'bogus/foo-') }
         qr/Invalid path/, 'invalid deposit';
 };
 
 subtest defaults => sub {
     my $p = new_ok 'MIDI::RtMidi::ScorePlayer' => [
-        score => 'score',
-        parts => ['parts'],
+        score => $score,
+        parts => [$part],
     ];
     isa_ok $p->{device}, 'MIDI::RtMidi::FFI::Device';
     is $p->{port}, qr/wavetable|loopmidi|timidity|fluid/i, 'port'
 };
 
 subtest play => sub {
-    my $score = setup_score(lead_in => 0);
     sub foo { return sub {} }
     my $p = new_ok 'MIDI::RtMidi::ScorePlayer' => [
         score    => $score,
@@ -39,7 +41,6 @@ subtest play => sub {
 };
 
 subtest deposit => sub {
-    my $score = setup_score(lead_in => 0);
     my $foo = sub { return sub { $score->r('qn') } };
     my $p = new_ok 'MIDI::RtMidi::ScorePlayer' => [
         score    => $score,

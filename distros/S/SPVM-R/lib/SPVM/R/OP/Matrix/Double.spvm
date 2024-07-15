@@ -5,6 +5,7 @@ class R::OP::Matrix::Double {
   
   use R::NDArray::Double;
   use R::OP::Double;
+  use R::OP::Matrix;
   use Sys;
   use Hash;
   use R::NDArray::Hash;
@@ -41,6 +42,14 @@ class R::OP::Matrix::Double {
     my $ret_ndarray = &matrix($new_data, $nrow, $ncol);
     
     return $ret_ndarray;
+  }
+  
+  static method add : R::NDArray::Double ($x_ndarray : R::NDArray::Double, $y_ndarray : R::NDArray::Double) {
+    return R::OP::Double->add($x_ndarray, $y_ndarray);
+  }
+  
+  static method sub : R::NDArray::Double ($x_ndarray : R::NDArray::Double, $y_ndarray : R::NDArray::Double) {
+    return R::OP::Double->sub($x_ndarray, $y_ndarray);
   }
   
   static method mul : R::NDArray::Double ($x_ndarray : R::NDArray::Double, $y_ndarray : R::NDArray::Double) {
@@ -300,10 +309,10 @@ class R::OP::Matrix::Double {
   native static method _eigen : void ($ret_data_ref : double[][], $ret_row_ref : int*, $ret_column_ref : int*, $x_data : double[], $x_row : int, $x_column : int, $eigen_values_data_ref : double[][]);
   
   static method cbind : R::NDArray::Double ($x_ndarray : R::NDArray::Double, $y_ndarray : R::NDArray::Double) {
-    return (R::NDArray::Double)R::OP->cbind($x_ndarray, $y_ndarray);
+    return (R::NDArray::Double)R::OP::Matrix->cbind($x_ndarray, $y_ndarray);
   }
   
   static method rbind : R::NDArray::Double ($x_ndarray : R::NDArray::Double, $y_ndarray : R::NDArray::Double) {
-    return (R::NDArray::Double)R::OP->rbind($x_ndarray, $y_ndarray);
+    return (R::NDArray::Double)R::OP::Matrix->rbind($x_ndarray, $y_ndarray);
   }
 }

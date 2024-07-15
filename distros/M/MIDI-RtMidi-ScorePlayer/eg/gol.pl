@@ -2,12 +2,16 @@
 use strict;
 use warnings;
 
+# Successfully tested with fluidsynth, only.
+
 # Examples:
-# perl eg/gol.pl 5
-# perl eg/gol.pl 5 eg/gol-4x.dat
-# perl eg/gol.pl 12
-# perl eg/gol.pl 12 eg/gol-12-blink.dat
-# perl eg/gol.pl 12 1 # render glider
+# perl eg/dat/gol.pl 5
+# perl eg/dat/gol.pl 5 eg/dat/gol-5-4x.dat
+# perl eg/dat/gol.pl 5 eg/dat/gol-5-13x.dat
+# perl eg/dat/gol.pl 12
+# perl eg/dat/gol.pl 12 eg/dat/gol-12-blink.dat
+# perl eg/dat/gol.pl 12 eg/dat/gol-5-4x.dat
+# perl eg/dat/gol.pl 12 1 # render glider
 
 use Game::Life::Faster ();
 use MIDI::RtMidi::ScorePlayer ();
@@ -47,25 +51,24 @@ elsif ($size == 5) {
 my $game = Game::Life::Faster->new($size);
 
 my $matrix;
-if ($init == 1) {
+if ($init eq '1') {
     $game->place_points(
         int $size / 2, int $size / 2,
         [ [ 1, 1, 1 ],
           [ 1, 0, 0 ],
-          [ 0, 1, 0 ],
-        ]
+          [ 0, 1, 0 ] ] # glider
     );
 }
 elsif ($init && -e $init) {
     $matrix = retrieve($init);
+    $game->place_points(0, 0, $matrix);
 }
 else {
     warn "Can't load $init\n" if $init;
     $matrix = [ map { [ map { int(rand 2) } 1 .. $size ] } 1 .. $size ];
     store($matrix, 'gol-state.dat');
+    $game->place_points(0, 0, $matrix);
 }
-
-$game->place_points(0, 0, $matrix);
 
 my @parts = (\&part) x $size;
 

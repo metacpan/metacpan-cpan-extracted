@@ -3,7 +3,7 @@ our $AUTHORITY = 'cpan:GENE';
 
 # ABSTRACT: Play a MIDI score in real-time
 
-our $VERSION = '0.0114';
+our $VERSION = '0.0117';
 
 use strict;
 use warnings;
@@ -19,7 +19,8 @@ sub new {
     my ($class, %opts) = @_;
 
     die 'A MIDI score object is required' unless $opts{score};
-    die 'A list of parts is required' unless $opts{parts} && @{ $opts{parts} };
+    die 'A list of parts is required'
+        unless $opts{parts} && grep { ref eq 'CODE' } @{ $opts{parts} };
 
     $opts{common}   ||= {};
     $opts{repeats}  ||= 1;
@@ -28,6 +29,7 @@ sub new {
     $opts{infinite} //= 1;
     $opts{verbose}  //= 1;
     $opts{deposit}  ||= '';
+
     if ($opts{deposit}) {
         ($opts{prefix}, $opts{path}) = fileparse($opts{deposit});
         die "Invalid path: $opts{path}\n" unless -d $opts{path};
@@ -49,9 +51,7 @@ sub new {
 sub play {
     my ($self) = @_;
     if ($self->{infinite}) {
-        while (1) {
-            $self->_play;
-        }
+        while (1) { $self->_play }
     }
     else {
         $self->_play for 1 .. $self->{loop};
@@ -119,7 +119,7 @@ MIDI::RtMidi::ScorePlayer - Play a MIDI score in real-time
 
 =head1 VERSION
 
-version 0.0114
+version 0.0117
 
 =head1 SYNOPSIS
 
@@ -156,7 +156,7 @@ version 0.0114
       loop     => 4, # loop limit if finite (default: 1)
       infinite => 0, # loop infinitely (default: 1)
       deposit  => 'path/prefix-', # optionally make a file after each loop
-			vebose   => 0, # show our progress (default: 1)
+      vebose   => 0, # show our progress (default: 1)
   )->play;
 
 =head1 DESCRIPTION
@@ -181,18 +181,18 @@ the scope of the coderef that is returned by the part.
 =head2 Hints
 
 B<Linux>:
-If your distro does not install a service, you can use timidity in
-daemon mode: C<timidity -iAD>. Also, FluidSynth is an alternative.
+If your distro does not install a service, you can use FluidSynth:
+C<fluidsynth -a alsa -m alsa_seq some-soundfont.sf2>
+Or try Timidity in daemon mode: C<timidity -iAD>, but YMMV, TBH.
 
 B<MacOS>:
 You can use FluidSynth like this:
-C<fluidsynth -a coreaudio -m coremidi -g 1.0 some-soundfont.sf2>
-Also, you can use Timidity. You can also use a digital audio
-workstation (DAW) like Logic, with a software synth track selected.
-If you wish, you can get General MIDI via "DLSMusicDevice" within a
-DAW. To do this, you will need a soundfont in
-C<~/Library/Audio/Sounds/Banks/> and DLSMusicDevice open in your DAW
-with the soundfont selected.
+C<fluidsynth -a coreaudio -m coremidi some-soundfont.sf2>
+Also, you can use Timidity, as above. A digital audio workstation
+(DAW) like Logic, with a software synth track selected, should work.
+And if you wish, you can get General MIDI with a "DLSMusicDevice"
+track open, and a soundfont in C<~/Library/Audio/Sounds/Banks/>. Make
+sure the soundfont is selected for the track.
 
 B<Windows>:
 This should I<just work> out of the box.

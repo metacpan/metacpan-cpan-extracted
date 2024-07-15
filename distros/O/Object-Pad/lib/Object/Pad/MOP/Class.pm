@@ -3,7 +3,7 @@
 #
 #  (C) Paul Evans, 2020-2023 -- leonerd@leonerd.org.uk
 
-package Object::Pad::MOP::Class 0.808;
+package Object::Pad::MOP::Class 0.809;
 
 use v5.14;
 use warnings;
@@ -90,8 +90,12 @@ sub try_for_class
         "Object::Pad::MOP is experimental and may be changed or removed without notice";
    }
 
-   my $code = $targetclass->can( "META" ) or
-      return undef;
+   my $code = do {
+      my $fqname = "${targetclass}::META";
+      no strict 'refs';
+      defined &$fqname or return undef;
+      \&{"${targetclass}::META"};
+   };
 
    return $code->( $targetclass );
 }

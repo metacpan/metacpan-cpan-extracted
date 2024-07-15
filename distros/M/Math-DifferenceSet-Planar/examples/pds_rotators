@@ -7,21 +7,25 @@ use Math::DifferenceSet::Planar 1.000;
 
 $| = 1;
 
-my $USAGE = "usage: pds_rotators [-f|-m] (p n|q)\n";
+my $USAGE = "usage: pds_rotators [-D database] [-f|-m] (p n|q)\n";
 
 my $full = 0;
 my $min  = 0;
+my $db   = undef;
 while (@ARGV && $ARGV[0] =~ /^-(.+)\z/s) {
     my $opt = $1;
     shift @ARGV;
-    last                      if '-' eq $opt;
-    $full = 1, $min = 0, last if 'f' eq $opt;
-    $full = 0, $min = 1, last if 'm' eq $opt;
+    last                       if '-' eq $opt;
+    $full = 1, $min = 0,  last if 'f' eq $opt;
+    $full = 0, $min = 1,  last if 'm' eq $opt;
+    $db   = shift(@ARGV), next if 'D' eq $opt && @ARGV;
+    $db   = $1,           next if $opt =~ /^D(.+)/s;
     die $USAGE;
 }
 if (@ARGV < 1 || 2 < @ARGV  || grep {!/^[1-9][0-9]*\z/} @ARGV) {
     die $USAGE;
 }
+Math::DifferenceSet::Planar->set_database($db) if defined $db;
 
 my $it = Math::DifferenceSet::Planar->iterate_rotators(@ARGV);
 
@@ -56,8 +60,8 @@ pds_rotators - enumerate planar difference set rotators of a given order
 
 =head1 SYNOPSIS
 
-  pds_rotators [-f|-m] p n
-  pds_rotators [-f|-m] order
+  pds_rotators [-D database] [-f|-m] p n
+  pds_rotators [-D database] [-f|-m] order
 
 =head1 DESCRIPTION
 
@@ -80,10 +84,15 @@ Martin Becker, E<lt>becker-cpan-mp I<at> cozap.comE<gt>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (c) 2022-2023 by Martin Becker, Blaubeuren.
+Copyright (c) 2022-2024 by Martin Becker, Blaubeuren.
 
 This library is free software; you can distribute it and/or modify it
 under the terms of the Artistic License 2.0 (see the LICENSE file).
+
+The licence grants freedom for related software development but does
+not cover incorporating code or documentation into AI training material.
+Please contact the copyright holder if you want to use the library whole
+or in part for other purposes than stated in the licence.
 
 =head1 DISCLAIMER OF WARRANTY
 

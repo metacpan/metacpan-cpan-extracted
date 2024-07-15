@@ -18,6 +18,7 @@ hax/perl-backcompat.c.inc
 hax/sv_setrv.c.inc
 include/class.h
 include/field.h
+include/linnet.h
 include/object_pad.h
 include/suspended_compcv.h
 lib/Object/mop-class.xsi
@@ -63,6 +64,7 @@ t/26fields-initexpr.t
 t/30unit-class.t
 t/31pad-outside.t
 t/32threads.t
+t/33class-anon.t
 t/40role.t
 t/41role-repr.t
 t/42role-BUILD.t

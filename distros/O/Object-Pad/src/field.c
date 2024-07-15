@@ -34,6 +34,7 @@ FieldMeta *ObjectPad_mop_create_field(pTHX_ SV *fieldname, FIELDOFFSET fieldix, 
   assert(fieldix > -1);
 
   *fieldmeta = (FieldMeta){
+    LINNET_INIT(LINNET_VAL_FIELDMETA)
     .name      = SvREFCNT_inc(fieldname),
     .is_direct = true,
     .class     = classmeta,
@@ -67,6 +68,7 @@ static void S_mop_field_set_param(pTHX_ FieldMeta *fieldmeta, SV *paramname)
   Newx(parammeta, 1, struct ParamMeta);
 
   *parammeta = (struct ParamMeta){
+    LINNET_INIT(LINNET_VAL_PARAMMETA)
     .name  = SvREFCNT_inc(paramname),
     .class = classmeta,
     .type  = PARAM_FIELD,
@@ -315,7 +317,7 @@ SV *ObjectPad_get_obj_fieldsv(pTHX_ SV *self, ClassMeta *classmeta, FieldMeta *f
     if(!svp)
       croak("Cannot fetch role field value from a non-applied instance");
 
-    RoleEmbedding *embedding = (RoleEmbedding *)*svp;
+    RoleEmbedding *embedding = MUST_ROLEEMBEDDING(*svp);
 
     fieldstore = get_obj_fieldstore(self, embedding->classmeta->repr, true);
     fieldix = fieldmeta->fieldix + embedding->offset;

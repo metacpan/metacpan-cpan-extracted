@@ -1,5 +1,5 @@
 package Dist::Build::Core;
-$Dist::Build::Core::VERSION = '0.004';
+$Dist::Build::Core::VERSION = '0.005';
 use strict;
 use warnings;
 
@@ -55,20 +55,20 @@ sub add_methods {
 	$self->add_delegate($planner, 'manify', sub {
 		my ($source, $destination, $section) = @_;
 		my $manify = new_action('manify', $source, $destination, $section);
+		my $dirname = dirname($destination);
 		ExtUtils::Builder::Node->new(
 			target       => $destination,
-			dependencies => [ $source ],
+			dependencies => [ $source, $dirname ],
 			actions      => [ $manify ],
 		);
 	});
 
-	$self->add_delegate($planner, 'mkdirs', sub {
-		my ($target, @mkdirs) = @_;
-		my @actions = map { new_action('mkdir', $_) } @mkdirs;
+	$self->add_delegate($planner, 'mkdir', sub {
+		my ($target, %options) = @_;
 		ExtUtils::Builder::Node->new(
 			target  => $target,
 			phony   => 1,
-			actions => \@actions,
+			actions => [ new_action('mkdir', $target, %options) ],
 		);
 	});
 
@@ -113,7 +113,7 @@ sub copy {
 
 sub mkdir {
 	my ($source, %options) = @_;
-	make_path($source, %options);
+	make_path($source, \%options);
 	return;
 }
 
@@ -149,7 +149,7 @@ sub tap_harness {
 
 sub install {
 	my (%args) = @_;
-	ExtUtils::Install::install($args{install_map}, $args{verbose}, 0, $args{uninst});
+	ExtUtils::Install::install($args{install_map}, $args{verbose}, $args{dry_run}, $args{uninst});
 	return;
 }
 
@@ -169,7 +169,7 @@ Dist::Build::Core - core functions for Dist::Build
 
 =head1 VERSION
 
-version 0.004
+version 0.005
 
 =head1 DESCRIPTION
 
@@ -191,9 +191,9 @@ Copy the executable C<$source> to C<$destination>.
 
 Manify C<$source> to C<$destination>, as section C<$section>.
 
-=item * mkdirs($target, @dirs)
+=item * mkdir($target, $dir, %options)
 
-This ensures the given directories exist.
+This ensures the given directory exist.
 
 =item * tap_harness(%options)
 

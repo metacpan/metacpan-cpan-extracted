@@ -28,6 +28,9 @@ class AClass {
    is( $obj->own_cvname, "AClass::own_cvname", '->own_cvname sees correct subname' );
 }
 
+is( (class { apply ARole })->new->one, 1,
+   'anonymous classes can apply roles' );
+
 # Older :does attribute notation
 class AClassAttr :does(ARole) {
 }

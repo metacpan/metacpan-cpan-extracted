@@ -51,7 +51,9 @@ void ObjectPad__need_PLparser(pTHX); /* in Object/Pad.xs */
 /* Empty MGVTBL simply for locating instance backing AV */
 static MGVTBL vtbl_backingav = {};
 
-RoleEmbedding ObjectPad__embedding_standalone = {};
+RoleEmbedding ObjectPad__embedding_standalone = {
+  LINNET_INIT(LINNET_VAL_ROLEEMBEDDING)
+};
 
 typedef struct ClassAttributeRegistration ClassAttributeRegistration;
 
@@ -262,7 +264,7 @@ ClassMeta *ObjectPad_mop_get_class_for_stash(pTHX_ HV *stash)
   if(!gvp)
     croak("Unable to find ClassMeta for %" HEKf, HEKfARG(HvNAME_HEK(stash)));
 
-  return NUM2PTR(ClassMeta *, SvUV(SvRV(GvSV(*gvp))));
+  return MUST_CLASSMETA(SvUV(SvRV(GvSV(*gvp))));
 }
 
 SV *ObjectPad_mop_class_get_name(pTHX_ ClassMeta *class)
@@ -291,7 +293,7 @@ static void S_make_instance_fields(pTHX_ const ClassMeta *classmeta, SV *fieldst
 
   I32 i;
   for(i = 0; i < nfields; i++) {
-    FieldMeta *fieldmeta = (FieldMeta *)AvARRAY(fields)[i];
+    FieldMeta *fieldmeta = MUST_FIELDMETA(AvARRAY(fields)[i]);
     if(!fieldmeta->is_direct)
       continue;
     char sigil = SvPV_nolen(fieldmeta->name)[0];
@@ -337,7 +339,7 @@ static void S_make_instance_fields(pTHX_ const ClassMeta *classmeta, SV *fieldst
     assert(classmeta->type == METATYPE_CLASS || nroles == 0);
 
     for(i = 0; i < nroles; i++) {
-      RoleEmbedding *embedding = embeddings[i];
+      RoleEmbedding *embedding = MUST_ROLEEMBEDDING(embeddings[i]);
       ClassMeta *rolemeta = embedding->rolemeta;
 
       assert(rolemeta->sealed);
@@ -358,7 +360,7 @@ static void S_alias_fieldkeys_into_av(pTHX_ ClassMeta *classmeta, HV *hv, AV *ba
 
   I32 i;
   for(i = 0; i < nfields; i++) {
-    FieldMeta *fieldmeta = (FieldMeta *)AvARRAY(fields)[i];
+    FieldMeta *fieldmeta = MUST_FIELDMETA(AvARRAY(fields)[i]);
     if(!fieldmeta->is_direct)
       continue;
 
@@ -487,7 +489,7 @@ RoleEmbedding *ObjectPad__get_embedding_from_pad(pTHX)
   PAD *pad1 = PadlistARRAY(CvPADLIST(find_runcv(0)))[1];
   SV *embeddingsv = PadARRAY(pad1)[PADIX_EMBEDDING];
   if(embeddingsv && embeddingsv != &PL_sv_undef)
-    return (RoleEmbedding *)SvPVX(embeddingsv);
+    return MUST_ROLEEMBEDDING(SvPVX(embeddingsv));
   else
     return NULL;
 }
@@ -567,7 +569,9 @@ void ObjectPad__start_method_parse(pTHX_ ClassMeta *meta, bool is_common)
 
     if(meta->role_is_invokable) {
       SV *sv = PadARRAY(pad1)[PADIX_EMBEDDING];
-      sv_setpvn(sv, "", 0);
+      SvUPGRADE(sv, SVt_PV);
+      SvPOK_on(sv);
+      SvLEN(sv) = 0;
       SvPVX(sv) = (void *)&ObjectPad__embedding_standalone;
     }
     else {
@@ -586,7 +590,7 @@ void ObjectPad__add_fields_to_pad(pTHX_ ClassMeta *meta, U32 since_field)
 
   U32 i;
   for(i = since_field; i < nfields; i++) {
-    FieldMeta *fieldmeta = (FieldMeta *)AvARRAY(fields)[i];
+    FieldMeta *fieldmeta = MUST_FIELDMETA(AvARRAY(fields)[i]);
 
     /* Skip the anonymous ones */
     if(SvCUR(fieldmeta->name) < 2)
@@ -673,7 +677,7 @@ static OP *S_make_methstart_ops(pTHX_ ClassMeta *meta, CV *outerscope)
 
   int i;
   for(i = 0; i < nfields; i++) {
-    FieldMeta *fieldmeta = (FieldMeta *)AvARRAY(fields)[i];
+    FieldMeta *fieldmeta = MUST_FIELDMETA(AvARRAY(fields)[i]);
 
     if(snames) {
       PADNAME *fieldname = snames[i + 1];
@@ -904,6 +908,7 @@ void ObjectPad__parse_adjust_params(pTHX_ ClassMeta *meta, AV *params)
       Newx(parammeta, 1, struct ParamMeta);
 
       *parammeta = (struct ParamMeta){
+        LINNET_INIT(LINNET_VAL_PARAMMETA)
         .name  = paramname,
         .class = meta,
         .type  = PARAM_ADJUST,
@@ -991,7 +996,7 @@ OP *ObjectPad__finish_adjust_params(pTHX_ ClassMeta *meta, AV *params, OP *body)
     newOP_CUSTOM(&pp_bind_params_hv, 0));
 
   for(U32 i = 0; params && i < av_count(params); i++) {
-    ParamMeta *parammeta = NUM2PTR(ParamMeta *, SvUV(AvARRAY(params)[i]));
+    ParamMeta *parammeta = MUST_PARAMMETA(SvUV(AvARRAY(params)[i]));
 
     SV *paramname = parammeta->name;
     OP *defexpr   = parammeta->adjust.defexpr;
@@ -1044,7 +1049,7 @@ MethodMeta *ObjectPad_mop_class_add_method(pTHX_ ClassMeta *meta, SV *methodname
 
   U32 i;
   for(i = 0; i < av_count(methods); i++) {
-    MethodMeta *methodmeta = (MethodMeta *)AvARRAY(methods)[i];
+    MethodMeta *methodmeta = MUST_METHODMETA(AvARRAY(methods)[i]);
     if(sv_eq(methodmeta->name, methodname)) {
       if(methodmeta->role)
         croak("Method '%" SVf "' clashes with the one provided by role %" SVf,
@@ -1058,6 +1063,7 @@ MethodMeta *ObjectPad_mop_class_add_method(pTHX_ ClassMeta *meta, SV *methodname
   Newx(methodmeta, 1, MethodMeta);
 
   *methodmeta = (MethodMeta){
+    LINNET_INIT(LINNET_VAL_METHODMETA)
     .name  = SvREFCNT_inc(methodname),
     .class = meta,
   };
@@ -1125,7 +1131,7 @@ FieldMeta *ObjectPad_mop_class_find_field(pTHX_ ClassMeta *meta, SV *fieldname, 
 
   U32 i, nfields = av_count(fields);
   for(i = 0; i < nfields; i++) {
-    FieldMeta *fieldmeta = (FieldMeta *)AvARRAY(fields)[i];
+    FieldMeta *fieldmeta = MUST_FIELDMETA(AvARRAY(fields)[i]);
     if(SvCUR(fieldmeta->name) < 2)
       continue;
 
@@ -1194,7 +1200,7 @@ static bool S_mop_class_implements_role(pTHX_ ClassMeta *meta, ClassMeta *roleme
     case METATYPE_CLASS: {
       RoleEmbedding **embeddings = mop_class_get_all_roles(meta, &n);
       for(i = 0; i < n; i++)
-        if(embeddings[i]->rolemeta == rolemeta)
+        if(MUST_ROLEEMBEDDING(embeddings[i])->rolemeta == rolemeta)
           return true;
 
       break;
@@ -1205,7 +1211,7 @@ static bool S_mop_class_implements_role(pTHX_ ClassMeta *meta, ClassMeta *roleme
       U32 n = av_count(meta->role.superroles);
       /* TODO: this isn't super-efficient in deep cross-linked heirarchies */
       for(i = 0; i < n; i++) {
-        if(roles[i] == rolemeta)
+        if(MUST_CLASSMETA(roles[i]) == rolemeta)
           return true;
         if(mop_class_implements_role(roles[i], rolemeta))
           return true;
@@ -1235,10 +1241,13 @@ static RoleEmbedding *S_embed_role(pTHX_ ClassMeta *classmeta, ClassMeta *roleme
 
   RoleEmbedding *embedding = (RoleEmbedding *)SvPVX(embeddingsv);
 
-  embedding->embeddingsv = embeddingsv;
-  embedding->rolemeta    = rolemeta;
-  embedding->classmeta   = classmeta;
-  embedding->offset      = -1;
+  *embedding = (RoleEmbedding){
+    LINNET_INIT(LINNET_VAL_ROLEEMBEDDING)
+    .embeddingsv = embeddingsv,
+    .rolemeta    = rolemeta,
+    .classmeta   = classmeta,
+    .offset      = -1,
+  };
 
   av_push(classmeta->cls.embedded_roles, (SV *)embedding);
   hv_store_ent(rolemeta->role.applied_classes, classmeta->name, (SV *)embedding, 0);
@@ -1269,7 +1278,7 @@ static RoleEmbedding *S_embed_role(pTHX_ ClassMeta *classmeta, ClassMeta *roleme
 
   U32 nmethods = av_count(rolemeta->direct_methods);
   for(i = 0; i < nmethods; i++) {
-    MethodMeta *methodmeta = (MethodMeta *)AvARRAY(rolemeta->direct_methods)[i];
+    MethodMeta *methodmeta = MUST_METHODMETA(AvARRAY(rolemeta->direct_methods)[i]);
     SV *mname = methodmeta->name;
 
     HE *he = hv_fetch_ent(srcstash, mname, 0, 0);
@@ -1291,9 +1300,15 @@ static RoleEmbedding *S_embed_role(pTHX_ ClassMeta *classmeta, ClassMeta *roleme
       croak("Method '%" SVf "' clashes with the one provided by role %" SVf,
         SVfARG(mname), SVfARG(rolemeta->name));
 
-    CV *newcv;
-    GvCV_set(*gvp, newcv = embed_cv(GvCV((GV *)HeVAL(he)), embedding));
-    CvGV_set(newcv, *gvp);
+    CV *cv = GvCV((GV *)HeVAL(he));
+    if(!methodmeta->is_common) {
+      CV *newcv = embed_cv(cv, embedding);
+      GvCV_set(*gvp, newcv);
+      CvGV_set(newcv, *gvp);
+    }
+    else
+      /* :common methods don't get an embedding */
+      GvCV_set(*gvp, (CV *)SvREFCNT_inc((SV *)cv));
   }
 
   nmethods = av_count(rolemeta->requiremethods);
@@ -1325,7 +1340,7 @@ void ObjectPad_mop_class_add_role(pTHX_ ClassMeta *dstmeta, ClassMeta *rolemeta)
         ClassMeta **roles = (ClassMeta **)AvARRAY(rolemeta->role.superroles);
         U32 i;
         for(i = 0; i < nroles; i++)
-          mop_class_add_role(dstmeta, roles[i]);
+          mop_class_add_role(dstmeta, MUST_CLASSMETA(roles[i]));
       }
 
       RoleEmbedding *embedding = embed_role(dstmeta, rolemeta);
@@ -1357,7 +1372,7 @@ void ObjectPad_mop_class_load_and_add_role(pTHX_ ClassMeta *meta, SV *rolename, 
   GV **metagvp = (GV **)hv_fetchs(rolestash, "META", 0);
   ClassMeta *rolemeta = NULL;
   if(metagvp)
-    rolemeta = NUM2PTR(ClassMeta *, SvUV(SvRV(GvSV(*metagvp))));
+    rolemeta = MUST_CLASSMETA(SvUV(SvRV(GvSV(*metagvp))));
 
   if(!rolemeta || rolemeta->type != METATYPE_ROLE)
     croak("%" SVf " is not a role", SVfARG(rolename));
@@ -1415,11 +1430,12 @@ static void S_mop_class_apply_role(pTHX_ RoleEmbedding *embedding)
         croak("Named parameter '%" SVf "' clashes with the one provided by role %" SVf,
           SVfARG(HeSVKEY_force(iter)), SVfARG(rolemeta->name));
 
-      ParamMeta *roleparammeta = (ParamMeta *)HeVAL(iter);
+      ParamMeta *roleparammeta = MUST_PARAMMETA(HeVAL(iter));
       ParamMeta *classparammeta;
       Newx(classparammeta, 1, struct ParamMeta);
 
       *classparammeta = (struct ParamMeta){
+        LINNET_INIT(LINNET_VAL_PARAMMETA)
         .name  = SvREFCNT_inc(roleparammeta->name),
         .class = roleparammeta->class,
         .type  = roleparammeta->type,
@@ -1477,7 +1493,7 @@ static void S_apply_roles(pTHX_ ClassMeta *dstmeta, ClassMeta *srcmeta)
   RoleEmbedding **arr = mop_class_get_direct_roles(srcmeta, &nroles);
   U32 i;
   for(i = 0; i < nroles; i++) {
-    mop_class_apply_role(arr[i]);
+    mop_class_apply_role(MUST_ROLEEMBEDDING(arr[i]));
   }
 }
 
@@ -1490,7 +1506,7 @@ void ObjectPad__check_colliding_param(pTHX_ ClassMeta *classmeta, SV *paramname)
   if(!he)
     return;
 
-  ParamMeta *colliding_parammeta = (ParamMeta *)HeVAL(he);
+  ParamMeta *colliding_parammeta = MUST_PARAMMETA(HeVAL(he));
   ClassMeta *origclassmeta = colliding_parammeta->class;
 
   if(origclassmeta != classmeta)
@@ -1596,7 +1612,7 @@ static void S_generate_initfields_method(pTHX_ ClassMeta *meta)
     RoleEmbedding **embeddings = mop_class_get_direct_roles(meta, &nroles);
 
     for(i = 0; i < nroles; i++) {
-      RoleEmbedding *embedding = embeddings[i];
+      RoleEmbedding *embedding = MUST_ROLEEMBEDDING(embeddings[i]);
       ClassMeta *rolemeta = embedding->rolemeta;
 
       if(!rolemeta->sealed)
@@ -1689,7 +1705,7 @@ void ObjectPad_mop_class_seal(pTHX_ ClassMeta *meta)
 
     U32 i;
     for(i = 0; i < nfields; i++) {
-      FieldMeta *fieldmeta = (FieldMeta *)AvARRAY(fields)[i];
+      FieldMeta *fieldmeta = MUST_FIELDMETA(AvARRAY(fields)[i]);
 
       U32 hooki;
       for(hooki = 0; fieldmeta->hooks && hooki < av_count(fieldmeta->hooks); hooki++) {
@@ -1772,7 +1788,7 @@ void ObjectPad_mop_class_seal(pTHX_ ClassMeta *meta)
     int i;
     SV **arr = AvARRAY(meta->pending_submeta);
     for(i = 0; i < av_count(meta->pending_submeta); i++) {
-      ClassMeta *submeta = (ClassMeta *)arr[i];
+      ClassMeta *submeta = MUST_CLASSMETA(arr[i]);
       arr[i] = &PL_sv_undef;
 
       mop_class_seal(submeta);
@@ -1787,7 +1803,7 @@ XS_INTERNAL(injected_constructor);
 XS_INTERNAL(injected_constructor)
 {
   dXSARGS;
-  const ClassMeta *meta = XSANY.any_ptr;
+  const ClassMeta *meta = MUST_CLASSMETA(XSANY.any_ptr);
   SV *class = ST(0);
   SV *self = NULL;
 
@@ -2159,10 +2175,18 @@ XS_INTERNAL(injected_constructor)
   XSRETURN(1);
 }
 
+XS_INTERNAL(injected_constructor_role);
+XS_INTERNAL(injected_constructor_role)
+{
+  const ClassMeta *meta = MUST_CLASSMETA(XSANY.any_ptr);
+  croak("Cannot directly construct an instance of role '%" SVf "'",
+    SVfARG(meta->name));
+}
+
 XS_INTERNAL(injected_DOES)
 {
   dXSARGS;
-  const ClassMeta *meta = XSANY.any_ptr;
+  const ClassMeta *meta = MUST_CLASSMETA(XSANY.any_ptr);
   SV *self = ST(0);
   SV *wantrole = ST(1);
 
@@ -2183,7 +2207,7 @@ XS_INTERNAL(injected_DOES)
 
     int i;
     for(i = 0; i < nroles; i++) {
-      RoleEmbedding *embedding = (RoleEmbedding *)AvARRAY(roles)[i];
+      RoleEmbedding *embedding = MUST_ROLEEMBEDDING(AvARRAY(roles)[i]);
       if(sv_eq(embedding->rolemeta->name, wantrole)) {
         XSRETURN_YES;
       }
@@ -2266,6 +2290,7 @@ ClassMeta *ObjectPad_mop_create_class(pTHX_ enum MetaType type, SV *name)
   Newx(meta, 1, ClassMeta);
 
   *meta = (ClassMeta){
+    LINNET_INIT(LINNET_VAL_CLASSMETA)
     .type = type,
     .repr = REPR_AUTOSELECT,
     .name = SvREFCNT_inc(name),
@@ -2359,7 +2384,14 @@ ClassMeta *ObjectPad_mop_create_class(pTHX_ enum MetaType type, SV *name)
     SV *newname = newSVpvf("%" SVf "::new", name);
     SAVEFREESV(newname);
 
-    CV *newcv = newXS_flags(SvPV_nolen(newname), injected_constructor, __FILE__, NULL, SvFLAGS(newname) & SVf_UTF8);
+    CV *newcv;
+    if(type == METATYPE_CLASS) {
+      newcv = newXS_flags(SvPV_nolen(newname), injected_constructor, __FILE__, NULL, SvFLAGS(newname) & SVf_UTF8);
+    }
+    else {
+      newcv = newXS_flags(SvPV_nolen(newname), injected_constructor_role, __FILE__, NULL, SvFLAGS(newname) & SVf_UTF8);
+    }
+
     CvXSUBANY(newcv).any_ptr = meta;
   }
 
@@ -2407,7 +2439,7 @@ void ObjectPad_mop_class_set_superclass(pTHX_ ClassMeta *meta, SV *superclassnam
   HV *superstash = gv_stashsv(superclassname, 0);
   GV **metagvp = (GV **)hv_fetchs(superstash, "META", 0);
   if(metagvp)
-    supermeta = NUM2PTR(ClassMeta *, SvUV(SvRV(GvSV(*metagvp))));
+    supermeta = MUST_CLASSMETA(SvUV(SvRV(GvSV(*metagvp))));
 
   if(supermeta) {
     /* A subclass of an Object::Pad class */
@@ -2480,7 +2512,7 @@ void ObjectPad_mop_class_set_superclass(pTHX_ ClassMeta *meta, SV *superclassnam
     if(nroles) {
       U32 i;
       for(i = 0; i < nroles; i++) {
-        RoleEmbedding *embedding = embeddings[i];
+        RoleEmbedding *embedding = MUST_ROLEEMBEDDING(embeddings[i]);
         ClassMeta *rolemeta = embedding->rolemeta;
 
         av_push(meta->cls.embedded_roles, (SV *)embedding);

@@ -1,5 +1,5 @@
 package Dist::Build::Serializer;
-$Dist::Build::Serializer::VERSION = '0.004';
+$Dist::Build::Serializer::VERSION = '0.005';
 use strict;
 use warnings;
 
@@ -41,6 +41,7 @@ sub deserialize_action {
 		my %args = @args;
 		$args{verbose} = $options{verbose} if defined $options{verbose};
 		$args{uninst} = $options{uninst} if defined $options{uninst};
+		$args{dry_run} = $options{dry_run} if defined $options{dry_run};
 		$args{install_map} = $options{install_paths}->install_map;
 		return make_function('install', %args);
 	} elsif (any { $command eq $_ } @Dist::Build::Core::EXPORT_OK) {
@@ -76,7 +77,7 @@ Dist::Build::Serializer - A Serializer for a Dist::Build plan
 
 =head1 VERSION
 
-version 0.004
+version 0.005
 
 =head1 DESCRIPTION
 

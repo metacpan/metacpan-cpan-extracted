@@ -15,7 +15,7 @@ package Term::Menus;
 ## See user documentation at the end of this file.  Search for =head
 
 
-our $VERSION = '3.035';
+our $VERSION = '3.036';
 
 
 use 5.006;
@@ -2107,10 +2107,23 @@ sub transform_mboi
          $esc_one=~s/^(.*?[]])[{](.*)[}]$/$1\[\{\]$2\[\}\]/;
          $esc_one=~s/\\/\\\\/g;
          $esc_one=~s/[+]/\[+\]/g;$esc_one=~s/[*]/\[*\]/g;
-         $esc_one=~s/(?:(?:\d\s*,\s*"|"\s*,\s*\d)(*SKIP)(*FAIL)|")/\\\"/g;
-         $esc_two=~s/(?:(?:\d\s*,\s*"|"\s*,\s*\d)(*SKIP)(*FAIL)|")/\\\"/g;
+         if ($] > 5.010) {
+            $esc_one=~s/(?:(?:\d\s*,\s*"|"\s*,\s*\d)(*SKIP)(*FAIL)|")/\\\"/g;
+            $esc_two=~s/(?:(?:\d\s*,\s*"|"\s*,\s*\d)(*SKIP)(*FAIL)|")/\\\"/g;
+         } else {
+            $esc_one=~s/(?<!\d,)"/\\\"/g;
+            $esc_one=~s/"(?!,\d)/\\\"/g;
+            $esc_one=~s/\\"/"/g;
+            $esc_two=~s/(?<!\d,)"/\\\"/g;
+            $esc_two=~s/"(?!,\d)/\\\"/g;
+            $esc_two=~s/\\"/"/g;
+         }
          $esc_one=~s/\$/\\\$/g;$esc_two=~s/\$/\\\$/g;
-         $esc_two=~s/(?:(?:\\[]]|\\[[]|\\["]|\\[\$])(*SKIP)(*FAIL)|\\)/\\\\/g;
+	 if ($] > 5.010) {
+            $esc_two=~s/(?:(?:\\[]]|\\[[]|\\["]|\\[\$])(*SKIP)(*FAIL)|\\)/\\\\/g;
+         } else {
+            $esc_two=~s/\\(?![[]|[]]|["]|[\$])/\\\\/g;
+         }
          my $instructions=$esc_two;
          $instructions=~s/^\\[]][^[]+\\[[]\s*[{](.*?)[}]$/$1/;
          $instructions=~/^(.*?),(.*?)$/;
@@ -2170,6 +2183,14 @@ sub transform_mbir
          my $length_of_macro=length $esc_one;
          $esc_one=~s/["]\s*[.]\s*["]//s;
          $esc_one=~s/\]/\\\]/;$esc_one=~s/\[/\\\[/;
+	 if ($] > 5.010) {
+            $esc_one=~s/(?:(?:\d\s*,\s*"|"\s*,\s*\d)(*SKIP)(*FAIL)|")/\\\"/g;
+         } else {
+		 print "WHAT IS ESC_ONE=$esc_one<==\n";
+            $esc_one=~s/(?<!\d,)"/\\\"/g;
+	    $esc_one=~s/"(?!,\d)/\\\"/g;
+	    $esc_one=~s/\\"/"/g;
+         }
          my $instructions=$esc_one;
          $instructions=~s/^\\[]][^[]+\\[[]\s*[{](.*?)[}]$/$1/;
          $instructions='('.$instructions.')';
@@ -2222,10 +2243,23 @@ sub transform_mbii
          $esc_one=~s/^(.*?[]])[{](.*)[}]$/$1\[\{\]$2\[\}\]/;
          $esc_one=~s/\\/\\\\/g;
          $esc_one=~s/[+]/\[+\]/g;$esc_one=~s/[*]/\[*\]/g;
-         $esc_one=~s/(?:(?:\d\s*,\s*"|"\s*,\s*\d)(*SKIP)(*FAIL)|")/\\\"/g;
-         $esc_two=~s/(?:(?:\d\s*,\s*"|"\s*,\s*\d)(*SKIP)(*FAIL)|")/\\\"/g;
+         if ($] > 5.010) {
+            $esc_one=~s/(?:(?:\d\s*,\s*"|"\s*,\s*\d)(*SKIP)(*FAIL)|")/\\\"/g;
+	    $esc_two=~s/(?:(?:\d\s*,\s*"|"\s*,\s*\d)(*SKIP)(*FAIL)|")/\\\"/g;
+         } else {
+            $esc_one=~s/(?<!\d,)"/\\\"/g;
+            $esc_one=~s/"(?!,\d)/\\\"/g;
+            $esc_one=~s/\\"/"/g;
+	    $esc_two=~s/(?<!\d,)"/\\\"/g;
+            $esc_two=~s/"(?!,\d)/\\\"/g;
+            $esc_two=~s/\\"/"/g;
+         }
          $esc_one=~s/\$/\\\$/g;$esc_two=~s/\$/\\\$/g;
-         $esc_two=~s/(?:(?:\\[]]|\\[[]|\\["]|\\[\$])(*SKIP)(*FAIL)|\\)/\\\\/g;
+	 if ($] > 5.010) {
+            $esc_two=~s/(?:(?:\\[]]|\\[[]|\\["]|\\[\$])(*SKIP)(*FAIL)|\\)/\\\\/g;
+	 } else {
+            $esc_two=~s/\\(?![[]|[]]|["]|[\$])/\\\\/g;
+         }
          my $instructions=$esc_two;
          $instructions=~s/^\\[]][^[]+\\[[]\s*[{](.*?)[}]$/$1/;
          $instructions='('.$instructions.')';

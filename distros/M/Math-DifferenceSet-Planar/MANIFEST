@@ -6,6 +6,7 @@ Makefile.PL
 README
 examples/A333852.pl
 examples/A353077.pl
+examples/A373514.pl
 examples/numlist_deltas
 examples/numlist_sort
 examples/pds_canonize
@@ -13,6 +14,7 @@ examples/pds_databases
 examples/pds_enumerate
 examples/pds_find_any_ref
 examples/pds_find_delta
+examples/pds_find_lex_ref
 examples/pds_find_space
 examples/pds_find_std_ref
 examples/pds_from_lambda
@@ -32,6 +34,7 @@ examples/pds_rotators
 examples/pds_sample
 examples/pds_sort_elements
 examples/pds_translate
+examples/pds_unit_elements
 examples/pds_verify
 lib/Math/DifferenceSet/Planar.pm
 lib/Math/DifferenceSet/Planar/Computation.pod

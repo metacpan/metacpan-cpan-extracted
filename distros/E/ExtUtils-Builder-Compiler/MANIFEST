@@ -29,6 +29,7 @@ lib/ExtUtils/Builder/Linker/XCOFF.pm
 lib/ExtUtils/Builder/MultiLingual.pm
 lib/ExtUtils/Builder/ParseXS.pm
 lib/ExtUtils/Builder/Profile/Perl.pm
+prereqs.yml
 t/30-compiler-unixy.t
 t/30-linker-elf-gcc.t
 t/40-autodetect-executable.t

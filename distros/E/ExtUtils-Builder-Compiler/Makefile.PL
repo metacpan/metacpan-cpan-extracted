@@ -35,11 +35,11 @@ my %WriteMakefileArgs = (
     "warnings" => 0
   },
   "TEST_REQUIRES" => {
-    "ExtUtils::Builder::Planner" => 0,
+    "ExtUtils::Builder::Planner" => "0.007",
     "IPC::Open2" => 0,
     "Test::More" => "0.89"
   },
-  "VERSION" => "0.009",
+  "VERSION" => "0.011",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -52,7 +52,7 @@ my %FallbackPrereqs = (
   "ExtUtils::Builder::Action::Command" => 0,
   "ExtUtils::Builder::Action::Function" => 0,
   "ExtUtils::Builder::Node" => 0,
-  "ExtUtils::Builder::Planner" => 0,
+  "ExtUtils::Builder::Planner" => "0.007",
   "ExtUtils::Builder::Planner::Extension" => 0,
   "ExtUtils::Config" => "0.007",
   "ExtUtils::Helpers" => "0.027",

@@ -13,6 +13,10 @@ use Object::Pad 0.800;
    my $warnings;
    $SIG{__WARN__} = sub { $warnings .= join "", @_ };
 
+   like( dies { ARole->new },
+      qr/^Cannot directly construct an instance of role 'ARole' /,
+      'failure from directly create a role instance' );
+
    ok( !eval <<'EOPERL',
       class AClass { apply ARole; method m {} }
 EOPERL

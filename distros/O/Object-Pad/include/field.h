@@ -1,7 +1,12 @@
 #ifndef __OBJECT_PAD__FIELD_H__
 #define __OBJECT_PAD__FIELD_H__
 
+#include "linnet.h"
+
+#define LINNET_VAL_FIELDMETA  0x4F50464D  /* "OPFM" */
+#define MUST_FIELDMETA(ptr)   LINNET_CHECK_CAST(ptr, FieldMeta *, LINNET_VAL_FIELDMETA)
 struct FieldMeta {
+  LINNET_FIELD
   /* Flags first */
   unsigned int is_direct : 1;
   unsigned int def_if_undef : 1;

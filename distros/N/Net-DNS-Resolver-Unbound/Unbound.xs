@@ -186,17 +186,6 @@ set_option(struct ub_ctx* ctx, SV* opt, SV* val)
     CODE:
 	checkerr( ub_ctx_set_option(ctx, (const char*) SvPVX(opt), (const char*) SvPVX(val)) );
 
-SV*
-get_option(struct ub_ctx* ctx, SV* opt)
-    INIT:
-	char* value;
-    CODE:
-	checkerr( ub_ctx_get_option(ctx, (const char*) SvPVX(opt), &value) );
-	RETVAL = newSVpv( value, 0 );
-	free(value);
-    OUTPUT:
-	RETVAL
-
 void
 config(struct ub_ctx* ctx, const char* fname)
     CODE:
@@ -338,6 +327,10 @@ emulate_wait(int async_id)
 	av_push(RETVAL, newSViv(async_id) );
     OUTPUT:
 	RETVAL
+
+
+void
+checkerr(int ret)
 
 
 #ifdef croak_memory_wrap

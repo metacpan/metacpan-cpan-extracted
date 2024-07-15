@@ -177,8 +177,9 @@ undefined strings and numeric registers.
 
 James E. Keenan, for reporting an issue with formatting L<> links
 containing only URLs when the URL receives some formatting (such as
-escaping of hyphens), for analysis of other bugs, and for analysis and an
-initial fix for build problems with autodie inside Perl core.
+escaping of hyphens), for analysis of other bugs, for analysis and an
+initial fix for build problems with autodie inside Perl core, and for
+finding a problem with the realclean target.
 
 Brian Gottreu, for fixing excessively long lines across all of the Perl
 core documentation, including perlpodstyle.

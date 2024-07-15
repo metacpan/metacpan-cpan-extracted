@@ -1,5 +1,16 @@
 Revision history for MIDI-RtMidi-ScorePlayer
 
+0.0117 2024-07-14 22:35:07
+    - Improve documentation yet again.
+    - Require that parts be CODErefs.
+
+0.0116 2024-07-14 18:43:13
+    - Improve documentation.
+    - Improve the eg/gol.pl program again.
+
+0.0115 2024-07-14 16:08:32
+    - Improve the eg/gol.pl program.
+
 0.0114 2024-07-13 21:31:36
     - Enhance the eg/gol.pl program.
 

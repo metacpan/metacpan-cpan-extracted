@@ -1,7 +1,10 @@
 Board.pm
+Board/Blank.pm
 Changes
 examples/plack_app_message_board.pl
-examples/print_block_html_and_css.pl
+examples/plack_app_message_board_blank.pl
+examples/print_message_board_blank_html_and_css.pl
+examples/print_message_board_html_and_css.pl
 images/plack_app_message_board.png
 inc/Module/Install.pm
 inc/Module/Install/AuthorRequires.pm
@@ -20,6 +23,13 @@ MANIFEST			This list of files
 META.yml
 README
 SIGNATURE
+t/Tags-HTML-Message-Board-Blank/01-use.t
+t/Tags-HTML-Message-Board-Blank/02-version.t
+t/Tags-HTML-Message-Board-Blank/03-new.t
+t/Tags-HTML-Message-Board-Blank/04-cleanup.t
+t/Tags-HTML-Message-Board-Blank/05-init.t
+t/Tags-HTML-Message-Board-Blank/06-process.t
+t/Tags-HTML-Message-Board-Blank/07-process_css.t
 t/Tags-HTML-Message-Board/01-use.t
 t/Tags-HTML-Message-Board/02-version.t
 t/Tags-HTML-Message-Board/03-new.t
@@ -27,5 +37,7 @@ t/Tags-HTML-Message-Board/04-cleanup.t
 t/Tags-HTML-Message-Board/05-init.t
 t/Tags-HTML-Message-Board/06-process.t
 t/Tags-HTML-Message-Board/07-process_css.t
+xt/Tags-HTML-Message-Board-Blank/01-pod_coverage.t
+xt/Tags-HTML-Message-Board-Blank/02-pod.t
 xt/Tags-HTML-Message-Board/01-pod_coverage.t
 xt/Tags-HTML-Message-Board/02-pod.t

@@ -6,52 +6,37 @@ package SPVM::R::DataFrame::Column;
 
 =head1 Name
 
-SPVM::R::DataFrame::Column - Short Description
+SPVM::R::DataFrame::Column - Column of Data Frame
 
 =head1 Description
 
-The R::DataFrame::Column class in L<SPVM> has methods to do someting.
+R::DataFrame::Column class in L<SPVM> represents a column of a L<data frame|SPVM::R::DataFrame>.
 
-=head1 Usage
-
-  use R::DataFrame::Column;
-
-=head1 Details
-
-
-
-=head1 Inheritance
-
-
-
-=head1 Interfaces
-
-
-
-=head1 Enumerations
-
-
+This class is a private class.
 
 =head1 Fields
 
+=head2 name
 
+C<has name : string;>
 
-=head1 Class Methods
+A column name.
 
+=head2 ndarray
 
+C<has ndarray : L<R::NDArray|SPVM::R::NDArray>;>
 
-=head1 Instance Methods
+A n-dimensional array.
 
+=head1 See Also
 
+=over 2
 
+=item * L<R::DataFrame|SPVM::R::DataFrame>
 
-=head1 Repository
+=item * L<R|SPVM::R>
 
-
-
-=head1 Author
-
-Yuki Kimoto C<kimoto.yuki@gmail.com>
+=back
 
 =head1 Copyright & License
 

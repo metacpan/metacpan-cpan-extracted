@@ -74,6 +74,7 @@ exit;
 
 
 END {
+	eval { Net::DNS::Resolver::libunbound::checkerr(1) };
 	eval { Net::DNS::Resolver::libunbound::croak_memory_wrap() }	# paper over crack in Devel::Cover
 }
 

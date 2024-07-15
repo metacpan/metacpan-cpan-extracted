@@ -1,5 +1,5 @@
 package ExtUtils::Builder::AutoDetect::C;
-$ExtUtils::Builder::AutoDetect::C::VERSION = '0.009';
+$ExtUtils::Builder::AutoDetect::C::VERSION = '0.011';
 use strict;
 use warnings;
 
@@ -179,12 +179,12 @@ ExtUtils::Builder::AutoDetect::C - compiler configuration, derived from perl's c
 
 =head1 VERSION
 
-version 0.009
+version 0.011
 
 =head1 SYNOPSIS
 
  my $planner = ExtUtils::Builder::Planner->new;
- $planner->load_module('ExtUtils::Builder::AutoDetect::C',
+ $planner->load_module('ExtUtils::Builder::AutoDetect::C', '0.001',
 	profile => '@Perl',
 	type    => 'loadable-object',
  );

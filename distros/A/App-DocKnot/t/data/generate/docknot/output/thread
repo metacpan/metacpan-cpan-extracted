@@ -187,6 +187,7 @@ development source].
     \doc[api/app-docknot-spin-pointer.html][App::DocKnot::Spin::Pointer]
     \doc[api/app-docknot-spin-rss.html][App::DocKnot::Spin::RSS]
     \doc[api/app-docknot-spin-sitemap.html][App::DocKnot::Spin::Sitemap]
+    \doc[api/app-docknot-spin-text.html][App::DocKnot::Spin::Text]
     \doc[api/app-docknot-spin-thread.html][App::DocKnot::Spin::Thread]
     \doc[api/app-docknot-spin-versions.html][App::DocKnot::Spin::Versions]
     \doc[api/app-docknot-update.html][App::DocKnot::Update]

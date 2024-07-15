@@ -1,5 +1,12 @@
 Revision history for Perl extension Math::DifferenceSet::Planar.
 
+1.002   Sun, 14 Jul 2024 13:53:26 +0200
+        - new principal planes iterators
+        - new plane unit/nonunit elements methods
+        - extended examples
+        - extended compute sources
+        - minor edits in documentation
+
 1.001   Sat, 23 Dec 2023 08:34:04 +0100
         - improved zeta/theta calculation
         - revised examples suite:

@@ -12,7 +12,7 @@
 # Modules and declarations
 ##############################################################################
 
-package Pod::Text v6.0.1;
+package Pod::Text v6.0.2;
 
 use 5.012;
 use parent qw(Pod::Simple);
@@ -1203,12 +1203,13 @@ Pod::Text 4.09, included in Perl 5.25.7, fixed a serious bug on EBCDIC
 systems, present in all versions back to 3.00, that would cause opening
 brackets to disappear.
 
-Pod::Text 5.00 and later default, on non-EBCDIC systems, to UTF-8 encoding if
-it sees a non-ASCII character in the input and the input encoding is not
-specified.  They also commit to an encoding with the first non-ASCII character
-and does not change the output encoding if the input encoding changes.  The
-L<Encode> module is now used for all output encoding rather than PerlIO
-layers, which fixes earlier problems with output to scalars.
+Pod::Text 5.00 and later, included in Perl 5.37.7, default, on non-EBCDIC
+systems, to UTF-8 encoding if it sees a non-ASCII character in the input and
+the input encoding is not specified.  They also commit to an encoding with the
+first non-ASCII character and does not change the output encoding if the input
+encoding changes.  The L<Encode> module is now used for all output encoding
+rather than PerlIO layers, which fixes earlier problems with output to
+scalars.
 
 =head1 CAVEATS
 

@@ -12,7 +12,7 @@
 # Modules and declarations
 ##############################################################################
 
-package Pod::Man v6.0.1;
+package Pod::Man v6.0.2;
 
 use 5.012;
 use parent qw(Pod::Simple);
@@ -2323,19 +2323,19 @@ Pod::Man 4.10, included in Perl 5.27.8, changed the formatting for manual page
 references and function names to bold instead of italic, following the current
 Linux manual page standard.
 
-Pod::Man 5.00 changed the default output encoding to UTF-8, overridable with
-the new C<encoding> option.  It also fixed problems with bold or italic
-extending too far when used with CZ<><> escapes, and began converting Unicode
-zero-width spaces (U+200B) to the C<\:> *roff escape.  It also dropped
-attempts to add subtle formatting corrections in the output that would only be
-visible when typeset with B<troff>, which had previously been a significant
-source of bugs.
+Pod::Man 5.00, included in Perl 5.37.7, changed the default output encoding to
+UTF-8, overridable with the new C<encoding> option.  It also fixed problems
+with bold or italic extending too far when used with CZ<><> escapes, and began
+converting Unicode zero-width spaces (U+200B) to the C<\:> *roff escape.  It
+also dropped attempts to add subtle formatting corrections in the output that
+would only be visible when typeset with B<troff>, which had previously been a
+significant source of bugs.
 
-Pod::Man 6.00 and later unconditionally convert C<-> to the C<\-> *roff
+Pod::Man v6.0.0 and later unconditionally convert C<-> to the C<\-> *roff
 escape, representing an ASCII hyphen-minus.  Earlier versions attempted to use
 heuristics to decide when a given C<-> character should translate to a
 hyphen-minus or a true hyphen, but these heuristics were buggy and fragile.
-6.00 and later also unconditionally convert C<`> and C<'> to ASCII grave
+v6.0.0 and later also unconditionally convert C<`> and C<'> to ASCII grave
 accent and apostrophe marks instead of the default *roff behavior of
 interpreting them as paired quotes.
 
@@ -2391,13 +2391,13 @@ UNIX command options and most filenames.  Hyphens, where appropriate, produce
 better typesetting, but incorrectly using them for command names and options
 can cause problems with searching and cut-and-paste.
 
-POD does not draw this distinction.  Before podlators 6.00, Pod::Man attempted
-to translate C<-> in the input into either a hyphen or a hyphen-minus,
-depending on context.  However, this distinction proved impossible to do
-correctly with heuristics.  Pod::Man therefore translates all C<-> characters
-in the input to C<\-> in the output, ensuring that command names and options
-are correct at the cost of somewhat inferior typesetting and line breaking
-issues with long hyphenated phrases.
+POD does not draw this distinction.  Before podlators v6.0.0, Pod::Man
+attempted to translate C<-> in the input into either a hyphen or a
+hyphen-minus, depending on context.  However, this distinction proved
+impossible to do correctly with heuristics.  Pod::Man therefore translates all
+C<-> characters in the input to C<\-> in the output, ensuring that command
+names and options are correct at the cost of somewhat inferior typesetting and
+line breaking issues with long hyphenated phrases.
 
 To use true hyphens in the Pod::Man output, declare an input character set of
 UTF-8 (or some other Unicode encoding) and use Unicode hyphens.  Pod::Man and

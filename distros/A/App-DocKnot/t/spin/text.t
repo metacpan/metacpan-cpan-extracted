@@ -2,7 +2,7 @@
 #
 # Test converting a single text file.
 #
-# Copyright 2022 Russ Allbery <rra@cpan.org>
+# Copyright 2022, 2024 Russ Allbery <rra@cpan.org>
 #
 # SPDX-License-Identifier: MIT
 
@@ -16,7 +16,7 @@ use Capture::Tiny qw(capture_stdout);
 use Path::Tiny qw(path);
 use Test::DocKnot::Spin qw(is_spin_output);
 
-use Test::More tests => 4;
+use Test::More tests => 5;
 
 require_ok('App::DocKnot::Spin::Text');
 
@@ -57,4 +57,13 @@ $tempfile->spew($html);
 is_spin_output(
     $tempfile, $outputdir->child('big-eight.html'),
     "spin_text_file of $input to stdout",
+);
+
+# Spin a Perl package changes file.
+$spin = App::DocKnot::Spin::Text->new({ style => '/~eagle/styles/news.css' });
+$input = $inputdir->child('docknot-changes');
+$spin->spin_text_file($input, $tempfile);
+is_spin_output(
+    $tempfile, $outputdir->child('docknot-changes.html'),
+    "spin_text_file of $input",
 );

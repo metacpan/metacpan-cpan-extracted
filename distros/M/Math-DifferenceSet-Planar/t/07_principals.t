@@ -1,6 +1,11 @@
-# Copyright (c) 2022-2023 Martin Becker, Blaubeuren.
+# Copyright (c) 2022-2024 Martin Becker, Blaubeuren.
 # This package is free software; you can distribute it and/or modify it
 # under the terms of the Artistic License 2.0 (see LICENSE file).
+
+# The licence grants freedom for related software development but does
+# not cover incorporating code or documentation into AI training material.
+# Please contact the copyright holder if you want to use the library whole
+# or in part for other purposes than stated in the licence.
 
 # Before 'make install' is performed this script should be runnable with
 # 'make test'. After 'make install' it should work as 'perl 07_principals.t'
@@ -17,7 +22,7 @@ use constant MDP => Math::DifferenceSet::Planar::;
 
 use Test::More;
 if (MDP->can('plane_principal_elements')) {
-    plan tests => 94;
+    plan tests => 106;
 }
 else {
     plan skip_all => 'principal elements not yet implemented';
@@ -51,6 +56,43 @@ while ($it->()) {
     ++$c;
 }
 is($c, 12, 'number of iterations');
+
+my $dp = MDP->new(25);
+$it = $dp->iterate_principal_planes_zc;
+is(ref($it), 'CODE', 'iterate principal planes using zeta-canonical sets');
+
+my $uc = $c = 0;
+while (my $di = $it->()) {
+    ++$c;
+    ++$uc if $di->contains(1);
+}
+is($c, 2, 'number of principal planes');
+is($uc, 2, 'number of principal planes containing principal element 1');
+
+$it = $dp->iterate_planes_zc;
+$uc = 0;
+while (my $di = $it->()) {
+    ++$uc if $di->contains(1);
+}
+is($uc, 2, 'number of planes containing principal element 1');
+
+$it = $dp->iterate_principal_planes;
+$uc = $c = 0;
+while (my $di = $it->()) {
+    ++$c;
+    ++$uc if $di->contains(3);
+}
+is($c, 2, 'number of principal planes');
+is($uc, 2, 'number of principal planes containing 013-set');
+
+$it = $dp->iterate_planes;
+$uc = $c = 0;
+while (my $di = $it->()) {
+    ++$c;
+    ++$uc if $di->contains(3);
+}
+is($c, 60, 'number of planes');
+is($uc, 2, 'number of planes containing 013-set');
 
 my $lr = MDP->lex_reference(3);
 SKIP: {
@@ -107,6 +149,16 @@ is("@fe", "91 182", 'fill elements');
 
 my @de = sort { $a <=> $b } $nr->plane_derived_elements_of(@pe, @se);
 is("@de", '2 4', 'derived elements');
+
+my @ue = $dp->plane_unit_elements;
+is("@ue", '1 5 25 125 625 521 128 640 596 376 578 286', 'unit elements');
+my $ue = $dp->plane_unit_elements;
+is($ue, 0+@ue, 'unit elements scalar');
+
+my @ne = $dp->plane_nonunit_elements;
+is("@ne", '12 60 300 198 339 393 126 630 546 168 189 294 217 434', 'nonunit elements');
+my $ne = $dp->plane_nonunit_elements;
+is($ne, 0+@ne, 'nonunit elements scalar');
 
 my $ds2 = eval { MDP->from_lambda(6, 1) };
 is($ds2, undef, 'no from_lambda non-prime-power order');

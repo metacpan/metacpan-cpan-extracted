@@ -18,6 +18,10 @@ If your contribution is accepted, you will be mentioned by name under
 ACKNOWLEDGEMENTS in the documentation.  Please indicate if you prefer
 an alias or to stay anonymous.
 
+Data extensions are currently hosted on GitHub, too, but urgently
+need a more cost-efficient download location than that.  Expect
+an announcement as well as new data before long.
+
 Development Guidelines
 ----------------------
 
@@ -58,8 +62,8 @@ As it can be expected that downloading sets will always be faster than
 generating them, a non-programmer contribution could be to host a large
 database of sample sets.  Especially helpful would be a solution that even
 allows to submit more data.  The author so far has collected and published
-sets with all orders up to 2 ** 17 and some single examples close to
-2 ** 21.  Extending this list would require massive computing power
+sets with all orders up to 2 ** 17 and some single examples up to
+2 ** 23.  Extending this list would require massive computing power
 and be conceivable as a project for distributed computation.  Not much
 scientific merit, alas, is going to be earned for such an effort, as the
 existence as well as most of the "interesting" properties of these sets
@@ -125,8 +129,8 @@ Development Platform
 --------------------
 
 CPAN releases of this library are currently prepared manually with
-scripts in the maint directory and ExtUtils::MakeMaker.  A switch to a
-distribution builder like Dist::Zilla may be performed in the future.
+scripts in the maint directory and ExtUtils::MakeMaker.  A migration to
+a distribution builder like Dist::Zilla may be performed in the future.
 
 The git repository contains these files the CPAN release does not:
 
@@ -166,4 +170,4 @@ Author's Note
 Thanks again for your interest.
 I am looking forward to your report or e-mail.
 
-Martin Becker, July 8, 2023.
+Martin Becker, July 14, 2024.

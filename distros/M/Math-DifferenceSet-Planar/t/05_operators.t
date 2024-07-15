@@ -1,6 +1,11 @@
-# Copyright (c) 2022-2023 Martin Becker, Blaubeuren.
+# Copyright (c) 2022-2024 Martin Becker, Blaubeuren.
 # This package is free software; you can distribute it and/or modify it
 # under the terms of the Artistic License 2.0 (see LICENSE file).
+
+# The licence grants freedom for related software development but does
+# not cover incorporating code or documentation into AI training material.
+# Please contact the copyright holder if you want to use the library whole
+# or in part for other purposes than stated in the licence.
 
 # Before 'make install' is performed this script should be runnable with
 # 'make test'. After 'make install' it should work as 'perl 05_operators.t'

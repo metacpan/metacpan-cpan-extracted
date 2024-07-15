@@ -19,7 +19,7 @@ use Tags::HTML::Element::Textarea;
 Readonly::Array our @TEXT_KEYS => qw(add_comment author date save);
 Readonly::Scalar our $CSS_CLASS_ADD_COMMENT => 'add-comment';
 
-our $VERSION = 0.01;
+our $VERSION = 0.02;
 
 # Constructor.
 sub new {
@@ -204,26 +204,26 @@ sub _process_css {
 		['d', 'margin-left', '10px'],
 		['e'],
 
-		['s', '.author'],
+		['s', '.'.$self->{'css_class'}.' .author'],
 		['d', 'font-weight', 'bold'],
 		['d', 'font-size', '1.2em'],
 		['e'],
 
-		['s', '.comment .author'],
+		['s', '.'.$self->{'css_class'}.' .comment .author'],
 		['d', 'font-size', '1em'],
 		['e'],
 
-		['s', '.date'],
+		['s', '.'.$self->{'css_class'}.' .date'],
 		['d', 'color', '#555'],
 		['d', 'font-size', '0.9em'],
 		['d', 'margin-bottom', '10px'],
 		['e'],
 
-		['s', '.comment .date'],
+		['s', '.'.$self->{'css_class'}.' .comment .date'],
 		['d', 'font-size', '0.8em'],
 		['e'],
 
-		['s', '.text'],
+		['s', '.'.$self->{'css_class'}.' .text'],
 		['d', 'margin-top', '10px'],
 		['e'],
 	);
@@ -451,7 +451,7 @@ Returns undef.
 
 =head1 EXAMPLE1
 
-=for comment filename=print_block_html_and_css.pl
+=for comment filename=print_message_board_html_and_css.pl
 
  use strict;
  use warnings;
@@ -692,6 +692,6 @@ BSD 2-Clause License
 
 =head1 VERSION
 
-0.01
+0.02
 
 =cut

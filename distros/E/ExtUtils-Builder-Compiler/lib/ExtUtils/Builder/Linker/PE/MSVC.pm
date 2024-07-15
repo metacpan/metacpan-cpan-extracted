@@ -1,5 +1,5 @@
 package ExtUtils::Builder::Linker::PE::MSVC;
-$ExtUtils::Builder::Linker::PE::MSVC::VERSION = '0.009';
+$ExtUtils::Builder::Linker::PE::MSVC::VERSION = '0.011';
 use strict;
 use warnings;
 
@@ -50,7 +50,7 @@ ExtUtils::Builder::Linker::PE::MSVC
 
 =head1 VERSION
 
-version 0.009
+version 0.011
 
 =head1 AUTHOR
 

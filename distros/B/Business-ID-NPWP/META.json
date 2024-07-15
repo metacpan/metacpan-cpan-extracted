@@ -52,7 +52,7 @@
    "provides" : {
       "Business::ID::NPWP" : {
          "file" : "lib/Business/ID/NPWP.pm",
-         "version" : "0.091"
+         "version" : "0.092"
       }
    },
    "release_status" : "stable",
@@ -67,7 +67,7 @@
          "web" : "https://github.com/perlancar/perl-Business-ID-NPWP"
       }
    },
-   "version" : "0.091",
+   "version" : "0.092",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.038002"
@@ -434,7 +434,7 @@
                      {
                         "class" : "Pod::Weaver::Plugin::AppendPrepend",
                         "name" : "@Author::PERLANCAR/AppendPrepend",
-                        "version" : "0.01"
+                        "version" : "0.021"
                      },
                      {
                         "class" : "Pod::Weaver::Plugin::EnsureUniqueSections",

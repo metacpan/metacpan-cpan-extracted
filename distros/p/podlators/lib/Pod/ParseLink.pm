@@ -11,7 +11,7 @@
 # Modules and declarations
 ##############################################################################
 
-package Pod::ParseLink v6.0.1;
+package Pod::ParseLink v6.0.2;
 
 use 5.012;
 use warnings;

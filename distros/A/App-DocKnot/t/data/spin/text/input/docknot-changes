@@ -1,5 +1,38 @@
                        Revision history for DocKnot
 
+v8.0.0 - 2024-07-07
+
+ - DocKnot now uses semantic versioning for the package and modules, with
+   a v prefix to work with Perl's packaging system.
+
+ - Merge faq2html into this package as App::DocKnot::Spin::Text, and add a
+   new command, docknot spin-text, which takes roughly the same options as
+   faq2html.  This adds the ability to convert text files in my personal
+   format into HTML.
+
+ - Support *.spin pointers in addition to *.faq pointers for external text
+   files.  *.faq files are deprecated and support will be removed in a
+   future version of DocKnot.
+
+ - Support version numbers prefixed with v in release tarball names, since
+   this appears to be the convention for Perl modules that use semantic
+   versions.
+
+ - Change the docknot.yaml field orphaned to unmaintained, and change the
+   templates to say the package is not maintained instead of orphaned.
+   This terminology is more precise and less metaphorical.
+
+ - Remove support information from the README.md and README templates for
+   packages that are no longer maintained, and adjust some of the wording
+   there and in the thread template.
+
+ - Add missing </address> closing tag in pages rendered from Markdown.
+
+ - Fix typo in README.md template for ExtUtils::MakeMaker packages.
+
+ - Fix the URL in the footer added by docknot spin to point to DocKnot
+   instead of my old web tools page.
+
 7.01 - 2022-01-19
 
  - Correctly handle Unicode output from commands run by pointers and from

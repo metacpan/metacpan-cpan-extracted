@@ -11,7 +11,7 @@ my @extra_compiler_flags = qw( -Iinclude -Ihax );
 # Perl 5.36 made -std=c99 standard; before then we'll have to request it specially
 push @extra_compiler_flags, qw( -std=c99 ) if $^V lt v5.36.0;
 
-push @extra_compiler_flags, qw( -DDEBUGGING=-g ) if $^X =~ m|/debugperl|;
+push @extra_compiler_flags, qw( -DDEBUGGING=-ggdb3 ) if $^X =~ m|/debugperl|;
 
 use Config;
 if( $Config{ccname} eq "gcc" ) {
@@ -56,6 +56,13 @@ XS::Parse::Sublike::Builder->extend_module_build( $build );
 if( eval { require Devel::MAT::Dumper::Helper and
             Devel::MAT::Dumper::Helper->VERSION( '0.45' ) } ) {
    Devel::MAT::Dumper::Helper->extend_module_build( $build );
+}
+
+if( $^X =~ m|/debugperl| ) {
+   # We need to tell gcc not to optimise away lots of things we want to see in
+   # the debugger. It'd be nice if M::B had a nicer way to do this...
+   $build->add_property( 'optimize' );
+   $build->config( optimize => '-ggdb3' );
 }
 
 $build->create_build_script;

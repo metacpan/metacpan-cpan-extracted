@@ -13522,13 +13522,15 @@ sub log
    }
    $fconf=$Hosts{$mr}{'FA_Core'}.'Custom/'.$username.
              '/Conf/'.$Net::FullAuto::FA_Core::fa_conf;
-   @data=();
-   open(CH,"+<$fconf") or &handle_error("Cannot open $fconf");
-   flock CH, 2;
-   @data=<CH>;
-   foreach my $ln (@data) {
-      if ($ln=~/^\s*[#]*\s*our\s+[\$]logcount\s*=\s*(\d+)\s*;*\s*$/i) {
-         $Hosts{'localhost'}{'LogCount'}=$1;
+   if (-e $fconf) {
+      @data=();
+      open(CH,"+<$fconf") or &handle_error("Cannot open $fconf");
+      flock CH, 2;
+      @data=<CH>;
+      foreach my $ln (@data) {
+         if ($ln=~/^\s*[#]*\s*our\s+[\$]logcount\s*=\s*(\d+)\s*;*\s*$/i) {
+            $Hosts{'localhost'}{'LogCount'}=$1;
+         }
       }
    }
    if ($logdir && ((exists $Hosts{'localhost'}{'LogCount'} &&
@@ -23320,8 +23322,7 @@ sub get_drive
    } else {
       if ($cmd_handle) {
          bless $cmd_handle, 'File_Transfer';
-         ($drvs,$stderr)=$cmd_handle->cmd("ls $cmd_handle->{_cygdrive}",'__debug__');
-print "DRVS=$drvs and STDERR=$stderr<==\n";<STDIN>;
+         ($drvs,$stderr)=$cmd_handle->cmd("ls $cmd_handle->{_cygdrive}");
          &Net::FullAuto::FA_Core::handle_error($stderr,'-1') if $stderr;
       } else {
          print "\n",'   ERROR - $cmd_handle parameter is REQUIRED at Line ',
@@ -30915,6 +30916,10 @@ print $Net::FullAuto::FA_Core::LOG "LETS LOOK AT LINE=$line<== and LASTLINE=$las
                                     $fullerror.=$line;
                                     $line=~s/\[/\\\[/g;
                                     $line=~s/\]/\\\]/g;
+				    $line=~s/\{/\\\{/g;
+                                    $line=~s/\}/\\\}/g;
+                                    $line=~s/\(/\\\(/g;
+                                    $line=~s/\)/\\\)/g;
                                     $growoutput=~s/$line//s;
                                  } elsif ($fulloutput || $line!~/^\s*$/s) {
                                     $fulloutput.=$line;
@@ -31304,12 +31309,14 @@ sub cmd_raw
 sub display
 {
 
-   my $print_line_debugging=1;
+   my $print_line_debugging=0;
    my $log='';
    if ($print_line_debugging) {
       $log=$Net::FullAuto::FA_Core::LOG
       if $Net::FullAuto::FA_Core::log &&
       -1<index $Net::FullAuto::FA_Core::LOG,'*';
+      $log||='';
+      $print_line_debugging=0 unless $log;
    }
    select(undef,undef,undef,0.50) if defined $_[4];
    my $line=$_[0];
@@ -31372,7 +31379,7 @@ sub display
       $line=$save.$line;
       $line=~s/^stdout: ?//mg;
       $line=~s/\s?$cmd_prompt$//s;
-      $line=~s/\d(\d|\d\d)?\s*$//s;
+      $line=~s/\n\d(\d|\d\d)?\s*$//s;
       $line=~s/^.*\s*0\s*[]]0.*$//s;
       if ($print_line_debugging) {
          print $log "display() CALLER=",caller,"\n";
@@ -31391,7 +31398,11 @@ sub display
          $save.=$line;
          return $save;
       } else {
-         $line=~s/\s*\d(\d|\d\d)?\s*$//s;
+         $line=~s/\n\d(\d|\d\d)?\s*$//s;
+         if ($line=~/^\d+$/) {
+            $save.=$line;
+            return $save;
+         }
          if ($print_line_debugging) {
             print $log "display() CALLER=",caller,"\n";
             print $log "display() ORIGINAL LINE=$_[0]<==\n";
@@ -31404,7 +31415,7 @@ sub display
       }
    } elsif ($line=~s/\n*$cmd_prompt//gs) {
       $line=$save.$line if $save;
-      $line=~s/\s+\d(\d|\d\d)?\s*$//s;
+      $line=~s/\n\d(\d|\d\d)?\s*$//s;
       if (-1<index $line,']0') {
          $line=~s/^(.*)\s*0\s*[]]0.*$/$1/s;
          $line=~s/^(.*)[]]0.*$/$1/s;
@@ -31443,7 +31454,7 @@ sub display
       $save.=$line;
       return $save;
    } else {
-      $line=~s/\s+\d(\d|\d\d)?\s*$//s;
+      $line=~s/\n\d(\d|\d\d)?\s*$//s;
       $line=~s/^.*\s*0\s*[]]0.*$//s;
       if ($line=~/ETA$|stalled -$/) {
          if ($print_line_debugging) {

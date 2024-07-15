@@ -29,4 +29,11 @@ is( [ Object::Pad::MOP::Class->for_class( "Example2" )->superclasses ],
 is( Object::Pad::MOP::Class->try_for_class( "main" ), undef,
    '->try_for_class does not throw' );
 
+package NotObjectPad {
+   use base qw( Example );
+}
+
+is( Object::Pad::MOP::Class->try_for_class( "NotObjectPad" ), undef,
+   '->try_for_class not confused by non-OP subclasses' );
+
 done_testing;

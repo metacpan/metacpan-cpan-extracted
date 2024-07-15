@@ -7,10 +7,29 @@ use Math::DifferenceSet::Planar 0.009;
 
 $| = 1;
 
-die "usage: pds_find_delta delta [file]...\n"
-    if @ARGV < 1 || $ARGV[0] !~ /^(?:0|-?[1-9][0-9]*)\z/;
-
-my $delta = shift @ARGV;
+my $USAGE  = "usage: pds_find_delta delta [delta... --] [file]...\n";
+my @deltas = ();
+while (@ARGV) {
+    my $arg = $ARGV[0];
+    if ($arg =~ /^(?:0|-?[1-9][0-9]*)\z/) {
+        push @deltas, shift @ARGV;
+        next;
+    }
+    if ($arg eq '--') {
+        shift @ARGV;
+        last;
+    }
+    if (@deltas == 1) {
+        last;
+    }
+    if (@deltas) {
+        my $delta = shift @deltas;
+        unshift @ARGV, @deltas;
+        @deltas = ($delta);
+        last;
+    }
+}
+die $USAGE if !@deltas;
 
 while (<<>>) {
     s/^\s+//;
@@ -21,10 +40,14 @@ while (<<>>) {
         if grep { !/^(?:0|[1-9][0-9]*)\z/ } @e;
 
     my $s = Math::DifferenceSet::Planar->from_elements(@e);
+    my @r = ();
 
-    my ($e1, $e2) = $s->find_delta($delta);
+    foreach my $delta (@deltas) {
+        my ($e1, $e2) = $s->find_delta($delta);
+        push @r, ($e1, $e2);
+    }
 
-    print "$e1 $e2\n";
+    print "@r\n";
 }
 
 __END__
@@ -35,13 +58,13 @@ pds_find_delta - find pairs of difference set elements with given difference
 
 =head1 SYNOPSIS
 
-  pds_find_delta delta [file]...
+  pds_find_delta delta [delta... --] [file]...
 
 =head1 DESCRIPTION
 
 This example program reads planar difference sets, one per line, as
-integer numbers separated by whitespace, finds in each set the pair of
-elements with the difference specified on the command line, and writes
+integer numbers separated by whitespace, finds in each set the pairs of
+elements with the differences specified on the command line, and writes
 those elements to standard output.
 
 Note that the difference is taken modulo the modulus of each set.
@@ -50,16 +73,31 @@ The program will fail with an error message if an input line is not a set
 containing such a pair, which also indicates it is not a difference set.
 Searching for a zero difference will yield a random element twice.
 
+The command line may start with an arbitrary list of numbers followed
+by a double dash, or a single number, as delta values.  The rest of the
+arguments, if present, are taken as file arguments.  Lines in the output
+will consist of as many element pairs as delta values have been specified.
+Each pair will consist of the two elements with the property that the
+first one plus the desired difference delta is equal to the second one.
+
+The double dash after the delta values can only be omitted if there is
+precisely one delta argument.
+
 =head1 AUTHOR
 
 Martin Becker, E<lt>becker-cpan-mp I<at> cozap.comE<gt>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (c) 2020-2023 by Martin Becker, Blaubeuren.
+Copyright (c) 2020-2024 by Martin Becker, Blaubeuren.
 
 This library is free software; you can distribute it and/or modify it
 under the terms of the Artistic License 2.0 (see the LICENSE file).
+
+The licence grants freedom for related software development but does
+not cover incorporating code or documentation into AI training material.
+Please contact the copyright holder if you want to use the library whole
+or in part for other purposes than stated in the licence.
 
 =head1 DISCLAIMER OF WARRANTY
 

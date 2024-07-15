@@ -42,26 +42,26 @@ is_deeply(
 		['d', 'margin-left', '10px'],
 		['e'],
 
-		['s', '.author'],
+		['s', '.message-board .author'],
 		['d', 'font-weight', 'bold'],
 		['d', 'font-size', '1.2em'],
 		['e'],
 
-		['s', '.comment .author'],
+		['s', '.message-board .comment .author'],
 		['d', 'font-size', '1em'],
 		['e'],
 
-		['s', '.date'],
+		['s', '.message-board .date'],
 		['d', 'color', '#555'],
 		['d', 'font-size', '0.9em'],
 		['d', 'margin-bottom', '10px'],
 		['e'],
 
-		['s', '.comment .date'],
+		['s', '.message-board .comment .date'],
 		['d', 'font-size', '0.8em'],
 		['e'],
 
-		['s', '.text'],
+		['s', '.message-board .text'],
 		['d', 'margin-top', '10px'],
 		['e'],
 
@@ -145,26 +145,26 @@ is_deeply(
 		['d', 'margin-left', '10px'],
 		['e'],
 
-		['s', '.author'],
+		['s', '.message-board .author'],
 		['d', 'font-weight', 'bold'],
 		['d', 'font-size', '1.2em'],
 		['e'],
 
-		['s', '.comment .author'],
+		['s', '.message-board .comment .author'],
 		['d', 'font-size', '1em'],
 		['e'],
 
-		['s', '.date'],
+		['s', '.message-board .date'],
 		['d', 'color', '#555'],
 		['d', 'font-size', '0.9em'],
 		['d', 'margin-bottom', '10px'],
 		['e'],
 
-		['s', '.comment .date'],
+		['s', '.message-board .comment .date'],
 		['d', 'font-size', '0.8em'],
 		['e'],
 
-		['s', '.text'],
+		['s', '.message-board .text'],
 		['d', 'margin-top', '10px'],
 		['e'],
 	],
@@ -206,26 +206,26 @@ is_deeply(
 		['d', 'margin-left', '10px'],
 		['e'],
 
-		['s', '.author'],
+		['s', '.my-board .author'],
 		['d', 'font-weight', 'bold'],
 		['d', 'font-size', '1.2em'],
 		['e'],
 
-		['s', '.comment .author'],
+		['s', '.my-board .comment .author'],
 		['d', 'font-size', '1em'],
 		['e'],
 
-		['s', '.date'],
+		['s', '.my-board .date'],
 		['d', 'color', '#555'],
 		['d', 'font-size', '0.9em'],
 		['d', 'margin-bottom', '10px'],
 		['e'],
 
-		['s', '.comment .date'],
+		['s', '.my-board .comment .date'],
 		['d', 'font-size', '0.8em'],
 		['e'],
 
-		['s', '.text'],
+		['s', '.my-board .text'],
 		['d', 'margin-top', '10px'],
 		['e'],
 

@@ -10,7 +10,7 @@
 # Modules and declarations
 ##############################################################################
 
-package App::DocKnot::Spin::Pointer v8.0.0;
+package App::DocKnot::Spin::Pointer v8.0.1;
 
 use 5.024;
 use autodie;
@@ -78,7 +78,7 @@ sub _spin_markdown {
         }
     }
     if ($data_ref->{style}) {
-        $style = $self->{style_url} . $data_ref->{style};
+        $style = $self->{style_url} . $data_ref->{style} . '.css';
     }
     my %vars = (
         docknot_url => $URL,
@@ -430,8 +430,9 @@ be done if this option is set to true.  The default is false.
 =item style
 
 The style sheet to use for the converted output.  Optional.  If not set,
-converted C<markdown> output will be unstyled and converted C<pod> output will
-use a style sheet named C<pod>.
+converted C<markdown> output will be unstyled, converted C<pod> output will
+use a style sheet named C<pod>, and converted C<text> output will use a style
+sheet named C<faq>.
 
 =item title
 

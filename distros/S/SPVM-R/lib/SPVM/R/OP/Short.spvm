@@ -33,4 +33,52 @@ class R::OP::Short {
     return $ndarray;
   }
   
+  static method rep : R::NDArray::Short ($x_ndarray : R::NDArray::Short, $times : int) {
+    return (R::NDArray::Short)R::OP->rep($x_ndarray, $times);
+  }
+  
+  static method rep_length : R::NDArray::Short ($x_ndarray : R::NDArray::Short, $length : int) {
+    return (R::NDArray::Short)R::OP->rep_length($x_ndarray, $length);
+  }
+  
+  static method seq : R::NDArray::Short ($begin : short, $end : short, $by : short = 1) {
+    
+    if ($by == 0) {
+      die "\$by must not be 0.";
+    }
+    elsif ($by > 0) {
+      unless ($end >= $begin) {
+        die "\$end must be greater than or equal to \$begin if \$by is greater than 0.";
+      }
+    }
+    else {
+      unless ($end <= $begin) {
+        die "\$end must be less than or equal to \$begin if \$by is less than 0.";
+      }
+    }
+    
+    my $ret_data_list = ShortList->new;
+    my $current = $begin;
+    while (1) {
+      if ($by >= 0) {
+        if ($current > $end) {
+          last;
+        }
+      }
+      else {
+        if ($current < $end) {
+          last;
+        }
+      }
+      $ret_data_list->push($current);
+      $current += $by;
+    }
+    
+    my $ret_data = $ret_data_list->to_array;
+    
+    my $ret_ndarray = R::OP::Short->c($ret_data);
+    
+    return $ret_ndarray;
+  }
+  
 }

@@ -1,0 +1,75 @@
+#!/usr/bin/env perl
+
+use 5.022;
+use strict;
+use warnings;
+use Math::DifferenceSet::Planar 1.002;
+
+$| = 1;
+
+while (@ARGV && $ARGV[0] =~ /^-(.+)/s) {
+    shift @ARGV;
+    last if $1 eq '-';
+    die "usage: pds_unit_elements [file]...\n";
+}
+
+while (<<>>) {
+    s/^\s+//;
+    my @e = split /\s+/;
+    next if !@e;
+
+    die "integer numbers separated by whitespace expected\n"
+        if grep { !/^(?:0|[1-9][0-9]*)\z/ } @e;
+
+    my $s = Math::DifferenceSet::Planar->from_elements(@e)->zeta_canonize;
+    my @z = $s->plane_unit_elements;
+    if (@z < @e) {
+        push @z, '|', $s->plane_nonunit_elements;
+    }
+    print "@z\n";
+}
+
+__END__
+
+=head1 NAME
+
+pds_unit_elements - print unit and nonunit plane elements separately
+
+=head1 SYNOPSIS
+
+  pds_unit_elements [file]...
+
+=head1 DESCRIPTION
+
+This example program reads planar difference sets, one per line,
+as integer numbers separated by whitespace, computes unit and nonunit
+elements of the zeta-canonical representative of each plane, and writes
+the result to standard output.  Cf. L<Math::DifferenceSet::Planar>
+for the definition of these sets.
+
+If a set has nonunit elements, they will be separated by a vertical bar
+from the unit elements.
+
+=head1 AUTHOR
+
+Martin Becker, E<lt>becker-cpan-mp I<at> cozap.comE<gt>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (c) 2024 by Martin Becker, Blaubeuren.
+
+This library is free software; you can distribute it and/or modify it
+under the terms of the Artistic License 2.0 (see the LICENSE file).
+
+The licence grants freedom for related software development but does
+not cover incorporating code or documentation into AI training material.
+Please contact the copyright holder if you want to use the library whole
+or in part for other purposes than stated in the licence.
+
+=head1 DISCLAIMER OF WARRANTY
+
+This library is distributed in the hope that it will be useful, but
+without any warranty; without even the implied warranty of merchantability
+or fitness for a particular purpose.
+
+=cut

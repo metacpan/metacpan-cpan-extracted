@@ -19,6 +19,24 @@
 #
 #######################################################################
 
+2024-07-14  Brian M. Kelly <Brian.Kelly@fullauto.com>
+
+        * Version 1.0000669 released
+
+	* Added regex filtering for closures
+
+2024-07-14  Brian M. Kelly <Brian.Kelly@fullauto.com>
+
+        * Version 1.0000668 released
+
+        * Forgot to remove temp debugging messages
+
+2024-07-14  Brian M. Kelly <Brian.Kelly@fullauto.com>
+
+        * Version 1.0000667 released
+
+        * Improved display() accuracy
+
 2024-07-13  Brian M. Kelly <Brian.Kelly@fullauto.com>
 
         * Version 1.0000666 released

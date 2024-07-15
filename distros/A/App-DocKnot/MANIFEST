@@ -154,6 +154,7 @@ t/data/spin/text/input/docknot-changes
 t/data/spin/text/input/mjqmail
 t/data/spin/text/input/rgra
 t/data/spin/text/output/big-eight.html
+t/data/spin/text/output/docknot-changes.html
 t/data/spin/text/output/mjqmail.html
 t/data/spin/text/output/rgra.html
 t/data/spin/update/input/changes.faq

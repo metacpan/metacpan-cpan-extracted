@@ -4,6 +4,7 @@ use 5.022;
 use strict;
 use warnings;
 use Math::DifferenceSet::Planar 1.000;
+use Math::Prime::Util qw(euler_phi);
 
 $| = 1;
 
@@ -13,7 +14,7 @@ $USAGE   .= "       pds_info -k\n";
 my @KEYS = qw(
     order order_base order_exponent modulus n_planes n_sets
     start_element peak_elements min_element max_element
-    largest_gap eta zeta theta lambda n_mult phi_modulus
+    largest_gap eta zeta theta lambda n_mult phi_modulus sigma tau_zero
     n_elems n_princ n_suppl n_deriv n_princ_deriv n_suppl_deriv n_fill
     elems
 );
@@ -46,6 +47,7 @@ while (@ARGV && $ARGV[0] =~ /^-(.+)/) {
     last                        if '-' eq $opt;
     $head  = 1,            next if 'h' eq $opt;
     $all   = 1,            next if 'a' eq $opt;
+    $all   = 0,            next if 'n' eq $opt;
     display_keys()              if 'k' eq $opt;
     push(@cols, $1),       next if $opt =~ /^-(\w+)\z/ && exists $keys{$1};
     $db    = shift(@ARGV), next if 'D' eq $opt && @ARGV;
@@ -101,12 +103,13 @@ package Math::DifferenceSet::Planar;
 
 use Math::BigInt try => 'GMP';
 
-sub n_sets  { Math::BigInt->new($_[0]->modulus) * $_[0]->n_planes }
-sub n_mult  { 0 + $_[0]->multipliers }
-sub n_elems { 1 + $_[0]->order }
-sub n_princ { 0 + $_[0]->plane_principal_elements }
-sub n_suppl { 0 + $_[0]->plane_supplemental_elements }
-sub n_fill  { 0 + $_[0]->plane_fill_elements }
+sub n_sets   { Math::BigInt->new($_[0]->modulus) * $_[0]->n_planes }
+sub n_mult   { 0 + $_[0]->multipliers }
+sub n_elems  { 1 + $_[0]->order }
+sub n_princ  { 0 + $_[0]->plane_principal_elements }
+sub n_suppl  { 0 + $_[0]->plane_supplemental_elements }
+sub n_fill   { 0 + $_[0]->plane_fill_elements }
+sub tau_zero { 0 + $_[0]->plane_unit_elements }
 
 sub n_deriv {
     my ($this) = @_;
@@ -126,6 +129,13 @@ sub n_suppl_deriv {
 sub phi_modulus {
     my ($this) = @_;
     return $this->n_planes * $this->multipliers;
+}
+
+sub sigma {
+    my ($this) = @_;
+    my $order    = $this->order;
+    my $exponent = $this->order_exponent;
+    return euler_phi(3 * $order - 3) * 3 * $exponent / 2;
 }
 
 sub elems {
@@ -169,12 +179,12 @@ order, order_base, order_exponent, modulus, n_planes.
 
 Attributes of interest can also be specified explicitly by enumerating
 attribute names preceded by two dashes.  In addition to the default
-attributes, these are: n_sets, start_element, peak_elements (yielding
-two output columns), min_element, max_element, largest_gap (yielding
-three output colums of two elements and their difference), eta, zeta,
-theta, lambda, n_mult, phi_modulus, n_elems, n_princ, n_suppl, n_deriv,
-n_princ_deriv, n_suppl_deriv n_fill, elems.  An unkown value of lambda
-is replaced by zero (which is not an otherwise possible value).
+attributes, these are: n_sets, start_element, peak_elements (yielding two
+output columns), min_element, max_element, largest_gap (yielding three
+output colums of two elements and their difference), eta, zeta, theta,
+lambda, n_mult, phi_modulus, sigma, tau_zero, n_elems, n_princ, n_suppl,
+n_deriv, n_princ_deriv, n_suppl_deriv, n_fill, elems.  An unkown value
+of lambda is replaced by zero (which is not an otherwise possible value).
 
 The first two values of largest_gap can be obtained with the
 largest_gap_elements attribute and the third value with the
@@ -213,7 +223,8 @@ Also the number of distinct translates of the set.
 =item n_planes
 
 The number of distinct planes of the same order.  Difference sets that
-are translates of each other belong to the same plane.
+are translates of each other belong to the same plane.  Equal to Euler
+phi(modulus) / (3 * order_exponent).
 
 =item n_sets
 
@@ -250,6 +261,7 @@ Example: I<{3, 4, 6} (mod 7)> has largest-gap elements I<6> and I<3>
 and the increment I<4>, as I<6 + 4 (mod 7)> is congruent to I<3 (mod 7)>.
 
 =item largest_gap_elements
+
 =item largest_gap_difference
 
 The elements (first two columns) of largest_gap can also be accessed as
@@ -280,8 +292,8 @@ cf. L<Math::DifferenceSet::Planar>.
 =item n_mult
 
 The number of multipliers of the set.  Multipliers are multiplication
-values that take a set to another set within the same plane, i.e. a
-translate.
+values that take a set to itself or another set within the same plane,
+i.e. a translate.  Equal to 3 * order_exponent.
 
 =item n_elems
 
@@ -291,6 +303,8 @@ The cardinality of the set, equal to its order plus one.
 
 The number of principal elements of a set's plane.
 For the definition, cf. L<Math::DifferenceSet::Planar>.
+
+Also the number of principal planes of a set's order.
 
 Note that you can get principal and supplemental elements themselves
 with the example program F<pds_main_elements>.
@@ -327,6 +341,17 @@ Note that I<n_princ + n_suppl + n_deriv + n_fill> is equal to I<n_elems>.
 The cardinality of the unit space of the modular integer ring.
 Equal to Euler phi(modulus), equal to n_planes * n_mult.
 
+=item sigma
+
+The number of different primitive monic third-degree polynomials over
+GF(order) generating the plane of this difference set.  Equal to Euler
+phi(3 * order - 3) * n_mult / 2.
+
+=item tau_zero
+
+The number of elements of the zeta-canonical representative of this
+set's plane that are coprime to the modulus.  Equal to n_princ * n_mult.
+
 =item elems
 
 The comma-separated list of elements of the set in numerically ascending
@@ -342,10 +367,15 @@ Martin Becker, E<lt>becker-cpan-mp I<at> cozap.comE<gt>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (c) 2022-2023 by Martin Becker, Blaubeuren.
+Copyright (c) 2022-2024 by Martin Becker, Blaubeuren.
 
 This library is free software; you can distribute it and/or modify it
 under the terms of the Artistic License 2.0 (see the LICENSE file).
+
+The licence grants freedom for related software development but does
+not cover incorporating code or documentation into AI training material.
+Please contact the copyright holder if you want to use the library whole
+or in part for other purposes than stated in the licence.
 
 =head1 DISCLAIMER OF WARRANTY
 

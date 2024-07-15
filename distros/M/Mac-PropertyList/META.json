@@ -1,10 +1,10 @@
 {
    "abstract" : "work with Mac plists at a low level",
    "author" : [
-      "brian d foy <bdfoy@cpan.org>"
+      "brian d foy <briandfoy@pobox.com>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.64, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "artistic_2"
    ],
@@ -54,10 +54,10 @@
       "homepage" : "https://github.com/briandfoy/mac-propertylist",
       "repository" : {
          "type" : "git",
-         "url" : "https://github.com/briandfoy/mac-propertylist.git",
+         "url" : "https://github.com/briandfoy/mac-propertylist",
          "web" : "https://github.com/briandfoy/mac-propertylist"
       }
    },
-   "version" : "1.504",
-   "x_serialization_backend" : "JSON::PP version 4.07"
+   "version" : "1.505",
+   "x_serialization_backend" : "JSON::PP version 4.16"
 }

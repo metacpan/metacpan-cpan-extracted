@@ -21,6 +21,10 @@ besides command line parameters are marked [P].
 
 [P] Generate terms of OEIS A353077.
 
+=item A373514.pl
+
+[P] Generate terms of OEIS A373514.
+
 =item numlist_deltas
 
 [F] Convert lists of numbers to lists of differences and vice versa.
@@ -48,6 +52,11 @@ besides command line parameters are marked [P].
 =item pds_find_delta
 
 [F] Find pairs of difference set elements with given difference.
+
+=item pds_find_lex_ref
+
+[F] Find lexically minimal planar difference sets from arbitrary planar
+difference sets.
 
 =item pds_find_space
 
@@ -125,6 +134,10 @@ besides command line parameters are marked [P].
 
 [F] Translate planar difference sets.
 
+=item pds_unit_elements
+
+[F] Print unit and nonunit plane elements separately.
+
 =item pds_verify
 
 [F] Verify lists of integers as planar difference sets.
@@ -192,10 +205,15 @@ Martin Becker, E<lt>becker-cpan-mp I<at> cozap.comE<gt>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (c) 2022-2023 by Martin Becker, Blaubeuren.
+Copyright (c) 2022-2024 by Martin Becker, Blaubeuren.
 
 This library is free software; you can distribute it and/or modify it
 under the terms of the Artistic License 2.0 (see the LICENSE file).
+
+The licence grants freedom for related software development but does
+not cover incorporating code or documentation into AI training material.
+Please contact the copyright holder if you want to use the library whole
+or in part for other purposes than stated in the licence.
 
 =head1 DISCLAIMER OF WARRANTY
 

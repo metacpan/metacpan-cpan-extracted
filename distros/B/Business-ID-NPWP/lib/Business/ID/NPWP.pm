@@ -7,9 +7,9 @@ use strict;
 use Exporter 'import';
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2024-01-10'; # DATE
+our $DATE = '2024-07-11'; # DATE
 our $DIST = 'Business-ID-NPWP'; # DIST
-our $VERSION = '0.091'; # VERSION
+our $VERSION = '0.092'; # VERSION
 
 our @EXPORT_OK = qw(parse_npwp);
 
@@ -115,7 +115,7 @@ Business::ID::NPWP - Parse Indonesian taxpayer registration number (NPWP)
 
 =head1 VERSION
 
-This document describes version 0.091 of Business::ID::NPWP (from Perl distribution Business-ID-NPWP), released on 2024-01-10.
+This document describes version 0.092 of Business::ID::NPWP (from Perl distribution Business-ID-NPWP), released on 2024-07-11.
 
 =head1 SYNOPSIS
 

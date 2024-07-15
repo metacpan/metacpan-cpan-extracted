@@ -1,5 +1,9 @@
 Revision history for Dist-Build
 
+0.005     2024-07-14 16:30:28+02:00 Europe/Brussels
+          - Fix argument handling in mkdir
+          - Add dry_run support to install deserializer
+
 0.004     2024-07-13 13:49:39+02:00 Europe/Brussels
           - Sort test files
           - Add self delegate for DSL

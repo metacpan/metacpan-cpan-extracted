@@ -123,7 +123,7 @@ static OP *pp_methstart(pTHX)
     SV *embeddingsv = PadARRAY(pad1)[PADIX_EMBEDDING];
 
     if(embeddingsv && embeddingsv != &PL_sv_undef &&
-       (embedding = (RoleEmbedding *)SvPVX(embeddingsv))) {
+       (embedding = MUST_ROLEEMBEDDING(SvPVX(embeddingsv)))) {
       if(embedding == &ObjectPad__embedding_standalone) {
         classstash = NULL;
         offset     = 0;
@@ -286,7 +286,7 @@ static ClassMeta *S_compclassmeta(pTHX)
   SV **svp = hv_fetchs(GvHV(PL_hintgv), "Object::Pad/compclassmeta", 0);
   if(!svp || !*svp || !SvOK(*svp))
     return NULL;
-  return NUM2PTR(ClassMeta *, SvIV(*svp));
+  return MUST_CLASSMETA(SvIV(*svp));
 }
 
 #define have_compclassmeta  S_have_compclassmeta(aTHX)
@@ -320,7 +320,7 @@ ClassMeta *ObjectPad_get_compclassmeta(pTHX)
 XS_INTERNAL(xsub_mop_class_seal)
 {
   dXSARGS;
-  ClassMeta *meta = XSANY.any_ptr;
+  ClassMeta *meta = MUST_CLASSMETA(XSANY.any_ptr);
 
   PERL_UNUSED_ARG(items);
 
@@ -411,6 +411,8 @@ static struct MethodAttributeDefinition method_attributes[] = {
  * Custom Keywords *
  *******************/
 
+static IV next_anonclass_id;
+
 static int build_classlike(pTHX_ OP **out, XSParseKeywordPiece *args[], size_t nargs, void *hookdata)
 {
   int argi = 0;
@@ -424,10 +426,13 @@ static int build_classlike(pTHX_ OP **out, XSParseKeywordPiece *args[], size_t n
       imported_version = SvNV(*svp) * 1000;
   }
 
+  bool is_anon = false;
   SV *packagename = args[argi++]->sv;
-  /* Grrr; XPK bug */
-  if(!packagename)
-    croak("Expected a class name after 'class'");
+  if(!packagename) {
+    is_anon = true;
+    packagename = newSVpvf("Object::Pad::__ANONCLASS__::%" IVdf,
+      next_anonclass_id++);
+  }
 
   enum MetaType type = PTR2UV(hookdata);
 
@@ -484,6 +489,8 @@ static int build_classlike(pTHX_ OP **out, XSParseKeywordPiece *args[], size_t n
   }
   else if(lex_consume_unichar(';')) {
     is_block = false;
+    if(is_anon)
+      croak("Anonymous class requires a {BLOCK}");
   }
   else
     croak("Expected a block or ';'");
@@ -555,12 +562,18 @@ static int build_classlike(pTHX_ OP **out, XSParseKeywordPiece *args[], size_t n
 
     LEAVE;
 
-    /* CARGOCULT from perl/perly.y:PACKAGE BAREWORD BAREWORD '{' */
-    /* a block is a loop that happens once */
-    *out = op_append_elem(OP_LINESEQ,
-      newWHILEOP(0, 1, NULL, NULL, body, NULL, 0),
-      newSVOP(OP_CONST, 0, &PL_sv_yes));
-    return KEYWORD_PLUGIN_STMT;
+    if(is_anon) {
+      *out = newSVOP(OP_CONST, 0, SvREFCNT_inc(packagename));
+      return KEYWORD_PLUGIN_EXPR;
+    }
+    else {
+      /* CARGOCULT from perl/perly.y:PACKAGE BAREWORD BAREWORD '{' */
+      /* a block is a loop that happens once */
+      *out = op_append_elem(OP_LINESEQ,
+        newWHILEOP(0, 1, NULL, NULL, body, NULL, 0),
+        newSVOP(OP_CONST, 0, &PL_sv_yes));
+      return KEYWORD_PLUGIN_STMT;
+    }
   }
   else {
     SAVEDESTRUCTOR_X(&ObjectPad_mop_class_seal, meta);
@@ -574,15 +587,12 @@ static int build_classlike(pTHX_ OP **out, XSParseKeywordPiece *args[], size_t n
 }
 
 static const struct XSParseKeywordPieceType pieces_classlike[] = {
-  XPK_PACKAGENAME,
+  XPK_PACKAGENAME_OPT,
   XPK_VSTRING_OPT,
   XPK_OPTIONAL(
     XPK_LITERAL("isa"),
     XPK_FAILURE("The 'isa' modifier keyword is no longer available; use 'inherit' instead")
   ),
-  /* This should really a repeated (tagged?) choice of a number of things, but
-   * right now there's only one thing permitted here anyway
-   */
   XPK_REPEATED(
     XPK_LITERAL("does"),
     XPK_FAILURE("The 'does' modifier keyword is no longer available; use 'apply' instead")
@@ -1015,6 +1025,7 @@ static void parse_method_pre_subparse(pTHX_ struct XSParseSublikeContext *ctx, v
   Newx(compmethodmeta, 1, MethodMeta);
 
   *compmethodmeta = (MethodMeta){
+    LINNET_INIT(LINNET_VAL_METHODMETA)
     .name = SvREFCNT_inc(ctx->name),
   };
 
@@ -1024,7 +1035,7 @@ static void parse_method_pre_subparse(pTHX_ struct XSParseSublikeContext *ctx, v
 
 static bool parse_method_filter_attr(pTHX_ struct XSParseSublikeContext *ctx, SV *attr, SV *val, void *hookdata)
 {
-  MethodMeta *compmethodmeta = NUM2PTR(MethodMeta *, SvUV(*hv_fetchs(ctx->moddata, "Object::Pad/compmethodmeta", 0)));
+  MethodMeta *compmethodmeta = MUST_METHODMETA(SvUV(*hv_fetchs(ctx->moddata, "Object::Pad/compmethodmeta", 0)));
 
   struct MethodAttributeDefinition *def;
   for(def = method_attributes; def->attrname; def++) {
@@ -1065,7 +1076,7 @@ static void parse_method_post_blockstart(pTHX_ struct XSParseSublikeContext *ctx
 {
   enum PhaserType type = PTR2UV(hookdata);
 
-  MethodMeta *compmethodmeta = NUM2PTR(MethodMeta *, SvUV(*hv_fetchs(ctx->moddata, "Object::Pad/compmethodmeta", 0)));
+  MethodMeta *compmethodmeta = MUST_METHODMETA(SvUV(*hv_fetchs(ctx->moddata, "Object::Pad/compmethodmeta", 0)));
 
   /* `method` always permits signatures */
 #ifdef HAVE_PARSE_SUBSIGNATURE
@@ -1124,7 +1135,7 @@ static void parse_method_pre_blockend(pTHX_ struct XSParseSublikeContext *ctx, v
 {
   enum PhaserType type = PTR2UV(hookdata);
 
-  MethodMeta *compmethodmeta = NUM2PTR(MethodMeta *, SvUV(*hv_fetchs(ctx->moddata, "Object::Pad/compmethodmeta", 0)));
+  MethodMeta *compmethodmeta = MUST_METHODMETA(SvUV(*hv_fetchs(ctx->moddata, "Object::Pad/compmethodmeta", 0)));
 
   SV **svp;
 
@@ -1197,7 +1208,7 @@ static void parse_method_post_newcv(pTHX_ struct XSParseSublikeContext *ctx, voi
   MethodMeta *compmethodmeta;
   {
     SV *tmpsv = *hv_fetchs(ctx->moddata, "Object::Pad/compmethodmeta", 0);
-    compmethodmeta = NUM2PTR(MethodMeta *, SvUV(tmpsv));
+    compmethodmeta = MUST_METHODMETA(SvUV(tmpsv));
     sv_setuv(tmpsv, 0);
   }
 
@@ -1587,13 +1598,13 @@ static void dump_classmeta(pTHX_ DMDContext *ctx, ClassMeta *classmeta)
   I32 i;
 
   for(i = 0; i < av_count(classmeta->fields); i++) {
-    FieldMeta *fieldmeta = (FieldMeta *)AvARRAY(classmeta->fields)[i];
+    FieldMeta *fieldmeta = MUST_FIELDMETA(AvARRAY(classmeta->fields)[i]);
 
     dump_fieldmeta(aTHX_ ctx, fieldmeta);
   }
 
   for(i = 0; i < av_count(classmeta->direct_methods); i++) {
-    MethodMeta *methodmeta = (MethodMeta *)AvARRAY(classmeta->direct_methods)[i];
+    MethodMeta *methodmeta = MUST_METHODMETA(AvARRAY(classmeta->direct_methods)[i]);
 
     dump_methodmeta(aTHX_ ctx, methodmeta);
   }
@@ -1604,7 +1615,7 @@ static void dump_classmeta(pTHX_ DMDContext *ctx, ClassMeta *classmeta)
 
     HE *iter;
     while((iter = hv_iternext(parammap))) {
-      ParamMeta *parammeta = (ParamMeta *)HeVAL(iter);
+      ParamMeta *parammeta = MUST_PARAMMETA(HeVAL(iter));
 
       dump_parammeta(aTHX_ ctx, parammeta);
     }
@@ -1613,7 +1624,7 @@ static void dump_classmeta(pTHX_ DMDContext *ctx, ClassMeta *classmeta)
   switch(classmeta->type) {
     case METATYPE_CLASS:
       for(i = 0; i < av_count(classmeta->cls.direct_roles); i++) {
-        RoleEmbedding *embedding = (RoleEmbedding *)AvARRAY(classmeta->cls.direct_roles)[i];
+        RoleEmbedding *embedding = MUST_ROLEEMBEDDING(AvARRAY(classmeta->cls.direct_roles)[i]);
 
         dump_roleembedding(aTHX_ ctx, embedding);
       }
@@ -1630,7 +1641,7 @@ static int dumppackage_class(pTHX_ DMDContext *ctx, const SV *sv)
 {
   int ret = 0;
 
-  ClassMeta *meta = NUM2PTR(ClassMeta *, SvUV((SV *)sv));
+  ClassMeta *meta = MUST_CLASSMETA(SvUV((SV *)sv));
 
   dump_classmeta(aTHX_ ctx, meta);
 
@@ -1714,7 +1725,7 @@ static U32 S_deconstruct_object_class(pTHX_ SV *fieldstore, ClassMeta *classmeta
 
   FIELDOFFSET i;
   for(i = 0; i < nfields; i++) {
-    FieldMeta *fieldmeta = (FieldMeta *)AvARRAY(fields)[i];
+    FieldMeta *fieldmeta = MUST_FIELDMETA(AvARRAY(fields)[i]);
     if(!fieldmeta->is_direct)
       continue;
 
@@ -1898,7 +1909,7 @@ deconstruct_object(SV *obj)
       AV *roles = classmeta->cls.direct_roles;
       U32 nroles = av_count(roles);
       for(U32 i = 0; i < nroles; i++) {
-        RoleEmbedding *embedding = (RoleEmbedding *)AvARRAY(roles)[i];
+        RoleEmbedding *embedding = MUST_ROLEEMBEDDING(AvARRAY(roles)[i]);
 
         retcount += deconstruct_object_class(fieldstore, embedding->rolemeta, embedding->offset);
       }
@@ -1949,7 +1960,7 @@ ref_field(SV *fieldname, SV *obj)
       AV *roles = classmeta->cls.direct_roles;
       U32 nroles = av_count(roles);
       for(U32 i = 0; i < nroles; i++) {
-        RoleEmbedding *embedding = (RoleEmbedding *)AvARRAY(roles)[i];
+        RoleEmbedding *embedding = MUST_ROLEEMBEDDING(AvARRAY(roles)[i]);
 
         if(!want_classname || sv_eq(want_classname, embedding->rolemeta->name)) {
           RETVAL = ref_field_class(want_fieldname, fieldstore, embedding->rolemeta, embedding->offset);

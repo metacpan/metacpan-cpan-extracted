@@ -3,6 +3,9 @@ Revision history for Perl extension Test::Without::Module.
 Todo:
   - Add way to allow only core modules (suggested by SREZIC)
 
+0.23 2024-07-14
+  - Lower minimum required Perl version back to 5.006, this addresses GH #5
+
 0.22 2024-07-05
   - Fix test suite to not skip a failing test
 

@@ -1,6 +1,11 @@
-# Copyright (c) 2008-2019 Martin Becker, Blaubeuren.
+# Copyright (c) 2008-2024 Martin Becker, Blaubeuren.
 # This package is free software; you can distribute it and/or modify it
 # under the terms of the Artistic License 2.0 (see LICENSE file).
+
+# The licence grants freedom for related software development but does
+# not cover incorporating code or documentation into AI training material.
+# Please contact the copyright holder if you want to use the library whole
+# or in part for other purposes than stated in the licence.
 
 # Utility functions for tests:
 # * conditionally skip tests if required modules are not available
@@ -16,7 +21,7 @@ use warnings;
 use Config;
 use base 'Exporter';
 
-our $VERSION   = '0.011';
+our $VERSION   = '0.013';
 our @EXPORT    = qw(use_or_bail maintainer_only);
 our @EXPORT_OK = qw(
     slurp_or_bail this_perl report_version

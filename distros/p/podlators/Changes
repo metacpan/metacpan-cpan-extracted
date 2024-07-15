@@ -1,5 +1,10 @@
                       Revision history for podlators
 
+v6.0.2 - 2024-07-14
+
+ - Fix removal of scripts/pod2man and scripts/pod2text by make realclean,
+   broken in the v6.0.0 release.  Thanks to James E Keenan for the report.
+
 v6.0.1 - 2024-07-12
 
  - Remove autodie from the module build process.  When built as part of

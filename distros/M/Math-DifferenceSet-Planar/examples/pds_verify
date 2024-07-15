@@ -48,7 +48,7 @@ pds_verify - verify lists of integers as planar difference sets
 
 =head1 SYNOPSIS
 
-  pds_verify [file]...
+  pds_verify [-q] [file]...
 
 =head1 DESCRIPTION
 
@@ -63,16 +63,29 @@ code is 0 (success) if no lines had to be filtered out, otherwise 1.
 The verification method of this tool is based on a full operator table
 and thus does not scale very well.  Its answer is conclusive, though.
 
+A faster verification method is to check the success of one of
+the other example programs reading difference sets, like pds_info.
+Their range is limited by the contents of the database of sample sets.
+If within that range, their success is a valid verification, but they
+might wrongly reject a counterexample to the conjecture that all cyclic
+planar difference sets are Singer type.  Outside that range, everything
+is rejected.
+
 =head1 AUTHOR
 
 Martin Becker, E<lt>becker-cpan-mp I<at> cozap.comE<gt>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (c) 2019-2023 by Martin Becker, Blaubeuren.
+Copyright (c) 2019-2024 by Martin Becker, Blaubeuren.
 
 This library is free software; you can distribute it and/or modify it
 under the terms of the Artistic License 2.0 (see the LICENSE file).
+
+The licence grants freedom for related software development but does
+not cover incorporating code or documentation into AI training material.
+Please contact the copyright holder if you want to use the library whole
+or in part for other purposes than stated in the licence.
 
 =head1 DISCLAIMER OF WARRANTY
 

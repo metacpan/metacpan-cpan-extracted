@@ -9,7 +9,7 @@
 # Modules and declarations
 ##############################################################################
 
-package App::DocKnot::Update v8.0.0;
+package App::DocKnot::Update v8.0.1;
 
 use 5.024;
 use autodie;
@@ -163,6 +163,21 @@ sub _config_from_json {
 # Spin helper methods
 ##############################################################################
 
+# Convert a style sheet reference into a style name for *.spin pointer files.
+#
+# $style - Partial URL for a style sheet
+#
+# Returns: Corresponding style name
+sub _convert_style {
+    my ($self, $style) = @_;
+    chomp($style);
+    if ($style =~ m{ / }xms) {
+        $style = (split(m{ / }xms, $style))[-1];
+    }
+    $style =~ s{ [.] css \z }{}xms;
+    return $style;
+}
+
 # Given an old-format *.faq pointer file, read the master file name and any
 # options.  Return them in the structure used for *.spin pointer files.
 #
@@ -184,8 +199,7 @@ sub _read_faq_pointer {
     # Put the results into the correct format.
     my %results = (format => 'text', path => $master);
     if (defined($style)) {
-        chomp($style);
-        $results{style} = $style;
+        $results{style} = $self->_convert_style($style);
     }
     if (defined($options)) {
         if ($options =~ m{ -l ( \s | \z ) }xms) {
@@ -220,7 +234,7 @@ sub _read_rpod_pointer {
     my %results = (format => 'pod', path => $master);
     if (defined($style)) {
         chomp($style);
-        $results{style} = $style;
+        $results{style} = $self->_convert_style($style);
     }
     if (defined($options)) {
         if ($options =~ m{ -c ( \s | \z ) }xms) {

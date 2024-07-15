@@ -3,7 +3,7 @@
 #
 #  (C) Paul Evans, 2019-2023 -- leonerd@leonerd.org.uk
 
-package Object::Pad 0.808;
+package Object::Pad 0.809;
 
 use v5.14;
 use warnings;
@@ -344,6 +344,35 @@ This attribute is a temporary stepping-stone for compatibility with existing
 code. It is recommended to enable this whenever possible, as a later version
 of this module will likely perform this behaviour unconditionally whenever no
 C<BUILD> blocks are present.
+
+=head2 class (anon)
+
+   my $class = class :ATTRS... { ... };
+
+I<Since version 0.809.>
+
+If a C<class> keyword is not followed by a package name, it creates an
+anonymous class expression. This is an expression that yields a value suitable
+to use as a constructor invocant for creating instances of that class, without
+specifying what its package name will actually be.
+
+This is useful for creating small one-off instances inline in expressions,
+such as in unit tests. Since it still accepts the usual attributes and inner
+body statements, it can be useful for creating one-off instances of roles,
+with required methods being applied.
+
+   my $testobj = (class {
+      apply Role::Under::Test;
+      method required { return "a useful value"; }
+   })->new;
+
+Due to limitations on how classes work in Perl, anonymous classes are still
+backed by long-lived named classes in the global symbol table, unlike true
+anonymous functions which can go out of scope and be reclaimed once no
+references to them remain in existence. This means that anonymous classes will
+retain references to any variables captured within them, even if the class
+expression itself goes out of scope and any instances created by it no longer
+remain.
 
 =head2 role
 

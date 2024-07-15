@@ -35,7 +35,7 @@
       "runtime" : {
          "requires" : {
             "Carp" : "0",
-            "perl" : "5.020"
+            "perl" : "5.006"
          }
       },
       "test" : {
@@ -58,7 +58,7 @@
          "web" : "https://github.com/Corion/test-without-module"
       }
    },
-   "version" : "0.22",
+   "version" : "0.23",
    "x_serialization_backend" : "JSON::PP version 4.07",
    "x_static_install" : 1
 }

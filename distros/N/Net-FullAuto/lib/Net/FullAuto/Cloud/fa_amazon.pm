@@ -451,6 +451,7 @@ our $aws_configure=sub {
    my $homedir='.';
    my $handle_homedir='';
    my $handle_username='';
+   print "\n";
    if ($handle) {
       $handle->cwd('~');
       $handle_homedir=$handle->cmd('pwd');

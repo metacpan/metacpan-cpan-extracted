@@ -33,7 +33,7 @@ use constant _MAX_SMALL_ORDER => int( sqrt(2)*((1<<(_NATIVE_BITS>>1))-0.5) );
 
 *canonize = \&lex_canonize;
 
-our $VERSION = '1.001';
+our $VERSION = '1.002';
 
 our $_MAX_ENUM_COUNT  = 32768;          # limit for stored rotator set size
 our $_MAX_MEMO_COUNT  = 4096;           # limit for memoized values
@@ -290,7 +290,7 @@ sub _sort_elements {
         $mg = $d, $xg = $xh if $d > $mg;
     }
     croak "duplicate element: $elements[$xs]" if !$ml;
-    croak "delta 1 elements missing"          if $ml > 1;
+    croak 'delta 1 elements missing'          if $ml > 1;
     return (\@elements, $xs, $xg);
 }
 
@@ -435,10 +435,8 @@ sub _is_mult {
 sub _order_from_params {
     my ($order, $exponent) = @_;
     my $base = undef;
-    my $key  = $order;
     if (defined $exponent) {
         $base  = $order;
-        $key   = "$base, $exponent";
         croak "order base $base is not a prime" if !is_prime($base);
         $order = _pow($base, $exponent);
         croak "order $base ** $exponent too large for this platform"
@@ -450,7 +448,7 @@ sub _order_from_params {
         $exponent = is_prime_power($order, \$base);
         croak "order $order is not a prime power" if !$exponent;
     }
-    return ($order, $base, $exponent, $key);
+    return ($order, $base, $exponent);
 }
 
 # ($this, $order, $base, $exponent, $modulus) = _full_params(@_);
@@ -579,9 +577,10 @@ sub known_space_desc {
 # $ds = Math::DifferenceSet::Planar->new(3, 2);
 sub new {
     my $class = shift;
-    my ($order, $base, $exponent, $key) = _order_from_params(@_);
+    my ($order, $base, $exponent) = _order_from_params(@_);
     my $pds = $class->_data->get($order);
     if (!$pds) {
+        my $key = join q[, ], @_;
         croak "PDS($key) not available";
     }
     return $class->_from_pds($order, $pds);
@@ -592,7 +591,7 @@ sub lex_reference {
     my ($order, $base, $exponent) = _order_from_params(@_);
     my $pds = $class->_data->get($order);
     if ($pds && (my $lambda = $pds->ref_lex)) {
-        return $class->_from_pds($order, $pds)->multiply($lambda)->canonize;
+        return $class->_from_pds($order, $pds)->multiply($lambda)->lex_canonize;
     }
     return undef;
 }
@@ -679,7 +678,7 @@ sub from_elements_fast {
             if (!defined delete $todo{$this}) {
                 croak
                     "bogus set: prime divisor $base of order $order " .
-                    "is not a multiplier";
+                    'is not a multiplier';
             }
             ++$count;
             $this = mulmod($this, $base, $modulus);
@@ -817,7 +816,7 @@ sub iterate_known_std_refs {
 
 sub iterate_known_lex_refs {
     my ($class, @minmax) = @_;
-    return $class->_iterate_refs('ref_lex', 'canonize', @minmax);
+    return $class->_iterate_refs('ref_lex', 'lex_canonize', @minmax);
 }
 
 sub iterate_known_gap_refs {
@@ -899,7 +898,7 @@ sub elements {
     my $elements = $this->_elements;
     return 0+@{$elements} if !wantarray;
     my $x_start = $this->[_F_X_START];
-    return @{$elements}[$x_start .. $#$elements, 0 .. $x_start-1];
+    return @{$elements}[$x_start .. $#{$elements}, 0 .. $x_start-1];
 }
 
 # $e0 = $ds->element(0);
@@ -1011,7 +1010,7 @@ sub iterate_planes {
     my $r_it = $this->iterate_rotators;
     return sub {
         my $r = $r_it->();
-        return $r? $this->multiply($r)->canonize: undef;
+        return $r? $this->multiply($r)->lex_canonize: undef;
     };
 }
 
@@ -1022,6 +1021,32 @@ sub iterate_planes_zc {
     return sub {
         my $r = $r_it->();
         return $r? $ref->multiply($r): undef;
+    };
+}
+
+sub iterate_principal_planes {
+    my ($this) = @_;
+    my $ref = $this->zeta_canonize;
+    my (      $princ_elems,   $modulus) =
+    @{$ref}[_F_PRINC_ELEMS, _F_MODULUS];
+    my $pex = 0;
+    return sub {
+        return undef if $pex >= @{$princ_elems};
+        my $r = invmod($princ_elems->[$pex++], $modulus);
+        return $ref->multiply($r)->lex_canonize;
+    };
+}
+
+sub iterate_principal_planes_zc {
+    my ($this) = @_;
+    my $ref = $this->zeta_canonize;
+    my (      $princ_elems,   $modulus) =
+    @{$ref}[_F_PRINC_ELEMS, _F_MODULUS];
+    my $pex = 0;
+    return sub {
+        return undef if $pex >= @{$princ_elems};
+        my $r = invmod($princ_elems->[$pex++], $modulus);
+        return $ref->multiply($r);
     };
 }
 
@@ -1186,6 +1211,33 @@ sub plane_derived_elements_of {
     return @de;
 }
 
+sub plane_unit_elements {
+    my ($this) = @_;
+    if (!wantarray) {
+        return 3 * $this->[_F_EXPONENT] * @{$this->[_F_PRINC_ELEMS]};
+    }
+    return
+        map { ($_, $this->plane_derived_elements_of($_)) }
+        @{$this->[_F_PRINC_ELEMS]};
+}
+
+sub plane_nonunit_elements {
+    my ($this) = @_;
+    if (!wantarray) {
+        return $this->[_F_ORDER] + 1 - $this->plane_unit_elements;
+    }
+    return
+        (
+            (
+                map { @{$_} }
+                sort { @{$b} <=> @{$a} || $a->[0] <=> $b->[0] }
+                map { [$_, $this->plane_derived_elements_of($_)] }
+                @{$this->[_F_SUPPL_ELEMS]}
+            ),
+            _fill_elements(@{$this}[_F_ORDER, _F_MODULUS])
+        );
+}
+
 # $bool = $ds->contains($e)
 sub contains {
     my ($this, $elem) = @_;
@@ -1309,7 +1361,7 @@ Math::DifferenceSet::Planar - object class for planar difference sets
 
 =head1 VERSION
 
-This documentation refers to version 1.001 of Math::DifferenceSet::Planar.
+This documentation refers to version 1.002 of Math::DifferenceSet::Planar.
 
 =head1 SYNOPSIS
 
@@ -1358,6 +1410,8 @@ This documentation refers to version 1.001 of Math::DifferenceSet::Planar.
   @es = $ds->plane_supplemental_elements;
   @ef = $ds->plane_fill_elements;
   @ed = $ds->plane_derived_elements_of(@ep, @es);
+  @ue = $ds->plane_unit_elements;
+  @ne = $ds->plane_nonunit_elements;
 
   $ds1 = $ds->translate(1);
   $ds2 = $ds->canonize;
@@ -1370,7 +1424,7 @@ This documentation refers to version 1.001 of Math::DifferenceSet::Planar.
   @pm  = $ds->multipliers;
   $it  = $ds->iterate_rotators;
   while (my $m = $it->()) {
-    $ds3 = $ds->multiply($m)->canonize;
+    $ds3 = $ds->multiply($m)->lex_canonize;
   }
   $it = $ds->iterate_planes;
   while (my $ds3 = $it->()) {
@@ -1379,6 +1433,14 @@ This documentation refers to version 1.001 of Math::DifferenceSet::Planar.
   $it = $ds->iterate_planes_zc;
   while (my $ds3 = $it->()) {
     # similar, but yielding zeta-canonical sets
+  }
+  $it = $ds->iterate_principal_planes;
+  while (my $ds3 = $it->()) {
+    # as above, yielding sets containing 0, 1, and 3
+  }
+  $it = $ds->iterate_principal_planes_zc;
+  while (my $ds3 = $it->()) {
+    # similar, but yielding zeta-canonical sets containing 1
   }
 
   $cmp  = $ds1->compare($ds2);
@@ -1507,9 +1569,9 @@ in strictly ascending numeric succession is possible as well.
 
 Each plane (i.e. complete set of translates of a planar difference set)
 has a unique set containing the elements 0 and 1.  We call this set the
-canonical representative of the plane.  The canonical representative is
-also the lexically first set of its plane when sorted with priority on
-small elements.
+canonical or lex-canonical representative of the plane.  The canonical
+representative is also the lexically first set of its plane when sorted
+with priority on small elements.
 
 Each planar difference set has, for each nonzero element I<delta>
 of its ring E<8484>_n, a unique pair of elements S<(I<e1>, I<e2>)>
@@ -1987,6 +2049,28 @@ is similar to C<$ds-E<gt>iterate_planes>, but returns zeta-canonical
 rather than lexically canonical sets.  This currently is the most
 efficient way to iterate over difference set planes.
 
+=item I<iterate_principal_planes_zc>
+
+If C<$ds> is a planar difference set object,
+C<$ds-E<gt>iterate_principal_planes_zc> is similar to
+C<$ds-E<gt>iterate_planes_zc>, but returns only the subsequence of
+zeta-canonical sets containing 1.  This can be used to find zeta-canonical
+reference sets for orders not covered by the precomputed data available,
+from an arbitrary sample difference set.  The number of principal planes
+of a particular order is equal to the number of principal elements of
+sets of that order.  Cf. L</plane_principal_elements>.
+
+=item I<iterate_principal_planes>
+
+If C<$ds> is a planar difference set object,
+C<$ds-E<gt>iterate_principal_planes> is similar to
+C<$ds-E<gt>iterate_principal_planes_zc>, but returns lex-canonical
+rather than zeta-canonical sets.  Apparently, the sets generated by
+this iterator are precisely the sets starting with elements 0, 1, and
+3 [citation needed].  If this is true, this iterator can be used to
+efficiently find lex-canonical reference sets for orders not covered by
+the precomputed data available, from an arbitrary sample difference set.
+
 =back
 
 =head2 Property Accessors
@@ -2175,9 +2259,9 @@ Each plane of I<k>-element cyclic planar difference sets can be
 constructed from a set of at most I<floor(k/3)> main elements and
 additional elements derived from these by an arithmetic progression.
 The main elements that are coprime to the modulus are called principal
-elements, the others are called supplemental elements.  Principal
-elements are sufficient to determine linear mappings between planes,
-while supplemental elements are sufficient to determine subplanes.
+elements, the other main elements are called supplemental elements.
+Principal elements are sufficient to determine linear mappings between
+planes, while supplemental elements are sufficient to determine subplanes.
 Main elements, derived elements and at most two fill elements build a
 complete zeta-canonical set.
 
@@ -2201,7 +2285,7 @@ The method I<plane_derived_elements_of>, called with a single
 principal or supplemental element as argument, returns the elements
 derived from that element.  This will be I<3 * order_exponent - 1>
 elements for a principal element, and I<3 * n - 1> elements, with
-I<1 E<8804> n E<8804> order_exponent>, for a supplemental element,
+I<n> some divisor of I<order_exponent>, for a supplemental element,
 in any order.
 
 Called with a list of elements, the method will return a collected list
@@ -2210,6 +2294,24 @@ of all derived elements of these elements.
 Calling I<plane_derived_elements_of> with other elements than principal
 or supplemental elements will yield some list with no meaningful relation
 to the plane at hand.
+
+=item I<plane_unit_elements>
+
+In list context, elements of the zeta-canonical representative of a set's
+plane that are coprime to the modulus.  In scalar context, their number.
+This number is also called I<E<964>E<8320>> (tau zero) and is equal for
+all planes of equal order.
+
+In the output, elements in the same p-orbit are grouped together.
+
+=item I<plane_nonunit_elements>
+
+In list context, elements of the zeta-canonical representative of a
+set's plane that are not coprime to the modulus.  In scalar context,
+their number.
+
+In the output, elements in the same p-orbit are grouped together and
+longer orbits precede shorter ones.
 
 =back
 
@@ -2402,7 +2504,7 @@ may yield broken objects with inconsistent behaviour, though.
 =item duplicate element: %d
 
 The class method I<from_elements> or I<from_elements_fast> was called
-with non-unique values.  One value occuring more than once is reported
+with non-unique values.  One value occurring more than once is reported
 in the message.
 
 =item delta %d elements missing
@@ -2448,10 +2550,10 @@ actually representing a valid planar difference set.
 
 =item parameters expected if called as a class method
 
-One of the methods I<n_planes>, I<multipliers>, or I<iterate_rotators>
-was called as a class method but without an I<order> parameter or an order
-I<base> and I<exponent> parameter pair.  Methods describing properties
-of spaces need a specific space to relate to.
+One of the methods I<n_planes>, I<sigma>, I<multipliers>, or I<iterate_rotators>
+was called as a class method but without either an I<order> parameter
+or an order I<base> and I<exponent> parameter pair.  Methods describing
+properties of spaces need a specific space to relate to.
 
 =back
 
@@ -2513,7 +2615,7 @@ E<lt>E<lt>E<gt>E<gt> and thus require perl version 5.22 or later to run.
 As this library depends on a database with sample sets, it will not
 generate arbitrarily large sets.  The database packaged with the base
 module is good for sets with at most 4097 elements.  Extensions in various
-sizes are available on GitHub, but not indended to be uploaded to CPAN,
+sizes are available on GitHub, but not intended to be uploaded to CPAN,
 to save storage space.  To improve efficiency for much larger sets,
 the API should presumably be changed to use PDL vectors rather than
 plain perl arrays.
@@ -2597,28 +2699,29 @@ extension modules Math::DifferenceSet::Planar::Data::M,
 Math::DifferenceSet::Planar::Data::L,
 Math::DifferenceSet::Planar::Data::XL, etc.
 
-For most planes in the larger collections, lex and gap reference sets
-are not yet computed.  At the time of the 1.000 release, we have computed
-lex reference sets for 1394 planes and gap reference sets for 644 planes
-only, while standard reference sets are available for all of the 12400
-planes included in the XL database, and even for the sets with millions
+For most planes in the larger collections, gap reference sets
+are not yet computed.  At the time of the 1.002 release, we have computed
+gap reference sets for 644 planes
+only, while standard and lex reference sets are available for all of the 12400
+planes included in the XL database, and even for most of the sets with millions
 of elements provided as an extra.  Lacking more efficient algorithms,
-a substantial extension of lex and gap reference sets would require
+a substantial extension of gap reference sets would require
 massive computing power, but we expect to at least gradually increase
 their number over time.
 
 More important perhaps is double- and triple-checking the data that is
 already present, before it can be regarded as scientifically acceptable.
 For each order, we used Singer's construction to generate a sample
-set, wich is provably valid, and iterated through its multiples
+set, which is provably valid, and iterated through its multiples
 to find reference sets with their respective optimality properties.
 As this was of course performed by computer programs and computers may
 malfunction, repetitions or, even better, independent reiterations
 will increase confidence in the results and weed out actual errors.
 
 Verifying difference set properties using complete difference tables is
-impractical for large sets.  Therefore, we are still looking for efficient
-verification methods for orders exceeding those of the collected samples.
+impractical for large sets.  Verification using reference sets, on the
+other hand, relies partly on conjectures.  Therefore, we are still looking
+for an efficient and proven verification method for very large sets.
 
 =head1 SEE ALSO
 
@@ -2645,7 +2748,7 @@ L<Math::DifferenceSet::Planar::Data::XL|https://github.com/mhasch/perl-Math-Diff
 - data extension modules of various sizes, available on GitHub.  They just
 contain data and no additional functionality.  We don't intend to upload
 these modules to CPAN, where they would only be dead weight, while users
-actually interested in them will have not much trouble to fetch them
+actually interested in them should not have much trouble to fetch them
 from the sources referenced above.
 
 =item *
@@ -2683,10 +2786,15 @@ Martin Becker, E<lt>becker-cpan-mp I<at> cozap.comE<gt>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (c) 2019-2023 by Martin Becker, Blaubeuren.
+Copyright (c) 2019-2024 by Martin Becker, Blaubeuren.
 
 This library is free software; you can distribute it and/or modify it
 under the terms of the Artistic License 2.0 (see the LICENSE file).
+
+The licence grants freedom for related software development but does
+not cover incorporating code or documentation into AI training material.
+Please contact the copyright holder if you want to use the library whole
+or in part for other purposes than stated in the licence.
 
 =head1 DISCLAIMER OF WARRANTY
 
