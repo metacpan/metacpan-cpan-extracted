@@ -1,5 +1,8 @@
 Revision history for Sub-Private
 
+0.04	Mon Jul 15 07:57:40 EDT 2024
+	Added dependancy on Test::More (RT#154368)
+
 0.03	Fri Jul 12 08:29:42 EDT 2024
 	Added SEE ALSO link to Sub::Deprecated (thanks to neilb)
         fixed typo in doc (thanks to neilb)

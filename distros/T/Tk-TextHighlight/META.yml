@@ -1,5 +1,5 @@
 ---
-abstract: 'a TextUndo/SuperText widget with syntax highlighting capabilities, can also use Kate languages.'
+abstract: 'a Tk::TextUndo/Tk::Text::SuperText widget with syntax  highlighting capabilities, can also use Kate languages.'
 author:
   - 'Jim Turner <turnerjw784@yahoo.com>'
 build_requires:
@@ -23,5 +23,5 @@ requires:
   Tk::HList: '0'
   Tk::ROText: '0'
   Tk::TextUndo: '0'
-version: '1.2'
+version: '2.0'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

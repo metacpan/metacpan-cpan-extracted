@@ -13,6 +13,7 @@ lib/Data/Radius/DictionaryParser.pm
 lib/Data/Radius/Packet.pm
 lib/Data/Radius/Dictionary.pm
 lib/Data/Radius/Encode.pm
+t/acct.t
 t/enum.t
 t/decode.t
 t/dict.t

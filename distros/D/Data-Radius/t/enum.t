@@ -1,6 +1,7 @@
 use strict;
 use warnings;
-use Test::More tests => 12;
+use Test::More tests => 12 + 1;
+use Test::NoWarnings;
 
 BEGIN { use_ok('Data::Radius::Util', qw(is_enum_type)) };
 

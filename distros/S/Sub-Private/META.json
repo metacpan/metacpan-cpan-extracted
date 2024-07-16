@@ -35,6 +35,7 @@
       },
       "test" : {
          "requires" : {
+            "Test::Most" : "0",
             "Test::Needs" : "0"
          }
       }
@@ -42,7 +43,7 @@
    "provides" : {
       "Sub::Private" : {
          "file" : "lib/Sub/Private.pm",
-         "version" : "0.03"
+         "version" : "0.04"
       }
    },
    "release_status" : "stable",
@@ -54,9 +55,9 @@
          "http://dev.perl.org/licenses/"
       ],
       "repository" : {
-         "url" : "https://github.com/nigelhorne/Sub-Private"
+         "url" : "https://rt.cpan.org/Public/Dist/Display.html?Name=Sub-Private"
       }
    },
-   "version" : "0.03",
+   "version" : "0.04",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

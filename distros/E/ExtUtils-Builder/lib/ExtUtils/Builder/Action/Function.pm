@@ -1,5 +1,5 @@
 package ExtUtils::Builder::Action::Function;
-$ExtUtils::Builder::Action::Function::VERSION = '0.007';
+$ExtUtils::Builder::Action::Function::VERSION = '0.008';
 use strict;
 use warnings;
 
@@ -45,9 +45,9 @@ sub execute {
 	(my $filename = $module) =~ s{::}{/}g;
 	require "$filename.pm";
 
-	if ($args{logger} && !$args{quiet}) {
+	if (!$args{quiet}) {
 		my $message = $self->{message} || sprintf "%s(%s)", $self->{fullname}, join ", ", $self->arguments;
-		$args{logger}->($message);
+		print "$message\n";
 	}
 
 	my $code = do { no strict 'refs'; \&{ $self->{fullname} } };
@@ -87,7 +87,7 @@ ExtUtils::Builder::Action::Function - Actions for perl function calls
 
 =head1 VERSION
 
-version 0.007
+version 0.008
 
 =head1 SYNOPSIS
 

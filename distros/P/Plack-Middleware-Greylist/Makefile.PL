@@ -29,7 +29,7 @@ my %WriteMakefileArgs = (
     "warnings" => 0
   },
   "TEST_REQUIRES" => {
-    "Cache::FastMmap" => "1.47",
+    "Cache::FastMmap" => "1.52",
     "File::Spec" => 0,
     "HTTP::Request::Common" => 0,
     "IO::Scalar" => 0,
@@ -46,7 +46,7 @@ my %WriteMakefileArgs = (
     "Test::More" => 0,
     "strict" => 0
   },
-  "VERSION" => "v0.8.0",
+  "VERSION" => "v0.8.1",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -54,7 +54,7 @@ my %WriteMakefileArgs = (
 
 
 my %FallbackPrereqs = (
-  "Cache::FastMmap" => "1.47",
+  "Cache::FastMmap" => "1.52",
   "File::Spec" => 0,
   "HTTP::Request::Common" => 0,
   "HTTP::Status" => 0,

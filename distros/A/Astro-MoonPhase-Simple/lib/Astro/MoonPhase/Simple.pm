@@ -9,11 +9,14 @@ use DateTime::Format::ISO8601;
 use DateTime::TimeZone;
 use Try::Tiny;
 use Data::Roundtrip qw/perl2dump no-unicode-escape-permanently/;
+####
+# Note that we require conditionally Geo::Location::TimeZone, see below
+####
 
-# the real heavy lifter!!! :
+# the real heavy lifter!!! thank you :
 use Astro::MoonPhase;
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 use Exporter 'import';
 our (@EXPORT, @EXPORT_OK);
@@ -29,7 +32,8 @@ BEGIN {
 #   time : optional time in hh:mm:ss
 #   timezone : optional timezone as a TZ identifier e.g. Africa/Abidjan
 #   location : optionally deduce timezone from location if above timezone is absent,
-#              it is a string with this format: longitude,latitude (e.g. -10.3,3.09191)
+#              it is a nameplace string, e.g. 'Abidjan'
+#        OR    it is a HASHref with keys 'lat' and 'lon'
 #   verbosity: optionally specify a positive integer to increase verbosity, default is zero for no verbose messages (only errors and warnings)
 # Returns:
 #   a hash with results including 'asString' which contains a string description of the results.
@@ -43,11 +47,14 @@ sub	calculate_moon_phase {
 		print STDERR "$whoami (via $parent) : parameters in the form of a HASHref are required.";
 		return undef
 	}
+	my $verbosity = exists($params->{'verbosity'}) && defined($params->{'verbosity'}) ? $params->{'verbosity'} : 0;
+
 	if( exists($params->{'date'}) && defined($params->{'date'}) ){
 		if( $params->{'date'} !~ /^\d{4}\-(0[1-9]|1[012])\-(0[1-9]|[12][0-9]|3[01])$/ ){
 			print STDERR "$whoami (via $parent) : parameter 'date' does not parse YYYY-MM-DD : ".$params->{'date'}."\n";
 			return undef
 		}
+		print STDOUT "$whoami (via $parent) : found parameter 'date' : '".$params->{'date'}."'.\n" if $verbosity > 1;
 	} else {
 		print STDERR "$whoami (via $parent) : parameter 'date' was not specified.\n";
 		return undef
@@ -57,21 +64,25 @@ sub	calculate_moon_phase {
 			print STDERR "$whoami (via $parent) : parameter 'time' does not parse hh:mm:ss : ".$params->{'time'}."\n";
 			return undef
 		}
+		print STDOUT "$whoami (via $parent) : found parameter 'time' : '".$params->{'date'}."'.\n" if $verbosity > 1;
 	}
 	if( exists($params->{'location'}) && defined($params->{'location'}) ){
-		if( ref($params->{'location'})ne'HASH' || ! exists($params->{'location'}->{'lon'}) || ! exists($params->{'location'}->{'lat'}) ){
-			print STDERR "$whoami (via $parent) : parameter 'location' is not a HASHref or it does not contain the two keys 'lon' and 'lat'.\n";
+		if( (ref($params->{'location'})eq'' && ($params->{'location'}=~/^[- a-zA-Z]+$/)) ){
+			print STDOUT "$whoami (via $parent) : found parameter 'location' (as a nameplace) : '".$params->{'location'}."'\n" if $verbosity > 1;
+		} elsif( (ref($params->{'location'})eq'HASH' && exists($params->{'location'}->{'lon'}) && exists($params->{'location'}->{'lat'})) ){
+			print STDOUT "$whoami (via $parent) : found parameter 'location' (as coordinates) : '".perl2dump($params->{'location'})."'\n" if $verbosity > 1;
+		} else {
+			print STDERR "$whoami (via $parent) : parameter 'location' is not a string of a location name (e.g. London) or it is not a HASHref which contains the two keys 'lon' and 'lat' : ".perl2dump(\$params->{'location'})."\n";
 			return undef
 		}
 	}
 
-	my $verbosity = exists($params->{'verbosity'}) && defined($params->{'verbosity'}) ? $params->{'verbosity'} : 0;
-
 	my $parsed_results = _parse_event($params);
 	if( ! defined $parsed_results ){ print STDERR perl2dump($params)."$whoami (via $parent) : error, call to ".'_parse_event()'." has failed for above parameters.\n"; return undef }
-	my $epoch = $parsed_results->{'epoch'};
+	my $epoch = $parsed_results->{'localepoch'};
 
-	print STDOUT _event2str($params) . "\n" if $verbosity > 0;
+	print STDOUT _event2str($params)."\n$whoami (via $parent) : deduced epoch as '$epoch' for above parameters, now calling Astro::MoonPhase::phase() ...\n"
+	 if $verbosity > 0;
 
 	my (	$MoonPhase,
 		$MoonIllum,
@@ -117,7 +128,7 @@ sub	calculate_moon_phase {
 sub _event2str {
 	my $params = shift;
 
-	if( ! exists $params->{_is_parsed} ){
+	if( ! exists $params->{datetime} ){
 		return "event has not been parsed, just dumping it:\n".perl2dump($params);
 	}
 	my $str =
@@ -133,6 +144,18 @@ sub _event2str {
 	return $str
 }
 
+# it expects a HASHref of input parameters which contain:
+#   date : the date of when you want to calculate the moon phase, YYYY-MM-DD
+#   time : optional time in hh:mm:ss
+#   timezone : optional timezone as a TZ identifier e.g. Africa/Abidjan
+#   location : optionally deduce timezone from location if above timezone is absent,
+#              it is a nameplace string, e.g. 'Abidjan'
+#        OR    it is a HASHref with keys 'lat' and 'lon'
+#   verbosity: optionally specify a positive integer to increase verbosity, default is zero for no verbose messages (only errors and warnings)
+# On failure it returns undef
+# On success it returns the input parameters HASH complemented with
+# various calculated things, most useful of which is 'localepoch' (based on timezone and time, date of the input params)
+# and also the DateTime object for calculating the above 'localepoch' under key: 'datetime'
 sub _parse_event {
 	my $_params = shift;
 
@@ -141,64 +164,78 @@ sub _parse_event {
 
 	my $verbosity = exists($params->{'verbosity'}) && defined($params->{'verbosity'}) ? $params->{'verbosity'} : 0;
 
-	if( ! exists $params->{date} ){ die "date field is missing from event." }
+	if( ! exists $params->{date} ){ print STDERR "_parse_event() : 'date' field is missing from params.\n"; return undef }
 
 	my $datestr = $params->{date};
 
 	my $timestr = "00:00:01";
 	if( exists $params->{time} ){
 		$timestr = $params->{time};
-		print "event2epoch(): setting time to '$timestr' ...\n"
+		print "_parse_event(): setting time to '$timestr' ...\n"
 			if $verbosity > 0;
-		die "time '$timestr' is not valid, it must be in the form 'hh:mm:ss'."
-			unless $timestr =~ /^\d{2}:\d{2}:\d{2}$/;
+		if( $timestr !~ /^\d{2}:\d{2}:\d{2}$/ ){ print STDERR "_parse_event() : time '$timestr' is not valid, it must be in the form 'hh:mm:ss'.\n"; return undef }
 	} else { $params->{time} = $timestr }
 
+	# create the DateTime object but on UTC timezone,
+	# then we calculate the epoch (which is always UTC-based)
+	# then we add the timezone offset to that epoch
 	my $isostr = $datestr . 'T' . $timestr;
-	my $dt = DateTime::Format::ISO8601->parse_datetime($isostr);
-	die "failed to parse date '$isostr', check date and time fields."
-		unless defined $dt;
+	my $dt = eval { DateTime::Format::ISO8601->parse_datetime($isostr) };
+	if( ! defined($dt) || $@ ){ print STDERR "_parse_event() : failed to parse date '$isostr', check date and time fields.\n"; return undef }
 	$params->{datetime} = $dt;
+	$dt->set_time_zone('UTC');
 
-	my $tzstr = 'UTC';
+	my $tzstr = undef;
 	if( exists $params->{timezone} ){
 		$tzstr = $params->{timezone};
-		print "event2epoch(): found a timezone via 'timezone' field as '$tzstr' (that does not mean it is valid) ...\n"
+		print "_parse_event(): found a timezone via 'timezone' field as '$tzstr' (that does not mean it is valid) ...\n"
 			if $verbosity > 0;
 	} elsif( exists $params->{location} ){
 		my $loc = $params->{location};
-		if( (ref($loc) eq '') && ($loc =~ /^[a-zA-Z]$/) ){
-			# we have a location string
-			my @alltzs = DateTime::TimeZone->all_names;
-			my $tzstr;
-			for (@alltzs){ if( $_ =~ /$loc/i  ){ $tzstr = $_; last } }
-			die "event's location can not be converted to a timezone, consider specifying the 'timezone' directly or setting 'location' coordinates with: \[lat,lon\]."
-				unless $tzstr;
-			print "event2epoch(): setting timezone via 'location' name to '$timestr' ...\n"
+		if( (ref($loc) eq '') && ($loc =~ /^[- a-zA-Z]+$/) ){
+			# we have a location NAME string (like 'London')
+			my @alltzs = grep { m#/${loc}$#i } DateTime::TimeZone->all_names;
+			if( scalar(@alltzs) == 0 ){ print STDERR "_parse_event(): error, the timezone of specified nameplace '$loc' can not be deduced from the TZ identifiers. You can specify coordinates of the location or the timezone explicitly.\n"; return undef }
+			elsif( scalar(@alltzs) > 1 ){ print STDERR "_parse_event(): warning more than one timezones matched location nameplace '$loc': @alltzs. The first timezone will be used. If this is incorrect please specify the timezone explicitly, via the 'timezone' parameter.\n"; }
+			$tzstr = $alltzs[0];
+			print STDOUT "_parse_event(): setting timezone via 'location' nameplace to '$tzstr' ...\n"
 				if $verbosity > 0;
 		} elsif( (ref($loc) eq 'HASH') && (exists $loc->{lat}) && (exists $loc->{lon}) ){
 			# we have a [lat,lon] array for location
 			require Geo::Location::TimeZone;
 			my $gltzobj = Geo::Location::TimeZone->new();
 			$tzstr = $gltzobj->lookup(lat => $loc->{lat}, lon => $loc->{lon});
-			if( ! $tzstr ){ die "timezone lookup from location coordinates lat:".$loc->{lat}.", lon:".$loc->{lon}." has failed." }
-			print "event2epoch(): setting timezone via 'location' coordinates lat:".$loc->{lat}.", lon:".$loc->{lon}." ...\n"
+			if( ! $tzstr ){ print STDERR "_parse_event() : timezone lookup from location coordinates lat:".$loc->{lat}.", lon:".$loc->{lon}." has failed.\n"; return undef }
+			print STDOUT "_parse_event(): setting timezone via 'location' coordinates lat:".$loc->{lat}.", lon:".$loc->{lon}." ...\n"
 				if $verbosity > 0
 		}
 	}
-	if( $tzstr ){
-		print "event2epoch(): deduced timezone to '$tzstr' and setting it ...\n"
-			if $verbosity > 0;
-		try {
-			$dt->set_time_zone($tzstr)
-		} catch {
-			die "$_\n failed to set the timezone '$tzstr', is it valid?"
-		}
-	}
+	my $localepoch = $dt->epoch; # this is UTC-based but the specified date+time has perhaps a timezone ...
 
-	$params->{_is_parsed} = 1;
-	$params->{epoch} = $dt->epoch;
-	# this is our input hash with added fields, the most important is 'epoch'
+	if( defined $tzstr ){
+		# the DateTime object now has the specified timezone
+		# but its epoch will still be UTC-based...
+		$dt->set_time_zone($tzstr);
+
+		# we have a timezone, find the offset and add it to the epoch
+		print "_parse_event(): deduced timezone to '$tzstr' and adjusting epoch to it ...\n"
+			if $verbosity > 0;
+		my $tzobj = eval { DateTime::TimeZone->new( name => $tzstr ) };
+		if( ! defined($tzobj) || $@ ){
+			print STDERR "_parse_event(): failed to set the timezone '$tzstr', is it valid? : $@\n";
+			return undef;
+		}
+		my $offset = $tzobj->offset_for_datetime($dt);
+		# we should not change the DateTime, just our own 'localepoch' 
+		#$dt->add(seconds => $offset);
+		$localepoch += $offset;
+		print STDOUT "_parse_event(): adjusted epoch for timezone '$tzstr' to $localepoch.\n"
+			if $verbosity > 0;
+	}
+	print STDOUT "DateTime: $dt\n(timezone: ".$dt->time_zone().")\n_parse_event(): above is the DateTime object for the moon phase calculations, with adjusted timezone.\n"
+		if $verbosity > 0;
+	$params->{localepoch} = $dt->epoch;
+	# this is our input hash with added fields, the most important is 'localepoch'
 	# of the input date/time/timezone
 	return $params
 }
@@ -213,7 +250,7 @@ Astro::MoonPhase::Simple - Calculate the phase of the Moon on a given time witho
 
 =head1 VERSION
 
-Version 0.01
+Version 0.02
 
 
 =head1 SYNOPSIS
@@ -228,7 +265,7 @@ checking.
     use Astro::MoonPhase::Simple;
 
     my $res = calculate_moon_phase({
-      'date' => '1974-07-14',
+      'date' => '1974-07-15',
       'timezone' => 'Asia/Nicosia',
     });
     print "moon is ".$res->{'MoonPhase%'}."% full\n";
@@ -236,12 +273,20 @@ checking.
 
     print $res->{'asString'};
 
-    # alternatively provide a location instead of a timezone
-    # to deduce the timezone
+    # alternatively provide location coordinates
+    # (instead of timezone) to deduce the timezone
     my $res = calculate_moon_phase({
-      'date' => '1974-07-14',
+      'date' => '1974-07-15',
       'time' => '04:00',
       'location' => {lat=>49.180000, lon=>-0.370000}
+    });
+
+    # alternatively provide a nameplace instead of a timezone
+    # to deduce the timezone
+    my $res = calculate_moon_phase({
+      'date' => '1974-07-15',
+      'time' => '04:00',
+      'location' => 'Nicosia',
     });
 
     ...
@@ -269,6 +314,19 @@ specify the location, as a HASHref of C<{lon, lat}>,
 the moon is observed from and this
 will deduce the timezone, albeit not always as accurately
 as with specifying a "timezone" explicitly.
+
+L<Astro::MoonPhase> calculates the moon phase
+given an I<epoch>. Which is the number of seconds
+since 1970-01-01 on a UTC timezone. This epoch
+is corrected to a I<localepoch> by adding to it
+the specific timezone offset. For example, if you
+specified the timezone to be "China/Beijing" and
+the local time (at the specified timezone) to be 23:00.
+It means UTC time is 15:00. The epoch will be calculated
+on UTC time. However, we add 23:00-15:00=8:00 hours to
+that epoch to make it "localepoch" and this is
+what we pass on to L<Astro::MoonPhase> to calculate
+the moon phase.
 
 On failure it returns C<undef>.
 On success it returns a HASHref with keys:
@@ -308,12 +366,15 @@ Example usage: C<moon-phase-calculator.pl --date 1974-07-14 --timezone 'Asia/Nic
 
 =head1 SEE ALSO
 
-This package summarises L<https://perlmonks.org/?node_id=11137299|this post> over at PerlMonks.org
+This package summarises the post and
+discussion L<this post|https://perlmonks.org/?node_id=11137299>
+over at PerlMonks.org
 
-There are some more goodies in that post e.g. PerlMonk Aldebaran does the
-same for planets.
+There are some more goodies in that post e.g. PerlMonk Aldebaran provides
+code for tracking the planets and at different altitudes.
 
-I can't iterate enough that this module wraps the functionality of L<Astro::MoonPhase>.
+I can't iterate enough that this module wraps the
+functionality of L<Astro::MoonPhase>.
 L<Astro::MoonPhase> does all the heavy lifting.
 
 =head1 AUTHOR
@@ -357,7 +418,7 @@ L<https://metacpan.org/release/Astro-MoonPhase-Simple>
 
 =head1 ACKNOWLEDGEMENTS
 
-The authors of L<Astro::MoonPhase> takes all the credit.
+The authors of L<Astro::MoonPhase> take all the credit.
 
 
 =head1 LICENSE AND COPYRIGHT

@@ -1,4 +1,4 @@
-package SPVM::R::NDArray::DoubleComplex;
+package SPVM::R::OP::DoubleComplex;
 
 
 
@@ -6,91 +6,211 @@ package SPVM::R::NDArray::DoubleComplex;
 
 =head1 Name
 
-SPVM::R::NDArray::DoubleComplex - N-Dimensional Array of Double Complex Type.
+SPVM::R::OP::DoubleComplex - N-Dimensional Array Operations for R::NDArray::DoubleComplex
 
 =head1 Description
 
-R::NDArray::DoubleComplex class in L<SPVM> represents n-dimensional array of double complex L<Complex_2d|SPVM::Complex_2d> type.
+The R::OP::DoubleComplex class in L<SPVM> has methods for n-dimensional array operations for L<R::NDArray::DoubleComplex|SPVM::R::NDArray::DoubleComplex>.
 
 =head1 Usage
 
-  use R::NDArray::DoubleComplex;
-  use Math;
+  use R::OP::DoubleComplex as DCOP;
   
-  my $data = [
-    Math->complex(1, 0),
-    Math->complex(2, 0),
-    Math->complex(3, 0),
-    Math->complex(4, 0),
-    Math->complex(5, 0),
-    Math->complex(6, 0)
-  ];
+  # 1+10i
+  my $ndarray_scalar = DCOP->c([(double)1,10]);
   
-  my $ndarray = R::NDArray::DoubleComplex->new({data => $data, dim => [3, 2]});
-
-=head1 Super Class
-
-L<R::NDArray|SPVM::R::NDArray>
-
-=head1 Field
-
-=head2 data
-
-C<method data : L<Complex_2d|SPVM::Complex_2d>[] ();>
-
-Same as L<R::NDArray#data|SPVM::R::NDArray/"data"> method, but the return type is different.
+  # 1+10i, 2+20i, 3 + 30i
+  my $ndarray_vector = DCOP->c([(double)1,10,  2,20,  3,30]);
+  
+  my $ndarray = DCOP->c([(double)1,10,  2,20,  3,30,  4,40,  5,50,  6,60], [3, 2]);
+  
+  my $ndarray2 = DCOP->c($ndarray);
 
 =head1 Class Methods
 
-C<static method new : L<R::NDArray::DoubleComplex|SPVM::R::NDArray::DoubleComplex> ($options : object[] = undef);>
+=head2 c
 
-Creates a new L<R::NDArray::DoubleComplex|SPVM::R::NDArray::DoubleComplex> and returns it.
+C<static method c : L<R::NDArray::DoubleComplex|SPVM::R::NDArray::DoubleComplex> ($data : object of float[]|Complex_2f[]|L<R::NDArray::DoubleComplex|SPVM::R::NDArray::DoubleComplex>, $dim : int[] = undef);>
 
-This method calls L<R::NDArray#init|SPVM::R::NDArray/"init"> method given the options $options.
+=head2 add
 
-=head1 Instance Methods
+C<static method add : L<R::NDArray::DoubleComplex|SPVM::R::NDArray::DoubleComplex> ($x_ndarray : L<R::NDArray::DoubleComplex|SPVM::R::NDArray::DoubleComplex>, $y_ndarray : L<R::NDArray::DoubleComplex|SPVM::R::NDArray::DoubleComplex>);>
 
-=head2 create_default_data
+=head2 sub
 
-C<method create_default_data : L<Complex_2d|SPVM::Complex_2d>[] ($length : int = 0);>
+C<static method sub : L<R::NDArray::DoubleComplex|SPVM::R::NDArray::DoubleComplex> ($x_ndarray : L<R::NDArray::DoubleComplex|SPVM::R::NDArray::DoubleComplex>, $y_ndarray : L<R::NDArray::DoubleComplex|SPVM::R::NDArray::DoubleComplex>);>
 
-Creates a default data given the length $length and returns it.
+=head2 mul
 
-=head2 elem_to_string
+C<static method mul : L<R::NDArray::DoubleComplex|SPVM::R::NDArray::DoubleComplex> ($x_ndarray : L<R::NDArray::DoubleComplex|SPVM::R::NDArray::DoubleComplex>, $y_ndarray : L<R::NDArray::DoubleComplex|SPVM::R::NDArray::DoubleComplex>);>
 
-C<method elem_to_string : string ($data : L<Complex_2d|SPVM::Complex_2d>[], $data_index : int);>
+=head2 scamul
 
-Converts an element $data at index $data_index to a string and returns it.
+C<static method scamul : L<R::NDArray::DoubleComplex|SPVM::R::NDArray::DoubleComplex> ($scalar_ndarray : L<R::NDArray::DoubleComplex|SPVM::R::NDArray::DoubleComplex>, $x_ndarray : L<R::NDArray::DoubleComplex|SPVM::R::NDArray::DoubleComplex>);>
 
-=head2 elem_assign
+=head2 div
 
-C<method elem_assign : void ($dist_data : L<Complex_2d|SPVM::Complex_2d>[], $dist_data_index : int, $src_data : L<Complex_2d|SPVM::Complex_2d>[], $src_data_index : int);>
+C<static method div : L<R::NDArray::DoubleComplex|SPVM::R::NDArray::DoubleComplex> ($x_ndarray : L<R::NDArray::DoubleComplex|SPVM::R::NDArray::DoubleComplex>, $y_ndarray : L<R::NDArray::DoubleComplex|SPVM::R::NDArray::DoubleComplex>);>
 
-Assigns the element $src_data at index $src_data_index to the element $dist_data at index $dist_data_index.
+=head2 scadiv
 
-=head2 elem_clone
+C<static method scadiv : L<R::NDArray::DoubleComplex|SPVM::R::NDArray::DoubleComplex> ($scalar_ndarray : L<R::NDArray::DoubleComplex|SPVM::R::NDArray::DoubleComplex>, $x_ndarray : L<R::NDArray::DoubleComplex|SPVM::R::NDArray::DoubleComplex>);>
 
-C<method elem_clone : void ($dist_data : L<Complex_2d|SPVM::Complex_2d>[], $dist_data_index : int, $src_data : L<Complex_2d|SPVM::Complex_2d>[], $src_data_index : int);>
+=head2 neg
 
-Copies the element $src_data at index $src_data_indext to the element $dist_data at index $dist_data_index.
+C<static method neg : L<R::NDArray::DoubleComplex|SPVM::R::NDArray::DoubleComplex> ($x_ndarray : L<R::NDArray::DoubleComplex|SPVM::R::NDArray::DoubleComplex>);>
 
-=head2 clone
+=head2 abs
 
-C<method clone : L<R::NDArray::DoubleComplex|SPVM::R::NDArray::DoubleComplex> ($shallow : int = 0);>
+C<static method abs : L<R::NDArray::Double|SPVM::R::NDArray::Double> ($x_ndarray : L<R::NDArray::DoubleComplex|SPVM::R::NDArray::DoubleComplex>);>
 
-Same as L<R::NDArray#clone|SPVM::R::NDArray/"clone"> method, but the return type is different.
+=head2 re
 
-=head2 slice
+C<static method re : L<R::NDArray::Double|SPVM::R::NDArray::Double> ($x_ndarray : L<R::NDArray::DoubleComplex|SPVM::R::NDArray::DoubleComplex>);>
 
-C<method slice : L<R::NDArray::DoubleComplex|SPVM::R::NDArray::DoubleComplex> ($asix_indexes_product : L<R::NDArray::Int|SPVM::R::NDArray::Int>[]);>
+=head2 im
 
-Same as L<R::NDArray#slice|SPVM::R::NDArray/"slice"> method, but the return type is different.
+C<static method im : L<R::NDArray::Double|SPVM::R::NDArray::Double> ($x_ndarray : L<R::NDArray::DoubleComplex|SPVM::R::NDArray::DoubleComplex>);>
 
-=head2 to_float_complex_ndarray
+=head2 i
 
-C<method to_float_complex_ndarray : L<R::NDArray::FloatComplex|SPVM::R::NDArray::FloatComplex> ();>
+C<static method i : L<R::NDArray::DoubleComplex|SPVM::R::NDArray::DoubleComplex> ();>
 
-Converts this n-dimensional array to a n-dimensional array of L<R::NDArray::FloatComplex|SPVM::R::NDArray::FloatComplex> and returns it.
+=head2 conj
+
+C<static method conj : L<R::NDArray::DoubleComplex|SPVM::R::NDArray::DoubleComplex> ($x_ndarray : L<R::NDArray::DoubleComplex|SPVM::R::NDArray::DoubleComplex>);>
+
+=head2 arg
+
+C<static method arg : L<R::NDArray::Double|SPVM::R::NDArray::Double> ($x_ndarray : L<R::NDArray::DoubleComplex|SPVM::R::NDArray::DoubleComplex>);>
+
+=head2 eq
+
+C<static method eq : L<R::NDArray::Int|SPVM::R::NDArray::Int> ($x_ndarray : L<R::NDArray::DoubleComplex|SPVM::R::NDArray::DoubleComplex>, $y_ndarray : L<R::NDArray::DoubleComplex|SPVM::R::NDArray::DoubleComplex>);>
+
+=head2 ne
+
+C<static method ne : L<R::NDArray::Int|SPVM::R::NDArray::Int> ($x_ndarray : L<R::NDArray::DoubleComplex|SPVM::R::NDArray::DoubleComplex>, $y_ndarray : L<R::NDArray::DoubleComplex|SPVM::R::NDArray::DoubleComplex>);>
+
+=head2 rep
+
+C<static method rep : L<R::NDArray::DoubleComplex|SPVM::R::NDArray::DoubleComplex> ($x_ndarray : L<R::NDArray::DoubleComplex|SPVM::R::NDArray::DoubleComplex>, $times : int);>
+
+=head2 rep_length
+
+C<static method rep_length : L<R::NDArray::DoubleComplex|SPVM::R::NDArray::DoubleComplex> ($x_ndarray : L<R::NDArray::DoubleComplex|SPVM::R::NDArray::DoubleComplex>, $length : int);>
+
+=head2 sin
+
+C<static method sin : L<R::NDArray::DoubleComplex|SPVM::R::NDArray::DoubleComplex> ($x_ndarray : L<R::NDArray::DoubleComplex|SPVM::R::NDArray::DoubleComplex>);>
+
+=head2 cos
+
+C<static method cos : L<R::NDArray::DoubleComplex|SPVM::R::NDArray::DoubleComplex> ($x_ndarray : L<R::NDArray::DoubleComplex|SPVM::R::NDArray::DoubleComplex>);>
+
+=head2 tan
+
+C<static method tan : L<R::NDArray::DoubleComplex|SPVM::R::NDArray::DoubleComplex> ($x_ndarray : L<R::NDArray::DoubleComplex|SPVM::R::NDArray::DoubleComplex>);>
+
+=head2 sinh
+
+C<static method sinh : L<R::NDArray::DoubleComplex|SPVM::R::NDArray::DoubleComplex> ($x_ndarray : L<R::NDArray::DoubleComplex|SPVM::R::NDArray::DoubleComplex>);>
+
+=head2 cosh
+
+C<static method cosh : L<R::NDArray::DoubleComplex|SPVM::R::NDArray::DoubleComplex> ($x_ndarray : L<R::NDArray::DoubleComplex|SPVM::R::NDArray::DoubleComplex>);>
+
+=head2 tanh
+
+C<static method tanh : L<R::NDArray::DoubleComplex|SPVM::R::NDArray::DoubleComplex> ($x_ndarray : L<R::NDArray::DoubleComplex|SPVM::R::NDArray::DoubleComplex>);>
+
+=head2 acos
+
+C<static method acos : L<R::NDArray::DoubleComplex|SPVM::R::NDArray::DoubleComplex> ($x_ndarray : L<R::NDArray::DoubleComplex|SPVM::R::NDArray::DoubleComplex>);>
+
+=head2 asin
+
+C<static method asin : L<R::NDArray::DoubleComplex|SPVM::R::NDArray::DoubleComplex> ($x_ndarray : L<R::NDArray::DoubleComplex|SPVM::R::NDArray::DoubleComplex>);>
+
+=head2 atan
+
+C<static method atan : L<R::NDArray::DoubleComplex|SPVM::R::NDArray::DoubleComplex> ($x_ndarray : L<R::NDArray::DoubleComplex|SPVM::R::NDArray::DoubleComplex>);>
+
+=head2 asinh
+
+C<static method asinh : L<R::NDArray::DoubleComplex|SPVM::R::NDArray::DoubleComplex> ($x_ndarray : L<R::NDArray::DoubleComplex|SPVM::R::NDArray::DoubleComplex>);>
+
+=head2 acosh
+
+C<static method acosh : L<R::NDArray::DoubleComplex|SPVM::R::NDArray::DoubleComplex> ($x_ndarray : L<R::NDArray::DoubleComplex|SPVM::R::NDArray::DoubleComplex>);>
+
+=head2 atanh
+
+C<static method atanh : L<R::NDArray::DoubleComplex|SPVM::R::NDArray::DoubleComplex> ($x_ndarray : L<R::NDArray::DoubleComplex|SPVM::R::NDArray::DoubleComplex>);>
+
+=head2 exp
+
+C<static method exp : L<R::NDArray::DoubleComplex|SPVM::R::NDArray::DoubleComplex> ($x_ndarray : L<R::NDArray::DoubleComplex|SPVM::R::NDArray::DoubleComplex>);>
+
+=head2 log
+
+C<static method log : L<R::NDArray::DoubleComplex|SPVM::R::NDArray::DoubleComplex> ($x_ndarray : L<R::NDArray::DoubleComplex|SPVM::R::NDArray::DoubleComplex>);>
+
+=head2 sqrt
+
+C<static method sqrt : L<R::NDArray::DoubleComplex|SPVM::R::NDArray::DoubleComplex> ($x_ndarray : L<R::NDArray::DoubleComplex|SPVM::R::NDArray::DoubleComplex>);>
+
+=head2 pow
+
+C<static method pow : L<R::NDArray::DoubleComplex|SPVM::R::NDArray::DoubleComplex> ($x_ndarray : L<R::NDArray::DoubleComplex|SPVM::R::NDArray::DoubleComplex>, $y_ndarray : L<R::NDArray::DoubleComplex|SPVM::R::NDArray::DoubleComplex>);>
+
+=head2 sum
+
+C<static method sum : L<R::NDArray::DoubleComplex|SPVM::R::NDArray::DoubleComplex> ($x_ndarray : L<R::NDArray::DoubleComplex|SPVM::R::NDArray::DoubleComplex>);>
+
+=head2 cumsum
+
+C<static method cumsum : L<R::NDArray::DoubleComplex|SPVM::R::NDArray::DoubleComplex> ($x_ndarray : L<R::NDArray::DoubleComplex|SPVM::R::NDArray::DoubleComplex>);>
+
+=head2 prod
+
+C<static method prod : L<R::NDArray::DoubleComplex|SPVM::R::NDArray::DoubleComplex> ($x_ndarray : L<R::NDArray::DoubleComplex|SPVM::R::NDArray::DoubleComplex>);>
+
+=head2 cumprod
+
+C<static method cumprod : L<R::NDArray::DoubleComplex|SPVM::R::NDArray::DoubleComplex> ($x_ndarray : L<R::NDArray::DoubleComplex|SPVM::R::NDArray::DoubleComplex>);>
+
+=head2 diff
+
+C<static method diff : L<R::NDArray::DoubleComplex|SPVM::R::NDArray::DoubleComplex> ($x_ndarray : L<R::NDArray::DoubleComplex|SPVM::R::NDArray::DoubleComplex>);>
+
+=head2 mean
+
+C<static method mean : L<R::NDArray::DoubleComplex|SPVM::R::NDArray::DoubleComplex> ($x_ndarray : L<R::NDArray::DoubleComplex|SPVM::R::NDArray::DoubleComplex>);>
+
+=head2 inner
+
+C<static method inner : L<R::NDArray::DoubleComplex|SPVM::R::NDArray::DoubleComplex> ($x_ndarray : L<R::NDArray::DoubleComplex|SPVM::R::NDArray::DoubleComplex>, $y_ndarray : L<R::NDArray::DoubleComplex|SPVM::R::NDArray::DoubleComplex>);>
+
+=head2 cross
+
+C<static method cross : L<R::NDArray::DoubleComplex|SPVM::R::NDArray::DoubleComplex> ($x_ndarray : L<R::NDArray::DoubleComplex|SPVM::R::NDArray::DoubleComplex>, $y_ndarray : L<R::NDArray::DoubleComplex|SPVM::R::NDArray::DoubleComplex>);>
+
+=head2 outer
+
+C<static method outer : L<R::NDArray::DoubleComplex|SPVM::R::NDArray::DoubleComplex> ($x_ndarray : L<R::NDArray::DoubleComplex|SPVM::R::NDArray::DoubleComplex>, $y_ndarray : L<R::NDArray::DoubleComplex|SPVM::R::NDArray::DoubleComplex>);>
+
+=head1 See Also
+
+=over 2
+
+=item * L<R::NDArray::DoubleComplex|SPVM::R::NDArray::DoubleComplex>
+
+=item * L<R::NDArray|SPVM::R::NDArray>
+
+=item * L<R|SPVM::R>
+
+=back
 
 =head1 Copyright & License
 

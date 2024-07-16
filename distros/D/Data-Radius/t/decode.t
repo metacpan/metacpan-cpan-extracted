@@ -1,6 +1,7 @@
 use strict;
 use warnings;
-use Test::More tests => 22;
+use Test::More tests => 22 + 1;
+use Test::NoWarnings;
 
 BEGIN { use_ok('Data::Radius::Decode', qw(decode)) };
 BEGIN { use_ok('Data::Radius::Dictionary') };

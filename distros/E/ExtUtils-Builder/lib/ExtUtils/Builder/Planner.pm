@@ -1,5 +1,5 @@
 package ExtUtils::Builder::Planner;
-$ExtUtils::Builder::Planner::VERSION = '0.007';
+$ExtUtils::Builder::Planner::VERSION = '0.008';
 use strict;
 use warnings;
 
@@ -104,7 +104,7 @@ my %dsl_commands = (
 	},
 	function => sub {
 		my %args = @_;
-		return ExtUtils::Builder::Action::Code->new(%args);
+		return ExtUtils::Builder::Action::Function->new(%args);
 	},
 );
 $set_subname->($_, $dsl_commands{$_}) for keys %dsl_commands;
@@ -157,7 +157,7 @@ ExtUtils::Builder::Planner - An ExtUtils::Builder Plan builder
 
 =head1 VERSION
 
-version 0.007
+version 0.008
 
 =head1 SYNOPSIS
 
@@ -213,9 +213,9 @@ This adds C<$sub> as a helper method to this planner, with the name C<$name>.
 
 This is a helper function that calls C<create_node> for a action-free phony target.
 
-=head2 load_module($extension, %options)
+=head2 load_module($extension, $version, %options)
 
-This adds the delegate from the given module
+This adds the delegate from the given module. If C<$version> is defined it will verify if the extension is at least that version.
 
 =head2 new_scope()
 

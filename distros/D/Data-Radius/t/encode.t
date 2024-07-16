@@ -1,6 +1,7 @@
 use strict;
 use warnings;
-use Test::More tests => 42;
+use Test::More tests => 42 + 1;
+use Test::NoWarnings;
 
 BEGIN { use_ok('Data::Radius::Encode', qw(encode)) };
 BEGIN { use_ok('Data::Radius::Dictionary') };

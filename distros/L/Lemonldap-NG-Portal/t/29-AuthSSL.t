@@ -68,6 +68,42 @@ m%<script type="application/init">\s*\{"sslHost":"https://authssl.example.com/au
     my ( $host, $url, $query ) =
       expectForm( $res, '#', undef, 'nossl', 'ajax_auth_token' );
 
+    # FIXME
+    subtest "Check workaround for #3180" => sub {
+        push @{ $client->p->afterSub->{extractFormInfo} }, sub {
+            my ($req) = @_;
+            is( utf8::is_utf8( $req->user ) || 0,
+                0, '$req->user is a binary string' );
+            return 0;
+        };
+
+        ok(
+            $res = $client->_get(
+                '/authssl',
+                accept => 'application/json',
+                custom => {
+                    SSL_CLIENT_S_DN_Custom   => 'dwhø',
+                    'SSL_CLIENT_I_DN_Custom' => 'cn=MyIssuer'
+                }
+            ),
+            'Auth query'
+        );
+        my $json = expectJSON($res);
+        ok( $json->{ajax_auth_token}, "User token was returned" );
+        my $ajax_auth_token = $json->{ajax_auth_token};
+
+        $query .= "&ajax_auth_token=$ajax_auth_token";
+
+        ok(
+            $res = $client->_post(
+                '/', IO::String->new($query),
+                length => length($query),
+                accept => 'text/html',
+            ),
+            'Post form'
+        );
+    };
+
     # AJAX request
     ok(
         $res = $client->_get(

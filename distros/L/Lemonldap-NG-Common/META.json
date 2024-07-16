@@ -27,7 +27,8 @@
             "Net::LDAP" : "0",
             "String::Random" : "0",
             "Test::Output" : "0",
-            "Test::Pod" : "1"
+            "Test::Pod" : "1",
+            "Time::Fake" : "0"
          }
       },
       "configure" : {
@@ -82,6 +83,6 @@
       ],
       "x_MailingList" : "mailto:lemonldap-ng-dev@ow2.org"
    },
-   "version" : "v2.19.0",
+   "version" : "v2.19.1",
    "x_serialization_backend" : "JSON::PP version 4.07"
 }

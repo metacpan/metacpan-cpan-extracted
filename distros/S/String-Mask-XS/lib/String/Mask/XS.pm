@@ -2,13 +2,13 @@ package String::Mask::XS;
 use 5.006;
 use strict;
 use warnings;
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 use base 'Import::Export';
 our %EX = (
 	mask => [qw/all/]
 );
 require XSLoader;
-XSLoader::load();
+XSLoader::load('String::Mask::XS', $VERSION);
 
 1;
 
@@ -20,7 +20,7 @@ String::Mask::XS - mask sensitive data faster
 
 =head1 VERSION
 
-Version 0.02
+Version 0.03
 
 =cut
 

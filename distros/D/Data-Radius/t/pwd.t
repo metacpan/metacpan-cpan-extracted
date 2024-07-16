@@ -1,6 +1,7 @@
 use strict;
 use warnings;
-use Test::More tests => 4;
+use Test::More tests => 4 + 1;
+use Test::NoWarnings;
 
 BEGIN { use_ok('Data::Radius::Util', qw(encrypt_pwd decrypt_pwd)) };
 

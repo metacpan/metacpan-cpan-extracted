@@ -10,7 +10,6 @@ use Mouse;
 use JSON;
 use URI;
 
-has isPP                     => ( is => 'rw' );
 has speChars                 => ( is => 'rw' );
 has skinRules                => ( is => 'rw' );
 has stayConnected            => ( is => 'rw', default => sub { 0 } );
@@ -98,13 +97,19 @@ sub displayInit {
       : map { ( s/\s+/<space>/r => 1 ) } split '',
       $self->conf->{passwordPolicySpecialChar};
     $self->speChars( join q{ }, sort keys %speChars );
+}
 
-    $self->isPP( $self->speChars
-          || $self->conf->{passwordPolicyMinSize}
-          || $self->conf->{passwordPolicyMinLower}
-          || $self->conf->{passwordPolicyMinUpper}
-          || $self->conf->{passwordPolicyMinDigit}
-          || $self->conf->{passwordPolicyMinSpeChar} );
+sub isPP {
+    my $self = shift;
+    my $ppRules = $self->getPpolicyRules();
+    foreach my $rule ( @$ppRules )
+    {
+        if( $rule->{'condition'} )
+        {
+            return 1;
+        }
+    }
+    return 0;
 }
 
 # Call portal process and set template parameters

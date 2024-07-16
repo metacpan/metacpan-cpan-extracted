@@ -20455,7 +20455,60 @@ sub cwd
       -1<index $Net::FullAuto::FA_Core::LOG,'*';
    my $self=$_[0];
    my $target_dir=$_[1];
-   my $cache=$_[2]||'';
+   my $timeout=0;my $debug=0;my $display=0;
+   my $log=0;my $delay='';my $cache='';
+   if (defined $_[2] && $_[2]) {
+      if ($_[2]=~/^[0-9]+/) {
+         $timeout=$_[2];
+      } else {
+         my $arg=lc($_[2]);
+         if ($arg eq '__debug__' || $arg eq '__DEBUG__') {
+            $debug=$arg;
+         } elsif ($arg eq '__display__' || $arg eq '__DISPLAY__') {
+            $display=1;
+         } elsif ($arg eq '__log__') {
+            $log=1;
+         } elsif ($arg=~/__delay__[=]?(.*)$/i) {
+            $delay=$arg;
+         } elsif (-1<index $_[2],'Cache::FileCache') {
+            $cache=$_[2];
+         } elsif ((-1<index $_[2],'Moose::Meta::Class::__ANON__::SERIAL')
+               && ($_[2]->chi_root_class)) {
+            $cache=$_[2];
+         } elsif (wantarray) {
+            return 0,'Third Argument for Timeout Value is not Whole Number';
+         } else {
+            &Net::FullAuto::FA_Core::handle_error(
+               'Third Argument for Timeout Value is not Whole Number')
+         }
+      }
+   }
+   if (defined $_[3] && $_[3]) {
+      if ($_[3]=~/^[0-9]+/) {
+         $timeout=$_[3];
+      } else {
+         my $arg=lc($_[3]);
+         if ($arg eq '__debug__') {
+            $debug=$arg;
+         } elsif ($arg eq '__display__') {
+            $display=1;
+         } elsif ($arg eq '__log__') {
+            $log=1;
+         } elsif ($arg=~/__delay__[=]?(.*)$/i) {
+            $delay=$arg;
+         } elsif (-1<index $_[3],'Cache::FileCache') {
+            $cache=$_[3];
+         } elsif ((-1<index $_[3],'Moose::Meta::Class::__ANON__::SERIAL')
+               && ($_[3]->chi_root_class)) {
+            $cache=$_[3];
+         } elsif (wantarray) {
+            return 0,'Third Argument for Timeout Value is not Whole Number';
+         } else {
+            &Net::FullAuto::FA_Core::handle_error(
+               'Third Argument for Timeout Value is not Whole Number')
+         }
+      }
+   }
    $target_dir||='';
    $target_dir=~s/[\/\\]*$//
       if $target_dir ne '/' && $target_dir ne '\\';
@@ -20512,7 +20565,21 @@ sub cwd
             $chdir=$self->{_homedir}.'/';
          } else { $chdir=$target_dir }
          if (exists $self->{_cmd_handle} && $self->{_cmd_handle}) {
-            ($output,$stderr)=$self->{_cmd_handle}->cmd("cd \"$chdir\"");
+            if (-1<index $target_dir,' ') {
+               ($output,$stderr)=$self->{_cmd_handle}->cmd("cd \"$chdir\"");
+               print "_cmd_handle cd \"$chdir\" ",
+                  "OUTPUT:\n==>$output<==\nat LINE ",__LINE__
+                  if ((!$Net::FullAuto::FA_Core::cron &&
+                  $Net::FullAuto::FA_Core::debug) ||
+                  $debug);
+            } else {
+               ($output,$stderr)=$self->{_cmd_handle}->cmd("cd $chdir");
+               print "_cmd_handle cd $chdir ",
+                  "OUTPUT:\n==>$output<==\nat LINE ",__LINE__
+                  if ((!$Net::FullAuto::FA_Core::cron &&
+                  $Net::FullAuto::FA_Core::debug) ||
+                  $debug);
+            }
          }
          $stderr=$output if -1<index $output,"Couldn't can";
          if ($stderr) {
@@ -20522,11 +20589,29 @@ sub cwd
             else { &Net::FullAuto::FA_Core::handle_error($die,'-7') }
          }
          if ($self->{_ftm_type}=~/s*ftp/) {
-            ($output,$stderr)=&Rem_Command::ftpcmd(
-                { _ftp_handle=>$self->{_ftp_handle},
-                  _hostlabel=>[ $hostlabel,'' ],
-                  _ftm_type  =>$self->{_ftm_type} },
-                "cd \"$chdir\"",$cache);
+            if (-1<index $target_dir,' ') {
+               ($output,$stderr)=&Rem_Command::ftpcmd(
+                  { _ftp_handle=>$self->{_ftp_handle},
+                    _hostlabel=>[ $hostlabel,'' ],
+                    _ftm_type  =>$self->{_ftm_type} },
+                  "cd \"$chdir\"",$cache);
+               print "Rem_Command::ftpcmd cd \"$chdir\" ",
+                  "OUTPUT:\n==>$output<==\nat LINE ",__LINE__
+                  if ((!$Net::FullAuto::FA_Core::cron &&
+                  $Net::FullAuto::FA_Core::debug) ||
+                  $debug);
+            } else {
+               ($output,$stderr)=&Rem_Command::ftpcmd(
+                  { _ftp_handle=>$self->{_ftp_handle},
+                    _hostlabel=>[ $hostlabel,'' ],
+                    _ftm_type  =>$self->{_ftm_type} },
+                  "cd $chdir",$cache);
+               print "Rem_Command::ftpcmd cd $chdir ",
+                  "OUTPUT:\n==>$output<==\nat LINE ",__LINE__
+                  if ((!$Net::FullAuto::FA_Core::cron &&
+                  $Net::FullAuto::FA_Core::debug) ||
+                  $debug);
+            }
             $stderr=$output if -1<index $output,"Couldn't can";
             if ($stderr) {
                if (wantarray) { return '',$stderr }
@@ -20578,6 +20663,10 @@ sub cwd
    print $Net::FullAuto::FA_Core::LOG "CWD GOING TO EVAL and $self->{_uname}\n"
       if $Net::FullAuto::FA_Core::log &&
       -1<index $Net::FullAuto::FA_Core::LOG,'*';
+   print "CWD GOING TO EVAL and $self->{_uname}\n"
+      if ((!$Net::FullAuto::FA_Core::cron &&
+      $Net::FullAuto::FA_Core::debug) ||
+      $debug);
    my @return=eval {
       if (($self->{_uname} eq 'cygwin') &&
              ($target_dir=~/^\\\\|^([^~.\/\\][^:])/
@@ -20661,6 +20750,10 @@ sub cwd
          }
       } elsif ($target_dir=~/^([^~.\/\\][^:])/) {
          $target_dir=~s/\\/\//g;
+         print "TARGET DIR BEFORE MOD: $target_dir\n"
+            if ((!$Net::FullAuto::FA_Core::cron &&
+            $Net::FullAuto::FA_Core::debug) ||
+            $debug);
          if (exists $self->{_work_dirs}->{_cwd}) {
             $self->{_work_dirs}->{_pre}=
                 $self->{_work_dirs}->{_cwd};
@@ -20670,24 +20763,237 @@ sub cwd
             $self->{_work_dirs}->{_pre}=$self->{_homedir}.'/';
             $target_dir=$self->{_homedir}.'/'.$target_dir;
          }
+	 print "TARGET DIR AFTER MOD: $target_dir\n"
+            if ((!$Net::FullAuto::FA_Core::cron &&
+            $Net::FullAuto::FA_Core::debug) ||
+            $debug);
          if (exists $self->{_cmd_handle} && $self->{_cmd_handle}) {
             if ($self->{_uname} eq 'cygwin') {
-               ($output,$stderr)=Rem_Command::cmd(
+	       $delay='__delay__=200' unless $delay;
+	       if ($debug) {
+                  if (-1<index $target_dir,' ') {
+                     my $astar='';
+                     if (substr($target_dir,-1) eq '*') {
+                        chop($target_dir);
+                        $astar='*';
+                     }
+                     my $bstar='';
+                     if (substr($target_dir,0,1) eq '*') {
+                        substr($target_dir,0,1)='';
+                        $bstar='*';
+                     }
+                     ($output,$stderr)=Rem_Command::cmd(
+                        { _cmd_handle=>$self->{_cmd_handle},
+                          _host_label=>[ $hostlabel,'' ] },
+                          "cd $bstar\"$target_dir\"$astar",$delay);
+                     print "_cmd_handle cd ",
+                        "$bstar\"$target_dir\"$astar OUTPUT:",
+                        "\n==>$output<==\nat LINE ",__LINE__
+                        if ((!$Net::FullAuto::FA_Core::cron &&
+                        $Net::FullAuto::FA_Core::debug) ||
+                        $debug);
+	          } else {
+		     ($output,$stderr)=Rem_Command::cmd(
+                        { _cmd_handle=>$self->{_cmd_handle},
+                          _host_label=>[ $hostlabel,'' ] },
+                          "cd $target_dir",$delay);
+                     print "_cmd_handle cd $target_dir OUTPUT:",
+                        "\n==>$output<==\nat LINE ",__LINE__
+                        if ((!$Net::FullAuto::FA_Core::cron &&
+                        $Net::FullAuto::FA_Core::debug) ||
+                        $debug);
+	          }
+               } else {
+                  if (-1<index $target_dir,' ') {
+                     my $astar='';
+                     if (substr($target_dir,-1) eq '*') {
+                        chop($target_dir);
+                        $astar='*';
+                     }
+                     my $bstar='';
+                     if (substr($target_dir,0,1) eq '*') {
+                        substr($target_dir,0,1)='';
+                        $bstar='*';
+                     }
+                     ($output,$stderr)=Rem_Command::cmd(
+                        { _cmd_handle=>$self->{_cmd_handle},
+                          _host_label=>[ $hostlabel,'' ] },
+                          "cd $bstar\"$target_dir\"$astar",$delay,$debug);
+                     print "_cmd_handle cd ",
+                        "$bstar\"$target_dir\"$astar OUTPUT:",
+                        "\n==>$output<==\nat LINE ",__LINE__
+                        if ((!$Net::FullAuto::FA_Core::cron &&
+                        $Net::FullAuto::FA_Core::debug) ||
+                        $debug);
+	          } else {
+		     ($output,$stderr)=Rem_Command::cmd(
+                        { _cmd_handle=>$self->{_cmd_handle},
+                          _host_label=>[ $hostlabel,'' ] },
+                          "cd $target_dir",$delay,$debug);
+                     print "_cmd_handle cd $target_dir OUTPUT:",
+                        "\n==>$output<==\nat LINE ",__LINE__
+                        if ((!$Net::FullAuto::FA_Core::cron &&
+                        $Net::FullAuto::FA_Core::debug) ||
+                        $debug);
+	          }
+               }
+            } elsif ($delay) {
+               if ($debug) {
+                  if (-1<index $target_dir,' ') {
+                     my $astar='';
+                     if (substr($target_dir,-1) eq '*') {
+                        chop($target_dir);
+                        $astar='*';
+                     }
+                     my $bstar='';
+                     if (substr($target_dir,0,1) eq '*') {
+			substr($target_dir,0,1)=''; 
+                        $bstar='*';
+                     }
+                     ($output,$stderr)=Rem_Command::cmd(
+                        { _cmd_handle=>$self->{_cmd_handle},
+                          _host_label=>[ $hostlabel,'' ] },
+                          "cd $bstar\"$target_dir\"$astar",$delay,$debug);
+                     print "_cmd_handle cd ",
+                        "$bstar\"$target_dir\"$astar OUTPUT:",
+                        "\n==>$output<==\nat LINE ",__LINE__
+                        if ((!$Net::FullAuto::FA_Core::cron &&
+                        $Net::FullAuto::FA_Core::debug) ||
+                        $debug);
+	          } else {
+		     ($output,$stderr)=Rem_Command::cmd(
+                        { _cmd_handle=>$self->{_cmd_handle},
+                          _host_label=>[ $hostlabel,'' ] },
+                          "cd $target_dir",$delay,$debug);
+                     print "_cmd_handle cd $target_dir OUTPUT:",
+                        "\n==>$output<==\nat LINE ",__LINE__
+                        if ((!$Net::FullAuto::FA_Core::cron &&
+                        $Net::FullAuto::FA_Core::debug) ||
+                        $debug);
+		  }
+               } else {
+                  if (-1<index $target_dir,' ') {
+                     my $astar='';
+                     if (substr($target_dir,-1) eq '*') {
+                        chop($target_dir);
+                        $astar='*';
+                     }
+                     my $bstar='';
+                     if (substr($target_dir,0,1) eq '*') {
+                        substr($target_dir,0,1)='';
+                        $bstar='*';
+                     }
+                     ($output,$stderr)=Rem_Command::cmd(
+                        { _cmd_handle=>$self->{_cmd_handle},
+                          _host_label=>[ $hostlabel,'' ] },
+                          "cd $bstar\"$target_dir\"$astar",$delay);
+                     print "_cmd_handle cd ",
+                        "$bstar\"$target_dir\"$astar OUTPUT:",
+                        "\n==>$output<==\nat LINE ",__LINE__
+                        if ((!$Net::FullAuto::FA_Core::cron &&
+                        $Net::FullAuto::FA_Core::debug) ||
+                        $debug);
+	          } else {
+		     ($output,$stderr)=Rem_Command::cmd(
+                        { _cmd_handle=>$self->{_cmd_handle},
+                          _host_label=>[ $hostlabel,'' ] },
+                          "cd $target_dir",$delay);
+                     print "_cmd_handle cd $target_dir OUTPUT:",
+                        "\n==>$output<==\nat LINE ",__LINE__
+                        if ((!$Net::FullAuto::FA_Core::cron &&
+                        $Net::FullAuto::FA_Core::debug) ||
+                        $debug);
+	          }
+               }
+            } elsif ($debug) {
+               if (-1<index $target_dir,' ') {
+                  my $astar='';
+                  if (substr($target_dir,-1) eq '*') {
+                     chop($target_dir);
+                     $astar='*';
+                  }
+                  my $bstar='';
+                  if (substr($target_dir,0,1) eq '*') {
+                     substr($target_dir,0,1)='';
+                     $bstar='*';
+                  }
+                  ($output,$stderr)=Rem_Command::cmd(
                      { _cmd_handle=>$self->{_cmd_handle},
                        _host_label=>[ $hostlabel,'' ] },
-                       "cd \"$target_dir\"",'__delay__=200');
+                       "cd $bstar\"$target_dir\"$astar",$debug);
+		  print "_cmd_handle cd ",
+                     "$bstar\"$target_dir\"$astar OUTPUT:",
+                     "\n==>$output<==\nat LINE ",__LINE__
+                     if ((!$Net::FullAuto::FA_Core::cron &&
+                     $Net::FullAuto::FA_Core::debug) ||
+                     $debug);
+               } else {
+                  ($output,$stderr)=Rem_Command::cmd(
+                     { _cmd_handle=>$self->{_cmd_handle},
+                       _host_label=>[ $hostlabel,'' ] },
+                       "cd $target_dir",$debug);
+                  print "_cmd_handle cd $target_dir OUTPUT:",
+		     "\n==>$output<==\nat LINE ",__LINE__
+                     if ((!$Net::FullAuto::FA_Core::cron &&
+                     $Net::FullAuto::FA_Core::debug) ||
+                     $debug);
+               }
             } else {
-	       ($output,$stderr)=Rem_Command::cmd(
+               if (-1<index $target_dir,' ') {
+                  my $astar='';
+                  if (substr($target_dir,-1) eq '*') {
+                     chop($target_dir);
+                     $astar='*';
+                  }
+                  my $bstar='';
+                  if (substr($target_dir,0,1) eq '*') {
+                     substr($target_dir,0,1)='';
+                     $bstar='*';
+                  }
+                  ($output,$stderr)=Rem_Command::cmd(
                      { _cmd_handle=>$self->{_cmd_handle},
                        _host_label=>[ $hostlabel,'' ] },
-                       "cd \"$target_dir\"");
+                       "cd $bstar\"$target_dir\"$astar");
+                  print "_cmd_handle cd ",
+                     "$bstar\"$target_dir\"$astar OUTPUT:",
+                     "\n==>$output<==\nat LINE ",__LINE__
+                     if ((!$Net::FullAuto::FA_Core::cron &&
+                     $Net::FullAuto::FA_Core::debug) ||
+                     $debug);
+               } else {
+                  ($output,$stderr)=Rem_Command::cmd(
+                     { _cmd_handle=>$self->{_cmd_handle},
+                       _host_label=>[ $hostlabel,'' ] },
+                       "cd $target_dir");
+                  print "_cmd_handle cd $target_dir OUTPUT:",
+                     "\n==>$output<==\nat LINE ",__LINE__
+                     if ((!$Net::FullAuto::FA_Core::cron &&
+                     $Net::FullAuto::FA_Core::debug) ||
+                     $debug);
+               }
             }
             $stderr=$output if -1<index $output,"Couldn't can";
          } elsif ((exists $self->{_ftm_type}) &&
                $self->{_ftm_type}=~/s*ftp/) {
-            ($output,$stderr)=
-               &Rem_Command::ftpcmd($self,
+            if (-1<index $target_dir,' ') {
+               ($output,$stderr)=
+                  &Rem_Command::ftpcmd($self,
                   "cd \"$target_dir\"",$cache);
+               print "Rem_Command::ftpcmd cd \"$target_dir\" ",
+                  "OUTPUT:\n==>$output<==\nat LINE ",__LINE__
+                  if ((!$Net::FullAuto::FA_Core::cron &&
+                  $Net::FullAuto::FA_Core::debug) ||
+                  $debug);
+            } else {
+               ($output,$stderr)=
+                  &Rem_Command::ftpcmd($self,
+                  "cd $target_dir",$cache);
+               print "Rem_Command::ftpcmd cd $target_dir ",
+                  "OUTPUT:\n==>$output<==\nat LINE ",__LINE__
+                  if ((!$Net::FullAuto::FA_Core::cron &&
+                  $Net::FullAuto::FA_Core::debug) ||
+                  $debug);
+            }
             $stderr=$output if -1<index $output,"Couldn't can";
             if ($stderr && (-1==index $stderr,'command success')) {
                if (wantarray) {
@@ -20707,11 +21013,29 @@ sub cwd
             else { &Net::FullAuto::FA_Core::handle_error($die,'-12') }
          }
          if ($self->{_ftm_type}=~/s*ftp/) {
-            ($output,$stderr)=&Rem_Command::ftpcmd(
-                { _ftp_handle=>$self->{_ftp_handle},
-                  _hostlabel=>[ $hostlabel,'' ],
-                  _ftm_type  =>$self->{_ftm_type} },
-                "cd \"$target_dir\"",$cache);
+            if (-1<index $target_dir,' ') {
+               ($output,$stderr)=&Rem_Command::ftpcmd(
+                  { _ftp_handle=>$self->{_ftp_handle},
+                    _hostlabel=>[ $hostlabel,'' ],
+                    _ftm_type  =>$self->{_ftm_type} },
+                  "cd \"$target_dir\"",$cache);
+               print "Rem_Command::ftpcmd cd \"$target_dir\" ",
+	          "OUTPUT:\n==>$output<==\nat LINE ",__LINE__
+                  if ((!$Net::FullAuto::FA_Core::cron &&
+                  $Net::FullAuto::FA_Core::debug) ||
+                  $debug);
+            } else {
+               ($output,$stderr)=&Rem_Command::ftpcmd(
+                  { _ftp_handle=>$self->{_ftp_handle},
+                    _hostlabel=>[ $hostlabel,'' ],
+                    _ftm_type  =>$self->{_ftm_type} },
+                  "cd $target_dir",$cache);
+               print "Rem_Command::ftpcmd cd $target_dir ",
+                  "OUTPUT:\n==>$output<==\nat LINE ",__LINE__
+                  if ((!$Net::FullAuto::FA_Core::cron &&
+                  $Net::FullAuto::FA_Core::debug) ||
+                  $debug);
+            }
             $stderr=$output if -1<index $output,"Couldn't can";
             if ($stderr) {
                if (wantarray) { return '',$stderr }
@@ -20749,7 +21073,21 @@ sub cwd
          my ($drive,$path)=unpack('a1 x1 a*',$target_dir);
          $path=~s/\\+/\//g;
          my $tar_dir=$self->{_cygdrive}.'/'.lc($drive).$path;
-         ($output,$stderr)=$self->cmd("cd \"$tar_dir\"");
+         if (-1<index $tar_dir,' ') {
+            ($output,$stderr)=$self->cmd("cd \"$tar_dir\"");
+            print "self->cmd cd \"$tar_dir\" ",
+               "OUTPUT:\n==>$output<==\nat LINE ",__LINE__
+               if ((!$Net::FullAuto::FA_Core::cron &&
+               $Net::FullAuto::FA_Core::debug) ||
+               $debug);
+         } else {
+            ($output,$stderr)=$self->cmd("cd $tar_dir");
+            print "self->cmd cd $tar_dir ",
+               "OUTPUT:\n==>$output<==\nat LINE ",__LINE__
+               if ((!$Net::FullAuto::FA_Core::cron &&
+               $Net::FullAuto::FA_Core::debug) ||
+               $debug);
+         }
          $stderr=$output if -1<index $output,"Couldn't can";
          if ($stderr) {
             if (wantarray) {
@@ -20759,11 +21097,29 @@ sub cwd
             }
          }
          if ($self->{_ftm_type}=~/s*ftp/) {
-            ($output,$stderr)=&Rem_Command::ftpcmd(
-                { _ftp_handle=>$self->{_ftp_handle},
-                  _hostlabel=>[ $hostlabel,'' ],
-                  _ftm_type  =>$self->{_ftm_type} },
-                "cd \"$tar_dir\"",$cache);
+            if (-1<index $tar_dir,' ') {
+               ($output,$stderr)=&Rem_Command::ftpcmd(
+                  { _ftp_handle=>$self->{_ftp_handle},
+                    _hostlabel=>[ $hostlabel,'' ],
+                    _ftm_type  =>$self->{_ftm_type} },
+                  "cd \"$tar_dir\"",$cache);
+               print "Rem_Command::ftpcmd cd \"$tar_dir\" ",
+                  "OUTPUT:\n==>$output<==\nat LINE ",__LINE__
+                  if ((!$Net::FullAuto::FA_Core::cron &&
+                  $Net::FullAuto::FA_Core::debug) ||
+                  $debug);
+            } else {
+               ($output,$stderr)=&Rem_Command::ftpcmd(
+                  { _ftp_handle=>$self->{_ftp_handle},
+                    _hostlabel=>[ $hostlabel,'' ],
+                    _ftm_type  =>$self->{_ftm_type} },
+                  "cd $tar_dir",$cache);
+               print "Rem_Command::ftpcmd cd $tar_dir ",
+                  "OUTPUT:\n==>$output<==\nat LINE ",__LINE__
+                  if ((!$Net::FullAuto::FA_Core::cron &&
+                  $Net::FullAuto::FA_Core::debug) ||
+                  $debug);
+            }
             $stderr=$output if -1<index $output,"Couldn't can";
             if ($stderr) {
                if (wantarray) { return '',$stderr }
@@ -20773,11 +21129,29 @@ sub cwd
       } else {
          if (1<$len_tdir && unpack('a2',$target_dir) eq '..') {
             if ($self->{_ftm_type}=~/s*ftp/) {
-               ($output,$stderr)=&Rem_Command::ftpcmd(
-                   { _ftp_handle=>$self->{_ftp_handle},
-                     _hostlabel=>[ $hostlabel,'' ],
-                     _ftm_type  =>$self->{_ftm_type} },
-                   'cd \'..\'',$cache);
+               if (-1<index $target_dir,' ') {
+                  ($output,$stderr)=&Rem_Command::ftpcmd(
+                     { _ftp_handle=>$self->{_ftp_handle},
+                       _hostlabel=>[ $hostlabel,'' ],
+                       _ftm_type  =>$self->{_ftm_type} },
+                     "cd \"$target_dir\"",$cache);
+                  print "Rem_Command::ftpcmd cd \"$target_dir\" ",
+                     "OUTPUT:\n==>$output<==\nat LINE ",__LINE__
+                     if ((!$Net::FullAuto::FA_Core::cron &&
+                     $Net::FullAuto::FA_Core::debug) ||
+                     $debug);
+               } else {
+                  ($output,$stderr)=&Rem_Command::ftpcmd(
+                     { _ftp_handle=>$self->{_ftp_handle},
+                       _hostlabel=>[ $hostlabel,'' ],
+                       _ftm_type  =>$self->{_ftm_type} },
+                     "cd $target_dir",$cache);
+                  print "Rem_Command::ftpcmd cd $target_dir ",
+                     "OUTPUT:\n==>$output<==\nat LINE ",__LINE__
+                     if ((!$Net::FullAuto::FA_Core::cron &&
+                     $Net::FullAuto::FA_Core::debug) ||
+                     $debug);
+               }
                $stderr=$output if -1<index $output,"Couldn't can";
                if ($stderr) {
                   if (wantarray) { return '',$stderr }
@@ -20787,7 +21161,12 @@ sub cwd
                }
             }
             if (exists $self->{_cmd_handle} && $self->{_cmd_handle}) { 
-               ($output,$stderr)=$self->cmd('cd \'..\'');
+               ($output,$stderr)=$self->cmd('cd ..');
+               print "self->cmd cd .. ",
+                  "OUTPUT:\n==>$output<==\nat LINE ",__LINE__
+                  if ((!$Net::FullAuto::FA_Core::cron &&
+                  $Net::FullAuto::FA_Core::debug) ||
+                  $debug);
                $stderr=$output if -1<index $output,"Couldn't can";
                if ($stderr) {
                   if (wantarray) { return '',$stderr }
@@ -20809,9 +21188,25 @@ sub cwd
          }
          if ((exists $self->{_ftm_type}) &&
                $self->{_ftm_type}=~/s*ftp/) {
-            ($output,$stderr)=
-               &Rem_Command::ftpcmd($self,
+            if (-1<index $target_dir,' ') {
+               ($output,$stderr)=
+                  &Rem_Command::ftpcmd($self,
                   "cd \"$target_dir\"",$cache);
+               print "Rem_Command::ftpcmd cd \"$target_dir\" ",
+                  "OUTPUT:\n==>$output<==\nat LINE ",__LINE__
+                  if ((!$Net::FullAuto::FA_Core::cron &&
+                  $Net::FullAuto::FA_Core::debug) ||
+                  $debug);
+            } else {
+               ($output,$stderr)=
+                  &Rem_Command::ftpcmd($self,
+                  "cd $target_dir",$cache);
+               print "Rem_Command::ftpcmd cd $target_dir ",
+                  "OUTPUT:\n==>$output<==\nat LINE ",__LINE__
+                  if ((!$Net::FullAuto::FA_Core::cron &&
+                  $Net::FullAuto::FA_Core::debug) ||
+                  $debug);
+            }
             $self->{_work_dirs}->{_pre}=
                 $self->{_work_dirs}->{_cwd}=$target_dir.'/' unless $stderr;
             $stderr=$output if -1<index $output,"Couldn't can";
@@ -20833,8 +21228,23 @@ sub cwd
                ($self->{_connect} eq 'connect_telnet_ssh')) {
 	    my $cwd='';
 	    ($cwd,$stderr)=$self->cmd('pwd','__delay__=200');
-            ($output,$stderr)=$self->cmd("cd \'$target_dir\'",
-               '__delay__=200');
+            if (-1<index $target_dir,' ') {
+               ($output,$stderr)=$self->cmd("cd \'$target_dir\'",
+                  '__delay__=200');
+               print "self->cmd cd \"$target_dir\" ",
+                  "OUTPUT:\n==>$output<==\nat LINE ",__LINE__
+                  if ((!$Net::FullAuto::FA_Core::cron &&
+                  $Net::FullAuto::FA_Core::debug) ||
+                  $debug);
+            } else {
+               ($output,$stderr)=$self->cmd("cd $target_dir",
+                  '__delay__=200');
+               print "self->cmd cd $target_dir ",
+                  "OUTPUT:\n==>$output<==\nat LINE ",__LINE__
+                  if ((!$Net::FullAuto::FA_Core::cron &&
+                  $Net::FullAuto::FA_Core::debug) ||
+                  $debug);
+            }
             my $pwd='';
 	    ($pwd,$stderr)=$self->cmd('pwd','__delay__=200');
             $stderr=$output if -1<index $output,"Couldn't can";
@@ -21103,7 +21513,7 @@ print "KEYS=",(join " | ",keys %{$cache}),"\n" if $cache;
    if ($Net::FullAuto::FA_Core::cltimeout ne 'X') {
       $btimeout=$Net::FullAuto::FA_Core::cltimeout;
    } elsif (!$btimeout) {
-      $btimeout=$timeout if !$btimeout;
+      $btimeout=$Net::FullAuto::FA_Core::timeout if !$btimeout;
    }
    my $bhost=($buse eq 'ip')?$bip:$bhostname;
    $bms_share||='';$btransfer_dir||='';
@@ -21117,7 +21527,7 @@ print "KEYS=",(join " | ",keys %{$cache}),"\n" if $cache;
    if ($Net::FullAuto::FA_Core::cltimeout ne 'X') {
       $dtimeout=$Net::FullAuto::FA_Core::cltimeout;
    } elsif (!$dtimeout) {
-      $dtimeout=$timeout if !$dtimeout;
+      $dtimeout=$Net::FullAuto::FA_Core::timeout if !$dtimeout;
    } my $do_dest_tmp_cwd=1;
    if ($baseFH->{_uname} ne 'cygwin' &&
          $baseFH->{_hostlabel}->[0] ne "__Master_${$}__") {

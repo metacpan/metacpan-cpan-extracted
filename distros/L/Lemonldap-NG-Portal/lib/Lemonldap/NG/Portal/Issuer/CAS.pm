@@ -15,6 +15,7 @@ use Lemonldap::NG::Portal::Main::Constants qw(
   PE_UNKNOWNPARTNER
   PE_UNAUTHORIZEDURL
   PE_UNAUTHORIZEDPARTNER
+  PE_BADURL
   PE_CAS_SERVICE_NOT_ALLOWED
 );
 use URI;
@@ -213,7 +214,11 @@ sub run {
         }
 
         unless ( $service =~ m#^(https?://[^/]+)(/.*)?$# ) {
-            return $self->_failAuthorize( $req, msg => "Bad service $service" );
+            return $self->_failLogin(
+                $req,
+                msg => "Bad service $service",
+                res => PE_BADURL,
+            );
         }
         my $app = $self->getCasApp($service);
 

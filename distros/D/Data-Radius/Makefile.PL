@@ -1,4 +1,5 @@
 use ExtUtils::MakeMaker;
+use English qw($PERL_VERSION);
 
 my %M = (
     NAME         => 'Data::Radius',
@@ -23,10 +24,11 @@ my %M = (
     },
     TEST_REQUIRES => {
         'Test::More' => 0,
-        'Test::Deep' => 0,
+        'Test::Deep' => ( $PERL_VERSION lt v5.12.0 ) ? '== 1.130' : 0,
         'File::Temp' => 0,
         'FindBin' => 0,
         'Data::HexDump' => 0,
+        'Test::NoWarnings' => 0,
     },
 );
 

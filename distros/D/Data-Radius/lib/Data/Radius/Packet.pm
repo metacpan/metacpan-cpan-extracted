@@ -29,9 +29,12 @@ use constant {
     # has extra byte in VSA header
     WIMAX_VENDOR        => 24757,
 };
+use constant ATTR_MSG_AUTH_ZERO => pack('C C', ATTR_MSG_AUTH, ATTR_MSG_AUTH_LEN) . ("\x0" x (ATTR_MSG_AUTH_LEN - 2));
 
 my %IS_REPLY   = map { $_ => 1 } (ACCESS_ACCEPT, ACCESS_REJECT, DISCONNECT_ACCEPT, DISCONNECT_REJECT, COA_ACCEPT, COA_REJECT);
 my %IS_REQUEST = map { $_ => 1 } (ACCESS_REQUEST, ACCOUNTING_REQUEST, DISCONNECT_REQUEST, COA_REQUEST);
+
+my %IS_ACCOUNTING = map { $_ => 1 } (ACCOUNTING_REQUEST, ACCOUNTING_RESPONSE);
 
 my $request_id = int( rand(255) );
 
@@ -58,6 +61,7 @@ sub new {
 #  secret - allow to override default secret from constructor
 #  with_msg_auth - boolean, to add Message-Authenticator.
 #                  This can be archieved by adding Message-Authenticator to av_list with undefined value
+#                  Is enabled by default now.
 #  request_id - allow to specify custom value (0..255), otherwise internal counter is used
 #  RaiseError - raise error from AV encoding/decoding - default is to print and forgive errors
 #  PrintError - print error from AV encoding/decoding - default on
@@ -78,12 +82,24 @@ sub build {
         $self->secret($h{secret});
     }
     Carp::croak('No secret value') if ! defined $self->secret;
-    # enable adding Message-Authenticator attribute (RFC3579)
-    # enable it by defaulf if Message-Authenticator is present in av_list with empty value
-    my $with_msg_auth = $h{with_msg_auth};
 
     if ($self->is_reply($type) && ! $h{authenticator}) {
         Carp::croak("No authenticator value from request");
+    }
+
+    # enable adding Message-Authenticator attribute (RFC3579)
+    my $with_msg_auth;
+    if ($IS_ACCOUNTING{ $type }) {
+        if ($h{with_msg_auth}) {
+            my $msg = 'Message-Authenticator is not used for accounting';
+            Carp::croak($msg) if ($h{RaiseError});
+            Carp::carp($msg)  if ($h{PrintError});
+        }
+        $with_msg_auth = 0;
+    }
+    else {
+        # enable it by default as protection against blast-RADIUS https://www.blastradius.fail/
+        $with_msg_auth = $h{with_msg_auth} // 1;
     }
 
     # Authenticator required now to encode password field (if present)
@@ -95,19 +111,45 @@ sub build {
 
     # pack attributes
     my @bin_av = ();
+
+    if ($with_msg_auth) {
+        # now Message-Authenticator has to be the first attribute, add zero for now
+        push @bin_av, ATTR_MSG_AUTH_ZERO;
+    }
+
+    my $n;
     foreach my $av (@{$av_list}) {
+        $n++;
         # Message-Authenticator
+        # now it has to be the first attribute
         if (($av->{Name} eq ATTR_MSG_AUTH_NAME) && !$av->{Value}) {
-            $with_msg_auth = 1;
-            # this AV will be calculated and added to the end of list
+            if ($IS_ACCOUNTING{$type}) {
+                my $msg = 'Message-Authenticator attribute is ignored';
+                Carp::croak($msg) if ($h{RaiseError});
+                Carp::carp($msg)  if ($h{PrintError});
+                next;
+            }
+
+            if ($n > 1) {
+                my $msg = 'Message-Authenticator must be the first attribute in the list';
+                Carp::croak($msg) if ($h{RaiseError});
+                Carp::carp($msg)  if ($h{PrintError});
+            }
+            elsif (! $with_msg_auth ) {
+                # not added yet
+                push @bin_av, ATTR_MSG_AUTH_ZERO;
+                $with_msg_auth = 1;
+            }
+
+            # already added
             next;
         }
 
         my $bin = eval { $self->pack_attribute($av, $authenticator) };
         if ($@) {
             my $msg = $@;
-            Carp::croak($msg) if $h{RaiseError};
-            Carp::carp ($msg) if $h{PrintError};
+            Carp::croak($msg) if ($h{RaiseError});
+            Carp::carp ($msg) if ($h{PrintError});
         }
         push (@bin_av, $bin) if $bin;
     }
@@ -123,9 +165,7 @@ sub build {
 
     # RFC3579 Message-Authenticator (EAP)
     if($with_msg_auth) {
-        # calculate and append Message-Authenticator attribute
-        $length += ATTR_MSG_AUTH_LEN;
-        my $msg_auth = "\x0" x (ATTR_MSG_AUTH_LEN - 2);
+        # calculate and update Message-Authenticator attribute
 
         my $used_auth;
         if ($type == ACCESS_REQUEST) {
@@ -133,7 +173,6 @@ sub build {
             $used_auth = $authenticator;
         }
         elsif ($self->is_request($type)) {
-            # Message-Authenticator should not be present in ACCOUNTING_REQUEST
             $used_auth = "\x00" x 16;
         }
         else {
@@ -145,15 +184,14 @@ sub build {
                         pack('C C n', $type, $req_id, $length),
                         $used_auth,
                         $attributes,
-                        pack('C C', ATTR_MSG_AUTH, ATTR_MSG_AUTH_LEN),
-                        $msg_auth,
                     );
 
         my $hmac = Digest::HMAC_MD5->new($self->secret);
         $hmac->add( $data );
-        $msg_auth = $hmac->digest;
+        my $msg_auth = $hmac->digest;
 
-        $attributes .= pack('C C', ATTR_MSG_AUTH, ATTR_MSG_AUTH_LEN) . $msg_auth;
+        # replace zeroes with the actual value
+        substr($attributes, 2, ATTR_MSG_AUTH_LEN - 2, $msg_auth );
     }
 
     # calculate authentificator value for non-authentication request
@@ -342,7 +380,7 @@ sub parse {
         }
 
         if ($attr_id == ATTR_MSG_AUTH && ! $vendor) {
-            die "Invalid Message-Authenticator len" if ($attr_len != 18);
+            die "Invalid Message-Authenticator len" if ($attr_len != ATTR_MSG_AUTH_LEN);
             $msg_auth = $attr_val;
             # zero it to verify later
             $attr_val = "\x0" x (ATTR_MSG_AUTH_LEN - 2);

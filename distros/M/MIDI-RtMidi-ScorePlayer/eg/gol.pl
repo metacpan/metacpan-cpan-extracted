@@ -12,8 +12,12 @@ use warnings;
 # perl eg/dat/gol.pl 12 eg/dat/gol-12-blink.dat
 # perl eg/dat/gol.pl 12 eg/dat/gol-5-4x.dat
 # perl eg/dat/gol.pl 12 1 # render glider
+# perl eg/dat/gol.pl 5 2  # render toad
+# perl eg/dat/gol.pl 7 3  # render beacon
+# perl eg/dat/gol.pl 12 4 # render spacship
 
 use Game::Life::Faster ();
+use Array::Transpose qw(transpose);
 use MIDI::RtMidi::ScorePlayer ();
 use MIDI::Util qw(setup_score set_chan_patch);
 use Music::Scales qw(get_scale_MIDI);
@@ -50,24 +54,42 @@ elsif ($size == 5) {
 
 my $game = Game::Life::Faster->new($size);
 
-my $matrix;
-if ($init eq '1') {
-    $game->place_points(
-        int $size / 2, int $size / 2,
-        [ [ 1, 1, 1 ],
-          [ 1, 0, 0 ],
-          [ 0, 1, 0 ] ] # glider
+my ($matrix, $x, $y);
+if ($init =~ /^\d\d?$/ && $init != '0') {
+    my %cells = (
+        1 => [ [qw(1 1 1)],     # glider
+               [qw(1 0 0)],
+               [qw(0 1 0)] ],
+        2 => [ [qw(0 0 0 0)],   # toad
+               [qw(0 1 1 1)],
+               [qw(1 1 1 0)],
+               [qw(0 0 0 0)] ],
+        3 => [ [qw(1 1 0 0)],   # beacon
+               [qw(1 1 0 0)],
+               [qw(0 0 1 1)],
+               [qw(0 0 1 1)] ],
+        4 => [ [qw(1 0 0 1 0)], # spaceship
+               [qw(0 0 0 0 1)],
+               [qw(1 0 0 0 1)],
+               [qw(0 1 1 1 1)],
+               [qw(0 0 0 0 0)] ],
     );
-}
-elsif ($init && -e $init) {
-    $matrix = retrieve($init);
-    $game->place_points(0, 0, $matrix);
+    $matrix = $cells{$init};
+    $matrix = transpose($matrix) if int rand 2;
+    ($x, $y) = (int rand($size - @$matrix + 1), int rand($size - @$matrix + 1));
+    $game->place_points($y, $x, $matrix);
 }
 else {
-    warn "Can't load $init\n" if $init;
-    $matrix = [ map { [ map { int(rand 2) } 1 .. $size ] } 1 .. $size ];
-    store($matrix, 'gol-state.dat');
-    $game->place_points(0, 0, $matrix);
+    if ($init && -e $init) {
+        $matrix = retrieve($init);
+        $game->place_points(0, 0, $matrix);
+    }
+    else {
+        die "Can't load $init\n" if $init;
+        $matrix = [ map { [ map { int(rand 2) } 1 .. $size ] } 1 .. $size ];
+        store($matrix, 'gol-state.dat');
+        $game->place_points(0, 0, $matrix);
+    }
 }
 
 my @parts = (\&part) x $size;
@@ -100,7 +122,7 @@ sub part {
 
     my $track = $args{size} - $args{_part}; # bottom -> up
     my $channel = $args{_part} < 9 ? $args{_part} : $args{_part} + 1;
-    my $octave = ($args{_part} % 6) + 1;
+    my $octave = (($args{_part} - 1) % 5) + 2;
     my $patch = 4; #int rand 20;
     my @scale = (
         get_scale_MIDI('C', $octave, $args{scale}),

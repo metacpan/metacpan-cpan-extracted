@@ -28,7 +28,7 @@ no_index:
 requires:
   Alien::Base: '0'
   Alien::Build: '0.25'
-version: '1.000002'
+version: '1.000003'
 x_alienfile:
   generated_by: 'Alien::Build::MM version 2.80'
   requires:

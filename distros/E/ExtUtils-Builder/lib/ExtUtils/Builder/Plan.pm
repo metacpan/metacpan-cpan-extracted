@@ -1,5 +1,5 @@
 package ExtUtils::Builder::Plan;
-$ExtUtils::Builder::Plan::VERSION = '0.007';
+$ExtUtils::Builder::Plan::VERSION = '0.008';
 use strict;
 use warnings;
 
@@ -86,7 +86,7 @@ ExtUtils::Builder::Plan - An ExtUtils::Builder Plan
 
 =head1 VERSION
 
-version 0.007
+version 0.008
 
 =head1 SYNOPSIS
 

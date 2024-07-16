@@ -66,6 +66,7 @@ WriteMakefile(
         'Text::Unidecode'     => 0,
         'XML::LibXML'         => 0,
         'XML::Simple'         => 0,
+        'Time::Fake'          => 0,
     },
     PREREQ_PM => {
         'Clone'                  => 0,

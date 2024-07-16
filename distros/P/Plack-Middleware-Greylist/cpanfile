@@ -12,11 +12,11 @@ requires "experimental" => "0";
 requires "parent" => "0";
 requires "perl" => "v5.20.0";
 requires "warnings" => "0";
-recommends "Cache::FastMmap" => "0";
+recommends "Cache::FastMmap" => "1.52";
 recommends "Ref::Util::XS" => "0";
 
 on 'test' => sub {
-  requires "Cache::FastMmap" => "1.47";
+  requires "Cache::FastMmap" => "1.52";
   requires "File::Spec" => "0";
   requires "HTTP::Request::Common" => "0";
   requires "IO::Scalar" => "0";

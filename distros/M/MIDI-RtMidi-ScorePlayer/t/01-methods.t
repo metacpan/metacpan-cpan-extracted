@@ -30,6 +30,7 @@ subtest defaults => sub {
 };
 
 subtest play => sub {
+SKIP: { skip 'Not going live', 2;
     sub foo { return sub {} }
     my $p = new_ok 'MIDI::RtMidi::ScorePlayer' => [
         score    => $score,
@@ -39,8 +40,10 @@ subtest play => sub {
     ];
     lives_ok { $p->play } 'expecting to live';
 };
+};
 
 subtest deposit => sub {
+SKIP: { skip 'Not going live', 4;
     my $foo = sub { return sub { $score->r('qn') } };
     my $p = new_ok 'MIDI::RtMidi::ScorePlayer' => [
         score    => $score,
@@ -55,6 +58,7 @@ subtest deposit => sub {
     ok -e $got[0], 'deposited';
     unlink $got[0];
     ok !-e $got[0], 'unlinked';
+};
 };
 
 done_testing();

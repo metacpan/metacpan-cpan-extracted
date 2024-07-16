@@ -26,8 +26,11 @@ my %WriteMakefileArgs = (
 	'DateTime::Format::ISO8601' => '0',
 	'DateTime::TimeZone' => '0',
 	'Try::Tiny' => '0',
+	'Geo::Location::TimeZone' => '0',
 	'Astro::MoonPhase' => '0',
+	'Exporter' => '0',
 	'Data::Roundtrip' => '0',
+	'Getopt::Long' => '0'
     },
     dist  => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
     clean => { FILES => 'Astro-MoonPhase-Simple-*' },

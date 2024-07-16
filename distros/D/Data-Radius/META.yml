@@ -10,10 +10,11 @@ build_requires:
   FindBin: '0'
   Test::Deep: '0'
   Test::More: '0'
+  Test::NoWarnings: '0'
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.48, CPAN::Meta::Converter version 2.150010'
+generated_by: 'ExtUtils::MakeMaker version 7.62, CPAN::Meta::Converter version 2.150010'
 license: artistic_2
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -32,5 +33,5 @@ requires:
   File::Spec: '0'
   Socket: '2.021'
   perl: '5.010000'
-version: v1.2.7
+version: v1.2.8
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

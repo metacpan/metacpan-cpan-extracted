@@ -56,7 +56,8 @@ METHODS
 
         "with_msg_auth" can be passed to append Message-Authenticator
         attribute. It also can be archived by adding this attribyte to AV
-        list with empty value
+        list with empty value.
+        Note that since the v1.2.8 this option is enabled by default.
 
         "request_id" - allow to define own it. By default internal sequence
         is used. Value must be in range 0-255 (1byte)

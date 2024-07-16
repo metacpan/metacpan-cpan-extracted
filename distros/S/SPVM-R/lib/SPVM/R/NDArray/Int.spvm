@@ -5,6 +5,9 @@ class R::NDArray::Int extends R::NDArray {
   
   use R::OP::Byte;
   use R::OP::Short;
+  use R::OP::Long;
+  use R::OP::Float;
+  use R::OP::Double;
   
   # Fields
   method data : int[] () {

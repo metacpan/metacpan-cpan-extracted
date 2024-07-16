@@ -2,7 +2,7 @@ package Plack::Middleware::Greylist;
 
 # ABSTRACT: throttle requests with different rates based on net blocks
 
-# RECOMMEND PREREQ: Cache::FastMmap
+# RECOMMEND PREREQ: Cache::FastMmap 1.52
 # RECOMMEND PREREQ: Ref::Util::XS
 
 use v5.20;
@@ -21,7 +21,7 @@ use Time::Seconds         qw/ ONE_MINUTE /;
 
 use experimental qw/ postderef signatures /;
 
-our $VERSION = 'v0.8.0';
+our $VERSION = 'v0.8.1';
 
 
 sub prepare_app($self) {
@@ -49,6 +49,7 @@ sub prepare_app($self) {
         $config->{share_file} = "$file";
 
         load Cache::FastMmap;
+        die "Cache::FastMmap version 1.52 or newer is required" if Cache::FastMmap->VERSION < 1.52;
 
         my $cache = Cache::FastMmap->new(%$config);
 
@@ -200,7 +201,7 @@ Plack::Middleware::Greylist - throttle requests with different rates based on ne
 
 =head1 VERSION
 
-version v0.8.0
+version v0.8.1
 
 =head1 SYNOPSIS
 
@@ -353,6 +354,8 @@ block).
 
 If you customise this, then you need to ensure that the counter resets or expires counts after a set period of time,
 e.g. one minute.  If you use a different time interval, then you may need to adjust the L</retry_after> time.
+
+You also need to ensure that the cache is shared between processes.
 
 =head2 callback
 

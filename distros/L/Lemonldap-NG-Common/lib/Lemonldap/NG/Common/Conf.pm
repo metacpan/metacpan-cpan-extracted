@@ -323,17 +323,20 @@ sub getLocalConf {
         # If default configuration cannot be read
         # - Error if configuration section is requested
         # - Silent exit for other section requests
-        unless ( -r $file ) {
+        if ( open( my $fh, '<', $file ) ) {
+
+            # Parse ini file
+            $cfg = Config::IniFiles->new( -file => $fh, -allowcontinue => 1 );
+            close($fh);
+        }
+        else {
             if ( $section eq CONFSECTION ) {
                 $msg .=
-                  "Cannot read $file to get configuration access parameters.\n";
+"Cannot read $file to get configuration access parameters: $!\n";
                 return $r;
             }
             return $r;
         }
-
-        # Parse ini file
-        $cfg = Config::IniFiles->new( -file => $file, -allowcontinue => 1 );
 
         unless ( defined $cfg ) {
             $msg .= "Local config error: "

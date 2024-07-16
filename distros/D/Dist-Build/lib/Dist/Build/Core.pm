@@ -1,5 +1,5 @@
 package Dist::Build::Core;
-$Dist::Build::Core::VERSION = '0.005';
+$Dist::Build::Core::VERSION = '0.006';
 use strict;
 use warnings;
 
@@ -14,6 +14,7 @@ use File::Basename qw/dirname/;
 use File::Copy ();
 use File::Path qw/make_path/;
 use File::Spec::Functions qw/catdir rel2abs/;
+use Parse::CPAN::Meta;
 
 use ExtUtils::Builder::Node;
 use ExtUtils::Builder::Action::Function;
@@ -67,7 +68,6 @@ sub add_methods {
 		my ($target, %options) = @_;
 		ExtUtils::Builder::Node->new(
 			target  => $target,
-			phony   => 1,
 			actions => [ new_action('mkdir', $target, %options) ],
 		);
 	});
@@ -94,7 +94,41 @@ sub add_methods {
 				new_action('install', install_map => $options{install_map}),
 			]
 		);
-	})
+	});
+
+	$self->add_delegate($planner, 'dump_binary', sub {
+		my ($target, %options) = @_;
+		ExtUtils::Builder::Node->new(
+			target       => $target,
+			dependencies => $options{dependencies},
+			actions      => [
+				new_action('dump_binary', $options{content}),
+			]
+		);
+	});
+
+	$self->add_delegate($planner, 'dump_text', sub {
+		my ($target, %options) = @_;
+		ExtUtils::Builder::Node->new(
+			target       => $target,
+			dependencies => $options{dependencies},
+			actions      => [
+				new_action('dump_text', $options{content}, $options{encoding} || 'utf-8'),
+			]
+		);
+	});
+
+	$self->add_delegate($planner, 'dump_json', sub {
+		my ($target, %options) = @_;
+		ExtUtils::Builder::Node->new(
+			target       => $target,
+			dependencies => $options{dependencies},
+			actions      => [
+				new_action('dump_json', $options{content}),
+			]
+		);
+	});
+
 }
 
 sub copy {
@@ -102,7 +136,6 @@ sub copy {
 
 	make_path(dirname($target));
 	File::Copy::copy($source, $target) or croak "Could not copy: $!";
-	printf "cp %s %s\n", $source, $target;
 
 	my ($atime, $mtime) = (stat $source)[8,9];
 	utime $atime, $mtime, $target;
@@ -153,6 +186,27 @@ sub install {
 	return;
 }
 
+sub dump_binary {
+	my ($filename, $content) = @_;
+	open my $fh, '>:raw', $filename;
+	print $fh $content;
+}
+
+sub dump_text {
+	my ($filename, $content, $encoding) = @_;
+	open my $fh, ">:encoding($encoding)", $filename;
+	print $fh $content;
+}
+
+my $json_backend = Parse::CPAN::Meta->json_backend;
+my $json = $json_backend->new->canonical->pretty->utf8;
+
+sub dump_json {
+	my ($filename, $content) = @_;
+	open my $fh, '>:raw', $filename;
+	print $fh $json->encode($content);
+}
+
 1;
 
 # ABSTRACT: core functions for Dist::Build
@@ -169,7 +223,7 @@ Dist::Build::Core - core functions for Dist::Build
 
 =head1 VERSION
 
-version 0.005
+version 0.006
 
 =head1 DESCRIPTION
 
@@ -234,6 +288,18 @@ This enables verbose mode.
 This uninstalls files before installing the new ones.
 
 =back
+
+=item * dump_binary($filename, $content)
+
+Write C<$content> to C<$filename> as binary data.
+
+=item * dump_text($filename, $content, $encoding = 'utf8')
+
+Write C<$content> to C<$filename> as text of the given encoding.
+
+=item * dump_json($filename, $content)
+
+Write C<$content> to C<$filename> as JSON.
 
 =back
 

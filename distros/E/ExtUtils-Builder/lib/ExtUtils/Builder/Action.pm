@@ -1,5 +1,5 @@
 package ExtUtils::Builder::Action;
-$ExtUtils::Builder::Action::VERSION = '0.007';
+$ExtUtils::Builder::Action::VERSION = '0.008';
 use strict;
 use warnings;
 
@@ -39,7 +39,7 @@ ExtUtils::Builder::Action - The ExtUtils::Builder Action role
 
 =head1 VERSION
 
-version 0.007
+version 0.008
 
 =head1 SYNOPSIS
 
@@ -63,10 +63,6 @@ An action can be consumed in many ways. It can be C<execute>d, which is often th
 Execute this action immediately. This may throw an exception on errors, but doesn't otherwise return anything. C<%arguments> may be used by the command.
 
 =over 4
-
-=item * logger
-
-This is a callback subref that messages may be written to while executing
 
 =item * quiet
 

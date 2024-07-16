@@ -10,6 +10,7 @@ Module::Build->new(
     # dist_author         => 'Peter Makholm <peter@makholm.net>',
     dist_author         => 'Nigel Horne <njh@bandsman.co.uk>',
     dist_version_from   => 'lib/Sub/Private.pm',
+    configure_requires => { 'Module::Build' => 0.42 },
     build_requires => {
         'Test::More' => 0,
         'Test::NoWarnings' => 0,
@@ -23,12 +24,14 @@ Module::Build->new(
     add_to_cleanup      => [ 'Sub-Private-*' ],
     meta_merge => {
         resources => {
-            # repository => 'http://github.com/pmakholm/sub-private-perl/tree/master',
-		repository => 'https://github.com/nigelhorne/Sub-Private',
+		# repository => 'https://github.com/nigelhorne/Sub-Private',
+		# RT#154368
+		repository => 'https://rt.cpan.org/Public/Dist/Display.html?Name=Sub-Private',
 		bugtracker => 'https://github.com/nigelhorne/Sub-Private/issues',
         }
     },
     test_requires => {
+	'Test::Most' => 0,	# RT#154368
     	'Test::Needs' => 0,
     }
 )->create_build_script();

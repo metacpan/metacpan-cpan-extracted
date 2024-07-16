@@ -1081,7 +1081,7 @@
 "samlIDPMetaDataExportedAttributes":"Attributs exportés",
 "samlIDPMetaDataNodes":"Fournisseurs d'identité SAML",
 "samlIDPMetaDataOptions":"Options",
-"samlIDPMetaDataOptionsAdaptSessionUtime":"Adapatation de la durée de vie de la session",
+"samlIDPMetaDataOptionsAdaptSessionUtime":"Adaptation de la durée de vie de la session",
 "samlIDPMetaDataOptionsAllowLoginFromIDP":"Authentification depuis le fournisseur autorisée",
 "samlIDPMetaDataOptionsAuthnRequest":"Requête d'authentification",
 "samlIDPMetaDataOptionsBinding":"Méthode",

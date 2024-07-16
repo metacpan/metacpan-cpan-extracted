@@ -18,11 +18,13 @@ like($action->to_code, qr/ system \( '.*?','-e0' \) \ and \ die /x, 'to_code ret
 
 lives_ok { $action->execute(quiet => 1) } 'Can execute quiet command';
 
-my @messages;
-lives_ok { $action->execute(logger => sub { push @messages, @_ }) } 'Can execute logging command';
+open my $stdout, '>', \my $output;
+select $stdout;
+lives_ok { $action->execute } 'Can execute logging command';
+select STDOUT;
+close $stdout;
 
-is(scalar(@messages), 1, 'Got one message');
-like($messages[0], qr/\Q$^X\E .+ -e0 \z/x, "Got '$^X -e0' as message");
+like($output, qr/\Q$^X\E .+ -e0 \n \z/x, "Got '$^X -e0' as message");
 
 is($action->preference, 'command', 'Preferred action is "execute"');
 

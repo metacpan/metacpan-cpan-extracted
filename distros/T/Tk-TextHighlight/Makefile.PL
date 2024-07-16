@@ -19,7 +19,6 @@ WriteMakefile(
 #	PMLIBDIRS => ['Tk'],
 	PM => {
 		"lib/Tk/$pm.pm" => "$ld/$pm.pm",
-		"lib/Tk/ROTextHighlight.pm" => "$ld/ROTextHighlight.pm",
 		"lib/Tk/$pm/Bash.pm" => "$ld/$pm/Bash.pm",
 		"lib/Tk/$pm/HTML.pm" => "$ld/$pm/HTML.pm",
 		"lib/Tk/$pm/Kate.pm" => "$ld/$pm/Kate.pm",
@@ -32,7 +31,8 @@ WriteMakefile(
 #		"lib/Tk/$pm.pod" => "$ld/$pm.pod",
 		"lib/Tk/$pm/RulesEditor.pm" => "$ld/$pm/RulesEditor.pm",
 	},
-	'dist'	=> {COMPRESS => 'gzip', SUFFIX => 'gz'},
+	dist	=> {COMPRESS => 'gzip', SUFFIX => 'gz'},
+	clean => { FILES => 'Tk-TextHighlight*' },
 );
 
 1

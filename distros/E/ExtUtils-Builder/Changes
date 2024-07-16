@@ -1,5 +1,9 @@
 Revision history for ExtUtils-Builder
 
+0.008     2024-07-15 21:02:09+02:00 Europe/Brussels
+          - Fix function() helper in DSLs
+          - Eliminate logger callback
+
 0.007     2024-07-13 13:47:56+02:00 Europe/Brussels
           - Add version check to load_module
           - Fix Node's phony method to return the correct value

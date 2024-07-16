@@ -1,5 +1,5 @@
 package ExtUtils::Builder::Compiler;
-$ExtUtils::Builder::Compiler::VERSION = '0.011';
+$ExtUtils::Builder::Compiler::VERSION = '0.012';
 use strict;
 use warnings;
 
@@ -64,16 +64,21 @@ sub collect_arguments  {
 
 sub compile {
 	my ($self, $from, $to, %opts) = @_;
+	my @actions ;
+	if ($opts{mkdir}) {
+		my $dirname = File::Basename::dirname($to);
+		push @actions, ExtUtils::Builder::Action::Function->new(
+			module    => 'File::Path',
+			function  => 'make_path',
+			exports   => 'explicit',
+			arguments => [ $dirname ],
+			message   => "mkdir $dirname",
+		);
+	}
 	my @argv = $self->arguments($from, $to, %opts);
-	my $main = ExtUtils::Builder::Action::Command->new(command => [ $self->cc, @argv ]);
-	my @mkdir   = $opts{mkdir} ? ExtUtils::Builder::Action::Function->new(
-		module    => 'File::Path',
-		function  => 'make_path',
-		exports   => 'explicit',
-		arguments => [ File::Basename::dirname($to) ],
-	) : ();
+	push @actions, ExtUtils::Builder::Action::Command->new(command => [ $self->cc, @argv ]);
 	my $deps = [ $from, @{ $opts{dependencies} || [] } ];
-	return ExtUtils::Builder::Node->new(target => $to, dependencies => $deps, actions => [$main]);
+	return ExtUtils::Builder::Node->new(target => $to, dependencies => $deps, actions => \@actions);
 }
 
 1;
@@ -92,7 +97,7 @@ ExtUtils::Builder::Compiler - An interface around different compilers.
 
 =head1 VERSION
 
-version 0.011
+version 0.012
 
 =head1 DESCRIPTION
 

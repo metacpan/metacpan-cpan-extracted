@@ -34,10 +34,14 @@ use Test::LivesOK 'lives_ok';
 		my (@actions, @messages);
 		local $callback = sub { push @actions, 2 };
 
-		lives_ok { $action->execute(logger => sub { push @messages, @_ }) } 'Can execute command';
+		open my $stdout, '>', \my $output;
+		select $stdout;
+		lives_ok { $action->execute } 'Can execute command';
+		select STDOUT;
+		close $stdout;
 
 		is_deeply(\@actions, [2], 'Command is executed with logging');
-		is_deeply(\@messages, [ 'callback' ], 'Got the message');
+		is_deeply($output, "callback\n", 'Got the message');
 	}
 
 	my @serialized = $action->to_command;

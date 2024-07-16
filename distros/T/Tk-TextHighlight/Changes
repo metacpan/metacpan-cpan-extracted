@@ -154,3 +154,37 @@ December 2007
 	2) ROTextHighlight - Remove "*Comment" and "*Indent" options from the Edit 
 	menu since these modify text (in readonly mode)!
 	3) Tidy up the POD docs a bit.
+
+15 July 2024
+	Update to version 2.0
+	* Improve brace-matching/jumping by ignoring brace characters contained 
+	within "comments", as defined by the syntax language.
+	* The -commentchar option can now be a string, and certain special 
+	comment strings:  "/*", "(*", and "<!--" are treated as multiline comments 
+	(matching their respective closures:  "*/", "*)", and "-->" respectively) 
+	greatly improving the auto-commenting of selected text method.
+	* Add new readonly() method to allow toggling between standard (editable) 
+	mode to readonly mode.  The popup-menu options that can alter text are 
+	automatically greyed out now in -readonly mode.
+	* NOTE:  ROTextHighlight.pm module REMOVED because it can now be replaced 
+	by a symlink, and / or initialize TextHighlight widget with the 
+	"-readonly => <true>").
+	* Added -syntaxcomments flag to allow the -commentchar string to be set 
+	by the selected language syntax's comment strings (for popular languages).
+	* Added -smartindent flag to perform "smarter" intenting in most modern 
+	programming languages (when Enter is pressed in or after a line.
+	* Added -noPopupMenu flag to replace the popup menu (Mouse-button-3) with 
+	selection extend.
+	* Improve some key-bindings, such as adding <Control-P> (upper case) to 
+	both 	jump to a matching brace but also highlight the text in between, and 
+	<Control-m> to pop up the popup menu (unless -noPopupMenu is true).
+	* Fix some issues when settnig or changing the background color.
+	* Added getViewMenu() method to return just the "View" menu normally in 
+	the popup menu options.
+	* Added EmptyDocument() method to allow the document to be cleared, ie. 
+	delete('0.0','end), but can be used in -readonly mode too.
+	* The insertTab() method now inserts the value of "-indentchar" instead 
+	of always the tab character (use insertTabChar() to force insertion of the 
+	tab character ("\t"), (ie. if -indentchar is set to spaces);
+	* Major documentation overhaul to include all the methods and options.
+	* Misc. general minor code fixes and cleanups.

@@ -48,6 +48,20 @@ count(1);
 
 expectPortalError( $res, 107, "Unknown CAS service" );
 
+# Request to malformed URL is rejected
+ok(
+    $res = $issuer->_get(
+        '/cas/login',
+        cookie => "lemonldap=$idpId",
+        query  => 'service=htp:invalid',
+        accept => 'text/html'
+    ),
+    'Query CAS server'
+);
+count(1);
+
+expectPortalError( $res, 37, "Unknown CAS service" );
+
 my $ticket;
 
 # Ticket cannot be validated against wrong service

@@ -86,6 +86,8 @@ sub get_auth_token {
     my $token = $self->authott->getToken($token_id);
     if ($token) {
         if ( $token->{type} eq ( 'auth_token_' . $self->auth_id ) ) {
+            # Fix #3180
+            utf8::downgrade($token->{user});
             return $token;
         }
         else {

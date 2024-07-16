@@ -1,5 +1,5 @@
 {
-   "abstract" : "a TextUndo/SuperText widget with syntax highlighting capabilities, can also use Kate languages.",
+   "abstract" : "a Tk::TextUndo/Tk::Text::SuperText widget with syntax  highlighting capabilities, can also use Kate languages.",
    "author" : [
       "Jim Turner <turnerjw784@yahoo.com>"
    ],
@@ -41,6 +41,6 @@
       }
    },
    "release_status" : "stable",
-   "version" : "1.2",
+   "version" : "2.0",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

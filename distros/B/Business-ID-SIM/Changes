@@ -1,6 +1,16 @@
-0.080   2019-11-21  Released-By: PERLANCAR; Urgency: medium; Backward-Compatible: no
+0.081   2024-07-11  Released-By: PERLANCAR; Urgency: low
+
+        - No functional changes.
+
+        - [dist] Edit Changes (replace Backward-Compatible: no with
+          Backward-Incompatible: yes).
+
+
+0.080   2019-11-21  Released-By: PERLANCAR; Urgency: medium; Backward-Incompatible: yes
 
 	- [incompatible change] No longer export parse_sim() by default.
+
+	- Update renamed prereq Data::Clean::JSON -> Data::Clean::ForJSON.
 
 
 0.07    2015-09-03  Released-By: PERLANCAR
@@ -18,7 +28,7 @@
 	  dependencies on our dist.
 
 
-0.05     2014-08-16 (SHARYANTO) - Happy 19th CPAN Day!
+0.05     2014-08-16  Released-By: SHARYANTO; Note: Happy 19th CPAN Day!
 
          - Add CLI script(s).
 

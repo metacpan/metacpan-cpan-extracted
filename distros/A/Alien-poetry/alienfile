@@ -19,6 +19,9 @@ share {
     [ q{ POETRY_HOME=%{alien.runtime.prefix} \
            python3 %{alien.install.extract}/install-poetry.py } ],
 
+    # https://stackoverflow.com/a/77710122
+    [ q{ %{alien.runtime.prefix}/bin/poetry self add urllib3==1.26.6 } ],
+
     # then copy back to blib so that .packlist gets files, and
     # allows use of File::ShareDir to locate binary cross-platform
     [ q{ cp -a %{alien.runtime.prefix}/bin     %{alien.install.prefix}/ } ],

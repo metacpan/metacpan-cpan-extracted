@@ -42,6 +42,7 @@ WriteMakefile(
         'String::Random' => 0,
         'Test::Pod'      => 1.00,
         'Test::Output'   => 0,
+        'Time::Fake'     => 0,
     },
     META_MERGE => {
         'recommends' => {

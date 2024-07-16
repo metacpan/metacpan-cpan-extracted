@@ -5,7 +5,8 @@ use FindBin qw($Bin);
 use File::Temp qw();
 
 use Test::Deep qw(cmp_deeply);
-use Test::More tests => 33;
+use Test::More tests => 33 + 1;
+use Test::NoWarnings;
 
 BEGIN { use_ok('Data::Radius::Dictionary') };
 

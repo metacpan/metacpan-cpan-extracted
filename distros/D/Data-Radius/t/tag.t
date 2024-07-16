@@ -1,8 +1,9 @@
 use strict;
 use warnings;
-use Test::More tests => 13;
 use File::Spec ();
 use Data::HexDump;
+use Test::More tests => 13 + 1;
+use Test::NoWarnings;
 
 BEGIN {
     use_ok('Data::Radius::Dictionary');

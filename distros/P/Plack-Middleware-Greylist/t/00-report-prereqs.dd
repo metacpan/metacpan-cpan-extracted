@@ -24,7 +24,7 @@ do { my $x = {
                     },
        'runtime' => {
                       'recommends' => {
-                                        'Cache::FastMmap' => '0',
+                                        'Cache::FastMmap' => '1.52',
                                         'Ref::Util::XS' => '0'
                                       },
                       'requires' => {
@@ -46,7 +46,7 @@ do { my $x = {
                                      'CPAN::Meta' => '2.120900'
                                    },
                    'requires' => {
-                                   'Cache::FastMmap' => '1.47',
+                                   'Cache::FastMmap' => '1.52',
                                    'File::Spec' => '0',
                                    'HTTP::Request::Common' => '0',
                                    'IO::Scalar' => '0',

@@ -12,6 +12,9 @@ use Try::Tiny;
 
 use AnyEvent::PgRecvlogical;
 
+my $CV;
+my $end_cv = AE::cv;
+
 sub ae_sleep {
     my $t  = shift || 0;
     my $cv = AE::cv;
@@ -31,18 +34,22 @@ my $pg = eval {
 #<<<
 my @expected = (
     'BEGIN',
-    "table public.test_tbl: INSERT: id[integer]:1 payload[text]:'qwerty'",
+    "table public.test_tbl: INSERT: id[integer]:1 payload[text]:'qwerty1'",
     'COMMIT',
     'BEGIN',
     "table public.test_tbl: INSERT: id[integer]:2 payload[text]:'asdfgh'",
+    'COMMIT',
+    'BEGIN',
+    "table public.test_tbl: INSERT: id[integer]:3 payload[text]:'qwerty2'",
+    'COMMIT',
+    'BEGIN',
+    "table public.test_tbl: INSERT: id[integer]:4 payload[text]:'qwerty3'",
     'COMMIT',
 );
 #>>>
 
 my $control = DBI->connect($pg->dsn, 'postgres');
 $control->do('create table test_tbl (id int primary key, payload text)');
-
-my $end_cv = AE::cv;
 
 my $recv = new_ok(
     'AnyEvent::PgRecvlogical' => [
@@ -59,6 +66,8 @@ my $recv = new_ok(
         on_message      => sub {
             is $_[0], shift @expected, $_[0];
             $end_cv->send(1) unless @expected;
+            $CV or diag "no CV";
+            $CV->end;
         },
         on_error => sub { fail $_[0]; $end_cv->croak(@_) },
     ],
@@ -69,44 +78,52 @@ ok $recv->dbh, 'connected';
 
 $recv->start->done(sub { pass 'replication started' }, sub { fail 'replication started'; diag @_ });
 
-ae_sleep(2);
+ae_sleep(0.1) until $recv->received_lsn;
 
-$control->do('insert into test_tbl (id, payload) values (?, ?)', undef, 1, 'qwerty');
+$CV = AE::cv;
+$CV->begin;
+$CV->begin foreach @expected;
 
-ae_sleep(2);
+$control->do('insert into test_tbl (id, payload) values (?, ?)', undef, 1, 'qwerty1');
 
 $control->do('select pg_terminate_backend(?)', undef, $recv->dbh->{pg_pid});
 
-ae_sleep(2);
-
 $control->do('insert into test_tbl (id, payload) values (?, ?)', undef, 2, 'asdfgh');
+$control->do('insert into test_tbl (id, payload) values (?, ?)', undef, 3, 'qwerty2');
+$control->do('insert into test_tbl (id, payload) values (?, ?)', undef, 4, 'qwerty3');
 
-# let some heartbeats go by
-ae_sleep(3);
+$CV->end;
+$CV->recv;
+
+ok !@expected, 'all messages received';
 
 $recv->pause;
 
 ok $recv->is_paused, 'sucessfully paused';
 
-$control->do('insert into test_tbl (id, payload) values (?, ?)', undef, 3, 'frobnicate');
-
-ae_sleep(1);
+$control->do('insert into test_tbl (id, payload) values (?, ?)', undef, 5, 'frobnicate');
 
 #<<<
 push @expected, (
     'BEGIN',
-    "table public.test_tbl: INSERT: id[integer]:3 payload[text]:'frobnicate'",
+    "table public.test_tbl: INSERT: id[integer]:5 payload[text]:'frobnicate'",
     'COMMIT',
 );
 #>>>
+
+$CV = AE::cv;
+$CV->begin;
+$CV->begin foreach @expected;
 
 $recv->unpause;
 
 ok !$recv->is_paused, 'sucessfully unpaused';
 
-ae_sleep(2);
+$CV->end;
+$CV->recv;
 
 ok $end_cv->recv, 'got all messages';
+ok !@expected, 'all messages received';
 $recv->stop;
 
 $end_cv = AE::cv;
@@ -136,11 +153,9 @@ $recv = new_ok(
 my $error = '';
 try {
     $recv->start;
-
-    ae_sleep(1);
+    ae_sleep(0.1);
     $end_cv->send;
-    ae_sleep(1);
-
+    ae_sleep(0.1);
     $end_cv->recv;
 } catch {
     $error = $_;

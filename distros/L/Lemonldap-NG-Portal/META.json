@@ -35,6 +35,7 @@
             "Net::SSLeay" : "0",
             "SOAP::Lite" : "0",
             "Text::Unidecode" : "0",
+            "Time::Fake" : "0",
             "XML::LibXML" : "0",
             "XML::Simple" : "0"
          }
@@ -92,6 +93,6 @@
       ],
       "x_MailingList" : "mailto:lemonldap-ng-dev@ow2.org"
    },
-   "version" : "v2.19.0",
+   "version" : "v2.19.1",
    "x_serialization_backend" : "JSON::PP version 4.07"
 }

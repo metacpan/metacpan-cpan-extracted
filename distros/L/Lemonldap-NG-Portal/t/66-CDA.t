@@ -21,6 +21,49 @@ my $client = LLNG::Manager::Test->new(
     }
 );
 
+subtest "Check that external URLs are correctly classified" => sub {
+    my $cda_plugin =
+      $client->p->loadedModules->{'Lemonldap::NG::Portal::Plugins::CDA'};
+    my $req = Lemonldap::NG::Portal::Main::Request->new(
+        { REQUEST_URI => "/", PATH_INFO => "" } );
+
+    my @tests = (
+
+        # DOMAIN, URLDC, EXPECTED RESULT
+        [ ".example.com", "https://example.com/",       0 ],
+        [ ".example.com", "http://auth.example.com/",   0 ],
+        [ ".example.com", "https://auth.example.com/",  0 ],
+        [ ".example.com", "http://example.org/",        1 ],
+        [ ".example.com", "https://example.org/",       1 ],
+        [ ".example.com", "https://example.org",        1 ],
+        [ ".example.com", "https://auth.example.comx/", 1 ],
+        [ ".example.com", "https://otherexample.com/",  1 ],
+        [ "",             "https://example.com/",       0 ],
+        [ "",             "https://example.comx/",      1 ],
+        [ "",             "https://xexample.com/",      1 ],
+        [ "",             "http://auth.example.com/",   1 ],
+        [ "",             "https://auth.example.com/",  1 ],
+        [ "",             "http://example.org/",        1 ],
+        [ "",             "https://example.org/",       1 ],
+        [ "",             "https://example.org",        1 ],
+        [ "",             "https://auth.example.comx/", 1 ],
+        [ "",             "https://otherexample.com/",  1 ],
+    );
+    for (@tests) {
+        my ( $domain, $urldc, $result ) = @$_;
+        my $log       = $result ? "is external"    : "is not external";
+        my $domainlog = $domain ? "domain $domain" : "empty domain";
+        is(
+            $cda_plugin->_cookie_can_be_seen( "https://example.com",
+                $domain, $urldc, $urldc )
+              || 0,
+            $result,
+            "URL $urldc $log for $domainlog"
+        );
+    }
+};
+count(1);
+
 # CDA with unauthentified user
 ok(
     $res = $client->_get(

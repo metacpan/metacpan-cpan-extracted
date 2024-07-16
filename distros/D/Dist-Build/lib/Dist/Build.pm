@@ -1,5 +1,5 @@
 package Dist::Build;
-$Dist::Build::VERSION = '0.005';
+$Dist::Build::VERSION = '0.006';
 use strict;
 use warnings;
 
@@ -16,7 +16,7 @@ use File::Spec::Functions qw/catfile catdir abs2rel /;
 use Getopt::Long 2.36 qw/GetOptionsFromArray/;
 use Parse::CPAN::Meta;
 
-use ExtUtils::Builder::Planner 0.007;
+use ExtUtils::Builder::Planner 0.008;
 use Dist::Build::Serializer;
 
 my $json_backend = Parse::CPAN::Meta->json_backend;
@@ -198,7 +198,7 @@ Dist::Build - A modern module builder, author tools not included!
 
 =head1 VERSION
 
-version 0.005
+version 0.006
 
 =head1 SYNOPSIS
 

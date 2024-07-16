@@ -15,11 +15,11 @@ Sub::Private - Private subroutines and methods
 
 =head1 VERSION
 
-Version 0.03
+Version 0.04
 
 =cut
 
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 
 =head1 SYNOPSIS
 
@@ -37,11 +37,11 @@ our $VERSION = '0.03';
 =cut
 
 sub UNIVERSAL::Private :ATTR(CODE,BEGIN) {
-    my ($package, $symbol, $referent, $attr, $data) = @_;
+	my ($package, $symbol, $referent, $attr, $data) = @_;
 
-    on_scope_end {
-        namespace::clean->clean_subroutines( get_code_info( $referent ) );
-    }
+	on_scope_end {
+		namespace::clean->clean_subroutines( get_code_info( $referent ) );
+	}
 }
 
 =head1 DESCRIPTION
@@ -80,10 +80,6 @@ You can also look for information at:
 =item * RT: CPAN's request tracker
 
 L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=Sub-Private>
-
-=item * CPAN Ratings
-
-L<http://cpanratings.perl.org/d/Sub-Private>
 
 =item * Search CPAN
 

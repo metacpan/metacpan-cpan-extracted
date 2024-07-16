@@ -1,6 +1,6 @@
 NAME
-    Tk::TextHighlight - a TextUndo/SuperText widget with syntax highlighting
-    capabilities, can also use Kate languages.
+    Tk::TextHighlight - a Tk::TextUndo/Tk::Text::SuperText widget with
+    syntax highlighting capabilities, can also use Kate languages.
 
     Tk::ROTextHighlight - a Read-only version of this widget.
 
@@ -9,99 +9,215 @@ SYNOPSIS
          my $haveKateInstalled = 0;
          eval "use Syntax::Highlight::Engine::Kate; \$haveKateInstalled = 1; 1";
 
-         require Tk::TextHighlight;
+         use Tk::TextHighlight;  #-OR- use Tk::ROTextHighlight;
 
          my $m = new MainWindow;
 
-         my $e = $m->Scrolled("TextHighlight",
-            -syntax => "Perl",
-            -scrollbars => "se",
-         )->pack(-expand => 1, -fill => "both");
+         my $e = $m->Scrolled('TextHighlight', #NOTE: always "TextHighlight"!
+            -syntax => 'Perl',
+            -commentchar => '#',
+            -scrollbars => 'se',
+         )->pack(-expand => 1, -fill => 'both');
 
          if ($haveKateInstalled) {
-          my ($sections, $kateExtensions) = $e->fetchKateInfo;
-          $e->addKate2ViewMenu($sections);
+            my ($sections, $kateExtensions) = $e->fetchKateInfo;
+            $e->addKate2ViewMenu($sections);
          }
+
          $m->configure(-menu => $e->menu);
          $m->MainLoop;
 
 DESCRIPTION
-    Tk::TextHighlight inherits Tk::TextUndo and all its options and methods.
-    Besides syntax highlighting, methods are provided for commenting and
-    uncommenting as well as indenting and unindenting a selected area,
-    matching pairs of braces, brackets and brackets and curlies and
-    automatic indenting of new lines. The included companion module
-    Tk::ROTextHighlight provides all the same functionality in a "readonly"
-    widget for text viewers, etc. Tk::TextHighlight also supports
-    highlighting of all the lauguages of the
-    Syntax::Highlight::Engine::Kate, if that module is installed.
+    Tk::TextHighlight inherits Tk::Text::SuperText, if available, or
+    Tk::TextUndo and all its options and methods. It provides an enhanced Tk
+    Text widget that specializes in code-editing by additionally providing
+    smart brace-matching / jumping between braces (but skipping ones in
+    comments), language-specific text color-highlighting, and a "readonly"
+    option for simply viewing text one doesn't want changed. Besides syntax
+    highlighting, methods and bindings are provided for commenting and
+    uncommenting as well as reindenting and unindenting a selected area,
+    automatic intelligent indenting of new lines.
 
-    If you want your widget to be read-only, then require
-    Tk::ROTextHighlight, which is based on Tk::ROText instead of
-    Tk::TextUndo.
+    Setting the *-readonly* flag or creating a symlink to the
+    TextHighlight.pm source file and naming it ROTextHighlight.pm, then
+    "using" it ("use Tk::ROTextHighlight") in the program provides all the
+    same functionality in a "readonly" widget for text viewers, etc.
+    Tk::TextHighlight also supports highlighting of all the many lauguages
+    and file formats supported by Syntax::Highlight::Engine::Kate, if that
+    optional module is installed. For Perl programmers in particular,
+    TextHighlight can use either the module Syntax::Highlight::Perl, or the
+    optional and better one: Syntax::Highlight::Perl::Improved. There is
+    also a "PerlCool" version that leans toward "cooler" colors (greens,
+    blues, violets), preferred by the author. One can also choose Kate's
+    Perl highlighter: Syntax::Highlight::Engine::Kate::Perl, if the Kate
+    modules are installed.
 
     Syntax highlighting is done through a plugin approach. Adding languages
     is a matter of writing plugin modules. Theoretically this is not limited
     to programming languages. The plugin approach could also provide the
     possibility for grammar or spell checking in spoken languages.
 
-    Currently there is support for Bash, HTML, Perl, Pod, Kate, and
-    Xresources.
+    Currently there is built-in support for Bash, HTML, Perl, Pod, and
+    Xresources. Optionally many others if *Syntax::Highlight::Engine::Kate*
+    is installed.
 
-OPTIONS
+STANDARD OPTIONS
+    -background -borderwidth -cursor -exportselection -font -foreground
+    -highlightbackground -highlightcolor -highlightthickness
+    -insertbackground -insertborderwidth -insertofftime -insertontime
+    -insertwidth -padx -pady -relief -selectbackground -selectborderwidth
+    -selectforeground -setgrid -spacing1 -spacing2 -spacing3 -state -tabs
+    -takefocus -xscrollcommand -yscrollcommand
+
+WIDGET-SPECIFIC OPTIONS
     Name: autoindent
     Class: Autoindent
     Switch: -autoindent
         Boolean, when you press the enter button, should the next line begin
-        at the same position as the current line or not. By default false.
+        at the same position as the current line or not. This indentation
+        works with either spaces or tabs are used (See also: *-indentchar*).
+
+        Default: false (start each new line at column 0).
 
     Name: commentchar
     Class: Commentchar
     Switch: -commentchar
-        By default "#".
+        This is slightly misleading - it represents a string of one or more
+        characters. Normally when using the *selectionComment()* method,
+        each selected line is prepended with the commentchar string. A
+        Special exception is made if the string is "/*", "(*", or "<!--", as
+        these normally represent comment braces, which must have a beginning
+        and ending string, and the selectionComment() method automatically
+        recognizes these special cases and instead automatically wraps the
+        entire block of selected text with the specified commentchar string
+        and it's proper terminating string. When specifying the *-syntax*
+        parameter when creating the TextHighlight widget, and editing files
+        containing C code, HTML, Pascal, etc. they should consider also
+        specifying the corresponding *-commentchar* string appropriate for
+        files containing that language. See also *-syntaxcomments*
+
+        Default: "#".
 
     Name: disablemenu
     Class: Disablemenu
     Switch: -disablemenu
-        Boolean, by default 0. In case you don't want the menu under the
-        right mouse button to pop up.
+        Boolean, if *true*, disables the popup menu under the right mouse
+        button (ButtonPress-3). Unlike -noPopupMenu This can be configured
+        programatically at run-time. See also -noPopupMenu.
+
+        Default: false (Menu will popup when right mouse button is pressed
+        over the widget).
 
     Name: highlightInBackground
-    Class: highlightInBackground
+    Class: HighlightInBackground
     Switch: -highlightInBackground
-        Whether or not to do highlighting in background freeing up the mouse
-        and keyboard for most events (experimental). May be 1 or 0. Default
-        0 (Do not highlight in background - block input until highlighting
-        completed).
+        Perform rehighlighting (after text changes) in a background thread
+        (if true), which, in most cases this should be desirable.
+
+        Default: false *Recommended value now: true* (modern multi-threaded
+        computer processors should handle this fine now)!
 
     Name: indentchar
     Class: Indentchar
     Switch: -indentchar
         String to be inserted when the [Tab] key is pressed or when
-        indenting. Default "\t".
+        indenting. Can also be set to one or more spaces.
+
+        Default: "\t" (tab character).
 
     Name: match
     Class: Match
     Switch: -match
-        string of pairs for brace/bracket/curlie etc matching. If this
+        string of pairs for brace/bracket/curly etc matching. If this
         description doesn't make anything clear, don't worry, the default
         setting will:
 
-         '[]{}()'
+        Default: *"[]{}()"*
 
-        if you don't want matching to be available, simply set it to ''.
+        if you don't want matching to be available, simply set it to "".
 
     Name: matchoptions
     Class: Matchoptions
     Switch: -matchoptions
-        Options list for the tag 'Match'. By default:
+        Options list for the tag 'Match' (the temporary color of the matched
+        brace character, if found, while the cursor is on the other matching
+        brace.
 
-         [-background => 'red', -foreground => 'yellow']
+        Default: [-background = 'red', -foreground => 'yellow']>
 
         You can also specify this option as a space separated string. Might
-        come in handy for your Xresource files.
+        come in handy for your Xresource files, ie. "-background red
+        -foreground yellow".
 
-         "-background red -foreground yellow"
+    Name: Not available
+    Class: Not available
+    Switch: -noPlugInit
+        Disables TextHighlight feature of initializing default rules when no
+        .rules file present.
+
+        Default: false (Enable initialing with default rules).
+
+    Name: noPopupMenu
+    Class: NoPopupMenu
+    Switch: -noPopupMenu
+        Disables the right mouse button (Button-3) popup menu common on
+        Tk::Text* widgets.
+
+        NOTE: Unlike -disablemenu, this must be set in initial configuration
+        and can not be changed by configure() later. (See also
+        -disablemenu).
+
+        Default: false (Menu will be created and will popup when right mouse
+        button is pressed over the widget - unless -disablemenu is later
+        configured to true).
+
+    Name: Not available
+    Class: Not available
+    Switch: -noRulesEditMenu
+        Don't show the Rules Editor option in the View submenu of the
+        right-click menu.
+
+        Default: false (Include this option item in the View submenu).
+
+    Name: Not available
+    Class: Not available
+    Switch: -noRulesMenu
+        Don't show any of the TextHighlight menu items (combines
+        -noSyntaxMenu, -noRulesEditMenu, and -noSaveRulesMenu options.
+
+        Default: false (Include all three, except any blocked by the more
+        specific options described above).
+
+    Name: Not available
+    Class: Not available
+    Switch: -noSaveRulesMenu
+        Don't show the Save Rules submenu option in the View submenu of the
+        right-click menu.
+
+        Default: false (Include this option item in the View submenu).
+
+    Name: Not available
+    Class: Not available
+    Switch: -noSyntaxMenu
+        Don't show the Syntax submenu option in the View submenu of the
+        right-click menu.
+
+        Default: false (Include this submenu in the View submenu).
+
+    Name: readOnly
+    Class: ReadOnly
+    Switch: -readonly
+        If set to a true value, causes the TextHighlight widget to be
+        "readonly" (content not changeable by the user). If false, the
+        widget content is editable. The default is 0 (false), unless a copy
+        of or symlink to the TextHighlight.pm module file named
+        *"ROTextHighlight.pm"*, and the module is "used" as
+        "Tk::Text::ROTextHighlight", in which case the value is fixed as 1
+        (*true*), regardless of this setting, and can not be changed to
+        false.
+
+        Default: false (if "use TextHighlight"), true (if "use
+        ROTextHighlight").
 
     Name: not available
     Class: not available
@@ -118,20 +234,36 @@ OPTIONS
         highlighted. See the language modules for more information about
         this data structure.
 
+        Default: The rules set by whatever language plugin is in use.
+
     Name: rulesdir
     Class: Rulesdir
     Switch -rulesdir
         Specify the directory where this widget stores its coloring
-        defenitions. Files in this directory are stored as "HTML.rules",
+        definitions. Files in this directory are stored as "HTML.rules",
         "Perl.rules" etc. By default it is set to '', which means that when
         you switch syntax the highlighting rules are not loaded or stored.
         The hard coded defaults in the language modules will be used.
+
+    Name: not available
+    Class: not available
+    Switch -smartindent
+        Boolean, when pressing the enter button *and* *-autoindent* is also
+        true, the indentation is also affected by the last character on the
+        previous line, ie. if "{", "(", "[", etc. is an opening bracket
+        character, and on the indentation and first character of the
+        following line, ie. "}", ")", etc., to be (hopefully) more
+        convenient for programmers.
+
+        Default: true (but practically false, since *-autoindent* currently
+        defaults to false).
 
     Name: syntax
     Class: Syntax
     Switch: -syntax
         Specifies the language for highlighting. At this moment the possible
-        values are None, HTML, Perl, Pod Kate:Language, and Xresources.
+        values are None, HTML, Perl, Pod Kate::*Language*, and Xresources.
+
         Default: None
 
         If Syntax::Highlight::Engine::Kate is installed, you may specify any
@@ -140,68 +272,162 @@ OPTIONS
         Alternatively it is possible to specify a reference to your
         independent plugin.
 
+    Name: syntax
+    Class: Syntax
+    Switch: -syntaxcomments
+        Boolean, when set to *true*, the *-commentchar* will be set
+        (overridden) to the comment string for the specific language
+        (<I-syntax>) for certain supported languages (C, C++, CSS, HTML,
+        Modula-II, Pascal, Perl, and XML).
+
+        Default: false (use the preset string in -commentchar.
+
     Name: Not available
     Class: Not available
     Switch: -updatecall
         Here you can specify a callback that will be executed whenever the
         insert cursor has moved or text has been modified, so your
         application can keep track of position etc. Don't make this callback
-        to heavy, the widget will get sluggish quickly.
+        to heavy, the widget will get sluggish quickly!
 
-    Name: Not available
-    Class: Not available
-    Switch: -noPlugInit
-        Disables TextHighlight feature of initializing default rules when no
-        .rules file present.
-
-    Name: Not available
-    Class: Not available
-    Switch: -noSyntaxMenu
-        Don't show the Syntax submenu option in the View submenu of the
-        right-click menu.
-
-    Name: Not available
-    Class: Not available
-    Switch: -noSaveRulesMenu
-        Don't show the Save Rules submenu option in the View submenu of the
-        right-click menu.
-
-    Name: Not available
-    Class: Not available
-    Switch: -noRulesEditMenu
-        Don't show the Rules Editor option in the View submenu of the
-        right-click menu.
-
-    Name: Not available
-    Class: Not available
-    Switch: -noRulesMenu
-        Don't show any of the TextHighlight menu items (combines
-        -noSyntaxMenu, -noRulesEditMenu, and -noSaveRulesMenu options.
-
-    There are some undocumented options. They are used internally. It is
-    propably best to leave them alone.
+        Default: none (sub {}
 
 METHODS
-    doAutoIndent
-        Checks the indention of the previous line and indents the line where
-        the cursor is equally deep.
+    addKate2ViewMenu(<sections)>
+        Inserts the list of Kate-supported languages to the widget's Syntax.
+        View right-mousebutton popup menu along with the basic
+        TextHight-supported choices. These choices can then be selected to
+        change the current language-highlighting used in the text in the
+        widget. sections is a hash-ref normally returned as the 1st item in
+        the list returned by fetchKateInfo. NOTE: No menu items will be
+        added if Kate is not installed or if -noRulesMenu or -noSyntaxMenu
+        are set!
 
-    highlight(*$begin*, *$end*);
+    beginUndoBlock
+        Used in application programs when wishing to group together a series
+        of edits that, in the event of a call to Undo() should be undone
+        together as a group. This method should be called before the first
+        insertion or deletion. See also endUndoBlock.
+
+    clipboardCopy
+        Copies any selected text to the system's CLIPBOARD paste-buffer.
+
+        Default bindings: Control-c.
+
+    clipboardCut
+        Default bindings: Control-x.
+
+        Deletes the selected text from the widget and puts it in the
+        system's CLIPBOARD paste-buffer.
+
+    clipboardPaste
+        Pastes the content of the system's CLIPBOARD paste-buffer at the
+        current cursor position and selects it.
+
+        Default bindings: Control-v.
+
+    delete(*index1, ?index2?*)
+        Delete a range of characters from the text. If both index1 and
+        index2 are specified, then delete all the characters starting with
+        the one given by index1 and stopping just before index2 (i.e. the
+        character at index2 is not deleted). If index2 doesn't specify a
+        position later in the text than index1 then no characters are
+        deleted. If index2 isn't specified then the single character at
+        index1 is deleted. It is not allowable to delete characters in a way
+        that would leave the text without a newline as the last character.
+        The command returns an empty string. If more indices are given,
+        multiple ranges of text will be deleted. All indices are first
+        checked for validity before any deletions are made. They are sorted
+        and the text is removed from the last range to the first range to
+        deleted text does not cause a undesired index shifting side-effects.
+        If multiple ranges with the same start index are given, then the
+        longest range is used. If overlapping ranges are given, then they
+        will be merged into spans that do not cause deletion of text outside
+        the given ranges due to text shifted during deletion.
+
+    doAutoIndent(*boolean*)
+        Checks the indention of the previous line and indents the line where
+        the cursor is equally deep. If a <true> value is passed in, and
+        *-autoindent* is set to *true*. Otherwise, *false* will cause no
+        indentation to be added when pressing the *Return* key. Note if both
+        *-autoindent* and *-smartindent* are set to *true* values,
+        indentation will also be affected by the indentation of the next
+        line, and whether the current line ends with an opening brace
+        character or the next line begins with an opening brace character,
+        causing indentation to be more typical to that used in computer
+        source code. *-smartindent* is ignored if *-autoindent* is false.
+
+        Default bindings: Return key: doAutoIndent(*true*), Shift-Return:
+        doAutoIndent(*false*)
+
+    EmptyDocument()
+        Resets the widget to an empty state (ie. $w->delete('0.0', 'end'),
+        except is actionable even if the widget is readonly!
+
+    extendSelect
+        Selects text between the insert cursor to the current mouse position
+        when pressed, then adjusted again if the mouse is released in a
+        different place than when pressed. The insert cursor should remain
+        in it's current location (like a pivot point).
+
+        Default bindings: Shift-ButtonPress-3, and ButtonPress-3 if the
+        *-noPopupMenu* option is set to *true*.
+
+    endUndoBlock
+        Used in application programs when wishing to group together a series
+        of edits that, in the event of a call to Undo() should be undone
+        together as a group. This method should be called after the last
+        insertion or deletion. See also beginUndoBlock.
+
+    fetchKateInfo
+        Returns 3 hashrefs containing information about the installed Kate
+        highlight engine (if installed). The three hashrefs contain in
+        order: The first can be passed to the addkate2viewmenu() method to
+        add the Kate languages to the Syntax.View menu. the keys are
+        "Kate::language" and the values are what's needed to instantiate
+        Kate for that language. the 2nd is a list of file- extension pattern
+        suitable for matching against file-names and the values are the
+        reccomended Kate language for that file-extension. It will return
+        (undef, undef, undef) if Kate is not installed.
+
+    get(*index1, ?index2?*)
+        Return a range of characters from the text. The return value will be
+        all the characters in the text starting with the one whose index is
+        index1 and ending just before the one whose index is index2 (the
+        character at index2 will not be returned). If index2 is omitted then
+        the single character at index1 is returned. If there are no
+        characters in the specified range (e.g. index1 is past the end of
+        the file or index2 is less than or equal to index1) then an empty
+        string is returned. If the specified range contains embedded
+        windows, no information about them is included in the returned
+        string. If multiple index pairs are given, multiple ranges of text
+        will be returned in a list. Invalid ranges will not be represented
+        with empty strings in the list. The ranges are returned in the order
+        passed to get.
+
+    getViewMenu
+        Returns the "View" submenu of the Popup menu, which the application
+        can clone and include in their application's menu, particularly if
+        they do not wish to use the normal mouse button-3 popup menu. Note,
+        this may not work (untested) if *-noPopupMenu* is set to *true*, but
+        will if *-disablemenu* is (See *-disablemenu* and *-noPopupMenu*).
+
+    highlight(*$begin*, *$end*)
         Does syntax highlighting on the section of text indicated by $begin
         and $end. $begin and $end are linenumbers not indexes!
 
-    highlightCheck>(*$begin*, *$end*);
+    highlightCheck(*$begin*, *$end*)
         An insert or delete has taken place affecting the section of text
         between $begin and $end. highlightCheck is being called after and
         insert or delete operation. $begin and $end (again, linenumbers, not
         indexes) indicate the section of text affected. highlightCheck
         checks what needs to be highlighted again and does the highlighting.
 
-    highlightLine(*$line*);
+    highlightLine(*$line*)
         Does syntax highlighting on linenumber $line.
 
     highlightPlug
-        Checks wether the appropriate highlight plugin has been loaded. If
+        Checks whether the appropriate highlight plugin has been loaded. If
         none or the wrong one is loaded, it loads the correct plugin. It
         returns a reference to the plugin loaded. It also checks wether the
         rules have changed. If so, it restarts highlighting from the
@@ -215,7 +441,7 @@ METHODS
         disk using rulesFetch. If this fails as well it will use the
         hardcoded rules from the syntax plugin.
 
-    highlightPurge(*$line*);
+    highlightPurge(*$line*)
         Tells the widget that the text from linenumber $line to the end of
         the text is not to be considered highlighted any more.
 
@@ -223,25 +449,104 @@ METHODS
         Calls visualEnd to see what part of the text is visible on the
         display, and adjusts highlighting accordingly.
 
-    linenumber(*$index*);
+    insert(*index, chars, ?tagList, chars, tagList, ...?*)
+        Inserts all of the chars arguments just before the character at
+        index. If index refers to the end of the text (the character after
+        the last newline) then the new text is inserted just before the last
+        newline instead. If there is a single chars argument and no tagList,
+        then the new text will receive any tags that are present on both the
+        character before and the character after the insertion point; if a
+        tag is present on only one of these characters then it will not be
+        applied to the new text. If tagList is specified then it consists of
+        a list of tag names; the new characters will receive all of the tags
+        in this list and no others, regardless of the tags present around
+        the insertion point. If multiple chars-tagList argument pairs are
+        present, they produce the same effect as if a separate insert widget
+        command had been issued for each pair, in order. The last tagList
+        argument may be omitted.
+
+    Insert(string)
+        Do NOT confuse this with the lower-case insert method. Insert string
+        at the point of the insertion cursor. If there is a selection in the
+        text, and it covers the point of the insertion cursor, then it
+        deletes the selection before inserting.
+
+    InsertKeypress(character)
+        Inserts character at the insert mark. If in overstrike mode, it
+        firsts deletes the character at the insert mark.
+
+    insertTab
+        Inserts the -indentchar string (Default is *tab* character. See
+        *-indentchar*
+
+        Default bindings: Tab key
+
+    insertTabChar
+        Inserts a *tab* character (always). See *-indentchar*
+
+        Default bindings: Alt-Tab
+
+    linenumber(*$index*)
         Returns the linenumber part of an index. You may also specify
         indexes like 'end' or 'insert' etc.
+
+    jumpToMatchingChar(*boolean*)
+        If the cursor is sitting on a bracing character (see -match option),
+        the cursor will jump to the matching character. If passed a *true*
+        value, then the two brace characters and the text between them will
+        be selected. There is no point in calling this method directly, but
+        rather it can be bound to a key-sequence (Default is currently
+        Control-p (jump only), and Control-P (jump and select eveything
+        inbetween).
+
+    Load(*$filename*)
+        Replaces the content of the widget with the content of file
+        $filename. Returns 1 (*true*) if successful, 0 (*false*) otherwise.
+        One can check the Perl variable $! for error message on failure.
 
     matchCheck
         Checks wether the character that is just before the 'insert'-mark
         should be matched, and if so, should it match forwards or backwards.
         It then calls matchFind.
 
-    matchFind(*$direction*, *$char*, *$match*, *$start*, *$stop*);
+    matchFind(*$direction*, *$char*, *$match*, *$start*, *$stop*)
         Matches $char to $match, skipping nested $char/$match pairs, and
         displays the match found (if any).
+
+    pastePrimaryAtMouse
+        Paste the primary selection at the current mouse position.
+
+        Default bindings: ButtonRelease-2
+
+    PostPopupMenu
+        Pops up the menu associated with Tk::Text* widgets, including
+        submenu items associated with TextHighlight, ie. the language
+        plugins, rules editor, etc. Note: both *-noPopupMenu* and
+        *-disablemenu* must NOT be set to *true*.
+
+        Default bindings: ButtonPress-3 (mouse button 3), Control-Key-m
+
+    readonly [ (*boolean*) ]
+        Get or set readonly status for the widget. If a *true* or *false*
+        value are passed in, the widget's state will be configured to either
+        *readonly* or *normal* (editable) respectively. This should normally
+        be done by the configure(-readonly, *boolean*) function. NOTE: If
+        using via "use ROTextHighlight" (copy or symlink), then the readonly
+        state is fixed and any changes here will be ignored.
+
+    Redo
+        Reapply the last change (or block of changes) undone by the last
+        call to Undo.
+
+    ResetUndo
+        Reset (clear) the Undo history stack.
 
     rulesEdit
         Pops up a window that enables the user to set the color and font
         options for the current syntax.
 
     rulesFetch
-        Checks wether the file
+        Checks whether the file:
 
          $text->cget('-rulesdir') . '/' . $text->cget('-syntax') . '.rules'
 
@@ -267,35 +572,31 @@ METHODS
     selectionUnIndent
         Unindent currently selected text.
 
-    setRule(rulename,colorattribute,color)
+    setRule(*rulename, colorattribute, color*)
         Allows altering of individual rules by the programmer.
 
-    fetchKateInfo
-        Fetches 3 hashrefs containing information about the installed Kate
-        highlight engine (if installed). The three hashrefs contain in
-        order: The first can be passed to the addkate2viewmenu() method to
-        add the Kate languages to the Syntax.View menu. the keys are
-        "Kate::language" and the values are what's needed to instantiate
-        Kate for that language. the 2nd is a list of file- extension pattern
-        suitable for matching against file-names and the values are the
-        reccomended Kate language for that file-extension. It will return
-        (undef, undef, undef) if Kate is not installed.
+    Undo
+        Undo the last change (or block of changes) to the text (the top of
+        the Undo stack).
 
-    addKate2ViewMenu($sections)
-        Inserts the list of Kate-supported languages to the widget's
-        Syntax.View right-mousebutton popup menu along with the basic
-        TextHight-supported choices. These choices can then be selected to
-        change the current language-highlighting used in the text in the
-        widget. $sections is a hash-ref normally returned as the 1st item in
-        the list returned by fetchKateInfo. NOTE: No menu items will be
-        added if Kate is not installed or if -noRulesMenu or -noSyntaxMenu
-        is set!
-
-SYNTAX HIGHLIGHTING
+SYNTAX HIGHLIGHTING, The Gory Details
     This section is a brief description of how the syntax highlighting
-    process works.
+    process works. Note: Most users should not need to worry about this
+    stuff when simply incorporating a Tk::TextHighlight widget into their
+    Perl/Tk application, except for perhaps writing a few lines of code in
+    their application to determine the value of the -syntax flag (see the
+    SYNOPSIS section for an example) from the content or extension of a file
+    they plan to edit in the widget, ie.:
 
-    Initiating plugin
+     $e->configure(-syntax => 'Perl')  if (filename =~ /\.p[lm]$/);
+
+    Users will hardly ever need to change the default *rules* for any of the
+    language plugins, as Tk::TextHighlight will automatically change any
+    highlight rule colors that match (clash with) the user's specified
+    background color, preventing invisible text, when the plugin is
+    initiated!
+
+    Initiating plugin:
 
     The highlighting plugin is only then initiated when it is needed. When
     some highlighting needs to be done, the widget calls highlightPlug to
@@ -341,52 +642,10 @@ SYNTAX HIGHLIGHTING
     foreground. Jumping directly to the end of a long fresh loaded textfile
     may very well take a couple of seconds.
 
-    Highlighting is done on a line to line basis. At the end of each line
+    Highlighting is done on a line by line basis. At the end of each line
     the highlighting status is saved in the list in -colorinf, so when
     highlighting the next line, the highlight method of TextHighlight will
     know how to begin.
-
-    The line that needs highlighting is offered to the highlight method of
-    the plugin. This method returns a list of offset and tagname pairs. Take
-    for example the following line of perl code.
-
-     my $mother = 'older than i am';
-
-    The highlight method of the Perl plugin will return the following list;
-
-     (2 => 'Reserved',    #'my' is a reserved word
-      1 => 'DEFAULT',     #Space
-      7 => 'Variable',    #$mother
-      1 => 'DEFAULT',     #Space
-      1 => 'Operator',    #'='
-      1 => 'DEFAULT',     #Space
-      17 => 'String',     #'older than i am'
-      1 => 'DEFAULT',)    #;
-
-    The highlight method of TextHighlight will then mark positions 0 to 2 as
-    'Reserved', positions 2 to 3 as 'DEFAULT', positions 3 to 10 as
-    'Variable', etc.
-
-WRITING PLUGINS
-    After writing a couple of plugins myself i have come to a couple of
-    guidelines about how to set them up. If you are interested in adding
-    support for your own syntax highlighting problem or language this
-    section is of interest to you.
-
-    From scratch
-
-    If you choose to build a plugin completely from scratch, your module
-    needs to meet the following requirements.
-
-     - If you want to write a formal addition to Tk::TextHighlight, 
-       your plugin must be in the namespace 
-       Tk::TextHighlight::YourSyntax.
-
-     - The constructor is called 'new', and it should accept 
-       a reference a reference to a list of rules as parameters.
-
-     - The following methods will be called upon by Tk::TextHighlight:  
-       highlight, stateCompare, rules, setSate, getState, syntax.
 
     More information about those methods is available in the documentation
     of Tk::TextHighlight::None and Tk::TextHighlight::Template.
@@ -508,6 +767,9 @@ CONTRIBUTIONS
     accompanied with the sample of code that you used for testing.
 
 AUTHOR
+    Jim Turner, "<https://metacpan.org/author/TURNERJW>"
+
+COPYRIGHT
     This module is Copyright (C) 2007-2024 by
 
     Jim Turner, "<turnerjw784 at yahoo.com>"
@@ -524,8 +786,8 @@ AUTHOR
     Thanks go to Mr. Hans Jeuken for his great work in making this and the
     Kate modules possible. He did the hard work!
 
-LICENSE AND COPYRIGHT
-    Copyright 2007-2024 Jim Turner.
+LICENSE
+    Copyright 2007-2024 Jim Turner. "<turnerjw784 at yahoo.com>"
 
     This program is free software; you can redistribute it and/or modify it
     under the terms of the the Artistic License (2.0). You may obtain a copy
@@ -564,9 +826,15 @@ LICENSE AND COPYRIGHT
     EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 BUGS
-    Unknown. If you find any, please contact the author.
+    Please report any bugs or feature requests to bug-tk-TextHighlight at
+    rt.cpan.org, or through the web interface at
+    https://rt.cpan.org/NoAuth/ReportBug.html?Queue=Tk-TextHighlight. I will
+    be notified, and then you'llautomatically be notified of progress on
+    your bug as I make changes.
 
 TODO
+    Consider adding some of the Tk::TextUndo methods not currently provided
+    by either this module Tk::Text, or Tk::Text::SuperText.
     Add additional language modules. I am going to need help on this one. We
     currently support all the original Tk::CodeText languages (included)
     plus all those supported by Syntax::Highlight::Engine::Kate, if it's
@@ -575,7 +843,6 @@ TODO
     with the language specification can actually be verified.
 
 SEE ALSO
-    Tk::Text, Tk::TextUndo, Tk::Text::SuperText, Tk::TextHighlight::Bash,
-    Tk::CodeText, Syntax::Highlight::Perl::Improved,
-    Syntax::Highlight::Engine::Kate
+    Tk::Text, Tk::ROText, Tk::TextUndo, Tk::Text::SuperText, Tk::CodeText,
+    Syntax::Highlight::Perl::Improved, Syntax::Highlight::Engine::Kate
 

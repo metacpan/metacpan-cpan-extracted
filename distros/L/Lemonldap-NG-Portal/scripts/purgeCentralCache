@@ -290,7 +290,41 @@ for my $options (@backends) {
     if (    $options->{backend} =~ /^Apache::Session::(?:Browseable::)?LDAP$/i
         and $force )
     {
-        my $ldap = Net::LDAP->new( $options->{ldapServer} );
+        my $useTls = 0;
+        my $tlsParam;
+        my @servers = ();
+        foreach my $server ( split /[\s,]+/, $options->{ldapServer} ) {
+            if ( $server =~ m{^ldap\+tls://([^/]+)/?\??(.*)$} ) {
+                $useTls   = 1;
+                $server   = $1;
+                $tlsParam = $2 || "";
+            }
+            else {
+                $useTls = 0;
+            }
+            push @servers, $server;
+        }
+        my $ldap = Net::LDAP->new( \@servers, keepalive => 1, onerror   => undef, );
+        unless ($ldap) {
+            print STDERR "Unable to connect to LDAP server\n";
+            $nb_error++;
+            next;
+        }
+
+        # Start TLS if needed
+        if ($useTls) {
+            my %h = split( /[&=]/, $tlsParam );
+            $h{verify} ||= $options->{ldapVerify} || "require";
+            $h{cafile} ||= $options->{ldapCAFile} if ( $options->{ldapCAFile} );
+            $h{capath} ||= $options->{ldapCAPath} if ( $options->{ldapCAPath} );
+            my $start_tls = $ldap->start_tls(%h);
+            if ( $start_tls->code ) {
+                print STDERR "STARTTLS error: " . $start_tls->code . ': ' . $start_tls->error;;
+                $nb_error++;
+                next;
+            }
+        }
+
         my $bind = $ldap->bind( $options->{ldapBindDN},
             password => $options->{ldapBindPassword} );
         my $attrId = $options->{ldapAttributeId} | "cn";

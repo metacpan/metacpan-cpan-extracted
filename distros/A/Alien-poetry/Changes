@@ -1,3 +1,9 @@
+1.000003 - 2024-07-15
+
+  [BUG FIXES]
+
+  * downgrade urllib3 to 1.26.6 to avoid libssl error
+
 1.000002 - 2024-07-11
 
   [BUG FIXES]

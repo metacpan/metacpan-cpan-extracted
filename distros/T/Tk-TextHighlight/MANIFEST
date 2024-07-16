@@ -4,7 +4,6 @@ Makefile.PL
 MANIFEST
 META.yml
 README
-lib/Tk/ROTextHighlight.pm
 lib/Tk/TextHighlight.pm
 lib/Tk/TextHighlight/Bash.pm
 lib/Tk/TextHighlight/HTML.pm

@@ -1,5 +1,9 @@
 Revision history for Dist-Build
 
+0.006     2024-07-15 21:22:15+02:00 Europe/Brussels
+          - Make mkdir nodes non-phony
+          - Provide better messages for most actions
+
 0.005     2024-07-14 16:30:28+02:00 Europe/Brussels
           - Fix argument handling in mkdir
           - Add dry_run support to install deserializer

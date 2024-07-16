@@ -4,7 +4,7 @@ Astro::MoonPhase::Simple - Calculate the phase of the Moon on a given time witho
 
 # VERSION
 
-Version 0.01
+Version 0.02
 
 # SYNOPSIS
 
@@ -18,7 +18,7 @@ checking.
     use Astro::MoonPhase::Simple;
 
     my $res = calculate_moon_phase({
-      'date' => '1974-07-14',
+      'date' => '1974-07-15',
       'timezone' => 'Asia/Nicosia',
     });
     print "moon is ".$res->{'MoonPhase%'}."% full\n";
@@ -26,12 +26,20 @@ checking.
 
     print $res->{'asString'};
 
-    # alternatively provide a location instead of a timezone
-    # to deduce the timezone
+    # alternatively provide location coordinates
+    # (instead of timezone) to deduce the timezone
     my $res = calculate_moon_phase({
-      'date' => '1974-07-14',
+      'date' => '1974-07-15',
       'time' => '04:00',
       'location' => {lat=>49.180000, lon=>-0.370000}
+    });
+
+    # alternatively provide a nameplace instead of a timezone
+    # to deduce the timezone
+    my $res = calculate_moon_phase({
+      'date' => '1974-07-15',
+      'time' => '04:00',
+      'location' => 'Nicosia',
     });
 
     ...
@@ -55,6 +63,19 @@ specify the location, as a HASHref of `{lon, lat}`,
 the moon is observed from and this
 will deduce the timezone, albeit not always as accurately
 as with specifying a "timezone" explicitly.
+
+[Astro::MoonPhase](https://metacpan.org/pod/Astro%3A%3AMoonPhase) calculates the moon phase
+given an _epoch_. Which is the number of seconds
+since 1970-01-01 on a UTC timezone. This epoch
+is corrected to a _localepoch_ by adding to it
+the specific timezone offset. For example, if you
+specified the timezone to be "China/Beijing" and
+the local time (at the specified timezone) to be 23:00.
+It means UTC time is 15:00. The epoch will be calculated
+on UTC time. However, we add 23:00-15:00=8:00 hours to
+that epoch to make it "localepoch" and this is
+what we pass on to [Astro::MoonPhase](https://metacpan.org/pod/Astro%3A%3AMoonPhase) to calculate
+the moon phase.
 
 On failure it returns `undef`.
 On success it returns a HASHref with keys:
@@ -80,12 +101,15 @@ Example usage: `moon-phase-calculator.pl --date 1974-07-14 --timezone 'Asia/Nico
 
 # SEE ALSO
 
-This package summarises [https://perlmonks.org/?node\_id=11137299](https://metacpan.org/pod/this%20post) over at PerlMonks.org
+This package summarises the post and
+discussion [this post](https://perlmonks.org/?node_id=11137299)
+over at PerlMonks.org
 
-There are some more goodies in that post e.g. PerlMonk Aldebaran does the
-same for planets.
+There are some more goodies in that post e.g. PerlMonk Aldebaran provides
+code for tracking the planets and at different altitudes.
 
-I can't iterate enough that this module wraps the functionality of [Astro::MoonPhase](https://metacpan.org/pod/Astro%3A%3AMoonPhase).
+I can't iterate enough that this module wraps the
+functionality of [Astro::MoonPhase](https://metacpan.org/pod/Astro%3A%3AMoonPhase).
 [Astro::MoonPhase](https://metacpan.org/pod/Astro%3A%3AMoonPhase) does all the heavy lifting.
 
 # AUTHOR
@@ -120,7 +144,7 @@ You can also look for information at:
 
 # ACKNOWLEDGEMENTS
 
-The authors of [Astro::MoonPhase](https://metacpan.org/pod/Astro%3A%3AMoonPhase) takes all the credit.
+The authors of [Astro::MoonPhase](https://metacpan.org/pod/Astro%3A%3AMoonPhase) take all the credit.
 
 # LICENSE AND COPYRIGHT
 
@@ -129,11 +153,3 @@ This software is Copyright (c) 2024 by Andreas Hadjiprocopis.
 This is free software, licensed under:
 
     The Artistic License 2.0 (GPL Compatible)
-
-# POD ERRORS
-
-Hey! **The above document had some coding errors, which are explained below:**
-
-- Around line 311:
-
-    alternative text 'https://perlmonks.org/?node\_id=11137299' contains non-escaped | or /

@@ -1,5 +1,5 @@
 package ExtUtils::Builder::Action::Code;
-$ExtUtils::Builder::Action::Code::VERSION = '0.007';
+$ExtUtils::Builder::Action::Code::VERSION = '0.008';
 use strict;
 use warnings;
 
@@ -24,9 +24,9 @@ sub modules {
 sub execute {
 	my ($self, %opts) = @_;
 	my $code = $self->to_code();
-	if ($opts{logger} && !$opts{quiet}) {
+	if (!$opts{quiet}) {
 		my $message = $self->{message} || $code;
-		$opts{logger}->($message);
+		print "$message\n";
 	}
 	eval $code . '; 1' or die $@;
 	return;
@@ -60,7 +60,7 @@ ExtUtils::Builder::Action::Code - Action objects for perl code
 
 =head1 VERSION
 
-version 0.007
+version 0.008
 
 =head1 SYNOPSIS
 

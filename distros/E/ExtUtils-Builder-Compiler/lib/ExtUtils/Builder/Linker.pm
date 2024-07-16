@@ -1,5 +1,5 @@
 package ExtUtils::Builder::Linker;
-$ExtUtils::Builder::Linker::VERSION = '0.011';
+$ExtUtils::Builder::Linker::VERSION = '0.012';
 use base qw/ExtUtils::Builder::ArgumentCollector ExtUtils::Builder::Binary/;
 
 use ExtUtils::Builder::Action::Command;
@@ -101,11 +101,13 @@ sub pre_action  {
 		);
 	}
 	if ($opts{mkdir}) {
+		my $dirname = File::Basename::dirname($to);
 		push @result, ExtUtils::Builder::Action::Function->new(
 			module    => 'File::Path',
 			function  => 'make_path',
 			exports   => 'explicit',
-			arguments => [ File::Basename::dirname($to) ],
+			arguments => [ $dirname ],
+			message   => "mkdir $dirname",
 		);
 	}
 	return @result;
@@ -137,7 +139,7 @@ ExtUtils::Builder::Linker
 
 =head1 VERSION
 
-version 0.011
+version 0.012
 
 =head1 METHODS
 

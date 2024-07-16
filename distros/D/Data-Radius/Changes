@@ -1,3 +1,11 @@
+1.2.8 2024-07-15
+
+ - enable Message-Authenticator by default and place it as the first attribute,
+   as a mitigation against the Blast-RADIUS https://www.blastradius.fail/
+ - do not add Message-Authenticator attribute to accounting request/response
+ - require Test::Deep@1.130 for Perl v5.10
+ - require Test::NoWarnings for tests
+
 1.2.7 2021-06-23
 
  - fix tests on big-endian platform

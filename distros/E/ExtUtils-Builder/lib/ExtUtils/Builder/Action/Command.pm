@@ -1,5 +1,5 @@
 package ExtUtils::Builder::Action::Command;
-$ExtUtils::Builder::Action::Command::VERSION = '0.007';
+$ExtUtils::Builder::Action::Command::VERSION = '0.008';
 use strict;
 use warnings;
 
@@ -32,7 +32,7 @@ sub execute {
 	my ($self, %opts) = @_;
 	my @command = @{ $self->{command} };
 	my $message = join ' ', map { my $arg = $_; $arg =~ s/ (?= ['#] ) /\\/gx ? "'$arg'" : $arg } @command;
-	$opts{logger}->($message) if $opts{logger} and not $opts{quiet};
+	print "$message\n" if not $opts{quiet};
 	system($quote->(@command)) and die "Could not run command @command" if not $opts{dry_run};
 	return;
 }
@@ -53,7 +53,7 @@ ExtUtils::Builder::Action::Command - An action object for external commands
 
 =head1 VERSION
 
-version 0.007
+version 0.008
 
 =head1 SYNOPSIS
 

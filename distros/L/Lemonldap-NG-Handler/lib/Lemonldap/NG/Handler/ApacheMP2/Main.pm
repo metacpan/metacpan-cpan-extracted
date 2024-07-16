@@ -257,6 +257,12 @@ sub addToHtmlHead {
             $buffer .= $bdata if ($bdata);
             if ($seen_eos) {
                 my $len = length $buffer;
+                if ( !$len ) {
+
+                    # Empty body, decline processing to avoid an
+                    # empty content error
+                    return DECLINED;
+                }
                 $f->r->headers_out->set( 'Content-Length', $len );
                 $f->print($buffer) if ($buffer);
             }

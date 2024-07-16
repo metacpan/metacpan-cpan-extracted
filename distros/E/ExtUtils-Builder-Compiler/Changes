@@ -1,5 +1,9 @@
 Revision history for ExtUtils-Builder-Compiler
 
+0.012     2024-07-15 21:03:08+02:00 Europe/Brussels
+          - Fix implicit mkdir in compile action
+          - Added message to function actions
+
 0.011     2024-07-14 16:57:11+02:00 Europe/Brussels
           - Depend on ExtUtils::Builder 0.007
 

@@ -4,7 +4,7 @@ Plack::Middleware::Greylist - throttle requests with different rates based on ne
 
 # VERSION
 
-version v0.8.0
+version v0.8.1
 
 # SYNOPSIS
 
@@ -157,6 +157,8 @@ block).
 
 If you customise this, then you need to ensure that the counter resets or expires counts after a set period of time,
 e.g. one minute.  If you use a different time interval, then you may need to adjust the ["retry\_after"](#retry_after) time.
+
+You also need to ensure that the cache is shared between processes.
 
 ## callback
 
