@@ -1,3 +1,9 @@
+1.1.5 2024-07-16
+
+- Require Data::Radius v1.2.8
+- The attribute Message-Authenticator now is added by the default,
+  except for the accounting request/response
+
 1.1.4 2022-06-24
 
 - Extended AnyEvent::Radius::Client with bind_ip option

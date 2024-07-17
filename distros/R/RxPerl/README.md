@@ -656,7 +656,7 @@ apply to RxPerl too).
 
     [https://rxjs.dev/api/operators/every](https://rxjs.dev/api/operators/every)
 
-    Works like rxjs's "every", except it emits 1 or 0 instead of true of false.
+    Works like rxjs's "every", and emits true of false.
 
         # 0, complete
         rx_of(5, 10, 15, 18, 20)->pipe(
@@ -793,7 +793,7 @@ apply to RxPerl too).
 
     [https://rxjs.dev/api/operators/isEmpty](https://rxjs.dev/api/operators/isEmpty)
 
-    Works like rxjs's "isEmpty", except it emits 1 or 0 instead of true or false.
+    Works like rxjs's "isEmpty", and emits true or false.
 
         # (pause 1 second) 0, complete
         rx_interval(1)->pipe(

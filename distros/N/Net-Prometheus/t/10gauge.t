@@ -1,9 +1,9 @@
 #!/usr/bin/perl
 
-use strict;
+use v5.14;
 use warnings;
 
-use Test::More;
+use Test2::V0;
 
 use Net::Prometheus::Gauge;
 
@@ -25,7 +25,7 @@ sub HASHfromSample
    my @samples = $gauge->samples;
    is( scalar @samples, 1, '$gauge->samples yields 1 sample' );
 
-   is_deeply( HASHfromSample( $samples[0] ),
+   is( HASHfromSample( $samples[0] ),
       { varname => "test_gauge", labels => [], value => 0, },
       '$samples[0] initially'
    );
@@ -76,7 +76,7 @@ sub HASHfromSample
       labels => [qw( lab )],
    );
 
-   is_deeply( [ $gauge->samples ], [],
+   is( [ $gauge->samples ], [],
       '$gauge->samples initially empty'
    );
 
@@ -87,7 +87,7 @@ sub HASHfromSample
    my @samples = $gauge->samples;
    is( scalar @samples, 2, '$gauge->samples yields 2 samples' );
 
-   is_deeply( [ map { HASHfromSample( $_ ) } @samples ],
+   is( [ map { HASHfromSample( $_ ) } @samples ],
       [
          { varname => "labeled_gauge", labels => [ lab => "one" ], value => 1 },
          { varname => "labeled_gauge", labels => [ lab => "two" ], value => 2 },
@@ -97,7 +97,7 @@ sub HASHfromSample
 
    $gauge->labels( "three" )->set( 3 );
 
-   is_deeply( [ map { HASHfromSample( $_ ) } $gauge->samples ],
+   is( [ map { HASHfromSample( $_ ) } $gauge->samples ],
       [
          { varname => "labeled_gauge", labels => [ lab => "one"   ], value => 1 },
          { varname => "labeled_gauge", labels => [ lab => "three" ], value => 3 },
@@ -136,7 +136,7 @@ sub HASHfromSample
    $gauge->set( { x => 1, y => 0 }, 30 );
    $gauge->set( { x => 1, y => 1 }, 40 );
 
-   is_deeply( [ map { HASHfromSample( $_ ) } $gauge->samples ],
+   is( [ map { HASHfromSample( $_ ) } $gauge->samples ],
       [
          { varname => "multidimensional_gauge", labels => [ x => "0", y => "0" ],
             value => 10 },

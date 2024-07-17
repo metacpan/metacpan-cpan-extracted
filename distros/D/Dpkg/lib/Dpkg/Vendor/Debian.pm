@@ -1,5 +1,5 @@
 # Copyright © 2009-2011 Raphaël Hertzog <hertzog@debian.org>
-# Copyright © 2009, 2011-2017 Guillem Jover <guillem@debian.org>
+# Copyright © 2009-2024 Guillem Jover <guillem@debian.org>
 #
 # Hardening build flags handling derived from work of:
 # Copyright © 2009-2011 Kees Cook <kees@debian.org>
@@ -88,7 +88,21 @@ sub run_hook {
         # Reset umask to a sane default.
         umask 0022;
         # Reset locale to a sane default.
+        #
+        # We ignore the LANGUAGE GNU extension, as that only affects
+        # LC_MESSAGES which will use LC_CTYPE for its codeset. We need to
+        # move the high priority LC_ALL catch-all into the low-priority
+        # LANG catch-all so that we can override LC_* variables, and remove
+        # any existing LC_* variables which would have been ignored anyway,
+        # and would now take precedence over LANG.
+        if (length $ENV{LC_ALL}) {
+            $ENV{LANG} = delete $ENV{LC_ALL};
+            foreach my $lc (grep { m/^LC_/ } keys %ENV) {
+                delete $ENV{$lc};
+            }
+        }
         $ENV{LC_COLLATE} = 'C.UTF-8';
+        $ENV{LC_CTYPE} = 'C.UTF-8';
     } elsif ($hook eq 'backport-version-regex') {
         return qr/~(bpo|deb)/;
     } else {
@@ -449,9 +463,7 @@ sub add_build_flags {
     }
 
     $flags->append($_, $default_flags) foreach @compile_flags;
-    $flags->append($_ . '_FOR_BUILD', $default_flags) foreach @compile_flags;
     $flags->append('DFLAGS', $default_d_flags);
-    $flags->append('DFLAGS_FOR_BUILD', $default_d_flags);
 
     ## Area: abi
 
@@ -479,6 +491,8 @@ sub add_build_flags {
     # Warnings that detect actual bugs.
     if ($flags->use_feature('qa', 'bug-implicit-func')) {
         $flags->append('CFLAGS', '-Werror=implicit-function-declaration');
+    } else {
+        $flags->append('CFLAGS', '-Wno-error=implicit-function-declaration');
     }
     if ($flags->use_feature('qa', 'bug')) {
         # C/C++ flags
@@ -631,6 +645,23 @@ sub add_build_flags {
         if (defined $flag) {
             $flags->append($_, $flag) foreach @compile_flags;
         }
+    }
+
+    # XXX: Handle *_FOR_BUILD flags here until we can properly initialize them.
+    require Dpkg::Arch;
+
+    my $host_arch = Dpkg::Arch::get_host_arch();
+    my $build_arch = Dpkg::Arch::get_build_arch();
+
+    if ($host_arch eq $build_arch) {
+        foreach my $flag ($flags->list()) {
+            next if $flag =~ m/_FOR_BUILD$/;
+            my $value = $flags->get($flag);
+            $flags->append($flag . '_FOR_BUILD', $value);
+        }
+    } else {
+        $flags->append($_ . '_FOR_BUILD', $default_flags) foreach @compile_flags;
+        $flags->append('DFLAGS_FOR_BUILD', $default_d_flags);
     }
 }
 

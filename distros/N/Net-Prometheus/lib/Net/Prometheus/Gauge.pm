@@ -1,15 +1,13 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2016,2018 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2016-2024 -- leonerd@leonerd.org.uk
 
-package Net::Prometheus::Gauge;
+package Net::Prometheus::Gauge 0.13;
 
-use strict;
+use v5.14;
 use warnings;
 use base qw( Net::Prometheus::Metric );
-
-our $VERSION = '0.12';
 
 use Carp;
 
@@ -66,7 +64,7 @@ reporting the size of an array or hash within the implementation's code.
 Instances of this class are not usually constructed directly, but instead via
 the L<Net::Prometheus> object that will serve it:
 
-   $gauge = $prometheus->new_gauge( %args )
+   $gauge = $prometheus->new_gauge( %args );
 
 This takes the same constructor arguments as documented in
 L<Net::Prometheus::Metric>.
@@ -93,10 +91,10 @@ sub new
 
 =head2 set
 
-   $gauge->set( @label_values, $value )
-   $gauge->set( \%labels, $value )
+   $gauge->set( @label_values, $value );
+   $gauge->set( \%labels, $value );
 
-   $child->set( $value )
+   $child->set( $value );
 
 Sets the current value for the gauge.
 
@@ -115,10 +113,10 @@ sub _set_child
 
 =head2 set_function
 
-   $gauge->set_function( @label_values, $func )
-   $gauge->set_function( \%labels, $func )
+   $gauge->set_function( @label_values, $func );
+   $gauge->set_function( \%labels, $func );
 
-   $child->set_function( $func )
+   $child->set_function( $func );
 
 Sets a value-returning callback function for the gauge. If the gauge is
 labeled, each label combination requires its own function.
@@ -126,7 +124,7 @@ labeled, each label combination requires its own function.
 When invoked, the function will be passed no arguments and is expected to
 return a single value
 
-   $value = $func->()
+   $value = $func->();
 
 =cut
 
@@ -144,10 +142,10 @@ sub _set_function_child
 
 =head2 inc
 
-   $gauge->inc( @label_values, $delta )
-   $gauge->inc( \%labels, $delta )
+   $gauge->inc( @label_values, $delta );
+   $gauge->inc( \%labels, $delta );
 
-   $child->inc( $delta )
+   $child->inc( $delta );
 
 Increment the current value for the gauge. C<$delta> will default to 1 if not
 supplied.
@@ -166,10 +164,10 @@ sub _inc_child
 
 =head2 dec
 
-   $gauge->dec( @label_values, $delta )
-   $gauge->dec( \%labels, $delta )
+   $gauge->dec( @label_values, $delta );
+   $gauge->dec( \%labels, $delta );
 
-   $child->dec( $delta )
+   $child->dec( $delta );
 
 Decrement the current value for the gauge. C<$delta> will default to 1 if not
 supplied.

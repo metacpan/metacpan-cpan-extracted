@@ -8,7 +8,7 @@ use Test2::V0;
 use lib "t";
 use testcase "t::test", qw( test_constraint );
 
-use Data::Checks qw( Str StrEq );
+use Data::Checks qw( Str StrEq StrMatch );
 
 # Str
 test_constraint Str => Str,
@@ -40,5 +40,25 @@ test_constraint Str => Str,
    ok(  t::test::check_value( $checker_empty, ""    ), 'StrEq empty accepts empty' );
    ok( !t::test::check_value( $checker_empty, undef ), 'StrEq empty rejects undef' );
 }
+
+# StrMatch
+test_constraint 'StrMatch(qr/^[A-Z]/i)' => StrMatch(qr/^[A-Z]/i),
+   [
+      'plain string'    => "a string",
+      'matching string' => "MATCH",
+   ],
+   [
+      'non-matching string' => "123",
+   ];
+
+# Debug inspection
+is( Data::Checks::Debug::inspect_constraint( Str ), "Str",
+   'debug inspect Str' );
+is( Data::Checks::Debug::inspect_constraint( StrEq("A") ), "StrEq(\"A\")",
+   'debug inspect StrEq("A")' );
+is( Data::Checks::Debug::inspect_constraint( StrEq("A", "B") ), "StrEq(\"A\", \"B\")",
+   'debug inspect StrEq("A", "B")' );
+is( Data::Checks::Debug::inspect_constraint( StrMatch(qr/ABC/) ), "StrMatch(/(?^u:ABC)/)",
+   'debug inspect StrMatch(qr/ABC/)' );
 
 done_testing;

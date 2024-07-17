@@ -1,11 +1,11 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2020 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2020-2024 -- leonerd@leonerd.org.uk
 
-package Net::Prometheus::Registry;
+package Net::Prometheus::Registry 0.13;
 
-use strict;
+use v5.14;
 use warnings;
 
 use Carp;
@@ -34,7 +34,7 @@ my @COLLECTORS;
 
 =head2 new
 
-   $registry = Net::Prometheus::Registry->new
+   $registry = Net::Prometheus::Registry->new;
 
 Returns a new registry instance.
 
@@ -52,8 +52,8 @@ sub new
 
 =head2 register
 
-   $collector = Net::Prometheus::Registry->register( $collector )
-   $collector = $registry->register( $collector )
+   $collector = Net::Prometheus::Registry->register( $collector );
+   $collector = $registry->register( $collector );
 
 Adds a new collector to the registry. The collector instance itself is
 returned, for convenience of chaining method calls on it.
@@ -73,8 +73,8 @@ sub register
 
 =head2 unregister
 
-   Net::Prometheus::Registry->unregister( $collector )
-   $registry->unregister( $collector )
+   Net::Prometheus::Registry->unregister( $collector );
+   $registry->unregister( $collector );
 
 Removes a previously-registered collector.
 
@@ -96,8 +96,8 @@ sub unregister
 
 =head2 collectors
 
-   @collectors = Net::Prometheus::Registry->collectors
-   @collectors = $registry->collectors
+   @collectors = Net::Prometheus::Registry->collectors;
+   @collectors = $registry->collectors;
 
 Returns a list of the currently-registered collectors.
 

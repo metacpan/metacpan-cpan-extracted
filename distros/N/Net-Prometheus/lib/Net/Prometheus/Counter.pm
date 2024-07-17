@@ -1,15 +1,13 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2016 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2016-2024 -- leonerd@leonerd.org.uk
 
-package Net::Prometheus::Counter;
+package Net::Prometheus::Counter 0.13;
 
-use strict;
+use v5.14;
 use warnings;
 use base qw( Net::Prometheus::Metric );
-
-our $VERSION = '0.12';
 
 use Carp;
 
@@ -51,7 +49,7 @@ instrumented program. It is a subclass of L<Net::Prometheus::Metric>.
 Instances of this class are not usually constructed directly, but instead via
 the L<Net::Prometheus> object that will serve it:
 
-   $counter = $prometheus->new_counter( %args )
+   $counter = $prometheus->new_counter( %args );
 
 This takes the same constructor arguments as documented in
 L<Net::Prometheus::Metric>.
@@ -77,10 +75,10 @@ sub new
 
 =head2 inc
 
-   $counter->inc( @label_values, $delta )
-   $counter->inc( \%labels, $delta )
+   $counter->inc( @label_values, $delta );
+   $counter->inc( \%labels, $delta );
 
-   $child->inc( $delta )
+   $child->inc( $delta );
 
 Increment the current value for the gauge. C<$delta> will default to 1 if not
 supplied and must be non-negative.

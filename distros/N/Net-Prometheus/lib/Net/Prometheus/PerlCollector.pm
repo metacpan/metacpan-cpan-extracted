@@ -1,15 +1,15 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2018-2020 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2018-2024 -- leonerd@leonerd.org.uk
 
-package Net::Prometheus::PerlCollector;
+package Net::Prometheus::PerlCollector 0.13;
 
-use strict;
+use v5.14;
 use warnings;
 
 BEGIN {
-   our $VERSION = '0.12';
+   our $VERSION = '0.13';
 }
 
 use constant HAVE_XS => defined eval {

@@ -1,5 +1,12 @@
 Revision history for Net-Prometheus
 
+0.13    2024-07-16
+        [CHANGES]
+         * Module style updates:
+            + use v5.14
+            + Swap unit tests from `Test::More` to `Test2::V0`; avoids needing
+              `Test::Fatal`
+
 0.12    2022-01-07
         [CHANGES]
          * Added ->export_to_Future_IO

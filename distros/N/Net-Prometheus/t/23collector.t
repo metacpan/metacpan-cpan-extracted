@@ -1,9 +1,9 @@
 #!/usr/bin/perl
 
-use strict;
+use v5.14;
 use warnings;
 
-use Test::More;
+use Test2::V0;
 
 use Net::Prometheus;
 
@@ -18,7 +18,7 @@ my $collector_options;
 
 $client->render( { custom_collector_option => 123 } );
 
-is_deeply( $collector_options, { custom_collector_option => 123 },
+is( $collector_options, { custom_collector_option => 123 },
    'CustomCollector->collect invoked with options' );
 
 done_testing;

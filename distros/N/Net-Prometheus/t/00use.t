@@ -1,23 +1,24 @@
 #!/usr/bin/perl
 
-use strict;
+use v5.14;
 use warnings;
 
-use Test::More;
+use Test2::V0;
 
-use_ok( 'Net::Prometheus' );
+require Net::Prometheus;
 
-use_ok( 'Net::Prometheus::Types' );
+require Net::Prometheus::Types;
 
-use_ok( 'Net::Prometheus::Gauge' );
-use_ok( 'Net::Prometheus::Counter' );
-use_ok( 'Net::Prometheus::Summary' );
-use_ok( 'Net::Prometheus::Histogram' );
+require Net::Prometheus::Gauge;
+require Net::Prometheus::Counter;
+require Net::Prometheus::Summary;
+require Net::Prometheus::Histogram;
 
-use_ok( 'Net::Prometheus::PerlCollector' );
-use_ok( 'Net::Prometheus::ProcessCollector' );
+require Net::Prometheus::PerlCollector;
+require Net::Prometheus::ProcessCollector;
 
 # Each process collector should at least *compile* when not on its own host OS
-use_ok( 'Net::Prometheus::ProcessCollector::linux' );
+require Net::Prometheus::ProcessCollector::linux;
 
+pass( 'Modules loaded' );
 done_testing;

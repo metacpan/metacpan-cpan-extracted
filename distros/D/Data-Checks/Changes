@@ -1,5 +1,12 @@
 Revision history for Data-Checks
 
+0.08    2024-07-16
+        [CHANGES]
+         * Added `StrMatch()`
+         * More efficient implementation of `Any()` and `All()` with 1
+           argument or in nested trees
+         * Support the `|` infix operator as a shorthand for `Any()`
+
 0.07    2024-07-12
         [CHANGES]
          * Added `ArrayRef` and `HashRef` constraints

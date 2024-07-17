@@ -3,7 +3,7 @@ use strict;
 use warnings;
 $|=1;
 use Scalar::Util 'weaken';
-use Test::More tests => 1151;
+use Test::More tests => 1153;
 my $srand;
 BEGIN {
     my $max = 2**16;
@@ -92,7 +92,8 @@ t 'apply 2',
         is => "@$x : @$y", '11 12 13 : 1 2 3';
 }
 {
-    my ($x, $y) = map & \(1 .. 3), 1 .. 2;
+    my ($x1, $x2, $x3) = (1 .. 3);
+    my ($x, $y) = map & \($x1, $x2, $x3), 1 .. 2;
     $_ += 10 for @$x;
     t 'map & \(1 .. 3), 1 .. 2',
         is => "@$x : @$y", '11 12 13 : 11 12 13';
@@ -1383,7 +1384,7 @@ eval {
     t 'while, over-- after over',
         is => $$while[19], undef;
 
-    my $deref = While {$_ < 10} gen {$_};
+    my $deref = While {$_ < 10} <0..99>;
 
     t 'while, array deref outside foreach',
         ok => !eval {my $x = join ' ' => @$deref; 1};
@@ -2740,7 +2741,10 @@ T {
           467 479 487 491 499 503 509 521 523 541
         );
         my $expect_990_to_1000 = '7841 7853 7867 7873 7877 7879 7883 7901 7907 7919';
+        my $prime_count_1e7 = 664579;
+        my @expect_around_1e7_r = qw(10000019 9999991);
 
+        local $List::Gen::FORCE_PRIME = 1;
         for my $test ('', ' trial division') {
             local $List::Gen::DEBUG_PRIME = $test;
 
@@ -2758,6 +2762,17 @@ T {
                 List::Gen::_reset_prime;
                 is primes->drop(990)->str(10), $expect_990_to_1000;
             }
+        }
+        is primes->take($prime_count_1e7 + 1)->reverse->take(2)->str,
+             "@expect_around_1e7_r", 'edge of sieve';
+        if (eval {require Math::Prime::Util}) {
+            $List::Gen::FORCE_PRIME = 0;
+            List::Gen::_reset_prime();
+            is primes->($prime_count_1e7), $expect_around_1e7_r[0],
+            'using Math::Prime::Util generator';
+        }
+        else {
+            pass 'skip Math::Prime::Util';
         }
     }
 
@@ -2804,6 +2819,7 @@ T {
     }
 
     t 'while->apply'; {
+        local $List::Gen::FORCE_PRIME = 1;
         is primes->while('<50')->apply->size, 15
     }
 

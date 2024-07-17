@@ -1,16 +1,13 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2016-2020 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2016-2024 -- leonerd@leonerd.org.uk
 
-package Net::Prometheus::Histogram;
+package Net::Prometheus::Histogram 0.13;
 
-use 5.010; # //
-use strict;
+use v5.14;
 use warnings;
 use base qw( Net::Prometheus::Metric );
-
-our $VERSION = '0.12';
 
 use Carp;
 use List::Util 1.33 qw( any );
@@ -65,7 +62,7 @@ reports of times. It is a subclass of L<Net::Prometheus::Metric>.
 Instances of this class are not usually constructed directly, but instead via
 the L<Net::Prometheus> object that will serve it:
 
-   $histogram = $prometheus->new_histogram( %args )
+   $histogram = $prometheus->new_histogram( %args );
 
 This takes the same constructor arguments as documented in
 L<Net::Prometheus::Metric>, and additionally the following:
@@ -158,7 +155,7 @@ sub _gen_buckets
 
 =head2 bucket_bounds
 
-   @bounds = $histogram->bucket_bounds
+   @bounds = $histogram->bucket_bounds;
 
 Returns the bounding values for each of the buckets, excluding the final
 C<+Inf> bucket.
@@ -173,10 +170,10 @@ sub bucket_bounds
 
 =head2 observe
 
-   $histogram->observe( @label_values, $value )
-   $histogram->observe( \%labels, $value )
+   $histogram->observe( @label_values, $value );
+   $histogram->observe( \%labels, $value );
 
-   $child->observe( $value )
+   $child->observe( $value );
 
 Increment the histogram sum by the given value, and each bucket count by 1
 where the value is less than or equal to the bucket upper bound.

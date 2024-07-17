@@ -1,8 +1,8 @@
 
-use strict;
+use v5.14;
 use warnings;
 
-use Test::More;
+use Test2::V0;
 plan skip_all => "Not for this OS" unless $^O eq "linux";
 
 use Net::Prometheus::ProcessCollector::linux;
@@ -25,7 +25,7 @@ sub _find_metric
 
    my $sample = $metric->samples->[0];
    is( $sample->varname, "process_cpu_seconds_total", 'sample varname' );
-   is_deeply( $sample->labels, [], 'sample labels' );
+   is( $sample->labels, [], 'sample labels' );
    ok( $sample->value > 0, 'sample value above zero' );
 }
 
@@ -41,7 +41,7 @@ sub _find_metric
    ok( $metric, 'found process_cpu_seconds_total' );
 
    my $sample = $metric->samples->[0];
-   is_deeply( $sample->labels, [ label => "value" ], 'sample labels' );
+   is( $sample->labels, [ label => "value" ], 'sample labels' );
 }
 
 done_testing;

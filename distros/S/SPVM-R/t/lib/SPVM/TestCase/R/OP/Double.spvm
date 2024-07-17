@@ -1,0 +1,513 @@
+class TestCase::R::OP::Double {
+  
+  use Array;
+  
+  use R::OP::Double as DOP;
+  
+  static method c : int () { return 1; }
+
+  static method add : int () {
+    
+    my $x_ndarray = DOP->c([(double)1, 2], [1, 2]);
+    
+    my $y_ndarray = DOP->c([(double)3, 4], [1, 2]);
+    
+    my $ret_ndarray = DOP->add($x_ndarray, $y_ndarray);
+    
+    unless ($ret_ndarray is_type R::NDArray::Double) {
+      return 0;
+    }
+    
+    unless (Array->equals_double($ret_ndarray->data, [(double)4, 6])) {
+      return 0;
+    }
+    
+    unless (Array->equals_int($ret_ndarray->dim, [1, 2])) {
+      return 0;
+    }
+    
+    # Exceptions
+    {
+      {
+        my $x_ndarray = DOP->c([(double)1, 2], [1, 2]);
+        
+        my $y_ndarray = DOP->c([(double)3, 4], [1, 2]);
+        
+        eval { DOP->add(undef, $y_ndarray); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+      {
+        my $x_ndarray = DOP->c([(double)1, 2], [1, 2]);
+        
+        my $y_ndarray = DOP->c([(double)3, 4], [1, 2]);
+        
+        eval { DOP->add($x_ndarray, undef); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+      {
+        my $x_ndarray = DOP->c([(double)1, 2], [1, 2]);
+        
+        my $y_ndarray = DOP->c([(double)3, 4], [2, 1]);
+        
+        eval { DOP->add($x_ndarray, $y_ndarray); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+    }
+    
+    $@ = undef;
+    
+    return 1;
+  }
+
+  static method sub : int () {
+    
+    my $x_ndarray = DOP->c([(double)1, 2], [1, 2]);
+    
+    my $y_ndarray = DOP->c([(double)3, 4], [1, 2]);
+    
+    my $ret_ndarray = DOP->sub($x_ndarray, $y_ndarray);
+    
+    unless ($ret_ndarray is_type R::NDArray::Double) {
+      return 0;
+    }
+    
+    unless (Array->equals_double($ret_ndarray->data, [(double)-2, -2])) {
+      return 0;
+    }
+    
+    unless (Array->equals_int($ret_ndarray->dim, [1, 2])) {
+      return 0;
+    }
+    
+    # Exceptions
+    {
+      {
+        my $x_ndarray = DOP->c([(double)1, 2], [1, 2]);
+        
+        my $y_ndarray = DOP->c([(double)3, 4], [1, 2]);
+        
+        eval { DOP->sub(undef, $y_ndarray); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+      {
+        my $x_ndarray = DOP->c([(double)1, 2], [1, 2]);
+        
+        my $y_ndarray = DOP->c([(double)3, 4], [1, 2]);
+        
+        eval { DOP->sub($x_ndarray, undef); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+      {
+        my $x_ndarray = DOP->c([(double)1, 2], [1, 2]);
+        
+        my $y_ndarray = DOP->c([(double)3, 4], [2, 1]);
+        
+        eval { DOP->sub($x_ndarray, $y_ndarray); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+    }
+    
+    $@ = undef;
+    
+    return 1;
+  }
+
+  static method mul : int () {
+    
+    my $x_ndarray = DOP->c([(double)1, 2], [1, 2]);
+    
+    my $y_ndarray = DOP->c([(double)3, 4], [1, 2]);
+    
+    my $ret_ndarray = DOP->mul($x_ndarray, $y_ndarray);
+    
+    unless ($ret_ndarray is_type R::NDArray::Double) {
+      return 0;
+    }
+    
+    unless (Array->equals_double($ret_ndarray->data, [(double)3, 8])) {
+      return 0;
+    }
+    
+    unless (Array->equals_int($ret_ndarray->dim, [1, 2])) {
+      return 0;
+    }
+    
+    # Exceptions
+    {
+      {
+        my $x_ndarray = DOP->c([(double)1, 2], [1, 2]);
+        
+        my $y_ndarray = DOP->c([(double)3, 4], [1, 2]);
+        
+        eval { DOP->mul(undef, $y_ndarray); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+      {
+        my $x_ndarray = DOP->c([(double)1, 2], [1, 2]);
+        
+        my $y_ndarray = DOP->c([(double)3, 4], [1, 2]);
+        
+        eval { DOP->mul($x_ndarray, undef); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+      {
+        my $x_ndarray = DOP->c([(double)1, 2], [1, 2]);
+        
+        my $y_ndarray = DOP->c([(double)3, 4], [2, 1]);
+        
+        eval { DOP->mul($x_ndarray, $y_ndarray); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+    }
+    
+    $@ = undef;
+    
+    return 1;
+  }
+
+  static method scamul : int () {
+    
+    my $x_ndarray = DOP->c([(double)3, 4], [1, 2]);
+    
+    my $scalar_ndarray = DOP->c((double)3);
+    
+    my $ret_ndarray = DOP->scamul($x_ndarray, $scalar_ndarray);
+    
+    unless ($ret_ndarray is_type R::NDArray::Double) {
+      return 0;
+    }
+    
+    unless (Array->equals_double($ret_ndarray->data, [(double)9, 12])) {
+      return 0;
+    }
+    
+    unless (Array->equals_int($ret_ndarray->dim, [1, 2])) {
+      return 0;
+    }
+    
+    # Exceptions
+    {
+      {
+        my $x_ndarray = DOP->c([(double)3, 4], [1, 2]);
+        
+        my $scalar_ndarray = DOP->c((double)3);
+        
+        eval { DOP->scamul(undef, $scalar_ndarray); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+      {
+        my $x_ndarray = DOP->c([(double)3, 4], [1, 2]);
+        
+        my $scalar_ndarray = DOP->c((double)3);
+        
+        eval { DOP->scamul($x_ndarray, undef); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+      {
+        my $scalar_ndarray = DOP->c([(double)1, 2], [1, 2]);
+        
+        my $x_ndarray = DOP->c([(double)3, 4], [2, 1]);
+        
+        eval { DOP->scamul($x_ndarray, $scalar_ndarray); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+    }
+    
+    $@ = undef;
+    
+    return 1;
+  }
+  
+  static method div : int () {
+    
+    my $x_ndarray = DOP->c([(double)1, 1], [1, 2]);
+    
+    my $y_ndarray = DOP->c([(double)2, 4], [1, 2]);
+    
+    my $ret_ndarray = DOP->div($x_ndarray, $y_ndarray);
+    
+    unless ($ret_ndarray is_type R::NDArray::Double) {
+      return 0;
+    }
+    
+    unless (Array->equals_double($ret_ndarray->data, [(double)0.5, 0.25])) {
+      return 0;
+    }
+    
+    unless (Array->equals_int($ret_ndarray->dim, [1, 2])) {
+      return 0;
+    }
+    
+    # Exceptions
+    {
+      {
+        my $x_ndarray = DOP->c([(double)1, 2], [1, 2]);
+        
+        my $y_ndarray = DOP->c([(double)3, 4], [1, 2]);
+        
+        eval { DOP->div(undef, $y_ndarray); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+      {
+        my $x_ndarray = DOP->c([(double)1, 2], [1, 2]);
+        
+        my $y_ndarray = DOP->c([(double)3, 4], [1, 2]);
+        
+        eval { DOP->div($x_ndarray, undef); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+      {
+        my $x_ndarray = DOP->c([(double)1, 2], [1, 2]);
+        
+        my $y_ndarray = DOP->c([(double)3, 4], [2, 1]);
+        
+        eval { DOP->div($x_ndarray, $y_ndarray); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+    }
+    
+    $@ = undef;
+    
+    return 1;
+  }
+  
+  static method scadiv : int () {
+    
+    my $x_ndarray = DOP->c([(double)1, 2], [1, 2]);
+    
+    my $scalar_ndarray = DOP->c((double)2);
+    
+    my $ret_ndarray = DOP->scadiv($x_ndarray, $scalar_ndarray);
+    
+    unless ($ret_ndarray is_type R::NDArray::Double) {
+      return 0;
+    }
+    
+    unless (Array->equals_double($ret_ndarray->data, [(double)0.5, 1])) {
+      return 0;
+    }
+    
+    unless (Array->equals_int($ret_ndarray->dim, [1, 2])) {
+      return 0;
+    }
+    
+    # Exceptions
+    {
+      {
+        my $x_ndarray = DOP->c([(double)3, 4], [1, 2]);
+        
+        my $scalar_ndarray = DOP->c((double)3);
+        
+        eval { DOP->scadiv($x_ndarray, undef); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+      {
+        my $x_ndarray = DOP->c([(double)3, 4], [1, 2]);
+        
+        my $scalar_ndarray = DOP->c((double)3);
+        
+        eval { DOP->scadiv(undef, $scalar_ndarray); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+      {
+        my $x_ndarray = DOP->c([(double)3, 4], [2, 1]);
+        
+        my $scalar_ndarray = DOP->c([(double)1, 2], [1, 2]);
+        
+        eval { DOP->scadiv($x_ndarray, $scalar_ndarray); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+    }
+    
+    $@ = undef;
+    
+    return 1;
+  }
+  
+  static method neg : int () { return 1; }
+
+  static method abs : int () { return 1; }
+
+  static method eq : int () { return 1; }
+
+  static method ne : int () { return 1; }
+
+  static method gt : int () { return 1; }
+
+  static method ge : int () { return 1; }
+
+  static method lt : int () { return 1; }
+
+  static method le : int () { return 1; }
+
+  static method rep : int () { return 1; }
+
+  static method rep_length : int () { return 1; }
+
+  static method seq : int () { return 1; }
+
+  static method seq_length : int () { return 1; }
+
+  static method sin : int () { return 1; }
+
+  static method cos : int () { return 1; }
+
+  static method tan : int () { return 1; }
+
+  static method sinh : int () { return 1; }
+
+  static method cosh : int () { return 1; }
+
+  static method tanh : int () { return 1; }
+
+  static method acos : int () { return 1; }
+
+  static method asin : int () { return 1; }
+
+  static method atan : int () { return 1; }
+
+  static method asinh : int () { return 1; }
+
+  static method acosh : int () { return 1; }
+
+  static method atanh : int () { return 1; }
+
+  static method exp : int () { return 1; }
+
+  static method expm1 : int () { return 1; }
+
+  static method log : int () { return 1; }
+
+  static method logb : int () { return 1; }
+
+  static method log2 : int () { return 1; }
+
+  static method log10 : int () { return 1; }
+
+  static method sqrt : int () { return 1; }
+
+  static method isinf : int () { return 1; }
+
+  static method is_infinite : int () { return 1; }
+
+  static method is_finite : int () { return 1; }
+
+  static method isnan : int () { return 1; }
+
+  static method is_nan : int () { return 1; }
+
+  static method pow : int () { return 1; }
+
+  static method atan2 : int () { return 1; }
+
+  static method modf : int () { return 1; }
+
+  static method ceil : int () { return 1; }
+
+  static method ceiling : int () { return 1; }
+
+  static method floor : int () { return 1; }
+
+  static method round : int () { return 1; }
+
+  static method lround : int () { return 1; }
+
+  static method remainder : int () { return 1; }
+
+  static method fmod : int () { return 1; }
+
+  static method sum : int () { return 1; }
+
+  static method cumsum : int () { return 1; }
+
+  static method prod : int () { return 1; }
+
+  static method cumprod : int () { return 1; }
+
+  static method diff : int () { return 1; }
+
+  static method max : int () { return 1; }
+
+  static method min : int () { return 1; }
+
+  static method mean : int () { return 1; }
+
+  static method inner : int () { return 1; }
+
+  static method cross : int () { return 1; }
+
+  static method outer : int () { return 1; }
+
+}

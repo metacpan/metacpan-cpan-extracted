@@ -7,7 +7,8 @@ use Test::More tests => 2;
 my (@before, @after);
 
 sub sublist {
-    sort grep {*{$main::{$_}}{CODE}} keys %main::
+    no strict 'refs';
+    sort grep {*{"main:\:$_"}{CODE}} keys %main::;
 }
 
 BEGIN {@before = sublist}

@@ -1,10 +1,9 @@
 #!/usr/bin/perl
 
-use strict;
+use v5.14;
 use warnings;
 
-use Test::More;
-use Test::Fatal;
+use Test2::V0;
 
 use Net::Prometheus::Histogram;
 
@@ -23,12 +22,12 @@ sub HASHfromSample
 
    ok( defined $histogram, 'defined $histogram' );
 
-   is_deeply( [ $histogram->bucket_bounds ],
+   is( [ $histogram->bucket_bounds ],
       [ 1, 2, 5 ],
       '$histogram->bucket_bounds'
    );
 
-   is_deeply( [ map { HASHfromSample( $_ ) } $histogram->samples ],
+   is( [ map { HASHfromSample( $_ ) } $histogram->samples ],
       [
          # Slightly fragile as we depend on 'count' coming before 'sum'
          { varname => "test_count", labels => [], value => 0 },
@@ -43,7 +42,7 @@ sub HASHfromSample
 
    $histogram->observe( 5 );
 
-   is_deeply( [ map { HASHfromSample( $_ ) } $histogram->samples ],
+   is( [ map { HASHfromSample( $_ ) } $histogram->samples ],
       [
          { varname => "test_count", labels => [], value => 1 },
          { varname => "test_sum",   labels => [], value => 5 },
@@ -57,7 +56,7 @@ sub HASHfromSample
 
    $histogram->observe( 1.5 );
 
-   is_deeply( [ map { HASHfromSample( $_ ) } $histogram->samples ],
+   is( [ map { HASHfromSample( $_ ) } $histogram->samples ],
       [
          { varname => "test_count", labels => [], value => 2 },
          { varname => "test_sum",   labels => [], value => 6.5 },
@@ -72,7 +71,7 @@ sub HASHfromSample
 
 # exceptions
 {
-   ok( exception {
+   ok( dies {
          Net::Prometheus::Histogram->new(
             name => "test",
             labels => [ "le" ],
@@ -81,7 +80,7 @@ sub HASHfromSample
       }, 'Histogram with "le" label dies'
    );
 
-   ok( exception {
+   ok( dies {
          Net::Prometheus::Histogram->new(
             name => "test",
             help => "",
@@ -102,7 +101,7 @@ sub HASHfromSample
       bucket_min => 1, bucket_max => 1E6
    );
 
-   is_deeply( [ $hist->bucket_bounds ],
+   is( [ $hist->bucket_bounds ],
       [ 1E0, 1E1, 1E2, 1E3, 1E4, 1E5, 1E6 ],
       'buckets for 1 to 1E6' );
 
@@ -113,7 +112,7 @@ sub HASHfromSample
       bucket_min => 1E-6, bucket_max => 1,
    );
 
-   is_deeply( [ $hist->bucket_bounds ],
+   is( [ $hist->bucket_bounds ],
       [ 1E-6, 1E-5, 1E-4, 1E-3, 1E-2, 1E-1, 1E0 ],
       'buckets for 1E-6 to 1' );
 }
@@ -128,7 +127,7 @@ sub HASHfromSample
       buckets_per_decade => [ 1, 1.5, 2.2, 3.3, 4.7, 6.8 ],
    );
 
-   is_deeply( [ $hist->bucket_bounds ],
+   is( [ $hist->bucket_bounds ],
       [  1.0, 1.5, 2.2, 3.3, 4.7, 6.8,
           10,  15,  22,  33,  47,  68,
          100, 150, 220, 330, 470, 680,

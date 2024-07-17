@@ -20,12 +20,12 @@ my %WriteMakefileArgs = (
         'Test::More' => '0',
 	'Try::Tiny' => '0',
 	'FindBin' => '0',
+	'Config' => '0',
     },
     PREREQ_PM => {
 	'DateTime' => '0',
 	'DateTime::Format::ISO8601' => '0',
 	'DateTime::TimeZone' => '0',
-	'Try::Tiny' => '0',
 	'Geo::Location::TimeZone' => '0',
 	'Astro::MoonPhase' => '0',
 	'Exporter' => '0',

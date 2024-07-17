@@ -7,4 +7,12 @@ Revision history for Astro-MoonPhase-Simple
         is now accurate, hopefully.
         'location' can now be a nameplace as well as lat/lon coordinates.
         Pod additions.
-
+0.03    2024-07-17/12:00
+        Hopefully fixed a bug in testing where I did not take into
+        account different timezones in host machines.
+        In tests, gotten and expected results will not be compared
+        using is_deeply()
+        if perl was compiled with uselongdouble flag because the
+        extra accuracy fails the comparisons. All other checks will be made.
+        A range check would be more suitable but there are also strings
+        containing numbers. So this is not going to change soon.

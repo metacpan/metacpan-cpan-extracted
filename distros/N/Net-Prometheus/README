@@ -79,20 +79,20 @@ METHODS
 
  register
 
-       $collector = $prometheus->register( $collector )
+       $collector = $prometheus->register( $collector );
 
     Registers a new collector to be collected from by the render method.
     The collector instance itself is returned, for convenience.
 
  unregister
 
-       $prometheus->unregister( $collector )
+       $prometheus->unregister( $collector );
 
     Removes a previously-registered collector.
 
  new_gauge
 
-       $gauge = $prometheus->new_gauge( %args )
+       $gauge = $prometheus->new_gauge( %args );
 
     Constructs a new Net::Prometheus::Gauge using the arguments given and
     registers it with the exporter. The newly-constructed gauge is
@@ -100,7 +100,7 @@ METHODS
 
  new_counter
 
-       $counter = $prometheus->new_counter( %args )
+       $counter = $prometheus->new_counter( %args );
 
     Constructs a new Net::Prometheus::Counter using the arguments given and
     registers it with the exporter. The newly-constructed counter is
@@ -108,7 +108,7 @@ METHODS
 
  new_summary
 
-       $summary = $prometheus->new_summary( %args )
+       $summary = $prometheus->new_summary( %args );
 
     Constructs a new Net::Prometheus::Summary using the arguments given and
     registers it with the exporter. The newly-constructed summary is
@@ -116,7 +116,7 @@ METHODS
 
  new_histogram
 
-       $histogram = $prometheus->new_histogram( %args )
+       $histogram = $prometheus->new_histogram( %args );
 
     Constructs a new Net::Prometheus::Histogram using the arguments given
     and registers it with the exporter. The newly-constructed histogram is
@@ -124,7 +124,7 @@ METHODS
 
  new_metricgroup
 
-       $group = $prometheus->new_metricgroup( %args )
+       $group = $prometheus->new_metricgroup( %args );
 
     Returns a new Metric Group instance as a convenience for registering
     multiple metrics using the same namespace and subsystem arguments.
@@ -140,26 +140,26 @@ METHODS
     Once constructed, the group acts as a proxy to the other new_* methods,
     passing in these values as overrides.
 
-       $gauge = $group->new_gauge( ... )
-       $counter = $group->new_counter( ... )
-       $summary = $group->new_summary( ... )
-       $histogram = $group->new_histogram( ... )
+       $gauge = $group->new_gauge( ... );
+       $counter = $group->new_counter( ... );
+       $summary = $group->new_summary( ... );
+       $histogram = $group->new_histogram( ... );
 
  collect
 
-       @metricsamples = $prometheus->collect( $opts )
+       @metricsamples = $prometheus->collect( $opts );
 
     Returns a list of "MetricSamples" in Net::Prometheus::Types obtained
     from all of the currently-registered collectors.
 
  render
 
-       $str = $prometheus->render
+       $str = $prometheus->render;
 
     Returns a string in the Prometheus text exposition format containing
     the current values of all the registered metrics.
 
-       $str = $prometheus->render( { options => "for collectors" } )
+       $str = $prometheus->render( { options => "for collectors" } );
 
     An optional HASH reference may be provided; if so it will be passed
     into the collect method of every registered collector.
@@ -169,7 +169,7 @@ METHODS
 
  handle
 
-       $response = $prometheus->handle( $request )
+       $response = $prometheus->handle( $request );
 
     Given an HTTP request in an HTTP::Request instance, renders the metrics
     in response to it and returns an HTTP::Response instance.
@@ -196,7 +196,7 @@ METHODS
 
  psgi_app
 
-       $app = $prometheus->psgi_app
+       $app = $prometheus->psgi_app;
 
     Returns a new PSGI application as a CODE reference. This application
     will render the metrics in the Prometheus text exposition format,
@@ -221,7 +221,7 @@ METHODS
 
  export_to_Future_IO
 
-       $f = $prometheus->export_to_Future_IO( %args )
+       $f = $prometheus->export_to_Future_IO( %args );
 
     Performs the necessary steps to create a minimal HTTP server for
     exporting metrics over HTTP, by using Future::IO directly. This
@@ -251,7 +251,7 @@ METHODS
 
  export_to_IO_Async
 
-       $prometheus->export_to_IO_Async( $loop, %args )
+       $prometheus->export_to_IO_Async( $loop, %args );
 
     Performs the necessary steps to create an HTTP server for exporting
     metrics over HTTP via IO::Async. This will involve creating a new

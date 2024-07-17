@@ -110,16 +110,29 @@ CONSTRAINTS
     Accepts any value that passes the Str check, and additionally is
     exactly equal to any of the given strings.
 
+ StrMatch
+
+       StrMatch(qr/pattern/)
+
+    Since version 0.08.
+
+    Accepts any value that passes the Str check, and additionally matches
+    the given regexp pattern.
+
+    Remember that the pattern must be supplied as a qr/.../ expression, not
+    simply m/.../ or /.../.
+
  Num
 
        Num()
 
     Accepts any defined non-reference value that is either a plain number,
     or a string that could be used as one without warning, or a reference
-    to an object in a class that overloads numification. rejects undefined,
-    strings that would raise a warning if converted to a number, unblessed
-    references, or references to objects in classes that do not overload
-    numification.
+    to an object in a class that overloads numification.
+
+    Rejects undefined, not-a-number, strings that would raise a warning if
+    converted to a number, unblessed references, or references to objects
+    in classes that do not overload numification.
 
  NumGT
 
@@ -223,6 +236,13 @@ CONSTRAINTS
     At least one constraint is required; it is an error to try to call
     Any() with no arguments. If you need a constraint that accepts any
     value at all, see "All".
+
+       $C1 | $C2 | ...
+
+    Since version 0.08.
+
+    This function is used to implement | operator overloading, so
+    constraint checks can be written using this more convenient syntax.
 
  All
 
@@ -345,8 +365,6 @@ TODO
 
       * Unit constraints - maybe Int, some plain-only variants of Str and
       Num, some reference types, etc...
-
-      * Parametric constraints - StrMatch
 
       * Structural constraints - HashOf, ArrayOf, etc...
 

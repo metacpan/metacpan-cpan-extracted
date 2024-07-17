@@ -82,4 +82,18 @@ test_constraint Callable => Callable,
       'object with &{}'   => ClassWithCodeRefify->new,
    ];
 
+# Debug inspection
+is( Data::Checks::Debug::inspect_constraint( Defined ), "Defined",
+   'debug inspect Defined' );
+is( Data::Checks::Debug::inspect_constraint( Object ), "Object",
+   'debug inspect Object' );
+is( Data::Checks::Debug::inspect_constraint( Isa("Base::Class") ), "Isa(\"Base::Class\")",
+   'debug inspect Isa("Base::Class")' );
+is( Data::Checks::Debug::inspect_constraint( ArrayRef ), "ArrayRef",
+   'debug inspect ArrayRef' );
+is( Data::Checks::Debug::inspect_constraint( HashRef ), "HashRef",
+   'debug inspect HashRef' );
+is( Data::Checks::Debug::inspect_constraint( Callable ), "Callable",
+   'debug inspect Callable' );
+
 done_testing;

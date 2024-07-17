@@ -1,15 +1,13 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2016 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2016-2024 -- leonerd@leonerd.org.uk
 
-package Net::Prometheus::Summary;
+package Net::Prometheus::Summary 0.13;
 
-use strict;
+use v5.14;
 use warnings;
 use base qw( Net::Prometheus::Metric );
-
-our $VERSION = '0.12';
 
 use Carp;
 use List::Util 1.33 qw( any );

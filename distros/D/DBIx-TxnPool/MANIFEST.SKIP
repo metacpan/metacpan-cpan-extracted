@@ -8,3 +8,5 @@
 ^DBIx-TxnPool-
 MYMETA\.yml
 MYMETA\.json
+\.idea/.*
+\.iml$

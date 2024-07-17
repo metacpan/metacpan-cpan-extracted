@@ -1,6 +1,6 @@
 NAME
     DBIx::TxnPool - Massive SQL updates by means of transactions with the
-    deadlock & signal solution
+    deadlock & signal solution for MySQL and MariaDB.
 
 SYNOPSIS
     This module will help to you to make quickly DML statements of InnoDB

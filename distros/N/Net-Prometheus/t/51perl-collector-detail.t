@@ -1,15 +1,17 @@
 #!/usr/bin/perl
 
-use strict;
+use v5.14;
 use warnings;
 
-use Test::More;
+use Test2::V0;
 
 use Net::Prometheus;
 use Net::Prometheus::PerlCollector;
 
 plan skip_all => "PerlCollector cannot collect heap information"
    unless Net::Prometheus::PerlCollector::HAVE_XS;
+
+use constant HAVE_TEST_MEMORYGROWTH => defined eval { require Test::MemoryGrowth; };
 
 $Net::Prometheus::PerlCollector::DETAIL = 1;
 
@@ -42,9 +44,7 @@ $Net::Prometheus::PerlCollector::DETAIL = 2;
 }
 
 # Leak check - it would be terrible if this tool itself leaked memory ;)
-SKIP: {
-   skip "Test::MemoryGrowth is not available", 1 unless eval { require Test::MemoryGrowth };
-
+if( HAVE_TEST_MEMORYGROWTH ) {
    Test::MemoryGrowth::no_growth( sub {
       $client->render;
    }, calls => 1000, burn_in => 2,

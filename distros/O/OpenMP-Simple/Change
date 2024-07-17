@@ -17,3 +17,10 @@
 0.0.5  02/24/2024 09:45:00 AM MST
       - updated more macro names to be more clear about purpose
       - updated POD
+
+0.0.6  07/16/2024 09:45:00 AM MST
+      - fixed tests which were failing because they were out of date
+      - made some minor updates to the POD
+
+0.0.7  07/16/2024 09:45:00 PM MST
+      - made some updates to the POD

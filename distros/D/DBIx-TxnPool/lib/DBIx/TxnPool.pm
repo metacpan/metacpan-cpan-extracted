@@ -8,7 +8,7 @@ use Try::Tiny;
 use Signal::Mask;
 use Carp qw( confess );
 
-our $VERSION = 0.12;
+our $VERSION = 0.13;
 our $BlockSignals = [ qw( TERM INT ) ];
 our @EXPORT = qw( txn_item txn_post_item txn_commit txn_sort );
 
@@ -257,7 +257,7 @@ __END__
 
 =head1 NAME
 
-DBIx::TxnPool - Massive SQL updates by means of transactions with the deadlock & signal solution
+DBIx::TxnPool - Massive SQL updates by means of transactions with the deadlock & signal solution for MySQL and MariaDB.
 
 =head1 SYNOPSIS
 

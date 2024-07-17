@@ -15,7 +15,8 @@ requires 'Signal::Mask';
 requires 'Carp';
 requires 'Exporter'      => 5.57;
 requires 'DBI';
-requires 'DBD::mysql';
+
+eval { require DBD::mysql; 1 } || eval { require DBD::MariaDB; 1 } || requires 'DBD::mysql';
 
 auto_set_repository;
 author_tests('xt');

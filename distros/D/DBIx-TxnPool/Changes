@@ -1,5 +1,9 @@
 Revision history for perl module DBIx::TxnPool
 
+0.13 2024-07-16
+    - Tests work with the DBD::MariaDB driver too (MariaDB 11.* requires only the DBD::MariaDB not DBD::mysql driver)
+    - Updated the inc::Module::Install
+
 0.12 2015-11-26
     - fix bug - sometimes callback the txn_commit was not called
     - commit improvements

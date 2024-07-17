@@ -398,5 +398,7 @@ MANIFEST.SKIP
 README.md
 t/basic.t
 t/lib/SPVM/TestCase/R.spvm
+t/lib/SPVM/TestCase/R/OP/Double.spvm
+t/R-OP-Double.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

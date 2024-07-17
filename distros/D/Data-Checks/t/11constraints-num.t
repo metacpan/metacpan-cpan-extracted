@@ -10,6 +10,10 @@ use testcase "t::test", qw( test_constraint );
 
 use Data::Checks qw( Num NumGT NumGE NumLE NumLT NumRange NumEq );
 
+use constant {
+   NAN => 0+"NaN",
+};
+
 # Num
 test_constraint Num => Num,
    [
@@ -20,6 +24,9 @@ test_constraint Num => Num,
    ],
    [
       'object with stringifty' => ClassWithStrOverload->new,
+      'not-a-number'           => NAN,
+      '"NaN"'                  => NAN . "",
+      '"nan"'                  => "nan",
    ];
 
 # Num bounded
@@ -82,5 +89,23 @@ test_constraint Num => Num,
    ok(  t::test::check_value( $checker_zero, 0     ), 'NumEq zero accepts zero' );
    ok( !t::test::check_value( $checker_zero, undef ), 'NumEq zero rejects undef' );
 }
+
+# Debug inspection
+is( Data::Checks::Debug::inspect_constraint( Num ), "Num",
+   'debug inspect Num' );
+is( Data::Checks::Debug::inspect_constraint( NumGT(10) ), "NumRange(10, undef)",
+   'debug inspect NumGT(10)' );
+is( Data::Checks::Debug::inspect_constraint( NumGE(10) ), "NumRange/1(10, undef)",
+   'debug inspect NumGE(10)' );
+is( Data::Checks::Debug::inspect_constraint( NumLE(10) ), "NumRange/2(undef, 10)",
+   'debug inspect NumLE(10)' );
+is( Data::Checks::Debug::inspect_constraint( NumLT(10) ), "NumRange(undef, 10)",
+   'debug inspect NumLT(10)' );
+is( Data::Checks::Debug::inspect_constraint( NumRange(10, 20) ), "NumRange/1(10, 20)",
+   'debug inspect NumRange(10, 20)' );
+is( Data::Checks::Debug::inspect_constraint( NumEq(10) ), "NumEq(10)",
+   'debug inspect NumEq(10)' );
+is( Data::Checks::Debug::inspect_constraint( NumEq(10, 20) ), "NumEq(10, 20)",
+   'debug inspect NumEq(10, 20)' );
 
 done_testing;

@@ -17,10 +17,13 @@ use constant {
     AV_USERNAME => 1,
     AV_PASSWORD => 2,
     AV_REPLY_MSG => 18,
+    AV_ACCT_STATUS => 40,
 
     AUTH_REQ => 1,
     AUTH_OK  => 2,
     AUTH_REJ => 3,
+    ACCT_REQ => 4,
+    ACCT_OK  => 5,
 };
 
 my $ip = '127.0.0.1';
@@ -44,8 +47,14 @@ if ($child) {
         if ($login eq 'chip') {
             ok($h->{type} == AUTH_OK, 'Chip auth ok');
         }
-        else {
+        elsif ($login eq 'dale') {
             ok($h->{type} == AUTH_REJ, 'Dale not allowed');
+        }
+        elsif ($login eq '[acct]') {
+            ok($h->{type} == ACCT_OK, 'Accounting reply');
+        }
+        else {
+            fail('unexpected reply');
         }
     };
 
@@ -66,17 +75,26 @@ if ($child) {
                 {Id => AV_PASSWORD, Name => 'Password', Type => 'string', Value => 'pwd'},
             ]);
     $user{$id} = 'dale';
+    $id = $nas->send_acct([
+                {Id => AV_ACCT_STATUS, Name => 'Acct-Status-Type', Type => 'integer', Value => 1 },
+            ]);
+    $user{$id} = '[acct]';
 
     $nas->wait;
     diag "Killing server $child";
     kill('KILL', $child);
 
-    is($replies, 2, 'got 2 replies from server');
+    is($replies, 3, 'got 3 replies from server');
 }
 elsif(defined $child) {
     # starts server
     my $radius_reply = sub {
         my ($self, $h) = @_;
+
+        if ($h->{type} eq ACCT_REQ) {
+            return (ACCT_OK, []);
+        }
+
         return undef if ($h->{type} != AUTH_REQ);
 
         foreach my $av (@{ $h->{av_list} }) {

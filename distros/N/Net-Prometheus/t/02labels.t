@@ -1,10 +1,9 @@
 #!/usr/bin/perl
 
-use strict;
+use v5.14;
 use warnings;
 
-use Test::More;
-use Test::Fatal;
+use Test2::V0;
 
 use Net::Prometheus::Metric;
 
@@ -22,10 +21,10 @@ use Net::Prometheus::Metric;
    );
 
    is( $sample->varname, "basename",                     '$sample->varname' );
-   is_deeply( $sample->labels, [ labelname => "value" ], '$sample->labels' );
+   is( $sample->labels, [ labelname => "value" ], '$sample->labels' );
    is( $sample->value, 123,                              '$sample->value' );
 
-   is_deeply(
+   is(
       $metric->make_sample(
          undef, $metric->labels( "value" )->labelkey, 123, [ another => "label" ],
       )->labels,
@@ -36,7 +35,7 @@ use Net::Prometheus::Metric;
 
 # exceptions
 {
-   ok( exception {
+   ok( dies {
          Net::Prometheus::Metric->new(
             name => "metric",
             labels => [ "ab/cd" ],
@@ -45,7 +44,7 @@ use Net::Prometheus::Metric;
       }, 'Invalid label name dies'
    );
 
-   ok( exception {
+   ok( dies {
          Net::Prometheus::Metric->new(
             name => "metric",
             labels => [ "__name" ],
@@ -54,7 +53,7 @@ use Net::Prometheus::Metric;
       }, 'Reserved label name dies'
    );
 
-   ok( exception {
+   ok( dies {
          my $metric = Net::Prometheus::Metric->new(
             name => "metric",
             labels => [ "label" ],

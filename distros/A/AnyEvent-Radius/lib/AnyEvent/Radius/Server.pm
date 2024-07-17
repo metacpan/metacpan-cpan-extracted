@@ -8,6 +8,7 @@ use AnyEvent::Handle::UDP;
 use base qw(Class::Accessor::Fast);
 __PACKAGE__->mk_accessors(qw(handler packer));
 
+use Data::Radius v1.2.8;
 use Data::Radius::Constants qw(:all);
 use Data::Radius::Dictionary ();
 use Data::Radius::Packet ();
@@ -101,7 +102,6 @@ sub new {
                                 av_list => $reply_av_list,
                                 authenticator => $authenticator,
                                 request_id => $req_id,
-                                with_msg_auth => 1,
                             );
         if(! $reply) {
             warn "Failed to build reply";

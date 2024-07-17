@@ -1,10 +1,9 @@
 #!/usr/bin/perl
 
-use strict;
+use v5.14;
 use warnings;
 
-use Test::More;
-use Test::Fatal;
+use Test2::V0;
 
 use Net::Prometheus::Summary;
 
@@ -22,7 +21,7 @@ sub HASHfromSample
 
    ok( defined $summary, 'defined $summary' );
 
-   is_deeply( [ map { HASHfromSample( $_ ) } $summary->samples ],
+   is( [ map { HASHfromSample( $_ ) } $summary->samples ],
       [
          # Slightly fragile as we depend on 'count' coming before 'sum'
          { varname => "test_count", labels => [], value => 0 },
@@ -33,7 +32,7 @@ sub HASHfromSample
 
    $summary->observe( 5 );
 
-   is_deeply( [ map { HASHfromSample( $_ ) } $summary->samples ],
+   is( [ map { HASHfromSample( $_ ) } $summary->samples ],
       [
          { varname => "test_count", labels => [], value => 1 },
          { varname => "test_sum",   labels => [], value => 5 },
@@ -44,7 +43,7 @@ sub HASHfromSample
 
 # exceptions
 {
-   ok( exception {
+   ok( dies {
          Net::Prometheus::Summary->new(
             name => "test",
             labels => [ "quantile" ],

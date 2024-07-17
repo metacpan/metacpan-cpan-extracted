@@ -10,8 +10,11 @@ data/pie-link.specs
 data/tupletable
 lib/Dpkg.pm
 lib/Dpkg/Arch.pm
+lib/Dpkg/Archive/Ar.pm
 lib/Dpkg/Build/Info.pm
 lib/Dpkg/BuildAPI.pm
+lib/Dpkg/BuildDriver.pm
+lib/Dpkg/BuildDriver/DebianRules.pm
 lib/Dpkg/BuildEnv.pm
 lib/Dpkg/BuildFlags.pm
 lib/Dpkg/BuildInfo.pm
@@ -235,6 +238,7 @@ t/Dpkg_Source_Patch/partial.patch
 t/Dpkg_Source_Quilt.t
 t/Dpkg_Source_Quilt/parse/debian/patches/series
 t/Dpkg_Substvars.t
+t/Dpkg_Substvars/substvars-req
 t/Dpkg_Substvars/substvars1
 t/Dpkg_Substvars/substvars2
 t/Dpkg_Vendor.t

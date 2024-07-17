@@ -4,7 +4,7 @@ Astro::MoonPhase::Simple - Calculate the phase of the Moon on a given time witho
 
 # VERSION
 
-Version 0.02
+Version 0.03
 
 # SYNOPSIS
 
@@ -64,16 +64,20 @@ the moon is observed from and this
 will deduce the timezone, albeit not always as accurately
 as with specifying a "timezone" explicitly.
 
+Warning: if the caller does not specify a `timezone` or `location`
+then the specified `time` will be assumed to be **UTC time** and not
+at the local timezone of the host.
+
 [Astro::MoonPhase](https://metacpan.org/pod/Astro%3A%3AMoonPhase) calculates the moon phase
 given an _epoch_. Which is the number of seconds
-since 1970-01-01 on a UTC timezone. This epoch
-is corrected to a _localepoch_ by adding to it
+since 1970-01-01 **on a UTC timezone**. This epoch
+is corrected to a "_localepoch_" by adding to it
 the specific timezone offset. For example, if you
 specified the timezone to be "China/Beijing" and
 the local time (at the specified timezone) to be 23:00.
 It means UTC time is 15:00. The epoch will be calculated
-on UTC time. However, we add 23:00-15:00=8:00 hours to
-that epoch to make it "localepoch" and this is
+on UTC time. However, we add `23:00-15:00=8:00` hours to
+that epoch to make it "_localepoch_" and this is
 what we pass on to [Astro::MoonPhase](https://metacpan.org/pod/Astro%3A%3AMoonPhase) to calculate
 the moon phase.
 
@@ -111,6 +115,12 @@ code for tracking the planets and at different altitudes.
 I can't iterate enough that this module wraps the
 functionality of [Astro::MoonPhase](https://metacpan.org/pod/Astro%3A%3AMoonPhase).
 [Astro::MoonPhase](https://metacpan.org/pod/Astro%3A%3AMoonPhase) does all the heavy lifting.
+
+# CAVEATS
+
+In [calculate\_moon\_phase](https://metacpan.org/pod/calculate_moon_phase), if the caller does not specify a `timezone` or `location`
+then the specified `time` will be assumed to be **UTC time** and not
+at the local timezone of the host.
 
 # AUTHOR
 

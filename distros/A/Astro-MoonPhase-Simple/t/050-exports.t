@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 use Test::More;
 use Try::Tiny;
@@ -19,19 +19,19 @@ use Astro::MoonPhase::Simple;
 #####
 
 for my $asub (qw/calculate_moon_phase/){
-	Try::Tiny::try {
+	try {
 		no strict 'refs';
 		$asub->()
-	} Try::Tiny::catch {
+	} catch {
 		ok($_!~/Undefined subroutine/, "$asub : it is not exported as expected.") or BAIL_OUT
 	}
 }
 
 for my $asub (qw/_event2str _parse_event/){
-	Try::Tiny::try {
+	try {
 		no strict 'refs';
 		$asub->()
-	} Try::Tiny::catch {
+	} catch {
 		ok($_=~/Undefined subroutine/, "$asub : it is not exported as expected.") or BAIL_OUT
 	}
 }

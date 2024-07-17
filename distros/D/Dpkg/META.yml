@@ -25,11 +25,20 @@ provides:
   Dpkg::Arch:
     file: lib/Dpkg/Arch.pm
     version: '1.03'
+  Dpkg::Archive::Ar:
+    file: lib/Dpkg/Archive/Ar.pm
+    version: '0.01'
   Dpkg::Build::Info:
     file: lib/Dpkg/Build/Info.pm
     version: '1.02'
   Dpkg::BuildAPI:
     file: lib/Dpkg/BuildAPI.pm
+    version: '0.01'
+  Dpkg::BuildDriver:
+    file: lib/Dpkg/BuildDriver.pm
+    version: '0.01'
+  Dpkg::BuildDriver::DebianRules:
+    file: lib/Dpkg/BuildDriver/DebianRules.pm
     version: '0.01'
   Dpkg::BuildEnv:
     file: lib/Dpkg/BuildEnv.pm
@@ -225,7 +234,7 @@ provides:
     version: '0.01'
   Dpkg::Source::Package:
     file: lib/Dpkg/Source/Package.pm
-    version: '2.02'
+    version: '2.03'
   Dpkg::Source::Package::V1:
     file: lib/Dpkg/Source/Package/V1.pm
     version: '0.01'
@@ -255,7 +264,7 @@ provides:
     version: '0.02'
   Dpkg::Substvars:
     file: lib/Dpkg/Substvars.pm
-    version: '2.01'
+    version: '2.02'
   Dpkg::Vendor:
     file: lib/Dpkg/Vendor.pm
     version: '1.02'
@@ -287,5 +296,5 @@ resources:
   homepage: https://wiki.debian.org/Teams/Dpkg
   license: http://www.gnu.org/licenses/old-licenses/gpl-2.0.txt
   repository: https://git.dpkg.org/git/dpkg/dpkg.git
-version: v1.22.6
+version: v1.22.7
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

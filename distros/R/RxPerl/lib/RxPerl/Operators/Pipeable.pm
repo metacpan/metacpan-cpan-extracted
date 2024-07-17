@@ -29,7 +29,7 @@ our @EXPORT_OK = qw/
 /;
 our %EXPORT_TAGS = (all => \@EXPORT_OK);
 
-our $VERSION = "v6.28.0";
+our $VERSION = "v6.29.0";
 
 sub op_audit {
     my ($duration_selector) = @_;
@@ -697,12 +697,12 @@ sub op_every {
                     my ($v) = @_;
                     local $_ = $v;
                     if (! $predicate->($v, $idx++)) {
-                        $subscriber->{next}->(0) if defined $subscriber->{next};
+                        $subscriber->{next}->(!!0) if defined $subscriber->{next};
                         $subscriber->{complete}->() if defined $subscriber->{complete};
                     }
                 },
                 complete => sub {
-                    $subscriber->{next}->(1) if defined $subscriber->{next};
+                    $subscriber->{next}->(!!1) if defined $subscriber->{next};
                     $subscriber->{complete}->() if defined $subscriber->{complete};
                 },
             };
@@ -926,8 +926,8 @@ sub op_is_empty {
 
         return $source->pipe(
             op_first(),
-            op_map_to(0),
-            op_default_if_empty(1),
+            op_map_to(!!0),
+            op_default_if_empty(!!1),
         );
     };
 }

@@ -1,0 +1,87 @@
+{
+   "abstract" : "Easy installation of the GSL shared library",
+   "author" : [
+      "Joel A. Berger <joel.a.berger@gmail.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Math-GSL-Alien",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Alien::Build" : "2.21",
+            "Alien::Build::MM" : "2.21",
+            "ExtUtils::MakeMaker" : "6.52"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Alien::Build" : "2.21",
+            "Alien::Build::MM" : "2.21",
+            "ExtUtils::MakeMaker" : "6.52"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Alien::Base" : "2.21",
+            "Alien::Build" : "0.25",
+            "Alien::Role::Dino" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.52",
+            "Test2::V0" : "0",
+            "Test::Alien" : "0",
+            "Test::Alien::Diag" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/hakonhagland/Math-GSL-Alien/issues"
+      },
+      "homepage" : "https://metacpan.org/pod/Math::GSL::Alien",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/hakonhagland/Math-GSL-Alien.git",
+         "web" : "https://github.com/hakonhagland/Math-GSL-Alien"
+      },
+      "x_IRC" : "irc://irc.perl.org/#native"
+   },
+   "version" : "1.01",
+   "x_alienfile" : {
+      "generated_by" : "Alien::Build::MM version 2.83",
+      "requires" : {
+         "share" : {
+            "Archive::Tar" : "0",
+            "Config" : "0",
+            "HTTP::Tiny" : "0.044",
+            "IO::Socket::SSL" : "1.56",
+            "IO::Zlib" : "0",
+            "Mojo::DOM58" : "1.00",
+            "Mozilla::CA" : "0",
+            "Net::SSLeay" : "1.49",
+            "Sort::Versions" : "0",
+            "URI" : "0",
+            "URI::Escape" : "0"
+         },
+         "system" : {}
+      }
+   },
+   "x_serialization_backend" : "JSON::PP version 4.16"
+}

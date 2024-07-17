@@ -47,3 +47,7 @@ Revision history for List-Gen
 
 0.974   2011.11.11
         a few bug fixes.
+
+0.975   2024.05.17
+        modify tests according to recent perl version.
+        fix bug https://rt.cpan.org/Ticket/Display.html?id=105758.

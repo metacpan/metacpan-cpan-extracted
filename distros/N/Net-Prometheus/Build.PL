@@ -1,3 +1,4 @@
+use v5;
 use strict;
 use warnings;
 
@@ -20,7 +21,7 @@ my $build = Module::Build->new(
       'Module::Build' => '0.4004', # test_requires
    },
    requires => {
-      'perl' => '5.010', # //
+      'perl' => '5.014',
       'List::Util' => '1.33',
       'Ref::Util' => 0,
       'Struct::Dumb' => 0,
@@ -29,8 +30,7 @@ my $build = Module::Build->new(
    test_requires => {
       'List::Util'  => '1.29', # pairgrep
       'HTTP::Request' => 0,
-      'Test::Fatal' => 0,
-      'Test::More'  => '0.88', # done_testing
+      'Test2::V0' => 0,
    },
    test_recommends => {
       'Future::IO::Impl::UV' => '0.03',

@@ -36,12 +36,12 @@
             "AnyEvent" : "0",
             "AnyEvent::Handle::UDP" : "0",
             "Class::Accessor::Fast" : "0",
-            "Data::Radius" : "v1.2.3",
+            "Data::Radius" : "v1.2.8",
             "perl" : "5.010000"
          }
       }
    },
    "release_status" : "stable",
-   "version" : "v1.1.4",
-   "x_serialization_backend" : "JSON::PP version 4.02"
+   "version" : "v1.1.5",
+   "x_serialization_backend" : "JSON::PP version 4.06"
 }

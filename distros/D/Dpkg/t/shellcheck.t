@@ -34,6 +34,7 @@ my @todofiles = qw(
 my @files = qw(
     autogen
     build-aux/gen-release
+    build-aux/get-vcs-id
     build-aux/get-version
     build-aux/run-script
     debian/dpkg.cron.daily
@@ -41,7 +42,6 @@ my @files = qw(
     src/dpkg-db-backup.sh
     src/dpkg-db-keeper.sh
     src/dpkg-maintscript-helper.sh
-    src/dpkg-realpath.sh
 );
 my @shellcheck_opts = (
     '--external-sources', # Allow checking external source files.

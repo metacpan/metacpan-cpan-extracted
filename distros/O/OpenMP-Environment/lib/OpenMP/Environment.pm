@@ -4,7 +4,7 @@ use warnings;
 
 use Validate::Tiny qw/filter is_in/;
 
-our $VERSION = q{1.2.0};
+our $VERSION = q{1.2.1};
 
 our @_OMP_VARS = (
     qw/OMP_CANCELLATION OMP_DISPLAY_ENV OMP_DEFAULT_DEVICE OMP_NUM_TEAMS
@@ -499,9 +499,18 @@ Provides accessors for affecting the OpenMP/GOMP environmental
 variables that affect some aspects of OpenMP programs and shared
 libraries at libary load and run times.
 
-This module is not directly useful with L<Inline::C> and L<Alien::OpenMP>,
-but can be. See L<Example 5> for more information on how to
-achieve this utility.
+The author of this module is also the author of L<OpenMP::Simple>,
+and it is recommended that these two modules be used together for
+maximum ease of creating Perl programs that contains C code that has
+been parallelized using OpenMP. L<Example 4> illustrates how to use
+L<Alien::OpenMP> and directly query C<%ENV> in a way that mimicks
+the OpenMP runtime's expected behavior of querying the environment
+for some important information like C<OMP_NUM_THREADS> explicitly.
+
+However, the recommended approach is illustrated in L<Example 5>,
+which uses both L<OpenMP::Simple> and L<OpenMP::Environment> to
+incorporate an C<%ENV> aware OpenMP into a Perl programs as seamlessly
+as possible.
 
 There are setters, getters, and unsetters for all published OpenMP
 (and GOMP) environmental variables, in additional to some utility
@@ -662,15 +671,21 @@ that it sets
         my $oenv = OpenMP::Environment->new;
         $oenv->omp_num_threads(16);     # serve as "default" (actual standard default is 4)
         $oenv->omp_thread_limit(32);    # demonstrate setting of the max number of threads
-    
-        # build and load subroutines
+
+        use Alien::OpenMP;
         use Inline (
-            C           => 'DATA',
-            name        => q{Test},
-            ccflagsex   => q{-fopenmp},
-            lddlflags   => join( q{ }, $Config::Config{lddlflags}, q{-fopenmp} ),
-            BUILD_NOISY => 1,
+            C    => 'DATA',
+            with => qw/Alien::OpenMP/,
         );
+    
+        # Note: Alien::OpenMP replaces:
+        #  use Inline (
+        #    C           => 'DATA',
+        #    name        => q{Test},
+        #    ccflagsex   => q{-fopenmp},
+        #    lddlflags   => join( q{ }, $Config::Config{lddlflags}, q{-fopenmp} ),
+        #    BUILD_NOISY => 1,
+        #  );
     }
     
     # use default
@@ -703,7 +718,8 @@ that it sets
 L<Example 5> in the following section demostrates how get around this
 restriction somewhat. The caveat is that the respective environmental
 variable must also come with a corresponding I<setter> function in the
-OpenMP run time.
+OpenMP run time. L<OpenMP::Simple> was written to do exactly that as
+seemlessly as possible and is currently the recommended approach.
 
 =head2 Example 5
 
@@ -722,44 +738,48 @@ The "user experience" of one running an OpenMP program from the
 shell is that it the number of threads used in the program may be
 set implicitly using the OMP_NUM_THREADS environmental variable.
 Therefore, one may run the binary in a shell loop and update
-C<OMP_NUM_THREADS> environmentally.
+C<OMP_NUM_THREADS> environmentally. Using L<OpenMP::Simple> (itself
+a wrapper around L<Alien::OpenMP>) makes it extremely clean and
+easy to begin adding OpenMP parallelized C code into Perl programs
+which contain the kind of environmental runtime controls one familiar
+with OpenMP has come to expect.
 
-    # build and load subroutines
-    use Inline (
-        C           => 'DATA',
-        name        => q{Test},
-        ccflagsex   => q{-fopenmp},
-        lddlflags   => join( q{ }, $Config::Config{lddlflags}, q{-fopenmp} ),
-        BUILD_NOISY => 1,
-    );
-    
-    my $oenv = OpenMP::Environment->new;
-    for my $num_threads (qw/1 2 4 8 16 24/) {
-        $oenv->omp_num_threads($num_threads);
-        test();
+  use strict;
+  use warnings;
+  
+  use OpenMP::Simple;
+  use OpenMP::Environment;
+  use Test::More tests => 8;
+  
+  use Inline (
+      C    => 'DATA',
+      with => qw/OpenMP::Simple/,
+  );
+  
+  my $env = OpenMP::Environment->new;
+  
+  note qq{Testing macro provided by OpenMP::Simple, 'PerlOMP_UPDATE_WITH_ENV__NUM_THREADS'};
+  for my $num_threads ( 1 .. 8 ) {
+      my $current_value = $env->omp_num_threads($num_threads);
+      is _get_num_threads(), $num_threads, sprintf qq{The number of threads (%0d) spawned in the OpenMP runtime via OMP_NUM_THREADS, as expected}, $num_threads;
+  }
+  
+  __DATA__
+  __C__
+  int _get_num_threads() {
+    PerlOMP_UPDATE_WITH_ENV__NUM_THREADS // <~ MACRO provided by OpenMP::Simple reads and updates based on OMP_NUM_THREADS in %ENV
+    int ret = 0;
+    #pragma omp parallel
+    {
+      #pragma omp single
+      ret = omp_get_num_threads();
     }
-    
-    __DATA__
-    
-    __C__
-    #include <omp.h>
-    #include <stdio.h>
-    #include <stdlib.h>
-     
-    void test() {
-      _ENV_set_num_threads();
-      #pragma omp parallel
-      {
-        if (0 == omp_get_thread_num())
-          printf("%-2d threads\n", omp_get_num_threads()); 
-      }
-    }
-        
-    void _ENV_set_num_threads() {
-      char *num;
-      num = getenv("OMP_NUM_THREADS");
-      omp_set_num_threads(atoi(num));
-    }
+    return ret;
+  }
+  
+  __END__
+
+=head2 Additional Discussion
 
 OpenMP benchmarks are often written in this fashion. It is possible
 to affect the number of threads in the binary, but only through

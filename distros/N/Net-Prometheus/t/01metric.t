@@ -1,10 +1,9 @@
 #!/usr/bin/perl
 
-use strict;
+use v5.14;
 use warnings;
 
-use Test::More;
-use Test::Fatal;
+use Test2::V0;
 
 use Net::Prometheus::Metric;
 
@@ -56,7 +55,7 @@ use Net::Prometheus::Metric;
    my $sample = $metric->make_sample( undef, "", 123 );
 
    is( $sample->varname, "basename", '$sample->varname' );
-   is_deeply( $sample->labels, [],   '$sample->labels' );
+   is( $sample->labels, [],   '$sample->labels' );
    is( $sample->value, 123,          '$sample->value' );
 
    is( $metric->make_sample( "suffix", "", 456 )->varname,
@@ -67,21 +66,21 @@ use Net::Prometheus::Metric;
 
 # exceptions
 {
-   ok( exception {
+   ok( dies {
          Net::Prometheus::Metric->new(
             name => "with_no_help",
          )
       }, 'Metric without help dies'
    );
 
-   ok( exception {
+   ok( dies {
          Net::Prometheus::Metric->new(
             help => "This metric lacks a name",
          )
       }, 'Metric without name dies'
    );
 
-   ok( exception {
+   ok( dies {
          Net::Prometheus::Metric->new(
             name => "hello/world",
             help => "",

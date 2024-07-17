@@ -7,7 +7,6 @@ use warnings;
 use DateTime;
 use DateTime::Format::ISO8601;
 use DateTime::TimeZone;
-use Try::Tiny;
 use Data::Roundtrip qw/perl2dump no-unicode-escape-permanently/;
 ####
 # Note that we require conditionally Geo::Location::TimeZone, see below
@@ -16,7 +15,7 @@ use Data::Roundtrip qw/perl2dump no-unicode-escape-permanently/;
 # the real heavy lifter!!! thank you :
 use Astro::MoonPhase;
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 use Exporter 'import';
 our (@EXPORT, @EXPORT_OK);
@@ -64,7 +63,7 @@ sub	calculate_moon_phase {
 			print STDERR "$whoami (via $parent) : parameter 'time' does not parse hh:mm:ss : ".$params->{'time'}."\n";
 			return undef
 		}
-		print STDOUT "$whoami (via $parent) : found parameter 'time' : '".$params->{'date'}."'.\n" if $verbosity > 1;
+		print STDOUT "$whoami (via $parent) : found parameter 'time' : '".$params->{'time'}."'.\n" if $verbosity > 1;
 	}
 	if( exists($params->{'location'}) && defined($params->{'location'}) ){
 		if( (ref($params->{'location'})eq'' && ($params->{'location'}=~/^[- a-zA-Z]+$/)) ){
@@ -75,6 +74,9 @@ sub	calculate_moon_phase {
 			print STDERR "$whoami (via $parent) : parameter 'location' is not a string of a location name (e.g. London) or it is not a HASHref which contains the two keys 'lon' and 'lat' : ".perl2dump(\$params->{'location'})."\n";
 			return undef
 		}
+	}
+	if( exists($params->{'localtimezone'}) && defined($params->{'localtimezone'}) ){
+		print STDOUT "$whoami (via $parent) : found parameter 'localtimezone' : '".$params->{'localtimezone'}."'.\n" if $verbosity > 1;
 	}
 
 	my $parsed_results = _parse_event($params);
@@ -93,18 +95,25 @@ sub	calculate_moon_phase {
 		$SunAng
 	) = Astro::MoonPhase::phase($epoch);
 
+	# the phases are unix epoch for each of the below moon phase names
+	# we are printing the date via DateTime on that epoch and adjusting for the timezone
+	# the user asked or UTC/or-local-see-below if none was specified.
+	# localtime() uses locale timezone or envvar TZ
+	# the DateTime as came from $parsed_results{'datetime'} knows the used timezone
+	# so we will use that same timezone.
+	#'New Moon' => scalar localtime($phases[0]), #<<< don't use this
+	my @phases = phasehunt($epoch);
+	my @phases_names = ('New Moon', 'First quarter', 'Full moon', 'Last quarter', 'Next New Moon');
+	my %phases = map { $phases_names[$_] => DateTime->from_epoch(epoch => $phases[$_], time_zone => $parsed_results->{'datetime'}->time_zone())->strftime('%a %b %d %T %Y') } 0..$#phases;
+
 	my $outstr = "Moon age: $MoonAge days\n";
 	$outstr .= "Moon phase: " . sprintf("%.1f", 100.0*$MoonPhase) . " % of cycle (birth-to-death)\n";
 	$outstr .= "Moon's illuminated fraction: " . sprintf("%.1f", 100.0*$MoonIllum) . " % of full disc\n";
 	$outstr .= "important moon phases around specified date ".$params->{'date'}.":\n";
-	my @phases = phasehunt($epoch);
-	$outstr .= "  New Moon      = ". scalar(localtime($phases[0])). "\n";
-	$outstr .= "  First quarter = ". scalar(localtime($phases[1])). "\n";
-	$outstr .= "  Full moon     = ". scalar(localtime($phases[2])). "\n";
-	$outstr .= "  Last quarter  = ". scalar(localtime($phases[3])). "\n";
-	$outstr .= "  New Moon      = ". scalar(localtime($phases[4])). "\n";
 
-	return {
+	$outstr .= sprintf("  %-14s= %s\n", $phases_names[$_], $phases{$phases_names[$_]}) for 0..$#phases;
+
+	my %ret = (
 		'MoonPhase' => $MoonPhase,
 		'MoonPhase%' => 100.0*$MoonPhase,
 		'MoonIllum' => $MoonIllum,
@@ -114,15 +123,11 @@ sub	calculate_moon_phase {
 		'MoonAng' => $MoonAng,
 		'SunDist' => $SunDist,
 		'SunAng' => $SunAng,
-		'phases' => {
-			'New Moon' => scalar localtime($phases[0]),
-			'First quarter' => scalar localtime($phases[1]),
-			'Full moon' => scalar localtime($phases[2]),
-			'Last quarter' => scalar localtime($phases[3]),
-			'Next New Moon' => scalar localtime($phases[4]),
-		},
+		'phases' => \%phases,
 		'asString' => $outstr,
-	}
+	);
+
+	return \%ret;
 }
 
 sub _event2str {
@@ -147,6 +152,8 @@ sub _event2str {
 # it expects a HASHref of input parameters which contain:
 #   date : the date of when you want to calculate the moon phase, YYYY-MM-DD
 #   time : optional time in hh:mm:ss
+#   localtimezone : optional LOCAL timezone for making the corrections to the UTC-based epoch
+#   
 #   timezone : optional timezone as a TZ identifier e.g. Africa/Abidjan
 #   location : optionally deduce timezone from location if above timezone is absent,
 #              it is a nameplace string, e.g. 'Abidjan'
@@ -183,7 +190,23 @@ sub _parse_event {
 	my $dt = eval { DateTime::Format::ISO8601->parse_datetime($isostr) };
 	if( ! defined($dt) || $@ ){ print STDERR "_parse_event() : failed to parse date '$isostr', check date and time fields.\n"; return undef }
 	$params->{datetime} = $dt;
+
+	# our local timezone:
+	$params->{localtimezone} = DateTime::TimeZone->new( name => "local")->name();
+
+	# this is the default timezone if user did not specify one
+	# DateTime::TimeZone->new( name => "local")->name();
+	# will print the local timezone if you want to set that
+	# but if you use local timezone then make sure that in the tests
+	# you always specify a location/timezone else some will fail!!!!!!!
+	# see https://rt.cpan.org/Ticket/Display.html?id=154400
+	# by using UTC, as default we are saying that if no location was specified
+	# then the user-specified times are in UTC
+	# but if we use that the tests break if test machine's local timezone is different
 	$dt->set_time_zone('UTC');
+	#$dt->set_time_zone($params->{localtimezone}); # make sure the tests don't break
+	#print "_parse_event(): found local timezone to be '".$params->{localtimezone}."' (this can be overriden by user) ...\n"
+	#	if $verbosity > 2;
 
 	my $tzstr = undef;
 	if( exists $params->{timezone} ){
@@ -214,7 +237,8 @@ sub _parse_event {
 
 	if( defined $tzstr ){
 		# the DateTime object now has the specified timezone
-		# but its epoch will still be UTC-based...
+		# but its epoch will still be UTC-based (as always) ...
+		# our "localepoch" is adjusted though, see below,
 		$dt->set_time_zone($tzstr);
 
 		# we have a timezone, find the offset and add it to the epoch
@@ -229,7 +253,7 @@ sub _parse_event {
 		# we should not change the DateTime, just our own 'localepoch' 
 		#$dt->add(seconds => $offset);
 		$localepoch += $offset;
-		print STDOUT "_parse_event(): adjusted epoch for timezone '$tzstr' to $localepoch.\n"
+		print STDOUT "_parse_event(): adjusted epoch for timezone '$tzstr' to $localepoch (offset of $offset).\n"
 			if $verbosity > 0;
 	}
 	print STDOUT "DateTime: $dt\n(timezone: ".$dt->time_zone().")\n_parse_event(): above is the DateTime object for the moon phase calculations, with adjusted timezone.\n"
@@ -250,7 +274,7 @@ Astro::MoonPhase::Simple - Calculate the phase of the Moon on a given time witho
 
 =head1 VERSION
 
-Version 0.02
+Version 0.03
 
 
 =head1 SYNOPSIS
@@ -315,16 +339,20 @@ the moon is observed from and this
 will deduce the timezone, albeit not always as accurately
 as with specifying a "timezone" explicitly.
 
+Warning: if the caller does not specify a C<timezone> or C<location>
+then the specified C<time> will be assumed to be B<UTC time> and not
+at the local timezone of the host.
+
 L<Astro::MoonPhase> calculates the moon phase
 given an I<epoch>. Which is the number of seconds
-since 1970-01-01 on a UTC timezone. This epoch
-is corrected to a I<localepoch> by adding to it
+since 1970-01-01 B<on a UTC timezone>. This epoch
+is corrected to a "I<localepoch>" by adding to it
 the specific timezone offset. For example, if you
 specified the timezone to be "China/Beijing" and
 the local time (at the specified timezone) to be 23:00.
 It means UTC time is 15:00. The epoch will be calculated
-on UTC time. However, we add 23:00-15:00=8:00 hours to
-that epoch to make it "localepoch" and this is
+on UTC time. However, we add C<23:00-15:00=8:00> hours to
+that epoch to make it "I<localepoch>" and this is
 what we pass on to L<Astro::MoonPhase> to calculate
 the moon phase.
 
@@ -376,6 +404,13 @@ code for tracking the planets and at different altitudes.
 I can't iterate enough that this module wraps the
 functionality of L<Astro::MoonPhase>.
 L<Astro::MoonPhase> does all the heavy lifting.
+
+=head1 CAVEATS
+
+In L<calculate_moon_phase>, if the caller does not specify a C<timezone> or C<location>
+then the specified C<time> will be assumed to be B<UTC time> and not
+at the local timezone of the host.
+
 
 =head1 AUTHOR
 

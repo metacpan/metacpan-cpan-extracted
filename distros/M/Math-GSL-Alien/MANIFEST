@@ -1,0 +1,10 @@
+alienfile
+Changes
+lib/Math/GSL/Alien.pm
+Makefile.PL
+MANIFEST
+MANIFEST.SKIP
+t/00_diag.t
+t/alien_gsl.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

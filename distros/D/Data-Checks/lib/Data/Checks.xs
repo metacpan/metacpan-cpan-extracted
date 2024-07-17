@@ -86,6 +86,7 @@ struct DataChecks_Checker
 #include "make_argcheck_ops.c.inc"
 #include "newOP_CUSTOM.c.inc"
 #include "optree-additions.c.inc"
+#include "sv_regexp_match.c.inc"
 #include "sv_streq.c.inc"
 #include "sv_numcmp.c.inc"
 
@@ -368,6 +369,29 @@ static SV *mk_constraint_StrEq(pTHX_ size_t nargs, SV **args)
   return ret;
 }
 
+static bool constraint_StrMatch(pTHX_ struct Constraint *c, SV *value)
+{
+  if(!constraint_Str(aTHX_ c, value))
+    return false;
+
+  return sv_regexp_match(value, (REGEXP *)c->args[0]);
+}
+
+static SV *mk_constraint_StrMatch(pTHX_ SV *arg0)
+{
+  SV *ret;
+  struct Constraint *c;
+  alloc_constraint(&ret, &c, &constraint_StrMatch, 1);
+  sv_2mortal(ret);
+
+  if(!SvROK(arg0) || !SvRXOK(SvRV(arg0)))
+    croak("Require a pre-compiled regexp pattern for StrMatch()");
+
+  c->args[0] = SvREFCNT_inc(SvRV(arg0));
+
+  return ret;
+}
+
 static bool constraint_Num(pTHX_ struct Constraint *c, SV *value)
 {
   if(!SvOK(value))
@@ -383,14 +407,22 @@ static bool constraint_Num(pTHX_ struct Constraint *c, SV *value)
 
     return false;
   }
+  else if(SvPOK(value)) {
+    if(!looks_like_number(value))
+      return false;
+
+    // reject NaN
+    if(SvPVX(value)[0] == 'N' || SvPVX(value)[0] == 'n')
+      return false;
+
+    return true;
+  }
   else {
-    if(!SvPOK(value))
-      return true;
+    // reject NaN
+    if(SvNOK(value) && Perl_isnan(SvNV(value)))
+      return false;
 
-    if(looks_like_number(value))
-      return true;
-
-    return false;
+    return true;
   }
 }
 
@@ -633,12 +665,26 @@ static SV *mk_constraint_Any(pTHX_ size_t nargs, SV **args)
 {
   if(!nargs)
     croak("Any() requires at least one inner constraint");
+  if(nargs == 1)
+    return args[0];
 
   AV *inners = newAV();
   sv_2mortal((SV *)inners); // in case of croak during construction
 
-  for(size_t i = 0; i < nargs; i++)
-    av_push(inners, SvREFCNT_inc(extract_constraint(args[i])));
+  for(size_t i = 0; i < nargs; i++) {
+    SV *innersv = extract_constraint(args[i]);
+    struct Constraint *inner = (struct Constraint *)SvPVX(innersv);
+
+    if(inner->func == &constraint_Any) {
+      AV *kidav = (AV *)inner->args[0];
+      size_t nkids = av_count(kidav);
+      for(size_t kidi = 0; kidi < nkids; kidi++) {
+        av_push(inners, SvREFCNT_inc(AvARRAY(kidav)[kidi]));
+      }
+    }
+    else
+      av_push(inners, SvREFCNT_inc(innersv));
+  }
 
   SV *ret;
   struct Constraint *c;
@@ -671,13 +717,28 @@ static bool constraint_All(pTHX_ struct Constraint *c, SV *value)
 static SV *mk_constraint_All(pTHX_ size_t nargs, SV **args)
 {
   /* nargs == 0 is valid */
+  if(nargs == 1)
+    return args[0];
+
   AV *inners = NULL;
   if(nargs) {
     inners = newAV();
     sv_2mortal((SV *)inners); // in case of croak during construction
 
-    for(size_t i = 0; i < nargs; i++)
-      av_push(inners, SvREFCNT_inc(extract_constraint(args[i])));
+    for(size_t i = 0; i < nargs; i++) {
+      SV *innersv = extract_constraint(args[i]);
+      struct Constraint *inner = (struct Constraint *)SvPVX(innersv);
+
+      if(inner->func == &constraint_All) {
+        AV *kidav = (AV *)inner->args[0];
+        size_t nkids = av_count(kidav);
+        for(size_t kidi = 0; kidi < nkids; kidi++) {
+          av_push(inners, SvREFCNT_inc(AvARRAY(kidav)[kidi]));
+        }
+      }
+      else
+        av_push(inners, SvREFCNT_inc(innersv));
+    }
   }
 
   SV *ret;
@@ -859,6 +920,145 @@ static void S_make_narg_constraint(pTHX_ const char *name, SV *(*mk_constraint)(
   av_push(exportok, newSVpv(name, 0));
 }
 
+#define sv_catsv_quotedprefix(buf, sv)  S_sv_catsv_quotedprefix(aTHX_ buf, sv)
+static void S_sv_catsv_quotedprefix(pTHX_ SV *buf, SV *sv)
+{
+#ifdef SVf_QUOTEDPREFIX
+  sv_catpvf(buf, "%" SVf_QUOTEDPREFIX, SVfARG(sv));
+#else
+  /* Not perfect as it won't do escaping but it'll do for human debugging purposes */
+  STRLEN len;
+  const char *s = SvPV_const(sv, len);
+  sv_catpvs(buf, "\"");
+  if(len > 256) {
+    sv_catpvn(buf, s, 256);
+    sv_catpvs(buf, "...");
+  }
+  else
+    sv_catpvn(buf, s, len);
+  sv_catpvs(buf, "\"");
+#endif
+}
+
+/* For debug and unit-test use */
+#define debug_inspect_constraint(c)  S_debug_inspect_constraint(aTHX_ c)
+static SV *S_debug_inspect_constraint(pTHX_ SV *csv)
+{
+  struct Constraint *c = (struct Constraint *)SvPVX(csv);
+
+  const char *name = NULL;
+  SV *args = sv_2mortal(newSVpvn("", 0));
+
+  /* such a shame C doesn't let us use function addresses as case labels */
+
+  // 0arg
+  if     (c->func == &constraint_Defined)
+    name = "Defined";
+  else if(c->func == &constraint_Object)
+    name = "Object";
+  else if(c->func == &constraint_ArrayRef)
+    name = "ArrayRef";
+  else if(c->func == &constraint_HashRef)
+    name = "HashRef";
+  else if(c->func == &constraint_Callable)
+    name = "Callable";
+  else if(c->func == &constraint_Num)
+    name = "Num";
+  else if(c->func == &constraint_Str)
+    name = "Str";
+  // 1arg
+  else if(c->func == &constraint_Isa) {
+    name = "Isa";
+    sv_catsv_quotedprefix(args, c->args[0]);
+  }
+  else if(c->func == &constraint_StrMatch) {
+    name = "StrMatch";
+    /* This isn't perfect if the pattern contains literal '/'s but it'll do
+     * for human-inspection debugging purposes */
+    sv_catpvs(args, "/");
+    sv_catsv(args, c->args[0]);
+    sv_catpvs(args, "/");
+  }
+  else if(c->func == &constraint_Maybe) {
+    name = "Maybe";
+    args = debug_inspect_constraint(c->args[0]);
+  }
+  // 2arg
+  else if(c->func == &constraint_NumRange) {
+    name = "NumRange";
+
+    if(c->args[0])
+      sv_catsv(args, c->args[0]);
+    else
+      sv_catpvs(args, "undef");
+    sv_catpvs(args, ", ");
+    if(c->args[1])
+      sv_catsv(args, c->args[1]);
+    else
+      sv_catpvs(args, "undef");
+  }
+  // narg
+  else if(c->func == &constraint_NumEq) {
+    name = "NumEq";
+    if(SvTYPE(c->args[0]) != SVt_PVAV)
+      sv_catsv(args, c->args[0]);
+    else {
+      U32 n = av_count((AV *)c->args[0]);
+      SV **vals = AvARRAY(c->args[0]);
+      for(U32 i = 0; i < n; i++) {
+        if(i > 0)
+          sv_catpvs(args, ", ");
+        sv_catsv(args, vals[i]);
+      }
+    }
+  }
+  else if(c->func == &constraint_StrEq) {
+    name = "StrEq";
+    if(SvTYPE(c->args[0]) != SVt_PVAV)
+      sv_catsv_quotedprefix(args, c->args[0]);
+    else {
+      U32 n = av_count((AV *)c->args[0]);
+      SV **vals = AvARRAY(c->args[0]);
+      for(U32 i = 0; i < n; i++) {
+        if(i > 0)
+          sv_catpvs(args, ", ");
+        sv_catsv_quotedprefix(args, vals[i]);
+      }
+    }
+  }
+  else if(c->func == &constraint_Any || c->func == &constraint_All) {
+    name = (c->func == &constraint_Any) ? "Any" : "All";
+    if(c->args[0]) {
+      U32 n = av_count((AV *)c->args[0]);
+      SV **inners = AvARRAY(c->args[0]);
+      for(U32 i = 0; i < n; i++) {
+        if(i > 0)
+          sv_catpvs(args, ", ");
+        sv_catsv(args, debug_inspect_constraint(inners[i]));
+      }
+    }
+  }
+
+  else
+    return newSVpvs_flags("TODO: debug inspect constraint", SVs_TEMP);
+
+  SV *ret = newSVpvf("%s", name);
+  if(c->flags)
+    sv_catpvf(ret, "/%d", c->flags);
+  if(SvCUR(args))
+    sv_catpvf(ret, "(%" SVf ")", SVfARG(args));
+
+  return sv_2mortal(ret);
+}
+
+MODULE = Data::Checks    PACKAGE = Data::Checks::Debug
+
+void inspect_constraint(SV *sv)
+  PPCODE:
+    /* Prevent XSUB from double-mortalising it */
+    PUSHs(debug_inspect_constraint(extract_constraint(sv)));
+    XSRETURN(1);
+
 MODULE = Data::Checks    PACKAGE = Data::Checks::Constraint
 
 void DESTROY(SV *self)
@@ -894,6 +1094,7 @@ BOOT:
   MAKE_0ARG_CONSTRAINT(Num);
 
   MAKE_nARG_CONSTRAINT(StrEq);
+  MAKE_1ARG_CONSTRAINT(StrMatch);
 
   MAKE_1ARG_CONSTRAINT(NumGT);
   MAKE_1ARG_CONSTRAINT(NumGE);

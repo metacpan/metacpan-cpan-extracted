@@ -5,7 +5,7 @@ NAME
 
 VERSION
 
-    Version 0.02
+    Version 0.03
 
 SYNOPSIS
 
@@ -62,15 +62,19 @@ SUBROUTINES
     moon is observed from and this will deduce the timezone, albeit not
     always as accurately as with specifying a "timezone" explicitly.
 
+    Warning: if the caller does not specify a timezone or location then the
+    specified time will be assumed to be UTC time and not at the local
+    timezone of the host.
+
     Astro::MoonPhase calculates the moon phase given an epoch. Which is the
     number of seconds since 1970-01-01 on a UTC timezone. This epoch is
-    corrected to a localepoch by adding to it the specific timezone offset.
-    For example, if you specified the timezone to be "China/Beijing" and
-    the local time (at the specified timezone) to be 23:00. It means UTC
-    time is 15:00. The epoch will be calculated on UTC time. However, we
-    add 23:00-15:00=8:00 hours to that epoch to make it "localepoch" and
-    this is what we pass on to Astro::MoonPhase to calculate the moon
-    phase.
+    corrected to a "localepoch" by adding to it the specific timezone
+    offset. For example, if you specified the timezone to be
+    "China/Beijing" and the local time (at the specified timezone) to be
+    23:00. It means UTC time is 15:00. The epoch will be calculated on UTC
+    time. However, we add 23:00-15:00=8:00 hours to that epoch to make it
+    "localepoch" and this is what we pass on to Astro::MoonPhase to
+    calculate the moon phase.
 
     On failure it returns undef. On success it returns a HASHref with keys:
 
@@ -123,6 +127,12 @@ SEE ALSO
 
     I can't iterate enough that this module wraps the functionality of
     Astro::MoonPhase. Astro::MoonPhase does all the heavy lifting.
+
+CAVEATS
+
+    In calculate_moon_phase, if the caller does not specify a timezone or
+    location then the specified time will be assumed to be UTC time and not
+    at the local timezone of the host.
 
 AUTHOR
 

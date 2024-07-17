@@ -15,7 +15,7 @@ our @EXPORT_OK = (
 );
 our %EXPORT_TAGS = (all => \@EXPORT_OK);
 
-our $VERSION = "v6.28.0";
+our $VERSION = "v6.29.0";
 
 1;
 __END__
@@ -686,7 +686,7 @@ L<https://rxjs.dev/api/operators/endWith>
 
 L<https://rxjs.dev/api/operators/every>
 
-Works like rxjs's "every", except it emits 1 or 0 instead of true of false.
+Works like rxjs's "every", and emits true of false.
 
     # 0, complete
     rx_of(5, 10, 15, 18, 20)->pipe(
@@ -823,7 +823,7 @@ L<https://rxjs.dev/api/operators/ignoreElements>
 
 L<https://rxjs.dev/api/operators/isEmpty>
 
-Works like rxjs's "isEmpty", except it emits 1 or 0 instead of true or false.
+Works like rxjs's "isEmpty", and emits true or false.
 
     # (pause 1 second) 0, complete
     rx_interval(1)->pipe(

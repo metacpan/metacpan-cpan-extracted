@@ -3,6 +3,7 @@ abstract: 'Calculate the phase of the Moon on a given time without too much blah
 author:
   - 'Andreas Hadjiprocopis <bliako@cpan.org>'
 build_requires:
+  Config: '0'
   ExtUtils::MakeMaker: '0'
   FindBin: '0'
   Test::More: '0'
@@ -29,7 +30,6 @@ requires:
   Exporter: '0'
   Geo::Location::TimeZone: '0'
   Getopt::Long: '0'
-  Try::Tiny: '0'
   perl: '5.006'
-version: '0.02'
+version: '0.03'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

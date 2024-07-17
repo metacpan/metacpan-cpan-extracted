@@ -537,6 +537,7 @@ subtest 'op_every' => sub {
         rx_of(5, 10, 15, 18, 20),
     )->pipe(
         op_every(sub { $_->[1] % 5 == 0 }),
+        op_map(sub { $_ ? 1 : 0 }),
     );
     obs_is $o, ['----0'], 'returns false';
 
@@ -758,12 +759,14 @@ subtest 'rx_iif' => sub {
 subtest 'op_is_empty' => sub {
     my $o = rx_interval(1)->pipe(
         op_is_empty,
+        op_map(sub { $_ ? 1 : 0 }),
     );
     obs_is $o, ['-0'], 'full';
 
     $o = rx_timer(2)->pipe(
         op_ignore_elements,
         op_is_empty,
+        op_map(sub { $_ ? 1 : 0 }),
     );
     obs_is $o, ['--1'], 'empty';
 };

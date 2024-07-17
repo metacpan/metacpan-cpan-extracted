@@ -1,5 +1,5 @@
 package ExtUtils::Builder::Profile::Perl;
-$ExtUtils::Builder::Profile::Perl::VERSION = '0.012';
+$ExtUtils::Builder::Profile::Perl::VERSION = '0.014';
 use strict;
 use warnings;
 
@@ -20,7 +20,14 @@ sub process_compiler {
 	my ($class, $compiler, $opts) = @_;
 	my $config = delete $opts->{config};
 	my $incdir = catdir(_get_var($config, $opts, 'archlibexp'), 'CORE');
-	$compiler->add_include_dirs([$incdir], ranking => sub { $_[0] + 1 });
+	my $os = _get_var($config, $opts, 'osname');
+	my $osver = _get_var($config, $opts, 'osvers');
+	my ($osmajor) = $osver =~ /^(\d+)/;
+	if ($os eq 'darwin' && $^X eq '/usr/bin/perl' && $osmajor >= 18) {
+		$compiler->add_argument(value => [ '-iwithsysroot', $incdir ], ranking => $compiler->default_include_ranking + 1);
+	} else {
+		$compiler->add_include_dirs([$incdir], ranking => sub { $_[0] + 1 });
+	}
 	$compiler->add_argument(ranking => 60, value => _split_var($config, $opts, 'ccflags'));
 	$compiler->add_argument(ranking => 65, value => _split_var($config, $opts, 'optimize'));
 	return;
@@ -74,7 +81,7 @@ ExtUtils::Builder::Profile::Perl - A profile for compiling and linking against p
 
 =head1 VERSION
 
-version 0.012
+version 0.014
 
 =head1 SYNOPSIS
 

@@ -2,7 +2,7 @@ package RxPerl::Subscriber;
 use strict;
 use warnings;
 
-our $VERSION = "v6.28.0";
+our $VERSION = "v6.29.0";
 
 sub next {
     my $self = shift;

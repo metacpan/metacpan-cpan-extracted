@@ -1,14 +1,12 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2016-2022 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2016-2024 -- leonerd@leonerd.org.uk
 
-package Net::Prometheus;
+package Net::Prometheus 0.13;
 
-use strict;
+use v5.14;
 use warnings;
-
-our $VERSION = '0.12';
 
 use Carp;
 
@@ -139,7 +137,7 @@ sub new
 
 =head2 register
 
-   $collector = $prometheus->register( $collector )
+   $collector = $prometheus->register( $collector );
 
 Registers a new L<collector|/COLLECTORS> to be collected from by the C<render>
 method. The collector instance itself is returned, for convenience.
@@ -156,7 +154,7 @@ sub register
 
 =head2 unregister
 
-   $prometheus->unregister( $collector )
+   $prometheus->unregister( $collector );
 
 Removes a previously-registered collector.
 
@@ -172,7 +170,7 @@ sub unregister
 
 =head2 new_gauge
 
-   $gauge = $prometheus->new_gauge( %args )
+   $gauge = $prometheus->new_gauge( %args );
 
 Constructs a new L<Net::Prometheus::Gauge> using the arguments given and
 registers it with the exporter. The newly-constructed gauge is returned.
@@ -189,7 +187,7 @@ sub new_gauge
 
 =head2 new_counter
 
-   $counter = $prometheus->new_counter( %args )
+   $counter = $prometheus->new_counter( %args );
 
 Constructs a new L<Net::Prometheus::Counter> using the arguments given and
 registers it with the exporter. The newly-constructed counter is returned.
@@ -206,7 +204,7 @@ sub new_counter
 
 =head2 new_summary
 
-   $summary = $prometheus->new_summary( %args )
+   $summary = $prometheus->new_summary( %args );
 
 Constructs a new L<Net::Prometheus::Summary> using the arguments given
 and registers it with the exporter. The newly-constructed summary is returned.
@@ -223,7 +221,7 @@ sub new_summary
 
 =head2 new_histogram
 
-   $histogram = $prometheus->new_histogram( %args )
+   $histogram = $prometheus->new_histogram( %args );
 
 Constructs a new L<Net::Prometheus::Histogram> using the arguments given
 and registers it with the exporter. The newly-constructed histogram is
@@ -241,7 +239,7 @@ sub new_histogram
 
 =head2 new_metricgroup
 
-   $group = $prometheus->new_metricgroup( %args )
+   $group = $prometheus->new_metricgroup( %args );
 
 Returns a new Metric Group instance as a convenience for registering multiple
 metrics using the same C<namespace> and C<subsystem> arguments. Takes the
@@ -260,10 +258,10 @@ String values to pass by default into new metrics the group will construct.
 Once constructed, the group acts as a proxy to the other C<new_*> methods,
 passing in these values as overrides.
 
-   $gauge = $group->new_gauge( ... )
-   $counter = $group->new_counter( ... )
-   $summary = $group->new_summary( ... )
-   $histogram = $group->new_histogram( ... )
+   $gauge = $group->new_gauge( ... );
+   $counter = $group->new_counter( ... );
+   $summary = $group->new_summary( ... );
+   $histogram = $group->new_histogram( ... );
 
 =cut
 
@@ -279,7 +277,7 @@ sub new_metricgroup
 
 =head2 collect
 
-   @metricsamples = $prometheus->collect( $opts )
+   @metricsamples = $prometheus->collect( $opts );
 
 Returns a list of L<Net::Prometheus::Types/MetricSamples> obtained from all
 of the currently-registered collectors.
@@ -312,12 +310,12 @@ sub collect
 
 =head2 render
 
-   $str = $prometheus->render
+   $str = $prometheus->render;
 
 Returns a string in the Prometheus text exposition format containing the
 current values of all the registered metrics.
 
-   $str = $prometheus->render( { options => "for collectors" } )
+   $str = $prometheus->render( { options => "for collectors" } );
 
 An optional HASH reference may be provided; if so it will be passed into the
 C<collect> method of every registered collector.
@@ -379,7 +377,7 @@ sub render
 
 =head2 handle
 
-   $response = $prometheus->handle( $request )
+   $response = $prometheus->handle( $request );
 
 Given an HTTP request in an L<HTTP::Request> instance, renders the metrics in
 response to it and returns an L<HTTP::Response> instance.
@@ -447,7 +445,7 @@ sub handle
 
 =head2 psgi_app
 
-   $app = $prometheus->psgi_app
+   $app = $prometheus->psgi_app;
 
 Returns a new L<PSGI> application as a C<CODE> reference. This application
 will render the metrics in the Prometheus text exposition format, suitable for
@@ -502,7 +500,7 @@ sub psgi_app
 
 =head2 export_to_Future_IO
 
-   $f = $prometheus->export_to_Future_IO( %args )
+   $f = $prometheus->export_to_Future_IO( %args );
 
 Performs the necessary steps to create a minimal HTTP server for exporting
 metrics over HTTP, by using L<Future::IO> directly. This requires
@@ -557,7 +555,7 @@ sub export_to_Future_IO
 
 =head2 export_to_IO_Async
 
-   $prometheus->export_to_IO_Async( $loop, %args )
+   $prometheus->export_to_IO_Async( $loop, %args );
 
 Performs the necessary steps to create an HTTP server for exporting metrics
 over HTTP via L<IO::Async>. This will involve creating a new

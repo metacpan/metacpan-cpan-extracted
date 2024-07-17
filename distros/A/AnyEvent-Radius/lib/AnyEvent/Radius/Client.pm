@@ -13,6 +13,7 @@ __PACKAGE__->mk_accessors(qw(
                 last_request_id
             ));
 
+use Data::Radius v1.2.8;
 use Data::Radius::Constants qw(%RADIUS_PACKET_TYPES);
 use Data::Radius::Dictionary ();
 use Data::Radius::Packet ();
@@ -311,7 +312,6 @@ sub send_packet {
     my ($packet, $req_id, $auth) = $self->packer()->build(
                         type => $type,
                         av_list => $av_list,
-                        with_msg_auth => 1,
                         request_id => $request_id,
                     );
 

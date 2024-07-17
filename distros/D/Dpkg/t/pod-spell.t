@@ -51,8 +51,10 @@ ORed
 OpenPGP
 RCS
 XDG
+ar
 archqual
 backport
+build-indep
 buildinfo
 bzip2
 bzr
@@ -60,6 +62,7 @@ canonicalized
 checksum
 checksums
 cmdline
+ctrl
 debian
 decompressor
 dep

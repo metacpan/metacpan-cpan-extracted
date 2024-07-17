@@ -160,7 +160,7 @@ class R::OP::FloatComplex {
     return $ret_ndarray;
   }
   
-  precompile static method scamul : R::NDArray::FloatComplex ($scalar_ndarray : R::NDArray::FloatComplex, $x_ndarray : R::NDArray::FloatComplex) {
+  precompile static method scamul : R::NDArray::FloatComplex ($x_ndarray : R::NDArray::FloatComplex, $scalar_ndarray : R::NDArray::FloatComplex) {
     
     unless ($scalar_ndarray) {
       die "The n-dimensional array \$scalar_ndarray must be defined.";
@@ -186,7 +186,7 @@ class R::OP::FloatComplex {
     
     my $scalar = $scalar_data->[0];
     for (my $i = 0; $i < $length; $i++) {
-      $ret_data->[$i] = Math->cmulf($scalar, $x_data->[$i]);
+      $ret_data->[$i] = Math->cmulf($x_data->[$i], $scalar);
     }
     
     return $ret_ndarray;
@@ -225,7 +225,7 @@ class R::OP::FloatComplex {
     return $ret_ndarray;
   }
   
-  precompile static method scadiv : R::NDArray::FloatComplex ($scalar_ndarray : R::NDArray::FloatComplex, $x_ndarray : R::NDArray::FloatComplex) {
+  precompile static method scadiv : R::NDArray::FloatComplex ($x_ndarray : R::NDArray::FloatComplex, $scalar_ndarray : R::NDArray::FloatComplex) {
     
     unless ($scalar_ndarray) {
       die "The n-dimensional array \$scalar_ndarray must be defined.";
@@ -251,7 +251,7 @@ class R::OP::FloatComplex {
     
     my $scalar = $scalar_data->[0];
     for (my $i = 0; $i < $length; $i++) {
-      $ret_data->[$i] = Math->cdivf($scalar, $x_data->[$i]);
+      $ret_data->[$i] = Math->cdivf($x_data->[$i], $scalar);
     }
     
     return $ret_ndarray;

@@ -121,43 +121,37 @@ __DATA__
 __C__
 
 /* Custom driver */
-
 AV* omp_rangeQuery(SV *AoA, int dims, int A, float eps) {
 
-  /* boilerplate */
+  /* boilerplate - updates number of threads to use with what's in $ENV{OMP_NUM_THREADS} */
   PerlOMP_UPDATE_WITH_ENV__NUM_THREADS
+
+  /* boilerplate - creates an array to return back to perl, named "ret" */
   PerlOMP_RET_ARRAY_REF_ret
 
   /* non-boilerplate */
-  int num_nodes = av_count((AV*)SvRV(AoA));
+  int num_nodes = PerlOMP_1D_Array_NUM_ELEMENTS(AoA);
 
   /* get 2d array ref into a 2d C array */
-  float nodes[num_nodes][dims];
-  PerlOMP_2D_AoA_TO_2D_FLOAT_ARRAY(AoA, num_nodes, dims, nodes);
+  float nodes[num_nodes][dims];                                  // create native 2D array as target
+  PerlOMP_2D_AoA_TO_2D_FLOAT_ARRAY(AoA, num_nodes, dims, nodes); // call macro to put AoA into native "nodes" array
 
   float A_x = nodes[A][0];
   float A_y = nodes[A][1];
 
   /* threaded section */
-  int accumulator[num_nodes];
   float dist;
 
-  #pragma omp parallel for shared(accumulator) private(dist)
+  #pragma omp parallel for private(dist)
   for(int i=0; i<num_nodes; i++) {
     float x = nodes[i][0];
     float y = nodes[i][1];
     dist = sqrt(pow(A_x-x,2)+pow(A_y-y,2));
     if (dist <= eps) {
-      accumulator[i] = 1;
-    }
-  }
-
-  for (int i = 0; i<num_nodes; i++) {
-    int tid = omp_get_thread_num();
-    if (accumulator[i] == 1) { 
       av_push(ret, newSViv(i+1));
     }
   }
 
+  // AV* 'ret' comes from "PerlOMP_RET_ARRAY_REF_ret" macro called above
   return ret;
 }

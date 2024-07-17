@@ -1,14 +1,12 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2016 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2016-2024 -- leonerd@leonerd.org.uk
 
-package Net::Prometheus::ProcessCollector;
+package Net::Prometheus::ProcessCollector 0.13;
 
-use strict;
+use v5.14;
 use warnings;
-
-our $VERSION = '0.12';
 
 use Net::Prometheus::Types qw( MetricSamples Sample );
 
@@ -48,7 +46,7 @@ pattern based on the value of the C<$^O> variable on the OS concerned.
 
 =head2 new
 
-   $collector = Net::Prometheus::ProcessCollector->new( %args )
+   $collector = Net::Prometheus::ProcessCollector->new( %args );
 
 Attempts to construct a new process collector for the OS named by C<$^O>,
 passing in any extra arguments into the C<new> constructor for the specific
@@ -84,7 +82,7 @@ sub new
 
 =head2 for_OS
 
-   $collector = Net::Prometheus::ProcessCollector->for_OS( $os, @args )
+   $collector = Net::Prometheus::ProcessCollector->for_OS( $os, @args );
 
 Attempts to construct a new process collector for the named OS. Except under
 especially-exceptional circumstances, you don't want to call this method.
@@ -131,5 +129,11 @@ sub _make_metric
    return MetricSamples( "${prefix}_$varname", $type, $help,
       [ Sample( "${prefix}_$varname", $self->{labels}, $value ) ] );
 }
+
+=head1 AUTHOR
+
+Paul Evans <leonerd@leonerd.org.uk>
+
+=cut
 
 0x55AA;

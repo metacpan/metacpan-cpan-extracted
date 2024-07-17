@@ -1,0 +1,46 @@
+Revision history for Perl module Math::GSL::Alien.
+
+1.01 Renamed to Math::GSL::Alien
+
+1.00 First version
+
+Revision history for Perl extension Alien::GSL.
+
+1.07 2021-07-30 16:56:07 -0600
+  - Production release otherwise identical to 1.06_01
+
+1.06_01 2021-07-30 12:28:08 -0600
+  - Bump configure time prereqs of AB to match what is
+    required at runtime.  (gh#12, gh#16)
+
+1.05_01 2021-07-26 11:42:15 -0600
+  - Additional diagnostics
+
+1.04 2021-07-25 08:03:00 -0600
+  - Work around recent macOS compiler (gh#13)
+
+1.03 2021-06-01 06:20:16 -0600
+  - Migrated to using alienfile for the installer.
+  - New maintainer
+
+1.02 2020-05-03
+  - Chage to https from ftp (Plicease++)
+
+1.01 2017-03-10
+  - Depend on Alien::Base::ModuleBuild in dependencies
+
+1.00 2015-05-30
+  - Breaking change!
+  - Converted to Alien::Base
+
+0.03 2011-10-26
+  - uses Module::Build
+  - has platform specific instruction
+    - download and compile when possible
+    - download precompiled library on MSWindows
+
+0.02 2011-08-01
+  - version incremented as upload to PAUSE wasn't complete
+
+0.01 2011-07-31
+  - original version

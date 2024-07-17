@@ -1,0 +1,3 @@
+class TestCase::Resource::Eigen {
+  native static method test : int ();
+}

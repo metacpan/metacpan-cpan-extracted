@@ -1,14 +1,12 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2016 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2016-2024 -- leonerd@leonerd.org.uk
 
-package Net::Prometheus::Metric;
+package Net::Prometheus::Metric 0.13;
 
-use strict;
+use v5.14;
 use warnings;
-
-our $VERSION = '0.12';
 
 use Carp;
 our @CARP_NOT = qw( Net::Prometheus );
@@ -58,7 +56,7 @@ L<Net::Prometheus::Histogram> - count the distribution of numeric observations
    $metric = Net::Prometheus::Metric->new(
       name => $name,
       help => $help,
-   )
+   );
 
 The constructor is not normally used directly by instrumented code. Instead it
 is more common to use one of the C<new_*> methods on the containing
@@ -68,7 +66,7 @@ registered as a collector, and gets exported by the render method.
    $metric = $prometheus->new_counter(
       name => $name,
       help => $help,
-   )
+   );
 
 In either case, it returns a newly-constructed metric.
 
@@ -137,7 +135,7 @@ sub new
 
 =head2 fullname
 
-   $fullname = $metric->fullname
+   $fullname = $metric->fullname;
 
 Returns the full name for the metric. This is formed by joining any of the
 defined values for C<namespace>, C<subsystem> and C<name> with C<'_'>.
@@ -152,7 +150,7 @@ sub fullname
 
 =head2 labelcount
 
-   $labels = $metric->labelcount
+   $labels = $metric->labelcount;
 
 Returns the number of labels defined for this metric.
 
@@ -166,9 +164,9 @@ sub labelcount
 
 =head2 labels
 
-   $child = $metric->labels( @values )
+   $child = $metric->labels( @values );
 
-   $child = $metric->labels( { name => $value, name => $value, ... } )
+   $child = $metric->labels( { name => $value, name => $value, ... } );
 
 Returns a child metric to represent the general one with the given set of
 labels. The label values may be provided either in a list corresponding to the
@@ -283,7 +281,7 @@ sub MAKE_child_method
 
 =head2 make_sample
 
-   $sample = $metric->make_sample( $suffix, $labelkey, $value, $extralabels )
+   $sample = $metric->make_sample( $suffix, $labelkey, $value, $extralabels );
 
 Returns a new L<Net::Prometheus::Types/Sample> structure to represent the
 given value, by expanding the opaque C<$labelkey> value into its actual label
@@ -321,7 +319,7 @@ sub collect
 
 =head2 samples
 
-   @samples = $metric->samples
+   @samples = $metric->samples;
 
 An abstract method in this class, this method is intended to be overridden by
 subclasses.

@@ -1,9 +1,9 @@
 #!/usr/bin/perl
 
-use strict;
+use v5.14;
 use warnings;
 
-use Test::More;
+use Test2::V0;
 
 use Net::Prometheus::Counter;
 
@@ -24,14 +24,14 @@ sub HASHfromSample
    my @samples = $counter->samples;
    is( scalar @samples, 1, '$counter->samples yields 1 sample' );
 
-   is_deeply( HASHfromSample( $samples[0] ),
+   is( HASHfromSample( $samples[0] ),
       { varname => "test_total", labels => [], value => 0 },
       '$samples[0] initially'
    );
 
    $counter->inc;
 
-   is_deeply( HASHfromSample( ( $counter->samples )[0] ),
+   is( HASHfromSample( ( $counter->samples )[0] ),
       { varname => "test_total", labels => [], value => 1 },
       '$samples[0]'
    );

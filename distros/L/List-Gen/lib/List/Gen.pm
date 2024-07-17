@@ -87,7 +87,7 @@ package List::Gen;
 
     my $MAX_IDX = eval {require POSIX; POSIX::DBL_MAX()} || 2**53 - 1;
 
-    our $VERSION = '0.974';
+    our $VERSION = '0.975';
 
 =head1 NAME
 
@@ -95,7 +95,7 @@ List::Gen - provides functions for generating lists
 
 =head1 VERSION
 
-version 0.974
+version 0.975
 
 =head1 SYNOPSIS
 
@@ -4083,19 +4083,27 @@ utilizing the same mechanism as the C<< <1..>->grep('prime') >> construct, the
 C< primes > function returns an equivalent, but more efficiently constructed
 generator.
 
-prime numbers below 1e7 are tested with a sieve of eratosthenes and should be
-reasonably efficient. beyond that, simple trial division is used.
+If the module C<Math::Prime::Util> is found in C<@INC>, the
+functions C<next_prime> and C<is_prime> thereof are used for generating
+and testing of primes.
+By setting C<$List::Gen::FORCE_PRIME> to true the
+below described internal implementation can be forced.
+
+Otherwise prime numbers below 1e7 are tested with a sieve of
+eratosthenes and should be reasonably efficient. beyond that, simple
+trial division is used.
 
 C< primes > always returns the same generator.
 
 =cut
 
     {
-        our $DEBUG_PRIME;
+        our ($DEBUG_PRIME, $FORCE_PRIME);
         BEGIN {
             *List::Gen::DEBUG_PRIME = sub () {0}
                 unless defined &List::Gen::DEBUG_PRIME;
         }
+        my $have_mpu = eval {require Math::Prime::Util};
         my ($max, $prime, $primes_gen) = -1;
         sub _reset_prime {$max = -1; $primes_gen = $prime = ''}
         my $build = sub {
@@ -4111,18 +4119,24 @@ C< primes > always returns the same generator.
         };
         sub primes () {
            $primes_gen ||= do {
-                $build->(1000);
                 my ($n, $lim, $i) = 2;
+                if ($have_mpu && !$FORCE_PRIME) {
+                    $n = 1;
+                    return &iterate(sub {
+                            $n = Math::Prime::Util::next_prime($n);
+                        });
+                }
+                $build->(1000);
                 &iterate(sub {
                     if (List::Gen::DEBUG_PRIME and $DEBUG_PRIME) {
                         return $n++ if $n == 2;
                         no warnings;
                         goto trial_division
                     }
-                    if ($n < 1e7) {
+                    if ($n <= 9999991) {
                         $n > $max and $build->($n * 10)
-                           until substr $prime, $n++, 1;
-                        $n - 1
+                           until length($prime) >= $n && substr $prime, $n++, 1;
+                        return $n - 1;
                     }
                     else {trial_division:
                         while (1) {
@@ -4144,6 +4158,9 @@ C< primes > always returns the same generator.
             if (List::Gen::DEBUG_PRIME and $DEBUG_PRIME) {
                 no warnings;
                 goto trial_division
+            }
+            if ($have_mpu && !$FORCE_PRIME) {
+                return Math::Prime::Util::is_prime($n);
             }
             if ($n < 1e7) {
                 $build->($n * 10) if $n > $max;

@@ -40,12 +40,12 @@
             "Exporter" : "0",
             "Geo::Location::TimeZone" : "0",
             "Getopt::Long" : "0",
-            "Try::Tiny" : "0",
             "perl" : "5.006"
          }
       },
       "test" : {
          "requires" : {
+            "Config" : "0",
             "FindBin" : "0",
             "Test::More" : "0",
             "Try::Tiny" : "0"
@@ -53,6 +53,6 @@
       }
    },
    "release_status" : "stable",
-   "version" : "0.02",
+   "version" : "0.03",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

@@ -40,11 +40,11 @@ C<static method sub : L<R::NDArray::Float|SPVM::R::NDArray::Float> ($x_ndarray :
 
 =head2 mul
 
-C<static method mul : L<R::NDArray::Float|SPVM::R::NDArray::Float> ($x_ndarray : L<R::NDArray::Float|SPVM::R::NDArray::Float>, $y_ndarray : L<R::NDArray::Float|SPVM::R::NDArray::Float>);>
+C<static method mul : L<R::NDArray::Float|SPVM::R::NDArray::Float> ($y_ndarray : L<R::NDArray::Float|SPVM::R::NDArray::Float>, $x_ndarray : L<R::NDArray::Float|SPVM::R::NDArray::Float>);>
 
 =head2 scamul
 
-C<static method scamul : R::NDArray::Int ($scalar_ndarray : L<R::NDArray::Float|SPVM::R::NDArray::Float>, $x_ndarray : L<R::NDArray::Float|SPVM::R::NDArray::Float>);>
+C<static method scamul : R::NDArray::Int ($x_ndarray : L<R::NDArray::Float|SPVM::R::NDArray::Float>, $scalar_ndarray : L<R::NDArray::Float|SPVM::R::NDArray::Float>);>
 
 =head2 div
 
@@ -52,7 +52,7 @@ C<static method div : L<R::NDArray::Float|SPVM::R::NDArray::Float> ($x_ndarray :
 
 =head2 scadiv
 
-C<static method scadiv : R::NDArray::Int ($scalar_ndarray : L<R::NDArray::Float|SPVM::R::NDArray::Float>, $x_ndarray : L<R::NDArray::Float|SPVM::R::NDArray::Float>);>
+C<static method scadiv : R::NDArray::Int ($x_ndarray : L<R::NDArray::Float|SPVM::R::NDArray::Float>, $scalar_ndarray : L<R::NDArray::Float|SPVM::R::NDArray::Float>);>
 
 =head2 neg
 

@@ -1,10 +1,10 @@
 {
-   "abstract" : "Provides some DWIM helpers for using OpenMP via C<Inline::C>.",
+   "abstract" : "Wrapper around C<Alien::OpenMP> that provides helpful C MACROs and runtime functions",
    "author" : [
       "oodler <oodler@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.025, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.032, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -28,10 +28,14 @@
       },
       "test" : {
          "requires" : {
+            "Alien::OpenMP" : "0",
             "Digest::MD5" : "0",
             "File::Temp" : "0",
+            "Inline::C" : "0",
+            "OpenMP::Environment" : "0",
             "Test::Exception" : "0",
-            "Test::More" : "0"
+            "Test::More" : "0",
+            "Util::H2O::More" : "0"
          }
       }
    },
@@ -44,9 +48,9 @@
          "web" : "https://github.com/Perl-OpenMP/p5-OpenMP-Simple"
       }
    },
-   "version" : "0.0.5",
-   "x_generated_by_perl" : "v5.36.0",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.29",
+   "version" : "0.0.7",
+   "x_generated_by_perl" : "v5.40.0",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.38",
    "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"
 }
 

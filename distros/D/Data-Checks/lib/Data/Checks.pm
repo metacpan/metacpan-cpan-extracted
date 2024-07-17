@@ -3,7 +3,7 @@
 #
 #  (C) Paul Evans, 2024 -- leonerd@leonerd.org.uk
 
-package Data::Checks 0.07;
+package Data::Checks 0.08;
 
 use v5.22;
 use warnings;
@@ -142,15 +142,29 @@ I<Since version 0.05.>
 Accepts any value that passes the L<Str> check, and additionally is exactly
 equal to I<any of> the given strings.
 
+=head2 StrMatch
+
+   StrMatch(qr/pattern/)
+
+I<Since version 0.08.>
+
+Accepts any value that passes the L<Str> check, and additionally matches the
+given regexp pattern.
+
+Remember that the pattern must be supplied as a C<qr/.../> expression, not
+simply C<m/.../> or C</.../>.
+
 =head2 Num
 
    Num()
 
 Accepts any defined non-reference value that is either a plain number, or a
 string that could be used as one without warning, or a reference to an object
-in a class that overloads numification. rejects undefined, strings that would
-raise a warning if converted to a number, unblessed references, or references
-to objects in classes that do not overload numification.
+in a class that overloads numification. 
+
+Rejects undefined, not-a-number, strings that would raise a warning if
+converted to a number, unblessed references, or references to objects in
+classes that do not overload numification.
 
 =head2 NumGT
 
@@ -254,6 +268,13 @@ At least one constraint is required; it is an error to try to call C<Any()>
 with no arguments. If you need a constraint that accepts any value at all, see
 L</All>.
 
+   $C1 | $C2 | ...
+
+I<Since version 0.08.>
+
+This function is used to implement C<|> operator overloading, so constraint
+checks can be written using this more convenient syntax.
+
 =head2 All
 
    All($C1, $C2, ...)
@@ -270,6 +291,16 @@ situations where it is required to provide a constraint check but you do not
 wish to constraint allowed values.
 
 =cut
+
+{
+   package # hide from indexer
+      Data::Checks::Constraint;
+
+   use overload
+      '|' => sub { my ( $lhs, $rhs ) = @_; return Data::Checks::Any( $lhs, $rhs ) };
+      # For now we won't support or encourage & to mean All() because parsing
+      # of expressions like `Str & Object` doesn't actually work properly.
+}
 
 =head1 XS FUNCTIONS
 
@@ -393,10 +424,6 @@ its assertion message if it does not.
 
 Unit constraints - maybe C<Int>, some plain-only variants of C<Str> and
 C<Num>, some reference types, etc...
-
-=item *
-
-Parametric constraints - C<StrMatch>
 
 =item *
 

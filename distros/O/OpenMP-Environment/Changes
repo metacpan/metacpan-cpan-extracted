@@ -54,3 +54,8 @@ Revision history for Perl extension OpenMP::Environment.
            end up being how all "boolean" envars are handled
          - added a couple more envars missing neede to support
            the upcoming OpenMP::Simple trial release
+
+1.2.1 Tue Jul 16 18:33:00 2024
+         - updated POD to reflect the recommended us of this
+           module with OpenMP::Simple
+         - updated examples

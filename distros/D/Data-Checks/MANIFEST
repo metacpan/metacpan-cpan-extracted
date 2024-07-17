@@ -8,6 +8,7 @@ hax/newOP_CUSTOM.c.inc
 hax/optree-additions.c.inc
 hax/perl-backcompat.c.inc
 hax/sv_numcmp.c.inc
+hax/sv_regexp_match.c.inc
 hax/sv_streq.c.inc
 inc/Module/Build/with/XSTests.pm
 lib/Data/Checks.pm
