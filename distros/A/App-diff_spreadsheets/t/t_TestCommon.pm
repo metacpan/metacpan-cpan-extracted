@@ -3,6 +3,9 @@
 # The author, Jim Avera (jim.avera at gmail) has waived all copyright and
 # related or neighboring rights to the content of this file.
 # Attribution is requested but is not required.
+#
+# PLEASE NOTE that the above applies to THIS FILE ONLY.  Other files in the
+# same distribution or in other collections may have more restrictive terms.
 
 # NO use strict; use warnings here to avoid conflict with t_Common which sets them
 
@@ -36,7 +39,7 @@
 
 package t_TestCommon;
 
-use t_Common qw/oops mytempfile mytempdir/;
+use t_Common qw/oops mytempfile mytempdir/; # also List::Util etc.
 
 use v5.16; # must have PerlIO for in-memory files for ':silent';
 
@@ -84,6 +87,7 @@ our @EXPORT = qw/silent
                  @quotes
                  string_to_tempfile
                  tmpcopy_if_writeable
+                 my_capture my_capture_merged my_tee_merged
                 /;
 our @EXPORT_OK = qw/$savepath $debug $silent $verbose %dvs dprint dprintf/;
 
@@ -99,6 +103,7 @@ unless (Cwd::abs_path(__FILE__) =~ /Data-Dumper-Interp/) {
 use Cwd qw/getcwd abs_path/;
 use POSIX qw/INT_MAX/;
 use File::Basename qw/dirname/;
+use Capture::Tiny qw/capture capture_merged tee_merged/;
 use Env qw/@PATH @PERL5LIB/;  # ties @PATH, @PERL5LIB
 use Config;
 
@@ -243,20 +248,35 @@ sub string_to_tempfile($@) {
 #        Otherwise wide chars will be corrupted
 #
 #
+require Carp::Always;
 sub run_perlscript(@) {
-  my $tf; # keep in scope until no longer needed
+  my @tfs; # keep in scope until no longer needed
   my @perlargs = ("-CIOE", @_);
   @perlargs = ((map{ "-I$_" } @INC), @perlargs);
-  unshift @perlargs, "-MCarp=verbose" if $Carp::Verbose;
-  unshift @perlargs, "-MCarp::Always=verbose" if $Carp::Always::Verbose;
+  #unshift @perlargs, "-MCarp=verbose" if $Carp::Verbose;
+  #unshift @perlargs, "-MCarp::Always=verbose" if $Carp::Always::Verbose;
+
+  ##This breaks no-internals-mentioned (AUTHOR_TESTS) in Spreadsheet::Edit
+  ## For unknown reason some smokers running older perls die with
+  ## "...undef value as a subroutine reference at site_perl/5.20.3/TAP/Harness.pm line 612
+  ## So trying to see what is happening...
+  #unshift @perlargs, "-MCarp::Always=verbose";
+
   if ($^O eq "MSWin32") {
     for (my $ix=0; $ix <= $#perlargs; $ix++) {
-      if ($perlargs[$ix] =~ /^-w?[Ee]$/) {
+      if ($perlargs[$ix] =~ /^-(w?)([Ee])$/) {
         # Passing perl code in an argument is impractical in DOS/Windows
-        $tf = Path::Tiny->tempfile("perlcode_XXXXX");
-        $tf->spew_utf8($perlargs[$ix+1]);
-        splice(@perlargs, $ix, 2, $tf->stringify);
+        my $tf = Path::Tiny->tempfile("perlcode_XXXXX");
+        push @tfs, $tf;
+        # N.B. -e (not -E) can be an arg to odfedit as well
+        $tf->append_utf8("use feature qw/:all/;\n") if $2 eq 'E';
+        $tf->append_utf8($perlargs[$ix+1]);
+warn "============= DUMP OF -$1$2 FILE ===========\n", "".scalar($tf->slurp_utf8), "\n=============(end)============\n" if $debug;
+        splice @perlargs, $ix, 2, ($1 ? ("-w") : ()), $tf->canonpath;
+        $ix += 2;
       }
+    }
+    for (my $ix=0; $ix <= $#perlargs; $ix++) {
       for ($perlargs[$ix]) {
         if (/^-\*[Ee]/) { oops "unhandled perl arg" }
         s/"/\\"/g;
@@ -268,6 +288,7 @@ sub run_perlscript(@) {
   }
 
   local $ENV{LC_ALL} = "C";
+  my $perlexe = $Config{perlpath}; # some say $^X is not reliable
 
   if ($debug) {
     my $msg = "%%% run_perlscript >";
@@ -275,11 +296,19 @@ sub run_perlscript(@) {
       next unless $k =~ /^(LC|LANG)/;
       $msg .= " $k='$ENV{$k}'"
     }
-    $msg .= " $^X";
-    $msg .= " '${_}'" foreach (@perlargs);
+    $msg .= " $perlexe";
+    $msg .= " <<${_}>>" foreach (@perlargs);
     print STDERR "$msg\n";
   }
-  my $wstat = system $^X, @perlargs;
+  my $wstat;
+  if ($^O eq "MSWin32") {
+    # This might avoid pseudo-forking
+    my $prochandle = system(1, $perlexe, @perlargs); # see man perlport
+    waitpid($prochandle, 0);
+    $wstat = $?;
+  } else {
+    $wstat = system $perlexe, @perlargs;
+  }
   print STDERR "%%%(returned from 'system', wstat=",sprintf("0x%04X",$wstat),")%%%\n" if $debug;
   $wstat
 }
@@ -382,24 +411,27 @@ END{
 
 # Find the ancestor build or checkout directory (it contains a "lib" subdir)
 # and derive the package name from e.g. "My-Pack" or "My-Pack-1.234"
+# If we are not part of a CPAN distribution tree, then silently continue
+# but croak if verif_no_internals_mentioned() is later used.
 my $testee_top_module;
 for (my $path=path(__FILE__);
              $path ne Path::Tiny->rootdir; $path=$path->parent) {
   if (-e (my $p = $path->child("dist.ini"))) {
-    $p->slurp() =~ /^ *name *= *(\S+)/i or oops;
+    $p->slurp_utf8() =~ /^ *name *= *(\S+)/i or oops;
     ($testee_top_module = $1) =~ s/-/::/g;
     last
   }
   if (-e (my $p = $path->child("MYMETA.json"))) {
-    $testee_top_module = JSON->new->decode($p->slurp())->{name};
+    $testee_top_module = JSON->new->decode($p->slurp_utf8())->{name};
     $testee_top_module =~ s/-/::/g;
     last;
   }
 }
-oops unless $testee_top_module;
 
 sub verif_no_internals_mentioned($) { # croaks if references found
   my $original = shift;
+  oops "This may not be used except in a CPAN distribution tree"
+    unless $testee_top_module;
   return if $Carp::Verbose;
 
   local $_ = $original;
@@ -575,8 +607,8 @@ sub mycheckeq_literal($$$) {
                           .($vposn > 0 ? "(line ".($vposn+1).")\n" : "\n")
         ." at line ", (caller(0))[2]."\n"
        ) ;
-  #goto &Carp::confess;
-  Carp::confess(@_);
+  goto &Carp::confess;
+  #Carp::confess(@_);
 }
 sub expect1($$) {
   @_ = ("", @_);
@@ -591,13 +623,16 @@ our $bs = '\\';  # a single backslash
 sub _expstr2restr($) {
   local $_ = shift;
   confess "bug" if ref($_);
+  return $_ if $_ eq "";
   # In \Q *string* \E the *string* may not end in a backslash because
   # it would be parsed as (\\)(E) instead of (\)(\E).
   # So change them to a unique token and later replace problematic
   # instances with ${bs} variable references.
   s/\\/<BS>/g;
   $_ = '\Q' . $_ . '\E';
-  s#([\$\@\%])#\\E\\$1\\Q#g;
+  s#([\$\@\%]+)# do{ local $_ = $1;
+                     join "", '\\E', (map{ "\\$_" } split(//,$_)), '\\Q'
+                   } #eg;
 
   if (m#qr/#) {
     # Canonical: qr/STUFF/MODIFIERS
@@ -651,7 +686,7 @@ sub expstr2re($) {
   wantarray ? ($xdesc, $output) : $output
 }
 
-# check $test_desc, string_or_regex, result
+# mycheck $test_desc, string_or_regex, result
 sub mycheck($$@) {
   my ($desc, $expected_arg, @actual) = @_;
   local $_;  # preserve $1 etc. for caller
@@ -716,7 +751,7 @@ sub verif_eval_err(;$) {  # MUST be called on same line as the 'eval'
     confess "Got UN-expected err (not matching $msg_regex) at $fn line $ln'):\n«$ex»\n",
             "\n";
   }
-  verif_no_internals_mentioned($ex);
+  verif_no_internals_mentioned($ex) if defined $testee_top_module;
   dprint "Got expected err: $ex\n";
 }
 
@@ -761,6 +796,29 @@ sub tmpcopy_if_writeable($) {
     return $tpath;
   }
   $path
+}
+
+sub clean_capture_output($) {
+  my $str = shift;
+  # For some reason I can not track down, tests on Windows in VirtualBox sometimes emit
+  # this message.  I think (unproven) that this occurs because the current directory
+  # is a VBox host-shared directory mounted read-only.   But nobody should be writing
+  # to the cwd!
+  $str =~ s/The media is write protected\S*\R//gs;
+  $str
+}
+
+sub my_capture(&) {
+  my ($out, $err, @results) = &capture($_[0]);
+  return( clean_capture_output($out), clean_capture_output($err), @results );
+}
+sub my_capture_merged(&) {
+  my ($merged, @results) = &capture_merged($_[0]);
+  return( clean_capture_output($merged), @results );
+}
+sub my_tee_merged(&) {
+  my ($merged, @results) = &tee_merged($_[0]);
+  return( clean_capture_output($merged), @results );
 }
 
 1;

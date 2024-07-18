@@ -4,7 +4,7 @@ use warnings;
 no indirect;
 use Object::Pad;
 
-our $VERSION = '0.001';    ## VERSION
+our $VERSION = '0.002';    ## VERSION
 
 class WebService::GrowthBook::AbstractFeatureCache {
     method get($key) {

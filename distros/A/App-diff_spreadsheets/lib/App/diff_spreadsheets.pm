@@ -5,9 +5,10 @@
 # Attribution is requested but is not required.
 
 package App::diff_spreadsheets;
+use strict; use warnings;  # placate Test::kwalitee
 
-our $DATE = '2023-09-20'; # DATE
-our $VERSION = '1.021'; # VERSION
+our $DATE = '2024-07-17'; # DATE
+our $VERSION = '1.022'; # VERSION
 
 1;
 

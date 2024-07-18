@@ -55,6 +55,7 @@
             "Digest::MD5" : "0",
             "HTTP::Tiny" : "0",
             "JSON::MaybeUTF8" : "0",
+            "JSON::MaybeXS" : "0",
             "Log::Any" : "0",
             "Object::Pad" : "0.805",
             "Scalar::Util" : "0",
@@ -89,46 +90,46 @@
    "provides" : {
       "WebService::GrowthBook" : {
          "file" : "lib/WebService/GrowthBook.pm",
-         "version" : "0.001"
+         "version" : "0.002"
       },
       "WebService::GrowthBook::AbstractFeatureCache" : {
          "file" : "lib/WebService/GrowthBook/AbstractFeatureCache.pm",
-         "version" : "0.001"
+         "version" : "0.002"
       },
       "WebService::GrowthBook::CacheEntry" : {
          "file" : "lib/WebService/GrowthBook/CacheEntry.pm",
-         "version" : "0.001"
+         "version" : "0.002"
       },
       "WebService::GrowthBook::Feature" : {
          "file" : "lib/WebService/GrowthBook/Feature.pm",
-         "version" : "0.001"
+         "version" : "0.002"
       },
       "WebService::GrowthBook::FeatureRepository" : {
          "file" : "lib/WebService/GrowthBook/FeatureRepository.pm",
-         "version" : "0.001"
+         "version" : "0.002"
       },
       "WebService::GrowthBook::FeatureResult" : {
          "file" : "lib/WebService/GrowthBook/FeatureResult.pm",
-         "version" : "0.001"
+         "version" : "0.002"
       },
       "WebService::GrowthBook::InMemoryFeatureCache" : {
          "file" : "lib/WebService/GrowthBook/InMemoryFeatureCache.pm",
-         "version" : "0.001"
+         "version" : "0.002"
       }
    },
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
-         "web" : "https://github.com/chylli-deriv/perl-WebService-GrowthBook/issues"
+         "web" : "https://github.com/deriv-com/perl-WebService-GrowthBook/issues"
       },
-      "homepage" : "https://github.com/chylli-deriv/perl-WebService-GrowthBook",
+      "homepage" : "https://github.com/deriv-com/perl-WebService-GrowthBook",
       "repository" : {
          "type" : "git",
-         "url" : "https://github.com/chylli-deriv/perl-WebService-GrowthBook.git",
-         "web" : "https://github.com/chylli-deriv/perl-WebService-GrowthBook"
+         "url" : "https://github.com/deriv-com/perl-WebService-GrowthBook.git",
+         "web" : "https://github.com/deriv-com/perl-WebService-GrowthBook"
       }
    },
-   "version" : "0.001",
+   "version" : "0.002",
    "x_authority" : "cpan:DERIV",
    "x_contributors" : [
       "chylli-deriv <chylli@deriv.com>",

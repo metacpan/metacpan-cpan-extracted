@@ -4,7 +4,7 @@
       "Shoichi Kaji <skaji@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.030, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.032, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -16,7 +16,7 @@
    "prereqs" : {
       "configure" : {
          "requires" : {
-            "Module::Build::Tiny" : "0.034"
+            "Dist::Build" : "0.006"
          }
       },
       "develop" : {
@@ -40,7 +40,7 @@
    "provides" : {
       "App::RemoteCommand" : {
          "file" : "lib/App/RemoteCommand.pm",
-         "version" : "0.990"
+         "version" : "0.991"
       },
       "App::RemoteCommand::LineBuffer" : {
          "file" : "lib/App/RemoteCommand/LineBuffer.pm"
@@ -70,12 +70,12 @@
          "web" : "https://github.com/skaji/App-RemoteCommand"
       }
    },
-   "version" : "0.990",
+   "version" : "0.991",
    "x_contributors" : [
       "Shoichi Kaji <skaji@outlook.com>"
    ],
-   "x_generated_by_perl" : "v5.36.1",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.36",
+   "x_generated_by_perl" : "v5.40.0",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.38",
    "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later",
    "x_static_install" : 1
 }

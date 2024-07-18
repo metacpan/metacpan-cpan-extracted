@@ -4,7 +4,7 @@
       "Joel Berger, <joel.a.berger@gmail.com>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "App::ModuleBuildTiny version 0.029",
+   "generated_by" : "App::ModuleBuildTiny version 0.042",
    "license" : [
       "perl_5"
    ],
@@ -16,12 +16,12 @@
    "prereqs" : {
       "configure" : {
          "requires" : {
-            "Module::Build::Tiny" : "0.034"
+            "Module::Build::Tiny" : "0.039"
          }
       },
       "develop" : {
          "requires" : {
-            "App::ModuleBuildTiny" : "0.029"
+            "App::ModuleBuildTiny" : "0.042"
          }
       },
       "runtime" : {
@@ -37,6 +37,7 @@
       },
       "test" : {
          "requires" : {
+            "Test2::V0" : "0",
             "Test::Without::Module" : "0"
          }
       }
@@ -44,7 +45,7 @@
    "provides" : {
       "Mojolicious::Plugin::ReplyTable" : {
          "file" : "lib/Mojolicious/Plugin/ReplyTable.pm",
-         "version" : "0.12"
+         "version" : "0.13"
       }
    },
    "release_status" : "stable",
@@ -59,7 +60,7 @@
          "url" : "http://github.com/jberger/Mojolicious-Plugin-ReplyTable"
       }
    },
-   "version" : "0.12",
-   "x_serialization_backend" : "JSON::PP version 4.04",
+   "version" : "0.13",
+   "x_serialization_backend" : "JSON::PP version 4.07",
    "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"
 }

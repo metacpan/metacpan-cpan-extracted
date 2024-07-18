@@ -1,3 +1,7 @@
+0.49.6 2024-07-17 17:25:39 +0200 Tobias Oetiker <tobi@oetiker.ch>
+
+ - fix some more memory loops
+
 0.49.5 2024-06-26 18:03:12 +0200 Tobias Oetiker <tobi@oetiker.ch>
 
  - fix translation regressions in card list

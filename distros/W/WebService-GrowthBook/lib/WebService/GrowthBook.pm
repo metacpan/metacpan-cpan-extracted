@@ -14,7 +14,7 @@ use WebService::GrowthBook::Feature;
 use WebService::GrowthBook::FeatureResult;
 use WebService::GrowthBook::InMemoryFeatureCache;
 
-our $VERSION = '0.001';
+our $VERSION = '0.002';
 
 =head1 NAME
 
@@ -45,7 +45,7 @@ WebService::GrowthBook - sdk of growthbook
 # singletons
 
 class WebService::GrowthBook {
-    field $url        : param //= 'https://api.growthbook.io/api/v1';
+    field $url        : param //= 'https://cdn.growthbook.io';
     field $client_key : param;
     field $features   : param //= {};
     field $cache_ttl  : param //= 60;
@@ -61,14 +61,14 @@ class WebService::GrowthBook {
     }
     method set_features($features_set) {
         $features = {};
-        for my $feature ($features_set->@*) {
+        for my $feature_id (keys $features_set->%*) {
+            my $feature = $features_set->{$feature_id};
             if (blessed($feature) && $feature->isa('WebService::GrowthBook::Feature')) {
                 $features->{$feature->id} = $feature;
             } else {
-                $features->{$feature->{id}} = WebService::GrowthBook::Feature->new(
-                    id            => $feature->{id},
-                    default_value => $feature->{defaultValue},
-                    value_type    => $feature->{valueType});
+                $features->{$feature_id} = WebService::GrowthBook::Feature->new(
+                    id            => $feature_id,
+                    default_value => $feature->{defaultValue});
             }
         }
     }
@@ -92,17 +92,9 @@ class WebService::GrowthBook {
         }
         my $feature       = $features->{$feature_name};
         my $default_value = $feature->default_value;
-        if ($feature->value_type eq 'json') {
-            $default_value = decode_json_text($default_value);
-        } elsif ($feature->value_type eq 'number') {
-            $default_value = 0 + $default_value;
-        } elsif ($feature->value_type eq 'boolean') {
-            $default_value = $default_value eq 'true' ? 1 : 0;
-        }
 
         return WebService::GrowthBook::FeatureResult->new(
             id    => $feature_name,
-            type  => $feature->value_type,
             value => $default_value
         );
     }

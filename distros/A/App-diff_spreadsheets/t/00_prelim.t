@@ -84,7 +84,7 @@ my $empty = Path::Tiny->tempfile(); $empty->spew("");
        dvis 'STDOUT:$out\nSTDERR:$err\nWSTAT=', sprintf("%04x\n", $wstat));
 
     like($err,
-         qr/\Q$nepath\E.*(missing|no such)/i,
+         qr/\Q$nepath\E.*(missing|no such|does not exist)/i,
          "$progname catches non-existent file",
            dvis '\n  $out\n  $err\n  ', sprintf("  wstat=%04x\n", $wstat));
   }

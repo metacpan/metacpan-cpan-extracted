@@ -17,15 +17,15 @@ package main;
 use strict;
 use warnings;
 use autodie;
-use feature      qw(say);
+use feature qw(say);
 use Getopt::Long qw(:config no_ignore_case);
 use Pod::Usage;
 use Data::Dumper;
 use Sys::Hostname;
-use POSIX                          qw(strftime);
-use File::Spec::Functions          qw(catdir catfile);
+use POSIX qw(strftime);
+use File::Spec::Functions qw(catdir catfile);
 use File::ShareDir::ProjectDistDir qw(dist_dir);
-use FindBin                        qw($Bin);
+use FindBin qw($Bin);
 use lib "$Bin/../lib";
 use Term::ANSIColor qw(:constants);
 use Convert::Pheno;
@@ -97,20 +97,22 @@ my @validation_checks = (
                 || ( defined $in_csv    && -f $in_csv )
                 || ( @omop_files        && -f $omop_files[0] ) );
         },
-        message => "Please specify a valid input file(s) -i <json|yaml|csv>\n",
+        message => "Please specify a valid input [-i input-type] <infile>\n",
     },
     {
         condition => sub { !-d $out_dir },
         message   => "Please specify a valid directory for --out-dir\n",
     },
     {
-        condition =>
-          sub { ( $in_redcap || $in_cdisc ) && ! $redcap_dictionary },
-        message => "Please specify a valid REDCap data dictionary --rcd <file>\n",
+        condition => sub { ( $in_redcap || $in_cdisc ) && !$redcap_dictionary },
+        message   =>
+          "Please specify a valid REDCap data dictionary --rcd <file>\n",
     },
     {
-        condition => sub { ( $in_redcap || $in_cdisc || $in_csv ) && !$mapping_file },
-        message => "Please specify a valid mapping file --mapping-file <file>\n",
+        condition =>
+          sub { ( $in_redcap || $in_cdisc || $in_csv ) && !$mapping_file },
+        message =>
+          "Please specify a valid mapping file --mapping-file <file>\n",
     },
     {
         condition =>
@@ -143,7 +145,7 @@ my @validation_checks = (
     {
         condition => sub { !-f $schema_file },
         message   =>
-          "Please specify a valid schema for the mapping file --schema-file <file>\n",
+"Please specify a valid schema for the mapping file --schema-file <file>\n",
     },
     {
         condition => sub { defined $path_to_ohdsi_db && !-d $path_to_ohdsi_db },
@@ -273,10 +275,8 @@ sub convert {
         ask_overwrite($o_file);
     }
 
-    if ($verbose) {
-        print BOLD BLUE program_body($l_data);
-        say BOLD GREEN "Writing <$o_file> file\n", RESET;
-    }
+    # Start verbose
+    print BOLD BLUE program_body($l_data), RESET if $verbose;
 
     # Creating object
     my $convert = Convert::Pheno->new($l_data);
@@ -284,26 +284,44 @@ sub convert {
     # Running $method and writing the results to $o_file
     my $method = $l_data->{method};
 
+    # Perform the conversion based on the method
+    my $data;
+
     # For omop2bff and omop2pxf we serialize by individual
     if ( $stream || $method eq 'omop2bff' || $method eq 'omop2pxf' ) {
+        say BOLD GREEN "Writing <$o_file> file\n", RESET if $verbose;
         $convert->$method;
     }
-    elsif ( $method eq 'bff2csv' || $method eq 'pxf2csv' ) {
-        my $data = $convert->$method;
-        write_csv(    # Print data as CSV
-            {
-                sep      => $l_data->{sep} // ';',
-                filepath => $o_file,
-                headers  => get_headers($data),
-                data     => $data
-            }
-        );
-    }
     else {
-        io_yaml_or_json(
-            { filepath => $o_file, mode => 'write', data => $convert->$method }
-        );
+        $data = $convert->$method;
     }
+
+    # Determine the appropriate writing method
+    if ($data) {
+        say BOLD GREEN "Writing <$o_file> file\n", RESET if $verbose;
+        if ( $method eq 'bff2csv' || $method eq 'pxf2csv' ) {
+            write_csv(
+                {
+                    sep      => $l_data->{sep} // ';',
+                    filepath => $o_file,
+                    headers  => get_headers($data),
+                    data     => $data,
+                }
+            );
+        }
+        else {
+            io_yaml_or_json(
+                {
+                    filepath => $o_file,
+                    mode     => 'write',
+                    data     => $data,
+                }
+            );
+        }
+    }
+
+   # Finish
+   print BOLD GREEN program_footer(), RESET if $verbose;
 }
 
 sub program_header {
@@ -321,6 +339,16 @@ EOF
     return $str;
 }
 
+sub program_footer {
+
+    my $str     = <<EOF;
+All done!
+
+EOF
+    return $str;
+}
+
+
 sub program_body {
 
     my $l_data = shift;
@@ -335,6 +363,7 @@ EOF
     return $msg;
 }
 
+
 sub write_log {
 
     my ( $log, $data ) = @_;
@@ -343,8 +372,7 @@ sub write_log {
     my $os = $^O;
     chomp(
         my $ncpuhost =
-          lc($os) eq 'darwin'
-          || lc($os) eq 'freebsd' ? qx{sysctl -n hw.ncpu} 
+          lc($os) eq 'darwin' || lc($os) eq 'freebsd' ? qx{sysctl -n hw.ncpu}
         : $os eq 'MSWin32' ? qx{wmic cpu get NumberOfLogicalProcessors}
         :                    qx{/usr/bin/nproc} // 1
     );
@@ -449,7 +477,7 @@ convert-pheno - A script to interconvert common data models for phenotypic data
      Options:
        -exposures-file <file>         CSV file with a list of 'concept_id' considered to be exposures (with -iomop)
        -mapping-file <file>           Fields mapping YAML (or JSON) file
-       -max-lines-sql <number>        Maximum number of lines read from SQL dump [500]
+       -max-lines-sql <number>        Maximum lines read per table from SQL dump [500]
        -min-text-similarity-score <score> Minimum score for cosine similarity (or Sorensen-Dice coefficient) [0.8] (to be used with --search mixed)
        -ohdsi-db                      Use Athena-OHDSI database (~2.2GB) with -iomop
        -omop-tables <tables>          OMOP-CDM tables to be processed. Tables <CONCEPT> and <PERSON> are always included.
@@ -625,6 +653,7 @@ B<Option 3:> Install Convert-Pheno and the dependencies in a "virtual environmen
 =head3 System requirements
 
   * Ideally a Debian-based distribution (Ubuntu or Mint), but any other (e.g., CentOs, OpenSuse, MacOS) should do as well.
+    (It should also work on macOS and Windows Server, but we are only providing information for Linux here)
   * Perl 5 (>= 5.26 core; installed by default in most Linux distributions). Check the version with "perl -v".
   * >= 4GB of RAM
   * 1 core

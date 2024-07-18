@@ -1,3 +1,9 @@
+2024-07-17  Brian M. Kelly  <Brian.Kelly@fullauto.com>
+
+        * Version 3.037
+
+        * Added BEGIN constant for older perls
+
 2024-07-14  Brian M. Kelly  <Brian.Kelly@fullauto.com>
 
         * Version 3.036

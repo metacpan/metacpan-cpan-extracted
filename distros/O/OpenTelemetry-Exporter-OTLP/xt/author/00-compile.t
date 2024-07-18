@@ -6,12 +6,14 @@ use warnings;
 
 use Test::More;
 
-plan tests => 5;
+plan tests => 7;
 
 my @module_files = (
     'OpenTelemetry/Exporter/OTLP.pm',
     'OpenTelemetry/Exporter/OTLP/Encoder/JSON.pm',
     'OpenTelemetry/Exporter/OTLP/Encoder/Protobuf.pm',
+    'OpenTelemetry/Exporter/OTLP/Logs.pm',
+    'OpenTelemetry/Exporter/OTLP/Traces.pm',
     'OpenTelemetry/Proto.pm'
 );
 

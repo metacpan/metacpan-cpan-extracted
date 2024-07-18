@@ -3,13 +3,15 @@ use Object::Pad ':experimental(init_expr)';
 
 package OpenTelemetry::Exporter::OTLP::Encoder::JSON;
 
-our $VERSION = '0.016';
+our $VERSION = '0.017';
 
 class OpenTelemetry::Exporter::OTLP::Encoder::JSON {
     use JSON::MaybeXS;
     use OpenTelemetry::Constants 'HEX_INVALID_SPAN_ID';
     use Ref::Util qw( is_hashref is_arrayref );
     use Scalar::Util 'refaddr';
+
+    use experimental 'isa';
 
     method content_type () { 'application/json' }
 
@@ -53,7 +55,7 @@ class OpenTelemetry::Exporter::OTLP::Encoder::JSON {
         };
     }
 
-    method encode_event ( $event ) {
+    method encode_span_event ( $event ) {
         {
             attributes             => $self->encode_kvlist($event->attributes),
             droppedAttributesCount => $event->dropped_attributes,
@@ -62,7 +64,7 @@ class OpenTelemetry::Exporter::OTLP::Encoder::JSON {
         };
     }
 
-    method encode_link ( $link ) {
+    method encode_span_link ( $link ) {
         {
             attributes             => $self->encode_kvlist($link->attributes),
             droppedAttributesCount => $link->dropped_attributes,
@@ -71,7 +73,7 @@ class OpenTelemetry::Exporter::OTLP::Encoder::JSON {
         };
     }
 
-    method encode_status ( $status ) {
+    method encode_span_status ( $status ) {
         {
             code    => $status->code,
             message => '' . $status->description,
@@ -85,13 +87,13 @@ class OpenTelemetry::Exporter::OTLP::Encoder::JSON {
             droppedEventsCount     => $span->dropped_events,
             droppedLinksCount      => $span->dropped_links,
             endTimeUnixNano        => int $span->end_timestamp * 1_000_000_000,
-            events                 => [ map $self->encode_event($_), $span->events ],
+            events                 => [ map $self->encode_span_event($_), $span->events ],
             kind                   => $span->kind,
-            links                  => [ map $self->encode_link($_),  $span->links  ],
+            links                  => [ map $self->encode_span_link($_),  $span->links  ],
             name                   => $span->name,
             spanId                 => $span->hex_span_id,
             startTimeUnixNano      => int $span->start_timestamp * 1_000_000_000,
-            status                 => $self->encode_status($span->status),
+            status                 => $self->encode_span_status($span->status),
             traceId                => $span->hex_trace_id,
             traceState             => $span->trace_state->to_string,
         };
@@ -99,6 +101,25 @@ class OpenTelemetry::Exporter::OTLP::Encoder::JSON {
         my $parent = $span->hex_parent_span_id;
         $data->{parentSpanId} = $parent
             unless $parent eq HEX_INVALID_SPAN_ID;
+
+        $data;
+    }
+
+    method encode_log ( $log ) {
+        my $data = {
+            attributes             => $self->encode_kvlist($log->attributes),
+            body                   => $self->encode_anyvalue($log->body),
+            droppedAttributesCount => $log->dropped_attributes,
+            flags                  => $log->trace_flags->flags,
+            observedTimeUnixNano   => int $log->observed_timestamp * 1_000_000_000,
+            severityNumber         => $log->severity_number,
+            severityText           => $log->severity_text,
+            spanId                 => $log->hex_span_id,
+            traceId                => $log->hex_trace_id,
+        };
+
+        my $t = $log->timestamp;
+        $data->{timeUnixNano} = int $t * 1_000_000_000 if defined $t;
 
         $data;
     }
@@ -119,6 +140,13 @@ class OpenTelemetry::Exporter::OTLP::Encoder::JSON {
         };
     }
 
+    method encode_scope_logs ( $scope, $logs ) {
+        {
+            scope      => $self->encode_scope($scope),
+            logRecords => [ map $self->encode_log($_), @$logs ],
+        };
+    }
+
     method encode_resource_spans ( $resource, $spans ) {
         my %scopes;
 
@@ -130,26 +158,47 @@ class OpenTelemetry::Exporter::OTLP::Encoder::JSON {
         }
 
         {
-            resource => $self->encode_resource($resource),
-            scopeSpans => [
-                map $self->encode_scope_spans(@$_), values %scopes,
-            ],
+            resource   => $self->encode_resource($resource),
+            scopeSpans => [ map $self->encode_scope_spans(@$_), values %scopes ],
+            schemaUrl  => $resource->schema_url,
+        };
+    }
+
+    method encode_resource_logs ( $resource, $logs ) {
+        my %scopes;
+
+        for (@$logs) {
+            my $key = refaddr $_->instrumentation_scope;
+
+            $scopes{ $key } //= [ $_->instrumentation_scope, [] ];
+            push @{ $scopes{ $key }[1] }, $_;
+        }
+
+        {
+            resource  => $self->encode_resource($resource),
+            scopeLogs => [ map $self->encode_scope_logs(@$_), values %scopes ],
             schemaUrl => $resource->schema_url,
         };
     }
 
-    method encode ( $spans ) {
+    method encode ( $data ) {
         my ( %request, %resources );
 
-        for (@$spans) {
+        my $type;
+        for (@$data) {
+            $type //= $_ isa OpenTelemetry::SDK::Logs::LogRecord
+                ? 'logs'
+                : 'spans';
+
             my $key = refaddr $_->resource;
             $resources{ $key } //= [ $_->resource, [] ];
             push @{ $resources{ $key }[1] }, $_;
         }
 
+        my $encode = "encode_resource_$type";
         $self->serialise({
-            resourceSpans => [
-                map $self->encode_resource_spans(@$_), values %resources,
+            'resource' . ucfirst $type => [
+                map $self->$encode(@$_), values %resources,
             ]
         });
     }

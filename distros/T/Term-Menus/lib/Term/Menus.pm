@@ -14,8 +14,11 @@ package Term::Menus;
 
 ## See user documentation at the end of this file.  Search for =head
 
+BEGIN {
+  *NEW_PERL = ($] >= 5.010) ? sub(){1} : sub(){0};
+}
 
-our $VERSION = '3.036';
+our $VERSION = '3.037';
 
 
 use 5.006;
@@ -2107,7 +2110,7 @@ sub transform_mboi
          $esc_one=~s/^(.*?[]])[{](.*)[}]$/$1\[\{\]$2\[\}\]/;
          $esc_one=~s/\\/\\\\/g;
          $esc_one=~s/[+]/\[+\]/g;$esc_one=~s/[*]/\[*\]/g;
-         if ($] > 5.010) {
+         if (NEW_PERL) {
             $esc_one=~s/(?:(?:\d\s*,\s*"|"\s*,\s*\d)(*SKIP)(*FAIL)|")/\\\"/g;
             $esc_two=~s/(?:(?:\d\s*,\s*"|"\s*,\s*\d)(*SKIP)(*FAIL)|")/\\\"/g;
          } else {
@@ -2119,7 +2122,7 @@ sub transform_mboi
             $esc_two=~s/\\"/"/g;
          }
          $esc_one=~s/\$/\\\$/g;$esc_two=~s/\$/\\\$/g;
-	 if ($] > 5.010) {
+	 if (NEW_PERL) {
             $esc_two=~s/(?:(?:\\[]]|\\[[]|\\["]|\\[\$])(*SKIP)(*FAIL)|\\)/\\\\/g;
          } else {
             $esc_two=~s/\\(?![[]|[]]|["]|[\$])/\\\\/g;
@@ -2183,7 +2186,7 @@ sub transform_mbir
          my $length_of_macro=length $esc_one;
          $esc_one=~s/["]\s*[.]\s*["]//s;
          $esc_one=~s/\]/\\\]/;$esc_one=~s/\[/\\\[/;
-	 if ($] > 5.010) {
+	 if (NEW_PERL) {
             $esc_one=~s/(?:(?:\d\s*,\s*"|"\s*,\s*\d)(*SKIP)(*FAIL)|")/\\\"/g;
          } else {
 		 print "WHAT IS ESC_ONE=$esc_one<==\n";
@@ -2243,7 +2246,7 @@ sub transform_mbii
          $esc_one=~s/^(.*?[]])[{](.*)[}]$/$1\[\{\]$2\[\}\]/;
          $esc_one=~s/\\/\\\\/g;
          $esc_one=~s/[+]/\[+\]/g;$esc_one=~s/[*]/\[*\]/g;
-         if ($] > 5.010) {
+         if (NEW_PERL) {
             $esc_one=~s/(?:(?:\d\s*,\s*"|"\s*,\s*\d)(*SKIP)(*FAIL)|")/\\\"/g;
 	    $esc_two=~s/(?:(?:\d\s*,\s*"|"\s*,\s*\d)(*SKIP)(*FAIL)|")/\\\"/g;
          } else {
@@ -2255,7 +2258,7 @@ sub transform_mbii
             $esc_two=~s/\\"/"/g;
          }
          $esc_one=~s/\$/\\\$/g;$esc_two=~s/\$/\\\$/g;
-	 if ($] > 5.010) {
+	 if (NEW_PERL) {
             $esc_two=~s/(?:(?:\\[]]|\\[[]|\\["]|\\[\$])(*SKIP)(*FAIL)|\\)/\\\\/g;
 	 } else {
             $esc_two=~s/\\(?![[]|[]]|["]|[\$])/\\\\/g;

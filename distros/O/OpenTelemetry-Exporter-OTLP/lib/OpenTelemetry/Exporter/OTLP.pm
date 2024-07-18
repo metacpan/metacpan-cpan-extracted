@@ -3,7 +3,7 @@ use Object::Pad ':experimental(init_expr)';
 
 package OpenTelemetry::Exporter::OTLP;
 
-our $VERSION = '0.016';
+our $VERSION = '0.017';
 
 class OpenTelemetry::Exporter::OTLP :does(OpenTelemetry::Exporter) {
     use Feature::Compat::Try;
@@ -71,32 +71,30 @@ class OpenTelemetry::Exporter::OTLP :does(OpenTelemetry::Exporter) {
     field $stopped;
     field $ua;
     field $endpoint;
-    field $compression :param = undef;
+    field $compression;
     field $encoder;
     field $max_retries = 5;
 
     ADJUSTPARAMS ($params) {
-        $endpoint
-            = delete $params->{traces_endpoint}
+        $endpoint = delete $params->{endpoint}
             // config('EXPORTER_OTLP_TRACES_ENDPOINT')
             // do {
-                my $base = delete $params->{endpoint}
-                    // config('EXPORTER_OTLP_ENDPOINT')
+                my $base = config('EXPORTER_OTLP_ENDPOINT')
                     // 'http://localhost:4318';
 
                 ( $base =~ s|/+$||r ) . '/v1/traces';
             };
 
-        $compression
-            //= config(qw( EXPORTER_OTLP_TRACES_COMPRESSION EXPORTER_OTLP_COMPRESSION ))
+        $compression = delete $params->{compression}
+            // config(<EXPORTER_OTLP_{TRACES_,}COMPRESSION>)
             // $COMPRESSION;
 
         my $timeout = delete $params->{timeout}
-            // config(qw( EXPORTER_OTLP_TRACES_TIMEOUT EXPORTER_OTLP_TIMEOUT ))
+            // config(<EXPORTER_OTLP_{TRACES_,}TIMEOUT>)
             // 10;
 
         my $headers = delete $params->{headers}
-            // config(qw( EXPORTER_OTLP_TRACES_HEADERS EXPORTER_OTLP_HEADERS ))
+            // config(<EXPORTER_OTLP_{TRACES_,}HEADERS>)
             // {};
 
         $headers = {
@@ -274,7 +272,8 @@ class OpenTelemetry::Exporter::OTLP :does(OpenTelemetry::Exporter) {
                                 );
 
                                 OpenTelemetry->handle_error(
-                                    message => "Unhandled error sending OTLP request: $res->{content}",
+                                    exception => $res->{content},
+                                    message   => 'Unhandled error sending OTLP request',
                                 );
 
                                 return TRACE_EXPORT_FAILURE;
@@ -285,18 +284,20 @@ class OpenTelemetry::Exporter::OTLP :does(OpenTelemetry::Exporter) {
                     redo if $self->$maybe_backoff( ++$retries, $reason );
                 }
                 case( m/^(?: 4 | 5 ) \d{2} $/ax ) {
-                    $metrics->inc_counter(
-                        failure => [ reason => $res->{status} ],
-                    );
+                    my $code = $res->{status};
+
+                    $metrics->inc_counter( failure => [ reason => $code ] );
 
                     if ( $CAN_USE_PROTOBUF ) {
-                        require OpenTelemetry::Proto;
                         try {
+                            require OpenTelemetry::Proto;
+
                             my $status = OTel::Google::RPC::Status
                                 ->decode($res->{content});
+
                             OpenTelemetry->handle_error(
-                                exception => 'OTLP exporter received an RPC error status',
-                                message   => $status->encode_json,
+                                exception => $status->encode_json,
+                                message   => 'OTLP exporter received an RPC error status',
                             );
                         }
                         catch($e) {
@@ -307,17 +308,16 @@ class OpenTelemetry::Exporter::OTLP :does(OpenTelemetry::Exporter) {
                         }
                     }
 
-                    my $after = $res->{status} =~ /^(?: 429 | 503 )$/x
+                    my $after = ( $code == 429 || $code == 503 )
                         ? $res->{headers}{'retry-after'}
                         : undef;
 
                     # As-per https://opentelemetry.io/docs/specs/otlp/#failures-1
-                    redo if $res->{status} =~ /^(?: 429 | 502 | 503 | 504 )$/x
-                        && $self->$maybe_backoff(
-                            ++$retries,
-                            $res->{status},
-                            $after,
-                        );
+                    redo if (  $code == 429
+                            || $code == 502
+                            || $code == 503
+                            || $code == 504
+                        ) && $self->$maybe_backoff( ++$retries, $code, $after );
                 }
             }
 
@@ -325,14 +325,25 @@ class OpenTelemetry::Exporter::OTLP :does(OpenTelemetry::Exporter) {
         }
     }
 
-    method export ( $spans, $timeout = undef ) {
+    method export ( $data, $timeout = undef ) {
         return TRACE_EXPORT_FAILURE if $stopped;
+        return unless @$data;
 
-        dynamically OpenTelemetry::Context->current
-            = OpenTelemetry::Trace->untraced_context;
+        try {
+            dynamically OpenTelemetry::Context->current
+                = OpenTelemetry::Trace->untraced_context;
 
-        my $request = $encoder->encode($spans);
-        $self->$send_request( $request, $timeout );
+            my $request = $encoder->encode($data);
+            my $result  = $self->$send_request( $request, $timeout );
+
+            $metrics->inc_counter('success');
+
+            return $result;
+        }
+        catch($e) {
+            warn "Could not export data: $e";
+            return TRACE_EXPORT_FAILURE;
+        }
     }
 
     async method shutdown ( $timeout = undef ) {

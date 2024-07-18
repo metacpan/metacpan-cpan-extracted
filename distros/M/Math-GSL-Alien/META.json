@@ -31,14 +31,14 @@
          "requires" : {
             "Alien::Build" : "2.21",
             "Alien::Build::MM" : "2.21",
+            "Alien::Role::Dino" : "0",
             "ExtUtils::MakeMaker" : "6.52"
          }
       },
       "runtime" : {
          "requires" : {
             "Alien::Base" : "2.21",
-            "Alien::Build" : "0.25",
-            "Alien::Role::Dino" : "0"
+            "Alien::Build" : "0.25"
          }
       },
       "test" : {
@@ -63,7 +63,7 @@
       },
       "x_IRC" : "irc://irc.perl.org/#native"
    },
-   "version" : "1.01",
+   "version" : "1.05",
    "x_alienfile" : {
       "generated_by" : "Alien::Build::MM version 2.83",
       "requires" : {

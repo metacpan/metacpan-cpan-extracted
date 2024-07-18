@@ -34,7 +34,9 @@ the controller
 
 =cut
 
-has 'controller', undef, weak => 1;
+has controller => undef, weak => 1;
+has app => undef, weak => 1;
+has log => undef, weak => 1;
 
 =head2 $self->userId
 
@@ -70,20 +72,6 @@ has userId => sub {
     return ($userCount == 0 ? '__ROOT' : undef );
 };
 
-=head2 $self->db
-
-a handle to a L<CallBackery::Database> object.
-
-=cut
-
-has app => sub {
-    my $app = shift->controller->app;
-    return $app;
-}, weak => 1;
-
-has log => sub {
-    shift->app->log;
-};
 
 has db => sub {
     shift->app->database;
@@ -148,7 +136,7 @@ has paramSessionCookie => sub {
 };
 
 has firstSecret => sub {
-    shift->controller->app->secrets()->[0];
+    shift->app->secrets()->[0];
 };
 
 sub isUserAuthenticated {
@@ -221,7 +209,7 @@ sub login {
         return 1;
     }
 
-    my $db = $self->app->database;
+    my $db = $self->db;
     my $userData = $db->fetchRow('cbuser',{login=>$login});
     if (not $userData) {
         $self->log->info("Login attempt with unknown user $login from $remoteAddress failed");

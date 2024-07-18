@@ -1,5 +1,8 @@
 Revision history for File-Copy-clonefile
 
+v0.0.5  2024-07-17 21:36:28 JST
+  - Use Dist::Build (#2)
+
 v0.0.4  2023-02-20 01:33:13 JST
   - Support flags (#1)
 

@@ -20582,6 +20582,10 @@ sub cwd
             }
          }
          $stderr=$output if -1<index $output,"Couldn't can";
+	 $stderr=~tr/\0-\37\177-\377//d;
+         if (-1<index $stderr,'[?2004') {
+            $stderr=~s/[[][?]2004[h|l]?//g;
+         }
          if ($stderr) {
             my $die="\n\n   --> $target_dir\n\n"
                    ."       DOES NOT EXIST!: $!";
@@ -20639,8 +20643,9 @@ sub cwd
                      &Net::FullAuto::FA_Core::handle_error($stderr,'-4')
                   }
                }
-            } elsif (exists $self->{_cmd_handle} && $self->{_cmd_handle}) {
-               ($output,$stderr)=$self->cmd("pwd");
+            }
+	    if (exists $self->{_cmd_handle} && $self->{_cmd_handle}) {
+               ($output,$stderr)=$self->cmd("pwd",'__delay__=200');
                $self->{_work_dirs}->{_cwd}=$output.'/';
             }
          } else {
@@ -31314,28 +31319,29 @@ print $Net::FullAuto::FA_Core::LOG "LETS LOOK AT LINE=$line<== and LASTLINE=$las
                                  $str_cnt--;
                                  if ($line=~s/^stdout: ?//) {
                                     $fulloutput.=$line;
-                                    $errflag='';
+				    #$errflag='';
                                  } elsif (($line!~/^\[[AK]$|^\n$/s &&
                                        $line ne $live_command &&
                                        $line!~/\s-e\s\'s\/\^\/stdout
                                        \:\s*\/\'\s2\>\&1\s*$/sx) ||
                                        ($fullerror && $line=~/^\n$/s)) {
-                                    if ($fullerror && !$errflag) {
-                                       $fullerror.="\n";
-                                    } $errflag=1;
+				       #if ($fullerror && !$errflag) {
+				       #$fullerror.="\n";
+				       #} $errflag=1;
                                     $fullerror.=$line;
                                     $line=~s/\[/\\\[/g;
                                     $line=~s/\]/\\\]/g;
 				    $line=~s/\{/\\\{/g;
                                     $line=~s/\}/\\\}/g;
-                                    $line=~s/\(/\\\(/g;
-                                    $line=~s/\)/\\\)/g;
+                                    $line=~s/[(]/\\(/g;
+                                    $line=~s/[)]/\\)/g;
+				    $line=~s/[*]/\\*/g;
                                     $growoutput=~s/$line//s;
                                  } elsif ($fulloutput || $line!~/^\s*$/s) {
                                     $fulloutput.=$line;
                                     #$save=&display($line,$cmd_prompt,$save)
                                     #   if $display;
-                                    $errflag='';
+				    #$errflag='';
                                  } #elsif ($display) {
                                    # $save=&display($line,$cmd_prompt,$save);
                                  #}
@@ -31366,7 +31372,7 @@ print $Net::FullAuto::FA_Core::LOG "GROW_ADDED_TO_FULL=$growoutput\n"
 print "WE HAVE LASTLINE CMDPROMPT AND ARE GOING TO EXIT and FO=$fulloutput and MS_CMD=$ms_cmd and FULLERROR=$fullerror<==\n"
    if !$Net::FullAuto::FA_Core::cron && ($Net::FullAuto::FA_Core::debug || $debug);
                         $stdout=$fulloutput;
-                        $stderr=$fullerror if $fulloutput!~/^.*\n0$/s;
+                        $stderr=$fullerror; #if $fulloutput!~/^.*\n0$/s;
 		        chomp $stdout if $stdout;
                         chomp $stderr if $stderr;
                         last FETCH;
@@ -31719,7 +31725,7 @@ sub cmd_raw
 sub display
 {
 
-   my $print_line_debugging=0;
+   my $print_line_debugging=1;
    my $log='';
    if ($print_line_debugging) {
       $log=$Net::FullAuto::FA_Core::LOG

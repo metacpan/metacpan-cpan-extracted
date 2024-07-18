@@ -1,0 +1,47 @@
+=encoding UTF-8
+
+=head1 NAME
+
+OpenTelemetry::Exporter::OTLP::Traces - An OpenTelemetry Protocol span exporter
+
+=head1 SYNOPSIS
+
+    use OpenTelemetry;
+    use OpenTelemetry::Exporter::OTLP::Traces;
+    use OpenTelemetry::SDK::Trace::Span::Processor::Batch;
+
+    # Use it with a span processor
+    my $processor = OpenTelemetry::SDK::Trace::Span::Processor::Batch->new(
+        exporter => OpenTelemetry::Exporter::OTLP::Traces->new( ... ),
+    );
+
+    # Register it with the OpenTelemetry tracer provider
+    OpenTelemetry->tracer_provider->add_span_processor($processor);
+
+=head1 DESCRIPTION
+
+This module is an alias for L<OpenTelemetry::Exporter::OTLP>, so please refer
+to that module for details. This module is provided for consistency with
+L<OpenTelemetry::Exporter::OTLP::Logs>.
+
+=head1 SEE ALSO
+
+=over
+
+=item L<OpenTelemetry::Exporter::OTLP>
+
+=item L<OpenTelemetry::Exporter::OTLP::Logs>
+
+=back
+
+=head1 ACKNOWLEDGEMENTS
+
+Special thanks to L<CV-Library Ltd.|https://cv-library.co.uk> for their
+support in the development of this library.
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2024 by José Joaquín Atria.
+
+This is free software; you can redistribute it and/or modify it under the same
+terms as the Perl 5 programming language system itself.

@@ -59,8 +59,13 @@ The current user object
 
 =cut
 
-has 'user'=> undef, weak => 1;
+has 'user'=> undef;
 
+has 'dbHandle' => sub ($self) {
+    $self->user->db;
+};
+
+    
 =head2 tabName
 
 What should the tab holding this plugin be called
@@ -474,7 +479,7 @@ has cfgHash => sub {
 has template => sub {
     my $self = shift;
     my $mt = Mojo::Template->new();
-    weaken($self);
+    $self->dbHandle;   
     my $dbLookup = sub { $self->getConfigValue(@_) // ''};
  
     # don't use L, use dbLookup instead
@@ -554,7 +559,7 @@ Read a config value from the database.
 sub getConfigValue {
     my $self = shift;
     my $key = shift;
-    my $value = $self->user->db->getConfigValue($key);
+    my $value = $self->dbHandle->getConfigValue($key);
     return undef if not defined $value;
     my $ret = eval { decode_json($value) };
     # warn "GET $key -> ".Dumper($ret);
@@ -575,7 +580,7 @@ sub setConfigValue {
     my $key = shift;
     my $value = shift;
     # warn "SET $key -> ".Dumper([$value]);
-    $self->user->db->setConfigValue($key,encode_json([$value]));
+    $self->dbHandle->setConfigValue($key,encode_json([$value]));
     if ($self->controller->can('runEventActions')){
         $self->controller->runEventActions('changeConfig');
     }

@@ -12,13 +12,14 @@ use Log::Any::Adapter;
 use Readonly;
 use Sub::Util 'set_subname';
 
-our $VERSION = '0.04';
+our $VERSION = '0.05';
 
 Readonly::Scalar my $DIE_AT_DEFAULT => numeric_level('fatal');
 Readonly::Scalar my $DIE_AT_KEY => 'Log::Any::Simple/die_at';
 Readonly::Scalar my $CATEGORY_KEY => 'Log::Any::Simple/category';
 Readonly::Scalar my $PREFIX_KEY => 'Log::Any::Simple/prefix';
 Readonly::Scalar my $DUMP_KEY => 'Log::Any::Simple/dump';
+Readonly::Scalar my $DIE_REPEATS_MSG_KEY => 'Log::Any::Simple/die_repeats_msg';
 
 Readonly::Array my @ALL_LOG_METHODS =>
     (Log::Any::Adapter::Util::logging_methods(), Log::Any::Adapter::Util::logging_aliases);
@@ -56,6 +57,8 @@ sub import {  ## no critic (RequireArgUnpacking, ProhibitExcessComplexity)
         croak 'Invalid :die_at level' unless defined $die_at;
         $^H{$DIE_AT_KEY} = $die_at;
       }
+    } elsif ($arg eq ':die_repeats_msg') {
+      $^H{$DIE_REPEATS_MSG_KEY} = 1;
     } elsif ($arg eq ':category') {
       my $category = shift;
       croak 'Invalid :category name' unless $category;
@@ -161,7 +164,7 @@ sub _export_logging_method {
     $sub = sub {
       no strict 'refs';  ## no critic (ProhibitNoStrict)
       my $logger = ${"${pkg_name}::__log_any_simple_logger"};
-      _die($category, $logger->$log_method(@_));
+      _die($category, _get_die_msg($logger->$log_method(@_), $hint_hash));
     };
   } else {
     $sub = sub {
@@ -207,6 +210,15 @@ sub _get_logger {
 sub _should_die {
   my ($level, $hint_hash) = @_;
   return numeric_level($level) <= ($hint_hash->{$DIE_AT_KEY} // $DIE_AT_DEFAULT);
+}
+
+sub _get_die_msg {
+  my ($msg, $hint_hash) = @_;
+  if ($hint_hash->{$DIE_REPEATS_MSG_KEY}) {
+    return $msg;
+  } else {
+    return 'Fatal error, see the logs for more details';
+  }
 }
 
 # This method is meant to be called only at logging time (and not at import time
@@ -289,7 +301,7 @@ for my $name (@ALL_LOG_METHODS) {
       my $hint_hash = $caller[$HINT_HASH];
       my $logger = _get_singleton_logger($caller[0], $hint_hash);
       my $method = $name.'f';
-      my $msg = $logger->$method(@_);
+      my $msg = _get_die_msg($logger->$method(@_), $hint_hash);
       _die(_get_category($caller[0], $hint_hash), $msg) if _should_die($name, $hint_hash);
     });
 }
@@ -447,6 +459,13 @@ C<B<:die_at> =E<gt> I<level_name>> specifies the lowest logging level that
 triggers a call to die() when used. By default this is C<fatal> (and so, the
 C<critical>, C<alert>, and C<emergency> levels also dies). You can also pass
 C<none> to disable this behavior entirely.
+
+=item *
+
+C<B<:die_repeats_msg>> By defaults, when the library dies, only a short message
+is sent to the actual call to die(). If this parameter is passed then the entire
+log message is sent, which might cause duplicate, depending on how your logging
+is configured.
 
 =item *
 

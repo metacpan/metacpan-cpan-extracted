@@ -1,5 +1,16 @@
 Revision history for Perl distribution Convert-Pheno
 
+0.23 2024-07-17T00:00:00Z (Manuel Rueda <mrueda@cpan.org>)
+
+ - Reduced RAM usage in -iomop -stream when loading mandatory tables from PostgreSQL dump
+
+0.22 2024-07-13T00:00:00Z (Manuel Rueda <mrueda@cpan.org>)
+
+ - Reduced memory usage in -iomop -stream by emptying CONCEPT, PERSON and VISIT_OCCURRENCE during AoH -> HoH step 
+ - Reduced memory usage in -iomop -no-stream by avoiding data duplication during transposition
+ - Added Devel::Size to production for use with -verbose (+ added to cpanfile/Makefile.PL)
+ - Implemented --max-lines-sql option to --stream mode
+
 0.21 2024-06-01T00:00:00Z (Manuel Rueda <mrueda@cpan.org>)
 
  - Updated the default value for the `treatment.interval` object
@@ -73,7 +84,7 @@ Revision history for Perl distribution Convert-Pheno
 
 0.12_2 2023-09-07T00:00:00Z (Manuel Rueda <mrueda@cpan.org>)
 
- - Added Data::Leaf::Walker to Makefile.PL
+ - Added Data::Leaf::Walker to cpanfile/Makefile.PL
 
 0.12_1 2023-09-06T00:00:00Z (Manuel Rueda <mrueda@cpan.org>)
 

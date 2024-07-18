@@ -4,7 +4,7 @@
       "Shoichi Kaji <skaji@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.030, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.032, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -14,16 +14,11 @@
    },
    "name" : "File-Copy-clonefile",
    "prereqs" : {
-      "build" : {
-         "requires" : {
-            "Module::Build" : "0.28"
-         }
-      },
       "configure" : {
          "requires" : {
             "Devel::CheckCompiler" : "0.07",
-            "ExtUtils::Constant" : "0",
-            "Module::Build" : "0.28"
+            "Dist::Build" : "0.006",
+            "ExtUtils::Constant" : "0"
          }
       },
       "runtime" : {
@@ -40,7 +35,7 @@
    "provides" : {
       "File::Copy::clonefile" : {
          "file" : "lib/File/Copy/clonefile.pm",
-         "version" : "v0.0.4"
+         "version" : "v0.0.5"
       }
    },
    "release_status" : "stable",
@@ -55,10 +50,9 @@
          "web" : "https://github.com/skaji/perl-File-Copy-clonefile"
       }
    },
-   "version" : "v0.0.4",
-   "x_generated_by_perl" : "v5.36.0",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.32",
-   "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later",
-   "x_static_install" : 0
+   "version" : "v0.0.5",
+   "x_generated_by_perl" : "v5.40.0",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.38",
+   "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"
 }
 

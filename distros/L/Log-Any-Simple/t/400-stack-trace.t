@@ -1,7 +1,7 @@
 use Test2::V0;
 
 package MyTest {
-  use Log::Any::Simple 'fatal';
+  use Log::Any::Simple 'fatal', ':die_repeats_msg';
   sub f { fatal('foo'); }
   sub g { f(); }
 }

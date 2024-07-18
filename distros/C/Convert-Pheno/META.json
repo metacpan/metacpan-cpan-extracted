@@ -38,6 +38,7 @@
             "DBD::SQLite" : "1.72",
             "DBI" : "1.643",
             "Data::Leaf::Walker" : "0.21",
+            "Devel::Size" : "0.84",
             "File::ShareDir::ProjectDistDir" : "1.000009",
             "Hash::Fold" : "v1.0.0",
             "JSON::Validator" : "5.14",
@@ -80,7 +81,7 @@
          "web" : "https://github.com/CNAG-Biomedical-Informatics/convert-pheno"
       }
    },
-   "version" : "0.21",
+   "version" : "0.23",
    "x_contributors" : [],
    "x_serialization_backend" : "JSON::PP version 4.06"
 }

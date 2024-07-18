@@ -6,7 +6,7 @@ use feature qw(state);
 use Object::Pad;
 use WebService::GrowthBook::CacheEntry;
 
-our $VERSION = '0.001';    ## VERSION
+our $VERSION = '0.002';    ## VERSION
 
 class WebService::GrowthBook::InMemoryFeatureCache : isa(WebService::GrowthBook::AbstractFeatureCache) {
     field %cache;

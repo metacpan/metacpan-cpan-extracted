@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use Alien::OpenMP;
 
-our $VERSION = q{0.0.7};
+our $VERSION = q{0.0.8};
 
 # This module is a wrapper around a ".h" file that is injected into Alien::OpenMP
 # via Inline:C's AUTO_INCLUDE feature. This header file constains C MACROs for reading
@@ -233,7 +233,6 @@ runtime functions
 
   use strict;
   use warnings;
-  use Test::More tests => 8;
   
   use OpenMP::Simple;
   use OpenMP::Environment;
@@ -245,32 +244,36 @@ runtime functions
   
   my $env = OpenMP::Environment->new;
   
-  note qq{Testing macro provided by OpenMP::Simple, 'PerlOMP_UPDATE_WITH_ENV__NUM_THREADS'};
+  for my $want_num_threads ( 1 .. 8 ) {
+      $env->omp_num_threads($want_num_threads);
 
-  for my $num_threads ( 1 .. 8 ) {
+      $env->assert_omp_environment; # (optional) validates %ENV
 
-      my $current_value = $env->omp_num_threads($num_threads);
+      # call parallelized C function
+      my $got_num_threads = _check_num_threads();
 
-      is _get_num_threads(), $num_threads, sprintf qq{The number of threads (%0d) spawned in the OpenMP runtime via OMP_NUM_THREADS, as expected}, $num_threads;
-
+      printf "%0d threads spawned in ".
+              "the OpenMP runtime, expecting %0d\n",
+                $got_num_threads, $want_num_threads;
   }
   
   __DATA__
   __C__
 
-  int _get_num_threads() {
-    PerlOMP_UPDATE_WITH_ENV__NUM_THREADS // <~ e.g., MACRO to update number of threads per
-                                         //    OMP_NUM_THREADS + omp_set_num_threads OpenMP runtime call
+  /* C function parallelized with OpenMP */
+  int _check_num_threads() {
     int ret = 0;
+
+    PerlOMP_UPDATE_WITH_ENV__NUM_THREADS /* <~ MACRO x OpenMP::Simple */
+
     #pragma omp parallel
     {
       #pragma omp single
       ret = omp_get_num_threads();
     }
+
     return ret;
   }
-  
-  __END__
 
 See the C<./t> directory for many more examples. It should be obvious,
 but C<Test::More> is not required; it's just for show and convenience here.

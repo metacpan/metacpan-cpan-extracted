@@ -1,5 +1,5 @@
 This archive contains the distribution OpenMP-Environment,
-version 1.2.1:
+version 1.2.3:
 
   Perl extension managing OpenMP variables in C<%ENV> within a script.
 

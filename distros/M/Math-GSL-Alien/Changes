@@ -1,5 +1,17 @@
 Revision history for Perl module Math::GSL::Alien.
 
+1.5 2024-07-18
+    - Fixed alienfile build rule to work on Windows
+
+1.04 2024-07-17
+    - Added plugin Build::Autoconf to alienfile to fix build on Windows.
+
+1.03 2024-07-17
+    - Moved Alien::Role::Dino prereq from build time to configure time
+
+1.02 2024-07-17
+    - Moved Alien::Role::Dino prereq from runtime to build time
+
 1.01 Renamed to Math::GSL::Alien
 
 1.00 First version

@@ -1,7 +1,7 @@
 #!/usr/bin/env perl
 
 use Log::Any::Adapter 'Stderr';
-use Test2::V0 -target => 'OpenTelemetry::Exporter::OTLP';
+use Test2::V0 -target => 'OpenTelemetry::Exporter::OTLP::Traces';
 
 use experimental 'signatures';
 
@@ -19,7 +19,7 @@ my $http_mock = mock 'HTTP::Tiny' => override => [
     request => sub { +{ success => 1, status => 200 } },
 ];
 
-my $span_mock = mock 'Local::Span' => add => [
+my $mock = mock 'OpenTelemetry::SDK::Trace::Span::Readable' => add => [
     attributes         => sub { {} },
     dropped_attributes => 0,
     dropped_events     => 0,
@@ -61,10 +61,10 @@ my $span_mock = mock 'Local::Span' => add => [
 ];
 
 is CLASS->new->export([
-    Local::Span->new,
-    Local::Span->new,
-    Local::Span->new,
-    Local::Span->new,
+    OpenTelemetry::SDK::Trace::Span::Readable->new,
+    OpenTelemetry::SDK::Trace::Span::Readable->new,
+    OpenTelemetry::SDK::Trace::Span::Readable->new,
+    OpenTelemetry::SDK::Trace::Span::Readable->new,
 ]), TRACE_EXPORT_SUCCESS;
 
 done_testing;

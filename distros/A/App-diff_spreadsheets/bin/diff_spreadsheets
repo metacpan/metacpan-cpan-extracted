@@ -5,8 +5,8 @@
 # related or neighboring rights.  Attribution is requested but is not required.
 use strict; use warnings FATAL => 'all'; use 5.010;
 
-our $VERSION = '1.021'; # VERSION
-our $DATE = '2023-09-20'; # DATE
+our $VERSION = '1.022'; # VERSION
+our $DATE = '2024-07-17'; # DATE
 
 #use 5.12; # for unicode_strings
 use v5.18; # for lexical_subs
@@ -141,78 +141,79 @@ my %opts = (
   trunc_title_width => $maxwidth > 60 ? int($maxwidth/3) : 20,
 );
 my $method = "native";
-my @diff_opts;
 my $help;
+
+sub dashopt($) {
+  my $optname = shift;
+  length($optname) == 1 ? "-$optname" : "--$optname";
+}
+sub combined_optval($@) { # value is optional
+  my ($nilval, $optname, $val) = @_;
+  if ($val eq $nilval) {
+    return dashopt($optname);
+  } else {
+    # e.g. -w20 or --width=20
+    return(length($optname) == 1 ? "-$optname${val}" : "--$optname=$val");
+  }
+}
+
+my @diff_opts;
+sub diffopt_noval      { push @diff_opts, dashopt($_[0]); }
+sub diffopt_withval    { push @diff_opts, dashopt($_[0]), $_[1]; }
+sub diffopt_comboptstr { push @diff_opts, combined_optval("",@_) }
+sub diffopt_comboptnum { push @diff_opts, combined_optval(0, @_) }
 
 ### MAIN ###
 
 badargs_exit(-msg => "Usage: $Script file1 file2\n   -h for help") if @ARGV==0;
 Getopt::Long::Configure ("default", "gnu_getopt", "auto_version");
 GetOptions(
-   "always-show-columns=s"     => sub{ push @{$opts{always_show_columns}}, $_[1] },
-   "a|text"                    => sub{ push @diff_opts, "-$_[0]"; },
-   "B|ignore-blank-lines"      => sub{ push @diff_opts, "-$_[0]"; },
-   "b|ignore-space-change"     => sub{ push @diff_opts, "-$_[0]"; },
+   # diff options:
+   (map { ((/=/ ? $_ : "$_=s") => \&diffopt_withval) }
+      qw/C|c|context=i D F GTYPE-group-format horizon-lines I ifdef
+         ignore-matching-lines label line-format LTYPE-group-format
+         show-function-line tabsize=i
+        /),
+   (map { ($_ => \&diffopt_noval) }
+        qw/a B b brief d E e ed expand-tabs i ignore-blank-lines ignore-case
+           ignore-space-change ignore-tab-expansion initial-tab l minimal n
+           p paginate q rcs report-identical-files s show-c-function
+           speed-large-files strip-trailing-cr T t text/),
+    # valid only for 'git diff':
+   (map { ((/[:=]/ ? $_ : "$_=s") => \&diffopt_comboptstr) }
+        qw/color/),
+   (map { ((/[:=]/ ? $_ : oops) => \&diffopt_comboptnum) }
+        qw/u|U|unified:i/),
+   (map { ((/=/ ? $_ : "$_=s") => \&diffopt_comboptstr) }
+        qw/word-diff-regex word-diff ws-error-highlight/),
+   (map { ($_ => \&diffopt_noval) }
+        qw/w|ignore-all-space y|side-by-side/),
+   "W|width=i" => sub{ $maxwidth = $_[1]; diffopt_comboptnum(@_); },
 
-   # --color is valid only for 'git diff'
-   "color=s"                   => sub{ push @diff_opts, "-$_[0]=$_[1]"; },
-
-   "columns=s"                 => sub{ push @{$opts{columns}}, $_[1] },
-   "c|C|context=i"             => sub{ push @diff_opts, "-$_[0]", $_[1]; },
-   "debug"                     => sub{ $opts{debug} = $_[1] },
-   "D|ifdef=s"                 => sub{ push @diff_opts, "-$_[0]", $_[1]; },
-   "d|minimal"                 => sub{ push @diff_opts, "-$_[0]"; },
-   "encoding=s"                => sub{ $opts{encoding} = $_[1] },
-   "e|ed"                      => sub{ push @diff_opts, "-$_[0]"; },
-   "E|ignore-tab-expansion"    => sub{ push @diff_opts, "-$_[0]"; },
-   "first-data-row=i"          => sub{ $opts{first_data_row} = $_[1] },
-   "F|show-function-line=s"    => sub{ push @diff_opts, "-$_[0]", $_[1]; },
-   "GTYPE-group-format=s"      => sub{ push @diff_opts, "-$_[0]", $_[1]; },
-   "hash-func=s"               => sub{ $opts{hash_func} = $_[1] },
-   "hashid-func=s"             => sub{ $opts{hashid_func} = $_[1] },
-   "horizon-lines=s"           => sub{ push @diff_opts, "-$_[0]", $_[1]; },
-   "h|help"                    => \$help,
-   "id-columns=s"              => sub{ push @{$opts{id_columns}}, $_[1] },
-   "i|ignore-case"             => sub{ push @diff_opts, "-$_[0]"; },
-   "I|ignore-matching-lines=s" => sub{ push @diff_opts, "-$_[0]", $_[1]; },
-   "keep-temps!"               => sub{ $opts{keep_temps} = $_[1] },
-   "label=s"                   => sub{ push @diff_opts, "-$_[0]", $_[1]; },
-   "line-format=s"             => sub{ push @diff_opts, "-$_[0]", $_[1]; },
-   "LTYPE-group-format=s"      => sub{ push @diff_opts, "-$_[0]", $_[1]; },
-   "l|paginate"                => sub{ push @diff_opts, "-$_[0]"; },
-   "m|method=s"                => \$method,
-   "n|rcs"                     => sub{ push @diff_opts, "-$_[0]"; },
-   "output-encoding=s"         => sub{ $opts{output_encoding} = $_[1] },
-   "p|show-c-function"         => sub{ push @diff_opts, "-$_[0]"; },
-   "quiet|silent"              => sub{ $opts{silent} = $_[1] },
-   "quote-char=s"              => sub{ $opts{quote_char} = $_[1] },
-   "q|brief"                   => sub{ push @diff_opts, "-$_[0]"; },
-   "sep-char=s"                => sub{ $opts{sep_char} = $_[1] },
-   "setup-code=s"              => sub{ $opts{setup_code} = $_[1] },
-   "sheets=s"                  => sub{ push @{$opts{sheet_names}}, $_[1] },
-   "show-empties"              => sub{ $opts{show_empties} = $_[1] },
-   "sort-rows!"                => sub{ $opts{sort_rows} = $_[1] }, # allow --no-sort
-   "speed-large-files"         => sub{ push @diff_opts, "-$_[0]"; },
-   "strip-trailing-cr"         => sub{ push @diff_opts, "-$_[0]"; },
-   "suppress-common-lines"     => sub{ $opts{suppress_common_lines} = 1; push @diff_opts, "-$_[0]"; },
-   "s|report-identical-files"  => sub{ push @diff_opts, "-$_[0]"; },
-   "tabsize=i"                 => sub{ push @diff_opts, "-$_[0]", $_[1]; },
-   "title-row=i"               => sub{ $opts{title_row} = $_[1] },
-   "t|expand-tabs"             => sub{ push @diff_opts, "-$_[0]"; },
-   "T|initial-tab"             => sub{ push @diff_opts, "-$_[0]"; },
-   "u|U|unified:i"             => sub{ push @diff_opts, "-$_[0]", $_[1]?($_[1]):(); },
-   "v|verbose"                 => sub{ $opts{verbose} = $_[1] },
-
-   # valid only for 'git diff':
-   "word-diff-regex=s"         => sub{ push @diff_opts, "-$_[0]=$_[1]"; },
-   "word-diff=s"               => sub{ push @diff_opts, "-$_[0]=$_[1]"; },
-   "ws-error-highlight=s"      => sub{ push @diff_opts, "-$_[0]=$_[1]"; },
-
-   "w|ignore-all-space"        => sub{ push @diff_opts, "-$_[0]"; },
-   "W|width=i"                 => sub{ $maxwidth = $_[1]; push @diff_opts, "-$_[0]", $_[1]; },
-   "y|side-by-side"            => sub{ push @diff_opts, "-$_[0]"; },
-   "Z|ignore-trailing-space"   => sub{ $opts{ign_trailing_spaces} = 1; push @diff_opts, "-$_[0]"; },
-   # Options valid only for 'git diff':
+   # our options:
+   "always-show-columns=s"   => sub{ push @{$opts{always_show_columns}}, $_[1]},
+   "columns=s"               => sub{ push @{$opts{columns}}, $_[1] },
+   "debug"                   => sub{ $opts{debug} = $_[1] },
+   "encoding=s"              => sub{ $opts{encoding} = $_[1] },
+   "first-data-row=i"        => sub{ $opts{first_data_row} = $_[1] },
+   "hash-func=s"             => sub{ $opts{hash_func} = $_[1] },
+   "hashid-func=s"           => sub{ $opts{hashid_func} = $_[1] },
+   "h|help"                  => \$help,
+   "id-columns=s"            => sub{ push @{$opts{id_columns}}, $_[1] },
+   "keep-temps!"             => sub{ $opts{keep_temps} = $_[1] },
+   "m|method=s"              => \$method,
+   "output-encoding=s"       => sub{ $opts{output_encoding} = $_[1] },
+   "quiet|silent"            => sub{ $opts{silent} = $_[1] },
+   "quote-char=s"            => sub{ $opts{quote_char} = $_[1] },
+   "sep-char=s"              => sub{ $opts{sep_char} = $_[1] },
+   "setup-code=s"            => sub{ $opts{setup_code} = $_[1] },
+   "sheets=s"                => sub{ push @{$opts{sheet_names}}, $_[1] },
+   "show-empties"            => sub{ $opts{show_empties} = $_[1] },
+   "sort-rows!"              => sub{ $opts{sort_rows} = $_[1] }, # allow --no-sort
+   "suppress-common-lines"   => sub{ $opts{suppress_common_lines} = 1; push @diff_opts, "-$_[0]"; },
+   "title-row=i"             => sub{ $opts{title_row} = $_[1] },
+   "v|verbose"               => sub{ $opts{verbose} = $_[1] },
+   "Z|ignore-trailing-space" => sub{ $opts{ign_trailing_spaces} = 1; push @diff_opts, "-$_[0]"; },
 ) or badargs_exit(-msg => "$Script -h for help");
 
 call_pod2usage(-verbose => 2, -output => \*STDOUT) if $help;
@@ -441,7 +442,7 @@ sub process_pair {
     for my $rx (0..$#$rows1) {
       my $r1 = $rows1->[$rx];
       my $r2 = $rows2->[$rx];
-      last PRECHECK if first { $r1->[$_] ne $r2->[$_] } 0..($num_cols-1)
+      last PRECHECK if defined first {$r1->[$_] ne $r2->[$_]} 0..($num_cols-1);
     }
     warn "> Paired sheets contain identical data, skipping fancier algos\n"
       if $opts{debug};
@@ -502,6 +503,7 @@ use List::Util qw(min max any first);
 use Guard qw(guard scope_guard);
 use Spreadsheet::Edit 1000.006 qw(:DEFAULT logmsg cx2let let2cx);
 use Data::Dumper::Interp 6.007;
+use Spreadsheet::Edit::Log ':btw=DS ${lno}:';
 
 sub _visualize($);
 sub _title_or_origABC($$);
@@ -1606,7 +1608,11 @@ is detected as a CHANGE and not as confusing separate DELETE and INSERT.
 
 B<C<--no-sort-rows>> disables this sorting so you can pre-sort the
 data yourself (for example, if "id columns" should be sorted
-numerically).
+numerically) or if detecting different row order is necessary.
+
+Note: With sorting, I<diffs will not be detected> if rows are in a different
+order but otherwise unchanged.   Use C<--no-sort-rows> if row order is
+important.
 
 When using the default "native" diff algorithm, the I<original>
 row numbers in each file are displayed in the results, hiding

@@ -13,14 +13,14 @@ my %WriteMakefileArgs = (
   "CONFIGURE_REQUIRES" => {
     "Alien::Build" => "2.21",
     "Alien::Build::MM" => "2.21",
-    "ExtUtils::MakeMaker" => "6.52"
+    "ExtUtils::MakeMaker" => "6.52",
+    "Alien::Role::Dino" => 0
   },
   "DISTNAME" => "Math-GSL-Alien",
   "LICENSE" => "perl",
   "NAME" => "Math::GSL::Alien",
   "PREREQ_PM" => {
     "Alien::Base" => "2.21",
-    "Alien::Role::Dino" => 0,
   },
   "TEST_REQUIRES" => {
     "ExtUtils::MakeMaker" => "6.52",

@@ -3,6 +3,9 @@
 # The author, Jim Avera (jim.avera at gmail) has waived all copyright and
 # related or neighboring rights to the content of this file.
 # Attribution is requested but is not required.
+#
+# PLEASE NOTE that the above applies to THIS FILE ONLY.  Other files in the
+# same distribution or in other collections may have more restrictive terms.
 
 # Common setup stuff, not specifically for test cases.
 # This file is intended to be identical in all my module distributions.
@@ -16,7 +19,25 @@ BEGIN {
   $default_pragmas = ($^H//"u").":".hash2str(\%^H);
 }
 
-use strict; use warnings  FATAL => 'all'; use feature qw/say state/;
+use strict;
+
+# Do not fatalize decode warnings (under category 'utf8') because various smokers
+# can have restrictive stdout encodings.
+use warnings  FATAL => 'all';
+use warnings  NONFATAL => qw(
+        utf8
+        exec
+        recursion
+        internal
+        malloc
+        newline
+        experimental
+        deprecated
+        portable
+      );
+#no warnings "once";
+
+use feature qw/say state/;
 
 require Exporter;
 use parent 'Exporter';
@@ -28,10 +49,16 @@ use Carp;
 
 sub oops(@) {
   my $pkg = caller;
-  my $pfx = "\n";
-  $pfx .= "$pkg " if $pkg ne 'main';
-  $pfx .= "oops:\n";
-  @_ = ($pfx, @_, "\n");
+  my $pfx = "\noops";
+  $pfx .= " in pkg '$pkg'" unless $pkg eq 'main';
+  $pfx .= ":\n";
+  if (defined(&Spreadsheet::Edit::logmsg)) {
+    # Show current apply sheet & row if any.
+    @_=($pfx, &Spreadsheet::Edit::logmsg(@_));
+  } else {
+    @_=($pfx, @_);
+  }
+  push @_,"\n" unless $_[-1] =~ /\R\z/;
   goto &Carp::confess
 }
 
@@ -44,7 +71,7 @@ sub btwN($@) {
   $fn =~ s/(.)\.[a-z]+$/$1/a;
   local $_ = join("",@_);
   s/\n\z//s;
-  printf "%s:%d: %s\n", $fn, $lno, $_;
+  printf STDERR "%s:%d: %s\n", $fn, $lno, $_;
 }
 
 sub import {
@@ -72,8 +99,9 @@ sub import {
   #warnings->import::into($target);
   warnings->import::into($target, FATAL => 'all'); # blowing up a test is ok
 
+  #As of perl 5.39.8 multiple 'use' specifying Perl version is deprecated
   #use 5.010;  # say, state
-  use 5.011;  # cpantester gets warning that 5.11 is the minimum acceptable
+  #use 5.011;  # cpantester gets warning that 5.11 is the minimum acceptable
   use 5.018;  # lexical_subs
   require feature;
   # Perl 5.18.0 seems to require the "no experimental..." before the "use feature"

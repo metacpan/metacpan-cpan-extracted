@@ -20,6 +20,12 @@
 #######################################################################
 
 
+2024-07-17  Brian M. Kelly <Brian.Kelly@fullauto.com>
+
+        * Version 1.0000671 released
+
+        * Fixed saved dir for cd .. in cwd()
+
 2024-07-15  Brian M. Kelly <Brian.Kelly@fullauto.com>
 
         * Version 1.0000670 released

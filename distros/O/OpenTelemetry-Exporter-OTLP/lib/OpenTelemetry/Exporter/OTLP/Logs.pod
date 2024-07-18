@@ -1,0 +1,159 @@
+=encoding UTF-8
+
+=head1 NAME
+
+OpenTelemetry::Exporter::OTLP::Logs - An OpenTelemetry Protocol log record exporter
+
+=head1 SYNOPSIS
+
+    use OpenTelemetry;
+    use OpenTelemetry::Exporter::OTLP::Logs;
+    use OpenTelemetry::SDK::Logs::LogRecord::Processor::Batch;
+
+    # Use it with a log processor
+    my $processor = OpenTelemetry::SDK::Logs::LogRecord::Processor::Batch->new(
+        exporter => OpenTelemetry::Exporter::OTLP::Logs->new( ... ),
+    );
+
+    # Register it with the OpenTelemetry logger provider
+    OpenTelemetry->logger_provider->add_log_record_processor($processor);
+
+=head1 DESCRIPTION
+
+This module provides an exporter that extends L<OpenTelemetry::Exporter::OTLP>
+to read the default values for the endpoint, timeout, compression, and headers
+from the environment variables specific to logs. All the rest of the
+behaviours are those described in L<OpenTelemetry::Exporter::OTLP>, so please
+refer to the documentation of that module for details.
+
+For a similar exporter that can be used for exporting traces, please see
+L<OpenTelemetry::Exporter::OTLP::Traces>.
+
+=head1 METHODS
+
+This class extends L<OpenTelemetry::Exporter::OTLP>, but modifies the sources
+that are used for some default values in the constructor. This documentation
+only describes those differences. For details on Those differences
+are documented below. For more details on the meaning of those parameters,
+or in any other parts of the API of the OTLP exporter, please
+to the documentation of the parent class.
+
+=head2 new
+
+    $exporter = OpenTelemetry::Exporter::OTLP->new(
+        certificate        => $file_path,           # optional
+        client_certificate => $file_path,           # optional
+        client_key         => $file_path,           # optional
+        compression        => $compression,         # optional
+        endpoint           => $url,                 # optional
+        headers            => \%headers || $string, # optional
+        protocol           => $protocol,            # optional
+        timeout            => $seconds,             # optional
+    );
+
+Behaves like the constructor of L<OpenTelemetry::Exporter::OTLP>, but uses
+different sources for their default values, as described below.
+
+=over
+
+=item certificate
+
+The default will be read from
+L<"OTEL_EXPORTER_OTLP_LOGS_CERTIFICATE"|OpenTelemetry::SDK/OTEL_EXPORTER_OTLP_LOGS_CERTIFICATE>,
+or
+L<"OTEL_EXPORTER_OTLP_CERTIFICATE"|OpenTelemetry::SDK/OTEL_EXPORTER_OTLP_CERTIFICATE>
+if that variable is not set.
+
+If none of those values are set, this will remain undefined.
+
+=item client_certificate
+
+The default value will be read from
+L<"OTEL_EXPORTER_OTLP_LOGS_CLIENT_CERTIFICATE"|OpenTelemetry::SDK/OTEL_EXPORTER_OTLP_LOGS_CLIENT_CERTIFICATE>,
+or
+L<"OTEL_EXPORTER_OTLP_CLIENT_CERTIFICATE"|OpenTelemetry::SDK/OTEL_EXPORTER_OTLP_CLIENT_CERTIFICATE>
+if that variable is not set.
+
+If none of those values are set, this will remain undefined.
+
+=item client_key
+
+The default value will be read from
+L<"OTEL_EXPORTER_OTLP_LOGS_CLIENT_KEY"|OpenTelemetry::SDK/OTEL_EXPORTER_OTLP_LOGS_CLIENT_KEY>,
+or
+L<"OTEL_EXPORTER_OTLP_CLIENT_KEY"|OpenTelemetry::SDK/OTEL_EXPORTER_OTLP_CLIENT_KEY>
+if that variable is not set.
+
+If none of those values are set, this will remain undefined.
+
+=item compression
+
+The default value will be read from the
+L<"OTEL_EXPORTER_OTLP_LOGS_COMPRESSION"|OpenTelemetry::SDK/OTEL_EXPORTER_OTLP_LOGS_COMPRESSION>
+environment variable, or
+L<"OTEL_EXPORTER_OTLP_COMPRESSION"|OpenTelemetry::SDK/OTEL_EXPORTER_OTLP_COMPRESSION>
+if the first one is not set.
+
+If none of these values is set, the default will depend on availability.
+If L<Compress::Zlib> is installed, the compression will default to "gzip",
+otherwise none will be used.
+
+=item endpoint
+
+The default value will be read from
+L<"OTEL_EXPORTER_OTLP_LOGS_ENDPOINT"|OpenTelemetry::SDK/OTEL_EXPORTER_OTLP_LOGS_ENDPOINT>.
+If this is set, it will be used as-is.
+
+If that value was not set, the "/v1/traces" path will be added to a base URL
+read from
+L<"OTEL_EXPORTER_OTLP_ENDPOINT"|OpenTelemetry::SDK/OTEL_EXPORTER_OTLP_ENDPOINT>.
+If this environment variable was not set, this base URL will default to
+"http://localhost:4318".
+
+=item headers
+
+The default value will be read from the
+L<"OTEL_EXPORTER_OTLP_LOGS_HEADERS"|OpenTelemetry::SDK/OTEL_EXPORTER_OTLP_LOGS_HEADERS>
+environment variable, or
+L<"OTEL_EXPORTER_OTLP_HEADERS"|OpenTelemetry::SDK/OTEL_EXPORTER_OTLP_HEADERS>
+if the first one is not set.
+
+If none of these is set, it will default to an empty hash.
+
+=item protocol
+
+No changes from the parent class.
+
+=item timeout
+
+The default value will be read from
+L<"OTEL_EXPORTER_OTLP_LOGS_TIMEOUT"|OpenTelemetry::SDK/OTEL_EXPORTER_OTLP_LOGS_TIMEOUT>,
+or from
+L<"OTEL_EXPORTER_OTLP_TIMEOUT"|OpenTelemetry::SDK/OTEL_EXPORTER_OTLP_TIMEOUT>
+if that variable is not set.
+
+If none of these values is set, this will default to 10.
+
+=back
+
+=head1 SEE ALSO
+
+=over
+
+=item L<OpenTelemetry::Exporter::OTLP>
+
+=item L<OpenTelemetry::Exporter::OTLP::Traces>
+
+=back
+
+=head1 ACKNOWLEDGEMENTS
+
+Special thanks to L<CV-Library Ltd.|https://cv-library.co.uk> for their
+support in the development of this library.
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2024 by José Joaquín Atria.
+
+This is free software; you can redistribute it and/or modify it under the same
+terms as the Perl 5 programming language system itself.

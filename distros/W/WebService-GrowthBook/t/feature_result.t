@@ -4,14 +4,15 @@ use Test::More;
 use Log::Any::Test;
 use Log::Any qw($log);
 use WebService::GrowthBook::FeatureResult;
+use JSON::MaybeXS;
 
 subtest "boolean" => sub {
     my $test_cases = [[1, 1, 1, 0], [0, 0, 0, 1]];
     for my $case ($test_cases->@*) {
         my $result = WebService::GrowthBook::FeatureResult->new(
             id    => 'test',
-            type  => 'boolean',
-            value => $case->[0]);
+            value => $case->[0] ? JSON::MaybeXS::true : JSON::MaybeXS::false
+        );
         is($result->value, $case->[1], "$case->[0] value is $case->[1]");
         is($result->on,    $case->[2], "$case->[0] on is $case->[2]");
         is($result->off,   $case->[3], "$case->[0] off is $case->[3]");
@@ -23,7 +24,6 @@ subtest "number" => sub {
     for my $case ($test_cases->@*) {
         my $result = WebService::GrowthBook::FeatureResult->new(
             id    => 'test',
-            type  => 'number',
             value => $case->[0]);
         is($result->value, $case->[1], "$case->[0] value is $case->[1]");
     }
@@ -34,7 +34,6 @@ subtest "string" => sub {
     for my $case ($test_cases->@*) {
         my $result = WebService::GrowthBook::FeatureResult->new(
             id    => 'test',
-            type  => 'string',
             value => $case->[0]);
         is($result->value, $case->[1], "$case->[0] value is $case->[1]");
     }
@@ -56,7 +55,6 @@ subtest "data structure" => sub {
     for my $case ($test_cases->@*) {
         my $result = WebService::GrowthBook::FeatureResult->new(
             id    => 'test',
-            type  => 'json',
             value => $case->[0]);
         is_deeply($result->value, $case->[1], "complex data structure test");
     }
@@ -65,15 +63,14 @@ subtest "data structure" => sub {
 subtest "call on/off on non-boolean" => sub {
     my $result = WebService::GrowthBook::FeatureResult->new(
         id    => 'test',
-        type  => 'number',
         value => 1
     );
     $log->clear;
     is($result->on, undef, "on called on non-boolean");
-    $log->contains_ok(qr/FeatureResult->on called on non-boolean feature test/, "log on non-boolean");
+    $log->contains_ok(qr{FeatureResult->on/off called on non-boolean feature test}, "log on non-boolean");
     $log->clear;
     is($result->off, undef, "off called on non-boolean");
-    $log->contains_ok(qr/FeatureResult->off called on non-boolean feature test/, "log off non-boolean");
+    $log->contains_ok(qr{FeatureResult->on/off called on non-boolean feature test}, "log off non-boolean");
 };
 
 done_testing();

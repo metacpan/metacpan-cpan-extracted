@@ -1,10 +1,5 @@
 package DBIx::Diff::Schema;
 
-our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-05-06'; # DATE
-our $DIST = 'DBIx-Diff-Schema'; # DIST
-our $VERSION = '0.097'; # VERSION
-
 use 5.010001;
 use strict 'subs', 'vars';
 use warnings;
@@ -13,8 +8,13 @@ use Log::ger;
 use DBIx::Util::Schema qw(has_table list_tables list_columns);
 use List::Util qw(first);
 
-use Exporter;
-our @ISA = qw(Exporter);
+use Exporter qw(import);
+
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2024-07-17'; # DATE
+our $DIST = 'DBIx-Diff-Schema'; # DIST
+our $VERSION = '0.098'; # VERSION
+
 our @EXPORT_OK = qw(
                        diff_db_schema
                        diff_table_schema
@@ -324,7 +324,7 @@ DBIx::Diff::Schema - Compare schema of two DBI databases
 
 =head1 VERSION
 
-This document describes version 0.097 of DBIx::Diff::Schema (from Perl distribution DBIx-Diff-Schema), released on 2020-05-06.
+This document describes version 0.098 of DBIx::Diff::Schema (from Perl distribution DBIx-Diff-Schema), released on 2024-07-17.
 
 =head1 SYNOPSIS
 
@@ -537,14 +537,6 @@ Please visit the project's homepage at L<https://metacpan.org/release/DBIx-Diff-
 
 Source repository is at L<https://github.com/perlancar/perl-DBIx-Diff-Schema>.
 
-=head1 BUGS
-
-Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=DBIx-Diff-Schema>
-
-When submitting a bug or request, please include a test-file or a
-patch to an existing test-file that illustrates the bug or desired
-feature.
-
 =head1 SEE ALSO
 
 L<DBIx::Compare> to compare database contents.
@@ -556,11 +548,37 @@ content) and display the result as the familiar colored unified-style diff.
 
 perlancar <perlancar@cpan.org>
 
+=head1 CONTRIBUTING
+
+
+To contribute, you can send patches by email/via RT, or send pull requests on
+GitHub.
+
+Most of the time, you don't need to build the distribution yourself. You can
+simply modify the code, then test via:
+
+ % prove -l
+
+If you want to build the distribution (e.g. to try to install it locally on your
+system), you can install L<Dist::Zilla>,
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>,
+L<Pod::Weaver::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps required beyond
+that are considered a bug and can be reported to me.
+
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020, 2018, 2017, 2015, 2014 by perlancar@cpan.org.
+This software is copyright (c) 2024, 2020, 2018, 2017, 2015, 2014 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=DBIx-Diff-Schema>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
 
 =cut

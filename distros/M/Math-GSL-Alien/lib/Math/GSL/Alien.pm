@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use 5.008001;
 
-our $VERSION = '1.01';
+our $VERSION = '1.05';
 
 use base 'Alien::Base';
 use Role::Tiny::With qw( with );
@@ -12,6 +12,8 @@ use Role::Tiny::With qw( with );
 with 'Alien::Role::Dino';
 
 1;
+
+=encoding UTF-8
 
 =head1 NAME
 

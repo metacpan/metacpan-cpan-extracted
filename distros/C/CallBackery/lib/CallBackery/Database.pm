@@ -45,7 +45,7 @@ has userName => sub {
 
 has config => sub {
     shift->app->config;
-};
+}, weak => 1;
 
 
 =head2 dhb

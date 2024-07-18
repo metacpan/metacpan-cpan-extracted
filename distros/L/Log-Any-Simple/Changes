@@ -1,5 +1,12 @@
 Revision history for Perl distribution Log-Any-Functions
 
+0.05 - 2024-07-17
+
+ - By default no longer send the whole log message to the die() method when
+   logging at a fatal level.
+ - Add a ':die_repeats_msg' import option to allow sending the whole message to
+   the die() method.
+
 0.04 - 2024-05-09
 
  - Require a relatively recent version of Log::Any, to avoid some bug in older

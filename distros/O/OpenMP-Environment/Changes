@@ -59,3 +59,11 @@ Revision history for Perl extension OpenMP::Environment.
          - updated POD to reflect the recommended us of this
            module with OpenMP::Simple
          - updated examples
+
+1.2.2 Tue Jul 17 08:33:00 2024
+         - updated POD to reflect the recommended use of this module with OpenMP::Simple
+         - updated examples
+
+1.2.3 Tue Jul 17 11:33:00 2024
+         - updated POD to reflect the recommended use of this module with OpenMP::Simple
+         - updated examples

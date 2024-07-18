@@ -2,7 +2,7 @@
 
 =head1 NAME
 
-OpenTelemetry::Exporter::OTLP - An OpenTelemetry Protocol span exporter
+OpenTelemetry::Exporter::OTLP - An OpenTelemetry Protocol exporter
 
 =head1 SYNOPSIS
 

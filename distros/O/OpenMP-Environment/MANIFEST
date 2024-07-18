@@ -199,3 +199,4 @@ lib/OpenMP/Environment.pm
 t/01-validation.t
 t/02-assert-env.t
 t/release-kwalitee.t
+x.pl

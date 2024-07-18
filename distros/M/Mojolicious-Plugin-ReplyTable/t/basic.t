@@ -1,6 +1,6 @@
 use Mojolicious::Lite;
 
-use Test::More;
+use Test2::V0;
 use Test::Mojo;
 use Test::Without::Module;
 
@@ -76,7 +76,7 @@ $t->get_ok('/table.csv')
   my $csv = Text::CSV->new({binary => 1});
   my $res = $t->tx->res->body;
   open my $fh, '<', \$res;
-  is_deeply $csv->getline_all($fh), $data, 'data returned as csv';
+  is $csv->getline_all($fh), $data, 'data returned as csv';
 }
 
 # csv with options
@@ -89,7 +89,7 @@ $t->get_ok('/table.csv?format_as_psv=1')
   my $csv = Text::CSV->new({binary => 1, sep_char => "|" });
   my $res = $t->tx->res->body;
   open my $fh, '<', \$res;
-  is_deeply $csv->getline_all($fh), $data, 'data returned as psv';
+  is $csv->getline_all($fh), $data, 'data returned as psv';
 }
 
 # invalid csv options
@@ -106,7 +106,7 @@ $t->get_ok('/table.html')
 
 {
   my $res = $t->tx->res->dom->find('tbody tr')->map(sub{ $_->find('td')->map('text')->to_array })->to_array;
-  is_deeply $res, $data, 'data returned as html';
+  is $res, $data, 'data returned as html';
 }
 
 $t->get_ok('/header.html')
@@ -115,9 +115,9 @@ $t->get_ok('/header.html')
 
 {
   my $head = $t->tx->res->dom->find('thead tr th')->map('text')->to_array;
-  is_deeply $head, $data->[0], 'correct html table headers';
+  is $head, $data->[0], 'correct html table headers';
   my $body = $t->tx->res->dom->find('tbody tr')->map(sub{ $_->find('td')->map('text')->to_array })->to_array;
-  is_deeply $body, [@$data[1..$#$data]], 'correct html table body';
+  is $body, [@$data[1..$#$data]], 'correct html table body';
 }
 
 # text
@@ -131,7 +131,7 @@ $t->get_ok('/header.html')
   my $res = trim $t->tx->res->text;
   $res =~ s/\s++/ /g;
   my $expect = c(@$data)->flatten->join(' ');
-  is $res, $expect, 'text table has correct information';
+  is $res, "$expect", 'text table has correct information';
   Test::Without::Module->unimport('Text::Table::Tiny');
 }
 
