@@ -1,5 +1,10 @@
 Revision history for Perl extension Exception::Sink.
 
+3.09  2024.07.18
+
+    1. fixed stack frames numbers when skipping frames
+    2. fixed boom() prototypes
+
 3.08  2024.07.08
 
     1. added book_skip($$) and optional skip argument to get_stack_trace()

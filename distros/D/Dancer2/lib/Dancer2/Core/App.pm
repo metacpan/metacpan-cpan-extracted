@@ -1,6 +1,6 @@
 # ABSTRACT: encapsulation of Dancer2 packages
 package Dancer2::Core::App;
-$Dancer2::Core::App::VERSION = '1.1.0';
+$Dancer2::Core::App::VERSION = '1.1.1';
 use Moo;
 use Carp               qw<croak carp>;
 use Scalar::Util       'blessed';
@@ -896,10 +896,17 @@ sub template {
         $self->set_with_return( sub {
             $local_response ||= shift;
         });
-        my $content = $template->process( @_ );
+        # Catch any exceptions that may happen during template processing
+        my $content = eval { $template->process( @_ ) };
+        my $eval_result = $@;
         $self->set_with_return($old_with_return);
+        # If there was a previous response set before the exception (or set as
+        # part of the exception handling), then use that, otherwise throw the
+        # exception as normal
         if ($local_response) {
             $self->with_return->($local_response);
+        } elsif ($eval_result) {
+            die $eval_result;
         }
         return $content;
     }
@@ -972,7 +979,9 @@ sub send_as {
         $options->{charset} = $self->config->{charset} || 'UTF-8';
         my $content = Encode::encode( $options->{charset}, $data );
         $options->{content_type} ||= join '/', 'text', lc $type;
-        $self->send_file( \$content, %$options );     # returns from sub
+        # Explicit return needed here, as if we are currently rendering a
+        # template then with_return will not longjump
+        return $self->send_file( \$content, %$options );
     }
 
     # Try and load the serializer class
@@ -1780,7 +1789,7 @@ Dancer2::Core::App - encapsulation of Dancer2 packages
 
 =head1 VERSION
 
-version 1.1.0
+version 1.1.1
 
 =head1 DESCRIPTION
 
@@ -1994,7 +2003,7 @@ Dancer Core Developers
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2023 by Alexis Sukrieh.
+This software is copyright (c) 2024 by Alexis Sukrieh.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

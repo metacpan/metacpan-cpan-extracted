@@ -28,15 +28,16 @@ Log::WarnDie - Log standard Perl warnings and errors on a log handler
 
 =head1 VERSION
 
-Version 0.09
+Version 0.11
 
 =head1 SYNOPSIS
 
     use Log::WarnDie; # install to be used later
     use Log::Dispatch;
+    use Log::Dispatch::Email::Sendmail;
 
     my $dispatcher = Log::Dispatch->new();       # can be any dispatcher!
-    $dispatcher->add( Log::Dispatch::Foo->new( # whatever output you like
+    $dispatcher->add( Log::Dispatch::Email::Sendmail->new( # whatever output you like
      name      => 'foo',
      min_level => 'info',
     ) );
@@ -79,9 +80,25 @@ carp, croak, cluck, confess or print to the STDERR handle,  will be logged
 using the Log::Dispatch logging dispatcher.  Logging can be disabled and
 enabled at any time for critical sections of code.
 
+The following log levels are used:
+
+=head2 warning
+
+Any C<warn>, C<Carp::carp> or C<Carp::cluck> will generate a "warning" level
+message.
+
+=head2 error
+
+Any direct output to STDERR will generate an "error" level message.
+
+=head2 critical
+
+Any C<die>, C<Carp::croak> or C<Carp::confess> will generate a "critical"
+level message.
+
 =cut
 
-our $VERSION = '0.09';
+our $VERSION = '0.11';
 
 =head1 SUBROUTINES/METHODS
 
@@ -98,7 +115,7 @@ our $VERSION = '0.09';
 # Called whenever a dispatcher is activated
 #
 #  IN: 1 class with which to bless
-# OUT: 1 blessed object 
+# OUT: 1 blessed object
 
 sub TIEHANDLE { bless \"$_[0]",$_[0] } #TIEHANDLE
 
@@ -120,7 +137,7 @@ sub PRINT {
 
     shift;
     if($FILTER) {
-    	return unless($FILTER->(@_));
+	return if($FILTER->(@_) == 0);
     }
     if ($DISPATCHER) {
         $DISPATCHER->error( @_ )
@@ -149,16 +166,19 @@ sub PRINTF {
 # Make sure it appears on the original STDERR as well
 
     shift;
+    my $format = shift;
+    my @args = @_;
+    return if(scalar(@args) == 0);
     if($FILTER) {
-    	return unless($FILTER->(@_));
+	return if($FILTER->(sprintf($format, @args)) == 0);
     }
     if ($DISPATCHER) {
-        $DISPATCHER->error( @_ )
-         unless $LAST and @$LAST == @_ and join( '',@$LAST ) eq join( '',@_ );
+        $DISPATCHER->error(sprintf($format, @args))
+         unless $LAST and @$LAST == @args and join( '',@$LAST ) eq join( '',@args );
         undef $LAST;
     }
     if($STDERR) {
-	printf $STDERR @_;
+	printf $STDERR $format, @args;
     }
 } #PRINTF
 
@@ -212,7 +232,7 @@ sub OPEN {
 #  Make sure the original STDERR is now handled by our sub
 
 BEGIN {
-    $STDERR = new IO::Handle;
+    $STDERR = IO::Handle->new();
     $STDERR->fdopen( fileno( STDERR ),"w" )
      or die "Could not open STDERR 2nd time: $!\n";
     tie *STDERR,__PACKAGE__;
@@ -227,8 +247,15 @@ BEGIN {
     $WARN = $SIG{__WARN__};
     $SIG{__WARN__} = sub {
 	if($FILTER) {
-		unless($FILTER->(@_)) {
-			$WARN ? $WARN->( @_ ) : CORE::warn( @_ );
+		if($FILTER->(@_) == 0) {
+			# $WARN ? $WARN->( @_ ) : CORE::warn( @_ );
+			return;
+		}
+	}
+	# Avoid 'Can't call method \"log\" on an undefined value' during the destroy phase
+	if(defined($^V) && ($^V ge 'v5.14.0')) {
+		if(${^GLOBAL_PHASE} eq 'DESTRUCT') {	# >= 5.14.0 only
+			CORE::warn(@_);
 			return;
 		}
 	}
@@ -252,17 +279,16 @@ BEGIN {
 
     $DIE = $SIG{__DIE__};
     $SIG{__DIE__} = sub {
-	# File::stat goes to long efforts to not display the Fcntl message - then we go and display it,
-	#	so let's not do that
-	# TODO: would be better to set a list of messages to be filtered out
-	if ($DISPATCHER && ($_[0] !~ /^S_IFFIFO is not a valid Fcntl macro/)) {
+	if ($DISPATCHER) {
 		if($FILTER) {
-			unless($FILTER->(@_)) {
+			if($FILTER->(@_) == 0) {
 				if($DIE) {
-					$DIE->(@_);
+					# $DIE->(@_);
+					$DIE->();
 				} else {
 					return unless((defined $^S) && ($^S == 0));	# Ignore errors in eval
-					CORE::die(@_);
+					# CORE::die(@_);
+					CORE::die;
 				}
 			}
 		}
@@ -290,8 +316,6 @@ BEGIN {
 
 # Satisfy require
 
-1;
-
 #---------------------------------------------------------------------------
 
 # Class methods
@@ -313,7 +337,7 @@ sub dispatcher {
 # Return the current dispatcher if no changes needed
 # Set the new dispatcher
 
-    return $DISPATCHER unless @_ > 1;
+    return $DISPATCHER if(scalar(@_) <= 1);
     $DISPATCHER = $_[1];
 
 # If there is a dispatcher now
@@ -349,10 +373,9 @@ Useful for noisy messages such as File::stat giving S_IFFIFO is not a valid Fcnt
 =cut
 
 sub filter {
-	return $FILTER unless @_ > 1;
+	return $FILTER if(scalar(@_) <= 1);
 	$FILTER = $_[1];
 }
-
 
 #---------------------------------------------------------------------------
 
@@ -379,29 +402,19 @@ sub unimport { import( undef ) } #unimport
 
 #---------------------------------------------------------------------------
 
-__END__
+=head1 AUTHOR
 
-=head1 LOG LEVELS
+Elizabeth Mattijsen, <liz@dijkmat.nl>
 
-The following log levels are used:
+Maintained by Nigel Horne, C<< <njh at bandsman.co.uk> >>
 
-=head2 warning
+=head1 BUGS
 
-Any C<warn>, C<Carp::carp> or C<Carp::cluck> will generate a "warning" level
-message.
-
-=head2 error
-
-Any direct output to STDERR will generate an "error" level message.
-
-=head2 critical
-
-Any C<die>, C<Carp::croak> or C<Carp::confess> will generate a "critical"
-level message.
-
-=head1 REQUIRED MODULES
-
- Scalar::Util (1.08)
+Please report any bugs or feature requests to C<bug-log-warndie at rt.cpan.org>,
+or through the web interface at
+L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Log-WarnDie>.
+I will be notified, and then you'll
+automatically be notified of progress on your bug as I make changes.
 
 =head1 CAVEATS
 
@@ -432,26 +445,14 @@ This disables the __DIE__ handler within the evalled block or string, and
 will automatically enable it again upon exit of the evalled block or string.
 Unfortunately there is no automatic way to do that for you.
 
-=head1 AUTHOR
-
-Elizabeth Mattijsen, <liz@dijkmat.nl>
-
-Maintained by Nigel Horne, C<< <njh at bandsman.co.uk> >>
-
-=head1 BUGS
-
-Please report any bugs or feature requests to C<bug-log-warndie at rt.cpan.org>,
-or through the web interface at
-L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Log-WarnDie>.
-I will be notified, and then you'll
-automatically be notified of progress on your bug as I make changes.
-
 =head1 COPYRIGHT
 
 Copyright (c) 2004, 2007 Elizabeth Mattijsen <liz@dijkmat.nl>. All rights
 reserved.  This program is free software; you can redistribute it and/or
 modify it under the same terms as Perl itself.
 
-Portions of versions 0.06 onwards, Copyright 2017 Nigel Horne
+Portions of versions 0.06 onwards, Copyright 2017-2024 Nigel Horne
 
 =cut
+
+1;

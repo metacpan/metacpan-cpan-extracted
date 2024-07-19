@@ -13,7 +13,7 @@ Dancer2::Manual - A gentle introduction to Dancer2
 
 =head1 VERSION
 
-version 1.1.0
+version 1.1.1
 
 =head1 DESCRIPTION
 
@@ -688,6 +688,35 @@ for details on the following hooks:
 =item * C<before_file_render>
 
 =item * C<after_file_render>
+
+=back
+
+=head2 Logging
+
+Logging hooks do not allow you to alter log message content, but they do
+give you a place to perform extra actions. For example, if you want to send
+an email for error messages, but you don't want to use a heavier logger
+such as L<Log::Any> or L<Log::Log4perl>:
+
+    hook 'engine.logger.after' => sub {
+        my ( $logger, $level, $message ) = @_;
+
+        if( $level eq 'error' ) {
+            # Send an email with the message content
+        }
+    };
+
+There are two hooks available for logging:
+
+=over 4
+
+=item * engine.logger.before
+
+This hook is called before a log message is produced.
+
+=item * engine.logger.after
+
+This hook is called after a log message is produced.
 
 =back
 
@@ -2289,7 +2318,7 @@ Dancer Core Developers
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2023 by Alexis Sukrieh.
+This software is copyright (c) 2024 by Alexis Sukrieh.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

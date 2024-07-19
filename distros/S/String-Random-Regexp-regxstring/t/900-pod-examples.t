@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-our $VERSION = '1.00';
+our $VERSION = '1.02';
 
 use Test::More;
 
@@ -16,7 +16,7 @@ my $N = 3;
 my $results = generate_random_strings($regx_str, $N);
 
 ok defined $results,
-	'generate_random_strings()'." : called and good results."
+	'generate_random_strings()'." : called and got good results."
 or BAIL_OUT();
 
 diag join "\n", @$results;

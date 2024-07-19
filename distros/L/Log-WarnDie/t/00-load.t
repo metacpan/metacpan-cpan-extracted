@@ -10,4 +10,4 @@ BEGIN {
 
 require_ok('Log::WarnDie') || print 'Bail out!';
 
-diag( "Testing Log::WarnDie $Log::WarnDie::VERSION, Perl $], $^X" );
+diag("Testing Log::WarnDie $Log::WarnDie::VERSION, Perl $], $^X");

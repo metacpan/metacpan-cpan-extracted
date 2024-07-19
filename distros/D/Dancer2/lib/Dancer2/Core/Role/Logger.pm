@@ -1,6 +1,6 @@
 package Dancer2::Core::Role::Logger;
 # ABSTRACT: Role for logger engines
-$Dancer2::Core::Role::Logger::VERSION = '1.1.0';
+$Dancer2::Core::Role::Logger::VERSION = '1.1.1';
 use Dancer2::Core::Types;
 
 use Moo::Role;
@@ -191,7 +191,7 @@ Dancer2::Core::Role::Logger - Role for logger engines
 
 =head1 VERSION
 
-version 1.1.0
+version 1.1.1
 
 =head1 DESCRIPTION
 
@@ -217,6 +217,10 @@ This is a format string (or a preset name) to specify the log format.
 The possible values are:
 
 =over 4
+
+=item %a
+
+app name
 
 =item %h
 
@@ -324,7 +328,7 @@ Dancer Core Developers
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2023 by Alexis Sukrieh.
+This software is copyright (c) 2024 by Alexis Sukrieh.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -4,7 +4,7 @@ String::Random::Regexp::regxstring - Generate random strings from a regular expr
 
 # VERSION
 
-Version 1.00
+Version 1.02
 
 # SYNOPSIS
 

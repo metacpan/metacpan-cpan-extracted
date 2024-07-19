@@ -4,7 +4,7 @@
       "Nigel Horne <njh@bandsman.co.uk>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.3, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "open_source"
    ],
@@ -38,10 +38,12 @@
       },
       "test" : {
          "requires" : {
+            "File::Spec" : "3.4",
             "IPC::System::Simple" : "0",
             "Log::Dispatch::Null" : "0",
             "Test::File::Contents" : "0",
             "Test::Most" : "0",
+            "Test::Needs" : "0",
             "Test::TempDir::Tiny" : "0",
             "autodie" : "0"
          }
@@ -51,14 +53,15 @@
    "resources" : {
       "bugtracker" : {
          "mailto" : "bug-Log::WarnDie@rt.cpan.org",
-         "web" : "https://rt.cpan.org/Public/Dist/Display.html?Name=Log::WarnDie"
+         "web" : "https://github.com/nigelhorne/Log-WarnDie"
       },
       "repository" : {
          "type" : "git",
          "url" : "git://github.com/nigelhorne/Log::WarnDie.git",
-         "web" : "https://github.com/nigelhorne/Log::WarnDie"
+         "web" : "https://github.com/nigelhorne/Log::WarnDie",
+         "x_repository" : "https://github.com/nigelhorne/Log-WarnDie"
       }
    },
-   "version" : "0.09",
-   "x_serialization_backend" : "JSON::PP version 2.94"
+   "version" : "0.11",
+   "x_serialization_backend" : "JSON::PP version 4.16"
 }

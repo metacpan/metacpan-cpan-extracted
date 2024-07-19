@@ -1,5 +1,5 @@
 package Dancer2;
-$Dancer2::VERSION = '1.1.0';
+$Dancer2::VERSION = '1.1.1';
 # ABSTRACT: Lightweight yet powerful web application framework
 
 use 5.12.0;
@@ -129,7 +129,7 @@ Dancer2 - Lightweight yet powerful web application framework
 
 =head1 VERSION
 
-version 1.1.0
+version 1.1.1
 
 =head1 DESCRIPTION
 
@@ -429,7 +429,7 @@ Dancer Core Developers
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2023 by Alexis Sukrieh.
+This software is copyright (c) 2024 by Alexis Sukrieh.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

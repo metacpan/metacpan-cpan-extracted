@@ -1,4 +1,4 @@
-Log-WarnDie 0.09
+Log-WarnDie 0.11
 
 INSTALLATION
 
@@ -37,5 +37,5 @@ Copyright (c) 2004, 2007 Elizabeth Mattijsen <liz@dijkmat.nl>. All rights
 reserved.  This program is free software; you can redistribute it and/or
 modify it under the same terms as Perl itself.
 
-Portions of version 0.06 and beyond, copyright (C) 2017 Nigel Horne. Those
+Portions of version 0.06 and beyond, copyright (C) 2017-2024 Nigel Horne. Those
 portions are released under GPL2.

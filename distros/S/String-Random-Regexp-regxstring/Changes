@@ -13,6 +13,14 @@ Revision history for String-Random-Regexp-regxstring
 0.04    02/07/2024-13:00
         Now exporting the main sub by default.
 
-1.00    02/07/2024-13:00
+1.00    02/07/2024-14:00
         Only one input parameter is required for sub generate_random_strings().
 
+1.01    18/07/2024-17:00
+        Wasting my time debugging on MS Windows :(
+
+1.02    18/07/2024-17:00
+        After getting "free to wrong pool" on threaded Perls,
+        I set a MyFree() function in XS code so as to
+	free externally malloc'ed memory with libc's free()
+        as per https://www.perlmonks.org/?node_id=742205

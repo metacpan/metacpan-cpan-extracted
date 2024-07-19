@@ -217,6 +217,8 @@ my @files = (
     't/issues/gh-1564.t',
     't/issues/gh-1621/gh-1621.t',
     't/issues/gh-1621/views/redirect.tt',
+    't/issues/gh-1712/gh-1712.t',
+    't/issues/gh-1712/views/exec.tt',
     't/issues/gh-596.t',
     't/issues/gh-634.t',
     't/issues/gh-639/fails/.dancer',

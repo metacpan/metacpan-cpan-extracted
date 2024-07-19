@@ -1,3 +1,7 @@
+#!perl -w
+
+use warnings;
+use strict;
 
 BEGIN {				# Magic Perl CORE pragma
     if ($ENV{PERL_CORE}) {
@@ -80,7 +84,7 @@ SKIP : {
     like( $message->[0]->{'message'},qr#^$confess#,"Check message contents" );
 
     my $stderr = "This stderr will be displayed\n";
-    print STDERR $stderr;
+    printf STDERR '%s', $stderr;
     $message = $channel->flush;
     is( scalar( @{$message} ),1,"Check if number of messages ok" );
     is( $message->[0]->{'level'},'error',"Check type of message" );

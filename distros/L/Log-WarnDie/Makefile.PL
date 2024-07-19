@@ -1,32 +1,36 @@
 require 5.006;
-
 use strict;
-use ExtUtils::MakeMaker;
+use warnings;
+use ExtUtils::MakeMaker 6.64;	# 6.64 for TEST_REQUIRES
+use File::Spec 3.4;
 use IO::Socket::INET;
 use Getopt::Long;	# Technique inspired by IO::Lambda
-eval "use Devel::Required";
+eval 'use Devel::Required';
 
 my $online_tests;
 
-if($ENV{RELEASE_TESTING}) {
+if($ENV{'AUTHOR_TESTING'}) {
 	$online_tests = are_online();
-} elsif($ENV{AUTOMATED_TESTING} || $ENV{NO_NETWORK_TESTING}) {
-	$online_tests = 0;
 } else {
 	Getopt::Long::GetOptions('online-tests!' => \$online_tests);
 
 	if(!defined($online_tests)) {
 		$online_tests = are_online();
 	}
+	if(!$online_tests) {
+		print "On-line tests have been disabled\n";
+	}
 }
 
 my $test_requires = {
 	'Log::Dispatch::Null' => 0,
 	'Test::Most' => 0,
+	'Test::Needs' => 0,
 	'Test::TempDir::Tiny' => 0,
 	'autodie' => 0,
 	'IPC::System::Simple' => 0,
 	'Test::File::Contents' => 0,
+	'File::Spec' => 3.4,
 };
 
 if($online_tests) {
@@ -61,9 +65,11 @@ WriteMakefile (
 				type => 'git',
 				url => 'git://github.com/nigelhorne/Log::WarnDie.git',
 				web => 'https://github.com/nigelhorne/Log::WarnDie',
+				repository => 'https://github.com/nigelhorne/Log-WarnDie',
 			},
 			bugtracker => {
-				web => 'https://rt.cpan.org/Public/Dist/Display.html?Name=Log::WarnDie',
+				# web => 'https://rt.cpan.org/Public/Dist/Display.html?Name=Log::WarnDie',
+				web => 'https://github.com/nigelhorne/Log-WarnDie',
 				mailto => 'bug-Log::WarnDie@rt.cpan.org'
 			}
 		}
@@ -73,6 +79,8 @@ WriteMakefile (
 
 sub are_online
 {
+	return 0 if($ENV{'NO_NETWORK_TESTING'} || $ENV{'TRAVIS_PERL_VERSION'}) || $ENV{'AUTOMATED_TESTING'} || (!-t STDIN);
+
 	my $s = IO::Socket::INET->new(
 		# PeerAddr => 'www.ripe.net:43',
 		PeerAddr => 'test.rebex.net:22',

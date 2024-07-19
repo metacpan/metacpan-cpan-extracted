@@ -1,3 +1,9 @@
+2024-07-19  Brian M. Kelly  <Brian.Kelly@fullauto.com>
+
+        * Version 3.038
+
+        * Added NEW_PERL to list of ignored variables 
+
 2024-07-17  Brian M. Kelly  <Brian.Kelly@fullauto.com>
 
         * Version 3.037

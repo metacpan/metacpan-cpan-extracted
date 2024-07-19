@@ -50,6 +50,6 @@ resources:
   homepage: https://github.com/CNAG-Biomedical-Informatics/convert-pheno
   license: http://www.opensource.org/licenses/artistic-license-2.0
   repository: https://github.com/CNAG-Biomedical-Informatics/convert-pheno.git
-version: '0.23'
+version: '0.24'
 x_contributors: []
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-our $VERSION = '1.00';
+our $VERSION = '1.02';
 
 use utf8; # allow for utf8 in code (we have regex strings in utf8)
 
@@ -13,6 +13,7 @@ use Test2::Plugin::UTF8;
 use String::Random::Regexp::regxstring qw/generate_random_strings/;
 
 my $VERBOSITY = 1;
+my $DEBUG = 1;
 
 my $N = 100; # ! wow !
 
@@ -202,7 +203,8 @@ for my $atest (@testdata){
   for my $I (1..2){
 	my $results = generate_random_strings(
 		$I==1 ? $atest->{'regexp-string'} : $atest->{'regexp-object'},
-		$N
+		$N,
+		$DEBUG
 	);
 	ok(defined $results, 'generate_random_strings()'." : called and got defined result.") or BAIL_OUT();
 	is(ref($results), 'ARRAY', 'generate_random_strings()'." : called and got defined result which is ARRAYref.") or BAIL_OUT("failed, result is of type '".ref($results)."'.");

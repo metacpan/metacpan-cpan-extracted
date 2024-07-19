@@ -1,3 +1,11 @@
+0.040   2024-07-17  Released-By: PERLANCAR; Urgency: low
+
+        - No functional changes.
+
+        - [dist] Edit Changes (replace Backward-Compatible: no with
+          Backward-Incompatible: yes).
+
+
 0.039   2020-02-13  Released-By: PERLANCAR; Urgency: medium
 
 	- Add transmute_object & recurse_object arguments to set how to
@@ -76,7 +84,7 @@
 	- Add & tweak documentation.
 
 
-0.030   2019-07-24  Released-By: PERLANCAR; Urgency: medium; Backward-Compatible: no
+0.030   2019-07-24  Released-By: PERLANCAR; Urgency: medium; Backward-Incompatible: yes
 
 	[INCOMPATIBLE CHANGE]
 

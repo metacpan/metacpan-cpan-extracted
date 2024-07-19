@@ -20,6 +20,12 @@
 #######################################################################
 
 
+2024-07-19  Brian M. Kelly <Brian.Kelly@fullauto.com>
+
+        * Version 1.0000672 released
+
+        * Using quotemeta to escape string
+
 2024-07-17  Brian M. Kelly <Brian.Kelly@fullauto.com>
 
         * Version 1.0000671 released

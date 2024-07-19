@@ -1,6 +1,6 @@
 package Dancer2::Core::Request;
 # ABSTRACT: Interface for accessing incoming requests
-$Dancer2::Core::Request::VERSION = '1.1.0';
+$Dancer2::Core::Request::VERSION = '1.1.1';
 use strict;
 use warnings;
 use parent 'Plack::Request';
@@ -658,7 +658,7 @@ Dancer2::Core::Request - Interface for accessing incoming requests
 
 =head1 VERSION
 
-version 1.1.0
+version 1.1.1
 
 =head1 SYNOPSIS
 
@@ -1191,7 +1191,7 @@ Dancer Core Developers
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2023 by Alexis Sukrieh.
+This software is copyright (c) 2024 by Alexis Sukrieh.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

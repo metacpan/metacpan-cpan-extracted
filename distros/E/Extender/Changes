@@ -1,0 +1,19 @@
+Revision history for Extender
+
+1.01  2024-07-16
+    - Added new functions: Alias, AddMethod, Decorate, ApplyRole, InitHook, Unload.
+    - Enhanced error handling and validation across all functions.
+    - Updated documentation for clarity and completeness.
+    - Fixed issues related to INIT and DESTRUCT hooks in `InitHook`.
+    - Improved compatibility with Moose roles in `MooseCompat`.
+    - Refactored internal methods for better performance and readability.
+    - Enhanced module documentation throughout.
+    - Improved error handling and validation in various functions.
+
+1.00  2024-07-15
+    - Initial release of Extender module.
+    - Implemented core functionalities to extend objects with methods, added functions: Extend, Extends to dynamically extend objects with methods.
+    - Created comprehensive documentation in README.md.
+    - Developed extensive test suite (`t/Extender.t`) to ensure module reliability.
+    - Prepared for CPAN distribution with `META.json`, `META.yml`, `Makefile.PL`, and `LICENSE`.
+    - Finalized example scripts and usage scenarios (`Extender.pl`).

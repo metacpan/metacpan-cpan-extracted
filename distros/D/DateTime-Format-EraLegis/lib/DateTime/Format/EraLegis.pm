@@ -1,8 +1,9 @@
 package DateTime::Format::EraLegis;
-$DateTime::Format::EraLegis::VERSION = '0.012';
-# ABSTRACT: DateTime formatter for Era Legis (http://oto-usa.org/calendar.html)
+$DateTime::Format::EraLegis::VERSION = '0.013';
+# ABSTRACT: DateTime formatter for Era Legis (https://eralegis.info)
 
-use 5.014;
+use strict;
+use warnings;
 use Function::Parameters qw(fun method);
 use Moo;
 use strictures 2;
@@ -92,7 +93,7 @@ requires 'lookup';
 
 ######################################################
 package DateTime::Format::EraLegis::Ephem::DBI;
-$DateTime::Format::EraLegis::Ephem::DBI::VERSION = '0.012';
+$DateTime::Format::EraLegis::Ephem::DBI::VERSION = '0.013';
 use 5.010;
 use Function::Parameters qw(fun method);
 use Moo;

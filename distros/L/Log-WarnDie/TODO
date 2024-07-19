@@ -3,5 +3,5 @@ Add examples and more elaborate test-suite.
 Die type messages don't appear in the output of the test-suite because
 Test::Harness installs a __DIE__ handler.
 
-Need to change the test-suite to use seperate files, because Test::Harness
+Need to change the test-suite to use separate files, because Test::Harness
 interferes with testing.

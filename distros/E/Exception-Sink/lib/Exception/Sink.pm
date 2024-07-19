@@ -31,7 +31,7 @@ our @EXPORT_OK   = qw(
                      );
                      
 our %EXPORT_TAGS = ( 'none' => [ ] );
-our $VERSION     = '3.08';
+our $VERSION     = '3.09';
 use Exception::Sink::Class;
 use strict;
 
@@ -42,7 +42,7 @@ sub dive();
 sub surface(@);
 sub surface2(@);
 
-sub boom($$);
+sub boom_skip($$);
 sub boom($);
 
 ##############################################################################
@@ -187,9 +187,10 @@ sub get_stack_trace
     }
   
   $i = 1 + $skip; # skip get_stack_trace frame and optionally first N frames
+  my $ii;
   while ( my ( $pack, $file, $line, $subname ) = caller($i++) )
     {
-    my $ii = $i - 1;
+    $ii++;
     my $l = length( "$pack::$subname" );
     my $pad = ' ' x ( $ml - $l );
     push @st, "      [$$] $ii: $pack::$subname $pad $file line $line\n";

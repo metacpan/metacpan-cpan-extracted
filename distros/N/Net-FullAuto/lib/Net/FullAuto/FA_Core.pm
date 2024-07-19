@@ -31750,6 +31750,8 @@ sub display
    my $tline=$line;
    $tline=~s/["|']/X/g;
    $tline=~s/\s*$//s;
+   $tline=quotemeta($tline);
+   $tline=~s/^\\(.)/$1?/s;
    if ((-1<index $line,'[K') &&
          ($line eq '[K' ||
          (substr($line,-2) eq '[K') ||
@@ -31779,8 +31781,9 @@ sub display
       }
    } elsif ($line=~/^\s*\[c\s*$/s) {
       $line=~s/\[c//gs
-   } elsif ($cmd && (($tcmd=~/^$tchomp_save$tline/) ||
+   } elsif ($cmd && (($tcmd=~/$tchomp_save$tline/s) ||
          ($tcmd eq "$tchomp_save$tline"))) {
+      return '' if $tcmd=~/$tchomp_save$tline$/s;
       return "$chomp_save$line";
    }
    $line=~s/^stdout: ?//mg;

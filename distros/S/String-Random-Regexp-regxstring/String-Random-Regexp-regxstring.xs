@@ -7,7 +7,7 @@
 */
 
 /*
-our $VERSION = '1.00';
+our $VERSION = '1.02';
 */
 
 #ifdef __cplusplus
@@ -28,6 +28,17 @@ int _SV_contains_undef(SV *ansv){ SvGETMAGIC(ansv); return(!SvOK(ansv)); }
 #endif
 
 #include "harness.h"
+
+/* Perl redefines libc's malloc() and free().
+   When memory is allocated externally,
+   we must use free() which is Perl's.
+   Do the same for malloc() if you need to use it.
+   Not any more with this:
+*/
+void MyFree( void *p ) {
+#undef free
+    free( p );
+}
 
 MODULE = String::Random::Regexp::regxstring		PACKAGE = String::Random::Regexp::regxstring
 
@@ -56,22 +67,25 @@ generate_random_strings_xs(SV *regx_SV, int N, ... /*optional params: int debug*
 		: SvPVbyte(regx_SV, regxstr_len)
 	;
 	/* this is in harness.cpp */
-	/* we need to free char **results when done */
+	/* we need to free char **results when done
+	   they were allocated in harness.cpp with malloc()
+	*/
 	char **results = regxstring_generate_random_strings_from_regex(
 		regxstr,
 		N,
 		debug
 	);
-
+	if( results == NULL ){ fprintf(stderr, "generate_random_strings_xs() : error, call to 'regxstring_generate_random_strings_from_regex()' has failed for the regex '%s' and N=%d.\n", regxstr, N); XSRETURN_UNDEF; }
+		
         RETVAL = (AV*)sv_2mortal((SV*)newAV());
         for(int i=0;i<N;i++){
 		/* newSVpvn_flags() and newSVpvn() create a new Perl string from each results string
 		   So, we can safely free results[i]
 		*/
 		av_push(RETVAL, newSVpvn_flags(results[i], strlen(results[i]), SVf_UTF8));
-		free(results[i]);
+		if( results[i] != NULL ) MyFree(results[i]);
         }
-	free(results);
+	MyFree(results);
 	// end of program
 
 	OUTPUT:
