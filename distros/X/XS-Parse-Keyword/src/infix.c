@@ -159,6 +159,7 @@ struct Registration {
 
   int opname_is_WIDE : 1;
   int opname_is_ident : 1;
+  int opname_is_fq : 1;
 };
 
 static struct Registration *registrations,   /* for legacy-style global key-enabled ones */
@@ -879,14 +880,40 @@ XS_INTERNAL(deparse_infix)
   SV **hinthashsvp = hv_fetchs(MUTABLE_HV(SvRV(deparseobj)), "hinthash", 0);
   HV *hinthash = hinthashsvp ? MUTABLE_HV(SvRV(*hinthashsvp)) : NULL;
 
-  if(hinthash && hv_fetch(hinthash, reg->hd.hooks->permit_hintkey, reg->permit_hintkey_len, 0)) {
+  SV *opnamesv;
+
+  bool infix_is_visible = FALSE;
+  /* Operator visibility rules differ for fully-qualified operator names */
+  if(reg->opname_is_fq) {
+    hv_iterinit(hinthash);
+    HE *he;
+    while((he = hv_iternext(hinthash))) {
+#define PREFIXLEN 17
+      STRLEN len;
+      if(!strnEQ(HePV(he, len), "XS::Parse::Infix/", PREFIXLEN))
+        continue;
+
+      if(!strEQ(SvPV_nolen(HeVAL(he)), reg->info.opname))
+        continue;
+
+      infix_is_visible = TRUE;
+      opnamesv = newSVpvn_flags(HePV(he, len) + PREFIXLEN, len - PREFIXLEN, HeUTF8(he) ? SVf_UTF8 : 0);
+      break;
+    }
+  }
+  else {
+    infix_is_visible = (hinthash && hv_fetch(hinthash, reg->hd.hooks->permit_hintkey, reg->permit_hintkey_len, 0));
+    opnamesv = newSVpvn_flags(reg->info.opname, reg->oplen, reg->opname_is_WIDE ? SVf_UTF8 : 0);
+  }
+
+  if(infix_is_visible) {
     ENTER;
     SAVETMPS;
 
     EXTEND(SP, 4);
     PUSHMARK(SP);
     PUSHs(deparseobj);
-    mPUSHs(newSVpvn_flags(reg->info.opname, reg->oplen, reg->opname_is_WIDE ? SVf_UTF8 : 0));
+    mPUSHs(opnamesv);
     PUSHs(ST(1));
     PUSHs(ST(2));
     PUTBACK;
@@ -959,6 +986,33 @@ static void reg_builtin(pTHX_ const char *opname, enum XSParseInfixClassificatio
   }
 }
 
+bool XSParseInfix_check_opname(pTHX_ const char *opname, STRLEN oplen)
+{
+  const char *opname_end = opname + oplen;
+
+  bool opname_is_fq = strstr(opname, "::") != NULL;
+  bool opname_is_ident = !opname_is_fq && isIDFIRST_utf8_safe(opname, opname_end);
+
+  const char *s = opname;
+  s += UTF8SKIP(s);
+
+  while(s < opname_end) {
+    if(opname_is_ident) {
+      if(!isIDCONT_utf8_safe(s, opname_end))
+        // name that starts with an identifier may not have non-identifier characters in it
+        return FALSE;
+    }
+    else {
+      if(isIDFIRST_utf8_safe(s, opname_end))
+        // name that does not start with an identifer may not have identifier characters in it
+        return FALSE;
+    }
+    s += UTF8SKIP(s);
+  }
+
+  return TRUE;
+}
+
 void XSParseInfix_register(pTHX_ const char *opname, const struct XSParseInfixHooks *hooks, void *hookdata)
 {
   STRLEN oplen = strlen(opname);
@@ -967,20 +1021,8 @@ void XSParseInfix_register(pTHX_ const char *opname, const struct XSParseInfixHo
   bool opname_is_ident = !opname_is_fq && isIDFIRST_utf8_safe(opname, opname_end);
 
   if(!opname_is_fq) {
-    const char *s = opname;
-    s += UTF8SKIP(s);
-
-    while(s < opname_end) {
-      if(opname_is_ident) {
-        if(!isIDCONT_utf8_safe(s, opname_end))
-          croak("Infix operator name that starts with an identifier may not have non-identifier characters in it");
-      }
-      else {
-        if(isIDFIRST_utf8_safe(s, opname_end))
-          croak("Infix operator name that does not start with an identifer may not have identifier characters in it");
-      }
-      s += UTF8SKIP(s);
-    }
+    if(!XSParseInfix_check_opname(aTHX_ opname, oplen))
+      croak("Infix operator name is invalid; must be an identifier or entirely non-identifier characters");
   }
 
   bool is_listassoc = hooks->flags & XPI_FLAG_LISTASSOC;
@@ -1092,6 +1134,7 @@ void XSParseInfix_register(pTHX_ const char *opname, const struct XSParseInfixHo
 
   reg->oplen           = oplen;
   reg->opname_is_ident = opname_is_ident;
+  reg->opname_is_fq    = opname_is_fq;
 
   reg->hd.hooks = hooks;
   reg->hd.data  = hookdata;
@@ -1150,8 +1193,6 @@ void XSParseInfix_register(pTHX_ const char *opname, const struct XSParseInfixHo
 
     CV *cv = newXS(SvPVX(namesv), deparse_infix, __FILE__);
     CvXSUBANY(cv).any_ptr = reg;
-
-    load_module(PERL_LOADMOD_NOIMPORT, newSVpvs("XS::Parse::Infix"), NULL);
   }
 }
 

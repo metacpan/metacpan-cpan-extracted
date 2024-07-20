@@ -1,0 +1,10 @@
+enum DiscMode					T_IV
+enum Pti					T_IV
+enum RemType					T_IV
+enum TrackFlag					T_IV
+enum TrackMode					T_IV
+enum TrackSubMode				T_IV
+struct Cd *					T_PTROBJ
+struct Cdtext *					T_PTROBJ
+struct Rem *					T_PTROBJ
+struct Track *					T_PTROBJ

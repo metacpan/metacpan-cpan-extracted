@@ -16,7 +16,7 @@ BEGIN {
 
 GB: {
 	SKIP: {
-		if((!defined($ENV{'AUTOMATED_TESTING'}) && (!defined($ENV{'NO NETWORK TESTING'})))) {
+		if((!defined($ENV{'AUTOMATED_TESTING'}) && (!defined($ENV{'NO_NETWORK_TESTING'})))) {
 			Database::Abstraction::init(directory => 'lib/Locale/Places/data');
 			my $places = new_ok('Locale::Places::GB' => [logger => new_ok('MyLogger'), no_entry => 1]);
 

@@ -1,3 +1,9 @@
+0.009   2024-07-18  Released-By: PERLANCAR; Urgency: medium
+
+        - [dist] Edit Changes (replace Backward-Compatible: no with
+          Backward-Incompatible: yes).
+
+
 0.008   2020-06-19  Released-By: PERLANCAR; Urgency: medium
 
 	- Add example.
@@ -9,7 +15,7 @@
 	  2.1.2).
 
 
-0.006   2020-06-09  Released-By: PERLANCAR; Urgency: medium; Backward-Compatible: no
+0.006   2020-06-09  Released-By: PERLANCAR; Urgency: medium; Backward-Incompatible: yes
 
         - Adjust to ColorTheme 2.1.0 (add get_args(), get_struct(), rename
           get_color to get_item_color).
@@ -25,7 +31,7 @@
         - Add ColorThemeBase::Static::FromObjectColors.
 
 
-0.004   2020-06-08  Released-By: PERLANCAR; Urgency: medium; Backward-Compatible: no
+0.004   2020-06-08  Released-By: PERLANCAR; Urgency: medium; Backward-Incompatible: yes
 
 	- [incompatible] Adjust to ColorTheme 2.0.1 (rename
 	  get_color_list() to list_items()).

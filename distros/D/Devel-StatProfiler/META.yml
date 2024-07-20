@@ -26,7 +26,7 @@ requires:
 resources:
   homepage: https://github.com/mbarbon/devel-statprofiler
   repository: https://github.com/mbarbon/devel-statprofiler.git
-version: '0.52'
+version: '0.53'
 x_generated_by_perl: v5.24.4
 x_serialization_backend: 'YAML::Tiny version 1.73'
 x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

@@ -12,12 +12,12 @@ my $build = Module::Build->new(
    },
    configure_requires => {
       'Module::Build' => '0.4004', # test_requires
-      'XS::Parse::Infix::Builder' => '0.27',
+      'XS::Parse::Infix::Builder' => '0.43',
    },
    requires => {
       'perl' => '5.016', # pad_alloc()
       'meta' => '0.003_002',
-      'XS::Parse::Infix' => '0.27',
+      'XS::Parse::Infix' => '0.43',
    },
    license => 'perl',
    create_license => 1,

@@ -2,6 +2,7 @@
 Build.PL
 Changes
 hax/sv_numeq.c.inc
+hax/sv_regexp_match.c.inc
 hax/sv_streq.c.inc
 lib/Syntax/Operator/Eqr.pm
 lib/Syntax/Operator/Equ.pm

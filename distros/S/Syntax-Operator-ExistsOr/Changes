@@ -1,5 +1,11 @@
 Revision history for Syntax-Operator-ExistsOr
 
+0.03    2024-07-19
+        [CHANGES]
+         * Updates for XS::Parse::Infix v0.44
+            + Use fully-qualified name
+            + No need to account for local XSParseInfix.h file
+
 0.02    2023-07-21
         [CHANGES]
          * Swap all unit tests from `Test::More` to `Test2::V0`

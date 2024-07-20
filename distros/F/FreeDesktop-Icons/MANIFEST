@@ -4,6 +4,7 @@ Makefile.PL
 MANIFEST			This list of files
 README.md
 t/FreeDesktop-Icons.t
+t/Raw/git-icon.png
 t/Themes/PNG1/actions/22/document-new.png
 t/Themes/PNG1/actions/22/document-save.png
 t/Themes/PNG1/actions/32/edit-cut.png

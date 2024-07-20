@@ -1,5 +1,15 @@
 Revision history for XS-Parse-Keyword
 
+0.44    2024-07-19
+        [BUGFIXES]
+         * `boot_xs_parse_infix()` has to load `XS/Parse/Infix.pm`, the perl
+           module
+         * Fix opname check for lexical operator alises, to match Perl's
+           actual identifier rules
+         * Fix deparse logic for fully-qualified infix operator names
+         * Fix `lex_scan_packagename()` to not get confused by attribute
+           syntax
+
 0.43    2024-07-03
         [CHANGES]
          * Use `File::ShareDir` for storing .h include files, rather than

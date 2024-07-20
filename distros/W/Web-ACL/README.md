@@ -1,6 +1,6 @@
 # Web-ACL
 
-A helper for creating basic apikey/slug/IP based ACLs.
+A helper for creating basic apikey/slug/IP/path/UA based ACLs.
 
 Slugs should be though of as a freeform field for use function names
 or the like.

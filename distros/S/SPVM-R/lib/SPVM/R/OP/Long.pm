@@ -44,7 +44,7 @@ C<static method mul : L<R::NDArray::Long|SPVM::R::NDArray::Long> ($x_ndarray : L
 
 =head2 scamul
 
-C<static method scamul : R::NDArray::Int ($x_ndarray : L<R::NDArray::Long|SPVM::R::NDArray::Long>, $scalar_ndarray : L<R::NDArray::Long|SPVM::R::NDArray::Long>);>
+C<static method scamul : L<R::NDArray::Long|SPVM::R::NDArray::Long> ($x_ndarray : L<R::NDArray::Long|SPVM::R::NDArray::Long>, $scalar_ndarray : L<R::NDArray::Long|SPVM::R::NDArray::Long>);>
 
 =head2 div
 
@@ -52,7 +52,7 @@ C<static method div : L<R::NDArray::Long|SPVM::R::NDArray::Long> ($x_ndarray : L
 
 =head2 scadiv
 
-C<static method scadiv : R::NDArray::Int ($x_ndarray : L<R::NDArray::Long|SPVM::R::NDArray::Long>, $scalar_ndarray : L<R::NDArray::Long|SPVM::R::NDArray::Long>);>
+C<static method scadiv : L<R::NDArray::Long|SPVM::R::NDArray::Long> ($x_ndarray : L<R::NDArray::Long|SPVM::R::NDArray::Long>, $scalar_ndarray : L<R::NDArray::Long|SPVM::R::NDArray::Long>);>
 
 =head2 div_u
 
@@ -88,27 +88,27 @@ C<static method seq : L<R::NDArray::Long|SPVM::R::NDArray::Long> ($begin : long,
 
 =head2 eq
 
-C<static method eq : L<R::NDArray::Long|SPVM::R::NDArray::Long> ($x_ndarray : L<R::NDArray::Long|SPVM::R::NDArray::Long>, $y_ndarray : L<R::NDArray::Long|SPVM::R::NDArray::Long>);>
+C<static method eq : L<R::NDArray::Int|SPVM::R::NDArray::Int> ($x_ndarray : L<R::NDArray::Long|SPVM::R::NDArray::Long>, $y_ndarray : L<R::NDArray::Long|SPVM::R::NDArray::Long>);>
 
 =head2 ne
 
-C<static method ne : L<R::NDArray::Long|SPVM::R::NDArray::Long> ($x_ndarray : L<R::NDArray::Long|SPVM::R::NDArray::Long>, $y_ndarray : L<R::NDArray::Long|SPVM::R::NDArray::Long>);>
+C<static method ne : L<R::NDArray::Int|SPVM::R::NDArray::Int> ($x_ndarray : L<R::NDArray::Long|SPVM::R::NDArray::Long>, $y_ndarray : L<R::NDArray::Long|SPVM::R::NDArray::Long>);>
 
 =head2 gt
 
-C<static method gt : L<R::NDArray::Long|SPVM::R::NDArray::Long> ($x_ndarray : L<R::NDArray::Long|SPVM::R::NDArray::Long>, $y_ndarray : L<R::NDArray::Long|SPVM::R::NDArray::Long>);>
+C<static method gt : L<R::NDArray::Int|SPVM::R::NDArray::Int> ($x_ndarray : L<R::NDArray::Long|SPVM::R::NDArray::Long>, $y_ndarray : L<R::NDArray::Long|SPVM::R::NDArray::Long>);>
 
 =head2 ge
 
-C<static method ge : L<R::NDArray::Long|SPVM::R::NDArray::Long> ($x_ndarray : L<R::NDArray::Long|SPVM::R::NDArray::Long>, $y_ndarray : L<R::NDArray::Long|SPVM::R::NDArray::Long>);>
+C<static method ge : L<R::NDArray::Int|SPVM::R::NDArray::Int> ($x_ndarray : L<R::NDArray::Long|SPVM::R::NDArray::Long>, $y_ndarray : L<R::NDArray::Long|SPVM::R::NDArray::Long>);>
 
 =head2 lt
 
-C<static method lt : L<R::NDArray::Long|SPVM::R::NDArray::Long> ($x_ndarray : L<R::NDArray::Long|SPVM::R::NDArray::Long>, $y_ndarray : L<R::NDArray::Long|SPVM::R::NDArray::Long>);>
+C<static method lt : L<R::NDArray::Int|SPVM::R::NDArray::Int> ($x_ndarray : L<R::NDArray::Long|SPVM::R::NDArray::Long>, $y_ndarray : L<R::NDArray::Long|SPVM::R::NDArray::Long>);>
 
 =head2 le
 
-C<static method le : L<R::NDArray::Long|SPVM::R::NDArray::Long> ($x_ndarray : L<R::NDArray::Long|SPVM::R::NDArray::Long>, $y_ndarray : L<R::NDArray::Long|SPVM::R::NDArray::Long>);>
+C<static method le : L<R::NDArray::Int|SPVM::R::NDArray::Int> ($x_ndarray : L<R::NDArray::Long|SPVM::R::NDArray::Long>, $y_ndarray : L<R::NDArray::Long|SPVM::R::NDArray::Long>);>
 
 =head2 sum
 

@@ -1,5 +1,8 @@
 Revision history for Web-ACL
 
+0.1.0	2024-02.07/12:30
+		 - Add path and UA checking.
+
 0.0.2	2024-02.07/12:30
 		 - Set min version of Error::Helper to 2.1.0
 

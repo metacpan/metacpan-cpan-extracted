@@ -4,7 +4,7 @@
 
 =head1 NAME
 
-YAMLScript - Program in YAML
+YAMLScript - Program in YAML — Code is Data
 
 =head2 SYNOPSIS
 

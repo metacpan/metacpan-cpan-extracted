@@ -22,21 +22,19 @@ static OP *new_op_existsor(pTHX_ U32 flags, OP *lhs, OP *rhs, SV **parsedata, vo
 }
 
 static const struct XSParseInfixHooks hooks_existsor_low = {
-  .cls            = XPI_CLS_LOGICAL_OR_LOW_MISC,
-  .permit_hintkey = "Syntax::Operator::ExistsOr/existsor",
-  .new_op         = &new_op_existsor,
+  .cls    = XPI_CLS_LOGICAL_OR_LOW_MISC,
+  .new_op = &new_op_existsor,
 };
 
 static const struct XSParseInfixHooks hooks_existsor = {
-  .cls            = XPI_CLS_LOGICAL_OR_MISC,
-  .permit_hintkey = "Syntax::Operator::ExistsOr/existsor",
-  .new_op         = &new_op_existsor,
+  .cls    = XPI_CLS_LOGICAL_OR_MISC,
+  .new_op = &new_op_existsor,
 };
 
 MODULE = Syntax::Operator::ExistsOr    PACKAGE = Syntax::Operator::ExistsOr
 
 BOOT:
-  boot_xs_parse_infix(0.26);
+  boot_xs_parse_infix(0.44);
 
-  register_xs_parse_infix("existsor", &hooks_existsor_low, NULL);
-  register_xs_parse_infix("\\\\",     &hooks_existsor,     NULL);
+  register_xs_parse_infix("Syntax::Operator::ExistsOr::existsor", &hooks_existsor_low, NULL);
+  register_xs_parse_infix("Syntax::Operator::ExistsOr::\\\\",     &hooks_existsor,     NULL);

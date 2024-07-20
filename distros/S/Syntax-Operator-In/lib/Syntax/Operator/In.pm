@@ -1,9 +1,9 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2021,2022 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2021-2024 -- leonerd@leonerd.org.uk
 
-package Syntax::Operator::In 0.09;
+package Syntax::Operator::In 0.10;
 
 use v5.14;
 use warnings;
@@ -73,13 +73,9 @@ sub apply
 
    @syms or @syms = qw( in );
 
-   my %syms = map { $_ => 1 } @syms;
-   if( delete $syms{in} ) {
-      $on ? $^H{"Syntax::Operator::In/in"}++
-          : delete $^H{"Syntax::Operator::In/in"};
-   }
+   $pkg->XS::Parse::Infix::apply_infix( $on, \@syms, qw( in ) );
 
-   croak "Unrecognised import symbols @{[ keys %syms ]}" if keys %syms;
+   croak "Unrecognised import symbols @syms" if @syms;
 }
 
 =head1 OPERATORS

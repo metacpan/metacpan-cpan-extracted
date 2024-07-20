@@ -231,7 +231,7 @@ Devel::StatProfiler::Aggregate - profile aggregation result
 
 =head1 VERSION
 
-version 0.52
+version 0.53
 
 =head1 AUTHORS
 

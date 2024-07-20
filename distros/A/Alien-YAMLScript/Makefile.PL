@@ -7,7 +7,7 @@ use 5.016000;
 use ExtUtils::MakeMaker;
 
 my %WriteMakefileArgs = (
-  "ABSTRACT" => "Program in YAML",
+  "ABSTRACT" => "Program in YAML \x{2014} Code is Data",
   "AUTHOR" => "Ingy d\x{f6}t Net <ingy\@ingy.net>",
   "BUILD_REQUIRES" => {
     "Alien::Build" => "0.32",
@@ -31,7 +31,7 @@ my %WriteMakefileArgs = (
     "Test2::V0" => "0.000159",
     "Test::Alien" => "2.8"
   },
-  "VERSION" => "0.1.67",
+  "VERSION" => "0.1.68",
   "test" => {
     "TESTS" => "t/*.t"
   }

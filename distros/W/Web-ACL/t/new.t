@@ -38,15 +38,22 @@ eval {
 				deny_subnets  => ['10.0.10.0/24'],
 			},
 			derpderp => {
-				ip_auth       => 0,
-				slug_auth     => 1,
-				require_ip    => 1,
-				require_slug  => 0,
-				final         => 1,
-				slugs         => ['derp'],
-				slugs_regex   => [],
-				allow_subnets => [],
-				deny_subnets  => [],
+				ip_auth           => 0,
+				slug_auth         => 1,
+				require_ip        => 1,
+				require_slug      => 0,
+				final             => 1,
+				slugs             => ['derp'],
+				slugs_regex       => [],
+				allow_subnets     => [],
+				deny_subnets      => [],
+				ua_regex_allow    => [],
+				ua_regex_deny     => [],
+				paths_regex_allow => [],
+				paths_regex_deny  => [],
+				path_auth         => 0,
+				ua_auth           => 0,
+
 			},
 		}
 	);
@@ -67,88 +74,26 @@ eval {
 		die('new accepts acl values that are not hashes');
 	}
 
-	eval {
-		$acl = Web::ACL->new(
-			acl => {
-				derpderp => {
-					ip_auth       => 0,
-					slug_auth     => 1,
-					require_ip    => 1,
-					require_slug  => 0,
-					final         => 1,
-					slugs         => '',
-					slugs_regex   => [],
-					allow_subnets => [],
-					deny_subnets  => [],
-				},
-			},
-		);
-	};
-	if ( !$@ ) {
-		die('new accepts acls in which slugs is not a array');
+	my @keys_that_are_arrays = (
+		'slugs',            'ua_regex_allow', 'ua_regex_deny', 'paths_regex_allow',
+		'paths_regex_deny', 'slugs_regex',    'allow_subnets', 'deny_subnets',
+	);
+	foreach my $array_key (@keys_that_are_arrays) {
+		eval { $acl = Web::ACL->new( acl => { derpderp => { $array_key => '', }, }, ); };
+		if ( !$@ ) {
+			die( 'new accepts acls in which ' . $array_key . ' is not a ref of ARRAY' );
+		}
 	}
 
-	eval {
-		$acl = Web::ACL->new(
-			acl => {
-				derpderp => {
-					ip_auth       => 0,
-					slug_auth     => 1,
-					require_ip    => 1,
-					require_slug  => 0,
-					final         => 1,
-					slugs         => [],
-					slugs_regex   => '',
-					allow_subnets => [],
-					deny_subnets  => [],
-				},
-			},
-		);
-	};
-	if ( !$@ ) {
-		die('new accepts acls in which slugs_regex is not a array');
-	}
-
-	eval {
-		$acl = Web::ACL->new(
-			acl => {
-				derpderp => {
-					ip_auth       => 0,
-					slug_auth     => 1,
-					require_ip    => 1,
-					require_slug  => 0,
-					final         => 1,
-					slugs         => [],
-					slugs_regex   => [],
-					allow_subnets => '',
-					deny_subnets  => [],
-				},
-			},
-		);
-	};
-	if ( !$@ ) {
-		die('new accepts acls in which allows_subnets is not a array');
-	}
-
-	eval {
-		$acl = Web::ACL->new(
-			acl => {
-				derpderp => {
-					ip_auth       => 0,
-					slug_auth     => 1,
-					require_ip    => 1,
-					require_slug  => 0,
-					final         => 1,
-					slugs         => [],
-					slugs_regex   => [],
-					allow_subnets => [],
-					deny_subnets  => '',
-				},
-			},
-		);
-	};
-	if ( !$@ ) {
-		die('new accepts acls in which deny_subnets is not a array');
+	my @keys_that_are_boolean = (
+		'ip_auth', 'require_ip', 'slug_auth', 'require_slug', 'path_auth', 'require_path',
+		'ua_auth', 'require_ua', 'final',
+	);
+	foreach my $boolean_key (@keys_that_are_boolean) {
+		eval { $acl = Web::ACL->new( acl => { derpderp => { $boolean_key => [], }, }, ); };
+		if ( !$@ ) {
+			die( 'new accepts acls in which ' . $boolean_key . ' is not a ref of ""' );
+		}
 	}
 
 	$worked = 1;

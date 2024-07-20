@@ -21,11 +21,11 @@ Locale::Places - Translate places between different languages using http://downl
 
 =head1 VERSION
 
-Version 0.12
+Version 0.13
 
 =cut
 
-our $VERSION = '0.12';
+our $VERSION = '0.13';
 
 =head1 SYNOPSIS
 
@@ -73,7 +73,7 @@ sub new {
 		directory => $directory
 	});
 
-	return bless { directory => $directory }, $class;
+	return bless { %args, directory => $directory }, $class;
 }
 
 =head2 translate
@@ -303,6 +303,9 @@ This is a problem with the data, which has this line:
     16324587	2653877	fr	Canterbury	1
 
 which overrides the translation by setting the 'isPreferredName' flag
+
+Can't specify below country level.
+For example, is Virginia a state or a town in Illinois or one in Minnesota?
 
 =head1 SEE ALSO
 

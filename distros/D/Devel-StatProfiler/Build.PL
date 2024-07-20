@@ -21,7 +21,7 @@ my %module_build_args = (
     "Steffen Mueller <smueller\@cpan.org>"
   ],
   "dist_name" => "Devel-StatProfiler",
-  "dist_version" => "0.52",
+  "dist_version" => "0.53",
   "license" => "perl",
   "module_name" => "Devel::StatProfiler",
   "recursive_test_files" => 1,

@@ -1,5 +1,5 @@
 {
-   "abstract" : "Program in YAML",
+   "abstract" : "Program in YAML \u2014 Code is Data",
    "author" : [
       "Ingy d\u00f6t Net <ingy@ingy.net>"
    ],
@@ -67,7 +67,7 @@
          "web" : "https://github.com/ingydotnet/yamlscript"
       }
    },
-   "version" : "0.1.67",
+   "version" : "0.1.68",
    "x_alienfile" : {
       "generated_by" : "Dist::Zilla::Plugin::AlienBuild version 0.32",
       "requires" : {

@@ -1,9 +1,9 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2021-2023 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2021-2024 -- leonerd@leonerd.org.uk
 
-package Syntax::Operator::Divides 0.07;
+package Syntax::Operator::Divides 0.08;
 
 use v5.14;
 use warnings;
@@ -86,14 +86,11 @@ sub apply
    my $pkg = shift;
    my ( $on, $caller, @syms ) = @_;
 
-   @syms or @syms = qw( divides );
+   @syms or @syms = qw( %% );
+
+   $pkg->XS::Parse::Infix::apply_infix( $on, \@syms, qw( %% ) );
 
    my %syms = map { $_ => 1 } @syms;
-   if( delete $syms{divides} ) {
-      $on ? $^H{"Syntax::Operator::Divides/divides"}++
-          : delete $^H{"Syntax::Operator::Divides/divides"};
-   }
-
    my $callerpkg;
 
    foreach (qw( is_divisor )) {

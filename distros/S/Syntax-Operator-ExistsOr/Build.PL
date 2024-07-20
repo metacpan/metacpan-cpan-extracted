@@ -8,14 +8,15 @@ use XS::Parse::Infix::Builder;
 my $build = Module::Build->new(
    module_name => "Syntax::Operator::ExistsOr",
    test_requires => {
-      'Test::More' => '0.88', # done_testing
+      'Test2::V0' => 0,
    },
    configure_requires => {
       'Module::Build' => '0.4004', # test_requires
-      'XS::Parse::Infix::Builder' => '0.26',
+      'XS::Parse::Infix::Builder' => '0.44',
    },
    requires => {
       'perl' => '5.014',
+      'XS::Parse::Infix' => '0.44',
    },
    license => 'perl',
    create_license => 1,

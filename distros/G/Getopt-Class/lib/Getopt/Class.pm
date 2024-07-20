@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Getopt::Long with Class - ~/lib/Getopt/Class.pm
-## Version v1.0.0
+## Version v1.1.0
 ## Copyright(c) 2024 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2020/04/25
-## Modified 2024/02/23
+## Modified 2024/07/20
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -25,9 +25,8 @@ BEGIN
     use Module::Generic::Array;
     use Module::Generic::File qw( file );
     use Module::Generic::Scalar;
-    use Nice::Try;
     use Scalar::Util;
-    our $VERSION = 'v1.0.0';
+    our $VERSION = 'v1.1.0';
 };
 
 use strict;
@@ -213,7 +212,17 @@ sub init
         my $opt = join( '|', @$opt_name );
         if( defined( $def->{default} ) && ( ref( $def->{default} ) || length( $def->{default} ) ) )
         {
-            $opts->{ $k2_under } = $def->{default};
+            if( $def->{type} eq 'file' )
+            {
+                if( $self->_can_overload( $def->{default} => '""' ) )
+                {
+                    $opts->{ $k2_under } = "$def->{default}";
+                }
+            }
+            else
+            {
+                $opts->{ $k2_under } = $def->{default};
+            }
         }
         else
         {
@@ -420,14 +429,16 @@ sub configure
     $conf = shift( @_ ) if( ref( $_[0] ) );
     $conf = $self->configure_options if( !scalar( @$conf ) );
     my $getopt = $self->getopt || return( $self->error( "No Getopt::Long::Parser object found." ) );
-    try
+    local $@;
+    # try-catch
+    eval
     {
         $getopt->configure( @$conf );
         $self->{configured} = 1;
-    }
-    catch( $e )
+    };
+    if( $@ )
     {
-        return( $self->error( "An error occurred while configuration Getlong::Opt: $e" ) );
+        return( $self->error( "An error occurred while configuration Getlong::Opt: $@" ) );
     }
     return( $self );
 }
@@ -1215,7 +1226,7 @@ Getopt::Class - Extended dictionary version of Getopt::Long
 
 =head1 VERSION
 
-    v1.0.0
+    v1.1.0
 
 =head1 DESCRIPTION
 

@@ -11,11 +11,10 @@ use strict;
 use warnings;
 use Carp;
 use vars qw($VERSION);
-$VERSION="0.02";
+$VERSION="0.03";
 use Config;
 
-my $mswin = 0;
-$mswin = 1 if $Config{'osname'} eq 'MSWin32';
+my $mswin = $Config{'osname'} eq 'MSWin32';
 
 use File::Basename;
 
@@ -429,12 +428,14 @@ sub FindRawImage {
 	for (@$path) {
 		my $folder = $_;
 		opendir(DIR, $folder);
-		my @files = grep(/!$name\.*/, readdir(DIR));
-		closedir(DIR);
-		for (@files) {
-			my $file = "$folder/$_";
-			return $file if $self->IsImage($file);
+		while (my $item = readdir(DIR)) {
+			my $full = "$folder/$item";
+			if ($self->IsImageFile($full) and ($item =~ /^$name/)) {
+				closedir(DIR);
+				return $full
+			}
 		}
+		closedir(DIR);
 	}
 	return undef
 }

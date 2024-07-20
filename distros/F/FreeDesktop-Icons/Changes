@@ -1,8 +1,12 @@
 Revision history for Perl extension FreeDesktop::Icons.
 
-0.01 Fri May 31 2024
-	-initial version created Thu May 23 2024.
-
-0.o2 Sat Jun 01 2024
-	-fixed missing dependancy Test::Deep
+0.03 Thu Jul 18 2024
+	- fixed bug in FindRawImage method
+	- updated Readme.md
 	
+0.02 Sat Jun 01 2024
+	- fixed missing dependancy Test::Deep
+	
+0.01 Fri May 31 2024
+	- initial version created Thu May 23 2024.
+

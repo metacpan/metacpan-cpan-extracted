@@ -77,9 +77,10 @@ ok(SPVM::TestCase::R::OP::Double->diff);
 ok(SPVM::TestCase::R::OP::Double->max);
 ok(SPVM::TestCase::R::OP::Double->min);
 ok(SPVM::TestCase::R::OP::Double->mean);
-ok(SPVM::TestCase::R::OP::Double->inner);
+ok(SPVM::TestCase::R::OP::Double->dot);
 ok(SPVM::TestCase::R::OP::Double->cross);
 ok(SPVM::TestCase::R::OP::Double->outer);
+ok(SPVM::TestCase::R::OP::Double->pi);
 
 my $end_memory_blocks_count = $api->get_memory_blocks_count;
 is($end_memory_blocks_count, $start_memory_blocks_count);

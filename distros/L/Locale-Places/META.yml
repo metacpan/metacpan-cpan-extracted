@@ -44,5 +44,5 @@ requires:
 resources:
   bugtracker: https://github.com/nigelhorne/Locale-Places/issues
   repository: git://github.com/nigelhorne/Locale-Places.git
-version: '0.12'
+version: '0.13'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

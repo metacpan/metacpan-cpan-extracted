@@ -48,6 +48,20 @@ eval {
 				allow_subnets => [],
 				deny_subnets  => [],
 			},
+			uaTest => {
+				ua_auth        => 1,
+				require_ua     => 1,
+				final          => 1,
+				ua_regex_allow => ['^allow test$'],
+				ua_regex_deny  => ['^deny test$'],
+			},
+			pathTest => {
+				path_auth        => 1,
+				require_path     => 1,
+				final            => 1,
+				path_regex_allow => ['^allow test$'],
+				path_regex_deny  => ['^deny test$'],
+			},
 		}
 	);
 
@@ -133,6 +147,59 @@ eval {
 	if ($return) {
 		die(
 			'Slug check for the ip "1.168.1.2" and slug "derp" for apikey "doof" did not fail... ' . Dumper($acl) );
+	}
+
+	$return = $acl->check( apikey => 'uaTest', );
+	if ($return) {
+		die( 'UA check for the ua undef for apikey "uaTest" did not fail... ' . Dumper($acl) );
+	}
+
+	$return = $acl->check(
+		apikey => 'uaTest',
+		ua     => 'derp',
+	);
+	if ($return) {
+		die( 'UA check for the ua "derp" and for apikey "uaTest" did not fail... ' . Dumper($acl) );
+	}
+
+	$return = $acl->check(
+		apikey => 'uaTest',
+		ua     => 'deny test',
+	);
+	if ($return) {
+		die( 'UA check for the ua "deny test" and for apikey "uaTest" did not fail... ' . Dumper($acl) );
+	}
+
+	$return = $acl->check(
+		apikey => 'uaTest',
+		ua     => 'allow test',
+	);
+	if ( !$return ) {
+		die( 'UA check for the ua "allow test" and for apikey "uaTest" did not fail... ' . Dumper($acl) );
+	}
+
+	$return = $acl->check(
+		apikey => 'pathTest',
+		path   => 'derp',
+	);
+	if ($return) {
+		die( 'path check for the path "derp" and for apikey "pathTest" did not fail... ' . Dumper($acl) );
+	}
+
+	$return = $acl->check(
+		apikey => 'pathTest',
+		path   => 'deny test',
+	);
+	if ($return) {
+		die( 'path check for the ua "deny test" and for apikey "pathTest" did not fail... ' . Dumper($acl) );
+	}
+
+	$return = $acl->check(
+		apikey => 'pathTest',
+		path   => 'allow test',
+	);
+	if ( !$return ) {
+		die( 'path check for the ua "allow test" and for apikey "pathTest" did not fail... ' . Dumper($acl) );
 	}
 
 	$worked = 1;

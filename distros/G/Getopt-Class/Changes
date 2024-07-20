@@ -1,5 +1,9 @@
 Revision history for Perl module Getopt::Class
 
+v1.1.0 2024-07-20T17:45:11+0900
+    - Improved handling of default value when type is 'file', otherwise Getopt::Long would trigger some error
+    - Removed dependency on Nice::Try
+
 v1.0.0 2024-02-23T03:56:26+0900
     - Added types uri and uri-array, improved documentation and added some missing code.
     - Changed this distribution to major stable release.

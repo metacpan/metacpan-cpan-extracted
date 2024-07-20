@@ -51,6 +51,6 @@
          "web" : "https://github.com/LilithSec/Web-ACL"
       }
    },
-   "version" : "v0.0.2",
+   "version" : "v0.1.0",
    "x_serialization_backend" : "JSON::PP version 4.07"
 }

@@ -31,7 +31,7 @@ my %WriteMakefileArgs = (
         'Devel::Confess'=> '0.009004',
         'Getopt::Long'  => '0.44',
         'Module::Generic' => 'v0.34.1',
-		'Nice::Try'		=> 'v1.3.5',
+		# 'Nice::Try'		=> 'v1.3.5',
         'Scalar::Util'  => '1.54',
     	'Tie::Hash'     => '1.05',
     },

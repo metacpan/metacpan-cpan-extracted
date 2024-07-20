@@ -11,6 +11,10 @@ SYNOPSIS
             create_user     => { type => 'boolean', alias => [qw(create_person create_customer)], action => 1 },
             create_product  => { type => 'boolean', action => 1 },
             debug           => { type => 'integer', default => \$DEBUG },
+            # Can be enabled with --enable-recurse
+            disable_recurse => { type => 'boolean', default => 1 },
+            # Can be disabled also with --disable-logging
+            enable_logging  => { type => 'boolean', default => 0 },
             help            => { type => 'code', code => sub{ pod2usage(1); }, alias => '?', action => 1 },
             man             => { type => 'code', code => sub{ pod2usage( -exitstatus => 0, -verbose => 2 ); }, action => 1 },
             quiet           => { type => 'boolean', default => 0, alias => 'silent' },
@@ -21,6 +25,9 @@ SYNOPSIS
             api_version     => { type => 'string', default => 1 },
             as_admin        => { type => 'boolean' },
             dry_run         => { type => 'boolean', default => 0 },
+        
+            # Can be enabled also with --with-zlib
+            without_zlib    => { type => 'integer', default => 1 },
     
             name            => { type => 'string', class => [qw( person product )] },
             created         => { type => 'datetime', class => [qw( person product )] },
@@ -30,6 +37,8 @@ SYNOPSIS
             age             => { type => 'integer', class => [qw(person)], name => 'age', },
             path            => { type => 'file' },
             skip            => { type => 'file-array' },
+            url             => { type => 'uri', package => 'URI' },
+            urls            => { type => 'uri-array', package => 'URI::Fast' },
         };
     
         # Assuming command line arguments like:
@@ -67,7 +76,7 @@ SYNOPSIS
         }
 
 VERSION
-        v0.102.6
+        v1.1.0
 
 DESCRIPTION
     Getopt::Class is a lightweight wrapper around Getopt::Long that
@@ -83,12 +92,15 @@ CONSTRUCTOR
     To instantiate a new Getopt::Class object, pass an hash reference of
     following parameters:
 
-    *dictionary*
+    *   "dictionary"
+
         This is required. It must contain a key value pair where the value
         is an anonymous hash reference that can contain the following
         parameters:
 
-        *alias* This is an array reference of alternative options that can
+        *       "alias"
+
+                This is an array reference of alternative options that can
                 be used in an interchangeable way
 
                     my $dict =
@@ -102,7 +114,8 @@ CONSTRUCTOR
                     # or
                     --family-name Doe
 
-        *default*
+        *       "default"
+
                 This contains the default value. For a string, this could be
                 anything, and also a reference to a scalar, such as:
 
@@ -135,7 +148,9 @@ CONSTRUCTOR
                 is provided. This is a design from Getopt::Long and although
                 I could circumvent this, I a not sure I should.
 
-        *error* A string to be used to set an error by "check_class_data".
+        *       "error"
+
+                A string to be used to set an error by "check_class_data".
                 Typically the string should provide meaningful information
                 as to what the data should normally be. For example:
 
@@ -144,40 +159,21 @@ CONSTRUCTOR
                     currency => { type => 'string', class => [qw(product)], name => 'currency', re => qr/^[a-z]{3}$/, error => "must be a three-letter iso 4217 value" },
                     };
 
-        *file*  This type will mark the value as a directory or file path
-                and will become a Module::Generic::File object.
+        *       "max"
 
-                This is particularly convenient when the user provided you
-                with a relative path, such as:
-
-                    ./my_prog.pl --debug 3 --path ./here/
-
-                And if you are not very careful and inadvertently change
-                directory like when using File::Find, then this relative
-                path could lead to some unpleasant surprise.
-
-                Setting this argument type to "file" ensure the resulting
-                value is a Module::Generic::File, whose underlying file or
-                directory will be resolved to their absolute path.
-
-        *file-array*
-                Same as *file* argument type, but allows multiple value
-                saved as an array. For example:
-
-                    ./my_prog.pl --skip ./not/here ./avoid/me/ ./skip/this/directory
-
-                This would result in the option property *skip* being an
-                array object containing 3 entries.
-
-        *max*   This is well explained in "Options with multiple values" in
+                This is well explained in "Options with multiple values" in
                 Getopt::Long
 
                 It serves "to specify the minimal and maximal number of
                 arguments an option takes".
 
-        *min*   Same as above
+        *       "min"
 
-        *re*    This must be a regular expression and is used by
+                Same as above
+
+        *       "re"
+
+                This must be a regular expression and is used by
                 "check_class_data" to check the sanity of the data provided
                 by the user. So, for example:
 
@@ -193,35 +189,159 @@ CONSTRUCTOR
                 would set an error that can be retrieved as an output of
                 "check_class_data"
 
-        *required*
+        *       "required"
+
                 Set this to true or false (1 or 0) to instruct
                 "check_class_data" whether to check if it is missing or not.
 
                 This is an alternative to the "required" method which is
                 used at an earlier stage, during "exec"
 
-        *type*  Type can be *array*, *boolean*, *code*, *decimal*, *hash*,
-                *integer*, *string*, *string-hash*
+        *       "type"
 
-                Type *hash* is convenient for free key-value pair such as:
+                Supported types are:
 
-                    --define customer_id=10 --define transaction_id 123
+                *           "array"
 
-                would result for "define" with an anonymous hash as value
-                containing "customer_id" with value 10 and "transaction_id"
-                with value 123
+                            This type will set the resulting value to be a
+                            Module::Generic::Array object of values
+                            provided.
 
-                Type code implies an anonymous sub routine and should be
-                accompanied with the attribute *code*, such as:
+                *           "boolean"
 
-                    { type => 'code', code => sub{ pod2usage(1); exit( 0 ) }, alias => '?', action => 1 },
+                            If type is "boolean" and the key is either
+                            "with", "without", "enable", "disable", their
+                            counterpart will automatically be available as
+                            well, such as you can do, as show in the excerpt
+                            in the synopsis above:
+
+                                --enable-recurse --with-zlib
+
+                            Be careful though. If, in your dictionary, as
+                            shown in the synopsis, you defined
+                            "without_zlib" with a default value of true,
+                            then using the option "--with-zlib" will set
+                            that value to false. So in your application, you
+                            would need to check like this:
+
+                                if( $opts->{without_zlib} )
+                                {
+                                    # Do something
+                                }
+                                else
+                                {
+                                    # Do something else
+                                }
+
+                *           "code"
+
+                            Type code implies an anonymous sub routine and
+                            should be accompanied with the attribute *code*,
+                            such as:
+
+                                { type => 'code', code => sub{ pod2usage(1); exit( 0 ) }, alias => '?', action => 1 },
+
+                *           "datetime"
+
+                            This type will set the resulting value to be a
+                            DateTime object of the value provided.
+
+                *           "decimal"
+
+                            This type will set the resulting value to be a
+                            Module::Generic::Number object of the value
+                            provided.
+
+                *           "file"
+
+                            This type will mark the value as a directory or
+                            file path and will become a
+                            Module::Generic::File object.
+
+                            This is particularly convenient when the user
+                            provided you with a relative path, such as:
+
+                                ./my_prog.pl --debug 3 --path ./here/
+
+                            And if you are not very careful and
+                            inadvertently change directory like when using
+                            File::Find, then this relative path could lead
+                            to some unpleasant surprise.
+
+                            Setting this argument type to "file" ensure the
+                            resulting value is a Module::Generic::File,
+                            whose underlying file or directory will be
+                            resolved to their absolute path.
+
+                *           "file-array"
+
+                            Same as "file" argument type, but allows
+                            multiple value saved as an array. For example:
+
+                                ./my_prog.pl --skip ./not/here ./avoid/me/ ./skip/this/directory
+
+                            This would result in the option property "skip"
+                            being an array object containing 3 entries.
+
+                *           "hash"
+
+                            Type "hash" is convenient for free key-value
+                            pair such as:
+
+                                --define customer_id=10 --define transaction_id 123
+
+                            would result for "define" with an anonymous hash
+                            as value containing "customer_id" with value 10
+                            and "transaction_id" with value 123
+
+                *           "integer"
+
+                            This type will set the resulting value to be a
+                            Module::Generic::Number object of the value
+                            provided.
+
+                *           "scalar"
+
+                            This type will set the resulting value to be a
+                            Module::Generic::Scalar object of the value
+                            provided.
+
+                *           "string"
+
+                            Same as "scalar". This type will set the
+                            resulting value to be a Module::Generic::Scalar
+                            object of the value provided.
+
+                *           "string-hash"
+
+                *           "uri"
+
+                            This type will mark the value as a directory or
+                            file path and will become a URI object, by
+                            default.
+
+                            You can override this default pacage, by using
+                            "package" property, such as:
+
+                                url => { type => 'uri', package => 'URI' }
+
+                *           "uri-array"
+
+                            Same as "uri" argument type, but allows multiple
+                            value saved as an array. For example:
+
+                                ./my_prog.pl --uris https://example.com/some/where https://example.com/some/where/else
+
+                            This would result in the option property "uris"
+                            being an array object containing 2 entries.
 
                 Also as seen in the example above, you can add additional
-                properties to be used in your program, here such as *action*
+                properties to be used in your program, here such as "action"
                 that could be used to identify all options that are used to
                 trigger an action or a call to a sub routine.
 
-    *debug*
+    *   "debug"
+
         This takes an integer, and is used to set the level of debugging.
         Anything under 3 will not provide anything meaningful.
 

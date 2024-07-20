@@ -3,7 +3,7 @@
 #
 #  (C) Paul Evans, 2022-2023 -- leonerd@leonerd.org.uk
 
-package Syntax::Operator::ExistsOr 0.02;
+package Syntax::Operator::ExistsOr 0.03;
 
 use v5.14;
 use warnings;
@@ -80,15 +80,11 @@ sub apply
    my $pkg = shift;
    my ( $on, $caller, @syms ) = @_;
 
-   @syms or @syms = qw( existsor );
+   @syms or @syms = qw( existsor \\\\ );
 
-   my %syms = map { $_ => 1 } @syms;
-   if( delete $syms{existsor} ) {
-      $on ? $^H{"Syntax::Operator::ExistsOr/existsor"}++
-          : delete $^H{"Syntax::Operator::ExistsOr/existsor"};
-   }
+   $pkg->XS::Parse::Infix::apply_infix( $on, \@syms, qw( existsor \\\\ ) );
 
-   croak "Unrecognised import symbols @{[ keys %syms ]}" if keys %syms;
+   croak "Unrecognised import symbols @syms" if @syms;
 }
 
 =head1 OPERATORS

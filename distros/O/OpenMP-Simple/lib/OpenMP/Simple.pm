@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use Alien::OpenMP;
 
-our $VERSION = q{0.0.8};
+our $VERSION = q{0.1.0};
 
 # This module is a wrapper around a ".h" file that is injected into Alien::OpenMP
 # via Inline:C's AUTO_INCLUDE feature. This header file constains C MACROs for reading
@@ -33,39 +33,49 @@ All setters EXCEPT the LOCK routines,
 +-------------------------------------------------------------------------------------------+
 **/
 
-/* %ENV Update Macros */
+/* %ENV Update Macros                                      */
 
 #define PerlOMP_UPDATE_WITH_ENV__DEFAULT_DEVICE             \
-    char *num = getenv("OMP_DEFAULT_DEVICE");               \
-    omp_set_default_device(atoi(num));                      ///< read and update with $ENV{OMP_NUM_TEAMS}
+    char *num1 = getenv("OMP_DEFAULT_DEVICE");              \
+    if (num1 != NULL) {                                     \
+      omp_set_default_device(atoi(num1));                   \
+    }
 
 #define PerlOMP_UPDATE_WITH_ENV__TEAMS_THREAD_LIMIT         \
-    char *num = getenv("OMP_TEAMS_THREAD_LIMIT");           \
-    omp_set_teams_thread_limit(atoi(num));                  ///< read and update with $ENV{OMP_NUM_TEAMS}
+    char *num2 = getenv("OMP_TEAMS_THREAD_LIMIT");          \
+    if (num2 != NULL) {                                     \
+      omp_set_teams_thread_limit(atoi(num2));               \
+    }
 
 #define PerlOMP_UPDATE_WITH_ENV__NUM_TEAMS                  \
-    char *num = getenv("OMP_NUM_TEAMS");                    \
-    omp_set_num_teams(atoi(num));                           ///< read and update with $ENV{OMP_NUM_TEAMS}
+    char *num3 = getenv("OMP_NUM_TEAMS");                   \
+    if (num3 != NULL) {                                     \
+      omp_set_num_teams(atoi(num3));                        \
+    }
 
 #define PerlOMP_UPDATE_WITH_ENV__MAX_ACTIVE_LEVELS          \
-    char *num = getenv("OMP_MAX_ACTIVE_LEVELS");            \
-    omp_set_max_active_levels(atoi(num));                   ///< read and update with $ENV{OMP_MAX_ACTIVE_LEVELS}
+    char *num4 = getenv("OMP_MAX_ACTIVE_LEVELS");           \
+    if (num4 != NULL) {                                     \
+      omp_set_max_active_levels(atoi(num4));                \
+    }
 
 #define PerlOMP_UPDATE_WITH_ENV__NUM_THREADS                \
-    char *num = getenv("OMP_NUM_THREADS");                  \
-    omp_set_num_threads(atoi(num));                         ///< read and update with $ENV{OMP_NUM_THREADS}
+    char *num5 = getenv("OMP_NUM_THREADS");                 \
+    if (num5 != NULL) {                                     \
+      omp_set_num_threads(atoi(num5));                      \
+    }
 
 #define PerlOMP_UPDATE_WITH_ENV__DYNAMIC                    \
-    char *VALUE = getenv("OMP_DYNAMIC");                    \
-    if (VALUE == NULL) {                                    \
-      omp_set_dynamic(VALUE);                               \
+    char *VALUE1 = getenv("OMP_DYNAMIC");                   \
+    if (VALUE1 == NULL) {                                   \
+      omp_set_dynamic(VALUE1);                              \
     }                                                       \
-    else if (strcmp(VALUE,"TRUE") || strcmp(VALUE,"true") || strcmp(VALUE,"1")) { \
+    else if (strcmp(VALUE1,"TRUE") || strcmp(VALUE1,"true") || strcmp(VALUE1,"1")) { \
       omp_set_dynamic(1);                                   \
     }                                                       \
     else {                                                  \
       omp_set_dynamic(NULL);                                \
-    };                                                      ///> read and update with $ENV{OMP_DYNAMIC} 
+    }
 
 #define PerlOMP_UPDATE_WITH_ENV__NESTED                     \
     char *VALUE = getenv("OMP_NESTED");                     \
@@ -77,30 +87,47 @@ All setters EXCEPT the LOCK routines,
     }                                                       \
     else {                                                  \
       omp_set_nested(NULL);                                 \
-    };                                                      ///> read and update with $ENV{OMP_NESTED} 
+    };
 
 #define PerlOMP_UPDATE_WITH_ENV__SCHEDULE                   \
     char *str = getenv("OMP_SCHEDULE");                     \
-    omp_sched_t SCHEDULE = omp_sched_static;                \
-    int CHUNK = 1; char *pt;                                \
-    pt = strtok (str,",");                                  \
-    if (strcmp(pt,"static")) {                              \
-      SCHEDULE = omp_sched_static;                          \
-    }                                                       \
-    else if (strcmp(pt,"dynamic")) {                        \
-      SCHEDULE = omp_sched_dynamic;                         \
-    }                                                       \
-    else if (strcmp(pt,"guided")) {                         \
-      SCHEDULE = omp_sched_guided;                          \
-    }                                                       \
-    else if (strcmp(pt,"auto")) {                           \
-      SCHEDULE = omp_sched_auto;                            \
-    }                                                       \
-    pt = strtok (NULL, ",");                                \
-    if (pt != NULL) {                                       \
-      CHUNK = atoi(pt);                                     \
-    }                                                       \
-    omp_set_schedule(SCHEDULE, CHUNK);                      ///< read and update with $ENV{OMP_SCHEDULE}
+    if (str != NULL) {                                      \
+      omp_sched_t SCHEDULE = omp_sched_static;              \
+      int CHUNK = 1; char *pt;                              \
+      pt = strtok (str,",");                                \
+      if (strcmp(pt,"static")) {                            \
+        SCHEDULE = omp_sched_static;                        \
+      }                                                     \
+      else if (strcmp(pt,"dynamic")) {                      \
+        SCHEDULE = omp_sched_dynamic;                       \
+      }                                                     \
+      else if (strcmp(pt,"guided")) {                       \
+        SCHEDULE = omp_sched_guided;                        \
+      }                                                     \
+      else if (strcmp(pt,"auto")) {                         \
+        SCHEDULE = omp_sched_auto;                          \
+      }                                                     \
+      pt = strtok (NULL, ",");                              \
+      if (pt != NULL) {                                     \
+        CHUNK = atoi(pt);                                   \
+      }                                                     \
+      omp_set_schedule(SCHEDULE, CHUNK);                    \
+    }
+
+/* bundled Macros */
+#define PerlOMP_GETENV_BASIC                                \
+    PerlOMP_UPDATE_WITH_ENV__NUM_THREADS                    \ 
+    PerlOMP_UPDATE_WITH_ENV__SCHEDULE
+
+#define PerlOMP_GETENV_ALL                                  \
+    PerlOMP_UPDATE_WITH_ENV__DEFAULT_DEVICE                 \
+    PerlOMP_UPDATE_WITH_ENV__TEAMS_THREAD_LIMIT             \
+    PerlOMP_UPDATE_WITH_ENV__NUM_TEAMS                      \
+    PerlOMP_UPDATE_WITH_ENV__MAX_ACTIVE_LEVELS              \
+    PerlOMP_UPDATE_WITH_ENV__NUM_THREADS                    \
+    PerlOMP_UPDATE_WITH_ENV__DYNAMIC                        \
+    PerlOMP_UPDATE_WITH_ENV__NESTED                         \
+    PerlOMP_UPDATE_WITH_ENV__SCHEDULE
 
 // ... add all of them from OpenMP::Environment, add unit tests
 
@@ -260,18 +287,14 @@ runtime functions
   __DATA__
   __C__
 
-  /* C function parallelized with OpenMP */
   int _check_num_threads() {
+    PerlOMP_GETENV_BASIC
     int ret = 0;
-
-    PerlOMP_UPDATE_WITH_ENV__NUM_THREADS /* <~ MACRO x OpenMP::Simple */
-
     #pragma omp parallel
     {
       #pragma omp single
       ret = omp_get_num_threads();
     }
-
     return ret;
   }
 
@@ -315,6 +338,30 @@ Github repository to get an idea of how to use C<OpenMP::Simple>'s macros
 with C<OpenMP::Environment>.
 
 =over 4
+
+=item C<PerlOMP_GETENV_OMP_Basic>
+
+Equivalent of using,
+
+  PerlOMP_UPDATE_WITH_ENV__NUM_THREADS
+  PerlOMP_UPDATE_WITH_ENV__NUM_SCHEDULE
+
+The purpose of this bundled approach is to make it easier to get started
+quickly. This list may be updated between versions. This is the recommended
+one to use when starting with this module. See the L<SYNOPSIS> example.
+
+=item C<PerlOMP_GETENV_OMP_All>
+
+Equivalent of using,
+
+    PerlOMP_UPDATE_WITH_ENV__DEFAULT_DEVICE
+    PerlOMP_UPDATE_WITH_ENV__TEAMS_THREAD_LIMIT
+    PerlOMP_UPDATE_WITH_ENV__NUM_TEAMS
+    PerlOMP_UPDATE_WITH_ENV__MAX_ACTIVE_LEVELS
+    PerlOMP_UPDATE_WITH_ENV__NUM_THREADS
+    PerlOMP_UPDATE_WITH_ENV__DYNAMIC
+    PerlOMP_UPDATE_WITH_ENV__NESTED
+    PerlOMP_UPDATE_WITH_ENV__SCHEDULE
 
 =item C<PerlOMP_UPDATE_WITH_ENV__NUM_THREADS>
 

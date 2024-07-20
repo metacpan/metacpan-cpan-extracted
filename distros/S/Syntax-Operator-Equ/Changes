@@ -1,5 +1,11 @@
 Revision history for Syntax-Operator-Equ
 
+0.10    2024-07-19
+        [CHANGES]
+         * Updates for XS::Parse::Infix v0.44
+            + Use fully-qualified name
+            + No need to account for local XSParseInfix.h file
+
 0.09    2024-01-06
         [CHANGES]
          * Quiet the meta::experimental warnings of meta 0.003_002

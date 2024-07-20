@@ -4,7 +4,7 @@
       "Paul Evans <leonerd@leonerd.org.uk>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.4231",
+   "generated_by" : "Module::Build version 0.4234",
    "license" : [
       "perl_5"
    ],
@@ -22,24 +22,25 @@
       "configure" : {
          "requires" : {
             "Module::Build" : "0.4004",
-            "XS::Parse::Infix::Builder" : "0.26"
+            "XS::Parse::Infix::Builder" : "0.44"
          }
       },
       "runtime" : {
          "requires" : {
+            "XS::Parse::Infix" : "0.44",
             "perl" : "5.014"
          }
       },
       "test" : {
          "requires" : {
-            "Test::More" : "0.88"
+            "Test2::V0" : "0"
          }
       }
    },
    "provides" : {
       "Syntax::Operator::ExistsOr" : {
          "file" : "lib/Syntax/Operator/ExistsOr.pm",
-         "version" : "0.02"
+         "version" : "0.03"
       }
    },
    "release_status" : "stable",
@@ -49,6 +50,6 @@
       ],
       "x_IRC" : "irc://irc.perl.org/#io-async"
    },
-   "version" : "0.02",
-   "x_serialization_backend" : "JSON::PP version 4.07"
+   "version" : "0.03",
+   "x_serialization_backend" : "JSON::PP version 4.16"
 }

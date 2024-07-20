@@ -59,6 +59,18 @@ static void XSParseInfix_register_v1(pTHX_ const char *opname, const struct XSPa
   XSParseInfix_register(aTHX_ opname, hooks, hookdata);
 }
 
+MODULE = XS::Parse::Keyword    PACKAGE = XS::Parse::Infix
+
+bool check_opname(SV *opname)
+  CODE:
+  {
+    STRLEN namelen;
+    const char *namepv = SvPV(opname, namelen);
+    RETVAL = XSParseInfix_check_opname(aTHX_ namepv, namelen);
+  }
+  OUTPUT:
+    RETVAL
+
 MODULE = XS::Parse::Keyword    PACKAGE = XS::Parse::Keyword
 
 BOOT:

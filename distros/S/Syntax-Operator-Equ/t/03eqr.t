@@ -20,6 +20,8 @@ ok(!(""    eqr undef), 'undef is not empty string');
 ok(  "ghi" eqr qr/h/,  'string pattern match');
 ok(!("ghi" eqr qr/H/), 'string pattern non-match');
 
+ok(!("x" eqr qr/abc/), 'string pattern non-match minimum length');
+
 my $pat = qr/i/;
 ok(  "ghi" eqr $pat, 'string pattern match from variable');
 

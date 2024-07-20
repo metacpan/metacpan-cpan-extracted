@@ -1,0 +1,12 @@
+Libcue.xs
+LICENSE
+Makefile.PL
+MANIFEST
+README.pod
+typemap
+t/c_interface.t
+t/perl_interface.t
+t/standard.cue
+lib/Audio/Cuefile/Libcue.pm
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

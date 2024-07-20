@@ -1,9 +1,9 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2021-2023 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2021-2024 -- leonerd@leonerd.org.uk
 
-package Syntax::Operator::Equ 0.09;
+package Syntax::Operator::Equ 0.10;
 
 use v5.14;
 use warnings;
@@ -96,14 +96,11 @@ sub apply
    my $pkg = shift;
    my ( $on, $caller, @syms ) = @_;
 
-   @syms or @syms = qw( equ );
+   @syms or @syms = qw( equ === );
+
+   $pkg->XS::Parse::Infix::apply_infix( $on, \@syms, qw( equ === ) );
 
    my %syms = map { $_ => 1 } @syms;
-   if( delete $syms{equ} ) {
-      $on ? $^H{"Syntax::Operator::Equ/equ"}++
-          : delete $^H{"Syntax::Operator::Equ/equ"};
-   }
-
    my $callerpkg;
 
    foreach (qw( is_strequ is_numequ )) {

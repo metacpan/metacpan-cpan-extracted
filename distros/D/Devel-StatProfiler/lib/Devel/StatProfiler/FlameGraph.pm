@@ -121,7 +121,7 @@ Devel::StatProfiler::FlameGraph
 
 =head1 VERSION
 
-version 0.52
+version 0.53
 
 =head1 AUTHORS
 

@@ -6,14 +6,14 @@ use warnings;
 
 use base qw/Import::Export/;
  
-our $VERSION = '0.02';
+our $VERSION = '0.03';
  
 our %EX = (
         entropy => [qw/all/]
 );
 
 require XSLoader;
-XSLoader::load();
+XSLoader::load("Shannon::Entropy::XS", $VERSION);
 
 1;
 
@@ -25,7 +25,7 @@ Shannon::Entropy::XS - Calculate the Shannon entropy H of a given input string f
  
 =head1 VERSION
  
-Version 0.02
+Version 0.03
  
 =cut
  

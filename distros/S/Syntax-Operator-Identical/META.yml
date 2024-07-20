@@ -7,7 +7,7 @@ build_requires:
   Test2::V0: '0'
 configure_requires:
   Module::Build: '0.4004'
-  XS::Parse::Infix::Builder: '0.26'
+  XS::Parse::Infix::Builder: '0.44'
 dynamic_config: 1
 generated_by: 'Module::Build version 0.4234, CPAN::Meta::Converter version 2.150010'
 license: perl
@@ -18,13 +18,13 @@ name: Syntax-Operator-Identical
 provides:
   Syntax::Operator::Identical:
     file: lib/Syntax/Operator/Identical.pm
-    version: '0.04'
+    version: '0.05'
 requires:
-  XS::Parse::Infix: '0.26'
+  XS::Parse::Infix: '0.44'
   meta: 0.003_002
   perl: '5.014'
 resources:
   IRC: irc://irc.perl.org/#io-async
   license: http://dev.perl.org/licenses/
-version: '0.04'
+version: '0.05'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -122,8 +122,7 @@ static void S_boot_xs_parse_infix(pTHX_ double ver) {
   SV **svp;
   SV *versv = ver ? newSVnv(ver) : NULL;
 
-  /* XS::Parse::Infix is implemented in XS::Parse::Keyword's .so file */
-  load_module(PERL_LOADMOD_NOIMPORT, newSVpvs("XS::Parse::Keyword"), versv, NULL);
+  load_module(PERL_LOADMOD_NOIMPORT, newSVpvs("XS::Parse::Infix"), versv, NULL);
 
   svp = hv_fetchs(PL_modglobal, "XS::Parse::Infix/ABIVERSION_MIN", 0);
   if(!svp)

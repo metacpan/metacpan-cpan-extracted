@@ -189,9 +189,8 @@ static OP *newop_in_num(pTHX_ U32 flags, OP *lhs, OP *rhs, SV **parsedata, void 
 }
 
 struct XSParseInfixHooks infix_in = {
-  .cls            = XPI_CLS_MATCH_MISC,
-  .rhs_flags      = XPI_OPERAND_LIST,
-  .permit_hintkey = "Syntax::Operator::In/in",
+  .cls       = XPI_CLS_MATCH_MISC,
+  .rhs_flags = XPI_OPERAND_LIST,
 
   .parse = &parse_in,
   .new_op = &newop_in,
@@ -220,9 +219,9 @@ struct XSParseInfixHooks infix_elem_num = {
 MODULE = Syntax::Operator::In    PACKAGE = Syntax::Operator::In
 
 BOOT:
-  boot_xs_parse_infix(0.28);
+  boot_xs_parse_infix(0.44);
 
-  register_xs_parse_infix("in", &infix_in, NULL);
+  register_xs_parse_infix("Syntax::Operator::In::in", &infix_in, NULL);
 
-  register_xs_parse_infix("elem", &infix_elem_str, NULL);
-  register_xs_parse_infix("∈",    &infix_elem_num, NULL);
+  register_xs_parse_infix("Syntax::Operator::Elem::elem", &infix_elem_str, NULL);
+  register_xs_parse_infix("Syntax::Operator::Elem::∈",    &infix_elem_num, NULL);

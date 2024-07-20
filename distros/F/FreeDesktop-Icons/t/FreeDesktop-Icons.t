@@ -11,6 +11,7 @@ my @theme = qw( png_1 png_2 svg_1 );
 
 
 my $depot = new FreeDesktop::Icons( @iconpath );
+$depot->rawpath([ 't/Raw' ]);
 ok (defined $depot, "creation");
 
 $depot->theme('png_1');
@@ -208,6 +209,12 @@ my @tests = (
 		args => ['no-exist', 22, 'Applications' ],
 		method => 'get',
 		expected => [ undef ]
+	},
+	{
+		name => 'Find raw',
+		args => ['git-icon', 22 ],
+		method => 'get',
+		expected => ['t/Raw/git-icon.png' ]
 	},
 
 );

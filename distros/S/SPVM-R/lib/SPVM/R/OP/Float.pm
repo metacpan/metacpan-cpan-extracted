@@ -44,7 +44,7 @@ C<static method mul : L<R::NDArray::Float|SPVM::R::NDArray::Float> ($y_ndarray :
 
 =head2 scamul
 
-C<static method scamul : R::NDArray::Int ($x_ndarray : L<R::NDArray::Float|SPVM::R::NDArray::Float>, $scalar_ndarray : L<R::NDArray::Float|SPVM::R::NDArray::Float>);>
+C<static method scamul : L<R::NDArray::Float|SPVM::R::NDArray::Float> ($x_ndarray : L<R::NDArray::Float|SPVM::R::NDArray::Float>, $scalar_ndarray : L<R::NDArray::Float|SPVM::R::NDArray::Float>);>
 
 =head2 div
 
@@ -52,7 +52,7 @@ C<static method div : L<R::NDArray::Float|SPVM::R::NDArray::Float> ($x_ndarray :
 
 =head2 scadiv
 
-C<static method scadiv : R::NDArray::Int ($x_ndarray : L<R::NDArray::Float|SPVM::R::NDArray::Float>, $scalar_ndarray : L<R::NDArray::Float|SPVM::R::NDArray::Float>);>
+C<static method scadiv : L<R::NDArray::Float|SPVM::R::NDArray::Float> ($x_ndarray : L<R::NDArray::Float|SPVM::R::NDArray::Float>, $scalar_ndarray : L<R::NDArray::Float|SPVM::R::NDArray::Float>);>
 
 =head2 neg
 
@@ -64,27 +64,27 @@ C<static method abs : L<R::NDArray::Float|SPVM::R::NDArray::Float> ($x_ndarray :
 
 =head2 eq
 
-C<static method eq : R::NDArray::Int ($x_ndarray : L<R::NDArray::Float|SPVM::R::NDArray::Float>, $y_ndarray : L<R::NDArray::Float|SPVM::R::NDArray::Float>);>
+C<static method eq : L<R::NDArray::Int|SPVM::R::NDArray::Int> ($x_ndarray : L<R::NDArray::Float|SPVM::R::NDArray::Float>, $y_ndarray : L<R::NDArray::Float|SPVM::R::NDArray::Float>);>
 
 =head2 ne
 
-C<static method ne : R::NDArray::Int ($x_ndarray : L<R::NDArray::Float|SPVM::R::NDArray::Float>, $y_ndarray : L<R::NDArray::Float|SPVM::R::NDArray::Float>);>
+C<static method ne : L<R::NDArray::Int|SPVM::R::NDArray::Int> ($x_ndarray : L<R::NDArray::Float|SPVM::R::NDArray::Float>, $y_ndarray : L<R::NDArray::Float|SPVM::R::NDArray::Float>);>
 
 =head2 gt
 
-C<static method gt : R::NDArray::Int ($x_ndarray : L<R::NDArray::Float|SPVM::R::NDArray::Float>, $y_ndarray : L<R::NDArray::Float|SPVM::R::NDArray::Float>);>
+C<static method gt : L<R::NDArray::Int|SPVM::R::NDArray::Int> ($x_ndarray : L<R::NDArray::Float|SPVM::R::NDArray::Float>, $y_ndarray : L<R::NDArray::Float|SPVM::R::NDArray::Float>);>
 
 =head2 ge
 
-C<static method ge : R::NDArray::Int ($x_ndarray : L<R::NDArray::Float|SPVM::R::NDArray::Float>, $y_ndarray : L<R::NDArray::Float|SPVM::R::NDArray::Float>);>
+C<static method ge : L<R::NDArray::Int|SPVM::R::NDArray::Int> ($x_ndarray : L<R::NDArray::Float|SPVM::R::NDArray::Float>, $y_ndarray : L<R::NDArray::Float|SPVM::R::NDArray::Float>);>
 
 =head2 lt
 
-C<static method lt : R::NDArray::Int ($x_ndarray : L<R::NDArray::Float|SPVM::R::NDArray::Float>, $y_ndarray : L<R::NDArray::Float|SPVM::R::NDArray::Float>);>
+C<static method lt : L<R::NDArray::Int|SPVM::R::NDArray::Int> ($x_ndarray : L<R::NDArray::Float|SPVM::R::NDArray::Float>, $y_ndarray : L<R::NDArray::Float|SPVM::R::NDArray::Float>);>
 
 =head2 le
 
-C<static method le : R::NDArray::Int ($x_ndarray : L<R::NDArray::Float|SPVM::R::NDArray::Float>, $y_ndarray : L<R::NDArray::Float|SPVM::R::NDArray::Float>);>
+C<static method le : L<R::NDArray::Int|SPVM::R::NDArray::Int> ($x_ndarray : L<R::NDArray::Float|SPVM::R::NDArray::Float>, $y_ndarray : L<R::NDArray::Float|SPVM::R::NDArray::Float>);>
 
 =head2 rep
 
@@ -270,9 +270,9 @@ C<static method min : L<R::NDArray::Float|SPVM::R::NDArray::Float> ($x_ndarray :
 
 C<static method mean : L<R::NDArray::Float|SPVM::R::NDArray::Float> ($x_ndarray : L<R::NDArray::Float|SPVM::R::NDArray::Float>);>
 
-=head2 inner
+=head2 dot
 
-C<static method inner : L<R::NDArray::Float|SPVM::R::NDArray::Float> ($x_ndarray : L<R::NDArray::Float|SPVM::R::NDArray::Float>, $y_ndarray : L<R::NDArray::Float|SPVM::R::NDArray::Float>);>
+C<static method dot : L<R::NDArray::Float|SPVM::R::NDArray::Float> ($x_ndarray : L<R::NDArray::Float|SPVM::R::NDArray::Float>, $y_ndarray : L<R::NDArray::Float|SPVM::R::NDArray::Float>);>
 
 =head2 cross
 
@@ -281,6 +281,10 @@ C<static method cross : L<R::NDArray::Float|SPVM::R::NDArray::Float> ($x_ndarray
 =head2 outer
 
 C<static method outer : L<R::NDArray::Float|SPVM::R::NDArray::Float> ($x_ndarray : L<R::NDArray::Float|SPVM::R::NDArray::Float>, $y_ndarray : L<R::NDArray::Float|SPVM::R::NDArray::Float>);>
+
+=head2 pi
+
+C<static method pi : L<R::NDArray::Float|SPVM::R::NDArray::Float> ();>
 
 =head1 See Also
 

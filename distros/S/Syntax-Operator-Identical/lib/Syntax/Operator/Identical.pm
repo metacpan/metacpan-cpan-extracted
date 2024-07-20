@@ -1,9 +1,9 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2022-2023 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2022-2024 -- leonerd@leonerd.org.uk
 
-package Syntax::Operator::Identical 0.04;
+package Syntax::Operator::Identical 0.05;
 
 use v5.14;
 use warnings;
@@ -164,14 +164,11 @@ sub apply
    my $pkg = shift;
    my ( $on, $caller, @syms ) = @_;
 
-   @syms or @syms = qw( identical );
+   @syms or @syms = qw( ≡ =:= ≢ !:= );
+
+   $pkg->XS::Parse::Infix::apply_infix( $on, \@syms, qw( ≡ =:= ≢ !:= ) );
 
    my %syms = map { $_ => 1 } @syms;
-   if( delete $syms{identical} ) {
-      $on ? $^H{"Syntax::Operator::Identical/identical"}++
-          : delete $^H{"Syntax::Operator::Identical/identical"};
-   }
-
    my $callerpkg;
 
    foreach (qw( is_identical is_not_identical )) {

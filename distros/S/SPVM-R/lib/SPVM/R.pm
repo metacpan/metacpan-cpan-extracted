@@ -1,6 +1,6 @@
 package SPVM::R;
 
-our $VERSION = "0.011";
+our $VERSION = "0.012";
 
 1;
 
@@ -47,7 +47,7 @@ B<WARNINGS:Tests are not yet done. All of method and field definitions in all cl
   my $tan_vec1 = DOP->tan($vec1);
   
   # Innner product
-  my $inner = DOP->inner($vec1, vec2);
+  my $dot = DOP->dot($vec1, vec2);
   
   # Matrix(column major)
   my $mat1 = DMOP->matrix([1, 0, 0, 1], 2, 2);

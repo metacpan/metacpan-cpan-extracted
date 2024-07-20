@@ -7,7 +7,7 @@ use 5.016000;
 use ExtUtils::MakeMaker;
 
 my %WriteMakefileArgs = (
-  "ABSTRACT" => "Program in YAML",
+  "ABSTRACT" => "Program in YAML \x{2014} Code is Data",
   "AUTHOR" => "Ingy d\x{f6}t Net <ingy\@ingy.net>",
   "CONFIGURE_REQUIRES" => {
     "ExtUtils::MakeMaker" => 0
@@ -17,7 +17,7 @@ my %WriteMakefileArgs = (
   "MIN_PERL_VERSION" => "5.016000",
   "NAME" => "YAMLScript",
   "PREREQ_PM" => {
-    "Alien::YAMLScript" => "0.1.67",
+    "Alien::YAMLScript" => "0.1.68",
     "Cpanel::JSON::XS" => "4.37",
     "FFI::CheckLib" => "0.31",
     "FFI::Platypus" => "2.08"
@@ -25,7 +25,7 @@ my %WriteMakefileArgs = (
   "TEST_REQUIRES" => {
     "Test2::V0" => "0.000159"
   },
-  "VERSION" => "0.1.67",
+  "VERSION" => "0.1.68",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -33,7 +33,7 @@ my %WriteMakefileArgs = (
 
 
 my %FallbackPrereqs = (
-  "Alien::YAMLScript" => "0.1.67",
+  "Alien::YAMLScript" => "0.1.68",
   "Cpanel::JSON::XS" => "4.37",
   "FFI::CheckLib" => "0.31",
   "FFI::Platypus" => "2.08",

@@ -1,9 +1,9 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2023 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2023-2024 -- leonerd@leonerd.org.uk
 
-package Syntax::Operator::Eqr 0.09;
+package Syntax::Operator::Eqr 0.10;
 
 use v5.14;
 use warnings;
@@ -108,12 +108,9 @@ sub apply
 
    @syms or @syms = qw( eqr );
 
-   my %syms = map { $_ => 1 } @syms;
-   if( delete $syms{eqr} ) {
-      $on ? $^H{"Syntax::Operator::Eqr/eqr"}++
-          : delete $^H{"Syntax::Operator::Eqr/eqr"};
-   }
+   $pkg->XS::Parse::Infix::apply_infix( $on, \@syms, qw( eqr ) );
 
+   my %syms = map { $_ => 1 } @syms;
    my $callerpkg;
 
    foreach (qw( is_eqr )) {

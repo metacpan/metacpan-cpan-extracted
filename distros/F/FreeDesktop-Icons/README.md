@@ -26,7 +26,8 @@ Others: $ENV{HOME} . '/.local/share/icons',  and the folders 'icons' in $ENV{XDG
 # On Windows
 
 If you use the windows operating system please make sure you have an icon library installed.
-Preferably the Oxygen theme. [Download it from here](https://github.com/KDE/oxygen-icons).
+We found a suitable one on softicons.com. [Download it from here](https://www.softicons.com/system-icons/oxygen-icons-by-oxygen).
 
-Extract the file and rename the folder oxygen-icons-master to Oxygen. 
+Extract the file and rename the folder png to Oxygen. 
 Create a folder Icons in C:\ProgramData and move the Oxygen folder into it.
+Downloading it from the Oxygen github repository gives all kinds of problems on Windows.

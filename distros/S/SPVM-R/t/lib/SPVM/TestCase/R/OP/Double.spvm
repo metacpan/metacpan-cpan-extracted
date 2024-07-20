@@ -70,7 +70,7 @@ class TestCase::R::OP::Double {
     
     return 1;
   }
-
+  
   static method sub : int () {
     
     my $x_ndarray = DOP->c([(double)1, 2], [1, 2]);
@@ -396,21 +396,469 @@ class TestCase::R::OP::Double {
     return 1;
   }
   
-  static method neg : int () { return 1; }
-
-  static method abs : int () { return 1; }
-
-  static method eq : int () { return 1; }
-
-  static method ne : int () { return 1; }
-
-  static method gt : int () { return 1; }
-
-  static method ge : int () { return 1; }
-
-  static method lt : int () { return 1; }
-
-  static method le : int () { return 1; }
+  static method neg : int () {
+    
+    my $x_ndarray = DOP->c([(double)1, 2], [1, 2]);
+    
+    my $ret_ndarray = DOP->neg($x_ndarray);
+    
+    unless ($ret_ndarray is_type R::NDArray::Double) {
+      return 0;
+    }
+    
+    unless (Array->equals_double($ret_ndarray->data, [(double)-1, -2])) {
+      return 0;
+    }
+    
+    unless (Array->equals_int($ret_ndarray->dim, [1, 2])) {
+      return 0;
+    }
+    
+    # Exceptions
+    {
+      {
+        my $x_ndarray = DOP->c([(double)1, 2], [1, 2]);
+        
+        eval { DOP->neg(undef); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+    }
+    
+    $@ = undef;
+    
+    return 1;
+  }
+  
+  static method abs : int () {
+    
+    my $x_ndarray = DOP->c([(double)1, -2], [1, 2]);
+    
+    my $ret_ndarray = DOP->abs($x_ndarray);
+    
+    unless ($ret_ndarray is_type R::NDArray::Double) {
+      return 0;
+    }
+    
+    unless (Array->equals_double($ret_ndarray->data, [(double)1, 2])) {
+      return 0;
+    }
+    
+    unless (Array->equals_int($ret_ndarray->dim, [1, 2])) {
+      return 0;
+    }
+    
+    # Exceptions
+    {
+      {
+        my $x_ndarray = DOP->c([(double)1, 2], [1, 2]);
+        
+        eval { DOP->abs(undef); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+    }
+    
+    $@ = undef;
+    
+    return 1;
+  }
+  
+  static method eq : int () {
+    
+    my $x_ndarray = DOP->c([(double)1, 1], [1, 2]);
+    
+    my $y_ndarray = DOP->c([(double)1, 2], [1, 2]);
+    
+    my $ret_ndarray = DOP->eq($x_ndarray, $y_ndarray);
+    
+    unless ($ret_ndarray is_type R::NDArray::Int) {
+      return 0;
+    }
+    
+    unless (Array->equals_int($ret_ndarray->data, [1, 0])) {
+      return 0;
+    }
+    
+    unless (Array->equals_int($ret_ndarray->dim, [1, 2])) {
+      return 0;
+    }
+    
+    # Exceptions
+    {
+      {
+        my $x_ndarray = DOP->c([(double)1, 2], [1, 2]);
+        
+        my $y_ndarray = DOP->c([(double)3, 4], [1, 2]);
+        
+        eval { DOP->eq(undef, $y_ndarray); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+      {
+        my $x_ndarray = DOP->c([(double)1, 2], [1, 2]);
+        
+        my $y_ndarray = DOP->c([(double)3, 4], [1, 2]);
+        
+        eval { DOP->eq($x_ndarray, undef); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+      {
+        my $x_ndarray = DOP->c([(double)1, 2], [1, 2]);
+        
+        my $y_ndarray = DOP->c([(double)3, 4], [2, 1]);
+        
+        eval { DOP->eq($x_ndarray, $y_ndarray); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+    }
+    
+    $@ = undef;
+    
+    return 1;
+  }
+  
+  static method ne : int () {
+    
+    my $x_ndarray = DOP->c([(double)1, 1], [1, 2]);
+    
+    my $y_ndarray = DOP->c([(double)1, 2], [1, 2]);
+    
+    my $ret_ndarray = DOP->ne($x_ndarray, $y_ndarray);
+    
+    unless ($ret_ndarray is_type R::NDArray::Int) {
+      return 0;
+    }
+    
+    unless (Array->equals_int($ret_ndarray->data, [0, 1])) {
+      return 0;
+    }
+    
+    unless (Array->equals_int($ret_ndarray->dim, [1, 2])) {
+      return 0;
+    }
+    
+    # Exceptions
+    {
+      {
+        my $x_ndarray = DOP->c([(double)1, 2], [1, 2]);
+        
+        my $y_ndarray = DOP->c([(double)3, 4], [1, 2]);
+        
+        eval { DOP->ne(undef, $y_ndarray); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+      {
+        my $x_ndarray = DOP->c([(double)1, 2], [1, 2]);
+        
+        my $y_ndarray = DOP->c([(double)3, 4], [1, 2]);
+        
+        eval { DOP->ne($x_ndarray, undef); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+      {
+        my $x_ndarray = DOP->c([(double)1, 2], [1, 2]);
+        
+        my $y_ndarray = DOP->c([(double)3, 4], [2, 1]);
+        
+        eval { DOP->ne($x_ndarray, $y_ndarray); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+    }
+    
+    $@ = undef;
+    
+    return 1;
+  }
+  
+  static method gt : int () {
+    
+    my $x_ndarray = DOP->c([(double)1, 1, 1], [1, 3]);
+    
+    my $y_ndarray = DOP->c([(double)0, 1, 2], [1, 3]);
+    
+    my $ret_ndarray = DOP->gt($x_ndarray, $y_ndarray);
+    
+    unless ($ret_ndarray is_type R::NDArray::Int) {
+      return 0;
+    }
+    
+    unless (Array->equals_int($ret_ndarray->data, [1, 0, 0])) {
+      return 0;
+    }
+    
+    unless (Array->equals_int($ret_ndarray->dim, [1, 3])) {
+      return 0;
+    }
+    
+    # Exceptions
+    {
+      {
+        my $x_ndarray = DOP->c([(double)1, 1, 1], [1, 3]);
+        
+        my $y_ndarray = DOP->c([(double)0, 1, 2], [1, 3]);
+        
+        eval { DOP->gt(undef, $y_ndarray); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+      {
+        my $x_ndarray = DOP->c([(double)1, 1, 1], [1, 3]);
+        
+        my $y_ndarray = DOP->c([(double)0, 1, 2], [1, 3]);
+        
+        eval { DOP->gt($x_ndarray, undef); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+      {
+        my $x_ndarray = DOP->c([(double)1, 1, 1], [1, 3]);
+        
+        my $y_ndarray = DOP->c([(double)0, 1, 2], [3, 1]);
+        
+        eval { DOP->gt($x_ndarray, $y_ndarray); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+    }
+    
+    $@ = undef;
+    
+    return 1;
+  }
+  
+  static method ge : int () {
+    
+    my $x_ndarray = DOP->c([(double)1, 1, 1], [1, 3]);
+    
+    my $y_ndarray = DOP->c([(double)0, 1, 2], [1, 3]);
+    
+    my $ret_ndarray = DOP->ge($x_ndarray, $y_ndarray);
+    
+    unless ($ret_ndarray is_type R::NDArray::Int) {
+      return 0;
+    }
+    
+    unless (Array->equals_int($ret_ndarray->data, [1, 1, 0])) {
+      return 0;
+    }
+    
+    unless (Array->equals_int($ret_ndarray->dim, [1, 3])) {
+      return 0;
+    }
+    
+    # Exceptions
+    {
+      {
+        my $x_ndarray = DOP->c([(double)1, 1, 1], [1, 3]);
+        
+        my $y_ndarray = DOP->c([(double)0, 1, 2], [1, 3]);
+        
+        eval { DOP->ge(undef, $y_ndarray); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+      {
+        my $x_ndarray = DOP->c([(double)1, 1, 1], [1, 3]);
+        
+        my $y_ndarray = DOP->c([(double)0, 1, 2], [1, 3]);
+        
+        eval { DOP->ge($x_ndarray, undef); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+      {
+        my $x_ndarray = DOP->c([(double)1, 1, 1], [1, 3]);
+        
+        my $y_ndarray = DOP->c([(double)0, 1, 2], [3, 1]);
+        
+        eval { DOP->ge($x_ndarray, $y_ndarray); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+    }
+    
+    $@ = undef;
+    
+    return 1;
+  }
+  
+  static method lt : int () {
+    
+    my $x_ndarray = DOP->c([(double)1, 1, 1], [1, 3]);
+    
+    my $y_ndarray = DOP->c([(double)0, 1, 2], [1, 3]);
+    
+    my $ret_ndarray = DOP->lt($x_ndarray, $y_ndarray);
+    
+    unless ($ret_ndarray is_type R::NDArray::Int) {
+      return 0;
+    }
+    
+    unless (Array->equals_int($ret_ndarray->data, [0, 0, 1])) {
+      return 0;
+    }
+    
+    unless (Array->equals_int($ret_ndarray->dim, [1, 3])) {
+      return 0;
+    }
+    
+    # Exceptions
+    {
+      {
+        my $x_ndarray = DOP->c([(double)1, 1, 1], [1, 3]);
+        
+        my $y_ndarray = DOP->c([(double)0, 1, 2], [1, 3]);
+        
+        eval { DOP->lt(undef, $y_ndarray); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+      {
+        my $x_ndarray = DOP->c([(double)1, 1, 1], [1, 3]);
+        
+        my $y_ndarray = DOP->c([(double)0, 1, 2], [1, 3]);
+        
+        eval { DOP->lt($x_ndarray, undef); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+      {
+        my $x_ndarray = DOP->c([(double)1, 1, 1], [1, 3]);
+        
+        my $y_ndarray = DOP->c([(double)0, 1, 2], [3, 1]);
+        
+        eval { DOP->lt($x_ndarray, $y_ndarray); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+    }
+    
+    $@ = undef;
+    
+    return 1;
+  }
+  
+  static method le : int () {
+    
+    my $x_ndarray = DOP->c([(double)1, 1, 1], [1, 3]);
+    
+    my $y_ndarray = DOP->c([(double)0, 1, 2], [1, 3]);
+    
+    my $ret_ndarray = DOP->le($x_ndarray, $y_ndarray);
+    
+    unless ($ret_ndarray is_type R::NDArray::Int) {
+      return 0;
+    }
+    
+    unless (Array->equals_int($ret_ndarray->data, [0, 1, 1])) {
+      return 0;
+    }
+    
+    unless (Array->equals_int($ret_ndarray->dim, [1, 3])) {
+      return 0;
+    }
+    
+    # Exceptions
+    {
+      {
+        my $x_ndarray = DOP->c([(double)1, 1, 1], [1, 3]);
+        
+        my $y_ndarray = DOP->c([(double)0, 1, 2], [1, 3]);
+        
+        eval { DOP->le(undef, $y_ndarray); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+      {
+        my $x_ndarray = DOP->c([(double)1, 1, 1], [1, 3]);
+        
+        my $y_ndarray = DOP->c([(double)0, 1, 2], [1, 3]);
+        
+        eval { DOP->le($x_ndarray, undef); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+      {
+        my $x_ndarray = DOP->c([(double)1, 1, 1], [1, 3]);
+        
+        my $y_ndarray = DOP->c([(double)0, 1, 2], [3, 1]);
+        
+        eval { DOP->le($x_ndarray, $y_ndarray); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+    }
+    
+    $@ = undef;
+    
+    return 1;
+  }
 
   static method rep : int () { return 1; }
 
@@ -420,53 +868,898 @@ class TestCase::R::OP::Double {
 
   static method seq_length : int () { return 1; }
 
-  static method sin : int () { return 1; }
+  static method sin : int () {
+    
+    my $x_ndarray = DOP->c([(double)1, -2], [1, 2]);
+    
+    my $ret_ndarray = DOP->sin($x_ndarray);
+    
+    unless ($ret_ndarray is_type R::NDArray::Double) {
+      return 0;
+    }
+    
+    unless (Array->equals_double($ret_ndarray->data, [(double)Math->sin($x_ndarray->data->[0]), Math->sin($x_ndarray->data->[1])])) {
+      return 0;
+    }
+    
+    unless (Array->equals_int($ret_ndarray->dim, [1, 2])) {
+      return 0;
+    }
+    
+    # Exceptions
+    {
+      {
+        my $x_ndarray = DOP->c([(double)1, 2], [1, 2]);
+        
+        eval { DOP->sin(undef); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+    }
+    
+    $@ = undef;
+    
+    return 1;
+  }
 
-  static method cos : int () { return 1; }
+  static method cos : int () {
+    
+    my $x_ndarray = DOP->c([(double)1, -2], [1, 2]);
+    
+    my $ret_ndarray = DOP->cos($x_ndarray);
+    
+    unless ($ret_ndarray is_type R::NDArray::Double) {
+      return 0;
+    }
+    
+    unless (Array->equals_double($ret_ndarray->data, [(double)Math->cos($x_ndarray->data->[0]), Math->cos($x_ndarray->data->[1])])) {
+      return 0;
+    }
+    
+    unless (Array->equals_int($ret_ndarray->dim, [1, 2])) {
+      return 0;
+    }
+    
+    # Exceptions
+    {
+      {
+        my $x_ndarray = DOP->c([(double)1, 2], [1, 2]);
+        
+        eval { DOP->cos(undef); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+    }
+    
+    $@ = undef;
+    
+    return 1;
+  }
 
-  static method tan : int () { return 1; }
+  static method tan : int () {
+    
+    my $x_ndarray = DOP->c([(double)1, -2], [1, 2]);
+    
+    my $ret_ndarray = DOP->tan($x_ndarray);
+    
+    unless ($ret_ndarray is_type R::NDArray::Double) {
+      return 0;
+    }
+    
+    unless (Array->equals_double($ret_ndarray->data, [(double)Math->tan($x_ndarray->data->[0]), Math->tan($x_ndarray->data->[1])])) {
+      return 0;
+    }
+    
+    unless (Array->equals_int($ret_ndarray->dim, [1, 2])) {
+      return 0;
+    }
+    
+    # Exceptions
+    {
+      {
+        my $x_ndarray = DOP->c([(double)1, 2], [1, 2]);
+        
+        eval { DOP->tan(undef); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+    }
+    
+    $@ = undef;
+    
+    return 1;
+  }
+  
+  static method sinh : int () {
+    
+    my $x_ndarray = DOP->c([(double)1, -2], [1, 2]);
+    
+    my $ret_ndarray = DOP->sinh($x_ndarray);
+    
+    unless ($ret_ndarray is_type R::NDArray::Double) {
+      return 0;
+    }
+    
+    unless (Array->equals_double($ret_ndarray->data, [(double)Math->sinh($x_ndarray->data->[0]), Math->sinh($x_ndarray->data->[1])])) {
+      return 0;
+    }
+    
+    unless (Array->equals_int($ret_ndarray->dim, [1, 2])) {
+      return 0;
+    }
+    
+    # Exceptions
+    {
+      {
+        my $x_ndarray = DOP->c([(double)1, 2], [1, 2]);
+        
+        eval { DOP->sinh(undef); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+    }
+    
+    $@ = undef;
+    
+    return 1;
+  }
 
-  static method sinh : int () { return 1; }
+  static method cosh : int () {
+    
+    my $x_ndarray = DOP->c([(double)1, -2], [1, 2]);
+    
+    my $ret_ndarray = DOP->cosh($x_ndarray);
+    
+    unless ($ret_ndarray is_type R::NDArray::Double) {
+      return 0;
+    }
+    
+    unless (Array->equals_double($ret_ndarray->data, [(double)Math->cosh($x_ndarray->data->[0]), Math->cosh($x_ndarray->data->[1])])) {
+      return 0;
+    }
+    
+    unless (Array->equals_int($ret_ndarray->dim, [1, 2])) {
+      return 0;
+    }
+    
+    # Exceptions
+    {
+      {
+        my $x_ndarray = DOP->c([(double)1, 2], [1, 2]);
+        
+        eval { DOP->cosh(undef); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+    }
+    
+    $@ = undef;
+    
+    return 1;
+  }
 
-  static method cosh : int () { return 1; }
+  static method tanh : int () {
+    
+    my $x_ndarray = DOP->c([(double)1, -2], [1, 2]);
+    
+    my $ret_ndarray = DOP->tanh($x_ndarray);
+    
+    unless ($ret_ndarray is_type R::NDArray::Double) {
+      return 0;
+    }
+    
+    unless (Array->equals_double($ret_ndarray->data, [(double)Math->tanh($x_ndarray->data->[0]), Math->tanh($x_ndarray->data->[1])])) {
+      return 0;
+    }
+    
+    unless (Array->equals_int($ret_ndarray->dim, [1, 2])) {
+      return 0;
+    }
+    
+    # Exceptions
+    {
+      {
+        my $x_ndarray = DOP->c([(double)1, 2], [1, 2]);
+        
+        eval { DOP->tanh(undef); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+    }
+    
+    $@ = undef;
+    
+    return 1;
+  }
 
-  static method tanh : int () { return 1; }
+  static method acos : int () {
+    
+    my $x_ndarray = DOP->c([(double)1, -1], [1, 2]);
+    
+    my $ret_ndarray = DOP->acos($x_ndarray);
+    
+    unless ($ret_ndarray is_type R::NDArray::Double) {
+      return 0;
+    }
+    
+    unless (Array->equals_double($ret_ndarray->data, [(double)Math->acos($x_ndarray->data->[0]), Math->acos($x_ndarray->data->[1])])) {
+      return 0;
+    }
+    
+    unless (Array->equals_int($ret_ndarray->dim, [1, 2])) {
+      return 0;
+    }
+    
+    # Exceptions
+    {
+      {
+        my $x_ndarray = DOP->c([(double)1, 2], [1, 2]);
+        
+        eval { DOP->acos(undef); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+    }
+    
+    $@ = undef;
+    
+    return 1;
+  }
+  
+  static method asin : int () {
+    
+    my $x_ndarray = DOP->c([(double)1, -1], [1, 2]);
+    
+    my $ret_ndarray = DOP->asin($x_ndarray);
+    
+    unless ($ret_ndarray is_type R::NDArray::Double) {
+      return 0;
+    }
+    
+    unless (Array->equals_double($ret_ndarray->data, [(double)Math->asin($x_ndarray->data->[0]), Math->asin($x_ndarray->data->[1])])) {
+      return 0;
+    }
+    
+    unless (Array->equals_int($ret_ndarray->dim, [1, 2])) {
+      return 0;
+    }
+    
+    # Exceptions
+    {
+      {
+        my $x_ndarray = DOP->c([(double)1, 2], [1, 2]);
+        
+        eval { DOP->asin(undef); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+    }
+    
+    $@ = undef;
+    
+    return 1;
+  }
+  
+  static method atan : int () {
+    
+    my $x_ndarray = DOP->c([(double)1, -1], [1, 2]);
+    
+    my $ret_ndarray = DOP->atan($x_ndarray);
+    
+    unless ($ret_ndarray is_type R::NDArray::Double) {
+      return 0;
+    }
+    
+    unless (Array->equals_double($ret_ndarray->data, [(double)Math->atan($x_ndarray->data->[0]), Math->atan($x_ndarray->data->[1])])) {
+      return 0;
+    }
+    
+    unless (Array->equals_int($ret_ndarray->dim, [1, 2])) {
+      return 0;
+    }
+    
+    # Exceptions
+    {
+      {
+        my $x_ndarray = DOP->c([(double)1, 2], [1, 2]);
+        
+        eval { DOP->atan(undef); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+    }
+    
+    $@ = undef;
+    
+    return 1;
+  }
+  
+  static method asinh : int () {
+    
+    my $x_ndarray = DOP->c([(double)1, -1], [1, 2]);
+    
+    my $ret_ndarray = DOP->asinh($x_ndarray);
+    
+    unless ($ret_ndarray is_type R::NDArray::Double) {
+      return 0;
+    }
+    
+    unless (Array->equals_double($ret_ndarray->data, [(double)Math->asinh($x_ndarray->data->[0]), Math->asinh($x_ndarray->data->[1])])) {
+      return 0;
+    }
+    
+    unless (Array->equals_int($ret_ndarray->dim, [1, 2])) {
+      return 0;
+    }
+    
+    # Exceptions
+    {
+      {
+        my $x_ndarray = DOP->c([(double)1, 2], [1, 2]);
+        
+        eval { DOP->asinh(undef); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+    }
+    
+    $@ = undef;
+    
+    return 1;
+  }
+  
+  static method acosh : int () {
+    
+    my $x_ndarray = DOP->c([(double)1, 2], [1, 2]);
+    
+    my $ret_ndarray = DOP->acosh($x_ndarray);
+    
+    unless ($ret_ndarray is_type R::NDArray::Double) {
+      return 0;
+    }
+    
+    unless (Array->equals_double($ret_ndarray->data, [(double)Math->acosh($x_ndarray->data->[0]), Math->acosh($x_ndarray->data->[1])])) {
+      return 0;
+    }
+    
+    unless (Array->equals_int($ret_ndarray->dim, [1, 2])) {
+      return 0;
+    }
+    
+    # Exceptions
+    {
+      {
+        my $x_ndarray = DOP->c([(double)1, 2], [1, 2]);
+        
+        eval { DOP->acosh(undef); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+    }
+    
+    $@ = undef;
+    
+    return 1;
+  }
+  
+  static method atanh : int () {
+    
+    my $x_ndarray = DOP->c([(double)1, -1], [1, 2]);
+    
+    my $ret_ndarray = DOP->atanh($x_ndarray);
+    
+    unless ($ret_ndarray is_type R::NDArray::Double) {
+      return 0;
+    }
+    
+    unless (Array->equals_double($ret_ndarray->data, [(double)Math->atanh($x_ndarray->data->[0]), Math->atanh($x_ndarray->data->[1])])) {
+      return 0;
+    }
+    
+    unless (Array->equals_int($ret_ndarray->dim, [1, 2])) {
+      return 0;
+    }
+    
+    # Exceptions
+    {
+      {
+        my $x_ndarray = DOP->c([(double)1, 2], [1, 2]);
+        
+        eval { DOP->atanh(undef); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+    }
+    
+    $@ = undef;
+    
+    return 1;
+  }
 
-  static method acos : int () { return 1; }
+  static method exp : int () {
+    
+    my $x_ndarray = DOP->c([(double)1, -1], [1, 2]);
+    
+    my $ret_ndarray = DOP->exp($x_ndarray);
+    
+    unless ($ret_ndarray is_type R::NDArray::Double) {
+      return 0;
+    }
+    
+    unless (Array->equals_double($ret_ndarray->data, [(double)Math->exp($x_ndarray->data->[0]), Math->exp($x_ndarray->data->[1])])) {
+      return 0;
+    }
+    
+    unless (Array->equals_int($ret_ndarray->dim, [1, 2])) {
+      return 0;
+    }
+    
+    # Exceptions
+    {
+      {
+        my $x_ndarray = DOP->c([(double)1, 2], [1, 2]);
+        
+        eval { DOP->exp(undef); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+    }
+    
+    $@ = undef;
+    
+    return 1;
+  }
 
-  static method asin : int () { return 1; }
-
-  static method atan : int () { return 1; }
-
-  static method asinh : int () { return 1; }
-
-  static method acosh : int () { return 1; }
-
-  static method atanh : int () { return 1; }
-
-  static method exp : int () { return 1; }
-
-  static method expm1 : int () { return 1; }
-
-  static method log : int () { return 1; }
-
-  static method logb : int () { return 1; }
-
-  static method log2 : int () { return 1; }
-
-  static method log10 : int () { return 1; }
-
-  static method sqrt : int () { return 1; }
-
-  static method isinf : int () { return 1; }
-
-  static method is_infinite : int () { return 1; }
-
-  static method is_finite : int () { return 1; }
-
-  static method isnan : int () { return 1; }
-
-  static method is_nan : int () { return 1; }
+  static method expm1 : int () {
+    
+    my $x_ndarray = DOP->c([(double)1, -1], [1, 2]);
+    
+    my $ret_ndarray = DOP->expm1($x_ndarray);
+    
+    unless ($ret_ndarray is_type R::NDArray::Double) {
+      return 0;
+    }
+    
+    unless (Array->equals_double($ret_ndarray->data, [(double)Math->expm1($x_ndarray->data->[0]), Math->expm1($x_ndarray->data->[1])])) {
+      return 0;
+    }
+    
+    unless (Array->equals_int($ret_ndarray->dim, [1, 2])) {
+      return 0;
+    }
+    
+    # Exceptions
+    {
+      {
+        my $x_ndarray = DOP->c([(double)1, 2], [1, 2]);
+        
+        eval { DOP->expm1(undef); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+    }
+    
+    $@ = undef;
+    
+    return 1;
+  }
+  
+  static method log : int () {
+    
+    my $x_ndarray = DOP->c([(double)1, 2], [1, 2]);
+    
+    my $ret_ndarray = DOP->log($x_ndarray);
+    
+    unless ($ret_ndarray is_type R::NDArray::Double) {
+      return 0;
+    }
+    
+    unless (Array->equals_double($ret_ndarray->data, [(double)Math->log($x_ndarray->data->[0]), Math->log($x_ndarray->data->[1])])) {
+      return 0;
+    }
+    
+    unless (Array->equals_int($ret_ndarray->dim, [1, 2])) {
+      return 0;
+    }
+    
+    # Exceptions
+    {
+      {
+        my $x_ndarray = DOP->c([(double)1, 2], [1, 2]);
+        
+        eval { DOP->log(undef); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+    }
+    
+    $@ = undef;
+    
+    return 1;
+  }
+  
+  static method logb : int () {
+    
+    my $x_ndarray = DOP->c([(double)1, 2], [1, 2]);
+    
+    my $ret_ndarray = DOP->logb($x_ndarray);
+    
+    unless ($ret_ndarray is_type R::NDArray::Double) {
+      return 0;
+    }
+    
+    unless (Array->equals_double($ret_ndarray->data, [(double)Math->logb($x_ndarray->data->[0]), Math->logb($x_ndarray->data->[1])])) {
+      return 0;
+    }
+    
+    unless (Array->equals_int($ret_ndarray->dim, [1, 2])) {
+      return 0;
+    }
+    
+    # Exceptions
+    {
+      {
+        my $x_ndarray = DOP->c([(double)1, 2], [1, 2]);
+        
+        eval { DOP->logb(undef); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+    }
+    
+    $@ = undef;
+    
+    return 1;
+  }
+  
+  static method log2 : int () {
+    
+    my $x_ndarray = DOP->c([(double)1, 2], [1, 2]);
+    
+    my $ret_ndarray = DOP->log2($x_ndarray);
+    
+    unless ($ret_ndarray is_type R::NDArray::Double) {
+      return 0;
+    }
+    
+    unless (Array->equals_double($ret_ndarray->data, [(double)Math->log2($x_ndarray->data->[0]), Math->log2($x_ndarray->data->[1])])) {
+      return 0;
+    }
+    
+    unless (Array->equals_int($ret_ndarray->dim, [1, 2])) {
+      return 0;
+    }
+    
+    # Exceptions
+    {
+      {
+        my $x_ndarray = DOP->c([(double)1, 2], [1, 2]);
+        
+        eval { DOP->log2(undef); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+    }
+    
+    $@ = undef;
+    
+    return 1;
+  }
+  
+  static method log10 : int () {
+    
+    my $x_ndarray = DOP->c([(double)1, 2], [1, 2]);
+    
+    my $ret_ndarray = DOP->log10($x_ndarray);
+    
+    unless ($ret_ndarray is_type R::NDArray::Double) {
+      return 0;
+    }
+    
+    unless (Array->equals_double($ret_ndarray->data, [(double)Math->log10($x_ndarray->data->[0]), Math->log10($x_ndarray->data->[1])])) {
+      return 0;
+    }
+    
+    unless (Array->equals_int($ret_ndarray->dim, [1, 2])) {
+      return 0;
+    }
+    
+    # Exceptions
+    {
+      {
+        my $x_ndarray = DOP->c([(double)1, 2], [1, 2]);
+        
+        eval { DOP->log10(undef); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+    }
+    
+    $@ = undef;
+    
+    return 1;
+  }
+  
+  static method sqrt : int () {
+    
+    my $x_ndarray = DOP->c([(double)1, 2], [1, 2]);
+    
+    my $ret_ndarray = DOP->sqrt($x_ndarray);
+    
+    unless ($ret_ndarray is_type R::NDArray::Double) {
+      return 0;
+    }
+    
+    unless (Array->equals_double($ret_ndarray->data, [(double)Math->sqrt($x_ndarray->data->[0]), Math->sqrt($x_ndarray->data->[1])])) {
+      return 0;
+    }
+    
+    unless (Array->equals_int($ret_ndarray->dim, [1, 2])) {
+      return 0;
+    }
+    
+    # Exceptions
+    {
+      {
+        my $x_ndarray = DOP->c([(double)1, 2], [1, 2]);
+        
+        eval { DOP->sqrt(undef); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+    }
+    
+    $@ = undef;
+    
+    return 1;
+  }
+  
+  static method isinf : int () {
+    
+    my $x_ndarray = DOP->c([(double)Math->INFINITY, 2], [1, 2]);
+    
+    my $ret_ndarray = DOP->isinf($x_ndarray);
+    
+    unless ($ret_ndarray is_type R::NDArray::Int) {
+      return 0;
+    }
+    
+    unless (Array->equals_int($ret_ndarray->data, [Math->isinf($x_ndarray->data->[0]), Math->isinf($x_ndarray->data->[1])])) {
+      return 0;
+    }
+    
+    unless (Array->equals_int($ret_ndarray->dim, [1, 2])) {
+      return 0;
+    }
+    
+    # Exceptions
+    {
+      {
+        my $x_ndarray = DOP->c([(double)1, 2], [1, 2]);
+        
+        eval { DOP->isinf(undef); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+    }
+    
+    $@ = undef;
+    
+    return 1;
+  }
+  
+  static method is_infinite : int () {
+    
+    my $x_ndarray = DOP->c([(double)Math->INFINITY, 2], [1, 2]);
+    
+    my $ret_ndarray = DOP->is_infinite($x_ndarray);
+    
+    unless ($ret_ndarray is_type R::NDArray::Int) {
+      return 0;
+    }
+    
+    unless (Array->equals_int($ret_ndarray->data, [Math->isinf($x_ndarray->data->[0]), Math->isinf($x_ndarray->data->[1])])) {
+      return 0;
+    }
+    
+    unless (Array->equals_int($ret_ndarray->dim, [1, 2])) {
+      return 0;
+    }
+    
+    # Exceptions
+    {
+      {
+        my $x_ndarray = DOP->c([(double)1, 2], [1, 2]);
+        
+        eval { DOP->is_infinite(undef); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+    }
+    
+    $@ = undef;
+    
+    return 1;
+  }
+  
+  static method is_finite : int () {
+    
+    my $x_ndarray = DOP->c([(double)Math->INFINITY, Math->NAN, 2], [1, 3]);
+    
+    my $ret_ndarray = DOP->is_finite($x_ndarray);
+    
+    unless ($ret_ndarray is_type R::NDArray::Int) {
+      return 0;
+    }
+    
+    unless (Array->equals_int($ret_ndarray->data, [0, 0, 1])) {
+      return 0;
+    }
+    
+    unless (Array->equals_int($ret_ndarray->data, [!Math->isinf($x_ndarray->data->[0]) && !Math->isnan($x_ndarray->data->[0]), !Math->isinf($x_ndarray->data->[1]) && !Math->isnan($x_ndarray->data->[1]), !Math->isinf($x_ndarray->data->[2]) && !Math->isnan($x_ndarray->data->[2])])) {
+      return 0;
+    }
+    
+    unless (Array->equals_int($ret_ndarray->dim, [1, 3])) {
+      return 0;
+    }
+    
+    # Exceptions
+    {
+      {
+        my $x_ndarray = DOP->c([(double)1, 2, 3], [1, 3]);
+        
+        eval { DOP->is_finite(undef); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+    }
+    
+    $@ = undef;
+    
+    return 1;
+  }
+  
+  static method isnan : int () {
+    
+    my $x_ndarray = DOP->c([(double)Math->NAN, 2], [1, 2]);
+    
+    my $ret_ndarray = DOP->isnan($x_ndarray);
+    
+    unless ($ret_ndarray is_type R::NDArray::Int) {
+      return 0;
+    }
+    
+    unless (Array->equals_int($ret_ndarray->data, [Math->isnan($x_ndarray->data->[0]), Math->isnan($x_ndarray->data->[1])])) {
+      return 0;
+    }
+    
+    unless (Array->equals_int($ret_ndarray->dim, [1, 2])) {
+      return 0;
+    }
+    
+    # Exceptions
+    {
+      {
+        my $x_ndarray = DOP->c([(double)1, 2], [1, 2]);
+        
+        eval { DOP->isnan(undef); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+    }
+    
+    $@ = undef;
+    
+    return 1;
+  }
+  
+  static method is_nan : int () {
+    
+    my $x_ndarray = DOP->c([(double)Math->NAN, 2], [1, 2]);
+    
+    my $ret_ndarray = DOP->is_nan($x_ndarray);
+    
+    unless ($ret_ndarray is_type R::NDArray::Int) {
+      return 0;
+    }
+    
+    unless (Array->equals_int($ret_ndarray->data, [Math->isnan($x_ndarray->data->[0]), Math->isnan($x_ndarray->data->[1])])) {
+      return 0;
+    }
+    
+    unless (Array->equals_int($ret_ndarray->dim, [1, 2])) {
+      return 0;
+    }
+    
+    # Exceptions
+    {
+      {
+        my $x_ndarray = DOP->c([(double)1, 2], [1, 2]);
+        
+        eval { DOP->is_nan(undef); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+    }
+    
+    $@ = undef;
+    
+    return 1;
+  }
+  
 
   static method pow : int () { return 1; }
 
@@ -474,40 +1767,917 @@ class TestCase::R::OP::Double {
 
   static method modf : int () { return 1; }
 
-  static method ceil : int () { return 1; }
+  static method ceil : int () {
+    
+    my $x_ndarray = DOP->c([(double)1.5, 2.5], [1, 2]);
+    
+    my $ret_ndarray = DOP->ceil($x_ndarray);
+    
+    unless ($ret_ndarray is_type R::NDArray::Double) {
+      return 0;
+    }
+    
+    unless (Array->equals_double($ret_ndarray->data, [(double)Math->ceil($x_ndarray->data->[0]), Math->ceil($x_ndarray->data->[1])])) {
+      return 0;
+    }
+    
+    unless (Array->equals_int($ret_ndarray->dim, [1, 2])) {
+      return 0;
+    }
+    
+    # Exceptions
+    {
+      {
+        my $x_ndarray = DOP->c([(double)1, 2], [1, 2]);
+        
+        eval { DOP->ceil(undef); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+    }
+    
+    $@ = undef;
+    
+    return 1;
+  }
+  
+  static method ceiling : int () {
+    
+    my $x_ndarray = DOP->c([(double)1.5, 2.5], [1, 2]);
+    
+    my $ret_ndarray = DOP->ceiling($x_ndarray);
+    
+    unless ($ret_ndarray is_type R::NDArray::Double) {
+      return 0;
+    }
+    
+    unless (Array->equals_double($ret_ndarray->data, [(double)Math->ceil($x_ndarray->data->[0]), Math->ceil($x_ndarray->data->[1])])) {
+      return 0;
+    }
+    
+    unless (Array->equals_int($ret_ndarray->dim, [1, 2])) {
+      return 0;
+    }
+    
+    # Exceptions
+    {
+      {
+        my $x_ndarray = DOP->c([(double)1, 2], [1, 2]);
+        
+        eval { DOP->ceiling(undef); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+    }
+    
+    $@ = undef;
+    
+    return 1;
+  }
+  
+  static method floor : int () {
+    
+    my $x_ndarray = DOP->c([(double)1.5, 2.5], [1, 2]);
+    
+    my $ret_ndarray = DOP->floor($x_ndarray);
+    
+    unless ($ret_ndarray is_type R::NDArray::Double) {
+      return 0;
+    }
+    
+    unless (Array->equals_double($ret_ndarray->data, [(double)Math->floor($x_ndarray->data->[0]), Math->floor($x_ndarray->data->[1])])) {
+      return 0;
+    }
+    
+    unless (Array->equals_int($ret_ndarray->dim, [1, 2])) {
+      return 0;
+    }
+    
+    # Exceptions
+    {
+      {
+        my $x_ndarray = DOP->c([(double)1, 2], [1, 2]);
+        
+        eval { DOP->floor(undef); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+    }
+    
+    $@ = undef;
+    
+    return 1;
+  }
+  
+  static method round : int () {
+    
+    my $x_ndarray = DOP->c([(double)1.5, 2.5], [1, 2]);
+    
+    my $ret_ndarray = DOP->round($x_ndarray);
+    
+    unless ($ret_ndarray is_type R::NDArray::Double) {
+      return 0;
+    }
+    
+    unless (Array->equals_double($ret_ndarray->data, [(double)Math->round($x_ndarray->data->[0]), Math->round($x_ndarray->data->[1])])) {
+      return 0;
+    }
+    
+    unless (Array->equals_int($ret_ndarray->dim, [1, 2])) {
+      return 0;
+    }
+    
+    # Exceptions
+    {
+      {
+        my $x_ndarray = DOP->c([(double)1, 2], [1, 2]);
+        
+        eval { DOP->round(undef); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+    }
+    
+    $@ = undef;
+    
+    return 1;
+  }
+  
+  static method lround : int () {
+    
+    my $x_ndarray = DOP->c([(double)1.5, 2.5], [1, 2]);
+    
+    my $ret_ndarray = DOP->lround($x_ndarray);
+    
+    unless ($ret_ndarray is_type R::NDArray::Long) {
+      return 0;
+    }
+    
+    unless (Array->equals_long($ret_ndarray->data, [(long)Math->lround($x_ndarray->data->[0]), Math->lround($x_ndarray->data->[1])])) {
+      return 0;
+    }
+    
+    unless (Array->equals_int($ret_ndarray->dim, [1, 2])) {
+      return 0;
+    }
+    
+    # Exceptions
+    {
+      {
+        my $x_ndarray = DOP->c([(double)1, 2], [1, 2]);
+        
+        eval { DOP->lround(undef); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+    }
+    
+    $@ = undef;
+    
+    return 1;
+  }
+  
+  static method remainder : int () {
+    
+    my $x_ndarray = DOP->c([(double)1, 3], [1, 2]);
+    
+    my $y_ndarray = DOP->c([(double)2, 4], [1, 2]);
+    
+    my $ret_ndarray = DOP->remainder($x_ndarray, $y_ndarray);
+    
+    unless ($ret_ndarray is_type R::NDArray::Double) {
+      return 0;
+    }
+    
+    unless (Array->equals_double($ret_ndarray->data, [(double)Math->remainder($x_ndarray->data->[0], $y_ndarray->data->[0]), Math->remainder($x_ndarray->data->[1], $y_ndarray->data->[1])])) {
+      return 0;
+    }
+    
+    unless (Array->equals_int($ret_ndarray->dim, [1, 2])) {
+      return 0;
+    }
+    
+    # Exceptions
+    {
+      {
+        my $x_ndarray = DOP->c([(double)1, 2], [1, 2]);
+        
+        my $y_ndarray = DOP->c([(double)3, 4], [1, 2]);
+        
+        eval { DOP->remainder(undef, $y_ndarray); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+      {
+        my $x_ndarray = DOP->c([(double)1, 2], [1, 2]);
+        
+        my $y_ndarray = DOP->c([(double)3, 4], [1, 2]);
+        
+        eval { DOP->remainder($x_ndarray, undef); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+      {
+        my $x_ndarray = DOP->c([(double)1, 2], [1, 2]);
+        
+        my $y_ndarray = DOP->c([(double)3, 4], [2, 1]);
+        
+        eval { DOP->remainder($x_ndarray, $y_ndarray); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+    }
+    
+    $@ = undef;
+    
+    return 1;
+  }
+  
+  static method fmod : int () {
+    
+    my $x_ndarray = DOP->c([(double)1, 3], [1, 2]);
+    
+    my $y_ndarray = DOP->c([(double)2, 4], [1, 2]);
+    
+    my $ret_ndarray = DOP->fmod($x_ndarray, $y_ndarray);
+    
+    unless ($ret_ndarray is_type R::NDArray::Double) {
+      return 0;
+    }
+    
+    unless (Array->equals_double($ret_ndarray->data, [(double)Math->fmod($x_ndarray->data->[0], $y_ndarray->data->[0]), Math->fmod($x_ndarray->data->[1], $y_ndarray->data->[1])])) {
+      return 0;
+    }
+    
+    unless (Array->equals_int($ret_ndarray->dim, [1, 2])) {
+      return 0;
+    }
+    
+    # Exceptions
+    {
+      {
+        my $x_ndarray = DOP->c([(double)1, 2], [1, 2]);
+        
+        my $y_ndarray = DOP->c([(double)3, 4], [1, 2]);
+        
+        eval { DOP->fmod(undef, $y_ndarray); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+      {
+        my $x_ndarray = DOP->c([(double)1, 2], [1, 2]);
+        
+        my $y_ndarray = DOP->c([(double)3, 4], [1, 2]);
+        
+        eval { DOP->fmod($x_ndarray, undef); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+      {
+        my $x_ndarray = DOP->c([(double)1, 2], [1, 2]);
+        
+        my $y_ndarray = DOP->c([(double)3, 4], [2, 1]);
+        
+        eval { DOP->fmod($x_ndarray, $y_ndarray); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+    }
+    
+    $@ = undef;
+    
+    return 1;
+  }
+  
+  static method sum : int () {
+    
+    my $x_ndarray = DOP->c([(double)1, 2], [1, 2]);
+    
+    my $ret_ndarray = DOP->sum($x_ndarray);
+    
+    unless ($ret_ndarray is_type R::NDArray::Double) {
+      return 0;
+    }
+    
+    unless (Array->equals_double($ret_ndarray->data, [(double)3])) {
+      return 0;
+    }
+    
+    unless (Array->equals_int($ret_ndarray->dim, [1])) {
+      return 0;
+    }
+    
+    # Exceptions
+    {
+      {
+        my $x_ndarray = DOP->c([(double)1, 2], [1, 2]);
+        
+        eval { DOP->sum(undef); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+    }
+    
+    $@ = undef;
+    
+    return 1;
+  }
+  
+  static method cumsum : int () {
+    
+    my $x_ndarray = DOP->c([(double)1, 2], [2]);
+    
+    my $ret_ndarray = DOP->cumsum($x_ndarray);
+    
+    unless ($ret_ndarray is_type R::NDArray::Double) {
+      return 0;
+    }
+    
+    unless (Array->equals_double($ret_ndarray->data, [(double)1, 3])) {
+      return 0;
+    }
+    
+    
+    unless (Array->equals_int($ret_ndarray->dim, [2])) {
+      return 0;
+    }
+    
+    # Exceptions
+    {
+      {
+        my $x_ndarray = DOP->c([(double)1, 2], [1, 2]);
+        
+        eval { DOP->cumsum(undef); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+      {
+        my $x_ndarray = DOP->c([(double)1, 2], [1, 2]);
+        
+        eval { DOP->cumsum($x_ndarray); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+    }
+    
+    $@ = undef;
+    
+    return 1;
+  }
+  
+  static method prod : int () {
+    
+    my $x_ndarray = DOP->c([(double)2, 3], [1, 2]);
+    
+    my $ret_ndarray = DOP->prod($x_ndarray);
+    
+    unless ($ret_ndarray is_type R::NDArray::Double) {
+      return 0;
+    }
+    
+    unless (Array->equals_double($ret_ndarray->data, [(double)6])) {
+      return 0;
+    }
+    
+    unless (Array->equals_int($ret_ndarray->dim, [1])) {
+      return 0;
+    }
+    
+    # Exceptions
+    {
+      {
+        my $x_ndarray = DOP->c([(double)1, 2], [1, 2]);
+        
+        eval { DOP->prod(undef); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+    }
+    
+    $@ = undef;
+    
+    return 1;
+  }
+  
+  static method cumprod : int () {
+    
+    my $x_ndarray = DOP->c([(double)2, 3], [2]);
+    
+    my $ret_ndarray = DOP->cumprod($x_ndarray);
+    
+    unless ($ret_ndarray is_type R::NDArray::Double) {
+      return 0;
+    }
+    
+    unless (Array->equals_double($ret_ndarray->data, [(double)2, 6])) {
+      return 0;
+    }
+    
+    
+    unless (Array->equals_int($ret_ndarray->dim, [2])) {
+      return 0;
+    }
+    
+    # Exceptions
+    {
+      {
+        my $x_ndarray = DOP->c([(double)1, 2], [1, 2]);
+        
+        eval { DOP->cumprod(undef); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+      {
+        my $x_ndarray = DOP->c([(double)1, 2], [1, 2]);
+        
+        eval { DOP->cumprod($x_ndarray); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+    }
+    
+    $@ = undef;
+    
+    return 1;
+  }
+  
+  static method diff : int () {
+    
+    my $x_ndarray = DOP->c([(double)2, 3, 6], [3]);
+    
+    my $ret_ndarray = DOP->diff($x_ndarray);
+    
+    unless ($ret_ndarray is_type R::NDArray::Double) {
+      return 0;
+    }
+    
+    unless (Array->equals_double($ret_ndarray->data, [(double)1, 3])) {
+      return 0;
+    }
+    
+    
+    unless (Array->equals_int($ret_ndarray->dim, [2])) {
+      return 0;
+    }
+    
+    # Exceptions
+    {
+      {
+        my $x_ndarray = DOP->c([(double)1, 2], [1, 2]);
+        
+        eval { DOP->diff(undef); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+      {
+        my $x_ndarray = DOP->c([(double)1, 2], [1, 2]);
+        
+        eval { DOP->diff($x_ndarray); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+    }
+    
+    $@ = undef;
+    
+    return 1;
+  }
+  
+  static method max : int () {
+    
+    my $x_ndarray = DOP->c([(double)-1, 0, 1], [1, 3]);
+    
+    my $ret_ndarray = DOP->max($x_ndarray);
+    
+    unless ($ret_ndarray is_type R::NDArray::Double) {
+      return 0;
+    }
+    
+    unless (Array->equals_double($ret_ndarray->data, [(double)1])) {
+      return 0;
+    }
+    
+    unless (Array->equals_int($ret_ndarray->dim, [1])) {
+      return 0;
+    }
+    
+    # Exceptions
+    {
+      {
+        my $x_ndarray = DOP->c([(double)1, 2], [1, 2]);
+        
+        eval { DOP->max(undef); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+    }
+    
+    $@ = undef;
+    
+    return 1;
+  }
+  
+  static method min : int () {
+    
+    my $x_ndarray = DOP->c([(double)-1, 0, 1], [1, 3]);
+    
+    my $ret_ndarray = DOP->min($x_ndarray);
+    
+    unless ($ret_ndarray is_type R::NDArray::Double) {
+      return 0;
+    }
+    
+    unless (Array->equals_double($ret_ndarray->data, [(double)-1])) {
+      return 0;
+    }
+    
+    unless (Array->equals_int($ret_ndarray->dim, [1])) {
+      return 0;
+    }
+    
+    # Exceptions
+    {
+      {
+        my $x_ndarray = DOP->c([(double)1, 2], [1, 2]);
+        
+        eval { DOP->min(undef); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+    }
+    
+    $@ = undef;
+    
+    return 1;
+  }
+  
+  static method mean : int () {
+    
+    my $x_ndarray = DOP->c([(double)-2, -1, 0, 1, 2]);
+    
+    my $ret_ndarray = DOP->mean($x_ndarray);
+    
+    unless ($ret_ndarray is_type R::NDArray::Double) {
+      return 0;
+    }
+    
+    unless (Array->equals_double($ret_ndarray->data, [(double)0])) {
+      return 0;
+    }
+    
+    unless (Array->equals_int($ret_ndarray->dim, [1])) {
+      return 0;
+    }
+    
+    # Exceptions
+    {
+      {
+        my $x_ndarray = DOP->c([(double)1, 2], [1, 2]);
+        
+        eval { DOP->mean(undef); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+    }
+    
+    $@ = undef;
+    
+    return 1;
+  }
+  
+  static method dot : int () {
+    
+    my $x_ndarray = DOP->c([(double)1, 2]);
+    
+    my $y_ndarray = DOP->c([(double)3, 4]);
+    
+    my $ret_ndarray = DOP->dot($x_ndarray, $y_ndarray);
+    
+    unless ($ret_ndarray is_type R::NDArray::Double) {
+      return 0;
+    }
+    
+    unless (Array->equals_double($ret_ndarray->data, [(double)11])) {
+      return 0;
+    }
+    
+    unless (Array->equals_int($ret_ndarray->dim, [1])) {
+      return 0;
+    }
+    
+    # Exceptions
+    {
+      {
+        my $x_ndarray = DOP->c([(double)1, 2]);
+        
+        my $y_ndarray = DOP->c([(double)3, 4]);
+        
+        eval { DOP->dot(undef, $y_ndarray); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+      {
+        my $x_ndarray = DOP->c([(double)1, 2]);
+        
+        my $y_ndarray = DOP->c([(double)3, 4]);
+        
+        eval { DOP->dot($x_ndarray, undef); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+      {
+        my $x_ndarray = DOP->c([(double)1, 2], [1, 2]);
+        
+        my $y_ndarray = DOP->c([(double)3, 4]);
+        
+        eval { DOP->dot($x_ndarray, $y_ndarray); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+      {
+        my $x_ndarray = DOP->c([(double)1, 2]);
+        
+        my $y_ndarray = DOP->c([(double)3, 4], [1, 2]);
+        
+        eval { DOP->dot($x_ndarray, $y_ndarray); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+      {
+        my $x_ndarray = DOP->c([(double)1, 2]);
+        
+        my $y_ndarray = DOP->c([(double)3, 4, 5]);
+        
+        eval { DOP->dot($x_ndarray, $y_ndarray); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+    }
+    
+    $@ = undef;
+    
+    return 1;
+  }
+  
+  static method cross : int () {
+    
+    my $x_ndarray = DOP->c([(double)1, 2, 3]);
+    
+    my $y_ndarray = DOP->c([(double)4, 5, 6]);
+    
+    my $ret_ndarray = DOP->cross($x_ndarray, $y_ndarray);
+    
+    unless ($ret_ndarray is_type R::NDArray::Double) {
+      return 0;
+    }
+    
+    unless (Array->equals_double($ret_ndarray->data, [(double)-3, 6, -3])) {
+      return 0;
+    }
+    
+    unless (Array->equals_int($ret_ndarray->dim, [3])) {
+      return 0;
+    }
+    
+    # Exceptions
+    {
+      {
+        my $x_ndarray = DOP->c([(double)1, 2, 3]);
+        
+        my $y_ndarray = DOP->c([(double)4, 5, 6]);
+        
+        eval { DOP->cross(undef, $y_ndarray); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+      {
+        my $x_ndarray = DOP->c([(double)1, 2, 3]);
+        
+        my $y_ndarray = DOP->c([(double)4, 5, 6]);
+        
+        eval { DOP->cross($x_ndarray, undef); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+      {
+        my $x_ndarray = DOP->c([(double)1, 2, 3], [1, 3]);
+        
+        my $y_ndarray = DOP->c([(double)4, 5, 6]);
+        
+        eval { DOP->cross($x_ndarray, $y_ndarray); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+      {
+        my $x_ndarray = DOP->c([(double)1, 2, 3]);
+        
+        my $y_ndarray = DOP->c([(double)4, 5, 6], [1, 3]);
+        
+        eval { DOP->cross($x_ndarray, $y_ndarray); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+      {
+        my $x_ndarray = DOP->c([(double)1, 2, 3, 4]);
+        
+        my $y_ndarray = DOP->c([(double)4, 5, 6]);
+        
+        eval { DOP->cross($x_ndarray, $y_ndarray); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+      {
+        my $x_ndarray = DOP->c([(double)1, 2, 3]);
+        
+        my $y_ndarray = DOP->c([(double)4, 5, 6, 7]);
+        
+        eval { DOP->cross($x_ndarray, $y_ndarray); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+    }
+    
+    $@ = undef;
+    
+    return 1;
+  }
+  
+  static method outer : int () {
+    
+    my $x_ndarray = DOP->c([(double)1, 2]);
+    
+    my $y_ndarray = DOP->c([(double)3, 4, 5]);
+    
+    my $ret_ndarray = DOP->outer($x_ndarray, $y_ndarray);
+    
+    unless ($ret_ndarray is_type R::NDArray::Double) {
+      return 0;
+    }
+    
+    unless (Array->equals_double($ret_ndarray->data, [(double)3, 6, 4, 8, 5, 10])) {
+      return 0;
+    }
+    
+    unless (Array->equals_int($ret_ndarray->dim, [2, 3])) {
+      return 0;
+    }
+    
+    # Exceptions
+    {
+      {
+        my $x_ndarray = DOP->c([(double)1, 2]);
+        
+        my $y_ndarray = DOP->c([(double)3, 4]);
+        
+        eval { DOP->outer(undef, $y_ndarray); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+      {
+        my $x_ndarray = DOP->c([(double)1, 2]);
+        
+        my $y_ndarray = DOP->c([(double)3, 4]);
+        
+        eval { DOP->outer($x_ndarray, undef); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+      {
+        my $x_ndarray = DOP->c([(double)1, 2], [1, 2]);
+        
+        my $y_ndarray = DOP->c([(double)3, 4]);
+        
+        eval { DOP->outer($x_ndarray, $y_ndarray); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+      {
+        my $x_ndarray = DOP->c([(double)1, 2]);
+        
+        my $y_ndarray = DOP->c([(double)3, 4], [1, 2]);
+        
+        eval { DOP->outer($x_ndarray, $y_ndarray); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+    }
+    
+    $@ = undef;
+    
+    return 1;
+  }
 
-  static method ceiling : int () { return 1; }
-
-  static method floor : int () { return 1; }
-
-  static method round : int () { return 1; }
-
-  static method lround : int () { return 1; }
-
-  static method remainder : int () { return 1; }
-
-  static method fmod : int () { return 1; }
-
-  static method sum : int () { return 1; }
-
-  static method cumsum : int () { return 1; }
-
-  static method prod : int () { return 1; }
-
-  static method cumprod : int () { return 1; }
-
-  static method diff : int () { return 1; }
-
-  static method max : int () { return 1; }
-
-  static method min : int () { return 1; }
-
-  static method mean : int () { return 1; }
-
-  static method inner : int () { return 1; }
-
-  static method cross : int () { return 1; }
-
-  static method outer : int () { return 1; }
+  static method pi : int () { return 1; }
 
 }

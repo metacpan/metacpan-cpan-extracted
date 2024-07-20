@@ -3,7 +3,7 @@
 #
 #  (C) Paul Evans, 2021-2024 -- leonerd@leonerd.org.uk
 
-package XS::Parse::Infix 0.43;
+package XS::Parse::Infix 0.44;
 
 use v5.14;
 use warnings;
@@ -150,9 +150,7 @@ sub apply_infix
       croak "Unrecognised apply_infix options " . join( ", ", sort keys %opts )
          if %opts;
 
-      # localname must either be an identifier, or entirely non-identifier
-      # characters
-      $localname =~ m/\A\p{ID_Start}\p{ID_Continue}*\Z/ or $localname !~ m/\p{ID_Start}/ or
+      XS::Parse::Infix::check_opname( $localname ) or
          croak "Local name '$localname' for imported operator $name is invalid";
 
       my $hintkey = "XS::Parse::Infix/$localname";

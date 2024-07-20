@@ -1,7 +1,7 @@
 /*  You may distribute under the terms of either the GNU General Public License
  *  or the Artistic License (the same terms as Perl itself)
  *
- *  (C) Paul Evans, 2016-2021 -- leonerd@leonerd.org.uk
+ *  (C) Paul Evans, 2016-2024 -- leonerd@leonerd.org.uk
  */
 #include "EXTERN.h"
 #include "perl.h"
@@ -42,7 +42,6 @@ static OP *new_op_divides(pTHX_ U32 flags, OP *lhs, OP *rhs, SV **parsedata, voi
 static const struct XSParseInfixHooks hooks_divides = {
   .cls               = XPI_CLS_MATCH_MISC,
   .wrapper_func_name = "Syntax::Operator::Divides::is_divisor",
-  .permit_hintkey    = "Syntax::Operator::Divides/divides",
   .new_op            = &new_op_divides,
   .ppaddr            = &pp_divides,
 };
@@ -50,6 +49,6 @@ static const struct XSParseInfixHooks hooks_divides = {
 MODULE = Syntax::Operator::Divides    PACKAGE = Syntax::Operator::Divides
 
 BOOT:
-  boot_xs_parse_infix(0.27);
+  boot_xs_parse_infix(0.43);
 
-  register_xs_parse_infix("%%", &hooks_divides, NULL);
+  register_xs_parse_infix("Syntax::Operator::Divides::%%", &hooks_divides, NULL);

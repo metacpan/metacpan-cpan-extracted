@@ -1,7 +1,7 @@
 /*  You may distribute under the terms of either the GNU General Public License
  *  or the Artistic License (the same terms as Perl itself)
  *
- *  (C) Paul Evans, 2022 -- leonerd@leonerd.org.uk
+ *  (C) Paul Evans, 2022-2024 -- leonerd@leonerd.org.uk
  */
 #define PERL_NO_GET_CONTEXT
 
@@ -127,27 +127,25 @@ static OP *pp_notidentical(pTHX)
 static const struct XSParseInfixHooks hooks_identical = {
   .cls               = XPI_CLS_EQUALITY,
   .wrapper_func_name = "Syntax::Operator::Identical::is_identical",
-  .permit_hintkey    = "Syntax::Operator::Identical/identical",
   .ppaddr            = &pp_identical,
 };
 
 static const struct XSParseInfixHooks hooks_notidentical = {
   .cls               = XPI_CLS_RELATION,
   .wrapper_func_name = "Syntax::Operator::Identical::is_not_identical",
-  .permit_hintkey    = "Syntax::Operator::Identical/identical",
   .ppaddr            = &pp_notidentical,
 };
 
 MODULE = Syntax::Operator::Identical    PACKAGE = Syntax::Operator::Identical
 
 BOOT:
-  boot_xs_parse_infix(0.26);
+  boot_xs_parse_infix(0.44);
 
-  register_xs_parse_infix("≡",   &hooks_identical, NULL);
-  register_xs_parse_infix("=:=", &hooks_identical, NULL);
+  register_xs_parse_infix("Syntax::Operator::Identical::≡",   &hooks_identical, NULL);
+  register_xs_parse_infix("Syntax::Operator::Identical::=:=", &hooks_identical, NULL);
 
-  register_xs_parse_infix("≢",   &hooks_notidentical, NULL);
-  register_xs_parse_infix("!:=", &hooks_notidentical, NULL);
+  register_xs_parse_infix("Syntax::Operator::Identical::≢",   &hooks_notidentical, NULL);
+  register_xs_parse_infix("Syntax::Operator::Identical::!:=", &hooks_notidentical, NULL);
 
   /* TODO: Consider adding some sort of rpeep integration into XPI so we can
    *   optimise not(identical) into notidentical or vice-versa

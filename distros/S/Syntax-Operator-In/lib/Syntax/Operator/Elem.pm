@@ -3,7 +3,7 @@
 #
 #  (C) Paul Evans, 2022-2024 -- leonerd@leonerd.org.uk
 
-package Syntax::Operator::Elem 0.09;
+package Syntax::Operator::Elem 0.10;
 
 use v5.14;
 use warnings;
@@ -87,14 +87,11 @@ sub apply
 
    require Syntax::Operator::In;  # no import
 
-   @syms or @syms = qw( elem );
+   @syms or @syms = qw( elem ∈ );
+
+   $pkg->XS::Parse::Infix::apply_infix( $on, \@syms, qw( elem ∈ ) );
 
    my %syms = map { $_ => 1 } @syms;
-   if( delete $syms{elem} ) {
-      $on ? $^H{"Syntax::Operator::Elem/elem"}++
-          : delete $^H{"Syntax::Operator::Elem/elem"};
-   }
-
    my $callerpkg;
 
    foreach (qw( elem_str elem_num )) {
