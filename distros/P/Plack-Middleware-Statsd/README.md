@@ -4,7 +4,7 @@ Plack::Middleware::Statsd - send statistics to statsd
 
 # VERSION
 
-version v0.7.0
+version v0.7.1
 
 # SYNOPSIS
 
@@ -326,7 +326,7 @@ Library [https://www.sciencephoto.com](https://www.sciencephoto.com).
 
 # COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2018-2023 by Robert Rothenberg.
+This software is Copyright (c) 2018-2024 by Robert Rothenberg.
 
 This is free software, licensed under:
 

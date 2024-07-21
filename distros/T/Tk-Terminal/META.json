@@ -32,10 +32,11 @@
       },
       "runtime" : {
          "requires" : {
+            "Getopt::Long" : "2.54",
             "IO::Handle" : "1.52",
             "Test::Tk" : "3.03",
             "Tk" : "804.031",
-            "Tk::TextANSIColor" : "0.16"
+            "Tk::TextANSIColor" : "0.15"
          }
       }
    },
@@ -47,6 +48,6 @@
          "web" : "https://github.com/haje61/Tk-Terminal"
       }
    },
-   "version" : "0.01",
+   "version" : "0.03",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

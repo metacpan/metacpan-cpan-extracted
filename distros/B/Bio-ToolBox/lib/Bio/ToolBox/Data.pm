@@ -1,5 +1,1229 @@
 package Bio::ToolBox::Data;
-our $VERSION = '1.69';
+
+use warnings;
+use strict;
+use Carp         qw(carp cluck croak confess);
+use List::Util   qw(sum0);
+use Scalar::Util qw(looks_like_number);
+use base 'Bio::ToolBox::Data::core';
+use Bio::ToolBox::Data::Iterator;
+use Bio::ToolBox::db_helper qw(
+	get_new_feature_list
+	get_new_genome_list
+	get_db_feature
+);
+use Bio::ToolBox::utility qw(simplify_dataset_name sane_chromo_sort);
+use Module::Load;
+
+our $VERSION = '2.00';
+
+### Initialize
+
+sub new {
+	my $class = shift;
+	my %args  = @_;
+	if ( ref $class ) {
+		$class = ref $class;
+	}
+
+	# check for important arguments
+	$args{features} ||= $args{feature} || 'gene';
+	$args{stream}   ||= $args{Stream}  || 0;
+	$args{file}     ||= $args{in}      || undef;
+	$args{parse}    ||= 0;
+	$args{noheader} ||= 0;
+
+	# check for stream
+	if ( $args{stream} ) {
+		$class = 'Bio::ToolBox::Data::Stream';
+		load($class);
+		return $class->new(@_);
+	}
+
+	# initialize
+	my $self = $class->SUPER::new();
+
+	# prepare a new table based on the provided arguments
+	if ( $args{file} and $args{parse} ) {
+
+		# parse from file
+		$args{subfeature} ||= q();
+		unless ( $self->parse_table( \%args ) ) {
+			my $l = $self->load_file( $args{file} );
+			return unless $l;
+			if (    $self->database
+				and $self->database =~ /^Parsed:(.+)$/x
+				and $self->feature_type eq 'named' )
+			{
+
+				# looks like the loaded file was from a previously parsed table
+				# let's try this again
+				# this may die if it doesn't work
+				$args{file}    = $1;
+				$args{feature} = $self->feature;
+				$self->parse_table( \%args );
+			}
+		}
+	}
+	elsif ( $args{file} ) {
+
+		# load from file
+		unless ( $self->load_file( $args{file}, $args{noheader} ) ) {
+			return;
+		}
+	}
+	elsif ( exists $args{db} and $args{features} ) {
+
+		# generate new list
+		$self->feature( $args{features} );
+		$self->database( $args{db} );
+		$args{data} = $self;
+		my $result;
+		if ( $args{features} eq 'genome' ) {
+
+			# create a genomic interval list
+			# first must parse any exclusion list provided as a new Data object
+			$args{blacklist} ||= $args{exclude} || undef;
+			if ( defined $args{blacklist} ) {
+				my $exclusion_Data = $self->new(
+					file  => $args{blacklist},
+					parse => 0                   # we don't need to parse
+				);
+				if ( $exclusion_Data and $exclusion_Data->feature_type eq 'coordinate' ) {
+					printf "   Loaded %d exclusion list items\n",
+						$exclusion_Data->number_rows;
+					delete $args{blacklist};
+					delete $args{exclude};
+					$args{exclude} = $exclusion_Data;
+				}
+				else {
+					carp
+"ERROR: Cannot not load exclusion coordinate list file $args{blacklist}!";
+					return;
+				}
+			}
+			$result = get_new_genome_list(%args);
+		}
+		else {
+			$result = get_new_feature_list(%args);
+		}
+		unless ($result) {
+			carp "ERROR: Cannot generate new $args{features} list!";
+			return;
+		}
+	}
+	else {
+		# a new empty structure
+
+		# check to see if user provided column names
+		$args{columns} ||= $args{datasets} || undef;
+		if ( defined $args{columns} ) {
+			foreach my $c ( @{ $args{columns} } ) {
+				$self->add_column($c);
+			}
+			$self->{feature} = $args{feature} if exists $args{feature};
+		}
+
+		# or possibly a specified format structure
+		elsif ( exists $args{gff} and $args{gff} ) {
+
+			# use standard names for the number of columns indicated
+			# we trust that the user knows the subtle difference between gff versions
+			$self->add_gff_metadata( $args{gff} );
+			unless ( $self->extension =~ /g[tf]f/ ) {
+				$self->{extension} =
+					  $args{gff} == 2.5 ? '.gtf'
+					: $args{gff} == 3   ? '.gff3'
+					:                     '.gff';
+			}
+		}
+		elsif ( exists $args{bed} and $args{bed} ) {
+
+			# use standard names for the number of columns indicated
+			unless ( $args{bed} =~ /^\d{1,2}$/ and $args{bed} >= 3 ) {
+				carp 'ERROR: bed parameter must be an integer 3-12!';
+				return;
+			}
+			$self->add_bed_metadata( $args{bed} );
+			unless ( $self->extension =~ /bed|peak/ ) {
+				$self->{extension} = '.bed';
+			}
+		}
+		elsif ( exists $args{ucsc} and $args{ucsc} ) {
+
+			# a ucsc format such as refFlat, genePred, or genePredExt
+			my $u = $self->add_ucsc_metadata( $args{ucsc} );
+			unless ($u) {
+				carp 'ERROR: unrecognized number of columns for ucsc format!';
+				return;
+			}
+			unless ( $self->extension =~ m/ucsc | ref+lat | genepred/xi ) {
+				$self->{extension} = '.ucsc';
+			}
+		}
+	}
+
+	return $self;
+}
+
+sub duplicate {
+	my $self = shift;
+
+	# duplicate the data structure
+	my $columns = $self->list_columns;
+	my $Dupe    = $self->new( 'columns' => $columns, )
+		or return;
+
+	# copy the metadata
+	for my $i ( 1 .. $self->number_columns ) {
+
+		# column metadata
+		my %md = $self->metadata($i);
+		$Dupe->{$i} = \%md;
+	}
+	foreach (qw(feature program db bed gff ucsc vcf headers)) {
+
+		# various keys
+		$Dupe->{$_} = $self->{$_};
+	}
+	my @comments = $self->comments;
+	push @{ $Dupe->{comments} }, @comments;
+
+	return $Dupe;
+}
+
+sub parse_table {
+	my $self = shift;
+	my $args = shift;
+	my $file;
+	if ( ref($args) eq 'HASH' ) {
+		$file = $args->{file} || q();
+	}
+	else {
+		# no hash reference, assume just a file name
+		$file = $args;
+		$args = {};      # empty hash for below
+	}
+	unless ($file) {
+		carp 'ERROR: no annotation file provided to parse!';
+		return;
+	}
+
+	# taste the file and open parser object
+	my ( $flavor, $format ) = $self->taste_file($file);
+	my $parser;
+	if ( defined $flavor ) {
+		eval {
+			load 'Bio::ToolBox::Parser';
+			$parser = Bio::ToolBox::Parser->new(
+				file     => $file,
+				flavor   => $flavor,
+				'format' => $format,
+			);
+		};
+		unless ($parser) {
+
+			# no parser object means no suitable parser adapter
+			return 0;
+		}
+	}
+	else {
+		# not suitable for parsing
+		return 0;
+	}
+	$self->format($format);    # specify the specific format
+
+	# additional user parameters
+	my $feature    = $args->{feature}    || q();
+	my $subfeature = $args->{subfeature} || q();
+	my $simplify =
+		( exists $args->{simplify} and defined $args->{simplify} )
+		? $args->{simplify}
+		: 1;                   # default is to simplify
+
+	# set feature based on the type list from the parser
+	my $typelist = $parser->typelist;
+	unless ($feature) {
+		if ( $typelist =~ /\b gene \b/xi ) {
+			$feature = 'gene';
+		}
+		elsif ( $typelist =~ /rna/i ) {
+			$feature = 'rna';    # generic RNA
+		}
+	}
+
+	# set additional parser parameters
+	$parser->simplify($simplify);
+	if ($subfeature) {
+		$parser->do_exon(1)  if $subfeature =~ /exon/i;
+		$parser->do_cds(1)   if $subfeature =~ /cds/i;
+		$parser->do_utr(1)   if $subfeature =~ /utr | untranslated/xi;
+		$parser->do_codon(1) if $subfeature =~ /codon/i;
+	}
+	if ( $feature =~ /gene$/i ) {
+		$parser->do_gene(1);
+	}
+	else {
+		$parser->do_gene(0);
+	}
+	my $mrna_check = 0;
+	if ( lc($feature) eq 'mrna' and $parser->typelist !~ /mrna/i and not $self->last_row )
+	{
+		# user requested mRNA for a new data file but it's not present in the type list
+		# look for it the hard way by parsing CDS too - sigh
+		load( 'Bio::ToolBox::GeneTools', 'is_coding' );
+		$parser->do_cds(1);
+		$mrna_check = 1;
+	}
+
+	# parse the table
+	$parser->parse_file or return;
+
+	# store the SeqFeature objects
+	if ( $self->number_rows > 0 ) {
+
+		# we already have a table, presumably representing the features
+		my $count = 0;
+		my @missing;
+		$self->iterate(
+			sub {
+				my $row = shift;
+				my $f   = $parser->fetch( $row->id );
+				if ($f) {
+					$self->store_seqfeature( $row->row_index, $f );
+					$count++;
+				}
+				else {
+					push @missing, $row->id;
+				}
+			}
+		);
+		if ( $count != $self->number_rows ) {
+			my $n = $self->number_rows;
+			my $d = $n - $count;
+			my $list;
+			if ( scalar @missing <= 10 ) {
+				$list = join ', ', @missing;
+			}
+			else {
+				$list = sprintf "%s...", join ', ',
+					( map { $_ || q() } @missing[ 0 .. 9 ] );
+			}
+			croak <<PARSEFAIL;
+
+ There were $d features out of $n that failed to match to a corresponding SeqFeature
+ in the annotation file '$file'. 
+ Missing IDs include: $list.
+ This may happen when the annotation file has changed or is not being parsed in the 
+ same manner. Suggestions include using the original annotation file or generating
+ a new table.
+PARSEFAIL
+		}
+	}
+	else {
+		# create a new table
+		$self->add_column('Primary_ID');
+		$self->add_column('Name');
+
+		# check for chromosome exclude
+		my $chr_exclude;
+		if ($args) {
+			$chr_exclude = $args->{chrskip} || undef;
+		}
+
+		# fill table with features
+		while ( my $f = $parser->next_top_feature ) {
+			if ($chr_exclude) {
+				next if $f->seq_id =~ m/$chr_exclude/xi;
+			}
+			if ($feature) {
+
+				# specific features are requested, look for them
+				if (   ( $f->type =~ /$feature/i )
+					or ( $mrna_check and is_coding($f) ) )
+				{
+					my $index = $self->add_row( [ $f->primary_id, $f->display_name ] );
+					$self->store_seqfeature( $index, $f );
+				}
+			}
+			else {
+				# no feature defined, take everything
+				my $index = $self->add_row( [ $f->primary_id, $f->display_name ] );
+				$self->store_seqfeature( $index, $f );
+			}
+		}
+		unless ( $self->number_rows > 0 ) {
+			printf
+" Zero '%s' features found!\n Check your feature or try generic features like gene, mRNA, or transcript\n",
+				$feature;
+		}
+		$self->database("Parsed:$file");
+		$self->feature($feature);
+		$self->add_comment("Chromosomes excluded: $chr_exclude") if $chr_exclude;
+
+		# add input parsed file metadata
+		$self->add_file_metadata($file);
+
+		# but delete some stuff, just want basename
+		$self->{extension} = q();
+		$self->{filename}  = q();
+		$self->{path}      = q();
+	}
+
+	# successfully parsed
+	return 1;
+}
+
+### Column manipulation
+
+sub column_values {
+	my ( $self, $column ) = @_;
+	return unless defined $column;
+	return unless exists $self->{$column};
+	my @values = map { $self->value( $_, $column ) } ( 0 .. $self->last_row );
+	return wantarray ? @values : \@values;
+}
+
+sub add_column {
+	my ( $self, $name ) = @_;
+	return unless $name;
+	my $column = $self->number_columns + 1;
+	$self->{'data_table'}->[0] ||= ['BLANK'];    # make sure we have a header row
+
+	# check for array of column data
+	my $name_ref = ref $name;
+	if ( $name_ref eq 'ARRAY' ) {
+		if ( $self->last_row > 1 ) {
+
+			# table has existing data beyond column headers
+			if ( $self->last_row == ( scalar @{$name} - 1 ) ) {
+
+				# same number of elements, add it the table
+				$self->{$column} = {
+					'name'  => $name->[0],
+					'index' => $column,
+				};
+				for my $r ( 0 .. $self->last_row ) {
+					$self->{data_table}->[$r][$column] = $name->[$r];
+				}
+			}
+			else {
+				# different number of elements
+				cluck 'ERROR: array has different number of elements than Data table!';
+				return;
+			}
+		}
+		else {
+			# table has no existing data
+			$self->{$column} = {
+				'name'  => $name->[0],
+				'index' => $column,
+			};
+			for my $r ( 0 .. $#{$name} ) {
+				$self->{data_table}->[$r][$column] = $name->[$r];
+
+				# this may auto-vivify an undefined value as first element
+			}
+			$self->{last_row} = $#{$name};
+			$self->{headers}  = 1;
+		}
+	}
+	elsif ( $name_ref eq 'Bio::DB::GFF::Typename' ) {
+
+		# a Typename object that was selected from a SeqFeature::Store database
+		$self->{$column} = {
+			'name'  => $name->asString,
+			'index' => $column,
+		};
+		$self->{data_table}->[0][$column] = $name->asString;
+		$self->{headers} = 1;
+	}
+	elsif ( $name_ref eq q() ) {
+
+		# just a name
+		$self->{$column} = {
+			'name'  => $name,
+			'index' => $column,
+		};
+		$self->{data_table}->[0][$column] = $name;
+	}
+	else {
+		cluck
+"ERROR: unrecognized reference '$name_ref'! pass a scalar value or array reference";
+		return;
+	}
+
+	# update metadata
+	$self->{number_columns} = $column;
+	delete $self->{column_indices} if exists $self->{column_indices};
+
+	return $column;
+}
+
+sub copy_column {
+	my $self  = shift;
+	my $index = shift;
+	return unless defined $index;
+	my $data      = $self->column_values($index);
+	my $new_index = $self->add_column($data);
+	$self->copy_metadata( $index, $new_index );
+	return $new_index;
+}
+
+### Rows and Data access
+
+sub add_row {
+	my $self = shift;
+	my @row_data;
+	if ( $_[0] and ref( $_[0] ) eq 'ARRAY' ) {
+		@row_data = @{ $_[0] };
+	}
+	elsif ( $_[0] and ref( $_[0] ) eq 'Bio::ToolBox::Data::Feature' ) {
+		@row_data = $_[0]->row_values;
+	}
+	elsif ( $_[0] and $_[0] =~ /\t/ ) {
+		@row_data = split /\t/, $_[0];
+	}
+	else {
+		@row_data = map {'.'} ( 1 .. $self->{number_columns} );
+	}
+	if ( scalar(@row_data) > $self->{number_columns} ) {
+		carp
+'ERROR: row added has more elements than table columns! truncating row elements';
+		splice @row_data, 0, $self->{number_columns};
+	}
+	elsif ( scalar(@row_data) < $self->{number_columns} ) {
+		push @row_data, ( '.' x ( $self->{number_columns} - scalar(@row_data) ) );
+	}
+	unshift @row_data, q();    # blank element to shift index
+	my $row_index = $self->{last_row} + 1;
+	$self->{data_table}->[$row_index] = \@row_data;
+	$self->{last_row}++;
+	return $row_index;
+}
+
+sub get_row {
+	my ( $self, $row_number ) = @_;
+	return unless defined $self->{data_table}->[$row_number];
+	my @options = (
+		'data'  => $self,
+		'index' => $row_number,
+	);
+	if ( exists $self->{SeqFeatureObjects}
+		and defined $self->{SeqFeatureObjects}->[$row_number] )
+	{
+		push @options, 'feature', $self->{SeqFeatureObjects}->[$row_number];
+	}
+	return Bio::ToolBox::Data::Feature->new(@options);
+}
+
+sub delete_row {
+	my $self    = shift;
+	my @deleted = sort { $b <=> $a } @_;
+	while (@deleted) {
+		my $d = shift @deleted;
+		splice( @{ $self->{data_table} }, $d, 1 );
+		$self->{last_row}--;
+		if ( exists $self->{SeqFeatureObjects} ) {
+			splice( @{ $self->{SeqFeatureObjects} }, $d, 1 );
+		}
+	}
+	return 1;
+}
+
+sub row_values {
+	my ( $self, $index ) = @_;
+	my @data =    # skip first value
+		@{ $self->{data_table}->[$index] }[ 1 .. $self->{number_columns} ];
+	return wantarray ? @data : \@data;
+}
+
+sub value {
+	my ( $self, $row, $column, $value ) = @_;
+	return unless ( defined $row and defined $column );
+	if ( defined $value ) {
+		$self->{data_table}->[$row][$column] = $value;
+	}
+	return $self->{data_table}->[$row][$column];
+}
+
+sub row_stream {
+	my $self = shift;
+	return Bio::ToolBox::Data::Iterator->new($self);
+}
+
+sub iterate {
+	my $self = shift;
+	my $code = shift;
+	unless ( ref($code) eq 'CODE' ) {
+		carp 'ERROR: iterate_function() method requires a code reference!';
+		return;
+	}
+	my $stream = $self->row_stream;
+	while ( my $row = $stream->next_row ) {
+		&{$code}($row);
+	}
+	return 1;
+}
+
+#### Stored SeqFeature manipulation
+
+sub store_seqfeature {
+	my ( $self, $row_i, $seqfeature ) = @_;
+	unless ( defined $row_i and ref($seqfeature) ) {
+		carp 'ERROR: must provide a row index and SeqFeature object!';
+	}
+	carp 'ERROR: invalid row index' unless ( $row_i <= $self->last_row );
+	$self->{SeqFeatureObjects} ||= [];
+	$self->{SeqFeatureObjects}->[$row_i] = $seqfeature;
+	return 1;
+}
+
+sub delete_seqfeature {
+	my ( $self, $row_i ) = @_;
+	carp 'ERROR: invalid row index' unless ( $row_i <= $self->last_row );
+	return                          unless $self->{SeqFeatureObjects};
+	undef $self->{SeqFeatureObjects}->[$row_i];
+}
+
+sub collapse_gene_transcripts {
+	my $self = shift;
+	unless ( $self->feature_type eq 'named' ) {
+		carp 'ERROR: Table does not contain named features!';
+		return;
+	}
+
+	# load module
+	load Bio::ToolBox::GeneTools, qw(collapse_transcripts);
+
+	# collapse the transcripts
+	my $success = 0;
+	if ( exists $self->{SeqFeatureObjects} ) {
+
+		# we should have stored SeqFeature objects, probably from parsed table
+		for my $i ( 0 .. $self->last_row ) {
+			my $feature     = $self->{SeqFeatureObjects}->[$i] or next;
+			my $collSeqFeat = collapse_transcripts($feature)   or next;
+			$success += $self->store_seqfeature( $i, $collSeqFeat );
+		}
+	}
+	else {
+		# no stored SeqFeature objects, probably names pointing to a database
+		# we will have to fetch the feature from a database
+		my $db = $self->open_meta_database(1);    # force open a new db connection
+		unless ($db) {
+			carp 'ERROR: No SeqFeature objects stored and no database connection!';
+			return;
+		}
+		my $name_i = $self->name_column;
+		my $id_i   = $self->id_column;
+		my $type_i = $self->type_column;
+		for my $i ( 0 .. $self->last_row ) {
+			my $feature = get_db_feature(
+				db   => $db,
+				name => $self->value( $i, $name_i ) || undef,
+				type => $self->value( $i, $type_i ) || undef,
+				id   => $self->value( $i, $id_i )   || undef,
+			) or next;
+			my $collSeqFeat = collapse_transcripts($feature) or next;
+			$success += $self->store_seqfeature( $i, $collSeqFeat );
+		}
+	}
+
+	return $success;
+}
+
+sub add_transcript_length {
+	my $self       = shift;
+	my $subfeature = shift || 'exon';
+
+	# load module
+	load Bio::ToolBox::GeneTools, qw(get_transcript_length get_transcript_cds_length
+		get_transcript_5p_utr_length get_transcript_3p_utr_length);
+
+	# determine name and calculation method
+	my $length_calculator;
+	my $length_name;
+	if ( $subfeature eq 'exon' ) {
+		$length_calculator = \&get_transcript_length;
+		$length_name       = 'Merged_Transcript_Length';
+	}
+	elsif ( $subfeature eq 'cds' ) {
+		$length_calculator = \&get_transcript_cds_length;
+		$length_name       = 'Transcript_CDS_Length';
+	}
+	elsif ( $subfeature eq '5p_utr' ) {
+		$length_calculator = \&get_transcript_5p_utr_length;
+		$length_name       = 'Transcript_5p_UTR_Length';
+	}
+	elsif ( $subfeature eq '3p_utr' ) {
+		$length_calculator = \&get_transcript_3p_utr_length;
+		$length_name       = 'Transcript_3p_UTR_Length';
+	}
+	else {
+		carp "ERROR: unrecognized subfeature type '$subfeature'! No length calculated";
+		return;
+	}
+
+	# add new column and calculate
+	my $length_i = $self->add_column($length_name);
+	if ( exists $self->{SeqFeatureObjects} ) {
+
+		# we should have stored SeqFeature objects, probably from parsed table
+		for my $i ( 0 .. $self->last_row ) {
+			my $feature = $self->{SeqFeatureObjects}->[$i] or next;
+			my $length  = &{$length_calculator}($feature);
+			$self->{data_table}->[$i][$length_i] = $length || $feature->length;
+		}
+	}
+	else {
+		# no stored SeqFeature objects, probably names pointing to a database
+		# we will have to fetch the feature from a database
+		my $db = $self->open_meta_database(1);    # force open a new db connection
+		unless ($db) {
+			carp 'ERROR: No SeqFeature objects stored and no database connection!';
+			return;
+		}
+		my $name_i = $self->name_column;
+		my $id_i   = $self->id_column;
+		my $type_i = $self->type_column;
+		for my $i ( 0 .. $self->last_row ) {
+			my $feature = get_db_feature(
+				db   => $db,
+				name => $self->value( $i, $name_i ) || undef,
+				type => $self->value( $i, $type_i ) || undef,
+				id   => $self->value( $i, $id_i )   || undef,
+			) or next;
+			my $length = &{$length_calculator}($feature);
+			$self->{data_table}->[$i][$length_i] = $length || $feature->length;
+			$self->store_seqfeature( $i, $feature );
+
+			# to store or not to store? May explode memory, but could save from
+			# expensive db calls later
+		}
+	}
+
+	return $length_i;
+}
+
+### Data structure manipulation
+
+sub sort_data {
+	my $self      = shift;
+	my $index     = shift;
+	my $direction = shift || 'i';
+
+	# confirm options
+	return unless exists $self->{$index}{name};
+	unless ( $direction eq 'i' or $direction eq 'd' ) {
+		carp "ERROR: unrecognized sort order '$direction'! Must be i or d";
+		return;
+	}
+
+	# put items into appropriate bins for sorting
+	my @numeric_items;
+	my @mixed_items_end;
+	my @mixed_items;
+	my @asci_items;
+	for my $row_i ( 1 .. $self->last_row ) {
+		my $v = $self->value( $row_i, $index );
+		if ( looks_like_number($v) ) {
+			push @numeric_items, [ $v, $row_i ];
+		}
+		elsif ( $v =~ /(\d+)$/x ) {
+
+			# integer at end of string
+			push @mixed_items_end, [ $1, $v, $row_i ];
+		}
+		elsif ( $v =~ /(\d+)/ ) {
+
+			# integer someplace else
+			push @mixed_items, [ $1, $v, $row_i ];
+		}
+		else {
+			push @asci_items, [ $v, $row_i ];
+		}
+	}
+
+	# sort each bin into replacement table
+	my @new_table;
+	push @new_table, $self->{data_table}->[0];
+	if ( $direction eq 'i' ) {
+		if (@numeric_items) {
+			push @new_table, map { $self->{data_table}->[ $_->[1] ] }
+				sort { $a->[0] <=> $b->[0] } @numeric_items;
+		}
+		if (@mixed_items) {
+			push @new_table, map { $self->{data_table}->[ $_->[2] ] }
+				sort { $a->[0] <=> $b->[0] or $a->[1] cmp $b->[1] } @mixed_items;
+		}
+		if (@mixed_items_end) {
+			push @new_table, map { $self->{data_table}->[ $_->[2] ] }
+				sort { $a->[0] <=> $b->[0] or $a->[1] cmp $b->[1] } @mixed_items_end;
+		}
+		if (@asci_items) {
+			push @new_table, map { $self->{data_table}->[ $_->[1] ] }
+				sort { $a->[0] cmp $b->[0] } @asci_items;
+		}
+	}
+	if ( $direction eq 'd' ) {
+		if (@numeric_items) {
+			push @new_table, map { $self->{data_table}->[ $_->[1] ] }
+				sort { $b->[0] <=> $a->[0] } @numeric_items;
+		}
+		if (@mixed_items) {
+			push @new_table, map { $self->{data_table}->[ $_->[2] ] }
+				sort { $b->[0] <=> $a->[0] or $b->[1] cmp $a->[1] } @mixed_items;
+		}
+		if (@mixed_items_end) {
+			push @new_table, map { $self->{data_table}->[ $_->[2] ] }
+				sort { $b->[0] <=> $a->[0] or $b->[1] cmp $a->[1] } @mixed_items_end;
+		}
+		if (@asci_items) {
+			push @new_table, map { $self->{data_table}->[ $_->[1] ] }
+				sort { $b->[0] cmp $a->[0] } @asci_items;
+		}
+	}
+	$self->{data_table} = \@new_table;
+
+	return 1;
+}
+
+sub gsort_data {
+	my $self = shift;
+
+	# identify indices
+	unless ( $self->feature_type eq 'coordinate' ) {
+		carp 'ERROR: no chromosome and start/position columns to sort!';
+		return;
+	}
+	my $chromo_i = $self->chromo_column;
+	my $start_i  = $self->start_column;
+	my $stop_i   = $self->stop_column || $start_i;
+
+	# collect the data by chromosome: start and end
+	my %chrom2row;
+	for my $row ( 1 .. $self->last_row ) {
+		my $c = $self->{data_table}->[$row]->[$chromo_i];
+		$chrom2row{$c} ||= [];
+		push @{ $chrom2row{$c} },
+			[
+				$self->{data_table}->[$row]->[$start_i],
+				$self->{data_table}->[$row]->[$stop_i],
+				$self->{data_table}->[$row]
+			];
+	}
+
+	# get sane chromosome order
+	my @chroms = sane_chromo_sort( keys %chrom2row );
+
+	# sort the table
+	my @sorted_data;
+	push @sorted_data, $self->{data_table}->[0];
+	if ( $self->gff ) {
+
+		# sort by increasing start and decreasing end, i.e. decreasing length
+		# this should mostly handle putting genes/transcripts before exons
+		foreach my $chr (@chroms) {
+			push @sorted_data, map { $_->[2] }
+				sort { $a->[0] <=> $b->[0] or $b->[1] <=> $a->[1] } @{ $chrom2row{$chr} };
+		}
+	}
+	else {
+		# sort by increasing start followed by increasing end, i.e. increasing length
+		foreach my $chr (@chroms) {
+			push @sorted_data, map { $_->[2] }
+				sort { $a->[0] <=> $b->[0] or $a->[1] <=> $b->[1] } @{ $chrom2row{$chr} };
+		}
+	}
+	$self->{data_table} = \@sorted_data;
+	return 1;
+}
+
+sub splice_data {
+	my ( $self, $part, $total_parts ) = @_;
+
+	unless ( $part and $total_parts ) {
+		confess 'FATAL: ordinal part and total number of parts not passed';
+	}
+	my $part_length = int( $self->last_row / $total_parts );
+
+	# check for SeqFeatureObjects array
+	if ( exists $self->{SeqFeatureObjects}
+		and scalar @{ $self->{SeqFeatureObjects} } !=
+		scalar @{ $self->{data_table} } )
+	{
+
+		# it needs to be the same length as the data table, it should be
+		while ( scalar @{ $self->{SeqFeatureObjects} } < scalar @{ $self->{data_table} } )
+		{
+			push @{ $self->{SeqFeatureObjects} }, undef;
+		}
+	}
+
+	# splicing based on which part we do
+	if ( $part == 1 ) {
+
+		# remove all but the first part
+		splice( @{ $self->{'data_table'} }, $part_length + 1 );
+		if ( exists $self->{SeqFeatureObjects} ) {
+			splice( @{ $self->{SeqFeatureObjects} }, $part_length + 1 );
+		}
+	}
+	elsif ( $part == $total_parts ) {
+
+		# remove all but the last part
+		splice( @{ $self->{'data_table'} }, 1, $part_length * ( $total_parts - 1 ) );
+		if ( exists $self->{SeqFeatureObjects} ) {
+			splice( @{ $self->{SeqFeatureObjects} },
+				1, $part_length * ( $total_parts - 1 ) );
+		}
+	}
+	else {
+		# splicing in the middle requires two rounds
+
+		# remove the last parts
+		splice( @{ $self->{'data_table'} }, ( $part * $part_length ) + 1 );
+
+		# remove the first parts
+		splice( @{ $self->{'data_table'} }, 1, $part_length * ( $part - 1 ) );
+
+		if ( exists $self->{SeqFeatureObjects} ) {
+			splice( @{ $self->{SeqFeatureObjects} }, ( $part * $part_length ) + 1 );
+			splice( @{ $self->{SeqFeatureObjects} }, 1, $part_length * ( $part - 1 ) );
+		}
+	}
+
+	# update last row metadata
+	$self->{'last_row'} = scalar( @{ $self->{'data_table'} } ) - 1;
+
+	# re-open a new un-cached database connection
+	if ( exists $self->{db_connection} ) {
+		delete $self->{db_connection};
+	}
+	return 1;
+}
+
+### File functions
+
+sub reload_children {
+	my $self  = shift;
+	my @files = @_;
+	return unless @files;
+
+	# prepare Stream
+	my $class = 'Bio::ToolBox::Data::Stream';
+	load $class;
+
+	# open first stream
+	my $first  = shift @files;
+	my $Stream = $class->new( in => $first );
+	unless ($Stream) {
+		carp "ERROR: unable to load first child file $first";
+		return;
+	}
+
+	# destroy current data table and metadata
+	$self->{data_table} = [];
+	for my $i ( 1 .. $self->number_columns ) {
+		delete $self->{$i};
+	}
+
+	# copy the metadata
+	foreach (qw(program feature db bed gff ucsc headers number_columns last_row)) {
+		$self->{$_} = $Stream->{$_};
+	}
+	for my $i ( 1 .. $Stream->number_columns ) {
+		my %md = $Stream->metadata($i);
+		$self->{$i} = \%md;
+	}
+	push @{ $self->{comments} }, ( $Stream->comments );
+
+	# first row column headers
+	$self->{data_table}->[0] = [ @{ $Stream->{data_table}->[0] } ];
+
+	# load the data
+	while ( my $row = $Stream->next_row ) {
+		$self->add_row($row);
+	}
+	$Stream->close_fh;
+
+	# load remaining files
+	foreach my $file (@files) {
+		my $Stream1 = $class->new( in => $file );
+		if ( $Stream1->number_columns != $self->number_columns ) {
+			confess "FATAL: child file $file has a different number of columns!";
+		}
+		while ( my $row = $Stream1->next_row ) {
+			my $a = $row->row_values;
+			$self->add_row($a);
+		}
+		$Stream1->close_fh;
+	}
+	$self->verify;
+
+	# clean up
+	unlink( $first, @files );
+	return $self->last_row;
+}
+
+### Export summary data file
+sub summary_file {
+	my $self = shift;
+
+	# Collect passed arguments
+	my %args = @_;
+
+	# parameters
+	# either one or more datasets can be summarized
+	my $outfile = $args{'filename'} || undef;
+	my @datasets;
+	if ( $args{dataset} and ref( $args{dataset} ) eq 'ARRAY' ) {
+		@datasets = @{ $args{dataset} };
+	}
+	elsif ( $args{dataset} and ref( $args{dataset} ) eq 'SCALAR' ) {
+		push @datasets, $args{dataset};
+	}
+	my @startcolumns;
+	if ( $args{startcolumn} and ref( $args{startcolumn} ) eq 'ARRAY' ) {
+		@startcolumns = @{ $args{startcolumn} };
+	}
+	elsif ( $args{startcolumn} and ref( $args{startcolumn} ) eq 'SCALAR' ) {
+		push @startcolumns, $args{startcolumn};
+	}
+	my @endcolumns;
+	$args{endcolumn} ||= $args{stopcolumn};
+	if ( $args{endcolumn} and ref( $args{endcolumn} ) eq 'ARRAY' ) {
+		@endcolumns = @{ $args{endcolumn} };
+	}
+	elsif ( $args{endcolumn} and ref( $args{endcolumn} ) eq 'SCALAR' ) {
+		push @endcolumns, $args{endcolumn};
+	}
+	$args{method} ||= 'mean';
+	if (    $args{method} ne 'mean'
+		and $args{method} ne 'median'
+		and $args{method} ne 'trimmean' )
+	{
+		carp 'ERROR: unrecognized summary file method!';
+		return;
+	}
+
+	# Check required values
+	unless ( defined $outfile ) {
+		if ( $self->basename ) {
+
+			# use the opened file's filename if it exists
+			# prepend the path if it exists
+			# the extension will be added later
+			$outfile = $self->path . $self->basename;
+		}
+		else {
+			carp 'ERROR: no filename passed to write_summary_data!';
+			return;
+		}
+	}
+
+	# Identify possible dataset columns
+	my %possibles;
+	my %skip = map { $_ => 1 } qw (systematicname name id alias aliases type class
+		geneclass chromosome chromo seq_id seqid start stop end gene strand
+		length primary_id merged_transcript_length transcript_cds_length
+		transcript_5p_utr_length transcript_3p_utr_length);
+
+	# walk through the dataset names
+	$possibles{unknown} = [];
+	for my $i ( 1 .. $self->number_columns ) {
+		if ( not exists $skip{ lc $self->{$i}{'name'} } ) {
+			my $d = $self->metadata( $i, 'dataset' ) || undef;
+			if ( defined $d ) {
+
+				# we have what appears to be a dataset column
+				$possibles{$d} ||= [];
+				push @{ $possibles{$d} }, $i;
+			}
+			else {
+				# still an unknown possibility
+				push @{ $possibles{unknown} }, $i;
+			}
+		}
+	}
+
+	# check datasets
+	unless (@datasets) {
+		if ( scalar( keys %possibles ) > 1 ) {
+
+			# we will always have the unknown category, so anything more than one
+			# means we found legitimate dataset columns
+			delete $possibles{unknown};
+		}
+		@datasets = sort { $a cmp $b } keys %possibles;
+	}
+
+	# check starts
+	if ( scalar @startcolumns != scalar @datasets ) {
+		@startcolumns = ();    # ignore what we were given?
+		foreach my $d (@datasets) {
+
+			# take the first column with this dataset
+			push @startcolumns, $possibles{$d}->[0];
+		}
+	}
+
+	# check stops
+	if ( scalar @endcolumns != scalar @datasets ) {
+		@endcolumns = ();      # ignore what we were given?
+		foreach my $d (@datasets) {
+
+			# take the last column with this dataset
+			push @endcolumns, $possibles{$d}->[-1];
+		}
+	}
+
+	# Prepare Data object to store the summed data
+	my $summed_data = $self->new(
+		feature => 'averaged_windows',
+		columns => [ 'Window', 'Midpoint' ],
+	);
+
+	# Go through each dataset
+	foreach my $d ( 0 .. $#datasets ) {
+
+		# Prepare score column name
+		my $data_name = simplify_dataset_name( $datasets[$d] );
+
+		# add column
+		my $i = $summed_data->add_column($data_name);
+		$summed_data->metadata( $i, 'dataset', $datasets[$d] );
+
+		# tag for remembering we're working with percentile bins
+		my $do_percentile = 0;
+
+		# remember the row
+		my $row = 1;
+
+		# Collect summarized data
+		for my $column ( $startcolumns[$d] .. $endcolumns[$d] ) {
+
+			# determine the midpoint position of the window
+			# this assumes the column metadata has start and stop
+			my $midpoint = int(
+				sum0(
+					$self->metadata( $column, 'start' ),
+					$self->metadata( $column, 'stop' )
+				) / 2
+			);
+
+			# convert midpoint to fraction of 1000 for plotting if necessary
+			if ( substr( $self->name($column), -1 ) eq '%' ) {
+				$midpoint *= 10;    # midpoint * 0.01 * 1000 bp
+				$do_percentile++;
+			}
+			if ( $do_percentile and substr( $self->name($column), -2 ) eq 'bp' ) {
+
+				# working on the extension after the percentile bins
+				$midpoint += 1000;
+			}
+
+			# collect the values in the column
+			my @values;
+			for my $row ( 1 .. $self->last_row ) {
+				my $v = $self->value( $row, $column );
+				if ( looks_like_number($v) ) {
+					push @values, $v;
+				}
+				else {
+					# we treat this as zero, as opposed to skipping it, so that we
+					# do not over-emphasize the remaining signal from those columns
+					# that do not have much signal to begin with
+					# it distorts the interpretation
+					push @values, 0;
+				}
+			}
+
+			# adjust if log value
+			my $log = $self->metadata( $column, 'log2' ) || 0;
+			if ($log) {
+				@values = map { 2**$_ } @values;
+			}
+
+			# determine mean value
+			my $window_value;
+			my $num_values = scalar(@values);
+			if (@values) {
+				if ( $args{method} eq 'mean' ) {
+					$window_value = sum0(@values) / $num_values;
+				}
+				elsif ( $args{method} eq 'trimmean' ) {
+					if ( scalar @values == 1 ) {
+						$window_value = $values[0];
+					}
+					elsif ( scalar @values < 100 ) {
+
+						# use standard mean
+						$window_value = sum0(@values) / $num_values;
+					}
+					else {
+						@values = sort { $a <=> $b } @values;
+						my $x = sprintf( "%.0f", $num_values / 100 );
+						$window_value = sum0( @values[ $x .. ( $num_values - $x ) ] ) /
+							( $num_values - ( 2 * $x ) );
+					}
+				}
+				elsif ( $args{method} eq 'median' ) {
+					if ( scalar @values == 1 ) {
+						$window_value = $values[0];
+					}
+					elsif ( $num_values & 1 ) {
+
+						# odd number of values
+						$window_value = $values[ ( $#values / 2 ) ];
+					}
+					else {
+						my $mid = $num_values / 2;
+						$window_value = sum0( $values[ $mid - 1 ], $values[$mid] ) / 2;
+					}
+				}
+				if ($log) {
+					$window_value = log($window_value) / log(2);
+				}
+			}
+			else {
+				$window_value = 0;
+			}
+
+			# push to summed output
+			if ( $d == 0 ) {
+
+				# this is the first dataset, so we need to add a row
+				$summed_data->add_row(
+					[ $self->{$column}{'name'}, $midpoint, $window_value ] );
+			}
+			else {
+				# we're summarizing multiple datasets, we already have name midpoint
+				# first do sanity check
+				if ( $summed_data->value( $row, 2 ) != $midpoint ) {
+					carp
+'ERROR: unable to summarize multiple datasets with nonequal columns of data!';
+					return;
+				}
+				$summed_data->value( $row, $i, $window_value );
+			}
+			$row++;
+		}
+	}
+
+	# Write summed data
+	$outfile =~ s/\.txt (\.gz)?$//xi;    # strip any .txt or .gz extensions if present
+	my $written_file = $summed_data->write_file(
+		'filename' => sprintf( "%s_%s_summary.txt", $outfile, $args{method} ),
+		'gz'       => 0,
+	);
+	return $written_file;
+}
+
+1;
+
+__END__
 
 =head1 NAME
 
@@ -278,7 +1502,7 @@ one or more argument options. Possible options include:
 
 The file name of the gene table to be parsed. This may 
 be a GFF, GFF3, GTF, or any of the UCSC gene table formats. 
-These will be parsed using Bio::ToolBox::parser::* adapters.
+These will be parsed using Bio::ToolBox::Parser::* adapters.
 
 =item feature
 
@@ -979,7 +2203,7 @@ You may pass these options. They are optional.
 =item filename
 
 Pass an optional new filename. The default is to take the basename 
-and append "_summed" to it.
+and append "_<method>_summary" to it.
 
 =item startcolumn
 
@@ -995,6 +2219,15 @@ The default ending column is the last rightmost column. Indexes are
 Pass a string that is the name of the dataset. This could be collected 
 from the metadata, if present. This will become the name of the score 
 column if defined.
+
+=item method
+
+Pass the name of the method to combine the values. Methods include 
+C<mean> (default if not specified), C<median>, or C<trimmean>, where 
+the top and bottom 1% of the sorted values are discarded and a mean
+of the remaining 98% of the values is used. If fewer than 100 values
+are available, no trimming is done and a straight mean value is 
+determined.
 
 =back
 
@@ -1088,1266 +2321,6 @@ perform this.)
 L<Bio::ToolBox::Data::Feature>, L<Bio::ToolBox::SeqFeature>, L<Bio::DB::Sam>,
 L<Bio::DB::HTS>, L<Bio::DB::BigWig>, L<Bio::DB::BigBed>, L<Bio::DB::USeq>, 
 L<Bio::DB::SeqFeature::Store>, L<Bio::Perl>
-
-=cut
-
-use strict;
-use Carp qw(carp cluck croak confess);
-use List::Util qw(sum0);
-use base 'Bio::ToolBox::Data::core';
-use Bio::ToolBox::db_helper qw(
-	get_new_feature_list  
-	get_new_genome_list
-	get_db_feature
-);
-use Bio::ToolBox::utility qw(simplify_dataset_name sane_chromo_sort);
-use Module::Load;
-
-1;
-
-
-### Initialize
-
-sub new {
-	my $class = shift;
-	my %args  = @_;
-	if (ref($class)) {
-		$class = ref($class);
-	}
-	
-	# check for important arguments
-	$args{features} ||= $args{feature} || 'gene';
-	$args{stream} ||= $args{Stream} || 0;
-	$args{file} ||= $args{in} || undef;
-	$args{parse} ||= 0;
-	$args{noheader} ||= 0;
-	
-	# check for stream
-	if ($args{stream}) {
-		$class = "Bio::ToolBox::Data::Stream";
-		load($class);
-		return $class->new(@_);
-	}
-	
-	# initialize
-	my $self = $class->SUPER::new();
-	
-	# prepare a new table based on the provided arguments
-	if ($args{file} and $args{parse}) {
-		# parse from file
-		$args{subfeature} ||= '';
-		unless ( $self->parse_table(\%args) ) {
-			my $l = $self->load_file($args{file});
-			return unless $l;
-			if ($self->database =~ /^Parsed:(.+)$/ and $self->feature_type eq 'named') {
-				# looks like the loaded file was from a previously parsed table
-				# let's try this again
-				# this may die if it doesn't work
-				$args{file} = $1;
-				$args{feature} = $self->feature;
-				$self->parse_table(\%args); 
-			}
-		}
-	}
-	elsif ($args{file}) {
-		# load from file
-		unless ( $self->load_file($args{file}, $args{noheader}) ) {
-			return;
-		}
-	}
-	elsif (exists $args{db} and $args{features}) {
-		# generate new list
-		$self->feature($args{features});
-		$self->database($args{db});
-		$args{data} = $self;
-		my $result;
-		if ($args{features} eq 'genome') {
-			# create a genomic interval list
-			# first must parse any exclusion list provided as a new Data object
-			$args{blacklist} ||= $args{exclude} || undef;
-			if (defined $args{blacklist}) {
-				my $exclusion_Data = $self->new(
-					file => $args{blacklist},
-					parse => 0 # we don't need to parse
-				);
-				if ($exclusion_Data and $exclusion_Data->feature_type eq 'coordinate') {
-					printf "   Loaded %d exclusion list items\n", 
-						$exclusion_Data->number_rows;
-					delete $args{blacklist};
-					delete $args{exclude};
-					$args{exclude} = $exclusion_Data;
-				}
-				else {
-					carp " Cannot not load exclusion coordinate list file $args{blacklist}!";
-					return;
-				}
-			}
-			$result = get_new_genome_list(%args);
-		}
-		else {
-			$result = get_new_feature_list(%args);
-		}
-		unless ($result) {
-			carp " Cannot generate new $args{features} list!";
-			return;
-		}
-	}
-	else {
-		# a new empty structure
-		
-		# check to see if user provided column names
-		$args{columns} ||= $args{datasets} || undef;
-		if (defined $args{columns}) {
-			 foreach my $c ( @{ $args{columns} } ) {
-			 	$self->add_column($c);
-			 }
-			 $self->{feature} = $args{feature} if exists $args{feature};
-		}
-		
-		# or possibly a specified format structure 
-		elsif (exists $args{gff} and $args{gff}) {
-			# use standard names for the number of columns indicated
-			# we trust that the user knows the subtle difference between gff versions
-			$self->add_gff_metadata($args{gff});
-			unless ($self->extension =~ /g[tf]f/) {
-				$self->{extension} = $args{gff} == 2.5 ? '.gtf' : 
-					$args{gff} == 3 ? '.gff3' : '.gff';
-			}
-		}
-		elsif (exists $args{bed} and $args{bed}) {
-			# use standard names for the number of columns indicated
-			unless ($args{bed} =~ /^\d{1,2}$/ and $args{bed} >= 3) {
-				carp "bed parameter must be an integer 3-12!";
-				return;
-			}	
-			$self->add_bed_metadata($args{bed});
-			unless ($self->extension =~ /bed|peak/) {
-				$self->{extension} = '.bed';
-			}
-		}
-		elsif (exists $args{ucsc} and $args{ucsc}) {
-			# a ucsc format such as refFlat, genePred, or genePredExt
-			my $u = $self->add_ucsc_metadata($args{ucsc});
-			unless ($u) {
-				carp "unrecognized number of columns for ucsc format!";
-				return;
-			};
-			unless ($self->extension =~ /ucsc|ref+lat|genepred/) {
-				$self->{extension} = '.ucsc';
-			}
-		}
-	}
-	
-	return $self;
-}
-
-sub duplicate {
-	my $self = shift;
-	
-	# duplicate the data structure
-	my $columns = $self->list_columns;
-	my $Dupe = $self->new(
-		'columns' => $columns,
-	) or return;
-	
-	# copy the metadata
-	for (my $i = 0; $i < $self->number_columns; $i++) {
-		# column metadata
-		my %md = $self->metadata($i);
-		$Dupe->{$i} = \%md;
-	}
-	foreach (qw(feature program db bed gff ucsc vcf headers)) {
-		# various keys
-		$Dupe->{$_} = $self->{$_};
-	}
-	my @comments = $self->comments;
-	push @{$Dupe->{comments}}, @comments;
-	
-	return $Dupe;
-}
-
-sub parse_table {
-	my $self = shift;
-	my $args = shift;
-	my ($file, $feature, $subfeature, $simplify);
-	if (ref $args) {
-		$file = $args->{file} || '';
-		$feature = $args->{feature} || '';
-		$subfeature = $args->{subfeature} || '';
-		$simplify = (exists $args->{simplify} and defined $args->{simplify}) ? 
-			$args->{simplify} : 1; # default is to simplify
-	}
-	else {
-		# no hash reference, assume just a file name
-		$file = $args;
-		undef $args;
-		$feature = undef;
-		$subfeature = '';
-		$simplify = 1;
-	}
-	unless ($file) {
-		carp "no annotation file provided to parse!";
-		return;
-	}
-	
-	# the file format determines the parser class
-	my ($flavor, $format) = $self->taste_file($file) or return;
-	my $class = 'Bio::ToolBox::parser::' . $flavor;
-	eval {load $class};
-	if ($@) {
-		carp "unable to load $class! cannot parse $flavor!";
-		return;
-	}
-	$self->format($format); # specify the specific format
-	
-	# open parser
-	my $parser = $class->new() or return;
-	$parser->open_file($file) or return;
-	my $typelist = $parser->typelist;
-	
-	# set feature based on the type list from the parser
-	unless ($feature) {
-		if ($typelist =~ /gene/i) {
-			$feature = 'gene';
-		}
-		elsif ($typelist eq 'region') {
-			$feature = 'region';
-		}
-		else {
-			$feature = 'rna'; # generic RNA
-		}
-	}
-	
-	# set parser parameters
-	$parser->simplify($simplify);
-	if ($subfeature) {
-		$parser->do_exon(1) if $subfeature =~ /exon/i;
-		$parser->do_cds(1) if $subfeature =~ /cds/i;
-		$parser->do_utr(1) if $subfeature =~ /utr|untranslated/i;
-		$parser->do_codon(1) if $subfeature =~/codon/i;
-	}
-	if ($feature =~ /gene$/i) {
-		$parser->do_gene(1);
-	}
-	else {
-		$parser->do_gene(0);
-	}
-	my $mrna_check = 0;
-	if (lc($feature) eq 'mrna' and $parser->typelist !~ /mrna/i and not $self->last_row) {
-		# user requested mRNA for a new data file but it's not present in the type list
-		# look for it the hard way by parsing CDS too - sigh
-		load('Bio::ToolBox::GeneTools', 'is_coding');
-		$parser->do_cds(1);
-		$mrna_check = 1;
-	}
-	
-	# parse the table
-	$parser->parse_file or return;
-	
-	# store the SeqFeature objects
-	if ($self->last_row > 0) {
-		# we already have a table, presumably representing the features
-		my $count = 0;
-		$self->iterate( sub {
-			my $row = shift;
-			my $f = $parser->find_gene(
-				name  => $row->name,
-				id    => $row->id,
-			);
-			if ($f) {
-				$self->store_seqfeature($row->row_index, $f);
-				$count++;
-			}
-		} );
-		unless ($count == $self->last_row) {
-			die <<PARSEFAIL;
-Not all features in the input file could be matched to a corresponding SeqFeature 
-object in the annotation file $file.
-Double check your input and annotation files. You can create a new table by just 
-providing your annotation file.
-PARSEFAIL
-		}
-	}
-	else {
-		# create a new table
-		$self->add_column('Primary_ID');
-		$self->add_column('Name');
-		
-		# check for chromosome exclude
-		my $chr_exclude;
-		if ($args) {
-			$chr_exclude = $args->{chrskip} || undef;
-		}
-		
-		# fill table with features
-		while (my $f = $parser->next_top_feature) {
-			if ($chr_exclude) {
-				next if $f->seq_id =~ /$chr_exclude/i;
-			}
-			my $type = $f->type;
-			if ($f->type =~ /$feature/i or ($mrna_check and is_coding($f)) ) {
-				my $index = $self->add_row([ $f->primary_id, $f->display_name ]);
-				$self->store_seqfeature($index, $f);
-			}
-		}
-		unless ($self->last_row) {
-			printf " Zero '%s' features found!\n Check your feature or try generic features like gene, mRNA, or transcript\n",
-				$feature;
-		}
-		$self->database("Parsed:$file");
-		$self->feature($feature);
-		$self->add_comment("Chromosomes excluded: $chr_exclude") if $chr_exclude;
-		
-		# add input parsed file metadata
-		$self->add_file_metadata($file);
-		# but delete some stuff, just want basename
-		undef $self->{extension};
-		undef $self->{filename};
-		undef $self->{path};
-	}
-	return 1;
-}
-
-
-
-
-### Column manipulation
-
-sub column_values {
-	my ($self, $column) = @_;
-	return unless defined $column;
-	return unless exists $self->{$column}{name};
-	my @values = map {$self->value($_, $column)} (0 .. $self->last_row);
-	return wantarray ? @values : \@values;
-}
-
-sub add_column {
-	my ($self, $name) = @_;
-	return unless $name;
-	my $column = $self->{number_columns};
-	
-	# check for array of column data
-	my $name_ref = ref $name;
-	if ($name_ref eq 'ARRAY') {
-		if ($self->last_row > 1) {
-			# table has existing data beyond column headers
-			if ($self->last_row == (scalar @$name - 1)) {
-				# same number of elements, add it the table
-				$self->{$column} = {
-					'name'  => $name->[0],
-					'index' => $column,    
-				};
-				for (my $r = 0; $r <= $self->last_row; $r++) {
-					$self->{data_table}->[$r][$column] = $name->[$r];
-				}
-			}
-			else {
-				# different number of elements
-				cluck "array has different number of elements than Data table!\n"; 
-				return;
-			}
-		}
-		else {
-			# table has no existing data
-			$self->{$column} = {
-				'name'  => $name->[0],
-				'index' => $column,    
-			};
-			for (my $i = 0; $i < scalar @$name; $i++) {
-				$self->value($i, $column, $name->[$i]);
-			}
-			$self->{last_row} = scalar @$name - 1;
-			$self->{headers} = 1; # boolean to indicate the table now has headers
-		}
-	}
-	elsif ($name_ref eq 'Bio::DB::GFF::Typename') {
-		# a Typename object that was selected from a SeqFeature::Store database
-		$self->{$column} = {
-			'name'      => $name->asString,
-			'index'     => $column,
-		};
-		$self->{data_table}->[0][$column] = $name->asString;
-	}
-	elsif ($name_ref eq '') {
-		# just a name
-		$self->{$column} = {
-			'name'      => $name,
-			'index'     => $column,
-		};
-		$self->{data_table}->[0][$column] = $name;
-	}
-	else {
-		cluck "unrecognized reference '$name_ref'! pass a scalar value or array reference";
-		return;
-	}
-	
-	$self->{number_columns}++;
-	delete $self->{column_indices} if exists $self->{column_indices};
-	if ($self->gff or $self->bed or $self->ucsc or $self->vcf) {
-		# check if we maintain integrity, at least insofar what we test
-		$self->verify(1); # silence so user doesn't get these messages
-	}
-	return $column;
-}
-
-sub copy_column {
-	my $self = shift;
-	my $index = shift;
-	return unless defined $index;
-	my $data = $self->column_values($index);
-	my $new_index = $self->add_column($data);
-	$self->copy_metadata($index, $new_index);
-	return $new_index;
-}
-
-
-
-### Rows and Data access
-
-sub add_row {
-	my $self = shift;
-	my @row_data;
-	if ($_[0] and ref $_[0] eq 'ARRAY') {
-		@row_data = @{ $_[0] };
-	}
-	elsif ($_[0] and ref $_[0] eq 'Bio::ToolBox::Data::Feature') {
-		@row_data = $_[0]->row_values;
-	}
-	elsif ($_[0] and $_[0] =~ /\t/) {
-		@row_data = split /\t/, $_[0];
-	}
-	else {
-		@row_data = map {'.'} (1 .. $self->{number_columns});
-	}
-	if (scalar @row_data > $self->{number_columns}) {
-		cluck "row added has more elements than table columns! truncating row elements\n"; 
-		splice @row_data, 0, $self->{number_columns};
-	}
-	until (scalar @row_data == $self->{number_columns}) {
-		push @row_data, '.';
-	}
-	my $row_index = $self->{last_row} + 1;
-	$self->{data_table}->[$row_index] = \@row_data;
-	$self->{last_row}++;
-	return $row_index;
-}
-
-sub get_row {
-	my ($self, $row_number) = @_;
-	return unless defined $self->{data_table}->[$row_number];
-	my @options = (
-		'data'      => $self,
-		'index'     => $row_number,
-	);
-	if (
-		exists $self->{SeqFeatureObjects} and
-		defined $self->{SeqFeatureObjects}->[$row_number] 
-	) {
-		push @options, 'feature', $self->{SeqFeatureObjects}->[$row_number];
-	}
-	return Bio::ToolBox::Data::Feature->new(@options);	
-}
-
-sub delete_row {
-	my $self = shift;
-	my @deleted = sort {$b <=> $a} @_;
-	while (@deleted) {
-		my $d = shift @deleted;
-		splice( @{ $self->{data_table} }, $d, 1);
-		$self->{last_row}--;
-		if (exists $self->{SeqFeatureObjects}) {
-			splice( @{ $self->{SeqFeatureObjects} }, $d, 1);
-		}
-	}
-	return 1;
-}
-
-sub row_values {
-	my ($self, $row)  = @_;
-	my @data = @{ $self->{data_table}->[$row] };
-	return wantarray ? @data : \@data;
-}
-
-sub value {
-	my ($self, $row, $column, $value) = @_;
-	return unless (defined $row and defined $column);
-	if (defined $value) {
-		$self->{data_table}->[$row][$column] = $value;
-	}
-	return $self->{data_table}->[$row][$column];
-}
-
-sub row_stream {
-	my $self = shift;
-	return Bio::ToolBox::Data::Iterator->new($self);
-}
-
-sub iterate {
-	my $self = shift;
-	my $code = shift;
-	unless (ref $code eq 'CODE') {
-		confess "iterate_function() method requires a code reference!";
-	}
-	my $stream = $self->row_stream;
-	while (my $row = $stream->next_row) {
-		&$code($row);
-	}
-	return 1;
-}
-
-
-#### Stored SeqFeature manipulation
-
-sub store_seqfeature {
-	my ($self, $row_i, $seqfeature) = @_;
-	unless (defined $row_i and ref($seqfeature)) {
-		confess "must provide a row index and SeqFeature object!";
-	}
-	confess "invalid row index" unless ($row_i <= $self->last_row);
-	$self->{SeqFeatureObjects} ||= [];
-	$self->{SeqFeatureObjects}->[$row_i] = $seqfeature;
-	return 1;
-}
-
-sub delete_seqfeature {
-	my ($self, $row_i) = @_;
-	confess "invalid row index" unless ($row_i <= $self->last_row);
-	return unless $self->{SeqFeatureObjects};
-	undef $self->{SeqFeatureObjects}->[$row_i];
-}
-
-sub collapse_gene_transcripts {
-	my $self = shift;
-	unless ($self->feature_type eq 'named') {
-		carp "Table does not contain named features!";
-		return;
-	}
-	
-	# load module
-	my $class = "Bio::ToolBox::GeneTools";
-	eval {load $class, qw(collapse_transcripts)};
-	if ($@) {
-		carp "unable to load $class! cannot collapse transcripts!";
-		return;
-	}
-	
-	# collapse the transcripts
-	my $success = 0;
-	if (exists $self->{SeqFeatureObjects}) {
-		# we should have stored SeqFeature objects, probably from parsed table
-		for (my $i = 1; $i <= $self->last_row; $i++) {
-			my $feature = $self->{SeqFeatureObjects}->[$i] or next;
-			my $collSeqFeat = collapse_transcripts($feature) or next;
-			$success += $self->store_seqfeature($i, $collSeqFeat);
-		}
-	}
-	else {
-		# no stored SeqFeature objects, probably names pointing to a database
-		# we will have to fetch the feature from a database
-		my $db = $self->open_meta_database(1) or  # force open a new db connection
-			confess "No SeqFeature objects stored and no database connection!";
-		my $name_i = $self->name_column;
-		my $id_i = $self->id_column;
-		my $type_i = $self->type_column;
-		for (my $i = 1; $i <= $self->last_row; $i++) {
-			my $feature = get_db_feature(
-				db    => $db,
-				name  => $self->value($i, $name_i) || undef,
-				type  => $self->value($i, $type_i) || undef,
-				id    => $self->value($i, $id_i) || undef,
-			) or next;
-			my $collSeqFeat = collapse_transcripts($feature) or next;
-			$success += $self->store_seqfeature($i, $collSeqFeat);
-		}
-	}
-	
-	return $success;
-}
-
-sub add_transcript_length {
-	my $self = shift;
-	my $subfeature = shift || 'exon';
-	unless (exists $self->{SeqFeatureObjects}) {
-		carp "no SeqFeature objects stored for collapsing!";
-		return;
-	}
-	
-	# load module
-	eval {load "Bio::ToolBox::GeneTools", qw(get_transcript_length get_transcript_cds_length
-		get_transcript_5p_utr_length get_transcript_3p_utr_length)};
-	if ($@) {
-		carp "unable to load Bio::ToolBox::GeneTools! cannot collapse transcripts!";
-		return;
-	}
-	
-	# determine name and calculation method
-	my $length_calculator;
-	my $length_name;
-	if ($subfeature eq 'exon') {
-		$length_calculator = \&get_transcript_length;
-		$length_name= 'Merged_Transcript_Length';
-	}
-	elsif ($subfeature eq 'cds') {
-		$length_calculator = \&get_transcript_cds_length;
-		$length_name= 'Transcript_CDS_Length';
-	}
-	elsif ($subfeature eq '5p_utr') {
-		$length_calculator = \&get_transcript_5p_utr_length;
-		$length_name= 'Transcript_5p_UTR_Length';
-	}
-	elsif ($subfeature eq '3p_utr') {
-		$length_calculator = \&get_transcript_3p_utr_length;
-		$length_name= 'Transcript_3p_UTR_Length';
-	}
-	else {
-		carp "unrecognized subfeature type '$subfeature'! No length calculated";
-		return;
-	}
-	
-	# add new column and calculate
-	my $length_i = $self->add_column($length_name);
-	if (exists $self->{SeqFeatureObjects}) {
-		# we should have stored SeqFeature objects, probably from parsed table
-		for (my $i = 1; $i <= $self->last_row; $i++) {
-			my $feature = $self->{SeqFeatureObjects}->[$i] or next;
-			my $length = &$length_calculator($feature);
-			$self->{data_table}->[$i][$length_i] = $length || $feature->length;
-		}
-	}
-	else {
-		# no stored SeqFeature objects, probably names pointing to a database
-		# we will have to fetch the feature from a database
-		my $db = $self->open_meta_database(1) or  # force open a new db connection
-			confess "No SeqFeature objects stored and no database connection!";
-		my $name_i = $self->name_column;
-		my $id_i = $self->id_column;
-		my $type_i = $self->type_column;
-		for (my $i = 1; $i <= $self->last_row; $i++) {
-			my $feature = get_db_feature(
-				db    => $db,
-				name  => $self->value($i, $name_i) || undef,
-				type  => $self->value($i, $type_i) || undef,
-				id    => $self->value($i, $id_i) || undef,
-			) or next;
-			my $length = &$length_calculator($feature);
-			$self->{data_table}->[$i][$length_i] = $length || $feature->length;
-			$self->store_seqfeature($i, $feature);
-				# to store or not to store? May explode memory, but could save from 
-				# expensive db calls later
-		}
-	}
-	
-	return $length_i;
-}
-
-
-
-### Data structure manipulation
-
-sub sort_data {
-	my $self = shift;
-	my $index = shift;
-	my $direction = shift || 'i';
-	
-	# confirm options
-	return unless exists $self->{$index}{name};
-	unless ($direction =~ /^[id]/i) {
-		carp "unrecognized sort order '$direction'! Must be i or d";
-		return;
-	}
-	
-	# Sample the dataset values
-	# this will be used to guess the sort method, below
-	my $example; # an example of the dataset
-	foreach (my $i = 1; $i <= $self->last_row; $i++) {
-		# we want to avoid null values, so keep trying
-		# null being . or any variation of N/A, NaN, inf
-		my $v = $self->value($i, $index);
-		if (defined $v and $v !~ /^(?:\.|n\/?a|nan|\-?inf)$/i) {
-			# a non-null value, take it
-			$example = $v;
-			last;
-		} 
-	}
-	
-	# Determine sort method, either numerical or alphabetical
-	my $sortmethod; 
-	if ($example =~ /[a-z]/i) { 
-		# there are detectable letters
-		$sortmethod = 'ascii';
-	} 
-	elsif ($example =~ /^\-?\d+\.?\d*$/) {
-		# there are only digits, allowing for minus sign and a decimal point
-		# I don't think this allows for exponents, though
-		$sortmethod = 'numeric';
-	} 
-	else { 
-		# unable to determine (probably alphanumeric), sort asciibetical
-		$sortmethod = 'ascii';
-	}
-	
-	# Re-order the datasets
-	# Directly sorting the @data array is proving difficult. It keeps giving me
-	# a segmentation fault. So I'm using a different approach by copying the 
-	# @data_table into a temporary hash.
-		# put data_table array into a temporary hash
-		# the hash key will the be dataset value, 
-		# the hash value will be the reference the row data
-	my %datahash;
-	
-	# reorder numerically
-	if ($sortmethod eq 'numeric') {
-		for my $row (1..$self->last_row) {
-			my $value = $self->value($row, $index); 
-			
-			# check to see whether this value exists or not
-			while (exists $datahash{$value}) {
-				# add a really small number to bump it up and make it unique
-				# this, of course, presumes that none of the dataset values
-				# are really this small - this may be an entirely bad 
-				# assumption!!!!! I suppose we could somehow calculate an 
-				# appropriate value.... nah.
-				# don't worry, we're only modifying the value used for sorting,
-				# not the actual value
-				$value += 0.00000001; 
-			}
-			# store the row data reference
-			$datahash{$value} = $self->{data_table}->[$row]; 
-		}
-		
-		# re-fill the array based on the sort direction
-		if ($direction =~ /^i/i) { 
-			# increasing sort
-			my $i = 1; # keep track of the row, skip the header
-			foreach (sort {$a <=> $b} keys %datahash) {
-				# put back the reference to the anonymous array of row data
-				$self->{data_table}->[$i] = $datahash{$_};
-				$i++; # increment for next row
-			}
-		} 
-		else { 
-			# decreasing sort
-			my $i = 1; # keep track of the row, skip the header
-			foreach (sort {$b <=> $a} keys %datahash) {
-				# put back the reference to the anonymous array of row data
-				$self->{data_table}->[$i] = $datahash{$_};
-				$i++; # increment for next row
-			}
-		}
-		
-		# summary prompt
-		printf " Data table sorted numerically by the contents of %s\n",
-			$self->name($index);
-	} 
-	
-	# reorder asciibetically
-	elsif ($sortmethod eq 'ascii') {
-		for my $row (1..$self->last_row) {
-			# get the value to sort by
-			my $value = $self->value($row, $index); 
-			if (exists $datahash{$value}) { 
-				# not unique
-				my $n = 1;
-				my $lookup = $value . sprintf("03%d", $n);
-				# we'll try to make a unique value by appending 
-				# a number to the original value
-				while (exists $datahash{$lookup}) {
-					# keep bumping up the number till it's unique
-					$n++;
-					$lookup = $value . sprintf("03%d", $n);
-				}
-				$datahash{$lookup} = $self->{data_table}->[$row];
-			} 
-			else {
-				# unique
-				$datahash{$value} = $self->{data_table}->[$row];
-			}
-		}
-		
-		# re-fill the array based on the sort direction
-		if ($direction eq 'i' or $direction eq 'I') { 
-			# increasing
-			my $i = 1; # keep track of the row
-			foreach (sort {$a cmp $b} keys %datahash) {
-				# put back the reference to the anonymous array of row data
-				$self->{data_table}->[$i] = $datahash{$_};
-				$i++; # increment for next row
-			}
-		} 
-		elsif ($direction eq 'd' or $direction eq 'D') { 
-			# decreasing
-			my $i = 1; # keep track of the row
-			foreach (sort {$b cmp $a} keys %datahash) {
-				# put back the reference to the anonymous array of row data
-				$self->{data_table}->[$i] = $datahash{$_};
-				$i++; # increment for next row
-			}
-		}
-		
-		# summary prompt
-		printf " Data table sorted asciibetically by the contents of '%s'\n",
-			$self->name($index);
-	}
-	
-	return 1;
-}
-
-sub gsort_data {
-	my $self = shift;
-	
-	# identify indices
-	unless ($self->feature_type eq 'coordinate') {
-		carp "no chromosome and start/position columns to sort!\n";
-		return;
-	}
-	my $chromo_i = $self->chromo_column;
-	my $start_i  = $self->start_column;
-	my $stop_i   = $self->stop_column || $start_i;
-	
-	# collect the data by chromosome: start and end
-	my %chrom2row;
-	for my $row (1 .. $self->last_row) {
-		my $c = $self->{data_table}->[$row]->[$chromo_i];
-		$chrom2row{$c} ||= [];
-		push @{ $chrom2row{$c} }, [
-			$self->{data_table}->[$row]->[$start_i], 
-			$self->{data_table}->[$row]->[$stop_i], 
-			$self->{data_table}->[$row]
-		];
-	}
-	
-	# get sane chromosome order
-	my @chroms = sane_chromo_sort(keys %chrom2row); 
-	
-	# sort the table
-	my @sorted_data;
-	push @sorted_data, $self->{data_table}->[0];
-	if ($self->gff) {
-		# sort by increasing start and decreasing end, i.e. decreasing length
-		# this should mostly handle putting genes/transcripts before exons
-		foreach my $chr (@chroms) {
-			push @sorted_data, 
-				map { $_->[2] }
-				sort { $a->[0] <=> $b->[0] or $b->[1] <=> $a->[1] }
-				@{ $chrom2row{$chr} };
-		}
-	}
-	else {
-		# sort by increasing start followed by increasing end, i.e. increasing length
-		foreach my $chr (@chroms) {
-			push @sorted_data, 
-				map { $_->[2] }
-				sort { $a->[0] <=> $b->[0] or $a->[1] <=> $b->[1] }
-				@{ $chrom2row{$chr} };
-		}
-	}
-	$self->{data_table} = \@sorted_data;
-	return 1;
-}
-
-sub splice_data {
-	my ($self, $part, $total_parts) = @_;
-	
-	unless ($part and $total_parts) {
-		confess "ordinal part and total number of parts not passed\n";
-	}
-	my $part_length = int($self->last_row / $total_parts);
-	
-	# check for SeqFeatureObjects array
-	if (exists $self->{SeqFeatureObjects}) {
-		# it needs to be the same length as the data table, it should be
-		while (scalar @{$self->{SeqFeatureObjects}} < scalar @{$self->{data_table}}) {
-			push @{$self->{SeqFeatureObjects}}, undef;
-		}
-	}
-	
-	# splicing based on which part we do 
-	if ($part == 1) {
-		# remove all but the first part
-		splice( 
-			@{$self->{'data_table'}}, 
-			$part_length + 1 
-		);
-		if (exists $self->{SeqFeatureObjects}) {
-			splice( 
-				@{$self->{SeqFeatureObjects}}, 
-				$part_length + 1 
-			);
-		}
-	}
-	elsif ($part == $total_parts) {
-		# remove all but the last part
-		splice( 
-			@{$self->{'data_table'}}, 
-			1,
-			$part_length * ($total_parts - 1) 
-		);
-		if (exists $self->{SeqFeatureObjects}) {
-			splice( 
-				@{$self->{SeqFeatureObjects}}, 
-				1,
-				$part_length * ($total_parts - 1) 
-			);
-		}
-	}
-	else {
-		# splicing in the middle requires two rounds
-		
-		# remove the last parts
-		splice( 
-			@{$self->{'data_table'}}, 
-			($part * $part_length) + 1
-		);
-		
-		# remove the first parts
-		splice( 
-			@{$self->{'data_table'}}, 
-			1,
-			$part_length * ($part - 1) 
-		);
-		
-		if (exists $self->{SeqFeatureObjects}) {
-			splice( 
-				@{$self->{SeqFeatureObjects}}, 
-				($part * $part_length) + 1
-			);
-			splice( 
-				@{$self->{SeqFeatureObjects}}, 
-				1,
-				$part_length * ($part - 1) 
-			);
-		}
-	}
-	
-	# update last row metadata
-	$self->{'last_row'} = scalar(@{$self->{'data_table'}}) - 1;
-	
-	# re-open a new un-cached database connection
-	if (exists $self->{db_connection}) {
-		delete $self->{db_connection};
-	}
-	return 1;
-}
-
-
-
-### File functions
-
-sub reload_children {
-	my $self = shift;
-	my @files = @_;
-	return unless @files;
-	
-	# prepare Stream
-	my $class = "Bio::ToolBox::Data::Stream";
-	eval {load $class};
-	if ($@) {
-		carp "unable to load $class! can't reload children!";
-		return;
-	}
-	
-	# open first stream
-	my $first = shift @files;
-	my $Stream = $class->new(in => $first);
-	unless ($Stream) {
-		carp "unable to load first child file $first";
-		return;
-	}
-	
-	# destroy current data table and metadata
-	$self->{data_table} = [];
-	for (my $i = 0; $i < $self->number_columns; $i++) {
-		delete $self->{$i};
-	}
-	
-	# copy the metadata
-	foreach (qw(program feature db bed gff ucsc headers number_columns last_row)) {
-		# various keys
-		$self->{$_} = $Stream->{$_};
-	}
-	for (my $i = 0; $i < $Stream->number_columns; $i++) {
-		# column metadata
-		my %md = $Stream->metadata($i);
-		$self->{$i} = \%md;
-	}
-	my @comments = $Stream->comments;
-	push @{$self->{other}}, @comments;
-	
-	# first row column headers
-	$self->{data_table}->[0] = [ @{ $Stream->{data_table}->[0] } ];
-	
-	# load the data
-	while (my $row = $Stream->next_row) {
-		$self->add_row($row);
-	}
-	$Stream->close_fh;
-	
-	# load remaining files
-	foreach my $file (@files) {
-		my $Stream = $class->new(in => $file);
-		if ($Stream->number_columns != $self->number_columns) {
-			confess "fatal error: child file $file has a different number of columns!";
-		}
-		while (my $row = $Stream->next_row) {
-			my $a = $row->row_values;
-			$self->add_row($a);
-		}
-		$Stream->close_fh;
-	}
-	$self->verify;
-	
-	# clean up
-	unlink($first, @files);
-	return $self->last_row;
-}
-
-
-
-
-### Export summary data file
-sub summary_file {
-	my $self = shift;
-	
-	# Collect passed arguments
-	my %args = @_; 
-	
-	# parameters
-	# either one or more datasets can be summarized
-	my $outfile = $args{'filename'} || undef;
-	my @datasets;
-	if ($args{dataset} and ref $args{dataset} eq 'ARRAY') {
-		@datasets = @{ $args{dataset} };
-	}
-	elsif ($args{dataset} and ref $args{dataset} eq 'SCALAR') {
-		push @datasets, $args{dataset};
-	}
-	my @startcolumns;
-	if ($args{startcolumn} and ref $args{startcolumn} eq 'ARRAY') {
-		@startcolumns = @{ $args{startcolumn} };
-	}
-	elsif ($args{startcolumn} and ref $args{startcolumn} eq 'SCALAR') {
-		push @startcolumns, $args{startcolumn};
-	}
-	my @endcolumns;
-	$args{endcolumn} ||= $args{stopcolumn};
-	if ($args{endcolumn} and ref $args{endcolumn} eq 'ARRAY') {
-		@endcolumns = @{ $args{endcolumn} };
-	}
-	elsif ($args{endcolumn} and ref $args{endcolumn} eq 'SCALAR') {
-		push @endcolumns, $args{endcolumn};
-	}
-	
-	
-	# Check required values
-	unless ($self->verify) {
-		cluck "bad data structure!";
-		return;
-	}
-	unless (defined $outfile) {
-		if ($self->basename) {
-			# use the opened file's filename if it exists
-			# prepend the path if it exists
-			# the extension will be added later
-			$outfile = $self->path . $self->basename;
-		}
-		else {
-			cluck "no filename passed to write_summary_data!\n";
-			return;
-		}
-	}
-	
-	# Identify possible dataset columns
-	my %possibles;
-	my %skip = map {$_ => 1} qw (systematicname name id alias aliases type class 
-			geneclass chromosome chromo seq_id seqid start stop end gene strand 
-			length primary_id merged_transcript_length transcript_cds_length 
-			transcript_5p_utr_length transcript_3p_utr_length);
-	# walk through the dataset names
-	$possibles{unknown} = [];
-	for (my $i = 0; $i < $self->number_columns; $i++) {
-		if (not exists $skip{ lc $self->{$i}{'name'} }) {
-			my $d = $self->metadata($i, 'dataset') || undef;
-			if (defined $d) {
-				# we have what appears to be a dataset column
-				$possibles{$d} ||= [];
-				push @{$possibles{$d}}, $i;
-			}
-			else {
-				# still an unknown possibility
-				push @{$possibles{unknown}}, $i;
-			}
-		}
-	}
-	
-	# check datasets
-	unless (@datasets) {
-		if (scalar keys %possibles > 1) {
-			# we will always have the unknown category, so anything more than one 
-			# means we found legitimate dataset columns
-			delete $possibles{unknown};
-		}
-		@datasets = sort {$a cmp $b} keys %possibles;
-	}
-	
-	# check starts
-	if (scalar @startcolumns != scalar @datasets) {
-		@startcolumns = (); # ignore what we were given?
-		foreach my $d (@datasets) {
-			# take the first column with this dataset
-			push @startcolumns, $possibles{$d}->[0];
-		}
-	}
-	
-	# check stops
-	if (scalar @endcolumns != scalar @datasets) {
-		@endcolumns = (); # ignore what we were given?
-		foreach my $d (@datasets) {
-			# take the last column with this dataset
-			push @endcolumns, $possibles{$d}->[-1];
-		}
-	}
-	
-	
-	# Prepare Data object to store the summed data
-	my $summed_data = $self->new(
-		feature => 'averaged_windows', 
-		columns => ['Window','Midpoint'],
-	);
-
-	# Go through each dataset
-	foreach my $d (0 .. $#datasets) {
-		
-		# Prepare score column name
-		my $data_name = simplify_dataset_name($datasets[$d]);
-		
-		# add column
-		my $i = $summed_data->add_column($data_name);
-		$summed_data->metadata($i, 'dataset', $datasets[$d]);
-		
-		# tag for remembering we're working with percentile bins
-		my $do_percentile = 0;
-		
-		# remember the row
-		my $row = 1;
-		
-		# Collect summarized data
-		for (
-			my $column = $startcolumns[$d];
-			$column <= $endcolumns[$d];
-			$column++
-		) { 
-		
-			# determine the midpoint position of the window
-			# this assumes the column metadata has start and stop
-			my $midpoint = int(sum0($self->metadata($column, 'start'), 
-				$self->metadata($column, 'stop')) / 2); 
-		
-			# convert midpoint to fraction of 1000 for plotting if necessary
-			if (substr($self->name($column), -1) eq '%') {
-				$midpoint *= 10; # midpoint * 0.01 * 1000 bp
-				$do_percentile++;
-			}
-			if ($do_percentile and substr($self->name($column), -2) eq 'bp') {
-				# working on the extension after the percentile bins
-				$midpoint += 1000;
-			}
-		
-			# collect the values in the column
-			my @values;
-			for my $row (1..$self->last_row) {
-				my $v = $self->value($row, $column);
-				push @values, $v eq '.' ? 0 : $v;  # treat nulls as zero
-			}
-		
-			# adjust if log value
-			my $log = $self->metadata($column, 'log2') || 0;
-			if ($log) {
-				@values = map { 2 ** $_ } @values;
-			}
-		
-			# determine mean value
-			my $window_mean = sum0(@values) / scalar(@values);
-			if ($log) { 
-				$window_mean = log($window_mean) / log(2);
-			}
-		
-			# push to summed output
-			if ($d == 0) {
-				# this is the first dataset, so we need to add a row
-				$summed_data->add_row( [ $self->{$column}{'name'}, $midpoint, $window_mean ] );
-			}
-			else {
-				# we're summarizing multiple datasets, we already have name midpoint
-				# first do sanity check
-				if ($summed_data->value($row, 1) != $midpoint) {
-					carp("unable to summarize multiple datasets with nonequal columns of data!");
-					return;
-				}
-				$summed_data->value($row, $i, $window_mean);
-			}
-			$row++;
-		}
-	}
-	
-	
-	
-	# Write summed data
-	$outfile =~ s/\.txt(\.gz)?$//i; # strip any .txt or .gz extensions if present
-	my $written_file = $summed_data->write_file(
-		'filename'  => $outfile . '_summary.txt',
-		'gz'        => 0,
-	);
-	return $written_file;
-}
-
-
-
-
-
-####################################################
-
-package Bio::ToolBox::Data::Iterator;
-use Bio::ToolBox::Data::Feature;
-use Carp;
-
-sub new {
-	my ($class, $data) = @_;
-	my %iterator = (
-		'index'     => 1,
-		'data'      => $data,
-	);
-	return bless \%iterator, $class;
-}
-
-sub next_row {
-	my $self = shift;
-	return if $self->{'index'} > $self->{data}->{last_row}; # no more
-	my $i = $self->{'index'};
-	$self->{'index'}++;
-	my @options = (
-		'data'      => $self->{data},
-		'index'     => $i,
-	);
-	if (
-		exists $self->{data}->{SeqFeatureObjects} and
-		defined $self->{data}->{SeqFeatureObjects}->[$i] 
-	) {
-		push @options, 'feature', $self->{data}->{SeqFeatureObjects}->[$i];
-	}
-	return Bio::ToolBox::Data::Feature->new(@options);	
-}
-
-sub row_index {
-	my $self = shift;
-	carp "row_index is a read only method" if @_;
-	return $self->{'index'};
-}
-
-
-
-####################################################
-
-__END__
 
 =head1 AUTHOR
 

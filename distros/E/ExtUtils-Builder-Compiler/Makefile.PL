@@ -28,7 +28,6 @@ my %WriteMakefileArgs = (
     "File::Basename" => 0,
     "File::Spec::Functions" => 0,
     "Perl::OSType" => 0,
-    "base" => 0,
     "parent" => 0,
     "sort" => 0,
     "strict" => 0,
@@ -39,7 +38,7 @@ my %WriteMakefileArgs = (
     "IPC::Open2" => 0,
     "Test::More" => "0.89"
   },
-  "VERSION" => "0.014",
+  "VERSION" => "0.015",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -61,7 +60,6 @@ my %FallbackPrereqs = (
   "IPC::Open2" => 0,
   "Perl::OSType" => 0,
   "Test::More" => "0.89",
-  "base" => 0,
   "parent" => 0,
   "sort" => 0,
   "strict" => 0,

@@ -1,0 +1,63 @@
+#!perl
+use v5.40;
+
+use File::Basename ();
+use File::Temp ();
+use Getopt::Long ();
+use IO::Compress::Gzip ();
+
+my $VERSION = v0.0.1;
+
+my $HELP = <<'EOF';
+Usage: perl-gzip-script [options] SCRIPT
+
+Options:
+  -i, --in-place  send output back to files, not stdout.
+  -s, --shebang   shebang, default: "#!/usr/bin/env perl"
+  -h, --help      show this help
+  -v, --version   show version
+
+Examples:
+  $ perl-gzip-script script.pl > script.pl.gz
+  $ perl-gzip-script -i script.pl
+EOF
+
+my $parser = Getopt::Long::Parser->new(
+    config => [qw(no_auto_abbrev no_ignore_case bundling)],
+);
+$parser->getoptionsfromarray(\@ARGV,
+    "i|in-place" => \my $in_place,
+    "s|shebang=s" => \(my $shebang = '#!/usr/bin/env perl'),
+    "h|help" => sub { die $HELP },
+    "v|version" => sub { printf "v%vd\n", $VERSION; exit },
+) or exit 1;
+
+my $script = shift or die "Need SCRIPT argument.\n";
+
+my $out = \*STDOUT;
+if ($in_place) {
+    $out = File::Temp->new(DIR => File::Basename::dirname($script))
+}
+
+$out->say($shebang);
+$out->print(<<'EOF');
+use IO::Uncompress::Gunzip ();
+IO::Uncompress::Gunzip::gunzip \*DATA, \my $script, AutoClose => 1 or die $IO::Uncompress::Gunzip::GunzipError;
+eval '#line 1 "' . __FILE__ . "\"\n" . $script;
+die $@ if $@;
+__DATA__
+EOF
+
+IO::Compress::Gzip::gzip $script, $out,
+    Append => 1,
+    Minimal => 1,
+    Level => IO::Compress::Gzip::Z_BEST_COMPRESSION,
+or die $IO::Compress::Gzip::GzipError;
+
+exit if !$in_place;
+
+$out->close;
+my $mode = (stat $script)[2];
+chmod $mode, $out->filename;
+rename $out->filename, $script or die $!;
+$out->unlink_on_destroy(0);

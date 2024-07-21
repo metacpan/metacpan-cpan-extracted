@@ -22,7 +22,7 @@ use Try::Tiny;
 
 use experimental qw/ postderef signatures /;
 
-our $VERSION = 'v0.7.0';
+our $VERSION = 'v0.7.1';
 
 # Note: You may be able to omit the client if there is a client
 # defined in the environment hash at C<psgix.monitor.statsd>, and the
@@ -205,7 +205,7 @@ Plack::Middleware::Statsd - send statistics to statsd
 
 =head1 VERSION
 
-version v0.7.0
+version v0.7.1
 
 =head1 SYNOPSIS
 
@@ -535,7 +535,7 @@ Library L<https://www.sciencephoto.com>.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2018-2023 by Robert Rothenberg.
+This software is Copyright (c) 2018-2024 by Robert Rothenberg.
 
 This is free software, licensed under:
 

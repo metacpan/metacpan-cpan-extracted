@@ -1,6 +1,6 @@
 package Bio::MUST::Core::Constants;
 # ABSTRACT: Distribution-wide constants for Bio::MUST::Core
-$Bio::MUST::Core::Constants::VERSION = '0.240390';
+$Bio::MUST::Core::Constants::VERSION = '0.242020';
 use strict;
 use warnings;
 
@@ -103,7 +103,8 @@ const our $ALI_SUFFIX    => qr{\.ali \z}xmsi;
 # Note: hash values correspond to -name arg in File::Find::Rule constructor
 
 const our %SUFFICES_FOR => (
-    Ali => qr{\. (?: ali|fasta|fas|fa|faa|fna ) \z}xmsi,
+    Ali  => qr{\. (?: ali|fasta|fas|fa|faa|fna ) \z}xmsi,
+    Tree => qr{\. (?: arb|nexus|nex|treefile|tree|tre ) \z}xmsi,
 );
 
 1;
@@ -118,7 +119,7 @@ Bio::MUST::Core::Constants - Distribution-wide constants for Bio::MUST::Core
 
 =head1 VERSION
 
-version 0.240390
+version 0.242020
 
 =head1 AUTHOR
 

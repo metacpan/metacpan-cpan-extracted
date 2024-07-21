@@ -3,7 +3,7 @@ use warnings;
 
 use OpenMP::Simple;
 use OpenMP::Environment;
-use Util::H2O::More qw/ddd h2o/;
+use Util::H2O::More qw/h2o/;
 use Test::More;
 
 use Inline (

@@ -13,7 +13,7 @@ use Smart::Comments;
 
 use Bio::MUST::Core;
 use Bio::MUST::Core::Constants qw(:seqids);
-use Bio::MUST::Core::Utils qw(secure_outfile);
+use Bio::MUST::Core::Utils qw(change_suffix secure_outfile);
 use aliased 'Bio::MUST::Core::Ali';
 use aliased 'Bio::MUST::Core::IdMapper';
 
@@ -112,7 +112,7 @@ inst-abbr-ids.pl - Abbreviate seq ids in FASTA files (optimized)
 
 =head1 VERSION
 
-version 0.240390
+version 0.242020
 
 =head1 USAGE
 

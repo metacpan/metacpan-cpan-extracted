@@ -1,5 +1,307 @@
 package Bio::ToolBox::utility;
-our $VERSION = '1.69';
+
+use warnings;
+use strict;
+use Carp;
+use File::Spec;
+use IO::Prompt::Tiny qw(prompt);
+require Exporter;
+
+our $VERSION = '2.00';
+
+### Variables
+# Export
+our @ISA = qw(Exporter);
+
+our @EXPORT_OK = qw(
+	parse_list
+	format_with_commas
+	ask_user_for_index
+	simplify_dataset_name
+	sane_chromo_sort
+);
+
+my $DATA_COLNAMES = q();
+my $DATA_FILENAME = q();
+
+### Parse string into list
+sub parse_list {
+
+	# this subroutine will parse a string into an array
+	# it is designed for a string of numbers delimited by commas
+	# a range of numbers may be specified using a dash
+	# hence 1,2,5-7 would become an array of 1,2,5,6,7
+
+	my $string = shift;
+	return unless defined $string;
+	if ( $string =~ /[^\d,\-\s\&]/x ) {
+		carp 'ERROR: the string contains characters that cannot be parsed';
+		return;
+	}
+	my @list;
+	foreach ( split /[,\s+]/, $string ) {
+
+		# check for a range
+		if (/\-/) {
+			my ( $start, $stop ) = split /\-/;
+
+			# add each item in the range to the list
+			for ( my $i = $start; $i <= $stop; $i++ ) {
+				push @list, $i;
+			}
+			next;
+		}
+		else {
+			# either an ordinary number or an "&"ed list of numbers
+			push @list, $_;
+		}
+	}
+	return @list;
+}
+
+### Format a number into readable comma-delimited by thousands number
+sub format_with_commas {
+
+	# for formatting a number with commas
+	my $number = shift;
+
+	# check number
+	my ( $integers, $decimals, $sign );
+	if ( $number =~ m/^ (\-)? (\d+) \. (\d+) $/x ) {
+		$sign     = $1;
+		$integers = $2;
+		$decimals = $3;
+	}
+	elsif ( $number =~ m/^ (\-)? (\d+) $/x ) {
+		$sign     = $1;
+		$integers = $2;
+	}
+	else {
+		carp 'ERROR: the string contains characters that cannot be parsed';
+		return $number;
+	}
+
+	# format
+	my @digits = split //, $integers;
+	my @formatted;
+	while (@digits) {
+		if ( @digits > 3 ) {
+			unshift @formatted, pop @digits;
+			unshift @formatted, pop @digits;
+			unshift @formatted, pop @digits;
+			unshift @formatted, ',';
+		}
+		else {
+			while (@digits) {
+				unshift @formatted, pop @digits;
+			}
+		}
+	}
+
+	# finished
+	my $final = $sign ? $sign : q();
+	$final .= join( q(), @formatted );
+	$final .= '.' . $decimals if defined $decimals;
+	return $final;
+}
+
+sub ask_user_for_index {
+	my $Data = shift;
+	my $line = shift || ' Enter the desired column index   ';
+	unless ( ref($Data) =~ /Bio::ToolBox::Data/x ) {
+		carp 'ERROR: Must pass a Bio::ToolBox::Data object!';
+		return;
+	}
+
+	# print column header names only if we have not done so before
+	unless (
+		# we use filename and column number as indicators
+		$Data->filename eq $DATA_FILENAME
+		and join( ';', $Data->list_columns ) eq $DATA_COLNAMES
+		)
+	{
+		print " These are the columns in the file\n";
+		my $i = 1;
+		foreach ( $Data->list_columns ) {
+			print "  $i\t$_\n";
+			$i++;
+		}
+
+		# remember for next time
+		$DATA_FILENAME = $Data->filename;
+		$DATA_COLNAMES = join( ';', $Data->list_columns );
+	}
+
+	# get response
+	my $response = prompt($line);
+	my @indices  = parse_list($response);
+
+	# verify
+	my @good;
+	my $n = $Data->number_columns;
+	foreach my $i (@indices) {
+		if ( $i =~ /^\d+$/ and $i > 0 and $i <= $n ) {
+			push @good, $i;
+		}
+		else {
+			print "  $i is not a valid index!\n";
+		}
+	}
+	return wantarray ? @good : $good[0];
+}
+
+sub simplify_dataset_name {
+	my $dataset = shift;
+	my $new_name;
+
+	# strip any file prefix
+	$dataset =~ s/^(?: file | http | ftp ):\/*//x;
+
+	if ( $dataset =~ /&/ ) {
+
+		# a combination dataset
+		foreach ( split /&/, $dataset ) {
+			my $n = simplify_dataset_name($_);
+			if ($new_name) {
+				$new_name .= '&' . $n;
+			}
+			else {
+				$new_name = $n;
+			}
+		}
+	}
+	else {
+		# a single dataset
+		# this could be either a file name or an entry in a BioPerl or BigWigSet database
+		# remove any possible paths
+		( undef, undef, $new_name ) = File::Spec->splitpath($dataset);
+
+		# remove any known file extensions
+		$new_name =~
+s/\. (?: bw | bam | bb | useq | bigwig | bigbed | g[tf]f3? | cram | wig | bdg | bedgraph ) (?:\.gz)? $//xi;
+
+		# remove common non-useful stuff
+		# trying to imagine all sorts of possible things
+		$new_name =~
+s/[_\.\-] (?: sort | sorted | dedup | dedupe | deduplicated | rmdup | mkdup | markdup | dup | unique | filt | filtered ) \b //xgi;
+		$new_name =~
+s/[_\.\-] (?: coverage | rpm | ext\d* | extend\d* | log2fe | log\d+ | qvalue | fragment | count | lambda_control | fe | fold.?enrichment | ratio | log\d*ratio ) \b //xgi;
+	}
+	return $new_name;
+}
+
+sub sane_chromo_sort {
+	my @chroms = @_;
+	return unless scalar @chroms;
+
+	# let's try and sort in some kind of rational order
+	my @numeric;
+	my @romanic;
+	my @mixed;
+	my @alphic;
+	my @sex;
+	my @mito;
+	foreach my $c (@chroms) {
+
+		my $name;
+		if ( ref($c) eq 'ARRAY' ) {
+			$name = $c->[0];
+		}
+		else {
+			$name = $c;
+		}
+
+		# identify the type of chromosome name to sort
+		if ( $name =~ m/^ (?:chr)? ( [wxyz] ) $/xi ) {
+
+			# sex chromosomes
+			push @sex, [ $1, $c ];
+		}
+		elsif ( $name =~ m/^ (?:chr)? (?: m | mt | mito ) (?:dna)? $/xi ) {
+
+			# mitochondrial
+			push @mito, [ $name, $c ];
+		}
+		elsif ( $name =~ m/^ (?:chr)? (\d+) $/xi ) {
+
+			# standard numeric chromosome
+			push @numeric, [ $1, $c ];
+		}
+		elsif ( $name =~ m/^ (?:chr)? ( [IVX]+ ) $/x ) {
+
+			# Roman numerals - silly Saccharomyces cerevisiae
+			push @romanic, [ $1, $c ];
+		}
+		elsif ( $name =~ m/^ ( [a-zA-Z_\-\.]+ ) (\d+)/x ) {
+
+			# presumed contigs and such?
+			push @mixed, [ $1, $2, $name, $c ];
+		}
+		else {
+			# everything else
+			push @alphic, [ $name, $c ];
+		}
+	}
+
+	# check romanic
+	if ( scalar @romanic ) {
+
+		# looks like we have romanic chromosomes
+		if ( scalar @sex ) {
+
+			# probably caught up chrX, unlikely WYZ
+			my @x = grep { $sex[$_]->[0] =~ m/^X$/ } ( 0 .. $#sex );
+			foreach ( reverse @x ) {
+
+				# I'm assuming and hoping there's only one chrX found
+				# but reverse the list, just in case - assuming grep returns in order
+				push @romanic, ( splice( @sex, $_, 1 ) );
+			}
+		}
+		if ( scalar @numeric ) {
+
+			# well, shoot, this is weird, mix of both numeric and romanic chromosomes?
+			# just merge romanic with alphic and hope for the best
+			push @alphic, @romanic;
+		}
+		else {
+			# convert the romanic to numeric
+			while (@romanic) {
+				my $r = shift @romanic;
+				my $c = $r->[0];
+				$c =~ s/IV/4/;
+				$c =~ s/IX/9/;
+				$c =~ s/V/5/;
+				$c =~ s/I/1/g;
+				my $n = 0;
+				foreach ( split m//, $c ) {
+					if ( $_ eq 'X' ) {
+						$n += 10;
+					}
+					else {
+						$n += $_;
+					}
+				}
+				push @numeric, [ $n, $r->[1] ];
+			}
+		}
+	}
+
+	# sort
+	my @sorted;
+	push @sorted, map { $_->[1] } sort { $a->[0] <=> $b->[0] } @numeric;
+	push @sorted, map { $_->[1] } sort { $a->[0] cmp $b->[0] } @sex;
+	push @sorted, map { $_->[1] } sort { $a->[0] cmp $b->[0] } @mito;
+	push @sorted, map { $_->[3] }
+		sort { $a->[0] cmp $b->[0] or $a->[1] <=> $b->[1] or $a->[2] cmp $b->[2] } @mixed;
+	push @sorted, map { $_->[1] } sort { $a->[0] cmp $b->[0] } @alphic;
+
+	return @sorted;
+}
+
+1;
+
+__END__
 
 =head1 NAME
 
@@ -83,302 +385,6 @@ references, with the first element assumed to be the name, e.g.
 C<[$name, $length]>. 
 
 =back
-
-=cut
-
-use strict;
-use Carp;
-use File::Spec;
-require Exporter;
-
-
-### Variables
-# Export
-our @ISA = qw(Exporter);
-our @EXPORT = qw(
-	parse_list
-	format_with_commas
-	ask_user_for_index
-	simplify_dataset_name
-	sane_chromo_sort
-);
-our $DATA_COLNAMES  = undef;
-our $DATA_FILENAME  = undef;
-
-### The True Statement
-1; 
-
-
-
-#################   The Subroutines   ###################
-
-### Parse string into list
-sub parse_list {
-	# this subroutine will parse a string into an array
-	# it is designed for a string of numbers delimited by commas
-	# a range of numbers may be specified using a dash
-	# hence 1,2,5-7 would become an array of 1,2,5,6,7
-	
-	my $string = shift;
-	return unless defined $string;
-	if ($string =~ /[^\d,\-\s\&]/) {
-		carp " the string contains characters that can't be parsed\n";
-		return;
-	}
-	my @list;
-	foreach (split /[,\s+]/, $string) {
-		# check for a range
-		if (/\-/) { 
-			my ($start, $stop) = split /\-/;
-			# add each item in the range to the list
-			for (my $i = $start; $i <= $stop; $i++) {
-				push @list, $i;
-			}
-			next;
-		} 
-		else {
-			# either an ordinary number or an "&"ed list of numbers 
-			push @list, $_;
-		}
-	}
-	return @list;
-}
-
-
-
-### Format a number into readable comma-delimited by thousands number
-sub format_with_commas {
-	# for formatting a number with commas
-	my $number = shift;
-	
-	# check number
-	my ($integers, $decimals, $sign);
-	if ($number =~ /^(\-)?(\d+)\.(\d+)$/) {
-		$sign     = $1;
-		$integers = $2;
-		$decimals = $3;
-	}
-	elsif ($number =~ /^(\-)?(\d+)$/) {
-		$sign     = $1;
-		$integers = $2;
-	}
-	else {
-		carp " the string contains characters that can't be parsed\n";
-		return $number;
-	}
-	
-	# format
-	my @digits = split //, $integers;
-	my @formatted;
-	while (@digits) {
-		if (@digits > 3) {
-			unshift @formatted, pop @digits;
-			unshift @formatted, pop @digits;
-			unshift @formatted, pop @digits;
-			unshift @formatted, ',';
-		}
-		else {
-			while (@digits) {
-				unshift @formatted, pop @digits;
-			}
-		}
-	}
-	
-	# finished
-	my $final = $sign ? $sign : '';
-	$final .= join("", @formatted);
-	$final .= '.' . $decimals if defined $decimals;
-	return $final;
-}
-
-
-sub ask_user_for_index {
-	my $Data = shift;
-	my $line = shift || ' Enter the desired column index   ';
-	unless (ref($Data) =~ /Bio::ToolBox::Data/) {
-		carp "Must pass a Bio::ToolBox::Data object!\n";
-		return;
-	}
-	
-	# print column header names only if we have not done so before
-	unless (
-		# we use filename and column number as indicators 
-		$Data->filename eq $DATA_FILENAME and 
-		join(";", $Data->list_columns) eq $DATA_COLNAMES
-	) {
-		print " These are the columns in the file\n";
-		my $i = 0;
-		foreach ($Data->list_columns) {
-			print "  $i\t$_\n";
-			$i++;
-		}
-		# remember for next time
-		$DATA_FILENAME = $Data->filename;
-		$DATA_COLNAMES = join(";", $Data->list_columns);
-	}
-	print $line;
-	
-	# get response
-	my $response = <STDIN>;
-	chomp $response;
-	my @indices = parse_list($response); 
-	
-	# verify
-	my @good;
-	foreach (@indices) {
-		if ($Data->name($_)) {
-			push @good, $_;
-		}
-		else {
-			print "  $_ is not a valid index!\n";
-		}
-	}
-	return wantarray ? @good : $good[0];
-}
-
-
-sub simplify_dataset_name {
-	my $dataset = shift;
-	my $new_name;
-	
-	# strip any file prefix
-	$dataset =~ s/^(?:file|http|ftp):\/*//;
-	
-	if ($dataset =~ /&/) {
-		# a combination dataset
-		foreach (split /&/, $dataset) {
-			my $n = simplify_dataset_name($_);
-			if ($new_name) {
-				$new_name .= '&' . $n;
-			}
-			else {
-				$new_name = $n;
-			}
-		}
-	}
-	else {
-		# a single dataset
-		# this could be either a file name or an entry in a BioPerl or BigWigSet database 
-		# remove any possible paths 
-		(undef, undef, $new_name) = File::Spec->splitpath($dataset);
-		
-		# remove any known file extensions
-		$new_name =~ s/\.(?:bw|bam|bb|useq|bigwig|bigbed|g[tf]f3?|cram|wig|bdg|bedgraph)(?:\.gz)?$//i;
-		
-		# remove common non-useful stuff
-		# trying to imagine all sorts of possible things
-		$new_name =~ s/[_\.\-](?:sort|sorted|dedup|dedupe|deduplicated|rmdup|mkdup|markdup|dup|unique|filt|filtered)\b//gi;
-		$new_name =~ s/[_\.\-](?:coverage|rpm|ext\d*|extend\d*|log2fe|log\d+|qvalue|fragment|count|lambda_control|fe|fold.?enrichment|ratio|log\d*ratio)\b//gi;
-	}
-	return $new_name;
-}
-
-
-sub sane_chromo_sort {
-	my @chroms = @_;
-	return unless scalar @chroms;
-	
-	# let's try and sort in some kind of rational order
-	my @numeric;
-	my @romanic;
-	my @mixed;
-	my @alphic;
-	my @sex;
-	my @mito;
-	foreach my $c (@chroms) {
-		
-		my $name;
-		if (ref($c) eq 'ARRAY') {
-			$name = $c->[0];
-		}
-		else {
-			$name = $c;
-		}
-		
-		# identify the type of chromosome name to sort
-		if ($name =~ /^(?:chr)?([wxyz])$/i) {
-			# sex chromosomes
-			push @sex, [$1, $c];
-		}
-		elsif ($name =~ /^(?:chr)?(?:m|mt|mito)(?:dna)?$/i) {
-			# mitochondrial
-			push @mito, [$name, $c];
-		}
-		elsif ($name =~ /^(?:chr)?(\d+)$/i) {
-			# standard numeric chromosome
-			push @numeric, [$1, $c];
-		} 
-		elsif ($name =~ /^(?:chr)?([IVX]+)$/) {
-			# Roman numerals - silly Saccharomyces cerevisiae
-			push @romanic, [$1, $c];
-		}
-		elsif ($name =~ /^([a-zA-Z_\-\.]+)(\d+)/) {
-			# presumed contigs and such?
-			push @mixed, [$1, $2, $name, $c];
-		}
-		else {
-			# everything else
-			push @alphic, [$name, $c];
-		}
-	}
-	
-	# check romanic 
-	if (scalar @romanic) {
-		# looks like we have romanic chromosomes
-		if (scalar @sex) {
-			# probably caught up chrX, unlikely WYZ
-			my @x = grep { $sex[$_]->[0] =~ m/^X$/ } (0 .. $#sex);
-			foreach (reverse @x) {
-				# I'm assuming and hoping there's only one chrX found
-				# but reverse the list, just in case - assuming grep returns in order
-				push @romanic, ( splice(@sex, $_, 1) );
-			}
-		}
-		if (scalar @numeric) {
-			# well, shoot, this is weird, mix of both numeric and romanic chromosomes?
-			# just merge romanic with alphic and hope for the best
-			push @alphic, @romanic;
-		}
-		else {
-			# convert the romanic to numeric 
-			while (@romanic) {
-				my $r = shift @romanic;
-				my $c = $r->[0];
-				$c =~ s/IV/4/;
-				$c =~ s/IX/9/;
-				$c =~ s/V/5/;
-				$c =~ s/I/1/g;
-				my $n = 0;
-				foreach (split q(), $c) {
-					if ($_ eq 'X') {
-						$n += 10;
-					}
-					else {
-						$n += $_;
-					}
-				}
-				push @numeric, [$n, $r->[1]];
-			}
-		}
-	}
-	
-	# sort
-	my @sorted;
-	push @sorted, map { $_->[1] } sort {$a->[0] <=> $b->[0]} @numeric;
-	push @sorted, map { $_->[1] } sort {$a->[0] cmp $b->[0]} @sex;
-	push @sorted, map { $_->[1] } sort {$a->[0] cmp $b->[0]} @mito;
-	push @sorted, map { $_->[3] } sort {
-		$a->[0] cmp $b->[0] or 
-		$a->[1] <=> $b->[1] or 
-		$a->[2] cmp $b->[2]
-	} @mixed; 
-	push @sorted, map { $_->[1] } sort { $a->[0] cmp $b->[0] } @alphic;
-	
-	return @sorted;
-}
-
-
-__END__
 
 =head1 AUTHOR
 

@@ -55,7 +55,9 @@ extern "C" {
 #endif
 
 
+#ifdef UNBOUND_VERSION_MAJOR
 #define UNBOUND_VERSION (UNBOUND_VERSION_MAJOR*100 + UNBOUND_VERSION_MINOR)*100 + UNBOUND_VERSION_MICRO
+#endif
 
 #define checkerr(arg)	checkret( (arg), __LINE__ )
 static void checkret(const int err, int line)
@@ -196,6 +198,22 @@ set_fwd(struct ub_ctx* ctx, const char* addr)
     CODE:
 	checkerr( ub_ctx_set_fwd(ctx, addr) );
 
+#if !(UNBOUND_VERSION < 10900)
+void
+set_tls(struct ub_ctx* ctx, int tls)
+    CODE:
+	checkerr( ub_ctx_set_tls(ctx, tls) );
+
+#endif
+
+#if !(UNBOUND_VERSION < 10508)
+void
+set_stub(struct ub_ctx* ctx, const char* zone, const char* addr, int isprime)
+    CODE:
+	checkerr( ub_ctx_set_stub(ctx, zone, addr, isprime) );
+
+#endif
+
 void
 resolv_conf(struct ub_ctx* ctx, const char* fname)
     CODE:
@@ -215,6 +233,14 @@ void
 add_ta_file(struct ub_ctx* ctx, const char* fname)
     CODE:
 	checkerr( ub_ctx_add_ta_file(ctx, fname) );
+
+#if !(UNBOUND_VERSION < 10500)
+void
+add_ta_autr(struct ub_ctx* ctx, const char* fname)
+    CODE:
+	checkerr( ub_ctx_add_ta_autr(ctx, fname) );
+
+#endif
 
 void
 trusted_keys(struct ub_ctx* ctx, const char* fname)
@@ -266,25 +292,6 @@ void
 ub_wait(struct ub_ctx* ctx)
     CODE:
 	checkerr( ub_wait(ctx) );
-
-
-#if !(UNBOUND_VERSION < 10900)
-void
-set_stub(struct ub_ctx* ctx, const char* zone, const char* addr, int isprime)
-    CODE:
-	checkerr( ub_ctx_set_stub(ctx, zone, addr, isprime) );
-
-void
-add_ta_autr(struct ub_ctx* ctx, const char* fname)
-    CODE:
-	checkerr( ub_ctx_add_ta_autr(ctx, fname) );
-
-void
-set_tls(struct ub_ctx* ctx, int tls)
-    CODE:
-	checkerr( ub_ctx_set_tls(ctx, tls) );
-
-#endif
 
 
 ########################

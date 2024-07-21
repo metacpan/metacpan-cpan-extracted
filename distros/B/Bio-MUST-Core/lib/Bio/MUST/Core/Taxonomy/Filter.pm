@@ -1,79 +1,20 @@
 package Bio::MUST::Core::Taxonomy::Filter;
 # ABSTRACT: Helper class for filtering seqs according to taxonomy
-$Bio::MUST::Core::Taxonomy::Filter::VERSION = '0.240390';
+$Bio::MUST::Core::Taxonomy::Filter::VERSION = '0.242020';
 use Moose;
 use namespace::autoclean;
 
 use autodie;
 use feature qw(say);
 
-use Smart::Comments;
+use Smart::Comments '###';
 
-use Carp;
-use Const::Fast;
 use List::AllUtils;
 
 use Bio::MUST::Core::Types;
 use aliased 'Bio::MUST::Core::IdList';
-with 'Bio::MUST::Core::Roles::Taxable';
-
-
-has '_specs' => (
-    is       => 'ro',
-    isa      => 'Bio::MUST::Core::IdList',
-    required => 1,
-    coerce   => 1,
-    handles  => {
-        all_specs => 'all_ids',
-    },
-);
-
-
-has '_is_' . $_ => (
-    traits   => ['Hash'],
-    is       => 'ro',
-    isa      => 'HashRef',
-    init_arg => undef,
-    writer   => '_set_is_' . $_,
-    handles  => {
-        'all_' . $_ => 'keys',
-         'is_' . $_ => 'defined',
-    },
-) for qw(wanted unwanted);
-
-
-# TODO: allow specifying taxa as partial lineages to solve ambiguities
-# TODO: allow specifying taxa as taxid and/or mustids (for strains)
-
-# regexes for deriving filter from specifications
-const my $WANTED   => qr{\A \+ \s* (.*) }xms;
-const my $UNWANTED => qr{\A \- \s* (.*) }xms;
-
-sub BUILD {
-    my $self = shift;
-
-    # parse filter specifications
-    my   @wanted = map { $_ =~   $WANTED ? $1 : () } $self->all_specs;
-    my @unwanted = map { $_ =~ $UNWANTED ? $1 : () } $self->all_specs;
-
-    # warn in case of ambiguous taxa
-    for my $taxon (@wanted, @unwanted) {
-        carp "[BMC] Warning: $taxon is taxonomically ambiguous in filter!"
-            if $self->tax->is_dupe($taxon);
-    }
-
-    # build filtering hashes from wanted and unwanted arrays
-    # Note: we want no virus by default but exclude nothing
-    push @wanted, 'cellular organisms' unless @wanted;
-    my %is_wanted   = map { $_ => 1 }   @wanted;
-    my %is_unwanted = map { $_ => 1 } @unwanted;
-
-    # store HashRefs for filter
-    $self->_set_is_wanted(  \%is_wanted  );
-    $self->_set_is_unwanted(\%is_unwanted);
-
-    return;
-}
+with 'Bio::MUST::Core::Roles::Filterable',
+     'Bio::MUST::Core::Roles::Taxable';
 
 
 
@@ -92,7 +33,6 @@ sub is_allowed {
     return 0     if List::AllUtils::any { $self->is_unwanted($_) } @lineage;
     return 1;
 }
-
 
 
 sub tax_list {
@@ -120,7 +60,7 @@ Bio::MUST::Core::Taxonomy::Filter - Helper class for filtering seqs according to
 
 =head1 VERSION
 
-version 0.240390
+version 0.242020
 
 =head1 SYNOPSIS
 

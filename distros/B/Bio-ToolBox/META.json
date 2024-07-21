@@ -4,7 +4,7 @@
       "Timothy Parnell <parnell.tj@gmail.com>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.4231",
+   "generated_by" : "Module::Build version 0.4234",
    "license" : [
       "perl_5"
    ],
@@ -22,86 +22,109 @@
       "runtime" : {
          "recommends" : {
             "Bio::DB::USeq" : "0.25",
-            "Net::FTP" : "0",
             "Parallel::ForkManager" : "1.02",
             "Set::IntSpan::Fast" : "1.15",
             "Set::IntervalTree" : "0.1"
          },
          "requires" : {
             "Bio::DB::Big" : "1",
-            "Bio::DB::HTS" : "2.1",
+            "Bio::DB::HTS" : "3.01",
             "Bio::Root::Version" : "1.006924",
             "Config::Simple" : "4.58",
             "File::Which" : "1.17",
             "Getopt::Long" : "2.24",
+            "IO::Prompt::Tiny" : "0.003",
             "List::MoreUtils" : "0.4",
             "List::Util" : "1.45",
             "Module::Load" : "0.32",
+            "Scalar::Util" : "1.45",
             "Statistics::Descriptive" : "3",
             "Statistics::Lite" : "3.2"
          }
       },
       "test" : {
          "requires" : {
-            "Test::More" : "1.302"
+            "Test::More" : "1.302",
+            "Test::Warn" : "0.36"
          }
       }
    },
    "provides" : {
       "Bio::ToolBox" : {
          "file" : "lib/Bio/ToolBox.pm",
-         "version" : "1.691"
+         "version" : "2.00"
       },
       "Bio::ToolBox::Data" : {
          "file" : "lib/Bio/ToolBox/Data.pm",
-         "version" : "1.69"
+         "version" : "2.00"
       },
       "Bio::ToolBox::Data::Feature" : {
          "file" : "lib/Bio/ToolBox/Data/Feature.pm",
-         "version" : "1.691"
+         "version" : "2.00"
       },
       "Bio::ToolBox::Data::Iterator" : {
-         "file" : "lib/Bio/ToolBox/Data.pm"
+         "file" : "lib/Bio/ToolBox/Data/Iterator.pm",
+         "version" : "2.00"
       },
       "Bio::ToolBox::Data::Stream" : {
          "file" : "lib/Bio/ToolBox/Data/Stream.pm",
-         "version" : "1.69"
+         "version" : "2.00"
       },
       "Bio::ToolBox::Data::core" : {
          "file" : "lib/Bio/ToolBox/Data/core.pm",
-         "version" : "1.69"
+         "version" : "2.00"
       },
       "Bio::ToolBox::Data::file" : {
          "file" : "lib/Bio/ToolBox/Data/file.pm",
-         "version" : "1.69"
+         "version" : "2.00"
       },
       "Bio::ToolBox::GeneTools" : {
          "file" : "lib/Bio/ToolBox/GeneTools.pm",
-         "version" : "1.67"
+         "version" : "2.00"
+      },
+      "Bio::ToolBox::Parser" : {
+         "file" : "lib/Bio/ToolBox/Parser.pm",
+         "version" : "2.00"
+      },
+      "Bio::ToolBox::Parser::bed" : {
+         "file" : "lib/Bio/ToolBox/Parser/bed.pm",
+         "version" : "2.00"
+      },
+      "Bio::ToolBox::Parser::gff" : {
+         "file" : "lib/Bio/ToolBox/Parser/gff.pm",
+         "version" : "2.00"
+      },
+      "Bio::ToolBox::Parser::ucsc" : {
+         "file" : "lib/Bio/ToolBox/Parser/ucsc.pm",
+         "version" : "2.00"
+      },
+      "Bio::ToolBox::Parser::ucsc::builder" : {
+         "file" : "lib/Bio/ToolBox/Parser/ucsc/builder.pm",
+         "version" : "2.00"
       },
       "Bio::ToolBox::SeqFeature" : {
          "file" : "lib/Bio/ToolBox/SeqFeature.pm",
-         "version" : "1.67"
+         "version" : "2.00"
       },
       "Bio::ToolBox::big_helper" : {
          "file" : "lib/Bio/ToolBox/big_helper.pm",
-         "version" : "1.68"
+         "version" : "2.00"
       },
       "Bio::ToolBox::db_helper" : {
          "file" : "lib/Bio/ToolBox/db_helper.pm",
-         "version" : "1.69"
+         "version" : "2.00"
       },
       "Bio::ToolBox::db_helper::alignment_callbacks" : {
          "file" : "lib/Bio/ToolBox/db_helper/alignment_callbacks.pm",
-         "version" : "1.62"
+         "version" : "2.00"
       },
       "Bio::ToolBox::db_helper::bam" : {
          "file" : "lib/Bio/ToolBox/db_helper/bam.pm",
-         "version" : "1.62"
+         "version" : "2.00"
       },
       "Bio::ToolBox::db_helper::big" : {
          "file" : "lib/Bio/ToolBox/db_helper/big.pm",
-         "version" : "1.69"
+         "version" : "2.00"
       },
       "Bio::ToolBox::db_helper::big::BedIteratorWrapper" : {
          "file" : "lib/Bio/ToolBox/db_helper/big.pm"
@@ -111,53 +134,39 @@
       },
       "Bio::ToolBox::db_helper::bigbed" : {
          "file" : "lib/Bio/ToolBox/db_helper/bigbed.pm",
-         "version" : "1.51"
+         "version" : "2.00"
       },
       "Bio::ToolBox::db_helper::bigwig" : {
          "file" : "lib/Bio/ToolBox/db_helper/bigwig.pm",
-         "version" : "1.51"
+         "version" : "2.00"
       },
       "Bio::ToolBox::db_helper::config" : {
          "file" : "lib/Bio/ToolBox/db_helper/config.pm",
-         "version" : "1.54"
+         "version" : "2.00"
       },
       "Bio::ToolBox::db_helper::constants" : {
-         "file" : "lib/Bio/ToolBox/db_helper/constants.pm"
+         "file" : "lib/Bio/ToolBox/db_helper/constants.pm",
+         "version" : "2.00"
       },
       "Bio::ToolBox::db_helper::hts" : {
          "file" : "lib/Bio/ToolBox/db_helper/hts.pm",
-         "version" : "1.63"
+         "version" : "2.00"
       },
       "Bio::ToolBox::db_helper::seqfasta" : {
          "file" : "lib/Bio/ToolBox/db_helper/seqfasta.pm",
-         "version" : "1.54"
+         "version" : "2.00"
       },
       "Bio::ToolBox::db_helper::useq" : {
          "file" : "lib/Bio/ToolBox/db_helper/useq.pm",
-         "version" : "1.51"
+         "version" : "2.00"
       },
       "Bio::ToolBox::db_helper::wiggle" : {
          "file" : "lib/Bio/ToolBox/db_helper/wiggle.pm",
-         "version" : "1.51"
-      },
-      "Bio::ToolBox::parser::bed" : {
-         "file" : "lib/Bio/ToolBox/parser/bed.pm",
-         "version" : "1.69"
-      },
-      "Bio::ToolBox::parser::gff" : {
-         "file" : "lib/Bio/ToolBox/parser/gff.pm",
-         "version" : "1.66"
-      },
-      "Bio::ToolBox::parser::ucsc" : {
-         "file" : "lib/Bio/ToolBox/parser/ucsc.pm",
-         "version" : "1.69"
-      },
-      "Bio::ToolBox::parser::ucsc::builder" : {
-         "file" : "lib/Bio/ToolBox/parser/ucsc.pm"
+         "version" : "2.00"
       },
       "Bio::ToolBox::utility" : {
          "file" : "lib/Bio/ToolBox/utility.pm",
-         "version" : "1.69"
+         "version" : "2.00"
       }
    },
    "release_status" : "stable",
@@ -169,6 +178,6 @@
          "url" : "https://github.com/tjparnell/biotoolbox"
       }
    },
-   "version" : "1.691",
-   "x_serialization_backend" : "JSON::PP version 4.04"
+   "version" : "2.00",
+   "x_serialization_backend" : "JSON::PP version 4.16"
 }

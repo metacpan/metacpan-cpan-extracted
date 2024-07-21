@@ -180,19 +180,51 @@ my @exp_lists = (
 );
 
 {
+    my $infile = file('test', 'complete.ali');
+    my $ali = Bio::MUST::Core::Ali->load($infile);
+    my $list = $ali->desc_seq_len_list;
+    my $exp_list = [ 'seq1', 'seq2', 'seq4', 'seq9', 'seq6', 'seq8', 'seq3', 'seq7', 'seq5', 'seq10' ];
+    is_deeply $list->ids, $exp_list, 'got expected order in desc seq len list'
+}
+
+{
     for my $exp_row (@exp_lists) {
         my $infile = file('test', 'complete.ali');
         my $ali = Bio::MUST::Core::Ali->load($infile);
 
         my $min_res = $exp_row->[0];
         my $list = $ali->complete_seq_list($min_res);
-        is_deeply $list->ids, $exp_row->[1],
+        cmp_bag $list->ids, $exp_row->[1],
             "got expected list of complete seqs at $min_res";
         my $negative = $list->negative_list($ali);
         is_deeply $negative->ids, $exp_row->[2],
             "got expected negative list at $min_res";
-
     }
+}
+
+# TODO: test asc_br_len_list alone
+
+{
+    my $exp_lens = [
+        '0.038079', '0.038166', '0.038446', '0.040787', '0.040942', '0.041572',
+        '0.042553', '0.042938', '0.046025', '0.055033', '0.060926', '0.072065',
+        '0.081487', '0.082900', '0.085217', '0.090435', '0.104203', '0.104247',
+        '0.106221', '0.125914', '0.127691', '0.209870', '0.222014', '0.363094',
+        '1.465643', '1.857985', '1.952998', '1.965933', '2.322922', '2.556498',
+        '3.333023', '3.431860',
+    ];
+
+    my $infile = file('test', 'long-leaf-tree.tre');
+    my $tree = Bio::MUST::Core::Tree->load($infile);
+    my ($list, $got_lens) = $tree->long_branch_list(1.5);
+
+    cmp_store(
+        obj  => $list, method => 'store',
+        file => 'long-leaf-seqs.idl',
+        test => 'wrote expected list of long branch tips'
+    );
+
+    is_deeply $got_lens, $exp_lens, '... and got expected branch lengths';
 }
 
 done_testing;

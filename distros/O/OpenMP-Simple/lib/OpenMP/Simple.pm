@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use Alien::OpenMP;
 
-our $VERSION = q{0.1.0};
+our $VERSION = q{0.1.2};
 
 # This module is a wrapper around a ".h" file that is injected into Alien::OpenMP
 # via Inline:C's AUTO_INCLUDE feature. This header file constains C MACROs for reading
@@ -339,7 +339,7 @@ with C<OpenMP::Environment>.
 
 =over 4
 
-=item C<PerlOMP_GETENV_OMP_Basic>
+=item C<PerlOMP_GETENV_BASIC>
 
 Equivalent of using,
 
@@ -350,7 +350,7 @@ The purpose of this bundled approach is to make it easier to get started
 quickly. This list may be updated between versions. This is the recommended
 one to use when starting with this module. See the L<SYNOPSIS> example.
 
-=item C<PerlOMP_GETENV_OMP_All>
+=item C<PerlOMP_GETENV_ALL>
 
 Equivalent of using,
 

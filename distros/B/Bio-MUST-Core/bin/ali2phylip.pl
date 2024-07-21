@@ -42,6 +42,9 @@ for my $infile (@ARGV_infiles) {
     # remove shared gaps (and more if asked to do so)
     $ali->idealize($ARGV_max_res_drop_site);
 
+    # TODO: allow deleting #NEW# sequences made identical to existing seqs
+    # of the same org after mask application (to handle 42 mini-inserts)
+
     # apply Gblocks mask
     $ali->apply_mask(
         SeqMask->gblocks_mask($ali, $ARGV_gb_mask)
@@ -142,7 +145,7 @@ ali2phylip.pl - Convert (and filter) ALI files to PHYLIP files for tree building
 
 =head1 VERSION
 
-version 0.240390
+version 0.242020
 
 =head1 USAGE
 

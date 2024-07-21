@@ -1,5 +1,5 @@
 package Dist::Build;
-$Dist::Build::VERSION = '0.006';
+$Dist::Build::VERSION = '0.007';
 use strict;
 use warnings;
 
@@ -136,6 +136,12 @@ sub Build_PL {
 		$planner->add_delegate($variable, sub { $options{$variable} });
 	}
 
+	$planner->add_delegate('new_planner', sub {
+		my $inner = ExtUtils::Builder::Planner->new;
+		$inner->add_delegate('config', sub { $options{config} });
+		return $inner;
+	});
+
 	for my $file (glob 'planner/*.pl') {
 		my $inner = $planner->new_scope;
 		$inner->add_delegate('self', sub { $inner });
@@ -198,7 +204,7 @@ Dist::Build - A modern module builder, author tools not included!
 
 =head1 VERSION
 
-version 0.006
+version 0.007
 
 =head1 SYNOPSIS
 

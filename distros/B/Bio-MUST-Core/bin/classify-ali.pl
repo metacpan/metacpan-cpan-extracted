@@ -38,6 +38,7 @@ for my $indir (@ARGV_indirs) {
     ### Processing: $indir
     my @infiles = File::Find::Rule
         ->file()
+        ->maxdepth(1)
         ->name( $SUFFICES_FOR{Ali} )
         ->in($indir)
     ;
@@ -79,7 +80,7 @@ classify-ali.pl - Classify ALI files based on taxonomic filters
 
 =head1 VERSION
 
-version 0.240390
+version 0.242020
 
 =head1 USAGE
 

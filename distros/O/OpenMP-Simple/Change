@@ -32,8 +32,14 @@
       - added a couple new macros for bundling a group of environmental
         variables to make it easier to get started and get the full set
         of variables supported in this module
-      - PerlOMP_GETENV_Basic
-      - PerlOMP_GETENV_All
+      - PerlOMP_GETENV_BASIC
+      - PerlOMP_GETENV_ALL
 
 0.1.0  07/20/2024 09:46:00 PM MST
       - fixed important POD typos
+
+0.1.1  07/20/2024 10:46:00 PM MST
+      - trying to fix some test environment failures
+
+0.1.2  07/20/2024 10:48:00 PM MST
+      - fixed POD regression

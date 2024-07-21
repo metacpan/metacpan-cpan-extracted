@@ -1,9 +1,9 @@
 package ExtUtils::Builder::AutoDetect::Cpp;
-$ExtUtils::Builder::AutoDetect::Cpp::VERSION = '0.014';
+$ExtUtils::Builder::AutoDetect::Cpp::VERSION = '0.015';
 use strict;
 use warnings;
 
-use base 'ExtUtils::Builder::AutoDetect::C';
+use parent 'ExtUtils::Builder::AutoDetect::C';
 
 sub _get_compiler {
 	my ($self, $opts) = @_;
@@ -34,7 +34,7 @@ ExtUtils::Builder::AutoDetect::Cpp
 
 =head1 VERSION
 
-version 0.014
+version 0.015
 
 =head1 AUTHOR
 

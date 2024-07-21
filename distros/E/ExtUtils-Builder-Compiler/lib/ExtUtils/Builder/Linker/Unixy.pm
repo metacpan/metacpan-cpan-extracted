@@ -1,9 +1,9 @@
 package ExtUtils::Builder::Linker::Unixy;
-$ExtUtils::Builder::Linker::Unixy::VERSION = '0.014';
+$ExtUtils::Builder::Linker::Unixy::VERSION = '0.015';
 use strict;
 use warnings;
 
-use base 'ExtUtils::Builder::Linker';
+use parent 'ExtUtils::Builder::Linker';
 
 sub linker_flags {
 	my ($self, $from, $to, %opts) = @_;
@@ -28,7 +28,7 @@ ExtUtils::Builder::Linker::Unixy
 
 =head1 VERSION
 
-version 0.014
+version 0.015
 
 =head1 AUTHOR
 

@@ -20,6 +20,7 @@ meta-spec:
   version: '1.4'
 name: MIDI-RtMidi-ScorePlayer
 requires:
+  Data::Dumper::Compact: '0'
   File::Basename: '0'
   MIDI::RtMidi::FFI::Device: '0'
   MIDI::Util: '0.1302'
@@ -31,7 +32,7 @@ requires:
 resources:
   homepage: https://github.com/ology/MIDI-RtMidi-ScorePlayer
   repository: https://github.com/ology/MIDI-RtMidi-ScorePlayer.git
-version: '0.0118'
+version: '0.0119'
 x_Dist_Zilla:
   perl:
     version: '5.032001'

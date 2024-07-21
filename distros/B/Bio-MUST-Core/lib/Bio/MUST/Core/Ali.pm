@@ -2,7 +2,7 @@ package Bio::MUST::Core::Ali;
 # ABSTRACT: Multiple sequence alignment
 # CONTRIBUTOR: Catherine COLSON <ccolson@doct.uliege.be>
 # CONTRIBUTOR: Arnaud DI FRANCO <arnaud.difranco@gmail.com>
-$Bio::MUST::Core::Ali::VERSION = '0.240390';
+$Bio::MUST::Core::Ali::VERSION = '0.242020';
 use Moose;
 use namespace::autoclean;
 
@@ -352,6 +352,7 @@ sub idealize {                              ## no critic (RequireArgUnpacking)
 # MISC METHODS
 
 
+# TODO: introduce miss_regex (without gaps?)
 sub gapmiss_regex {
     return shift->is_protein ? $GAPPROTMISS : $GAPDNAMISS;
 }
@@ -823,7 +824,7 @@ Bio::MUST::Core::Ali - Multiple sequence alignment
 
 =head1 VERSION
 
-version 0.240390
+version 0.242020
 
 =head1 SYNOPSIS
 

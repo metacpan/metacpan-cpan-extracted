@@ -1,25 +1,32 @@
 package Bio::ToolBox::db_helper::constants;
 
-# modules
-require Exporter;
 use strict;
+require Exporter;
+
+our $VERSION = '2.00';
+
 use constant {
-	CHR  => 0,  # chromosome
-	STRT => 1,  # start
-	STOP => 2,  # stop
-	STR  => 3,  # strand
-	STND => 4,  # strandedness
-	METH => 5,  # method
-	RETT => 6,  # return type
-	DB   => 7,  # database object
-	DATA => 8,  # first dataset, additional may be present
+	CHR  => 0,    # chromosome
+	STRT => 1,    # start
+	STOP => 2,    # stop
+	STR  => 3,    # strand
+	STND => 4,    # strandedness
+	METH => 5,    # method
+	RETT => 6,    # return type
+	DB   => 7,    # database object
+	DATA => 8,    # first dataset, additional may be present
 };
 
 our @ISA = qw(Exporter);
+
+## no critic
+## this is never intended to be used directly by end users
+## and exporting everything is required
 our @EXPORT = qw(CHR STRT STOP STR STND METH RETT DB DATA);
+## use critic
 
 # The true statement
-1; 
+1;
 
 __END__
 

@@ -19,6 +19,7 @@ t/02-logging.t
 t/03-warnings.t
 t/04-fatal.t
 t/05-fatal.t
+t/author-changes.t
 t/author-critic.t
 t/author-eof.t
 t/author-eol.t
@@ -31,7 +32,7 @@ t/author-portability.t
 t/author-vars.t
 t/etc/perlcritic.rc
 t/lib/MockStatsd.pm
-t/release-check-manifest.t
+t/release-dist-manifest.t
 t/release-fixme.t
 t/release-kwalitee.t
 t/release-trailing-space.t

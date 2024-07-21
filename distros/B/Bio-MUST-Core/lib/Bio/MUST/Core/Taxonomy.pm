@@ -2,7 +2,7 @@ package Bio::MUST::Core::Taxonomy;
 # ABSTRACT: NCBI Taxonomy one-stop shop
 # CONTRIBUTOR: Loic MEUNIER <loic.meunier@doct.uliege.be>
 # CONTRIBUTOR: Mick VAN VLIERBERGHE <mvanvlierberghe@doct.uliege.be>
-$Bio::MUST::Core::Taxonomy::VERSION = '0.240390';
+$Bio::MUST::Core::Taxonomy::VERSION = '0.242020';
 use Moose;
 use namespace::autoclean;
 
@@ -21,7 +21,8 @@ use Carp;
 use Const::Fast;
 use File::Find::Rule;
 use IPC::System::Simple qw(system);
-use List::AllUtils 0.12 qw(first firstidx uniq each_array mesh count_by max_by);
+use List::AllUtils 0.12
+    qw(first firstidx uniq each_array mesh count_by max_by);
 use LWP::Simple qw(get getstore);
 use Path::Class qw(dir file);
 use POSIX;
@@ -537,6 +538,9 @@ around qr{ _from_name \z }xms => sub {
     return $self->$method($name);
 };
 
+# keep track of noted taxon mergers to avoid repeated Note messages
+my %was_noted;
+
 around qw( get_taxonomy get_taxonomy_with_levels get_term_at_level ) => sub {
     my $method   = shift;
     my $self     = shift;
@@ -545,9 +549,11 @@ around qw( get_taxonomy get_taxonomy_with_levels get_term_at_level ) => sub {
     # update taxon_id if merged in current version of NCBI Taxonomy
     # in contrast, we don't do anything if taxon_id has been deleted
     if ( defined $taxon_id && $self->is_merged($taxon_id) ) {
+        my $noted = $was_noted{$taxon_id};         # noted?
+        $was_noted{$taxon_id} //= 1;               # noted!
         my $msg = "[BMC] Note: merged taxid for $taxon_id;";
         $taxon_id = $self->merged_for($taxon_id);
-        carp "$msg using $taxon_id instead!";
+        carp "$msg using $taxon_id instead!" unless $noted;
     }
 
     return $self->$method($taxon_id, @_);
@@ -869,8 +875,13 @@ sub attach_taxonomies_to_terminals {
     my $self = shift;
     my $tree = shift;
 
+    #### ATTACHING TAXONOMIES TO TERMINALS...
+
+    # transparently fetch Bio::Phylo component object
+    $tree = $tree->tree if $tree->isa('Bio::MUST::Core::Tree');
+
     # store tip taxonomies in Bio::Phylo::Forest::Node generic attributes
-    for my $tip ( @{ $tree->tree->get_terminals } ) {
+    for my $tip ( @{ $tree->get_terminals } ) {
 
         # fetch taxonomy (and level list) from tip's seq id
         my @tax = $self->get_taxonomy_with_levels_from_seq_id($tip->get_name);
@@ -991,7 +1002,6 @@ sub attach_taxa_to_entities {
 
     return;
 }
-
 
 # Listable IdList and IdMapper factory methods
 
@@ -1202,7 +1212,7 @@ sub tab_mapper {
 
 
 
-sub tax_mapper {                      ## no critic (RequireArgUnpacking)
+sub tax_mapper {                        ## no critic (RequireArgUnpacking)
     my $self     = shift;
     my $listable = shift;
 
@@ -2015,7 +2025,7 @@ Bio::MUST::Core::Taxonomy - NCBI Taxonomy one-stop shop
 
 =head1 VERSION
 
-version 0.240390
+version 0.242020
 
 =head1 SYNOPSIS
 

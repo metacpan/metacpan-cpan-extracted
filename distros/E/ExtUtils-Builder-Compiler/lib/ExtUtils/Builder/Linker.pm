@@ -1,6 +1,6 @@
 package ExtUtils::Builder::Linker;
-$ExtUtils::Builder::Linker::VERSION = '0.014';
-use base qw/ExtUtils::Builder::ArgumentCollector ExtUtils::Builder::Binary/;
+$ExtUtils::Builder::Linker::VERSION = '0.015';
+use parent qw/ExtUtils::Builder::ArgumentCollector ExtUtils::Builder::Binary/;
 
 use ExtUtils::Builder::Action::Command;
 use ExtUtils::Builder::Action::Function;
@@ -139,7 +139,7 @@ ExtUtils::Builder::Linker
 
 =head1 VERSION
 
-version 0.014
+version 0.015
 
 =head1 METHODS
 

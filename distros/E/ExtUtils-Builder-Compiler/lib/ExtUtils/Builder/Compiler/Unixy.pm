@@ -1,9 +1,9 @@
 package ExtUtils::Builder::Compiler::Unixy;
-$ExtUtils::Builder::Compiler::Unixy::VERSION = '0.014';
+$ExtUtils::Builder::Compiler::Unixy::VERSION = '0.015';
 use strict;
 use warnings;
 
-use base 'ExtUtils::Builder::Compiler';
+use parent 'ExtUtils::Builder::Compiler';
 
 sub _init {
 	my ($self, %args) = @_;
@@ -44,7 +44,7 @@ ExtUtils::Builder::Compiler::Unixy - Class for compiling with a unix compiler
 
 =head1 VERSION
 
-version 0.014
+version 0.015
 
 =head1 AUTHOR
 

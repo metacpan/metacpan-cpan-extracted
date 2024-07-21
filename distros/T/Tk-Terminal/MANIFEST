@@ -1,8 +1,9 @@
+bin/tkterm
 Changes
+lib/Tk/Terminal.pm
 Makefile.PL
 MANIFEST
 README.md
 t/Tk-Terminal.t
-lib/Tk/Terminal.pm
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

@@ -1,6 +1,11 @@
 Revision history for Perl extension Net::DNS::Resolver::Unbound.
 
 
+**** 1.26  Jul 20, 2024
+	Rewrite code to allow option deletion.
+	Simplify context option representation.
+
+
 **** 1.25  Jul 14, 2024
 	Improve robustness of Unbound context management.
 	Fix SEGV and core dump in make disttest.

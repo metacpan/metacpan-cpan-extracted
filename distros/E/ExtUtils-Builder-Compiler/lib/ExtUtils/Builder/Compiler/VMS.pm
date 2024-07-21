@@ -1,9 +1,9 @@
 package ExtUtils::Builder::Compiler::VMS;
-$ExtUtils::Builder::Compiler::VMS::VERSION = '0.014';
+$ExtUtils::Builder::Compiler::VMS::VERSION = '0.015';
 use strict;
 use warnings;
 
-use base 'ExtUtils::Builder::Compiler';
+use parent 'ExtUtils::Builder::Compiler';
 
 use Carp ();
 
@@ -63,7 +63,7 @@ ExtUtils::Builder::Compiler::VMS - Class for compiling with a VMS compiler
 
 =head1 VERSION
 
-version 0.014
+version 0.015
 
 =head1 AUTHOR
 

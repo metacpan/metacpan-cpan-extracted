@@ -31,7 +31,7 @@
             "Parse::CPAN::Meta" : "0",
             "TAP::Harness::Env" : "0",
             "parent" : "0",
-            "perl" : "5.006"
+            "perl" : "5.010"
          }
       },
       "develop" : {
@@ -72,7 +72,7 @@
             "TAP::Harness::Env" : "0",
             "Text::ParseWords" : "0",
             "parent" : "0",
-            "perl" : "5.006",
+            "perl" : "5.010",
             "strict" : "0",
             "warnings" : "0"
          }
@@ -92,7 +92,7 @@
             "XSLoader" : "0",
             "blib" : "0",
             "lib" : "0",
-            "perl" : "5.006"
+            "perl" : "5.010"
          },
          "suggests" : {
             "File::ShareDir" : "1.000"
@@ -102,23 +102,23 @@
    "provides" : {
       "Dist::Build" : {
          "file" : "lib/Dist/Build.pm",
-         "version" : "0.006"
+         "version" : "0.007"
       },
       "Dist::Build::Core" : {
          "file" : "lib/Dist/Build/Core.pm",
-         "version" : "0.006"
+         "version" : "0.007"
       },
       "Dist::Build::Serializer" : {
          "file" : "lib/Dist/Build/Serializer.pm",
-         "version" : "0.006"
+         "version" : "0.007"
       },
       "Dist::Build::ShareDir" : {
          "file" : "lib/Dist/Build/ShareDir.pm",
-         "version" : "0.006"
+         "version" : "0.007"
       },
       "Dist::Build::XS" : {
          "file" : "lib/Dist/Build/XS.pm",
-         "version" : "0.006"
+         "version" : "0.007"
       }
    },
    "release_status" : "stable",
@@ -132,7 +132,7 @@
          "web" : "https://github.com/Leont/dist-build"
       }
    },
-   "version" : "0.006",
+   "version" : "0.007",
    "x_generated_by_perl" : "v5.38.0",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.36",
    "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"

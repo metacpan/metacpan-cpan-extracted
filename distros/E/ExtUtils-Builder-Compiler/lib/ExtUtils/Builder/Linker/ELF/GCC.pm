@@ -1,9 +1,9 @@
 package ExtUtils::Builder::Linker::ELF::GCC;
-$ExtUtils::Builder::Linker::ELF::GCC::VERSION = '0.014';
+$ExtUtils::Builder::Linker::ELF::GCC::VERSION = '0.015';
 use strict;
 use warnings;
 
-use base 'ExtUtils::Builder::Linker::ELF::Any';
+use parent 'ExtUtils::Builder::Linker::ELF::Any';
 
 sub _init {
 	my ($self, %args) = @_;
@@ -34,7 +34,7 @@ ExtUtils::Builder::Linker::ELF::GCC
 
 =head1 VERSION
 
-version 0.014
+version 0.015
 
 =head1 AUTHOR
 

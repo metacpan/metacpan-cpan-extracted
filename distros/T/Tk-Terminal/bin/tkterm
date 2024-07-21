@@ -1,0 +1,113 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+use vars qw ($VERSION);
+$VERSION = 0.02;
+
+use Tk;
+require Tk::Terminal;
+use Getopt::Long;
+
+my $help = 0;
+my $folder;
+my $history;
+my $command;
+my $version = 0;
+
+my $helpstring = 'Usage:
+  tkterm [options]
+
+Options:
+  -c or -command:
+  command to execute on start up.
+
+  -d or -directory:
+  working directory.
+
+  -h or -help:
+  show this message.
+
+  -i or -history:
+  specify history file. default none.
+
+  -v or -version:
+  show version.
+';
+
+GetOptions(
+	#help
+	'h' => \$help,
+	'help' => \$help,
+	#folder
+	'd=s' => \$folder,
+	'directory=s' => \$folder,
+	#command
+	'c=s' => \$command,
+	'command=s' => \$command,
+	#history
+	'i=s' => \$history,
+	'hiistory=s' => \$history,
+	#version
+	'v' => \$version,
+	'version' => \$version,
+) or die $helpstring;
+
+if ($help) {
+	print $helpstring;
+	exit;
+}
+
+if ($version) {
+	print "Tk::Terminal version ", Tk::Terminal->VERSION, "\n";
+	exit;
+}
+
+my @texts = (
+	'You are granted free use of the escalators at Wallmart.',
+	'If the left side is the right side, then the right side must be wrong.',
+	'Eventually you arrive at the question what to do when all succeeds.',
+	'Suffering is caused by pain you are unwilling to endure.',
+	'Leave all judging about where your money comes from to others. They do that a lot better.',
+	'You can not keep the whole world and your father happy.',
+	'A straight line is nothing but a circle with an infinite radius.',
+	'The level of communication usually is reverse proportional to the number of available communication means.',
+	'If you do what you always did, you get the results you always got.',
+	'Growth happens at the edge of where you can be comfortable with your discomfort.',
+	'What you find annoying in others says everything about you.',
+	'Is it nice? Is it helpfull? Is it appropriate? If not, don\'t speak.',
+);
+
+my $mw = new MainWindow;
+
+my $t = $mw->Scrolled('Terminal',
+	-scrollbars => 'oe',
+	-usercommands => {
+		exit => ['destroy', $mw],
+		pepali => \&wisdom,
+	}
+)->pack(-expand => 1, -fill => 'both');
+
+$mw->after(10, sub {
+	if (defined $history) {
+		$t->configure(-historyfile => $history);
+	}
+	if (defined $folder) {
+		$t->launch("cd $folder");
+	}
+	$mw->after(10, sub {
+		if (defined $command) {
+			$t->launch($command)
+		}
+	})
+});
+
+$t->focus;
+$mw->MainLoop;
+
+sub wisdom {
+	my $size = @texts;
+	my $num = int(rand($size));
+	my $txt = $texts[$num];
+	$t->write($texts[$num]);
+}

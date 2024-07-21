@@ -1,11 +1,15 @@
 package Bio::ToolBox::db_helper::config;
 
+use warnings;
 use strict;
-require Exporter;
-use File::Spec;
 use Carp;
+use English qw(-no_match_vars);
+use File::Spec;
+use IO::File;
 use Config::Simple;
-our $VERSION = '1.54';
+require Exporter;
+
+our $VERSION = '2.00';
 
 # variables
 my $default;
@@ -13,11 +17,9 @@ my $default_path;
 my $config_path;
 our $BTB_CONFIG;
 
-
-
 # Load the config file before exporting it
 BEGIN {
-	
+
 	# the default configuration
 	$default = <<DEFAULT;
 #### BioToolBox Default Config file ####
@@ -41,109 +43,120 @@ dsn                      = /path/to/example.sqlite
 
 DEFAULT
 
-	
 	# possible paths
-	$default_path  = File::Spec->catdir($ENV{HOME}, '.biotoolbox.cfg');
+	$default_path = File::Spec->catdir( $ENV{HOME}, '.biotoolbox.cfg' );
 	my $var = $ENV{'BIOTOOLBOX'} || undef;
-	
+
 	# check for file possible paths
-	if (-s $default_path) {
+	if ( defined $var and -s $var ) {
+		$config_path = $var;
+	}
+	elsif ( -s $default_path ) {
 		$config_path = $default_path;
 	}
-	elsif (defined $var and -s $var) {
-		$config_path = $var;
-	}	
 
 	# Open the configuration file
 	if ($config_path) {
 		$BTB_CONFIG = Config::Simple->new($config_path);
-	} else {
+	}
+	else {
 		# no path, open empty object
 		# this should still work, it just won't return anything useful
-		$BTB_CONFIG = Config::Simple->new(syntax => 'ini');
+		$BTB_CONFIG = Config::Simple->new( syntax => 'ini' );
 	}
 }
 
-# Exported names
-our @ISA = qw(Exporter);
-our @EXPORT = qw($BTB_CONFIG);
+## no critic
+## this is never intended to be used directly by end users
+## and exporting config mut always be done
+our @ISA       = qw(Exporter);
+our @EXPORT    = qw($BTB_CONFIG);
 our @EXPORT_OK = qw(add_database add_program);
-
-
-# The true statement
-1; 
+## use critic
 
 sub add_database {
 	my %args = @_;
-	
+
 	# check
-	croak "no name provided for new database configuration\n" unless ($args{name});
-	croak "no dsn provided for new database configuration\n" unless 
-		($args{dsn} || $args{dsn_prefix});
-	
+	unless ( $args{name} ) {
+		carp 'ERROR: no name provided for new database configuration';
+		return;
+	}
+	unless ( $args{dsn} or $args{dsn_prefix} ) {
+		carp 'ERROR: no dsn provided for new database configuration';
+		return;
+	}
+
 	# check that we have config file to update
 	unless ($config_path) {
-		_write_new_config();
+		_write_new_config() or return;
 	}
-	
+
 	# set name
 	my $name = $args{name};
 	delete $args{name};
-	
+
 	# add configuration
-	$BTB_CONFIG->set_block($name, \%args);
+	$BTB_CONFIG->set_block( $name, \%args );
 	return _rewrite_config();
 }
 
 sub add_program {
 	my $path = shift;
-	unless (-e $path and -x _) {
-		carp "$path either does not exist or is not executable\n";
+	unless ( -e $path and -x _ ) {
+		carp "ERROR: $path either does not exist or is not executable";
 		return;
 	}
-	
+
 	# check that we have config file to update
 	unless ($config_path) {
 		_write_new_config();
 	}
-	
+
 	# add parameter
-	my ($vol, $dir, $file) = File::Spec->splitpath($path);
-	$BTB_CONFIG->param('applications.' . $file, $path);
+	my ( $vol, $dir, $file ) = File::Spec->splitpath($path);
+	$BTB_CONFIG->param( 'applications.' . $file, $path );
 	return _rewrite_config();
 }
 
 sub _write_new_config {
-	open(FH, '>', $default_path) or croak 
-		"Cannot write biotoolbox configuration file $default_path!\n$!\n";
-	print FH $default;
-	close FH;
+	my $fh = IO::File->new( '>', $default_path );
+	unless ($fh) {
+		carp "ERROR: Cannot write biotoolbox configuration file $default_path! $OS_ERROR";
+		return;
+	}
+	$fh->print($default);
+	$fh->close;
 	$config_path = $default_path;
 	$BTB_CONFIG->read($default_path);
+	return 1;
 }
 
-
 sub _rewrite_config {
-	# write new config file
 	my $updated;
-	if (-w $config_path) {
+	if ( -w $config_path ) {
 		$updated = $BTB_CONFIG->write;
 	}
 	unless ($updated) {
+
 		# attempt to write in users own directory, which takes precedence
-		my $file = File::Spec->catdir($ENV{HOME}, '.biotoolbox.cfg');
+		my $file = File::Spec->catdir( $ENV{HOME}, '.biotoolbox.cfg' );
 		$updated = $BTB_CONFIG->write($file);
 		if ($updated) {
 			$config_path = $file;
 			return 1;
 		}
 		else {
-			carp "unable to write updated configuration to $file!\n" . 
-			$BTB_CONFIG->error . "\n";
+			carp sprintf "ERROR: unable to write updated configuration to %s!\n%s",
+				$file, $BTB_CONFIG->error;
 			return;
 		}
 	}
 }
+
+1;
+
+__END__
 
 =head1 NAME
 

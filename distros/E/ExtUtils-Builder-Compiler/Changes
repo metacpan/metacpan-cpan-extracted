@@ -1,5 +1,11 @@
 Revision history for ExtUtils-Builder-Compiler
 
+0.015     2024-07-20 15:18:22+02:00 Europe/Brussels
+          - Add exe_file helper to EU::B::Autodetect::C
+          - Add missing argument in MSCV manifesting
+          - Add directories to loadable_file/library_file/exe_file
+          - Use parent instead of base
+
 0.014     2024-07-17 01:30:56+02:00 Europe/Brussels
           - Correctly check os version with -iwithsysroot
 

@@ -17,7 +17,9 @@ eg/dat/gol-5-corral.dat
 eg/dat/gol-5-flicker.dat
 eg/dat/gol-7-glider.dat
 eg/drum-circle.pl
+eg/drummer.pl
 eg/gol.pl
+eg/readkey.pl
 eg/rpsls-game.pl
 eg/treble-bass.pl
 gol-state.dat

@@ -1,5 +1,11 @@
 Revision history for Dist-Build
 
+0.007     2024-07-20 15:19:09+02:00 Europe/Brussels
+          - Properly depend on new ExtUtils::Builder::Compiler
+          - Fix misspelling of extra_linker_flags
+          - Add file argument to Dist::Build::XS
+          - Add new_planner delegate
+
 0.006     2024-07-15 21:22:15+02:00 Europe/Brussels
           - Make mkdir nodes non-phony
           - Provide better messages for most actions

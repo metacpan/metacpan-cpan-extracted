@@ -3,7 +3,7 @@ use strict;
 use warnings;
 
 use lib 'lib';
-use 5.006;
+use 5.010;
 use Dist::Build 0.001;
 Build_PL(\@ARGV, \%ENV);
 

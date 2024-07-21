@@ -1,9 +1,9 @@
 package ExtUtils::Builder::Linker::XCOFF;
-$ExtUtils::Builder::Linker::XCOFF::VERSION = '0.014';
+$ExtUtils::Builder::Linker::XCOFF::VERSION = '0.015';
 use strict;
 use warnings;
 
-use base qw/ExtUtils::Builder::Linker::Unixy ExtUtils::Builder::Linker::COFF/;
+use parent qw/ExtUtils::Builder::Linker::Unixy ExtUtils::Builder::Linker::COFF/;
 
 use File::Basename ();
 
@@ -47,7 +47,7 @@ ExtUtils::Builder::Linker::XCOFF
 
 =head1 VERSION
 
-version 0.014
+version 0.015
 
 =head1 AUTHOR
 

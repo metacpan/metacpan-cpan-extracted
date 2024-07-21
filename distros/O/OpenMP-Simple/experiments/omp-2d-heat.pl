@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use OpenMP::Simple;
 use OpenMP::Environment ();
-use Util::H2O::More qw/ddd Getopt2h2o h2o/;
+use Util::H2O::More qw/Getopt2h2oh2o/;
 
 use Inline (
     C           => 'DATA',

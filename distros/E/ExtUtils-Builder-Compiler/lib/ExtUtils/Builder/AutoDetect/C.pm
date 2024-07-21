@@ -1,9 +1,9 @@
 package ExtUtils::Builder::AutoDetect::C;
-$ExtUtils::Builder::AutoDetect::C::VERSION = '0.014';
+$ExtUtils::Builder::AutoDetect::C::VERSION = '0.015';
 use strict;
 use warnings;
 
-use base 'ExtUtils::Builder::Planner::Extension';
+use parent 'ExtUtils::Builder::Planner::Extension';
 
 use Carp 'croak';
 use ExtUtils::Config 0.007;
@@ -150,14 +150,23 @@ sub add_methods {
 
 	my $dlext = $opts{config}->get('dlext');
 	$class->add_helper($planner, 'loadable_file', sub {
-		my ($file) = @_;
-		"$file.$dlext";
+		my ($file, $dir) = @_;
+		my $filename = "$file.$dlext";
+		return defined $dir ? catfile($dir, $filename) : $filename;
 	});
 
 	my $so = $opts{config}->get('so');
 	$class->add_helper($planner, 'library_file', sub {
-		my ($file) = @_;
-		"$file.$so";
+		my ($file, $dir) = @_;
+		my $filename = "$file.$so";
+		return defined $dir ? catfile($dir, $filename) : $filename;
+	});
+
+	my $exe = $opts{config}->get('_exe');
+	$class->add_helper($planner, 'exe_file', sub {
+		my ($file, $dir) = @_;
+		my $filename = "$file$exe";
+		return defined $dir ? catfile($dir, $filename) : $filename;
 	});
 
 	return;
@@ -179,7 +188,7 @@ ExtUtils::Builder::AutoDetect::C - compiler configuration, derived from perl's c
 
 =head1 VERSION
 
-version 0.014
+version 0.015
 
 =head1 SYNOPSIS
 

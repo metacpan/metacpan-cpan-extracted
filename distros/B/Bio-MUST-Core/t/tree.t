@@ -5,7 +5,10 @@ use Test::Most;
 use autodie;
 use feature qw(say);
 
-use Path::Class qw(file);
+use Smart::Comments;
+
+use List::AllUtils qw(shuffle);
+use Path::Class qw(dir file);
 
 use Bio::MUST::Core;
 use Bio::MUST::Core::Utils qw(change_suffix cmp_store);
@@ -165,19 +168,103 @@ SKIP: {
     );
 }
 
+my @exp_long_branched_names = (
+    'Theileria_orientalis_869250@403221013',
+    'Theileria_orientalis_869250@697888408',
+    'Theileria_annulata_353154@84998812',
+    'Babesia_equi_1537102@428672781',
+    'Babesia_bigemina_5866@656183635',
+    'Babesia_microti_1133968@399217536',
+);
+
 {
-    my $infile = file('test', 'long-leaf-tree.tre');
+    my $infile = file('test', 'root_tree_names_unrooted.tre');
     my $tree = $class->load($infile);
-    my $list = $tree->long_leaf_list(1.5);
+
+    my $node = $tree->get_node_that_maximizes;
+    my @got_names = map { $_->get_name } @{ $node->get_terminals };
+    cmp_bag \@got_names, \@exp_long_branched_names,
+        'correctly identified the longest branch';
+
+    $tree->root_tree($node, -1, 1);
+    $tree->tree->ladderize(1);
 
     cmp_store(
-        obj  => $list, method => 'store',
-        file => 'long-leaf-seqs.idl',
-        test => 'wrote expected list of long leaf ids'
+        obj => $tree, method => 'store',
+        file => "root_tree_names_rooted_ladder.tre",
+        # Note: root_tree_names_rooted_ladder_hand.tre (made with Seaview)
+        # has no duplication of the node name around the new root ; this is both
+        # better and worse depending on the visualization format (see in iToL)
+        test => 'wrote expected .tre rooted on longest branch',
     );
 }
 
+# {   # TODO: fix this test as set_root_below adds zero-length branches
+#     my $infile = file('test', 'fake-unroot.tpl');
+#     my $tree = $class->load($infile);
+#         my ($node) = @{ $tree->tree->get_by_regular_expression(
+#             -value => 'get_name',
+#             -match => qr/Fagus/,
+#         ) };
+#     $tree->root_tree($node, -1, 1);
+#     # should not trigger node metadata backup
+#
+#     my $exp_file = file('test', 'fake-rootF.tpl');
+#     cmp_ok $tree->newick_str, 'eq', $class->load($exp_file)->newick_str,
+#         'got expected newick string after rerooting topology on Fagus';
+# }
 
+my @exp_rootings = (
+    [ 'Canis',          'fake-rootC.tre'  ],
+    [ 'Amanita',        'fake-rootA.tre'  ],
+    [ 'Elmera',         'fake-rootE.tre'  ],
+    [ 'Dasypus',        'fake-rootD.tre'  ],
+    [ 'Boletus',        'fake-rootB.tre'  ],
+    [ 'Fagus',          'fake-rootF.tre'  ],
+    [ 'Eutheria',       'fake-rootCD.tre' ],
+    [ 'Agaricomycetes', 'fake-rootAB.tre' ],
+    [ 'eudicotyledons', 'fake-rootEF.tre' ],
+);
+
+{
+    my $infile = file('test', 'fake-unroot.tre');
+    my $tree = $class->load($infile);
+
+    for my $exp_rooting (@exp_rootings) {
+        my ($taxon, $file) = @{$exp_rooting};
+
+        my @nodes = @{ $tree->tree->get_entities };
+        my ($node) = @{ $tree->tree->get_by_regular_expression(
+            -value => 'get_name',
+            -match => qr/$taxon/,
+        ) };
+        $tree->root_tree($node, -1, 1);
+
+        cmp_store(
+            obj => $tree, method => 'store',
+            file => $file,
+            test => "wrote expected .tre rooted on $taxon",
+        );
+    }
+}
+
+{
+    for my $family ( qw(A B) ) {
+
+        my $infile = file('test', 'archaea-mcr-concat.tre');
+        my $tree = $class->load($infile);
+
+        my $filter = Bio::MUST::Core::SeqId->family_filter( [ "+$family" ] );
+        $tree->root_tree($filter, -1, 1);
+
+        # Note: both rooted trees should be equal for now
+        cmp_store(
+            obj => $tree, method => 'store',
+            file => "archaea-mcr-concat-root$family.tre",
+            test => "wrote expected .tre rooted on family $family",
+        );
+    }
+}
 
 # TODO: test this!
 # {

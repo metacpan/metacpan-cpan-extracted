@@ -1,7 +1,7 @@
 package Bio::MUST::Core::Tree;
 # ABSTRACT: Thin wrapper around Bio::Phylo trees
 # CONTRIBUTOR: Valerian LUPO <valerian.lupo@doct.uliege.be>
-$Bio::MUST::Core::Tree::VERSION = '0.240390';
+$Bio::MUST::Core::Tree::VERSION = '0.242020';
 use Moose;
 # use MooseX::SemiAffordanceAccessor;
 use namespace::autoclean;
@@ -9,22 +9,27 @@ use namespace::autoclean;
 use autodie;
 use feature qw(say);
 
-use Smart::Comments '####';
+use Smart::Comments '###';
 
 use Carp;
 use Const::Fast;
 use File::Basename;
-use List::AllUtils qw(uniq);
-use Statistics::Descriptive;
+use List::AllUtils qw(uniq max_by);
 use Tie::IxHash;
 
+use Bio::Phylo::Util::Logger ':levels';
 use Bio::Phylo::IO qw(parse);
+
+# silence warnings about removing orphan nodes
+use Bio::Phylo::Forest::TreeRole 'verbose' => ERROR;
 
 use Bio::MUST::Core::Types;
 use Bio::MUST::Core::Constants qw(:files);
 use Bio::MUST::Core::Utils qw(:filenames);
 use aliased 'Bio::MUST::Core::SeqId';
 use aliased 'Bio::MUST::Core::IdList';
+# TODO: check if no circularity issue between Tree and Tree::Splits load?
+use aliased 'Bio::MUST::Core::Tree::Splits';
 with 'Bio::MUST::Core::Roles::Commentable',
      'Bio::MUST::Core::Roles::Listable';
 
@@ -36,6 +41,22 @@ has 'tree' => (
     writer   => '_set_tree',
 );
 
+
+
+sub newick_str {                            ## no critic (RequireArgUnpacking)
+    return _clean_newick_str( shift->tree->to_newick(@_) );     # currying
+}
+
+sub _clean_newick_str {
+    my $newick_str = shift;
+
+    # remove quotes...
+    # ...and trailing zero-length branch length (RAxML) if any
+    $newick_str =~ tr{'"}{}d;
+    $newick_str =~ s{:0\.0+;}{;}xmsg;
+
+    return $newick_str;
+}
 
 # color for uncolored taxon (see Taxonomy::ColorScheme)
 const my $BLACK => '#000000';
@@ -232,36 +253,68 @@ sub collapse_subtrees {
     return;
 }
 
-# Note: very naive approach and not applicable in practice.
-# Should probably use the derivative of branch length increase in log space.
-# Meanwhile: use treeshrink
 
-sub long_leaf_list {
-    my $self = shift;
-    my $fact = shift // 1.5;
 
-    my @tips = @{ $self->tree->get_terminals };
+sub get_node_that_maximizes {
+    my $self   = shift;
+    my $method = shift // 'get_branch_length';
 
-    # compute terminal branch length distribution
-    my @lengths = map { $_->get_branch_length } @tips;
-    #### list: sort { $a <=> $b } @lengths
-    my $stat = Statistics::Descriptive::Full->new;
-       $stat->add_data( \@lengths );
+    # return node for which method yields the highest value
+    my $node = max_by { $_->$method // 0 } @{ $self->tree->get_entities };
+    # Note: scalar context to get only one node!
 
-    my ($q1, $q3) = ( $stat->quantile(1), $stat->quantile(3) );
-    #### $q1
-    #### $q3
-    #### iqr: $q3-$q1
-    #### $fact
-    my $threshold = $q3 + $fact * ($q3 - $q1);
-    #### $threshold
-
-    my @seq_ids =  map { SeqId->new( full_id => $_->get_name ) }
-                  grep { $_->get_branch_length > $threshold    } @tips;
-
-    #### n: scalar @seq_ids
-    return IdList->new( ids => \@seq_ids );
+    return $node;
 }
+
+
+sub root_tree {                             ## no critic (RequireArgUnpacking)
+    my $self = shift;
+    my $node = shift;
+
+    my $tree = $self->tree;
+    my $splits;
+
+    # TODO: check that get_internals is enough
+    if ( List::AllUtils::any { $_->get_name } @{ $tree->get_internals } ) {
+        #### Saving splits metadata before rooting...
+        $splits = Splits->new_from_tree($tree);
+        #### s: $splits->_bp_for
+    }
+
+    # when passed a filter use it as outgroup to determine root node
+    if ( $node->can('score') ) {
+        $node = $splits->get_node_for_split( $self,
+            $splits->get_split_that_maximizes($node) );
+    }
+
+    # actually root tree using Bio::Phylo method
+    $node->set_root_below(@_);              # currying...
+
+    # remove old root (but only if the tree was already rooted)
+    $tree->remove_orphans;
+
+    # restore node metadata if needed
+    if ($splits) {
+        #### Restoring splits metadata after rooting...
+        for my $node ( @{ $tree->get_internals } ) {
+            my $bp_key = $splits->node2key($node);
+            #### $bp_key
+            # Note: when rooting on a single OTU there exists an internal node
+            # for which the key looks like a key for the trivial split leading
+            # to the root. It generally must be clear-up (see just below).
+            my $bp_val = !$bp_key ? q{} : $splits->bp_for($bp_key)
+                // $splits->comp_bp_for($bp_key) // q{};
+            #### $bp_val
+            # Note: a key can be undef (e.g., root) or corresponds to a trivial
+            # split for which no value was stored. In both cases, the original
+            # value must be explicitly cleared-up using q{}.
+            $node->set_name($bp_val);
+        }
+    }
+
+    return $self;
+}
+
 
 # TREE-MATCHING METHODS
 
@@ -351,7 +404,7 @@ sub store {
     $args->{-nodelabels} //= 1;         # default to nodelabels on
 
     open my $out, '>', $outfile;
-    say {$out} _clean_newick_str( $self->tree->to_newick( %{$args} ) );
+    say {$out} $self->newick_str( %{$args} );
 
     return;
 }
@@ -445,6 +498,7 @@ sub store_figtree {
     }   # Note: get_generic does not return undef, hence: if $taxon
 
     # build mesquite-enabled Newick string
+    # TODO: consider using newick_str instead?
     my $newick_str = $self->tree->to_newick(
         -nodelabels => 1,
 #         -blformat => '%.10f',
@@ -488,16 +542,10 @@ sub store_arb {
         $self->insert_comment("$basename$ext");
     }
 
-    # build standard Newick string
-    my $newick_str = _clean_newick_str(
-        $self->tree->to_newick( -nodelabels => 0 )
-    );
-
-    open my $out, '>', $outfile;
-
     # output ARB tree file
+    open my $out, '>', $outfile;
     print {$out} $self->header;
-    say {$out} $newick_str;
+    say   {$out} $self->newick_str( -nodelabels => 0 );
 
     return;
 }
@@ -553,9 +601,7 @@ sub store_tpl {
 
     # output topology
     say {$out} '1';     # TODO: improve this for multiple topologies
-    say {$out} _clean_newick_str(
-        $self->tree->to_newick( -nodelabels => 0 )
-    );
+    say {$out} $self->newick_str( -nodelabels => 0 );
 
     # restore branch lengths
     for my $node ( @{ $self->tree->get_entities } ) {
@@ -563,18 +609,6 @@ sub store_tpl {
     }
 
     return;
-}
-
-
-sub _clean_newick_str {
-    my $newick_str = shift;
-
-    # remove quotes...
-    # ...and trailing zero-length branch length (RAxML) if any
-    $newick_str =~ tr{'"}{}d;
-    $newick_str =~ s{:0\.0+;}{;}xmsg;
-
-    return $newick_str;
 }
 
 __PACKAGE__->meta->make_immutable;
@@ -590,7 +624,7 @@ Bio::MUST::Core::Tree - Thin wrapper around Bio::Phylo trees
 
 =head1 VERSION
 
-version 0.240390
+version 0.242020
 
 =head1 SYNOPSIS
 
@@ -601,6 +635,8 @@ version 0.240390
     # TODO
 
 =head1 METHODS
+
+=head2 newick_str
 
 =head2 all_seq_ids
 
@@ -617,6 +653,10 @@ version 0.240390
 =head2 switch_branch_lengths_and_labels_for_entities
 
 =head2 collapse_subtrees
+
+=head2 get_node_that_maximizes
+
+=head2 root_tree
 
 =head2 match_branch_lengths
 

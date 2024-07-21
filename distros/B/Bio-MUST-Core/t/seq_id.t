@@ -525,6 +525,7 @@ my @valid_ids = (
         'u#Emiliania_huxleyi_PLYM219@CAMNT_0030889445',
         q{'u#Emiliania huxleyi_PLYM219@CAMNT_0030889445'} ],
 
+    # space-trailing ids (unparsable)
     [ ('Arabidopsis halleri_81970@78182999 ') x 2, '1', undef, undef, undef, undef, undef,
         undef, undef, undef, undef, undef,
         undef, undef, undef, undef, undef, undef,
@@ -535,10 +536,19 @@ my @valid_ids = (
         'Arabidopsis halleri_81970@78182999 ',
         q{'Arabidopsis halleri_81970@78182999 '} ],
 
+    # quoted ids (from trees)
+    [ q{'Nematostella_vectensis_45351@NEMVEDRAFT_v1g166011-PA'}, 'Nematostella vectensis_45351@NEMVEDRAFT_v1g166011-PA', 0, 0, 0, 0, undef, undef,
+        'Nematostella', 'vectensis', undef, 'NEMVEDRAFT_v1g166011-PA', undef, '45351',
+        undef, undef, undef, undef, undef, undef, undef, undef, undef,
+        'Nematostella vectensis', 'N. vectensis', 'Nematostella vectensis_45351',
+        'Nematostella vectensis 45351', 'Nematostella vectensis 45351',
+        'Nematostella_vectensis_45351@NEMVEDRAFT_v1g166011-PA',
+        q{'Nematostella vectensis_45351@NEMVEDRAFT_v1g166011-PA'} ],
 );
 
 for my $exp_row (@valid_ids) {
     my $seq_id = $class->new( full_id => $exp_row->[0] );
+    explain $seq_id->full_id;
     my $got_row = [
         $seq_id->full_id,                           # 0
         $seq_id->is_foreign,                        # 1

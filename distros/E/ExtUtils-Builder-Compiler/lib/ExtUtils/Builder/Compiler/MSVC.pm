@@ -1,9 +1,9 @@
 package ExtUtils::Builder::Compiler::MSVC;
-$ExtUtils::Builder::Compiler::MSVC::VERSION = '0.014';
+$ExtUtils::Builder::Compiler::MSVC::VERSION = '0.015';
 use strict;
 use warnings;
 
-use base qw/ExtUtils::Builder::Compiler ExtUtils::Builder::MultiLingual/;
+use parent qw/ExtUtils::Builder::Compiler ExtUtils::Builder::MultiLingual/;
 
 sub _init {
 	my ($self, %args) = @_;
@@ -44,7 +44,7 @@ ExtUtils::Builder::Compiler::MSVC - Class for compiling with Microsoft Visual C
 
 =head1 VERSION
 
-version 0.014
+version 0.015
 
 =head1 AUTHOR
 

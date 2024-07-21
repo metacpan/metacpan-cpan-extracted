@@ -9,7 +9,7 @@ Tk::Terminal - Running system commands in a Tk::Text widget.
 use strict;
 use warnings;
 use vars qw( $VERSION );
-$VERSION = '0.01';
+$VERSION = '0.03';
 
 use Cwd;
 use Fcntl;
@@ -604,6 +604,7 @@ sub historyDown {
 		$self->commandSet($hist->[$hp]);
 		$self->hp($hp);
 	}
+	$self->see('point');
 }
 
 sub historyLoad {
@@ -668,6 +669,7 @@ sub historyUp {
 	}
 	$self->commandSet($hist->[$hp]);
 	$self->hp($hp);
+	$self->see('point');
 }
 
 sub hp {
@@ -702,8 +704,8 @@ sub Insert {
 		}
  	} else {
 		$self->insert('point',$string);
-		$self->see('point');
 	}
+	$self->see('point');
 }
 
 sub InsertKeyPress {

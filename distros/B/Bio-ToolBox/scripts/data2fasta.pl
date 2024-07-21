@@ -2,84 +2,69 @@
 
 # documentation at end of file
 
+use warnings;
 use strict;
 use Getopt::Long qw(:config no_ignore_case bundling);
 use Pod::Usage;
 use Bio::ToolBox::Data;
-my $bio;
-eval {
-	require Bio::Seq;
-	require Bio::SeqIO;
-	$bio = 1;
-};
 
-my $VERSION =  '1.63';
+our $VERSION = '2.00';
 
 print "\n This program will convert a data file to fasta\n\n";
 
 ### Quick help
-unless (@ARGV) { 
+unless (@ARGV) {
+
 	# when no command line options are present
 	# print SYNOPSIS
-	pod2usage( {
-		'-verbose' => 0, 
-		'-exitval' => 1,
-	} );
+	pod2usage(
+		{
+			'-verbose' => 0,
+			'-exitval' => 1,
+		}
+	);
 }
-
-
 
 ### Get command line options and initialize values
 my (
-	$infile,
-	$outfile,
-	$database,
-	$feature,
-	$subfeature,
-	$id_i,
-	$desc_i,
-	$seq_i,
-	$chr_i,
-	$start_i,
-	$stop_i,
-	$strand_i,
-	$extend,
-	$concatenate,
-	$pad,
-	$gz,
-	$help,
-	$print_version,
+	$infile, $outfile,  $database, $feature,     $subfeature,
+	$id_i,   $desc_i,   $seq_i,    $chr_i,       $start_i,
+	$stop_i, $strand_i, $extend,   $concatenate, $pad,
+	$gz,     $help,     $print_version,
 );
 
 # Command line options
-GetOptions( 
-	'i|in=s'          => \$infile, # the solexa data file
-	'o|out=s'         => \$outfile, # name of output file 
-	'd|db|fasta=s'    => \$database, # database name or genomic fasta file
-	'f|feature=s'     => \$feature, # feature from input file
-	'u|subfeature=s'  => \$subfeature, # subfeature to collect sequence
-	'n|name|id=i'     => \$id_i, # id index
-	'desc=i'          => \$desc_i, # description index
-	's|seq=i'         => \$seq_i, # sequence index
-	'c|chr=i'         => \$chr_i, # chromosome index
-	'b|begin|start=i' => \$start_i, # start index
-	'e|stop|end=i'    => \$stop_i, # stop index
-	't|strand=i'      => \$strand_i, # strand index
-	'x|extend=i'      => \$extend, # extend sequence by given bp
-	'cat!'            => \$concatenate, # concatenate sequences into one
-	'pad=i'           => \$pad, # pad concatenate sequences with given N bp
-	'z|gz!'           => \$gz, # compress output
-	'h|help'          => \$help, # request help
-	'v|version'       => \$print_version, # print the version
+GetOptions(
+	'i|in=s'          => \$infile,           # the solexa data file
+	'o|out=s'         => \$outfile,          # name of output file
+	'd|db|fasta=s'    => \$database,         # database name or genomic fasta file
+	'f|feature=s'     => \$feature,          # feature from input file
+	'u|subfeature=s'  => \$subfeature,       # subfeature to collect sequence
+	'n|name|id=i'     => \$id_i,             # id index
+	'desc=i'          => \$desc_i,           # description index
+	's|seq=i'         => \$seq_i,            # sequence index
+	'c|chr=i'         => \$chr_i,            # chromosome index
+	'b|begin|start=i' => \$start_i,          # start index
+	'e|stop|end=i'    => \$stop_i,           # stop index
+	't|strand=i'      => \$strand_i,         # strand index
+	'x|extend=i'      => \$extend,           # extend sequence by given bp
+	'cat!'            => \$concatenate,      # concatenate sequences into one
+	'pad=i'           => \$pad,              # pad concatenate sequences with given N bp
+	'z|gz!'           => \$gz,               # compress output
+	'h|help'          => \$help,             # request help
+	'v|version'       => \$print_version,    # print the version
 ) or die " unrecognized option(s)!! please refer to the help documentation\n\n";
 
 # Print help
 if ($help) {
+
 	# print entire POD
-	pod2usage( {
-		'-verbose' => 2,
-		'-exitval' => 1,
-	} );
+	pod2usage(
+		{
+			'-verbose' => 2,
+			'-exitval' => 1,
+		}
+	);
 }
 
 # Print version
@@ -93,32 +78,23 @@ if ($print_version) {
 	exit;
 }
 
-
-
 ### Check for requirements
-unless ($bio) {
-	print <<END;
- This program requires Bio::Seq to ensure properly formatted fasta files.
- Please install the Bio::Perl package. You will need this to also obtain
- fasta indexing and retrieval modules, including Bio::DB::HTS, Bio::DB::Sam, 
- or Bio::DB::Fasta.
-END
-	exit;
-}
 unless ($infile) {
-	$infile = shift @ARGV or
-		die " no input file! use --help for more information\n";
+	if (@ARGV) {
+		$infile = shift @ARGV;
+	}
+	else {
+		print STDERR " FATAL: no input file! use --help for more information\n";
+		exit 1;
+	}
 }
-unless (defined $gz) {
+unless ( defined $gz ) {
 	$gz = 0;
 }
 
-
-
-
 ### Open file ####
 my $Data = Bio::ToolBox::Data->new(
-	file       => $infile, 
+	file       => $infile,
 	parse      => 1,
 	feature    => $feature,
 	subfeature => $subfeature,
@@ -127,116 +103,114 @@ unless ($database) {
 	$database = $Data->database;
 }
 
-
-
 ### Identify columns ####
-unless (defined $id_i) {
+unless ($id_i) {
 	$id_i = $Data->name_column;
 }
-unless (defined $seq_i) {
+unless ($seq_i) {
 	$seq_i = $Data->find_column('sequence');
 }
-unless (defined $desc_i) {
+unless ($desc_i) {
 	$desc_i = $Data->find_column('description|note');
 }
-my $coords;
-my $do_feature;
-if (defined $chr_i and defined $start_i and defined $stop_i) {
+my $coords = 0;
+if ( $chr_i and $start_i and $stop_i ) {
+
 	# user defined coordinates
 	$coords = 1;
 }
-elsif ($Data->feature_type eq 'coordinate') {
+elsif ( $Data->feature_type eq 'coordinate' ) {
+
 	# Input has coordinate columns
 	$coords = 1;
 }
-elsif ($Data->feature_type eq 'named') {
+elsif ( $Data->feature_type eq 'named' ) {
+
 	# Input has named features that presumably have coordinates in a database
 	$coords = 1;
-	$do_feature = 1;
 }
 
-
 ### Determine mode ###
-if (defined $id_i and defined $seq_i and $concatenate) {
+if ( $id_i and $seq_i and $concatenate ) {
+
 	# sequence is already in the source file
-	printf " Found Sequence column %s\n", defined $seq_i ? $seq_i : '-';
+	printf " Found Sequence column %s\n",    defined $seq_i  ? $seq_i  : '-';
 	printf " Found Description column %s\n", defined $desc_i ? $desc_i : '-';
 	print " writing a single concatenated fasta with the provided sequence\n";
 	write_direct_single_fasta();
 }
-elsif (defined $id_i and defined $seq_i) {
+elsif ( $id_i and $seq_i ) {
+
 	# sequence is already in the source file
-	printf " Found Sequence column %s\n", defined $seq_i ? $seq_i : '-';
+	printf " Found Sequence column %s\n",    defined $seq_i  ? $seq_i  : '-';
 	printf " Found Description column %s\n", defined $desc_i ? $desc_i : '-';
 	print " writing a multi-fasta with the provided sequence\n";
 	write_direct_multi_fasta();
 }
-elsif ($coords and $concatenate) {
+elsif ( $coords and $concatenate ) {
+
 	# collect sequences and concatenate into single
 	print " fetching sequence from $database and writing a concatenated fasta\n";
 	fetch_seq_and_write_single_fasta();
 }
 elsif ($coords) {
+
 	# need to collect sequence
 	print " fetching sequence from $database and writing a multi-fasta\n";
 	fetch_seq_and_write_multi_fasta();
 }
 else {
-	die " unable to identify appropriate columns! see help\n";
+	print STDERR " FATAL: unable to identify appropriate columns! see help\n";
+	exit 1;
 }
-
-
 
 ### Finished
 print " wrote file '$outfile'\n";
 
-
 ########################   Subroutines   ###################################
 
 sub write_direct_single_fasta {
-	# concatenate each of the provided sequences
-	my $concat_seq;
-	
-	$Data->iterate( sub {
-		my $row = shift;
-		$concat_seq .= $row->value($seq_i);
-		$concat_seq .= 'N' x $pad if $pad;
-	} );
-	
-	# create final sequence object
-	my $seq = Bio::Seq->new(
-		-id     => $Data->basename,
-		-desc   => "Concatenated sequences",
-		-seq    => $concat_seq,
-	);
-	
-	# write out
-	my $seq_io = open_output_fasta();
-	$seq_io->write_seq($seq);
-}
 
+	# concatenate each of the provided sequences
+	my $concat_seq = q();
+
+	$Data->iterate(
+		sub {
+			my $row = shift;
+			$concat_seq .= $row->value($seq_i);
+			$concat_seq .= 'N' x $pad if $pad;
+		}
+	);
+
+	# write out
+	my $seq_fh = open_output_fasta();
+	write_fasta_seq( $seq_fh, $Data->basename, 'Concatenated sequences', $concat_seq );
+	$seq_fh->close;
+}
 
 sub write_direct_multi_fasta {
-	# write multi-fasta with the provided sequences
-	my $seq_io = open_output_fasta();
-	$Data->iterate( sub {
-		my $row = shift;
-		# create seq object
-		my $seq = Bio::Seq->new(
-			-id     => $row->value($id_i),
-			-seq    => $row->value($seq_i),
-		);
-		if (defined $desc_i) {
-			$seq->desc( $row->value($desc_i) );
-		}
-		$seq_io->write_seq($seq);
-	} );
-}
 
+	# write multi-fasta with the provided sequences
+	my $seq_fh = open_output_fasta();
+	$Data->iterate(
+		sub {
+			my $row  = shift;
+			my $id   = $row->value($id_i);
+			my $seq  = $row->value($seq_i);
+			my $desc = q();
+			if ( defined $desc_i ) {
+				$desc = $row->value($desc_i);
+			}
+			write_fasta_seq( $seq_fh, $id, $desc, $seq );
+		}
+	);
+	$seq_fh->close;
+}
 
 sub fetch_seq_and_write_single_fasta {
+
 	# fetch sequence from database and write concatenated fasta file
-	
+
 	# Open fasta database
 	my $db;
 	if ($database) {
@@ -245,62 +219,58 @@ sub fetch_seq_and_write_single_fasta {
 			die " Could not open database '$database' to use!\n";
 		}
 	}
-	elsif ($Data->database) {
+	elsif ( $Data->database ) {
+
 		# cool, database defined in metadata, we'll use that
 		# hope it works....
 	}
 	else {
-		die " A sequence or fasta database must be provided to collect sequence!\n";
+		print STDERR
+" FATAL: A sequence or fasta database must be provided to collect sequence!\n";
+		exit 1;
 	}
-	
+
 	# collect concatenated sequences and write
-	my $concat_seq;
-	$Data->iterate( sub {
-		my $row = shift;
-		
-		# make sure we parse and/or fetch the seqfeature if need be
-		# this isn't necessarily automatic....
-		my $f = $row->seqfeature if $do_feature;
-		
-		# collect provided arguments for generating sequence
-		my @args;
-		push @args, ('db', $db) if $db;
-		push @args, ('start', $row->value($start_i)) if defined $start_i;
-		push @args, ('stop', $row->value($stop_i)) if defined $stop_i;
-		push @args, ('seq_id', $row->value($chr_i)) if defined $chr_i;
-		push @args, ('strand', $row->value($strand_i)) if defined $strand_i;
-		push @args, ('extend', $extend) if $extend;
-		
-		# collect sequence using provided arguments as necessary
-		my $sequence = $row->get_sequence(@args);
-		unless ($sequence) {
-			printf "no sequence for line %d, %s", $row->line_number, 
-				$row->name || $row->coordinate;
-			next;
+	my $concat_seq = q();
+	$Data->iterate(
+		sub {
+			my $row = shift;
+
+			# collect provided arguments for generating sequence
+			my @args;
+			push @args, ( 'db',     $db )                    if $db;
+			push @args, ( 'start',  $row->value($start_i) )  if defined $start_i;
+			push @args, ( 'stop',   $row->value($stop_i) )   if defined $stop_i;
+			push @args, ( 'seq_id', $row->value($chr_i) )    if defined $chr_i;
+			push @args, ( 'strand', $row->value($strand_i) ) if defined $strand_i;
+			push @args, ( 'extend', $extend )                if $extend;
+
+			# collect sequence using provided arguments as necessary
+			my $sequence = $row->get_sequence(@args);
+			unless ($sequence) {
+				printf "no sequence for line %d, %s", $row->line_number,
+					$row->name || $row->coordinate;
+				next;
+			}
+
+			# concatenate the sequence
+			$concat_seq .= $sequence;
+			$concat_seq .= 'N' x $pad if $pad;
 		}
-	
-		# concatenate the sequence
-		$concat_seq .= $sequence;
-		$concat_seq .= 'N' x $pad if $pad;
-	} );
-	
-	# create final sequence object
-	my $seq = Bio::Seq->new(
-		-id     => $Data->basename,
-		-desc   => "Concatenated sequences",
-		-seq    => $concat_seq,
 	);
-	
+
 	# write out
-	my $seq_io = open_output_fasta();
-	$seq_io->write_seq($seq);
+	my $seq_fh = open_output_fasta();
+	my $id     = $Data->basename;
+	my $desc   = 'Concatenated sequences';
+	write_fasta_seq( $seq_fh, $id, $desc, $concat_seq );
+	$seq_fh->close;
 }
-
-
 
 sub fetch_seq_and_write_multi_fasta {
+
 	# fetch sequence from database and write multi-fasta file
-	
+
 	# Open fasta database
 	my $db;
 	if ($database) {
@@ -309,83 +279,90 @@ sub fetch_seq_and_write_multi_fasta {
 			die " Could not open database '$database' to use!\n";
 		}
 	}
-	elsif ($Data->database) {
+	elsif ( $Data->database ) {
+
 		# cool, database defined in metadata, we'll use that
 		# hope it works....
 	}
 	else {
-		die " A sequence or fasta database must be provided to collect sequence!\n";
+		print STDERR
+" FATAL: A sequence or fasta database must be provided to collect sequence!\n";
+		exit 1;
 	}
-	
+
 	# open output file
-	my $seq_io = open_output_fasta();
-	
+	my $seq_fh = open_output_fasta();
+
 	# collect sequences and write
-	$Data->iterate( sub {
-		my $row = shift;
-		
-		# make sure we parse and/or fetch the seqfeature if need be
-		# this isn't necessarily automatic....
-		my $f = $row->seqfeature if $do_feature;
-		
-		# collect provided arguments for generating sequence
-		my @args;
-		push @args, ('subfeature', $subfeature) if $subfeature;
-		push @args, ('db', $db) if $db;
-		push @args, ('start', $row->value($start_i)) if defined $start_i;
-		push @args, ('stop', $row->value($stop_i)) if defined $stop_i;
-		push @args, ('seq_id', $row->value($chr_i)) if defined $chr_i;
-		push @args, ('strand', $row->value($strand_i)) if defined $strand_i;
-		push @args, ('extend', $extend) if $extend;
-		
-		# collect sequence based on values obtained above
-		my $sequence = $row->get_sequence(@args);
-		unless ($sequence) {
-			printf "no sequence for line %d, %s", $row->line_number, 
-				$row->name || $row->coordinate;
-			next;
+	$Data->iterate(
+		sub {
+			my $row = shift;
+
+			# collect provided arguments for generating sequence
+			my @args;
+			push @args, ( 'subfeature', $subfeature )            if $subfeature;
+			push @args, ( 'db',         $db )                    if $db;
+			push @args, ( 'start',      $row->value($start_i) )  if $start_i;
+			push @args, ( 'stop',       $row->value($stop_i) )   if $stop_i;
+			push @args, ( 'seq_id',     $row->value($chr_i) )    if $chr_i;
+			push @args, ( 'strand',     $row->value($strand_i) ) if $strand_i;
+			push @args, ( 'extend',     $extend )                if $extend;
+
+			# collect sequence based on values obtained above
+			my $seq = $row->get_sequence(@args);
+			unless ($seq) {
+				printf "no sequence for line %d, %s", $row->line_number,
+					$row->name || $row->coordinate;
+				next;
+			}
+
+			# write out sequence
+			my $id   = $row->name || $row->coordinate;
+			my $desc = q();
+			if ( defined $desc_i ) {
+				$desc = $row->value($desc_i);
+			}
+			write_fasta_seq( $seq_fh, $id, $desc, $seq );
 		}
-	
-		# create seq object
-		my $seq = Bio::Seq->new(
-			-id     => $row->name || $row->coordinate,
-			-seq    => $sequence,
-		);
-		if (defined $desc_i) {
-			$seq->desc( $row->value($desc_i) );
-		}
-		
-		# write out
-		$seq_io->write_seq($seq);
-	} );
+	);
+	$seq_fh->close;
 }
 
-
 sub open_output_fasta {
-	
+
 	# get filename
 	unless ($outfile) {
 		$outfile = $Data->path . $Data->basename . '.fa';
 	}
-	unless ($outfile =~ /\.fa(?:sta)?(?:\.gz)?/i) {
+	unless ( $outfile =~ /\.fa (?:sta)? (?:\.gz)? $/xi ) {
 		$outfile .= '.fasta';
 	}
-	if ($gz and $outfile !~ /\.gz$/i) {
+	if ( $gz and $outfile !~ /\.gz$/i ) {
 		$outfile .= '.gz';
 	}
-	
+
 	# open for writing
-	my $out_fh = Bio::ToolBox::Data->open_to_write_fh($outfile, $gz) or 
-		die "unable to open '$outfile' for writing!\n";
-	
-	# open SeqIO object
-	my $seq_io = Bio::SeqIO->new(
-		-fh     => $out_fh,
-		-format => 'fasta',
-	);
-	return $seq_io;
+	my $out_fh = Bio::ToolBox::Data->open_to_write_fh( $outfile, $gz )
+		or die "unable to open '$outfile' for writing!\n";
+	return $out_fh;
 }
 
+sub write_fasta_seq {
+	my ( $fh, $id, $desc, $seq ) = @_;
+	if ($desc) {
+		$fh->printf( ">%s %s\n", $id, $desc );
+	}
+	else {
+		$fh->printf( ">%s\n", $id );
+	}
+	while ( length($seq) > 60 ) {
+		my $line = substr $seq, 0, 60, q();
+		$fh->printf( "%s\n", $line );
+	}
+	if ( length $seq ) {
+		$fh->printf( "%s\n", $seq );
+	}
+}
 
 __END__
 

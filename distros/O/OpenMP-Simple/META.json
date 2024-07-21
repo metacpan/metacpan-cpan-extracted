@@ -35,7 +35,7 @@
             "OpenMP::Environment" : "0",
             "Test::Exception" : "0",
             "Test::More" : "0",
-            "Util::H2O::More" : "0"
+            "Util::H2O::More" : "v0.3.4"
          }
       }
    },
@@ -48,7 +48,7 @@
          "web" : "https://github.com/Perl-OpenMP/p5-OpenMP-Simple"
       }
    },
-   "version" : "0.1.0",
+   "version" : "0.1.2",
    "x_generated_by_perl" : "v5.40.0",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.38",
    "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"

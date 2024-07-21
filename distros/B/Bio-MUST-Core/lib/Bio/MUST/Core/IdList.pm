@@ -1,6 +1,6 @@
 package Bio::MUST::Core::IdList;
 # ABSTRACT: Id list for selecting specific sequences
-$Bio::MUST::Core::IdList::VERSION = '0.240390';
+$Bio::MUST::Core::IdList::VERSION = '0.242020';
 use Moose;
 use namespace::autoclean;
 
@@ -31,6 +31,7 @@ has 'ids' => (
         count_ids => 'count',
           all_ids => 'elements',
           add_id  => 'push',
+          get_id  => 'get',
     },
 );
 
@@ -39,7 +40,7 @@ has 'ids' => (
 has '_index_for' => (
     traits   => ['Hash'],
     is       => 'ro',
-    isa      => 'HashRef[Str]',
+    isa      => 'HashRef[Num]',
     init_arg => undef,
     lazy     => 1,
     builder  => '_build_index_for',
@@ -141,9 +142,11 @@ sub _ali_from_list_ {
         ### Using lookup...
 
         # get slot list from lookup
-        # Note: Since this list follows the list in $self it is 'reordered'.
+        # Note1: Since this list follows the list in $self it is 'reordered'.
         # We thus sort it by ascending slot if the Ali order must be kept.
-        my @slots = $lookup->index_for($self->all_ids);
+        # Note2: We go through SeqId objects to correctly handle MUST ids
+        my @ids = map { $_->full_id } $self->all_seq_ids;
+        my @slots = $lookup->index_for(@ids);
            @slots = sort { $a <=> $b } @slots unless $reorder;
 
         # populate new Ali with deep copies of Seqs in slot list
@@ -294,7 +297,7 @@ Bio::MUST::Core::IdList - Id list for selecting specific sequences
 
 =head1 VERSION
 
-version 0.240390
+version 0.242020
 
 =head1 SYNOPSIS
 

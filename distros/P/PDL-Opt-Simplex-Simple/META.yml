@@ -27,5 +27,5 @@ resources:
   bugtracker: https://github.com/KJ7LNW/perl-PDL-Opt-Simplex-Simple/issues
   homepage: https://github.com/KJ7LNW/perl-PDL-Opt-Simplex-Simple
   repository: git://github.com/KJ7LNW/perl-PDL-Opt-Simplex-Simple.git
-version: '2.001'
+version: '2.002'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

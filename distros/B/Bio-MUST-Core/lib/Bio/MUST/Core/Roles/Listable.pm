@@ -1,6 +1,6 @@
 package Bio::MUST::Core::Roles::Listable;
 # ABSTRACT: Listable Moose role for objects with implied id lists
-$Bio::MUST::Core::Roles::Listable::VERSION = '0.240390';
+$Bio::MUST::Core::Roles::Listable::VERSION = '0.242020';
 use Moose::Role;
 
 use autodie;
@@ -9,8 +9,9 @@ use feature qw(say);
 use Carp;
 use Const::Fast;
 use Date::Format;
-use List::AllUtils;
+use List::AllUtils qw(nsort_by rev_nsort_by);
 use POSIX qw(ceil floor);
+use Statistics::Descriptive;
 
 use Bio::MUST::Core::Types;
 use Bio::MUST::Core::Constants qw(:seqids);
@@ -59,25 +60,168 @@ around qw(complete_seq_list len_mapper) => sub {
 };
 
 
+sub desc_seq_len_list {
+    my $self = shift;
+    return $self->complete_seq_list(0);     # explicit 0 for clarity
+}
+
+
 sub complete_seq_list {
     my $self    = shift;
     my $min_res = shift;
 
-    # get (non-missing char) lengths of all seqs and record max_len
-    my @lengths = map { $_->nomiss_seq_len } $self->all_seqs;
-    my $max_len = List::AllUtils::max @lengths;
+    # sort seqs in desc order according to their (non-missing) length
+    # Note: accessor call is optimized
+    my @seqs = rev_nsort_by { $_->nomiss_seq_len } $self->all_seqs;
 
-    # convert fractional min_res to conservative integer (if needed)
-    $min_res = ceil($min_res * $max_len)
-        if 0 < $min_res && $min_res < 1;
+    # optionally truncate list
+    if ($min_res) {
 
-    # filter out seqs with less than min_res non-missing chars
-    my @ids = map { $_->full_id } $self->all_seq_ids;
-    my @indices = grep { $lengths[$_] >= $min_res } 0..$#ids;
+        # take max seq length from first seq
+        my $max_len = $seqs[0]->nomiss_seq_len;
 
-    return Bio::MUST::Core::IdList->new( ids => [ @ids[@indices] ] );
+        # convert fractional min_res to conservative integer (if needed)
+        $min_res = ceil($min_res * $max_len)
+            if 0 < $min_res && $min_res < 1;
+
+        # filter out seqs with less than min_res non-missing chars
+        # Note: this might seem inefficient but results in clearer code
+        @seqs = List::AllUtils::before {
+            $_->nomiss_seq_len < $min_res
+        } @seqs;
+    }
+
+    # get ids from ordered (and possibly truncated list)
+    my @ids = map { $_->full_id } @seqs;
+
+    # in scalar context return bare IdList
+    my $list = Bio::MUST::Core::IdList->new( ids => \@ids );
+    return $list unless wantarray;
+
+    # in list context further return the corresponding lengths
+    # Note: consider recycling old code below for efficiency
+    my @lens = map { $_->nomiss_seq_len } @seqs;
+    return ($list, \@lens);
 }
 
+# old code (maybe faster but more complex and without sort)
+
+# sub complete_seq_list {
+#     my $self    = shift;
+#     my $min_res = shift;
+#
+#     # get (non-missing char) lengths of all seqs and record max_len
+#     my @lengths = map { $_->nomiss_seq_len } $self->all_seqs;
+#     my $max_len = List::AllUtils::max @lengths;
+#
+#     # convert fractional min_res to conservative integer (if needed)
+#     $min_res = ceil($min_res * $max_len)
+#         if 0 < $min_res && $min_res < 1;
+#
+#     # filter out seqs with less than min_res non-missing chars
+#     my @ids = map { $_->full_id } $self->all_seq_ids;
+#     my @indices = grep { $lengths[$_] >= $min_res } 0..$#ids;
+#
+#     return Bio::MUST::Core::IdList->new( ids => [ @ids[@indices] ] );
+# }
+
+around qw(long_branch_list) => sub {
+    my $method = shift;
+    my $self   = shift;
+
+    # ensure that tips are available (e.g., the object is a Tree)
+    unless ( $self->can('tree') ) {
+        carp '[BMC] Warning: cannot proceed without a tree; returning undef!';
+        return;
+    }
+
+    return $self->$method(@_);
+};
+
+
+sub asc_br_len_list {
+    my $self = shift;
+    return $self->long_branch_list(0);      # explicit 0 for clarity
+}
+
+# Note: very naive approach and not applicable in practice.
+# Should probably use the derivative of branch length increase in log space.
+# Meanwhile: use treeshrink
+
+
+sub long_branch_list {
+    my $self = shift;
+    my $fact = shift;
+
+    # sort tips in desc order according to their branch length
+    # Note: accessor call is optimized
+    my @tips = nsort_by { $_->get_branch_length }
+        @{ $self->tree->get_terminals };
+
+    # optionally truncate list
+    if ($fact) {
+
+        # define threshold using 1.5 x IQR over Q3
+        my $stat = Statistics::Descriptive::Full->new;
+           $stat->add_data( [ map { $_->get_branch_length } @tips ] );
+        my ($q1, $q3) = ( $stat->quantile(1), $stat->quantile(3) );
+        #### $q1
+        #### $q3
+        #### iqr: $q3-$q1
+        #### $fact
+        my $threshold = $q3 + $fact * ($q3 - $q1);
+        #### $threshold
+
+        # filter out tips with branch length over the threshold
+        # Note: this might seem inefficient but results in clearer code
+        @tips = List::AllUtils::after_incl {
+            $_->get_branch_length > $threshold
+        } @tips;
+    }
+
+    # get ids from ordered (and possibly truncated list)
+    my @ids = map {
+        Bio::MUST::Core::SeqId->new( full_id => $_->get_name )->full_id
+    } @tips;
+
+    # in scalar context return bare IdList
+    my $list = Bio::MUST::Core::IdList->new( ids => \@ids );
+    return $list unless wantarray;
+
+    # in list context further return the corresponding branch lengths
+    # Note: consider recycling old code below for efficiency
+    my @lens = map { $_->get_branch_length } @tips;
+    return ($list, \@lens);
+}
+
+# old code (maybe faster but more complex and without sort)
+
+# sub long_leaf_list {
+#     my $self = shift;
+#     my $fact = shift // 1.5;
+#
+#     my @tips = @{ $self->tree->get_terminals };
+#
+#     # compute terminal branch length distribution
+#     my @lengths = map { $_->get_branch_length } @tips;
+#     #### list: sort { $a <=> $b } @lengths
+#     my $stat = Statistics::Descriptive::Full->new;
+#        $stat->add_data( \@lengths );
+#
+#     my ($q1, $q3) = ( $stat->quantile(1), $stat->quantile(3) );
+#     #### $q1
+#     #### $q3
+#     #### iqr: $q3-$q1
+#     #### $fact
+#     my $threshold = $q3 + $fact * ($q3 - $q1);
+#     #### $threshold
+#
+#     my @seq_ids =  map { SeqId->new( full_id => $_->get_name ) }
+#                   grep { $_->get_branch_length > $threshold    } @tips;
+#
+#     #### n: scalar @seq_ids
+#     return IdList->new( ids => \@seq_ids );
+# }
 
 # IdMapper factory methods
 
@@ -231,7 +375,7 @@ Bio::MUST::Core::Roles::Listable - Listable Moose role for objects with implied 
 
 =head1 VERSION
 
-version 0.240390
+version 0.242020
 
 =head1 SYNOPSIS
 
@@ -249,7 +393,13 @@ version 0.240390
 
 =head2 alphabetical_list
 
+=head2 desc_seq_len_list
+
 =head2 complete_seq_list
+
+=head2 asc_br_len_list
+
+=head2 long_branch_list
 
 =head2 std_mapper
 

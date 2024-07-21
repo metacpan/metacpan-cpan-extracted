@@ -28,9 +28,9 @@ my %WriteMakefileArgs = (
     "OpenMP::Environment" => 0,
     "Test::Exception" => 0,
     "Test::More" => 0,
-    "Util::H2O::More" => 0
+    "Util::H2O::More" => "0.3.4"
   },
-  "VERSION" => "0.1.0",
+  "VERSION" => "0.1.2",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -45,7 +45,7 @@ my %FallbackPrereqs = (
   "OpenMP::Environment" => 0,
   "Test::Exception" => 0,
   "Test::More" => 0,
-  "Util::H2O::More" => 0
+  "Util::H2O::More" => "0.3.4"
 );
 
 

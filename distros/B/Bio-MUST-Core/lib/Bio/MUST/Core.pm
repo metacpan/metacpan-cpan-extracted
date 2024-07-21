@@ -6,7 +6,7 @@ package Bio::MUST::Core;
 # CONTRIBUTOR: Valerian LUPO <valerian.lupo@doct.uliege.be>
 # CONTRIBUTOR: Loic MEUNIER <loic.meunier@doct.uliege.be>
 # CONTRIBUTOR: Mick VAN VLIERBERGHE <mvanvlierberghe@doct.uliege.be>
-$Bio::MUST::Core::VERSION = '0.240390';
+$Bio::MUST::Core::VERSION = '0.242020';
 use strict;
 use warnings;
 
@@ -23,6 +23,7 @@ use Bio::MUST::Core::Ali::Stash;
 use Bio::MUST::Core::Ali::Temporary;
 use Bio::MUST::Core::Tree;
 use Bio::MUST::Core::Tree::Forest;
+use Bio::MUST::Core::Tree::Splits;
 use Bio::MUST::Core::Taxonomy;
 use Bio::MUST::Core::GeneticCode::Factory;
 use Bio::MUST::Core::PostPred;
@@ -41,7 +42,7 @@ Bio::MUST::Core - Core classes and utilities for Bio::MUST
 
 =head1 VERSION
 
-version 0.240390
+version 0.242020
 
 =head1 DESCRIPTION
 

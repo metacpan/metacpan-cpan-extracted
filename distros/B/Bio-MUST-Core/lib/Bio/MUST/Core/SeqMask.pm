@@ -2,7 +2,7 @@ package Bio::MUST::Core::SeqMask;
 # ABSTRACT: Sequence mask for selecting specific sites
 # CONTRIBUTOR: Catherine COLSON <ccolson@doct.uliege.be>
 # CONTRIBUTOR: Raphael LEONARD <rleonard@doct.uliege.be>
-$Bio::MUST::Core::SeqMask::VERSION = '0.240390';
+$Bio::MUST::Core::SeqMask::VERSION = '0.242020';
 # TODO: handle codons with gblocks/bmge (and idealize?)
 
 use Moose;
@@ -160,7 +160,7 @@ sub blocks2mask {
     my $class  = shift;
     my $blocks = shift;
 
-    # old version: only handled non-overlapping ordered blocks
+    # old code: only handled non-overlapping ordered blocks
     # my @mask;
     # for my $block ( @{$blocks} ) {
     #     my ($start, $end) = @{$block};
@@ -432,6 +432,7 @@ sub gblocks_mask {
 }
 
 
+# TODO: check interface for BMGE 2.x
 my %bmge_parms_for = (
     strict => [ 0.4, 0.05 ],
     medium => [ 0.5, 0.20 ],
@@ -747,7 +748,7 @@ Bio::MUST::Core::SeqMask - Sequence mask for selecting specific sites
 
 =head1 VERSION
 
-version 0.240390
+version 0.242020
 
 =head1 SYNOPSIS
 

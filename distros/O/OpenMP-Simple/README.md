@@ -5,7 +5,7 @@ This module will provide `Inline::C` related things with conveniences for buildi
 **It's happening! See code for current state, feedback needed!**
 
 Current thought: OpenMP::Simple should basically be the encapsulation of:
-* `Inline::C`+`Alien::OpenMP` (with `omp.h` _auto_include_)
+* `Inline::C`+`Alien::OpenMP` (with `omp.h` + [auto_include](https://metacpan.org/pod/Inline::C#C-CONFIGURATION-OPTIONS))
 * an addition "auto_include" that defines some helpful macros and utility functions
 
 Example of things that will be provided to make it easier to blend OpenMP decorated `Inline::C`

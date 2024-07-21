@@ -118,7 +118,7 @@ import-itol.pl - Upload trees and associate metadata files to iTOL
 
 =head1 VERSION
 
-version 0.240390
+version 0.242020
 
 =head1 USAGE
 

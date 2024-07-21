@@ -1,6 +1,87 @@
 package Bio::ToolBox;
 
-our $VERSION = '1.691';
+use warnings;
+use strict;
+use Carp qw(cluck);
+use Bio::ToolBox::Data;
+
+our $VERSION = '2.00';
+
+sub load_file {
+	my $self = shift;
+	if ( scalar(@_) == 1 ) {
+		return Bio::ToolBox::Data->new( file => $_[0], );
+	}
+	else {
+		return Bio::ToolBox::Data->new(@_);
+	}
+}
+
+sub parse_file {
+	my $self = shift;
+	if ( scalar(@_) == 1 ) {
+		return Bio::ToolBox::Data->new(
+			file       => $_[0],
+			parse      => 1,
+			simplify   => 1,
+			subfeature => 'exon,cds,utr',
+		);
+	}
+	else {
+		my %args = @_;
+		$args{parse} ||= 1;    # make sure this is present
+		return Bio::ToolBox::Data->new(%args);
+	}
+}
+
+sub new_data {
+	my $self = shift;
+	if ( scalar(@_) and $_[0] =~ m/^(?: columns | datasets )$/x ) {
+
+		# looks like a correctly formatted list
+		return Bio::ToolBox::Data->new(@_);
+	}
+	else {
+		# put provided list into an array
+		return Bio::ToolBox::Data->new( columns => [@_] );
+	}
+}
+
+sub open_file {
+	my $self = shift;
+	cluck('Bio::ToolBox->open_file has been replaced by read_file');
+	return Bio::ToolBox::Data->open_to_read_fh(@_);
+}
+
+sub read_file {
+	my $self = shift;
+	return Bio::ToolBox::Data->open_to_read_fh(@_);
+}
+
+sub write_file {
+	my $self = shift;
+	return Bio::ToolBox::Data->open_to_write_fh(@_);
+}
+
+sub open_database {
+	my $self = shift;
+	return Bio::ToolBox::Data->open_new_database(@_);
+}
+
+sub bam_adapter {
+	my $self = shift;
+	return Bio::ToolBox::Data->bam_adapter(@_);
+}
+
+sub big_adapter {
+	my $self = shift;
+	return Bio::ToolBox::Data->big_adapter(@_);
+}
+
+1;
+
+__END__
+
 
 =head1 NAME
 
@@ -71,14 +152,24 @@ an arbitrary text file. A number of convenience methods are present for
 collecting data from data files. This module is not used directly by the 
 user, but its objects are returned when using L<Bio::ToolBox::Data> iterators.
 
-=item Annotation parsers
+=item L<Bio::ToolBox::Parser>
 
-Included are two generic parsers for loading an entire genome-worth of 
-annotation into memory within a reasonably short amount of time. 
+This is the working base class for parsing annotation files, including
+BED and related formats, GFF, GTF, GFF3, and UCSC-derived refFlat, 
+genePred, and genePredExt tables. This is designed to slurp an entire 
+genome-worth of annotation into memory within a reasonably short amount
+of time. Sub-classes include the following.
 
 =over 4
 
-=item L<Bio::ToolBox::parser::gff>
+=item L<Bio::ToolBox::Parser::bed>
+
+This parses simple BED formats (3-6 columns), gene-based BED files (12 columns),
+ENCODE-style peak formats (narrowPeak, broadPeak, and gappedPeak), and other 
+BED-related derivatives. Gene-based BED12 files are parsed into hierarchical
+parent and child subfeatures.
+
+=item L<Bio::ToolBox::Parser::gff>
 
 This parses both GTF and GFF3 file formats. Unlike many other GFF parsers 
 that work line-by-line only, this maintains parent and child hierarchical 
@@ -86,7 +177,7 @@ relationships as parent feature and child subfeatures. To further maintain
 control and reduce unnecessary parsing, unwanted feature types can be 
 selectively skipped.
 
-=item L<Bio::ToolBox::parser::ucsc>
+=item L<Bio::ToolBox::Parser::ucsc>
 
 This parses various UCSC file formats, including different refFlat, GenePred, 
 and knownGene flavors. Genes, transcripts, and exons are assembled into 
@@ -232,90 +323,3 @@ L<Bio::ViennaNGS>
 
 This package is free software; you can redistribute it and/or modify
 it under the terms of the Artistic License 2.0. 
-
-
-=cut
-
-use strict;
-use Carp qw(cluck);
-use Bio::ToolBox::Data;
-
-1;
-
-sub load_file {
-	my $self = shift;
-	if (scalar(@_) == 1) {
-		return Bio::ToolBox::Data->new(
-			file   => $_[0],
-		);
-	}
-	else {
-		return Bio::ToolBox::Data->new(@_);
-	}
-}
-
-sub parse_file {
-	my $self = shift;
-	if (scalar(@_) == 1) {
-		return Bio::ToolBox::Data->new(
-			file       => $_[0],
-			parse      => 1,
-			simplify   => 1,
-			subfeature => 'exon,cds,utr',
-		);
-	}
-	else {
-		my %args = @_;
-		$args{parse} ||= 1; # make sure this is present
-		return Bio::ToolBox::Data->new(%args);
-	}
-}
-
-sub new_data {
-	my $self = shift;
-	if ($_[0] =~ /^(?:columns|datasets)$/) {
-		# looks like a correctly formatted list
-		return Bio::ToolBox::Data->new(@_);
-	}
-	else {
-		# put provided list into an array
-		return Bio::ToolBox::Data->new(
-			columns => [@_]
-		);
-	}
-}
-
-sub open_file {
-	my $self = shift;
-	cluck("Bio::ToolBox->open_file has been replaced by read_file");
-	return Bio::ToolBox::Data->open_to_read_fh(@_);
-}
-
-sub read_file {
-	my $self = shift;
-	return Bio::ToolBox::Data->open_to_read_fh(@_);
-}
-
-sub write_file {
-	my $self = shift;
-	return Bio::ToolBox::Data->open_to_write_fh(@_);
-}
-
-sub open_database {
-	my $self = shift;
-	return Bio::ToolBox::Data->open_new_database(@_);
-}
-
-sub bam_adapter {
-	my $self = shift;
-	return Bio::ToolBox::Data->bam_adapter(@_);
-}
-
-sub big_adapter {
-	my $self = shift;
-	return Bio::ToolBox::Data->big_adapter(@_);
-}
-
-__END__
-
-

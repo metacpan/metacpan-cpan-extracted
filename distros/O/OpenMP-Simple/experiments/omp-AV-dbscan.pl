@@ -2,7 +2,7 @@
 
 use warnings;
 use strict;
-use Util::H2O::More qw/ddd Getopt2h2o/;
+use Util::H2O::More qw/Getopt2h2o/;
 
 # build and load subroutines
 use OpenMP::Simple;

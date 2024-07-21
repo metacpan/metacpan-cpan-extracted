@@ -1,9 +1,9 @@
 package ExtUtils::Builder::Linker::ELF::Any;
-$ExtUtils::Builder::Linker::ELF::Any::VERSION = '0.014';
+$ExtUtils::Builder::Linker::ELF::Any::VERSION = '0.015';
 use strict;
 use warnings;
 
-use base 'ExtUtils::Builder::Linker::Unixy';
+use parent 'ExtUtils::Builder::Linker::Unixy';
 
 sub _init {
 	my ($self, %args) = @_;
@@ -46,7 +46,7 @@ ExtUtils::Builder::Linker::ELF::Any
 
 =head1 VERSION
 
-version 0.014
+version 0.015
 
 =head1 AUTHOR
 

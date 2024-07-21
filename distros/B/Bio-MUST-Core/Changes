@@ -1,3 +1,23 @@
+0.242020  2024-07-20 12:23:52+02:00 Europe/Rome
+    - Additions
+      - Filterable: new role to generalize filtering of SeqId objects beyond taxonomy
+      - Listable: added method desc_seq_len_list
+      - SeqId: added method instance for memoized object construction (to speed up Splits analysis)
+      - SeqId::Filter: new class to implement method SeqId::family_filter
+      - Tree: added method get_node_that_maximizes (e.g., to look for long branch lengths)
+      - Tree: added method newick_str as a robust wrapper around Bio::Phylo to_newick method
+      - Tree: finally added full-working method root_tree!
+      - Tree::Splits: new class to handle splits and preserve node metadata after rooting
+      - binaries: added automated rooting on taxon or family to format-tree.pl
+    - Changes
+      - Listable: refactored complete_seq_list method to optionally report seq lengths
+      - Listable: refactored (and renamed) long_leaf_list method (to long_branch_list)
+      - SeqId: now automatically (and silently) removes quotes around ids (especially in trees)
+      - Taxonomy: reduced redundancy of Note messages about merged taxa
+    - Fixes
+      - IdList: fixed SeqId-related bug preventing seqs to be batch-extracted in some cases
+      - binaries: improved robustness of classify-ali.pl and inst-abbr-ids.pl
+
 0.240390  2024-02-08 21:59:31+01:00 Europe/Brussels
     - Additions
       - Ali: temp_fasta can now be passed an existing IdMapper

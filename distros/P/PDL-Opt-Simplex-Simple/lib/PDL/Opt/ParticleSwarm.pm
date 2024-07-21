@@ -357,7 +357,12 @@ sub _calcPosFit
 	# We have to transpose here because functions return a vector
 	# for each particle, but internally we need a (1,N) piddle for
 	# fitness values:
-	return $self->{fitFunc}->(@{ $self->{fitParams} }, $pos)->transpose;
+	my $fit = $self->{fitFunc}->(@{ $self->{fitParams} }, $pos)->transpose;
+
+	# Convert any NaN's to infinity so the optimizer knows they are a poor
+	# solution.  It will then continue to try and find a lower fitness
+	# value.
+	return $fit->setnantobad()->setbadtoval(inf);
 }
 
 sub _swarm

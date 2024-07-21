@@ -3,11 +3,12 @@ our $AUTHORITY = 'cpan:GENE';
 
 # ABSTRACT: Play a MIDI score in real-time
 
-our $VERSION = '0.0118';
+our $VERSION = '0.0119';
 
 use strict;
 use warnings;
 
+use Data::Dumper::Compact qw(ddc);
 use File::Basename qw(fileparse);
 use MIDI::RtMidi::FFI::Device ();
 use MIDI::Util qw(get_microseconds score2events);
@@ -27,7 +28,8 @@ sub new {
     $opts{sleep}    //= 1;
     $opts{loop}     ||= 1;
     $opts{infinite} //= 1;
-    $opts{verbose}  //= 1;
+    $opts{verbose}  //= 0;
+    $opts{dump}     //= 0;
     $opts{deposit}  ||= '';
 
     if ($opts{deposit}) {
@@ -61,17 +63,18 @@ sub play {
 sub _play {
     my ($self) = @_;
     $self->_sync_parts;
+    print ddc($self->{score}) if $self->{dump};
     my $micros = get_microseconds($self->{score});
     my $events = score2events($self->{score});
     for my $event (@$events) {
         next if $event->[0] =~ /set_tempo|time_signature/;
-        if ( $event->[0] eq 'text_event' ) {
+        if ($event->[0] eq 'text_event') {
             printf "%s\n", $event->[-1] if $self->{verbose};
             next;
         }
         my $useconds = $micros * $event->[1];
         usleep($useconds) if $useconds > 0 && $useconds < 1_000_000;
-        $self->{device}->send_event( $event->[0] => @{ $event }[ 2 .. $#$event ] );
+        $self->{device}->send_event($event->[0] => @{ $event }[ 2 .. $#$event ]);
     }
     if ($self->{deposit}) {
         my $filename = path($self->{path}, $self->{prefix} . time() . '.midi');
@@ -119,7 +122,7 @@ MIDI::RtMidi::ScorePlayer - Play a MIDI score in real-time
 
 =head1 VERSION
 
-version 0.0118
+version 0.0119
 
 =head1 SYNOPSIS
 
@@ -156,7 +159,8 @@ version 0.0118
       loop     => 4, # loop limit if finite (default: 1)
       infinite => 0, # loop infinitely (default: 1)
       deposit  => 'path/prefix-', # optionally make a file after each loop
-      vebose   => 0, # show our progress (default: 1)
+      vebose   => 0, # print out text events (default: 0)
+      dump     => 0, # dump the score before each play (default: 0)
   )->play;
 
 =head1 DESCRIPTION

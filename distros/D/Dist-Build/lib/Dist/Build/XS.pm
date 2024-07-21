@@ -1,5 +1,5 @@
 package Dist::Build::XS;
-$Dist::Build::XS::VERSION = '0.006';
+$Dist::Build::XS::VERSION = '0.007';
 use strict;
 use warnings;
 
@@ -21,28 +21,29 @@ sub add_methods {
 	$planner->add_delegate('add_xs', sub {
 		my ($planner, %args) = @_;
 
-		my $pureperl_only = $args{pureperl_only} || $planner->pureperl_only;
+		my $pureperl_only = $args{pureperl_only} // $planner->pureperl_only;
 		die "Can't build xs files under --pureperl-only\n" if $pureperl_only;
 
-		my $module_name = $args{module_name} || do {
+		my $module_name = $args{module_name} // do {
 			(my $dist_name = $planner->dist_name) =~ s/-/::/g;
 			$dist_name;
 		};
-		my $module_version = $args{module_version} || $planner->dist_version;
+		my $module_version = $args{module_version} // $planner->dist_version;
 
 		$planner = $planner->new_scope;
 
 		$planner->load_module('ExtUtils::Builder::ParseXS');
-		$planner->load_module('ExtUtils::Builder::AutoDetect::C', '0.012');
+		$planner->load_module('ExtUtils::Builder::AutoDetect::C');
 
-		my $xs_file = catfile('lib', split /::/, $module_name) . '.xs';
-		my $c_file = $planner->c_file_for_xs($xs_file, 'lib');
+		my $xs_file = $args{file} // catfile('lib', split /::/, $module_name) . '.xs';
+		my $xs_dir = dirname($xs_file);
+		my $c_file = $planner->c_file_for_xs($xs_file, $xs_dir);
 
 		my @dependencies = -f 'typemap' ? 'typemap' : ();
 
 		$planner->parse_xs($xs_file, $c_file, dependencies => \@dependencies);
 
-		my $o_file = $planner->obj_file(basename($c_file, '.c'));
+		my $o_file = $planner->obj_file(basename($c_file, '.c'), $xs_dir);
 
 		my %defines = (
 			%{ $args{defines} || {} },
@@ -63,7 +64,8 @@ sub add_methods {
 		my @objects = ($o_file, @{ $args{extra_objects} || [] });
 
 		for my $source (@{ $args{extra_sources} }) {
-			my $object = $planner->obj_file(basename($source, '.c'));
+			my $dirname = dirname($source);
+			my $object = $planner->obj_file(basename($source, '.c'), $dirname);
 			$planner->compile($source, $object,
 				type         => 'loadable-object',
 				profile      => '@Perl',
@@ -80,7 +82,7 @@ sub add_methods {
 			profile      => '@Perl',
 			module_name  => $module_name,
 			mkdir        => 1,
-			extra_args   => get_flags($args{extra_linker_args}),
+			extra_args   => get_flags($args{extra_linker_flags}),
 			library_dirs => $args{library_dirs},
 			libraries    => $args{libraries},
 		);
@@ -105,7 +107,7 @@ Dist::Build::XS - An XS implementation for Dist::Build
 
 =head1 VERSION
 
-version 0.006
+version 0.007
 
 =head1 SYNOPSIS
 
@@ -137,6 +139,10 @@ The name of the module to be compiled. This defaults to C<$dist_name =~ s/-/::/g
 =item * module_version
 
 The version of the module, defaulting to the dist version.
+
+=item * file
+
+The name of the XS file. By default it's derived from the C<$module_name>, e.g. C<lib/Foo/Bar.xs> for C<Foo::Bar>.
 
 =item * defines
 

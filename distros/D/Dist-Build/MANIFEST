@@ -13,6 +13,7 @@ lib/Dist/Build/Core.pm
 lib/Dist/Build/Serializer.pm
 lib/Dist/Build/ShareDir.pm
 lib/Dist/Build/XS.pm
+prereqs.yml
 t/00-compile.t
 t/lib/DistGen.pm
 t/simple.t

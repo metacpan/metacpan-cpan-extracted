@@ -1,7 +1,7 @@
 package Bio::MUST::Core::SeqId;
 # ABSTRACT: Modern and legacy MUST-compliant sequence id
 # CONTRIBUTOR: Mick VAN VLIERBERGHE <mvanvlierberghe@doct.uliege.be>
-$Bio::MUST::Core::SeqId::VERSION = '0.240390';
+$Bio::MUST::Core::SeqId::VERSION = '0.242020';
 use Moose;
 use namespace::autoclean;
 
@@ -10,13 +10,15 @@ use namespace::autoclean;
 use autodie;
 use feature qw(say);
 
-use Smart::Comments;
+# use Smart::Comments;
 
 use Carp;
 use Const::Fast;
+use Regexp::Common;
 
 use Bio::MUST::Core::Types;
 use Bio::MUST::Core::Constants qw(:ncbi :seqids);
+use aliased 'Bio::MUST::Core::SeqId::Filter';
 
 
 has 'full_id' => (
@@ -204,14 +206,14 @@ const my @GENERA  => qw(
     A-2
     acetamiprid-degrading
     Activation-tagging
-    Adeno-Associated
-    Adeno-associated
     adeno-associated
+    Adeno-associated
+    Adeno-Associated
     Agave-associated
     Aids-associated
     Aksy-Durug
-    alfalfa-associated
     Alfalfa-associated
+    alfalfa-associated
     alk-system
     allo-octoploid
     Altai-like
@@ -274,8 +276,8 @@ const my @GENERA  => qw(
     Birds-foot
     Black-and-white
     Black-eyed
-    Black-headed
     black-headed
+    Black-headed
     Blackcurrant-associated
     Bo-Circo-like
     Bombus-associated
@@ -534,8 +536,8 @@ const my @GENERA  => qw(
     Cysteine-free
     Cytophaga-like
     DCM-degrading
-    Deep-sea
     deep-sea
+    Deep-sea
     Deinococcus-like
     Deinococcus-Thermus
     Dendro-hypnum
@@ -795,8 +797,8 @@ const my @GENERA  => qw(
     Non-geniculate
     Non-human
     non-mammal
-    non-primate
     Non-primate
+    non-primate
     Norovirus/GII.4/1993-6/UK
     Norovirus/Hu/GII.2/V1/09/18-Jan-2009/Slovenia
     Norovirus/Hu/GII.4/1732/07/07-Jun-2007/Slovenia
@@ -7016,6 +7018,11 @@ sub _set_gca_and_or_taxon_id {
 sub BUILD {
     my $self = shift;
 
+    # possibly remove surrounding quotes (before anything else is done)
+    if ($self->full_id =~ m/\A $RE{delimited}{-delim=>q{'"}}{-keep} \z/xms) {
+        $self->_set_full_id($3);
+    }
+
     # warn of trailing spaces as they harm taxonomic analysis
     carp '[BMC] Warning: "' . $self->full_id . '" has trailing spaces;'
         . ' cannot parse sequence id!' if $self->full_id =~ m/\s+\z/xms;
@@ -7269,6 +7276,32 @@ sub abbr_with_regex {
 #     }
 
 
+# memoized constructor derived from MooseX::Role::Flyweight
+
+
+# cache for created SeqId objects (even if out of scope)
+my %instance_for;
+
+sub instance {
+    my ($class, %args) = @_;
+
+    # TODO: check if this optimized way always work for us
+    my $key = $args{full_id};
+
+    # return the existing instance
+    return $instance_for{$key} if defined $instance_for{$key};
+
+    # create a new instance
+    my $instance = $class->new(%args);
+    $instance_for{$key} = $instance;
+    # Note: do not weaken reference or this will defeat the purpose.
+    # However, this could lead to memory leak in some extreme cases.
+    # Scalar::Util::weaken $instance_for{$key};
+
+    return $instance;
+}
+
+
 # class methods to build modern MUST-compliant id from NCBI components
 
 
@@ -7355,6 +7388,14 @@ sub clean_strain {
     return $strain;
 }
 
+
+sub family_filter {
+    my $self = shift;
+    my $list = shift;
+
+    return Filter->new( tax => $self, _specs => $list );
+}
+
 __PACKAGE__->meta->make_immutable;
 1;
 
@@ -7368,7 +7409,7 @@ Bio::MUST::Core::SeqId - Modern and legacy MUST-compliant sequence id
 
 =head1 VERSION
 
-version 0.240390
+version 0.242020
 
 =head1 SYNOPSIS
 
@@ -7400,6 +7441,8 @@ version 0.240390
 
 =head2 abbr_with_regex
 
+=head2 instance
+
 =head2 new_with
 
 =head2 parse_ncbi_name
@@ -7407,6 +7450,8 @@ version 0.240390
 =head2 clean_ncbi_name
 
 =head2 clean_strain
+
+=head2 family_filter
 
 =head1 AUTHOR
 

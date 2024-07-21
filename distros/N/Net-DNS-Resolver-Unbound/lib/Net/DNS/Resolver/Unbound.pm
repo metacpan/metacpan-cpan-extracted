@@ -12,11 +12,22 @@ use base qw(Net::DNS::Resolver::Base DynaLoader), OS_CONF;
 our $VERSION;
 
 BEGIN {
-	$VERSION = '1.25';
+	$VERSION = '1.26';
 	eval { __PACKAGE__->bootstrap($VERSION) };
 }
 
+use constant UNBOUND_VERSION => eval {
+	my $version = Net::DNS::Resolver::libunbound->VERSION();
+	my ( $v1, $v2, $v3 ) = split /\D/, $version;
+	( $v1 * 100 + $v2 ) * 100 + $v3;
+};
+
 use constant UB_CONTEXT => 'Net::DNS::Resolver::Unbound::Context';
+
+use constant IP_PREF	 => UNBOUND_VERSION > 11100;
+use constant SET_TLS	 => UB_CONTEXT->can('set_tls');
+use constant SET_STUB	 => UB_CONTEXT->can('set_stub');
+use constant ADD_TA_AUTR => UB_CONTEXT->can('add_ta_autr');
 
 
 =head1 NAME
@@ -90,13 +101,12 @@ sub new {
 	my ( $class, @args ) = @_;
 	my $self = $class->SUPER::new();
 	$self->nameservers( $self->SUPER::nameservers );
-	$self->_finalise_config;				# base configuration
+	$self->_finalise_config;				# default configuration
 	$self->{update} = {} if @args;				# force context rebuild
 	while ( my $attr = shift @args ) {
 		my $value = shift @args;
 		$self->$attr( ref($value) ? @$value : $value );
 	}
-	$self->_finalise_config;
 	return $self;
 }
 
@@ -126,9 +136,11 @@ By default, DNS queries are sent to the IP addresses listed in
 sub nameservers {
 	my ( $self, @nameservers ) = @_;
 	if ( defined wantarray ) {
-		$self->_finalise_config;
-		my %config = %{$self->{config}};
-		my @value  = map { ref($_) ? @$_ : $_ } $config{set_fwd};
+		my $config   = $self->{config};
+		my $update   = $self->{update};
+		my @setfwd   = ( $update->{set_fwd}, $config->{set_fwd}, [] );
+		my ($setfwd) = grep { defined $_ } @setfwd;
+		my @value    = map { ref($_) ? @$_ : $_ } $setfwd;
 		return @value;
 	}
 	$self->set_fwd() unless @nameservers;
@@ -255,8 +267,6 @@ Use DNS over TLS for queries to nameservers specified using set_fwd().
 
 =cut
 
-use constant SET_TLS => UB_CONTEXT->can('set_tls');
-
 sub set_tls {
 	my ( $self, $tls ) = @_;
 	return SET_TLS ? $self->_config( 'set_tls', $tls ) : undef;
@@ -272,8 +282,6 @@ hints or pointing to a local authoritative DNS server. For DNS resolvers
 and the 'DHCP DNS' IP address, use set_fwd().
 
 =cut
-
-use constant SET_STUB => UB_CONTEXT->can('set_stub');
 
 sub set_stub {
 	my ( $self, $zone, $address, $prime ) = @_;
@@ -354,8 +362,6 @@ automated trust anchor maintenance.  The file is written when the
 trust anchor is changed.
 
 =cut
-
-use constant ADD_TA_AUTR => UB_CONTEXT->can('add_ta_autr');
 
 sub add_ta_autr {
 	my ( $self, $filename ) = @_;
@@ -450,19 +456,19 @@ END
 	$self->{update} ||= {};					# force config rebuild
 	$self->_finalise_config;
 	my %config = %{$self->{config}};
-	my $optref = $config{set_option} || [];			# sort option list
-	my %option = map {@$_} @$optref;
-	my @option;
+	my $optref = $config{set_option} || [];
+	my @option = @$optref;					# pre-sorted option list
 
-	foreach my $opt ( sort keys %option ) {
-		my $value = $option{$opt};
-		my @value = map { ref($_) ? @$_ : $_ } $value;
-		push @option, [$opt, $_] foreach @value;
+	my @expand;
+	while ( my $name = shift @option ) {			# expand option list
+		foreach my $value ( map { ref($_) ? @$_ : $_ } shift @option ) {
+			push @expand, [$name, $value];
+		}
 	}
 
 	my $format = ";; %s\t%s\n";
+	local $config{set_option} = \@expand;
 	foreach my $name ( sort keys %config ) {
-		local $config{set_option} = \@option;
 		my $value = $config{$name};
 		if ( ref $value ) {
 			foreach my $arg (@$value) {
@@ -498,16 +504,15 @@ sub _decode_result {
 
 sub _config {
 	my ( $self, $name, @arg ) = @_;
-	$self->{ub_ctx} = Net::DNS::Resolver::Unbound::Context->new() unless $self->{update};
-	$self->{ub_ctx}->$name(@arg) if @arg;			# error check only
-	my $entry  = ( scalar(@arg) == 1 ) ? $arg[0] : [@arg];
-	my $update = $self->{update} ||= {};			# collect context changes
-	my $value  = $update->{$name};
-	if ( defined $value ) {					# second and subsequent entries
-		$value = $update->{$name} = [$value] unless ref $value;
-		push @$value, $entry;
+	my $entry = ( scalar(@arg) == 1 ) ? $arg[0] : [@arg];
+	$self->{test_ctx} = Net::DNS::Resolver::Unbound::Context->new() unless $self->{update};
+	$self->{test_ctx}->$name(@arg) if @arg;			# error check only
+	my $state = $self->{update}->{$name};
+	if ( defined $state ) {					# second and subsequent entries
+		$state = $self->{update}->{$name} = [$state] unless ref $state;
+		push @$state, $entry;
 	} else {						# initial entry
-		$update->{$name} = ( scalar(@arg) > 1 ) ? [$entry] : $entry;
+		$self->{update}->{$name} = ( scalar(@arg) > 1 ) ? [$entry] : $entry;
 	}
 	return;
 }
@@ -515,27 +520,30 @@ sub _config {
 
 sub _option {
 	my ( $self, $name, @arg ) = @_;
-	$self->{ub_ctx} = Net::DNS::Resolver::Unbound::Context->new() unless $self->{update};
-	my $ub_ctx = $self->{ub_ctx};
-	my $setopt = $self->{config}->{set_option};
-	my $updopt = $self->{update}->{set_option} || [];
-	my %option = map {@$_} @$setopt, @$updopt;
+	my ($entry) = @arg;
+	my $opt = "${name}:";
+	$self->{test_ctx} = Net::DNS::Resolver::Unbound::Context->new() unless $self->{update};
+	$self->{test_ctx}->set_option( $opt, @arg ) if defined $entry;	  # error check only
+	my $updopt = $self->{update}->{set_option};
+	my %option = map {$_} @$updopt;
 
-	my $opt	  = "${name}:";
-	my $value = $option{$opt};
-	return ref($value) ? @$value : $value unless @arg;
-
-	my $entry = ( scalar(@arg) > 1 ) ? [@arg] : $arg[0];
-	$ub_ctx->set_option( $opt, @arg ) if defined $entry;
-	if ( defined $value ) {					# second and subsequent entries
-		$value = $option{$opt} = [$value] unless ref $value;
-		push @$value, $entry;
-	} else {						# initial entry
-		delete $option{$opt};
-		$option{$opt} = ( scalar(@arg) > 1 ? [$entry] : $entry ) if defined $entry;
+	unless (@arg) {
+		my $setopt = $self->{config}->{set_option};
+		my %config = map {$_} @$setopt, @$updopt;
+		my $value  = $config{$opt};
+		return ref($value) ? @$value : $value;
 	}
 
-	my @option = map { [$_, $option{$_}] } keys %option;
+	my $state = $option{$opt};
+	if ( defined $state ) {					# second and subsequent entries
+		$option{$opt} = $state = [$state] unless ref $state;
+		push @$state, $entry;
+	} else {						# initial entry
+		$option{$opt} = $entry;
+	}
+
+	$option{$opt} = [] unless defined $entry;		# delete entire option
+	my @option = map { ( $_, $option{$_} ) } keys %option;
 	$self->{update}->{set_option} = \@option;
 	return;
 }
@@ -546,8 +554,9 @@ my %IP_conf = (
 	force_v6  => ['do-ip4:'	    => 'no'],
 	prefer_v4 => ['prefer-ip4:' => 'yes'],
 	prefer_v6 => ['prefer-ip6:' => 'yes'] );
-my @IPconf = sort keys %IP_conf;
 my @IPpref = map {@$_} values %IP_conf;
+delete @IP_conf{qw(prefer_v4 prefer_v6)} unless IP_PREF;
+my @IPconf = sort keys %IP_conf;
 
 sub _finalise_config {
 	my $self = shift;
@@ -556,44 +565,31 @@ sub _finalise_config {
 	return unless $update;
 	my $ctx = $self->{ub_ctx} = Net::DNS::Resolver::Unbound::Context->new();
 
-	my $config = $self->{config} || {set_option => []};	# merge config updates
-	my %config = ( %$config, %$update );
+	my $config = $self->{config};
+	my $cfgopt = delete $config->{set_option};		# extract option lists
+	my $updopt = delete $update->{set_option};
+	my %config = ( %$config, %$update );			# merge config updates
 
-	my $optref = delete $config{set_option};		# extract option hash table
-	my %option = map {@$_} @$optref;
-	my @junk   = delete @option{@IPpref};			# expunge IP preferences
-	my @option = map { [$_, $option{$_}] } keys %option;	# reassemble set_option list
+	my %option = map {$_} @$cfgopt, @$updopt;		# merge option updates
+	delete @option{@IPpref};				# expunge IP preference
+	foreach my $key ( grep { $self->$_ } @IPconf ) {	# insert IP preference
+		my ( $key, $value ) = @{$IP_conf{$key}};
+		$option{$key} = $value;
+		last;
+	}
+	my @option = map { ( $_, $option{$_} ) } sort keys %option;    # rebuild option list
+
+	foreach my $name ( keys %option ) {			# set unbound options
+		foreach my $value ( map { ref($_) ? @$_ : $_ } $option{$name} ) {
+			$ctx->set_option( $name, $value );
+		}
+	}
 
 	foreach my $name ( keys %config ) {			# rebuild unbound context
-		my $value = $config{$name};
-		if ( ref $value ) {
-			foreach my $element (@$value) {
-				my @value = map { ref($_) ? @$_ : $_ } $element;
-				$ctx->$name(@value);
-			}
-		} else {
-			$ctx->$name($value);
+		foreach my $value ( map { ref($_) ? @$_ : $_ } $config{$name} ) {
+			my @arg = map { ref($_) ? @$_ : $_ } $value;
+			$ctx->$name(@arg);
 		}
-	}
-
-	foreach my $opt ( keys %option ) {			# set unbound options
-		my $value = $option{$opt};
-		if ( ref $value ) {
-			foreach my $element (@$value) {
-				$ctx->set_option( $opt, $element );
-			}
-		} else {
-			$ctx->set_option( $opt, $value );
-		}
-	}
-
-	foreach my $key ( grep { $self->$_ } @IPconf ) {	# append IP preference
-		my $arg = $IP_conf{$key};
-		eval {
-			$ctx->set_option(@$arg);
-			push @option, $arg;
-		};
-		last;
 	}
 
 	$config{set_option} = \@option if @option;

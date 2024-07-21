@@ -23,6 +23,7 @@ my @files = (
     't/03-warnings.t',
     't/04-fatal.t',
     't/05-fatal.t',
+    't/author-changes.t',
     't/author-critic.t',
     't/author-eof.t',
     't/author-eol.t',
@@ -35,7 +36,7 @@ my @files = (
     't/author-vars.t',
     't/etc/perlcritic.rc',
     't/lib/MockStatsd.pm',
-    't/release-check-manifest.t',
+    't/release-dist-manifest.t',
     't/release-fixme.t',
     't/release-kwalitee.t',
     't/release-trailing-space.t'

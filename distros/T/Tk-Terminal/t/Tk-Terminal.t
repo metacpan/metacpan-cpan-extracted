@@ -23,15 +23,6 @@ if (defined $app) {
 		-linkreg => qr/[^\s]+\sline\s\d+/,
 		-scrollbars => 'oe',
 	)->pack(-expand => 1, -fill => 'both');
-	my $cframe = $app->Frame->pack(-fill => 'x');
-	$cframe->Button(
-		-text => 'Tell',
-		-command => sub { $terminal->launch('perl t/tellme')	},
-	)->pack(-padx => 2, -pady => 2, -side => 'left');
-	$cframe->Button(
-		-text => 'Buggy',
-		-command => sub { $terminal->launch('perl t/buggy')	},
-	)->pack(-padx => 2, -pady => 2, -side => 'left');
 }
 
 testaccessors($terminal, 'cur', 'err', 'hist', 'hp', 'in', 'linkScanned', 'out', 'pid');

@@ -463,6 +463,7 @@ my @dupe_tests = (
 my @filters = (
     [
         [ qw(+eudicotyledons +Lycopodiopsida -Arabidopsis -Medicago) ],
+        -6,
         [
             'Glycine max_3847@356550732',
             'Selaginella moellendorffii_88036@302803464',
@@ -472,6 +473,7 @@ my @filters = (
     ],
     [
         [ qw(+Poaceae) ],
+        0,
         [
             'Oryza sativa_39947@315623028',
             'Sorghum bicolor_4558@242096926',
@@ -484,6 +486,7 @@ my @filters = (
     ],
     [
         [ qw(-eudicotyledons) ],
+        +2,
         [
             'Oryza sativa_39947@315623028',
             'Sorghum bicolor_4558@242096926',
@@ -497,6 +500,7 @@ my @filters = (
     ],
     [
         [ '+Arabidopsis thaliana', '+Brachypodium distachyon' ],
+        -6,
         [
             'Arabidopsis thaliana_3702@7269912',
             'Brachypodium distachyon_15368@357123620',
@@ -506,6 +510,7 @@ my @filters = (
     ],
     [
         [],
+        +10,
         [
             'Medicago truncatula_3880@357479567',
             'Arabidopsis thaliana_3702@7269912',
@@ -529,24 +534,26 @@ my @filters = (
 
     for my $exp_row (@filters) {
         my $filter = $tax->tax_filter( $exp_row->[0] );
+        cmp_ok $filter->score( $ali->all_seq_ids ), '==', $exp_row->[1],
+            'got expected score from filter:';
+        explain [ $filter->all_specs ];
 #         explain [ $filter->all_wanted ];
 #         explain [ $filter->all_unwanted ];
         my $id_list = $filter->tax_list($ali);
-        is_deeply [ $id_list->all_ids ], $exp_row->[1],
-            'got expected taxonomic list from filter:';
-        explain [ $filter->all_specs ];
+        is_deeply [ $id_list->all_ids ], $exp_row->[2],
+            'got expected taxonomic list from the same filter';
         my $filtered = $id_list->filtered_ali($ali);
 
         my @lineage_10 = $tax->get_common_taxonomy_from_seq_ids(
             $filtered->all_seq_ids
         );
-        cmp_ok join('; ', @lineage_10), 'eq', $exp_row->[2],
+        cmp_ok join('; ', @lineage_10), 'eq', $exp_row->[3],
             'got expected common taxonomy at strict threshold';
 
         my @lineage_08 = $tax->get_common_taxonomy_from_seq_ids(
             0.8, $filtered->all_seq_ids
         );
-        cmp_ok join('; ', @lineage_08), 'eq', $exp_row->[3],
+        cmp_ok join('; ', @lineage_08), 'eq', $exp_row->[4],
             'got expected common taxonomy at 80% threshold';
     }
 
@@ -1155,6 +1162,39 @@ my @html_colors = qw( ff6347 6a5acd 228b22 228b22 228b22 a0522d b22222 ffd700 );
          "wrote expected iTOL label file: $label_file");
      compare_ok($outfile5, $colps_file,
          "wrote expected iTOL collapse file: $colps_file");
+}
+
+# see tree.t for identical definitions but used in a simpler context
+my @exp_rootings = (
+    [ 'Canis',          'fake-rootC.tre'  ],
+    [ 'Amanita',        'fake-rootA.tre'  ],
+    [ 'Elmera',         'fake-rootE.tre'  ],
+    [ 'Dasypus',        'fake-rootD.tre'  ],
+    [ 'Boletus',        'fake-rootB.tre'  ],
+    [ 'Fagus',          'fake-rootF.tre'  ],
+    [ 'Agaricomycetes', 'fake-rootAB.tre' ],
+    [ 'Eutheria',       'fake-rootCD.tre' ],
+    [ 'eudicotyledons', 'fake-rootEF.tre' ],
+);
+
+use aliased 'Bio::MUST::Core::Tree::Splits';
+
+{
+    my $infile = file('test', 'fake-unroot.tre');
+    my $tree = Bio::MUST::Core::Tree->load($infile);
+
+    for my $exp_rooting (@exp_rootings) {
+        my ($taxon, $file) = @{$exp_rooting};
+
+        my $filter = $tax->tax_filter( [ '+' . $taxon ] );
+        $tree->root_tree($filter, -1, 1);
+
+        cmp_store(
+            obj => $tree, method => 'store',
+            file => "tax-$file",
+            test => "wrote expected .tre rooted on $taxon",
+        );
+    }
 }
 
 # {

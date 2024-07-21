@@ -1,12 +1,12 @@
 package ExtUtils::Builder::Compiler;
-$ExtUtils::Builder::Compiler::VERSION = '0.014';
+$ExtUtils::Builder::Compiler::VERSION = '0.015';
 use strict;
 use warnings;
 
 use ExtUtils::Builder::Action::Command;
 use ExtUtils::Builder::Node;
 
-use base qw/ExtUtils::Builder::ArgumentCollector ExtUtils::Builder::Binary/;
+use parent qw/ExtUtils::Builder::ArgumentCollector ExtUtils::Builder::Binary/;
 
 sub new {
 	my ($class, %args) = @_;
@@ -97,7 +97,7 @@ ExtUtils::Builder::Compiler - An interface around different compilers.
 
 =head1 VERSION
 
-version 0.014
+version 0.015
 
 =head1 DESCRIPTION
 

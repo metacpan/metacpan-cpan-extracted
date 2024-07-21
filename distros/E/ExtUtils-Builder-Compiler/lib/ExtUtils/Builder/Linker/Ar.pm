@@ -1,11 +1,11 @@
 package ExtUtils::Builder::Linker::Ar;
-$ExtUtils::Builder::Linker::Ar::VERSION = '0.014';
+$ExtUtils::Builder::Linker::Ar::VERSION = '0.015';
 use strict;
 use warnings;
 
 use Carp ();
 
-use base 'ExtUtils::Builder::Linker';
+use parent 'ExtUtils::Builder::Linker';
 
 sub _init {
 	my ($self, %args) = @_;
@@ -45,7 +45,7 @@ ExtUtils::Builder::Linker::Ar
 
 =head1 VERSION
 
-version 0.014
+version 0.015
 
 =head1 AUTHOR
 

@@ -14,6 +14,7 @@ use Bio::MUST::Core;
 use Bio::MUST::Core::Utils qw(:filenames secure_outfile);
 use aliased 'Bio::MUST::Core::IdList';
 use aliased 'Bio::MUST::Core::IdMapper';
+use aliased 'Bio::MUST::Core::SeqId';
 use aliased 'Bio::MUST::Core::Taxonomy';
 use aliased 'Bio::MUST::Core::Tree';
 
@@ -24,7 +25,7 @@ Missing required arguments:
     --annotate=<level>
 EOT
 
-die <<'EOT' if !$ARGV_taxdir && ($ARGV_annotate || $ARGV_auto_final_ids);
+die <<'EOT' if !$ARGV_taxdir && ($ARGV_root_on_taxon || $ARGV_annotate || $ARGV_auto_final_ids);
 Missing required arguments:
     --taxdir=<dir>
 EOT
@@ -94,6 +95,16 @@ for my $infile (@ARGV_infiles) {
 
     if ($ARGV_ultrametrize) {
         $tree->tree->chronompl;
+    }
+
+    # Note: rerooting must occur before propagating taxonomy to nodes
+    if ($ARGV_root_on_family || $ARGV_root_on_taxon) {
+        ### Rooting tree on: $ARGV_root_on_family // $ARGV_root_on_taxon
+        my $filter = $ARGV_root_on_family
+            ? SeqId->family_filter( [ '+' . $ARGV_root_on_family ] )
+            :  $tax->tax_filter(    [ '+' . $ARGV_root_on_taxon  ] )
+        ;
+        $tree->root_tree($filter, -1, 1);
     }
 
     if ($ARGV_ladderize) {
@@ -179,7 +190,7 @@ format-tree.pl - Format (and annotate) trees for printing
 
 =head1 VERSION
 
-version 0.240390
+version 0.242020
 
 =head1 USAGE
 
@@ -260,6 +271,22 @@ and should thus be displayed as a cladogram.
 
 When specified, the tree is made ultrametric using the method of Britton et
 al. (2002), as implemented in C<Bio::Phylo>.
+
+=item --root-on-family=<family>
+
+When specified, the tree is rooted on the branch best separating the outgroup
+family from the other families of the tree [default: none].
+
+=for Euclid: family.type: string
+
+=item --root-on-taxon=<taxon>
+
+When specified, the tree is rooted on the branch best separating the outgroup
+taxon from the remaining of the tree [default: none]. This requires a local
+mirror of the NCBI Taxonomy database but not necessarily enabling taxonomic
+annotation.
+
+=for Euclid: taxon.type: string
 
 =item --ladderize=<dir>
 
