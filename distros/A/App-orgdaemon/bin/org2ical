@@ -4,12 +4,11 @@
 #
 # Author: Slaven Rezic
 #
-# Copyright (C) 2017,2018 Slaven Rezic. All rights reserved.
+# Copyright (C) 2017,2018,2024 Slaven Rezic. All rights reserved.
 # This program is free software; you can redistribute it and/or
 # modify it under the same terms as Perl itself.
 #
-# Mail: slaven@rezic.de
-# WWW:  http://www.rezic.de/eserte/
+# WWW:  https://github.com/eserte/org-daemon
 #
 
 package # hide from PAUSE indexer
@@ -30,15 +29,27 @@ use File::Temp     ();
 
 require "org-daemon"; # for App::orgdaemon::find_dates_in_org_file
 
-our $VERSION = '0.04';
+our $VERSION = '0.05';
 
 sub org2ical {
     my(%opts) = @_;
     my $out_ics    =    delete $opts{out_ics};
     my @todo_files = @{ delete $opts{todo_files} };
+    my @include_tags = @{ delete $opts{include_tags} || [] };
+    my @exclude_tags = @{ delete $opts{exclude_tags} || [] };
     my $domain_id  =    delete $opts{domain_id};
     my $debug      =    delete $opts{debug};
     die "Unhandled options: " . join(" ", %opts) if %opts;
+
+    my($include_tags_rx, $exclude_tags_rx);
+    if (@include_tags) {
+	$include_tags_rx = ':(' . join('|', map { quotemeta } @include_tags) . '):';
+	$include_tags_rx = qr{$include_tags_rx};
+    }
+    if (@exclude_tags) {
+	$exclude_tags_rx = ':(' . join('|', map { quotemeta } @exclude_tags) . '):';
+	$exclude_tags_rx = qr{$exclude_tags_rx};
+    }
 
     my %old_events;
     if (-e $out_ics) {
@@ -96,8 +107,19 @@ EOF
     for my $todo_file (@todo_files) {
 	my $todo_mtime = (stat($todo_file))[9];
 	my @todo_dates = App::orgdaemon::find_dates_in_org_file($todo_file, include_timeless => 1, time_fallback => '00:00');
-	for my $todo_date (reverse @todo_dates) {
-	    if ($todo_date->{text} !~ m{:(homecomputer|workcomputer|ignoreics):}) { # XXX tag list to ignore should be only configurable
+    HANDLE_TODO_ITEM: for my $todo_date (reverse @todo_dates) {
+	    if ($include_tags_rx) {
+		if ($todo_date->{text} !~ $include_tags_rx) {
+		    next HANDLE_TODO_ITEM;
+		}
+	    }
+	    if ($exclude_tags_rx) {
+		if ($todo_date->{text} =~ $exclude_tags_rx) {
+		    next HANDLE_TODO_ITEM;
+		}
+	    }
+
+	    {
 		my $uid = md5_base64(encode_utf8($todo_date->id)) . '@' . $hostname;
 		my $dtstamp = strftime "%Y%m%dT%H%M%SZ", gmtime $todo_mtime;
 		#my $dtstart = $todo_date->start_is_timeless ? strftime("DTSTART;VALUE=DATE:%Y%m%d", localtime $todo_date->{epoch}) : strftime("DTSTART:%Y%m%dT%H%M%SZ", gmtime $todo_date->{epoch});
@@ -340,9 +362,13 @@ sub usage (;$) {
     die "usage: $0 [--debug] --todo-file path --ics-file path\n";
 }
 
+my @include_tags;
+my @exclude_tags;
 Getopt::Long::GetOptions(
     'todo-file=s@'       => \my @todo_files,
     "ics-file|out-ics=s" => \my $out_ics,
+    'include-tags=s',    => sub { push @include_tags, split /,/, $_[1] },
+    'exclude-tags=s',    => sub { push @exclude_tags, split /,/, $_[1] },
     "debug!"             => \my $debug,
     "domain-id=s"        => \my $domain_id,
     "version|v"          => sub {
@@ -363,6 +389,8 @@ if (!@todo_files) {
 App::org2ical::org2ical(
     out_ics    => $out_ics,
     todo_files => \@todo_files,
+    include_tags => \@include_tags,
+    exclude_tags => \@exclude_tags,
     domain_id  => $domain_id,
     debug      => $debug,
 );
@@ -375,7 +403,7 @@ org2ical - convert appointments in org-mode files to .ics files
 
 =head1 SYNOPSIS
 
-    org2ical [--debug] [--domain-id=example.org] --todo-file /path/to/file.org [--todo-file ...] --ics-file /path/to/outfile.ics
+    org2ical [--debug] [--domain-id=example.org] --todo-file /path/to/file.org [--todo-file ...] [--include-tags tag,tag,...] [--exclude-tags tag,tag,...] --ics-file /path/to/outfile.ics
 
 =head1 DESCRIPTION
 
@@ -397,6 +425,16 @@ The path to an org-mode file. Mandatory. May be specified multiple times.
 
 The path for the output ical (.ics) file. Mandatory.
 
+=item C<--include-tags I<tag,tag,...>>
+
+Generate ical events only for TODO item matching one of the given tags
+(comma-separated list).
+
+=item C<--exclude-tags I<tag,tag,...>>
+
+Do not generate ical events for TODO item matching at least one of the
+given tags (comma-separated list).
+
 =item C<--domain-id I<value>>
 
 Specify the domain part of generated uids. If not given, then the fqdn
@@ -410,17 +448,22 @@ the generated .ics file.
 
 =back
 
+=head1 HISTORY
+
+Before version 0.05, the options C<--include-tags> and
+C<--exclude-tags> were not implemented. In these versions a hard-coded
+exclude tag list C<homecomputer,workcomputer,ignoreics> was used.
+Since 0.05 there is no such hard-coded list.
+
 =head1 EXAMPLE
 
 A sample crontab entry:
 
-    0 * * * * org2ical --domain-id=example.org --todo-file $HOME/TODO.org --ics-file $HOME/public_html/secure/TODO.ics
+    0 * * * * org2ical --domain-id=example.org --todo-file $HOME/TODO.org --ics-file $HOME/public_html/secure/TODO.ics --exclude-tags homecomputer,workcomputer,ignoreics
 
 =head1 TODO & LIMITATIONS
 
- * it's possible to ignore appointments by tags; this tag list should be configurable
-
- * the handling of description/summar/comment is not yet defined
+ * the handling of description/summary/comment is not yet defined
 
 =head1 AUTHOR
 

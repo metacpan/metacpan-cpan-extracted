@@ -12,7 +12,7 @@ use Log::Any::Adapter;
 use Readonly;
 use Sub::Util 'set_subname';
 
-our $VERSION = '0.05';
+our $VERSION = '0.06';
 
 Readonly::Scalar my $DIE_AT_DEFAULT => numeric_level('fatal');
 Readonly::Scalar my $DIE_AT_KEY => 'Log::Any::Simple/die_at';
@@ -59,6 +59,8 @@ sub import {  ## no critic (RequireArgUnpacking, ProhibitExcessComplexity)
       }
     } elsif ($arg eq ':die_repeats_msg') {
       $^H{$DIE_REPEATS_MSG_KEY} = 1;
+    } elsif ($arg eq ':die_silence_msg') {
+      $^H{$DIE_REPEATS_MSG_KEY} = 0;
     } elsif ($arg eq ':category') {
       my $category = shift;
       croak 'Invalid :category name' unless $category;
@@ -214,7 +216,7 @@ sub _should_die {
 
 sub _get_die_msg {
   my ($msg, $hint_hash) = @_;
-  if ($hint_hash->{$DIE_REPEATS_MSG_KEY}) {
+  if ($hint_hash->{$DIE_REPEATS_MSG_KEY} // 1) {
     return $msg;
   } else {
     return 'Fatal error, see the logs for more details';
@@ -462,10 +464,16 @@ C<none> to disable this behavior entirely.
 
 =item *
 
-C<B<:die_repeats_msg>> By defaults, when the library dies, only a short message
-is sent to the actual call to die(). If this parameter is passed then the entire
-log message is sent, which might cause duplicate, depending on how your logging
-is configured.
+C<B<:die_silence_msg>> By defaults, when the library dies, the call to die()
+receive the entire log message that was passed to the logging function. This may
+results in duplicated log messages, depending on how your logging is configured.
+
+This parameter makes it so that die() will only receive a shorter message.
+
+=item *
+
+C<B<:die_repeats_msg>> This is the opposite of C<B<:die_silence_msg>> and
+restores the default behavior of passing the entire fatal message to die().
 
 =item *
 

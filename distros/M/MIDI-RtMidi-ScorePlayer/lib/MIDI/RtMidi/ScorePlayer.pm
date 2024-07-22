@@ -3,7 +3,7 @@ our $AUTHORITY = 'cpan:GENE';
 
 # ABSTRACT: Play a MIDI score in real-time
 
-our $VERSION = '0.0119';
+our $VERSION = '0.0120';
 
 use strict;
 use warnings;
@@ -122,7 +122,7 @@ MIDI::RtMidi::ScorePlayer - Play a MIDI score in real-time
 
 =head1 VERSION
 
-version 0.0119
+version 0.0120
 
 =head1 SYNOPSIS
 

@@ -1,0 +1,53 @@
+Revision history for Perl distribution App-ArduinoBuilder
+
+0.08 - 2024-07-21
+
+ - Implement a workaround to convert command lines to using Windows escaping
+   when needed.
+ - Improve the logging. Convert it to using Log::Log4perl through Log::Any.
+ - Replace the custom CommandRunner with Parallel::TaskExecutor (the same code
+   forked to a new separate distribution).
+ - Fix a bug with an inverted logic when recursing in the src directories.
+ - Use IPC::Run for the JsonTool module.
+ - Reduce the default verbosity of the output by not logging entire command
+   lines on failures.
+ - Add a way to force a port for the system, even if the discovery fails.
+ - Improve the discovery and the matching of the upload and monitor ports.
+
+0.07 - 2023-06-05
+
+ - Implement a "monitor" tool to talk to the board being programmed.
+ - Improve the matchin of the --port option.
+ - Refactor the command runner.
+
+0.06 - 2023-05-02
+
+ - Add support to upload the firmware to the board.
+ - Make the command line more powerful (allow to execute more than one command).
+ - Display the binary and data size of the compiled program.
+ - Use the builtin tools of the Arduino GUI when we can find them.
+
+0.05 - 2023-04-30
+
+ - Bump required Perl to 5.26 for conveniance (indented here-docs).
+ - The configuration can be overriden on the command line.
+ - Parallelize the compilation
+ - Many bug fixes.
+ - Support more commands (in particular a "clean" command).
+ - Add a mechanism to extend existing configuration option.
+
+0.04 - 2023-04-25
+
+ - Fix a compilation bug where some library objects were missing from the build.
+
+0.03 - 2023-04-25
+
+ - Fix a bug when handling paths with space in them.
+
+0.02 - 2023-04-25
+
+ - Find and use the Arduino configuration under Linux.
+ - Add some initial documentation.
+
+0.01
+ - Initial release

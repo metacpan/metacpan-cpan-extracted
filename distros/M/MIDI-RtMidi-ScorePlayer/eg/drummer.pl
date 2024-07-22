@@ -9,6 +9,7 @@ use warnings;
 use IO::Async::Loop ();
 use MIDI::Drummer::Tiny ();
 use MIDI::RtMidi::ScorePlayer ();
+use MIDI::Util qw(dura_size reverse_dump);
 use Term::TermKey::Async qw(FORMAT_VIM KEYMOD_CTRL);
 use Time::HiRes qw(time);
 
@@ -16,9 +17,8 @@ my $verbose = shift || 0;
 
 my %common;
 my @parts;
-my $bpm  = 100;
-my $dura = 'qn';
-my $mode = 'serial';
+my ($bpm, $dura, $mode, $repeats) = (100, 'qn', 'serial', 1);
+print "State: BPM=$bpm, Duration=$dura, Mode=$mode, Repeats=$repeats\n";
 my $loop = IO::Async::Loop->new;
 my $tka  = Term::TermKey::Async->new(
   term   => \*STDIN,
@@ -27,7 +27,7 @@ my $tka  = Term::TermKey::Async->new(
     my $pressed = $self->format_key($key, FORMAT_VIM);
     # print "Got key: $pressed\n" if $verbose;
     # PLAY SCORE
-    if ($pressed eq 'p') {
+    if ($pressed eq ' ') {
       print "Play score\n" if $verbose;
       my $d = MIDI::Drummer::Tiny->new(
         bpm  => $bpm,
@@ -35,7 +35,7 @@ my $tka  = Term::TermKey::Async->new(
       );
       $common{drummer} = $d;
       $common{parts}   = \@parts;
-      my $parts;
+      my $parts = [];
       if ($mode eq 'serial') {
         $parts = [ sub {
           my (%args) = @_;
@@ -43,7 +43,6 @@ my $tka  = Term::TermKey::Async->new(
         } ];
       }
       elsif ($mode eq 'parallel') {
-        $parts = [];
         my %by_name;
         for my $part (@parts) {
           my ($name) = split /\./, $part;
@@ -63,11 +62,13 @@ my $tka  = Term::TermKey::Async->new(
         parts    => $parts,
         sleep    => 0,
         infinite => 0,
+        # dump     => 1,
       )->play;
     }
-    # RESET SCORE
+    # RESET STATE
     elsif ($pressed eq 'r') {
-      print "Reset score\n" if $verbose;
+      print "Reset state\n" if $verbose;
+      ($bpm, $dura, $mode, $repeats) = (100, 'qn', 'serial', 1);
       %common = ();
       @parts  = ();
     }
@@ -97,6 +98,46 @@ my $tka  = Term::TermKey::Async->new(
       $bpm -= 5 if $bpm > 0;
       print "BPM: $bpm\n" if $verbose;
     }
+    # ONE REPEAT
+    elsif ($pressed eq '!') {
+      $repeats = 1;
+      print "Repeats: $repeats\n" if $verbose;
+    }
+    # TWO REPEATS
+    elsif ($pressed eq '@') {
+      $repeats = 2;
+      print "Repeats: $repeats\n" if $verbose;
+    }
+    # THREE REPEATS
+    elsif ($pressed eq '#') {
+      $repeats = 3;
+      print "Repeats: $repeats\n" if $verbose;
+    }
+    # FOUR REPEATS
+    elsif ($pressed eq '$') {
+      $repeats = 4;
+      print "Repeats: $repeats\n" if $verbose;
+    }
+    # FIVE REPEATS
+    elsif ($pressed eq '%') {
+      $repeats = 5;
+      print "Repeats: $repeats\n" if $verbose;
+    }
+    # SIX REPEATS
+    elsif ($pressed eq '^') {
+      $repeats = 6;
+      print "Repeats: $repeats\n" if $verbose;
+    }
+    # SEVEN REPEATS
+    elsif ($pressed eq '&') {
+      $repeats = 7;
+      print "Repeats: $repeats\n" if $verbose;
+    }
+    # EIGHT REPEATS
+    elsif ($pressed eq '*') {
+      $repeats = 8;
+      print "Repeats: $repeats\n" if $verbose;
+    }
     # SIXTEENTH
     elsif ($pressed eq '2') {
       $dura = 'sn';
@@ -114,74 +155,97 @@ my $tka  = Term::TermKey::Async->new(
     }
     # HIHAT
     elsif ($pressed eq 'h') {
-      print "Hihat\n" if $verbose;
-      my $id = time();
-      my $part = sub {
-        my (%args) = @_;
-        $args{drummer}->note(
-          $args{'hihat.duration.' . $id},
-          $args{drummer}->closed_hh
-        );
-      };
-      $common{'hihat.duration.' . $id} = $dura;
-      $common{'hihat.' . $id} = $part;
-      push @parts, 'hihat.' . $id;
-      my $d = MIDI::Drummer::Tiny->new(bpm => $bpm);
-      $common{drummer} = $d;
-      snippit($part, \%common);
+      play_patch('hithat', 'closed_hh');
+    }
+    # HIHAT REST
+    elsif ($pressed eq '<Backspace>') { # same key as <C-h>
+      rest_patch('hihat');
+    }
+    # CRASH
+    elsif ($pressed eq 'a') {
+      play_patch('crash1', 'crash1');
+    }
+    # CRASH1 REST
+    elsif ($pressed eq '<C-a>') {
+      rest_patch('crash1');
+    }
+    elsif ($pressed eq 'q') {
+      play_patch('crash2', 'crash1');
+    }
+    # CRASH2 REST
+    elsif ($pressed eq '<C-q>') {
+      rest_patch('crash2');
     }
     # KICK
     elsif ($pressed eq 'k') {
-      print "Kick\n" if $verbose;
-      my $id = time();
-      my $part = sub {
-        my (%args) = @_;
-        $args{drummer}->note(
-          $args{'kick.duration.' . $id},
-          $args{drummer}->kick
-        );
-      };
-      $common{'kick.duration.' . $id} = $dura;
-      $common{'kick.' . $id} = $part;
-      push @parts, 'kick.' . $id;
-      my $d = MIDI::Drummer::Tiny->new(bpm => $bpm);
-      $common{drummer} = $d;
-      snippit($part, \%common);
+      play_patch('kick', 'kick');
+    }
+    # KICK REST
+    elsif ($pressed eq '<C-k>') {
+      rest_patch('kick');
     }
     # SNARE
     elsif ($pressed eq 's') {
-      print "Snare\n" if $verbose;
+      play_patch('snare', 'snare');
+    }
+    # SNARE REST
+    elsif ($pressed eq '<C-s>') {
+      rest_patch('snare');
+    }
+    # BASIC BEAT
+    elsif ($pressed eq 'x') {
+      my $name = 'backbeat';
+      print "Basic $name\n" if $verbose;
       my $id = time();
       my $part = sub {
         my (%args) = @_;
         $args{drummer}->note(
-          $args{'snare.duration.' . $id},
-          $args{drummer}->snare
-        );
+          $args{ "$name.duration.$id" },
+          $_ % 2 ? $args{drummer}->kick : $args{drummer}->snare
+        ) for 1 .. int($args{drummer}->beats / 2) * $common{ "$name.repeats.$id" };
       };
-      $common{'snare.duration.' . $id} = $dura;
-      $common{'snare.' . $id} = $part;
-      push @parts, 'snare.' . $id;
-      my $d = MIDI::Drummer::Tiny->new(bpm => $bpm);
-      $common{drummer} = $d;
+      $common{ "$name.duration.$id" } = $dura;
+      $common{ "$name.repeats.$id" } = $repeats;
+      $common{ "$name.$id" } = $part;
+      push @parts, "$name.$id";
       snippit($part, \%common);
     }
-    # BEAT
-    elsif ($pressed eq 'x') {
-      print "Backbeat\n" if $verbose;
+    # BASIC BEAT REST
+    elsif ($pressed eq '<C-x>') {
+      my $name = 'backbeat';
+      print "Basic $name rest\n" if $verbose;
       my $id = time();
       my $part = sub {
         my (%args) = @_;
-        $args{drummer}->note(
-          $args{'backbeat.duration.' . $id},
-          $_ % 2 ? $args{drummer}->kick : $args{drummer}->snare
-        ) for 1 .. int($args{drummer}->beats / 2);
+        my $size = dura_size($args{ "$name.duration.$id" });
+        my $x = $size * 2;
+        my $twice = reverse_dump('length')->{$x};
+        $args{drummer}->rest($twice);
       };
-      $common{'backbeat.duration.' . $id} = $dura;
-      $common{'backbeat.' . $id} = $part;
-      push @parts, 'backbeat.' . $id;
-      my $d = MIDI::Drummer::Tiny->new(bpm => $bpm);
-      $common{drummer} = $d;
+      $common{ "$name.duration.$id" } = $dura;
+      $common{ "$name.repeats.$id" } = $repeats;
+      $common{ "$name.$id" } = $part;
+      push @parts, "$name.$id";
+    }
+    # DOUBLE KICK BEAT
+    elsif ($pressed eq 'X') {
+      my $name = 'backbeat';
+      print "Double kick $name\n" if $verbose;
+      my $id = time();
+      my $part = sub {
+        my (%args) = @_;
+        my $size = dura_size($args{ "$name.duration.$id" });
+        my $x = $size / 2;
+        my $half = reverse_dump('length')->{$x};
+        $args{drummer}->note($half, $args{drummer}->kick);
+        $args{drummer}->note($half, $args{drummer}->kick);
+        $args{drummer}->note($half, $args{drummer}->snare);
+        $args{drummer}->rest($half);
+      };
+      $common{ "$name.duration.$id" } = $dura;
+      $common{ "$name.repeats.$id" } = $repeats;
+      $common{ "$name.$id" } = $part;
+      push @parts, "$name.$id";
       snippit($part, \%common);
     }
     # FINISH
@@ -196,11 +260,46 @@ $loop->loop_forever;
 
 sub snippit {
   my ($part, $common) = @_;
+  my $d = MIDI::Drummer::Tiny->new(bpm => $bpm);
+  $common{drummer} = $d;
   MIDI::RtMidi::ScorePlayer->new(
-    score  => $common->{drummer}->score,
-    common => $common,
-    parts  => [ $part ],
+    score    => $d->score,
+    common   => $common,
+    parts    => [ $part ],
     sleep    => 0,
     infinite => 0,
   )->play;
+}
+
+sub play_patch {
+  my ($name, $patch) = @_;
+  print ucfirst($name), "\n" if $verbose;
+  my $id = time();
+  my $part = sub {
+    my (%args) = @_;
+    $args{drummer}->note(
+      $args{ "$name.duration.$id" },
+      $args{drummer}->$patch
+    ) for 1 .. $common{ "$name.repeats.$id" };
+  };
+  $common{ "$name.duration.$id" } = $dura;
+  $common{ "$name.repeats.$id" } = $repeats;
+  $common{ "$name.$id" } = $part;
+  push @parts, "$name.$id";
+  snippit($part, \%common);
+}
+
+sub rest_patch {
+  my ($name) = @_;
+  print ucfirst($name), " rest\n" if $verbose;
+  my $id = time();
+  my $part = sub {
+    my (%args) = @_;
+    $args{drummer}->rest($args{ "$name.duration.$id" })
+      for 1 .. $common{ "$name.repeats.$id" };
+  };
+  $common{ "$name.duration.$id" } = $dura;
+  $common{ "$name.repeats.$id" } = $repeats;
+  $common{ "$name.$id" } = $part;
+  push @parts, "$name.$id";
 }

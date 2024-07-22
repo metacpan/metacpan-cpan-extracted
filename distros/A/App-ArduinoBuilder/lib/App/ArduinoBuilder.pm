@@ -6,27 +6,55 @@ use warnings;
 use utf8;
 
 use App::ArduinoBuilder::Builder 'build_archive', 'build_object_files', 'link_executable', 'run_hook';
-use App::ArduinoBuilder::CommandRunner;
 use App::ArduinoBuilder::Config 'get_os_name';
 use App::ArduinoBuilder::Discovery;
 use App::ArduinoBuilder::FilePath 'find_latest_revision_dir', 'list_sub_directories', 'find_all_files_with_extensions';
-use App::ArduinoBuilder::Logger;
 use App::ArduinoBuilder::Monitor;
 use App::ArduinoBuilder::System 'find_arduino_dir', 'system_cwd', 'execute_cmd';
-
+use Data::Section::Simple;
 use File::Basename;
 use File::Path 'remove_tree';
 use File::Spec::Functions;
 use Getopt::Long;
 use List::Util 'any', 'none', 'first';
+use Log::Log4perl;
+use Log::Log4perl::Level;
+use Log::Any::Adapter;
+use Log::Any::Simple ':default';
+use Parallel::TaskExecutor 'default_executor';
 use Pod::Usage;
 
-our $VERSION = '0.07';
+our $VERSION = '0.08';
 
 # User agent used for the pluggable discovery and pluggable monitor tools.
 our $TOOLS_USER_AGENT = "\"App::ArduinoBuilder ${VERSION}\"";
 
+sub _string_to_log4perl_level {
+  my ($level) = @_; 
+  return "FATAL" if $level =~ m/^FATAL$/i;
+  return "ERROR" if $level =~ m/^ERR(?:OR)?$/i;
+  return "WARNING" if $level =~ m/^WARN(:?ING)?$/i;
+  return "INFO" if $level =~ m/^INFO?$/i;
+  return "DEBUG" if $level =~ m/^(?:DBG|DEBUG)$/i;
+  return "TRACE" if $level =~ m/^(?:TRACE|FULL(:?_?(?:DBG|DEBUG))?)$/i;
+  fatal "Unknown log level: ${level}";
+}
+
+sub set_log_level {
+  my ($str_level) = @_;
+  my $log4perl_priority = Log::Log4perl::Level::to_priority(_string_to_log4perl_level($str_level));
+  Log::Log4perl->get_logger("")->level($log4perl_priority);
+  return;
+}
+
 sub Run {
+  # We initialize Log4perl here because we might need to log early during the
+  # initialization. But the default level or even the full config can be
+  # overriden later.
+  Log::Log4perl->init(\Data::Section::Simple::get_data_section('log4perl.conf'));
+  Log::Any::Adapter->set('Log4perl');
+  set_log_level($ENV{ARDUINO_BUILDER_LOG_LEVEL}) if exists $ENV{ARDUINO_BUILDER_LOG_LEVEL};
+
   my $config = App::ArduinoBuilder::Config->new();
 
   my (@skip, @force, @only);
@@ -34,15 +62,21 @@ sub Run {
       'help|h' => sub { pod2usage(-exitval => 0, -verbose => 2)},
       'project-dir|project|p=s' => sub { $config->set('builder.project_dir' => $_[1], allow_override => 1) },
       'build-dir|build|b=s' => sub { $config->set('builder.internal.build_dir' => $_[1], allow_override => 1) },
-      'log-level|l=s' => sub { App::ArduinoBuilder::Logger::set_log_level($_[1]) },
+      'log-level|l=s' => sub { set_log_level($_[1]) },
       'config|c=s%' => sub { $config->set($_[1] => $_[2], allow_override => 1) },
       'menu=s%' => sub { $config->set('builder.menu.'.$_[1] => $_[2], allow_override => 1) },
       'skip=s@' => sub { push @skip, split /,/, $_[1] },  # skip this step
       'force=s@' => sub { push @force, split /,/, $_[1] },  # even if it would be skipped by the dependency checker
       'only=s@' => sub { push @only, split /,/, $_[1] },  # run only these steps (skip all others)
-      'stack-trace-on-error|stack' => sub { App::ArduinoBuilder::Logger::print_stack_on_fatal_error(1) },
+      'stack-trace-on-error|stack' => sub { Log::Any::Simple::die_with_stack_trace('long') },
       'parallelize|j=i' => sub { $config->set('builder.parallelize' => $_[1], allow_override => 1) },
       'target-port|port=s' => sub { $config->append('builder.upload.port' => $_[1], ',')},
+      'force-port=s' => sub {
+        my ($protocol, $address) = split(/:/, $_[1]);
+        $config->set('builder.forced_port.protocol' => $protocol);
+        $config->set('builder.forced_port.address' => $address);
+        $config->set('builder.forced_port.forced' => 1);
+      },
     ) or pod2usage(-exitval => 2, -verbose =>0);
 
   if (my @unknown = grep { !/^(clean|build|discover|upload|monitor)$/ } @ARGV) {
@@ -53,13 +87,15 @@ sub Run {
 
   push @ARGV, 'build' unless @ARGV;
 
+  trace "Executing the following command: %s", sub { join(', ', @ARGV) };
+
   if (grep { /^clean$/ } @ARGV) {
     clean($config);
   }
   if (grep { /^build$/ } @ARGV) {
     build($config, \@skip, \@force, \@only);
   }
-  if (grep { /^discover$/ } @ARGV && ! grep { /^(upload|monitor)$/ } @ARGV) {
+  if (grep { /^discover$/ } @ARGV and not grep { /^(upload|monitor)$/ } @ARGV) {
     discover($config);
   }
   if (grep { /^upload$/ } @ARGV) {
@@ -83,8 +119,10 @@ sub generate_project_config {
     $project_dir_is_cwd = 1;
     $project_dir = system_cwd();
     $config->set('builder.project_dir' => $project_dir);
+    debug 'Using the current directory as the project dir: %s', $project_dir;
   } else {
     $project_dir = $config->get('builder.project_dir');
+    debug 'Using the specified project dir: %s', $project_dir;
   }
 
   $config->read_file(catfile($project_dir, 'arduino_builder.local'), allow_missing => 1);
@@ -95,12 +133,16 @@ sub generate_project_config {
     if ($config->exists('builder.default_build_dir')) {
       $build_dir = $config->get('builder.default_build_dir');
       $config->set('builder.internal.build_dir_from_default' => 1);
+      debug 'Using the default build dir: %s', $build_dir;
     } elsif (!$project_dir_is_cwd) {
       $build_dir = system_cwd();
+      debug 'Using the current directory as the build dir: %s', $build_dir;
     } else {
       fatal 'No builder.default_build_dir config and --build_dir was not passed when building from the project directory.';
     }
     $config->set('builder.internal.build_dir' => $build_dir);
+  } else {
+    debug 'Using the explicitly specified build dir: %s', $config->get('builder.internal.build_dir')
   }
   $config->set('build.path' => $config->get('builder.internal.build_dir'));
 
@@ -109,19 +151,24 @@ sub generate_project_config {
     if (defined $d) {
       $config->set('builder.source.path' => catdir($project_dir, $d));
       $config->set('builder.source.is_recursive' => 1, ignore_existing => 1);
+      debug 'Using the following directory as the source dir (recursively): %s', $d;
     } else {
       $config->set('builder.source.path' => $project_dir);
       $config->set('builder.source.is_recursive' => 0, ignore_existing => 1);
+      debug 'Using the project dir (non-recursively) as the source dir.';
     }
   } else {
     $config->set('builder.source.is_recursive' => 1, ignore_existing => 1);
+    debug 'Using an explicitly specified source dir (%s): %s', ($config->get('builder.source.is_recursive') ? 'recursively' : 'non-recursively'), $config->get('builder.source.path');
   }
 
   my $arduino_dir;
   if ($config->exists('builder.arduino.install_dir')) {
     $arduino_dir = $config->get('builder.arduino.install_dir');
+    debug 'Using the explicitly specified arduino directory: %s', $arduino_dir;
   } else {
     $arduino_dir = find_arduino_dir();
+    debug 'Using the discovered arduino directory: %s', $arduino_dir;
   }
 
   if (!$config->exists('builder.package.path')) {
@@ -129,12 +176,11 @@ sub generate_project_config {
     # TODO: the core package can also be installed in a "hardware" directory in
     # the sketch directory. We should search for it there.
     fatal "The builder.package.path config is not set and Arduino installation directory not found" unless $arduino_dir;
-    debug "Using arduino directory: ${arduino_dir}";
     my $package_name = $config->get('builder.package.name');
     my @tests = (catdir($arduino_dir, 'packages', $package_name), catdir($arduino_dir, 'hardware', $package_name));
     my @dirs = grep { -d } @tests;
     fatal "Cannot find the package directory for '${package_name}' inside Arduino directory: ${arduino_dir}" unless @dirs;
-    debug "Using package directory: ${dirs[0]}";
+    debug 'Using package directory found from its name (%s): %s', $package_name, $dirs[0];
     $config->set('builder.package.path' => $dirs[0]);
   } else {
     if ($config->exists('builder.package.name')) {
@@ -142,6 +188,7 @@ sub generate_project_config {
     } else {
       $config->set('builder.package.name' => basename($config->get('builder.package.path')));
     }
+    debug 'Using the explicitly specified package directory: %s', $config->get('builder.package.path');
   }
 
   my $package_path = $config->get('builder.package.path');
@@ -157,7 +204,7 @@ sub generate_project_config {
       fatal 'The builder.package.arch config is not set and more than one arch is present in the package: '.$hardware_dir;
     }
   }
-  debug "Project config: \n%s", sub { $config->dump('  ') };
+  debug "Project config:\n%s", sub { $config->dump('  ') };
 
   my $hardware_path = find_latest_revision_dir(catdir($hardware_dir, $config->get('builder.package.arch')));
 
@@ -186,7 +233,7 @@ sub generate_project_config {
     # directly by the user (e.g. on the command line), which is way all this is
     # done in a temporary config.
     my $menu_value = $board_menu->filter("${m}.${v}");
-    full_debug "Merging menu values for menu '${m}' with key '${v}':\n%s", sub { $menu_value->dump('  ') };
+    trace "Merging menu values for menu '${m}' with key '${v}':\n%s", sub { $menu_value->dump('  ') };
     $board_config->merge($menu_value, allow_override => 1);
   }
   $config->merge($board_config);
@@ -222,11 +269,11 @@ sub generate_project_config {
     warning 'The Arduino GUI directory could not be found, we won’t use the builtin tools.';
   }
 
+  my @all_tools;
   for my $tools_dir (@tools_dirs) {
     next unless -d $tools_dir;
     my @tools = list_sub_directories($tools_dir);
     for my $t (@tools) {
-      debug "Found tool: $t";
       my $tool_path = catdir($tools_dir, $t);
       my $latest_tool_path = find_latest_revision_dir($tool_path);
       # That one could point to the latest version found across all packages
@@ -236,7 +283,9 @@ sub generate_project_config {
         $config->set("runtime.tools.${t}-${v}.path", catdir($tool_path, $v), ignore_existing => 1);
       }
     }
+    push @all_tools, splice @tools;
   }
+  debug "Found tools: %s", [sort @all_tools];
 
   my $config_append = $config->filter('builder.config.append');
   for my $k ($config_append->keys()) {
@@ -248,10 +297,10 @@ sub generate_project_config {
   # considerations that we are not handling yet from:
   # https://arduino.github.io/arduino-cli/0.32/package_index_json-specification/#how-a-tools-path-is-determined-in-platformtxt
 
-  full_debug "Complete configuration: \n%s", sub { $config->dump('  ') };
+  trace "Complete configuration: \n%s", sub { $config->dump('  ') };
 
   if ($config->exists('builder.parallelize')) {
-    default_runner()->set_max_parallel_tasks($config->get('builder.parallelize'));
+    default_executor()->set_max_parallel_tasks($config->get('builder.parallelize'));
   }
 
   return 1;
@@ -259,6 +308,8 @@ sub generate_project_config {
 
 sub clean {
   my ($config) = @_;
+
+  info 'Cleaning the build directory...';
 
   # TODO: add a way to clean only parts of the projects.
   my $build_dir = $config->get('builder.internal.build_dir');
@@ -304,7 +355,7 @@ sub build {
     $builder->run_hook('core.prebuild');
     my $built_core = $builder->build_archive([$config->get('build.core.path'), $config->get('build.variant.path')], catdir($config->get('build.path'), 'core'), 'core.a', $force->('core'));
     info ($built_core ? '  Success' : '  Already up-to-date');
-    $built_something |= $built_core;
+    $built_something ||= $built_core;
     $builder->run_hook('core.postbuild');
   }
 
@@ -368,7 +419,7 @@ sub build {
     # build only the code inside the src/ directory
     my $built_sketch = $builder->build_object_files(
         $config->get('builder.source.path'), catdir($config->get('build.path'), 'sketch'),
-        [], $force->('sketch'), $config->get('builder.source.is_recursive'));
+        [], $force->('sketch'), !$config->get('builder.source.is_recursive'));
     info ($built_sketch ? '  Success' : '  Already up-to-date');
     $built_something |= $built_sketch;
     $builder->run_hook('sketch.postbuild');
@@ -417,31 +468,51 @@ sub build {
 sub discover {
   my ($config) = @_;
 
-  info 'Running board discovery. Be sure to run with "-l debug" to see the result...';
+  if ($config->get('builder.forced_port.forced', default => 0)) {
+    info 'Skipping board discovery';
+    return;
+  }
+
+  info 'Running board discovery...';
   my @ports = App::ArduinoBuilder::Discovery::discover($config);
-  $config->set('builder.internal.ports' => \@ports);
-  info 'Success!';
+  # Discovery can be run more than once, as the port of a board can be changed
+  # after upload. So we override any previous discovered ports.
+  $config->set('builder.internal.ports' => \@ports, allow_override =>1);
+  if (@ports) {
+    debug 'Found port%s: %s', (@ports > 1 ? 's' : ''), join(', ', map { $_->get('upload.port.label') } @ports);
+  } else {
+    warning 'No port found.';
+  }
 }
 
 sub select_port {
   my ($config) = @_;
 
+  if ($config->get('builder.forced_port.forced', default => 0)) {
+    # A forced port does not match a found port (as there are none), so we can’t
+    # just set selected_port here.
+    return $config->filter('builder.forced_port')->prefix('upload.port');
+  }
+
   {
     my $port = $config->get('builder.internal.selected_port', default => undef);
-    return $port if defined $port;
+    if (defined $port) {
+      debug 'Using previously selected port: %s', $port->get('upload.port.label');
+      return $port;
+    }
   }
 
   my @ports = @{$config->get('builder.internal.ports')};
   # TODO: implement an exact match selection and an interactive selection.
   fatal "You must pass the --target-port option to select the upload target" unless $config->exists('builder.upload.port');
-  my @targets = map { fc } split(/\s*,\s*/, $config->get('builder.upload.port'));
-  my $port = first { my $port = $_; any { $port->get('upload.port.lc_label') eq $_ || $port->get('upload.port.lc_address') eq $_ } @targets } @ports;
-  unless (defined $port) {
-    error "None of the found ports match the specified ones";
-    error "Found the following ports: %s", join(', ', map { $_->get('upload.port.label') } @ports);
-    error "Specified ports: %s", join(', ', @targets);
+  my @targets = map { qr/^$_$/i } split(/\s*,\s*/, $config->get('builder.upload.port'));
+  @ports = grep { my $port = $_; any { $port->get('upload.port.lc_label') =~ m/$_/ || $port->get('upload.port.lc_address') =~ m/$_/ } @targets } @ports;
+  unless (@ports) {
     fatal "None of the specified ports (%s) can be found, can your target be found by the 'discover' command?", join(', ', @targets);
   }
+  warn "More than one found port match with builder.upload.port. Picking the firt one." if @ports > 1;
+  my $port = $ports[0];
+  info 'Using the first match port from the configuration: %s', $port->get('upload.port.address');
 
   $config->set('builder.internal.selected_port' => $port);
   return $port;
@@ -474,7 +545,7 @@ sub upload {
 
   my $cmd = $upload_config->get('upload.pattern');
   debug "Upload configuration:\n%s", sub { $upload_config->dump('  ') };
-  default_runner()->run_forked(sub {
+  default_executor()->run_now(sub {
         close STDIN;
         execute_cmd($cmd);
       });
@@ -495,3 +566,50 @@ sub monitor {
 }
 
 1;
+
+__DATA__
+
+@@ log4perl.conf
+
+# We send all messages to two appenders (one that prints the level and the
+# other that does not). But they have each a LevelMatch filter attached so
+# that each message is eventually only printed once.
+# This is so that frequent message (below the INFO level) are printed without
+# their level to increase readability (especially for command lines). More
+# serious messages are displayed with their level.
+#
+# All of that can be configured with the --logconf flag.
+#
+# Remember that we have a custom log level.
+# 
+# The default log level itself is set to a default here but can be configured
+# later too.
+log4perl.rootLogger = INFO, ScreenWithLevel, ScreenWithoutLevel
+
+# Configuration of the ScreenWithLevel appender for the levels INFO to
+# FATAL.
+log4perl.appender.ScreenWithLevel = Log::Log4perl::Appender::Screen
+log4perl.appender.ScreenWithLevel.layout = PatternLayout
+log4perl.appender.ScreenWithLevel.layout.ConversionPattern = %p: %m%n
+log4perl.appender.ScreenWithLevel.Filter = InfoToFatalFilter
+
+log4perl.filter.InfoToFatalFilter = Log::Log4perl::Filter::LevelRange
+log4perl.filter.InfoToFatalFilter.LevelMin = INFO
+log4perl.filter.InfoToFatalFilter.LevelMax = FATAL
+log4perl.filter.InfoToFatalFilter.AcceptOnMatch = true
+
+# Configuration of the ScreenWithoutLevel appender for the levels levels below
+# INFO.
+log4perl.appender.ScreenWithoutLevel = Log::Log4perl::Appender::Screen
+log4perl.appender.ScreenWithoutLevel.layout = PatternLayout
+log4perl.appender.ScreenWithoutLevel.layout.ConversionPattern = %m%n
+log4perl.appender.ScreenWithoutLevel.Filter = DebugFilter
+
+# We just define this filter as the complement of the other one, to be sure not
+# to loose any message.
+log4perl.filter.DebugFilter = Log::Log4perl::Filter::LevelRange
+log4perl.filter.DebugFilter.LevelMin = INFO
+log4perl.filter.DebugFilter.LevelMax = FATAL
+log4perl.filter.DebugFilter.AcceptOnMatch = false
+
+log4perl.oneMessagePerAppender = 1

@@ -1,23 +1,19 @@
 ---
-abstract: 'Build system for Arduino programs'
+abstract: 'All-in-one build system for Arduino programs'
 author:
   - 'Mathias Kende <mathias@cpan.org>'
 build_requires:
+  CPAN::Common::Index::Mux::Ordered: '0'
   ExtUtils::MakeMaker: '0'
+  Readonly: '0'
   Test2::V0: '0'
+  Test::CPANfile: '0'
+  Test::More: '0'
 configure_requires:
-  ExtUtils::MakeMaker: '0'
+  ExtUtils::MakeMaker::CPANfile: '0.09'
+  perl: v5.26.0
 dynamic_config: 0
-generated_by: 'ExtUtils::MakeMaker version 7.64, CPAN::Meta::Converter version 2.150010'
-keywords:
-  - arduino
-  - embedded
-  - arm
-  - avr
-  - build
-  - make
-  - compiler
-  - source
+generated_by: 'ExtUtils::MakeMaker version 7.44, CPAN::Meta::Converter version 2.150010'
 license: mit
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -27,15 +23,23 @@ no_index:
   directory:
     - t
     - inc
+    - local
+    - vendor
+    - t
   namespace:
     - App::ArduinoBuilder
-optional_features:
-  test_coverage:
-    description: 'Run `make cover` to compute test coverage'
 requires:
+  Data::Section::Simple: '0'
+  IPC::Run: '0'
+  Log::Any: '0'
+  Log::Any::Adapter::Log4perl: '0'
+  Log::Any::Simple: '0.05'
+  Log::Log4perl: '0'
+  Parallel::TaskExecutor: '0'
+  Win32::ShellQuote: '0'
   perl: '5.026'
 resources:
   bugtracker: https://github.com/mkende/arduino_builder/issues
   repository: https://github.com/mkende/arduino_builder
-version: '0.07'
+version: '0.08'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

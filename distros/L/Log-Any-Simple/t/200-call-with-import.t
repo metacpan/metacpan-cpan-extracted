@@ -37,12 +37,19 @@ package MyTest4 {
 
 package MyTest5 {
   use Log::Any::Simple ':default', ':die_at' => 'info';
-  ::like(::dies { info('foo %s baz', 'bar') }, qr/Fatal error/, 'dies at info');
+  ::like(::dies { info('foo %s baz', 'bar') }, qr/foo bar baz/, 'dies at info');
   ::is($::log->msgs(), [{category => 'MyTest5', level => 'info', message => 'foo bar baz'}], 'log info with die_at');
   $::log->clear();
 }
 
 package MyTest6 {
+  use Log::Any::Simple ':default', ':die_at' => 'info', , ':die_silence_msg';
+  ::like(::dies { info('foo %s baz', 'bar') }, qr/Fatal error/, 'dies at info');
+  ::is($::log->msgs(), [{category => 'MyTest6', level => 'info', message => 'foo bar baz'}], 'log info with die_at');
+  $::log->clear();
+}
+
+package MyTest7 {
   use Log::Any::Simple qw(die_with_stack_trace get_logger);
   ::imported_ok(qw(die_with_stack_trace get_logger));
 }

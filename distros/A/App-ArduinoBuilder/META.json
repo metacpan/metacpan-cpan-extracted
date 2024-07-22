@@ -1,20 +1,10 @@
 {
-   "abstract" : "Build system for Arduino programs",
+   "abstract" : "All-in-one build system for Arduino programs",
    "author" : [
       "Mathias Kende <mathias@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "ExtUtils::MakeMaker version 7.64, CPAN::Meta::Converter version 2.150010",
-   "keywords" : [
-      "arduino",
-      "embedded",
-      "arm",
-      "avr",
-      "build",
-      "make",
-      "compiler",
-      "source"
-   ],
+   "generated_by" : "ExtUtils::MakeMaker version 7.44, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "mit"
    ],
@@ -26,23 +16,14 @@
    "no_index" : {
       "directory" : [
          "t",
-         "inc"
+         "inc",
+         "local",
+         "vendor",
+         "t"
       ],
       "namespace" : [
          "App::ArduinoBuilder"
       ]
-   },
-   "optional_features" : {
-      "test_coverage" : {
-         "description" : "Run `make cover` to compute test coverage",
-         "prereqs" : {
-            "test" : {
-               "requires" : {
-                  "Devel::Cover" : "0"
-               }
-            }
-         }
-      }
    },
    "prereqs" : {
       "build" : {
@@ -52,22 +33,43 @@
       },
       "configure" : {
          "requires" : {
-            "ExtUtils::MakeMaker" : "0"
+            "ExtUtils::MakeMaker::CPANfile" : "0.09",
+            "perl" : "v5.26.0"
+         }
+      },
+      "develop" : {
+         "recommends" : {
+            "Devel::Cover" : "0"
          }
       },
       "runtime" : {
          "requires" : {
+            "Data::Section::Simple" : "0",
+            "IPC::Run" : "0",
+            "Log::Any" : "0",
+            "Log::Any::Adapter::Log4perl" : "0",
+            "Log::Any::Simple" : "0.05",
+            "Log::Log4perl" : "0",
+            "Parallel::TaskExecutor" : "0",
+            "Win32::ShellQuote" : "0",
             "perl" : "5.026"
          }
       },
       "test" : {
+         "recommends" : {
+            "Test::Pod" : "1.22"
+         },
          "requires" : {
-            "Test2::V0" : "0"
+            "CPAN::Common::Index::Mux::Ordered" : "0",
+            "Readonly" : "0",
+            "Test2::V0" : "0",
+            "Test::CPANfile" : "0",
+            "Test::More" : "0"
          },
          "suggests" : {
+            "IPC::Run3" : "0",
             "Perl::Tidy" : "20220613",
-            "Test2::Tools::PerlCritic" : "0",
-            "Test::Pod" : "1.00"
+            "Test2::Tools::PerlCritic" : "0"
          }
       }
    },
@@ -81,6 +83,6 @@
          "web" : "https://github.com/mkende/arduino_builder"
       }
    },
-   "version" : "0.07",
-   "x_serialization_backend" : "JSON::PP version 4.16"
+   "version" : "0.08",
+   "x_serialization_backend" : "JSON::PP version 4.04"
 }

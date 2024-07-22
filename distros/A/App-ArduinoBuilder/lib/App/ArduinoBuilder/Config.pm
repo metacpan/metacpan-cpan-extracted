@@ -4,8 +4,8 @@ use strict;
 use warnings;
 use utf8;
 
-use App::ArduinoBuilder::Logger '!dump';
 use Exporter 'import';
+use Log::Any::Simple ':default';
 
 our @EXPORT_OK = qw(get_os_name);
 
@@ -86,6 +86,13 @@ sub get {
 sub keys {
   my ($this, %options) = @_;
   return keys %{$this->{config}};
+}
+
+# Returns the "top-level" keys (all the different first piece of all the keys).
+sub top_level_keys {
+  my ($this) = @_;
+  my %set = map { $_ =~ m/^([^.]*)/; $1 => 1 } $this->keys();
+  return CORE::keys %set;
 }
 
 sub exists {
@@ -199,6 +206,11 @@ sub dump {
     $out .= "${p}${k}=${v}\n";
   }
   return $out;
+}
+
+sub get_hash {
+  my ($this) = @_;
+  return %{$this->{config}}
 }
 
 1;

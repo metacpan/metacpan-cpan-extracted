@@ -93184,3 +93184,15 @@ E/EW/EWHEELER/PDL-Opt-Simplex-Simple-2.002.tar.gz
 R/RR/RRWO/Plack-Middleware-Statsd-v0.7.1.tar.gz
 P/PE/PERLANCAR/Sah-SchemaBundle-Currency-0.009.tar.gz
 H/HA/HANJE/Tk-Terminal-0.03.tar.gz
+M/MA/MATHIAS/Dist-Setup/App-ArduinoBuilder-0.08.tar.gz
+S/SR/SREZIC/App-orgdaemon-1.14.tar.gz
+R/RE/REEDFISH/Net-FullAuto-1.0000673.tar.gz
+S/SR/SREZIC/CPAN-Plugin-Sysdeps-0.79.tar.gz
+P/PE/PERLANCAR/Data-Sah-Filter-0.025.tar.gz
+G/GU/GUILLEM/Dpkg-1.22.8.tar.gz
+N/NH/NHORNE/Geo-Coder-Mapbox-0.02.tar.gz
+G/GE/GENE/Geography-States-Borders-0.0107.tar.gz
+S/SR/SREZIC/Kwalify-1.24.tar.gz
+M/MA/MATHIAS/Dist-Setup/Log-Any-Simple-0.06.tar.gz
+G/GE/GENE/MIDI-RtMidi-ScorePlayer-0.0120.tar.gz
+E/EW/EWHEELER/PDL-Opt-Simplex-Simple-2.003.tar.gz

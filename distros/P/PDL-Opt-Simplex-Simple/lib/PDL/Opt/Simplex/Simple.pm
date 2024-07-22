@@ -20,7 +20,7 @@
 #  respective owners and no grant or license is provided thereof.
 
 package PDL::Opt::Simplex::Simple;
-$VERSION = '2.002';
+$VERSION = '2.003';
 
 use 5.010;
 use strict;
@@ -434,8 +434,12 @@ sub _simplex_f
 		$f_ret = pdl \@f_ret;
 	}
 
-	# $f_ret is guaranteed to be PDL here.  Find the minimum result,
-	# that is our best index for this iteration:
+	# $f_ret is guaranteed to be PDL here.
+
+	# Make sure none are NaN.  If any are NaN, set them to infinity:
+	$f_ret = $f_ret->setnantobad()->setbadtoval(inf);
+
+	# Find the minimum result, that is our best index for this iteration:
 	my $min_ind = minimum_ind($f_ret);
 	die "best_minima: min_ind > 1: $f_ret" if ($min_ind->nelem > 1);
 
@@ -1332,7 +1336,7 @@ sub _is_numeric
 # This is for debugging:
 #
 # Builds a tree from $h that is suitable for passing to Data::Dumper.
-# This is neccesary because PDL's need to be stringified since Dumper()
+# This is necessary because PDL's need to be stringified since Dumper()
 # will dump at the object itself.
 sub dumpify
 {
@@ -1478,7 +1482,7 @@ Useful for calling simplex again with refined values
 This is for debugging:
 
 Builds a tree from C<$vars> that is suitable for passing to L<Data::Dumper>.  This is
-neccesary because PDL's need to be stringified since Dumper() will dump at the
+necessary because PDL's need to be stringified since Dumper() will dump at the
 object itself.
 
 =back

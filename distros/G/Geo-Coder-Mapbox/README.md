@@ -4,18 +4,18 @@ Geo::Coder::Mapbox - Provides a Geo-Coding functionality using [https://mapbox.c
 
 # VERSION
 
-Version 0.01
+Version 0.02
 
 # SYNOPSIS
 
-      use Geo::Coder::Mapbox;
+    use Geo::Coder::Mapbox;
 
-      my $geo_coder = Geo::Coder::Mapbox->new(access_token => $ENV{'MAPBOX'});
-      my $location = $geo_coder->geocode(location => 'Washington, DC');
+    my $geo_coder = Geo::Coder::Mapbox->new(access_token => $ENV{'MAPBOX_KEY'});
+    my $location = $geo_coder->geocode(location => 'Washington, DC');
 
 # DESCRIPTION
 
-Geo::Coder::Mapbox provides an interface to mapbox.com, a free Geo-Coding database covering many countries.
+Geo::Coder::Mapbox provides an interface to mapbox.com, a Geo-Coding database covering many countries.
 
 # METHODS
 
@@ -48,7 +48,7 @@ You can also set your own User-Agent object:
 
     use LWP::UserAgent::Throttled;
     my $ua = LWP::UserAgent::Throttled->new();
-    $ua->throttle({ 'mapbox.com' => 2 });
+    $ua->throttle({ 'api.mapbox.com' => 2 });
     $geo_coder->ua($ua);
 
 ## reverse\_geocode
@@ -74,6 +74,6 @@ Lots of thanks to the folks at mapbox.com.
 
 # LICENSE AND COPYRIGHT
 
-Copyright 2021 Nigel Horne.
+Copyright 2021-2024 Nigel Horne.
 
 This program is released under the following licence: GPL2

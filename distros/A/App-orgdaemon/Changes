@@ -1,5 +1,9 @@
 Revision history for org-daemon.
 
+1.14	2024-07-21
+	- org2ical: new options --include-tags and --exclude-tags
+	- ci work
+
 1.13	2024-03-10
 	- x11: set pid + client_machine properties
 	- ci work

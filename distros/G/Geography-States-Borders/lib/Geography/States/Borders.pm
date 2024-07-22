@@ -3,7 +3,7 @@ our $AUTHORITY = 'cpan:GENE';
 
 # ABSTRACT: Return the borders of states and provinces
 
-our $VERSION = '0.0106';
+our $VERSION = '0.0107';
 
 use strictures 2;
 use Moo;
@@ -207,13 +207,13 @@ Geography::States::Borders - Return the borders of states and provinces
 
 =head1 VERSION
 
-version 0.0106
+version 0.0107
 
 =head1 SYNOPSIS
 
   use Geography::States::Borders ();
   my $geo = Geography::States::Borders->new(country => 'Netherlands');
-  my $states = $geo->borders('AW'); # empty list
+  my $states = $geo->borders('XX'); # empty list
   $states = $geo->borders('UT');    # ZH NH GE
 
 =head1 DESCRIPTION
@@ -233,6 +233,14 @@ the Netherlands, and the USA.
 Set the country.
 
 Default: C<usa>
+
+Options:
+
+  australia
+  brazil
+  canada
+  netherlands
+  usa
 
 =head1 METHODS
 

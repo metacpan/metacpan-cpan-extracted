@@ -15,10 +15,10 @@ CA: {
 			diag('Online tests disabled');
 			skip('Test requires Internet access', 5);
 		}
-		my $access_token = $ENV{'MAPBOX'};
+		my $access_token = $ENV{'MAPBOX_KEY'};
 		if((!defined($access_token)) || (length($access_token) == 0)) {
-			diag('Set MAPBOX variable to your API key');
-			skip('Set MAPBOX variable to your API key', 5);
+			diag('Set MAPBOX_KEY variable to your API key');
+			skip('Set MAPBOX_KEY variable to your API key', 5);
 		}
 
 		eval {

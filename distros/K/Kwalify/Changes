@@ -1,5 +1,10 @@
 Revision history for Perl extension Kwalify.
 
+1.24	2024-07-21
+	- doc improvements (by guillemj)
+	- ci changes (swich from travis-ci to github actions)
+	- tests: allow cyclic_refs when YAML::PP is used
+
 1.23    2020-02-21
 	- stable release with all changes in 1.22_90
 

@@ -62,7 +62,7 @@
          "web" : "https://github.com/ology/Geography-States-Borders"
       }
    },
-   "version" : "0.0106",
+   "version" : "0.0107",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.032001"
@@ -109,7 +109,7 @@
                "Dist::Zilla::Plugin::PodWeaver" : {
                   "finder" : [
                      ":InstallModules",
-                     ":ExecFiles"
+                     ":PerlExecFiles"
                   ],
                   "plugins" : [
                      {
@@ -196,7 +196,7 @@
                }
             },
             "name" : "PodWeaver",
-            "version" : "4.008"
+            "version" : "4.010"
          },
          {
             "class" : "Dist::Zilla::Plugin::PodCoverageTests",

@@ -1,63 +1,36 @@
-use 5.026;
+# DO NOT EDIT! This file is written by perl_setup_dist.
+# If needed, you can add content at the end of the file.
 
+## no critic (Policy)
+
+use 5.026;
 use strict;
 use warnings;
-
-use ExtUtils::MakeMaker;
+use ExtUtils::MakeMaker::CPANfile;
 
 WriteMakefile(
     NAME             => 'App::ArduinoBuilder',
+    DISTNAME         => 'App-ArduinoBuilder',
     AUTHOR           => q{Mathias Kende <mathias@cpan.org>},
     VERSION_FROM     => 'lib/App/ArduinoBuilder.pm',
-    ABSTRACT         => "Build system for Arduino programs",
+    ABSTRACT         => q{All-in-one build system for Arduino programs},
     LICENSE          => 'mit',
-    EXE_FILES        => ['script/arduino_builder'],
-    # The only requirement on 5.26 are indented here docs in the tests.
-    # Otherwise I believe that everything should work with 5.22
+    EXE_FILES        => ['script/arduino_builder',],
     MIN_PERL_VERSION => '5.026',
     MAN3PODS         => {},
-    CONFIGURE_REQUIRES => {
-      'ExtUtils::MakeMaker' => '0',
-    },
-    PREREQ_PM => {
-    },
-    TEST_REQUIRES => {
-      'Test2::V0'             => 0,
-    },
-    # We don’t really need a MYMETA file, but then cpanm can’t correctly find
-    # our dependencies. CPAN works correctly either way.
-    # NO_MYMETA => 1,
+    # Directories in which we look for Makefile.PL. In general could be omitted but is needed in case there
+    # is a file named Makefile.PL in a sub-directory. Should be customized if such a file needs to be
+    # processed by ExtUtils.
+    DIR              => [],
+    NO_MYMETA => 1,
     META_MERGE => {
       'meta-spec' => { version => 2 },
+      # Goes with NO_MYMETA (which would provide the dynamic config).
       dynamic_config => 0,
       no_index => {
-        # ignores child of App::ArduinoBuilder, but not App::ArduinoBuilder itself.
-        namespace => [ 'App::ArduinoBuilder' ],
+        directory => [ 'local', 'vendor', 't' ],
+        namespace => ['App::ArduinoBuilder',],
       },
-      prereqs => {
-        test => {
-          suggests => {
-            'Perl::Tidy'               => '20220613',
-            'Test::Pod'                => '1.00',
-            'Test2::Tools::PerlCritic' => 0,
-          },
-        },
-      },
-      optional_features => {
-        # This is set as an optional feature so that the GitHub CI does not need
-        # to fetch this module that has a lot of dependencies.
-        test_coverage => {
-          description => 'Run `make cover` to compute test coverage',
-          prereqs => {
-            test => {
-              requires => {
-                'Devel::Cover' => 0,
-              },
-            },
-          },
-        },
-      },
-      keywords => [ qw(arduino embedded arm avr build make compiler source) ],
       resources => {
         repository => {
           type => 'git',
@@ -69,30 +42,52 @@ WriteMakefile(
         },
       },
     },
-    dist  => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
-    clean => { FILES => 'Arduino-Builder-* cover_db' },
+    dist  => { COMPRESS => 'gzip -9f', SUFFIX => '.gz', },
+    clean => { FILES => 'App-ArduinoBuilder-*' },
 );
 
 sub MY::postamble {
-  return <<MAKE_FRAGMENT
+  my ($self) = @_;
+
+  my @postamble;
+  push @postamble, ::postamble() if *::postamble{CODE};
+
+  # Solaris has a weird (?) make that does not support our `export` statements.
+  push @postamble, <<"MAKE_FRAGMENT" unless $^O eq 'solaris';
+distupload: distcheck disttest
+\t\$(MAKE) tardist
+\tcpan-upload --directory Dist-Setup \$(DISTVNAME).tar\$(SUFFIX)
+
 cover:
 \tcover -test
 
-critic:
-\tperlcritic lib
+critic: export EXTENDED_TESTING = 1
+critic: all
+\tperl -Ilib t/001-perlcritic.t 2>&1 | less
+
+rawcritic:
+\tperlcritic lib script
 
 tidy:
-\tperltidy -b lib/App/ArduinoBuilder.pm
+\tperltidy -b -bext='/' \$(shell find lib -name "*.pm") script/arduino_builder
 
-tidydiff:
-\tperltidy lib/App/ArduinoBuilder.pm
-\tdiff -u lib/App/ArduinoBuilder.pm lib/App/ArduinoBuilder.tdy
-
-spelling: export TEST_AUTHOR = 1
+spelling: export EXTENDED_TESTING = 1
 spelling:
-\tperl -Ilib t/00-spelling.t --interactive
+\t\$(PERLRUN) t/001-spelling.t --interactive
 
-alltest: export TEST_AUTHOR = 1
+alltest: export EXTENDED_TESTING = 1
 alltest: test
+
+clean:: clean_coverdb
+
+clean_coverdb:
+\trm -fr cover_db
 MAKE_FRAGMENT
+
+  return join "\n", @postamble;
 }
+
+# You can add below this template a `postamble` sub that returns more content to
+# add to the generated Makefile.
+
+# End of the template. You can add custom content below this line.

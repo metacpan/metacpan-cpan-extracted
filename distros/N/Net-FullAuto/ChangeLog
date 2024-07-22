@@ -20,6 +20,12 @@
 #######################################################################
 
 
+2024-07-21  Brian M. Kelly <Brian.Kelly@fullauto.com>
+
+        * Version 1.0000673 released
+
+	* Formatted Output for any git cloning
+
 2024-07-19  Brian M. Kelly <Brian.Kelly@fullauto.com>
 
         * Version 1.0000672 released

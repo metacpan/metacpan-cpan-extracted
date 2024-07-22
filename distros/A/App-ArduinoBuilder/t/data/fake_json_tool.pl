@@ -44,13 +44,14 @@ EOF
 
 
 
-# unbuffer STDOUT
-binmode(STDOUT, ':unix');
+$| = 1;  # unbuffer STDOUT
+
+# print STDERR "Fake tool starting\n";
 
 while (<>) {
   chomp;
-  #print STDERR "Fake tool received: ${_}\n";
-  #print STDERR "Fake tool sending: ${data{$_}}\n";
-  print $data{$_};
+  # print STDERR "Fake tool received: ${_}\n";
+  # print STDERR "Fake tool sending: ${data{$_}}\n";
+  print STDOUT $data{$_};
   exit if /^quit$/;
 }

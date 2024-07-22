@@ -1,3 +1,11 @@
+0.025   2024-07-17  Released-By: PERLANCAR; Urgency: low
+
+        - No functional changes.
+
+        - [dist] Edit Changes (replace Backward-Compatible: no with
+          Backward-Incompatible: yes).
+
+
 0.024   2024-01-17  Released-By: PERLANCAR; Urgency: medium
 
         - Support specifying gen arguments as string using the Foo=arg1,val1,...
@@ -123,7 +131,7 @@
 	- Add filters: Float::{ceil,floor,round} (currently perl only).
 
 
-0.006   2020-05-31  Released-By: PERLANCAR; Urgency: medium; Backward-Compatible: no
+0.006   2020-05-31  Released-By: PERLANCAR; Urgency: medium; Backward-Incompatible: yes
 
 	- [incompatible] Rename filter 'Str::lowcase' to 'Str::lowercase'.
 
@@ -135,7 +143,7 @@
         - Add filters 'Str::ucfirst' & 'Str::lcfirst'.
 
 
-0.005   2020-05-30  Released-By: PERLANCAR; Urgency: medium; Backward-Compatible: no
+0.005   2020-05-30  Released-By: PERLANCAR; Urgency: medium; Backward-Incompatible: yes
 
 	- [incompatible] Rename rule 'Str::downcase' to the more familiar
           'Str::lowcase'. UPDATE: 'Str::downcase' restored in 0.006.

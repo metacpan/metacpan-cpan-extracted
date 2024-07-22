@@ -1,5 +1,9 @@
 Revision history for PDL-Opt-Simplex-Simple
 
+2.003	2024-07-21T15:49:34-07:00
+	- bugfix: work-around NaNs that may arise in ::Simplex::Core.
+	  this bugfix is slightly different from the previous one,
+	  both are needed.
 
 2.002	2024-07-20T19:09:36-07:00
 	- bugfix: work-around NaNs that may arise in Particle Swarm

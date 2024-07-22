@@ -4,11 +4,11 @@ use strict;
 use warnings;
 use utf8;
 
-use App::ArduinoBuilder::Logger ':default', 'is_logged';
 use App::ArduinoBuilder::JsonTool;
 use File::Spec::Functions 'catfile';
 use IO::Select;
 use IO::Socket::INET;
+use Log::Any::Simple ':default';
 
 sub monitor {
   my ($config, $port) = @_;
@@ -31,8 +31,9 @@ sub monitor {
       my $tool_dir = $config->get($tool_key);
       $cmd = catfile($tool_dir, $tool);
       $cmd .= '.exe' if $^O eq 'MSWin32';
+      debug 'Using monitor tool required for protocol %s: %s (%s)', $protocol, $tool, $cmd;
     } else {
-      error "Invalid pluggable discovery reference format: $tooldef";
+      fatal "Invalid pluggable discovery reference format: $tooldef";
     }
   } elsif ($config->exists("pluggable_monitor.pattern.${protocol}")) {
     $cmd = $config->get("pluggable_monitor.pattern.${protocol}");
@@ -51,16 +52,16 @@ sub monitor {
   # The protocol is described at:
   # https://arduino.github.io/arduino-cli/0.32/pluggable-monitor-specification
 
-  my $tool = App::ArduinoBuilder::JsonTool->new(
-    $cmd, catch_error => 1);
+  my $tool = App::ArduinoBuilder::JsonTool->new($cmd);
   $tool->send("HELLO 1 ${App::ArduinoBuilder::TOOLS_USER_AGENT}\n");
 
-  if (is_logged('DEBUG')) {
-    my $params = $tool->send("DESCRIBE\n")->{port_description}{configuration_parameters};
-    my %set_params = map { $_->{label} => $_->{selected} } values %{$params};
-    debug "Monitor port configuration: %s", \%set_params;
-    full_debug "Monitor port available options: %s", $params;
-  }
+  # TODO: we should have a way to check whether we are at least logging DEBUG
+  # messages and, if so, building the all_params and set_params variable with a
+  # single call to the tool to pass the result to the log calls.
+  my $get_all_params = sub { $tool->send("DESCRIBE\n")->{port_description}{configuration_parameters} };
+  my $get_set_params = sub { { map { $_->{label} => $_->{selected} } values %{$get_all_params->()} } };
+  debug "Monitor port configuration: %s", $get_set_params;
+  trace "Monitor port available options: %s", $get_all_params;
   
   my $serv = IO::Socket::INET->new(Listen => 1, Timeout => 5);
   my $serv_addr = sprintf "%s:%s", $serv->sockhost, $serv->sockport();

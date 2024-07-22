@@ -3,7 +3,7 @@ package CPAN::Plugin::Sysdeps::Mapping;
 use strict;
 use warnings;
 
-our $VERSION = '0.78';
+our $VERSION = '0.79';
 
 # shortcuts
 #  os and distros
@@ -142,6 +142,18 @@ sub mapping {
        [package => 'libnss3-dev']],
       [like_fedora,
        [package => 'nss-devel']],
+     ],
+
+     [cpanmod => 'Alien::proj',
+      [os_freebsd,
+       [osvers => {'>=', 13},
+	[package => ['proj']]]],
+      [like_debian,
+       [before_ubuntu_focal, # Alien::proj needs at least version 6.1, see https://metacpan.org/release/SLAFFAN/Alien-proj-1.27/source/alienfile#L60 which is satisfied with https://packages.ubuntu.com/search?keywords=libproj-dev&searchon=names&suite=all&section=all and later. Building from source currently fails.
+	[package => ['g++']]],
+       [package => ['libproj-dev', 'g++']]],
+      [like_fedora,
+       [package => ['gcc-c++']]],
      ],
 
      [cpanmod => 'Alien::ProtoBuf',
@@ -866,19 +878,15 @@ sub mapping {
        [linuxdistro => 'centos',
 	linuxdistroversion => qr{^6\.},
 	package => 'db4-devel'],
-       [linuxdistro => 'centos', # CentOS 7 and 8
-	package => 'libdb-devel'],
-       [linuxdistro => 'fedora',
-	linuxdistroversion => { '>=', '28' },
-	package => 'libdb-devel'],
+       [package => 'libdb-devel'],
       ],
      ],
 
      [cpanmod => 'DBD::Firebird',
       [os_freebsd,
-       [package => 'firebird25-server']],
+       [package => 'firebird40-server | firebird30-server | firebird25-server']],
       [os_dragonfly,
-       [package => 'firebird25-server']],
+       [package => 'firebird40-server | firebird30-server | firebird25-server']],
       [like_debian,
        [before_debian_stretch,
 	[package => 'firebird-dev']],
@@ -1016,10 +1024,10 @@ sub mapping {
       [os_darwin,
        [package => 'ldns']]],
 
-     [cpanmod => 'DNS::Unbound',
+     [cpanmod => ['DNS::Unbound', 'Net::DNS::Resolver::Unbound'],
      #[cpandist => qr{^DNS-Unbound-\d},
       [os_freebsd,
-       [package => 'unbound']], # build problems: port's pkg-config file references ssl & crypto, but these are already in base system
+       [package => 'unbound']], # build problems with DNS::Unbound: port's pkg-config file references ssl & crypto, but these are already in base system
       [like_debian,
        [package => 'libunbound-dev']],
       [like_fedora,
@@ -1237,7 +1245,10 @@ sub mapping {
       [like_fedora,
        [package => 'gd-devel']],
       [os_darwin,
-       [package => 'gd']]],
+       [package => 'gd']],
+      [os_windows,
+       [package => 'gd']],
+     ],
 
      [cpanmod => 'Gearman::XS',
       [os_freebsd,
@@ -2472,6 +2483,16 @@ sub mapping {
        [package => 'libneo4j-client-dev']],
      ],
 
+     [cpanmod => 'Net::AMQP::RabbitMQ',
+      # freebsd has all libssl in the base system
+      [like_debian,
+       [package => ['libssl-dev']]],
+      [like_fedora,
+       [package => ['openssl-devel']]],
+      [os_windows,
+       [package => 'openssl.light']], # XXX create openssl.dev
+     ],
+
      [cpanmod => 'Net::Bluetooth',
       [like_debian,
        [package => 'libbluetooth-dev']],
@@ -2734,6 +2755,8 @@ sub mapping {
        [package => 'libyaz-dev']],
       [like_fedora,
        [linuxdistro => 'centos', linuxdistroversion => qr{^7\.}, # available only for CentOS6, not for 7
+	[package => []]],
+       [linuxdistro => 'rocky', # not available in Rocky 8, probably neither in other versions
 	[package => []]],
        [package => 'libyaz-devel']],
       [os_darwin,

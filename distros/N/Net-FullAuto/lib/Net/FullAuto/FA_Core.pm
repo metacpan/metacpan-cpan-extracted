@@ -17994,10 +17994,11 @@ sub ftpcmd
       (join ' ',@topcaller),
       "\n" if $Net::FullAuto::FA_Core::log &&
       -1<index $Net::FullAuto::FA_Core::LOG,'*';
-   my $self = shift @_;
-   my $cmd  = shift @_;
-   if (exists $self->{_ftp_handle}) {
-      return $self->{_ftp_handle}->cmd($cmd);
+   #my $self = shift @_;
+   #my $cmd  = shift @_;
+   if (exists $_[0]->{_ftp_handle}) {
+      return Rem_Command::ftpcmd(@_);
+      #return $self->{_ftp_handle}->cmd($cmd);
    } else {
       my $error="Not logged in via (s)ftp\n";
       &Net::FullAuto::FA_Core::handle_error($error);
@@ -19661,10 +19662,12 @@ print $Net::FullAuto::FA_Core::LOG
             if $ftm_type ne 'sftp';
          &Net::FullAuto::FA_Core::handle_error($stderr,'-1') if $stderr;
 
-         ($output,$stderr)=&Rem_Command::ftpcmd(\%ftp,'pwd',$cache);
+         ($output,$stderr)=&Rem_Command::ftpcmd(\%ftp,'pwd','__delay__=200',
+            $cache);
          &Net::FullAuto::FA_Core::handle_error($stderr,'-1') if $stderr;
          my $rwd='Remote working directory:';
          my $icd=' is the current directory';
+	 $output=~s/^pwd\s*//s;
          ($homedir=$output)=~s/^(?:257 ["]|$rwd\s+)(.*)?(?:["]$icd)*$/$1/s;
 
          if ($_connect ne 'connect_sftp' && $_connect ne 'connect_ftp') {
@@ -20456,59 +20459,45 @@ sub cwd
    my $self=$_[0];
    my $target_dir=$_[1];
    my $timeout=0;my $debug=0;my $display=0;
-   my $log=0;my $delay='';my $cache='';
-   if (defined $_[2] && $_[2]) {
-      if ($_[2]=~/^[0-9]+/) {
-         $timeout=$_[2];
-      } else {
-         my $arg=lc($_[2]);
-         if ($arg eq '__debug__' || $arg eq '__DEBUG__') {
-            $debug=$arg;
-         } elsif ($arg eq '__display__' || $arg eq '__DISPLAY__') {
-            $display=1;
-         } elsif ($arg eq '__log__') {
+   my $log=0;my $delay='';my $cache='';my $return_all='';
+   if (1<$#_) {
+      foreach my $i (2..$#_) {
+         $_[$i]||='';
+         if ($_[$i]=~/^[0-9]+/) {
+            $timeout=$_[$i];
+         } elsif ($_[$i]=~/__to__[=]?(.*)$/i) {
+            $timeout=$1;
+         } elsif ($_[$i]=~/__timeout__[=]?(.*)$/i) {
+            $timeout=$1;
+         } elsif ($_[$i]=~/__delay__[=]?(.*)$/i) {
+            $delay=$1;
+         } elsif (lc($_[$i]) eq '__log__') {
             $log=1;
-         } elsif ($arg=~/__delay__[=]?(.*)$/i) {
-            $delay=$arg;
-         } elsif (-1<index $_[2],'Cache::FileCache') {
-            $cache=$_[2];
-         } elsif ((-1<index $_[2],'Moose::Meta::Class::__ANON__::SERIAL')
-               && ($_[2]->chi_root_class)) {
-            $cache=$_[2];
-         } elsif (wantarray) {
-            return 0,'Third Argument for Timeout Value is not Whole Number';
-         } else {
-            &Net::FullAuto::FA_Core::handle_error(
-               'Third Argument for Timeout Value is not Whole Number')
+         } elsif (lc($_[$i]) eq '__display__') {
+            $display=1;
+         } elsif (lc($_[$i]) eq '__debug__') {
+            $debug=1;
+         } elsif (lc($_[$i]) eq '__return_all_output__') {
+            $return_all=1;
+         } elsif (-1<index $_[$i],'Cache::FileCache') {
+            $cache=$_[$i];
+         } elsif ((-1<index $_[$i],'Moose::Meta::Class::__ANON__::SERIAL')
+               && ($_[$i]->chi_root_class)) {
+            $cache=$_[$i];
          }
       }
    }
-   if (defined $_[3] && $_[3]) {
-      if ($_[3]=~/^[0-9]+/) {
-         $timeout=$_[3];
-      } else {
-         my $arg=lc($_[3]);
-         if ($arg eq '__debug__') {
-            $debug=$arg;
-         } elsif ($arg eq '__display__') {
-            $display=1;
-         } elsif ($arg eq '__log__') {
-            $log=1;
-         } elsif ($arg=~/__delay__[=]?(.*)$/i) {
-            $delay=$arg;
-         } elsif (-1<index $_[3],'Cache::FileCache') {
-            $cache=$_[3];
-         } elsif ((-1<index $_[3],'Moose::Meta::Class::__ANON__::SERIAL')
-               && ($_[3]->chi_root_class)) {
-            $cache=$_[3];
-         } elsif (wantarray) {
-            return 0,'Third Argument for Timeout Value is not Whole Number';
-         } else {
-            &Net::FullAuto::FA_Core::handle_error(
-               'Third Argument for Timeout Value is not Whole Number')
-         }
-      }
-   }
+   print "\nINFO: File_Transfer::cwd() target_dir arg:\n       ",
+      "==>$target_dir<==\n",
+      (join ' ',@topcaller),"\n\n"
+      if (!$Net::FullAuto::FA_Core::cron &&
+      $Net::FullAuto::FA_Core::debug) || $debug;
+   print $Net::FullAuto::FA_Core::LOG
+      "\nFile_Transfer::cwd() target_dir arg:\n       ",
+      "==>$target_dir<==\n",
+      (join ' ',@topcaller),"\n\n"
+      if $Net::FullAuto::FA_Core::log &&
+      -1<index $Net::FullAuto::FA_Core::LOG,'*';
    $target_dir||='';
    $target_dir=~s/[\/\\]*$//
       if $target_dir ne '/' && $target_dir ne '\\';
@@ -20568,22 +20557,22 @@ sub cwd
             if (-1<index $target_dir,' ') {
                ($output,$stderr)=$self->{_cmd_handle}->cmd("cd \"$chdir\"");
                print "_cmd_handle cd \"$chdir\" ",
-                  "OUTPUT:\n==>$output<==\nat LINE ",__LINE__
+                  "OUTPUT:\n==>$output<==\nat LINE ",__LINE__,"\n"
                   if ((!$Net::FullAuto::FA_Core::cron &&
                   $Net::FullAuto::FA_Core::debug) ||
                   $debug);
             } else {
                ($output,$stderr)=$self->{_cmd_handle}->cmd("cd $chdir");
                print "_cmd_handle cd $chdir ",
-                  "OUTPUT:\n==>$output<==\nat LINE ",__LINE__
+                  "OUTPUT:\n==>$output<==\nat LINE ",__LINE__,"\n"
                   if ((!$Net::FullAuto::FA_Core::cron &&
                   $Net::FullAuto::FA_Core::debug) ||
                   $debug);
             }
          }
          $stderr=$output if -1<index $output,"Couldn't can";
-	 $stderr=~tr/\0-\37\177-\377//d;
-         if (-1<index $stderr,'[?2004') {
+	 $stderr=~tr/\33//d if $stderr;
+         if ($stderr && (-1<index $stderr,'[?2004')) {
             $stderr=~s/[[][?]2004[h|l]?//g;
          }
          if ($stderr) {
@@ -20600,7 +20589,7 @@ sub cwd
                     _ftm_type  =>$self->{_ftm_type} },
                   "cd \"$chdir\"",$cache);
                print "Rem_Command::ftpcmd cd \"$chdir\" ",
-                  "OUTPUT:\n==>$output<==\nat LINE ",__LINE__
+                  "OUTPUT:\n==>$output<==\nat LINE ",__LINE__,"\n"
                   if ((!$Net::FullAuto::FA_Core::cron &&
                   $Net::FullAuto::FA_Core::debug) ||
                   $debug);
@@ -20611,7 +20600,7 @@ sub cwd
                     _ftm_type  =>$self->{_ftm_type} },
                   "cd $chdir",$cache);
                print "Rem_Command::ftpcmd cd $chdir ",
-                  "OUTPUT:\n==>$output<==\nat LINE ",__LINE__
+                  "OUTPUT:\n==>$output<==\nat LINE ",__LINE__,"\n"
                   if ((!$Net::FullAuto::FA_Core::cron &&
                   $Net::FullAuto::FA_Core::debug) ||
                   $debug);
@@ -20755,10 +20744,17 @@ sub cwd
          }
       } elsif ($target_dir=~/^([^~.\/\\][^:])/) {
          $target_dir=~s/\\/\//g;
-         print "TARGET DIR BEFORE MOD: $target_dir\n"
+	 print "\nINFO: File_Transfer::cwd() target_dir BEFORE MOD:\n",
+            "       ==>$target_dir<==\n",
+            (join ' ',@topcaller),"\n\n"
             if ((!$Net::FullAuto::FA_Core::cron &&
-            $Net::FullAuto::FA_Core::debug) ||
-            $debug);
+            $Net::FullAuto::FA_Core::debug) || $debug);
+         print $Net::FullAuto::FA_Core::LOG
+            "\nINFO: File_Transfer::cwd() target_dir BEFORE MOD:\n",
+            "       ==>$target_dir<==\n",
+            (join ' ',@topcaller),"\n\n"
+            if $Net::FullAuto::FA_Core::log &&
+            -1<index $Net::FullAuto::FA_Core::LOG,'*';
          if (exists $self->{_work_dirs}->{_cwd}) {
             $self->{_work_dirs}->{_pre}=
                 $self->{_work_dirs}->{_cwd};
@@ -20768,10 +20764,17 @@ sub cwd
             $self->{_work_dirs}->{_pre}=$self->{_homedir}.'/';
             $target_dir=$self->{_homedir}.'/'.$target_dir;
          }
-	 print "TARGET DIR AFTER MOD: $target_dir\n"
+	 print "\nINFO: File_Transfer::cwd() target_dir AFTER MOD:\n",
+            "       ==>$target_dir<==\n",
+            (join ' ',@topcaller),"\n\n"
             if ((!$Net::FullAuto::FA_Core::cron &&
-            $Net::FullAuto::FA_Core::debug) ||
-            $debug);
+            $Net::FullAuto::FA_Core::debug) || $debug);
+         print $Net::FullAuto::FA_Core::LOG
+            "\nINFO: File_Transfer::cwd() target_dir AFTER MOD:\n",
+            "       ==>$target_dir<==\n",
+            (join ' ',@topcaller),"\n\n"
+            if $Net::FullAuto::FA_Core::log &&
+            -1<index $Net::FullAuto::FA_Core::LOG,'*';
          if (exists $self->{_cmd_handle} && $self->{_cmd_handle}) {
             if ($self->{_uname} eq 'cygwin') {
 	       $delay='__delay__=200' unless $delay;
@@ -20793,7 +20796,7 @@ sub cwd
                           "cd $bstar\"$target_dir\"$astar",$delay);
                      print "_cmd_handle cd ",
                         "$bstar\"$target_dir\"$astar OUTPUT:",
-                        "\n==>$output<==\nat LINE ",__LINE__
+                        "\n==>$output<==\nat LINE ",__LINE__,"\n"
                         if ((!$Net::FullAuto::FA_Core::cron &&
                         $Net::FullAuto::FA_Core::debug) ||
                         $debug);
@@ -20803,7 +20806,7 @@ sub cwd
                           _host_label=>[ $hostlabel,'' ] },
                           "cd $target_dir",$delay);
                      print "_cmd_handle cd $target_dir OUTPUT:",
-                        "\n==>$output<==\nat LINE ",__LINE__
+                        "\n==>$output<==\nat LINE ",__LINE__,"\n"
                         if ((!$Net::FullAuto::FA_Core::cron &&
                         $Net::FullAuto::FA_Core::debug) ||
                         $debug);
@@ -20826,7 +20829,7 @@ sub cwd
                           "cd $bstar\"$target_dir\"$astar",$delay,$debug);
                      print "_cmd_handle cd ",
                         "$bstar\"$target_dir\"$astar OUTPUT:",
-                        "\n==>$output<==\nat LINE ",__LINE__
+                        "\n==>$output<==\nat LINE ",__LINE__,"\n"
                         if ((!$Net::FullAuto::FA_Core::cron &&
                         $Net::FullAuto::FA_Core::debug) ||
                         $debug);
@@ -20836,7 +20839,7 @@ sub cwd
                           _host_label=>[ $hostlabel,'' ] },
                           "cd $target_dir",$delay,$debug);
                      print "_cmd_handle cd $target_dir OUTPUT:",
-                        "\n==>$output<==\nat LINE ",__LINE__
+                        "\n==>$output<==\nat LINE ",__LINE__,"\n"
                         if ((!$Net::FullAuto::FA_Core::cron &&
                         $Net::FullAuto::FA_Core::debug) ||
                         $debug);
@@ -20861,7 +20864,7 @@ sub cwd
                           "cd $bstar\"$target_dir\"$astar",$delay,$debug);
                      print "_cmd_handle cd ",
                         "$bstar\"$target_dir\"$astar OUTPUT:",
-                        "\n==>$output<==\nat LINE ",__LINE__
+                        "\n==>$output<==\nat LINE ",__LINE__,"\n"
                         if ((!$Net::FullAuto::FA_Core::cron &&
                         $Net::FullAuto::FA_Core::debug) ||
                         $debug);
@@ -20871,7 +20874,7 @@ sub cwd
                           _host_label=>[ $hostlabel,'' ] },
                           "cd $target_dir",$delay,$debug);
                      print "_cmd_handle cd $target_dir OUTPUT:",
-                        "\n==>$output<==\nat LINE ",__LINE__
+                        "\n==>$output<==\nat LINE ",__LINE__,"\n"
                         if ((!$Net::FullAuto::FA_Core::cron &&
                         $Net::FullAuto::FA_Core::debug) ||
                         $debug);
@@ -20894,7 +20897,7 @@ sub cwd
                           "cd $bstar\"$target_dir\"$astar",$delay);
                      print "_cmd_handle cd ",
                         "$bstar\"$target_dir\"$astar OUTPUT:",
-                        "\n==>$output<==\nat LINE ",__LINE__
+                        "\n==>$output<==\nat LINE ",__LINE__,"\n"
                         if ((!$Net::FullAuto::FA_Core::cron &&
                         $Net::FullAuto::FA_Core::debug) ||
                         $debug);
@@ -20904,7 +20907,7 @@ sub cwd
                           _host_label=>[ $hostlabel,'' ] },
                           "cd $target_dir",$delay);
                      print "_cmd_handle cd $target_dir OUTPUT:",
-                        "\n==>$output<==\nat LINE ",__LINE__
+                        "\n==>$output<==\nat LINE ",__LINE__,"\n"
                         if ((!$Net::FullAuto::FA_Core::cron &&
                         $Net::FullAuto::FA_Core::debug) ||
                         $debug);
@@ -20928,7 +20931,7 @@ sub cwd
                        "cd $bstar\"$target_dir\"$astar",$debug);
 		  print "_cmd_handle cd ",
                      "$bstar\"$target_dir\"$astar OUTPUT:",
-                     "\n==>$output<==\nat LINE ",__LINE__
+                     "\n==>$output<==\nat LINE ",__LINE__,"\n"
                      if ((!$Net::FullAuto::FA_Core::cron &&
                      $Net::FullAuto::FA_Core::debug) ||
                      $debug);
@@ -20938,7 +20941,7 @@ sub cwd
                        _host_label=>[ $hostlabel,'' ] },
                        "cd $target_dir",$debug);
                   print "_cmd_handle cd $target_dir OUTPUT:",
-		     "\n==>$output<==\nat LINE ",__LINE__
+		     "\n==>$output<==\nat LINE ",__LINE__,"\n"
                      if ((!$Net::FullAuto::FA_Core::cron &&
                      $Net::FullAuto::FA_Core::debug) ||
                      $debug);
@@ -20961,7 +20964,7 @@ sub cwd
                        "cd $bstar\"$target_dir\"$astar");
                   print "_cmd_handle cd ",
                      "$bstar\"$target_dir\"$astar OUTPUT:",
-                     "\n==>$output<==\nat LINE ",__LINE__
+                     "\n==>$output<==\nat LINE ",__LINE__,"\n"
                      if ((!$Net::FullAuto::FA_Core::cron &&
                      $Net::FullAuto::FA_Core::debug) ||
                      $debug);
@@ -20971,7 +20974,7 @@ sub cwd
                        _host_label=>[ $hostlabel,'' ] },
                        "cd $target_dir");
                   print "_cmd_handle cd $target_dir OUTPUT:",
-                     "\n==>$output<==\nat LINE ",__LINE__
+                     "\n==>$output<==\nat LINE ",__LINE__,"\n"
                      if ((!$Net::FullAuto::FA_Core::cron &&
                      $Net::FullAuto::FA_Core::debug) ||
                      $debug);
@@ -20985,7 +20988,7 @@ sub cwd
                   &Rem_Command::ftpcmd($self,
                   "cd \"$target_dir\"",$cache);
                print "Rem_Command::ftpcmd cd \"$target_dir\" ",
-                  "OUTPUT:\n==>$output<==\nat LINE ",__LINE__
+                  "OUTPUT:\n==>$output<==\nat LINE ",__LINE__,"\n"
                   if ((!$Net::FullAuto::FA_Core::cron &&
                   $Net::FullAuto::FA_Core::debug) ||
                   $debug);
@@ -20994,7 +20997,7 @@ sub cwd
                   &Rem_Command::ftpcmd($self,
                   "cd $target_dir",$cache);
                print "Rem_Command::ftpcmd cd $target_dir ",
-                  "OUTPUT:\n==>$output<==\nat LINE ",__LINE__
+                  "OUTPUT:\n==>$output<==\nat LINE ",__LINE__,"\n"
                   if ((!$Net::FullAuto::FA_Core::cron &&
                   $Net::FullAuto::FA_Core::debug) ||
                   $debug);
@@ -21025,7 +21028,7 @@ sub cwd
                     _ftm_type  =>$self->{_ftm_type} },
                   "cd \"$target_dir\"",$cache);
                print "Rem_Command::ftpcmd cd \"$target_dir\" ",
-	          "OUTPUT:\n==>$output<==\nat LINE ",__LINE__
+	          "OUTPUT:\n==>$output<==\nat LINE ",__LINE__,"\n"
                   if ((!$Net::FullAuto::FA_Core::cron &&
                   $Net::FullAuto::FA_Core::debug) ||
                   $debug);
@@ -21036,7 +21039,7 @@ sub cwd
                     _ftm_type  =>$self->{_ftm_type} },
                   "cd $target_dir",$cache);
                print "Rem_Command::ftpcmd cd $target_dir ",
-                  "OUTPUT:\n==>$output<==\nat LINE ",__LINE__
+                  "OUTPUT:\n==>$output<==\nat LINE ",__LINE__,"\n"
                   if ((!$Net::FullAuto::FA_Core::cron &&
                   $Net::FullAuto::FA_Core::debug) ||
                   $debug);
@@ -21081,14 +21084,14 @@ sub cwd
          if (-1<index $tar_dir,' ') {
             ($output,$stderr)=$self->cmd("cd \"$tar_dir\"");
             print "self->cmd cd \"$tar_dir\" ",
-               "OUTPUT:\n==>$output<==\nat LINE ",__LINE__
+               "OUTPUT:\n==>$output<==\nat LINE ",__LINE__,"\n"
                if ((!$Net::FullAuto::FA_Core::cron &&
                $Net::FullAuto::FA_Core::debug) ||
                $debug);
          } else {
             ($output,$stderr)=$self->cmd("cd $tar_dir");
             print "self->cmd cd $tar_dir ",
-               "OUTPUT:\n==>$output<==\nat LINE ",__LINE__
+               "OUTPUT:\n==>$output<==\nat LINE ",__LINE__,"\n"
                if ((!$Net::FullAuto::FA_Core::cron &&
                $Net::FullAuto::FA_Core::debug) ||
                $debug);
@@ -21109,7 +21112,7 @@ sub cwd
                     _ftm_type  =>$self->{_ftm_type} },
                   "cd \"$tar_dir\"",$cache);
                print "Rem_Command::ftpcmd cd \"$tar_dir\" ",
-                  "OUTPUT:\n==>$output<==\nat LINE ",__LINE__
+                  "OUTPUT:\n==>$output<==\nat LINE ",__LINE__,"\n"
                   if ((!$Net::FullAuto::FA_Core::cron &&
                   $Net::FullAuto::FA_Core::debug) ||
                   $debug);
@@ -21120,7 +21123,7 @@ sub cwd
                     _ftm_type  =>$self->{_ftm_type} },
                   "cd $tar_dir",$cache);
                print "Rem_Command::ftpcmd cd $tar_dir ",
-                  "OUTPUT:\n==>$output<==\nat LINE ",__LINE__
+                  "OUTPUT:\n==>$output<==\nat LINE ",__LINE__,"\n"
                   if ((!$Net::FullAuto::FA_Core::cron &&
                   $Net::FullAuto::FA_Core::debug) ||
                   $debug);
@@ -21141,7 +21144,7 @@ sub cwd
                        _ftm_type  =>$self->{_ftm_type} },
                      "cd \"$target_dir\"",$cache);
                   print "Rem_Command::ftpcmd cd \"$target_dir\" ",
-                     "OUTPUT:\n==>$output<==\nat LINE ",__LINE__
+                     "OUTPUT:\n==>$output<==\nat LINE ",__LINE__,"\n"
                      if ((!$Net::FullAuto::FA_Core::cron &&
                      $Net::FullAuto::FA_Core::debug) ||
                      $debug);
@@ -21152,7 +21155,7 @@ sub cwd
                        _ftm_type  =>$self->{_ftm_type} },
                      "cd $target_dir",$cache);
                   print "Rem_Command::ftpcmd cd $target_dir ",
-                     "OUTPUT:\n==>$output<==\nat LINE ",__LINE__
+                     "OUTPUT:\n==>$output<==\nat LINE ",__LINE__,"\n"
                      if ((!$Net::FullAuto::FA_Core::cron &&
                      $Net::FullAuto::FA_Core::debug) ||
                      $debug);
@@ -21168,7 +21171,7 @@ sub cwd
             if (exists $self->{_cmd_handle} && $self->{_cmd_handle}) { 
                ($output,$stderr)=$self->cmd('cd ..');
                print "self->cmd cd .. ",
-                  "OUTPUT:\n==>$output<==\nat LINE ",__LINE__
+                  "OUTPUT:\n==>$output<==\nat LINE ",__LINE__,"\n"
                   if ((!$Net::FullAuto::FA_Core::cron &&
                   $Net::FullAuto::FA_Core::debug) ||
                   $debug);
@@ -21198,7 +21201,7 @@ sub cwd
                   &Rem_Command::ftpcmd($self,
                   "cd \"$target_dir\"",$cache);
                print "Rem_Command::ftpcmd cd \"$target_dir\" ",
-                  "OUTPUT:\n==>$output<==\nat LINE ",__LINE__
+                  "OUTPUT:\n==>$output<==\nat LINE ",__LINE__,"\n"
                   if ((!$Net::FullAuto::FA_Core::cron &&
                   $Net::FullAuto::FA_Core::debug) ||
                   $debug);
@@ -21207,7 +21210,7 @@ sub cwd
                   &Rem_Command::ftpcmd($self,
                   "cd $target_dir",$cache);
                print "Rem_Command::ftpcmd cd $target_dir ",
-                  "OUTPUT:\n==>$output<==\nat LINE ",__LINE__
+                  "OUTPUT:\n==>$output<==\nat LINE ",__LINE__,"\n"
                   if ((!$Net::FullAuto::FA_Core::cron &&
                   $Net::FullAuto::FA_Core::debug) ||
                   $debug);
@@ -21237,7 +21240,7 @@ sub cwd
                ($output,$stderr)=$self->cmd("cd \'$target_dir\'",
                   '__delay__=200');
                print "self->cmd cd \"$target_dir\" ",
-                  "OUTPUT:\n==>$output<==\nat LINE ",__LINE__
+                  "OUTPUT:\n==>$output<==\nat LINE ",__LINE__,"\n"
                   if ((!$Net::FullAuto::FA_Core::cron &&
                   $Net::FullAuto::FA_Core::debug) ||
                   $debug);
@@ -21245,7 +21248,7 @@ sub cwd
                ($output,$stderr)=$self->cmd("cd $target_dir",
                   '__delay__=200');
                print "self->cmd cd $target_dir ",
-                  "OUTPUT:\n==>$output<==\nat LINE ",__LINE__
+                  "OUTPUT:\n==>$output<==\nat LINE ",__LINE__,"\n"
                   if ((!$Net::FullAuto::FA_Core::cron &&
                   $Net::FullAuto::FA_Core::debug) ||
                   $debug);
@@ -28910,21 +28913,35 @@ sub ftpcmd
       (join ' ',@topcaller),"\n\n"
       if $Net::FullAuto::FA_Core::log &&
       -1<index $Net::FullAuto::FA_Core::LOG,'*';
-   my $handle=$_[0];my $cache='';
-#print "DUMP=",Data::Dump::Streamer::Dump($handle)->Out()," and CALLER=",caller,"\n";<STDIN>;
-   my $cmd=$_[1];my $ftperr='';my $return_all=0;my $display=0;
+   my $handle=$_[0];
+   my $cmd=$_[1];
+   my $ftperr='';my $timeout=0;my $debug=0;
+   my $display=0;my $log=0;my $delay='';
+   my $cache='';my $return_all='';
    if (1<$#_) {
       foreach my $i (2..$#_) {
-	 $_[$i]||='';
-         if ($_[$i] eq '__return_all_output__') {
+         $_[$i]||='';
+         if ($_[$i]=~/^[0-9]+/) {
+            $timeout=$_[$i];
+         } elsif ($_[$i]=~/__to__[=]?(.*)$/i) {
+            $timeout=$1;
+         } elsif ($_[$i]=~/__timeout__[=]?(.*)$/i) {
+            $timeout=$1;
+         } elsif ($_[$i]=~/__delay__[=]?(.*)$/i) {
+            $delay=$1;
+         } elsif (lc($_[$i]) eq '__log__') {
+            $log=1;
+         } elsif (lc($_[$i]) eq '__display__') {
+            $display=1;
+         } elsif (lc($_[$i]) eq '__debug__') {
+            $debug=1;
+         } elsif (lc($_[$i]) eq '__return_all_output__') {
             $return_all=1;
          } elsif (-1<index $_[$i],'Cache::FileCache') {
             $cache=$_[$i];
          } elsif ((-1<index $_[$i],'Moose::Meta::Class::__ANON__::SERIAL')
                && ($_[$i]->chi_root_class)) {
             $cache=$_[$i];
-         } elsif (-1<index $_[$i],'__display__') {
-            $display=1; 
          }
       }
    }
@@ -28974,7 +28991,7 @@ sub ftpcmd
          }
          next if unpack('a1',$line) ne '-';
          $line=~s/[ ]*\015//g;
-         $line=~tr/\0-\37\177-\377//d;
+	 $line=~tr/\33//d; # DELETE ESCAPE CHARACTER
          if ($line=~s/$gpf$//) {
             $lsline=$line;last;
          }
@@ -28992,7 +29009,7 @@ sub ftpcmd
             }
             next if unpack('a1',$line) ne '-';
             $line=~s/[ ]*\015//g;
-            $line=~tr/\0-\37\177-\377//d;
+	    $line=~tr/\33//d; # DELETE ESCAPE CHARACTER
             if ($handle->{_luname} eq 'cygwin') {
                if ($gf eq '*') {
                   if ($line=~/[*]$/i) {
@@ -29057,12 +29074,16 @@ sub ftpcmd
             } elsif (!$stdout) {
                $starttime=time();
             }
+	    if ($delay) {
+               $delay=$delay*.001;
+               select(undef,undef,undef,$delay);
+            }
             print $Net::FullAuto::FA_Core::LOG
                "(S)FTP-OUTPUT: ==>$output<==\n"
                if $Net::FullAuto::FA_Core::log &&
                -1<index $Net::FullAuto::FA_Core::LOG,'*';
             $output=~s/[ ]*\015//g;
-            $output=~tr/\0-\11\13-\37\177-\377//d;
+	    $output=~tr/\33//d; # DELETE ESCAPE CHARACTER
             $stdout.=$output;
             if ($gpfile && (!$Net::FullAuto::FA_Core::cron ||
                   $Net::FullAuto::FA_Core::debug)) {
@@ -29110,7 +29131,7 @@ sub ftpcmd
                } elsif (!$keepcount) {
                   foreach my $line (split /\n+/, $output) {
                      $line=~s/[ ]*\015//g;
-                     $line=~tr/\0-\11\13-\37\177-\377//d;
+		     $line=~tr/\33//d; # DELETE ESCAPE CHARACTER
                      $line=~tr/#//d;
                      $line=~s/s*ftp> ?$//s if !($line=~s/^\s*$//m);
                      print $Net::FullAuto::FA_Core::LOG
@@ -29235,7 +29256,7 @@ sub ftpcmd
                }
                $loop=0;
                $output=~s/[ ]*\015//g;
-               $output=~tr/\0-\11\13-\37\177-\377//d;
+	       $output=~tr/\33//d; # DELETE ESCAPE CHARACTER
                my $prompt=($handle->{_ftm_type} eq 'ftp')?'ftp>':'sftp>';
                $save=&display($output,$prompt,$save,$cmd)
                   if $display;
@@ -29295,13 +29316,13 @@ print $Net::FullAuto::FA_Core::LOG "FTP-STDOUT-COMPLETED=$stdout<==\n"
          $stdout=~/^(5.*)$/m;
          $stderr=$1;
          $stderr=~s/[ ]*\015//g;
-         $stderr=~tr/\0-\37\177-\377//d;
+	 $stderr=~tr/\33//d; # DELETE ESCAPE CHARACTER
 print $Net::FullAuto::FA_Core::LOG "FTP-STDERR-500-DETECTED=$stderr<==\n"
    if $Net::FullAuto::FA_Core::log && -1<index $Net::FullAuto::FA_Core::LOG,'*';
       } elsif ((-1<index $stdout,":5") && $stdout=~/^(.*:5\d\d\s.*)$/m) {
          my $line=$1;
          $line=~s/[ ]*\015//g;
-         $line=~tr/\0-\37\177-\377//d;
+	 $line=~tr/\33//d; # DELETE ESCAPE CHARACTER
          $stderr="$line\n       $!" if $line!~/^\d+\s+bytes/;
       } elsif ((-1<index $stdout,'file access p')
                || (-1<index $stdout,'not found')
@@ -30639,11 +30660,6 @@ print $Net::FullAuto::FA_Core::LOG "WEVE GOT WINDOWSCOMMAND=$command\n"
                      "SELECT_TIMEOUT=$select_timeout\n"
                      if $Net::FullAuto::FA_Core::log &&
                      -1<index $Net::FullAuto::FA_Core::LOG,'*';
-               #if ($select_timeout!=2 && $select_timeout==$tim) {
-               #   $self->{_cmd_handle}->print("\003");
-               #   my ($cfh_ignore,$cfh_error)=
-               #      &Net::FullAuto::FA_Core::clean_filehandle(
-               #      $self->{_cmd_handle},$tim,$command);
                if ($select_timeout!=2 && $select_timeout==$tim
                      && (!$cmtimeout || $tim<=$cmtimeout)) {
                   my $errhost='';
@@ -30682,9 +30698,7 @@ print "GOING TO INT SIX\n";
                      if $Net::FullAuto::FA_Core::log &&
                      -1<index $Net::FullAuto::FA_Core::LOG,'*';
                   $output=~s/[ ]*\015//g;
-                  #$output=~tr/\0-\10\13-\37\177-\377//d;
                   $output=~tr/\33//d; # DELETE ESCAPE CHARACTER
-                  #$output=~tr/\0-\10\177-\377//d;
                   if (-1<index $output,'[A') {
                      $output=~s/^(.*2[>][&]1\s*)\[A\s*$/$1/s;
                   } 
@@ -30815,8 +30829,21 @@ print "GOING TO INT SIX\n";
                               "LAST_LINE=$last_line<== and OUTPUT=$output<==\n"
                               if $Net::FullAuto::FA_Core::log &&
                               -1<index $Net::FullAuto::FA_Core::LOG,'*';
-print "LSLC=$lslc and LTSO=$ltso and UNPACK=",unpack("a$lslc",$test_stripped_output)," and STIPPEDLIVECMD=$stripped_live_command\n" if !$Net::FullAuto::FA_Core::cron && ($Net::FullAuto::FA_Core::debug || $debug);
-print $Net::FullAuto::FA_Core::LOG "LSLC=$lslc and LTSO=$ltso and UNPACK=",unpack("a$lslc",$test_stripped_output)," and STIPPEDLIVECMD=$stripped_live_command\n" if $Net::FullAuto::FA_Core::log && -1<index $Net::FullAuto::FA_Core::LOG,'*';
+                           print "LengthStrippedLiveCommand=$lslc and ",
+			         "LengthTestStrippedOutput=$ltso\nand ",
+				 "COMPARE StrippedOutput=",
+				 unpack("a$lslc",$test_stripped_output),
+				 " and StrippedLiveCommand=$stripped_live_command\n"
+				 if !$Net::FullAuto::FA_Core::cron &&
+				 ($Net::FullAuto::FA_Core::debug || $debug);
+                           print $Net::FullAuto::FA_Core::LOG
+			         "LengthStrippedLiveCommand=$lslc and ",
+				 "LengthTestStrippedOutput=$ltso and ",
+				 "COMPARE StrippedOutput=",
+				 unpack("a$lslc",$test_stripped_output),
+				 " and StrippedLiveCommand=$stripped_live_command\n"
+				 if $Net::FullAuto::FA_Core::log &&
+				 -1<index $Net::FullAuto::FA_Core::LOG,'*';
                            if (($lslc<$ltso) &&
                                  (unpack("a$lslc",$test_stripped_output) eq
                                  $stripped_live_command)) {
@@ -30865,9 +30892,10 @@ print $Net::FullAuto::FA_Core::LOG "LSLC=$lslc and LTSO=$ltso and UNPACK=",unpac
                                  $growoutput=$output;
                                  $growoutput=~s/^\s*(.*)($cmd_prompt)*$/$1/s;
                               }
-print $Net::FullAuto::FA_Core::LOG "GROWOUTPUT AFTER COMMAND STRIPPED=$growoutput\n"
-   if $Net::FullAuto::FA_Core::log
-   && (-1<index $Net::FullAuto::FA_Core::LOG,'*');
+                              print $Net::FullAuto::FA_Core::LOG
+			         "Gathering OUTPUT after COMMAND Removed=$growoutput\n"
+                                 if $Net::FullAuto::FA_Core::log
+                                 && (-1<index $Net::FullAuto::FA_Core::LOG,'*');
                               $save=&display($output,$cmd_prompt,$save)
                                  if $display;
                               $output='';
@@ -31098,7 +31126,7 @@ print $Net::FullAuto::FA_Core::LOG "NO GROWOUTPUTTTTTTTTTTTTT\n" if $Net::FullAu
                      }
                   }
                   $output=~s/^[ |\t]+(stdout:.*)$/$1/m if !$fullerror;
-                  $save=&display($output,$cmd_prompt,$save)
+                  $save=&display($output,$cmd_prompt,$save,$live_command)
                      if $display;
                   $growoutput.=$output;
 #if ($Net::FullAuto::FA_Core::debug || $debug) {
@@ -31734,7 +31762,7 @@ sub display
       $log||='';
       $print_line_debugging=0 unless $log;
    }
-   select(undef,undef,undef,0.50) if defined $_[4];
+   select()->flush();
    my $line=$_[0];
    return '' if -1<index $line,'[sudo]';
    my $cmd_prompt=$_[1];
@@ -31752,6 +31780,23 @@ sub display
    $tline=~s/\s*$//s;
    $tline=quotemeta($tline);
    $tline=~s/^\\(.)/$1?/s;
+   if (-1<index $cmd,'git clone') {
+      return unless $line;
+      if (-1<index $line,'Receiving objects:') {
+         print "\n";
+	 $line=~s/sReceiving/s\nReceiving/sg;
+      } elsif (-1<index $line,'Resolving deltas:') {
+         print "\n"
+      } elsif (-1<index $line,'Updating files:') {
+         print "\n";
+	 $line=~s/[)]Updating/)\nUpdating/sg;
+      } elsif (-1<index $line,'pack-reused') {
+         print "\n";
+      }
+      if (-1<index $line,'[K') {
+	 $line=~s/[[]K/\n/sg;
+      }
+   }
    if ((-1<index $line,'[K') &&
          ($line eq '[K' ||
          (substr($line,-2) eq '[K') ||
@@ -31869,7 +31914,6 @@ sub display
    } elsif ((-1<index $line,']0') &&
          ($line=~/^.*\s*0\s*[]]0.*$/s) &&
          (-1==index $line,$cmd_prompt)) {
-#print "WHAT IS LINE HERE=$line<==\n";<STDIN>;
       $save.=$line;
       return $save;
    } else {

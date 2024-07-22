@@ -11,9 +11,9 @@ use IPC::System::Options;
 use Nodejs::Util qw(get_nodejs_path);
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2024-01-17'; # DATE
+our $DATE = '2024-07-17'; # DATE
 our $DIST = 'Data-Sah-Filter'; # DIST
-our $VERSION = '0.024'; # VERSION
+our $VERSION = '0.025'; # VERSION
 
 our @EXPORT_OK = qw(gen_filter);
 
@@ -126,7 +126,7 @@ Data::Sah::FilterJS - Generate filter code
 
 =head1 VERSION
 
-This document describes version 0.024 of Data::Sah::FilterJS (from Perl distribution Data-Sah-Filter), released on 2024-01-17.
+This document describes version 0.025 of Data::Sah::FilterJS (from Perl distribution Data-Sah-Filter), released on 2024-07-17.
 
 =head1 SYNOPSIS
 

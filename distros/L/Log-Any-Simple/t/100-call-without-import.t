@@ -24,7 +24,7 @@ package MyTest3 {
 }
 
 package MyTest4 {
-  use Log::Any::Simple ':die_at' => 'info';
+  use Log::Any::Simple ':die_at' => 'info', ':die_silence_msg';
   ::like(::dies { Log::Any::Simple::info('foo %s baz', 'bar') }, qr/Fatal error/, 'dies at info');
   ::is($::log->msgs(), [{category => 'MyTest4', level => 'info', message => 'foo bar baz'}], 'log info with die_at');
   $::log->clear();
@@ -34,6 +34,13 @@ package MyTest5 {
   use Log::Any::Simple ':die_at' => 'info', ':die_repeats_msg';
   ::like(::dies { Log::Any::Simple::info('foo %s baz', 'bar') }, qr/foo bar baz/, 'dies at info with msg');
   ::is($::log->msgs(), [{category => 'MyTest5', level => 'info', message => 'foo bar baz'}], 'log info with die_at');
+  $::log->clear();
+}
+
+package MyTest6 {
+  use Log::Any::Simple ':die_at' => 'info';
+  ::like(::dies { Log::Any::Simple::info('foo %s baz', 'bar') }, qr/foo bar baz/, 'dies at info with msg');
+  ::is($::log->msgs(), [{category => 'MyTest6', level => 'info', message => 'foo bar baz'}], 'log info with die_at');
   $::log->clear();
 }
 

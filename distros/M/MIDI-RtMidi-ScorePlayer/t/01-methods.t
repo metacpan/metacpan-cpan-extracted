@@ -26,7 +26,15 @@ subtest defaults => sub {
         parts => [$part],
     ];
     isa_ok $p->{device}, 'MIDI::RtMidi::FFI::Device';
-    is $p->{port}, qr/wavetable|loopmidi|timidity|fluid/i, 'port'
+    is $p->{port}, qr/wavetable|loopmidi|timidity|fluid/i, 'port';
+    is_deeply $p->{common}, {}, 'common';
+    is $p->{repeats}, 1, 'repeats';
+    is $p->{sleep}, 1, 'sleep';
+    is $p->{loop}, 1, 'loop';
+    is $p->{infinite}, 1, 'infinite';
+    is $p->{verbose}, 0, 'verbose';
+    is $p->{dump}, 0, 'dump';
+    is $p->{deposit}, '', 'deposit';
 };
 
 subtest play => sub {

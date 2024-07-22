@@ -4,7 +4,7 @@
       "Slaven Rezic <srezic@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.64, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -41,6 +41,6 @@
          "url" : "git://github.com/eserte/p5-Kwalify.git"
       }
    },
-   "version" : "1.23",
-   "x_serialization_backend" : "JSON::PP version 2.97001"
+   "version" : "1.24",
+   "x_serialization_backend" : "JSON::PP version 4.07"
 }

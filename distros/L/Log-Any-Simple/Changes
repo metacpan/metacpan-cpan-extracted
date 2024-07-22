@@ -1,5 +1,10 @@
 Revision history for Perl distribution Log-Any-Functions
 
+0.06 - 2024-07-22
+
+ - Restore the default semantic for fatal as of 0.04, to not break existing
+   code.
+
 0.05 - 2024-07-17
 
  - By default no longer send the whole log message to the die() method when

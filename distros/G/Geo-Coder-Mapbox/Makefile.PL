@@ -6,6 +6,14 @@ use IO::Socket::INET;
 
 my $online_tests;
 
+# Test for broken smokers that don't set AUTOMATED_TESTING
+if(my $reporter = $ENV{'PERL_CPAN_REPORTER_CONFIG'}) {
+	if($reporter =~ /smoker/i) {
+		warn 'AUTOMATED_TESTING added for you';
+		$ENV{'AUTOMATED_TESTING'} = 1;
+	}
+}
+
 if($ENV{AUTHOR_TESTING}) {
 	$online_tests = are_online();
 } else {
@@ -23,6 +31,7 @@ if($ENV{AUTHOR_TESTING}) {
 my $test_requires = {
 	'Test::Compile' => 0,
 	'Test::Most' => 0,
+	'Test::Needs' => 0,
 	'Test::NoWarnings' => 0,
 	'Test::Requires' => 0,
 };
@@ -50,7 +59,7 @@ WriteMakefile(
 	TEST_REQUIRES => $test_requires,
     PREREQ_PM => {
 	'Encode' => 0,
-	'JSON' => 0,
+	'JSON::MaybeXS' => 0,
 	'HTTP::Request' => 0,
 	'LWP::UserAgent' => 0,
 	'LWP::Protocol::https' => 0,
@@ -77,15 +86,13 @@ WriteMakefile(
 
 sub are_online
 {
-	return 0 if($ENV{'NO_NETWORK_TESTING'});
-	return 0 if(!-t STDIN);
+	return 0 if($ENV{'NO_NETWORK_TESTING'} || $ENV{'TRAVIS_PERL_VERSION'}) || $ENV{'AUTOMATED_TESTING'} || (!-t STDIN);
 
-	my $s = IO::Socket::INET->new(
+	if(my $s = IO::Socket::INET->new(
 		PeerAddr => 'mapbox.com:443',
 		Timeout => 10
-	);
-	if($s) {
-		if($ENV{'PERL_MM_USE_DEFAULT'} || $ENV{'AUTOMATED_TESTING'}) {
+	)) {
+		if($ENV{'PERL_MM_USE_DEFAULT'}) {
 			close($s);
 			return 1;
 		}

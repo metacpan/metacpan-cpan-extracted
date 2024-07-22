@@ -114,7 +114,7 @@ callback function.
     This is for debugging:
 
     Builds a tree from `$vars` that is suitable for passing to [Data::Dumper](https://metacpan.org/pod/Data::Dumper).  This is
-    neccesary because PDL's need to be stringified since Dumper() will dump at the
+    necessary because PDL's need to be stringified since Dumper() will dump at the
     object itself.
 
 # ARGUMENTS

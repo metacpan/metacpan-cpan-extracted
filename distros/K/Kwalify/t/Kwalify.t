@@ -40,8 +40,15 @@ use_ok('Schema::Kwalify');
 my $use_yaml_module;
 for my $mod (qw(YAML::XS YAML::PP)) { # YAML::Syck currently does not work --- https://github.com/toddr/YAML-Syck/issues/52
     if (eval qq{ require $mod; 1 }) {
-	no strict 'refs';
-	*YAML_Load = \&{$mod . '::Load'};
+	if ($mod eq 'YAML::PP') {
+	    no strict 'refs';
+	    *YAML_Load = sub {
+		YAML::PP->new(cyclic_refs => 'allow')->load_string($_[0]);
+	    };
+	} else {
+	    no strict 'refs';
+	    *YAML_Load = \&{$mod . '::Load'};
+	}
 	$use_yaml_module = $mod;
 	last;
     }

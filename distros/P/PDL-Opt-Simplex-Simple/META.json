@@ -56,6 +56,6 @@
          "web" : "https://github.com/KJ7LNW/perl-PDL-Opt-Simplex-Simple.git"
       }
    },
-   "version" : "2.002",
+   "version" : "2.003",
    "x_serialization_backend" : "JSON::PP version 2.97001"
 }

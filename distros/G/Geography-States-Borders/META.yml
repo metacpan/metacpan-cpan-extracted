@@ -29,7 +29,7 @@ requires:
 resources:
   homepage: https://github.com/ology/Geography-States-Borders
   repository: https://github.com/ology/Geography-States-Borders.git
-version: '0.0106'
+version: '0.0107'
 x_Dist_Zilla:
   perl:
     version: '5.032001'
@@ -68,7 +68,7 @@ x_Dist_Zilla:
         Dist::Zilla::Plugin::PodWeaver:
           finder:
             - ':InstallModules'
-            - ':ExecFiles'
+            - ':PerlExecFiles'
           plugins:
             -
               class: Pod::Weaver::Plugin::EnsurePod5
@@ -135,7 +135,7 @@ x_Dist_Zilla:
               name: '@Default/Legal'
               version: '4.017'
       name: PodWeaver
-      version: '4.008'
+      version: '4.010'
     -
       class: Dist::Zilla::Plugin::PodCoverageTests
       name: PodCoverageTests

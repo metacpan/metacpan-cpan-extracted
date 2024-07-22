@@ -24,9 +24,11 @@ t/noopentickets.t
 t/noplan.t
 t/pod-cm.t
 t/pod-spelling.t
+t/pod-synopsis.t
 t/pod.t
 t/port.t
 t/snippets.t
 t/unused.t
+t/vars.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

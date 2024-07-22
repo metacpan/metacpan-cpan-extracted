@@ -3,12 +3,12 @@
 #
 # Author: Slaven Rezic
 #
-# Copyright (C) 2006,2007,2008,2009,2010,2015,2020 Slaven Rezic. All rights reserved.
+# Copyright (C) 2006,2007,2008,2009,2010,2015,2020,2024 Slaven Rezic. All rights reserved.
 # This package is free software; you can redistribute it and/or
 # modify it under the same terms as Perl itself.
 #
 # Mail: srezic@cpan.org
-# WWW:  http://www.rezic.de/eserte/
+# WWW:  https://github.com/eserte/p5-kwalify/
 #
 
 package Kwalify;
@@ -20,7 +20,7 @@ use base qw(Exporter);
 use vars qw(@EXPORT_OK $VERSION);
 @EXPORT_OK = qw(validate);
 
-$VERSION = '1.23';
+$VERSION = '1.24';
 
 sub validate ($$) {
     my($schema, $data) = @_;
@@ -430,7 +430,7 @@ Typically used together with YAML or JSON:
 
 Kwalify is a Perl implementation for validating data structures
 against the Kwalify schema. For a schema definition, see
-L<http://www.kuwata-lab.com/kwalify/ruby/users-guide.01.html>, but see
+L<https://web.archive.org/web/20190718083758/http://www.kuwata-lab.com/kwalify/ruby/users-guide.01.html>, but see
 also below L</SCHEMA DEFINITION>.
 
 =head2 validate($schema_data, $data)
@@ -447,13 +447,64 @@ types and behaviour. Here's how B<Kwalify.pm> implements things:
 
 =over
 
+=item name
+
+The name of the schema.
+
+=item desc
+
+The description for the rule.
+It is not used for validation.
+
 =item pattern
+
+A pattern matching the valid values.
 
 Perl regular expressions are used for patterns. This may or may not be
 compatible with other Kwalify validators, so restrict to "simple"
 regular expression constructs to be compatible with other validators.
 
+=item enum
+
+A list of the valid values.
+
+=item range
+
+A hash with the valid value ranges for types other than B<seq>, B<map>,
+B<bool> and B<any>.
+
+=over
+
+=item max
+
+The maximum inclusive.
+
+=item min
+
+The minimum inclusive.
+
+=item max-ex
+
+The maximum exclusive.
+
+=item min-ex
+
+The minimum exclusive.
+
+=back
+
+=item length
+
+Like B<range> but for B<str> and B<text>.
+
+=item required
+
+A constraint to denote the value is required when B<true>.
+The default is B<false>.
+
 =item type
+
+The default B<type> if omitted is B<str>.
 
 =over
 
@@ -472,6 +523,16 @@ supported, and it is also not clear whether it should be supported.
 A possibly signed floating value with a mandatory decimal point. Note
 that scientific notation is also not supported here.
 
+=item number
+
+A possibly signed floating value with an optional decimal point (so
+either B<int> or B<float>).
+Note that scientific notation is also not supported here.
+
+=item text
+
+Any defined value which is either a B<str> or a B<number>.
+
 =item bool
 
 The values B<yes>, B<true>, and B<1> for true values and the values
@@ -487,10 +548,6 @@ B<pattern> or B<enum> to ensure this:
     type: bool
     enum: [0, 1]
 
-=item scalar
-
-Currently the same as B<text>, but it's not clear if this is correct.
-
 =item date
 
 A string matching C<< /^\d{4}-\d{2}-\d{2}$/ >> (i.e. YYYY-MM-DD). Note
@@ -505,7 +562,30 @@ that no time range checks are done (yet).
 
 Not supported --- it is not clear what this is supposed to be.
 
+=item seq
+
+A sequence (list) of rules.
+
+=item map
+
+A mapping (hash) of rules.
+
+The name "B<=>" can be used to apply rules to any key.
+
+=item scalar
+
+Currently the same as B<text>, but it's not clear if this is correct.
+Originally defined as all but B<seq> and B<map>.
+
+=item any
+
+Any data type.
+
 =back
+
+=item unique
+
+The value is unique for a B<seq> or a B<map>.
 
 =item assert
 
@@ -513,7 +593,7 @@ Currently not supported by the Perl implementation.
 
 =item classname
 
-Previously defined what is now B<class>, see L<http://web.archive.org/web/20071230173101/http://www.kuwata-lab.com/kwalify/users-guide.01.html>.
+Previously defined what is now B<class>, see L<https://web.archive.org/web/20190718083758/http://www.kuwata-lab.com/kwalify/ruby/users-guide.01.html>.
 
 =item class
 

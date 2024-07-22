@@ -4,14 +4,14 @@ use strict;
 use warnings;
 use utf8;
 
-use App::ArduinoBuilder::CommandRunner;
 use App::ArduinoBuilder::Config 'get_os_name';
 use App::ArduinoBuilder::DepCheck 'check_dep';
 use App::ArduinoBuilder::FilePath 'find_all_files_with_extensions';
-use App::ArduinoBuilder::Logger;
 use App::ArduinoBuilder::System 'execute_cmd';
 use File::Path 'make_path';
 use File::Spec::Functions 'catfile';
+use Parallel::TaskExecutor 'default_executor';
+use Log::Any::Simple ':default';
 
 my @supported_source_extensions = qw(c cpp S ino);
 
@@ -82,6 +82,7 @@ sub _ino_to_cpp {
   # TODO: there is a step in the real Arduino tool that is badly documented but which uses ctags to extract the
   # prototype of the functions in the .ino files (and adds them at the beginning of the C++ file), so that the
   # functions can be called before they are declared.
+  # TODO: if the correct null output is needed again, move this line to System.pm
   # my $null = get_os_name() eq 'windows' ? 'nul' : '/dev/null';
   return;
 }
@@ -148,7 +149,7 @@ sub build_archive {
       # uncommented to execute the dependency check inside the forked process.
       # However this does not seem to improve the execution speed.
       next unless $force || check_dep($s, $object_file);
-      push @tasks, default_runner()->execute(
+      push @tasks, default_executor()->run(
         sub {
           # return unless $force || check_dep($s, $object_file);
           $this->build_file($s, $object_file);
@@ -156,7 +157,7 @@ sub build_archive {
         });
     }
   }
-  default_runner->wait();
+  default_executor->wait();
   my $did_something;
   for my $t (@tasks) {
     my $o = $t->data();
@@ -180,14 +181,14 @@ sub build_object_files {
   for my $s (@sources) {
     my $object_file = $obj_name->object_for($s);
     next unless $force || check_dep($s, $object_file);
-    push @tasks, default_runner()->execute(
+    push @tasks, default_executor()->run(
       sub {
         # return unless $force || check_dep($s, $object_file);
         $this->build_file($s, $object_file);
         return 1;
       });
   }
-  default_runner->wait();
+  default_executor->wait();
   for my $t (@tasks) {
     my $o = $t->data();
     if ($o) {
@@ -233,10 +234,10 @@ sub compute_binary_size {
     }
     my $max_data_size = $this->{config}->get('upload.maximum_data_size', default => undef);
     if ($max_data_size) {
-      info '  Global varables use %d bytes (%d%%) of dynamic memory, leaving %d bytes for local variables. Maximum is %d bytes.', $data_size, ($data_size * 100 / $max_data_size), ($max_data_size - $data_size), $max_data_size;
+      info '  Global variables use %d bytes (%d%%) of dynamic memory, leaving %d bytes for local variables. Maximum is %d bytes.', $data_size, ($data_size * 100 / $max_data_size), ($max_data_size - $data_size), $max_data_size;
       fatal 'Too much memory used' if $data_size > $max_data_size;
     } else {
-      info '  Global varables use %d bytes of dynamic memory.', $data_size;
+      info '  Global variables use %d bytes of dynamic memory.', $data_size;
     }
   }
 

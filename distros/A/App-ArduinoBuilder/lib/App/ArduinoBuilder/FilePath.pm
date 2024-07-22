@@ -4,12 +4,12 @@ use strict;
 use warnings;
 use utf8;
 
-use App::ArduinoBuilder::Logger;
 use App::ArduinoBuilder::System 'system_canonpath';
 use Exporter 'import';
 use File::Find;
 use File::Spec::Functions 'catdir';
 use List::Util 'min', 'any';
+use Log::Any::Simple ':default';
 
 our @EXPORT_OK = qw(find_latest_revision_dir list_sub_directories find_all_files_with_extensions);
 

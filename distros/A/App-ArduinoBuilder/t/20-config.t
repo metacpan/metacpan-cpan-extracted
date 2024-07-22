@@ -86,7 +86,7 @@ is($config->filter('test')->dump(), <<~EOF);
   is ($c->get('c'), '1123');
 }
 
-like(dies { new()->parse_perl({a => [qw(1 2)]})}, qr/"ARRAY"/);
+like(dies { new()->parse_perl({a => [qw(1 2)]})}, qr/.+/);
 
 is(App::ArduinoBuilder::Config->new(files=>[$simple_config_path], resolve => 1, allow_partial => 1)->dump(), $simple_config_resolved);
 

@@ -4,10 +4,10 @@ use strict;
 use warnings;
 use utf8;
 
-use App::ArduinoBuilder::Logger;
 use Exporter 'import';
 use File::Basename;
 use File::Spec::Functions;
+use Log::Any::Simple ':default';
 
 our @EXPORT_OK = qw(check_dep);
 
@@ -17,18 +17,18 @@ sub check_dep {
   fatal "Can’t find source file: ${source}" unless -f $source;
   my $source_time = -M _;  # Note: this is negated mtime due to a weird Perl quirk.
   unless (-f $target) {
-    full_debug "Rebuilding ${source} because ${target} does not exist";
+    trace "Rebuilding ${source} because ${target} does not exist";
     return 1;
   }
   # In some error situation a 0 byte .o file is written, let’s assume that a valid output is
   # never empty (which would not be true in the general case for a build system).
   if (-z _) {
-    full_debug "Rebuilding ${source} because ${target} is empty";
+    trace "Rebuilding ${source} because ${target} is empty";
     return 1;
   }
   my $target_time = -M _;
   if ($source_time < $target_time) {
-    full_debug "Rebuilding ${source} because of ${target}";
+    trace "Rebuilding ${source} because of ${target}";
     return 1;
   }
 
@@ -38,7 +38,7 @@ sub check_dep {
     return 0;  # We assume that there is no other dependency.
   }
   if ($source_time < -M _) {
-    full_debug "Rebuilding ${source} because it’s newer than dependency file ${d_file}";
+    trace "Rebuilding ${source} because it’s newer than dependency file ${d_file}";
     return 1;
   }
 
@@ -56,7 +56,7 @@ sub check_dep {
   }
   # we could test that rel2abs($1) eq rel2abs($target)
     if ($2 && -M $1 < $target_time) {
-      full_debug "Rebuilding ${source} because of ${2}";
+      trace "Rebuilding ${source} because of ${2}";
       return 1;
     }
 
@@ -67,11 +67,11 @@ sub check_dep {
       return 1;
     }
     if ($1 && -M $1 < $target_time) {
-      full_debug "Rebuilding ${source} because of ${1}";
+      trace "Rebuilding ${source} because of ${1}";
       return 1;
     }
   }
-  full_debug "Not rebuilding ${target}, it is up-to-date";
+  trace "Not rebuilding ${target}, it is up-to-date";
   close $fh;
   return 0;
 }

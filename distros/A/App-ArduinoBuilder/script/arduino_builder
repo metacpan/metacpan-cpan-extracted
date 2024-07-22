@@ -5,6 +5,10 @@ use strict;
 use warnings;
 use utf8;
 
+# This is used when using our custom cpanm command line, that ensure that the
+# dependencies can be found even after a perl upgrade.
+use lib '/usr/local/lib/perl5';
+
 use open ':std', ':encoding(UTF-8)';
 
 use App::ArduinoBuilder;
@@ -25,7 +29,7 @@ __DATA__
 
 =head1 NAME
 
-arduino_builder - Build system for Arduino programs
+arduino_builder - All-in-one build system for Arduino programs
 
 =head1 SYNOPSIS
 
@@ -107,6 +111,8 @@ This is usually, but not necessarily, done through a serial port.
 =item C<--stack-trace-on-error>, C<--stack>
 
 =item C<--target-port I<port>>, C<--port>
+
+=item C<--force-port I<protocol:port>>
 
 =back
 
@@ -220,6 +226,9 @@ which ports are found by the command.
 You can also use a comma separated list for this configuration value in case
 your board can appear under different ports.
 
+The values passed in this list are treated as regex, so you can specify things
+like C<com\d+> to match any COM ports (on Windows).
+
 =item C<builder.project_dir>
 
 The path to the root directory of the project (typically the directory that
@@ -300,6 +309,7 @@ handled.
 If the reset to bootloader is not performed by the upload tools used, Arduino
 Builder cannot yet perform this reset itself (documented
 L<here|https://arduino.github.io/arduino-cli/0.32/platform-specification/#1200-bps-bootloader-reset>).
+
 =back
 
 =head1 AUTHOR

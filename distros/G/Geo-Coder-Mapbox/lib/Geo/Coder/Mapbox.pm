@@ -5,7 +5,7 @@ use warnings;
 
 use Carp;
 use Encode;
-use JSON;
+use JSON::MaybeXS;
 use HTTP::Request;
 use LWP::UserAgent;
 use LWP::Protocol::https;
@@ -17,17 +17,17 @@ Geo::Coder::Mapbox - Provides a Geo-Coding functionality using L<https://mapbox.
 
 =head1 VERSION
 
-Version 0.01
+Version 0.02
 
 =cut
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 =head1 SYNOPSIS
 
     use Geo::Coder::Mapbox;
 
-    my $geo_coder = Geo::Coder::Mapbox->new(access_token => $ENV{'MAPBOX'});
+    my $geo_coder = Geo::Coder::Mapbox->new(access_token => $ENV{'MAPBOX_KEY'});
     my $location = $geo_coder->geocode(location => 'Washington, DC');
 
 =head1 DESCRIPTION
@@ -46,18 +46,22 @@ Geo::Coder::Mapbox provides an interface to mapbox.com, a Geo-Coding database co
 =cut
 
 sub new {
-	my $proto = shift;
-	my $class = ref($proto) || $proto;
+	my $class = shift;
+	my %args = (ref($_[0]) eq 'HASH') ? %{$_[0]} : @_;
 
 	# Use Geo::Coder::Mapbox->new(), not Geo::Coder::Mapbox::new()
 	if(!defined($class)) {
-		carp(__PACKAGE__, ' use ->new() not ::new() to instantiate');
-		return;
+		# carp(__PACKAGE__, ' use ->new() not ::new() to instantiate');
+		# return;
+
+		# FIXME: this only works when no arguments are given
+		$class = __PACKAGE__;
+	} elsif(ref($class)) {
+		# clone the given object
+		return bless { %{$class}, %args }, ref($class);
 	}
 
-	my %args = (ref($_[0]) eq 'HASH') ? %{$_[0]} : @_;
-
-	my $ua = delete $args{ua} || LWP::UserAgent->new(agent => __PACKAGE__ . "/$VERSION");
+	my $ua = $args{ua} || LWP::UserAgent->new(agent => __PACKAGE__ . "/$VERSION");
 	# if(!defined($args{'host'})) {
 		# $ua->ssl_opts(verify_hostname => 0);	# Yuck
 	# }
@@ -66,6 +70,7 @@ sub new {
 		access_token => ''
 	);
 
+	# Re-seen keys take precedence, so defaults come first
 	return bless { %defaults, %args, ua => $ua }, $class;
 }
 
@@ -118,7 +123,7 @@ sub geocode {
 		return { };
 	}
 
-	my $json = JSON->new()->utf8();
+	my $json = JSON::MaybeXS->new()->utf8();
 	my $rc;
 	eval {
 		$rc = $json->decode($res->content());
@@ -158,7 +163,7 @@ You can also set your own User-Agent object:
 
     use LWP::UserAgent::Throttled;
     my $ua = LWP::UserAgent::Throttled->new();
-    $ua->throttle({ 'mapbox.com' => 2 });
+    $ua->throttle({ 'api.mapbox.com' => 2 });
     $geo_coder->ua($ua);
 
 =cut
@@ -213,7 +218,7 @@ L<Geo::Coder::GooglePlaces>, L<HTML::GoogleMaps::V3>, L<https://docs.mapbox.com/
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2021 Nigel Horne.
+Copyright 2021-2024 Nigel Horne.
 
 This program is released under the following licence: GPL2
 
