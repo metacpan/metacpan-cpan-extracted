@@ -3,7 +3,7 @@ Changes
 LICENSE
 lib/Test/Strict.pm
 Makefile.PL
-MANIFEST			This list of files
+MANIFEST    		This list of files
 MANIFEST.SKIP
 README
 t/01all.t
@@ -13,7 +13,6 @@ t/04cover.t
 t/00-load.t
 t/90-pod.t
 t/91-pod-coverage.t
-t/92-manifest.t
 t/93-checkmanifest.t
 t/94-version.t
 t/95-changes.t

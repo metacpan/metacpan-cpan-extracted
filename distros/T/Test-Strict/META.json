@@ -4,7 +4,7 @@
       "Pierre Denis <pdenis@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -49,7 +49,7 @@
    "provides" : {
       "Test::Strict" : {
          "file" : "lib/Test/Strict.pm",
-         "version" : "0.52"
+         "version" : "0.53"
       }
    },
    "release_status" : "stable",
@@ -64,7 +64,7 @@
          "x_license" : "http://dev.perl.org/licenses/"
       }
    },
-   "version" : "0.52",
+   "version" : "0.53",
    "x_contributors" : [
       "Gabor Szabo <szabgab@cpan.org>",
       "Peter Vereshagin <veresc@cpan.org>",
@@ -72,5 +72,5 @@
       "Mohammad S Anwar <manwar@cpan.org>",
       "Robert Rothenberg <rrwo@cpan.org>"
    ],
-   "x_serialization_backend" : "JSON::PP version 4.00"
+   "x_serialization_backend" : "JSON::PP version 4.16"
 }

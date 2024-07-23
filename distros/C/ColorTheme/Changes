@@ -1,3 +1,11 @@
+2.1.5   2024-07-17  Released-By: PERLANCAR; Urgency: low
+
+        - No spec changes.
+
+        - [dist] Edit Changes (replace Backward-Compatible: no with
+          Backward-Incompatible: yes).
+
+
 2.1.4   2023-07-14  Released-By: PERLANCAR; Urgency: low
 
         - No spec changes.
@@ -28,7 +36,7 @@
         - Minor Fixes/tweaks.
 
 
-2.1.0   2020-06-09  Released-By: PERLANCAR; Urgency: medium; Backward-Compatible: no
+2.1.0   2020-06-09  Released-By: PERLANCAR; Urgency: medium; Backward-Incompatible: yes
 
 	- [incompatible] Rename get_color() to get_item_color() to be more
 	  specific.
@@ -44,7 +52,7 @@
 	- Add note about status of the 2.x specification.
 
 
-2.0.1   2020-06-08  Released-By: PERLANCAR; Backward-Compatible: no
+2.0.1   2020-06-08  Released-By: PERLANCAR; Backward-Incompatible: yes
 
         - Revise.
 
@@ -53,7 +61,7 @@
         - [incompatible change] Rename method get_color_list() to list_items().
 
 
-2.0.0   2020-06-07  Released-By: PERLANCAR; Backward-Compatible: no
+2.0.0   2020-06-07  Released-By: PERLANCAR; Backward-Incompatible: yes
 
         - Renamed from Color-Theme to ColorTheme.
 

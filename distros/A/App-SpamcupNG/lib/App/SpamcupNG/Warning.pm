@@ -3,7 +3,7 @@ use strict;
 use warnings;
 use Carp qw(confess);
 
-our $VERSION = '0.018'; # VERSION
+our $VERSION = '0.019'; # VERSION
 
 =head1 NAME
 

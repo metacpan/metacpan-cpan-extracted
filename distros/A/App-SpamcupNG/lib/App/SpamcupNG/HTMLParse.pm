@@ -3,7 +3,8 @@ use strict;
 use warnings;
 use HTML::TreeBuilder::XPath 0.14;
 use Exporter 'import';
-use Carp 'croak';
+use Carp 'confess';
+use Log::Log4perl 1.57 qw(get_logger :levels);
 
 use App::SpamcupNG::Error::Factory   qw(create_error);
 use App::SpamcupNG::Warning::Factory qw(create_warning);
@@ -20,7 +21,7 @@ my %regexes = (
     message_age => qr/^Message\sis\s(\d+)\s(\w+)\sold/
 );
 
-our $VERSION = '0.018'; # VERSION
+our $VERSION = '0.019'; # VERSION
 
 =head1 NAME
 
@@ -62,7 +63,7 @@ case.
 
 sub find_header_info {
     my $content_ref = shift;
-    croak "Must receive an scalar reference as parameter"
+    confess "Must receive an scalar reference as parameter"
       unless ( ref($content_ref) eq 'SCALAR' );
     my $tree = HTML::TreeBuilder::XPath->new;
     $tree->parse_content($$content_ref);
@@ -142,7 +143,7 @@ If nothing is found, returns C<undef>;
 
 sub find_message_age {
     my $content_ref = shift;
-    croak "Must receive an scalar reference as parameter"
+    confess "Must receive an scalar reference as parameter"
       unless ( ref($content_ref) eq 'SCALAR' );
     my $tree = HTML::TreeBuilder::XPath->new;
     $tree->parse_content($$content_ref);
@@ -178,7 +179,7 @@ Returns the ID if found, otherwise C<undef>.
 
 sub find_next_id {
     my $content_ref = shift;
-    croak "Must receive an scalar reference as parameter"
+    confess "Must receive an scalar reference as parameter"
       unless ( ref($content_ref) eq 'SCALAR' );
     my $tree = HTML::TreeBuilder::XPath->new;
     $tree->parse_content($$content_ref);
@@ -216,7 +217,7 @@ Returns an array reference with all warnings found.
 # TODO: create a single tree instance and check for everything at once
 sub find_warnings {
     my $content_ref = shift;
-    croak "Must receive an scalar reference as parameter"
+    confess "Must receive an scalar reference as parameter"
       unless ( ref($content_ref) eq 'SCALAR' );
     my $tree = HTML::TreeBuilder::XPath->new;
     $tree->parse_content($$content_ref);
@@ -256,7 +257,7 @@ Returns an array reference with all errors found.
 
 sub find_errors {
     my $content_ref = shift;
-    croak "Must receive an scalar reference as parameter"
+    confess "Must receive an scalar reference as parameter"
       unless ( ref($content_ref) eq 'SCALAR' );
     my $tree = HTML::TreeBuilder::XPath->new;
     $tree->parse_content($$content_ref);
@@ -317,7 +318,7 @@ Returns an array reference with all best contacts found.
 
 sub find_best_contacts {
     my $content_ref = shift;
-    croak "Must receive an scalar reference as parameter"
+    confess "Must receive an scalar reference as parameter"
       unless ( ref($content_ref) eq 'SCALAR' );
     my $tree = HTML::TreeBuilder::XPath->new;
     $tree->parse_content($content_ref);
@@ -356,7 +357,7 @@ Returns an array reference with all the lines of the e-mail header found.
 
 sub find_spam_header {
     my $content_ref = shift;
-    croak "Must receive an scalar reference as parameter"
+    confess "Must receive an scalar reference as parameter"
       unless ( ref($content_ref) eq 'SCALAR' );
     my $formatted //= 0;
     my $tree = HTML::TreeBuilder::XPath->new;
@@ -380,7 +381,7 @@ sub find_spam_header {
         if (   ( scalar(@nodes) != 1 )
             or ( ref( $nodes[0] ) ne 'HTML::Element' ) )
         {
-            croak 'Unexpected content of SPAM header: ' . Dumper(@nodes);
+            confess 'Unexpected content of SPAM header: ' . Dumper(@nodes);
         }
 
         my @lines;
@@ -430,14 +431,16 @@ Returns an array reference, where each item is a string.
 
 sub find_receivers {
     my $content_ref = shift;
-    croak "Must receive an scalar reference as parameter"
+    confess "Must receive an scalar reference as parameter"
       unless ( ref($content_ref) eq 'SCALAR' );
     my $tree = HTML::TreeBuilder::XPath->new;
     $tree->parse_content($content_ref);
     my @nodes = $tree->findnodes('//*[@id="content"]');
     my @receivers;
-    my $devnull     = q{/dev/null'ing};
-    my $report_sent = 'Spam report id';
+    my $devnull          = q{/dev/null'ing};
+    my $report_sent      = 'Spam report id';
+    my $logger           = get_logger('SpamcupNG');
+    my $reports_disabled = 'Reports disabled for';
 
     foreach my $node (@nodes) {
         foreach my $inner ( $node->content_list() ) {
@@ -460,8 +463,21 @@ sub find_receivers {
             {
                 $result_ref = [ $parts[6], $parts[3] ];
             }
+
+            # Reports disabled for bondedsender@admin.spamcop.net
+            elsif (
+                substr( $inner, 0, length($reports_disabled) ) eq
+                $reports_disabled )
+            {
+                # must generate a random value due table PK
+                $result_ref = [ $parts[-1], join( '-', 'N/A', time() ) ];
+            }
             else {
-                warn "Unexpected receiver format: $inner";
+                $logger->fatal("Unexpected receiver format: $inner");
+                $logger->info('Logging entire HTML content for revision');
+                $logger->info($$content_ref);
+                $logger->logdie(
+                    'Impossible to continue, try to manually report the SPAM');
             }
 
             push( @receivers, $result_ref );

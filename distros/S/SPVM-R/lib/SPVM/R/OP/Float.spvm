@@ -538,7 +538,7 @@ class R::OP::Float {
   
   static method seq_length : R::NDArray::Float ($begin : float, $end : float, $length : int) {
     
-    my $by = (float)(($end - $begin) / $length);
+    my $by = (float)(($end - $begin + 1) / $length);
     
     my $ret_ndarray = &seq($begin, $end, $by);
     
@@ -1122,6 +1122,8 @@ class R::OP::Float {
       $x_data_intpart->[$i] = $intpart;
     }
     
+    $intpart_ndarray_ref->[0] = $intpart_ndarray;
+    
     return $ret_ndarray;
   }
   
@@ -1623,7 +1625,7 @@ class R::OP::Float {
     
     my $x_length = $x_ndarray->length;
     
-    my $y_length = $x_ndarray->length;
+    my $y_length = $y_ndarray->length;
     
     my $ret_length = $x_length * $y_length;
     

@@ -125,33 +125,31 @@ subtest perl_v5_12 => sub {
   strict_ok($filename);
 };
 
-exit;
-
 {
-	my %data;
-	sub make_file {
-		my ($filename, $name) = @_;
-		if (not %data) {
-			my $section_name;
-			while (my $row = <DATA>) {
-				if (not $section_name) {
-					$section_name = $row;
-					chomp $section_name;
-					next;
-				}
-				if ($row =~ /^---------/) {
-					undef $section_name;
-					next;
-				}
-				die 'Undefined section_name - internal test error' if not defined $section_name;
-				$data{$section_name} .= $row;
-			}
-		}
-		open my $fh, '>', $filename or die "Could not open '$filename' for writing. $!";
-		print $fh $data{$name};
-		close $fh;
-		return $filename;
-	}
+    my %data;
+    sub make_file {
+    	my ($filename, $name) = @_;
+    	if (not %data) {
+    		my $section_name;
+    		while (my $row = <DATA>) {
+    			if (not $section_name) {
+    				$section_name = $row;
+    				chomp $section_name;
+    				next;
+    			}
+    			if ($row =~ /^---------/) {
+    				undef $section_name;
+    				next;
+    			}
+    			die 'Undefined section_name - internal test error' if not defined $section_name;
+    			$data{$section_name} .= $row;
+    		}
+    	}
+    	open my $fh, '>', $filename or die "Could not open '$filename' for writing. $!";
+    	print $fh $data{$name};
+    	close $fh;
+    	return $filename;
+    }
   #return $HAS_WIN32 ? Win32::GetLongPathName($filename) : $filename;
 }
 
@@ -172,7 +170,7 @@ sub make_warning_files {
 
   my ($fh2, $filename2) = tempfile( DIR => $tmpdir, SUFFIX => '.pl' );
   print $fh2 <<'DUMMY';
-#!/usr/bin/perl -vw
+#!/usr/bin/perl -w
 use strict;
 print "Hello world";
 

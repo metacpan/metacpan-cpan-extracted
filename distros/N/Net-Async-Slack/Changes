@@ -1,6 +1,13 @@
 
 Revision history for Net-Async-Slack
 
+0.015     2024-07-23 08:52:47+08:00 Asia/Singapore
+    [New features]
+
+    - added `event_callback` message type for socket mode
+    - fix some API methods such as `conversations_members`, these were throwing exceptions
+    due to the `uri` parameter not being passed correctly
+
 0.014     2023-12-04 23:27:45+08:00 Asia/Singapore
     [Bugs fixed]
 

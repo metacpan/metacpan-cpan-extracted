@@ -1,3 +1,11 @@
+0.11 2024-07-22
+
+    - No changes from 0.10_01
+
+0.10_01 2024-07-19
+
+    - Test suite: remove abuse counter tests on domain check (RT 154437)
+
 0.10 2024-04-22
 
     - Update minimum Net::EPP version to 0.27

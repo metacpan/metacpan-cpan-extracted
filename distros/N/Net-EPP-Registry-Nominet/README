@@ -1,6 +1,6 @@
-Net::EPP::Registry::Nominet 0.10
+Net::EPP::Registry::Nominet 0.11
 
-Released: 22nd April 2024
+Released: 22nd July 2024
 
 
 INSTALLATION
@@ -42,8 +42,7 @@ compatible interface to Net::EPP::Simple so far as is practical.
 NEW SINCE LAST PRODUCTION VERSION
 ---------------------------------
 
-Update minimum Net::EPP version to 0.27
-Remove the workaround from 0.08_01 as upstream now patched
+Test suite: remove abuse counter tests on domain check (RT 154437)
 
 See the Changes file for a complete history.
 

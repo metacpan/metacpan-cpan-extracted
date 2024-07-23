@@ -9,7 +9,7 @@ use HTTP::CookieJar::LWP 0.014;
 use Mozilla::PublicSuffix v1.0.6;
 use HTTP::Request::Common 6.44 qw(POST);
 
-our $VERSION = '0.018'; # VERSION
+our $VERSION = '0.019'; # VERSION
 
 =head1 NAME
 
@@ -127,7 +127,7 @@ sub _redact_auth_req {
         my @params = split( '&', $request->content );
         my %params =
           map { my @tmp = split( '=', $_ ); $tmp[0] => $tmp[1] } @params;
-        croak(  'Unexpected request content, missing '
+        confess('Unexpected request content, missing '
               . $self->{password_field}
               . ' field' )
           unless exists( $params{ $self->{password_field} } );
@@ -225,7 +225,7 @@ sub login {
     my $status = $response->status_line();
 
     if ( $response->code() == 500 ) {
-        $logger->fatal("Can\'t connect to server: $status");
+        $logger->die("Can\'t connect to server: $status");
     }
     else {
         $logger->warn($status);
@@ -235,7 +235,7 @@ sub login {
             return $self->login( $id, $password, 1 );
         }
 
-        $logger->fatal(
+        $logger->die(
 'Cannot connect to server or invalid credentials. Please verify your username and password and try again.'
         );
     }
@@ -270,8 +270,7 @@ sub spam_report {
     }
 
     unless ( $response->is_success ) {
-        $logger->fatal("Can't connect to server. Try again later.");
-        return undef;
+        $logger->die("Can't connect to server. Try again later.");
     }
 
     return \( $response->content );
@@ -307,8 +306,7 @@ sub complete_report {
     }
 
     unless ( $response->is_success ) {
-        $logger->fatal('Cannot connect to server. Try again later. Quitting.');
-        return undef;
+        $logger->die('Cannot connect to server. Try again later. Quitting.');
     }
 
     return \( $response->content );

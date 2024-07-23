@@ -1,0 +1,231 @@
+class TestCase::R::OP::Short {
+  
+  use Array;
+  
+  use R::OP::Short as SOP;
+  
+  static method c : int () {
+    
+    {
+      my $ret_ndarray = SOP->c((short)1);
+      
+      unless ($ret_ndarray is_type R::NDArray::Short) {
+        return 0;
+      }
+      
+      unless (Array->equals_short($ret_ndarray->data, [(short)1])) {
+        return 0;
+      }
+      
+      unless (Array->equals_int($ret_ndarray->dim, [1])) {
+        return 0;
+      }
+    }
+    
+    {
+      my $data = [(short)1, 2];
+      my $ret_ndarray = SOP->c($data);
+      
+      unless ($ret_ndarray is_type R::NDArray::Short) {
+        return 0;
+      }
+      
+      unless ($ret_ndarray->data == $data) {
+        return 0;
+      }
+      
+      unless (Array->equals_short($ret_ndarray->data, [(short)1, 2])) {
+        return 0;
+      }
+      
+      unless (Array->equals_int($ret_ndarray->dim, [2])) {
+        return 0;
+      }
+    }
+    
+    {
+      my $data = [(short)1, 2];
+      my $ret_ndarray = SOP->c(SOP->c($data));
+      
+      unless ($ret_ndarray is_type R::NDArray::Short) {
+        return 0;
+      }
+      
+      unless ($ret_ndarray->data == $data) {
+        return 0;
+      }
+      
+      unless (Array->equals_short($ret_ndarray->data, [(short)1, 2])) {
+        return 0;
+      }
+      
+      unless (Array->equals_int($ret_ndarray->dim, [2])) {
+        return 0;
+      }
+    }
+    
+    {
+      my $data = [(short)1, 2];
+      my $ret_ndarray = SOP->c(SOP->c($data), [1, 2]);
+      
+      unless ($ret_ndarray is_type R::NDArray::Short) {
+        return 0;
+      }
+      
+      unless ($ret_ndarray->data == $data) {
+        return 0;
+      }
+      
+      unless (Array->equals_short($ret_ndarray->data, [(short)1, 2])) {
+        return 0;
+      }
+      
+      unless (Array->equals_int($ret_ndarray->dim, [1, 2])) {
+        return 0;
+      }
+    }
+    
+    # Exceptions
+    {
+      {
+        eval { SOP->c(true); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+    }
+    
+    return 1;
+  }
+  
+  static method rep : int () {
+    
+    my $x_ndarray = SOP->c([(short)1, 2]);
+    
+    my $ret_ndarray = SOP->rep($x_ndarray, 2);
+    
+    unless (Array->equals_short($ret_ndarray->data, [(short)1, 2, 1, 2])) {
+      return 0;
+    }
+    
+    unless (Array->equals_int($ret_ndarray->dim, [4])) {
+      return 0;
+    }
+    
+    return 1;
+  }
+  
+  static method rep_length : int () {
+    
+    my $x_ndarray = SOP->c([(short)1, 2]);
+    
+    my $ret_ndarray = SOP->rep_length($x_ndarray, 4);
+    
+    unless (Array->equals_short($ret_ndarray->data, [(short)1, 2, 1, 2])) {
+      return 0;
+    }
+    
+    unless (Array->equals_int($ret_ndarray->dim, [4])) {
+      return 0;
+    }
+    
+    return 1;
+  }
+  
+  static method seq : int () {
+    
+    {
+      my $ret_ndarray = SOP->seq(1, 4);
+      
+      unless (Array->equals_short($ret_ndarray->data, [(short)1, 2, 3, 4])) {
+        return 0;
+      }
+      
+      unless (Array->equals_int($ret_ndarray->dim, [4])) {
+        return 0;
+      }
+    }
+    
+    {
+      my $ret_ndarray = SOP->seq(-3, 0);
+      
+      unless (Array->equals_short($ret_ndarray->data, [(short)-3, -2, -1, 0])) {
+        return 0;
+      }
+      
+      unless (Array->equals_int($ret_ndarray->dim, [4])) {
+        return 0;
+      }
+    }
+    
+    {
+      my $ret_ndarray = SOP->seq(1, 5, 2);
+      
+      unless (Array->equals_short($ret_ndarray->data, [(short)1, 3, 5])) {
+        return 0;
+      }
+      
+      unless (Array->equals_int($ret_ndarray->dim, [3])) {
+        return 0;
+      }
+    }
+    
+    {
+      my $ret_ndarray = SOP->seq(4, 1, -1);
+      
+      unless (Array->equals_short($ret_ndarray->data, [(short)4, 3, 2, 1])) {
+        return 0;
+      }
+      
+      unless (Array->equals_int($ret_ndarray->dim, [4])) {
+        return 0;
+      }
+    }
+    
+    {
+      my $ret_ndarray = SOP->seq(5, 1, -2);
+      
+      unless (Array->equals_short($ret_ndarray->data, [(short)5, 3, 1])) {
+        return 0;
+      }
+      
+      unless (Array->equals_int($ret_ndarray->dim, [3])) {
+        return 0;
+      }
+    }
+    
+    # Exceptions
+    {
+      {
+        eval { SOP->seq(1, 4, 0); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+      {
+        eval { SOP->seq(1, 4, -1); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+      {
+        eval { SOP->seq(4, 1, 1); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+    }
+    
+    $@ = undef;
+    
+    return 1;
+  }
+  
+}

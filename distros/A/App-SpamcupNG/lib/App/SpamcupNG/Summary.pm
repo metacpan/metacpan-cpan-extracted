@@ -8,7 +8,7 @@ use Set::Tiny 0.04;
 
 use App::SpamcupNG::Summary::Receiver;
 
-our $VERSION = '0.018'; # VERSION
+our $VERSION = '0.019'; # VERSION
 
 =pod
 

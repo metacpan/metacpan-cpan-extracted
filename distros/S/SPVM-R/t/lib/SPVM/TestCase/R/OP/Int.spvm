@@ -1,0 +1,1739 @@
+class TestCase::R::OP::Int {
+  
+  use Array;
+  
+  use R::OP::Int as IOP;
+  
+  static method c : int () {
+    
+    {
+      my $ret_ndarray = IOP->c((int)1);
+      
+      unless ($ret_ndarray is_type R::NDArray::Int) {
+        return 0;
+      }
+      
+      unless (Array->equals_int($ret_ndarray->data, [(int)1])) {
+        return 0;
+      }
+      
+      unless (Array->equals_int($ret_ndarray->dim, [1])) {
+        return 0;
+      }
+    }
+    
+    {
+      my $data = [(int)1, 2];
+      my $ret_ndarray = IOP->c($data);
+      
+      unless ($ret_ndarray is_type R::NDArray::Int) {
+        return 0;
+      }
+      
+      unless ($ret_ndarray->data == $data) {
+        return 0;
+      }
+      
+      unless (Array->equals_int($ret_ndarray->data, [(int)1, 2])) {
+        return 0;
+      }
+      
+      unless (Array->equals_int($ret_ndarray->dim, [2])) {
+        return 0;
+      }
+    }
+    
+    {
+      my $data = [(int)1, 2];
+      my $ret_ndarray = IOP->c(IOP->c($data));
+      
+      unless ($ret_ndarray is_type R::NDArray::Int) {
+        return 0;
+      }
+      
+      unless ($ret_ndarray->data == $data) {
+        return 0;
+      }
+      
+      unless (Array->equals_int($ret_ndarray->data, [(int)1, 2])) {
+        return 0;
+      }
+      
+      unless (Array->equals_int($ret_ndarray->dim, [2])) {
+        return 0;
+      }
+    }
+    
+    {
+      my $data = [(int)1, 2];
+      my $ret_ndarray = IOP->c(IOP->c($data), [1, 2]);
+      
+      unless ($ret_ndarray is_type R::NDArray::Int) {
+        return 0;
+      }
+      
+      unless ($ret_ndarray->data == $data) {
+        return 0;
+      }
+      
+      unless (Array->equals_int($ret_ndarray->data, [(int)1, 2])) {
+        return 0;
+      }
+      
+      unless (Array->equals_int($ret_ndarray->dim, [1, 2])) {
+        return 0;
+      }
+    }
+    
+    # Exceptions
+    {
+      {
+        eval { IOP->c(true); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+    }
+    
+    return 1;
+  }
+  
+  static method add : int () {
+    
+    my $x_ndarray = IOP->c([(int)1, 2], [1, 2]);
+    
+    my $y_ndarray = IOP->c([(int)3, 4], [1, 2]);
+    
+    my $ret_ndarray = IOP->add($x_ndarray, $y_ndarray);
+    
+    unless ($ret_ndarray is_type R::NDArray::Int) {
+      return 0;
+    }
+    
+    unless (Array->equals_int($ret_ndarray->data, [(int)4, 6])) {
+      return 0;
+    }
+    
+    unless (Array->equals_int($ret_ndarray->dim, [1, 2])) {
+      return 0;
+    }
+    
+    # Exceptions
+    {
+      {
+        my $x_ndarray = IOP->c([(int)1, 2], [1, 2]);
+        
+        my $y_ndarray = IOP->c([(int)3, 4], [1, 2]);
+        
+        eval { IOP->add(undef, $y_ndarray); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+      {
+        my $x_ndarray = IOP->c([(int)1, 2], [1, 2]);
+        
+        my $y_ndarray = IOP->c([(int)3, 4], [1, 2]);
+        
+        eval { IOP->add($x_ndarray, undef); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+      {
+        my $x_ndarray = IOP->c([(int)1, 2], [1, 2]);
+        
+        my $y_ndarray = IOP->c([(int)3, 4], [2, 1]);
+        
+        eval { IOP->add($x_ndarray, $y_ndarray); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+    }
+    
+    $@ = undef;
+    
+    return 1;
+  }
+  
+  static method sub : int () {
+    
+    my $x_ndarray = IOP->c([(int)1, 2], [1, 2]);
+    
+    my $y_ndarray = IOP->c([(int)3, 4], [1, 2]);
+    
+    my $ret_ndarray = IOP->sub($x_ndarray, $y_ndarray);
+    
+    unless ($ret_ndarray is_type R::NDArray::Int) {
+      return 0;
+    }
+    
+    unless (Array->equals_int($ret_ndarray->data, [(int)-2, -2])) {
+      return 0;
+    }
+    
+    unless (Array->equals_int($ret_ndarray->dim, [1, 2])) {
+      return 0;
+    }
+    
+    # Exceptions
+    {
+      {
+        my $x_ndarray = IOP->c([(int)1, 2], [1, 2]);
+        
+        my $y_ndarray = IOP->c([(int)3, 4], [1, 2]);
+        
+        eval { IOP->sub(undef, $y_ndarray); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+      {
+        my $x_ndarray = IOP->c([(int)1, 2], [1, 2]);
+        
+        my $y_ndarray = IOP->c([(int)3, 4], [1, 2]);
+        
+        eval { IOP->sub($x_ndarray, undef); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+      {
+        my $x_ndarray = IOP->c([(int)1, 2], [1, 2]);
+        
+        my $y_ndarray = IOP->c([(int)3, 4], [2, 1]);
+        
+        eval { IOP->sub($x_ndarray, $y_ndarray); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+    }
+    
+    $@ = undef;
+    
+    return 1;
+  }
+
+  static method mul : int () {
+    
+    my $x_ndarray = IOP->c([(int)1, 2], [1, 2]);
+    
+    my $y_ndarray = IOP->c([(int)3, 4], [1, 2]);
+    
+    my $ret_ndarray = IOP->mul($x_ndarray, $y_ndarray);
+    
+    unless ($ret_ndarray is_type R::NDArray::Int) {
+      return 0;
+    }
+    
+    unless (Array->equals_int($ret_ndarray->data, [(int)3, 8])) {
+      return 0;
+    }
+    
+    unless (Array->equals_int($ret_ndarray->dim, [1, 2])) {
+      return 0;
+    }
+    
+    # Exceptions
+    {
+      {
+        my $x_ndarray = IOP->c([(int)1, 2], [1, 2]);
+        
+        my $y_ndarray = IOP->c([(int)3, 4], [1, 2]);
+        
+        eval { IOP->mul(undef, $y_ndarray); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+      {
+        my $x_ndarray = IOP->c([(int)1, 2], [1, 2]);
+        
+        my $y_ndarray = IOP->c([(int)3, 4], [1, 2]);
+        
+        eval { IOP->mul($x_ndarray, undef); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+      {
+        my $x_ndarray = IOP->c([(int)1, 2], [1, 2]);
+        
+        my $y_ndarray = IOP->c([(int)3, 4], [2, 1]);
+        
+        eval { IOP->mul($x_ndarray, $y_ndarray); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+    }
+    
+    $@ = undef;
+    
+    return 1;
+  }
+
+  static method scamul : int () {
+    
+    my $x_ndarray = IOP->c([(int)3, 4], [1, 2]);
+    
+    my $scalar_ndarray = IOP->c((int)3);
+    
+    my $ret_ndarray = IOP->scamul($x_ndarray, $scalar_ndarray);
+    
+    unless ($ret_ndarray is_type R::NDArray::Int) {
+      return 0;
+    }
+    
+    unless (Array->equals_int($ret_ndarray->data, [(int)9, 12])) {
+      return 0;
+    }
+    
+    unless (Array->equals_int($ret_ndarray->dim, [1, 2])) {
+      return 0;
+    }
+    
+    # Exceptions
+    {
+      {
+        my $x_ndarray = IOP->c([(int)3, 4], [1, 2]);
+        
+        my $scalar_ndarray = IOP->c((int)3);
+        
+        eval { IOP->scamul(undef, $scalar_ndarray); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+      {
+        my $x_ndarray = IOP->c([(int)3, 4], [1, 2]);
+        
+        my $scalar_ndarray = IOP->c((int)3);
+        
+        eval { IOP->scamul($x_ndarray, undef); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+      {
+        my $scalar_ndarray = IOP->c([(int)1, 2], [1, 2]);
+        
+        my $x_ndarray = IOP->c([(int)3, 4], [2, 1]);
+        
+        eval { IOP->scamul($x_ndarray, $scalar_ndarray); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+    }
+    
+    $@ = undef;
+    
+    return 1;
+  }
+  
+  static method div : int () {
+    
+    my $x_ndarray = IOP->c([(int)4, 12], [1, 2]);
+    
+    my $y_ndarray = IOP->c([(int)2, 4], [1, 2]);
+    
+    my $ret_ndarray = IOP->div($x_ndarray, $y_ndarray);
+    
+    unless ($ret_ndarray is_type R::NDArray::Int) {
+      return 0;
+    }
+    
+    unless (Array->equals_int($ret_ndarray->data, [(int)2, 3])) {
+      return 0;
+    }
+    
+    unless (Array->equals_int($ret_ndarray->dim, [1, 2])) {
+      return 0;
+    }
+    
+    # Exceptions
+    {
+      {
+        my $x_ndarray = IOP->c([(int)1, 2], [1, 2]);
+        
+        my $y_ndarray = IOP->c([(int)3, 4], [1, 2]);
+        
+        eval { IOP->div(undef, $y_ndarray); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+      {
+        my $x_ndarray = IOP->c([(int)1, 2], [1, 2]);
+        
+        my $y_ndarray = IOP->c([(int)3, 4], [1, 2]);
+        
+        eval { IOP->div($x_ndarray, undef); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+      {
+        my $x_ndarray = IOP->c([(int)1, 2], [1, 2]);
+        
+        my $y_ndarray = IOP->c([(int)3, 4], [2, 1]);
+        
+        eval { IOP->div($x_ndarray, $y_ndarray); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+    }
+    
+    $@ = undef;
+    
+    return 1;
+  }
+  
+  static method div_u : int () {
+    
+    my $x_ndarray = IOP->c([(int)4, 12], [1, 2]);
+    
+    my $y_ndarray = IOP->c([(int)2, 4], [1, 2]);
+    
+    my $ret_ndarray = IOP->div_u($x_ndarray, $y_ndarray);
+    
+    unless ($ret_ndarray is_type R::NDArray::Int) {
+      return 0;
+    }
+    
+    unless (Array->equals_int($ret_ndarray->data, [(int)2, 3])) {
+      return 0;
+    }
+    
+    unless (Array->equals_int($ret_ndarray->dim, [1, 2])) {
+      return 0;
+    }
+    
+    # Exceptions
+    {
+      {
+        my $x_ndarray = IOP->c([(int)1, 2], [1, 2]);
+        
+        my $y_ndarray = IOP->c([(int)3, 4], [1, 2]);
+        
+        eval { IOP->div_u(undef, $y_ndarray); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+      {
+        my $x_ndarray = IOP->c([(int)1, 2], [1, 2]);
+        
+        my $y_ndarray = IOP->c([(int)3, 4], [1, 2]);
+        
+        eval { IOP->div_u($x_ndarray, undef); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+      {
+        my $x_ndarray = IOP->c([(int)1, 2], [1, 2]);
+        
+        my $y_ndarray = IOP->c([(int)3, 4], [2, 1]);
+        
+        eval { IOP->div_u($x_ndarray, $y_ndarray); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+    }
+    
+    $@ = undef;
+    
+    return 1;
+  }
+  
+  static method mod : int () {
+    
+    my $x_ndarray = IOP->c([(int)1, 3], [1, 2]);
+    
+    my $y_ndarray = IOP->c([(int)2, 4], [1, 2]);
+    
+    my $ret_ndarray = IOP->mod($x_ndarray, $y_ndarray);
+    
+    unless ($ret_ndarray is_type R::NDArray::Int) {
+      return 0;
+    }
+    
+    unless (Array->equals_int($ret_ndarray->data, [$x_ndarray->data->[0] % $y_ndarray->data->[0], $x_ndarray->data->[1] % $y_ndarray->data->[1]])) {
+      return 0;
+    }
+    
+    unless (Array->equals_int($ret_ndarray->dim, [1, 2])) {
+      return 0;
+    }
+    
+    # Exceptions
+    {
+      {
+        my $x_ndarray = IOP->c([(int)1, 2], [1, 2]);
+        
+        my $y_ndarray = IOP->c([(int)3, 4], [1, 2]);
+        
+        eval { IOP->mod(undef, $y_ndarray); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+      {
+        my $x_ndarray = IOP->c([(int)1, 2], [1, 2]);
+        
+        my $y_ndarray = IOP->c([(int)3, 4], [1, 2]);
+        
+        eval { IOP->mod($x_ndarray, undef); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+      {
+        my $x_ndarray = IOP->c([(int)1, 2], [1, 2]);
+        
+        my $y_ndarray = IOP->c([(int)3, 4], [2, 1]);
+        
+        eval { IOP->mod($x_ndarray, $y_ndarray); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+    }
+    
+    $@ = undef;
+    
+    return 1;
+  }
+  
+  static method mod_u : int () {
+    
+    my $x_ndarray = IOP->c([(int)1, 3], [1, 2]);
+    
+    my $y_ndarray = IOP->c([(int)2, 4], [1, 2]);
+    
+    my $ret_ndarray = IOP->mod_u($x_ndarray, $y_ndarray);
+    
+    unless ($ret_ndarray is_type R::NDArray::Int) {
+      return 0;
+    }
+    
+    unless (Array->equals_int($ret_ndarray->data, [$x_ndarray->data->[0] mod_uint $y_ndarray->data->[0], $x_ndarray->data->[1] mod_uint $y_ndarray->data->[1]])) {
+      return 0;
+    }
+    
+    unless (Array->equals_int($ret_ndarray->dim, [1, 2])) {
+      return 0;
+    }
+    
+    # Exceptions
+    {
+      {
+        my $x_ndarray = IOP->c([(int)1, 2], [1, 2]);
+        
+        my $y_ndarray = IOP->c([(int)3, 4], [1, 2]);
+        
+        eval { IOP->mod_u(undef, $y_ndarray); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+      {
+        my $x_ndarray = IOP->c([(int)1, 2], [1, 2]);
+        
+        my $y_ndarray = IOP->c([(int)3, 4], [1, 2]);
+        
+        eval { IOP->mod_u($x_ndarray, undef); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+      {
+        my $x_ndarray = IOP->c([(int)1, 2], [1, 2]);
+        
+        my $y_ndarray = IOP->c([(int)3, 4], [2, 1]);
+        
+        eval { IOP->mod_u($x_ndarray, $y_ndarray); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+    }
+    
+    $@ = undef;
+    
+    return 1;
+  }
+  
+  static method scadiv : int () {
+    
+    my $x_ndarray = IOP->c([(int)4, 2], [1, 2]);
+    
+    my $scalar_ndarray = IOP->c((int)2);
+    
+    my $ret_ndarray = IOP->scadiv($x_ndarray, $scalar_ndarray);
+    
+    unless ($ret_ndarray is_type R::NDArray::Int) {
+      return 0;
+    }
+    
+    unless (Array->equals_int($ret_ndarray->data, [(int)2, 1])) {
+      return 0;
+    }
+    
+    unless (Array->equals_int($ret_ndarray->dim, [1, 2])) {
+      return 0;
+    }
+    
+    # Exceptions
+    {
+      {
+        my $x_ndarray = IOP->c([(int)3, 4], [1, 2]);
+        
+        my $scalar_ndarray = IOP->c((int)3);
+        
+        eval { IOP->scadiv($x_ndarray, undef); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+      {
+        my $x_ndarray = IOP->c([(int)3, 4], [1, 2]);
+        
+        my $scalar_ndarray = IOP->c((int)3);
+        
+        eval { IOP->scadiv(undef, $scalar_ndarray); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+      {
+        my $x_ndarray = IOP->c([(int)3, 4], [2, 1]);
+        
+        my $scalar_ndarray = IOP->c([(int)1, 2], [1, 2]);
+        
+        eval { IOP->scadiv($x_ndarray, $scalar_ndarray); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+    }
+    
+    $@ = undef;
+    
+    return 1;
+  }
+  
+  static method neg : int () {
+    
+    my $x_ndarray = IOP->c([(int)1, 2], [1, 2]);
+    
+    my $ret_ndarray = IOP->neg($x_ndarray);
+    
+    unless ($ret_ndarray is_type R::NDArray::Int) {
+      return 0;
+    }
+    
+    unless (Array->equals_int($ret_ndarray->data, [(int)-1, -2])) {
+      return 0;
+    }
+    
+    unless (Array->equals_int($ret_ndarray->dim, [1, 2])) {
+      return 0;
+    }
+    
+    # Exceptions
+    {
+      {
+        my $x_ndarray = IOP->c([(int)1, 2], [1, 2]);
+        
+        eval { IOP->neg(undef); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+    }
+    
+    $@ = undef;
+    
+    return 1;
+  }
+  
+  static method abs : int () {
+    
+    my $x_ndarray = IOP->c([(int)1, -2], [1, 2]);
+    
+    my $ret_ndarray = IOP->abs($x_ndarray);
+    
+    unless ($ret_ndarray is_type R::NDArray::Int) {
+      return 0;
+    }
+    
+    unless (Array->equals_int($ret_ndarray->data, [(int)1, 2])) {
+      return 0;
+    }
+    
+    unless (Array->equals_int($ret_ndarray->dim, [1, 2])) {
+      return 0;
+    }
+    
+    # Exceptions
+    {
+      {
+        my $x_ndarray = IOP->c([(int)1, 2], [1, 2]);
+        
+        eval { IOP->abs(undef); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+    }
+    
+    $@ = undef;
+    
+    return 1;
+  }
+  
+  static method eq : int () {
+    
+    my $x_ndarray = IOP->c([(int)1, 1], [1, 2]);
+    
+    my $y_ndarray = IOP->c([(int)1, 2], [1, 2]);
+    
+    my $ret_ndarray = IOP->eq($x_ndarray, $y_ndarray);
+    
+    unless ($ret_ndarray is_type R::NDArray::Int) {
+      return 0;
+    }
+    
+    unless (Array->equals_int($ret_ndarray->data, [1, 0])) {
+      return 0;
+    }
+    
+    unless (Array->equals_int($ret_ndarray->dim, [1, 2])) {
+      return 0;
+    }
+    
+    # Exceptions
+    {
+      {
+        my $x_ndarray = IOP->c([(int)1, 2], [1, 2]);
+        
+        my $y_ndarray = IOP->c([(int)3, 4], [1, 2]);
+        
+        eval { IOP->eq(undef, $y_ndarray); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+      {
+        my $x_ndarray = IOP->c([(int)1, 2], [1, 2]);
+        
+        my $y_ndarray = IOP->c([(int)3, 4], [1, 2]);
+        
+        eval { IOP->eq($x_ndarray, undef); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+      {
+        my $x_ndarray = IOP->c([(int)1, 2], [1, 2]);
+        
+        my $y_ndarray = IOP->c([(int)3, 4], [2, 1]);
+        
+        eval { IOP->eq($x_ndarray, $y_ndarray); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+    }
+    
+    $@ = undef;
+    
+    return 1;
+  }
+  
+  static method ne : int () {
+    
+    my $x_ndarray = IOP->c([(int)1, 1], [1, 2]);
+    
+    my $y_ndarray = IOP->c([(int)1, 2], [1, 2]);
+    
+    my $ret_ndarray = IOP->ne($x_ndarray, $y_ndarray);
+    
+    unless ($ret_ndarray is_type R::NDArray::Int) {
+      return 0;
+    }
+    
+    unless (Array->equals_int($ret_ndarray->data, [0, 1])) {
+      return 0;
+    }
+    
+    unless (Array->equals_int($ret_ndarray->dim, [1, 2])) {
+      return 0;
+    }
+    
+    # Exceptions
+    {
+      {
+        my $x_ndarray = IOP->c([(int)1, 2], [1, 2]);
+        
+        my $y_ndarray = IOP->c([(int)3, 4], [1, 2]);
+        
+        eval { IOP->ne(undef, $y_ndarray); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+      {
+        my $x_ndarray = IOP->c([(int)1, 2], [1, 2]);
+        
+        my $y_ndarray = IOP->c([(int)3, 4], [1, 2]);
+        
+        eval { IOP->ne($x_ndarray, undef); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+      {
+        my $x_ndarray = IOP->c([(int)1, 2], [1, 2]);
+        
+        my $y_ndarray = IOP->c([(int)3, 4], [2, 1]);
+        
+        eval { IOP->ne($x_ndarray, $y_ndarray); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+    }
+    
+    $@ = undef;
+    
+    return 1;
+  }
+  
+  static method gt : int () {
+    
+    my $x_ndarray = IOP->c([(int)1, 1, 1], [1, 3]);
+    
+    my $y_ndarray = IOP->c([(int)0, 1, 2], [1, 3]);
+    
+    my $ret_ndarray = IOP->gt($x_ndarray, $y_ndarray);
+    
+    unless ($ret_ndarray is_type R::NDArray::Int) {
+      return 0;
+    }
+    
+    unless (Array->equals_int($ret_ndarray->data, [1, 0, 0])) {
+      return 0;
+    }
+    
+    unless (Array->equals_int($ret_ndarray->dim, [1, 3])) {
+      return 0;
+    }
+    
+    # Exceptions
+    {
+      {
+        my $x_ndarray = IOP->c([(int)1, 1, 1], [1, 3]);
+        
+        my $y_ndarray = IOP->c([(int)0, 1, 2], [1, 3]);
+        
+        eval { IOP->gt(undef, $y_ndarray); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+      {
+        my $x_ndarray = IOP->c([(int)1, 1, 1], [1, 3]);
+        
+        my $y_ndarray = IOP->c([(int)0, 1, 2], [1, 3]);
+        
+        eval { IOP->gt($x_ndarray, undef); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+      {
+        my $x_ndarray = IOP->c([(int)1, 1, 1], [1, 3]);
+        
+        my $y_ndarray = IOP->c([(int)0, 1, 2], [3, 1]);
+        
+        eval { IOP->gt($x_ndarray, $y_ndarray); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+    }
+    
+    $@ = undef;
+    
+    return 1;
+  }
+  
+  static method ge : int () {
+    
+    my $x_ndarray = IOP->c([(int)1, 1, 1], [1, 3]);
+    
+    my $y_ndarray = IOP->c([(int)0, 1, 2], [1, 3]);
+    
+    my $ret_ndarray = IOP->ge($x_ndarray, $y_ndarray);
+    
+    unless ($ret_ndarray is_type R::NDArray::Int) {
+      return 0;
+    }
+    
+    unless (Array->equals_int($ret_ndarray->data, [1, 1, 0])) {
+      return 0;
+    }
+    
+    unless (Array->equals_int($ret_ndarray->dim, [1, 3])) {
+      return 0;
+    }
+    
+    # Exceptions
+    {
+      {
+        my $x_ndarray = IOP->c([(int)1, 1, 1], [1, 3]);
+        
+        my $y_ndarray = IOP->c([(int)0, 1, 2], [1, 3]);
+        
+        eval { IOP->ge(undef, $y_ndarray); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+      {
+        my $x_ndarray = IOP->c([(int)1, 1, 1], [1, 3]);
+        
+        my $y_ndarray = IOP->c([(int)0, 1, 2], [1, 3]);
+        
+        eval { IOP->ge($x_ndarray, undef); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+      {
+        my $x_ndarray = IOP->c([(int)1, 1, 1], [1, 3]);
+        
+        my $y_ndarray = IOP->c([(int)0, 1, 2], [3, 1]);
+        
+        eval { IOP->ge($x_ndarray, $y_ndarray); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+    }
+    
+    $@ = undef;
+    
+    return 1;
+  }
+  
+  static method lt : int () {
+    
+    my $x_ndarray = IOP->c([(int)1, 1, 1], [1, 3]);
+    
+    my $y_ndarray = IOP->c([(int)0, 1, 2], [1, 3]);
+    
+    my $ret_ndarray = IOP->lt($x_ndarray, $y_ndarray);
+    
+    unless ($ret_ndarray is_type R::NDArray::Int) {
+      return 0;
+    }
+    
+    unless (Array->equals_int($ret_ndarray->data, [0, 0, 1])) {
+      return 0;
+    }
+    
+    unless (Array->equals_int($ret_ndarray->dim, [1, 3])) {
+      return 0;
+    }
+    
+    # Exceptions
+    {
+      {
+        my $x_ndarray = IOP->c([(int)1, 1, 1], [1, 3]);
+        
+        my $y_ndarray = IOP->c([(int)0, 1, 2], [1, 3]);
+        
+        eval { IOP->lt(undef, $y_ndarray); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+      {
+        my $x_ndarray = IOP->c([(int)1, 1, 1], [1, 3]);
+        
+        my $y_ndarray = IOP->c([(int)0, 1, 2], [1, 3]);
+        
+        eval { IOP->lt($x_ndarray, undef); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+      {
+        my $x_ndarray = IOP->c([(int)1, 1, 1], [1, 3]);
+        
+        my $y_ndarray = IOP->c([(int)0, 1, 2], [3, 1]);
+        
+        eval { IOP->lt($x_ndarray, $y_ndarray); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+    }
+    
+    $@ = undef;
+    
+    return 1;
+  }
+  
+  static method le : int () {
+    
+    my $x_ndarray = IOP->c([(int)1, 1, 1], [1, 3]);
+    
+    my $y_ndarray = IOP->c([(int)0, 1, 2], [1, 3]);
+    
+    my $ret_ndarray = IOP->le($x_ndarray, $y_ndarray);
+    
+    unless ($ret_ndarray is_type R::NDArray::Int) {
+      return 0;
+    }
+    
+    unless (Array->equals_int($ret_ndarray->data, [0, 1, 1])) {
+      return 0;
+    }
+    
+    unless (Array->equals_int($ret_ndarray->dim, [1, 3])) {
+      return 0;
+    }
+    
+    # Exceptions
+    {
+      {
+        my $x_ndarray = IOP->c([(int)1, 1, 1], [1, 3]);
+        
+        my $y_ndarray = IOP->c([(int)0, 1, 2], [1, 3]);
+        
+        eval { IOP->le(undef, $y_ndarray); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+      {
+        my $x_ndarray = IOP->c([(int)1, 1, 1], [1, 3]);
+        
+        my $y_ndarray = IOP->c([(int)0, 1, 2], [1, 3]);
+        
+        eval { IOP->le($x_ndarray, undef); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+      {
+        my $x_ndarray = IOP->c([(int)1, 1, 1], [1, 3]);
+        
+        my $y_ndarray = IOP->c([(int)0, 1, 2], [3, 1]);
+        
+        eval { IOP->le($x_ndarray, $y_ndarray); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+    }
+    
+    $@ = undef;
+    
+    return 1;
+  }
+  
+  static method rep : int () {
+    
+    my $x_ndarray = IOP->c([(int)1, 2]);
+    
+    my $ret_ndarray = IOP->rep($x_ndarray, 2);
+    
+    unless (Array->equals_int($ret_ndarray->data, [(int)1, 2, 1, 2])) {
+      return 0;
+    }
+    
+    unless (Array->equals_int($ret_ndarray->dim, [4])) {
+      return 0;
+    }
+    
+    return 1;
+  }
+  
+  static method rep_length : int () {
+    
+    my $x_ndarray = IOP->c([(int)1, 2]);
+    
+    my $ret_ndarray = IOP->rep_length($x_ndarray, 4);
+    
+    unless (Array->equals_int($ret_ndarray->data, [(int)1, 2, 1, 2])) {
+      return 0;
+    }
+    
+    unless (Array->equals_int($ret_ndarray->dim, [4])) {
+      return 0;
+    }
+    
+    return 1;
+  }
+  
+  static method seq : int () {
+    
+    {
+      my $ret_ndarray = IOP->seq(1, 4);
+      
+      unless (Array->equals_int($ret_ndarray->data, [(int)1, 2, 3, 4])) {
+        return 0;
+      }
+      
+      unless (Array->equals_int($ret_ndarray->dim, [4])) {
+        return 0;
+      }
+    }
+    
+    {
+      my $ret_ndarray = IOP->seq(-3, 0);
+      
+      unless (Array->equals_int($ret_ndarray->data, [(int)-3, -2, -1, 0])) {
+        return 0;
+      }
+      
+      unless (Array->equals_int($ret_ndarray->dim, [4])) {
+        return 0;
+      }
+    }
+    
+    {
+      my $ret_ndarray = IOP->seq(1, 5, 2);
+      
+      unless (Array->equals_int($ret_ndarray->data, [(int)1, 3, 5])) {
+        return 0;
+      }
+      
+      unless (Array->equals_int($ret_ndarray->dim, [3])) {
+        return 0;
+      }
+    }
+    
+    {
+      my $ret_ndarray = IOP->seq(4, 1, -1);
+      
+      unless (Array->equals_int($ret_ndarray->data, [(int)4, 3, 2, 1])) {
+        return 0;
+      }
+      
+      unless (Array->equals_int($ret_ndarray->dim, [4])) {
+        return 0;
+      }
+    }
+    
+    {
+      my $ret_ndarray = IOP->seq(5, 1, -2);
+      
+      unless (Array->equals_int($ret_ndarray->data, [(int)5, 3, 1])) {
+        return 0;
+      }
+      
+      unless (Array->equals_int($ret_ndarray->dim, [3])) {
+        return 0;
+      }
+    }
+    
+    # Exceptions
+    {
+      {
+        eval { IOP->seq(1, 4, 0); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+      {
+        eval { IOP->seq(1, 4, -1); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+      {
+        eval { IOP->seq(4, 1, 1); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+    }
+    
+    $@ = undef;
+    
+    return 1;
+  }
+  
+  static method sum : int () {
+    
+    my $x_ndarray = IOP->c([(int)1, 2], [1, 2]);
+    
+    my $ret_ndarray = IOP->sum($x_ndarray);
+    
+    unless ($ret_ndarray is_type R::NDArray::Int) {
+      return 0;
+    }
+    
+    unless (Array->equals_int($ret_ndarray->data, [(int)3])) {
+      return 0;
+    }
+    
+    unless (Array->equals_int($ret_ndarray->dim, [1])) {
+      return 0;
+    }
+    
+    # Exceptions
+    {
+      {
+        my $x_ndarray = IOP->c([(int)1, 2], [1, 2]);
+        
+        eval { IOP->sum(undef); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+    }
+    
+    $@ = undef;
+    
+    return 1;
+  }
+  
+  static method cumsum : int () {
+    
+    my $x_ndarray = IOP->c([(int)1, 2], [2]);
+    
+    my $ret_ndarray = IOP->cumsum($x_ndarray);
+    
+    unless ($ret_ndarray is_type R::NDArray::Int) {
+      return 0;
+    }
+    
+    unless (Array->equals_int($ret_ndarray->data, [(int)1, 3])) {
+      return 0;
+    }
+    
+    
+    unless (Array->equals_int($ret_ndarray->dim, [2])) {
+      return 0;
+    }
+    
+    # Exceptions
+    {
+      {
+        my $x_ndarray = IOP->c([(int)1, 2], [1, 2]);
+        
+        eval { IOP->cumsum(undef); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+      {
+        my $x_ndarray = IOP->c([(int)1, 2], [1, 2]);
+        
+        eval { IOP->cumsum($x_ndarray); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+    }
+    
+    $@ = undef;
+    
+    return 1;
+  }
+  
+  static method prod : int () {
+    
+    my $x_ndarray = IOP->c([(int)2, 3], [1, 2]);
+    
+    my $ret_ndarray = IOP->prod($x_ndarray);
+    
+    unless ($ret_ndarray is_type R::NDArray::Int) {
+      return 0;
+    }
+    
+    unless (Array->equals_int($ret_ndarray->data, [(int)6])) {
+      return 0;
+    }
+    
+    unless (Array->equals_int($ret_ndarray->dim, [1])) {
+      return 0;
+    }
+    
+    # Exceptions
+    {
+      {
+        my $x_ndarray = IOP->c([(int)1, 2], [1, 2]);
+        
+        eval { IOP->prod(undef); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+    }
+    
+    $@ = undef;
+    
+    return 1;
+  }
+  
+  static method cumprod : int () {
+    
+    my $x_ndarray = IOP->c([(int)2, 3], [2]);
+    
+    my $ret_ndarray = IOP->cumprod($x_ndarray);
+    
+    unless ($ret_ndarray is_type R::NDArray::Int) {
+      return 0;
+    }
+    
+    unless (Array->equals_int($ret_ndarray->data, [(int)2, 6])) {
+      return 0;
+    }
+    
+    
+    unless (Array->equals_int($ret_ndarray->dim, [2])) {
+      return 0;
+    }
+    
+    # Exceptions
+    {
+      {
+        my $x_ndarray = IOP->c([(int)1, 2], [1, 2]);
+        
+        eval { IOP->cumprod(undef); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+      {
+        my $x_ndarray = IOP->c([(int)1, 2], [1, 2]);
+        
+        eval { IOP->cumprod($x_ndarray); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+    }
+    
+    $@ = undef;
+    
+    return 1;
+  }
+  
+  static method diff : int () {
+    
+    my $x_ndarray = IOP->c([(int)2, 3, 6], [3]);
+    
+    my $ret_ndarray = IOP->diff($x_ndarray);
+    
+    unless ($ret_ndarray is_type R::NDArray::Int) {
+      return 0;
+    }
+    
+    unless (Array->equals_int($ret_ndarray->data, [(int)1, 3])) {
+      return 0;
+    }
+    
+    
+    unless (Array->equals_int($ret_ndarray->dim, [2])) {
+      return 0;
+    }
+    
+    # Exceptions
+    {
+      {
+        my $x_ndarray = IOP->c([(int)1, 2], [1, 2]);
+        
+        eval { IOP->diff(undef); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+      {
+        my $x_ndarray = IOP->c([(int)1, 2], [1, 2]);
+        
+        eval { IOP->diff($x_ndarray); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+    }
+    
+    $@ = undef;
+    
+    return 1;
+  }
+  
+  static method max : int () {
+    
+    my $x_ndarray = IOP->c([(int)-1, 0, 1], [1, 3]);
+    
+    my $ret_ndarray = IOP->max($x_ndarray);
+    
+    unless ($ret_ndarray is_type R::NDArray::Int) {
+      return 0;
+    }
+    
+    unless (Array->equals_int($ret_ndarray->data, [(int)1])) {
+      return 0;
+    }
+    
+    unless (Array->equals_int($ret_ndarray->dim, [1])) {
+      return 0;
+    }
+    
+    # Exceptions
+    {
+      {
+        my $x_ndarray = IOP->c([(int)1, 2], [1, 2]);
+        
+        eval { IOP->max(undef); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+    }
+    
+    $@ = undef;
+    
+    return 1;
+  }
+  
+  static method min : int () {
+    
+    my $x_ndarray = IOP->c([(int)-1, 0, 1], [1, 3]);
+    
+    my $ret_ndarray = IOP->min($x_ndarray);
+    
+    unless ($ret_ndarray is_type R::NDArray::Int) {
+      return 0;
+    }
+    
+    unless (Array->equals_int($ret_ndarray->data, [(int)-1])) {
+      return 0;
+    }
+    
+    unless (Array->equals_int($ret_ndarray->dim, [1])) {
+      return 0;
+    }
+    
+    # Exceptions
+    {
+      {
+        my $x_ndarray = IOP->c([(int)1, 2], [1, 2]);
+        
+        eval { IOP->min(undef); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+    }
+    
+    $@ = undef;
+    
+    return 1;
+  }
+  
+  static method and : int () {
+    
+    my $x_ndarray = IOP->c([(int)0, 1, 0, 1], [1, 4]);
+    
+    my $y_ndarray = IOP->c([(int)0, 0, 1, 1], [1, 4]);
+    
+    my $ret_ndarray = IOP->and($x_ndarray, $y_ndarray);
+    
+    unless ($ret_ndarray is_type R::NDArray::Int) {
+      return 0;
+    }
+    
+    unless (Array->equals_int($ret_ndarray->data, [0, 0, 0, 1])) {
+      return 0;
+    }
+    
+    unless (Array->equals_int($ret_ndarray->dim, [1, 4])) {
+      return 0;
+    }
+    
+    # Exceptions
+    {
+      {
+        my $x_ndarray = IOP->c([(int)1, 2], [1, 2]);
+        
+        my $y_ndarray = IOP->c([(int)3, 4], [1, 2]);
+        
+        eval { IOP->and(undef, $y_ndarray); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+      {
+        my $x_ndarray = IOP->c([(int)1, 2], [1, 2]);
+        
+        my $y_ndarray = IOP->c([(int)3, 4], [1, 2]);
+        
+        eval { IOP->and($x_ndarray, undef); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+      {
+        my $x_ndarray = IOP->c([(int)1, 2], [1, 2]);
+        
+        my $y_ndarray = IOP->c([(int)3, 4], [2, 1]);
+        
+        eval { IOP->and($x_ndarray, $y_ndarray); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+    }
+    
+    $@ = undef;
+    
+    return 1;
+  }
+  
+  static method or : int () {
+    
+    my $x_ndarray = IOP->c([(int)0, 1, 0, 1], [1, 4]);
+    
+    my $y_ndarray = IOP->c([(int)0, 0, 1, 1], [1, 4]);
+    
+    my $ret_ndarray = IOP->or($x_ndarray, $y_ndarray);
+    
+    unless ($ret_ndarray is_type R::NDArray::Int) {
+      return 0;
+    }
+    
+    unless (Array->equals_int($ret_ndarray->data, [0, 1, 1, 1])) {
+      return 0;
+    }
+    
+    unless (Array->equals_int($ret_ndarray->dim, [1, 4])) {
+      return 0;
+    }
+    
+    # Exceptions
+    {
+      {
+        my $x_ndarray = IOP->c([(int)1, 2], [1, 2]);
+        
+        my $y_ndarray = IOP->c([(int)3, 4], [1, 2]);
+        
+        eval { IOP->or(undef, $y_ndarray); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+      {
+        my $x_ndarray = IOP->c([(int)1, 2], [1, 2]);
+        
+        my $y_ndarray = IOP->c([(int)3, 4], [1, 2]);
+        
+        eval { IOP->or($x_ndarray, undef); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+      {
+        my $x_ndarray = IOP->c([(int)1, 2], [1, 2]);
+        
+        my $y_ndarray = IOP->c([(int)3, 4], [2, 1]);
+        
+        eval { IOP->or($x_ndarray, $y_ndarray); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+    }
+    
+    $@ = undef;
+    
+    return 1;
+  }
+  
+  static method not : int () {
+    
+    my $x_ndarray = IOP->c([(int)0, 1], [1, 2]);
+    
+    my $ret_ndarray = IOP->not($x_ndarray);
+    
+    unless ($ret_ndarray is_type R::NDArray::Int) {
+      return 0;
+    }
+    
+    unless (Array->equals_int($ret_ndarray->data, [1, 0])) {
+      return 0;
+    }
+    
+    unless (Array->equals_int($ret_ndarray->dim, [1, 2])) {
+      return 0;
+    }
+    
+    # Exceptions
+    {
+      {
+        my $x_ndarray = IOP->c([(int)1, 2], [1, 2]);
+        
+        eval { IOP->not(undef); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+    }
+    
+    $@ = undef;
+    
+    return 1;
+  }
+  
+}

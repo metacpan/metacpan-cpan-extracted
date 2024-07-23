@@ -2,9 +2,9 @@
 package ColorTheme;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2023-07-14'; # DATE
+our $DATE = '2024-07-17'; # DATE
 our $DIST = 'ColorTheme'; # DIST
-our $VERSION = '2.1.4'; # VERSION
+our $VERSION = '2.1.5'; # VERSION
 
 1;
 # ABSTRACT: Color themes
@@ -25,7 +25,7 @@ ColorTheme - Color themes
 
 =head1 VERSION
 
-This document describes version 2.1.4 of ColorTheme (from Perl distribution ColorTheme), released on 2023-07-14.
+This document describes version 2.1.5 of ColorTheme (from Perl distribution ColorTheme), released on 2024-07-17.
 
 =head1 DESCRIPTION
 
@@ -275,7 +275,7 @@ that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2023, 2020, 2018, 2014 by perlancar <perlancar@cpan.org>.
+This software is copyright (c) 2024, 2023, 2020, 2018, 2014 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

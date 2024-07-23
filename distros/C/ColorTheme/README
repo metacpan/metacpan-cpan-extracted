@@ -5,8 +5,8 @@ SPECIFICATION VERSION
     2
 
 VERSION
-    This document describes version 2.1.4 of ColorTheme (from Perl
-    distribution ColorTheme), released on 2023-07-14.
+    This document describes version 2.1.5 of ColorTheme (from Perl
+    distribution ColorTheme), released on 2024-07-17.
 
 DESCRIPTION
     This document specifies a way to create and use color themes.
@@ -238,7 +238,7 @@ CONTRIBUTING
     required beyond that are considered a bug and can be reported to me.
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2023, 2020, 2018, 2014 by perlancar
+    This software is copyright (c) 2024, 2023, 2020, 2018, 2014 by perlancar
     <perlancar@cpan.org>.
 
     This is free software; you can redistribute it and/or modify it under

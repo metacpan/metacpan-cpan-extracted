@@ -3,7 +3,7 @@ package Net::Async::Slack::Event::GridMigrationFinished;
 use strict;
 use warnings;
 
-our $VERSION = '0.014'; # VERSION
+our $VERSION = '0.015'; # VERSION
 
 use Net::Async::Slack::EventType;
 
@@ -43,4 +43,4 @@ Tom Molesworth <TEAM@cpan.org>
 
 =head1 LICENSE
 
-Copyright Tom Molesworth 2016-2023. Licensed under the same terms as Perl itself.
+Copyright Tom Molesworth 2016-2024. Licensed under the same terms as Perl itself.

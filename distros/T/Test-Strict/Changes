@@ -1,5 +1,9 @@
 Revision history for Test::Strict.
 
+0.53  2024-07-22 13:30:00 MANWAR
+      - Don't simultaneously test -c and -v switches (PR #33), thanks @jkeenan.
+      - Fixed manifest check (PR #35), thanks @haarg.
+
 0.52  2019-06-16 10:10:00 MANWAR
       - Applied patch provided by Matthew (Issue #25).
 

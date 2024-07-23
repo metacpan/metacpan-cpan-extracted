@@ -1,6 +1,6 @@
 use warnings;
 use strict;
-use Test::More tests => 20;
+use Test::More tests => 24;
 use Test::Exception;
 use App::SpamcupNG::HTMLParse qw(find_errors);
 
@@ -67,7 +67,7 @@ is(
 );
 is( $errors_ref->[0]->is_fatal(), 1, 'Error is fatal' );
 throws_ok { find_errors('foobar') } qr/scalar\sreference/,
-    'find_errors dies with invalid parameter';
+  'find_errors dies with invalid parameter';
 
 note('Login error');
 $errors_ref = find_errors( read_html('login_failed.html') );
@@ -82,3 +82,17 @@ is(
     'Got the expected error message'
 );
 
+note('Reports disabled');
+$errors_ref = find_errors( read_html('reports_disabled.html') );
+is( ref($errors_ref), 'ARRAY',
+    'result from find_errors is an array reference' );
+cmp_ok( scalar( @{$errors_ref} ),
+    '==', 1, 'Got the expected number of errors' );
+is( $errors_ref->[0]->is_fatal(), 0, 'Error is not fatal' );
+is(
+    $errors_ref->[0]->message(),
+    'Reports disabled for bondedsender@admin.spamcop.net',
+    'Got the expected error message'
+);
+
+done_testing;

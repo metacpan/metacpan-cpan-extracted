@@ -91,7 +91,23 @@ MANIFEST.SKIP
 README.md
 t/basic.t
 t/lib/SPVM/TestCase/R.spvm
+t/lib/SPVM/TestCase/R/OP/Byte.spvm
 t/lib/SPVM/TestCase/R/OP/Double.spvm
+t/lib/SPVM/TestCase/R/OP/Float.spvm
+t/lib/SPVM/TestCase/R/OP/Int.spvm
+t/lib/SPVM/TestCase/R/OP/Long.spvm
+t/lib/SPVM/TestCase/R/OP/Short.spvm
+t/lib/SPVM/TestCase/R/OP/String.spvm
+t/lib/SPVM/TestCase/R/OP/StringBuffer.spvm
+t/lib/SPVM/TestCase/R/OP/Time/Piece.spvm
+t/R-OP-Byte.t
 t/R-OP-Double.t
+t/R-OP-Float.t
+t/R-OP-Int.t
+t/R-OP-Long.t
+t/R-OP-Short.t
+t/R-OP-String.t
+t/R-OP-StringBuffer.t
+t/R-OP-Time-Piece.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

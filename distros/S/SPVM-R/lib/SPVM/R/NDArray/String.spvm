@@ -170,7 +170,7 @@ class R::NDArray::String extends R::NDArray {
       my $elem = $data->[$i];
       
       if ($elem) {
-        StringBuffer->new($data->[$i]);
+        $ret_data->[$i] = StringBuffer->new($data->[$i]);
       }
       else {
         $ret_data->[$i] = undef;

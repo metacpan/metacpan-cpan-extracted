@@ -1,4 +1,0 @@
-- Save all captured data to SQLite database.
-- Redact authentication credentials when running in DEBUG level.
-- Reuse user agent cookies if possible before repeating authentication step.
-

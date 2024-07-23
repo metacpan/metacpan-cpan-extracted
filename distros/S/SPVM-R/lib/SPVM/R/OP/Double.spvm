@@ -541,7 +541,7 @@ class R::OP::Double {
   
   static method seq_length : R::NDArray::Double ($begin : double, $end : double, $length : int) {
     
-    my $by = (double)(($end - $begin) / $length);
+    my $by = (double)(($end - $begin + 1) / $length);
     
     my $ret_ndarray = &seq($begin, $end, $by);
     
@@ -1121,8 +1121,11 @@ class R::OP::Double {
     for (my $i = 0; $i < $length; $i++) {
       my $intpart = 0.0;
       $ret_data->[$i] = Math->modf($x_data->[$i], \$intpart);
+      
       $x_data_intpart->[$i] = $intpart;
     }
+    
+    $intpart_ndarray_ref->[0] = $intpart_ndarray;
     
     return $ret_ndarray;
   }
@@ -1397,8 +1400,8 @@ class R::OP::Double {
     
     my $x_dim = $x_ndarray->dim;
     
-    unless (@$x_dim == 1) {
-      die "The length of dim field of \$x_ndarray must be 1.";
+    unless ($x_ndarray->is_vector) {
+      die "The n-dimensional array \$x_ndarray must be a vector.";
     }
     
     my $length = $x_ndarray->length;

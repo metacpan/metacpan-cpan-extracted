@@ -16,7 +16,7 @@ use warnings FATAL => 'recursion';
 use Test::More;
 
 if (defined $ENV{NOMTAG} and defined $ENV{NOMPASS}) {
-	plan tests => 16;
+	plan tests => 13;
 } else {
 	plan skip_all => 'Cannot connect to testbed without NOMTAG and NOMPASS';
 }
@@ -43,23 +43,16 @@ my $reason  = undef;
 # Check domains
 ($res, $abuse, $reason) = $epp->check_domain ("duncan-$tag.co.uk");
 is ($res, 0, 'Existent domain check');
-like ($abuse, qr/^[0-9]+$/, 'Existent domain check abuse counter');
-my $abuseval = $abuse;
-diag "Abuse = $abuse\n" if $ENV{DEBUG_TEST};
 is ($reason, 'Registered', 'Reason is "Registered"');
 
 ($res, $abuse, $reason) = $epp->check_domain ("octavia-$tag.co.uk");
 is ($res, 0, 'Existent pending delete domain check');
-is ($abuse, --$abuseval, 'Existent pending delete domain check abuse counter');
-diag "Abuse = $abuse\n" if $ENV{DEBUG_TEST};
 like ($reason, qr/^drop \d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\dZ$/,
 	'Reason is "drop <ISO drop time>"');
 diag "Reason = $reason\n" if $ENV{DEBUG_TEST};
 
 ($res, $abuse, $reason) = $epp->check_domain ("dlfkgshklghsld-$tag.co.uk");
 is ($res, 1, 'Non-existent domain check');
-is ($abuse, --$abuseval, 'Non-existent domain check abuse counter');
-diag "Abuse = $abuse\n" if $ENV{DEBUG_TEST};
 is ($reason, undef, 'Reason is undef');
 
 # Check contacts

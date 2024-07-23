@@ -3,7 +3,7 @@ package Net::Async::Slack::Message;
 use strict;
 use warnings;
 
-our $VERSION = '0.014'; # VERSION
+our $VERSION = '0.015'; # VERSION
 
 use Scalar::Util qw(weaken);
 use JSON::MaybeXS;

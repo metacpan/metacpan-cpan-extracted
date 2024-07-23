@@ -3,6 +3,8 @@
 
 class R::NDArray::Short extends R::NDArray {
   
+  use R::NDArray::Int;
+  
   # Fields
   method data : short[] () {
     

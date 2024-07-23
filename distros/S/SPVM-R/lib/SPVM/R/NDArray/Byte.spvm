@@ -6,6 +6,8 @@
 
 class R::NDArray::Byte extends R::NDArray {
   
+  use R::NDArray::Int;
+  
   # Fields
   method data : byte[] () {
     

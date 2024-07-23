@@ -4,7 +4,7 @@ package Net::Async::Slack;
 use strict;
 use warnings;
 
-our $VERSION = '0.014';
+our $VERSION = '0.015';
 
 use parent qw(IO::Async::Notifier Net::Async::Slack::Commands);
 
@@ -473,11 +473,12 @@ Issues an HTTP GET request.
 =cut
 
 sub http_get {
-    my ($self, %args) = @_;
+    my ($self, @args) = @_;
+    my %args = (@args == 1) ? (uri => @args) : @args;
 
     my $uri = delete $args{uri};
-    $args{headers} ||= $self->auth_headers;
     $log->tracef("GET %s { %s }", "$uri", \%args);
+    $args{headers} ||= $self->auth_headers;
     $self->http->GET(
         $uri,
         %args
@@ -632,5 +633,5 @@ Tom Molesworth <TEAM@cpan.org>
 
 =head1 LICENSE
 
-Copyright Tom Molesworth 2016-2023. Licensed under the same terms as Perl itself.
+Copyright Tom Molesworth 2016-2024. Licensed under the same terms as Perl itself.
 

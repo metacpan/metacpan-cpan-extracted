@@ -1,0 +1,580 @@
+class TestCase::R::OP::StringBuffer {
+  
+  use Array;
+  
+  use R::OP::StringBuffer as BUFOP;
+  use R::OP::String as STROP;
+  
+  static method c : int () {
+    
+    {
+      my $ret_ndarray = BUFOP->c((string)1);
+      
+      unless ($ret_ndarray is_type R::NDArray::StringBuffer) {
+        return 0;
+      }
+      
+      unless (Array->equals_string($ret_ndarray->to_string_ndarray->data, [(string)1])) {
+        return 0;
+      }
+      
+      unless (Array->equals_int($ret_ndarray->dim, [1])) {
+        return 0;
+      }
+    }
+    
+    {
+      my $data = [(string)1, 2];
+      my $ret_ndarray = BUFOP->c($data);
+      
+      unless ($ret_ndarray is_type R::NDArray::StringBuffer) {
+        return 0;
+      }
+      
+      unless (Array->equals_string($ret_ndarray->to_string_ndarray->data, [(string)1, 2])) {
+        return 0;
+      }
+      
+      unless (Array->equals_int($ret_ndarray->dim, [2])) {
+        return 0;
+      }
+    }
+    
+    {
+      my $data = [(string)1, 2];
+      my $ret_ndarray = BUFOP->c(BUFOP->c($data));
+      
+      unless ($ret_ndarray is_type R::NDArray::StringBuffer) {
+        return 0;
+      }
+      
+      unless (Array->equals_string($ret_ndarray->to_string_ndarray->data, [(string)1, 2])) {
+        return 0;
+      }
+      
+      unless (Array->equals_int($ret_ndarray->dim, [2])) {
+        return 0;
+      }
+    }
+    
+    {
+      my $data = [(string)1, 2];
+      my $ret_ndarray = BUFOP->c(BUFOP->c($data), [1, 2]);
+      
+      unless ($ret_ndarray is_type R::NDArray::StringBuffer) {
+        return 0;
+      }
+      
+      unless (Array->equals_string($ret_ndarray->to_string_ndarray->data, [(string)1, 2])) {
+        return 0;
+      }
+      
+      unless (Array->equals_int($ret_ndarray->dim, [1, 2])) {
+        return 0;
+      }
+    }
+    
+    # Exceptions
+    {
+      {
+        eval { BUFOP->c(true); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+    }
+    
+    return 1;
+  }
+  
+  static method push : int () {
+    
+    my $ret_ndarray = BUFOP->c([(string)1, 1], [1, 2]);
+    
+    my $y_ndarray = STROP->c([(string)1, 2], [1, 2]);
+    
+    BUFOP->push($ret_ndarray, $y_ndarray);
+    
+    unless ($ret_ndarray is_type R::NDArray::StringBuffer) {
+      return 0;
+    }
+    
+    unless (Array->equals_string($ret_ndarray->to_string_ndarray->data, ["11", "12"])) {
+      return 0;
+    }
+    
+    unless (Array->equals_int($ret_ndarray->dim, [1, 2])) {
+      return 0;
+    }
+    
+    # Exceptions
+    {
+      {
+        my $x_ndarray = BUFOP->c([(string)1, 2], [1, 2]);
+        
+        my $y_ndarray = STROP->c([(string)3, 4], [1, 2]);
+        
+        eval { BUFOP->push(undef, $y_ndarray); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+      {
+        my $x_ndarray = BUFOP->c([(string)1, 2], [1, 2]);
+        
+        my $y_ndarray = STROP->c([(string)3, 4], [1, 2]);
+        
+        eval { BUFOP->push($x_ndarray, undef); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+      {
+        my $x_ndarray = BUFOP->c([(string)1, 2], [1, 2]);
+        
+        my $y_ndarray = STROP->c([(string)3, 4], [2, 1]);
+        
+        eval { BUFOP->push($x_ndarray, $y_ndarray); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+    }
+    
+    $@ = undef;
+    
+    return 1;
+  }
+  
+  static method eq : int () {
+    
+    my $x_ndarray = BUFOP->c([(string)1, 1], [1, 2]);
+    
+    my $y_ndarray = BUFOP->c([(string)1, 2], [1, 2]);
+    
+    my $ret_ndarray = BUFOP->eq($x_ndarray, $y_ndarray);
+    
+    unless ($ret_ndarray is_type R::NDArray::Int) {
+      return 0;
+    }
+    
+    unless (Array->equals_int($ret_ndarray->data, [1, 0])) {
+      return 0;
+    }
+    
+    unless (Array->equals_int($ret_ndarray->dim, [1, 2])) {
+      return 0;
+    }
+    
+    # Exceptions
+    {
+      {
+        my $x_ndarray = BUFOP->c([(string)1, 2], [1, 2]);
+        
+        my $y_ndarray = BUFOP->c([(string)3, 4], [1, 2]);
+        
+        eval { BUFOP->eq(undef, $y_ndarray); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+      {
+        my $x_ndarray = BUFOP->c([(string)1, 2], [1, 2]);
+        
+        my $y_ndarray = BUFOP->c([(string)3, 4], [1, 2]);
+        
+        eval { BUFOP->eq($x_ndarray, undef); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+      {
+        my $x_ndarray = BUFOP->c([(string)1, 2], [1, 2]);
+        
+        my $y_ndarray = BUFOP->c([(string)3, 4], [2, 1]);
+        
+        eval { BUFOP->eq($x_ndarray, $y_ndarray); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+    }
+    
+    $@ = undef;
+    
+    return 1;
+  }
+  
+  static method ne : int () {
+    
+    my $x_ndarray = BUFOP->c([(string)1, 1], [1, 2]);
+    
+    my $y_ndarray = BUFOP->c([(string)1, 2], [1, 2]);
+    
+    my $ret_ndarray = BUFOP->ne($x_ndarray, $y_ndarray);
+    
+    unless ($ret_ndarray is_type R::NDArray::Int) {
+      return 0;
+    }
+    
+    unless (Array->equals_int($ret_ndarray->data, [0, 1])) {
+      return 0;
+    }
+    
+    unless (Array->equals_int($ret_ndarray->dim, [1, 2])) {
+      return 0;
+    }
+    
+    # Exceptions
+    {
+      {
+        my $x_ndarray = BUFOP->c([(string)1, 2], [1, 2]);
+        
+        my $y_ndarray = BUFOP->c([(string)3, 4], [1, 2]);
+        
+        eval { BUFOP->ne(undef, $y_ndarray); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+      {
+        my $x_ndarray = BUFOP->c([(string)1, 2], [1, 2]);
+        
+        my $y_ndarray = BUFOP->c([(string)3, 4], [1, 2]);
+        
+        eval { BUFOP->ne($x_ndarray, undef); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+      {
+        my $x_ndarray = BUFOP->c([(string)1, 2], [1, 2]);
+        
+        my $y_ndarray = BUFOP->c([(string)3, 4], [2, 1]);
+        
+        eval { BUFOP->ne($x_ndarray, $y_ndarray); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+    }
+    
+    $@ = undef;
+    
+    return 1;
+  }
+  
+  static method gt : int () {
+    
+    my $x_ndarray = BUFOP->c([(string)1, 1, 1], [1, 3]);
+    
+    my $y_ndarray = BUFOP->c([(string)0, 1, 2], [1, 3]);
+    
+    my $ret_ndarray = BUFOP->gt($x_ndarray, $y_ndarray);
+    
+    unless ($ret_ndarray is_type R::NDArray::Int) {
+      return 0;
+    }
+    
+    unless (Array->equals_int($ret_ndarray->data, [1, 0, 0])) {
+      return 0;
+    }
+    
+    unless (Array->equals_int($ret_ndarray->dim, [1, 3])) {
+      return 0;
+    }
+    
+    # Exceptions
+    {
+      {
+        my $x_ndarray = BUFOP->c([(string)1, 1, 1], [1, 3]);
+        
+        my $y_ndarray = BUFOP->c([(string)0, 1, 2], [1, 3]);
+        
+        eval { BUFOP->gt(undef, $y_ndarray); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+      {
+        my $x_ndarray = BUFOP->c([(string)1, 1, 1], [1, 3]);
+        
+        my $y_ndarray = BUFOP->c([(string)0, 1, 2], [1, 3]);
+        
+        eval { BUFOP->gt($x_ndarray, undef); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+      {
+        my $x_ndarray = BUFOP->c([(string)1, 1, 1], [1, 3]);
+        
+        my $y_ndarray = BUFOP->c([(string)0, 1, 2], [3, 1]);
+        
+        eval { BUFOP->gt($x_ndarray, $y_ndarray); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+    }
+    
+    $@ = undef;
+    
+    return 1;
+  }
+  
+  static method ge : int () {
+    
+    my $x_ndarray = BUFOP->c([(string)1, 1, 1], [1, 3]);
+    
+    my $y_ndarray = BUFOP->c([(string)0, 1, 2], [1, 3]);
+    
+    my $ret_ndarray = BUFOP->ge($x_ndarray, $y_ndarray);
+    
+    unless ($ret_ndarray is_type R::NDArray::Int) {
+      return 0;
+    }
+    
+    unless (Array->equals_int($ret_ndarray->data, [1, 1, 0])) {
+      return 0;
+    }
+    
+    unless (Array->equals_int($ret_ndarray->dim, [1, 3])) {
+      return 0;
+    }
+    
+    # Exceptions
+    {
+      {
+        my $x_ndarray = BUFOP->c([(string)1, 1, 1], [1, 3]);
+        
+        my $y_ndarray = BUFOP->c([(string)0, 1, 2], [1, 3]);
+        
+        eval { BUFOP->ge(undef, $y_ndarray); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+      {
+        my $x_ndarray = BUFOP->c([(string)1, 1, 1], [1, 3]);
+        
+        my $y_ndarray = BUFOP->c([(string)0, 1, 2], [1, 3]);
+        
+        eval { BUFOP->ge($x_ndarray, undef); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+      {
+        my $x_ndarray = BUFOP->c([(string)1, 1, 1], [1, 3]);
+        
+        my $y_ndarray = BUFOP->c([(string)0, 1, 2], [3, 1]);
+        
+        eval { BUFOP->ge($x_ndarray, $y_ndarray); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+    }
+    
+    $@ = undef;
+    
+    return 1;
+  }
+  
+  static method lt : int () {
+    
+    my $x_ndarray = BUFOP->c([(string)1, 1, 1], [1, 3]);
+    
+    my $y_ndarray = BUFOP->c([(string)0, 1, 2], [1, 3]);
+    
+    my $ret_ndarray = BUFOP->lt($x_ndarray, $y_ndarray);
+    
+    unless ($ret_ndarray is_type R::NDArray::Int) {
+      return 0;
+    }
+    
+    unless (Array->equals_int($ret_ndarray->data, [0, 0, 1])) {
+      return 0;
+    }
+    
+    unless (Array->equals_int($ret_ndarray->dim, [1, 3])) {
+      return 0;
+    }
+    
+    # Exceptions
+    {
+      {
+        my $x_ndarray = BUFOP->c([(string)1, 1, 1], [1, 3]);
+        
+        my $y_ndarray = BUFOP->c([(string)0, 1, 2], [1, 3]);
+        
+        eval { BUFOP->lt(undef, $y_ndarray); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+      {
+        my $x_ndarray = BUFOP->c([(string)1, 1, 1], [1, 3]);
+        
+        my $y_ndarray = BUFOP->c([(string)0, 1, 2], [1, 3]);
+        
+        eval { BUFOP->lt($x_ndarray, undef); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+      {
+        my $x_ndarray = BUFOP->c([(string)1, 1, 1], [1, 3]);
+        
+        my $y_ndarray = BUFOP->c([(string)0, 1, 2], [3, 1]);
+        
+        eval { BUFOP->lt($x_ndarray, $y_ndarray); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+    }
+    
+    $@ = undef;
+    
+    return 1;
+  }
+  
+  static method le : int () {
+    
+    my $x_ndarray = BUFOP->c([(string)1, 1, 1], [1, 3]);
+    
+    my $y_ndarray = BUFOP->c([(string)0, 1, 2], [1, 3]);
+    
+    my $ret_ndarray = BUFOP->le($x_ndarray, $y_ndarray);
+    
+    unless ($ret_ndarray is_type R::NDArray::Int) {
+      return 0;
+    }
+    
+    unless (Array->equals_int($ret_ndarray->data, [0, 1, 1])) {
+      return 0;
+    }
+    
+    unless (Array->equals_int($ret_ndarray->dim, [1, 3])) {
+      return 0;
+    }
+    
+    # Exceptions
+    {
+      {
+        my $x_ndarray = BUFOP->c([(string)1, 1, 1], [1, 3]);
+        
+        my $y_ndarray = BUFOP->c([(string)0, 1, 2], [1, 3]);
+        
+        eval { BUFOP->le(undef, $y_ndarray); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+      {
+        my $x_ndarray = BUFOP->c([(string)1, 1, 1], [1, 3]);
+        
+        my $y_ndarray = BUFOP->c([(string)0, 1, 2], [1, 3]);
+        
+        eval { BUFOP->le($x_ndarray, undef); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+      {
+        my $x_ndarray = BUFOP->c([(string)1, 1, 1], [1, 3]);
+        
+        my $y_ndarray = BUFOP->c([(string)0, 1, 2], [3, 1]);
+        
+        eval { BUFOP->le($x_ndarray, $y_ndarray); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+    }
+    
+    $@ = undef;
+    
+    return 1;
+  }
+  
+  static method rep : int () {
+    
+    my $x_ndarray = BUFOP->c([(string)1, 2]);
+    
+    my $ret_ndarray = BUFOP->rep($x_ndarray, 2);
+    
+    unless (Array->equals_string($ret_ndarray->to_string_ndarray->data, [(string)1, 2, 1, 2])) {
+      return 0;
+    }
+    
+    unless (Array->equals_int($ret_ndarray->dim, [4])) {
+      return 0;
+    }
+    
+    return 1;
+  }
+  
+  static method rep_length : int () {
+    
+    my $x_ndarray = BUFOP->c([(string)1, 2]);
+    
+    my $ret_ndarray = BUFOP->rep_length($x_ndarray, 4);
+    
+    unless (Array->equals_string($ret_ndarray->to_string_ndarray->data, [(string)1, 2, 1, 2])) {
+      return 0;
+    }
+    
+    unless (Array->equals_int($ret_ndarray->dim, [4])) {
+      return 0;
+    }
+    
+    return 1;
+  }
+  
+}

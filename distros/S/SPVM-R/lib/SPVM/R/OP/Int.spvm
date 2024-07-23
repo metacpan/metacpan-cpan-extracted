@@ -668,11 +668,15 @@ class R::OP::Int {
       die "The n-dimensional array \$x_ndarray must be defined.";
     }
     
+    unless ($x_ndarray->is_vector) {
+      die "The n-dimensional array \$x_ndarray must be a vector.";
+    }
+    
     my $length = $x_ndarray->length;
     
     my $x_dim = $x_ndarray->dim;
     
-    my $ret_ndarray = &c(undef, $x_dim);
+    my $ret_ndarray = &c(undef, [$length]);
     
     my $x_data = $x_ndarray->data;
     my $ret_data = $ret_ndarray->data;
@@ -716,11 +720,15 @@ class R::OP::Int {
       die "The n-dimensional array \$x_ndarray must be defined.";
     }
     
+    unless ($x_ndarray->is_vector) {
+      die "The n-dimensional array \$x_ndarray must be a vector.";
+    }
+    
     my $length = $x_ndarray->length;
     
     my $x_dim = $x_ndarray->dim;
     
-    my $ret_ndarray = &c(undef, $x_dim);
+    my $ret_ndarray = &c(undef, [$length]);
     
     my $x_data = $x_ndarray->data;
     my $ret_data = $ret_ndarray->data;
@@ -742,8 +750,8 @@ class R::OP::Int {
     
     my $x_dim = $x_ndarray->dim;
     
-    unless (@$x_dim == 1) {
-      die "The length of dim field of \$x_ndarray must be 1.";
+    unless ($x_ndarray->is_vector) {
+      die "The n-dimensional array \$x_ndarray must be a vector.";
     }
     
     my $length = $x_ndarray->length;

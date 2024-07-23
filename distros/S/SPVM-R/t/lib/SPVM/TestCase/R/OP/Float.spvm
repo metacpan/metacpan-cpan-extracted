@@ -1,0 +1,3141 @@
+class TestCase::R::OP::Float {
+  
+  use Array;
+  
+  use R::OP::Float as FOP;
+  
+  static method c : int () {
+    
+    {
+      my $ret_ndarray = FOP->c((float)1);
+      
+      unless ($ret_ndarray is_type R::NDArray::Float) {
+        return 0;
+      }
+      
+      unless (Array->equals_float($ret_ndarray->data, [(float)1])) {
+        return 0;
+      }
+      
+      unless (Array->equals_int($ret_ndarray->dim, [1])) {
+        return 0;
+      }
+    }
+    
+    {
+      my $data = [(float)1, 2];
+      my $ret_ndarray = FOP->c($data);
+      
+      unless ($ret_ndarray is_type R::NDArray::Float) {
+        return 0;
+      }
+      
+      unless ($ret_ndarray->data == $data) {
+        return 0;
+      }
+      
+      unless (Array->equals_float($ret_ndarray->data, [(float)1, 2])) {
+        return 0;
+      }
+      
+      unless (Array->equals_int($ret_ndarray->dim, [2])) {
+        return 0;
+      }
+    }
+    
+    {
+      my $data = [(float)1, 2];
+      my $ret_ndarray = FOP->c(FOP->c($data));
+      
+      unless ($ret_ndarray is_type R::NDArray::Float) {
+        return 0;
+      }
+      
+      unless ($ret_ndarray->data == $data) {
+        return 0;
+      }
+      
+      unless (Array->equals_float($ret_ndarray->data, [(float)1, 2])) {
+        return 0;
+      }
+      
+      unless (Array->equals_int($ret_ndarray->dim, [2])) {
+        return 0;
+      }
+    }
+    
+    {
+      my $data = [(float)1, 2];
+      my $ret_ndarray = FOP->c(FOP->c($data), [1, 2]);
+      
+      unless ($ret_ndarray is_type R::NDArray::Float) {
+        return 0;
+      }
+      
+      unless ($ret_ndarray->data == $data) {
+        return 0;
+      }
+      
+      unless (Array->equals_float($ret_ndarray->data, [(float)1, 2])) {
+        return 0;
+      }
+      
+      unless (Array->equals_int($ret_ndarray->dim, [1, 2])) {
+        return 0;
+      }
+    }
+    
+    # Exceptions
+    {
+      {
+        eval { FOP->c(true); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+    }
+    
+    return 1;
+  }
+  
+  static method add : int () {
+    
+    my $x_ndarray = FOP->c([(float)1, 2], [1, 2]);
+    
+    my $y_ndarray = FOP->c([(float)3, 4], [1, 2]);
+    
+    my $ret_ndarray = FOP->add($x_ndarray, $y_ndarray);
+    
+    unless ($ret_ndarray is_type R::NDArray::Float) {
+      return 0;
+    }
+    
+    unless (Array->equals_float($ret_ndarray->data, [(float)4, 6])) {
+      return 0;
+    }
+    
+    unless (Array->equals_int($ret_ndarray->dim, [1, 2])) {
+      return 0;
+    }
+    
+    # Exceptions
+    {
+      {
+        my $x_ndarray = FOP->c([(float)1, 2], [1, 2]);
+        
+        my $y_ndarray = FOP->c([(float)3, 4], [1, 2]);
+        
+        eval { FOP->add(undef, $y_ndarray); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+      {
+        my $x_ndarray = FOP->c([(float)1, 2], [1, 2]);
+        
+        my $y_ndarray = FOP->c([(float)3, 4], [1, 2]);
+        
+        eval { FOP->add($x_ndarray, undef); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+      {
+        my $x_ndarray = FOP->c([(float)1, 2], [1, 2]);
+        
+        my $y_ndarray = FOP->c([(float)3, 4], [2, 1]);
+        
+        eval { FOP->add($x_ndarray, $y_ndarray); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+    }
+    
+    $@ = undef;
+    
+    return 1;
+  }
+  
+  static method sub : int () {
+    
+    my $x_ndarray = FOP->c([(float)1, 2], [1, 2]);
+    
+    my $y_ndarray = FOP->c([(float)3, 4], [1, 2]);
+    
+    my $ret_ndarray = FOP->sub($x_ndarray, $y_ndarray);
+    
+    unless ($ret_ndarray is_type R::NDArray::Float) {
+      return 0;
+    }
+    
+    unless (Array->equals_float($ret_ndarray->data, [(float)-2, -2])) {
+      return 0;
+    }
+    
+    unless (Array->equals_int($ret_ndarray->dim, [1, 2])) {
+      return 0;
+    }
+    
+    # Exceptions
+    {
+      {
+        my $x_ndarray = FOP->c([(float)1, 2], [1, 2]);
+        
+        my $y_ndarray = FOP->c([(float)3, 4], [1, 2]);
+        
+        eval { FOP->sub(undef, $y_ndarray); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+      {
+        my $x_ndarray = FOP->c([(float)1, 2], [1, 2]);
+        
+        my $y_ndarray = FOP->c([(float)3, 4], [1, 2]);
+        
+        eval { FOP->sub($x_ndarray, undef); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+      {
+        my $x_ndarray = FOP->c([(float)1, 2], [1, 2]);
+        
+        my $y_ndarray = FOP->c([(float)3, 4], [2, 1]);
+        
+        eval { FOP->sub($x_ndarray, $y_ndarray); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+    }
+    
+    $@ = undef;
+    
+    return 1;
+  }
+
+  static method mul : int () {
+    
+    my $x_ndarray = FOP->c([(float)1, 2], [1, 2]);
+    
+    my $y_ndarray = FOP->c([(float)3, 4], [1, 2]);
+    
+    my $ret_ndarray = FOP->mul($x_ndarray, $y_ndarray);
+    
+    unless ($ret_ndarray is_type R::NDArray::Float) {
+      return 0;
+    }
+    
+    unless (Array->equals_float($ret_ndarray->data, [(float)3, 8])) {
+      return 0;
+    }
+    
+    unless (Array->equals_int($ret_ndarray->dim, [1, 2])) {
+      return 0;
+    }
+    
+    # Exceptions
+    {
+      {
+        my $x_ndarray = FOP->c([(float)1, 2], [1, 2]);
+        
+        my $y_ndarray = FOP->c([(float)3, 4], [1, 2]);
+        
+        eval { FOP->mul(undef, $y_ndarray); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+      {
+        my $x_ndarray = FOP->c([(float)1, 2], [1, 2]);
+        
+        my $y_ndarray = FOP->c([(float)3, 4], [1, 2]);
+        
+        eval { FOP->mul($x_ndarray, undef); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+      {
+        my $x_ndarray = FOP->c([(float)1, 2], [1, 2]);
+        
+        my $y_ndarray = FOP->c([(float)3, 4], [2, 1]);
+        
+        eval { FOP->mul($x_ndarray, $y_ndarray); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+    }
+    
+    $@ = undef;
+    
+    return 1;
+  }
+
+  static method scamul : int () {
+    
+    my $x_ndarray = FOP->c([(float)3, 4], [1, 2]);
+    
+    my $scalar_ndarray = FOP->c((float)3);
+    
+    my $ret_ndarray = FOP->scamul($x_ndarray, $scalar_ndarray);
+    
+    unless ($ret_ndarray is_type R::NDArray::Float) {
+      return 0;
+    }
+    
+    unless (Array->equals_float($ret_ndarray->data, [(float)9, 12])) {
+      return 0;
+    }
+    
+    unless (Array->equals_int($ret_ndarray->dim, [1, 2])) {
+      return 0;
+    }
+    
+    # Exceptions
+    {
+      {
+        my $x_ndarray = FOP->c([(float)3, 4], [1, 2]);
+        
+        my $scalar_ndarray = FOP->c((float)3);
+        
+        eval { FOP->scamul(undef, $scalar_ndarray); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+      {
+        my $x_ndarray = FOP->c([(float)3, 4], [1, 2]);
+        
+        my $scalar_ndarray = FOP->c((float)3);
+        
+        eval { FOP->scamul($x_ndarray, undef); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+      {
+        my $scalar_ndarray = FOP->c([(float)1, 2], [1, 2]);
+        
+        my $x_ndarray = FOP->c([(float)3, 4], [2, 1]);
+        
+        eval { FOP->scamul($x_ndarray, $scalar_ndarray); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+    }
+    
+    $@ = undef;
+    
+    return 1;
+  }
+  
+  static method div : int () {
+    
+    my $x_ndarray = FOP->c([(float)1, 1], [1, 2]);
+    
+    my $y_ndarray = FOP->c([(float)2, 4], [1, 2]);
+    
+    my $ret_ndarray = FOP->div($x_ndarray, $y_ndarray);
+    
+    unless ($ret_ndarray is_type R::NDArray::Float) {
+      return 0;
+    }
+    
+    unless (Array->equals_float($ret_ndarray->data, [(float)0.5f, 0.25f])) {
+      return 0;
+    }
+    
+    unless (Array->equals_int($ret_ndarray->dim, [1, 2])) {
+      return 0;
+    }
+    
+    # Exceptions
+    {
+      {
+        my $x_ndarray = FOP->c([(float)1, 2], [1, 2]);
+        
+        my $y_ndarray = FOP->c([(float)3, 4], [1, 2]);
+        
+        eval { FOP->div(undef, $y_ndarray); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+      {
+        my $x_ndarray = FOP->c([(float)1, 2], [1, 2]);
+        
+        my $y_ndarray = FOP->c([(float)3, 4], [1, 2]);
+        
+        eval { FOP->div($x_ndarray, undef); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+      {
+        my $x_ndarray = FOP->c([(float)1, 2], [1, 2]);
+        
+        my $y_ndarray = FOP->c([(float)3, 4], [2, 1]);
+        
+        eval { FOP->div($x_ndarray, $y_ndarray); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+    }
+    
+    $@ = undef;
+    
+    return 1;
+  }
+  
+  static method scadiv : int () {
+    
+    my $x_ndarray = FOP->c([(float)1, 2], [1, 2]);
+    
+    my $scalar_ndarray = FOP->c((float)2);
+    
+    my $ret_ndarray = FOP->scadiv($x_ndarray, $scalar_ndarray);
+    
+    unless ($ret_ndarray is_type R::NDArray::Float) {
+      return 0;
+    }
+    
+    unless (Array->equals_float($ret_ndarray->data, [(float)0.5f, 1])) {
+      return 0;
+    }
+    
+    unless (Array->equals_int($ret_ndarray->dim, [1, 2])) {
+      return 0;
+    }
+    
+    # Exceptions
+    {
+      {
+        my $x_ndarray = FOP->c([(float)3, 4], [1, 2]);
+        
+        my $scalar_ndarray = FOP->c((float)3);
+        
+        eval { FOP->scadiv($x_ndarray, undef); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+      {
+        my $x_ndarray = FOP->c([(float)3, 4], [1, 2]);
+        
+        my $scalar_ndarray = FOP->c((float)3);
+        
+        eval { FOP->scadiv(undef, $scalar_ndarray); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+      {
+        my $x_ndarray = FOP->c([(float)3, 4], [2, 1]);
+        
+        my $scalar_ndarray = FOP->c([(float)1, 2], [1, 2]);
+        
+        eval { FOP->scadiv($x_ndarray, $scalar_ndarray); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+    }
+    
+    $@ = undef;
+    
+    return 1;
+  }
+  
+  static method neg : int () {
+    
+    my $x_ndarray = FOP->c([(float)1, 2], [1, 2]);
+    
+    my $ret_ndarray = FOP->neg($x_ndarray);
+    
+    unless ($ret_ndarray is_type R::NDArray::Float) {
+      return 0;
+    }
+    
+    unless (Array->equals_float($ret_ndarray->data, [(float)-1, -2])) {
+      return 0;
+    }
+    
+    unless (Array->equals_int($ret_ndarray->dim, [1, 2])) {
+      return 0;
+    }
+    
+    # Exceptions
+    {
+      {
+        my $x_ndarray = FOP->c([(float)1, 2], [1, 2]);
+        
+        eval { FOP->neg(undef); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+    }
+    
+    $@ = undef;
+    
+    return 1;
+  }
+  
+  static method abs : int () {
+    
+    my $x_ndarray = FOP->c([(float)1, -2], [1, 2]);
+    
+    my $ret_ndarray = FOP->abs($x_ndarray);
+    
+    unless ($ret_ndarray is_type R::NDArray::Float) {
+      return 0;
+    }
+    
+    unless (Array->equals_float($ret_ndarray->data, [(float)1, 2])) {
+      return 0;
+    }
+    
+    unless (Array->equals_int($ret_ndarray->dim, [1, 2])) {
+      return 0;
+    }
+    
+    # Exceptions
+    {
+      {
+        my $x_ndarray = FOP->c([(float)1, 2], [1, 2]);
+        
+        eval { FOP->abs(undef); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+    }
+    
+    $@ = undef;
+    
+    return 1;
+  }
+  
+  static method eq : int () {
+    
+    my $x_ndarray = FOP->c([(float)1, 1], [1, 2]);
+    
+    my $y_ndarray = FOP->c([(float)1, 2], [1, 2]);
+    
+    my $ret_ndarray = FOP->eq($x_ndarray, $y_ndarray);
+    
+    unless ($ret_ndarray is_type R::NDArray::Int) {
+      return 0;
+    }
+    
+    unless (Array->equals_int($ret_ndarray->data, [1, 0])) {
+      return 0;
+    }
+    
+    unless (Array->equals_int($ret_ndarray->dim, [1, 2])) {
+      return 0;
+    }
+    
+    # Exceptions
+    {
+      {
+        my $x_ndarray = FOP->c([(float)1, 2], [1, 2]);
+        
+        my $y_ndarray = FOP->c([(float)3, 4], [1, 2]);
+        
+        eval { FOP->eq(undef, $y_ndarray); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+      {
+        my $x_ndarray = FOP->c([(float)1, 2], [1, 2]);
+        
+        my $y_ndarray = FOP->c([(float)3, 4], [1, 2]);
+        
+        eval { FOP->eq($x_ndarray, undef); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+      {
+        my $x_ndarray = FOP->c([(float)1, 2], [1, 2]);
+        
+        my $y_ndarray = FOP->c([(float)3, 4], [2, 1]);
+        
+        eval { FOP->eq($x_ndarray, $y_ndarray); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+    }
+    
+    $@ = undef;
+    
+    return 1;
+  }
+  
+  static method ne : int () {
+    
+    my $x_ndarray = FOP->c([(float)1, 1], [1, 2]);
+    
+    my $y_ndarray = FOP->c([(float)1, 2], [1, 2]);
+    
+    my $ret_ndarray = FOP->ne($x_ndarray, $y_ndarray);
+    
+    unless ($ret_ndarray is_type R::NDArray::Int) {
+      return 0;
+    }
+    
+    unless (Array->equals_int($ret_ndarray->data, [0, 1])) {
+      return 0;
+    }
+    
+    unless (Array->equals_int($ret_ndarray->dim, [1, 2])) {
+      return 0;
+    }
+    
+    # Exceptions
+    {
+      {
+        my $x_ndarray = FOP->c([(float)1, 2], [1, 2]);
+        
+        my $y_ndarray = FOP->c([(float)3, 4], [1, 2]);
+        
+        eval { FOP->ne(undef, $y_ndarray); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+      {
+        my $x_ndarray = FOP->c([(float)1, 2], [1, 2]);
+        
+        my $y_ndarray = FOP->c([(float)3, 4], [1, 2]);
+        
+        eval { FOP->ne($x_ndarray, undef); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+      {
+        my $x_ndarray = FOP->c([(float)1, 2], [1, 2]);
+        
+        my $y_ndarray = FOP->c([(float)3, 4], [2, 1]);
+        
+        eval { FOP->ne($x_ndarray, $y_ndarray); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+    }
+    
+    $@ = undef;
+    
+    return 1;
+  }
+  
+  static method gt : int () {
+    
+    my $x_ndarray = FOP->c([(float)1, 1, 1], [1, 3]);
+    
+    my $y_ndarray = FOP->c([(float)0, 1, 2], [1, 3]);
+    
+    my $ret_ndarray = FOP->gt($x_ndarray, $y_ndarray);
+    
+    unless ($ret_ndarray is_type R::NDArray::Int) {
+      return 0;
+    }
+    
+    unless (Array->equals_int($ret_ndarray->data, [1, 0, 0])) {
+      return 0;
+    }
+    
+    unless (Array->equals_int($ret_ndarray->dim, [1, 3])) {
+      return 0;
+    }
+    
+    # Exceptions
+    {
+      {
+        my $x_ndarray = FOP->c([(float)1, 1, 1], [1, 3]);
+        
+        my $y_ndarray = FOP->c([(float)0, 1, 2], [1, 3]);
+        
+        eval { FOP->gt(undef, $y_ndarray); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+      {
+        my $x_ndarray = FOP->c([(float)1, 1, 1], [1, 3]);
+        
+        my $y_ndarray = FOP->c([(float)0, 1, 2], [1, 3]);
+        
+        eval { FOP->gt($x_ndarray, undef); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+      {
+        my $x_ndarray = FOP->c([(float)1, 1, 1], [1, 3]);
+        
+        my $y_ndarray = FOP->c([(float)0, 1, 2], [3, 1]);
+        
+        eval { FOP->gt($x_ndarray, $y_ndarray); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+    }
+    
+    $@ = undef;
+    
+    return 1;
+  }
+  
+  static method ge : int () {
+    
+    my $x_ndarray = FOP->c([(float)1, 1, 1], [1, 3]);
+    
+    my $y_ndarray = FOP->c([(float)0, 1, 2], [1, 3]);
+    
+    my $ret_ndarray = FOP->ge($x_ndarray, $y_ndarray);
+    
+    unless ($ret_ndarray is_type R::NDArray::Int) {
+      return 0;
+    }
+    
+    unless (Array->equals_int($ret_ndarray->data, [1, 1, 0])) {
+      return 0;
+    }
+    
+    unless (Array->equals_int($ret_ndarray->dim, [1, 3])) {
+      return 0;
+    }
+    
+    # Exceptions
+    {
+      {
+        my $x_ndarray = FOP->c([(float)1, 1, 1], [1, 3]);
+        
+        my $y_ndarray = FOP->c([(float)0, 1, 2], [1, 3]);
+        
+        eval { FOP->ge(undef, $y_ndarray); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+      {
+        my $x_ndarray = FOP->c([(float)1, 1, 1], [1, 3]);
+        
+        my $y_ndarray = FOP->c([(float)0, 1, 2], [1, 3]);
+        
+        eval { FOP->ge($x_ndarray, undef); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+      {
+        my $x_ndarray = FOP->c([(float)1, 1, 1], [1, 3]);
+        
+        my $y_ndarray = FOP->c([(float)0, 1, 2], [3, 1]);
+        
+        eval { FOP->ge($x_ndarray, $y_ndarray); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+    }
+    
+    $@ = undef;
+    
+    return 1;
+  }
+  
+  static method lt : int () {
+    
+    my $x_ndarray = FOP->c([(float)1, 1, 1], [1, 3]);
+    
+    my $y_ndarray = FOP->c([(float)0, 1, 2], [1, 3]);
+    
+    my $ret_ndarray = FOP->lt($x_ndarray, $y_ndarray);
+    
+    unless ($ret_ndarray is_type R::NDArray::Int) {
+      return 0;
+    }
+    
+    unless (Array->equals_int($ret_ndarray->data, [0, 0, 1])) {
+      return 0;
+    }
+    
+    unless (Array->equals_int($ret_ndarray->dim, [1, 3])) {
+      return 0;
+    }
+    
+    # Exceptions
+    {
+      {
+        my $x_ndarray = FOP->c([(float)1, 1, 1], [1, 3]);
+        
+        my $y_ndarray = FOP->c([(float)0, 1, 2], [1, 3]);
+        
+        eval { FOP->lt(undef, $y_ndarray); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+      {
+        my $x_ndarray = FOP->c([(float)1, 1, 1], [1, 3]);
+        
+        my $y_ndarray = FOP->c([(float)0, 1, 2], [1, 3]);
+        
+        eval { FOP->lt($x_ndarray, undef); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+      {
+        my $x_ndarray = FOP->c([(float)1, 1, 1], [1, 3]);
+        
+        my $y_ndarray = FOP->c([(float)0, 1, 2], [3, 1]);
+        
+        eval { FOP->lt($x_ndarray, $y_ndarray); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+    }
+    
+    $@ = undef;
+    
+    return 1;
+  }
+  
+  static method le : int () {
+    
+    my $x_ndarray = FOP->c([(float)1, 1, 1], [1, 3]);
+    
+    my $y_ndarray = FOP->c([(float)0, 1, 2], [1, 3]);
+    
+    my $ret_ndarray = FOP->le($x_ndarray, $y_ndarray);
+    
+    unless ($ret_ndarray is_type R::NDArray::Int) {
+      return 0;
+    }
+    
+    unless (Array->equals_int($ret_ndarray->data, [0, 1, 1])) {
+      return 0;
+    }
+    
+    unless (Array->equals_int($ret_ndarray->dim, [1, 3])) {
+      return 0;
+    }
+    
+    # Exceptions
+    {
+      {
+        my $x_ndarray = FOP->c([(float)1, 1, 1], [1, 3]);
+        
+        my $y_ndarray = FOP->c([(float)0, 1, 2], [1, 3]);
+        
+        eval { FOP->le(undef, $y_ndarray); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+      {
+        my $x_ndarray = FOP->c([(float)1, 1, 1], [1, 3]);
+        
+        my $y_ndarray = FOP->c([(float)0, 1, 2], [1, 3]);
+        
+        eval { FOP->le($x_ndarray, undef); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+      {
+        my $x_ndarray = FOP->c([(float)1, 1, 1], [1, 3]);
+        
+        my $y_ndarray = FOP->c([(float)0, 1, 2], [3, 1]);
+        
+        eval { FOP->le($x_ndarray, $y_ndarray); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+    }
+    
+    $@ = undef;
+    
+    return 1;
+  }
+  
+  static method rep : int () {
+    
+    my $x_ndarray = FOP->c([(float)1, 2]);
+    
+    my $ret_ndarray = FOP->rep($x_ndarray, 2);
+    
+    unless (Array->equals_float($ret_ndarray->data, [(float)1, 2, 1, 2])) {
+      return 0;
+    }
+    
+    unless (Array->equals_int($ret_ndarray->dim, [4])) {
+      return 0;
+    }
+    
+    return 1;
+  }
+  
+  static method rep_length : int () {
+    
+    my $x_ndarray = FOP->c([(float)1, 2]);
+    
+    my $ret_ndarray = FOP->rep_length($x_ndarray, 4);
+    
+    unless (Array->equals_float($ret_ndarray->data, [(float)1, 2, 1, 2])) {
+      return 0;
+    }
+    
+    unless (Array->equals_int($ret_ndarray->dim, [4])) {
+      return 0;
+    }
+    
+    return 1;
+  }
+  
+  static method seq : int () {
+    
+    {
+      my $ret_ndarray = FOP->seq(1, 4);
+      
+      unless (Array->equals_float($ret_ndarray->data, [(float)1, 2, 3, 4])) {
+        return 0;
+      }
+      
+      unless (Array->equals_int($ret_ndarray->dim, [4])) {
+        return 0;
+      }
+    }
+    
+    {
+      my $ret_ndarray = FOP->seq(-3, 0);
+      
+      unless (Array->equals_float($ret_ndarray->data, [(float)-3, -2, -1, 0])) {
+        return 0;
+      }
+      
+      unless (Array->equals_int($ret_ndarray->dim, [4])) {
+        return 0;
+      }
+    }
+    
+    {
+      my $ret_ndarray = FOP->seq(1, 5, 2);
+      
+      unless (Array->equals_float($ret_ndarray->data, [(float)1, 3, 5])) {
+        return 0;
+      }
+      
+      unless (Array->equals_int($ret_ndarray->dim, [3])) {
+        return 0;
+      }
+    }
+    
+    {
+      my $ret_ndarray = FOP->seq(4, 1, -1);
+      
+      unless (Array->equals_float($ret_ndarray->data, [(float)4, 3, 2, 1])) {
+        return 0;
+      }
+      
+      unless (Array->equals_int($ret_ndarray->dim, [4])) {
+        return 0;
+      }
+    }
+    
+    {
+      my $ret_ndarray = FOP->seq(5, 1, -2);
+      
+      unless (Array->equals_float($ret_ndarray->data, [(float)5, 3, 1])) {
+        return 0;
+      }
+      
+      unless (Array->equals_int($ret_ndarray->dim, [3])) {
+        return 0;
+      }
+    }
+    
+    # Exceptions
+    {
+      {
+        eval { FOP->seq(1, 4, 0); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+      {
+        eval { FOP->seq(1, 4, -1); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+      {
+        eval { FOP->seq(4, 1, 1); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+    }
+    
+    $@ = undef;
+    
+    return 1;
+  }
+  
+  static method seq_length : int () {
+    
+    {
+      my $ret_ndarray = FOP->seq_length(1, 4, 4);
+      
+      unless (Array->equals_float($ret_ndarray->data, [(float)1, 2, 3, 4])) {
+        return 0;
+      }
+      
+      unless (Array->equals_int($ret_ndarray->dim, [4])) {
+        return 0;
+      }
+    }
+    
+    return 1;
+  }
+  
+  static method sin : int () {
+    
+    my $x_ndarray = FOP->c([(float)1, -2], [1, 2]);
+    
+    my $ret_ndarray = FOP->sin($x_ndarray);
+    
+    unless ($ret_ndarray is_type R::NDArray::Float) {
+      return 0;
+    }
+    
+    unless (Array->equals_float($ret_ndarray->data, [(float)Math->sinf($x_ndarray->data->[0]), Math->sinf($x_ndarray->data->[1])])) {
+      return 0;
+    }
+    
+    unless (Array->equals_int($ret_ndarray->dim, [1, 2])) {
+      return 0;
+    }
+    
+    # Exceptions
+    {
+      {
+        my $x_ndarray = FOP->c([(float)1, 2], [1, 2]);
+        
+        eval { FOP->sin(undef); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+    }
+    
+    $@ = undef;
+    
+    return 1;
+  }
+  
+  static method cos : int () {
+    
+    my $x_ndarray = FOP->c([(float)1, -2], [1, 2]);
+    
+    my $ret_ndarray = FOP->cos($x_ndarray);
+    
+    unless ($ret_ndarray is_type R::NDArray::Float) {
+      return 0;
+    }
+    
+    unless (Array->equals_float($ret_ndarray->data, [(float)Math->cosf($x_ndarray->data->[0]), Math->cosf($x_ndarray->data->[1])])) {
+      return 0;
+    }
+    
+    unless (Array->equals_int($ret_ndarray->dim, [1, 2])) {
+      return 0;
+    }
+    
+    # Exceptions
+    {
+      {
+        my $x_ndarray = FOP->c([(float)1, 2], [1, 2]);
+        
+        eval { FOP->cos(undef); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+    }
+    
+    $@ = undef;
+    
+    return 1;
+  }
+
+  static method tan : int () {
+    
+    my $x_ndarray = FOP->c([(float)1, -2], [1, 2]);
+    
+    my $ret_ndarray = FOP->tan($x_ndarray);
+    
+    unless ($ret_ndarray is_type R::NDArray::Float) {
+      return 0;
+    }
+    
+    unless (Array->equals_float($ret_ndarray->data, [(float)Math->tanf($x_ndarray->data->[0]), Math->tanf($x_ndarray->data->[1])])) {
+      return 0;
+    }
+    
+    unless (Array->equals_int($ret_ndarray->dim, [1, 2])) {
+      return 0;
+    }
+    
+    # Exceptions
+    {
+      {
+        my $x_ndarray = FOP->c([(float)1, 2], [1, 2]);
+        
+        eval { FOP->tan(undef); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+    }
+    
+    $@ = undef;
+    
+    return 1;
+  }
+  
+  static method sinh : int () {
+    
+    my $x_ndarray = FOP->c([(float)1, -2], [1, 2]);
+    
+    my $ret_ndarray = FOP->sinh($x_ndarray);
+    
+    unless ($ret_ndarray is_type R::NDArray::Float) {
+      return 0;
+    }
+    
+    unless (Array->equals_float($ret_ndarray->data, [(float)Math->sinhf($x_ndarray->data->[0]), Math->sinhf($x_ndarray->data->[1])])) {
+      return 0;
+    }
+    
+    unless (Array->equals_int($ret_ndarray->dim, [1, 2])) {
+      return 0;
+    }
+    
+    # Exceptions
+    {
+      {
+        my $x_ndarray = FOP->c([(float)1, 2], [1, 2]);
+        
+        eval { FOP->sinh(undef); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+    }
+    
+    $@ = undef;
+    
+    return 1;
+  }
+
+  static method cosh : int () {
+    
+    my $x_ndarray = FOP->c([(float)1, -2], [1, 2]);
+    
+    my $ret_ndarray = FOP->cosh($x_ndarray);
+    
+    unless ($ret_ndarray is_type R::NDArray::Float) {
+      return 0;
+    }
+    
+    unless (Array->equals_float($ret_ndarray->data, [(float)Math->coshf($x_ndarray->data->[0]), Math->coshf($x_ndarray->data->[1])])) {
+      return 0;
+    }
+    
+    unless (Array->equals_int($ret_ndarray->dim, [1, 2])) {
+      return 0;
+    }
+    
+    # Exceptions
+    {
+      {
+        my $x_ndarray = FOP->c([(float)1, 2], [1, 2]);
+        
+        eval { FOP->cosh(undef); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+    }
+    
+    $@ = undef;
+    
+    return 1;
+  }
+
+  static method tanh : int () {
+    
+    my $x_ndarray = FOP->c([(float)1, -2], [1, 2]);
+    
+    my $ret_ndarray = FOP->tanh($x_ndarray);
+    
+    unless ($ret_ndarray is_type R::NDArray::Float) {
+      return 0;
+    }
+    
+    unless (Array->equals_float($ret_ndarray->data, [(float)Math->tanhf($x_ndarray->data->[0]), Math->tanhf($x_ndarray->data->[1])])) {
+      return 0;
+    }
+    
+    unless (Array->equals_int($ret_ndarray->dim, [1, 2])) {
+      return 0;
+    }
+    
+    # Exceptions
+    {
+      {
+        my $x_ndarray = FOP->c([(float)1, 2], [1, 2]);
+        
+        eval { FOP->tanh(undef); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+    }
+    
+    $@ = undef;
+    
+    return 1;
+  }
+
+  static method acos : int () {
+    
+    my $x_ndarray = FOP->c([(float)1, -1], [1, 2]);
+    
+    my $ret_ndarray = FOP->acos($x_ndarray);
+    
+    unless ($ret_ndarray is_type R::NDArray::Float) {
+      return 0;
+    }
+    
+    unless (Array->equals_float($ret_ndarray->data, [(float)Math->acosf($x_ndarray->data->[0]), Math->acosf($x_ndarray->data->[1])])) {
+      return 0;
+    }
+    
+    unless (Array->equals_int($ret_ndarray->dim, [1, 2])) {
+      return 0;
+    }
+    
+    # Exceptions
+    {
+      {
+        my $x_ndarray = FOP->c([(float)1, 2], [1, 2]);
+        
+        eval { FOP->acos(undef); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+    }
+    
+    $@ = undef;
+    
+    return 1;
+  }
+  
+  static method asin : int () {
+    
+    my $x_ndarray = FOP->c([(float)1, -1], [1, 2]);
+    
+    my $ret_ndarray = FOP->asin($x_ndarray);
+    
+    unless ($ret_ndarray is_type R::NDArray::Float) {
+      return 0;
+    }
+    
+    unless (Array->equals_float($ret_ndarray->data, [(float)Math->asinf($x_ndarray->data->[0]), Math->asinf($x_ndarray->data->[1])])) {
+      return 0;
+    }
+    
+    unless (Array->equals_int($ret_ndarray->dim, [1, 2])) {
+      return 0;
+    }
+    
+    # Exceptions
+    {
+      {
+        my $x_ndarray = FOP->c([(float)1, 2], [1, 2]);
+        
+        eval { FOP->asin(undef); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+    }
+    
+    $@ = undef;
+    
+    return 1;
+  }
+  
+  static method atan : int () {
+    
+    my $x_ndarray = FOP->c([(float)1, -1], [1, 2]);
+    
+    my $ret_ndarray = FOP->atan($x_ndarray);
+    
+    unless ($ret_ndarray is_type R::NDArray::Float) {
+      return 0;
+    }
+    
+    unless (Array->equals_float($ret_ndarray->data, [(float)Math->atanf($x_ndarray->data->[0]), Math->atanf($x_ndarray->data->[1])])) {
+      return 0;
+    }
+    
+    unless (Array->equals_int($ret_ndarray->dim, [1, 2])) {
+      return 0;
+    }
+    
+    # Exceptions
+    {
+      {
+        my $x_ndarray = FOP->c([(float)1, 2], [1, 2]);
+        
+        eval { FOP->atan(undef); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+    }
+    
+    $@ = undef;
+    
+    return 1;
+  }
+  
+  static method asinh : int () {
+    
+    my $x_ndarray = FOP->c([(float)1, -1], [1, 2]);
+    
+    my $ret_ndarray = FOP->asinh($x_ndarray);
+    
+    unless ($ret_ndarray is_type R::NDArray::Float) {
+      return 0;
+    }
+    
+    unless (Array->equals_float($ret_ndarray->data, [(float)Math->asinhf($x_ndarray->data->[0]), Math->asinhf($x_ndarray->data->[1])])) {
+      return 0;
+    }
+    
+    unless (Array->equals_int($ret_ndarray->dim, [1, 2])) {
+      return 0;
+    }
+    
+    # Exceptions
+    {
+      {
+        my $x_ndarray = FOP->c([(float)1, 2], [1, 2]);
+        
+        eval { FOP->asinh(undef); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+    }
+    
+    $@ = undef;
+    
+    return 1;
+  }
+  
+  static method acosh : int () {
+    
+    my $x_ndarray = FOP->c([(float)1, 2], [1, 2]);
+    
+    my $ret_ndarray = FOP->acosh($x_ndarray);
+    
+    unless ($ret_ndarray is_type R::NDArray::Float) {
+      return 0;
+    }
+    
+    unless (Array->equals_float($ret_ndarray->data, [(float)Math->acoshf($x_ndarray->data->[0]), Math->acoshf($x_ndarray->data->[1])])) {
+      return 0;
+    }
+    
+    unless (Array->equals_int($ret_ndarray->dim, [1, 2])) {
+      return 0;
+    }
+    
+    # Exceptions
+    {
+      {
+        my $x_ndarray = FOP->c([(float)1, 2], [1, 2]);
+        
+        eval { FOP->acosh(undef); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+    }
+    
+    $@ = undef;
+    
+    return 1;
+  }
+  
+  static method atanh : int () {
+    
+    my $x_ndarray = FOP->c([(float)1, -1], [1, 2]);
+    
+    my $ret_ndarray = FOP->atanh($x_ndarray);
+    
+    unless ($ret_ndarray is_type R::NDArray::Float) {
+      return 0;
+    }
+    
+    unless (Array->equals_float($ret_ndarray->data, [(float)Math->atanhf($x_ndarray->data->[0]), Math->atanhf($x_ndarray->data->[1])])) {
+      return 0;
+    }
+    
+    unless (Array->equals_int($ret_ndarray->dim, [1, 2])) {
+      return 0;
+    }
+    
+    # Exceptions
+    {
+      {
+        my $x_ndarray = FOP->c([(float)1, 2], [1, 2]);
+        
+        eval { FOP->atanh(undef); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+    }
+    
+    $@ = undef;
+    
+    return 1;
+  }
+
+  static method exp : int () {
+    
+    my $x_ndarray = FOP->c([(float)1, -1], [1, 2]);
+    
+    my $ret_ndarray = FOP->exp($x_ndarray);
+    
+    unless ($ret_ndarray is_type R::NDArray::Float) {
+      return 0;
+    }
+    
+    unless (Array->equals_float($ret_ndarray->data, [(float)Math->expf($x_ndarray->data->[0]), Math->expf($x_ndarray->data->[1])])) {
+      return 0;
+    }
+    
+    unless (Array->equals_int($ret_ndarray->dim, [1, 2])) {
+      return 0;
+    }
+    
+    # Exceptions
+    {
+      {
+        my $x_ndarray = FOP->c([(float)1, 2], [1, 2]);
+        
+        eval { FOP->exp(undef); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+    }
+    
+    $@ = undef;
+    
+    return 1;
+  }
+
+  static method expm1 : int () {
+    
+    my $x_ndarray = FOP->c([(float)1, -1], [1, 2]);
+    
+    my $ret_ndarray = FOP->expm1($x_ndarray);
+    
+    unless ($ret_ndarray is_type R::NDArray::Float) {
+      return 0;
+    }
+    
+    unless (Array->equals_float($ret_ndarray->data, [(float)Math->expm1f($x_ndarray->data->[0]), Math->expm1f($x_ndarray->data->[1])])) {
+      return 0;
+    }
+    
+    unless (Array->equals_int($ret_ndarray->dim, [1, 2])) {
+      return 0;
+    }
+    
+    # Exceptions
+    {
+      {
+        my $x_ndarray = FOP->c([(float)1, 2], [1, 2]);
+        
+        eval { FOP->expm1(undef); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+    }
+    
+    $@ = undef;
+    
+    return 1;
+  }
+  
+  static method log : int () {
+    
+    my $x_ndarray = FOP->c([(float)1, 2], [1, 2]);
+    
+    my $ret_ndarray = FOP->log($x_ndarray);
+    
+    unless ($ret_ndarray is_type R::NDArray::Float) {
+      return 0;
+    }
+    
+    unless (Array->equals_float($ret_ndarray->data, [(float)Math->logf($x_ndarray->data->[0]), Math->logf($x_ndarray->data->[1])])) {
+      return 0;
+    }
+    
+    unless (Array->equals_int($ret_ndarray->dim, [1, 2])) {
+      return 0;
+    }
+    
+    # Exceptions
+    {
+      {
+        my $x_ndarray = FOP->c([(float)1, 2], [1, 2]);
+        
+        eval { FOP->log(undef); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+    }
+    
+    $@ = undef;
+    
+    return 1;
+  }
+  
+  static method logb : int () {
+    
+    my $x_ndarray = FOP->c([(float)1, 2], [1, 2]);
+    
+    my $ret_ndarray = FOP->logb($x_ndarray);
+    
+    unless ($ret_ndarray is_type R::NDArray::Float) {
+      return 0;
+    }
+    
+    unless (Array->equals_float($ret_ndarray->data, [(float)Math->logbf($x_ndarray->data->[0]), Math->logbf($x_ndarray->data->[1])])) {
+      return 0;
+    }
+    
+    unless (Array->equals_int($ret_ndarray->dim, [1, 2])) {
+      return 0;
+    }
+    
+    # Exceptions
+    {
+      {
+        my $x_ndarray = FOP->c([(float)1, 2], [1, 2]);
+        
+        eval { FOP->logb(undef); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+    }
+    
+    $@ = undef;
+    
+    return 1;
+  }
+  
+  static method log2 : int () {
+    
+    my $x_ndarray = FOP->c([(float)1, 2], [1, 2]);
+    
+    my $ret_ndarray = FOP->log2($x_ndarray);
+    
+    unless ($ret_ndarray is_type R::NDArray::Float) {
+      return 0;
+    }
+    
+    unless (Array->equals_float($ret_ndarray->data, [(float)Math->log2f($x_ndarray->data->[0]), Math->log2f($x_ndarray->data->[1])])) {
+      return 0;
+    }
+    
+    unless (Array->equals_int($ret_ndarray->dim, [1, 2])) {
+      return 0;
+    }
+    
+    # Exceptions
+    {
+      {
+        my $x_ndarray = FOP->c([(float)1, 2], [1, 2]);
+        
+        eval { FOP->log2(undef); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+    }
+    
+    $@ = undef;
+    
+    return 1;
+  }
+  
+  static method log10 : int () {
+    
+    my $x_ndarray = FOP->c([(float)1, 2], [1, 2]);
+    
+    my $ret_ndarray = FOP->log10($x_ndarray);
+    
+    unless ($ret_ndarray is_type R::NDArray::Float) {
+      return 0;
+    }
+    
+    unless (Array->equals_float($ret_ndarray->data, [(float)Math->log10f($x_ndarray->data->[0]), Math->log10f($x_ndarray->data->[1])])) {
+      return 0;
+    }
+    
+    unless (Array->equals_int($ret_ndarray->dim, [1, 2])) {
+      return 0;
+    }
+    
+    # Exceptions
+    {
+      {
+        my $x_ndarray = FOP->c([(float)1, 2], [1, 2]);
+        
+        eval { FOP->log10(undef); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+    }
+    
+    $@ = undef;
+    
+    return 1;
+  }
+  
+  static method sqrt : int () {
+    
+    my $x_ndarray = FOP->c([(float)1, 2], [1, 2]);
+    
+    my $ret_ndarray = FOP->sqrt($x_ndarray);
+    
+    unless ($ret_ndarray is_type R::NDArray::Float) {
+      return 0;
+    }
+    
+    unless (Array->equals_float($ret_ndarray->data, [(float)Math->sqrtf($x_ndarray->data->[0]), Math->sqrtf($x_ndarray->data->[1])])) {
+      return 0;
+    }
+    
+    unless (Array->equals_int($ret_ndarray->dim, [1, 2])) {
+      return 0;
+    }
+    
+    # Exceptions
+    {
+      {
+        my $x_ndarray = FOP->c([(float)1, 2], [1, 2]);
+        
+        eval { FOP->sqrt(undef); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+    }
+    
+    $@ = undef;
+    
+    return 1;
+  }
+  
+  static method isinf : int () {
+    
+    my $x_ndarray = FOP->c([(float)Math->INFINITYF, 2], [1, 2]);
+    
+    my $ret_ndarray = FOP->isinf($x_ndarray);
+    
+    unless ($ret_ndarray is_type R::NDArray::Int) {
+      return 0;
+    }
+    
+    unless (Array->equals_int($ret_ndarray->data, [Math->isinff($x_ndarray->data->[0]), Math->isinff($x_ndarray->data->[1])])) {
+      return 0;
+    }
+    
+    unless (Array->equals_int($ret_ndarray->dim, [1, 2])) {
+      return 0;
+    }
+    
+    # Exceptions
+    {
+      {
+        my $x_ndarray = FOP->c([(float)1, 2], [1, 2]);
+        
+        eval { FOP->isinf(undef); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+    }
+    
+    $@ = undef;
+    
+    return 1;
+  }
+  
+  static method is_infinite : int () {
+    
+    my $x_ndarray = FOP->c([(float)Math->INFINITYF, 2], [1, 2]);
+    
+    my $ret_ndarray = FOP->is_infinite($x_ndarray);
+    
+    unless ($ret_ndarray is_type R::NDArray::Int) {
+      return 0;
+    }
+    
+    unless (Array->equals_int($ret_ndarray->data, [Math->isinff($x_ndarray->data->[0]), Math->isinff($x_ndarray->data->[1])])) {
+      return 0;
+    }
+    
+    unless (Array->equals_int($ret_ndarray->dim, [1, 2])) {
+      return 0;
+    }
+    
+    # Exceptions
+    {
+      {
+        my $x_ndarray = FOP->c([(float)1, 2], [1, 2]);
+        
+        eval { FOP->is_infinite(undef); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+    }
+    
+    $@ = undef;
+    
+    return 1;
+  }
+  
+  static method is_finite : int () {
+    
+    my $x_ndarray = FOP->c([(float)Math->INFINITYF, Math->NANF, 2], [1, 3]);
+    
+    my $ret_ndarray = FOP->is_finite($x_ndarray);
+    
+    unless ($ret_ndarray is_type R::NDArray::Int) {
+      return 0;
+    }
+    
+    unless (Array->equals_int($ret_ndarray->data, [0, 0, 1])) {
+      return 0;
+    }
+    
+    unless (Array->equals_int($ret_ndarray->data, [!Math->isinff($x_ndarray->data->[0]) && !Math->isnanf($x_ndarray->data->[0]), !Math->isinff($x_ndarray->data->[1]) && !Math->isnanf($x_ndarray->data->[1]), !Math->isinff($x_ndarray->data->[2]) && !Math->isnanf($x_ndarray->data->[2])])) {
+      return 0;
+    }
+    
+    unless (Array->equals_int($ret_ndarray->dim, [1, 3])) {
+      return 0;
+    }
+    
+    # Exceptions
+    {
+      {
+        my $x_ndarray = FOP->c([(float)1, 2, 3], [1, 3]);
+        
+        eval { FOP->is_finite(undef); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+    }
+    
+    $@ = undef;
+    
+    return 1;
+  }
+  
+  static method isnan : int () {
+    
+    my $x_ndarray = FOP->c([(float)Math->NANF, 2], [1, 2]);
+    
+    my $ret_ndarray = FOP->isnan($x_ndarray);
+    
+    unless ($ret_ndarray is_type R::NDArray::Int) {
+      return 0;
+    }
+    
+    unless (Array->equals_int($ret_ndarray->data, [Math->isnanf($x_ndarray->data->[0]), Math->isnanf($x_ndarray->data->[1])])) {
+      return 0;
+    }
+    
+    unless (Array->equals_int($ret_ndarray->dim, [1, 2])) {
+      return 0;
+    }
+    
+    # Exceptions
+    {
+      {
+        my $x_ndarray = FOP->c([(float)1, 2], [1, 2]);
+        
+        eval { FOP->isnan(undef); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+    }
+    
+    $@ = undef;
+    
+    return 1;
+  }
+  
+  static method is_nan : int () {
+    
+    my $x_ndarray = FOP->c([(float)Math->NANF, 2], [1, 2]);
+    
+    my $ret_ndarray = FOP->is_nan($x_ndarray);
+    
+    unless ($ret_ndarray is_type R::NDArray::Int) {
+      return 0;
+    }
+    
+    unless (Array->equals_int($ret_ndarray->data, [Math->isnanf($x_ndarray->data->[0]), Math->isnanf($x_ndarray->data->[1])])) {
+      return 0;
+    }
+    
+    unless (Array->equals_int($ret_ndarray->dim, [1, 2])) {
+      return 0;
+    }
+    
+    # Exceptions
+    {
+      {
+        my $x_ndarray = FOP->c([(float)1, 2], [1, 2]);
+        
+        eval { FOP->is_nan(undef); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+    }
+    
+    $@ = undef;
+    
+    return 1;
+  }
+  
+
+  static method pow : int () {
+    
+    my $x_ndarray = FOP->c([(float)1, 0.5f], [1, 2]);
+    
+    my $y_ndarray = FOP->c([(float)0.5f, 0.25f], [1, 2]);
+    
+    my $ret_ndarray = FOP->pow($x_ndarray, $y_ndarray);
+    
+    unless ($ret_ndarray is_type R::NDArray::Float) {
+      return 0;
+    }
+    
+    unless (Array->equals_float($ret_ndarray->data, [Math->powf($x_ndarray->data->[0], $x_ndarray->data->[1]), Math->powf($y_ndarray->data->[0], $y_ndarray->data->[1])])) {
+      return 0;
+    }
+    
+    unless (Array->equals_int($ret_ndarray->dim, [1, 2])) {
+      return 0;
+    }
+    
+    # Exceptions
+    {
+      {
+        my $x_ndarray = FOP->c([(float)1, 2], [1, 2]);
+        
+        my $y_ndarray = FOP->c([(float)3, 4], [1, 2]);
+        
+        eval { FOP->pow(undef, $y_ndarray); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+      {
+        my $x_ndarray = FOP->c([(float)1, 2], [1, 2]);
+        
+        my $y_ndarray = FOP->c([(float)3, 4], [1, 2]);
+        
+        eval { FOP->pow($x_ndarray, undef); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+      {
+        my $x_ndarray = FOP->c([(float)1, 2], [1, 2]);
+        
+        my $y_ndarray = FOP->c([(float)3, 4], [2, 1]);
+        
+        eval { FOP->pow($x_ndarray, $y_ndarray); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+    }
+    
+    $@ = undef;
+    
+    return 1;
+  }
+  
+  static method atan2 : int () {
+    
+    my $x_ndarray = FOP->c([(float)1, 0.5f], [1, 2]);
+    
+    my $y_ndarray = FOP->c([(float)0.5f, 0.25f], [1, 2]);
+    
+    my $ret_ndarray = FOP->atan2($x_ndarray, $y_ndarray);
+    
+    unless ($ret_ndarray is_type R::NDArray::Float) {
+      return 0;
+    }
+    
+    unless (Array->equals_float($ret_ndarray->data, [Math->atan2f($x_ndarray->data->[0], $x_ndarray->data->[1]), Math->atan2f($y_ndarray->data->[0], $y_ndarray->data->[1])])) {
+      return 0;
+    }
+    
+    unless (Array->equals_int($ret_ndarray->dim, [1, 2])) {
+      return 0;
+    }
+    
+    # Exceptions
+    {
+      {
+        my $x_ndarray = FOP->c([(float)1, 2], [1, 2]);
+        
+        my $y_ndarray = FOP->c([(float)3, 4], [1, 2]);
+        
+        eval { FOP->atan2(undef, $y_ndarray); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+      {
+        my $x_ndarray = FOP->c([(float)1, 2], [1, 2]);
+        
+        my $y_ndarray = FOP->c([(float)3, 4], [1, 2]);
+        
+        eval { FOP->atan2($x_ndarray, undef); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+      {
+        my $x_ndarray = FOP->c([(float)1, 2], [1, 2]);
+        
+        my $y_ndarray = FOP->c([(float)3, 4], [2, 1]);
+        
+        eval { FOP->atan2($x_ndarray, $y_ndarray); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+    }
+    
+    $@ = undef;
+    
+    return 1;
+  }
+  
+  static method modf : int () {
+    
+    my $x_ndarray = FOP->c([(float)1, 0.5f], [1, 2]);
+    
+    my $intpart_ndarray = FOP->c([(float)0, 0], [1, 2]);
+    
+    my $intpart_ndarray_ref = [$intpart_ndarray];
+    
+    my $ret_ndarray = FOP->modf($x_ndarray, $intpart_ndarray_ref);
+    
+    unless ($ret_ndarray is_type R::NDArray::Float) {
+      return 0;
+    }
+    
+    my $intpart0 = (float)0;
+    my $intpart1 = (float)0;
+    unless (Array->equals_float($ret_ndarray->data, [Math->modff($x_ndarray->data->[0], \$intpart0), Math->modff($x_ndarray->data->[1], \$intpart1)])) {
+      return 0;
+    }
+    
+    unless ($intpart_ndarray_ref->[0]->data->[0] == $intpart0) {
+      return 0;
+    }
+    
+    unless ($intpart_ndarray_ref->[0]->data->[1] == $intpart1) {
+      return 0;
+    }
+    
+    unless (Array->equals_int($ret_ndarray->dim, [1, 2])) {
+      return 0;
+    }
+    
+    # Exceptions
+    {
+      {
+        my $x_ndarray = FOP->c([(float)1, 2], [1, 2]);
+        
+        my $intpart_ndarray = FOP->c([(float)1, 0.5f], [1, 2]);
+        
+        my $intpart_ndarray_ref = [$intpart_ndarray];
+        
+        eval { FOP->modf(undef, $intpart_ndarray_ref); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+      {
+        my $x_ndarray = FOP->c([(float)1, 2], [1, 2]);
+        
+        my $intpart_ndarray = FOP->c([(float)1, 0.5f], [1, 2]);
+        
+        my $intpart_ndarray_ref = [$intpart_ndarray];
+        
+        eval { FOP->modf($x_ndarray, undef); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+      {
+        my $x_ndarray = FOP->c([(float)1, 2], [1, 2]);
+        
+        my $intpart_ndarray = FOP->c([(float)1, 0.5f], [1, 2]);
+        
+        my $intpart_ndarray_ref = [$intpart_ndarray, $intpart_ndarray];
+        
+        eval { FOP->modf($x_ndarray, $intpart_ndarray_ref); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+    }
+    
+    $@ = undef;
+    
+    return 1;
+  }
+  
+  static method ceil : int () {
+    
+    my $x_ndarray = FOP->c([(float)1.5f, 2.5f], [1, 2]);
+    
+    my $ret_ndarray = FOP->ceil($x_ndarray);
+    
+    unless ($ret_ndarray is_type R::NDArray::Float) {
+      return 0;
+    }
+    
+    unless (Array->equals_float($ret_ndarray->data, [(float)Math->ceilf($x_ndarray->data->[0]), Math->ceilf($x_ndarray->data->[1])])) {
+      return 0;
+    }
+    
+    unless (Array->equals_int($ret_ndarray->dim, [1, 2])) {
+      return 0;
+    }
+    
+    # Exceptions
+    {
+      {
+        my $x_ndarray = FOP->c([(float)1, 2], [1, 2]);
+        
+        eval { FOP->ceil(undef); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+    }
+    
+    $@ = undef;
+    
+    return 1;
+  }
+  
+  static method ceiling : int () {
+    
+    my $x_ndarray = FOP->c([(float)1.5f, 2.5f], [1, 2]);
+    
+    my $ret_ndarray = FOP->ceiling($x_ndarray);
+    
+    unless ($ret_ndarray is_type R::NDArray::Float) {
+      return 0;
+    }
+    
+    unless (Array->equals_float($ret_ndarray->data, [(float)Math->ceilf($x_ndarray->data->[0]), Math->ceilf($x_ndarray->data->[1])])) {
+      return 0;
+    }
+    
+    unless (Array->equals_int($ret_ndarray->dim, [1, 2])) {
+      return 0;
+    }
+    
+    # Exceptions
+    {
+      {
+        my $x_ndarray = FOP->c([(float)1, 2], [1, 2]);
+        
+        eval { FOP->ceiling(undef); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+    }
+    
+    $@ = undef;
+    
+    return 1;
+  }
+  
+  static method floor : int () {
+    
+    my $x_ndarray = FOP->c([(float)1.5f, 2.5f], [1, 2]);
+    
+    my $ret_ndarray = FOP->floor($x_ndarray);
+    
+    unless ($ret_ndarray is_type R::NDArray::Float) {
+      return 0;
+    }
+    
+    unless (Array->equals_float($ret_ndarray->data, [(float)Math->floorf($x_ndarray->data->[0]), Math->floorf($x_ndarray->data->[1])])) {
+      return 0;
+    }
+    
+    unless (Array->equals_int($ret_ndarray->dim, [1, 2])) {
+      return 0;
+    }
+    
+    # Exceptions
+    {
+      {
+        my $x_ndarray = FOP->c([(float)1, 2], [1, 2]);
+        
+        eval { FOP->floor(undef); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+    }
+    
+    $@ = undef;
+    
+    return 1;
+  }
+  
+  static method round : int () {
+    
+    my $x_ndarray = FOP->c([(float)1.5f, 2.5f], [1, 2]);
+    
+    my $ret_ndarray = FOP->round($x_ndarray);
+    
+    unless ($ret_ndarray is_type R::NDArray::Float) {
+      return 0;
+    }
+    
+    unless (Array->equals_float($ret_ndarray->data, [(float)Math->roundf($x_ndarray->data->[0]), Math->roundf($x_ndarray->data->[1])])) {
+      return 0;
+    }
+    
+    unless (Array->equals_int($ret_ndarray->dim, [1, 2])) {
+      return 0;
+    }
+    
+    # Exceptions
+    {
+      {
+        my $x_ndarray = FOP->c([(float)1, 2], [1, 2]);
+        
+        eval { FOP->round(undef); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+    }
+    
+    $@ = undef;
+    
+    return 1;
+  }
+  
+  static method lround : int () {
+    
+    my $x_ndarray = FOP->c([(float)1.5f, 2.5f], [1, 2]);
+    
+    my $ret_ndarray = FOP->lround($x_ndarray);
+    
+    unless ($ret_ndarray is_type R::NDArray::Long) {
+      return 0;
+    }
+    
+    unless (Array->equals_long($ret_ndarray->data, [(long)Math->lroundf($x_ndarray->data->[0]), Math->lroundf($x_ndarray->data->[1])])) {
+      return 0;
+    }
+    
+    unless (Array->equals_int($ret_ndarray->dim, [1, 2])) {
+      return 0;
+    }
+    
+    # Exceptions
+    {
+      {
+        my $x_ndarray = FOP->c([(float)1, 2], [1, 2]);
+        
+        eval { FOP->lround(undef); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+    }
+    
+    $@ = undef;
+    
+    return 1;
+  }
+  
+  static method remainder : int () {
+    
+    my $x_ndarray = FOP->c([(float)1, 3], [1, 2]);
+    
+    my $y_ndarray = FOP->c([(float)2, 4], [1, 2]);
+    
+    my $ret_ndarray = FOP->remainder($x_ndarray, $y_ndarray);
+    
+    unless ($ret_ndarray is_type R::NDArray::Float) {
+      return 0;
+    }
+    
+    unless (Array->equals_float($ret_ndarray->data, [(float)Math->remainderf($x_ndarray->data->[0], $y_ndarray->data->[0]), Math->remainderf($x_ndarray->data->[1], $y_ndarray->data->[1])])) {
+      return 0;
+    }
+    
+    unless (Array->equals_int($ret_ndarray->dim, [1, 2])) {
+      return 0;
+    }
+    
+    # Exceptions
+    {
+      {
+        my $x_ndarray = FOP->c([(float)1, 2], [1, 2]);
+        
+        my $y_ndarray = FOP->c([(float)3, 4], [1, 2]);
+        
+        eval { FOP->remainder(undef, $y_ndarray); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+      {
+        my $x_ndarray = FOP->c([(float)1, 2], [1, 2]);
+        
+        my $y_ndarray = FOP->c([(float)3, 4], [1, 2]);
+        
+        eval { FOP->remainder($x_ndarray, undef); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+      {
+        my $x_ndarray = FOP->c([(float)1, 2], [1, 2]);
+        
+        my $y_ndarray = FOP->c([(float)3, 4], [2, 1]);
+        
+        eval { FOP->remainder($x_ndarray, $y_ndarray); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+    }
+    
+    $@ = undef;
+    
+    return 1;
+  }
+  
+  static method fmod : int () {
+    
+    my $x_ndarray = FOP->c([(float)1, 3], [1, 2]);
+    
+    my $y_ndarray = FOP->c([(float)2, 4], [1, 2]);
+    
+    my $ret_ndarray = FOP->fmod($x_ndarray, $y_ndarray);
+    
+    unless ($ret_ndarray is_type R::NDArray::Float) {
+      return 0;
+    }
+    
+    unless (Array->equals_float($ret_ndarray->data, [(float)Math->fmodf($x_ndarray->data->[0], $y_ndarray->data->[0]), Math->fmodf($x_ndarray->data->[1], $y_ndarray->data->[1])])) {
+      return 0;
+    }
+    
+    unless (Array->equals_int($ret_ndarray->dim, [1, 2])) {
+      return 0;
+    }
+    
+    # Exceptions
+    {
+      {
+        my $x_ndarray = FOP->c([(float)1, 2], [1, 2]);
+        
+        my $y_ndarray = FOP->c([(float)3, 4], [1, 2]);
+        
+        eval { FOP->fmod(undef, $y_ndarray); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+      {
+        my $x_ndarray = FOP->c([(float)1, 2], [1, 2]);
+        
+        my $y_ndarray = FOP->c([(float)3, 4], [1, 2]);
+        
+        eval { FOP->fmod($x_ndarray, undef); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+      {
+        my $x_ndarray = FOP->c([(float)1, 2], [1, 2]);
+        
+        my $y_ndarray = FOP->c([(float)3, 4], [2, 1]);
+        
+        eval { FOP->fmod($x_ndarray, $y_ndarray); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+    }
+    
+    $@ = undef;
+    
+    return 1;
+  }
+  
+  static method sum : int () {
+    
+    my $x_ndarray = FOP->c([(float)1, 2], [1, 2]);
+    
+    my $ret_ndarray = FOP->sum($x_ndarray);
+    
+    unless ($ret_ndarray is_type R::NDArray::Float) {
+      return 0;
+    }
+    
+    unless (Array->equals_float($ret_ndarray->data, [(float)3])) {
+      return 0;
+    }
+    
+    unless (Array->equals_int($ret_ndarray->dim, [1])) {
+      return 0;
+    }
+    
+    # Exceptions
+    {
+      {
+        my $x_ndarray = FOP->c([(float)1, 2], [1, 2]);
+        
+        eval { FOP->sum(undef); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+    }
+    
+    $@ = undef;
+    
+    return 1;
+  }
+  
+  static method cumsum : int () {
+    
+    my $x_ndarray = FOP->c([(float)1, 2], [2]);
+    
+    my $ret_ndarray = FOP->cumsum($x_ndarray);
+    
+    unless ($ret_ndarray is_type R::NDArray::Float) {
+      return 0;
+    }
+    
+    unless (Array->equals_float($ret_ndarray->data, [(float)1, 3])) {
+      return 0;
+    }
+    
+    
+    unless (Array->equals_int($ret_ndarray->dim, [2])) {
+      return 0;
+    }
+    
+    # Exceptions
+    {
+      {
+        my $x_ndarray = FOP->c([(float)1, 2], [1, 2]);
+        
+        eval { FOP->cumsum(undef); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+      {
+        my $x_ndarray = FOP->c([(float)1, 2], [1, 2]);
+        
+        eval { FOP->cumsum($x_ndarray); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+    }
+    
+    $@ = undef;
+    
+    return 1;
+  }
+  
+  static method prod : int () {
+    
+    my $x_ndarray = FOP->c([(float)2, 3], [1, 2]);
+    
+    my $ret_ndarray = FOP->prod($x_ndarray);
+    
+    unless ($ret_ndarray is_type R::NDArray::Float) {
+      return 0;
+    }
+    
+    unless (Array->equals_float($ret_ndarray->data, [(float)6])) {
+      return 0;
+    }
+    
+    unless (Array->equals_int($ret_ndarray->dim, [1])) {
+      return 0;
+    }
+    
+    # Exceptions
+    {
+      {
+        my $x_ndarray = FOP->c([(float)1, 2], [1, 2]);
+        
+        eval { FOP->prod(undef); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+    }
+    
+    $@ = undef;
+    
+    return 1;
+  }
+  
+  static method cumprod : int () {
+    
+    my $x_ndarray = FOP->c([(float)2, 3], [2]);
+    
+    my $ret_ndarray = FOP->cumprod($x_ndarray);
+    
+    unless ($ret_ndarray is_type R::NDArray::Float) {
+      return 0;
+    }
+    
+    unless (Array->equals_float($ret_ndarray->data, [(float)2, 6])) {
+      return 0;
+    }
+    
+    
+    unless (Array->equals_int($ret_ndarray->dim, [2])) {
+      return 0;
+    }
+    
+    # Exceptions
+    {
+      {
+        my $x_ndarray = FOP->c([(float)1, 2], [1, 2]);
+        
+        eval { FOP->cumprod(undef); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+      {
+        my $x_ndarray = FOP->c([(float)1, 2], [1, 2]);
+        
+        eval { FOP->cumprod($x_ndarray); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+    }
+    
+    $@ = undef;
+    
+    return 1;
+  }
+  
+  static method diff : int () {
+    
+    my $x_ndarray = FOP->c([(float)2, 3, 6], [3]);
+    
+    my $ret_ndarray = FOP->diff($x_ndarray);
+    
+    unless ($ret_ndarray is_type R::NDArray::Float) {
+      return 0;
+    }
+    
+    unless (Array->equals_float($ret_ndarray->data, [(float)1, 3])) {
+      return 0;
+    }
+    
+    
+    unless (Array->equals_int($ret_ndarray->dim, [2])) {
+      return 0;
+    }
+    
+    # Exceptions
+    {
+      {
+        my $x_ndarray = FOP->c([(float)1, 2], [1, 2]);
+        
+        eval { FOP->diff(undef); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+      {
+        my $x_ndarray = FOP->c([(float)1, 2], [1, 2]);
+        
+        eval { FOP->diff($x_ndarray); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+    }
+    
+    $@ = undef;
+    
+    return 1;
+  }
+  
+  static method max : int () {
+    
+    my $x_ndarray = FOP->c([(float)-1, 0, 1], [1, 3]);
+    
+    my $ret_ndarray = FOP->max($x_ndarray);
+    
+    unless ($ret_ndarray is_type R::NDArray::Float) {
+      return 0;
+    }
+    
+    unless (Array->equals_float($ret_ndarray->data, [(float)1])) {
+      return 0;
+    }
+    
+    unless (Array->equals_int($ret_ndarray->dim, [1])) {
+      return 0;
+    }
+    
+    # Exceptions
+    {
+      {
+        my $x_ndarray = FOP->c([(float)1, 2], [1, 2]);
+        
+        eval { FOP->max(undef); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+    }
+    
+    $@ = undef;
+    
+    return 1;
+  }
+  
+  static method min : int () {
+    
+    my $x_ndarray = FOP->c([(float)-1, 0, 1], [1, 3]);
+    
+    my $ret_ndarray = FOP->min($x_ndarray);
+    
+    unless ($ret_ndarray is_type R::NDArray::Float) {
+      return 0;
+    }
+    
+    unless (Array->equals_float($ret_ndarray->data, [(float)-1])) {
+      return 0;
+    }
+    
+    unless (Array->equals_int($ret_ndarray->dim, [1])) {
+      return 0;
+    }
+    
+    # Exceptions
+    {
+      {
+        my $x_ndarray = FOP->c([(float)1, 2], [1, 2]);
+        
+        eval { FOP->min(undef); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+    }
+    
+    $@ = undef;
+    
+    return 1;
+  }
+  
+  static method mean : int () {
+    
+    my $x_ndarray = FOP->c([(float)-2, -1, 0, 1, 2]);
+    
+    my $ret_ndarray = FOP->mean($x_ndarray);
+    
+    unless ($ret_ndarray is_type R::NDArray::Float) {
+      return 0;
+    }
+    
+    unless (Array->equals_float($ret_ndarray->data, [(float)0])) {
+      return 0;
+    }
+    
+    unless (Array->equals_int($ret_ndarray->dim, [1])) {
+      return 0;
+    }
+    
+    # Exceptions
+    {
+      {
+        my $x_ndarray = FOP->c([(float)1, 2], [1, 2]);
+        
+        eval { FOP->mean(undef); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+    }
+    
+    $@ = undef;
+    
+    return 1;
+  }
+  
+  static method dot : int () {
+    
+    my $x_ndarray = FOP->c([(float)1, 2]);
+    
+    my $y_ndarray = FOP->c([(float)3, 4]);
+    
+    my $ret_ndarray = FOP->dot($x_ndarray, $y_ndarray);
+    
+    unless ($ret_ndarray is_type R::NDArray::Float) {
+      return 0;
+    }
+    
+    unless (Array->equals_float($ret_ndarray->data, [(float)11])) {
+      return 0;
+    }
+    
+    unless (Array->equals_int($ret_ndarray->dim, [1])) {
+      return 0;
+    }
+    
+    # Exceptions
+    {
+      {
+        my $x_ndarray = FOP->c([(float)1, 2]);
+        
+        my $y_ndarray = FOP->c([(float)3, 4]);
+        
+        eval { FOP->dot(undef, $y_ndarray); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+      {
+        my $x_ndarray = FOP->c([(float)1, 2]);
+        
+        my $y_ndarray = FOP->c([(float)3, 4]);
+        
+        eval { FOP->dot($x_ndarray, undef); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+      {
+        my $x_ndarray = FOP->c([(float)1, 2], [1, 2]);
+        
+        my $y_ndarray = FOP->c([(float)3, 4]);
+        
+        eval { FOP->dot($x_ndarray, $y_ndarray); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+      {
+        my $x_ndarray = FOP->c([(float)1, 2]);
+        
+        my $y_ndarray = FOP->c([(float)3, 4], [1, 2]);
+        
+        eval { FOP->dot($x_ndarray, $y_ndarray); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+      {
+        my $x_ndarray = FOP->c([(float)1, 2]);
+        
+        my $y_ndarray = FOP->c([(float)3, 4, 5]);
+        
+        eval { FOP->dot($x_ndarray, $y_ndarray); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+    }
+    
+    $@ = undef;
+    
+    return 1;
+  }
+  
+  static method cross : int () {
+    
+    my $x_ndarray = FOP->c([(float)1, 2, 3]);
+    
+    my $y_ndarray = FOP->c([(float)4, 5, 6]);
+    
+    my $ret_ndarray = FOP->cross($x_ndarray, $y_ndarray);
+    
+    unless ($ret_ndarray is_type R::NDArray::Float) {
+      return 0;
+    }
+    
+    unless (Array->equals_float($ret_ndarray->data, [(float)-3, 6, -3])) {
+      return 0;
+    }
+    
+    unless (Array->equals_int($ret_ndarray->dim, [3])) {
+      return 0;
+    }
+    
+    # Exceptions
+    {
+      {
+        my $x_ndarray = FOP->c([(float)1, 2, 3]);
+        
+        my $y_ndarray = FOP->c([(float)4, 5, 6]);
+        
+        eval { FOP->cross(undef, $y_ndarray); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+      {
+        my $x_ndarray = FOP->c([(float)1, 2, 3]);
+        
+        my $y_ndarray = FOP->c([(float)4, 5, 6]);
+        
+        eval { FOP->cross($x_ndarray, undef); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+      {
+        my $x_ndarray = FOP->c([(float)1, 2, 3], [1, 3]);
+        
+        my $y_ndarray = FOP->c([(float)4, 5, 6]);
+        
+        eval { FOP->cross($x_ndarray, $y_ndarray); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+      {
+        my $x_ndarray = FOP->c([(float)1, 2, 3]);
+        
+        my $y_ndarray = FOP->c([(float)4, 5, 6], [1, 3]);
+        
+        eval { FOP->cross($x_ndarray, $y_ndarray); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+      {
+        my $x_ndarray = FOP->c([(float)1, 2, 3, 4]);
+        
+        my $y_ndarray = FOP->c([(float)4, 5, 6]);
+        
+        eval { FOP->cross($x_ndarray, $y_ndarray); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+      {
+        my $x_ndarray = FOP->c([(float)1, 2, 3]);
+        
+        my $y_ndarray = FOP->c([(float)4, 5, 6, 7]);
+        
+        eval { FOP->cross($x_ndarray, $y_ndarray); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+    }
+    
+    $@ = undef;
+    
+    return 1;
+  }
+  
+  static method outer : int () {
+    
+    my $x_ndarray = FOP->c([(float)1, 2]);
+    
+    my $y_ndarray = FOP->c([(float)3, 4, 5]);
+    
+    my $ret_ndarray = FOP->outer($x_ndarray, $y_ndarray);
+    
+    unless ($ret_ndarray is_type R::NDArray::Float) {
+      return 0;
+    }
+    
+    unless (Array->equals_float($ret_ndarray->data, [(float)3, 6, 4, 8, 5, 10])) {
+      return 0;
+    }
+    
+    unless (Array->equals_int($ret_ndarray->dim, [2, 3])) {
+      return 0;
+    }
+    
+    # Exceptions
+    {
+      {
+        my $x_ndarray = FOP->c([(float)1, 2]);
+        
+        my $y_ndarray = FOP->c([(float)3, 4]);
+        
+        eval { FOP->outer(undef, $y_ndarray); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+      {
+        my $x_ndarray = FOP->c([(float)1, 2]);
+        
+        my $y_ndarray = FOP->c([(float)3, 4]);
+        
+        eval { FOP->outer($x_ndarray, undef); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+      {
+        my $x_ndarray = FOP->c([(float)1, 2], [1, 2]);
+        
+        my $y_ndarray = FOP->c([(float)3, 4]);
+        
+        eval { FOP->outer($x_ndarray, $y_ndarray); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+      {
+        my $x_ndarray = FOP->c([(float)1, 2]);
+        
+        my $y_ndarray = FOP->c([(float)3, 4], [1, 2]);
+        
+        eval { FOP->outer($x_ndarray, $y_ndarray); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+    }
+    
+    $@ = undef;
+    
+    return 1;
+  }
+
+  static method pi : int () {
+    
+    my $ret_ndarray = FOP->pi;
+    
+    unless ($ret_ndarray is_type R::NDArray::Float) {
+      return 0;
+    }
+    
+    unless (Array->equals_float($ret_ndarray->data, [(float)Math->PI])) {
+      return 0;
+    }
+    
+    unless (Array->equals_int($ret_ndarray->dim, [1])) {
+      return 0;
+    }
+    
+    $@ = undef;
+    
+    return 1;
+  }
+  
+
+}

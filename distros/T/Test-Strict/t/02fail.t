@@ -40,8 +40,6 @@ TODO: {
   ok !Test::Strict::_strict_ok($fh1), 'use strict in print';
 }
 
-exit;
-
 
 sub test1 {
   my $bad_file_content = _bad_file_content();
@@ -199,7 +197,7 @@ DUMMY
 
   my ($fh2, $filename2) = tempfile( DIR => $tmpdir, SUFFIX => '.pl' );
   print $fh2 <<'DUMMY';
-#!/usr/bin/perl -vw
+#!/usr/bin/perl -w
 use strict;
 print "Hello world";
 

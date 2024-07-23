@@ -41,7 +41,7 @@ my %regexes = (
 
 lock_hash(%OPTIONS_MAP);
 
-our $VERSION = '0.018'; # VERSION
+our $VERSION = '0.019'; # VERSION
 
 =head1 NAME
 
@@ -347,7 +347,7 @@ sub main_loop {
 
     # avoid loops
     if ( ($last_seen) and ( $next_id eq $last_seen ) ) {
-        $logger->fatal(
+        $logger->die(
             'I have seen this ID earlier, we do not want to report it again.'
               . 'This usually happens because of a bug in Spamcup.'
               . 'Make sure you use latest version!'
@@ -404,7 +404,7 @@ sub main_loop {
 
         foreach my $error ( @{$errors_ref} ) {
             if ( $error->is_fatal() ) {
-                $logger->fatal( $error->message() );
+                $logger->die( $error->message() );
 
                 # must stop processing the HTML for this report and move to next
                 return 0;
@@ -422,7 +422,7 @@ sub main_loop {
     my $base_uri = $ua->base();
 
     unless ($base_uri) {
-        $logger->fatal(
+        $logger->die(
 'No base URI found. Internal error? Please report this error by registering an issue on Github'
         );
     }
@@ -441,7 +441,7 @@ sub main_loop {
     }
 
     my $form = _report_form( $response_ref, $base_uri );
-    $logger->fatal(
+    $logger->die(
 'Could not find the HTML form to report the SPAM! May be a temporary Spamcop.net error, try again later! Quitting...'
     ) unless ( defined($form) );
 
@@ -522,7 +522,7 @@ sub main_loop {
         }
     }
 
-    $logger->fatal(
+    $logger->die(
 'Could not find the HTML form to report the SPAM! May be a temporary Spamcop website error, try again later! Quitting...'
     ) unless ($form);
 

@@ -1,0 +1,1573 @@
+class TestCase::R::OP::Long {
+  
+  use Array;
+  
+  use R::OP::Long as LOP;
+  
+  static method c : int () {
+    
+    {
+      my $ret_ndarray = LOP->c((long)1);
+      
+      unless ($ret_ndarray is_type R::NDArray::Long) {
+        return 0;
+      }
+      
+      unless (Array->equals_long($ret_ndarray->data, [(long)1])) {
+        return 0;
+      }
+      
+      unless (Array->equals_int($ret_ndarray->dim, [1])) {
+        return 0;
+      }
+    }
+    
+    {
+      my $data = [(long)1, 2];
+      my $ret_ndarray = LOP->c($data);
+      
+      unless ($ret_ndarray is_type R::NDArray::Long) {
+        return 0;
+      }
+      
+      unless ($ret_ndarray->data == $data) {
+        return 0;
+      }
+      
+      unless (Array->equals_long($ret_ndarray->data, [(long)1, 2])) {
+        return 0;
+      }
+      
+      unless (Array->equals_int($ret_ndarray->dim, [2])) {
+        return 0;
+      }
+    }
+    
+    {
+      my $data = [(long)1, 2];
+      my $ret_ndarray = LOP->c(LOP->c($data));
+      
+      unless ($ret_ndarray is_type R::NDArray::Long) {
+        return 0;
+      }
+      
+      unless ($ret_ndarray->data == $data) {
+        return 0;
+      }
+      
+      unless (Array->equals_long($ret_ndarray->data, [(long)1, 2])) {
+        return 0;
+      }
+      
+      unless (Array->equals_int($ret_ndarray->dim, [2])) {
+        return 0;
+      }
+    }
+    
+    {
+      my $data = [(long)1, 2];
+      my $ret_ndarray = LOP->c(LOP->c($data), [1, 2]);
+      
+      unless ($ret_ndarray is_type R::NDArray::Long) {
+        return 0;
+      }
+      
+      unless ($ret_ndarray->data == $data) {
+        return 0;
+      }
+      
+      unless (Array->equals_long($ret_ndarray->data, [(long)1, 2])) {
+        return 0;
+      }
+      
+      unless (Array->equals_int($ret_ndarray->dim, [1, 2])) {
+        return 0;
+      }
+    }
+    
+    # Exceptions
+    {
+      {
+        eval { LOP->c(true); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+    }
+    
+    return 1;
+  }
+  
+  static method add : int () {
+    
+    my $x_ndarray = LOP->c([(long)1, 2], [1, 2]);
+    
+    my $y_ndarray = LOP->c([(long)3, 4], [1, 2]);
+    
+    my $ret_ndarray = LOP->add($x_ndarray, $y_ndarray);
+    
+    unless ($ret_ndarray is_type R::NDArray::Long) {
+      return 0;
+    }
+    
+    unless (Array->equals_long($ret_ndarray->data, [(long)4, 6])) {
+      return 0;
+    }
+    
+    unless (Array->equals_int($ret_ndarray->dim, [1, 2])) {
+      return 0;
+    }
+    
+    # Exceptions
+    {
+      {
+        my $x_ndarray = LOP->c([(long)1, 2], [1, 2]);
+        
+        my $y_ndarray = LOP->c([(long)3, 4], [1, 2]);
+        
+        eval { LOP->add(undef, $y_ndarray); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+      {
+        my $x_ndarray = LOP->c([(long)1, 2], [1, 2]);
+        
+        my $y_ndarray = LOP->c([(long)3, 4], [1, 2]);
+        
+        eval { LOP->add($x_ndarray, undef); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+      {
+        my $x_ndarray = LOP->c([(long)1, 2], [1, 2]);
+        
+        my $y_ndarray = LOP->c([(long)3, 4], [2, 1]);
+        
+        eval { LOP->add($x_ndarray, $y_ndarray); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+    }
+    
+    $@ = undef;
+    
+    return 1;
+  }
+  
+  static method sub : int () {
+    
+    my $x_ndarray = LOP->c([(long)1, 2], [1, 2]);
+    
+    my $y_ndarray = LOP->c([(long)3, 4], [1, 2]);
+    
+    my $ret_ndarray = LOP->sub($x_ndarray, $y_ndarray);
+    
+    unless ($ret_ndarray is_type R::NDArray::Long) {
+      return 0;
+    }
+    
+    unless (Array->equals_long($ret_ndarray->data, [(long)-2, -2])) {
+      return 0;
+    }
+    
+    unless (Array->equals_int($ret_ndarray->dim, [1, 2])) {
+      return 0;
+    }
+    
+    # Exceptions
+    {
+      {
+        my $x_ndarray = LOP->c([(long)1, 2], [1, 2]);
+        
+        my $y_ndarray = LOP->c([(long)3, 4], [1, 2]);
+        
+        eval { LOP->sub(undef, $y_ndarray); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+      {
+        my $x_ndarray = LOP->c([(long)1, 2], [1, 2]);
+        
+        my $y_ndarray = LOP->c([(long)3, 4], [1, 2]);
+        
+        eval { LOP->sub($x_ndarray, undef); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+      {
+        my $x_ndarray = LOP->c([(long)1, 2], [1, 2]);
+        
+        my $y_ndarray = LOP->c([(long)3, 4], [2, 1]);
+        
+        eval { LOP->sub($x_ndarray, $y_ndarray); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+    }
+    
+    $@ = undef;
+    
+    return 1;
+  }
+
+  static method mul : int () {
+    
+    my $x_ndarray = LOP->c([(long)1, 2], [1, 2]);
+    
+    my $y_ndarray = LOP->c([(long)3, 4], [1, 2]);
+    
+    my $ret_ndarray = LOP->mul($x_ndarray, $y_ndarray);
+    
+    unless ($ret_ndarray is_type R::NDArray::Long) {
+      return 0;
+    }
+    
+    unless (Array->equals_long($ret_ndarray->data, [(long)3, 8])) {
+      return 0;
+    }
+    
+    unless (Array->equals_int($ret_ndarray->dim, [1, 2])) {
+      return 0;
+    }
+    
+    # Exceptions
+    {
+      {
+        my $x_ndarray = LOP->c([(long)1, 2], [1, 2]);
+        
+        my $y_ndarray = LOP->c([(long)3, 4], [1, 2]);
+        
+        eval { LOP->mul(undef, $y_ndarray); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+      {
+        my $x_ndarray = LOP->c([(long)1, 2], [1, 2]);
+        
+        my $y_ndarray = LOP->c([(long)3, 4], [1, 2]);
+        
+        eval { LOP->mul($x_ndarray, undef); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+      {
+        my $x_ndarray = LOP->c([(long)1, 2], [1, 2]);
+        
+        my $y_ndarray = LOP->c([(long)3, 4], [2, 1]);
+        
+        eval { LOP->mul($x_ndarray, $y_ndarray); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+    }
+    
+    $@ = undef;
+    
+    return 1;
+  }
+
+  static method scamul : int () {
+    
+    my $x_ndarray = LOP->c([(long)3, 4], [1, 2]);
+    
+    my $scalar_ndarray = LOP->c((long)3);
+    
+    my $ret_ndarray = LOP->scamul($x_ndarray, $scalar_ndarray);
+    
+    unless ($ret_ndarray is_type R::NDArray::Long) {
+      return 0;
+    }
+    
+    unless (Array->equals_long($ret_ndarray->data, [(long)9, 12])) {
+      return 0;
+    }
+    
+    unless (Array->equals_int($ret_ndarray->dim, [1, 2])) {
+      return 0;
+    }
+    
+    # Exceptions
+    {
+      {
+        my $x_ndarray = LOP->c([(long)3, 4], [1, 2]);
+        
+        my $scalar_ndarray = LOP->c((long)3);
+        
+        eval { LOP->scamul(undef, $scalar_ndarray); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+      {
+        my $x_ndarray = LOP->c([(long)3, 4], [1, 2]);
+        
+        my $scalar_ndarray = LOP->c((long)3);
+        
+        eval { LOP->scamul($x_ndarray, undef); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+      {
+        my $scalar_ndarray = LOP->c([(long)1, 2], [1, 2]);
+        
+        my $x_ndarray = LOP->c([(long)3, 4], [2, 1]);
+        
+        eval { LOP->scamul($x_ndarray, $scalar_ndarray); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+    }
+    
+    $@ = undef;
+    
+    return 1;
+  }
+  
+  static method div : int () {
+    
+    my $x_ndarray = LOP->c([(long)4, 12], [1, 2]);
+    
+    my $y_ndarray = LOP->c([(long)2, 4], [1, 2]);
+    
+    my $ret_ndarray = LOP->div($x_ndarray, $y_ndarray);
+    
+    unless ($ret_ndarray is_type R::NDArray::Long) {
+      return 0;
+    }
+    
+    unless (Array->equals_long($ret_ndarray->data, [(long)2, 3])) {
+      return 0;
+    }
+    
+    unless (Array->equals_int($ret_ndarray->dim, [1, 2])) {
+      return 0;
+    }
+    
+    # Exceptions
+    {
+      {
+        my $x_ndarray = LOP->c([(long)1, 2], [1, 2]);
+        
+        my $y_ndarray = LOP->c([(long)3, 4], [1, 2]);
+        
+        eval { LOP->div(undef, $y_ndarray); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+      {
+        my $x_ndarray = LOP->c([(long)1, 2], [1, 2]);
+        
+        my $y_ndarray = LOP->c([(long)3, 4], [1, 2]);
+        
+        eval { LOP->div($x_ndarray, undef); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+      {
+        my $x_ndarray = LOP->c([(long)1, 2], [1, 2]);
+        
+        my $y_ndarray = LOP->c([(long)3, 4], [2, 1]);
+        
+        eval { LOP->div($x_ndarray, $y_ndarray); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+    }
+    
+    $@ = undef;
+    
+    return 1;
+  }
+  
+  static method div_u : int () {
+    
+    my $x_ndarray = LOP->c([(long)4, 12], [1, 2]);
+    
+    my $y_ndarray = LOP->c([(long)2, 4], [1, 2]);
+    
+    my $ret_ndarray = LOP->div_u($x_ndarray, $y_ndarray);
+    
+    unless ($ret_ndarray is_type R::NDArray::Long) {
+      return 0;
+    }
+    
+    unless (Array->equals_long($ret_ndarray->data, [(long)2, 3])) {
+      return 0;
+    }
+    
+    unless (Array->equals_int($ret_ndarray->dim, [1, 2])) {
+      return 0;
+    }
+    
+    # Exceptions
+    {
+      {
+        my $x_ndarray = LOP->c([(long)1, 2], [1, 2]);
+        
+        my $y_ndarray = LOP->c([(long)3, 4], [1, 2]);
+        
+        eval { LOP->div_u(undef, $y_ndarray); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+      {
+        my $x_ndarray = LOP->c([(long)1, 2], [1, 2]);
+        
+        my $y_ndarray = LOP->c([(long)3, 4], [1, 2]);
+        
+        eval { LOP->div_u($x_ndarray, undef); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+      {
+        my $x_ndarray = LOP->c([(long)1, 2], [1, 2]);
+        
+        my $y_ndarray = LOP->c([(long)3, 4], [2, 1]);
+        
+        eval { LOP->div_u($x_ndarray, $y_ndarray); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+    }
+    
+    $@ = undef;
+    
+    return 1;
+  }
+  
+  static method mod : int () {
+    
+    my $x_ndarray = LOP->c([(long)1, 3], [1, 2]);
+    
+    my $y_ndarray = LOP->c([(long)2, 4], [1, 2]);
+    
+    my $ret_ndarray = LOP->mod($x_ndarray, $y_ndarray);
+    
+    unless ($ret_ndarray is_type R::NDArray::Long) {
+      return 0;
+    }
+    
+    unless (Array->equals_long($ret_ndarray->data, [$x_ndarray->data->[0] % $y_ndarray->data->[0], $x_ndarray->data->[1] % $y_ndarray->data->[1]])) {
+      return 0;
+    }
+    
+    unless (Array->equals_int($ret_ndarray->dim, [1, 2])) {
+      return 0;
+    }
+    
+    # Exceptions
+    {
+      {
+        my $x_ndarray = LOP->c([(long)1, 2], [1, 2]);
+        
+        my $y_ndarray = LOP->c([(long)3, 4], [1, 2]);
+        
+        eval { LOP->mod(undef, $y_ndarray); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+      {
+        my $x_ndarray = LOP->c([(long)1, 2], [1, 2]);
+        
+        my $y_ndarray = LOP->c([(long)3, 4], [1, 2]);
+        
+        eval { LOP->mod($x_ndarray, undef); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+      {
+        my $x_ndarray = LOP->c([(long)1, 2], [1, 2]);
+        
+        my $y_ndarray = LOP->c([(long)3, 4], [2, 1]);
+        
+        eval { LOP->mod($x_ndarray, $y_ndarray); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+    }
+    
+    $@ = undef;
+    
+    return 1;
+  }
+  
+  static method mod_u : int () {
+    
+    my $x_ndarray = LOP->c([(long)1, 3], [1, 2]);
+    
+    my $y_ndarray = LOP->c([(long)2, 4], [1, 2]);
+    
+    my $ret_ndarray = LOP->mod_u($x_ndarray, $y_ndarray);
+    
+    unless ($ret_ndarray is_type R::NDArray::Long) {
+      return 0;
+    }
+    
+    unless (Array->equals_long($ret_ndarray->data, [$x_ndarray->data->[0] mod_ulong $y_ndarray->data->[0], $x_ndarray->data->[1] mod_ulong $y_ndarray->data->[1]])) {
+      return 0;
+    }
+    
+    unless (Array->equals_int($ret_ndarray->dim, [1, 2])) {
+      return 0;
+    }
+    
+    # Exceptions
+    {
+      {
+        my $x_ndarray = LOP->c([(long)1, 2], [1, 2]);
+        
+        my $y_ndarray = LOP->c([(long)3, 4], [1, 2]);
+        
+        eval { LOP->mod_u(undef, $y_ndarray); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+      {
+        my $x_ndarray = LOP->c([(long)1, 2], [1, 2]);
+        
+        my $y_ndarray = LOP->c([(long)3, 4], [1, 2]);
+        
+        eval { LOP->mod_u($x_ndarray, undef); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+      {
+        my $x_ndarray = LOP->c([(long)1, 2], [1, 2]);
+        
+        my $y_ndarray = LOP->c([(long)3, 4], [2, 1]);
+        
+        eval { LOP->mod_u($x_ndarray, $y_ndarray); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+    }
+    
+    $@ = undef;
+    
+    return 1;
+  }
+  
+  static method scadiv : int () {
+    
+    my $x_ndarray = LOP->c([(long)4, 2], [1, 2]);
+    
+    my $scalar_ndarray = LOP->c((long)2);
+    
+    my $ret_ndarray = LOP->scadiv($x_ndarray, $scalar_ndarray);
+    
+    unless ($ret_ndarray is_type R::NDArray::Long) {
+      return 0;
+    }
+    
+    unless (Array->equals_long($ret_ndarray->data, [(long)2, 1])) {
+      return 0;
+    }
+    
+    unless (Array->equals_int($ret_ndarray->dim, [1, 2])) {
+      return 0;
+    }
+    
+    # Exceptions
+    {
+      {
+        my $x_ndarray = LOP->c([(long)3, 4], [1, 2]);
+        
+        my $scalar_ndarray = LOP->c((long)3);
+        
+        eval { LOP->scadiv($x_ndarray, undef); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+      {
+        my $x_ndarray = LOP->c([(long)3, 4], [1, 2]);
+        
+        my $scalar_ndarray = LOP->c((long)3);
+        
+        eval { LOP->scadiv(undef, $scalar_ndarray); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+      {
+        my $x_ndarray = LOP->c([(long)3, 4], [2, 1]);
+        
+        my $scalar_ndarray = LOP->c([(long)1, 2], [1, 2]);
+        
+        eval { LOP->scadiv($x_ndarray, $scalar_ndarray); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+    }
+    
+    $@ = undef;
+    
+    return 1;
+  }
+  
+  static method neg : int () {
+    
+    my $x_ndarray = LOP->c([(long)1, 2], [1, 2]);
+    
+    my $ret_ndarray = LOP->neg($x_ndarray);
+    
+    unless ($ret_ndarray is_type R::NDArray::Long) {
+      return 0;
+    }
+    
+    unless (Array->equals_long($ret_ndarray->data, [(long)-1, -2])) {
+      return 0;
+    }
+    
+    unless (Array->equals_int($ret_ndarray->dim, [1, 2])) {
+      return 0;
+    }
+    
+    # Exceptions
+    {
+      {
+        my $x_ndarray = LOP->c([(long)1, 2], [1, 2]);
+        
+        eval { LOP->neg(undef); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+    }
+    
+    $@ = undef;
+    
+    return 1;
+  }
+  
+  static method abs : int () {
+    
+    my $x_ndarray = LOP->c([(long)1, -2], [1, 2]);
+    
+    my $ret_ndarray = LOP->abs($x_ndarray);
+    
+    unless ($ret_ndarray is_type R::NDArray::Long) {
+      return 0;
+    }
+    
+    unless (Array->equals_long($ret_ndarray->data, [(long)1, 2])) {
+      return 0;
+    }
+    
+    unless (Array->equals_int($ret_ndarray->dim, [1, 2])) {
+      return 0;
+    }
+    
+    # Exceptions
+    {
+      {
+        my $x_ndarray = LOP->c([(long)1, 2], [1, 2]);
+        
+        eval { LOP->abs(undef); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+    }
+    
+    $@ = undef;
+    
+    return 1;
+  }
+  
+  static method eq : int () {
+    
+    my $x_ndarray = LOP->c([(long)1, 1], [1, 2]);
+    
+    my $y_ndarray = LOP->c([(long)1, 2], [1, 2]);
+    
+    my $ret_ndarray = LOP->eq($x_ndarray, $y_ndarray);
+    
+    unless ($ret_ndarray is_type R::NDArray::Int) {
+      return 0;
+    }
+    
+    unless (Array->equals_int($ret_ndarray->data, [1, 0])) {
+      return 0;
+    }
+    
+    unless (Array->equals_int($ret_ndarray->dim, [1, 2])) {
+      return 0;
+    }
+    
+    # Exceptions
+    {
+      {
+        my $x_ndarray = LOP->c([(long)1, 2], [1, 2]);
+        
+        my $y_ndarray = LOP->c([(long)3, 4], [1, 2]);
+        
+        eval { LOP->eq(undef, $y_ndarray); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+      {
+        my $x_ndarray = LOP->c([(long)1, 2], [1, 2]);
+        
+        my $y_ndarray = LOP->c([(long)3, 4], [1, 2]);
+        
+        eval { LOP->eq($x_ndarray, undef); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+      {
+        my $x_ndarray = LOP->c([(long)1, 2], [1, 2]);
+        
+        my $y_ndarray = LOP->c([(long)3, 4], [2, 1]);
+        
+        eval { LOP->eq($x_ndarray, $y_ndarray); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+    }
+    
+    $@ = undef;
+    
+    return 1;
+  }
+  
+  static method ne : int () {
+    
+    my $x_ndarray = LOP->c([(long)1, 1], [1, 2]);
+    
+    my $y_ndarray = LOP->c([(long)1, 2], [1, 2]);
+    
+    my $ret_ndarray = LOP->ne($x_ndarray, $y_ndarray);
+    
+    unless ($ret_ndarray is_type R::NDArray::Int) {
+      return 0;
+    }
+    
+    unless (Array->equals_int($ret_ndarray->data, [0, 1])) {
+      return 0;
+    }
+    
+    unless (Array->equals_int($ret_ndarray->dim, [1, 2])) {
+      return 0;
+    }
+    
+    # Exceptions
+    {
+      {
+        my $x_ndarray = LOP->c([(long)1, 2], [1, 2]);
+        
+        my $y_ndarray = LOP->c([(long)3, 4], [1, 2]);
+        
+        eval { LOP->ne(undef, $y_ndarray); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+      {
+        my $x_ndarray = LOP->c([(long)1, 2], [1, 2]);
+        
+        my $y_ndarray = LOP->c([(long)3, 4], [1, 2]);
+        
+        eval { LOP->ne($x_ndarray, undef); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+      {
+        my $x_ndarray = LOP->c([(long)1, 2], [1, 2]);
+        
+        my $y_ndarray = LOP->c([(long)3, 4], [2, 1]);
+        
+        eval { LOP->ne($x_ndarray, $y_ndarray); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+    }
+    
+    $@ = undef;
+    
+    return 1;
+  }
+  
+  static method gt : int () {
+    
+    my $x_ndarray = LOP->c([(long)1, 1, 1], [1, 3]);
+    
+    my $y_ndarray = LOP->c([(long)0, 1, 2], [1, 3]);
+    
+    my $ret_ndarray = LOP->gt($x_ndarray, $y_ndarray);
+    
+    unless ($ret_ndarray is_type R::NDArray::Int) {
+      return 0;
+    }
+    
+    unless (Array->equals_int($ret_ndarray->data, [1, 0, 0])) {
+      return 0;
+    }
+    
+    unless (Array->equals_int($ret_ndarray->dim, [1, 3])) {
+      return 0;
+    }
+    
+    # Exceptions
+    {
+      {
+        my $x_ndarray = LOP->c([(long)1, 1, 1], [1, 3]);
+        
+        my $y_ndarray = LOP->c([(long)0, 1, 2], [1, 3]);
+        
+        eval { LOP->gt(undef, $y_ndarray); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+      {
+        my $x_ndarray = LOP->c([(long)1, 1, 1], [1, 3]);
+        
+        my $y_ndarray = LOP->c([(long)0, 1, 2], [1, 3]);
+        
+        eval { LOP->gt($x_ndarray, undef); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+      {
+        my $x_ndarray = LOP->c([(long)1, 1, 1], [1, 3]);
+        
+        my $y_ndarray = LOP->c([(long)0, 1, 2], [3, 1]);
+        
+        eval { LOP->gt($x_ndarray, $y_ndarray); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+    }
+    
+    $@ = undef;
+    
+    return 1;
+  }
+  
+  static method ge : int () {
+    
+    my $x_ndarray = LOP->c([(long)1, 1, 1], [1, 3]);
+    
+    my $y_ndarray = LOP->c([(long)0, 1, 2], [1, 3]);
+    
+    my $ret_ndarray = LOP->ge($x_ndarray, $y_ndarray);
+    
+    unless ($ret_ndarray is_type R::NDArray::Int) {
+      return 0;
+    }
+    
+    unless (Array->equals_int($ret_ndarray->data, [1, 1, 0])) {
+      return 0;
+    }
+    
+    unless (Array->equals_int($ret_ndarray->dim, [1, 3])) {
+      return 0;
+    }
+    
+    # Exceptions
+    {
+      {
+        my $x_ndarray = LOP->c([(long)1, 1, 1], [1, 3]);
+        
+        my $y_ndarray = LOP->c([(long)0, 1, 2], [1, 3]);
+        
+        eval { LOP->ge(undef, $y_ndarray); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+      {
+        my $x_ndarray = LOP->c([(long)1, 1, 1], [1, 3]);
+        
+        my $y_ndarray = LOP->c([(long)0, 1, 2], [1, 3]);
+        
+        eval { LOP->ge($x_ndarray, undef); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+      {
+        my $x_ndarray = LOP->c([(long)1, 1, 1], [1, 3]);
+        
+        my $y_ndarray = LOP->c([(long)0, 1, 2], [3, 1]);
+        
+        eval { LOP->ge($x_ndarray, $y_ndarray); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+    }
+    
+    $@ = undef;
+    
+    return 1;
+  }
+  
+  static method lt : int () {
+    
+    my $x_ndarray = LOP->c([(long)1, 1, 1], [1, 3]);
+    
+    my $y_ndarray = LOP->c([(long)0, 1, 2], [1, 3]);
+    
+    my $ret_ndarray = LOP->lt($x_ndarray, $y_ndarray);
+    
+    unless ($ret_ndarray is_type R::NDArray::Int) {
+      return 0;
+    }
+    
+    unless (Array->equals_int($ret_ndarray->data, [0, 0, 1])) {
+      return 0;
+    }
+    
+    unless (Array->equals_int($ret_ndarray->dim, [1, 3])) {
+      return 0;
+    }
+    
+    # Exceptions
+    {
+      {
+        my $x_ndarray = LOP->c([(long)1, 1, 1], [1, 3]);
+        
+        my $y_ndarray = LOP->c([(long)0, 1, 2], [1, 3]);
+        
+        eval { LOP->lt(undef, $y_ndarray); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+      {
+        my $x_ndarray = LOP->c([(long)1, 1, 1], [1, 3]);
+        
+        my $y_ndarray = LOP->c([(long)0, 1, 2], [1, 3]);
+        
+        eval { LOP->lt($x_ndarray, undef); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+      {
+        my $x_ndarray = LOP->c([(long)1, 1, 1], [1, 3]);
+        
+        my $y_ndarray = LOP->c([(long)0, 1, 2], [3, 1]);
+        
+        eval { LOP->lt($x_ndarray, $y_ndarray); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+    }
+    
+    $@ = undef;
+    
+    return 1;
+  }
+  
+  static method le : int () {
+    
+    my $x_ndarray = LOP->c([(long)1, 1, 1], [1, 3]);
+    
+    my $y_ndarray = LOP->c([(long)0, 1, 2], [1, 3]);
+    
+    my $ret_ndarray = LOP->le($x_ndarray, $y_ndarray);
+    
+    unless ($ret_ndarray is_type R::NDArray::Int) {
+      return 0;
+    }
+    
+    unless (Array->equals_int($ret_ndarray->data, [0, 1, 1])) {
+      return 0;
+    }
+    
+    unless (Array->equals_int($ret_ndarray->dim, [1, 3])) {
+      return 0;
+    }
+    
+    # Exceptions
+    {
+      {
+        my $x_ndarray = LOP->c([(long)1, 1, 1], [1, 3]);
+        
+        my $y_ndarray = LOP->c([(long)0, 1, 2], [1, 3]);
+        
+        eval { LOP->le(undef, $y_ndarray); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+      {
+        my $x_ndarray = LOP->c([(long)1, 1, 1], [1, 3]);
+        
+        my $y_ndarray = LOP->c([(long)0, 1, 2], [1, 3]);
+        
+        eval { LOP->le($x_ndarray, undef); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+      {
+        my $x_ndarray = LOP->c([(long)1, 1, 1], [1, 3]);
+        
+        my $y_ndarray = LOP->c([(long)0, 1, 2], [3, 1]);
+        
+        eval { LOP->le($x_ndarray, $y_ndarray); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+    }
+    
+    $@ = undef;
+    
+    return 1;
+  }
+  
+  static method rep : int () {
+    
+    my $x_ndarray = LOP->c([(long)1, 2]);
+    
+    my $ret_ndarray = LOP->rep($x_ndarray, 2);
+    
+    unless (Array->equals_long($ret_ndarray->data, [(long)1, 2, 1, 2])) {
+      return 0;
+    }
+    
+    unless (Array->equals_int($ret_ndarray->dim, [4])) {
+      return 0;
+    }
+    
+    return 1;
+  }
+  
+  static method rep_length : int () {
+    
+    my $x_ndarray = LOP->c([(long)1, 2]);
+    
+    my $ret_ndarray = LOP->rep_length($x_ndarray, 4);
+    
+    unless (Array->equals_long($ret_ndarray->data, [(long)1, 2, 1, 2])) {
+      return 0;
+    }
+    
+    unless (Array->equals_int($ret_ndarray->dim, [4])) {
+      return 0;
+    }
+    
+    return 1;
+  }
+  
+  static method seq : int () {
+    
+    {
+      my $ret_ndarray = LOP->seq(1, 4);
+      
+      unless (Array->equals_long($ret_ndarray->data, [(long)1, 2, 3, 4])) {
+        return 0;
+      }
+      
+      unless (Array->equals_int($ret_ndarray->dim, [4])) {
+        return 0;
+      }
+    }
+    
+    {
+      my $ret_ndarray = LOP->seq(-3, 0);
+      
+      unless (Array->equals_long($ret_ndarray->data, [(long)-3, -2, -1, 0])) {
+        return 0;
+      }
+      
+      unless (Array->equals_int($ret_ndarray->dim, [4])) {
+        return 0;
+      }
+    }
+    
+    {
+      my $ret_ndarray = LOP->seq(1, 5, 2);
+      
+      unless (Array->equals_long($ret_ndarray->data, [(long)1, 3, 5])) {
+        return 0;
+      }
+      
+      unless (Array->equals_int($ret_ndarray->dim, [3])) {
+        return 0;
+      }
+    }
+    
+    {
+      my $ret_ndarray = LOP->seq(4, 1, -1);
+      
+      unless (Array->equals_long($ret_ndarray->data, [(long)4, 3, 2, 1])) {
+        return 0;
+      }
+      
+      unless (Array->equals_int($ret_ndarray->dim, [4])) {
+        return 0;
+      }
+    }
+    
+    {
+      my $ret_ndarray = LOP->seq(5, 1, -2);
+      
+      unless (Array->equals_long($ret_ndarray->data, [(long)5, 3, 1])) {
+        return 0;
+      }
+      
+      unless (Array->equals_int($ret_ndarray->dim, [3])) {
+        return 0;
+      }
+    }
+    
+    # Exceptions
+    {
+      {
+        eval { LOP->seq(1, 4, 0); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+      {
+        eval { LOP->seq(1, 4, -1); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+      {
+        eval { LOP->seq(4, 1, 1); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+    }
+    
+    $@ = undef;
+    
+    return 1;
+  }
+  
+  static method sum : int () {
+    
+    my $x_ndarray = LOP->c([(long)1, 2], [1, 2]);
+    
+    my $ret_ndarray = LOP->sum($x_ndarray);
+    
+    unless ($ret_ndarray is_type R::NDArray::Long) {
+      return 0;
+    }
+    
+    unless (Array->equals_long($ret_ndarray->data, [(long)3])) {
+      return 0;
+    }
+    
+    unless (Array->equals_int($ret_ndarray->dim, [1])) {
+      return 0;
+    }
+    
+    # Exceptions
+    {
+      {
+        my $x_ndarray = LOP->c([(long)1, 2], [1, 2]);
+        
+        eval { LOP->sum(undef); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+    }
+    
+    $@ = undef;
+    
+    return 1;
+  }
+  
+  static method cumsum : int () {
+    
+    my $x_ndarray = LOP->c([(long)1, 2], [2]);
+    
+    my $ret_ndarray = LOP->cumsum($x_ndarray);
+    
+    unless ($ret_ndarray is_type R::NDArray::Long) {
+      return 0;
+    }
+    
+    unless (Array->equals_long($ret_ndarray->data, [(long)1, 3])) {
+      return 0;
+    }
+    
+    
+    unless (Array->equals_int($ret_ndarray->dim, [2])) {
+      return 0;
+    }
+    
+    # Exceptions
+    {
+      {
+        my $x_ndarray = LOP->c([(long)1, 2], [1, 2]);
+        
+        eval { LOP->cumsum(undef); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+      {
+        my $x_ndarray = LOP->c([(long)1, 2], [1, 2]);
+        
+        eval { LOP->cumsum($x_ndarray); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+    }
+    
+    $@ = undef;
+    
+    return 1;
+  }
+  
+  static method prod : int () {
+    
+    my $x_ndarray = LOP->c([(long)2, 3], [1, 2]);
+    
+    my $ret_ndarray = LOP->prod($x_ndarray);
+    
+    unless ($ret_ndarray is_type R::NDArray::Long) {
+      return 0;
+    }
+    
+    unless (Array->equals_long($ret_ndarray->data, [(long)6])) {
+      return 0;
+    }
+    
+    unless (Array->equals_int($ret_ndarray->dim, [1])) {
+      return 0;
+    }
+    
+    # Exceptions
+    {
+      {
+        my $x_ndarray = LOP->c([(long)1, 2], [1, 2]);
+        
+        eval { LOP->prod(undef); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+    }
+    
+    $@ = undef;
+    
+    return 1;
+  }
+  
+  static method cumprod : int () {
+    
+    my $x_ndarray = LOP->c([(long)2, 3], [2]);
+    
+    my $ret_ndarray = LOP->cumprod($x_ndarray);
+    
+    unless ($ret_ndarray is_type R::NDArray::Long) {
+      return 0;
+    }
+    
+    unless (Array->equals_long($ret_ndarray->data, [(long)2, 6])) {
+      return 0;
+    }
+    
+    
+    unless (Array->equals_int($ret_ndarray->dim, [2])) {
+      return 0;
+    }
+    
+    # Exceptions
+    {
+      {
+        my $x_ndarray = LOP->c([(long)1, 2], [1, 2]);
+        
+        eval { LOP->cumprod(undef); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+      {
+        my $x_ndarray = LOP->c([(long)1, 2], [1, 2]);
+        
+        eval { LOP->cumprod($x_ndarray); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+    }
+    
+    $@ = undef;
+    
+    return 1;
+  }
+  
+  static method diff : int () {
+    
+    my $x_ndarray = LOP->c([(long)2, 3, 6], [3]);
+    
+    my $ret_ndarray = LOP->diff($x_ndarray);
+    
+    unless ($ret_ndarray is_type R::NDArray::Long) {
+      return 0;
+    }
+    
+    unless (Array->equals_long($ret_ndarray->data, [(long)1, 3])) {
+      return 0;
+    }
+    
+    
+    unless (Array->equals_int($ret_ndarray->dim, [2])) {
+      return 0;
+    }
+    
+    # Exceptions
+    {
+      {
+        my $x_ndarray = LOP->c([(long)1, 2], [1, 2]);
+        
+        eval { LOP->diff(undef); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+      {
+        my $x_ndarray = LOP->c([(long)1, 2], [1, 2]);
+        
+        eval { LOP->diff($x_ndarray); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+    }
+    
+    $@ = undef;
+    
+    return 1;
+  }
+  
+  static method max : int () {
+    
+    my $x_ndarray = LOP->c([(long)-1, 0, 1], [1, 3]);
+    
+    my $ret_ndarray = LOP->max($x_ndarray);
+    
+    unless ($ret_ndarray is_type R::NDArray::Long) {
+      return 0;
+    }
+    
+    unless (Array->equals_long($ret_ndarray->data, [(long)1])) {
+      return 0;
+    }
+    
+    unless (Array->equals_int($ret_ndarray->dim, [1])) {
+      return 0;
+    }
+    
+    # Exceptions
+    {
+      {
+        my $x_ndarray = LOP->c([(long)1, 2], [1, 2]);
+        
+        eval { LOP->max(undef); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+    }
+    
+    $@ = undef;
+    
+    return 1;
+  }
+  
+  static method min : int () {
+    
+    my $x_ndarray = LOP->c([(long)-1, 0, 1], [1, 3]);
+    
+    my $ret_ndarray = LOP->min($x_ndarray);
+    
+    unless ($ret_ndarray is_type R::NDArray::Long) {
+      return 0;
+    }
+    
+    unless (Array->equals_long($ret_ndarray->data, [(long)-1])) {
+      return 0;
+    }
+    
+    unless (Array->equals_int($ret_ndarray->dim, [1])) {
+      return 0;
+    }
+    
+    # Exceptions
+    {
+      {
+        my $x_ndarray = LOP->c([(long)1, 2], [1, 2]);
+        
+        eval { LOP->min(undef); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+    }
+    
+    $@ = undef;
+    
+    return 1;
+  }
+  
+
+}

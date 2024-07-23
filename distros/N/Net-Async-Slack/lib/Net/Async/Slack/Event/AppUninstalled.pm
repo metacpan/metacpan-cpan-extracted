@@ -3,7 +3,7 @@ package Net::Async::Slack::Event::AppUninstalled;
 use strict;
 use warnings;
 
-our $VERSION = '0.014'; # VERSION
+our $VERSION = '0.015'; # VERSION
 
 use Net::Async::Slack::EventType;
 

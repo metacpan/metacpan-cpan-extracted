@@ -3,7 +3,7 @@ package Net::Async::Slack::Socket;
 use strict;
 use warnings;
 
-our $VERSION = '0.014'; # VERSION
+our $VERSION = '0.015'; # VERSION
 our $AUTHORITY = 'cpan:TEAM'; # AUTHORITY
 
 use parent qw(IO::Async::Notifier);
@@ -67,6 +67,7 @@ use Net::Async::Slack::Event::DndUpdated;
 use Net::Async::Slack::Event::DndUpdatedUser;
 use Net::Async::Slack::Event::EmailDomainChanged;
 use Net::Async::Slack::Event::EmojiChanged;
+use Net::Async::Slack::Event::EventCallback;
 use Net::Async::Slack::Event::FileChange;
 use Net::Async::Slack::Event::FileCommentAdded;
 use Net::Async::Slack::Event::FileCommentDeleted;
@@ -555,5 +556,5 @@ Tom Molesworth <TEAM@cpan.org>
 
 =head1 LICENSE
 
-Copyright Tom Molesworth 2016-2023. Licensed under the same terms as Perl itself.
+Copyright Tom Molesworth 2016-2024. Licensed under the same terms as Perl itself.
 

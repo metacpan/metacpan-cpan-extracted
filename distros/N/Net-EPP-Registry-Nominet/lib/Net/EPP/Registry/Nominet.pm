@@ -28,7 +28,7 @@ use constant EPP_XMLNS	=> 'urn:ietf:params:xml:ns:epp-1.0';
 use vars qw($Error $Code $Message);
 
 BEGIN {
-	our $VERSION = '0.10';
+	our $VERSION = '0.11';
 }
 
 # file-scoped lexicals

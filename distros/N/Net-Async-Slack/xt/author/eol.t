@@ -56,6 +56,8 @@ my @files = (
     'lib/Net/Async/Slack/Event/EmailDomainChanged.pod',
     'lib/Net/Async/Slack/Event/EmojiChanged.pm',
     'lib/Net/Async/Slack/Event/EmojiChanged.pod',
+    'lib/Net/Async/Slack/Event/EventCallback.pm',
+    'lib/Net/Async/Slack/Event/EventCallback.pod',
     'lib/Net/Async/Slack/Event/FileChange.pm',
     'lib/Net/Async/Slack/Event/FileChange.pod',
     'lib/Net/Async/Slack/Event/FileCommentAdded.pm',

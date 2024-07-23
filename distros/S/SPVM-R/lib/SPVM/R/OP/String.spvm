@@ -4,6 +4,8 @@
 class R::OP::String {
   
   use R::NDArray::String;
+  use R::NDArray::Int;
+  
   
   # Class Methods
   static method c : R::NDArray::String ($data : object of string|string[]|R::NDArray::String, $dim : int[] = undef) {
@@ -59,7 +61,49 @@ class R::OP::String {
     my $y_data = $y_ndarray->data;
     
     for (my $i = 0; $i < $length; $i++) {
-      $ret_data->[$i] = $x_data->[$i] . $y_data->[$i];
+      my $x = (string)undef;
+      if ($x_data->[$i]) {
+        $x = $x_data->[$i];
+      }
+      else {
+        $x = "";
+      }
+      
+      my $y = (string)undef;
+      if ($y_data->[$i]) {
+        $y = $y_data->[$i];
+      }
+      else {
+        $y = "";
+      }
+      
+      $ret_data->[$i] = $x . $y;
+    }
+    
+    return $ret_ndarray;
+  }
+  
+  precompile static method substr : R::NDArray::String ($x_ndarray : R::NDArray::String, $offset : int, $substr_length : int = -1, $replacement : string = undef) {
+    
+    unless ($x_ndarray) {
+      die "The n-dimensional array \$x_ndarray must be defined.";
+    }
+    
+    my $length = $x_ndarray->length;
+    
+    my $x_dim = $x_ndarray->dim;
+    
+    my $ret_ndarray = R::OP::String->c(undef, $x_dim);
+    my $ret_data = $ret_ndarray->data;
+    
+    my $x_data = $x_ndarray->data;
+    
+    for (my $i = 0; $i < $length; $i++) {
+      eval { $ret_data->[$i] = Fn->substr($x_data->[$i], $offset, $substr_length, $replacement); }
+      
+      if ($@) {
+        $ret_data->[$i] = undef;
+      }
     }
     
     return $ret_ndarray;
@@ -125,7 +169,7 @@ class R::OP::String {
     my $y_data = $y_ndarray->data;
     
     for (my $i = 0; $i < $length; $i++) {
-      $ret_data->[$i] = !($x_data->[$i] ne $y_data->[$i]);
+      $ret_data->[$i] = $x_data->[$i] ne $y_data->[$i];
     }
     
     return $ret_ndarray;

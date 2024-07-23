@@ -664,16 +664,20 @@ class R::OP::Long {
       die "The n-dimensional array \$x_ndarray must be defined.";
     }
     
+    unless ($x_ndarray->is_vector) {
+      die "The n-dimensional array \$x_ndarray must be a vector.";
+    }
+    
     my $length = $x_ndarray->length;
     
     my $x_dim = $x_ndarray->dim;
     
-    my $ret_ndarray = &c(undef, $x_dim);
+    my $ret_ndarray = &c(undef, [$length]);
     
     my $x_data = $x_ndarray->data;
     my $ret_data = $ret_ndarray->data;
     
-    my $sum = 0L;
+    my $sum = (long)0;
     for (my $i = 0; $i < $length; $i++) {
       $sum += $x_data->[$i];
       $ret_data->[$i] = $sum;
@@ -712,16 +716,20 @@ class R::OP::Long {
       die "The n-dimensional array \$x_ndarray must be defined.";
     }
     
+    unless ($x_ndarray->is_vector) {
+      die "The n-dimensional array \$x_ndarray must be a vector.";
+    }
+    
     my $length = $x_ndarray->length;
     
     my $x_dim = $x_ndarray->dim;
     
-    my $ret_ndarray = &c(undef, $x_dim);
+    my $ret_ndarray = &c(undef, [$length]);
     
     my $x_data = $x_ndarray->data;
     my $ret_data = $ret_ndarray->data;
     
-    my $prod = 1L;
+    my $prod = (long)1;
     for (my $i = 0; $i < $length; $i++) {
       $prod *= $x_data->[$i];
       $ret_data->[$i] = $prod;
@@ -738,8 +746,8 @@ class R::OP::Long {
     
     my $x_dim = $x_ndarray->dim;
     
-    unless (@$x_dim == 1) {
-      die "The length of dim field of \$x_ndarray must be 1.";
+    unless ($x_ndarray->is_vector) {
+      die "The n-dimensional array \$x_ndarray must be a vector.";
     }
     
     my $length = $x_ndarray->length;

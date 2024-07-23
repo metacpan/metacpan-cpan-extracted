@@ -1,4 +1,5 @@
-^\.git
+\.gitignore
+\.git/
 maint
 ^tags$
 .last_cover_stats
@@ -8,7 +9,7 @@ Makefile$
 ^.*.bak
 ^.*.old
 ^t.*sessions
-^cover_db
+cover_db/
 ^.*\.log
 ^.*\.swp$
 ^.*~$

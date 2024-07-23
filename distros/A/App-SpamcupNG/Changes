@@ -1,10 +1,230 @@
 ==================================================
-Changes from 2023-05-02 00:00:00 +0000 to present.
+Changes from 2023-07-24 00:00:00 +0000 to present.
 ==================================================
 
 ------------------------------------------
-version 0.018 at 2024-05-01 03:13:55 +0000
+version 0.019 at 2024-07-23 03:12:52 +0000
 ------------------------------------------
+
+  Change: d0dd685e8e55db0bf4d9252cf8560e8abd1bdf5a
+  Author: Alceu Rodrigues de Freitas Junior <glasswalk3r@yahoo.com.br>
+  Date : 2024-07-23 00:08:52 +0000
+
+    Merge pull request #16 from glasswalk3r/bugfix/fatal-errors
+
+    Bugfix/fatal errors 
+
+  Change: afe499f9623d9568fa2891d1f2dbee7d6e5b4572
+  Author: Alceu Rodrigues de Freitas Junior <glasswalk3r@yahoo.com.br>
+  Date : 2024-07-22 23:57:00 +0000
+
+    chore: extended testing 
+
+  Change: 2bd8e705896811f381f72a1767adaa540203457e
+  Author: Alceu Rodrigues de Freitas Junior <glasswalk3r@yahoo.com.br>
+  Date : 2024-07-22 23:54:59 +0000
+
+    chore: extended testing 
+
+  Change: d82e112a677f2620d001455d5147236f0679ecf4
+  Author: Alceu Rodrigues de Freitas Junior <glasswalk3r@yahoo.com.br>
+  Date : 2024-07-22 23:53:55 +0000
+
+    refactor: added logging 
+
+  Change: 0f8b378afb06b2495fef925d20c50197aa726c73
+  Author: Alceu Rodrigues de Freitas Junior <glasswalk3r@yahoo.com.br>
+  Date : 2024-07-22 23:43:34 +0000
+
+    chore: cleanup 
+
+  Change: e443779496f35362cee598bd9345eb2e51de3fc1
+  Author: Alceu Rodrigues de Freitas Junior <glasswalk3r@yahoo.com.br>
+  Date : 2024-07-22 23:43:08 +0000
+
+    chore: ordered for easy maintenance 
+
+  Change: 0d24bd22d17040448d623ad16186a82223265383
+  Author: Alceu Rodrigues de Freitas Junior <glasswalk3r@yahoo.com.br>
+  Date : 2024-07-22 23:04:53 +0000
+
+    fix: missing dependencies 
+
+  Change: 9ab6e2d1c80eb09bbb878483f6ce188bb85ebc69
+  Author: Alceu Rodrigues de Freitas Junior <glasswalk3r@yahoo.com.br>
+  Date : 2024-07-22 23:00:22 +0000
+
+    fix: missing dependencies 
+
+  Change: ec9dd5883a70fadc0dbfa501d64723881d9152ab
+  Author: Alceu Rodrigues de Freitas Junior <glasswalk3r@yahoo.com.br>
+  Date : 2024-07-22 22:49:00 +0000
+
+    fix: missing dependencies 
+
+  Change: 222f355846b8fbf01f4aa83598b3ed2977ac57ef
+  Author: Alceu Rodrigues de Freitas Junior <glasswalk3r@yahoo.com.br>
+  Date : 2024-07-22 22:43:43 +0000
+
+    fix: replacing dist-zilla 
+
+  Change: 607afa113289570350209f4d525d65f71837413d
+  Author: Alceu Rodrigues de Freitas Junior <glasswalk3r@yahoo.com.br>
+  Date : 2024-07-22 22:34:45 +0000
+
+    chore: all implemented 
+
+  Change: e7fa0efa1960c2837f7a7eee59f63459d4a7fdb3
+  Author: Alceu Rodrigues de Freitas Junior <glasswalk3r@yahoo.com.br>
+  Date : 2024-07-22 09:34:58 +0000
+
+    refactor: trying to reduce time 
+
+  Change: 5854d47160a5d7cd50f626a83d23d1678ed423af
+  Author: Alceu Rodrigues de Freitas Junior <glasswalk3r@yahoo.com.br>
+  Date : 2024-07-22 09:22:19 +0000
+
+    Update unit-test.yml 
+
+  Change: efd2b14c37f25be865346b9195e46091ad94b0d6
+  Author: Alceu Rodrigues de Freitas Junior <glasswalk3r@yahoo.com.br>
+  Date : 2024-07-22 09:16:35 +0000
+
+    fix: install as root 
+
+  Change: 0f34dc6eba83213420c9a2805e4bb0fc93ba5576
+  Author: Alceu Rodrigues de Freitas Junior <glasswalk3r@yahoo.com.br>
+  Date : 2024-07-22 09:15:11 +0000
+
+    fix: install as root 
+
+  Change: 697f6bec1d1454654a6c29bf3b7e37b5fb7d4b27
+  Author: Alceu Rodrigues de Freitas Junior <glasswalk3r@yahoo.com.br>
+  Date : 2024-07-22 09:06:39 +0000
+
+    chore: troubleshooting 
+
+  Change: 19b8feddd9b20e6e9b8e4f9a13c5bdddcfe9adb5
+  Author: Alceu Rodrigues de Freitas Junior <glasswalk3r@yahoo.com.br>
+  Date : 2024-07-22 09:03:30 +0000
+
+    chore: troubleshooting 
+
+  Change: 120f07f7a1348541148fe1baf5d9ca0ca58a3666
+  Author: Alceu Rodrigues de Freitas Junior <glasswalk3r@yahoo.com.br>
+  Date : 2024-07-22 09:00:58 +0000
+
+    fix: action not released 
+
+  Change: 25bbc23d6f793c69ecbf015b23008290f5b8c3bc
+  Author: Alceu Rodrigues de Freitas Junior <glasswalk3r@yahoo.com.br>
+  Date : 2024-07-22 08:58:27 +0000
+
+    fix: using cpanm instead 
+
+  Change: 42166b08d8d9a0616edac86211fbee6e4d1049ee
+  Author: Alceu Rodrigues de Freitas Junior <glasswalk3r@yahoo.com.br>
+  Date : 2024-07-22 08:42:25 +0000
+
+    fix: testing 
+
+  Change: 8275e9d3e1a78441fbff9627945d81b9ce4bc0d6
+  Author: Alceu Rodrigues de Freitas Junior <glasswalk3r@yahoo.com.br>
+  Date : 2024-07-22 08:35:43 +0000
+
+    fix: missing space 
+
+  Change: f31f5045a76ccb2f7c6872b7609a8c1611b25c76
+  Author: Alceu Rodrigues de Freitas Junior <glasswalk3r@yahoo.com.br>
+  Date : 2024-07-22 08:34:20 +0000
+
+    fix: running cpan 
+
+  Change: dbb1049ac4503f8a465e66145729d3fa741fec2a
+  Author: Alceu Rodrigues de Freitas Junior <glasswalk3r@yahoo.com.br>
+  Date : 2024-07-22 08:33:56 +0000
+
+    chore: upgraded actions 
+
+  Change: f933d36d7f1b556d9d5a45290810b7a1f6819600
+  Author: Alceu Rodrigues de Freitas Junior <glasswalk3r@yahoo.com.br>
+  Date : 2024-07-22 08:02:30 +0000
+
+    fix: missing author dependencies 
+
+  Change: 4680c239aa25918ba2720c7b1c1dc99f54ea5273
+  Author: Alceu Rodrigues de Freitas Junior <glasswalk3r@yahoo.com.br>
+  Date : 2024-07-22 08:00:17 +0000
+
+    fix: missing author dependencies 
+
+  Change: 7afed806d8f3dd776dd8e70ec031bcdecc53cd36
+  Author: Alceu Rodrigues de Freitas Junior <glasswalk3r@yahoo.com.br>
+  Date : 2024-07-21 22:44:22 +0000
+
+    chore: update requirements 
+
+  Change: 94932d749090e8da65a4cca3a0b988cb1852d210
+  Author: Alceu Rodrigues de Freitas Junior <glasswalk3r@yahoo.com.br>
+  Date : 2024-07-21 22:43:31 +0000
+
+    refactor: reports disabled
+
+    Not yet a fix, but at least will allow to see the error when parsing
+    the HTML and then update the parser. 
+
+  Change: ca595133696955f42fe6520606b7cd7eb4d690ea
+  Author: Alceu Rodrigues de Freitas Junior <glasswalk3r@yahoo.com.br>
+  Date : 2024-07-21 21:53:24 +0000
+
+    fix: misuse of fatal()
+
+    Forgot that this log level is not the same thing as logdie(), which
+    is the expected action where fatal() was replaced. 
+
+  Change: fd94d4465238e934c046bf6b7e43608a9c6c5ec4
+  Author: Alceu Rodrigues de Freitas Junior <glasswalk3r@yahoo.com.br>
+  Date : 2024-07-21 21:53:05 +0000
+
+    refactor: better error context 
+
+  Change: 2657c0b0a566753b4d6c97ff824ee423609e9916
+  Author: Alceu Rodrigues de Freitas Junior <glasswalk3r@yahoo.com.br>
+  Date : 2024-05-11 22:54:57 +0000
+
+    fix: missing requirement 
+
+  Change: 5f2deddaeff5b8f6bdf379b24553dc5120981f6f
+  Author: Alceu Rodrigues de Freitas Junior <glasswalk3r@yahoo.com.br>
+  Date : 2024-05-11 22:45:11 +0000
+
+    feat: comments on cpanfile 
+
+  Change: 29d22260507cb6434f8329c893254b056727935c
+  Author: Alceu Rodrigues de Freitas Junior <glasswalk3r@yahoo.com.br>
+  Date : 2024-05-11 22:44:11 +0000
+
+    feat: dependencies without Dist::Zilla 
+
+  Change: 1fda1c9223717e25fc1997a4e57e35a7a60914b2
+  Author: Alceu Rodrigues de Freitas Junior <glasswalk3r@yahoo.com.br>
+  Date : 2024-05-08 16:22:45 +0000
+
+    Merge pull request #14 from glasswalk3r/feature/er-diagram
+
+    feat: ER diagram 
+
+  Change: 85fbaa918697d0773bbf442244053d37ffaceb73
+  Author: Alceu Rodrigues de Freitas Junior <glasswalk3r@yahoo.com.br>
+  Date : 2024-05-08 16:17:08 +0000
+
+    fix: skip CI for README 
+
+  Change: ab6e970c2f6b524c29c5f00a55505c960f070e5e
+  Author: Alceu Rodrigues de Freitas Junior <glasswalk3r@yahoo.com.br>
+  Date : 2024-05-08 16:14:47 +0000
+
+    feat: ER diagram 
 
   Change: ddba72f540968edb6b102682a88ad6ec712d0075
   Author: Alceu Rodrigues de Freitas Junior <glasswalk3r@yahoo.com.br>

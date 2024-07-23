@@ -12,6 +12,10 @@ reporting your SPAM. Spamcup NG tries to be as polite as possible, introducing
 forced delays to not overwhelm SpamCop.net website. All reports are sent
 sequentially.
 
+App-SpamcupNG also saves data from the report sends to Spamcop. The data
+available are only those exposed by Spamcop itself, there is no correlation of
+the statistics Spamcop have and save for themselves.
+
 App-SpamcupNG is a fork from the original Spamcup project.
 
 Spamcup is copyright (C) Toni Willberg.
@@ -75,7 +79,10 @@ You will need administrator rights to install this globally unless you're lucky
 to be on a UNIX-like OS and you install your own Perl interpreter (like those
 installed by [perlbrew](https://perlbrew.pl/)).
 
-## Configuration file
+[local::lib](https://metacpan.org/pod/local::lib) is also your friend to avoid
+the need of administrative rights.
+
+### Configuration file
 
 You can also provide a configuration file to avoid having to provide the same
 information everytime you want to execute the program.
@@ -109,6 +116,73 @@ Accounts:
 ```
 All those options have their corresponding command line parameter. Be sure to
 take care of file permissions to avoid disclosure of your SpamCop.net password!
+
+### Local database
+
+You probably noticed the following configuration lines from the YAML:
+
+```YAML
+  database:
+    enabled: true
+    path: /var/spamcupng/reports.db
+```
+
+Those lines define the configuration for a local database based on
+[SQLite](https://sqlite.org/).
+
+This database will save data related to the submitted reports and can be used
+to provide further details of what kind of SPAM you're getting and from.
+
+## Local database schema
+
+```mermaid
+---
+title: Reports sent to Spamcop
+---
+erDiagram
+    SUMMARY |o--o{ EMAIL_CHARSET : has
+    SUMMARY ||--|| EMAIL_CONTENT_TYPE : has
+    SUMMARY |o--o{ MAILER : has
+    SUMMARY ||--|| SUMMARY_RECEIVER : has
+    SUMMARY ||--|| SPAM_AGE_UNIT : has
+    SUMMARY_RECEIVER ||--|| RECEIVER : relates-to
+    SUMMARY {
+        integer id PK
+        string tracking_id UK
+        integer created
+        integer charset_id FK
+        integer content_type_id FK
+        integer age
+        integer age_unit_id FK
+        integer mailer_id FK
+    }
+    EMAIL_CHARSET {
+        integer id PK
+        string name
+    }
+    EMAIL_CONTENT_TYPE {
+        integer id PK
+        string name
+    }
+    MAILER {
+        integer id PK
+        string name
+    }
+    SUMMARY_RECEIVER {
+        integer id PK
+        integer summary_id FK
+        integer receiver_id FK
+        string report_id UK
+    }
+    RECEIVER {
+        integer id PK
+        string email UK
+    }
+    SPAM_AGE_UNIT {
+        integer id PK
+        string name UK
+    }
+```
 
 # Copyright and license
 

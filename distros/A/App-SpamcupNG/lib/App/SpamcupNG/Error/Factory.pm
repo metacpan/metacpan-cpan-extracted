@@ -3,13 +3,14 @@ use strict;
 use warnings;
 use Carp qw(confess);
 use Exporter 'import';
+use Log::Log4perl 1.57 qw(get_logger :levels);
 
 use App::SpamcupNG::Error;
 use App::SpamcupNG::Error::Mailhost;
 use App::SpamcupNG::Error::Bounce;
 use App::SpamcupNG::Error::LoginFailed;
 
-our $VERSION = '0.018'; # VERSION
+our $VERSION = '0.019'; # VERSION
 
 =head1 NAME
 
@@ -45,42 +46,76 @@ The type of error is identified from this message.
 
 Expects as parameters:
 
-- an array reference where each index is a string line from the original error
+=over
+
+=item *
+
+An array reference where each index is a string line from the original error
 message.
 
-- a integer, being 0 if the error message is not fatal, 1 otherwise.
+=item *
 
-Returns an instance of App::SpamcupNG::Error or one of it's subclasses.
+A optional integer, being 0 if the error message is not fatal, 1 otherwise.
+
+It defaults to 0.
+
+=back
+
+Returns an instance of L<App::SpamcupNG::Error> or one of it's subclasses.
 
 =cut
 
 sub create_error {
     my ( $message_ref, $is_fatal ) = @_;
     $is_fatal //= 0;
+    my $logger = get_logger('SpamcupNG');
+
+    if ( $logger->is_debug ) {
+        $logger->debug('message reference received:');
+        $logger->debug( join( ' - ', @{$message_ref} ) );
+        $logger->debug("is_fatal: $is_fatal");
+    }
 
     confess 'message must be an no empty array reference'
       unless ( ( ref($message_ref) eq 'ARRAY' )
         and ( scalar( @{$message_ref} ) > 0 ) );
 
-    return App::SpamcupNG::Error::Mailhost->new($message_ref)
-      if ( $message_ref->[0] =~ $mailhost_regex );
+    if ( $message_ref->[0] =~ $mailhost_regex ) {
+        $logger->debug('Message is a App::SpamcupNG::Error::Mailhost instance')
+          if ( $logger->is_debug );
+        return App::SpamcupNG::Error::Mailhost->new($message_ref);
+    }
 
-    return App::SpamcupNG::Error::Bounce->new( $message_ref, 1 )
-      if ( $message_ref->[0] =~ $bounce_regex );
+    if ( $message_ref->[0] =~ $bounce_regex ) {
+        $logger->debug('Message is a App::SpamcupNG::Error::Bounce instance')
+          if ( $logger->is_debug );
+        return App::SpamcupNG::Error::Bounce->new( $message_ref, 1 );
+    }
 
-    return App::SpamcupNG::Error::LoginFailed->new($message_ref)
-      if ( $message_ref->[0] =~ $login_failed_regex );
+    if ( $message_ref->[0] =~ $login_failed_regex ) {
+        $logger->debug(
+            'Message is a App::SpamcupNG::Error::LoginFailed instance')
+          if ( $logger->is_debug );
+        return App::SpamcupNG::Error::LoginFailed->new($message_ref);
+    }
 
-    return App::SpamcupNG::Error->new( $message_ref, $is_fatal )
-      if ($is_fatal);
+    if ($is_fatal) {
+        $logger->debug(
+'Message is a App::SpamcupNG::Error instance because it is classified as fatal'
+        ) if ( $logger->is_debug );
+        return App::SpamcupNG::Error->new( $message_ref, $is_fatal );
+    }
 
     foreach my $regex (@fatal_errors) {
         if ( $message_ref->[0] =~ $regex ) {
             $is_fatal = 1;
+            $logger->debug("Message matches '$regex', so is considered fatal")
+              if ( $logger->is_debug );
             last;
         }
     }
 
+    $logger->info('Message is not any subclass of App::SpamcupNG::Error');
     return App::SpamcupNG::Error->new( $message_ref, $is_fatal );
 }
 

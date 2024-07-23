@@ -20459,7 +20459,7 @@ sub cwd
    my $self=$_[0];
    my $target_dir=$_[1];
    my $timeout=0;my $debug=0;my $display=0;
-   my $log=0;my $delay='';my $cache='';my $return_all='';
+   my $log=0;my $delay='';my $cache='';my $return_all_output='';
    if (1<$#_) {
       foreach my $i (2..$#_) {
          $_[$i]||='';
@@ -20478,7 +20478,7 @@ sub cwd
          } elsif (lc($_[$i]) eq '__debug__') {
             $debug=1;
          } elsif (lc($_[$i]) eq '__return_all_output__') {
-            $return_all=1;
+            $return_all_output=1;
          } elsif (-1<index $_[$i],'Cache::FileCache') {
             $cache=$_[$i];
          } elsif ((-1<index $_[$i],'Moose::Meta::Class::__ANON__::SERIAL')
@@ -28917,7 +28917,7 @@ sub ftpcmd
    my $cmd=$_[1];
    my $ftperr='';my $timeout=0;my $debug=0;
    my $display=0;my $log=0;my $delay='';
-   my $cache='';my $return_all='';
+   my $cache='';my $return_all_output='';
    if (1<$#_) {
       foreach my $i (2..$#_) {
          $_[$i]||='';
@@ -28936,7 +28936,7 @@ sub ftpcmd
          } elsif (lc($_[$i]) eq '__debug__') {
             $debug=1;
          } elsif (lc($_[$i]) eq '__return_all_output__') {
-            $return_all=1;
+            $return_all_output=1;
          } elsif (-1<index $_[$i],'Cache::FileCache') {
             $cache=$_[$i];
          } elsif ((-1<index $_[$i],'Moose::Meta::Class::__ANON__::SERIAL')
@@ -29937,177 +29937,62 @@ sub cmd
    my $wantarray= wantarray ? wantarray : '';
    my $cmtimeout='X';my $svtimeout='X';my $sem='';
    my $notrap=0;my $ignore='';my $login_retry=0;
-   my $allow_no_output=0;my $debug=0;
+   my $allow_no_output=0;my $return_all_output=0;
+   my $debug=0;my $lock_label='';
    my ($stdout,$stderr)=('','');
-   if (defined $_[2] && $_[2]) {
-      if ($_[2]=~/^[0-9]+/) {
-         $cmtimeout=$_[2];
-      } else {
-         my $arg=lc($_[2]);
-         if ($arg eq '__ftp__') {
-            $ftp=1;
-         } elsif ($arg eq '__allow_no_output__') {
-            $allow_no_output=1;
-         } elsif ($arg eq '__live__' || $arg eq '__LIVE__') {
-            $live=1;
-         } elsif ($arg eq '__debug__' || $arg eq '__DEBUG__') {
-            $debug=1;
-         } elsif ($arg eq '__display__' || $arg eq '__DISPLAY__') {
-            $display=1;
-         } elsif ($arg eq '__log__') {
+   if (1<$#_) {
+      foreach my $i (2..$#_) {
+         $_[$i]||='';
+         if ($_[$i]=~/^[0-9]+/) {
+            $timeout=$_[$i];
+         } elsif ($_[$i]=~/__to__[=]?(.*)$/i) {
+            $timeout=$1;
+         } elsif ($_[$i]=~/__timeout__[=]?(.*)$/i) {
+            $timeout=$1;
+         } elsif ($_[$i]=~/__delay__[=]?(.*)$/i) {
+            $delay=$1;
+         } elsif (lc($_[$i]) eq '__log__') {
             $log=1;
-         } elsif ($arg eq '__notrap__') {
-            $notrap=1;
-         } elsif ($arg=~/__delay__[=]?(.*)$/i) {
-            $delay=$1||20;
-         } elsif ($arg eq '__retry_on_error__') {
+         } elsif (lc($_[$i]) eq '__display__') {
+            $display=1;
+         } elsif (lc($_[$i]) eq '__debug__') {
+            $debug=1;
+         } elsif (lc($_[$i]) eq '__live__') {
+            $live=1;
+         } elsif (lc($_[$i]) eq '__ftp__') {
+            $ftp=1; 
+         } elsif (lc($_[$i]) eq '__notrap__') {
+            $notrap=1; 
+         } elsif (lc($_[$i]) eq '__allow_no_output__') {
+            $allow_no_output=1;
+         } elsif (lc($_[$i]) eq '__retry_on_error__') {
             $login_retry=-1;
-         } elsif (-1<index $_[2],'Cache::FileCache') {
-            $cache=$_[2];
-         } elsif ((-1<index $_[2],'Moose::Meta::Class::__ANON__::SERIAL')
-               && ($_[2]->chi_root_class)) {
-            $cache=$_[2];
-         } elsif ($wantarray) {
-            return 0,'Third Argument for Timeout Value is not Whole Number';
-         } else {
-            &Net::FullAuto::FA_Core::handle_error(
-               'Third Argument for Timeout Value is not Whole Number')
-         }
-      }
-   } my $login_id='';
-   if (defined $_[3] && $_[3]) {
-      my $arg=lc($_[3]);
-      if ($arg eq '__ftp__') {
-         $ftp=1;
-      } elsif ($arg eq '__allow_no_output__') {
-         $allow_no_output=1;
-      } elsif ($arg eq '__live__' || $arg eq '__LIVE__') {
-         $live=1;
-      } elsif ($arg eq '__debug__' || $arg eq '__DEBUG__') {
-         $debug=1;
-      } elsif ($arg eq '__display__' || $arg eq '__DISPLAY__') {
-         $display=1;
-      } elsif ($arg eq '__log__') {
-         $log=1;
-      } elsif ($arg eq '__notrap__') {
-         $notrap=1;
-      } elsif ($arg=~/__delay__[=]?(.*)$/i) {
-         $delay=$1||20;
-      } elsif ($arg eq '__retry_on_error__') {
-         $login_retry=-1;
-      } elsif (-1<index $_[3],'Cache::FileCache') {
-         $cache=$_[3];
-      } elsif ((-1<index $_[3],'Moose::Meta::Class::__ANON__::SERIAL')
-            && ($_[3]->chi_root_class)) {
-         $cache=$_[3];
-      } else {
-         $login_id=$_[3];
-      }
-   }
-   if (defined $_[4] && $_[4]) {
-      my $arg=lc($_[4]);
-      if ($arg eq '__ftp__') {
-         $ftp=1;
-      } elsif ($arg eq '__allow_no_output__') {
-         $allow_no_output=1;
-      } elsif ($arg eq '__live__' || $arg eq '__LIVE__') {
-         $live=1;
-      } elsif ($arg eq '__debug__' || $arg eq '__DEBUG__') {
-         $debug=1;
-      } elsif ($arg eq '__display__' || $arg eq '__DISPLAY__') {
-         $display=1;
-      } elsif ($arg eq '__log__') {
-         $log=1;
-      } elsif ($arg eq '__notrap__') {
-         $notrap=1;
-      } elsif ($arg=~/__delay__[=]?(.*)$/i) {
-         $delay=$1||20;
-      } elsif ($arg eq '__retry_on_error__') {
-         $login_retry=-1;
-      } elsif (-1<index $_[4],'Cache::FileCache') {
-         $cache=$_[4];
-      } elsif ((-1<index $_[4],'Moose::Meta::Class::__ANON__::SERIAL')
-            && ($_[4]->chi_root_class)) {
-         $cache=$_[4];
-      } else {
-         if (&Net::FullAuto::FA_Core::test_semaphore($_[4])) {
-            if ($wantarray) {
-               return 0,"Semaphore Blocking Command";
-            } else { return 'Semaphore Blocking Command' }
-         } else {
-            &Net::FullAuto::FA_Core::acquire_fa_lock($_[4]);
-            $sem=$_[4];
-         }
-      }
-   }
-   if (defined $_[5] && $_[5]) {
-      my $arg=lc($_[5]);
-      if ($arg eq '__ftp__') {
-         $ftp=1;$arg='';
-      } elsif ($arg eq '__allow_no_output__') {
-         $allow_no_output=1;
-      } elsif ($arg eq '__live__' || $arg eq '__LIVE__') {
-         $live=1;$arg='';
-      } elsif ($arg eq '__debug__' || $arg eq '__DEBUG__') {
-         $debug=1;
-      } elsif ($arg eq '__display__' || $arg eq '__DISPLAY__') {
-         $display=1;
-      } elsif ($arg eq '__log__') {
-         $log=1;
-      } elsif ($arg eq '__notrap__') {
-         $notrap=1;
-      } elsif ($arg=~/__delay__[=]?(.*)$/i) {
-         $delay=$1||20;
-      } elsif ($arg eq '__retry_on_error__') {
-         $login_retry=-1;
-      } elsif (-1<index $_[5],'Cache::FileCache') {
-         $cache=$_[5];
-      } elsif ((-1<index $_[5],'Moose::Meta::Class::__ANON__::SERIAL')
-            && ($_[5]->chi_root_class)) {
-         $cache=$_[5];
-      } else {
-         if (&Net::FullAuto::FA_Core::test_semaphore($_[5])) {
-            if ($wantarray) {
-               return 0,"Semaphore Blocking Command";
-            } else { return 'Semaphore Blocking Command' }
-         } else {
-            &Net::FullAuto::FA_Core::acquire_fa_lock($_[5]);
-            $sem=$_[5];
-         }
-      }
-   }
-   if (!$ftp && (grep{lc($_) eq '__ftp__'}@_)) {
-      $ftp=1;
-   } elsif (!$allow_no_output &&
-         (grep{lc($_) eq '__allow_no_output__'}@_)) {
-      $allow_no_output=1;
-   } elsif (!$live && (grep{lc($_) eq '__live__'}@_)) {
-      $live=1;
-   } elsif (!$debug && (grep{lc($_) eq '__debug__'}@_)) {
-      $debug=1;
-   } elsif (!$display && (grep{lc($_) eq '__display__'}@_)) {
-      $display=1;
-   } elsif (!$log && (grep{lc($_) eq '__log__'}@_)) {
-      $log=1;
-   } elsif (!$notrap && (grep{lc($_) eq '__notrap__'}@_)) {
-      $notrap=1;
-   } elsif (!$delay && (grep{$_=~/__delay__[=]?(.*)$/i}@_)) {
-      $delay=$1||20;
-   } elsif ($login_retry==0 && (grep{lc($_) eq '__retry_on_error__'}@_)) {
-      $login_retry=-1;
-   } elsif (!$cache &&
-         (grep{/Cache::FileCache|Moose::Meta::Class::__ANON__::SERIAL/}@_)) {
-      foreach my $i (0..$#_) {
-         if (-1<index $_[$i],'Cache::FileCache') {
+         } elsif (lc($_[$i]) eq '__return_all_output__') {
+            $return_all_output=1;
+         } elsif (-1<index $_[$i],'Cache::FileCache') {
             $cache=$_[$i];
-            last;
          } elsif ((-1<index $_[$i],'Moose::Meta::Class::__ANON__::SERIAL')
                && ($_[$i]->chi_root_class)) {
             $cache=$_[$i];
-            last;
+         } elsif ($_[$i]=~/__lock__[=]?(.*)$/i) {
+            $lock_label=$1;
+            unless ($lock_label) {
+               if ($wantarray) {
+                  return 1,"ERROR - Must Provide LABEL with __lock__=<label> argument";
+               } else { return "ERROR - Must Provide LABEL with __lock__=<label> argument" }
+            }
+            if (&Net::FullAuto::FA_Core::test_semaphore($lock_label)) {
+               if ($wantarray) {
+                  return 0,"Semaphore Blocking Command";
+               } else { return 'Semaphore Blocking Command' }
+            } else {
+               &Net::FullAuto::FA_Core::acquire_fa_lock($lock_label);
+               $sem=$lock_label;
+            }
          }
       }
    }
+   my $login_id='';
    my $cmd_prompt='';
    if (!$ftp) {
       $cmd_prompt=substr($self->{_cmd_handle}->prompt,1,-2);
@@ -30965,11 +30850,13 @@ print "GOING TO INT SIX\n";
                            $first=0;
                            next
                         }
-if (!$Net::FullAuto::FA_Core::cron && ($Net::FullAuto::FA_Core::debug || $debug)) {
-   print "WE DID NOTHING TO STDOUT - $output\n";#sleep 2;
-}
-print $Net::FullAuto::FA_Core::LOG "WE DID NOTHING TO STDOUT - $output\n"
-   if $Net::FullAuto::FA_Core::log && -1<index $Net::FullAuto::FA_Core::LOG,'*';
+                        print "This FETCH Loop Gathered NO OUTPUT: ==>$output<=="
+                           if !$Net::FullAuto::FA_Core::cron &&
+                           ($Net::FullAuto::FA_Core::debug || $debug);
+                        print $Net::FullAuto::FA_Core::LOG
+                           "This FETCH Loop Gathered NO OUTPUT: ==>$output<=="
+                           if $Net::FullAuto::FA_Core::log &&
+                           -1<index $Net::FullAuto::FA_Core::LOG,'*';
 
 #open(BK,">brianout.txt");
 #print BK "$output";
@@ -30986,9 +30873,10 @@ print $Net::FullAuto::FA_Core::LOG "WE DID NOTHING TO STDOUT - $output\n"
                      } else {
                         #$save=&display($output,$cmd_prompt,$save)
                         #   if $display;
-                        $appendout=$output;next
-                     }
-                  }
+                        $appendout=$output;
+			next
+                     } my $line_number_marker1;
+                  } my $line_number_marker2;
 print $Net::FullAuto::FA_Core::LOG "PAST THE ALARM3\n"
       if $Net::FullAuto::FA_Core::log &&
       -1<index $Net::FullAuto::FA_Core::LOG,'*';
@@ -31128,7 +31016,11 @@ print $Net::FullAuto::FA_Core::LOG "NO GROWOUTPUTTTTTTTTTTTTT\n" if $Net::FullAu
                   $output=~s/^[ |\t]+(stdout:.*)$/$1/m if !$fullerror;
                   $save=&display($output,$cmd_prompt,$save,$live_command)
                      if $display;
-                  $growoutput.=$output;
+                  if ($growoutput!~/\n$/s && $output=~/^stdout: /) {
+	             $growoutput.="\n$output";
+		  } else {
+                     $growoutput.=$output;
+		  }
 #if ($Net::FullAuto::FA_Core::debug || $debug) {
 #open(BK,">brianout.txt");
 #print BK "$growoutput";
@@ -31141,7 +31033,7 @@ print $Net::FullAuto::FA_Core::LOG "NO GROWOUTPUTTTTTTTTTTTTT\n" if $Net::FullAu
                   $test_out="\$growoutput";
 if (!$Net::FullAuto::FA_Core::cron && ($Net::FullAuto::FA_Core::debug || $debug)) {
 print "THISEVALLL=",($test_out=~/$cmd_prompt$/s),
-       " and OUT=$output and CMD_PROMPT=$cmd_prompt\n";
+       " and OUT=$output<== and GROWOUTPUT=$growoutput<== and CMD_PROMPT=$cmd_prompt\n";
 }
                   if (15<length $growoutput &&
                         unpack('a16',$growoutput) eq '?Invalid command') {
@@ -31384,7 +31276,7 @@ print $Net::FullAuto::FA_Core::LOG "LETS LOOK AT LINE=$line<== and LASTLINE=$las
                            $growoutput=~s/^stdout: ?//mg;
                            $fulloutput=$growoutput;
                         }
-                        $save=&display($line,$cmd_prompt,$save)
+                        $save=&display($line,$cmd_prompt,$save,$live_command)
                            if $display;
                      }
 print "GROW_ADDED_TO_FULL=$growoutput<==\n" if !$Net::FullAuto::FA_Core::cron && ($Net::FullAuto::FA_Core::debug || $debug) && $loop_count<$loop_max;
@@ -31772,21 +31664,31 @@ sub display
    my $tchomp_save=$chomp_save;
    $tchomp_save=~s/["|']/X/g;
    $tchomp_save=~s/^\s+//s;
+   $tchomp_save=quotemeta($tchomp_save);
    my $cmd=$_[3]||'';
    my $tcmd=$cmd;
    $tcmd=~s/["|']/X/g;
    my $tline=$line;
    $tline=~s/["|']/X/g;
    $tline=~s/\s*$//s;
+   my $ttline=unpack('A1',$tline);
    $tline=quotemeta($tline);
-   $tline=~s/^\\(.)/$1?/s;
-   if (-1<index $cmd,'git clone') {
+   if (quotemeta($ttline) ne $ttline) {
+      if ($ttline eq '<' || $ttline eq '>') {
+         $tline=~s/^\\(.)/$1?/s;
+      }
+   } else {
+      $tline=~s/^(.)/$1?/s;
+   }
+   if ((-1<index $cmd,'git clone') ||
+         (-1<index $cmd,'git checkout')) {
       return unless $line;
       if (-1<index $line,'Receiving objects:') {
          print "\n";
 	 $line=~s/sReceiving/s\nReceiving/sg;
       } elsif (-1<index $line,'Resolving deltas:') {
-         print "\n"
+         print "\n";
+	 $line=~s/[)]Resolving/)\nResolving/sg;
       } elsif (-1<index $line,'Updating files:') {
          print "\n";
 	 $line=~s/[)]Updating/)\nUpdating/sg;

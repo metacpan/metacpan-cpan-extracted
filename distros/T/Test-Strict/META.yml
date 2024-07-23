@@ -9,7 +9,7 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: '6.64'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010'
+generated_by: 'ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -22,7 +22,7 @@ no_index:
 provides:
   Test::Strict:
     file: lib/Test/Strict.pm
-    version: '0.52'
+    version: '0.53'
 requires:
   File::Find: '0.01'
   File::Spec: '0.01'
@@ -33,7 +33,7 @@ requires:
 resources:
   bugtracker: http://github.com/manwar/Test-Strict
   repository: http://github.com/manwar/Test-Strict.git
-version: '0.52'
+version: '0.53'
 x_contributors:
   - 'Gabor Szabo <szabgab@cpan.org>'
   - 'Peter Vereshagin <veresc@cpan.org>'

@@ -1,7 +1,7 @@
 use strict;
 use warnings;
-use Test::More;
+use Test::More tests => 2;
+use ExtUtils::Manifest;
 
-eval 'use Test::CheckManifest 1.28';
-plan skip_all => 'Test::CheckManifest 1.28 required to test MANIFEST' if $@;
-ok_manifest();
+is_deeply [ ExtUtils::Manifest::manicheck() ], [], 'missing';
+is_deeply [ ExtUtils::Manifest::filecheck() ], [], 'extra';

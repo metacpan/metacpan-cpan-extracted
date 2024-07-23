@@ -1,0 +1,231 @@
+class TestCase::R::OP::Byte {
+  
+  use Array;
+  
+  use R::OP::Byte as BOP;
+  
+  static method c : int () {
+    
+    {
+      my $ret_ndarray = BOP->c((byte)1);
+      
+      unless ($ret_ndarray is_type R::NDArray::Byte) {
+        return 0;
+      }
+      
+      unless (Array->equals_byte($ret_ndarray->data, [(byte)1])) {
+        return 0;
+      }
+      
+      unless (Array->equals_int($ret_ndarray->dim, [1])) {
+        return 0;
+      }
+    }
+    
+    {
+      my $data = [(byte)1, 2];
+      my $ret_ndarray = BOP->c($data);
+      
+      unless ($ret_ndarray is_type R::NDArray::Byte) {
+        return 0;
+      }
+      
+      unless ($ret_ndarray->data == $data) {
+        return 0;
+      }
+      
+      unless (Array->equals_byte($ret_ndarray->data, [(byte)1, 2])) {
+        return 0;
+      }
+      
+      unless (Array->equals_int($ret_ndarray->dim, [2])) {
+        return 0;
+      }
+    }
+    
+    {
+      my $data = [(byte)1, 2];
+      my $ret_ndarray = BOP->c(BOP->c($data));
+      
+      unless ($ret_ndarray is_type R::NDArray::Byte) {
+        return 0;
+      }
+      
+      unless ($ret_ndarray->data == $data) {
+        return 0;
+      }
+      
+      unless (Array->equals_byte($ret_ndarray->data, [(byte)1, 2])) {
+        return 0;
+      }
+      
+      unless (Array->equals_int($ret_ndarray->dim, [2])) {
+        return 0;
+      }
+    }
+    
+    {
+      my $data = [(byte)1, 2];
+      my $ret_ndarray = BOP->c(BOP->c($data), [1, 2]);
+      
+      unless ($ret_ndarray is_type R::NDArray::Byte) {
+        return 0;
+      }
+      
+      unless ($ret_ndarray->data == $data) {
+        return 0;
+      }
+      
+      unless (Array->equals_byte($ret_ndarray->data, [(byte)1, 2])) {
+        return 0;
+      }
+      
+      unless (Array->equals_int($ret_ndarray->dim, [1, 2])) {
+        return 0;
+      }
+    }
+    
+    # Exceptions
+    {
+      {
+        eval { BOP->c(true); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+    }
+    
+    return 1;
+  }
+  
+  static method rep : int () {
+    
+    my $x_ndarray = BOP->c([(byte)1, 2]);
+    
+    my $ret_ndarray = BOP->rep($x_ndarray, 2);
+    
+    unless (Array->equals_byte($ret_ndarray->data, [(byte)1, 2, 1, 2])) {
+      return 0;
+    }
+    
+    unless (Array->equals_int($ret_ndarray->dim, [4])) {
+      return 0;
+    }
+    
+    return 1;
+  }
+  
+  static method rep_length : int () {
+    
+    my $x_ndarray = BOP->c([(byte)1, 2]);
+    
+    my $ret_ndarray = BOP->rep_length($x_ndarray, 4);
+    
+    unless (Array->equals_byte($ret_ndarray->data, [(byte)1, 2, 1, 2])) {
+      return 0;
+    }
+    
+    unless (Array->equals_int($ret_ndarray->dim, [4])) {
+      return 0;
+    }
+    
+    return 1;
+  }
+  
+  static method seq : int () {
+    
+    {
+      my $ret_ndarray = BOP->seq(1, 4);
+      
+      unless (Array->equals_byte($ret_ndarray->data, [(byte)1, 2, 3, 4])) {
+        return 0;
+      }
+      
+      unless (Array->equals_int($ret_ndarray->dim, [4])) {
+        return 0;
+      }
+    }
+    
+    {
+      my $ret_ndarray = BOP->seq(-3, 0);
+      
+      unless (Array->equals_byte($ret_ndarray->data, [(byte)-3, -2, -1, 0])) {
+        return 0;
+      }
+      
+      unless (Array->equals_int($ret_ndarray->dim, [4])) {
+        return 0;
+      }
+    }
+    
+    {
+      my $ret_ndarray = BOP->seq(1, 5, 2);
+      
+      unless (Array->equals_byte($ret_ndarray->data, [(byte)1, 3, 5])) {
+        return 0;
+      }
+      
+      unless (Array->equals_int($ret_ndarray->dim, [3])) {
+        return 0;
+      }
+    }
+    
+    {
+      my $ret_ndarray = BOP->seq(4, 1, -1);
+      
+      unless (Array->equals_byte($ret_ndarray->data, [(byte)4, 3, 2, 1])) {
+        return 0;
+      }
+      
+      unless (Array->equals_int($ret_ndarray->dim, [4])) {
+        return 0;
+      }
+    }
+    
+    {
+      my $ret_ndarray = BOP->seq(5, 1, -2);
+      
+      unless (Array->equals_byte($ret_ndarray->data, [(byte)5, 3, 1])) {
+        return 0;
+      }
+      
+      unless (Array->equals_int($ret_ndarray->dim, [3])) {
+        return 0;
+      }
+    }
+    
+    # Exceptions
+    {
+      {
+        eval { BOP->seq(1, 4, 0); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+      {
+        eval { BOP->seq(1, 4, -1); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+      {
+        eval { BOP->seq(4, 1, 1); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+    }
+    
+    $@ = undef;
+    
+    return 1;
+  }
+  
+}

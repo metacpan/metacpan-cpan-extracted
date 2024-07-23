@@ -6,7 +6,7 @@ use warnings;
 
 use Test::More;
 
-plan tests => 109 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+plan tests => 110 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 my @module_files = (
     'Net/Async/Slack.pm',
@@ -35,6 +35,7 @@ my @module_files = (
     'Net/Async/Slack/Event/DndUpdatedUser.pm',
     'Net/Async/Slack/Event/EmailDomainChanged.pm',
     'Net/Async/Slack/Event/EmojiChanged.pm',
+    'Net/Async/Slack/Event/EventCallback.pm',
     'Net/Async/Slack/Event/FileChange.pm',
     'Net/Async/Slack/Event/FileCommentAdded.pm',
     'Net/Async/Slack/Event/FileCommentDeleted.pm',

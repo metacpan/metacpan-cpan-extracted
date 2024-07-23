@@ -93196,3 +93196,10 @@ S/SR/SREZIC/Kwalify-1.24.tar.gz
 M/MA/MATHIAS/Dist-Setup/Log-Any-Simple-0.06.tar.gz
 G/GE/GENE/MIDI-RtMidi-ScorePlayer-0.0120.tar.gz
 E/EW/EWHEELER/PDL-Opt-Simplex-Simple-2.003.tar.gz
+A/AR/ARFREITAS/App-SpamcupNG-0.019.tar.gz
+R/RE/REEDFISH/Net-FullAuto-1.0000675.tar.gz
+P/PE/PERLANCAR/ColorTheme-2.1.5.tar.gz
+T/TE/TEAM/Net-Async-Slack-0.015.tar.gz
+H/HO/HOUSTON/Net-EPP-Registry-Nominet-0.11.tar.gz
+K/KI/KIMOTO/SPVM-R-0.013.tar.gz
+M/MA/MANWAR/Test-Strict-0.53.tar.gz

@@ -20,6 +20,18 @@
 #######################################################################
 
 
+2024-07-22  Brian M. Kelly <Brian.Kelly@fullauto.com>
+
+        * Version 1.0000675 released
+
+        * Fixed output edge case
+
+2024-07-22  Brian M. Kelly <Brian.Kelly@fullauto.com>
+
+        * Version 1.0000674 released
+
+        * Updated parameter handling in cmd()
+
 2024-07-21  Brian M. Kelly <Brian.Kelly@fullauto.com>
 
         * Version 1.0000673 released
