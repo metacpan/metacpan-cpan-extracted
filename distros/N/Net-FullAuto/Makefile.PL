@@ -26,7 +26,7 @@
 ################################################################
 
 
-our $VERSION='1.0000675';
+our $VERSION='1.0000677';
 
 
 if ($ENV{'AUTOMATED_TESTING'}) {
@@ -5395,7 +5395,7 @@ if (keys %amazon) {
          my @list=();
          my %perms_menu=();
          unless ($^O eq 'cygwin') {
-            @list=('Install with 777 Permissions on FullAuto Files Only (Default)',
+            @list=("Install with 777 Permissions on FullAuto Files Only (Default)\n\n",
                    #'Install with Setuid Permissions (Experimental)',
                    #'Install with Setgid Permissions (Experimental)',
                    'Install with 770 Permissions on FullAuto Files Only (Experimental)'

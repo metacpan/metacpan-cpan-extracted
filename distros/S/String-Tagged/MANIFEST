@@ -31,4 +31,5 @@ t/33sprintf.t
 t/34join.t
 t/40operators.t
 t/50subclass.t
+t/51isa.t
 t/99pod.t

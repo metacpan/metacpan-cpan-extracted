@@ -1,5 +1,9 @@
 Revision history for File-Open-NoCache-ReadOnly
 
+0.03	Tue Jul 23 10:56:57 EDT 2024
+	Close now warns about attempting to close twice
+	Use Test::Needs
+
 0.02	Mon 12 Aug 08:39:30 EDT 2019
 	Added the fatal option to new()
 	Aim better for sequential read once

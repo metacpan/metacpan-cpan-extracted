@@ -21,10 +21,10 @@ no_index:
 provides:
   PDF::FromHTML:
     file: lib/PDF/FromHTML.pm
-    version: '0.33'
+    version: '0.34'
   PDF::FromHTML::Template:
     file: lib/PDF/FromHTML/Template.pm
-    version: '0.33'
+    version: '0.34'
   PDF::FromHTML::Template::Base:
     file: lib/PDF/FromHTML/Template/Base.pm
   PDF::FromHTML::Template::Constants:
@@ -87,7 +87,7 @@ provides:
     file: lib/PDF/FromHTML/Twig.pm
 requires:
   Graphics::ColorNames: 0
-  HTML::Tidy: 0
+  HTML::Tidy5: 0
   Image::Size: 0
   LWP::Simple: 0
   List::Util: 0
@@ -95,4 +95,4 @@ requires:
   PDF::Writer: '0.05'
   XML::Twig: 0
   perl: 5.6.0
-version: '0.33'
+version: '0.34'

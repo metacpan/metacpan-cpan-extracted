@@ -9,9 +9,9 @@ use Cwd ();
 use Exporter 'import';
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2023-11-24'; # DATE
+our $DATE = '2024-07-17'; # DATE
 our $DIST = 'File-Util-Test'; # DIST
-our $VERSION = '0.631'; # VERSION
+our $VERSION = '0.632'; # VERSION
 
 our @EXPORT_OK = qw(
                        file_exists
@@ -465,7 +465,7 @@ File::Util::Test - Utilities related mostly to testing/checking for files in dir
 
 =head1 VERSION
 
-This document describes version 0.631 of File::Util::Test (from Perl distribution File-Util-Test), released on 2023-11-24.
+This document describes version 0.632 of File::Util::Test (from Perl distribution File-Util-Test), released on 2024-07-17.
 
 =head1 SYNOPSIS
 
@@ -947,7 +947,7 @@ that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2023, 2021, 2020, 2019, 2017, 2015, 2014, 2013 by perlancar <perlancar@cpan.org>.
+This software is copyright (c) 2024, 2023, 2021, 2020, 2019, 2017, 2015, 2014, 2013 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

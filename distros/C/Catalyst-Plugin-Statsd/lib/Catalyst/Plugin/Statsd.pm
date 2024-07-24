@@ -2,12 +2,14 @@ package Catalyst::Plugin::Statsd;
 
 # ABSTRACT: Log Catalyst stats to statsd
 
-use v5.14;
+use v5.20;
 
 use Moose::Role;
 
 use POSIX qw/ ceil /;
 use Ref::Util qw/ is_plain_arrayref /;
+
+use experimental qw/ signatures /;
 
 # RECOMMEND PREREQ: Ref::Util::XS
 
@@ -15,18 +17,16 @@ use namespace::autoclean;
 
 requires qw/ log_stats /;
 
-our $VERSION = 'v0.8.2';
+our $VERSION = 'v0.9.0';
 
 
-sub statsd_client {
-    my ($c) = @_;
+sub statsd_client($c) {
     return $c->req->env->{'psgix.monitor.statsd'};
 }
 
 
 
-sub statsd_metric_name_filter {
-    my ($c, $stat) = @_;
+sub statsd_metric_name_filter( $c, $stat ) {
 
     return "$stat" unless is_plain_arrayref($stat);
 
@@ -36,8 +36,7 @@ sub statsd_metric_name_filter {
     return $metric;
 }
 
-around log_stats => sub {
-    my ( $next, $c ) = @_;
+around log_stats => sub ( $next, $c ) {
 
     state $config = $c->config->{'Plugin::Statsd'} // {};
 
@@ -65,8 +64,7 @@ around log_stats => sub {
     $c->$next unless $disabled;
 };
 
-around finalize => sub {
-    my ($next, $c) = @_;
+around finalize => sub ( $next, $c ) {
 
     if (my $client = $c->statsd_client) {
 
@@ -99,7 +97,7 @@ Catalyst::Plugin::Statsd - Log Catalyst stats to statsd
 
 =head1 VERSION
 
-version v0.8.2
+version v0.9.0
 
 =head1 SYNOPSIS
 
@@ -236,13 +234,9 @@ accordingly.
 
 =head1 SUPPORT FOR OLDER PERL VERSIONS
 
-Since v0.8.0, the this module requires Perl v5.14 or later.
+Since v0.9.0, the this module requires Perl v5.20 or later.
 
 Future releases may only support Perl versions released in the last ten years.
-
-If you need this module on Perl v5.10, please use one of the v0.7.x
-versions of this module.  Significant bug or security fixes may be
-backported to those versions.
 
 =head1 SEE ALSO
 
@@ -291,7 +285,7 @@ Slaven Rezić <slaven@rezic.de>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2018-2023 by Robert Rothenberg.
+This software is Copyright (c) 2018-2024 by Robert Rothenberg.
 
 This is free software, licensed under:
 

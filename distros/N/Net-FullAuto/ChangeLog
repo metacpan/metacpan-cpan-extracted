@@ -20,6 +20,18 @@
 #######################################################################
 
 
+2024-07-23  Brian M. Kelly <Brian.Kelly@fullauto.com>
+
+        * Version 1.0000677 released
+
+        * Forgot to remove a debugging message
+
+2024-07-23  Brian M. Kelly <Brian.Kelly@fullauto.com>
+
+        * Version 1.0000676 released
+
+        * Reduced timeout for cleanup
+
 2024-07-22  Brian M. Kelly <Brian.Kelly@fullauto.com>
 
         * Version 1.0000675 released

@@ -1,0 +1,1817 @@
+class TestCase::R::OP::DoubleComplex {
+  
+  use Array;
+  use Math;
+  use R::OP::DoubleComplex as DCOP;
+  
+  static method c : int () {
+    
+    {
+      my $data = [Math->complex(1, -1), Math->complex(2, -2)];
+      my $ret_ndarray = DCOP->c($data);
+      
+      unless ($ret_ndarray is_type R::NDArray::DoubleComplex) {
+        return 0;
+      }
+      
+      unless ($ret_ndarray->data == $data) {
+        return 0;
+      }
+      
+      unless (&equals_double_complex($ret_ndarray->data, [Math->complex(1, -1), Math->complex(2, -2)])) {
+        return 0;
+      }
+      
+      unless (Array->equals_int($ret_ndarray->dim, [2])) {
+        return 0;
+      }
+    }
+    
+    {
+      my $data = [Math->complex(1, -1), Math->complex(2, -2)];
+      my $ret_ndarray = DCOP->c(DCOP->c($data));
+      
+      unless ($ret_ndarray is_type R::NDArray::DoubleComplex) {
+        return 0;
+      }
+      
+      unless ($ret_ndarray->data == $data) {
+        return 0;
+      }
+      
+      unless (&equals_double_complex($ret_ndarray->data, [Math->complex(1, -1), Math->complex(2, -2)])) {
+        return 0;
+      }
+      
+      unless (Array->equals_int($ret_ndarray->dim, [2])) {
+        return 0;
+      }
+    }
+    
+    {
+      my $data = [Math->complex(1, -1), Math->complex(2, -2)];
+      my $ret_ndarray = DCOP->c(DCOP->c($data), [1, 2]);
+      
+      unless ($ret_ndarray is_type R::NDArray::DoubleComplex) {
+        return 0;
+      }
+      
+      unless ($ret_ndarray->data == $data) {
+        return 0;
+      }
+      
+      unless (&equals_double_complex($ret_ndarray->data, [Math->complex(1, -1), Math->complex(2, -2)])) {
+        return 0;
+      }
+      
+      unless (Array->equals_int($ret_ndarray->dim, [1, 2])) {
+        return 0;
+      }
+    }
+    
+    # Exceptions
+    {
+      {
+        eval { DCOP->c(true); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+    }
+    
+    return 1;
+  }
+  
+  static method add : int () {
+    
+    my $x_ndarray = DCOP->c([Math->complex(1, -1), Math->complex(2, -2)], [1, 2]);
+    
+    my $y_ndarray = DCOP->c([Math->complex(3, -3), Math->complex(4, -4)], [1, 2]);
+    
+    my $ret_ndarray = DCOP->add($x_ndarray, $y_ndarray);
+    
+    unless ($ret_ndarray is_type R::NDArray::DoubleComplex) {
+      return 0;
+    }
+    
+    unless (&equals_double_complex($ret_ndarray->data, [Math->complex(4, -4), Math->complex(6, -6)])) {
+      return 0;
+    }
+    
+    unless (Array->equals_int($ret_ndarray->dim, [1, 2])) {
+      return 0;
+    }
+    
+    # Exceptions
+    {
+      {
+        my $x_ndarray = DCOP->c([Math->complex(1, -1), Math->complex(2, -2)], [1, 2]);
+        
+        my $y_ndarray = DCOP->c([Math->complex(3, -3), Math->complex(4, -4)], [1, 2]);
+        
+        eval { DCOP->add(undef, $y_ndarray); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+      {
+        my $x_ndarray = DCOP->c([Math->complex(1, -1), Math->complex(2, -2)], [1, 2]);
+        
+        my $y_ndarray = DCOP->c([Math->complex(3, -3), Math->complex(4, -4)], [1, 2]);
+        
+        eval { DCOP->add($x_ndarray, undef); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+      {
+        my $x_ndarray = DCOP->c([Math->complex(1, -1), Math->complex(2, -2)], [1, 2]);
+        
+        my $y_ndarray = DCOP->c([Math->complex(3, -3), Math->complex(4, -4)], [2, 1]);
+        
+        eval { DCOP->add($x_ndarray, $y_ndarray); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+    }
+    
+    $@ = undef;
+    
+    return 1;
+  }
+  
+  static method sub : int () {
+    
+    my $x_ndarray = DCOP->c([Math->complex(1, -1), Math->complex(2, -2)], [1, 2]);
+    
+    my $y_ndarray = DCOP->c([Math->complex(3, -3), Math->complex(4, -4)], [1, 2]);
+    
+    my $ret_ndarray = DCOP->sub($x_ndarray, $y_ndarray);
+    
+    unless ($ret_ndarray is_type R::NDArray::DoubleComplex) {
+      return 0;
+    }
+    
+    unless (&equals_double_complex($ret_ndarray->data, [Math->complex(-2, 2), Math->complex(-2, 2)])) {
+      return 0;
+    }
+    
+    unless (Array->equals_int($ret_ndarray->dim, [1, 2])) {
+      return 0;
+    }
+    
+    # Exceptions
+    {
+      {
+        my $x_ndarray = DCOP->c([Math->complex(1, -1), Math->complex(2, -2)], [1, 2]);
+        
+        my $y_ndarray = DCOP->c([Math->complex(3, -3), Math->complex(4, -4)], [1, 2]);
+        
+        eval { DCOP->sub(undef, $y_ndarray); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+      {
+        my $x_ndarray = DCOP->c([Math->complex(1, -1), Math->complex(2, -2)], [1, 2]);
+        
+        my $y_ndarray = DCOP->c([Math->complex(3, -3), Math->complex(4, -4)], [1, 2]);
+        
+        eval { DCOP->sub($x_ndarray, undef); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+      {
+        my $x_ndarray = DCOP->c([Math->complex(1, -1), Math->complex(2, -2)], [1, 2]);
+        
+        my $y_ndarray = DCOP->c([Math->complex(3, -3), Math->complex(4, -4)], [2, 1]);
+        
+        eval { DCOP->sub($x_ndarray, $y_ndarray); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+    }
+    
+    $@ = undef;
+    
+    return 1;
+  }
+
+  static method mul : int () {
+    
+    my $x_ndarray = DCOP->c([Math->complex(1, -1), Math->complex(2, -2)], [1, 2]);
+    
+    my $y_ndarray = DCOP->c([Math->complex(3, -3), Math->complex(4, -4)], [1, 2]);
+    
+    my $ret_ndarray = DCOP->mul($x_ndarray, $y_ndarray);
+    
+    unless ($ret_ndarray is_type R::NDArray::DoubleComplex) {
+      return 0;
+    }
+    
+    unless (&equals_double_complex($ret_ndarray->data, [Math->cmul(Math->complex(1, -1), Math->complex(3, -3)), Math->cmul(Math->complex(2, -2), Math->complex(4, -4))])) {
+      return 0;
+    }
+    
+    unless (Array->equals_int($ret_ndarray->dim, [1, 2])) {
+      return 0;
+    }
+    
+    # Exceptions
+    {
+      {
+        my $x_ndarray = DCOP->c([Math->complex(1, -1), Math->complex(2, -2)], [1, 2]);
+        
+        my $y_ndarray = DCOP->c([Math->complex(3, -3), Math->complex(4, -4)], [1, 2]);
+        
+        eval { DCOP->mul(undef, $y_ndarray); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+      {
+        my $x_ndarray = DCOP->c([Math->complex(1, -1), Math->complex(2, -2)], [1, 2]);
+        
+        my $y_ndarray = DCOP->c([Math->complex(3, -3), Math->complex(4, -4)], [1, 2]);
+        
+        eval { DCOP->mul($x_ndarray, undef); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+      {
+        my $x_ndarray = DCOP->c([Math->complex(1, -1), Math->complex(2, -2)], [1, 2]);
+        
+        my $y_ndarray = DCOP->c([Math->complex(3, -3), Math->complex(4, -4)], [2, 1]);
+        
+        eval { DCOP->mul($x_ndarray, $y_ndarray); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+    }
+    
+    $@ = undef;
+    
+    return 1;
+  }
+
+  static method scamul : int () {
+    
+    my $x_ndarray = DCOP->c([Math->complex(3, -3), Math->complex(4, -4)], [1, 2]);
+    
+    my $scalar_ndarray = DCOP->c([Math->complex(3, -3)]);
+    
+    my $ret_ndarray = DCOP->scamul($x_ndarray, $scalar_ndarray);
+    
+    unless ($ret_ndarray is_type R::NDArray::DoubleComplex) {
+      return 0;
+    }
+    
+    unless (&equals_double_complex($ret_ndarray->data, [Math->cmul(Math->complex(3, -3), Math->complex(3, -3)), Math->cmul(Math->complex(4, -4), Math->complex(3, -3))])) {
+      return 0;
+    }
+    
+    unless (Array->equals_int($ret_ndarray->dim, [1, 2])) {
+      return 0;
+    }
+    
+    # Exceptions
+    {
+      {
+        my $x_ndarray = DCOP->c([Math->complex(3, -3), Math->complex(4, -4)], [1, 2]);
+        
+        my $scalar_ndarray = DCOP->c([Math->complex(3, -3)]);
+        
+        eval { DCOP->scamul(undef, $scalar_ndarray); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+      {
+        my $x_ndarray = DCOP->c([Math->complex(3, -3), Math->complex(4, -4)], [1, 2]);
+        
+        my $scalar_ndarray = DCOP->c([Math->complex(3, -3)]);
+        
+        eval { DCOP->scamul($x_ndarray, undef); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+      {
+        my $scalar_ndarray = DCOP->c([Math->complex(1, -1), Math->complex(2, -2)], [1, 2]);
+        
+        my $x_ndarray = DCOP->c([Math->complex(3, -3), Math->complex(4, -4)], [2, 1]);
+        
+        eval { DCOP->scamul($x_ndarray, $scalar_ndarray); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+    }
+    
+    $@ = undef;
+    
+    return 1;
+  }
+  
+  static method div : int () {
+    
+    my $x_ndarray = DCOP->c([Math->complex(1, -1), Math->complex(1, -1)], [1, 2]);
+    
+    my $y_ndarray = DCOP->c([Math->complex(2, -2), Math->complex(4, -4)], [1, 2]);
+    
+    my $ret_ndarray = DCOP->div($x_ndarray, $y_ndarray);
+    
+    unless ($ret_ndarray is_type R::NDArray::DoubleComplex) {
+      return 0;
+    }
+    
+    unless (&equals_double_complex($ret_ndarray->data, [Math->cdiv(Math->complex(1, -1), Math->complex(2, -2)), Math->cdiv(Math->complex(1, -1), Math->complex(4, -4))])) {
+      return 0;
+    }
+    
+    unless (Array->equals_int($ret_ndarray->dim, [1, 2])) {
+      return 0;
+    }
+    
+    # Exceptions
+    {
+      {
+        my $x_ndarray = DCOP->c([Math->complex(1, -1), Math->complex(2, -2)], [1, 2]);
+        
+        my $y_ndarray = DCOP->c([Math->complex(3, -3), Math->complex(4, -4)], [1, 2]);
+        
+        eval { DCOP->div(undef, $y_ndarray); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+      {
+        my $x_ndarray = DCOP->c([Math->complex(1, -1), Math->complex(2, -2)], [1, 2]);
+        
+        my $y_ndarray = DCOP->c([Math->complex(3, -3), Math->complex(4, -4)], [1, 2]);
+        
+        eval { DCOP->div($x_ndarray, undef); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+      {
+        my $x_ndarray = DCOP->c([Math->complex(1, -1), Math->complex(2, -2)], [1, 2]);
+        
+        my $y_ndarray = DCOP->c([Math->complex(3, -3), Math->complex(4, -4)], [2, 1]);
+        
+        eval { DCOP->div($x_ndarray, $y_ndarray); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+    }
+    
+    $@ = undef;
+    
+    return 1;
+  }
+  
+  static method scadiv : int () {
+    
+    my $x_ndarray = DCOP->c([Math->complex(1, -1), Math->complex(2, -2)], [1, 2]);
+    
+    my $scalar_ndarray = DCOP->c([Math->complex(2, -2)]);
+    
+    my $ret_ndarray = DCOP->scadiv($x_ndarray, $scalar_ndarray);
+    
+    unless ($ret_ndarray is_type R::NDArray::DoubleComplex) {
+      return 0;
+    }
+    
+    unless (&equals_double_complex($ret_ndarray->data, [Math->cdiv(Math->complex(1, -1), Math->complex(2, -2)), Math->cdiv(Math->complex(2, -2), Math->complex(2, -2))])) {
+      return 0;
+    }
+    
+    unless (Array->equals_int($ret_ndarray->dim, [1, 2])) {
+      return 0;
+    }
+    
+    # Exceptions
+    {
+      {
+        my $x_ndarray = DCOP->c([Math->complex(3, -3), Math->complex(4, -4)], [1, 2]);
+        
+        my $scalar_ndarray = DCOP->c([Math->complex(3, -3)]);
+        
+        eval { DCOP->scadiv($x_ndarray, undef); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+      {
+        my $x_ndarray = DCOP->c([Math->complex(3, -3), Math->complex(4, -4)], [1, 2]);
+        
+        my $scalar_ndarray = DCOP->c([Math->complex(3, -3)]);
+        
+        eval { DCOP->scadiv(undef, $scalar_ndarray); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+      {
+        my $x_ndarray = DCOP->c([Math->complex(3, -3), Math->complex(4, -4)], [2, 1]);
+        
+        my $scalar_ndarray = DCOP->c([Math->complex(1, -1), Math->complex(2, -2)], [1, 2]);
+        
+        eval { DCOP->scadiv($x_ndarray, $scalar_ndarray); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+    }
+    
+    $@ = undef;
+    
+    return 1;
+  }
+  
+  static method neg : int () {
+    
+    my $x_ndarray = DCOP->c([Math->complex(1, -1), Math->complex(2, -2)], [1, 2]);
+    
+    my $ret_ndarray = DCOP->neg($x_ndarray);
+    
+    unless ($ret_ndarray is_type R::NDArray::DoubleComplex) {
+      return 0;
+    }
+    
+    unless (&equals_double_complex($ret_ndarray->data, [Math->complex(-1, 1), Math->complex(-2, 2)])) {
+      return 0;
+    }
+    
+    unless (Array->equals_int($ret_ndarray->dim, [1, 2])) {
+      return 0;
+    }
+    
+    # Exceptions
+    {
+      {
+        my $x_ndarray = DCOP->c([Math->complex(1, -1), Math->complex(2, -2)], [1, 2]);
+        
+        eval { DCOP->neg(undef); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+    }
+    
+    $@ = undef;
+    
+    return 1;
+  }
+  
+  static method abs : int () {
+    
+    my $x_ndarray = DCOP->c([Math->complex(1, -1), Math->complex(-2, 2)], [1, 2]);
+    
+    my $ret_ndarray = DCOP->abs($x_ndarray);
+    
+    unless ($ret_ndarray is_type R::NDArray::Double) {
+      return 0;
+    }
+    
+    unless (Array->equals_double($ret_ndarray->data, [Math->cabs(Math->complex(1, -1)), Math->cabs(Math->complex(-2, 2))])) {
+      return 0;
+    }
+    
+    unless (Array->equals_int($ret_ndarray->dim, [1, 2])) {
+      return 0;
+    }
+    
+    # Exceptions
+    {
+      {
+        my $x_ndarray = DCOP->c([Math->complex(1, -1), Math->complex(2, -2)], [1, 2]);
+        
+        eval { DCOP->abs(undef); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+    }
+    
+    $@ = undef;
+    
+    return 1;
+  }
+  
+  static method re : int () { return 1; }
+  
+  static method im : int () { return 1; }
+  
+  static method conj : int () { return 1; }
+  
+  static method arg : int () { return 1; }
+  
+  static method eq : int () {
+    
+    my $x_ndarray = DCOP->c([Math->complex(1, -1), Math->complex(1, -1)], [1, 2]);
+    
+    my $y_ndarray = DCOP->c([Math->complex(1, -1), Math->complex(2, -2)], [1, 2]);
+    
+    my $ret_ndarray = DCOP->eq($x_ndarray, $y_ndarray);
+    
+    unless ($ret_ndarray is_type R::NDArray::Int) {
+      return 0;
+    }
+    
+    unless (Array->equals_int($ret_ndarray->data, [1, 0])) {
+      return 0;
+    }
+    
+    unless (Array->equals_int($ret_ndarray->dim, [1, 2])) {
+      return 0;
+    }
+    
+    # Exceptions
+    {
+      {
+        my $x_ndarray = DCOP->c([Math->complex(1, -1), Math->complex(2, -2)], [1, 2]);
+        
+        my $y_ndarray = DCOP->c([Math->complex(3, -3), Math->complex(4, -4)], [1, 2]);
+        
+        eval { DCOP->eq(undef, $y_ndarray); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+      {
+        my $x_ndarray = DCOP->c([Math->complex(1, -1), Math->complex(2, -2)], [1, 2]);
+        
+        my $y_ndarray = DCOP->c([Math->complex(3, -3), Math->complex(4, -4)], [1, 2]);
+        
+        eval { DCOP->eq($x_ndarray, undef); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+      {
+        my $x_ndarray = DCOP->c([Math->complex(1, -1), Math->complex(2, -2)], [1, 2]);
+        
+        my $y_ndarray = DCOP->c([Math->complex(3, -3), Math->complex(4, -4)], [2, 1]);
+        
+        eval { DCOP->eq($x_ndarray, $y_ndarray); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+    }
+    
+    $@ = undef;
+    
+    return 1;
+  }
+  
+  static method ne : int () {
+    
+    my $x_ndarray = DCOP->c([Math->complex(1, -1), Math->complex(1, -1)], [1, 2]);
+    
+    my $y_ndarray = DCOP->c([Math->complex(1, -1), Math->complex(2, -2)], [1, 2]);
+    
+    my $ret_ndarray = DCOP->ne($x_ndarray, $y_ndarray);
+    
+    unless ($ret_ndarray is_type R::NDArray::Int) {
+      return 0;
+    }
+    
+    unless (Array->equals_int($ret_ndarray->data, [0, 1])) {
+      return 0;
+    }
+    
+    unless (Array->equals_int($ret_ndarray->dim, [1, 2])) {
+      return 0;
+    }
+    
+    # Exceptions
+    {
+      {
+        my $x_ndarray = DCOP->c([Math->complex(1, -1), Math->complex(2, -2)], [1, 2]);
+        
+        my $y_ndarray = DCOP->c([Math->complex(3, -3), Math->complex(4, -4)], [1, 2]);
+        
+        eval { DCOP->ne(undef, $y_ndarray); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+      {
+        my $x_ndarray = DCOP->c([Math->complex(1, -1), Math->complex(2, -2)], [1, 2]);
+        
+        my $y_ndarray = DCOP->c([Math->complex(3, -3), Math->complex(4, -4)], [1, 2]);
+        
+        eval { DCOP->ne($x_ndarray, undef); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+      {
+        my $x_ndarray = DCOP->c([Math->complex(1, -1), Math->complex(2, -2)], [1, 2]);
+        
+        my $y_ndarray = DCOP->c([Math->complex(3, -3), Math->complex(4, -4)], [2, 1]);
+        
+        eval { DCOP->ne($x_ndarray, $y_ndarray); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+    }
+    
+    $@ = undef;
+    
+    return 1;
+  }
+  
+  static method rep : int () {
+    
+    my $x_ndarray = DCOP->c([Math->complex(1, -1), Math->complex(2, -2)]);
+    
+    my $ret_ndarray = DCOP->rep($x_ndarray, 2);
+    
+    unless (&equals_double_complex($ret_ndarray->data, [Math->complex(1, -1), Math->complex(2, -2), Math->complex(1, -1), Math->complex(2, -2)])) {
+      return 0;
+    }
+    
+    unless (Array->equals_int($ret_ndarray->dim, [4])) {
+      return 0;
+    }
+    
+    return 1;
+  }
+  
+  static method rep_length : int () {
+    
+    my $x_ndarray = DCOP->c([Math->complex(1, -1), Math->complex(2, -2)]);
+    
+    my $ret_ndarray = DCOP->rep_length($x_ndarray, 4);
+    
+    unless (&equals_double_complex($ret_ndarray->data, [Math->complex(1, -1), Math->complex(2, -2), Math->complex(1, -1), Math->complex(2, -2)])) {
+      return 0;
+    }
+    
+    unless (Array->equals_int($ret_ndarray->dim, [4])) {
+      return 0;
+    }
+    
+    return 1;
+  }
+  
+  static method sin : int () {
+    
+    my $x_ndarray = DCOP->c([Math->complex(1, -1), Math->complex(-2, 2)], [1, 2]);
+    
+    my $ret_ndarray = DCOP->sin($x_ndarray);
+    
+    unless ($ret_ndarray is_type R::NDArray::DoubleComplex) {
+      return 0;
+    }
+    
+    unless (&equals_double_complex($ret_ndarray->data, [Math->csin($x_ndarray->data->[0]), Math->csin($x_ndarray->data->[1])])) {
+      return 0;
+    }
+    
+    unless (Array->equals_int($ret_ndarray->dim, [1, 2])) {
+      return 0;
+    }
+    
+    # Exceptions
+    {
+      {
+        my $x_ndarray = DCOP->c([Math->complex(1, -1), Math->complex(2, -2)], [1, 2]);
+        
+        eval { DCOP->sin(undef); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+    }
+    
+    $@ = undef;
+    
+    return 1;
+  }
+  
+  static method cos : int () {
+    
+    my $x_ndarray = DCOP->c([Math->complex(1, -1), Math->complex(-2, 2)], [1, 2]);
+    
+    my $ret_ndarray = DCOP->cos($x_ndarray);
+    
+    unless ($ret_ndarray is_type R::NDArray::DoubleComplex) {
+      return 0;
+    }
+    
+    unless (&equals_double_complex($ret_ndarray->data, [Math->ccos($x_ndarray->data->[0]), Math->ccos($x_ndarray->data->[1])])) {
+      return 0;
+    }
+    
+    unless (Array->equals_int($ret_ndarray->dim, [1, 2])) {
+      return 0;
+    }
+    
+    # Exceptions
+    {
+      {
+        my $x_ndarray = DCOP->c([Math->complex(1, -1), Math->complex(2, -2)], [1, 2]);
+        
+        eval { DCOP->cos(undef); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+    }
+    
+    $@ = undef;
+    
+    return 1;
+  }
+
+  static method tan : int () {
+    
+    my $x_ndarray = DCOP->c([Math->complex(1, -1), Math->complex(-2, 2)], [1, 2]);
+    
+    my $ret_ndarray = DCOP->tan($x_ndarray);
+    
+    unless ($ret_ndarray is_type R::NDArray::DoubleComplex) {
+      return 0;
+    }
+    
+    unless (&equals_double_complex($ret_ndarray->data, [Math->ctan($x_ndarray->data->[0]), Math->ctan($x_ndarray->data->[1])])) {
+      return 0;
+    }
+    
+    unless (Array->equals_int($ret_ndarray->dim, [1, 2])) {
+      return 0;
+    }
+    
+    # Exceptions
+    {
+      {
+        my $x_ndarray = DCOP->c([Math->complex(1, -1), Math->complex(2, -2)], [1, 2]);
+        
+        eval { DCOP->tan(undef); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+    }
+    
+    $@ = undef;
+    
+    return 1;
+  }
+  
+  static method sinh : int () {
+    
+    my $x_ndarray = DCOP->c([Math->complex(1, -1), Math->complex(-2, 2)], [1, 2]);
+    
+    my $ret_ndarray = DCOP->sinh($x_ndarray);
+    
+    unless ($ret_ndarray is_type R::NDArray::DoubleComplex) {
+      return 0;
+    }
+    
+    unless (&equals_double_complex($ret_ndarray->data, [Math->csinh($x_ndarray->data->[0]), Math->csinh($x_ndarray->data->[1])])) {
+      return 0;
+    }
+    
+    unless (Array->equals_int($ret_ndarray->dim, [1, 2])) {
+      return 0;
+    }
+    
+    # Exceptions
+    {
+      {
+        my $x_ndarray = DCOP->c([Math->complex(1, -1), Math->complex(2, -2)], [1, 2]);
+        
+        eval { DCOP->sinh(undef); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+    }
+    
+    $@ = undef;
+    
+    return 1;
+  }
+
+  static method cosh : int () {
+    
+    my $x_ndarray = DCOP->c([Math->complex(1, -1), Math->complex(-2, 2)], [1, 2]);
+    
+    my $ret_ndarray = DCOP->cosh($x_ndarray);
+    
+    unless ($ret_ndarray is_type R::NDArray::DoubleComplex) {
+      return 0;
+    }
+    
+    unless (&equals_double_complex($ret_ndarray->data, [Math->ccosh($x_ndarray->data->[0]), Math->ccosh($x_ndarray->data->[1])])) {
+      return 0;
+    }
+    
+    unless (Array->equals_int($ret_ndarray->dim, [1, 2])) {
+      return 0;
+    }
+    
+    # Exceptions
+    {
+      {
+        my $x_ndarray = DCOP->c([Math->complex(1, -1), Math->complex(2, -2)], [1, 2]);
+        
+        eval { DCOP->cosh(undef); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+    }
+    
+    $@ = undef;
+    
+    return 1;
+  }
+
+  static method tanh : int () {
+    
+    my $x_ndarray = DCOP->c([Math->complex(1, -1), Math->complex(-2, 2)], [1, 2]);
+    
+    my $ret_ndarray = DCOP->tanh($x_ndarray);
+    
+    unless ($ret_ndarray is_type R::NDArray::DoubleComplex) {
+      return 0;
+    }
+    
+    unless (&equals_double_complex($ret_ndarray->data, [Math->ctanh($x_ndarray->data->[0]), Math->ctanh($x_ndarray->data->[1])])) {
+      return 0;
+    }
+    
+    unless (Array->equals_int($ret_ndarray->dim, [1, 2])) {
+      return 0;
+    }
+    
+    # Exceptions
+    {
+      {
+        my $x_ndarray = DCOP->c([Math->complex(1, -1), Math->complex(2, -2)], [1, 2]);
+        
+        eval { DCOP->tanh(undef); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+    }
+    
+    $@ = undef;
+    
+    return 1;
+  }
+
+  static method acos : int () {
+    
+    my $x_ndarray = DCOP->c([Math->complex(1, -1), Math->complex(-1, 1)], [1, 2]);
+    
+    my $ret_ndarray = DCOP->acos($x_ndarray);
+    
+    unless ($ret_ndarray is_type R::NDArray::DoubleComplex) {
+      return 0;
+    }
+    
+    unless (&equals_double_complex($ret_ndarray->data, [Math->cacos($x_ndarray->data->[0]), Math->cacos($x_ndarray->data->[1])])) {
+      return 0;
+    }
+    
+    unless (Array->equals_int($ret_ndarray->dim, [1, 2])) {
+      return 0;
+    }
+    
+    # Exceptions
+    {
+      {
+        my $x_ndarray = DCOP->c([Math->complex(1, -1), Math->complex(2, -2)], [1, 2]);
+        
+        eval { DCOP->acos(undef); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+    }
+    
+    $@ = undef;
+    
+    return 1;
+  }
+  
+  static method asin : int () {
+    
+    my $x_ndarray = DCOP->c([Math->complex(1, -1), Math->complex(-1, 1)], [1, 2]);
+    
+    my $ret_ndarray = DCOP->asin($x_ndarray);
+    
+    unless ($ret_ndarray is_type R::NDArray::DoubleComplex) {
+      return 0;
+    }
+    
+    unless (&equals_double_complex($ret_ndarray->data, [Math->casin($x_ndarray->data->[0]), Math->casin($x_ndarray->data->[1])])) {
+      return 0;
+    }
+    
+    unless (Array->equals_int($ret_ndarray->dim, [1, 2])) {
+      return 0;
+    }
+    
+    # Exceptions
+    {
+      {
+        my $x_ndarray = DCOP->c([Math->complex(1, -1), Math->complex(2, -2)], [1, 2]);
+        
+        eval { DCOP->asin(undef); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+    }
+    
+    $@ = undef;
+    
+    return 1;
+  }
+  
+  static method atan : int () {
+    
+    my $x_ndarray = DCOP->c([Math->complex(1, -1), Math->complex(-1, 1)], [1, 2]);
+    
+    my $ret_ndarray = DCOP->atan($x_ndarray);
+    
+    unless ($ret_ndarray is_type R::NDArray::DoubleComplex) {
+      return 0;
+    }
+    
+    unless (&equals_double_complex($ret_ndarray->data, [Math->catan($x_ndarray->data->[0]), Math->catan($x_ndarray->data->[1])])) {
+      return 0;
+    }
+    
+    unless (Array->equals_int($ret_ndarray->dim, [1, 2])) {
+      return 0;
+    }
+    
+    # Exceptions
+    {
+      {
+        my $x_ndarray = DCOP->c([Math->complex(1, -1), Math->complex(2, -2)], [1, 2]);
+        
+        eval { DCOP->atan(undef); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+    }
+    
+    $@ = undef;
+    
+    return 1;
+  }
+  
+  static method asinh : int () {
+    
+    my $x_ndarray = DCOP->c([Math->complex(1, -1), Math->complex(-1, 1)], [1, 2]);
+    
+    my $ret_ndarray = DCOP->asinh($x_ndarray);
+    
+    unless ($ret_ndarray is_type R::NDArray::DoubleComplex) {
+      return 0;
+    }
+    
+    unless (&equals_double_complex($ret_ndarray->data, [Math->casinh($x_ndarray->data->[0]), Math->casinh($x_ndarray->data->[1])])) {
+      return 0;
+    }
+    
+    unless (Array->equals_int($ret_ndarray->dim, [1, 2])) {
+      return 0;
+    }
+    
+    # Exceptions
+    {
+      {
+        my $x_ndarray = DCOP->c([Math->complex(1, -1), Math->complex(2, -2)], [1, 2]);
+        
+        eval { DCOP->asinh(undef); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+    }
+    
+    $@ = undef;
+    
+    return 1;
+  }
+  
+  static method acosh : int () {
+    
+    my $x_ndarray = DCOP->c([Math->complex(1, -1), Math->complex(2, -2)], [1, 2]);
+    
+    my $ret_ndarray = DCOP->acosh($x_ndarray);
+    
+    unless ($ret_ndarray is_type R::NDArray::DoubleComplex) {
+      return 0;
+    }
+    
+    unless (&equals_double_complex($ret_ndarray->data, [Math->cacosh($x_ndarray->data->[0]), Math->cacosh($x_ndarray->data->[1])])) {
+      return 0;
+    }
+    
+    unless (Array->equals_int($ret_ndarray->dim, [1, 2])) {
+      return 0;
+    }
+    
+    # Exceptions
+    {
+      {
+        my $x_ndarray = DCOP->c([Math->complex(1, -1), Math->complex(2, -2)], [1, 2]);
+        
+        eval { DCOP->acosh(undef); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+    }
+    
+    $@ = undef;
+    
+    return 1;
+  }
+  
+  static method atanh : int () {
+    
+    my $x_ndarray = DCOP->c([Math->complex(1, -1), Math->complex(-1, 1)], [1, 2]);
+    
+    my $ret_ndarray = DCOP->atanh($x_ndarray);
+    
+    unless ($ret_ndarray is_type R::NDArray::DoubleComplex) {
+      return 0;
+    }
+    
+    unless (&equals_double_complex($ret_ndarray->data, [Math->catanh($x_ndarray->data->[0]), Math->catanh($x_ndarray->data->[1])])) {
+      return 0;
+    }
+    
+    unless (Array->equals_int($ret_ndarray->dim, [1, 2])) {
+      return 0;
+    }
+    
+    # Exceptions
+    {
+      {
+        my $x_ndarray = DCOP->c([Math->complex(1, -1), Math->complex(2, -2)], [1, 2]);
+        
+        eval { DCOP->atanh(undef); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+    }
+    
+    $@ = undef;
+    
+    return 1;
+  }
+
+  static method exp : int () {
+    
+    my $x_ndarray = DCOP->c([Math->complex(1, -1), Math->complex(-1, 1)], [1, 2]);
+    
+    my $ret_ndarray = DCOP->exp($x_ndarray);
+    
+    unless ($ret_ndarray is_type R::NDArray::DoubleComplex) {
+      return 0;
+    }
+    
+    unless (&equals_double_complex($ret_ndarray->data, [Math->cexp($x_ndarray->data->[0]), Math->cexp($x_ndarray->data->[1])])) {
+      return 0;
+    }
+    
+    unless (Array->equals_int($ret_ndarray->dim, [1, 2])) {
+      return 0;
+    }
+    
+    # Exceptions
+    {
+      {
+        my $x_ndarray = DCOP->c([Math->complex(1, -1), Math->complex(2, -2)], [1, 2]);
+        
+        eval { DCOP->exp(undef); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+    }
+    
+    $@ = undef;
+    
+    return 1;
+  }
+  
+  static method log : int () {
+    
+    my $x_ndarray = DCOP->c([Math->complex(1, -1), Math->complex(2, -2)], [1, 2]);
+    
+    my $ret_ndarray = DCOP->log($x_ndarray);
+    
+    unless ($ret_ndarray is_type R::NDArray::DoubleComplex) {
+      return 0;
+    }
+    
+    unless (&equals_double_complex($ret_ndarray->data, [Math->clog($x_ndarray->data->[0]), Math->clog($x_ndarray->data->[1])])) {
+      return 0;
+    }
+    
+    unless (Array->equals_int($ret_ndarray->dim, [1, 2])) {
+      return 0;
+    }
+    
+    # Exceptions
+    {
+      {
+        my $x_ndarray = DCOP->c([Math->complex(1, -1), Math->complex(2, -2)], [1, 2]);
+        
+        eval { DCOP->log(undef); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+    }
+    
+    $@ = undef;
+    
+    return 1;
+  }
+  
+  static method sqrt : int () {
+    
+    my $x_ndarray = DCOP->c([Math->complex(1, -1), Math->complex(2, -2)], [1, 2]);
+    
+    my $ret_ndarray = DCOP->sqrt($x_ndarray);
+    
+    unless ($ret_ndarray is_type R::NDArray::DoubleComplex) {
+      return 0;
+    }
+    
+    unless (&equals_double_complex($ret_ndarray->data, [Math->csqrt($x_ndarray->data->[0]), Math->csqrt($x_ndarray->data->[1])])) {
+      return 0;
+    }
+    
+    unless (Array->equals_int($ret_ndarray->dim, [1, 2])) {
+      return 0;
+    }
+    
+    # Exceptions
+    {
+      {
+        my $x_ndarray = DCOP->c([Math->complex(1, -1), Math->complex(2, -2)], [1, 2]);
+        
+        eval { DCOP->sqrt(undef); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+    }
+    
+    $@ = undef;
+    
+    return 1;
+  }
+  
+  static method pow : int () {
+    
+    my $x_ndarray = DCOP->c([Math->complex(1, -1), Math->complex(0.5, -0.5)], [1, 2]);
+    
+    my $y_ndarray = DCOP->c([Math->complex(0.5, -0.5), Math->complex(0.25, -0.25)], [1, 2]);
+    
+    my $ret_ndarray = DCOP->pow($x_ndarray, $y_ndarray);
+    
+    unless ($ret_ndarray is_type R::NDArray::DoubleComplex) {
+      return 0;
+    }
+    
+    unless (&equals_double_complex($ret_ndarray->data, [Math->cpow($x_ndarray->data->[0], $x_ndarray->data->[1]), Math->cpow($y_ndarray->data->[0], $y_ndarray->data->[1])])) {
+      return 0;
+    }
+    
+    unless (Array->equals_int($ret_ndarray->dim, [1, 2])) {
+      return 0;
+    }
+    
+    # Exceptions
+    {
+      {
+        my $x_ndarray = DCOP->c([Math->complex(1, -1), Math->complex(2, -2)], [1, 2]);
+        
+        my $y_ndarray = DCOP->c([Math->complex(3, -3), Math->complex(4, -4)], [1, 2]);
+        
+        eval { DCOP->pow(undef, $y_ndarray); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+      {
+        my $x_ndarray = DCOP->c([Math->complex(1, -1), Math->complex(2, -2)], [1, 2]);
+        
+        my $y_ndarray = DCOP->c([Math->complex(3, -3), Math->complex(4, -4)], [1, 2]);
+        
+        eval { DCOP->pow($x_ndarray, undef); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+      {
+        my $x_ndarray = DCOP->c([Math->complex(1, -1), Math->complex(2, -2)], [1, 2]);
+        
+        my $y_ndarray = DCOP->c([Math->complex(3, -3), Math->complex(4, -4)], [2, 1]);
+        
+        eval { DCOP->pow($x_ndarray, $y_ndarray); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+    }
+    
+    $@ = undef;
+    
+    return 1;
+  }
+  
+  static method sum : int () {
+    
+    my $x_ndarray = DCOP->c([Math->complex(1, -1), Math->complex(2, -2)], [1, 2]);
+    
+    my $ret_ndarray = DCOP->sum($x_ndarray);
+    
+    unless ($ret_ndarray is_type R::NDArray::DoubleComplex) {
+      return 0;
+    }
+    
+    unless (&equals_double_complex($ret_ndarray->data, [Math->complex(3, -3)])) {
+      return 0;
+    }
+    
+    unless (Array->equals_int($ret_ndarray->dim, [1])) {
+      return 0;
+    }
+    
+    # Exceptions
+    {
+      {
+        my $x_ndarray = DCOP->c([Math->complex(1, -1), Math->complex(2, -2)], [1, 2]);
+        
+        eval { DCOP->sum(undef); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+    }
+    
+    $@ = undef;
+    
+    return 1;
+  }
+  
+  static method cumsum : int () {
+    
+    my $x_ndarray = DCOP->c([Math->complex(1, -1), Math->complex(2, -2)], [2]);
+    
+    my $ret_ndarray = DCOP->cumsum($x_ndarray);
+    
+    unless ($ret_ndarray is_type R::NDArray::DoubleComplex) {
+      return 0;
+    }
+    
+    unless (&equals_double_complex($ret_ndarray->data, [Math->complex(1, -1), Math->complex(3, -3)])) {
+      return 0;
+    }
+    
+    
+    unless (Array->equals_int($ret_ndarray->dim, [2])) {
+      return 0;
+    }
+    
+    # Exceptions
+    {
+      {
+        my $x_ndarray = DCOP->c([Math->complex(1, -1), Math->complex(2, -2)], [1, 2]);
+        
+        eval { DCOP->cumsum(undef); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+      {
+        my $x_ndarray = DCOP->c([Math->complex(1, -1), Math->complex(2, -2)], [1, 2]);
+        
+        eval { DCOP->cumsum($x_ndarray); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+    }
+    
+    $@ = undef;
+    
+    return 1;
+  }
+  
+  static method prod : int () {
+    
+    my $x_ndarray = DCOP->c([Math->complex(2, -2), Math->complex(3, -3)], [1, 2]);
+    
+    my $ret_ndarray = DCOP->prod($x_ndarray);
+    
+    unless ($ret_ndarray is_type R::NDArray::DoubleComplex) {
+      return 0;
+    }
+    
+    unless (&equals_double_complex($ret_ndarray->data, [Math->cmul(Math->complex(2, -2), Math->complex(3, -3))])) {
+      return 0;
+    }
+    
+    unless (Array->equals_int($ret_ndarray->dim, [1])) {
+      return 0;
+    }
+    
+    # Exceptions
+    {
+      {
+        my $x_ndarray = DCOP->c([Math->complex(1, -1), Math->complex(2, -2)], [1, 2]);
+        
+        eval { DCOP->prod(undef); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+    }
+    
+    $@ = undef;
+    
+    return 1;
+  }
+  
+  static method cumprod : int () {
+    
+    my $x_ndarray = DCOP->c([Math->complex(2, -2), Math->complex(3, -3)], [2]);
+    
+    my $ret_ndarray = DCOP->cumprod($x_ndarray);
+    
+    unless ($ret_ndarray is_type R::NDArray::DoubleComplex) {
+      return 0;
+    }
+    
+    unless (&equals_double_complex($ret_ndarray->data, [Math->complex(2, -2), Math->cmul(Math->complex(2, -2), Math->complex(3, -3))])) {
+      return 0;
+    }
+    
+    unless (Array->equals_int($ret_ndarray->dim, [2])) {
+      return 0;
+    }
+    
+    # Exceptions
+    {
+      {
+        my $x_ndarray = DCOP->c([Math->complex(1, -1), Math->complex(2, -2)], [1, 2]);
+        
+        eval { DCOP->cumprod(undef); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+      {
+        my $x_ndarray = DCOP->c([Math->complex(1, -1), Math->complex(2, -2)], [1, 2]);
+        
+        eval { DCOP->cumprod($x_ndarray); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+    }
+    
+    $@ = undef;
+    
+    return 1;
+  }
+  
+  static method diff : int () {
+    
+    my $x_ndarray = DCOP->c([Math->complex(2, -2), Math->complex(3, -3), Math->complex(6, -6)], [3]);
+    
+    my $ret_ndarray = DCOP->diff($x_ndarray);
+    
+    unless ($ret_ndarray is_type R::NDArray::DoubleComplex) {
+      return 0;
+    }
+    
+    unless (&equals_double_complex($ret_ndarray->data, [Math->complex(1, -1), Math->complex(3, -3)])) {
+      return 0;
+    }
+    
+    unless (Array->equals_int($ret_ndarray->dim, [2])) {
+      return 0;
+    }
+    
+    # Exceptions
+    {
+      {
+        my $x_ndarray = DCOP->c([Math->complex(1, -1), Math->complex(2, -2)], [1, 2]);
+        
+        eval { DCOP->diff(undef); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+      {
+        my $x_ndarray = DCOP->c([Math->complex(1, -1), Math->complex(2, -2)], [1, 2]);
+        
+        eval { DCOP->diff($x_ndarray); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+    }
+    
+    $@ = undef;
+    
+    return 1;
+  }
+  
+  static method mean : int () {
+    
+    my $x_ndarray = DCOP->c([Math->complex(-2, 2), Math->complex(-1, 1), Math->complex(0, 0), Math->complex(1, -1), Math->complex(2, -2)]);
+    
+    my $ret_ndarray = DCOP->mean($x_ndarray);
+    
+    unless ($ret_ndarray is_type R::NDArray::DoubleComplex) {
+      return 0;
+    }
+    
+    unless (&equals_double_complex($ret_ndarray->data, [Math->complex(0, 0)])) {
+      return 0;
+    }
+    
+    unless (Array->equals_int($ret_ndarray->dim, [1])) {
+      return 0;
+    }
+    
+    # Exceptions
+    {
+      {
+        my $x_ndarray = DCOP->c([Math->complex(1, -1), Math->complex(2, -2)], [1, 2]);
+        
+        eval { DCOP->mean(undef); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+    }
+    
+    $@ = undef;
+    
+    return 1;
+  }
+  
+  static method dot : int () {
+    
+    my $x_ndarray = DCOP->c([Math->complex(1, -1), Math->complex(2, -2)]);
+    
+    my $y_ndarray = DCOP->c([Math->complex(3, -3), Math->complex(4, -4)]);
+    
+    my $ret_ndarray = DCOP->dot($x_ndarray, $y_ndarray);
+    
+    unless ($ret_ndarray is_type R::NDArray::DoubleComplex) {
+      return 0;
+    }
+    
+    unless (&equals_double_complex($ret_ndarray->data, [Math->complex(22, 0)])) {
+      return 0;
+    }
+    
+    unless (Array->equals_int($ret_ndarray->dim, [1])) {
+      return 0;
+    }
+    
+    # Exceptions
+    {
+      {
+        my $x_ndarray = DCOP->c([Math->complex(1, -1), Math->complex(2, -2)]);
+        
+        my $y_ndarray = DCOP->c([Math->complex(3, -3), Math->complex(4, -4)]);
+        
+        eval { DCOP->dot(undef, $y_ndarray); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+      {
+        my $x_ndarray = DCOP->c([Math->complex(1, -1), Math->complex(2, -2)]);
+        
+        my $y_ndarray = DCOP->c([Math->complex(3, -3), Math->complex(4, -4)]);
+        
+        eval { DCOP->dot($x_ndarray, undef); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+      {
+        my $x_ndarray = DCOP->c([Math->complex(1, -1), Math->complex(2, -2)], [1, 2]);
+        
+        my $y_ndarray = DCOP->c([Math->complex(3, -3), Math->complex(4, -4)]);
+        
+        eval { DCOP->dot($x_ndarray, $y_ndarray); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+      {
+        my $x_ndarray = DCOP->c([Math->complex(1, -1), Math->complex(2, -2)]);
+        
+        my $y_ndarray = DCOP->c([Math->complex(3, -3), Math->complex(4, -4)], [1, 2]);
+        
+        eval { DCOP->dot($x_ndarray, $y_ndarray); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+      {
+        my $x_ndarray = DCOP->c([Math->complex(1, -1), Math->complex(2, -2)]);
+        
+        my $y_ndarray = DCOP->c([Math->complex(3, -3), Math->complex(4, -4), Math->complex(5, -5)]);
+        
+        eval { DCOP->dot($x_ndarray, $y_ndarray); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+    }
+    
+    $@ = undef;
+    
+    return 1;
+  }
+  
+  static method outer : int () {
+    
+    my $x_ndarray = DCOP->c([Math->complex(1, -1), Math->complex(2, -2)]);
+    
+    my $y_ndarray = DCOP->c([Math->complex(3, -3), Math->complex(4, -4), Math->complex(5, -5)]);
+    
+    my $ret_ndarray = DCOP->outer($x_ndarray, $y_ndarray);
+    
+    unless ($ret_ndarray is_type R::NDArray::DoubleComplex) {
+      return 0;
+    }
+    
+    unless (&equals_double_complex($ret_ndarray->data, [Math->complex(0, -6), Math->complex(0, -12),Math->complex(0, -8),Math->complex(0, -16),Math->complex(0, -10),Math->complex(0, -20)])) {
+      return 0;
+    }
+    
+    unless (Array->equals_int($ret_ndarray->dim, [2, 3])) {
+      return 0;
+    }
+    
+    # Exceptions
+    {
+      {
+        my $x_ndarray = DCOP->c([Math->complex(1, -1), Math->complex(2, -2)]);
+        
+        my $y_ndarray = DCOP->c([Math->complex(3, -3), Math->complex(4, -4)]);
+        
+        eval { DCOP->outer(undef, $y_ndarray); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+      {
+        my $x_ndarray = DCOP->c([Math->complex(1, -1), Math->complex(2, -2)]);
+        
+        my $y_ndarray = DCOP->c([Math->complex(3, -3), Math->complex(4, -4)]);
+        
+        eval { DCOP->outer($x_ndarray, undef); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+      {
+        my $x_ndarray = DCOP->c([Math->complex(1, -1), Math->complex(2, -2)], [1, 2]);
+        
+        my $y_ndarray = DCOP->c([Math->complex(3, -3), Math->complex(4, -4)]);
+        
+        eval { DCOP->outer($x_ndarray, $y_ndarray); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+      {
+        my $x_ndarray = DCOP->c([Math->complex(1, -1), Math->complex(2, -2)]);
+        
+        my $y_ndarray = DCOP->c([Math->complex(3, -3), Math->complex(4, -4)], [1, 2]);
+        
+        eval { DCOP->outer($x_ndarray, $y_ndarray); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+    }
+    
+    $@ = undef;
+    
+    return 1;
+  }
+
+  static method pi : int () {
+    
+    my $ret_ndarray = DCOP->pi;
+    
+    unless ($ret_ndarray is_type R::NDArray::DoubleComplex) {
+      return 0;
+    }
+    
+    unless (&equals_double_complex($ret_ndarray->data, [Math->complex(Math->PI, 0)])) {
+      return 0;
+    }
+    
+    unless (Array->equals_int($ret_ndarray->dim, [1])) {
+      return 0;
+    }
+    
+    $@ = undef;
+    
+    return 1;
+  }
+  
+  static method equals_double_complex : int ($x1_array : Complex_2d[], $x2_array : Complex_2d[]) {
+    
+    unless ($x1_array) {
+      die "The array \$x1_array must be defined.";
+    }
+    
+    unless ($x2_array) {
+      die "The array \$x2_array must be defined.";
+    }
+    
+    my $x1_array_length = @$x1_array;
+    
+    my $x2_array_length = @$x2_array;
+    
+    my $equals = 0;
+    
+    if ($x1_array_length == $x2_array_length) {
+      my $array_length = $x1_array_length;
+      
+      my $not_equals_elem = 0;
+      for (my $i = 0; $i < $array_length; $i++) {
+        unless ($x1_array->[$i]{re} == $x2_array->[$i]{re} && $x1_array->[$i]{im} == $x2_array->[$i]{im}) {
+          $not_equals_elem = 1;
+          last;
+        }
+      }
+      
+      unless ($not_equals_elem) {
+        $equals = 1;
+      }
+    }
+    
+    return $equals;
+  }
+
+}

@@ -4,7 +4,7 @@
 use strict;
 use warnings;
 use IO::File;
-use Test::More tests => 9;
+use Test::More tests => 10;
 
 use Net::DNS::Resolver::Unbound;
 
@@ -37,34 +37,41 @@ is( $bogus, undef, 'nonexistent resolver option' );
 ok( $resolver->string(), '$resolver->string' );
 
 
-my $filename = "file$$";
+my $index = $$ % 10000;
+my @filename;
+
+sub filename {
+	my $filename = join '', 'file', $index++;
+	close( IO::File->new( $filename, '>' ) or die $! );
+	push @filename, $filename;
+	return $filename;
+}
 
 END {
-	$resolver->string;
-	unlink $filename;
+	unlink $_ foreach @filename;
 }
-close( IO::File->new( $filename, '>' ) or die "Can't touch $filename $!" );
 
 
 ## exercise context methods
 eval { $resolver->option( 'verbosity',		 undef ) };
 eval { $resolver->option( 'outgoing-port-avoid', '3200-3208' ) };
-eval { $resolver->config($filename) };
+eval { $resolver->config(filename) };
 eval { $resolver->set_fwd('::1') };
 eval { $resolver->set_fwd('127.0.0.1') };
 eval { $resolver->set_fwd('127.0.0.53') };
 eval { $resolver->set_tls(0) };
 eval { $resolver->set_stub( 'zone', '10.1.2.3', 0 ) };
-eval { $resolver->resolv_conf($filename) };
-eval { $resolver->hosts($filename) };
+eval { $resolver->resolv_conf(filename) };
+eval { $resolver->hosts(filename) };
 eval { $resolver->add_ta('zone DS') };
-eval { $resolver->add_ta_file($filename) };
-eval { $resolver->add_ta_autr($filename) };
-eval { $resolver->trusted_keys($filename) };
-eval { $resolver->debug_out($filename) };
+eval { $resolver->add_ta_file(filename) };
+eval { $resolver->add_ta_autr(filename) };
+eval { $resolver->trusted_keys(filename) };
+eval { $resolver->debug_out(filename) };
 eval { $resolver->debug_level(1) };
 eval { $resolver->async_thread(1) };
 
+ok( $resolver->string(), 'context rebuilt' );
 
 exit;
 

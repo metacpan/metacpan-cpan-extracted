@@ -1,3 +1,11 @@
+0.632   2024-07-17  Released-By: PERLANCAR; Urgency: low
+
+        - No functional changes.
+
+        - [dist] Edit Changes (replace Backward-Compatible: no with
+          Backward-Incompatible: yes).
+
+
 0.631   2023-11-24  Released-By: PERLANCAR; Urgency: medium
 
         - Add function: get_dir_only_symlink().
@@ -45,7 +53,7 @@
 	- Add functions: dir_not_empty() and its alias dir_has_entries().
 
 
-0.624   2020-05-30  Released-By: PERLANCAR; Urgency: medium; Backward-Compatible: no
+0.624   2020-05-30  Released-By: PERLANCAR; Urgency: medium; Backward-Incompatible: yes
 
 	- Add functions: dir_has_non_subdirs, get_dir_non_subdirs.
 

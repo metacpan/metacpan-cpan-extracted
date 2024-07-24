@@ -1,5 +1,15 @@
 Revision history for Catalyst-Plugin-Statsd.
 
+v0.9.0    2024-07-23 19:37:56+01:00 Europe/London
+  [Enhancements]
+  - Internals changed to use newer Perl syntax features.
+
+  [Incompatible Changes]
+  - Perl v5.20 or later is required, matching Plack::Middleware::Statsd v0.7.0 changes.
+
+  [Documentation]
+  - Update copyright year.
+
 v0.8.2    2023-06-22 12:36:45+01:00 Europe/London
   [Tests]
   - Added required module for tests to work around broken CPAN Testers environments.

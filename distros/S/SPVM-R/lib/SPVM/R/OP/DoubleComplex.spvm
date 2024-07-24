@@ -1028,64 +1028,11 @@ class R::OP::DoubleComplex {
     my $x_data = $x_ndarray->data;
     my $y_data = $y_ndarray->data;
     
-    my $inner_product = Math->complex(1, 0);
+    my $inner_product = Math->complex(0, 0);
     for (my $data_index = 0; $data_index < $length; $data_index++) {
-      $inner_product = Math->cadd($inner_product, Math->cmul($x_data->[$data_index], $y_data->[$data_index]));
+      $inner_product = Math->cadd($inner_product, Math->cmul(Math->conj($x_data->[$data_index]), $y_data->[$data_index]));
     }
     $ret_data->[0] = $inner_product;
-    
-    return $ret_ndarray;
-  }
-  
-  precompile static method cross : R::NDArray::DoubleComplex ($x_ndarray : R::NDArray::DoubleComplex, $y_ndarray : R::NDArray::DoubleComplex) {
-    
-    unless ($x_ndarray) {
-      die "The n-dimensional array \$x_ndarray must be defined.";
-    }
-    
-    unless ($x_ndarray->is_vector) {
-      die "The n-dimensional array \$x_ndarray must be a vector.";
-    }
-    
-    unless ($y_ndarray) {
-      die "The n-dimensional array \$y_ndarray must be defined.";
-    }
-    
-    unless ($y_ndarray->is_vector) {
-      die "The n-dimensional array \$y_ndarray must be a vector.";
-    }
-    
-    my $equals_dropped_dim = R::OP->equals_dim($x_ndarray, $y_ndarray);
-    
-    unless ($equals_dropped_dim) {
-      die "The dimension of n-dimensional array \$x_ndarray must be equal to the dimension of n-dimensional array \$y_ndarray.";
-    }
-    
-    my $x_length = $x_ndarray->length;
-    
-    unless ($x_length == 3) {
-      die "The length of elems of n-dimensional array \$x_ndarray must be 3.";
-    }
-    
-    my $y_length = $y_ndarray->length;
-    
-    unless ($y_length == 3) {
-      die "The length of elems of n-dimensional array \$y_ndarray must be 3.";
-    }
-    
-    my $length = $x_length;
-    
-    my $ret_dim = [3];
-    
-    my $ret_ndarray = &c(undef, $ret_dim);
-    my $ret_data = $ret_ndarray->data;
-    
-    my $x_data = $x_ndarray->data;
-    my $y_data = $y_ndarray->data;
-    
-    $ret_data->[0] = Math->csub(Math->cmul($x_data->[1], $y_data->[2]), Math->cmul($x_data->[2], $y_data->[1]));
-    $ret_data->[1] = Math->csub(Math->cmul($x_data->[2], $y_data->[0]), Math->cmul($x_data->[0], $y_data->[2]));
-    $ret_data->[2] = Math->csub(Math->cmul($x_data->[0], $y_data->[1]), Math->cmul($x_data->[1], $y_data->[0]));
     
     return $ret_ndarray;
   }
@@ -1110,7 +1057,7 @@ class R::OP::DoubleComplex {
     
     my $x_length = $x_ndarray->length;
     
-    my $y_length = $x_ndarray->length;
+    my $y_length = $y_ndarray->length;
     
     my $ret_length = $x_length * $y_length;
     

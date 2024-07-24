@@ -1,3 +1,6 @@
+0.39 2024-07-23
+- bump minimum PDL to 2.083 as tricpy needs ArgOrder
+
 0.38 2024-02-24
 - tricpy now supports native-complex types
 - tricpy now defaults to upper - thanks @jo-37

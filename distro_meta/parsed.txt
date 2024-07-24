@@ -93203,3 +93203,13 @@ T/TE/TEAM/Net-Async-Slack-0.015.tar.gz
 H/HO/HOUSTON/Net-EPP-Registry-Nominet-0.11.tar.gz
 K/KI/KIMOTO/SPVM-R-0.013.tar.gz
 M/MA/MANWAR/Test-Strict-0.53.tar.gz
+R/RE/REEDFISH/Net-FullAuto-1.0000677.tar.gz
+R/RR/RRWO/Catalyst-Plugin-Statsd-v0.9.0.tar.gz
+N/NH/NHORNE/File-Open-NoCache-ReadOnly-0.03.tar.gz
+P/PE/PERLANCAR/File-Util-Test-0.632.tar.gz
+J/JD/JDEGUEST/Locale-Unicode-v0.1.10.tar.gz
+R/RW/RWF/Net-DNS-Resolver-Unbound-1.27.tar.gz
+A/AU/AUDREYT/PDF-FromHTML-0.34.tar.gz
+E/ET/ETJ/PDL-LinearAlgebra-0.39.tar.gz
+K/KI/KIMOTO/SPVM-R-0.014.tar.gz
+P/PE/PEVANS/String-Tagged-0.24.tar.gz

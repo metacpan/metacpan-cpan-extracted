@@ -2094,23 +2094,25 @@ print $Net::FullAuto::FA_Core::LOG
                                           "rm -rf $tdir");
                                     }
                                     if ($tran[3]) {
+                                       $cmd_fh->timeout(5);
                                        ($stdout,$stderr)=Rem_Command::cmd(
                                           { _cmd_handle=>$cmd_fh,
                                             _shell=>$shell,
                                             _hostlabel=>[ $hostlabel,'' ] },
-                                          "cd $tran[0]");
+                                          "cd $tran[0]",'__delay__=200');
                                        ($stdout,$stderr)=Rem_Command::cmd(
                                           { _cmd_handle=>$cmd_fh,
                                             _shell=>$shell,
                                             _hostlabel=>[ $hostlabel,'' ] },
-                                          "rm -f transfer$tran[3].tar");
+                                          "rm -f transfer$tran[3].tar",
+				          '__delay__=200');
                                        if ($tran[4]) {
                                           ($stdout,$stderr)=Rem_Command::cmd(
                                              { _cmd_handle=>$cmd_fh,
                                                _shell=>$shell,
                                                _hostlabel=>[ $hostlabel,'' ] },
                                              "cmd /c rmdir /s /q ".
-                                             "transfer$tran[3]");
+                                             "transfer$tran[3]",'__delay__=200');
                                           if (&test_dir(
                                                 $cmd_fh,"transfer$tran[3]")) {
                                              ($stdout,$stderr)=Rem_Command::cmd(
@@ -2119,14 +2121,14 @@ print $Net::FullAuto::FA_Core::LOG
                                                   _hostlabel=>[ $hostlabel,'' ]
                                                 },
                                                 "chmod -Rv 777 transfer".
-                                                $tran[3]);
+                                                $tran[3],'__delay__=200');
                                              ($stdout,$stderr)=Rem_Command::cmd(
                                                 { _cmd_handle=>$cmd_fh,
                                                   _shell=>$shell,
                                                   _hostlabel=>[ $hostlabel,'' ]
                                                 },
                                                 "cmd /c rmdir /s /q ".
-                                                "transfer$tran[3]");
+                                                "transfer$tran[3]",'__delay__=200');
                                           }
                                        } 
                                     }
@@ -18448,7 +18450,8 @@ sub ftr_cmd
             $work_dirs=&Net::FullAuto::FA_Core::work_dirs($transfer_dir,
                           $hostlabel,$ftr_cmd,$cmd_type,'',$_connect);
             my $curdir='';
-            ($curdir,$stderr)=&Net::FullAuto::FA_Core::cmd($ftr_cmd,'pwd');
+            ($curdir,$stderr)=&Net::FullAuto::FA_Core::cmd($ftr_cmd,
+               'pwd','__delay__=200');
             &handle_error($stderr,'-1') if $stderr;
             my $cdr='';
             if (exists $Net::FullAuto::FA_Core::cygpathw{$curdir}) {
@@ -18463,7 +18466,8 @@ sub ftr_cmd
             ${$work_dirs}{_pre_mswin}=$cdr.'\\\\';
             $ftr_cmd->{_cygdrive}||='/';
             $work_dirs->{_pre}=$curdir.'/';
-            ($output,$stderr)=$ftr_cmd->cmd('cd '.$work_dirs->{_tmp});
+            ($output,$stderr)=$ftr_cmd->cmd('cd '.$work_dirs->{_tmp},
+	       '__delay__=200');
             if ($stderr) {
                @FA_Core::tran=();
                my $die="Cannot cd to TransferDir -> ".$work_dirs->{_tmp}
@@ -18477,7 +18481,8 @@ sub ftr_cmd
             &Net::FullAuto::FA_Core::handle_error($cfh_error,'-1')
                if $cfh_error;
             $output=join '',
-               $ftr_cmd->{_ftp_handle}->cmd('cd '.$work_dirs->{_tmp});
+               $ftr_cmd->{_ftp_handle}->cmd('cd '.$work_dirs->{_tmp},
+	          '__delay__=200');
             if ($output=~/^(5.*)$/m) {
                my $line=$1;
                $line=~tr/\0-\37\177-\377//d;
@@ -18495,7 +18500,8 @@ sub ftr_cmd
          } else {
             my $curdir='';
             if ($ftr_cmd->{_uname} eq 'cygwin') {
-               ($curdir,$stderr)=&Net::FullAuto::FA_Core::cmd($localhost,'pwd');
+               ($curdir,$stderr)=&Net::FullAuto::FA_Core::cmd(
+	          $localhost,'pwd','__delay__=200');
                &handle_error($stderr,'-1') if $stderr;
                if ($^O eq 'cygwin') {
                   my $cdr='';
@@ -18527,7 +18533,7 @@ sub ftr_cmd
             } else {
                my $cnt=3;
                while ($cnt--) {
-                  ($curdir,$stderr)=$ftr_cmd->cmd('pwd');
+                  ($curdir,$stderr)=$ftr_cmd->cmd('pwd','__delay__=200');
                   if (!$curdir) {
                      my $cfh_ignore='';my $cfh_error='';
                      ($cfh_ignore,$cfh_error)=
@@ -31016,7 +31022,7 @@ print $Net::FullAuto::FA_Core::LOG "NO GROWOUTPUTTTTTTTTTTTTT\n" if $Net::FullAu
                   $output=~s/^[ |\t]+(stdout:.*)$/$1/m if !$fullerror;
                   $save=&display($output,$cmd_prompt,$save,$live_command)
                      if $display;
-                  if ($growoutput!~/\n$/s && $output=~/^stdout: /) {
+                  if ($growoutput && $growoutput!~/\n$/s && $output=~/^stdout: /) {
 	             $growoutput.="\n$output";
 		  } else {
                      $growoutput.=$output;
@@ -31680,23 +31686,26 @@ sub display
    } else {
       $tline=~s/^(.)/$1?/s;
    }
-   if ((-1<index $cmd,'git clone') ||
-         (-1<index $cmd,'git checkout')) {
-      return unless $line;
-      if (-1<index $line,'Receiving objects:') {
-         print "\n";
-	 $line=~s/sReceiving/s\nReceiving/sg;
-      } elsif (-1<index $line,'Resolving deltas:') {
-         print "\n";
-	 $line=~s/[)]Resolving/)\nResolving/sg;
-      } elsif (-1<index $line,'Updating files:') {
-         print "\n";
-	 $line=~s/[)]Updating/)\nUpdating/sg;
-      } elsif (-1<index $line,'pack-reused') {
-         print "\n";
-      }
-      if (-1<index $line,'[K') {
-	 $line=~s/[[]K/\n/sg;
+   if (-1<index $cmd,'git') {
+      if ((-1<index $cmd,'git checkout') ||
+            (-1<index $cmd,'git checkout') ||
+            (-1<index $cmd,'git pull')) {
+         return unless $line;
+         if (-1<index $line,'Receiving objects:') {
+            print "\n";
+            $line=~s/sReceiving/s\nReceiving/sg;
+         } elsif (-1<index $line,'Resolving deltas:') {
+            print "\n";
+            $line=~s/[)]Resolving/)\nResolving/sg;
+         } elsif (-1<index $line,'Updating files:') {
+            print "\n";
+            $line=~s/[)]Updating/)\nUpdating/sg;
+         } elsif (-1<index $line,'pack-reused') {
+            print "\n";
+         }
+         if (-1<index $line,'[K') {
+            $line=~s/[[]K/\n/sg;
+         }
       }
    }
    if ((-1<index $line,'[K') &&

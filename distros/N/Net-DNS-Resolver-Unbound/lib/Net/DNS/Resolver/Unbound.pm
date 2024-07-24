@@ -12,22 +12,22 @@ use base qw(Net::DNS::Resolver::Base DynaLoader), OS_CONF;
 our $VERSION;
 
 BEGIN {
-	$VERSION = '1.26';
+	$VERSION = '1.27';
 	eval { __PACKAGE__->bootstrap($VERSION) };
 }
 
-use constant UNBOUND_VERSION => eval {
+use constant UB_VERSION => scalar eval {
 	my $version = Net::DNS::Resolver::libunbound->VERSION();
-	my ( $v1, $v2, $v3 ) = split /\D/, $version;
-	( $v1 * 100 + $v2 ) * 100 + $v3;
+	my ( $major, $minor, $minimus ) = split /\D/, $version;
+	( $major * 100 + $minor ) * 100 + $minimus;
 };
 
 use constant UB_CONTEXT => 'Net::DNS::Resolver::Unbound::Context';
 
-use constant IP_PREF	 => UNBOUND_VERSION > 11100;
-use constant SET_TLS	 => UB_CONTEXT->can('set_tls');
-use constant SET_STUB	 => UB_CONTEXT->can('set_stub');
+use constant IP_PREF	 => UB_VERSION > 11100;
 use constant ADD_TA_AUTR => UB_CONTEXT->can('add_ta_autr');
+use constant SET_STUB	 => UB_CONTEXT->can('set_stub');
+use constant SET_TLS	 => UB_CONTEXT->can('set_tls');
 
 
 =head1 NAME
@@ -73,7 +73,7 @@ extracted from the presented packet.
 =item *
 
 Result packet is synthesised in libunbound and not the "real thing".
-In particular, the returned queryID is always zero.
+In particular, the queryID returned by Unbound is always zero.
 
 =back
 
@@ -114,19 +114,25 @@ sub new {
 =head2 nameservers
 
     my $stub_resolver = Net::DNS::Resolver::Unbound->new(
-	nameservers => [ '127.0.0.53' ]
+	nameserver => '127.0.0.53'
 	);
 
     my $fully_recursive = Net::DNS::Resolver::Unbound->new(
-	nameservers => []		# override /etc/resolv.conf
-	);
-
-    my $dnssec_resolver = Net::DNS::Resolver::Unbound->new(
-	nameservers => [],
+	nameservers => [],		# override /etc/resolv.conf
 	add_ta_file => '/var/lib/unbound/root.key'
 	);
 
-    $stub_resolver->nameservers( '127.0.0.53', ... );
+    my $DoT_resolver = Net::DNS::Resolver->new(
+	nameserver => '2606:4700:4700::1111@853#cloudflare-dns.com',
+	nameserver => '2001:4860:4860::8888@853#dns.google',
+	nameserver => '8.8.8.8@853#dns.google',
+	nameserver => '9.9.9.9@853#dns.quad9.net',
+	option     => [qw(tls-cert-bundle /etc/ssl/cert.pem)],
+	set_tls    => 1
+	);
+
+    $resolver->nameservers( '::1', '127.0.0.1', ... );
+    @nameservers = $resolver->nameservers;
 
 By default, DNS queries are sent to the IP addresses listed in
 /etc/resolv.conf or similar platform-specific sources.
@@ -161,19 +167,19 @@ use constant UB_SEND => UB_CONTEXT->can('ub_send');
 
 sub send {
 	my ( $self, @argument ) = @_;
+
+	my ($packet) = @argument;
+	if ( ref $packet ) {					# resolve packets asynchronously
+		my $handle = $self->bgsend(@argument);
+		return $self->bgread($handle);
+	}
+
 	$self->_finalise_config;
 	$self->_reset_errorstring;
 
-	my ($packet) = @argument;
-	my $query = $self->_make_query_packet(@argument);
-	my $result;
-	if ( UB_SEND && ref($packet) ) {
-		$result = $self->{ub_ctx}->ub_send( $query->encode );
-	} else {
-		my ($q) = $query->question;
-		$result = $self->{ub_ctx}->ub_resolve( $q->name, $q->{qtype}, $q->{qclass} );
-	}
-
+	my $query  = $self->_make_query_packet(@argument);
+	my ($q)	   = $query->question;
+	my $result = $self->{ub_ctx}->ub_resolve( $q->name, $q->{qtype}, $q->{qclass} );
 	return $self->_decode_result($result);
 }
 
@@ -203,10 +209,10 @@ sub bgread {
 	return unless $handle;
 
 	$self->{ub_ctx}->ub_wait if &bgbusy;
-
 	$self->errorstring( $handle->err );
+
 	my $reply = $self->_decode_result( $handle->result ) || return;
-	$reply->header->id( $handle->query_id );
+	$reply->header->id( $handle->query_id );		# lying toad!;
 	return $reply;
 }
 
@@ -303,7 +309,7 @@ or other platform-specific sources.
 
 sub resolv_conf {
 	my ( $self, $filename ) = @_;
-	return $self->_config( 'resolv_conf', $filename );
+	return $self->_config( 'resolvconf', $filename );
 }
 
 
@@ -379,7 +385,7 @@ Pass the name of a BIND-style config file containing trusted-keys{}.
 
 sub trusted_keys {
 	my ( $self, $filename ) = @_;
-	return $self->_config( 'trusted_keys', $filename );
+	return $self->_config( 'trustedkeys', $filename );
 }
 
 
@@ -394,7 +400,7 @@ Pass a null argument to disable. Default is stderr.
 
 sub debug_out {
 	my ( $self, $stream ) = @_;
-	return $self->_config( 'debug_out', $stream );
+	return $self->_config( 'debugout', $stream );
 }
 
 
@@ -410,7 +416,7 @@ Set verbosity of the debug output directed to stderr.  Level 0 is off,
 sub debug_level {
 	my ( $self, $verbosity ) = @_;
 	$self->debug($verbosity);
-	return $self->_config( 'debug_level', $verbosity );
+	return $self->_config( 'debuglevel', $verbosity );
 }
 
 

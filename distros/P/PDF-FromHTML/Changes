@@ -1,3 +1,7 @@
+[Changes for 0.34 - Tue Jul 23 20:00:23 EAT 2024]
+
+* Migrated from HTML::Tidy to HTML::Tidy5 for enhanced HTML5 support and because tidyp is no longer maintained.
+
 [Changes for 0.33 - Wed Oct 23 20:00:23 EAT 2019]
 
 * Fix META.yml and README; no functional changes.

@@ -3,7 +3,7 @@
 #
 #  (C) Paul Evans, 2008-2023 -- leonerd@leonerd.org.uk
 
-package String::Tagged 0.23;
+package String::Tagged 0.24;
 
 use v5.14;
 use warnings;
@@ -127,7 +127,9 @@ Out-of-band data
    # It would be nice if we could #ifdef HAVE_PERL_VERSION(...)
    ( $] >= 5.034 ) ?
       do { eval 'use experimental "isa"; sub { $_[0] isa __PACKAGE__ }' // die $@ } :
-      do { sub { blessed $_[0] and $_[0]->isa( __PACKAGE__ ) } };
+      # We can't call ->isa as a method on 5.32 because of a bug in the isa
+      # operator implementation that breaks the isa cache on the package.
+      do { sub { blessed $_[0] and UNIVERSAL::isa( $_[0], __PACKAGE__ ) } };
 
 =head1 CONSTRUCTOR
 

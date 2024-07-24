@@ -4,7 +4,7 @@ use 5.006;
 use strict;
 use warnings;
 
-our $VERSION = '0.33';
+our $VERSION = '0.34';
 
 BEGIN {
     foreach my $method ( qw( pdf twig tidy args ) ) {
@@ -35,11 +35,11 @@ use constant PDF_WRITER_BACKEND => do {
 };
 use constant HAS_HTML_TIDY => do {
     local $@;
-    eval { require HTML::Tidy; 1 } or do {
+    eval { require HTML::Tidy5; 1 } or do {
         unless ( eval { require XML::Clean; 1 } ) {
-            die( "Please install HTML::Tidy (preferred) or XML::Clean first" );
+            die( "Please install HTML::Tidy5 (preferred) or XML::Clean first" );
         }
-        0; # Has XML::Clean but no HTML::Tidy
+        0; # Has XML::Clean but no HTML::Tidy5
     };
 };
 
@@ -125,7 +125,7 @@ sub parse_file {
         if (HAS_UNICODE_SUPPORT()) {
             $content = Encode::encode( ascii => $content, Encode::FB_XMLCREF());
         }
-        $content = HTML::Tidy->new->clean(
+        $content = HTML::Tidy5->new->clean(
             '<?xml version="1.0" encoding="UTF-8"?>',
             '<html xmlns="http://www.w3.org/1999/xhtml">',
             $content,

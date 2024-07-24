@@ -4,7 +4,7 @@ Catalyst::Plugin::Statsd - Log Catalyst stats to statsd
 
 # VERSION
 
-version v0.8.2
+version v0.9.0
 
 # SYNOPSIS
 
@@ -155,13 +155,9 @@ accordingly.
 
 # SUPPORT FOR OLDER PERL VERSIONS
 
-Since v0.8.0, the this module requires Perl v5.14 or later.
+Since v0.9.0, the this module requires Perl v5.20 or later.
 
 Future releases may only support Perl versions released in the last ten years.
-
-If you need this module on Perl v5.10, please use one of the v0.7.x
-versions of this module.  Significant bug or security fixes may be
-backported to those versions.
 
 # SEE ALSO
 
@@ -196,7 +192,7 @@ Slaven Rezić <slaven@rezic.de>
 
 # COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2018-2023 by Robert Rothenberg.
+This software is Copyright (c) 2018-2024 by Robert Rothenberg.
 
 This is free software, licensed under:
 

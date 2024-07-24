@@ -1,0 +1,1817 @@
+class TestCase::R::OP::FloatComplex {
+  
+  use Array;
+  use Math;
+  use R::OP::FloatComplex as FCOP;
+  
+  static method c : int () {
+    
+    {
+      my $data = [Math->complexf(1f, -1f), Math->complexf(2f, -2f)];
+      my $ret_ndarray = FCOP->c($data);
+      
+      unless ($ret_ndarray is_type R::NDArray::FloatComplex) {
+        return 0;
+      }
+      
+      unless ($ret_ndarray->data == $data) {
+        return 0;
+      }
+      
+      unless (&equals_float_complex($ret_ndarray->data, [Math->complexf(1f, -1f), Math->complexf(2f, -2f)])) {
+        return 0;
+      }
+      
+      unless (Array->equals_int($ret_ndarray->dim, [2])) {
+        return 0;
+      }
+    }
+    
+    {
+      my $data = [Math->complexf(1f, -1f), Math->complexf(2f, -2f)];
+      my $ret_ndarray = FCOP->c(FCOP->c($data));
+      
+      unless ($ret_ndarray is_type R::NDArray::FloatComplex) {
+        return 0;
+      }
+      
+      unless ($ret_ndarray->data == $data) {
+        return 0;
+      }
+      
+      unless (&equals_float_complex($ret_ndarray->data, [Math->complexf(1f, -1f), Math->complexf(2f, -2f)])) {
+        return 0;
+      }
+      
+      unless (Array->equals_int($ret_ndarray->dim, [2])) {
+        return 0;
+      }
+    }
+    
+    {
+      my $data = [Math->complexf(1f, -1f), Math->complexf(2f, -2f)];
+      my $ret_ndarray = FCOP->c(FCOP->c($data), [1, 2]);
+      
+      unless ($ret_ndarray is_type R::NDArray::FloatComplex) {
+        return 0;
+      }
+      
+      unless ($ret_ndarray->data == $data) {
+        return 0;
+      }
+      
+      unless (&equals_float_complex($ret_ndarray->data, [Math->complexf(1f, -1f), Math->complexf(2f, -2f)])) {
+        return 0;
+      }
+      
+      unless (Array->equals_int($ret_ndarray->dim, [1, 2])) {
+        return 0;
+      }
+    }
+    
+    # Exceptions
+    {
+      {
+        eval { FCOP->c(true); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+    }
+    
+    return 1;
+  }
+  
+  static method add : int () {
+    
+    my $x_ndarray = FCOP->c([Math->complexf(1f, -1f), Math->complexf(2f, -2f)], [1, 2]);
+    
+    my $y_ndarray = FCOP->c([Math->complexf(3f, -3f), Math->complexf(4f, -4f)], [1, 2]);
+    
+    my $ret_ndarray = FCOP->add($x_ndarray, $y_ndarray);
+    
+    unless ($ret_ndarray is_type R::NDArray::FloatComplex) {
+      return 0;
+    }
+    
+    unless (&equals_float_complex($ret_ndarray->data, [Math->complexf(4f, -4f), Math->complexf(6, -6)])) {
+      return 0;
+    }
+    
+    unless (Array->equals_int($ret_ndarray->dim, [1, 2])) {
+      return 0;
+    }
+    
+    # Exceptions
+    {
+      {
+        my $x_ndarray = FCOP->c([Math->complexf(1f, -1f), Math->complexf(2f, -2f)], [1, 2]);
+        
+        my $y_ndarray = FCOP->c([Math->complexf(3f, -3f), Math->complexf(4f, -4f)], [1, 2]);
+        
+        eval { FCOP->add(undef, $y_ndarray); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+      {
+        my $x_ndarray = FCOP->c([Math->complexf(1f, -1f), Math->complexf(2f, -2f)], [1, 2]);
+        
+        my $y_ndarray = FCOP->c([Math->complexf(3f, -3f), Math->complexf(4f, -4f)], [1, 2]);
+        
+        eval { FCOP->add($x_ndarray, undef); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+      {
+        my $x_ndarray = FCOP->c([Math->complexf(1f, -1f), Math->complexf(2f, -2f)], [1, 2]);
+        
+        my $y_ndarray = FCOP->c([Math->complexf(3f, -3f), Math->complexf(4f, -4f)], [2, 1]);
+        
+        eval { FCOP->add($x_ndarray, $y_ndarray); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+    }
+    
+    $@ = undef;
+    
+    return 1;
+  }
+  
+  static method sub : int () {
+    
+    my $x_ndarray = FCOP->c([Math->complexf(1f, -1f), Math->complexf(2f, -2f)], [1, 2]);
+    
+    my $y_ndarray = FCOP->c([Math->complexf(3f, -3f), Math->complexf(4f, -4f)], [1, 2]);
+    
+    my $ret_ndarray = FCOP->sub($x_ndarray, $y_ndarray);
+    
+    unless ($ret_ndarray is_type R::NDArray::FloatComplex) {
+      return 0;
+    }
+    
+    unless (&equals_float_complex($ret_ndarray->data, [Math->complexf(-2, 2), Math->complexf(-2, 2)])) {
+      return 0;
+    }
+    
+    unless (Array->equals_int($ret_ndarray->dim, [1, 2])) {
+      return 0;
+    }
+    
+    # Exceptions
+    {
+      {
+        my $x_ndarray = FCOP->c([Math->complexf(1f, -1f), Math->complexf(2f, -2f)], [1, 2]);
+        
+        my $y_ndarray = FCOP->c([Math->complexf(3f, -3f), Math->complexf(4f, -4f)], [1, 2]);
+        
+        eval { FCOP->sub(undef, $y_ndarray); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+      {
+        my $x_ndarray = FCOP->c([Math->complexf(1f, -1f), Math->complexf(2f, -2f)], [1, 2]);
+        
+        my $y_ndarray = FCOP->c([Math->complexf(3f, -3f), Math->complexf(4f, -4f)], [1, 2]);
+        
+        eval { FCOP->sub($x_ndarray, undef); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+      {
+        my $x_ndarray = FCOP->c([Math->complexf(1f, -1f), Math->complexf(2f, -2f)], [1, 2]);
+        
+        my $y_ndarray = FCOP->c([Math->complexf(3f, -3f), Math->complexf(4f, -4f)], [2, 1]);
+        
+        eval { FCOP->sub($x_ndarray, $y_ndarray); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+    }
+    
+    $@ = undef;
+    
+    return 1;
+  }
+
+  static method mul : int () {
+    
+    my $x_ndarray = FCOP->c([Math->complexf(1f, -1f), Math->complexf(2f, -2f)], [1, 2]);
+    
+    my $y_ndarray = FCOP->c([Math->complexf(3f, -3f), Math->complexf(4f, -4f)], [1, 2]);
+    
+    my $ret_ndarray = FCOP->mul($x_ndarray, $y_ndarray);
+    
+    unless ($ret_ndarray is_type R::NDArray::FloatComplex) {
+      return 0;
+    }
+    
+    unless (&equals_float_complex($ret_ndarray->data, [Math->cmulf(Math->complexf(1f, -1f), Math->complexf(3f, -3f)), Math->cmulf(Math->complexf(2f, -2f), Math->complexf(4f, -4f))])) {
+      return 0;
+    }
+    
+    unless (Array->equals_int($ret_ndarray->dim, [1, 2])) {
+      return 0;
+    }
+    
+    # Exceptions
+    {
+      {
+        my $x_ndarray = FCOP->c([Math->complexf(1f, -1f), Math->complexf(2f, -2f)], [1, 2]);
+        
+        my $y_ndarray = FCOP->c([Math->complexf(3f, -3f), Math->complexf(4f, -4f)], [1, 2]);
+        
+        eval { FCOP->mul(undef, $y_ndarray); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+      {
+        my $x_ndarray = FCOP->c([Math->complexf(1f, -1f), Math->complexf(2f, -2f)], [1, 2]);
+        
+        my $y_ndarray = FCOP->c([Math->complexf(3f, -3f), Math->complexf(4f, -4f)], [1, 2]);
+        
+        eval { FCOP->mul($x_ndarray, undef); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+      {
+        my $x_ndarray = FCOP->c([Math->complexf(1f, -1f), Math->complexf(2f, -2f)], [1, 2]);
+        
+        my $y_ndarray = FCOP->c([Math->complexf(3f, -3f), Math->complexf(4f, -4f)], [2, 1]);
+        
+        eval { FCOP->mul($x_ndarray, $y_ndarray); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+    }
+    
+    $@ = undef;
+    
+    return 1;
+  }
+
+  static method scamul : int () {
+    
+    my $x_ndarray = FCOP->c([Math->complexf(3f, -3f), Math->complexf(4f, -4f)], [1, 2]);
+    
+    my $scalar_ndarray = FCOP->c([Math->complexf(3f, -3f)]);
+    
+    my $ret_ndarray = FCOP->scamul($x_ndarray, $scalar_ndarray);
+    
+    unless ($ret_ndarray is_type R::NDArray::FloatComplex) {
+      return 0;
+    }
+    
+    unless (&equals_float_complex($ret_ndarray->data, [Math->cmulf(Math->complexf(3f, -3f), Math->complexf(3f, -3f)), Math->cmulf(Math->complexf(4f, -4f), Math->complexf(3f, -3f))])) {
+      return 0;
+    }
+    
+    unless (Array->equals_int($ret_ndarray->dim, [1, 2])) {
+      return 0;
+    }
+    
+    # Exceptions
+    {
+      {
+        my $x_ndarray = FCOP->c([Math->complexf(3f, -3f), Math->complexf(4f, -4f)], [1, 2]);
+        
+        my $scalar_ndarray = FCOP->c([Math->complexf(3f, -3f)]);
+        
+        eval { FCOP->scamul(undef, $scalar_ndarray); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+      {
+        my $x_ndarray = FCOP->c([Math->complexf(3f, -3f), Math->complexf(4f, -4f)], [1, 2]);
+        
+        my $scalar_ndarray = FCOP->c([Math->complexf(3f, -3f)]);
+        
+        eval { FCOP->scamul($x_ndarray, undef); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+      {
+        my $scalar_ndarray = FCOP->c([Math->complexf(1f, -1f), Math->complexf(2f, -2f)], [1, 2]);
+        
+        my $x_ndarray = FCOP->c([Math->complexf(3f, -3f), Math->complexf(4f, -4f)], [2, 1]);
+        
+        eval { FCOP->scamul($x_ndarray, $scalar_ndarray); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+    }
+    
+    $@ = undef;
+    
+    return 1;
+  }
+  
+  static method div : int () {
+    
+    my $x_ndarray = FCOP->c([Math->complexf(1f, -1f), Math->complexf(1f, -1f)], [1, 2]);
+    
+    my $y_ndarray = FCOP->c([Math->complexf(2f, -2f), Math->complexf(4f, -4f)], [1, 2]);
+    
+    my $ret_ndarray = FCOP->div($x_ndarray, $y_ndarray);
+    
+    unless ($ret_ndarray is_type R::NDArray::FloatComplex) {
+      return 0;
+    }
+    
+    unless (&equals_float_complex($ret_ndarray->data, [Math->cdivf(Math->complexf(1f, -1f), Math->complexf(2f, -2f)), Math->cdivf(Math->complexf(1f, -1f), Math->complexf(4f, -4f))])) {
+      return 0;
+    }
+    
+    unless (Array->equals_int($ret_ndarray->dim, [1, 2])) {
+      return 0;
+    }
+    
+    # Exceptions
+    {
+      {
+        my $x_ndarray = FCOP->c([Math->complexf(1f, -1f), Math->complexf(2f, -2f)], [1, 2]);
+        
+        my $y_ndarray = FCOP->c([Math->complexf(3f, -3f), Math->complexf(4f, -4f)], [1, 2]);
+        
+        eval { FCOP->div(undef, $y_ndarray); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+      {
+        my $x_ndarray = FCOP->c([Math->complexf(1f, -1f), Math->complexf(2f, -2f)], [1, 2]);
+        
+        my $y_ndarray = FCOP->c([Math->complexf(3f, -3f), Math->complexf(4f, -4f)], [1, 2]);
+        
+        eval { FCOP->div($x_ndarray, undef); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+      {
+        my $x_ndarray = FCOP->c([Math->complexf(1f, -1f), Math->complexf(2f, -2f)], [1, 2]);
+        
+        my $y_ndarray = FCOP->c([Math->complexf(3f, -3f), Math->complexf(4f, -4f)], [2, 1]);
+        
+        eval { FCOP->div($x_ndarray, $y_ndarray); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+    }
+    
+    $@ = undef;
+    
+    return 1;
+  }
+  
+  static method scadiv : int () {
+    
+    my $x_ndarray = FCOP->c([Math->complexf(1f, -1f), Math->complexf(2f, -2f)], [1, 2]);
+    
+    my $scalar_ndarray = FCOP->c([Math->complexf(2f, -2f)]);
+    
+    my $ret_ndarray = FCOP->scadiv($x_ndarray, $scalar_ndarray);
+    
+    unless ($ret_ndarray is_type R::NDArray::FloatComplex) {
+      return 0;
+    }
+    
+    unless (&equals_float_complex($ret_ndarray->data, [Math->cdivf(Math->complexf(1f, -1f), Math->complexf(2f, -2f)), Math->cdivf(Math->complexf(2f, -2f), Math->complexf(2f, -2f))])) {
+      return 0;
+    }
+    
+    unless (Array->equals_int($ret_ndarray->dim, [1, 2])) {
+      return 0;
+    }
+    
+    # Exceptions
+    {
+      {
+        my $x_ndarray = FCOP->c([Math->complexf(3f, -3f), Math->complexf(4f, -4f)], [1, 2]);
+        
+        my $scalar_ndarray = FCOP->c([Math->complexf(3f, -3f)]);
+        
+        eval { FCOP->scadiv($x_ndarray, undef); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+      {
+        my $x_ndarray = FCOP->c([Math->complexf(3f, -3f), Math->complexf(4f, -4f)], [1, 2]);
+        
+        my $scalar_ndarray = FCOP->c([Math->complexf(3f, -3f)]);
+        
+        eval { FCOP->scadiv(undef, $scalar_ndarray); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+      {
+        my $x_ndarray = FCOP->c([Math->complexf(3f, -3f), Math->complexf(4f, -4f)], [2, 1]);
+        
+        my $scalar_ndarray = FCOP->c([Math->complexf(1f, -1f), Math->complexf(2f, -2f)], [1, 2]);
+        
+        eval { FCOP->scadiv($x_ndarray, $scalar_ndarray); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+    }
+    
+    $@ = undef;
+    
+    return 1;
+  }
+  
+  static method neg : int () {
+    
+    my $x_ndarray = FCOP->c([Math->complexf(1f, -1f), Math->complexf(2f, -2f)], [1, 2]);
+    
+    my $ret_ndarray = FCOP->neg($x_ndarray);
+    
+    unless ($ret_ndarray is_type R::NDArray::FloatComplex) {
+      return 0;
+    }
+    
+    unless (&equals_float_complex($ret_ndarray->data, [Math->complexf(-1, 1), Math->complexf(-2, 2)])) {
+      return 0;
+    }
+    
+    unless (Array->equals_int($ret_ndarray->dim, [1, 2])) {
+      return 0;
+    }
+    
+    # Exceptions
+    {
+      {
+        my $x_ndarray = FCOP->c([Math->complexf(1f, -1f), Math->complexf(2f, -2f)], [1, 2]);
+        
+        eval { FCOP->neg(undef); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+    }
+    
+    $@ = undef;
+    
+    return 1;
+  }
+  
+  static method abs : int () {
+    
+    my $x_ndarray = FCOP->c([Math->complexf(1f, -1f), Math->complexf(-2, 2)], [1, 2]);
+    
+    my $ret_ndarray = FCOP->abs($x_ndarray);
+    
+    unless ($ret_ndarray is_type R::NDArray::Float) {
+      return 0;
+    }
+    
+    unless (Array->equals_float($ret_ndarray->data, [Math->cabsf(Math->complexf(1f, -1f)), Math->cabsf(Math->complexf(-2, 2))])) {
+      return 0;
+    }
+    
+    unless (Array->equals_int($ret_ndarray->dim, [1, 2])) {
+      return 0;
+    }
+    
+    # Exceptions
+    {
+      {
+        my $x_ndarray = FCOP->c([Math->complexf(1f, -1f), Math->complexf(2f, -2f)], [1, 2]);
+        
+        eval { FCOP->abs(undef); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+    }
+    
+    $@ = undef;
+    
+    return 1;
+  }
+  
+  static method re : int () { return 1; }
+  
+  static method im : int () { return 1; }
+  
+  static method conj : int () { return 1; }
+  
+  static method arg : int () { return 1; }
+  
+  static method eq : int () {
+    
+    my $x_ndarray = FCOP->c([Math->complexf(1f, -1f), Math->complexf(1f, -1f)], [1, 2]);
+    
+    my $y_ndarray = FCOP->c([Math->complexf(1f, -1f), Math->complexf(2f, -2f)], [1, 2]);
+    
+    my $ret_ndarray = FCOP->eq($x_ndarray, $y_ndarray);
+    
+    unless ($ret_ndarray is_type R::NDArray::Int) {
+      return 0;
+    }
+    
+    unless (Array->equals_int($ret_ndarray->data, [1, 0])) {
+      return 0;
+    }
+    
+    unless (Array->equals_int($ret_ndarray->dim, [1, 2])) {
+      return 0;
+    }
+    
+    # Exceptions
+    {
+      {
+        my $x_ndarray = FCOP->c([Math->complexf(1f, -1f), Math->complexf(2f, -2f)], [1, 2]);
+        
+        my $y_ndarray = FCOP->c([Math->complexf(3f, -3f), Math->complexf(4f, -4f)], [1, 2]);
+        
+        eval { FCOP->eq(undef, $y_ndarray); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+      {
+        my $x_ndarray = FCOP->c([Math->complexf(1f, -1f), Math->complexf(2f, -2f)], [1, 2]);
+        
+        my $y_ndarray = FCOP->c([Math->complexf(3f, -3f), Math->complexf(4f, -4f)], [1, 2]);
+        
+        eval { FCOP->eq($x_ndarray, undef); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+      {
+        my $x_ndarray = FCOP->c([Math->complexf(1f, -1f), Math->complexf(2f, -2f)], [1, 2]);
+        
+        my $y_ndarray = FCOP->c([Math->complexf(3f, -3f), Math->complexf(4f, -4f)], [2, 1]);
+        
+        eval { FCOP->eq($x_ndarray, $y_ndarray); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+    }
+    
+    $@ = undef;
+    
+    return 1;
+  }
+  
+  static method ne : int () {
+    
+    my $x_ndarray = FCOP->c([Math->complexf(1f, -1f), Math->complexf(1f, -1f)], [1, 2]);
+    
+    my $y_ndarray = FCOP->c([Math->complexf(1f, -1f), Math->complexf(2f, -2f)], [1, 2]);
+    
+    my $ret_ndarray = FCOP->ne($x_ndarray, $y_ndarray);
+    
+    unless ($ret_ndarray is_type R::NDArray::Int) {
+      return 0;
+    }
+    
+    unless (Array->equals_int($ret_ndarray->data, [0, 1])) {
+      return 0;
+    }
+    
+    unless (Array->equals_int($ret_ndarray->dim, [1, 2])) {
+      return 0;
+    }
+    
+    # Exceptions
+    {
+      {
+        my $x_ndarray = FCOP->c([Math->complexf(1f, -1f), Math->complexf(2f, -2f)], [1, 2]);
+        
+        my $y_ndarray = FCOP->c([Math->complexf(3f, -3f), Math->complexf(4f, -4f)], [1, 2]);
+        
+        eval { FCOP->ne(undef, $y_ndarray); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+      {
+        my $x_ndarray = FCOP->c([Math->complexf(1f, -1f), Math->complexf(2f, -2f)], [1, 2]);
+        
+        my $y_ndarray = FCOP->c([Math->complexf(3f, -3f), Math->complexf(4f, -4f)], [1, 2]);
+        
+        eval { FCOP->ne($x_ndarray, undef); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+      {
+        my $x_ndarray = FCOP->c([Math->complexf(1f, -1f), Math->complexf(2f, -2f)], [1, 2]);
+        
+        my $y_ndarray = FCOP->c([Math->complexf(3f, -3f), Math->complexf(4f, -4f)], [2, 1]);
+        
+        eval { FCOP->ne($x_ndarray, $y_ndarray); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+    }
+    
+    $@ = undef;
+    
+    return 1;
+  }
+  
+  static method rep : int () {
+    
+    my $x_ndarray = FCOP->c([Math->complexf(1f, -1f), Math->complexf(2f, -2f)]);
+    
+    my $ret_ndarray = FCOP->rep($x_ndarray, 2);
+    
+    unless (&equals_float_complex($ret_ndarray->data, [Math->complexf(1f, -1f), Math->complexf(2f, -2f), Math->complexf(1f, -1f), Math->complexf(2f, -2f)])) {
+      return 0;
+    }
+    
+    unless (Array->equals_int($ret_ndarray->dim, [4])) {
+      return 0;
+    }
+    
+    return 1;
+  }
+  
+  static method rep_length : int () {
+    
+    my $x_ndarray = FCOP->c([Math->complexf(1f, -1f), Math->complexf(2f, -2f)]);
+    
+    my $ret_ndarray = FCOP->rep_length($x_ndarray, 4);
+    
+    unless (&equals_float_complex($ret_ndarray->data, [Math->complexf(1f, -1f), Math->complexf(2f, -2f), Math->complexf(1f, -1f), Math->complexf(2f, -2f)])) {
+      return 0;
+    }
+    
+    unless (Array->equals_int($ret_ndarray->dim, [4])) {
+      return 0;
+    }
+    
+    return 1;
+  }
+  
+  static method sin : int () {
+    
+    my $x_ndarray = FCOP->c([Math->complexf(1f, -1f), Math->complexf(-2, 2)], [1, 2]);
+    
+    my $ret_ndarray = FCOP->sin($x_ndarray);
+    
+    unless ($ret_ndarray is_type R::NDArray::FloatComplex) {
+      return 0;
+    }
+    
+    unless (&equals_float_complex($ret_ndarray->data, [Math->csinf($x_ndarray->data->[0]), Math->csinf($x_ndarray->data->[1])])) {
+      return 0;
+    }
+    
+    unless (Array->equals_int($ret_ndarray->dim, [1, 2])) {
+      return 0;
+    }
+    
+    # Exceptions
+    {
+      {
+        my $x_ndarray = FCOP->c([Math->complexf(1f, -1f), Math->complexf(2f, -2f)], [1, 2]);
+        
+        eval { FCOP->sin(undef); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+    }
+    
+    $@ = undef;
+    
+    return 1;
+  }
+  
+  static method cos : int () {
+    
+    my $x_ndarray = FCOP->c([Math->complexf(1f, -1f), Math->complexf(-2, 2)], [1, 2]);
+    
+    my $ret_ndarray = FCOP->cos($x_ndarray);
+    
+    unless ($ret_ndarray is_type R::NDArray::FloatComplex) {
+      return 0;
+    }
+    
+    unless (&equals_float_complex($ret_ndarray->data, [Math->ccosf($x_ndarray->data->[0]), Math->ccosf($x_ndarray->data->[1])])) {
+      return 0;
+    }
+    
+    unless (Array->equals_int($ret_ndarray->dim, [1, 2])) {
+      return 0;
+    }
+    
+    # Exceptions
+    {
+      {
+        my $x_ndarray = FCOP->c([Math->complexf(1f, -1f), Math->complexf(2f, -2f)], [1, 2]);
+        
+        eval { FCOP->cos(undef); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+    }
+    
+    $@ = undef;
+    
+    return 1;
+  }
+
+  static method tan : int () {
+    
+    my $x_ndarray = FCOP->c([Math->complexf(1f, -1f), Math->complexf(-2, 2)], [1, 2]);
+    
+    my $ret_ndarray = FCOP->tan($x_ndarray);
+    
+    unless ($ret_ndarray is_type R::NDArray::FloatComplex) {
+      return 0;
+    }
+    
+    unless (&equals_float_complex($ret_ndarray->data, [Math->ctanf($x_ndarray->data->[0]), Math->ctanf($x_ndarray->data->[1])])) {
+      return 0;
+    }
+    
+    unless (Array->equals_int($ret_ndarray->dim, [1, 2])) {
+      return 0;
+    }
+    
+    # Exceptions
+    {
+      {
+        my $x_ndarray = FCOP->c([Math->complexf(1f, -1f), Math->complexf(2f, -2f)], [1, 2]);
+        
+        eval { FCOP->tan(undef); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+    }
+    
+    $@ = undef;
+    
+    return 1;
+  }
+  
+  static method sinh : int () {
+    
+    my $x_ndarray = FCOP->c([Math->complexf(1f, -1f), Math->complexf(-2, 2)], [1, 2]);
+    
+    my $ret_ndarray = FCOP->sinh($x_ndarray);
+    
+    unless ($ret_ndarray is_type R::NDArray::FloatComplex) {
+      return 0;
+    }
+    
+    unless (&equals_float_complex($ret_ndarray->data, [Math->csinhf($x_ndarray->data->[0]), Math->csinhf($x_ndarray->data->[1])])) {
+      return 0;
+    }
+    
+    unless (Array->equals_int($ret_ndarray->dim, [1, 2])) {
+      return 0;
+    }
+    
+    # Exceptions
+    {
+      {
+        my $x_ndarray = FCOP->c([Math->complexf(1f, -1f), Math->complexf(2f, -2f)], [1, 2]);
+        
+        eval { FCOP->sinh(undef); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+    }
+    
+    $@ = undef;
+    
+    return 1;
+  }
+
+  static method cosh : int () {
+    
+    my $x_ndarray = FCOP->c([Math->complexf(1f, -1f), Math->complexf(-2, 2)], [1, 2]);
+    
+    my $ret_ndarray = FCOP->cosh($x_ndarray);
+    
+    unless ($ret_ndarray is_type R::NDArray::FloatComplex) {
+      return 0;
+    }
+    
+    unless (&equals_float_complex($ret_ndarray->data, [Math->ccoshf($x_ndarray->data->[0]), Math->ccoshf($x_ndarray->data->[1])])) {
+      return 0;
+    }
+    
+    unless (Array->equals_int($ret_ndarray->dim, [1, 2])) {
+      return 0;
+    }
+    
+    # Exceptions
+    {
+      {
+        my $x_ndarray = FCOP->c([Math->complexf(1f, -1f), Math->complexf(2f, -2f)], [1, 2]);
+        
+        eval { FCOP->cosh(undef); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+    }
+    
+    $@ = undef;
+    
+    return 1;
+  }
+
+  static method tanh : int () {
+    
+    my $x_ndarray = FCOP->c([Math->complexf(1f, -1f), Math->complexf(-2, 2)], [1, 2]);
+    
+    my $ret_ndarray = FCOP->tanh($x_ndarray);
+    
+    unless ($ret_ndarray is_type R::NDArray::FloatComplex) {
+      return 0;
+    }
+    
+    unless (&equals_float_complex($ret_ndarray->data, [Math->ctanhf($x_ndarray->data->[0]), Math->ctanhf($x_ndarray->data->[1])])) {
+      return 0;
+    }
+    
+    unless (Array->equals_int($ret_ndarray->dim, [1, 2])) {
+      return 0;
+    }
+    
+    # Exceptions
+    {
+      {
+        my $x_ndarray = FCOP->c([Math->complexf(1f, -1f), Math->complexf(2f, -2f)], [1, 2]);
+        
+        eval { FCOP->tanh(undef); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+    }
+    
+    $@ = undef;
+    
+    return 1;
+  }
+
+  static method acos : int () {
+    
+    my $x_ndarray = FCOP->c([Math->complexf(1f, -1f), Math->complexf(-1, 1)], [1, 2]);
+    
+    my $ret_ndarray = FCOP->acos($x_ndarray);
+    
+    unless ($ret_ndarray is_type R::NDArray::FloatComplex) {
+      return 0;
+    }
+    
+    unless (&equals_float_complex($ret_ndarray->data, [Math->cacosf($x_ndarray->data->[0]), Math->cacosf($x_ndarray->data->[1])])) {
+      return 0;
+    }
+    
+    unless (Array->equals_int($ret_ndarray->dim, [1, 2])) {
+      return 0;
+    }
+    
+    # Exceptions
+    {
+      {
+        my $x_ndarray = FCOP->c([Math->complexf(1f, -1f), Math->complexf(2f, -2f)], [1, 2]);
+        
+        eval { FCOP->acos(undef); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+    }
+    
+    $@ = undef;
+    
+    return 1;
+  }
+  
+  static method asin : int () {
+    
+    my $x_ndarray = FCOP->c([Math->complexf(1f, -1f), Math->complexf(-1, 1)], [1, 2]);
+    
+    my $ret_ndarray = FCOP->asin($x_ndarray);
+    
+    unless ($ret_ndarray is_type R::NDArray::FloatComplex) {
+      return 0;
+    }
+    
+    unless (&equals_float_complex($ret_ndarray->data, [Math->casinf($x_ndarray->data->[0]), Math->casinf($x_ndarray->data->[1])])) {
+      return 0;
+    }
+    
+    unless (Array->equals_int($ret_ndarray->dim, [1, 2])) {
+      return 0;
+    }
+    
+    # Exceptions
+    {
+      {
+        my $x_ndarray = FCOP->c([Math->complexf(1f, -1f), Math->complexf(2f, -2f)], [1, 2]);
+        
+        eval { FCOP->asin(undef); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+    }
+    
+    $@ = undef;
+    
+    return 1;
+  }
+  
+  static method atan : int () {
+    
+    my $x_ndarray = FCOP->c([Math->complexf(1f, -1f), Math->complexf(-1, 1)], [1, 2]);
+    
+    my $ret_ndarray = FCOP->atan($x_ndarray);
+    
+    unless ($ret_ndarray is_type R::NDArray::FloatComplex) {
+      return 0;
+    }
+    
+    unless (&equals_float_complex($ret_ndarray->data, [Math->catanf($x_ndarray->data->[0]), Math->catanf($x_ndarray->data->[1])])) {
+      return 0;
+    }
+    
+    unless (Array->equals_int($ret_ndarray->dim, [1, 2])) {
+      return 0;
+    }
+    
+    # Exceptions
+    {
+      {
+        my $x_ndarray = FCOP->c([Math->complexf(1f, -1f), Math->complexf(2f, -2f)], [1, 2]);
+        
+        eval { FCOP->atan(undef); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+    }
+    
+    $@ = undef;
+    
+    return 1;
+  }
+  
+  static method asinh : int () {
+    
+    my $x_ndarray = FCOP->c([Math->complexf(1f, -1f), Math->complexf(-1, 1)], [1, 2]);
+    
+    my $ret_ndarray = FCOP->asinh($x_ndarray);
+    
+    unless ($ret_ndarray is_type R::NDArray::FloatComplex) {
+      return 0;
+    }
+    
+    unless (&equals_float_complex($ret_ndarray->data, [Math->casinhf($x_ndarray->data->[0]), Math->casinhf($x_ndarray->data->[1])])) {
+      return 0;
+    }
+    
+    unless (Array->equals_int($ret_ndarray->dim, [1, 2])) {
+      return 0;
+    }
+    
+    # Exceptions
+    {
+      {
+        my $x_ndarray = FCOP->c([Math->complexf(1f, -1f), Math->complexf(2f, -2f)], [1, 2]);
+        
+        eval { FCOP->asinh(undef); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+    }
+    
+    $@ = undef;
+    
+    return 1;
+  }
+  
+  static method acosh : int () {
+    
+    my $x_ndarray = FCOP->c([Math->complexf(1f, -1f), Math->complexf(2f, -2f)], [1, 2]);
+    
+    my $ret_ndarray = FCOP->acosh($x_ndarray);
+    
+    unless ($ret_ndarray is_type R::NDArray::FloatComplex) {
+      return 0;
+    }
+    
+    unless (&equals_float_complex($ret_ndarray->data, [Math->cacoshf($x_ndarray->data->[0]), Math->cacoshf($x_ndarray->data->[1])])) {
+      return 0;
+    }
+    
+    unless (Array->equals_int($ret_ndarray->dim, [1, 2])) {
+      return 0;
+    }
+    
+    # Exceptions
+    {
+      {
+        my $x_ndarray = FCOP->c([Math->complexf(1f, -1f), Math->complexf(2f, -2f)], [1, 2]);
+        
+        eval { FCOP->acosh(undef); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+    }
+    
+    $@ = undef;
+    
+    return 1;
+  }
+  
+  static method atanh : int () {
+    
+    my $x_ndarray = FCOP->c([Math->complexf(1f, -1f), Math->complexf(-1, 1)], [1, 2]);
+    
+    my $ret_ndarray = FCOP->atanh($x_ndarray);
+    
+    unless ($ret_ndarray is_type R::NDArray::FloatComplex) {
+      return 0;
+    }
+    
+    unless (&equals_float_complex($ret_ndarray->data, [Math->catanhf($x_ndarray->data->[0]), Math->catanhf($x_ndarray->data->[1])])) {
+      return 0;
+    }
+    
+    unless (Array->equals_int($ret_ndarray->dim, [1, 2])) {
+      return 0;
+    }
+    
+    # Exceptions
+    {
+      {
+        my $x_ndarray = FCOP->c([Math->complexf(1f, -1f), Math->complexf(2f, -2f)], [1, 2]);
+        
+        eval { FCOP->atanh(undef); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+    }
+    
+    $@ = undef;
+    
+    return 1;
+  }
+
+  static method exp : int () {
+    
+    my $x_ndarray = FCOP->c([Math->complexf(1f, -1f), Math->complexf(-1, 1)], [1, 2]);
+    
+    my $ret_ndarray = FCOP->exp($x_ndarray);
+    
+    unless ($ret_ndarray is_type R::NDArray::FloatComplex) {
+      return 0;
+    }
+    
+    unless (&equals_float_complex($ret_ndarray->data, [Math->cexpf($x_ndarray->data->[0]), Math->cexpf($x_ndarray->data->[1])])) {
+      return 0;
+    }
+    
+    unless (Array->equals_int($ret_ndarray->dim, [1, 2])) {
+      return 0;
+    }
+    
+    # Exceptions
+    {
+      {
+        my $x_ndarray = FCOP->c([Math->complexf(1f, -1f), Math->complexf(2f, -2f)], [1, 2]);
+        
+        eval { FCOP->exp(undef); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+    }
+    
+    $@ = undef;
+    
+    return 1;
+  }
+  
+  static method log : int () {
+    
+    my $x_ndarray = FCOP->c([Math->complexf(1f, -1f), Math->complexf(2f, -2f)], [1, 2]);
+    
+    my $ret_ndarray = FCOP->log($x_ndarray);
+    
+    unless ($ret_ndarray is_type R::NDArray::FloatComplex) {
+      return 0;
+    }
+    
+    unless (&equals_float_complex($ret_ndarray->data, [Math->clogf($x_ndarray->data->[0]), Math->clogf($x_ndarray->data->[1])])) {
+      return 0;
+    }
+    
+    unless (Array->equals_int($ret_ndarray->dim, [1, 2])) {
+      return 0;
+    }
+    
+    # Exceptions
+    {
+      {
+        my $x_ndarray = FCOP->c([Math->complexf(1f, -1f), Math->complexf(2f, -2f)], [1, 2]);
+        
+        eval { FCOP->log(undef); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+    }
+    
+    $@ = undef;
+    
+    return 1;
+  }
+  
+  static method sqrt : int () {
+    
+    my $x_ndarray = FCOP->c([Math->complexf(1f, -1f), Math->complexf(2f, -2f)], [1, 2]);
+    
+    my $ret_ndarray = FCOP->sqrt($x_ndarray);
+    
+    unless ($ret_ndarray is_type R::NDArray::FloatComplex) {
+      return 0;
+    }
+    
+    unless (&equals_float_complex($ret_ndarray->data, [Math->csqrtf($x_ndarray->data->[0]), Math->csqrtf($x_ndarray->data->[1])])) {
+      return 0;
+    }
+    
+    unless (Array->equals_int($ret_ndarray->dim, [1, 2])) {
+      return 0;
+    }
+    
+    # Exceptions
+    {
+      {
+        my $x_ndarray = FCOP->c([Math->complexf(1f, -1f), Math->complexf(2f, -2f)], [1, 2]);
+        
+        eval { FCOP->sqrt(undef); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+    }
+    
+    $@ = undef;
+    
+    return 1;
+  }
+  
+  static method pow : int () {
+    
+    my $x_ndarray = FCOP->c([Math->complexf(1f, -1f), Math->complexf(0.5f, -0.5f)], [1, 2]);
+    
+    my $y_ndarray = FCOP->c([Math->complexf(0.5f, -0.5f), Math->complexf(0.25f, -0.25f)], [1, 2]);
+    
+    my $ret_ndarray = FCOP->pow($x_ndarray, $y_ndarray);
+    
+    unless ($ret_ndarray is_type R::NDArray::FloatComplex) {
+      return 0;
+    }
+    
+    unless (&equals_float_complex($ret_ndarray->data, [Math->cpowf($x_ndarray->data->[0], $x_ndarray->data->[1]), Math->cpowf($y_ndarray->data->[0], $y_ndarray->data->[1])])) {
+      return 0;
+    }
+    
+    unless (Array->equals_int($ret_ndarray->dim, [1, 2])) {
+      return 0;
+    }
+    
+    # Exceptions
+    {
+      {
+        my $x_ndarray = FCOP->c([Math->complexf(1f, -1f), Math->complexf(2f, -2f)], [1, 2]);
+        
+        my $y_ndarray = FCOP->c([Math->complexf(3f, -3f), Math->complexf(4f, -4f)], [1, 2]);
+        
+        eval { FCOP->pow(undef, $y_ndarray); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+      {
+        my $x_ndarray = FCOP->c([Math->complexf(1f, -1f), Math->complexf(2f, -2f)], [1, 2]);
+        
+        my $y_ndarray = FCOP->c([Math->complexf(3f, -3f), Math->complexf(4f, -4f)], [1, 2]);
+        
+        eval { FCOP->pow($x_ndarray, undef); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+      {
+        my $x_ndarray = FCOP->c([Math->complexf(1f, -1f), Math->complexf(2f, -2f)], [1, 2]);
+        
+        my $y_ndarray = FCOP->c([Math->complexf(3f, -3f), Math->complexf(4f, -4f)], [2, 1]);
+        
+        eval { FCOP->pow($x_ndarray, $y_ndarray); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+    }
+    
+    $@ = undef;
+    
+    return 1;
+  }
+  
+  static method sum : int () {
+    
+    my $x_ndarray = FCOP->c([Math->complexf(1f, -1f), Math->complexf(2f, -2f)], [1, 2]);
+    
+    my $ret_ndarray = FCOP->sum($x_ndarray);
+    
+    unless ($ret_ndarray is_type R::NDArray::FloatComplex) {
+      return 0;
+    }
+    
+    unless (&equals_float_complex($ret_ndarray->data, [Math->complexf(3f, -3f)])) {
+      return 0;
+    }
+    
+    unless (Array->equals_int($ret_ndarray->dim, [1])) {
+      return 0;
+    }
+    
+    # Exceptions
+    {
+      {
+        my $x_ndarray = FCOP->c([Math->complexf(1f, -1f), Math->complexf(2f, -2f)], [1, 2]);
+        
+        eval { FCOP->sum(undef); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+    }
+    
+    $@ = undef;
+    
+    return 1;
+  }
+  
+  static method cumsum : int () {
+    
+    my $x_ndarray = FCOP->c([Math->complexf(1f, -1f), Math->complexf(2f, -2f)], [2]);
+    
+    my $ret_ndarray = FCOP->cumsum($x_ndarray);
+    
+    unless ($ret_ndarray is_type R::NDArray::FloatComplex) {
+      return 0;
+    }
+    
+    unless (&equals_float_complex($ret_ndarray->data, [Math->complexf(1f, -1f), Math->complexf(3f, -3f)])) {
+      return 0;
+    }
+    
+    
+    unless (Array->equals_int($ret_ndarray->dim, [2])) {
+      return 0;
+    }
+    
+    # Exceptions
+    {
+      {
+        my $x_ndarray = FCOP->c([Math->complexf(1f, -1f), Math->complexf(2f, -2f)], [1, 2]);
+        
+        eval { FCOP->cumsum(undef); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+      {
+        my $x_ndarray = FCOP->c([Math->complexf(1f, -1f), Math->complexf(2f, -2f)], [1, 2]);
+        
+        eval { FCOP->cumsum($x_ndarray); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+    }
+    
+    $@ = undef;
+    
+    return 1;
+  }
+  
+  static method prod : int () {
+    
+    my $x_ndarray = FCOP->c([Math->complexf(2f, -2f), Math->complexf(3f, -3f)], [1, 2]);
+    
+    my $ret_ndarray = FCOP->prod($x_ndarray);
+    
+    unless ($ret_ndarray is_type R::NDArray::FloatComplex) {
+      return 0;
+    }
+    
+    unless (&equals_float_complex($ret_ndarray->data, [Math->cmulf(Math->complexf(2f, -2f), Math->complexf(3f, -3f))])) {
+      return 0;
+    }
+    
+    unless (Array->equals_int($ret_ndarray->dim, [1])) {
+      return 0;
+    }
+    
+    # Exceptions
+    {
+      {
+        my $x_ndarray = FCOP->c([Math->complexf(1f, -1f), Math->complexf(2f, -2f)], [1, 2]);
+        
+        eval { FCOP->prod(undef); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+    }
+    
+    $@ = undef;
+    
+    return 1;
+  }
+  
+  static method cumprod : int () {
+    
+    my $x_ndarray = FCOP->c([Math->complexf(2f, -2f), Math->complexf(3f, -3f)], [2]);
+    
+    my $ret_ndarray = FCOP->cumprod($x_ndarray);
+    
+    unless ($ret_ndarray is_type R::NDArray::FloatComplex) {
+      return 0;
+    }
+    
+    unless (&equals_float_complex($ret_ndarray->data, [Math->complexf(2f, -2f), Math->cmulf(Math->complexf(2f, -2f), Math->complexf(3f, -3f))])) {
+      return 0;
+    }
+    
+    unless (Array->equals_int($ret_ndarray->dim, [2])) {
+      return 0;
+    }
+    
+    # Exceptions
+    {
+      {
+        my $x_ndarray = FCOP->c([Math->complexf(1f, -1f), Math->complexf(2f, -2f)], [1, 2]);
+        
+        eval { FCOP->cumprod(undef); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+      {
+        my $x_ndarray = FCOP->c([Math->complexf(1f, -1f), Math->complexf(2f, -2f)], [1, 2]);
+        
+        eval { FCOP->cumprod($x_ndarray); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+    }
+    
+    $@ = undef;
+    
+    return 1;
+  }
+  
+  static method diff : int () {
+    
+    my $x_ndarray = FCOP->c([Math->complexf(2f, -2f), Math->complexf(3f, -3f), Math->complexf(6, -6)], [3]);
+    
+    my $ret_ndarray = FCOP->diff($x_ndarray);
+    
+    unless ($ret_ndarray is_type R::NDArray::FloatComplex) {
+      return 0;
+    }
+    
+    unless (&equals_float_complex($ret_ndarray->data, [Math->complexf(1f, -1f), Math->complexf(3f, -3f)])) {
+      return 0;
+    }
+    
+    unless (Array->equals_int($ret_ndarray->dim, [2])) {
+      return 0;
+    }
+    
+    # Exceptions
+    {
+      {
+        my $x_ndarray = FCOP->c([Math->complexf(1f, -1f), Math->complexf(2f, -2f)], [1, 2]);
+        
+        eval { FCOP->diff(undef); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+      {
+        my $x_ndarray = FCOP->c([Math->complexf(1f, -1f), Math->complexf(2f, -2f)], [1, 2]);
+        
+        eval { FCOP->diff($x_ndarray); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+    }
+    
+    $@ = undef;
+    
+    return 1;
+  }
+  
+  static method mean : int () {
+    
+    my $x_ndarray = FCOP->c([Math->complexf(-2, 2), Math->complexf(-1, 1), Math->complexf(0, 0), Math->complexf(1f, -1f), Math->complexf(2f, -2f)]);
+    
+    my $ret_ndarray = FCOP->mean($x_ndarray);
+    
+    unless ($ret_ndarray is_type R::NDArray::FloatComplex) {
+      return 0;
+    }
+    
+    unless (&equals_float_complex($ret_ndarray->data, [Math->complexf(0, 0)])) {
+      return 0;
+    }
+    
+    unless (Array->equals_int($ret_ndarray->dim, [1])) {
+      return 0;
+    }
+    
+    # Exceptions
+    {
+      {
+        my $x_ndarray = FCOP->c([Math->complexf(1f, -1f), Math->complexf(2f, -2f)], [1, 2]);
+        
+        eval { FCOP->mean(undef); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+    }
+    
+    $@ = undef;
+    
+    return 1;
+  }
+  
+  static method dot : int () {
+    
+    my $x_ndarray = FCOP->c([Math->complexf(1f, -1f), Math->complexf(2f, -2f)]);
+    
+    my $y_ndarray = FCOP->c([Math->complexf(3f, -3f), Math->complexf(4f, -4f)]);
+    
+    my $ret_ndarray = FCOP->dot($x_ndarray, $y_ndarray);
+    
+    unless ($ret_ndarray is_type R::NDArray::FloatComplex) {
+      return 0;
+    }
+    
+    unless (&equals_float_complex($ret_ndarray->data, [Math->complexf(22, 0)])) {
+      return 0;
+    }
+    
+    unless (Array->equals_int($ret_ndarray->dim, [1])) {
+      return 0;
+    }
+    
+    # Exceptions
+    {
+      {
+        my $x_ndarray = FCOP->c([Math->complexf(1f, -1f), Math->complexf(2f, -2f)]);
+        
+        my $y_ndarray = FCOP->c([Math->complexf(3f, -3f), Math->complexf(4f, -4f)]);
+        
+        eval { FCOP->dot(undef, $y_ndarray); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+      {
+        my $x_ndarray = FCOP->c([Math->complexf(1f, -1f), Math->complexf(2f, -2f)]);
+        
+        my $y_ndarray = FCOP->c([Math->complexf(3f, -3f), Math->complexf(4f, -4f)]);
+        
+        eval { FCOP->dot($x_ndarray, undef); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+      {
+        my $x_ndarray = FCOP->c([Math->complexf(1f, -1f), Math->complexf(2f, -2f)], [1, 2]);
+        
+        my $y_ndarray = FCOP->c([Math->complexf(3f, -3f), Math->complexf(4f, -4f)]);
+        
+        eval { FCOP->dot($x_ndarray, $y_ndarray); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+      {
+        my $x_ndarray = FCOP->c([Math->complexf(1f, -1f), Math->complexf(2f, -2f)]);
+        
+        my $y_ndarray = FCOP->c([Math->complexf(3f, -3f), Math->complexf(4f, -4f)], [1, 2]);
+        
+        eval { FCOP->dot($x_ndarray, $y_ndarray); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+      {
+        my $x_ndarray = FCOP->c([Math->complexf(1f, -1f), Math->complexf(2f, -2f)]);
+        
+        my $y_ndarray = FCOP->c([Math->complexf(3f, -3f), Math->complexf(4f, -4f), Math->complexf(5, -5)]);
+        
+        eval { FCOP->dot($x_ndarray, $y_ndarray); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+    }
+    
+    $@ = undef;
+    
+    return 1;
+  }
+  
+  static method outer : int () {
+    
+    my $x_ndarray = FCOP->c([Math->complexf(1f, -1f), Math->complexf(2f, -2f)]);
+    
+    my $y_ndarray = FCOP->c([Math->complexf(3f, -3f), Math->complexf(4f, -4f), Math->complexf(5, -5)]);
+    
+    my $ret_ndarray = FCOP->outer($x_ndarray, $y_ndarray);
+    
+    unless ($ret_ndarray is_type R::NDArray::FloatComplex) {
+      return 0;
+    }
+    
+    unless (&equals_float_complex($ret_ndarray->data, [Math->complexf(0, -6), Math->complexf(0, -12),Math->complexf(0, -8),Math->complexf(0, -16),Math->complexf(0, -10),Math->complexf(0, -20)])) {
+      return 0;
+    }
+    
+    unless (Array->equals_int($ret_ndarray->dim, [2, 3])) {
+      return 0;
+    }
+    
+    # Exceptions
+    {
+      {
+        my $x_ndarray = FCOP->c([Math->complexf(1f, -1f), Math->complexf(2f, -2f)]);
+        
+        my $y_ndarray = FCOP->c([Math->complexf(3f, -3f), Math->complexf(4f, -4f)]);
+        
+        eval { FCOP->outer(undef, $y_ndarray); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+      {
+        my $x_ndarray = FCOP->c([Math->complexf(1f, -1f), Math->complexf(2f, -2f)]);
+        
+        my $y_ndarray = FCOP->c([Math->complexf(3f, -3f), Math->complexf(4f, -4f)]);
+        
+        eval { FCOP->outer($x_ndarray, undef); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+      {
+        my $x_ndarray = FCOP->c([Math->complexf(1f, -1f), Math->complexf(2f, -2f)], [1, 2]);
+        
+        my $y_ndarray = FCOP->c([Math->complexf(3f, -3f), Math->complexf(4f, -4f)]);
+        
+        eval { FCOP->outer($x_ndarray, $y_ndarray); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+      {
+        my $x_ndarray = FCOP->c([Math->complexf(1f, -1f), Math->complexf(2f, -2f)]);
+        
+        my $y_ndarray = FCOP->c([Math->complexf(3f, -3f), Math->complexf(4f, -4f)], [1, 2]);
+        
+        eval { FCOP->outer($x_ndarray, $y_ndarray); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+    }
+    
+    $@ = undef;
+    
+    return 1;
+  }
+
+  static method pi : int () {
+    
+    my $ret_ndarray = FCOP->pi;
+    
+    unless ($ret_ndarray is_type R::NDArray::FloatComplex) {
+      return 0;
+    }
+    
+    unless (&equals_float_complex($ret_ndarray->data, [Math->complexf((float)Math->PI, 0)])) {
+      return 0;
+    }
+    
+    unless (Array->equals_int($ret_ndarray->dim, [1])) {
+      return 0;
+    }
+    
+    $@ = undef;
+    
+    return 1;
+  }
+  
+  static method equals_float_complex : int ($x1_array : Complex_2f[], $x2_array : Complex_2f[]) {
+    
+    unless ($x1_array) {
+      die "The array \$x1_array must be defined.";
+    }
+    
+    unless ($x2_array) {
+      die "The array \$x2_array must be defined.";
+    }
+    
+    my $x1_array_length = @$x1_array;
+    
+    my $x2_array_length = @$x2_array;
+    
+    my $equals = 0;
+    
+    if ($x1_array_length == $x2_array_length) {
+      my $array_length = $x1_array_length;
+      
+      my $not_equals_elem = 0;
+      for (my $i = 0; $i < $array_length; $i++) {
+        unless ($x1_array->[$i]{re} == $x2_array->[$i]{re} && $x1_array->[$i]{im} == $x2_array->[$i]{im}) {
+          $not_equals_elem = 1;
+          last;
+        }
+      }
+      
+      unless ($not_equals_elem) {
+        $equals = 1;
+      }
+    }
+    
+    return $equals;
+  }
+
+}

@@ -1,5 +1,10 @@
 Revision history for String-Tagged
 
+0.24    2024-07-23
+        [BUGFIXES]
+         * Workaround for Perl 5.32.1's buggy `isa` operator that breaks the
+           isa cache
+
 0.23    2023-10-13
         [CHANGES]
          * Don't extend edge-anchored tags when appending a `String::Tagged`

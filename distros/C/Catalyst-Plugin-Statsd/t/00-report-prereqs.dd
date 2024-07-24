@@ -32,8 +32,9 @@ do { my $x = {
                                       'POSIX' => '0',
                                       'Plack::Middleware::Statsd' => 'v0.6.0',
                                       'Ref::Util' => '0',
+                                      'experimental' => '0',
                                       'namespace::autoclean' => '0',
-                                      'perl' => 'v5.14.0'
+                                      'perl' => 'v5.20.0'
                                     }
                     },
        'test' => {

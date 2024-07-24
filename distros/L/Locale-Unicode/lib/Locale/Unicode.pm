@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Unicode Locale Identifier - ~/lib/Locale/Unicode.pm
-## Version v0.1.9
+## Version v0.1.10
 ## Copyright(c) 2024 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2024/05/11
-## Modified 2024/07/08
+## Modified 2024/07/24
 ## All rights reserved
 ## 
 ## 
@@ -14,6 +14,7 @@
 package Locale::Unicode;
 BEGIN
 {
+    use v5.10;
     use strict;
     use warnings;
     use warnings::register;
@@ -307,7 +308,7 @@ BEGIN
     our $PROP_TO_SUB = {};
     # False, by default
     our $EXPLICIT_BOOLEAN = 0;
-    our $VERSION = 'v0.1.9';
+    our $VERSION = 'v0.1.10';
 };
 
 use strict;
@@ -472,7 +473,7 @@ sub as_string
     sd  => 'subdivision',
     ss  => 'sentence_break',
     tz  => 'time_zone',
-    va  => 'variant',
+    va  => 'va',
     };
     my $collation =
     {
@@ -1241,7 +1242,7 @@ sub tz_name2id
 sub unit { return( shift->reset(@_)->_set_get_prop( 'unit', @_ ) ); }
 
 # u-va
-sub va { return( shift->variant( @_ ) ); }
+sub va { return( shift->reset(@_)->_set_get_prop( 'va', @_ ) ); }
 
 # u-va
 sub variant { return( shift->reset(@_)->_set_get_prop( 'variant', @_ ) ); }
@@ -3417,7 +3418,7 @@ In Scalar or in list context, the value returned is the last value set.
 
 =head1 VERSION
 
-    v0.1.9
+    v0.1.10
 
 =head1 DESCRIPTION
 
@@ -3752,10 +3753,12 @@ See L</"Collation Options"> for more information.
 
     my $locale = Locale::Unicode->new( 'ja-Kana-JP-t-de-AT-t0-und-u-ca-japanese-tz-jptyo' );
     say $locale->core; # ja-Kana-JP
+    my $locale = Locale::Unicode->new( 'es-001-valencia-t-und-latn-m0-ungegn-2007' );
+    say $locale->core; # es-001-valencia
 
 This is a read-only method.
 
-It returns the core part of the C<locale>, which is composed of a 2 to 3-characters code, some optional C<script> and C<country> or C<region> code.
+It returns the core part of the C<locale>, which is composed of a 2 to 3-characters code, some optional C<script> and C<country> or C<region> code, and some option C<variant> ID.
 
 =head2 country_code
 

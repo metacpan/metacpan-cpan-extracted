@@ -14,21 +14,21 @@ my $calls = 0;
 
 OPEN: {
 	diag('Ignore redefine messages');
-	my $c = 999;
 	if(my $fin = new_ok('File::Open::NoCache::ReadOnly' => [
 		filename => 'lib/File/Open/NoCache/ReadOnly.pm'
 	])) {
 		my $fd = $fin->fd();
 		ok(<$fd> =~ /^package File::Open::NoCache::ReadOnly;/);
-		$c = $calls;
+		my $c = $calls;
 		$fin->close();
 		ok($calls == $c + 1);	# Check flush was called
+		diag('Ignore message about attempt to close twice');
 		$fin->close();
 		ok($calls == $c + 1);	# Close, nothing to flush
 
-		ok(!($fin = defined(File::Open::NoCache::ReadOnly->new('/asdasd.not.notthere'))));
+		ok(!($fin = defined(File::Open::NoCache::ReadOnly->new('/asdasd.not.there'))));
 		ok(defined($fin = new_ok('File::Open::NoCache::ReadOnly' => [
-			filename => 'lib/File/Open/NoCache/ReadOnly.pm'
+			{ filename => 'lib/File/Open/NoCache/ReadOnly.pm' }
 		])));
 		# $c = $calls;
 	}

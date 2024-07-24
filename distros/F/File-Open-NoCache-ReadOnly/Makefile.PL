@@ -2,6 +2,9 @@ use strict;
 use warnings;
 use ExtUtils::MakeMaker 6.64;	# 6.64 for TEST_REQUIRES
 
+# yum install libaio-devel
+# apk install libaio-dev
+
 WriteMakefile(
 	NAME		=> 'File::Open::NoCache::ReadOnly',
 	AUTHOR		=> q{Nigel Horne <njh@bandsman.co.uk>},
@@ -17,13 +20,14 @@ WriteMakefile(
 		'IPC::System::Simple' => 0,
 		'Test::Exception' => 0.42,
 		'Test::Most' => 0,
+		'Test::Needs' => 0,
 		'Test::NoWarnings' => 0,
 		'Test::Script' => 1.12,
-		'Test::CleanNamespaces' => 0,
+		'Test::Carp' => 0,
+		# 'Test::CleanNamespaces' => 0,
 		# 'Test::Kwalitee' => 0,
 		'Test::Warn' => 0,
-	},
-	PREREQ_PM => {
+	}, PREREQ_PM => {
 		'Carp' => 0,
 		'IO::AIO' => 0,
 	},
@@ -47,7 +51,6 @@ WriteMakefile(
 				web => 'https://github.com/nigelhorne/File-Open-NoCache-ReadOnly/issues',
 				url => 'https://github.com/nigelhorne/File-Open-NoCache-ReadOnly/issues',
 			}
-		
 		},
 	},
 	MIN_PERL_VERSION	=> '5.6.2'	# Probably would work, but never tested on earlier versions than this

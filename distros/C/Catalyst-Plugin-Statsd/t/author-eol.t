@@ -30,6 +30,7 @@ my @files = (
     't/author-pod-linkcheck.t',
     't/author-pod-syntax.t',
     't/author-portability.t',
+    't/etc/perlcritic.rc',
     't/lib/MockStatsd.pm',
     't/lib/StatsApp.pm',
     't/lib/StatsApp/Controller/Root.pm',

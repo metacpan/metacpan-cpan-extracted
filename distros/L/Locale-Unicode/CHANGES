@@ -1,5 +1,8 @@
 Revision history for Perl module Locale::Unicode
 
+v0.1.10 2024-07-24T10:48:42+0900
+    - Corrected a bug mixing t-va with the variant subtag
+
 v0.1.9 2024-07-08T22:03:30+0900
     - Added the method 'territory'
     - Added a sanity check to ensure proper locale is provided upon object instantiation.

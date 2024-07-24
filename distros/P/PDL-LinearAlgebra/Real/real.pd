@@ -2317,7 +2317,7 @@ pp_def("ggesx",
 		// querying the workspace. See release notes of Lapack
 		// for this feature.
 
-		minwrk = ($SIZE(n) + 1 << 3) + 16;
+		minwrk = (($SIZE(n) + 1) << 3) + 16;
 		maxwrk = ($SIZE(n) + 1) * 7 + $SIZE(n) * (integer)FORTRAN(ilaenv)(&c__1, "DGEQRF", " ", &(integer){$SIZE(n)}, &c__1,
 		&(integer){$SIZE(n)}, &c__0, (ftnlen)6, (ftnlen)1) + 16;
 

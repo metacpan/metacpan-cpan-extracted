@@ -34,10 +34,10 @@ unless (can_use('PDF::API2') or can_use('pdflib_pl')) {
     }
 }
 
-unless (can_use('HTML::Tidy') or can_use('XML::Clean')) {
-    requires 'HTML::Tidy';
+unless (can_use('HTML::Tidy5') or can_use('XML::Clean')) {
+    requires 'HTML::Tidy5';
     print << '.';
-*** If you cannot install HTML::Tidy, you may use the XML::Clean
+*** If you cannot install HTML::Tidy5, you may use the XML::Clean
     module instead; however, you will run probably run into more
     "XML not well-formed" errors that way.
 .

@@ -11,6 +11,7 @@ my @pkgs = qw(lapack blas);
 our $libs0 = (
   eval {require PkgConfig; join ' ', map PkgConfig->find($_)->get_ldflags, @pkgs} ||
   eval {require ExtUtils::PkgConfig; join ' ', map ExtUtils::PkgConfig->libs($_), @pkgs} ||
+  find_macos_libs() ||
   find_libs() ||
   `pkg-config @pkgs --libs` ||
   '-L/usr/lib/atlas -llapack -lblas -latlas'
@@ -63,12 +64,12 @@ WriteMakefile(
     x_IRC => 'irc://irc.perl.org/#pdl',
   },
   CONFIGURE_REQUIRES =>  {
-    "PDL" => '2.078',
+    "PDL" => '2.083',
     "Devel::CheckLib" => 0,
     "ExtUtils::F77" => '1.26',
   },
   PREREQ_PM => {
-    "PDL" => '2.078', # PDL::Complex method aliases
+    "PDL" => '2.083', # ArgOrder, used by tricpy
   },
   TEST_REQUIRES =>  {
     "Test::More" => '0.88', # done_testing
@@ -80,7 +81,6 @@ WriteMakefile(
 
 sub find_libs {
   return if $^O !~ /linux/i;
-
   # in performance order based on libraries I've used
   # for xnec2c in Ubuntu, Debian, SuSE, CentOS, etc.
   # See comments here for detail:
@@ -93,12 +93,18 @@ sub find_libs {
     openblas
     openblas_serial
     mkl_rt/;
-
   for my $l (@libs) {
     return "-l$l" if (check_lib(lib => $l));
   }
-
   return;
+}
+
+sub find_macos_libs {
+  return if $^O ne 'darwin';
+  my $pref = `brew --prefix lapack`;
+  return if !$pref;
+  chomp $pref;
+  qq{-L"$pref/lib" -llapack -lblas};
 }
 
 sub MY::postamble {
