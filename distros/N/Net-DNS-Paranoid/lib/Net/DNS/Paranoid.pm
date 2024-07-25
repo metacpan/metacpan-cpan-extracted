@@ -2,7 +2,7 @@ package Net::DNS::Paranoid;
 use strict;
 use warnings;
 use 5.008008;
-our $VERSION = '0.10';
+our $VERSION = '0.11';
 
 use Class::Accessor::Lite (
     rw => [qw(timeout blocked_hosts whitelisted_hosts resolver)]

@@ -8,7 +8,7 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.030, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Zilla version 6.032, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -17,6 +17,7 @@ name: Bitcoin-Crypto
 requires:
   Bitcoin::BIP39: '0.002'
   CryptX: '0.074'
+  List::Util: '1.33'
   Math::BigInt: '1.999831'
   Moo: '2.003004'
   Mooish::AttributeBuilder: '1.001'
@@ -25,9 +26,9 @@ requires:
   namespace::clean: '0.27'
   perl: '5.010'
 resources:
-  bugtracker: https://github.com/bbrtj/perl-bitcoin-crypto/issues
-  repository: git://github.com/bbrtj/perl-bitcoin-crypto.git
-version: '2.004'
-x_generated_by_perl: v5.38.0
+  bugtracker: https://github.com/Perl-Bitcoin/Bitcoin-Crypto/issues
+  repository: git://github.com/Perl-Bitcoin/Bitcoin-Crypto.git
+version: '2.005'
+x_generated_by_perl: v5.40.0
 x_serialization_backend: 'YAML::Tiny version 1.74'
 x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

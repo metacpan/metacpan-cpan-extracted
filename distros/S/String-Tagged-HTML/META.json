@@ -4,7 +4,7 @@
       "Paul Evans <leonerd@leonerd.org.uk>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.4231",
+   "generated_by" : "Module::Build version 0.4234",
    "license" : [
       "perl_5"
    ],
@@ -34,7 +34,7 @@
    "provides" : {
       "String::Tagged::HTML" : {
          "file" : "lib/String/Tagged/HTML.pm",
-         "version" : "0.02"
+         "version" : "0.03"
       }
    },
    "release_status" : "stable",
@@ -43,6 +43,6 @@
          "http://dev.perl.org/licenses/"
       ]
    },
-   "version" : "0.02",
-   "x_serialization_backend" : "JSON::PP version 4.07"
+   "version" : "0.03",
+   "x_serialization_backend" : "JSON::PP version 4.16"
 }

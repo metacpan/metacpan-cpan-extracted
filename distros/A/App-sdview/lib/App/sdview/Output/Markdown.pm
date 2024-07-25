@@ -8,7 +8,7 @@ use warnings;
 
 use Object::Pad 0.807;
 
-package App::sdview::Output::Markdown 0.15;
+package App::sdview::Output::Markdown 0.16;
 class App::sdview::Output::Markdown :strict(params);
 
 apply App::sdview::Output;
@@ -120,7 +120,7 @@ method _convert_str ( $s )
          monospace => "fixed",
          strikethrough => "strike",
          file => "italic", # There isn't a "filename" format in Markdown
-         link => sub ($t, $v) { return link => $v->{target} },
+         link => sub ($t, $v) { return link => $v->{uri} },
       }
    )->build_markdown;
 }

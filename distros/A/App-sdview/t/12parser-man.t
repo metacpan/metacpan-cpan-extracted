@@ -165,7 +165,7 @@ subtest "Definition lists" => sub {
 First
 The first item
 .TP
-Second
+Second \\fIitem\\fP
 The second item
 .TP
 Third
@@ -188,7 +188,8 @@ EOMAN
    is( $items[0]->text, "The first item", 'items[0] text' );
 
    is( $items[1]->type, "item",  'items[1] type' );
-   is( $items[1]->term, "Second", 'items[1] term' );
+   is( $items[1]->term, "Second item", 'items[1] term' );
+   is( [ $items[1]->term->tagnames ], [qw( italic )], 'items[1] term tags' );
    is( $items[1]->text, "The second item", 'items[1] text' );
 
    is( $items[2]->type, "item",  'items[2] type' );

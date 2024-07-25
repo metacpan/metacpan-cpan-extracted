@@ -37,11 +37,11 @@
    "provides" : {
       "String::Tagged::Terminal" : {
          "file" : "lib/String/Tagged/Terminal.pm",
-         "version" : "0.07"
+         "version" : "0.08"
       },
       "String::Tagged::Terminal::Win32Console" : {
          "file" : "lib/String/Tagged/Terminal/Win32Console.pm",
-         "version" : "0.07"
+         "version" : "0.08"
       }
    },
    "release_status" : "stable",
@@ -50,6 +50,6 @@
          "http://dev.perl.org/licenses/"
       ]
    },
-   "version" : "0.07",
-   "x_serialization_backend" : "JSON::PP version 4.07"
+   "version" : "0.08",
+   "x_serialization_backend" : "JSON::PP version 4.16"
 }

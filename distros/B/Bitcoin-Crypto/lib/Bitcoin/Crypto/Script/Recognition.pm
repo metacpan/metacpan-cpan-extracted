@@ -1,5 +1,5 @@
 package Bitcoin::Crypto::Script::Recognition;
-$Bitcoin::Crypto::Script::Recognition::VERSION = '2.004';
+$Bitcoin::Crypto::Script::Recognition::VERSION = '2.005';
 use v5.10;
 use strict;
 use warnings;
@@ -7,6 +7,7 @@ use warnings;
 use Moo;
 use Mooish::AttributeBuilder -standard;
 use Bitcoin::Crypto::Types qw(InstanceOf);
+use List::Util qw(any);
 use Try::Tiny;
 
 use Bitcoin::Crypto::Script::Opcode;
@@ -121,7 +122,7 @@ sub _check_blueprint
 
 	if (!ref $part) {
 		my $opcode = Bitcoin::Crypto::Script::Opcode->get_opcode_by_name($part);
-		return !!0 unless $opcode->code eq substr $this_script, $pos, 1;
+		return !!0 unless chr($opcode->code) eq substr $this_script, $pos, 1;
 		return $self->_check_blueprint($pos + 1, @more_parts);
 	}
 	else {
@@ -130,7 +131,7 @@ sub _check_blueprint
 		if ($kind eq 'address' || $kind eq 'data') {
 			my $len = ord substr $this_script, $pos, 1;
 
-			return !!0 unless grep { $_ == $len } @vars;
+			return !!0 unless any { $_ == $len } @vars;
 			if ($self->_check_blueprint($pos + $len + 1, @more_parts)) {
 				$self->set_address(substr $this_script, $pos + 1, $len)
 					if $kind eq 'address';
@@ -141,7 +142,7 @@ sub _check_blueprint
 			my $count = 0;
 			while (1) {
 				my $len = ord substr $this_script, $pos, 1;
-				last unless grep { $_ == $len } @vars;
+				last unless any { $_ == $len } @vars;
 
 				$pos += $len + 1;
 				$count += 1;
@@ -149,18 +150,18 @@ sub _check_blueprint
 
 			return !!0 if $count == 0 || $count > 16;
 			my $opcode = Bitcoin::Crypto::Script::Opcode->get_opcode_by_name("OP_$count");
-			return !!0 unless $opcode->code eq substr $this_script, $pos, 1;
+			return !!0 unless chr($opcode->code) eq substr $this_script, $pos, 1;
 			return $self->_check_blueprint($pos, @more_parts);
 		}
 		elsif ($kind eq 'op_n') {
 			my $opcode;
 			try {
-				$opcode = Bitcoin::Crypto::Script::Opcode->get_opcode_by_code(substr $this_script, $pos, 1);
+				$opcode = Bitcoin::Crypto::Script::Opcode->get_opcode_by_code(ord substr $this_script, $pos, 1);
 			};
 
 			return !!0 unless $opcode;
 			return !!0 unless $opcode->name =~ /\AOP_(\d+)\z/;
-			return !!0 unless grep { $_ == $1 } @vars;
+			return !!0 unless any { $_ == $1 } @vars;
 			return $self->_check_blueprint($pos + 1, @more_parts);
 		}
 		else {

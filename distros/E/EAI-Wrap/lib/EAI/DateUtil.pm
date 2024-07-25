@@ -1,4 +1,4 @@
-package EAI::DateUtil 1.914;
+package EAI::DateUtil 1.915;
 
 use strict; use warnings; use feature 'unicode_strings'; use utf8;
 use Exporter qw(import); use Time::Local qw( timelocal_modern timegm_modern ); use Time::localtime; use POSIX qw(mktime);

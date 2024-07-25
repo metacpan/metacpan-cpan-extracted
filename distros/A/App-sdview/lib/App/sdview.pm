@@ -9,7 +9,7 @@ use utf8;
 
 use Object::Pad 0.800;
 
-package App::sdview 0.15;
+package App::sdview 0.16;
 class App::sdview :strict(params);
 
 use App::sdview::Style;
@@ -75,6 +75,10 @@ method run ( $file, %opts )
    my @PARSER_CLASSES = sort { $a->sort_order <=> $b->sort_order } PARSERS();
    my @OUTPUT_CLASSES = OUTPUTS();
 
+   my %output_options = map {
+      map { m/^(.*?)=(.*)$/ ? ( $1 => $2 ) : ( $_ => !!1 ) } split m/,/, $_;
+   } $opts{output_options}->@*;
+
    my $parser_class;
 
    if( defined $opts{format} ) {
@@ -106,7 +110,8 @@ method run ( $file, %opts )
 
    my @paragraphs = $parser_class->new->parse_file( $file );
 
-   $output_class->new->output( @paragraphs );
+   # TODO: unrecognised output option key names will not look very neat here
+   $output_class->new( %output_options )->output( @paragraphs );
 }
 
 =head1 TODO

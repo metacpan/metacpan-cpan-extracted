@@ -1,9 +1,9 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2017-2023 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2017-2024 -- leonerd@leonerd.org.uk
 
-package String::Tagged::Terminal 0.07;
+package String::Tagged::Terminal 0.08;
 
 use v5.14;
 use warnings;
@@ -68,6 +68,8 @@ colours:
 
 =head2 sizepos
 
+I<Since version 0.06.>
+
 (experimental)
 
 This tag takes a value indicating an adjustment to the vertical positioning,
@@ -75,6 +77,15 @@ and possibly also size, in order to create subscript or superscript effects.
 
 Recognised values are C<sub> for subscript, and C<super> for superscript.
 These are implemented using the F<mintty>-style C<CSI 73/74/75 m> codes.
+
+=head2 link
+
+I<Since version 0.08.>
+
+(experimental)
+
+This tag takes a HASH reference, whose C<uri> key is emitted using the
+C<OSC 8> hyperlink sequence.
 
 =cut
 
@@ -104,7 +115,7 @@ sub new_from_formatting
 
    return $class->clone( $orig,
       only_tags => [qw(
-         bold under italic strike blink reverse sizepos
+         bold under italic strike blink reverse sizepos link
          monospace
          fg bg
       )],
@@ -127,7 +138,7 @@ Returns a new instance by parsing a string containing SGR terminal escape
 sequences mixed with plain string content.
 
 The parser will only accept 7- or 8-bit encodings of the SGR escape sequence
-(C<\e[ ... m> or C<\x9b[ ... m>). If any other escape sequences are present,
+(C<\e[ ... m> or C<\x9b ... m>). If any other escape sequences are present,
 an exception is thrown.
 
 Conversely, unrecognised formatting codes in SGR sequences are simply ignored
@@ -205,6 +216,16 @@ sub parse_terminal
             # Else unrecognised
          }
       }
+      elsif( $s =~ m/\G\e]8;/gc || $s =~ m/\G\x{9d}8;/gc ) {
+         # OSC 8 hyperlink
+         $s =~ m/\G.*?;/gc; # skip args
+
+         $s =~ m/\G(.*?)\e\\/gc or $s =~ m/\G(.*?)\x07/gc or $s =~ m/\G(.*?)\x9c/gc or
+            croak "Found an OSC 8 introduction that does not end with ST";
+
+         length $1 ? $tags{link} = { uri => $1 }
+                   : delete $tags{link};
+      }
       else {
          croak "Found an escape sequence that is not SGR";
       }
@@ -252,6 +273,7 @@ sub build_terminal
 
    my $ret = "";
    my %pen;
+   my $osc8_uri;
    $self->iter_substr_nooverlap( sub {
       my ( $s, %tags ) = @_;
 
@@ -346,6 +368,23 @@ sub build_terminal
          }
       }
 
+      {
+         my $link = $tags{link};
+         my $uri  = $link ? $link->{uri} : undef;
+
+         if( defined $osc8_uri and !defined $uri ) {
+            $ret .= "\e]8;;\e\\";
+            undef $osc8_uri;
+         }
+         elsif( defined $osc8_uri and defined $uri and $osc8_uri eq $uri ) {
+            # leave it
+         }
+         elsif( defined $uri ) {
+            $ret .= "\e]8;;" . ( $uri =~ s/[^[:print:]]//gr ) . "\e\\";
+            $osc8_uri = $uri;
+         }
+      }
+
       if( @sgr and %pen ) {
          $ret .= "\e[" . join( ";", @sgr ) . "m";
       }
@@ -358,6 +397,7 @@ sub build_terminal
       ( $opts{no_color} ? ( except => [qw( fgindex bgindex )] ) : () ) );
 
    $ret .= "\e[m" if %pen;
+   $ret .= "\e]8;;\e\\" if defined $osc8_uri;
 
    return $ret;
 }
@@ -379,7 +419,7 @@ sub as_formatting
 
    return String::Tagged->clone( $self,
       only_tags => [qw(
-         bold under italic strike blink reverse sizepos
+         bold under italic strike blink reverse sizepos link
          altfont
          fgindex bgindex
       )],

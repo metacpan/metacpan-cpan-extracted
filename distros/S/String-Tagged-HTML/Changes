@@ -1,5 +1,9 @@
 Revision history for String-Tagged-HTML
 
+0.03    2024-07-24
+        [CHANGES]
+         * Support the new `link` Formatting tag as "<a href=...>"
+
 0.02    2023-02-15
         [CHANGES]
          * Added `->new_from_formatting`, which attempts to convert

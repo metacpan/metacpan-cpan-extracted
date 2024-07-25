@@ -79,6 +79,27 @@ use String::Tagged::Terminal;
       '->build_terminal rounds to integer' );
 }
 
+# sizepos
+{
+   my $st = String::Tagged::Terminal->new
+      ->append( "baseline" )
+      ->append_tagged( "below", sizepos => "sub" )
+      ->append_tagged( "above", sizepos => "super" );
+
+   is( $st->build_terminal, "baseline\e[74mbelow\e[73mabove\e[m",
+      '->build_terminal with sizepos' );
+}
+
+# link
+{
+   my $st = String::Tagged::Terminal->new
+      ->append( "Click " )
+      ->append_tagged( "here", link => { uri => "scheme://host/path" } );
+
+   is( $st->build_terminal, "Click \e]8;;scheme://host/path\e\\here\e]8;;\e\\",
+      '->build_terminal with link' );
+}
+
 # Trailing format gets reset
 {
    my $st = String::Tagged::Terminal->new

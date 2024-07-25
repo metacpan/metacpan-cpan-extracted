@@ -1,5 +1,5 @@
 package Bitcoin::Crypto::Network;
-$Bitcoin::Crypto::Network::VERSION = '2.004';
+$Bitcoin::Crypto::Network::VERSION = '2.005';
 use v5.10;
 use strict;
 use warnings;
@@ -9,12 +9,13 @@ use Mooish::AttributeBuilder -standard;
 use Type::Params -sigs;
 
 use Bitcoin::Crypto::Exception;
-use Bitcoin::Crypto::Types qw(Object HashRef CodeRef Str StrLength Int);
+use Bitcoin::Crypto::Types qw(Object HashRef CodeRef Str StrLength Int Maybe);
 
 use namespace::clean;
 
 my %networks;
 my $default_network;
+my $single_network = 0;
 
 has param 'id' => (
 	isa => Str,
@@ -77,9 +78,21 @@ has param 'bip44_coin' => (
 	required => 0,
 );
 
+signature_for single_network => (
+	method => Str,
+	positional => [],
+);
+
+sub single_network
+{
+	my ($class) = @_;
+
+	return $single_network;
+}
+
 signature_for register => (
-	method => 1,
-	positional => [HashRef, {slurpy => 1}],
+	method => !!1,
+	positional => [HashRef, {slurpy => !!1}],
 );
 
 sub register
@@ -91,6 +104,23 @@ sub register
 	}
 
 	$networks{$self->id} = $self;
+	return $self;
+}
+
+signature_for unregister => (
+	method => Object,
+	positional => [],
+);
+
+sub unregister
+{
+	my ($self) = @_;
+
+	Bitcoin::Crypto::Exception::NetworkConfig->raise(
+		'cannot unregister the default network - set another network as default first'
+	) if $default_network eq $self->id;
+
+	delete $networks{$self->id};
 	return $self;
 }
 
@@ -108,6 +138,22 @@ sub set_default
 	) unless defined $networks{$self->id};
 
 	$default_network = $self->id;
+	$single_network = 0;
+	return $self;
+}
+
+signature_for set_single => (
+	method => Object,
+	positional => [],
+);
+
+sub set_single
+{
+	my ($self) = @_;
+
+	$self->set_default;
+	$single_network = 1;
+
 	return $self;
 }
 
@@ -125,7 +171,7 @@ sub supports_segwit
 
 signature_for find => (
 	method => Str,
-	positional => [CodeRef, {optional => 1}],
+	positional => [Maybe [CodeRef], {default => undef}],
 );
 
 sub find
@@ -359,6 +405,23 @@ segwit address without C<segwit_hrp> field set.
 
 =head1 METHODS
 
+=head2 single_network
+
+	$boolean = $class->single_network()
+
+Returns a boolean indicating whether the module is operating in a
+single-network mode. In this mode, creation of objects with any other network
+than default is disallowed and will raise an exception. If any keys already
+exist and they have a different network set, they will continue to work but it
+will become impossible to alter them or get any kind of derived keys from them.
+
+This mode may be useful to make sure you are not importing keys with unwanted
+networks. By default, the module operates in multi-network mode and allows each
+key and script to set its own network, which can sometimes yield surprising
+results.
+
+See L</set_single>.
+
 =head2 register
 
 	$network_object = $class->register(%config)
@@ -371,6 +434,15 @@ context.
 
 Returns the network instance.
 
+=head2 unregister
+
+	my $network_object = $object->unregister()
+
+Does the opposite of L</register>. The network object will no longer be stored
+in the module, so it will be destroyed if you let go of its reference.
+
+Can be useful if some of the default networks are interferring with your use case.
+
 =head2 set_default
 
 	$network_object = $object->set_default()
@@ -379,6 +451,14 @@ Sets a network as the default one. All newly created private and public keys
 will be bound to this network.
 
 Returns the network instance.
+
+=head2 set_single
+
+	$network_object = $object->set_single()
+
+Same as L</set_default>, but makes the module go into single-network mode.
+ To go back from this mode, call L</set_default> on any Network
+object.
 
 =head2 supports_segwit
 
@@ -423,7 +503,7 @@ Example:
 		return $instance->name eq 'Some name';
 	}
 
-Returns a list of network instances (objects).
+Returns a list of network instance ids (strings).
 
 =head1 SEE ALSO
 

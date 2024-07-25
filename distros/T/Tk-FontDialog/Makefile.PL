@@ -2,6 +2,7 @@ use ExtUtils::MakeMaker;
 # See lib/ExtUtils/MakeMaker.pm for details of how to influence
 # the contents of the Makefile that is written.
 
+my $is_devel_host = defined $ENV{USER} && $ENV{USER} eq 'eserte' && ($^O =~ /bsd/i || $ENV{PERL_RELEASE_READY}) && -f "../../perl.release.mk";
 my $eumm_recent_enough = $ExtUtils::MakeMaker::VERSION >= 6.54;
 
 if (!$eumm_recent_enough) {
@@ -18,6 +19,7 @@ WriteMakefile(
     'NAME'	=> 'Tk::FontDialog',
     'VERSION_FROM' => 'lib/Tk/FontDialog.pm', # finds $VERSIO
     'ABSTRACT_FROM' => 'lib/Tk/FontDialog.pm',
+    'LICENSE'       => 'perl_5',
     'MIN_PERL_VERSION' => 5.004,
     'PREREQ_PM' => {'Tk'             => 800},
     'dist'      => {'POSTOP'=>'-$(CHMOD) 644 $(DISTVNAME).tar$(SUFFIX)'},
@@ -48,7 +50,7 @@ demo :: pure_all
 EOF
     }
 
-    if (defined $ENV{USER} && $ENV{USER} eq 'eserte' && $^O =~ /bsd/i && -f "../../perl.release.mk") {
+    if ($is_devel_host) {
 	$postamble .= <<'EOF';
 
 # Test::Distribution complains about Tk::Font which is part of Tk

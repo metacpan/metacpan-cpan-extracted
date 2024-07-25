@@ -41,7 +41,7 @@ CONSTRUCTORS
 
  parse_markdown
 
-       $st = String::Tagged::InlineFormatted->parse_markdown( $str )
+       $st = String::Tagged::Markdown->parse_markdown( $str );
 
     Parses a text string containing Markdown-like formatting as described
     above.
@@ -79,8 +79,8 @@ CONSTRUCTORS
     Returns a new instance by convertig String::Tagged::Formatting standard
     tags.
 
-    The bold, italic and strike tags are preserved. monospace is renamed to
-    fixed.
+    The bold, italic, strike and link tags are preserved. monospace is
+    renamed to fixed.
 
     Supports the following extra named arguments:
 
@@ -93,7 +93,7 @@ METHODS
 
  build_markdown
 
-       $str = $st->build_markdown
+       $str = $st->build_markdown;
 
     Returns a plain text string containing Markdown-like inline formatting
     markers to format the tags in the given instance. Uses the notation
@@ -104,13 +104,13 @@ METHODS
 
  as_formatting
 
-       $fmt = $st->as_formatting( %args )
+       $fmt = $st->as_formatting( %args );
 
     Returns a new String::Tagged instance tagged with
     String::Tagged::Formatting standard tags.
 
-    The bold, italic and strike tags are preserved, fixed is renamed to
-    monospace. The link tag is currently not represented at all.
+    The bold, italic, strike and link tags are preserved, fixed is renamed
+    to monospace.
 
     Supports the following extra named arguments:
 

@@ -1,5 +1,5 @@
 package Bitcoin::Crypto::Role::ExtendedKey;
-$Bitcoin::Crypto::Role::ExtendedKey::VERSION = '2.004';
+$Bitcoin::Crypto::Role::ExtendedKey::VERSION = '2.005';
 use v5.10;
 use strict;
 use warnings;
@@ -7,6 +7,7 @@ use Scalar::Util qw(blessed);
 use Mooish::AttributeBuilder -standard;
 use Type::Params -sigs;
 use Carp qw(carp);
+use List::Util qw(none);
 
 use Bitcoin::Crypto::Key::Private;
 use Bitcoin::Crypto::Key::Public;
@@ -95,7 +96,7 @@ sub to_serialized
 
 signature_for from_serialized => (
 	method => Str,
-	positional => [ByteStr, Maybe [Str], {optional => 1}],
+	positional => [ByteStr, Maybe [Str], {default => undef}],
 );
 
 sub from_serialized
@@ -143,9 +144,15 @@ sub from_serialized
 			last if @found_networks > 0;
 		}
 
-		Bitcoin::Crypto::Exception::KeyCreate->raise(
-			'found multiple networks possible for given serialized key'
-		) if @found_networks > 1;
+		if (@found_networks > 1) {
+			my $default_network = Bitcoin::Crypto::Network->get->id;
+
+			Bitcoin::Crypto::Exception::KeyCreate->raise(
+				'found multiple networks possible for given serialized key: ' . join ', ', @found_networks
+			) if none { $_ eq $default_network } @found_networks;
+
+			@found_networks = ($default_network);
+		}
 
 		Bitcoin::Crypto::Exception::KeyCreate->raise(
 			"network name $network cannot be used for given serialized key"
@@ -227,7 +234,7 @@ sub _get_purpose_from_BIP44
 
 signature_for derive_key => (
 	method => Object,
-	positional => [Str | InstanceOf ['Bitcoin::Crypto::BIP44']],
+	positional => [Str | Object],
 );
 
 sub derive_key
@@ -241,10 +248,10 @@ sub derive_key
 
 	Bitcoin::Crypto::Exception::KeyDerive->raise(
 		'cannot derive key: key type mismatch'
-	) if !!$self->_is_private ne !!$path_info->{private};
+	) if !!$self->_is_private ne !!$path_info->private;
 
 	my $key = $self;
-	for my $child_num (@{$path_info->{path}}) {
+	for my $child_num (@{$path_info->path}) {
 		my $hardened = $child_num >= Bitcoin::Crypto::Constants::max_child_keys;
 
 		# dies if hardened-from-public requested

@@ -6,7 +6,7 @@ use warnings;
 use utf8;
 
 # Declare module version.  (Also in pod documentation below.)
-use version; our $VERSION = version->declare('v1.1.0');
+use version; our $VERSION = version->declare('v1.2.0');
 
 # Initialize modules.
 use mro;
@@ -25,8 +25,10 @@ use Scalar::Util        qw[blessed reftype];
 use bytes;
 
 # Basic parsing regular expressions.
-our $n = qr/(?:\n|\r\n?)/;                        # Match a newline. (LF, CRLF or CR)
-our $ws = qr/(?:(?:(?>%[^\r\n]*)?\s+)+)/;         # Match whitespace, including PDF comments.
+our $n  = qr/(?:\n|\r\n?)/;                       # Match a newline. (LF, CRLF or CR)
+our $ss = '\x00\x09\x0a\x0c\x0d\x20';             # List of PDF whitespace characters.
+our $s  = "[$ss]";                                # Match a single PDF whitespace character.
+our $ws = qr/(?:(?:(?>%[^\r\n]*)?$s+)+)/;         # Match whitespace, including PDF comments.
 
 # Declare prototypes.
 sub is_hash ($);
@@ -177,7 +179,7 @@ sub parse_pdf {
   $self = bless \%args, $class;
 
   # Validate minimal PDF file structure starting with %PDF and ending with %%EOF.
-  my ($pdf_version, $pdf_data) = $data =~ /%PDF-(\d+\.\d+)\s*?$n(.*)%%EOF/s
+  my ($pdf_version, $pdf_data) = $data =~ /%PDF-(\d+\.\d+)$s*?$n(.*)%%EOF/s
     or croak join(": ", $self->{-file} || (), "File does not contain a valid PDF document!\n");
 
   # Discard startxref value which should be present in any valid PDF, but don't require it.
@@ -358,7 +360,7 @@ sub merge_content_streams {
   foreach my $stream (@{$streams}) {
     die unless is_stream $stream;
     $stream->{-data} //= "";
-    $stream->{-data} =~ s/(?<=\s) \z//;
+    $stream->{-data} =~ s/(?<=$s) \z//;
   }
 
   # Concatenate stream data and calculate new length.
@@ -388,7 +390,7 @@ sub find_bbox {
   # Determine bounding box from content stream.
   foreach (@lines) {
     # Skip neutral lines.
-    next if m{^(?:/Figure <</MCID \d >>BDC|/PlacedGraphic /MC\d BDC|EMC|/GS\d gs|BX /Sh\d sh EX Q|[Qqh]|W n|$n $n $n $n $n $n cm)\s*$};
+    next if m{^(?:/Figure <</MCID \d >>BDC|/PlacedGraphic /MC\d BDC|EMC|/GS\d gs|BX /Sh\d sh EX Q|[Qqh]|W n|$n $n $n $n $n $n cm)$s*$};
 
     # Capture coordinates from drawing operations to calculate bounding box.
     if (my ($x1, $y1, $x2, $y2, $x3, $y3) = /^($n) ($n) (?:[ml]|($n) ($n) (?:[vy]|($n) ($n) c))$/) {
@@ -438,7 +440,7 @@ sub timestamp {
   $time //= time;
   my @time = localtime $time;
   my $tz = $time[8] * 60 - mktime(gmtime 0) / 60;
-  return sprintf "(D:%s%+03d'%02d)", strftime("%Y%m%d%H%M%S", @time), $tz / 60, abs($tz) % 60;
+  return sprintf "(D:%s%+03d'%02d')", strftime("%Y%m%d%H%M%S", @time), $tz / 60, abs($tz) % 60;
 }
 
 # Round numeric values to 12 significant digits to avoid floating-point rounding error and remove trailing zeroes.
@@ -673,6 +675,9 @@ sub generate_content_stream {
     } elsif ($object->[1]{type} eq "array") {
       # Serialize array.
       $self->serialize_array(\$stream, $object->[0]);
+    } elsif ($object->[1]{type} eq "image") {
+      # Serialize inline image data.
+      $self->serialize_image(\$stream, $object->[0]);
     } else {
       # Serialize string or other token.
       $self->serialize_object(\$stream, $object->[0]);
@@ -724,21 +729,29 @@ sub serialize_array {
   ${$stream} .= "]";
 }
 
+# Append the serialization of inline image data to the generated content stream.
+sub serialize_image {
+  my ($self, $stream, $image) = @_;
+
+  # Append inline image data between ID (Image Data) and EI (End Image) operators.
+  ${$stream} .= "\nID\n$image\nEI\n";
+}
+
 # Append the serialization of an object to the generated content stream.
 sub serialize_object {
   my ($self, $stream, $object) = @_;
 
   # Strip leading/trailing whitespace from object if minifying.
   if ($self->{-minify}) {
-    $object =~ s/^\s+//;
-    $object =~ s/\s+$//;
+    $object =~ s/^$s+//;
+    $object =~ s/$s+$//;
   }
 
   # Wrap the line if line length would exceed 255 characters.
   ${$stream} .= "\n" if length(${$stream}) - (rindex(${$stream}, "\n") + 1) + length($object) >= 255;
 
   # Add a space if necessary.
-  ${$stream} .= " " unless ${$stream} =~ /(^|[\s)>\[\]{}])$/ or $object =~ /^[\s()<>\[\]{}\/%]/;
+  ${$stream} .= " " unless ${$stream} =~ /(^|[$ss)>\[\]{}])$/ or $object =~ /^[$ss()<>\[\]{}\/%]/;
 
   # Add the serialized object.
   ${$stream} .= $object;
@@ -818,9 +831,9 @@ sub parse_objects {
       push @objects, [ $array, { type => "array" }];
     } elsif (s/\A(\((?:(?>[^\\()]+)|\\.|(?1))*\))//) {                          # String literal: (...) (including nested parens)
       push @objects, [ $1, { type => "string" } ];
-    } elsif (s/\A(<[0-9A-Fa-f\s]*>)//) {                                        # Hexadecimal string literal: <...>
-      push @objects, [ lc($1) =~ s/\s+//gr, { type => "hex" } ];
-    } elsif (s/\A(\/?[^\s()<>\[\]{}\/%]+)//) {                                  # /Name, number or other token
+    } elsif (s/\A(<[0-9A-Fa-f$ss]*>)//) {                                       # Hexadecimal string literal: <...>
+      push @objects, [ lc($1) =~ s/$s+//gr, { type => "hex" } ];
+    } elsif (s/\A(\/?[^$ss()<>\[\]{}\/%]+)//) {                                 # /Name, number or other token
       # Check for tokens of special interest.
       my $token = $1;
       if ($token eq "obj" or $token eq "R") {                                   # Indirect object/reference: 999 0 obj or 999 0 R
@@ -833,6 +846,13 @@ sub parse_objects {
           ($token eq "R" ? \$new_id : $new_id),
           { type => $token, offset => $id->[1]{offset} }
         ];
+      } elsif ($token eq "ID") {                                                # Inline image data: ID ... EI
+        s/\A$s(.*?)(?:\r\n|$s)?EI$s//s or croak join(": ", $self->{-file} || (), "Byte offset $offset: Invalid inline image data!\n");
+        my $image = $1;
+
+        # TODO: Apply encoding filters?
+
+        push @objects, [ $image, { type => "image" } ];
       } elsif ($token eq "stream") {                                            # Stream content: stream ... endstream
         my ($id, $stream) = @objects[-2,-1];
         $stream->[1]{type} eq "dict" or croak join(": ", $self->{-file} || (), "Byte offset $offset: Stream dictionary missing!\n");
@@ -848,13 +868,13 @@ sub parse_objects {
           croak join(": ", $self->{-file} || (), "Byte offset $offset: PDF 1.5 object streams are not supported!\n");
         } elsif ($type eq "/XRef") {
           croak join(": ", $self->{-file} || (), "Byte offset $offset: PDF 1.5 cross-reference streams are not supported!\n");
-	} elsif ($type !~ /^(?:\/(?:Metadata|XObject))?$/) {
-          croak join(": ", $self->{-file} || (), "Byte offset $offset: Unrecognized stream type \"$type\"!\n");
+	} elsif ($type !~ /^(?:\/(?:CMap|Metadata|XObject))?$/) {
+          carp join(": ", $self->{-file} || (), "Byte offset $offset: Unrecognized stream type \"$type\"!\n");
         }
 
         # If the declared stream length is missing or invalid, determine the shortest possible length to make the stream valid.
-        unless (defined($length) && !ref($length) && substr($_, $length) =~ /\A(\s*endstream$ws)/) {
-          if (/\A((?>(?:[^e]+|(?!endstream\s)e)*))\s*endstream$ws/) {
+        unless (defined($length) && !ref($length) && substr($_, $length) =~ /\A($s*endstream$ws)/) {
+          if (/\A((?>(?:[^e]+|(?!endstream$s)e)*))endstream$s/) {
             $length = length($1);
           } else {
             croak join(": ", $self->{-file} || (), "Byte offset $offset: Invalid stream definition!\n");
@@ -866,7 +886,7 @@ sub parse_objects {
         $stream->{Length} = $length;
 
         $_ = substr($_, $length);
-        s/\A\s*endstream$ws//;
+        s/\A$s*endstream$ws//;
 
         $self->filter_stream($stream) if $stream->{Filter};
       } elsif ($token eq "endobj") {                                            # Indirect object definition: 999 0 obj ... endobj
@@ -1000,7 +1020,7 @@ sub resolve_references {
     # For streams, validate the length metadata.
     if (is_stream $object) {
       $object->{-data} //= "";
-      substr($object->{-data}, $object->{Length}) =~ s/\A\s+\z// if $object->{Length} and length($object->{-data}) > $object->{Length};
+      substr($object->{-data}, $object->{Length}) =~ s/\A$s+\z// if $object->{Length} and length($object->{-data}) > $object->{Length};
       my $len = length $object->{-data};
       $object->{Length} ||= $len;
       $len == $object->{Length}
@@ -1303,7 +1323,7 @@ sub dump_object {
       for (my $i = 0; $i < @{$object}; $i++) {
         $output .= sprintf "%s%s,\n", " " x ($indent + 2), $self->dump_object($object->[$i], "$label\[$i\]", $seen, $indent + 2, $mode) if ref $object->[$i];
       }
-      if ($output =~ /\A\s+(.*?),\n\z/) {
+      if ($output =~ /\A$s+(.*?),\n\z/) {
         $output = "[... $1]";
       } elsif ($output =~ /\n/) {
         $output = join("", "[ # $label\n", $output, (" " x $indent), "]");
@@ -1387,7 +1407,7 @@ PDF::Data - Manipulate PDF files and objects as data structures
 
 =head1 VERSION
 
-version v1.1.0
+version v1.2.0
 
 =head1 SYNOPSIS
 

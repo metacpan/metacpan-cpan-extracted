@@ -83,14 +83,14 @@
    "provides" : {
       "PDF::Data" : {
          "file" : "lib/PDF/Data.pm",
-         "version" : "v1.1.0"
+         "version" : "v1.2.0"
       }
    },
    "release_status" : "stable",
-   "version" : "v1.1.0",
+   "version" : "v1.2.0",
    "x_Dist_Zilla" : {
       "perl" : {
-         "version" : "5.038002"
+         "version" : "5.034000"
       },
       "plugins" : [
          {
@@ -279,7 +279,7 @@
                   "changelog" : "Changes"
                },
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.39.3 (Apple Git-146)",
+                  "git_version" : "2.34.1",
                   "repo_root" : "."
                }
             },
@@ -303,7 +303,7 @@
                   "changelog" : "Changes"
                },
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.39.3 (Apple Git-146)",
+                  "git_version" : "2.34.1",
                   "repo_root" : "."
                },
                "Dist::Zilla::Role::Git::StringFormatter" : {
@@ -320,12 +320,12 @@
                   "branch" : null,
                   "changelog" : "Changes",
                   "signed" : 0,
-                  "tag" : "v1.1.0",
+                  "tag" : "v1.2.0",
                   "tag_format" : "v%V",
                   "tag_message" : "v%V"
                },
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.39.3 (Apple Git-146)",
+                  "git_version" : "2.34.1",
                   "repo_root" : "."
                },
                "Dist::Zilla::Role::Git::StringFormatter" : {
@@ -345,7 +345,7 @@
                   "remotes_must_exist" : 1
                },
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.39.3 (Apple Git-146)",
+                  "git_version" : "2.34.1",
                   "repo_root" : "."
                }
             },
@@ -436,8 +436,8 @@
          "version" : "6.032"
       }
    },
-   "x_generated_by_perl" : "v5.38.2",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.38",
+   "x_generated_by_perl" : "v5.34.0",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.36",
    "x_spdx_expression" : "MIT"
 }
 

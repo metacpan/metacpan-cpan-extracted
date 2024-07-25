@@ -1,4 +1,4 @@
-package EAI::Wrap 1.914;
+package EAI::Wrap 1.915;
 
 use strict; use feature 'unicode_strings'; use warnings;
 use Exporter qw(import); use Data::Dumper qw(Dumper); use File::Copy qw(copy move); use Cwd qw(chdir); use Archive::Extract ();
@@ -883,8 +883,8 @@ sub processingEnd {
 		$endTime .= ($endTime eq "2359" ? "59" : (length($endTime) == 4 ? "00" : "")) if $endTime; # amend HHMM time with seconds, special case 235959
 		$endTime = "235959" if !$endTime and $processFailed; # set to retry until end of day for failed processes (can be shortened with $common{task}{retrySecondsXfails})
 		$endTime = "000000->not set" if !$endTime; # if neither planned nor process failed then endtime is undefined and needs to be lower than any currentTime for next decision
-		if ($failcountFinish or $nextStartTime >= $endTime or ($nextStartTime =~ /1....../)) {
-			$logger->info("finished processing due ".($failcountFinish ? "to reaching set error count \$common{task}{retrySecondsXfails} $common{task}{retrySecondsXfails} and \$common{task}{retrySecondsErrAfterXfails} is false" : "to time out: next start time(".$nextStartTime.") >= endTime(".$endTime.") or after midnight"));
+		if ($failcountFinish or $nextStartTime >= $endTime or ($common{task}{retryEndsAfterMidnight} and ($nextStartTime =~ /1....../ or (substr($execute{startingTime},0,2) > substr($currentTime,0,2))))) {
+			$logger->info("finished processing due ".($failcountFinish ? "to reaching set error count \$common{task}{retrySecondsXfails} $common{task}{retrySecondsXfails} and \$common{task}{retrySecondsErrAfterXfails} is false" : ($common{task}{retryEndsAfterMidnight} ? "to ending retry after midnight: nextStartTime=$nextStartTime, startingTime=$execute{startingTime}, currentTime=$currentTime" : "to time out: next start time(".$nextStartTime.") >= endTime(".$endTime.")")));
 			moveFilesToHistory($common{task}{customHistoryTimestamp});
 			deleteFiles($execute{filesToDelete}) if $execute{filesToDelete};
 			deleteFiles($execute{uploadFilesToDelete},1) if $execute{uploadFilesToDelete};
@@ -1590,6 +1590,10 @@ how many seconds are passed between retries. This is set on error with process=>
 
 name of the current process script, also used in log/history setup together with addToScriptName for config{checkLookup} keys
 
+=item startingTime
+
+tasks starting time for checking task{retryEndsAfterMidnight} against current time
+
 =item timeToCheck
 
 for logchecker: scheduled time of job (don't look earlier for log entries)
@@ -2153,6 +2157,10 @@ flag for specifying a redo
 =item redoTimestampPatternPart
 
 part of the regex for checking against filename in redo with additional timestamp/redoDir pattern (e.g. "redo", numbers and _), anything after files barename (and before ".$ext" if extension is defined) is regarded as a timestamp. Example: '[\d_]', the regex is built like ($ext ? qr/$barename($redoTimestampPatternPart|$redoDir)*\.$ext/ : qr/$barename($redoTimestampPatternPart|$redoDir)*.*/)
+
+=item retryEndsAfterMidnight
+
+if set, all retries should end after midnight
 
 =item retrySecondsErr
 

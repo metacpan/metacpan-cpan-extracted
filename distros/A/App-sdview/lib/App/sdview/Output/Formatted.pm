@@ -9,7 +9,7 @@ use utf8;
 
 use Object::Pad 0.800;
 
-package App::sdview::Output::Formatted 0.15;
+package App::sdview::Output::Formatted 0.16;
 class App::sdview::Output::Formatted :strict(params);
 
 # This isn't itself an output module; but a base class to build them on

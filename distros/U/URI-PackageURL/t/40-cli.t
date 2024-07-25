@@ -27,7 +27,7 @@ sub cmd {
 
 }
 
-my $t1 = 'pkg:cpan/GDT/URI-PackageURL@2.20';
+my $t1 = 'pkg:cpan/GDT/URI-PackageURL@2.21';
 my $t2 = 'vers:cpan/1.00|>=2.00|<5.00';
 
 subtest "URI::PackageURL::App - '$t1' (JSON output)" => sub {
@@ -41,7 +41,7 @@ subtest "URI::PackageURL::App - '$t1' (JSON output)" => sub {
     is($test_2->{type},      'cpan',           'JSON output: Type');
     is($test_2->{namespace}, 'GDT',            'JSON output: Namespace');
     is($test_2->{name},      'URI-PackageURL', 'JSON output: Name');
-    is($test_2->{version},   '2.20',           'JSON output: Version');
+    is($test_2->{version},   '2.21',           'JSON output: Version');
 
 };
 

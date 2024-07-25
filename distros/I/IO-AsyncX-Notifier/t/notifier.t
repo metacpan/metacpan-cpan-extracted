@@ -8,9 +8,9 @@ use Object::Pad;
 use Object::Pad qw(:experimental);
 class Example :isa(IO::AsyncX::Notifier) {
     use Ryu::Observable;
-    has $slot_to_populate = "empty";
-    has $slot_to_leave_alone = "untouched";
-    has $observable_slot { Ryu::Observable->new };
+    field $slot_to_populate = "empty";
+    field $slot_to_leave_alone = "untouched";
+    field $observable_slot { Ryu::Observable->new };
 
     method populated () { $slot_to_populate }
     method untouched () { $slot_to_leave_alone }

@@ -1,12 +1,15 @@
 package IO::AsyncX::Notifier;
 # ABSTRACT: Combining IO::Async::Notifier with Object::Pad
+use strict;
+use warnings;
+use utf8;
 
-use Object::Pad;
-use Object::Pad qw(:experimental);
+use Object::Pad qw(:experimental(mop));
 
-class IO::AsyncX::Notifier :isa(IO::Async::Notifier);
+class IO::AsyncX::Notifier;
+inherit IO::Async::Notifier;
 
-our $VERSION = '0.003';
+our $VERSION = '0.004';
 
 =head1 NAME
 
@@ -15,13 +18,15 @@ IO::AsyncX::Notifier - easier IO::Async::Notifiers with Object::Pad
 =head1 SYNOPSIS
 
  use Object::Pad;
- class Example isa IO::AsyncX::Notifier {
+ class Example {
+  inherit IO::AsyncX::Notifier;
+
   # This will be populated by ->configure(example_field => ...)
   # or ->new(example_field => ...)
-  has $example_field;
+  field $example_field;
   # This will be updated by ->configure (or ->new) in a similar fashion
   use Ryu::Observable;
-  has $observable_field { Ryu::Observable->new };
+  field $observable_field { Ryu::Observable->new };
 
   # You can have as many other fields as you want, main limitation
   # at the moment is that they have to be scalars.
@@ -44,12 +49,12 @@ L<IO::Async::Notifier> subclasses.
 
 =cut
 
-use mro qw(c3);
+use mro qw(c3); # for ->next::method
 use Syntax::Keyword::Try;
 use Scalar::Util ();
 
 # This is a hack to defer ->configure until we have an object
-has $prepared;
+field $prepared;
 
 ADJUSTPARAMS ($args) {
     # We set this once after instantiation and never touch it again
@@ -111,5 +116,5 @@ Tom Molesworth C<< <TEAM@cpan.org> >>
 
 =head1 LICENSE
 
-Copyright Tom Molesworth 2021. Licensed under the same terms as Perl itself.
+Copyright Tom Molesworth 2021-2024. Licensed under the same terms as Perl itself.
 

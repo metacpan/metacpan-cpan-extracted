@@ -18,7 +18,7 @@ use constant FALSE => !!0;
 
 use overload '""' => 'to_string', fallback => 1;
 
-our $VERSION = '2.20';
+our $VERSION = '2.21';
 our @EXPORT  = qw(encode_vers decode_vers);
 
 my $VERS_REGEXP = qr{^vers:[a-z\\.\\-\\+][a-z0-9\\.\\-\\+]*/.+};

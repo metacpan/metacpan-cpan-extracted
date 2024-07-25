@@ -1,9 +1,9 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2011-2021 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2011-2024 -- leonerd@leonerd.org.uk
 
-package String::Tagged::HTML 0.02;
+package String::Tagged::HTML 0.03;
 
 use v5.14;
 use warnings;
@@ -125,6 +125,8 @@ The following tag conversions are supported:
    fg                   <span style="color: #rrggbb">
    bg                   <span style="background-color: #rrggbb">
 
+   link                 <a href="uri">
+
 =cut
 
 =head1 CONSTRUCTORS
@@ -177,7 +179,7 @@ sub new_from_formatting
    my ( $class, $orig, %params ) = @_;
 
    my $ret = $class->clone( $orig,
-      only_tags => [qw( bold italic under strike monospace sizepos fg bg )],
+      only_tags => [qw( bold italic under strike monospace sizepos fg bg link )],
       convert_tags => {
          bold      => "strong",
          italic    => "em",
@@ -197,6 +199,11 @@ sub new_from_formatting
          bg => sub {
             my ( $k, $v ) = @_;
             return _span_style_background_color => "#" . $v->as_rgb8->hex;
+         },
+         link => sub {
+            my ( $k, $v ) = @_;
+            return unless defined( my $uri = $v->{uri} );
+            return a => { href => $uri };
          },
       }
    );

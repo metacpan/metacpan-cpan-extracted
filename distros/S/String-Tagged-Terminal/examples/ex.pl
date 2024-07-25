@@ -54,4 +54,13 @@ foreach my $b ( 0 .. 5 ) {
 $st .= "\n";
 
 $st->append_tagged( "  ", bgindex => 232 + $_ ) for 0 .. 23;
+$st .= "\n";
+
+$st->say_to_terminal;
+
+$st = String::Tagged::Terminal->new;
+$st->append( "Written by " )
+   ->append_tagged( "String::Tagged::Terminal",
+      altfont => 1,
+      link    => "https://metacpan.org/pod/String::Tagged::Terminal" );
 $st->say_to_terminal;

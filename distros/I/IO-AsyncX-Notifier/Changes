@@ -1,5 +1,10 @@
 Revision history for IO-AsyncX-Notifier
 
+0.004     2024-07-25 01:19:07+08:00 Asia/Singapore
+    [Dependency updates]
+
+    - updated to latest Object::Pad module and syntax
+
 0.003     2022-03-21 02:08:25+08:00 Asia/Kuala_Lumpur
     [Dependency updates]
 

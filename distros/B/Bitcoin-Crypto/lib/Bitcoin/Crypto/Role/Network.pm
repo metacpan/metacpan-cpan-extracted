@@ -1,5 +1,5 @@
 package Bitcoin::Crypto::Role::Network;
-$Bitcoin::Crypto::Role::Network::VERSION = '2.004';
+$Bitcoin::Crypto::Role::Network::VERSION = '2.005';
 use v5.10;
 use strict;
 use warnings;
@@ -18,7 +18,20 @@ has param 'network' => (
 		return Bitcoin::Crypto::Network->get;
 	},
 	writer => -hidden,
+	trigger => -hidden,
 );
+
+sub _trigger_network
+{
+	my ($self) = @_;
+
+	if (Bitcoin::Crypto::Network->single_network) {
+		my $default = Bitcoin::Crypto::Network->get;
+		Bitcoin::Crypto::Exception::NetworkCheck->raise(
+			'invalid network, running in single-network mode with ' . $default->id
+		) if $default->id ne $self->network->id;
+	}
+}
 
 # make writer chainable
 sub set_network

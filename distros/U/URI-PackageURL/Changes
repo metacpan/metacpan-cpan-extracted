@@ -1,5 +1,12 @@
 Change history for URI-PackageURL
 
+2.21 2024-07-24
+    - Use RFC 2119 terms for CPAN purl type specification (sjn)
+    - Added "swid" purl type support
+    - Moved normalization and validation check in "URI::PackageURL::Util"
+    - Dropped support for "version_prefix" qualifier for "github", "gitlab" and 
+      "bitbucket" PURL types in "purl_to_urls" util (pombredanne via giterlizzi/perl-URI-PackageURL#14)
+
 2.20 2024-05-13
     - Added support for the official "cpan" PURL type specification (giterlizzi/perl-URI-PackageURL#8)
     - Added "Version Range" (vers) support (giterlizzi/perl-URI-PackageURL#12)

@@ -23,6 +23,9 @@ BEGIN {
 			hash160
 			hash256
 			to_format
+			from_format
+			pack_compactsize
+			unpack_compactsize
 		)
 	);
 }
@@ -105,6 +108,8 @@ subtest 'testing get_path_info' => sub {
 	);
 
 	for my $case (@path_test_data) {
+		isa_ok(get_path_info($case->[0]), 'Bitcoin::Crypto::DerivationPath')
+			if defined $case->[1];
 		is_deeply(get_path_info($case->[0]), $case->[1], "test case $case->[0]");
 	}
 };
@@ -194,16 +199,58 @@ subtest 'should pass validation of segwit version 15 program' => sub {
 	};
 };
 
-subtest 'to_format should handle bytes' => sub {
-	is to_format [bytes => "\x00\xff\x55"], "\x00\xff\x55";
+subtest 'testing to_format' => sub {
+	is to_format [bytes => "\x00\xff\x55"], "\x00\xff\x55", 'should handle bytes';
+	is to_format [hex => "\x00\xff\x55"], '00ff55', 'should handle hex';
+	is to_format [base58 => "\x00\xff\x55"], '13C9fhDMSM', 'should handle base58';
+	is to_format [base64 => "\x00\xff\x55"], 'AP9V', 'should handle base64';
 };
 
-subtest 'to_format should handle hexadecimals' => sub {
-	is to_format [hex => "\x00\xff\x55"], '00ff55';
+subtest 'testing from_format' => sub {
+	is from_format [bytes => "\x00\xff\x55"], "\x00\xff\x55", 'should handle bytes';
+	is from_format [hex => '00ff55'], "\x00\xff\x55", 'should handle hex';
+	is from_format [base58 => '13C9fhDMSM'], "\x00\xff\x55", 'should handle base58';
+	is from_format [base64 => 'AP9V'], "\x00\xff\x55", 'should handle base64';
 };
 
-subtest 'to_format should handle base58' => sub {
-	is to_format [base58 => "\x00\xff\x55"], '13C9fhDMSM';
+subtest 'testing compactsize one byte' => sub {
+	is pack_compactsize(128), "\x80", 'packing ok';
+	is unpack_compactsize("\x80"), 128, 'unpacking ok';
+};
+
+subtest 'testing compactsize one byte (high)' => sub {
+	is pack_compactsize(255), "\xfd\xff\x00", 'packing ok';
+	is unpack_compactsize("\xfd\xff\x00"), 255, 'unpacking ok';
+};
+
+subtest 'testing compactsize two bytes' => sub {
+	is pack_compactsize(515), "\xfd\x03\x02", 'packing ok';
+	is unpack_compactsize("\xfd\x03\x02"), 515, 'unpacking ok';
+};
+
+subtest 'testing compactsize four bytes' => sub {
+	is pack_compactsize(75105), "\xfe\x61\x25\x01\x00", 'packing ok';
+	is unpack_compactsize("\xfe\x61\x25\x01\x00"), 75105, 'unpacking ok';
+};
+
+subtest 'testing compactsize eight bytes' => sub {
+	plan skip_all => 'requires 64 bit system'
+		unless Bitcoin::Crypto::Constants::is_64bit;
+
+	is pack_compactsize(7451076510762517), "\xff\x15\x46\x9e\xf0\xb6\x78\x1a\x00", 'packing ok';
+	is unpack_compactsize("\xff\x15\x46\x9e\xf0\xb6\x78\x1a\x00"), 7451076510762517, 'unpacking ok';
+};
+
+subtest 'testing unpack_compactsize with pos argument' => sub {
+	my $pos = 2;
+	is unpack_compactsize("\x00\x00\xfe\x61\x25\x01\x00\x00", \$pos), 75105, 'unpacking ok';
+	is $pos, 7, 'position ok';
+};
+
+subtest 'testing unpack_compactsize with leftover data' => sub {
+	throws_ok {
+		unpack_compactsize("\xfe\x61\x25\x01\x00\x00");
+	} 'Bitcoin::Crypto::Exception';
 };
 
 done_testing;

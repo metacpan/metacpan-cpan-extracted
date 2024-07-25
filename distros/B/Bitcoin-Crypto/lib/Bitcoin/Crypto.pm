@@ -1,5 +1,5 @@
 package Bitcoin::Crypto;
-$Bitcoin::Crypto::VERSION = '2.004';
+$Bitcoin::Crypto::VERSION = '2.005';
 use v5.10;
 use strict;
 use warnings;
@@ -14,6 +14,7 @@ our @EXPORT_OK = qw(
 	btc_transaction
 	btc_block
 	btc_utxo
+	btc_psbt
 );
 
 our %EXPORT_TAGS = (all => [@EXPORT_OK]);
@@ -64,6 +65,12 @@ sub btc_block
 {
 	require Bitcoin::Crypto::Block;
 	return 'Bitcoin::Crypto::Block';
+}
+
+sub btc_psbt
+{
+	require Bitcoin::Crypto::PSBT;
+	return 'Bitcoin::Crypto::PSBT';
 }
 
 __END__
@@ -147,6 +154,10 @@ Loads L<Bitcoin::Crypto::Transaction::UTXO>
 =head2 btc_block
 
 Loads L<Bitcoin::Crypto::Block>
+
+=head2 btc_psbt
+
+Loads L<Bitcoin::Crypto::PSBT>
 
 =head1 SEE ALSO
 

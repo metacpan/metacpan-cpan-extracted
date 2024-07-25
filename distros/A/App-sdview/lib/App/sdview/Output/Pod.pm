@@ -8,7 +8,7 @@ use warnings;
 
 use Object::Pad 0.807;
 
-package App::sdview::Output::Pod 0.15;
+package App::sdview::Output::Pod 0.16;
 class App::sdview::Output::Pod :strict(params);
 
 apply App::sdview::Output;
@@ -131,11 +131,11 @@ method _convert_str ( $s )
 
          if( my $link = $tags{link} ) {
             # TODO: This is even suckier than the bit in the parser
-            if( $link->{target} eq "https://metacpan.org/pod/$substr" ) {
+            if( $link->{uri} eq "https://metacpan.org/pod/$substr" ) {
                $pod = "L$open$substr$close";
             }
             else {
-               $pod = "L$open$pod|$link->{target}$close";
+               $pod = "L$open$pod|$link->{uri}$close";
             }
          }
 

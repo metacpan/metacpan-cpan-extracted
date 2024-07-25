@@ -10,12 +10,14 @@ use Getopt::Long;
 GetOptions(
    'format|f=s' => \my $FORMAT,
    'output|t=s' => \my $OUTPUT,
+   'output-option|O=s@' => \my @OUTPUT_OPTIONS,
 ) or exit 1;
 
 exit App::sdview->new->run(
    shift @ARGV,
    format => $FORMAT,
    output => $OUTPUT,
+   output_options => \@OUTPUT_OPTIONS,
 );
 
 =head1 NAME
@@ -70,6 +72,11 @@ rendering formatted output directly to the terminal. Useful for cross-
 converting between file types:
 
    $ sdview lib/App/sdview.pm -t Markdown > sdview.md
+
+=head2 -O, --output-option KEY=VALUE,...
+
+Provides additional options to pass to the selected output plugin. The exact
+options recognised will depend on the selected plugin.
 
 =head1 AUTHOR
 

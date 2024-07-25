@@ -49,6 +49,17 @@ use constant HAVE_CONVERT_COLOR => defined eval { require Convert::Color; 1 };
       is( $sth->as_html, qq(<span style="color: #ff0000;">red</span><span style="background-color: #00ff00;">black-on-green</span>),
          'fg and bg rendered as span style' );
    }
+
+   # link
+   {
+      my $st = String::Tagged->new
+         ->append( "Click " )
+         ->append_tagged( "here", link => { uri => "scheme://target" } );
+
+      my $sth = String::Tagged::HTML->new_from_formatting( $st );
+      is( $sth->as_html, q(Click <a href="scheme://target">here</a>),
+         'link renders as <a href...>' );
+   }
 }
 
 # Linefeed conversion

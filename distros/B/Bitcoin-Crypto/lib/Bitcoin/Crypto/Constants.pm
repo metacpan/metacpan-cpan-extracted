@@ -1,5 +1,5 @@
 package Bitcoin::Crypto::Constants;
-$Bitcoin::Crypto::Constants::VERSION = '2.004';
+$Bitcoin::Crypto::Constants::VERSION = '2.005';
 use v5.10;
 use strict;
 use warnings;
@@ -33,6 +33,12 @@ use constant {
 
 	p2sh_timestamp_threshold => 1333238400,
 	rbf_sequence_no_threshold => 0xffffffff - 2,
+
+	psbt_magic => "\x70\x73\x62\x74\xff",
+	psbt_separator => "\x00",
+	psbt_global_map => 'global',
+	psbt_input_map => 'in',
+	psbt_output_map => 'out',
 };
 
 # These constants are environment-specific and internal only

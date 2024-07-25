@@ -1,4 +1,4 @@
-package EAI::Common 1.914;
+package EAI::Common 1.915;
 
 use strict; use feature 'unicode_strings'; use warnings; no warnings 'uninitialized';
 use Exporter qw(import); use EAI::DateUtil; use Data::Dumper qw(Dumper); use Getopt::Long qw(:config no_ignore_case); use Log::Log4perl qw(get_logger); use MIME::Lite (); use Scalar::Util qw(looks_like_number);
@@ -68,6 +68,7 @@ my %hashCheck = (
 		retryBecauseOfError => 1, # retryBecauseOfError shows if a rerun occurs due to errors (for successMail) 
 		retrySeconds => 60, # how many seconds are passed between retries. This is set on error with process=>retrySecondsErr and if planned retry is defined with process=>retrySecondsPlanned
 		scriptname => "", # name of the current process script, also used in log/history setup together with addToScriptName for config{checkLookup} keys
+		startingTime => "", # tasks starting time for checking task{retryEndsAfterMidnight} against current time
 		timeToCheck => "", # for logchecker: scheduled time of job (don't look earlier for log entries)
 		uploadFilesToDelete => [], # list of files to be deleted locally after upload, necessary for cleanup at the end of the process
 	},
@@ -215,6 +216,7 @@ my %hashCheck = (
 		plannedUntil => 2359, # latest time that planned repetition should start, this can be given either as HHMM (HourMinute) or HHMMSS (HourMinuteSecond), in case of HHMM the "Second" part is attached as 59
 		redoFile => 1, # flag for specifying a redo
 		redoTimestampPatternPart => "", # part of the regex for checking against filename in redo with additional timestamp/redoDir pattern (e.g. "redo", numbers and _), anything after files barename (and before ".$ext" if extension is defined) is regarded as a timestamp. Example: '[\d_]', the regex is built like ($ext ? qr/$barename($redoTimestampPatternPart|$redoDir)*\.$ext/ : qr/$barename($redoTimestampPatternPart|$redoDir)*.*/)
+		retryEndsAfterMidnight => 1, # if set, all retries should end after midnight
 		retrySecondsErr => 60, # retry period in case of error
 		retrySecondsErrAfterXfails => 600, # after fail count is reached this alternate retry period in case of error is applied. If 0/undefined then job finishes after fail count
 		retrySecondsXfails => 3, # fail count after which the retrySecondsErr are changed to retrySecondsErrAfterXfails
@@ -600,15 +602,22 @@ sub setupLogging {
 sub setupEAIWrap {
 	my $logger = get_logger();
 	setupConfigMerge(); # %config (from site.config, amended with command line options) and %common (from process script, amended with command line options) are merged into %common and all @loads (amended with command line options)
-	# starting log entry: process script name + %common parameters, used for process monitoring (%config is not written due to sensitive information)
+	# starting log entry: process script name + %common parameters, used for process monitoring (%config is not written due to sensitive information, $execute is stripped down to standard keys to avoid potentially sensitve information there as well)
 	$logger->info("==============================================================================================");
-	$logger->info("started $execute{scriptname} in $execute{homedir} (environment $execute{env}) ... execute parameters: ".dumpFlat(\%execute,1,1)." ... common parameters: ".dumpFlat(\%common,1,1));
+	my %executeDump; my %configDump;
+	for my $key (keys %{$hashCheck{execute}}) {
+		$executeDump{$key} = $execute{$key};
+	}
+	for my $key (keys %config) {
+		$configDump{$key} = $config{$key} if $key ne "sensitive";
+	}
+	$logger->info("started $execute{scriptname} in $execute{homedir} (environment $execute{env}) ... execute parameters: ".dumpFlat(\%executeDump,1,1)." ... common parameters: ".dumpFlat(\%common,1,1)." ... config parameters: ".dumpFlat(\%configDump,1,1));
 	if ($logger->is_debug) {
 		$logger->debug("load $_ parameters: ".dumpFlat($loads[$_],1,1)) for (0..$#loads);
-		$logger->trace("config parameters: ".dumpFlat(\%config,1,1)) if !defined($config{sensitive}) and $logger->is_trace();
 	}
 	# check starting conditions and exit if met (returned true)
 	checkStartingCond(\%common) and exit 0;
+	$execute{startingTime} = get_curtime("%02d%02d%02d");
 	setErrSubject("General EAI::Wrap script execution"); # general context after setup of EAI::Wrap
 }
 

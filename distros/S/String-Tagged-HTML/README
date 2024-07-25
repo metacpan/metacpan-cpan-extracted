@@ -108,6 +108,8 @@ DESCRIPTION
     
        fg                   <span style="color: #rrggbb">
        bg                   <span style="background-color: #rrggbb">
+    
+       link                 <a href="uri">
 
 CONSTRUCTORS
 

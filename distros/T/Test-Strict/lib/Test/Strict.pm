@@ -6,7 +6,7 @@ Test::Strict - Check syntax, presence of use strict; and test coverage
 
 =head1 VERSION
 
-Version 0.53
+Version 0.54
 
 =head1 SYNOPSIS
 
@@ -71,7 +71,7 @@ use File::Find;
 use Config;
 
 our $COVER;
-our $VERSION = '0.53';
+our $VERSION = '0.54';
 our $PERL    = $^X || 'perl';
 our $COVERAGE_THRESHOLD = 50; # 50%
 our $UNTAINT_PATTERN    = qr|^(.*)$|;
@@ -130,7 +130,7 @@ sub _all_files {
         #return if ($File::Find::dir =~ m![\\/]?blib[\\/]libdoc$!); # Filter out pod doc in dist
         #return if ($File::Find::dir =~ m![\\/]?blib[\\/]man\d$!); # Filter out pod doc in dist
         if (-d $File::Find::name &&
-            ($_ eq 'CVS' || $_ eq '.svn' || $_ eq '.git' || # Filter out cvs or git or subversion dirs
+            ($File::Find::name =~ m!(?:^|[\\/])(?:CVS|\.svn|\.git)$! || # Filter out cvs or git or subversion dirs
              $File::Find::name =~ m!(?:^|[\\/])blib[\\/]libdoc$! || # Filter out pod doc in dist
              $File::Find::name =~ m!(?:^|[\\/])blib[\\/]man\d$!) # Filter out pod doc in dist
             ) {

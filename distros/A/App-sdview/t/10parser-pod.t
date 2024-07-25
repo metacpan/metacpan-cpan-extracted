@@ -73,9 +73,9 @@ EOPOD
    ok( $p[3]->text->get_tag_at( 0, "file" ), 'file tag' );
 
    is( $p[4]->text, "link Module::Here", 'link text' );
-   is( $p[4]->text->get_tag_at( 0, "link" ), { target => "target://" },
+   is( $p[4]->text->get_tag_at( 0, "link" ), { uri => "target://" },
       'link tag' );
-   is( $p[4]->text->get_tag_at( 5, "link" ), { target => "https://metacpan.org/pod/Module::Here" },
+   is( $p[4]->text->get_tag_at( 5, "link" ), { uri => "https://metacpan.org/pod/Module::Here" },
       'link to metacpan' );
 
    is( $p[5]->text, "underline underline", 'underline text' );
@@ -224,7 +224,7 @@ subtest "Definition lists" => sub {
 
 The first item
 
-=item Second
+=item Second I<item>
 
 The second item
 
@@ -251,7 +251,8 @@ EOPOD
    is( $items[0]->text, "The first item", 'items[0] text' );
 
    is( $items[1]->type, "item",  'items[1] type' );
-   is( $items[1]->term, "Second", 'items[1] term' );
+   is( $items[1]->term, "Second item", 'items[1] term' );
+   is( [ $items[1]->term->tagnames ], [qw( italic )], 'items[1] term tags' );
    is( $items[1]->text, "The second item", 'items[1] text' );
 
    is( $items[2]->type, "item",  'items[2] type' );

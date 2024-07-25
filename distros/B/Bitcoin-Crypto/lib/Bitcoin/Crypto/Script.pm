@@ -1,5 +1,5 @@
 package Bitcoin::Crypto::Script;
-$Bitcoin::Crypto::Script::VERSION = '2.004';
+$Bitcoin::Crypto::Script::VERSION = '2.005';
 use v5.10;
 use strict;
 use warnings;
@@ -8,6 +8,7 @@ use Crypt::Digest::SHA256 qw(sha256);
 use Mooish::AttributeBuilder -standard;
 use Try::Tiny;
 use Scalar::Util qw(blessed);
+use List::Util qw(any);
 use Type::Params -sigs;
 use Carp qw(carp);
 
@@ -304,7 +305,7 @@ sub operations
 			my $this_byte = substr $serialized, 0, 1, '';
 
 			try {
-				my $opcode = Bitcoin::Crypto::Script::Opcode->get_opcode_by_code($this_byte);
+				my $opcode = Bitcoin::Crypto::Script::Opcode->get_opcode_by_code(ord $this_byte);
 				push @debug_ops, $opcode->name;
 				my $to_push = [$opcode, $this_byte];
 
@@ -390,7 +391,7 @@ sub add_operation
 	my ($self, $name) = @_;
 
 	my $opcode = Bitcoin::Crypto::Script::Opcode->get_opcode_by_name($name);
-	$self->add_raw($opcode->code);
+	$self->add_raw(chr $opcode->code);
 
 	return $self;
 }
@@ -468,7 +469,7 @@ sub is_native_segwit
 
 	my $script_type = $self->type // '';
 
-	return 0 != grep { $script_type eq $_ } @segwit_types;
+	return any { $script_type eq $_ } @segwit_types;
 }
 
 sub get_script
@@ -524,7 +525,7 @@ sub from_serialized
 
 signature_for from_standard => (
 	method => Str,
-	positional => [ScriptDesc, {slurpy => 1}],
+	positional => [ScriptDesc, {slurpy => !!1}],
 );
 
 sub from_standard

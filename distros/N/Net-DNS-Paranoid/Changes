@@ -1,5 +1,11 @@
 Revision history for Perl extension Net::DNS::Paranoid
 
+0.11 2024-07-25T03:06:53Z
+
+    re-relese
+
+    https://github.com/tokuhirom/Net-DNS-Paranoid/issues/9
+
 0.10 2024-06-22T05:07:58Z
 
     force reindex!

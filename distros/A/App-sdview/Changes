@@ -1,5 +1,18 @@
 Revision history for App-sdview
 
+0.16    2024-07-24
+        [CHANGES]
+         * Support passing options to output plugins
+         * Recognise `-O nopager` and `-O width=NN` in Terminal output
+         * Better handling of embedded links in supported formats
+         * Render links to terminal using OSC 8
+
+        [BUGFIXES]
+         * Needs to use `Object::Pad::FieldAttr::Checked` v0.09 to make
+           `Data::Checks` work correctly
+         * Ensure Pod parser copes correctly with formatting tags within list
+           item term paragraphs
+
 0.15    2024-07-02
         [CHANGES]
          * Use the constraint checks from `Data::Checks` rather than

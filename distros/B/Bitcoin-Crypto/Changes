@@ -1,5 +1,30 @@
 Revision history for Perl extension Bitcoin::Crypto.
 
+2.005 Wed Jul 24 2024
+	[Added interface]
+	- Bitcoin::Crypto::PSBT namespace (support for PSBT)
+	- Bitcoin::Crypto::Util::from_format function (the reverse of existing to_format)
+	- Bitcoin::Crypto::Util::pack_compactsize function
+	- Bitcoin::Crypto::Util::unpack_compactsize function
+	- Bitcoin::Crypto::DerivationPath class (internal representation of path)
+	- Bitcoin::Crypto::BIP44::get_derivation_path method (getting internal representation of BIP44 path)
+	- Bitcoin::Crypto::Network::single_network class method (single-network mode)
+	- Bitcoin::Crypto::Network::set_single method
+	- Bitcoin::Crypto::Network::unregister method
+
+	[Improvements]
+	- PSBT format from BIP174 can now be serialized, deserialized and validated using Bitcoin::Crypto::PSBT
+	- transactions can now be created without registering UTXOs beforehand (with limited functionality)
+	- format descriptions now also handle base64
+	- extended keys can now be derived by directly passing Bitcoin::Crypto::DerivationPath
+	- exception is no longer raised if the default network is among multiple possible networks after deserialization of WIFs and extended keys
+	- module can now be configured to work in single-network mode, disallowing creation of objects with different networks
+
+	[Changes and deprecations]
+	- codes in Bitcoin::Crypto::Script::Opcode are now integers instead of bytestrings of length 1
+	- Bitcoin::Crypto::Util::get_path_info now returns instances of Bitcoin::Crypto::DerivationPath (internal structure remains unchanged)
+	- Bitcoin::Crypto::Key::Public::key_hash is now deprecated, added new method get_hash (consistent naming with other modules)
+
 2.004 Tue Apr 23 2024
 	[Improvements]
 	- documentation fixes and improvements

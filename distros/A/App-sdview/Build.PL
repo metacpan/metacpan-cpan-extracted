@@ -9,7 +9,7 @@ my $build = Module::Build->new(
    requires => {
       perl => '5.026',
       'Object::Pad' => '0.807',
-      'Object::Pad::FieldAttr::Checked' => '0.04',
+      'Object::Pad::FieldAttr::Checked' => '0.09',
       'Data::Checks' => '0.05',
 
       'Config::Tiny' => 0,
@@ -23,7 +23,7 @@ my $build = Module::Build->new(
       'Pod::Simple' => 0,
       'String::Tagged' => '0.15',
       'String::Tagged::Markdown' => '0.05',
-      'String::Tagged::Terminal' => 0,
+      'String::Tagged::Terminal' => '0.08',
       'Term::Size' => 0,
    },
    test_requires => {

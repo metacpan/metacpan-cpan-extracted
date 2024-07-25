@@ -5,13 +5,15 @@ NAME
 SYNOPSIS
 
      use Object::Pad;
-     class Example isa IO::AsyncX::Notifier {
+     class Example {
+      inherit IO::AsyncX::Notifier;
+    
       # This will be populated by ->configure(example_field => ...)
       # or ->new(example_field => ...)
-      has $example_field;
+      field $example_field;
       # This will be updated by ->configure (or ->new) in a similar fashion
       use Ryu::Observable;
-      has $observable_field { Ryu::Observable->new };
+      field $observable_field { Ryu::Observable->new };
     
       # You can have as many other fields as you want, main limitation
       # at the moment is that they have to be scalars.
@@ -38,6 +40,6 @@ AUTHOR
 
 LICENSE
 
-    Copyright Tom Molesworth 2021. Licensed under the same terms as Perl
-    itself.
+    Copyright Tom Molesworth 2021-2024. Licensed under the same terms as
+    Perl itself.
 

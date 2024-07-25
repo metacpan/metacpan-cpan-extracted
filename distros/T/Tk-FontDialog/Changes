@@ -1,5 +1,9 @@
 Revision history for Perl extension Tk::FontDialog.
 
+0.19	2024-07-24
+	- minor distribution care (by dod38fr and manwar)
+	- CI changes (remove travis, add github workflow)
+
 0.18	2017-03-22
 	- no real code changes, just fixes for perlcritic and cpants
 	  issues (by viviparous and Mohammad S Anwar)

@@ -75,16 +75,16 @@ including running the script step by step, stopping after each opcode.
 
 =item * work with Bitcoin-related encodings
 
-There are L<Bitcoin::Crypto::Base58> and L<Bitcoin::Crypto::Bech32>. You can
-validate an address and get its type using
-L<Bitcoin::Crypto::Util/get_address_type>.
+There are L<Bitcoin::Crypto::Base58> and L<Bitcoin::Crypto::Bech32>. PSBT
+format is supported in L<Bitcoin::Crypto::PSBT>. You can validate an address
+and get its type using L<Bitcoin::Crypto::Util/get_address_type>.
 
 =item * work with other cryptocurrencies
 
 You can work with any cryptocurrency as long as it is based on the same
 fundamentals as Bitcoin. You have to register a network in
 L<Bitcoin::Crypto::Network> first, with the protocol data valid for your
-cryptocurrency.
+cryptocurrency. Also see L</Support for other cryptocurrencies>
 
 =back
 
@@ -132,8 +132,17 @@ For strings of hex data, this may look like this:
 	use Bitcoin::Crypto qw(btc_prv);
 	my $private = btc_prv->from_serialized([hex => '152a3f549597a2bef783']);
 
-Currently supported values for the first argument are: C<hex> (hexadecimal
-string, may be prefixed by C<0x>) and C<base58> (base58check string).
+Currently supported values for the first argument are:
+
+=over
+
+=item * C<hex> (hexadecimal string, may be prefixed by C<0x>)
+
+=item * C<base58> (base58-encoded string with the checksum)
+
+=item * C<base64> (base64-encoded string)
+
+=back
 
 It is also common for functions to return bytestrings (like C<to_serialized>).
 If you need help changing that output format you may use
@@ -167,6 +176,28 @@ will result in an exception.
 
 See L<Bitcoin::Crypto::Script/from_standard> for more details.
 
+=head2 Support for other cryptocurrencies
+
+Bitcoin::Crypto has limited support for other cryptocurrency networks through
+L<Bitcoin::Crypto::Network>. The network must be fully compatible with Bitcoin
+(a Bitcoin clone or a strict subset of Bitcoin features) - no extra cases will
+exist in the code, only constant values can differ between the networks. Lack
+of certain constant values can be used to mark feature unsupported in the given
+network, for example lack of C<segwit_hrp> network constant will be interpreted
+as network not supporting Segregated Witness. Note that Bitcoin testnet is also
+considered a separate network.
+
+Networks can be set globally through default network or on per-object basis for
+basic and extended keys, and scripts. Other parts of the system does not
+support per-object setting of networks and rely on the currently set default
+network. Setting keys for every object separately is considered an outdated
+feature which is kept for backwards compatibility (and convenience, sometimes).
+If you want to make sure all your keys are in the same, default network, see
+single-network mode in L<Bitcoin::Crypto::Network/single_network>. This mode
+will disallow creation of objects with other network than the default. It can
+come handy if you are de-serializing keys from non-constant strings, for
+example fetched from the Internet or entered by the user.
+
 =head1 DISCLAIMER
 
 Although the module was written with an extra care and appropriate tests are in
@@ -185,7 +216,7 @@ I will gladly accept help working on these:
 
 =item * All listed in L<Bitcoin::Crypto::Manual::Transactions/Current known problems with transactions>
 
-=item * Taproot compatibility
+=item * All issues with C<help wanted> tag on GitHub
 
 =item * Better error checking (edge cases etc.)
 

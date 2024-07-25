@@ -1,5 +1,5 @@
 package Bitcoin::Crypto::Role::SignVerify;
-$Bitcoin::Crypto::Role::SignVerify::VERSION = '2.004';
+$Bitcoin::Crypto::Role::SignVerify::VERSION = '2.005';
 use v5.10;
 use strict;
 use warnings;

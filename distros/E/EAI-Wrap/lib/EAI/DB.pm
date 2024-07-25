@@ -1,4 +1,4 @@
-package EAI::DB 1.914;
+package EAI::DB 1.915;
 
 use strict; use feature 'unicode_strings'; use warnings;
 use Exporter qw(import); use DBI qw(:sql_types); use DBD::ODBC (); use Data::Dumper qw(Dumper); use Log::Log4perl qw(get_logger);
@@ -270,7 +270,7 @@ sub storeInDB ($$;$) {
 					# date/time
 					} elsif ($datatype =~ /^date/ or $datatype =~ /^time/) {
 						# prevent non date/time
-						$dataArray[$tgtCol] = undef if !($dataArray[$tgtCol] =~ /^(\d{2})[.\/]*(\d{2})[.\/]*(\d{2,4})/ or $dataArray[$tgtCol] =~ /^(\d{4})-(\d{2})-(\d{2})/ or $dataArray[$tgtCol] =~ /^(\d{2}):(\d{2}):(\d{2})/);
+						$dataArray[$tgtCol] = undef if !($dataArray[$tgtCol] =~ /^(\d{2})[.\/]*(\d{2})[.\/]*(\d{2,4})/ or $dataArray[$tgtCol] =~ /^(\d{4})-(\d{2})-(\d{2})/ or $dataArray[$tgtCol] =~ /^(\d{2}):(\d{2}):(\d{2})/ or $dataArray[$tgtCol] =~ /^(\d{2}):(\d{2}):(\d{2})/ or $dataArray[$tgtCol] =~ /^(\d{2}):(\d{2})/);
 						# convert DD./MM./YYYY hh:mm:ss to ODBC format YYYY-MM-DD hh:mm:ss
 						$dataArray[$tgtCol] =~ s/^(\d{2})[.\/](\d{2})[.\/](\d{4}) (\d{2}):(\d{2}):(\d{2})/$3-$2-$1 $4:$5:$6/ if ($dataArray[$tgtCol] =~ /^(\d{2})[.\/](\d{2})[.\/](\d{4}) (\d{2}):(\d{2}):(\d{2})/);
 						# convert YYYY-MM-DD hh:mm:ss.msec to ODBC format YYYY-MM-DD hh:mm:ss

@@ -8,7 +8,7 @@ use warnings;
 
 use Object::Pad 0.800;
 
-package App::sdview::Output 0.15;
+package App::sdview::Output 0.16;
 role App::sdview::Output;
 
 field $_content;

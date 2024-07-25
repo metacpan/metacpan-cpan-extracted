@@ -9,7 +9,7 @@ use utf8;
 
 use Object::Pad 0.805;
 
-package App::sdview::Output::Tickit 0.07;
+package App::sdview::Output::Tickit 0.08;
 class App::sdview::Output::Tickit
    :strict(params);
 
@@ -249,7 +249,12 @@ method output ( @paragraphs )
          foreach my $item ( @items ) {
             push @matches, $item->apply_highlight( $searchre );
          }
-         $self->select_and_jump( 0 ); # TODO pick the first one visible
+         if( @matches ) {
+            $self->select_and_jump( 0 ); # TODO pick the first one visible
+         }
+         else {
+            $matchposfloat->hide;
+         }
          $scroller->redraw;
       },
    );
@@ -448,6 +453,25 @@ method _output_list ( $listtype, $para, %opts )
    }
 }
 
+# Logic kindof stolen from T:W:Scroller::Item::(Rich)Text but modified
+
+sub _convert_color_tag ($n, $v)
+{
+   return $n => $v->as_xterm->index;
+}
+
+my %convert_tags = (
+   bold      => "b",
+   under     => "u",
+   italic    => "i",
+   strike    => "strike",
+   blink     => "blink",
+   monospace => sub ($, $v) { "af" => ( $v ? 1 : 0 ) },
+   reverse   => "rv",
+   fg        => \&_convert_color_tag,
+   bg        => \&_convert_color_tag,
+);
+
 class App::sdview::Output::Tickit::_ParagraphItem
    :strict(params)
 {
@@ -457,32 +481,19 @@ class App::sdview::Output::Tickit::_ParagraphItem
    field $_margin_left  :param = 0;
    field $_margin_right :param = 0;
    field $_indent       :param = 0;
-   field $_leader       :param = undef;
+
+   field $_leader;
+   ADJUST :params ( :$leader = undef ) 
+   {
+      $_leader = $leader->clone( convert_tags => \%convert_tags ) if defined $leader;
+   }
+
    field $_leaderlen;
    field $_has_leaderline      = 0;
    ADJUST {
       $_leaderlen = Tickit::Utils::textwidth( $_leader ) if defined $_leader;
       $_has_leaderline = 1 if $_leaderlen and $_leaderlen + 1 > $_indent;
    }
-
-   # Logic kindof stolen from T:W:Scroller::Item::(Rich)Text but modified
-
-   sub _convert_color_tag ($n, $v)
-   {
-      return $n => $v->as_xterm->index;
-   }
-
-   my %convert_tags = (
-      bold      => "b",
-      under     => "u",
-      italic    => "i",
-      strike    => "strike",
-      blink     => "blink",
-      monospace => sub ($, $v) { "af" => ( $v ? 1 : 0 ) },
-      reverse   => "rv",
-      fg        => \&_convert_color_tag,
-      bg        => \&_convert_color_tag,
-   );
 
    field $_text;
    field @_chunks; # => [ $start, $end, $width, $is_softhyphen ]
@@ -600,10 +611,7 @@ class App::sdview::Output::Tickit::_ParagraphItem
                },
             );
 
-            if( $_has_leaderline ) {
-               $rb->restore if $_pen;
-               next;
-            }
+            goto next_line if $_has_leaderline;
          }
 
          $rb->erase_to( $_margin_left + $_indent ) if $_indent;
@@ -624,6 +632,7 @@ class App::sdview::Output::Tickit::_ParagraphItem
          );
          $rb->text( "-" ) if $is_softhyphen;
 
+      next_line:
          if( $_pen ) {
             $rb->erase_to( $width - $_margin_right );
             $rb->restore;

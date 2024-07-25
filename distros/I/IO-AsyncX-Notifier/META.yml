@@ -14,7 +14,7 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.024, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Zilla version 6.032, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -30,17 +30,17 @@ no_index:
 provides:
   IO::AsyncX::Notifier:
     file: lib/IO/AsyncX/Notifier.pm
-    version: '0.003'
+    version: '0.004'
 requires:
-  IO::Async::Notifier: '0.79'
-  Object::Pad: '0.63'
+  IO::Async::Notifier: '0.803'
+  Object::Pad: '0.809'
   perl: '5.026'
 resources:
   bugtracker: https://github.com/team-at-cpan/IO-AsyncX-Notifier/issues
   homepage: https://github.com/team-at-cpan/IO-AsyncX-Notifier
   repository: https://github.com/team-at-cpan/IO-AsyncX-Notifier.git
-version: '0.003'
+version: '0.004'
 x_authority: cpan:TEAM
-x_generated_by_perl: v5.34.0
-x_serialization_backend: 'YAML::Tiny version 1.73'
+x_generated_by_perl: v5.40.0
+x_serialization_backend: 'YAML::Tiny version 1.74'
 x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

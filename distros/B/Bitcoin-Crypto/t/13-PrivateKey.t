@@ -110,7 +110,7 @@ subtest 'should validate key length' => sub {
 	} 'Bitcoin::Crypto::Exception::KeyCreate', 'Too long key got rejected';
 };
 
-subtest 'should not allow creation of keys from public key data' => sub {
+subtest 'should not allow creation of private keys from public key data' => sub {
 	throws_ok {
 		btc_prv->from_serialized([hex => $cases[0]{pub}]);
 	} 'Bitcoin::Crypto::Exception::KeyCreate', 'Public key got rejected';

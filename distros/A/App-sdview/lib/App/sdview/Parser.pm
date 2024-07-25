@@ -8,9 +8,9 @@ use warnings;
 use utf8;
 
 use Object::Pad 0.807;
-use Object::Pad::FieldAttr::Checked;
+use Object::Pad::FieldAttr::Checked 0.09;
 
-package App::sdview::Parser 0.15;
+package App::sdview::Parser 0.16;
 role App::sdview::Parser;
 
 use String::Tagged;
@@ -28,6 +28,8 @@ class App::sdview::Para::Heading :strict(params) {
    field $text  :param :reader :Checked(Isa 'String::Tagged');
 
    method type { "head" . $level }
+
+   method append_text ( $str, %tags ) { $text->append_tagged( $str, %tags ); }
 }
 
 class App::sdview::Para::Plain :strict(params) {
@@ -35,6 +37,8 @@ class App::sdview::Para::Plain :strict(params) {
    field $indent :param :reader :Checked(Num) = 0;
 
    method type { "plain" }
+
+   method append_text ( $str, %tags ) { $text->append_tagged( $str, %tags ); }
 }
 
 class App::sdview::Para::Verbatim :strict(params) {
@@ -43,6 +47,8 @@ class App::sdview::Para::Verbatim :strict(params) {
    field $indent   :param :reader :Checked(Num) = 0;
 
    method type { "verbatim" }
+
+   method append_text ( $str, %tags ) { $text->append_tagged( $str, %tags ); }
 }
 
 class App::sdview::Para::List :strict(params) {
@@ -62,7 +68,15 @@ class App::sdview::Para::ListItem :strict(params) {
    field $term     :param :reader :Checked(Maybe Isa 'String::Tagged') = undef;
    field $text     :param :reader :Checked(Isa 'String::Tagged');
 
+   field $term_is_done = !!0;
+   method term_done { $term_is_done = !!1; }
+
    method type { "item" }
+
+   method append_text ( $str, %tags ) {
+      ( defined $term && !$term_is_done ? $term : $text )
+         ->append_tagged( $str, %tags );
+   }
 }
 
 class App::sdview::Para::Table :strict(params) {

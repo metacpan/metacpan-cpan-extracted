@@ -8,7 +8,7 @@ use v5.16;
 use warnings;
 
 # Program version.
-use version; our $version = version->declare('v1.1.0');
+use version; our $version = version->declare('v1.2.0');
 
 # Initialize modules.
 use File::Basename qw[basename dirname];

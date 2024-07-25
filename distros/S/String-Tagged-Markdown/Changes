@@ -1,5 +1,9 @@
 Revision history for String-Tagged-Markdown
 
+0.06    2024-07-24
+        [CHANGES]
+         * Support converting to and from the new `link` Formatting tag
+
 0.05    2023-09-25
         [CHANGES]
          * Decode HTML entities during parsing

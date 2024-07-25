@@ -1,6 +1,6 @@
 #!perl
 
-use JSON;
+use JSON::PP;
 use Test::More;
 use File::Spec;
 
@@ -74,7 +74,7 @@ BAIL_OUT('"test-suite-data.json" file not found') if (!-e $test_suite_file);
 open my $fh, '<', $test_suite_file or Carp::croak "Can't open file: $!";
 
 my $test_suite_content = do { local $/; <$fh> };
-my $test_suite_data    = JSON::decode_json($test_suite_content);
+my $test_suite_data    = JSON::PP::decode_json($test_suite_content);
 
 foreach my $test (@{$test_suite_data}) {
     test_purl_encode($test);

@@ -37,11 +37,11 @@
    "provides" : {
       "String::Tagged::Markdown" : {
          "file" : "lib/String/Tagged/Markdown.pm",
-         "version" : "0.05"
+         "version" : "0.06"
       },
       "String::Tagged::Markdown::HFM" : {
          "file" : "lib/String/Tagged/Markdown/HFM.pm",
-         "version" : "0.05"
+         "version" : "0.06"
       }
    },
    "release_status" : "stable",
@@ -50,6 +50,6 @@
          "http://dev.perl.org/licenses/"
       ]
    },
-   "version" : "0.05",
-   "x_serialization_backend" : "JSON::PP version 4.07"
+   "version" : "0.06",
+   "x_serialization_backend" : "JSON::PP version 4.16"
 }

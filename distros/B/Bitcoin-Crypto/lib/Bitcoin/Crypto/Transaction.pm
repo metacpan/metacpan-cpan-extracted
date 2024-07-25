@@ -1,5 +1,5 @@
 package Bitcoin::Crypto::Transaction;
-$Bitcoin::Crypto::Transaction::VERSION = '2.004';
+$Bitcoin::Crypto::Transaction::VERSION = '2.005';
 use v5.10;
 use strict;
 use warnings;
@@ -9,7 +9,7 @@ use Mooish::AttributeBuilder -standard;
 use Type::Params -sigs;
 use Scalar::Util qw(blessed);
 use Carp qw(carp);
-use List::Util qw(sum);
+use List::Util qw(sum any);
 
 use Bitcoin::Crypto qw(btc_script btc_utxo);
 use Bitcoin::Crypto::Constants;
@@ -17,10 +17,9 @@ use Bitcoin::Crypto::Exception;
 use Bitcoin::Crypto::Transaction::Input;
 use Bitcoin::Crypto::Transaction::Output;
 use Bitcoin::Crypto::Transaction::Digest;
-use Bitcoin::Crypto::Util qw(hash256 to_format);
-use Bitcoin::Crypto::Helpers qw(pack_varint unpack_varint);
+use Bitcoin::Crypto::Util qw(pack_compactsize unpack_compactsize hash256 to_format);
 use Bitcoin::Crypto::Types
-	qw(IntMaxBits ArrayRef InstanceOf HashRef Object ByteStr Str PositiveInt PositiveOrZeroInt Enum BitcoinScript Bool);
+	qw(IntMaxBits ArrayRef InstanceOf HashRef Object ByteStr Str PositiveInt PositiveOrZeroInt Enum BitcoinScript Bool Maybe);
 use Bitcoin::Crypto::Script::Common;
 
 use namespace::clean;
@@ -51,7 +50,7 @@ with qw(
 
 signature_for add_input => (
 	method => Object,
-	positional => [ArrayRef, {slurpy => 1}],
+	positional => [ArrayRef, {slurpy => !!1}],
 );
 
 sub add_input
@@ -75,7 +74,7 @@ sub add_input
 
 signature_for add_output => (
 	method => Object,
-	positional => [ArrayRef, {slurpy => 1}],
+	positional => [ArrayRef, {slurpy => !!1}],
 );
 
 sub add_output
@@ -103,6 +102,7 @@ signature_for to_serialized => (
 		witness => Bool,
 		{default => 1},
 	],
+	bless => !!0,
 );
 
 sub to_serialized
@@ -134,19 +134,19 @@ sub to_serialized
 	# Process inputs
 	my @inputs = @{$self->inputs};
 
-	my $with_witness = $args->witness && grep { $_->has_witness } @inputs;
+	my $with_witness = $args->{witness} && any { $_->has_witness } @inputs;
 	if ($with_witness) {
 		$serialized .= "\x00\x01";
 	}
 
-	$serialized .= pack_varint(scalar @inputs);
+	$serialized .= pack_compactsize(scalar @inputs);
 	foreach my $input (@inputs) {
 		$serialized .= $input->to_serialized;
 	}
 
 	# Process outputs
 	my @outputs = @{$self->outputs};
-	$serialized .= pack_varint(scalar @outputs);
+	$serialized .= pack_compactsize(scalar @outputs);
 	foreach my $item (@outputs) {
 		$serialized .= $item->to_serialized;
 	}
@@ -155,9 +155,9 @@ sub to_serialized
 		foreach my $input (@inputs) {
 			my @this_witness = $input->has_witness ? @{$input->witness} : ();
 
-			$serialized .= pack_varint(scalar @this_witness);
+			$serialized .= pack_compactsize(scalar @this_witness);
 			foreach my $witness_item (@this_witness) {
-				$serialized .= pack_varint(length $witness_item);
+				$serialized .= pack_compactsize(length $witness_item);
 				$serialized .= $witness_item;
 			}
 		}
@@ -184,9 +184,7 @@ sub from_serialized
 	my $witness_flag = (substr $serialized, $pos, 2) eq "\x00\x01";
 	$pos += 2 if $witness_flag;
 
-	my ($input_count_len, $input_count) = unpack_varint(substr $serialized, $pos, 9);
-	$pos += $input_count_len;
-
+	my $input_count = unpack_compactsize $serialized, \$pos;
 	my @inputs;
 	for (1 .. $input_count) {
 		push @inputs, Bitcoin::Crypto::Transaction::Input->from_serialized(
@@ -194,9 +192,7 @@ sub from_serialized
 		);
 	}
 
-	my ($output_count_len, $output_count) = unpack_varint(substr $serialized, $pos, 9);
-	$pos += $output_count_len;
-
+	my $output_count = unpack_compactsize $serialized, \$pos;
 	my @outputs;
 	for (1 .. $output_count) {
 		push @outputs, Bitcoin::Crypto::Transaction::Output->from_serialized(
@@ -206,13 +202,10 @@ sub from_serialized
 
 	if ($witness_flag) {
 		foreach my $input (@inputs) {
-			my ($input_witness_len, $input_witness) = unpack_varint(substr $serialized, $pos, 9);
-			$pos += $input_witness_len;
-
+			my $input_witness = unpack_compactsize $serialized, \$pos;
 			my @witness;
 			for (1 .. $input_witness) {
-				my ($witness_count_len, $witness_count) = unpack_varint(substr $serialized, $pos, 9);
-				$pos += $witness_count_len;
+				my $witness_count = unpack_compactsize $serialized, \$pos;
 
 				push @witness, substr $serialized, $pos, $witness_count;
 				$pos += $witness_count;
@@ -277,6 +270,7 @@ sub fee
 
 	my $input_value = 0;
 	foreach my $input (@{$self->inputs}) {
+		return undef unless $input->utxo_registered;
 		$input_value += $input->utxo->output->value;
 	}
 
@@ -298,8 +292,9 @@ sub fee_rate
 	my ($self) = @_;
 
 	my $fee = $self->fee;
-	my $size = $self->virtual_size;
+	return undef unless defined $fee;
 
+	my $size = $self->virtual_size;
 	return $fee->as_float / $size;
 }
 
@@ -380,7 +375,7 @@ sub update_utxos
 	my ($self) = @_;
 
 	foreach my $input (@{$self->inputs}) {
-		$input->utxo->unregister;
+		$input->utxo->unregister if $input->utxo_registered;
 	}
 
 	foreach my $output_index (0 .. $#{$self->outputs}) {
@@ -491,15 +486,16 @@ sub _verify_script_segwit
 signature_for verify => (
 	method => Object,
 	named => [
-		block => InstanceOf ['Bitcoin::Crypto::Block'],
-		{optional => 1},
+		block => Maybe [InstanceOf ['Bitcoin::Crypto::Block']],
+		{default => undef},
 	],
+	bless => !!0,
 );
 
 sub verify
 {
 	my ($self, $args) = @_;
-	my $block = $args->block;
+	my $block = $args->{block};
 
 	my $script_runner = Bitcoin::Crypto::Script::Runner->new(
 		transaction => $self,
@@ -517,7 +513,7 @@ sub verify
 
 	# locktime checking
 	if (
-		$self->locktime > 0 && grep {
+		$self->locktime > 0 && any {
 			$_->sequence_no != Bitcoin::Crypto::Constants::max_sequence_no
 		} @inputs
 		)
@@ -580,19 +576,22 @@ sub verify
 
 signature_for dump => (
 	method => Object,
-	named => [
-	],
+	positional => [],
 );
 
 sub dump
 {
-	my ($self, $params) = @_;
+	my ($self) = @_;
+
+	my $fee = $self->fee;
+	my $fee_rate = defined $fee ? int($self->fee_rate * 100) / 100 : '??';
+	$fee //= '??';
 
 	my @result;
 	push @result, 'Transaction ' . to_format [hex => $self->get_hash];
 	push @result, 'version: ' . $self->version;
 	push @result, 'size: ' . $self->virtual_size . 'vB, ' . $self->weight . 'WU';
-	push @result, 'fee: ' . $self->fee . ' sat (~' . (int($self->fee_rate * 100) / 100) . ' sat/vB)';
+	push @result, "fee: $fee sat (~$fee_rate sat/vB)";
 	push @result, 'replace-by-fee: ' . ($self->has_rbf ? 'yes' : 'no');
 	push @result, 'locktime: ' . $self->locktime;
 	push @result, '';
@@ -730,10 +729,10 @@ data. Note that this is a no-op in non-segwit transactions.
 
 Deserializes the bytestring C<$data> into a transaction object.
 
-Keep in mind deserialization requires a full set of UTXO to be registered. If
-they are not, an exception will be raised with missing transaction id and
-output index, which should help you fill in the blanks. See
-L<Bitcoin::Crypto::Transaction::UTXO> for details.
+Keep in mind it's best to have a full set of UTXOs registered. If they are not,
+an exception may be raised if a function requires full UTXO data. That
+exception will contain transaction ID and output index, which should help you
+fill in the blanks. See L<Bitcoin::Crypto::Transaction::UTXO> for details.
 
 =head3 get_hash
 
@@ -778,14 +777,15 @@ The sighash which should be used for the digest. By default C<SIGHASH_ALL>.
 	$fee = $object->fee()
 
 Returns the fee - the difference between sum of input values and the sum of
-output values. The fee is always zero or positive integer.
+output values. The fee is always zero or positive integer, but can be undefined
+if the UTXOs were not registered.
 
 =head3 fee_rate
 
 	$fee_rate = $object->fee_rate()
 
 Returns the fee rate - the amount of satoshi per virtual byte (a floating point
-value).
+value) or undef if C<fee> is undef.
 
 NOTE: since weight of the transaction changes after signing it, it is not
 possible to accurately measure fee rate prior to signing.

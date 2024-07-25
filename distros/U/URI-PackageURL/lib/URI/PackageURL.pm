@@ -7,13 +7,13 @@ use warnings;
 
 use Carp                  ();
 use Exporter              qw(import);
-use URI::PackageURL::Util qw(purl_to_urls);
+use URI::PackageURL::Util qw(purl_to_urls purl_components_normalize);
 
 use constant DEBUG => $ENV{PURL_DEBUG};
 
 use overload '""' => 'to_string', fallback => 1;
 
-our $VERSION = '2.20';
+our $VERSION = '2.21';
 our @EXPORT  = qw(encode_purl decode_purl);
 
 my $PURL_REGEXP = qr{^pkg:[A-Za-z\\.\\-\\+][A-Za-z0-9\\.\\-\\+]*/.+};
@@ -30,100 +30,7 @@ sub new {
     my $qualifiers = delete $params{qualifiers} // {};
     my $subpath    = delete $params{subpath};
 
-    Carp::croak "Invalid Package URL: '$scheme' is not a valid scheme" if (!$scheme eq 'pkg');
-
-    $type = lc $type;
-
-    if (grep { $_ eq $type } qw(alpm apk bitbucket composer deb github gitlab hex npm oci pypi)) {
-        $name = lc $name;
-    }
-
-    if ($namespace) {
-        if (grep { $_ eq $type } qw(alpm apk bitbucket composer deb github gitlab golang hex rpm)) {
-            $namespace = lc $namespace;
-        }
-    }
-
-    foreach my $qualifier (keys %{$qualifiers}) {
-        Carp::croak "Invalid Package URL: '$qualifier' is not a valid qualifier" if ($qualifier =~ /\s/);
-        Carp::croak "Invalid Package URL: '$qualifier' is not a valid qualifier" if ($qualifier =~ /\%/);
-    }
-
-
-    # A PyPI package name must be lowercased and underscore "_" replaced with a dash "-".
-    $name =~ s/_/-/g if $type eq 'pypi';
-
-    if ($type eq 'cpan') {
-
-        # To refer to a CPAN distribution name, the "namespace" MUST be present. In this
-        # case, the "namespace" is the CPAN id of the author/publisher. It MUST be
-        # written uppercase, followed by the distribution name in the "name" component. A
-        # distribution name may NEVER contain the string "::".
-
-        # To refer to a CPAN module, the "namespace" MUST be absent. The module name MAY
-        # contain zero or more "::" strings, and the module name MUST NOT contain a "-"
-
-        $namespace = uc $namespace if ($namespace);
-
-        if (($namespace && $name) && $namespace =~ /\:/) {
-            Carp::croak "Invalid Package URL: CPAN 'namespace' component must have the distribution author";
-        }
-
-        if (($namespace && $name) && $name =~ /\:/) {
-            Carp::croak "Invalid Package URL: CPAN 'name' component must have the distribution name";
-        }
-
-        if (!$namespace && $name =~ /\-/) {
-            Carp::croak "Invalid Package URL: CPAN 'name' component must have the module name";
-        }
-
-    }
-
-    if ($type eq 'swift') {
-        Carp::croak "Invalid Package URL: Swift 'version' is required"   unless defined $version;
-        Carp::croak "Invalid Package URL: Swift 'namespace' is required" unless defined $namespace;
-    }
-
-    if ($type eq 'cran') {
-        Carp::croak "Invalid Package URL: Cran 'version' is required" unless defined $version;
-    }
-
-    if ($type eq 'conan') {
-
-        if ($namespace && $namespace ne '') {
-            if (!defined $qualifiers->{channel}) {
-                Carp::croak "Invalid Package URL: Conan 'channel' qualifier does not exist for namespace '$namespace'";
-            }
-        }
-        else {
-            if (defined $qualifiers->{channel}) {
-                Carp::croak
-                    "Invalid Package URL: Conan 'namespace' does not exist for channel '$qualifiers->{channel}'";
-            }
-        }
-
-    }
-
-    if ($type eq 'mlflow') {
-
-        # The "name" case sensitivity depends on the server implementation:
-        #   - Azure ML: it is case sensitive and must be kept as-is in the package URL.
-        #   - Databricks: it is case insensitive and must be lowercased in the package URL.
-
-        if (defined $qualifiers->{repository_url} && $qualifiers->{repository_url} =~ /azuredatabricks/) {
-            $name = lc $name;
-        }
-
-    }
-
-    if ($type eq 'huggingface') {
-
-        # The version is the model revision Git commit hash. It is case insensitive and
-        # must be lowercased in the package URL.
-        $version = lc $version;
-    }
-
-    my $self = {
+    return bless purl_components_normalize(
         scheme     => $scheme,
         type       => $type,
         namespace  => $namespace,
@@ -131,9 +38,7 @@ sub new {
         version    => $version,
         qualifiers => $qualifiers,
         subpath    => $subpath
-    };
-
-    return bless $self, $class;
+    ), $class;
 
 }
 
@@ -378,7 +283,7 @@ URI::PackageURL - Perl extension for Package URL (aka "purl")
     type      => cpan,
     namespace => 'GDT',
     name      => 'URI-PackageURL',
-    version   => '2.20'
+    version   => '2.21'
   );
   
   say $purl; # pkg:cpan/GDT/URI-PackageURL@2.20
@@ -391,7 +296,7 @@ URI::PackageURL - Perl extension for Package URL (aka "purl")
   $purl = decode_purl('pkg:cpan/GDT/URI-PackageURL@2.20');
   say $purl->type;  # cpan
 
-  $purl_string = encode_purl(type => cpan, name => 'URI::PackageURL', version => '2.20');
+  $purl_string = encode_purl(type => cpan, name => 'URI::PackageURL', version => '2.21');
   say $purl_string; # pkg:cpan/URI::PackageURL@2.20
 
 =head1 DESCRIPTION
@@ -451,7 +356,7 @@ C<cpan> is an official "purl" type (L<https://github.com/package-url/purl-spec/b
 =item * To refer to a CPAN distribution name, the C<namespace> MUST be present.
 In this case, the namespace is the CPAN id of the author/publisher.
 It MUST be written uppercase, followed by the distribution name in the name component.
-A distribution name may NEVER contain the string C<::>.
+A distribution name MUST NOT contain the string C<::>.
 
 =item * To refer to a CPAN module, the C<namespace> MUST be absent.
 The module name MAY contain zero or more C<::> strings, and the module name MUST NOT contain a C<->
@@ -495,7 +400,7 @@ They are exported by default:
 
 =over
 
-=item $purl_string = encode_purl(%purl_components);
+=item $purl_string = encode_purl(%purl_components)
 
 Converts the given Package URL components to "purl" string. Croaks on error.
 
@@ -503,7 +408,7 @@ This function call is functionally identical to:
 
     $purl_string = URI::PackageURL->new(%purl_components)->to_string;
 
-=item $purl_components = decode_purl($purl_string);
+=item $purl_components = decode_purl($purl_string)
 
 Converts the given "purl" string to Package URL components. Croaks on error.
 

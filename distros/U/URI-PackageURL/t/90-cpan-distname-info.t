@@ -83,4 +83,4 @@ KMACLEOD/Frontier-RPC-0.07b4.tar.gz
 RTFIREFLY/Frontier-RPC-0.07b4p1.tar.gz
 AJPEACOCK/HTML-Table-2.08a.tar.gz
 DANPEDER/MIME-Base32-1.02a.tar.gz
-CPAN/authors/id/G/GD/GDT/URI-PackageURL-2.20.tar.gz
+CPAN/authors/id/G/GD/GDT/URI-PackageURL-2.21.tar.gz

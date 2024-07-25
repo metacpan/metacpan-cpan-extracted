@@ -4,7 +4,7 @@
       "Tokuhiro Matsuno < tokuhirom @A gmail DOT. com>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Minilla/v3.1.10",
+   "generated_by" : "Minilla/v3.1.23",
    "license" : [
       "perl_5"
    ],
@@ -57,7 +57,7 @@
    "provides" : {
       "Net::DNS::Paranoid" : {
          "file" : "lib/Net/DNS/Paranoid.pm",
-         "version" : "0.10"
+         "version" : "0.11"
       }
    },
    "release_status" : "stable",
@@ -67,16 +67,17 @@
       },
       "homepage" : "https://github.com/tokuhirom/Net-DNS-Paranoid",
       "repository" : {
-         "url" : "git://github.com/tokuhirom/Net-DNS-Paranoid.git",
+         "type" : "git",
+         "url" : "https://github.com/tokuhirom/Net-DNS-Paranoid.git",
          "web" : "https://github.com/tokuhirom/Net-DNS-Paranoid"
       }
    },
-   "version" : "0.10",
+   "version" : "0.11",
    "x_contributors" : [
       "Anirvan Chatterjee <anirvan@users.noreply.github.com>",
       "Graham TerMarsch <graham@howlingfrog.com>",
       "Tokuhiro Matsuno <tokuhirom@gmail.com>"
    ],
-   "x_serialization_backend" : "JSON::PP version 4.02",
+   "x_serialization_backend" : "JSON::PP version 4.16",
    "x_static_install" : 1
 }

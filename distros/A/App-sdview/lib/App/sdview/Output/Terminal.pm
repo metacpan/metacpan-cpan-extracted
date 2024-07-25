@@ -1,7 +1,7 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2021-2023 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2021-2024 -- leonerd@leonerd.org.uk
 
 use v5.26;
 use warnings;
@@ -9,7 +9,7 @@ use utf8;
 
 use Object::Pad 0.807;
 
-package App::sdview::Output::Terminal 0.15;
+package App::sdview::Output::Terminal 0.16;
 class App::sdview::Output::Terminal :strict(params);
 
 inherit App::sdview::Output::Formatted;
@@ -17,7 +17,7 @@ inherit App::sdview::Output::Formatted;
 use constant format => "terminal";
 
 use Scalar::Util qw( blessed );
-use String::Tagged::Terminal;
+use String::Tagged::Terminal 0.08; # for OSC 8 hyperlink support
 use Term::Size;
 
 =head1 NAME
@@ -41,18 +41,42 @@ the output is piped via F<less -R> to act as a simple iteractive pager.
 
 =cut
 
+=head1 OPTIONS
+
+=over 4
+
+=item -O nopager
+
+Disables use of F<less> as an output pager, causing output to be printed to
+the terminal directly.
+
+=item -O width=NN
+
+Overrides the detected width of the terminal.
+
+=back
+
+=cut
+
+field $pager :param = !!1;
+
+# TODO: Is this the neatest way to do this?
+ADJUST :params ( :$nopager = undef ) {
+   $pager = !!0 if $nopager;
+}
+
+field $width :param :reader = scalar Term::Size::chars;
+
 method setup_output ()
 {
-   if( -T STDOUT ) {
+   if( $pager and -T STDOUT ) {
       open my $outh, "|-", "less", "-R";
       $outh->binmode( ":encoding(UTF-8)" );
       select $outh;
    }
-}
-
-method width ()
-{
-   return scalar Term::Size::chars;
+   else {
+      STDOUT->binmode( ":encoding(UTF-8)" );
+   }
 }
 
 method say ( @s )

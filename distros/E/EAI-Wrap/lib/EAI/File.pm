@@ -1,4 +1,4 @@
-package EAI::File 1.914;
+package EAI::File 1.915;
 
 use strict; use feature 'unicode_strings'; use warnings; no warnings 'uninitialized';
 use Exporter qw(import);use Text::CSV();use Data::XLSX::Parser();use Spreadsheet::ParseExcel();use Spreadsheet::WriteExcel();use Excel::Writer::XLSX();use Data::Dumper qw(Dumper);use XML::LibXML();use XML::LibXML::Debugging();
@@ -337,14 +337,22 @@ sub readExcel ($$$;$$) {
 			$parser->add_row_event_handler(\&row_handlerXLSX);
 			if ($File->{format_worksheet}) {
 				$worksheet = $parser->workbook->sheet_id($File->{format_worksheet});
-				$logger->logdie("no worksheet found named ".$File->{format_worksheet}.", maybe try {format_worksheetID} (numerically ordered place)") if !$worksheet;
+				if (!$worksheet) {
+					$logger->error("no xlsx worksheet found named ".$File->{format_worksheet}.", maybe try {format_worksheetID} (numerically ordered place)");
+					return 0;
+				}
 			} elsif ($File->{format_worksheetID}) {
 				$worksheet = $File->{format_worksheetID};
 			} else {
-				$logger->logdie("neither worksheetname nor worksheetID (numerically ordered place) given");
+				$logger->error("neither worksheetname nor worksheetID (numerically ordered place) given for xlsx workbook");
+				return 0;
 			}
 			$logger->debug("starting parser for xlsx sheet name: ".$File->{format_worksheet}.", id:".$worksheet);
-			$parser->sheet_by_id($worksheet);
+			eval { $parser->sheet_by_id($worksheet); };
+			if ($@) {
+				$logger->error("Error parsing xlsx sheet: ".$@);
+				return 0;
+			}
 		} elsif ($File->{format_xlformat} =~ /^xls$/i) {
 			$logger->warn("worksheets can't be found by name for the old xls format, please pass numerically ordered place in {format_worksheetID}") if ($File->{format_worksheet});
 			$worksheet = $File->{format_worksheetID} if $File->{format_worksheetID};
@@ -355,7 +363,7 @@ sub readExcel ($$$;$$) {
 			);
 			my $workbook = $parser->parse($redoSubDir.$filename);
 			if (!defined $workbook) {
-				$logger->error("excel parsing error: ".$parser->error());
+				$logger->error("excel xls parsing error: ".$parser->error());
 				return 0;
 			}
 		} else {

@@ -1,5 +1,14 @@
 Revision history for App-sdview-Output-Tickit
 
+0.08    2024-07-24
+        [CHANGES]
+         * Support formatting in list item term paragraph
+
+        [BUGFIXES]
+         * Don't crash on pressing Enter when no search matches are found
+         * Remember to erase to end of line when rendering list item term
+           paragraph
+
 0.07    2024-06-08
         [CHANGES]
          * Notate dependency on String::Tagged v0.23 for RT150015 bugfix

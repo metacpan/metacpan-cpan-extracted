@@ -7,7 +7,7 @@ use v5.26;
 use warnings;
 use experimental 'signatures';
 
-package App::sdview::Style 0.15;
+package App::sdview::Style 0.16;
 
 use Convert::Color;
 use Convert::Color::XTerm 0.06;
@@ -73,7 +73,15 @@ sub convert_str ( $pkg, $s )
 {
    return $s->clone(
       convert_tags => {
-         ( map { $_ => do { my $k = $_; sub { $FORMATSTYLES{$k}->%* } } } keys %FORMATSTYLES ),
+         ( map {
+            my $k = $_;
+            if( $k eq "link" ) {
+               $k => sub ($, $v) { link => $v, $FORMATSTYLES{$k}->%* };
+            }
+            else {
+               $k => sub { $FORMATSTYLES{$k}->%* };
+            }
+         } keys %FORMATSTYLES ),
       },
    );
 }

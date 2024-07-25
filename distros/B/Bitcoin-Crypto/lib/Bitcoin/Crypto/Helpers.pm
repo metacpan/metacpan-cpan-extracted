@@ -1,12 +1,12 @@
 package Bitcoin::Crypto::Helpers;
-$Bitcoin::Crypto::Helpers::VERSION = '2.004';
+$Bitcoin::Crypto::Helpers::VERSION = '2.005';
 use v5.10;
 use strict;
 use warnings;
 use Exporter qw(import);
-use List::Util qw(max);
 use Crypt::PK::ECC;
 use Carp qw(carp);
+use MIME::Base64;
 
 use Bitcoin::Crypto::Constants;
 use Bitcoin::Crypto::Exception;
@@ -27,9 +27,8 @@ our @EXPORT_OK = qw(
 	pad_hex
 	ensure_length
 	add_ec_points
-	pack_varint
-	unpack_varint
 	carp_once
+	parse_formatdesc
 );
 
 our @CARP_NOT;
@@ -63,70 +62,6 @@ sub ensure_length
 	) if $missing < 0;
 
 	return pack("x$missing") . $packed;
-}
-
-sub pack_varint
-{
-	my ($value) = @_;
-
-	Bitcoin::Crypto::Exception->raise(
-		"VarInt must be positive or zero"
-	) if $value < 0;
-
-	if ($value <= 0xfc) {
-		return pack 'C', $value;
-	}
-	elsif ($value <= 0xffff) {
-		return "\xfd" . pack 'v', $value;
-	}
-	elsif ($value <= 0xffffffff) {
-		return "\xfe" . pack 'V', $value;
-	}
-	else {
-		# 32 bit archs should not reach this
-		return "\xff" . (pack 'V', $value & 0xffffffff) . (pack 'V', $value >> 32);
-	}
-}
-
-sub unpack_varint
-{
-	my ($stream) = @_;
-
-	my $value = ord substr $stream, 0, 1, '';
-	my $length = 1;
-
-	if ($value == 0xfd) {
-		Bitcoin::Crypto::Exception->raise(
-			"cannot unpack VarInt: not enough data in stream"
-		) if length $stream < 2;
-
-		$value = unpack 'v', substr $stream, 0, 2;
-		$length += 2;
-	}
-	elsif ($value == 0xfe) {
-		Bitcoin::Crypto::Exception->raise(
-			"cannot unpack VarInt: not enough data in stream"
-		) if length $stream < 4;
-
-		$value = unpack 'V', substr $stream, 0, 4;
-		$length += 4;
-	}
-	elsif ($value == 0xff) {
-		Bitcoin::Crypto::Exception->raise(
-			"cannot unpack VarInt: no 64 bit support"
-		) if !Bitcoin::Crypto::Constants::is_64bit;
-
-		Bitcoin::Crypto::Exception->raise(
-			"cannot unpack VarInt: not enough data in stream"
-		) if length $stream < 8;
-
-		my $lower = unpack 'V', substr $stream, 0, 4;
-		my $higher = unpack 'V', substr $stream, 4, 4;
-		$value = ($higher << 32) + $lower;
-		$length += 8;
-	}
-
-	return ($length, $value);
 }
 
 # Self-contained implementation on elliptic curve points addition.
@@ -201,18 +136,30 @@ sub add_ec_points
 		: undef;
 }
 
-# not exported - used exclusively by the internal FormatDesc type
-
+# default operation is to decode based on formatdesc
+# passing $reverse makes it encode instead
 sub parse_formatdesc
 {
-	my ($type, $data) = @{$_[0]};
+	my ($type, $data, $reverse) = @_;
 
 	if ($type eq 'hex') {
-		$data = pack 'H*', pad_hex $data;
+		$data = $reverse
+			? unpack 'H*', $data
+			: pack 'H*', pad_hex $data
+			;
 	}
 	elsif ($type eq 'base58') {
 		require Bitcoin::Crypto::Base58;
-		$data = Bitcoin::Crypto::Base58::decode_base58check($data);
+		$data = $reverse
+			? Bitcoin::Crypto::Base58::encode_base58check($data)
+			: Bitcoin::Crypto::Base58::decode_base58check($data)
+			;
+	}
+	elsif ($type eq 'base64') {
+		$data = $reverse
+			? encode_base64($data, '')
+			: decode_base64($data)
+			;
 	}
 
 	return $data;

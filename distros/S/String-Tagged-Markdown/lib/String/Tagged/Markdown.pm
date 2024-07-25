@@ -1,9 +1,9 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2022-2023 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2022-2024 -- leonerd@leonerd.org.uk
 
-package String::Tagged::Markdown 0.05;
+package String::Tagged::Markdown 0.06;
 
 use v5.26;
 use warnings;
@@ -118,7 +118,7 @@ sub __cache_per_class ( $code )
 
 =head2 parse_markdown
 
-   $st = String::Tagged::InlineFormatted->parse_markdown( $str )
+   $st = String::Tagged::Markdown->parse_markdown( $str );
 
 Parses a text string containing Markdown-like formatting as described above.
 
@@ -214,8 +214,8 @@ sub parse_markdown ( $class, $str )
 Returns a new instance by convertig L<String::Tagged::Formatting> standard
 tags.
 
-The C<bold>, C<italic> and C<strike> tags are preserved. C<monospace> is
-renamed to C<fixed>.
+The C<bold>, C<italic>, C<strike> and C<link> tags are preserved. C<monospace>
+is renamed to C<fixed>.
 
 Supports the following extra named arguments:
 
@@ -240,6 +240,10 @@ sub tags_from_formatting ( $class )
    italic    => "italic",
    monospace => "fixed",
    strike    => "strike",
+   link      => sub ( $k, $v ) {
+      defined( my $uri = $v->{uri} ) or return;
+      "link" => $uri
+   },
 }
 
 sub new_from_formatting ( $class, $orig, %args )
@@ -262,7 +266,7 @@ sub new_from_formatting ( $class, $orig, %args )
 
 =head2 build_markdown
 
-   $str = $st->build_markdown
+   $str = $st->build_markdown;
 
 Returns a plain text string containing Markdown-like inline formatting markers
 to format the tags in the given instance. Uses the notation given in the
@@ -342,13 +346,13 @@ sub build_markdown ( $self )
 
 =head2 as_formatting
 
-   $fmt = $st->as_formatting( %args )
+   $fmt = $st->as_formatting( %args );
 
 Returns a new C<String::Tagged> instance tagged with
 L<String::Tagged::Formatting> standard tags.
 
-The C<bold>, C<italic> and C<strike> tags are preserved, C<fixed> is renamed
-to C<monospace>. The C<link> tag is currently not represented at all.
+The C<bold>, C<italic>, C<strike> and C<link> tags are preserved, C<fixed> is
+renamed to C<monospace>.
 
 Supports the following extra named arguments:
 
@@ -373,6 +377,9 @@ sub tags_to_formatting ( $class )
    italic => "italic",
    fixed  => "monospace",
    strike => "strike",
+   link   => sub ( $k, $v ) {
+      "link" => { uri => $v }
+   },
 }
 
 sub as_formatting ( $self, %args )

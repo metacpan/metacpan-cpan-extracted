@@ -1,3 +1,4 @@
+.editorconfig
 Build.PL
 Changes
 lib/String/Tagged/HTML.pm

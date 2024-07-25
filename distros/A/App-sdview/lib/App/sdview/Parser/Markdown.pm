@@ -8,7 +8,7 @@ use warnings;
 
 use Object::Pad 0.807;
 
-package App::sdview::Parser::Markdown 0.15;
+package App::sdview::Parser::Markdown 0.16;
 class App::sdview::Parser::Markdown :strict(params);
 
 apply App::sdview::Parser;
@@ -243,7 +243,7 @@ method _handle_spans ( $s )
             # bold, italic stay as they are
             fixed  => "monospace",
             strike => "strikethrough",
-            link   => sub ($t, $v) { return link => { target => $v } },
+            link   => sub ($t, $v) { return link => { uri => $v } },
          },
          only_tags => [qw( bold italic fixed strike link )],
       );

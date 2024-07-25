@@ -64,3 +64,5 @@
 	- execute hash not checked anymore, so it can be used to transport custom data; column definitions in DB.pm now debug level, tracing of data is now row wise (whole data structure was too big to be dumped)
 1.914  Wed May 29 00:00:00 2024
 	- counting progress without precentage works now by setting countPercent to >= 100, fixed fallback to config level defined settings with prefix (in config subhash "lookups") also for loads, fixed unicode problems in log error mails, fixed problem in parsing scientific numer notations in DB.pm, caching of ftp handles in FTP.pm, additional folderEnvironmentMapping via accessed module's folder (if in test -> test), reset error mail filter ONLY for planned tasks, don't connect to FTP if redo from local file
+1.915  Wed Jul 23 00:00:00 2024
+	- fixed retry ending problem with executions running over midnight, made retry ending over midnight configurable with task{retryEndsAfterMidnight}, restricted execute info on start parameter dump (setupEAIWrap) to configured entries (sensitive info), also display now config hash on start parameter dump (without sensitive info), fixed time type parsing in DB.pm

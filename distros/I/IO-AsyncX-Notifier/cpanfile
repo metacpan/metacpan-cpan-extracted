@@ -1,6 +1,6 @@
 requires 'perl', '>= 5.026';
-requires 'Object::Pad', '>= 0.63';
-requires 'IO::Async::Notifier', '>= 0.79';
+requires 'Object::Pad', '>= 0.809';
+requires 'IO::Async::Notifier', '>= 0.803';
 
 on 'test' => sub {
     requires 'Test::More', '>= 0.98';

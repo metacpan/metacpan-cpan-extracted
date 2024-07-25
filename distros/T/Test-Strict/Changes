@@ -1,5 +1,8 @@
 Revision history for Test::Strict.
 
+0.54  2024-07-24 17:45:00 MANWAR
+      - Fix skipping of .git, .svn, and CVS directories, thanks @haarg.
+
 0.53  2024-07-22 13:30:00 MANWAR
       - Don't simultaneously test -c and -v switches (PR #33), thanks @jkeenan.
       - Fixed manifest check (PR #35), thanks @haarg.

@@ -1,5 +1,9 @@
 Revision history for String-Tagged-Terminal
 
+0.08    2024-07-24
+        [CHANGES]
+         * Support the new `link` Formatting tag by emitting OSC 8 sequences
+
 0.07    2023-11-24
         [CHANGES]
          * Added `->parse_terminal` constructor

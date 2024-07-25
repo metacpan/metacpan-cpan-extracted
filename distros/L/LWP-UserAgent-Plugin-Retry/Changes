@@ -1,3 +1,11 @@
+0.005   2024-07-17  Released-By: PERLANCAR; Urgency: low
+
+        - No functional changes.
+
+        - [dist] Edit Changes (replace Backward-Compatible: no with
+          Backward-Incompatible: yes).
+
+
 0.004   2021-08-13  Released-By: PERLANCAR; Urgency: low
 
 	- No functional changes.
@@ -5,7 +13,7 @@
 	- [doc] Fix typo in Synopsis (RT#138640).
 
 
-0.003   2020-08-14  Released-By: PERLANCAR; Urgency: medium; Backward-Compatible: no
+0.003   2020-08-14  Released-By: PERLANCAR; Urgency: medium; Backward-Incompatible: yes
 
 	- [incompatible change] Synchronize features with
 	  HTTP::Tiny::Plugin::Retry: remove retry_{server,client}_errors

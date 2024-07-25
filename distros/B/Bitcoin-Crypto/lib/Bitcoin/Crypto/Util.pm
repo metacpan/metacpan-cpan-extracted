@@ -1,10 +1,9 @@
 package Bitcoin::Crypto::Util;
-$Bitcoin::Crypto::Util::VERSION = '2.004';
+$Bitcoin::Crypto::Util::VERSION = '2.005';
 use v5.10;
 use strict;
 use warnings;
 use Exporter qw(import);
-use Crypt::PK::ECC;
 use Unicode::Normalize;
 use Crypt::KeyDerivation qw(pbkdf2);
 use Encode qw(encode);
@@ -15,8 +14,10 @@ use Try::Tiny;
 use Scalar::Util qw(blessed);
 use Type::Params -sigs;
 
+use Bitcoin::Crypto::Helpers qw(parse_formatdesc);
 use Bitcoin::Crypto::Constants;
-use Bitcoin::Crypto::Types qw(Str ByteStr FormatStr InstanceOf Maybe PositiveInt Tuple);
+use Bitcoin::Crypto::Types qw(Str ByteStr FormatStr ConsumerOf Maybe PositiveInt Tuple ScalarRef PositiveOrZeroInt);
+use Bitcoin::Crypto::DerivationPath;
 use Bitcoin::Crypto::Exception;
 
 our @EXPORT_OK = qw(
@@ -29,7 +30,10 @@ our @EXPORT_OK = qw(
 	mnemonic_from_entropy
 	mnemonic_to_seed
 	get_path_info
+	from_format
 	to_format
+	pack_compactsize
+	unpack_compactsize
 	hash160
 	hash256
 );
@@ -99,11 +103,7 @@ sub validate_segwit
 }
 
 signature_for get_address_type => (
-	positional => [
-		Str,
-		Maybe [Str],
-		{optional => !!1},
-	],
+	positional => [Str, Maybe [Str], {default => undef}],
 );
 
 sub get_address_type
@@ -218,7 +218,7 @@ sub get_public_key_compressed
 }
 
 signature_for mnemonic_to_seed => (
-	positional => [Str, Maybe [Str], {optional => 1}],
+	positional => [Str, Maybe [Str], {default => undef}],
 );
 
 sub mnemonic_to_seed
@@ -272,38 +272,26 @@ sub mnemonic_from_entropy
 }
 
 signature_for get_path_info => (
-	positional => [Str | InstanceOf ['Bitcoin::Crypto::BIP44']],
+	positional => [Str | ConsumerOf ['Bitcoin::Crypto::Role::WithDerivationPath']],
 );
 
 sub get_path_info
 {
 	my ($path) = @_;
-	if ($path =~ m{\A ([mM]) ((?: / \d+ '?)*) \z}x) {
-		my ($head, $rest) = ($1, $2);
-		my @path;
+	return $path->get_derivation_path if blessed $path;
 
-		if (defined $rest && length $rest > 0) {
+	return scalar try {
+		Bitcoin::Crypto::DerivationPath->from_string($path);
+	};
+}
 
-			# remove leading slash (after $head)
-			substr $rest, 0, 1, '';
+# use signature, not signature_for, because of the prototype
+sub from_format ($)
+{
+	state $sig = signature(positional => [Tuple [FormatStr, Str]]);
+	my ($format, $data) = @{($sig->(@_))[0]};
 
-			for my $part (split '/', $rest) {
-				my $is_hardened = $part =~ tr/'//d;
-
-				return undef if $part >= Bitcoin::Crypto::Constants::max_child_keys;
-
-				$part += Bitcoin::Crypto::Constants::max_child_keys if $is_hardened;
-				push @path, $part;
-			}
-		}
-
-		return {
-			private => $head eq 'm',
-			path => \@path,
-		};
-	}
-
-	return undef;
+	return parse_formatdesc($format, $data);
 }
 
 # use signature, not signature_for, because of the prototype
@@ -312,15 +300,81 @@ sub to_format ($)
 	state $sig = signature(positional => [Tuple [FormatStr, ByteStr]]);
 	my ($format, $data) = @{($sig->(@_))[0]};
 
-	if ($format eq 'hex') {
-		$data = unpack 'H*', $data;
+	return parse_formatdesc($format, $data, 1);
+}
+
+signature_for pack_compactsize => (
+	positional => [PositiveOrZeroInt],
+);
+
+sub pack_compactsize
+{
+	my ($value) = @_;
+
+	if ($value <= 0xfc) {
+		return pack 'C', $value;
 	}
-	elsif ($format eq 'base58') {
-		require Bitcoin::Crypto::Base58;
-		$data = Bitcoin::Crypto::Base58::encode_base58check($data);
+	elsif ($value <= 0xffff) {
+		return "\xfd" . pack 'v', $value;
+	}
+	elsif ($value <= 0xffffffff) {
+		return "\xfe" . pack 'V', $value;
+	}
+	else {
+		# 32 bit archs should not reach this
+		return "\xff" . (pack 'V', $value & 0xffffffff) . (pack 'V', $value >> 32);
+	}
+}
+
+signature_for unpack_compactsize => (
+	positional => [ByteStr, Maybe [ScalarRef [PositiveOrZeroInt]], {default => undef}],
+);
+
+sub unpack_compactsize
+{
+	my ($stream, $pos_ref) = @_;
+	my $partial = !!$pos_ref;
+	my $pos = $partial ? $$pos_ref : 0;
+
+	# if the first byte is 0xfd, 0xfe or 0xff, then CompactSize contains 2, 4 or 8
+	# bytes respectively
+	my $value = ord substr $stream, $pos++, 1;
+	my $length = 2**($value - 0xfd + 1);
+
+	if ($length > 1) {
+		Bitcoin::Crypto::Exception->raise(
+			"cannot unpack CompactSize: not enough data in stream"
+		) if length $stream < $length;
+
+		if ($length == 2) {
+			$value = unpack 'v', substr $stream, $pos, 2;
+		}
+		elsif ($length == 4) {
+			$value = unpack 'V', substr $stream, $pos, 4;
+		}
+		else {
+			Bitcoin::Crypto::Exception->raise(
+				"cannot unpack CompactSize: no 64 bit support"
+			) if !Bitcoin::Crypto::Constants::is_64bit;
+
+			my $lower = unpack 'V', substr $stream, $pos, 4;
+			my $higher = unpack 'V', substr $stream, $pos + 4, 4;
+			$value = ($higher << 32) + $lower;
+		}
+
+		$pos += $length;
 	}
 
-	return $data;
+	if ($partial) {
+		$$pos_ref = $pos;
+	}
+	else {
+		Bitcoin::Crypto::Exception->raise(
+			"cannot unpack CompactSize: leftover data in stream"
+		) unless $pos == length $stream;
+	}
+
+	return $value;
 }
 
 signature_for hash160 => (
@@ -364,7 +418,10 @@ Bitcoin::Crypto::Util - General Bitcoin utilities
 		mnemonic_from_entropy
 		mnemonic_to_seed
 		get_path_info
+		from_format
 		to_format
+		pack_compactsize
+		unpack_compactsize
 		hash160
 		hash256
 	);
@@ -494,8 +551,11 @@ wallet.
 
 	$path_data = get_path_info($path);
 
-Tries to get derivation path data from C<$path>  (like C<"m/1/3'">). Returns
-undef if C<$path> is not a valid path, otherwise returns the structure:
+Tries to get derivation path data from C<$path>, which can be a string like
+C<"m/1/3'"> or an object which implements C<get_derivation_path> method (and
+does C<Bitcoin::Crypto::Role::WithDerivationPath>). Returns undef if C<$path>
+is not a valid path, otherwise returns the structure as an instance of
+L<Bitcoin::Crypto::DerivationPath>:
 
 	{
 		private => bool, # is path derivation private (lowercase m)
@@ -514,21 +574,54 @@ manual unpacking.
 
 Supported C<$format> values are:
 
-C<bytes>, does nothing
+=over
 
-C<hex>, encodes as a hexadecimal string (no C<0x> prefix)
+=item * C<bytes>, does nothing
 
-C<base58>, uses base58 and includes the checksum (base58check)
+=item * C<hex>, encodes as a hexadecimal string (no C<0x> prefix)
+
+=item * C<base58>, uses base58 and includes the checksum (base58check)
+
+=item * C<base64>, uses base64
+
+=back
+
+=head2 from_format
+
+	$decoded = from_format [$format => $string];
+
+Reverse of L</to_format> - decodes C<$string> into bytestring, treating it as
+C<$format>.
+
+I<Note: this is not usually needed to be called explicitly, as every bytestring
+parameter of the module will do this conversion implicitly.>
+
+=head2 pack_compactsize
+
+	$bytestr = pack_compactsize($integer);
+
+Serializes C<$integer> as Bitcoin's CompactSize format and returns it as a byte string.
+
+=head2 unpack_compactsize
+
+	$integer = unpack_compactsize($bytestr, $pos = undef);
+
+Deserializes CompactSize from C<$bytestr>, returning an integer.
+
+If C<$pos> is passed, it must be a reference to a scalar containing the
+position at which to start the decoding. It will be modified to contain the
+next position after the CompactSize. If not, decoding will start at 0 and will raise
+an exception if C<$bytestr> contains anything other than CompactSize.
 
 =head2 hash160
 
-	my $hash = hash160($data);
+	$hash = hash160($data);
 
 This is hash160 used by Bitcoin (C<RIPEMD160> of C<SHA256>)
 
 =head2 hash256
 
-	my $hash = hash256($data);
+	$hash = hash256($data);
 
 This is hash256 used by Bitcoin (C<SHA256> of C<SHA256>)
 

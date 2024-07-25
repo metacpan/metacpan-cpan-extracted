@@ -50,6 +50,8 @@ TAGS
 
  sizepos
 
+    Since version 0.06.
+
     (experimental)
 
     This tag takes a value indicating an adjustment to the vertical
@@ -58,6 +60,15 @@ TAGS
 
     Recognised values are sub for subscript, and super for superscript.
     These are implemented using the mintty-style CSI 73/74/75 m codes.
+
+ link
+
+    Since version 0.08.
+
+    (experimental)
+
+    This tag takes a HASH reference, whose uri key is emitted using the OSC
+    8 hyperlink sequence.
 
 CONSTRUCTORS
 
@@ -82,7 +93,7 @@ CONSTRUCTORS
     escape sequences mixed with plain string content.
 
     The parser will only accept 7- or 8-bit encodings of the SGR escape
-    sequence (\e[ ... m or \x9b[ ... m). If any other escape sequences are
+    sequence (\e[ ... m or \x9b ... m). If any other escape sequences are
     present, an exception is thrown.
 
     Conversely, unrecognised formatting codes in SGR sequences are simply

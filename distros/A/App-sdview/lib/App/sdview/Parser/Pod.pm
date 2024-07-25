@@ -8,7 +8,7 @@ use warnings;
 
 use Object::Pad 0.807;
 
-package App::sdview::Parser::Pod 0.15;
+package App::sdview::Parser::Pod 0.16;
 class App::sdview::Parser::Pod :strict(params);
 
 inherit Pod::Simple;
@@ -66,6 +66,8 @@ ADJUST
    $self->nix_X_codes( 1 );
 
    $self->accept_codes(qw( U ));
+
+   $self->accept_directive_as_verbatim( 'code' );
 }
 
 field @_indentstack;
@@ -130,12 +132,12 @@ method _handle_element_start ( $type, $attrs )
       %_curtags = ();
    }
    elsif( $type eq "L" ) {
-      my $target = $attrs->{to};
+      my $uri = $attrs->{to};
       # TODO: more customizable
-      if( defined $target and $target !~ m(^\w+://) ) {
-         $target = "https://metacpan.org/pod/$target";
+      if( defined $uri and $uri !~ m(^\w+://) ) {
+         $uri = "https://metacpan.org/pod/$uri";
       }
-      $_curtags{link} = { target => $target };
+      $_curtags{link} = { uri => $uri };
    }
    elsif( my $tag = $FORMAT_TYPES{$type} ) {
       ++$_curtags{$tag};
@@ -197,6 +199,9 @@ method _handle_element_end ( $type, @ )
       my @items = ( pop @_parastack )->@*;
       $_parastack[-1][-1]->push_item( $_ ) for @items;
    }
+   elsif( $type eq "item-text" ) {
+      $_parastack[-1][-1]->term_done;
+   }
    elsif( $type =~ m/^item-.*/ ) {
       # nothing
    }
@@ -209,13 +214,7 @@ method _handle_text ( $text )
 {
    $text =~ s/ /\xA0/g if $_conv_nbsp;
 
-   if( $_curpara->type eq "item" and
-         $_curpara->listtype eq "text" and !length $_curpara->term ) {
-      $_curpara->term->append_tagged( $text, %_curtags );
-   }
-   else {
-      $_curpara->text->append_tagged( $text, %_curtags );
-   }
+   $_curpara->append_text( $text, %_curtags );
 }
 
 method trim_leading_whitespace ( $para )

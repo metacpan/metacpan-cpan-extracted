@@ -1,5 +1,5 @@
 package Bitcoin::Crypto::Key::ExtPrivate;
-$Bitcoin::Crypto::Key::ExtPrivate::VERSION = '2.004';
+$Bitcoin::Crypto::Key::ExtPrivate::VERSION = '2.005';
 use v5.10;
 use strict;
 use warnings;
@@ -114,7 +114,7 @@ sub get_public_key
 
 signature_for derive_key_bip44 => (
 	method => Object,
-	positional => [HashRef, {slurpy => 1}],
+	positional => [HashRef, {slurpy => !!1}],
 );
 
 sub derive_key_bip44

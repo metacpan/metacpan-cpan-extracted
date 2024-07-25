@@ -36,6 +36,8 @@ test_roundtrip "\e[101mhi-red\e[m",             'bg hi colour text';
 
 test_roundtrip "\e[73msuperscript\e[m \e[74msubscript\e[m", 'sub/superscript text';
 
+test_roundtrip "\e]8;;http://example.com/\e\\Link here\e]8;;\e\\", 'OSC 8 hyperlink';
+
 sub test_parsebuild
 {
    my ( $inp, $out, $title ) = @_;

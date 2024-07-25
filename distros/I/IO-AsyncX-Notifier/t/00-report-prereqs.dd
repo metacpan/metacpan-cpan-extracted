@@ -23,8 +23,8 @@ do { my $x = {
                     },
        'runtime' => {
                       'requires' => {
-                                      'IO::Async::Notifier' => '0.79',
-                                      'Object::Pad' => '0.63',
+                                      'IO::Async::Notifier' => '0.803',
+                                      'Object::Pad' => '0.809',
                                       'perl' => '5.026'
                                     }
                     },

@@ -1,5 +1,5 @@
 package Bitcoin::Crypto::Transaction::Sign;
-$Bitcoin::Crypto::Transaction::Sign::VERSION = '2.004';
+$Bitcoin::Crypto::Transaction::Sign::VERSION = '2.005';
 use v5.10;
 use strict;
 use warnings;

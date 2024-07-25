@@ -22,7 +22,7 @@ my @tests = (
     },
 
     {
-        purl           => 'pkg:gitlab/gitlab-org/gitlab-runner@16.0.2?version_prefix=v',
+        purl           => 'pkg:gitlab/gitlab-org/gitlab-runner@v16.0.2',
         download_url   => 'https://gitlab.com/gitlab-org/gitlab-runner/-/archive/v16.0.2/gitlab-runner-v16.0.2.tar.gz',
         repository_url => 'https://gitlab.com/gitlab-org/gitlab-runner'
     },
@@ -73,6 +73,12 @@ my @tests = (
         purl           => 'pkg:docker/smartentry/debian@dc437cc87d10',
         repository_url => 'https://hub.docker.com/r/smartentry/debian'
     },
+
+    {
+        purl           => 'pkg:github/nexb/scancode-toolkit@v3.1.1',
+        download_url   => 'https://github.com/nexb/scancode-toolkit/archive/refs/tags/v3.1.1.tar.gz',
+        repository_url => 'https://github.com/nexb/scancode-toolkit'
+    }
 
 );
 

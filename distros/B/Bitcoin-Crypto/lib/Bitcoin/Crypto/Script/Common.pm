@@ -1,5 +1,5 @@
 package Bitcoin::Crypto::Script::Common;
-$Bitcoin::Crypto::Script::Common::VERSION = '2.004';
+$Bitcoin::Crypto::Script::Common::VERSION = '2.005';
 use v5.10;
 use strict;
 use warnings;

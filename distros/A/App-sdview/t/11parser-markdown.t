@@ -92,7 +92,7 @@ EOMARKDOWN
    ok( $p[2]->text->get_tag_at( 0, "monospace" ), 'code tag' );
 
    is( $p[3]->text, "link", 'link text' );
-   is( $p[3]->text->get_tag_at( 0, "link" ), { target => "target://" }, 'link tag' );
+   is( $p[3]->text->get_tag_at( 0, "link" ), { uri => "target://" }, 'link tag' );
 
    is( $p[4]->text, "strikethrough", 'strikethrough text' );
    ok( $p[4]->text->get_tag_at( 0, "strikethrough" ), 'strikethrough tag' );

@@ -22,6 +22,14 @@ use String::Tagged::Markdown;
 
    is( $st->build_markdown, "**bold** *italic* ~~strike~~ `monospace`",
       '$st handles S:T:Formatting tags' );
+
+   $st = String::Tagged::Markdown->new_from_formatting(
+      String::Tagged->new
+         ->append_tagged( "link", link => { uri => "scheme://target" } )
+   );
+
+   is( $st->build_markdown, "[link](scheme://target)",
+      '$st handles S:T:Formatting link tag' );
 }
 
 # ->as_formatting
@@ -30,6 +38,12 @@ use String::Tagged::Markdown;
       ->as_formatting;
 
    ok( $st->get_tag_at( 0, "monospace" ), '$st has monospace tag' );
+
+   $st = String::Tagged::Markdown->parse_markdown( "[link](scheme://target)" )
+      ->as_formatting;
+
+   is( $st->get_tag_at( 0, "link" ), { uri => "scheme://target" },
+      '$st has link tag' );
 }
 
 # custom convert_tags

@@ -1,5 +1,5 @@
 package Bitcoin::Crypto::Transaction::Output;
-$Bitcoin::Crypto::Transaction::Output::VERSION = '2.004';
+$Bitcoin::Crypto::Transaction::Output::VERSION = '2.005';
 use v5.10;
 use strict;
 use warnings;
@@ -8,18 +8,16 @@ use Moo;
 use Mooish::AttributeBuilder -standard;
 use Type::Params -sigs;
 
-use Bitcoin::Crypto::Types qw(Int BitcoinScript InstanceOf Object Str ByteStr PositiveOrZeroInt ScalarRef);
-use Bitcoin::Crypto::Helpers qw(pack_varint unpack_varint ensure_length);    # loads BigInt
-use Bitcoin::Crypto::Util qw(to_format);
+use Bitcoin::Crypto::Types qw(BitcoinScript Object Str ByteStr PositiveOrZeroInt ScalarRef Maybe SatoshiAmount);
+use Bitcoin::Crypto::Helpers qw(ensure_length);
+use Bitcoin::Crypto::Util qw(to_format pack_compactsize unpack_compactsize);
 use Bitcoin::Crypto::Exception;
 
 use namespace::clean;
 
 has param 'value' => (
 	writer => 1,
-	coerce => (InstanceOf ['Math::BigInt'])
-		->where(q{$_ >= 0})
-		->plus_coercions(Int | Str, q{ Math::BigInt->new($_) }),
+	coerce => SatoshiAmount,
 );
 
 has param 'locking_script' => (
@@ -88,7 +86,7 @@ sub to_serialized
 	$serialized .= $self->value_serialized;
 
 	my $script = $self->locking_script->to_serialized;
-	$serialized .= pack_varint(length $script);
+	$serialized .= pack_compactsize(length $script);
 	$serialized .= $script;
 
 	return $serialized;
@@ -98,22 +96,22 @@ signature_for from_serialized => (
 	method => Str,
 	head => [ByteStr],
 	named => [
-		pos => ScalarRef [PositiveOrZeroInt],
-		{optional => 1},
+		pos => Maybe [ScalarRef [PositiveOrZeroInt]],
+		{default => undef},
 	],
+	bless => !!0,
 );
 
 sub from_serialized
 {
 	my ($class, $serialized, $args) = @_;
-	my $partial = $args->pos;
-	my $pos = $partial ? ${$args->pos} : 0;
+	my $partial = !!$args->{pos};
+	my $pos = $partial ? ${$args->{pos}} : 0;
 
 	my $value = reverse substr $serialized, $pos, 8;
 	$pos += 8;
 
-	my ($script_size_len, $script_size) = unpack_varint(substr $serialized, $pos, 9);
-	$pos += $script_size_len;
+	my $script_size = unpack_compactsize $serialized, \$pos;
 
 	Bitcoin::Crypto::Exception::Transaction->raise(
 		'serialized input script data is corrupted'
@@ -126,7 +124,7 @@ sub from_serialized
 		'serialized output data is corrupted'
 	) if !$partial && $pos != length $serialized;
 
-	${$args->pos} = $pos
+	${$args->{pos}} = $pos
 		if $partial;
 
 	return $class->new(
@@ -137,13 +135,12 @@ sub from_serialized
 
 signature_for dump => (
 	method => Object,
-	named => [
-	],
+	positional => [],
 );
 
 sub dump
 {
-	my ($self, $params) = @_;
+	my ($self) = @_;
 
 	my $type = $self->locking_script->type // 'Custom';
 	my $address = $self->locking_script->get_address // '';

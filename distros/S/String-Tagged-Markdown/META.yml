@@ -16,10 +16,10 @@ name: String-Tagged-Markdown
 provides:
   String::Tagged::Markdown:
     file: lib/String/Tagged/Markdown.pm
-    version: '0.05'
+    version: '0.06'
   String::Tagged::Markdown::HFM:
     file: lib/String/Tagged/Markdown/HFM.pm
-    version: '0.05'
+    version: '0.06'
 requires:
   HTML::Entities: '0'
   List::Util: '1.45'
@@ -28,5 +28,5 @@ requires:
   perl: '5.026'
 resources:
   license: http://dev.perl.org/licenses/
-version: '0.05'
+version: '0.06'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

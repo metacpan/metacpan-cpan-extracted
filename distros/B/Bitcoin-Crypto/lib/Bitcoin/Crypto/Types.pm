@@ -1,5 +1,5 @@
 package Bitcoin::Crypto::Types;
-$Bitcoin::Crypto::Types::VERSION = '2.004';
+$Bitcoin::Crypto::Types::VERSION = '2.005';
 use v5.10;
 use strict;
 use warnings;
@@ -34,6 +34,7 @@ my $formatstr = __PACKAGE__->add_type(
 		'bytes',
 		'hex',
 		'base58',
+		'base64',
 	)
 );
 
@@ -63,7 +64,7 @@ my $bytestr = __PACKAGE__->add_type(
 );
 
 $bytestr->coercion->add_type_coercions(
-	$formatdesc, q{ Bitcoin::Crypto::Helpers::parse_formatdesc($_) }
+	$formatdesc, q{ Bitcoin::Crypto::Helpers::parse_formatdesc(@{$_}) }
 );
 
 my $scripttype = __PACKAGE__->add_type(
@@ -87,6 +88,26 @@ my $script = __PACKAGE__->add_type(
 $script->coercion->add_type_coercions(
 	$scriptdesc, q{ require Bitcoin::Crypto::Script; Bitcoin::Crypto::Script->from_standard(@$_) },
 	$bytestr->coercibles, q{ require Bitcoin::Crypto::Script; Bitcoin::Crypto::Script->from_serialized($_) },
+);
+
+my $psbt_map_type = __PACKAGE__->add_type(
+	name => 'PSBTMapType',
+	parent => Enum->of(
+		Bitcoin::Crypto::Constants::psbt_global_map,
+		Bitcoin::Crypto::Constants::psbt_input_map,
+		Bitcoin::Crypto::Constants::psbt_output_map,
+	),
+);
+
+my $psbt_field_type = __PACKAGE__->add_type(
+	name => 'PSBTFieldType',
+	parent => InstanceOf->of('Bitcoin::Crypto::PSBT::FieldType'),
+);
+
+$psbt_field_type->coercion->add_type_coercions(
+	Tuple->of($psbt_map_type, PositiveOrZeroInt),
+	q{ require Bitcoin::Crypto::PSBT::FieldType; Bitcoin::Crypto::PSBT::FieldType->get_field_by_code(@$_) },
+	Str, q{ require Bitcoin::Crypto::PSBT::FieldType; Bitcoin::Crypto::PSBT::FieldType->get_field_by_name($_) },
 );
 
 __PACKAGE__->add_type(
@@ -130,6 +151,15 @@ __PACKAGE__->add_type(
 		my $bits = shift;
 		return "Value does not fit in $bits bits";
 	},
+);
+
+my $satoshi_amount = __PACKAGE__->add_type(
+	name => 'SatoshiAmount',
+	parent => InstanceOf->of('Math::BigInt')->where(q{$_ >= 0}),
+);
+
+$satoshi_amount->coercion->add_type_coercions(
+	Int | Str, q{ Math::BigInt->new($_) },
 );
 
 __PACKAGE__->make_immutable;
