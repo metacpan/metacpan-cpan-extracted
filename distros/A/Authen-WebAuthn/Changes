@@ -1,5 +1,8 @@
 Revision history for Authen-WebAuthn
  
+0.004
+  - Add allow_untrusted_attestation option
+
 0.003 2023-11-09
   - Update Crypt::OpenSSL::X509::Extension and Net::SSLeay dependancies
   - Make sure Net::SSLeay is initialized before use

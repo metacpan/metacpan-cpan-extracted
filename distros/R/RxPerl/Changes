@@ -1,5 +1,16 @@
 Revision history for Perl extension RxPerl
 
+v6.29.2 2024-07-25T14:49:00Z
+
+    - no changes
+
+v6.29.1 2024-07-25T14:43:03Z
+
+    - tests pass on perl v5.40 (Promise::ES6 can't install on v5.40)
+    - added gitlab pipeline tests for perl versions 5.40, 5.38 and 5.20
+    - updated documentation on op_merge_map and op_switch_map about the ability to use $_ in their callback
+    - corrected the documentation on op_every and op_is_empty
+
 v6.29.0 2024-07-16T22:09:44Z
 
     - op_every and op_is_empty emit true or false instead of 1 and 0

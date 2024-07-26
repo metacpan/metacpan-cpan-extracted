@@ -1,5 +1,13 @@
 Revision history for Perl module Locale::Unicode
 
+v0.3.0 2024-07-26T15:58:33+0900
+    - Added method merge
+
+v0.2.0 2024-07-25T23:00:15+0900
+    - Improved the regular expression to include BCP47 privateuse, and grandfathered language ID
+    - Added methods grandfathered_irregular, grandfathered_regular, privateuse and their documentation
+    - Added method canonical to format a locale according to the LDML specifications.
+
 v0.1.10 2024-07-24T10:48:42+0900
     - Corrected a bug mixing t-va with the variant subtag
 

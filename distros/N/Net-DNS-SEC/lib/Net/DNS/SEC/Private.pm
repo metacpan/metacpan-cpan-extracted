@@ -3,7 +3,7 @@ package Net::DNS::SEC::Private;
 use strict;
 use warnings;
 
-our $VERSION = (qw$Id: Private.pm 1853 2021-10-11 10:40:59Z willem $)[2];
+our $VERSION = (qw$Id: Private.pm 1978 2024-06-02 09:58:05Z willem $)[2];
 
 
 =head1 NAME
@@ -89,10 +89,11 @@ sub _new_params {
 }
 
 
-our $AUTOLOAD;
+sub _index { return my @empty }		## no algorithm index
 
-sub AUTOLOAD {				## Default method
+sub AUTOLOAD {				## Dynamic instance methods
 	my ($self) = @_;
+	our $AUTOLOAD;
 
 	my ($attribute) = $AUTOLOAD =~ m/::([^:]*)$/;
 	$attribute =~ tr/A-Za-z0-9\000-\377/a-za-z0-9/d;

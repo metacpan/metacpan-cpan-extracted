@@ -43,9 +43,9 @@ C<static method rbind : L<R::NDArray::DoubleComplex|SPVM::R::NDArray::DoubleComp
 
 C<static method diag : L<R::NDArray::DoubleComplex|SPVM::R::NDArray::DoubleComplex> ($x_ndarray : L<R::NDArray::DoubleComplex|SPVM::R::NDArray::DoubleComplex>);>
 
-=head2 diag_identity
+=head2 identity
 
-C<static method diag_identity : L<R::NDArray::DoubleComplex|SPVM::R::NDArray::DoubleComplex> ($nrow : int);>
+C<static method identity : L<R::NDArray::DoubleComplex|SPVM::R::NDArray::DoubleComplex> ($nrow : int);>
 
 =head2 mul
 

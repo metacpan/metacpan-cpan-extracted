@@ -1,5 +1,5 @@
 #
-# $Id: Makefile.PL 1971 2024-04-17 09:35:43Z willem $	-*-perl-*-
+# $Id: Makefile.PL 1983 2024-07-25 06:23:28Z willem $	-*-perl-*-
 #
 
 use 5.008009;
@@ -25,8 +25,11 @@ my %metadata = (
 	AUTHOR		   => $author,
 	LICENSE		   => 'mit',
 	MIN_PERL_VERSION   => 5.008009,
-	CONFIGURE_REQUIRES => {'ExtUtils::MakeMaker' => 6.48},
-	TEST_REQUIRES	   => {
+	CONFIGURE_REQUIRES => {
+		'Config'	      => 0,
+		'ExtUtils::MakeMaker' => 6.48,
+		},
+	TEST_REQUIRES => {
 		'ExtUtils::MakeMaker' => 0,
 		'File::Find'	      => 1.13,
 		'File::Spec'	      => 3.29,
@@ -71,6 +74,9 @@ $inc = $ENV{OPENSSL_INCLUDE} if $ENV{OPENSSL_INCLUDE};
 $lib = $ENV{OPENSSL_LIB}     if $ENV{OPENSSL_LIB};
 chomp $_ for ( $inc, $lib );
 
+
+my @cppflags = grep /^-I/, split /\s+(?=\-)/, $Config{cppflags} || '';
+$inc = join ' ', $inc, @cppflags;
 
 WriteMakefile(
 	%metadata,

@@ -42,9 +42,9 @@ C<static method rbind : L<R::NDArray::Float|SPVM::R::NDArray::Float> ($x_ndarray
 
 C<static method diag : L<R::NDArray::Float|SPVM::R::NDArray::Float> ($x_ndarray : L<R::NDArray::Float|SPVM::R::NDArray::Float>);>
 
-=head2 diag_identity
+=head2 identity
 
-C<static method diag_identity : L<R::NDArray::Float|SPVM::R::NDArray::Float> ($nrow : int);>
+C<static method identity : L<R::NDArray::Float|SPVM::R::NDArray::Float> ($nrow : int);>
 
 =head2 mul
 

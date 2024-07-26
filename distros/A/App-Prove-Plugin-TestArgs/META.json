@@ -27,29 +27,24 @@
       },
       "configure" : {
          "requires" : {
-            "App::cpanminus" : "1.7046",
             "Config" : "0",
             "ExtUtils::MakeMaker::CPANfile" : "0.09",
+            "File::Basename" : "0",
             "File::Spec" : "0",
             "lib" : "0",
             "strict" : "0",
             "subs" : "0",
+            "version" : "0.9915",
             "warnings" : "0"
-         }
-      },
-      "develop" : {
-         "suggests" : {
-            "App::CPANtoRPM" : "0",
-            "App::Software::License" : "0"
          }
       },
       "runtime" : {
          "requires" : {
-            "Carp" : "0",
+            "Carp" : "1.32",
             "Class::Method::Modifiers" : "1.08",
             "Config::Any" : "0",
             "YAML" : "0",
-            "perl" : "5.010001",
+            "perl" : "5.008009",
             "strict" : "0",
             "warnings" : "0"
          }
@@ -58,7 +53,7 @@
          "requires" : {
             "App::Prove" : "3.17",
             "Test::Fatal" : "0",
-            "Test::More" : "0.47",
+            "Test::More" : "0.92",
             "Test::Needs" : "0"
          }
       }
@@ -66,7 +61,7 @@
    "provides" : {
       "App::Prove::Plugin::TestArgs" : {
          "file" : "lib/App/Prove/Plugin/TestArgs.pm",
-         "version" : "1.000001"
+         "version" : "v2.0.0"
       }
    },
    "release_status" : "stable",
@@ -80,5 +75,5 @@
          "web" : "https://github.com/XSven/App-Prove-Plugin-TestArgs"
       }
    },
-   "version" : "1.000001"
+   "version" : "2.0.0"
 }

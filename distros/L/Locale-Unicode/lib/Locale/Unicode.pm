@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Unicode Locale Identifier - ~/lib/Locale/Unicode.pm
-## Version v0.1.10
+## Version v0.3.0
 ## Copyright(c) 2024 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2024/05/11
-## Modified 2024/07/24
+## Modified 2024/07/26
 ## All rights reserved
 ## 
 ## 
@@ -21,7 +21,8 @@ BEGIN
     use vars qw(
         $ERROR $VERSION $DEBUG
         $LOCALE_BCP47_RE $LOCALE_BCP47_NAMELESS_RE $LOCALE_RE $LOCALE_UNICODE_SUBTAG_RE
-        $LOCALE_EXTENSIONS_RE $LOCALE_TRANSFORM_PARAMETERS_RE
+        $LOCALE_EXTENSIONS_RE $LOCALE_TRANSFORM_PARAMETERS_RE $GRANDFATHERED_IRREGULAR
+        $GRANDFATHERED_REGULAR
         $TZ_DICT $TZ_NAME2ID
         $PROP_TO_SUB
         $EXPLICIT_BOOLEAN
@@ -33,6 +34,7 @@ BEGIN
     );
     use Scalar::Util ();
     use Want;
+    # NOTE: $LOCALE_BCP47_RE
     our $LOCALE_BCP47_RE = qr/
     (?:
         (?:
@@ -70,15 +72,24 @@ BEGIN
         (?:
             -
             (?<variant>
-                (?:[[:alpha:]]{5,8})
-                |
-                (?:\d[[:alpha:]]{3})
+                (?:
+                    (?:[[:alpha:]]{5,8})
+                    |
+                    (?:\d[[:alpha:]]{3})
+                )
+                (?:
+                    \-
+                    (?:[[:alpha:]]{5,8})
+                    |
+                    (?:\d[[:alpha:]]{3})
+                )*
             )
         )?
     )?
     /xi;
     # We need the same regular express as $LOCALE_BCP47_RE, but without named capturing group
     # so it does not interfere with matches from $LOCALE_BCP47_RE
+    # NOTE: $LOCALE_BCP47_NAMELESS_RE
     our $LOCALE_BCP47_NAMELESS_RE = qr/
     (?:
         (?:
@@ -116,13 +127,22 @@ BEGIN
         (?:
             -
             (?:
-                (?:[[:alpha:]]{5,8})
-                |
-                (?:\d[[:alpha:]]{3})
+                (?:
+                    (?:[[:alpha:]]{5,8})
+                    |
+                    (?:\d[[:alpha:]]{3})
+                )
+                (?:
+                    \-
+                    (?:[[:alpha:]]{5,8})
+                    |
+                    (?:\d[[:alpha:]]{3})
+                )*
             )
         )?
     )?
     /xi;
+    # NOTE: $LOCALE_UNICODE_SUBTAG_RE
     our $LOCALE_UNICODE_SUBTAG_RE = qr/
     (?<ext_unicode_subtag>
         (?:
@@ -190,7 +210,9 @@ BEGIN
         )
     )?
     /xi;
+    # NOTE: $LOCALE_TRANSFORM_PARAMETERS_RE
     our $LOCALE_TRANSFORM_PARAMETERS_RE = qr/(?:d0|h0|i0|k0|m0|s0|t0|x0|[a]0)/i;
+    # NOTE: $LOCALE_TRANSFORM_SUBTAG_RE
     our $LOCALE_TRANSFORM_SUBTAG_RE = qr/
     (?<ext_transform_locale>
         $LOCALE_BCP47_NAMELESS_RE
@@ -244,6 +266,7 @@ BEGIN
         )
     )?
     /xi;
+    # NOTE: $LOCALE_EXTENSIONS_RE
     our $LOCALE_EXTENSIONS_RE = qr/
     (?:
         (?<ext_transform>
@@ -268,6 +291,24 @@ BEGIN
         )
     )
     /xi;
+    # NOTE: $GRANDFATHERED_IRREGULAR
+    our $GRANDFATHERED_IRREGULAR = qr/
+    (?:
+        en-GB-oed
+        |
+        (?:i-
+            (?:ami|bnn|default|enochian|hak|klingon|lux|mingo|navajo|pwn|tao|tay|tsu)
+        )
+        |
+        (?:sgn-(?:BE-FR|BE-NL|CH-DE))
+    )
+    /xi;
+    # NOTE: $GRANDFATHERED_REGULAR
+    our $GRANDFATHERED_REGULAR = qr/
+    (?:
+        art-lojban|cel-gaulish|no-bok|no-nyn|zh-guoyu|zh-hakka|zh-min|zh-min-nan|zh-xiang
+    )
+    /xi;
     # Possible IETF BCP 47 language tags:
     # fr
     # fre
@@ -276,9 +317,28 @@ BEGIN
     # fr-Bret-FR
     # See: <https://en.wikipedia.org/wiki/IETF_language_tag#Syntax_of_language_tags>
     #      <https://en.wikipedia.org/wiki/ISO_15924>
+    #      Grandfathered subtags: <https://www.rfc-editor.org/rfc/rfc5646.html#section-2.2.8>
+    # NOTE: $LOCALE_RE
     our $LOCALE_RE = qr/
     (?<locale_bcp47>
-        $LOCALE_BCP47_RE
+        (?:
+            (?:
+                x
+                \-
+                (?<privateuse>
+                    [a-zA-Z0-9]{1,8}
+                    (?:\-[a-zA-Z0-9]{1,8})*
+                )
+            )
+            |
+            (?<grandfathered>
+                (?<grandfathered_irregular>$GRANDFATHERED_IRREGULAR)
+                |
+                (?<grandfathered_regular>$GRANDFATHERED_REGULAR)
+            )
+            |
+            $LOCALE_BCP47_RE
+        )
     )
     # BCP47, section 2.2.6:
     # "Optional extension subtags, separated by hyphens, each composed of a single character, with the exception of the letter x, and a hyphen followed by one or more subtags of two to eight characters each, separated by hyphens"
@@ -308,7 +368,7 @@ BEGIN
     our $PROP_TO_SUB = {};
     # False, by default
     our $EXPLICIT_BOOLEAN = 0;
-    our $VERSION = 'v0.1.10';
+    our $VERSION = 'v0.3.0';
 };
 
 use strict;
@@ -338,6 +398,8 @@ sub new
     $self->{emoji}              = undef;
     # u-fw
     $self->{first_day}          = undef;
+    $self->{grandfathered_irregular} = undef;
+    $self->{grandfathered_regular}   = undef;
     # u-hc
     $self->{hour_cycle}         = undef;
     # t-h0
@@ -360,6 +422,7 @@ sub new
     $self->{mechanism}          = undef;
     # x-something
     $self->{private}            = undef;
+    $self->{privateuse}         = undef;
     $self->{region}             = undef;
     # u-rg
     $self->{region_override}    = undef;
@@ -595,6 +658,65 @@ sub ca { return( shift->calendar( @_ ) ); }
 
 sub calendar { return( shift->reset(@_)->_set_get_prop( 'calendar', @_ ) ); }
 
+# NOTE: canonical -> specs <https://unicode.org/reports/tr35/tr35.html#Canonical_Unicode_Locale_Identifiers>
+# <https://unicode.org/reports/tr35/tr35.html#LocaleId_Canonicalization>
+# <https://unicode.org/reports/tr35/tr35.html#5.-canonicalizing-syntax>
+sub canonical
+{
+    my $self = shift( @_ );
+    local $EXPLICIT_BOOLEAN = 0;
+    my $clone = Locale::Unicode->new( "$self" );
+    if( my $variant = $self->variant )
+    {
+        my $variant2 = join( '-', sort( map( lc( $_ ), split( /-/, $variant ) ) ) );
+        $clone->variant( $variant2 ) if( $variant2 ne $variant );
+    }
+
+    # We query the country_code method only, because territory includes both world region 
+    # and country code, and world region is only digits that do not need to be in uppercase
+    if( my $country_code = $self->country_code )
+    {
+        my $cc = uc( $country_code );
+        $clone->country_code( $cc ) if( $cc ne $country_code );
+    }
+
+    if( my $script = $self->script )
+    {
+        my $script2 = ucfirst( lc( $script ) );
+        $clone->script( $script2 ) if( $script2 ne $script );
+    }
+
+    my( $lang, $lang3 );
+    if( ( $lang = $self->language ) ||
+        ( $lang3 = $self->language3 ) )
+    {
+        # <https://unicode.org/reports/tr35/tr35.html#Unicode_Locale_Identifier_BCP_47_to_CLDR>
+        # "the primary language subtag "und" is replaced with "root" if no script, region, or variant subtags are present."
+        # Hmmm, I am really reluctant to do this, because other parts of the LDML indicates we should stick with dash and use 'und' and 'root' is not compliant with RFC standard that a language ID should be 2 to 3-characters
+        # if( !$locale->script && 
+        #     !$locale->territory &&
+        #     !$locale->variant )
+        # {
+        #     $locale->language( 'root' );
+        # }
+        if( $lang )
+        {
+            my $lang_canon = lc( $lang );
+            $clone->language( $lang_canon ) if( $lang_canon ne $lang );
+        }
+        elsif( $lang3 )
+        {
+            my $lang_canon = lc( $lang3 );
+            $clone->language3( $lang_canon ) if( $lang_canon ne $lang3 );
+        }
+    }
+    else
+    {
+        $clone->language( 'und' );
+    }
+    return( $clone );
+}
+
 # u-cf
 sub cf { return( shift->cu_format( @_ ) ); }
 
@@ -687,34 +809,45 @@ sub core
 {
     my $self = shift( @_ );
     my @locale_parts = ();
-    if( my $lang = $self->language )
+    if( my $privateuse = $self->privateuse )
     {
-        push( @locale_parts, $lang );
+        push( @locale_parts, 'x-' . $privateuse );
     }
-    elsif( my $lang3 = $self->language3 )
+    elsif( my $grandfathered = $self->grandfathered )
     {
-        push( @locale_parts, $lang3 );
+        push( @locale_parts, $grandfathered );
     }
-    # 'und' for 'undefined'
     else
     {
-        push( @locale_parts, 'und' );
-    }
-    if( my $script = $self->script )
-    {
-        push( @locale_parts, $script );
-    }
-    if( my $cc = $self->country_code )
-    {
-        push( @locale_parts, $cc );
-    }
-    elsif( my $region = $self->region )
-    {
-        push( @locale_parts, $region );
-    }
-    if( my $variant = $self->variant )
-    {
-        push( @locale_parts, $variant );
+        if( my $lang = $self->language )
+        {
+            push( @locale_parts, $lang );
+        }
+        elsif( my $lang3 = $self->language3 )
+        {
+            push( @locale_parts, $lang3 );
+        }
+        # 'und' for 'undefined'
+        else
+        {
+            push( @locale_parts, 'und' );
+        }
+        if( my $script = $self->script )
+        {
+            push( @locale_parts, $script );
+        }
+        if( my $cc = $self->country_code )
+        {
+            push( @locale_parts, $cc );
+        }
+        elsif( my $region = $self->region )
+        {
+            push( @locale_parts, $region );
+        }
+        if( my $variant = $self->variant )
+        {
+            push( @locale_parts, $variant );
+        }
     }
     return( join( '-', @locale_parts ) );
 }
@@ -776,6 +909,56 @@ sub first_day { return( shift->reset(@_)->_set_get_prop( 'first_day', @_ ) ); }
 # u-fw
 sub fw { return( shift->reset(@_)->_set_get_prop( 'first_day', @_ ) ); }
 
+sub grandfathered
+{
+    my $self = shift( @_ );
+    if( @_ )
+    {
+        my $val = shift( @_ );
+        $self->reset(1);
+        if( !defined( $val ) )
+        {
+            $self->_set_get_prop( 'grandfathered_irregular', undef );
+            $self->_set_get_prop( 'grandfathered_regular', undef );
+        }
+        elsif( $val =~ /^$GRANDFATHERED_IRREGULAR$/ )
+        {
+            $self->grandfathered_irregular( $val );
+        }
+        elsif( $val =~ /^$GRANDFATHERED_REGULAR$/ )
+        {
+            $self->grandfathered_regular( $val );
+        }
+        else
+        {
+            warn( "Value provided does not seem to be either a regular or irregular grandfathered language tag." ) if( warnings::enabled() );
+        }
+    }
+    return( $self->_set_get_prop( 'grandfathered_irregular' ) || $self->_set_get_prop( 'grandfathered_regular' ) );
+}
+
+sub grandfathered_irregular { return( shift->reset(@_)->_set_get_prop( {
+    field => 'grandfathered_irregular',
+    on_update => sub
+    {
+        $_[0]->{language} = undef;
+        $_[0]->{language3} = undef;
+        $_[0]->{privateuse} = undef;
+        $_[0]->{grandfathered_regular} = undef;
+    },
+}, @_ ) ); }
+
+sub grandfathered_regular { return( shift->reset(@_)->_set_get_prop( {
+    field => 'grandfathered_regular',
+    on_update => sub
+    {
+        $_[0]->{language} = undef;
+        $_[0]->{language3} = undef;
+        $_[0]->{privateuse} = undef;
+        $_[0]->{grandfathered_irregular} = undef;
+    },
+}, @_ ) ); }
+
 # t-h0
 sub h0 { return( shift->reset(@_)->_set_get_prop( 'hybrid', @_ ) ); }
 
@@ -832,17 +1015,53 @@ sub kv { return( shift->colValue( @_ ) ); }
 
 sub lang { return( shift->reset(@_)->_set_get_prop( {
     field => 'language',
-    on_update => sub{ $_[0]->{language3} = undef; },
+    on_update => sub
+    {
+        $_[0]->{language3} = undef;
+        $_[0]->{grandfathered_irregular} = undef;
+        $_[0]->{grandfathered_regular} = undef;
+        $_[0]->{privateuse} = undef;
+    },
 }, @_ ) ); }
 
 sub lang3 { return( shift->reset(@_)->_set_get_prop( {
     field => 'language3',
-    on_update => sub{ $_[0]->{language} = undef; },
+    on_update => sub
+    {
+        $_[0]->{language} = undef;
+        $_[0]->{grandfathered_irregular} = undef;
+        $_[0]->{grandfathered_regular} = undef;
+        $_[0]->{privateuse} = undef;
+    },
 }, @_ ) ); }
 
 sub language { return( shift->lang( @_ ) ); }
 
 sub language3 { return( shift->lang3( @_ ) ); }
+
+sub language_id
+{
+    my $self = shift( @_ );
+    if( @_ )
+    {
+        my $val = shift( @_ );
+        if( !defined( $val ) )
+        {
+            $self->language( undef );
+        }
+        elsif( length( $val ) eq 3 )
+        {
+            $self->language3( $val );
+        }
+        # Should be a 2-characters language ID, but we are not going to enforce it.
+        # This is the responsibility of the developer.
+        else
+        {
+            $self->language( $val );
+        }
+    }
+    return( $self->language || $self->language3 );
+}
 
 # u-lb
 sub lb { return( shift->reset(@_)->_set_get_prop( 'line_break', @_ ) ); }
@@ -890,6 +1109,56 @@ sub measurement { return( shift->reset(@_)->_set_get_prop( 'measurement', @_ ) )
 # t-m0
 sub mechanism { return( shift->reset(@_)->_set_get_prop( 'mechanism', @_ ) ); }
 
+sub merge
+{
+    my $self = shift( @_ );
+    my @locales = @_;
+    if( scalar( @_ ) != 1 )
+    {
+        return( $self->error( "I expected 1 locale, but instead received ", scalar( @locales ), " locales." ) );
+    }
+    my $other = shift( @locales );
+    unless( Scalar::Util::blessed( $other ) &&
+            $other->isa( 'Locale::Unicode' ) )
+    {
+        $other = Locale::Unicode->new( "$other" ) ||
+            return( $self->pass_error( Locale::Unicode->error ) );
+    }
+    my @keys = grep{ exists( $PROP_TO_SUB->{ $_ } ) || $self->can( $_ ) } keys( %$self );
+    foreach my $prop ( @keys )
+    {
+        next if( $prop eq 'variant' );
+        if( exists( $other->{ $prop } ) &&
+            defined( $other->{ $prop } ) )
+        {
+            $self->$prop( $other->{ $prop } );
+        }
+    }
+    my $ref;
+    if( ( $ref = $other->variants ) &&
+        scalar( @$ref ) )
+    {
+        my $orig = $self->variants;
+        if( scalar( @$orig ) )
+        {
+            # Make sure we have unique keys
+            my $uniq = sub
+            {
+                my %seen;
+                grep( !$seen{ $_ }++, @_ );
+            };
+            my @variants = $uniq->( @$orig, @$ref );
+            $self->variant( join( '-', @variants ) );
+        }
+        else
+        {
+            my $var = $other->variant;
+            $self->variant( $var );
+        }
+    }
+    return( $self );
+}
+
 # u-ms
 sub ms { return( shift->measurement( @_ ) ); }
 
@@ -914,7 +1183,7 @@ sub parse
     my $info = {};
     # Value provided failed to match the locale regular expression
     return( $info ) if( !$re );
-    foreach my $prop ( qw( language language3 extended script country_code region variant ) )
+    foreach my $prop ( qw( language language3 extended script country_code region variant privateuse grandfathered_irregular grandfathered_regular ) )
     {
         # the property provided as an option can be undef by design to remove the value
         if( exists( $opts->{ $prop } ) )
@@ -1058,6 +1327,17 @@ sub pass_error
 
 # x-something
 sub private { return( shift->reset(@_)->_set_get_prop( 'private', @_ ) ); }
+
+sub privateuse { return( shift->reset(@_)->_set_get_prop( {
+    field => 'privateuse',
+    on_update => sub
+    {
+        $_[0]->{language} = undef;
+        $_[0]->{language3} = undef;
+        $_[0]->{grandfathered_irregular} = undef;
+        $_[0]->{grandfathered_regular} = undef;
+    },
+}, @_ ) ); }
 
 sub region { return( shift->reset(@_)->_set_get_prop({
     field => 'region',
@@ -1246,6 +1526,17 @@ sub va { return( shift->reset(@_)->_set_get_prop( 'va', @_ ) ); }
 
 # u-va
 sub variant { return( shift->reset(@_)->_set_get_prop( 'variant', @_ ) ); }
+
+sub variants
+{
+    my $self = shift( @_ );
+    my $variants = [];
+    if( my $variant = $self->variant )
+    {
+        $variants = [split( /-/, $variant )];
+    }
+    return( $variants );
+}
 
 # u-vt
 sub vt { return( shift->colVariableTop( @_ ) ); }
@@ -3418,7 +3709,7 @@ In Scalar or in list context, the value returned is the last value set.
 
 =head1 VERSION
 
-    v0.1.10
+    v0.3.0
 
 =head1 DESCRIPTION
 
@@ -3426,13 +3717,15 @@ This module implements the L<Unicode LDML (Locale Data Markup Language) extensio
 
 It does not enforce the standard, and is merely an API to construct, access and modify locales. It is your responsibility to set the right values.
 
-The only requirement is to provide a proper C<language>, which is a 2 or 3-characters code.
+The only requirement is to provide a proper L<language|https://unicode.org/reports/tr35/tr35.html#Unicode_language_identifier>, which is a 2 or 3-characters code, or a L<privateuse or other grandfathered language tags|https://www.rfc-editor.org/rfc/rfc5646.html#section-2.2.8>
 
 For your convenience, summary of key elements of the standard can be found in this documentation.
 
 It is lightweight and fast with no dependency outside of L<Scalar::Util> and L<Want>. It requires perl C<v5.10> minimum to operate.
 
 The object stringifies, and once its string value is computed, it is cached and re-used until it is changed. Thus repetitive call to L<as_string|/as_string> or to stringification does not incur any speed penalty by recomputing what has not changed.
+
+See the L<LDML specifications|https://unicode.org/reports/tr35/tr35.html#Unicode_language_identifier> fore more information of what composes a Unicode language identifier.
 
 =head1 CONSTRUCTOR
 
@@ -3538,6 +3831,49 @@ This is an alias for L</calendar>
 Sets or gets the Unicode extension C<ca>, which is a L<calendar identifier|https://unicode.org/reports/tr35/#UnicodeCalendarIdentifier>.
 
 See the section on L</"BCP47 EXTENSIONS"> for the proper values.
+
+=head2 canonical
+
+This returns a L<clone|/clone> of the current object, formatted as per the L<Unicode locale canonical specifications|https://unicode.org/reports/tr35/tr35.html#Canonical_Unicode_Locale_Identifiers>.
+
+This means that:
+
+=over 4
+
+=item * C<variant>
+
+Variants are sorted and made in lower case.
+
+    my $locale = Locale::Unicode->new( 'en-Scouse-fonipA' );
+    say $locale->canonical; # en-fonipa-scouse
+
+=item * C<territory>
+
+Territory is made in upper case
+
+    my $locale = Locale::Unicode->new( 'en-us' );
+    say $locale->canonical; # en-US
+
+    # Spanish as spoken in South America
+    my $locale = Locale::Unicode->new( 'es-005' );
+    say $locale->canonical; # es-005
+
+=item * C<script>
+
+Script is formatted in title case.
+
+    my $locale = Locale::Unicode->new( 'ja-kana-jp' );
+    say $locale->canonical; # ja-Kana-JP
+
+=item * C<language>
+
+The language code is made in lower case.
+
+=back
+
+See the L<LDML specifications|https://unicode.org/reports/tr35/tr35.html#5.-canonicalizing-syntax> for more information.
+
+See also the method L<Locale::Unicode::Data/normalise>
 
 =head2 cf
 
@@ -3877,6 +4213,61 @@ Sets or gets the Unicode extension C<fw>.
 
 Its values are C<sun>, C<mon>, etc... C<sat>
 
+=head2 grandfathered
+
+    # auto-detect and sets an irregular grandfathered language tag
+    $locale->grandfathered( 'i-klingon' );
+    # sets a regular grandfathered language tag
+    $locale->grandfathered( 'zh-hakka' );
+
+Sets or gets a L<regular|/grandfathered_regular> or L<irregular|/grandfathered_irregular> L<grandfathered language tags|https://www.rfc-editor.org/rfc/rfc5646.html#section-2.2.8>
+
+Those language tags are old-style language tags, that, although they remain valid for most of them, their format has morphed, and most of them have been superseded.
+
+This is a convenient method that takes a language tag, and based on its value, this will call the method L<regular|/grandfathered_regular> or L<irregular|/grandfathered_irregular>
+
+If you set a grandfathered language tag, this will automatically unset the L<language|/language>, L<language3|/language3> or L<privateuse|/privateuse> tag value.
+
+=head2 grandfathered_irregular
+
+    $locale->grandfathered_irregular( 'en-GB-oed' );
+    $locale->grandfathered_irregular( 'i-ami' );
+    $locale->grandfathered_irregular( 'i-bnn' );
+    $locale->grandfathered_irregular( 'i-default' );
+    $locale->grandfathered_irregular( 'i-enochian' );
+    $locale->grandfathered_irregular( 'i-hak' );
+    $locale->grandfathered_irregular( 'i-klingon' );
+    $locale->grandfathered_irregular( 'i-lux' );
+    $locale->grandfathered_irregular( 'i-mingo' );
+    $locale->grandfathered_irregular( 'i-navajo' );
+    $locale->grandfathered_irregular( 'i-pwn' );
+    $locale->grandfathered_irregular( 'i-tao' );
+    $locale->grandfathered_irregular( 'i-tay' );
+    $locale->grandfathered_irregular( 'i-tsu' );
+    $locale->grandfathered_irregular( 'sgn-BE-FR' );
+    $locale->grandfathered_irregular( 'sgn-BE-NL' );
+    $locale->grandfathered_irregular( 'sgn-CH-DE' );
+
+Sets or gets an L<irregular grandfathered language tag|https://www.rfc-editor.org/rfc/rfc5646.html#section-2.2.8>.
+
+Setting a value, including C<undef>, will unset the L<language|/language>, L<language3|/language3>, L<privateuse|/privateuse> or L<grandfathered_regular|/grandfathered_regular> tag value.
+
+=head2 grandfathered_regular
+
+    $locale->grandfathered_regular( 'art-lojban' );
+    $locale->grandfathered_regular( 'cel-gaulish' );
+    $locale->grandfathered_regular( 'no-bok' );
+    $locale->grandfathered_regular( 'no-nyn' );
+    $locale->grandfathered_regular( 'zh-guoyu' );
+    $locale->grandfathered_regular( 'zh-hakka' );
+    $locale->grandfathered_regular( 'zh-min' );
+    $locale->grandfathered_regular( 'zh-min-nan' );
+    $locale->grandfathered_regular( 'zh-xiang' );
+
+Sets or gets a L<regular grandfathered language tag|https://www.rfc-editor.org/rfc/rfc5646.html#section-2.2.8>.
+
+Setting a value, including C<undef>, will unset the L<language|/language>, L<language3|/language3>, L<privateuse|/privateuse> or L<grandfathered_irregular|/grandfathered_irregular> tag value.
+
 =head2 h0
 
 This is an alias for L</hybrid>
@@ -4030,6 +4421,21 @@ This is an alias for L<lang|/lang>
 
 This is an alias for L<lang3|/lang3>
 
+=head2 language_id
+
+    $locale->language_id( 'ja' );
+    $locale->language_id( 'ryu' );
+    $locale->language_id( 'und' );
+    # Unset the language ID
+    $locale->language_id( undef );
+    my $str = $locale->language_id;
+
+Sets or gets a language ID.
+
+In mutator mode, if the language ID provided is 3-characters long, then L<language3|/language3> will be called to set it, otherwise L<language|/language> will be called.
+
+In accessor mode, it returns the language ID whether it is a 2-characters ID accessible via L<language|/language>, or a 3-characters ID accessible via L<language3|/language3>
+
 =head2 lb
 
 This is an alias for L</line_break>
@@ -4083,6 +4489,26 @@ Sets or gets the Transformation extension C<m0>.
 
 See the section on L</"Transform extensions"> for more information.
 
+=head2 merge
+
+    my $locale1 = Locale::Unicode->new( 'ja-JP' );
+    my $locale2 = Locale::Unicode->new( 'ja-Kana-hepburn-heploc' );
+    say $locale1->merge( $locale2 ); # ja-Kana-JP-hepburn-heploc
+
+Provided with another L<Locale::Unicode> object, or a C<locale> string, and this will merge all of that object property with the current object used to call this method.
+
+Since a C<locale> can have multiple C<variant>s, merging two C<locale> object, will merge the C<variant>s, while avoiding duplicates, like so:
+
+    my $locale1 = Locale::Unicode->new( 'ja-Kana-posix-hepburn' );
+    my $locale2 = Locale::Unicode->new( 'ja-JP-hepburn-heploc' );
+    say $locale1->merge( $locale2 ); # ja-Kana-JP-posix-hepburn-heploc
+
+Note that it will not sort the variants. For that you want to use the L<canonical|/canonical> method.
+
+See also the method L<Locale::Unicode::Data/normalise>
+
+It returns the current object.
+
 =head2 ms
 
 This is an alias for L</measurement>
@@ -4108,6 +4534,15 @@ Sets or gets the Unicode extension C<nu>.
     # Now: ja-JP-x-something-else
 
 This serves to set or get the value for a private subtag.
+
+=head2 privateuse
+
+    $locale->privateuse( 'x-abc' );
+    my $str = $locale->privateuse;
+
+Sets or gets the L<privateuse|https://www.rfc-editor.org/rfc/rfc5646.html> language tag.
+
+Note that this use is deprecated. See the L<LDML specifications|https://unicode.org/reports/tr35/tr35.html#BCP_47_Language_Tag_Conversion>
 
 =head2 region
 
@@ -4459,6 +4894,24 @@ This is an alias for L</variant>
 This is a Unicode Variant Identifier that specifies a special variant used for locales.
 
 Sets or gets the Unicode extension C<va>.
+
+=head2 variants
+
+This returns the C<variant> part of the C<locale> as an array reference of C<variants>.
+
+It will always return an array reference whether any variant is set or not.
+
+    my $locale = Locale::Unicode->new( 'en-fonipa-scouse' );
+    my $ref = $locale->variants; # ['fonipa', 'scouse']
+
+You could reliably do something like:
+
+    if( scalar( @{$locale->variants} ) > 1 )
+    {
+        # Do something
+    }
+
+Note that the proper canonical format of a C<locale> has the variants sorted in alphabetical order.
 
 =head2 vt
 
@@ -8712,6 +9165,8 @@ L<BCP47|https://www.rfc-editor.org/rfc/bcp/bcp47.txt>
 L<RFC6067 on the Unicode extensions|https://datatracker.ietf.org/doc/html/rfc6067>
 
 L<RFC6497 on the transformation extension|https://datatracker.ietf.org/doc/html/rfc6497>
+
+L<RFC5646|https://www.rfc-editor.org/rfc/rfc5646.html>
 
 See L<HTML::Object::Locale> for an implementation of Web API class L<Intl.Locale|https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Intl/Locale>
 

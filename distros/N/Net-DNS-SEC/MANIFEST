@@ -23,8 +23,6 @@ t/00-load.t
 t/00-pod.t
 t/10-keyset.t
 t/20-digest.t
-t/21-RSA-MD5.t
-t/22-RSA-SHA1.t
 t/23-RSA-SHA256.t
 t/24-RSA-SHA512.t
 t/31-DSA-SHA1.t

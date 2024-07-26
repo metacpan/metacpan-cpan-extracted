@@ -44,16 +44,6 @@ class R::NDArray {
   
   has is_dim_read_only : ro byte;
   
-  # Class Mehtods
-  static method new : R::NDArray ($options : object[] = undef) {
-    
-    my $self = new R::NDArray;
-    
-    $self->init($options);
-    
-    return $self;
-  }
-  
   # Instance Methods
   protected method init : void ($options : object[] = undef) {
     

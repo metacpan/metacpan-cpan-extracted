@@ -1,6 +1,5 @@
-#<<<
-use strict; use warnings;
-#>>>
+use strict;
+use warnings;
 
 use Test::More import => [ qw( plan ) ];
 

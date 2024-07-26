@@ -28,7 +28,9 @@ can_ok( $loc, 'as_string' );
 can_ok( $loc, 'break_exclusion' );
 can_ok( $loc, 'ca' );
 can_ok( $loc, 'calendar' );
+can_ok( $loc, 'canonical' );
 can_ok( $loc, 'cf' );
+can_ok( $loc, 'clone' );
 can_ok( $loc, 'co' );
 can_ok( $loc, 'colAlternate' );
 can_ok( $loc, 'colBackwards' );
@@ -43,6 +45,7 @@ can_ok( $loc, 'colReorder' );
 can_ok( $loc, 'colStrength' );
 can_ok( $loc, 'colValue' );
 can_ok( $loc, 'colVariableTop' );
+can_ok( $loc, 'core' );
 can_ok( $loc, 'country_code' );
 can_ok( $loc, 'cu_format' );
 can_ok( $loc, 'cu' );
@@ -57,6 +60,9 @@ can_ok( $loc, 'error' );
 can_ok( $loc, 'false' );
 can_ok( $loc, 'first_day' );
 can_ok( $loc, 'fw' );
+can_ok( $loc, 'grandfathered' );
+can_ok( $loc, 'grandfathered_irregular' );
+can_ok( $loc, 'grandfathered_regular' );
 can_ok( $loc, 'h0' );
 can_ok( $loc, 'hc' );
 can_ok( $loc, 'hour_cycle' );
@@ -77,6 +83,9 @@ can_ok( $loc, 'ks' );
 can_ok( $loc, 'kv' );
 can_ok( $loc, 'lang' );
 can_ok( $loc, 'lang3' );
+can_ok( $loc, 'language' );
+can_ok( $loc, 'language3' );
+can_ok( $loc, 'language_id' );
 can_ok( $loc, 'lb' );
 can_ok( $loc, 'line_break' );
 can_ok( $loc, 'line_break_word' );
@@ -94,6 +103,7 @@ can_ok( $loc, 'number' );
 can_ok( $loc, 'parse' );
 can_ok( $loc, 'pass_error' );
 can_ok( $loc, 'private' );
+can_ok( $loc, 'privateuse' );
 can_ok( $loc, 'region' );
 can_ok( $loc, 'region_override' );
 can_ok( $loc, 'rg' );
@@ -111,6 +121,7 @@ can_ok( $loc, 't_private' );
 can_ok( $loc, 'territory' );
 can_ok( $loc, 'time_zone' );
 can_ok( $loc, 'timezone' );
+can_ok( $loc, 'transform' );
 can_ok( $loc, 'transform_locale' );
 can_ok( $loc, 'translation' );
 can_ok( $loc, 'true' );
@@ -122,6 +133,7 @@ can_ok( $loc, 'tz_name2id' );
 can_ok( $loc, 'unit' );
 can_ok( $loc, 'va' );
 can_ok( $loc, 'variant' );
+can_ok( $loc, 'variants' );
 can_ok( $loc, 'vt' );
 can_ok( $loc, 'x0' );
 
@@ -548,6 +560,469 @@ subtest 'colCaseFirst' => sub
             is( $l->colCaseFirst, $def->{expects}, "colCaseFirst for '$def->{test}' -> '$def->{expects}'" );
         };
     }
+};
+
+subtest 'grandfathered irregular' => sub
+{
+    my @tests = (
+        {
+            test => 'en-GB-oed',
+            expects =>
+            {
+                language => undef,
+                language3 => undef,
+                privateuse => undef,
+                grandfathered_irregular => 'en-GB-oed',
+                grandfathered_regular => undef,
+            }
+        },
+    
+        {
+            test => 'i-ami',
+            expects =>
+            {
+                language => undef,
+                language3 => undef,
+                privateuse => undef,
+                grandfathered_irregular => 'i-ami',
+                grandfathered_regular => undef,
+            }
+        },
+    
+        {
+            test => 'i-bnn',
+            expects =>
+            {
+                language => undef,
+                language3 => undef,
+                privateuse => undef,
+                grandfathered_irregular => 'i-bnn',
+                grandfathered_regular => undef,
+            }
+        },
+    
+        {
+            test => 'i-default',
+            expects =>
+            {
+                language => undef,
+                language3 => undef,
+                privateuse => undef,
+                grandfathered_irregular => 'i-default',
+                grandfathered_regular => undef,
+            }
+        },
+    
+        {
+            test => 'i-enochian',
+            expects =>
+            {
+                language => undef,
+                language3 => undef,
+                privateuse => undef,
+                grandfathered_irregular => 'i-enochian',
+                grandfathered_regular => undef,
+            }
+        },
+    
+        {
+            test => 'i-hak',
+            expects =>
+            {
+                language => undef,
+                language3 => undef,
+                privateuse => undef,
+                grandfathered_irregular => 'i-hak',
+                grandfathered_regular => undef,
+            }
+        },
+    
+        {
+            test => 'i-klingon',
+            expects =>
+            {
+                language => undef,
+                language3 => undef,
+                privateuse => undef,
+                grandfathered_irregular => 'i-klingon',
+                grandfathered_regular => undef,
+            }
+        },
+    
+        {
+            test => 'i-lux',
+            expects =>
+            {
+                language => undef,
+                language3 => undef,
+                privateuse => undef,
+                grandfathered_irregular => 'i-lux',
+                grandfathered_regular => undef,
+            }
+        },
+    
+        {
+            test => 'i-mingo',
+            expects =>
+            {
+                language => undef,
+                language3 => undef,
+                privateuse => undef,
+                grandfathered_irregular => 'i-mingo',
+                grandfathered_regular => undef,
+            }
+        },
+    
+        {
+            test => 'i-navajo',
+            expects =>
+            {
+                language => undef,
+                language3 => undef,
+                privateuse => undef,
+                grandfathered_irregular => 'i-navajo',
+                grandfathered_regular => undef,
+            }
+        },
+    
+        {
+            test => 'i-pwn',
+            expects =>
+            {
+                language => undef,
+                language3 => undef,
+                privateuse => undef,
+                grandfathered_irregular => 'i-pwn',
+                grandfathered_regular => undef,
+            }
+        },
+    
+        {
+            test => 'i-tao',
+            expects =>
+            {
+                language => undef,
+                language3 => undef,
+                privateuse => undef,
+                grandfathered_irregular => 'i-tao',
+                grandfathered_regular => undef,
+            }
+        },
+    
+        {
+            test => 'i-tay',
+            expects =>
+            {
+                language => undef,
+                language3 => undef,
+                privateuse => undef,
+                grandfathered_irregular => 'i-tay',
+                grandfathered_regular => undef,
+            }
+        },
+    
+        {
+            test => 'i-tsu',
+            expects =>
+            {
+                language => undef,
+                language3 => undef,
+                privateuse => undef,
+                grandfathered_irregular => 'i-tsu',
+                grandfathered_regular => undef,
+            }
+        },
+    
+        {
+            test => 'sgn-BE-FR',
+            expects =>
+            {
+                language => undef,
+                language3 => undef,
+                privateuse => undef,
+                grandfathered_irregular => 'sgn-BE-FR',
+                grandfathered_regular => undef,
+            }
+        },
+    
+        {
+            test => 'sgn-BE-NL',
+            expects =>
+            {
+                language => undef,
+                language3 => undef,
+                privateuse => undef,
+                grandfathered_irregular => 'sgn-BE-NL',
+                grandfathered_regular => undef,
+            }
+        },
+    
+        {
+            test => 'sgn-CH-DE',
+            expects =>
+            {
+                language => undef,
+                language3 => undef,
+                privateuse => undef,
+                grandfathered_irregular => 'sgn-CH-DE',
+                grandfathered_regular => undef,
+            }
+        },
+    );
+
+    foreach my $def ( @tests )
+    {
+        my $l = Locale::Unicode->new( $def->{test}, ( exists( $def->{opts} ) ? ( %{$def->{opts}} ) : () ) );
+        isa_ok( $l => 'Locale::Unicode' );
+        SKIP:
+        {
+            if( !defined( $l ) )
+            {
+                skip( "Failed instantiating object for test locale '$def->{test}': " . Locale::Unicode->error, 1 );
+            }
+            diag( "Locale for '$def->{test}' stringifies to '$l'" ) if( $DEBUG );
+            foreach my $meth ( sort( keys( %{$def->{expects}} ) ) )
+            {
+                my $coderef = $l->can( $meth ) || BAIL_OUT( "Unable to find method ${meth} in Locale::Unicode !" );
+                my $val = $coderef->( $l );
+                is( $val => $def->{expects}->{ $meth }, "${meth} expects " . ( $def->{expects}->{ $meth } // 'undef' ) );
+            }
+        };
+    }
+
+    my $l = Locale::Unicode->new( 'ja-Kana-JP' );
+    isa_ok( $l => 'Locale::Unicode' );
+    $l->grandfathered( 'sgn-CH-DE' );
+    is( $l->grandfathered_irregular, 'sgn-CH-DE', 'grandfathered_irregular() -> sgn-CH-DE' );
+    is( $l->grandfathered_regular, undef, 'grandfathered_irregular() -> undef' );
+    is( "$l", "sgn-CH-DE", '$l -> sgn-CH-DE' );
+};
+
+subtest 'grandfathered regular' => sub
+{
+    my @tests = (
+        {
+            test => 'art-lojban',
+            expects =>
+            {
+                language => undef,
+                language3 => undef,
+                privateuse => undef,
+                grandfathered_irregular => undef,
+                grandfathered_regular => 'art-lojban',
+            }
+        },
+    
+        {
+            test => 'cel-gaulish',
+            expects =>
+            {
+                language => undef,
+                language3 => undef,
+                privateuse => undef,
+                grandfathered_irregular => undef,
+                grandfathered_regular => 'cel-gaulish',
+            }
+        },
+    
+        {
+            test => 'no-bok',
+            expects =>
+            {
+                language => undef,
+                language3 => undef,
+                privateuse => undef,
+                grandfathered_irregular => undef,
+                grandfathered_regular => 'no-bok',
+            }
+        },
+    
+        {
+            test => 'no-nyn',
+            expects =>
+            {
+                language => undef,
+                language3 => undef,
+                privateuse => undef,
+                grandfathered_irregular => undef,
+                grandfathered_regular => 'no-nyn',
+            }
+        },
+    
+        {
+            test => 'zh-guoyu',
+            expects =>
+            {
+                language => undef,
+                language3 => undef,
+                privateuse => undef,
+                grandfathered_irregular => undef,
+                grandfathered_regular => 'zh-guoyu',
+            }
+        },
+    
+        {
+            test => 'zh-hakka',
+            expects =>
+            {
+                language => undef,
+                language3 => undef,
+                privateuse => undef,
+                grandfathered_irregular => undef,
+                grandfathered_regular => 'zh-hakka',
+            }
+        },
+    
+        {
+            test => 'zh-min',
+            expects =>
+            {
+                language => undef,
+                language3 => undef,
+                privateuse => undef,
+                grandfathered_irregular => undef,
+                grandfathered_regular => 'zh-min',
+            }
+        },
+    
+        {
+            test => 'zh-min-nan',
+            expects =>
+            {
+                language => undef,
+                language3 => undef,
+                privateuse => undef,
+                grandfathered_irregular => undef,
+                grandfathered_regular => 'zh-min-nan',
+            }
+        },
+    
+        {
+            test => 'zh-xiang',
+            expects =>
+            {
+                language => undef,
+                language3 => undef,
+                privateuse => undef,
+                grandfathered_irregular => undef,
+                grandfathered_regular => 'zh-xiang',
+            }
+        },
+    );
+
+    foreach my $def ( @tests )
+    {
+        my $l = Locale::Unicode->new( $def->{test}, ( exists( $def->{opts} ) ? ( %{$def->{opts}} ) : () ) );
+        isa_ok( $l => 'Locale::Unicode' );
+        SKIP:
+        {
+            if( !defined( $l ) )
+            {
+                skip( "Failed instantiating object for test locale '$def->{test}': " . Locale::Unicode->error, 1 );
+            }
+            diag( "Locale for '$def->{test}' stringifies to '$l'" ) if( $DEBUG );
+            foreach my $meth ( sort( keys( %{$def->{expects}} ) ) )
+            {
+                my $coderef = $l->can( $meth ) || BAIL_OUT( "Unable to find method ${meth} in Locale::Unicode !" );
+                my $val = $coderef->( $l );
+                is( $val => $def->{expects}->{ $meth }, "${meth} expects " . ( $def->{expects}->{ $meth } // 'undef' ) );
+            }
+        };
+    }
+
+    my $l = Locale::Unicode->new( 'ja-Kana-JP' );
+    isa_ok( $l => 'Locale::Unicode' );
+    $l->grandfathered( 'zh-min-nan' );
+    is( $l->grandfathered_regular, 'zh-min-nan', 'grandfathered_regular() -> zh-min-nan' );
+    is( $l->grandfathered_irregular, undef, 'grandfathered_irregular() -> undef' );
+    is( "$l", "zh-min-nan", '$l -> zh-min-nan' );
+};
+
+subtest 'privateuse' => sub
+{
+    my @tests = 
+    (
+        {
+            test => 'x-abc',
+            expects =>
+            {
+                language => undef,
+                language3 => undef,
+                privateuse => 'abc',
+                grandfathered_irregular => undef,
+                grandfathered_regular => undef,
+            }
+        }
+    );
+
+    foreach my $def ( @tests )
+    {
+        my $l = Locale::Unicode->new( $def->{test}, ( exists( $def->{opts} ) ? ( %{$def->{opts}} ) : () ) );
+        isa_ok( $l => 'Locale::Unicode' );
+        SKIP:
+        {
+            if( !defined( $l ) )
+            {
+                skip( "Failed instantiating object for test locale '$def->{test}': " . Locale::Unicode->error, 1 );
+            }
+            diag( "Locale for '$def->{test}' stringifies to '$l'" ) if( $DEBUG );
+            foreach my $meth ( sort( keys( %{$def->{expects}} ) ) )
+            {
+                my $coderef = $l->can( $meth ) || BAIL_OUT( "Unable to find method ${meth} in Locale::Unicode !" );
+                my $val = $coderef->( $l );
+                is( $val => $def->{expects}->{ $meth }, "${meth} expects " . ( $def->{expects}->{ $meth } // 'undef' ) );
+            }
+        };
+    }
+
+    my $l = Locale::Unicode->new( 'ja-Kana-JP' );
+    isa_ok( $l => 'Locale::Unicode' );
+    $l->privateuse( 'abc' );
+    is( "$l", "x-abc", '$l -> x-abc' );
+};
+
+subtest 'canonical' => sub
+{
+    my @tests =
+    (
+        {
+            test => 'ja-kana-jp',
+            expects => 'ja-Kana-JP',
+        }
+    );
+    foreach my $def ( @tests )
+    {
+        my $l = Locale::Unicode->new( $def->{test}, ( exists( $def->{opts} ) ? ( %{$def->{opts}} ) : () ) );
+        isa_ok( $l => 'Locale::Unicode' );
+        SKIP:
+        {
+            if( !defined( $l ) )
+            {
+                skip( "Failed instantiating object for test locale '$def->{test}': " . Locale::Unicode->error, 1 );
+            }
+            diag( "Locale for '$def->{test}' stringifies to '$l'" ) if( $DEBUG );
+            my $me = $l->canonical;
+            if( !defined( $me ) )
+            {
+                diag( "Unable to get the canonical form for object '$def->{test}': ", $l->error ) if( $DEBUG );
+            }
+            isa_ok( $me => 'Locale::Unicode' );
+            is( "$me" => $def->{expects}, "$def->{test} -> $me" );
+        };
+    }
+};
+
+subtest 'merge' => sub
+{
+    my $locale1 = Locale::Unicode->new( 'ja-JP' );
+    my $locale2 = Locale::Unicode->new( 'ja-Kana-hepburn-heploc' );
+    $locale1->merge( $locale2 );
+    is( "$locale1", 'ja-Kana-JP-hepburn-heploc', 'merge -> ja-Kana-JP-hepburn-heploc' );
+
+    $locale1 = Locale::Unicode->new( 'ja-Kana-posix-hepburn' );
+    $locale2 = Locale::Unicode->new( 'ja-JP-hepburn-heploc' );
+    $locale1->merge( $locale2 );
+    is( "$locale1", 'ja-Kana-JP-posix-hepburn-heploc', 'merge -> ja-Kana-JP-posix-hepburn-heploc' );
 };
 
 done_testing();

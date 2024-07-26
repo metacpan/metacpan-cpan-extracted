@@ -11,8 +11,9 @@ lib/Authen/WebAuthn.pm
 lib/Authen/WebAuthn.pod
 lib/Authen/WebAuthn/SSLeayChainVerifier.pm
 lib/Authen/WebAuthn/Test.pm
-t/00-WebAuthn-Ext1.t
 t/00-WebAuthn-U2F.t
 t/00-WebAuthn.t
 t/01-SSLeayChainVerifier.t
+t/02-Attestation-tests.t
+t/03-Interop-tests.t
 t/certs.pl

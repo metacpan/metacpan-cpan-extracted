@@ -70,15 +70,13 @@ C<has is_dim_read_only : ro byte;>
 
 If this field is a true value, it indicates L</"dim"> field is read only, otherwise writable.
 
-=head1 Class Methods
+=head1 Instance Methods
 
-=head2 new
+=head2 init
 
-C<static method new : R::NDArray ($options : object[] = undef);>
+C<protected method init : void ($options : object[] = undef);>
 
-Creates a new L<R::NDArray|SPVM::R::NDArray> object given the options $options and returns the created object.
-
-This method calls L</"init"> method for initialization for the object.
+Initialize this instance given the options $options that is the same as L</"new"> method.
 
 Options:
 
@@ -90,17 +88,9 @@ An array set to L</"data"> field.
 
 =item C<dim> : int[] = undef
 
-Dimensions set to L</"dim"> field.
-
 =back
 
-=head1 Instance Methods
-
-=head2 init
-
-C<protected method init : void ($options : object[] = undef);>
-
-Initialize this instance given the options $options that is the same as L</"new"> method.
+Dimensions set to L</"dim"> field.
 
 C<dim> option is assinged to $dim variable.
 

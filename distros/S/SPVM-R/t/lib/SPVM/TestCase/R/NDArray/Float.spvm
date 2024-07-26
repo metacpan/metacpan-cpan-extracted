@@ -1,0 +1,334 @@
+class TestCase::R::NDArray::Float {
+  
+  use R::NDArray::Float;
+  use R::OP::Int as IOP;
+  
+  static method data : int () {
+    
+    my $data = [(float)1f, 2f, 3f];
+    my $dim = [1, 3];
+    my $ndarray = R::NDArray::Float->new({data => $data, dim => $dim});
+    
+    my $got_data = $ndarray->data;
+    
+    unless ($got_data is_compile_type float[]) {
+      return 0;
+    }
+    
+    unless ($got_data == $data) {
+      return 0;
+    }
+    
+    return 1;
+  }
+  
+  static method new : int () {
+    
+    my $data = [(float)1f, 2f, 3f];
+    my $dim = [1, 3];
+    my $ndarray = R::NDArray::Float->new({data => $data, dim => $dim});
+    
+    unless ($ndarray is_type R::NDArray::Float) {
+      return 0;
+    }
+    
+    unless ($ndarray->data == $data) {
+      return 0;
+    }
+    
+    unless (Array->equals_int($ndarray->dim, [1, 3])) {
+      return 0;
+    }
+    
+    return 1;
+  }
+  
+  static method create_default_data : int () {
+    
+    {
+      my $ndarray = R::NDArray::Float->new;
+      
+      my $default_data = $ndarray->create_default_data;
+      
+      unless ($default_data is_type float[]) {
+        return 0;
+      }
+      
+      unless (Array->equals_float($default_data, new float[0])) {
+        return 0;
+      }
+    }
+    
+    {
+      my $ndarray = R::NDArray::Float->new;
+      
+      my $length = 0;
+      my $default_data = $ndarray->create_default_data($length);
+      
+      unless ($default_data is_type float[]) {
+        return 0;
+      }
+      
+      unless (Array->equals_float($default_data, new float[0])) {
+        return 0;
+      }
+    }
+    
+    {
+      my $ndarray = R::NDArray::Float->new;
+      
+      my $length = 2;
+      my $default_data = $ndarray->create_default_data($length);
+      
+      unless ($default_data is_type float[]) {
+        return 0;
+      }
+      
+      unless (Array->equals_float($default_data, [(float)0f, 0f])) {
+        return 0;
+      }
+    }
+    
+    return 1;
+  }
+  
+  static method elem_to_string : int () { return 1; }
+  
+  static method elem_assign : int () { return 1; }
+  
+  static method elem_clone : int () { return 1; }
+  
+  static method elem_cmp : int () { return 1; }
+  
+  static method clone : int () {
+    
+    {
+      my $data = [(float)1f, 2f, 3f];
+      my $dim = [1, 3];
+      my $ndarray = R::NDArray::Float->new({data => $data, dim => $dim});
+      
+      my $ret_ndarray = $ndarray->clone;
+      
+      unless ($ret_ndarray is_type R::NDArray::Float) {
+        return 0;
+      }
+      
+      if ($ret_ndarray->data == $ndarray->data) {
+        return 0;
+      }
+      
+      unless (Array->equals_float($ret_ndarray->data, $ndarray->data)) {
+        return 0;
+      }
+      
+      unless (Array->equals_int($ret_ndarray->dim, [1, 3])) {
+        return 0;
+      }
+    }
+    
+    {
+      my $data = [(float)1f, 2f, 3f];
+      my $dim = [1, 3];
+      my $ndarray = R::NDArray::Float->new({data => $data, dim => $dim});
+      
+      my $shallow = 1;
+      my $ret_ndarray = $ndarray->clone($shallow);
+      
+      unless ($ret_ndarray is_type R::NDArray::Float) {
+        return 0;
+      }
+      
+      if ($ret_ndarray->data == $ndarray->data) {
+        return 0;
+      }
+      
+      unless (Array->equals_float($ret_ndarray->data, $ndarray->data)) {
+        return 0;
+      }
+      
+      unless (Array->equals_int($ret_ndarray->dim, [1, 3])) {
+        return 0;
+      }
+    }
+    
+    return 1;
+  }
+  
+  static method slice : int () {
+    
+    {
+      my $data = [(float)1f, 2f, 3f, 4f, 5f, 6f];
+      my $dim = [2, 3];
+      my $ndarray = R::NDArray::Float->new({data => $data, dim => $dim});
+      
+      my $asix_indexes_product = [IOP->c([0, 1]), IOP->c([1])];
+      my $ret_ndarray = $ndarray->slice($asix_indexes_product);
+      
+      unless ($ret_ndarray is_type R::NDArray::Float) {
+        return 0;
+      }
+      
+      unless (Array->equals_float($ret_ndarray->data, [(float)3f, 4f])) {
+        return 0;
+      }
+      
+      unless (Array->equals_int($ret_ndarray->dim, [2, 1])) {
+        return 0;
+      }
+    }
+    
+    return 1;
+  }
+  
+  static method to_int_ndarray : int () {
+    
+    {
+      my $data = [(float)1f, 2f, 3f];
+      my $dim = [1, 3];
+      my $ndarray = R::NDArray::Float->new({data => $data, dim => $dim});
+      
+      my $ret_ndarray = $ndarray->to_int_ndarray;
+      
+      unless ($ret_ndarray is_type R::NDArray::Int) {
+        return 0;
+      }
+      
+      if ($ret_ndarray->data == $ndarray->data) {
+        return 0;
+      }
+      
+      unless (Array->equals_int($ret_ndarray->data, [(int)1, 2, 3])) {
+        return 0;
+      }
+      
+      unless (Array->equals_int($ret_ndarray->dim, [1, 3])) {
+        return 0;
+      }
+    }
+    
+    return 1;
+  }
+  
+  static method to_long_ndarray : int () {
+    
+    {
+      my $data = [(float)1f, 2f, 3f];
+      my $dim = [1, 3];
+      my $ndarray = R::NDArray::Float->new({data => $data, dim => $dim});
+      
+      my $ret_ndarray = $ndarray->to_long_ndarray;
+      
+      unless ($ret_ndarray is_type R::NDArray::Long) {
+        return 0;
+      }
+      
+      if ($ret_ndarray->data == $ndarray->data) {
+        return 0;
+      }
+      
+      unless (Array->equals_long($ret_ndarray->data, [(long)1, 2, 3])) {
+        return 0;
+      }
+      
+      unless (Array->equals_int($ret_ndarray->dim, [1, 3])) {
+        return 0;
+      }
+    }
+    
+    return 1;
+  }
+  
+  static method to_double_ndarray : int () {
+    
+    {
+      my $data = [(float)1f, 2f, 3f];
+      my $dim = [1, 3];
+      my $ndarray = R::NDArray::Float->new({data => $data, dim => $dim});
+      
+      my $ret_ndarray = $ndarray->to_double_ndarray;
+      
+      unless ($ret_ndarray is_type R::NDArray::Double) {
+        return 0;
+      }
+      
+      if ($ret_ndarray->data == $ndarray->data) {
+        return 0;
+      }
+      
+      unless (Array->equals_double($ret_ndarray->data, [(double)1, 2, 3])) {
+        return 0;
+      }
+      
+      unless (Array->equals_int($ret_ndarray->dim, [1, 3])) {
+        return 0;
+      }
+    }
+    
+    return 1;
+  }
+  
+  static method to_float_complex_ndarray : int () {
+    
+    {
+      my $data = [(float)1f, 2f, 3f];
+      my $dim = [1, 3];
+      my $ndarray = R::NDArray::Float->new({data => $data, dim => $dim});
+      
+      my $ret_ndarray = $ndarray->to_float_complex_ndarray;
+      
+      unless ($ret_ndarray is_type R::NDArray::FloatComplex) {
+        return 0;
+      }
+      
+      if ($ret_ndarray->data == $ndarray->data) {
+        return 0;
+      }
+      
+      unless (&equals_float_complex($ret_ndarray->data, [Math->complexf(1f, 0f), Math->complexf(2f, 0f), Math->complexf(3f, 0f)])) {
+        return 0;
+      }
+      
+      unless (Array->equals_int($ret_ndarray->dim, [1, 3])) {
+        return 0;
+      }
+    }
+    
+    return 1;
+  }
+  
+  static method equals_float_complex : int ($x1_array : Complex_2f[], $x2_array : Complex_2f[]) {
+    
+    unless ($x1_array) {
+      die "The array \$x1_array must be defined.";
+    }
+    
+    unless ($x2_array) {
+      die "The array \$x2_array must be defined.";
+    }
+    
+    my $x1_array_length = @$x1_array;
+    
+    my $x2_array_length = @$x2_array;
+    
+    my $equals = 0;
+    
+    if ($x1_array_length == $x2_array_length) {
+      my $array_length = $x1_array_length;
+      
+      my $not_equals_elem = 0;
+      for (my $i = 0; $i < $array_length; $i++) {
+        unless ($x1_array->[$i]{re} == $x2_array->[$i]{re} && $x1_array->[$i]{im} == $x2_array->[$i]{im}) {
+          $not_equals_elem = 1;
+          last;
+        }
+      }
+      
+      unless ($not_equals_elem) {
+        $equals = 1;
+      }
+    }
+    
+    return $equals;
+  }
+
+}

@@ -9,7 +9,7 @@ use Perl::Tidy;
 use Data::Dumper;
 use Module::Starter;
 $Data::Dumper::Deparse = 1;
-our $VERSION = '0.28';
+our $VERSION = '1.00';
 our %CLASS;
 our $SUB_INDEX = 1;
 
@@ -715,7 +715,7 @@ Module::Generate - Assisting with module generation.
 
 =head1 VERSION
 
-Version 0.28
+Version 1.00
 
 =cut
 
@@ -723,19 +723,19 @@ Version 0.28
 
 	use Module::Generate;
 
-	Module::Generate->dist('Planes')
+	Module::Generate->dist('Plane')
 		->author('LNATION')
 		->email('email@lnation.org')
 		->version('0.01')
-		->class('Planes')
-			->abstract('Over my head.')
+		->class('Plane')
+			->abstract('Plane')
 			->our('$type')
 			->begin(sub {
 				$type = 'boeing';
 			})
 			->new
 				->pod('Instantiate a new plane.')
-				->example('my $plane = Planes->new')
+				->example('my $plane = Plane->new')
 			->accessor('airline')
 			->sub('type')
 				->code(sub { $type })
@@ -783,7 +783,7 @@ Instantiate a new Module::Generate object.
 
 Provide a name for the distribution.
 
-	my $dist = Module::Generate->dist('Planes');
+	my $dist = Module::Generate->dist('Plane');
 
 =cut
 
@@ -831,7 +831,7 @@ The version number of the distribution/module.
 
 Start a new class/package/module..
 
-	my $class = Module::Generate->class('Planes');
+	my $class = Module::Generate->class('Plane');
 
 =cut
 

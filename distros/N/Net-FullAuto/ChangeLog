@@ -20,6 +20,12 @@
 #######################################################################
 
 
+2024-07-25  Brian M. Kelly <Brian.Kelly@fullauto.com>
+
+        * Version 1.0000678 released
+
+        * Improved display() when running git
+
 2024-07-23  Brian M. Kelly <Brian.Kelly@fullauto.com>
 
         * Version 1.0000677 released

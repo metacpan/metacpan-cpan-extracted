@@ -24,6 +24,7 @@ requires:
   SPVM::Resource::Eigen: '0.001'
   SPVM::Sys: '0.525'
   SPVM::Time::Piece: '0.003'
-resources: {}
-version: '0.014'
+resources:
+  repository: https://github.com/yuki-kimoto/SPVM-R.git
+version: '0.015'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

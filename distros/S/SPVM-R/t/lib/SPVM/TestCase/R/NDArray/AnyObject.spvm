@@ -1,0 +1,283 @@
+class TestCase::R::NDArray::AnyObject {
+  
+  use R::NDArray::AnyObject;
+  use R::OP::Int as IOP;
+  
+  use R::OP::AnyObject as BUFOP;
+  
+  use Point;
+  
+  static method data : int () {
+    
+    my $data = [(object)Point->new(1, 1), Point->new(2, 2), Point->new(3, 3)];
+    my $dim = [1, 3];
+    my $ndarray = R::NDArray::AnyObject->new({data => $data, dim => $dim});
+    
+    my $got_data = $ndarray->data;
+    
+    unless ($got_data is_compile_type object[]) {
+      return 0;
+    }
+    
+    unless ($got_data == $data) {
+      return 0;
+    }
+    
+    return 1;
+  }
+  
+  static method new : int () {
+    
+    my $data = [(object)Point->new(1, 1), Point->new(2, 2), Point->new(3, 3)];
+    my $dim = [1, 3];
+    my $ndarray = R::NDArray::AnyObject->new({data => $data, dim => $dim});
+    
+    unless ($ndarray is_type R::NDArray::AnyObject) {
+      return 0;
+    }
+    
+    unless ($ndarray->data == $data) {
+      return 0;
+    }
+    
+    unless (Array->equals_int($ndarray->dim, [1, 3])) {
+      return 0;
+    }
+    
+    return 1;
+  }
+  
+  static method create_default_data : int () {
+    
+    {
+      my $ndarray = R::NDArray::AnyObject->new;
+      
+      my $default_data = $ndarray->create_default_data;
+      
+      unless ($default_data is_type object[]) {
+        return 0;
+      }
+      
+      unless (@$default_data == 0) {
+        return 0;
+      }
+    }
+    
+    {
+      my $ndarray = R::NDArray::AnyObject->new;
+      
+      my $length = 0;
+      my $default_data = $ndarray->create_default_data($length);
+      
+      unless ($default_data is_type object[]) {
+        return 0;
+      }
+      
+      unless (@$default_data == 0) {
+        return 0;
+      }
+    }
+    
+    {
+      my $ndarray = R::NDArray::AnyObject->new;
+      
+      my $length = 2;
+      my $default_data = $ndarray->create_default_data($length);
+      
+      unless ($default_data is_type object[]) {
+        return 0;
+      }
+      
+      unless (@$default_data == 2) {
+        return 0;
+      }
+      
+      if ($default_data->[0]) {
+        return 0;
+      }
+      
+      if ($default_data->[1]) {
+        return 0;
+      }
+    }
+    
+    return 1;
+  }
+  
+  static method elem_to_string : int () { return 1; }
+  
+  static method elem_assign : int () { return 1; }
+  
+  static method elem_clone : int () { return 1; }
+  
+  static method elem_cmp : int () { return 1; }
+  
+  static method clone : int () {
+    
+    {
+      my $data = [(object)Point->new(1, 1), Point->new(2, 2), Point->new(3, 3)];
+      my $dim = [1, 3];
+      my $ndarray = R::NDArray::AnyObject->new({data => $data, dim => $dim});
+      
+      my $ret_ndarray = $ndarray->clone;
+      
+      unless ($ret_ndarray is_type R::NDArray::AnyObject) {
+        return 0;
+      }
+      
+      if ($ret_ndarray->data == $ndarray->data) {
+        return 0;
+      }
+      
+      unless ($ret_ndarray->length == 3) {
+        return 0;
+      }
+      
+      if ($ret_ndarray->data->[0]->(Point) == $data->[0]->(Point)) {
+        return 0;
+      }
+      
+      if ($ret_ndarray->data->[0]->(Point) == $data->[0]->(Point)) {
+        return 0;
+      }
+      
+      if ($ret_ndarray->data->[0]->(Point) == $data->[0]->(Point)) {
+        return 0;
+      }
+      
+      unless ($ret_ndarray->data->[0]->(Point)->x == $data->[0]->(Point)->x) {
+        return 0;
+      }
+      
+      unless ($ret_ndarray->data->[0]->(Point)->y == $data->[0]->(Point)->y) {
+        return 0;
+      }
+      
+      unless ($ret_ndarray->data->[1]->(Point)->x == $data->[1]->(Point)->x) {
+        return 0;
+      }
+      
+      unless ($ret_ndarray->data->[1]->(Point)->y == $data->[1]->(Point)->y) {
+        return 0;
+      }
+      
+      unless ($ret_ndarray->data->[2]->(Point)->x == $data->[2]->(Point)->x) {
+        return 0;
+      }
+      
+      unless ($ret_ndarray->data->[2]->(Point)->y == $data->[2]->(Point)->y) {
+        return 0;
+      }
+      
+      unless (Array->equals_int($ret_ndarray->dim, [1, 3])) {
+        return 0;
+      }
+    }
+    
+    {
+      my $data = [(object)Point->new(1, 1), Point->new(2, 2), Point->new(3, 3)];
+      my $dim = [1, 3];
+      my $ndarray = R::NDArray::AnyObject->new({data => $data, dim => $dim});
+      
+      my $shallow = 1;
+      my $ret_ndarray = $ndarray->clone($shallow);
+      
+      unless ($ret_ndarray is_type R::NDArray::AnyObject) {
+        return 0;
+      }
+      
+      if ($ret_ndarray->to_string_ndarray->data == $ndarray->data) {
+        return 0;
+      }
+      
+      unless ($ret_ndarray->length == 3) {
+        return 0;
+      }
+      
+      unless ($ret_ndarray->data->[0]->(Point) == $data->[0]->(Point)) {
+        return 0;
+      }
+      
+      unless ($ret_ndarray->data->[0]->(Point) == $data->[0]->(Point)) {
+        return 0;
+      }
+      
+      unless ($ret_ndarray->data->[0]->(Point) == $data->[0]->(Point)) {
+        return 0;
+      }
+      
+      unless ($ret_ndarray->data->[0]->(Point)->x == $data->[0]->(Point)->x) {
+        return 0;
+      }
+      
+      unless ($ret_ndarray->data->[0]->(Point)->y == $data->[0]->(Point)->y) {
+        return 0;
+      }
+      
+      unless ($ret_ndarray->data->[1]->(Point)->x == $data->[1]->(Point)->x) {
+        return 0;
+      }
+      
+      unless ($ret_ndarray->data->[1]->(Point)->y == $data->[1]->(Point)->y) {
+        return 0;
+      }
+      
+      unless ($ret_ndarray->data->[2]->(Point)->x == $data->[2]->(Point)->x) {
+        return 0;
+      }
+      
+      unless ($ret_ndarray->data->[2]->(Point)->y == $data->[2]->(Point)->y) {
+        return 0;
+      }
+      
+      unless (Array->equals_int($ret_ndarray->dim, [1, 3])) {
+        return 0;
+      }
+    }
+    
+    return 1;
+  }
+  
+  static method slice : int () {
+    
+    {
+      my $data = [(object)Point->new(1, 1), Point->new(2, 2), Point->new(3, 3), Point->new(4, 4), Point->new(5, 5), Point->new(6, 6)];
+      my $dim = [2, 3];
+      my $ndarray = R::NDArray::AnyObject->new({data => $data, dim => $dim});
+      
+      my $asix_indexes_product = [IOP->c([0, 1]), IOP->c([1])];
+      my $ret_ndarray = $ndarray->slice($asix_indexes_product);
+      
+      unless ($ret_ndarray is_type R::NDArray::AnyObject) {
+        return 0;
+      }
+      
+      unless ($ret_ndarray->length == 2) {
+        return 0;
+      }
+      
+      unless ($ret_ndarray->data->[0]->(Point)->x == 3) {
+        return 0;
+      }
+      
+      unless ($ret_ndarray->data->[0]->(Point)->y == 3) {
+        return 0;
+      }
+      
+      unless ($ret_ndarray->data->[1]->(Point)->x == 4) {
+        return 0;
+      }
+      
+      unless ($ret_ndarray->data->[1]->(Point)->y == 4) {
+        return 0;
+      }
+      
+      unless (Array->equals_int($ret_ndarray->dim, [2, 1])) {
+        return 0;
+      }
+    }
+    
+    return 1;
+  }
+  
+}

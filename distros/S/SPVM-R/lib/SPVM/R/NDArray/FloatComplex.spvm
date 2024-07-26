@@ -42,6 +42,11 @@ class R::NDArray::FloatComplex extends R::NDArray {
     return $string;
   }
   
+  method elem_assign : void ($dist_data : Complex_2f[], $dist_data_index : int, $src_data : Complex_2f[], $src_data_index : int) {
+    
+    $dist_data->[$dist_data_index] = $src_data->[$src_data_index];
+  }
+  
   method elem_clone : void ($dist_data : Complex_2f[], $dist_data_index : int, $src_data : Complex_2f[], $src_data_index : int) {
     
     $dist_data->[$dist_data_index] = $src_data->[$src_data_index];

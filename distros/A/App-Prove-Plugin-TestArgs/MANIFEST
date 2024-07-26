@@ -8,7 +8,6 @@ maint/AuthorExtensions.pl
 Makefile.PL
 MANIFEST			This list of files
 README
-t/.proverc
 t/00-plugin.t
 t/01-pod.t
 t/02-critic.t

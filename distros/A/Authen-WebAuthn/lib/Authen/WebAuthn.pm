@@ -1,5 +1,5 @@
 package Authen::WebAuthn;
-$Authen::WebAuthn::VERSION = '0.003';
+$Authen::WebAuthn::VERSION = '0.004';
 use strict;
 use warnings;
 use Mouse;
@@ -63,15 +63,16 @@ sub validate_registration {
     my ( $self, %params ) = @_;
 
     my (
-        $challenge_b64,        $requested_uv,
-        $client_data_json_b64, $attestation_object_b64,
-        $token_binding_id_b64, $trust_anchors,
-        $allowed_attestation_types
+        $challenge_b64,             $requested_uv,
+        $client_data_json_b64,      $attestation_object_b64,
+        $token_binding_id_b64,      $trust_anchors,
+        $allowed_attestation_types, $allow_untrusted_attestation,
       )
       = @params{ qw(
           challenge_b64        requested_uv
           client_data_json_b64 attestation_object_b64
-          token_binding_id_b64 trust_anchors allowed_attestation_types
+          token_binding_id_b64 trust_anchors
+          allowed_attestation_types allow_untrusted_attestation
         )
       };
 
@@ -229,7 +230,9 @@ sub validate_registration {
     # 21. Assess the attestation trustworthiness using the outputs of the
     # verification procedure in step 19, as follows:
     $self->check_attestation_trust( $attestation_result, $trust_anchors,
-        $allowed_attestation_types );
+        $allow_untrusted_attestation );
+    $self->check_attestation_type( $allowed_attestation_types,
+        $attestation_result->{type} );
 
     # 22. Check that the credentialId is not yet registered to any other user
     # TODO
@@ -481,16 +484,9 @@ sub check_token_binding {
     }
 }
 
-sub check_attestation_trust {
-    my ( $self, $attestation_result, $trust_anchors,
-        $allowed_attestation_types )
-      = @_;
+sub check_attestation_type {
+    my ( $self, $allowed_attestation_types, $attestation_type ) = @_;
 
-    # If no attestation was provided, verify that None attestation is acceptable
-    # under Relying Party policy.
-    # If self attestation was used, verify that self attestation is acceptable
-    # under
-    my $attestation_type = $attestation_result->{type};
     if ( ref($allowed_attestation_types) eq "ARRAY"
         and @$allowed_attestation_types )
     {
@@ -500,9 +496,15 @@ sub check_attestation_trust {
             croak("Attestation type $attestation_type is not allowed");
         }
     }
+}
 
-    return 1 if $attestation_type eq "Self";
-    return 1 if $attestation_type eq "None";
+sub check_attestation_trust {
+    my ( $self, $attestation_result, $trust_anchors,
+        $allow_untrusted_attestation )
+      = @_;
+
+    return 1 if $attestation_result->{type} eq "Self";
+    return 1 if $attestation_result->{type} eq "None";
 
     #Otherwise, use the X.509 certificates returned as the attestation trust
     #path from the verification procedure to verify that the attestation public
@@ -521,17 +523,34 @@ sub check_attestation_trust {
     if ( $self->matchCertificateInList( $attn_cert, $trust_anchors ) ) {
         return 1;
     }
+
     my $verify_result =
       Authen::WebAuthn::SSLeayChainVerifier::verify_chain( $trust_anchors,
         $attn_cert, \@trust_chain );
+
     if ( $verify_result->{result} == 1 ) {
         return 1;
     }
     else {
-        croak( "Could not validate attestation trust: "
-              . $verify_result->{message} );
-    }
-
+        # If the attestation statement attStmt successfully verified but is not
+        # trustworthy per step 21 above, the Relying Party SHOULD fail the
+        # registration ceremony.
+        if ( !$allow_untrusted_attestation ) {
+            croak( "Could not validate attestation trust: "
+                  . $verify_result->{message} );
+        }
+        else {
+         # NOTE: However, if permitted by policy, the Relying Party MAY register
+         # the credential ID and credential public key but treat the credential
+         # as one with self attestation
+         %$attestation_result = (
+             success    => 1,
+             type       => "Self",
+             trust_path => [],
+         );
+         return 1;
+     }
+ }
 }
 
 # Try to find a DER-encoded certificate in a list of PEM-encoded certificates

@@ -1,0 +1,285 @@
+class TestCase::R::OP::DataFrame {
+  
+  use Array;
+  
+  use R::OP::Int as IOP;
+  use R::OP::Double as DOP;
+  use R::OP::DataFrame as DFOP;
+  
+  static method cbind : int () {
+    
+    my $data_frame0 = R::DataFrame->new;
+    
+    my $ndarray0_0 = IOP->c([1, 2]);
+    my $ndarray0_1 = IOP->c([3, 4]);
+    $data_frame0->insert_col("Name0_0", $ndarray0_0);
+    $data_frame0->insert_col("Name0_1", $ndarray0_1);
+    
+    my $data_frame1 = R::DataFrame->new;
+    
+    my $ndarray1_0 = IOP->c([5, 6]);
+    my $ndarray1_1 = IOP->c([7, 8]);
+    $data_frame1->insert_col("Name1_0", $ndarray1_0);
+    $data_frame1->insert_col("Name1_1", $ndarray1_1);
+    
+    my $data_frame_ret = DFOP->cbind($data_frame0, $data_frame1);
+    
+    unless ($data_frame_ret->ncol == 4) {
+      return 0;
+    }
+    
+    unless ($data_frame_ret->col("Name0_0") == $ndarray0_0) {
+      return 0;
+    }
+    
+    unless ($data_frame_ret->col("Name0_1") == $ndarray0_1) {
+      return 0;
+    }
+    
+    unless ($data_frame_ret->col("Name1_0") == $ndarray1_0) {
+      return 0;
+    }
+    
+    unless ($data_frame_ret->col("Name1_1") == $ndarray1_1) {
+      return 0;
+    }
+    
+    unless ($data_frame_ret->col_by_index(0) == $ndarray0_0) {
+      return 0;
+    }
+    
+    unless ($data_frame_ret->col_by_index(1) == $ndarray0_1) {
+      return 0;
+    }
+    
+    unless ($data_frame_ret->col_by_index(2) == $ndarray1_0) {
+      return 0;
+    }
+    
+    unless ($data_frame_ret->col_by_index(3) == $ndarray1_1) {
+      return 0;
+    }
+    
+    # Exceptions
+    {
+      {
+        my $data_frame0 = R::DataFrame->new;
+        
+        my $ndarray0_0 = IOP->c([1, 2]);
+        my $ndarray0_1 = IOP->c([3, 4]);
+        $data_frame0->insert_col("Name0_0", $ndarray0_0);
+        $data_frame0->insert_col("Name0_1", $ndarray0_1);
+        
+        my $data_frame1 = R::DataFrame->new;
+        
+        my $ndarray1_0 = IOP->c([5, 6]);
+        my $ndarray1_1 = IOP->c([7, 8]);
+        $data_frame1->insert_col("Name1_0", $ndarray1_0);
+        $data_frame1->insert_col("Name1_1", $ndarray1_1);
+        
+        eval { DFOP->cbind($data_frame0, undef); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+      {
+        my $data_frame0 = R::DataFrame->new;
+        
+        my $ndarray0_0 = IOP->c([1, 2]);
+        my $ndarray0_1 = IOP->c([3, 4]);
+        $data_frame0->insert_col("Name0_0", $ndarray0_0);
+        $data_frame0->insert_col("Name0_1", $ndarray0_1);
+        
+        my $data_frame1 = R::DataFrame->new;
+        
+        my $ndarray1_0 = IOP->c([5, 6]);
+        my $ndarray1_1 = IOP->c([7, 8]);
+        $data_frame1->insert_col("Name1_0", $ndarray1_0);
+        $data_frame1->insert_col("Name1_1", $ndarray1_1);
+        
+        eval { DFOP->cbind(undef, $data_frame1); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+      {
+        my $data_frame0 = R::DataFrame->new;
+        
+        my $ndarray0_0 = IOP->c([1, 2]);
+        my $ndarray0_1 = IOP->c([3, 4]);
+        $data_frame0->insert_col("Name0_0", $ndarray0_0);
+        $data_frame0->insert_col("Name0_1", $ndarray0_1);
+        
+        my $data_frame1 = R::DataFrame->new;
+        
+        my $ndarray1_0 = IOP->c([5, 6, 7]);
+        $data_frame1->insert_col("Name1_0", $ndarray1_0);
+        
+        eval { DFOP->cbind($data_frame0, $data_frame1); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+    }
+    
+    $@ = undef;
+    
+    return 1;
+  }
+  
+  static method rbind : int () {
+    
+    {
+      my $data_frame0 = R::DataFrame->new;
+      
+      my $ndarray0_0 = IOP->c([1, 2]);
+      my $ndarray0_1 = IOP->c([3, 4]);
+      $data_frame0->insert_col("Name0_0", $ndarray0_0);
+      $data_frame0->insert_col("Name0_1", $ndarray0_1);
+      
+      my $data_frame1 = R::DataFrame->new;
+      
+      my $ndarray1_0 = IOP->c([5, 6]);
+      my $ndarray1_1 = IOP->c([7, 8]);
+      $data_frame1->insert_col("Name0_0", $ndarray1_0);
+      $data_frame1->insert_col("Name0_1", $ndarray1_1);
+      
+      my $data_frame_ret = DFOP->rbind($data_frame0, $data_frame1);
+      
+      unless ($data_frame_ret->nrow == 4) {
+        return 0;
+      }
+      
+      unless (Array->equals_int($data_frame_ret->col_by_index(0)->(R::NDArray::Int)->data, [1, 2, 5, 6])) {
+        return 0;
+      }
+      
+      unless (Array->equals_int($data_frame_ret->col_by_index(1)->(R::NDArray::Int)->data, [3, 4, 7, 8])) {
+        return 0;
+      }
+    }
+    
+    # Exceptions
+    {
+      {
+        my $data_frame0 = R::DataFrame->new;
+        
+        my $ndarray0_0 = IOP->c([1, 2]);
+        my $ndarray0_1 = IOP->c([3, 4]);
+        $data_frame0->insert_col("Name0_0", $ndarray0_0);
+        $data_frame0->insert_col("Name0_1", $ndarray0_1);
+        
+        my $data_frame1 = R::DataFrame->new;
+        
+        my $ndarray1_0 = IOP->c([5, 6]);
+        my $ndarray1_1 = IOP->c([7, 8]);
+        $data_frame1->insert_col("Name0_0", $ndarray1_0);
+        $data_frame1->insert_col("Name0_1", $ndarray1_1);
+        
+        eval { DFOP->rbind($data_frame0, undef); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+      {
+        my $data_frame0 = R::DataFrame->new;
+        
+        my $ndarray0_0 = IOP->c([1, 2]);
+        my $ndarray0_1 = IOP->c([3, 4]);
+        $data_frame0->insert_col("Name0_0", $ndarray0_0);
+        $data_frame0->insert_col("Name0_1", $ndarray0_1);
+        
+        my $data_frame1 = R::DataFrame->new;
+        
+        my $ndarray1_0 = IOP->c([5, 6]);
+        my $ndarray1_1 = IOP->c([7, 8]);
+        $data_frame1->insert_col("Name0_0", $ndarray1_0);
+        $data_frame1->insert_col("Name0_1", $ndarray1_1);
+        
+        eval { DFOP->rbind(undef, $data_frame1); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+      {
+        my $data_frame0 = R::DataFrame->new;
+        
+        my $ndarray0_0 = IOP->c([1, 2]);
+        my $ndarray0_1 = IOP->c([3, 4]);
+        $data_frame0->insert_col("Name0_0", $ndarray0_0);
+        $data_frame0->insert_col("Name0_1", $ndarray0_1);
+        
+        my $data_frame1 = R::DataFrame->new;
+        
+        my $ndarray1_0 = IOP->c([5, 6]);
+        my $ndarray1_1 = IOP->c([7, 8]);
+        $data_frame1->insert_col("Name0_0", $ndarray1_0);
+        
+        eval { DFOP->rbind($data_frame0, $data_frame1); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+      {
+        my $data_frame0 = R::DataFrame->new;
+        
+        my $ndarray0_0 = IOP->c([1, 2]);
+        my $ndarray0_1 = IOP->c([3, 4]);
+        $data_frame0->insert_col("Name0_0", $ndarray0_0);
+        $data_frame0->insert_col("Name0_1", $ndarray0_1);
+        
+        my $data_frame1 = R::DataFrame->new;
+        
+        my $ndarray1_0 = IOP->c([5, 6]);
+        my $ndarray1_1 = IOP->c([7, 8]);
+        $data_frame1->insert_col("Name0_0", $ndarray1_0);
+        $data_frame1->insert_col("Name0_1_xxx", $ndarray1_0);
+        
+        eval { DFOP->rbind($data_frame0, $data_frame1); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+      {
+        my $data_frame0 = R::DataFrame->new;
+        
+        my $ndarray0_0 = IOP->c([1, 2]);
+        my $ndarray0_1 = IOP->c([3, 4]);
+        $data_frame0->insert_col("Name0_0", $ndarray0_0);
+        $data_frame0->insert_col("Name0_1", $ndarray0_1);
+        
+        my $data_frame1 = R::DataFrame->new;
+        
+        my $ndarray1_0 = DOP->c([(double)5, 6]);
+        my $ndarray1_1 = DOP->c([(double)7, 8]);
+        $data_frame1->insert_col("Name0_0", $ndarray1_0);
+        $data_frame1->insert_col("Name0_1", $ndarray1_0);
+        
+        eval { DFOP->rbind($data_frame0, $data_frame1); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+    }
+    
+    $@ = undef;
+    
+    return 1;
+  }
+}

@@ -1,7 +1,6 @@
 ## no critic (RequireExtendedFormatting, ProhibitComplexRegexes)
-#<<<
-use strict; use warnings;
-#>>>
+use strict;
+use warnings;
 
 use Test::Fatal qw( exception );
 use Test::More import => [ qw( BAIL_OUT can_ok is_deeply like plan require_ok subtest ) ], tests => 5;

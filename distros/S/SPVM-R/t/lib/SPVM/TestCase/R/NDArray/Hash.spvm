@@ -1,0 +1,246 @@
+class TestCase::R::NDArray::Hash {
+  
+  use R::NDArray::Hash;
+  use R::OP::Byte as BOP;
+  use R::OP::Short as SOP;
+  use R::OP::Int as IOP;
+  use R::OP::Long as LOP;
+  use R::OP::Float as FOP;
+  use R::OP::FloatComplex as FCOP;
+  use R::OP::Double as DOP;
+  use R::OP::DoubleComplex as DCOP;
+  use R::OP::String as STROP;
+  
+  static method new : int () {
+    
+    my $hash = R::NDArray::Hash->new;
+    
+    unless ($hash is_type R::NDArray::Hash) {
+      return 0;
+    }
+    
+    return 1;
+  }
+  
+  static method set : int () {
+    
+    my $hash = R::NDArray::Hash->new;
+    
+    $hash->set("Name0", IOP->c(1));
+    
+    $hash->set("Name1", IOP->c(2));
+    
+    unless ($hash->get("Name0")->(R::NDArray::Int)->data->[0] == 1) {
+      return 0;
+    }
+    
+    unless ($hash->get("Name1")->(R::NDArray::Int)->data->[0] == 2) {
+      return 0;
+    }
+    
+    return 1;
+  }
+  
+  static method get : int () {
+    
+    my $hash = R::NDArray::Hash->new;
+    
+    $hash->set("Name0", IOP->c(1));
+    
+    $hash->set("Name1", IOP->c(2));
+    
+    unless ($hash->get("Name0")->(R::NDArray::Int)->data->[0] == 1) {
+      return 0;
+    }
+    
+    unless ($hash->get("Name1")->(R::NDArray::Int)->data->[0] == 2) {
+      return 0;
+    }
+    
+    # Excepsions
+    {
+      my $hash = R::NDArray::Hash->new;
+      
+      eval { $hash->get("Name0"); }
+      
+      unless ($@) {
+        return 0;
+      }
+    }
+    
+    $@ = undef;
+    
+    return 1;
+  }
+  
+  static method get_byte : int () {
+    
+    my $hash = R::NDArray::Hash->new;
+    
+    $hash->set("Name0", BOP->c((byte)1));
+    
+    my $ndarray = $hash->get_byte("Name0");
+    
+    unless ($ndarray is_type R::NDArray::Byte) {
+      return 0;
+    }
+    
+    unless ($ndarray->data->[0] == 1) {
+      return 0;
+    }
+    
+    return 1;
+  }
+  
+  static method get_short : int () {
+    
+    my $hash = R::NDArray::Hash->new;
+    
+    $hash->set("Name0", SOP->c((short)1));
+    
+    my $ndarray = $hash->get_short("Name0");
+    
+    unless ($ndarray is_type R::NDArray::Short) {
+      return 0;
+    }
+    
+    unless ($ndarray->data->[0] == 1) {
+      return 0;
+    }
+    
+    return 1;
+  }
+  
+  static method get_int : int () {
+    
+    my $hash = R::NDArray::Hash->new;
+    
+    $hash->set("Name0", IOP->c((int)1));
+    
+    my $ndarray = $hash->get_int("Name0");
+    
+    unless ($ndarray is_type R::NDArray::Int) {
+      return 0;
+    }
+    
+    unless ($ndarray->data->[0] == 1) {
+      return 0;
+    }
+    
+    return 1;
+  }
+  
+  static method get_long : int () {
+    
+    my $hash = R::NDArray::Hash->new;
+    
+    $hash->set("Name0", LOP->c((long)1));
+    
+    my $ndarray = $hash->get_long("Name0");
+    
+    unless ($ndarray is_type R::NDArray::Long) {
+      return 0;
+    }
+    
+    unless ($ndarray->data->[0] == 1) {
+      return 0;
+    }
+    
+    return 1;
+  }
+  
+  static method get_float : int () {
+    
+    my $hash = R::NDArray::Hash->new;
+    
+    $hash->set("Name0", FOP->c((float)1f));
+    
+    my $ndarray = $hash->get_float("Name0");
+    
+    unless ($ndarray is_type R::NDArray::Float) {
+      return 0;
+    }
+    
+    unless ($ndarray->data->[0] == 1f) {
+      return 0;
+    }
+    
+    return 1;
+  }
+  
+  static method get_float_complex : int () {
+    
+    my $hash = R::NDArray::Hash->new;
+    
+    $hash->set("Name0", FCOP->c([(float)1f,-1f]));
+    
+    my $ndarray = $hash->get_float_complex("Name0");
+    
+    unless ($ndarray is_type R::NDArray::FloatComplex) {
+      return 0;
+    }
+    
+    unless ($ndarray->data->[0]{re} == 1 && $ndarray->data->[0]{im} == -1) {
+      return 0;
+    }
+    
+    return 1;
+  }
+  
+  static method get_double : int () {
+    
+    my $hash = R::NDArray::Hash->new;
+    
+    $hash->set("Name0", DOP->c((double)1));
+    
+    my $ndarray = $hash->get_double("Name0");
+    
+    unless ($ndarray is_type R::NDArray::Double) {
+      return 0;
+    }
+    
+    unless ($ndarray->data->[0] == 1) {
+      return 0;
+    }
+    
+    return 1;
+  }
+  
+  static method get_double_complex : int () {
+    
+    my $hash = R::NDArray::Hash->new;
+    
+    $hash->set("Name0", DCOP->c([(double)1f,-1f]));
+    
+    my $ndarray = $hash->get_double_complex ("Name0");
+    
+    unless ($ndarray is_type R::NDArray::DoubleComplex) {
+      return 0;
+    }
+    
+    unless ($ndarray->data->[0]{re} == 1 && $ndarray->data->[0]{im} == -1) {
+      return 0;
+    }
+    
+    return 1;
+  }
+  
+  static method get_string : int () {
+    
+    my $hash = R::NDArray::Hash->new;
+    
+    $hash->set("Name0", STROP->c((string)1));
+    
+    my $ndarray = $hash->get_string("Name0");
+    
+    unless ($ndarray is_type R::NDArray::String) {
+      return 0;
+    }
+    
+    unless ($ndarray->data->[0] eq "1") {
+      return 0;
+    }
+    
+    return 1;
+  }
+}

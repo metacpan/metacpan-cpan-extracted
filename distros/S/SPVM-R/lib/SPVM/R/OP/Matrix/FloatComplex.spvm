@@ -83,7 +83,7 @@ class R::OP::Matrix::FloatComplex {
     return $ret_ndarray;
   }
   
-  static method diag_identity : R::NDArray::FloatComplex ($nrow : int) {
+  static method identity : R::NDArray::FloatComplex ($nrow : int) {
     
     unless ($nrow > 0) {
       die "The row \$nrow must be greater than 0.";

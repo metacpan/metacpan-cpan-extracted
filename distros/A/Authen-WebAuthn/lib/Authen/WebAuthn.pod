@@ -13,7 +13,7 @@ Authen::WebAuthn - A library to add Web Authentication support to server applica
 
 =head1 VERSION
 
-version 0.003
+version 0.004
 
 =head1 SYNOPSIS
 
@@ -148,6 +148,18 @@ Currently supported values are C<None>,C<Self>,C<Basic>
 
 By default, all attestation types are allowed
 
+=item allow_untrusted_attestation
+
+By default, if an attestation type such as C<Basic> is used by the
+authenticator and a correct trust_anchor could not be found, the validation
+will fail as mandated by the WebAuthn specification. However, in some cases it
+is permitted to allow the registration to proceed, but treat it as C<Self>
+attestation.
+
+This setting allows you to successfully validate registration, but change the
+type to C<Self> if a trusted certificate was not provided in the
+C<trust_anchors> parameter.
+
 =back
 
 This method croaks on errors. If the registration was successful, it returns a hashref with the following subkeys:
@@ -190,7 +202,9 @@ An arrayref of DER-encoded certificates provided by the authenticator
 
 =item aaguid
 
-The verified AAGUID of the authenticator, this is only provided if the attestation was verified successfully
+The verified AAGUID of the authenticator, this is only provided if the
+attestation was verified successfully and chained up to a trusted root
+certificate.
 
 =back
 

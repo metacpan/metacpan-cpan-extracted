@@ -93229,3 +93229,16 @@ P/PE/PEVANS/String-Tagged-Terminal-0.08.tar.gz
 M/MA/MANWAR/Test-Strict-0.54.tar.gz
 S/SR/SREZIC/Tk-FontDialog-0.19.tar.gz
 G/GD/GDT/URI-PackageURL-2.21.tar.gz
+U/UT/UTASHIRO/App-Greple-9.14.tar.gz
+S/SV/SVW/App-Prove-Plugin-TestArgs-2.0.0.tar.gz
+M/MB/MBESSON/Authen-WebAuthn-0.004.tar.gz
+R/RE/REEDFISH/Net-FullAuto-1.0000678.tar.gz
+J/JD/JDEGUEST/Locale-Unicode-v0.3.0.tar.gz
+S/SK/SKAJI/Minilla-v3.1.24.tar.gz
+L/LN/LNATION/Module-Generate-1.00.tar.gz
+N/NL/NLNETLABS/Net-DNS-SEC-1.25.tar.gz
+L/LN/LNATION/Number-Iterator-XS-0.02.tar.gz
+P/PE/PERLANCAR/Path-Naive-0.044.tar.gz
+K/KA/KARJALA/RxPerl-v6.29.2.tar.gz
+K/KA/KARJALA/RxPerl-v6.29.1.tar.gz
+K/KI/KIMOTO/SPVM-R-0.015.tar.gz

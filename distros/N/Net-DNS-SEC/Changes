@@ -1,6 +1,18 @@
 Revision history for Perl extension Net::DNS::SEC.
 
 
+**** 1.25 Jul 24, 2024
+
+	Suppress AUTOLOAD for Net::DNS::SEC::Private::_index.
+	Abandon support for OpenSSL pre-1.1.1 API.
+
+Fix: rt.cpan.org #154526
+	Tests exhibiting signatures with SHA-1 fail since Fedora 41
+
+Fix: rt.cpan.org #153606
+	Net::DNS minimum version dependency
+ 	
+ 	
 **** 1.24 Apr 25, 2024
 
 	Eliminate deprecated RSA CRT parameter names.
@@ -686,4 +698,4 @@ Net::DNS. The history of those is documented below.
 
 
 ---------------------------------------------------------------------------
-$Id: Changes 1976 2024-04-25 09:05:27Z willem $
+$Id: Changes 1983 2024-07-25 06:23:28Z willem $

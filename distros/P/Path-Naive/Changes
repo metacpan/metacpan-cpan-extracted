@@ -1,3 +1,11 @@
+0.044   2024-07-17  Released-By: PERLANCAR; Urgency: low
+
+        - No functional changes.
+
+        - [dist] Edit Changes (replace Backward-Compatible: no with
+          Backward-Incompatible: yes).
+
+
 0.043   2020-02-12  Released-By: PERLANCAR; Urgency: medium
 
 	- Add rel_path(), normalize_and_split_path().
@@ -5,7 +13,7 @@
 	- [doc] Show example of split_path() splitting on multiple /'s.
 
 
-0.042   2020-02-07  Released-By: PERLANCAR; Urgency: medium; Backward-Compatible: no
+0.042   2020-02-07  Released-By: PERLANCAR; Urgency: medium; Backward-Incompatible: yes
 
 	[Incompatible changes]
 

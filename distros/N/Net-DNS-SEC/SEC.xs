@@ -1,5 +1,5 @@
 
-#define XS_Id "$Id: SEC.xs 1975 2024-04-22 14:41:36Z willem $"
+#define XS_Id "$Id: SEC.xs 1978 2024-06-02 09:58:05Z willem $"
 
 
 =head1 NAME
@@ -97,93 +97,27 @@ static OSSL_LIB_CTX *libctx = NULL;
 #endif
 
 
-#if (OPENSSL_RELEASE < 0x01000100)
-#error	ancient libcrypto version
+#if (OPENSSL_RELEASE < 0x01010100)		/* OpenSSL support status */
+#error	deprecated OpenSSL version
 #include OPENSSL_VERSION_TEXT /* in error log; by any means, however reprehensible! */
-#endif
-
-
-#if (OPENSSL_RELEASE < 0x03040000)
+#elif (OPENSSL_RELEASE < 0x03000000)
+#define EOL 20230911
+#elif (OPENSSL_RELEASE < 0x03010000)
+#define EOL 20260907
+#elif (OPENSSL_RELEASE < 0x03020000)
+#define EOL 20250314
+#elif (OPENSSL_RELEASE < 0x03030000)
+#define EOL 20251123
+#elif (OPENSSL_RELEASE < 0x03040000)
 #define EOL 20260409
 #endif
 
-#if (OPENSSL_RELEASE < 0x03030000)
-#undef  EOL
-#define EOL 20251123
-#endif
-
-#if (OPENSSL_RELEASE < 0x03020000)
-#undef  EOL
-#define EOL 20250314
-#endif
-
-#if (OPENSSL_RELEASE < 0x03010000)
-#undef  EOL
-#define EOL 20260907
-#endif
 
 #if (OPENSSL_RELEASE < 0x03000000)
-#undef  EOL
-#define EOL 20230911
-#define NO_SM3
 #ifndef NID_ED25519
 #define NO_EdDSA
 #endif
-#endif
-
-
-#if (OPENSSL_RELEASE < 0x01010000)
-#define EVP_MD_CTX_new()	EVP_MD_CTX_create()
-#define EVP_MD_CTX_free(ctx)	EVP_MD_CTX_destroy((ctx))
-
-int DSA_set0_pqg(DSA *d, BIGNUM *p, BIGNUM *q, BIGNUM *g)
-{
-	d->p = p;
-	d->q = q;
-	d->g = g;
-	return 1;
-}
-
-int DSA_set0_key(DSA *d, BIGNUM *pub_key, BIGNUM *priv_key)
-{
-	d->priv_key = priv_key;
-	d->pub_key  = pub_key;
-	return 1;
-}
-
-int RSA_set0_key(RSA *r, BIGNUM *n, BIGNUM *e, BIGNUM *d)
-{
-	r->n = n;
-	r->e = e;
-	r->d = d;
-	return 1;
-}
-
-int RSA_set0_factors(RSA *r, BIGNUM *p, BIGNUM *q)
-{
-	r->p = p;
-	r->q = q;
-	return 1;
-}
-#endif
-
-
-#if (OPENSSL_RELEASE < 0x01010100)
-int EVP_DigestSign(EVP_MD_CTX *ctx,
-		unsigned char *sig, size_t *sig_len,
-		const unsigned char *data, size_t data_len)
-{
-	EVP_DigestUpdate( ctx, data, data_len );
-	return EVP_DigestSignFinal( ctx, sig, sig_len );
-}
-
-int EVP_DigestVerify(EVP_MD_CTX *ctx,
-		const unsigned char *sig, size_t sig_len,
-		const unsigned char *data, size_t data_len)
-{
-	EVP_DigestUpdate( ctx, data, data_len );
-	return EVP_DigestVerifyFinal( ctx, sig, sig_len );
-}
+#define NO_SM3
 #endif
 
 

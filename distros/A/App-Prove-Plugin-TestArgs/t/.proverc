@@ -1,4 +1,0 @@
-# - This configuration file is only used by prove (App::Prove) and not
-#   by ExtUtils::MakeMaker. "make testp" triggers prove to run the tests.
-# - --shuffle and --recurse is turned on by default.
--PTestArgs=t/config.yml

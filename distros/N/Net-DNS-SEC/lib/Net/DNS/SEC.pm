@@ -4,16 +4,16 @@ use strict;
 use warnings;
 use Carp;
 
-our $SVNVERSION = (qw$Id: SEC.pm 1976 2024-04-25 09:05:27Z willem $)[2];
+our $SVNVERSION = (qw$Id: SEC.pm 1983 2024-07-25 06:23:28Z willem $)[2];
 our $VERSION;
-$VERSION = '1.24';
+$VERSION = '1.25';
 
 use base qw(Exporter DynaLoader);
 
 eval { __PACKAGE__->bootstrap($VERSION) };
 warn "\n\n$@\n" if $@;
 
-use Net::DNS 1.01 qw(:DEFAULT);
+use Net::DNS 1.08 qw(:DEFAULT);
 
 our @EXPORT = ( @Net::DNS::EXPORT, qw(algorithm digtype key_difference) );
 

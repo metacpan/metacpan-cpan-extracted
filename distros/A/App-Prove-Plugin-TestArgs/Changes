@@ -1,5 +1,10 @@
 Release history for App-Prove-Plugin-TestArgs
 
+2.0.0     2024-07-25
+          - simplify project setup
+          - change the version scheme from decimal to dotted decimal
+          - reduce minimum perl version
+
 1.000001  2024-02-08
           - improve documentation
 

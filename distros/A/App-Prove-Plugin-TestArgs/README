@@ -22,16 +22,12 @@ MAINTENANCE
 
 To maintain this module, run the following commands:
 
-  perl Makefile.PL
-  make PERL_CPANM_OPT="--notest --with-develop --with-recommends" installdeps 
+  cpanm --notest --with-configure --with-develop --no-man-pages --local-lib-contained local --installdeps .
   perl Makefile.PL
   make
   make RELEASE_TESTING=1 test  # use Test::Harness
   make RELEASE_TESTING=1 testp # use TAP::Harness
-  make cover
-
-The second command installs the module dependencies in a "local" directory
-using "cpanm".
+  make cover                   # coverage statistics in vim format
 
 COPYRIGHT AND LICENSE
 

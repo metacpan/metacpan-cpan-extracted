@@ -3,7 +3,7 @@ package Net::DNS::SEC::RSA;
 use strict;
 use warnings;
 
-our $VERSION = (qw$Id: RSA.pm 1940 2023-10-30 15:59:20Z willem $)[2];
+our $VERSION = (qw$Id: RSA.pm 1983 2024-07-25 06:23:28Z willem $)[2];
 
 
 =head1 NAME
@@ -64,7 +64,7 @@ sub sign {
 	my ( $class, $sigdata, $private ) = @_;
 
 	my $evpmd = $parameters{$private->algorithm};
-	die 'private key not RSA' unless $evpmd;
+	die 'unsupported RSA algorithm ', $private->algorithm unless $evpmd;
 
 	my @key = qw(Modulus PublicExponent PrivateExponent Prime1 Prime2 Exponent1 Exponent2 Coefficient);
 	my ( $n, $e, $d, $p1, $p2, $e1, $e2, $c ) = map { decode_base64( $private->$_ ) } @key;
@@ -78,7 +78,7 @@ sub verify {
 	my ( $class, $sigdata, $keyrr, $sigbin ) = @_;
 
 	my $evpmd = $parameters{$keyrr->algorithm};
-	die 'public key not RSA' unless $evpmd;
+	die 'unsupported RSA algorithm ', $keyrr->algorithm unless $evpmd;
 
 	return unless $sigbin;
 

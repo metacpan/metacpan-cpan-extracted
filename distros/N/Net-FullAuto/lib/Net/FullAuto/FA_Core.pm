@@ -30980,14 +30980,12 @@ print $Net::FullAuto::FA_Core::LOG "NO GROWOUTPUTTTTTTTTTTTTT\n" if $Net::FullAu
                         $lastline=$cmd_prompt;
                         $output='';$fulloutput='';
                      } elsif ($output=~/$cmd_prompt$/s) {
-#print "OUTPUTTTTTTTTTT=$output<==\n";
                         if ($output=~
                               /^(.*)stdout: (\d)\s+\]0;.*$cmd_prompt$/s) {
                            $output="${1}stdout: $2\n$cmd_prompt";
                         }
                         $growoutput.=$output;
                         $lastline=$cmd_prompt;
-#print "OUTPUT FOR DISPLAY=$output<==\n";
                         $save=&display($output,$cmd_prompt,$save)
                            if $display;
                         $output='';$fulloutput='';
@@ -31245,15 +31243,11 @@ print $Net::FullAuto::FA_Core::LOG "LETS LOOK AT LINE=$line<== and LASTLINE=$las
                                  $str_cnt--;
                                  if ($line=~s/^stdout: ?//) {
                                     $fulloutput.=$line;
-				    #$errflag='';
                                  } elsif (($line!~/^\[[AK]$|^\n$/s &&
                                        $line ne $live_command &&
                                        $line!~/\s-e\s\'s\/\^\/stdout
                                        \:\s*\/\'\s2\>\&1\s*$/sx) ||
                                        ($fullerror && $line=~/^\n$/s)) {
-				       #if ($fullerror && !$errflag) {
-				       #$fullerror.="\n";
-				       #} $errflag=1;
                                     $fullerror.=$line;
                                     $line=~s/\[/\\\[/g;
                                     $line=~s/\]/\\\]/g;
@@ -31265,14 +31259,7 @@ print $Net::FullAuto::FA_Core::LOG "LETS LOOK AT LINE=$line<== and LASTLINE=$las
                                     $growoutput=~s/$line//s;
                                  } elsif ($fulloutput || $line!~/^\s*$/s) {
                                     $fulloutput.=$line;
-                                    #$save=&display($line,$cmd_prompt,$save)
-                                    #   if $display;
-				    #$errflag='';
-                                 } #elsif ($display) {
-                                   # $save=&display($line,$cmd_prompt,$save);
-                                 #}
-                                 #$save=&display($line,$cmd_prompt,$save)
-                                 #   if $display;
+                                 }
                               }
                            }
                         } elsif ($fulloutput || $line!~/^\s*$/s) {
@@ -31282,8 +31269,6 @@ print $Net::FullAuto::FA_Core::LOG "LETS LOOK AT LINE=$line<== and LASTLINE=$las
                            $growoutput=~s/^stdout: ?//mg;
                            $fulloutput=$growoutput;
                         }
-                        $save=&display($line,$cmd_prompt,$save,$live_command)
-                           if $display;
                      }
 print "GROW_ADDED_TO_FULL=$growoutput<==\n" if !$Net::FullAuto::FA_Core::cron && ($Net::FullAuto::FA_Core::debug || $debug) && $loop_count<$loop_max;
 print $Net::FullAuto::FA_Core::LOG "GROW_ADDED_TO_FULL=$growoutput\n"
@@ -31687,24 +31672,36 @@ sub display
       $tline=~s/^(.)/$1?/s;
    }
    if (-1<index $cmd,'git') {
-      if ((-1<index $cmd,'git checkout') ||
+      if ((-1<index $cmd,'git clone') ||
             (-1<index $cmd,'git checkout') ||
             (-1<index $cmd,'git pull')) {
          return unless $line;
-         if (-1<index $line,'Receiving objects:') {
-            print "\n";
-            $line=~s/sReceiving/s\nReceiving/sg;
-         } elsif (-1<index $line,'Resolving deltas:') {
-            print "\n";
-            $line=~s/[)]Resolving/)\nResolving/sg;
-         } elsif (-1<index $line,'Updating files:') {
-            print "\n";
-            $line=~s/[)]Updating/)\nUpdating/sg;
-         } elsif (-1<index $line,'pack-reused') {
-            print "\n";
-         }
+	 $line=$save.$line if $save;
          if (-1<index $line,'[K') {
             $line=~s/[[]K/\n/sg;
+         }
+	 if (($line!~/[).,;'"]\s*$/s) &&
+               ($line!~/MiB\/s\s*$/s)) {
+	    $save.=$line;
+	    return $save;
+	 }
+         if (-1<index $line,'Receiving objects:') {
+	    $line=~s/[)]Receiving/)\nReceiving/sg;
+	    $line=~s/sReceiving/s\nReceiving/sg;
+	    $line.="\n" if $line!~/\n$/s;
+	 }
+         if (-1<index $line,'Resolving deltas:') {
+            $line=~s/[)]Resolving/)\nResolving/sg;
+	    $line.="\n" if $line!~/\n$/s;
+         } 
+	 if (-1<index $line,'Updating files:') {
+            $line=~s/[)]Updating/)\nUpdating/sg;
+	    $line.="\n" if $line!~/\n$/s;
+         }
+	 if (-1<index $line,'remote') {
+            $line=~s/[)]remote/)\nremote/sg;
+	    $line=~s/sremote/s\nremote/sg;
+	    $line.="\n" if $line!~/\n$/s;
          }
       }
    }

@@ -15,7 +15,7 @@ our @EXPORT_OK = (
 );
 our %EXPORT_TAGS = (all => \@EXPORT_OK);
 
-our $VERSION = "v6.29.0";
+our $VERSION = "v6.29.2";
 
 1;
 __END__
@@ -688,7 +688,7 @@ L<https://rxjs.dev/api/operators/every>
 
 Works like rxjs's "every", and emits true of false.
 
-    # 0, complete
+    # "", complete
     rx_of(5, 10, 15, 18, 20)->pipe(
         op_every(sub ($value, $idx) { $value % 5 == 0 }), # can also use $_ here
     )->subscribe($observer);
@@ -825,7 +825,7 @@ L<https://rxjs.dev/api/operators/isEmpty>
 
 Works like rxjs's "isEmpty", and emits true or false.
 
-    # (pause 1 second) 0, complete
+    # (pause 1 second) "", complete
     rx_interval(1)->pipe(
         op_is_empty(),
     )->subscribe($observer);
@@ -918,6 +918,7 @@ L<https://rxjs.dev/api/operators/mergeMap>
     # 11, 21, 31, 12, 22, 32, 13, 23, 33, complete
     rx_of(10, 20, 30)->pipe(
         op_merge_map(sub ($x, $idx) {
+            # can also use $_ here instead of $_[0]
             return rx_interval(1)->pipe(
                 op_map(sub ($y, @) {
                     return $x + $y + 1;
@@ -1173,6 +1174,7 @@ L<https://rxjs.dev/api/operators/switchMap>
 
     $o->pipe(
         op_switch_map(sub ($x, $idx) {
+            # can also use $_ here instead of $_[0]
             return rx_interval(0.7)->pipe(
                 op_map(sub ($y, $idx2) { $x * 10 + $y + 1 }),
             );

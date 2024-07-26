@@ -2,7 +2,7 @@ package Minilla;
 use strict;
 use warnings;
 use 5.010001;
-use version; our $VERSION = version->declare("v3.1.23");
+use version; our $VERSION = version->declare("v3.1.24");
 
 our $DEBUG;
 our $AUTO_INSTALL;
@@ -418,6 +418,14 @@ or program. Build fail if the command does not exist.
 
 Use a different module to generate C<README.md> from your pod. This
 module must subclass L<Pod::Markdown>.
+
+=item markdown_maker_opts
+
+    [markdown_maker_opts]
+    local_module_re = "^MyApp::"
+    local_module_url_prefix = "https://example.org/perl/pod/"
+
+Specify arguments to pass to C<markdown_maker>'s C<new()> constructor.
 
 =item Metadata
 

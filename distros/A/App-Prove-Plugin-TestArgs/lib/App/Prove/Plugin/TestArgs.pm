@@ -1,13 +1,15 @@
-#<<<
-use strict; use warnings;
-#>>>
+use strict;
+use warnings;
 
 package App::Prove::Plugin::TestArgs;
 
 use Class::Method::Modifiers qw( install_modifier );
 use Config::Any              qw();
 
-our $VERSION = '1.000001';
+# keeping the following $VERSION declaration on a single line is important
+#<<<
+use version 0.9915; our $VERSION = version->declare( '2.0.0' );
+#>>>
 
 my $command_line_test_args;
 my %test_script_has_alias;

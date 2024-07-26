@@ -83,7 +83,37 @@ class R::OP::Matrix::Double {
     return $ret_ndarray;
   }
   
-  static method diag_identity : R::NDArray::Double ($nrow : int) {
+  static method slice_diag : R::NDArray::Double ($x_ndarray : R::NDArray::Double) {
+    
+    unless ($x_ndarray) {
+      die "The n-dimensional array \$x_ndarray must be defined.";
+    }
+    
+    unless ($x_ndarray->is_square_matrix) {
+      die "The n-dimensional array \$x_ndarray must be a matrix.";
+    }
+    
+    my $x_data = (double[])$x_ndarray->data;
+    
+    my $x_row = $x_ndarray->nrow;
+    
+    my $x_column = $x_ndarray->ncol;
+    
+    my $ret_dim = [$x_row];
+    
+    my $ret_ndarray = R::OP::Double->c(undef, $ret_dim);
+    
+    my $ret_data = $ret_ndarray->data;
+    
+    my $x_index = 0;
+    for (my $row = 0; $row < $x_row; $row++) {
+      $ret_data->[$row] = $x_data->[$x_column * $row + $row];
+    }
+    
+    return $ret_ndarray;
+  }
+  
+  static method identity : R::NDArray::Double ($nrow : int) {
     
     unless ($nrow > 0) {
       die "The row \$nrow must be greater than 0.";
@@ -229,6 +259,10 @@ class R::OP::Matrix::Double {
     
     unless ($x_ndarray->is_square_matrix) {
       die "The n-dimensional array \$x_ndarray must be a squre matrix.";
+    }
+    
+    if (&det($x_ndarray)->data->[0] == 0) {
+      die "The determinant of the n-dimensional array(matrix) \$x_ndarray must not be equal to 0.";
     }
     
     my $x_data = (double[])$x_ndarray->data;

@@ -2,16 +2,17 @@ NAME
     Path::Naive - Yet another abstract, Unix-like path manipulation routines
 
 VERSION
-    This document describes version 0.043 of Path::Naive (from Perl
-    distribution Path-Naive), released on 2020-02-12.
+    This document describes version 0.044 of Path::Naive (from Perl
+    distribution Path-Naive), released on 2024-07-17.
 
 SYNOPSIS
      use Path::Naive qw(
          abs_path
-         concat_path
          concat_and_normalize_path
+         concat_path
          is_abs_path
          is_rel_path
+         normalize_and_split_path
          normalize_path
          rel_path
          split_path
@@ -107,8 +108,12 @@ FUNCTIONS
   is_abs_path($path) => bool
   is_rel_path($path) => bool
   normalize_and_split_path($path) => list
+    Added in v0.043.
+
   normalize_path($path) => str
   rel_path($path, $base) => str
+    Added in v0.043.
+
   split_path($path) => list
 HOMEPAGE
     Please visit the project's homepage at
@@ -116,13 +121,6 @@ HOMEPAGE
 
 SOURCE
     Source repository is at <https://github.com/perlancar/perl-Path-Naive>.
-
-BUGS
-    Please report any bugs or feature requests on the bugtracker website
-    <https://rt.cpan.org/Public/Dist/Display.html?Name=Path-Naive>
-
-    When submitting a bug or request, please include a test-file or a patch
-    to an existing test-file that illustrates the bug or desired feature.
 
 SEE ALSO
     Path::Abstract a similar module. The difference is, it does not
@@ -134,9 +132,36 @@ SEE ALSO
 AUTHOR
     perlancar <perlancar@cpan.org>
 
+CONTRIBUTOR
+    Steven Haryanto <stevenharyanto@gmail.com>
+
+CONTRIBUTING
+    To contribute, you can send patches by email/via RT, or send pull
+    requests on GitHub.
+
+    Most of the time, you don't need to build the distribution yourself. You
+    can simply modify the code, then test via:
+
+     % prove -l
+
+    If you want to build the distribution (e.g. to try to install it locally
+    on your system), you can install Dist::Zilla,
+    Dist::Zilla::PluginBundle::Author::PERLANCAR,
+    Pod::Weaver::PluginBundle::Author::PERLANCAR, and sometimes one or two
+    other Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps
+    required beyond that are considered a bug and can be reported to me.
+
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2020, 2014, 2013 by perlancar@cpan.org.
+    This software is copyright (c) 2024, 2020, 2014, 2013 by perlancar
+    <perlancar@cpan.org>.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Path-Naive>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
 
