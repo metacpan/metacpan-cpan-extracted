@@ -20601,34 +20601,6 @@ XS(_wrap_gsl_matrix_char_isnonneg) {
 }
 
 
-XS(_wrap_gsl_matrix_char_norm1) {
-  {
-    gsl_matrix_char *arg1 = (gsl_matrix_char *) 0 ;
-    void *argp1 = 0 ;
-    int res1 = 0 ;
-    int argvi = 0;
-    char result;
-    dXSARGS;
-    
-    if ((items < 1) || (items > 1)) {
-      SWIG_croak("Usage: gsl_matrix_char_norm1(m);");
-    }
-    res1 = SWIG_ConvertPtr(ST(0), &argp1,SWIGTYPE_p_gsl_matrix_char, 0 |  0 );
-    if (!SWIG_IsOK(res1)) {
-      SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "gsl_matrix_char_norm1" "', argument " "1"" of type '" "gsl_matrix_char const *""'"); 
-    }
-    arg1 = (gsl_matrix_char *)(argp1);
-    result = (char)gsl_matrix_char_norm1((gsl_matrix_char const *)arg1);
-    ST(argvi) = SWIG_From_char  SWIG_PERL_CALL_ARGS_1((char)(result)); argvi++ ;
-    
-    XSRETURN(argvi);
-  fail:
-    
-    SWIG_croak_null();
-  }
-}
-
-
 XS(_wrap_gsl_matrix_char_add) {
   {
     gsl_matrix_char *arg1 = (gsl_matrix_char *) 0 ;
@@ -22129,7 +22101,6 @@ static swig_command_info swig_commands[] = {
 {"Math::GSL::Matrixc::gsl_matrix_char_ispos", _wrap_gsl_matrix_char_ispos},
 {"Math::GSL::Matrixc::gsl_matrix_char_isneg", _wrap_gsl_matrix_char_isneg},
 {"Math::GSL::Matrixc::gsl_matrix_char_isnonneg", _wrap_gsl_matrix_char_isnonneg},
-{"Math::GSL::Matrixc::gsl_matrix_char_norm1", _wrap_gsl_matrix_char_norm1},
 {"Math::GSL::Matrixc::gsl_matrix_char_add", _wrap_gsl_matrix_char_add},
 {"Math::GSL::Matrixc::gsl_matrix_char_sub", _wrap_gsl_matrix_char_sub},
 {"Math::GSL::Matrixc::gsl_matrix_char_mul_elements", _wrap_gsl_matrix_char_mul_elements},

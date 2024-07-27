@@ -44,7 +44,10 @@ sub GSL_LINALG_LU_DECOMP : Tests {
     $base->set_row(0, [0,1,2,3])
          ->set_row(1, [5,6,7,8])
          ->set_row(2, [9,10,11,12])
-         ->set_row(3, [13,14,15,16]);
+         # NOTE: Using [13,14,15,16] here causes a singular matrix but due to 
+         #     rounding errors it is not recognized as such on some platforms,
+         #    so we will instead repeat the third row to make it singular in a more obvious way
+         ->set_row(3, [9,10,11,12]);
     my $permutation = gsl_permutation_alloc(4);
     gsl_permutation_init($permutation);
     my $first = Math::GSL::Matrix->new(4,4);
@@ -53,16 +56,12 @@ sub GSL_LINALG_LU_DECOMP : Tests {
     my ($result, $signum) = gsl_linalg_LU_decomp($base->raw, $permutation);
     my $version= gsl_version();
     my ($major, $minor) = split /\./, $version;
+    #Math::GSL::Test::dump_lu_matrix([$base->as_list], $permutation, 4, 4);
     if ($major >= 2 && $minor >= 8) {
         # From version 2.8 onwards, the result value for a singular matrix is an integer
         #  such that U(i,i) = 0
         # TODO: For some reason this is not the case on macOS yet
-        if ($^O eq 'darwin') {
-            is_deeply( [ $result, $signum ], [ 0, 1] );
-        }
-        else {
-            is_deeply( [ $result, $signum ], [ 4, 1] );
-        }
+        is_deeply( [ $result, $signum ], [ 4, 1] );
     }
     else {
         is_deeply( [ $result, $signum ], [ 0, 1] );

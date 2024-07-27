@@ -9,10 +9,11 @@ use utf8;
 
 use Object::Pad 0.800;
 
-package App::sdview 0.16;
+package App::sdview 0.17;
 class App::sdview :strict(params);
 
 use App::sdview::Style;
+use App::sdview::Highlighter;
 
 use List::Keywords qw( first );
 
@@ -21,6 +22,8 @@ use List::Keywords qw( first );
 C<App::sdview> - a terminal document viewer for Pod and other syntaxes
 
 =head1 SYNOPSIS
+
+=for highlighter perl
 
    use App::sdview;
 
@@ -34,6 +37,8 @@ a basic understanding of nroff (for manpages). Future versions may expand on
 these abilities, extending them or adding new formats.
 
 To actually use it, you likely wanted wanted to see the F<bin/sdview> script.
+
+=for highlighter
 
    $ sdview Some::Module
 
@@ -110,6 +115,13 @@ method run ( $file, %opts )
 
    my @paragraphs = $parser_class->new->parse_file( $file );
 
+   foreach my $para ( @paragraphs ) {
+      if( $opts{highlight} and
+            $para->type eq "verbatim" and defined( my $language = $para->language ) ) {
+         App::sdview::Highlighter->highlight_str( $para->text, $language );
+      }
+   }
+
    # TODO: unrecognised output option key names will not look very neat here
    $output_class->new( %output_options )->output( @paragraphs );
 }
@@ -117,10 +129,6 @@ method run ( $file, %opts )
 =head1 TODO
 
 =over 4
-
-=item *
-
-Customisable formatting and style information in C<App::sdview::Style>.
 
 =item *
 

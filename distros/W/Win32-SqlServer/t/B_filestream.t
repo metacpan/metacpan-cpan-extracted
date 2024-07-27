@@ -1,9 +1,15 @@
 #---------------------------------------------------------------------
-# $Header: /Perl/OlleDB/t/B_filestream.t 10    19-07-05 21:48 Sommar $
+# $Header: /Perl/OlleDB/t/B_filestream.t 11    24-07-23 22:45 Sommar $
 #
 # Tests for OpenSqlFilestream.
 #
 # $History: B_filestream.t $
+# 
+# *****************  Version 11  *****************
+# User: Sommar       Date: 24-07-23   Time: 22:45
+# Updated in $/Perl/OlleDB/t
+# Rewritten the test of alloclen to avoid issues with bluescreen. Also,
+# this test now passes with 32-bit Perl.
 # 
 # *****************  Version 10  *****************
 # User: Sommar       Date: 19-07-05   Time: 21:48
@@ -283,39 +289,54 @@ FROM   fstest
 WHERE  name = 'Kolme'
 SQLEND
 
-# To test that the $alloclen parameter really works we ask for so much space
-# that it just has to fail.
+# Test that the $alloclen parameter really seem to work.
 my $alloclen;
 if ($x86) {
-	$alloclen = {High => 20000, Low => 0};
+	$alloclen = {High => 1, Low => 0};
 }
 else {
-    $alloclen = int(80E12);
+    $alloclen = 4 * 1024 * 1024 * 1024;
 }
 
-# Special test: on my machine machine, this test blue-screens because of a
-# collision of filter drivers.
-unless ($servername =~ /^SOMMERWALD/) {
-   $fh = $X->OpenSqlFilestream($path, FILESTREAM_READWRITE, $context, 0,
+# We need to know the free space on the drive before and after.
+my $drive = $X->sql_one(<<SQLEND, Win32::SqlServer::SCALAR);
+    SELECT left(physical_name, 1)
+    FROM   sys.database_files
+    WHERE  name = 'fs'
+SQLEND
+
+my %fixed_drives = $X->sql('EXEC master..xp_fixeddrives', 
+                           Win32::SqlServer::KEYED, Win32::SqlServer::SCALAR, [1]);
+
+my $before_size = $fixed_drives{$drive};
+
+$fh = $X->OpenSqlFilestream($path, FILESTREAM_READWRITE, $context, 0,
                                $alloclen);
-   if ($fh > 0) {
-      print "not ok 9  # You don't have a 80 TB disk, do you?\n";
-   }
+if ($fh > 0) {
+   %fixed_drives = $X->sql('EXEC master..xp_fixeddrives', 
+                           Win32::SqlServer::KEYED, Win32::SqlServer::SCALAR, [1]);
+   
+   my $size_delta = $before_size - $fixed_drives{$drive};
+
+   if ($size_delta > 3 * 1024) {
+      print "ok 9\n";
+   } 
    else {
-      my $errmsg = $X->{ErrInfo}{Messages}[0];
-      if ($errmsg and
-         $errmsg->{Source} eq 'OpenSqlFilestream' and
-          $errmsg->{Errno} = -112 and
-         $errmsg->{Severity} = 16) { 
-          print "ok 9\n";
-      }
-      else {
-         print "not ok 9\n";
-      }	  
+      print "not ok 9 # before - after = $size_delta\n";
    }
 }
 else {
-   print "ok 9 # skip, would blue-screen the SQL Server machine";
+   # Maybe there is no space on the disk?
+   my $errmsg = $X->{ErrInfo}{Messages}[0];
+   if ($errmsg and
+      $errmsg->{Source} eq 'OpenSqlFilestream' and
+       $errmsg->{Errno} = -112 and
+      $errmsg->{Severity} = 16) { 
+       print "ok 9\n";
+   }
+   else {
+      print "not ok 9\n";
+   }
 }
 
 # Close this transaction.

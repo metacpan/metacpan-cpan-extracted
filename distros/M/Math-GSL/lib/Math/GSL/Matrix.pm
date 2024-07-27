@@ -384,7 +384,6 @@ package Math::GSL::Matrix;
 *gsl_matrix_char_ispos = *Math::GSL::Matrixc::gsl_matrix_char_ispos;
 *gsl_matrix_char_isneg = *Math::GSL::Matrixc::gsl_matrix_char_isneg;
 *gsl_matrix_char_isnonneg = *Math::GSL::Matrixc::gsl_matrix_char_isnonneg;
-*gsl_matrix_char_norm1 = *Math::GSL::Matrixc::gsl_matrix_char_norm1;
 *gsl_matrix_char_add = *Math::GSL::Matrixc::gsl_matrix_char_add;
 *gsl_matrix_char_sub = *Math::GSL::Matrixc::gsl_matrix_char_sub;
 *gsl_matrix_char_mul_elements = *Math::GSL::Matrixc::gsl_matrix_char_mul_elements;

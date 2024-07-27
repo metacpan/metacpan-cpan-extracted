@@ -13,6 +13,32 @@
 <CENTER>
 <H1>History Win32::SqlServer</H1>
 </CENTER>
+<H3>2022-07-25 &#8211; 2.015</H3>
+<UL>
+  <LI><B>Platform support:</B>
+<UL>
+      <LI>This version includes binaries for these Perl versions: 5.32, 5.34, 5.36, 5.38 and 5.40. Yes, that means that four versions have been shaved off since 2.014, but recall that my basic policy is to support five Perl versions back.</LI>
+    </UL>
+  </LI>
+  <LI><B>Breaking Changes</B>:
+<UL>
+      <LI>The deprecated login property <B>AutoTranslate</B> has been removed. Since 2.012, the property has not had any effect.</LI>
+    </UL>
+  </LI>
+  <LI><B>Feature enhancements</B>:
+    <UL>
+      <LI>New login property <A HREF="Win32-SqlServer.html#ServerCertificate">ServerCertificate</A>, which is only available with MSOLEBDSQL19, version 19.2.0 and later.</LI>
+      <LI>Added one more parameter to <A HREF="Win32-SqlServer.html#SetDefaultForEncryption">SetDefaultForEncryption</A> to support server certificate.</LI>
+    </UL>
+  </LI>
+  <LI><B>Bug fixes:</B>
+<UL>
+      <LI><CODE>sql_variant</CODE> data where the underlying data type was <CODE>varchar</CODE> data with a UTF-8 collation would come back garbled with recent versions of the MSOLEDBSQL and MSOLEDBSQL19 providers. This was due to a change in Win32::SqlServer 2.013 (see below) where I tried to adapt to changes in the OLE DB providers. However, it seems that one of these changes were deemed to be a bug, which Microsoft fixed MSOLEDBSQL  18.6.4 and MSOLEDBSQL 19.1.0. Beware that if you have older versions of these providers, you may face issues with <CODE>varchar</CODE> data in <CODE>sql_variant</CODE> values.</LI>
+      <LI>Fixed a long-standing problem in the test for FILESTREAM, where one test would always fail with 32-bit, and the same test could under some circumstance blue-screen your machine. I've rewritten that particular test so that it is less &quot;wild&quot;, and now seem to pass under all circumstances. At least in my environments. :-)</LI>
+      <LI>Some tests in <B>9_loginproperties.t</B> would fail if you ran against an instance that had been enabled for Entra ID authentication. The test script now simply skips these test on such a server.</LI>
+    </UL>
+  </LI>
+</UL>
 <H3>2022-06-12 &#8211; 2.014</H3>
 <UL>
   <LI><B>Platform support:</B>
@@ -364,7 +390,7 @@ source distribution for further details.
 
 <HR>
 <I>
-Last updated <!--$$Modtime:--> 22-06-08 21:56 <!-- $-->
+Last updated <!--$$Modtime:--> 24-07-25 14:35 <!-- $-->
 </I>
 </BODY>
 </HTML>

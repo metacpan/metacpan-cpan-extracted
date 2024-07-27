@@ -5,7 +5,7 @@
 %typemap(in) gsl_multiroot_function * {
     gsl_multiroot_function *f;
     /* stub */
-    $1 = &f;
+    $1 = (gsl_multiroot_function *)&f;
 }
 
 %{

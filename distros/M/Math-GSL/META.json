@@ -25,7 +25,7 @@
       },
       "configure" : {
          "requires" : {
-            "Alien::GSL" : "1.01",
+            "Math::GSL::Alien" : "1.03",
             "Module::Build" : "0.38",
             "PkgConfig" : "0.07720"
          }
@@ -43,7 +43,7 @@
    "provides" : {
       "Math::GSL" : {
          "file" : "lib/Math/GSL.pm",
-         "version" : "0.45"
+         "version" : "0.48"
       },
       "Math::GSL::BLAS" : {
          "file" : "lib/Math/GSL/BLAS.pm",
@@ -1343,6 +1343,6 @@
          "url" : "https://github.com/hakonhagland/perl-math-gsl/tree/master"
       }
    },
-   "version" : "0.45",
+   "version" : "0.48",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

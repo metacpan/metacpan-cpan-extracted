@@ -9,7 +9,7 @@ use HTTP::CookieJar::LWP 0.014;
 use Mozilla::PublicSuffix v1.0.6;
 use HTTP::Request::Common 6.44 qw(POST);
 
-our $VERSION = '0.019'; # VERSION
+our $VERSION = '0.020'; # VERSION
 
 =head1 NAME
 

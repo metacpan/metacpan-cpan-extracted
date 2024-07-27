@@ -10,6 +10,7 @@ require App::sdview::Parser::Markdown;
 require App::sdview::Parser::Pod;
 require App::sdview::Parser::Man;
 
+require App::sdview::Highlighter;
 require App::sdview::Style;
 
 require App::sdview::Output::Terminal;

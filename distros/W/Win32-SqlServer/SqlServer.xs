@@ -1,12 +1,17 @@
 /*---------------------------------------------------------------------
- $Header: /Perl/OlleDB/SqlServer.xs 100   22-05-18 22:22 Sommar $
+ $Header: /Perl/OlleDB/SqlServer.xs 101   24-07-15 23:50 Sommar $
 
   The main flie for Win32::SqlServer. This file only includes the XS
   parts these days. All other code is in other files.
 
-  Copyright (c) 2004-2022   Erland Sommarskog
+  Copyright (c) 2004-2024   Erland Sommarskog
 
   $History: SqlServer.xs $
+ * 
+ * *****************  Version 101  *****************
+ * User: Sommar       Date: 24-07-15   Time: 23:50
+ * Updated in $/Perl/OlleDB
+ * Added one more parameter to SetDefaultForEncryption
  * 
  * *****************  Version 100  *****************
  * User: Sommar       Date: 22-05-18   Time: 22:22
@@ -210,10 +215,11 @@ BOOT:
 initialize();
 
 void
-SetDefaultForEncryption(sv_Encrypt, sv_Trust = NULL, sv_HostName = NULL)
+SetDefaultForEncryption(sv_Encrypt, sv_Trust = NULL, sv_HostName = NULL, sv_ServerName = NULL)
    SV * sv_Encrypt
    SV * sv_Trust
    SV * sv_HostName
+   SV * sv_ServerName
 
 
 void

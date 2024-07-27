@@ -7,9 +7,9 @@ use warnings;
 use Fcntl qw(:DEFAULT);
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2023-07-09'; # DATE
+our $DATE = '2024-07-17'; # DATE
 our $DIST = 'Perinci-Examples'; # DIST
-our $VERSION = '0.824'; # VERSION
+our $VERSION = '0.825'; # VERSION
 
 our %SPEC;
 
@@ -164,7 +164,7 @@ Perinci::Examples::FileStream - Examples for reading/writing files (using stream
 
 =head1 VERSION
 
-This document describes version 0.824 of Perinci::Examples::FileStream (from Perl distribution Perinci-Examples), released on 2023-07-09.
+This document describes version 0.825 of Perinci::Examples::FileStream (from Perl distribution Perinci-Examples), released on 2024-07-17.
 
 =head1 DESCRIPTION
 
@@ -346,7 +346,7 @@ that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2023, 2022, 2020, 2019, 2018, 2017, 2016, 2015, 2014, 2013, 2012, 2011 by perlancar <perlancar@cpan.org>.
+This software is copyright (c) 2024, 2023, 2022, 2020, 2019, 2018, 2017, 2016, 2015, 2014, 2013, 2012, 2011 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

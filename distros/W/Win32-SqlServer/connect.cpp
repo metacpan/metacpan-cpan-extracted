@@ -1,11 +1,23 @@
 /*---------------------------------------------------------------------
- $Header: /Perl/OlleDB/connect.cpp 17    22-05-27 23:59 Sommar $
+ $Header: /Perl/OlleDB/connect.cpp 19    24-07-17 23:06 Sommar $
 
   Implements the connection routines on Win32::SqlServer.
 
-  Copyright (c) 2004-2022   Erland Sommarskog
+  Copyright (c) 2004-2024   Erland Sommarskog
 
   $History: connect.cpp $
+ * 
+ * *****************  Version 19  *****************
+ * User: Sommar       Date: 24-07-17   Time: 23:06
+ * Updated in $/Perl/OlleDB
+ * Entirely removed AutoTranslate as an option and it is now considered
+ * unknown.
+ * 
+ * *****************  Version 18  *****************
+ * User: Sommar       Date: 24-07-15   Time: 23:52
+ * Updated in $/Perl/OlleDB
+ * Added new login property ServerCertificate which also can be set
+ * through SetDefaultForEncryption.
  * 
  * *****************  Version 17  *****************
  * User: Sommar       Date: 22-05-27   Time: 23:59
@@ -391,6 +403,12 @@ void setloginproperty(SV   * olle_ptr,
      croak("Unknown property '%s' passed to setloginproperty", prop_name);
    }
 
+   // AutoTranslate is not settable, and we pretend that it does not exist.
+   if (gbl_init_props[ix].propset_enum == ssinit_props &&
+       gbl_init_props[ix].property_id == SSPROP_INIT_AUTOTRANSLATE) {
+     croak("Unknown property 'AutoTranslate' passed to setloginproperty");
+   }
+
 
    // Some properties affects others.
    if (gbl_init_props[ix].propset_enum == oleinit_props &&
@@ -411,7 +429,8 @@ void setloginproperty(SV   * olle_ptr,
                    (mydata->init_properties[j].dwPropertyID == SSPROP_INIT_AUTOTRANSLATE ||
                     mydata->init_properties[j].dwPropertyID == SSPROP_INIT_ENCRYPT ||
                     mydata->init_properties[j].dwPropertyID == SSPROP_INIT_TRUST_SERVER_CERTIFICATE ||
-                    mydata->init_properties[j].dwPropertyID == SSPROP_INIT_HOST_NAME_CERTIFICATE))) {
+                    mydata->init_properties[j].dwPropertyID == SSPROP_INIT_HOST_NAME_CERTIFICATE ||
+                    mydata->init_properties[j].dwPropertyID == SSPROP_INIT_SERVER_CERTIFICATE))) {
             VariantClear(&mydata->init_properties[j].vValue);
          }
       }
@@ -425,12 +444,6 @@ void setloginproperty(SV   * olle_ptr,
         gbl_init_props[ix].property_id == SSPROP_INIT_NETWORKADDRESS)) {
       free_sqlver_currentdb(mydata);
       ClearCodepages(olle_ptr);
-   }
-
-   // AutoTranslate is deprecated and ingnored.
-   if (gbl_init_props[ix].propset_enum == ssinit_props &&
-       gbl_init_props[ix].property_id == SSPROP_INIT_AUTOTRANSLATE) {
-      olledb_message(olle_ptr, -1, 10, 1, "Warning: The AutoTranslate property is no longer settable and will be removed in a future release or Win32::SqlServer.\n");
    }
 
    // The property ApplicationIntent requires validation.

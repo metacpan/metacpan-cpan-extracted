@@ -1,10 +1,15 @@
 ﻿#---------------------------------------------------------------------
-# $Header: /Perl/OlleDB/t/2_datatypes.t 41    22-04-24 22:46 Sommar $
+# $Header: /Perl/OlleDB/t/2_datatypes.t 42    24-07-15 23:56 Sommar $
 #
 # This test script tests using sql_sp and sql_insert in all possible
 # ways and with testing use of all datatypes.
 #
 # $History: 2_datatypes.t $
+# 
+# *****************  Version 42  *****************
+# User: Sommar       Date: 24-07-15   Time: 23:56
+# Updated in $/Perl/OlleDB/t
+# Removed old debug label.
 # 
 # *****************  Version 41  *****************
 # User: Sommar       Date: 22-04-24   Time: 22:46
@@ -2823,7 +2828,6 @@ do_tests($X, 0, 'sql_variant', 'smalldatetime iso/hash');
               outtype => '%s eq %s');
 do_tests($X, 0, 'sql_variant', 'char');
 
-hit:
 %tbl       = (varcol  => "ä23456789\x00123456789nn",
               intype  => undef,
               outtype => 'varchar');

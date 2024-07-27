@@ -1,5 +1,5 @@
 /*---------------------------------------------------------------------
- $Header: /Perl/OlleDB/init.cpp 18    22-05-27 19:03 Sommar $
+ $Header: /Perl/OlleDB/init.cpp 20    24-07-17 23:06 Sommar $
 
   This file holds code that is run when the module initialiases, and
   when a new OlleDB object is created. This file also declares global
@@ -7,9 +7,21 @@
   constants that are set up once and then never changed.
 
 
-  Copyright (c) 2004-2022   Erland Sommarskog
+  Copyright (c) 2004-2024  Erland Sommarskog
 
   $History: init.cpp $
+ * 
+ * *****************  Version 20  *****************
+ * User: Sommar       Date: 24-07-17   Time: 23:06
+ * Updated in $/Perl/OlleDB
+ * Entirely removed AutoTranslate as an option and it is now considered
+ * unknown.
+ * 
+ * *****************  Version 19  *****************
+ * User: Sommar       Date: 24-07-15   Time: 23:52
+ * Updated in $/Perl/OlleDB
+ * Added new login property ServerCertificate which also can be set
+ * through SetDefaultForEncryption.
  * 
  * *****************  Version 18  *****************
  * User: Sommar       Date: 22-05-27   Time: 19:03
@@ -332,7 +344,7 @@ static void setup_init_properties ()
    add_init_property("Appname", ssinit_props, SSPROP_INIT_APPNAME,
                      FALSE, VT_BSTR, FALSE, scriptname, NULL, ix);
    add_init_property("Autotranslate", ssinit_props, SSPROP_INIT_AUTOTRANSLATE,
-                     FALSE, VT_BOOL, FALSE, NULL, NULL, ix);
+                     FALSE, VT_BOOL, FALSE, NULL, NULL, ix);   // This property is not settable by the user, but we also force it as FALSE.
    add_init_property("Language", ssinit_props, SSPROP_INIT_CURRENTLANGUAGE,
                      FALSE, VT_BSTR, TRUE, NULL, NULL, ix);
    add_init_property("AttachFilename", ssinit_props, SSPROP_INIT_FILENAME,
@@ -391,6 +403,8 @@ static void setup_init_properties ()
    // Properties new in MSOLEDBSQL19.
    add_init_property("HostNameInCertificate", ssinit_props, SSPROP_INIT_HOST_NAME_CERTIFICATE,
                      FALSE, VT_BSTR, TRUE, NULL, FALSE, ix);
+   add_init_property("ServerCertificate", ssinit_props, SSPROP_INIT_SERVER_CERTIFICATE,
+                     FALSE, VT_BSTR, TRUE, NULL, FALSE, ix);
    no_of_ssprops_msoledbsql19 = init_propset_info[ssinit_props].no_of_props;   
 
    
@@ -409,15 +423,18 @@ static void setup_init_properties ()
 // routine permits the user to override.
 void SetDefaultForEncryption(SV * sv_Encrypt,
                              SV * sv_Trust,
-                             SV * sv_HostName) {
+                             SV * sv_HostName,
+                             SV * sv_ServerCert) {
    int    encrypt_ix = -1;
    int    trust_cert_ix = -1;
    int    host_name_ix  = -1;
+   int    server_cert_ix = -1;
 
    // Loop over gbl_init_props to find the indexes for the Encrypt and TrustServerCert options
    for (int ix = 0; 
             ix < MAX_INIT_PROPERTIES && 
-                 (encrypt_ix < 0 || trust_cert_ix < 0 || host_name_ix < 0); ix++) {
+                 (encrypt_ix < 0 || trust_cert_ix < 0 || 
+                  host_name_ix < 0 || server_cert_ix < 0); ix++) {
       if (gbl_init_props[ix].propset_enum == ssinit_props) {
          if (gbl_init_props[ix].property_id == SSPROP_INIT_ENCRYPT) {
             encrypt_ix = ix;
@@ -428,13 +445,16 @@ void SetDefaultForEncryption(SV * sv_Encrypt,
          else if (gbl_init_props[ix].property_id == SSPROP_INIT_HOST_NAME_CERTIFICATE) {
             host_name_ix = ix;
          }
+         else if (gbl_init_props[ix].property_id == SSPROP_INIT_SERVER_CERTIFICATE) {
+            server_cert_ix = ix;
+         }
       }
    }
 
    // Sanity check.
-   if (encrypt_ix == -1 || trust_cert_ix == -1 || host_name_ix == -1) {
-      croak("Internal error! Was not able to set encrypt_ix(%d), trust_cert_ix(%d) or host_name_ix(%d)!\n", 
-            encrypt_ix, trust_cert_ix, host_name_ix);
+   if (encrypt_ix == -1 || trust_cert_ix == -1 || host_name_ix == -1 || server_cert_ix == -1) {
+      croak("Internal error! Was not able to set encrypt_ix(%d), trust_cert_ix(%d), host_name_ix(%d) or server_cert_ix(%d)!\n", 
+            encrypt_ix, trust_cert_ix, host_name_ix, server_cert_ix);
    }
    
    // Handle Encrypt option
@@ -481,6 +501,18 @@ void SetDefaultForEncryption(SV * sv_Encrypt,
       gbl_init_props[host_name_ix].isoptional = TRUE;
       VariantClear(&gbl_init_props[host_name_ix].default_value);
    }
+
+   // Finally, server certificate.
+   if (sv_ServerCert && SvOK(sv_ServerCert)) {
+      gbl_init_props[server_cert_ix].isoptional = FALSE;
+      gbl_init_props[server_cert_ix].default_value.vt = VT_BSTR;
+      gbl_init_props[server_cert_ix].default_value.bstrVal = SV_to_BSTR(sv_ServerCert);
+   }
+   else {
+      gbl_init_props[server_cert_ix].isoptional = TRUE;
+      VariantClear(&gbl_init_props[server_cert_ix].default_value);
+   }
+
 }
 
 

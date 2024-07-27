@@ -9,7 +9,7 @@ use utf8;
 
 use Object::Pad 0.807;
 
-package App::sdview::Output::Terminal 0.16;
+package App::sdview::Output::Terminal 0.17;
 class App::sdview::Output::Terminal :strict(params);
 
 inherit App::sdview::Output::Formatted;

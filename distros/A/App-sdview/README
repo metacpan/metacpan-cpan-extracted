@@ -37,9 +37,6 @@ DESCRIPTION
 
 TODO
 
-      * Customisable formatting and style information in
-      App::sdview::Style.
-
       * Add more formats. ReST perhaps. Maybe others too.
 
       * Improved Markdown parser. Currently the parser is very simple.

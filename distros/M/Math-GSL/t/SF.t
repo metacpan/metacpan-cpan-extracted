@@ -1276,7 +1276,7 @@ sub TEST_MATHIEU : Tests {
     my $version= gsl_version();
     my ($major, $minor) = split /\./, $version;
 
-    diag("GSL version=$version");
+    #diag("GSL version=$version");
 
     local $TODO = "these functions are not currently available";
     return;

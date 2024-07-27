@@ -9,7 +9,7 @@ use utf8;
 
 use Object::Pad 0.805;
 
-package App::sdview::Output::Tickit 0.08;
+package App::sdview::Output::Tickit 0.09;
 class App::sdview::Output::Tickit
    :strict(params);
 
@@ -40,7 +40,7 @@ It uses L<Tickit> to provide the terminal interactions.
 
 =item *
 
-C<Home> - scroll to top
+C<Home> or C<< < >> - scroll to top
 
 =item *
 
@@ -52,11 +52,19 @@ C<PageUp> - scroll up half a page
 
 =item *
 
+C<[> - scroll up to the previous item
+
+=item *
+
 C<Up> - scroll up a line
 
 =item *
 
 C<Down> - scroll down a line
+
+=item *
+
+C<]> - scroll up to the previous item
 
 =item *
 
@@ -68,7 +76,7 @@ C<Space> - scroll down a page
 
 =item *
 
-C<End> - scroll to bottom
+C<End> or C<< > >> - scroll to bottom
 
 =item *
 
@@ -163,6 +171,8 @@ ADJUST
       '<Space>'     => "scroll_down_page",
       '<Backspace>' => "scroll_up_page",
       '<End>'       => "scroll_to_bottom",
+      '<<>'         => "scroll_to_top",
+      '<>>'         => "scroll_to_bottom",
    );
 
    $outlinetree = App::sdview::Output::Tickit::_OutlineTree->new;
@@ -194,6 +204,26 @@ method output ( @paragraphs )
 
    $t->bind_key(
       'F9' => sub { $outlinefloat->is_visible ? $outlinefloat->hide : $outlinefloat->show },
+   );
+   $t->bind_key(
+      ']' => sub {
+         my $item = $outlinetree->next_item( +1 );
+         $scroller->scroll_to( 0, $item->itemidx, 0 ) if $item;
+      }
+   );
+   $t->bind_key(
+      '[' => sub {
+         my $item = $outlinetree->current_item;
+         # Scroll back up to that item if it's not visible
+         my ( undef, $offscreen ) = $scroller->item2line( $item->itemidx, 0 );
+         if( defined $offscreen and $offscreen eq "above" ) {
+            $scroller->scroll_to( 0, $item->itemidx, 0 );
+            return;
+         }
+
+         $item = $outlinetree->next_item( -1 );
+         $scroller->scroll_to( 0, $item->itemidx, 0 ) if $item;
+      }
    );
 
    $scroller->set_on_scrolled( sub ( $scroller, $ ) {
@@ -314,7 +344,13 @@ method select_and_jump ( $new_idx )
 
       my ( $item, $e ) = $matches[$matchidx]->@*;
       my $startline = $item->line_for_char( $e->start );
-      $scroller->scroll_to( 2, $item, $startline );
+
+      # Is the target line already visible?
+      my $physline = $scroller->item2line( $item, $startline );
+
+      $scroller->scroll_to( 2, $item, $startline )
+         # Only scroll if the item is offscreen, or too close to the edge
+         if !defined $physline or $physline < 2 or $physline > ( $scroller->window->lines - 2 );
 
       $scroller->redraw; # to adjust highlights
    }
@@ -606,6 +642,10 @@ class App::sdview::Output::Tickit::_ParagraphItem
             $_leader->iter_substr_nooverlap(
                sub ( $substr, %tags )
                {
+                  if( exists $tags{highlight} ) {
+                     %tags = ( %tags, @HIGHLIGHT_PEN );
+                     %tags = ( %tags, @SELECT_PEN ) if $tags{highlight}->$*;
+                  }
                   my $pen = Tickit::Pen::Immutable->new_from_attrs( \%tags );
                   $rb->text( $substr, $pen );
                },
@@ -648,6 +688,14 @@ class App::sdview::Output::Tickit::_ParagraphItem
    {
       my $redraw_needed;
 
+      $_leader->iter_extents(
+         sub ( $e, $t, $v ) {
+            $_leader->delete_tag( $e, $t );
+            $redraw_needed++;
+         },
+         only => [qw( highlight )],
+      ) if defined $_leader;
+
       $_text->iter_extents(
          sub ( $e, $t, $v ) {
             $_text->delete_tag( $e, $t );
@@ -659,6 +707,11 @@ class App::sdview::Output::Tickit::_ParagraphItem
       my @ret;
 
       if( defined $re ) {
+         foreach my $e ( defined $_leader ? $_leader->match_extents( $re ) : () ) {
+            push @ret, [ $self, $e, 0 ];
+            $_leader->apply_tag( $e, highlight => \$ret[-1][2] );
+         }
+
          foreach my $e ( $_text->match_extents( $re ) ) {
             push @ret, [ $self, $e, 0 ];
             $_text->apply_tag( $e, highlight => \$ret[-1][2] );
@@ -680,7 +733,7 @@ class App::sdview::Output::Tickit::_FixedWidthItem
    ADJUST :params (
       :$text,
    ) {
-      $_text = $text;
+      $_text = $text->clone( convert_tags => \%convert_tags );
 
       my $start = 0;
       while( $text =~ m/\n|$/g ) {
@@ -732,7 +785,6 @@ class App::sdview::Output::Tickit::_FixedWidthItem
             },
             start => $start,
             end   => $end,
-            only  => [qw( highlight )],
          );
          $rb->erase_to( $_maxwidth + $_margin_left );
 
@@ -857,6 +909,21 @@ class App::sdview::Output::Tickit::_OutlineTree
       }
 
       $self->redraw if $self->window && $self->window->is_visible;
+   }
+
+   method current_item ()
+   {
+      return $all_items[$current];
+   }
+
+   method next_item ( $dir )
+   {
+      $dir = ( $dir > 0 ) ? 1 : -1;
+
+      my $next = $current + $dir;
+      return if $next < 0 or $next > $#all_items;
+
+      return $all_items[$next];
    }
 
    method render_to_rb ( $rb, $rect )

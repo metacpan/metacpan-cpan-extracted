@@ -18,21 +18,25 @@ DESCRIPTION
 
  Keybindings
 
-      * Home - scroll to top
+      * Home or < - scroll to top
 
       * Backspace - scroll up a page
 
       * PageUp - scroll up half a page
 
+      * [ - scroll up to the previous item
+
       * Up - scroll up a line
 
       * Down - scroll down a line
+
+      * ] - scroll up to the previous item
 
       * PageDown - scroll down half a page
 
       * Space - scroll down a page
 
-      * End - scroll to bottom
+      * End or > - scroll to bottom
 
       * F9 - open the outline view popup. See Below.
 

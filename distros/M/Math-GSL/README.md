@@ -5,11 +5,9 @@ Scientific Library (GSL) is a numerical library for C and C++ programmers. It
 is free software under the GNU General Public License.  Math::GSL uses SWIG to
 generate Perl bindings to *most* GSL functionality.
 
-[![Build Status](https://secure.travis-ci.org/leto/math--gsl.png)](http://travis-ci.org/leto/math--gsl)
-
 # Dependencies
 
-Currently `Math::GSL` requires at least Perl 5.8.1 to compile.
+Currently, `Math::GSL` requires at least Perl 5.8.1 to compile.
 
 ## Library dependencies
 
@@ -56,13 +54,7 @@ You can also look for information at:
 
 MetaCPAN: https://metacpan.org/release/Math-GSL
 
-Known bugs/issues: https://github.com/leto/math--gsl/issues/
-
-AnnoCPAN, Annotated CPAN documentation http://annocpan.org/dist/Math::GSL
-
-CPAN Ratings http://cpanratings.perl.org/d/Math::GSL
-
-Search CPAN http://search.cpan.org/dist/Math::GSL
+Known bugs/issues: https://github.com/hakonhagland/perl-math-gsl/issues/
 
 
 # Developer information
@@ -86,7 +78,7 @@ On OS X with Homebrew, you can install swig with:
 
 Copyright (C) 2008-2024 Jonathan "Duke" Leto and Thierry Moisan.
 
-A full list of contributors is listed in the [CREDITS](https://github.com/leto/math--gsl/blob/master/CREDITS) file.
+A full list of contributors is listed in the [CREDITS](https://github.com/hakonhagland/perl-math-gsl/blob/master/CREDITS) file.
 
 This program is free software; you can redistribute it and/or modify it
-under the same terms as Perl itself. Fuck Yeah.
+under the same terms as Perl itself.

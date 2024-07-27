@@ -658,3 +658,17 @@ Revision history for StreamFinder
         redo of their site (more Javascript & crap), but they have a second 
         site URL (api.bitchute.com) which still works well, so we autoconvert 
         non-working URLs from www.bitchute.com to api.bitchute.com.
+2.40    2024/07/26
+        - StreamFinder::Youtube - Refactor to add "-format-fallback" option to 
+        allow specifying a second "-f <format-string>" option for use if no 
+        streams match the "-format" option.  Defaults have been changed from 
+        "mp4" to "best", and the "-format-fallback" defaults to "bestaudio".  
+        These changes are required after 07/24 due to Youtube making (nearly) 
+        all of their public streams either audio-only or video-only, which 
+        are pretty much useless for streaming via your own media-player without 
+        actually downloading the video (and remuxing to combine the audio and 
+        video streams) to a file first!  Note:  The ability to do this is only 
+        possible due to the Herculean efforts of the yt-dlp developers and 
+        users are strongly encouraged to upgrade to the latest version 
+        2024.07.25 to avoid likely just getting audio streams, as the internet 
+        continues to get crapped up and locked down every day. :(

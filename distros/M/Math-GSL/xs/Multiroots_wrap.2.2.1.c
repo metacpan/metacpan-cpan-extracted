@@ -2940,7 +2940,7 @@ XS(_wrap_gsl_multiroot_fdjacobian) {
     {
       gsl_multiroot_function *f;
       /* stub */
-      arg1 = &f;
+      arg1 = (gsl_multiroot_function *)&f;
     }
     res2 = SWIG_ConvertPtr(ST(1), &argp2,SWIGTYPE_p_gsl_vector, 0 |  0 );
     if (!SWIG_IsOK(res2)) {
@@ -3503,7 +3503,7 @@ XS(_wrap_gsl_multiroot_fsolver_function_set) {
     {
       gsl_multiroot_function *f;
       /* stub */
-      arg2 = &f;
+      arg2 = (gsl_multiroot_function *)&f;
     }
     if (arg1) (arg1)->function = arg2;
     ST(argvi) = &PL_sv_undef;
@@ -3938,7 +3938,7 @@ XS(_wrap_gsl_multiroot_fsolver_set) {
     {
       gsl_multiroot_function *f;
       /* stub */
-      arg2 = &f;
+      arg2 = (gsl_multiroot_function *)&f;
     }
     res3 = SWIG_ConvertPtr(ST(2), &argp3,SWIGTYPE_p_gsl_vector, 0 |  0 );
     if (!SWIG_IsOK(res3)) {

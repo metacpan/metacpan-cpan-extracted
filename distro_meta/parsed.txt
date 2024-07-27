@@ -93242,3 +93242,13 @@ P/PE/PERLANCAR/Path-Naive-0.044.tar.gz
 K/KA/KARJALA/RxPerl-v6.29.2.tar.gz
 K/KA/KARJALA/RxPerl-v6.29.1.tar.gz
 K/KI/KIMOTO/SPVM-R-0.015.tar.gz
+P/PE/PEVANS/App-sdview-0.17.tar.gz
+P/PE/PEVANS/App-sdview-Output-Tickit-0.09.tar.gz
+A/AR/ARFREITAS/App-SpamcupNG-0.020.tar.gz
+J/JD/JDEGUEST/Locale-Unicode-v0.3.1.tar.gz
+B/BR/BRIANDFOY/Mac-PropertyList-1.601.tar.gz
+H/HA/HAKONH/Math-GSL-0.48.tar.gz
+P/PE/PERLANCAR/Perinci-Examples-0.825.tar.gz
+B/BW/BWEST/SignalWire-RestAPI-1.7.tar.gz
+T/TU/TURNERJW/StreamFinder-2.40.tar.gz
+S/SO/SOMMAR/Win32-SqlServer-2.015-withoutworldwriteables.tar.gz

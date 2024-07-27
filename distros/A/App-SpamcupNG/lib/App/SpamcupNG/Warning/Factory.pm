@@ -7,7 +7,7 @@ use Carp qw(confess);
 use App::SpamcupNG::Warning;
 use App::SpamcupNG::Warning::Yum;
 
-our $VERSION = '0.019'; # VERSION
+our $VERSION = '0.020'; # VERSION
 
 =head1 NAME
 

@@ -209,7 +209,7 @@ result set(s).</P>
    <DD>x86 and AMD64 are supported. </DD>
    <DT>&nbsp;</DT>
    <DT><B>Perl</B></DT>
-   <DD>The module includes the statement <CODE>require 5.012;</CODE>. Thus, you need at least Perl 5.12. However, beware that the lowest Perl version I have tested with (and provide binaries for) is Perl 5.24. </DD>
+   <DD>The module includes the statement <CODE>require 5.012;</CODE>. Thus, you need at least Perl 5.12. However, beware that the lowest Perl version I have tested with (and provide binaries for) is Perl 5.32. </DD>
    <DT>&nbsp;</DT>
    <DT><B>Operating Systems</B></DT>
    <DD>Minimum level is Windows 7 SP1 (client O/S) and Windows 2008 R2 SP1 (server O/S). For versions before Windows 10, you need to have the update in <A HREF="https://support.microsoft.com/en-us/help/2999226/update-for-universal-c-runtime-in-windows">KB2999226</A> installed. </DD>
@@ -219,8 +219,8 @@ result set(s).</P>
      are several of them, or at least there are several names (they can been seen as
    different versions of the same provider). They are here listed in reverse order of release: 
      <UL>
-       <LI><SMALL>MSOLEDBSQL19</SMALL> &#8211; <A HREF="https://go.microsoft.com/fwlink/?linkid=2186934">Microsoft OLE DB Driver 19 for SQL Server</A>. The most recent provider, released in March 2022. As of this writing, there is only 19.0, but there will certainly be .point releases in the future. This provider has a breaking change in the default for settings for encryption for which Win32::SqlServer offers some mitigation with the routine <A HREF="#SetDefaultForEncryption"><SPAN CLASS="nowrap">SetDefaultForEncryption()</SPAN></A>. I recommend that you use this provider or <SMALL>MSOLEDBSQL</SMALL> (next in the list).</LI>
-       <LI><SMALL>MSOLEDBSQL</SMALL> &#8211; <A HREF="http://www.microsoft.com/download/details.aspx?id=56730">Microsoft OLE DB Driver for SQL Server</A>. Originally released in March 2018, the first release of OLE DB for SQL Server after some years of deprecation. There have been point releases of this provider. The current release of Win32::SqlServer was tested against version 18.6. Version 18.2 of this provider ships with SQL 2019.</LI>
+       <LI><SMALL>MSOLEDBSQL19</SMALL> &#8211; <A HREF="https://go.microsoft.com/fwlink/?linkid=2186934">Microsoft OLE DB Driver 19 for SQL Server</A>. The most recent provider, released in March 2022. This provider has a breaking change in the default for settings for encryption for which Win32::SqlServer offers some mitigation with the routine <A HREF="#SetDefaultForEncryption"><SPAN CLASS="nowrap">SetDefaultForEncryption()</SPAN></A>. I recommend that you use this provider or <SMALL>MSOLEDBSQL</SMALL> (next in the list). The current release of Win32::SqlServer was tested against version 19.3.3.</LI>
+       <LI><SMALL>MSOLEDBSQL</SMALL> &#8211; <A HREF="http://www.microsoft.com/download/details.aspx?id=56730">Microsoft OLE DB Driver for SQL Server</A>. Originally released in March 2018, the first release of OLE DB for SQL Server after some years of deprecation. There have been point releases of this provider. The current release of Win32::SqlServer was tested against version 18.7.4. </LI>
        <LI><SMALL>SQLNCLI11</SMALL> &#8211; SQL Server Native Client 11.0. The provider that ships with SQL 2012 and later versions.</LI>
        <LI><SMALL>SQLNCLI10</SMALL> &#8211; SQL Server Native Client 10.0. The provider that
          shipped with SQL&nbsp;2008.</LI>
@@ -243,15 +243,16 @@ result set(s).</P>
   <DT>&nbsp;</DT>   
   <DT><B>Binary Support</B></DT>
   <DD><UL>
-    <LI>The binary distribution includes 32-bit and 64-bit binaries for Perl 5.24, 5.26, 5.28, 5.30, 5.32, 5.34 and 5.36. Generally, I commit myself to support five versions of Perl, but I may stretch it  if I find it appropriate. Thus, when Perl 5.38 comes out, I may drop support from 5.28 and down.</LI> 
-    <LI>Note that 32-bit versiions were built with the flag  <SMALL>USE_64_BIT_INT</SMALL> set. and they will not run with a 32-bit Perl built without this flag set.</LI> 
-    <LI>I have tested all binaries with Strawberry Perl and/or ActivePer up to Perl 5.34, save for the 32-bit 5.34 binaries (because there is no free binary distribution of 5.34 32-bit.) I released the current version shortly after the release of Perl 5.36, and there was no binary distribution available at that time.</LI>
+    <LI>The binary distribution includes 32-bit and 64-bit binaries for Perl 5.32, 5.34, 5.36, 5.38 and 5.40. Generally, I commit myself to support five versions of Perl, but I may stretch it  if I find it appropriate. </LI> 
+    <LI>Note that 32-bit versions were built with the flag  <SMALL>USE_64_BIT_INT</SMALL> set. and they will not run with a 32-bit Perl built without this flag set.</LI> 
+    <LI>I have tested  the 32-bit binaries with Strawberry Perl 5.32, and the 64-bit binaries with Strawberry Perl 5.32, 5.36 and 5.38. That is, the binary versions of Strawberry Perl that were available at the time of the release of Win32::SqlServer 2.015. The binaries should also work with ActivePerl, but downloading ActivePerl requires registration and other hassle I prefer to stay away from, so I have not tested with ActivePerl.</LI>
     </UL>
   </DD>
 </DL>
 <P>To run Win32::SqlServer on platforms not included above, you can use older versions as follows:</P>
 <UL>
-  <LI>For binary support for Perl 5.20 and 5.22 use <A HREF="http://www.sommarskog.se/mssqlperl/Win32-SqlServer-2.012.zip">version 2.012</A> of Win32::SqlServer</LI>
+  <LI>For binary support for Perl 5.24, 5.26, 5.28 and 5.30 use <A HREF="http://www.sommarskog.se/mssqlperl/Win32-SqlServer-2.014.zip">version 2.014</A> of Win32::SqlServer.</LI>
+  <LI>For binary support for Perl 5.20 and 5.22 use <A HREF="http://www.sommarskog.se/mssqlperl/Win32-SqlServer-2.012.zip">version 2.012</A> of Win32::SqlServer.</LI>
   <LI>For binary support for Perl 5.18, use <A HREF="http://www.sommarskog.se/mssqlperl/Win32-SqlServer-2.011.zip">version 2.011</A> of Win32::SqlServer.</LI>
   <LI>To able to connect to SQL 7, use <A HREF="http://www.sommarskog.se/mssqlperl/Win32-SqlServer-2.011.zip">version 2.011</A> of Win32::SqlServer.</LI>
   <LI>For support for Perl 5.12, 5.14 or 5.16, use <A HREF="http://www.sommarskog.se/mssqlperl/Win32-SqlServer-2.010.zip">version 2.010</A> of Win32::SqlServer.</LI>
@@ -1320,7 +1321,7 @@ instead of rounding, using <SPAN CLASS="nowrap">1899-12-30</SPAN> as the default
 <P>On output the <B><CODE>sql_variant</CODE></B> value is handled as the
    underlying base type. Thus for a datetime value, Win32::SqlServer
    will look at <B><A HREF="#datetime">DatetimeOption</A></B>, for a binary value at <B><A HREF="#binary">BinaryAsStr</A></B>
-   etc. Note that if the underlying data type is <B><CODE>char</CODE></B><CODE></CODE> or <CODE><B>varchar</B></CODE>, the interpretation of the string depends on which OLE DB provider you are using. With <SMALL>SQLNCLI11</SMALL> and earlier, Win32::SqlServer will assume that the code page of the string is the same as of the database collation, since the OLE DB provider does not return information about collation or code page for the value. With the <SMALL>MSOLEDBSQL</SMALL> provider, the OLE DB provider will always coerce the string into the code page of the client. (More precisely, this is a change that was introduced in version 18.4 of the <SMALL>MSOLEDBSQL</SMALL> provider.)</P>
+   etc. Note that if the underlying data type is <B><CODE>char</CODE></B><CODE></CODE> or <CODE><B>varchar</B></CODE>, the string will always be interpreted according to the code page of the database collation, as the OLE DB provider does not return information about collation or code page for the value.</P>
 <H3>Input</H3>
 <P>On input, Win32::SqlServer only supports conversion to some possible base types for the
    SQL variant value, more precisely <B><CODE>int</CODE></B>,
@@ -1362,11 +1363,7 @@ instead of rounding, using <SPAN CLASS="nowrap">1899-12-30</SPAN> as the default
    <DT><B>floating-point value</B></DT>
    <DD>Win32::SqlServer passes the value as a <B><CODE>float</CODE></B>.</DD>
    <DT>&nbsp;</DT>
-   <DT>&nbsp;</DT>
-   <DT>&nbsp;</DT>
-   <DT><B>string </B></DT>
-   <DD>&nbsp;</DD>
-   <DT>&nbsp;</DT>
+   <DT><B>string</B></DT>
    <DD>Win32::SqlServer will pass the string as <B><CODE>nvarchar</CODE></B> if any of these are true:
 <UL>
       <LI>The UTF-8 bit set. (Normally, Perl only sets this bit if there really are characters that do not fit into the current 8-bit character set. However, as noted above, Win32::SqlServer always sets
@@ -1491,7 +1488,8 @@ a return value of these data types from <SMALL>SQLOLEDB</SMALL>. </P>
    each query. Since the encryption options can be a little tricky, Win32::SqlServer offers a way to set a default for these.</P>
 <H2><A NAME="SetDefaultForEncryption"><SPAN><SPAN CLASS="nowrap">SetDefaultForEncryption()</SPAN></SPAN></A></H2>
 <P>With the introduction of the <SMALL>MSOLEDBSQL19</SMALL> provider, Microsoft changed the default for the <I>Encrypt</I> setting, that is, whether the data sent to/from SQL Server, should be encrypted. Win32::SqlServer respects these defaults. However, this can be problematic if you are moving your scripts between different environments with different providers installed, and you generally don't expect encryption to work. (Because typically there are no trusted certificates installed.) For this reason, Win32::SqlServer offers this module-level routine to set your encryption options once for all.</P>
-<PRE>Win32::SqlServer::SetDefaultForEncryption($EncryptOption [, $TrustServerCert [,$HostNameInCert]));</PRE>
+<PRE>Win32::SqlServer::SetDefaultForEncryption($EncryptOption [, $TrustServerCert 
+                                          [,$HostNameInCert [, $ServerCert]]]);</PRE>
 <P>Observe that this routine is not exported &#8211; you must include <CODE>Win32::SqlServer::</CODE> in the call.</P>
 <P>Note that the intended usage is like this:</P>
 <PRE>use Win32::SqlServer qw(:DEFAULT :consts);
@@ -1501,9 +1499,11 @@ Win32::SqlServer::SetDefaultForEncryption('Optional');</PRE>
   <DT><CODE>$EncryptOption</CODE></DT>
 <DD>One of <CODE>undef</CODE>, <I>Optional</I>, <I>Mandatory</I> and <I>Strict</I>. <CODE>undef</CODE> means that you use the default of the provider. <I>Optional</I> means that you permit the conection to be unencrypted. <I>Mandatory</I> means that you require the connection to be encrypted. <I>Strict</I> means that also pre-login packets should be encrypted. The latter option is only functional with the <SMALL>MSOLEDBSQL19</SMALL> provider and later and only if you connect to an engine that supports TDS 8.0, for instance SQL 2022. For older providers, <I>Strict</I> and <I>Mandatory</I> are synonymous. Beware that if you specify <I>Strict</I> and the provider is <SMALL>MSOLEDBSQL19</SMALL> and you connect to SQL 2019 or earlier, connection will fail.</DD>
 <DT><CODE>$TrustServerCert</CODE></DT>
-<DD>This can be <CODE>undef</CODE> or a true or false value and sets the default for the setting <I>TrustServerCertificate</I>. <CODE>undef</CODE> means that you go with the provider default. </DD>
+<DD>This can be <CODE>undef</CODE> or a true or false value and sets the default for the setting <I>TrustServerCertificate</I>. <CODE>undef</CODE> means that you go with the provider default. Keep in mind that by setting this option to a true value, you are susceptible to a man-in-the-middle attack, where someone one the network pretends to be your SQL Server instance and steals or distorts data.</DD>
 <DT><CODE>$HostNameInCert</CODE></DT>
 <DD>When you have <I>Mandatory</I> or <I>Strict</I> for <CODE>$EncryptOption</CODE>, the name in the certificate must agree with the name you specified for the server with <A HREF="#sql_init"><SPAN CLASS="nowrap">sql_init()</SPAN></A> or <A HREF="#setloginproperty"><SPAN CLASS="nowrap">setloginproperty()</SPAN></A>. This can be unpractical if you need to connect by, for instance, IP-address for DNS reasons. This setting permits you to spefiy the server name you expect in the certificate. This setting was introduced in <SMALL>MSOLEDBSQL19</SMALL> and is ignonred by earlier versions.</DD>
+<DT><CODE>$ServerCert</CODE></DT>
+<DD>Specifies a file path where the server certificate is located. When not specified, the OLE DB provider looks in your certificate store. This setting was introduced in <SMALL>MSOLEDBSQL19</SMALL> and is ignonred by earlier versions. Observe that the OLE DB provider only permits you to use this setting with strict encryption.</DD>
 </DL>
 <P>Beware that there are also registry values that affect the encryption settings, and they may specify that <B><I>Mandatory</I></B> is the lowest permitted level. Please refer to the topic <I><A HREF="https://docs.microsoft.com/en-us/sql/connect/oledb/features/encryption-and-certificate-validation?view=sql-server-ver15">Encryption and Certificate Validation</A></I> in the OLE DB docs for details.</P>
 <H2><A NAME="sql_init"><SPAN CLASS="nowrap">sql_init()</SPAN></A></H2>
@@ -1595,6 +1595,7 @@ but for now <CODE><SPAN CLASS="nowrap">Win32::SqlServer-&gt;sql_init()</SPAN></C
    applies. The same applies if you set a property to <CODE>undef</CODE> – this
    means that Win32::SqlServer will not set it, leaving room for whatever default value
 the provider fancies.</P>
+<P>Far from all properites are available with all OLE DB providers. If you specify that is not at all available with a certain provider, <A HREF="#setloginproperty"><SPAN CLASS="nowrap">setloginproperty()</SPAN></A> will ignore it entirely. However, if you are trying to use a login property that was introduced in a later point version of your provider (for instance, you have 19.1 and the option was introduced in 19.2), <A HREF="#setloginproperty"><SPAN CLASS="nowrap">setloginproperty()</SPAN></A> will attempt to set it, which will result in an error. (There does not seem be any civilised to find out what point version of the provider that is installed.)</P>
 <H3><A NAME="AccessToken">AccessToken</A></H3>
 <P>
 <TABLE BORDER=1 CELLSPACING=0 CELLPADDING=0>
@@ -1658,19 +1659,6 @@ available with the <SMALL>SQLNCLI11</SMALL> provider or later.</P>
 <P>This property specifies by which means of authentication you want to log in. Permitted values are <I>SqlPassword</I> (that is, you use Username and Password), <I>ActiveDirectoryIntegrated</I> (more or less the same as <B><A HREF="#IntegratedSecurity">IntegratedSecurity</A></B> = 'SSPI'),  <I>ActiveDirectoryPassword</I> (Azure Active Directory, that is), <I>ActiveDirectoryInteractive</I>,<I> ActiveDirectoryServicePrincipal</I> and <I>ActiveDirectoryMSI</I>. See the topic <I><A HREF="https://docs.microsoft.com/en-us/sql/connect/oledb/features/using-azure-active-directory?view=sql-server-ver15">Using Azure Directory</A></I> in OLE DB Docs  for further details.</P>
 
 
-
-<H3><A NAME="Autotranslate">Autotranslate</A></H3>
-<P>
-<TABLE BORDER=1 CELLSPACING=0 CELLPADDING=0>
-<TR><TH>Data type</TH><TD CLASS="extrapad">boolean</TD><TH>Default</TH>
-<TD CLASS="extrapad">false</TD>
-    <TH>OLE DB Property</TH><TD CLASS="extrapad"><SMALL>SSPROP_INIT_AUTOTRANSLATE</SMALL></TD></TR>
-</TABLE>
-</P>
-<P>This setting is deprecated and will be removed from a future version of Win32::SqlServer. Any attempt to set it renders a warning through the <A HREF="#MsgHandler">current
-message handler</A> and the value is ignored. The setting controls how data to <B><CODE>(var)char</CODE></B> columns is converted, and this is on by default with OLE DB. However, since Win32::SqlServer itself performs character conversion from Perl's internal UTF-8 representation to the code page of the database as discussed in the section on <I><A HREF="#char">
-<NOMEDDLE>char, varchar and text</NOMEDDLE>
-</A></I>, Win32::SqlServer forces this setting to <B>false</B>.</P>
 
 <H3><A NAME="ConnectionString">ConnectionString</A></H3>
 <P>
@@ -1978,6 +1966,18 @@ from <A HREF="https://docs.microsoft.com/en-us/previous-versions/windows/desktop
 </TABLE>
 </P>
 <P>Which SQL Server instance to connect to.</P>
+<H3><A NAME="ServerCertificate">ServerCertificate</A></H3>
+<P>
+<TABLE BORDER=1 CELLSPACING=0 CELLPADDING=0>
+<TR><TH>Data type</TH><TD CLASS="extrapad">string</TD><TH>Default</TH>
+<TD CLASS="extrapad"><CODE>undef</CODE>
+</TD>
+<TH>OLE DB Property</TH><TD CLASS="extrapad"><SMALL>SSPROP_INIT_SERVER_CERTIFICATE</SMALL></TD></TR>
+</TABLE>
+</P>
+<P>Normally, when the OLE DB provider looks up the server's certificate in the certificate store of the local computer. This option permits you instead specify a file path where the certificate is located. This parameter is only available with the <SMALL>MSOLEDBSQL19</SMALL> provider, starting with version 19.2.0. Furthermore, to use this option, you must set the <B><A HREF="#Encrypt">Encrypt</A></B> option to <I>Srtict</I>, as required by the OLE DB provider.</P>
+<P>You can also set this property once for all with <A HREF="#SetDefaultForEncryption"><SPAN CLASS="nowrap">SetDefaultForEncryption()</SPAN></A>.</P>
+
 
 <H3><A NAME="ServerSPN">ServerSPN</A></H3>
 <P>
@@ -2012,9 +2012,8 @@ details. This property is only available with the <SMALL>SQLNCLI10</SMALL> provi
     <TH>OLE DB Property</TH><TD CLASS="extrapad"><SMALL>SSPROP_INIT_TRUST_SERVER_CERTIFICATE</SMALL></TD></TR>
 </TABLE>
 </P>
-<P>Whether you trust the server certificate when you use encryption. Please
-refer to the OLE DB Docs for further details. This property is unavailable with
-   the <SMALL>SQLOLEDB</SMALL> provider and applies only to SQL&nbsp;2005
+<P>Whether you trust the server certificate when you use encryption. You would use this option when you don't have access to the server certificate and want an encrypted connection. Note that trusting the server certificate makes you susceptible to a man-in-the-middle attack, where someone on the network pretends to be your SQL Server and steals or distorts your data. Thus, the best solution is to have the server certificate in your certificate store or have it on a file (which requires use of the login property <A HREF="#ServerCertificate">ServerCertificate</A>). This property is unavailable with
+  the <SMALL>SQLOLEDB</SMALL> provider and applies only to SQL&nbsp;2005
 and later.</P>
 <P>You can also set this property once for all with <A HREF="#SetDefaultForEncryption"><SPAN CLASS="nowrap">SetDefaultForEncryption()</SPAN></A>.</P>
 
@@ -6105,7 +6104,7 @@ WAITFOR DELAY &#39;00:00:05&#39;</PRE>
  want, as long as you don&#39;t claim that you wrote it yourself.</P>
 <HR />
 <I>
-This file was last updated <!--$$Modtime:--> 22-06-08 22:08 <!-- $-->
+This file was last updated <!--$$Modtime:--> 24-07-21 23:37 <!-- $-->
 </I>
 </BODY>
 </HTML>

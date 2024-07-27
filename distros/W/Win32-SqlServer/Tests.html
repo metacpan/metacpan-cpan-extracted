@@ -103,7 +103,7 @@ file</A> is correctly constructed.
 <B>Creates in <SMALL>SQL</SMALL> Server</B>: Tables and stored
 procedures in tempdb, and on <SMALL>SQL</SMALL> 2005 and later also an <SMALL>XML</SMALL> schema collection and three
 <SMALL>CLR</SMALL> user-defined types (the latter only if <SMALL>CLR</SMALL> is enabled and CLR strict security is not in force). </P>
-<P><B>Known issues</B>: For <SMALL>OLE DB</SMALL> providers earlier than <SMALL>MSOLEDBSQL</SMALL> 18.5, five tests fail, unless you have a UTF8 collation, because of a bug in the OLE DB providers reated to NUL characters.</P>
+<P><B>Known issues</B>: For <SMALL>OLE DB</SMALL> providers earlier than <SMALL>MSOLEDBSQL</SMALL> 18.5, five tests fail, unless your server collation is a UTF8 collation, because of a bug in the OLE DB providers related to NUL characters. For <SMALL>MSOLEDBSQL</SMALL> from 18.4 to 18.6.3 as well as <SMALL>MSOLEDBSQL19</SMALL> 19.0.0, nine tests will fail if your server collation is a UTF8 collation, because of a bug where the OLE DB provider ignores the AutoTranslate setting for sql_variant values.</P>
 <H3>
 <B>3_retvalues.t</B> </H3>
 <P>
@@ -194,7 +194,7 @@ second test server with the <SMALL>OLLEDBTEST</SMALL> environment variable.</P>
 is defined. Some tests are skipped depending on the <SMALL>version of SQL</SMALL> Server and the provider.
 Only with <SMALL>SQL</SMALL> 2005 or later and <SMALL>MSOLEDBSQL19</SMALL> or later and a second server all tests will be
 performed. And even in that case, two tests will be skipped if <SMALL>SQL</SMALL>
-Server is configured for Windows authentication only. Four tests are skipped if you are testing against an instancs of LocalDB.</P>
+Server is configured for Windows authentication only. Four tests are skipped if you are testing against an instance of LocalDB. There also some tests that are skipped if you run against an instance which is enabled for Entra Authentication.</P>
 <P>
 <B>Creates in <SMALL>SQL</SMALL> Server</B>: Creates a <FONT COLOR="#FF0000"><I>database</I></FONT> which it detaches and
 then reattaches with a different name. Both names start with &quot;OlleDB&quot;. On
@@ -240,9 +240,7 @@ according to <B>sys.configurations</B>.
   database</FONT></I>, Olle$DB, with a <SMALL>FILESTREAM</SMALL> file group. It creates a table 
   with filestream data in that database. The database is dropped at the end of the 
 script.</P>
-<P><B>Known issues</B>: Some or most tests fail when connected to SQL 2008. I also see failures when testing against SQL 2008 R2, put sometimes all tests pass. No such issues are seen on SQL 2012 or later, save for the issue below.</P>
-<P>On 32-bit Perl with USE_64_BIT_INT, the last test often fails for reasons I have not been able to understand. The test intends to pre-allocate a 80 TB record which is expected to fail, but the call unexpectedly succeeds.</P>
-<P><B>WARNING</B>! I have experienced Blue Screens with this test on one of my machines. Specifically it is the last test where I test to allocate too much that crashes Windows.  The Blue Screen occurs on the machine where SQL Server is running and the error code is BAD POOL CALLER. I have not nailed the exact conditions for the crash to occur, but it seems to be a combination of filter drivers. The machine in question has an installation of Storagecraft's Shadowprotect which sets up a filter driver. There is also the fileinfo filter driver, which I am told is only comes with client O/S like Windows 10, but not server O/Ss.</P>
+<P><B>Known issues</B>: Some or most tests fail when connected to SQL 2008. I also see failures when testing against SQL 2008 R2, but sometimes all tests pass. No such issues are seen on SQL 2012 or later.</P>
 <H3>C_character.t</H3>
 <P><B>Tests</B> sending and retrieving char and varchar data with different collations.</P>
 <P><B>Number of tests</B>: 210 with SQL 2008 or later and the SQLNCLI10 provider or later. Fewer tests are executed with older versions of SQL Server and/or providers because of the lack of support for table parameters.</P>
@@ -290,7 +288,7 @@ generate output files.
 </P>
 <HR />
 <I>
-Last updated <!--$$Modtime:--> 22-06-09 22:59 <!-- $-->
+Last updated <!--$$Modtime:--> 24-07-25 13:48 <!-- $-->
 </I>
 </P>
 </BODY>

@@ -3,6 +3,7 @@ bin/sdview
 Build.PL
 Changes
 lib/App/sdview.pm
+lib/App/sdview/Highlighter.pm
 lib/App/sdview/Output.pm
 lib/App/sdview/Output/Formatted.pm
 lib/App/sdview/Output/Man.pm

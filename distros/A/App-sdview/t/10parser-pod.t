@@ -107,21 +107,30 @@ EOPOD
    is( $p[0]->text, "Some content with non-breaking\xA0spaces in it.", 'p[0] text' );
 };
 
-subtest "Verbatim trimming" => sub {
+subtest "Verbatim" => sub {
    my @p = App::sdview::Parser::Pod->new->parse_string( <<"EOPOD" );
 =head1 EXAMPLE
+
+=for highlighter perl
 
    use v5.14;
    use warnings;
    say "Hello, world";
 
+=for highlighter
+
+   This should be plain text
 EOPOD
 
-   is( scalar @p, 2, 'Received 2 paragraphs' );
+   is( scalar @p, 3, 'Received 3 paragraphs' );
 
    is( $p[0]->text, "EXAMPLE", 'p[0] text' );
 
    is( $p[1]->text, qq(use v5.14;\nuse warnings;\nsay "Hello, world";), 'p[1] text' );
+   is( $p[1]->language, "perl", 'p[1] language' );
+
+   is( $p[2]->text, qq(This should be plain text), 'p[2] text' );
+   is( $p[2]->language, undef, 'p[2] language' );
 };
 
 subtest "Indented" => sub {

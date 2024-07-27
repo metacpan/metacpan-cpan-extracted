@@ -1,10 +1,30 @@
 ==================================================
-Changes from 2023-07-24 00:00:00 +0000 to present.
+Changes from 2023-07-28 00:00:00 +0000 to present.
 ==================================================
 
 ------------------------------------------
-version 0.019 at 2024-07-23 03:12:52 +0000
+version 0.020 at 2024-07-27 01:58:37 +0000
 ------------------------------------------
+
+  Change: 65e359b404e18ea3af9d1c617c8d4b53d2ab6935
+  Author: Alceu Rodrigues de Freitas Junior <glasswalk3r@yahoo.com.br>
+  Date : 2024-07-26 22:57:27 +0000
+
+    Merge pull request #17 from glasswalk3r/bugfix/logdie
+
+    logger->die: wrong method and context 
+
+  Change: e9e101c06492c2f2849970d463788809e4d92bdf
+  Author: Alceu Rodrigues de Freitas Junior <glasswalk3r@yahoo.com.br>
+  Date : 2024-07-26 22:06:40 +0000
+
+    chore: version bump 
+
+  Change: 353c5ae02836e46def5cab1eecaebba9ac50df77
+  Author: Alceu Rodrigues de Freitas Junior <glasswalk3r@yahoo.com.br>
+  Date : 2024-07-26 22:06:02 +0000
+
+    fix: wrong method and context 
 
   Change: d0dd685e8e55db0bf4d9252cf8560e8abd1bdf5a
   Author: Alceu Rodrigues de Freitas Junior <glasswalk3r@yahoo.com.br>

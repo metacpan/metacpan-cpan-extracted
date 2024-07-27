@@ -26,14 +26,16 @@ use lib 'inc';
 use GSLBuilder;
 use Ver2Func;
 use File::Spec::Functions qw/:ALL/;
-use Alien::GSL;
+use Math::GSL::Alien;
+use File::Temp qw(tempdir);
 
 our $MIN_GSL_VERSION = "1.15";
 
 my $gsl_conf;
 
 check_alien_gsl_share_dir();
-$gsl_conf = check_gsl_version();
+$gsl_conf = check_gsl_version_gsl_config();
+$gsl_conf = check_gsl_version_alien_gsl() if not $gsl_conf;
 $gsl_conf = check_gsl_version_pkgconfig() if not $gsl_conf;
 
 my ($major,$minor,$tiny) = split /\./, $gsl_conf->{gsl_version};
@@ -81,8 +83,9 @@ if ($Config{archname} =~ /x86_64|amd64/ ) {
 }
 # this causes warnings with clang + OSX
 $ccflags = $Config{cccdlflags} . ' ' . $ccflags unless GSLBuilder::is_darwin();
+my $platform_uses_signed_char = platform_uses_signed_char();
 
-my $ver2func = Ver2Func->new( $gsl_conf->{gsl_version} );
+my $ver2func = Ver2Func->new( $gsl_conf->{gsl_version}, $platform_uses_signed_char );
 
 my $cleanup = qq{
                  xs/*_wrap*.c core *.core swig/system.i swig/renames.i
@@ -141,9 +144,9 @@ my $builder = GSLBuilder->new(
     },
     sign                  => 0,
     configure_requires => {
-        'PkgConfig'       => '0.07720',
-        'Module::Build'   => '0.38',
-        'Alien::GSL'      => '1.01',
+        'PkgConfig'         => '0.07720',
+        'Module::Build'     => '0.38',
+        'Math::GSL::Alien'  => '1.03',
     },
     swig_version          => $swig_version,
     current_version       => $gsl_conf->{gsl_version},
@@ -250,12 +253,119 @@ sub try_cflags {
     return '';
 }
 
+# Returns true if the platform uses signed char
+sub platform_uses_signed_char {
+    my $c_prog = <<'END';
+#include <limits.h>  // Include limits.h to use CHAR_MIN
+// Test if char is signed on the given platform
+// If CHAR_MIN is not 0, then char is signed
+// Returns 0 if char is signed, 1 if char is unsigned
+int main() {
+    if (CHAR_MIN != 0) {
+        return 0;
+    }
+    else {
+        return 1;
+    }
+}
+END
+    # Create a temporary directory for the C program and executable
+    my $tempdir = tempdir(CLEANUP => 1);
+    my $prog_name = 'signed_char';
+    my $prog_name_path = catfile($tempdir, "${prog_name}.c");
+    open (my $fh, '>', $prog_name_path) or die "Could not open file '$prog_name_path' $!";
+    print $fh $c_prog;
+    close $fh;
+    my $executable = catfile($tempdir, $prog_name);
+    my $sub_name = 'platform_uses_signed_char()';
+    # Compile the C program
+    system($Config{'cc'}, '-o', $executable, $prog_name_path);
+    if ($? == -1) {
+        print "${sub_name}: failed to execute: $!\n";
+    }
+    elsif ($? & 127) {
+        printf "${sub_name}: child died with signal %d, %s coredump\n",
+            ($? & 127),  ($? & 128) ? 'with' : 'without';
+    }
+    elsif ($? >> 8) {
+        printf "${sub_name}: gcc: failed to compile: exit value %d\n", $? >> 8;
+    }
+    # Execute the compiled program and capture the return value
+    system($executable);
+    if ($? == -1) {
+        die "${sub_name}: Failed to execute the compiled program: $!";
+    }
+    elsif ($? & 127) {
+        printf "${sub_name}: child died with signal %d, %s coredump\n",
+            ($? & 127),  ($? & 128) ? 'with' : 'without';
+    }
+    # The return value from the C program is in the high 8 bits of the exit status
+    my $return_value = $? >> 8;
+    if ($return_value == 0) {
+        print "platform: char is signed\n";
+    }
+    else {
+        print "platform: char is unsigned\n";
+    }
+    return $return_value == 0;
+}
+
+
+
 sub check_alien_gsl_share_dir {
-    if (Alien::GSL->install_type eq "share") {
-        my $dist_dir = Alien::GSL->dist_dir;
+    if (Math::GSL::Alien->install_type eq "share") {
+        my $dist_dir = Math::GSL::Alien->dist_dir;
         my $bin_dir = File::Spec->catfile( $dist_dir, "bin" );
+        # Try to use gsl-config in the share directory first, so add that to the PATH
         $ENV{PATH} .= ":$bin_dir";
     }
+    else {
+        # If Math::GSL::Alien->install_type is "system", gsl-config
+        # might be in the PATH already, but not necessarily. The user could also have installed
+        # GSL in a non-standard location, then set PKG_CONFIG_PATH before installing Math::GSL::Alien.
+        my $command = 'gsl-config';
+        my $check_command = $^O eq 'MSWin32' ? 'where' : 'which';
+        # Check if the command exists in PATH
+        my $exists = qx($check_command $command 2>/dev/null);
+        if (!$exists) {
+            # Math::GSL::Alien property bin_dir is usually not set in this case
+            my $bin_dir = Math::GSL::Alien->bin_dir;
+            if ($bin_dir && (-d $bin_dir)) {
+                $ENV{PATH} .= ":$bin_dir";
+            }
+            else {
+                # We might get lucky and derive the bin dir from the libs value
+                my $libs = Math::GSL::Alien->libs;
+                my $lib_dir = $libs =~ m{-L(\S+)} ? $1 : '';
+                if ($lib_dir) {
+                    my $bin_dir = $lib_dir =~ s{/lib}{/bin}r;
+                    if (-d $bin_dir) {
+                        $ENV{PATH} .= ":$bin_dir";
+                    }
+                }
+            }
+        }
+    }
+}
+
+sub check_gsl_version_alien_gsl {
+    my $gsl_version = Math::GSL::Alien->version;
+    if (!defined $gsl_version) {
+        print "***
+*** Can't find GSL with Math::GSL::Alien (this should not happen)
+*** Trying with PkgConfig.\n";
+        return undef;
+    }
+    my $libs = Math::GSL::Alien->libs;
+    my $config = Math::GSL::Alien->runtime_prop;
+    my $prefix = $config->{prefix};
+    my $cflags = Math::GSL::Alien->cflags;
+    return {
+        gsl_version => $gsl_version,
+        gsl_prefix  => $prefix,
+        gsl_libs    => $libs,
+        gsl_cflags  => $cflags,
+    };
 }
 
 sub check_gsl_version_pkgconfig {
@@ -305,7 +415,7 @@ sub check_gsl_version_pkgconfig {
     };
 }
 
-sub check_gsl_version {
+sub check_gsl_version_gsl_config {
 
     print "Checking for GSL using gsl-config\n";
 

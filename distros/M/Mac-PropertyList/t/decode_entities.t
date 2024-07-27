@@ -25,7 +25,7 @@ decode_entities.t
 
 =head1 AUTHORS
 
-Original author: brian d foy C<< <bdfoy@cpan.org> >>
+Original author: brian d foy C<< <briandfoy@pobox.com> >>
 
 =head1 SOURCE
 
@@ -33,7 +33,7 @@ This file was originally in https://github.com/briandfoy/mac-propertylist
 
 =head1 COPYRIGHT
 
-Copyright © 2002-2023, brian d foy, C<< <bdfoy@cpan.org> >>
+Copyright © 2002-2024, brian d foy, C<< <briandfoy@pobox.com> >>
 
 =head1 LICENSE
 
@@ -49,7 +49,7 @@ my $parse_fqname = $class . '::parse_plist';
 
 my $array =<<"HERE";
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE plist PUBLIC "-//Apple Computer//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <array>
 	<string>Mimi &amp; Buster</string>

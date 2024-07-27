@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Unicode Locale Identifier - ~/lib/Locale/Unicode.pm
-## Version v0.3.0
+## Version v0.3.1
 ## Copyright(c) 2024 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2024/05/11
-## Modified 2024/07/26
+## Modified 2024/07/27
 ## All rights reserved
 ## 
 ## 
@@ -44,7 +44,13 @@ BEGIN
         )
         # "Up to three optional extended language subtags composed of three letters each, separated by hyphens"
         # "There is currently no extended language subtag registered in the Language Subtag Registry without an equivalent and preferred primary language subtag"
-        (?<extended>[a-z]{3}){0,3}
+        (?:
+            \-
+            (?<extended>
+                [a-z]{3}
+                (?:\-[a-z]{3}){0,2}
+            )
+        )?
     )
     # ISO 15924 for scripts
     (?:
@@ -99,7 +105,13 @@ BEGIN
         )
         # "Up to three optional extended language subtags composed of three letters each, separated by hyphens"
         # "There is currently no extended language subtag registered in the Language Subtag Registry without an equivalent and preferred primary language subtag"
-        (?:[a-z]{3}){0,3}
+        (?:
+            \-
+            (?:
+                [a-z]{3}
+                (?:\-[a-z]{3}){0,2}
+            )
+        )?
     )
     # ISO 15924 for scripts
     (?:
@@ -368,7 +380,7 @@ BEGIN
     our $PROP_TO_SUB = {};
     # False, by default
     our $EXPLICIT_BOOLEAN = 0;
-    our $VERSION = 'v0.3.0';
+    our $VERSION = 'v0.3.1';
 };
 
 use strict;
@@ -416,6 +428,10 @@ sub new
     $self->{measurement}        = undef;
     # u-nu
     $self->{number}             = undef;
+    # Overlong country code (3-characters code) whereas it should be 2-characters code
+    # For example: PAN -> PA
+    # See the 'alias' method in Locale::Unicode::Data to convert those overlong territory to their 2-characters equivalent
+    $self->{overlong}           = undef;
     # u-mu
     $self->{unit}               = undef;
     # t-m0
@@ -854,7 +870,11 @@ sub core
 
 sub country_code { return( shift->reset(@_)->_set_get_prop({
     field => 'country_code',
-    on_update => sub{ $_[0]->{region} = undef; },
+    on_update => sub
+    {
+        $_[0]->{region} = undef;
+        $_[0]->{overlong} = undef;
+    },
 }, @_ ) ); }
 
 # u-cf
@@ -900,6 +920,8 @@ sub error
     }
     return( ref( $self ) ? $self->{error} : $ERROR );
 }
+
+sub extended { return( shift->reset(@_)->_set_get_prop( 'extended', @_ ) ); }
 
 sub false { return( $Locale::Unicode::Boolean::false ); }
 
@@ -1171,6 +1193,15 @@ sub nu { return( shift->number( @_ ) ); }
 # u-nu
 sub number { return( shift->reset(@_)->_set_get_prop( 'number', @_ ) ); }
 
+sub overlong { return( shift->reset(@_)->_set_get_prop( {
+    field => 'overlong',
+    on_update => sub
+    {
+        $_[0]->{country_code} = $_[1];
+        $_[0]->{region} = undef;
+    },
+}, @_ ) ); }
+
 sub parse
 {
     my $self = shift( @_ );
@@ -1183,7 +1214,7 @@ sub parse
     my $info = {};
     # Value provided failed to match the locale regular expression
     return( $info ) if( !$re );
-    foreach my $prop ( qw( language language3 extended script country_code region variant privateuse grandfathered_irregular grandfathered_regular ) )
+    foreach my $prop ( qw( language language3 extended script country_code region variant privateuse grandfathered_irregular grandfathered_regular overlong ) )
     {
         # the property provided as an option can be undef by design to remove the value
         if( exists( $opts->{ $prop } ) )
@@ -3709,7 +3740,7 @@ In Scalar or in list context, the value returned is the last value set.
 
 =head1 VERSION
 
-    v0.3.0
+    v0.3.1
 
 =head1 DESCRIPTION
 
@@ -4197,6 +4228,25 @@ For example:
 
 In this example, C<jptyo> will never be set, because C<transform_locale> triggered an exception that returned an C<Locale::Unicode::NullObject> object catching all further method calls, but eventually we get the error and die.
 
+=head2 extended
+
+    # Chinese, Mandarin, Simplified script, as used in China
+    my $locale = Locale::Unicode->new( 'zh-cmn-Hans-CN' );
+    say $locale->extended; # cmn
+
+    # Mandarin Chinese, Simplified script, as used in China
+    my $locale = Locale::Unicode->new( 'cmn-Hans-CN' );
+    say $locale->extended; # undef
+    say $locale->script; # Hans
+
+    # Chinese, Cantonese, as used in Hong Kong SAR
+    my $locale = Locale::Unicode->new( 'zh-yue-HK' );
+    say $locale->extended; # yue
+
+Sets or gets the C<extended> C<language> subtags. As per the standard, a language ID may be followed by up to 3 C<extended> C<language> subtag. However, the L<standard states|https://www.rfc-editor.org/rfc/rfc5646.html#section-2.2.2>: "Although the ABNF production 'extlang' permits up to three extended language tags in the language tag, extended language subtags MUST NOT include another extended language subtag in their 'Prefix'. That is, the second and third extended language subtag positions in a language tag are permanently reserved and tags that include those subtags in that position are, and will always remain, invalid."
+
+The regular expression in L<Locale::Unicode> supports the C<extended> language subtag inherited by Unicode from C<BCP47>, although L<it is not strictly supported by the standard|https://unicode.org/reports/tr35/tr35.html#BCP_47_Conformance>. This is done in order to ensure maximum portability and flexibility.
+
 =head2 false
 
 This is read-only and returns a L<Locale::Unicode::Boolean> object representing a false value.
@@ -4228,6 +4278,8 @@ This is a convenient method that takes a language tag, and based on its value, t
 
 If you set a grandfathered language tag, this will automatically unset the L<language|/language>, L<language3|/language3> or L<privateuse|/privateuse> tag value.
 
+The regular expression in L<Locale::Unicode> supports the C<grandfathered> language subtag inherited by Unicode from C<BCP47>, although L<it is not strictly supported by the standard|https://unicode.org/reports/tr35/tr35.html#BCP_47_Conformance>. This is done in order to ensure maximum portability and flexibility.
+
 =head2 grandfathered_irregular
 
     $locale->grandfathered_irregular( 'en-GB-oed' );
@@ -4252,6 +4304,8 @@ Sets or gets an L<irregular grandfathered language tag|https://www.rfc-editor.or
 
 Setting a value, including C<undef>, will unset the L<language|/language>, L<language3|/language3>, L<privateuse|/privateuse> or L<grandfathered_regular|/grandfathered_regular> tag value.
 
+The regular expression in L<Locale::Unicode> supports the C<grandfathered> language subtag inherited by Unicode from C<BCP47>, although L<it is not strictly supported by the standard|https://unicode.org/reports/tr35/tr35.html#BCP_47_Conformance>. This is done in order to ensure maximum portability and flexibility.
+
 =head2 grandfathered_regular
 
     $locale->grandfathered_regular( 'art-lojban' );
@@ -4267,6 +4321,8 @@ Setting a value, including C<undef>, will unset the L<language|/language>, L<lan
 Sets or gets a L<regular grandfathered language tag|https://www.rfc-editor.org/rfc/rfc5646.html#section-2.2.8>.
 
 Setting a value, including C<undef>, will unset the L<language|/language>, L<language3|/language3>, L<privateuse|/privateuse> or L<grandfathered_irregular|/grandfathered_irregular> tag value.
+
+The regular expression in L<Locale::Unicode> supports the C<grandfathered> language subtag inherited by Unicode from C<BCP47>, although L<it is not strictly supported by the standard|https://unicode.org/reports/tr35/tr35.html#BCP_47_Conformance>. This is done in order to ensure maximum portability and flexibility.
 
 =head2 h0
 
@@ -4527,6 +4583,36 @@ This is a Unicode Number System Identifier that specifies a type of number syste
 
 Sets or gets the Unicode extension C<nu>.
 
+=head2 overlong
+
+    my $locale = Locale::Unicode->new( 'en-US' );
+    say $locale->overlong; # undef
+    say $locale->country_code; # US
+    say $locale->territory; # US
+    # Changing to overlong USA
+    $locale->overlong( 'USA' );
+    say $locale->overlong; # USA
+    say $locale->country_code; # undef
+    say $locale->territory; # undef
+
+But doing the following will not yield what you expect, because the C<overlong> C<territory> would be confused by an L<extended|/extended> language subtag.
+
+    # Italian at Vatican City
+    my $locale = Locale::Unicode->new( 'it-VAT' );
+    say $locale->overlong; # undef
+    say $locale->extended; # VAT
+
+    # Spanish as spoken at Panama
+    my $locale = Locale::Unicode->new( 'es-PAN-valencia' );
+    say $locale->overlong; # undef
+    say $locale->extended; # PAN
+
+Thus, you cannot expect to have the value for L<overlong|/overlong> set. However, you can set it yourself directly by passing a value to method C<overlong>
+
+Sets or gets an overlong country code.
+
+You can normalise those C<overlong> country code to their normal equivalent by using L<Locale::Unicode::Data/normalise>
+
 =head2 private
 
     my $locale = Locale::Unicode->new( 'ja-JP' );
@@ -4543,6 +4629,8 @@ This serves to set or get the value for a private subtag.
 Sets or gets the L<privateuse|https://www.rfc-editor.org/rfc/rfc5646.html> language tag.
 
 Note that this use is deprecated. See the L<LDML specifications|https://unicode.org/reports/tr35/tr35.html#BCP_47_Language_Tag_Conversion>
+
+The regular expression in L<Locale::Unicode> supports the C<privateuse> language subtag inherited by Unicode from C<BCP47>, although L<it is not strictly supported by the standard|https://unicode.org/reports/tr35/tr35.html#BCP_47_Conformance>. This is done in order to ensure maximum portability and flexibility.
 
 =head2 region
 

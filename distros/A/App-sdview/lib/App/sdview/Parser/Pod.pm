@@ -1,14 +1,14 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2021-2023 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2021-2024 -- leonerd@leonerd.org.uk
 
 use v5.26;
 use warnings;
 
 use Object::Pad 0.807;
 
-package App::sdview::Parser::Pod 0.16;
+package App::sdview::Parser::Pod 0.17;
 class App::sdview::Parser::Pod :strict(params);
 
 inherit Pod::Simple;
@@ -40,11 +40,36 @@ Pod formatting.
 
 It uses L<Pod::Simple> as its driving parser.
 
-As an extension, it also supports the inline formatting code C<UE<lt>...E<gt>>
-to request underline formatting.
-
 The C<SE<lt>...E<gt>> formatting code is handled by converting inner spaces to
 non-breaking spaces (U+00A0) characters in the returned string.
+
+By default, verbatim blocks are presumed to contain Perl code, and emitted
+with the C<language>> field set to C<perl>. This can be altered by embedded
+C<=code> or C<=for highlighter> directives; see below.
+
+=head2 Extensions
+
+Partly as an experiment into how to handle possible future features of the Pod
+spec, the following extensions are recognised:
+
+=over 4
+
+=item *
+
+Inline formatting code C<UE<lt>...E<gt>> to request underline formatting.
+
+=item *
+
+C<=code> directive to set the highlighter language name of any following
+verbatim paragraphs.
+
+=item *
+
+Also follows the C<=for highlighter ...> spec used by
+L<https://metacpan.org/pod/Pod::Simple::XHTML::WithHighlightConfig> for
+setting the language name
+
+=back
 
 =cut
 
@@ -67,7 +92,8 @@ ADJUST
 
    $self->accept_codes(qw( U ));
 
-   $self->accept_directive_as_verbatim( 'code' );
+   $self->accept_target( 'highlighter' );
+   $self->accept_directive_as_data( 'code' );
 }
 
 field @_indentstack;
@@ -75,6 +101,8 @@ field @_parastack;
 
 field %_curtags;
 field $_curpara;
+
+field %_verbatim_options = ( language => "perl" );
 
 field $_conv_nbsp;
 
@@ -108,6 +136,8 @@ my %FORMAT_TYPES = (
    L => "link",
 );
 
+field $_redirect_text;
+
 method _handle_element_start ( $type, $attrs )
 {
    if( $type eq "Document" ) {
@@ -120,6 +150,23 @@ method _handle_element_start ( $type, $attrs )
       );
       %_curtags = ();
    }
+   elsif( $type eq "code" or
+         ( $type eq "for" and $attrs->{target} eq "highlighter" ) ) {
+      $_redirect_text = method ( $text ) {
+         my @args = split m/\s+/, $text;
+         $args[0] = "language=$args[0]" if @args and $args[0] !~ m/=/;
+
+         %_verbatim_options = ();
+
+         foreach ( @args ) {
+            my ( $key, $val ) = m/^(.*?)=(.*)$/ or next;
+            $_verbatim_options{$key} = $val;
+         }
+      };
+   }
+   elsif( $type eq "Data" ) {
+      # ignore?
+   }
    elsif( $type eq "Para" and $_curpara and 
       $_curpara->type eq "item" and $_curpara->listtype eq "text" and !length $_curpara->text ) {
       %_curtags = ();
@@ -128,6 +175,7 @@ method _handle_element_start ( $type, $attrs )
       push $_parastack[-1]->@*, $_curpara = $class->new(
          text   => String::Tagged->new,
          indent => $_indentstack[-1],
+         ( $type eq "Verbatim" ) ? ( %_verbatim_options ) : (),
       );
       %_curtags = ();
    }
@@ -182,6 +230,15 @@ method _handle_element_end ( $type, @ )
    elsif( $type =~ m/^head\d+$/ ) {
       # nothing
    }
+   elsif( $type eq "code" ) {
+      undef $_redirect_text;
+   }
+   elsif( $type eq "for" ) {
+      undef $_redirect_text;
+   }
+   elsif( $type eq "Data" ) {
+      # ignore?
+   }
    elsif( $PARA_TYPES{$type} ) {
       $type eq "Verbatim" and
          $_parastack[-1][-1] = $self->trim_leading_whitespace( $_parastack[-1][-1] );
@@ -212,6 +269,10 @@ method _handle_element_end ( $type, @ )
 
 method _handle_text ( $text )
 {
+   if( $_redirect_text ) {
+      return $self->$_redirect_text( $text );
+   }
+
    $text =~ s/ /\xA0/g if $_conv_nbsp;
 
    $_curpara->append_text( $text, %_curtags );
@@ -229,7 +290,8 @@ method trim_leading_whitespace ( $para )
    $text .= "\n" . $_ for @lines;
 
    return (ref $para)->new(
-      text => $text,
+      text     => $text,
+      language => $para->language,
    );
 }
 

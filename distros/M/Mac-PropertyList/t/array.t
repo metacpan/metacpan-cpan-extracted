@@ -25,7 +25,7 @@ array.t
 
 =head1 AUTHORS
 
-Original author: brian d foy C<< <bdfoy@cpan.org> >>
+Original author: brian d foy C<< <briandfoy@pobox.com> >>
 
 Contributors:
 
@@ -41,7 +41,7 @@ This file was originally in https://github.com/briandfoy/mac-propertylist
 
 =head1 COPYRIGHT
 
-Copyright © 2002-2023, brian d foy, C<< <bdfoy@cpan.org> >>
+Copyright © 2002-2024, brian d foy, C<< <briandfoy@pobox.com> >>
 
 =head1 LICENSE
 
@@ -66,7 +66,7 @@ is( $array->count, 0, 'Empty object has no elements' );
 
 my $array =<<"HERE";
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE plist PUBLIC "-//Apple Computer//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <array>
 	<string>Mimi</string>
@@ -88,7 +88,7 @@ ok( eq_array( \@values, [qw(Mimi Roscoe Juliet Buster)] ),
 note 'Try non-canonical layout';
 $plist = &{$parse_fqname}( <<"HERE" );
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE plist PUBLIC "-//Apple Computer//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <array><string>Athos</string><string>Porthos</string><string>Aramis</string></array>
 </plist>

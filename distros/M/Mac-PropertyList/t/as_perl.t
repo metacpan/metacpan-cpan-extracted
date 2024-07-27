@@ -28,7 +28,7 @@ as_perl.t
 
 =head1 AUTHORS
 
-Original author: brian d foy C<< <bdfoy@cpan.org> >>
+Original author: brian d foy C<< <briandfoy@pobox.com> >>
 
 =head1 SOURCE
 
@@ -36,7 +36,7 @@ This file was originally in https://github.com/briandfoy/mac-propertylist
 
 =head1 COPYRIGHT
 
-Copyright © 2002-2023, brian d foy, C<< <bdfoy@cpan.org> >>
+Copyright © 2002-2024, brian d foy, C<< <briandfoy@pobox.com> >>
 
 =head1 LICENSE
 

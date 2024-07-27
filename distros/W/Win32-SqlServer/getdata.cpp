@@ -1,14 +1,25 @@
 /*---------------------------------------------------------------------
- $Header: /Perl/OlleDB/getdata.cpp 10    21-07-03 23:18 Sommar $
+ $Header: /Perl/OlleDB/getdata.cpp 12    24-07-15 21:15 Sommar $
 
   Implements the routines for getting data and metadata from SQL Server:
   nextresultset, getcolumninfo, nextrow, getoutputparams. Includes routines
   to Server data types to Perl values, save datetime data; those are in
   datetime.cpp.
 
-  Copyright (c) 2004-2021   Erland Sommarskog
+  Copyright (c) 2004-2024   Erland Sommarskog
 
   $History: getdata.cpp $
+ * 
+ * *****************  Version 12  *****************
+ * User: Sommar       Date: 24-07-15   Time: 21:15
+ * Updated in $/Perl/OlleDB
+ * Updated year for copyright.
+ * 
+ * *****************  Version 11  *****************
+ * User: Sommar       Date: 24-07-15   Time: 20:56
+ * Updated in $/Perl/OlleDB
+ * Reverted to the old behaviour for variant data, since the changes in
+ * MSOLEDBSQL 18.4 apparently was a bug which they fixed in 18.6.3/19.1.0.
  * 
  * *****************  Version 10  *****************
  * User: Sommar       Date: 21-07-03   Time: 23:18
@@ -833,13 +844,7 @@ static SV * ssvariant_to_SV(SV          * olle_ptr,
 
        case VT_SS_STRING    :
        case VT_SS_VARSTRING : {
-             // They changed the rules with MSOLEDBSQL 18.4. Before that they
-             // accepted the bytes vene if DB collation was different from
-             // ANSI code page, but now they always convert.
-             internaldata * mydata = get_internaldata(olle_ptr);
-             UINT codepage = (mydata->provider >= provider_msoledbsql ?
-                                       GetACP() :
-                                       OptCurrentCodepage(olle_ptr));
+             UINT codepage = OptCurrentCodepage(olle_ptr);
              if (codepage == GetACP() && codepage != CP_UTF8) {
                 perl_value = newSVpvn(ssvar.CharVal.pchCharVal,
                                       ssvar.CharVal.sActualLength);
@@ -850,8 +855,8 @@ static SV * ssvariant_to_SV(SV          * olle_ptr,
                                              codepage);
              }
              OLE_malloc_ptr->Free(ssvar.CharVal.pchCharVal);
-             if (ssvar.CharVal.pwchReserved != NULL) {
-                OLE_malloc_ptr->Free(ssvar.CharVal.pwchReserved);
+             if (ssvar.NCharVal.pwchReserved != NULL) {
+                OLE_malloc_ptr->Free(ssvar.NCharVal.pwchReserved);
              }
           }
           break;

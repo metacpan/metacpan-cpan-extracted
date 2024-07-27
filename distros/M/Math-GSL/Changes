@@ -1,10 +1,23 @@
 =head1 Math::GSL Changes
 
-=head v.045 - July 2024
+=head v0.48 - July 2024
+    - Fix build failure for gcc 14 on debian (emollier)
+
+=head v0.47 - July 2024
+    - Build shared libgsl.so by default. See https://github.com/PerlAlien/Alien-GSL/issues/17 for
+      more information.
+
+=head v0.46 - July 2024
+    - Fixes some test failures compared to version 0.45 released at metacpan.org: 
+    - Linalg.t : "GSL LINALG LU DECOMP" returned 0 instead of 4
+    - Matrix.so: undefined symbol: gsl_matrix_char_norm1 and gsl_spmatrix_char_norm1
+    - Fixes wrong version number in Changes file
+
+=head v0.45 - July 2024
     - Added support for GSL 2.8 (hakonhagland)
     - Update to distribution metadata (mohawk2)
 
-=head1 v.044 - December 2023
+=head1 v0.44 - December 2023
     - Added support for GSL 2.7.1 (yewtc)
 
 =head1 v0.43 - July 2021

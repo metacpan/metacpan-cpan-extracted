@@ -1,3 +1,11 @@
+0.825   2024-07-17  Released-By: PERLANCAR; Urgency: low
+
+        - No functional changes.
+
+        - [dist] Edit Changes (replace Backward-Compatible: no with
+          Backward-Incompatible: yes).
+
+
 0.824   2023-07-09  Released-By: PERLANCAR; Urgency: medium
 
         - Remove the use of smartmatch.
@@ -15,7 +23,7 @@
         - [module Perinci::Examples::Table] add function sales().
 
 
-0.821   2021-01-30  Released-By: PERLANCAR; Urgency: medium; Backward-Compatible: no
+0.821   2021-01-30  Released-By: PERLANCAR; Urgency: medium; Backward-Incompatible: yes
 
 	- [incompatible change] Rename functions (remove 'test_' prefix).
 

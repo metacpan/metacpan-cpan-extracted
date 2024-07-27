@@ -1,5 +1,12 @@
 Revision history for App-sdview
 
+0.17    2024-07-26
+        [CHANGES]
+         * Initial experiment at using `tree-sitter` to apply syntax
+           highlighting to verbatim text paragraphs with defined language
+         * Experimental parsing of `=code` and `=for highlighter` directives
+           in Pod to set the highlight language
+
 0.16    2024-07-24
         [CHANGES]
          * Support passing options to output plugins

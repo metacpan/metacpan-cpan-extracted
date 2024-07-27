@@ -1,4 +1,4 @@
-makefile.pl                      Makefile.pl for Win32::SqlServer.
+Makefile.PL                      Makefile.pl for Win32::SqlServer.
 MANIFEST                         This file.
 README.html                      README file.
 Win32-SqlServer.pod              Rudimentary POD for Win32::SqlServer.

@@ -298,8 +298,8 @@ my @ver2func = (
     "2.6" => {
         new => [
             qw/
-	      ^gsl_spmatrix_pool_node$
-	      ^gsl_spmatrix_pool$
+	          ^gsl_spmatrix_pool_node$
+	          ^gsl_spmatrix_pool$
               ^gsl_vector_complex_axpby$
               ^gsl_vector_int_axpby$
               ^gsl_vector_ushort_axpby$
@@ -523,7 +523,6 @@ my @ver2func = (
               ^gsl_linalg_LU_band_decomp$
               ^gsl_linalg_LU_band_solve$
               ^gsl_linalg_householder_transform2$
-
               /
         ]
     },
@@ -571,14 +570,31 @@ my ( %index, @info, @versions );
 
 }
 
+sub handle_unsigned_char_platforms {
+    my ( $platform_uses_signed_char ) = @_;
+
+    return if $platform_uses_signed_char;
+
+    my $version = "2.7";
+    my $vers_idx = $index{$version};
+    my $info_2_7 = $info[$vers_idx];
+    # Remove these two functions if the platform does not support signed char
+    $info_2_7->{deprecated} = [
+        '^gsl_matrix_char_norm1$',
+        '^gsl_spmatrix_char_norm1$',
+    ];
+}
+
 sub new {
-    my ( $class, $version ) = @_;
+    my ( $class, $version, $platform_uses_signed_char ) = @_;
 
     $version = '1.16' if $version eq '1.16.1';
     $version = '2.7' if $version eq '2.7.1';
 
     defined( my $vers_idx = $index{$version} )
       or croak( "Unsupported GSL version!!! : $version" );
+
+    handle_unsigned_char_platforms( $platform_uses_signed_char );
 
     my ( @ignore, @subsystems );
 

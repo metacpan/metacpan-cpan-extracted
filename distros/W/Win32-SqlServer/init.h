@@ -1,5 +1,5 @@
 /*---------------------------------------------------------------------
- $Header: /Perl/OlleDB/init.h 10    22-05-18 22:22 Sommar $
+ $Header: /Perl/OlleDB/init.h 11    24-07-15 23:50 Sommar $
 
   This file holds code associated with module and object initialitaion.
   This file also declares global variables that exist through the lifetime
@@ -8,9 +8,14 @@
   The header file also define some enums related to initialisation.
 
 
-  Copyright (c) 2004-2022   Erland Sommarskog
+  Copyright (c) 2004-2024   Erland Sommarskog
 
   $History: init.h $
+ * 
+ * *****************  Version 11  *****************
+ * User: Sommar       Date: 24-07-15   Time: 23:50
+ * Updated in $/Perl/OlleDB
+ * Added one more parameter to SetDefaultForEncryption
  * 
  * *****************  Version 10  *****************
  * User: Sommar       Date: 22-05-18   Time: 22:22
@@ -149,4 +154,4 @@ extern provider_enum default_provider(void);
 
 // This routine permits the caller to change the default for the options Encrypt and
 // TrustServerCertificate.
-extern void SetDefaultForEncryption(SV *, SV*, SV *);
+extern void SetDefaultForEncryption(SV *, SV*, SV *, SV *);

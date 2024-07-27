@@ -20274,34 +20274,6 @@ XS(_wrap_gsl_spmatrix_char_equal) {
 }
 
 
-XS(_wrap_gsl_spmatrix_char_norm1) {
-  {
-    gsl_spmatrix_char *arg1 = (gsl_spmatrix_char *) 0 ;
-    void *argp1 = 0 ;
-    int res1 = 0 ;
-    int argvi = 0;
-    char result;
-    dXSARGS;
-    
-    if ((items < 1) || (items > 1)) {
-      SWIG_croak("Usage: gsl_spmatrix_char_norm1(a);");
-    }
-    res1 = SWIG_ConvertPtr(ST(0), &argp1,SWIGTYPE_p_gsl_spmatrix_char, 0 |  0 );
-    if (!SWIG_IsOK(res1)) {
-      SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "gsl_spmatrix_char_norm1" "', argument " "1"" of type '" "gsl_spmatrix_char const *""'"); 
-    }
-    arg1 = (gsl_spmatrix_char *)(argp1);
-    result = (char)gsl_spmatrix_char_norm1((gsl_spmatrix_char const *)arg1);
-    ST(argvi) = SWIG_From_char  SWIG_PERL_CALL_ARGS_1((char)(result)); argvi++ ;
-    
-    XSRETURN(argvi);
-  fail:
-    
-    SWIG_croak_null();
-  }
-}
-
-
 XS(_wrap_gsl_spmatrix_char_transpose) {
   {
     gsl_spmatrix_char *arg1 = (gsl_spmatrix_char *) 0 ;
@@ -33720,7 +33692,6 @@ static swig_command_info swig_commands[] = {
 {"Math::GSL::SparseMatrixc::gsl_spmatrix_char_sp2d", _wrap_gsl_spmatrix_char_sp2d},
 {"Math::GSL::SparseMatrixc::gsl_spmatrix_char_add_to_dense", _wrap_gsl_spmatrix_char_add_to_dense},
 {"Math::GSL::SparseMatrixc::gsl_spmatrix_char_equal", _wrap_gsl_spmatrix_char_equal},
-{"Math::GSL::SparseMatrixc::gsl_spmatrix_char_norm1", _wrap_gsl_spmatrix_char_norm1},
 {"Math::GSL::SparseMatrixc::gsl_spmatrix_char_transpose", _wrap_gsl_spmatrix_char_transpose},
 {"Math::GSL::SparseMatrixc::gsl_spmatrix_char_transpose2", _wrap_gsl_spmatrix_char_transpose2},
 {"Math::GSL::SparseMatrixc::gsl_spmatrix_char_transpose_memcpy", _wrap_gsl_spmatrix_char_transpose_memcpy},

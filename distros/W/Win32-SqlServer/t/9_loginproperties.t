@@ -1,9 +1,21 @@
 #---------------------------------------------------------------------
-# $Header: /Perl/OlleDB/t/9_loginproperties.t 33    22-06-09 23:02 Sommar $
+# $Header: /Perl/OlleDB/t/9_loginproperties.t 35    24-07-24 0:10 Sommar $
 #
 # This test suite tests that setloginproperty, Autoclose and CommandTimeout.
 #
 # $History: 9_loginproperties.t $
+# 
+# *****************  Version 35  *****************
+# User: Sommar       Date: 24-07-24   Time: 0:10
+# Updated in $/Perl/OlleDB/t
+# Oops! That new query does not run on SQL 2000.
+# 
+# *****************  Version 34  *****************
+# User: Sommar       Date: 24-07-23   Time: 22:19
+# Updated in $/Perl/OlleDB/t
+# 1) PacketSize is bigger than requested when connection is encrypted.
+# 2) Skip the tests on the Authentication on instances enabled for Entra
+# authentication, since outcome is different.
 # 
 # *****************  Version 33  *****************
 # User: Sommar       Date: 22-06-09   Time: 23:02
@@ -206,12 +218,12 @@ sub setup_testc {
     if ($userpw and $mainpw) {
        $testc->setloginproperty('Password', $mainpw);
     }
-     $testc->{ErrInfo}{PrintMsg}    = 17;
-     $testc->{ErrInfo}{PrintLines}  = 17;
-     $testc->{ErrInfo}{PrintText}   = 17;
-     $testc->{ErrInfo}{MaxSeverity} = 17;
-     $testc->{ErrInfo}{CarpLevel}   = 17;
-     $testc->{ErrInfo}{SaveMessages} = 1;
+    $testc->{ErrInfo}{PrintMsg}    = 17;
+    $testc->{ErrInfo}{PrintLines}  = 17;
+    $testc->{ErrInfo}{PrintText}   = 17;
+    $testc->{ErrInfo}{MaxSeverity} = 17;
+    $testc->{ErrInfo}{CarpLevel}   = 17;
+    $testc->{ErrInfo}{SaveMessages} = 1;
     return $testc;
 }
 
@@ -536,7 +548,7 @@ SQLEND
    warn "$netlib\n";
 }
 
-# Packet size. Only testable on SQL 2005.
+# Packet size. Only testable on SQL 2005 and later.
 if ($monitorsqlver >= 9) {
    $testc = setup_testc;
    $testc->setloginproperty('PacketSize', 1280);
@@ -544,7 +556,8 @@ if ($monitorsqlver >= 9) {
    my $pktsize = $testc->sql_one(<<'SQLEND', SCALAR);
    SELECT net_packet_size FROM sys.dm_exec_connections WHERE session_id = @@spid
 SQLEND
-   if ($pktsize == 1280) {
+   # If connection is encrypted, the packet size is somewhat bigger.
+   if ($pktsize == 1280 or $pktsize = 1338) {
       print "ok 17\n";
    }
    else {
@@ -919,11 +932,17 @@ else {
    print "ok 45 # skip\n";
 }
 
-# Test if the Authentication property. While they are available in 
-# MSOLEDBSQL, they are only testable MSOLEDBSQL19, as they require
-# a valid certificate to be in place with MSOLEDBSQL.
-if ($monitor->{Provider} >= PROVIDER_MSOLEDBSQL19) {
-   my $testc = setup_testc(0);
+# Test the Authentication property. However, this one is a little
+# difficult to test in some environments. With MSOLEDBSQL they 
+# require a valid certificate to be in place. And with an Entra-ID
+# enabled instance, the outcome is not as expected for mosts tests.
+my $has_ext_users;
+if ($monitorsqlver > 8) {
+   $has_ext_users = $monitor->sql_one("SELECT COUNT(*) FROM sys.server_principals WHERE type = 'E'",
+                                      Win32::SqlServer::SCALAR);
+}
+if ($monitor->{Provider} >= PROVIDER_MSOLEDBSQL19 and not $has_ext_users) {
+   $testc = setup_testc(0);
 
    # Test that incorrect value gives error message.
    my $wrong = 'AzureDirectoryPassword';

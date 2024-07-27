@@ -309,7 +309,6 @@ package Math::GSL::SparseMatrix;
 *gsl_spmatrix_char_sp2d = *Math::GSL::SparseMatrixc::gsl_spmatrix_char_sp2d;
 *gsl_spmatrix_char_add_to_dense = *Math::GSL::SparseMatrixc::gsl_spmatrix_char_add_to_dense;
 *gsl_spmatrix_char_equal = *Math::GSL::SparseMatrixc::gsl_spmatrix_char_equal;
-*gsl_spmatrix_char_norm1 = *Math::GSL::SparseMatrixc::gsl_spmatrix_char_norm1;
 *gsl_spmatrix_char_transpose = *Math::GSL::SparseMatrixc::gsl_spmatrix_char_transpose;
 *gsl_spmatrix_char_transpose2 = *Math::GSL::SparseMatrixc::gsl_spmatrix_char_transpose2;
 *gsl_spmatrix_char_transpose_memcpy = *Math::GSL::SparseMatrixc::gsl_spmatrix_char_transpose_memcpy;

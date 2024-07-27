@@ -1,5 +1,9 @@
 Revision history for Perl module Locale::Unicode
 
+v0.3.1 2024-07-27T09:53:44+0900
+    - Added method extended and corrected regular expression
+    - Improved documentation
+
 v0.3.0 2024-07-26T15:58:33+0900
     - Added method merge
 

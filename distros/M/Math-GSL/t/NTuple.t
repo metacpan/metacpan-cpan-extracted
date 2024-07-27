@@ -11,7 +11,7 @@ use strict;
 
 BEGIN{ gsl_set_error_handler_off(); }
 
-END { warn "This is the end" }
+#END { warn "This is the end" }
 
 sub make_fixture : Test(setup) {
     my $self = shift;

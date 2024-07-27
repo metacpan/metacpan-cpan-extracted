@@ -11,6 +11,7 @@ GetOptions(
    'format|f=s' => \my $FORMAT,
    'output|t=s' => \my $OUTPUT,
    'output-option|O=s@' => \my @OUTPUT_OPTIONS,
+   'highlight|h' => \my $HIGHLIGHT,
 ) or exit 1;
 
 exit App::sdview->new->run(
@@ -18,6 +19,7 @@ exit App::sdview->new->run(
    format => $FORMAT,
    output => $OUTPUT,
    output_options => \@OUTPUT_OPTIONS,
+   highlight => $HIGHLIGHT,
 );
 
 =head1 NAME
@@ -77,6 +79,13 @@ converting between file types:
 
 Provides additional options to pass to the selected output plugin. The exact
 options recognised will depend on the selected plugin.
+
+=head2 -h, --highlight
+
+Enables syntax highlighting of verbatim or code blocks, by using
+F<tree-sitter> and any available language parsers. This is switched off by
+default, partly because of unlikely availablity, and partly because of slow
+performance, especially in the presence of many small code sections.
 
 =head1 AUTHOR
 

@@ -26,7 +26,7 @@ our %EXPORT_TAGS = ( all => \@EXPORT_OK, );
 
 our ($GSL_PREC_DOUBLE, $GSL_PREC_SINGLE, $GSL_PREC_APPROX ) = 0 .. 2;
 our $GSL_MODE_DEFAULT = $GSL_PREC_DOUBLE;
-our $VERSION = '0.45';
+our $VERSION = '0.48';
 
 =head1 NAME
 
@@ -34,7 +34,7 @@ Math::GSL - Perl interface to the GNU Scientific Library (GSL)
 
 =head1 VERSION
 
-Version 0.45
+Version 0.48
 
 =head1 SYNOPSIS
 
@@ -195,67 +195,17 @@ Jonathan "Duke" Leto, C<< <jonathan@leto.net> >> and Thierry Moisan C<< <thierry
 =head1 BUGS
 
 This software is still in active development, we appreciate your detailed bug reports and
-documentation patches. Please report any bugs or feature requests to the authors directly.
+documentation patches. Please report any bugs or feature requests to L<https://github.com/hakonhagland/perl-math-gsl/issues>.
 
-=head1 COMPILING ISSUES
-
-Some operating system configurations will make the compilation of Math::GSL fail. One
-common problem that happens on RedHat Linux (RHEL) and CentOS looks like this:
-
-
-    Error:  Can't load '/usr/src/misc/perl-package/Math-GSL-0.20/blib/arch/auto/Math/GSL/Errno/Errno.so'
-    for module Math::GSL::Errno: /usr/src/misc/perl-package/Math-GSL-0.20/blib/arch/auto/Math/GSL/Errno/Errno.so:
-    cannot restore segment prot after reloc: Permission denied at /usr/lib/perl5/5.10.0/i386-linux-thread-multi/DynaLoader.pm line 203.
-    #  at blib/lib/Math/GSL/Errno.pm line 10
-
-This is due to the SE Linux setting being set to "enforcing". To Temporarily
-disable enforcement on a running system:
-
-    /usr/sbin/setenforce 0
-
-To permanently disable enforcement during a system startup change "enforcing" to
-"disabled" in ''/etc/selinux/config'' and reboot.
-
-
-=head1 SUPPORT
-
-You can find documentation for this module with the perldoc command.
-
-    perldoc Math::GSL
-
-or online at L<http://leto.net/code/Math-GSL/>
-
-=over 4
-
-=item * AnnoCPAN: Annotated CPAN documentation
-
-L<http://annocpan.org/dist/Math::GSL>
-
-=item * CPAN Ratings
-
-L<http://cpanratings.perl.org/d/Math::GSL>
-
-=item * Search CPAN
-
-L<http://search.cpan.org/dist/Math::GSL>
-
-=back
 
 =head1 DEVELOPMENT
 
 If you would like the help develop Math::GSL, visit us on Github
-L<https://github.com/leto/math--gsl> and fork, send Pull Requests
+L<https://github.com/hakonhagland/perl-math-gsl/issues> and fork, send Pull Requests
 and/or create issues.
 
 To view the latest source code online, go to
-L<http://github.com/leto/math--gsl/tree/master>.
-
-The latest version of Git can be found at L<http://git-scm.com> .
-
-=head1 ACKNOWLEDGEMENTS
-
-Thanks to PDX.pm, The Perl Foundation and everyone at Google who makes
-the Summer of Code happen each year. You rock.
+L<https://github.com/hakonhagland/perl-math-gsl>.
 
 =head1 DEDICATION
 

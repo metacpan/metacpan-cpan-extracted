@@ -7,7 +7,7 @@ use v5.26;
 use warnings;
 use experimental 'signatures';
 
-package App::sdview::Style 0.16;
+package App::sdview::Style 0.17;
 
 use Convert::Color;
 use Convert::Color::XTerm 0.06;
@@ -23,6 +23,8 @@ formatters, such a L<App::sdview::Output::Plain> or
 L<App::sdview::Output::Terminal>.
 
 =head2 Config File
+
+=for highlighter
 
 Style information can be overridden by the user, supplying a
 L<Config::Tiny>-style file at F<$HOME/.sdviewrc>. Formatting for each kind of
@@ -40,6 +42,9 @@ key gives formatting values.
    [Para head2]
    ...
 
+Specifying the special value C<~> deletes the default value for that key
+without providing a replacement.
+
 The value for keys that set colours should be a string suitable for
 L<< Convert::Color->new >>:
 
@@ -56,18 +61,43 @@ C<Inline $NAME>, using the same key names as paragraphs.
 Note that the C<[Inline monospace]> style is automatically inherited by
 C<[Para verbatim]>.
 
+Style information for syntax highlighting can be supplied in sections called
+C<[Highlight $NAME]>, where each name is the F<tree-sitter> query capture name
+for the highlight group.
+
+   [Highlight comment]
+   bg = xterm:232
+
 =cut
+
+sub _fixup_colour_keys ( $style )
+{
+   $style->{$_} and
+      $style->{$_} = Convert::Color->new( $style->{$_} ) for qw( fg bg );
+}
 
 my %FORMATSTYLES = (
    bold          => { bold => 1 },
    italic        => { italic => 1 },
-   monospace     => { monospace => 1, bg => Convert::Color->new( "xterm:235" ) },
+   monospace     => { monospace => 1, bg => "xterm:235" },
    underline     => { under => 1 },
    strikethrough => { strike => 1 },
 
    file => { italic => 1, under => 1 },
-   link => { under => 1, fg => Convert::Color->new( "xterm:rgb(3,3,5)" ) }, # light blue
+   link => { under => 1, fg => "xterm:rgb(3,3,5)" }, # light blue
 );
+_fixup_colour_keys $_ for values %FORMATSTYLES;
+
+sub inline_style ( $pkg, $type )
+{
+   $FORMATSTYLES{$type} or
+      die "Unrecognised inline style for $type";
+
+   my %style = $FORMATSTYLES{$type}->%*;
+   defined $style{$_} or delete $style{$_} for keys %style;
+
+   return \%style;
+}
 
 sub convert_str ( $pkg, $s )
 {
@@ -87,10 +117,10 @@ sub convert_str ( $pkg, $s )
 }
 
 my %PARASTYLES = (
-   head1    => { fg => Convert::Color->new( "vga:yellow" ), bold => 1 },
-   head2    => { fg => Convert::Color->new( "vga:cyan" ), bold => 1, margin => 2 },
-   head3    => { fg => Convert::Color->new( "vga:green" ), bold => 1, margin => 4 },
-   head4    => { fg => Convert::Color->new( "xterm:217" ), under => 1, margin => 5 },
+   head1    => { fg => "vga:yellow", bold => 1 },
+   head2    => { fg => "vga:cyan",   bold => 1, margin => 2 },
+   head3    => { fg => "vga:green",  bold => 1, margin => 4 },
+   head4    => { fg => "xterm:217",  under => 1, margin => 5 },
    plain    => { margin => 6, blank_after => 1 },
    verbatim => { margin => 8, blank_after => 1, inherit => "monospace" },
    list     => { margin => 6 },
@@ -99,9 +129,69 @@ my %PARASTYLES = (
    table    => { margin => 8 },
    "table-heading" => { bold => 1 },
 );
+_fixup_colour_keys $_ for values %PARASTYLES;
+
+sub para_style ( $pkg, $type )
+{
+   $PARASTYLES{$type} or
+      die "Unrecognised paragraph style for $type";
+
+   my %style = $PARASTYLES{$type}->%*;
+   %style = ( %style, $FORMATSTYLES{delete $style{inherit}}->%* ) if defined $style{inherit};
+   defined $style{$_} or delete $style{$_} for keys %style;
+
+   return \%style;
+}
+
+my %HIGHLIGHTSTYLES = (
+   # Names stolen from tree-sitter's highlight theme
+   attribute  => { fg => "vga:cyan", italic => 1 },
+   character  => { fg => "vga:magenta" },
+   comment    => { fg => "xterm:15", bg => "xterm:54", italic => 1 },
+   decorator  => { fg => "xterm:140", italic => 1 },
+   function   => { fg => "xterm:147", },
+   keyword    => { fg => "vga:yellow", bold => 1 },
+   module     => { fg => "vga:green", bold => 1 },
+   number     => { fg => "vga:magenta" },
+   operator   => { fg => "vga:yellow" },
+   string     => { fg => "vga:magenta" },
+   type       => { fg => "vga:green" },
+   variable   => { fg => "vga:cyan" },
+
+   'string.special' => { fg => "vga:red" },
+   'function.builtin' => { fg => "xterm:147", bold => 1 },
+);
+$HIGHLIGHTSTYLES{$_} = { fallback => "keyword"  } for qw( include repeat conditional exception );
+$HIGHLIGHTSTYLES{$_} = { fallback => "function" } for qw( method );
+_fixup_colour_keys $_ for values %HIGHLIGHTSTYLES;
+
+sub highlight_style ( $pkg, $key )
+{
+   my @nameparts = split m/\./, $key;
+   while( @nameparts ) {
+      my $style = $HIGHLIGHTSTYLES{ join ".", @nameparts } or
+         pop( @nameparts ), next;
+
+      if( keys( $style->%* ) == 1 and defined( my $fbkey = $style->{fallback} ) ) {
+         return $pkg->highlight_style( $fbkey );
+      }
+
+      return $style;
+   }
+
+   return undef;
+}
+
+my %VALID_STYLE_KEYS = map { $_ => 1 } qw(
+   fg bg
+   bold italic monospace blank_after
+   under margin
+);
 
 sub _convert_val ( $stylekey, $val )
 {
+   return undef if !defined $val or $val eq "~";
+
    if( $stylekey =~ m/^(fg|bg)$/ ) {
       return Convert::Color->new( $val );
    }
@@ -125,6 +215,8 @@ sub load_config ( $pkg, $path )
                               : Config::Tiny->read( $path );
 
    foreach my $section ( sort keys %$config ) {
+      my $configdata = $config->{$section};
+
       if( $section =~ m/^Inline (.*)$/ ) {
          my $format = $1;
 
@@ -133,9 +225,11 @@ sub load_config ( $pkg, $path )
             next;
          }
 
-         foreach my $stylekey ( sort keys $config->{$section}->%* ) {
-            defined( $FORMATSTYLES{$format}{$stylekey} = _convert_val( $stylekey, $config->{$section}{$stylekey} ) )
-               or warn "Unrecognised $section key $stylekey in $path\n";
+         foreach my $stylekey ( sort keys $configdata->%* ) {
+            $VALID_STYLE_KEYS{$stylekey} or
+               warn( "Unrecognised $section key $stylekey in $path\n" ), next;
+
+            $FORMATSTYLES{$format}{$stylekey} = _convert_val( $stylekey, $configdata->{$stylekey} );
          }
       }
       elsif( $section =~ m/^Para (.*)$/ ) {
@@ -146,27 +240,34 @@ sub load_config ( $pkg, $path )
             next;
          }
 
-         foreach my $stylekey ( sort keys $config->{$section}->%* ) {
-            defined( $PARASTYLES{$para}{$stylekey} = _convert_val( $stylekey, $config->{$section}{$stylekey} ) )
-               or warn "Unrecognised $section key $stylekey in $path\n";
+         foreach my $stylekey ( sort keys $configdata->%* ) {
+            $VALID_STYLE_KEYS{$stylekey} or
+               warn( "Unrecognised $section key $stylekey in $path\n" ), next;
+
+            $PARASTYLES{$para}{$stylekey} = _convert_val( $stylekey, $configdata->{$stylekey} );
+         }
+      }
+      elsif( $section =~ m/^Highlight (.*)$/ ) {
+         my $keyname = $1;
+         my $highlight = $HIGHLIGHTSTYLES{$keyname} //= {};
+
+         foreach my $stylekey ( sort keys $configdata->%* ) {
+            $VALID_STYLE_KEYS{$stylekey} or
+               warn( "Unrecognised $section key $stylekey in $path\n" ), next;
+
+            $highlight->{$stylekey} = _convert_val( $stylekey, $configdata->{$stylekey} );
+         }
+
+         defined $highlight->{$_} or delete $highlight->{$_} for keys %$highlight;
+
+         if( keys( %$highlight ) > 1 ) {
+            delete $highlight->{fallback};
          }
       }
       else {
          warn "Unrecognised section $section in $path\n";
       }
    }
-}
-
-sub para_style ( $pkg, $type )
-{
-   $PARASTYLES{$type} or
-      die "Unrecognised paragraph style for $type";
-
-   my %style = $PARASTYLES{$type}->%*;
-   %style = ( %style, $FORMATSTYLES{delete $style{inherit}}->%* ) if defined $style{inherit};
-   defined $style{$_} or delete $style{$_} for keys %style;
-
-   return \%style;
 }
 
 =head1 AUTHOR

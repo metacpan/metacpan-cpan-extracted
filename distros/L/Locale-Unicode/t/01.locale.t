@@ -1025,6 +1025,30 @@ subtest 'merge' => sub
     is( "$locale1", 'ja-Kana-JP-posix-hepburn-heploc', 'merge -> ja-Kana-JP-posix-hepburn-heploc' );
 };
 
+subtest 'overlong' => sub
+{
+    # no warnings 'Locale::Unicode';
+    # Italian at Vatican City
+    my $locale = Locale::Unicode->new( 'it-VAT' );
+    is( $locale->extended, 'VAT', 'it-VAT -> VAT is extended subtag' );
+    is( $locale->overlong, undef, 'it-VAT -> overlong is undef' );
+
+    # Spanish as spoken at Panama
+    $locale = Locale::Unicode->new( 'es-PAN-valencia' );
+    is( $locale->extended, 'PAN', 'es-PAN-valencia -> PAN is extended subtag' );
+    is( $locale->overlong, undef, 'es-PAN-valencia -> overlong is undef' );
+
+    $locale = Locale::Unicode->new( 'en-US' );
+    is( $locale->overlong, undef, '[overlong] en-US -> undef' );
+    is( $locale->country_code, 'US', '[country_code] en-US -> US' );
+    is( $locale->territory, 'US', '[territory] en-US -> US' );
+    # Changing to overlong USA
+    $locale->overlong( 'USA' );
+    is( $locale->overlong, 'USA', '[overlong] en-US -> USA' );
+    is( $locale->country_code, 'USA', '[country_code] en-US -> undef' );
+    is( $locale->territory, 'USA', '[territory] en-US -> undef' );
+};
+
 done_testing();
 
 __END__

@@ -25,7 +25,7 @@ parse.t
 
 =head1 AUTHORS
 
-Original author: brian d foy C<< <bdfoy@cpan.org> >>
+Original author: brian d foy C<< <briandfoy@pobox.com> >>
 
 Contributors:
 
@@ -43,7 +43,7 @@ This file was originally in https://github.com/briandfoy/mac-propertylist
 
 =head1 COPYRIGHT
 
-Copyright © 2002-2023, brian d foy, C<< <bdfoy@cpan.org> >>
+Copyright © 2002-2024, brian d foy, C<< <briandfoy@pobox.com> >>
 
 =head1 LICENSE
 
@@ -53,58 +53,57 @@ received a copy of this license with this distribution.
 =cut
 
 my $class = 'Mac::PropertyList';
-use_ok( $class ) or BAIL_OUT( "$class did not compile\n" );
+my $method = 'parse_plist';
+my $method_ref;
+subtest sanity => sub {
+	use_ok( $class ) or BAIL_OUT( "$class did not compile\n" );
+	can_ok $class, $method;
+	$method_ref = $class->can($method);
+};
 
-my $array =<<"HERE";
+my $old_template = <<"HERE";
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE plist PUBLIC "-//Apple Computer//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
+%s
+</plist>
+HERE
+
+my $new_template = $old_template;
+$new_template =~ s/Apple Computer/Apple/;
+
+my %templates = (
+	'Apple' => $new_template,
+	'Apple Computer' => $old_template,
+	);
+
+my $array =<<"HERE";
 <array>
 	<string>Mimi</string>
 	<string>Roscoe</string>
 </array>
-</plist>
 HERE
 
 my $dict =<<"HERE";
-<?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE plist PUBLIC "-//Apple Computer//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
-<plist version="1.0">
 <dict>
 	<key>Mimi</key>
 	<string>Roscoe</string>
 </dict>
-</plist>
 HERE
 
 my $string1_0 =<<"HERE";
-<?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE plist PUBLIC "-//Apple Computer//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
-<plist version="1.0">
 <string>This is it</string>
-</plist>
 HERE
 
 my $string0_9 =<<"HERE";
-<?xml version="0.9" encoding="UTF-8"?>
-<!DOCTYPE plist PUBLIC "-//Apple Computer//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
-<plist version="1.0">
 <string>This is it</string>
-</plist>
 HERE
 
 my $empty_string =<<"HERE";
-<?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE plist PUBLIC "-//Apple Computer//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
-<plist version="1.0">
 <string/>
-</plist>
 HERE
 
 my $nested_dict =<<"HERE";
-<?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE plist PUBLIC "-//Apple Computer//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
-<plist version="1.0">
 <dict>
 	<key>Mimi</key>
 	<dict>
@@ -114,11 +113,8 @@ my $nested_dict =<<"HERE";
 		<true/>
 	</dict>
 </dict>
-</plist>
 HERE
 
-########################################################################
-my $parse_fqname = $class . '::parse_plist';
 
 my $array_shortname  = 'array';
 my $dict_shortname   = 'dict';
@@ -128,63 +124,70 @@ my $array_type  = join '::', $class, $array_shortname;
 my $dict_type   = join '::', $class, $dict_shortname;
 my $string_type = join '::', $class, $string_shortname;
 
-{
-my $plist = &{$parse_fqname}( $array );
+foreach my $key ( sort keys %templates ) {
+	subtest $key => sub {
+		my $template = $templates{$key};
 
-isa_ok( $plist, $array_type );
-is(     $plist->type, $array_shortname, "Item is an $array_shortname type" );
-isa_ok( $plist->value, $array_type );
+		subtest 'array' => sub {
+			my $plist = $method_ref->( sprintf $template, $array );
 
-my @elements = @{ $plist->value };
-isa_ok( $elements[0], $string_type );
-isa_ok( $elements[1], $string_type );
-is( $elements[0]->value, 'Mimi',   "Mimi $string_shortname is right"  );
-is( $elements[1]->value, 'Roscoe', "Roscoe $string_shortname is right" );
-}
+			isa_ok( $plist, $array_type );
+			is(     $plist->type, $array_shortname, "Item is an $array_shortname type" );
+			isa_ok( $plist->value, $array_type );
 
-########################################################################
-{
-my $plist = &{$parse_fqname}( $dict );
-isa_ok( $plist, $dict_type );
-is( $plist->type, $dict_shortname, "item is a $dict_shortname type" );
-isa_ok( $plist->value, $dict_type );
+			my @elements = @{ $plist->value };
+			isa_ok( $elements[0], $string_type );
+			isa_ok( $elements[1], $string_type );
+			is( $elements[0]->value, 'Mimi',   "Mimi $string_shortname is right"  );
+			is( $elements[1]->value, 'Roscoe', "Roscoe $string_shortname is right" );
+			};
 
-my $hash = $plist->value;
-ok( exists $hash->{Mimi}, 'Mimi key exists for dict' );
-isa_ok( $hash->{Mimi}, $string_type );
-is( $hash->{Mimi}->value, 'Roscoe', 'Mimi string has right value' );
-}
+		subtest 'dict' => sub {
+			my $plist = $method_ref->( sprintf $template, $dict );
+			isa_ok( $plist, $dict_type );
+			is( $plist->type, $dict_shortname, "item is a $dict_shortname type" );
+			isa_ok( $plist->value, $dict_type );
 
-########################################################################
-foreach my $string ( ( $string0_9, $string1_0 ) ) {
-	my $plist = &{$parse_fqname}( $string );
+			my $hash = $plist->value;
+			ok( exists $hash->{Mimi}, 'Mimi key exists for dict' );
+			isa_ok( $hash->{Mimi}, $string_type );
+			is( $hash->{Mimi}->value, 'Roscoe', 'Mimi string has right value' );
+			};
 
-	isa_ok( $plist, $string_type );
-	is( $plist->type, $string_shortname, 'type key has right value for string' );
-	is( $plist->value, 'This is it', 'value is right for string' );
+		subtest 'strings' => sub {
+			foreach my $string ( $string0_9, $string1_0 ) {
+				my $plist = $method_ref->( sprintf $template, $string );
+
+				isa_ok( $plist, $string_type );
+				is( $plist->type, $string_shortname, 'type key has right value for string' );
+				is( $plist->value, 'This is it', 'value is right for string' );
+				}
+			};
+
+		subtest 'nested dict' => sub {
+			my $plist = $method_ref->( sprintf $template, $nested_dict );
+
+			isa_ok( $plist, $dict_type );
+			is( $plist->type, $dict_shortname, 'type key has right value for nested dict' );
+			isa_ok( $plist->value, 'HASH' );
+
+			my $hash = $plist->value->{Mimi};
+
+			isa_ok( $plist, $dict_type );
+			is( $plist->type, $dict_shortname, "item is a $dict_shortname type" );
+			isa_ok( $plist->value, $dict_type );
+			is( $hash->value->{Roscoe}->value, 1, 'Roscoe string has right value'   );
+			is( $hash->value->{Boolean}->value, 'true', 'Boolean string has right value'  );
+			};
+
+		subtest 'empty string' => sub {
+			my $plist = $method_ref->( sprintf $template, $empty_string );
+
+			isa_ok( $plist, $string_type );
+			is( $plist->type, $string_shortname, 'type key has right value for string' );
+			is( $plist->value, '', 'value is right for string' );
+			};
+		};
 	}
-
-$plist = &{$parse_fqname}( $nested_dict );
-
-isa_ok( $plist, $dict_type );
-is( $plist->type, $dict_shortname, 'type key has right value for nested dict' );
-isa_ok( $plist->value, 'HASH' );
-
-########################################################################
-my $hash = $plist->value->{Mimi};
-
-isa_ok( $plist, $dict_type );
-is( $plist->type, $dict_shortname, "item is a $dict_shortname type" );
-isa_ok( $plist->value, $dict_type );
-is( $hash->value->{Roscoe}->value, 1, 'Roscoe string has right value'   );
-is( $hash->value->{Boolean}->value, 'true', 'Boolean string has right value'  );
-
-########################################################################
-
-$plist = &{$parse_fqname}( $empty_string );
-
-isa_ok( $plist, $string_type );
-is( $plist->type, $string_shortname, 'type key has right value for string' );
-is( $plist->value, '', 'value is right for string' );
 
 done_testing();

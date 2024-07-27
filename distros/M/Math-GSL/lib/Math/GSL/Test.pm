@@ -42,6 +42,41 @@ sub _dump_result($)
     diag sprintf( "result->val: %.18g\n", $r->{val});
 }
 
+sub dump_lu_matrix
+{
+    # Syntax: dump_lu_matrix($base->raw, $permutation, 4, 4);
+
+    my ($base, $perm, $m, $n) = @_;
+    # Dump the upper triangular matrix first:
+    my $U = "U = [";
+    for my $i (0..$m-1) {
+        for my $j (0..$n-1) {
+            if ($j >= $i) {
+                $U .= sprintf "%g ", $base->[$i*$n + $j];
+            } else {
+                $U .= "0 ";
+            }
+        }
+        $U .= "\n";
+    }
+    diag $U . "]\n";
+    # Now dump the lower triangular matrix:
+    my $L = "L = [";
+    for my $i (0..$m-1) {
+        for my $j (0..$n-1) {
+            if ($j < $i) {
+                $L .= sprintf "%g ", $base->[$i*$n + $j];
+            } elsif ($j == $i) {
+                $L .= "1 ";
+            } else {
+                $L .= "0 ";
+            }
+        }
+        $L .= "\n";
+    }
+    diag $L . "]\n";
+}
+
 =head2 is_windows()
 
 Returns true if current system is Windows-like.

@@ -4,7 +4,7 @@
       "perlancar <perlancar@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.030, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.031, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -35,12 +35,13 @@
       },
       "runtime" : {
          "requires" : {
+            "Exporter" : "5.57",
             "Fcntl" : "0",
             "List::Util" : "1.54",
             "Log::ger" : "0.038",
             "Perinci::Object" : "0.311",
             "Perinci::Sub::Property::arg::cmdline" : "0",
-            "Perinci::Sub::Util" : "0.471",
+            "Perinci::Sub::Util" : "0.472",
             "Scalar::Util" : "0",
             "Scalar::Util::Numeric" : "0",
             "perl" : "5.010001",
@@ -61,91 +62,95 @@
    "provides" : {
       "Perinci::Examples" : {
          "file" : "lib/Perinci/Examples.pm",
-         "version" : "0.824"
+         "version" : "0.825"
       },
       "Perinci::Examples::ArgsAs" : {
          "file" : "lib/Perinci/Examples/ArgsAs.pm",
-         "version" : "0.824"
+         "version" : "0.825"
       },
       "Perinci::Examples::CLI" : {
          "file" : "lib/Perinci/Examples/CLI.pm",
-         "version" : "0.824"
+         "version" : "0.825"
       },
       "Perinci::Examples::CSV" : {
          "file" : "lib/Perinci/Examples/CSV.pm",
-         "version" : "0.824"
+         "version" : "0.825"
       },
       "Perinci::Examples::CmdLineResMeta" : {
          "file" : "lib/Perinci/Examples/CmdLineResMeta.pm",
-         "version" : "0.824"
+         "version" : "0.825"
       },
       "Perinci::Examples::CmdLineSrc" : {
          "file" : "lib/Perinci/Examples/CmdLineSrc.pm",
-         "version" : "0.824"
+         "version" : "0.825"
       },
       "Perinci::Examples::Coercion" : {
          "file" : "lib/Perinci/Examples/Coercion.pm",
-         "version" : "0.824"
+         "version" : "0.825"
       },
       "Perinci::Examples::Completion" : {
          "file" : "lib/Perinci/Examples/Completion.pm",
-         "version" : "0.824"
+         "version" : "0.825"
       },
       "Perinci::Examples::FilePartial" : {
          "file" : "lib/Perinci/Examples/FilePartial.pm",
-         "version" : "0.824"
+         "version" : "0.825"
       },
       "Perinci::Examples::FileStream" : {
          "file" : "lib/Perinci/Examples/FileStream.pm",
-         "version" : "0.824"
+         "version" : "0.825"
       },
       "Perinci::Examples::NoMeta" : {
          "file" : "lib/Perinci/Examples/NoMeta.pm",
-         "version" : "0.824"
+         "version" : "0.825"
       },
       "Perinci::Examples::ResultNaked" : {
          "file" : "lib/Perinci/Examples/ResultNaked.pm",
-         "version" : "0.824"
+         "version" : "0.825"
+      },
+      "Perinci::Examples::RiapSub" : {
+         "file" : "lib/Perinci/Examples/RiapSub.pm",
+         "version" : "0.825"
       },
       "Perinci::Examples::Stream" : {
          "file" : "lib/Perinci/Examples/Stream.pm",
-         "version" : "0.824"
+         "version" : "0.825"
       },
       "Perinci::Examples::SubMeta" : {
          "file" : "lib/Perinci/Examples/SubMeta.pm",
-         "version" : "0.824"
+         "version" : "0.825"
       },
       "Perinci::Examples::Table" : {
          "file" : "lib/Perinci/Examples/Table.pm",
-         "version" : "0.824"
+         "version" : "0.825"
       },
       "Perinci::Examples::Tiny" : {
          "file" : "lib/Perinci/Examples/Tiny.pm",
-         "version" : "0.824"
+         "version" : "0.825"
       },
       "Perinci::Examples::Tiny::Args" : {
          "file" : "lib/Perinci/Examples/Tiny/Args.pm",
-         "version" : "0.824"
+         "version" : "0.825"
       },
       "Perinci::Examples::Tiny::Result" : {
          "file" : "lib/Perinci/Examples/Tiny/Result.pm",
-         "version" : "0.824"
+         "version" : "0.825"
       },
       "Perinci::Examples::Tx" : {
          "file" : "lib/Perinci/Examples/Tx.pm",
-         "version" : "0.824"
+         "version" : "0.825"
       },
       "Perinci::Examples::Version" : {
          "file" : "lib/Perinci/Examples/Version.pm",
-         "version" : "0.824"
+         "version" : "0.825"
       },
       "Perinci::Examples::rimetadb::ExcludedPackage" : {
          "file" : "lib/Perinci/Examples/rimetadb/ExcludedPackage.pm",
-         "version" : "0.824"
+         "version" : "0.825"
       },
       "Perinci::Examples::rimetadb::IncludedPackage" : {
          "file" : "lib/Perinci/Examples/rimetadb/IncludedPackage.pm",
-         "version" : "0.824"
+         "version" : "0.825"
       }
    },
    "release_status" : "stable",
@@ -160,10 +165,10 @@
          "web" : "https://github.com/perlancar/perl-Perinci-Examples"
       }
    },
-   "version" : "0.824",
+   "version" : "0.825",
    "x_Dist_Zilla" : {
       "perl" : {
-         "version" : "5.038000"
+         "version" : "5.038002"
       },
       "plugins" : [
          {
@@ -185,52 +190,52 @@
                }
             },
             "name" : "@Author::PERLANCAR/@Filter/GatherDir",
-            "version" : "6.030"
+            "version" : "6.031"
          },
          {
             "class" : "Dist::Zilla::Plugin::PruneCruft",
             "name" : "@Author::PERLANCAR/@Filter/PruneCruft",
-            "version" : "6.030"
+            "version" : "6.031"
          },
          {
             "class" : "Dist::Zilla::Plugin::ManifestSkip",
             "name" : "@Author::PERLANCAR/@Filter/ManifestSkip",
-            "version" : "6.030"
+            "version" : "6.031"
          },
          {
             "class" : "Dist::Zilla::Plugin::MetaYAML",
             "name" : "@Author::PERLANCAR/@Filter/MetaYAML",
-            "version" : "6.030"
+            "version" : "6.031"
          },
          {
             "class" : "Dist::Zilla::Plugin::License",
             "name" : "@Author::PERLANCAR/@Filter/License",
-            "version" : "6.030"
+            "version" : "6.031"
          },
          {
             "class" : "Dist::Zilla::Plugin::PodCoverageTests",
             "name" : "@Author::PERLANCAR/@Filter/PodCoverageTests",
-            "version" : "6.030"
+            "version" : "6.031"
          },
          {
             "class" : "Dist::Zilla::Plugin::PodSyntaxTests",
             "name" : "@Author::PERLANCAR/@Filter/PodSyntaxTests",
-            "version" : "6.030"
+            "version" : "6.031"
          },
          {
             "class" : "Dist::Zilla::Plugin::ExtraTests",
             "name" : "@Author::PERLANCAR/@Filter/ExtraTests",
-            "version" : "6.030"
+            "version" : "6.031"
          },
          {
             "class" : "Dist::Zilla::Plugin::ExecDir",
             "name" : "@Author::PERLANCAR/@Filter/ExecDir",
-            "version" : "6.030"
+            "version" : "6.031"
          },
          {
             "class" : "Dist::Zilla::Plugin::ShareDir",
             "name" : "@Author::PERLANCAR/@Filter/ShareDir",
-            "version" : "6.030"
+            "version" : "6.031"
          },
          {
             "class" : "Dist::Zilla::Plugin::MakeMaker",
@@ -240,27 +245,27 @@
                }
             },
             "name" : "@Author::PERLANCAR/@Filter/MakeMaker",
-            "version" : "6.030"
+            "version" : "6.031"
          },
          {
             "class" : "Dist::Zilla::Plugin::Manifest",
             "name" : "@Author::PERLANCAR/@Filter/Manifest",
-            "version" : "6.030"
+            "version" : "6.031"
          },
          {
             "class" : "Dist::Zilla::Plugin::ConfirmRelease",
             "name" : "@Author::PERLANCAR/@Filter/ConfirmRelease",
-            "version" : "6.030"
+            "version" : "6.031"
          },
          {
             "class" : "Dist::Zilla::Plugin::ExecDir",
             "name" : "@Author::PERLANCAR/ExecDir script",
-            "version" : "6.030"
+            "version" : "6.031"
          },
          {
             "class" : "Dist::Zilla::Plugin::PERLANCAR::BeforeBuild",
             "name" : "@Author::PERLANCAR/PERLANCAR::BeforeBuild",
-            "version" : "0.608"
+            "version" : "0.610"
          },
          {
             "class" : "Dist::Zilla::Plugin::Rinci::AbstractFromMeta",
@@ -336,17 +341,17 @@
          {
             "class" : "Dist::Zilla::Plugin::IfBuilt",
             "name" : "@Author::PERLANCAR/IfBuilt",
-            "version" : "0.03"
+            "version" : "0.02"
          },
          {
             "class" : "Dist::Zilla::Plugin::MetaJSON",
             "name" : "@Author::PERLANCAR/MetaJSON",
-            "version" : "6.030"
+            "version" : "6.031"
          },
          {
             "class" : "Dist::Zilla::Plugin::MetaConfig",
             "name" : "@Author::PERLANCAR/MetaConfig",
-            "version" : "6.030"
+            "version" : "6.031"
          },
          {
             "class" : "Dist::Zilla::Plugin::MetaProvides::Package",
@@ -356,7 +361,7 @@
                      {
                         "class" : "Dist::Zilla::Plugin::FinderCode",
                         "name" : "@Author::PERLANCAR/MetaProvides::Package/AUTOVIV/:InstallModulesPM",
-                        "version" : "6.030"
+                        "version" : "6.031"
                      }
                   ],
                   "include_underscores" : 0
@@ -527,7 +532,7 @@
                      {
                         "class" : "Pod::Weaver::Plugin::AppendPrepend",
                         "name" : "@Author::PERLANCAR/AppendPrepend",
-                        "version" : "0.01"
+                        "version" : "0.021"
                      },
                      {
                         "class" : "Pod::Weaver::Plugin::EnsureUniqueSections",
@@ -553,7 +558,7 @@
          {
             "class" : "Dist::Zilla::Plugin::PruneFiles",
             "name" : "@Author::PERLANCAR/PruneFiles",
-            "version" : "6.030"
+            "version" : "6.031"
          },
          {
             "class" : "Dist::Zilla::Plugin::Pod2Readme",
@@ -641,7 +646,7 @@
          {
             "class" : "Dist::Zilla::Plugin::Acme::CPANModules::Blacklist",
             "name" : "@Author::PERLANCAR/Acme::CPANModules::Blacklist",
-            "version" : "0.001"
+            "version" : "0.002"
          },
          {
             "class" : "Dist::Zilla::Plugin::Prereqs::EnsureVersion",
@@ -667,7 +672,7 @@
                }
             },
             "name" : "TestRequires",
-            "version" : "6.030"
+            "version" : "6.031"
          },
          {
             "class" : "Dist::Zilla::Plugin::Prereqs",
@@ -678,7 +683,7 @@
                }
             },
             "name" : "Prereqs",
-            "version" : "6.030"
+            "version" : "6.031"
          },
          {
             "class" : "Dist::Zilla::Plugin::Prereqs",
@@ -689,62 +694,62 @@
                }
             },
             "name" : "DevelopX_spec",
-            "version" : "6.030"
+            "version" : "6.031"
          },
          {
             "class" : "Dist::Zilla::Plugin::FinderCode",
             "name" : ":InstallModules",
-            "version" : "6.030"
+            "version" : "6.031"
          },
          {
             "class" : "Dist::Zilla::Plugin::FinderCode",
             "name" : ":IncModules",
-            "version" : "6.030"
+            "version" : "6.031"
          },
          {
             "class" : "Dist::Zilla::Plugin::FinderCode",
             "name" : ":TestFiles",
-            "version" : "6.030"
+            "version" : "6.031"
          },
          {
             "class" : "Dist::Zilla::Plugin::FinderCode",
             "name" : ":ExtraTestFiles",
-            "version" : "6.030"
+            "version" : "6.031"
          },
          {
             "class" : "Dist::Zilla::Plugin::FinderCode",
             "name" : ":ExecFiles",
-            "version" : "6.030"
+            "version" : "6.031"
          },
          {
             "class" : "Dist::Zilla::Plugin::FinderCode",
             "name" : ":PerlExecFiles",
-            "version" : "6.030"
+            "version" : "6.031"
          },
          {
             "class" : "Dist::Zilla::Plugin::FinderCode",
             "name" : ":ShareFiles",
-            "version" : "6.030"
+            "version" : "6.031"
          },
          {
             "class" : "Dist::Zilla::Plugin::FinderCode",
             "name" : ":MainModule",
-            "version" : "6.030"
+            "version" : "6.031"
          },
          {
             "class" : "Dist::Zilla::Plugin::FinderCode",
             "name" : ":AllFiles",
-            "version" : "6.030"
+            "version" : "6.031"
          },
          {
             "class" : "Dist::Zilla::Plugin::FinderCode",
             "name" : ":NoFiles",
-            "version" : "6.030"
+            "version" : "6.031"
          },
          {
             "class" : "Dist::Zilla::Plugin::FinderCode",
             "name" : "@Author::PERLANCAR/MetaProvides::Package/AUTOVIV/:InstallModulesPM",
-            "version" : "6.030"
+            "version" : "6.031"
          }
       ],
       "zilla" : {
@@ -752,15 +757,15 @@
          "config" : {
             "is_trial" : 0
          },
-         "version" : "6.030"
+         "version" : "6.031"
       }
    },
    "x_authority" : "cpan:PERLANCAR",
    "x_contributors" : [
       "Steven Haryanto <stevenharyanto@gmail.com>"
    ],
-   "x_generated_by_perl" : "v5.38.0",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.36",
+   "x_generated_by_perl" : "v5.38.2",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.37",
    "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later",
    "x_static_install" : 1
 }

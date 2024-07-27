@@ -475,8 +475,8 @@ print STDERR "---LATEST SONG ID=$url2fetch= IMGURL=".$self->{'artimageurl'}."=\n
 				my %globalArgs = ('-noiframes' => 1, '-fast' => 1, '-format' => 'any',
 						-debug => $DEBUG
 				);
-				foreach my $arg (qw(secure log logfmt youtube-format youtube-formatonly
-						youtube-dl-args youtube-dl-add-args)) {
+				foreach my $arg (qw(secure log logfmt youtube-format youtube-format-fallback
+						youtube-formatonly youtube-dl-args youtube-dl-add-args)) {
 					(my $arg0 = $arg) =~ s/^youtube\-(?!dl)//o;
 					$globalArgs{$arg0} = $self->{$arg}  if (defined $self->{$arg});
 				}

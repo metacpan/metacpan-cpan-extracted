@@ -1,5 +1,17 @@
 Revision history for App-sdview-Output-Tickit
 
+0.09    2024-07-26
+        [CHANGES]
+         * Less jumpy scrolling when moving between search matches
+         * Keybindings '<' and '>' as synonyms for Home and End
+         * Keybindings '[' and ']' to jump between headings
+
+        [BUGFIXES]
+         * Ensure formatting applies to fixed-width paragraphs, so syntax
+           highlight works correctly
+         * When searching and highlighting matches, remember to include
+           paragraph leader text
+
 0.08    2024-07-24
         [CHANGES]
          * Support formatting in list item term paragraph

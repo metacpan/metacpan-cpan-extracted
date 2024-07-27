@@ -124,6 +124,7 @@ such as yt-dlp.
 [, I<-secure> [ => 0|1 ]] 
 [, I<-fast> [ => 0|1 ]] 
 [, I<-format> => "youtube-dl format specification" ] 
+[, I<-format-fallback> => "youtube-dl format specification (2nd try)" ] 
 [, I<-formatonly> [ => 0|1 ]] [, I<-noiframes> [ => 0|1 ]] 
 [, I<-youtubeonly> [ => 0|1 ]] 
 [, I<-user-agent> => "user-agent string"] 
@@ -152,13 +153,20 @@ If I<-format> is specified, it should be a valid "I<youtube-dl -f>" format
 string (see the youtube-dl manpage for details).  Examples:  
 "I<mp4[height<=720]/best[height<=720]>" which limits videos to 720p, or 
 "bestaudio" to download only audio streams.
-Default is "I<mp4>", but if no streams are found, it then tries all, 
+Default is "B<best>", but if no streams are found, it then tries all, 
 unless I<-formatonly> is specified.
 
+If I<-format-fallback> is specified, it should be a valid "I<youtube-dl -f>" format 
+string (see the youtube-dl manpage for details), and will be used if no 
+streams matching the I<-format> are found.  Default is "B<bestaudio>".
+
 If I<-formatonly> is specified (set to 1 (true)), then if no streams match 
-the specified I<-format> argument (default "I<mp4>"), then no streams will 
-be returned.  Otherwise, youtube-dl is called again with no format (I<-f>) 
-argument.  Default is 0 (false / unset).
+the specified I<-format> argument (default "I<best>"), then if 
+I<-format-fallback> is specified, that will be tried, otherwise, no streams 
+will be returned.  Otherwise (if I<-formatonly> is unspecified or false, 
+youtube-dl is called again with either the -F I<-format-fallback> 
+(if specified) or else, no format (I<-f>) argument (match any stream we 
+can find).  Default is 0 (false / unset).
 
 If I<-formats_by_url> is specified, it should be a valid hash-ref. of url 
 patterns to match (keys) and valid "I<youtube-dl -f>" format strings.  
@@ -472,6 +480,8 @@ use parent 'StreamFinder::_Class';
 
 my $DEBUG = 0;
 my $DEFAULTYTSITE = 'https://www.youtube.com';
+my $DEFAULTFMT = 'best';
+my $DEFAULTFALLBACK = 'bestaudio';
 
 sub new
 {
@@ -519,6 +529,9 @@ sub new
 		} elsif ($_[0] =~ /^\-?format$/o) {
 			shift;
 			$self->{'format'} = shift  if (defined $_[0]);
+		} elsif ($_[0] =~ /^\-?format\-fallback$/o) {
+			shift;
+			$self->{'format-fallback'} = shift  if (defined $_[0]);
 		} elsif ($_[0] =~ /^\-?user-agent$/o) {
 			shift;
 			$self->{'user-agent'} = shift  if (defined $_[0]);
@@ -555,7 +568,7 @@ sub new
 		$self->{'id'} = $url;
 		$url2fetch = $self->{'youtube-site'} . '/watch?v=' . $url;
 	}
-	print STDERR "-1 (isYT=".$self->{'_isaYtPage'}.") FETCHING URL=$url2fetch= VIA youtube-dl: ID=".$self->{'id'}."=\n"  if ($DEBUG);
+	print STDERR "-1 (isYT=$$self{'_isaYtPage'}) FETCHING URL=$url2fetch= VIA $$self{'youtube-dl'}: ID=$$self{'id'}=\n"  if ($DEBUG);
 	$self->{'genre'} = 'Video';
 	$self->{'albumartist'} = $url2fetch;
 
@@ -661,7 +674,9 @@ DO_YTDL:
 			$self->{'format'} = $formats_by_url{$i}  if ($url =~ m#$i#i);
 		}
 	}
-	my $ytformat = (defined $self->{'format'}) ? $self->{'format'} : 'mp4';
+	$self->{'format-fallback'} = $DEFAULTFALLBACK
+		if  (!defined($self->{'format-fallback'}) && $self->{'formatonly'});
+	my $ytformat = (defined $self->{'format'}) ? $self->{'format'} : $DEFAULTFMT;
 	my $ua = (defined $self->{'user-agent'}) ? (' --user-agent "'.$self->{'user-agent'}.'"') : '';
 	my $ytdlArgs = $self->{'youtube-dl-args'};
 	$ytdlArgs .= $self->{'youtube-dl-add-args'}  if (defined $self->{'youtube-dl-add-args'});
@@ -681,12 +696,16 @@ RETRYIT:
 	} else {
 		$cmd = $self->{'youtube-dl'} . " $ytdlArgs " . '"' . $url2fetch . '"';
 	}
-	print STDERR "--TRY($try of 1): youtube-dl: ARGS=$ytdlArgs= FMT=$ytformat= YT COMMAND==>$cmd<==\n"  if ($DEBUG);
+	print STDERR "--TRY($try of 1): youtube-dl: ARGS=$ytdlArgs= FMT=$ytformat=\nYT COMMAND==>$cmd<==\n"  if ($DEBUG);
 	$_ = `$cmd`;
 	print STDERR "--YT RETURNED DATA===>$_<===\n"  if ($DEBUG);
 	@ytdldata = split /\r?\n/s;
 	unless ($try || scalar(@ytdldata) > 0) {  #IF NOTHING FOUND, RETRY WITHOUT THE SPECIFIC FILE-FORMAT:
 		$try++;
+		if (defined $self->{'format-fallback'}) {
+			print STDERR "..1:No ($ytformat) streams found, try again with ($$self{'formatonly'})...\n"  if ($DEBUG);
+			goto RETRYIT  if ($ytdlArgs =~ s/\-f\s+\"[^\"]+\"/\-f \"$$self{'format-fallback'}\"/);
+		}
 		unless ($self->{'formatonly'}) {
 			print STDERR "..1:No ($ytformat) streams found, try again for any (audio, etc.)...\n"  if ($DEBUG);
 			goto RETRYIT  if ($ytdlArgs =~ s/\-f\s+\"[^\"]+\"//);
@@ -729,6 +748,10 @@ RETRYIT:
 	print STDERR "-STREAM COUNT=".$self->{'cnt'}."= FMTS=".join('|',@fmtsfound)."= ICON=".$self->{'iconurl'}."=\n"  if ($DEBUG);
 	unless ($try || $self->{'cnt'} > 0) {  #IF NO STREAMS FOUND, RETRY WITHOUT THE SPECIFIC FILE-FORMAT:
 		$try++;
+		if (defined $self->{'format-fallback'}) {
+			print STDERR "..1:No ($ytformat) streams found, try again with ($$self{'formatonly'})...\n"  if ($DEBUG);
+			goto RETRYIT  if ($ytdlArgs =~ s/\-f\s+\"[^\"]+\"/\-f \"$$self{'format-fallback'}\"/);
+		}
 		unless (defined($self->{'formatonly'}) && $self->{'formatonly'}) {
 			print STDERR "..2:No ($ytformat) streams found, try again for any (audio, etc.)...\n"  if ($DEBUG);
 			goto RETRYIT  if ($ytdlArgs =~ s/\-f\s+\"[^\"]+\"//);
