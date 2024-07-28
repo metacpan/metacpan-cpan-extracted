@@ -1,12 +1,12 @@
 package Bitcoin::Crypto::Transaction;
-$Bitcoin::Crypto::Transaction::VERSION = '2.005';
+$Bitcoin::Crypto::Transaction::VERSION = '2.006';
 use v5.10;
 use strict;
 use warnings;
 
 use Moo;
 use Mooish::AttributeBuilder -standard;
-use Type::Params -sigs;
+use Types::Common -sigs, -types;
 use Scalar::Util qw(blessed);
 use Carp qw(carp);
 use List::Util qw(sum any);
@@ -18,8 +18,7 @@ use Bitcoin::Crypto::Transaction::Input;
 use Bitcoin::Crypto::Transaction::Output;
 use Bitcoin::Crypto::Transaction::Digest;
 use Bitcoin::Crypto::Util qw(pack_compactsize unpack_compactsize hash256 to_format);
-use Bitcoin::Crypto::Types
-	qw(IntMaxBits ArrayRef InstanceOf HashRef Object ByteStr Str PositiveInt PositiveOrZeroInt Enum BitcoinScript Bool Maybe);
+use Bitcoin::Crypto::Types -types;
 use Bitcoin::Crypto::Script::Common;
 
 use namespace::clean;

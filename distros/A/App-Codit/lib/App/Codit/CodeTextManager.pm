@@ -10,7 +10,7 @@ use strict;
 use warnings;
 use Carp;
 use vars qw($VERSION);
-$VERSION="0.08";
+$VERSION="0.09";
 use Tk;
 require Tk::CodeText;
 
@@ -28,7 +28,7 @@ sub Populate {
 		-height => 8,
 		-logcall => ['log', $ext],
 		-modifiedcall => ['Modified', $self],
-		-saveimage => $self->Extension->getArt('document-save', 16),
+		-saveimage => $ext->getArt('document-save', 16),
 		-scrollbars => 'osoe',
 		-width => 8,
 	)->pack(-expand => 1, -fill => 'both');
@@ -39,6 +39,11 @@ sub Populate {
 	$self->ConfigSpecs(
 		-contentautoindent => [{-autoindent => $xt}],
 		-contentbackground => [{-background => $xt}],
+		-contentbgdspace => ['PASSIVE', undef, undef, '#E600A8'],
+		-contentbgdtab => ['PASSIVE', undef, undef, '#B5C200'],
+		-contentinsertbg => ['PASSIVE', undef, undef, '#000000'],
+		-contentmatchbg => ['PASSIVE', undef, undef, '#0000FF'],
+		-contentmatchfg => ['PASSIVE', undef, undef, '#FFFF00'],
 		-contentforeground => [{-foreground => $xt}],
 		-contentfont => [{-font => $xt}],
 		-contentindent => [{-indentstyle => $xt}],
@@ -46,7 +51,6 @@ sub Populate {
 		-contentsyntax => [{-syntax => $text}],
 		-contenttabs => [{-tabs => $xt}],
 		-contentwrap => [{-wrap => $xt}],
-#		-contentxml => [{-xmlfolder => $text}],
 		-showfolds => [$text],
 		-shownumbers => [$text],
 		-showstatus => [$text],
@@ -56,30 +60,59 @@ sub Populate {
 	$self->Delegates(
 		DEFAULT => $text,
 	);
+	$self->after(10, ['configureTags', $self]);
 }
 
-# sub ConfigureCM {
-# 	my $self = shift;
-# 	my $ext = $self->Extension;
-# 	my $cmopt = $ext->configGet('-contentmanageroptions');
-# 	
-# 	my @o = @$cmopt; #Hack preventing from the original being modified. No idea why this is needed.
-# 	for (@o) {
-# 		my $key = $_;
-# # 		print "option $key\n";
-# 		my $val = $ext->configGet($key);
-# 		if ((defined $val) and ($val ne '')) {
-# # 			print "configuring $key with value $val\n";
-# 			$self->configure($key, $val) ;
-# 		}
-# 	}
-# }
-
+#sub ConfigureCM {
+#	my $self = shift;
+#	my $ext = $self->Extension;
+#	my $cmopt = $ext->configGet('-contentmanageroptions');
+#	
+#	my @matchoptions = ();
+#	my @o = @$cmopt; #Hack preventing from the original being modified. No idea why this is needed.
+#	for (@o) {
+#		my $key = $_;
+#		my $val = $ext->configGet($key);
+#		if ((defined $val) and ($val ne '')) {
+#			if ($key =~ /^\-contentmatch/) {
+#				push @matchoptions, $key, $val
+#			} else {
+#				$self->configure($key, $val);
+#			}
+#		}
+#	}
+#	$self->CWidg->configure('-matchoptions', \@matchoptions) if @matchoptions;
+#}
 
 sub Close {
 	my $self = shift;
 	$self->doClear;
 	return 1;
+}
+
+sub configureTags {
+	my $self = shift;
+	my $widg = $self->CWidg;
+
+	#configuring space and tabs indicators
+	for ('dtab', 'dspace') {
+		my $bgopt = $self->cget("-contentbg$_");
+		$widg->tagConfigure($_,
+			-background => $bgopt,
+		);
+	}
+
+	#configuring the match options
+	my @matchoptions = ();
+	my $bg = $self->cget('-contentmatchbg');
+	push @matchoptions, '-background', $bg if defined $bg;
+	my $fg = $self->cget('-contentmatchfg');
+	push @matchoptions, '-foreground', $fg if defined $fg;
+	$widg->configure('-matchoptions', \@matchoptions) if @matchoptions;
+	
+	#configuring insert background
+	my $ib = $self->cget('-contentinsertbg');
+	$widg->configure('-insertbackground', $ib) if defined $ib;
 }
 
 sub doClear {

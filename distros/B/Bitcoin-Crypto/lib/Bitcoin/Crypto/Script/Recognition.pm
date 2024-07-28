@@ -1,12 +1,12 @@
 package Bitcoin::Crypto::Script::Recognition;
-$Bitcoin::Crypto::Script::Recognition::VERSION = '2.005';
+$Bitcoin::Crypto::Script::Recognition::VERSION = '2.006';
 use v5.10;
 use strict;
 use warnings;
 
 use Moo;
 use Mooish::AttributeBuilder -standard;
-use Bitcoin::Crypto::Types qw(InstanceOf);
+use Types::Common -types;
 use List::Util qw(any);
 use Try::Tiny;
 

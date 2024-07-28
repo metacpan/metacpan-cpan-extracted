@@ -17,6 +17,8 @@ sub run {
         eval { shift->() };
     }
 
+    $out .= $@ if $@;
+
     $out;
 }
 
@@ -148,6 +150,81 @@ is_deeply
   [ 1, 2, 3 ],
   "c - uniq";
 
+# Set - Unique.
+is
+  run( sub { print set( 2, 4, 6, 4 ) } ),
+  "(2 4 6)",
+  "set unique";
+
+# Clear a new universe to not interfere with above.
+Set::Scalar::Universe->new->enter;
+
+# Set Object.
+my $a = set( qw( a b c d e ) );
+my $b = set( qw( c d e f g ) );
+my $c = set( qw( e f g h i ) );
+
+# Set - Union.
+is
+  run( sub { print $a + $b } ),
+  "(a b c d e f g)",
+  "set union: a + b";
+is
+  run( sub { print $a + $b + $c } ),
+  "(a b c d e f g h i)",
+  "set union: a + b + c";
+
+# Set - Intersection.
+is
+  run( sub { print $a * $b } ),
+  "(c d e)",
+  "set intersection: a * b";
+is
+  run( sub { print $a * $b * $c } ),
+  "(e)",
+  "set intersection: a * b * c";
+
+# Set - Difference.
+is
+  run( sub { print $a - $b } ),
+  "(a b)",
+  "set difference: a - b";
+is
+  run( sub { print $a - $b - $c } ),
+  "(a b)",
+  "set difference: a - b - c";
+
+# Set - Symmetric Difference.
+is
+  run( sub { print $a % $b } ),
+  "(a b f g)",
+  "set symmetric difference: a % b";
+is
+  run( sub { print $a % $b % $c } ),
+  "(a b e h i)",
+  "set symmetric difference: a % b % c";
+
+# Set - Unique.
+is
+  run( sub { print $a / $b } ),
+  "(a b f g)",
+  "set unique: a / b";
+is
+  run( sub { print $a / $b / $c } ),
+  "(a b e h i)",
+  "set unique: a / b / c";
+
+# Set - Complement.
+is
+  run( sub { print -$a } ),
+  "(f g h i)",
+  "set complement: -a";
+is
+  run( sub { print -$b } ),
+  "(a b h i)",
+  "set complement: -b";
+
+
 ######################################
 #         Files Convenience
 ######################################
@@ -161,6 +238,22 @@ is
 ######################################
 #             Output
 ######################################
+
+# Say
+is
+  run( sub { say 11 } ),
+  "11\n",
+  "say - scalar";
+
+is
+  run( sub { say 11, 22 } ),
+  "1122\n",
+  "say - array";
+
+is
+  run( sub { say for 1, 2, 3 } ),
+  "1\n2\n3\n",
+  "say - void (default var)";
 
 # Table
 {

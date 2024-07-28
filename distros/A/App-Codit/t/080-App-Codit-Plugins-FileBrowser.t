@@ -4,14 +4,16 @@ use warnings;
 use Tk;
 
 use Test::Tk;
-use Test::More tests => 5;
+use Test::More tests => 6;
 use File::Spec;
 use Config;
 my $mswin = $Config{'osname'} eq 'MSWin32';
 $mwclass = 'App::Codit';
 
-$quitdelay = 1000 if $mswin;
-$delay = 1500;
+$quitdelay = 1000;
+$quitdelay = 3000 if $mswin;
+$delay = 3000;
+$delay = 5000 if $mswin;
 
 BEGIN { use_ok('App::Codit::Plugins::FileBrowser') };
 
@@ -38,6 +40,10 @@ push @tests, (
 		return defined $b 
 #		return $pext->plugExists('FileBrowser') 
 	}, '', 'Plugin FileBrowser unloaded' ],
+	[ sub {
+		$pext->plugLoad('FileBrowser');
+		return $pext->plugExists('FileBrowser') 
+	}, 1, 'Plugin FileBrowser reloaded' ],
 );
 
 starttesting;

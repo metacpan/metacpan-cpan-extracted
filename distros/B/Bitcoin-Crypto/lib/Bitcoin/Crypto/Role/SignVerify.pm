@@ -1,12 +1,12 @@
 package Bitcoin::Crypto::Role::SignVerify;
-$Bitcoin::Crypto::Role::SignVerify::VERSION = '2.005';
+$Bitcoin::Crypto::Role::SignVerify::VERSION = '2.006';
 use v5.10;
 use strict;
 use warnings;
 use Mooish::AttributeBuilder -standard;
-use Type::Params -sigs;
+use Types::Common -sigs, -types;
 
-use Bitcoin::Crypto::Types qw(Object Str ByteStr InstanceOf HashRef);
+use Bitcoin::Crypto::Types -types;
 use Bitcoin::Crypto::Helpers qw(carp_once);    # load Math::BigInt
 use Crypt::Digest::SHA256 qw(sha256);
 use Bitcoin::Crypto::Transaction::Sign;

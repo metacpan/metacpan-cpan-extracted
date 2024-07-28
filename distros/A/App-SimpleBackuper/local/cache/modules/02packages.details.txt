@@ -1,0 +1,58 @@
+File:         02packages.details.txt
+URL:          http://www.perl.com/CPAN/modules/02packages.details.txt
+Description:  Package names found in cpanfile.snapshot
+Columns:      package name, version, path
+Intended-For: Automated fetch routines, namespace documentation.
+Written-By:   Carton v1.0.35
+Line-Count:   49
+Last-Updated: Sat Jul 27 12:50:50 2024
+
+Compress::Raw::Lzma               2.206  P/PM/PMQS/Compress-Raw-Lzma-2.206.tar.gz
+Const::Fast                       0.014  L/LE/LEONT/Const-Fast-0.014.tar.gz
+Crypt::OpenSSL::Guess              0.15  A/AK/AKIYM/Crypt-OpenSSL-Guess-0.15.tar.gz
+Crypt::OpenSSL::Random             0.15  R/RU/RURBAN/Crypt-OpenSSL-Random-0.15.tar.gz
+Crypt::OpenSSL::RSA                0.33  T/TO/TODDR/Crypt-OpenSSL-RSA-0.33.tar.gz
+Crypt::Rijndael                    1.16  L/LE/LEONT/Crypt-Rijndael-1.16.tar.gz
+ExtUtils::Config                  0.008  L/LE/LEONT/ExtUtils-Config-0.008.tar.gz
+ExtUtils::Helpers                 0.026  L/LE/LEONT/ExtUtils-Helpers-0.026.tar.gz
+ExtUtils::Helpers::Unix           0.026  L/LE/LEONT/ExtUtils-Helpers-0.026.tar.gz
+ExtUtils::Helpers::VMS            0.026  L/LE/LEONT/ExtUtils-Helpers-0.026.tar.gz
+ExtUtils::Helpers::Windows        0.026  L/LE/LEONT/ExtUtils-Helpers-0.026.tar.gz
+ExtUtils::InstallPaths            0.012  L/LE/LEONT/ExtUtils-InstallPaths-0.012.tar.gz
+Module::Build                    0.4234  L/LE/LEONT/Module-Build-0.4234.tar.gz
+Module::Build::Base              0.4234  L/LE/LEONT/Module-Build-0.4234.tar.gz
+Module::Build::Compat            0.4234  L/LE/LEONT/Module-Build-0.4234.tar.gz
+Module::Build::Config            0.4234  L/LE/LEONT/Module-Build-0.4234.tar.gz
+Module::Build::Cookbook          0.4234  L/LE/LEONT/Module-Build-0.4234.tar.gz
+Module::Build::Dumper            0.4234  L/LE/LEONT/Module-Build-0.4234.tar.gz
+Module::Build::Notes             0.4234  L/LE/LEONT/Module-Build-0.4234.tar.gz
+Module::Build::Platform::aix     0.4234  L/LE/LEONT/Module-Build-0.4234.tar.gz
+Module::Build::Platform::cygwin  0.4234  L/LE/LEONT/Module-Build-0.4234.tar.gz
+Module::Build::Platform::darwin  0.4234  L/LE/LEONT/Module-Build-0.4234.tar.gz
+Module::Build::Platform::Default 0.4234  L/LE/LEONT/Module-Build-0.4234.tar.gz
+Module::Build::Platform::MacOS   0.4234  L/LE/LEONT/Module-Build-0.4234.tar.gz
+Module::Build::Platform::os2     0.4234  L/LE/LEONT/Module-Build-0.4234.tar.gz
+Module::Build::Platform::Unix    0.4234  L/LE/LEONT/Module-Build-0.4234.tar.gz
+Module::Build::Platform::VMS     0.4234  L/LE/LEONT/Module-Build-0.4234.tar.gz
+Module::Build::Platform::VOS     0.4234  L/LE/LEONT/Module-Build-0.4234.tar.gz
+Module::Build::Platform::Windows 0.4234  L/LE/LEONT/Module-Build-0.4234.tar.gz
+Module::Build::PodParser         0.4234  L/LE/LEONT/Module-Build-0.4234.tar.gz
+Module::Build::PPMMaker          0.4234  L/LE/LEONT/Module-Build-0.4234.tar.gz
+Module::Build::Tiny               0.047  L/LE/LEONT/Module-Build-Tiny-0.047.tar.gz
+Net::SFTP::Foreign                 1.93  S/SA/SALVA/Net-SFTP-Foreign-1.93.tar.gz
+Net::SFTP::Foreign::Attributes  1.68_05  S/SA/SALVA/Net-SFTP-Foreign-1.93.tar.gz
+Net::SFTP::Foreign::Attributes::Compat 0.01  S/SA/SALVA/Net-SFTP-Foreign-1.93.tar.gz
+Net::SFTP::Foreign::Backend::Unix 1.88_02  S/SA/SALVA/Net-SFTP-Foreign-1.93.tar.gz
+Net::SFTP::Foreign::Backend::Windows 1.70_08  S/SA/SALVA/Net-SFTP-Foreign-1.93.tar.gz
+Net::SFTP::Foreign::Buffer      1.68_05  S/SA/SALVA/Net-SFTP-Foreign-1.93.tar.gz
+Net::SFTP::Foreign::Common      1.76_02  S/SA/SALVA/Net-SFTP-Foreign-1.93.tar.gz
+Net::SFTP::Foreign::Compat      1.70_05  S/SA/SALVA/Net-SFTP-Foreign-1.93.tar.gz
+Net::SFTP::Foreign::Constants   1.63_05  S/SA/SALVA/Net-SFTP-Foreign-1.93.tar.gz
+Net::SFTP::Foreign::DirHandle      1.93  S/SA/SALVA/Net-SFTP-Foreign-1.93.tar.gz
+Net::SFTP::Foreign::FileHandle     1.93  S/SA/SALVA/Net-SFTP-Foreign-1.93.tar.gz
+Net::SFTP::Foreign::Handle         1.93  S/SA/SALVA/Net-SFTP-Foreign-1.93.tar.gz
+Net::SFTP::Foreign::Helpers     1.74_06  S/SA/SALVA/Net-SFTP-Foreign-1.93.tar.gz
+Net::SFTP::Foreign::Local          1.57  S/SA/SALVA/Net-SFTP-Foreign-1.93.tar.gz
+Sub::Exporter::Progressive     0.001013  F/FR/FREW/Sub-Exporter-Progressive-0.001013.tar.gz
+Text::Glob                         0.11  R/RC/RCLAMP/Text-Glob-0.11.tar.gz
+Try::Tiny                          0.31  E/ET/ETHER/Try-Tiny-0.31.tar.gz

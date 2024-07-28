@@ -9,7 +9,7 @@ use Params::ValidationCompiler 0.13 qw( validation_for );
 use Specio::Declare;
 use Storable qw( dclone );
 
-our $VERSION = '1.42';
+our $VERSION = '1.43';
 
 my @FormatLengths;
 
@@ -200,7 +200,12 @@ sub prefers_24_hour_time {
     return $self->{prefers_24_hour_time}
         if exists $self->{prefers_24_hour_time};
 
-    $self->{prefers_24_hour_time} = $self->time_format_short =~ /h|K/ ? 0 : 1;
+    # This regex splits the pattern into parts, but only keeps the parts that aren't quoted. This
+    # lets us ignore literal strings in the pattern when looking for `h|K`. Without this we could
+    # match on a literal `'h'` in the pattern (which fr-CA has at the time of this writing), giving
+    # us a false positive.
+    my @parts = split /(?:'(?:(?:[^']|'')*)')/, $self->time_format_short;
+    return $self->{prefers_24_hour_time} = !( grep {/h|K/} @parts );
 }
 
 sub language_code {
@@ -289,7 +294,7 @@ DateTime::Locale::FromData - Class for locale objects instantiated from pre-defi
 
 =head1 VERSION
 
-version 1.42
+version 1.43
 
 =head1 SYNOPSIS
 

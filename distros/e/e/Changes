@@ -1,6 +1,14 @@
 Revision history for e
 
 =================
+1.26 - 2024-07-27
+=================
+
+Internal cleanup.
+Added color when STDOUT is closed.
+Added set command (Set::Scalar).
+
+=================
 1.25 - 2024-07-04
 =================
 

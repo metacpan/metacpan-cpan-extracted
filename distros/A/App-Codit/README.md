@@ -102,9 +102,9 @@ Just hoping you never need this
 ## General troubleshooting
 
 If you encounter problems and error message using Codit, here are some general troubleshooting steps:
-    • Use the -config command line option to point to a new, preferably fresh location.
-    • Use the -noplugins command line option to launch Codit without any plugins loaded.
-    • Use the -plugins command line option to launch Codit with only the plugins loaded you specify here.
+    Use the -config command line option to point to a new, preferably fresh location.
+    Use the -noplugins command line option to launch Codit without any plugins loaded.
+    Use the -plugins command line option to launch Codit with only the plugins loaded you specify here.
 
 ## No icons
 
@@ -130,5 +130,5 @@ Sorry, that is all we have to offer.
 
 ## Report a bug
 
-If all fails you are welcome to open a ticket here: https://github.com/haje61/App-Codit/issues
+If all fails you are welcome to [open a ticket here](https://github.com/haje61/App-Codit/issues).
 

@@ -1,6 +1,7 @@
 use strict;
 use warnings;
 package Array::Circular;
+our $VERSION=0.009;
 # ABSTRACT: Provide an array data structure that can go around in circles
 
 use Carp;

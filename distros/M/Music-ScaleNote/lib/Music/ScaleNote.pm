@@ -3,7 +3,7 @@ our $AUTHORITY = 'cpan:GENE';
 
 # ABSTRACT: Manipulate the position of a note in a scale
 
-our $VERSION = '0.0801';
+our $VERSION = '0.0803';
 
 use Moo;
 use strictures 2;
@@ -152,7 +152,7 @@ Music::ScaleNote - Manipulate the position of a note in a scale
 
 =head1 VERSION
 
-version 0.0801
+version 0.0803
 
 =head1 SYNOPSIS
 

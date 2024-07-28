@@ -9,7 +9,7 @@ App::Codit::Plugins::SearchReplace - plugin for App::Codit
 use strict;
 use warnings;
 use vars qw( $VERSION );
-$VERSION = 0.05;
+$VERSION = 0.09;
 
 use base qw( Tk::AppWindow::BaseClasses::Plugin );
 require Tk::LabFrame;
@@ -300,19 +300,19 @@ sub Find {
 			$self->FindInDoc($_);
 		}
 	} elsif ($$mode eq $srchprj) {
-		$self->popMessage("$srchprj\nSorry, not yet implemented");
+		$self->FindInProject;
 	}
 }
 
 sub FindInDoc {
 	my ($self, $name) = @_;
 
-	my $mdi = $self->extGet('CoditMDI');
+	my $mdi = $self->mdi;
 	my $search = $self->{SEARCH};
 	my $case = $self->{CASE};
 	my $regex = $self->{REGEX};
 	my $results = $self->{RESULTSLIST};
-	unless ($mdi->deferredExists($name)) {
+	if (($mdi->docExists($name)) and (not $mdi->deferredExists($name))) {
 		my $widg = $mdi->docGet($name)->CWidg;
 		my $srch = $$search;
 		$srch = quotemeta($srch) if $$regex eq 'exact';
@@ -379,6 +379,24 @@ sub FindInDoc {
 		}
 	}
 	$self->update;
+}
+
+sub FindInProject {
+	my $self = shift;
+	my $git = $self->extGet('Plugins')->plugGet('Git');
+	unless (defined $git) {
+		$self->popMessage('Plugin git must be loaded for this', 'dialog-warning');
+		return
+	}
+	my $project = $git->projectCurrent;
+	if ($project eq '') {
+		$self->popMessage('No project selected in Git plugin', 'dialog-warning');
+		return
+	}
+	my @list = $git->gitFileList($project);
+	for (@list) {
+		$self->FindInDoc($_) if -T $_;
+	}
 }
 
 sub FinishedCheck {

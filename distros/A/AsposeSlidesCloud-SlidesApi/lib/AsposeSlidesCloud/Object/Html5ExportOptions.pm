@@ -102,6 +102,13 @@ __PACKAGE__->method_documentation({
     	format => '',
     	read_only => '',
     		},
+    'gradient_style' => {
+    	datatype => 'string',
+    	base_name => 'GradientStyle',
+    	description => 'Default regular font for rendering the presentation. ',
+    	format => '',
+    	read_only => '',
+    		},
     'font_fallback_rules' => {
     	datatype => 'ARRAY[FontFallbackRule]',
     	base_name => 'FontFallbackRules',
@@ -151,28 +158,39 @@ __PACKAGE__->method_documentation({
     	format => '',
     	read_only => '',
     		},
+    'templates_path' => {
+    	datatype => 'string',
+    	base_name => 'TemplatesPath',
+    	description => 'Path to custom templates',
+    	format => '',
+    	read_only => '',
+    		},
 });
 
 __PACKAGE__->swagger_types( {
     'default_regular_font' => 'string',
+    'gradient_style' => 'string',
     'font_fallback_rules' => 'ARRAY[FontFallbackRule]',
     'font_subst_rules' => 'ARRAY[FontSubstRule]',
     'format' => 'string',
     'animate_transitions' => 'boolean',
     'animate_shapes' => 'boolean',
     'embed_images' => 'boolean',
-    'notes_comments_layouting' => 'NotesCommentsLayoutingOptions'
+    'notes_comments_layouting' => 'NotesCommentsLayoutingOptions',
+    'templates_path' => 'string'
 } );
 
 __PACKAGE__->attribute_map( {
     'default_regular_font' => 'DefaultRegularFont',
+    'gradient_style' => 'GradientStyle',
     'font_fallback_rules' => 'FontFallbackRules',
     'font_subst_rules' => 'FontSubstRules',
     'format' => 'Format',
     'animate_transitions' => 'AnimateTransitions',
     'animate_shapes' => 'AnimateShapes',
     'embed_images' => 'EmbedImages',
-    'notes_comments_layouting' => 'NotesCommentsLayouting'
+    'notes_comments_layouting' => 'NotesCommentsLayouting',
+    'templates_path' => 'TemplatesPath'
 } );
 
 __PACKAGE__->mk_accessors(keys %{__PACKAGE__->attribute_map});

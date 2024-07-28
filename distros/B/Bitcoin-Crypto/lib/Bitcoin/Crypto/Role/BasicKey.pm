@@ -1,13 +1,13 @@
 package Bitcoin::Crypto::Role::BasicKey;
-$Bitcoin::Crypto::Role::BasicKey::VERSION = '2.005';
+$Bitcoin::Crypto::Role::BasicKey::VERSION = '2.006';
 use v5.10;
 use strict;
 use warnings;
-use Type::Params -sigs;
+use Types::Common -sigs, -types;
 use Carp qw(carp);
 
 use Bitcoin::Crypto::Exception;
-use Bitcoin::Crypto::Types qw(Object Str ByteStr FormatStr);
+use Bitcoin::Crypto::Types -types;
 use Bitcoin::Crypto::Util qw(to_format);
 use Moo::Role;
 

@@ -26,7 +26,7 @@
               ⠹⡽⣾⣿⠹⣿⣆⣾⢯⣿⣿ ⡞ ⠻⣿⣿⣿⠁ ⢠⣿⢏  ⡀ ⡟  ⢀⣴⣿⠃⢁⡼⠁ ⠈
                 ⠈⠛ ⢻⣿⣧⢸⢟⠶⢾⡇  ⣸⡿⠁ ⢠⣾⡟⢼  ⣷ ⡇ ⣰⠋⠙⠁
                    ⠈⣿⣻⣾⣦⣇⢸⣇⣀⣶⡿⠁⣀⣀⣾⢿⡇⢸  ⣟⡦⣧⣶⠏ unleashed
-                    ⠸⢿⡍⠛⠻⠿⠿⠿⠋⣠⡾⢋⣾⣏⣸⣷⡸⣇⢰⠟⠛⠻⡄  v1.25
+                    ⠸⢿⡍⠛⠻⠿⠿⠿⠋⣠⡾⢋⣾⣏⣸⣷⡸⣇⢰⠟⠛⠻⡄  v1.26
                       ⢻⡄   ⠐⠚⠋⣠⡾⣧⣿⠁⠙⢳⣽⡟
                       ⠈⠳⢦⣤⣤⣀⣤⡶⠛ ⠈⢿⡆  ⢿⡇
                             ⠈    ⠈⠓  ⠈
@@ -264,6 +264,11 @@ Decode a byte steam to UTF-8 code point:
 
 Set STDOUT and STDERR as UTF-8 encoded.
 
+If given a filehandle, will set the encoding
+for it to UTF-8.
+
+    utf8($fh);
+
 ## Enhanced Types
 
 ### b
@@ -283,6 +288,57 @@ Work with arrays.
     my $collection = c(1, 2, 3);
 
 Turn list into a [Mojo::Collection](https://metacpan.org/pod/Mojo%3A%3ACollection) object.
+
+### set
+
+Work with sets.
+
+    my $set = set(2,4,6,4);
+
+Turn list into a [Set::Scalar](https://metacpan.org/pod/Set%3A%3AScalar) object.
+
+    $ perl -Me -e 'say set(2,4,6,2)'
+    (2 4 6)
+    
+
+Get elements:
+
+    $ perl -Me -e 'say for sort(set(2,4,6,2)->elements)'
+    $ perl -Me -e 'say for sort(set(2,4,6,2)->@*)'
+    2
+    4
+    6
+
+Intersection:
+
+    $ perl -Ilib/ -Me -e 'say set(2,4,6,2) * set(3,4,5,6)'
+    (4 6)
+
+Create a new universe:
+
+    # Universe 1:
+    # ...
+    Set::Scalar::Universe->new->enter;
+    # Universe 2:
+    # ...
+
+Operations:
+
+    set                         value
+
+    $a                          (a b c d e _ _ _ _)
+    $b                          (_ _ c d e f g _ _)
+    $c                          (_ _ _ _ e f g h i)
+
+    union:        $a + $b       (a b c d e f g _ _)
+    union:        $a + $b + $c  (a b c d e f g h i)
+    intersection: $a * $b       (_ _ c d e _ _ _ _)
+    intersection: $a * $b * $c  (_ _ _ _ e _ _ _ _)
+    difference:   $a - $b       (a b _ _ _ _ _ _ _)
+    difference:   $a - $b - $c  (a b _ _ _ _ _ _ _)
+    unique:       $a % $b       (a b _ _ _ f g _ _)
+    symm_diff:    $a / $b       (a b _ _ _ f g _ _)
+    complement:   -$a           (_ _ c d e f g h i)
 
 ## Files Convenience
 
@@ -309,11 +365,11 @@ Always sends output to the terminal even
 when STDOUT and/or STDERR are redirected:
 
     $ perl -Me -e '
+        say "Shown before";
         close *STDOUT;
         close *STDERR;
-        say 111;
-        print "999\n";
-        say 222;
+        say "Shown with no stdout/err";
+        print "Print not seen\n";
     '
     111
     222
@@ -406,16 +462,39 @@ Insert subroutines into the symbol table.
 
 Extracted from Mojo::Util for performance.
 
-Import methods into another function
-(as done this module):
+Import methods into another package
+(as done in this module):
 
-    $ perl -e 'package A; use e; sub import { my $c = caller(); monkey_patch $c, new => sub { say "Im new" } } package main; A->import; new()'
+    $ perl -e '
+        package A;
+        use e;
+        sub import {
+            my $c = caller();
+            monkey_patch
+                $c,
+                new => sub { say "Im new" };
+        }
+        package main;
+        A->import;
+        new();
+    '
     Im new
 
 Import methods into the same package
 (probably not so useful):
 
-    $ perl -e 'package A; use e; sub import { my $c = caller(); monkey_patch $c, new => sub { say "Im new" } } A->import; A->new()'
+    $ perl -e '
+        package A;
+        use e;
+        sub import {
+            my $c = caller();
+            monkey_patch
+                $c,
+                new => sub { say "Im new" };
+        }
+        A->import;
+        A->new();
+    '
     Im new
 
 Perhaps can be updated based on the outcome

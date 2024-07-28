@@ -103,6 +103,13 @@ __PACKAGE__->method_documentation({
     	format => '',
     	read_only => '',
     		},
+    'gradient_style' => {
+    	datatype => 'string',
+    	base_name => 'GradientStyle',
+    	description => 'Default regular font for rendering the presentation. ',
+    	format => '',
+    	read_only => '',
+    		},
     'font_fallback_rules' => {
     	datatype => 'ARRAY[FontFallbackRule]',
     	base_name => 'FontFallbackRules',
@@ -243,10 +250,18 @@ __PACKAGE__->method_documentation({
     	format => '',
     	read_only => '',
     		},
+    'rasterize_unsupported_font_styles' => {
+    	datatype => 'boolean',
+    	base_name => 'RasterizeUnsupportedFontStyles',
+    	description => 'True if text should be rasterized as a bitmap and saved to PDF when the font does not support bold styling. This approach can enhance the quality of text in the resulting PDF for certain fonts.',
+    	format => '',
+    	read_only => '',
+    		},
 });
 
 __PACKAGE__->swagger_types( {
     'default_regular_font' => 'string',
+    'gradient_style' => 'string',
     'font_fallback_rules' => 'ARRAY[FontFallbackRule]',
     'font_subst_rules' => 'ARRAY[FontSubstRule]',
     'format' => 'string',
@@ -266,11 +281,13 @@ __PACKAGE__->swagger_types( {
     'apply_image_transparent' => 'boolean',
     'access_permissions' => 'AccessPermissions',
     'hide_ink' => 'boolean',
-    'interpret_mask_op_as_opacity' => 'boolean'
+    'interpret_mask_op_as_opacity' => 'boolean',
+    'rasterize_unsupported_font_styles' => 'boolean'
 } );
 
 __PACKAGE__->attribute_map( {
     'default_regular_font' => 'DefaultRegularFont',
+    'gradient_style' => 'GradientStyle',
     'font_fallback_rules' => 'FontFallbackRules',
     'font_subst_rules' => 'FontSubstRules',
     'format' => 'Format',
@@ -290,7 +307,8 @@ __PACKAGE__->attribute_map( {
     'apply_image_transparent' => 'ApplyImageTransparent',
     'access_permissions' => 'AccessPermissions',
     'hide_ink' => 'HideInk',
-    'interpret_mask_op_as_opacity' => 'InterpretMaskOpAsOpacity'
+    'interpret_mask_op_as_opacity' => 'InterpretMaskOpAsOpacity',
+    'rasterize_unsupported_font_styles' => 'RasterizeUnsupportedFontStyles'
 } );
 
 __PACKAGE__->mk_accessors(keys %{__PACKAGE__->attribute_map});

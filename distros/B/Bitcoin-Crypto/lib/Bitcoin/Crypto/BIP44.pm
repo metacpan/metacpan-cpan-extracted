@@ -1,16 +1,16 @@
 package Bitcoin::Crypto::BIP44;
-$Bitcoin::Crypto::BIP44::VERSION = '2.005';
+$Bitcoin::Crypto::BIP44::VERSION = '2.006';
 use v5.10;
 use strict;
 use warnings;
 use Moo;
 use Mooish::AttributeBuilder -standard;
-use Type::Params -sigs;
+use Types::Common -sigs, -types;
 
 use Scalar::Util qw(blessed);
 
 use Bitcoin::Crypto::DerivationPath;
-use Bitcoin::Crypto::Types qw(Object BIP44Purpose PositiveOrZeroInt Bool Enum);
+use Bitcoin::Crypto::Types -types;
 use Bitcoin::Crypto::Network;
 use Bitcoin::Crypto::Exception;
 
@@ -134,7 +134,7 @@ sub get_derivation_path
 __END__
 =head1 NAME
 
-Bitcoin::Crypto::BIP44 - BIP44 implementation
+Bitcoin::Crypto::BIP44 - BIP44 (multi-account hierarchy) implementation
 
 =head1 SYNOPSIS
 

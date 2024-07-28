@@ -28,12 +28,11 @@ my %WriteMakefileArgs = (
     "namespace::clean" => "0.27"
   },
   "TEST_REQUIRES" => {
-    "Test::Exception" => 0,
-    "Test::More" => "0.88"
+    "Test2::V0" => 0
   },
-  "VERSION" => "2.005",
+  "VERSION" => "2.006",
   "test" => {
-    "TESTS" => "t/*.t t/10-script/*.t t/40-transaction/*.t t/41-psbt/*.t t/41-psbt/03-bip/*.t"
+    "TESTS" => "t/*.t t/Key/*.t t/PSBT/*.t t/Script/*.t t/Transaction/*.t"
   }
 );
 
@@ -45,8 +44,7 @@ my %FallbackPrereqs = (
   "Math::BigInt" => "1.999831",
   "Moo" => "2.003004",
   "Mooish::AttributeBuilder" => "1.001",
-  "Test::Exception" => 0,
-  "Test::More" => "0.88",
+  "Test2::V0" => 0,
   "Try::Tiny" => 0,
   "Type::Tiny" => 2,
   "namespace::clean" => "0.27"

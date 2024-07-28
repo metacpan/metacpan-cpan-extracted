@@ -1,19 +1,19 @@
 package Bitcoin::Crypto::Role::ExtendedKey;
-$Bitcoin::Crypto::Role::ExtendedKey::VERSION = '2.005';
+$Bitcoin::Crypto::Role::ExtendedKey::VERSION = '2.006';
 use v5.10;
 use strict;
 use warnings;
 use Scalar::Util qw(blessed);
 use Mooish::AttributeBuilder -standard;
-use Type::Params -sigs;
+use Types::Common -sigs, -types;
 use Carp qw(carp);
 use List::Util qw(none);
 
 use Bitcoin::Crypto::Key::Private;
 use Bitcoin::Crypto::Key::Public;
 use Bitcoin::Crypto::Constants;
-use Bitcoin::Crypto::Types qw(IntMaxBits StrLength Str Object Maybe ByteStr PositiveInt InstanceOf);
-use Bitcoin::Crypto::Util qw(get_path_info hash160 to_format);
+use Bitcoin::Crypto::Types -types;
+use Bitcoin::Crypto::Util qw(hash160 to_format);
 use Bitcoin::Crypto::Helpers qw(ensure_length);
 use Bitcoin::Crypto::Network;
 use Bitcoin::Crypto::Exception;
@@ -234,17 +234,15 @@ sub _get_purpose_from_BIP44
 
 signature_for derive_key => (
 	method => Object,
-	positional => [Str | Object],
+	positional => [Defined],
 );
 
 sub derive_key
 {
 	my ($self, $path) = @_;
-	my $path_info = get_path_info $path;
 
-	Bitcoin::Crypto::Exception::KeyDerive->raise(
-		'invalid key derivation path supplied'
-	) unless defined $path_info;
+	# $path must be remembered for BIP44 operation below
+	my $path_info = DerivationPath->assert_coerce($path);
 
 	Bitcoin::Crypto::Exception::KeyDerive->raise(
 		'cannot derive key: key type mismatch'

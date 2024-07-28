@@ -5,6 +5,7 @@ my %prereq = (
 	'Data::Compare'       => '1.29',
 	'File::Path'          => '2.18',
 	'File::Spec'          => '3.75',
+	'Getopt::Long'        => '2.54',
 	'Test::Tk'            => '3.03',
 	'Tk'                  => '804.030',
 	'Tk::AppWindow'       => '0.11',

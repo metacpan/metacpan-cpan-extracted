@@ -3261,6 +3261,7 @@ December
 Decembro
 Dee
 Deesanbur
+Deguest
 Deireadh
 Dek
 Dekabr
@@ -3978,6 +3979,7 @@ JL
 JMP
 JN
 JUM
+Jacques
 Jahres
 Jamaica
 James
@@ -8183,6 +8185,7 @@ ja-JP
 ja_JP
 jaan
 jaanuar
+jack
 jamanoo
 jan
 janar

@@ -93252,3 +93252,16 @@ P/PE/PERLANCAR/Perinci-Examples-0.825.tar.gz
 B/BW/BWEST/SignalWire-RestAPI-1.7.tar.gz
 T/TU/TURNERJW/StreamFinder-2.40.tar.gz
 S/SO/SOMMAR/Win32-SqlServer-2.015-withoutworldwriteables.tar.gz
+L/LE/LEEJO/Acme-Glue-2024.07.tar.gz
+H/HA/HANJE/App-Codit-0.09.tar.gz
+N/NO/NOVOZHILV/App-SimpleBackuper-0.2.26.tar.gz
+Z/ZA/ZARQUON/Array-Circular-0.009.tar.gz
+A/AS/ASPOSE/AsposeSlidesCloud-SlidesApi-24.07.tar.gz
+B/BR/BRTASTIC/Bitcoin-Crypto-2.006.tar.gz
+D/DR/DROLSKY/DateTime-Locale-1.43.tar.gz
+T/TI/TIMKA/e-1.26.tar.gz
+H/HA/HANJE/FreeDesktop-Icons-0.04.tar.gz
+E/ET/ETHER/OpenAPI-Modern-0.067.tar.gz
+J/JD/JDEGUEST/Locale-Unicode-v0.3.4.tar.gz
+G/GE/GENE/Music-ScaleNote-0.0803.tar.gz
+P/PE/PERLANCAR/Sah-SchemaBundle-DBI-0.006.tar.gz

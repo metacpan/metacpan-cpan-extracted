@@ -1,14 +1,12 @@
 package Bitcoin::Crypto::Block;
-$Bitcoin::Crypto::Block::VERSION = '2.005';
+$Bitcoin::Crypto::Block::VERSION = '2.006';
 use v5.10;
 use strict;
 use warnings;
 
 use Moo;
 use Mooish::AttributeBuilder -standard;
-use Type::Params -sigs;
-
-use Bitcoin::Crypto::Types qw(Object PositiveInt PositiveOrZeroInt InstanceOf);
+use Types::Common -sigs, -types;
 
 has param 'timestamp' => (
 	isa => PositiveInt,

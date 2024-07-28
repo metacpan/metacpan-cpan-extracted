@@ -1,5 +1,9 @@
 Revision history for OpenAPI-Modern
 
+0.067     2024-07-27 23:55:46Z
+          - fix path template regex to allow for [/?#] characters in capture
+            names
+
 0.066     2024-07-13 23:27:00Z
           - now preserving the numeric/string type of any path capture values
             passed in via the $options hash, while still evaluating path
@@ -8,13 +12,14 @@ Revision history for OpenAPI-Modern
 0.065     2024-05-25 23:56:08Z
           - BREAKING CHANGE: path_item_uri is dropped from the populated
             $options hash in validate_request, validate_response, and
-            find_path, and replaced with operation_uri
+            find_path, and replaced with operation_uri (note that the
+            path-item uri is always one level up)
           - add support for "allowEmptyValue" option in query parameter
             descriptions
 
 0.064     2024-05-07 00:14:00Z
           - fix: requests with an empty URI path (e.g. "https://example.com?foo=1")
-            now match path "/".
+            now matches path "/".
           - fix: preserve all headers of the same name when validating a
             Plack::Response object
           - support added for validation of Catalyst::Request and

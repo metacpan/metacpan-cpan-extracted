@@ -9,7 +9,7 @@ App::Codit::Plugins::Sessions - plugin for App::Codit
 use strict;
 use warnings;
 use vars qw( $VERSION );
-$VERSION = 0.03;
+$VERSION = 0.09;
 
 use base qw( Tk::AppWindow::BaseClasses::Plugin );
 
@@ -33,9 +33,9 @@ Manage your sessions. Saves your named session on exit and reloads it on start.
 
 =head1 DETAILS
 
-The sessions plugin allows you to save a collection of documents as a session. 
-When re-opening the session the documents are loaded in the exact order as they 
-were when the session was closed. Also the syntax option, tab size, indent style 
+The sessions plugin allows you to save a collection of documents as a session.
+When re-opening the session the documents are loaded in the exact order as they
+were when the session was closed. Also the syntax option, tab size, indent style
 and insert cursor position are saved.
 
 The session manager allows you to keep your sessions orderly.
@@ -46,9 +46,9 @@ sub new {
 	my $class = shift;
 	my $self = $class->SUPER::new(@_, 'ConfigFolder', 'MenuBar');
 	return undef unless defined $self;
-	
+
 	$self->sessionFolder;
-	
+
 	$self->{CURRENT} = '';
 	$self->{DATA} = {};
 
@@ -66,7 +66,7 @@ sub new {
 
 sub AdjustTitle {
 	my $self = shift;
-	my $mdi = $self->extGet('CoditMDI');
+	my $mdi = $self->mdi;
 	my $doc = $mdi->docSelected;
 	my $name = $self->configGet('-appname');
 	if (defined $doc) {
@@ -83,8 +83,16 @@ sub AdjustTitle {
 sub CanQuit {
 	my $self = shift;
 	$self->sessionSave unless $self->sessionCurrent eq '';
-	$self->extGet('CoditMDI')->docForceClose(1);
+	$self->mdi->docForceClose(1);
 	return 1
+}
+
+sub consoleDir {
+	my ($self, $dir) = @_;
+	my $console = $self->extGet('Plugins')->plugGet('Console');
+	return unless defined $console;
+	$console->dirSet($dir) if defined $dir;
+	return $console->dirGet;
 }
 
 sub MenuItems {
@@ -92,8 +100,8 @@ sub MenuItems {
 	return (
 #This table is best viewed with tabsize 3.
 #			 type					menupath			label						cmd						icon					keyb			config variable
- 		[	'menu', 				undef,			"~Session"], 
- 		[	'menu', 				'Session::',	"~Open session",		'session_fill_menu'],
+		[	'menu', 				undef,			"~Session"],
+		[	'menu', 				'Session::',	"~Open session",		'session_fill_menu'],
 		[	'menu_normal',		'Session::',	"~New session",		'session_new',			'document-new'],
 		[	'menu_separator',	'Session::',	'se1'],
 		[	'menu_normal',		'Session::',	"~Save session",		'session_save',		'document-save'],
@@ -103,10 +111,18 @@ sub MenuItems {
 	)
 }
 
+sub projectName {
+	my ($self, $proj) = @_;
+	my $git = $self->extGet('Plugins')->plugGet('Git');
+	return '' unless defined $git;
+	$git->projectSelect($proj) if defined $proj;
+	return $git->projectCurrent;
+}
+
 sub sessionClose {
 	my $self = shift;
 	my $session = $self->sessionCurrent;
-	my $mdi = $self->extGet('CoditMDI');
+	my $mdi = $self->mdi;
 	if ($mdi->docConfirmSaveAll) {
 		$self->sessionSave unless $session eq '';
 		$self->sessionCurrent('');
@@ -164,7 +180,7 @@ sub sessionExists {
 
 sub sessionDocList {
 	my $self = shift;
-	my $interface = $self->extGet('CoditMDI')->Interface;
+	my $interface = $self->mdi->Interface;
 	my $disp = $interface->{DISPLAYED};
 	my $undisp = $interface->{UNDISPLAYED};
 	return @$disp, @$undisp;
@@ -214,7 +230,7 @@ sub sessionList {
 sub sessionNew {
 	my $self = shift;
 	$self->sessionClose;
-	$self->extGet('CoditMDI')->docSelectFirst;
+	$self->mdi->docSelectFirst;
 }
 
 sub sessionOpen {
@@ -229,17 +245,21 @@ sub sessionOpen {
 
 	my @list = $cff->loadSectionedList($file, 'cdt session');
 
-	my $mdi = $self->extGet('CoditMDI');
+	my $mdi = $self->mdi;
 	$mdi->silentMode(1);
 
 	my $count = 0;
 	my $size = @list;
 	$self->progressAdd('multi_open', 'Open session', $size, \$count);
 	my $select;
+	my $workdir; #plugin Console
+	my $project; #plugin Git
 	for (@list) {
 		my ($file, $options) = @$_;
 		if ($file eq 'general') {
 			$select = $options->{'selected'};
+			$workdir = $options->{'workdir'};
+			$project = $options->{'project'};
 			$count ++
 		} else {
 			if ($self->cmdExecute('doc_open', $file)) {
@@ -261,6 +281,8 @@ sub sessionOpen {
 	} else {
 		$mdi->docSelectFirst
 	}
+	$self->consoleDir($workdir) if defined $workdir;
+	$self->projectName($project) if defined $project;
 	$self->update;
 	$self->StatusMessage("Session '$name' loaded");
 }
@@ -274,11 +296,21 @@ sub sessionSave {
 
 	my $file = "Sessions/$name";
 	my $cff = $self->extGet('ConfigFolder');
-	my $mdi = $self->extGet('CoditMDI');
+	my $mdi = $self->mdi;
+
+	#configuring general options
+	my @genopt = (	'selected', $mdi->docSelected	);
+	#workdir of plugin Console
+	my $workdir = $self->consoleDir;
+	push @genopt, 'workdir', $workdir if defined $workdir;
+	#project name of plugin Git
+	my $project = $self->projectName;
+	push @genopt, 'project', $project if $project ne '';
+
+	my @list = (['general', { @genopt }]);
 
 	#getting all document names ordered as they are on the tab bar.
 	my @items = $self->sessionDocList;
-	my @list = (['general', {selected => $mdi->docSelected}]);
 	for (@items) {
 		my $item = $_;
 		if ($mdi->deferredExists($item)) {
@@ -286,6 +318,7 @@ sub sessionSave {
 			my %h = %$options;
 			push @list, [$item, \%h]
 		} else {
+			next if $item =~/^Untitled/;
 			my $doc = $mdi->docGet($item);
 			my %h = ();
 			for (@saveoptions) { $h{$_} = $doc->cget($_) }
@@ -315,7 +348,7 @@ sub sessionSaveAs {
 		$self->sessionSave;
 		$self->AdjustTitle;
 	}
-	
+
 }
 
 sub sessionValidateName {

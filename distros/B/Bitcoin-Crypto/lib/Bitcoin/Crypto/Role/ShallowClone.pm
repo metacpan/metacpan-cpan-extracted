@@ -1,11 +1,10 @@
 package Bitcoin::Crypto::Role::ShallowClone;
-$Bitcoin::Crypto::Role::ShallowClone::VERSION = '2.005';
+$Bitcoin::Crypto::Role::ShallowClone::VERSION = '2.006';
 use v5.10;
 use strict;
 use warnings;
 
-use Type::Params -sigs;
-use Bitcoin::Crypto::Types qw(Object);
+use Types::Common -sigs, -types;
 use Moo::Role;
 
 signature_for clone => (

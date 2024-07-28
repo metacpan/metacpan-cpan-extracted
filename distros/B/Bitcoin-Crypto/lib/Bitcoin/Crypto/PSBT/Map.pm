@@ -1,16 +1,16 @@
 package Bitcoin::Crypto::PSBT::Map;
-$Bitcoin::Crypto::PSBT::Map::VERSION = '2.005';
+$Bitcoin::Crypto::PSBT::Map::VERSION = '2.006';
 use v5.10;
 use strict;
 use warnings;
 
 use Moo;
 use Mooish::AttributeBuilder -standard;
-use Type::Params -sigs;
+use Types::Common -sigs, -types;
 use List::Util qw(any);
 
 use Bitcoin::Crypto::PSBT::Field;
-use Bitcoin::Crypto::Types qw(Maybe Enum ByteStr PositiveOrZeroInt Str Object InstanceOf PSBTMapType ScalarRef);
+use Bitcoin::Crypto::Types -types;
 use Bitcoin::Crypto::Exception;
 use Bitcoin::Crypto::Constants;
 

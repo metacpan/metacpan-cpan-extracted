@@ -45,6 +45,7 @@ my $builder = $class->new(
         'Data::Trace'       => '1.05',
         'Mojolicious'       => '0',
         'Runtime::Debugger' => '1.03',
+        'Set::Scalar'       => '0',
         'Sub::Util'         => '0',
         'Term::Table'       => '0',
         'Tiny::Prof'        => '0.03',

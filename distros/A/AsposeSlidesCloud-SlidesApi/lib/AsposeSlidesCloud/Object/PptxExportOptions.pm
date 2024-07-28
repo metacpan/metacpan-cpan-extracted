@@ -101,6 +101,13 @@ __PACKAGE__->method_documentation({
     	format => '',
     	read_only => '',
     		},
+    'gradient_style' => {
+    	datatype => 'string',
+    	base_name => 'GradientStyle',
+    	description => 'Default regular font for rendering the presentation. ',
+    	format => '',
+    	read_only => '',
+    		},
     'font_fallback_rules' => {
     	datatype => 'ARRAY[FontFallbackRule]',
     	base_name => 'FontFallbackRules',
@@ -125,7 +132,14 @@ __PACKAGE__->method_documentation({
     'conformance' => {
     	datatype => 'string',
     	base_name => 'Conformance',
-    	description => 'The conformance class to which the PresentationML document conforms. Read/write Conformance.',
+    	description => 'The conformance class to which the PresentationML document conforms.',
+    	format => '',
+    	read_only => '',
+    		},
+    'zip64_mode' => {
+    	datatype => 'string',
+    	base_name => 'Zip64Mode',
+    	description => 'Specifies whether the ZIP64 format is used for the Presentation document. The default value is Zip64Mode.IfNecessary.',
     	format => '',
     	read_only => '',
     		},
@@ -133,18 +147,22 @@ __PACKAGE__->method_documentation({
 
 __PACKAGE__->swagger_types( {
     'default_regular_font' => 'string',
+    'gradient_style' => 'string',
     'font_fallback_rules' => 'ARRAY[FontFallbackRule]',
     'font_subst_rules' => 'ARRAY[FontSubstRule]',
     'format' => 'string',
-    'conformance' => 'string'
+    'conformance' => 'string',
+    'zip64_mode' => 'string'
 } );
 
 __PACKAGE__->attribute_map( {
     'default_regular_font' => 'DefaultRegularFont',
+    'gradient_style' => 'GradientStyle',
     'font_fallback_rules' => 'FontFallbackRules',
     'font_subst_rules' => 'FontSubstRules',
     'format' => 'Format',
-    'conformance' => 'Conformance'
+    'conformance' => 'Conformance',
+    'zip64_mode' => 'Zip64Mode'
 } );
 
 __PACKAGE__->mk_accessors(keys %{__PACKAGE__->attribute_map});

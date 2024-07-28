@@ -9,7 +9,7 @@ App::Codit::BaseClasses::TextModPlugin - baseclass for plugins that respond to t
 use strict;
 use warnings;
 use vars qw( $VERSION );
-$VERSION = 0.05;
+$VERSION = 0.09;
 use Tk;
 
 use base qw( Tk::AppWindow::BaseClasses::Plugin );
@@ -24,7 +24,7 @@ sub new {
 	my $self = $class->SUPER::new(@_);
 	return undef unless defined $self;
 	
-	$self->{ACTIVEDELAY} = 300;
+	$self->{ACTIVEDELAY} = 600;
 	$self->cmdHookBefore('quit', 'selectBlock', $self);
 	$self->cmdHookBefore('deferred_open', 'selectBlock', $self);
 	$self->cmdHookAfter('modified', 'activate', $self);

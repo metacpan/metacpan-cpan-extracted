@@ -1,10 +1,10 @@
 use strictures 2;
-package OpenAPI::Modern; # git description: v0.065-14-gce382cd
+package OpenAPI::Modern; # git description: v0.066-14-gc3cb31a
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Validate HTTP requests and responses against an OpenAPI v3.1 document
 # KEYWORDS: validation evaluation JSON Schema OpenAPI v3.1 Swagger HTTP request response
 
-our $VERSION = '0.066';
+our $VERSION = '0.067';
 
 use 5.020;
 use utf8;
@@ -334,7 +334,7 @@ sub find_path ($self, $options, $state = {}) {
   # method from options
   if (exists $options->{method}) {
     $method = lc $options->{method};
-    return E({ %$state, data_path => '/request/method' }, 'wrong HTTP method %s', $options->{request}->method)
+    return E({ %$state, data_path => '/request/method' }, 'wrong HTTP method "%s"', $options->{request}->method)
       if $options->{request} and lc $options->{request}->method ne $method;
   }
   elsif ($options->{request}) {
@@ -363,7 +363,7 @@ sub find_path ($self, $options, $state = {}) {
       if exists $options->{path_template} and $options->{path_template} ne $path_template;
 
     return E({ %$state, data_path => '/request/method', schema_path => $operation_path },
-        'wrong HTTP method %s', $options->{method})
+        'wrong HTTP method "%s"', $options->{method})
       if $options->{method} and lc $options->{method} ne $method;
 
     $options->{method} = lc $method;
@@ -412,6 +412,11 @@ sub find_path ($self, $options, $state = {}) {
       # path prefixes present in server urls
       next if $uri_path !~ m/^$path_pattern$/;
 
+      # perldoc perlvar, @-: $n coincides with "substr $_, $-[n], $+[n] - $-[n]" if "$-[n]" is defined
+      my @capture_values = map
+        Encode::decode('UTF-8', URI::Escape::uri_unescape(substr($uri_path, $-[$_], $+[$_]-$-[$_])),
+          Encode::FB_CROAK | Encode::LEAVE_SRC), 1 .. $#-;
+
       $options->{path_template} = $path_template;
 
       # FIXME: follow $ref chain in path-item
@@ -419,16 +424,12 @@ sub find_path ($self, $options, $state = {}) {
       $options->{_path_item} = $self->openapi_document->get($path_item_path);
       $state->{schema_path} = $path_item_path;
 
-      # perldoc perlvar, @-: $n coincides with "substr $_, $-[n], $+[n] - $-[n]" if "$-[n]" is defined
-      my @capture_values = map
-        Encode::decode('UTF-8', URI::Escape::uri_unescape(substr($uri_path, $-[$_], $+[$_]-$-[$_])),
-          Encode::FB_CROAK | Encode::LEAVE_SRC), 1 .. $#-;
       # { for the editor
-      my @capture_names = ($path_template =~ m!\{([^/?#}]+)\}!g);
+      my @capture_names = ($path_template =~ m!\{([^}]+)\}!g);
       my %path_captures; @path_captures{@capture_names} = @capture_values;
 
       if (exists $options->{path_captures}) {
-        return E({ %$state, schema_path => '/paths' }, 'provided path_captures values do not match request URI')
+        return E($state, 'provided path_captures values do not match request URI')
           if not is_equal($options->{path_captures}, \%path_captures, { stringy_numbers => 1 });
       }
       else {
@@ -451,7 +452,8 @@ sub find_path ($self, $options, $state = {}) {
       return 1;
     }
 
-    return E({ %$state, keyword => 'paths' }, 'no match found for URI path "%s"', $uri_path);
+    return E({ %$state, keyword => 'paths' }, 'no match found for URI "%s"',
+      $options->{request}->url->clone->query(undef)->fragment(undef));
   }
 
   # FIXME: operation_id alone is insufficient to infer path_template, but we may not need it
@@ -929,7 +931,7 @@ OpenAPI::Modern - Validate HTTP requests and responses against an OpenAPI v3.1 d
 
 =head1 VERSION
 
-version 0.066
+version 0.067
 
 =head1 SYNOPSIS
 

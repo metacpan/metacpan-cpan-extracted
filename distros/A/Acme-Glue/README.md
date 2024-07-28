@@ -4,7 +4,7 @@ Acme::Glue - A placeholder module for code accompanying a Perl photo project
 
 # VERSION
 
-2024.04
+2024.07
 
 # DESCRIPTION
 
@@ -188,6 +188,24 @@ Here are the snippets that may accompany the photo project
       sort { $a->[1] <=> $b->[1] or $a->[0] cmp $b->[0] }
       map  { [$_, length($_)] }
       qw(demo of schwartzian transform);
+
+## LIST OF WORKSHOPS / CONFERENCES
+
+A full list of the workshops and conferences this project was shot at
+
+- Alpine Perl Workshop (2016)
+- FOSDEM (2024)
+- German Perl Workshop (2019)
+- German Perl and Raku Workshop (2022, 2023, 2024)
+- Les Journées Perl (2017, 2019)
+- London Perl Workshop (2015, 2016, 2019)
+- PerlCon (2019)
+- Swiss Perl Workshop (2015, 2017, 2018, 2019)
+- The Perl Conference \[EU\] (2017, 2018)
+- The Perl Conference \[NA\] (2016, 2017)
+- The Perl Toolchain Sumit (2017)
+- The Perl and Raku Conference \[NA\] (2023, 2024)
+- Yet Another Perl Conference \[EU\] (2015, 2016)
 
 # THANKS
 

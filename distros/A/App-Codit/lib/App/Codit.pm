@@ -138,7 +138,7 @@ use strict;
 use warnings;
 use Carp;
 use vars qw($VERSION);
-$VERSION="0.08";
+$VERSION="0.09";
 use Tk;
 require App::Codit::CodeTextManager;
 
@@ -150,31 +150,52 @@ sub Populate {
 
 	$self->geometry('800x600+150+150');
 
+	my $rawdir = Tk::findINC('App/Codit/Icons');
 	my %opts = (
 #		-appname => 'Codit',
 		-logo => Tk::findINC('App/Codit/codit_logo.png'),
 		-extensions => [qw[Art CoditMDI ToolBar StatusBar MenuBar Navigator ToolPanel Help Settings Plugins]],
 		-documentinterface => 'CoditMDI',
 		-namespace => 'App::Codit',
+		-rawiconpath => [ $rawdir ],
 		-savegeometry => 1,
 		-updatesmenuitem => 1,
 
 		-aboutinfo => {
 #			version => $VERSION,
 			author => 'Hans Jeuken',
-			components => ['Syntax::Kamelon', 'Tk', 'Tk::AppWindow', 'Tk::CodeText'],
+			components => [
+				'FreeDesktop::Icons',
+				'Imager',
+				'Syntax::Kamelon', 
+				'Tk', 
+				'Tk::AppWindow', 
+				'Tk::CodeText',
+				'Tk::ColorEntry',
+				'Tk::DocumentTree',
+				'Tk::FileBrowser',
+				'Tk::QuickForm',
+				'Tk::Terminal',
+				'Tk::YADialog',
+				'Tk::YANoteBook',
+			],
 			http => 'https://github.com/haje61/App-Codit',
 #			license => 'Same as Perl',
 		},
-		-helpfile => Tk::findINC('App/Codit/manual.pdf'),
+		-helpfile => 'https://www.perlgui.org/wp-content/uploads/2024/07/codit_manual.pdf',
 
 		-contentmanagerclass => 'CodeTextManager',
 		-contentmanageroptions => [
 			'-contentautoindent', 
-			'-contentbackground', 
+			'-contentbackground',
+			'-contentbgdspace',
+			'-contentbgdtab',
 			'-contentfont', 
 			'-contentforeground', 
 			'-contentindent', 
+			'-contentinsertbg', 
+			'-contentmatchbg', 
+			'-contentmatchfg', 
 			'-contentsyntax', 
 			'-contenttabs', 
 			'-contentwrap',
@@ -195,22 +216,36 @@ sub Populate {
 
 		-useroptions => [
 			'*page' => 'Editing',
-			'*section' => 'Text',
-			-contentforeground => ['color', 'Foreground'],
-			-contentbackground => ['color', 'Background'],
-			-contentfont => ['font', 'Font'],
-			'*end',
 			'*section' => 'Editor settings',
+			-contentfont => ['font', 'Font'],
 			-contentautoindent => ['boolean', 'Auto indent'],
-			-contentindent => ['text', 'Indent style', -width => 4],
-			'*column',
-			-contenttabs => ['text', 'Tab size', -width => 4],
+#			-contentindent => ['text', 'Indent style', -width => 4],
+			-contentindent => ['text', 'Indent style', -regex => qr/^\d+|tab$/, -width => 4],
+#			'*column',
+#			-contenttabs => ['text', 'Tab size', -width => 4],
+			-contenttabs => ['text', 'Tab size', -regex => qr/^\d+\.?\d*[c|i|m|p]$/, -width => 4],
 			-contentwrap => ['radio', 'Wrap', -values => [qw[none char word]]],
+			-doc_show_spaces => ['boolean', 'Show spaces'],
 			'*end',
 			'*section' => 'Show indicators',
 			-showfolds => ['boolean', 'Fold indicators'],
 			-shownumbers => ['boolean', 'Line numbers'],
 			-showstatus => ['boolean', 'Doc status'],
+			'*end',
+
+			'*page' => 'Colors',
+			'*section' => 'Editing',
+			-contentforeground => ['color', 'Foreground', -width => 8],
+			-contentbackground => ['color', 'Background', -width => 8],
+			-contentinsertbg => ['color', 'Insert bg', -width => 8],
+			'*end',
+			'*section' => 'Spaces and tabs',
+			-contentbgdspace => ['color', 'Space bg', -width => 8],
+			-contentbgdtab => ['color', 'Tab bg', -width => 8],
+			'*end',
+			'*section' => 'Matching {}, [] and ()',
+			-contentmatchfg => ['color', 'Foreground', -width => 8],
+			-contentmatchbg => ['color', 'Background', -width => 8],
 			'*end',
 
 			'*page' => 'GUI',
@@ -251,6 +286,7 @@ sub DoPostConfig {
 	my $self = shift;
 	$self->SetThemeFile;
 	$self->cmdExecute('doc_new');
+#	$self->mdi->createContextMenu;
 }
 
 sub GetThemeFile {

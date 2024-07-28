@@ -27,6 +27,18 @@ You may want to check out Aspose free [Powerpoint to PDF](https://products.aspos
 **Web:** HTML/HTML5
 **Other:** MPEG4, SWF (export whole presentations)
 
+## Enhancements in Version 24.7
+
+* Added **TemplatesPath** property to **Html5ExportOptions** class. It enables using custom templates in conversion to Html5 format.
+* Added **GetHtml5Templates** method to retrieve the list of default Html5 templates.
+* Added **Xml** to the list of available export formats.
+* Added **wholeWordsOnly** parameter to **ReplacePresentationText** and  **ReplacePresentationTextOnline** methods.
+* Added **GradientStyle** property to **ExportOptions** class.
+* Added **ResterizeUnsupportedFontStyles** property to **PdfExportOptions** class.
+* Added **Zip64Mode** property to **PptxExportOptions** class.
+* Added **Transparency** property to **Table** and **TableCell** class.
+* Removed obsolete **DownloadPortionsAsMathML**, **SavePortionsAsMathML** methods. Use **DownloadMathPortion** and **SaveMathPortion** methods to convert portions to math formats.
+
 ## Enhancements in Version 24.6
 
 * Added **HideInk** and **InterpretMaskOpAsOpacity** properties to **PdfExportOptions** class.

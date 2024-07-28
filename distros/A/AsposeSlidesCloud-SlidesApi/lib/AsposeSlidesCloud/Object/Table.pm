@@ -303,6 +303,13 @@ __PACKAGE__->method_documentation({
     	format => '',
     	read_only => '',
     		},
+    'transparency' => {
+    	datatype => 'double',
+    	base_name => 'Transparency',
+    	description => 'Transparency.',
+    	format => '',
+    	read_only => '',
+    		},
 });
 
 __PACKAGE__->swagger_types( {
@@ -334,7 +341,8 @@ __PACKAGE__->swagger_types( {
     'last_col' => 'boolean',
     'last_row' => 'boolean',
     'right_to_left' => 'boolean',
-    'vertical_banding' => 'boolean'
+    'vertical_banding' => 'boolean',
+    'transparency' => 'double'
 } );
 
 __PACKAGE__->attribute_map( {
@@ -366,7 +374,8 @@ __PACKAGE__->attribute_map( {
     'last_col' => 'LastCol',
     'last_row' => 'LastRow',
     'right_to_left' => 'RightToLeft',
-    'vertical_banding' => 'VerticalBanding'
+    'vertical_banding' => 'VerticalBanding',
+    'transparency' => 'Transparency'
 } );
 
 __PACKAGE__->mk_accessors(keys %{__PACKAGE__->attribute_map});

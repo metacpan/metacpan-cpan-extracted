@@ -1,3 +1,6 @@
+0.2.26  2024-07-27
+    - Reduced peak memory usage.
+    - Minor fix.
 0.2.25  2021-03-27
     - Use a static feature bundle (thanks to Graham Knop aka @haarg)
 0.2.24  2021-02-28

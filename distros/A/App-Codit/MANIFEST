@@ -5,9 +5,11 @@ lib/App/Codit/BaseClasses/TextModPlugin.pm
 lib/App/Codit/CodeTextManager.pm
 lib/App/Codit/codit_logo.png
 lib/App/Codit/CoditTagsEditor.pm
+lib/App/Codit/Macro.pm
 lib/App/Codit/Ext/CoditMDI.pm
 lib/App/Codit/highlight_theme.ctt
-lib/App/Codit/manual.pdf
+lib/App/Codit/Icons/git-icon.png
+lib/App/Codit/Icons/show-spaces.png
 lib/App/Codit/Plugins/Backups.pm
 lib/App/Codit/Plugins/Bookmarks.pm
 lib/App/Codit/Plugins/Colors.pm

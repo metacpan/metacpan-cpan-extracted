@@ -8,7 +8,10 @@ sub BackupDB {
 	
 	print "Backuping database...\t" if $options->{verbose};
 	
-	my $db_file = App::SimpleBackuper::RegularFile->new($options->{db}, $options);
+	my $db_file = App::SimpleBackuper::RegularFile->new(
+        $options->{db},
+        {%$options, compression_level => 5},
+    );
 	$db_file->data_ref( $state->{db}->dump() );
 	
 	$db_file->compress();

@@ -654,7 +654,7 @@ sub convert {
     }
 
     # verify enum value
-    if (!grep(/^$args{'format'}$/i, ( 'Pdf', 'Xps', 'Tiff', 'Pptx', 'Odp', 'Otp', 'Ppt', 'Pps', 'Ppsx', 'Pptm', 'Ppsm', 'Pot', 'Potx', 'Potm', 'Html', 'Html5', 'Swf', 'Svg', 'Jpeg', 'Png', 'Gif', 'Bmp', 'Fodp', 'Xaml', 'Mpeg4', 'Md' ))) {
+    if (!grep(/^$args{'format'}$/i, ( 'Pdf', 'Xps', 'Tiff', 'Pptx', 'Odp', 'Otp', 'Ppt', 'Pps', 'Ppsx', 'Pptm', 'Ppsm', 'Pot', 'Potx', 'Potm', 'Html', 'Html5', 'Swf', 'Svg', 'Jpeg', 'Png', 'Gif', 'Bmp', 'Fodp', 'Xaml', 'Mpeg4', 'Md', 'Xml' ))) {
       croak("Invalid value for 'format': " . $args{'format'});
     }
 
@@ -799,7 +799,7 @@ sub convert_and_save {
     }
 
     # verify enum value
-    if (!grep(/^$args{'format'}$/i, ( 'Pdf', 'Xps', 'Tiff', 'Pptx', 'Odp', 'Otp', 'Ppt', 'Pps', 'Ppsx', 'Pptm', 'Ppsm', 'Pot', 'Potx', 'Potm', 'Html', 'Html5', 'Swf', 'Svg', 'Jpeg', 'Png', 'Gif', 'Bmp', 'Fodp', 'Xaml', 'Mpeg4', 'Md' ))) {
+    if (!grep(/^$args{'format'}$/i, ( 'Pdf', 'Xps', 'Tiff', 'Pptx', 'Odp', 'Otp', 'Ppt', 'Pps', 'Ppsx', 'Pptm', 'Ppsm', 'Pot', 'Potx', 'Potm', 'Html', 'Html5', 'Swf', 'Svg', 'Jpeg', 'Png', 'Gif', 'Bmp', 'Fodp', 'Xaml', 'Mpeg4', 'Md', 'Xml' ))) {
       croak("Invalid value for 'format': " . $args{'format'});
     }
 
@@ -15507,176 +15507,6 @@ sub download_notes_slide_online {
 }
 
 #
-# download_portion_as_math_ml
-#
-# Convert Mathematical Text to MathML Format
-# 
-# @param string $name Document name. (required)
-# @param int $slide_index Slide index. (required)
-# @param int $shape_index Shape index. (required)
-# @param int $paragraph_index Paragraph index. (required)
-# @param int $portion_index Portion index. (required)
-# @param string $password Document password. (optional)
-# @param string $folder Document folder. (optional)
-# @param string $storage Document storage. (optional)
-{
-    my $params = {
-    'name' => {
-        data_type => 'string',
-        description => 'Document name.',
-        required => '1',
-    },
-    'slide_index' => {
-        data_type => 'int',
-        description => 'Slide index.',
-        required => '1',
-    },
-    'shape_index' => {
-        data_type => 'int',
-        description => 'Shape index.',
-        required => '1',
-    },
-    'paragraph_index' => {
-        data_type => 'int',
-        description => 'Paragraph index.',
-        required => '1',
-    },
-    'portion_index' => {
-        data_type => 'int',
-        description => 'Portion index.',
-        required => '1',
-    },
-    'password' => {
-        data_type => 'string',
-        description => 'Document password.',
-        required => '0',
-    },
-    'folder' => {
-        data_type => 'string',
-        description => 'Document folder.',
-        required => '0',
-    },
-    'storage' => {
-        data_type => 'string',
-        description => 'Document storage.',
-        required => '0',
-    },
-    };
-    __PACKAGE__->method_documentation->{ 'download_portion_as_math_ml' } = { 
-    	summary => 'Convert Mathematical Text to MathML Format',
-        params => $params,
-        returns => 'File',
-        };
-}
-# @return File
-#
-sub download_portion_as_math_ml {
-    my ($self, %args) = @_;
-
-    # verify the required parameter 'name' is set
-    unless (exists $args{'name'} && defined $args{'name'} && $args{'name'}) {
-      croak("Missing the required parameter 'name' when calling download_portion_as_math_ml");
-    }
-
-    # verify the required parameter 'slide_index' is set
-    unless (exists $args{'slide_index'} && defined $args{'slide_index'}) {
-      croak("Missing the required parameter 'slide_index' when calling download_portion_as_math_ml");
-    }
-
-    # verify the required parameter 'shape_index' is set
-    unless (exists $args{'shape_index'} && defined $args{'shape_index'}) {
-      croak("Missing the required parameter 'shape_index' when calling download_portion_as_math_ml");
-    }
-
-    # verify the required parameter 'paragraph_index' is set
-    unless (exists $args{'paragraph_index'} && defined $args{'paragraph_index'}) {
-      croak("Missing the required parameter 'paragraph_index' when calling download_portion_as_math_ml");
-    }
-
-    # verify the required parameter 'portion_index' is set
-    unless (exists $args{'portion_index'} && defined $args{'portion_index'}) {
-      croak("Missing the required parameter 'portion_index' when calling download_portion_as_math_ml");
-    }
-
-    # parse inputs
-    my $_resource_path = '/slides/{name}/slides/{slideIndex}/shapes/{shapeIndex}/paragraphs/{paragraphIndex}/portions/{portionIndex}/mathml';
-
-    my $_method = 'POST';
-    my $query_params = {};
-    my $header_params = {};
-    my $form_params = {};
-
-    # 'Accept' and 'Content-Type' header
-    my $_header_accept = $self->{api_client}->select_header_accept('multipart/form-data');
-    if ($_header_accept) {
-        $header_params->{'Accept'} = $_header_accept;
-    }
-    $header_params->{'Content-Type'} = $self->{api_client}->select_header_content_type('application/json');
-
-    # query params
-    if (exists $args{'folder'} && defined $args{'folder'}) {
-        $query_params->{'folder'} = $self->{api_client}->to_query_value($args{'folder'});
-    }
-
-    # query params
-    if (exists $args{'storage'} && defined $args{'storage'}) {
-        $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
-    }
-
-    # header params
-    if ( exists $args{'password'}) {
-        $header_params->{':password'} = $self->{api_client}->to_header_value($args{'password'});
-    }
-
-    # path params
-    if ( exists $args{'name'}) {
-        my $_base_variable = "{" . "name" . "}";
-        my $_base_value = $self->{api_client}->to_path_value($args{'name'});
-        $_resource_path =~ s/$_base_variable/$_base_value/g;
-    }
-
-    # path params
-    if ( exists $args{'slide_index'}) {
-        my $_base_variable = "{" . "slideIndex" . "}";
-        my $_base_value = $self->{api_client}->to_path_value($args{'slide_index'});
-        $_resource_path =~ s/$_base_variable/$_base_value/g;
-    }
-
-    # path params
-    if ( exists $args{'shape_index'}) {
-        my $_base_variable = "{" . "shapeIndex" . "}";
-        my $_base_value = $self->{api_client}->to_path_value($args{'shape_index'});
-        $_resource_path =~ s/$_base_variable/$_base_value/g;
-    }
-
-    # path params
-    if ( exists $args{'paragraph_index'}) {
-        my $_base_variable = "{" . "paragraphIndex" . "}";
-        my $_base_value = $self->{api_client}->to_path_value($args{'paragraph_index'});
-        $_resource_path =~ s/$_base_variable/$_base_value/g;
-    }
-
-    # path params
-    if ( exists $args{'portion_index'}) {
-        my $_base_variable = "{" . "portionIndex" . "}";
-        my $_base_value = $self->{api_client}->to_path_value($args{'portion_index'});
-        $_resource_path =~ s/$_base_variable/$_base_value/g;
-    }
-
-    my $_body_data;
-    my $files = [];
-    # make the API Call
-    my $response = $self->{api_client}->call_api($_resource_path, $_method,
-                                           $query_params, $form_params,
-                                           $header_params, $_body_data, $files);
-    if (!$response) {
-        return;
-    }
-    my $_response_object = $self->{api_client}->deserialize('File', $response);
-    return $_response_object;
-}
-
-#
 # download_presentation
 #
 # Save a presentation to a specified format.
@@ -15754,7 +15584,7 @@ sub download_presentation {
     }
 
     # verify enum value
-    if (!grep(/^$args{'format'}$/i, ( 'Pdf', 'Xps', 'Tiff', 'Pptx', 'Odp', 'Otp', 'Ppt', 'Pps', 'Ppsx', 'Pptm', 'Ppsm', 'Pot', 'Potx', 'Potm', 'Html', 'Html5', 'Swf', 'Svg', 'Jpeg', 'Png', 'Gif', 'Bmp', 'Fodp', 'Xaml', 'Mpeg4', 'Md' ))) {
+    if (!grep(/^$args{'format'}$/i, ( 'Pdf', 'Xps', 'Tiff', 'Pptx', 'Odp', 'Otp', 'Ppt', 'Pps', 'Ppsx', 'Pptm', 'Ppsm', 'Pot', 'Potx', 'Potm', 'Html', 'Html5', 'Swf', 'Svg', 'Jpeg', 'Png', 'Gif', 'Bmp', 'Fodp', 'Xaml', 'Mpeg4', 'Md', 'Xml' ))) {
       croak("Invalid value for 'format': " . $args{'format'});
     }
 
@@ -16441,7 +16271,7 @@ sub download_slide {
     }
 
     # verify enum value
-    if (!grep(/^$args{'format'}$/i, ( 'Jpeg', 'Png', 'Gif', 'Bmp', 'Tiff', 'Html', 'Pdf', 'Xps', 'Pptx', 'Odp', 'Otp', 'Ppt', 'Pps', 'Ppsx', 'Pptm', 'Ppsm', 'Potx', 'Pot', 'Potm', 'Svg', 'Fodp', 'Xaml', 'Html5', 'Md' ))) {
+    if (!grep(/^$args{'format'}$/i, ( 'Jpeg', 'Png', 'Gif', 'Bmp', 'Tiff', 'Html', 'Pdf', 'Xps', 'Pptx', 'Odp', 'Otp', 'Ppt', 'Pps', 'Ppsx', 'Pptm', 'Ppsm', 'Potx', 'Pot', 'Potm', 'Svg', 'Fodp', 'Xaml', 'Html5', 'Md', 'Xml' ))) {
       croak("Invalid value for 'format': " . $args{'format'});
     }
 
@@ -16618,7 +16448,7 @@ sub download_slide_online {
     }
 
     # verify enum value
-    if (!grep(/^$args{'format'}$/i, ( 'Jpeg', 'Png', 'Gif', 'Bmp', 'Tiff', 'Html', 'Pdf', 'Xps', 'Pptx', 'Odp', 'Otp', 'Ppt', 'Pps', 'Ppsx', 'Pptm', 'Ppsm', 'Potx', 'Pot', 'Potm', 'Svg', 'Fodp', 'Xaml', 'Html5', 'Md' ))) {
+    if (!grep(/^$args{'format'}$/i, ( 'Jpeg', 'Png', 'Gif', 'Bmp', 'Tiff', 'Html', 'Pdf', 'Xps', 'Pptx', 'Odp', 'Otp', 'Ppt', 'Pps', 'Ppsx', 'Pptm', 'Ppsm', 'Potx', 'Pot', 'Potm', 'Svg', 'Fodp', 'Xaml', 'Html5', 'Md', 'Xml' ))) {
       croak("Invalid value for 'format': " . $args{'format'});
     }
 
@@ -18355,6 +18185,53 @@ sub get_format_scheme {
         return;
     }
     my $_response_object = $self->{api_client}->deserialize('FormatScheme', $response);
+    return $_response_object;
+}
+
+#
+# get_html5_templates
+#
+# Get default templates for HTML5 export.
+# 
+{
+    my $params = {
+    };
+    __PACKAGE__->method_documentation->{ 'get_html5_templates' } = { 
+    	summary => 'Get default templates for HTML5 export.',
+        params => $params,
+        returns => 'File',
+        };
+}
+# @return File
+#
+sub get_html5_templates {
+    my ($self, %args) = @_;
+
+    # parse inputs
+    my $_resource_path = '/slides/html5Templates';
+
+    my $_method = 'GET';
+    my $query_params = {};
+    my $header_params = {};
+    my $form_params = {};
+
+    # 'Accept' and 'Content-Type' header
+    my $_header_accept = $self->{api_client}->select_header_accept('multipart/form-data');
+    if ($_header_accept) {
+        $header_params->{'Accept'} = $_header_accept;
+    }
+    $header_params->{'Content-Type'} = $self->{api_client}->select_header_content_type('application/json');
+
+    my $_body_data;
+    my $files = [];
+    # make the API Call
+    my $response = $self->{api_client}->call_api($_resource_path, $_method,
+                                           $query_params, $form_params,
+                                           $header_params, $_body_data, $files);
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('File', $response);
     return $_response_object;
 }
 
@@ -27718,6 +27595,7 @@ sub replace_image_online {
 # @param string $old_value Text value to be replaced. (required)
 # @param string $new_value Text value to replace with. (required)
 # @param boolean $ignore_case True if character case must be ignored. (optional, default to false)
+# @param boolean $whole_words_only True to replace whole words only. (optional, default to false)
 # @param string $password Document password. (optional)
 # @param string $folder Document folder. (optional)
 # @param string $storage Document storage. (optional)
@@ -27741,6 +27619,11 @@ sub replace_image_online {
     'ignore_case' => {
         data_type => 'boolean',
         description => 'True if character case must be ignored.',
+        required => '0',
+    },
+    'whole_words_only' => {
+        data_type => 'boolean',
+        description => 'True to replace whole words only.',
         required => '0',
     },
     'password' => {
@@ -27816,6 +27699,11 @@ sub replace_presentation_text {
     }
 
     # query params
+    if (exists $args{'whole_words_only'} && defined $args{'whole_words_only'}) {
+        $query_params->{'wholeWordsOnly'} = $self->{api_client}->to_boolean_query_value($args{'whole_words_only'});
+    }
+
+    # query params
     if (exists $args{'folder'} && defined $args{'folder'}) {
         $query_params->{'folder'} = $self->{api_client}->to_query_value($args{'folder'});
     }
@@ -27859,6 +27747,7 @@ sub replace_presentation_text {
 # @param string $old_value Text value to be replaced. (required)
 # @param string $new_value Text value to replace with. (required)
 # @param boolean $ignore_case True if character case must be ignored. (optional, default to false)
+# @param boolean $whole_words_only True to replace whole words only. (optional, default to false)
 # @param string $password Document password. (optional)
 {
     my $params = {
@@ -27880,6 +27769,11 @@ sub replace_presentation_text {
     'ignore_case' => {
         data_type => 'boolean',
         description => 'True if character case must be ignored.',
+        required => '0',
+    },
+    'whole_words_only' => {
+        data_type => 'boolean',
+        description => 'True to replace whole words only.',
         required => '0',
     },
     'password' => {
@@ -27942,6 +27836,11 @@ sub replace_presentation_text_online {
     # query params
     if (exists $args{'ignore_case'} && defined $args{'ignore_case'}) {
         $query_params->{'ignoreCase'} = $self->{api_client}->to_boolean_query_value($args{'ignore_case'});
+    }
+
+    # query params
+    if (exists $args{'whole_words_only'} && defined $args{'whole_words_only'}) {
+        $query_params->{'wholeWordsOnly'} = $self->{api_client}->to_boolean_query_value($args{'whole_words_only'});
     }
 
     # header params
@@ -28741,188 +28640,6 @@ sub save_math_portion {
 }
 
 #
-# save_portion_as_math_ml
-#
-# Convert Mathematical Text to MathML Format and saves result to the storage
-# 
-# @param string $name Document name. (required)
-# @param int $slide_index Slide index. (required)
-# @param int $shape_index Shape index. (required)
-# @param int $paragraph_index Paragraph index. (required)
-# @param int $portion_index Portion index. (required)
-# @param string $out_path Path to save result. (required)
-# @param string $password Document password. (optional)
-# @param string $folder Presentation folder. (optional)
-# @param string $storage Presentation storage. (optional)
-{
-    my $params = {
-    'name' => {
-        data_type => 'string',
-        description => 'Document name.',
-        required => '1',
-    },
-    'slide_index' => {
-        data_type => 'int',
-        description => 'Slide index.',
-        required => '1',
-    },
-    'shape_index' => {
-        data_type => 'int',
-        description => 'Shape index.',
-        required => '1',
-    },
-    'paragraph_index' => {
-        data_type => 'int',
-        description => 'Paragraph index.',
-        required => '1',
-    },
-    'portion_index' => {
-        data_type => 'int',
-        description => 'Portion index.',
-        required => '1',
-    },
-    'out_path' => {
-        data_type => 'string',
-        description => 'Path to save result.',
-        required => '1',
-    },
-    'password' => {
-        data_type => 'string',
-        description => 'Document password.',
-        required => '0',
-    },
-    'folder' => {
-        data_type => 'string',
-        description => 'Presentation folder.',
-        required => '0',
-    },
-    'storage' => {
-        data_type => 'string',
-        description => 'Presentation storage.',
-        required => '0',
-    },
-    };
-    __PACKAGE__->method_documentation->{ 'save_portion_as_math_ml' } = { 
-    	summary => 'Convert Mathematical Text to MathML Format and saves result to the storage',
-        params => $params,
-        returns => undef,
-        };
-}
-# @return void
-#
-sub save_portion_as_math_ml {
-    my ($self, %args) = @_;
-
-    # verify the required parameter 'name' is set
-    unless (exists $args{'name'} && defined $args{'name'} && $args{'name'}) {
-      croak("Missing the required parameter 'name' when calling save_portion_as_math_ml");
-    }
-
-    # verify the required parameter 'slide_index' is set
-    unless (exists $args{'slide_index'} && defined $args{'slide_index'}) {
-      croak("Missing the required parameter 'slide_index' when calling save_portion_as_math_ml");
-    }
-
-    # verify the required parameter 'shape_index' is set
-    unless (exists $args{'shape_index'} && defined $args{'shape_index'}) {
-      croak("Missing the required parameter 'shape_index' when calling save_portion_as_math_ml");
-    }
-
-    # verify the required parameter 'paragraph_index' is set
-    unless (exists $args{'paragraph_index'} && defined $args{'paragraph_index'}) {
-      croak("Missing the required parameter 'paragraph_index' when calling save_portion_as_math_ml");
-    }
-
-    # verify the required parameter 'portion_index' is set
-    unless (exists $args{'portion_index'} && defined $args{'portion_index'}) {
-      croak("Missing the required parameter 'portion_index' when calling save_portion_as_math_ml");
-    }
-
-    # verify the required parameter 'out_path' is set
-    unless (exists $args{'out_path'} && defined $args{'out_path'} && $args{'out_path'}) {
-      croak("Missing the required parameter 'out_path' when calling save_portion_as_math_ml");
-    }
-
-    # parse inputs
-    my $_resource_path = '/slides/{name}/slides/{slideIndex}/shapes/{shapeIndex}/paragraphs/{paragraphIndex}/portions/{portionIndex}/mathml';
-
-    my $_method = 'PUT';
-    my $query_params = {};
-    my $header_params = {};
-    my $form_params = {};
-
-    # 'Accept' and 'Content-Type' header
-    my $_header_accept = $self->{api_client}->select_header_accept('application/json');
-    if ($_header_accept) {
-        $header_params->{'Accept'} = $_header_accept;
-    }
-    $header_params->{'Content-Type'} = $self->{api_client}->select_header_content_type('application/json');
-
-    # query params
-    if (exists $args{'out_path'} && defined $args{'out_path'}) {
-        $query_params->{'outPath'} = $self->{api_client}->to_query_value($args{'out_path'});
-    }
-
-    # query params
-    if (exists $args{'folder'} && defined $args{'folder'}) {
-        $query_params->{'folder'} = $self->{api_client}->to_query_value($args{'folder'});
-    }
-
-    # query params
-    if (exists $args{'storage'} && defined $args{'storage'}) {
-        $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
-    }
-
-    # header params
-    if ( exists $args{'password'}) {
-        $header_params->{':password'} = $self->{api_client}->to_header_value($args{'password'});
-    }
-
-    # path params
-    if ( exists $args{'name'}) {
-        my $_base_variable = "{" . "name" . "}";
-        my $_base_value = $self->{api_client}->to_path_value($args{'name'});
-        $_resource_path =~ s/$_base_variable/$_base_value/g;
-    }
-
-    # path params
-    if ( exists $args{'slide_index'}) {
-        my $_base_variable = "{" . "slideIndex" . "}";
-        my $_base_value = $self->{api_client}->to_path_value($args{'slide_index'});
-        $_resource_path =~ s/$_base_variable/$_base_value/g;
-    }
-
-    # path params
-    if ( exists $args{'shape_index'}) {
-        my $_base_variable = "{" . "shapeIndex" . "}";
-        my $_base_value = $self->{api_client}->to_path_value($args{'shape_index'});
-        $_resource_path =~ s/$_base_variable/$_base_value/g;
-    }
-
-    # path params
-    if ( exists $args{'paragraph_index'}) {
-        my $_base_variable = "{" . "paragraphIndex" . "}";
-        my $_base_value = $self->{api_client}->to_path_value($args{'paragraph_index'});
-        $_resource_path =~ s/$_base_variable/$_base_value/g;
-    }
-
-    # path params
-    if ( exists $args{'portion_index'}) {
-        my $_base_variable = "{" . "portionIndex" . "}";
-        my $_base_value = $self->{api_client}->to_path_value($args{'portion_index'});
-        $_resource_path =~ s/$_base_variable/$_base_value/g;
-    }
-
-    my $_body_data;
-    my $files = [];
-    # make the API Call
-    $self->{api_client}->call_api($_resource_path, $_method,
-                                           $query_params, $form_params,
-                                           $header_params, $_body_data, $files);
-    return;
-}
-
-#
 # save_presentation
 #
 # Save a presentation to a specified format.
@@ -29006,7 +28723,7 @@ sub save_presentation {
     }
 
     # verify enum value
-    if (!grep(/^$args{'format'}$/i, ( 'Pdf', 'Xps', 'Tiff', 'Pptx', 'Odp', 'Otp', 'Ppt', 'Pps', 'Ppsx', 'Pptm', 'Ppsm', 'Pot', 'Potx', 'Potm', 'Html', 'Html5', 'Swf', 'Svg', 'Jpeg', 'Png', 'Gif', 'Bmp', 'Fodp', 'Xaml', 'Mpeg4', 'Md' ))) {
+    if (!grep(/^$args{'format'}$/i, ( 'Pdf', 'Xps', 'Tiff', 'Pptx', 'Odp', 'Otp', 'Ppt', 'Pps', 'Ppsx', 'Pptm', 'Ppsm', 'Pot', 'Potx', 'Potm', 'Html', 'Html5', 'Swf', 'Svg', 'Jpeg', 'Png', 'Gif', 'Bmp', 'Fodp', 'Xaml', 'Mpeg4', 'Md', 'Xml' ))) {
       croak("Invalid value for 'format': " . $args{'format'});
     }
 
@@ -29643,7 +29360,7 @@ sub save_slide {
     }
 
     # verify enum value
-    if (!grep(/^$args{'format'}$/i, ( 'Jpeg', 'Png', 'Gif', 'Bmp', 'Tiff', 'Html', 'Pdf', 'Xps', 'Pptx', 'Odp', 'Otp', 'Ppt', 'Pps', 'Ppsx', 'Pptm', 'Ppsm', 'Potx', 'Pot', 'Potm', 'Svg', 'Fodp', 'Xaml', 'Html5', 'Md' ))) {
+    if (!grep(/^$args{'format'}$/i, ( 'Jpeg', 'Png', 'Gif', 'Bmp', 'Tiff', 'Html', 'Pdf', 'Xps', 'Pptx', 'Odp', 'Otp', 'Ppt', 'Pps', 'Ppsx', 'Pptm', 'Ppsm', 'Potx', 'Pot', 'Potm', 'Svg', 'Fodp', 'Xaml', 'Html5', 'Md', 'Xml' ))) {
       croak("Invalid value for 'format': " . $args{'format'});
     }
 
@@ -29832,7 +29549,7 @@ sub save_slide_online {
     }
 
     # verify enum value
-    if (!grep(/^$args{'format'}$/i, ( 'Jpeg', 'Png', 'Gif', 'Bmp', 'Tiff', 'Html', 'Pdf', 'Xps', 'Pptx', 'Odp', 'Otp', 'Ppt', 'Pps', 'Ppsx', 'Pptm', 'Ppsm', 'Potx', 'Pot', 'Potm', 'Svg', 'Fodp', 'Xaml', 'Html5', 'Md' ))) {
+    if (!grep(/^$args{'format'}$/i, ( 'Jpeg', 'Png', 'Gif', 'Bmp', 'Tiff', 'Html', 'Pdf', 'Xps', 'Pptx', 'Odp', 'Otp', 'Ppt', 'Pps', 'Ppsx', 'Pptm', 'Ppsm', 'Potx', 'Pot', 'Potm', 'Svg', 'Fodp', 'Xaml', 'Html5', 'Md', 'Xml' ))) {
       croak("Invalid value for 'format': " . $args{'format'});
     }
 
@@ -33394,7 +33111,7 @@ sub split {
     }
 
     # verify enum value
-    if (exists $args{'format'} && $args{'format'} && !grep(/^$args{'format'}$/i, ( 'Jpeg', 'Png', 'Gif', 'Bmp', 'Tiff', 'Html', 'Pdf', 'Xps', 'Pptx', 'Odp', 'Otp', 'Ppt', 'Pps', 'Ppsx', 'Pptm', 'Ppsm', 'Potx', 'Pot', 'Potm', 'Svg', 'Fodp', 'Xaml', 'Html5', 'Md' ))) {
+    if (exists $args{'format'} && $args{'format'} && !grep(/^$args{'format'}$/i, ( 'Jpeg', 'Png', 'Gif', 'Bmp', 'Tiff', 'Html', 'Pdf', 'Xps', 'Pptx', 'Odp', 'Otp', 'Ppt', 'Pps', 'Ppsx', 'Pptm', 'Ppsm', 'Potx', 'Pot', 'Potm', 'Svg', 'Fodp', 'Xaml', 'Html5', 'Md', 'Xml' ))) {
       croak("Invalid value for 'format': " . $args{'format'});
     }
 
@@ -33584,7 +33301,7 @@ sub split_and_save_online {
     }
 
     # verify enum value
-    if (!grep(/^$args{'format'}$/i, ( 'Jpeg', 'Png', 'Gif', 'Bmp', 'Tiff', 'Html', 'Pdf', 'Xps', 'Pptx', 'Odp', 'Otp', 'Ppt', 'Pps', 'Ppsx', 'Pptm', 'Ppsm', 'Potx', 'Pot', 'Potm', 'Svg', 'Fodp', 'Xaml', 'Html5', 'Md' ))) {
+    if (!grep(/^$args{'format'}$/i, ( 'Jpeg', 'Png', 'Gif', 'Bmp', 'Tiff', 'Html', 'Pdf', 'Xps', 'Pptx', 'Odp', 'Otp', 'Ppt', 'Pps', 'Ppsx', 'Pptm', 'Ppsm', 'Potx', 'Pot', 'Potm', 'Svg', 'Fodp', 'Xaml', 'Html5', 'Md', 'Xml' ))) {
       croak("Invalid value for 'format': " . $args{'format'});
     }
 
@@ -33761,7 +33478,7 @@ sub split_online {
     }
 
     # verify enum value
-    if (!grep(/^$args{'format'}$/i, ( 'Jpeg', 'Png', 'Gif', 'Bmp', 'Tiff', 'Html', 'Pdf', 'Xps', 'Pptx', 'Odp', 'Otp', 'Ppt', 'Pps', 'Ppsx', 'Pptm', 'Ppsm', 'Potx', 'Pot', 'Potm', 'Svg', 'Fodp', 'Xaml', 'Html5', 'Md' ))) {
+    if (!grep(/^$args{'format'}$/i, ( 'Jpeg', 'Png', 'Gif', 'Bmp', 'Tiff', 'Html', 'Pdf', 'Xps', 'Pptx', 'Odp', 'Otp', 'Ppt', 'Pps', 'Ppsx', 'Pptm', 'Ppsm', 'Potx', 'Pot', 'Potm', 'Svg', 'Fodp', 'Xaml', 'Html5', 'Md', 'Xml' ))) {
       croak("Invalid value for 'format': " . $args{'format'});
     }
 

@@ -108,7 +108,7 @@ YAML
           instanceLocation => '/request/uri/path',
           keywordLocation => '/paths',
           absoluteKeywordLocation => $doc_uri->clone->fragment('/paths')->to_string,
-          error => 'no match found for URI path "/foo/bar"',
+          error => 'no match found for URI "http://example.com/foo/bar"',
         },
       ],
     },
@@ -128,7 +128,7 @@ YAML
             instanceLocation => '/request/uri/path',
             keywordLocation => '/paths',
             absoluteKeywordLocation => $doc_uri->clone->fragment('/paths')->to_string,
-            error => 'no match found for URI path "/foo/bar"',
+            error => 'no match found for URI "http://example.com/foo/bar"',
           },
         ],
       },
@@ -354,7 +354,7 @@ YAML
     MultipleValuesAsArray => ' three ',
   ]);
   cmp_result(
-    $openapi->validate_response($response, { path_template => '/foo', path_captures => {}, method => 'get' })->TO_JSON,
+    $openapi->validate_response($response, { path_template => '/foo', method => 'get' })->TO_JSON,
     {
       valid => false,
       errors => [

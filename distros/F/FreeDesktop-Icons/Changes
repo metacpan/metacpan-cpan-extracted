@@ -1,5 +1,8 @@
 Revision history for Perl extension FreeDesktop::Icons.
 
+0.03 Sun Jul 28 2024
+	- searching on deviant icon names, '-' replaced by '_' and ''.
+
 0.03 Thu Jul 18 2024
 	- fixed bug in FindRawImage method
 	- updated Readme.md

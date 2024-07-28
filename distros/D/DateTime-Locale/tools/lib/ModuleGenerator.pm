@@ -430,11 +430,11 @@ sub _write_pod_files ($self) {
         ),
         DateTime->new(
             year      => -10,
-            month     => 9,
-            day       => 15,
-            hour      => 4,
-            minute    => 44,
-            second    => 23,
+            month     =>  9,
+            day       =>  15,
+            hour      =>  4,
+            minute    =>  44,
+            second    =>  23,
             time_zone => 'UTC',
         ),
     );

@@ -11,7 +11,7 @@ use strict;
 use warnings;
 use Carp;
 use vars qw($VERSION);
-$VERSION="0.03";
+$VERSION="0.04";
 use Config;
 
 my $mswin = $Config{'osname'} eq 'MSWin32';
@@ -26,6 +26,20 @@ my @extensions = (
 	'.xbm',
 	'.xpm',
 	'.svg',
+);
+
+my %regsubs = (
+	1 => sub { return shift },
+	2 => sub {
+		my $test = shift;
+		$test =~ s/\-/_/g;
+		return $test;
+	},
+	3 => sub {
+		my $test = shift;
+		$test =~ s/\-//g;
+		return $test;
+	},
 );
 
 my @defaulticonpath = ();
@@ -122,13 +136,17 @@ sub availableContexts {
 			}
 		}
 	} elsif ((defined $name) and (not defined $size)) {
-		if (exists $t->{$name}) {
-			my $si = $t->{$name};
-			my @sizes = keys %$si;
-			for (@sizes) {
-				my $ci = $si->{$_};
-				for (keys %$ci) {
-					$found{$_} = 1;
+		for (1 .. 3) {
+			my $sub = $regsubs{$_};
+			my $test = &$sub($name);
+			if (exists $t->{$test}) {
+				my $si = $t->{$test};
+				my @sizes = keys %$si;
+				for (@sizes) {
+					my $ci = $si->{$_};
+					for (keys %$ci) {
+						$found{$_} = 1;
+					}
 				}
 			}
 		}
@@ -143,11 +161,15 @@ sub availableContexts {
 			}
 		}
 	} else {
-		if (exists $t->{$name}) {
-			my $si = $t->{$name};
-			if (exists $si->{$size}) {
-				my $ci = $si->{$size};
-				%found = %$ci;
+		for (1 .. 3) {
+			my $sub = $regsubs{$_};
+			my $test = &$sub($name);
+			if (exists $t->{$test}) {
+				my $si = $t->{$test};
+				if (exists $si->{$size}) {
+					my $ci = $si->{$size};
+					%found = %$ci;
+				}
 			}
 		}
 	}
@@ -211,18 +233,6 @@ sub availableIcons {
 	return sort keys %matches
 }
 
-=item B<availableThemes>
-
-Returns a list of available themes it found while initiating the module.
-
-=cut
-
-sub availableThemes {
-	my $self = shift;
-	my $k = $self->{THEMES};
-	return sort keys %$k
-}
-
 
 =item B<availableSizes>I<($theme, >[ I<$name, $context> ] I<);>
 
@@ -247,9 +257,13 @@ sub availableSizes {
 			}
 		}
 	} elsif ((defined $name) and (not defined $context)) {
-		if (exists $t->{$name}) {
-			my $si = $t->{$name};
-			%found = %$si;
+		for (1 .. 3) {
+			my $sub = $regsubs{$_};
+			my $test = &$sub($name);
+			if (exists $t->{$test}) {
+				my $si = $t->{$test};
+				%found = %$si;
+			}
 		}
 	} elsif ((not defined $name) and (defined $context)) {
 		my @names = keys %$t;
@@ -264,12 +278,16 @@ sub availableSizes {
 			}
 		}
 	} else {
-		if (exists $t->{$name}) {
-			my $si = $t->{$name};
-			my @sizes = keys %$si;
-			for (@sizes) {
-				if (exists $t->{$name}->{$_}->{$context}) {
-					$found{$_} = 1
+		for (1 .. 3) {
+			my $sub = $regsubs{$_};
+			my $test = &$sub($name);
+			if (exists $t->{$test}) {
+				my $si = $t->{$test};
+				my @sizes = keys %$si;
+				for (@sizes) {
+					if (exists $t->{$test}->{$_}->{$context}) {
+						$found{$_} = 1
+					}
 				}
 			}
 		}
@@ -282,7 +300,19 @@ sub availableSizes {
 		}
 	}
 	delete $found{'unknown'};
-	return sort {$a <=> $b} keys %found
+	return sort keys %found
+}
+
+=item B<availableThemes>
+
+Returns a list of available themes it found while initiating the module.
+
+=cut
+
+sub availableThemes {
+	my $self = shift;
+	my $k = $self->{THEMES};
+	return sort keys %$k
 }
 
 sub AvailableSizesCurrentTheme {
@@ -453,9 +483,16 @@ All parameters except $name are optional.
 
 sub get {
 	my ($self, $name, $size, $context, $resize) = @_;
-	my $img = $self->FindRawImage($name);
-	return $img if defined $img;
-	return $self->FindLibImage($name, $size, $context, $resize);
+
+	for (1 .. 3) {
+		my $sub = $regsubs{$_};
+		my $test = &$sub($name);
+		my $img = $self->FindRawImage($test);
+		return $img if defined $img;
+		$img = $self->FindLibImage($test, $size, $context, $resize);
+		return $img if defined $img;
+	}
+	return undef;
 }
 
 =item B<getFolders>I<($theme)>

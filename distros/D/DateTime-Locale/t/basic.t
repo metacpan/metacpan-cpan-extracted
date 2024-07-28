@@ -61,7 +61,6 @@ my %is_locale_without_native_data = map { $_ => 1 } qw(
     nso
     sid
     sid-ET
-    skr
     tig
     tig-ER
     tn
@@ -135,11 +134,25 @@ sub test_one_locale {
         '$locale->code returns the code used to load the locale'
     );
 
-    unless ( $is_locale_without_en_data{$code} ) {
+    if ( $is_locale_without_en_data{$code} ) {
+        is(
+            $locale->name,
+            q{},
+            'does not have a native locale name',
+        );
+    }
+    else {
         ok( length $locale->name, 'has a locale name' );
     }
 
-    unless ( $is_locale_without_native_data{$code} ) {
+    if ( $is_locale_without_native_data{$code} ) {
+        is(
+            $locale->native_name,
+            q{},
+            'does not have a native locale name',
+        );
+    }
+    else {
         ok(
             length $locale->native_name,
             'has a native locale name',

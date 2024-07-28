@@ -1,3 +1,5 @@
+0.009 Sun 28 Jul 2024
+  Put VERSION in main module so cpanm upgrades
 0.008 Wed 10 Jul 2024
   Allow negative offsets for the previous() and next() methods https://github.com/dr-kd/p5-array-circular/pull/6 thanks @ology
 0.007 29/8/2019

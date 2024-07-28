@@ -1,0 +1,37 @@
+0.006   2024-06-26  Released-By: PERLANCAR; Urgency: medium
+
+        - Rename module/dist Sah-Schema{s,Bundle}-* for consistency with
+          others.
+
+
+0.005   2021-07-19  Released-By: PERLANCAR; Urgency: low
+
+        - No functional changes.
+
+	- [build] Rebuild with updated Pod::Weaver plugin [-Sah::Schemas] to
+          properly list schemas in distribution.
+
+
+0.004   2020-03-08  Released-By: PERLANCAR; Urgency: medium
+
+        - No functional changes.
+
+	- [build] Rebuild with updated Pod::Weaver plugin [-Sah::Schemas] to
+          correctly show examples.
+
+
+0.003   2020-03-04  Released-By: PERLANCAR; Urgency: medium
+
+	- Update examples, use 'value' instead of 'data'.
+
+
+0.002   2020-03-02  Released-By: PERLANCAR; Urgency: low
+
+	- No functional changes.
+
+	- Add examples (tests).
+
+
+0.001   2019-01-20  Released-By: PERLANCAR
+
+        - First release.

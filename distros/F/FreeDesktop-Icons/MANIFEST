@@ -3,7 +3,8 @@ lib/FreeDesktop/Icons.pm
 Makefile.PL
 MANIFEST			This list of files
 README.md
-t/FreeDesktop-Icons.t
+t/FreeDesktop-Icons-1.t
+t/FreeDesktop-Icons-2.t
 t/Raw/git-icon.png
 t/Themes/PNG1/actions/22/document-new.png
 t/Themes/PNG1/actions/22/document-save.png
@@ -30,5 +31,30 @@ t/Themes/SVG1/apps/22/kate.svg
 t/Themes/SVG1/apps/32/utilities-terminal.svg
 t/Themes/SVG1/apps/32/vlc.svg
 t/Themes/SVG1/index.theme
+t/Themes2/PNG1/actions/22/document_new.png
+t/Themes2/PNG1/actions/22/document_save.png
+t/Themes2/PNG1/actions/32/editcut.png
+t/Themes2/PNG1/actions/32/editfind.png
+t/Themes2/PNG1/apps/22/multimedia_volume_control.png
+t/Themes2/PNG1/apps/22/system_file_manager.png
+t/Themes2/PNG1/apps/32/accessories_text_editor.png
+t/Themes2/PNG1/apps/32/helpbrowser.png
+t/Themes2/PNG1/index.theme
+t/Themes2/PNG2/actions/22/arrowdown.png
+t/Themes2/PNG2/actions/22/arrowleft.png
+t/Themes2/PNG2/actions/32/arrow_left_double.png
+t/Themes2/PNG2/actions/32/arrow_up_double.png
+t/Themes2/PNG2/apps/22/callstart.png
+t/Themes2/PNG2/apps/22/checkbox.png
+t/Themes2/PNG2/apps/32/gwenview.png
+t/Themes2/PNG2/apps/32/inkscape.png
+t/Themes2/PNG2/index.theme
+t/Themes2/SVG1/actions/22/adjustrgb.svg
+t/Themes2/SVG1/actions/32/align_horizontal_left.svg
+t/Themes2/SVG1/actions/32/align_horizontal_left_out.svg
+t/Themes2/SVG1/apps/22/kate.svg
+t/Themes2/SVG1/apps/32/utilitiesterminal.svg
+t/Themes2/SVG1/apps/32/vlc.svg
+t/Themes2/SVG1/index.theme
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

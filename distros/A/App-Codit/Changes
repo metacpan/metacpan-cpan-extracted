@@ -1,5 +1,31 @@
 Revision history for Perl extension App::Codit.
 
+0.09 Sat Jul 27 2024
+	- added many more components to the About tab.
+	- added module App::Codit::Macro.
+	- new method CoditMDI: docCaseLower.
+	- new method CoditMDI: docCaseUpper.
+	- new method CoditMDI: docFixIndent.
+	- new method CoditMDI: docFixIndentCycle.
+	- new method CoditMDI: docRemoveTrailing.
+	- new method CoditMDI: docRemoveTrailingCycle.
+	- new method CoditMDI: macroGet.
+	- new method CoditMDI: macroInit.
+	- new method CoditMDI: macroList.
+	- new method CoditMDI: macroRemove.
+	- new method CoditMDI: macroRemoveAll.
+	- new method CoditMDI: spaceMacroAdd.
+	- new method CoditMDI: spaceMacroCycle.
+	- new method CoditMDI: spaceMacroRemove.
+	- new option CoditMDI: -doc_show_spaces.
+	- new commands CoditMDI: doc_case_upper, doc_case_lower, doc_fix_indent and doc_remove_trailing.
+	- added their companions in the edit and tool menu.
+	- added some options to the settings dialog and modified it's layout.
+	- plugin Git now functional.
+	- plugin sessions now aware of Console and Git.
+	- modified context menu of the Navigator tree.
+	- the manual pdf is now online.
+
 0.08 Wed Jul 10 2024
 	- compliant with Tk::AppWindow version 0.11
 	- fixed bug in plugin Console.

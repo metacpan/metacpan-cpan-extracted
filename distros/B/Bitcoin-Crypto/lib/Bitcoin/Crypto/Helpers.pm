@@ -1,5 +1,5 @@
 package Bitcoin::Crypto::Helpers;
-$Bitcoin::Crypto::Helpers::VERSION = '2.005';
+$Bitcoin::Crypto::Helpers::VERSION = '2.006';
 use v5.10;
 use strict;
 use warnings;

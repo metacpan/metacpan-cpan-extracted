@@ -4,14 +4,21 @@ use warnings;
 use Tk;
 
 use Test::Tk;
-use Test::More tests => 5;
+use Test::More;
 use File::Spec;
 use Config;
 my $mswin = $Config{'osname'} eq 'MSWin32';
 $mwclass = 'App::Codit';
 
-$quitdelay = 1000 if $mswin;
-$delay = 1500;
+#test for git support
+my $gitsupport = 0;
+my $git = `git -v`;
+$gitsupport = $git =~ /^git\sversion/;
+print "No git support\n" unless $gitsupport;
+
+$quitdelay = 1000;
+$delay = 3000;
+$delay = 5000 if $mswin;
 
 BEGIN { use_ok('App::Codit::Plugins::Git') };
 
@@ -37,7 +44,12 @@ push @tests, (
 		return defined $b 
 #		return $pext->plugExists('Git') 
 	}, '', 'Plugin Git unloaded' ],
-);
+	[ sub {
+		$pext->plugLoad('Git');
+		return $pext->plugExists('Git') 
+	}, 1, 'Plugin Git reloaded' ],
+) if $gitsupport;
 
 starttesting;
 
+done_testing(@tests + 3);

@@ -4,13 +4,14 @@ use warnings;
 use Tk;
 
 use Test::Tk;
-use Test::More tests => 5;
+use Test::More tests => 6;
 use File::Spec;
 use Config;
 my $mswin = $Config{'osname'} eq 'MSWin32';
 $mwclass = 'App::Codit';
-$delay = 1500;
-$quitdelay = 1000 if $mswin;
+$delay = 3000;
+$delay = 5000 if $mswin;
+$quitdelay = 1000;
 
 BEGIN { use_ok('App::Codit::Plugins::Backups') };
 
@@ -26,7 +27,8 @@ if (defined $app) {
 	$pext = $app->extGet('Plugins');
 }
 push @tests, (
-	[ sub { 
+	[ sub {
+#		pause(4000);
 		return $pext->plugExists('Backups') 
 	}, 1, 'Plugin Backups loaded' ],
 	[ sub {
@@ -36,6 +38,10 @@ push @tests, (
 		return defined $b 
 #		return $pext->plugExists('Backups') 
 	}, '', 'Plugin Backups unloaded' ],
+	[ sub {
+		$pext->plugLoad('Backups');
+		return $pext->plugExists('Backups') 
+	}, 1, 'Plugin Backups reloaded' ],
 );
 
 starttesting;

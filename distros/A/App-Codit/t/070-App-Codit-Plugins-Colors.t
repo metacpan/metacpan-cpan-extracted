@@ -4,14 +4,15 @@ use warnings;
 use Tk;
 
 use Test::Tk;
-use Test::More tests => 5;
+use Test::More tests => 6;
 use File::Spec;
 use Config;
 my $mswin = $Config{'osname'} eq 'MSWin32';
 $mwclass = 'App::Codit';
 
-$quitdelay = 1000 if $mswin;
-$delay = 1500;
+$quitdelay = 1000;
+$delay = 3000;
+$delay = 5000 if $mswin;
 
 BEGIN { use_ok('App::Codit::Plugins::Colors') };
 
@@ -37,6 +38,10 @@ push @tests, (
 		return defined $b 
 #		return $pext->plugExists('Colors') 
 	}, '', 'Plugin Colors unloaded' ],
+	[ sub {
+		$pext->plugLoad('Colors');
+		return $pext->plugExists('Colors') 
+	}, 1, 'Plugin Colors reloaded' ],
 );
 
 starttesting;

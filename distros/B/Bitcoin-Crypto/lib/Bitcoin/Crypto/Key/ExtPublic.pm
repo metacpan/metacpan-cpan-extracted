@@ -1,15 +1,14 @@
 package Bitcoin::Crypto::Key::ExtPublic;
-$Bitcoin::Crypto::Key::ExtPublic::VERSION = '2.005';
+$Bitcoin::Crypto::Key::ExtPublic::VERSION = '2.006';
 use v5.10;
 use strict;
 use warnings;
 use Moo;
 use Crypt::Mac::HMAC qw(hmac);
-use Type::Params -sigs;
+use Types::Common -sigs, -types;
 
 use Bitcoin::Crypto::Constants;
 use Bitcoin::Crypto::Helpers qw(ensure_length add_ec_points);
-use Bitcoin::Crypto::Types qw(Object HashRef);
 use Bitcoin::Crypto::Exception;
 use Bitcoin::Crypto::BIP44;
 

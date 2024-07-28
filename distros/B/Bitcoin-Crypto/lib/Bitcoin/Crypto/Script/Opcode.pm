@@ -1,12 +1,12 @@
 package Bitcoin::Crypto::Script::Opcode;
-$Bitcoin::Crypto::Script::Opcode::VERSION = '2.005';
+$Bitcoin::Crypto::Script::Opcode::VERSION = '2.006';
 use v5.10;
 use strict;
 use warnings;
 
 use Moo;
 use Mooish::AttributeBuilder -standard;
-use Type::Params -sigs;
+use Types::Common -sigs, -types;
 use List::Util qw(notall);
 
 use Crypt::Digest::RIPEMD160 qw(ripemd160);
@@ -16,7 +16,7 @@ use Crypt::Digest::SHA1 qw(sha1);
 use Bitcoin::Crypto qw(btc_pub);
 use Bitcoin::Crypto::Constants;
 use Bitcoin::Crypto::Exception;
-use Bitcoin::Crypto::Types qw(Str IntMaxBits CodeRef Bool);
+use Bitcoin::Crypto::Types -types;
 use Bitcoin::Crypto::Util qw(hash160 hash256 get_public_key_compressed);
 use Bitcoin::Crypto::Transaction::Input;
 

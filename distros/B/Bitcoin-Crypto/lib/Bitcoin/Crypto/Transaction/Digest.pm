@@ -1,16 +1,17 @@
 package Bitcoin::Crypto::Transaction::Digest;
-$Bitcoin::Crypto::Transaction::Digest::VERSION = '2.005';
+$Bitcoin::Crypto::Transaction::Digest::VERSION = '2.006';
 use v5.10;
 use strict;
 use warnings;
 
 use Moo;
 use Mooish::AttributeBuilder -standard;
+use Types::Common -types;
 
 use Bitcoin::Crypto::Util qw(hash256 pack_compactsize);
+use Bitcoin::Crypto::Types -types;
 use Bitcoin::Crypto::Exception;
 use Bitcoin::Crypto::Constants;
-use Bitcoin::Crypto::Types qw(InstanceOf ByteStr PositiveOrZeroInt PositiveOrZeroInt);
 
 has param 'transaction' => (
 	isa => InstanceOf ['Bitcoin::Crypto::Transaction'],

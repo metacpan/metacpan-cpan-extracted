@@ -1,0 +1,1 @@
+{"version":"0.40","name":"Package::Stash","target":"Package::Stash","provides":{"Package::Stash::PP":{"version":"0.40","file":"lib/Package/Stash/PP.pm"},"Package::Stash":{"file":"lib/Package/Stash.pm","version":"0.40"}},"dist":"Package-Stash-0.40","pathname":"E/ET/ETHER/Package-Stash-0.40.tar.gz"}

@@ -1,15 +1,15 @@
 package Bitcoin::Crypto::Script::Runner;
-$Bitcoin::Crypto::Script::Runner::VERSION = '2.005';
+$Bitcoin::Crypto::Script::Runner::VERSION = '2.006';
 use v5.10;
 use strict;
 use warnings;
 use Moo;
 use Mooish::AttributeBuilder -standard;
-use Type::Params -sigs;
+use Types::Common -sigs, -types;
 
 use Scalar::Util qw(blessed);
 
-use Bitcoin::Crypto::Types qw(ArrayRef Str ByteStr Object InstanceOf PositiveOrZeroInt);
+use Bitcoin::Crypto::Types -types;
 use Bitcoin::Crypto::Exception;
 use Bitcoin::Crypto::Helpers qw(pad_hex);
 use Bitcoin::Crypto::Script::Transaction;

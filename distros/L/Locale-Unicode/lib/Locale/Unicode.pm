@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Unicode Locale Identifier - ~/lib/Locale/Unicode.pm
-## Version v0.3.1
+## Version v0.3.4
 ## Copyright(c) 2024 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2024/05/11
-## Modified 2024/07/27
+## Modified 2024/07/28
 ## All rights reserved
 ## 
 ## 
@@ -34,10 +34,15 @@ BEGIN
     );
     use Scalar::Util ();
     use Want;
+    # ""root" is treated as a special unicode_language_subtag"
+    # <https://unicode.org/reports/tr35/tr35.html#Unicode_language_identifier>
     # NOTE: $LOCALE_BCP47_RE
     our $LOCALE_BCP47_RE = qr/
     (?:
         (?:
+            # "root" is treated as a special Unicode language subtag in the LDML and required in the valid pattern
+            (?<root>root)
+            |
             (?<language>[a-z]{2})
             |
             (?<language3>[a-z]{3})
@@ -68,7 +73,8 @@ BEGIN
                 (?<country_code>[A-Z]{2})
                 |
                 # BCP47, section 2.2.4.4: the UN Standard Country or Area Codes for Statistical Use
-                (?<region>\d{3})
+                # We are careful not to catch a following variant starting with a digit.
+                (?<region>\d{3}(?!\d))
             )
         )?
         # "Optional variant subtags, separated by hyphens, each composed of five to eight letters, or of four characters starting with a digit"
@@ -79,15 +85,17 @@ BEGIN
             -
             (?<variant>
                 (?:
-                    (?:[[:alpha:]]{5,8})
+                    (?:[[:alnum:]]{5,8})
                     |
-                    (?:\d[[:alpha:]]{3})
+                    (?:\d[[:alnum:]]{3})
                 )
                 (?:
                     \-
-                    (?:[[:alpha:]]{5,8})
-                    |
-                    (?:\d[[:alpha:]]{3})
+                    (?:
+                        (?:[[:alnum:]]{5,8})
+                        |
+                        (?:\d[[:alnum:]]{3})
+                    )
                 )*
             )
         )?
@@ -99,6 +107,9 @@ BEGIN
     our $LOCALE_BCP47_NAMELESS_RE = qr/
     (?:
         (?:
+            # "root" is treated as a special Unicode language subtag in the LDML and required in the valid pattern
+            (?:root)
+            |
             (?:[a-z]{2})
             |
             (?:[a-z]{3})
@@ -129,7 +140,8 @@ BEGIN
                 (?:[A-Z]{2})
                 |
                 # BCP47, section 2.2.4.4: the UN Standard Country or Area Codes for Statistical Use
-                (?:\d{3})
+                # We are careful not to catch a following variant starting with a digit.
+                (?:\d{3}\d{3}(?!\d))
             )
         )?
         # "Optional variant subtags, separated by hyphens, each composed of five to eight letters, or of four characters starting with a digit"
@@ -140,15 +152,17 @@ BEGIN
             -
             (?:
                 (?:
-                    (?:[[:alpha:]]{5,8})
+                    (?:[[:alnum:]]{5,8})
                     |
-                    (?:\d[[:alpha:]]{3})
+                    (?:\d[[:alnum:]]{3})
                 )
                 (?:
                     \-
-                    (?:[[:alpha:]]{5,8})
-                    |
-                    (?:\d[[:alpha:]]{3})
+                    (?:
+                        (?:[[:alnum:]]{5,8})
+                        |
+                        (?:\d[[:alnum:]]{3})
+                    )
                 )*
             )
         )?
@@ -380,7 +394,7 @@ BEGIN
     our $PROP_TO_SUB = {};
     # False, by default
     our $EXPLICIT_BOOLEAN = 0;
-    our $VERSION = 'v0.3.1';
+    our $VERSION = 'v0.3.4';
 };
 
 use strict;
@@ -408,6 +422,7 @@ sub new
     $self->{destination}        = undef;
     # u-em
     $self->{emoji}              = undef;
+    $self->{extended}           = undef;
     # u-fw
     $self->{first_day}          = undef;
     $self->{grandfathered_irregular} = undef;
@@ -684,7 +699,15 @@ sub canonical
     my $clone = Locale::Unicode->new( "$self" );
     if( my $variant = $self->variant )
     {
-        my $variant2 = join( '-', sort( map( lc( $_ ), split( /-/, $variant ) ) ) );
+        # Make sure we have unique variants
+        # "The sequence of variant subtags must not have any duplicates (eg, de-1996-fonipa-1996 is not syntactically well-formed)."
+        # <https://unicode.org/reports/tr35/tr35.html#Unicode_language_identifier>
+        my $uniq = sub
+        {
+            my %seen;
+            grep( !$seen{ $_ }++, @_ );
+        };
+        my $variant2 = join( '-', $uniq->( sort( map( lc( $_ ), split( /-/, $variant ) ) ) ) );
         $clone->variant( $variant2 ) if( $variant2 ne $variant );
     }
 
@@ -718,6 +741,7 @@ sub canonical
         if( $lang )
         {
             my $lang_canon = lc( $lang );
+            $lang_canon = 'und' if( $lang_canon eq 'root' );
             $clone->language( $lang_canon ) if( $lang_canon ne $lang );
         }
         elsif( $lang3 )
@@ -848,10 +872,17 @@ sub core
         {
             push( @locale_parts, 'und' );
         }
+
+        if( my $extended = $self->extended )
+        {
+            push( @locale_parts, $extended );
+        }
+
         if( my $script = $self->script )
         {
             push( @locale_parts, $script );
         }
+
         if( my $cc = $self->country_code )
         {
             push( @locale_parts, $cc );
@@ -860,6 +891,7 @@ sub core
         {
             push( @locale_parts, $region );
         }
+
         if( my $variant = $self->variant )
         {
             push( @locale_parts, $variant );
@@ -1059,6 +1091,26 @@ sub lang3 { return( shift->reset(@_)->_set_get_prop( {
 
 sub language { return( shift->lang( @_ ) ); }
 
+sub language_extended
+{
+    my $self = shift( @_ );
+    my @parts = ();
+    if( my $lang = $self->language )
+    {
+        push( @parts, $lang );
+    }
+    elsif( my $lang3 = $self->language3 )
+    {
+        push( @parts, $lang3 );
+    }
+
+    if( my $ext = $self->extended )
+    {
+        push( @parts, $ext );
+    }
+    return( join( '-', @parts ) );
+}
+
 sub language3 { return( shift->lang3( @_ ) ); }
 
 sub language_id
@@ -1071,7 +1123,7 @@ sub language_id
         {
             $self->language( undef );
         }
-        elsif( length( $val ) eq 3 )
+        elsif( length( $val ) == 3 )
         {
             $self->language3( $val );
         }
@@ -1112,10 +1164,10 @@ sub matches
     # Required by RFC for parsing
     $lang =~ tr/_/-/;
     # Special language 'root' becomes 'und' for 'undefined'
-    if( substr( lc( $lang ), 0, 5 ) eq 'root-' )
-    {
-        substr( $lang, 0, 4, 'und' );
-    }
+    # if( substr( lc( $lang ), 0, 5 ) eq 'root-' )
+    # {
+    #     substr( $lang, 0, 4, 'und' );
+    # }
     if( $lang =~ /^$LOCALE_RE$/ )
     {
         my $re = {%+};
@@ -1214,6 +1266,14 @@ sub parse
     my $info = {};
     # Value provided failed to match the locale regular expression
     return( $info ) if( !$re );
+    # "root" is treated as a special unicode_language_subtag
+    # <https://unicode.org/reports/tr35/tr35.html#Unicode_language_identifier>
+    if( exists( $re->{root} ) &&
+        defined( $re->{root} ) &&
+        length( $re->{root} ) )
+    {
+        $re->{language} = delete( $re->{root} )
+    }
     foreach my $prop ( qw( language language3 extended script country_code region variant privateuse grandfathered_irregular grandfathered_regular overlong ) )
     {
         # the property provided as an option can be undef by design to remove the value
@@ -3740,7 +3800,7 @@ In Scalar or in list context, the value returned is the last value set.
 
 =head1 VERSION
 
-    v0.3.1
+    v0.3.4
 
 =head1 DESCRIPTION
 
@@ -3779,7 +3839,7 @@ See the L<LDML specifications|https://unicode.org/reports/tr35/tr35.html#Unicode
     $locale->country_code( 'JP' );
     # Now: ja-Kana-JP-t-de-t0-und
 
-This takes a C<locale> as compliant with the BCP47 standard, and an optional hash or hash reference of options and this returns a new object.
+This takes a C<locale> as compliant with the BCP47 standard upgraded by the L<LDML specifications|https://unicode.org/reports/tr35>, and an optional hash or hash reference of options and this returns a new object.
 
 The C<locale> provided is parsed and its components can be accessed and modified using all the methods of this class API.
 
@@ -4476,6 +4536,44 @@ This is an alias for L<lang|/lang>
 =head2 language3
 
 This is an alias for L<lang3|/lang3>
+
+=head2 language_extended
+
+    my $locale = Locale::Unicode->new( 'zh-cmn-TW' );
+    say $locale->language; # zh
+    say $locale->language3; # undef
+    say $locale->language_id; # zh
+    say $locale->extended; # cmn
+    say $locale->language_extended; # zh-cmn
+    say $locale->country_code; # TW
+
+    my $locale = Locale::Unicode->new( 'ja-JP' );
+    say $locale->language; # ja
+    say $locale->extended; # undef
+    say $locale->language_extended; # ja
+
+    # Okinawan spoken in Japan Southern islands
+    my $locale = Locale::Unicode->new( 'ryu-JP' );
+    say $locale->language; # undef
+    say $locale->language3; # ryu
+    say $locale->language_id; # ryu
+    say $locale->language_extended; # ryu
+
+Read-only. This method returns the extended form of the language subtag, which means the 2 to 3-characters language ID and an optional extended language subtag.
+
+Extended language subtag serves to provide more granularity to a locale, complementing the primary language subtag.
+
+For example:
+
+=over 4
+
+=item * zh-cmn-Hans-CN (Chinese, Mandarin, Simplified script, as used in China)
+
+=item * zh-yue-HK (Chinese, Cantonese, as used in Hong Kong SAR)
+
+=back
+
+However, with Unicode C<LDML>, this is deprecated, and, for example, C<zh-cmn-TW> would be normalised to just C<zh-TW>. See L<Locale::Unicode::Data/normalise> for more information.
 
 =head2 language_id
 

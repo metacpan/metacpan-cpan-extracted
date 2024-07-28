@@ -1,13 +1,13 @@
 package Bitcoin::Crypto::Script::Transaction;
-$Bitcoin::Crypto::Script::Transaction::VERSION = '2.005';
+$Bitcoin::Crypto::Script::Transaction::VERSION = '2.006';
 use v5.10;
 use strict;
 use warnings;
 use Moo;
 use Mooish::AttributeBuilder -standard;
-use Type::Params -sigs;
+use Types::Common -sigs, -types;
 
-use Bitcoin::Crypto::Types qw(Object InstanceOf PositiveOrZeroInt ByteStr);
+use Bitcoin::Crypto::Types -types;
 use Bitcoin::Crypto::Exception;
 
 use namespace::clean;

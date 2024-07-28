@@ -209,6 +209,8 @@ my $encoder = JSON::Schema::Modern::_JSON_BACKEND()->new
   ->pretty(1)
   ->indent_length(2);
 
+*UNIVERSAL::TO_JSON = sub ($obj) { $obj.'' };
+
 # deep comparison, with strict typing
 sub is_equal ($got, $expected, $test_name = undef) {
   context_do {

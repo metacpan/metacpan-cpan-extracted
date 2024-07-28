@@ -1,0 +1,1 @@
+{"name":"Crypt::OpenSSL::RSA","version":0.33,"target":"Crypt::OpenSSL::RSA","pathname":"T/TO/TODDR/Crypt-OpenSSL-RSA-0.33.tar.gz","provides":{"Crypt::OpenSSL::RSA":{"version":0.33,"file":"RSA.pm"}},"dist":"Crypt-OpenSSL-RSA-0.33"}

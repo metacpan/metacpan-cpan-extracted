@@ -4,7 +4,7 @@ use utf8;
 use strict;
 use warnings;
 
-$Acme::Glue::VERSION = "2024.04";
+$Acme::Glue::VERSION = "2024.07";
 
 =encoding utf8
 
@@ -14,7 +14,7 @@ Acme::Glue - A placeholder module for code accompanying a Perl photo project
 
 =head1 VERSION
 
-2024.04
+2024.07
 
 =head1 DESCRIPTION
 
@@ -199,6 +199,40 @@ Here are the snippets that may accompany the photo project
       sort { $a->[1] <=> $b->[1] or $a->[0] cmp $b->[0] }
       map  { [$_, length($_)] }
       qw(demo of schwartzian transform);
+
+=head2 LIST OF WORKSHOPS / CONFERENCES
+
+A full list of the workshops and conferences this project was shot at
+
+=over
+
+=item Alpine Perl Workshop (2016)
+
+=item FOSDEM (2024)
+
+=item German Perl Workshop (2019)
+
+=item German Perl and Raku Workshop (2022, 2023, 2024)
+
+=item Les Journées Perl (2017, 2019)
+
+=item London Perl Workshop (2015, 2016, 2019)
+
+=item PerlCon (2019)
+
+=item Swiss Perl Workshop (2015, 2017, 2018, 2019)
+
+=item The Perl Conference [EU] (2017, 2018)
+
+=item The Perl Conference [NA] (2016, 2017)
+
+=item The Perl Toolchain Sumit (2017)
+
+=item The Perl and Raku Conference [NA] (2023, 2024)
+
+=item Yet Another Perl Conference [EU] (2015, 2016)
+
+=back
 
 =head1 THANKS
 

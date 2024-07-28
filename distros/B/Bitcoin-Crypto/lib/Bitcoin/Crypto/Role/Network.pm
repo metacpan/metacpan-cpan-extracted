@@ -1,12 +1,12 @@
 package Bitcoin::Crypto::Role::Network;
-$Bitcoin::Crypto::Role::Network::VERSION = '2.005';
+$Bitcoin::Crypto::Role::Network::VERSION = '2.006';
 use v5.10;
 use strict;
 use warnings;
 use Scalar::Util qw(blessed);
 use Mooish::AttributeBuilder -standard;
+use Types::Common -types;
 
-use Bitcoin::Crypto::Types qw(InstanceOf Str);
 use Bitcoin::Crypto::Network;
 use Bitcoin::Crypto::Exception;
 use Moo::Role;

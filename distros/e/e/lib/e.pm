@@ -30,7 +30,7 @@ package e;
            ⠹⡽⣾⣿⠹⣿⣆⣾⢯⣿⣿ ⡞ ⠻⣿⣿⣿⠁ ⢠⣿⢏  ⡀ ⡟  ⢀⣴⣿⠃⢁⡼⠁ ⠈
              ⠈⠛ ⢻⣿⣧⢸⢟⠶⢾⡇  ⣸⡿⠁ ⢠⣾⡟⢼  ⣷ ⡇ ⣰⠋⠙⠁
                 ⠈⣿⣻⣾⣦⣇⢸⣇⣀⣶⡿⠁⣀⣀⣾⢿⡇⢸  ⣟⡦⣧⣶⠏ unleashed
-                 ⠸⢿⡍⠛⠻⠿⠿⠿⠋⣠⡾⢋⣾⣏⣸⣷⡸⣇⢰⠟⠛⠻⡄  v1.25
+                 ⠸⢿⡍⠛⠻⠿⠿⠿⠋⣠⡾⢋⣾⣏⣸⣷⡸⣇⢰⠟⠛⠻⡄  v1.26
                    ⢻⡄   ⠐⠚⠋⣠⡾⣧⣿⠁⠙⢳⣽⡟
                    ⠈⠳⢦⣤⣤⣀⣤⡶⠛ ⠈⢿⡆  ⢿⡇
                          ⠈    ⠈⠓  ⠈
@@ -45,7 +45,7 @@ use 5.006;
 use strict;
 use warnings;
 
-our $VERSION = '1.25';
+our $VERSION = '1.26';
 
 =head1 SYNOPSIS
 
@@ -284,6 +284,11 @@ Decode a byte steam to UTF-8 code point:
 
 Set STDOUT and STDERR as UTF-8 encoded.
 
+If given a filehandle, will set the encoding
+for it to UTF-8.
+
+    utf8($fh);
+
 =cut
 
 =head2 Enhanced Types
@@ -305,6 +310,58 @@ Work with arrays.
     my $collection = c(1, 2, 3);
 
 Turn list into a L<Mojo::Collection> object.
+
+=cut
+
+=head3 set
+
+Work with sets.
+
+    my $set = set(2,4,6,4);
+
+Turn list into a L<Set::Scalar> object.
+
+    $ perl -Me -e 'say set(2,4,6,2)'
+    (2 4 6)
+    
+Get elements:
+
+    $ perl -Me -e 'say for sort(set(2,4,6,2)->elements)'
+    $ perl -Me -e 'say for sort(set(2,4,6,2)->@*)'
+    2
+    4
+    6
+
+Intersection:
+
+    $ perl -Ilib/ -Me -e 'say set(2,4,6,2) * set(3,4,5,6)'
+    (4 6)
+
+Create a new universe:
+
+    # Universe 1:
+    # ...
+    Set::Scalar::Universe->new->enter;
+    # Universe 2:
+    # ...
+
+Operations:
+
+    set                         value
+
+    $a                          (a b c d e _ _ _ _)
+    $b                          (_ _ c d e f g _ _)
+    $c                          (_ _ _ _ e f g h i)
+
+    union:        $a + $b       (a b c d e f g _ _)
+    union:        $a + $b + $c  (a b c d e f g h i)
+    intersection: $a * $b       (_ _ c d e _ _ _ _)
+    intersection: $a * $b * $c  (_ _ _ _ e _ _ _ _)
+    difference:   $a - $b       (a b _ _ _ _ _ _ _)
+    difference:   $a - $b - $c  (a b _ _ _ _ _ _ _)
+    unique:       $a % $b       (a b _ _ _ f g _ _)
+    symm_diff:    $a / $b       (a b _ _ _ f g _ _)
+    complement:   -$a           (_ _ c d e f g h i)
 
 =cut
 
@@ -335,11 +392,11 @@ Always sends output to the terminal even
 when STDOUT and/or STDERR are redirected:
 
     $ perl -Me -e '
+        say "Shown before";
         close *STDOUT;
         close *STDERR;
-        say 111;
-        print "999\n";
-        say 222;
+        say "Shown with no stdout/err";
+        print "Print not seen\n";
     '
     111
     222
@@ -436,16 +493,39 @@ Insert subroutines into the symbol table.
 
 Extracted from Mojo::Util for performance.
 
-Import methods into another function
-(as done this module):
+Import methods into another package
+(as done in this module):
 
-    $ perl -e 'package A; use e; sub import { my $c = caller(); monkey_patch $c, new => sub { say "Im new" } } package main; A->import; new()'
+    $ perl -e '
+        package A;
+        use e;
+        sub import {
+            my $c = caller();
+            monkey_patch
+                $c,
+                new => sub { say "Im new" };
+        }
+        package main;
+        A->import;
+        new();
+    '
     Im new
 
 Import methods into the same package
 (probably not so useful):
 
-    $ perl -e 'package A; use e; sub import { my $c = caller(); monkey_patch $c, new => sub { say "Im new" } } A->import; A->new()'
+    $ perl -e '
+        package A;
+        use e;
+        sub import {
+            my $c = caller();
+            monkey_patch
+                $c,
+                new => sub { say "Im new" };
+        }
+        A->import;
+        A->new();
+    '
     Im new
 
 Perhaps can be updated based on the outcome
@@ -497,7 +577,7 @@ sub monkey_patch {
 
 sub import {
     my ( $class, $caller ) = @_;
-    my %imported;
+    my %imported;    # Require only once a package.
     $caller //= caller;
 
     monkey_patch(
@@ -637,6 +717,14 @@ sub import {
             Mojo::Collection::c( @_ );
         },
 
+        # Array Object.
+        set => sub {
+            if ( !$imported{$caller}{"Set::Scalar"}++ ) {
+                require Set::Scalar;
+            }
+            Set::Scalar->new( @_ );
+        },
+
         ######################################
         #         Files Convenience
         ######################################
@@ -662,15 +750,19 @@ sub import {
             # issues with next say() if still closed:
             #   "say() on closed filehandle STDOUT"
             if ( !-t STDOUT ) {
-                open my $tty, ">", "/dev/tty" or die $!;
-                caller->can( "utf8" )->( $tty );    # Method now in caller.
-                CORE::say $tty @args;
-                close $tty;
+                if ( open my $tty, ">", "/dev/tty" ) {
+                    caller->can( "utf8" )->( $tty );    # Method now in caller.
+                    my $prefix =
+                      caller->can( "dye" )->( "no-stdout: ", "CYAN" );
+                    CORE::say( $tty $prefix, @args );
+                    close $tty;
+                }
             }
 
             # Send to output incase something expects it there.
-            caller->can( "utf8" );
-            CORE::say @args;
+            caller->can( "utf8" )->();
+            CORE::say( @args );
+
         },
 
         # Pretty Print.
@@ -735,7 +827,7 @@ sub import {
             my @lines = Term::Table->new(
                 header   => $header,
                 rows     => \@rows,
-                sanitize => 0,          # To not show \n
+                sanitize => 0,         # To not show \n
             )->render;
 
             return @lines if wantarray;
@@ -753,10 +845,10 @@ sub import {
             if ( !$imported{$caller}{"Mojo::UserAgent"}++ ) {
                 require Mojo::UserAgent;
             }
-            my $UA = Mojo::UserAgent->new;
-            $UA->max_redirects( 10 ) unless defined $ENV{MOJO_MAX_REDIRECTS};
-            $UA->proxy->detect       unless defined $ENV{MOJO_PROXY};
-            $UA->get( @_ )->result;
+            my $ua = Mojo::UserAgent->new;
+            $ua->max_redirects( 10 ) unless defined $ENV{MOJO_MAX_REDIRECTS};
+            $ua->proxy->detect       unless defined $ENV{MOJO_PROXY};
+            $ua->get( @_ )->result;
         },
 
         # URL.

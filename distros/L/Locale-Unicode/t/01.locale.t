@@ -23,6 +23,7 @@ isa_ok( $loc, 'Locale::Unicode' );
 
 # To generate this list:
 # perl -lnE '/^sub (?!new|[A-Z]|_)/ and say "can_ok( \$loc, \''", [split(/\s+/, $_)]->[1], "\'' );"' ./lib/Locale/Unicode.pm
+# NOTE: methods check
 can_ok( $loc, 'apply' );
 can_ok( $loc, 'as_string' );
 can_ok( $loc, 'break_exclusion' );
@@ -57,6 +58,7 @@ can_ok( $loc, 'dx' );
 can_ok( $loc, 'em' );
 can_ok( $loc, 'emoji' );
 can_ok( $loc, 'error' );
+can_ok( $loc, 'extended' );
 can_ok( $loc, 'false' );
 can_ok( $loc, 'first_day' );
 can_ok( $loc, 'fw' );
@@ -85,6 +87,7 @@ can_ok( $loc, 'lang' );
 can_ok( $loc, 'lang3' );
 can_ok( $loc, 'language' );
 can_ok( $loc, 'language3' );
+can_ok( $loc, 'language_extended' );
 can_ok( $loc, 'language_id' );
 can_ok( $loc, 'lb' );
 can_ok( $loc, 'line_break' );
@@ -96,10 +99,12 @@ can_ok( $loc, 'm0' );
 can_ok( $loc, 'matches' );
 can_ok( $loc, 'measurement' );
 can_ok( $loc, 'mechanism' );
+can_ok( $loc, 'merge' );
 can_ok( $loc, 'ms' );
 can_ok( $loc, 'mu' );
 can_ok( $loc, 'nu' );
 can_ok( $loc, 'number' );
+can_ok( $loc, 'overlong' );
 can_ok( $loc, 'parse' );
 can_ok( $loc, 'pass_error' );
 can_ok( $loc, 'private' );
@@ -138,6 +143,7 @@ can_ok( $loc, 'vt' );
 can_ok( $loc, 'x0' );
 
 my $re;
+# NOTE: Using all locale codes provided by DateTime::Locale to test
 # From version 0.90 onward, the method 'codes' is available
 if( $DateTime::Locale::VERSION >= 0.90 )
 {
@@ -152,6 +158,7 @@ if( $DateTime::Locale::VERSION >= 0.90 )
     }
 }
 
+# NOTE: Various locales form test data
 my @tests = (
     'gsw-u-sd-chzh' => 
         {
@@ -175,6 +182,7 @@ my @tests = (
                 language3 => "gsw",
                 sd => "chzh",
             },
+            stringify => 'gsw-u-sd-chzh',
         },
     'he-IL-u-ca-hebrew-tz-jeruslm' =>
         {
@@ -203,6 +211,7 @@ my @tests = (
                 language => "he",
                 tz => "jeruslm",
             },
+            stringify => 'he-IL-u-ca-hebrew-tz-jeruslm',
         },
     'ja-t-it' =>
         {
@@ -225,6 +234,7 @@ my @tests = (
                 language => "ja",
                 transform_locale => 'it',
             },
+            stringify => 'ja-t-it',
         },
     'ja-Kana-t-it' =>
         {
@@ -250,6 +260,7 @@ my @tests = (
                 script => "Kana",
                 transform_locale => 'it',
             },
+            stringify => 'ja-Kana-t-it',
         },
     'und-Latn-t-und-cyrl' =>
         {
@@ -275,6 +286,7 @@ my @tests = (
                 script => "Latn",
                 transform_locale => 'und-cyrl',
             },
+            stringify => 'und-Latn-t-und-cyrl',
         },
     'und-Cyrl-t-und-latn-m0-ungegn-2007' =>
         {
@@ -304,6 +316,7 @@ my @tests = (
                 script => "Cyrl",
                 transform_locale => 'und-latn',
             },
+            stringify => 'und-Cyrl-t-und-latn-m0-ungegn-2007',
         },
     'de-u-co-phonebk-ka-shifted' =>
         {
@@ -330,6 +343,7 @@ my @tests = (
                 ka => "shifted",
                 language => "de",
             },
+            stringify => 'de-u-co-phonebk-ka-shifted',
         },
     'ja-t-de-t0-und' =>
         {
@@ -356,6 +370,7 @@ my @tests = (
                 t0 => "und",
                 transform_locale => 'de',
             },
+            stringify => 'ja-t-de-t0-und',
         },
     'ja-t-de-t0-und-x0-medical' =>
         {
@@ -385,6 +400,7 @@ my @tests = (
                 transform_locale => 'de',
                 x0 => "medical",
             },
+            stringify => 'ja-t-de-t0-und-x0-medical',
         },
     'ja-t-de-AT-t0-und-x0-medical-u-ca-japanese-tz-jptyo-nu-jpanfin-x-private-subtag' =>
         {
@@ -428,9 +444,117 @@ my @tests = (
                 tz => "jptyo",
                 x0 => "medical",
             },
+            # It is different intentionally from the string provided, because the Unicode extension 't' comes before the extension 'u'
+            stringify => 'ja-u-ca-japanese-nu-jpanfin-tz-jptyo-t-de-AT-t0-und-x0-medical-x-private-subtag',
+        },
+    'zh-cmn-Hans-CN' =>
+        {
+            matches =>
+            {
+                country_code => "CN",
+                extended => "cmn",
+                language => "zh",
+                locale_bcp47 => "zh-cmn-Hans-CN",
+                script => "Hans",
+                territory => "CN",
+            },
+            parse =>
+            {
+                country_code => "CN",
+                extended => "cmn",
+                language => "zh",
+                script => "Hans",
+            },
+            subs =>
+            {
+                country_code => "CN",
+                extended => "cmn",
+                language => "zh",
+                language_extended => "zh-cmn",
+                core => "zh-cmn-Hans-CN",
+                script => "Hans",
+                territory => "CN",
+            },
+            stringify => 'zh-cmn-Hans-CN',
+        },
+    'zh-yue-HK' =>
+        {
+            matches =>
+            {
+                country_code => "HK",
+                extended => "yue",
+                language => "zh",
+                locale_bcp47 => "zh-yue-HK",
+                territory => "HK",
+            },
+            parse =>
+            {
+                country_code => "HK",
+                extended => "yue",
+                language => "zh",
+            },
+            subs =>
+            {
+                country_code => "HK",
+                extended => "yue",
+                language => "zh",
+                language_extended => "zh-yue",
+                core => "zh-yue-HK",
+                script => undef,
+                territory => "HK",
+            },
+            stringify => 'zh-yue-HK',
+        },
+    'root' =>
+        {
+            matches =>
+            {
+                locale_bcp47 => "root",
+                root => "root",
+            },
+            parse =>
+            {
+                language => "root",
+            },
+            subs =>
+            {
+                extended => undef,
+                language => "root",
+                language_extended => "root",
+                core => "root",
+                script => undef,
+                territory => undef,
+            },
+            stringify => 'root',
+        },
+    'de-1996-fonipa-1606nict' =>
+        {
+            matches =>
+            {
+                language => "de",
+                locale_bcp47 => "de-1996-fonipa-1606nict",
+                variant => "1996-fonipa-1606nict",
+            },
+            parse =>
+            {
+                language => "de",
+                variant => "1996-fonipa-1606nict",
+            },
+            subs =>
+            {
+                extended => undef,
+                language => "de",
+                language_extended => "de",
+                core => "de-1996-fonipa-1606nict",
+                script => undef,
+                territory => undef,
+                variant => "1996-fonipa-1606nict",
+            },
+            stringify => 'de-1996-fonipa-1606nict',
         },
 );
 
+# NOTE: various locales form check
 my $meth_cache = {};
 for( my $i = 0; $i < scalar( @tests ); $i += 2 )
 {
@@ -460,6 +584,7 @@ for( my $i = 0; $i < scalar( @tests ); $i += 2 )
             {
                 skip( "Error instantiating Locale::Unicode object for '$t': " . Locale::Unicode->error, 1 );
             }
+            is( "$locale", $def->{stringify}, "stringification of object yields ${t}" );
             foreach my $meth ( sort( keys( %{$def->{subs}} ) ) )
             {
                 my $code;
@@ -473,12 +598,13 @@ for( my $i = 0; $i < scalar( @tests ); $i += 2 )
                     $meth_cache->{ $meth } = $code;
                 }
                 my $rv = $code->( $locale );
-                is( "${rv}", $def->{subs}->{ $meth }, "\$locale->${meth}() -> '" . ( $rv // 'undef' ) . "' vs expected '" . ( $def->{subs}->{ $meth } // 'undef' ) . "'" );
+                is( defined( $rv ) ? "$rv" : undef, $def->{subs}->{ $meth }, "\$locale->${meth}() -> '" . ( $rv // 'undef' ) . "' vs expected '" . ( $def->{subs}->{ $meth } // 'undef' ) . "'" );
             }
         };
     };
 }
 
+# NOTE: instantiate and change
 subtest 'instantiate and change' => sub
 {
     my $locale = Locale::Unicode->new( 'ja-t-de-t0-und' );
@@ -495,6 +621,7 @@ subtest 'instantiate and change' => sub
     };
 };
 
+# NOTE: transform
 subtest 'transform' => sub
 {
     my $locale = Locale::Unicode->new( 'ja' );
@@ -506,6 +633,7 @@ subtest 'transform' => sub
     isa_ok( $locale->transform, 'Locale::Unicode', '$locale->transform( $object ) -> Locale::Unicode' );
 };
 
+# NOTE: chaining
 subtest 'chaining' => sub
 {
     my $locale = Locale::Unicode->new( 'ja' );
@@ -515,6 +643,7 @@ subtest 'chaining' => sub
     is( $locale->ca, 'japanese', 'ca' );
 };
 
+# NOTE: tz_ functions
 subtest 'tz_ functions' => sub
 {
     is( Locale::Unicode->tz_id2name( 'jptyo' ), 'Asia/Tokyo', 'tz_id2name' );
@@ -532,6 +661,7 @@ subtest 'tz_ functions' => sub
     is( Locale::Unicode->tz_name2id( 'Australia/Canberra' ), 'ausyd', 'tz_name2id' );
 };
 
+# NOTE: colCaseFirst
 subtest 'colCaseFirst' => sub
 {
     my @tests = (
@@ -562,6 +692,7 @@ subtest 'colCaseFirst' => sub
     }
 };
 
+# NOTE: grandfathered irregular
 subtest 'grandfathered irregular' => sub
 {
     my @tests = (
@@ -798,6 +929,7 @@ subtest 'grandfathered irregular' => sub
     is( "$l", "sgn-CH-DE", '$l -> sgn-CH-DE' );
 };
 
+# NOTE: grandfathered regular
 subtest 'grandfathered regular' => sub
 {
     my @tests = (
@@ -938,6 +1070,7 @@ subtest 'grandfathered regular' => sub
     is( "$l", "zh-min-nan", '$l -> zh-min-nan' );
 };
 
+# NOTE: privateuse
 subtest 'privateuse' => sub
 {
     my @tests = 
@@ -981,6 +1114,7 @@ subtest 'privateuse' => sub
     is( "$l", "x-abc", '$l -> x-abc' );
 };
 
+# NOTE: canonical
 subtest 'canonical' => sub
 {
     my @tests =
@@ -988,6 +1122,14 @@ subtest 'canonical' => sub
         {
             test => 'ja-kana-jp',
             expects => 'ja-Kana-JP',
+        },
+        {
+            test => 'root',
+            expects => 'und',
+        },
+        {
+            test => 'de-1996-fonipa-1996',
+            expects => 'de-1996-fonipa',
         }
     );
     foreach my $def ( @tests )
@@ -1007,11 +1149,12 @@ subtest 'canonical' => sub
                 diag( "Unable to get the canonical form for object '$def->{test}': ", $l->error ) if( $DEBUG );
             }
             isa_ok( $me => 'Locale::Unicode' );
-            is( "$me" => $def->{expects}, "$def->{test} -> $me" );
+            is( "$me" => $def->{expects}, "$def->{test} -> $def->{expects}" );
         };
     }
 };
 
+# NOTE: merge
 subtest 'merge' => sub
 {
     my $locale1 = Locale::Unicode->new( 'ja-JP' );
@@ -1025,6 +1168,7 @@ subtest 'merge' => sub
     is( "$locale1", 'ja-Kana-JP-posix-hepburn-heploc', 'merge -> ja-Kana-JP-posix-hepburn-heploc' );
 };
 
+# NOTE: overlong
 subtest 'overlong' => sub
 {
     # no warnings 'Locale::Unicode';

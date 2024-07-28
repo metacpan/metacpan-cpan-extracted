@@ -1,5 +1,15 @@
 Revision history for Perl module Locale::Unicode
 
+v0.3.4 2024-07-28T12:26:08+0900
+    - Minor correction for special locale 'root' with extension
+
+v0.3.3 2024-07-28T09:14:43+0900
+    - Corrected locale regular expression for variant (e.g. 1606nict)
+
+v0.3.2 2024-07-27T13:52:42+0900
+    - Corrected unit test and missing extended in stringification
+    - Added special language case "root" as per the LDML specification
+
 v0.3.1 2024-07-27T09:53:44+0900
     - Added method extended and corrected regular expression
     - Improved documentation

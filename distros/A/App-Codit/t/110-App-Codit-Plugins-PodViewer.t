@@ -4,14 +4,15 @@ use warnings;
 use Tk;
 
 use Test::Tk;
-use Test::More tests => 5;
+use Test::More tests => 6;
 use File::Spec;
 use Config;
 my $mswin = $Config{'osname'} eq 'MSWin32';
 $mwclass = 'App::Codit';
 
-$delay = 2000;
-#$quitdelay = 1000 if $mswin;
+$delay = 3000;
+$delay = 5000 if $mswin;
+$quitdelay = 1000;
 
 BEGIN { use_ok('App::Codit::Plugins::PodViewer') };
 
@@ -41,6 +42,10 @@ push @tests, (
 		return defined $b 
 #		return $pext->plugExists('PodViewer') 
 	}, '', 'Plugin PodViewer unloaded' ],
+	[ sub {
+		$pext->plugLoad('PodViewer');
+		return $pext->plugExists('PodViewer') 
+	}, 1, 'Plugin PodViewer reloaded' ],
 );
 
 starttesting;

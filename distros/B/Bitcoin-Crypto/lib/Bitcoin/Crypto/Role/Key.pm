@@ -1,14 +1,14 @@
 package Bitcoin::Crypto::Role::Key;
-$Bitcoin::Crypto::Role::Key::VERSION = '2.005';
+$Bitcoin::Crypto::Role::Key::VERSION = '2.006';
 use v5.10;
 use strict;
 use warnings;
 use Crypt::PK::ECC;
 use Scalar::Util qw(blessed);
 use Mooish::AttributeBuilder -standard;
-use Type::Params -sigs;
+use Types::Common -sigs, -types;
 
-use Bitcoin::Crypto::Types qw(Object InstanceOf BIP44Purpose Enum Maybe);
+use Bitcoin::Crypto::Types -types;
 use Bitcoin::Crypto::Constants;
 use Bitcoin::Crypto::Util qw(get_key_type);
 use Bitcoin::Crypto::Helpers qw(ensure_length);    # loads Math::BigInt

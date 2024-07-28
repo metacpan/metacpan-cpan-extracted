@@ -2,20 +2,26 @@
 use strict;
 use warnings;
 
-use if $ENV{USER} eq "gene", lib => map { "$ENV{HOME}/sandbox/$_/lib" } qw(Music-ScaleNote);
 use Music::ScaleNote ();
 
 my $row_offset = shift || 4; # major 3rd
 my $col_offset = shift || 7; # major 5th
+my $row_num    = shift || 6; # 
+my $col_num    = shift || 9; # 
 
-my $msn = Music::ScaleNote->new(scale_name => 'chromatic');
+my $half_one = int ($col_num - 1) / 2;
+
+my $msn = Music::ScaleNote->new(
+    scale_name => 'chromatic',
+    flat       => 1,
+);
 
 my $note_name = 'C4';
 
 # compute the row notes
 my @notes = ($note_name);
 my $name = $note_name;
-for my $i (1 .. 5) {
+for my $i (1 .. $row_num - 1) {
     my $n = $msn->get_offset(
         note_name => $name,
         offset    => $row_offset,
@@ -30,7 +36,7 @@ my $width = 2;
 for my $note (@notes) {
     $row++;
 
-    for my $i (-4 .. -1) {
+    for my $i (-$half_one .. -1) {
         my $n = $msn->get_offset(
             note_name => $note,
             offset    => $i * $col_offset,
@@ -41,7 +47,7 @@ for my $note (@notes) {
     ($name = $note) =~ s/\d+//;
     printf '%-*s  ', $width, $name;
 
-    for my $i (1 .. 4) {
+    for my $i (1 .. $half_one) {
         my $n = $msn->get_offset(
             note_name => $note,
             offset    => $i * $col_offset,
@@ -54,9 +60,9 @@ for my $note (@notes) {
 }
 
 __END__
-G#  D#  A#  F   C   G   D   A   E   
-  C   G   D   A   E   B   F#  C#  G#  
-    E   B   F#  C#  G#  D#  A#  F   C   
-      G#  D#  A#  F   C   G   D   A   E   
-        C   G   D   A   E   B   F#  C#  G#  
-          E   B   F#  C#  G#  D#  A#  F   C
+Ab  Eb  Bb  F   C   G   D   A   E
+  C   G   D   A   E   B   Gb  Db  Ab
+    E   B   Gb  Db  Ab  Eb  Bb  F   C
+      Ab  Eb  Bb  F   C   G   D   A   E
+        C   G   D   A   E   B   Gb  Db  Ab
+          E   B   Gb  Db  Ab  Eb  Bb  F   C
