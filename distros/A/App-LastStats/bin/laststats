@@ -1,0 +1,67 @@
+#!/usr/bin/perl -CS
+
+use strict;
+use warnings;
+
+use Getopt::Long;
+
+use App::LastStats;
+
+my $laststats;
+
+if (@ARGV == 1) {
+  $laststats = App::LastStats->new(username => $ARGV[0]);
+} else {
+  my %opts;
+  GetOptions(\%opts, 'user=s', 'count=i', 'format=s', 'period=s');
+
+  $laststats = App::LastStats->new(%opts);
+}
+
+$laststats->run;
+
+__END__
+
+=head1 NAME
+
+laststats - A script to fetch and display Last.fm statistics
+
+=head1 SYNOPSIS
+
+  laststats [options]
+
+=head1 DESCRIPTION
+
+This script fetches and displays Last.fm statistics for a given user. It allows you to specify the time period, format, and number of artists to display.
+
+=head1 OPTIONS
+
+=over 4
+
+=item B<--user>
+
+Last.fm username (defaults to "davorg")
+
+=item B<--count>
+
+The number of artists to display (defaults to 10)
+
+=item B<--format>
+
+The format to display results in. Can be "text", "html" or "json" (defaults to "text")
+
+=item B<--period>
+
+The time period for the stats. Can be "overall", "7day", "1month", "3month", "6month", "12month" (defaults to "7day")
+
+=back
+
+=head1 AUTHOR
+
+Dave Cross <dave@perlhacks.com>
+
+=head1 LICENSE
+
+This script is free software; you can redistribute it and/or modify it under the same terms as Perl itself.
+
+=cut

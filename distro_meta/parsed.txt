@@ -93265,3 +93265,13 @@ E/ET/ETHER/OpenAPI-Modern-0.067.tar.gz
 J/JD/JDEGUEST/Locale-Unicode-v0.3.4.tar.gz
 G/GE/GENE/Music-ScaleNote-0.0803.tar.gz
 P/PE/PERLANCAR/Sah-SchemaBundle-DBI-0.006.tar.gz
+D/DA/DAVECROSS/App-LastStats-0.0.2.tar.gz
+S/SV/SVW/App-Prove-Plugin-TestArgs-2.1.0.tar.gz
+R/RE/REEDFISH/Net-FullAuto-1.0000679.tar.gz
+B/BA/BARBARITO/Kanboard-API-0.01.tar.gz
+J/JD/JDEGUEST/Locale-Unicode-v0.3.5.tar.gz
+S/SI/SISYPHUS/Math-MPC-1.33.tar.gz
+G/GE/GENE/MIDI-RtMidi-ScorePlayer-0.0201.tar.gz
+E/ET/ETJ/PGPLOT-2.30.tar.gz
+P/PE/PERLANCAR/Software-Catalog-1.0.8.tar.gz
+B/BF/BFAIST/WebService-MusicBrainz-1.0.7.tar.gz

@@ -30060,422 +30060,7 @@ sub cmd
          my $testcmd='';my $ms_cmd='';
          ($ms_cmd=$command)=~tr/ //s;
          $ms_cmd=(-1<index lc($command),'cmd /c') ? 1 : 0;
-         if (0 && !$live && $ms_cmd) {
-print $Net::FullAuto::FA_Core::LOG "WEVE GOT WINDOWSCOMMAND=$command\n"
-   if $Net::FullAuto::FA_Core::log && -1<index $Net::FullAuto::FA_Core::LOG,'*';
-            if ($self->{_uname} ne 'cygwin') {
-               ($output,$stderr)=Rem_Command::cmd($self,
-                  'uname',@args);
-               &Net::FullAuto::FA_Core::handle_error($stderr) if $stderr;
-               $stderr="remote OS is $output - NOT a cygwin system!\n";
-               &Net::FullAuto::FA_Core::handle_error($stderr);
-            }
-            $pid_ts=$self->{_cmd_pid}.'_'.$Net::FullAuto::FA_Core::invoked[0]
-                   .'_'.$Net::FullAuto::FA_Core::increment++;
-            push @FA_Core::pid_ts, $pid_ts;
-            my $t=$self->{_work_dirs}->{_tmp_mswin}.'\\';
-            $t=~s/\\/\\\\/g;
-            $t=~s/\\$//mg;
-            my $str=" echo \"del ${t}end${pid_ts}.flg ${t}cmd${pid_ts}.bat"
-                   ." ${t}out${pid_ts}.txt ${t}err${pid_ts}.txt\""
-                   ." > ${t}rm${pid_ts}.bat";
-            $self->{_cmd_handle}->print($str);
-            my $cfh_ignore='';my $cfh_error='';
-            ($cfh_ignore,$cfh_error)=
-               &Net::FullAuto::FA_Core::clean_filehandle(
-               $self->{_cmd_handle});
-            &Net::FullAuto::FA_Core::handle_error($cfh_error,'-1')
-               if $cfh_error;
-            my $cmmd='';
-            if (-1<index $command,"\n") {
-               my @command=split /\n/,$command;my $ccnt=0;
-               foreach my $cmd (@command) {
-                  ($cmmd=$cmd)=~s/^\s*[cC][mM][dD]\s+\/[cC]\s+(.*)$/$1/;
-                  $cmmd=~tr/\'/\"/;
-                  $cmmd=~s/\\/\\\\/g;
-                  $cmmd=~s/\\$//mg;
-                  $cmmd=~s/\"/\\\"/g;
-                  if (!$ccnt++) {
-                     if (unpack('a4',$cmmd) eq 'set ') {
-                        $str=" echo \"$cmmd\""
-                            ." > ${t}cmd${pid_ts}.bat";
-                     } else {
-                        $str=" echo \"$cmmd 2>${t}err${pid_ts}.txt "
-                            ."1>${t}out${pid_ts}"
-                            .".txt\" > ${t}cmd${pid_ts}.bat";
-                     }
-                     $self->{_cmd_handle}->print($str);
-                     my $lastDB7=0;
-                     DB7: while (1) {
-                        $self->{_cmd_handle}->print;
-                        eval {
-                           while (my $line=$self->{_cmd_handle}->get(
-                                             Timeout=>$cmtimeout)) {
-                              $line=~s/\s//g;
-                              if ($line=~/^$cmd_prompt$/) {
-                                 $lastDB7=1;last
-                              } last if $line=~/$cmd_prompt$/s;
-                           }
-                        }; last if $lastDB7;
-                        if ($@) {
-                           if (-1<index $@,'read timed-out') {
-                              next;
-                           } else { die "$@       $!" }
-                        }
-                     }
-                     $output=join '',$self->{_cmd_handle}->cmd(
-                               String => $str,
-                               Timeout => $cmtimeout
-                            );
-                  } else {
-                     if (unpack('a4',$cmmd) eq 'set ') {
-                        $str=" echo \"$cmmd\""
-                            ." >> ${t}cmd${pid_ts}.bat";
-                     } else {
-                        $str=" echo \"$cmmd 2>>${t}err${pid_ts}.txt "
-                            ."1>>${t}out${pid_ts}"
-                            .".txt\" >> ${t}cmd${pid_ts}.bat";
-                     }
-                     $self->{_cmd_handle}->print($str);
-                     my $lastDB8=0;
-                     DB8: while (1) {
-                        $self->{_cmd_handle}->print;
-                        eval {
-                           while (my $line=$self->{_cmd_handle}->get(
-                                             Timeout=>$cmtimeout)) {
-                              $line=~s/\s//g;
-                              if ($line=~/^$cmd_prompt$/) {
-                                 $lastDB8=1;last
-                              } last if $line=~/$cmd_prompt$/s;
-                           }
-                        }; last if $lastDB8;
-                        if ($@) {
-                           if (-1<index $@,'read timed-out') {
-                              next;
-                           } else { die "$@       $!" }
-                        }
-                     }
-                  }
-               }
-            } else {
-               ($cmmd=$command)=~s/^\s*[cC][mM][dD]\s+\/[cC]\s+(.*)$/$1/;
-               $cmmd=~tr/\'/\"/;
-               $cmmd=~s/\\/\\\\/g;
-               $cmmd=~s/\\$//mg;
-               $cmmd=~s/\"/\\\"/g;
-               $str=" echo \" $cmmd 2>${t}err${pid_ts}.txt 1>${t}out${pid_ts}"
-                   .".txt\" > ${t}cmd${pid_ts}.bat";
-               $self->{_cmd_handle}->print($str);
-               my $lastDB9=0;
-               DB9: while (1) {
-                  $self->{_cmd_handle}->print;
-                  eval {
-                     while (my $line=$self->{_cmd_handle}->get(
-                                      Timeout=>$cmtimeout)) {
-                        $line=~s/\s//g;
-                        if ($line=~/^$cmd_prompt$/) {
-                           $lastDB9=1;last
-                        } last if $line=~/$cmd_prompt$/s;
-                     }
-                  }; last if $lastDB9;
-                  if ($@) {
-                     if (-1<index $@,'read timed-out') {
-                        next;
-                     } else { die "$@       $!" }
-                  }
-               }
-            }
-            $str=" echo \"echo \"DONE\" > ${t}end${pid_ts}.flg\" >>"
-                ." ${t}cmd${pid_ts}.bat";
-            $self->{_cmd_handle}->print($str);
-            my $lastDB10=0;
-            DB10: while (1) {
-               $self->{_cmd_handle}->print;
-               eval {
-                  while (my $line=$self->{_cmd_handle}->get(
-                                      Timeout=>$cmtimeout)) {
-                     $line=~s/\s//g;
-                     if ($line=~/^$cmd_prompt$/) {
-                        $lastDB10=1;last
-                     } last if $line=~/$cmd_prompt$/s;
-                  }
-               }; last if $lastDB10;
-               if ($@) {
-                  if (-1<index $@,'read timed-out') {
-                     next;
-                  } else { die "$@       $!" }
-               }
-            }
-            $self->{_cmd_handle}->
-               print(" echo \"exit\" >> ${t}cmd${pid_ts}.bat");
-            my $lastDB11=0;
-            DB11: while (1) {
-               $self->{_cmd_handle}->print;
-               eval {
-                  while (my $line=$self->{_cmd_handle}->get(
-                                      Timeout=>$cmtimeout)) {
-                     $line=~s/\s//g;
-                     if ($line=~/^$cmd_prompt$/) {
-                        $lastDB11=1;last
-                     } last if $line=~/$cmd_prompt$/s;
-                  }
-               };
-               if ($lastDB11) {
-                  $self->{_cmd_handle}->print(' echo ECHO');
-                  eval {
-                     my $echo=0;
-                     while (my $line=$self->{_cmd_handle}->get(
-                                       Timeout=>$cmtimeout)) {
-                        $line=~s/\s//g;
-                        if ($line=~/ECHO/s) {
-                           last if $line=~/$cmd_prompt$/s;
-                              $echo=1;
-                        } elsif ($echo==1) {
-                           last if $line=~/$cmd_prompt$/s;
-                        }
-                     }
-                  };
-               } last if $lastDB11;
-               if ($@) {
-                  if (-1<index $@,'read timed-out') {
-                     next;
-                  } else { die "$@       $!" }
-               }
-            }
-#print "RUNNING COMMANDBAT $cmmd\n";
-            $self->{_cmd_handle}->print(" cmd /c start ${t}cmd${pid_ts}.bat");
-            ($cfh_ignore,$cfh_error)=
-               &Net::FullAuto::FA_Core::clean_filehandle(
-               $self->{_cmd_handle});
-            &Net::FullAuto::FA_Core::handle_error($cfh_error,'-1')
-               if $cfh_error;
-            KC: foreach my $hlabel (keys %Net::FullAuto::FA_Core::Processes) {
-               foreach my $sid (keys %{$Net::FullAuto::FA_Core::Processes{$hlabel}}) {
-                  foreach my $type (keys %{$Net::FullAuto::FA_Core::Processes{$hlabel}
-                          {$sid}}) {
-                     if ($self->{_cmd_handle} eq ${$Net::FullAuto::FA_Core::Processes
-                           {$hlabel}{$sid}{$type}}[0]) {
-                        ${$Net::FullAuto::FA_Core::Processes{$hlabel}{$sid}{$type}}[3]=
-                           "cmd /c start cmd${pid_ts}.bat"; 
-                        last KC;
-                     }
-                  }
-               }
-            }
-            my $err_cownt=0;my $nowerr_cownt=0;
-            my $err_size=0;my $err_size_save=0;
-            my $c=$self->{_work_dirs}->{_tmp}||
-                  $self->{_work_dirs}->{_tmp_mswin};
-            my $loop_time=0;
-            LK: while (1) {
-               my $shell_cmd=" if\n[[ -f ${c}end${pid_ts}.flg ]]\nthen" .
-                  "\necho END\nelse\necho LOOKING\nfi\n";
-               $self->{_cmd_handle}->print($shell_cmd);
-               if ($self->{_cmd_handle}->errmsg) {
-                  my $err=$self->{_cmd_handle}->errmsg;
-                  &Net::FullAuto::FA_Core::handle_error($err);
-               } my $looptime=0;$allines='';
-               while (1) {
-                  my $line=$self->{_cmd_handle}->
-                           get(Timeout=>$cmtimeout);
-                  $allines.=$line;
-                  last if $allines=~/^(END|LOOKING)/m;
-                  $self->{_cmd_handle}->print;
-                  $looptime=time() if !$looptime;
-                  if ($cmtimeout<time()-$looptime) {
-                     my $lv_errmsg="read timed-out for command :"
-                                  ."\n\n       -> $cmmd"
-                                  ."\n\n       invoked on \'$hostlabel\'"
-                                  ."\n\n       Current Timeout "
-                                  ."Setting is ->  $cmtimeout seconds.\n\n";
-                     $self->{_cmd_handle}->timeout($svtimeout);
-                     if ($wantarray) {
-                        die $lv_errmsg;
-                     } else {
-                        &Net::FullAuto::FA_Core::handle_error($lv_errmsg)
-                     }
-                  }
-               }
-               $allines=~s/\s*$//s;
-               if ($allines=~/^END/m) {
-                  my $cfh_ignore='';my $cfh_error='';
-                  ($cfh_ignore,$cfh_error)=
-                     &Net::FullAuto::FA_Core::clean_filehandle(
-                     $self->{_cmd_handle});
-                  &Net::FullAuto::FA_Core::handle_error($cfh_error,'-1')
-                     if $cfh_error;
-                  my $err_outt='';
-                  ($err_outt,$stderr)=$self->cmd("ls -l ${c}err${pid_ts}.txt");
-                  &Net::FullAuto::FA_Core::handle_error($stderr) if $stderr;
-                  $err_size='';
-                  ($err_size=$err_outt)
-                     =~s/^\S+\s+\d+\s+\S+\s+\S+\s+(\d+).*$/$1/s;
-                  if ($err_size!~/^\d+$/) {
-                     ($err_size=$err_outt)
-                        =~s/^\S+\s+\d+\s+\S+\s+\S+\s+\S+\s+(\d+).*$/$1/s;
-                  }
-                  if ($err_size=~/^\d+$/) {
-                     if ($err_size==$err_size_save &&
-                           $nowerr_cownt+3<$err_cownt++) {
-                        &Net::FullAuto::FA_Core::handle_error($stderr)
-                           if $stderr;
-                        last LK;
-                     } else { $err_size_save=$err_size }
-                  }
-                  last LK;
-               }
-               if (!$Net::FullAuto::FA_Core::cron ||
-                     ($Net::FullAuto::FA_Core::debug || $debug)) {
-                  print $Net::FullAuto::FA_Core::blanklines;
-                  print "\n       Gathering MSWin Output  $dots";
-                  if ($dcnt++<5) {
-                     $dots.="  .";
-                  } else { $dots='';$dcnt=0 }
-                  print "\n\n       From Command =>  $cmmd\n\n";
-               } sleep 1;
-            }
-            my $trandir='';
-            unless ($self->{_uname} eq 'cygwin' &&
-                  $self->{_hostlabel}->[0] eq "__Master_${$}__") {
-               if ($self->{_work_dirs}->{_lcd} ne
-                     $self->{_work_dirs}->{_tmp_lcd}) {
-                  ($output,$stderr)=&ftpcmd($self,
-                     "lcd \"$self->{_work_dirs}->{_tmp_lcd}\"",
-                     $cache);
-                  &Net::FullAuto::FA_Core::handle_error($stderr,'-2')
-                     if $stderr;
-                  ($output,$stderr)=&ftpcmd($self,
-                     "get \"${c}out${pid_ts}.txt\"",$cache);
-                  &Net::FullAuto::FA_Core::handle_error($stderr,'-3')
-                     if $stderr;
-                  ($output,$stderr)=&ftpcmd($self,
-                     "lcd \"$self->{_work_dirs}->{_lcd}\"",$cache);
-                  &Net::FullAuto::FA_Core::handle_error($stderr,'-2')
-                     if $stderr;
-               } else {
-                  ($output,$stderr)=&ftpcmd($self,
-                     "get \"${c}out${pid_ts}.txt\"",$cache);
-               }
-               if ($err_size) {
-                  if ($self->{_work_dirs}->{_lcd} ne
-                        $self->{_work_dirs}->{_tmp_lcd}) {
-                     ($output,$stderr)=&ftpcmd($self,
-                        "lcd \"$self->{_work_dirs}->{_tmp_lcd}\"",
-                        $cache);
-                     &Net::FullAuto::FA_Core::handle_error($stderr,'-2')
-                        if $stderr;
-                     ($output,$stderr)=&ftpcmd($self,
-                        "get \"${c}err${pid_ts}.txt\"",$cache);
-                     &Net::FullAuto::FA_Core::handle_error($stderr,'-3')
-                        if $stderr;
-                     ($output,$stderr)=&ftpcmd($self,
-                        "lcd \"$self->{_work_dirs}->{_lcd}\"",
-                        $cache);
-                     &Net::FullAuto::FA_Core::handle_error($stderr,'-2')
-                        if $stderr;
-                  } else {
-                     ($output,$stderr)=&ftpcmd($self,
-                       "get \"${c}err${pid_ts}.txt\"",$cache);
-                     &Net::FullAuto::FA_Core::handle_error($stderr,'-1')
-                        if $stderr;
-                  }
-               }
-            }
-            if ($Net::FullAuto::FA_Core::localhost->{_work_dirs}->{_tmp}) {
-               $trandir=$Net::FullAuto::FA_Core::localhost->{
-                  '_work_dirs'}->{'_tmp'};
-               if (substr($trandir,-1) ne '/') {
-                  $trandir.='/';
-               }
-            }
-            ($stdout,$stderr)=$localhost->cmd(
-               "cat ${trandir}out${pid_ts}.txt");
-            if ($stderr) {
-               my $die="$stderr\n\n       From Command -> "
-                      ."\"cat ${trandir}out${pid_ts}.txt\"";
-               &Net::FullAuto::FA_Core::handle_error($die);
-            }
-            my $cmd_error='';my $error='';
-            if ($err_size) {
-               ($cmd_error,$stderr)=$localhost->cmd(
-                  "cat ${trandir}err${pid_ts}.txt");
-               if ($stderr) {
-                  my $die="$stderr\n\n       From Command -> "
-                         ."\"cat ${trandir}err${pid_ts}.txt\"";
-                  &Net::FullAuto::FA_Core::handle_error($die,'-4');
-               }
-            }
-            my $out='';
-            if ($^O eq 'cygwin') {
-               ($out,$error)=$localhost->cmd(
-                  "cmd /c del /S /Q "
-                  .$Net::FullAuto::FA_Core::localhost->{
-                  '_work_dirs'}->{'_tmp_mswin'}
-                  ."\\\\out${pid_ts}.txt",
-                          '__live__');
-               if ($error) {
-                  my $die="$error\n\n       From Command -> "
-                         ."\"cmd /c del /S /Q "
-                         .$Net::FullAuto::FA_Core::localhost->{
-                         '_work_dirs'}-{'_tmp_mswin'}
-                         ."\\\\out${pid_ts}.txt\"";
-                  &Net::FullAuto::FA_Core::handle_error($die);
-               }
-               ($out,$error)=$localhost->cmd(
-                  "cmd /c del /S /Q "
-                  .$Net::FullAuto::FA_Core::localhost->{
-                  '_work_dirs'}->{'_tmp_mswin'}
-                  ."\\\\err${pid_ts}.txt",
-                          '__live__');
-               if ($error) {
-                  my $die="$error\n\n       From Command -> "
-                         ."\"cmd /c del /S /Q "
-                         .$Net::FullAuto::FA_Core::localhost->{
-                         '_work_dirs'}->{'_tmp_mswin'}
-                         ."\\\\err${pid_ts}.txt\"";
-                  &Net::FullAuto::FA_Core::handle_error($die);
-               }
-               &Net::FullAuto::FA_Core::handle_error(
-                  "$cmd_error\n\n       From Command -> $cmmd",'-8')
-                  if $cmd_error && !$wantarray;
-            } else {
-               ($out,$error)=$localhost->cmd(
-                  "rm -rf ${trandir}out${pid_ts}.txt");
-               if ($error) {
-                  my $die="$error\n\n       From Command -> "
-                         ."\"rm -rf ${trandir}out${pid_ts}.txt\"";
-                  &Net::FullAuto::FA_Core::handle_error($die);
-               }
-               ($out,$error)=$localhost->cmd(
-                  "rm -rf ${trandir}err${pid_ts}.txt");
-               if ($error) {
-                  my $die="$error\n\n       From Command -> "
-                         ."\"rm -rf ${trandir}err${pid_ts}.txt\"";
-                  &Net::FullAuto::FA_Core::handle_error($die);
-               }
-            }
-            $str=" echo \"del ${t}rm${pid_ts}.bat\""
-                ." >> ${t}rm${pid_ts}.bat";
-            $self->{_cmd_handle}->print($str);
-            $allines='';
-            while (my $line=$self->{_cmd_handle}->
-                                    get(Timeout=>$cmtimeout)) {
-               $allines.=$line;
-               last if $allines=~/$cmd_prompt$/s;
-            }
-            $self->{_cmd_handle}->print(" cmd /c ${t}rm${pid_ts}.bat");
-            ($cfh_ignore,$cfh_error)=
-               &Net::FullAuto::FA_Core::clean_filehandle(
-               $self->{_cmd_handle});
-            &Net::FullAuto::FA_Core::handle_error($cfh_error,'-1')
-               if $cfh_error;
-            if ($cmd_error) {
-               my $error="$cmd_error\n\n       From Command -> $cmmd";
-               &Net::FullAuto::FA_Core::handle_error($error) if !$wantarray;
-               die "$error\n\n       at $topcaller[0] "
-                   ."$topcaller[1] line ".__LINE__.".\n";
-            }
-         } elsif ($ftp) {
+         if ($ftp) {
             ($stdout,$stderr)
                 =&ftpcmd($self->{_cmd_handle},$command,$cache);
             if ($stderr) {
@@ -30565,7 +30150,6 @@ print $Net::FullAuto::FA_Core::LOG "WEVE GOT WINDOWSCOMMAND=$command\n"
                             ."\n\n       Increase the timeout?\n\n";
                   print $errmsg;
                   sleep 2;
-print "GOING TO INT SIX\n";
                   #$self->{_cmd_handle}->print("\003");
                   my ($cfh_ignore,$cfh_error)=
                      &Net::FullAuto::FA_Core::clean_filehandle(
@@ -30677,7 +30261,7 @@ print "GOING TO INT SIX\n";
                            "RAW OUTPUT: ==>$output<== ".
                            "\n\n TEST_STRIPPED_OUTPUT=$test_stripped_output".
                            "\n\n STRIPPED_LIVE_COMMAND=$stripped_live_command".
-                           "\n\n at Line ",__LINE__,"\n"
+                           "\n at Line ",__LINE__,"\n"
                            if !$Net::FullAuto::FA_Core::cron &&
                            ($Net::FullAuto::FA_Core::debug || $debug);
                         print $Net::FullAuto::FA_Core::LOG 
@@ -30685,14 +30269,13 @@ print "GOING TO INT SIX\n";
                            "OUTPUT: ==>$output<== ".
                            "\n\n TEST_STRIPPED_OUTPUT=$test_stripped_output".
                            "\n\n STRIPPED_LIVE_COMMAND=$stripped_live_command".
-                           "\n\n at Line ",__LINE__,"\n"
+                           "\n at Line ",__LINE__,"\n"
                            if $Net::FullAuto::FA_Core::log && 
                            (-1<index $Net::FullAuto::FA_Core::LOG,'*') &&
                            $loop_count<$loop_max;
                         die 'logout' if $output=~/imed out/s
                            || $output=~/logout$|closed\.$/mg;
                         if (-1<index $output,'[A[C[C') {
-#print "\n\nWHAT IS THE OUTPUT$output<==\n\n";
                            my $one='';my $two='';my $thr='';
                            my $qrx=qr/\s*stdout:.*|\s*_funkyPrompt_/;
                            my $grx=qr/(?:\[A(?:\[C)+(?:\[K1)*)/;
@@ -30700,6 +30283,13 @@ print "GOING TO INT SIX\n";
                            $one=$1 if defined $1;
                            $two=$2 if defined $2;
                            $output=$one.$two;
+                           print $Net::FullAuto::FA_Core::LOG
+                              "\nNNNNNNN OUTPUT AFTER [A[C[K STRIPPED NNNNNNN ".
+                              "OUTPUT: ==>$output<== ".
+                              "\n at Line ",__LINE__,"\n"
+                           if $Net::FullAuto::FA_Core::log &&
+                           (-1<index $Net::FullAuto::FA_Core::LOG,'*') &&
+                           $loop_count<$loop_max;
                            $test_stripped_output=~s/$grx//s;
                            $ltso=length $test_stripped_output;
                         }
@@ -30784,11 +30374,12 @@ print "GOING TO INT SIX\n";
                                  $growoutput=~s/^\s*(.*)($cmd_prompt)*$/$1/s;
                               }
                               print $Net::FullAuto::FA_Core::LOG
-			         "Gathering OUTPUT after COMMAND Removed=$growoutput\n"
+			         "Gathering OUTPUT after COMMAND Removed=",
+                                 "$growoutput\n"
                                  if $Net::FullAuto::FA_Core::log
                                  && (-1<index $Net::FullAuto::FA_Core::LOG,'*');
-                              $save=&display($output,$cmd_prompt,$save)
-                                 if $display;
+                              $save=&display($output,$cmd_prompt,$save,
+                                 $live_command) if $display;
                               $output='';
                            } elsif (($lslc<$ltso) &&
                                  (-1<index $test_stripped_output,
@@ -30798,14 +30389,14 @@ print "GOING TO INT SIX\n";
                                  $growoutput=$output;
                                  $command_stripped_from_output=1;
                               }
-                              $save=&display($output,$cmd_prompt,$save)
-                                 if $display;
+                              $save=&display($output,$cmd_prompt,$save,
+                                 $live_command) if $display;
                               $output='';
                            } elsif ((-1<index $output,'stdout:') &&
                                  $output=~s/^\s*(stdout.*
                                  \n$cmd_prompt)$/$1/sx) {
-                              $save=&display($output,$cmd_prompt,$save)
-                                 if $display;
+                              $save=&display($output,$cmd_prompt,$save,
+                                 $live_command) if $display;
                               $growoutput.=$output;$output='';
                               $first=0;
                            } else {
@@ -30846,21 +30437,23 @@ print "GOING TO INT SIX\n";
                            ($ignore,$growoutput)=
                                  split /2\s*\>\s*\&\s*1\s*/s,
                                  $output;
-                           $save=&display($growoutput,$cmd_prompt,$save)
-                              if $display;
+                           $save=&display($growoutput,$cmd_prompt,$save,
+                              $live_command) if $display;
                            next
                         } else {
-                           $save=&display($output,$cmd_prompt,$save,$live_command)
-                              if $display;
+                           $save=&display($output,$cmd_prompt,$save,
+                              $live_command) if $display;
                            $appendout=$output;
                            $first=0;
                            next
                         }
-                        print "This FETCH Loop Gathered NO OUTPUT: ==>$output<=="
+                        print "\nThis FETCH Loop Gathered NO OUTPUT: ",
+                           "==>$output<=="
                            if !$Net::FullAuto::FA_Core::cron &&
                            ($Net::FullAuto::FA_Core::debug || $debug);
                         print $Net::FullAuto::FA_Core::LOG
-                           "This FETCH Loop Gathered NO OUTPUT: ==>$output<=="
+                           "\nThis FETCH Loop Gathered NO OUTPUT: ",
+                           "==>$output<=="
                            if $Net::FullAuto::FA_Core::log &&
                            -1<index $Net::FullAuto::FA_Core::LOG,'*';
 
@@ -30877,28 +30470,34 @@ print "GOING TO INT SIX\n";
 #print "EXAMINERR=>OPUT=$output<= and LV_CMD=$lv_cmd<=\n";
 
                      } else {
-                        #$save=&display($output,$cmd_prompt,$save)
-                        #   if $display;
                         $appendout=$output;
 			next
                      } my $line_number_marker1;
                   } my $line_number_marker2;
-print $Net::FullAuto::FA_Core::LOG "PAST THE ALARM3\n"
-      if $Net::FullAuto::FA_Core::log &&
-      -1<index $Net::FullAuto::FA_Core::LOG,'*';
-
-print "OUTPUT ***After First-Line Loop***=$output<== and COMSTROUT=$command_stripped_from_output and GROWOUTPUT=$growoutput<==\n"
-   if !$Net::FullAuto::FA_Core::cron && ($Net::FullAuto::FA_Core::debug || $debug) && $loop_count<$loop_max;
-print $Net::FullAuto::FA_Core::LOG "OUTPUTNOWWWWWWWWWWW=$output<== and STRIPPED=$command_stripped_from_output\n"
-   if $Net::FullAuto::FA_Core::log && -1<index $Net::FullAuto::FA_Core::LOG,'*';
-#print "\n\nOUTPUTNOWWWWWWWWWWW=$output<== and STRIPPED=$command_stripped_from_output\n\n";
+                  print "\nOUTPUT ***After First-Line Loop***=$output<==\n",
+			"and COMMAND_STRIPPED_FROM_OUTPUT=",
+			$command_stripped_from_output,"\nand GROWOUTPUT=",
+			$growoutput,"<==\n" if !$Net::FullAuto::FA_Core::cron
+		       	&& ($Net::FullAuto::FA_Core::debug || $debug)
+		       	&& $loop_count<$loop_max;
+                  print $Net::FullAuto::FA_Core::LOG
+		        "\nOUTPUT ***After First-Line Loop***=$output<==\n",
+                        "and COMMAND_STRIPPED_FROM_OUTPUT=",
+                        $command_stripped_from_output,"\nand GROWOUTPUT=",
+                        if $Net::FullAuto::FA_Core::log &&
+		       	-1<index $Net::FullAuto::FA_Core::LOG,'*';
                   if ($command_stripped_from_output) {
-print $Net::FullAuto::FA_Core::LOG "GOT STRIPPED_COMMAND_FLAG AND GROWOUTPUT=$growoutput<==\n"
-   if $Net::FullAuto::FA_Core::log && (-1<index $Net::FullAuto::FA_Core::LOG,'*') && $loop_count<$loop_max;
+                     print $Net::FullAuto::FA_Core::LOG
+		        "\nGOT STRIPPED_COMMAND_FLAG AND GROWOUTPUT=$growoutput<==\n"
+                        if $Net::FullAuto::FA_Core::log &&
+		       	(-1<index $Net::FullAuto::FA_Core::LOG,'*')
+		       	&& $loop_count<$loop_max;
                      my $lcp=length $cmd_prompt;
                      $lcp+=18;
                      unless ($growoutput) {
-print $Net::FullAuto::FA_Core::LOG "NO GROWOUTPUTTTTTTTTTTTTT\n" if $Net::FullAuto::FA_Core::log && (-1<index $Net::FullAuto::FA_Core::LOG,'*');
+                        print $Net::FullAuto::FA_Core::LOG "\nNO GROWOUTPUT\n"
+		       	   if $Net::FullAuto::FA_Core::log &&
+			   (-1<index $Net::FullAuto::FA_Core::LOG,'*');
                         if ($output && unpack('a1',$output) eq '[') {
                            if ($output=~/^\[A(\[C)+\[K?1?\s*/s) {
                               next FETCH;
@@ -30931,8 +30530,8 @@ print $Net::FullAuto::FA_Core::LOG "NO GROWOUTPUTTTTTTTTTTTTT\n" if $Net::FullAu
                               if ($growoutput=~/$cmd_prompt$/s) {
                                  $growoutput=~s/^(.*)($cmd_prompt)*$/$1/s;
                                  chomp($growoutput);
-                                 $save=&display($growoutput,$cmd_prompt,$save)
-                                    if $display;
+                                 $save=&display($growoutput,$cmd_prompt,$save,
+                                    $live_command) if $display;
                                  $growoutput.="\n".$cmd_prompt;
                                  $lastline=$cmd_prompt;
                               } else {
@@ -30946,8 +30545,8 @@ print $Net::FullAuto::FA_Core::LOG "NO GROWOUTPUTTTTTTTTTTTTT\n" if $Net::FullAu
                               $command_stripped_from_output=0;
                               $appendout=$tou;
                               $fetchflag=1;
-                              $save=&display($tou,$cmd_prompt,$save)
-                                 if $display;
+                              $save=&display($tou,$cmd_prompt,$save,
+                                 $live_command) if $display;
                               next FETCH;
                            } last FETCH;
                         } elsif (-1<index $output,'Connection reset by peer') {
@@ -30960,8 +30559,8 @@ print $Net::FullAuto::FA_Core::LOG "NO GROWOUTPUTTTTTTTTTTTTT\n" if $Net::FullAu
                            $lastline=$cmd_prompt;
                            $output='';$fulloutput='';
                         } elsif ($fetchflag) {
-                           $save=&display($output,$cmd_prompt,$save)
-                              if $display;
+                           $save=&display($output,$cmd_prompt,$save,
+                              $live_command) if $display;
                            $growoutput.=$output;
                            next FETCH
                         }
@@ -30969,12 +30568,12 @@ print $Net::FullAuto::FA_Core::LOG "NO GROWOUTPUTTTTTTTTTTTTT\n" if $Net::FullAu
                            ($growoutput=~/ 2\>&1\s?$/)) {
                         $growoutput=$output;
                         if ($output!~/$cmd_prompt$/s) {
-                           $save=&display($output,$cmd_prompt,$save)
-                              if $display;
+                           $save=&display($output,$cmd_prompt,$save,
+                              $live_command) if $display;
                            next FETCH
                         }
                         $output='';$fulloutput='';
-                     } elsif ($growoutput && $output eq $cmd_prompt) {
+                     } elsif ($growoutput && ($output eq $cmd_prompt)) {
                         chomp $growoutput;
                         $growoutput.="\n".$cmd_prompt;
                         $lastline=$cmd_prompt;
@@ -30986,8 +30585,8 @@ print $Net::FullAuto::FA_Core::LOG "NO GROWOUTPUTTTTTTTTTTTTT\n" if $Net::FullAu
                         }
                         $growoutput.=$output;
                         $lastline=$cmd_prompt;
-                        $save=&display($output,$cmd_prompt,$save)
-                           if $display;
+                        $save=&display($output,$cmd_prompt,$save,
+                           $live_command) if $display;
                         $output='';$fulloutput='';
                      } elsif (unpack("a$lcp",$output) eq
                            $cmd_prompt.'cmd /Q /C "set /A ') {
@@ -31004,8 +30603,8 @@ print $Net::FullAuto::FA_Core::LOG "NO GROWOUTPUTTTTTTTTTTTTT\n" if $Net::FullAu
                      if (substr($growoutput,-1) eq '2') {
                         $growoutput.=$output;
                         $first=-1;
-                        $save=&display($output,$cmd_prompt,$save)
-                           if $display;
+                        $save=&display($output,$cmd_prompt,$save,
+                           $live_command) if $display;
                         next FETCH;
                      }
                      my $die="The Command:\n\n       $command"
@@ -31017,7 +30616,20 @@ print $Net::FullAuto::FA_Core::LOG "NO GROWOUTPUTTTTTTTTTTTTT\n" if $Net::FullAu
                         &Net::FullAuto::FA_Core::handle_error($die)
                      }
                   }
-                  $output=~s/^[ |\t]+(stdout:.*)$/$1/m if !$fullerror;
+		  my $tmp_output='';
+		  my $test_for_newline_is_last=($output=~/\n$/s)?1:0;
+		  foreach my $line (split /\n/,$output) {
+                     if ($line=~/^stdout:/) {
+                        $tmp_output.=$line."\n";
+                     } elsif (-1<index $line,'stdout:') {
+                        $line=~/^(.*?)(stdout:.*)$/;
+			$fullerror.=$1;$tmp_output.=$2."\n";
+                     } else {
+                        $tmp_output.=$line."\n";
+                     }
+                  }
+		  $output=$tmp_output;
+                  $output=~s/\n$//s unless $test_for_newline_is_last;
                   $save=&display($output,$cmd_prompt,$save,$live_command)
                      if $display;
                   if ($growoutput && $growoutput!~/\n$/s && $output=~/^stdout: /) {
@@ -31025,6 +30637,7 @@ print $Net::FullAuto::FA_Core::LOG "NO GROWOUTPUTTTTTTTTTTTTT\n" if $Net::FullAu
 		  } else {
                      $growoutput.=$output;
 		  }
+
 #if ($Net::FullAuto::FA_Core::debug || $debug) {
 #open(BK,">brianout.txt");
 #print BK "$growoutput";
@@ -31033,12 +30646,23 @@ print $Net::FullAuto::FA_Core::LOG "NO GROWOUTPUTTTTTTTTTTTTT\n" if $Net::FullAu
 #unlink "brianout.txt";
 #}
 
-
-                  $test_out="\$growoutput";
-if (!$Net::FullAuto::FA_Core::cron && ($Net::FullAuto::FA_Core::debug || $debug)) {
-print "THISEVALLL=",($test_out=~/$cmd_prompt$/s),
-       " and OUT=$output<== and GROWOUTPUT=$growoutput<== and CMD_PROMPT=$cmd_prompt\n";
-}
+		  my $test_growoutput_for_cmd_prompt=($growoutput=~/$cmd_prompt$/s);
+		  $test_growoutput_for_cmd_prompt||=0;
+		  $test_growoutput_for_cmd_prompt=
+		     ($test_growoutput_for_cmd_prompt)?'true':'false';
+                  print "\nTEST FOR CMD-OUTPUT-ENDING CMD_PROMPT:\n",
+		     "Is ",$cmd_prompt," at the end of GROWOUTPUT?: ",
+		     $test_growoutput_for_cmd_prompt."\nand GROWOUTPUT=",
+		     $growoutput,"<==\nand OUTPUT=",$output,"<=="
+                     if !$Net::FullAuto::FA_Core::cron &&
+                     ($Net::FullAuto::FA_Core::debug || $debug);
+                  print $Net::FullAuto::FA_Core::LOG
+		     "\nTEST FOR CMD-OUTPUT-ENDING CMD_PROMPT:\n",
+                     "Is ",$cmd_prompt," at the end of GROWOUTPUT?: ",
+                     $test_growoutput_for_cmd_prompt."\nand GROWOUTPUT=",
+                     $growoutput,"<==\nand OUTPUT=",$output,"<=="
+                     if $Net::FullAuto::FA_Core::log &&
+                     -1<index $Net::FullAuto::FA_Core::LOG,'*';
                   if (15<length $growoutput &&
                         unpack('a16',$growoutput) eq '?Invalid command') {
                      $self->{_cmd_handle}->timeout($svtimeout);
@@ -31054,22 +30678,35 @@ print "THISEVALLL=",($test_out=~/$cmd_prompt$/s),
                              $growoutput=~/($cmd_prompt)$/s) {
                      my $oneline=$1;$oneline||=0;
                      ($lastline=$growoutput)=~s/^.*\n(.*)$/$1/s;
-print "NOWLASTLINE=$lastline<==\n" if !$Net::FullAuto::FA_Core::cron && ($Net::FullAuto::FA_Core::debug || $debug);
-print $Net::FullAuto::FA_Core::LOG "NOWLASTLINE=$lastline<==\n"
-   if $Net::FullAuto::FA_Core::log && -1<index $Net::FullAuto::FA_Core::LOG,'*';
+                     print "\nLAST LINE OF GROWOUTPUT=$lastline<==\n"
+		        if !$Net::FullAuto::FA_Core::cron &&
+		       	($Net::FullAuto::FA_Core::debug || $debug);
+                     print $Net::FullAuto::FA_Core::LOG
+		        "LAST LINE OF GROWOUTPUT=$lastline<==\n"
+                        if $Net::FullAuto::FA_Core::log &&
+		       	-1<index $Net::FullAuto::FA_Core::LOG,'*';
                      if ($lastline eq $growoutput &&
                            $growoutput=~/$cmd_prompt$/s
                            && (length $growoutput<7 ||
                            unpack('a7',$growoutput) ne 'stdout:')) { 
-print $Net::FullAuto::FA_Core::LOG "FIRST_THIRTEEN\n"
-   if $Net::FullAuto::FA_Core::log && -1<index $Net::FullAuto::FA_Core::LOG,'*';
+                        print $Net::FullAuto::FA_Core::LOG
+                           "\nCLEARING OUT GROWOUTPUT\n"
+                           if $Net::FullAuto::FA_Core::log &&
+			   -1<index $Net::FullAuto::FA_Core::LOG,'*';
                         $first=0;
                         $growoutput='';
                      } else {
                         if ($growoutput=~/$cmd_prompt/s) {
-print "GROWOUTPUT2=$growoutput\n" if !$Net::FullAuto::FA_Core::cron && ($Net::FullAuto::FA_Core::debug || $debug);
-print $Net::FullAuto::FA_Core::LOG "GROWOUTPUT2=$growoutput\n"
-   if $Net::FullAuto::FA_Core::log && (-1<index $Net::FullAuto::FA_Core::LOG,'*') && $loop_count<$loop_max;
+                           print "\nGROWOUTPUT CONTAINS CMD_PROMPT:\n",
+			      "$growoutput<==\n"
+			      if !$Net::FullAuto::FA_Core::cron &&
+			      ($Net::FullAuto::FA_Core::debug || $debug);
+                           print $Net::FullAuto::FA_Core::LOG
+			      "\nGROWOUTPUT CONTAINS CMD_PROMPT:\n",
+			      "$growoutput<==\n"
+                              if $Net::FullAuto::FA_Core::log &&
+			      (-1<index $Net::FullAuto::FA_Core::LOG,'*')
+			      && $loop_count<$loop_max;
                            if ($growoutput=~/stdout: PS1=/m) {
                               ($lastline=$growoutput)=~s/^.*\n(.*)$/$1/s;
                            } elsif ($growoutput=~s/^\n*$cmd_prompt\n*//s) {
@@ -31115,9 +30752,15 @@ print $Net::FullAuto::FA_Core::LOG "GROWOUTPUT2=$growoutput\n"
                                     next FETCH;
                                  }
                               }
-print "CLEANEDGROWOUT=$growoutput\n" if !$Net::FullAuto::FA_Core::cron && ($Net::FullAuto::FA_Core::debug || $debug) && $loop_count<$loop_max;
-print $Net::FullAuto::FA_Core::LOG "CLEANEDGROWOUT=$growoutput\n"
-   if $Net::FullAuto::FA_Core::log && (-1<index $Net::FullAuto::FA_Core::LOG,'*') && $loop_count<$loop_max;
+                              print "GROWOUTPUT GATHERING AND CLEANING COMPLETE:\n",
+			         "$growoutput\n" if !$Net::FullAuto::FA_Core::cron
+				 && ($Net::FullAuto::FA_Core::debug || $debug)
+				 && $loop_count<$loop_max;
+                              print $Net::FullAuto::FA_Core::LOG
+			         "GROWOUTPUT GATHERING AND CLEANING COMPLETE:\n",
+				 "=$growoutput\n" if $Net::FullAuto::FA_Core::log
+				 && (-1<index $Net::FullAuto::FA_Core::LOG,'*')
+				 && $loop_count<$loop_max;
                            } elsif ((-1<index $growoutput,$live_command) &&
                                  ((-1<index $growoutput,'[C[C[K1') ||
                                  (-1<index $growoutput,'[A[C[C'))) {
@@ -31131,58 +30774,87 @@ print $Net::FullAuto::FA_Core::LOG "CLEANEDGROWOUT=$growoutput\n"
                         }
                         my $l=length $live_command;
                         if ($first<0) {
-print $Net::FullAuto::FA_Core::LOG "FIRST_FOURTEEN and GROW=$growoutput<===\n"
-   if $Net::FullAuto::FA_Core::log && (-1<index $Net::FullAuto::FA_Core::LOG,'*') && $loop_count<$loop_max;
+                              print $Net::FullAuto::FA_Core::LOG
+			         "\nGATHERING FIRST LINE and GROWOUTPUT:\n",
+                                 $growoutput,"<==\n"
+                                 if $Net::FullAuto::FA_Core::log &&
+				 (-1<index $Net::FullAuto::FA_Core::LOG,'*')
+				 && $loop_count<$loop_max;
                            if ($growoutput=~/2\s*>\s*&1\s*$/s) {
-print $Net::FullAuto::FA_Core::LOG "FIRST_FOURTEENa\n"
-   if $Net::FullAuto::FA_Core::log && -1<index $Net::FullAuto::FA_Core::LOG,'*';
+                              print $Net::FullAuto::FA_Core::LOG
+			         "\nFOUND FIRST LINE by MATCHING 2>&1\n",
+			         "SO CLEARING GROWOUTPUT"
+                                 if $Net::FullAuto::FA_Core::log &&
+				 -1<index $Net::FullAuto::FA_Core::LOG,'*';
                               $first=0;$growoutput='';
                               $output='';
                            } elsif ($oneline) {
-print $Net::FullAuto::FA_Core::LOG "FIRST_FOURTEENb\n"
-   if $Net::FullAuto::FA_Core::log && -1<index $Net::FullAuto::FA_Core::LOG,'*';
+                              print $Net::FullAuto::FA_Core::LOG
+                                 "\nGATHERING FIRST LINE and LOOKING FOR CMD\n"
+                                 if $Net::FullAuto::FA_Core::log &&
+                                 -1<index $Net::FullAuto::FA_Core::LOG,'*';
                               if ($growoutput=~s/^$live_command//) {
-print $Net::FullAuto::FA_Core::LOG "FIRST_FOURTEENc\n"
-   if $Net::FullAuto::FA_Core::log && -1<index $Net::FullAuto::FA_Core::LOG,'*';
+                                 print $Net::FullAuto::FA_Core::LOG
+                                    "\nDETERMINED ENTIRE FIRST ",
+				    "LINE by MATCHING CMD\n"
+                                    if $Net::FullAuto::FA_Core::log &&
+                                    -1<index $Net::FullAuto::FA_Core::LOG,'*';
                                  $first=0;
                               }
                            } else {
-print $Net::FullAuto::FA_Core::LOG "FIRST_FOURTEENd\n"
-   if $Net::FullAuto::FA_Core::log && -1<index $Net::FullAuto::FA_Core::LOG,'*';
+			      print $Net::FullAuto::FA_Core::LOG
+                                 "\nGATHERING FIRST LINE and LOOKING FOR 2>&1\n"
+                                 if $Net::FullAuto::FA_Core::log &&
+                                 -1<index $Net::FullAuto::FA_Core::LOG,'*';
                               $growoutput=~s/^(.*?)\012//s;
                               my $f_line=$1;
                               if ($f_line=~/[2]\s*[>]\s*[&][1]\s*$/s) {
-print $Net::FullAuto::FA_Core::LOG "FIRST_FOURTEENe\n"
-   if $Net::FullAuto::FA_Core::log && -1<index $Net::FullAuto::FA_Core::LOG,'*';
+                                 print $Net::FullAuto::FA_Core::LOG
+                                    "\nDETERMINED ENTIRE FIRST ",
+                                    "LINE by MATCHING 2>&1\n"
+                                    if $Net::FullAuto::FA_Core::log &&
+                                    -1<index $Net::FullAuto::FA_Core::LOG,'*';
                                  $first=0;
                               } elsif ($live_command=~
                                     /cd.*[;]pwd\s*[2]\s*[>]\s*[&][1]\s*$/s) {
+                                 print $Net::FullAuto::FA_Core::LOG
+                                    "\nGATHERING FIRST LINE ",
+                                    "FOR cd;pwd SO PREPENDING stdout:\n"
+                                    if $Net::FullAuto::FA_Core::log &&
+                                    -1<index $Net::FullAuto::FA_Core::LOG,'*';
                                  $growoutput="stdout: $f_line";
                                  $first=1;
                               }
                            }
                         } elsif ($command_stripped_from_output==0) {
-print $Net::FullAuto::FA_Core::LOG "FIRST_TEENeeee and GO=$growoutput\n"
-   if $Net::FullAuto::FA_Core::log && -1<index $Net::FullAuto::FA_Core::LOG,'*';
+                           print $Net::FullAuto::FA_Core::LOG
+			      "\nLOOKING TO STRIP CMD FROM GROWOUTPUT:\n",
+			      "=$growoutput<==\n"
+                              if $Net::FullAuto::FA_Core::log &&
+			      -1<index $Net::FullAuto::FA_Core::LOG,'*';
                            my $test_stripped_output=$growoutput;
                            $test_stripped_output=~s/\s*//gs;
                            my $stripped_live_command=$live_command;
                            $stripped_live_command=~s/\s*//gs;
                            my $lslc=length $stripped_live_command;
                            my $ltso=length $test_stripped_output;
-print $Net::FullAuto::FA_Core::LOG "TEEN1=",substr($test_stripped_output,-$lslc),"<==\n" if $Net::FullAuto::FA_Core::log && -1<index $Net::FullAuto::FA_Core::LOG,'*';
-print $Net::FullAuto::FA_Core::LOG "TEEN2=$stripped_live_command<==\n" if $Net::FullAuto::FA_Core::log && -1<index $Net::FullAuto::FA_Core::LOG,'*';
-
+                           print "\nLengthStrippedLiveCommand=$lslc and ",
+                              "LengthTestStrippedOutput=$ltso\nand ",
+                              "COMPARE StrippedOutput=",
+                              unpack("a$lslc",$test_stripped_output),
+                              " and StrippedLiveCommand=$stripped_live_command\n"
+                              if !$Net::FullAuto::FA_Core::cron &&
+                              ($Net::FullAuto::FA_Core::debug || $debug);
                            if (($lslc<$ltso) &&
                                  (unpack("a$lslc",$test_stripped_output) eq
                                  $stripped_live_command)) {
-print $Net::FullAuto::FA_Core::LOG "LSLC_TEEN=$lslc and LTSO_TEEN=$ltso and UNPACK=",unpack("a$lslc",$test_stripped_output),"_TEEN and STIPPEDLIVECMD_TEEN=$stripped_live_command\n" if $Net::FullAuto::FA_Core::log && -1<index $Net::FullAuto::FA_Core::LOG,'*
-';
                               my $llc=length $live_command;
                               my $oup=unpack("a$llc",$output);
                               if ($oup ne $live_command) {
-print $Net::FullAuto::FA_Core::LOG "OUPPPPPPPPPPPPTTTTTTT=$oup\n" if $Net::FullAuto::FA_Core::log && -1<index $Net::FullAuto::FA_Core::LOG,'*';
-                                 #my $o=$output;my $c=0;
+                                 print $Net::FullAuto::FA_Core::LOG
+				    "\nOUTPUT STRIPPED THE LENGTH OF CMD:\n",
+				    "=$oup\n" if $Net::FullAuto::FA_Core::log
+				    && -1<index $Net::FullAuto::FA_Core::LOG,'*';
                                  my $o=$growoutput;my $c=0;
                                  while (1) {
                                     last if $c++==5;
@@ -31213,8 +30885,8 @@ print $Net::FullAuto::FA_Core::LOG "GRO_OUT_AFTER_MEGA_STRIPTTTTTTTTTT=$growoutp
                               if ($output=~/$cmd_prompt$/s &&
                                     $growoutput!~/$cmd_prompt$/s) {
                                  $growoutput=$output;
-                                 $save=&display($output,$cmd_prompt,$save)
-                                    if $display;
+                                 $save=&display($output,$cmd_prompt,$save,
+                                    $live_command) if $display;
                                  $lastline=$cmd_prompt;
                               } else {
                                  next FETCH;                                 
@@ -31249,13 +30921,14 @@ print $Net::FullAuto::FA_Core::LOG "LETS LOOK AT LINE=$line<== and LASTLINE=$las
                                        \:\s*\/\'\s2\>\&1\s*$/sx) ||
                                        ($fullerror && $line=~/^\n$/s)) {
                                     $fullerror.=$line;
-                                    $line=~s/\[/\\\[/g;
-                                    $line=~s/\]/\\\]/g;
-				    $line=~s/\{/\\\{/g;
-                                    $line=~s/\}/\\\}/g;
-                                    $line=~s/[(]/\\(/g;
-                                    $line=~s/[)]/\\)/g;
-				    $line=~s/[*]/\\*/g;
+				    #$line=~s/\[/\\\[/g;
+				    #$line=~s/\]/\\\]/g;
+				    #$line=~s/\{/\\\{/g;
+				    #$line=~s/\}/\\\}/g;
+				    #$line=~s/[(]/\\(/g;
+				    #$line=~s/[)]/\\)/g;
+				    #$line=~s/[*]/\\*/g;
+				    $line=quotemeta($line);
                                     $growoutput=~s/$line//s;
                                  } elsif ($fulloutput || $line!~/^\s*$/s) {
                                     $fulloutput.=$line;
@@ -31359,8 +31032,8 @@ print $Net::FullAuto::FA_Core::LOG "cmd() STDERRBOTTOM=$stderr<== and LASTLINE=$
             }
          }
       };
-      &display("\n",$cmd_prompt,'')
-         if $display && $stdout && $stdout!~/^\s+$/s;
+      #&display("\n",$cmd_prompt,'')
+      #   if $display && $stdout && $stdout!~/^\s+$/s;
       $self->{_cmd_handle}->autoflush(0)
          if defined fileno $self->{_cmd_handle};
       my $eval_error='';
@@ -31626,7 +31299,7 @@ sub cmd_raw
    while (1) {
       $output.=Net::FullAuto::FA_Core::fetch($self);
       last if $output=~/$prompt/;
-      $save=&Rem_Command::display($output,$prompt,$save)
+      $save=&Rem_Command::display($output,$prompt,$save,$cmd)
          if $display;
    }
    return $output;
@@ -31650,17 +31323,9 @@ sub display
    return '' if -1<index $line,'[sudo]';
    my $cmd_prompt=$_[1];
    my $save=$_[2]||'';
-   my $chomp_save=$save;
-   $chomp_save=~s/\n//g;
-   my $tchomp_save=$chomp_save;
-   $tchomp_save=~s/["|']/X/g;
-   $tchomp_save=~s/^\s+//s;
-   $tchomp_save=quotemeta($tchomp_save);
+   $line=$save.$line;
    my $cmd=$_[3]||'';
-   my $tcmd=$cmd;
-   $tcmd=~s/["|']/X/g;
    my $tline=$line;
-   $tline=~s/["|']/X/g;
    $tline=~s/\s*$//s;
    my $ttline=unpack('A1',$tline);
    $tline=quotemeta($tline);
@@ -31734,27 +31399,37 @@ sub display
       }
    } elsif ($line=~/^\s*\[c\s*$/s) {
       $line=~s/\[c//gs
-   } elsif ($cmd && (($tcmd=~/$tchomp_save$tline/s) ||
-         ($tcmd eq "$tchomp_save$tline"))) {
-      return '' if $tcmd=~/$tchomp_save$tline$/s;
-      return "$chomp_save$line";
    }
-   $line=~s/^stdout: ?//mg;
+   my $testl=sub {
+      my $line=$_[0];
+      unless ($line=~/^tdout: /s) {
+         unless ($line=~/^dout: /s) {
+            unless ($line=~/^out: /s) {
+               unless ($line=~/^ut: /s) {
+                  unless ($line=~/^t: /s) {
+                     unless ($line=~/^: /s) {
+                        return 0
+                     } else { return 1 }
+                  } else { return 1 }
+               } else { return 1 }
+            } else { return 1 }
+         } else { return 1 }
+      } else { return 1 }
+   };
    my $print_out=0;
    $print_out=1 if $Net::FullAuto::FA_Core::log &&
       -1<index $Net::FullAuto::FA_Core::LOG,'*';
-   if ($line=~/^t?d?o?u?t?:? .*$/s) {
-      if ($line=~/^.*\nst?d?o?u?t?:?\s*$/s) {
+   if ($line=~/^\s*stdout: .*$/s) {
+      if ($line=~/stdout: \d\d?\d?\s*$/s) {
          $save.=$line;
          return $save;
       }
-      $line=$save.$line;
+      $line=~s/(?:stdout: \d(?:\d|\d\d)*)*\n*$cmd_prompt$//s;
       $line=~s/^stdout: ?//mg;
-      $line=~s/\s?$cmd_prompt$//s;
-      $line=~s/\n\d(\d|\d\d)?\s*$//s;
+      #$line=~s/\s*$cmd_prompt$//s;
       $line=~s/^.*\s*0\s*[]]0.*$//s;
       if ($print_line_debugging) {
-         print $log "display() CALLER=",caller,"\n";
+         print $log "display() CALLER=",(join " ",caller),"\n";
          print $log "display() ORIGINAL LINE=$_[0]<==\n";
          print $log "display() MODIFIED LINE=$line<==\n";
          print $log "display() print line = ".__LINE__."\n";
@@ -31762,7 +31437,7 @@ sub display
       print $line;
       print $OUTPUT $line if $print_out;
       return '';
-   } elsif ($line=~/^.*\nst?d?o?u?t?:?\s*$/s) {
+   } elsif ((-1<index $line,':') && $testl->($line)) {
       $save.=$line;
       return $save;
    } elsif (length $line<length $cmd_prompt) {
@@ -31776,7 +31451,7 @@ sub display
             return $save;
          }
          if ($print_line_debugging) {
-            print $log "display() CALLER=",caller,"\n";
+            print $log "display() CALLER=",(join " ",caller),"\n";
             print $log "display() ORIGINAL LINE=$_[0]<==\n";
             print $log "display() MODIFIED LINE=$line<==\n";
             print $log "display() print line = ".__LINE__."\n";
@@ -31786,22 +31461,23 @@ sub display
          return '';
       }
    } elsif ($line=~s/\n*$cmd_prompt//gs) {
-      $line=$save.$line if $save;
-      $line=~s/\n\d(\d|\d\d)?\s*$//s;
       if (-1<index $line,']0') {
-         $line=~s/^(.*)\s*0\s*[]]0.*$/$1/s;
-         $line=~s/^(.*)[]]0.*$/$1/s;
-      } 
-      unless ($line=~/^\d(\d|\d\d)?$/) {
-         if ($print_line_debugging) {
-            print $log "display() CALLER=",caller,"\n";
-            print $log "display() ORIGINAL LINE=$_[0]<==\n";
-            print $log "display() MODIFIED LINE=$line<==\n";
-            print $log "display() print line = ".__LINE__."\n";
+         unless ($line=~s/^(.*)\s*0\s*[]]0.*$/$1/s) {
+            unless ($line=~s/^(.*)[]]0.*$/$1/s) {
+               $line=~s/^[]]0;.*$/$1/s if $line!~/\n/s;
+            }
          }
-         print $line."\n";
-         print $OUTPUT "\n" if $print_out;
       }
+      $line=~s/(?:stdout: \d(?:\d|\d\d)*)*$//s; 
+      $line=~s/^stdout: ?//mg;
+      if ($print_line_debugging) {
+         print $log "display() CALLER=",(join " ",caller),"\n";
+         print $log "display() ORIGINAL LINE=$_[0]<==\n";
+         print $log "display() MODIFIED LINE=$line<==\n";
+         print $log "display() print line = ".__LINE__."\n";
+      }
+      print $line."\n";
+      print $OUTPUT "\n" if $print_out;
       return '';
    } elsif (-1<index $cmd_prompt,$line) {
       substr($line,(rindex $line,$cmd_prompt))=0;
@@ -31811,7 +31487,7 @@ sub display
          && (-1<index $line,'K .')) {
       $line=~s/stdout: //g;
       if ($print_line_debugging) {
-         print $log "display() CALLER=",caller,"\n";
+         print $log "display() CALLER=",(join " ",caller),"\n";
          print $log "display() ORIGINAL LINE=$_[0]<==\n";
          print $log "display() MODIFIED LINE=$line<==\n";
          print $log "display() print line = ".__LINE__."\n";
@@ -31825,20 +31501,26 @@ sub display
       $save.=$line;
       return $save;
    } else {
-      $line=~s/\n\d(\d|\d\d)?\s*$//s;
+      $line=~s/\n\d(\d|\d\d)?$//s;
       $line=~s/^.*\s*0\s*[]]0.*$//s;
+      my $tline=$line;
+      $tline=~s/\s*$//s;
+      $tline=~s/^\s*//s;
+      $tline=quotemeta($tline);
+      $cmd=~s/^\s*//s;
       if ($line=~/ETA$|stalled -$/) {
          if ($print_line_debugging) {
-            print $log "display() CALLER=",caller,"\n";
+            print $log "display() CALLER=",(join " ",caller),"\n";
             print $log "display() ORIGINAL LINE=$_[0]<==\n";
             print $log "display() MODIFIED LINE=$line<==\n";
             print $log "display() print line = ".__LINE__."\n";
          }
          print $line,"\n";
          print $OUTPUT $line,"\n" if $print_out;
-      } else {
+      } elsif ($cmd!~/^$tline/s) {
+         $line=~s/^stdout: ?//mg;
          if ($print_line_debugging) {
-            print $log "display() CALLER=",caller,"\n";
+            print $log "display() CALLER=",(join " ",caller),"\n";
             print $log "display() ORIGINAL LINE=$_[0]<==\n";
             print $log "display() MODIFIED LINE=$line<==\n";
             print $log "display() print line = ".__LINE__."\n";

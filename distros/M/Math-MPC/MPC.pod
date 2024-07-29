@@ -26,6 +26,7 @@ Math::MPC - perl interface to the MPC (multi precision complex) library.
    use Math::MPFR qw(:mpfr); # needed by some Math::MPC functions
    use Math::MPC qw(:mpc);
    Rmpc_set_default_prec(500); # Set default precision to 500 bits
+                               # for both real and imaginary values.
    my $mpc1 = Math::MPC->new(12.5, 1125); # 12.5 + 1125*i
    $mpc2 = sqrt($mpc1);
    print "Square root of $mpc1 is $mpc2\n";
@@ -58,13 +59,12 @@ Math::MPC - perl interface to the MPC (multi precision complex) library.
    function whenever they go out of scope.
 
    Rmpc_init2_nobless and Rmpc_init3_nobless are the same as Rmpc_init2
-   and Rmpc_init3, except that they return an unblessed object.
+   and Rmpc_init3, except that they return an object that has not been
+   blessed into any package..
    If you create Math::MPC objects using the '_nobless' versions,
    it will then be up to you to clean up the memory associated with
    these objects by calling Rmpc_clear($op) for each object.
    Alternatively such objects will be cleaned up when the script ends.
-   I don't know why you would want to create unblessed objects. The
-   point is that you can if you want to.
 
 =head1 MIXING MPC OBJECTS WITH MPFR & GMP OBJECTS
 
@@ -908,7 +908,7 @@ Math::MPC - perl interface to the MPC (multi precision complex) library.
 
     This program is free software; you may redistribute it and/or
     modify it under the same terms as Perl itself.
-    Copyright 2006-2011, 2014, 2016, 2018, 2020, 2022-23 Sisyphus
+    Copyright 2006-2011, 2014, 2016, 2018, 2020, 2022-24 Sisyphus
 
 =head1 AUTHOR
 

@@ -1,4 +1,3 @@
-.perlcriticrc
 Changes
 cpanfile
 lib/App/Prove/Plugin/TestArgs.pm
@@ -11,7 +10,10 @@ README
 t/00-plugin.t
 t/01-pod.t
 t/02-critic.t
+t/bar.t
 t/config.yml
+t/config_name_scripts.yml
+t/config_scripts.yml
 t/foo.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

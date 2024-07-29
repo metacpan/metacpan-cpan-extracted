@@ -1,0 +1,30 @@
+---
+abstract: 'A module to fetch and display Last.fm statistics'
+author:
+  - 'Dave Cross <dave@perlhacks.com>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: App-LastStats
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Feature::Compat::Class: '0'
+  Getopt::Long: '0'
+  JSON: '0'
+  Net::LastFM: '0'
+  perl: '5.026000'
+resources:
+  bugtracker: https://github.com/davorg-cpan/app-laststats/issues
+  repository: git://github.com/davorg-cpan/app-laststats.git
+version: v0.0.2
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

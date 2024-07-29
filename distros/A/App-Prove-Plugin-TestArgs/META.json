@@ -42,8 +42,8 @@
          "requires" : {
             "Carp" : "1.32",
             "Class::Method::Modifiers" : "1.08",
-            "Config::Any" : "0",
-            "YAML" : "0",
+            "String::Format" : "1.18",
+            "YAML::PP" : "0",
             "perl" : "5.008009",
             "strict" : "0",
             "warnings" : "0"
@@ -53,7 +53,7 @@
          "requires" : {
             "App::Prove" : "3.17",
             "Test::Fatal" : "0",
-            "Test::More" : "0.92",
+            "Test::More" : "1.302015",
             "Test::Needs" : "0"
          }
       }
@@ -61,7 +61,7 @@
    "provides" : {
       "App::Prove::Plugin::TestArgs" : {
          "file" : "lib/App/Prove/Plugin/TestArgs.pm",
-         "version" : "v2.0.0"
+         "version" : "v2.1.0"
       }
    },
    "release_status" : "stable",
@@ -75,5 +75,5 @@
          "web" : "https://github.com/XSven/App-Prove-Plugin-TestArgs"
       }
    },
-   "version" : "2.0.0"
+   "version" : "2.1.0"
 }

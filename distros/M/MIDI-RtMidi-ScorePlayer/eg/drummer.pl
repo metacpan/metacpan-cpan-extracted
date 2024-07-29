@@ -17,7 +17,7 @@ my $verbose = shift || 0;
 
 my %common;
 my @parts;
-my ($bpm, $dura, $mode, $repeats) = (100, 'qn', 'serial', 1);
+my ($bpm, $dura, $mode, $repeats) = (100, 'qn', 'parallel', 1);
 print "State: BPM=$bpm, Duration=$dura, Mode=$mode, Repeats=$repeats\n";
 my $loop = IO::Async::Loop->new;
 my $tka  = Term::TermKey::Async->new(
@@ -26,8 +26,12 @@ my $tka  = Term::TermKey::Async->new(
     my ($self, $key) = @_;
     my $pressed = $self->format_key($key, FORMAT_VIM);
     # print "Got key: $pressed\n" if $verbose;
+    # HELP
+    if ($pressed eq '?') {
+      print "State: BPM=$bpm, Duration=$dura, Mode=$mode, Repeats=$repeats\n";
+    }
     # PLAY SCORE
-    if ($pressed eq ' ') {
+    elsif ($pressed eq ' ') {
       print "Play score\n" if $verbose;
       my $d = MIDI::Drummer::Tiny->new(
         bpm  => $bpm,
@@ -59,7 +63,7 @@ my $tka  = Term::TermKey::Async->new(
       MIDI::RtMidi::ScorePlayer->new(
         score    => $d->score,
         common   => \%common,
-        parts    => $parts,
+        parts    => [ $parts ],
         sleep    => 0,
         infinite => 0,
         # dump     => 1,

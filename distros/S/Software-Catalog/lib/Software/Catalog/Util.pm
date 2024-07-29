@@ -1,8 +1,5 @@
 package Software::Catalog::Util;
 
-our $DATE = '2020-10-02'; # DATE
-our $VERSION = '1.0.7'; # VERSION
-
 use 5.010001;
 use strict;
 use warnings;
@@ -11,6 +8,12 @@ use Log::ger;
 our %SPEC;
 
 use Exporter qw(import);
+
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2024-07-17'; # DATE
+our $DIST = 'Software-Catalog'; # DIST
+our $VERSION = '1.0.8'; # VERSION
+
 our @EXPORT_OK = qw(
                        extract_from_url
                );
@@ -32,6 +35,9 @@ $SPEC{extract_from_url} = {
         all => {
             schema => 'bool*',
         },
+        agent => {
+            schema => 'str*',
+        },
     },
     args_rels => {
         req_one => [qw/re code/],
@@ -42,8 +48,10 @@ sub extract_from_url {
         require LWP::UserAgent;
         LWP::UserAgent->new;
     };
+    state $orig_agent = $ua->agent;
     my %args = @_;
 
+    $ua->agent( $args{agent} || $orig_agent);
     my $lwp_res = $ua->get($args{url});
     unless ($lwp_res->is_success) {
         return [$lwp_res->code, "Couldn't retrieve URL '$args{url}'" . (
@@ -77,26 +85,6 @@ sub extract_from_url {
     $res;
 }
 
-$SPEC{detect_arch} = {
-    v => 1.1,
-};
-sub detect_arch {
-    require Config; Config->import;
-    my $archname = do { no strict 'vars'; no warnings 'once'; $Config{archname} };
-    if ($archname =~ /\Ax86-linux/) {
-        return "linux-x86"; # linux i386
-    } elsif ($archname =~ /\Ax86-linux/) {
-    } elsif ($archname =~ /\Ax86_64-linux/) {
-        return "linux-x86_64";
-    } elsif ($archname =~ /\AMSWin32-x86(-|\z)/) {
-        return "win32";
-    } elsif ($archname =~ /\AMSWin32-x64(-|\z)/) {
-        return "win64";
-    } else {
-        die "Unsupported arch '$archname'";
-    }
-}
-
 1;
 # ABSTRACT: Utility routines
 
@@ -112,39 +100,16 @@ Software::Catalog::Util - Utility routines
 
 =head1 VERSION
 
-This document describes version 1.0.7 of Software::Catalog::Util (from Perl distribution Software-Catalog), released on 2020-10-02.
+This document describes version 1.0.8 of Software::Catalog::Util (from Perl distribution Software-Catalog), released on 2024-07-17.
 
 =head1 FUNCTIONS
-
-
-=head2 detect_arch
-
-Usage:
-
- detect_arch() -> [status, msg, payload, meta]
-
-This function is not exported.
-
-No arguments.
-
-Returns an enveloped result (an array).
-
-First element (status) is an integer containing HTTP status code
-(200 means OK, 4xx caller error, 5xx function error). Second element
-(msg) is a string containing error message, or 'OK' if status is
-200. Third element (payload) is optional, the actual result. Fourth
-element (meta) is called result metadata and is optional, a hash
-that contains extra information.
-
-Return value:  (any)
-
 
 
 =head2 extract_from_url
 
 Usage:
 
- extract_from_url(%args) -> [status, msg, payload, meta]
+ extract_from_url(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
 This function is not exported by default, but exportable.
 
@@ -152,25 +117,37 @@ Arguments ('*' denotes required arguments):
 
 =over 4
 
+=item * B<agent> => I<str>
+
+(No description)
+
 =item * B<all> => I<bool>
+
+(No description)
 
 =item * B<code> => I<code>
 
+(No description)
+
 =item * B<re> => I<re>
 
+(No description)
+
 =item * B<url>* => I<url>
+
+(No description)
 
 
 =back
 
 Returns an enveloped result (an array).
 
-First element (status) is an integer containing HTTP status code
+First element ($status_code) is an integer containing HTTP-like status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
-(msg) is a string containing error message, or 'OK' if status is
-200. Third element (payload) is optional, the actual result. Fourth
-element (meta) is called result metadata and is optional, a hash
-that contains extra information.
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
+element (%result_meta) is called result metadata and is optional, a hash
+that contains extra information, much like how HTTP response headers provide additional metadata.
 
 Return value:  (any)
 
@@ -182,6 +159,35 @@ Please visit the project's homepage at L<https://metacpan.org/release/Software-C
 
 Source repository is at L<https://github.com/perlancar/perl-Software-Catalog>.
 
+=head1 AUTHOR
+
+perlancar <perlancar@cpan.org>
+
+=head1 CONTRIBUTING
+
+
+To contribute, you can send patches by email/via RT, or send pull requests on
+GitHub.
+
+Most of the time, you don't need to build the distribution yourself. You can
+simply modify the code, then test via:
+
+ % prove -l
+
+If you want to build the distribution (e.g. to try to install it locally on your
+system), you can install L<Dist::Zilla>,
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>,
+L<Pod::Weaver::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps required beyond
+that are considered a bug and can be reported to me.
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2024, 2020, 2019, 2018, 2015, 2014, 2012 by perlancar <perlancar@cpan.org>.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
 =head1 BUGS
 
 Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Software-Catalog>
@@ -189,16 +195,5 @@ Please report any bugs or feature requests on the bugtracker website L<https://r
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
 feature.
-
-=head1 AUTHOR
-
-perlancar <perlancar@cpan.org>
-
-=head1 COPYRIGHT AND LICENSE
-
-This software is copyright (c) 2020, 2019, 2018, 2015, 2014, 2012 by perlancar@cpan.org.
-
-This is free software; you can redistribute it and/or modify it under
-the same terms as the Perl 5 programming language system itself.
 
 =cut

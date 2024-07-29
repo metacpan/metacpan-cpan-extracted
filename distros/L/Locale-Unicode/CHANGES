@@ -1,5 +1,10 @@
 Revision history for Perl module Locale::Unicode
 
+v0.3.5 2024-07-29T07:30:08+0900
+    - Minor correction in canonical
+    - Added the method 'base'
+    - Corrected locale regular expression to match when there is only a private subtag.
+
 v0.3.4 2024-07-28T12:26:08+0900
     - Minor correction for special locale 'root' with extension
 

@@ -33,7 +33,7 @@
    "provides" : {
       "WebService::MusicBrainz" : {
          "file" : "lib/WebService/MusicBrainz.pm",
-         "version" : "v1.0.6"
+         "version" : "v1.0.7"
       },
       "WebService::MusicBrainz::Request" : {
          "file" : "lib/WebService/MusicBrainz/Request.pm",
@@ -49,6 +49,6 @@
          "url" : "git://github.com/bfaist/webservice-musicbrainz.git"
       }
    },
-   "version" : "v1.0.6",
-   "x_serialization_backend" : "JSON::PP version 4.02"
+   "version" : "v1.0.7",
+   "x_serialization_backend" : "JSON::PP version 4.06"
 }

@@ -1,5 +1,13 @@
 Revision history for MIDI-RtMidi-ScorePlayer
 
+0.0201 2024-07-28 10:53:10
+    - Forgot to update the eg/gol.pl program parts. Whoops
+
+0.0200 2024-07-28 10:07:28
+    - Allow sequencing of single parts (not multitrack).
+    - Refactor the eg/* programs a bit for this change.
+    - Skip all tests because many cpantesters do not have an audio device to fire-up.
+
 0.0120 2024-07-21 17:20:56
     - Add more default tests.
     - Enhance the eg/drummer.pl program.

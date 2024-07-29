@@ -1,38 +1,22 @@
-mpq_t *		MPQ
-mpz_t *		MPZ
-mpf_t * 		MPF
-mpfr_t *		MPFR
-mpc_t *		MPC
-mpcr_t*		MPCR
-mpcb_t*		MPCB
-mpc_ptr		MPC_PTR
-mpcr_ptr		MPCR_PTR
-mpcb_ptr		MPCB_PTR
+mpq_t *            GMP_PTR
+mpz_t *            GMP_PTR
+mpf_t *            GMP_PTR
+mpc_t *            GMP_PTR
+mpcr_t *           GMP_PTR
+mpcb_t *           GMP_PTR
+mpc_ptr            GMP_PTR
+mpcr_ptr           GMP_PTR
+mpcb_ptr           GMP_PTR
+mpfi_t *           GMP_PTR
+mpfr_t *           GMP_PTR
+gmp_randstate_t *   GMP_PTR
 mpc_rnd_t		MPC_RND
 intmax_t		INTMAX
 uintmax_t		UINTMAX
 long double		LONG_DOUBLE
 
 INPUT
-MPQ
-            $var = INT2PTR($type, SvIVX(SvRV($arg)))
-MPZ
-            $var = INT2PTR($type, SvIVX(SvRV($arg)))
-MPF
-            $var = INT2PTR($type, SvIVX(SvRV($arg)))
-MPFR
-            $var = INT2PTR($type, SvIVX(SvRV($arg)))
-MPC
-            $var = INT2PTR($type, SvIVX(SvRV($arg)))
-MPCR
-            $var = INT2PTR($type, SvIVX(SvRV($arg)))
-MPCB
-            $var = INT2PTR($type, SvIVX(SvRV($arg)))
-MPC_PTR
-            $var = INT2PTR($type, SvIVX(SvRV($arg)))
-MPCR_PTR
-            $var = INT2PTR($type, SvIVX(SvRV($arg)))
-MPCB_PTR
+GMP_PTR
             $var = INT2PTR($type, SvIVX(SvRV($arg)))
 MPC_RND
             $var = ($type)SvUV($arg)
@@ -42,11 +26,3 @@ UINTMAX
             $var = ($type)SvUV($arg)
 LONG_DOUBLE
             $var = ($type)SvNV($arg)
-
-
-
-
-
-
-
-

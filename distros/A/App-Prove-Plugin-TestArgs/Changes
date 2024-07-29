@@ -1,5 +1,9 @@
 Release history for App-Prove-Plugin-TestArgs
 
+2.1.0     2024-07-29
+          - introduce an advanced onfiguration scheme
+          - use YAML::PP instead of Config::Any and YAML
+
 2.0.0     2024-07-25
           - simplify project setup
           - change the version scheme from decimal to dotted decimal

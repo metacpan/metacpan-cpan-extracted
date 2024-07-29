@@ -1,3 +1,6 @@
+2.30 2024-07-29
+- restructure .pm under "lib", CI and doc tweaks
+
 2.29 2024-03-24
 - incorporate PDL XS code into the XS, and the PDL modules so all under one roof
 

@@ -4,7 +4,7 @@ use strict;
 use Mojo::Base -base;
 use WebService::MusicBrainz::Request;
 
-our $VERSION = '1.0.6';
+our $VERSION = '1.0.7';
 
 has 'request';
 has valid_resources =>

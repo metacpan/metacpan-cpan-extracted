@@ -49,7 +49,7 @@
     use constant MPC_HEADER_V  => Math::MPC::Constant::_mpc_header_version();
     use constant MPC_HEADER_V_STR => Math::MPC::Constant::_mpc_header_version_str();
 
-    # Inspired by https://github.com/Perl/perl5/issues/19550, which affects only perl-5.35.10:
+    # In reaction to https://github.com/Perl/perl5/issues/19550, which affects only perl-5.35.10:
     use constant ISSUE_19550    => Math::MPC::Constant::_issue_19550();
 
     use subs qw(MPC_VERSION MPC_VERSION_MAJOR MPC_VERSION_MINOR
@@ -175,7 +175,7 @@ if(MPC_HEADER_V >= 66304) {
 }
 
     @Math::MPC::EXPORT_OK = (@tagged, @radius, @ball);
-    our $VERSION = '1.32';
+    our $VERSION = '1.33';
     #$VERSION = eval $VERSION;
 
     Math::MPC->DynaLoader::bootstrap($VERSION);
@@ -184,6 +184,16 @@ if(MPC_HEADER_V >= 66304) {
 
 $Math::MPC::NOK_POK = 0; # Set to 1 to allow warnings in new() and overloaded operations when
                           # a scalar that has set both NOK (NV) and POK (PV) flags is encountered
+
+# The following 3 variables store the initial default precisions and default rounding mode.
+# They can be altered by directly assigning new values to them, or by calling
+# Rmpc_set_default_prec(), Rmpc_set_default_prec2() or Rmpc_set_default_rounding
+# mode - which will assign the new values for you..
+# The values can also be retrieved directly, or by calling Rmpc_get_default_prec(),
+# Rmpc_get_default_prec2() or Rmpc_get_default_rounding_mode
+$Math::MPC::DEFAULT_PREC_RE = 53;
+$Math::MPC::DEFAULT_PREC_IM = 53;
+$Math::MPC::DEFAULT_ROUNDING_MODE = MPC_RNDNN;
 
 eval {require Math::Complex_C::Q;};
 
@@ -494,6 +504,38 @@ sub Rmpcr_split_mpfr {
   else {
     die "Rmpcr_split_mpfr function not implemented - needs mpc-1.3.0 but we have only mpc-", MPC_HEADER_V_STR, "\n";
   }
+}
+
+sub Rmpc_set_default_rounding_mode {
+  # First validate rounding value
+  if (MPC_HEADER_V < 66304) {
+    die("Illegal rounding value (%d) supplied for this version (%s) of the mpc library", $_[0], MPC_HEADER_V_STR)
+      if !_check_rounding_value($_[0]);
+  }
+  $Math::MPC::DEFAULT_ROUNDING_MODE = shift;
+}
+
+sub Rmpc_get_default_rounding_mode {
+  return $Math::MPC::DEFAULT_ROUNDING_MODE;
+}
+
+sub Rmpc_set_default_prec {
+  $Math::MPC::DEFAULT_PREC_RE = shift;
+  $Math::MPC::DEFAULT_PREC_IM = $Math::MPC::DEFAULT_PREC_RE;
+}
+
+sub Rmpc_set_default_prec2 {
+  ($Math::MPC::DEFAULT_PREC_RE, $Math::MPC::DEFAULT_PREC_IM) = (shift, shift);
+}
+
+sub Rmpc_get_default_prec {
+  return $Math::MPC::DEFAULT_PREC_RE
+    if $Math::MPC::DEFAULT_PREC_IM == $Math::MPC::DEFAULT_PREC_RE;
+  return 0;
+}
+
+sub Rmpc_get_default_prec2 {
+  return ($Math::MPC::DEFAULT_PREC_RE, $Math::MPC::DEFAULT_PREC_IM);
 }
 
 sub MPC_VERSION            () {return _MPC_VERSION()}

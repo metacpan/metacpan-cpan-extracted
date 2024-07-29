@@ -1,6 +1,6 @@
 ##----------------------------------------------------------------------------
 ## Unicode Locale Identifier - ~/lib/Locale/Unicode.pm
-## Version v0.3.4
+## Version v0.3.5
 ## Copyright(c) 2024 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2024/05/11
@@ -370,16 +370,29 @@ BEGIN
     # "Optional extension subtags, separated by hyphens, each composed of a single character, with the exception of the letter x, and a hyphen followed by one or more subtags of two to eight characters each, separated by hyphens"
     (?:
         \-
-        (?<locale_extensions>
-            $LOCALE_EXTENSIONS_RE
-            (?:
-                \-
-                $LOCALE_EXTENSIONS_RE
-            )*
-        )?
-        # "An optional private-use subtag, composed of the letter x and a hyphen followed by subtags of one to eight characters each, separated by hyphens"
         (?:
-            \-
+            (?:
+                (?<locale_extensions>
+                    $LOCALE_EXTENSIONS_RE
+                    (?:
+                        \-
+                        $LOCALE_EXTENSIONS_RE
+                    )*
+                )?
+                # "An optional private-use subtag, composed of the letter x and a hyphen followed by subtags of one to eight characters each, separated by hyphens"
+                (?:
+                    \-
+                    (?<private_extension>
+                        x
+                        \-
+                        (?<private_subtag>
+                            [a-zA-Z0-9]{1,8}
+                            (?:\-[a-zA-Z0-9]{1,8})*
+                        )
+                    )
+                )*
+            )
+            |
             (?<private_extension>
                 x
                 \-
@@ -388,13 +401,13 @@ BEGIN
                     (?:\-[a-zA-Z0-9]{1,8})*
                 )
             )
-        )*
+        )
     )?
     /xi;
     our $PROP_TO_SUB = {};
     # False, by default
     our $EXPLICIT_BOOLEAN = 0;
-    our $VERSION = 'v0.3.4';
+    our $VERSION = 'v0.3.5';
 };
 
 use strict;
@@ -681,6 +694,63 @@ sub as_string
     return( $rv );
 }
 
+sub base
+{
+    my $self = shift( @_ );
+    if( @_ )
+    {
+        my $base = shift( @_ );
+        unless( Scalar::Util::blessed( $base ) &&
+                $base->isa( 'Locale::Unicode' ) )
+        {
+            $base = Locale::Unicode->new( "$base" ) ||
+                return( $self->pass_error );
+        }
+        # $base = $base->canonical;
+        if( my $lang = $base->language_id )
+        {
+            $self->language_id( $lang );
+        }
+        else
+        {
+            $self->language_id( undef );
+        }
+
+        if( my $script = $base->script )
+        {
+            $self->script( $script );
+        }
+        else
+        {
+            $self->script( undef );
+        }
+
+        if( my $territory = $base->territory )
+        {
+            $self->territory( $territory ) ||
+                return( $self->pass_error );
+        }
+        else
+        {
+            $self->territory( undef );
+        }
+
+        my $ref;
+        if( ( $ref = $base->variants ) &&
+            ref( $ref // '' ) eq 'ARRAY' &&
+            scalar( @$ref ) )
+        {
+            local $" = '-';
+            $self->variant( "@$ref" );
+        }
+        else
+        {
+            $self->variant( undef );
+        }
+    }
+    return( $self->core );
+}
+
 # u-dx
 sub break_exclusion { return( shift->reset(@_)->_set_get_prop( 'break_exclusion', @_ ) ); }
 
@@ -697,6 +767,15 @@ sub canonical
     my $self = shift( @_ );
     local $EXPLICIT_BOOLEAN = 0;
     my $clone = Locale::Unicode->new( "$self" );
+    if( my $privateuse = $clone->privateuse )
+    {
+        return( $clone );
+    }
+    elsif( my $grandfathered = $clone->grandfathered )
+    {
+        return( $clone );
+    }
+
     if( my $variant = $self->variant )
     {
         # Make sure we have unique variants
@@ -741,8 +820,14 @@ sub canonical
         if( $lang )
         {
             my $lang_canon = lc( $lang );
-            $lang_canon = 'und' if( $lang_canon eq 'root' );
-            $clone->language( $lang_canon ) if( $lang_canon ne $lang );
+            if( $lang_canon eq 'root' )
+            {
+                $clone->language3( 'und' );
+            }
+            elsif( $lang_canon ne $lang )
+            {
+                $clone->language( $lang_canon );
+            }
         }
         elsif( $lang3 )
         {
@@ -1122,6 +1207,7 @@ sub language_id
         if( !defined( $val ) )
         {
             $self->language( undef );
+            $self->language3( undef );
         }
         elsif( length( $val ) == 3 )
         {
@@ -3800,7 +3886,7 @@ In Scalar or in list context, the value returned is the last value set.
 
 =head1 VERSION
 
-    v0.3.4
+    v0.3.5
 
 =head1 DESCRIPTION
 
@@ -3894,6 +3980,27 @@ For example:
     });
     say $locale; # ko-Kore-KR-u-kf-upper-kn-true
 
+=head2 base
+
+    my $locale = Locale::Unicode->new( 'en-US' );
+    say $locale->base; # en-US
+
+    my $locale = Locale::Unicode->new( 'en-Latn-US-posix-t-de-AT-t0-und-x0-medical' );
+    say $locale->base; # en-Latn-US-posix
+    $locale->base( 'ja-JP' );
+    say $locale->base; # ja-JP
+    say $locale; ja-JP-t-de-AT-t0-und-x0-medical
+
+This method sets or gets the L<base part|https://datatracker.ietf.org/doc/html/rfc6067#section-2.1> of the C<locale>
+
+The C<base> part is composed of the L<language_id|/language_id>, an optional L<script|/script>, an optional L<territory|/territory> and zero or more L<variants|/variant>
+
+If a value is provided, it will replace the current C<locale> object C<base>
+
+If an improper C<base> value is provided, it will set an L<error object|Locale::Unicode::Exception> and return C<undef> in scalar context and an empty list in list context.
+
+It returns the current base as a string.
+
 =head2 break_exclusion
 
     my $locale = Locale::Unicode->new( 'ja' );
@@ -3938,6 +4045,11 @@ Variants are sorted and made in lower case.
     my $locale = Locale::Unicode->new( 'en-Scouse-fonipA' );
     say $locale->canonical; # en-fonipa-scouse
 
+Any duplicates are removed as L<per the LDML specifications|https://unicode.org/reports/tr35/tr35.html#Unicode_language_identifier>.
+
+    my $locale = Locale::Unicode->new( 'de-1996-fonipa-1996' );
+    say $locale->canonical; # de-1996-fonipa    
+
 =item * C<territory>
 
 Territory is made in upper case
@@ -3959,6 +4071,8 @@ Script is formatted in title case.
 =item * C<language>
 
 The language code is made in lower case.
+
+The special C<language> code C<root> is replaced by C<und>
 
 =back
 
@@ -4515,6 +4629,19 @@ For example:
 See also L</language>
 
 Note that you can alternatively use the method L<locale|/locale>, although strictly speaking a C<locale> is the whole string, while the C<language> is a component of it.
+
+If you use the L<special locale root|https://unicode.org/reports/tr35/tr35.html#Unicode_language_identifier>, it will be accessible via the method L<language|/language>, although normally this is for 2-characters C<language>
+
+    my $locale = Locale::Unicode->new( 'root' );
+    say $locale; # root
+    say $locale->language; # root
+    say $locale->canonical; # und
+
+    my $locale = Locale::Unicode->new( 'root-t-de-t0-ja-x0-medical' );
+    say $locale; # root-t-de-t0-und-x0-medical
+    say $locale->language; # root
+    say $locale->canonical; # und-t-de-t0-ja-x0-medical
+    say $locale->canonical->language; # und
 
 =head2 lang3
 

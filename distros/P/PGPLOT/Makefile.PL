@@ -102,8 +102,8 @@ if ( !defined $Arg{IDIR} || !defined $Arg{LDIR} ) {
 
     # and if nothing worked, use some defaults
 
-    $Arg{IDIR} ||= $IDIR || '/usr/include,/Applications/PDL/pgplot,/usr/local/pgplot';
-    $Arg{LDIR} ||= $LDIR || '/usr/lib,/usr/lib64';
+    $Arg{IDIR} ||= $IDIR || '/usr/include,/Applications/PDL/pgplot,/usr/local/pgplot,/opt/homebrew/opt/pgplot/include';
+    $Arg{LDIR} ||= $LDIR || '/usr/lib,/usr/lib64,/opt/homebrew/opt/pgplot/lib';
 
 }
 
@@ -250,7 +250,7 @@ WriteMakefile(
     'NAME'	=> 'PGPLOT',
     'CONFIGURE_REQUIRES' => { 'ExtUtils::F77' => 1.13, 'Devel::CheckLib' => '1.14' },
     'TEST_REQUIRES' => { 'Test::More' => '0.88' },
-    'VERSION_FROM'	=> 'PGPLOT.pm',
+    'VERSION_FROM'	=> 'lib/PGPLOT.pm',
     'dist'      => { COMPRESS=>"gzip", SUFFIX=>"gz" },
     'depend'    => { '$(OBJECT)' => q[pgfun.c arrays.c PGPLOT.c]},
     'META_MERGE' => {

@@ -1,3 +1,12 @@
+
+#ifdef  __MINGW32__
+#ifndef __USE_MINGW_ANSI_STDIO
+#define __USE_MINGW_ANSI_STDIO 1
+#endif
+#endif
+
+#define PERL_NO_GET_CONTEXT 1
+
 #include "EXTERN.h"
 #include "perl.h"
 #include "XSUB.h"
@@ -25,11 +34,11 @@ int _is_NOK_and_POK(SV * in) {
  * the mpc library (as specified by mpc.h)  *
  * at compile time.                         */
 
-SV * _mpc_header_version(void) {
+SV * _mpc_header_version(pTHX) {
   return newSVuv(MPC_VERSION);
 }
 
-SV * _mpc_header_version_str(void) {
+SV * _mpc_header_version_str(pTHX) {
   return newSVpv(MPC_VERSION_STRING, 0);
 }
 
@@ -49,9 +58,15 @@ _is_NOK_and_POK (in)
 
 SV *
 _mpc_header_version ()
+CODE:
+  RETVAL = _mpc_header_version (aTHX);
+OUTPUT:  RETVAL
 
 
 SV *
 _mpc_header_version_str ()
+CODE:
+  RETVAL = _mpc_header_version_str (aTHX);
+OUTPUT:  RETVAL
 
 

@@ -81,7 +81,7 @@ my @parts = (\&part) x $opts{drummers};
 
 MIDI::RtMidi::ScorePlayer->new(
     score  => $d->score,
-    parts  => \@parts,
+    parts  => [ \@parts ],
     common => \%common,
     sleep  => 2,
 )->play;

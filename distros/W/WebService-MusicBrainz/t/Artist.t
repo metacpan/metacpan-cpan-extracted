@@ -1,5 +1,6 @@
 use strict;
 use Test::More;
+use Data::Dumper;
 
 use WebService::MusicBrainz;
 
@@ -55,7 +56,7 @@ sleep(1);
 
 my $s6_res = $ws->search(artist => { artist => 'Van Halen', type => 'group' });
 exit_if_mb_busy($s6_res);
-ok($s6_res->{count} == 1);
+ok($s6_res->{count} >= 1);
 ok($s6_res->{artists}->[0]->{type} eq 'Group');
 ok($s6_res->{artists}->[0]->{id} eq 'b665b768-0d83-4363-950c-31ed39317c15');
 sleep(1);

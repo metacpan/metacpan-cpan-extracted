@@ -26,6 +26,7 @@ isa_ok( $loc, 'Locale::Unicode' );
 # NOTE: methods check
 can_ok( $loc, 'apply' );
 can_ok( $loc, 'as_string' );
+can_ok( $loc, 'base' );
 can_ok( $loc, 'break_exclusion' );
 can_ok( $loc, 'ca' );
 can_ok( $loc, 'calendar' );
@@ -86,8 +87,8 @@ can_ok( $loc, 'kv' );
 can_ok( $loc, 'lang' );
 can_ok( $loc, 'lang3' );
 can_ok( $loc, 'language' );
-can_ok( $loc, 'language3' );
 can_ok( $loc, 'language_extended' );
+can_ok( $loc, 'language3' );
 can_ok( $loc, 'language_id' );
 can_ok( $loc, 'lb' );
 can_ok( $loc, 'line_break' );
@@ -551,6 +552,34 @@ my @tests = (
                 variant => "1996-fonipa-1606nict",
             },
             stringify => 'de-1996-fonipa-1606nict',
+        },
+    'und-x-i-enochian' =>
+        {
+            matches =>
+            {
+                language3 => "und",
+                locale_bcp47 => "und",
+                private_extension => "x-i-enochian",
+                private_subtag => "i-enochian",
+            },
+            parse =>
+            {
+                language3 => "und",
+                private => "i-enochian",
+            },
+            subs =>
+            {
+                extended => undef,
+                language => undef,
+                language3 => "und",
+                language_extended => "und",
+                core => "und",
+                private => "i-enochian",
+                script => undef,
+                territory => undef,
+                variant => undef,
+            },
+            stringify => 'und-x-i-enochian',
         },
 );
 
@@ -1191,6 +1220,24 @@ subtest 'overlong' => sub
     is( $locale->overlong, 'USA', '[overlong] en-US -> USA' );
     is( $locale->country_code, 'USA', '[country_code] en-US -> undef' );
     is( $locale->territory, 'USA', '[territory] en-US -> undef' );
+};
+
+# NOTE: base
+subtest 'base' => sub
+{
+    my $locale = Locale::Unicode->new( 'en-US' );
+    is( $locale->base, 'en-US', 'base -> en-US' );
+
+    $locale = Locale::Unicode->new( 'en-Latn-US-posix-t-de-AT-t0-und-x0-medical' );
+    is( $locale->base, 'en-Latn-US-posix', 'base -> en-Latn-US-posix' );
+    ok( $locale->base( 'ja-JP' ), 'base( ja-JP )' );
+    is( $locale->base, 'ja-JP', 'base -> ja-JP' );
+    is( "$locale", 'ja-JP-t-de-AT-t0-und-x0-medical', 'stringification -> ja-JP-t-de-AT-t0-und-x0-medical' );
+
+    $locale = Locale::Unicode->new( 'en-US' );
+    $locale->base( 'en-GB-1996-fonipa-1996' );
+    is( $locale->base, 'en-GB-1996-fonipa-1996', 'base -> en-GB-1996-fonipa-1996' );
+    is( "$locale", 'en-GB-1996-fonipa-1996', 'stringification -> en-GB-1996-fonipa-1996' );
 };
 
 done_testing();

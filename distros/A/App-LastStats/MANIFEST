@@ -1,0 +1,9 @@
+Makefile.PL
+lib/App/LastStats.pm
+bin/laststats
+t/00-load.t
+t/01-basic.t
+MANIFEST
+ChangeLog.md
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

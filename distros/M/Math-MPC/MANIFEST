@@ -1,6 +1,7 @@
 MANIFEST
 Makefile.PL
 math_mpc_include.h
+math_mpc_unused.h
 MPC.pm
 MPC.pod
 MPC.xs

@@ -7,7 +7,7 @@ require Exporter;
 *import = \&Exporter::import;
 require DynaLoader;
 
-our $VERSION = '1.32';
+our $VERSION = '1.33';
 #$VERSION = eval $VERSION;
 Math::MPC::Radius->DynaLoader::bootstrap($VERSION);
 

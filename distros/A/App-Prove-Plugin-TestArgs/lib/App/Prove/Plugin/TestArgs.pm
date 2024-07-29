@@ -4,15 +4,17 @@ use warnings;
 package App::Prove::Plugin::TestArgs;
 
 use Class::Method::Modifiers qw( install_modifier );
-use Config::Any              qw();
+use String::Format           qw( stringf );
+use YAML::PP                 qw( LoadFile );
 
 # keeping the following $VERSION declaration on a single line is important
 #<<<
-use version 0.9915; our $VERSION = version->declare( '2.0.0' );
+use version 0.9915; our $VERSION = version->declare( '2.1.0' );
 #>>>
 
 my $command_line_test_args;
-my %test_script_has_alias;
+# script means test script
+my %script_has_alias;
 
 sub load {
   my $plugin_name = shift;
@@ -22,20 +24,16 @@ sub load {
   # initialize (overwrite) test args
   $app_prove->test_args( {} );
 
-  my $config;
-  {
-    no warnings 'once'; ## no critic (ProhibitNoWarnings)
-    local $YAML::Preserve = 1; ## no critic (ProhibitPackageVars)
-    ( undef, $config ) =
-      %{ Config::Any->load_files( { files => [ $plugin_args->[ 0 ] ], use_ext => 1, flatten_to_hash => 1 } ) };
-  }
+  my $config = LoadFile( $plugin_args->[ 0 ] );
 
-  for my $test_script ( keys %$config ) {
-    for ( @{ $config->{ $test_script } } ) {
-      my ( $alias, $test_script_args ) = @{ $_ }{ qw( alias args ) };
+  my $scripts = exists $config->{ scripts } ? $config->{ scripts } : $config;
+  for my $script ( keys %$scripts ) {
+    for ( @{ $scripts->{ $script } } ) {
+      my ( $alias, $script_args ) = @{ $_ }{ qw( alias args ) };
+      $alias = stringf( $config->{ name }, { a => $alias, s => $script } ) if exists $config->{ name };
       # update test args ("args" is optional)
-      $app_prove->test_args->{ $alias } = defined $test_script_args ? $test_script_args : $command_line_test_args;
-      push @{ $test_script_has_alias{ $test_script } }, [ $test_script, $alias ];
+      $app_prove->test_args->{ $alias } = defined $script_args ? $script_args : $command_line_test_args;
+      push @{ $script_has_alias{ $script } }, [ $script, $alias ];
     }
   }
 }
@@ -46,8 +44,8 @@ install_modifier 'App::Prove', 'around', '_get_tests' => sub {
 
   my @tests;
   for ( $app_prove->$_get_tests_orig( @_ ) ) {
-    if ( exists $test_script_has_alias{ $_ } ) {
-      push @tests, @{ $test_script_has_alias{ $_ } };
+    if ( exists $script_has_alias{ $_ } ) {
+      push @tests, @{ $script_has_alias{ $_ } };
     } else {
       my $alias = $_;
       push @tests, [ $_, $alias ];
@@ -57,7 +55,7 @@ install_modifier 'App::Prove', 'around', '_get_tests' => sub {
     }
   }
   undef $command_line_test_args;
-  undef %test_script_has_alias;
+  undef %script_has_alias;
 
   return @tests;
 };

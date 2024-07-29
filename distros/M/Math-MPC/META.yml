@@ -23,5 +23,5 @@ requires:
   Test::More: '0.88'
 resources:
   repository: https://github.com/sisyphus/math-mpc.git
-version: '1.32'
+version: '1.33'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

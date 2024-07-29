@@ -1,5 +1,17 @@
+1.33
+ - Silence pointless compiling warnings generated during compilation of the XS files.
+ - Rewrite the XS code in MPC.xs to do away with the "MY_CXT" stuff. (PERL_NO_GET_CONTEXT
+   is still defined to 1.)
+ - Define PERL_NO_GET_CONTEXT to 1 in Constant/Constant.xs.
+ - The Rmpc_set_default_prec, Rmpc_set_default_prec2 and Rmpc_set_default_rounding_mode
+   functions have been moved from MPC.xs to MPC.pm.
+ - The Rmpc_get_default_prec, Rmpc_get_default_prec2 and Rmpg_set_default_rounding_mode
+   functions have also been moved from MPC.xs to MPC.pm.
+
 1.32
  - Avoid monitoring PL_markstack_ptr in MPC.xs, Ball.xs and Radius.xs
+ - In all (2) calls to mpfr_get_str() in MPC.xs, replace first argument of '0' with 'NULL'.
+   (Might be relevant to https://rt.cpan.org/Ticket/Display.html?id=151057.)
 
 1.31
  - Add new functions Rmpcr_out_str_win, Rmpc_say_win & Rmpcr_print_win.

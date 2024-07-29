@@ -1,0 +1,8 @@
+name: "%s (%a)"
+scripts:
+  t/foo.t:
+    - alias: "foo once"
+      args:  [ABC, DEF]
+    - alias: "foo twice"
+    - alias: "foo thrice"
+      args:  [GHI]

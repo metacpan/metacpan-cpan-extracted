@@ -22,7 +22,7 @@ my %WriteMakefileArgs = (
     provides    => {
       'App::Prove::Plugin::TestArgs' => {
         file    => 'lib/App/Prove/Plugin/TestArgs.pm',
-        version => '2.0.0',
+        version => '2.1.0',
       },
     },
     resources => {

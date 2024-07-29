@@ -29,6 +29,7 @@ RtMidi
 ScorePlayer
 TBH
 distro
+durations
 gene
 lib
 soundfont

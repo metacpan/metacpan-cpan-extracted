@@ -106,7 +106,7 @@ while (1) {
 
     MIDI::RtMidi::ScorePlayer->new(
       score    => $score,
-      parts    => \@parts,
+      parts    => [ \@parts ],
       common   => \%common,
       sleep    => 0,
       infinite => 0,

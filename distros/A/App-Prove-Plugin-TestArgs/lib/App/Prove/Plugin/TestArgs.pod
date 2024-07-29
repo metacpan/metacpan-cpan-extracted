@@ -10,31 +10,36 @@ arguments
   # t/config.yml
   ---
   t/foo.t:
-    - alias: "Foo once"
-      args:  [foo, bar]
-    - alias: "Foo twice"
-    - alias: "Foo thrice"
-      args:  [baz]
+    - alias: "foo once"
+      args:  [ABC, DEF]
+    - alias: "foo twice"
+    - alias: "foo thrice"
+      args:  [GHI]
 
   # command-line 
-  prove -PTestArgs=t/config.yml --verbose t/foo.t :: quux corge
-  Foo once ....
+  prove -PTestArgs=t/config.yml --verbose t/foo.t t/bar.t :: UVW XYZ
+  foo once ....
   1..1
-  # ['foo','bar']
+  # ['ABC','DEF']
   ok 1 - t/foo.t
   ok
-  Foo twice ...
+  foo twice ...
   1..1
-  # ['quux','corge']
+  # ['UVW','XYZ']
   ok 1 - t/foo.t
   ok
-  Foo thrice ..
+  foo thrice ..
   1..1
-  # ['baz']
+  # ['GHI']
   ok 1 - t/foo.t
+  ok
+  t/bar.t .....
+  1..1
+  # ['UVW','XYZ']
+  ok 1 - t/bar.t
   ok
   All tests successful.
-  Files=3, Tests=3,  0 wallclock secs ( 0.02 usr  0.01 sys +  0.07 cusr  0.02 csys =  0.12 CPU)
+  Files=4, Tests=4,  0 wallclock secs ( 0.01 usr  0.01 sys +  0.03 cusr  0.00 csys =  0.05 CPU)
   Result: PASS
 
 =head1 DESCRIPTION
@@ -42,19 +47,68 @@ arguments
 L<TAP::Harness> is the default test harness of the C<prove> command-line test
 driver program. The harness has a C<test_args> object attribute that allows us
 to pass different arguments to test scripts. Furthermore the harness
-C<runtests()> object method implementation allows us to run a test script
-multiple times giving each run a unique name (an C<alias>).  Unfortunately it
-seems to be impossible to control this functionality directly via the C<prove>
-command-line interface.
+C<runtests()> object method implementation helps us to run a test script
+multiple times giving each run a unique test name (an C<alias>).  Unfortunately
+it seems to be impossible to control this feature directly via the C<prove>
+command-line interface. C<prove> uses the full path to the test script as the
+test name in its test output.
 
-This plugin allows you to assign multiple C<alias>-C<args> pairs to a test
-script.  Each pair triggers a separate run of the test script. The C<args> part
-of a pair is optional. If it is missing, C<prove>'s own optional test script
-arguments passed at the command-line after an arisdottle (C<::>) are used as a
-default.
+This plugin allows us to assign multiple C<alias>-C<args> mappings to a test
+script.  Each mapping triggers a separate run of the test script. The C<args>
+key of a mapping is optional. If it is missing, C<prove>'s own optional test
+script arguments, passed at the command-line after an arisdottle (C<::>), are
+used as a default.
 
 For the time being the configuration has to be stored in a YAML file that is
 the only argument passed to this plugin.
+
+C<prove>'s test output no longer shows the test script names, if test aliases
+are configured. As of version C<2.1.0> this plugin provides an alternative
+configuration scheme that helps us to overcome this drawback.
+
+  # t/config_name_scripts.yml
+  ---
+  name: "%s (%a)"
+  scripts:
+    t/foo.t:
+      - alias: "foo once"
+        args:  [ABC, DEF]
+      - alias: "foo twice"
+      - alias: "foo thrice"
+        args:  [GHI]
+
+  # command-line 
+  prove -PTestArgs=t/config_name_scripts.yml --verbose t/foo.t t/bar.t :: UVW XYZ
+  t/foo.t (foo once) ....
+  1..1
+  # ['ABC','DEF']
+  ok 1 - t/foo.t
+  ok
+  t/foo.t (foo twice) ...
+  1..1
+  # ['UVW','XYZ']
+  ok 1 - t/foo.t
+  ok
+  t/foo.t (foo thrice) ..
+  1..1
+  # ['GHI']
+  ok 1 - t/foo.t
+  ok
+  t/bar.t ...............
+  1..1
+  # ['UVW','XYZ']
+  ok 1 - t/bar.t
+  ok
+  All tests successful.
+  Files=4, Tests=4,  0 wallclock secs ( 0.02 usr  0.01 sys +  0.15 cusr  0.02 csys =  0.20 CPU)
+  Result: PASS
+
+The C<scripts> key points to the test scripts mapping. The C<name> key points
+to a L<functions/sprintf> like format. The allowed conversions are C<%s> (full
+path to the test script) and C<%a> (test alias). The format tells C<prove> what
+to use as the test name in its test output. The C<name> key is optional. If it
+is omitted the C<scripts> key can be omitted too and this brings us back to the
+original configuration scheme.
 
 =head1 AUTHORS
 

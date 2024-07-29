@@ -2,6 +2,7 @@
 use strict;
 use warnings;
 
+use if $ENV{USER} eq 'gene', lib => map { "$ENV{HOME}/sandbox/$_/lib" } qw(MIDI-RtMidi-ScorePlayer MIDI-Util);
 use MIDI::RtMidi::ScorePlayer ();
 use MIDI::Util qw( setup_score set_chan_patch );
 use Music::Scales qw( get_scale_MIDI );
@@ -12,11 +13,9 @@ my %common = ( score => $score );
 
 MIDI::RtMidi::ScorePlayer->new(
   score    => $score,
-  parts    => [ \&treble, \&bass ],
+  parts    => [ \&bass, [ \&treble, \&bass ], [ \&treble, \&bass ], \&bass ],
   common   => \%common,
-  repeats  => 1,
   sleep    => 0,
-  loop     => 4,
   infinite => 0,
 )->play;
 
@@ -26,6 +25,8 @@ sub bass {
   my @pitches = (
     get_scale_MIDI( 'C', 2, 'pentatonic' ),
   );
+
+  $common{'tick.durations'} = [ ('hn') x 4 ];
 
   my $bass = sub {
     set_chan_patch( $args{score}, 0, 35 );

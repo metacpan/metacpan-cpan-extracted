@@ -139,8 +139,8 @@
    Rmpcr_out_str ($fh, $op);
    Rmpcr_print($op);
    Rmpcr_say($op);
-    Rmpcr_out_str outputs $op on $fh, which may be 'stdout'.
-    Rmpcr_print and Rmpcr_say print to 'stdout', with Rmpcr_say adding
+    Rmpcr_out_str outputs $op on $fh, which may be *stdout.
+    Rmpcr_print and Rmpcr_say print to *stdout, with Rmpcr_say adding
     a newline - as with perl's say() function.
     Caveat: These functions so far serve mainly for debugging purposes.
             Their output format changed after the release of mpc-1.3.1,

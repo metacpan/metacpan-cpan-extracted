@@ -1,3 +1,26 @@
+package PDL::Graphics::PGPLOT::Window;
+use strict;
+use warnings;
+require Exporter;
+
+use PDL::Core qw/:Func :Internal/; # Grab the Core names
+use PDL::Basic;
+use PDL::Ufunc;
+use PDL::Primitive;
+use PDL::Types;
+use PDL::Options;
+use PDL::Graphics::State;
+use PDL::Graphics::PGPLOTOptions qw(default_options);
+use PDL::Slices;
+use PGPLOT;
+
+require DynaLoader;
+
+our @ISA = qw( Exporter );
+our @EXPORT = qw( pgwin );
+
+$PDL::Graphics::PGPLOT::RECORDING = 0; # By default recording is off..
+
 =head1 NAME
 
 PDL::Graphics::PGPLOT::Window - A OO interface to PGPLOT windows
@@ -716,8 +739,6 @@ instead recommend that you do not turn on recording unless you need it.
 =back
 
 
-
-
 =head1 FUNCTIONS
 
 A more detailed listing of the functions and their usage follows. For
@@ -748,7 +769,7 @@ Exported constructor for PGPLOT object/device/plot window.
 =for usage
 
  Usage: pgwin($opt);
- Usage: pgwin($option->$value,...);
+ Usage: pgwin($option=>$value,...);
  Usage: pgwin($device);
 
 Parameters are passed on to new() and can either be specified by hash
@@ -1102,7 +1123,7 @@ Sets the maximum value for the same.
 
 A more compact way to specify MIN and MAX, as a list:
 you can say "Range=>[0,10]" to scale the color table for
-brightness values between 0 and 10 in the iamge data.
+brightness values between 0 and 10 in the image data.
 
 =item CRANGE
 
@@ -1982,6 +2003,146 @@ Example:
    $t = $w->transform(dims($im), {ImageCenter => 0,  Pixinc => 5});
    $w->imag($im, {Transform => $t});
 
+=cut
+
+{
+    use strict;
+    my $transform_options = undef;
+
+    sub transform {
+	# Compute the transform array needed in contour and image plotting
+	my $self = shift;
+
+	if (!defined($transform_options)) {
+	  $transform_options =
+	    $self->{PlotOptions}->extend({Angle => undef,
+					  ImageDims => undef,
+					  Pixinc => undef,
+					  ImageCenter => undef,
+					  RefPos => undef
+					  });
+	  $transform_options->synonyms({
+	      ImageDimensions => 'ImageDims',
+	      ImageCentre => 'ImageCenter',
+	      ReferencePosition => 'RefPos',
+	      });
+	}
+
+	# parse the input
+	my ($in, $opt)=_extract_hash(@_);
+	my ($x_pix, $y_pix)= @$in;
+
+	# handle options
+	$opt = {} if !defined($opt);
+	my ($o, $u_opt) = $self->_parse_options($transform_options, $opt);
+	$self->_standard_options_parser($u_opt);
+
+	my ($angle, $x_pixinc, $y_pixinc, $xref_pix, $yref_pix, $xref_wrld, $yref_wrld);
+	if (defined($o->{Angle})) {
+	    $angle = $o->{Angle};
+	}
+	else {
+	    $angle = 0;
+	}
+
+	if (defined($o->{Pixinc})) {
+	    if (ref($o->{Pixinc}) eq 'ARRAY') {
+		($x_pixinc, $y_pixinc) = @{$o->{Pixinc}};
+	    }
+	    else {
+		$x_pixinc = $y_pixinc = $o->{Pixinc};
+	    }
+	}
+	else {
+	    $x_pixinc = $y_pixinc = 1;
+	}
+
+	if ( defined $o->{ImageDims} ) {
+	    if ( ref($o->{ImageDims}) eq 'ARRAY' ) {
+		($x_pix, $y_pix) = @{$o->{ImageDims}};
+	    }
+	    else {
+		barf "Image dimensions must be given as an array reference!";
+	    }
+	}
+
+	# The user has to pass the dimensions of the image somehow, so this
+	# is a good point to check whether they have done so.
+	unless (defined($x_pix) && defined($y_pix)) {
+	  barf "You must pass the image dimensions to the transform routine\n";
+	}
+
+	# The RefPos option gives more flexibility than
+	# ImageCentre, since ImageCentre => [ a, b ] is the same
+	# as PosReference => [ [(nx-1)/2,(ny-1/2)], [a,b] ].
+	# We use ImageCentre in preference to PosReference
+	#
+	if (defined $o->{ImageCenter}) {
+	    print "transform() ignoring RefPos as seen ImageCentre\n"
+		if defined $o->{RefPos} and $PDL::verbose;
+	    my $ic = $o->{ImageCenter};
+	    if (ref($ic) eq 'ARRAY') {
+	        ($xref_wrld, $yref_wrld) = @{$ic};
+	    }
+	    else {
+		$xref_wrld = $yref_wrld = $ic;
+	    }
+
+	    $xref_pix = ($x_pix - 1)/2;
+	    $yref_pix = ($y_pix - 1)/2;
+
+	}
+	elsif ( defined $o->{RefPos} ) {
+	    my $aref = $o->{RefPos};
+	    barf "RefPos option must be sent an array reference.\n"
+		unless ref($aref) eq 'ARRAY';
+	    barf "RefPos must be a 2-element array reference\n"
+		unless $#$aref == 1;
+	    my $pixref  = $aref->[0];
+	    my $wrldref = $aref->[1];
+	    barf "Elements of RefPos must be 2-element array references\n"
+		unless $#$pixref == 1 and $#$wrldref == 1;
+
+	    ($xref_pix,  $yref_pix)  = @{$pixref};
+	    ($xref_wrld, $yref_wrld) = @{$wrldref};
+	}
+	else {
+	    $xref_wrld = $yref_wrld = 0;
+	    $xref_pix = ($x_pix - 1)/2;
+	    $yref_pix = ($y_pix - 1)/2;
+	}
+
+	# The elements of the transform ndarray,
+	# here labelled t0 to t5, relate to the
+	# following maxtix equation:
+	#
+	#   world = zp + matrix * pixel
+	#
+	# world  - the position of the point in the world,
+	#          ie plot, coordinate system
+	# pixel  - the position of the point in pixel
+	#          coordinates (bottom-left is 0,0 pixel)
+	# zp     - (t0)
+	#          (t3)
+	# matrix - (t1 t2)
+	#          (t4 t5)
+	#
+	my $ca = cos( $angle );
+	my $sa = sin( $angle );
+	my $t1 = $x_pixinc * $ca;
+	my $t2 = $y_pixinc * $sa;
+	my $t4 = -$x_pixinc * $sa;
+	my $t5 = $y_pixinc * $ca;
+
+	return pdl(
+		   $xref_wrld - $t1 * $xref_pix - $t2 * $yref_pix,
+		   $t1, $t2,
+		   $yref_wrld - $t4 * $xref_pix - $t5 * $yref_pix,
+		   $t4, $t5
+		   );
+    }
+}
+
 =head2 tline
 
 =for ref
@@ -2005,6 +2166,74 @@ Example:
   $ty = $tx + $tx->yvals;
   $win->tline($tx, $ty, $h);
 
+=cut
+
+# A "broadcasted" line - I cannot come up with a more elegant way of doing
+# this without re-coding bits of broadcast_over but it might very well be
+# that you may :)
+my $line_options = undef;
+sub tline {
+  my $self = shift;
+  my ($in, $opt)=_extract_hash(@_);
+  $self->_add_to_state(\&tline, $in, $opt);
+  $opt={} if !defined($opt);
+
+  barf 'Usage tline ([$x], $y, [, $options])' if $#$in < 0 || $#$in > 2;
+  my ($x, $y)=@$in;
+  if (!defined($line_options)) {
+    $line_options=$self->{PlotOptions}->extend({Missing => undef});
+  }
+
+  if ($#$in==0) {
+    $y = $x; $x = $y->xvals();
+  }
+
+  catch_signals {
+    # This is very very kludgy, but it was the best way I could find..
+    my $o = _broadcast_options($y->getdim(1), $opt);
+    # We need to keep track of the current status of hold or not since
+    # the tline function automatically enforces a hold to allow for overplots.
+    my $tmp_hold = $self->held();
+    unless ( $self->held() ) {
+      my ($o, $u_opt) = $self->_parse_options($line_options,$opt);
+      $self->_check_move_or_erase($o->{Panel}, $o->{Erase});
+
+      # use Data::Dumper;
+      # print Dumper $o;
+      # print Dumper $u_opt;
+
+      my ($ymin, $ymax, $xmin, $xmax);
+      # Make sure the missing value is used as the min or max value
+      if (defined $o->{Missing} ) {
+        ($ymin, $ymax)=ref $o->{YRange} eq 'ARRAY' ?
+          @{$o->{YRange}} : minmax($y->where($y != $o->{Missing}));
+        ($xmin, $xmax)=ref $o->{XRange} eq 'ARRAY' ?
+          @{$o->{XRange}} : minmax($x->where($x != $o->{Missing}));
+      } else {
+        ($ymin, $ymax)=ref $o->{YRange} eq 'ARRAY' ? @{$o->{YRange}} :
+          minmax($y);
+        ($xmin, $xmax)=ref $o->{XRange} eq 'ARRAY' ? @{$o->{XRange}} :
+          minmax($x);
+      }
+      if ($xmin == $xmax) { $xmin -= 0.5; $xmax += 0.5; }
+      if ($ymin == $ymax) { $ymin -= 0.5; $ymax += 0.5; }
+      # use Data::Dumper;
+      # print "tline options: ", Dumper($opt), "\n";
+      $self->initenv( $xmin, $xmax, $ymin, $ymax, $opt);
+      $self->hold; # we hold for the duration of the broadcasted plot
+    }
+    _tline($x, $y, PDL->sequence($y->getdim(1)), $self, $o);
+    $self->release unless $tmp_hold;
+  };
+}
+PDL::broadcast_define('_tline(a(n);b(n);ind()), NOtherPars => 2',
+  PDL::over {
+    my ($x, $y, $ind, $self, $opt)=@_;
+    # use Data::Dumper;
+    # print Dumper $opt->[$ind->at(0)];
+    $self->line($x, $y,$opt->[$ind->at(0)] || {}); #
+});
+
 =head2 tpoints
 
 =for ref
@@ -2027,6 +2256,68 @@ Example:
   $tx=zeroes(100,5)->xlinvals(-5,5);
   $ty = $tx + $tx->yvals;
   tpoints($tx, $ty, $h);
+
+=cut
+
+# A "broadcasted" point - I cannot come up with a more elegant way of doing
+# this without re-coding bits of broadcast_over but it might very well be
+# that you may :)
+my $points_options = undef;
+sub tpoints {
+  my $self = shift;
+  my ($in, $opt)=_extract_hash(@_);
+  $self->_add_to_state(\&tpoints, $in, $opt);
+  $opt={} if !defined($opt);
+
+  barf 'Usage tpoints ([$x], $y, [, $options])' if $#$in < 0 || $#$in > 2;
+  my ($x, $y)=@$in;
+
+  if ($#$in==0) {
+    $y = $x; $x = $y->xvals();
+  }
+
+  # This is very very cludgy, but it was the best way I could find..
+  my $o = _broadcast_options($y->getdim(1), $opt);
+  # We need to keep track of the current status of hold or not since
+  # the tline function automatically enforces a hold to allow for overplots.
+  my $tmp_hold = $self->held();
+  unless ( $self->held() ) {
+    if (!defined($points_options)) {
+      $points_options = $self->{PlotOptions}->extend({PlotLine => 0});
+    }
+    my ($o, $u_opt) = $self->_parse_options($points_options,$opt);
+    $self->_check_move_or_erase($o->{Panel}, $o->{Erase});
+
+    # use Data::Dumper;
+    # print Dumper $o;
+    # print Dumper $u_opt;
+
+    my ($ymin, $ymax, $xmin, $xmax);
+    # Make sure the missing value is used as the min or max value
+    if (defined $o->{Missing} ) {
+      ($ymin, $ymax)=ref $o->{YRange} eq 'ARRAY' ?
+	@{$o->{YRange}} : minmax($y->where($y != $o->{Missing}));
+      ($xmin, $xmax)=ref $o->{XRange} eq 'ARRAY' ?
+	@{$o->{XRange}} : minmax($x->where($x != $o->{Missing}));
+    } else {
+      ($ymin, $ymax)=ref $o->{YRange} eq 'ARRAY' ? @{$o->{YRange}} :
+	minmax($y);
+      ($xmin, $xmax)=ref $o->{XRange} eq 'ARRAY' ? @{$o->{XRange}} :
+	minmax($x);
+    }
+    if ($xmin == $xmax) { $xmin -= 0.5; $xmax += 0.5; }
+    if ($ymin == $ymax) { $ymin -= 0.5; $ymax += 0.5; }
+    $self->initenv( $xmin, $xmax, $ymin, $ymax, $opt);
+    $self->hold; # we hold for the duration of the broadcasted plot
+  }
+  _tpoints($x, $y, PDL->sequence($y->getdim(1)), $self, $o);
+  $self->release unless $tmp_hold;
+}
+PDL::broadcast_define('_tpoints(a(n);b(n);ind()), NOtherPars => 2',
+  PDL::over {
+    my ($x, $y, $ind, $self, $opt)=@_;
+    $self->points($x, $y, $opt->[$ind->at(0)] || {});
+});
 
 =head2 tcircle
 
@@ -2053,6 +2344,60 @@ Example:
  tcircle($x, $y, $r, $h);
 
 Note that C<$x> and C<$y> must be the same size (>1D is OK, though meaningless as far as C<tcircle> is concerned). C<$r> can be the same size as C<$x> OR a 1-element ndarray OR a single perl scalar.
+
+=cut
+
+my $circle_options = undef;
+sub tcircle {
+    my $self = shift;
+    my ($in, $opt)=_extract_hash(@_);
+    $self->_add_to_state(\&tcircle,$in,$opt);
+    $opt = {} if !defined($opt);
+
+    barf 'Usage tcircle ($x,$y,$r,[$options])'
+	if $#$in < 0 || $#$in > 3;
+
+    my ($x, $y, $radius)=@$in;
+    $x=$x->flat;$y=$y->flat;$radius=$radius->flat;
+
+    if (!defined($circle_options)){
+      $circle_options=$self->{PlotOptions}->extend({Missing => undef});
+    }
+
+    my $o = _broadcast_options($x->nelem,$opt);
+    my $tmp_hold = $self->held();
+
+    unless ( $self->held() ) {
+      my ($o,$u_opt) = $self->_parse_options($circle_options,$opt);
+      $self->_check_move_or_erase($o->{Panel},$o->{Erase});
+
+    my ($ymin, $ymax, $xmin, $xmax);
+
+    if ( defined $o->{Missing} ) {
+	($ymin, $ymax)=ref $o->{YRange} eq 'ARRAY' ?
+	    @{$o->{YRange}} : minmax($y->where($y != $o->{Missing}));
+	($xmin, $xmax)=ref $o->{XRange} eq 'ARRAY' ?
+	    @{$o->{XRange}} : minmax($x->where($x != $o->{Missing}));
+    } else {
+	($ymin, $ymax)=ref $o->{YRange} eq 'ARRAY' ? @{$o->{YRange}} :
+	    (min($y-$radius),max($y+$radius));
+	($xmin, $xmax)=ref $o->{XRange} eq 'ARRAY' ? @{$o->{XRange}} :
+	    (min($x-$radius),max($x+$radius));
+    }
+      if ($xmin == $xmax) { $xmin-=0.5; $xmax +=0.5; }
+      if ($ymin == $ymax) { $ymin-=0.5; $ymax +=0.5; }
+
+    $self->initenv( $xmin, $xmax, $ymin, $ymax, $opt);
+    $self->hold;
+      }
+
+    _tcircle($x,$y,$radius,PDL->sequence($x->nelem),$self,$o);
+    $self->release unless $tmp_hold;
+}
+PDL::broadcast_define '_tcircle(a();b();c();ind()), NOtherPars => 2', sub {
+     my ($x,$y,$r,$ind,$self,$opt)=@_;
+     $self->circle($x,$y,$r,$opt->[$ind->at(0)] || {} );
+};
 
 =head2 Text routines
 
@@ -2243,29 +2588,6 @@ To select a region of the X-axis:
 
 =cut
 
-package PDL::Graphics::PGPLOT::Window;
-use strict;
-use warnings;
-require Exporter;
-
-use PDL::Core qw/:Func :Internal/; # Grab the Core names
-use PDL::Basic;
-use PDL::Ufunc;
-use PDL::Primitive;
-use PDL::Types;
-use PDL::Options;
-use PDL::Graphics::State;
-use PDL::Graphics::PGPLOTOptions qw(default_options);
-use PDL::Slices;
-use PGPLOT;
-
-require DynaLoader;
-
-our @ISA = qw( Exporter );
-our @EXPORT = qw( pgwin );
-
-$PDL::Graphics::PGPLOT::RECORDING = 0; # By default recording is off..
-
 ####
 # Helper routines to handle signal avoidance:
 # cpgplot doesn't take well to being interrupted, so we mask out INT
@@ -2345,8 +2667,8 @@ sub catch_signals (&) {
   my(@sigs) = ('INT');
   local($_, $@);
   if($sig_nest == 0) {
-    foreach $_(@sigs) {
-      next if ($SIG{$_}//0) == \&signal_catcher;
+    foreach (@sigs) {
+      next if ($SIG{$_}//'') ne 'DEFAULT' and ($SIG{$_}//0) == \&signal_catcher;
       $sig_handlers{$_}=$SIG{$_};
       $SIG{$_}=\&signal_catcher;
     }
@@ -2498,7 +2820,6 @@ sub new {
   $this_plotopt->synonyms($s);
   $this_plotopt->warnonmissing(0);
 
-  # Modified 7/4/02 JB to add CTAB as an aspect of the window.
   my $self = {
 	      'Options'	      => $this_opt,
 	      'PlotOptions'   => $this_plotopt,
@@ -4379,155 +4700,9 @@ sub env {
   }
 }
 
-
-
-
-{
-    use strict;
-    my $transform_options = undef;
-
-    sub transform {
-	# Compute the transform array needed in contour and image plotting
-	my $self = shift;
-
-	if (!defined($transform_options)) {
-	  $transform_options =
-	    $self->{PlotOptions}->extend({Angle => undef,
-					  ImageDims => undef,
-					  Pixinc => undef,
-					  ImageCenter => undef,
-					  RefPos => undef
-					  });
-	  $transform_options->synonyms({
-	      ImageDimensions => 'ImageDims',
-	      ImageCentre => 'ImageCenter',
-	      ReferencePosition => 'RefPos',
-	      });
-	}
-
-	# parse the input
-	my ($in, $opt)=_extract_hash(@_);
-	my ($x_pix, $y_pix)= @$in;
-
-	# handle options
-	$opt = {} if !defined($opt);
-	my ($o, $u_opt) = $self->_parse_options($transform_options, $opt);
-	$self->_standard_options_parser($u_opt);
-
-	my ($angle, $x_pixinc, $y_pixinc, $xref_pix, $yref_pix, $xref_wrld, $yref_wrld);
-	if (defined($o->{Angle})) {
-	    $angle = $o->{Angle};
-	}
-	else {
-	    $angle = 0;
-	}
-
-	if (defined($o->{Pixinc})) {
-	    if (ref($o->{Pixinc}) eq 'ARRAY') {
-		($x_pixinc, $y_pixinc) = @{$o->{Pixinc}};
-	    }
-	    else {
-		$x_pixinc = $y_pixinc = $o->{Pixinc};
-	    }
-	}
-	else {
-	    $x_pixinc = $y_pixinc = 1;
-	}
-
-	if ( defined $o->{ImageDims} ) {
-	    if ( ref($o->{ImageDims}) eq 'ARRAY' ) {
-		($x_pix, $y_pix) = @{$o->{ImageDims}};
-	    }
-	    else {
-		barf "Image dimensions must be given as an array reference!";
-	    }
-	}
-
-	# The user has to pass the dimensions of the image somehow, so this
-	# is a good point to check whether they have done so.
-	unless (defined($x_pix) && defined($y_pix)) {
-	  barf "You must pass the image dimensions to the transform routine\n";
-	}
-
-	# The RefPos option gives more flexibility than
-	# ImageCentre, since ImageCentre => [ a, b ] is the same
-	# as PosReference => [ [(nx-1)/2,(ny-1/2)], [a,b] ].
-	# We use ImageCentre in preference to PosReference
-	#
-	if (defined $o->{ImageCenter}) {
-	    print "transform() ignoring RefPos as seen ImageCentre\n"
-		if defined $o->{RefPos} and $PDL::verbose;
-	    my $ic = $o->{ImageCenter};
-	    if (ref($ic) eq 'ARRAY') {
-	        ($xref_wrld, $yref_wrld) = @{$ic};
-	    }
-	    else {
-		$xref_wrld = $yref_wrld = $ic;
-	    }
-
-	    $xref_pix = ($x_pix - 1)/2;
-	    $yref_pix = ($y_pix - 1)/2;
-
-	}
-	elsif ( defined $o->{RefPos} ) {
-	    my $aref = $o->{RefPos};
-	    barf "RefPos option must be sent an array reference.\n"
-		unless ref($aref) eq 'ARRAY';
-	    barf "RefPos must be a 2-element array reference\n"
-		unless $#$aref == 1;
-	    my $pixref  = $aref->[0];
-	    my $wrldref = $aref->[1];
-	    barf "Elements of RefPos must be 2-element array references\n"
-		unless $#$pixref == 1 and $#$wrldref == 1;
-
-	    ($xref_pix,  $yref_pix)  = @{$pixref};
-	    ($xref_wrld, $yref_wrld) = @{$wrldref};
-	}
-	else {
-	    $xref_wrld = $yref_wrld = 0;
-	    $xref_pix = ($x_pix - 1)/2;
-	    $yref_pix = ($y_pix - 1)/2;
-	}
-
-	# The elements of the transform ndarray,
-	# here labelled t0 to t5, relate to the
-	# following maxtix equation:
-	#
-	#   world = zp + matrix * pixel
-	#
-	# world  - the position of the point in the world,
-	#          ie plot, coordinate system
-	# pixel  - the position of the point in pixel
-	#          coordinates (bottom-left is 0,0 pixel)
-	# zp     - (t0)
-	#          (t3)
-	# matrix - (t1 t2)
-	#          (t4 t5)
-	#
-	my $ca = cos( $angle );
-	my $sa = sin( $angle );
-	my $t1 = $x_pixinc * $ca;
-	my $t2 = $y_pixinc * $sa;
-	my $t4 = -$x_pixinc * $sa;
-	my $t5 = $y_pixinc * $ca;
-
-	return pdl(
-		   $xref_wrld - $t1 * $xref_pix - $t2 * $yref_pix,
-		   $t1, $t2,
-		   $yref_wrld - $t4 * $xref_pix - $t5 * $yref_pix,
-		   $t4, $t5
-		   );
-    }
-}
-
-
 # display a contour map of an image using pgconb()
-
 {
-
   my $cont_options = undef;
-
-
   sub cont {
     my $self=shift;
     if (!defined($cont_options)) {
@@ -4888,147 +5063,6 @@ EOD
     1;
   }
 }
-
-#
-# A "broadcasted" line - I cannot come up with a more elegant way of doing
-# this without re-coding bits of broadcast_over but it might very well be
-# that you may :)
-#
-
-my $line_options = undef;
-sub tline {
-
-  my $self = shift;
-  my ($in, $opt)=_extract_hash(@_);
-  $self->_add_to_state(\&tline, $in, $opt);
-  $opt={} if !defined($opt);
-
-  barf 'Usage tline ([$x], $y, [, $options])' if $#$in < 0 || $#$in > 2;
-  my ($x, $y)=@$in;
-  if (!defined($line_options)) {
-    $line_options=$self->{PlotOptions}->extend({Missing => undef});
-  }
-
-  if ($#$in==0) {
-    $y = $x; $x = $y->xvals();
-  }
-
-  catch_signals {
-    # This is very very kludgy, but it was the best way I could find..
-    my $o = _broadcast_options($y->getdim(1), $opt);
-    # We need to keep track of the current status of hold or not since
-    # the tline function automatically enforces a hold to allow for overplots.
-    my $tmp_hold = $self->held();
-    unless ( $self->held() ) {
-      my ($o, $u_opt) = $self->_parse_options($line_options,$opt);
-      $self->_check_move_or_erase($o->{Panel}, $o->{Erase});
-
-      # use Data::Dumper;
-      # print Dumper $o;
-      # print Dumper $u_opt;
-
-      my ($ymin, $ymax, $xmin, $xmax);
-      # Make sure the missing value is used as the min or max value
-      if (defined $o->{Missing} ) {
-        ($ymin, $ymax)=ref $o->{YRange} eq 'ARRAY' ?
-          @{$o->{YRange}} : minmax($y->where($y != $o->{Missing}));
-        ($xmin, $xmax)=ref $o->{XRange} eq 'ARRAY' ?
-          @{$o->{XRange}} : minmax($x->where($x != $o->{Missing}));
-      } else {
-        ($ymin, $ymax)=ref $o->{YRange} eq 'ARRAY' ? @{$o->{YRange}} :
-          minmax($y);
-        ($xmin, $xmax)=ref $o->{XRange} eq 'ARRAY' ? @{$o->{XRange}} :
-          minmax($x);
-      }
-      if ($xmin == $xmax) { $xmin -= 0.5; $xmax += 0.5; }
-      if ($ymin == $ymax) { $ymin -= 0.5; $ymax += 0.5; }
-      # use Data::Dumper;
-      # print "tline options: ", Dumper($opt), "\n";
-      $self->initenv( $xmin, $xmax, $ymin, $ymax, $opt);
-      $self->hold; # we hold for the duration of the broadcasted plot
-    }
-    _tline($x, $y, PDL->sequence($y->getdim(1)), $self, $o);
-    $self->release unless $tmp_hold;
-  };
-}
-
-
-PDL::broadcast_define('_tline(a(n);b(n);ind()), NOtherPars => 2',
-  PDL::over {
-    my ($x, $y, $ind, $self, $opt)=@_;
-    # use Data::Dumper;
-    # print Dumper $opt->[$ind->at(0)];
-    $self->line($x, $y,$opt->[$ind->at(0)] || {}); #
-});
-
-
-#
-# A "broadcasted" point - I cannot come up with a more elegant way of doing
-# this without re-coding bits of broadcast_over but it might very well be
-# that you may :)
-#
-
-my $points_options = undef;
-sub tpoints {
-
-  my $self = shift;
-  my ($in, $opt)=_extract_hash(@_);
-  $self->_add_to_state(\&tpoints, $in, $opt);
-  $opt={} if !defined($opt);
-
-  barf 'Usage tpoints ([$x], $y, [, $options])' if $#$in < 0 || $#$in > 2;
-  my ($x, $y)=@$in;
-
-  if ($#$in==0) {
-    $y = $x; $x = $y->xvals();
-  }
-
-  # This is very very cludgy, but it was the best way I could find..
-  my $o = _broadcast_options($y->getdim(1), $opt);
-  # We need to keep track of the current status of hold or not since
-  # the tline function automatically enforces a hold to allow for overplots.
-  my $tmp_hold = $self->held();
-  unless ( $self->held() ) {
-    if (!defined($points_options)) {
-      $points_options = $self->{PlotOptions}->extend({PlotLine => 0});
-    }
-    my ($o, $u_opt) = $self->_parse_options($points_options,$opt);
-    $self->_check_move_or_erase($o->{Panel}, $o->{Erase});
-
-    # use Data::Dumper;
-    # print Dumper $o;
-    # print Dumper $u_opt;
-
-    my ($ymin, $ymax, $xmin, $xmax);
-    # Make sure the missing value is used as the min or max value
-    if (defined $o->{Missing} ) {
-      ($ymin, $ymax)=ref $o->{YRange} eq 'ARRAY' ?
-	@{$o->{YRange}} : minmax($y->where($y != $o->{Missing}));
-      ($xmin, $xmax)=ref $o->{XRange} eq 'ARRAY' ?
-	@{$o->{XRange}} : minmax($x->where($x != $o->{Missing}));
-    } else {
-      ($ymin, $ymax)=ref $o->{YRange} eq 'ARRAY' ? @{$o->{YRange}} :
-	minmax($y);
-      ($xmin, $xmax)=ref $o->{XRange} eq 'ARRAY' ? @{$o->{XRange}} :
-	minmax($x);
-    }
-    if ($xmin == $xmax) { $xmin -= 0.5; $xmax += 0.5; }
-    if ($ymin == $ymax) { $ymin -= 0.5; $ymax += 0.5; }
-    $self->initenv( $xmin, $xmax, $ymin, $ymax, $opt);
-    $self->hold; # we hold for the duration of the broadcasted plot
-  }
-  _tpoints($x, $y, PDL->sequence($y->getdim(1)), $self, $o);
-  $self->release unless $tmp_hold;
-}
-
-
-PDL::broadcast_define('_tpoints(a(n);b(n);ind()), NOtherPars => 2',
-  PDL::over {
-    my ($x, $y, $ind, $self, $opt)=@_;
-    $self->points($x, $y, $opt->[$ind->at(0)] || {});
-});
-
-
 
 # Plot a line with pgline()
 
@@ -5540,15 +5574,13 @@ sub arrow {
   # The ITF is in the general options - since other functions might want
   # it too.
   #
-  # There is some repetetiveness in the code, but this is to allow the
+  # There is some repetitiveness in the code, but this is to allow the
   # user to set global defaults when opening a new window.
   #
   #
   #
 
   my $im_options = undef;
-
-
   sub _imag {
     my $self = shift;
 
@@ -5687,7 +5719,6 @@ sub arrow {
     $self->redraw_axes($u_opt) unless $self->held();
     1;
   } # sub: imag()
-
 }
 
 ######################################################################
@@ -5804,7 +5835,6 @@ sub rgbi {
 
     sub _fits_foo {
 	my $pane = shift;
-	my $cmd = shift;
 	my ($in,$opt_in) = _extract_hash(@_);
 	my ($pdl,@rest) = @$in;
 
@@ -5833,7 +5863,6 @@ sub rgbi {
 						  HardCH=>undef,
 						  HardLW=>undef,
  					          TextThick=>undef,
-
 						  WCS => undef,
 						 });
 	}
@@ -5844,29 +5873,15 @@ sub rgbi {
 	# What WCS system are we using?
 	# we could check that the WCS is valid here but we delegate it
 	# to the _FITS_tr() routine.
-	#
-	my $wcs = $$u_opt{WCS} || "";
-
 	my %opt2 = %$u_opt; # copy options
-	delete $opt2{WCS};
+	my $wcs = delete $opt2{WCS} || "";
 	$opt2{Transform} = _FITS_tr($pane,$pdl,{WCS => $wcs});
-
-	local($_);
-	foreach $_(keys %opt2){
-	    delete $opt2{$_} if (m/title/i);
-	}
-
-	$opt2{Align} = 'CC' unless defined($opt2{Align});
-	$opt2{DrawWedge} = 1 unless defined($opt2{DrawWedge});
-
-	my $min  = (defined $opt->{min}) ? $opt->{min} : $pdl->min;
-	my $max  = (defined $opt->{max}) ? $opt->{max} : $pdl->max;
-	my $unit = $pdl->gethdr->{BUNIT} || "";
-	my $rangestr = " ($min to $max $unit) ";
+	delete @opt2{ grep /title/i, keys %opt2 };
+	$opt2{Align} //= 'CC';
+	$opt2{DrawWedge} //= 1;
 
 	# I am assuming here that CUNIT1<A-Z> is a valid keyword for
 	# 'alternative' WCS mappings (DJB)
-	#
 	$opt2{Pix}=1.0
 	    if( (!defined($opt2{Justify}) || !$opt2{Justify}) &&
 		(!defined($opt2{Pix})) &&
@@ -5876,51 +5891,48 @@ sub rgbi {
 		  )
 		);
 
-	my $o2 = \%opt2;
-
-	my $cmdstr =   '$pane->' . $cmd .
-	    '($pdl,' . (scalar(@rest) ? '@rest,' : '') .
-	    '$o2);';
-
-	eval $cmdstr;
-
-        my $mkaxis = sub {
-	  my ($typ,$unit) = @_;
-	  our @templates = ("(arbitrary units)","%u","%t","%t (%u)");
-	  my $s = $templates[2 * (defined $typ) + (defined $unit && $unit !~ m/^\s+$/)];
-	  $s =~ s/\%u/$unit/;
-	  $s =~ s/\%t/$typ/;
-	  $s;
-	};
-
-	$pane->label_axes(
-			  $opt->{XTitle} ||
-			  &$mkaxis($hdr->{"CTYPE1$wcs"},$hdr->{"CUNIT1$wcs"}),
-			  $opt->{YTitle} ||
-			  &$mkaxis($hdr->{"CTYPE2$wcs"},$hdr->{"CUNIT2$wcs"}),
-			  $opt->{Title}, $opt
-			  );
-
+	([$pdl, @rest, \%opt2], [
+          $opt->{XTitle} || _mkaxis(@$hdr{"CTYPE1$wcs","CUNIT1$wcs"}),
+          $opt->{YTitle} || _mkaxis(@$hdr{"CTYPE2$wcs","CUNIT2$wcs"}),
+          $opt->{Title}, $opt
+        ]);
     } # sub: _fits_foo()
 
+    my @fits_templates = ("(arbitrary units)","%u","%t","%t (%u)");
+    sub _mkaxis {
+      my ($typ,$unit) = @_;
+      my $s = $fits_templates[2 * defined($typ) + (defined $unit && $unit !~ m/^\s+$/)];
+      $s =~ s/%u/$unit/;
+      $s =~ s/%t/$typ/;
+      $s;
+    }
+
     sub fits_imag {
-	my($self) = shift;
-	_fits_foo($self,'imag',@_);
+	my $self = shift;
+	my ($main_args, $label_args) = _fits_foo($self,@_);
+	$self->imag(@$main_args);
+	$self->label_axes(@$label_args);
     }
 
     sub fits_rgbi {
-	my($self) = shift;
-	_fits_foo($self,'rgbi',@_);
+	my $self = shift;
+	my ($main_args, $label_args) = _fits_foo($self,@_);
+	$self->rgbi(@$main_args);
+	$self->label_axes(@$label_args);
     }
 
     sub fits_cont {
-	my($self) = shift;
-	_fits_foo($self,'cont',@_);
+	my $self = shift;
+	my ($main_args, $label_args) = _fits_foo($self,@_);
+	$self->cont(@$main_args);
+	$self->label_axes(@$label_args);
     }
 
     sub fits_vect {
 	my($self) = shift;
-	_fits_vect($self,'vect',@_);
+	my ($main_args, $label_args) = _fits_foo($self,@_);
+	$self->vect(@$main_args);
+	$self->label_axes(@$label_args);
     }
 
 } # closure around _fits_foo and fits_XXXX routines
@@ -6218,62 +6230,6 @@ sub poly {
     $self->_add_to_state(\&circle, $in, $opt);
   }
 }
-
-
-my $circle_options = undef;
-sub tcircle {
-
-    my $self = shift;
-    my ($in, $opt)=_extract_hash(@_);
-    $self->_add_to_state(\&tcircle,$in,$opt);
-    $opt = {} if !defined($opt);
-
-    barf 'Usage tcircle ($x,$y,$r,[$options])'
-	if $#$in < 0 || $#$in > 3;
-
-    my ($x, $y, $radius)=@$in;
-    $x=$x->flat;$y=$y->flat;$radius=$radius->flat;
-
-    if (!defined($circle_options)){
-      $circle_options=$self->{PlotOptions}->extend({Missing => undef});
-    }
-
-    my $o = _broadcast_options($x->nelem,$opt);
-    my $tmp_hold = $self->held();
-
-    unless ( $self->held() ) {
-      my ($o,$u_opt) = $self->_parse_options($circle_options,$opt);
-      $self->_check_move_or_erase($o->{Panel},$o->{Erase});
-
-    my ($ymin, $ymax, $xmin, $xmax);
-
-    if ( defined $o->{Missing} ) {
-	($ymin, $ymax)=ref $o->{YRange} eq 'ARRAY' ?
-	    @{$o->{YRange}} : minmax($y->where($y != $o->{Missing}));
-	($xmin, $xmax)=ref $o->{XRange} eq 'ARRAY' ?
-	    @{$o->{XRange}} : minmax($x->where($x != $o->{Missing}));
-    } else {
-	($ymin, $ymax)=ref $o->{YRange} eq 'ARRAY' ? @{$o->{YRange}} :
-	    (min($y-$radius),max($y+$radius));
-	($xmin, $xmax)=ref $o->{XRange} eq 'ARRAY' ? @{$o->{XRange}} :
-	    (min($x-$radius),max($x+$radius));
-    }
-      if ($xmin == $xmax) { $xmin-=0.5; $xmax +=0.5; }
-      if ($ymin == $ymax) { $ymin-=0.5; $ymax +=0.5; }
-
-    $self->initenv( $xmin, $xmax, $ymin, $ymax, $opt);
-    $self->hold;
-      }
-
-    _tcircle($x,$y,$radius,PDL->sequence($x->nelem),$self,$o);
-    $self->release unless $tmp_hold;
-}
-
-PDL::broadcast_define '_tcircle(a();b();c();ind()), NOtherPars => 2', sub {
-     my ($x,$y,$r,$ind,$self,$opt)=@_;
-     $self->circle($x,$y,$r,$opt->[$ind->at(0)] || {} );
- };
-
 
 # Plot an ellipse using poly.
 

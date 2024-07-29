@@ -235,6 +235,11 @@
           'exponent' parts by calling Rmpcr_split($parts[2]). See the
           'Rmpcr_split' documentation in the Math::MPC::Radius docs.
 
+   Rmpcb_out_str($fh, $op);
+    Rmpcb_out_str outputs $op on $fh, which may be *stdout. The format
+    is to output the centre (in round parentheses), followed by the
+    radius (in square brackets).
+
    Rmpcb_clear($op);
     Free memory associated with $op.
     It's normally unnecessary to call this function unless $op was

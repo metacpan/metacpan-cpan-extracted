@@ -8,6 +8,9 @@ use MIDI::Util qw(setup_score);
 
 use_ok 'MIDI::RtMidi::ScorePlayer';
 
+done_testing();
+__END__
+
 my $score = setup_score(lead_in => 0);
 my $part  = sub { return sub { $score->r('qn') } };
 

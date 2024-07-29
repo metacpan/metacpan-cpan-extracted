@@ -14,6 +14,8 @@
 #include <mpc.h>
 #include <inttypes.h>
 
+#include "../math_mpc_unused.h"
+
 /*********************
  If the mpc library is not at version 1.3.0 or higher, then
  we allow this XS file to compile, by specifying the following
@@ -77,6 +79,7 @@ void Rmpcr_set_str_2str(mpcr_ptr rop, char * mantissa, char* exponent) {
   if(scanned > 1) warn("Extra data found in scan of second input (%s) to Rmpc_set_str", exponent);
   mpcr_set_ui64_2si64(rop, m, e);
 #else
+  PERL_UNUSED_ARG3(rop, mantissa, exponent);
   croak("Rmpcr_* functions need mpc-1.3.0. This is only mpc-%s", MPC_VERSION_STRING);
 #endif
 }
@@ -88,6 +91,7 @@ void Rmpcr_clear(mpcr_ptr op) {
 # endif
   Safefree(op);
 #else
+  PERL_UNUSED_ARG(op);
   croak("Rmpcr_* functions need mpc-1.3.0. This is only mpc-%s", MPC_VERSION_STRING);
 #endif
 }
@@ -99,6 +103,7 @@ void DESTROY(mpcr_ptr op) {
 # endif
   Safefree(op);
 #else
+  PERL_UNUSED_ARG(op);
   croak("Rmpcr_* functions need mpc-1.3.0. This is only mpc-%s", MPC_VERSION_STRING);
 #endif
 }
@@ -107,6 +112,7 @@ int Rmpcr_inf_p(mpcr_ptr op) {
 #if MPC_VERSION >= 66304
    return mpcr_inf_p(op);
 #else
+  PERL_UNUSED_ARG(op);
   croak("Rmpcr_* functions need mpc-1.3.0. This is only mpc-%s", MPC_VERSION_STRING);
 #endif
 }
@@ -115,6 +121,7 @@ int Rmpcr_zero_p(mpcr_ptr op) {
 #if MPC_VERSION >= 66304
    return mpcr_zero_p(op);
 #else
+  PERL_UNUSED_ARG(op);
   croak("Rmpcr_* functions need mpc-1.3.0. This is only mpc-%s", MPC_VERSION_STRING);
 #endif
 }
@@ -123,6 +130,7 @@ int Rmpcr_lt_half_p(mpcr_ptr op) {
 #if MPC_VERSION >= 66304
    return mpcr_lt_half_p(op);
 #else
+  PERL_UNUSED_ARG(op);
   croak("Rmpcr_* functions need mpc-1.3.0. This is only mpc-%s", MPC_VERSION_STRING);
 #endif
 }
@@ -131,6 +139,7 @@ int Rmpcr_cmp(mpcr_ptr op1, mpcr_ptr op2) {
 #if MPC_VERSION >= 66304
    return mpcr_cmp(op1, op2);
 #else
+  PERL_UNUSED_ARG2(op1, op2);
   croak("Rmpcr_* functions need mpc-1.3.0. This is only mpc-%s", MPC_VERSION_STRING);
 #endif
 }
@@ -139,6 +148,7 @@ void Rmpcr_set_inf(mpcr_ptr op) {
 #if MPC_VERSION >= 66304
   mpcr_set_inf(op);
 #else
+  PERL_UNUSED_ARG(op);
   croak("Rmpcr_* functions need mpc-1.3.0. This is only mpc-%s", MPC_VERSION_STRING);
 #endif
 }
@@ -147,6 +157,7 @@ void Rmpcr_set_zero(mpcr_ptr op) {
 #if MPC_VERSION >= 66304
   mpcr_set_zero(op);
 #else
+  PERL_UNUSED_ARG(op);
   croak("Rmpcr_* functions need mpc-1.3.0. This is only mpc-%s", MPC_VERSION_STRING);
 #endif
 }
@@ -155,6 +166,7 @@ void Rmpcr_set_one(mpcr_ptr op) {
 #if MPC_VERSION >= 66304
   mpcr_set_one(op);
 #else
+  PERL_UNUSED_ARG(op);
   croak("Rmpcr_* functions need mpc-1.3.0. This is only mpc-%s", MPC_VERSION_STRING);
 #endif
 }
@@ -163,6 +175,7 @@ void Rmpcr_set(mpcr_ptr rop, mpcr_ptr op) {
 #if MPC_VERSION >= 66304
   mpcr_set(rop, op);
 #else
+  PERL_UNUSED_ARG2(op, rop);
   croak("Rmpcr_* functions need mpc-1.3.0. This is only mpc-%s", MPC_VERSION_STRING);
 #endif
 }
@@ -171,6 +184,7 @@ void Rmpcr_set_ui64_2si64(pTHX_ mpcr_ptr rop, UV mantissa, IV exponent) {
 #if MPC_VERSION >= 66304
    mpcr_set_ui64_2si64(rop,mantissa, exponent);
 #else
+  PERL_UNUSED_ARG3(rop, mantissa, exponent);
   croak("Rmpcr_* functions need mpc-1.3.0. This is only mpc-%s", MPC_VERSION_STRING);
 #endif
 }
@@ -179,6 +193,7 @@ void Rmpcr_max (mpcr_ptr rop, mpcr_ptr op1, mpcr_ptr op2) {
 #if MPC_VERSION >= 66304
    mpcr_max(rop, op1, op2);
 #else
+  PERL_UNUSED_ARG3(rop, op1, op2);
   croak("Rmpcr_* functions need mpc-1.3.0. This is only mpc-%s", MPC_VERSION_STRING);
 #endif
 }
@@ -195,6 +210,7 @@ IV Rmpcr_get_exp (mpcr_ptr op) {
 #  endif
    return (IV)ret;
 #else
+  PERL_UNUSED_ARG(op);
   croak("Rmpcr_* functions need mpc-1.3.0. This is only mpc-%s", MPC_VERSION_STRING);
 #endif
 }
@@ -217,6 +233,7 @@ SV * Rmpcr_get_exp_mpfr (pTHX_ mpcr_ptr op) {
   SvREADONLY_on(obj);
   return obj_ref;
 #else
+  PERL_UNUSED_ARG(op);
   croak("Rmpcr_* functions need mpc-1.3.0. This is only mpc-%s", MPC_VERSION_STRING);
 #endif
 }
@@ -226,6 +243,7 @@ void Rmpcr_out_str (pTHX_ FILE *stream, mpcr_ptr op) {
   mpcr_out_str(stream, op);
   fflush(stream);
 #else
+  PERL_UNUSED_ARG2(stream, op);
   croak("Rmpcr_* functions need mpc-1.3.0. This is only mpc-%s", MPC_VERSION_STRING);
 #endif
 }
@@ -239,9 +257,11 @@ void Rmpcr_out_str_win (pTHX_ FILE *stream, mpcr_ptr op) {
    fflush(stream);
    SetConsoleOutputCP(cp);
 #  else
+  PERL_UNUSED_ARG2(stream, op);
    croak("Rmpcr_out_str_win is for MS Windows only");
 #  endif
 #else
+  PERL_UNUSED_ARG2(stream, op);
    croak("Rmpcr_* functions need mpc-1.3.0. This is only mpc-%s", MPC_VERSION_STRING);
 #endif
 }
@@ -251,6 +271,7 @@ void Rmpcr_print (pTHX_ mpcr_ptr op) {
  mpcr_out_str(stdout, op);
  fflush(stdout);
 #else
+  PERL_UNUSED_ARG(op);
  croak("Rmpcr_* functions need mpc-1.3.0. This is only mpc-%s", MPC_VERSION_STRING);
 #endif
 }
@@ -264,9 +285,11 @@ void Rmpcr_print_win (pTHX_ mpcr_ptr op) {
    fflush(stdout);
    SetConsoleOutputCP(cp);
 #  else
+   PERL_UNUSED_ARG(op);
    croak("Rmpcr_print_win is for MS Windows only");
 #  endif
 #else
+   PERL_UNUSED_ARG(op);
    croak("Rmpcr_* functions need mpc-1.3.0. This is only mpc-%s", MPC_VERSION_STRING);
 #endif
 }
@@ -277,6 +300,7 @@ void Rmpcr_say (pTHX_ mpcr_ptr op) {
   printf("\n");
   fflush(stdout);
 #else
+  PERL_UNUSED_ARG(op);
   croak("Rmpcr_* functions need mpc-1.3.0. This is only mpc-%s", MPC_VERSION_STRING);
 #endif
 }
@@ -291,9 +315,11 @@ void Rmpcr_say_win (pTHX_ mpcr_ptr op) {
    fflush(stdout);
    SetConsoleOutputCP(cp);
 #  else
+   PERL_UNUSED_ARG(op);
    croak("Rmpcr_say_win is for MS Windows only");
 #  endif
 #else
+  PERL_UNUSED_ARG(op);
   croak("Rmpcr_* functions need mpc-1.3.0. This is only mpc-%s", MPC_VERSION_STRING);
 #endif
 }
@@ -302,6 +328,7 @@ void Rmpcr_add (mpcr_ptr rop, mpcr_ptr op1, mpcr_ptr op2) {
 #if MPC_VERSION >= 66304
    mpcr_add(rop, op1, op2);
 #else
+  PERL_UNUSED_ARG3(rop, op1, op2);
   croak("Rmpcr_* functions need mpc-1.3.0. This is only mpc-%s", MPC_VERSION_STRING);
 #endif
 }
@@ -318,6 +345,7 @@ void Rmpcr_mul (mpcr_ptr rop, mpcr_ptr op1, mpcr_ptr op2) {
 #if MPC_VERSION >= 66304
    mpcr_mul(rop, op1, op2);
 #else
+  PERL_UNUSED_ARG3(rop, op1, op2);
   croak("Rmpcr_* functions need mpc-1.3.0. This is only mpc-%s", MPC_VERSION_STRING);
 #endif
 }
@@ -326,6 +354,7 @@ void Rmpcr_div (mpcr_ptr rop, mpcr_ptr op1, mpcr_ptr op2) {
 #if MPC_VERSION >= 66304
    mpcr_div(rop, op1, op2);
 #else
+  PERL_UNUSED_ARG3(rop, op1, op2);
   croak("Rmpcr_* functions need mpc-1.3.0. This is only mpc-%s", MPC_VERSION_STRING);
 #endif
 }
@@ -334,6 +363,7 @@ void Rmpcr_mul_2ui (mpcr_ptr rop, mpcr_ptr op, unsigned long ui) {
 #if MPC_VERSION >= 66304
    mpcr_mul_2ui(rop, op, ui);
 #else
+  PERL_UNUSED_ARG3(rop, op, ui);
   croak("Rmpcr_* functions need mpc-1.3.0. This is only mpc-%s", MPC_VERSION_STRING);
 #endif
 }
@@ -342,6 +372,7 @@ void Rmpcr_div_2ui (mpcr_ptr rop, mpcr_ptr op, unsigned long ui) {
 #if MPC_VERSION >= 66304
    mpcr_div_2ui(rop, op, ui);
 #else
+  PERL_UNUSED_ARG3(rop, op, ui);
   croak("Rmpcr_* functions need mpc-1.3.0. This is only mpc-%s", MPC_VERSION_STRING);
 #endif
 }
@@ -358,6 +389,7 @@ void Rmpcr_sqrt (mpcr_ptr rop, mpcr_ptr op) {
 #if MPC_VERSION >= 66304
    mpcr_sqrt(rop, op);
 #else
+  PERL_UNUSED_ARG2(rop, op);
   croak("Rmpcr_* functions need mpc-1.3.0. This is only mpc-%s", MPC_VERSION_STRING);
 #endif
 }
@@ -366,6 +398,7 @@ void Rmpcr_sub_rnd (pTHX_ mpcr_ptr rop, mpcr_ptr op1, mpcr_ptr op2, SV * round) 
 #if MPC_VERSION >= 66304
    mpcr_sub_rnd(rop, op1, op2, (mpfr_rnd_t)SvUV(round));
 #else
+  PERL_UNUSED_ARG4(rop, op1, op2, round);
   croak("Rmpcr_* functions need mpc-1.3.0. This is only mpc-%s", MPC_VERSION_STRING);
 #endif
 }
@@ -374,6 +407,7 @@ void Rmpcr_c_abs_rnd (pTHX_ mpcr_ptr rop, mpc_ptr mpc_op, SV * round) { /* mpc_p
 #if MPC_VERSION >= 66304
    mpcr_c_abs_rnd(rop, mpc_op, (mpfr_rnd_t)SvUV(round));
 #else
+  PERL_UNUSED_ARG3(rop, mpc_op, round);
   croak("Rmpcr_* functions need mpc-1.3.0. This is only mpc-%s", MPC_VERSION_STRING);
 #endif
 }
@@ -382,6 +416,7 @@ void Rmpcr_add_rounding_error (pTHX_ mpcr_ptr rop, SV * op, SV * round) {
 #if MPC_VERSION >= 66304
    mpcr_add_rounding_error(rop, (mpfr_prec_t)SvUV(op), (mpfr_rnd_t)SvUV(round));
 #else
+  PERL_UNUSED_ARG3(rop, op, round);
   croak("Rmpcr_* functions need mpc-1.3.0. This is only mpc-%s", MPC_VERSION_STRING);
 #endif
 }
@@ -389,6 +424,7 @@ void Rmpcr_add_rounding_error (pTHX_ mpcr_ptr rop, SV * op, SV * round) {
 void Rmpcr_split(pTHX_  mpcr_ptr op) {
 #if MPC_VERSION >= 66304
    dXSARGS;
+   PERL_UNUSED_ARG(items);
 
    if(mpcr_zero_p(op)) {
      ST(0) = sv_2mortal(newSVuv(0));
@@ -416,6 +452,7 @@ void Rmpcr_split(pTHX_  mpcr_ptr op) {
    ST(1) = sv_2mortal(newSViv(op->exp));
    XSRETURN(2);
 #else
+  PERL_UNUSED_ARG(op);
   croak("Rmpcr_* functions need mpc-1.3.0. This is only mpc-%s", MPC_VERSION_STRING);
 #endif
 }
@@ -439,6 +476,7 @@ SV * _get_radius_mantissa(pTHX_  mpcr_ptr op) {
   SvREADONLY_on(obj);
   return obj_ref;
 #else
+  PERL_UNUSED_ARG(op);
   croak("Rmpcr_* functions need mpc-1.3.0. This is only mpc-%s", MPC_VERSION_STRING);
 #endif
 }
@@ -462,6 +500,7 @@ SV * _get_radius_exponent(pTHX_  mpcr_ptr op) {
   SvREADONLY_on(obj);
   return obj_ref;
 #else
+  PERL_UNUSED_ARG(op);
   croak("Rmpcr_* functions need mpc-1.3.0. This is only mpc-%s", MPC_VERSION_STRING);
 #endif
 }

@@ -1,0 +1,56 @@
+{
+   "abstract" : "A module to fetch and display Last.fm statistics",
+   "author" : [
+      "Dave Cross <dave@perlhacks.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "App-LastStats",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Feature::Compat::Class" : "0",
+            "Getopt::Long" : "0",
+            "JSON" : "0",
+            "Net::LastFM" : "0",
+            "perl" : "5.026000"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/davorg-cpan/app-laststats/issues"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/davorg-cpan/app-laststats.git",
+         "web" : "https://github.com/davorg-cpan/app-laststats"
+      }
+   },
+   "version" : "v0.0.2",
+   "x_serialization_backend" : "JSON::PP version 4.16"
+}

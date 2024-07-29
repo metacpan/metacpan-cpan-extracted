@@ -4,6 +4,7 @@ use Config;
 # Stop f77-linking causing spurious undefined symbols (alpha)
 $ENV{'PERL_DL_NONLAZY'}=0 if $Config{'osname'} eq "dec_osf"; 
 require PGPLOT;
+plan skip_all => 'CI fails with bus error' if $^O eq 'darwin' and $ENV{CI};
 
 my $dev = $ENV{PGPLOT_DEV} || '/NULL';
 
