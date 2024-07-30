@@ -57,6 +57,11 @@ around BUILDARGS => sub {
   return $options;
 };
 
+sub form_action { shift->options->{html}{action} }
+sub form_method { shift->options->{html}{method} }
+sub form_enctype { shift->options->{html}{method} }
+sub csrf_token { shift->options->{html}{data}{csrf_token} }
+
 sub DEFAULT_MODEL_ERROR_MSG_ON_FIELD_ERRORS { return 'Your form has errors' }
 sub DEFAULT_MODEL_ERROR_TAG_ON_FIELD_ERRORS { return 'invalid_form' }
 sub DEFAULT_COLLECTION_CHECKBOX_BUILDER { return 'Valiant::HTML::FormBuilder::Checkbox' }
@@ -316,6 +321,18 @@ sub _default_errors_for_content {
 sub process_options {
   my ($self, $attribute, $options) = @_;
 
+  if($options->{data}{remote}) {
+    my $url = $self->form_action->clone;
+    my $replace = exists($options->{data}{replace})
+      ? $options->{data}{replace}
+      : '#'.$options->{id};
+    $url->query_param(replace=>$replace);
+
+    $options->{data}{url} = $url;
+    $options->{data}{method} ||= $self->form_method;
+    $options->{data}{params} = $self->view->uri_escape(csrf_token => $self->csrf_token);
+  }
+
   if( ($self->attribute_has_errors($attribute)) && (my $errors_attrs = delete $options->{errors_attrs})) {
     foreach my $key(keys %$errors_attrs) {
       if(exists $options->{$key}) {
@@ -507,7 +524,7 @@ sub _submit_default_value {
   my $self = shift;
   my $model = $self->model->can('to_model') ? $self->model->to_model : $self->model;
   my $key = $model->can('in_storage') ? ( $model->in_storage ? 'update':'create' ) : 'submit';
-  my $model_placeholder = $model->can('model_name') ? $model->model_name->human : $self->tag_helpers->_humanize($self->name);
+  my $model_placeholder = $self->tag_helpers->_humanize($self->name);
 
   my @defaults = ();
 
@@ -573,13 +590,13 @@ sub _legend_default_value {
   my $self = shift;
   my $model = $self->model->can('to_model') ? $self->model->to_model : $self->model;
   my $key = $model->can('in_storage') ? ( $model->in_storage ? 'update':'create' ) : 'new';
-  my $model_placeholder = $model->can('model_name') ? $model->model_name->human : $self->tag_helpers->_humanize($self->name);
+  my $model_placeholder = $self->tag_helpers->_humanize($self->name);
 
   my @defaults = ();
 
   return "@{[ $self->tag_helpers->_humanize($key) ]} ${model_placeholder}" unless $self->model->can('i18n');
 
-  push @defaults, _t "formbuilder.legend.@{[ $self->model_name->i18n_key ]}.${key}";
+  push @defaults, _t "formbuilder.legend.@{[ $self->name ]}.${key}";
   push @defaults, _t "formbuilder.legend.${key}";
   push @defaults, "@{[ $self->tag_helpers->_humanize($key) ]} ${model_placeholder}";
 
@@ -738,15 +755,37 @@ sub select {
 
 #collection_select(object, method, collection, value_method, text_method, options = {}, html_options = {})
 sub collection_select {
-  my ($self, $method_proto, $collection) = (shift, shift, shift);
+  my ($self, $method_proto) = (shift, shift);
+  my $model = $self->model->can('to_model') ? $self->model->to_model : $self->model;
   my $options = (ref($_[-1])||'') eq 'HASH' ? pop(@_) : +{};
   $options = $self->merge_theme_field_opts('collection_select', undef, $options);
-  
-  my ($value_method, $label_method) = (@_, 'value', 'label');
-  my $model = $self->model->can('to_model') ? $self->model->to_model : $self->model;
-  my $include_hidden = exists($options->{include_hidden}) ? delete($options->{include_hidden}) : 1;
-  $collection = $model->$collection unless Scalar::Util::blessed($collection); 
 
+  my ($collection, $value_method, $label_method) = @_;
+
+  # If the collection of options is not provided then we need to figure out what it is
+  if(!defined $collection) {
+    my ($options_model, $options_method) = ($model, $method_proto);
+    if(ref $method_proto) {
+      my $bridge; ($bridge, $options_method) = %$method_proto;
+      if($model->can('related_model')) {
+        $options_model = $model->related_model($bridge);
+      } else {
+        my $local_model = $model->$bridge;
+        if($local_model->can('next')) {
+          $local_model = $local_model->next;
+        }
+        $options_model = $local_model;
+      }
+    }
+    ($collection, $label_method, $value_method) = $options_model->select_options_for($options_method, %$options);
+  }
+  $collection = $model->$collection if (ref(\$collection)||'') eq 'SCALAR'; 
+  $value_method = 'value' unless defined($value_method);
+  $label_method = 'label' unless defined($label_method);
+
+  $collection = $model->$collection if (ref(\$collection)||'') eq 'SCALAR'; 
+
+  my $include_hidden = exists($options->{include_hidden}) ? delete($options->{include_hidden}) : 1;
   my (@selected, $name, $id) = ();
   if(ref $method_proto) {
     $options->{multiple} = 1 unless exists($options->{multiple});
@@ -779,7 +818,10 @@ sub collection_select {
     $name = $self->tag_name_for_attribute($method_proto);
     $options->{id} = $id = $self->tag_id_for_attribute($method_proto);
   }
-  
+
+  $collection = $self->tag_helpers->array_to_collection(@$collection)
+    if (ref($collection)||'') eq 'ARRAY';
+
   my @disabled = ( @{delete($options->{disabled})||[]});
   @selected = @{ delete($options->{selected})||[]} if exists($options->{selected});
   my $select_tag = $self->tag_helpers->select_tag(
@@ -804,14 +846,34 @@ sub default_collection_checkbox_include_hidden { return 1 }
 # $fb->collection_checkbox({person_roles => role_id}, $roles_rs, $value_method, $text_method, \%options, \&block);
 # $fb->collection_checkbox({person_roles => role_id}, $roles_rs, $value_method, $text_method, \%options, \&block);
 sub collection_checkbox {
-  my ($self, $attribute_spec, $collection) = (shift, shift, shift);
+  my ($self, $attribute_spec) = (shift, shift);
   my $codeblock = (ref($_[-1])||'') eq 'CODE' ? pop(@_) : undef;
   my $options = (ref($_[-1])||'') eq 'HASH' ? pop(@_) : +{};
   $options = $self->merge_theme_field_opts('collection_checkbox', undef, $options);
-
-  my $value_method = @_ ? shift(@_) : 'value';
-  my $label_method = @_ ? shift(@_) : 'label';
   my $model = $self->model->can('to_model') ? $self->model->to_model : $self->model;
+
+  my ($collection, $value_method, $label_method) = @_;
+  if(!defined $collection) {
+    if(ref $attribute_spec) {
+      my ($bridge, $method) = %$attribute_spec;
+      if($model->can('related_model')) {
+        ($collection, $label_method, $value_method) = $model->related_model($bridge)->checkbox_rs_for($method, %$options);
+      } else {
+        my $local_model = $model->$bridge;
+        if($local_model->can('next')) {
+          $local_model = $local_model->next;
+        }
+        ($collection, $label_method, $value_method) = $local_model->checkbox_rs_for($method, %$options);
+      }
+    } else {
+      ($collection, $label_method, $value_method) = $model->checkbox_rs_for($attribute_spec, %$options);
+    }
+  }
+
+  $collection = $model->$collection if (ref(\$collection)||'') eq 'SCALAR'; 
+  $value_method = 'value' unless defined($value_method);
+  $label_method = 'label' unless defined($label_method);
+
   my $include_hidden = exists($options->{include_hidden}) ? delete($options->{include_hidden}) : $self->default_collection_checkbox_include_hidden;
   my $container_tag = exists($options->{container_tag}) ? delete($options->{container_tag}) : 'div';
 
@@ -858,7 +920,9 @@ sub collection_checkbox {
   };
   $checkbox_builder_options->{namespace} = $self->namespace if $self->has_namespace;
 
-  $collection = $model->$collection unless Scalar::Util::blessed($collection);
+  $collection = $model->$collection if (ref(\$collection)||'') eq 'SCALAR';
+  $collection = $self->tag_helpers->array_to_collection(@$collection)
+    if (ref($collection)||'') eq 'ARRAY';
 
   while (my $checkbox_model = $collection->next) {
     #my $index = $self->nested_child_index($attribute); 
@@ -914,14 +978,33 @@ sub _default_collection_checkbox_content {
 sub default_collection_radio_buttons_include_hidden { return 1 }
 
 sub collection_radio_buttons {
-  my ($self, $attribute, $collection) = (shift, shift, shift);
+  my ($self, $attribute) = (shift, shift);
   my $codeblock = (ref($_[-1])||'') eq 'CODE' ? pop(@_) : undef;
   my $options = (ref($_[-1])||'') eq 'HASH' ? pop(@_) : +{};
   $options = $self->merge_theme_field_opts('collection_radio_buttons', $attribute, $options);
-
-  my $value_method = @_ ? shift(@_) : 'value';
-  my $label_method = @_ ? shift(@_) : 'label';
+ 
   my $model = $self->model->can('to_model') ? $self->model->to_model : $self->model;
+
+  my ($collection, $value_method, $label_method) = @_;
+  if(!defined $collection) {
+    if(ref $attribute) {
+      my ($bridge, $method) = %$attribute;
+      if($model->can('related_model')) {
+        ($collection, $label_method, $value_method) = $model->related_model($bridge)->radio_button_rs_for($method, %$options);
+      } else {
+        my $local_model = $model->$bridge;
+        if($local_model->can('next')) {
+          $local_model = $local_model->next;
+        }
+        ($collection, $label_method, $value_method) = $local_model->radio_button_rs_for($method, %$options);
+      }
+    } else {
+      ($collection, $label_method, $value_method) = $model->radio_button_rs_for($attribute, %$options);
+    }
+  }
+  $value_method = 'value' unless defined($value_method);
+  $label_method = 'label' unless defined($label_method);
+
   my $checked_value = exists($options->{checked_value}) ? delete($options->{checked_value}) : $self->tag_value_for_attribute($attribute);
   my $include_hidden = exists($options->{include_hidden}) ? delete($options->{include_hidden}) : $self->default_collection_radio_buttons_include_hidden;
   my $container_tag = exists($options->{container_tag}) ? delete($options->{container_tag}) : 'div';
@@ -941,8 +1024,7 @@ sub collection_radio_buttons {
   };
   $radio_buttons_builder_options->{namespace} = $self->namespace if $self->has_namespace;
 
-  $collection = $model->$collection unless Scalar::Util::blessed($collection);
-
+  $collection = $model->$collection if (ref(\$collection)||'') eq 'SCALAR'; 
   while (my $radio_button_model = $collection->next) {
     my $name = "@{[ $self->name ]}.${attribute}";
     my $current_value = $radio_button_model->can('read_attribute_for_html') ?
@@ -984,15 +1066,28 @@ sub _default_collection_radio_buttons_content {
 }
 
 sub radio_buttons {
-  my ($self, $attribute, $collection_proto) = (shift, shift, shift);
+  my ($self, $attribute) = (shift, shift);
+  my $model = $self->model->can('to_model') ? $self->model->to_model : $self->model;
+  my $codeblock = (ref($_[-1])||'') eq 'CODE' ? pop(@_) : undef;
+  my $options = (ref($_[-1])||'') eq 'HASH' ? pop(@_) : +{};
+  $options = $self->merge_theme_field_opts('radio_buttons', $attribute, $options);
 
-  my $collection;
-  $collection = $self->model->$collection_proto if (ref(\$collection_proto)||'') eq 'SCALAR';
-  $collection = $self->tag_helpers->array_to_collection(@$collection_proto) if (ref($collection_proto)||'') eq 'ARRAY';
-
-  #$collection_proto = $self->model->$collection_proto unless (ref($collection_proto)||'') eq 'ARRAY';
-  #my $collection = $self->tag_helpers->array_to_collection(@$collection_proto);
-  return $self->collection_radio_buttons($attribute, $collection, @_);
+  # If args then its either a string to the model method or an arrayref of option
+  if(@_) {
+    my ($collection, $value_method, $label_method) = @_;
+    $collection = do { my $method = shift; $model->$method } if (ref(\$_[0])||'') eq 'SCALAR';
+    $collection = $self->tag_helpers->array_to_collection(@{shift(@_)}) if (ref($_[0])||'') eq 'ARRAY';
+    $value_method = 'value' unless defined($value_method);
+    $label_method = 'label' unless defined($label_method);
+    return $self->collection_radio_buttons($attribute, $collection, $value_method, $label_method, $options, $codeblock);
+  } else {
+    # If we are here that means we are using the model method to get the collection
+    my @buttons = $model->radio_buttons_for($attribute, %$options);
+    my $collection = $self->tag_helpers->array_to_collection(@buttons);
+    my $value_method = 'value';
+    my $label_method = 'label';
+    return $self->collection_radio_buttons($attribute, $collection, $value_method, $label_method, $options, $codeblock);
+  }
 }
 
 # select collection needs work (with multiple)
@@ -1202,6 +1297,22 @@ B<NOTE>: In the future the view API might change so keep an eye on this spot.
 =head1 METHODS
 
 This class defines the following public instance methods.
+
+=head2 form_action
+
+The Form action attribute
+
+=head2 form_method
+
+The form method attribute
+
+=head2 form_enctype
+
+the form enctype attribute
+
+=head2 csrf_token
+
+The CSRF token, if there is one
 
 =head2 form_has_errors
 
@@ -2028,6 +2139,7 @@ C<_nop> field.
     $fb->collection_select($attribute_proto, $collection, $value_method, $text_method, \%options);
     $fb->collection_select($attribute_proto, $collection, $value_method, $text_method);
     $fb->collection_select($attribute_proto, $collection);
+    $fb->collection_select($attribute_proto, \%options);
 
 Where C<$attribute_proto> is one of:
 
@@ -2261,6 +2373,36 @@ separately.  Example:
 
 Supports using a template subroutine reference (like L</collection_radio_buttons>) when you need to be
 fussy about style and positioning.
+
+=head1 REMOTE FORMS
+
+Remote forms are forms that submit via AJAX.  They are a bit more complex than regular forms because
+they need to handle the AJAX response and update the DOM.  The form builder has some support for
+remote forms but you will need to write some javascript to handle the response.  Here's an example
+
+    $fb->remote_form_for(sub {
+      my $fb = shift;
+      return $fb->input('name'),
+             $fb->submit('Save');
+    }, +{url=>'/person', method=>'POST', remote=>1, success=>'alert("Saved")'});
+
+See L<https://github.com/rails/jquery-ujs> for more information on how to handle the response.
+You can also look at the example application for more examples of how this works.
+
+When adding C<remote=1> to the options hashref we will automatically add the following attributes
+to the form tag:
+
+=over 4
+
+=item data-replace
+
+The ID of the element to replace with the response.  If not provided we will replace the form itself.
+
+=back
+
+B<NOTE> Remote support is evolving and may change in the future.  Please see the release notes for
+changes.  I consider this a beta feature and will break compatibility if needed to fix bugs.  Its
+also possible remote support might be moved to a separate module in the future.
 
 =head1 HELPERS
 

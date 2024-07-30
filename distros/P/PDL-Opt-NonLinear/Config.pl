@@ -1,4 +1,3 @@
 %config = (
-	PORT3 => 0,
-
+	PORT3 => 0
 );

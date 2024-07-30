@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-use strict;
+use v5.14;
 
 use Net::Async::FastCGI;
 

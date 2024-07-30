@@ -1,7 +1,7 @@
 {
    "abstract" : "Non linear optimization routines for PDL",
    "author" : [
-      "Grégory Vanuxem <gvanuxem.perl@gmail.com>"
+      "Grégory Vanuxem <g.vanuxem@gmail.com>"
    ],
    "dynamic_config" : 1,
    "generated_by" : "ExtUtils::MakeMaker version 7.44, CPAN::Meta::Converter version 2.150010",
@@ -28,12 +28,12 @@
       "configure" : {
          "requires" : {
             "ExtUtils::F77" : "0",
-            "PDL" : "2.063"
+            "PDL" : "2.088"
          }
       },
       "runtime" : {
          "requires" : {
-            "PDL" : "2.063",
+            "PDL" : "2.088",
             "PDL::LinearAlgebra" : "0"
          }
       },
@@ -55,7 +55,7 @@
          "web" : "https://github.com/PDLPorters/PDL-Opt-NonLinear"
       }
    },
-   "version" : "0.08",
+   "version" : "0.09",
    "x_IRC" : "irc://irc.perl.org/#pdl",
    "x_serialization_backend" : "JSON::PP version 4.04"
 }

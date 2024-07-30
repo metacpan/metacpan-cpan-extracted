@@ -4,21 +4,19 @@
       "Paul Evans <leonerd@leonerd.org.uk>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.4001, CPAN::Meta::Converter version 2.120921",
+   "generated_by" : "Module::Build version 0.4234",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Net-Async-FastCGI",
    "prereqs" : {
       "build" : {
          "requires" : {
-            "Test::HexString" : "0",
-            "Test::More" : "0",
-            "Test::Refcount" : "0"
+            "Test2::V0" : "0.000149"
          }
       },
       "runtime" : {
@@ -33,34 +31,35 @@
             "IO::Async::Test" : "0",
             "Net::FastCGI::Constant" : "0.10",
             "Net::FastCGI::Protocol" : "0.10",
-            "Tie::Handle" : "0"
+            "Tie::Handle" : "0",
+            "perl" : "5.014"
          }
       }
    },
    "provides" : {
       "Net::Async::FastCGI" : {
          "file" : "lib/Net/Async/FastCGI.pm",
-         "version" : "0.25"
+         "version" : "0.26"
       },
       "Net::Async::FastCGI::PSGI" : {
          "file" : "lib/Net/Async/FastCGI/PSGI.pm",
-         "version" : "0.25"
+         "version" : "0.26"
       },
       "Net::Async::FastCGI::Protocol" : {
          "file" : "lib/Net/Async/FastCGI/Protocol.pm",
-         "version" : "0.25"
+         "version" : "0.26"
       },
       "Net::Async::FastCGI::Request" : {
          "file" : "lib/Net/Async/FastCGI/Request.pm",
-         "version" : "0.25"
+         "version" : "0.26"
       },
       "Net::Async::FastCGI::ServerProtocol" : {
          "file" : "lib/Net/Async/FastCGI/ServerProtocol.pm",
-         "version" : 0
+         "version" : "0.26"
       },
       "Plack::Handler::Net::Async::FastCGI" : {
          "file" : "lib/Plack/Handler/Net/Async/FastCGI.pm",
-         "version" : "0.25"
+         "version" : "0.26"
       }
    },
    "release_status" : "stable",
@@ -69,5 +68,6 @@
          "http://dev.perl.org/licenses/"
       ]
    },
-   "version" : "0.25"
+   "version" : "0.26",
+   "x_serialization_backend" : "JSON::PP version 4.16"
 }

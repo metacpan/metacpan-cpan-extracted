@@ -1,6 +1,14 @@
 Revision history for Perl extension Net::DNS::SEC.
 
 
+**** 1.26 Jul 29, 2024
+
+	Avoid test failure on RedHat by requiring DSA-SHA1 opt-in.
+
+Fix: rt.cpan.org #154560
+	Rocky linux 9: libcrypto error
+
+
 **** 1.25 Jul 24, 2024
 
 	Suppress AUTOLOAD for Net::DNS::SEC::Private::_index.
@@ -11,8 +19,8 @@ Fix: rt.cpan.org #154526
 
 Fix: rt.cpan.org #153606
 	Net::DNS minimum version dependency
- 	
- 	
+
+
 **** 1.24 Apr 25, 2024
 
 	Eliminate deprecated RSA CRT parameter names.
@@ -698,4 +706,4 @@ Net::DNS. The history of those is documented below.
 
 
 ---------------------------------------------------------------------------
-$Id: Changes 1983 2024-07-25 06:23:28Z willem $
+$Id: Changes 1986 2024-07-29 10:45:40Z willem $

@@ -8,11 +8,11 @@
     },
     valiant => {
       models => {
-        'example/schema/result_set/todo' => 'Task',
-        #'example/schema/result/todo' => {
-        #  one => 'Task',
-        #  many => 'Tasks',
-        #},
+        'example/schema/result_set/todo' => {
+          one => 'Task',
+          many => 'Tasks',
+        },
+        'example/schema/result/todo' => 'Task',
       },
       errors => {
         models => {

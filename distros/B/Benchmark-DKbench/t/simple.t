@@ -56,7 +56,8 @@ diag $std[0];
 %stats2 = %stats1;
 $stats2{_opt} = {%{$stats1{_opt}}};
 $stats2{_opt}->{threads} = 2;
-calc_scalability(\%stats1, \%stats2);
+@std = capture {calc_scalability(\%stats1, \%stats2)};
+like($std[0], qr/Single:\s*\d+\s*\(\d+ - \d+/, 'Min Max');
 
 $stats1{_opt}->{iter} = 1;
 @std = capture {calc_scalability(\%stats1, \%stats2)};
@@ -92,6 +93,7 @@ my $datadir = dist_dir("Benchmark-DKbench");
             datapath => $datadir,
             time     => 1,
             iter     => 1,
+            duration => 1,
             no_mce   => 1,
             sleep    => 1,
             include  => 'prove',
@@ -99,5 +101,6 @@ my $datadir = dist_dir("Benchmark-DKbench");
     )
 };
 like($std[0], qr/Overall Time/, 'Single');
+like($std[0], qr/0s of 1s/, 'Duration');
 
 done_testing();

@@ -1,5 +1,12 @@
 Revision history for Net-Async-FastCGI
 
+0.26    2024-07-29
+        [CHANGES]
+         * Added streaming stdin support
+         * General module style refresh:
+            + use v5.14
+            + Pod style updates
+
 0.25    CHANGES:
          * Import PSGI support from FCGI::Async directly here
          * Add some convenience methods to get often-used fields from request

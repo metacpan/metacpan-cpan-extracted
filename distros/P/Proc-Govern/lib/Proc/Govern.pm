@@ -8,9 +8,9 @@ use Log::ger;
 use Exporter qw(import);
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2023-11-16'; # DATE
+our $DATE = '2024-07-17'; # DATE
 our $DIST = 'Proc-Govern'; # DIST
-our $VERSION = '0.213'; # VERSION
+our $VERSION = '0.214'; # VERSION
 
 our @EXPORT_OK = qw(govern_process);
 
@@ -728,7 +728,7 @@ Proc::Govern - Run child process and govern its various aspects
 
 =head1 VERSION
 
-This document describes version 0.213 of Proc::Govern (from Perl distribution Proc-Govern), released on 2023-11-16.
+This document describes version 0.214 of Proc::Govern (from Perl distribution Proc-Govern), released on 2024-07-17.
 
 =head1 SYNOPSIS
 
@@ -1216,7 +1216,7 @@ that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2023, 2020, 2019, 2018, 2017, 2016, 2015, 2014, 2013, 2012 by perlancar.
+This software is copyright (c) 2024, 2023, 2020, 2019, 2018, 2017, 2016, 2015, 2014, 2013, 2012 by perlancar.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

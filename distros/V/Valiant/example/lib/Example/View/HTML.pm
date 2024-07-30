@@ -1,11 +1,15 @@
 package Example::View::HTML;
 
-use Moo;
+use Moose;
 use Example::Syntax;
-use Catalyst::View::Valiant::HTMLBuilder -tags => qw(p);
+use Catalyst::View::Valiant::HTMLBuilder;
 
-sub the_time :Renders ($self) {
-  return p {class=>'timestamp'}, scalar localtime;
+sub redirect_to_action ($self, $action, @args) {
+  return $self->redirect_to($self->uri_for_action($action, @args));
+}
+
+sub the_time  ($self) {
+  return P {class=>'timestamp'}, scalar localtime;
 }
 
 sub formbuilder_class { 'Example::FormBuilder' }
@@ -37,4 +41,4 @@ sub formbuilder_theme($self) {
   };
 }
 
-__PACKAGE__->meta->make_immutable();
+__PACKAGE__->meta->make_immutable;

@@ -20,7 +20,7 @@ provides:
     file: lib/AsposeCellsCloud/ApiFactory.pm
   AsposeCellsCloud::CellsApi:
     file: lib/AsposeCellsCloud/CellsApi.pm
-    version: 24.6
+    version: 24.7
   AsposeCellsCloud::Configuration:
     file: lib/AsposeCellsCloud/Configuration.pm
   AsposeCellsCloud::Role:
@@ -661,6 +661,10 @@ provides:
     file: lib/AsposeCellsCloud/Object/PivotTable.pm
   AsposeCellsCloud::Object::PivotTables:
     file: lib/AsposeCellsCloud/Object/PivotTables.pm
+  AsposeCellsCloud::Object::AddTextOptions:
+    file: lib/AsposeCellsCloud/Object/AddTextOptions.pm
+  AsposeCellsCloud::Object::BaseOperateOptions:
+    file: lib/AsposeCellsCloud/Object/BaseOperateOptions.pm
   AsposeCellsCloud::Object::CellValue:
     file: lib/AsposeCellsCloud/Object/CellValue.pm
   AsposeCellsCloud::Object::CustomParserConfig:
@@ -887,6 +891,8 @@ provides:
     file: lib/AsposeCellsCloud/Request/PostBatchUnlockRequest.pm
   AsposeCellsCloud::Request::PostBatchSplitRequest:
     file: lib/AsposeCellsCloud/Request/PostBatchSplitRequest.pm
+  AsposeCellsCloud::Request::PostAccessTokenRequest:
+    file: lib/AsposeCellsCloud/Request/PostAccessTokenRequest.pm
   AsposeCellsCloud::Request::PostClearContentsRequest:
     file: lib/AsposeCellsCloud/Request/PostClearContentsRequest.pm
   AsposeCellsCloud::Request::PostClearFormatsRequest:
@@ -1351,6 +1357,8 @@ provides:
     file: lib/AsposeCellsCloud/Request/PostWorksheetSparklineGroupRequest.pm
   AsposeCellsCloud::Request::PostRunTaskRequest:
     file: lib/AsposeCellsCloud/Request/PostRunTaskRequest.pm
+  AsposeCellsCloud::Request::PostAddTextContentRequest:
+    file: lib/AsposeCellsCloud/Request/PostAddTextContentRequest.pm
   AsposeCellsCloud::Request::GetWorkbookDefaultStyleRequest:
     file: lib/AsposeCellsCloud/Request/GetWorkbookDefaultStyleRequest.pm
   AsposeCellsCloud::Request::GetWorkbookTextItemsRequest:
@@ -1542,5 +1550,5 @@ requires:
   strict: '0'
   utf8: '0'
   warnings: '0'
-version: 24.6
+version: 24.7
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

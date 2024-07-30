@@ -1,10 +1,11 @@
-#!/usr/bin/perl -w
+#!/usr/bin/perl
 
-use strict;
+use v5.14;
+use warnings;
+
 use lib 't/lib';
 
-use Test::More tests => 2;
-use Test::HexString;
+use Test2::V0;
 
 use IO::Async::Loop;
 use IO::Async::Test;
@@ -45,7 +46,7 @@ $buffer = "";
 
 wait_for_stream { length $buffer >= length $expect } $C => $buffer;
 
-is_hexstr( $buffer, $expect, 'FastCGI unknown type' );
+is( $buffer, $expect, 'FastCGI unknown type' );
 
 $C->syswrite(
    # Begin
@@ -60,4 +61,6 @@ $buffer = "";
 
 wait_for_stream { length $buffer >= length $expect } $C => $buffer;
 
-is_hexstr( $buffer, $expect, "FastCGI end request record with unknown role" );
+is( $buffer, $expect, "FastCGI end request record with unknown role" );
+
+done_testing;

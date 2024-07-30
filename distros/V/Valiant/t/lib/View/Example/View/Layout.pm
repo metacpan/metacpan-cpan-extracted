@@ -1,5 +1,7 @@
 package View::Example::View::Layout;
 
+1;
+__END__
 use Moo;
 use View::Example::View
   -tags => qw(html head title meta link body script),

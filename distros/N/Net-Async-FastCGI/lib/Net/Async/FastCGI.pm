@@ -1,11 +1,11 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2005-2013 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2005-2024 -- leonerd@leonerd.org.uk
 
-package Net::Async::FastCGI;
+package Net::Async::FastCGI 0.26;
 
-use strict;
+use v5.14;
 use warnings;
 
 use Carp;
@@ -14,8 +14,6 @@ use base qw( IO::Async::Listener );
 IO::Async::Listener->VERSION( '0.35' );
 
 use Net::Async::FastCGI::ServerProtocol;
-
-our $VERSION = '0.25';
 
 # The FCGI_GET_VALUES request might ask for our maximally supported number of
 # concurrent connections or requests. We don't really have an inbuilt maximum,
@@ -31,58 +29,58 @@ C<Net::Async::FastCGI> - use FastCGI with L<IO::Async>
 
 As an adapter:
 
- use Net::Async::FastCGI;
- use IO::Async::Loop;
+   use Net::Async::FastCGI;
+   use IO::Async::Loop;
 
- my $loop = IO::Async::Loop->new();
+   my $loop = IO::Async::Loop->new();
 
- my $fastcgi = Net::Async::FastCGI->new(
-    on_request => sub {
-       my ( $fastcgi, $req ) = @_;
+   my $fastcgi = Net::Async::FastCGI->new(
+      on_request => sub {
+         my ( $fastcgi, $req ) = @_;
 
-       # Handle the request here
-    }
- );
+         # Handle the request here
+      }
+   );
 
- $loop->add( $fastcgi );
+   $loop->add( $fastcgi );
 
- $fastcgi->listen(
-    service => 1234,
-    on_resolve_error => sub { die "Cannot resolve - $_[-1]\n" },
-    on_listen_error  => sub { die "Cannot listen - $_[-1]\n" },
- );
+   $fastcgi->listen(
+      service => 1234,
+      on_resolve_error => sub { die "Cannot resolve - $_[-1]\n" },
+      on_listen_error  => sub { die "Cannot listen - $_[-1]\n" },
+   );
 
- $loop->run;
+   $loop->run;
 
 As a subclass:
 
- package MyFastCGIResponder;
- use base qw( Net::Async::FastCGI );
+   package MyFastCGIResponder;
+   use base qw( Net::Async::FastCGI );
 
- sub on_request
- {
-    my $self = shift;
-    my ( $req ) = @_;
+   sub on_request
+   {
+      my $self = shift;
+      my ( $req ) = @_;
 
-    # Handle the request here
- }
+      # Handle the request here
+   }
 
- ...
+   ...
 
- use IO::Async::Loop;
+   use IO::Async::Loop;
 
- my $loop = IO::Async::Loop->new();
+   my $loop = IO::Async::Loop->new();
 
- my $fastcgi;
- $loop->add( $fastcgi = MyFastCGIResponder->new( service => 1234 ) );
+   my $fastcgi;
+   $loop->add( $fastcgi = MyFastCGIResponder->new( service => 1234 ) );
 
- $fastcgi->listen(
-    service => 1234,
-    on_resolve_error => sub { die "Cannot resolve - $_[-1]\n" },
-    on_listen_error  => sub { die "Cannot listen - $_[-1]\n" },
- );
+   $fastcgi->listen(
+      service => 1234,
+      on_resolve_error => sub { die "Cannot resolve - $_[-1]\n" },
+      on_listen_error  => sub { die "Cannot listen - $_[-1]\n" },
+   );
 
- $loop->run;
+   $loop->run;
 
 =head1 DESCRIPTION
 
@@ -123,6 +121,12 @@ CODE references for C<on_request> event handler.
 Sets the default encoding used by all new requests. If not supplied then
 C<UTF-8> will apply.
 
+=item stream_stdin => BOOL
+
+If true, requests will expect to handling streaming of stdin data. In this
+mode, the C<on_request> event handler will be invoked once parameters for a
+new request have been received, even if the stdin stream is not yet complete.
+
 =back
 
 =cut
@@ -141,12 +145,9 @@ sub configure
    my $self = shift;
    my %params = @_;
 
-   if( exists $params{on_request} ) {
-      $self->{on_request} = delete $params{on_request};
-   }
-
-   if( exists $params{default_encoding} ) {
-      $self->{default_encoding} = delete $params{default_encoding};
+   foreach (qw( on_request default_encoding stream_stdin )) {
+      exists $params{$_} and
+         $self->{$_} = delete $params{$_};
    }
 
    $self->SUPER::configure( %params );
@@ -158,8 +159,9 @@ sub on_stream
    my ( $stream ) = @_;
 
    $self->add_child( Net::Async::FastCGI::ServerProtocol->new(
-      transport => $stream,
-      fcgi      => $self,
+      transport    => $stream,
+      fcgi         => $self,
+      stream_stdin => $self->{stream_stdin},
    ) );
 }
 
@@ -167,7 +169,9 @@ sub on_stream
 
 =cut
 
-=head2 $fcgi->listen( %args )
+=head2 listen
+
+   $fcgi->listen( %args );
 
 Start listening for connections on a socket, creating it first if necessary.
 
@@ -218,6 +222,8 @@ sub _request_ready
    my ( $req ) = @_;
 
    $self->invoke_event( on_request => $req );
+
+   $req->_start;
 }
 
 sub _default_encoding
@@ -233,8 +239,8 @@ maximum number of connections or requests it can support. Because this module
 puts no fundamental limit on these values, it will return some arbitrary
 numbers. These are given in package variables:
 
- $Net::Async::FastCGI::MAX_CONNS = 1024;
- $Net::Async::FastCGI::MAX_REQS  = 1024;
+   $Net::Async::FastCGI::MAX_CONNS = 1024;
+   $Net::Async::FastCGI::MAX_REQS  = 1024;
 
 These variables are provided in case the containing application wishes to make
 the library return different values in the request. These values are not

@@ -261,7 +261,7 @@ ok !$person->valid;
   });
 
   is $result,
-    '<form accept-charset="UTF-8" action="posts" class="aaa bbb ccc" enctype="application/x-www-form-urlencoded" method="post">'.
+    '<form accept-charset="UTF-8" action="posts" class="aaa bbb ccc" data-csrf-token="toke" enctype="application/x-www-form-urlencoded" method="post">'.
       '<input id="csrf_token" name="csrf_token" type="hidden" value="toke"/>'.
       '<input id="local_person_fake" name="local_person.fake" type="text" value=""/>'.
     '</form>'
@@ -315,6 +315,61 @@ ok !$person->valid;
   });
 
   is $result, '<input id="foo_first_name" name="foo.first_name" type="text" value="aa"/>';
+}
+
+{
+  my $form = $f->form_for($person, {url=>'ddd'}, sub {
+    my ($view, $fb, $person) = @_;
+    return '';
+  });
+
+  is $form, '<form accept-charset="UTF-8" action="ddd" class="new_local_person" enctype="application/x-www-form-urlencoded" id="new_local_person" method="post"></form>';  
+}
+
+{
+  my $form = $f->form_for($person, 
+  { url => sub { my ($view, $model) = @_; is scalar(@$model), 0; 'aa' } }, 
+  sub {
+    my ($view, $fb, $person) = @_;
+    return '';
+  });
+
+  is $form, '<form accept-charset="UTF-8" action="aa" class="new_local_person" enctype="application/x-www-form-urlencoded" id="new_local_person" method="post"></form>';  
+}
+
+{
+  $person->persisted(1);
+  my $form = $f->form_for($person, 
+  { url => sub { my ($view, $model) = @_; is scalar(@$model), 1; 'aa' } }, 
+  sub {
+    my ($view, $fb, $person) = @_;
+    return '';
+  });
+  $person->persisted(0);
+
+  is $form, '<form accept-charset="UTF-8" action="aa?x-tunneled-method=patch" class="edit_local_person" data-tunneled-method="patch" enctype="application/x-www-form-urlencoded" id="edit_local_person" method="post"></form>';  
+}
+
+{
+  my $form = $f->form_for($person, 
+  { new_url => sub { my ($view, $model) = @_; is scalar(@$model), 0; 'bb' } }, 
+  sub {
+    my ($view, $fb, $person) = @_;
+    return '';
+  });
+  is $form, '<form accept-charset="UTF-8" action="bb" class="new_local_person" enctype="application/x-www-form-urlencoded" id="new_local_person" method="post"></form>';
+}
+
+{
+  $person->persisted(1);
+  my $form = $f->form_for($person, 
+  { edit_url => sub { my ($view, $model) = @_; is scalar(@$model), 1; 'cc' } }, 
+  sub {
+    my ($view, $fb, $person) = @_;
+    return '';
+  });
+  $person->persisted(0);
+  is $form, '<form accept-charset="UTF-8" action="cc?x-tunneled-method=patch" class="edit_local_person" data-tunneled-method="patch" enctype="application/x-www-form-urlencoded" id="edit_local_person" method="post"></form>';
 }
 
 done_testing;

@@ -1,10 +1,11 @@
-#!/usr/bin/perl -w
+#!/usr/bin/perl
 
-use strict;
+use v5.14;
+use warnings;
+
 use lib 't/lib';
 
-use Test::More tests => 3;
-use Test::HexString;
+use Test2::V0;
 
 use IO::Async::Loop;
 use IO::Async::Test;
@@ -52,7 +53,7 @@ $buffer = "";
 
 wait_for_stream { length $buffer >= length $expect } $C => $buffer;
 
-is_hexstr( $buffer, $expect, 'FastCGI end request record for FCGI_MPXS_CONNS' );
+is( $buffer, $expect, 'FastCGI end request record for FCGI_MPXS_CONNS' );
 
 $C->syswrite(
    # FCGI_GET_VALUES
@@ -75,7 +76,7 @@ $buffer = "";
 
 wait_for_stream { length $buffer >= length $expect } $C => $buffer;
 
-is_hexstr( $buffer, $expect, 'FastCGI end request record for FCGI_MAX_CONNS' );
+is( $buffer, $expect, 'FastCGI end request record for FCGI_MAX_CONNS' );
 
 $C->syswrite(
    # FCGI_GET_VALUES
@@ -98,4 +99,6 @@ $buffer = "";
 
 wait_for_stream { length $buffer >= length $expect } $C => $buffer;
 
-is_hexstr( $buffer, $expect, 'FastCGI end request record for FCGI_MAX_REQS' );
+is( $buffer, $expect, 'FastCGI end request record for FCGI_MAX_REQS' );
+
+done_testing;

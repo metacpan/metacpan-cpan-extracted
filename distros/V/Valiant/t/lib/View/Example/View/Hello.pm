@@ -1,26 +1,27 @@
 package View::Example::View::Hello;
 
+1;
+
+__END__
 use Moo;
-use View::Example::View
-  -tags => qw(div input hr p button_tag form_for link_to a ul li blockquote),
-  -util => qw($sf content_for path ),
-  -views => 'Layout', 'Fragments';
+use View::Example::View;
+
+
 
 has name => (is=>'ro', required=>1);
 
-sub form :Renders {
+sub form  {
   my $self = shift;
   return $self->form_for($self, +{a=>1}, sub {
     my ($self, $fb) = @_;
     $fb->input('name'),
-  }); 
-}
-sub simple :Renders {
+  }); }
+sub simple  {
   my $self = shift;
   return div "Hey";
 }
 
-sub bits :Renders {
+sub bits  {
   my $self = shift;
   return fragments->stuff4;
 }
@@ -30,7 +31,7 @@ sub bits2 {
   return $self->fragments->stuff4;
 }
 
-sub stuff :Renders {
+sub stuff  {
   my $self = shift;
   return div "Hey", p [
     div "there",

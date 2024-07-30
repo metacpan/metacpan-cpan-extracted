@@ -8,6 +8,7 @@ use Example::Syntax;
 
 __PACKAGE__->load_components(qw/
   Valiant::Result
+  Valiant::Result::HTML::FormFields
   BcryptColumn
   ResultClass::TrackColumns
   Core

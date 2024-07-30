@@ -1,5 +1,5 @@
 #
-# $Id: Makefile.PL 1983 2024-07-25 06:23:28Z willem $	-*-perl-*-
+# $Id: Makefile.PL 1986 2024-07-29 10:45:40Z willem $	-*-perl-*-
 #
 
 use 5.008009;
@@ -8,6 +8,8 @@ use warnings;
 use Config;
 use ExtUtils::MakeMaker;
 use constant MSWin32 => $^O eq 'MSWin32';
+
+use constant DSA => defined $ENV{NETDNSSEC_ENABLE_DSA_SIGNATURES};    # opt-in
 
 my $distro = 'Net::DNS::SEC';
 my $module = join '/', 'lib', split /::/, "$distro.pm";
@@ -52,6 +54,7 @@ my %prerequisite = (
 my @debris = qw(*.gcov *.gcda *.gcno *.lock);
 
 
+my $def = DSA ? '' : '-DNO_DSA',
 my $inc = '';
 my $lib = '-lcrypto';
 my $nul = MSWin32 ? 'nul' : '/dev/null';
@@ -81,6 +84,7 @@ $inc = join ' ', $inc, @cppflags;
 WriteMakefile(
 	%metadata,
 	PREREQ_PM => {%prerequisite},
+	DEFINE	  => $def,
 	INC	  => $inc,
 	LIBS	  => [$lib],
 	clean	  => {FILES => "@debris"},

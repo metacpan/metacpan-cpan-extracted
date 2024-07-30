@@ -28,6 +28,7 @@ sub root :At('$path_end/...') Via('../protected') ($self, $c, $user) {
 
   # /todos/...
   sub prepare_build :At('/...') Via('search') ($self, $c, $todos) {
+
     $self->view_for('list',
       list => $todos,
       todo => my $new_todo = $todos->new_todo

@@ -1,17 +1,15 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2010-2013 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2010-2024 -- leonerd@leonerd.org.uk
 
-package Plack::Handler::Net::Async::FastCGI;
+package Plack::Handler::Net::Async::FastCGI 0.26;
 
-use strict;
+use v5.14;
 use warnings;
 
 use Net::Async::FastCGI::PSGI;
 use IO::Async::Loop;
-
-our $VERSION = '0.25';
 
 =head1 NAME
 
@@ -22,7 +20,7 @@ C<Plack::Handler::Net::Async::FastCGI> - FastCGI handler for Plack using L<Net::
 This module allows L<Plack> to run a L<PSGI> application as a standalone
 FastCGI daemon under L<IO::Async>, by using L<Net::Async::FastCGI>.
 
- plackup -s Net::Async::FastCGI --listen ":2000" application.psgi
+   plackup -s Net::Async::FastCGI --listen ":2000" application.psgi
 
 This is internally implemented using L<Net::Async::FastCGI::PSGI>; further
 information on environment etc.. is documented there.

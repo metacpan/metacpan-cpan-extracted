@@ -28,7 +28,7 @@ our %HTML_CONTENT_ELEMENTS = map { $_ => 1 } qw(
   data datalist dd del details dfn dialog dir div dl dt
   em
   fieldset figcaption figure font footer form frame frameset
-  head header hgroup h1 h2 h3 h4 5 h6 html
+  head header hgroup h1 h2 h3 h4 h5 h6 html
   i iframe ins
   kbd label legend li
   main map mark menu menuitem meter
@@ -42,13 +42,19 @@ our %HTML_CONTENT_ELEMENTS = map { $_ => 1 } qw(
   u ul
   var video);
 
+our @ALL_TAGS = (keys(%HTML_VOID_ELEMENTS), keys(%HTML_CONTENT_ELEMENTS));
+
 has view => (
   is => 'ro',
   required => 1,
   handles => [qw(safe raw escape_html safe_concat)],
 );
 
-sub import { shift->_install_tags }
+sub BUILD {
+  my $self = shift;
+  my $class = ref $self;
+  $class->_install_tags;
+}
 
 sub _install_tags {
   my $class = shift;
@@ -262,17 +268,19 @@ sub content_tag {
 sub sf {
   my $self = shift;
   if(Scalar::Util::blessed $_[0]) {
-    my ($src_object, $format) = @_;
+    my ($src_object, $format, $opts) = @_;
+    my $raw = exists($opts->{raw}) ? delete $opts->{raw} : 0;
     $format =~ s/\{(.*?)\:([^}]+)\}/ $src_object->can($2) ? ($1 ? sprintf($1,$src_object->$2) : $src_object->$2) : croak("Source object '@{[ ref $src_object ]}' has no method '$2'") /gex;
-    return $self->safe($format);
+    return $raw ? $self->raw($format) : $self->safe($format);
   } else {
     my ($format, %args) = @_;
     my $collapse = delete $args{collapse};
+    my $raw = delete $args{raw};
     $format =~ s/\{(.*?)\:([^}]+)\}/ exists($args{$2})? ($1 ? sprintf($1,$args{$2}) : $args{$2}) : croak("Source data has no value '$2'") /gex;
     if($collapse) {
       $format =~s/\s+/ /gsm;
     }
-    return $self->safe($format);
+    return $raw ? $self->raw($format) : $self->safe($format);
   }
 };
 

@@ -2,6 +2,7 @@ use strict;
 use warnings;
 use PDL::LiteF;
 use PDL::Opt::NonLinear;
+use PDL::NiceSlice;
 use Test::More;
 
 sub approx_ok {
@@ -26,21 +27,21 @@ my $gtol = pdl(1e-8);
 #$stepmx = pdl(0.5);
 my $maxit = pdl(long, 50);
 sub min_func{
-	my ($fx, $x) = @_;
-	$fx .= rosen($x);
+    my ($fx, $x) = @_;
+    $fx .= rosen($x);
 }
 sub grad_func{
-	my ($gx, $x) = @_;
-	$gx .= rosen_grad($x);
+    my ($gx, $x) = @_;
+    $gx .= rosen_grad($x);
 }
 sub hess_func{
-	my ($hx, $x) = @_;
-	$hx .= rosen_hess($x);
+    my ($hx, $x) = @_;
+    $hx .= rosen_hess($x);
 }
-tensoropt($fx, $gx, $hx, $x, 
-	  1,$maxit,15,1,2,1,
-	  ones(5),0.5,$xtol,$gtol,2,6,
-	  \&min_func, \&grad_func, \&hess_func);
+tensoropt($fx, $gx, $hx, $x,
+      1,$maxit,15,1,2,1,
+      ones(5),0.5,$xtol,$gtol,2,6,
+      \&min_func, \&grad_func, \&hess_func);
 
 approx_ok $x,$res,0.001,'tensoropt';
 
@@ -69,5 +70,53 @@ sub fg_func{
 lbfgs($fx, $gx, $x, $diag, $diagco, $m, $maxit, $maxfc, $eps, $xtol, $gtol,
                        $print,$info,\&fg_func,\&fdiag);
 approx_ok $x,$res,0.0001,'lbfgs';
+
+$x = pdl '[0.49823058 0.98093641 0.63151156 0.66477157 0.60801367]';
+$gx = zeroes(5);
+$fx = pdl(0);
+
+my $bounds =  zeroes(5,2);
+$bounds(,0).= -5;
+$bounds(,1).= 5;
+my $tbounds = zeroes(5);
+$tbounds .= 2;
+$gtol = pdl(0.9);
+my $pgtol = pdl(1e-10);
+my $factr = pdl(100);
+$print = pdl(long, [0,0]);
+$maxit = pdl(long,100);
+$info = pdl(long,0);
+$m = pdl(long,10);
+my $iv = zeroes(long,44);
+my $v = zeroes(29);
+
+lbfgsb($fx, $gx, $x, $m, $bounds, $tbounds, $maxit, $factr, $pgtol, $gtol,
+	$print, $info,$iv, $v,\&fg_func);
+approx_ok $x,$res,0.0001,'lbfgsb';
+
+$x = pdl '[0.49823058 0.98093641 0.63151156 0.66477157 0.60801367]';
+$gx = rosen_grad($x);
+$fx = rosen($x);
+$print = zeroes(2);
+$maxit = pdl(long, 200);
+$info = pdl(long,0);
+cgfam($fx, $gx, $x, $maxit, $eps, $xtol, $gtol,$print,$info,1,\&fg_func);
+approx_ok $x,$res,0.0001,'cgfam';
+
+$x = pdl '[0.49823058 0.98093641 0.63151156 0.66477157 0.60801367]';
+$gx = $x->zeroes;
+$fx = rosen($x);
+
+my $accrcy = pdl(1e-16);
+$xtol = pdl(1e-10);
+my $stepmx =pdl(1);
+my $eta =pdl(0.9);
+
+$info = pdl(long, 0);
+$print = pdl(long, 1);
+$maxit = pdl(long, 50);
+my $cgmaxit = pdl(long, 50);
+$maxfc = pdl(long,250);
+lmqn($fx, $gx, $x, $maxit, $maxfc, $cgmaxit, $xtol, $accrcy, $eta, $stepmx, $print, $info,\&fg_func);
 
 done_testing;

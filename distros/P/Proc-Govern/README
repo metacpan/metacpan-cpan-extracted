@@ -2,8 +2,8 @@ NAME
     Proc::Govern - Run child process and govern its various aspects
 
 VERSION
-    This document describes version 0.213 of Proc::Govern (from Perl
-    distribution Proc-Govern), released on 2023-11-16.
+    This document describes version 0.214 of Proc::Govern (from Perl
+    distribution Proc-Govern), released on 2024-07-17.
 
 SYNOPSIS
     To use as Perl module:
@@ -461,8 +461,8 @@ CONTRIBUTING
     required beyond that are considered a bug and can be reported to me.
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2023, 2020, 2019, 2018, 2017, 2016, 2015,
-    2014, 2013, 2012 by perlancar.
+    This software is copyright (c) 2024, 2023, 2020, 2019, 2018, 2017, 2016,
+    2015, 2014, 2013, 2012 by perlancar.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.

@@ -1,5 +1,8 @@
 package DBIx::Class::Valiant;
 
+use strict;
+use warnings;
+
 # Placeholder for now, not sure if there's going to be code here or not :)
 
 1;

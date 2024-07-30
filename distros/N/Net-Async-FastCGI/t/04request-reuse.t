@@ -1,10 +1,11 @@
-#!/usr/bin/perl -w
+#!/usr/bin/perl
 
-use strict;
+use v5.14;
+use warnings;
+
 use lib 't/lib';
 
-use Test::More tests => 6;
-use Test::HexString;
+use Test2::V0;
 
 use IO::Async::Loop;
 use IO::Async::Test;
@@ -42,9 +43,9 @@ $C->syswrite(
 
 wait_for { defined $request };
 
-is_deeply( $request->params,
-           { NAME => 'first' },
-           '$request params' );
+is( $request->params,
+    { NAME => 'first' },
+    '$request params' );
 is( $request->read_stdin_line,
     undef,
     '$request has empty STDIN' );
@@ -68,7 +69,7 @@ $buffer = "";
 
 wait_for_stream { length $buffer >= length $expect } $C => $buffer;
 
-is_hexstr( $buffer, $expect, 'FastCGI end request record' );
+is( $buffer, $expect, 'FastCGI end request record' );
 
 # Now send a second one
 $C->syswrite(
@@ -85,9 +86,9 @@ $C->syswrite(
 undef $request;
 wait_for { defined $request };
 
-is_deeply( $request->params,
-           { NAME => 'second' },
-           '$request params' );
+is( $request->params,
+    { NAME => 'second' },
+    '$request params' );
 is( $request->read_stdin_line,
     undef,
     '$req has empty STDIN' );
@@ -107,4 +108,6 @@ $buffer = "";
 
 wait_for_stream { length $buffer >= length $expect } $C => $buffer;
 
-is_hexstr( $buffer, $expect, 'FastCGI end request record' );
+is( $buffer, $expect, 'FastCGI end request record' );
+
+done_testing;

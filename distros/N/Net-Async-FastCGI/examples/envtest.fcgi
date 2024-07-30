@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-use strict;
+use v5.14;
 
 use IO::Async::Loop;
 

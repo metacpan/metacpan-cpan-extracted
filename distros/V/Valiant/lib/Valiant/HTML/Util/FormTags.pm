@@ -156,8 +156,9 @@ sub _process_method {
 
 sub _process_content {
   my ($self, $content, $attrs) = @_;
-  return $content unless my $csrf_token = delete $attrs->{csrf_token};
-  return $self->_prepend_block($content, $self->hidden_tag('csrf_token', $csrf_token));
+  return $content unless exists $attrs->{csrf_token};
+  $attrs->{data}{csrf_token} = delete $attrs->{csrf_token};
+  return $self->_prepend_block($content, $self->hidden_tag('csrf_token', $attrs->{data}{csrf_token}));
 }
 
 sub label_tag {

@@ -8,10 +8,10 @@ use warnings;
 # Redo rmn example
 # optimize without function parameter => pb
 
-my %config;
+our %config;
 do('./Config.pl');
 
-our $VERSION = '0.08';
+our $VERSION = '0.09';
 use PDL::Exporter;
 
 pp_setversion($VERSION);
@@ -101,9 +101,9 @@ PDL::Opt::NonLinear -- Non Linear optimization routines
  $maxit = pdl(long, 200);
  $info = pdl(long,0);
  sub fg_func{
-	my ($f, $g, $x) = @_;
-	$f .= rosen($x);
-	$g .= rosen_grad($x);		
+    my ($f, $g, $x) = @_;
+    $f .= rosen($x);
+    $g .= rosen_grad($x);		
  }
  cgfam($fx, $gx, $x, $maxit, $eps, $xtol, $gtol,$print,$info,1,\&fg_func);
 
@@ -111,14 +111,14 @@ PDL::Opt::NonLinear -- Non Linear optimization routines
 
 This module provides routine that solves optimization problem:
 
-	minimize     f(x)
-	   x
+    minimize     f(x)
+       x
 
 Some routines can handle bounds, so:
 
-	minimize     f(x)
-	   x
-	subject to   low <= x <= up
+    minimize     f(x)
+       x
+    subject to   low <= x <= up
 
 =cut
 
@@ -131,57 +131,54 @@ extern SV*   oned_function;
 double oned_wrapper(double *f);
 extern SV*   pdl4_function;
 void dpdl4_wrapper(
-		PDL_Indx m, double *a,
-		PDL_Indx n, double *b,
-		PDL_Indx o, PDL_Indx *c,
-		PDL_Indx p, double *d);
+        PDL_Indx m, double *a,
+        PDL_Indx n, double *b,
+        PDL_Indx o, PDL_Indx *c,
+        PDL_Indx p, double *d);
 
 void fpdl4_wrapper(
-		PDL_Indx m, float *a,
-		PDL_Indx n, float *b,
-		PDL_Indx o, PDL_Indx *c,
-		PDL_Indx p, float *d);
+        PDL_Indx m, float *a,
+        PDL_Indx n, float *b,
+        PDL_Indx o, PDL_Indx *c,
+        PDL_Indx p, float *d);
 
 extern SV*   doubler_function;
 double np_wrapper(integer *n, double *p);
 ');
 
 pp_def("fmin",
-       HandleBad => 0,
-	Pars => '[phys]a();[phys]b();[phys]tol();[o,phys]y();[o,phys]x()',
-	OtherPars => "SV* min_func" ,
-	GenericTypes => ['F','D'],
-	Code =>'
-		extern $GENERIC() $TFD(,d)PDL_FORTRAN(fmin)(param$TFD(f,d) f, $GENERIC() *X, $GENERIC() *A, $GENERIC() *B, $GENERIC() *T);
-		oned_function    = $COMP(min_func);
-		$y() = $TFD(,d)PDL_FORTRAN(fmin)(oned_wrapper, $P(x), $P(a),$P(b),$P(tol));
-
-
-',
-	Doc =>'
-
+    HandleBad => 0,
+    Pars => '[phys]a();[phys]b();[phys]tol();[o,phys]y();[o,phys]x()',
+    OtherPars => "SV* min_func" ,
+    GenericTypes => ['F','D'],
+    Code => pp_line_numbers(__LINE__, <<'EOF'),
+        extern $GENERIC() $TFD(,d)PDL_FORTRAN(fmin)(param$TFD(f,d) f, $GENERIC() *X, $GENERIC() *A, $GENERIC() *B, $GENERIC() *T);
+        oned_function    = $COMP(min_func);
+        $y() = $TFD(,d)PDL_FORTRAN(fmin)(oned_wrapper, $P(x), $P(a),$P(b),$P(tol));
+EOF
+    Doc =>'
 =for ref
 
 Finds an approximation x to the point in
 the interval (a,b) at which f attains its minimum,
 and returns the value of f in x. Uses algorithm from Brent (1973).
 
-	a,b:       Interval bounds.
-	tol:       Tolerance (computer smallest floating-point constant if < 0).
-	y:         On exit, contains an approximation of the minimum.
-	x:         On exit, contains an approximation to the point
-	           in the interval at which f(x) attains a (local) minimum.
-	min_func:  Function to be mimimized (scalar on entry and exit).
+    a,b:       Interval bounds.
+    tol:       Tolerance (computer smallest floating-point constant if < 0).
+    y:         On exit, contains an approximation of the minimum.
+    x:         On exit, contains an approximation to the point
+               in the interval at which f(x) attains a (local) minimum.
+    min_func:  Function to be mimimized (scalar on entry and exit).
 
 =for example
 
-	sub test{
-		$a = pdl(shift);
-		$a = -$a * exp(-$a);
-		$a->sclr;
-	}
-	fmin(pdl(0.8),pdl(1.2),pdl(-1),($y=null), ($x=null),\&test);
-	print "Minimum $y founds at $x\n";
+    sub test{
+        $a = pdl(shift);
+        $a = -$a * exp(-$a);
+        $a->sclr;
+    }
+    fmin(pdl(0.8),pdl(1.2),pdl(-1),($y=null), ($x=null),\&test);
+    print "Minimum $y founds at $x\n";
 
 ');
 
@@ -194,58 +191,58 @@ extern void PDL_FORTRAN(entsrc)(integer *old, integer *new);
 
 pp_def("smnsx",
        HandleBad => 0,
-	Pars => '[io,phys]x(n);[io,phys]step();[io,phys]tol();[o,phys]y()',
-	OtherPars => "SV* simplex_func" ,
-	GenericTypes => ['D'],
-	Code =>'
-		integer old, new,err;
-		extern $GENERIC() PDL_FORTRAN(dsmnsx)(paramd f, PDL_Indx *p, $GENERIC() *step, $GENERIC() *tol,$GENERIC() *X);
-		//TODO istkgt istkin: stack
-		doubler_function    = $COMP(simplex_func);
-		
-		new = 1;
-		PDL_FORTRAN(entsrc)(&old, &new);
-		$y() = PDL_FORTRAN(dsmnsx)(np_wrapper, &$SIZE(n), $P(step), $P(tol),$P(x));
-		PDL_FORTRAN(nerror)(&err);
-		if (err > 0 )
-			PDL_FORTRAN(eprint)();
-		PDL_FORTRAN(erroff)();
-',
-	Doc =>'
+    Pars => '[io,phys]x(n);[io,phys]step();[io,phys]tol();[o,phys]y()',
+    OtherPars => "SV* simplex_func" ,
+    GenericTypes => ['D'],
+    Code => pp_line_numbers(__LINE__, <<'EOF'),
+        integer old, new,err;
+        extern $GENERIC() PDL_FORTRAN(dsmnsx)(paramd f, PDL_Indx *p, $GENERIC() *step, $GENERIC() *tol,$GENERIC() *X);
+        //TODO istkgt istkin: stack
+        doubler_function    = $COMP(simplex_func);
+        
+        new = 1;
+        PDL_FORTRAN(entsrc)(&old, &new);
+        $y() = PDL_FORTRAN(dsmnsx)(np_wrapper, &$SIZE(n), $P(step), $P(tol),$P(x));
+        PDL_FORTRAN(nerror)(&err);
+        if (err > 0 )
+            PDL_FORTRAN(eprint)();
+        PDL_FORTRAN(erroff)();
+EOF
+    Doc =>'
 
 =for ref
 
 Nelder-Mead simplex method (pattern search) for unconstrained minimization.
 Simple to use version of mnsx.
 
-	x:    Parameter vector,
-	      on entry initial guess,
-	      on exit best parameter found.
+    x:    Parameter vector,
+          on entry initial guess,
+          on exit best parameter found.
 
-	step: Initial and final size of the step used in computing
-	      initial simplex. (See library documentation for more details)
-	      On exit the maximum width in any coordinate direction
-	      of the final simplex.
+    step: Initial and final size of the step used in computing
+          initial simplex. (See library documentation for more details)
+          On exit the maximum width in any coordinate direction
+          of the final simplex.
 
-	tol:  Initial and final stopping tolerance.
-	      (standard deviation of the function values at the simplex)
-	
-	simplex_func:
-	      Function to be minimized.
-	      PDL in entry, scalar on exit.
+    tol:  Initial and final stopping tolerance.
+          (standard deviation of the function values at the simplex)
+    
+    simplex_func:
+          Function to be minimized.
+          PDL in entry, scalar on exit.
 
 =for example
 
-	$x = random(5);
-	sub test{
-		my $a = shift;
-		my $b = rosen($a);
-		$b->sclr;
-	}
-	$step = pdl(0.5);
-	$tol = pdl(1e-16);
-	$x->smnsx($step,$tol,($y = null), \&test);
-	print "Minimum $y found at $x with a tolerance of $tol";
+    $x = random(5);
+    sub test{
+        my $a = shift;
+        my $b = rosen($a);
+        $b->sclr;
+    }
+    $step = pdl(0.5);
+    $tol = pdl(1e-16);
+    $x->smnsx($step,$tol,($y = null), \&test);
+    print "Minimum $y found at $x with a tolerance of $tol";
 
 
 
@@ -253,121 +250,120 @@ Simple to use version of mnsx.
 
 pp_def("mnsx",
        HandleBad => 0,
-	Pars => '[io,phys]x(n);[io,phys]vertices(n,pp);int [phys]maxit(); [io,phys]tol();[o,phys]y()',
-	OtherPars => "SV* simplex_func" ,
-	GenericTypes => ['D'],
-	Code =>'
-		integer old, new,err;
-		extern $GENERIC() PDL_FORTRAN(dmnsx)(paramd f, integer *itmx, PDL_Indx *p, PDL_Indx *pp,
-			$GENERIC() *s, $GENERIC() *tol,$GENERIC() *X);
-		//TODO istkgt istkin: stack
+    Pars => '[io,phys]x(n);[io,phys]vertices(n,pp);int [phys]maxit(); [io,phys]tol();[o,phys]y()',
+    OtherPars => "SV* simplex_func" ,
+    GenericTypes => ['D'],
+    Code => pp_line_numbers(__LINE__, <<'EOF'),
+        integer old, new,err;
+        extern $GENERIC() PDL_FORTRAN(dmnsx)(paramd f, integer *itmx, PDL_Indx *p, PDL_Indx *pp,
+            $GENERIC() *s, $GENERIC() *tol,$GENERIC() *X);
+        //TODO istkgt istkin: stack
 
-		doubler_function    = $COMP(simplex_func);
-		new = 1;
-		PDL_FORTRAN(entsrc)(&old, &new);
-		$y() = PDL_FORTRAN(dmnsx)(np_wrapper,
-				$P(maxit),
-				&$SIZE(n),
-				&$SIZE(n),
-				$P(vertices),
-				$P(tol),
-				$P(x));
-		PDL_FORTRAN(nerror)(&err);
-		if (err > 0 )
-			PDL_FORTRAN(eprint)();
-		PDL_FORTRAN(erroff)();
-
-',
-	Doc =>'
+        doubler_function    = $COMP(simplex_func);
+        new = 1;
+        PDL_FORTRAN(entsrc)(&old, &new);
+        $y() = PDL_FORTRAN(dmnsx)(np_wrapper,
+                $P(maxit),
+                &$SIZE(n),
+                &$SIZE(n),
+                $P(vertices),
+                $P(tol),
+                $P(x));
+        PDL_FORTRAN(nerror)(&err);
+        if (err > 0 )
+            PDL_FORTRAN(eprint)();
+        PDL_FORTRAN(erroff)();
+EOF
+    Doc =>'
 
 =for ref
 
 Nelder-Mead simplex method (pattern search) for unconstrained minimization with input vertices.
 
-	x:     Parameter vector,
-	       on entry initial guess,
-	       on exit best parameter found.
+    x:     Parameter vector,
+           on entry initial guess,
+           on exit best parameter found.
 
-	vertices:
-	       Vertice of the initial and final simplex,
-	       length (n+1,n), must be transposed.(Fortran storage type).
-	
-	maxit: Maximum number of iterations.
-	
-	tol:   Initial and final stopping tolerance.
-	       (standard deviation of the function values at the simplex)
-	
-	simplex_func:
-	       Function to be minimized.
-	       PDL in entry, scalar on exit.
+    vertices:
+           Vertice of the initial and final simplex,
+           length (n+1,n), must be transposed.(Fortran storage type).
+    
+    maxit: Maximum number of iterations.
+    
+    tol:   Initial and final stopping tolerance.
+           (standard deviation of the function values at the simplex)
+    
+    simplex_func:
+           Function to be minimized.
+           PDL in entry, scalar on exit.
 
 =for example
 
-	$x = random(5);
-	sub vertice{
-		#TODO: vertices ???? and rosen
-		my ($a,$diff )= @_;
-		my $aa = zeroes($a->dim(0)+1, $a->dim(0));
-		for ($j = 0; $j <= ($a->dim(0)); $j++){
-			for ($i = 0; $i < $a->dim(0); $i++){
-				$aa($j, $i) .= $a($i) - $diff;
-			}
-			$aa($j, $j) .= $a($j) + $diff if ($j < $a->dim(0));
-		}
-		$aa;
-	}
-	sub test{
-		my $a = shift;
-		my $b = rosen($a);
-		$b->sclr;
-	}
-	$vertice = transpose(vertice($x,0.5));
-	$tol = pdl(1e-16);
-	$maxit = pdl(long, 1000);
-	$x->mnsx($vertice,$maxit,$tol,($y = null), \&test);
-	print "Minimum $y found at $x with a tolerance of $tol";
+    $x = random(5);
+    sub vertice{
+        #TODO: vertices ???? and rosen
+        my ($a,$diff )= @_;
+        my $aa = zeroes($a->dim(0)+1, $a->dim(0));
+        for ($j = 0; $j <= ($a->dim(0)); $j++){
+            for ($i = 0; $i < $a->dim(0); $i++){
+                $aa($j, $i) .= $a($i) - $diff;
+            }
+            $aa($j, $j) .= $a($j) + $diff if ($j < $a->dim(0));
+        }
+        $aa;
+    }
+    sub test{
+        my $a = shift;
+        my $b = rosen($a);
+        $b->sclr;
+    }
+    $vertice = transpose(vertice($x,0.5));
+    $tol = pdl(1e-16);
+    $maxit = pdl(long, 1000);
+    $x->mnsx($vertice,$maxit,$tol,($y = null), \&test);
+    print "Minimum $y found at $x with a tolerance of $tol";
 
 ');
 
 pp_def("ivset",
        HandleBad => 0,
-	Pars => 'int [phys]type();int [io,phys]iv(n);[io,phys]v(p)',
-	GenericTypes => ['F','D'],
-	Code =>'
-		extern void $TFD(,d)PDL_FORTRAN(ivset)(integer *alg, integer *iv, PDL_Indx *liv, PDL_Indx *lv, $GENERIC() *v);
-		$TFD(,d)PDL_FORTRAN(ivset)($P(type), $P(iv), &$SIZE(n), &$SIZE(p),$P(v));
-',
-	Doc =>'
+    Pars => 'int [phys]type();int [io,phys]iv(n);[io,phys]v(p)',
+    GenericTypes => ['F','D'],
+    Code => pp_line_numbers(__LINE__, <<'EOF'),
+        extern void $TFD(,d)PDL_FORTRAN(ivset)(integer *alg, integer *iv, PDL_Indx *liv, PDL_Indx *lv, $GENERIC() *v);
+        $TFD(,d)PDL_FORTRAN(ivset)($P(type), $P(iv), &$SIZE(n), &$SIZE(p),$P(v));
+EOF
+    Doc =>'
 
 =for ref
 
 Initialize input controls and tolerances passed to optimization routines.
 
-	type:
-		1: Unconstrained or simply bounded regression.
-		2: Unconstrained or simply bounded general optimization.
-		3: Regression with general linear constraints.
-		4: General optimization with general linear constraints.
+    type:
+        1: Unconstrained or simply bounded regression.
+        2: Unconstrained or simply bounded general optimization.
+        3: Regression with general linear constraints.
+        4: General optimization with general linear constraints.
 
 
-	Without bound:
+    Without bound:
 
-		length of iv array >= 59.
+        length of iv array >= 59.
 
-		length of v array  >= 77 + P*(P+17) / 2 for rmnf,
-				      71 + P*(P+13) / 2 for rmng,
-				      78 + P*(P+21) / 2 for rmnh.
+        length of v array  >= 77 + P*(P+17) / 2 for rmnf,
+                      71 + P*(P+13) / 2 for rmng,
+                      78 + P*(P+21) / 2 for rmnh.
 
-	With bounds:
+    With bounds:
 
-		length of iv array >= 59 + P for rmnfb and rmngb,
-				      59 + 3 * P for rmnhb.
+        length of iv array >= 59 + P for rmnfb and rmngb,
+                      59 + 3 * P for rmnhb.
 
-		length of V array >= 77 + P*(P+23) / 2 for rmnfb,
-			             71 + P*(P+19) / 2 for rmngb,
-				     78 + P*(P+27) / 2 for rmnhb.
+        length of V array >= 77 + P*(P+23) / 2 for rmnfb,
+                         71 + P*(P+19) / 2 for rmngb,
+                     78 + P*(P+27) / 2 for rmnhb.
 
-	where P is the number of variables.
+    where P is the number of variables.
 
 
 $iv[20] => control Fortran output unit for printing (0 => no output).
@@ -375,488 +371,476 @@ $iv[20] => control Fortran output unit for printing (0 => no output).
 
 =for example
 
-	# Size of problem:5
-	# Routine used: rmng
-	$iv = zeroes(long, 59);
-	$v = zeroes(116);
-	ivset(2,$iv,$v);
+    # Size of problem:5
+    # Routine used: rmng
+    $iv = zeroes(long, 59);
+    $v = zeroes(116);
+    ivset(2,$iv,$v);
 
 ');
 
 pp_def("rmnf",
        HandleBad => 0,
-	Pars => '[phys]fx(); [io,phys]x(m);[io,phys]scale(m);int [io,phys]iv(n);[io,phys]v(p)',
-	OtherPars => "SV* min_func" ,
-	GenericTypes => ['F','D'],
-	Code =>'
-		extern void $TFD(,d)PDL_FORTRAN(rmnf)($GENERIC() *d, $GENERIC() *fx, integer *iv, PDL_Indx *liv,
-		PDL_Indx *lv, PDL_Indx *n, $GENERIC() *v, $GENERIC()*x);
-		pdl4_function    = $COMP(min_func);
-		do{
-			$TFD(,d)PDL_FORTRAN(rmnf)(
-				$P(scale),
-				$P(fx),
-				$P(iv),
-				&$SIZE(n),
-				&$SIZE(p),
-				&$SIZE(m),
-				$P(v),
-				$P(x));
-			$TFD(f,d)pdl4_wrapper(1, $P(fx),
-					$SIZE(m), $P(x),
-					$SIZE(n), $P(iv),
-					$SIZE(p), $P(v));
-		}while($iv(n=>0) <= 2 );
-
-
-',
-	Doc =>'
+    Pars => '[phys]fx(); [io,phys]x(m);[io,phys]scale(m);int [io,phys]iv(n);[io,phys]v(p)',
+    OtherPars => "SV* min_func" ,
+    GenericTypes => ['F','D'],
+    Code => pp_line_numbers(__LINE__, <<'EOF'),
+        extern void $TFD(,d)PDL_FORTRAN(rmnf)($GENERIC() *d, $GENERIC() *fx, integer *iv, PDL_Indx *liv,
+        PDL_Indx *lv, PDL_Indx *n, $GENERIC() *v, $GENERIC()*x);
+        pdl4_function    = $COMP(min_func);
+        do{
+            $TFD(,d)PDL_FORTRAN(rmnf)(
+                $P(scale),
+                $P(fx),
+                $P(iv),
+                &$SIZE(n),
+                &$SIZE(p),
+                &$SIZE(m),
+                $P(v),
+                $P(x));
+            $TFD(f,d)pdl4_wrapper(1, $P(fx),
+                    $SIZE(m), $P(x),
+                    $SIZE(n), $P(iv),
+                    $SIZE(p), $P(v));
+        }while($iv(n=>0) <= 2 );
+EOF
+    Doc =>'
 
 =for ref
 
 Given a function f of p variables, the optimization routines attempt to find a p-vector x* that minimizes
 f(x).
 
-	scale:	Scale vector such that |$scale(i) * $x(i)| are all in comparable unit.
-	fx:	Objective function value f(x).
-	x:      Parameter vector.
-	iv:	Working and parameter array.
-	v:	Working and parameter array.
-	min_func:
-		parameter: PDL(fx), PDL(x)
+    scale:	Scale vector such that |$scale(i) * $x(i)| are all in comparable unit.
+    fx:	Objective function value f(x).
+    x:      Parameter vector.
+    iv:	Working and parameter array.
+    v:	Working and parameter array.
+    min_func:
+        parameter: PDL(fx), PDL(x)
 
 =for example
 
-	$x = random(5);
-	$fx = pdl(0);
-	$v = zeroes(77 + 5 *(5+17) / 2);
-	$iv = zeroes(long,59);
-	ivset(2,$iv,$v);
-	$scale = ones(5);
-	sub min_func{
-		my ($fx, $x) = @_;
-		$fx .= rosen($x);
-	}
-	rmnf($fx, $x, $scale, $iv, $v, \&min_func);
+    $x = random(5);
+    $fx = pdl(0);
+    $v = zeroes(77 + 5 *(5+17) / 2);
+    $iv = zeroes(long,59);
+    ivset(2,$iv,$v);
+    $scale = ones(5);
+    sub min_func{
+        my ($fx, $x) = @_;
+        $fx .= rosen($x);
+    }
+    rmnf($fx, $x, $scale, $iv, $v, \&min_func);
 
 ');
 
 pp_def("rmng",
        HandleBad => 0,
-	Pars => '[phys]fx(); [io,phys]gx(m); [io,phys]x(m);[io,phys]scale(m);int [io,phys]iv(n);[io,phys]v(p)',
-	OtherPars => "SV* min_func; SV* grad_func" ,
-	GenericTypes => ['F','D'],
-	Code =>'
-		extern void $TFD(,d)PDL_FORTRAN(rmng)($GENERIC() *d, $GENERIC() *fx, $GENERIC() *g, integer *iv, PDL_Indx *liv,
-		PDL_Indx *lv, PDL_Indx *n, $GENERIC() *v, $GENERIC()*x);
-		do{
-			$TFD(,d)PDL_FORTRAN(rmng)(
-				$P(scale),
-				$P(fx),
-				$P(gx),
-				$P(iv),
-				&$SIZE(n),
-				&$SIZE(p),
-				&$SIZE(m),
-				$P(v),
-				$P(x));
-			if($iv(n=>0) == 1 )
-			{
-				pdl4_function    = $COMP(min_func);
-				$TFD(f,d)pdl4_wrapper(1, $P(fx),
-					$SIZE(m), $P(x),
-					$SIZE(n), $P(iv),
-					$SIZE(p), $P(v));
-			}
-			else if($iv(n=>0) == 2 )
-			{
-				pdl4_function    = $COMP(grad_func);
-				$TFD(f,d)pdl4_wrapper($SIZE(m), $P(gx),
-					$SIZE(m), $P(x),
-					$SIZE(n), $P(iv),
-					$SIZE(p), $P(v));
-			}
-		}while($iv(n=>0) <= 2 );
-
-
-',
-	Doc =>'
+    Pars => '[phys]fx(); [io,phys]gx(m); [io,phys]x(m);[io,phys]scale(m);int [io,phys]iv(n);[io,phys]v(p)',
+    OtherPars => "SV* min_func; SV* grad_func" ,
+    GenericTypes => ['F','D'],
+    Code => pp_line_numbers(__LINE__, <<'EOF'),
+        extern void $TFD(,d)PDL_FORTRAN(rmng)($GENERIC() *d, $GENERIC() *fx, $GENERIC() *g, integer *iv, PDL_Indx *liv,
+        PDL_Indx *lv, PDL_Indx *n, $GENERIC() *v, $GENERIC()*x);
+        do{
+            $TFD(,d)PDL_FORTRAN(rmng)(
+                $P(scale),
+                $P(fx),
+                $P(gx),
+                $P(iv),
+                &$SIZE(n),
+                &$SIZE(p),
+                &$SIZE(m),
+                $P(v),
+                $P(x));
+            if($iv(n=>0) == 1 )
+            {
+                pdl4_function    = $COMP(min_func);
+                $TFD(f,d)pdl4_wrapper(1, $P(fx),
+                    $SIZE(m), $P(x),
+                    $SIZE(n), $P(iv),
+                    $SIZE(p), $P(v));
+            }
+            else if($iv(n=>0) == 2 )
+            {
+                pdl4_function    = $COMP(grad_func);
+                $TFD(f,d)pdl4_wrapper($SIZE(m), $P(gx),
+                    $SIZE(m), $P(x),
+                    $SIZE(n), $P(iv),
+                    $SIZE(p), $P(v));
+            }
+        }while($iv(n=>0) <= 2 );
+EOF
+    Doc =>'
 
 =for ref
 
 Given a function f of p variables, the optimization routines attempt to find a p-vector x* that minimizes
 f(x) with user computed gradient.
 
-	fx:	Objective function value f(x).
-	gx:	Gradient vector g(x).
-	x:      Parameter vector.
-	scale:	Scale vector such that |$scale(i) * $x(i)| are all in comparable unit.
-	iv:	Working and parameter array.
-	v:	Working and parameter array.
-	min_func:
-		parameter: PDL(fx), PDL(x)
-	grad_func:
-		parameter PDL(gx), PDL(x)
+    fx:	Objective function value f(x).
+    gx:	Gradient vector g(x).
+    x:      Parameter vector.
+    scale:	Scale vector such that |$scale(i) * $x(i)| are all in comparable unit.
+    iv:	Working and parameter array.
+    v:	Working and parameter array.
+    min_func:
+        parameter: PDL(fx), PDL(x)
+    grad_func:
+        parameter PDL(gx), PDL(x)
 
 
 =for example
 
-	$x = random(5);
-	$fx = pdl(0);
-	$v = zeroes(71 + 5 *(5+13) / 2);
-	$iv = zeroes(long,59);
-	ivset(2,$iv,$v);
-	# Change initial step
-	$v(34).= 0.9
-	$scale = ones(5);
-	sub min_func{
-		my ($fx, $x) = @_;
-		$fx .= rosen($x);
-	}
-	sub grad_func{
-		my ($gx, $x) = @_;
-		$gx .= rosen_grad($x);
-	}
-	rmng($fx, $gx, $x, $scale, $iv, $v, \&min_func, \&grad_func);
+    $x = random(5);
+    $fx = pdl(0);
+    $v = zeroes(71 + 5 *(5+13) / 2);
+    $iv = zeroes(long,59);
+    ivset(2,$iv,$v);
+    # Change initial step
+    $v(34).= 0.9
+    $scale = ones(5);
+    sub min_func{
+        my ($fx, $x) = @_;
+        $fx .= rosen($x);
+    }
+    sub grad_func{
+        my ($gx, $x) = @_;
+        $gx .= rosen_grad($x);
+    }
+    rmng($fx, $gx, $x, $scale, $iv, $v, \&min_func, \&grad_func);
 
 ');
 
 pp_def("rmnh",
        HandleBad => 0,
-	Pars => '[phys]fx(); [io,phys]gx(m); [io,phys] hx(n);[io,phys]x(m);[io,phys]scale(m);int [io,phys]iv(p);[io,phys]v(q)',
-	OtherPars => "SV* min_func; SV* grad_func; SV* hess_func" ,
-	GenericTypes => ['F','D'],
-	Code =>'
-		extern void $TFD(,d)PDL_FORTRAN(rmnh)($GENERIC() *d, $GENERIC() *fx, $GENERIC() *g, $GENERIC() *h, integer *iv, PDL_Indx *lh,
-		PDL_Indx *liv, PDL_Indx *lv, PDL_Indx *n, $GENERIC() *v, $GENERIC()*x);
-		do{
-			$TFD(,d)PDL_FORTRAN(rmnh)(
-				$P(scale),
-				$P(fx),
-				$P(gx),
-				$P(hx),
-				$P(iv),
-				&$SIZE(n),
-				&$SIZE(p),
-				&$SIZE(q),
-				&$SIZE(m),
-				$P(v),
-				$P(x));
-			if($iv(p=>0) == 1 )
-			{
-				pdl4_function    = $COMP(min_func);
-				$TFD(f,d)pdl4_wrapper(1, $P(fx),
-					$SIZE(m), $P(x),
-					$SIZE(p), $P(iv),
-					$SIZE(q), $P(v));
-				dpdl4_wrapper(1, $P(fx),
-					$SIZE(m), $P(x),
-					$SIZE(p), $P(iv),
-					$SIZE(q), $P(v));
-			}
-			else if($iv(p=>0) == 2 )
-			{
-				pdl4_function    = $COMP(grad_func);
-				$TFD(f,d)pdl4_wrapper($SIZE(m), $P(gx),
-					$SIZE(m), $P(x),
-					$SIZE(p), $P(iv),
-					$SIZE(q), $P(v));			
-				pdl4_function    = $COMP(hess_func);
-				$TFD(f,d)pdl4_wrapper($SIZE(n), $P(hx),
-					$SIZE(m), $P(x),
-					$SIZE(p), $P(iv),
-					$SIZE(q), $P(v));
-			}
-		}while($iv(p=>0) <= 2 );
-
-
-',
-	Doc =>'
+    Pars => '[phys]fx(); [io,phys]gx(m); [io,phys] hx(n);[io,phys]x(m);[io,phys]scale(m);int [io,phys]iv(p);[io,phys]v(q)',
+    OtherPars => "SV* min_func; SV* grad_func; SV* hess_func" ,
+    GenericTypes => ['F','D'],
+    Code => pp_line_numbers(__LINE__, <<'EOF'),
+        extern void $TFD(,d)PDL_FORTRAN(rmnh)($GENERIC() *d, $GENERIC() *fx, $GENERIC() *g, $GENERIC() *h, integer *iv, PDL_Indx *lh,
+        PDL_Indx *liv, PDL_Indx *lv, PDL_Indx *n, $GENERIC() *v, $GENERIC()*x);
+        do{
+            $TFD(,d)PDL_FORTRAN(rmnh)(
+                $P(scale),
+                $P(fx),
+                $P(gx),
+                $P(hx),
+                $P(iv),
+                &$SIZE(n),
+                &$SIZE(p),
+                &$SIZE(q),
+                &$SIZE(m),
+                $P(v),
+                $P(x));
+            if($iv(p=>0) == 1 )
+            {
+                pdl4_function    = $COMP(min_func);
+                $TFD(f,d)pdl4_wrapper(1, $P(fx),
+                    $SIZE(m), $P(x),
+                    $SIZE(p), $P(iv),
+                    $SIZE(q), $P(v));
+                dpdl4_wrapper(1, $P(fx),
+                    $SIZE(m), $P(x),
+                    $SIZE(p), $P(iv),
+                    $SIZE(q), $P(v));
+            }
+            else if($iv(p=>0) == 2 )
+            {
+                pdl4_function    = $COMP(grad_func);
+                $TFD(f,d)pdl4_wrapper($SIZE(m), $P(gx),
+                    $SIZE(m), $P(x),
+                    $SIZE(p), $P(iv),
+                    $SIZE(q), $P(v));			
+                pdl4_function    = $COMP(hess_func);
+                $TFD(f,d)pdl4_wrapper($SIZE(n), $P(hx),
+                    $SIZE(m), $P(x),
+                    $SIZE(p), $P(iv),
+                    $SIZE(q), $P(v));
+            }
+        }while($iv(p=>0) <= 2 );
+EOF
+    Doc =>'
 
 =for ref
 
 Given a function f of p variables, attempt to find a p-vector x* that minimizes
 f(x) with user computed hessian and gradient.
 
-	fx:	Objective function value f(x).
-	gx:	Gradient vector g(x).
-	hx:	Vector that contains lower triangle of the Hessian matrix H(x), stored rowwise.
-	x:      Parameter vector.
-	scale:	Scale vector such that |$scale(i) * $x(i)| are all in comparable unit.
-	iv:	Working and parameter array.
-	v:	Working and parameter array.
-	min_func:
-		parameter: PDL(fx), PDL(x)
-	grad_func:
-		parameter PDL(gx), PDL(x)
-	hess_func:
-		parameter PDL(hx), PDL(x)
+    fx:	Objective function value f(x).
+    gx:	Gradient vector g(x).
+    hx:	Vector that contains lower triangle of the Hessian matrix H(x), stored rowwise.
+    x:      Parameter vector.
+    scale:	Scale vector such that |$scale(i) * $x(i)| are all in comparable unit.
+    iv:	Working and parameter array.
+    v:	Working and parameter array.
+    min_func:
+        parameter: PDL(fx), PDL(x)
+    grad_func:
+        parameter PDL(gx), PDL(x)
+    hess_func:
+        parameter PDL(hx), PDL(x)
 
 =for example
 
-	$x = random(5);
-	$fx = pdl(0);
-	$hx = zeroes( 5 *(5+1)/2 );
-	$v = zeroes(78 + 5 *(5+21) / 2);
-	$iv = zeroes(long,59);
-	ivset(2,$iv,$v);
-	$scale = ones(5);
-	sub min_func{
-		my ($fx, $x) = @_;
-		$fx .= rosen($x);
-	}
-	sub grad_func{
-		my ($gx, $x) = @_;
-		$gx .= rosen_grad($x);
-	}
-	sub hess_func{
-		my ($hx, $x) = @_;
-		rosen_hess($x,1)->squaretotri($hx);
-	}
-	rmnh($fx, $gx, $hx, $x, $scale, $iv, $v, \&min_func, \&grad_func, \&hess_func);
+    $x = random(5);
+    $fx = pdl(0);
+    $hx = zeroes( 5 *(5+1)/2 );
+    $v = zeroes(78 + 5 *(5+21) / 2);
+    $iv = zeroes(long,59);
+    ivset(2,$iv,$v);
+    $scale = ones(5);
+    sub min_func{
+        my ($fx, $x) = @_;
+        $fx .= rosen($x);
+    }
+    sub grad_func{
+        my ($gx, $x) = @_;
+        $gx .= rosen_grad($x);
+    }
+    sub hess_func{
+        my ($hx, $x) = @_;
+        rosen_hess($x,1)->squaretotri($hx);
+    }
+    rmnh($fx, $gx, $hx, $x, $scale, $iv, $v, \&min_func, \&grad_func, \&hess_func);
 
 ');
 
 pp_def("rmnfb",
        HandleBad => 0,
-	Pars => '[io,phys]fx(); [io,phys]x(m);[phys]bound(2,m);[io,phys]scale(m);int [io,phys]iv(n);[io,phys]v(p)',
-	OtherPars => "SV* min_func" ,
-	GenericTypes => ['F','D'],
-	Code =>'
-		extern void $TFD(,d)PDL_FORTRAN(rmnfb)($GENERIC() *bound, $GENERIC() *d, $GENERIC() *fx, integer *iv, PDL_Indx *liv,
-		PDL_Indx *lv, PDL_Indx *n, $GENERIC() *v, $GENERIC()*x);
-		pdl4_function    = $COMP(min_func);
-		do{
-			$TFD(,d)PDL_FORTRAN(rmnfb)(
-				$P(bound),
-				$P(scale),
-				$P(fx),
-				$P(iv),
-				&$SIZE(n),
-				&$SIZE(p),
-				&$SIZE(m),
-				$P(v),
-				$P(x));
-			$TFD(f,d)pdl4_wrapper(1, $P(fx),
-				$SIZE(m), $P(x),
-				$SIZE(n), $P(iv),
-				$SIZE(p), $P(v));
-		}while($iv(n=>0) <= 2 );
-
-
-',
-	Doc =>'
+    Pars => '[io,phys]fx(); [io,phys]x(m);[phys]bound(2,m);[io,phys]scale(m);int [io,phys]iv(n);[io,phys]v(p)',
+    OtherPars => "SV* min_func" ,
+    GenericTypes => ['F','D'],
+    Code => pp_line_numbers(__LINE__, <<'EOF'),
+        extern void $TFD(,d)PDL_FORTRAN(rmnfb)($GENERIC() *bound, $GENERIC() *d, $GENERIC() *fx, integer *iv, PDL_Indx *liv,
+        PDL_Indx *lv, PDL_Indx *n, $GENERIC() *v, $GENERIC()*x);
+        pdl4_function    = $COMP(min_func);
+        do{
+            $TFD(,d)PDL_FORTRAN(rmnfb)(
+                $P(bound),
+                $P(scale),
+                $P(fx),
+                $P(iv),
+                &$SIZE(n),
+                &$SIZE(p),
+                &$SIZE(m),
+                $P(v),
+                $P(x));
+            $TFD(f,d)pdl4_wrapper(1, $P(fx),
+                $SIZE(m), $P(x),
+                $SIZE(n), $P(iv),
+                $SIZE(p), $P(v));
+        }while($iv(n=>0) <= 2 );
+EOF
+    Doc =>'
 
 =for ref
 
 Given a function f of p variables, the optimization routines attempt to find a p-vector x* that minimizes
 f(x) with simple bounds.
 
-	fx:	Objective function value f(x).
-	x:      Parameter vector.
-	bound:	Lower and upper bound stored columnwise.
-	scale:	Scale vector such that |$scale(i) * $x(i)| are all in comparable unit.
-	iv:	Working and parameter array.
-	v:	Working and parameter array.
-	min_func:
-		parameter: PDL(fx), PDL(x)
+    fx:	Objective function value f(x).
+    x:      Parameter vector.
+    bound:	Lower and upper bound stored columnwise.
+    scale:	Scale vector such that |$scale(i) * $x(i)| are all in comparable unit.
+    iv:	Working and parameter array.
+    v:	Working and parameter array.
+    min_func:
+        parameter: PDL(fx), PDL(x)
 
 =for example
 
-	$x = random(5);
-	$fx = pdl(0);
-	$bounds = zeroes(2,5);
-	$bounds(0,).= 0;
-	$bounds(1,).= 5;
-	$v = zeroes(77 + 5 *(5+23));
-	$iv = zeroes(long,59+5);
-	ivset(2,$iv,$v);
-	$scale = ones(5);
-	sub min_func{
-		my ($fx, $x) = @_;
-		$fx .= rosen($x);
-	}
-	rmnfb($fx, $x, $bounds, $scale, $iv, $v, \&min_func);
+    $x = random(5);
+    $fx = pdl(0);
+    $bounds = zeroes(2,5);
+    $bounds(0,).= 0;
+    $bounds(1,).= 5;
+    $v = zeroes(77 + 5 *(5+23));
+    $iv = zeroes(long,59+5);
+    ivset(2,$iv,$v);
+    $scale = ones(5);
+    sub min_func{
+        my ($fx, $x) = @_;
+        $fx .= rosen($x);
+    }
+    rmnfb($fx, $x, $bounds, $scale, $iv, $v, \&min_func);
 
 ');
 
 pp_def("rmngb",
        HandleBad => 0,
-	Pars => '[io,phys]fx(); [io,phys]gx(m); [io,phys]x(m);[phys]bound(2,m);[io,phys]scale(m);int [io,phys]iv(n);[io,phys]v(p)',
-	OtherPars => "SV* min_func; SV* grad_func" ,
-	GenericTypes => ['F','D'],
-	Code =>'
-		extern void $TFD(,d)PDL_FORTRAN(rmngb)($GENERIC() *bound, $GENERIC() *d, $GENERIC() *fx, $GENERIC() *g, integer *iv, PDL_Indx *liv,
-		PDL_Indx *lv, PDL_Indx *n, $GENERIC() *v, $GENERIC()*x);
-		do{
-			$TFD(,d)PDL_FORTRAN(rmngb)(
-				$P(bound),
-				$P(scale),
-				$P(fx),
-				$P(gx),
-				$P(iv),
-				&$SIZE(n),
-				&$SIZE(p),
-				&$SIZE(m),
-				$P(v),
-				$P(x));
-			if($iv(n=>0) == 1 )
-			{
-				pdl4_function    = $COMP(min_func);
-				$TFD(f,d)pdl4_wrapper(1, $P(fx),
-					$SIZE(m), $P(x),
-					$SIZE(n), $P(iv),
-					$SIZE(p), $P(v));
-			}
-			else if($iv(n=>0) == 2 )
-			{
-				pdl4_function    = $COMP(grad_func);
-				$TFD(f,d)pdl4_wrapper($SIZE(m), $P(gx),
-					$SIZE(m), $P(x),
-					$SIZE(n), $P(iv),
-					$SIZE(p), $P(v));			
-			}
-		}while($iv(n=>0) <= 2 );
-
-
-',
-	Doc =>'
+    Pars => '[io,phys]fx(); [io,phys]gx(m); [io,phys]x(m);[phys]bound(2,m);[io,phys]scale(m);int [io,phys]iv(n);[io,phys]v(p)',
+    OtherPars => "SV* min_func; SV* grad_func" ,
+    GenericTypes => ['F','D'],
+    Code => pp_line_numbers(__LINE__, <<'EOF'),
+        extern void $TFD(,d)PDL_FORTRAN(rmngb)($GENERIC() *bound, $GENERIC() *d, $GENERIC() *fx, $GENERIC() *g, integer *iv, PDL_Indx *liv,
+        PDL_Indx *lv, PDL_Indx *n, $GENERIC() *v, $GENERIC()*x);
+        do{
+            $TFD(,d)PDL_FORTRAN(rmngb)(
+                $P(bound),
+                $P(scale),
+                $P(fx),
+                $P(gx),
+                $P(iv),
+                &$SIZE(n),
+                &$SIZE(p),
+                &$SIZE(m),
+                $P(v),
+                $P(x));
+            if($iv(n=>0) == 1 )
+            {
+                pdl4_function    = $COMP(min_func);
+                $TFD(f,d)pdl4_wrapper(1, $P(fx),
+                    $SIZE(m), $P(x),
+                    $SIZE(n), $P(iv),
+                    $SIZE(p), $P(v));
+            }
+            else if($iv(n=>0) == 2 )
+            {
+                pdl4_function    = $COMP(grad_func);
+                $TFD(f,d)pdl4_wrapper($SIZE(m), $P(gx),
+                    $SIZE(m), $P(x),
+                    $SIZE(n), $P(iv),
+                    $SIZE(p), $P(v));			
+            }
+        }while($iv(n=>0) <= 2 );
+EOF
+    Doc =>'
 
 =for ref
 
 Given a function f of p variables, the optimization routines attempt to find a p-vector x* that minimizes
 f(x) with user computed gradient.
 
-	fx:	Objective function value f(x).
-	gx:	Gradient vector g(x).
-	x:      Parameter vector.
-	bound:	Lower and upper bound stored columnwise.
-	scale:	Scale vector such that |$scale(i) * $x(i)| are all in comparable unit.
-	iv:	Working and parameter array.
-	v:	Working and parameter array.
-	min_func:
-		parameter: PDL(fx), PDL(x)
-	grad_func:
-		parameter PDL(gx), PDL(x)
+    fx:	Objective function value f(x).
+    gx:	Gradient vector g(x).
+    x:      Parameter vector.
+    bound:	Lower and upper bound stored columnwise.
+    scale:	Scale vector such that |$scale(i) * $x(i)| are all in comparable unit.
+    iv:	Working and parameter array.
+    v:	Working and parameter array.
+    min_func:
+        parameter: PDL(fx), PDL(x)
+    grad_func:
+        parameter PDL(gx), PDL(x)
 
 =for example
 
-	$x = random(5);
-	$fx = pdl(0);
-	$bounds = zeroes(2,5);
-	$bounds(0,).= 0;
-	$bounds(1,).= 5;
-	$v = zeroes(71 + 5 *( 5 + 19 )/2);
-	$iv = zeroes(long,59+5);
-	ivset(2,$iv,$v);
-	$scale = ones(5);
-	sub min_func{
-		my ($fx, $x) = @_;
-		$fx .= rosen($x);
-	}
-	sub grad_func{
-		my ($gx, $x) = @_;
-		$gx .= rosen_grad($x);
-	}
-	rmngb($fx, $gx, $x, $bounds, $scale, $iv, $v, \&min_func, \&grad_func);
+    $x = random(5);
+    $fx = pdl(0);
+    $bounds = zeroes(2,5);
+    $bounds(0,).= 0;
+    $bounds(1,).= 5;
+    $v = zeroes(71 + 5 *( 5 + 19 )/2);
+    $iv = zeroes(long,59+5);
+    ivset(2,$iv,$v);
+    $scale = ones(5);
+    sub min_func{
+        my ($fx, $x) = @_;
+        $fx .= rosen($x);
+    }
+    sub grad_func{
+        my ($gx, $x) = @_;
+        $gx .= rosen_grad($x);
+    }
+    rmngb($fx, $gx, $x, $bounds, $scale, $iv, $v, \&min_func, \&grad_func);
 
 ');
 
 pp_def("rmnhb",
        HandleBad => 0,
-	Pars => '[io,phys]fx(); [io,phys]gx(m); [io,phys] hx(n);[io,phys]x(m);[phys]bound(2,m);[io,phys]scale(m);int [io,phys]iv(p);[io,phys]v(q)',
-	OtherPars => "SV* min_func; SV* grad_func; SV* hess_func" ,
-	GenericTypes => ['F','D'],
-	Code =>'
-		extern void $TFD(,d)PDL_FORTRAN(rmnhb)($GENERIC() *bound, $GENERIC() *d, $GENERIC() *fx, $GENERIC() *g, $GENERIC() *h, integer *iv, PDL_Indx *lh,
-		PDL_Indx *liv,PDL_Indx *lv, PDL_Indx *n, $GENERIC() *v, $GENERIC()*x);
-		do{
-			$TFD(,d)PDL_FORTRAN(rmnhb)(
-				$P(bound),
-				$P(scale),
-				$P(fx),
-				$P(gx),
-				$P(hx),
-				$P(iv),
-				&$SIZE(n),
-				&$SIZE(p),
-				&$SIZE(q),
-				&$SIZE(m),
-				$P(v),
-				$P(x));
-			if($iv(p=>0) == 1 )
-			{
-				pdl4_function    = $COMP(min_func);
-				$TFD(f,d)pdl4_wrapper(1, $P(fx),
-					$SIZE(m), $P(x),
-					$SIZE(p), $P(iv),
-					$SIZE(q), $P(v));
-			}
-			else if($iv(p=>0) == 2 )
-			{
-				pdl4_function    = $COMP(grad_func);
-				$TFD(f,d)pdl4_wrapper($SIZE(m), $P(gx),
-					$SIZE(m), $P(x),
-					$SIZE(p), $P(iv),
-					$SIZE(q), $P(v));
-				pdl4_function    = $COMP(hess_func);
-				$TFD(f,d)pdl4_wrapper($SIZE(n), $P(hx),
-					$SIZE(m), $P(x),
-					$SIZE(p), $P(iv),
-					$SIZE(q), $P(v));
-			}
-		}while($iv(p=>0) <= 2 );
-
-
-',
-	Doc =>'
+    Pars => '[io,phys]fx(); [io,phys]gx(m); [io,phys] hx(n);[io,phys]x(m);[phys]bound(2,m);[io,phys]scale(m);int [io,phys]iv(p);[io,phys]v(q)',
+    OtherPars => "SV* min_func; SV* grad_func; SV* hess_func" ,
+    GenericTypes => ['F','D'],
+    Code => pp_line_numbers(__LINE__, <<'EOF'),
+        extern void $TFD(,d)PDL_FORTRAN(rmnhb)($GENERIC() *bound, $GENERIC() *d, $GENERIC() *fx, $GENERIC() *g, $GENERIC() *h, integer *iv, PDL_Indx *lh,
+        PDL_Indx *liv,PDL_Indx *lv, PDL_Indx *n, $GENERIC() *v, $GENERIC()*x);
+        do{
+            $TFD(,d)PDL_FORTRAN(rmnhb)(
+                $P(bound),
+                $P(scale),
+                $P(fx),
+                $P(gx),
+                $P(hx),
+                $P(iv),
+                &$SIZE(n),
+                &$SIZE(p),
+                &$SIZE(q),
+                &$SIZE(m),
+                $P(v),
+                $P(x));
+            if($iv(p=>0) == 1 )
+            {
+                pdl4_function    = $COMP(min_func);
+                $TFD(f,d)pdl4_wrapper(1, $P(fx),
+                    $SIZE(m), $P(x),
+                    $SIZE(p), $P(iv),
+                    $SIZE(q), $P(v));
+            }
+            else if($iv(p=>0) == 2 )
+            {
+                pdl4_function    = $COMP(grad_func);
+                $TFD(f,d)pdl4_wrapper($SIZE(m), $P(gx),
+                    $SIZE(m), $P(x),
+                    $SIZE(p), $P(iv),
+                    $SIZE(q), $P(v));
+                pdl4_function    = $COMP(hess_func);
+                $TFD(f,d)pdl4_wrapper($SIZE(n), $P(hx),
+                    $SIZE(m), $P(x),
+                    $SIZE(p), $P(iv),
+                    $SIZE(q), $P(v));
+            }
+        }while($iv(p=>0) <= 2 );
+EOF
+    Doc =>'
 
 =for ref
 
 Given a function f of p variables, attempt to find a p-vector x* that minimizes
 f(x) with user computed hessian and gradient.
 
-	fx:	Objective function value f(x).
-	gx:	Gradient vector g(x).
-	hx:	Vector that contains lower triangle of the Hessian matrix H(x), stored rowwise.
-	x:      Parameter vector.
-	bound:	Lower and upper bound stored columnwise.
-	scale:	Scale vector such that |$scale(i) * $x(i)| are all in comparable unit.
-	iv:	Working and parameter array.
-	v:	Working and parameter array.
-	min_func:
-		parameter: PDL(fx), PDL(x)
-	grad_func:
-		parameter PDL(gx), PDL(x)
-	hess_func:
-		parameter PDL(hx), PDL(x)
+    fx:	Objective function value f(x).
+    gx:	Gradient vector g(x).
+    hx:	Vector that contains lower triangle of the Hessian matrix H(x), stored rowwise.
+    x:      Parameter vector.
+    bound:	Lower and upper bound stored columnwise.
+    scale:	Scale vector such that |$scale(i) * $x(i)| are all in comparable unit.
+    iv:	Working and parameter array.
+    v:	Working and parameter array.
+    min_func:
+        parameter: PDL(fx), PDL(x)
+    grad_func:
+        parameter PDL(gx), PDL(x)
+    hess_func:
+        parameter PDL(hx), PDL(x)
 
 =for example
 
-	$x = random(5);
-	$fx = pdl(0);
-	$hx = zeroes( 5 *(5+1)/2 );
-	$bounds = zeroes(2,5);
-	$bounds(0,).= 0;
-	$bounds(1,).= 5;
-	$v = zeroes(78 + 5 * (5+27)/2 );
-	$iv = zeroes(long, 59 + 3*5);
-	ivset(2,$iv,$v);
-	$scale = ones(5);
+    $x = random(5);
+    $fx = pdl(0);
+    $hx = zeroes( 5 *(5+1)/2 );
+    $bounds = zeroes(2,5);
+    $bounds(0,).= 0;
+    $bounds(1,).= 5;
+    $v = zeroes(78 + 5 * (5+27)/2 );
+    $iv = zeroes(long, 59 + 3*5);
+    ivset(2,$iv,$v);
+    $scale = ones(5);
 
-	sub min_func{
-		my ($fx, $x) = @_;
-		$fx .= rosen($x);
-	}
-	sub grad_func{
-		my ($gx, $x) = @_;
-		$gx .= rosen_grad($x);
-	}
-	sub hess_func{
-		my ($hx, $x) = @_;
-		rosen_hess($x,1)->squaretotri($hx);
-	}
-	rmnhb($fx, $gx, $hx, $x, $bounds, $scale, $iv, $v, \&min_func, \&grad_func, \&hess_func);
+    sub min_func{
+        my ($fx, $x) = @_;
+        $fx .= rosen($x);
+    }
+    sub grad_func{
+        my ($gx, $x) = @_;
+        $gx .= rosen_grad($x);
+    }
+    sub hess_func{
+        my ($hx, $x) = @_;
+        rosen_hess($x,1)->squaretotri($hx);
+    }
+    rmnhb($fx, $gx, $hx, $x, $bounds, $scale, $iv, $v, \&min_func, \&grad_func, \&hess_func);
 ');
 }
 
@@ -869,63 +853,55 @@ void tensor_hess_wrapper(integer *nr, integer *n, double *x, double *hx);
 
 pp_def("tensoropt",
        HandleBad => 0,
-	Pars => '[io,phys]fx();[io,phys]gx(n);[io,phys]hx(n,n);[io,phys]x(n);int [phys]method();int [io,phys]maxit();int [phys]digits();int [phys]gtype();int [phys] htype();[phys]fscale();[phys]typx(n);[phys]stepmx();[phys]xtol();[phys]gtol();int [phys]print();int [io,phys]ipr()',
-	OtherPars => "SV* f_func;SV* g_func;SV* h_func" ,
-	GenericTypes => ['D'],
-	Code =>'
-		integer it, *iwork,i;
-		$GENERIC() *work, *xtmp;
-		extern int PDL_FORTRAN(tensor)(PDL_Indx *nr, PDL_Indx *n, $GENERIC() *x, paramv fcn,
-		paramv grd, paramv hsn, $GENERIC() *typx, $GENERIC() *fscale, $GENERIC()
-		*gradtl, $GENERIC() *steptl, integer *itnlim, $GENERIC() *stepmx,
-		integer *ipr, integer *method, integer *grdflg, integer *hesflg,
-		integer *ndigit, integer *msg, $GENERIC() *xpls, $GENERIC() *fpls,
-		$GENERIC() *gpls, $GENERIC() *h__, integer *itnno, $GENERIC() *wrk,
-		integer *iwrk);
+    Pars => '[io,phys]fx();[io,phys]gx(n);[io,phys]hx(n,n);[io,phys]x(n);int [phys]method();int [io,phys]maxit();int [phys]digits();int [phys]gtype();int [phys] htype();[phys]fscale();[phys]typx(n);[phys]stepmx();[phys]xtol();[phys]gtol();int [phys]print();int [io,phys]ipr();
+      int [t] iwork(n); [t] work(nwork=CALC(8*$SIZE(n))); [t] xtmp(n)',
+    OtherPars => "SV* f_func;SV* g_func;SV* h_func" ,
+    GenericTypes => ['D'],
+    Code => pp_line_numbers(__LINE__, <<'EOF'),
+        integer it;
+        extern int PDL_FORTRAN(tensor)(PDL_Indx *nr, PDL_Indx *n, $GENERIC() *x, paramv fcn,
+        paramv grd, paramv hsn, $GENERIC() *typx, $GENERIC() *fscale, $GENERIC()
+        *gradtl, $GENERIC() *steptl, integer *itnlim, $GENERIC() *stepmx,
+        integer *ipr, integer *method, integer *grdflg, integer *hesflg,
+        integer *ndigit, integer *msg, $GENERIC() *xpls, $GENERIC() *fpls,
+        $GENERIC() *gpls, $GENERIC() *h__, integer *itnno, $GENERIC() *wrk,
+        integer *iwrk);
 
-		tensor_f_function = $COMP(f_func);
-		tensor_grad_function = $COMP(g_func);
-		tensor_hess_function = $COMP(h_func);
+        tensor_f_function = $COMP(f_func);
+        tensor_grad_function = $COMP(g_func);
+        tensor_hess_function = $COMP(h_func);
 
-		iwork = (integer * ) malloc ( $SIZE(n) * sizeof(integer));
-		work = ($GENERIC() * ) malloc ( ($SIZE(n) * 8) * sizeof($GENERIC()));
-		xtmp = ($GENERIC() * ) malloc ( $SIZE(n) * sizeof($GENERIC()));
+        PDL_FORTRAN(tensor)(
+        &$SIZE(n),
+        &$SIZE(n),
+        $P(x),
+        tensor_f_wrapper,
+        tensor_grad_wrapper,
+        tensor_hess_wrapper,
+        $P(typx),
+        $P(fscale),
+        $P(gtol),
+        $P(xtol),
+        $P(maxit),
+        $P(stepmx),
+        $P(ipr),
+        $P(method),
+        $P(gtype),
+        $P(htype),
+        $P(digits),
+        $P(print),
+        $P(xtmp),
+        $P(fx),
+        $P(gx),
+        $P(hx),
+        &it,
+        $P(work),
+        $P(iwork));
 
-		PDL_FORTRAN(tensor)(
-		&$SIZE(n),
-		&$SIZE(n),
-		$P(x),
-		tensor_f_wrapper,
-		tensor_grad_wrapper,
-		tensor_hess_wrapper,
-		$P(typx),
-		$P(fscale),
-		$P(gtol),
-		$P(xtol),
-		$P(maxit),
-		$P(stepmx),
-		$P(ipr),
-		$P(method),
-		$P(gtype),
-		$P(htype),
-		$P(digits),
-		$P(print),
-		xtmp,
-		$P(fx),
-		$P(gx),
-		$P(hx),
-		&it,
-		work,
-		iwork);
-
-		for (i = 0; i < $SIZE(n); i++)
-			$x(n=>i) = xtmp[i];
-		$maxit()=it;
-		free(work);
-		free(iwork);
-		free(xtmp);
-',
-	Doc =>'
+        loop (n) %{ $x() = $xtmp(); %}
+        $maxit() = it;
+EOF
+    Doc =>'
 
 =for ref
 
@@ -944,64 +920,64 @@ matrix.
 
 parameters:
 
-	fx      --> function value and final function value
-	gx(n)   <-- current gradient and gradient at final point
-	hx(n,n) --> hessian
-	x(n)    --> initial guess (input) and final point
-	method  --> if value is 0 then use only newton step at
-		    each iteration, if value is 1 then try both
-		    tensor and newton steps at each iteration
-	maxit   <-- iteration limit and final number of iterations
-	digits  --> number of good digits in optimization function fcn
-	gtype   --> = 0: gradient computed by finite difference
-		      1: analytical gradient supplied is checked
-		      2: analytical gradient supplied
-	htype   --> = 0: hessian computed by finite difference
-		      1: analytical hessian supplied is checked
-		      2: analytical hessian supplied
-	fscale  --> estimate of scale of objective function fcn
-	typx(n) --> typical size of each component of x
-	stepmx  --> maximum step length allowed
-	xtol    --> step tolerance
-	gtol    --> gradient tolerance
-	ipr     --> output unit number
-	print   --> output message control
-	f_func:
-		parameter: PDL(fx), PDL(x)
-	g_func:
-		parameter PDL(gx), PDL(x)
-	h_func:
-		parameter PDL(hx), PDL(x)
+    fx      --> function value and final function value
+    gx(n)   <-- current gradient and gradient at final point
+    hx(n,n) --> hessian
+    x(n)    --> initial guess (input) and final point
+    method  --> if value is 0 then use only newton step at
+            each iteration, if value is 1 then try both
+            tensor and newton steps at each iteration
+    maxit   <-- iteration limit and final number of iterations
+    digits  --> number of good digits in optimization function fcn
+    gtype   --> = 0: gradient computed by finite difference
+              1: analytical gradient supplied is checked
+              2: analytical gradient supplied
+    htype   --> = 0: hessian computed by finite difference
+              1: analytical hessian supplied is checked
+              2: analytical hessian supplied
+    fscale  --> estimate of scale of objective function fcn
+    typx(n) --> typical size of each component of x
+    stepmx  --> maximum step length allowed
+    xtol    --> step tolerance
+    gtol    --> gradient tolerance
+    ipr     --> output unit number
+    print   --> output message control
+    f_func:
+        parameter: PDL(fx), PDL(x)
+    g_func:
+        parameter PDL(gx), PDL(x)
+    h_func:
+        parameter PDL(hx), PDL(x)
 
 =for example
 
-	$x = random(5);
-	$gx = rosen_grad($x);
-	$hx = rosen_hess($x);
-	$fx = rosen($x);
+    $x = random(5);
+    $gx = rosen_grad($x);
+    $hx = rosen_hess($x);
+    $fx = rosen($x);
 
-	$xtol = pdl(1e-16);
-	$gtol = pdl(1e-8);
+    $xtol = pdl(1e-16);
+    $gtol = pdl(1e-8);
 
-	$stepmx =pdl(0.5);
-	$maxit = pdl(long, 50);
+    $stepmx =pdl(0.5);
+    $maxit = pdl(long, 50);
 
-	sub min_func{
-		my ($fx, $x) = @_;
-		$fx .= rosen($x);
-	}
-	sub grad_func{
-		my ($gx, $x) = @_;
-		$gx .= rosen_grad($x);
-	}
-	sub hess_func{
-		my ($hx, $x) = @_;
-		$hx .= rosen_hess($x);
-	}
-	tensoropt($fx, $gx, $hx, $x,
-		1,$maxit,15,1,2,1,
-		ones(5),0.5,$xtol,$gtol,2,6,
-		\&min_func, \&grad_func, \&hess_func);
+    sub min_func{
+        my ($fx, $x) = @_;
+        $fx .= rosen($x);
+    }
+    sub grad_func{
+        my ($gx, $x) = @_;
+        $gx .= rosen_grad($x);
+    }
+    sub hess_func{
+        my ($hx, $x) = @_;
+        $hx .= rosen_hess($x);
+    }
+    tensoropt($fx, $gx, $hx, $x,
+        1,$maxit,15,1,2,1,
+        ones(5),0.5,$xtol,$gtol,2,6,
+        \&min_func, \&grad_func, \&hess_func);
 
 
 ');
@@ -1015,71 +991,69 @@ int lbfgs_diag_wrapper(PDL_Indx n, double *a, double *b, SV *lbfgs_diag_func);
 
 pp_def("lbfgs",
        HandleBad => 0,
-	Pars => '[io,phys]fx(); [io,phys]gx(n); [io,phys]x(n);[io,phys]diag(n);int [phys]diagco();int [phys]m();int [io,phys]maxit();int [io,phys]maxfc();[phys]eps();[phys]xtol();[phys]gtol();int [phys]print(2);int [io,phys]info()',
-	OtherPars => "SV* fg_func;SV* diag_func" ,
-	GenericTypes => ['D'],
-	Code =>'
+    Pars => '[io,phys]fx(); [io,phys]gx(n); [io,phys]x(n);[io,phys]diag(n);int [phys]diagco();int [phys]m();int [io,phys]maxit();int [io,phys]maxfc();[phys]eps();[phys]xtol();[phys]gtol();int [phys]print(2);int [io,phys]info()',
+    OtherPars => "SV* fg_func;SV* diag_func" ,
+    GenericTypes => ['D'],
+    Code => pp_line_numbers(__LINE__, <<'EOF'),
+    $GENERIC() *w;
+    integer i,stop;
+    extern int PDL_FORTRAN(lbfgs)(PDL_Indx *n, integer *m, $GENERIC() *x, $GENERIC()
+    *f, $GENERIC() *g, logical *diagco, $GENERIC() *diag, integer *maxit,integer *iprint,
+     $GENERIC() *eps, $GENERIC() *xtol, $GENERIC() *gtol,$GENERIC() *w, integer *iflag);
+    w = ($GENERIC() * ) malloc ( ($SIZE(n) * (2*$m() +1)+ 2*$m())* sizeof($GENERIC()));
+    stop = 0;
 
-	$GENERIC() *w;
-	integer i,stop;
-	extern int PDL_FORTRAN(lbfgs)(PDL_Indx *n, integer *m, $GENERIC() *x, $GENERIC()
-	*f, $GENERIC() *g, logical *diagco, $GENERIC() *diag, integer *maxit,integer *iprint,
-	 $GENERIC() *eps, $GENERIC() *xtol, $GENERIC() *gtol,$GENERIC() *w, integer *iflag);
-	w = ($GENERIC() * ) malloc ( ($SIZE(n) * (2*$m() +1)+ 2*$m())* sizeof($GENERIC()));
-	stop = 0;
+    for (i = 1 ; i < $maxfc(); )
+    {
+            PDL_FORTRAN(lbfgs)(
+            &$SIZE(n),
+            $P(m),
+            $P(x),
+            $P(fx),
+            $P(gx),
+            $P(diagco),
+            $P(diag),
+            $P(print),
+            $P(maxit),
+            $P(eps),
+            $P(xtol),
+            $P(gtol),
+            w,
+            $P(info)
+            );
+            switch($info())
+            {
+        
+                 case 1:	stop = lbfgs_wrapper($SIZE(n),$P(fx), $P(gx),$P(x), $COMP(fg_func));
+                        if (stop != 0)
+                        {
+                            $info() = -3;
+                            goto end;
+                        }
+                        i++;
+                        break;
+            
+                 case 2:        stop = lbfgs_diag_wrapper($SIZE(n),$P(diag), $P(x), $COMP(diag_func));
+                        if (stop != 0)
+                        {
+                            $info() = -3;
+                            goto end;
+                        }
+                        break;
 
-	for (i = 1 ; i < $maxfc(); )
-	{
-			PDL_FORTRAN(lbfgs)(
-			&$SIZE(n),
-			$P(m),
-			$P(x),
-			$P(fx),
-			$P(gx),
-			$P(diagco),
-			$P(diag),
-			$P(print),
-			$P(maxit),
-			$P(eps),
-			$P(xtol),
-			$P(gtol),
-			w,
-			$P(info)
-			);
-			switch($info())
-			{
-		
-				 case 1:	stop = lbfgs_wrapper($SIZE(n),$P(fx), $P(gx),$P(x), $COMP(fg_func));
-						if (stop != 0)
-						{
-							$info() = -3;
-							goto end;
-						}
-						i++;
-						break;
-			
-				 case 2:        stop = lbfgs_diag_wrapper($SIZE(n),$P(diag), $P(x), $COMP(diag_func));
-						if (stop != 0)
-						{
-							$info() = -3;
-							goto end;
-						}
-						break;
-
-				 default:       goto end;
-			}
-	}
+                 default:       goto end;
+            }
+    }
 end:
-	$maxfc() = i;
-	free(w);	
-',
-	Doc =>'
-
+    $maxfc() = i;
+    free(w);	
+EOF
+    Doc => <<'EOF',
 =for ref
 
 This subroutine solves the unconstrained minimization problem
 
-		min f(x),    x= (x1,x2,...,xn),
+        min f(x),    x= (x1,x2,...,xn),
 
 using the limited memory bfgs method. The routine is especially
 effective on problems involving a large number of variables. In
@@ -1097,7 +1071,6 @@ The steplength is determined at each iteration by means of the
 line search routine mcvsrch, which is a slight modification of
 the routine csrch written by Moré and Thuente.
 
-
       where
 
      m       The number of corrections used in the bfgs update. it
@@ -1107,8 +1080,8 @@ the routine csrch written by Moré and Thuente.
 
      x       On initial entry, it must be set by the user to the values
              of the initial estimate of the solution vector.
-	     On exit with info=0, it contains the values of the variables
-	     at the best point found (usually a solution).
+         On exit with info=0, it contains the values of the variables
+         at the best point found (usually a solution).
 
      f       is a double precision variable. before initial entry and on
              a re-entry with info=1, it must be set by the user to
@@ -1150,10 +1123,10 @@ the routine csrch written by Moré and Thuente.
                 print(2) = 3 : same as print(2)=2, plus gradient vector.
 
      maxit   On entry maximum number of iteration.
-	     On exit, the number of iteration.
+         On exit, the number of iteration.
 
      maxfc   On entry maximum number of function evaluation.
-	     On exit, the number of function evaluation.
+         On exit, the number of function evaluation.
 
      eps     is a positive double precision variable that must be set by
              the user, and determines the accuracy with which the solution
@@ -1170,16 +1143,16 @@ the routine csrch written by Moré and Thuente.
              is less than xtol.
 
      gtol    is a double precision variable which controls the accuracy of
-	     the line search routine mcsrch. If the function and gradient
+         the line search routine mcsrch. If the function and gradient
              evaluations are inexpensive with respect to the cost of the
-	     iteration (which is sometimes the case when solving very large
-	     problems) it may be advantageous to set gtol to a small value.
-	     A typical small value is 0.1. It\'s set to 0.9 if gtol < 1.d-04.
-	     restriction: gtol should be greater than 1.d-04.
+         iteration (which is sometimes the case when solving very large
+         problems) it may be advantageous to set gtol to a small value.
+         A typical small value is 0.1. It's set to 0.9 if gtol < 1.d-04.
+         restriction: gtol should be greater than 1.d-04.
 
      info    is an integer variable that must be set to 0 on initial entry
              to the subroutine. A return with info < 0 or info > 2 indicates
-	     an error.
+         an error.
              The following values of info, detecting an error,
              are possible:
 
@@ -1211,37 +1184,37 @@ the routine csrch written by Moré and Thuente.
 
                        info = 8  improper input parameters.
 
-	fg_func:
-		stop = fg_func PDL(fx), PDL(gx), PDL(x)
+    fg_func:
+        stop = fg_func PDL(fx), PDL(gx), PDL(x)
 
 =for example
 
-	$x = random(5);
-	$gx = rosen_grad($x);
-	$fx = rosen($x);
-	$diag = zeroes(5);
-	
-	$xtol = pdl(1e-16);
-	$gtol = pdl(0.9);
-	$eps = pdl(1e-10);
-	$print = ones(2);
-	$maxfc = pdl(long,100);
-	$maxit = pdl(long,50);
-	$info = pdl(long,0);
-	$diagco= pdl(long,0);
-	$m = pdl(long,10);
+    $x = random(5);
+    $gx = rosen_grad($x);
+    $fx = rosen($x);
+    $diag = zeroes(5);
+    
+    $xtol = pdl(1e-16);
+    $gtol = pdl(0.9);
+    $eps = pdl(1e-10);
+    $print = ones(2);
+    $maxfc = pdl(long,100);
+    $maxit = pdl(long,50);
+    $info = pdl(long,0);
+    $diagco= pdl(long,0);
+    $m = pdl(long,10);
 
-	sub fdiag{};
-	sub fg_func{
-		my ($f, $g, $x) = @_;
-		$f .= rosen($x);
-		$g .= rosen_grad($x);
-		return 0;
-	}
-	lbfgs($fx, $gx, $x, $diag, $diagco, $m, $maxit, $maxfc, $eps, $xtol, $gtol,
-		$print,$info,\&fg_func,\&fdiag);
-
-');
+    sub fdiag{};
+    sub fg_func{
+        my ($f, $g, $x) = @_;
+        $f .= rosen($x);
+        $g .= rosen_grad($x);
+        return 0;
+    }
+    lbfgs($fx, $gx, $x, $diag, $diagco, $m, $maxit, $maxfc, $eps, $xtol, $gtol,
+        $print,$info,\&fg_func,\&fdiag);
+EOF
+);
 
 pp_addhdr('
 int lbfgsb_wrapper(PDL_Indx n , double *a, double *b, double *c, integer *d, double *e, SV *lbfgsb_func);
@@ -1249,91 +1222,87 @@ int lbfgsb_wrapper(PDL_Indx n , double *a, double *b, double *c, integer *d, dou
 
 pp_def("lbfgsb",
        HandleBad => 0,
-	Pars => '[io,phys]fx(); [io,phys]gx(n); [io,phys]x(n);int [phys]m();[phys]bound(n,m=2);int [phys]tbound(n);int [io]maxit();[phys]factr();[phys]pgtol();[phys]gtol();int [phys]print(2);int [io,phys]info();int [o,phys]iv(p=44);[o,phys]v(q=29)',
-	OtherPars => "SV* fg_func",
-	GenericTypes => ['D'],
-	Code =>'
+    Pars => '[io,phys]fx(); [io,phys]gx(n); [io,phys]x(n);int [phys]m();[phys]bound(n,m=2);int [phys]tbound(n);int [io]maxit();[phys]factr();[phys]pgtol();[phys]gtol();int [phys]print(2);int [io,phys]info();int [o,phys]iv(p=44);[o,phys]v(q=29);
+      int [t] iwa(niwa=CALC(3*$SIZE(n)))',
+    OtherPars => "SV* fg_func",
+    GenericTypes => ['D'],
+    Code => pp_line_numbers(__LINE__, <<'EOF'),
+    int stop;
+    char csave[60];
+    char task[60];
+    integer lsave[4];
+    $GENERIC() *wa;
+    integer i;
+    extern void PDL_FORTRAN(setulb)(PDL_Indx *n, integer *m, $GENERIC() *x, $GENERIC() *l, $GENERIC() *u,
+        integer *nbd, $GENERIC() *f, $GENERIC() *g, $GENERIC() *factr, $GENERIC() *pgtol, $GENERIC() *gtol,
+        $GENERIC() *wa,integer *iwa, char *task, integer *iprint, char *csave, integer *lsave,
+        integer *isave, $GENERIC() *dsave);
 
-	int stop;
-	char csave[60];
-	char task[60];
-	integer lsave[4];
-	$GENERIC() *wa;
-	integer *iwa;
-	integer i;
-	extern void PDL_FORTRAN(setulb)(PDL_Indx *n, integer *m, $GENERIC() *x, $GENERIC() *l, $GENERIC() *u,
-		integer *nbd, $GENERIC() *f, $GENERIC() *g, $GENERIC() *factr, $GENERIC() *pgtol, $GENERIC() *gtol,
-		$GENERIC() *wa,integer *iwa, char *task, integer *iprint, char *csave, integer *lsave,
-		integer *isave, $GENERIC() *dsave);
+    strcpy(task, "START");
+    //TODO
+    memset(task+5, ' ', sizeof(task)-5);
+    wa = ($GENERIC() * ) malloc ((2*$m()*$SIZE(n)+4*$SIZE(n)+12*$m()*$m()+12*$m())* sizeof($GENERIC()));
+    i = 0;
 
+    while(1)
+    {
+            PDL_FORTRAN(setulb)(
+            &$SIZE(n),
+            $P(m),
+            $P(x),
+            &$bound(n=>0,m=>0),
+            &$bound(n=>0,m=>1),
+            $P(tbound),
+            $P(fx),
+            $P(gx),
+            $P(factr),
+            $P(pgtol),
+            $P(gtol),
+            wa,
+            $P(iwa),
+            &task[0],
+            $P(print),
+            &csave[0],
+            &lsave[0],
+            $P(iv),
+            $P(v)
+            );
+            switch(task[0])
+            {
+        
+                 case 'C':	/*CONV*/
+                        goto end;
+            
+                 case 'F':	/*FG*/
+                        stop = lbfgsb_wrapper($SIZE(n), $P(fx), $P(gx), $P(x), $P(iv), $P(v), $COMP(fg_func));
+                        if (stop == -1)
+                            strcpy(task, "STOP  CPU, REQUESTED BY USER.");
+                        break;
+            
+                 case 'N':	/*NEW_X*/
+                        if (stop == 1)
+                            strcpy(task, "STOP REQUESTED BY USER");
+                        if( i >= ($maxit()-1) )
+                            strcpy(task, "STOP: ITERATION LIMIT");
+                        i++;
+                        break;
 
-	strcpy(task, "START");
-	//TODO
-	memset(task+5, \' \', sizeof(task)-5);
-	iwa = (integer * ) malloc ( 3 * $SIZE(n)   * sizeof(integer));
-	wa = ($GENERIC() * ) malloc ((2*$m()*$SIZE(n)+4*$SIZE(n)+12*$m()*$m()+12*$m())* sizeof($GENERIC()));
-	i = 0;
+                 case 'S':	/*STOP*/
+                        goto end;
 
-	while(1)
-	{
-			PDL_FORTRAN(setulb)(
-			&$SIZE(n),
-			$P(m),
-			$P(x),
-			&$bound(n=>0,m=>0),
-			&$bound(n=>0,m=>1),
-			$P(tbound),
-			$P(fx),
-			$P(gx),
-			$P(factr),
-			$P(pgtol),
-			$P(gtol),
-			wa,
-			iwa,
-			&task[0],
-			$P(print),
-			&csave[0],
-			&lsave[0],
-			$P(iv),
-			$P(v)
-			);
-			switch(task[0])
-			{
-		
-				 case \'C\':	/*CONV*/
-						goto end;
-			
-				 case \'F\':	/*FG*/
-						stop = lbfgsb_wrapper($SIZE(n), $P(fx), $P(gx), $P(x), $P(iv), $P(v), $COMP(fg_func));
-						if (stop == -1)
-							strcpy(task, "STOP  CPU, REQUESTED BY USER.");
-						break;
-			
-				 case \'N\':	/*NEW_X*/
-						if (stop == 1)
-							strcpy(task, "STOP REQUESTED BY USER");
-						if( i >= ($maxit()-1) )
-							strcpy(task, "STOP: ITERATION LIMIT");
-						i++;
-						break;
-
-				 case \'S\':	/*STOP*/
-						goto end;
-
-				 case \'A\':	/*ABNO*/
-						$info() = -1;
-						goto end;
-				 default:       /*ERROR*/
-						$info() = -2;
-						goto end;
-			}
-	}		
+                 case 'A':	/*ABNO*/
+                        $info() = -1;
+                        goto end;
+                 default:       /*ERROR*/
+                        $info() = -2;
+                        goto end;
+            }
+    }		
 end:
-	 $maxit() = i;
-	 free(iwa);
-	 free(wa);	
-',
-	Doc =>'
+     $maxit() = i;
+     free(wa);	
+EOF
+    Doc =>'
 
 =for ref
 
@@ -1347,71 +1316,71 @@ It uses the limited memory BFGS method.
 (The direct method will be used in the subspace minimization.)
 
      x
-	is a double precision array of dimension n.
-	On entry x is an approximation to the solution.
-	On exit x is the current approximation.
+    is a double precision array of dimension n.
+    On entry x is an approximation to the solution.
+    On exit x is the current approximation.
 
      m
-	On entry m is the maximum number of variable metric corrections
+    On entry m is the maximum number of variable metric corrections
         used to define the limited memory matrix.
         On exit m is unchanged.
 
      bound(n,2)
-	On entry bound(,0) is the lower bound on x.
-	On entry bound(,1) is the upper bound on x.
-	On exit bound(n,2) is unchanged.
+    On entry bound(,0) is the lower bound on x.
+    On entry bound(,1) is the upper bound on x.
+    On exit bound(n,2) is unchanged.
 
      tbound(n)
-	On entry nbd represents the type of bounds imposed on the
-	variables, and must be specified as follows:
-	nbd(i)=0 if x(i) is unbounded,
+    On entry nbd represents the type of bounds imposed on the
+    variables, and must be specified as follows:
+    nbd(i)=0 if x(i) is unbounded,
                 1 if x(i) has only a lower bound,
                 2 if x(i) has both lower and upper bounds, and
                 3 if x(i) has only an upper bound.
-	On exit nbd is unchanged.
+    On exit nbd is unchanged.
 
      fx
-	On first entry f is unspecified.
-	On final exit f is the value of the function at x.
+    On first entry f is unspecified.
+    On final exit f is the value of the function at x.
 
      gx(n)
-	On first entry g is unspecified.
-	On final exit g is the value of the gradient at x.
+    On first entry g is unspecified.
+    On final exit g is the value of the gradient at x.
 
      maxit
-	On entry maximum number of iteration.
-	On exit, the number of iteration
+    On entry maximum number of iteration.
+    On exit, the number of iteration
 
      factr
-	On entry factr >= 0 is specified by the user.  The iteration
+    On entry factr >= 0 is specified by the user.  The iteration
         will stop when
 
-	(f^k - f^{k+1})/max{|f^k|,|f^{k+1}|,1} <= factr*epsmch
+    (f^k - f^{k+1})/max{|f^k|,|f^{k+1}|,1} <= factr*epsmch
 
-	where epsmch is the machine precision, which is automatically
-	generated by the code. Typical values for factr: 1.d+12 for
-	low accuracy; 1.d+7 for moderate accuracy; 1.d+1 for extremely
-	high accuracy.
+    where epsmch is the machine precision, which is automatically
+    generated by the code. Typical values for factr: 1.d+12 for
+    low accuracy; 1.d+7 for moderate accuracy; 1.d+1 for extremely
+    high accuracy.
 
      pgtol
-	On entry pgtol >= 0 is specified by the user.  The iteration
-	will stop when
+    On entry pgtol >= 0 is specified by the user.  The iteration
+    will stop when
 
-	max{|proj g_i | i = 1, ..., n} <= pgtol
+    max{|proj g_i | i = 1, ..., n} <= pgtol
 
-	where pg_i is the ith component of the projected gradient.
+    where pg_i is the ith component of the projected gradient.
 
      gtol
-	Controls the accuracy of the line search routine mcsrch.
-	If the function and gradient evaluations are inexpensive with
-	respect to the cost of the iteration (which is sometimes the case
-	when solving very large problems) it may be advantageous to set
-	gtol to a small value. A typical small value is 0.1.
-	It\'s set to 0.9 if gtol < 1.d-04.
-	Restriction: gtol should be greater than 1.d-04.
+    Controls the accuracy of the line search routine mcsrch.
+    If the function and gradient evaluations are inexpensive with
+    respect to the cost of the iteration (which is sometimes the case
+    when solving very large problems) it may be advantageous to set
+    gtol to a small value. A typical small value is 0.1.
+    It\'s set to 0.9 if gtol < 1.d-04.
+    Restriction: gtol should be greater than 1.d-04.
 
      print
-	Controls the frequency and type of output generated:
+    Controls the frequency and type of output generated:
          print[0] < 0      no output is generated;
          print[0] = 0      print only one line at the last iteration;
          0 < print[0] < 99 print also f and |proj g| every iprint iterations;
@@ -1421,18 +1390,18 @@ It uses the limited memory BFGS method.
          When print[1] > 0, the file iterate.dat will be created to
                         summarize the iteration.
      info
-	On entry 0,
-	On exit, contain error code:
-	  0 : no error
-	  -1: the routine has terminated abnormally
+    On entry 0,
+    On exit, contain error code:
+      0 : no error
+      -1: the routine has terminated abnormally
               without being able to satisfy the termination conditions,
               x contains the best approximation found,
               f and g contain f(x) and g(x) respectively
           -2: the routine has detected an error in the
               input parameters;
      iv(44)
-	On exit, at end of an iteration, the following information is
-	available:
+    On exit, at end of an iteration, the following information is
+    available:
          iv(21) = the total number of intervals explored in the
                          search of Cauchy points;
          iv(25) = the total number of skipped BFGS updates before
@@ -1456,7 +1425,7 @@ It uses the limited memory BFGS method.
                            active constraints in the current iteration;
          iv(40) = the number of variables entering the set of active
                          constraints in the current iteration.
-	else
+    else
 
          iv(29) = the current iteration number;
          iv(33) = the total number of function and gradient
@@ -1468,122 +1437,121 @@ It uses the limited memory BFGS method.
          iv(38) = the number of active constraints at the current
                          iteration
 
-     v(29)
-	On exit, at end of an iteration, the following information is
-	available:
-         v(0) = current \'theta\' in the BFGS matrix;
-         v(1) = f(x) in the previous iteration;
-         v(2) = factr*epsmch;
-         v(3) = 2-norm of the line search direction vector;
-         v(4) = the machine precision epsmch generated by the code;
-         v(6) = the accumulated time spent on searching for Cauchy points;
-         v(7) = the accumulated time spent on subspace minimization;
-         v(8) = the accumulated time spent on line search;
-         v(10) = the slope of the line search function at
-		 the current point of line search;
-         v(11) = the maximum relative step length imposed in line search;
-         v(12) = the infinity norm of the projected gradient;
-         v(13) = the relative step length in the line search;
-         v(14) = the slope of the line search function at the starting point of the line search;
-         v(15) = the square of the 2-norm of the line search direction vector.
+         v(29)  = On exit, at end of an iteration, the following information is
+                         available:
+           v(0) = current \'theta\' in the BFGS matrix;
+           v(1) = f(x) in the previous iteration;
+           v(2) = factr*epsmch;
+           v(3) = 2-norm of the line search direction vector;
+           v(4) = the machine precision epsmch generated by the code;
+           v(6) = the accumulated time spent on searching for Cauchy points;
+           v(7) = the accumulated time spent on subspace minimization;
+           v(8) = the accumulated time spent on line search;
+           v(10) = the slope of the line search function at
+                         the current point of line search;
+           v(11) = the maximum relative step length imposed in line search;
+           v(12) = the infinity norm of the projected gradient;
+           v(13) = the relative step length in the line search;
+           v(14) = the slope of the line search function at the starting point of the line search;
+           v(15) = the square of the 2-norm of the line search direction vector.
 
      scalar fg_func: computes the value(fx) and gradient(gx) of the function at x.
-		iv and v are also provided for info
-		param fx, gx, x, iv, v
-		return value
-		 -1 stop now and restore the information at
-		    the latest iterate
-		 0  continue
-		 1  last iteration
+        iv and v are also provided for info
+        param fx, gx, x, iv, v
+        return value
+         -1 stop now and restore the information at
+            the latest iterate
+         0  continue
+         1  last iteration
 
 
 
 =for example
 
-	# Global Optimization
-	# Try to solve (with threading)
-	# The SIAM 100-Digit Challenge problem 4
-	# see http://www-m8.ma.tum.de/m3/bornemann/challengebook/
-	# result: -3.30686864747523728007611377089851565716648236
-	use PDL::Opt::NonLinear;
-	use PDL::Stat::Distributions;
+    # Global Optimization
+    # Try to solve (with threading)
+    # The SIAM 100-Digit Challenge problem 4
+    # see http://www-m8.ma.tum.de/m3/bornemann/challengebook/
+    # result: -3.30686864747523728007611377089851565716648236
+    use PDL::NiceSlice;
+    use PDL::Opt::NonLinear;
 
-	$x = (random(2,500)-0.5)*2;
-	$gx = zeroes(2,500);
-	$fx = zeroes(500);
+    $x = (random(2,500)-0.5)*2;
+    $gx = zeroes(2,500);
+    $fx = zeroes(500);
 
-	$bounds =  zeroes(2,2);
-	$bounds(,0).= -1;
-	$bounds(,1).= 1;
+    $bounds =  zeroes(2,2);
+    $bounds(,0).= -1;
+    $bounds(,1).= 1;
 
-	$tbounds = zeroes(2);
-	$tbounds .= 2;
+    $tbounds = zeroes(2);
+    $tbounds .= 2;
 
-	$gtol = pdl(0.9);
-	$pgtol = pdl(1e-4);
+    $gtol = pdl(0.9);
+    $pgtol = pdl(1e-4);
 
-	$factr = pdl(10000);
-	$m = pdl(10);
+    $factr = pdl(10000);
+    $m = pdl(10);
 
-	$print = pdl([-1,0]);
+    $print = pdl([-1,0]);
 
-	$maxit = zeroes(long,500);
-	$maxit .= 200;
+    $maxit = zeroes(long,500);
+    $maxit .= 200;
 
-	$info = zeroes(long,500);
+    $info = zeroes(long,500);
 
-	$iv = zeroes(long,44,500);
-	$v = zeroes(29,500);
-	sub fg_func{
-		my ($f, $g, $x) = @_;
-	
-		$f.= exp(sin(50*$x(0)))+sin(60*exp($x(1)))+
-			sin(70*sin($x(0)))+sin(sin(80*$x(1)))-
-	sin(10*($x(0)+$x(1)))+($x(0)**2+$x(1)**2)/4;
+    $iv = zeroes(long,44,500);
+    $v = zeroes(29,500);
+    sub fg_func{
+        my ($f, $g, $x) = @_;
+    
+        $f.= exp(sin(50*$x(0)))+sin(60*exp($x(1)))+
+            sin(70*sin($x(0)))+sin(sin(80*$x(1)))-
+    sin(10*($x(0)+$x(1)))+($x(0)**2+$x(1)**2)/4;
 
-		$g(0) .= 50*cos(50*$x(0))* exp(sin(50*$x(0)))+
-	        70*cos(70*sin($x(0)))*cos($x(0))-
-	10*cos(10*$x(0)+10*$x(1))+1/2*$x(0);
+        $g(0) .= 50*cos(50*$x(0))* exp(sin(50*$x(0)))+
+            70*cos(70*sin($x(0)))*cos($x(0))-
+    10*cos(10*$x(0)+10*$x(1))+1/2*$x(0);
 
-		$g(1) .= 60*cos(60*exp($x(1)))* exp($x(1))+
-	        80*cos(sin(80*$x(1)))* cos(80*$x(1))-
-	10*cos(10*$x(0)+10*$x(1))+1/2*$x(1);
+        $g(1) .= 60*cos(60*exp($x(1)))* exp($x(1))+
+            80*cos(sin(80*$x(1)))* cos(80*$x(1))-
+    10*cos(10*$x(0)+10*$x(1))+1/2*$x(1);
 
-		return 0;
-	}
-	lbfgsb($fx, $gx, $x, $m, $bounds, $tbounds, $maxit, $factr, $pgtol, $gtol,
+        return 0;
+    }
+    lbfgsb($fx, $gx, $x, $m, $bounds, $tbounds, $maxit, $factr, $pgtol, $gtol,
                 $print, $info,$iv, $v,\&fg_func);
-	print $fx->min;
+    print $fx->min;
 
 
-	# Local Optimization
-	$x = random(5);
-	$gx = zeroes(5);
-	$fx = pdl(0);
-	
-	$bounds =  zeroes(5,2);
-	$bounds(,0).= -5;
-	$bounds(,1).= 5;
-	$tbounds = zeroes(5);
-	$tbounds .= 2;	
-	$gtol = pdl(0.9);
-	$pgtol = pdl(1e-10);
-	$factr = pdl(100);
-	$print = pdl(long, [1,0]);
-	$maxit = pdl(long,100);
-	$info = pdl(long,0);
-	$m = pdl(long,10);
-	$iv = zeroes(long,44);
-	$v = zeroes(29);
+    # Local Optimization
+    $x = random(5);
+    $gx = zeroes(5);
+    $fx = pdl(0);
+    
+    $bounds =  zeroes(5,2);
+    $bounds(,0).= -5;
+    $bounds(,1).= 5;
+    $tbounds = zeroes(5);
+    $tbounds .= 2;	
+    $gtol = pdl(0.9);
+    $pgtol = pdl(1e-10);
+    $factr = pdl(100);
+    $print = pdl(long, [1,0]);
+    $maxit = pdl(long,100);
+    $info = pdl(long,0);
+    $m = pdl(long,10);
+    $iv = zeroes(long,44);
+    $v = zeroes(29);
 
-	sub fg_func{
-		my ($f, $g, $x) = @_;
-		$f .= rosen($x);
-		$g .= rosen_grad($x);
-		return 0;
-	}
-	lbfgsb($fx, $gx, $x, $m, $bounds, $tbounds, $maxit, $factr, $pgtol, $gtol,
-		$print, $info,$iv, $v,\&fg_func);
+    sub fg_func{
+        my ($f, $g, $x) = @_;
+        $f .= rosen($x);
+        $g .= rosen_grad($x);
+        return 0;
+    }
+    lbfgsb($fx, $gx, $x, $m, $bounds, $tbounds, $maxit, $factr, $pgtol, $gtol,
+        $print, $info,$iv, $v,\&fg_func);
 
 ');
 
@@ -1597,44 +1565,42 @@ void npg_grad_wrapper(integer *n, double *x, double *g, integer *inform);
 
 pp_def("spg",
        HandleBad => 0,
-	Pars => '[io,phys]fx();[io,phys]x(n);int [io,phys]m();int [io,phys]maxit();int [phys]maxfc();[phys]eps1();[phys]eps2();int [phys]print();int [io,phys]fcnt();int [io,phys]gcnt();[io,phys]pginf();[io,phys]pgtwon();int [io,phys]info()',
-	OtherPars => "SV* min_func; SV* grad_func; SV* px_func" ,
-	GenericTypes => ['D'],
-	Code =>'
-		extern void PDL_FORTRAN(spg)(PDL_Indx *n, $GENERIC() *x, integer *m, $GENERIC() *eps, $GENERIC() *eps2,
-			integer *maxit, integer *maxfc, integer *output, $GENERIC()  *f, $GENERIC() *pginfn, $GENERIC() *pgtwon,
-	integer *iter, integer *fcnt, integer *gcnt, integer *flag, paramv *evalf, paramv *evalg, paramv *proj);
-		integer iter;
+    Pars => '[io,phys]fx();[io,phys]x(n);int [io,phys]m();int [io,phys]maxit();int [phys]maxfc();[phys]eps1();[phys]eps2();int [phys]print();int [io,phys]fcnt();int [io,phys]gcnt();[io,phys]pginf();[io,phys]pgtwon();int [io,phys]info()',
+    OtherPars => "SV* min_func; SV* grad_func; SV* px_func" ,
+    GenericTypes => ['D'],
+    Code => pp_line_numbers(__LINE__, <<'EOF'),
+        extern void PDL_FORTRAN(spg)(PDL_Indx *n, $GENERIC() *x, integer *m, $GENERIC() *eps, $GENERIC() *eps2,
+        integer *maxit, integer *maxfc, integer *output, $GENERIC()  *f, $GENERIC() *pginfn, $GENERIC() *pgtwon,
+        integer *iter, integer *fcnt, integer *gcnt, integer *flag, paramv evalf, paramv evalg, paramv proj);
+        integer iter;
 
-		npg_f_function    = $COMP(min_func);
-		npg_grad_function    = $COMP(grad_func);
-		npg_pgrad_function    = $COMP(px_func);
+        npg_f_function    = $COMP(min_func);
+        npg_grad_function    = $COMP(grad_func);
+        npg_pgrad_function    = $COMP(px_func);
 
-			PDL_FORTRAN(spg)(
-				&$SIZE(n),
-				$P(x),
-				$P(m),
-				$P(eps1),
-				$P(eps2),
-				$P(maxit),
-				$P(maxfc),
-				$P(print),
-				$P(fx),
-				$P(pginf),
-				$P(pgtwon),
-				&iter,
-				$P(fcnt),
-				$P(gcnt),
-				$P(info),
-				npg_f_wrapper,				
-				npg_grad_wrapper,
-				npg_pgrad_wrapper
-				);
-		$maxit() = iter;
-
-
-',
-	Doc =>'
+            PDL_FORTRAN(spg)(
+                &$SIZE(n),
+                $P(x),
+                $P(m),
+                $P(eps1),
+                $P(eps2),
+                $P(maxit),
+                $P(maxfc),
+                $P(print),
+                $P(fx),
+                $P(pginf),
+                $P(pgtwon),
+                &iter,
+                $P(fcnt),
+                $P(gcnt),
+                $P(info),
+                npg_f_wrapper,				
+                npg_grad_wrapper,
+                npg_pgrad_wrapper
+                );
+        $maxit() = iter;
+EOF
+    Doc =>'
 
 =for ref
 
@@ -1697,7 +1663,7 @@ Final revision 03 JUL 2001 by E.G.Birgin, J.M.Martinez and M.Raydan.
            ||projected grad||_2^2 at the final iteration,
 
      maxit
-	   number of iterations,
+       number of iterations,
 
      fcnt  number of function evaluations,
 
@@ -1713,51 +1679,51 @@ Final revision 03 JUL 2001 by E.G.Birgin, J.M.Martinez and M.Raydan.
            6= error in evalg subroutine.
 
      min_func:
-	   parameter: PDL(fx), PDL(x)
+       parameter: PDL(fx), PDL(x)
 
      grad_func:
-	   parameter: PDL(gx), PDL(x)
+       parameter: PDL(gx), PDL(x)
 
      px_func:
-	   parameter: PDL(x)
+       parameter: PDL(x)
 
 =for example
 
-	# Bounded example
-	$bounds = zeroes(5,2);
-	$bounds(,0) .= -5;
-	$bounds(,1) .= 5;	
-	$info = pdl(long,0);
-	$print = pdl(long,1);
-	$fcnt = pdl(long,0);
-	$gcnt = pdl(long,0);
-	$pginf = pdl(0);
-	$pgtwon = pdl(0);
-	$maxit = pdl(long , 500);
-	$maxfc = pdl(long , 1000);
-	$m = pdl(long , 100);
-	$eps1 = pdl(0);
-	$eps2 = pdl(1e-5);
-	$fx = pdl(0);
-	$a= random(5)
-	sub pgrad{
-		$x = shift;
-		$c = minimum transpose(cat $x, $bounds(,1));
-		$c = maximum transpose(cat $c, $bounds(,0));
-		$x .=$c;
-		return 0;
-	}
-	sub grad{
-		($aa, $bb) = @_;
-		$aa .= rosen_grad($bb);
-		return 0;
-	}
-	sub min_func{
-		($aa, $bb) = @_;
-		$aa .= rosen($bb);
-		return 0;
-	}
-	spg($fx, $a, $m, $maxit, $maxfc, $eps1, $eps2, $print, $fcnt, $gcnt, $pginf, $pgtwon, $info, \&min_func,\&grad, \&pgrad);
+    # Bounded example
+    $bounds = zeroes(5,2);
+    $bounds(,0) .= -5;
+    $bounds(,1) .= 5;	
+    $info = pdl(long,0);
+    $print = pdl(long,1);
+    $fcnt = pdl(long,0);
+    $gcnt = pdl(long,0);
+    $pginf = pdl(0);
+    $pgtwon = pdl(0);
+    $maxit = pdl(long , 500);
+    $maxfc = pdl(long , 1000);
+    $m = pdl(long , 100);
+    $eps1 = pdl(0);
+    $eps2 = pdl(1e-5);
+    $fx = pdl(0);
+    $a = random(5)
+    sub pgrad{
+        $x = shift;
+        $c = minimum transpose(cat $x, $bounds(,1));
+        $c = maximum transpose(cat $c, $bounds(,0));
+        $x .=$c;
+        return 0;
+    }
+    sub grad{
+        ($aa, $bb) = @_;
+        $aa .= rosen_grad($bb);
+        return 0;
+    }
+    sub min_func{
+        ($aa, $bb) = @_;
+        $aa .= rosen($bb);
+        return 0;
+    }
+    spg($fx, $a, $m, $maxit, $maxfc, $eps1, $eps2, $print, $fcnt, $gcnt, $pginf, $pgtwon, $info, \&min_func,\&grad, \&pgrad);
 
 ');
 
@@ -1768,44 +1734,38 @@ void lm_wrapper(integer *n, double *x, double *f, double *g);
 
 pp_def("lmqn",
        HandleBad => 0,
-	Pars => '[io,phys]fx();[io,phys]gx(n);[io,phys]x(n);int [io,phys]maxit();int [io,phys]maxfc();int [phys]cgmaxit();[phys]xtol();[phys]accrcy();[phys]eta();[phys]stepmx();int [phys]print();int [io,phys]info()',
-	OtherPars => "SV* fg_func" ,
-	GenericTypes => ['D'],
-	Code =>'
-		integer lw;
-		$GENERIC() *w;
-		extern void PDL_FORTRAN(lmqn)(integer *ifail, PDL_Indx *n, $GENERIC() *x,
-		$GENERIC() *f, $GENERIC() *g, $GENERIC() *w, integer *lw, paramv *sfun,
-		integer *msglvl, integer *maxit, integer *maxfun, integer *mxitgc, $GENERIC() *eta,
-		$GENERIC() *stepmx, $GENERIC() *accrcy, $GENERIC() *xtol);
+    Pars => '[io,phys]fx();[io,phys]gx(n);[io,phys]x(n);int [io,phys]maxit();int [io,phys]maxfc();int [phys]cgmaxit();[phys]xtol();[phys]accrcy();[phys]eta();[phys]stepmx();int [phys]print();int [io,phys]info();
+      [t] work(nwork=CALC(14*$SIZE(n)))',
+    OtherPars => "SV* fg_func" ,
+    GenericTypes => ['D'],
+    Code => pp_line_numbers(__LINE__, <<'EOF'),
+        extern void PDL_FORTRAN(lmqn)(integer *ifail, PDL_Indx *n, $GENERIC() *x,
+        $GENERIC() *f, $GENERIC() *g, $GENERIC() *w, integer *lw, paramv sfun,
+        integer *msglvl, integer *maxit, integer *maxfun, integer *mxitgc, $GENERIC() *eta,
+        $GENERIC() *stepmx, $GENERIC() *accrcy, $GENERIC() *xtol);
 
+        lm_function = $COMP(fg_func);
 
-		lm_function = $COMP(fg_func);
-		lw = 14 *  $SIZE(n);
-		w  = ($GENERIC() *) malloc (lw * sizeof($GENERIC()));
-
-			PDL_FORTRAN(lmqn)(
-				$P(info),
-				&$SIZE(n),
-				$P(x),
-				$P(fx),
-				$P(gx),
-				w,
-				&lw,
-				lm_wrapper,
-				$P(print),
-				$P(maxit),
-				$P(maxfc),
-				$P(cgmaxit),
-				$P(eta),
-				$P(stepmx),
-				$P(accrcy),
-				$P(xtol)
-				);
-		free(w);
-
-',
-	Doc =>'
+            PDL_FORTRAN(lmqn)(
+                $P(info),
+                &$SIZE(n),
+                $P(x),
+                $P(fx),
+                $P(gx),
+                $P(work),
+                &(integer){$SIZE(nwork)},
+                lm_wrapper,
+                $P(print),
+                $P(maxit),
+                $P(maxfc),
+                $P(cgmaxit),
+                $P(eta),
+                $P(stepmx),
+                $P(accrcy),
+                $P(xtol)
+                );
+EOF
+    Doc =>'
 
 =for ref
 
@@ -1823,122 +1783,113 @@ global solution), but does assume that the function is bounded below.
 It can solve problems having any number of variables, but it is
 especially useful when the number of variables (n) is large.
 
-	subroutine parameters:
+    subroutine parameters:
 
-	fx      On input, a rough estimate of the value of the
-	objective function at the solution; on output, the value
-	        of the objective function at the solution
+    fx      On input, a rough estimate of the value of the
+    objective function at the solution; on output, the value
+            of the objective function at the solution
 
-	gx(n)   on output, the final value of the gradient
+    gx(n)   on output, the final value of the gradient
 
-	x(n)    on input, an initial estimate of the solution;
-		on output, the computed solution.
+    x(n)    on input, an initial estimate of the solution;
+        on output, the computed solution.
 
-	maxit   maximum number of inner iterations
+    maxit   maximum number of inner iterations
 
-	maxfc   maximum allowable number of function evaluations
+    maxfc   maximum allowable number of function evaluations
 
-	maxit   maximum number of inner iterations per step
+    maxit   maximum number of inner iterations per step
 
-	cgmaxit maximum number of inner iterations per step
-		(preconditionned conjugate iteration)
+    cgmaxit maximum number of inner iterations per step
+        (preconditionned conjugate iteration)
 
-	eta     severity of the linesearch
+    eta     severity of the linesearch
 
-	xtol    desired accuracy for the solution x*
+    xtol    desired accuracy for the solution x*
 
-	stepmx  maximum allowable step in the linesearch
+    stepmx  maximum allowable step in the linesearch
 
-	accrcy  accuracy of computed function values
+    accrcy  accuracy of computed function values
 
-	print   determines quantity of printed output
-		0 = none, 1 = one line per major iteration.
+    print   determines quantity of printed output
+        0 = none, 1 = one line per major iteration.
 
-	info     ( 0 => normal return)
-	         ( 1 => more than maxit iterations)
-	         ( 2 => more than maxfun evaluations)
-	 ( 3 => line search failed to find
-	         (          lower point (may not be serious)
-	         (-1 => error in input parameters)
+    info     ( 0 => normal return)
+             ( 1 => more than maxit iterations)
+             ( 2 => more than maxfun evaluations)
+     ( 3 => line search failed to find
+             (          lower point (may not be serious)
+             (-1 => error in input parameters)
 
-	fg_func:
-		parameter: PDL(fx), PDL(gx), PDL(x)
+    fg_func:
+        parameter: PDL(fx), PDL(gx), PDL(x)
 
 =for example
 
-	$x = random(5);
-	$gx = $x->zeroes;
-	$fx = rosen($x);
-	
-	$accrcy = pdl(1e-16);
-	$xtol = pdl(1e-10);
-	$stepmx =pdl(1);
-	$eta =pdl(0.9);
-	
+    $x = random(5);
+    $gx = $x->zeroes;
+    $fx = rosen($x);
+    
+    $accrcy = pdl(1e-16);
+    $xtol = pdl(1e-10);
+    $stepmx =pdl(1);
+    $eta =pdl(0.9);
+    
 
-	$info = pdl(long, 0);
-	$print = pdl(long, 1);
-	$maxit = pdl(long, 50);
-	$cgmaxit = pdl(long, 50);
-	$maxfc = pdl(long,250);
+    $info = pdl(long, 0);
+    $print = pdl(long, 1);
+    $maxit = pdl(long, 50);
+    $cgmaxit = pdl(long, 50);
+    $maxfc = pdl(long,250);
 
 
-	sub fg_func{
-		my ($f, $g, $x) = @_;
-		$f .= rosen($x);
-		$g .= rosen_grad($x);
-	}
-	lmqn($fx, $gx, $x, $maxit, $maxfc, $cgmaxit, $xtol, $accrcy, $eta, $stepmx, $print, $info,\&fg_func);
+    sub fg_func{
+        my ($f, $g, $x) = @_;
+        $f .= rosen($x);
+        $g .= rosen_grad($x);
+    }
+    lmqn($fx, $gx, $x, $maxit, $maxfc, $cgmaxit, $xtol, $accrcy, $eta, $stepmx, $print, $info,\&fg_func);
 
 
 ');
 
 pp_def("lmqnbc",
        HandleBad => 0,
-	Pars => '[io,phys]fx();[io,phys]gx(n);[io,phys]x(n);[phys]bound(n,m=2);int [io,phys]maxit();int [io,phys]maxfc();int [phys]cgmaxit();[phys]xtol();[phys]accrcy();[phys]eta();[phys]stepmx();int [phys]print();int [io,phys]info()',
-	OtherPars => "SV* fg_func" ,
-	GenericTypes => ['D'],
-	Code =>'
-		integer lw, *ipivot;
-		$GENERIC() *w;
-		extern void PDL_FORTRAN(lmqnbc)(integer *ifail, PDL_Indx *n, $GENERIC() *x,
-		$GENERIC() *f, $GENERIC() *g, $GENERIC() *w, integer *lw, paramv *sfun,
-		$GENERIC() *low,$GENERIC() *up, integer *ipivot,
-		integer *msglvl, integer *maxit, integer *maxfun, integer *cgmaxit,$GENERIC() *eta,
-		$GENERIC() *stepmx, $GENERIC() *accrcy, $GENERIC() *xtol);
+    Pars => '[io,phys]fx();[io,phys]gx(n);[io,phys]x(n);[phys]bound(n,m=2);int [io,phys]maxit();int [io,phys]maxfc();int [phys]cgmaxit();[phys]xtol();[phys]accrcy();[phys]eta();[phys]stepmx();int [phys]print();int [io,phys]info();
+      [t] work(nwork=CALC(14*$SIZE(n))); int [t] ipivot(n)',
+    OtherPars => "SV* fg_func" ,
+    GenericTypes => ['D'],
+    Code => pp_line_numbers(__LINE__, <<'EOF'),
+        extern void PDL_FORTRAN(lmqnbc)(integer *ifail, PDL_Indx *n, $GENERIC() *x,
+        $GENERIC() *f, $GENERIC() *g, $GENERIC() *w, integer *lw, paramv sfun,
+        $GENERIC() *low,$GENERIC() *up, integer *ipivot,
+        integer *msglvl, integer *maxit, integer *maxfun, integer *cgmaxit,$GENERIC() *eta,
+        $GENERIC() *stepmx, $GENERIC() *accrcy, $GENERIC() *xtol);
 
-
-		lm_function    = $COMP(fg_func);
-		lw = 14 *  $SIZE(n);
-		w  = ($GENERIC() *) malloc (lw * sizeof($GENERIC()));
-		ipivot  = (integer *) malloc ($SIZE(n) * sizeof(integer));
-			PDL_FORTRAN(lmqnbc)(
-				$P(info),
-				&$SIZE(n),
-				$P(x),
-				$P(fx),
-				$P(gx),
-				w,
-				&lw,
-				lm_wrapper,
-				&$bound(n=>0,m=>0),
-				&$bound(n=>0,m=>1),
-				ipivot,
-				$P(print),
-				$P(maxit),
-				$P(maxfc),
-				$P(cgmaxit),
-				$P(eta),
-				$P(stepmx),
-				$P(accrcy),
-				$P(xtol)
-				);
-		free(w);
-		free(ipivot);
-		
-
-',
-	Doc =>'
+        lm_function    = $COMP(fg_func);
+            PDL_FORTRAN(lmqnbc)(
+                $P(info),
+                &$SIZE(n),
+                $P(x),
+                $P(fx),
+                $P(gx),
+                $P(work),
+                &(integer){$SIZE(nwork)},
+                lm_wrapper,
+                &$bound(n=>0,m=>0),
+                &$bound(n=>0,m=>1),
+                $P(ipivot),
+                $P(print),
+                $P(maxit),
+                $P(maxfc),
+                $P(cgmaxit),
+                $P(eta),
+                $P(stepmx),
+                $P(accrcy),
+                $P(xtol)
+                );
+EOF
+    Doc =>'
 
 =for ref
 
@@ -1958,165 +1909,156 @@ global solution), but does assume that the function is bounded below.
 It can solve problems having any number of variables, but it is
 especially useful when the number of variables (n) is large.
 
-	subroutine parameters:
+    subroutine parameters:
 
-	fx      On input, a rough estimate of the value of the
-	objective function at the solution; on output, the value
-	        of the objective function at the solution
+    fx      On input, a rough estimate of the value of the
+    objective function at the solution; on output, the value
+            of the objective function at the solution
 
-	gx(n)   on output, the final value of the gradient
+    gx(n)   on output, the final value of the gradient
 
-	x(n)    on input, an initial estimate of the solution;
-		on output, the computed solution.
+    x(n)    on input, an initial estimate of the solution;
+        on output, the computed solution.
 
-	bound(n,2)
-		The lower and upper bounds on the variables.  if
-	there are no bounds on a particular variable, set
-	the bounds to -1.d38 and 1.d38, respectively.
+    bound(n,2)
+        The lower and upper bounds on the variables.  if
+    there are no bounds on a particular variable, set
+    the bounds to -1.d38 and 1.d38, respectively.
 
-	maxit   maximum number of inner iterations
+    maxit   maximum number of inner iterations
 
-	maxfc   maximum allowable number of function evaluations
+    maxfc   maximum allowable number of function evaluations
 
-	cgmaxit maximum number of inner iterations per step
-		(preconditionned conjugate iteration)
+    cgmaxit maximum number of inner iterations per step
+        (preconditionned conjugate iteration)
 
-	eta     severity of the linesearch
+    eta     severity of the linesearch
 
-	xtol    desired accuracy for the solution x*
+    xtol    desired accuracy for the solution x*
 
-	stepmx  maximum allowable step in the linesearch
+    stepmx  maximum allowable step in the linesearch
 
-	accrcy  accuracy of computed function values
+    accrcy  accuracy of computed function values
 
-	print   determines quantity of printed output
-		0 = none, 1 = one line per major iteration.
+    print   determines quantity of printed output
+        0 = none, 1 = one line per major iteration.
 
-	info     ( 0 => normal return)
-	         ( 1 => more than maxit iterations)
-	         ( 2 => more than maxfun evaluations)
-	 ( 3 => line search failed to find
-	         (          lower point (may not be serious)
-	         (-1 => error in input parameters)
+    info     ( 0 => normal return)
+             ( 1 => more than maxit iterations)
+             ( 2 => more than maxfun evaluations)
+     ( 3 => line search failed to find
+             (          lower point (may not be serious)
+             (-1 => error in input parameters)
 
-	fg_func:
-		parameter: PDL(fx), PDL(gx), PDL(x)
+    fg_func:
+        parameter: PDL(fx), PDL(gx), PDL(x)
 
 =for example
 
-	$x = random(5);
-	$gx = $x->zeroes;
-	$fx = rosen($x);
-	$bounds =  zeroes(5,2);
-	$bounds(,0).= -5;
-	$bounds(,1).= 5;	
-	
-	$accrcy = pdl(1e-20);
-	$xtol = pdl(1e-10);
-	$stepmx =pdl(1);
-	$eta = pdl(0.9);
-	
+    $x = random(5);
+    $gx = $x->zeroes;
+    $fx = rosen($x);
+    $bounds =  zeroes(5,2);
+    $bounds(,0).= -5;
+    $bounds(,1).= 5;	
+    
+    $accrcy = pdl(1e-20);
+    $xtol = pdl(1e-10);
+    $stepmx =pdl(1);
+    $eta = pdl(0.9);
+    
 
-	$info = pdl(long, 0);
-	$print = pdl(long, 1);
-	$maxit = pdl(long, 100);
-	$maxfc = pdl(long,250);
-	$cgmaxit = pdl(long, 50);
+    $info = pdl(long, 0);
+    $print = pdl(long, 1);
+    $maxit = pdl(long, 100);
+    $maxfc = pdl(long,250);
+    $cgmaxit = pdl(long, 50);
 
 
-	sub fg_func{
-		my ($f, $g, $x) = @_;
-		$f .= rosen($x);
-		$g .= rosen_grad($x);
-	}
-	lmqnbc($fx, $gx, $x, $bounds, $maxit, $maxfc, $cgmaxit, $xtol, $accrcy, $eta, $stepmx, $print, $info,\&fg_func);
+    sub fg_func{
+        my ($f, $g, $x) = @_;
+        $f .= rosen($x);
+        $g .= rosen_grad($x);
+    }
+    lmqnbc($fx, $gx, $x, $bounds, $maxit, $maxfc, $cgmaxit, $xtol, $accrcy, $eta, $stepmx, $print, $info,\&fg_func);
 
 
 ');
 
 pp_def("cgfam",
        HandleBad => 0,
-	Pars => '[io,phys]fx(); [io,phys]gx(n); [io,phys]x(n);int [io,phys]maxit();[phys]eps();[io,phys]xtol();[io,phys]gtol();int [phys]print(2);int [io,phys]info(); int [phys]method()',
-	OtherPars => "SV* fg_func" ,
-	GenericTypes => ['D'],
-	Code =>'
+    Pars => '[io,phys]fx(); [io,phys]gx(n); [io,phys]x(n);int [io,phys]maxit();[phys]eps();[io,phys]xtol();[io,phys]gtol();int [phys]print(2);int [io,phys]info(); int [phys]method();
+      [t] w(n); [t] gold(n); [t] d(n)',
+    OtherPars => "SV* fg_func" ,
+    GenericTypes => ['D'],
+    Code => pp_line_numbers(__LINE__, <<'EOF'),
+    int PDL_FORTRAN(cgfam)(PDL_Indx *n, $GENERIC() *x, $GENERIC() *f,
+    $GENERIC() *g, $GENERIC() *d, $GENERIC() *gold, integer *iprint,
+    $GENERIC() *eps, $GENERIC() *xtol, $GENERIC() *gtol,$GENERIC() *w, integer *iflag, integer *irest,
+    integer *method, logical *finish);
 
-	$GENERIC() *w, *gold, *d;
-	int stop;
-	integer i, irest, finish;
-	int PDL_FORTRAN(cgfam)(PDL_Indx *n, $GENERIC() *x, $GENERIC() *f,
-	$GENERIC() *g, $GENERIC() *d__, $GENERIC() *gold, integer *iprint,
-	$GENERIC() *eps, $GENERIC() *xtol, $GENERIC() *gtol,$GENERIC() *w, integer *iflag, integer *irest,
-	integer *method, logical *finish);
+    int stop;
+    integer i, irest, finish;
+    irest = 1;
+    finish = 0;
+    stop = 0;
 
-	w = ($GENERIC() * ) malloc ( $SIZE(n) * sizeof($GENERIC()));
-	gold = ($GENERIC() * ) malloc ( $SIZE(n) * sizeof($GENERIC()));
-	d = ($GENERIC() * ) malloc ( $SIZE(n) * sizeof($GENERIC()));
-	irest = 1;
-	finish = 0;
-	stop = 0;
-
-	for (i = 1 ; i <= $maxit(); )
-	{
-			PDL_FORTRAN(cgfam)(
-			&$SIZE(n),
-			$P(x),
-			$P(fx),
-			$P(gx),
-			d,
-			gold,
-			$P(print),
-			$P(eps),
-			$P(xtol),
-			$P(gtol),
-			w,
-			$P(info),
-			&irest,
-			$P(method),
-			&finish
-			);
-			switch($info())
-			{
-		
-				 case 0:	/*CONV*/
-						goto end;
-				 case 1:	
-						stop = lbfgs_wrapper($SIZE(n),$P(fx), $P(gx),$P(x), $COMP(fg_func));
-						break;
-				 case 2:
-						if ( i == $maxit() || stop == 1)
-							finish = 1;
-						else
-							i++;
-						break;
-				 default:       printf("Error in cgfam: %d\n", $info());
-						goto end;
-			}
-	}
+    for (i = 1 ; i <= $maxit(); )
+    {
+            PDL_FORTRAN(cgfam)(
+            &$SIZE(n),
+            $P(x),
+            $P(fx),
+            $P(gx),
+            $P(d),
+            $P(gold),
+            $P(print),
+            $P(eps),
+            $P(xtol),
+            $P(gtol),
+            $P(w),
+            $P(info),
+            &irest,
+            $P(method),
+            &finish
+            );
+            switch($info())
+            {
+        
+                 case 0:	/*CONV*/
+                        goto end;
+                 case 1:	
+                        stop = lbfgs_wrapper($SIZE(n),$P(fx), $P(gx),$P(x), $COMP(fg_func));
+                        break;
+                 case 2:
+                        if ( i == $maxit() || stop == 1)
+                            finish = 1;
+                        else
+                            i++;
+                        break;
+                 default:       printf("Error in cgfam: %d\n", $info());
+                        goto end;
+            }
+    }
 end:
-	$maxit() = i;
-	if (finish == 1)
-		if (stop == 1 )
-			$info() = 1;
-		else
-			$info() = 2;
-	free(w);
-	free(d);
-	free(gold);
-',
-	Doc =>'
-
+    $maxit() = i;
+    if (finish == 1)
+        if (stop == 1 )
+            $info() = 1;
+        else
+            $info() = 2;
+EOF
+    Doc =>'
 =for ref
 
 This subroutine solves the unconstrained minimization problem
 
-		min f(x),    x= (x1,x2,...,xn),
+        min f(x),    x= (x1,x2,...,xn),
 
 using conjugate gradient methods, as described in the paper:
 gilbert, j.c. and nocedal, j. (1992). "global convergence properties
 of conjugate gradient methods", siam journal on optimization, vol. 2,
 pp. 21-42.
-
 
       where
 
@@ -2130,8 +2072,8 @@ pp. 21-42.
              the point x.
      x       on initial entry, it must be set by the user to the values
              of the initial estimate of the solution vector.
-	     on exit with info=0, it contains the values of the variables
-	     at the best point found (usually a solution).
+         on exit with info=0, it contains the values of the variables
+         at the best point found (usually a solution).
 
      maxit   maximum number of iterations.
 
@@ -2150,12 +2092,12 @@ pp. 21-42.
              is less than xtol.
 
      gtol    is a double precision variable which controls the accuracy of
-	     the line search routine mcsrch. if the function and gradient
+         the line search routine mcsrch. if the function and gradient
              evaluations are inexpensive with respect to the cost of the
-	     iteration (which is sometimes the case when solving very large
-	     problems) it may be advantageous to set gtol to a small value.
-	     A typical small value is 0.1. It\'s set to 0.9 if gtol < 1.d-04.
-	     restriction: gtol should be greater than 1.d-04.
+         iteration (which is sometimes the case when solving very large
+         problems) it may be advantageous to set gtol to a small value.
+         A typical small value is 0.1. It\'s set to 0.9 if gtol < 1.d-04.
+         restriction: gtol should be greater than 1.d-04.
 
      print   frequency and type of printing
               iprint(1) < 0 : no output is generated
@@ -2165,10 +2107,10 @@ pp. 21-42.
                               the larger the value (between 0 and 3),
                               the more information
               iprint(2) = 0 : no additional information printed
-		iprint(2) = 1 : initial x and gradient vectors printed
-		iprint(2) = 2 : x vector printed every iteration
-		iprint(2) = 3 : x vector and gradient vector printed
-				every iteration
+        iprint(2) = 1 : initial x and gradient vectors printed
+        iprint(2) = 2 : x vector printed every iteration
+        iprint(2) = 3 : x vector and gradient vector printed
+                every iteration
     info     controls termination of code, and return to main
                program to evaluate function and gradient
                info = -3 : improper input parameters
@@ -2184,31 +2126,31 @@ pp. 21-42.
                3 : positive polak-ribiere ( beta=max{beta,0} )
 
      scalar fg_func: computes the value(fx) and gradient(gx)  of the function at x.
-		param fx, gx, x
-		return value
-		 0  continue
-		 1  last iteration
+        param fx, gx, x
+        return value
+         0  continue
+         1  last iteration
 
 =for example
 
-	$x = random(5);
-	$gx = rosen_grad($x);
-	$fx = rosen($x);
-	
-	$xtol = pdl(1e-10);
-	$gtol = pdl(0.9);
-	$eps = pdl(1e-10);
-	$print = ones(2);
-	$maxit = pdl(long, 200);
-	$info = pdl(long,0);
+    $x = random(5);
+    $gx = rosen_grad($x);
+    $fx = rosen($x);
+    
+    $xtol = pdl(1e-10);
+    $gtol = pdl(0.9);
+    $eps = pdl(1e-10);
+    $print = ones(2);
+    $maxit = pdl(long, 200);
+    $info = pdl(long,0);
 
-	sub fg_func{
-		my ($f, $g, $x) = @_;
-		$f .= rosen($x);
-		$g .= rosen_grad($x);
-		return 0;		
-	}
-	cgfam($fx, $gx, $x, $maxit, $eps, $xtol, $gtol,$print,$info,1,\&fg_func);
+    sub fg_func{
+        my ($f, $g, $x) = @_;
+        $f .= rosen($x);
+        $g .= rosen_grad($x);
+        return 0;		
+    }
+    cgfam($fx, $gx, $x, $maxit, $eps, $xtol, $gtol,$print,$info,1,\&fg_func);
 
 ');
 
@@ -2218,18 +2160,18 @@ double hooke_wrapper(int n, double *p);
 ');
 pp_def("hooke",
        HandleBad => 0,
-	Pars => '[io,phys]x(n);int [io,phys]maxit();[phys]rho();[phys]tol()',
-	OtherPars => "SV* hooke_func" ,
-	GenericTypes => ['D'],
-	Code =>'
-		extern int hooke(PDL_Indx nvars, paramd func, $GENERIC() *startpt,
-			$GENERIC() *endpt, $GENERIC() rho, $GENERIC() tol, int maxit);
+    Pars => '[io,phys]x(n);int [io,phys]maxit();[phys]rho();[phys]tol()',
+    OtherPars => "SV* hooke_func" ,
+    GenericTypes => ['D'],
+    Code => pp_line_numbers(__LINE__, <<'EOF'),
+        extern int hooke(PDL_Indx nvars, paramd func, $GENERIC() *startpt,
+            $GENERIC() *endpt, $GENERIC() rho, $GENERIC() tol, int maxit);
 
-		hooke_function    = $COMP(hooke_func);
-		
-		$maxit() = hooke($SIZE(n), hooke_wrapper, $P(x), $P(x), $rho(), $tol(),$maxit());
-',
-	Doc =>'
+        hooke_function    = $COMP(hooke_func);
+        
+        $maxit() = hooke($SIZE(n), hooke_wrapper, $P(x), $P(x), $rho(), $tol(),$maxit());
+EOF
+    Doc =>'
 
 =for ref
 
@@ -2237,7 +2179,7 @@ Find a point X where the nonlinear function f(X) has a local
 minimum.  X is an n-vector and f(X) is a scalar.  In mathematical
 notation
 
-	f: R^n -> R^1.
+    f: R^n -> R^1.
 
 The objective function f()
 is not required to be continuous.  Nor does f() need to be
@@ -2287,52 +2229,52 @@ begin the second minimization.
 
 
      x:		   On entry this is the user-supplied guess at the minimum.
-		   On exit this is the location of  the local minimum,
-		   calculated by the program
+           On exit this is the location of  the local minimum,
+           calculated by the program
 
      maxit	   On entry, a rarely used, halting
-		   criterion.  If the algorithm uses >= maxit
-		   iterations, halt.
-		   On exit number of iteration.
+           criterion.  If the algorithm uses >= maxit
+           iterations, halt.
+           On exit number of iteration.
 
      rho	   This is a user-supplied convergence
-		   parameter (more detail above), which should be
-		   set to a value between 0.0 and 1.0.	Larger	
-		   values of rho give greater probability of	
-		   convergence on highly nonlinear functions, at a
-		   cost of more function evaluations.  Smaller	
-		   values of rho reduces the number of evaluations
-		   (and the program running time), but increases
-		   the risk of nonconvergence.	See below.	
+           parameter (more detail above), which should be
+           set to a value between 0.0 and 1.0.	Larger	
+           values of rho give greater probability of	
+           convergence on highly nonlinear functions, at a
+           cost of more function evaluations.  Smaller	
+           values of rho reduces the number of evaluations
+           (and the program running time), but increases
+           the risk of nonconvergence.	See below.	
 
      tol	   This is the criterion for halting
-		   the search for a minimum.  When the algorithm
-		   begins to make less and less progress on each
-		   iteration, it checks the halting criterion: if
-		   the stepsize is below tol, terminate the
-		   iteration and return the current best estimate
-		   of the minimum.  Larger values of tol (such
-		   as 1.0e-4) give quicker running time, but a	
-		   less accurate estimate of the minimum.  Smaller
-		   values of tol (such as 1.0e-7) give longer
-		   running time, but a more accurate estimate of
-		   the minimum.				
+           the search for a minimum.  When the algorithm
+           begins to make less and less progress on each
+           iteration, it checks the halting criterion: if
+           the stepsize is below tol, terminate the
+           iteration and return the current best estimate
+           of the minimum.  Larger values of tol (such
+           as 1.0e-4) give quicker running time, but a	
+           less accurate estimate of the minimum.  Smaller
+           values of tol (such as 1.0e-7) give longer
+           running time, but a more accurate estimate of
+           the minimum.				
 
      func	   objective function to be minimized.
-		   scalar double fun ($x(n))
+           scalar double fun ($x(n))
 
 =for example
 
-	$x = random(2);
-	sub test{
-		my $a = shift;
-		rosen($a)->sclr;
-	}
-	$rho = pdl(0.5);
-	$tol = pdl(1e-7);
-	$maxit =pdl(long, 500);
-	$x->hooke($maxit, $rho,$tol,\&test);
-	print "Minimum found at $x in $maxit iteration(s)";
+    $x = random(2);
+    sub test{
+        my $a = shift;
+        rosen($a)->sclr;
+    }
+    $rho = pdl(0.5);
+    $tol = pdl(1e-7);
+    $maxit =pdl(long, 500);
+    $x->hooke($maxit, $rho,$tol,\&test);
+    print "Minimum found at $x in $maxit iteration(s)";
 
 ');
 
@@ -2370,63 +2312,45 @@ extern void PDL_FORTRAN(gencan)(PDL_Indx *n, double *x, double *l,
 
 pp_def("gencan",
        HandleBad => 0,
-	Pars => '[io,phys]fx();[io,phys]gx(n);[io,phys]x(n);[phys]bound(n,m=2);[phys]fmin();int [phys]maxit();int [phys]maxfc();
-		int [phys]nearlyq();int [phys]gtype();int [phys]htvtype();int [phys]trtype();int [phys]fmaxit();int [phys]gmaxit();
-		int [phys]interpmaxit();int [phys]cgstop();int [phys]cgmaxit();int [phys]qmpmaxit();
-		[phys]ftol();[phys]epsgpen();[phys]epsgpsn();[phys]cggtol();[phys]cgitol();[phys]cgftol();
-		[phys]qmptol();[phys]delta();[phys]eta();[phys]delmin();
-		[phys]lammin();[phys]lammax();[phys]theta();[phys]gamma();[phys]beta();
-		[phys]sigma1();[phys]sigma2();[phys]nint();[phys]next();
-		[phys]sterel();[phys]steabs();[phys]epsrel();[phys]epsabs();[phys]infty();
-		[o,phys]gpeucn2();[o,phys]gpsupn();int [o,phys]iter();int [o,phys]fcnt();int [o,phys]gcnt();int [o,phys]cgcnt();
-		int [o,phys]spgiter();int [o,phys] spgfcnt();int [o,phys]tniter();int [o,phys]tnfcnt();int [o,phys]tnstpcnt();
-		int [o,phys]tnintcnt();int [o,phys] tnexgcnt();int [o,phys]tnexbcnt();int [o,phys]tnintfe();int [o,phys]tnexgfe();int [o,phys]tnexbfe();
-		int [phys]print(p);int [phys]ncomp();int [io,phys]info()',
-	OtherPars => "SV* f_func; SV* g_func; SV* h_func",
-	GenericTypes => ['D'],
-	Code =>'
-		integer *ind;
-
-		$GENERIC() *s, *y, *d__, *w;
-		gencanf_function    = $COMP(f_func);		
-		gencang_function    = $COMP(g_func);
-		gencanh_function    = $COMP(h_func);
-		
-		
-		ind = (integer * ) malloc ( $SIZE(n) * sizeof(integer));
-		s = ($GENERIC() * ) malloc ( $SIZE(n) * sizeof($GENERIC()));
-		y = ($GENERIC() * ) malloc ( $SIZE(n) * sizeof($GENERIC()));
-		d__ = ($GENERIC() * ) malloc ( $SIZE(n) * sizeof($GENERIC()));
-		w = ($GENERIC() * ) malloc (5 * $SIZE(n) * sizeof($GENERIC()));
-
-
-		PDL_FORTRAN(gencan)(&$SIZE(n), $P(x), &$bound(n=>0,m=>0), &$bound(n=>0,m=>1),
-		$P(epsgpen), $P(epsgpsn), $P(ftol), $P(fmaxit), $P(gmaxit), $P(fmin),
-		$P(maxit), $P(maxfc), $P(delta), $P(cgmaxit), $P(cgstop), $P(cggtol), $P(cgitol),
-		$P(cgftol), $P(qmptol), $P(qmpmaxit), $P(nearlyq), $P(gtype), $P(htvtype), $P(trtype),
-		&$print(p=>0), &$print(p=>1), $P(fx), $P(gx),
-		$P(gpeucn2), $P(gpsupn), $P(iter), $P(fcnt), $P(gcnt), $P(cgcnt), $P(spgiter), $P(spgfcnt),
-		$P(tniter), $P(tnfcnt), $P(tnstpcnt), $P(tnintcnt), $P(tnexgcnt), $P(tnexbcnt),
-		$P(tnintfe), $P(tnexgfe), $P(tnexbfe), $P(info), s, y, d__, ind, w, $P(eta),
-		$P(delmin), $P(lammax), $P(lammin), $P(theta), $P(gamma), $P(beta),
-		$P(sigma1), $P(sigma2),$P(nint), $P(next),
-		$P(interpmaxit), $P(ncomp), $P(sterel), $P(steabs), $P(epsrel), $P(epsabs), $P(infty),
-		gencanf_wrapper, gencang_wrapper, gencanh_wrapper);
-
-	free(s);
-	free(y);
-	free(d__);
-	free(w);
-	free(ind);	
-',
-	Doc =>'
-
+    Pars => '[io,phys]fx();[io,phys]gx(n);[io,phys]x(n);[phys]bound(n,m=2);[phys]fmin();int [phys]maxit();int [phys]maxfc();
+        int [phys]nearlyq();int [phys]gtype();int [phys]htvtype();int [phys]trtype();int [phys]fmaxit();int [phys]gmaxit();
+        int [phys]interpmaxit();int [phys]cgstop();int [phys]cgmaxit();int [phys]qmpmaxit();
+        [phys]ftol();[phys]epsgpen();[phys]epsgpsn();[phys]cggtol();[phys]cgitol();[phys]cgftol();
+        [phys]qmptol();[phys]delta();[phys]eta();[phys]delmin();
+        [phys]lammin();[phys]lammax();[phys]theta();[phys]gamma();[phys]beta();
+        [phys]sigma1();[phys]sigma2();[phys]nint();[phys]next();
+        [phys]sterel();[phys]steabs();[phys]epsrel();[phys]epsabs();[phys]infty();
+        [o,phys]gpeucn2();[o,phys]gpsupn();int [o,phys]iter();int [o,phys]fcnt();int [o,phys]gcnt();int [o,phys]cgcnt();
+        int [o,phys]spgiter();int [o,phys] spgfcnt();int [o,phys]tniter();int [o,phys]tnfcnt();int [o,phys]tnstpcnt();
+        int [o,phys]tnintcnt();int [o,phys] tnexgcnt();int [o,phys]tnexbcnt();int [o,phys]tnintfe();int [o,phys]tnexgfe();int [o,phys]tnexbfe();
+        int [phys]print(p);int [phys]ncomp();int [io,phys]info();
+          int [t] ind(n); [t] s(n); [t] y(n); [t] d(n); [t] w(nw=CALC(5*$SIZE(n)))',
+    OtherPars => "SV* f_func; SV* g_func; SV* h_func",
+    GenericTypes => ['D'],
+    Code => pp_line_numbers(__LINE__, <<'EOF'),
+        gencanf_function    = $COMP(f_func);		
+        gencang_function    = $COMP(g_func);
+        gencanh_function    = $COMP(h_func);
+        PDL_FORTRAN(gencan)(&$SIZE(n), $P(x), &$bound(n=>0,m=>0), &$bound(n=>0,m=>1),
+        $P(epsgpen), $P(epsgpsn), $P(ftol), $P(fmaxit), $P(gmaxit), $P(fmin),
+        $P(maxit), $P(maxfc), $P(delta), $P(cgmaxit), $P(cgstop), $P(cggtol), $P(cgitol),
+        $P(cgftol), $P(qmptol), $P(qmpmaxit), $P(nearlyq), $P(gtype), $P(htvtype), $P(trtype),
+        &$print(p=>0), &$print(p=>1), $P(fx), $P(gx),
+        $P(gpeucn2), $P(gpsupn), $P(iter), $P(fcnt), $P(gcnt), $P(cgcnt), $P(spgiter), $P(spgfcnt),
+        $P(tniter), $P(tnfcnt), $P(tnstpcnt), $P(tnintcnt), $P(tnexgcnt), $P(tnexbcnt),
+        $P(tnintfe), $P(tnexgfe), $P(tnexbfe), $P(info), $P(s), $P(y), $P(d), $P(ind), $P(w), $P(eta),
+        $P(delmin), $P(lammax), $P(lammin), $P(theta), $P(gamma), $P(beta),
+        $P(sigma1), $P(sigma2),$P(nint), $P(next),
+        $P(interpmaxit), $P(ncomp), $P(sterel), $P(steabs), $P(epsrel), $P(epsabs), $P(infty),
+        gencanf_wrapper, gencang_wrapper, gencanh_wrapper);
+EOF
+    Doc =>'
 =for ref
 
 Solves the box-constrained minimization problem
 
-		Minimize f(x)
-		subject to l \leq x \leq u
+        Minimize f(x)
+        subject to l \leq x \leq u
 
 using a method described in
 E. G. Birgin and J. M. Martinez, "Large-scale active-set
@@ -2438,9 +2362,9 @@ Subroutines evalf and evalg must be supplied by the user to
 evaluate the function f and its gradient, respectively. The
 calling sequences are
 
-	inform evalf(f, x)
+    inform evalf(f, x)
 
-	inform evalg(g, x)
+    inform evalg(g, x)
 
 where x is the point where the function (the gradient) must be
 evaluated, n is the number of variables and f (g) is the
@@ -2452,7 +2376,7 @@ is optional. If this subroutine is not provided an incremental
 quotients version will be used instead. The calling sequence of
 this subroutine should be
 
-	inform	call evalhd(hu, x, u, ind)
+    inform	call evalhd(hu, x, u, ind)
 
 where x is the point where the approx-Hessian is being considered,
 u is the vector which should be
@@ -2891,127 +2815,110 @@ evalhd could be:
 
 =for example
 
-	$x = random(50);
-	$gx = $x->zeroes;
-	$fx = pdl(0);
-	
-	$print = pdl(long,[1,0]);
-	$info = pdl(long,0);
-	$bounds = zeroes(50,2);
-	$bounds(,0).=-5;
-	$bounds(,1).=5;
+    $x = random(50);
+    $gx = $x->zeroes;
+    $fx = pdl(0);
+    
+    $print = pdl(long,[1,0]);
+    $info = pdl(long,0);
+    $bounds = zeroes(50,2);
+    $bounds(,0).=-5;
+    $bounds(,1).=5;
 
-	sub f_func{
-		my ($fx, $x) = @_;
-		$fx .= rosen($x);
-		return 0;	
-	}
-	sub g_func{
-		my ($gx, $x) = @_;
-		$gx .= rosen_grad($x);		
-		return 0;	
-	}
-	sub h_func{
-		my ($hx, $x, $d, $ind) = @_;
-		$hx .= rosen_hess($x,1) x $d;
-		return 0;	
-	}
-	gencan($fx, $gx, $x, $bounds, -1e308, 200, 1000,
-	1, 0, 0, 0, 5, 10, 5, 1, -1, 5,
-	0, 1e-10, 1e-10, 1e-8, 0.1, 1e-8, 1e-8,
-	-1, 0.9, 0.1,
-	1e+40, 1e-40, 1e-6, 0.0001, 0.5, 0.1,0.9,
-	2, 2, 1e-10, 1e-99, 1e-30, 1e-99, 1e+308,
-	($gpeucn2=null), ($gpsupn=null), ($iter=null), ($fcnt=null),
-	($gcnt=null), ($cgcnt=null), ($spgiter=null), ($spgfcnt=null),
-	($tniter=null), ($tnfcnt=null), ($tnstpcnt=null), ($tnintcnt=null), ($tnexgcnt=null), ($tnexbcnt=null),
-	($tnintfe=null), ($tnexgfe=null), ($tnexbfe=null),	
-	$print,5, $info,\&f_func,\&g_func, \&h_func);
+    sub f_func{
+        my ($fx, $x) = @_;
+        $fx .= rosen($x);
+        return 0;	
+    }
+    sub g_func{
+        my ($gx, $x) = @_;
+        $gx .= rosen_grad($x);		
+        return 0;	
+    }
+    sub h_func{
+        my ($hx, $x, $d, $ind) = @_;
+        $hx .= rosen_hess($x,1) x $d;
+        return 0;	
+    }
+    gencan($fx, $gx, $x, $bounds, -1e308, 200, 1000,
+    1, 0, 0, 0, 5, 10, 5, 1, -1, 5,
+    0, 1e-10, 1e-10, 1e-8, 0.1, 1e-8, 1e-8,
+    -1, 0.9, 0.1,
+    1e+40, 1e-40, 1e-6, 0.0001, 0.5, 0.1,0.9,
+    2, 2, 1e-10, 1e-99, 1e-30, 1e-99, 1e+308,
+    ($gpeucn2=null), ($gpsupn=null), ($iter=null), ($fcnt=null),
+    ($gcnt=null), ($cgcnt=null), ($spgiter=null), ($spgfcnt=null),
+    ($tniter=null), ($tnfcnt=null), ($tnstpcnt=null), ($tnintcnt=null), ($tnexgcnt=null), ($tnexbcnt=null),
+    ($tnintfe=null), ($tnexgfe=null), ($tnexbfe=null),	
+    $print,5, $info,\&f_func,\&g_func, \&h_func);
 
 ');
 
 
 pp_def("sgencan",
        HandleBad => 0,
-	Pars => '[io,phys]fx();[io,phys]gx(n);[io,phys]x(n);[phys]bound(n,m=2);int [io,phys]maxit();int [io,phys]maxfc();
-		int [phys]nearlyq();int [phys]gtype();int [phys]htvtype();int [phys]trtype();int [phys]fmaxit();int [phys]gmaxit();
-		int [phys]interpmaxit();int [phys]cgstop();int [phys]cgmaxit();int [phys]qmpmaxit();
-		[phys]ftol();[phys]epsgpen();[phys]epsgpsn();[phys]cggtol();[phys]cgitol();[phys]cgftol();
-		[phys]qmptol();[phys]delta();[phys]eta();[phys]delmin();
-		int [phys]print(p);int [io,phys]info()',
-	OtherPars => "SV* f_func; SV* g_func; SV* h_func",
-	GenericTypes => ['D'],
-	Code =>'
-		integer iter, fcnt, gcnt, cgcnt, spgiter;
-		integer spgfcnt, tniter, tnfcnt, tnstpcnt, tnintcnt, tnexgcnt, tnexbcnt, tnintfe, tnexgfe;
-		integer tnexbfe, ncomp;
-		integer *ind;
+    Pars => '[io,phys]fx();[io,phys]gx(n);[io,phys]x(n);[phys]bound(n,m=2);int [io,phys]maxit();int [io,phys]maxfc();
+        int [phys]nearlyq();int [phys]gtype();int [phys]htvtype();int [phys]trtype();int [phys]fmaxit();int [phys]gmaxit();
+        int [phys]interpmaxit();int [phys]cgstop();int [phys]cgmaxit();int [phys]qmpmaxit();
+        [phys]ftol();[phys]epsgpen();[phys]epsgpsn();[phys]cggtol();[phys]cgitol();[phys]cgftol();
+        [phys]qmptol();[phys]delta();[phys]eta();[phys]delmin();
+        int [phys]print(p);int [io,phys]info();
+          int [t] ind(n); [t] s(n); [t] y(n); [t] d(n); [t] w(nw=CALC(5*$SIZE(n)))',
+    OtherPars => "SV* f_func; SV* g_func; SV* h_func",
+    GenericTypes => ['D'],
+    Code => pp_line_numbers(__LINE__, <<'EOF'),
+        integer iter, fcnt, gcnt, cgcnt, spgiter;
+        integer spgfcnt, tniter, tnfcnt, tnstpcnt, tnintcnt, tnexgcnt, tnexbcnt, tnintfe, tnexgfe;
+        integer tnexbfe, ncomp;
 
-		$GENERIC() fmin;
-		$GENERIC() gpeucn2, gpsupn, lammax, lammin, theta, gamma, beta;
-		$GENERIC() sigma1, sigma2, nint, next, sterel, steabs, epsrel, epsabs, infty;
-		$GENERIC() *s, *y, *d__, *w;
-		gencanf_function    = $COMP(f_func);		
-		gencang_function    = $COMP(g_func);
-		gencanh_function    = $COMP(h_func);
-		
-		
-		ind = (integer * ) malloc ( $SIZE(n) * sizeof(integer));
-		ncomp = 10;
+        $GENERIC() fmin;
+        $GENERIC() gpeucn2, gpsupn, lammax, lammin, theta, gamma, beta;
+        $GENERIC() sigma1, sigma2, nint, next, sterel, steabs, epsrel, epsabs, infty;
+        gencanf_function    = $COMP(f_func);
+        gencang_function    = $COMP(g_func);
+        gencanh_function    = $COMP(h_func);
 
-		fmin = -1e+308;
+        ncomp = 10;
+        fmin = -1e+308;
 
+        lammax = 1e+40;
+        lammin = 1e-40;
+        theta = 1e-6;
+        gamma = 0.0001;
+        beta = 0.5;
+        sigma1 = 0.1;
+        sigma2 = 0.9;
+        nint = 2;
+        next = 2;
+        sterel = 1e-10;
+        steabs = 1e-99;
+        epsrel = 1e-30;
+        epsabs= 1e-99;
+        infty= 1e+308;
 
-		s = ($GENERIC() * ) malloc ( $SIZE(n) * sizeof($GENERIC()));
-		y = ($GENERIC() * ) malloc ( $SIZE(n) * sizeof($GENERIC()));
-		d__ = ($GENERIC() * ) malloc ( $SIZE(n) * sizeof($GENERIC()));
-		w = ($GENERIC() * ) malloc (5 * $SIZE(n) * sizeof($GENERIC()));
+        PDL_FORTRAN(gencan)(&$SIZE(n), $P(x), &$bound(n=>0,m=>0), &$bound(n=>0,m=>1),
+        $P(epsgpen), $P(epsgpsn), $P(ftol), $P(fmaxit), $P(gmaxit), &fmin,
+        $P(maxit), $P(maxfc), $P(delta), $P(cgmaxit), $P(cgstop), $P(cggtol), $P(cgitol),
+        $P(cgftol), $P(qmptol), $P(qmpmaxit), $P(nearlyq), $P(gtype), $P(htvtype), $P(trtype),
+        &$print(p=>0), &$print(p=>1), $P(fx), $P(gx),
+        &gpeucn2, &gpsupn, &iter, &fcnt, &gcnt, &cgcnt, &spgiter, &spgfcnt,
+        &tniter, &tnfcnt, &tnstpcnt, &tnintcnt, &tnexgcnt, &tnexbcnt,
+        &tnintfe, &tnexgfe, &tnexbfe, $P(info), $P(s), $P(y), $P(d), $P(ind), $P(w), $P(eta),
+        $P(delmin), &lammax, &lammin, &theta, &gamma, &beta,
+        &sigma1, &sigma2, &nint, &next,
+        $P(interpmaxit), &ncomp, &sterel, &steabs, &epsrel, &epsabs, &infty,
+        gencanf_wrapper, gencang_wrapper, gencanh_wrapper);
 
-
-		lammax = 1e+40;
-		lammin = 1e-40;
-		theta = 1e-6;
-		gamma = 0.0001;
-		beta = 0.5;
-		sigma1 = 0.1;
-		sigma2 = 0.9;
-		nint = 2;
-		next = 2;
-		sterel = 1e-10;
-		steabs = 1e-99;
-		epsrel = 1e-30;
-		epsabs= 1e-99;
-		infty= 1e+308;
-
-		PDL_FORTRAN(gencan)(&$SIZE(n), $P(x), &$bound(n=>0,m=>0), &$bound(n=>0,m=>1),
-		$P(epsgpen), $P(epsgpsn), $P(ftol), $P(fmaxit), $P(gmaxit), &fmin,
-		$P(maxit), $P(maxfc), $P(delta), $P(cgmaxit), $P(cgstop), $P(cggtol), $P(cgitol),
-		$P(cgftol), $P(qmptol), $P(qmpmaxit), $P(nearlyq), $P(gtype), $P(htvtype), $P(trtype),
-		&$print(p=>0), &$print(p=>1), $P(fx), $P(gx),
-		&gpeucn2, &gpsupn, &iter, &fcnt, &gcnt, &cgcnt, &spgiter, &spgfcnt,
-		&tniter, &tnfcnt, &tnstpcnt, &tnintcnt, &tnexgcnt, &tnexbcnt,
-		&tnintfe, &tnexgfe, &tnexbfe, $P(info), s, y, d__, ind, w, $P(eta),
-		$P(delmin), &lammax, &lammin, &theta, &gamma, &beta,
-		&sigma1, &sigma2, &nint, &next,
-		$P(interpmaxit), &ncomp, &sterel, &steabs, &epsrel, &epsabs, &infty,
-		gencanf_wrapper, gencang_wrapper, gencanh_wrapper);
-
-	free(s);
-	free(y);
-	free(d__);
-	free(w);
-	free(ind);	
-	$maxit() = iter;
-	$maxfc() = fcnt;
-',
-	Doc =>'
-
+    $maxit() = iter;
+    $maxfc() = fcnt;
+EOF
+    Doc =>'
 =for ref
 
 Solves the box-constrained minimization problem
 
-		Minimize f(x)
-		subject to l \leq x \leq u
+        Minimize f(x)
+        subject to l \leq x \leq u
 
 using a method described in
 E. G. Birgin and J. M. Martinez, "Large-scale active-set
@@ -3024,9 +2931,9 @@ Subroutines evalf and evalg must be supplied by the user to
 evaluate the function f and its gradient, respectively. The
 calling sequences are
 
-	inform evalf(f, x)
+    inform evalf(f, x)
 
-	inform evalg(g, x)
+    inform evalg(g, x)
 
 where x is the point where the function (the gradient) must be
 evaluated, n is the number of variables and f (g) is the
@@ -3038,11 +2945,11 @@ is optional. If this subroutine is not provided an incremental
 quotients version will be used instead. The calling sequence of
 this subroutine should be
 
-	inform	call evalhd(hu, x, u, ind)
+    inform	call evalhd(hu, x, u, ind)
 
         where x is the point where the approx-Hessian is being considered,
         u is the vector which should be multiplied by the approx-Hessian H
-	and hu is the vector where the product should be placed.
+    and hu is the vector where the product should be placed.
 
 The information about the matrix H must
 be passed to evalhd by means of common declarations. The necessary
@@ -3370,199 +3277,183 @@ evalhd could be:
 
 =for example
 
-	$x = random(5);
-	$gx = $x->zeroes;
-	$fx = pdl(0);
-	
-	$print = pdl(long,[1,0]);
-	$maxit = pdl(long, 200);
-	$maxfc = pdl(long, 1000);
-	$info = pdl(long,0);
-	$bounds = zeroes(5,2);
-	$bounds(,0).=-5;
-	$bounds(,1).=5;
+    $x = random(5);
+    $gx = $x->zeroes;
+    $fx = pdl(0);
+    
+    $print = pdl(long,[1,0]);
+    $maxit = pdl(long, 200);
+    $maxfc = pdl(long, 1000);
+    $info = pdl(long,0);
+    $bounds = zeroes(5,2);
+    $bounds(,0).=-5;
+    $bounds(,1).=5;
 
-	sub f_func{
-		my ($fx, $x) = @_;
-		$fx .= rosen($x);
-		return 0;
-	}
-	sub g_func{
-		my ($gx, $x) = @_;
-		$gx .= rosen_grad($x);		
-		return 0;	
-	}
-	sub h_func{
-		my ($hx, $x, $d, $ind) = @_;
-		$hx .= rosen_hess($x,1) x $d;
-		return 0;
-	}
-	sgencan($fx, $gx, $x, $bounds, $maxit, $maxfc,
-	1, 0, 0, 0, 5, 10, 5, 1, -1, 5,
-	0, 1e-8, 1e-10, 1e-5, 0.1, 1e-5, 1e-5,
-	-1, 0.9, 0.1,
-	$print,$info,\&f_func,\&g_func, \&h_func);
+    sub f_func{
+        my ($fx, $x) = @_;
+        $fx .= rosen($x);
+        return 0;
+    }
+    sub g_func{
+        my ($gx, $x) = @_;
+        $gx .= rosen_grad($x);		
+        return 0;	
+    }
+    sub h_func{
+        my ($hx, $x, $d, $ind) = @_;
+        $hx .= rosen_hess($x,1) x $d;
+        return 0;
+    }
+    sgencan($fx, $gx, $x, $bounds, $maxit, $maxfc,
+    1, 0, 0, 0, 5, 10, 5, 1, -1, 5,
+    0, 1e-8, 1e-10, 1e-5, 0.1, 1e-5, 1e-5,
+    -1, 0.9, 0.1,
+    $print,$info,\&f_func,\&g_func, \&h_func);
 
 ');
 
 pp_def("dhc",
-	HandleBad => 0,
-	Pars => '[io,phys]xrandom(n,m);step(); xtol(); int print();[o]fx();[o]x(n)',
-	OtherPars => "SV* dhc_func" ,
-	GenericTypes => ['D'],
-	Code =>'
-		extern double dhc(PDL_Indx nvars, double *xrandom, double init, double tol,
-			double *u, double *v, double *xv, double (*func)());
-		$GENERIC() *u, *v, *xv;
-		$GENERIC() fx;
-		PDL_Indx i,j,k;
-
-		hooke_function    = $COMP(dhc_func);
-		u = ($GENERIC() *) malloc (sizeof($GENERIC()) * $SIZE(n));
-		v = ($GENERIC() *) malloc (sizeof($GENERIC()) * $SIZE(n));
-		xv = ($GENERIC() *) malloc (sizeof($GENERIC()) * $SIZE(n));
-		
-		$fx() = fx = DBL_MAX;
-		
-		for(i = 0; i < $SIZE(m); i++)
-		{
-			fx = dhc($SIZE(n),
-				&$xrandom(n=>0,m=>i),
-				$step(),
-				$xtol(),
-				u,
-				v,
-				xv,
-				hooke_wrapper);
-			
-			if ($print())
-			{
-				printf("\nAt starting location %"IND_FLAG":\n",i+1);
-				printf("Minimal point (first components):\n");
-				for(k = 0; k < $SIZE(n); k++)
-				{
-					printf("%5.5g  ", $xrandom(n=>k,m=>i));
-					if (k > 4)
-						break;
-				}
-				printf("\nFunctional value: %5.5g\n",fx);
-			}
-			if (fx < $fx())
-			{
-				$fx() = fx;
-				for (j = 0; j < $SIZE(n); j++)
-				{
-					$x(n=>j) =  $xrandom(n=>j,m=>i);
-				}
-			}
-		}
-		free(u);
-		free(v);
-		free(xv);
-',
-	Doc =>'
-
+    HandleBad => 0,
+    Pars => '[io,phys]xrandom(n,m);step(); xtol(); int print();[o]fx();[o]x(n);
+      [t] u(n); [t] v(n); [t] xv(n)',
+    OtherPars => "SV* dhc_func" ,
+    GenericTypes => ['D'],
+    Code => pp_line_numbers(__LINE__, <<'EOF'),
+        extern double dhc(PDL_Indx nvars, double *xrandom, double init, double tol,
+            double *u, double *v, double *xv, double (*func)());
+        $GENERIC() fx;
+        hooke_function    = $COMP(dhc_func);
+        
+        $fx() = fx = DBL_MAX;
+        
+        loop (m) %{
+            fx = dhc($SIZE(n),
+                $P(xrandom),
+                $step(),
+                $xtol(),
+                $P(u),
+                $P(v),
+                $P(xv),
+                hooke_wrapper);
+            
+            if ($print())
+            {
+                printf("\nAt starting location %"IND_FLAG":\n",m+1);
+                printf("Minimal point (first components):\n");
+                loop (n) %{
+                    printf("%5.5g  ", $xrandom());
+                    if (n > 4) break;
+                %}
+                printf("\nFunctional value: %5.5g\n",fx);
+            }
+            if (fx < $fx())
+            {
+                $fx() = fx;
+                loop (n) %{
+                    $x() =  $xrandom();
+                %}
+            }
+        %}
+EOF
+    Doc =>'
 =for ref
 
 Find a point X where the function dhc_func(X) has a global
 minimum.  X is an n-vector and f(X) is a scalar.  In mathematical
 notation
 
-	f: R^n -> R^1.
+    f: R^n -> R^1.
 
 using a method, dynamic hill climbing, described in
 D. Yuret, "From Genetic Algorithms To Efficient Optimization",
 A.I. Technical Report No. 1569 (1994).
 (http://home.ku.edu.tr/~dyuret/pub/aitr1569.html).
 
-
       where
 
      fx:           On exit it contains the value of the function f at
-		   the point x.
+           the point x.
      x:		   On exit this is the location of the global minimum,
-		   calculated by the program.
+           calculated by the program.
      xrandom:	   This is a user-supplied initial starting locations.
-		   On exit there are locations of the minimums
-		   calculated by the program.
+           On exit there are locations of the minimums
+           calculated by the program.
      step:	   Initial step length.
      xtol:	   Step tolerance(minimum step size).
      print:	   if true print some information at each iteration
-		   (each minimum).
+           (each minimum).
      dhc_func:	   Objective function to be minimized.
-		   If you need boundary conditions, put them in the
-		   objective function such that the optimizer gets
-		   bad values for points out of bounds.
-		   scalar double dhc_func($x())
+           If you need boundary conditions, put them in the
+           objective function such that the optimizer gets
+           bad values for points out of bounds.
+           scalar double dhc_func($x())
 
 =for example
 
-	# Local Optimization
-	$randomx = grandom(2);
-	sub test{
-		my $a = shift;
-		rosen($a)->sclr;
-	}
-	$step = pdl(1.0);
-	$tol = pdl(1e-10);
-	($fx ,  $ret) = dhc($randomx, $step, $tol,0,\&test);
-	print "Minimum found ($fx) at $ret";
+    # Local Optimization
+    $randomx = grandom(2);
+    sub test{
+        my $a = shift;
+        rosen($a)->sclr;
+    }
+    $step = pdl(1.0);
+    $tol = pdl(1e-10);
+    ($fx ,  $ret) = dhc($randomx, $step, $tol,0,\&test);
+    print "Minimum found ($fx) at $ret";
 
-	# Try to solve
-	# The SIAM 100-Digit Challenge problem 4
-	# see http://www-m8.ma.tum.de/m3/bornemann/challengebook/
-	# result: -3.30686864747523728007611377089851565716648236
-	$randomx = (random(2,100)-0.5)*2;
-	sub test{
-		my $x = shift;
-		my $f = exp(sin(50*$x(0)))+sin(60*exp($x(1)))+
-		sin(70*sin($x(0)))+sin(sin(80*$x(1)))-
+    # Try to solve
+    # The SIAM 100-Digit Challenge problem 4
+    # see http://www-m8.ma.tum.de/m3/bornemann/challengebook/
+    # result: -3.30686864747523728007611377089851565716648236
+    $randomx = (random(2,100)-0.5)*2;
+    sub test{
+        my $x = shift;
+        my $f = exp(sin(50*$x(0)))+sin(60*exp($x(1)))+
+        sin(70*sin($x(0)))+sin(sin(80*$x(1)))-
                 sin(10*($x(0)+$x(1)))+($x(0)**2+$x(1)**2)/4;
-		$f->sclr;
-	}
-	$step = pdl(0.7);
-	$tol = pdl(1e-8);
-	($fx ,  $ret) = dhc($randomx, $step, $tol,0,\&test);
-	print "Minimum found ($fx) at $ret";
+        $f->sclr;
+    }
+    $step = pdl(0.7);
+    $tol = pdl(1e-8);
+    ($fx ,  $ret) = dhc($randomx, $step, $tol,0,\&test);
+    print "Minimum found ($fx) at $ret";
 ');
 
 pp_def("de_opt",
-	HandleBad => 0,
-	Pars => '[io,phys]x(n);int genmax();int seed();int strategy();
-		int np();f();cr();inibound_l();inibound_u();int print();[o]fx();[o]cvar()',
-	OtherPars => "SV* de_func" ,
-	GenericTypes => ['D'],
-	Code =>'
-		extern double de_optimize(PDL_Indx D, double *best, int genmax, int seed, int  NP,
-		int  strategy, double F, double CR, double *cvar,
-		double inibound_h, double inibound_l, int   refresh, double (*evaluate)());
-
-		hooke_function    = $COMP(de_func);
-		
-		$fx() = de_optimize($SIZE(n),
-				$P(x),
-				$genmax(),
-				$seed(),
-				$np(),
-				$strategy(),
-				$f(),
-				$cr(),
-				$P(cvar),
-				$inibound_l(),
-				$inibound_u(),
-				$print(),
-				hooke_wrapper);
-			
-',
-	Doc =>'
-
+    HandleBad => 0,
+    Pars => '[io,phys]x(n);int genmax();int seed();int strategy();
+        int np();f();cr();inibound_l();inibound_u();int print();[o]fx();[o]cvar()',
+    OtherPars => "SV* de_func" ,
+    GenericTypes => ['D'],
+    CHeader => '
+        extern double de_optimize(PDL_Indx D, double *best, int genmax, int seed, int  NP,
+        int  strategy, double F, double CR, double *cvar,
+        double inibound_h, double inibound_l, int   refresh, double (*evaluate)());
+    ',
+    Code => pp_line_numbers(__LINE__, <<'EOF'),
+        hooke_function    = $COMP(de_func);
+        $fx() = de_optimize($SIZE(n),
+                $P(x),
+                $genmax(),
+                $seed(),
+                $np(),
+                $strategy(),
+                $f(),
+                $cr(),
+                $P(cvar),
+                $inibound_l(),
+                $inibound_u(),
+                $print(),
+                hooke_wrapper);
+EOF
+    Doc =>'
 =for ref
 
 Find a point X where the function de_func(X) has a global
 minimum.  X is an n-vector and f(X) is a scalar. In mathematical
 notation
 
-	f: R^n -> R^1.
+    f: R^n -> R^1.
 
 using a method described in
 Storn, R. and Price, K., "Differential Evolution - a Simple and Efficient
@@ -3572,7 +3463,7 @@ Technical Report TR-95-012, ICSI, March 1995.
 
 Strategy:
 
-	1:   "DE/best/1/exp",
+        1:   "DE/best/1/exp",
         2:    "DE/rand/1/exp",
         3:    "DE/rand-to-best/1/exp",
         4:    "DE/best/2/exp",
@@ -3584,27 +3475,27 @@ Strategy:
         10:    "DE/rand/2/bin"
 
 
-	Choice of strategy
-	We have tried to come up with a sensible naming-convention: DE/x/y/z
-	DE :  stands for Differential Evolution
-	x  :  a string which denotes the vector to be perturbed
-	y  :  number of difference vectors taken for perturbation of x
-	z  :  crossover method (exp = exponential, bin = binomial)
+    Choice of strategy
+    We have tried to come up with a sensible naming-convention: DE/x/y/z
+    DE :  stands for Differential Evolution
+    x  :  a string which denotes the vector to be perturbed
+    y  :  number of difference vectors taken for perturbation of x
+    z  :  crossover method (exp = exponential, bin = binomial)
 
-	There are some simple rules which are worth following:
-	F is usually between 0.5 and 1 (in rare cases > 1
-	CR is between 0 and 1 with 0., 0.3, 0.7 and 1. being worth to be tried first
-	To start off NP = 10*D is a reasonable choice. Increase NP if misconvergence happens.
-	If you increase NP, F usually has to be decreased
-	When the DE/best... schemes fail DE/rand... usually works and vice versa
+    There are some simple rules which are worth following:
+    F is usually between 0.5 and 1 (in rare cases > 1
+    CR is between 0 and 1 with 0., 0.3, 0.7 and 1. being worth to be tried first
+    To start off NP = 10*D is a reasonable choice. Increase NP if misconvergence happens.
+    If you increase NP, F usually has to be decreased
+    When the DE/best... schemes fail DE/rand... usually works and vice versa
 
 
       where
 
      fx:           On exit it contains the value of the function f at
-		   the point x.
+           the point x.
      x:		   On exit this is the location of the global minimum,
-		   calculated by the program.
+           calculated by the program.
      cvar:	   On exit it contains the value variance of the function f.
      strategy:	   Choice of strategy.
      seed:	   Random seed.
@@ -3615,47 +3506,47 @@ Strategy:
      inibound_l:   Lower parameter bound for init.
      inibound_u:   Upper parameter bound for init.
      print:	   if > 1 print some information at each \'print\' generation
-		   (minimum = 1).
+           (minimum = 1).
      de_func:	   Objective function to be minimized.
-		   If you need boundary conditions, put them in the
-		   objective function such that the optimizer gets
-		   bad values for points out of bounds.
-		   scalar double de_func($x())
+           If you need boundary conditions, put them in the
+           objective function such that the optimizer gets
+           bad values for points out of bounds.
+           scalar double de_func($x())
 
 =for example
 
-	# Try to solve
-	# The SIAM 100-Digit Challenge problem 4
-	# see http://www-m8.ma.tum.de/m3/bornemann/challengebook/
-	# result: -3.30686864747523728007611377089851565716648236
-	use PDL::Opt::NonLinear;
+    # Try to solve
+    # The SIAM 100-Digit Challenge problem 4
+    # see http://www-m8.ma.tum.de/m3/bornemann/challengebook/
+    # result: -3.30686864747523728007611377089851565716648236
+    use PDL::Opt::NonLinear;
 
-	$x = zeroes(2);
-	$strategy = pdl(long,7);
-	$np = pdl(long,50);
-	$print = pdl(long,50);
-	$inibound_l = pdl(-1.0);
-	$inibound_h = pdl(1.0);
-	$genmax = pdl(long,250);
-	$seed = pdl(long,3);
-	$f = pdl(0.9);
-	$cr = pdl(0.9);
+    $x = zeroes(2);
+    $strategy = pdl(long,7);
+    $np = pdl(long,50);
+    $print = pdl(long,50);
+    $inibound_l = pdl(-1.0);
+    $inibound_h = pdl(1.0);
+    $genmax = pdl(long,250);
+    $seed = pdl(long,3);
+    $f = pdl(0.9);
+    $cr = pdl(0.9);
 
-	sub test{
+    sub test{
                 my $x = shift;
                 my ($x0, $y1);
-		$x0 = PDL::Core::sclr_c($x(0));
-		$y1 = PDL::Core::sclr_c($x(1));
-		my $f = exp(sin(50*$x0))+sin(60*exp($y1))+
+        $x0 = PDL::Core::sclr_c($x(0));
+        $y1 = PDL::Core::sclr_c($x(1));
+        my $f = exp(sin(50*$x0))+sin(60*exp($y1))+
                 sin(70*sin($x0))+sin(sin(80*$y1))-
                 sin(10*($x0+$y1))+($x0**2+$y1**2)/4;
                 $f;
-	}
-	($fx,$cvar)=de_opt($x, $genmax, $seed, $strategy, $np,
-		$f, $cr, $inibound_l, $inibound_h,
-		$print, \&test);
+    }
+    ($fx,$cvar)=de_opt($x, $genmax, $seed, $strategy, $np,
+        $f, $cr, $inibound_l, $inibound_h,
+        $print, \&test);
 
-	print "Minimum found ($fx) at $x with variance $cvar\n";
+    print "Minimum found ($fx) at $x with variance $cvar\n";
 ');
 
 
@@ -3673,32 +3564,30 @@ double asa_wrapper (double *x,
 
 #TODO : FUNC EXIT/GRADIENT/HESSIAN/  tangent(s)
 pp_def("asa_opt",
-	HandleBad => 0,
-	Pars => '[io,phys]x(n);int seed();inibound_l(n);inibound_u(n);
-	int parameter_type(n); int limit(5); cost_param(4); temperature(3);
-	int generic(10);resolution(n);coarse_resolution(n);
-	quench_cost(); quench_param(n);int print();[o]fx();[o]tangents(n);[o]curvature(n,n);int [o]info()',
-	OtherPars => "SV* asa_func" ,
-	GenericTypes => ['D'],
-	Code =>'
-
-	extern int asa_main (PDL_Indx n, double *x,double *fx, double *upper, double *lower,
-			int *parameter_type, PDL_Long seed, PDL_Long *limit, double *cost_param, double *temp,
-			PDL_Long *generic,double *res, double *coarse, double *tangent, double *curvature,
-			double *quench_cost, double *quench_scale, PDL_Long print, double (*func)());
-	asa_function  = $COMP(asa_func);
-	$info() = asa_main($SIZE(n), $P(x), $P(fx), $P(inibound_l),
-			$P(inibound_u), $P(parameter_type),$seed(),
-			$P(limit), $P(cost_param), $P(temperature), $P(generic),
-			$P(resolution), $P(coarse_resolution), $P(tangents),
-			$P(curvature),$P(quench_cost), $P(quench_param),
-			$print(),asa_wrapper);
-
-',
-	Doc =>'
-
+    HandleBad => 0,
+    Pars => '[io,phys]x(n);int seed();inibound_l(n);inibound_u(n);
+    int parameter_type(n); int limit(5); cost_param(4); temperature(3);
+    int generic(10);resolution(n);coarse_resolution(n);
+    quench_cost(); quench_param(n);int print();[o]fx();[o]tangents(n);[o]curvature(n,n);int [o]info()',
+    OtherPars => "SV* asa_func" ,
+    GenericTypes => ['D'],
+    CHeader => '
+      extern int asa_main (PDL_Indx n, double *x,double *fx, double *upper, double *lower,
+              int *parameter_type, PDL_Long seed, PDL_Long *limit, double *cost_param, double *temp,
+              PDL_Long *generic,double *res, double *coarse, double *tangent, double *curvature,
+              double *quench_cost, double *quench_scale, PDL_Long print, double (*func)());
+    ',
+    Code => pp_line_numbers(__LINE__, <<'EOF'),
+    asa_function  = $COMP(asa_func);
+    $info() = asa_main($SIZE(n), $P(x), $P(fx), $P(inibound_l),
+            $P(inibound_u), $P(parameter_type),$seed(),
+            $P(limit), $P(cost_param), $P(temperature), $P(generic),
+            $P(resolution), $P(coarse_resolution), $P(tangents),
+            $P(curvature),$P(quench_cost), $P(quench_param),
+            $print(),asa_wrapper);
+EOF
+    Doc =>'
 =for ref
-
 
 This routine solves the optimization problem
 
@@ -3706,113 +3595,112 @@ This routine solves the optimization problem
       x
    subject to   low <= x <= up
 
-
 It uses the Adaptive Simulated Annealing (ASA) method.
 (see http://www.ingber.com/#ASA-CODE)
 
      where
 
      x
-	is a double precision array of dimension n.
-	On entry x is an approximation to the solution.
-	On exit x is the current approximation.
+    is a double precision array of dimension n.
+    On entry x is an approximation to the solution.
+    On exit x is the current approximation.
 
      seed
-	random seed.
+    random seed.
 
      inibound_l
-	lower bound on x.
-	
+    lower bound on x.
+    
      inibound_u
-	upper bound on x.
+    upper bound on x.
 
      parameter_type
-	type of value of x
-		-2 => real value, no reanneal
-		-1 => real value
-		 1 => integral value
-		 2 => integral value, no reanneal
+    type of value of x
+        -2 => real value, no reanneal
+        -1 => real value
+         1 => integral value
+         2 => integral value, no reanneal
 
      limit
-	limit(0) = Maximum_Cost_Repeat
-	limit(1) = Number_Cost_Samples
-	limit(2) = Limit_Acceptances
-	limit(3) = Limit_Generated
-	limit(4) = Limit_Invalid_Generated_States
-	
+    limit(0) = Maximum_Cost_Repeat
+    limit(1) = Number_Cost_Samples
+    limit(2) = Limit_Acceptances
+    limit(3) = Limit_Generated
+    limit(4) = Limit_Invalid_Generated_States
+    
      cost_param
-	cost_param(0) = Accepted_To_Generated_Ratio
-	cost_param(1) = Cost_Precision
-	cost_parma(2) = Cost_Parameter_Scale_Ratio
-	cost_parma(3) = Delta_X
-	
+    cost_param(0) = Accepted_To_Generated_Ratio
+    cost_param(1) = Cost_Precision
+    cost_parma(2) = Cost_Parameter_Scale_Ratio
+    cost_parma(3) = Delta_X
+    
      temperature
-	temperature(0) = Initial_Parameter_Temperature
-	temperature(1) = Temperature_Ratio_Scale
-	temperature(2) = Temperature_Anneal_Scale
+    temperature(0) = Initial_Parameter_Temperature
+    temperature(1) = Temperature_Ratio_Scale
+    temperature(2) = Temperature_Anneal_Scale
 
      generic
-	generic(0) = Include_Integer_Parameters
-	generic(1) = User_Initial_Parameters
-	generic(2) = Sequential_Parameters
-	generic(3) = Acceptance_Frequency_Modulus
-	generic(4) = Generated_Frequency_Modulus
-	generic(5) = Reanneal_Cost
-	generic(6) = Reanneal_Parameters
-	generic(7) = Queue_Size
-	generic(8) = User_Tangents (not implemented)
-	generic(9) = Curvature_0
+    generic(0) = Include_Integer_Parameters
+    generic(1) = User_Initial_Parameters
+    generic(2) = Sequential_Parameters
+    generic(3) = Acceptance_Frequency_Modulus
+    generic(4) = Generated_Frequency_Modulus
+    generic(5) = Reanneal_Cost
+    generic(6) = Reanneal_Parameters
+    generic(7) = Queue_Size
+    generic(8) = User_Tangents (not implemented)
+    generic(9) = Curvature_0
 
      resolution
-	On entry, array of resolutions used to compare
-	the currently generated parameters to those in the queue.
+    On entry, array of resolutions used to compare
+    the currently generated parameters to those in the queue.
 
      coarse_resolution
-	On entry, array of resolutions used to resolve
-	the values of generated parameters.
+    On entry, array of resolutions used to resolve
+    the values of generated parameters.
 
      quench_cost
-	used to adaptively set the scale of the temperature schedule.
+    used to adaptively set the scale of the temperature schedule.
 
      quench_param
-	used to adaptively set the scale of the temperature schedule.
+    used to adaptively set the scale of the temperature schedule.
 
      print
-	 print = 0 no output is generated
+     print = 0 no output is generated
 
      fx
-	On final exit f is the value of the function at x.
+    On final exit f is the value of the function at x.
 
      tangents
-	On exit, it is the value of the tangents (gradient) at x.
+    On exit, it is the value of the tangents (gradient) at x.
 
      curvature
-	On exit, it is the value of the curvature (hessian) at x.
+    On exit, it is the value of the curvature (hessian) at x.
 
      info
-	On entry 0,
-	On exit, contain error code:
-		NORMAL_EXIT		    => 0
-		P_TEMP_TOO_SMALL	    => 1
-		C_TEMP_TOO_SMALL	    => 2
-		COST_REPEATING		    => 3
-		TOO_MANY_INVALID_STATES	    => 4
-		IMMEDIATE_EXIT		    => 5
-		INVALID_USER_INPUT	    => 7
-		INVALID_COST_FUNCTION	    => 8
-		INVALID_COST_FUNCTION_DERIV => 9
-		CALLOC_FAILED		    => -1
+    On entry 0,
+    On exit, contain error code:
+        NORMAL_EXIT		            => 0
+        P_TEMP_TOO_SMALL	        => 1
+        C_TEMP_TOO_SMALL	        => 2
+        COST_REPEATING		        => 3
+        TOO_MANY_INVALID_STATES	    => 4
+        IMMEDIATE_EXIT		        => 5
+        INVALID_USER_INPUT	        => 7
+        INVALID_COST_FUNCTION	    => 8
+        INVALID_COST_FUNCTION_DERIV => 9
+        CALLOC_FAILED		        => -1
 
 
 
 =for example
 
-	# Try to solve
-	# The SIAM 100-Digit Challenge problem 4
-	# see http://www-m8.ma.tum.de/m3/bornemann/challengebook/
-	# result: -3.30686864747523728007611377089851565716648236
-	use PDL::Opt::NonLinear;
-	sub test{
+    # Try to solve
+    # The SIAM 100-Digit Challenge problem 4
+    # see http://www-m8.ma.tum.de/m3/bornemann/challengebook/
+    # result: -3.30686864747523728007611377089851565716648236
+    use PDL::Opt::NonLinear;
+    sub test{
                 my $x = shift;
                 my ($x0, $y1);
                 $x0 = PDL::Core::sclr_c($x(0));
@@ -3823,35 +3711,35 @@ It uses the Adaptive Simulated Annealing (ASA) method.
                 $f;
         }
 
-	$bu = zeroes(2);
-	$bl = zeroes(2);
-	$bu .= 1;
-	$bl .= -1;
-	$seed = pdl(696969);
-	$parameter = zeroes(long,2);
-	$parameter .= -1;
-	$qp = ones(2);
-	$qc = pdl(1.0);
-	$print = pdl(long,0);
-	$seed = pdl(long, 696969);
-	$limit = pdl(long,[5,10,1000,99999,1000]);
-	$cost_param = pdl [1.e-4,1.e-18,1.0,0.001];
-	# $temp = pdl [1.0,1.e-5,100.0]; for generic problem
-	$temp = pdl [1.0,1.e-5,10000.0];
-	$generic = pdl(long,[0,0,-1,100,10000,1,1,50,0,0]);
-	$res = zeroes(2);
-	$coarse = zeroes(2);
+    $bu = zeroes(2);
+    $bl = zeroes(2);
+    $bu .= 1;
+    $bl .= -1;
+    $seed = pdl(696969);
+    $parameter = zeroes(long,2);
+    $parameter .= -1;
+    $qp = ones(2);
+    $qc = pdl(1.0);
+    $print = pdl(long,0);
+    $seed = pdl(long, 696969);
+    $limit = pdl(long,[5,10,1000,99999,1000]);
+    $cost_param = pdl [1.e-4,1.e-18,1.0,0.001];
+    # $temp = pdl [1.0,1.e-5,100.0]; for generic problem
+    $temp = pdl [1.0,1.e-5,10000.0];
+    $generic = pdl(long,[0,0,-1,100,10000,1,1,50,0,0]);
+    $res = zeroes(2);
+    $coarse = zeroes(2);
 
-	$x = (random(2)-0.5)*2;
-	asa_opt($x, ++$seed, $bl, $bu, $parameter, $limit, $cost_param, $temp,
-		$generic, $res, $coarse, $qc, $qp, $print, \&test);
+    $x = (random(2)-0.5)*2;
+    asa_opt($x, ++$seed, $bl, $bu, $parameter, $limit, $cost_param, $temp,
+        $generic, $res, $coarse, $qc, $qp, $print, \&test);
 
-	# Local optimize now
-	$rho = pdl(0.2);
-	$tol = pdl(1e-10);
-	$maxit =pdl(long, 500);
-	$x->hooke($maxit, $rho,$tol,\&test);
-	print "Minimum found ".test($x)." at $x in $maxit iteration(s)";
+    # Local optimize now
+    $rho = pdl(0.2);
+    $tol = pdl(1e-10);
+    $maxit =pdl(long, 500);
+    $x->hooke($maxit, $rho,$tol,\&test);
+    print "Minimum found ".test($x)." at $x in $maxit iteration(s)";
 
 ');
 
@@ -3861,621 +3749,621 @@ pp_add_exported('', 'rosen rosen_grad rosen_hess optimize');
 pp_addpm({At=>'Bot'},<<'EOD');
 
 sub rosen{
-	my $a = shift;
-	sumover( 100 * ($a(1:) - $a(:-2)->power(2,0))**2 + (1-$a(:-2))**2);
+    my $a = shift;
+    sumover( 100 * ($a(1:) - $a(:-2)->power(2,0))**2 + (1-$a(:-2))**2);
 
 }
 
 sub optimize{
-	my ($x, %opt) = @_;
-	my ($function, %ret);
+    my ($x, %opt) = @_;
+    my ($function, %ret);
 
-	$function = $opt{function} ? $opt{function} : 'lbfgs';
-	$ret{fx} = pdl($x->type, 0);
+    $function = $opt{function} ? $opt{function} : 'lbfgs';
+    $ret{fx} = pdl($x->type, 0);
 
-	#TODO error, print
+    #TODO error, print
 
-	if (substr($function,0,5) eq 'lbfgs' ||
-		substr($function,0,4) eq 'lmqn' ||
-		 $function eq 'cgfam'){
-		barf "optimize: no evaluation function\n"
-			if ( (!defined $opt{fg_func}) && (!defined $opt{f_func}) && (!defined $opt{g_func}));
-		if (!defined $opt{fg_func}){
-			barf "optimize: no gradient evaluation function\n" unless defined $opt{g_func};
-			barf "optimize: no evaluation function\n" unless defined $opt{f_func};
-			$opt{fg_func} = sub {
-				my ($fx, $gx, $x) = @_;
-				$opt{f_func}($fx, $x);
-				$opt{g_func}($gx, $x);
-			};
-		}
-		if ($function eq 'lbfgs'){
-			my ($diagco, $diag);
-			$ret{gx} = $x->zeroes;
-			$diag = $x->zeroes;		
+    if (substr($function,0,5) eq 'lbfgs' ||
+        substr($function,0,4) eq 'lmqn' ||
+         $function eq 'cgfam'){
+        barf "optimize: no evaluation function\n"
+            if ( (!defined $opt{fg_func}) && (!defined $opt{f_func}) && (!defined $opt{g_func}));
+        if (!defined $opt{fg_func}){
+            barf "optimize: no gradient evaluation function\n" unless defined $opt{g_func};
+            barf "optimize: no evaluation function\n" unless defined $opt{f_func};
+            $opt{fg_func} = sub {
+                my ($fx, $gx, $x) = @_;
+                $opt{f_func}($fx, $x);
+                $opt{g_func}($gx, $x);
+            };
+        }
+        if ($function eq 'lbfgs'){
+            my ($diagco, $diag);
+            $ret{gx} = $x->zeroes;
+            $diag = $x->zeroes;		
 
-			$opt{eps} = pdl(1e-16) unless defined $opt{eps};
-			$opt{eta} = pdl(0.9) unless defined $opt{eta};
-			$opt{gtol} = pdl(1e-10) unless defined $opt{gtol};
-			$opt{'print'} = pdl(long,[-1,0])unless defined $opt{'print'};
-			if ( ! ref $opt{'print'}){
-				if ($opt{'print'} == -1){
-					$opt{'print'} = pdl(long,[-1,0]);
-				}
-				elsif ($opt{'print'} == 0){
-					$opt{'print'} = pdl(long,[$opt{'print'},0]);
-				}
-				else{
-					$opt{'print'} = pdl(long,[$opt{'print'},0]);
-				}
-			}
-			$ret{fcnt} = defined $opt{maxfc} ? pdl ($opt{maxfc}) : pdl(long , 100);
-			$ret{iter} = defined $opt{maxit} ? pdl ($opt{maxit}) : pdl(long , 50);
-			$ret{info} = pdl(long,0);
-			$opt{'m'} = pdl(long , 10) unless defined $opt{'m'};
-			if(defined $opt{d_func}){
-				$opt{d_func}($diag, $x);
-				$diagco= pdl(long,1);
-			}
-			else{
-				$opt{d_func} = sub{};
-				$diagco= pdl(long,0);
-			}
-			$opt{fg_func}($ret{fx}, $ret{gx}, $x);
-			lbfgs($ret{fx}, $ret{gx}, $x, $diag, $diagco, $opt{'m'}, $ret{iter}, $ret{fcnt}, $opt{gtol}, $opt{eps}, $opt{eta},
-			        $opt{'print'},$ret{info},$opt{fg_func},$opt{d_func});
-		}
-		elsif($function eq 'lbfgsb'){
-			my ($iv, $v);
-			$ret{gx} = $x->zeroes;
-			
-			#TODO: extract iv and v		
-			if (defined $opt{bound}){
-				barf "optimize: no bound type\n" unless defined $opt{tbound};
-			}
-			else{
-				$opt{tbound} = zeroes(long, $x->dim(0));
-				$opt{bound} = zeroes($x->type, $x->dim(0),2);
-			}
-			$opt{eta} = pdl(0.9) unless defined $opt{eta};
-			$opt{gtol} = pdl(1e-10) unless defined $opt{gtol};
-			$opt{factr} = pdl(100) unless defined $opt{factr};
-			$opt{'print'} = pdl(long,[-1,0])unless defined $opt{'print'};
-			if ( ! ref $opt{'print'}){
-				if ($opt{'print'} == -1){
-					$opt{'print'} = pdl(long,[-1,0]);
-				}
-				elsif ($opt{'print'} == 0){
-					$opt{'print'} = pdl(long,[$opt{'print'},0]);
-				}
-				else{
-					$opt{'print'} = pdl(long,[$opt{'print'},0]);
-				}
-			}
-			$ret{iter} = defined $opt{maxit} ? pdl ($opt{maxit}) : pdl(long , 50);
-			$ret{info} = pdl(long,0);
-			$opt{'m'} = pdl(long , 10) unless defined $opt{'m'};
-			$iv = zeroes(long,44);
-			$v = zeroes(29);
-			lbfgsb($ret{fx}, $ret{gx}, $x, $opt{'m'}, $opt{bound}, $opt{tbound}, $ret{iter}, $opt{factr}, $opt{gtol}, $opt{eta},
-			        $opt{'print'}, $ret{info},$iv, $v,$opt{fg_func});
-			$ret{fcnt} = $iv(33);
-		}
-		elsif (substr($function,0,4) eq 'lmqn'){
-			$ret{gx} = $x->zeroes;
-	                #BUG => param maxfc && cg
-			$opt{accrcy} = pdl(1e-16) unless defined $opt{accrcy};
-			$opt{eps} = pdl(1e-10) unless defined $opt{eps};
-			$opt{stepmx} = pdl(1) unless defined $opt{stepmx};
-			$opt{eta} = pdl(0.25) unless defined $opt{eta};
-			$ret{info} = pdl(long,0);
-			$opt{'print'} = pdl(long,0)unless defined $opt{'print'};
-			if ( (! ref $opt{'print'}) && defined($opt{'print'})){
-				if ($opt{'print'} == -1){
-					$opt{'print'} = pdl(long,0);
-				}
-				elsif ($opt{'print'} == 0){
-					$opt{'print'} = pdl(long,1);
-				}
-				else{
-					$opt{'print'} = pdl($opt{'print'});
-				}
-			}
-			$ret{fcnt} = defined $opt{maxfc} ? pdl ($opt{maxfc}) : pdl(long , 200);
-			$ret{iter} = defined $opt{maxit} ? pdl ($opt{maxit}) : pdl(long , 100);
-			$opt{cgmaxit} = pdl(long, 50) unless defined $opt{cgmaxit};
-			$opt{fg_func}($ret{fx}, $ret{gx}, $x);
-			$opt{fg_func}($ret{fx}, $ret{gx}, $x);
-			defined $opt{bound} ?
-			lmqnbc($ret{fx}, $ret{gx}, $x, $opt{bound}, $ret{iter}, $ret{fcnt}, $opt{cgmaxit}, $opt{eps}, $opt{accrcy}, $opt{eta}, $opt{stepmx}, $opt{'print'}, $ret{info}, $opt{fg_func}):
-			lmqn($ret{fx}, $ret{gx}, $x, $ret{iter}, $ret{fcnt}, $opt{cgmaxit}, $opt{eps}, $opt{accrcy}, $opt{eta}, $opt{stepmx}, $opt{'print'}, $ret{info}, $opt{fg_func});
-			if ($opt{'print'}){
-				if($ret{info} == 0){
-					print "Convergence in lmqn optimization\n";
-				}
-				elsif($ret{info} == 1){
-					print "Too many iterations in lmqn optimization\n";
-				}
-				elsif($ret{info} == 2){
-					print "Too many function evaluations in lmqn optimization\n";
-				}
-				elsif($ret{info} == 3){
-					print "Line search failed to find lowest point in lmqn optimization\n";
-				}
-				else{
-					print "Error $ret{info} in lmqn optimization\n";
-				}
-			}
-		}
-		elsif ($function eq 'cgfam'){
-			$ret{gx} = $x->zeroes;
-	                #BUG => param maxit			
-			$opt{cgmethod} = pdl(long, 1) unless defined $opt{cgmethod};
-			$opt{eps} = pdl(1e-16) unless defined $opt{eps};
-			$opt{eta} = pdl(0.9) unless defined $opt{eta};
-			$opt{gtol} = pdl(1e-10) unless defined $opt{gtol};
-			$opt{'print'} = pdl(long,[-1,0])unless defined $opt{'print'};
-			if ( ! ref $opt{'print'}){
-				if ($opt{'print'} == -1){
-					$opt{'print'} = pdl(long,[-1,0]);
-				}
-				elsif ($opt{'print'} == 0){
-					$opt{'print'} = pdl(long,[$opt{'print'},0]);
-				}
-				else{
-					$opt{'print'} = pdl(long,[$opt{'print'},0]);
-				}
-			}
-			$ret{iter} = defined $opt{maxit} ? pdl ($opt{maxit}) : pdl(long , 200);
-			$ret{info} = pdl(long,0);
-			$opt{fg_func}($ret{fx}, $ret{gx}, $x);
-			cgfam($ret{fx}, $ret{gx}, $x, $ret{iter}, $opt{gtol}, $opt{eps}, $opt{eta},$opt{'print'},$ret{info},$opt{cgmethod}, $opt{fg_func});
-		}
+            $opt{eps} = pdl(1e-16) unless defined $opt{eps};
+            $opt{eta} = pdl(0.9) unless defined $opt{eta};
+            $opt{gtol} = pdl(1e-10) unless defined $opt{gtol};
+            $opt{'print'} = pdl(long,[-1,0])unless defined $opt{'print'};
+            if ( ! ref $opt{'print'}){
+                if ($opt{'print'} == -1){
+                    $opt{'print'} = pdl(long,[-1,0]);
+                }
+                elsif ($opt{'print'} == 0){
+                    $opt{'print'} = pdl(long,[$opt{'print'},0]);
+                }
+                else{
+                    $opt{'print'} = pdl(long,[$opt{'print'},0]);
+                }
+            }
+            $ret{fcnt} = defined $opt{maxfc} ? pdl ($opt{maxfc}) : pdl(long , 100);
+            $ret{iter} = defined $opt{maxit} ? pdl ($opt{maxit}) : pdl(long , 50);
+            $ret{info} = pdl(long,0);
+            $opt{'m'} = pdl(long , 10) unless defined $opt{'m'};
+            if(defined $opt{d_func}){
+                $opt{d_func}($diag, $x);
+                $diagco= pdl(long,1);
+            }
+            else{
+                $opt{d_func} = sub{};
+                $diagco= pdl(long,0);
+            }
+            $opt{fg_func}($ret{fx}, $ret{gx}, $x);
+            lbfgs($ret{fx}, $ret{gx}, $x, $diag, $diagco, $opt{'m'}, $ret{iter}, $ret{fcnt}, $opt{gtol}, $opt{eps}, $opt{eta},
+                    $opt{'print'},$ret{info},$opt{fg_func},$opt{d_func});
+        }
+        elsif($function eq 'lbfgsb'){
+            my ($iv, $v);
+            $ret{gx} = $x->zeroes;
+            
+            #TODO: extract iv and v		
+            if (defined $opt{bound}){
+                barf "optimize: no bound type\n" unless defined $opt{tbound};
+            }
+            else{
+                $opt{tbound} = zeroes(long, $x->dim(0));
+                $opt{bound} = zeroes($x->type, $x->dim(0),2);
+            }
+            $opt{eta} = pdl(0.9) unless defined $opt{eta};
+            $opt{gtol} = pdl(1e-10) unless defined $opt{gtol};
+            $opt{factr} = pdl(100) unless defined $opt{factr};
+            $opt{'print'} = pdl(long,[-1,0])unless defined $opt{'print'};
+            if ( ! ref $opt{'print'}){
+                if ($opt{'print'} == -1){
+                    $opt{'print'} = pdl(long,[-1,0]);
+                }
+                elsif ($opt{'print'} == 0){
+                    $opt{'print'} = pdl(long,[$opt{'print'},0]);
+                }
+                else{
+                    $opt{'print'} = pdl(long,[$opt{'print'},0]);
+                }
+            }
+            $ret{iter} = defined $opt{maxit} ? pdl ($opt{maxit}) : pdl(long , 50);
+            $ret{info} = pdl(long,0);
+            $opt{'m'} = pdl(long , 10) unless defined $opt{'m'};
+            $iv = zeroes(long,44);
+            $v = zeroes(29);
+            lbfgsb($ret{fx}, $ret{gx}, $x, $opt{'m'}, $opt{bound}, $opt{tbound}, $ret{iter}, $opt{factr}, $opt{gtol}, $opt{eta},
+                    $opt{'print'}, $ret{info},$iv, $v,$opt{fg_func});
+            $ret{fcnt} = $iv(33);
+        }
+        elsif (substr($function,0,4) eq 'lmqn'){
+            $ret{gx} = $x->zeroes;
+                    #BUG => param maxfc && cg
+            $opt{accrcy} = pdl(1e-16) unless defined $opt{accrcy};
+            $opt{eps} = pdl(1e-10) unless defined $opt{eps};
+            $opt{stepmx} = pdl(1) unless defined $opt{stepmx};
+            $opt{eta} = pdl(0.25) unless defined $opt{eta};
+            $ret{info} = pdl(long,0);
+            $opt{'print'} = pdl(long,0)unless defined $opt{'print'};
+            if ( (! ref $opt{'print'}) && defined($opt{'print'})){
+                if ($opt{'print'} == -1){
+                    $opt{'print'} = pdl(long,0);
+                }
+                elsif ($opt{'print'} == 0){
+                    $opt{'print'} = pdl(long,1);
+                }
+                else{
+                    $opt{'print'} = pdl($opt{'print'});
+                }
+            }
+            $ret{fcnt} = defined $opt{maxfc} ? pdl ($opt{maxfc}) : pdl(long , 200);
+            $ret{iter} = defined $opt{maxit} ? pdl ($opt{maxit}) : pdl(long , 100);
+            $opt{cgmaxit} = pdl(long, 50) unless defined $opt{cgmaxit};
+            $opt{fg_func}($ret{fx}, $ret{gx}, $x);
+            $opt{fg_func}($ret{fx}, $ret{gx}, $x);
+            defined $opt{bound} ?
+            lmqnbc($ret{fx}, $ret{gx}, $x, $opt{bound}, $ret{iter}, $ret{fcnt}, $opt{cgmaxit}, $opt{eps}, $opt{accrcy}, $opt{eta}, $opt{stepmx}, $opt{'print'}, $ret{info}, $opt{fg_func}):
+            lmqn($ret{fx}, $ret{gx}, $x, $ret{iter}, $ret{fcnt}, $opt{cgmaxit}, $opt{eps}, $opt{accrcy}, $opt{eta}, $opt{stepmx}, $opt{'print'}, $ret{info}, $opt{fg_func});
+            if ($opt{'print'}){
+                if($ret{info} == 0){
+                    print "Convergence in lmqn optimization\n";
+                }
+                elsif($ret{info} == 1){
+                    print "Too many iterations in lmqn optimization\n";
+                }
+                elsif($ret{info} == 2){
+                    print "Too many function evaluations in lmqn optimization\n";
+                }
+                elsif($ret{info} == 3){
+                    print "Line search failed to find lowest point in lmqn optimization\n";
+                }
+                else{
+                    print "Error $ret{info} in lmqn optimization\n";
+                }
+            }
+        }
+        elsif ($function eq 'cgfam'){
+            $ret{gx} = $x->zeroes;
+                    #BUG => param maxit			
+            $opt{cgmethod} = pdl(long, 1) unless defined $opt{cgmethod};
+            $opt{eps} = pdl(1e-16) unless defined $opt{eps};
+            $opt{eta} = pdl(0.9) unless defined $opt{eta};
+            $opt{gtol} = pdl(1e-10) unless defined $opt{gtol};
+            $opt{'print'} = pdl(long,[-1,0])unless defined $opt{'print'};
+            if ( ! ref $opt{'print'}){
+                if ($opt{'print'} == -1){
+                    $opt{'print'} = pdl(long,[-1,0]);
+                }
+                elsif ($opt{'print'} == 0){
+                    $opt{'print'} = pdl(long,[$opt{'print'},0]);
+                }
+                else{
+                    $opt{'print'} = pdl(long,[$opt{'print'},0]);
+                }
+            }
+            $ret{iter} = defined $opt{maxit} ? pdl ($opt{maxit}) : pdl(long , 200);
+            $ret{info} = pdl(long,0);
+            $opt{fg_func}($ret{fx}, $ret{gx}, $x);
+            cgfam($ret{fx}, $ret{gx}, $x, $ret{iter}, $opt{gtol}, $opt{eps}, $opt{eta},$opt{'print'},$ret{info},$opt{cgmethod}, $opt{fg_func});
+        }
 
-	}
-	elsif ($function eq 'tensoropt'){
-		barf "optimize: no evaluation function\n" unless defined $opt{f_func};
+    }
+    elsif ($function eq 'tensoropt'){
+        barf "optimize: no evaluation function\n" unless defined $opt{f_func};
 
-		$opt{f_func}($ret{fx}, $x);
-		my $hx = zeroes($x->dim(0),$x->dim(0));
-		$ret{gx} = $x->zeroes;
+        $opt{f_func}($ret{fx}, $x);
+        my $hx = zeroes($x->dim(0),$x->dim(0));
+        $ret{gx} = $x->zeroes;
 
-		if (defined $opt{g_func}){
-			$opt{gtype} = 2 unless defined $opt{gtype};
-			$opt{g_func}($ret{gx}, $x);
-		}
-		else{
-			$opt{g_func} = $opt{f_func};
-			$opt{gtype} = 0;
-		}
-		if (defined $opt{h_func}){
-			$opt{htype} = 2 unless defined $opt{htype};
-			$opt{h_func}($hx, $x);
-		}
-		else{
-			$opt{h_func} = $opt{f_func};
-			$opt{htype} = 0;
-		}
+        if (defined $opt{g_func}){
+            $opt{gtype} = 2 unless defined $opt{gtype};
+            $opt{g_func}($ret{gx}, $x);
+        }
+        else{
+            $opt{g_func} = $opt{f_func};
+            $opt{gtype} = 0;
+        }
+        if (defined $opt{h_func}){
+            $opt{htype} = 2 unless defined $opt{htype};
+            $opt{h_func}($hx, $x);
+        }
+        else{
+            $opt{h_func} = $opt{f_func};
+            $opt{htype} = 0;
+        }
 
-		if ( (! ref $opt{'print'}) && defined($opt{'print'})){
-			if ($opt{'print'} == -1){
-				$opt{'print'} = pdl(long,0);
-			}
-			elsif ($opt{'print'}){
-				$opt{'print'} = pdl(long,2);
-			}
-			else {
-				$opt{'print'} = pdl(long,1);
-			}
-		}
+        if ( (! ref $opt{'print'}) && defined($opt{'print'})){
+            if ($opt{'print'} == -1){
+                $opt{'print'} = pdl(long,0);
+            }
+            elsif ($opt{'print'}){
+                $opt{'print'} = pdl(long,2);
+            }
+            else {
+                $opt{'print'} = pdl(long,1);
+            }
+        }
 
-		$ret{iter} = defined $opt{maxit} ? pdl($opt{maxit}) : pdl(long , 100);
-		$opt{'method'} = pdl(long , 1) unless defined $opt{'method'};
-		$opt{gtol} =  pdl(1e-10) unless defined $opt{gtol};
-		$opt{xtol} =  pdl(1e-16) unless defined $opt{xtol};
-		$opt{stempx} =  pdl(1) unless defined $opt{stepmx};
-		$opt{ipr} =  pdl(long,6) unless defined $opt{ipr};
-		$opt{digits} =  pdl(long,16) unless defined $opt{digits};
-		$opt{fscale} =  pdl(1) unless defined $opt{fscale};
-		$opt{typx} =  ones($x->dim(0)) unless defined $opt{typx};
+        $ret{iter} = defined $opt{maxit} ? pdl($opt{maxit}) : pdl(long , 100);
+        $opt{'method'} = pdl(long , 1) unless defined $opt{'method'};
+        $opt{gtol} =  pdl(1e-10) unless defined $opt{gtol};
+        $opt{xtol} =  pdl(1e-16) unless defined $opt{xtol};
+        $opt{stempx} =  pdl(1) unless defined $opt{stepmx};
+        $opt{ipr} =  pdl(long,6) unless defined $opt{ipr};
+        $opt{digits} =  pdl(long,16) unless defined $opt{digits};
+        $opt{fscale} =  pdl(1) unless defined $opt{fscale};
+        $opt{typx} =  ones($x->dim(0)) unless defined $opt{typx};
 
-		tensoropt($ret{fx}, $ret{gx}, $hx, $x,
-			$opt{'method'},$ret{iter},$opt{digits},$opt{gtype},$opt{htype},$opt{fscale},
-			$opt{typx},$opt{stempx},$opt{xtol},$opt{gtol},$opt{'print'},$opt{ipr},
-			$opt{f_func}, $opt{g_func}, $opt{h_func});
+        tensoropt($ret{fx}, $ret{gx}, $hx, $x,
+            $opt{'method'},$ret{iter},$opt{digits},$opt{gtype},$opt{htype},$opt{fscale},
+            $opt{typx},$opt{stempx},$opt{xtol},$opt{gtol},$opt{'print'},$opt{ipr},
+            $opt{f_func}, $opt{g_func}, $opt{h_func});
 
-	}
-	elsif ($function eq ('gencan' )){
-		barf "optimize: no evaluation function\n" unless defined $opt{f_func};
-		$ret{gx} = $x->zeroes;
+    }
+    elsif ($function eq ('gencan' )){
+        barf "optimize: no evaluation function\n" unless defined $opt{f_func};
+        $ret{gx} = $x->zeroes;
 
-		if( ! defined $opt{g_func}){
-			$opt{gtype} = pdl(long, 1);
-			$opt{g_func} = sub {};
-		}
-		else {$opt{gtype} = pdl(long, 0);}
+        if( ! defined $opt{g_func}){
+            $opt{gtype} = pdl(long, 1);
+            $opt{g_func} = sub {};
+        }
+        else {$opt{gtype} = pdl(long, 0);}
 
-		if( ! defined $opt{h_func}){		
-			$opt{htvtype} = pdl(long, 1);
-			$opt{h_func} = sub {};
-		}
-		else{
-			$opt{htvtype} = pdl(long, 0);
-		}
+        if( ! defined $opt{h_func}){		
+            $opt{htvtype} = pdl(long, 1);
+            $opt{h_func} = sub {};
+        }
+        else{
+            $opt{htvtype} = pdl(long, 0);
+        }
 
-		$opt{delta} = pdl(-1) unless defined $opt{delta};
-		$opt{eta} = pdl(0.9) unless defined $opt{eta};
-		$opt{delmin} = pdl(0.1) unless defined $opt{delmin};
-		$opt{ftol} = pdl(0) unless defined $opt{ftol};
-		$opt{fmaxit} = pdl(long, 5) unless defined $opt{fmaxit};
-		$opt{gmaxit} = pdl(long, 10) unless defined $opt{gmaxit};
-		$opt{interpmaxit} = pdl(long, 5) unless defined $opt{interpmaxit};
-		$opt{cgstop} = pdl(long, 1) unless defined $opt{cgstop};
-		$opt{cgmaxit} = pdl(long, -1) unless defined $opt{cgmaxit};
-		$opt{qmpmaxit} = pdl(long, 5) unless defined $opt{qmpmaxit};
-		$opt{cggtol} = pdl(1e-5) unless defined $opt{cggtol};
-		$opt{cgintol} = pdl(0.1) unless defined $opt{cgintol};
-		$opt{cgfitol} = pdl(1e-5) unless defined $opt{cgfitol};
-		$opt{qmptol} = pdl(1e-5) unless defined $opt{qmptol};
+        $opt{delta} = pdl(-1) unless defined $opt{delta};
+        $opt{eta} = pdl(0.9) unless defined $opt{eta};
+        $opt{delmin} = pdl(0.1) unless defined $opt{delmin};
+        $opt{ftol} = pdl(0) unless defined $opt{ftol};
+        $opt{fmaxit} = pdl(long, 5) unless defined $opt{fmaxit};
+        $opt{gmaxit} = pdl(long, 10) unless defined $opt{gmaxit};
+        $opt{interpmaxit} = pdl(long, 5) unless defined $opt{interpmaxit};
+        $opt{cgstop} = pdl(long, 1) unless defined $opt{cgstop};
+        $opt{cgmaxit} = pdl(long, -1) unless defined $opt{cgmaxit};
+        $opt{qmpmaxit} = pdl(long, 5) unless defined $opt{qmpmaxit};
+        $opt{cggtol} = pdl(1e-5) unless defined $opt{cggtol};
+        $opt{cgintol} = pdl(0.1) unless defined $opt{cgintol};
+        $opt{cgfitol} = pdl(1e-5) unless defined $opt{cgfitol};
+        $opt{qmptol} = pdl(1e-5) unless defined $opt{qmptol};
 
-		$opt{trtype} = pdl(long, 0) unless defined $opt{trtype};
-		$opt{nearlyq} = pdl(long,0) unless defined $opt{nealryq};
-		$opt{fmin} = pdl(-1e+308) unless defined $opt{fmin};
-		$opt{trtype} = pdl(long,0) unless defined $opt{trtype};
-		$opt{ncomp} = pdl(long,5) unless defined $opt{ncomp};
-		$opt{'print'} = pdl(long,[-1,0])unless defined $opt{'print'};
-		if ( ! ref $opt{'print'}){
-			if ($opt{'print'} == -1){
-				$opt{'print'} = pdl(long,[-1,0]);
-			}
-			elsif ($opt{'print'} == 0){
-				$opt{'print'} = pdl(long,[$opt{'print'},0]);
-			}
-			else{
-				$opt{'print'} = pdl(long,[$opt{'print'},0]);
-			}
-		}
-		$opt{maxfc} = pdl(long , 1000) unless defined $opt{maxfc};
-		$opt{maxit} = pdl(long , 200) unless defined $opt{maxit};
+        $opt{trtype} = pdl(long, 0) unless defined $opt{trtype};
+        $opt{nearlyq} = pdl(long,0) unless defined $opt{nealryq};
+        $opt{fmin} = pdl(-1e+308) unless defined $opt{fmin};
+        $opt{trtype} = pdl(long,0) unless defined $opt{trtype};
+        $opt{ncomp} = pdl(long,5) unless defined $opt{ncomp};
+        $opt{'print'} = pdl(long,[-1,0])unless defined $opt{'print'};
+        if ( ! ref $opt{'print'}){
+            if ($opt{'print'} == -1){
+                $opt{'print'} = pdl(long,[-1,0]);
+            }
+            elsif ($opt{'print'} == 0){
+                $opt{'print'} = pdl(long,[$opt{'print'},0]);
+            }
+            else{
+                $opt{'print'} = pdl(long,[$opt{'print'},0]);
+            }
+        }
+        $opt{maxfc} = pdl(long , 1000) unless defined $opt{maxfc};
+        $opt{maxit} = pdl(long , 200) unless defined $opt{maxit};
 
-		$opt{lammax} = pdl(1e+40) unless defined $opt{lammax};
-		$opt{lammin} = pdl(1e-40) unless defined $opt{lammin};
-		$opt{theta} = pdl(1e-6) unless defined $opt{theta};
-		$opt{gamma} = pdl(0.0001) unless defined $opt{gamma};
-		$opt{beta} = pdl(0.5) unless defined $opt{beta};
-		$opt{sigma1} = pdl(0.1) unless defined $opt{sigma1};
-		$opt{sigma2} = pdl(0.9) unless defined $opt{sigma2};
-		$opt{nint} = pdl(2) unless defined $opt{nint};
-		$opt{'next'} = pdl(2) unless defined $opt{'next'};
+        $opt{lammax} = pdl(1e+40) unless defined $opt{lammax};
+        $opt{lammin} = pdl(1e-40) unless defined $opt{lammin};
+        $opt{theta} = pdl(1e-6) unless defined $opt{theta};
+        $opt{gamma} = pdl(0.0001) unless defined $opt{gamma};
+        $opt{beta} = pdl(0.5) unless defined $opt{beta};
+        $opt{sigma1} = pdl(0.1) unless defined $opt{sigma1};
+        $opt{sigma2} = pdl(0.9) unless defined $opt{sigma2};
+        $opt{nint} = pdl(2) unless defined $opt{nint};
+        $opt{'next'} = pdl(2) unless defined $opt{'next'};
 
-		$opt{sterel} = pdl(1e-10) unless defined $opt{sterel};
-		$opt{steabs} = pdl(1e-99) unless defined $opt{steabs};
-		$opt{epsrel} = pdl(1e-30) unless defined $opt{epsrel};
-		$opt{epsabs} = pdl(1e-99) unless defined $opt{epsabs};
-		$opt{infty} = pdl(1e+308) unless defined $opt{infty};
+        $opt{sterel} = pdl(1e-10) unless defined $opt{sterel};
+        $opt{steabs} = pdl(1e-99) unless defined $opt{steabs};
+        $opt{epsrel} = pdl(1e-30) unless defined $opt{epsrel};
+        $opt{epsabs} = pdl(1e-99) unless defined $opt{epsabs};
+        $opt{infty} = pdl(1e+308) unless defined $opt{infty};
 
-		if (defined $opt{gtol}){
-			$opt{gtol1} = $opt{gtol} unless defined $opt{gtol1};
-			$opt{gtol2} = $opt{gtol} unless defined $opt{gtol2};
-		}
-		else{
-			$opt{gtol1} = pdl(1-10) unless defined $opt{gtol1};
-			$opt{gtol2} = pdl(1e-10) unless defined $opt{gtol2};
-		}
+        if (defined $opt{gtol}){
+            $opt{gtol1} = $opt{gtol} unless defined $opt{gtol1};
+            $opt{gtol2} = $opt{gtol} unless defined $opt{gtol2};
+        }
+        else{
+            $opt{gtol1} = pdl(1-10) unless defined $opt{gtol1};
+            $opt{gtol2} = pdl(1e-10) unless defined $opt{gtol2};
+        }
 
-		$ret{info} = pdl(long,0);
-		$ret{gnorm1} = null;$ret{gnorm2} = null;
-		$ret{iter} = null; $ret{fcnt}= null;$ret{spgfcnt}=null;
-		$ret{gcnt} = null; $ret{cgcnt} = null; $ret{spgiter} = null;
-		$ret{tniter} = null; $ret{tnfcnt} = null; $ret{tnstpcnt} = null;
-		$ret{tnintcnt}= null; $ret{tnexgcnt} = null; $ret{tnexbcnt} = null;
-		$ret{tnintfe}= null; $ret{tnexgfe}= null; $ret{tnexbfe}=null;
+        $ret{info} = pdl(long,0);
+        $ret{gnorm1} = null;$ret{gnorm2} = null;
+        $ret{iter} = null; $ret{fcnt}= null;$ret{spgfcnt}=null;
+        $ret{gcnt} = null; $ret{cgcnt} = null; $ret{spgiter} = null;
+        $ret{tniter} = null; $ret{tnfcnt} = null; $ret{tnstpcnt} = null;
+        $ret{tnintcnt}= null; $ret{tnexgcnt} = null; $ret{tnexbcnt} = null;
+        $ret{tnintfe}= null; $ret{tnexgfe}= null; $ret{tnexbfe}=null;
 
-		if (! defined $opt{bound}){
-			$opt{bound} = zeroes($x->type, $x->dim(0),2);
-			$opt{bound}->(,0).= pdl(-1e308);
-			$opt{bound}->(,1).= pdl(1e308);
-		}
-			
+        if (! defined $opt{bound}){
+            $opt{bound} = zeroes($x->type, $x->dim(0),2);
+            $opt{bound}->(,0).= pdl(-1e308);
+            $opt{bound}->(,1).= pdl(1e308);
+        }
+            
 
-		gencan($ret{fx}, $ret{gx}, $x, $opt{bound}, $opt{fmin}, $opt{maxit}, $opt{maxfc},
-		$opt{nearlyq}, $opt{gtype}, $opt{htvtype}, $opt{trtype}, $opt{fmaxit}, $opt{gmaxit}, $opt{interpmaxit}, $opt{cgstop}, $opt{cgmaxit}, $opt{qmpmaxit},
-		$opt{ftol}, $opt{gtol2}, $opt{gtol1}, $opt{cggtol}, $opt{cgintol}, $opt{cgfitol}, $opt{qmptol},
-		$opt{delta}, $opt{eta}, $opt{delmin},
-		$opt{lammax}, $opt{lammin}, $opt{theta}, $opt{gamma}, $opt{beta}, $opt{sigma1},$opt{sigma2},
-		$opt{nint}, $opt{'next'}, $opt{sterel}, $opt{steabs}, $opt{epsrel}, $opt{epsabs}, $opt{infty},
-		$ret{gnorm2}, $ret{gnorm1}, $ret{iter}, $ret{fcnt},
-		$ret{gcnt}, $ret{cgcnt}, $ret{spgiter}, $ret{spgfcnt},
-		$ret{tniter}, $ret{tnfcnt}, $ret{tnstpcnt}, $ret{tnintcnt}, $ret{tnexgcnt}, $ret{tnexbcnt},
-		$ret{tnintfe}, $ret{tnexgfe}, $ret{tnexbfe},
-		$opt{'print'},$opt{ncomp}, $ret{info}, $opt{f_func}, $opt{g_func}, $opt{h_func});
-	
-	}
-	elsif ($function eq 'spg'){
-		barf "optimize: no gradient evaluation function\n" unless defined $opt{g_func};
-		barf "optimize: no evaluation function\n" unless defined $opt{f_func};
+        gencan($ret{fx}, $ret{gx}, $x, $opt{bound}, $opt{fmin}, $opt{maxit}, $opt{maxfc},
+        $opt{nearlyq}, $opt{gtype}, $opt{htvtype}, $opt{trtype}, $opt{fmaxit}, $opt{gmaxit}, $opt{interpmaxit}, $opt{cgstop}, $opt{cgmaxit}, $opt{qmpmaxit},
+        $opt{ftol}, $opt{gtol2}, $opt{gtol1}, $opt{cggtol}, $opt{cgintol}, $opt{cgfitol}, $opt{qmptol},
+        $opt{delta}, $opt{eta}, $opt{delmin},
+        $opt{lammax}, $opt{lammin}, $opt{theta}, $opt{gamma}, $opt{beta}, $opt{sigma1},$opt{sigma2},
+        $opt{nint}, $opt{'next'}, $opt{sterel}, $opt{steabs}, $opt{epsrel}, $opt{epsabs}, $opt{infty},
+        $ret{gnorm2}, $ret{gnorm1}, $ret{iter}, $ret{fcnt},
+        $ret{gcnt}, $ret{cgcnt}, $ret{spgiter}, $ret{spgfcnt},
+        $ret{tniter}, $ret{tnfcnt}, $ret{tnstpcnt}, $ret{tnintcnt}, $ret{tnexgcnt}, $ret{tnexbcnt},
+        $ret{tnintfe}, $ret{tnexgfe}, $ret{tnexbfe},
+        $opt{'print'},$opt{ncomp}, $ret{info}, $opt{f_func}, $opt{g_func}, $opt{h_func});
+    
+    }
+    elsif ($function eq 'spg'){
+        barf "optimize: no gradient evaluation function\n" unless defined $opt{g_func};
+        barf "optimize: no evaluation function\n" unless defined $opt{f_func};
 
-		# Bounded example
-		$ret{info} = pdl(long,0);
-		if ( (! ref $opt{'print'}) && defined($opt{'print'})){
-			if ($opt{'print'} == -1){
-				$opt{'print'} = pdl(long,0);
-			}
-			else {
-				$opt{'print'} = pdl(long,1);
-			}
-		}
-		$ret{fcnt} = pdl(long,0);
-		$ret{gcnt} = pdl(long,0);
-		$ret{iter} = defined $opt{maxit} ? pdl ($opt{maxit}) : pdl(long , 500);
-		$opt{maxfc} = pdl(long , 1000) unless defined $opt{maxfc};
-		$opt{'m'} = pdl(long , 100) unless defined $opt{'m'};
+        # Bounded example
+        $ret{info} = pdl(long,0);
+        if ( (! ref $opt{'print'}) && defined($opt{'print'})){
+            if ($opt{'print'} == -1){
+                $opt{'print'} = pdl(long,0);
+            }
+            else {
+                $opt{'print'} = pdl(long,1);
+            }
+        }
+        $ret{fcnt} = pdl(long,0);
+        $ret{gcnt} = pdl(long,0);
+        $ret{iter} = defined $opt{maxit} ? pdl ($opt{maxit}) : pdl(long , 500);
+        $opt{maxfc} = pdl(long , 1000) unless defined $opt{maxfc};
+        $opt{'m'} = pdl(long , 100) unless defined $opt{'m'};
 
-		$ret{gnorm1} = pdl(0);
-		$ret{gnorm2} = pdl(0);
-		if (defined $opt{gtol}){
-			$opt{gtol1} = $opt{gtol} unless defined $opt{gtol1};
-			$opt{gtol2} = $opt{gtol} unless defined $opt{gtol2};
-		}
-		else{
-			$opt{gtol1} = pdl(0) unless defined $opt{gtol1};
-			$opt{gtol2} = pdl(1e-5) unless defined $opt{gtol2};
-		}
+        $ret{gnorm1} = pdl(0);
+        $ret{gnorm2} = pdl(0);
+        if (defined $opt{gtol}){
+            $opt{gtol1} = $opt{gtol} unless defined $opt{gtol1};
+            $opt{gtol2} = $opt{gtol} unless defined $opt{gtol2};
+        }
+        else{
+            $opt{gtol1} = pdl(0) unless defined $opt{gtol1};
+            $opt{gtol2} = pdl(1e-5) unless defined $opt{gtol2};
+        }
 
-		$opt{pg_func} = sub{ return 0;}  unless defined $opt{pg_func};
+        $opt{pg_func} = sub{ return 0;}  unless defined $opt{pg_func};
 
-		spg($ret{fx}, $x, $opt{'m'}, $ret{iter}, $opt{maxfc}, $opt{gtol1}, $opt{gtol2}, $opt{'print'},
-				$ret{fcnt}, $ret{gcnt}, $ret{gnorm1}, $ret{gnorm2}, $ret{info}, $opt{f_func}, $opt{g_func}, $opt{pg_func});
-		if ($opt{'print'}){
-			if($ret{info} == 0){
-				print "Convergence with projected gradient infinite-norm in spg optimization\n";;
-			}
-			elsif($ret{info} == 1){
-				print "Convergence with projected gradient 2-norm in spg optimization\n";
-			}
-			elsif($ret{info} == 2){
-				print "Too many iterations in spg optimization\n";
-			}
-			elsif($ret{info} == 4){
-				print "Error in pg_func subroutine in spg optimization\n";
-			}
-			elsif($ret{info} == 5){
-				print "Error in f_func subroutine in spg optimization\n";
-			}
-			elsif($ret{info} == 6){
-				print "Error in g_func subroutine in spg optimization\n";
-			}
-		}
-	}
-	elsif ($function eq 'smnsx'){
-		barf "optimize: no evaluation function\n" unless defined $opt{f_func};
-		$ret{fx} = pdl(0);
-		$ret{step} = defined $opt{step} ? pdl ($opt{step}) : pdl(0.5);
-		$ret{stdev} = defined $opt{tol} ? pdl ($opt{tol}) : pdl(1e-16);
-		smnsx($x, $ret{step}, $ret{stdev}, $ret{fx}, $opt{f_func});
-	}
-	elsif ($function eq 'mnsx'){
-		barf "optimize: no evaluation function\n" unless defined $opt{f_func};
-		barf "optimize: no vertices\n" unless defined $opt{vertices};
-		$ret{fx} = pdl(0);
-		$ret{vertices} = pdl $opt{vertices};
-		$ret{stdev} = defined $opt{tol} ? pdl ($opt{tol}) : pdl(1e-16);
-		$opt{maxit} = pdl(long , 1000) unless defined $opt{maxit};
-		mnsx($x, $ret{vertices}, $opt{maxit}, $ret{stdev}, $ret{fx}, $opt{f_func});
-	}
-	elsif ($function eq 'rmn'){
-		barf "optimize: no evaluation function\n" unless defined $opt{f_func};
-		my ($dim,$iv, $v);
-		$dim = $x->dim(0);
-		if (defined $opt{bound}){
-			if (defined $opt{h_func}){
-				barf "optimize: no gradient evaluation function\n" unless defined $opt{g_func};
-				$ret{gx} = $x->zeroes;
-				$ret{hx} = zeroes($x->type, $dim *($dim+1)/2 );
-				$v = zeroes(78 + $dim * ($dim+27)/2 );
-				$iv = zeroes(long, 59 + 3*$dim);
-				ivset(2,$iv,$v);
-				$iv(16) .= $opt{maxfc} if defined $opt{maxfc};
-				$iv(17) .= $opt{maxit} if defined $opt{maxit};
-				if (defined $opt{'print'}){
-					if ($opt{'print'} == -1){
-						$iv(20).= 0;					
-					}
-					elsif($opt{'print'} == 0){
-						$iv(18).= 0;
-					}
-					else{
-						$iv(18).= $opt{'print'};
-					}
-				}
-				else{
-					$iv(20).= 0;
-				}
-				$v(34) .= $opt{stepmx} if defined $opt{stepmx};
-				$v(31) .= $opt{rfctol} if defined $opt{rfctol};
-				$v(32) .= $opt{xctol} if defined $opt{xctol};
-				$opt{scale} = ones($x->type, $dim) unless defined $opt{scale};
-				rmnhb($ret{fx}, $ret{gx}, $ret{hx}, $x, $opt{bound}->xchg(0,1), $opt{scale}, $iv, $v, $opt{f_func}, $opt{g_func}, $opt{h_func});
-			}
-			elsif (defined $opt{g_func}){
-				$ret{gx} = $x->zeroes;
-				$v = zeroes(71 + $dim *( $dim + 19 )/2);
-				$iv = zeroes(long,59+$dim);
-				ivset(2,$iv,$v);
-				$iv(16) .= $opt{maxfc} if defined $opt{maxfc};
-				$iv(17) .= $opt{maxit} if defined $opt{maxit};
-				if (defined $opt{'print'}){
-					if ($opt{'print'} == -1){
-						$iv(20).= 0;					
-					}
-					elsif($opt{'print'} == 0){
-						$iv(18).= 0;
-					}
-					else{
-						$iv(18).= $opt{'print'};
-					}
-				}
-				else{
-					$iv(20).= 0;
-				}
-				$v(34) .= $opt{stepmx} if defined $opt{stepmx};
-				$v(31) .= $opt{rfctol} if defined $opt{rfctol};
-				$v(32) .= $opt{xctol} if defined $opt{xctol};
-				$opt{scale} = ones($x->type, $dim) unless defined $opt{scale};
-				rmngb($ret{fx}, $ret{gx}, $x, $opt{bound}->xchg(0,1), $opt{scale}, $iv, $v, $opt{f_func}, $opt{g_func});
-			}
-			else{
-				$v = zeroes(77 + $dim *($dim+23));
-				$iv = zeroes(long,59+$dim);
-				ivset(2,$iv,$v);
-				$iv(16) .= $opt{maxfc} if defined $opt{maxfc};
-				$iv(17) .= $opt{maxit} if defined $opt{maxit};
-				if (defined $opt{'print'}){
-					if ($opt{'print'} == -1){
-						$iv(20).= 0;					
-					}
-					elsif($opt{'print'} == 0){
-						$iv(18).= 0;
-					}
-					else{
-						$iv(18).= $opt{'print'};
-					}
-				}
-				else{
-					$iv(20).= 0;
-				}
-				$v(41).= $opt{eta} if defined $opt{eta};
-				$v(34) .= $opt{stepmx} if defined $opt{stepmx};
-				$v(31) .= $opt{rfctol} if defined $opt{rfctol};
-				$v(32) .= $opt{xctol} if defined $opt{xctol};
-				$opt{scale} = ones($x->type, $dim) unless defined $opt{scale};
-				rmnfb($ret{fx}, $ret{gx}, $x, $opt{bound}->xchg(0,1), $opt{scale}, $iv, $v, $opt{f_func});
-			}
-		}
-		else{
-			if (defined $opt{h_func}){
-				barf "optimize: no gradient evaluation function\n" unless defined $opt{g_func};
-				$ret{gx} = $x->zeroes;
-				$ret{hx} = zeroes($x->type, $dim *($dim+1)/2 );
-				$v = zeroes(78 + $dim * ($dim+21)/2 );
-				$iv = zeroes(long, 59);
-				ivset(2,$iv,$v);
-				$iv(16) .= $opt{maxfc} if defined $opt{maxfc};
-				$iv(17) .= $opt{maxit} if defined $opt{maxit};
-				if (defined $opt{'print'}){
-					if ($opt{'print'} == -1){
-						$iv(20).= 0;					
-					}
-					elsif($opt{'print'} == 0){
-						$iv(18).= 0;
-					}
-					else{
-						$iv(18).= $opt{'print'};
-					}
-				}
-				else{
-					$iv(20).= 0;
-				}
-				$v(34) .= $opt{stepmx} if defined $opt{stepmx};
-				$v(31) .= $opt{rfctol} if defined $opt{rfctol};
-				$v(32) .= $opt{xctol} if defined $opt{xctol};
-				$opt{scale} = ones($x->type, $dim) unless defined $opt{scale};
-				rmnh($ret{fx}, $ret{gx}, $ret{hx}, $x, $opt{scale}, $iv, $v, $opt{f_func}, $opt{g_func}, $opt{h_func});
-			}
-			elsif (defined $opt{g_func}){
-				$ret{gx} = $x->zeroes;
-				$v = zeroes(71 + $dim *( $dim + 13 )/2);
-				$iv = zeroes(long,59);
-				ivset(2,$iv,$v);
-				$iv(16) .= $opt{maxfc} if defined $opt{maxfc};
-				$iv(17) .= $opt{maxit} if defined $opt{maxit};
-				if (defined $opt{'print'}){
-					if ($opt{'print'} == -1){
-						$iv(20).= 0;					
-					}
-					elsif($opt{'print'} == 0){
-						$iv(18).= 0;
-					}
-					else{
-						$iv(18).= $opt{'print'};
-					}
-				}
-				else{
-					$iv(20).= 0;
-				}
-				$v(34) .= $opt{stepmx} if defined $opt{stepmx};
-				$v(31) .= $opt{rfctol} if defined $opt{rfctol};
-				$v(32) .= $opt{xctol} if defined $opt{xctol};
-				$opt{scale} = ones($x->type, $dim) unless defined $opt{scale};
-				rmng($ret{fx}, $ret{gx}, $x, $opt{scale}, $iv, $v, $opt{f_func}, $opt{g_func});
-			}
-			else{
-				$v = zeroes(77 + $dim *($dim+17)/2);
-				$iv = zeroes(long,59);
-				ivset(2,$iv,$v);
-				$iv(16) .= $opt{maxfc} if defined $opt{maxfc};
-				$iv(17) .= $opt{maxit} if defined $opt{maxit};
-				if (defined $opt{'print'}){
-					if ($opt{'print'} == -1){
-						$iv(20).= 0;					
-					}
-					elsif($opt{'print'} == 0){
-						$iv(18).= 0;
-					}
-					else{
-						$iv(18).= $opt{'print'};
-					}
-				}
-				else{
-					$iv(20).= 0;
-				}
-				$v(41).= $opt{eta} if defined $opt{eta};
-				$v(34) .= $opt{stepmx} if defined $opt{stepmx};
-				$v(31) .= $opt{rfctol} if defined $opt{rfctol};
-				$v(32) .= $opt{xctol} if defined $opt{xctol};
-				$opt{scale} = ones($x->type, $dim) unless defined $opt{scale};
-				rmnf($ret{fx}, $ret{gx}, $x, $opt{scale}, $iv, $v, $opt{f_func});
-			}
-		}
-		$ret{fcnt} = $iv(5);
-		$ret{gcnt} = $iv(29);
-		$ret{info} = $iv(0);
-		$ret{iter} = $iv(30);
-		$ret{fx} = $v(9);
-		$ret{gnorm2} = $v(0);
-	}
-	else{
-		barf "$function is not supported\n";
-	}
-	wantarray ? return $x, %ret : return $x;
+        spg($ret{fx}, $x, $opt{'m'}, $ret{iter}, $opt{maxfc}, $opt{gtol1}, $opt{gtol2}, $opt{'print'},
+                $ret{fcnt}, $ret{gcnt}, $ret{gnorm1}, $ret{gnorm2}, $ret{info}, $opt{f_func}, $opt{g_func}, $opt{pg_func});
+        if ($opt{'print'}){
+            if($ret{info} == 0){
+                print "Convergence with projected gradient infinite-norm in spg optimization\n";;
+            }
+            elsif($ret{info} == 1){
+                print "Convergence with projected gradient 2-norm in spg optimization\n";
+            }
+            elsif($ret{info} == 2){
+                print "Too many iterations in spg optimization\n";
+            }
+            elsif($ret{info} == 4){
+                print "Error in pg_func subroutine in spg optimization\n";
+            }
+            elsif($ret{info} == 5){
+                print "Error in f_func subroutine in spg optimization\n";
+            }
+            elsif($ret{info} == 6){
+                print "Error in g_func subroutine in spg optimization\n";
+            }
+        }
+    }
+    elsif ($function eq 'smnsx'){
+        barf "optimize: no evaluation function\n" unless defined $opt{f_func};
+        $ret{fx} = pdl(0);
+        $ret{step} = defined $opt{step} ? pdl ($opt{step}) : pdl(0.5);
+        $ret{stdev} = defined $opt{tol} ? pdl ($opt{tol}) : pdl(1e-16);
+        smnsx($x, $ret{step}, $ret{stdev}, $ret{fx}, $opt{f_func});
+    }
+    elsif ($function eq 'mnsx'){
+        barf "optimize: no evaluation function\n" unless defined $opt{f_func};
+        barf "optimize: no vertices\n" unless defined $opt{vertices};
+        $ret{fx} = pdl(0);
+        $ret{vertices} = pdl $opt{vertices};
+        $ret{stdev} = defined $opt{tol} ? pdl ($opt{tol}) : pdl(1e-16);
+        $opt{maxit} = pdl(long , 1000) unless defined $opt{maxit};
+        mnsx($x, $ret{vertices}, $opt{maxit}, $ret{stdev}, $ret{fx}, $opt{f_func});
+    }
+    elsif ($function eq 'rmn'){
+        barf "optimize: no evaluation function\n" unless defined $opt{f_func};
+        my ($dim,$iv, $v);
+        $dim = $x->dim(0);
+        if (defined $opt{bound}){
+            if (defined $opt{h_func}){
+                barf "optimize: no gradient evaluation function\n" unless defined $opt{g_func};
+                $ret{gx} = $x->zeroes;
+                $ret{hx} = zeroes($x->type, $dim *($dim+1)/2 );
+                $v = zeroes(78 + $dim * ($dim+27)/2 );
+                $iv = zeroes(long, 59 + 3*$dim);
+                ivset(2,$iv,$v);
+                $iv(16) .= $opt{maxfc} if defined $opt{maxfc};
+                $iv(17) .= $opt{maxit} if defined $opt{maxit};
+                if (defined $opt{'print'}){
+                    if ($opt{'print'} == -1){
+                        $iv(20).= 0;					
+                    }
+                    elsif($opt{'print'} == 0){
+                        $iv(18).= 0;
+                    }
+                    else{
+                        $iv(18).= $opt{'print'};
+                    }
+                }
+                else{
+                    $iv(20).= 0;
+                }
+                $v(34) .= $opt{stepmx} if defined $opt{stepmx};
+                $v(31) .= $opt{rfctol} if defined $opt{rfctol};
+                $v(32) .= $opt{xctol} if defined $opt{xctol};
+                $opt{scale} = ones($x->type, $dim) unless defined $opt{scale};
+                rmnhb($ret{fx}, $ret{gx}, $ret{hx}, $x, $opt{bound}->xchg(0,1), $opt{scale}, $iv, $v, $opt{f_func}, $opt{g_func}, $opt{h_func});
+            }
+            elsif (defined $opt{g_func}){
+                $ret{gx} = $x->zeroes;
+                $v = zeroes(71 + $dim *( $dim + 19 )/2);
+                $iv = zeroes(long,59+$dim);
+                ivset(2,$iv,$v);
+                $iv(16) .= $opt{maxfc} if defined $opt{maxfc};
+                $iv(17) .= $opt{maxit} if defined $opt{maxit};
+                if (defined $opt{'print'}){
+                    if ($opt{'print'} == -1){
+                        $iv(20).= 0;					
+                    }
+                    elsif($opt{'print'} == 0){
+                        $iv(18).= 0;
+                    }
+                    else{
+                        $iv(18).= $opt{'print'};
+                    }
+                }
+                else{
+                    $iv(20).= 0;
+                }
+                $v(34) .= $opt{stepmx} if defined $opt{stepmx};
+                $v(31) .= $opt{rfctol} if defined $opt{rfctol};
+                $v(32) .= $opt{xctol} if defined $opt{xctol};
+                $opt{scale} = ones($x->type, $dim) unless defined $opt{scale};
+                rmngb($ret{fx}, $ret{gx}, $x, $opt{bound}->xchg(0,1), $opt{scale}, $iv, $v, $opt{f_func}, $opt{g_func});
+            }
+            else{
+                $v = zeroes(77 + $dim *($dim+23));
+                $iv = zeroes(long,59+$dim);
+                ivset(2,$iv,$v);
+                $iv(16) .= $opt{maxfc} if defined $opt{maxfc};
+                $iv(17) .= $opt{maxit} if defined $opt{maxit};
+                if (defined $opt{'print'}){
+                    if ($opt{'print'} == -1){
+                        $iv(20).= 0;					
+                    }
+                    elsif($opt{'print'} == 0){
+                        $iv(18).= 0;
+                    }
+                    else{
+                        $iv(18).= $opt{'print'};
+                    }
+                }
+                else{
+                    $iv(20).= 0;
+                }
+                $v(41).= $opt{eta} if defined $opt{eta};
+                $v(34) .= $opt{stepmx} if defined $opt{stepmx};
+                $v(31) .= $opt{rfctol} if defined $opt{rfctol};
+                $v(32) .= $opt{xctol} if defined $opt{xctol};
+                $opt{scale} = ones($x->type, $dim) unless defined $opt{scale};
+                rmnfb($ret{fx}, $ret{gx}, $x, $opt{bound}->xchg(0,1), $opt{scale}, $iv, $v, $opt{f_func});
+            }
+        }
+        else{
+            if (defined $opt{h_func}){
+                barf "optimize: no gradient evaluation function\n" unless defined $opt{g_func};
+                $ret{gx} = $x->zeroes;
+                $ret{hx} = zeroes($x->type, $dim *($dim+1)/2 );
+                $v = zeroes(78 + $dim * ($dim+21)/2 );
+                $iv = zeroes(long, 59);
+                ivset(2,$iv,$v);
+                $iv(16) .= $opt{maxfc} if defined $opt{maxfc};
+                $iv(17) .= $opt{maxit} if defined $opt{maxit};
+                if (defined $opt{'print'}){
+                    if ($opt{'print'} == -1){
+                        $iv(20).= 0;					
+                    }
+                    elsif($opt{'print'} == 0){
+                        $iv(18).= 0;
+                    }
+                    else{
+                        $iv(18).= $opt{'print'};
+                    }
+                }
+                else{
+                    $iv(20).= 0;
+                }
+                $v(34) .= $opt{stepmx} if defined $opt{stepmx};
+                $v(31) .= $opt{rfctol} if defined $opt{rfctol};
+                $v(32) .= $opt{xctol} if defined $opt{xctol};
+                $opt{scale} = ones($x->type, $dim) unless defined $opt{scale};
+                rmnh($ret{fx}, $ret{gx}, $ret{hx}, $x, $opt{scale}, $iv, $v, $opt{f_func}, $opt{g_func}, $opt{h_func});
+            }
+            elsif (defined $opt{g_func}){
+                $ret{gx} = $x->zeroes;
+                $v = zeroes(71 + $dim *( $dim + 13 )/2);
+                $iv = zeroes(long,59);
+                ivset(2,$iv,$v);
+                $iv(16) .= $opt{maxfc} if defined $opt{maxfc};
+                $iv(17) .= $opt{maxit} if defined $opt{maxit};
+                if (defined $opt{'print'}){
+                    if ($opt{'print'} == -1){
+                        $iv(20).= 0;					
+                    }
+                    elsif($opt{'print'} == 0){
+                        $iv(18).= 0;
+                    }
+                    else{
+                        $iv(18).= $opt{'print'};
+                    }
+                }
+                else{
+                    $iv(20).= 0;
+                }
+                $v(34) .= $opt{stepmx} if defined $opt{stepmx};
+                $v(31) .= $opt{rfctol} if defined $opt{rfctol};
+                $v(32) .= $opt{xctol} if defined $opt{xctol};
+                $opt{scale} = ones($x->type, $dim) unless defined $opt{scale};
+                rmng($ret{fx}, $ret{gx}, $x, $opt{scale}, $iv, $v, $opt{f_func}, $opt{g_func});
+            }
+            else{
+                $v = zeroes(77 + $dim *($dim+17)/2);
+                $iv = zeroes(long,59);
+                ivset(2,$iv,$v);
+                $iv(16) .= $opt{maxfc} if defined $opt{maxfc};
+                $iv(17) .= $opt{maxit} if defined $opt{maxit};
+                if (defined $opt{'print'}){
+                    if ($opt{'print'} == -1){
+                        $iv(20).= 0;					
+                    }
+                    elsif($opt{'print'} == 0){
+                        $iv(18).= 0;
+                    }
+                    else{
+                        $iv(18).= $opt{'print'};
+                    }
+                }
+                else{
+                    $iv(20).= 0;
+                }
+                $v(41).= $opt{eta} if defined $opt{eta};
+                $v(34) .= $opt{stepmx} if defined $opt{stepmx};
+                $v(31) .= $opt{rfctol} if defined $opt{rfctol};
+                $v(32) .= $opt{xctol} if defined $opt{xctol};
+                $opt{scale} = ones($x->type, $dim) unless defined $opt{scale};
+                rmnf($ret{fx}, $ret{gx}, $x, $opt{scale}, $iv, $v, $opt{f_func});
+            }
+        }
+        $ret{fcnt} = $iv(5);
+        $ret{gcnt} = $iv(29);
+        $ret{info} = $iv(0);
+        $ret{iter} = $iv(30);
+        $ret{fx} = $v(9);
+        $ret{gnorm2} = $v(0);
+    }
+    else{
+        barf "$function is not supported\n";
+    }
+    wantarray ? return $x, %ret : return $x;
 
 }
 
 sub rosen_grad{
-	my $a = shift;
+    my $a = shift;
         my( $am, $am_m1, $am_p1, $grad);
-	$am = $a(1:-2);
+    $am = $a(1:-2);
         $am_m1 = $a(:-3);
         $am_p1 = $a(2:);
-	$grad = $a->zeroes;
-	$grad(1:-2) .= 200 *( $am - $am_m1->power(2,0)) - 400*($am_p1 - $am->power(2,0))*$am - 2*(1-$am);
-	$grad(0) .= -400 * $a(0) * ($a(1) - $a(0)->power(2,0)) - 2*(1-$a(0));
-	$grad(-1) .= 200 * ( $a(-1) - $a(-2)->power(2,0) );
-	return $grad;
+    $grad = $a->zeroes;
+    $grad(1:-2) .= 200 *( $am - $am_m1->power(2,0)) - 400*($am_p1 - $am->power(2,0))*$am - 2*(1-$am);
+    $grad(0) .= -400 * $a(0) * ($a(1) - $a(0)->power(2,0)) - 2*(1-$a(0));
+    $grad(-1) .= 200 * ( $a(-1) - $a(-2)->power(2,0) );
+    return $grad;
 }
 
 sub rosen_hess{
-	my ($a, $squared) = @_;
-	my ($hess,$diag);
-	#$diag = $a(:-2)->mult(-400,0)->diag(1);
-	#$hess = $diag + $diag->xchg(0,1);
-	$hess = $a(:-2)->mult(-400,0)->diag(1);
-	$diag = $a->zeroes;
-	$diag(0) .= 1200 * $a(0) - 400 * $a(1) + 2;
+    my ($a, $squared) = @_;
+    my ($hess,$diag);
+    #$diag = $a(:-2)->mult(-400,0)->diag(1);
+    #$hess = $diag + $diag->xchg(0,1);
+    $hess = $a(:-2)->mult(-400,0)->diag(1);
+    $diag = $a->zeroes;
+    $diag(0) .= 1200 * $a(0) - 400 * $a(1) + 2;
         $diag(-1) .= 200;
         $diag(1:-2) .= 202 + 1200 * $a(1:-2)->power(2,0) - 400 * $a(2:);
         $hess->diagonal(0,1) += $diag;
-	$squared  ? return $hess->tritosym : return  $hess;
+    $squared  ? return $hess->tritosym : return  $hess;
 }
 
 =head1 COPYRIGHT

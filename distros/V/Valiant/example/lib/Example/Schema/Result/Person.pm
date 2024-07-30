@@ -85,7 +85,7 @@ sub viewable_posts($self, $search_args = {}) {
 }
 
 __PACKAGE__->validates(username => presence=>1, length=>[3,24], format=>'alpha_numeric', unique=>1);
-__PACKAGE__->validates( password => (presence=>1, confirmation => 1,  on=>'create' ));
+__PACKAGE__->validates( password => (presence=>1, length=>[3,24], confirmation => 1,  on=>'create' ));
 __PACKAGE__->validates( password => (confirmation => { 
     on => 'update',
     if => 'is_column_changed', # This method defined by DBIx::Class::Row

@@ -72,7 +72,7 @@ sub new {
        }
     };
     __PACKAGE__->method_documentation->{ 'get_workbook_default_style' } = { 
-    	summary => 'Retrieve the description of the default style for the workbook.',
+    	summary => 'Retrieve the description of the default style for the workbook .',
         params => $params,
         returns => 'StyleResponse',
     };

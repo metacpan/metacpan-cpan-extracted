@@ -1,11 +1,11 @@
-#!/usr/bin/perl -w
+#!/usr/bin/perl
 
-use strict;
+use v5.14;
+use warnings;
+
 use lib 't/lib';
 
-use Test::More tests => 5;
-use Test::HexString;
-use Test::Refcount;
+use Test2::V0 0.000149;
 
 use IO::Async::Loop;
 use IO::Async::Test;
@@ -89,7 +89,7 @@ $buffer = "";
 
 wait_for_stream { length $buffer >= length $expect } $C => $buffer;
 
-is_hexstr( $buffer, $expect, 'FastCGI end request after deferred content' );
+is( $buffer, $expect, 'FastCGI end request after deferred content' );
 
 undef $responder;
 
@@ -133,7 +133,7 @@ $buffer = "";
 
 wait_for_stream { length $buffer >= length $expect } $C => $buffer;
 
-is_hexstr( $buffer, $expect, 'FastCGI STDOUT record after streamed responder' );
+is( $buffer, $expect, 'FastCGI STDOUT record after streamed responder' );
 
 $writer->write( "Streamed " );
 
@@ -145,7 +145,7 @@ $buffer = "";
 
 wait_for_stream { length $buffer >= length $expect } $C => $buffer;
 
-is_hexstr( $buffer, $expect, 'FastCGI STDOUT record after streamed writer write' );
+is( $buffer, $expect, 'FastCGI STDOUT record after streamed writer write' );
 
 $writer->write( "Output" );
 $writer->close;
@@ -162,4 +162,6 @@ $buffer = "";
 
 wait_for_stream { length $buffer >= length $expect } $C => $buffer;
 
-is_hexstr( $buffer, $expect, 'FastCGI STDOUT record after streamed writer write' );
+is( $buffer, $expect, 'FastCGI STDOUT record after streamed writer write' );
+
+done_testing;

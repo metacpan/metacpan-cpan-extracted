@@ -6,11 +6,11 @@ use warnings;
 use base 'Example::Schema::Result';
 
 __PACKAGE__->table("state");
-__PACKAGE__->load_components(qw/Valiant::Result/);
+__PACKAGE__->load_components(qw/Valiant::Result Valiant::Result::HTML::FormFields/);
 
 __PACKAGE__->add_columns(
-  id => { data_type => 'integer', is_nullable => 0, is_auto_increment => 1, tag=>'value' },
-  name => { data_type => 'varchar', is_nullable => 0, size => '24', tag=>'label' },
+  id => { data_type => 'integer', is_nullable => 0, is_auto_increment => 1, tag=>'option_value' },
+  name => { data_type => 'varchar', is_nullable => 0, size => '24', tag=>'option_label' },
   abbreviation => { data_type => 'varchar', is_nullable => 0, size => '24' },
 );
 

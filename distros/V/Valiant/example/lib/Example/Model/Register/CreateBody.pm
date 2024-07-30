@@ -5,7 +5,7 @@ use CatalystX::RequestModel;
 
 extends 'Catalyst::Model';
 
-namespace 'person';
+namespace 'registration';
 content_type 'application/x-www-form-urlencoded';
 
 has username => (is=>'ro', property=>1);   

@@ -1,3 +1,4 @@
+use v5;
 use strict;
 use warnings;
 
@@ -6,6 +7,8 @@ use Module::Build;
 my $build = Module::Build->new(
    module_name => 'Net::Async::FastCGI',
    requires => {
+      perl => '5.014',
+
       'Encode' => 0,
       'Exporter' => '5.57',
       'HTTP::Request' => 0,
@@ -19,13 +22,10 @@ my $build = Module::Build->new(
       'Tie::Handle' => 0,
    },
    build_requires => {
-      'Test::HexString' => 0,
-      'Test::More' => 0,
-      'Test::Refcount' => 0,
+      'Test2::V0' => '0.000149',
    },
    auto_configure_requires => 0, # Don't add M::B to configure_requires
    license => 'perl',
-   create_makefile_pl => 'traditional',
    create_license => 1,
    create_readme  => 1,
 );

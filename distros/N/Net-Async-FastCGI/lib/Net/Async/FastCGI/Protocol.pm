@@ -1,16 +1,14 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2010-2011 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2010-2024 -- leonerd@leonerd.org.uk
 
-package Net::Async::FastCGI::Protocol;
+package Net::Async::FastCGI::Protocol 0.26;
 
-use strict;
+use v5.14;
 use warnings;
 
 use base qw( IO::Async::Protocol::Stream );
-
-our $VERSION = '0.25';
 
 use Net::FastCGI::Constant qw( 
    FCGI_UNKNOWN_TYPE

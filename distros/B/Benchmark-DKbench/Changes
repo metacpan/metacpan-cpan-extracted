@@ -1,5 +1,10 @@
 Revision history for Benchmark-DKbench
 
+2.9     2024-07-29
+        - Added --duration option.
+        - Added min/max scores to the summary.
+        - Updated version base for some modules.
+
 2.8     2024-06-24
         - Added suite_calc.
 

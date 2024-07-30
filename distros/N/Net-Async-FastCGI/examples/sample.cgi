@@ -1,5 +1,5 @@
 #!/usr/bin/perl
-use strict; use warnings;
+use v5.14; use warnings;
 use CGI;
 
 my $c = new CGI;

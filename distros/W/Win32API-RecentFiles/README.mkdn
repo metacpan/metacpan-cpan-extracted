@@ -1,0 +1,76 @@
+
+[![Windows](https://github.com/Corion/Win32API-RecentFiles/workflows/windows/badge.svg)](https://github.com/Corion/Win32API-RecentFiles/actions?query=workflow%3Awindows)
+
+# NAME
+
+Win32API::RecentFiles - recently accessed file API functions on Windows
+
+# SYNOPSIS
+
+    use Win32API::RecentFiles qw(SHAddToRecentDocsA SHAddToRecentDocsW SHAddToRecentDocsU);
+    use Win32;
+    use Encode 'encode';
+    SHAddToRecentDocsA('C:\\Full\\Path\\To\\Makefile.PL');
+    SHAddToRecentDocsW(encode('UTF-16LE', 'C:\\Full\\Path\\To\\Motörhead.mp3'));
+
+    use utf8;
+    SHAddToRecentDocsU('C:\\Full\\Path\\To\\fünf.txt');
+    my $recent_dir = Win32::GetFolderPath(Win32::CSIDL_RECENT());
+    # $recent_dir\\fünf.txt.lnk exists
+
+# DESCRIPTION
+
+This module exports the `SHAddToRecentDocsA`
+`SHAddToRecentDocsU` and `SHAddToRecentDocsW` functions.
+
+# FUNCTIONS
+
+## `SHAddToRecentDocsA`
+
+    SHAddToRecentDocsA('C:\\Full\\Path\\To\\Makefile.PL');
+    
+
+Adds the filename to the list of recently accessed documents.
+`$filename` must be an ANSI string encoded in the local code page.
+
+## `SHAddToRecentDocsU`
+
+    SHAddToRecentDocsU('C:\\Full\\Path\\To\\Makefile.PL');
+
+`$filename` must be a Unicode string encoded as UTF-8.
+
+## `SHAddToRecentDocsW`
+
+    SHAddToRecentDocsW('C\0:\0\\\0...');
+
+`$filename` must be a Unicode string encoded as UTF-16.
+
+# SEE ALSO
+
+Microsoft documentation at [https://learn.microsoft.com/de-de/windows/win32/api/shlobj\_core/nf-shlobj\_core-shaddtorecentdocs](https://learn.microsoft.com/de-de/windows/win32/api/shlobj_core/nf-shlobj_core-shaddtorecentdocs)
+
+# REPOSITORY
+
+The public repository of this module is
+[https://github.com/Corion/Win32API-RecentFiles](https://github.com/Corion/Win32API-RecentFiles).
+
+# SUPPORT
+
+The public support forum of this module is [https://perlmonks.org/](https://perlmonks.org/).
+
+# BUG TRACKER
+
+Please report bugs in this module via the Github bug queue at
+[https://github.com/Corion/Win32API-RecentFiles/issues](https://github.com/Corion/Win32API-RecentFiles/issues)
+
+# AUTHOR
+
+Max Maischein `corion@cpan.org`
+
+# COPYRIGHT (c)
+
+Copyright 2024- by Max Maischein `corion@cpan.org`.
+
+# LICENSE
+
+This module is released under the Artistic License 2.0.

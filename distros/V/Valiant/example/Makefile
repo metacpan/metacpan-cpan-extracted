@@ -25,6 +25,7 @@ server:
 	@DBIC_TRACE=1 perl \
 		-I ../lib \
 		-I ./lib \
+		-I ../../Catalyst-ControllerPerContext/lib \
 		./lib/Example/PSGI.pm
 
 dependencies:

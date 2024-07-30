@@ -3,7 +3,10 @@ package Example::Schema::ResultSet::Todo;
 use Example::Syntax;
 use base 'Example::Schema::ResultSet';
 
-__PACKAGE__->mk_group_accessors('simple' => qw/status/);
+sub status($self, $status = undef) {
+  $self->{attrs}{status} = $status if defined $status;
+  return $self->{attrs}{status};
+}
 
 sub available($self) {
   return $self->search_rs({status=>{'!='=>'archived'}});
@@ -13,16 +16,18 @@ sub newer_first($self) {
 }
 
 sub filter_by_request($self, $request) {
-  my $filtered_resultset = $self->next::method($request);
-  $filtered_resultset = $filtered_resultset->search({status=>$request->status}) unless $request->status_all;
-  $filtered_resultset->status($request->status);
-  return $filtered_resultset; 
+  return $self->next::method($request)
+    ->by_status($request->status);
+}
+
+sub by_status($self, $status = 'all') {
+  $self->status($status);
+  return $self if $status eq 'all';
+  return $self->search_rs({status=>$status}); 
 }
 
 sub get_last_page($self) {
-  my $new_resultset = $self->page($self->pager->last_page);
-  $new_resultset->status($self->status);
-  return $new_resultset; 
+  return $self->page($self->pager->last_page);
 }
 
 sub new_todo($self) {

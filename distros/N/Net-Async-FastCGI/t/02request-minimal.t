@@ -1,11 +1,11 @@
-#!/usr/bin/perl -w
+#!/usr/bin/perl
 
-use strict;
+use v5.14;
+use warnings;
+
 use lib 't/lib';
 
-use Test::More tests => 10;
-use Test::HexString;
-use Test::Refcount;
+use Test2::V0 0.000149;
 
 use IO::Async::Loop;
 use IO::Async::Test;
@@ -27,7 +27,7 @@ my $fcgi = Net::Async::FastCGI->new(
 );
 
 ok( defined $fcgi, 'defined $fcgi' );
-isa_ok( $fcgi, "Net::Async::FastCGI", '$fcgi isa FCGI::Async' );
+isa_ok( $fcgi, [ "Net::Async::FastCGI" ], '$fcgi isa FCGI::Async' );
 
 is_oneref( $fcgi, '$fcgi has refcount 1 initially' );
 
@@ -51,9 +51,9 @@ $C->syswrite(
 
 wait_for { defined $request };
 
-is_deeply( $request->params,
-           {},
-           '$request has empty params hash' );
+is( $request->params,
+    {},
+    '$request has empty params hash' );
 is( $request->read_stdin_line,
     undef,
     '$request has empty STDIN' );
@@ -76,7 +76,7 @@ $buffer = "";
 
 wait_for_stream { length $buffer >= length $expect } $C => $buffer;
 
-is_hexstr( $buffer, $expect, 'FastCGI end request record' );
+is( $buffer, $expect, 'FastCGI end request record' );
 
 # Since we didn't specify FCGI_KEEP_CONN, we expect that $C should now be
 # closed, and that reading any more will give us EOF
@@ -89,3 +89,5 @@ is_refcount( $fcgi, 2, '$fcgi has refcount 2 before $loop->remove' );
 $loop->remove( $fcgi );
 
 is_oneref( $fcgi, '$fcgi has refcount 1 finally' );
+
+done_testing;

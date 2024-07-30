@@ -1,11 +1,8 @@
 package Example::View::HTML::Home::UserShow;
 
-use Moo;
+use CatalystX::Moose;
 use Example::Syntax;
-use Example::View::HTML
-  -tags => qw(div blockquote link_to button),
-  -views => 'HTML::Page', 'HTML::Navbar',
-  -helpers => qw(user_show_uri public_posts_list_uri );
+use Example::View::HTML qw(link_to uri);
 
 has info => (is=>'rw', predicate=>'has_info');
 
@@ -16,23 +13,21 @@ sub add_info($self, $info) {
 }
 
 sub render($self, $c) {
-  html_page page_title => 'Home', sub($page) {
-    html_navbar active_link=>'home',
-    blockquote +{ if=>$self->has_info, 
+  $self->view('HTML::Page', { page_title => 'Home' }, sub($page) {
+    $self->view('HTML::Navbar', { active_link=>'home' }),
+    Blockquote +{ if=>$self->has_info, 
       class=>"alert alert-primary", 
       role=>"alert" }, $self->info,
-    div 'Welcome to your Example application Homepage',
-    div [
-      'See ', link_to public_posts_list_uri(), 'Recent Blogs'
-    ],
-     div [
-      button {
-        formaction => user_show_uri(),
+    Div 'Welcome to your Example application Homepage',
+    Div $self->link_to($self->uri('/public/posts/list'), 'See Recent Blogs'),
+    Div [
+      Button {
         type => 'button', 
         class => 'btn btn-primary',
-        data => +{remote=>'true', confirm=>'Are you Sure'} }, 'Test Button'
+        data => +{ remote=>'true', url=>$self->uri('js_test'), confirm=>'Are you Sure?' },
+      }, 'Test Button'
     ]   
-  };
+  });
 }
 
 1;

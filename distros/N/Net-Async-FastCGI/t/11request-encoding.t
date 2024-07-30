@@ -1,10 +1,11 @@
-#!/usr/bin/perl -w
+#!/usr/bin/perl
 
-use strict;
+use v5.14;
+use warnings;
+
 use lib 't/lib';
 
-use Test::More tests => 5;
-use Test::HexString;
+use Test2::V0;
 
 use IO::Async::Loop;
 use IO::Async::Test;
@@ -42,9 +43,9 @@ $C->syswrite(
 
 wait_for { defined $request };
 
-is_deeply( $request->params,
-           {},
-           '$request has empty params hash' );
+is( $request->params,
+    {},
+    '$request has empty params hash' );
 is( $request->read_stdin_line,
     chr(0xe5),
     '$request has a single Unicode character' );
@@ -64,7 +65,7 @@ $buffer = "";
 
 wait_for_stream { length $buffer >= length $expect } $C => $buffer;
 
-is_hexstr( $buffer, $expect, 'FastCGI STDOUT stream contains UTF-8 encoded data' );
+is( $buffer, $expect, 'FastCGI STDOUT stream contains UTF-8 encoded data' );
 
 $request->set_encoding( "ISO-8859-1" );
 
@@ -83,10 +84,12 @@ $buffer = "";
 
 wait_for_stream { length $buffer >= length $expect } $C => $buffer;
 
-is_hexstr( $buffer, $expect, 'FastCGI end request record contains ISO-8859-1 data' );
+is( $buffer, $expect, 'FastCGI end request record contains ISO-8859-1 data' );
 
 # Since we didn't specify FCGI_KEEP_CONN, we expect that $C should now be
 # closed, and that reading any more will give us EOF
 
 my $l = $C->sysread( $buffer, 8192 );
 is( $l, 0, 'Client connection now closed' );
+
+done_testing;

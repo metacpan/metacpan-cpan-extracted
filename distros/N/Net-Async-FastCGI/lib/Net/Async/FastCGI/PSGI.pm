@@ -1,18 +1,16 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2010-2013 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2010-2024 -- leonerd@leonerd.org.uk
 
-package Net::Async::FastCGI::PSGI;
+package Net::Async::FastCGI::PSGI 0.26;
 
-use strict;
+use v5.14;
 use warnings;
 
 use Carp;
 
 use base qw( Net::Async::FastCGI );
-
-our $VERSION = '0.25';
 
 my $CRLF = "\x0d\x0a";
 
@@ -22,27 +20,27 @@ C<Net::Async::FastCGI::PSGI> - use C<PSGI> applications with C<Net::Async::FastC
 
 =head1 SYNOPSIS
 
- use Net::Async::FastCGI::PSGI;
- use IO::Async::Loop;
+   use Net::Async::FastCGI::PSGI;
+   use IO::Async::Loop;
 
- my $loop = IO::Async::Loop->new;
+   my $loop = IO::Async::Loop->new;
 
- my $fcgi = Net::Async::FastCGI::PSGI->new(
-    port => 12345,
-    app => sub {
-       my $env = shift;
+   my $fcgi = Net::Async::FastCGI::PSGI->new(
+      port => 12345,
+      app => sub {
+         my $env = shift;
 
-       return [
-          200,
-          [ "Content-Type" => "text/plain" ],
-          [ "Hello, world!" ],
-       ];
-    },
- );
+         return [
+            200,
+            [ "Content-Type" => "text/plain" ],
+            [ "Hello, world!" ],
+         ];
+      },
+   );
 
- $loop->add( $fcgi );
+   $loop->add( $fcgi );
 
- $loop->run;
+   $loop->run;
 
 =head1 DESCRIPTION
 

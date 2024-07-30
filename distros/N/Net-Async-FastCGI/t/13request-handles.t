@@ -1,10 +1,11 @@
-#!/usr/bin/perl -w
+#!/usr/bin/perl
 
-use strict;
+use v5.14;
+use warnings;
+
 use lib 't/lib';
 
-use Test::More tests => 7;
-use Test::HexString;
+use Test2::V0;
 
 use IO::Async::Loop;
 use IO::Async::Test;
@@ -85,4 +86,6 @@ $buffer = "";
 
 wait_for_stream { length $buffer >= length $expect } $C => $buffer;
 
-is_hexstr( $buffer, $expect, 'FastCGI end request record' );
+is( $buffer, $expect, 'FastCGI end request record' );
+
+done_testing;

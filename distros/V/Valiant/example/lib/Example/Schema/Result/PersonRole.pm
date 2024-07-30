@@ -1,12 +1,9 @@
 package Example::Schema::Result::PersonRole;
 
-use strict;
-use warnings;
-
+use Example::Syntax;
 use base 'Example::Schema::Result';
 
 __PACKAGE__->table("person_role");
-__PACKAGE__->load_components(qw/Valiant::Result/);
 
 __PACKAGE__->add_columns(
   person_id => { data_type => 'integer', is_nullable => 0, is_foreign_key => 1 },
@@ -27,8 +24,11 @@ __PACKAGE__->belongs_to(
   { 'foreign.id' => 'self.role_id' },
 );
 
-sub is_user {
-  my $self = shift;
+__PACKAGE__->add_checkbox_rs_for('role_id', sub($self, %options) {
+  return $self->person->viewable_roles->search_rs({}, {order_by => 'label'});
+});
+
+sub is_user($self) {
   return $self->role->label eq 'user' ? 1:0;
 }
 

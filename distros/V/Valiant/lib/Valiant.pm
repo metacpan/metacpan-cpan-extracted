@@ -1,6 +1,9 @@
 package Valiant;
 
-our $VERSION = '0.002003';
+use warnings;
+use strict;
+
+our $VERSION = '0.002004';
 $VERSION = eval $VERSION;
 
 1;
@@ -11,9 +14,9 @@ Valiant - Object validation inspired by Ruby on Rails and more.
 
 =begin html
 
-<a href="https://github.com/jjn1056/valiant/actions"><img src="https://github.com/jjn1056/valiant/actions/workflows/linux.yml/badge.svg"></a>
-<a href="https://github.com/jjn1056/valiant/actions"><img src="https://github.com/jjn1056/valiant/actions/workflows/macos.yml/badge.svg"></a>
-<a href="https://github.com/jjn1056/valiant/actions"><img src="https://github.com/jjn1056/valiant/actions/workflows/windows.yml/badge.svg"></a>
+<a href="https://github.com/jjn1056/valiant/actions"><img src="https://github.com/jjn1056/valiant/actions/workflows/linux.yml/badge.svg?tag=0.002004"></a>
+<a href="https://github.com/jjn1056/valiant/actions"><img src="https://github.com/jjn1056/valiant/actions/workflows/macos.yml/badge.svg?tag=0.002004"></a>
+<a href="https://github.com/jjn1056/valiant/actions"><img src="https://github.com/jjn1056/valiant/actions/workflows/windows.yml/badge.svg?tag=0.002004"></a>
 <a href="https://metacpan.org/pod/Valiant"><img src="https://badge.fury.io/pl/Valiant.svg"></a>
 <a href="https://codecov.io/github/jjn1056/Valiant/?branch=main"><img alt="Coverage" src="https://codecov.io/github/jjn1056/Valiant/coverage.svg?branch=main"></a>
 
@@ -1446,7 +1449,7 @@ Or to any dog charity that fits best with your personal beliefs and economic mea
 
 =head1 COPYRIGHT & LICENSE
  
-Copyright 2023, John Napiorkowski L<email:jjnapiork@cpan.org>
+Copyright 2024, John Napiorkowski L<email:jjnapiork@cpan.org>
  
 This library is free software; you can redistribute it and/or modify it under
 the same terms as Perl itself.

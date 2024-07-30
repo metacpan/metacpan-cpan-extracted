@@ -1,12 +1,11 @@
-#!/usr/bin/perl -w
+#!/usr/bin/perl
 
-use strict;
+use v5.14;
+use warnings;
+
 use lib 't/lib';
 
-use Test::More tests => 12;
-use Test::Identity;
-use Test::HexString;
-use Test::Refcount;
+use Test2::V0 0.000149;
 
 use IO::Async::Loop;
 use IO::Async::Test;
@@ -70,11 +69,11 @@ wait_for { defined $received_env };
 ok( defined(delete $received_env->{'psgi.input'}), "psgi.input exists" );
 ok( defined(delete $received_env->{'psgi.errors'}), "psgi.errors exists" );
 
-identical( delete $received_env->{'net.async.fastcgi'}, $fcgi, "net.async.fastcgi is \$fcgi" );
+ref_is( delete $received_env->{'net.async.fastcgi'}, $fcgi, "net.async.fastcgi is \$fcgi" );
 can_ok( delete $received_env->{'net.async.fastcgi.req'}, "params" );
-identical( delete $received_env->{'io.async.loop'}, $loop, "io.async.loop is \$loop" );
+ref_is( delete $received_env->{'io.async.loop'}, $loop, "io.async.loop is \$loop" );
 
-is_deeply( $received_env,
+is( $received_env,
    {
       PATH_INFO       => "",
       QUERY_STRING    => "",
@@ -118,7 +117,7 @@ $buffer = "";
 
 wait_for_stream { length $buffer >= length $expect } $C => $buffer;
 
-is_hexstr( $buffer, $expect, 'FastCGI end request record' );
+is( $buffer, $expect, 'FastCGI end request record' );
 
 $fcgi->configure(
    app => sub {
@@ -178,7 +177,7 @@ $buffer = "";
 
 wait_for_stream { length $buffer >= length $expect } $C => $buffer;
 
-is_hexstr( $buffer, $expect, 'FastCGI request/response with STDIN reading' );
+is( $buffer, $expect, 'FastCGI request/response with STDIN reading' );
 
 $fcgi->configure(
    app => sub {
@@ -236,7 +235,7 @@ $buffer = "";
 
 wait_for_stream { length $buffer >= length $expect } $C => $buffer;
 
-is_hexstr( $buffer, $expect, 'FastCGI request/response with STDERR printing' );
+is( $buffer, $expect, 'FastCGI request/response with STDERR printing' );
 
 $fcgi->configure(
    app => sub {
@@ -292,4 +291,6 @@ $buffer = "";
 
 wait_for_stream { length $buffer >= length $expect } $C => $buffer;
 
-is_hexstr( $buffer, $expect, 'FastCGI request/response with IO-like body' );
+is( $buffer, $expect, 'FastCGI request/response with IO-like body' );
+
+done_testing;

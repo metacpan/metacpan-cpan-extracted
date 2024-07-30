@@ -10,7 +10,7 @@ requires 'Catalyst::Plugin::ServeFile', '0.004';
 requires 'Catalyst::Plugin::CSRFToken', '0.006';
 requires 'CatalystX::Errors', '0.001009';
 requires 'CatalystX::RequestModel', '0.018';
-requires 'Catalyst::ControllerPerContext', '0.006';
+requires 'Catalyst::ControllerPerContext', '0.007';
 requires 'Catalyst::View::BasePerRequest', '0.010';
 requires 'Catalyst::View::MojoTemplate::PerContext', '0.005';
 requires 'Catalyst::ActionRole::RenderView', '0.001';
@@ -22,6 +22,8 @@ requires 'DBIx::Class::TimeStamp', '0.14';
 requires 'DBIx::Class::BcryptColumn', '0.001003';
 requires 'DBIx::Class::ResultSet::SetControl';
 requires 'DBIx::Class::ResultClass::TrackColumns', '0.001002';
+
+requires 'Patterns::UndefObject';
 
 requires 'Gazelle', '0.46';
 requires 'Module::Runtime';
@@ -38,6 +40,7 @@ requires 'Plack::Runner';
 requires 'Scalar::Util';
 requires 'Sub::Exporter';
 requires 'Term::Size::Any';
-
-
+requires 'Mojo::DOM'
+requires 'MooseX::NonMoose', '0.26';
+requires 'MooseX::MarkAsMethods', '0.15';
 

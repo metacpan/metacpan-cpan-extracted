@@ -17,26 +17,27 @@ See POD on the main module for info:
  dkbench [options]
 
  Options:
- --threads <i>, -j <i> : Number of benchmark threads (default is 1).
- --multi,       -m     : Multi-threaded using all your CPU cores/threads.
- --max_threads <i>     : Override the cpu detection to specify max cpu threads.
- --iter <i>,    -i <i> : Number of suite iterations (with min/max/avg at the end).
- --stdev               : Show relative standard deviation (for iter > 1).
- --include <regex>     : Run only benchmarks that match regex.
- --exclude <regex>     : Do not run benchmarks that match regex.
- --time,        -t     : Report time (sec) instead of score.
- --quick,       -q     : Quick benchmark run (implies -t).
- --no_mce              : Do not run under MCE::Loop (implies -j 1).
- --scale <i>,   -s <i> : Scale the bench workload by x times (incompatible with -q).
- --skip_bio            : Skip BioPerl benchmarks.
- --skip_prove          : Skip Moose prove benchmark.
- --time_piece          : Run optional Time::Piece benchmark (see benchmark details).
- --bio_codons          : Run optional BioPerl Codons benchmark (does not scale well).
- --sleep <i>           : Sleep for <i> secs after each benchmark.
- --setup               : Download the Genbank data to enable the BioPerl tests.
- --datapath <path>     : Override the path where the expected benchmark data is found.
- --ver <num>           : Skip benchmarks added after the specified version.
- --help         -h     : Show basic help and exit.
+ --threads <i>,  -j <i> : Number of benchmark threads (default is 1).
+ --multi,        -m     : Multi-threaded using all your CPU cores/threads.
+ --max_threads <i>      : Override the cpu detection to specify max cpu threads.
+ --iter <i>,     -i <i> : Number of suite iterations (with min/max/avg at the end).
+ --stdev                : Show relative standard deviation (for iter > 1).
+ --include <regex>      : Run only benchmarks that match regex.
+ --exclude <regex>      : Do not run benchmarks that match regex.
+ --time,         -t     : Report time (sec) instead of score.
+ --quick,        -q     : Quick benchmark run (implies -t).
+ --no_mce               : Do not run under MCE::Loop (implies -j 1).
+ --scale <i>,    -s <i> : Scale the bench workload by x times (incompatible with -q).
+ --skip_bio             : Skip BioPerl benchmarks.
+ --skip_prove           : Skip Moose prove benchmark.
+ --time_piece           : Run optional Time::Piece benchmark (see benchmark details).
+ --bio_codons           : Run optional BioPerl Codons benchmark (does not scale well).
+ --sleep <i>            : Sleep for <i> secs after each benchmark.
+ --duration <i>, -d <i> : Minimum duration in seconds for suite run.
+ --setup                : Download the Genbank data to enable the BioPerl tests.
+ --datapath <path>      : Override the path where the expected benchmark data is found.
+ --ver <num>            : Skip benchmarks added after the specified version.
+ --help          -h     : Show basic help and exit.
 
 The default run (no options) will run all the benchmarks both single-threaded and
 multi-threaded (using all detected CPU cores/hyperthreads) and show you scores and
@@ -79,6 +80,7 @@ GetOptions (
     'ver=s',
     'setup',
     'datapath=s',
+    'duration|d=i',
     'help|h',
 );
 
@@ -106,8 +108,8 @@ if ($opt{threads} || !$max_threads || $max_threads == 1) {
 }
 
 sub check_kit {
-    warn "! Perl version v5.36 recommended as a comparison base\n"
-        unless $^V =~ /v5.36.\d/;
+    warn "! Perl version v5.36 or later suggested as a comparison base\n"
+        unless $] >= 5.036000;
 
     my %mod_ver = Benchmark::DKbench::Setup::cpan_versions();
 
@@ -116,7 +118,7 @@ sub check_kit {
         eval "use $module";
         my $ver = eval "\$${module}::VERSION" || 'none';
         unless ($ver eq $mod_ver{$module}) {
-            my $msg = "! $module $mod_ver{$module} recommended as a comparison base ($ver found).";
+            my $msg = "! $module $mod_ver{$module} suggested as a comparison base ($ver found).";
             $msg .= " Older versions may show benchmark failures."
                 if $mod_ver{$module} cmp $ver; # $ver is less
             if ($module =~ /^Bio/ && $ver eq 'none') {

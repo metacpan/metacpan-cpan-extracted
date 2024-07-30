@@ -38,7 +38,7 @@ use Text::Levenshtein::XS;
 
 my $mono_clock = $^O !~ /win/i || $Time::HiRes::VERSION >= 1.9764;
 
-our $VERSION = '2.8';
+our $VERSION = '2.9';
 our @EXPORT  = qw(system_identity suite_run calc_scalability suite_calc);
 our $datadir = dist_dir("Benchmark-DKbench");
 
@@ -139,26 +139,27 @@ options to control number of threads, iterations, which benchmarks to run etc:
  dkbench [options]
 
  Options:
- --threads <i>, -j <i> : Number of benchmark threads (default is 1).
- --multi,       -m     : Multi-threaded using all your CPU cores/threads.
- --max_threads <i>     : Override the cpu detection to specify max cpu threads.
- --iter <i>,    -i <i> : Number of suite iterations (with min/max/avg at the end).
- --stdev               : Show relative standard deviation (for iter > 1).
- --include <regex>     : Run only benchmarks that match regex.
- --exclude <regex>     : Do not run benchmarks that match regex.
- --time,        -t     : Report time (sec) instead of score.
- --quick,       -q     : Quick benchmark run (implies -t).
- --no_mce              : Do not run under MCE::Loop (implies -j 1).
- --scale <i>,   -s <i> : Scale the bench workload by x times (incompatible with -q).
- --skip_bio            : Skip BioPerl benchmarks.
- --skip_prove          : Skip Moose prove benchmark.
- --time_piece          : Run optional Time::Piece benchmark (see benchmark details).
- --bio_codons          : Run optional BioPerl Codons benchmark (does not scale well).
- --sleep <i>           : Sleep for <i> secs after each benchmark.
- --setup               : Download the Genbank data to enable the BioPerl tests.
- --datapath <path>     : Override the path where the expected benchmark data is found.
- --ver <num>           : Skip benchmarks added after the specified version.
- --help         -h     : Show basic help and exit.
+ --threads <i>,  -j <i> : Number of benchmark threads (default is 1).
+ --multi,        -m     : Multi-threaded using all your CPU cores/threads.
+ --max_threads <i>      : Override the cpu detection to specify max cpu threads.
+ --iter <i>,     -i <i> : Number of suite iterations (with min/max/avg at the end).
+ --stdev                : Show relative standard deviation (for iter > 1).
+ --include <regex>      : Run only benchmarks that match regex.
+ --exclude <regex>      : Do not run benchmarks that match regex.
+ --time,         -t     : Report time (sec) instead of score.
+ --quick,        -q     : Quick benchmark run (implies -t).
+ --no_mce               : Do not run under MCE::Loop (implies -j 1).
+ --scale <i>,    -s <i> : Scale the bench workload by x times (incompatible with -q).
+ --skip_bio             : Skip BioPerl benchmarks.
+ --skip_prove           : Skip Moose prove benchmark.
+ --time_piece           : Run optional Time::Piece benchmark (see benchmark details).
+ --bio_codons           : Run optional BioPerl Codons benchmark (does not scale well).
+ --sleep <i>            : Sleep for <i> secs after each benchmark.
+ --duration <i>, -d <i> : Minimum duration in seconds for suite run.
+ --setup                : Download the Genbank data to enable the BioPerl tests.
+ --datapath <path>      : Override the path where the expected benchmark data is found.
+ --ver <num>            : Skip benchmarks added after the specified version.
+ --help          -h     : Show basic help and exit.
 
 The default run (no options) will run all the benchmarks both single-threaded and
 multi-threaded (using all detected CPU cores/hyperthreads) and show you scores and
@@ -166,7 +167,7 @@ multi vs single threaded scalability.
 
 The scores are calibrated such that a reference CPU (Intel Xeon Platinum 8481C -
 Sapphire Rapids) would achieve a score of 1000 in a single-core benchmark run using
-the default software configuration (Linux/Perl 5.36.0 built with multiplicity and
+the default software configuration (Linux/Perl 5.36+ built with multiplicity and
 threads, with reference CPAN module versions). Perl built without thread support and
 multi(plicity) will be a bit faster (usually in the order of ~3-4%), while older Perl
 versions will most likely be slower. Different CPAN module versions will also impact
@@ -570,9 +571,24 @@ sub suite_run {
         chunk_size  => 1,
     } unless $opt->{no_mce};
 
-    foreach (1..$opt->{iter}) {
-        print "Iteration $_ of $opt->{iter}...\n" if $opt->{iter} > 1;
-        run_iteration($opt, \%stats);
+    if ($opt->{duration}) {
+        my $t0  = _get_time();
+        my $cnt = 0;
+        my $t   = 0;
+        while ($t < $opt->{duration}) {
+            $cnt++;
+            print "Iteration $cnt (".int($t+0.5)."s of $opt->{duration}s)...\n";
+            run_iteration($opt, \%stats);
+            $t = _get_time()-$t0;
+        }
+        $opt->{iter}         = $cnt;
+        $stats{_opt}->{iter} = $cnt;
+        $opt->{duration}     = 0;
+    } else {
+        foreach (1..$opt->{iter}) {
+            print "Iteration $_ of $opt->{iter}...\n" if $opt->{iter} > 1;
+            run_iteration($opt, \%stats);
+        }
     }
 
     total_stats($opt, \%stats) if $opt->{iter} > 1;
@@ -632,16 +648,20 @@ sub calc_scalability {
     }
     die "No bench times recorded" unless @perf;
     print (("-"x40)."\n");
-    my $avg1 = min_max_avg($stats1->{_total}->{$display});
-    my $avg2 = min_max_avg($stats2->{_total}->{$display});
+    my @avg1 = min_max_avg($stats1->{_total}->{$display});
+    my @avg2 = min_max_avg($stats2->{_total}->{$display});
     print "DKbench summary ($cnt benchmark";
     print "s" if $cnt > 1;
     print " x$opt->{scale} scale"     if $opt->{scale} > 1;
     print ", $opt->{iter} iterations" if $opt->{iter} > 1;
     print ", $opt2->{threads} threads):\n";
     $opt->{f} .= "s" if $opt->{time};
-    print pad_to("Single:").sprintf($opt->{f}, $avg1)."\n";
-    print pad_to("Multi:").sprintf($opt->{f}, $avg2)."\n";
+    my $f = $opt->{time} ? '%.3f' : '%.0f';
+    $f = $opt->{iter} > 1 ? "$opt->{f}\t($f - $f)" : $opt->{f};
+    @avg1 =  $opt->{iter} > 1 ? ($avg1[2], $avg1[0], $avg1[1]) : ($avg1[2]);
+    @avg2 =  $opt->{iter} > 1 ? ($avg2[2], $avg2[0], $avg2[1]) : ($avg2[2]);
+    print pad_to("Single:").sprintf($f, @avg1)."\n";
+    print pad_to("Multi:").sprintf($f, @avg2)."\n";
     my @newperf = Benchmark::DKbench::drop_outliers(\@perf, -1);
     my @newscal = Benchmark::DKbench::drop_outliers(\@scal, -1);
     @perf = min_max_avg(\@newperf);

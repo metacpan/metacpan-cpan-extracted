@@ -1,5 +1,36 @@
 The following logs changes for the CPAN distribution Valiant
 
+0.002004 2024 July 29
+          - Lots of updates to the example application (again).  Most more
+            testing of AJAXy bits to try to figure out weaknesses in the overall
+            design as well as seeing how well this works with some other semi
+            experimental code I'm working on like per request controllers, etc.
+          - General documentation improvements and updates.
+          - Catalyst::View::Valiant::HTMLBuilder is basically a 'do over'.  If you
+            were using this experimental and mostly undocumented code, your application
+            will completely break when you install this.
+          - New DBIC plugin: DBIx::Class::Valiant::Result::HTML::FormFields which
+            provides a way to annotate a DBIC result class with form field information
+            that is used by the FormBuilder to generate forms.  This can make your
+            templates neater and also keeps DB type information out of your templates.
+          - Valiant::HTML::FormBuilder we create some additionl helpers to proxy
+            some form options like method, enctype, etc.  Support for data 'remote'
+            for making it easier to use AJAX with forms.  See the docs.
+            Also improves some display and internationalization options.  Support
+            for inferrring collection info from a model (see DBIx::Class::Valiant::Result::HTML::FormFields).
+          - Added Valiant::HTML::PagerBuilder which is an experimental way to build
+            a pager for a list of items.  This is experimental and minimally documented.
+            You can look at the example application to see how it works.  I will feel
+            free to totally break this as needed to make it work better.
+          - SafeString now has an escape_html helper
+          - When using the 'form_for' helper you can now create the form and later
+            render it.
+          - Lots of little improvements to the internationalization code.  Shouldn't
+            break anything.
+          - Updated cpanfile to use more modern CPAN modules and to remove some
+            dependencies that are no longer needed.  This could force install a newer
+            version of some modules that you might not have wanted to upgrade.
+
 0.002003 2023 October 04
           - This is probably not a mandatory upgrade, it has lots of small
             tweaks, tests and doc updates but nothing major.

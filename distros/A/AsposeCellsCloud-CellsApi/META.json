@@ -63,7 +63,7 @@
       },
       "AsposeCellsCloud::CellsApi" : {
          "file" : "lib/AsposeCellsCloud/CellsApi.pm",
-         "version" : "24.6"
+         "version" : "24.7"
       },    
       "AsposeCellsCloud::Configuration" : {
          "file" : "lib/AsposeCellsCloud/Configuration.pm"
@@ -1019,6 +1019,12 @@
       "AsposeCellsCloud::Object::PivotTables" : {
          "file" : "lib/AsposeCellsCloud/Object/PivotTables.pm"
       },
+      "AsposeCellsCloud::Object::AddTextOptions" : {
+         "file" : "lib/AsposeCellsCloud/Object/AddTextOptions.pm"
+      },
+      "AsposeCellsCloud::Object::BaseOperateOptions" : {
+         "file" : "lib/AsposeCellsCloud/Object/BaseOperateOptions.pm"
+      },
       "AsposeCellsCloud::Object::CellValue" : {
          "file" : "lib/AsposeCellsCloud/Object/CellValue.pm"
       },
@@ -1357,6 +1363,9 @@
       },
       "AsposeCellsCloud::Request::PostBatchSplitRequest" : {
          "file" : "lib/AsposeCellsCloud/Request/PostBatchSplitRequest.pm"
+      },
+      "AsposeCellsCloud::Request::PostAccessTokenRequest" : {
+         "file" : "lib/AsposeCellsCloud/Request/PostAccessTokenRequest.pm"
       },
       "AsposeCellsCloud::Request::PostClearContentsRequest" : {
          "file" : "lib/AsposeCellsCloud/Request/PostClearContentsRequest.pm"
@@ -2054,6 +2063,9 @@
       "AsposeCellsCloud::Request::PostRunTaskRequest" : {
          "file" : "lib/AsposeCellsCloud/Request/PostRunTaskRequest.pm"
       },
+      "AsposeCellsCloud::Request::PostAddTextContentRequest" : {
+         "file" : "lib/AsposeCellsCloud/Request/PostAddTextContentRequest.pm"
+      },
       "AsposeCellsCloud::Request::GetWorkbookDefaultStyleRequest" : {
          "file" : "lib/AsposeCellsCloud/Request/GetWorkbookDefaultStyleRequest.pm"
       },
@@ -2311,6 +2323,6 @@
       }
    },
    "release_status" : "stable",
-   "version" : "24.6",
+   "version" : "24.7",
    "x_serialization_backend" : "JSON::PP version 2.27400"
 }

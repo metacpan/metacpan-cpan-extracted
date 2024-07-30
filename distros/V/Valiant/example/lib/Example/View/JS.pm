@@ -1,19 +1,19 @@
 package Example::View::JS;
 
-use Moo;
+use Moose;
 use Example::Syntax;
-use Valiant::JSON::Util ();
+use Catalyst::View::Valiant::HTMLBuilder;
 
-extends 'Catalyst::View::MojoTemplate::PerContext';
-
-sub escape_javascript($self, $string) {
-  return Valiant::JSON::Util::escape_javascript($string);
+sub redirect_to_action ($self, $action, @args) {
+  my $location = $self->ctx->uri($action, @args);
+  $self->ctx->response->content_type('text/javascript');
+  $self->ctx->response->body("window.location = '$location';");
 }
 
-__PACKAGE__->config(
-  content_type => 'application/javascript',
-  file_extension => 'js'
-);
+sub render($self, $c) {
+  my $response_body = $self->data_template;
+  $c->log->debug($response_body) if $ENV{DEBUG_JAVASCRIPT};
+  return $response_body;
+}
 
-__DATA__
-% my ($self) = @_;
+__PACKAGE__->config(content_type=>'application/javascript');

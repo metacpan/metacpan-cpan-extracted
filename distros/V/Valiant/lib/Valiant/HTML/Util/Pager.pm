@@ -122,6 +122,7 @@ sub pager_for {
   $options->{name} = $object_name;
   $options->{class} ||= $self->_dom_class($model, 'pager');
   $options->{id} ||= $self->_dom_id($model, 'pager');
+  $options->{controller} ||= $self->controller if $self->has_controller;
 
   my $scope = exists $options->{scope} ?
     delete $options->{scope} :
@@ -153,16 +154,13 @@ sub pager_for {
 
 sub _polymorphic_path_for_model {
   my ($self, $model_path, $scope, $options) = @_;
-  my $model = $model_path->[-1];
   my $scoped_method = "list_${scope}_uri";
   my $controller_method = "list_uri";
+  my $controller = $options->{controller};
 
   return $self->view->list_uri_for_model($model_path, $scope) if $self->view->can('list_uri_for_model');
-  return $self->controller->list_uri_for_model($model_path, $scope) if $self->has_controller && $self->controller->can('list_uri_for_model');
-  return $self->context->list_uri_for_model($model_path, $scope) if $self->has_context && $self->context->can('list_uri_for_model');
-  return $self->view->$scoped_method($model_path) if $self->view->can($scoped_method);
-  return $self->controller->$scoped_method($model_path) if $self->has_controller && $self->controller->can($scoped_method);
-  return $self->controller->$controller_method($model_path) if $self->has_controller && $self->controller->can($controller_method);
+  pop @$model_path if @$model_path > 0; # Remove the last item
+  return $controller->$controller_method($model_path) if $controller && $controller->can($controller_method);
 
   return undef;
 }
@@ -204,37 +202,128 @@ sub _instantiate_builder {
 
 =head1 NAME
 
-Valiant::HTML::Util::Pager- HTML pager 
+Valiant::HTML::Util::Pager - HTML pager component
 
 =head1 SYNOPSIS
 
-    TBD
+    pager_for $list, +{uri_base => list_uri(+{'todo.status'=>$self->status})}, sub ($self, $pg, $list) {
+      $pg->window_info,
+      table +{class=>'table table-striped table-bordered', style=>'margin-bottom:0.5rem'}, [
+        thead
+          trow [
+            th +{scope=>"col"},'Title',
+            th +{scope=>"col", style=>'width:8em'}, 'Status',
+          ],
+        tbody { repeat=>$list }, sub ($self, $todo, $i) {
+          trow [
+            td a +{ href=>edit_uri([$todo]) }, $todo->title,
+            td $todo->status,
+          ],
+        },
+        tfoot,
+          td {colspan=>2, style=>'background:white'},
+            $pg->navigation_line,
+      ],
+    }, sub ($self, $list) {
+      div { class=>"alert alert-warning", role=>"alert" },
+        "There are no tasks to display."
+    },
+
 
 =head1 DESCRIPTION
 
-    TBF
+Given a model with a pager object, or supplied with a pager object, this component
+will render a pager for the model.  The pager object is expected to be a L<Data::Page>
+object or something that can be coerced into a L<Data::Page> object.
+
+=head1 ATTRIBUTES
+
+This class defines the following attributes.
+
+=head2 context
+
+Optional.  If provided this is the L<Catalyst> context object.  If not provided
+then the context is expected to be available via the view object.
+
+=head2 controller
+
+Optional.  If provided this is the L<Catalyst> controller object.  If not provided
+then the controller is expected to be available via the view object.
+
+=head2 pager_builder_class
+
+Optional.  If provided this is the class used to instantiate the pager builder object.
+
 
 =head1 INHERITED METHODS
 
 This class inherits all methods from L<Valiant::HTML::Util::TagBuilder> and 
 L<Valiant::HTML::Util::FormTags>.
 
-=head1 CLASS METHODS
-
-    TBD
-
-=head2 Generating a URL for the action attribure
-
-The following methods are used to generate the URL for the C<action> attribute of the form tag.  They
-are tried in the following order:
-
-    TBD
-
 =head1 INSTANCE METHODS 
 
 The following public instance methods are provided by this class.
 
-    TBD
+=head2 pager_for
+
+    $pager->pager_for($model, \%options, \&block, \&empty_block);
+
+'\&block' is a coderef that will be called with the following arguments:
+
+=over 4
+
+=item $self
+
+The current object
+
+=item $pager
+
+The pager object
+
+=item $model
+
+The model object
+
+=back
+
+'\&empty_block' is called if the pager has no items and is a coderef that will be 
+called with the following arguments:
+
+=over 4
+
+=item $self
+
+The current object
+
+=item $model
+
+The model object
+
+=back
+
+The options hashref can contain the following keys:
+
+=over 4
+
+=item as
+
+Optional.  The name of the pager.  If not provided the name is derived from the model
+
+=item pager
+
+Optional.  The pager object.  If not provided the pager object is derived from the model
+
+=item uri_base
+
+Optional.  The base uri for the pager.  If not provided the uri is derived from the either
+the view or the controller.
+
+=item controller 
+
+Optional.  The controller object.  If not provided the controller object is derived from $self
+Used to override if the controller associated with the given model is not the current controller
+
+=back
 
 
 =head1 SEE ALSO

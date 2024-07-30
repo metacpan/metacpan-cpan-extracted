@@ -1,5 +1,7 @@
 package View::Example::View;
 
+1;
+__END__
 use Moo;
 use Catalyst::View::Valiant::HTMLBuilder
   -tags => qw(blockquote label_tag);
@@ -13,7 +15,7 @@ sub stuff2 {
   return $self->tags->div('stuff2');
 }
 
-sub stuff3 :Renders {
+sub stuff3  {
   blockquote 'stuff3', 
   shift->div('stuff333')
 }

@@ -901,6 +901,41 @@ sub post_batch_split{
 }
 
 #
+# PostAccessTokenRequest
+#
+# Get Access Token Result
+# 
+ 
+#
+{
+    my $params = {
+       'request' =>{
+            data_type => 'PostAccessTokenRequest',
+            description => 'PostAccessToken Request.',
+            required => '0',
+       }
+    };
+    __PACKAGE__->method_documentation->{ 'post_access_token' } = { 
+    	summary => 'Get Access Token Result',
+        params => $params,
+        returns => 'string',
+    };
+}
+#
+# @return string
+#
+sub post_access_token{
+    my ($self, %args) = @_;
+    my $request = $args{'request'};
+    my $response = $request->run_http_request('client' => $self->{api_client} );
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('string', $response);
+    return $_response_object;
+}
+
+#
 # PostClearContentsRequest
 #
 # Clear cell area contents in the worksheet.
@@ -10119,9 +10154,44 @@ sub post_run_task{
 }
 
 #
+# PostAddTextContentRequest
+#
+# 
+# 
+# @addTextOptions  AddTextOptions (required)     
+#
+{
+    my $params = {
+       'request' =>{
+            data_type => 'PostAddTextContentRequest',
+            description => 'PostAddTextContent Request.',
+            required => '0',
+       }
+    };
+    __PACKAGE__->method_documentation->{ 'post_add_text_content' } = { 
+    	summary => '',
+        params => $params,
+        returns => 'FileInfo',
+    };
+}
+#
+# @return FileInfo
+#
+sub post_add_text_content{
+    my ($self, %args) = @_;
+    my $request = $args{'request'};
+    my $response = $request->run_http_request('client' => $self->{api_client} );
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('FileInfo', $response);
+    return $_response_object;
+}
+
+#
 # GetWorkbookDefaultStyleRequest
 #
-# Retrieve the description of the default style for the workbook.
+# Retrieve the description of the default style for the workbook .
 # 
 # @name  string (required)  The file name.  
 # @folder  string   The folder where the file is situated.  
@@ -10136,7 +10206,7 @@ sub post_run_task{
        }
     };
     __PACKAGE__->method_documentation->{ 'get_workbook_default_style' } = { 
-    	summary => 'Retrieve the description of the default style for the workbook.',
+    	summary => 'Retrieve the description of the default style for the workbook .',
         params => $params,
         returns => 'StyleResponse',
     };

@@ -139,7 +139,7 @@ is $tb->options_from_collection_for_select($collection, 'value', 'label', sub { 
 is $tb->form_tag('/user', +{ class=>'form', method=>'put', csrf_token=>'toke-me' }, sub {
   is ref(shift), ref($view);
     $tb->checkbox_tag('person[1]username', +{class=>'aaa'});
-  }), '<form accept-charset="UTF-8" action="/user" class="form" enctype="application/x-www-form-urlencoded" method="put">'.
+  }), '<form accept-charset="UTF-8" action="/user" class="form" data-csrf-token="toke-me" enctype="application/x-www-form-urlencoded" method="put">'.
       '<input id="csrf_token" name="csrf_token" type="hidden" value="toke-me"/>'.
       '<input class="aaa" id="person_1username" name="person[1]username" type="checkbox" value="1"/></form>';
 

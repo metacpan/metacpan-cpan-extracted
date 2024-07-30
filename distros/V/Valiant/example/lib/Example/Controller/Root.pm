@@ -1,30 +1,25 @@
 package Example::Controller::Root;
 
-use Moose;
-use MooseX::MethodAttributes;
+use CatalystX::Moose;
 use Example::Syntax;
 
 extends 'Example::Controller';
 
-sub root :At('/...') ($self, $c) {
-  $c->action->next($c->user);
-}
+sub root :At('/...') ($self, $c) { }
 
-  sub not_found :At('/{*}') Via('root') ($self, $c, $user, @args) {
+  sub not_found :At('/{*}') Via('root') ($self, $c, @args) {
     return $c->detach_error(404, +{error=>"Requested URL not found: @{[ $c->req->uri ]}"});
   }
 
-  sub public :At('/...') Via('root') ($self, $c, $user) {
-    $c->action->next($user);
-  }
+  sub public :At('/...') Via('root') ($self, $c) { }
 
-    sub static :Get('static/{*}') Via('public') ($self, $c, $user, @args) {
+    sub static :Get('static/{*}') Via('public') ($self, $c, @args) {
       return $c->serve_file('static', @args) // $c->detach_error(404, +{error=>"Requested URL not found."});
     }
   
-  sub protected :At('/...') Via('root') ($self, $c, $user) {
-    return $c->redirect_to_action('/session/build') && $c->detach unless $user->authenticated;
-    $c->action->next($user); 
+  sub protected :At('/...') Via('root') ($self, $c) {
+    return $c->redirect_to_action('/session/build') && $c->detach
+      unless $c->user->authenticated;
   }
 
 sub end :Action Does('RenderErrors') Does('RenderView') { }  # The order of the Action Roles is important!!

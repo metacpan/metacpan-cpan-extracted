@@ -1,3 +1,4 @@
+.editorconfig
 Build.PL
 Changes
 examples/envtest.fcgi
@@ -11,16 +12,11 @@ lib/Net/Async/FastCGI/PSGI.pm
 lib/Net/Async/FastCGI/Request.pm
 lib/Net/Async/FastCGI/ServerProtocol.pm
 lib/Plack/Handler/Net/Async/FastCGI.pm
-LICENSE
-Makefile.PL
 MANIFEST			This list of files
-META.json
-META.yml
 psgifiles/counter.psgi
 psgifiles/env.psgi
 psgifiles/helloworld.psgi
 psgifiles/sleepy.psgi
-README
 t/00use.t
 t/01test.t
 t/02request-minimal.t
@@ -35,9 +31,14 @@ t/10request-close.t
 t/11request-encoding.t
 t/12request-unknown.t
 t/13request-handles.t
+t/14request-streamstdin.t
 t/20get_values.t
 t/30request-HTTP.t
 t/40psgi.t
 t/41psgi-streaming.t
 t/99pod.t
 t/lib/TestFCGI.pm
+README
+LICENSE
+META.yml
+META.json

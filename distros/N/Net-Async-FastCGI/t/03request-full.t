@@ -1,10 +1,11 @@
-#!/usr/bin/perl -w
+#!/usr/bin/perl
 
-use strict;
+use v5.14;
+use warnings;
+
 use lib 't/lib';
 
-use Test::More tests => 12;
-use Test::HexString;
+use Test2::V0;
 
 use IO::Async::Loop;
 use IO::Async::Test;
@@ -54,15 +55,15 @@ $C->syswrite(
 
 wait_for { defined $request };
 
-is_deeply( $request->params,
-           {
-              REQUEST_METHOD  => "GET",
-              SCRIPT_NAME     => "/cgi-bin/foo.fcgi",
-              PATH_INFO       => "/another/path",
-              QUERY_STRING    => "foo=bar",
-              SERVER_PROTOCOL => "HTTP/1.1",
-           },
-           '$request has correct params' );
+is( $request->params,
+    {
+       REQUEST_METHOD  => "GET",
+       SCRIPT_NAME     => "/cgi-bin/foo.fcgi",
+       PATH_INFO       => "/another/path",
+       QUERY_STRING    => "foo=bar",
+       SERVER_PROTOCOL => "HTTP/1.1",
+    },
+    '$request has correct params' );
 is( $request->method,       "GET",                            '$request->method' );
 is( $request->script_name,  "/cgi-bin/foo.fcgi",              '$request->script_name' );
 is( $request->path_info,    "/another/path",                  '$request->path_info' );
@@ -107,4 +108,6 @@ $buffer = "";
 
 wait_for_stream { length $buffer >= length $expect } $C => $buffer;
 
-is_hexstr( $buffer, $expect, 'FastCGI end request record' );
+is( $buffer, $expect, 'FastCGI end request record' );
+
+done_testing;

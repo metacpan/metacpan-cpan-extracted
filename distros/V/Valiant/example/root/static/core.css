@@ -26,10 +26,4 @@
   text-decoration: underline;
 }
 
-.pager_current_page {
-  text-align:center;
-  margin-top:0; 
-  margin-bottom: .5rem;
-}
-
 /* End Pager component CSS */

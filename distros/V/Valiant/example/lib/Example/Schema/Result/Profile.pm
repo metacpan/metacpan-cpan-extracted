@@ -5,12 +5,17 @@ use Valiant::I18N;
 use base 'Example::Schema::Result';
 
 __PACKAGE__->table("profile");
-__PACKAGE__->load_components(qw/Valiant::Result/);
 
 __PACKAGE__->add_columns(
   id => { data_type => 'bigint', is_nullable => 0, is_auto_increment => 1 },
   person_id => { data_type => 'integer', is_nullable => 0, is_foreign_key => 1 },
-  state_id => { data_type => 'integer', is_nullable => 0, is_foreign_key => 1 },
+  state_id => { 
+    data_type => 'integer', 
+    is_nullable => 0, 
+    is_foreign_key => 1, 
+    option_value_method=>'id', 
+    option_label_method=>'name',
+  },
   address => { data_type => 'varchar', is_nullable => 0, size => 48 },
   city => { data_type => 'varchar', is_nullable => 0, size => 32 },
   zip => { data_type => 'varchar', is_nullable => 0, size => 5 },
@@ -70,6 +75,22 @@ __PACKAGE__->validates(status => (
 
 __PACKAGE__->validates_with(\&valid_employment_registration );
 __PACKAGE__->validates_with(\&valid_state_registration );
+
+
+##__PACKAGE_->add_text_field('state_id');
+## add_select_options_rs_for => add_select_options_itr_for
+
+__PACKAGE__->add_select_options_rs_for('state_id', sub($self, %options) {
+  return $self->person->states->search_rs({}, {order_by => 'name'});
+});
+
+__PACKAGE__->add_radio_button_rs_for('employment_id', sub($self, %options) {
+  return $self->person->employment_options->search_rs({}, {order_by => 'label'});
+});
+
+__PACKAGE__->add_radio_buttons_for('status', sub($self, %options) {
+  return $self->status_list;
+});
 
 sub status_list($self) { return qw( pending active inactive ) }
 

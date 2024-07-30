@@ -23,12 +23,12 @@ See POD on the main module for info.
 
 sub cpan_packages {
     return qw(
-O/OA/OALDERS/HTML-Parser-3.81.tar.gz
+O/OA/OALDERS/HTML-Parser-3.82.tar.gz
 K/KE/KENTNL/HTML-Tree-5.07.tar.gz
 N/NI/NIGELM/HTML-Formatter-2.16.tar.gz
 K/KA/KAMELKEV/CSS-Inliner-4018.tar.gz
 C/CJ/CJFIELDS/BioPerl-1.7.8.tar.gz
-E/ET/ETHER/Moose-2.2206.tar.gz
+E/ET/ETHER/Moose-2.2207.tar.gz
 D/DR/DROLSKY/DateTime-TimeZone-2.62.tar.gz
 D/DR/DROLSKY/DateTime-1.65.tar.gz
 D/DK/DKECHAG/Astro-Coord-Precession-0.03.tar.gz
@@ -36,8 +36,8 @@ D/DK/DKECHAG/Astro-Coord-Constellations-0.01.tar.gz
 D/DK/DKECHAG/Image-PHash-0.3.tar.gz
 D/DK/DKECHAG/Math-DCT-0.04.tar.gz
 D/DK/DKECHAG/SQL-Inserter-0.04.tar.gz
-M/MI/MIK/CryptX-0.078.tar.gz
-M/MI/MIK/Crypt-JWT-0.034.tar.gz
+M/MI/MIK/CryptX-0.080.tar.gz
+M/MI/MIK/Crypt-JWT-0.035.tar.gz
 M/ML/MLEHMANN/JSON-XS-4.03.tar.gz
 L/LE/LETO/Math-MatrixReal-2.13.tar.gz
 R/RI/RIBASUSHI/SQL-Abstract-Classic-1.91.tar.gz

@@ -96,10 +96,8 @@ sub model_persisted {
 sub form_for {
   my $self = shift;
   my $proto = shift; # required; at the start
-  my $content_block_coderef = pop; # required; at the end
+  my $content_block_coderef = (ref($_[-1])||'') eq 'CODE' ? pop : undef; 
   my $options = ref($_[-1]||'') eq 'HASH' ? pop : +{};
-
-  croak "You must provide a content block to form_for" unless ref($content_block_coderef) eq 'CODE';
 
   my ($model, $object_name);
   if( ref(\$proto) eq 'SCALAR') {
@@ -164,91 +162,116 @@ sub _apply_form_for_options {
 
 sub form_with {
   my $self = shift;
-  my $content_block_coderef = pop; # required; at the end
+  my $content_block_coderef = (ref($_[-1])||'') eq 'CODE' ? pop : undef; 
   my $options = @_ ? shift : +{};
-  my $scope = exists $options->{scope} ? $options->{scope} : undef;
+    my $scope = exists $options->{scope} ? $options->{scope} : undef;
 
-  $options->{allow_method_names_outside_object} = 1;
-  $options->{skip_default_ids} = 0;
+    $options->{allow_method_names_outside_object} = 1;
+    $options->{skip_default_ids} = 0;
+    $options->{controller} ||= $self->controller if $self->has_controller;
 
-  my ($model, $url);
-  if($options->{model}) {
-    my $model_path = ((ref($options->{model})||'') eq 'ARRAY') ? $options->{model} : [$options->{model}];
-    $model = $self->_to_model($self->_object_from_record_proto(delete $options->{model}));
+    my ($model, $model_path, $url);
+    if($options->{model}) {
+      $model_path = ((ref($options->{model})||'') eq 'ARRAY') ? $options->{model} : [$options->{model}];
+      $model = $self->_to_model($self->_object_from_record_proto(delete $options->{model}));
     $scope = exists $options->{scope} ?
       delete $options->{scope} :
         $self->_model_name_from_object_or_class($model)->param_key;
-    $url = $self->_polymorphic_path_for_model($model_path, $scope, $options);
+    $url = $self->_polymorphic_path_for_model(
+      $model_path, $scope, 
+      $options->{controller}, $options->{new_url}, $options->{edit_url}
+    );
   }
 
   $url ||= delete $options->{url} if exists $options->{url};
+  $url = $url->($self, $model_path) if (ref($url)||'') eq 'CODE';
 
-  my $builder = $self->_instantiate_builder($scope, $model, $options);
   my $html_options = $self->_html_options_for_form_with($url, $model, $options);
-  my $output = $self->join_tags(
-    $self->form_tag($html_options, sub {
-      my @form_node = $content_block_coderef->($self->view, $builder, $model);
-      return $builder->view->safe_concat(@form_node);
-    })
-  );
+  $options->{html}{csrf_token} = $html_options->{csrf_token} if exists $html_options->{csrf_token};
+  my $builder = $self->_instantiate_builder($scope, $model, $options);
 
-  return $output;
-}
+  if($html_options->{data}{remote}) {
+    my $url = $html_options->{action}->clone;
+    my $replace = exists($html_options->{data}{replace})
+      ? $html_options->{data}{replace}
+      : '#'.$html_options->{id};
+    $url->query_param(replace=>$replace);
 
-sub _polymorphic_path_for_model {
-  my ($self, $model_path, $scope, $options) = @_;
-  my $model = $model_path->[-1];
+    $html_options->{action} = $url;
+    $html_options->{data}{method} ||= $html_options->{method};
+  }
 
-  # $model can be an object, string or array of objects strings
-  if($self->model_persisted($model)) {
-    if(my $edit = $options->{controller_edit_uri}) {
-      return $self->controller->$edit($model_path);
-    }
-    return $self->_edit_action_for_model($model_path, $scope);
+  if($content_block_coderef) {
+    return my $output = $self->join_tags(
+      $self->form_tag($html_options, sub {
+        my @form_node = $content_block_coderef->($self->view, $builder, $model);
+        return $builder->view->safe_concat(@form_node);
+      })
+    );
   } else {
-    if(my $create = $options->{controller_create_uri}) {
-      return $self->controller->$create($model_path);
-    }
-    return $self->_new_action_for_model($model_path, $scope);
+    return my $obj = bless +{
+      fb => $builder,
+      model => $model,
+      html_options => $html_options,
+      util_form => $self,
+      view => $self->view,
+    }, 'Valiant::HTML::Util::Form::FormObject';
   }
 }
 
-sub _edit_action_for_model {
-  my ($self, $model_path, $scope) = @_;
-  my $scoped_method = "update_${scope}_uri";
-  my $controller_method = "update_uri";
+# if url is empty
+# update
+# $view->update_uri_for($form_controller, $scope, $model_path)
+# $form_controller->update_uri($model_path)
+# create
+# $view->create_uri_for($form_controller, $scope, $model_path, $new_model)
+# $form_controller->create_uri($model_path, $new_model)
 
-  return $self->view->update_uri_for_model($model_path, $scope) if $self->view->can('update_uri_for_model');
-  return $self->controller->update_uri_for_model($model_path, $scope) if $self->has_controller && $self->controller->can('update_uri_for_model');
-  return $self->context->update_uri_for_model($model_path, $scope) if $self->has_context && $self->context->can('update_uri_for_model');
-  return $self->view->$scoped_method($model_path) if $self->view->can($scoped_method);
-  return $self->controller->$scoped_method($model_path) if $self->has_controller && $self->controller->can($scoped_method);
-  return $self->controller->$controller_method($model_path) if $self->has_controller && $self->controller->can($controller_method);
-  return $self->context->$scoped_method($model_path) if $self->has_context && $self->context->can($scoped_method);
+sub _polymorphic_path_for_model {
+  my $self = shift;
+  my @args = my ($model_path, $scope, $controller, $new_url, $edit_url) = @_;
+
+  if($self->model_persisted($model_path->[-1])) {
+    return $edit_url ?
+      $edit_url->($self->view, $model_path) :
+      $self->_edit_action_for_model(@args)
+  } else {
+    return $new_url ?
+      do { pop @{$model_path}; $new_url->($self->view, $model_path) } :
+      $self->_new_action_for_model(@args);
+  } 
+}
+
+sub _edit_action_for_model {
+  my ($self, $model_path, $scope, $controller) = @_;
+
+  if($self->can('update_uri_for')) {
+    my $url = $self->update_uri_for($model_path, $scope, $controller);
+    return $url if $url;
+  }   
+  if($controller && $controller->can('update_uri')) {
+    my $url = $controller->update_uri($model_path);
+    return $url if $url;
+  }
 
   return undef;
 }
 
 sub _new_action_for_model {
-  my ($self, $model_path, $scope) = @_;
-  my $scoped_method = "create_${scope}_uri";
-  my $controller_method = "create_uri";
+  my ($self, $model_path, $scope, $controller) = @_;
+  my $new_model = pop @{$model_path};
 
-  my @full_model_path = @$model_path;
-  pop @full_model_path if @full_model_path;
-
-  return $self->view->create_uri_for_model($model_path, $scope) if $self->view->can('create_uri_for_model');
-  return $self->controller->create_uri_for_model($model_path, $scope) if $self->has_controller && $self->controller->can('create_uri_for_model');
-  return $self->context->create_uri_for_model($model_path, $scope) if $self->has_context && $self->context->can('create_uri_for_model');
-
-  return $self->view->$scoped_method(\@full_model_path) if $self->view->can($scoped_method);
-  return $self->controller->$scoped_method(\@full_model_path) if $self->has_controller && $self->controller->can($scoped_method);
-  return $self->controller->$controller_method(\@full_model_path) if $self->has_controller && $self->controller->can($controller_method);
-  return $self->context->$scoped_method(\@full_model_path) if $self->has_context && $self->context->can($scoped_method);
+  if($self->can('create_uri_for')) {
+    my $url = $self->create_uri_for($model_path, $new_model, $scope, $controller);
+    return $url if $url;
+  }   
+  if($controller && $controller->can('create_uri')) {
+    my $url = $controller->create_uri($model_path);
+    return $url if $url;
+  }
 
   return undef;
 }
-
 
 # _instantiate_builder($object)
 # _instantiate_builder($object, \%options)
@@ -286,7 +309,7 @@ sub _html_options_for_form_with {
   my $html_options = $options->{html} || +{};
 
   $self->_merge_attrs($html_options, $options, qw(action method data id csrf_token class style));
-
+  $url = $url->($self, $model) if (ref($url)||'') eq 'CODE';
   $html_options->{action} ||= $url if $url;
   $html_options->{csrf_token} ||= $self->view->csrf_token if $self->view->can('csrf_token');
   $html_options->{csrf_token} ||= $self->context->csrf_token if $self->has_context && $self->context->can('csrf_token');
@@ -359,6 +382,30 @@ sub fields {
   return $output;
 }
 
+package Valiant::HTML::Util::Form::FormObject;
+
+use warnings;
+use strict;
+use Carp;
+
+sub fb { shift->{fb} }
+
+sub render {
+  my ($self, $content_block_coderef) = @_;
+  croak "No content block provided" unless $content_block_coderef;
+
+  return my $output = $self->{util_form}->join_tags(
+    $self->{util_form}->form_tag($self->{html_options}, sub {
+      my @form_node = $content_block_coderef->(
+        $self->{view},
+        $self->{fb},
+        $self->{model},
+      );
+      return $self->{fb}->view->safe_concat(@form_node);
+    })
+  );
+}
+
 1;
 
 =head1 NAME
@@ -410,6 +457,20 @@ Generates something like:
       <label for="person_last_name">Last Name</label>
       <input id="person_last_name" name="person.last_name" type="text" value="Napiorkowski"/>
     </form>
+
+Alternatively you can create a form object and then render it later:
+
+    my $form = $f->form_for($person);
+    $form->render(sub($fb, $person) {
+      return  $fb->label('first_name'),
+              $fb->input('first_name'),
+              $fb->errors_for('first_name', +{ class=>'invalid-feedback' }),
+              $fb->label('last_name'),
+              $fb->input('last_name'),
+              $fb->errors_for('last_name'+{ class=>'invalid-feedback' });
+    });
+
+Would return the same output.
 
 =head1 DESCRIPTION
 
@@ -530,44 +591,39 @@ are tried in the following order:
 
 =over 4
 
-=item * create_uri_for_model
+=item * $self->create_uri_for
 
-=item * create_${scope}_uri
+=item * $controller->create_uri
 
-=item * create_uri
+=item * $self->update_uri_for
 
-=item * update_uri_for_model
-
-=item * update_${scope}_uri
-
-=item * update_uri
+=item * $controller->update_uri
 
 =back
 
 The 'create' methods are checked when the model is not persistent (ie not in storage).  The 'update' methods
 are checked when the model is persistent (ie in storage).
 
-Where C<${scope}> is the C<scope> argument passed to C<form_with> or C<form_for>.  If you don't provide
-a C<scope> argument we try to guess one based on the model name.  For example if your model is C<Person>
-we will try to use C<person> as the scope.
+We first look for these methods on the view object, then the controller object. If you don't provide any of 
+these objects we will just return C<undef> which will result in no C<action> attribute being generated (You
+will have to supply it yourself).
 
-We first look for these methods on the view object, then the controller object and finally the context
-object.  If you don't provide any of these objects we will just return C<undef> which will result in 
-no C<action> attribute being generated (You will have to supply it yourself).
-
-All the 'update_*' methods are passed the full model path as an argument, which is an arrayref whos last
+All the 'update_*' methods are passed the full model path as an argument, which is an arrayref whose last
 member is the model object and any preceding members are the parent objects or strings used to create a
 path.  For example if you have a deeply nested model you might need both its ID and the ID of its parent
 to form the correct URL to its update action.
 
 All the 'create_*' methods are passed only the 'path' parts of model path, that is the models or
-strings that are used to create the path.  However the C<create_uri_for_model> (and the C<update_uri_for_model>)
+strings that are used to create the path.  However the C<create_uri_for> (and the C<update_uri_for>)
 methods always get the full path as an argument.  You might use those if you create a central registry
 mapping models to controllers (perhaps this is a possible good idea for a L<Catalyst> plugin or similar?)
 
 This allows you to move more of the request and application bound logic and information out of the view
 and back to the controller.  For an example of how this works with L<Catalyst> you can review the example
 application in the C<example> directory of this distribution.
+
+If you prefer a different behavior you can override the methods C<_edit_action_for_model> and 
+C<_new_action_for_model> in your subclass.  Or just set the url directly in the form and ignore this feature
 
 =head1 INSTANCE METHODS 
 
@@ -620,7 +676,7 @@ is supported and the model is marked for updating of an existing model).
 
 =item action
 
-Should be the URL that the form with post to.  
+Should be the URL that the form with post to. This is a string and used exactly as typed. 
 
 =item data
 
@@ -659,6 +715,34 @@ This is useful for CSRF protection.  If you don't provide a value we will try to
 C<csrf_token> method on the current view object.  If that doesn't exist we will try to use
 the C<csrf_token> method on the current context object (if one exists).  If you are using
 L<Catalyst> with this you can use L<Catalyst::Plugin::CSRFToken> to generate a token.
+
+=item url
+
+The url to use for the form action (unless 'action' is defined).  Can be a string or a coderef.
+if a coderef will recieve the view object and model_path as argument.
+
+    url => sub ($self, $model_path) { $model_path->[-1]->persisted ? path('update') : path('create') }
+
+=item edit_url
+
+=item new_url
+
+A string or coderef that is the url for the form action when the model is persisted (edit_url) or 
+not persisted (new_url).  If you provide these we will ignore the C<url> option.
+
+    edit_url => path('update'), new_url => path('create'),
+
+If using the coderef form you get the view and model_path as arguments:
+
+    edit_url => sub ($self, $model_path) { path('update') }
+
+For C<edit_url> the model_path will be the full path to the model, for C<new_url> the model_path
+will be the path to the model minus the last element (which is the model itself).
+
+=item controller
+
+The controller object that is associated with the form, if one exists.  Defaults to the controller
+associated with the view if it exists.
 
 =back
 

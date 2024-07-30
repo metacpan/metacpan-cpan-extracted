@@ -1,11 +1,11 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2005-2011 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2005-2024 -- leonerd@leonerd.org.uk
 
-package Net::Async::FastCGI::ServerProtocol;
+package Net::Async::FastCGI::ServerProtocol 0.26;
 
-use strict;
+use v5.14;
 use warnings;
 
 use base qw( Net::Async::FastCGI::Protocol );
@@ -19,6 +19,19 @@ use Net::FastCGI::Protocol qw(
 );
 
 use Net::Async::FastCGI::Request;
+
+sub configure
+{
+   my $self = shift;
+   my %params = @_;
+
+   foreach (qw( stream_stdin )) {
+      exists $params{$_} and
+         $self->{$_} = delete $params{$_};
+   }
+
+   $self->SUPER::configure( %params );
+}
 
 sub _init
 {
@@ -65,6 +78,7 @@ sub on_record
             conn => $self,
             fcgi => $self->{fcgi},
             rec  => $rec,
+            stream_stdin => $self->{stream_stdin},
          );
          $self->{reqs}->{$reqid} = $req;
       }

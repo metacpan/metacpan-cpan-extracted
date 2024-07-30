@@ -1,5 +1,5 @@
 
-#define XS_Id "$Id: SEC.xs 1978 2024-06-02 09:58:05Z willem $"
+#define XS_Id "$Id: SEC.xs 1986 2024-07-29 10:45:40Z willem $"
 
 
 =head1 NAME
@@ -76,6 +76,7 @@ static OSSL_LIB_CTX *libctx = NULL;
 
 
 #ifdef OPENSSL_NO_DSA
+#undef  NO_DSA		/* suppress compiler noise if already defined */
 #define NO_DSA
 #endif
 
@@ -122,13 +123,11 @@ static OSSL_LIB_CTX *libctx = NULL;
 
 
 #ifdef OPENSSL_IS_BORINGSSL
-#undef  EOL
-#define NO_DSA
+#undef EOL
 #endif
 
 #ifdef LIBRESSL_VERSION_NUMBER
-#undef  EOL
-#define NO_DSA
+#undef EOL
 #endif
 
 

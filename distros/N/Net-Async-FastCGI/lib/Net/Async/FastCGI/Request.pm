@@ -1,11 +1,11 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2005-2013 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2005-2024 -- leonerd@leonerd.org.uk
 
-package Net::Async::FastCGI::Request;
+package Net::Async::FastCGI::Request 0.26;
 
-use strict;
+use v5.14;
 use warnings;
 
 use Carp;
@@ -23,8 +23,6 @@ use constant MAXRECORDDATA => 65535;
 use Encode qw( find_encoding );
 use POSIX qw( EAGAIN );
 
-our $VERSION = '0.25';
-
 my $CRLF = "\x0d\x0a";
 
 =head1 NAME
@@ -33,35 +31,36 @@ C<Net::Async::FastCGI::Request> - a single active FastCGI request
 
 =head1 SYNOPSIS
 
- use Net::Async::FastCGI;
- use IO::Async::Loop;
+   use Net::Async::FastCGI;
+   use IO::Async::Loop;
 
- my $fcgi = Net::Async::FastCGI->new(
-    on_request => sub {
-       my ( $fcgi, $req ) = @_;
+   my $fcgi = Net::Async::FastCGI->new(
+      on_request => sub {
+         my ( $fcgi, $req ) = @_;
 
-       my $path = $req->param( "PATH_INFO" );
-       $req->print_stdout( "Status: 200 OK\r\n" .
-                           "Content-type: text/plain\r\n" .
-                           "\r\n" .
-                           "You requested $path" );
-       $req->finish();
-    }
- );
+         my $path = $req->param( "PATH_INFO" );
+         $req->print_stdout( "Status: 200 OK\r\n" .
+                             "Content-type: text/plain\r\n" .
+                             "\r\n" .
+                             "You requested $path" );
+         $req->finish();
+      }
+   );
 
- my $loop = IO::Async::Loop->new();
+   my $loop = IO::Async::Loop->new();
 
- $loop->add( $fcgi );
+   $loop->add( $fcgi );
 
- $loop->run;
+   $loop->run;
 
 =head1 DESCRIPTION
 
 Instances of this object class represent individual requests received from the
 webserver that are currently in-progress, and have not yet been completed.
 When given to the controlling program, each request will already have its
-parameters and STDIN data. The program can then write response data to the
-STDOUT stream, messages to the STDERR stream, and eventually finish it.
+parameters (and, on servers without stdin streaming enabled, its STDIN data).
+The program can then write response data to the STDOUT stream, messages to the
+STDERR stream, and eventually finish it.
 
 This module would not be used directly by a program using
 C<Net::Async::FastCGI>, but rather, objects in this class are passed into the
@@ -83,8 +82,10 @@ sub new
       reqid      => $rec->{reqid},
       keepconn   => $rec->{flags} & FCGI_KEEP_CONN,
 
-      stdin      => "",
-      stdindone  => 0,
+      stdin        => "",
+      stdindone    => 0,
+      stream_stdin => $args{stream_stdin},
+
       params     => {},
       paramsdone => 0,
 
@@ -143,7 +144,7 @@ sub _ready_check
 {
    my $self = shift;
 
-   if( $self->{stdindone} and $self->{paramsdone} ) {
+   if( $self->{paramsdone} and ( $self->{stdindone} || $self->{stream_stdin} ) ) {
       $self->{fcgi}->_request_ready( $self );
    }
 }
@@ -184,14 +185,45 @@ sub incomingrecord_stdin
       $self->{stdindone} = 1;
    }
 
-   $self->_ready_check;
+   if( $self->{stream_stdin} ) {
+      $self->_flush_stdin;
+   }
+   else {
+      $self->_ready_check;
+   }
+}
+
+sub _start
+{
+   my $self = shift;
+   $self->{started} = 1;
+
+   $self->_flush_stdin if $self->{stream_stdin} and length $self->{stdin};
+}
+
+sub _flush_stdin
+{
+   my $self = shift;
+
+   my $on_stdin = $self->{on_stdin_read};
+   if( !$on_stdin ) {
+      warn "NaFastCGI::Request incoming STDIN data with on on_stdin_read\n" if $self->{started};
+      return;
+   }
+
+   {
+      my $ret = $self->$on_stdin( \$self->{stdin}, $self->{stdindone} );
+      redo if $ret and length $self->{stdin};
+   }
 }
 
 =head1 METHODS
 
 =cut
 
-=head2 $hashref = $req->params
+=head2 params
+
+   $hashref = $req->params;
 
 This method returns a reference to a hash containing a copy of the request
 parameters that had been sent by the webserver as part of the request.
@@ -207,7 +239,9 @@ sub params
    return \%p;
 }
 
-=head2 $p = $req->param( $key )
+=head2 param
+
+   $p = $req->param( $key );
 
 This method returns the value of a single request parameter, or C<undef> if no
 such key exists.
@@ -222,7 +256,9 @@ sub param
    return $self->{params}{$key};
 }
 
-=head2 $method = $req->method
+=head2 method
+
+   $method = $req->method;
 
 Returns the value of the C<REQUEST_METHOD> parameter, or C<GET> if there is no
 value set for it.
@@ -235,7 +271,9 @@ sub method
    return $self->param( "REQUEST_METHOD" ) || "GET";
 }
 
-=head2 $script_name = $req->script_name
+=head2 script_name
+
+   $script_name = $req->script_name;
 
 Returns the value of the C<SCRIPT_NAME> parameter.
 
@@ -247,7 +285,9 @@ sub script_name
    return $self->param( "SCRIPT_NAME" );
 }
 
-=head2 $path_info = $req->path_info
+=head2 path_info
+
+   $path_info = $req->path_info;
 
 Returns the value of the C<PATH_INFO> parameter.
 
@@ -259,7 +299,9 @@ sub path_info
    return $self->param( "PATH_INFO" );
 }
 
-=head2 $path = $req->path
+=head2 path
+
+   $path = $req->path;
 
 Returns the full request path by reconstructing it from C<script_name> and
 C<path_info>.
@@ -278,7 +320,9 @@ sub path
    return $path;
 }
 
-=head2 $query_string = $req->query_string
+=head2 query_string
+
+   $query_string = $req->query_string;
 
 Returns the value of the C<QUERY_STRING> parameter.
 
@@ -290,7 +334,9 @@ sub query_string
    return $self->param( "QUERY_STRING" ) || "";
 }
 
-=head2 $protocol = $req->protocol
+=head2 protocol
+
+   $protocol = $req->protocol;
 
 Returns the value of the C<SERVER_PROTOCOL> parameter.
 
@@ -302,7 +348,9 @@ sub protocol
    return $self->param( "SERVER_PROTOCOL" );
 }
 
-=head2 $req->set_encoding( $encoding )
+=head2 set_encoding
+
+   $req->set_encoding( $encoding );
 
 Sets the character encoding used by the request's STDIN, STDOUT and STDERR
 streams. This method may be called at any time to change the encoding in
@@ -330,7 +378,9 @@ sub set_encoding
    }
 }
 
-=head2 $line = $req->read_stdin_line
+=head2 read_stdin_line
+
+   $line = $req->read_stdin_line;
 
 This method works similarly to the C<< <HANDLE> >> operator. If at least one
 line of data is available then it is returned, including the linefeed, and
@@ -343,6 +393,7 @@ is returned instead.
 sub read_stdin_line
 {
    my $self = shift;
+   croak "Cannot call ->read_stdin_line on streaming-stdin requests" if $self->{stream_stdin};
 
    my $codec = $self->{codec};
 
@@ -357,7 +408,9 @@ sub read_stdin_line
    }
 }
 
-=head2 $data = $req->read_stdin( $size )
+=head2 read_stdin
+
+   $data = $req->read_stdin( $size );
 
 This method works similarly to the C<read(HANDLE)> function. It returns the
 next block of up to $size bytes from the STDIN buffer. If no data is available
@@ -369,6 +422,7 @@ will return all the available data.
 sub read_stdin
 {
    my $self = shift;
+   croak "Cannot call ->read_stdin on streaming-stdin requests" if $self->{stream_stdin};
    my ( $size ) = @_;
 
    return undef unless length $self->{stdin};
@@ -380,6 +434,39 @@ sub read_stdin
    # If $size is too big, substr() will cope
    my $bytes = substr( $self->{stdin}, 0, $size, "" );
    return $codec ? $codec->decode( $bytes ) : $bytes;
+}
+
+=head2 set_on_stdin_read
+
+   $req->set_on_stdin_read( $on_stdin_read );
+
+      $again = $on_stdin_read->( $req, $buffref, $eof );
+
+I<Since version 0.26.>
+
+Only valid on requests on servers with stdin streaming enabled.
+
+This method should be called as part of the C<on_request> event on the server,
+to set the callback function to invoke when new data is provided to the stdin
+stream for this request.
+
+The callback function is invoked in a similar style to the C<on_read> event
+handler of an L<IO::Async::Stream>. It is passed the request itself, along
+with a SCALAR reference to the buffer containing the stdin data, and a boolean
+indicating if the end of stdin data has been reached.
+
+It should inspect this buffer and remove some prefix of it that it wishes to
+consume. Any remaining content will be present on the next call. If it returns
+a true value, the callback will be invoked again immediately, to consume more
+data. This continues until there is no more data left, or it returns false.
+
+=cut
+
+sub set_on_stdin_read
+{
+   my $self = shift;
+   croak "Cannot call ->set_on_stdin_read except on streaming-stdin requests" unless $self->{stream_stdin};
+   ( $self->{on_stdin_read} ) = @_;
 }
 
 sub _print_stream
@@ -418,7 +505,9 @@ sub _needs_flush
    return defined $self->{stdout_cb};
 }
 
-=head2 $req->print_stdout( $data )
+=head2 print_stdout
+
+   $req->print_stdout( $data );
 
 This method appends the given data to the STDOUT stream of the FastCGI
 request, sending it to the webserver to be sent to the client.
@@ -437,7 +526,9 @@ sub print_stdout
    $self->{conn}->_req_needs_flush( $self );
 }
 
-=head2 $req->print_stderr( $data )
+=head2 print_stderr
+
+   $req->print_stderr( $data );
 
 This method appends the given data to the STDERR stream of the FastCGI
 request, sending it to the webserver.
@@ -457,7 +548,9 @@ sub print_stderr
    $self->{conn}->_req_needs_flush( $self );
 }
 
-=head2 $req->stream_stdout_then_finish( $readfn, $exitcode )
+=head2 stream_stdout_then_finish
+
+   $req->stream_stdout_then_finish( $readfn, $exitcode );
 
 This method installs a callback for streaming data to the STDOUT stream.
 Whenever the output stream is otherwise-idle, the function will be called to
@@ -492,7 +585,9 @@ sub stream_stdout_then_finish
    $self->{conn}->_req_needs_flush( $self );
 }
 
-=head2 $stdin = $req->stdin
+=head2 stdin
+
+   $stdin = $req->stdin;
 
 Returns an IO handle representing the request's STDIN buffer. This may be read
 from using the C<read> or C<readline> functions or the C<< <$stdin> >>
@@ -518,9 +613,13 @@ sub stdin
    );
 }
 
-=head2 $stdout = $req->stdout
+=head2 stdout
 
-=head2 $stderr = $req->stderr
+=head2 stderr
+
+   $stdout = $req->stdout;
+
+   $stderr = $req->stderr;
 
 Returns an IO handle representing the request's STDOUT or STDERR streams
 respectively. These may written to using C<print>, C<printf>, C<say>, etc..
@@ -550,7 +649,9 @@ sub stderr
    return shift->_stdouterr( "print_stderr" );
 }
 
-=head2 $req->finish( $exitcode )
+=head2 finish
+
+   $req->finish( $exitcode );
 
 When the request has been dealt with, this method should be called to indicate
 to the webserver that it is finished. After calling this method, no more data
@@ -592,7 +693,9 @@ sub finish
    }
 }
 
-=head2 $stdout = $req->stdout_with_close
+=head2 stdout_with_close
+
+   $stdout = $req->stdout_with_close;
 
 Similar to the C<stdout> method, except that when the C<close> method is
 called on the returned filehandle, the request will be finished by calling
@@ -621,7 +724,9 @@ sub _abort
    delete $self->{stdout_cb};
 }
 
-=head2 $req->is_aborted
+=head2 is_aborted
+
+   $req->is_aborted;
 
 Returns true if the webserver has already closed the control connection. No
 further work on this request is necessary, as it will be discarded.
@@ -648,7 +753,9 @@ that already uses these.
 
 =cut
 
-=head2 $http_req = $req->as_http_request
+=head2 as_http_request
+
+   $http_req = $req->as_http_request;
 
 Returns a new C<HTTP::Request> object that gives a reasonable approximation to
 the request. Because the webserver has translated the original HTTP request
@@ -700,7 +807,9 @@ sub as_http_request
    return $req;
 }
 
-=head2 $req->send_http_response( $resp )
+=head2 send_http_response
+
+   $req->send_http_response( $resp );
 
 Sends the given C<HTTP::Response> object as the response to this request. The
 status, headers and content are all written out to the request's STDOUT stream
@@ -761,29 +870,29 @@ sub WRITE    { shift->{WRITE}->( @_ ) }
 To serve contents of files on disk, it may be more efficient to use
 C<stream_stdout_then_finish>:
 
- use Net::Async::FastCGI;
- use IO::Async::Loop;
+   use Net::Async::FastCGI;
+   use IO::Async::Loop;
 
- my $fcgi = Net::Async::FastCGI->new(
-    on_request => sub {
-       my ( $fcgi, $req ) = @_;
+   my $fcgi = Net::Async::FastCGI->new(
+      on_request => sub {
+         my ( $fcgi, $req ) = @_;
 
-       open( my $file, "<", "/path/to/file" );
-       $req->print_stdout( "Status: 200 OK\r\n" .
-                           "Content-type: application/octet-stream\r\n" .
-                           "\r\n" );
+         open( my $file, "<", "/path/to/file" );
+         $req->print_stdout( "Status: 200 OK\r\n" .
+                             "Content-type: application/octet-stream\r\n" .
+                             "\r\n" );
 
-       $req->stream_stdout_then_finish(
-          sub { read( $file, my $buffer, 8192 ) or return undef; return $buffer },
-          0
-       );
-    }
+         $req->stream_stdout_then_finish(
+            sub { read( $file, my $buffer, 8192 ) or return undef; return $buffer },
+            0
+         );
+      }
 
- my $loop = IO::Async::Loop->new();
+   my $loop = IO::Async::Loop->new();
 
- $loop->add( $fcgi );
+   $loop->add( $fcgi );
 
- $loop->run;
+   $loop->run;
 
 It may be more efficient again to instead use the C<X-Sendfile> feature of
 certain webservers, which allows the webserver itself to serve the file

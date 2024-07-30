@@ -13,6 +13,7 @@ sub importables {
     'utf8',
     'strict',
     'warnings',
+    'Patterns::UndefObject::maybe',
     ['feature', ':5.34'],
     ['Scalar::Util', 'blessed'],
     ['experimental', 'signatures'],

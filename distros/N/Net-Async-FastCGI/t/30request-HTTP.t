@@ -1,10 +1,11 @@
-#!/usr/bin/perl -w
+#!/usr/bin/perl
 
-use strict;
+use v5.14;
+use warnings;
+
 use lib 't/lib';
 
-use Test::More tests => 8;
-use Test::HexString;
+use Test2::V0;
 
 use IO::Async::Loop;
 use IO::Async::Test;
@@ -58,7 +59,7 @@ wait_for { defined $request };
 
 my $httpreq = $request->as_http_request;
 
-isa_ok( $httpreq, 'HTTP::Request', '$httpreq isa HTTP::Request' );
+isa_ok( $httpreq, [ 'HTTP::Request' ], '$httpreq isa HTTP::Request' );
 
 is( $httpreq->method,           "GET",         '$httpreq->method' );
 is( $httpreq->protocol,         "HTTP/1.1",    '$httpreq->protocol' );
@@ -101,4 +102,6 @@ $buffer = "";
 
 wait_for_stream { length $buffer >= length $expect } $C => $buffer;
 
-is_hexstr( $buffer, $expect, 'FastCGI end request record' );
+is( $buffer, $expect, 'FastCGI end request record' );
+
+done_testing;

@@ -1,19 +1,19 @@
 package Example::View::JS::Session::Build;
 
-use Moo;
+use CatalystX::Moose;
 use Example::Syntax;
-extends 'Example::View::JS';
+use Example::View::JS;
 
-sub login_path($self) {
-  return my $login_path = $self->ctx->uri('build');
-};
+has replace => (is=>'ro', required=>1);
 
-1;
+sub get_form_html($self) {
+  my $content = $self->ctx->view('HTML::Session::Form')->get_rendered;
+  return my $escaped = $self->escape_javascript($content);
+}
+
+__PACKAGE__->meta->make_immutable;
 
 __DATA__
-% my ($self, $c) = @_;
-$(document).on('ajax:success', function(event, data, status, xhr) {
-  console.log("Redirecting: <%= $self->login_path %>");
-  alert("Your session has expired; redirecting to login page.");
-  window.location.href = "<%= $self->login_path %>";
+$('{:replace}').on('ajax:success', function(event, data, status, xhr) {
+  $(event.target).html('{:get_form_html}');
 });

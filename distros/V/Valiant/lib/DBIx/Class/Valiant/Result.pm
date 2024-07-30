@@ -369,13 +369,7 @@ sub read_attribute_for_validation {
   return $columns{$attribute} if exists($columns{$attribute});
 }
 
-sub read_attribute_for_html {
-  my ($self, $attribute) = @_;
 
-  return $self->is_marked_for_deletion if $attribute eq '_delete';
-  return 1 if $attribute eq '_add';
-  return $self->read_attribute_for_validation($attribute);
-}
 
 sub get_attribute_for_json {
   my ($self, $attribute) = @_;

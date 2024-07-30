@@ -1,10 +1,11 @@
-#!/usr/bin/perl -w
+#!/usr/bin/perl
 
-use strict;
+use v5.14;
+use warnings;
+
 use lib 't/lib';
 
-use Test::More tests => 3;
-use Test::HexString;
+use Test2::V0;
 
 use IO::Async::Loop;
 use IO::Async::Test;
@@ -40,9 +41,9 @@ $C->syswrite(
 
 wait_for { defined $request };
 
-is_deeply( $request->params,
-           {},
-           '$request has empty params hash' );
+is( $request->params,
+    {},
+    '$request has empty params hash' );
 is( $request->read_stdin_line,
     undef,
     '$request has empty STDIN' );
@@ -67,4 +68,6 @@ $buffer = "";
 
 wait_for_stream { length $buffer >= length $expect } $C => $buffer;
 
-is_hexstr( $buffer, $expect, 'FastCGI end request record' );
+is( $buffer, $expect, 'FastCGI end request record' );
+
+done_testing;

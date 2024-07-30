@@ -1,7 +1,6 @@
 package Example::Controller::Home;
 
-use Moose;
-use MooseX::MethodAttributes;
+use CatalystX::Moose;
 use Example::Syntax;
 
 extends 'Example::Controller';
@@ -11,7 +10,7 @@ extends 'Example::Controller';
 ## we check the last matching action first so put the 'catchall' nearer the top of the
 ## of the controller.
 
-sub root :At('/...') Via('../public')  ($self, $c, $user) { }
+sub root :At('/...') Via('../public')  ($self, $c) { }
 
   # GET /
   sub public_show :Get('') Via('root') ($self, $c) {
@@ -24,6 +23,11 @@ sub root :At('/...') Via('../public')  ($self, $c, $user) { }
     return $self->view
       ->add_info("Welcome to your home page!")
       ->add_info('The time is '. localtime); # This is just to show how to use the view object
+  }
+
+  # GET /js/test
+  sub js_test :Get('js/test') Via('root') Does(Authenticated) ($self, $c) {
+    return $self->view(name=>'John Doe');
   }
 
 __PACKAGE__->meta->make_immutable;

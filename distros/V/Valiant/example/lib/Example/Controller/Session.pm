@@ -1,35 +1,32 @@
 package Example::Controller::Session;
 
-use Moose;
-use MooseX::MethodAttributes;
+use CatalystX::Moose;
 use Example::Syntax;
 
 extends 'Example::Controller';
 
-has post_login_action => (is=>'ro', isa=>'Str', default=>'/home/user_show');
+has person => (is=>'ro', context=>'user');
 
-sub root :At('login/...') Via('../root') ($self, $c, $user) {
-  return $c->redirect_to_action($self->post_login_action) && $c->detach
-    if $user->authenticated;
-  $c->action->next($user);
+sub root :At('login/...') Via('../root') ($self, $c) {
+  return $c->redirect_to_action('/home/user_show') && $c->detach
+    if $self->person->authenticated;
 }
 
-  sub prepare_build :At('...') Via('root') ($self, $c, $user) {
-    $self->view_for('build', person => $user); 
-    $c->action->next($user);
+  sub prepare_build :At('...') Via('root') QueryModel ($self, $c, $q) {
+    return $self->view_for('build', ($q->has_replace ? (replace=>$q->replace) : ())); 
   }
 
     # GET /login/new
-    sub build :Get('new') Via('prepare_build') ($self, $c, $user) {   }
+    sub build :Get('new') Via('prepare_build') ($self, $c) { }
 
     # POST /login
-    sub create :Post('') Via('prepare_build') BodyModel ($self, $c, $user, $bm) {
-      return $c->redirect_to_action($self->post_login_action)
-        if $c->authenticate($user, $bm);
+    sub create :Post('') Via('prepare_build') BodyModel ($self, $c, $bm) {
+      return $self->view->redirect_to_action('/home/user_show')
+        if $c->authenticate($self->person, $bm);
     }
 
 # GET /logout
-sub logout :Get('logout') Via('../protected') ($self, $c, $user) {
+sub logout :Get('logout') Via('../protected') ($self, $c) {
   return $c->logout && $c->redirect_to_action('build');
 }
 

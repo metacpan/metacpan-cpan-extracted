@@ -20,12 +20,12 @@ Enhance your Perl applications with the [Aspose.Cells Cloud](https://products.as
 - Import/Export: Facilitates importing data from various sources into spreadsheets and exporting spreadsheet data to other formats.
 - Security Management: Offers a range of security features like data encryption, access control, and permission management to safeguard the security and integrity of spreadsheet data.
 
-## Feature & Enhancements in Version 24.6
+## Feature & Enhancements in Version 24.7
 
 Full list of issues covering all changes in this release:
 
-- Optimize load data function of data transformation.
-- Optimize the data conversion applied steps.
+- Add a new feature about adding text content. 
+- Add get access token by client id and client secret.
 
 ## Support file format
 
@@ -115,6 +115,12 @@ $instance->put_convert_workbook(request=> $request);
 [Product Page](https://products.aspose.cloud/cells/perl) | [Documentation](https://docs.aspose.cloud/cells/) | [Live Demo](https://products.aspose.app/cells/family) | [API Reference](https://apireference.aspose.cloud/cells/) | [Code Samples](https://github.com/aspose-cells-cloud/aspose-cells-cloud-perl) | [Blog](https://blog.aspose.cloud/category/cells/) | [Free Support](https://forum.aspose.cloud/c/cells) | [Free Trial](https://dashboard.aspose.cloud/#/apps)
 
 # Release history version
+
+## Enhancements in Version 24.6
+
+- Optimize load data function of data transformation.
+- Optimize the data conversion applied steps.
+
 
 ## Enhancements in Version 24.5
 

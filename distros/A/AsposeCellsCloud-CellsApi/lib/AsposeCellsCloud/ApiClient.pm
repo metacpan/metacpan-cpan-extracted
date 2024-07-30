@@ -117,7 +117,7 @@ sub o_auth_post {
     }
 
     # parse inputs
-    my $_resource_path = '/connect/token';
+    my $_resource_path = '/v3.0/cells/connect/token';
     if($self->{config}->{api_version} eq "v1.1"){
         $_resource_path = '/oauth2/token';
     }

@@ -1,0 +1,60 @@
+Win32API::RecentFiles - recently accessed file API functions on Windows
+
+DESCRIPTION
+
+This module exports the C<SHAddToRecentDocsA>
+C<SHAddToRecentDocsU> and C<SHAddToRecentDocsW> functions.
+
+This document describes version 0.01.
+
+
+INSTALLATION
+
+This is a Perl module distribution. It should be installed with whichever
+tool you use to manage your installation of Perl, e.g. any of
+
+  cpanm .
+  cpan  .
+  cpanp -i .
+
+Consult https://www.cpan.org/modules/INSTALL.html for further instruction.
+Should you wish to install this module manually, the procedure is
+
+  perl Makefile.PL
+  make
+  make test
+  make install
+
+
+REPOSITORY
+
+The public repository of this module is
+L<https://github.com/Corion/Win32API-RecentFiles>.
+
+SUPPORT
+
+The public support forum of this module is L<https://perlmonks.org/>.
+
+
+
+BUG TRACKER
+
+Please report bugs in this module via the Github bug queue at
+L<https://github.com/Corion/Win32API-RecentFiles/issues>
+
+
+SEE ALSO
+
+Microsoft documentation at L<https://learn.microsoft.com/de-de/windows/win32/api/shlobj_core/nf-shlobj_core-shaddtorecentdocs>
+
+AUTHOR
+
+Max Maischein C<corion@cpan.org>
+
+LICENSE
+
+This module is released under the Artistic License 2.0.
+
+COPYRIGHT (c)
+
+Copyright 2024- by Max Maischein C<corion@cpan.org>.

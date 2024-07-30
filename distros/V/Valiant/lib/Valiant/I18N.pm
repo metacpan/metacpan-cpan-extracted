@@ -84,7 +84,7 @@ sub _lookup_translation_by_count {
   $translated = $translated->{zero} if $count == 0 and exists $translated->{zero};
   $translated = $translated->{one} if $count == 1 and  exists $translated->{one};
   $translated = $translated->{other} if $count > 1 and exists $translated->{other};
-  $translated = $translated->{many} if $count > 1 and ref($translated) and exists $translated->{many};  
+  $translated = $translated->{many} if $count > 1 and ref($translated) and exists $translated->{many}; 
 
   throw_exception('MissingCountKey', tag=>$original, count=>$count) if ref $translated;
 
@@ -109,7 +109,7 @@ sub translate {
   # TODO work around 0 count bug in Data::Localize until I can get a fix in
   $args{count} = 'zero' if defined($count) && $count == 0;
 
-  $scope = join('.',@{$scope}) if (ref($scope)||'') eq 'ARRAY';
+  $scope = join('.', @{$scope}) if (ref($scope)||'') eq 'ARRAY';
 
   # TODO deal with $count
 
