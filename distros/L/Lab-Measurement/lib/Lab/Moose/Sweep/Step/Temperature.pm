@@ -1,5 +1,5 @@
 package Lab::Moose::Sweep::Step::Temperature;
-$Lab::Moose::Sweep::Step::Temperature::VERSION = '3.901';
+$Lab::Moose::Sweep::Step::Temperature::VERSION = '3.902';
 #ABSTRACT: Step/list sweep of temperature
 
 use v5.20;
@@ -60,7 +60,7 @@ Lab::Moose::Sweep::Step::Temperature - Step/list sweep of temperature
 
 =head1 VERSION
 
-version 3.901
+version 3.902
 
 =head1 SYNOPSIS
 
@@ -89,7 +89,7 @@ setpoint.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2023 by the Lab::Measurement team; in detail:
+This software is copyright (c) 2024 by the Lab::Measurement team; in detail:
 
   Copyright 2018       Andreas K. Huettel, Simon Reinhardt
             2019       Simon Reinhardt

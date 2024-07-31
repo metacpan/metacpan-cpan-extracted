@@ -1,5 +1,5 @@
 package Lab::Moose;
-$Lab::Moose::VERSION = '3.901';
+$Lab::Moose::VERSION = '3.902';
 #ABSTRACT: Convenient loaders and constructors for L<Lab::Moose::Instrument>, L<Lab::Moose::Sweep>, L<Lab::Moose::DataFolder> and L<Lab::Moose::DataFile>
 
 use v5.20;
@@ -144,6 +144,18 @@ subtype 'ArrayRefOfInstruments',
 coerce 'ArrayRefOfInstruments',
     from 'Lab::Moose::Instrument', via { [ $_ ] };
 
+INIT {
+    my $percentage = 2;
+    my $message = "Please cite Lab::Measurement in your publications based on the measured data, \n" .
+                  "e.g. in the acknowledgment section of the article. The reference is:\n" .
+                  "  S. Reinhard et al., Comp. Phys. Comm. 234, 216 (2019)\n" .
+                  "  doi:10.1016/j.cpc.2018.07.024\n\n";
+
+    if( rand() < ($percentage / 100) ){
+        print $message;
+    };
+};
+
 1;
 
 __END__
@@ -158,7 +170,7 @@ Lab::Moose - Convenient loaders and constructors for L<Lab::Moose::Instrument>, 
 
 =head1 VERSION
 
-version 3.901
+version 3.902
 
 =head1 SYNOPSIS
 
@@ -256,12 +268,13 @@ These are described in a separate tutorial: L<Lab::Measurement::Tutorial>.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2023 by the Lab::Measurement team; in detail:
+This software is copyright (c) 2024 by the Lab::Measurement team; in detail:
 
   Copyright 2016       Simon Reinhardt
             2017       Andreas K. Huettel, Simon Reinhardt
             2018-2019  Simon Reinhardt
             2021       Fabian Weinelt
+            2024       Andreas K. Huettel
 
 
 This is free software; you can redistribute it and/or modify it under

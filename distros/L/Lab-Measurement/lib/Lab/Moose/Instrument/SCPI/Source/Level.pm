@@ -1,5 +1,5 @@
 package Lab::Moose::Instrument::SCPI::Source::Level;
-$Lab::Moose::Instrument::SCPI::Source::Level::VERSION = '3.901';
+$Lab::Moose::Instrument::SCPI::Source::Level::VERSION = '3.902';
 #ABSTRACT: Role for the SCPI SOURce:(CURRent|VOLTage):Level commands
 
 use v5.20;
@@ -53,7 +53,7 @@ Lab::Moose::Instrument::SCPI::Source::Level - Role for the SCPI SOURce:(CURRent|
 
 =head1 VERSION
 
-version 3.901
+version 3.902
 
 =head1 METHODS
 
@@ -68,7 +68,7 @@ The type of output signal is determined with the SCPI::Source::Function role.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2023 by the Lab::Measurement team; in detail:
+This software is copyright (c) 2024 by the Lab::Measurement team; in detail:
 
   Copyright 2017       Simon Reinhardt
 

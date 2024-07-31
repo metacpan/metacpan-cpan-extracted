@@ -1,5 +1,5 @@
 package Lab::Moose::Connection::WWW;
-$Lab::Moose::Connection::WWW::VERSION = '3.901';
+$Lab::Moose::Connection::WWW::VERSION = '3.902';
 #ABSTRACT: Connection with URL requests
 
 use v5.20;
@@ -63,7 +63,7 @@ Lab::Moose::Connection::WWW - Connection with URL requests
 
 =head1 VERSION
 
-version 3.901
+version 3.902
 
 =head1 SYNOPSIS
 
@@ -82,7 +82,7 @@ server.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2023 by the Lab::Measurement team; in detail:
+This software is copyright (c) 2024 by the Lab::Measurement team; in detail:
 
   Copyright 2022       Mia Schambeck
 

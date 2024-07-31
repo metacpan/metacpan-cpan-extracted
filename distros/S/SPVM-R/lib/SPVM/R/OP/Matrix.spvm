@@ -24,23 +24,23 @@ class R::OP::Matrix {
     unless (type_name $x_ndarray eq type_name $y_ndarray) {
       die "The class name of the n-dimention array \$x_ndarray must be eqaul to the class name of the n-dimention array \$x_ndarray.";
     }
-    my $x_row = $x_ndarray->nrow;
+    my $x_nrow = $x_ndarray->nrow;
     
-    my $x_column = $x_ndarray->ncol;
+    my $x_ncol = $x_ndarray->ncol;
     
-    my $y_row = $y_ndarray->nrow;
+    my $y_nrow = $y_ndarray->nrow;
     
-    my $y_column = $y_ndarray->ncol;
+    my $y_ncol = $y_ndarray->ncol;
     
-    unless ($x_row == $y_row) {
+    unless ($x_nrow == $y_nrow) {
       die "The row of the n-dimention array \$x_ndarray must be equal to the row of the n-dimention array \$y_ndarray.";
     }
     
-    my $ret_row = $x_row;
+    my $ret_nrow = $x_nrow;
     
-    my $ret_column = $x_column + $y_column;
+    my $ret_ncol = $x_ncol + $y_ncol;
     
-    my $ret_ndarray = (R::NDArray)R::Util->new_proto($x_ndarray, {data => undef, dim => [$ret_row, $ret_column]});
+    my $ret_ndarray = (R::NDArray)R::Util->new_proto($x_ndarray, {data => undef, dim => [$ret_nrow, $ret_ncol]});
     
     my $ret_data = $ret_ndarray->data;
     
@@ -51,14 +51,14 @@ class R::OP::Matrix {
     my $elem_size = $x_ndarray->elem_size;
     
     if ($x_ndarray->is_any_numeric_ndarray) {
-      Fn->memcpy($ret_data, 0, $x_data, 0, $elem_size * ($x_row * $x_column));
+      Fn->memcpy($ret_data, 0, $x_data, 0, $elem_size * ($x_nrow * $x_ncol));
       
-      Fn->memcpy($ret_data, $x_row * $x_column, $y_data, 0, $elem_size * ($y_row * $y_column));
+      Fn->memcpy($ret_data, $elem_size * ($x_nrow * $x_ncol), $y_data, 0, $elem_size * ($y_nrow * $y_ncol));
     }
     else {
-      Array->memcpy_object_address((object[])$ret_data, 0, (object[])$x_data, 0, $x_row * $x_column);
+      Array->memcpy_object_address((object[])$ret_data, 0, (object[])$x_data, 0, $x_nrow * $x_ncol);
       
-      Array->memcpy_object_address((object[])$ret_data, $x_row * $x_column, (object[])$y_data, 0, $y_row * $y_column);
+      Array->memcpy_object_address((object[])$ret_data, $x_nrow * $x_ncol, (object[])$y_data, 0, $y_nrow * $y_ncol);
     }
     
     return $ret_ndarray;
@@ -85,23 +85,23 @@ class R::OP::Matrix {
     unless (type_name $x_ndarray eq type_name $y_ndarray) {
       die "The class name of the n-dimention array \$x_ndarray must be eqaul to the class name of the n-dimention array \$x_ndarray.";
     }
-    my $x_row = $x_ndarray->nrow;
+    my $x_nrow = $x_ndarray->nrow;
     
-    my $x_column = $x_ndarray->ncol;
+    my $x_ncol = $x_ndarray->ncol;
     
-    my $y_row = $y_ndarray->nrow;
+    my $y_nrow = $y_ndarray->nrow;
     
-    my $y_column = $y_ndarray->ncol;
+    my $y_ncol = $y_ndarray->ncol;
     
-    unless ($x_column == $y_column) {
+    unless ($x_ncol == $y_ncol) {
       die "The column of the n-dimention array \$x_ndarray must be equal to the column of the n-dimention array \$y_ndarray.";
     }
     
-    my $ret_row = $x_row + $y_row;
+    my $ret_nrow = $x_nrow + $y_nrow;
     
-    my $ret_column = $x_column;
+    my $ret_ncol = $x_ncol;
     
-    my $ret_ndarray = (R::NDArray)R::Util->new_proto($x_ndarray, {data => undef, dim => [$ret_row, $ret_column]});
+    my $ret_ndarray = (R::NDArray)R::Util->new_proto($x_ndarray, {data => undef, dim => [$ret_nrow, $ret_ncol]});
     
     my $ret_data = $ret_ndarray->data;
     
@@ -113,19 +113,19 @@ class R::OP::Matrix {
     
     my $elem_size = $x_ndarray->elem_size;
     
-    for (my $col = 0; $col < $ret_column; $col++) {
+    for (my $col = 0; $col < $ret_ncol; $col++) {
       if ($x_ndarray->is_any_numeric_ndarray) {
-        Fn->memcpy($ret_data, $elem_size * $ret_data_index, $x_data, 0, $elem_size * $x_row);
+        Fn->memcpy($ret_data, $elem_size * $ret_data_index, $x_data, $elem_size * $x_nrow * $col, $elem_size * $x_nrow);
         
-        Fn->memcpy($ret_data, $elem_size * ($ret_data_index + $x_row), $y_data, 0, $elem_size * $y_row);
+        Fn->memcpy($ret_data, $elem_size * ($ret_data_index + $x_nrow), $y_data, $elem_size * $y_nrow * $col, $elem_size * $y_nrow);
       }
       else {
-        Array->memcpy_object_address((object[])$ret_data, $ret_data_index, (object[])$x_data, 0, $x_row);
+        Array->memcpy_object_address((object[])$ret_data, $ret_data_index, (object[])$x_data, $x_nrow * $col, $x_nrow);
         
-        Array->memcpy_object_address((object[])$ret_data, ($ret_data_index + $x_row), (object[])$y_data, 0, $y_row);
+        Array->memcpy_object_address((object[])$ret_data, $ret_data_index + $x_nrow, (object[])$y_data, $y_nrow * $col, $y_nrow);
       }
       
-      $ret_data_index += $ret_column;
+      $ret_data_index += $x_nrow * $y_nrow;
     }
     
     return $ret_ndarray;

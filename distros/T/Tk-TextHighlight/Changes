@@ -1,33 +1,4 @@
-Tk::TextHighlight module changes log
-
-04 august 2007
-	Initial release - adding following new features to Tk::CodeText
-	(no longer maintained, afaik):
-	
-	1)  Tk::Text::SuperText - like bracket highlighting / matching with vi-like 
-	jump-to-matching bracket (Ctrl-p).
-
-	2)  Added feature to auto-change rules-colors for rules whose color is the same as 
-	the background color of the widget (to avoid invisible text).  The color is set to 
-	either black or white depending on the brightness of the background color.
-
-	3)  Fixed TextUndo-related bug to allow user to see text as he types past right-edge 
-	of screen.
-
-	4)  Added "setRule()" method to allow altering of individual rules by the programmer.
-
-	5)  Modified right-click menu to allow saving of modified rules.
-
-	6)  Added new options:  -noRulesMenu (dont show rules-menu in right-click menu), 
-	-noSyntaxMenu, -noRulesEditMenu, -noSaveRulesMenu to prevent the corresponding items 
-	from appearing in the right-click menu.  -noPlugInit - disables new feature #8 and 
-	behaves as original CodeText.
-
-	7) Fixed small bug w/auto-indenting.
-
-	8) Fixed small bug w/rules-initialization when no .rules file present.
-
-Tk::CodeText module changes log
+Legacy Tk::CodeText module changes log:
 
 27 march 2004
 	removed -headerbackground bug from RulesEditor
@@ -87,6 +58,35 @@ Tk::CodeText module changes log
 
 02 February 2003
 	First alpha version 0.1
+
+========= END CodeText changelog, BEGIN TextHighlight changelog =========
+
+04 august 2007
+	Initial release - adding following new features to Tk::CodeText
+	(no longer maintained, afaik):
+	
+	1)  Tk::Text::SuperText - like bracket highlighting / matching with vi-like 
+	jump-to-matching bracket (Ctrl-p).
+
+	2)  Added feature to auto-change rules-colors for rules whose color is the same as 
+	the background color of the widget (to avoid invisible text).  The color is set to 
+	either black or white depending on the brightness of the background color.
+
+	3)  Fixed TextUndo-related bug to allow user to see text as he types past right-edge 
+	of screen.
+
+	4)  Added "setRule()" method to allow altering of individual rules by the programmer.
+
+	5)  Modified right-click menu to allow saving of modified rules.
+
+	6)  Added new options:  -noRulesMenu (dont show rules-menu in right-click menu), 
+	-noSyntaxMenu, -noRulesEditMenu, -noSaveRulesMenu to prevent the corresponding items 
+	from appearing in the right-click menu.  -noPlugInit - disables new feature #8 and 
+	behaves as original CodeText.
+
+	7) Fixed small bug w/auto-indenting.
+
+	8) Fixed small bug w/rules-initialization when no .rules file present.
 
 30 August 2007
 	Initial v 1.0.0 release as "TextHighlight" by Jim Turner, now supporting 
@@ -161,13 +161,13 @@ December 2007
 	within "comments", as defined by the syntax language.
 	* The -commentchar option can now be a string, and certain special 
 	comment strings:  "/*", "(*", and "<!--" are treated as multiline comments 
-	(matching their respective closures:  "*/", "*)", and "-->" respectively) 
-	greatly improving the auto-commenting of selected text method.
-	* Add new readonly() method to allow toggling between standard (editable) 
-	mode to readonly mode.  The popup-menu options that can alter text are 
-	automatically greyed out now in -readonly mode.
+	(matching their respective closures:  "*/", "*)", and "-->") greatly 
+	improving the auto-commenting of selected text method.
+	* Add new readonly() method and -readonly flag to allow toggling between 
+	standard (editable) mode to readonly mode.  The popup-menu options that 
+	can alter text are automatically greyed out now in -readonly mode.
 	* NOTE:  ROTextHighlight.pm module REMOVED because it can now be replaced 
-	by a symlink, and / or initialize TextHighlight widget with the 
+	by a symlink, and / or initialize TextHighlight widget with the flag:  
 	"-readonly => <true>").
 	* Added -syntaxcomments flag to allow the -commentchar string to be set 
 	by the selected language syntax's comment strings (for popular languages).
@@ -176,15 +176,26 @@ December 2007
 	* Added -noPopupMenu flag to replace the popup menu (Mouse-button-3) with 
 	selection extend.
 	* Improve some key-bindings, such as adding <Control-P> (upper case) to 
-	both 	jump to a matching brace but also highlight the text in between, and 
+	both jump to a matching brace but also highlight the text in between, and 
 	<Control-m> to pop up the popup menu (unless -noPopupMenu is true).
-	* Fix some issues when settnig or changing the background color.
+	* Fix some issues when setting or changing the background color.
 	* Added getViewMenu() method to return just the "View" menu normally in 
 	the popup menu options.
 	* Added EmptyDocument() method to allow the document to be cleared, ie. 
-	delete('0.0','end), but can be used in -readonly mode too.
+	delete('0.0','end), but can also be used in -readonly mode.
 	* The insertTab() method now inserts the value of "-indentchar" instead 
 	of always the tab character (use insertTabChar() to force insertion of the 
 	tab character ("\t"), (ie. if -indentchar is set to spaces);
 	* Major documentation overhaul to include all the methods and options.
 	* Misc. general minor code fixes and cleanups.
+
+	Update to version 2.1
+	* Exclude escaped (preceeded by a backslash - "\") brace characters and 
+	those contained in quoted strings from matching when doing brace-matching. 
+	This should make searching for matching braces much easer to find in 
+	large, complex source-files!
+	* Add support for future planned module (when I release it): 
+	"Syntax::Highlight::Perl::ImprovedMore", which will become the default in 
+	lieu of "Syntax::Highlight::Perl::Improved" (an ancient, unmaintained 
+	syntax-parsing module), when it is installed.  The new module will offer 
+	better here-doc highlighting and improved efficiency (speed).

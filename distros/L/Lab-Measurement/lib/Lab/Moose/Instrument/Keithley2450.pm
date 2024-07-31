@@ -1,5 +1,5 @@
 package Lab::Moose::Instrument::Keithley2450;
-$Lab::Moose::Instrument::Keithley2450::VERSION = '3.901';
+$Lab::Moose::Instrument::Keithley2450::VERSION = '3.902';
 #ABSTRACT: Keithley 2450 voltage/current sourcemeter.
 
 use v5.20;
@@ -156,7 +156,7 @@ Lab::Moose::Instrument::Keithley2450 - Keithley 2450 voltage/current sourcemeter
 
 =head1 VERSION
 
-version 3.901
+version 3.902
 
 =head1 SYNOPSIS
 
@@ -269,7 +269,7 @@ For XPRESS voltage sweep. Equivalent to C<< set_level(value => $value) >>.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2023 by the Lab::Measurement team; in detail:
+This software is copyright (c) 2024 by the Lab::Measurement team; in detail:
 
   Copyright 2021       Simon Reinhardt
 

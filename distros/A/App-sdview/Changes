@@ -1,5 +1,16 @@
 Revision history for App-sdview
 
+0.18    2024-07-30
+        [CHANGES]
+         * Pod directive `=code` is no longer sticky, and now only applies to
+           the next verbatim paragraph
+         * Attempt to classify verbatim blocks into perl vs. plain-text in Pod
+           parser if no `=code` or `=for highlighter` directives tell it
+           otherwise
+
+        [BUGFIXES]
+         * Apply syntax highlight to verbatim paragraphs nested within lists
+
 0.17    2024-07-26
         [CHANGES]
          * Initial experiment at using `tree-sitter` to apply syntax

@@ -1,6 +1,6 @@
 package Lab::Moose::Instrument::AMI_430;
 #ABSTRACT: American Magnetics magnet power supply
-$Lab::Moose::Instrument::AMI_430::VERSION = '3.901';
+$Lab::Moose::Instrument::AMI_430::VERSION = '3.902';
 use v5.20;
 
 use Moose;
@@ -260,7 +260,7 @@ Lab::Moose::Instrument::AMI_430 - American Magnetics magnet power supply
 
 =head1 VERSION
 
-version 3.901
+version 3.902
 
 =head1 SYNOPSIS
 
@@ -311,7 +311,7 @@ This function waits for the device to finish.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2023 by the Lab::Measurement team; in detail:
+This software is copyright (c) 2024 by the Lab::Measurement team; in detail:
 
   Copyright 2023       Mia Schambeck
 

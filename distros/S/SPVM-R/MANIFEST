@@ -89,8 +89,9 @@ Makefile.PL
 MANIFEST			This list of files
 MANIFEST.SKIP
 README.md
-t/basic.t
+t/extra.t
 t/lib/SPVM/TestCase/R.spvm
+t/lib/SPVM/TestCase/R/DataFrame.spvm
 t/lib/SPVM/TestCase/R/NDArray.spvm
 t/lib/SPVM/TestCase/R/NDArray/AnyObject.spvm
 t/lib/SPVM/TestCase/R/NDArray/Byte.spvm
@@ -113,10 +114,12 @@ t/lib/SPVM/TestCase/R/OP/Float.spvm
 t/lib/SPVM/TestCase/R/OP/FloatComplex.spvm
 t/lib/SPVM/TestCase/R/OP/Int.spvm
 t/lib/SPVM/TestCase/R/OP/Long.spvm
+t/lib/SPVM/TestCase/R/OP/Matrix/Double.spvm
 t/lib/SPVM/TestCase/R/OP/Short.spvm
 t/lib/SPVM/TestCase/R/OP/String.spvm
 t/lib/SPVM/TestCase/R/OP/StringBuffer.spvm
 t/lib/SPVM/TestCase/R/OP/Time/Piece.spvm
+t/R-DataFrame.t
 t/R-NDArray-AnyObject.t
 t/R-NDArray-Byte.t
 t/R-NDArray-Double.t
@@ -129,7 +132,7 @@ t/R-NDArray-Long.t
 t/R-NDArray-Short.t
 t/R-NDArray-String.t
 t/R-NDArray-StringBuffer.t
-t/R-NDArray-TimePiece.t
+t/R-NDArray-Time-Piece.t
 t/R-NDArray.t
 t/R-OP-Byte.t
 t/R-OP-DataFrame.t
@@ -139,6 +142,7 @@ t/R-OP-Float.t
 t/R-OP-FloatComplex.t
 t/R-OP-Int.t
 t/R-OP-Long.t
+t/R-OP-Matrix-Double.t
 t/R-OP-Short.t
 t/R-OP-String.t
 t/R-OP-StringBuffer.t

@@ -1,5 +1,10 @@
 Tk::CodeText module changes log
 
+0.53 31 Jul 2024
+	Added option -readonly.
+	Added bookmarks functionality
+	Gave the codetext executable some TLC.
+
 0.52 10 Jul 2024
 	Fixed bug in TagsEditor.
 

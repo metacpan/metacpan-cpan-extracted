@@ -9,7 +9,7 @@ Tk::CodeText - Programmer's Swiss army knife Text widget.
 use strict;
 use warnings;
 use vars qw($VERSION);
-$VERSION = '0.52';
+$VERSION = '0.53';
 
 use base qw(Tk::Derived Tk::Frame);
 
@@ -126,6 +126,24 @@ It keeps track of the last saving point and selections
 By default 0. If set the text will be indented to the 
 level and style of the previous line.
 
+=item Name: B<bookmarkColor>
+
+=item Class: B<BookmarkColor>
+
+=item Switch: B<-bookmarkcolor>
+
+Default value #71D0CC. Background color for the line number label
+of a bookmarked line.
+
+=item Name: B<bookmarkSize>
+
+=item Class: B<BookmarkSize>
+
+=item Switch: B<-bookmarksize>
+
+Default value 20. length of the label for bookmark entries
+in the bookmarks menu.
+
 =item Name: B<configDir>
 
 =item Class: B<ConfigDir>
@@ -192,6 +210,11 @@ the location index as parameter.
 
 Image used for the expand state of a folding point.
 By default it is a bitmap defined in this module.
+
+=item Switch: B<-readonly>
+
+Default value 0. If you set it to 1 the user will not be
+able to make modifications.
 
 =item Switch: B<-saveimage>
 
@@ -349,8 +372,8 @@ sub Populate {
 
 	#create the textwidget
 	my @opt = (
-		-width => 20,
-		-height => 10,
+#		-width => 20,
+#		-height => 10,
 		-findandreplacecall => sub { $self->FindAndOrReplace(@_) },
 		-modifycall => ['OnModify', $self],
 		-relief => 'flat',
@@ -363,6 +386,8 @@ sub Populate {
 		$text = $ef->Scrolled('XText', @opt)
 	}
 	$text->pack(-side => 'left', -expand =>1, -fill => 'both');
+	$text->bind('Control-b>', [$self, 'bookmarkNew']);
+	$text->bind('Control-B>', [$self, 'bookmarkRemove']);
 	
 	#create the find and replace panel
 	my @pack = (-side => 'left', -padx => 2, -pady => 2);
@@ -483,6 +508,8 @@ sub Populate {
 	$l->destroy;
 
 	$self->ConfigSpecs(
+		-bookmarkcolor => [qw/PASSIVE bookmarkColor BookmarkColor/, '#71D0CC'],
+		-bookmarksize => [qw/PASSIVE bookmarkSize BookmarkSize/, 20],
 		-configdir => [qw/PASSIVE configdir ConfigDir/, ''],
 		-highlightinterval => [qw/METHOD highlightInterval HighlightInterval/, 1],
 		-minusimg => ['PASSIVE', undef, undef, $self->Bitmap(
@@ -552,11 +579,242 @@ sub Populate {
 			$text->bind( "<$event>", sub { $self->contentCheck } );
 		}
 	}
- 	$self->after(1, sub {
+ 	$self->after(10, sub {
 		$self->{POSTCONFIG} = 1;
 		$self->themeUpdate;
 		$self->lnumberCheck(1);
  	});
+}
+
+=item B<bookmarkAdd>I<(?$line?)>
+
+Bookmarks line number I<$line?>. If you do not specify I<$line?>, the line that has
+the insert cursor is bookmarked.
+
+=cut
+
+sub bookmarkAdd {
+	my ($self, $line) = @_;
+	$line = $self->linenumber('insert') unless defined $line;
+	return if $self->bookmarked($line);
+	$self->tagAdd('BOOKMARK', "$line.0", "$line.0 lineend");
+}
+
+sub bookmarkCheck {
+	my $self = shift;
+	my $numframe = $self->Subwidget('Numbers');
+	my $nbg = $numframe->cget('-background');
+	my $bbg = $self->cget('-bookmarkcolor');
+	
+	my $nimf = $self->{NUMBERINF};
+	for (@$nimf) {
+		my $lab = $_;
+		my $line = $lab->cget('-text');
+		if ($self->bookmarked($line)) {
+			$lab->configure('-background', $bbg);
+		} else {
+			$lab->configure('-background', $nbg);
+		}
+	}
+}
+
+=item B<bookmarked>I<($line)>
+
+Returns true if line number I<$line?> is bookmarked.
+
+=cut
+
+sub bookmarked {
+	my ($self, $line) = @_;
+	my @range = $self->tagNextrange('BOOKMARK', "$line.0", "$line.0 lineend");
+	return @range eq 2
+}
+
+sub bookmarkGo {
+	my ($self, $line) = @_;
+	return unless $self->bookmarked($line);
+	$self->goTo("$line.0");
+}
+
+=item B<bookmarkList>
+
+Returns a list of all bookmarked line numbers in the text.
+
+=cut
+
+sub bookmarkList {
+	my $self = shift;
+	my @list = ();
+	my @ranges = $self->tagRanges('BOOKMARK');
+	while (@ranges) {
+		my $begin = shift @ranges;
+		push @list, $self->linenumber($begin);
+		shift @ranges;
+	}
+	return @list
+}
+
+sub bookmarkMenuItems {
+	my $self = shift;
+	my @items = ( 
+		[command => '~Add bookmark',
+			-command => ['bookmarkNew', $self],
+		],
+		[command => '~Remove bookmark',
+			-command => ['bookmarkRemove', $self],
+		],
+		[command => '~Remove all bookmarks',
+			-command => ['bookmarkRemoveAll', $self],
+		],
+		[separator => ''],
+		[command => '~Next bookmark',
+			-command => ['bookmarkNext', $self],
+		],
+		[command => '~Previous bookmark',
+			-command => ['bookmarkPrev', $self],
+		],
+		[separator => ''],
+	);
+	return @items
+}
+
+sub bookmarkMenuPop {
+	my ($self, $menu, $bmentry) = @_;
+	#find bookmark submenu
+	my $submenu;
+	for(0 ..$menu->index('end')) {
+		if ($menu->type($_) eq 'cascade') {
+			my $label = $menu->entrycget($_, '-label');
+			if ($label eq $bmentry) {
+				$submenu = $menu->entrycget($_, '-menu');
+				last;
+			}
+		}
+	} 
+
+	#refresh the bookmarks menu
+	if (defined $submenu) {
+		#find first entry that is a bookmark
+		my $first;
+		for(0 ..$submenu->index('end')) {
+			next unless $submenu->type($_) eq 'command';
+			my $label = $submenu->entrycget($_, '-label');
+			if ($label =~ /^\d+/) {
+				$first = $_;
+				last;
+			}
+		}
+		#delete all bookmarks from the menu
+		$submenu->delete($first, 'end') if defined $first;
+		#add all current bookmarks
+		my @bookmarks = $self->bookmarkList;
+		for (@bookmarks) {
+			my $mark = $_;
+			$submenu->add('command',
+				-command => sub { $self->bookmarkGo($mark) },
+				-label => "$mark - " . $self->bookmarkText($mark),
+			);
+		}
+	} else {
+		warn "Submenu $bmentry not found"
+	}
+}
+
+=item B<bookmarkNew>
+
+Same as B<bookmarkAdd> except it updates the visible bookmarks
+in the line number column.
+
+=cut
+
+sub bookmarkNew {
+	my $self = shift;
+	$self->bookmarkAdd(@_);
+	$self->bookmarkCheck;
+}
+
+=item B<bookmarkNext>I<(?$line?)>
+
+Jumps to the next bookmark relative to line number I<$line>.
+If you do not specify I<$line?>, the jump is made from the insert cursor position.
+
+=cut
+
+sub bookmarkNext {
+	my ($self, $line) = @_;
+	$line = $self->linenumber('insert') unless defined $line;
+	my @list = $self->bookmarkList;
+	for (@list) {
+		my $next = $_;
+		if ($next > $line) {
+			$self->bookmarkGo($next);
+			return
+		}
+	}
+}
+
+=item B<bookmarkPrev>I<(?$line?)>
+
+Jumps to the previous bookmark relative to line number I<$line?>.
+If you do not specify I<$line?>, the jump is made from the insert cursor position.
+
+=cut
+
+sub bookmarkPrev {
+	my ($self, $line) = @_;
+	$line = $self->linenumber('insert') unless defined $line;
+	my @list = $self->bookmarkList;
+	for (reverse @list) {
+		my $prev = $_;
+		if ($prev < $line) {
+			$self->bookmarkGo($prev);
+			return
+		}
+	}
+}
+
+=item B<bookmarkRemove>I<(?$line?)>
+
+Removes the bookmark at I<$line?>. 
+If you do not specify I<$line?>, the bookmark of the line that holds the insert cursor position is removed.
+
+=cut
+
+sub bookmarkRemove {
+	my $self = shift;
+	$self->bookmarkRemoveForce(@_);
+	$self->bookmarkCheck;
+}
+
+=item B<bookmarkRemoveAll>I<(?$line?)>
+
+Removes all bookmarks. 
+
+=cut
+
+sub bookmarkRemoveAll {
+	my $self = shift;
+	my @list = $self->bookmarkList;
+	for (@list) {
+		$self->bookmarkRemove($_);
+	}
+	$self->bookmarkCheck;
+}
+
+sub bookmarkRemoveForce {
+	my ($self, $line) = @_;
+	$line = $self->linenumber('insert') unless defined $line;
+	return unless $self->bookmarked($line);
+	$self->tagRemove('BOOKMARK', "$line.0", "$line.0 lineend");
+}
+
+sub bookmarkText {
+	my ($self, $line) = @_;
+	my $text = $self->get("$line.0", "$line.0 lineend");
+	$text =~ s/^\s+//; #remove leading spaces
+	my $max = $self->cget('-bookmarksize');
+	$text = substr($text, 0, $max) if length($text) > $max;
+	return $text
 }
 
 =item B<canUndo>
@@ -607,13 +865,18 @@ sub contentCheck {
 	my $self = shift;
 	$self->lnumberCheck;
 	$self->foldsCheck;
+	$self->bookmarkCheck;
 }
 
 sub contentCheckLight {
 	my $self = shift;
 	my $start = $self->SaveFirstVisible;
 	my $end = $self->SaveLastVisible;
-	$self->contentCheck if (($start ne $self->visualBegin) or ($end ne $self->visualEnd));
+	if (($start ne $self->visualBegin) or ($end ne $self->visualEnd)) {
+		$self->contentCheck;
+	} else {
+		$self->bookmarkCheck;
+	}
 }
 
 sub FindAndOrReplace {
@@ -986,6 +1249,17 @@ Returns the line number of $index.
 
 =cut
 
+=item B<lineVisible>I<($line)>
+
+=cut
+
+sub lineVisible {
+	my ($self, $line) = @_;
+	my $first = $self->visualBegin;
+	my $last = $self->visualEnd;
+	return (($line >= $first) and ($line <= $last))
+}
+
 sub lnumberCheck {
 	my ($self, $force) = @_;
 	$force = 0 unless defined $force;
@@ -1027,8 +1301,13 @@ sub lnumberCheck {
 		}
 
 		#configure and position the number label
+
+#		#take care of bookmarked lines
+#		my $labbg = $numframe->cget('-background');
+#		$labbg = $self->cget('-bookmarkcolor') if $self->bookmarked($line);
 		my $lab = $nimf->[$count];
 		$lab->configure(
+#			-background => $labbg,
 			-text => $line,
 			-width => length($last),
 		);
@@ -1088,6 +1367,7 @@ sub OnKeyPress {
 sub OnModify {
 	my ($self, $index) = @_;
 	$self->highlightCheck($index);
+	$self->bookmarkCheck;
 	$self->Callback('-modifiedcall', $index);
 }
 

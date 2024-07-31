@@ -7,7 +7,7 @@ Tk::XText - Extended Text widget
 =cut
 
 use vars qw($VERSION);
-$VERSION = '0.51';
+$VERSION = '0.53';
 use strict;
 use warnings;
 use Carp;
@@ -97,6 +97,10 @@ This callback is called every time text is modified.
 used in L<Tk::Codetext> for adjusting line numbers and
 triggering syntax highlighting/code folding.
 
+=item Switch: B<-readonly>
+
+.
+
 =item Switch: B<-slcomment>
 
 The start string of a single line comment.
@@ -156,6 +160,7 @@ sub Populate {
 		-mlcommentend => ['PASSIVE'],
 		-mlcommentstart => ['PASSIVE'],
 		-modifycall => ['CALLBACK', undef, undef, sub {}],
+		-readonly => ['PASSIVE', undef, undef, 0],
 		-slcomment => ['PASSIVE'],
 		DEFAULT => [ 'SELF' ],
 	);
@@ -175,6 +180,7 @@ sub Populate {
 
 sub Backspace {
 	my $self = shift;
+	return if $self->cget('-readonly');
 	if ($self->compare('insert','!=','1.0')) { #We are not at the start of the text
 		$self->RecordUndo('backspace', $self->editModified);
 		if ($self->selectionExists) {
@@ -375,7 +381,14 @@ sub clipboardCopy {
  
 sub clipboardCut {
 	my $self = shift;
+	return if $self->cget('-readonly');
 	$self->SUPER::clipboardCut(@_) if $self->tagRanges('sel');
+}
+ 
+sub clipboardPaste {
+	my $self = shift;
+	return if $self->cget('-readonly');
+	$self->SUPER::clipboardPaste(@_);
 }
  
 =item B<comment>
@@ -384,6 +397,7 @@ sub clipboardCut {
 
 sub comment {
 	my $self = shift;
+	return if $self->cget('-readonly');
 	my $slstart = $self->cget('-slcomment');
 	my $mlend = $self->cget('-mlcommentend');
 	my $mlstart = $self->cget('-mlcommentstart');
@@ -627,6 +641,7 @@ sub HomeEndKey {
 
 sub indent {
 	my $self = shift;
+	return if $self->cget('-readonly');
 	my $ichar = $self->indentString;
 	if ($self->selectionExists) {
 		$self->selectionModify($ichar, 0, 'Indented');
@@ -665,6 +680,7 @@ sub insert {
 
 sub Insert {
 	my ($self, $string) = @_;
+	return if $self->cget('-readonly');
 	if (($string eq "\n") and ($self->cget('-autoindent'))) {
 		my $ins = $self->index('insert');
 		my $i = $self->index('insert linestart');
@@ -683,6 +699,7 @@ sub Insert {
 sub InsertKeypress {
 	my ($self, $char) = @_;
 	return unless length($char);
+	return if $self->cget('-readonly');
 	my $index = $self->index('insert');
 	if ($self->OverstrikeMode) {
 		my $current = $self->get('insert');
@@ -698,6 +715,7 @@ sub InsertKeypress {
 
 sub insertTab {
 	my $self = shift;
+	return if $self->cget('-readonly');
 	if ($self->selectionExists) {
 		$self->indent;
 	} else {
@@ -964,6 +982,7 @@ sub RecordUndo {
 
 sub redo {
 	my $self = shift;
+	return if $self->cget('-readonly');
 	$self->Flush;
 	if ($self->canRedo) {
 		my $o = $self->PullRedo;
@@ -1158,6 +1177,7 @@ sub selectionModify {
 
 sub uncomment {
 	my $self = shift;
+	return if $self->cget('-readonly');
 	my $slstart = $self->cget('-slcomment');
 	my $mlstart = $self->cget('-mlcommentstart');
 	my $mlend = $self->cget('-mlcommentend');
@@ -1212,6 +1232,7 @@ sub uncomment {
 
 sub undo {
 	my $self = shift;
+	return if $self->cget('-readonly');
 	if ($self->canUndo) {
 		$self->Flush;
 
@@ -1272,6 +1293,7 @@ sub UndoStack {
 
 sub unindent {
 	my $self = shift;
+	return if $self->cget('-readonly');
 	my $ichar = $self->indentString;
 	if ($self->selectionExists) {
 		$self->selectionModify($ichar, 1, 'Unindent');

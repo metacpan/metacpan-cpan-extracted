@@ -112,7 +112,7 @@ sub snippetParse {
 	unless (defined($attr)) { $attr = $hlt->stackTop }
 	my $out = $hlt->{'out'};
 #	print "parsing '$snip' with attribute '$attr'\n";
-	if ($snip) {
+	if (length $snip) {
 		push(@$out, length($snip), $attr);
 		$hlt->snippet('');
 	}

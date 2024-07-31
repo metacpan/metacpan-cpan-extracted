@@ -12,6 +12,7 @@ WriteMakefile(
         'Getopt::Long' => 0,
         'JSON' => 0,
         'Feature::Compat::Class' => 0,
+        ($^V < v5.38 ? ('Object::Pad' => 0) : ()),
     },
     META_MERGE        => {
         'meta-spec' => { version => 2 },

@@ -4,7 +4,7 @@
       "Gisle Aas <gaas@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.031, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.032, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -88,32 +88,32 @@
    "provides" : {
       "HTML::Entities" : {
          "file" : "lib/HTML/Entities.pm",
-         "version" : "3.82"
+         "version" : "3.83"
       },
       "HTML::Filter" : {
          "file" : "lib/HTML/Filter.pm",
-         "version" : "3.82",
+         "version" : "3.83",
          "x_deprecated" : 1
       },
       "HTML::HeadParser" : {
          "file" : "lib/HTML/HeadParser.pm",
-         "version" : "3.82"
+         "version" : "3.83"
       },
       "HTML::LinkExtor" : {
          "file" : "lib/HTML/LinkExtor.pm",
-         "version" : "3.82"
+         "version" : "3.83"
       },
       "HTML::Parser" : {
          "file" : "lib/HTML/Parser.pm",
-         "version" : "3.82"
+         "version" : "3.83"
       },
       "HTML::PullParser" : {
          "file" : "lib/HTML/PullParser.pm",
-         "version" : "3.82"
+         "version" : "3.83"
       },
       "HTML::TokeParser" : {
          "file" : "lib/HTML/TokeParser.pm",
-         "version" : "3.82"
+         "version" : "3.83"
       }
    },
    "release_status" : "stable",
@@ -128,7 +128,7 @@
          "web" : "https://github.com/libwww-perl/HTML-Parser"
       }
    },
-   "version" : "3.82",
+   "version" : "3.83",
    "x_contributors" : [
       "Antonio Radici <antonio@dyne.org>",
       "Barbie <barbie@missbarbell.co.uk>",
@@ -145,6 +145,7 @@
       "James Raspass <jraspass@gmail.com>",
       "Jess Robinson <castaway@desert-island.me.uk>",
       "Jon Jensen <jon@endpoint.com>",
+      "Lukas Mai <lukasmai.403@gmail.com>",
       "Michal Josef \u0160pa\u010dek <mspacek@redhat.com>",
       "Mike South <msouth@gmail.com>",
       "Nicholas Clark <nick@ccl4.org>",
@@ -158,7 +159,7 @@
       "Zefram <zefram@fysh.org>"
    ],
    "x_generated_by_perl" : "v5.34.0",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.37",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.38",
    "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"
 }
 

@@ -8,12 +8,14 @@ my $ld = '$(INST_LIBDIR)';
 WriteMakefile(
 	NAME => "Tk::$pm",
 	PREREQ_PM => {
-		'File::Path' => 0,
-		'Math::Round' => 0,
+		'File::Path' => '2.18',
+		'File::Spec' => '3.75',
+		'Getopt::Long' => '2.54',
+		'Math::Round' => '0.08',
 		'Syntax::Kamelon' => '0.24',
 		'Test::Tk' => '3.03',
 		'Tk' => '804.030',
-		'Tk::ColorEntry' => '0.07',
+		'Tk::ColorEntry' => '0.08',
 		'Tk::PopList' => '0.09',
 	},
 	ABSTRACT_FROM => "lib/Tk/$pm.pm",

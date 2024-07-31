@@ -3,34 +3,61 @@
 use strict;
 use warnings;
 
-use Tk::GtkSettings qw(applyGtkSettings);
-applyGtkSettings;
+use vars qw($VERSION);
+$VERSION = '0.53';
 
 use Tk;
 require Tk::CodeText;
 require Tk::Dialog;
+use Getopt::Long;
 use File::Path qw(make_path);
+use File::Spec;
 use Config;
+my $mswin = $Config{osname} eq 'MSWin32';
 
-my $configfolder;
-if ($Config{osname} eq 'MSWin32') {
-	$configfolder = $ENV{LOCALAPPDATA} . '/codetext' 
-} else {
-	$configfolder = $ENV{HOME} . '/.local/share/codetext'
-}
-unless (-e $configfolder) {
-	unless (make_path($configfolder)) {
-		die "Could not create path $configfolder";
-	}
-}
-my $settingsfile = "$configfolder/settingsrc";
 my $filename = '';
 
+my $configfolder;
+my $autoindent;
+my $font;
+my $help = 0;
+my $match;
+my $indentstyle;
+my $shownumbers;
+my $showfolds;
+my $showstatus;
+my $tabs;
+my $themefile;
+my $version = 0;
+my $wrap;
+my $xmlfolder;
+
+#main help text
+my $help_text = <<__EOF;
+Usage: codetext [options] [filename]
+Options:
+-a -autoindent    1 or 0. Autoindent
+-c -config:       Config folder.
+-f -font:         'font string' Specify the editing font.
+-h -help:         Displays this message.
+-m -match:        By default '{}()[]'. 
+-n -shownumbers:  1 or 0. By default 1. 
+-o -showfolds:    1 or 0. By default 1 
+-s -indentstyle:  By default 'tab'. Or a number of spaces.
+-t -tabs:         Tab size. By default '8m' (8 milimeters') 
+   -themefile:    Load a theme file with color and font definitions 
+-u -showstatus:   1 or 0. By default 1 
+                  for syntax highlighting 
+-w -wrap:         By default 'none'. Can also be 'word' or 'char'. 
+-x -xmlfolder:    Specifies the XML directory for syntax highlighting.
+__EOF
+
+# hard coded defaults
 my %options = (
 	-autoindent => 1,
 	-font => 'Courier 12',
 	-indentstyle => 'tab',
-	-logcall => sub { my $m = shift; print STDERR "$m\n" },
+#	-logcall => sub { my $m = shift; print STDERR "$m\n" },
 	-match => '{}()[]',
 	-showfolds => 1,
 	-shownumbers => 1,
@@ -40,120 +67,94 @@ my %options = (
 	-xmlfolder => undef,
 );
 
+#load command line options
+GetOptions(
+	#autoindent
+	'a=s' => \$autoindent,
+	'autoindent=s' => \$autoindent,
+	#autoindent
+	'c=s' => \$configfolder,
+	'config=s' => \$configfolder,
+	#font
+	'f=s' => \$font,
+	'font=s' => \$font,
+	#help
+	'h' => \$help,
+	'help' => \$help,
+	#match
+	'm=s' => \$font,
+	'match=s' => \$font,
+	#shownumbers
+	'n=s' => \$shownumbers,
+	'shownumbers' => \$shownumbers,
+	#showfolds
+	'o=s' => \$showfolds,
+	'showfolds=s' => \$showfolds,
+	#showfolds
+	'o=s' => \$showfolds,
+	'showfolds=s' => \$showfolds,
+	#indentstyle
+	's=s' => \$indentstyle,
+	'indentstyle=s' => \$indentstyle,
+	#tabs
+	't=s' => \$tabs,
+	'tabs=s' => \$tabs,
+	#themefile
+	'themefile' => \$themefile,
+	#showstatus
+	'u=s' => \$showstatus,
+	'showstatus=s' => \$showstatus,
+	#version
+	'v' => \$version,
+	'version' => \$version,
+	#wrap
+	'w=s' => \$wrap,
+	'wrap=s' => \$wrap,
+	#xnlfolder
+	'x=s' => \$xmlfolder,
+	'xmlfolder=s' => \$xmlfolder,
+) or die $help_text;
+
+if ($help) {
+	print $help_text;
+	exit;
+}
+
+if ($version) {
+	print "CodeText version ", Tk::CodeText->VERSION, "\n";
+	exit;
+}
+
+unless (defined $configfolder) {
+	if ($mswin) {
+		$configfolder = $ENV{LOCALAPPDATA} . '/codetext' 
+	} else {
+		$configfolder = $ENV{HOME} . '/.local/share/codetext'
+	}
+}
+unless (-e $configfolder) {
+	unless (make_path($configfolder)) {
+		die "Could not create path $configfolder";
+	}
+}
+my $settingsfile = "$configfolder/settingsrc";
+
+#load user settings
 my @usersettings = ('-autoindent', '-indentstyle', '-match', '-showfolds', '-shownumbers', '-showstatus', '-tabs', '-wrap');
 &loadSettings if -e $settingsfile;
 
-#main help text
-my $help_main = <<__EOF;
-Usage: codetext [options] [filename]exit
-Options:
--a -autoindent    1 or 0. Autoindent
--f -font:         'font string' Specify the editing font.
--h -help:         Displays this message.
--m -match:        By default '{}()[]'. 
--n -shownumbers:  1 or 0. By default 1. 
--o -showfolds:    1 or 0. By default 1 
--s -indentstyle:  By default 'tab'. Or a number of spaces.
--t -tabs:         Tab size. By default '8m' (8 milimeters') 
--u -showstatus:   1 or 0. By default 1 
--v -themefile:    Load a theme file with color and font definitions 
-                  for syntax highlighting 
--w -wrap:         By default 'none'. Can also be 'word' or 'char'. 
--x -xmlfolder:    Specifies the XML directory for syntax highlighting.
-__EOF
+$options{'-autoindent'} = $autoindent if defined $autoindent;
+$options{'-font'} = $font if defined $font;
+$options{'-indentstyle'} = $indentstyle if defined $indentstyle;
+$options{'-match'} = $match if defined $match;
+$options{'-showfolds'} = $showfolds if defined $showfolds;
+$options{'-shownumbers'} = $shownumbers if defined $shownumbers;
+$options{'-showstatus'} = $showstatus if defined $showstatus;
+$options{'-tabs'} = $tabs if defined $tabs;
+$options{'-wrap'} = $wrap if defined $wrap;
+$options{'-xmlfolder'} = $xmlfolder if defined $xmlfolder;
 
-my %short_args = (
-	'-a' => sub { 
-		my $value = shift @ARGV;
-		die "Please specify autoindent value, 1 or 0\n$help_main" unless defined $value;
-		die "Please specify autoindent value, 1 or 0\n$help_main" unless (($value eq 0) or ($value eq 1));
-		$options{'-autoindent'} = $value
-	},
-	'-f' => sub { 
-		my $value = shift @ARGV;
-		die "Please specify font\n$help_main" unless defined $value;
-		$options{'-font'} = $value
-	},
-	'-h' => sub {
-		print $help_main;
-		exit;
-	},
-	'-m' => sub { 
-		my $value = shift @ARGV;
-		die "Please specify match value\n$help_main" unless defined $value;
-		$options{'-match'} = $value
-	},
-	'-n' => sub { 
-		my $value = shift @ARGV;
-		die "Please specify linenumbers, 1 or 0\n$help_main" unless defined $value;
-		die "Please specify linenumbers, 1 or 0\n$help_main" unless (($value eq 0) or ($value eq 1));
-		$options{'-shownumbers'} = $value
-	},
-	'-o' => sub { 
-		my $value = shift @ARGV;
-		die "Please specify folds, 1 or 0\n$help_main" unless defined $value;
-		die "Please specify folds, 1 or 0\n$help_main" unless (($value eq 0) or ($value eq 1));
-		$options{'-showfolds'} = $value
-	},
-	'-s' => sub { 
-		my $value = shift @ARGV;
-		die "Please specify indent style\n$help_main" unless defined $value;
-		$options{'-indentstyle'} = $value
-	},
-	'-t' => sub { 
-		my $value = shift @ARGV;
-		die "Please specify tabs\n$help_main" unless defined $value;
-		$options{'-tabs'} = $value
-	},
-	'-u' => sub { 
-		my $value = shift @ARGV;
-		die "Please specify status bar, 1 or 0\n$help_main" unless defined $value;
-		die "Please specify status bar, 1 or 0\n$help_main" unless (($value eq 0) or ($value eq 1));
-		$options{'-showstatus'} = $value
-	},
-	'-v' => sub { 
-		my $value = shift @ARGV;
-		die "Please specify theme file\n$help_main" unless defined $value;
-		$options{'-themefile'} = $value
-	},
-	'-w' => sub { 
-		my $value = shift @ARGV;
-		die "Please specify wrap\n$help_main" unless defined $value;
-		$options{'-wrap'} = $value
-	},
-	'-x' => sub { 
-		my $value = shift @ARGV;
-		die "please specify xml folder\n$help_main" unless defined $value;
-		$options{'-xmlfolder'} = $value
-	},
-);
 
-my %main_args = (%short_args,
-	'-autoindent' => $short_args{'-a'},
-	'-font' => $short_args{'-f'},
-	'-help' => $short_args{'-h'},
-	'-indentstyle' => $short_args{'-s'},
-	'-match' => $short_args{'-m'},
-	'-showfolds' => $short_args{'-o'},
-	'-shownumbers' => $short_args{'-n'},
-	'-showstatus' => $short_args{'-u'},
-	'-tabs' => $short_args{'-t'},
-	'-themefile' => $short_args{'-v'},
-	'-wrap' => $short_args{'-w'},
-	'-xmlfolder' => $short_args{'-x'},
-);
-
-while (@ARGV) {
-	my $o = shift @ARGV;
-	my $call = $main_args{$o};
-	if (defined $call) {
-		&$call;
-	} else {
-		die "File '$o' does not exist\n$help_main" unless -e $o;
-		die "'$o' is a folder\n$help_main" if -d $o;
-		$filename = $o;
-	}
-}
 
 
 my $app = MainWindow->new(-title => 'Codetext');
@@ -173,8 +174,8 @@ $app->bind('<Control-r>', [$txt, 'FindAndReplacePopUp']);
 $app->bind('<Control-s>', \&saveDoc);
 $app->bind('<Control-q>', \&quit);
 
-
-$app->configure(-menu => $app->Menu(
+my $menu;
+$menu = $app->Menu(
 	-menuitems => [
 		['cascade' => '~File',
 			-menuitems => [
@@ -202,8 +203,7 @@ $app->configure(-menu => $app->Menu(
 			],
 		],
 		['cascade' => '~Edit',
-			-menuitems => [ $txt->EditMenuItems
-			],
+			-menuitems => [ $txt->EditMenuItems	],
 		],
 		['cascade' => '~Tools',
 			-menuitems => [ 
@@ -225,16 +225,32 @@ $app->configure(-menu => $app->Menu(
 				['separator' => '-'],
 				$txt->ViewMenuItems,
 				['separator' => '-'],
-				['command' => '~Save settings',
+				['command' => 'Sa~ve settings',
 					-command => \&saveSettings,
 				],
 			],
 		],
+		['cascade' => '~Bookmarks',
+			-menuitems => [ $txt->bookmarkMenuItems	],
+			-postcommand => sub { $txt->bookmarkMenuPop($menu, 'Bookmarks') },
+		],
 	],
-));
+);
+$app->configure(-menu => $menu);
 
 $app->after(300, sub {
-	&loadDoc($filename) if $filename ne ''
+	if (@ARGV) {
+		my $file = File::Spec->rel2abs(shift @ARGV);
+		unless (-e $file) {
+			warn "File $_ does not exit";
+			return;
+		}
+		if (-d $file) {
+			warn "'$file' is a folder";
+			return;
+		}
+		&loadDoc($file)
+	}
 });
 # my $screenwidth = $app->vrootwidth;
 # print "width $screenwidth\n";
@@ -242,7 +258,6 @@ $app->after(300, sub {
 # my $posy = int($app->vrootheight / 2) - 300;
 # print "popping at $posx, $posy\n";
 $app->geometry(sprintf('%dx%d+%d+%d', 800, 600, 250, 250));
-
 	
 $app->MainLoop;
 

@@ -93285,3 +93285,17 @@ E/ET/ETJ/PDL-Opt-NonLinear-0.09.tar.gz
 N/NJ/NJFRANCK/Plack-App-Catmandu-SRU-0.01.tar.gz
 P/PE/PERLANCAR/Proc-Govern-0.214.tar.gz
 C/CO/CORION/Win32API-RecentFiles-0.01.tar.gz
+I/IN/INGY/Alien-YAMLScript-0.1.69.tar.gz
+G/GD/GDT/CVSS-1.00.tar.gz
+D/DA/DAVECROSS/App-LastStats-0.0.3.tar.gz
+P/PE/PEVANS/App-sdview-0.18.tar.gz
+R/RE/REEDFISH/Net-FullAuto-1.0000680.tar.gz
+O/OA/OALDERS/HTML-Parser-3.83.tar.gz
+A/AK/AKHUETTEL/Lab-Measurement-3.902.tar.gz
+L/LW/LWP/Mozilla-CA-20240730.tar.gz
+H/HA/HANJE/Tk-CodeText-0.53.tar.gz
+K/KI/KIMOTO/SPVM-R-0.016.tar.gz
+T/TU/TURNERJW/Tk-TextHighlight-2.1.tar.gz
+D/DE/DERF/Travel-Status-DE-DBWagenreihung-0.15.tar.gz
+P/PE/PERLANCAR/WHO-GrowthReference-Table-0.013.tar.gz
+I/IN/INGY/YAMLScript-0.1.69.tar.gz

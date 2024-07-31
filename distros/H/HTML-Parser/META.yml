@@ -16,7 +16,7 @@ configure_requires:
   ExtUtils::MakeMaker: '6.52'
   perl: '5.008'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.031, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Zilla version 6.032, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -33,26 +33,26 @@ no_index:
 provides:
   HTML::Entities:
     file: lib/HTML/Entities.pm
-    version: '3.82'
+    version: '3.83'
   HTML::Filter:
     file: lib/HTML/Filter.pm
-    version: '3.82'
+    version: '3.83'
     x_deprecated: 1
   HTML::HeadParser:
     file: lib/HTML/HeadParser.pm
-    version: '3.82'
+    version: '3.83'
   HTML::LinkExtor:
     file: lib/HTML/LinkExtor.pm
-    version: '3.82'
+    version: '3.83'
   HTML::Parser:
     file: lib/HTML/Parser.pm
-    version: '3.82'
+    version: '3.83'
   HTML::PullParser:
     file: lib/HTML/PullParser.pm
-    version: '3.82'
+    version: '3.83'
   HTML::TokeParser:
     file: lib/HTML/TokeParser.pm
-    version: '3.82'
+    version: '3.83'
 requires:
   Carp: '0'
   Exporter: '0'
@@ -68,7 +68,7 @@ resources:
   bugtracker: https://github.com/libwww-perl/HTML-Parser/issues
   homepage: https://github.com/libwww-perl/HTML-Parser
   repository: https://github.com/libwww-perl/HTML-Parser.git
-version: '3.82'
+version: '3.83'
 x_contributors:
   - 'Antonio Radici <antonio@dyne.org>'
   - 'Barbie <barbie@missbarbell.co.uk>'
@@ -85,6 +85,7 @@ x_contributors:
   - 'James Raspass <jraspass@gmail.com>'
   - 'Jess Robinson <castaway@desert-island.me.uk>'
   - 'Jon Jensen <jon@endpoint.com>'
+  - 'Lukas Mai <lukasmai.403@gmail.com>'
   - 'Michal Josef Špaček <mspacek@redhat.com>'
   - 'Mike South <msouth@gmail.com>'
   - 'Nicholas Clark <nick@ccl4.org>'

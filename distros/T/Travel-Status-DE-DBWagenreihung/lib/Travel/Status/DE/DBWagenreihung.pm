@@ -12,102 +12,14 @@ use JSON;
 use List::Util qw(uniq);
 use LWP::UserAgent;
 use Travel::Status::DE::DBWagenreihung::Group;
-use Travel::Status::DE::DBWagenreihung::Section;
-use Travel::Status::DE::DBWagenreihung::Wagon;
+use Travel::Status::DE::DBWagenreihung::Sector;
+use Travel::Status::DE::DBWagenreihung::Carriage;
 
-our $VERSION = '0.14';
+our $VERSION = '0.15';
 
 Travel::Status::DE::DBWagenreihung->mk_ro_accessors(
-	qw(direction platform station train_no train_type));
+	qw(direction platform train_type));
 
-# {{{ Rolling Stock Models
-
-my %is_redesign = (
-	"02" => 1,
-	"03" => 1,
-	"06" => 1,
-	"09" => 1,
-	"10" => 1,
-	"13" => 1,
-	"14" => 1,
-	"15" => 1,
-	"16" => 1,
-	"18" => 1,
-	"19" => 1,
-	"20" => 1,
-	"23" => 1,
-	"24" => 1,
-	"27" => 1,
-	"28" => 1,
-	"29" => 1,
-	"31" => 1,
-	"32" => 1,
-	"33" => 1,
-	"34" => 1,
-	"35" => 1,
-	"36" => 1,
-	"37" => 1,
-	"53" => 1
-);
-
-my %model_name = (
-	'011'      => [ 'ICE T', 'ÖBB 4011' ],
-	'401'      => ['ICE 1'],
-	'402'      => ['ICE 2'],
-	'403.S1'   => [ 'ICE 3',        'BR 403, 1. Serie' ],
-	'403.S2'   => [ 'ICE 3',        'BR 403, 2. Serie' ],
-	'403.R'    => [ 'ICE 3',        'BR 403 Redesign' ],
-	'406'      => [ 'ICE 3',        'BR 406' ],
-	'406.R'    => [ 'ICE 3',        'BR 406 Redesign' ],
-	'407'      => [ 'ICE 3 Velaro', 'BR 407' ],
-	'408'      => [ 'ICE 3neo',     'BR 408' ],
-	'411.S1'   => [ 'ICE T',        'BR 411, 1. Serie' ],
-	'411.S2'   => [ 'ICE T',        'BR 411, 2. Serie' ],
-	'412'      => ['ICE 4'],
-	'415'      => [ 'ICE T', 'BR 415' ],
-	'420'      => ['BR 420'],
-	'422'      => ['BR 422'],
-	'423'      => ['BR 423'],
-	'425'      => ['BR 425'],
-	'427'      => [ 'FLIRT', 'BR 427' ],
-	'428'      => [ 'FLIRT', 'BR 428' ],
-	'429'      => [ 'FLIRT', 'BR 429' ],
-	'430'      => ['BR 430'],
-	'440'      => [ 'Coradia Continental', 'BR 440' ],
-	'442'      => [ 'Talent 2',            'BR 442' ],
-	'445'      => [ 'Twindexx Vario',      'BR 445' ],
-	'446'      => [ 'Twindexx Vario',      'BR 446' ],
-	'462'      => [ 'Desiro HC',           'BR 462' ],
-	'463'      => [ 'Mireo',               'BR 463' ],
-	'475'      => [ 'TGV',                 'BR 475' ],
-	'612'      => [ 'RegioSwinger',        'BR 612' ],
-	'620'      => [ 'LINT 81',             'BR 620' ],
-	'622'      => [ 'LINT 54',             'BR 622' ],
-	'631'      => [ 'Link I',              'BR 631' ],
-	'632'      => [ 'Link II',             'BR 632' ],
-	'633'      => [ 'Link III',            'BR 633' ],
-	'640'      => [ 'LINT 27',             'BR 640' ],
-	'642'      => [ 'Desiro Classic',      'BR 642' ],
-	'643'      => [ 'TALENT',              'BR 643' ],
-	'648'      => [ 'LINT 41',             'BR 648' ],
-	'IC2.TWIN' => ['IC 2 Twindexx'],
-	'IC2.KISS' => ['IC 2 KISS'],
-);
-
-my %power_desc = (
-	90 => 'mit sonstigem Antrieb',
-	91 => 'mit elektrischer Lokomotive',
-	92 => 'mit Diesellokomotive',
-	93 => 'Hochgeschwindigkeitszug',
-	94 => 'Elektrischer Triebzug',
-	95 => 'Diesel-Triebzug',
-	96 => 'mit speziellen Beiwagen',
-	97 => 'mit elektrischer Rangierlok',
-	98 => 'mit Diesel-Rangierlok',
-	99 => 'Sonderfahrzeug',
-);
-
-# }}}
 # {{{ Constructors
 
 sub new {
@@ -122,13 +34,15 @@ sub new {
 	}
 
 	my $self = {
-		api_base => $opt{api_base}
-		  // 'https://ist-wr.noncd.db.de/wagenreihung/1.0',
+		api_base =>
+'https://www.bahn.de/web/api/reisebegleitung/wagenreihung/vehicle-sequence',
 		developer_mode => $opt{developer_mode},
 		cache          => $opt{cache},
 		departure      => $opt{departure},
+		eva            => $opt{eva},
 		from_json      => $opt{from_json},
 		json           => JSON->new,
+		train_type     => $opt{train_type},
 		train_number   => $opt{train_number},
 		user_agent     => $opt{user_agent},
 	};
@@ -151,26 +65,36 @@ sub get_wagonorder {
 
 	my $api_base     = $self->{api_base};
 	my $cache        = $self->{cache};
+	my $eva          = $self->{eva};
+	my $train_type   = $self->{train_type};
 	my $train_number = $self->{train_number};
-
-	my $datetime = $self->{departure};
-
-	if ( ref($datetime) eq 'DateTime' ) {
-		$datetime = $datetime->strftime('%Y%m%d%H%M');
-	}
 
 	my $json = $self->{from_json};
 
 	if ( not $json ) {
-		my ( $content, $err )
-		  = $self->get_with_cache( $cache,
-			"${api_base}/${train_number}/${datetime}" );
+		my $datetime = $self->{departure}->clone->set_time_zone('UTC');
+		my $date     = $datetime->strftime('%Y-%m-%d');
+		my $time     = $datetime->rfc3339 =~ s{(?=Z)}{.000}r;
+		$self->{param} = {
+			administrationId => 80,
+			category         => $train_type,
+			date             => $date,
+			evaNumber        => $eva,
+			number           => $train_number,
+			time             => $time
+		};
+		my ( $content, $err ) = $self->get_with_cache(
+			$cache,
+			$api_base . '?'
+			  . join( '&',
+				map { $_ . '=' . $self->{param}{$_} } keys %{ $self->{param} } )
+		);
 
 		if ($err) {
 			$self->{errstr} = "Failed to fetch station data: $err";
 			return;
 		}
-		$json = $self->{json}->utf8->decode($content);
+		$json = $self->{from_json} = $self->{json}->utf8->decode($content);
 	}
 
 	if ( exists $json->{error} ) {
@@ -178,15 +102,10 @@ sub get_wagonorder {
 		return;
 	}
 
-	if (    @{ $json->{data}{istformation}{allFahrzeuggruppe} // [] } == 0
-		and @{ $json->{data}{istformation}{halt} // [] } == 0 )
-	{
+	if ( not $json->{departureID} ) {
 		$self->{errstr} = 'No carriage formation available';
 		return;
 	}
-
-	$self->{data} = $json->{data};
-	$self->{meta} = $json->{meta};
 
 	return $self->parse_wagonorder;
 }
@@ -230,56 +149,16 @@ sub get_with_cache {
 	return ( $content, undef );
 }
 
-sub wagongroup_powertype {
-	my ( $self, @wagons ) = @_;
-
-	if ( not @wagons ) {
-		@wagons = $self->wagons;
-	}
-
-	my %ml = map { $_ => 0 } ( 90 .. 99 );
-
-	for my $wagon (@wagons) {
-
-		if ( not $wagon->uic_id or length( $wagon->uic_id ) != 12 ) {
-			next;
-		}
-
-		my $wagon_type = substr( $wagon->uic_id, 0, 2 );
-		if ( $wagon_type < 90 ) {
-			next;
-		}
-
-		$ml{$wagon_type}++;
-	}
-
-	my @likelihood = reverse sort { $ml{$a} <=> $ml{$b} } keys %ml;
-
-	if ( $ml{ $likelihood[0] } == 0 ) {
-		return undef;
-	}
-
-	return $likelihood[0];
-}
-
 sub parse_wagonorder {
 	my ($self) = @_;
 
-	$self->{platform} = $self->{data}{istformation}{halt}{gleisbezeichnung};
+	$self->{platform}       = $self->{from_json}{departurePlatform};
+	$self->{platform_sched} = $self->{from_json}{departurePlatformSchedule};
 
-	$self->{station} = {
-		ds100 => $self->{data}{istformation}{halt}{rl100},
-		eva   => $self->{data}{istformation}{halt}{evanummer},
-		name  => $self->{data}{istformation}{halt}{bahnhofsname},
-	};
-
-	$self->{train_type} = $self->{data}{istformation}{zuggattung};
-	$self->{train_no}   = $self->{data}{istformation}{zugnummer};
-
-	$self->parse_wagons;
-	$self->{origins}      = $self->merge_group_attr('origin');
-	$self->{destinations} = $self->merge_group_attr('destination');
-	$self->{train_nos}    = $self->merge_group_attr('train_no');
+	$self->parse_carriages;
+	$self->{destinations}  = $self->merge_group_attr('destination');
+	$self->{train_numbers} = $self->merge_group_attr('train_no');
+	$self->{trains}        = $self->merge_group_attr('train');
 }
 
 sub merge_group_attr {
@@ -287,12 +166,12 @@ sub merge_group_attr {
 
 	my @attrs;
 	my %attr_to_group;
-	my %attr_to_sections;
+	my %attr_to_sectors;
 
 	for my $group ( $self->groups ) {
-		push( @attrs,                                    $group->{$attr} );
-		push( @{ $attr_to_group{ $group->{$attr} } },    $group );
-		push( @{ $attr_to_sections{ $group->{$attr} } }, $group->sections );
+		push( @attrs,                                   $group->{$attr} );
+		push( @{ $attr_to_group{ $group->{$attr} } },   $group );
+		push( @{ $attr_to_sectors{ $group->{$attr} } }, $group->sectors );
 	}
 
 	@attrs = uniq @attrs;
@@ -300,52 +179,68 @@ sub merge_group_attr {
 	return [
 		map {
 			{
-				name     => $_,
-				groups   => $attr_to_group{$_},
-				sections => $attr_to_sections{$_}
+				name    => $_,
+				groups  => $attr_to_group{$_},
+				sectors => $attr_to_sectors{$_}
 			}
 		} @attrs
 	];
 }
 
-sub parse_wagons {
+sub parse_carriages {
 	my ($self) = @_;
 
-	my @wagon_groups;
+	my $platform_length
+	  = $self->{from_json}{platform}{end} - $self->{from_json}{platform}{start};
 
-	for my $group ( @{ $self->{data}{istformation}{allFahrzeuggruppe} } ) {
-		my @group_wagons;
-		for my $wagon ( @{ $group->{allFahrzeug} } ) {
-			my $wagon_object
-			  = Travel::Status::DE::DBWagenreihung::Wagon->new( %{$wagon},
-				train_no => $group->{verkehrlichezugnummer} );
-			push( @{ $self->{wagons} }, $wagon_object );
-			push( @group_wagons,        $wagon_object );
-			if ( not $wagon_object->{position}{valid} ) {
-				$self->{has_bad_wagons} = 1;
-			}
-		}
-		my $group_obj = Travel::Status::DE::DBWagenreihung::Group->new(
-			id          => $group->{fahrzeuggruppebezeichnung},
-			train_no    => $group->{verkehrlichezugnummer},
-			origin      => $group->{startbetriebsstellename},
-			destination => $group->{zielbetriebsstellename},
-			wagons      => \@group_wagons,
+	for my $sector ( @{ $self->{from_json}{platform}{sectors} } ) {
+		push(
+			@{ $self->{sectors} },
+			Travel::Status::DE::DBWagenreihung::Sector->new(
+				json     => $sector,
+				platform => {
+					start => $self->{from_json}{platform}{start},
+					end   => $self->{from_json}{platform}{end},
+				}
+			)
 		);
-		push( @wagon_groups, $group_obj );
-
-		my ( $short, $desc )
-		  = $self->wagongroup_description( $group_obj->wagons );
-		my @sections = uniq map { $_->section } $group_obj->wagons;
-
-		if ( @sections and length( join( q{}, @sections ) ) ) {
-			$group_obj->set_sections(@sections);
-		}
-		$group_obj->set_description( $desc, $short );
 	}
-	if ( @{ $self->{wagons} // [] } > 1 and not $self->has_bad_wagons ) {
-		if ( $self->{wagons}[0]->{position}{start_percent}
-			> $self->{wagons}[-1]->{position}{start_percent} )
+
+	my @groups;
+	my @numbers;
+
+	for my $group ( @{ $self->{from_json}{groups} // [] } ) {
+		my @group_carriages;
+		for my $carriage ( @{ $group->{vehicles} // [] } ) {
+			my $carriage_object
+			  = Travel::Status::DE::DBWagenreihung::Carriage->new(
+				json     => $carriage,
+				platform => {
+					start => $self->{from_json}{platform}{start},
+					end   => $self->{from_json}{platform}{end},
+				}
+			  );
+			push( @group_carriages,        $carriage_object );
+			push( @{ $self->{carriages} }, $carriage_object );
+		}
+		@group_carriages
+		  = sort { $a->start_percent <=> $b->start_percent } @group_carriages;
+		my $group_obj = Travel::Status::DE::DBWagenreihung::Group->new(
+			json      => $group,
+			carriages => \@group_carriages,
+		);
+		push( @groups,  $group_obj );
+		push( @numbers, $group_obj->train_no );
+	}
+
+	@groups = sort { $a->start_percent <=> $b->start_percent } @groups;
+
+	@numbers = uniq @numbers;
+	$self->{train_numbers} = \@numbers;
+
+	if ( @{ $self->{carriages} // [] } > 1 ) {
+		if ( $self->{carriages}[0]->{start_percent}
+			> $self->{carriages}[-1]->{start_percent} )
 		{
 			$self->{direction} = 100;
 		}
@@ -353,23 +248,8 @@ sub parse_wagons {
 			$self->{direction} = 0;
 		}
 	}
-	if ( not $self->has_bad_wagons ) {
-		@{ $self->{wagons} } = sort {
-			$a->{position}->{start_percent} <=> $b->{position}->{start_percent}
-		} @{ $self->{wagons} };
-		for my $group (@wagon_groups) {
-			$group->sort_wagons;
-		}
-	}
 
-	for my $i ( 0 .. $#wagon_groups ) {
-		my $group = $wagon_groups[$i];
-		my $tt    = $self->wagongroup_subtype( $group->wagons );
-		$group->set_traintype( $i, $tt );
-		$group->{type} = $tt;
-	}
-
-	$self->{wagongroups} = [@wagon_groups];
+	$self->{groups} = [@groups];
 }
 
 # }}}
@@ -387,364 +267,36 @@ sub destinations {
 	return @{ $self->{destinations} // [] };
 }
 
-sub origins {
-	my ($self) = @_;
-
-	return @{ $self->{origins} // [] };
-}
-
-sub train_nos {
-	my ($self) = @_;
-
-	return @{ $self->{train_nos} // [] };
-}
-
-sub sections {
-	my ($self) = @_;
-
-	if ( exists $self->{sections} ) {
-		return @{ $self->{sections} };
-	}
-
-	for my $section ( @{ $self->{data}{istformation}{halt}{allSektor} } ) {
-		my $pos = $section->{positionamgleis};
-		if ( $pos->{startprozent} eq '' or $pos->{endeprozent} eq '' ) {
-			next;
-		}
-		push(
-			@{ $self->{sections} },
-			Travel::Status::DE::DBWagenreihung::Section->new(
-				name          => $section->{sektorbezeichnung},
-				start_percent => $pos->{startprozent},
-				end_percent   => $pos->{endeprozent},
-				start_meters  => $pos->{startmeter},
-				end_meters    => $pos->{endemeter},
-			)
-		);
-	}
-
-	return @{ $self->{sections} // [] };
-}
-
 sub train_numbers {
 	my ($self) = @_;
 
-	if ( exists $self->{train_numbers} ) {
-		return @{ $self->{train_numbers} };
-	}
-
-	my @numbers;
-
-	for my $group ( @{ $self->{data}{istformation}{allFahrzeuggruppe} } ) {
-		push( @numbers, $group->{verkehrlichezugnummer} );
-	}
-
-	@numbers = uniq @numbers;
-
-	$self->{train_numbers} = \@numbers;
-
-	return @numbers;
+	return @{ $self->{train_numbers} // [] };
 }
 
-sub has_bad_wagons {
+sub trains {
 	my ($self) = @_;
 
-	if ( defined $self->{has_bad_wagons} ) {
-		return $self->{has_bad_wagons};
-	}
-
-	for my $group ( @{ $self->{data}{istformation}{allFahrzeuggruppe} } ) {
-		for my $wagon ( @{ $group->{allFahrzeug} } ) {
-			my $pos = $wagon->{positionamhalt};
-			if (   $pos->{startprozent} eq ''
-				or $pos->{endeprozent} eq ''
-				or $pos->{startmeter} eq ''
-				or $pos->{endemeter} eq '' )
-			{
-				return $self->{has_bad_wagons} = 1;
-			}
-		}
-	}
-
-	return $self->{has_bad_wagons} = 0;
+	return @{ $self->{trains} // [] };
 }
 
-sub wagongroup_description {
-	my ( $self, @wagons ) = @_;
+sub sectors {
+	my ($self) = @_;
 
-	my $powertype = $self->wagongroup_powertype(@wagons);
-	my @model     = $self->wagongroup_model(@wagons);
-
-	my $short;
-	my $ret = q{};
-
-	if (@model) {
-		$short = $model[0];
-		$ret .= $model[0];
-	}
-
-	if ( $powertype and $power_desc{$powertype} ) {
-		if ( not $ret and $power_desc{$powertype} =~ m{^mit} ) {
-			$ret = "Zug";
-		}
-		$ret .= " $power_desc{$powertype}";
-		$short //= $ret;
-		$short =~ s{elektrischer }{E-};
-		$short =~ s{[Ll]\Kokomotive}{ok};
-	}
-
-	if ( @model > 1 ) {
-		$ret .= " ($model[1])";
-	}
-
-	return ( $short, $ret );
-}
-
-sub wagongroup_model {
-	my ( $self, @wagons ) = @_;
-
-	my $subtype = $self->wagongroup_subtype(@wagons);
-
-	if ( $subtype and $model_name{$subtype} ) {
-		return @{ $model_name{$subtype} };
-	}
-	if ($subtype) {
-		return $subtype;
-	}
-	return;
-}
-
-sub wagongroup_subtype {
-	my ( $self, @wagons ) = @_;
-
-	if ( not @wagons ) {
-		@wagons = $self->wagons;
-	}
-
-	my %ml = (
-		'011'      => 0,
-		'401'      => 0,
-		'402'      => 0,
-		'403.S1'   => 0,
-		'403.S2'   => 0,
-		'403.R'    => 0,
-		'406'      => 0,
-		'407'      => 0,
-		'408'      => 0,
-		'411.S1'   => 0,
-		'411.S2'   => 0,
-		'412'      => 0,
-		'415'      => 0,
-		'420'      => 0,
-		'422'      => 0,
-		'423'      => 0,
-		'425'      => 0,
-		'427'      => 0,
-		'428'      => 0,
-		'429'      => 0,
-		'430'      => 0,
-		'440'      => 0,
-		'442'      => 0,
-		'445'      => 0,
-		'446'      => 0,
-		'462'      => 0,
-		'463'      => 0,
-		'475'      => 0,
-		'612'      => 0,
-		'620'      => 0,
-		'622'      => 0,
-		'631'      => 0,
-		'632'      => 0,
-		'633'      => 0,
-		'640'      => 0,
-		'642'      => 0,
-		'643'      => 0,
-		'648'      => 0,
-		'IC2.TWIN' => 0,
-		'IC2.KISS' => 0,
-	);
-
-	for my $wagon (@wagons) {
-		if ( not $wagon->model ) {
-			next;
-		}
-		if ( $wagon->model == 401
-			or ( $wagon->model >= 801 and $wagon->model <= 804 ) )
-		{
-			$ml{'401'}++;
-		}
-		elsif ( $wagon->model == 402
-			or ( $wagon->model >= 805 and $wagon->model <= 808 ) )
-		{
-			$ml{'402'}++;
-		}
-		elsif ( $wagon->model == 403
-			and $is_redesign{ substr( $wagon->uic_id, 9, 2 ) } )
-		{
-			$ml{'403.R'}++;
-		}
-		elsif ( $wagon->model == 403 and substr( $wagon->uic_id, 9, 2 ) <= 37 )
-		{
-			$ml{'403.S1'}++;
-		}
-		elsif ( $wagon->model == 403 and substr( $wagon->uic_id, 9, 2 ) > 37 ) {
-			$ml{'403.S2'}++;
-		}
-		elsif ( $wagon->model == 406 ) {
-			$ml{'406'}++;
-		}
-		elsif ( $wagon->model == 407 ) {
-			$ml{'407'}++;
-		}
-		elsif ( $wagon->model == 408 ) {
-			$ml{'408'}++;
-		}
-		elsif ( $wagon->model == 412 or $wagon->model == 812 ) {
-			$ml{'412'}++;
-		}
-		elsif ( $wagon->model == 411 and substr( $wagon->uic_id, 9, 2 ) <= 32 )
-		{
-			$ml{'411.S1'}++;
-		}
-		elsif ( $wagon->model == 411 and substr( $wagon->uic_id, 9, 2 ) > 32 ) {
-			$ml{'411.S2'}++;
-		}
-		elsif ( $wagon->model == 415 ) {
-			$ml{'415'}++;
-		}
-		elsif ( $wagon->model == 420 or $wagon->model == 421 ) {
-			$ml{'420'}++;
-		}
-		elsif ( $wagon->model == 422 or $wagon->model == 432 ) {
-			$ml{'422'}++;
-		}
-		elsif ( $wagon->model == 423 or $wagon->model == 433 ) {
-			$ml{'423'}++;
-		}
-		elsif ( $wagon->model == 425 or $wagon->model == 435 ) {
-			$ml{'425'}++;
-		}
-		elsif ( $wagon->model == 427 or $wagon->model == 827 ) {
-			$ml{'427'}++;
-		}
-		elsif ( $wagon->model == 428 or $wagon->model == 828 ) {
-			$ml{'428'}++;
-		}
-		elsif ( $wagon->model == 429 or $wagon->model == 829 ) {
-			$ml{'429'}++;
-		}
-		elsif ( $wagon->model == 430 or $wagon->model == 431 ) {
-			$ml{'430'}++;
-		}
-		elsif ($wagon->model == 440
-			or $wagon->model == 441
-			or $wagon->model == 841 )
-		{
-			$ml{'440'}++;
-		}
-		elsif ($wagon->model == 442
-			or $wagon->model == 443 )
-		{
-			$ml{'442'}++;
-		}
-		elsif ($wagon->model == 462
-			or $wagon->model == 862 )
-		{
-			$ml{'462'}++;
-		}
-		elsif ($wagon->model == 463
-			or $wagon->model == 863 )
-		{
-			$ml{'463'}++;
-		}
-		elsif ( $wagon->model == 445 ) {
-			$ml{'445'}++;
-		}
-		elsif ( $wagon->model == 446 ) {
-			$ml{'446'}++;
-		}
-		elsif ( $wagon->model == 475 ) {
-			$ml{'475'}++;
-		}
-		elsif ( $wagon->model == 612 ) {
-			$ml{'612'}++;
-		}
-		elsif ( $wagon->model == 620 or $wagon->model == 621 ) {
-			$ml{'620'}++;
-		}
-		elsif ( $wagon->model == 622 ) {
-			$ml{'622'}++;
-		}
-		elsif ( $wagon->model == 631 ) {
-			$ml{'631'}++;
-		}
-		elsif ( $wagon->model == 632 ) {
-			$ml{'632'}++;
-		}
-		elsif ( $wagon->model == 633 ) {
-			$ml{'633'}++;
-		}
-		elsif ( $wagon->model == 640 ) {
-			$ml{'640'}++;
-		}
-		elsif ( $wagon->model == 642 ) {
-			$ml{'642'}++;
-		}
-		elsif ( $wagon->model == 643 or $wagon->model == 943 ) {
-			$ml{'643'}++;
-		}
-		elsif ( $wagon->model == 648 ) {
-			$ml{'648'}++;
-		}
-		elsif ( $self->train_type eq 'IC' and $wagon->model == 110 ) {
-			$ml{'IC2.KISS'}++;
-		}
-		elsif ( $self->train_type eq 'IC' and $wagon->is_dosto ) {
-			$ml{'IC2.TWIN'}++;
-		}
-		elsif ( substr( $wagon->uic_id, 4, 4 ) eq '4011' ) {
-			$ml{'011'}++;
-		}
-	}
-
-	my @likelihood = reverse sort { $ml{$a} <=> $ml{$b} } keys %ml;
-
-	# Less than two wagons are generally inconclusive.
-	# Exception: BR 631 (Link I) only has a single wagon
-	if (
-		$ml{ $likelihood[0] } < 2
-		and not($likelihood[0] eq '631'
-			and @wagons == 1
-			and substr( $wagons[0]->uic_id, 0, 2 ) eq '95' )
-	  )
-	{
-		return undef;
-	}
-
-	return $likelihood[0];
+	return @{ $self->{sectors} // [] };
 }
 
 sub groups {
 	my ($self) = @_;
-	return @{ $self->{wagongroups} // [] };
+	return @{ $self->{groups} // [] };
 }
 
 sub carriages {
 	my ($self) = @_;
-	return @{ $self->{wagons} // [] };
-}
-
-sub wagons {
-	my ($self) = @_;
-	return @{ $self->{wagons} // [] };
+	return @{ $self->{carriages} // [] };
 }
 
 sub TO_JSON {
 	my ($self) = @_;
-
-	# ensure that all objects are available
-	$self->train_numbers;
-	$self->sections;
 
 	my %copy = %{$self};
 
@@ -768,29 +320,30 @@ Travel::Status::DE::DBWagenreihung - Interface to Deutsche Bahn carriage formati
     use Travel::Status::DE::DBWagenreihung;
 
     my $wr = Travel::Status::DE::DBWagenreihung->new(
-        departure => 'DateTime or YYYYMMDDhhmm',
-        train_number => 1234,
+        eva => 8000080,
+        departure => $datetime,
+        train_type => 'IC',
+        train_number => 2045,
     );
 
     for my $carriage ( $wr->carriages ) {
-        printf("Wagen %s: Abschnitt %s\n", $carriage->number // '?', $carriage->section);
+        printf("Wagen %s: Abschnitt %s\n", $carriage->number // '?', $carriage->sector);
     }
 
 =head1 VERSION
 
-version 0.14
+version 0.15
 
 This is beta software. The API may change without notice.
 
 =head1 DESCRIPTION
 
 Travel:Status:DE::DBWagenreihung is an unofficial interface to the Deutsche
-Bahn carriage formation (API at L<https://ist-wr.noncd.db.de/wagenreihung/1.0>.
-It returns station-specific carriage formations (also kwnown as coach
-sequences) for a variety of trains in the rail network associated with Deutsche
-Bahn.  Data includes carriage positions on the platform, train type (e.g. ICE
-series), carriage-specific attributes such as first/second class, and the
-internal type and number of each carriage.
+Bahn carriage formation API.  It returns station-specific carriage formations
+(also kwnown as coach sequences) for a variety of trains in the rail network
+associated with Deutsche Bahn.  Data includes carriage positions on the
+platform, train type (e.g. ICE series), carriage-specific attributes such as
+first/second class, and the internal type and number of each carriage.
 
 Positions on the platform are given both in meters and percent (relative to
 platform length).
@@ -813,15 +366,22 @@ Arguments:
 
 =over
 
-=item B<departure> => I<datetime-obj> | I<YYYYMMDDhhmm>
+=item B<departure> => I<datetime-obj>
 
-Scheduled departure at the station of interest. Must be either a
-L<DateTime> object or a string in I<YYYYMMDDhhmm> format. Mandatory.
+Scheduled departure at the station of interest. Must be a L<DateTime> object.
+Mandatory.
+
+=item B<eva> => I<number>
+
+EVA ID of the station of interest.
+
+=item B<train_type> => I<string>
+
+Train type, e.g. "S" or "ICE".
 
 =item B<train_number> => I<number>
 
-Train number. Do not include the train type: Use "8" for "EC 8" or
-"100" for "ICE 100".
+Train number.
 
 =back
 
@@ -832,15 +392,15 @@ Returns undef otherwise.
 
 =item $wr->groups
 
-Returns a list of Travel::Status::DE::DBWagenreihung::Group(3pm) objects
-which describe the groups making up the carriage formation. Typically, each
-group has a distinct origin, destination, or train number. Each group contains
-a set of carriages.
+Returns a list of Travel::Status::DE::DBWagenreihung::Group(3pm) objects which
+describe the groups making up the carriage formation. Individual groups may
+have distinct destinations or train numbers. Each group contains a set of
+carriages.
 
 =item $wr->carriages
 
 Describes the individual carriages the train consists of. Returns a list of
-L<Travel::Status::DE::DBWagenreihung::Wagon> objects.
+L<Travel::Status::DE::DBWagenreihung::carriage> objects.
 
 =item $wr->direction
 
@@ -848,17 +408,10 @@ Gives the train's direction of travel. Returns 0 if the train will depart
 towards position 0 and 100 if the train will depart towards the other platform
 end (mnemonic: towards the 100% position).
 
-=item $wr->origins
-
-Returns a list describing the unique origins of this train's carriage groups.
-Each origin is a hashref that contains its B<name>, a B<groups> arrayref to the
-corresponding Travel::Status::DE::DBWagenreihung::Group(3pm) objects, and
-a B<sections> arrayref to section identifiers (subject to change).
-
 =item $wr->destinations
 
 Returns a list describing the unique destinations of this train's carriage
-groups.  Each origin is a hashref that contains its B<name>, a B<groups>
+groups.  Each destination is a hashref that contains its B<name>, a B<groups>
 arrayref to the corresponding Travel::Status::DE::DBWagenreihung::Group(3pm)
 objects, and a B<sections> arrayref to section identifiers (subject to change).
 
@@ -866,24 +419,12 @@ objects, and a B<sections> arrayref to section identifiers (subject to change).
 
 Returns the platform name.
 
-=item $wr->sections
+=item $wr->sectors
 
-Describes the sections of the platform this train will depart from.
-Returns a list of L<Travel::Status::DE::DBWagenreihung::Section> objects.
-
-=item $wr->station
-
-Returns a hashref describing the requested station. The hashref contains three
-entries: B<ds100> (DS100 / Ril100 identifier), B<eva> (EVA ID, related to but
-not necessarily identical with UIC station ID), and B<name> (station name).
+Describes the sectors of the platform this train will depart from.
+Returns a list of L<Travel::Status::DE::DBWagenreihung::Sector> objects.
 
 =item $wr->train_numbers
-
-Returns the list of train numbers for this departure. In most cases, this is
-just one element. For trains consisting of multiple wings (which typically have
-different numbers), it contains one element for each wing.
-
-=item $wr->train_nos
 
 Returns a list describing the unique train numbers associated with this train's
 carriage groups.  Each train number is a hashref that contains its B<name>

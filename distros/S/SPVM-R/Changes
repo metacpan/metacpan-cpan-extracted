@@ -1,3 +1,8 @@
+0.016 2024-07-31
+  [Test Improvement]
+    * Add many tests.
+  [Bug Fix]
+    * Fix some bugs.
 0.015 2024-07-26
   [Incompatibe Changes]
     * There are some incompatible changes.

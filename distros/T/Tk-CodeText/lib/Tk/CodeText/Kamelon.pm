@@ -1,6 +1,9 @@
 package Tk::CodeText::Kamelon;
+
 use strict;
 use warnings;
+use vars qw($VERSION);
+$VERSION = '0.53';
 
 use base qw(Syntax::Kamelon);
 

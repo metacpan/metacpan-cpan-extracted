@@ -7,9 +7,10 @@ $VERSION = '0.4';
 BEGIN
 {
 	my $havePerlImproved = 0;
-	eval 'use base "Syntax::Highlight::Perl::Improved"; $havePerlImproved = 1; 1';
+	eval 'use base "Syntax::Highlight::Perl::ImprovedMore"; $havePerlImproved = 1; 1';
 	unless ($havePerlImproved) {
-		eval 'use base "Syntax::Highlight::Perl"; 1';
+		eval 'use base "Syntax::Highlight::Perl::Improved"; $havePerlImproved = 1; 1';
+		eval 'use base "Syntax::Highlight::Perl"; 1'  unless ($havePerlImproved);
 	}
 }
 
@@ -158,6 +159,7 @@ sets and returns a reference to a list of tagnames and options.
 By default it is set to:
 
  [
+    ['DEFAULT', -foreground => 'black'],
     ['Comment_Normal', -foreground => 'lightblue'],
     ['Comment_Pod', -foreground => 'lightblue'],
     ['Directive', -foreground => 'black'],

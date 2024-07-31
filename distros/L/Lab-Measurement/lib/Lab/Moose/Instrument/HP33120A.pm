@@ -1,5 +1,5 @@
 package Lab::Moose::Instrument::HP33120A;
-$Lab::Moose::Instrument::HP33120A::VERSION = '3.901';
+$Lab::Moose::Instrument::HP33120A::VERSION = '3.902';
 #ABSTRACT: HP 33120A 15 MHz Arbitrary Waveform Generator, also as voltage source
 
 use v5.20;
@@ -209,7 +209,7 @@ Lab::Moose::Instrument::HP33120A - HP 33120A 15 MHz Arbitrary Waveform Generator
 
 =head1 VERSION
 
-version 3.901
+version 3.902
 
 =head1 SYNOPSIS
 
@@ -277,7 +277,7 @@ Query current level.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2023 by the Lab::Measurement team; in detail:
+This software is copyright (c) 2024 by the Lab::Measurement team; in detail:
 
   Copyright 2023       Andreas K. Huettel
 

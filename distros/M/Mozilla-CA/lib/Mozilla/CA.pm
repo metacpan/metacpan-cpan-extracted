@@ -2,7 +2,7 @@ package Mozilla::CA;
 use strict;
 use warnings;
 
-our $VERSION = '20240313';
+our $VERSION = '20240730';
 
 use File::Spec ();
 use File::Basename qw(dirname);

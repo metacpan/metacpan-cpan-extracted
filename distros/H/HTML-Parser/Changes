@@ -1,5 +1,8 @@
 Change history for HTML-Parser
 
+3.83      2024-07-30
+    - fix '$\/]' in HTML::Entities::encode_entities (GH#45) (mauke)
+
 3.82      2024-03-13
     - "img lowsrc" and "body background" are not in the HTMLv5 spec (GH#43)
       (Jess)

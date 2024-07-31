@@ -1,3 +1,13 @@
+Travel::Status::DE::DBWagenreihung 0.15 - Tue Jul 30 2024
+
+    * Switch to new bahn.de API; the one used until 0.14 has been discontinued
+    * DBWagenreihung->new: new constructor signature; now requires "departure",
+      "eva", "train_type" and "train_number".
+    * DBWagenreihung: Remove "wagons" accessor
+    * DBWagenreihung: Rename "sections" to "sectors"
+    * DBWagenreihung: Remove "train_nos" accessor
+    * DBWagenreihung: Remove "origins" accessor
+
 Travel::Status::DE::DBWagenreihung 0.14 - Sun Apr 28 2024
 
     * This module now explicitly treats carriages as groups, just like the

@@ -156,9 +156,7 @@ int32_t SPVM__R__OP__Matrix__DoubleComplex___solve(SPVM_ENV* env, SPVM_VALUE* st
   
   Eigen::Matrix<std::complex<double>, Eigen::Dynamic, Eigen::Dynamic> x_matrix = Eigen::Map<Eigen::Matrix<std::complex<double>, Eigen::Dynamic, Eigen::Dynamic>>(x_data, x_nrow, x_ncol);
   
-  Eigen::Matrix<std::complex<double>, Eigen::Dynamic, Eigen::Dynamic> ret_matrix = x_matrix;
-  
-  ret_matrix.inverse();
+  Eigen::Matrix<std::complex<double>, Eigen::Dynamic, Eigen::Dynamic> ret_matrix = x_matrix.inverse();
   
   int32_t ret_length = ret_matrix.rows() * ret_matrix.cols();
   void* obj_ret_data = env->new_mulnum_array_by_name(env, stack, "Complex_2d", ret_length, &e, __func__, FILE_NAME, __LINE__);

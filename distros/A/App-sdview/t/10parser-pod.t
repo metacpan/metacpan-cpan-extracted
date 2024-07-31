@@ -120,9 +120,17 @@ subtest "Verbatim" => sub {
 =for highlighter
 
    This should be plain text
+
+=code perl
+
+   perl
+
+Z<>
+
+   not perl
 EOPOD
 
-   is( scalar @p, 3, 'Received 3 paragraphs' );
+   is( scalar @p, 6, 'Received 6 paragraphs' );
 
    is( $p[0]->text, "EXAMPLE", 'p[0] text' );
 
@@ -131,6 +139,14 @@ EOPOD
 
    is( $p[2]->text, qq(This should be plain text), 'p[2] text' );
    is( $p[2]->language, undef, 'p[2] language' );
+
+   is( $p[3]->text, qq(perl), 'p[3] text' );
+   is( $p[3]->language, "perl", 'p[3] language' );
+
+   # p[4] is blank
+
+   is( $p[5]->text, qq(not perl), 'p[5] text' );
+   is( $p[5]->language, undef, 'p[5] language' );
 };
 
 subtest "Indented" => sub {
@@ -270,6 +286,26 @@ EOPOD
 
    is( $items[3]->type, "plain", 'items[3] type' );
    is( $items[3]->text, "Has two paragraphs", 'items[3] text' );
+};
+
+subtest "Verbatim syntax autodetect" => sub {
+   foreach (
+      [ perl => "use v5.14;\nsay 'Hello, world'" ],
+      [ perl => "\$result = somefunc(1, 2, 3);" ],
+      [ perl => "my \$result = somefunc(1, 2);" ],
+      [ undef,  "This is not perl code" ],
+   ) {
+      my ( $want_lang, $src ) = @$_;
+
+      $src =~ s/^/   /mg;
+
+      my @p = App::sdview::Parser::Pod->new->parse_string( "=pod\n\n" . $src );
+
+      is( scalar @p, 1, 'Received 1 paragraphs' );
+
+      is( $p[0]->language, $want_lang,
+         ( $want_lang // "undef" ) . " language autodetected" );
+   }
 };
 
 done_testing;

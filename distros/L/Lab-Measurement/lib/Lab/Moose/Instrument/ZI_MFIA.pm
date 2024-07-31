@@ -1,5 +1,5 @@
 package Lab::Moose::Instrument::ZI_MFIA;
-$Lab::Moose::Instrument::ZI_MFIA::VERSION = '3.901';
+$Lab::Moose::Instrument::ZI_MFIA::VERSION = '3.902';
 #ABSTRACT: Zurich Instruments MFIA Impedance Analyzer.
 
 use v5.20;
@@ -45,7 +45,7 @@ Lab::Moose::Instrument::ZI_MFIA - Zurich Instruments MFIA Impedance Analyzer.
 
 =head1 VERSION
 
-version 3.901
+version 3.902
 
 =head1 SYNOPSIS
 
@@ -82,7 +82,7 @@ Return impedance sample as hashref. C<$timeout> argument is optional.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2023 by the Lab::Measurement team; in detail:
+This software is copyright (c) 2024 by the Lab::Measurement team; in detail:
 
   Copyright 2017       Simon Reinhardt
 

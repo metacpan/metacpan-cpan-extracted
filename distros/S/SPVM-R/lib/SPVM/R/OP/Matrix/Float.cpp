@@ -151,9 +151,7 @@ int32_t SPVM__R__OP__Matrix__Double___solve(SPVM_ENV* env, SPVM_VALUE* stack) {
   
   Eigen::Matrix<float, Eigen::Dynamic, Eigen::Dynamic> x_matrix = Eigen::Map<Eigen::Matrix<float, Eigen::Dynamic, Eigen::Dynamic>>(x_data, x_nrow, x_ncol);
   
-  Eigen::Matrix<float, Eigen::Dynamic, Eigen::Dynamic> ret_matrix = x_matrix;
-  
-  ret_matrix.inverse();
+  Eigen::Matrix<float, Eigen::Dynamic, Eigen::Dynamic> ret_matrix = x_matrix.inverse();
   
   int32_t ret_length = ret_matrix.rows() * ret_matrix.cols();
   void* obj_ret_data = env->new_float_array(env, stack, ret_length);

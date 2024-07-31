@@ -41,9 +41,7 @@ TODO
 
       * Improved Markdown parser. Currently the parser is very simple.
 
-      * Other outputs. Consider a Tickit-based frontend.
-
-      Also more structured file writers - ReST.
+      * Also more structured file writers - ReST.
 
 AUTHOR
 

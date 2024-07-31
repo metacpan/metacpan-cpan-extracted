@@ -3,6 +3,12 @@
 
 class R::NDArray::Double extends R::NDArray {
   
+  use R::NDArray::Int;
+  use R::NDArray::Long;
+  use R::NDArray::Float;
+  use R::NDArray::DoubleComplex;
+  use R::NDArray::String;
+  
   # Fields
   method data : double[] () {
     

@@ -8,7 +8,7 @@ use warnings;
 
 use Object::Pad 0.807;
 
-package App::sdview::Parser::Pod 0.17;
+package App::sdview::Parser::Pod 0.18;
 class App::sdview::Parser::Pod :strict(params);
 
 inherit Pod::Simple;
@@ -43,9 +43,10 @@ It uses L<Pod::Simple> as its driving parser.
 The C<SE<lt>...E<gt>> formatting code is handled by converting inner spaces to
 non-breaking spaces (U+00A0) characters in the returned string.
 
-By default, verbatim blocks are presumed to contain Perl code, and emitted
-with the C<language>> field set to C<perl>. This can be altered by embedded
-C<=code> or C<=for highlighter> directives; see below.
+By default, verbatim blocks are scanned for likely patterns that indicate perl
+code, and emitted with the C<language>> field set to C<perl> if it looks
+plausible. This can be overridden by embedded C<=code> or C<=for highlighter>
+directives; see below.
 
 =head2 Extensions
 
@@ -60,14 +61,14 @@ Inline formatting code C<UE<lt>...E<gt>> to request underline formatting.
 
 =item *
 
-C<=code> directive to set the highlighter language name of any following
-verbatim paragraphs.
+C<=code> directive to set the highlighter language name for the next verbatim
+paragraph.
 
 =item *
 
 Also follows the C<=for highlighter ...> spec used by
 L<https://metacpan.org/pod/Pod::Simple::XHTML::WithHighlightConfig> for
-setting the language name
+setting the language name for following verbatim paragraphs.
 
 =back
 
@@ -102,7 +103,8 @@ field @_parastack;
 field %_curtags;
 field $_curpara;
 
-field %_verbatim_options = ( language => "perl" );
+field %_verbatim_options = ( language => "__AUTO__" );
+field %_next_verbatim_options;
 
 field $_conv_nbsp;
 
@@ -152,15 +154,17 @@ method _handle_element_start ( $type, $attrs )
    }
    elsif( $type eq "code" or
          ( $type eq "for" and $attrs->{target} eq "highlighter" ) ) {
+      my $options = ( $type eq "for" ) ? \%_verbatim_options : \%_next_verbatim_options;
+
       $_redirect_text = method ( $text ) {
          my @args = split m/\s+/, $text;
          $args[0] = "language=$args[0]" if @args and $args[0] !~ m/=/;
 
-         %_verbatim_options = ();
+         %$options = ();
 
          foreach ( @args ) {
             my ( $key, $val ) = m/^(.*?)=(.*)$/ or next;
-            $_verbatim_options{$key} = $val;
+            $options->{$key} = $val;
          }
       };
    }
@@ -175,9 +179,10 @@ method _handle_element_start ( $type, $attrs )
       push $_parastack[-1]->@*, $_curpara = $class->new(
          text   => String::Tagged->new,
          indent => $_indentstack[-1],
-         ( $type eq "Verbatim" ) ? ( %_verbatim_options ) : (),
+         ( $type eq "Verbatim" ) ? ( %_verbatim_options, %_next_verbatim_options ) : (),
       );
       %_curtags = ();
+      %_next_verbatim_options = ();
    }
    elsif( $type eq "L" ) {
       my $uri = $attrs->{to};
@@ -241,7 +246,7 @@ method _handle_element_end ( $type, @ )
    }
    elsif( $PARA_TYPES{$type} ) {
       $type eq "Verbatim" and
-         $_parastack[-1][-1] = $self->trim_leading_whitespace( $_parastack[-1][-1] );
+         $_parastack[-1][-1] = $self->finalise_verbatim( $_parastack[-1][-1] );
    }
    elsif( my $tag = $FORMAT_TYPES{$type} ) {
       delete $_curtags{$tag};
@@ -278,7 +283,7 @@ method _handle_text ( $text )
    $_curpara->append_text( $text, %_curtags );
 }
 
-method trim_leading_whitespace ( $para )
+method finalise_verbatim ( $para )
 {
    my @lines = $para->text->split( qr/\n/ );
 
@@ -289,9 +294,23 @@ method trim_leading_whitespace ( $para )
    my $text = shift @lines;
    $text .= "\n" . $_ for @lines;
 
+   my $language = $para->language;
+   if( ( $language // "" ) eq "__AUTO__" ) {
+      # Try to detect the language. It doesn't have to be perfect, just a good
+      # guess is enough.
+      undef $language;
+
+      if( $text =~ m/^use [A-Za-z_]|^package [A-Za-z_]/ ) {
+         $language = "perl";
+      }
+      elsif( $text =~ m/^(my )?[\$\@%][A-Za-z_]/m ) {
+         $language = "perl";
+      }
+   }
+
    return (ref $para)->new(
       text     => $text,
-      language => $para->language,
+      language => $language,
    );
 }
 

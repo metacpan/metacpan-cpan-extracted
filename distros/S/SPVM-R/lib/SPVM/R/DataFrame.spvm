@@ -225,7 +225,7 @@ class R::DataFrame {
       
       my $ret_ndarray = $ndarray->clone($shallow);
       
-      $ret_data_frame->insert_col($colname, $ndarray);
+      $ret_data_frame->insert_col($colname, $ret_ndarray);
     }
     
     return $ret_data_frame;

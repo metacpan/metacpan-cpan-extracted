@@ -1,5 +1,5 @@
 package Lab::Moose::Instrument::Bluefors_Temp;
-$Lab::Moose::Instrument::Bluefors_Temp::VERSION = '3.901';
+$Lab::Moose::Instrument::Bluefors_Temp::VERSION = '3.902';
 #ABSTRACT: Bluefors temperature control
 
 use v5.20;
@@ -310,7 +310,7 @@ Lab::Moose::Instrument::Bluefors_Temp - Bluefors temperature control
 
 =head1 VERSION
 
-version 3.901
+version 3.902
 
 =head1 SYNOPSIS
 
@@ -425,7 +425,7 @@ Use the set_heater function for all other use cases.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2023 by the Lab::Measurement team; in detail:
+This software is copyright (c) 2024 by the Lab::Measurement team; in detail:
 
   Copyright 2023       Andreas K. Huettel, Mia Schambeck
 

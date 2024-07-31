@@ -1,5 +1,5 @@
 package Lab::Moose::Connection::Socket;
-$Lab::Moose::Connection::Socket::VERSION = '3.901';
+$Lab::Moose::Connection::Socket::VERSION = '3.902';
 #ABSTRACT: Transfer IEEE 488.2 / SCPI messages over TCP
 
 use v5.20;
@@ -167,7 +167,7 @@ Lab::Moose::Connection::Socket - Transfer IEEE 488.2 / SCPI messages over TCP
 
 =head1 VERSION
 
-version 3.901
+version 3.902
 
 =head1 SYNOPSIS
 
@@ -228,7 +228,7 @@ Append this to each write command. Default: C<"\n">.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2023 by the Lab::Measurement team; in detail:
+This software is copyright (c) 2024 by the Lab::Measurement team; in detail:
 
   Copyright 2017       Andreas K. Huettel, Simon Reinhardt
             2021       Andreas K. Huettel, Simon Reinhardt

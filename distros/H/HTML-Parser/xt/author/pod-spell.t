@@ -46,7 +46,9 @@ Jon
 Josef
 Knop
 LinkExtor
+Lukas
 MSIE
+Mai
 Michael
 Michal
 Mike
@@ -96,6 +98,7 @@ jacquesg
 jon
 jraspass
 lib
+lukasmai
 mchase
 msouth
 mspacek

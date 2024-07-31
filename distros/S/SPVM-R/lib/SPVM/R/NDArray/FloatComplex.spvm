@@ -37,7 +37,7 @@ class R::NDArray::FloatComplex extends R::NDArray {
     
     my $elem = $data->[$data_index];
     
-    my $string = (string)(float)$elem->{re} . " + " . (string)(float)$elem->{im};
+    my $string = &float_complex_to_string($elem);
     
     return $string;
   }
@@ -77,6 +77,24 @@ class R::NDArray::FloatComplex extends R::NDArray {
   
   method clone : R::NDArray::FloatComplex ($shallow : int = 0) {
     return (R::NDArray::FloatComplex)$self->SUPER::clone($shallow);
+  }
+  
+  private static method float_complex_to_string : string ($z : Complex_2f) {
+    
+    my $re = $z->{re};
+    
+    my $im = $z->{im};
+    
+    my $string = (string)undef;
+    
+    if ($im < 0) {
+      $string = "$re${im}i";
+    }
+    else {
+      $string = "$re+${im}i";
+    }
+    
+    return $string;
   }
   
 }

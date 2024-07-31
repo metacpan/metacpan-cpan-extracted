@@ -1,5 +1,14 @@
 Revision history for Mozilla-CA
 
+20240730
+  - Update from Mozilla repository to 2024-07-30
+  - Added certificates:
+    - FIRMAPROFESIONAL CA ROOT-A WEB
+      sha256: bef256daf26e9c69bdec1602359798f3caf71821a03e018257c53c65617f3d4a
+  - Removed certificates:
+    - GLOBALTRUST 2020
+      sha256: 9a296a5182d1d451a2e37f439b74daafa267523329f90f9a0d2007c334e23c9a
+
 20240313
   - Update from Mozilla repository to 2024-03-13
   - Added certificates:

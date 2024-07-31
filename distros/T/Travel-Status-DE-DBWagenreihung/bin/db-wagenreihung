@@ -4,7 +4,7 @@ use warnings;
 use 5.020;
 use utf8;
 
-our $VERSION = '0.14';
+our $VERSION = '0.15';
 
 use Getopt::Long;
 use List::Util qw(min);
@@ -65,54 +65,56 @@ if ( @trains != 1 ) {
 }
 
 my $wr = Travel::Status::DE::DBWagenreihung->new(
-	departure      => $trains[0]->sched_departure || $trains[0]->sched_arrival,
 	developer_mode => $developer_mode,
+	departure      => $trains[0]->sched_departure || $trains[0]->sched_arrival,
+	eva            => $trains[0]->station_eva,
+	train_type     => $trains[0]->type,
 	train_number   => $train_number,
 );
 
+if ( $wr->errstr ) {
+	say STDERR $wr->errstr;
+	exit 2;
+}
+
 printf(
-	"%s: %s → %s\n",
-	join( ' / ', map { $wr->train_type . ' ' . $_ } $wr->train_numbers ),
+	"%s → %s\n",
 	join(
-		' / ',
-		map {
-			sprintf( '%s (%s)', $_->{name}, join( q{}, @{ $_->{sections} } ) )
-		} $wr->origins
+		' / ', map { $wr->train_type . ' ' . $_->{name} } $wr->train_numbers
 	),
 	join(
 		' / ',
 		map {
-			sprintf( '%s (%s)', $_->{name}, join( q{}, @{ $_->{sections} } ) )
+			sprintf( '%s (%s)', $_->{name}, join( q{}, @{ $_->{sectors} } ) )
 		} $wr->destinations
 	),
 );
 
-printf( "%s Gleis %s\n\n", $wr->station->{name}, $wr->platform );
+printf( "Gleis %s\n\n", $wr->platform );
 
-for my $section ( $wr->sections ) {
-	my $section_length = $section->length_percent;
-	my $spacing_left   = int( ( $section_length - 2 ) / 2 ) - 1;
-	my $spacing_right  = int( ( $section_length - 2 ) / 2 );
+for my $sector ( $wr->sectors ) {
+	my $sector_length = $sector->length_percent;
+	my $spacing_left  = int( ( $sector_length - 2 ) / 2 ) - 1;
+	my $spacing_right = int( ( $sector_length - 2 ) / 2 );
 
-	if ( $section_length % 2 ) {
+	if ( $sector_length % 2 ) {
 		$spacing_left++;
 	}
 
 	printf( "▏%s%s%s▕",
-		( $spacing_left >= 0 )                  ? ' ' x $spacing_left  : q{},
-		$section->name, ( $spacing_right >= 0 ) ? ' ' x $spacing_right : q{} );
+		( $spacing_left >= 0 )                 ? ' ' x $spacing_left  : q{},
+		$sector->name, ( $spacing_right >= 0 ) ? ' ' x $spacing_right : q{} );
 }
 print "\n";
 
-my @start_percentages = map { $_->{position}{start_percent} } $wr->wagons;
+my @start_percentages = map { $_->start_percent } $wr->carriages;
 if ( my $min_percentage = min @start_percentages ) {
 	print ' ' x ( $min_percentage - 1 );
 }
 print $wr->direction == 100 ? '>' : '<';
 
-for my $wagon ( $wr->wagons ) {
-	my $wagon_length
-	  = $wagon->{position}->{end_percent} - $wagon->{position}->{start_percent};
+for my $wagon ( $wr->carriages ) {
+	my $wagon_length  = $wagon->length_percent;
 	my $spacing_left  = int( $wagon_length / 2 ) - 2;
 	my $spacing_right = int( $wagon_length / 2 ) - 1;
 
@@ -149,21 +151,18 @@ print $wr->direction == 100 ? '>' : '<';
 print "\n\n";
 
 for my $group ( $wr->groups ) {
-	if ( $group->has_sections ) {
+	if ( $group->has_sectors ) {
 		printf( "%s (%s)\n",
 			$group->description || 'Zug',
-			join( q{}, $group->sections ) );
+			join( q{}, $group->sectors ) );
 	}
 	else {
 		say $group->description || 'Zug';
 	}
-	printf(
-		"%s %s  %s → %s\n\n",
-		$wr->train_type, $group->train_no,
-		$group->origin,  $group->destination
-	);
+	printf( "%s %s  → %s\n\n",
+		$wr->train_type, $group->train_no, $group->destination );
 
-	for my $wagon ( $group->wagons ) {
+	for my $wagon ( $group->carriages ) {
 		printf(
 			"%3s: %3s %10s  %s\n",
 			$wagon->is_closed       ? 'X'
@@ -189,7 +188,7 @@ B<db-wagenreihung> I<station> I<train-number>
 
 =head1 VERSION
 
-version 0.14
+version 0.15
 
 This is beta software: API and output format may change without notice.
 

@@ -1,5 +1,5 @@
 package Lab::Moose::Instrument::SCPI::Sense::Function::Concurrent;
-$Lab::Moose::Instrument::SCPI::Sense::Function::Concurrent::VERSION = '3.901';
+$Lab::Moose::Instrument::SCPI::Sense::Function::Concurrent::VERSION = '3.902';
 #ABSTRACT: Role for the SCPI SENSe:FUNCtion subsystem with support for concurrent sense
 
 use v5.20;
@@ -123,7 +123,7 @@ Lab::Moose::Instrument::SCPI::Sense::Function::Concurrent - Role for the SCPI SE
 
 =head1 VERSION
 
-version 3.901
+version 3.902
 
 =head1 DESCRIPTION
 
@@ -183,7 +183,7 @@ Query/set list of parameters which should not be measured.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2023 by the Lab::Measurement team; in detail:
+This software is copyright (c) 2024 by the Lab::Measurement team; in detail:
 
   Copyright 2018       Simon Reinhardt
 

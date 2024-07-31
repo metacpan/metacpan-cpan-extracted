@@ -1,3 +1,11 @@
+0.013   2024-07-17  Released-By: PERLANCAR; Urgency: low
+
+        - No data changes.
+
+        - [dist] Edit Changes (replace Backward-Compatible: no with
+          Backward-Incompatible: yes).
+
+
 0.012   2022-06-07  Released-By: PERLANCAR; Urgency: medium
 
         - [ux] Add command-line aliases --boy, --girl, --male, --female,
@@ -53,7 +61,7 @@
 	- [doc] Mention WHO::GrowthReference::GenChart.
 
 
-0.005   2021-01-08  Released-By: PERLANCAR; Urgency: medium; Backward-Compatible: no
+0.005   2021-01-08  Released-By: PERLANCAR; Urgency: medium; Backward-Incompatible: yes
 
         [Incompatible Changes]
 

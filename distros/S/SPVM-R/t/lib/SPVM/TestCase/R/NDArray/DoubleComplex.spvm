@@ -92,13 +92,137 @@ class TestCase::R::NDArray::DoubleComplex {
     return 1;
   }
   
-  static method elem_to_string : int () { return 1; }
+  static method elem_to_string : int () {
+    
+    {
+      my $ndarray = R::NDArray::DoubleComplex->new;
+      
+      my $data = [Math->complex(1f, -1f), Math->complex(2f, -2f)];
+      
+      my $data_index = 1;
+      
+      my $string = $ndarray->elem_to_string($data, $data_index);
+      
+      unless ($string eq &double_complex_to_string($data->[$data_index])) {
+        return 0;
+      }
+    }
+    
+    {
+      my $ndarray = R::NDArray::DoubleComplex->new;
+      
+      my $data = [Math->complex(1f, -1f), Math->complex(2f, -2f)];
+      
+      my $data_index = 1;
+      
+      my $string = $ndarray->elem_to_string($data, $data_index);
+      
+      unless ($string eq "2-2i") {
+        return 0;
+      }
+    }
+    
+    {
+      my $ndarray = R::NDArray::DoubleComplex->new;
+      
+      my $data = [Math->complex(1f, -1f), Math->complex(2f, 2f)];
+      
+      my $data_index = 1;
+      
+      my $string = $ndarray->elem_to_string($data, $data_index);
+      
+      unless ($string eq &double_complex_to_string($data->[$data_index])) {
+        return 0;
+      }
+    }
+    
+    {
+      my $ndarray = R::NDArray::DoubleComplex->new;
+      
+      my $data = [Math->complex(1f, -1f), Math->complex(2f, 2f)];
+      
+      my $data_index = 1;
+      
+      my $string = $ndarray->elem_to_string($data, $data_index);
+      
+      unless ($string eq "2+2i") {
+        return 0;
+      }
+    }
+    
+    return 1;
+  }
   
-  static method elem_assign : int () { return 1; }
+  static method elem_assign : int () {
+    
+    my $ndarray = R::NDArray::DoubleComplex->new;
+    
+    my $dist_data = [Math->complex(0f, 0f), Math->complex(0f, 0f)];
+    
+    my $dist_data_index = 1;
+    
+    my $src_data = [Math->complex(1f, -1f), Math->complex(2f, -2f)];
+    
+    my $src_data_index = 1;
+    
+    $ndarray->elem_assign($dist_data, $dist_data_index, $src_data, $src_data_index);
+    
+    unless ($dist_data->[$dist_data_index]{re} == $src_data->[$src_data_index]{re}) {
+      return 0;
+    }
+    
+    unless ($dist_data->[$dist_data_index]{im} == $src_data->[$src_data_index]{im}) {
+      return 0;
+    }
+    
+    return 1;
+  }
   
-  static method elem_clone : int () { return 1; }
+  static method elem_clone : int () {
+    
+    my $ndarray = R::NDArray::DoubleComplex->new;
+    
+    my $dist_data = [Math->complex(0f, 0f), Math->complex(0, 0f)];
+    
+    my $dist_data_index = 1;
+    
+    my $src_data = [Math->complex(1f, -1f), Math->complex(2f, -2f)];
+    
+    my $src_data_index = 1;
+    
+    $ndarray->elem_clone($dist_data, $dist_data_index, $src_data, $src_data_index);
+    
+    unless ($dist_data->[$dist_data_index]{re} == $src_data->[$src_data_index]{re}) {
+      return 0;
+    }
+    
+    unless ($dist_data->[$dist_data_index]{im} == $src_data->[$src_data_index]{im}) {
+      return 0;
+    }
+    
+    return 1;
+  }
   
-  static method elem_cmp : int () { return 1; }
+  static method elem_cmp : int () {
+    
+    my $ndarray = R::NDArray::DoubleComplex->new;
+    
+    my $data = [Math->complex(1f, -1f), Math->complex(2f, -2f)];
+    
+    my $a_data_index = 0;
+    
+    my $b_data_index = 1;
+    
+    eval { $ndarray->elem_cmp($data, $a_data_index, $b_data_index); }
+    
+    unless ($@) {
+      return 0;
+    }
+    
+    $@ = undef;
+    
+    return 1;
+  }
   
   static method clone : int () {
     
@@ -279,4 +403,22 @@ class TestCase::R::NDArray::DoubleComplex {
     return $equals;
   }
 
+  private static method double_complex_to_string : string ($z : Complex_2d) {
+    
+    my $re = $z->{re};
+    
+    my $im = $z->{im};
+    
+    my $string = (string)undef;
+    
+    if ($im < 0) {
+      $string = "$re${im}i";
+    }
+    else {
+      $string = "$re+${im}i";
+    }
+    
+    return $string;
+  }
+  
 }

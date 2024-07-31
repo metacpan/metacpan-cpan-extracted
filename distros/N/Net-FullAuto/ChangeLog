@@ -22,6 +22,12 @@
 
 2024-07-29  Brian M. Kelly <Brian.Kelly@fullauto.com>
 
+        * Version 1.0000680 released
+
+        * Fixed parsing in sub display()
+
+2024-07-29  Brian M. Kelly <Brian.Kelly@fullauto.com>
+
         * Version 1.0000679 released
 
         * Fixed parsing of stdout and stderr

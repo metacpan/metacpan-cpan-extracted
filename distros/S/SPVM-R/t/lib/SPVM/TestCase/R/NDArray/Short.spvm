@@ -92,13 +92,83 @@ class TestCase::R::NDArray::Short {
     return 1;
   }
   
-  static method elem_to_string : int () { return 1; }
+  static method elem_to_string : int () {
+    
+    my $ndarray = R::NDArray::Short->new;
+    
+    my $data = [(short)1, 2];
+    
+    my $data_index = 1;
+    
+    my $string = $ndarray->elem_to_string($data, $data_index);
+    
+    unless ($string eq (string)$data->[$data_index]) {
+      return 0;
+    }
+    
+    return 1;
+  }
   
-  static method elem_assign : int () { return 1; }
+  static method elem_assign : int () {
+    
+    my $ndarray = R::NDArray::Short->new;
+    
+    my $dist_data = [(short)0, 0];
+    
+    my $dist_data_index = 1;
+    
+    my $src_data = [(short)1, 2];
+    
+    my $src_data_index = 1;
+    
+    $ndarray->elem_assign($dist_data, $dist_data_index, $src_data, $src_data_index);
+    
+    unless ($dist_data->[$dist_data_index] == $src_data->[$src_data_index]) {
+      return 0;
+    }
+    
+    return 1;
+  }
   
-  static method elem_clone : int () { return 1; }
+  static method elem_clone : int () {
+    
+    my $ndarray = R::NDArray::Short->new;
+    
+    my $dist_data = [(short)0, 0];
+    
+    my $dist_data_index = 1;
+    
+    my $src_data = [(short)1, 2];
+    
+    my $src_data_index = 1;
+    
+    $ndarray->elem_clone($dist_data, $dist_data_index, $src_data, $src_data_index);
+    
+    unless ($dist_data->[$dist_data_index] == $src_data->[$src_data_index]) {
+      return 0;
+    }
+    
+    return 1;
+  }
   
-  static method elem_cmp : int () { return 1; }
+  static method elem_cmp : int () {
+    
+    my $ndarray = R::NDArray::Short->new;
+    
+    my $data = [(short)1, 2];
+    
+    my $a_data_index = 0;
+    
+    my $b_data_index = 1;
+    
+    my $ret_cmp = $ndarray->elem_cmp($data, $a_data_index, $b_data_index);
+    
+    unless ($ret_cmp == ($data->[$a_data_index] <=> $data->[$b_data_index])) {
+      return 0;
+    }
+    
+    return 1;
+  }
   
   static method clone : int () {
     

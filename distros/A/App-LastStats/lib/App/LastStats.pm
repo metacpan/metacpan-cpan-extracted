@@ -4,14 +4,13 @@ class App::LastStats {
 
   use strict;
   use warnings;
-  no warnings 'experimental::class';
   use feature 'say';
 
   use Net::LastFM;
   use Getopt::Long;
   use JSON;
 
-  our $VERSION = '0.0.2';
+  our $VERSION = '0.0.3';
 
   field $username :param = 'davorg';
   field $period   :param = '7day';

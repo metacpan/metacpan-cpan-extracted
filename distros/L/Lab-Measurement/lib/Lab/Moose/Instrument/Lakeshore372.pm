@@ -1,5 +1,5 @@
 package Lab::Moose::Instrument::Lakeshore372;
-$Lab::Moose::Instrument::Lakeshore372::VERSION = '3.901';
+$Lab::Moose::Instrument::Lakeshore372::VERSION = '3.902';
 #ABSTRACT: Lakeshore Model 372 Temperature Controller
 
 #
@@ -689,7 +689,7 @@ Lab::Moose::Instrument::Lakeshore372 - Lakeshore Model 372 Temperature Controlle
 
 =head1 VERSION
 
-version 3.901
+version 3.902
 
 =head1 SYNOPSIS
 
@@ -1010,7 +1010,7 @@ This driver consumes the following roles:
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2023 by the Lab::Measurement team; in detail:
+This software is copyright (c) 2024 by the Lab::Measurement team; in detail:
 
   Copyright 2018       Simon Reinhardt
             2020       Andreas K. Huettel, Simon Reinhardt

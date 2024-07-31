@@ -1,5 +1,5 @@
 package Lab::Moose::Instrument::OI_ILM210;
-$Lab::Moose::Instrument::OI_ILM210::VERSION = '3.901';
+$Lab::Moose::Instrument::OI_ILM210::VERSION = '3.902';
 #ABSTRACT: Oxford Instruments ILM Intelligent Helium Level Meter
 
 use v5.20;
@@ -58,7 +58,7 @@ Lab::Moose::Instrument::OI_ILM210 - Oxford Instruments ILM Intelligent Helium Le
 
 =head1 VERSION
 
-version 3.901
+version 3.902
 
 =head1 DESCRIPTION
 
@@ -66,7 +66,7 @@ Driver for the Oxford Instruments ILM210 Intelligent Level Meter.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2023 by the Lab::Measurement team; in detail:
+This software is copyright (c) 2024 by the Lab::Measurement team; in detail:
 
   Copyright 2021       Andreas K. Huettel, Fabian Weinelt, Simon Reinhardt
 

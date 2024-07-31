@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-use Test::More tests => 15;
+use Test::More tests => 29;
 use Test::Tk;
 use Tk;
 
@@ -16,6 +16,7 @@ if (defined $app) {
 		-tabs => '7m',
 		-font => 'Monospace 12',
 		-modifiedcall => sub { my $index = shift; print "index $index\n"; },
+#		-readonly => 1,
 		-syntax => 'XML',
 	)->pack(
 		-expand => 1,
@@ -34,7 +35,20 @@ if (defined $app) {
 		-command => ['load', $text, 't/ref_file.pl'], 
 	)->pack(-side => 'left');
 
-	$app->configure(-menu => $app->Menu(
+	$text->Subwidget('Statusbar')->Button(
+		-text=> 'Bm new',
+		-relief => 'flat',
+		-command => ['bookmarkNew', $text], 
+	)->pack(-side => 'left');
+
+	$text->Subwidget('Statusbar')->Button(
+		-text=> 'Bm clear',
+		-relief => 'flat',
+		-command => ['bookmarkRemove', $text], 
+	)->pack(-side => 'left');
+
+	my $menu;
+	$menu = $app->Menu(
 		-menuitems => [
 			[ cascade => '~File',
 				-menuitems => [
@@ -57,8 +71,13 @@ if (defined $app) {
 			[ cascade => '~View',
 				-menuitems => [ $text->ViewMenuItems ],
 			],
+			[ cascade => '~Bookmarks',
+				-postcommand => sub { $text->bookmarkMenuPop($menu, 'Bookmarks') },
+				-menuitems => [ $text->bookmarkMenuItems ],
+			],
 		],
-	));
+	);
+	$app->configure(-menu => $menu);
 	$app->geometry('800x600+200+200');
 }
 
@@ -84,6 +103,69 @@ push @tests, (
 		$text->configure(-syntax => 'Perl');
 		return $text->syntax 
 	}, 'Perl', 'Syntax set to Perl' ],
+	[ sub { 
+		$text->load('Makefile.PL');
+		pause(100);
+		$text->bookmarkNew(12);
+		return $text->bookmarked(12);
+	}, 1, 'Line 12 of Makefile.PL bookmarked' ],
+	[ sub { 
+		$text->goTo('16.0');
+		$text->bookmarkNew();
+		return $text->bookmarked(16);
+	}, 1, 'Line 16 of Makefile.PL bookmarked' ],
+	[ sub {
+		my @list = $text->bookmarkList;
+		return \@list
+	}, [ 12, 16 ], 'Bookmark list' ],
+	[ sub { 
+		$text->bookmarkRemove(12);
+		return $text->bookmarked(12);
+	}, '', 'Bookmark line 12 of Makefile.PL removed' ],
+	[ sub {
+		my @list = $text->bookmarkList;
+		return \@list
+	}, [ 16] , 'Bookmark list2' ],
+	[ sub {
+		for (10, 22, 28) {
+			$text->bookmarkNew($_);
+		}
+		$text->goTo('1.0');
+		$text->bookmarkNext;
+		return $text->linenumber('insert');
+	}, 10, 'Bookmark Next 10' ],
+	[ sub {
+		$text->bookmarkNext;
+		return $text->linenumber('insert');
+	}, 16, 'Bookmark Next 16' ],
+	[ sub {
+		$text->bookmarkNext;
+		return $text->linenumber('insert');
+	}, 22, 'Bookmark Next 22' ],
+	[ sub {
+		$text->bookmarkNext;
+		return $text->linenumber('insert');
+	}, 28, 'Bookmark Next 28' ],
+	[ sub {
+		$text->bookmarkNext;
+		return $text->linenumber('insert');
+	}, 28, 'Bookmark Last 28' ],
+	[ sub {
+		$text->bookmarkPrev;
+		return $text->linenumber('insert');
+	}, 22, 'Bookmark Previous 22' ],
+	[ sub {
+		$text->bookmarkPrev;
+		return $text->linenumber('insert');
+	}, 16, 'Bookmark Previous 16' ],
+	[ sub {
+		$text->bookmarkPrev;
+		return $text->linenumber('insert');
+	}, 10, 'Bookmark Previous 10' ],
+	[ sub {
+		$text->bookmarkPrev;
+		return $text->linenumber('insert');
+	}, 10, 'Bookmark First 10' ],
 );
 
 

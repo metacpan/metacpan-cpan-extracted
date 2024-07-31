@@ -1,0 +1,25 @@
+bin/cvss
+Changes
+INSTALL.md
+lib/App/CVSS.pm
+lib/CVSS.pm
+lib/CVSS/Base.pm
+lib/CVSS/Constants.pm
+lib/CVSS/v2.pm
+lib/CVSS/v3.pm
+lib/CVSS/v4.pm
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+t/00-load.t
+t/10-cvss2.t
+t/10-cvss3.t
+t/10-cvss4.t
+t/11-builder.t
+t/kwalitee.t
+t/manifest.t
+t/pod-coverage.t
+t/pod.t
+
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

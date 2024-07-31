@@ -1,5 +1,5 @@
 package Lab::Moose::Instrument::SCPI::Unit;
-$Lab::Moose::Instrument::SCPI::Unit::VERSION = '3.901';
+$Lab::Moose::Instrument::SCPI::Unit::VERSION = '3.902';
 #ABSTRACT: Role for SCPI UNIT subsystem.
 
 use v5.20;
@@ -43,7 +43,7 @@ Lab::Moose::Instrument::SCPI::Unit - Role for SCPI UNIT subsystem.
 
 =head1 VERSION
 
-version 3.901
+version 3.902
 
 =head1 METHODS
 
@@ -56,7 +56,7 @@ Set/Get amplitude units for the input, output and display.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2023 by the Lab::Measurement team; in detail:
+This software is copyright (c) 2024 by the Lab::Measurement team; in detail:
 
   Copyright 2018       Eugeniy E. Mikhailov
 

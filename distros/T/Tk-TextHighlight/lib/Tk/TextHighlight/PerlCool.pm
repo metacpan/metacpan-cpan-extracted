@@ -7,9 +7,10 @@ $VERSION = '0.4';
 BEGIN
 {
 	my $havePerlImproved = 0;
-	eval 'use base "Syntax::Highlight::Perl::Improved"; $havePerlImproved = 1; 1';
+	eval 'use base "Syntax::Highlight::Perl::ImprovedMore"; $havePerlImproved = 1; 1';
 	unless ($havePerlImproved) {
-		eval 'use base "Syntax::Highlight::Perl"; 1';
+		eval 'use base "Syntax::Highlight::Perl::Improved"; $havePerlImproved = 1; 1';
+		eval 'use base "Syntax::Highlight::Perl"; 1'  unless ($havePerlImproved);
 	}
 }
 
@@ -219,7 +220,7 @@ in Tk::TextHighlight.
 
 Original CodeText Author:  Hans Jeuken (haje@toneel.demon.nl)
 
-TextHighlight Author:  Jim Turner (turnerjw784@mesh.net)
+PerlCool and TextHighlight Author:  Jim Turner (turnerjw784@mesh.net)
 
 =cut
 
@@ -228,9 +229,4 @@ TextHighlight Author:  Jim Turner (turnerjw784@mesh.net)
 Propably plenty
 
 =cut
-
-
-
-
-
 

@@ -102,13 +102,87 @@ class TestCase::R::NDArray::StringBuffer {
     return 1;
   }
   
-  static method elem_to_string : int () { return 1; }
+  static method elem_to_string : int () {
+    
+    my $ndarray = R::NDArray::StringBuffer->new;
+    
+    my $data = BUFOP->c([(string)1, 2])->data;
+    
+    my $data_index = 1;
+    
+    my $string = $ndarray->elem_to_string($data, $data_index);
+    
+    unless ($string eq (string)$data->[$data_index]->to_string) {
+      return 0;
+    }
+    
+    return 1;
+  }
   
-  static method elem_assign : int () { return 1; }
+  static method elem_assign : int () {
+    
+    my $ndarray = R::NDArray::StringBuffer->new;
+    
+    my $dist_data = BUFOP->c([(string)undef, undef])->data;
+    
+    my $dist_data_index = 1;
+    
+    my $src_data = BUFOP->c([(string)1, 2])->data;
+    
+    my $src_data_index = 1;
+    
+    $ndarray->elem_assign($dist_data, $dist_data_index, $src_data, $src_data_index);
+    
+    unless ($dist_data->[$dist_data_index] == $src_data->[$src_data_index]) {
+      return 0;
+    }
+    
+    return 1;
+  }
   
-  static method elem_clone : int () { return 1; }
+  static method elem_clone : int () {
+    
+    my $ndarray = R::NDArray::StringBuffer->new;
+    
+    my $dist_data = BUFOP->c([(string)undef, undef])->data;
+    
+    my $dist_data_index = 1;
+    
+    my $src_data = BUFOP->c([(string)1, 2])->data;
+    
+    my $src_data_index = 1;
+    
+    $ndarray->elem_clone($dist_data, $dist_data_index, $src_data, $src_data_index);
+    
+    if ($dist_data->[$dist_data_index] == $src_data->[$src_data_index]) {
+      return 0;
+    }
+    
+    unless ($dist_data->[$dist_data_index]->to_string eq $src_data->[$src_data_index]->to_string) {
+      return 0;
+    }
+    
+    return 1;
+  }
   
-  static method elem_cmp : int () { return 1; }
+  static method elem_cmp : int () {
+    
+    my $ndarray = R::NDArray::StringBuffer->new;
+    
+    my $data = BUFOP->c([(string)1, 2])->data;
+    
+    my $a_data_index = 0;
+    
+    my $b_data_index = 1;
+    
+    my $ret_cmp = $ndarray->elem_cmp($data, $a_data_index, $b_data_index);
+    
+    unless ($ret_cmp == ($data->[$a_data_index]->to_string cmp $data->[$b_data_index]->to_string)) {
+      return 0;
+    }
+    
+    return 1;
+  }
   
   static method clone : int () {
     

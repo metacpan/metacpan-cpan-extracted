@@ -9,7 +9,7 @@ use utf8;
 
 use Object::Pad 0.800;
 
-package App::sdview 0.17;
+package App::sdview 0.18;
 class App::sdview :strict(params);
 
 use App::sdview::Style;
@@ -115,15 +115,23 @@ method run ( $file, %opts )
 
    my @paragraphs = $parser_class->new->parse_file( $file );
 
-   foreach my $para ( @paragraphs ) {
-      if( $opts{highlight} and
-            $para->type eq "verbatim" and defined( my $language = $para->language ) ) {
-         App::sdview::Highlighter->highlight_str( $para->text, $language );
-      }
+   if( $opts{highlight} ) {
+      apply_highlights( $_ ) for @paragraphs;
    }
 
    # TODO: unrecognised output option key names will not look very neat here
    $output_class->new( %output_options )->output( @paragraphs );
+}
+
+sub apply_highlights ( $para )
+{
+   if( $para->type eq "verbatim" and defined( my $language = $para->language ) ) {
+      App::sdview::Highlighter->highlight_str( $para->text, $language );
+   }
+
+   if( $para->type =~ m/^list-/ ) {
+      apply_highlights( $_ ) for $para->items;
+   }
 }
 
 =head1 TODO
@@ -139,8 +147,6 @@ Add more formats. ReST perhaps. Maybe others too.
 Improved Markdown parser. Currently the parser is very simple.
 
 =item *
-
-Other outputs. Consider a L<Tickit>-based frontend.
 
 Also more structured file writers - ReST.
 

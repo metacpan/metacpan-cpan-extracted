@@ -3,8 +3,6 @@
 Tk::TextHighlight - a Tk::TextUndo/Tk::Text::SuperText widget with syntax 
 highlighting capabilities, can also use Kate languages.
 
-Tk::ROTextHighlight - a Read-only version of this widget.
-
 =head1 SYNOPSIS
 
 =over 4
@@ -42,7 +40,7 @@ jumping between braces (but skipping ones in comments), language-specific text
 color-highlighting, and a "readonly" option for simply viewing text one 
 doesn't want changed.  Besides syntax highlighting, methods and bindings are 
 provided for commenting and uncommenting as well as reindenting and unindenting 
-a selected area, automatic intelligent indenting of new lines.  
+a selected area, and automatic intelligent indenting of new lines.  
 
 Setting the I<-readonly> flag or creating a symlink to the TextHighlight.pm 
 source file and naming it ROTextHighlight.pm, then "using" it 
@@ -257,7 +255,7 @@ If set to a true value, causes the TextHighlight widget to be "readonly"
 (content not changeable by the user).  If false, the widget content is 
 editable.  The default is 0 (false), unless a copy of or symlink to the 
 TextHighlight.pm module file named I<"ROTextHighlight.pm">, and the module is 
-"used" as B<"Tk::Text::ROTextHighlight">, in which case the value is fixed 
+"used" as B<"Tk::ROTextHighlight">, in which case the value is fixed 
 as 1 (I<true>), regardless of this setting, and can not be changed to false.
 
 Default:  B<false> (if "use TextHighlight"), B<true> (if "use ROTextHighlight").
@@ -332,7 +330,7 @@ Alternatively it is possible to specify a reference to your independent plugin.
 =item Switch: B<-syntaxcomments>
 
 Boolean, when set to I<true>, the I<-commentchar> will be set (overridden) 
-to the comment string for the specific language (<I-syntax>) for certain 
+to the comment string for the specific language (I<-syntax>) for certain 
 supported languages (C, C++, CSS, HTML, Modula-II, Pascal, Perl, and XML).
 
 Default:  B<false> (use the preset string in B<-commentchar>.
@@ -348,7 +346,7 @@ cursor has moved or text has been modified, so your application can keep
 track of position etc. Don't make this callback to heavy, the widget will 
 get sluggish quickly!
 
-Default:  none (B<sub {}>
+Default:  none (B<sub {}>)
 
 =back
 
@@ -356,12 +354,12 @@ Default:  none (B<sub {}>
 
 =over 4
 
-=item B<addKate2ViewMenu(<sections>)>
+=item B<addKate2ViewMenu(I<$sections>)>
 
 Inserts the list of B<Kate>-supported languages to the widget's Syntax.  View 
 right-mousebutton popup menu along with the basic TextHight-supported choices. 
 These choices can then be selected to change the current language-highlighting 
-used in the text in the widget.  B<sections> is a hash-ref normally returned 
+used in the text in the widget.  B<$sections> is a hash-ref normally returned 
 as the 1st item in the list returned by B<fetchKateInfo>.  NOTE:  No menu 
 items will be added if B<Kate> is not installed or if B<-noRulesMenu> or 
 B<-noSyntaxMenu> are set!
@@ -426,7 +424,7 @@ source code.  I<-smartindent> is ignored if I<-autoindent> is false.
 Default bindings:  B<Return key>:  doAutoIndent(I<true>), B<Shift-Return>:  
 doAutoIndent(I<false>)
 
-=item B<EmptyDocument()>
+=item B<EmptyDocument>
 
 Resets the widget to an empty state (ie. $w->delete('0.0', 'end'), except is 
 actionable even if the widget is readonly!
@@ -933,14 +931,14 @@ your bug as I make changes.
 
 =over 4
 
-=item Consider adding some of the Tk::TextUndo methods not currently provided 
+Consider adding some of the Tk::TextUndo methods not currently provided 
 by either this module Tk::Text, or Tk::Text::SuperText.
 
-=item Add additional language modules. I am going to need help on this one.  
+Add additional language modules. I am going to need help on this one.  
 We currently support all the original B<Tk::CodeText> languages (included) plus 
 all those supported by B<Syntax::Highlight::Engine::Kate>, if it's installed.
 
-=item The sample files in the test suite should be set up so that conformity 
+The sample files in the test suite should be set up so that conformity 
 with the language specification can actually be verified.
 
 =back
@@ -960,7 +958,7 @@ L<Syntax::Highlight::Engine::Kate>
 package Tk::TextHighlight;
 
 use vars qw($VERSION);
-$VERSION = '2.0';
+$VERSION = '2.1';
 use Tk qw(Ev);
 use strict;
 use Storable;
@@ -1219,12 +1217,13 @@ sub doAutoIndent {  #WE HANDLE AUTOINDENT NOW FOR EVERYONE!:
 	}
 
 	my $i = $cw->index('insert linestart');
+	my $begin = $cw->linenumber($i);
 	my $insertStuff = "\n";
 	my $s = $cw->get("$i", "$i lineend");
 	$cw->beginUndoBlock;
 	#if ($s =~ /\S/o)  #JWT: UNCOMMENT TO CAUSE SUBSEQUENT BLANK LINES TO NOT BE AUTOINDENTED.
 	#{
-		#$s =~ /^(\s+)/;  #CHGD. TO NEXT 20060701 JWT TO FIX "e" BEING INSERTED INTO LINE WHEN AUTOINDENT ON?!
+		#$s =~ /^(\s+)/;  #JWT:CHGD. TO NEXT 20060701 TO FIX "e" BEING INSERTED INTO LINE WHEN AUTOINDENT ON?!
 		$s =~ /^(\s*)/o;
 		if ($doAutoIndent) {
 			my $thisindent = defined($1) ? $1 : '';
@@ -1258,7 +1257,7 @@ sub doAutoIndent {  #WE HANDLE AUTOINDENT NOW FOR EVERYONE!:
 	$cw->insert('insert', $insertStuff);
 	$cw->endUndoBlock;
 	$cw->see('insert linestart');
-	$cw->highlightCheck(1, $cw->linenumber('end'));
+	$cw->highlightCheck($begin, $cw->linenumber('end'));
 }
 
 sub highlight {
@@ -1319,8 +1318,9 @@ sub highlightLine {
 	my $rl = $hlt->rules;
 	foreach my $tn (@$rl) {
 		$cw->tagRemove($tn->[0], $begin, $end);
-	}	
+	}
 	my $txt = $cw->get($begin, $end); #get the text to be highlighted
+#print "--HL:stateSet(".join('|',@$k).") line=$txt=\n";
 	my @v;
 	if ($txt) { #if the line is not empty
 		my $pos = 0;
@@ -1521,30 +1521,33 @@ sub matchCheck {
 		$cw->markSet('match', '0.0');
 		$cw->markUnset('MyMatch');
 	}
-	if ($c) {
+	if ($c && $c =~ /\S/o) {  #DON'T BOTHER IF CHAR IS EMPTY OR WHITESPACE.
 		my $v = $cw->cget('-match');
 		my $p = index($v, $c);
 		if ($p ne -1) { #a character in '-match' has been detected.
-			my $count = 0;
-			my $found = 0;
-			#ADDED NEXT 2 20240729 TO AVOID MATCHING CHARACTERS IN COMMENTS:
-			my $inTags = join('|', $cw->tagNames('insert'));
-			unless ($inTags =~ /Comment/o) {
-				if ($p % 2) {
-					my $m = substr($v, $p - 1, 1);
-					$cw->matchFind('-backwards', $c, $m, 
-						$cw->index('insert'),
-#						$cw->index('@0,0'),   #CHGD. TO NEXT 20060630 TO PERMIT ^p JUMPING TO MATCHING CHAR OUTSIDE VISIBLE AREA.
-						$cw->index('0.0'),
-					);
-				} else {
-					my $m = substr($v, $p + 1, 1);
-#					print "searching -forwards, $c, $m\n";
-					$cw->matchFind('-forwards', $c, $m,
-						$cw->index('insert + 1 chars'),
-#						$cw->index($cw->visualend . '.0 lineend'),   #CHGD. TO NEXT 20060630 TO PERMIT ^p JUMPING TO MATCHING CHAR OUTSIDE VISIBLE AREA.
-						$cw->index('end'),
-					);
+			#JWT:ADDED NEXT 2 (INCL CONDITION) 20240729:
+			my $cprev = $cw->get('insert - 1 chars', 'insert');
+			unless ($cprev =~ /\\/o) {  #AVOID MATCHING ESCAPED BRACES, IE. IN REGICES:
+				my $count = 0;
+				my $found = 0;
+				#ADDED NEXT 2 20240701 TO AVOID MATCHING BRACES IN COMMENTS:
+				my $inTags = join('|', $cw->tagNames('insert'));
+				unless ($inTags =~ /(?:Comment|String)/o) {
+					if ($p % 2) {
+						my $m = substr($v, $p - 1, 1);
+						$cw->matchFind('-backwards', $c, $m, 
+							$cw->index('insert'),
+#							$cw->index('@0,0'),   #CHGD. TO NEXT 20060630 TO PERMIT ^p JUMPING TO MATCHING CHAR OUTSIDE VISIBLE AREA.
+							$cw->index('0.0'),
+						);
+					} else {
+						my $m = substr($v, $p + 1, 1);
+						$cw->matchFind('-forwards', $c, $m,
+							$cw->index('insert + 1 chars'),
+#							$cw->index($cw->visualend . '.0 lineend'),   #CHGD. TO NEXT 20060630 TO PERMIT ^p JUMPING TO MATCHING CHAR OUTSIDE VISIBLE AREA.
+							$cw->index('end'),
+						);
+					}
 				}
 			}
 		}
@@ -1564,25 +1567,18 @@ sub matchFind {
 		my $k = $cw->get($i, "$i + 1 chars");
 #		print "found $k at $i and count is $count\n";
 		if ($k eq $ochar) {
-			#JWT:NEXT ADDED 20240729 TO AVOID MATCHING CHARACTERS IN COMMENTS:
+			#JWT:ADDED ALL "inTags" LINES BELOW 20240701 TO AVOID MATCHING BRACES IN COMMENTS:
 			my $inTags = join('|', $cw->tagNames($i));
 			if ($count > 0) {
-#				print "decrementing count\n";
-				#JWT:TEST ADDED TO NEXT 20240729 TO AVOID MATCHING CHARACTERS IN COMMENTS:
-				$count--  unless ($inTags =~ /Comment/o);
-				if ($dir eq '-forwards') {
-					$start = $cw->index("$i + 1 chars");
-				} else {
-					$start = $i;
-				}
+				#JWT:ADDED NEXT AND ALTERED NEXT TEST: 20240729 TO AVOID MATCHING ESCAPED BRACES:
+				my $kprev = $cw->get("$i - 1 chars", "$i");
+				$count--  unless ($inTags =~ /(?:Comment|String)/o || $kprev =~ /\\/o);
+				$start = ($dir eq '-forwards') ? $cw->index("$i + 1 chars") : $i;
 			} else {
-				#JWT:NEXT (THEN PART) ADDED 20240729 TO AVOID MATCHING CHARACTERS IN COMMENTS:
-				if ($inTags =~ /Comment/o) {
-					if ($dir eq '-forwards') {
-						$start = $cw->index("$i + 1 chars");
-					} else {
-						$start = $i;
-					}
+				#JWT:ADDED NEXT AND ALTERED NEXT TEST: 20240729 TO AVOID MATCHING ESCAPED BRACES:
+				my $kprev = $cw->get("$i - 1 chars", "$i");
+				if ($inTags =~ /(?:Comment|String)/o || $kprev =~ /\\/o) {
+					$start = ($dir eq '-forwards') ? $cw->index("$i + 1 chars") : $i;
 				} else {
 #					print "Found !!!\n";
 					$cw->markSet('match', $i);
@@ -1593,13 +1589,12 @@ sub matchFind {
 				}
 			}
 		} elsif ($k eq $char) {
-			#JWT:NEXT ADDED 20240729 TO AVOID MATCHING CHARACTERS IN COMMENTS:
 			my $inTags = join('|', $cw->tagNames($i));
-#			print "incrementing count\n";
-			#JWT:TEST ADDED TO NEXT 20240729 TO AVOID MATCHING CHARACTERS IN COMMENTS:
-			$count++  unless ($inTags =~ /Comment/o);
+			#JWT:ADDED NEXT AND ALTERED NEXT TEST: 20240729 TO AVOID MATCHING ESCAPED BRACES:
+			my $kprev = $cw->get("$i - 1 chars", "$i");
+			$count++  unless ($inTags =~ /(?:Comment|String)/o || $kprev =~ /\\/o);
 			$start = ($dir eq '-forwards') ? $cw->index("$i + 1 chars") : $i;
-		} elsif ($i eq $start) {  #THIS *SEEMS* TO NEVER HAPPEN, BUT PREVENTS POTENTIAL INFINITE LOOP, PERHAPS?
+		} elsif ($i eq $start) {  #JWT:THIS *SEEMS* TO NEVER HAPPEN, BUT PREVENTS POTENTIAL INFINITE LOOP, PERHAPS?
 			$found = 1;
 		}
 	}

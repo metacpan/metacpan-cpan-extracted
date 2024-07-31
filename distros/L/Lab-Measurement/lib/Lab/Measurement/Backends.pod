@@ -14,7 +14,7 @@ Lab::Measurement::Backends - Back end packages (hardware drivers) for Lab::Measu
 
 =head1 VERSION
 
-version 3.901
+version 3.902
 
 =head1 National Instruments NI-VISA back-end
 
@@ -169,7 +169,7 @@ covers all steps of the installation.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2023 by the Lab::Measurement team; in detail:
+This software is copyright (c) 2024 by the Lab::Measurement team; in detail:
 
   Copyright 2016       Simon Reinhardt
             2017       Andreas K. Huettel, Simon Reinhardt

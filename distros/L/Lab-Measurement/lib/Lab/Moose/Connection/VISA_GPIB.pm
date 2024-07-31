@@ -1,5 +1,5 @@
 package Lab::Moose::Connection::VISA_GPIB;
-$Lab::Moose::Connection::VISA_GPIB::VERSION = '3.901';
+$Lab::Moose::Connection::VISA_GPIB::VERSION = '3.902';
 #ABSTRACT: compatiblity alias for VISA::GPIB
 
 use v5.20;
@@ -25,11 +25,11 @@ Lab::Moose::Connection::VISA_GPIB - compatiblity alias for VISA::GPIB
 
 =head1 VERSION
 
-version 3.901
+version 3.902
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2023 by the Lab::Measurement team; in detail:
+This software is copyright (c) 2024 by the Lab::Measurement team; in detail:
 
   Copyright 2017       Simon Reinhardt
 

@@ -26,7 +26,9 @@ Features:
 Following Perl modules should be installed:
 
   * File::Path
+  * File::Spec
   * Math::Round
+  * Opt::Long
   * Syntax::Kamelon
   * Test::Tk
   * Tk

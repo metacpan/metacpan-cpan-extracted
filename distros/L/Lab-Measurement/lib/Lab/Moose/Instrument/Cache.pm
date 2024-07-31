@@ -1,5 +1,5 @@
 package Lab::Moose::Instrument::Cache;
-$Lab::Moose::Instrument::Cache::VERSION = '3.901';
+$Lab::Moose::Instrument::Cache::VERSION = '3.902';
 #ABSTRACT: Device caching functionality in Moose::Instrument drivers
 
 use v5.20;
@@ -156,7 +156,7 @@ Lab::Moose::Instrument::Cache - Device caching functionality in Moose::Instrumen
 
 =head1 VERSION
 
-version 3.901
+version 3.902
 
 =head1 SYNOPSIS
 
@@ -237,7 +237,7 @@ you can give the C<index_arg> argument to the cache keyword:
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2023 by the Lab::Measurement team; in detail:
+This software is copyright (c) 2024 by the Lab::Measurement team; in detail:
 
   Copyright 2016       Simon Reinhardt
             2017       Andreas K. Huettel, Simon Reinhardt

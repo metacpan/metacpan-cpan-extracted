@@ -17176,6 +17176,13 @@ print $Net::FullAuto::FA_Core::LOG "main::cmd() LAUNCING ***NEW*** HANDLE=",
             }
             return $stdout,$stderr,$exitcode;
          } elsif ($stderr) {
+            # https://stackoverflow.com/questions/10060500/bash-how-to-evaluate-ps1-ps2
+            #my $discoverprompt="echo xyzzyplughtwisty | ".
+            #      "bash -i 2>&1 | grep xyzzyplughtwisty | ".
+            #      "head -1 | sed 's/xyzzyplughtwisty//g'";
+            #clean_filehandle($_[0]);
+            #my ($disout,$diserr,$disrc)=Rem_Command::cmd($_[0],
+            #   $discoverprompt,'__delay__200');
             if (-1<index $self,'HASH') {
                &handle_error($stderr,'-19');
             } elsif (-1<index $self,'HASH') {
@@ -18222,7 +18229,9 @@ sub lcd
    }
    $self->{_work_dirs}->{_pre_lcd}=$self->{_work_dirs}->{_lcd};
    $path=~s/\\/\\\\/g;
-print $Net::FullAuto::FA_Core::LOG "File_Transfer::lcd() PATH=$path<==\n" if -1<index $Net::FullAuto::FA_Core::LOG,'*';
+   print $Net::FullAuto::FA_Core::LOG
+      "File_Transfer::lcd() PATH=$path<==\n"
+      if -1<index $Net::FullAuto::FA_Core::LOG,'*';
    ($output,$stderr)=&Rem_Command::ftpcmd($self,"lcd \"$path\"",$cache);
    if ($self->{_ftm_type} eq 'sftp') {
       ($stdout,$stderr)=&Rem_Command::ftpcmd($self,"lpwd",$cache);
@@ -30477,13 +30486,15 @@ sub cmd
                   print "\nOUTPUT ***After First-Line Loop***=$output<==\n",
 			"and COMMAND_STRIPPED_FROM_OUTPUT=",
 			$command_stripped_from_output,"\nand GROWOUTPUT=",
-			$growoutput,"<==\n" if !$Net::FullAuto::FA_Core::cron
+			$growoutput,"<== and OUTPUT=$output<==\n"
+                        if !$Net::FullAuto::FA_Core::cron
 		       	&& ($Net::FullAuto::FA_Core::debug || $debug)
 		       	&& $loop_count<$loop_max;
                   print $Net::FullAuto::FA_Core::LOG
 		        "\nOUTPUT ***After First-Line Loop***=$output<==\n",
                         "and COMMAND_STRIPPED_FROM_OUTPUT=",
                         $command_stripped_from_output,"\nand GROWOUTPUT=",
+                        $growoutput,"<== and OUTPUT=$output<==\n"
                         if $Net::FullAuto::FA_Core::log &&
 		       	-1<index $Net::FullAuto::FA_Core::LOG,'*';
                   if ($command_stripped_from_output) {
@@ -30576,6 +30587,8 @@ sub cmd
                      } elsif ($growoutput && ($output eq $cmd_prompt)) {
                         chomp $growoutput;
                         $growoutput.="\n".$cmd_prompt;
+                        $save=&display("\n".$output,$cmd_prompt,$save,
+                           $live_command) if $display;
                         $lastline=$cmd_prompt;
                         $output='';$fulloutput='';
                      } elsif ($output=~/$cmd_prompt$/s) {
@@ -30588,6 +30601,9 @@ sub cmd
                         $save=&display($output,$cmd_prompt,$save,
                            $live_command) if $display;
                         $output='';$fulloutput='';
+                     } elsif ($output=~/^\n$/s) {
+                         $save=&display($output,$cmd_prompt,$save,
+                            $live_command) if $display;
                      } elsif (unpack("a$lcp",$output) eq
                            $cmd_prompt.'cmd /Q /C "set /A ') {
                         $lastline=$cmd_prompt;
@@ -31328,45 +31344,47 @@ sub display
    my $tline=$line;
    $tline=~s/\s*$//s;
    my $ttline=unpack('A1',$tline);
-   $tline=quotemeta($tline);
-   if (quotemeta($ttline) ne $ttline) {
-      if ($ttline eq '<' || $ttline eq '>') {
-         $tline=~s/^\\(.)/$1?/s;
+   if (($ttline eq '<') or ($ttline eq '>')) {
+      $tline=quotemeta($tline);
+      if (quotemeta($ttline) ne $ttline) {
+         if ($ttline eq '<' || $ttline eq '>') {
+            $tline=~s/^\\(.)/$1?/s;
+         }
+      } else {
+         $tline=~s/^(.)/$1?/s;
       }
-   } else {
-      $tline=~s/^(.)/$1?/s;
+      $line=~s/$tline//s if $cmd=~/$tline/s;
    }
    if (-1<index $cmd,'git') {
       if ((-1<index $cmd,'git clone') ||
             (-1<index $cmd,'git checkout') ||
             (-1<index $cmd,'git pull')) {
          return unless $line;
-	 $line=$save.$line if $save;
          if (-1<index $line,'[K') {
             $line=~s/[[]K/\n/sg;
          }
-	 if (($line!~/[).,;'"]\s*$/s) &&
+         if (($line!~/[).,;'"]\s*$/s) &&
                ($line!~/MiB\/s\s*$/s)) {
-	    $save.=$line;
-	    return $save;
-	 }
+            $save=$line;
+            return $save;
+         }
          if (-1<index $line,'Receiving objects:') {
-	    $line=~s/[)]Receiving/)\nReceiving/sg;
-	    $line=~s/sReceiving/s\nReceiving/sg;
-	    $line.="\n" if $line!~/\n$/s;
-	 }
+            $line=~s/[)]Receiving/)\nReceiving/sg;
+            $line=~s/sReceiving/s\nReceiving/sg;
+            $line.="\n" if $line!~/\n$/s;
+         }
          if (-1<index $line,'Resolving deltas:') {
             $line=~s/[)]Resolving/)\nResolving/sg;
-	    $line.="\n" if $line!~/\n$/s;
-         } 
-	 if (-1<index $line,'Updating files:') {
-            $line=~s/[)]Updating/)\nUpdating/sg;
-	    $line.="\n" if $line!~/\n$/s;
+            $line.="\n" if $line!~/\n$/s;
          }
-	 if (-1<index $line,'remote') {
+         if (-1<index $line,'Updating files:') {
+            $line=~s/[)]Updating/)\nUpdating/sg;
+            $line.="\n" if $line!~/\n$/s;
+         }
+         if (-1<index $line,'remote') {
             $line=~s/[)]remote/)\nremote/sg;
-	    $line=~s/sremote/s\nremote/sg;
-	    $line.="\n" if $line!~/\n$/s;
+            $line=~s/sremote/s\nremote/sg;
+            $line.="\n" if $line!~/\n$/s;
          }
       }
    }
@@ -31378,10 +31396,9 @@ sub display
          (-1<index $line,'KUp'))) {
       select(undef,undef,undef,0.50);
       if ($line=~/\[K?$/s) {
-         $save.=$line;
+         $save=$line;
          return $save;
       }
-      $line=$save.$line;
       $line=~s/\[K/\n/gs;
       if (-1<index $line,'remote: T') {
          $line="\n\n$line";
@@ -31390,7 +31407,6 @@ sub display
       }
    } elsif ($save eq '[K') {
       select(undef,undef,undef,0.50);
-      $line=$save.$line;
       $line=~s/\[K/\n/gs;
       if (-1<index $line,'remote: T') {
          $line="\n\n$line";
@@ -31400,7 +31416,7 @@ sub display
    } elsif ($line=~/^\s*\[c\s*$/s) {
       $line=~s/\[c//gs
    }
-   my $testl=sub {
+   my $testbl=sub {
       my $line=$_[0];
       unless ($line=~/^tdout: /s) {
          unless ($line=~/^dout: /s) {
@@ -31416,15 +31432,37 @@ sub display
          } else { return 1 }
       } else { return 1 }
    };
+   my $testel=sub {
+      my $line=$_[0];
+      my $lastline=$line;
+      $lastline=~/^(.*)\n(.*)$/s;
+      $line=$1||'';$lastline=$2||'';
+      unless ($lastline eq 'stdout') {
+         unless ($lastline eq 'stdou') {
+            unless ($lastline eq 'stdo') {
+               unless ($lastline eq 'std') {
+                  unless ($lastline eq 'st') {
+                     unless ($lastline eq 's') {
+                        return 0
+                     } else { return $line,'s' }
+                  } else { return $line,'st' }
+               } else { return $line,'std' }
+            } else { return $line,'stdo' }
+         } else { return $line,'stdou' }
+      } else { return $line,'stdout' }
+   };
    my $print_out=0;
    $print_out=1 if $Net::FullAuto::FA_Core::log &&
       -1<index $Net::FullAuto::FA_Core::LOG,'*';
    if ($line=~/^\s*stdout: .*$/s) {
       if ($line=~/stdout: \d\d?\d?\s*$/s) {
-         $save.=$line;
+         $save=$line;
+         return $save;
+      } elsif ($testel->($line)) {
+         $save=$line;
          return $save;
       }
-      $line=~s/(?:stdout: \d(?:\d|\d\d)*)*\n*$cmd_prompt$//s;
+      $line=~s/(?:stdout: \d(?:\d|\d\d)*)*(?:\n*$cmd_prompt)+$//s;
       $line=~s/^stdout: ?//mg;
       #$line=~s/\s*$cmd_prompt$//s;
       $line=~s/^.*\s*0\s*[]]0.*$//s;
@@ -31437,17 +31475,21 @@ sub display
       print $line;
       print $OUTPUT $line if $print_out;
       return '';
-   } elsif ((-1<index $line,':') && $testl->($line)) {
-      $save.=$line;
+   } elsif ((-1<index $line,':') && $testbl->($line)) {
+      $line=~/^(.*?)\n(.*)$/s;
+      my $l=$1||'';my $ll=$2||'';
+      $l=~s/^stdout: ?//mg;
+      print $l;
+      $save=$ll;
       return $save;
    } elsif (length $line<length $cmd_prompt) {
       if (-1<index $cmd_prompt,substr($line,(rindex $line,$cmd_prompt))) {
-         $save.=$line;
+         $save=$line;
          return $save;
       } else {
          $line=~s/\n\d(\d|\d\d)?\s*$//s;
          if ($line=~/^\d+$/) {
-            $save.=$line;
+            $save=$line;
             return $save;
          }
          if ($print_line_debugging) {
@@ -31468,7 +31510,7 @@ sub display
             }
          }
       }
-      $line=~s/(?:stdout: \d(?:\d|\d\d)*)*$//s; 
+      $line=~s/(?:stdout: \d(?:\d|\d\d)*)*$//s;
       $line=~s/^stdout: ?//mg;
       if ($print_line_debugging) {
          print $log "display() CALLER=",(join " ",caller),"\n";
@@ -31482,7 +31524,7 @@ sub display
    } elsif (-1<index $cmd_prompt,$line) {
       substr($line,(rindex $line,$cmd_prompt))=0;
       $save.=$line;
-      return $save; 
+      return $save;
    } elsif ($cmd && (-1<index $cmd,'wget')
          && (-1<index $line,'K .')) {
       $line=~s/stdout: //g;
@@ -31498,7 +31540,7 @@ sub display
    } elsif ((-1<index $line,']0') &&
          ($line=~/^.*\s*0\s*[]]0.*$/s) &&
          (-1==index $line,$cmd_prompt)) {
-      $save.=$line;
+      $save=$line;
       return $save;
    } else {
       $line=~s/\n\d(\d|\d\d)?$//s;
@@ -31518,7 +31560,14 @@ sub display
          print $line,"\n";
          print $OUTPUT $line,"\n" if $print_out;
       } elsif ($cmd!~/^$tline/s) {
+         $line=~s/(?:stdout: \d(?:\d|\d\d)*)*\n*//s;
          $line=~s/^stdout: ?//mg;
+         my ($l,$ll)=$testel->($line);
+         if ($l) {
+            $save=$ll;
+            print $line;
+            return $save;
+         }
          if ($print_line_debugging) {
             print $log "display() CALLER=",(join " ",caller),"\n";
             print $log "display() ORIGINAL LINE=$_[0]<==\n";
