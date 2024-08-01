@@ -4,6 +4,7 @@ use Test::More;
 use PDL::Graphics::Gnuplot qw(plot gpwin);
 use File::Temp qw(tempfile);
 use PDL;
+use PDL::Transform::Cartography; # t_raster2fits
 
 ##########
 # Uncomment these to test error handling on Microsoft Windows, from within POSIX....
@@ -150,6 +151,33 @@ unlink($testoutput) or warn "\$!: $! for '$testoutput'";
   my $r9 = rvals(9,9);
   eval {$w->plot({colorbox => 1},{with => 'image'},$r9->xvals,$r9->yvals,$r9)};
   is($@, '', "colorbox succeeded");
+  for my $dims ([3,9,9],[4,9,9],[9,9,3],[9,9,4]) {
+    eval {$w->plot({with => 'image'},$r9->xvals,$r9->yvals,rvals(@$dims))};
+    is($@, '', "regularising image succeeded (@$dims)");
+  }
+  eval {$w->plot({with => 'fits'},$r9)};
+  isnt $@, '', "with 'fits' only if FITS header";
+  my @dims = $r9->dims;
+  my $h = PDL::Graphics::Gnuplot::_make_fits_hdr(@dims[0,1], 1, 1, 0, 0, @dims[0,1], qw(X Y Pixels Pixels));
+  $r9->sethdr($h);
+  eval {$w->plot({with => 'fits'},$r9)};
+  is($@, '', "with 'fits'");
+  eval {$w->plot({with => 'fits', resample=>1},$r9)};
+  is($@, '', "with 'fits', resample");
+  eval {$w->plot({with => 'fits', resample=>[100,100]},$r9)};
+  is($@, '', "with 'fits', resample [100,100]");
+  my $r9_rgb = pdl(0,$r9,$r9)->mv(-1,0); $r9_rgb->slice(0) .= 6; $r9_rgb *= 20;
+  eval {$w->plot({with => 'fits'}, t_raster2fits()->apply($r9_rgb))};
+  is($@, '', "with 'fits', rgb");
+}
+
+{
+  my $w = gpwin('dumb',size=>[79,24,'ch'], output=>$testoutput);
+  my $r9 = rvals(9,9);
+  eval {$w->plot({colorbox => 1},{with => 'image'},$r9->xvals,$r9->yvals,$r9,
+    {with=>'lines'}, xvals(5)**2,
+  )};
+  is($@, '', "both image and non-image to exercise image-range path");
 }
 
 if ($PDL::Graphics::Gnuplot::gp_version >= 4.7) { # only 4.7+
@@ -175,9 +203,12 @@ is $@, '', "set binary mode to 0";
 eval { $w->plot( xvals(5), xvals(5)**2 ); };
 is($@, '', "ascii plot succeeded");
 
+eval { $w->plot( [xvals(5)->list], [(xvals(5)**2)->list] ); };
+is($@, '', "ascii array-ref plot succeeded");
+
 my $text = eval { $w->plot_generate( xvals(5), xvals(5)**2 ); };
 is($@, '', "plot_generate succeeded");
-like $text, qr/plot\s*'-'\s*using 1:2 notitle with lines\s*dt solid/, 'plot_generate';
+like $text, qr/plot\s*\$PGG_data_\d+\s*using 1:2 notitle with lines\s*dt solid/, 'plot_generate';
 
 eval { $w->plot( xvals(10000), xvals(10000)->sqrt ); };
 is($@, '', "looong ascii plot succeeded ");
@@ -288,7 +319,7 @@ like($@, qr/mismatch/, "Mismatch detected in array size vs. PDL size");
 # Test placement of topcmds, extracmds, and bottomcmds
 eval { $w->plot(xmin=>3,extracmds=>'reset',xrange=>[4,5],xvals(10),xvals(10)**2); };
 is($@, '', "extracmds does not cause an error");
-like($PDL::Graphics::Gnuplot::last_plotcmd, qr/\]\s+reset\s+plot/o, "extracmds inserts exactly one copy in the right place");
+like($PDL::Graphics::Gnuplot::last_plotcmd, qr/\nreset\n(?:\$PGG_.*?\n)?plot/, "extracmds inserts exactly one copy in the right place");
 
 eval { $w->plot(xmin=>3,topcmds=>'reset',xrange=>[4,5],xvals(10),xvals(10)**2);};
 is($@, '', "topcmds does not cause an error");
@@ -296,7 +327,7 @@ like($PDL::Graphics::Gnuplot::last_plotcmd, qr/set\s+output\s+\"[^\"]+\"\s+reset
 
 eval { $w->plot(xmin=>3,bottomcmds=>'reset',xrange=>[4,5],xvals(10),xvals(10)**2);};
 is($@, '', "bottomcmds does not cause an error");
-like($PDL::Graphics::Gnuplot::last_plotcmd, qr/\]\s+reset\s*$/o, "bottomcmds inserts exactly one copy in the right place");
+like($PDL::Graphics::Gnuplot::last_plotcmd, qr/\s+reset\s*$/o, "bottomcmds inserts exactly one copy in the right place");
 
 ##############################
 # Test tuple size determination: 2-D, 3-D, and variables (palette and variable)
@@ -805,6 +836,20 @@ undef $@;
 eval { $w->options(justify=>"1") };
 is($@, '', "justify accepts positive numbers");
 
+eval {
+  $w = gpwin('dumb', output=>$testoutput);
+  $w->multiplot(layout=>[1,1]);
+  $w->plot(
+    {
+      label => [ [ 'left-justified', at=>[0,0], 'left' ] ],
+      xrange => [ 0, 4 ], yrange => [ -1, 5 ]
+    },
+    { with => 'labels' },
+    [ 0 ], [ -1 ], [ '' ]
+  );
+};
+is($@, '', "labels with multiplot works even in Gnuplot 6.0.1");
+
 ##############################
 ##############################
 ## Test explicit and implicit plotting in 2-D and 3-D, both binary and ASCII
@@ -817,23 +862,23 @@ $w->options(binary=>0);
 eval { $w->plot(with=>'lines',xvals(5)) };
 is($@, '', "ascii plot with implicit col succeeded");
 
-like($PDL::Graphics::Gnuplot::last_plotcmd, qr/plot +\'\-\' +using 0\:1 /,
+like($PDL::Graphics::Gnuplot::last_plotcmd, qr/plot +\$PGG_data_\d+ +using 0\:1 /,
    "ascii plot with implicit col uses explicit reference to column 0");
 
 eval { $w->plot(with=>'lines',xvals(5),xvals(5)) };
 is($@, '', "ascii plot with no implicit col succeeded");
-like($PDL::Graphics::Gnuplot::last_plotcmd, qr/plot +\'\-\' +using 1\:2 /s,
+like($PDL::Graphics::Gnuplot::last_plotcmd, qr/plot +\$PGG_data_\d+ +using 1\:2 /s,
    "ascii plot with no implicit cols uses columns 1 and 2");
 
 eval { $w->plot(with=>'lines',xvals(5,5)) };
 is($@, '', "ascii plot with threaded data and implicit column succeeded");
-like($PDL::Graphics::Gnuplot::last_plotcmd, qr/plot +\'-\' +using 0\:1 [^u]+using 0\:1 /s,
+like($PDL::Graphics::Gnuplot::last_plotcmd, qr/plot +\$PGG_data_\d+ +using 0\:1 [^u]+using 0\:1 /s,
    "threaded ascii plot with one implicit col does the Right Thing");
 
 
 eval { $w->plot(with=>'lines',xvals(5),{trid=>1}) };
 is($@, '', "ascii 3-d plot with 2 implicit cols succeeded");
-like($PDL::Graphics::Gnuplot::last_plotcmd, qr/plot +\'-' +using 0\:\(\$0\*0\)\:1 /s,
+like($PDL::Graphics::Gnuplot::last_plotcmd, qr/plot +\$PGG_data_\d+ +using 0:\(\$0\*0\):1/s,
    "ascii plot with two implicit cols uses column 0 and zeroed-out column 0");
 
 eval { $w->plot(with=>'lines',xvals(5),xvals(5),{trid=>1})};
@@ -841,12 +886,12 @@ isnt($@, '', "ascii 3-d plot with 1 implicit col fails (0 or 2 only)");
 
 eval { $w->plot(with=>'lines',xvals(5),xvals(5),xvals(5),{trid=>1}) };
 is($@, '', "ascii 3-d plot with no implicit cols succeeds");
-like($PDL::Graphics::Gnuplot::last_plotcmd, qr/plot +\'-\' +using 1\:2\:3 /s,
+like($PDL::Graphics::Gnuplot::last_plotcmd, qr/plot +\$PGG_data_\d+ +using 1:2:3 /s,
    "ascii 3-d plot with no implicit cols does the Right Thing");
 
 eval { $w->plot(with=>'lines',xvals(5,5),{trid=>1}) };
 is($@, '', "ascii 3-d plot with 2-D data and 2 implicit cols succeeded");
-like($PDL::Graphics::Gnuplot::last_plotcmd, qr/splot +\"-\" binary array\=\(5,5\) /s,
+like($PDL::Graphics::Gnuplot::last_plotcmd, qr/splot +"-" binary array=\(5,5\) /s,
    "ascii plot with 2-D data and 2 implicit cols uses binary ARRAY mode");
 
 eval { $w->plot(with=>'lines',xvals(5,5),xvals(5,5),{trid=>1}) };
@@ -854,7 +899,7 @@ isnt($@, '', "ascii 3-d plot with 2-D data and 1 implicit col fails (0 or 2 only
 
 eval { $w->plot(with=>'lines',xvals(5,5),xvals(5,5),xvals(5,5),{trid=>1}) };
 is($@, '', "ascii 3-d plot with 2-D data and no implicit cols succeeded");
-like($PDL::Graphics::Gnuplot::last_plotcmd, qr/splot +\"-\" binary record\=\(5,5\) /s,
+like($PDL::Graphics::Gnuplot::last_plotcmd, qr/splot +"-" binary record=\(5,5\) /s,
    "ascii plot with 2-D data and no implicit cols uses binary RECORD mode");
 
 eval { $w->plot(with=>'yerrorbars', (xvals(50)-25)**2, pdl(0.5),{binary=>0})  };
@@ -905,6 +950,18 @@ $a = { PDL => xvals(5)**2 };
 bless($a,'MyPackage');
 eval { $w->plot( $a ); };
 is $@, '', "subclass of PDL plots OK";
+
+my @d = qw(PDL Demos);
+my $m51path;
+foreach my $path (@INC) {
+  my $check = File::Spec->catfile( $path, @d, "m51.fits" );
+  if ( -f $check ) { $m51path = $check; last; }
+}
+if (defined $m51path) {
+  my $m51 = rfits $m51path;
+  eval { $w->reset; $w->plot(with => 'fits', $m51); }; # reset of "ascii"
+  is $@, '', "with => 'fits' OK";
+}
 
 # Test terminal defaulting
 eval { $w=PDL::Graphics::Gnuplot::new(size=>[9,9]); undef($w);};

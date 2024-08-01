@@ -27,7 +27,7 @@
 	$Data::Dumper::Terse = 1;
 	$Data::Dumper::Pad = "";
 
-	our $VERSION = "2023.362.1";
+	our $VERSION = "2024.213.1";
 
 	BEGIN{ use_ok('SQL::SimpleOps'); }
 
@@ -330,6 +330,13 @@
 		w=> [ a => 1, [ [ b => [] ], "or", [ c => 2 ] ] ],
 		r=> "a = '1' AND c = '2'",
 	);
+	&my_where
+        (
+                f=> "0300",
+		t=> ["t1","t2"],
+		w => [ "func1()" => "\\func2(f1)" , "func3(f2)" => "\\func4(t1.f1)", "func5(t2.f2)" ],
+                r=> "func1() = func2(f1) AND func3(f2) = func4(t1.f1) AND func5(t2.f2)",
+        );
 
 	diag("################################################################");
 	fail((@er+0)." error, tests: ".join(", ",@er)) if (@er);

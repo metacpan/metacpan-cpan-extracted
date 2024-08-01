@@ -2,8 +2,8 @@ NAME
     Sort::Sub - Collection of sort subroutines
 
 VERSION
-    This document describes version 0.120 of Sort::Sub (from Perl
-    distribution Sort-Sub), released on 2020-05-25.
+    This document describes version 0.121 of Sort::Sub (from Perl
+    distribution Sort-Sub), released on 2024-07-17.
 
 SYNOPSIS
      use Sort::Sub qw($naturally);
@@ -54,7 +54,7 @@ SYNOPSIS
 
 DESCRIPTION
     Sort::Sub and "Sort::Sub::*" are a convenient packaging of any kind of
-    subroutine which you can use for "sort()".
+    subroutine which you can use for sort().
 
     To use Sort::Sub, you import a list of:
 
@@ -91,7 +91,7 @@ GUIDELINES FOR WRITING A SORT::SUB::* MODULE
 
     Where $is_reserve will be set to true if user requests a reverse sort,
     $is_ci will be set to true if user requests a case-insensitive sort.
-    $args is hashref to pass additional arguments to the "gen_sorter()"
+    $args is hashref to pass additional arguments to the gen_sorter()
     routine. The subroutine should return a code reference.
 
     The module should also contain a "meta" subroutine which returns a
@@ -128,13 +128,6 @@ HOMEPAGE
 SOURCE
     Source repository is at <https://github.com/perlancar/perl-Sort-Sub>.
 
-BUGS
-    Please report any bugs or feature requests on the bugtracker website
-    <https://rt.cpan.org/Public/Dist/Display.html?Name=Sort-Sub>
-
-    When submitting a bug or request, please include a test-file or a patch
-    to an existing test-file that illustrates the bug or desired feature.
-
 SEE ALSO
     Other additional "Sort::Sub::*" not bundled in this distribution.
 
@@ -144,10 +137,33 @@ SEE ALSO
 AUTHOR
     perlancar <perlancar@cpan.org>
 
+CONTRIBUTING
+    To contribute, you can send patches by email/via RT, or send pull
+    requests on GitHub.
+
+    Most of the time, you don't need to build the distribution yourself. You
+    can simply modify the code, then test via:
+
+     % prove -l
+
+    If you want to build the distribution (e.g. to try to install it locally
+    on your system), you can install Dist::Zilla,
+    Dist::Zilla::PluginBundle::Author::PERLANCAR,
+    Pod::Weaver::PluginBundle::Author::PERLANCAR, and sometimes one or two
+    other Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps
+    required beyond that are considered a bug and can be reported to me.
+
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2020, 2019, 2018, 2016, 2015 by
-    perlancar@cpan.org.
+    This software is copyright (c) 2024, 2020, 2019, 2018, 2016, 2015 by
+    perlancar <perlancar@cpan.org>.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Sort-Sub>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
 

@@ -6,6 +6,8 @@ page at L<http://metacpan.org/pod/PDL::Graphics::Gnuplot>.
 
 =cut
 
+=encoding UTF-8
+
 =head1 NAME
 
 PDL::Graphics::Gnuplot - Gnuplot-based plotting for PDL
@@ -110,7 +112,7 @@ of devices; see the description of plot options, below.
 
 You can specify what type of graphics output you want, but in most cases
 doing nothing will cause a plot to be rendered on your screen: with
-X windows on UNIX or Linux systems, with an XQuartz windows on MacOS,
+X windows on UNIX or Linux systems, with an XQuartz window on MacOS,
 or with a native window on Microsoft Windows.
 
 You select a plot style with the "with" curve option, and feed in columns
@@ -224,6 +226,31 @@ Change font to (optional) fontname, and optional absolute font size or relative 
 Backslash escapes control characters to render them as themselves.
 
 =back
+
+=head2 Unicode text
+
+Separately to "enhanced" text above, if you wish to include text that
+is not ASCII, then you will need to pass data that has been UTF-8
+encoded. Sample code to achieve this:
+
+  use utf8;
+  use Encode;
+  use PDL;
+  use PDL::Graphics::Gnuplot;
+  use PDL::Constants qw(PI);
+
+  sub plot_sin {
+    my ($w, $coeff) = @_;
+    my $xrange = [ -2*PI, 2*PI ];
+    my $x = zeroes(1e3)->xlinvals(@$xrange); my $y = sin($coeff * 2 * PI * $x);
+    my $title = "y = sin( $coeff * 2π * x )";
+    # to get around sending text through syswrite()
+    my $title_octets = encode('UTF-8', $title);
+    $w->plot(with=>'lines', $x, $y, {
+      xrange => $xrange,
+      title => $title_octets, # can not pass $title as-is
+    });
+  }
 
 =head2 Color specification
 
@@ -495,7 +522,7 @@ FITS images in scientific coordinates with
 
  gplot( with=>'fits', $fitsdata );
 
-The fits plot style accepts a modifier "resample" (which may be
+The fits plot style accepts a curve option "resample" (which may be
 abbreviated), that allows you to downsample and/or rectify the image
 before it is passed to the Gnuplot back-end.  This is useful either to
 cut down on the burden of transferring large blocks of image data or
@@ -503,12 +530,14 @@ to rectify images with nonlinear WCS transformations in their headers.
 (gnuplot itself has a bug that prevents direct rendering of images in
 nonlinear coordinates).
 
- gplot( with=>'fits res 200', $fitsdata );
- gplot( with=>'fits res 100,400',$fitsdata );
+ gplot( with=>'fits', res=>1, $fitsdata );
+ gplot( with=>'fits', res=>[200], $fitsdata );
+ gplot( with=>'fits', res=>[100,400],$fitsdata );
 
-to specify that the output are to be resampled onto a square 200x200
-grid or a 100x400 grid, respectively.  The resample sizes must be
+to specify that the output are to be resampled onto a square 1024x1024 grid,
+a 200x200 grid, or a 100x400 grid, respectively. The resample sizes must be
 positive integers.
+A true non-ref value will be treated as 1024x1024.
 
 =head2 Interactivity
 
@@ -1455,7 +1484,7 @@ B<C<pointsize>> accepts a single number and scales the size of points used in pl
 
 B<C<style>> provides a great deal of customization for individual plot styles.
 It is not (yet) fully parsed by PDL::Graphics::Gnuplot; please refer to the Gnuplot
-manual for details (it is pp. 145ff in the Gnuplot 4.6.1 maual).  C<style> accepts
+manual for details (it is pp. 145ff in the Gnuplot 4.6.1 manual).  C<style> accepts
 a hash ref whose keys are plot styles (such as you would feed to the C<with> curve option),
 and whose values are array refs containing keywords and other parameters to modify how each
 plot style should be displayed.
@@ -1693,6 +1722,10 @@ of lines using the threaded syntax, try
     $w->plot3d( wi=>'lines', cd=>1, xvals($r2), yvals($r2), $r2 );
 
 which will plot 21 separate curves in a threaded manner.
+
+=item resample
+
+For C<< with=>'fits' >>. See L</Images>.
 
 =back
 
@@ -2179,6 +2212,15 @@ global gnuplot object.
 =cut
 =pod
 
+=head2 plot_generate
+
+=for ref
+
+Called with the same arguments as L</plot>, it returns the text that
+would be sent to Gnuplot. Exportable.
+Added in 2.025.
+
+=cut
 =head2 gplot
 
 =for ref
@@ -2328,6 +2370,14 @@ Displays a FITS image.  Synonym for C<plot(globalwith =E<gt> 'fits', ...)>.
 =cut
 =pod
 
+=head2 multiplot_generate
+
+=for ref
+
+Called with the same arguments as L</multiplot>, it returns the text that
+would be sent to Gnuplot.
+Added in 2.025.
+
 =head2 multiplot
 
 =for example
@@ -2338,6 +2388,7 @@ Displays a FITS image.  Synonym for C<plot(globalwith =E<gt> 'fits', ...)>.
  $w->multiplot(layout=>[2,2,"columnsfirst"]);
  $w->plot({title=>"points"},with=>"points",$a,$b);
  $w->plot({title=>"lines"}, with=>"lines", $a,$b);
+ $w->multiplot_next; # with Gnuplot 4.7+
  $w->plot({title=>"image"}, with=>"image", $a->(*1) * $b );
  $w->end_multi();
 
@@ -2385,6 +2436,28 @@ C<offset> takes an array ref containing two values, that control placement
 of each plot within the grid.
 
 =back
+
+=head2 multiplot_next_generate
+
+=for ref
+
+Called with the same arguments as L</multiplot_next>, it returns the text that
+would be sent to Gnuplot. Exportable.
+Added in 2.025.
+
+=head2 multiplot_next
+
+=for ref
+
+Skip one plot. Added in 2.025. Requires Gnuplot 4.7+.
+
+=head2 end_multi_generate
+
+=for ref
+
+Called with the same arguments as L</end_multi>, it returns the text that
+would be sent to Gnuplot. Exportable.
+Added in 2.025.
 
 =head2 end_multi
 

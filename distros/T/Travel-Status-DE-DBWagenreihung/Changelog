@@ -1,3 +1,7 @@
+Travel::Status::DE::DBWagenreihung 0.16 - Wed Jul 31 2024
+
+    * Carriage: (re-)add amenity and first/second class accessors
+
 Travel::Status::DE::DBWagenreihung 0.15 - Tue Jul 30 2024
 
     * Switch to new bahn.de API; the one used until 0.14 has been discontinued

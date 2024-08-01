@@ -27,8 +27,8 @@ requires:
   JSON: '0'
   Sys::Syslog: '0'
 resources:
-  bugtracker: https://sourceforge.net/p/csi-sql-simpleops/tickets/
+  homepage: https://sourceforge.net/p/csi-sql-simpleops/wiki/Home/
   license: http://www.gnu.org/licenses/gpl-3.0.html
   repository: https://sourceforge.net/projects/csi-sql-simpleops/files
-version: v2023.362.1
+version: v2024.213.1
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

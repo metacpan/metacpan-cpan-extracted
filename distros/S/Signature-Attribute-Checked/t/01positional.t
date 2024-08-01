@@ -23,11 +23,12 @@ extended sub f_as_package ($x :Checked('Numerical')) { return $x + 1 }
       'f_as_package sees correct param value' );
 
    like( dies { f_as_package( "zero" ) },
-      qr/^Parameter \$x requires a value satisfying :Checked\('Numerical'\) /,
+      qr/^Parameter \$x requires a value satisfying Numerical /,
       'f_as_package with string throws' );
 }
 
 package ArrayRefChecker {
+   use overload '""' => sub { "ArrayRef" };
    sub check { return ref($_[1]) eq "ARRAY" }
 }
 sub ArrayRef { return bless {}, "ArrayRefChecker" }
@@ -39,7 +40,7 @@ extended sub f_as_object ($x :Checked(ArrayRef)) { }
       'f_as_object with arrayref OK' );
 
    like( dies { f_as_object( "1,2,3" ) },
-      qr/^Parameter \$x requires a value satisfying :Checked\(ArrayRef\) /,
+      qr/^Parameter \$x requires a value satisfying ArrayRef /,
       'f_as_object with string throws' );
 }
 

@@ -22,7 +22,7 @@ extended sub g_as_package (:$y :Checked('Numerical')) { }
       diag( "Failed $@" );
 
    like( dies { g_as_package( y => "zero" ) },
-      qr/^Named parameter :\$y requires a value satisfying :Checked\('Numerical'\) /,
+      qr/^Named parameter :\$y requires a value satisfying Numerical /,
       'f_as_package with string throws' );
 }
 

@@ -93299,3 +93299,14 @@ T/TU/TURNERJW/Tk-TextHighlight-2.1.tar.gz
 D/DE/DERF/Travel-Status-DE-DBWagenreihung-0.15.tar.gz
 P/PE/PERLANCAR/WHO-GrowthReference-Table-0.013.tar.gz
 I/IN/INGY/YAMLScript-0.1.69.tar.gz
+J/JM/JMASLAK/App-RouterColorizer-1.242131.tar.gz
+P/PE/PEVANS/Data-Checks-0.09.tar.gz
+L/LE/LEONT/Dist-Zilla-Plugin-DynamicPrereqs-Meta-0.003.tar.gz
+M/MI/MIRK/Net-Z3950-SimpleServer-1.28.tar.gz
+E/ET/ETJ/PDL-Graphics-Gnuplot-2.027.tar.gz
+P/PE/PEVANS/Signature-Attribute-Checked-0.06.tar.gz
+P/PE/PERLANCAR/Sort-Sub-0.121.tar.gz
+C/CC/CCELSO/SQL-SimpleOps-2024.213.1.tar.gz
+L/LE/LEONT/Syntax-Infix-Smartmatch-0.006.tar.gz
+D/DE/DERF/Travel-Status-DE-DBWagenreihung-0.16.tar.gz
+C/CO/CORION/Win32API-RecentFiles-0.02.tar.gz

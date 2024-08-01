@@ -624,3 +624,22 @@ wdm$ module show slot 2
 [33mWARNING:[0m
 [33m  You cannot abort the restart operation once it has started.[0m
 [1;31mERROR: setting PTP attributes for 2/1: admin state must be disabled[0m
+
+wdm03*$ chassis power show
+
++------------------ CHASSIS POWER CONSUMPTION --------------+
+| Parameter                   | Value (Watts)               |
++-----------------------------+-----------------------------+
+| Usage                       |                       328.0 |
++-----------------------------+-----------------------------+
+
++-------------------------------------- POWER SUPPLY STATUS -----------------------------------------------------+
+| Slot   | Admin    | Oper   | Type    | Model                            | Serial Number | Part Number / Rev    |
++--------+----------+--------+---------+----------------------------------+---------------+----------------------+
+|[32m PSU-1  [0m|[32m Enabled  [0m|[32m Up     [0m|[32m AC/240VDC [0m|[32m Waveserver Ai AC/DC Power Module [0m|[32m ABCDEFGH      [0m|[32m    186-[4m1[24m510-901/001  [0m|
++--------+----------+--------+---------+----------------------------------+---------------+----------------------+
+|[33m PSU-2  [0m|[33m Disabled [0m|[33m Something [0m|[33m AC/240VDC [0m|[33m Waveserver Ai AC/DC Power Module [0m|[33m ABCDEFGH      [0m|[33m    186-[4m1[24m510-901/001  [0m|
++--------+----------+--------+---------+----------------------------------+---------------+----------------------+
+|[1;31m PSU-2  [0m|[1;31m Enabled  [0m|[1;31m Faulted [0m|[1;31m AC/240VDC [0m|[1;31m Waveserver Ai AC/DC Power Module [0m|[1;31m ABCDEFGH      [0m|[1;31m    186-[4m1[24m510-901/001  [0m|
++--------+----------+--------+---------+----------------------------------+---------------+----------------------+
+

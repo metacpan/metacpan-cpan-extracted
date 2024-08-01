@@ -21,7 +21,7 @@ TYPEMAP: <<HERE
 struct DataChecks_Checker * T_PTR
 HERE
 
-struct DataChecks_Checker *make_checkdata(SV *checkspec, SV *name, SV *constraint)
+struct DataChecks_Checker *make_checkdata(SV *checkspec, SV *name, SV *constraint = &PL_sv_undef)
   CODE:
     RETVAL = make_checkdata(checkspec);
     gen_assertmess(RETVAL, name, constraint);

@@ -1,5 +1,14 @@
 Revision history for Data-Checks
 
+0.09    2024-07-31
+        [CHANGES]
+         * Deprecate the use of plain CODE references as constraint checkers
+         * Added `->check` method to constraint checker class, allowing direct
+           use from pureperl code
+         * Better formatting of debug inspection strings
+         * Automatically generate stringified constraint names for assert
+           message if one is not supplied
+
 0.08    2024-07-16
         [CHANGES]
          * Added `StrMatch()`

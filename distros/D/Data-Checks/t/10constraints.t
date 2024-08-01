@@ -12,7 +12,7 @@ use Data::Checks qw( Defined Object Str Isa ArrayRef HashRef Callable );
 
 # Defined
 {
-   my $checker = t::test::make_checkdata( Defined, "Value", "Defined" );
+   my $checker = t::test::make_checkdata( Defined, "Value" );
 
    ok( t::test::check_value( $checker, "ok" ), 'Defined accepts value' );
    ok( !t::test::check_value( $checker, undef ), 'Defined rejects undef' );
@@ -31,6 +31,12 @@ use Data::Checks qw( Defined Object Str Isa ArrayRef HashRef Callable );
       'Defined asserter bad' );
 
    t::test::free_checkdata( $checker );
+}
+
+# Constraints have a ->check method directly
+{
+   ok(  Defined->check( 123 ),   'Defined->check accepts defined value' );
+   ok( !Defined->check( undef ), 'Defined->check rejects undef' );
 }
 
 # Object

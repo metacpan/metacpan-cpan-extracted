@@ -8,7 +8,7 @@ if($PDL::Graphics::Gnuplot::valid_terms->{wxt}) {
 } elsif($ENV{DISPLAY}) {
     $subst = "x11, size=>[8,6,'in'], title=>'Gnuplot demo window', persist=>0";
 }
-my @d = ( "PDL", "Demos" );
+my @d = qw(PDL Demos);
 our $m51path = undef;
 foreach my $path ( @INC ) {
   my $check = File::Spec->catfile( $path, @d, "m51.fits" );
@@ -212,7 +212,8 @@ EOF
   $m51 = rfits $|.__PACKAGE__.q|::m51path;
 
   $w->reset;
-  $w->image({j=>1, clut=>'gray', title=>"M51 galaxy"}, with=>'image',$m51 );
+  # note this uses the 'fits' plot type, which adjusts the coordinates
+  $w->plot({j=>1, clut=>'gray', title=>"M51 galaxy"}, with=>'fits',$m51 );
 |],
 
     [act => q|

@@ -73,6 +73,10 @@ static SV *S_extract_constraint(pTHX_ SV *sv)
   return SvRV(sv);
 }
 
+#define stringify_constraint(c)       S_stringify_constraint(aTHX_ c)
+#define stringify_constraint_sv(csv)  S_stringify_constraint(aTHX_ (struct Constraint *)SvPVX(csv))
+static SV *S_stringify_constraint(pTHX_ struct Constraint *c);
+
 struct DataChecks_Checker
 {
   CV *cv;
@@ -115,6 +119,8 @@ static OP *S_op_force_list(pTHX_ OP *o)
 }
 #endif
 
+#define warn_deprecated(...)  Perl_ck_warner(aTHX_ packWARN(WARN_DEPRECATED), __VA_ARGS__)
+
 static struct DataChecks_Checker *S_DataChecks_make_checkdata(pTHX_ SV *checkspec)
 {
   HV *stash = NULL;
@@ -126,6 +132,8 @@ static struct DataChecks_Checker *S_DataChecks_make_checkdata(pTHX_ SV *checkspe
   else if(SvPOK(checkspec) && (stash = gv_stashsv(checkspec, GV_NOADD_NOINIT)))
     ; /* checkspec is package name */
   else if(SvROK(checkspec) && !SvOBJECT(SvRV(checkspec)) && SvTYPE(SvRV(checkspec)) == SVt_PVCV) {
+    /* checkspec is a code reference */
+    warn_deprecated("Using a CODE reference as a constraint checker is deprecated");
     checkcv = (CV *)SvREFCNT_inc(SvRV(checkspec));
     checkspec = NULL;
   }
@@ -173,6 +181,14 @@ static void S_DataChecks_free_checkdata(pTHX_ struct DataChecks_Checker *checker
 
 static void S_DataChecks_gen_assertmess(pTHX_ struct DataChecks_Checker *checker, SV *name, SV *constraint)
 {
+  if(!constraint || !SvOK(constraint)) {
+    if(checker->constraint)
+      constraint = stringify_constraint(checker->constraint);
+    else if(checker->arg0)
+      constraint = sv_2mortal(newSVsv_str(checker->arg0));
+    else
+      croak("gen_assertmess requires a constraint name if the constraint is a CODE reference");
+  }
   checker->assertmess = newSVpvf("%" SVf " requires a value satisfying %" SVf,
       SVfARG(name), SVfARG(constraint));
 }
@@ -920,32 +936,32 @@ static void S_make_narg_constraint(pTHX_ const char *name, SV *(*mk_constraint)(
   av_push(exportok, newSVpv(name, 0));
 }
 
-#define sv_catsv_quotedprefix(buf, sv)  S_sv_catsv_quotedprefix(aTHX_ buf, sv)
-static void S_sv_catsv_quotedprefix(pTHX_ SV *buf, SV *sv)
+/* This does NOT use SVf_quoted as that is intended for C's quoting
+ * rules; we want qq()-style perlish ones. This means that $ and @ need to be
+ * escaped as well.
+ */
+#define sv_catsv_quoted(buf, sv, quote)  S_sv_catsv_quoted(aTHX_ buf, sv, quote)
+static void S_sv_catsv_quoted(pTHX_ SV *buf, SV *sv, char quote)
 {
-#ifdef SVf_QUOTEDPREFIX
-  sv_catpvf(buf, "%" SVf_QUOTEDPREFIX, SVfARG(sv));
-#else
-  /* Not perfect as it won't do escaping but it'll do for human debugging purposes */
   STRLEN len;
   const char *s = SvPV_const(sv, len);
-  sv_catpvs(buf, "\"");
-  if(len > 256) {
-    sv_catpvn(buf, s, 256);
-    sv_catpvs(buf, "...");
+  sv_catpvn(buf, &quote, 1);
+  for(STRLEN i = 0; i < len; i++) {
+    if(len == 256) {
+      sv_catpvs(buf, "...");
+      break;
+    }
+    char c = s[i];
+    if(c == '\\' || c == quote || (quote != '\'' && (c == '$' || c == '@')))
+      sv_catpvs(buf, "\\");
+    /* TODO: UTF-8 */
+    sv_catpvn(buf, &c, 1);
   }
-  else
-    sv_catpvn(buf, s, len);
-  sv_catpvs(buf, "\"");
-#endif
+  sv_catpvn(buf, &quote, 1);
 }
 
-/* For debug and unit-test use */
-#define debug_inspect_constraint(c)  S_debug_inspect_constraint(aTHX_ c)
-static SV *S_debug_inspect_constraint(pTHX_ SV *csv)
+static SV *S_stringify_constraint(pTHX_ struct Constraint *c)
 {
-  struct Constraint *c = (struct Constraint *)SvPVX(csv);
-
   const char *name = NULL;
   SV *args = sv_2mortal(newSVpvn("", 0));
 
@@ -969,33 +985,32 @@ static SV *S_debug_inspect_constraint(pTHX_ SV *csv)
   // 1arg
   else if(c->func == &constraint_Isa) {
     name = "Isa";
-    sv_catsv_quotedprefix(args, c->args[0]);
+    sv_catsv_quoted(args, c->args[0], '"');
   }
   else if(c->func == &constraint_StrMatch) {
     name = "StrMatch";
-    /* This isn't perfect if the pattern contains literal '/'s but it'll do
-     * for human-inspection debugging purposes */
-    sv_catpvs(args, "/");
-    sv_catsv(args, c->args[0]);
-    sv_catpvs(args, "/");
+    sv_catpvs(args, "qr");
+    sv_catsv_quoted(args, c->args[0], '/');
   }
   else if(c->func == &constraint_Maybe) {
     name = "Maybe";
-    args = debug_inspect_constraint(c->args[0]);
+    args = stringify_constraint_sv(c->args[0]);
   }
   // 2arg
   else if(c->func == &constraint_NumRange) {
-    name = "NumRange";
+    if(!c->args[0])
+      name = (c->flags & NUMRANGE_UPPER_INCLUSIVE ) ? "NumLE" : "NumLT";
+    else if(!c->args[1])
+      name = (c->flags & NUMRANGE_LOWER_INCLUSIVE ) ? "NumGE" : "NumGT";
+    else
+      name = "NumRange";
 
     if(c->args[0])
       sv_catsv(args, c->args[0]);
-    else
-      sv_catpvs(args, "undef");
-    sv_catpvs(args, ", ");
+    if(c->args[0] && c->args[1])
+      sv_catpvs(args, ", ");
     if(c->args[1])
       sv_catsv(args, c->args[1]);
-    else
-      sv_catpvs(args, "undef");
   }
   // narg
   else if(c->func == &constraint_NumEq) {
@@ -1015,14 +1030,14 @@ static SV *S_debug_inspect_constraint(pTHX_ SV *csv)
   else if(c->func == &constraint_StrEq) {
     name = "StrEq";
     if(SvTYPE(c->args[0]) != SVt_PVAV)
-      sv_catsv_quotedprefix(args, c->args[0]);
+      sv_catsv_quoted(args, c->args[0], '"');
     else {
       U32 n = av_count((AV *)c->args[0]);
       SV **vals = AvARRAY(c->args[0]);
       for(U32 i = 0; i < n; i++) {
         if(i > 0)
           sv_catpvs(args, ", ");
-        sv_catsv_quotedprefix(args, vals[i]);
+        sv_catsv_quoted(args, vals[i], '"');
       }
     }
   }
@@ -1034,7 +1049,7 @@ static SV *S_debug_inspect_constraint(pTHX_ SV *csv)
       for(U32 i = 0; i < n; i++) {
         if(i > 0)
           sv_catpvs(args, ", ");
-        sv_catsv(args, debug_inspect_constraint(inners[i]));
+        sv_catsv(args, stringify_constraint_sv(inners[i]));
       }
     }
   }
@@ -1043,8 +1058,6 @@ static SV *S_debug_inspect_constraint(pTHX_ SV *csv)
     return newSVpvs_flags("TODO: debug inspect constraint", SVs_TEMP);
 
   SV *ret = newSVpvf("%s", name);
-  if(c->flags)
-    sv_catpvf(ret, "/%d", c->flags);
   if(SvCUR(args))
     sv_catpvf(ret, "(%" SVf ")", SVfARG(args));
 
@@ -1056,7 +1069,7 @@ MODULE = Data::Checks    PACKAGE = Data::Checks::Debug
 void inspect_constraint(SV *sv)
   PPCODE:
     /* Prevent XSUB from double-mortalising it */
-    PUSHs(debug_inspect_constraint(extract_constraint(sv)));
+    PUSHs(stringify_constraint_sv(extract_constraint(sv)));
     XSRETURN(1);
 
 MODULE = Data::Checks    PACKAGE = Data::Checks::Constraint
@@ -1068,6 +1081,13 @@ void DESTROY(SV *self)
     for(int i = c->n - 1; i >= 0; i--)
       SvREFCNT_dec(c->args[i]);
   }
+
+bool check(SV *self, SV *value)
+  CODE:
+    struct Constraint *c = (struct Constraint *)SvPVX(SvRV(self));
+    RETVAL = (c->func)(aTHX_ c, value);
+  OUTPUT:
+    RETVAL
 
 MODULE = Data::Checks    PACKAGE = Data::Checks
 

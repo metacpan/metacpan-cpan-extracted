@@ -18,7 +18,9 @@
 			resources =>
 			{
 				license => 'http://www.gnu.org/licenses/gpl-3.0.html',
-				bugtracker => { web => 'https://sourceforge.net/p/csi-sql-simpleops/tickets/' },
+				homepage => 'https://sourceforge.net/p/csi-sql-simpleops/wiki/Home/',
+#				bugtracker => { web => 'https://sourceforge.net/p/csi-sql-simpleops/tickets/' },
+				bugtracker => 'https://sourceforge.net/p/csi-sql-simpleops/tickets/',
 				repository =>
 				{
 					type => 'git',

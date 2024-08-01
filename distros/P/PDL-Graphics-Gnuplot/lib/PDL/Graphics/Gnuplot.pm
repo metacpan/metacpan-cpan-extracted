@@ -69,6 +69,8 @@
 # PDL::Options in other circumstances.
 #
 
+=encoding UTF-8
+
 =head1 NAME
 
 PDL::Graphics::Gnuplot - Gnuplot-based plotting for PDL
@@ -173,7 +175,7 @@ of devices; see the description of plot options, below.
 
 You can specify what type of graphics output you want, but in most cases
 doing nothing will cause a plot to be rendered on your screen: with
-X windows on UNIX or Linux systems, with an XQuartz windows on MacOS,
+X windows on UNIX or Linux systems, with an XQuartz window on MacOS,
 or with a native window on Microsoft Windows.
 
 You select a plot style with the "with" curve option, and feed in columns
@@ -583,7 +585,7 @@ FITS images in scientific coordinates with
 
  gplot( with=>'fits', $fitsdata );
 
-The fits plot style accepts a modifier "resample" (which may be
+The fits plot style accepts a curve option "resample" (which may be
 abbreviated), that allows you to downsample and/or rectify the image
 before it is passed to the Gnuplot back-end.  This is useful either to
 cut down on the burden of transferring large blocks of image data or
@@ -591,12 +593,14 @@ to rectify images with nonlinear WCS transformations in their headers.
 (gnuplot itself has a bug that prevents direct rendering of images in
 nonlinear coordinates).
 
- gplot( with=>'fits res 200', $fitsdata );
- gplot( with=>'fits res 100,400',$fitsdata );
+ gplot( with=>'fits', res=>1, $fitsdata );
+ gplot( with=>'fits', res=>[200], $fitsdata );
+ gplot( with=>'fits', res=>[100,400],$fitsdata );
 
-to specify that the output are to be resampled onto a square 200x200
-grid or a 100x400 grid, respectively.  The resample sizes must be
+to specify that the output are to be resampled onto a square 1024x1024 grid,
+a 200x200 grid, or a 100x400 grid, respectively. The resample sizes must be
 positive integers.
+A true non-ref value will be treated as 1024x1024.
 
 =head2 Interactivity
 
@@ -1543,7 +1547,7 @@ B<C<pointsize>> accepts a single number and scales the size of points used in pl
 
 B<C<style>> provides a great deal of customization for individual plot styles.
 It is not (yet) fully parsed by PDL::Graphics::Gnuplot; please refer to the Gnuplot
-manual for details (it is pp. 145ff in the Gnuplot 4.6.1 maual).  C<style> accepts
+manual for details (it is pp. 145ff in the Gnuplot 4.6.1 manual).  C<style> accepts
 a hash ref whose keys are plot styles (such as you would feed to the C<with> curve option),
 and whose values are array refs containing keywords and other parameters to modify how each
 plot style should be displayed.
@@ -1781,6 +1785,10 @@ of lines using the threaded syntax, try
     $w->plot3d( wi=>'lines', cd=>1, xvals($r2), yvals($r2), $r2 );
 
 which will plot 21 separate curves in a threaded manner.
+
+=item resample
+
+For C<< with=>'fits' >>. See L</Images>.
 
 =back
 
@@ -2053,7 +2061,7 @@ our $echo_eating = 0;                             # Older versions of gnuplot on
 our $debug_echo = 0;                              # If set, mock up Losedows half-duplex pipes
 
 
-our $VERSION = '2.026';
+our $VERSION = '2.027';
 $VERSION = eval $VERSION;
 
 our $gp_version = undef;    # eventually gets the extracted gnuplot(1) version number.
@@ -3120,7 +3128,7 @@ POS
 		$chunks->[$i]{testdata} = $testdataunit_binary x ($chunks->[$i]{tuplesize}) if $check_syntax;
 	    } else {
 		# ASCII transfer has been specified - plot command is easier, but the data are in ASCII.
-		$pchunk = " '-' ".$plotcmds[$i];
+		$pchunk = " \$PGG_data_$i ".$plotcmds[$i];
 		$tchunk = $pchunk if $check_syntax;
 		$chunks->[$i]{testdata} = " 1 " x ($chunks->[$i]{tuplesize}) . "\ne\n" if $check_syntax;
 	    }
@@ -3152,12 +3160,13 @@ POS
     ##############################
     ##### Send the PlotOptionsString
     my @plot_chunks = [$plotOptionsString];
-    my $plotshow = $plotOptionsString;
+    my @plotshow_chunks = $plotOptionsString;
     ##############################
     ##### Finally..... send the actual plot command to the gnuplot device.
     print "plot command is:\n$plotcmd\n" if $PDL::Graphics::Gnuplot::DEBUG;
     push @plot_chunks, [$plotcmd];
-    $plotshow .= $plotcmd;
+    push @plotshow_chunks, $plotcmd;
+    my $chunk_i = 0;
     for my $chunk (@$chunks) {
 	# Gnuplot doesn't handle bad values, but it *does* know to
 	# omit nans.  If we're running under a PDL that uses the
@@ -3176,22 +3185,22 @@ POS
 	    # Currently all images are sent binary
 	    my $p = $chunk->{data}[0]->double->sever;
 	    push @plot_chunks, [${$p->get_dataref}, {binary => 1, data => 1 }];
-	    $plotshow .= " [ ".length(${$p->get_dataref})." bytes of binary image data ]\n";
+	    push @plotshow_chunks, " [ ".length(${$p->get_dataref})." bytes of binary image data ]\n";
 	} elsif ($chunk->{binaryCurveFlag}) {
 	    # Send in binary if the binary flag is set.
 	    my $p = pdl(@{$chunk->{data}})->mv(-1,0)->double->sever;
 	    push @plot_chunks, [${$p->get_dataref}, {binary => 1, data => 1 }];
-	    $plotshow .= " [ ".length(${$p->get_dataref})." bytes of binary data ]\n";
+	    push @plotshow_chunks, " [ ".length(${$p->get_dataref})." bytes of binary data ]\n";
 	} else {
 	    # Assemble and dump the ASCII
 	    if ($chunk->{data}[0]->$_isa('PDL')) {
 		# It's a collection of PDL data only.
 		my $p = pdl(@{$chunk->{data}})->slice(":,:"); # ensure at least 2 dims
 		$p = $p->mv(-1,0);                         # tuple dim first, rows second
-		$plotshow .= " [ ".$p->dim(1)." lines of ASCII data ]\n";
+		splice @plotshow_chunks, 1, 0, "\$PGG_data_$chunk_i << [ ".$p->dim(1)." lines of ASCII data ]\n";
 		# Create a set of ASCII lines.  If any of the elements of a given row are NaN or BAD, blank that line.
 		my $outbuf = join("\n", map $_->isfinite->all ? join(" ", $_->list) : "", $p->dog) . "\n";
-		push @plot_chunks, _emit_ascii($this, $outbuf);
+		splice @plot_chunks, 1, 0, _emit_ascii($this, $chunk_i, $outbuf);
 	    } else {
 		# It's a collection of array ref data only.  Assemble strings.
 		my $data = $chunk->{data};
@@ -3209,10 +3218,11 @@ POS
 		    }
 		    $s .= "\n";                     # add newline
 		}
-		$plotshow .= $s;
-		push @plot_chunks, _emit_ascii($this, $s);
+		splice @plotshow_chunks, 1, 0, "\$PGG_data_$chunk_i << e\n${s}e\n";
+		splice @plot_chunks, 1, 0, _emit_ascii($this, $chunk_i, $s);
 	    }
 	}
+	$chunk_i++;
     }
     ##############################
     # Finally, finally ...  send any required cleanup commands.  This
@@ -3231,10 +3241,10 @@ POS
 	  if $checkpointMessage;
     }
     push @plot_chunks, [$cleanup_cmd];
-    $plotshow .= $cleanup_cmd;
+    push @plotshow_chunks, $cleanup_cmd;
     # Flag the output as rescalable if anti-aliasing is in effect
     $this->{aa_ready} = 1 if $this->{aa} && $this->{aa} != 1;
-    (\@plot_chunks, $plotshow);
+    (\@plot_chunks, join('', @plotshow_chunks));
 }
 
 *gplot = \&plot;
@@ -3298,12 +3308,12 @@ sub plot
 # Not in binary mode - send this chunk in ASCII.  Each line gets one
 # tuple, followed a line with just "e".
 sub _emit_ascii {
-  my ($this, $chunk) = @_;
+  my ($this, $chunk_i, $chunk) = @_;
   # Under real OSes, we can just send a schwack of stuff - there is no echo.
-  return [$chunk."e\n", {data => 1}]
+  return ["\$PGG_data_$chunk_i << e\n${chunk}e\n", {data => 1}]
     if !$MS_io_braindamage;
   my $pipe_stuff = !$this->{dumping} && $echo_eating;
-  ((map $pipe_stuff ? \$_ : $_, map ["$_\n", {data => 1 }], split /\n/, $chunk), ["e\n", {data => 1 }]);
+  ((map $pipe_stuff ? \$_ : $_, map ["$_\n", {data => 1 }], "\$PGG_data_$chunk_i <<e", split /\n/, $chunk), ["e\n", {data => 1 }]);
 }
 
 #####################
@@ -3405,14 +3415,9 @@ sub parseArgs
     # First, unpack the "with" -- we accept a list of with parameters, but also
     # unpack them if they are supplied as a single smushed-together string.
     our $plotStyleProps; # declared below
-    my @with;
-    if(@{$chunk{options}{with}}==1) {
-      @with = split /\s+/,$chunk{options}{with}->[0];
-      @{$chunk{options}{with}} = @with;
-    } else {
-      @with = @{$chunk{options}{with}};
-    }
-    if(@with > 1) {
+    my $with = $chunk{options}{with};
+    @$with = split /\s+/, $with->[0] if @$with == 1;
+    if (@$with > 1) {
       carp q{
 WARNING: deprecated usage of complex 'with' detected.  Use a simple 'with'
 specifier and curve options instead.  This will fail in future releases of
@@ -3421,26 +3426,24 @@ PDL::Graphics::Gnuplot. (Set $ENV{'PGG_DEP'}=1 to silence this warning.
     }
     # Look for the plotStyleProps entry.  If not there, try cleaning up the with style
     # before giving up entirely.
-    unless ( exists( $plotStyleProps->{$with[0]}[0] ) ) {
-      our $plotStylesAbbrevs;
+    unless ( exists $plotStyleProps->{$with->[0]} ) {
       # Try pluralizing and lc'ing if that works...
-      if($with[0] !~ m/s$/i  and  exists( $plotStyleProps->{lc $with[0].'s'} ) ) {
-        $with[0] = lc $with[0].'s';
-        $chunk{options}{with}[0] = $with[0];
+      if ($with->[0] !~ m/s$/i  and  exists( $plotStyleProps->{lc $with->[0].'s'} ) ) {
+        $with->[0] = lc $with->[0].'s';
       } else {
         # nope.  throw a fit.
-        barf "invalid plotstyle 'with $with[0]' in plot\n";
+        barf "invalid plotstyle 'with $with->[0]' in plot\n";
       }
     }
-    my $psProps = $plotStyleProps->{$with[0]};
+    my $psProps = $plotStyleProps->{$with->[0]};
     # Extract the data objects from the argument list.
     # They should all be either PDLs or array refs.
     my @dataPiddles = @args[$argIndex..$nextOptionIdx-1];
     # Some plot styles (currently just "fits") are implemented via a
     # prefrobnicator that processes the data.
     if( $psProps->[ 4 ] ) {
-      @dataPiddles = &{ $psProps->[4] }( \@with, $this, \%chunk, @dataPiddles );
-      $psProps = $plotStyleProps->{$with[0]};
+      @dataPiddles = &{ $psProps->[4] }( $with, $this, \%chunk, @dataPiddles );
+      $psProps = $plotStyleProps->{$with->[0]};
     }
     # Image flag and base tuplesizes allowed for this plot style...
     my $tupleSizes   = $psProps->[ !!$is3d ];  # index is 0 or 1 depending on truth of 3D flag
@@ -3458,7 +3461,7 @@ PDL::Graphics::Gnuplot. (Set $ENV{'PGG_DEP'}=1 to silence this warning.
       {
       carp <<EOF;
 PDL::Graphics::Gnuplot warning: user asked for $asked data transfer, but
-'$with[0]' plots are ALWAYS sent in $got. Ignoring '$asked' request.
+'$with->[0]' plots are ALWAYS sent in $got. Ignoring '$asked' request.
 Set environment variable PGG_SUPPRESS_BINARY_MISMATCH_WARNING to suppress
 this warning.
 EOF
@@ -3467,13 +3470,13 @@ EOF
     }
     # Reject disallowed plot styles
     unless (ref $tupleSizes) {
-      barf "plotstyle 'with ".($with[0])."' isn't valid in $ND plots\n";
+      barf "plotstyle 'with $with->[0]' isn't valid in $ND plots\n";
     }
     # Additional columns are needed for certain 'with' modifiers. Figure 'em, cheesily: each
     # palette or variable option to 'with' needs an additional column.
-    # The search over @with will disappear with the deprecated compound-with form;
+    # The search over @$with will disappear with the deprecated compound-with form;
     # the real one is the second line that scans through curve options.
-    my $ExtraColumns = grep /(palette|variable)/, map split(/\s+/,$_), @with;
+    my $ExtraColumns = grep /(palette|variable)/, @$with;
     for my $k (qw/linecolor textcolor fillstyle pointsize linewidth/ ) {
       my $v = $chunk{options}{$k};
       next unless defined($v);
@@ -3498,7 +3501,7 @@ EOF
       # No match -- barf unless you really meant it
       if (!$chunk{options}{tuplesize}) {
         my $pl = ($NdataPiddles==1)?"":"s";
-        my $s = "Found $NdataPiddles PDL$pl for $ND plot type 'with ".($with[0])."', which needs ";
+        my $s = "Found $NdataPiddles PDL$pl for $ND plot type 'with $with->[0]', which needs ";
         barf "Ouch! I'm never supposed to take this path. Please report a bug."
 	  if !@$tupleSizes;
         if (@$tupleSizes==1) {
@@ -3530,28 +3533,12 @@ EOF
     # This happens if RGB or RGBA is in dim 0 or in dim 2.
     # The other dimensions have to have at least five elements.
     if ( $cdims==2 ) {
-      if ($chunk{options}{with}[0] eq 'image') {
+      if ($with->[0] eq 'image') {
         my $dp = $dataPiddles[-1];
-        if ($dp->ndims==3) {
-          if ($dp->dim(1) >= 5) {
-            if ($dp->dim(0) ==3 && $dp->dim(1) >= 5 && $dp->dim(2) >= 5) {
-              $chunk{options}{with}[0] = 'rgbimage';
-              pop @dataPiddles;
-              push @dataPiddles,$dp->using(0,1,2);
-            } elsif ($dp->dim(2)==3 && $dp->dim(1)>=5 && $dp->dim(0) >= 5) {
-              $chunk{options}{with}[0] = 'rgbimage';
-              pop @dataPiddles;
-              push @dataPiddles,$dp->mv(2,0)->using(0,1,2);
-            } elsif ($dp->dim(0)==4 && $dp->dim(1) >= 5 && $dp->dim(2) >= 5) {
-              $chunk{options}{with}[0] = 'rgbalpha';
-              pop @dataPiddles;
-              push @dataPiddles,$dp->using(0,1,2,3);
-            } elsif ($dp->dim(2)==4 && $dp->dim(0) >= 5 && $dp->dim(1) >= 5) {
-              $chunk{options}{with}[0] = 'rgbalpha';
-              pop @dataPiddles;
-              push @dataPiddles, $dp->mv(2,0)->using(0,1,2,3);
-            }
-          }
+        if ($dp->ndims==3 and $dp->dim(1) >= 5) {
+          my ($new_with, @ndarrays) = _regularise_image($dp);
+          $with->[0] = $new_with;
+          splice @dataPiddles, -1, 1, @ndarrays;
         }
       }
     }
@@ -3670,10 +3657,26 @@ FOO
       push @chunks, \%chunk;
     }
     $Ncurves += $ncurves;
-    $chunk{imageflag} = $imgFlag;
     $argIndex = $nextOptionIdx;
   }
   return (\@chunks, $Ncurves);
+}
+
+sub _regularise_image {
+  my ($dp) = @_;
+  my $with = $dp->dim(0) == 3 || $dp->dim(2) == 3 ? 'rgbimage' :
+    $dp->dim(0) == 4 || $dp->dim(2) == 4 ? 'rgbalpha' : undef;
+  my @ndarrays;
+  if ($dp->dim(0) == 3 && $dp->dim(2) >= 5) {
+    @ndarrays = $dp->using(0..2);
+  } elsif ($dp->dim(2) == 3 && $dp->dim(0) >= 5) {
+    @ndarrays = $dp->mv(2,0)->using(0..2);
+  } elsif ($dp->dim(0) == 4 && $dp->dim(2) >= 5) {
+    @ndarrays = $dp->using(0..3);
+  } elsif ($dp->dim(2) == 4 && $dp->dim(0) >= 5) {
+    @ndarrays = $dp->mv(2,0)->using(0..3);
+  }
+  ($with, @ndarrays);
 }
 
 ##########
@@ -5238,7 +5241,16 @@ our $cOptionsTable = {
     'nosurface' =>['b', 'cff', undef, 21],
     'palette'   =>['b', 'cff',  undef, 22],
 
-    'tuplesize'=> ['s',sub { return ""}]    # set tuplesize explicitly (not a gnuplot option)
+    'tuplesize'=> ['s',sub { return ""}], # set tuplesize explicitly (not a gnuplot option)
+    'resample' => [sub { my ($k, $v, $h) = @_; # for FITS
+	return if !$v;
+	return [1024,1024] if !ref $v;
+	barf "Curve option 'resample' given non-array ref '$v'" if ref $v ne 'ARRAY';
+	barf "Curve option 'resample' given array-ref with no values" if !@$v;
+	barf "Curve option 'resample' given array-ref with too many values" if @$v > 2;
+	@$v == 1 ? [@$v[0,0]] : $v;
+      },
+      sub {""}],
 };
 
 our $cOptionsAbbrevs = _gen_abbrev_list(keys %$cOptionsTable);
@@ -7726,6 +7738,20 @@ sub _obj_or_global {
 ### necessary because FITS images often have nonlinear mappings
 ### between pixel and scientific coordinates.
 
+sub _make_fits_hdr {
+  my ($x, $y, $x_pix, $y_pix, $x_min, $y_min, $x_max, $y_max, $x_type, $y_type, $x_unit, $y_unit) = @_;
+  {
+    NAXIS=>2,
+    NAXIS1=> $x,      NAXIS2=> $y,
+    CRPIX1=> $x_pix,  CRPIX2=> $y_pix,
+    CRVAL1=> $x_min,  CRVAL2=> $y_min,
+    CDELT1=> ($x_max-$x_min)/$x,
+    CDELT2=> ($y_max-$y_min)/$y,
+    CTYPE1=> $x_type, CTYPE2=> $y_type,
+    CUNIT1=> $x_unit, CUNIT2=> $x_unit
+  };
+}
+
 ##############################
 # _with_fits_prefrobnicator
 #
@@ -7736,143 +7762,49 @@ sub _obj_or_global {
 # tuple form of "with image" only works for affine transformations between
 # pixel coordinates and scientific plane coordinates.
 #
-#
-our $fitsmap_size = 1024;
 sub _with_fits_prefrobnicator {
-    my( $with, $this, $chunk, @data ) = @_;
-    my $resample_flag = 0;
-    my @resample_dims = ($fitsmap_size,$fitsmap_size);
-
-    # search for fits-specific 'with' options
-    my $i;
-    for($i=0;$i<@$with;$i++) {
-	if( ($with->[$i]) =~ m/^re(s(a(m(p(l(e)?)?)?)?)?)?/i ) {
-	    splice @$with, $i,1; # remove 'resample' from list
-	    $resample_flag = 1;
-	    if( ($with->[$i]) =~ m/(\d+)(\,(\d+))?/ ) {
-		@resample_dims = ($1, $3 // $1);
-		splice @$with, $i, 1;
-	    }
-	    $i--;
-	}
-    }
-
-    eval "use PDL::Transform;";
-    barf "PDL::Graphics::Gnuplot: couldn't load PDL::Transform for 'with fits' option" if($@);
-
-    barf "PDL::Graphics::Gnuplot: 'with fits' special option requires a single FITS image\n" if(@data != 1);
-    my $data = $data[0];
-
-    my $h = $data->gethdr();
-    unless($h   and   ref $h eq 'HASH'   and   $h->{NAXIS}   and   $h->{NAXIS1}   and   $h->{NAXIS2}) {
-	if($data->ndims==2 or ($data->ndims==3 && ($data->dim(3)==3 || $data->dim(3)==1))) {
-	    warn("PDL::Graphics::Gnuplot: 'with fits' expected a FITS header.  Using pixel coordinates...\n");
-		 $h = {
-		     NAXIS=>2,
-		     NAXIS1 => $data->dim(0),
-		     NAXIS2 => $data->dim(1),
-		     CRPIX1=>1,		         CRPIX2=>1,
-		     CRVAL1=>0,   		 CRVAL2=>0,
-		     CDELT1=>1,                  CDELT2=>1,
-		     CTYPE1=>"X",                CTYPE2=>"Y",
-		     CUNIT1=>"Pixels",           CUNIT2=>"Pixels"
-		 }
-	} else {
-	    barf("PDL::Graphics::Gnuplot: 'with fits' got a (non-image) ".join("x",$data->dims)." PDL with no FITS header.\n");
-	}
-    }
-
-    ##############################
+  my ($with, $this, $chunk, @data ) = @_;
+  eval "use PDL::Transform";
+  barf "PDL::Graphics::Gnuplot: couldn't load PDL::Transform for 'with fits' option: $@" if $@;
+  barf "PDL::Graphics::Gnuplot: 'with fits' special option requires a single FITS image\n" if @data != 1;
+  my $data = $data[0];
+  barf "PDL::Graphics::Gnuplot: 'with fits' needs an image, RGB triplet, or RGBA quad\n" unless $data->ndims==2 || ($data->ndims==3 && ($data->dim(2)==4 || $data->dim(2)==3 || $data->dim(2)==1));
+  my $h = $data->gethdr;
+  barf "PDL::Graphics::Gnuplot: 'with fits' expected a FITS header\n"
+    unless $h && ref $h eq 'HASH' && !grep !$h->{$_}, qw(NAXIS NAXIS1 NAXIS2);
+  if (my $resample = $chunk->{options}{resample}) {
     # Now find the dataspace boundaries for the map, so we don't waste pixels.
-    my ($xmin,$xmax,$ymin,$ymax);
-    if(exists($this->{options}{xrange})) {
-	$xmin = $this->{options}{xrange}[0];
-	$xmax = $this->{options}{xrange}[1];
+    my ($xmin, $xmax) = @{$this->{options}{xrange}||[]};
+    my ($ymin, $ymax) = @{$this->{options}{yrange}||[]};
+    unless (defined($xmin) && defined($xmax) && defined($ymin) && defined($ymax)) {
+      my $pix_corners = pdl([0,0],[0,1],[1,0],[1,1]) * pdl($data->dim(0),$data->dim(1)) - 0.5;
+      my $corners = $pix_corners->apply(t_fits($h));
+      $xmin //= $corners->slice("(0)")->min;
+      $xmax //= $corners->slice("(0)")->max;
+      $ymin //= $corners->slice("(1)")->min;
+      $ymax //= $corners->slice("(1)")->max;
     }
-    if(exists($this->{options}{yrange})) {
-	$ymin = $this->{options}{yrange}[0];
-	$ymax = $this->{options}{yrange}[1];
-    }
-
-    unless(defined($xmin) && defined($xmax) && defined($ymin) && defined($ymax)) {
-	my $pix_corners = pdl([0,0],[0,1],[1,0],[1,1]) * pdl($data->dim(0),$data->dim(1)) - 0.5;
-	my $corners = $pix_corners->apply(t_fits($data));
-	$xmin //= $corners->slice("(0)")->min;
-	$xmax //= $corners->slice("(0)")->max;
-	$ymin //= $corners->slice("(1)")->min;
-	$ymax //= $corners->slice("(1)")->max;
-    }
-
-    if($ymin > $ymax) {
-	my $a = $ymin; $ymin = $ymax; $ymax = $a;
-    }
-    if($xmin > $xmax) {
-	my $a = $xmin; $xmin = $xmax; $xmax = $a;
-    }
-
-    our $dest_hdr = {NAXIS=>2,
-		    NAXIS1=> $resample_dims[0],     NAXIS2=>$resample_dims[1],
-		    CRPIX1=> 0.5,                   CRPIX2=>0.5,
-		    CRVAL1=> $xmin,                 CRVAL2=>$ymin,
-		    CDELT1=> ($xmax-$xmin)/($resample_dims[0]),
-		    CDELT2=> ($ymax-$ymin)/($resample_dims[1]),
-		    CTYPE1=> $h->{CTYPE1},	    CTYPE2=> $h->{CTYPE2},
-		    CUNIT1=> $h->{CUNIT1},          CUNIT2=> $h->{CUNIT2}
-    };
-
-    my ($d2,$ndc);
-    if($resample_flag) {
-	my $d1 = double $data;
-	unless($data->hdrcpy) {$d1->sethdr($data->gethdr);} # no copying - ephemeral value
-	$d2 = $d1->map( t_identity(), $dest_hdr,{method=>'h'} );  # Rescale into coordinates proportional to the scientific ones
-	$ndc = ndcoords($d2->dim(0),$d2->dim(1)) -> apply( t_fits($d2) );
-    } else {
-	$d2 = $data;
-	$ndc = ndcoords($data->dim(0),$data->dim(1))->apply(t_fits($data));
-    }
-
-    # Now update plot options to set the axis labels, if they haven't been updated already...
-    unless(defined $this->{options}{xlabel}) {
-	$this->{tmp_options}{xlabel} = [join(" ",
-					  $h->{CTYPE1} || "X",
-					  $h->{CUNIT1} ? "($h->{CUNIT1})" : "(pixels)"
-				      )];
-    }
-    unless(defined $this->{options}{ylabel}) {
-	$this->{tmp_options}{ylabel} = [join(" ",
-					  $h->{CTYPE2} || "Y",
-					  $h->{CUNIT2} ? "($h->{CUNIT2})" : "(pixels)"
-				      )];
-    }
-    unless(defined $this->{options}{cblabel}) {
-	$this->{tmp_options}{cblabel} = [join(" ",
-					    $h->{BTYPE} || "Value",
-					    $h->{BUNIT} ? "($h->{BUNIT})" : ""
-				       )];
-    }
-
-    ##
-    # Debugging Gnuplot's horrible indexing problem
-    # $PDL::Graphics::Gnuplot::prefrobnicated = [$ndc->mv(0,-1)->dog, $d2];
-
-    if($d2->ndims == 2) {
-	$with->[0] = 'image';
-	$chunk->{options}{with} = [@$with];
-	return ($ndc->mv(0,-1)->dog, $d2);
-    }
-
-    if($data->ndims == 3 and $data->dim(2)==3) {
-	$with->[0] = 'rgbimage';
-	return ($ndc->mv(0,-1)->dog, $d2->dog);
-    }
-
-    if($data->ndims == 3 and $data->dim(2)==4) {
-	$with->[0] = 'rgbalpha';
-	return ($ndc->mv(0,-1)->dog, $d2->dog);
-    }
-
-    barf "PDL::Graphics::Gnuplot: 'with fits' needs an image, RGB triplet, or RGBA quad\n";
-
+    ($xmin, $xmax) = ($xmax, $xmin) if $xmin > $xmax;
+    ($ymin, $ymax) = ($ymax, $ymin) if $ymin > $ymax;
+    my $d1 = $data->double;
+    $d1->sethdr($h) if !$d1->gethdr; # ie converted and no hdrcpy
+    $h = _make_fits_hdr(@$resample, 0.5, 0.5, $xmin, $ymin, $xmax, $ymax, @$h{qw(CTYPE1 CTYPE2 CUNIT1 CUNIT2)});
+    $data = $d1->map( t_identity(), $h, {method=>'h'} );  # Rescale into coordinates proportional to the scientific ones
+  }
+  # Now update plot options to set the axis labels, if they haven't been updated already...
+  for ([qw(xlabel CTYPE1 X CUNIT1 (pixels))],
+    [qw(ylabel CTYPE2 Y CUNIT2 (pixels))],
+    [qw(cblabel BTYPE Value BUNIT), ''],
+  ) {
+    my ($label, $type, $typel, $unit, $unitdef) = @$_;
+    next if defined $this->{options}{$label};
+    $this->{tmp_options}{$label} = [join(" ",
+      $h->{$type} || $typel,
+      $h->{$unit} ? "($h->{$unit})" : $unitdef
+    )];
+  }
+  $with->[0] = 'image';
+  (ndcoords(map $data->dim($_), 0,1)->apply(t_fits($h, {ignore_rgb=>1}))->mv(0,-1)->dog, $data);
 }
 
 ##########

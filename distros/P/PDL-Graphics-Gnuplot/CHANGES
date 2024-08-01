@@ -1,3 +1,8 @@
+2.027 2024-07-31
+- add "resample" curve option for with=>'fits'
+- with=>'fits' error if no FITS header
+- fix ASCII plots to work in multiplot with Gnuplot 6+
+
 2.026 2024-04-20
 - fix {colorbox=>1} (#100)
 

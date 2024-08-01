@@ -55,7 +55,7 @@ static void apply_Checked(pTHX_ struct XPSSignatureParamContext *ctx, SV *attrva
 
   gen_assertmess(checker,
     sv_2mortal(newSVpvf(ctx->is_named ? "Named parameter :%s" : "Parameter %s", PadnamePV(pn))),
-    sv_2mortal(newSVpvf(":Checked(%" SVf ")", SVfARG(attrvalue))));
+    NULL);
 
   *attrdata_ptr = checker;
 }
@@ -98,6 +98,6 @@ MODULE = Signature::Attribute::Checked    PACKAGE = Signature::Attribute::Checke
 
 BOOT:
   boot_xs_parse_sublike(0.19);
-  boot_data_checks(0.02);
+  boot_data_checks(0.09);
 
   register_xps_signature_attribute("Checked", &funcs_Checked, NULL);

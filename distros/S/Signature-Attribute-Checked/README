@@ -68,10 +68,6 @@ PARAMETER ATTRIBUTES
 
          $ok = $checkerobj->check( $value );
 
-      * A code reference:
-
-         $ok = $checkersub->( $value );
-
       * A plain string giving the name of a package with a check method:
 
          $ok = $checkerpkg->check( $value );

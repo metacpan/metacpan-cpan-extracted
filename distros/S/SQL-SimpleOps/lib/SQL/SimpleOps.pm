@@ -94,7 +94,7 @@
 		$err
 	);
 
-	our $VERSION = "2023.362.1";
+	our $VERSION = "2024.213.1";
 
 	our @EXPORT_OK = @EXPORT;
 
@@ -844,6 +844,7 @@ sub _Select()
 	my @fields_work;
 	my %fields_distinct;
 	my %fields_aliases;
+
 	if (defined($argv->{fields}))
 	{
 		my $fields_argv;
@@ -938,7 +939,6 @@ sub _Select()
 			}
 		}
 	}
-
 	## testing groupby
 	my @group_work;
 	if (defined($argv->{group_by}))
@@ -1051,7 +1051,7 @@ sub _Select()
 				{
 					if ($alias)
 					{
-						push(@fields,$distinct.$field.$middle.$alias);
+						push(@fields,$distinct.$field_a.$field.$field_b.$middle.$alias);
 					}
 					else
 					{
@@ -1066,8 +1066,8 @@ sub _Select()
 							}
 						}
 						($alias) ?
-							push(@fields,$distinct.$field.$middle.$alias):
-							push(@fields,$distinct.$field);
+							push(@fields,$distinct.$field_a.$field.$field_b.$middle.$alias):
+							push(@fields,$distinct.$field_a.$field.$field_b);
 					}
 				}
 			}

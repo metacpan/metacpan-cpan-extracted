@@ -1,5 +1,5 @@
 package Dist::Zilla::Plugin::DynamicPrereqs::Meta;
-$Dist::Zilla::Plugin::DynamicPrereqs::Meta::VERSION = '0.002';
+$Dist::Zilla::Plugin::DynamicPrereqs::Meta::VERSION = '0.003';
 use 5.020;
 
 use Moose;
@@ -23,7 +23,7 @@ sub mvp_multivalue_args {
 sub mvp_aliases {
 	return {
 		condition => 'conditions',
-		prereq => 'input_prereq',
+		prereq => 'prereqs',
 	};
 }
 
@@ -132,7 +132,7 @@ Dist::Zilla::Plugin::DynamicPrereqs::Meta - Add dynamic prereqs to to the metada
 
 =head1 VERSION
 
-version 0.002
+version 0.003
 
 =head1 SYNOPSIS
 

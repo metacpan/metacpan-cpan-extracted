@@ -4,11 +4,11 @@ author:
   - 'Leon Timmermans <leont@cpan.org>'
 build_requires:
   Test::More: '0'
-  XS::Parse::Infix: '0.26'
 configure_requires:
-  Module::Build::Tiny: '0.039'
+  Dist::Build: '0.001'
+  XS::Parse::Infix: '0.26'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.030, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Zilla version 6.031, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -17,7 +17,7 @@ name: Syntax-Infix-Smartmatch
 provides:
   Syntax::Infix::Smartmatch:
     file: lib/Syntax/Infix/Smartmatch.pm
-    version: '0.005'
+    version: '0.006'
 requires:
   XSLoader: '0'
   perl: '5.014'
@@ -26,7 +26,7 @@ requires:
 resources:
   bugtracker: https://github.com/Leont/syntax-infix-smartmatch/issues
   repository: git://github.com/Leont/syntax-infix-smartmatch.git
-version: '0.005'
+version: '0.006'
 x_contributors:
   - 'Leon Timmermans <fawaka@gmail.com>'
 x_generated_by_perl: v5.38.0

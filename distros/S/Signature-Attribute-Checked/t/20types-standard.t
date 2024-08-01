@@ -28,7 +28,7 @@ use experimental 'signatures';
       'f sees correct param value' );
 
    like( dies { f( "zero" ) },
-      qr/^Parameter \$x requires a value satisfying :Checked\(Num\) /,
+      qr/^Parameter \$x requires a value satisfying Num /,
       'f with string throws' );
 }
 
@@ -45,7 +45,7 @@ use experimental 'signatures';
       'g with undef OK' );
 
    like( dies { g( "zero" ) },
-      qr/^Parameter \$x requires a value satisfying :Checked\(Maybe\[Num\]\) /,
+      qr/^Parameter \$x requires a value satisfying Maybe\[Num\] /,
       'g with string throws' );
 }
 

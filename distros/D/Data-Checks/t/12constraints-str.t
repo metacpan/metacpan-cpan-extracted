@@ -24,18 +24,18 @@ test_constraint Str => Str,
 
 # Str eq set
 {
-   my $checker = t::test::make_checkdata( StrEq(qw( A C E )), "Value", "StrEq A, C, E" );
+   my $checker = t::test::make_checkdata( StrEq(qw( A C E )), "Value" );
 
    ok(  t::test::check_value( $checker, "A" ), 'StrEq accepts a value' );
    ok(  t::test::check_value( $checker, "E" ), 'StrEq accepts a value' );
    ok( !t::test::check_value( $checker, "B" ), 'StrEq rejects a value not in the list' );
 
-   my $checker_Z = t::test::make_checkdata( StrEq("Z"), "Value", "StrEq Z" );
+   my $checker_Z = t::test::make_checkdata( StrEq("Z"), "Value" );
 
    ok(  t::test::check_value( $checker_Z, "Z" ), 'StrEq singleton accepts the value' );
    ok( !t::test::check_value( $checker_Z, "x" ), 'StrEq singleton rejects a different value' );
 
-   my $checker_empty = t::test::make_checkdata( StrEq(""), "Value", "StrEq empty" );
+   my $checker_empty = t::test::make_checkdata( StrEq(""), "Value" );
 
    ok(  t::test::check_value( $checker_empty, ""    ), 'StrEq empty accepts empty' );
    ok( !t::test::check_value( $checker_empty, undef ), 'StrEq empty rejects undef' );
@@ -58,7 +58,11 @@ is( Data::Checks::Debug::inspect_constraint( StrEq("A") ), "StrEq(\"A\")",
    'debug inspect StrEq("A")' );
 is( Data::Checks::Debug::inspect_constraint( StrEq("A", "B") ), "StrEq(\"A\", \"B\")",
    'debug inspect StrEq("A", "B")' );
-is( Data::Checks::Debug::inspect_constraint( StrMatch(qr/ABC/) ), "StrMatch(/(?^u:ABC)/)",
+is( Data::Checks::Debug::inspect_constraint( StrEq('"quoted value"') ), q(StrEq("\\"quoted value\\"")),
+   'debug inspect StrEq(\'"quoted value"\')' );
+is( Data::Checks::Debug::inspect_constraint( StrEq('literal $dollar') ), q(StrEq("literal \\$dollar")),
+   'debug inspect StrEq(\'literal $dollar\')' );
+is( Data::Checks::Debug::inspect_constraint( StrMatch(qr/ABC/) ), "StrMatch(qr/(?^u:ABC)/)",
    'debug inspect StrMatch(qr/ABC/)' );
 
 done_testing;

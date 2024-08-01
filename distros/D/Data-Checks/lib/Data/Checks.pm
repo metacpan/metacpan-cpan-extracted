@@ -3,7 +3,7 @@
 #
 #  (C) Paul Evans, 2024 -- leonerd@leonerd.org.uk
 
-package Data::Checks 0.08;
+package Data::Checks 0.09;
 
 use v5.22;
 use warnings;
@@ -37,6 +37,8 @@ C<Data::Checks> - Value constraint checking
 =head1 SYNOPSIS
 
 With L<Signature::Attribute::Checked>:
+
+=for highlighter perl
 
    use v5.26;
    use Sublike::Extended;
@@ -129,7 +131,7 @@ unblessed data.
    Str()
 
 Accepts any defined non-reference value, or a reference to an object in a
-class that overloads stringification. rejects undefined, unblessed references,
+class that overloads stringification. Rejects undefined, unblessed references,
 or references to objects in classes that do not overload stringification.
 
 =head2 StrEq
@@ -282,13 +284,27 @@ checks can be written using this more convenient syntax.
 
 I<Since version 0.07.>
 
-Accepts a value that is accepted by every one of the givn constraints. Rejects
-if at least one of them rejects it.
+Accepts a value that is accepted by every one of the given constraints.
+Rejects if at least one of them rejects it.
 
 Note that if no constraints are given, this accepts all possible values. This
 may be useful as an "accept-all" fallback case for generated code, or other
 situations where it is required to provide a constraint check but you do not
 wish to constraint allowed values.
+
+=head1 CONSTRAINT METHODS
+
+While not intended to be called from regular Perl code, these constraints
+still act like objects with the following methods.
+
+=head2 check
+
+   $ok = $constraint->check( $value );
+
+I<Since version 0.09.>
+
+Returns a boolean value indicating whether the constraint accepts the given
+value.
 
 =cut
 
@@ -306,6 +322,8 @@ wish to constraint allowed values.
 
 The following functions are provided by the F<DataChecks.h> header file for
 use in XS modules that implement value constraint checking.
+
+=for highlighter c
 
 =head2 boot_data_checks
 
@@ -331,6 +349,8 @@ The constraint check itself is specified by the C<SV> given by I<checkspec>,
 which should come directly from the user code. The constraint check may be
 specified in any of three ways:
 
+=for highlighter perl
+
 =over 4
 
 =item *
@@ -353,6 +373,10 @@ A B<code reference>. Value checks will be invoked with a single argument, as
 
    $ok = $checkersub->( $value );
 
+I<Since version 0.09> this form is now deprecated, because it does not easily
+support a way to query the constraint for its name or stringified form, which
+is useful when generating error messages.
+
 =item *
 
 Additionally, the constraint check functions provided by this module may be
@@ -361,6 +385,8 @@ fourth different mechanism. Outside code should not rely on what that
 mechanism may be.
 
 =back
+
+=for highlighter c
 
 Once constructed into a checker structure, the choice of which implementation
 is used is fixed, and if a method lookup is involved its result is stored
@@ -383,7 +409,11 @@ Releases any stored SVs in the checker structure, and the structure itself.
 Generates and stores a message string for the assert message to be used by
 L</make_assertop> and L</assert_value>. The message will take the form
 
+=for highlighter
+
    NAME requires a value satisfying CONSTRAINT
+
+=for highlighter c
 
 Both I<name> and I<constraint> SVs used as temporary strings to generate the
 stored message string. Neither SV is retained by the checker directly.

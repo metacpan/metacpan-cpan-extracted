@@ -1,5 +1,8 @@
 Revision history for Syntax-Infix-Smartmatch
 
+0.006     2024-07-31 15:39:44+02:00 Europe/Brussels
+          - Use Dist::Build for XS::Parse::Infix::Builder compatibility
+
 0.005     2023-07-11 22:56:49+02:00 Europe/Brussels
           - Fix compilation issue on unthreaded perl
           - Move bugtracker to github

@@ -624,3 +624,22 @@ Terminal will be disconnected in 1 minute if it remains inactive.
 WARNING:
   You cannot abort the restart operation once it has started.
 ERROR: setting PTP attributes for 2/1: admin state must be disabled
+
+wdm03*$ chassis power show
+
++------------------ CHASSIS POWER CONSUMPTION --------------+
+| Parameter                   | Value (Watts)               |
++-----------------------------+-----------------------------+
+| Usage                       |                       328.0 |
++-----------------------------+-----------------------------+
+
++-------------------------------------- POWER SUPPLY STATUS -----------------------------------------------------+
+| Slot   | Admin    | Oper   | Type    | Model                            | Serial Number | Part Number / Rev    |
++--------+----------+--------+---------+----------------------------------+---------------+----------------------+
+| PSU-1  | Enabled  | Up     | AC/240VDC | Waveserver Ai AC/DC Power Module | ABCDEFGH      |    186-1510-901/001  |
++--------+----------+--------+---------+----------------------------------+---------------+----------------------+
+| PSU-2  | Disabled | Something | AC/240VDC | Waveserver Ai AC/DC Power Module | ABCDEFGH      |    186-1510-901/001  |
++--------+----------+--------+---------+----------------------------------+---------------+----------------------+
+| PSU-2  | Enabled  | Faulted | AC/240VDC | Waveserver Ai AC/DC Power Module | ABCDEFGH      |    186-1510-901/001  |
++--------+----------+--------+---------+----------------------------------+---------------+----------------------+
+

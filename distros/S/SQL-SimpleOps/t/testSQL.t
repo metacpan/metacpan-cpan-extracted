@@ -22,7 +22,7 @@
 	use warnings;
 	use Test::More;
 
-	our $VERSION = "2023.362.1";
+	our $VERSION = "2024.213.1";
 
 	BEGIN{ use_ok('SQL::SimpleOps'); }
 
@@ -2302,6 +2302,70 @@ sub callWithout()
 		t=> 'Select( table=>"t1", fields => [{"t1.abc"=>"_a"}], where => [ "func1(_a)" => 123, "func1(t1.abc)" => 456 ] )',
 		r=> "SELECT t1.abc _a FROM t1 WHERE func1(abc) = '123' AND func1(t1.abc) = '456'",
 	);
+	&my_cmd
+	(
+		f=> "S0540",
+		s=> sub { $mymod->Select( table=>"t1", fields => ["count(t1.abc)"],  make_only=>1) },
+		t=> 'Select( table=>"t1", fields => [count(t1.abc)] )',
+		r=> "SELECT count(t1.abc) FROM t1",
+	);
+       &my_cmd
+        (
+                f=> "S0541",
+                s=> sub { $mymod->Select( table=>"t1", fields => [{"count(t1.abc)"=>"a"}],  make_only=>1) },
+                t=> 'Select( table=>"t1", fields => [{count(t1.abc)=>"a"}] )',
+                r=> "SELECT count(t1.abc) a FROM t1",
+        );
+       &my_cmd
+        (
+                f=> "S0542",
+                s=> sub { $mymod->Select( table=>"t1", fields => [{"count(*)"=>"a"}],  make_only=>1) },
+                t=> 'Select( table=>"t1", fields => [{count(*)=>"a"}] )',
+                r=> "SELECT count(*) a FROM t1",
+        );
+       &my_cmd
+        (
+                f=> "S0543",
+                s=> sub { $mymod->Select( table=>"t1", fields => [{"count()"=>"a"}],  make_only=>1) },
+                t=> 'Select( table=>"t1", fields => [{count()=>"a"}] )',
+                r=> "SELECT count() a FROM t1",
+        );
+	&my_cmd
+	(
+		f=> "S0550",
+		s=> sub { $mymod->Select( table=>["t1","t2"], fields => ["count(t1.abc)"],  make_only=>1) },
+		t=> 'Select( table=>["t1","t2"], fields => [count(t1.abc)] )',
+		r=> "SELECT count(t1.abc) FROM t1, t2",
+	);
+       &my_cmd
+        (
+                f=> "S0551",
+                s=> sub { $mymod->Select( table=>["t1","t2"], fields => [{"count(t1.abc)"=>"a"}],  make_only=>1) },
+                t=> 'Select( table=>["t1","t2"], fields => [{count(t1.abc)=>"a"}] )',
+                r=> "SELECT count(t1.abc) a FROM t1, t2",
+        );
+cc:
+       &my_cmd
+        (
+                f=> "S0552",
+                s=> sub { $mymod->Select( table=>["t1","t2"], fields => [{"count(*)"=>"a"}],  make_only=>1) },
+                t=> 'Select( table=>["t1","t2"], fields => [{count(*)=>"a"}] )',
+                r=> "SELECT count(*) a FROM t1, t2",
+        );
+       &my_cmd
+        (
+                f=> "S0553",
+                s=> sub { $mymod->Select( table=>["t1","t2"], fields => [{"count()"=>"a"}],  make_only=>1) },
+                t=> 'Select( table=>["t1","t2"], fields => [{count()=>"a"}] )',
+                r=> "SELECT count() a FROM t1, t2",
+        );
+       &my_cmd
+        (
+                f=> "S0560",
+                s=> sub { $mymod->Select( table=>["t1","t2"], fields => ["func1()","func2(f1)",{"func3(f2)"=>"aa"},"func4(t1.f1)",{"func5(t2.f2)"=>"bb"}],  make_only=>1) },
+                t=> 'Select( table=>["t1","t2"], fields => ["func1()","func2(f1)",{"func3(f2)"=>"aa"},"func4(t1.f1)",{"func5(t2.f2)"=>"bb"}] )',
+                r=> "SELECT func1(), func2(f1), func3(f2) aa, func4(t1.f1), func5(t2.f2) bb FROM t1, t2",
+        );
 }
 
 ################################################################################

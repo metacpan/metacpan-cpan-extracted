@@ -6,7 +6,7 @@ use warnings;
 
 use Test::More;
 
-plan tests => 20 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+plan tests => 21 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 my @module_files = (
     'Sort/Sub.pm',
@@ -24,6 +24,7 @@ my @module_files = (
     'Sort/Sub/by_rand.pm',
     'Sort/Sub/naturally.pm',
     'Sort/Sub/numerically.pm',
+    'Sort/Sub/numerically_no_warning.pm',
     'Sort/Sub/randomly.pm',
     'Sort/Sub/record_by_order.pm',
     'Sort/Sub/record_by_reverse_order.pm',

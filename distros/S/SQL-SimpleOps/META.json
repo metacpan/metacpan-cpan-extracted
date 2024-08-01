@@ -48,9 +48,7 @@
    },
    "release_status" : "stable",
    "resources" : {
-      "bugtracker" : {
-         "web" : "https://sourceforge.net/p/csi-sql-simpleops/tickets/"
-      },
+      "homepage" : "https://sourceforge.net/p/csi-sql-simpleops/wiki/Home/",
       "license" : [
          "http://www.gnu.org/licenses/gpl-3.0.html"
       ],
@@ -60,6 +58,6 @@
          "web" : "https://sourceforge.net/projects/csi-sql-simpleops/"
       }
    },
-   "version" : "v2023.362.1",
+   "version" : "v2024.213.1",
    "x_serialization_backend" : "JSON::PP version 2.27400_02"
 }

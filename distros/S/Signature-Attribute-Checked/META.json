@@ -21,14 +21,14 @@
       },
       "configure" : {
          "requires" : {
-            "Data::Checks::Builder" : "0.02",
+            "Data::Checks" : "0.09",
             "Module::Build" : "0.4004",
             "XS::Parse::Sublike::Builder" : "0.19"
          }
       },
       "runtime" : {
          "requires" : {
-            "Data::Checks" : "0.04",
+            "Data::Checks" : "0.09",
             "XS::Parse::Sublike" : "0.19",
             "perl" : "5.026"
          }
@@ -42,7 +42,7 @@
    "provides" : {
       "Signature::Attribute::Checked" : {
          "file" : "lib/Signature/Attribute/Checked.pm",
-         "version" : "0.05"
+         "version" : "0.06"
       }
    },
    "release_status" : "stable",
@@ -51,6 +51,6 @@
          "http://dev.perl.org/licenses/"
       ]
    },
-   "version" : "0.05",
+   "version" : "0.06",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

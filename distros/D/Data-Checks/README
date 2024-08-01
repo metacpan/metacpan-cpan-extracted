@@ -96,7 +96,7 @@ CONSTRAINTS
        Str()
 
     Accepts any defined non-reference value, or a reference to an object in
-    a class that overloads stringification. rejects undefined, unblessed
+    a class that overloads stringification. Rejects undefined, unblessed
     references, or references to objects in classes that do not overload
     stringification.
 
@@ -251,13 +251,27 @@ CONSTRAINTS
 
     Since version 0.07.
 
-    Accepts a value that is accepted by every one of the givn constraints.
+    Accepts a value that is accepted by every one of the given constraints.
     Rejects if at least one of them rejects it.
 
     Note that if no constraints are given, this accepts all possible
     values. This may be useful as an "accept-all" fallback case for
     generated code, or other situations where it is required to provide a
     constraint check but you do not wish to constraint allowed values.
+
+CONSTRAINT METHODS
+
+    While not intended to be called from regular Perl code, these
+    constraints still act like objects with the following methods.
+
+ check
+
+       $ok = $constraint->check( $value );
+
+    Since version 0.09.
+
+    Returns a boolean value indicating whether the constraint accepts the
+    given value.
 
 XS FUNCTIONS
 
@@ -302,6 +316,10 @@ XS FUNCTIONS
       argument, as
 
          $ok = $checkersub->( $value );
+
+      Since version 0.09 this form is now deprecated, because it does not
+      easily support a way to query the constraint for its name or
+      stringified form, which is useful when generating error messages.
 
       * Additionally, the constraint check functions provided by this
       module may be implemented using any of the above mechanisms, or may

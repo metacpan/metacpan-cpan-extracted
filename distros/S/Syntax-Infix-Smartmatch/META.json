@@ -4,7 +4,7 @@
       "Leon Timmermans <leont@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.030, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.031, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -14,14 +14,10 @@
    },
    "name" : "Syntax-Infix-Smartmatch",
    "prereqs" : {
-      "build" : {
-         "requires" : {
-            "XS::Parse::Infix" : "0.26"
-         }
-      },
       "configure" : {
          "requires" : {
-            "Module::Build::Tiny" : "0.039"
+            "Dist::Build" : "0.001",
+            "XS::Parse::Infix" : "0.26"
          }
       },
       "develop" : {
@@ -48,7 +44,7 @@
    "provides" : {
       "Syntax::Infix::Smartmatch" : {
          "file" : "lib/Syntax/Infix/Smartmatch.pm",
-         "version" : "0.005"
+         "version" : "0.006"
       }
    },
    "release_status" : "stable",
@@ -62,7 +58,7 @@
          "web" : "https://github.com/Leont/syntax-infix-smartmatch"
       }
    },
-   "version" : "0.005",
+   "version" : "0.006",
    "x_contributors" : [
       "Leon Timmermans <fawaka@gmail.com>"
    ],

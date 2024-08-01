@@ -18,16 +18,16 @@ name: Travel-Status-DE-DBWagenreihung
 provides:
   Travel::Status::DE::DBWagenreihung:
     file: lib/Travel/Status/DE/DBWagenreihung.pm
-    version: '0.15'
+    version: '0.16'
   Travel::Status::DE::DBWagenreihung::Carriage:
     file: lib/Travel/Status/DE/DBWagenreihung/Carriage.pm
-    version: '0.15'
+    version: '0.16'
   Travel::Status::DE::DBWagenreihung::Group:
     file: lib/Travel/Status/DE/DBWagenreihung/Group.pm
-    version: '0.15'
+    version: '0.16'
   Travel::Status::DE::DBWagenreihung::Sector:
     file: lib/Travel/Status/DE/DBWagenreihung/Sector.pm
-    version: '0.15'
+    version: '0.16'
 requires:
   Carp: '0'
   Class::Accessor: '0'
@@ -40,5 +40,5 @@ requires:
 resources:
   license: http://dev.perl.org/licenses/
   repository: https://github.com/derf/Travel-Status-DE-DBWagenreihung
-version: '0.15'
+version: '0.16'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

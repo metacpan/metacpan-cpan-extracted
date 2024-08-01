@@ -1,9 +1,12 @@
 Revision history for Perl extension SQL::SimpleOps.
 
+2024.213.1 Wed Jul 31 23:09:41 2024
+	- fix: function parsing fields error in multiple tables; by CCELSO
+
 2023.362.1 Thu Dec 28 20:00:42 2023
 	- NOTICE: For end users of previous version 2023.284.1 only
 	- NOTICE: This version provide enchanced changes (you must see the version notes)
-	- news: escape quote character in values if exists: by CCELSO
+	- news: escape quote character in values if exists; by CCELSO
 
 2023.302.1 Sun Oct 29 03:14:35 2023
 	- NOTICE: For end users of previous version 2023.284.1 only

@@ -66,7 +66,7 @@ sub test_constraint
    $rejects //= [];
 
    subtest "$name constraint" => sub {
-      my $checker = t::test::make_checkdata( $constraint, "Value", $name );
+      my $checker = t::test::make_checkdata( $constraint, "Value" );
 
       my %accepted;
 

@@ -1,5 +1,12 @@
 Revision history for Signature-Attribute-Checked
 
+0.06    2024-07-31
+        [CHANGES]
+         * Use automatic generation of assert messages from Data::Checks v0.09
+           to simplify generated messages
+         * Don't document the use of plain code references as constraint
+           checks as these will no longer work
+
 0.05    2024-07-03
         [CHANGES]
          * Adjust docs, examples, unit tests to prefer Data::Checks

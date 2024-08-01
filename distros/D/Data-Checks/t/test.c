@@ -174,8 +174,8 @@ XS_EUPXS(XS_t__test_make_checkdata); /* prototype to pass -Wmissing-prototypes *
 XS_EUPXS(XS_t__test_make_checkdata)
 {
     dVAR; dXSARGS;
-    if (items != 3)
-       croak_xs_usage(cv,  "checkspec, name, constraint");
+    if (items < 2 || items > 3)
+       croak_xs_usage(cv,  "checkspec, name, constraint= &PL_sv_undef");
     {
 	struct DataChecks_Checker *	RETVAL;
 	dXSTARG;
@@ -183,12 +183,18 @@ XS_EUPXS(XS_t__test_make_checkdata)
 ;
 	SV *	name = ST(1)
 ;
-	SV *	constraint = ST(2)
+	SV *	constraint;
+
+	if (items < 3)
+	    constraint = &PL_sv_undef;
+	else {
+	    constraint = ST(2)
 ;
+	}
 #line 26 "t/test.xs"
     RETVAL = make_checkdata(checkspec);
     gen_assertmess(RETVAL, name, constraint);
-#line 192 "t/test.c"
+#line 198 "t/test.c"
 	XSprePUSH;
 	PUSHi(PTR2IV(RETVAL));
     }
@@ -279,7 +285,7 @@ XS_EUPXS(XS_t__test_make_asserter_sub)
     CV *cv = newATTRSUB(floorix, NULL, NULL, NULL, body);
     RETVAL = newRV_noinc((SV *)cv);
   }
-#line 283 "t/test.c"
+#line 289 "t/test.c"
 	RETVAL = sv_2mortal(RETVAL);
 	ST(0) = RETVAL;
     }
@@ -325,7 +331,7 @@ XS_EXTERNAL(boot_t__test)
 #line 61 "t/test.xs"
   boot_data_checks(0);
 
-#line 329 "t/test.c"
+#line 335 "t/test.c"
 
     /* End of Initialisation Section */
 

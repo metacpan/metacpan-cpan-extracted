@@ -8,7 +8,7 @@ use utf8;
 use parent 'Class::Accessor';
 use List::Util qw(uniq);
 
-our $VERSION = '0.15';
+our $VERSION = '0.16';
 
 Travel::Status::DE::DBWagenreihung::Group->mk_ro_accessors(
 	qw(train_no train_type description desc_short destination has_sectors model series start_percent end_percent)

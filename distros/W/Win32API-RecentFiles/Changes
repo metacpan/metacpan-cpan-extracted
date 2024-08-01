@@ -1,2 +1,8 @@
+0.02 2024-07-31
+    * make tests somewhat more resilient
+    * Provide raw SHAddRecentFileW()
+    * Add SHAddRecentFileU() in place of the old SHAddRecentFileW()
+      functionality, which converts UTF-8 to Wide
+
 0.01 2024-07-29
     * Released on an unsuspecting world

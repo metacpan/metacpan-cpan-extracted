@@ -63,5 +63,9 @@ __EOT__
 
 # When running on MacOS Monterey 12.7.5, "make test" fails with
 # Can't load 'blib/arch/auto/Net/Z3950/SimpleServer/SimpleServer.bundle' for module Net::Z3950::SimpleServer [...] (relative path not allowed in hardened program)
-# We prevent this by overriding the target with an absolute path:
-sub MY::postamble { 'INST_ARCHLIB = `pwd`/blib/arch' }
+# We can prevent this by overriding the target with an absolute path:
+#
+# HOWEVER, doing so causes the "make install" phase to fail: see
+# https://folio-org.atlassian.net/browse/ZF-103
+# So until we figure out something better, we'll just comment this out.
+#sub MY::postamble { 'INST_ARCHLIB = `pwd`/blib/arch' }

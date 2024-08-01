@@ -10,6 +10,9 @@ use testcase "t::test";
 
 sub CheckFunction { return $_[0] eq "ok" }
 
+# These are now deprecated but for now we'll just quiet the warning
+no warnings 'deprecated';
+
 # checker as code ref
 {
    my $checker = t::test::make_checkdata( \&CheckFunction, "Value", "CheckFunction" );

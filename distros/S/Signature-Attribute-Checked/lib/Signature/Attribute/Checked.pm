@@ -3,7 +3,7 @@
 #
 #  (C) Paul Evans, 2023-2024 -- leonerd@leonerd.org.uk
 
-package Signature::Attribute::Checked 0.05;
+package Signature::Attribute::Checked 0.06;
 
 use v5.14;
 use warnings;
@@ -81,12 +81,6 @@ Any of the constraint checkers provided by the L<Data::Checks> module itself.
 An B<object> reference with a C<check> method:
 
    $ok = $checkerobj->check( $value );
-
-=item *
-
-A B<code> reference:
-
-   $ok = $checkersub->( $value );
 
 =item *
 

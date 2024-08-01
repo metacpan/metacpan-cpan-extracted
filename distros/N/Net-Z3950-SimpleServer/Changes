@@ -1,5 +1,9 @@
 Revision history for Perl extension Net::Z3950::SimpleServer
 
+1.28  Wed 31 Jul 2024 18:28:11 BST
+	* Revert ZOOM-31, which prevented installation from
+	  working. See https://folio-org.atlassian.net/browse/ZF-103
+
 1.27  Fri  5 Jul 2024 20:35:58 BST
 	* Rework configuration to use Debian's yaz-config when
 	  pkg-config is absent. Fixes ZOOM-30.

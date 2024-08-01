@@ -1,3 +1,11 @@
+1.242131  2024-07-31 15:46:54-06:00 America/Denver
+ Joelle Maslak <jmaslak@antelope.net>
+ * [bugfix] Ciena "chassis power show" removed a space by mistake
+
+1.242130  2024-07-31 14:58:37-06:00 America/Denver
+ Joelle Maslak <jmaslak@antelope.net>
+ * [feature] Colorize Ciena "chassis power show"
+
 1.233180  2023-11-14 11:28:34-07:00 America/Denver
  Joelle Maslak <jmaslak@antelope.net>
  * [bugfix] Do not colorize too much of the output from "show security
