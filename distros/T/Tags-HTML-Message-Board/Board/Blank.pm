@@ -18,7 +18,7 @@ use Tags::HTML::Element::Textarea;
 Readonly::Array our @TEXT_KEYS => qw(add_message_board save);
 Readonly::Scalar our $CSS_CLASS_ADD_COMMENT => 'add-comment';
 
-our $VERSION = 0.02;
+our $VERSION = 0.05;
 
 # Constructor.
 sub new {
@@ -79,6 +79,8 @@ sub new {
 	$self->{'_tags_textarea'} = Tags::HTML::Element::Textarea->new(%c);
 	my $data_textarea = Data::HTML::Element::Textarea->new(
 		'autofocus' => 1,
+		'id' => 'message_board_message',
+		'name' => 'message_board_message',
 		'rows' => 6,
 	);
 	$self->{'_tags_textarea'}->init($data_textarea);
@@ -88,6 +90,9 @@ sub new {
 		'data' => [
 			$self->_text('save'),
 		],
+		'name' => 'action',
+		'type' => 'submit',
+		'value' => 'add_message_board',
 	);
 	$self->{'_tags_button'}->init($data_button);
 
@@ -102,6 +107,8 @@ sub _process {
 		['b', 'div'],
 		['a', 'class', $self->{'css_class'}],
 		['b', 'div'],
+		['a', 'class', 'new-message-board'],
+		['b', 'div'],
 		['a', 'class', 'title'],
 		['d', $self->_text('add_message_board')],
 		['e', 'div'],
@@ -112,6 +119,7 @@ sub _process {
 	$self->{'_tags_button'}->process;
 	$self->{'tags'}->put(
 		['e', 'form'],
+		['e', 'div'],
 		['e', 'div'],
 	);
 
@@ -125,6 +133,11 @@ sub _process_css {
 	$self->{'_tags_button'}->process_css;
 	$self->{'css'}->put(
 		['s', '.'.$self->{'css_class'}],
+		['d', 'margin', '1em'],
+		['e'],
+
+		['s', '.'.$self->{'css_class'}.' .new-message-board'],
+		['d', 'font-family', 'Arial, Helvetica, sans-serif'],
 		['d', 'max-width', '600px'],
 		['d', 'margin', 'auto'],
 		['e'],
@@ -140,51 +153,6 @@ sub _process_css {
 		['d', 'margin', 0],
 		['e'],
 	);
-#	$self->{'css'}->put(
-#		['s', '.'.$self->{'css_class'}.' .main-message'],
-#		['d', 'border', '1px solid #ccc'],
-#		['d', 'padding', '20px'],
-#		['d', 'border-radius', '5px'],
-#		['d', 'background-color', '#f9f9f9'],
-#		['d', 'max-width', '600px'],
-#		['d', 'margin', 'auto'],
-#		['e'],
-#
-#		['s', '.'.$self->{'css_class'}.' .comments'],
-#		['d', 'max-width', '600px'],
-#		['d', 'margin', 'auto'],
-#		['e'],
-#
-#		['s', '.'.$self->{'css_class'}.' .comment'],
-#		['d', 'border-left', '2px solid #ccc'],
-#		['d', 'padding-left', '10px'],
-#		['d', 'margin-top', '20px'],
-#		['d', 'margin-left', '10px'],
-#		['e'],
-#
-#		['s', '.'.$self->{'css_class'}.' .author'],
-#		['d', 'font-weight', 'bold'],
-#		['d', 'font-size', '1.2em'],
-#		['e'],
-#
-#		['s', '.'.$self->{'css_class'}.' .comment .author'],
-#		['d', 'font-size', '1em'],
-#		['e'],
-#
-#		['s', '.'.$self->{'css_class'}.' .date'],
-#		['d', 'color', '#555'],
-#		['d', 'font-size', '0.9em'],
-#		['d', 'margin-bottom', '10px'],
-#		['e'],
-#
-#		['s', '.'.$self->{'css_class'}.' .comment .date'],
-#		['d', 'font-size', '0.8em'],
-#		['e'],
-#
-#		['s', '.'.$self->{'css_class'}.' .text'],
-#		['d', 'margin-top', '10px'],
-#		['e'],
-#	);
 
 	return;
 }
@@ -514,6 +482,6 @@ BSD 2-Clause License
 
 =head1 VERSION
 
-0.02
+0.05
 
 =cut

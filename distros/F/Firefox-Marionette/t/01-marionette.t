@@ -1191,6 +1191,9 @@ SKIP: {
 	}
 	my $proxy = Firefox::Marionette::Proxy->new(%proxy_parameters);
 	my $bookmarks_path = File::Spec->catfile(Cwd::cwd(), qw(t data bookmarks_edge.html));
+	if ($major_version == 38) {
+		skip("Skipping b/c of segmentation faults for proxy capabilities", 6);
+	}
 	($skip_message, $firefox) = start_firefox(0, kiosk => 1, sleep_time_in_ms => 5, profile => $profile, capabilities => Firefox::Marionette::Capabilities->new(proxy => $proxy, moz_headless => 1, strict_file_interactability => 1, accept_insecure_certs => 1, page_load_strategy => 'eager', unhandled_prompt_behavior => 'accept and notify', moz_webdriver_click => 1, moz_accessibility_checks => 1, moz_use_non_spec_compliant_pointer_origin => 1, timeouts => Firefox::Marionette::Timeouts->new(page_load => 54_321, script => 4567, implicit => 6543)), bookmarks => $bookmarks_path);
 	if (!$skip_message) {
 		$at_least_one_success = 1;
@@ -1446,6 +1449,9 @@ SKIP: {
 	my $longitude = 24;
 	my $geo1 = Firefox::Marionette::GeoLocation->new(lat => $latitude, lng => $longitude);
 	diag("Starting new firefox for testing proxies with proxy port TCP/$proxyPort");
+	if (($major_version == 45) || ($major_version == 38)) {
+		skip("Skipping b/c of segmentation faults for proxy capabilities", 6);
+	}
 	($skip_message, $firefox) = start_firefox(0, chatty => 1, devtools => 1, page_load => 65432, capabilities => Firefox::Marionette::Capabilities->new(proxy => Firefox::Marionette::Proxy->new( pac => URI->new('http://localhost:' . $proxyPort)), moz_headless => 1), geo => $geo1);
 	if (!$skip_message) {
 		$at_least_one_success = 1;
@@ -1492,6 +1498,9 @@ SKIP: {
 	my $visible = 1;
 	if (($ENV{FIREFOX_HOST}) && ($ENV{FIREFOX_HOST} eq 'localhost') && ($ENV{FIREFOX_USER})) {
 		$visible = 'local';
+	}
+	if ($major_version == 38) {
+		skip("Skipping b/c proxy must be undefined", 7);
 	}
 	($skip_message, $firefox) = start_firefox($visible, seer => 1, chatty => 1, capabilities => Firefox::Marionette::Capabilities->new(proxy => Firefox::Marionette::Proxy->new( host => 'localhost', none => 'localhost')));
 	if (!$skip_message) {
@@ -1743,6 +1752,23 @@ SKIP: {
 	my $webdriver = $firefox->script('return navigator.webdriver');
 	ok(!$webdriver, "navigator.webdriver returns false when stealth is on");
 	if (($tls_tests_ok) && ($ENV{RELEASE_TESTING})) {
+		$firefox->chrome();
+		foreach my $name (@Firefox::Marionette::DNS::EXPORT_OK) {
+			my $correct = $firefox->script("return Components.interfaces.nsIDNSService.$name");
+			my $actual = eval "return Firefox::Marionette::DNS::$name();";
+			local $TODO = ($major_version < 115 && $name =~ /^((?:RESOLVE_(?:TYPE_DEFAULT|TYPE_TXT|TYPE_HTTPSSVC|ALLOW_NAME_COLLISION|DISABLE_TRR|REFRESH_CACHE|TRR_MODE_MASK|TRR_DISABLED_MODE|IGNORE_SOCKS_DNS|IP_HINT|WANT_RECORD_ON_ERROR))|ALL_DNSFLAGS_BITS)$/smx) ? "Older firefox (less than 115) can have different values for Firefox::Marionette::DNS constants" : q[];
+			local $TODO = $TODO || (($major_version < 130 && $name =~ /^((?:RESOLVE_(?:CREATE_MOCK_HTTPS_RR|DISABLE_NATIVE_HTTPS_QUERY))|ALL_DNSFLAGS_BITS)$/smx) ? "Older firefox (less than 130) can have different values for Firefox::Marionette::DNS constants" : q[]);
+			ok(defined $correct && defined $actual && $correct == $actual, "Firefox::Marionette::DNS::$name() ($actual) matches the value in firefox (" . (defined $correct ? $correct : "null") . ")");
+		}
+		$firefox->content();
+		if ($major_version >= 52) {
+			foreach my $result ($firefox->resolve('localhost')) {
+				ok($result =~ /^(127[.]0[.]0[.]1|::1)/smx, "\$firefox->resolve('localhost') returned correctly:$result");
+			}
+			foreach my $result ($firefox->resolve('localhost', type => 0, flags => 0)) {
+				ok($result =~ /^(127[.]0[.]0[.]1|::1)/smx, "\$firefox->resolve('localhost', type => 0, flags => 0) returned correctly:$result");
+			}
+		}
 		my $json;
 		if ($major_version < 50) {
 			diag("\$firefox->json(\$url) calls aren't going to work for versions < 50");
@@ -1914,12 +1940,9 @@ SKIP: {
 				local $TODO = ($major_version < 113 && $name !~ /^(CLEAR_COOKIES|CLEAR_NETWORK_CACHE|CLEAR_IMAGE_CACHE)$/smx) ? "Older firefox (less than 113) can have different values for Firefox::Marionette::Cache constants" : q[];
 				local $TODO = $TODO || ($major_version < 128 && $name =~ /^(?:CLEAR_CREDENTIAL_MANAGER_STATE|CLEAR_COOKIE_BANNER_EXCEPTION|CLEAR_COOKIE_BANNER_EXECUTED_RECORD|CLEAR_FINGERPRINTING_PROTECTION_STATE|CLEAR_BOUNCE_TRACKING_PROTECTION_STATE|CLEAR_FORGET_ABOUT_SITE|CLEAR_STORAGE_PERMISSIONS|CLEAR_COOKIES_AND_SITE_DATA)$/) ? "Old firefox (less than 128) can have different values for Firefox::Marionette::Cache constants" : q[];
 				local $TODO = $TODO || ($major_version < 129 && $name =~ /^(?:CLEAR_PERMISSIONS|CLEAR_FORGET_ABOUT_SITE)$/) ? "Old firefox (less than 129) can have different values for Firefox::Marionette::Cache constants" : q[];
+				local $TODO = $TODO || ($major_version < 130 && $name =~ /^(?:CLEAR_ALL_CACHES|CLEAR_FORGET_ABOUT_SITE)$/) ? "Old firefox (less than 130) can have different values for Firefox::Marionette::Cache constants" : q[];
 				my $result = $firefox->check_cache_key($name);
-				if (($name eq 'CLEAR_FORGET_ABOUT_SITE') && ($major_version < 124)) {
-					ok($result <= &$name(), "\$firefox->check_cache_key($name) eq Firefox::Marionette::Cache::${name} which should less than or equal to $result and is " . &$name());
-				} else {
-					ok($result == &$name(), "\$firefox->check_cache_key($name) eq Firefox::Marionette::Cache::${name} which should be $result and is " . &$name());
-				}
+				ok($result == &$name(), "\$firefox->check_cache_key($name) eq Firefox::Marionette::Cache::${name} which should be $result and is " . &$name());
 			}
 			use strict;
 		}
@@ -2903,6 +2926,12 @@ SKIP: {
 	if (($ENV{RELEASE_TESTING}) && (!$ENV{FIREFOX_NO_NETWORK})) { # har sometimes hangs and sometimes metacpan.org fails certificate checks.  for example. http://www.cpantesters.org/cpan/report/e71bfb3b-7413-1014-98e6-045206f7812f
 		if (!$tls_tests_ok) {
 			skip("TLS test infrastructure seems compromised", 5);
+		}
+		if ($^O eq 'darwin') {
+			if (($firefox->nightly()) || ($firefox->developer())) {
+				skip("github actions are having trouble for Darwin nightly", 5);
+				diag("github actions are having trouble for Darwin nightly");
+			}
 		}
 		ok($firefox->go(URI->new("https://fastapi.metacpan.org/author/DDICK")), "https://fastapi.metacpan.org/author/DDICK has been loaded");
 		ok($firefox->interactive() && $firefox->loaded(), "\$firefox->interactive() and \$firefox->loaded() are ok");
@@ -4664,6 +4693,9 @@ SKIP: {
 	my $proxyPort = empty_port();
 	diag("Starting new firefox for testing proxy by argument, capabilities, window switching and certificates using proxy port TCP/$proxyPort");
 	my $proxy_host = 'localhost:' . $proxyPort;
+	if ($major_version == 38) {
+		skip("Skipping b/c proxy must be undefined", 32);
+	}
 	($skip_message, $firefox) = start_firefox(1, import_profile_paths => [ 't/data/logins.json', 't/data/key4.db' ], manual_certificate_add => 1, console => 1, debug => 0, capabilities => Firefox::Marionette::Capabilities->new(moz_headless => 0, accept_insecure_certs => 0, page_load_strategy => 'none', moz_webdriver_click => 0, moz_accessibility_checks => 0, proxy => Firefox::Marionette::Proxy->new(host => $proxy_host)), timeouts => Firefox::Marionette::Timeouts->new(page_load => 78_901, script => 76_543, implicit => 34_567));
 	if (!$skip_message) {
 		$at_least_one_success = 1;
@@ -4946,9 +4978,12 @@ SKIP: {
 	my $proxyHttpPort = empty_port();
 	my $proxyHttpsPort = empty_port();
 	my $proxyFtpPort = empty_port();
-	$ENV{http_proxy} = 'http://localhost:' . $proxyHttpPort;
-	$ENV{https_proxy} = 'http://localhost:' . $proxyHttpsPort;
-	$ENV{ftp_proxy} = 'ftp://localhost:' . $proxyFtpPort;
+	if ($major_version == 38) {
+	} else {
+		$ENV{http_proxy} = 'http://localhost:' . $proxyHttpPort;
+		$ENV{https_proxy} = 'http://localhost:' . $proxyHttpsPort;
+		$ENV{ftp_proxy} = 'ftp://localhost:' . $proxyFtpPort;
+	}
 	($skip_message, $firefox) = start_firefox(1, addons => 1, visible => 1, width => 800, height => 600);
 	if (!$skip_message) {
 		$at_least_one_success = 1;
@@ -5124,6 +5159,12 @@ SKIP: {
 	diag("Starting new firefox for testing visibility and TLS proxy servers");
 	my $proxyPort = empty_port();
 	my $proxy_host = 'localhost:' . $proxyPort;
+	if ($major_version == 45) {
+		skip("Skipping b/c of proxy setCharPref exceptions", 1);
+	}
+	if ($major_version == 38) {
+		skip("Skipping b/c proxy must be undefined", 1);
+	}
 	($skip_message, $firefox) = start_firefox(1, visible => 1, width => 800, height => 600,capabilities => Firefox::Marionette::Capabilities->new(moz_headless => 0, proxy => Firefox::Marionette::Proxy->new(tls => $proxy_host)));
 	if (!$skip_message) {
 		$at_least_one_success = 1;
@@ -5220,6 +5261,9 @@ SKIP: {
 	diag("Starting new firefox for shortcut TLS proxy servers");
 	my $proxyPort = empty_port();
 	my $proxy_host = 'localhost:' . $proxyPort;
+	if (($major_version == 45) || ($major_version == 38)) {
+		skip("Skipping b/c of segmentation faults for proxy capabilities", 5);
+	}
 	($skip_message, $firefox) = start_firefox(0, capabilities => Firefox::Marionette::Capabilities->new(moz_headless => 0, page_load_strategy => 'none', proxy => Firefox::Marionette::Proxy->new(host => $proxy_host)), proxy => "https://$proxy_host");
 	if (!$skip_message) {
 		$at_least_one_success = 1;
@@ -5255,6 +5299,9 @@ SKIP: {
 	diag("Starting new firefox for shortcut normal proxy servers");
 	my $proxyPort = empty_port();
 	my $proxy_host = 'localhost:' . $proxyPort;
+	if ($major_version == 38) {
+		skip("Skipping b/c of segmentation faults for proxy capabilities", 5);
+	}
 	($skip_message, $firefox) = start_firefox(0, proxy => URI::URL->new("http://$proxy_host"));
 	if (!$skip_message) {
 		$at_least_one_success = 1;

@@ -4,7 +4,7 @@
       "Jos\u00e9 Joaqu\u00edn Atria <jjatria@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.030, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.032, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -51,6 +51,7 @@
             "Mutex" : "0",
             "Object::Pad" : "0.74",
             "OpenTelemetry" : "0.010",
+            "bigfloat" : "0.65",
             "perl" : "v5.32.0"
          }
       },
@@ -73,71 +74,71 @@
    "provides" : {
       "OpenTelemetry::SDK" : {
          "file" : "lib/OpenTelemetry/SDK.pm",
-         "version" : "0.022"
+         "version" : "0.024"
       },
       "OpenTelemetry::SDK::Exporter::Console" : {
          "file" : "lib/OpenTelemetry/SDK/Exporter/Console.pm",
-         "version" : "0.022"
+         "version" : "0.024"
       },
       "OpenTelemetry::SDK::InstrumentationScope" : {
          "file" : "lib/OpenTelemetry/SDK/InstrumentationScope.pm",
-         "version" : "0.022"
+         "version" : "0.024"
       },
       "OpenTelemetry::SDK::Resource" : {
          "file" : "lib/OpenTelemetry/SDK/Resource.pm",
-         "version" : "0.022"
+         "version" : "0.024"
       },
       "OpenTelemetry::SDK::Trace::Sampler" : {
          "file" : "lib/OpenTelemetry/SDK/Trace/Sampler.pm",
-         "version" : "0.022"
+         "version" : "0.024"
       },
       "OpenTelemetry::SDK::Trace::Sampler::AlwaysOff" : {
          "file" : "lib/OpenTelemetry/SDK/Trace/Sampler/AlwaysOff.pm",
-         "version" : "0.022"
+         "version" : "0.024"
       },
       "OpenTelemetry::SDK::Trace::Sampler::AlwaysOn" : {
          "file" : "lib/OpenTelemetry/SDK/Trace/Sampler/AlwaysOn.pm",
-         "version" : "0.022"
+         "version" : "0.024"
       },
       "OpenTelemetry::SDK::Trace::Sampler::ParentBased" : {
          "file" : "lib/OpenTelemetry/SDK/Trace/Sampler/ParentBased.pm",
-         "version" : "0.022"
+         "version" : "0.024"
       },
       "OpenTelemetry::SDK::Trace::Sampler::Result" : {
          "file" : "lib/OpenTelemetry/SDK/Trace/Sampler/Result.pm",
-         "version" : "0.022"
+         "version" : "0.024"
       },
       "OpenTelemetry::SDK::Trace::Sampler::TraceIDRatioBased" : {
          "file" : "lib/OpenTelemetry/SDK/Trace/Sampler/TraceIDRatioBased.pm",
-         "version" : "0.022"
+         "version" : "0.024"
       },
       "OpenTelemetry::SDK::Trace::Span" : {
          "file" : "lib/OpenTelemetry/SDK/Trace/Span.pm",
-         "version" : "0.022"
+         "version" : "0.024"
       },
       "OpenTelemetry::SDK::Trace::Span::Processor::Batch" : {
          "file" : "lib/OpenTelemetry/SDK/Trace/Span/Processor/Batch.pm",
-         "version" : "0.022"
+         "version" : "0.024"
       },
       "OpenTelemetry::SDK::Trace::Span::Processor::Simple" : {
          "file" : "lib/OpenTelemetry/SDK/Trace/Span/Processor/Simple.pm",
-         "version" : "0.022"
+         "version" : "0.024"
       },
       "OpenTelemetry::SDK::Trace::Span::Readable" : {
          "file" : "lib/OpenTelemetry/SDK/Trace/Span/Readable.pm",
-         "version" : "0.022"
+         "version" : "0.024"
       },
       "OpenTelemetry::SDK::Trace::SpanLimits" : {
          "file" : "lib/OpenTelemetry/SDK/Trace/SpanLimits.pm",
-         "version" : "0.022"
+         "version" : "0.024"
       },
       "OpenTelemetry::SDK::Trace::Tracer" : {
          "file" : "lib/OpenTelemetry/SDK/Trace/Tracer.pm",
-         "version" : "0.022"
+         "version" : "0.024"
       },
       "OpenTelemetry::SDK::Trace::TracerProvider" : {
          "file" : "lib/OpenTelemetry/SDK/Trace/TracerProvider.pm",
-         "version" : "0.022"
+         "version" : "0.024"
       }
    },
    "release_status" : "stable",
@@ -151,16 +152,16 @@
          "web" : "https://github.com/jjatria/perl-opentelemetry-sdk"
       }
    },
-   "version" : "0.022",
+   "version" : "0.024",
    "x_Dist_Zilla" : {
       "perl" : {
-         "version" : "5.038000"
+         "version" : "5.040000"
       },
       "plugins" : [
          {
             "class" : "Dist::Zilla::Plugin::NextRelease",
             "name" : "NextRelease",
-            "version" : "6.030"
+            "version" : "6.032"
          },
          {
             "class" : "Dist::Zilla::Plugin::Git::GatherDir",
@@ -174,7 +175,6 @@
                      "dist.ini"
                   ],
                   "exclude_match" : [],
-                  "follow_symlinks" : 0,
                   "include_dotfiles" : 0,
                   "prefix" : "",
                   "prune_directory" : [],
@@ -185,27 +185,27 @@
                }
             },
             "name" : "@Starter::Git/Git::GatherDir",
-            "version" : "2.048"
+            "version" : "2.051"
          },
          {
             "class" : "Dist::Zilla::Plugin::MetaYAML",
             "name" : "@Starter::Git/MetaYAML",
-            "version" : "6.030"
+            "version" : "6.032"
          },
          {
             "class" : "Dist::Zilla::Plugin::MetaJSON",
             "name" : "@Starter::Git/MetaJSON",
-            "version" : "6.030"
+            "version" : "6.032"
          },
          {
             "class" : "Dist::Zilla::Plugin::License",
             "name" : "@Starter::Git/License",
-            "version" : "6.030"
+            "version" : "6.032"
          },
          {
             "class" : "Dist::Zilla::Plugin::PodSyntaxTests",
             "name" : "@Starter::Git/PodSyntaxTests",
-            "version" : "6.030"
+            "version" : "6.032"
          },
          {
             "class" : "Dist::Zilla::Plugin::Test::ReportPrereqs",
@@ -248,17 +248,17 @@
          {
             "class" : "Dist::Zilla::Plugin::Manifest",
             "name" : "@Starter::Git/Manifest",
-            "version" : "6.030"
+            "version" : "6.032"
          },
          {
             "class" : "Dist::Zilla::Plugin::PruneCruft",
             "name" : "@Starter::Git/PruneCruft",
-            "version" : "6.030"
+            "version" : "6.032"
          },
          {
             "class" : "Dist::Zilla::Plugin::ManifestSkip",
             "name" : "@Starter::Git/ManifestSkip",
-            "version" : "6.030"
+            "version" : "6.032"
          },
          {
             "class" : "Dist::Zilla::Plugin::RunExtraTests",
@@ -290,7 +290,7 @@
                }
             },
             "name" : "@Starter::Git/Git::Check",
-            "version" : "2.048"
+            "version" : "2.051"
          },
          {
             "class" : "Dist::Zilla::Plugin::RewriteVersion",
@@ -311,7 +311,7 @@
          {
             "class" : "Dist::Zilla::Plugin::NextRelease",
             "name" : "@Starter::Git/NextRelease",
-            "version" : "6.030"
+            "version" : "6.032"
          },
          {
             "class" : "Dist::Zilla::Plugin::CopyFilesFromRelease",
@@ -373,7 +373,7 @@
                }
             },
             "name" : "@Starter::Git/Release_Commit",
-            "version" : "2.048"
+            "version" : "2.051"
          },
          {
             "class" : "Dist::Zilla::Plugin::Git::Tag",
@@ -382,7 +382,7 @@
                   "branch" : null,
                   "changelog" : "Changes",
                   "signed" : 0,
-                  "tag" : "0.022",
+                  "tag" : "0.024",
                   "tag_format" : "%v",
                   "tag_message" : ""
                },
@@ -395,7 +395,7 @@
                }
             },
             "name" : "@Starter::Git/Git::Tag",
-            "version" : "2.048"
+            "version" : "2.051"
          },
          {
             "class" : "Dist::Zilla::Plugin::BumpVersionAfterRelease",
@@ -439,32 +439,32 @@
                }
             },
             "name" : "@Starter::Git/Version_Bump_Commit",
-            "version" : "2.048"
+            "version" : "2.051"
          },
          {
             "class" : "Dist::Zilla::Plugin::TestRelease",
             "name" : "@Starter::Git/TestRelease",
-            "version" : "6.030"
+            "version" : "6.032"
          },
          {
             "class" : "Dist::Zilla::Plugin::ConfirmRelease",
             "name" : "@Starter::Git/ConfirmRelease",
-            "version" : "6.030"
+            "version" : "6.032"
          },
          {
             "class" : "Dist::Zilla::Plugin::UploadToCPAN",
             "name" : "@Starter::Git/UploadToCPAN",
-            "version" : "6.030"
+            "version" : "6.032"
          },
          {
             "class" : "Dist::Zilla::Plugin::MetaConfig",
             "name" : "@Starter::Git/MetaConfig",
-            "version" : "6.030"
+            "version" : "6.032"
          },
          {
             "class" : "Dist::Zilla::Plugin::MetaNoIndex",
             "name" : "@Starter::Git/MetaNoIndex",
-            "version" : "6.030"
+            "version" : "6.032"
          },
          {
             "class" : "Dist::Zilla::Plugin::MetaProvides::Package",
@@ -474,7 +474,7 @@
                      {
                         "class" : "Dist::Zilla::Plugin::FinderCode",
                         "name" : "@Starter::Git/MetaProvides::Package/AUTOVIV/:InstallModulesPM",
-                        "version" : "6.030"
+                        "version" : "6.032"
                      }
                   ],
                   "include_underscores" : 0
@@ -486,7 +486,7 @@
                   "meta_noindex" : 1
                },
                "Dist::Zilla::Role::ModuleMetadata" : {
-                  "Module::Metadata" : "1.000037",
+                  "Module::Metadata" : "1.000038",
                   "version" : "0.006"
                }
             },
@@ -496,12 +496,12 @@
          {
             "class" : "Dist::Zilla::Plugin::ShareDir",
             "name" : "@Starter::Git/ShareDir",
-            "version" : "6.030"
+            "version" : "6.032"
          },
          {
             "class" : "Dist::Zilla::Plugin::ExecDir",
             "name" : "@Starter::Git/ExecDir",
-            "version" : "6.030"
+            "version" : "6.032"
          },
          {
             "class" : "Dist::Zilla::Plugin::MinimumPerl",
@@ -535,62 +535,62 @@
                }
             },
             "name" : "Git::Contributors",
-            "version" : "0.036"
+            "version" : "0.037"
          },
          {
             "class" : "Dist::Zilla::Plugin::FinderCode",
             "name" : ":InstallModules",
-            "version" : "6.030"
+            "version" : "6.032"
          },
          {
             "class" : "Dist::Zilla::Plugin::FinderCode",
             "name" : ":IncModules",
-            "version" : "6.030"
+            "version" : "6.032"
          },
          {
             "class" : "Dist::Zilla::Plugin::FinderCode",
             "name" : ":TestFiles",
-            "version" : "6.030"
+            "version" : "6.032"
          },
          {
             "class" : "Dist::Zilla::Plugin::FinderCode",
             "name" : ":ExtraTestFiles",
-            "version" : "6.030"
+            "version" : "6.032"
          },
          {
             "class" : "Dist::Zilla::Plugin::FinderCode",
             "name" : ":ExecFiles",
-            "version" : "6.030"
+            "version" : "6.032"
          },
          {
             "class" : "Dist::Zilla::Plugin::FinderCode",
             "name" : ":PerlExecFiles",
-            "version" : "6.030"
+            "version" : "6.032"
          },
          {
             "class" : "Dist::Zilla::Plugin::FinderCode",
             "name" : ":ShareFiles",
-            "version" : "6.030"
+            "version" : "6.032"
          },
          {
             "class" : "Dist::Zilla::Plugin::FinderCode",
             "name" : ":MainModule",
-            "version" : "6.030"
+            "version" : "6.032"
          },
          {
             "class" : "Dist::Zilla::Plugin::FinderCode",
             "name" : ":AllFiles",
-            "version" : "6.030"
+            "version" : "6.032"
          },
          {
             "class" : "Dist::Zilla::Plugin::FinderCode",
             "name" : ":NoFiles",
-            "version" : "6.030"
+            "version" : "6.032"
          },
          {
             "class" : "Dist::Zilla::Plugin::FinderCode",
             "name" : "@Starter::Git/MetaProvides::Package/AUTOVIV/:InstallModulesPM",
-            "version" : "6.030"
+            "version" : "6.032"
          }
       ],
       "zilla" : {
@@ -598,7 +598,7 @@
          "config" : {
             "is_trial" : 0
          },
-         "version" : "6.030"
+         "version" : "6.032"
       }
    },
    "x_contributors" : [
@@ -606,8 +606,8 @@
       "K. Andrew Parker <kparker@citytech.cuny.edu>",
       "Tom Molesworth <tom@audioboundary.com>"
    ],
-   "x_generated_by_perl" : "v5.38.0",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.37",
+   "x_generated_by_perl" : "v5.40.0",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.38",
    "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"
 }
 

@@ -1,0 +1,7 @@
+Revision history for Perl module Locale::Unicode::Data
+
+v0.1.1 2024-08-03T13:40:30+0900
+    - Minor unit test correction for perl compiled with uselongdouble (NetBSD?)
+
+v0.1.0 2024-08-02T07:39:07+0900
+    - Initial release

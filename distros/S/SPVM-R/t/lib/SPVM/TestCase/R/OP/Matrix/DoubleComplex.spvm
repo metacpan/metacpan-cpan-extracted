@@ -1,0 +1,684 @@
+class TestCase::R::OP::Matrix::DoubleComplex {
+  
+  use R::OP::Double as DOP;
+  use R::OP::DoubleComplex as DCOP;
+  use R::OP::Matrix::DoubleComplex as MDCOP;
+  
+  static method matrix : int () {
+    
+    {
+      {
+        my $seq_ndarray = DOP->seq(1, 6)->to_double_complex_ndarray;
+        
+        my $nrow = 3;
+        my $ncol = 2;
+        my $ret_ndarray = MDCOP->matrix($seq_ndarray, $nrow, $ncol);
+        
+        unless ($ret_ndarray is_type R::NDArray::DoubleComplex) {
+          return 0;
+        }
+        
+        unless ($ret_ndarray->data == $seq_ndarray->data) {
+          return 0;
+        }
+        
+        unless (Array->equals_int($ret_ndarray->dim, [$nrow, $ncol])) {
+          return 0;
+        }
+      }
+      
+      {
+        my $data = [(double)1,-1,  2,-2,  3,-3,  4,-4,  5,-5,  6,-6];
+        my $nrow = 3;
+        my $ncol = 2;
+        my $ret_ndarray = MDCOP->matrix($data, $nrow, $ncol);
+        
+        unless ($ret_ndarray is_type R::NDArray::DoubleComplex) {
+          return 0;
+        }
+        
+        unless (R::Util->_equals_double_complex($ret_ndarray->data, R::Util->_Complex_2d_new_array_from_pairs($data))) {
+          return 0;
+        }
+        
+        unless (Array->equals_int($ret_ndarray->dim, [$nrow, $ncol])) {
+          return 0;
+        }
+      }
+    }
+    
+    return 1;
+  }
+  
+  static method matrix_byrow : int () {
+    
+    {
+      my $seq_ndarray = DOP->seq(1, 6)->to_double_complex_ndarray;
+      my $nrow = 3;
+      my $ncol = 2;
+      my $ret_ndarray = MDCOP->matrix_byrow($seq_ndarray, $nrow, $ncol);
+      
+      unless ($ret_ndarray is_type R::NDArray::DoubleComplex) {
+        return 0;
+      }
+      
+      unless (Array->equals_double(R::Util->_Complex_2d_to_re_array($ret_ndarray->data), [(double)1, 3, 5, 2, 4, 6])) {
+        return 0;
+      }
+      
+      unless (Array->equals_int($ret_ndarray->dim, [$nrow, $ncol])) {
+        return 0;
+      }
+    }
+    
+    return 1;
+  }
+  
+  static method cbind : int () {
+   
+    {
+      my $x_ndarray = MDCOP->matrix(DOP->seq(1, 6)->to_double_complex_ndarray, 2, 3);
+      my $y_ndarray = MDCOP->matrix(DOP->seq(11, 16)->to_double_complex_ndarray, 2, 3);
+      
+      my $ret_ndarray = MDCOP->cbind($x_ndarray, $y_ndarray);
+      
+      unless ($ret_ndarray is_type R::NDArray::DoubleComplex) {
+        return 0;
+      }
+      
+      unless (Array->equals_double(R::Util->_Complex_2d_to_re_array($ret_ndarray->data), [(double)1, 2, 3, 4, 5, 6, 11, 12, 13, 14, 15, 16])) {
+        return 0;
+      }
+      
+      unless (Array->equals_int($ret_ndarray->dim, [2, 6])) {
+        return 0;
+      }
+    }
+    
+    return 1;
+  }
+  
+  static method rbind : int () {
+   
+    {
+      my $x_ndarray = MDCOP->matrix(DOP->seq(1, 6)->to_double_complex_ndarray, 2, 3);
+      my $y_ndarray = MDCOP->matrix(DOP->seq(11, 16)->to_double_complex_ndarray, 2, 3);
+      
+      my $ret_ndarray = MDCOP->rbind($x_ndarray, $y_ndarray);
+      
+      unless ($ret_ndarray is_type R::NDArray::DoubleComplex) {
+        return 0;
+      }
+      
+      unless (Array->equals_double(R::Util->_Complex_2d_to_re_array($ret_ndarray->data), [(double)1, 2, 11, 12, 3, 4, 13, 14, 5, 6, 15, 16])) {
+        return 0;
+      }
+      
+      unless (Array->equals_int($ret_ndarray->dim, [4, 3])) {
+        return 0;
+      }
+    }
+    
+    return 1;
+  }
+  
+  static method diag : int () {
+    
+    {
+      my $seq_ndarray = DOP->seq(1, 3)->to_double_complex_ndarray;
+      
+      my $x_ndarray = MDCOP->diag($seq_ndarray);
+      
+      my $ret_ndarray = MDCOP->t($x_ndarray);
+      
+      unless ($ret_ndarray is_type R::NDArray::DoubleComplex) {
+        return 0;
+      }
+      
+      unless (Array->equals_double(R::Util->_Complex_2d_to_re_array($ret_ndarray->data), [(double)1, 0, 0, 0, 2, 0, 0, 0, 3])) {
+        return 0;
+      }
+      
+      unless (Array->equals_int($ret_ndarray->dim, [3, 3])) {
+        return 0;
+      }
+    }
+    
+    # Exceptions
+    {
+      {
+        my $seq_ndarray = DOP->seq(1, 3)->to_double_complex_ndarray;
+        
+        eval { MDCOP->diag(undef); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+      {
+        my $seq_ndarray = DCOP->c(DOP->seq(1, 4)->to_double_complex_ndarray, [2, 2]);
+        
+        eval { MDCOP->diag($seq_ndarray); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+    }
+    
+    $@ = undef;
+    
+    return 1;
+  }
+  
+  static method slice_diag : int () {
+    
+    {
+      my $seq_ndarray = DOP->seq(1, 9)->to_double_complex_ndarray;
+      
+      my $x_ndarray = MDCOP->matrix($seq_ndarray, 3, 3);
+      
+      my $ret_ndarray = MDCOP->slice_diag($x_ndarray);
+      
+      unless ($ret_ndarray is_type R::NDArray::DoubleComplex) {
+        return 0;
+      }
+      
+      unless (Array->equals_double(R::Util->_Complex_2d_to_re_array($ret_ndarray->data), [(double)1, 5, 9])) {
+        return 0;
+      }
+      
+      unless (Array->equals_int($ret_ndarray->dim, [3])) {
+        return 0;
+      }
+    }
+    
+    # Exceptions
+    {
+      {
+        my $seq_ndarray = DOP->seq(1, 9)->to_double_complex_ndarray;
+        
+        my $x_ndarray = MDCOP->matrix($seq_ndarray, 3, 3);
+        
+        eval { MDCOP->slice_diag(undef); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+      {
+        my $seq_ndarray = DOP->seq(1, 6)->to_double_complex_ndarray;
+        
+        my $x_ndarray = MDCOP->matrix($seq_ndarray, 3, 2);
+        
+        eval { MDCOP->slice_diag($x_ndarray); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+    }
+    
+    $@ = undef;
+    
+    return 1;
+  }
+  
+  static method identity : int () {
+    
+    {
+      my $nrow = 3;
+      my $ret_ndarray = MDCOP->identity($nrow);
+      
+      unless ($ret_ndarray is_type R::NDArray::DoubleComplex) {
+        return 0;
+      }
+      
+      unless (Array->equals_double(R::Util->_Complex_2d_to_re_array($ret_ndarray->data), [(double)1, 0, 0, 0, 1, 0, 0, 0, 1])) {
+        return 0;
+      }
+      
+      unless (Array->equals_int($ret_ndarray->dim, [3, 3])) {
+        return 0;
+      }
+    }
+    
+    # Exceptions
+    {
+      {
+        my $nrow = 0;
+        eval { MDCOP->identity($nrow); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+    }
+    
+    $@ = undef;
+    
+    return 1;
+  }
+  
+  static method mul : int () {
+    
+    {
+      my $seq_ndarray = DOP->seq(1, 6)->to_double_complex_ndarray;
+      
+      my $x_ndarray = MDCOP->matrix(DOP->seq(1, 6)->to_double_complex_ndarray, 2, 3);
+      my $y_ndarray = MDCOP->matrix(DOP->seq(1, 6)->to_double_complex_ndarray, 3, 2);
+      
+      my $ret_ndarray = MDCOP->mul($x_ndarray, $y_ndarray);
+      
+      unless ($ret_ndarray is_type R::NDArray::DoubleComplex) {
+        return 0;
+      }
+      
+      unless (Array->equals_double(R::Util->_Complex_2d_to_re_array($ret_ndarray->data), [(double)22, 28, 49, 64])) {
+        return 0;
+      }
+      
+      unless (Array->equals_int($ret_ndarray->dim, [2, 2])) {
+        return 0;
+      }
+    }
+    
+    {
+      my $seq_ndarray = DOP->seq(1, 6)->to_double_complex_ndarray;
+      
+      my $x_ndarray = MDCOP->matrix(DOP->seq(1, 6)->to_double_complex_ndarray, 2, 3);
+      my $y_ndarray = DOP->seq(1, 3)->to_double_complex_ndarray;
+      
+      my $ret_ndarray = MDCOP->mul($x_ndarray, $y_ndarray);
+      
+      unless ($ret_ndarray is_type R::NDArray::DoubleComplex) {
+        return 0;
+      }
+      
+      unless (Array->equals_double(R::Util->_Complex_2d_to_re_array($ret_ndarray->data), [(double)22, 28])) {
+        return 0;
+      }
+      
+      unless (Array->equals_int($ret_ndarray->dim, [2, 1])) {
+        return 0;
+      }
+    }
+    
+    # Exceptions
+    {
+      {
+        my $x_ndarray = MDCOP->matrix(DOP->seq(1, 6)->to_double_complex_ndarray, 2, 3);
+        my $y_ndarray = MDCOP->matrix(DOP->seq(1, 6)->to_double_complex_ndarray, 3, 2);
+        
+        eval { MDCOP->mul(undef, $y_ndarray); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+      {
+        my $x_ndarray = DCOP->c(DOP->seq(1, 24)->to_double_complex_ndarray, [2, 3, 4]);
+        my $y_ndarray = MDCOP->matrix(DOP->seq(1, 6)->to_double_complex_ndarray, 3, 2);
+        
+        eval { MDCOP->mul($x_ndarray, $y_ndarray); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+      {
+        my $x_ndarray = MDCOP->matrix(DOP->seq(1, 6)->to_double_complex_ndarray, 2, 3);
+        my $y_ndarray = MDCOP->matrix(DOP->seq(1, 6)->to_double_complex_ndarray, 3, 2);
+        
+        eval { MDCOP->mul($x_ndarray, undef); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+      {
+        my $x_ndarray = MDCOP->matrix(DOP->seq(1, 6)->to_double_complex_ndarray, 2, 3);
+        my $y_ndarray = DCOP->c(DOP->seq(1, 24)->to_double_complex_ndarray, [3, 2, 4]);
+        
+        eval { MDCOP->mul($x_ndarray, $y_ndarray); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+      {
+        my $x_ndarray = MDCOP->matrix(DOP->seq(1, 4)->to_double_complex_ndarray, 2, 2);
+        my $y_ndarray = MDCOP->matrix(DOP->seq(1, 6)->to_double_complex_ndarray, 3, 2);
+        
+        eval { MDCOP->mul($x_ndarray, $y_ndarray); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+    }
+    
+    $@ = undef;
+    
+    return 1;
+  }
+  
+  static method t : int () {
+    
+    {
+      my $seq_ndarray = DOP->seq(1, 6)->to_double_complex_ndarray;
+      
+      my $x_ndarray = MDCOP->matrix(DOP->seq(1, 6)->to_double_complex_ndarray, 2, 3);
+      
+      my $ret_ndarray = MDCOP->t($x_ndarray);
+      
+      unless ($ret_ndarray is_type R::NDArray::DoubleComplex) {
+        return 0;
+      }
+      
+      unless (Array->equals_double(R::Util->_Complex_2d_to_re_array($ret_ndarray->data), [(double)1, 3, 5, 2, 4, 6])) {
+        return 0;
+      }
+      
+      unless (Array->equals_int($ret_ndarray->dim, [3, 2])) {
+        return 0;
+      }
+    }
+    
+    # Exceptions
+    {
+      {
+        my $x_ndarray = MDCOP->matrix(DOP->seq(1, 6)->to_double_complex_ndarray, 2, 3);
+        
+        eval { MDCOP->t(undef); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+      {
+        my $x_ndarray = DCOP->c(DOP->seq(1, 24)->to_double_complex_ndarray, [2, 3, 4]);
+        
+        eval { MDCOP->t($x_ndarray); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+    }
+    
+    $@ = undef;
+    
+    return 1;
+  }
+  
+  static method det : int () {
+    
+    {
+      my $seq_ndarray = DOP->seq(1, 4)->to_double_complex_ndarray;
+      
+      my $x_ndarray = MDCOP->matrix(DOP->seq(1, 4)->to_double_complex_ndarray, 2, 2);
+      
+      my $ret_ndarray = MDCOP->det($x_ndarray);
+      
+      unless ($ret_ndarray is_type R::NDArray::DoubleComplex) {
+        return 0;
+      }
+      
+      unless (Array->equals_double(R::Util->_Complex_2d_to_re_array($ret_ndarray->data), [(double)-2])) {
+        return 0;
+      }
+      
+      unless (Array->equals_int($ret_ndarray->dim, [1])) {
+        return 0;
+      }
+    }
+    
+    # Exceptions
+    {
+      {
+        my $x_ndarray = MDCOP->matrix(DOP->seq(1, 4)->to_double_complex_ndarray, 2, 2);
+        
+        eval { MDCOP->det(undef); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+      {
+        my $x_ndarray = MDCOP->matrix(DOP->seq(1, 2)->to_double_complex_ndarray, 2, 1);
+        
+        eval { MDCOP->det($x_ndarray); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+    }
+    
+    $@ = undef;
+    
+    return 1;
+  }
+  
+  static method solve : int () {
+    
+    {
+      my $x_ndarray = MDCOP->matrix(R::Util->_Complex_2d_new_array_from_re_array([(double)1, 2, 1, 3]), 2, 2);
+      
+      my $ret_ndarray = MDCOP->solve($x_ndarray);
+      
+      unless ($ret_ndarray is_type R::NDArray::DoubleComplex) {
+        return 0;
+      }
+      
+      unless (Array->equals_double(R::Util->_Complex_2d_to_re_array($ret_ndarray->data), [(double)3, -2, -1, 1])) {
+        return 0;
+      }
+      
+      unless (Array->equals_int($ret_ndarray->dim, [2, 2])) {
+        return 0;
+      }
+    }
+    
+    # Exceptions
+    {
+      {
+        my $x_ndarray = MDCOP->matrix(R::Util->_Complex_2d_new_array_from_re_array([(double)1, 2, 1, 3]), 2, 2);
+        
+        eval { MDCOP->solve(undef); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+      {
+        my $x_ndarray = MDCOP->matrix(R::Util->_Complex_2d_new_array_from_re_array([(double)1, 2]), 2, 1);
+        
+        eval { MDCOP->solve($x_ndarray); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+      {
+        my $x_ndarray = MDCOP->matrix(R::Util->_Complex_2d_new_array_from_re_array([(double)1, 2, 1, 2]), 2, 2);
+        
+        eval { MDCOP->solve($x_ndarray); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+    }
+    
+    $@ = undef;
+    
+    return 1;
+  }
+  
+  static method eigen : int () {
+    
+    {
+      my $x_ndarray = MDCOP->matrix(R::Util->_Complex_2d_new_array_from_re_array([(double)3, 2, 1, 2]), 2, 2);
+      
+      my $ret_ndarray_h = MDCOP->eigen($x_ndarray);
+      
+      my $ret_ndarray_eigen_vectors = $ret_ndarray_h->get_double_complex("vectors");
+      
+      my $ret_ndarray_eigen_values = $ret_ndarray_h->get_double_complex("values");
+      
+      unless ($ret_ndarray_eigen_values is_type R::NDArray::DoubleComplex) {
+        return 0;
+      }
+      
+      unless ($ret_ndarray_eigen_values->data->[0]{re} < 1 + 1e-5) {
+        return 0;
+      }
+      
+      unless ($ret_ndarray_eigen_values->data->[0]{re} > 1 - 1e-5) {
+        return 0;
+      }
+      
+      unless ($ret_ndarray_eigen_values->data->[0]{im} < 0 + 1e-5) {
+        return 0;
+      }
+      
+      unless ($ret_ndarray_eigen_values->data->[0]{im} > 0 - 1e-5) {
+        return 0;
+      }
+      
+      unless ($ret_ndarray_eigen_values->data->[1]{re} < 4 + 1e-5) {
+        return 0;
+      }
+      
+      unless ($ret_ndarray_eigen_values->data->[1]{re} > 4 - 1e-5) {
+        return 0;
+      }
+      
+      unless ($ret_ndarray_eigen_values->data->[1]{im} < 0 + 1e-5) {
+        return 0;
+      }
+      
+      unless ($ret_ndarray_eigen_values->data->[1]{im} > 0 - 1e-5) {
+        return 0;
+      }
+      
+      unless (Array->equals_int($ret_ndarray_eigen_values->dim, [2])) {
+        return 0;
+      }
+      
+      unless ($ret_ndarray_eigen_vectors->data->[0]{re} < -0.4472136 + 1e-5) {
+        return 0;
+      }
+      
+      unless ($ret_ndarray_eigen_vectors->data->[0]{re} > -0.4472136 - 1e-5) {
+        return 0;
+      }
+      
+      unless ($ret_ndarray_eigen_vectors->data->[0]{im} < 0 + 1e-5) {
+        return 0;
+      }
+      
+      unless ($ret_ndarray_eigen_vectors->data->[0]{im} > 0 - 1e-5) {
+        return 0;
+      }
+      
+      unless ($ret_ndarray_eigen_vectors->data->[1]{re} < 0.8944272 + 1e-5) {
+        return 0;
+      }
+      
+      unless ($ret_ndarray_eigen_vectors->data->[1]{re} > 0.8944272 - 1e-5) {
+        return 0;
+      }
+      
+      unless ($ret_ndarray_eigen_vectors->data->[1]{im} < 0 + 1e-5) {
+        return 0;
+      }
+      
+      unless ($ret_ndarray_eigen_vectors->data->[1]{im} > 0 - 1e-5) {
+        return 0;
+      }
+      
+      unless ($ret_ndarray_eigen_vectors->data->[2]{re} < 0.7071068 + 1e-5) {
+        return 0;
+      }
+      
+      unless ($ret_ndarray_eigen_vectors->data->[2]{re} > 0.7071068 - 1e-5) {
+        return 0;
+      }
+      
+      unless ($ret_ndarray_eigen_vectors->data->[2]{im} < 0 + 1e-5) {
+        return 0;
+      }
+      
+      unless ($ret_ndarray_eigen_vectors->data->[2]{im} > 0 - 1e-5) {
+        return 0;
+      }
+      
+      unless ($ret_ndarray_eigen_vectors->data->[3]{re} < 0.7071068 + 1e-5) {
+        return 0;
+      }
+      
+      unless ($ret_ndarray_eigen_vectors->data->[3]{re} > 0.7071068 - 1e-5) {
+        return 0;
+      }
+      
+      unless ($ret_ndarray_eigen_vectors->data->[3]{im} < 0 + 1e-5) {
+        return 0;
+      }
+      
+      unless ($ret_ndarray_eigen_vectors->data->[3]{im} > 0 - 1e-5) {
+        return 0;
+      }
+      
+      unless (Array->equals_int($ret_ndarray_eigen_vectors->dim, [2, 2])) {
+        return 0;
+      }
+      
+    }
+    
+    # Exceptions
+    {
+      {
+        my $x_ndarray = MDCOP->matrix(R::Util->_Complex_2d_new_array_from_re_array([(double)3, 2, 1, 2]), 2, 2);
+        
+        eval { MDCOP->eigen(undef); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+      {
+        my $x_ndarray = MDCOP->matrix(R::Util->_Complex_2d_new_array_from_re_array([(double)3, 2]), 2, 1);
+        
+        eval { MDCOP->eigen($x_ndarray); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+    }
+    
+    $@ = undef;
+    
+    return 1;
+  }
+}

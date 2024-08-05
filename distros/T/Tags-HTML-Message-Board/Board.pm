@@ -19,7 +19,7 @@ use Tags::HTML::Element::Textarea;
 Readonly::Array our @TEXT_KEYS => qw(add_comment author date save);
 Readonly::Scalar our $CSS_CLASS_ADD_COMMENT => 'add-comment';
 
-our $VERSION = 0.02;
+our $VERSION = 0.05;
 
 # Constructor.
 sub new {
@@ -89,6 +89,8 @@ sub new {
 	$self->{'_tags_textarea'} = Tags::HTML::Element::Textarea->new(%c);
 	my $data_textarea = Data::HTML::Element::Textarea->new(
 		'autofocus' => 1,
+		'id' => 'message_board_comment_message',
+		'name' => 'message_board_comment_message',
 		'rows' => 6,
 	);
 	$self->{'_tags_textarea'}->init($data_textarea);
@@ -98,6 +100,9 @@ sub new {
 		'data' => [
 			$self->_text('save'),
 		],
+		'name' => 'action',
+		'type' => 'submit',
+		'value' => 'add_message_board_comment',
 	);
 	$self->{'_tags_button'}->init($data_button);
 
@@ -183,6 +188,11 @@ sub _process_css {
 	my $self = shift;
 
 	$self->{'css'}->put(
+		['s', '.'.$self->{'css_class'}],
+		['d', 'font-family', 'Arial, Helvetica, sans-serif'],
+		['d', 'margin', '1em'],
+		['e'],
+
 		['s', '.'.$self->{'css_class'}.' .main-message'],
 		['d', 'border', '1px solid #ccc'],
 		['d', 'padding', '20px'],
@@ -225,6 +235,7 @@ sub _process_css {
 
 		['s', '.'.$self->{'css_class'}.' .text'],
 		['d', 'margin-top', '10px'],
+		['d', 'white-space', 'pre-wrap'],
 		['e'],
 	);
 	if ($self->{'mode_comment_form'}) {
@@ -269,10 +280,10 @@ sub _tags_message {
 		['d', $self->_text('date').': '.$obj->date->dmy('.').' '.$obj->date->hms],
 		['e', 'div'],
 
-		['b', 'div'],
+		['b', 'pre'],
 		['a', 'class', 'text'],
 		['d', $obj->message],
-		['e', 'div'],
+		['e', 'pre'],
 
 		['e', 'div'],
 	);
@@ -692,6 +703,6 @@ BSD 2-Clause License
 
 =head1 VERSION
 
-0.02
+0.05
 
 =cut

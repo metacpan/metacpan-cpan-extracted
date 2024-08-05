@@ -3,7 +3,7 @@ use strict;
 
 package RT::Extension::FormTools;
 
-our $VERSION = '1.11';
+our $VERSION = '1.12';
 
 RT->AddStyleSheets('rt-extension-formtools.css');
 RT->AddJavaScript('rt-extension-formtools.js');
@@ -278,6 +278,8 @@ Valid core fields include:
 
 =item AdminCc
 
+=item Owner
+
 =item Subject
 
 =item Content
@@ -285,6 +287,8 @@ Valid core fields include:
 =item Attach
 
 =item Due
+
+=item TimeEstimated
 
 =back
 
@@ -318,10 +322,12 @@ my %is_core_field = map { $_ => 1 } qw(
     Requestors
     Cc
     AdminCc
+    Owner
     Subject
     Content
     Attach
     Due
+    TimeEstimated
 );
 
 sub is_core_field {

@@ -6,19 +6,23 @@ class App::LastStats {
   use warnings;
   use feature 'say';
 
+  no if $^V >= v5.38, warnings => 'experimental::class';
+
   use Net::LastFM;
   use Getopt::Long;
   use JSON;
 
-  our $VERSION = '0.0.3';
+  our $VERSION = '0.0.6';
 
-  field $username :param = 'davorg';
-  field $period   :param = '7day';
-  field $format   :param = 'text';
-  field $count    :param = 10;
-  field $lastfm   = Net::LastFM->new(
-    api_key    => $ENV{LASTFM_API_KEY},
-    api_secret => $ENV{LASTFM_SECRET},
+  field $username   :param = 'davorg';
+  field $period     :param = '7day';
+  field $format     :param = 'text';
+  field $count      :param = 10;
+  field $api_key    :param = $ENV{LASTFM_API_KEY};
+  field $api_secret :param = $ENV{LASTFM_API_SECRET};
+  field $lastfm     = Net::LastFM->new(
+    api_key    => $api_key,
+    api_secret => $api_secret,
   );
   field $method   = 'user.getTopArtists';
   field $data;
@@ -32,10 +36,12 @@ class App::LastStats {
 
   method run {
     GetOptions(
-      'user=s'   => \$username,
-      'period=s' => \$period,
-      'format=s' => \$format,
-      'count=i'  => \$count,
+      'user=s'      => \$username,
+      'period=s'    => \$period,
+      'format=s'    => \$format,
+      'count=i'     => \$count,
+      'api-key=s'   => \$api_key,
+      'api-secret=s'=> \$api_secret,
     );
 
     $self->validate;
@@ -119,10 +125,12 @@ App::LastStats - A module to fetch and display Last.fm statistics
   use App::LastStats;
 
   my $stats = App::LastStats->new(
-    username => 'davorg',
-    period   => '7day',
-    format   => 'text',
-    count    => 10,
+    username   => 'davorg',
+    period     => '7day',
+    format     => 'text',
+    count      => 10,
+    api_key    => 'your_api_key',
+    api_secret => 'your_api_secret',
   );
 
   $stats->run;
@@ -161,12 +169,22 @@ Renders the statistics using the specified format.
 
 Fetches the Last.fm statistics for the specified user and time period.
 
+=head1 API
+
+You will need an API key and secret in order to use this program. You can
+get these from - L<https://www.last.fm/api/account/create>.
+
+The API key and secret can be passed as arguments to the constructor (as
+in the sample code above). Alternatively, they can be read from
+environment variables called `LASTFM_API_KEY` and `LASTFM_API_SECRET`.
+
 =head1 AUTHOR
 
 Dave Cross <dave@perlhacks.com>
 
 =head1 LICENSE
 
-This library is free software; you can redistribute it and/or modify it under the same terms as Perl itself.
+This library is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
 
 =cut

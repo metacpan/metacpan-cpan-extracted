@@ -18,7 +18,7 @@ class TestCase::R::OP::DoubleComplex {
         return 0;
       }
       
-      unless (&equals_double_complex($ret_ndarray->data, [Math->complex(1, -1), Math->complex(2, -2)])) {
+      unless (R::Util->_equals_double_complex($ret_ndarray->data, [Math->complex(1, -1), Math->complex(2, -2)])) {
         return 0;
       }
       
@@ -39,7 +39,7 @@ class TestCase::R::OP::DoubleComplex {
         return 0;
       }
       
-      unless (&equals_double_complex($ret_ndarray->data, [Math->complex(1, -1), Math->complex(2, -2)])) {
+      unless (R::Util->_equals_double_complex($ret_ndarray->data, [Math->complex(1, -1), Math->complex(2, -2)])) {
         return 0;
       }
       
@@ -60,7 +60,7 @@ class TestCase::R::OP::DoubleComplex {
         return 0;
       }
       
-      unless (&equals_double_complex($ret_ndarray->data, [Math->complex(1, -1), Math->complex(2, -2)])) {
+      unless (R::Util->_equals_double_complex($ret_ndarray->data, [Math->complex(1, -1), Math->complex(2, -2)])) {
         return 0;
       }
       
@@ -95,7 +95,7 @@ class TestCase::R::OP::DoubleComplex {
       return 0;
     }
     
-    unless (&equals_double_complex($ret_ndarray->data, [Math->complex(4, -4), Math->complex(6, -6)])) {
+    unless (R::Util->_equals_double_complex($ret_ndarray->data, [Math->complex(4, -4), Math->complex(6, -6)])) {
       return 0;
     }
     
@@ -160,7 +160,7 @@ class TestCase::R::OP::DoubleComplex {
       return 0;
     }
     
-    unless (&equals_double_complex($ret_ndarray->data, [Math->complex(-2, 2), Math->complex(-2, 2)])) {
+    unless (R::Util->_equals_double_complex($ret_ndarray->data, [Math->complex(-2, 2), Math->complex(-2, 2)])) {
       return 0;
     }
     
@@ -225,7 +225,7 @@ class TestCase::R::OP::DoubleComplex {
       return 0;
     }
     
-    unless (&equals_double_complex($ret_ndarray->data, [Math->cmul(Math->complex(1, -1), Math->complex(3, -3)), Math->cmul(Math->complex(2, -2), Math->complex(4, -4))])) {
+    unless (R::Util->_equals_double_complex($ret_ndarray->data, [Math->cmul(Math->complex(1, -1), Math->complex(3, -3)), Math->cmul(Math->complex(2, -2), Math->complex(4, -4))])) {
       return 0;
     }
     
@@ -290,7 +290,7 @@ class TestCase::R::OP::DoubleComplex {
       return 0;
     }
     
-    unless (&equals_double_complex($ret_ndarray->data, [Math->cmul(Math->complex(3, -3), Math->complex(3, -3)), Math->cmul(Math->complex(4, -4), Math->complex(3, -3))])) {
+    unless (R::Util->_equals_double_complex($ret_ndarray->data, [Math->cmul(Math->complex(3, -3), Math->complex(3, -3)), Math->cmul(Math->complex(4, -4), Math->complex(3, -3))])) {
       return 0;
     }
     
@@ -355,7 +355,7 @@ class TestCase::R::OP::DoubleComplex {
       return 0;
     }
     
-    unless (&equals_double_complex($ret_ndarray->data, [Math->cdiv(Math->complex(1, -1), Math->complex(2, -2)), Math->cdiv(Math->complex(1, -1), Math->complex(4, -4))])) {
+    unless (R::Util->_equals_double_complex($ret_ndarray->data, [Math->cdiv(Math->complex(1, -1), Math->complex(2, -2)), Math->cdiv(Math->complex(1, -1), Math->complex(4, -4))])) {
       return 0;
     }
     
@@ -420,7 +420,7 @@ class TestCase::R::OP::DoubleComplex {
       return 0;
     }
     
-    unless (&equals_double_complex($ret_ndarray->data, [Math->cdiv(Math->complex(1, -1), Math->complex(2, -2)), Math->cdiv(Math->complex(2, -2), Math->complex(2, -2))])) {
+    unless (R::Util->_equals_double_complex($ret_ndarray->data, [Math->cdiv(Math->complex(1, -1), Math->complex(2, -2)), Math->cdiv(Math->complex(2, -2), Math->complex(2, -2))])) {
       return 0;
     }
     
@@ -483,7 +483,7 @@ class TestCase::R::OP::DoubleComplex {
       return 0;
     }
     
-    unless (&equals_double_complex($ret_ndarray->data, [Math->complex(-1, 1), Math->complex(-2, 2)])) {
+    unless (R::Util->_equals_double_complex($ret_ndarray->data, [Math->complex(-1, 1), Math->complex(-2, 2)])) {
       return 0;
     }
     
@@ -691,7 +691,7 @@ class TestCase::R::OP::DoubleComplex {
     
     my $ret_ndarray = DCOP->rep($x_ndarray, 2);
     
-    unless (&equals_double_complex($ret_ndarray->data, [Math->complex(1, -1), Math->complex(2, -2), Math->complex(1, -1), Math->complex(2, -2)])) {
+    unless (R::Util->_equals_double_complex($ret_ndarray->data, [Math->complex(1, -1), Math->complex(2, -2), Math->complex(1, -1), Math->complex(2, -2)])) {
       return 0;
     }
     
@@ -708,7 +708,7 @@ class TestCase::R::OP::DoubleComplex {
     
     my $ret_ndarray = DCOP->rep_length($x_ndarray, 4);
     
-    unless (&equals_double_complex($ret_ndarray->data, [Math->complex(1, -1), Math->complex(2, -2), Math->complex(1, -1), Math->complex(2, -2)])) {
+    unless (R::Util->_equals_double_complex($ret_ndarray->data, [Math->complex(1, -1), Math->complex(2, -2), Math->complex(1, -1), Math->complex(2, -2)])) {
       return 0;
     }
     
@@ -729,7 +729,7 @@ class TestCase::R::OP::DoubleComplex {
       return 0;
     }
     
-    unless (&equals_double_complex($ret_ndarray->data, [Math->csin($x_ndarray->data->[0]), Math->csin($x_ndarray->data->[1])])) {
+    unless (R::Util->_equals_double_complex($ret_ndarray->data, [Math->csin($x_ndarray->data->[0]), Math->csin($x_ndarray->data->[1])])) {
       return 0;
     }
     
@@ -766,7 +766,7 @@ class TestCase::R::OP::DoubleComplex {
       return 0;
     }
     
-    unless (&equals_double_complex($ret_ndarray->data, [Math->ccos($x_ndarray->data->[0]), Math->ccos($x_ndarray->data->[1])])) {
+    unless (R::Util->_equals_double_complex($ret_ndarray->data, [Math->ccos($x_ndarray->data->[0]), Math->ccos($x_ndarray->data->[1])])) {
       return 0;
     }
     
@@ -803,7 +803,7 @@ class TestCase::R::OP::DoubleComplex {
       return 0;
     }
     
-    unless (&equals_double_complex($ret_ndarray->data, [Math->ctan($x_ndarray->data->[0]), Math->ctan($x_ndarray->data->[1])])) {
+    unless (R::Util->_equals_double_complex($ret_ndarray->data, [Math->ctan($x_ndarray->data->[0]), Math->ctan($x_ndarray->data->[1])])) {
       return 0;
     }
     
@@ -840,7 +840,7 @@ class TestCase::R::OP::DoubleComplex {
       return 0;
     }
     
-    unless (&equals_double_complex($ret_ndarray->data, [Math->csinh($x_ndarray->data->[0]), Math->csinh($x_ndarray->data->[1])])) {
+    unless (R::Util->_equals_double_complex($ret_ndarray->data, [Math->csinh($x_ndarray->data->[0]), Math->csinh($x_ndarray->data->[1])])) {
       return 0;
     }
     
@@ -877,7 +877,7 @@ class TestCase::R::OP::DoubleComplex {
       return 0;
     }
     
-    unless (&equals_double_complex($ret_ndarray->data, [Math->ccosh($x_ndarray->data->[0]), Math->ccosh($x_ndarray->data->[1])])) {
+    unless (R::Util->_equals_double_complex($ret_ndarray->data, [Math->ccosh($x_ndarray->data->[0]), Math->ccosh($x_ndarray->data->[1])])) {
       return 0;
     }
     
@@ -914,7 +914,7 @@ class TestCase::R::OP::DoubleComplex {
       return 0;
     }
     
-    unless (&equals_double_complex($ret_ndarray->data, [Math->ctanh($x_ndarray->data->[0]), Math->ctanh($x_ndarray->data->[1])])) {
+    unless (R::Util->_equals_double_complex($ret_ndarray->data, [Math->ctanh($x_ndarray->data->[0]), Math->ctanh($x_ndarray->data->[1])])) {
       return 0;
     }
     
@@ -951,7 +951,7 @@ class TestCase::R::OP::DoubleComplex {
       return 0;
     }
     
-    unless (&equals_double_complex($ret_ndarray->data, [Math->cacos($x_ndarray->data->[0]), Math->cacos($x_ndarray->data->[1])])) {
+    unless (R::Util->_equals_double_complex($ret_ndarray->data, [Math->cacos($x_ndarray->data->[0]), Math->cacos($x_ndarray->data->[1])])) {
       return 0;
     }
     
@@ -988,7 +988,7 @@ class TestCase::R::OP::DoubleComplex {
       return 0;
     }
     
-    unless (&equals_double_complex($ret_ndarray->data, [Math->casin($x_ndarray->data->[0]), Math->casin($x_ndarray->data->[1])])) {
+    unless (R::Util->_equals_double_complex($ret_ndarray->data, [Math->casin($x_ndarray->data->[0]), Math->casin($x_ndarray->data->[1])])) {
       return 0;
     }
     
@@ -1025,7 +1025,7 @@ class TestCase::R::OP::DoubleComplex {
       return 0;
     }
     
-    unless (&equals_double_complex($ret_ndarray->data, [Math->catan($x_ndarray->data->[0]), Math->catan($x_ndarray->data->[1])])) {
+    unless (R::Util->_equals_double_complex($ret_ndarray->data, [Math->catan($x_ndarray->data->[0]), Math->catan($x_ndarray->data->[1])])) {
       return 0;
     }
     
@@ -1062,7 +1062,7 @@ class TestCase::R::OP::DoubleComplex {
       return 0;
     }
     
-    unless (&equals_double_complex($ret_ndarray->data, [Math->casinh($x_ndarray->data->[0]), Math->casinh($x_ndarray->data->[1])])) {
+    unless (R::Util->_equals_double_complex($ret_ndarray->data, [Math->casinh($x_ndarray->data->[0]), Math->casinh($x_ndarray->data->[1])])) {
       return 0;
     }
     
@@ -1099,7 +1099,7 @@ class TestCase::R::OP::DoubleComplex {
       return 0;
     }
     
-    unless (&equals_double_complex($ret_ndarray->data, [Math->cacosh($x_ndarray->data->[0]), Math->cacosh($x_ndarray->data->[1])])) {
+    unless (R::Util->_equals_double_complex($ret_ndarray->data, [Math->cacosh($x_ndarray->data->[0]), Math->cacosh($x_ndarray->data->[1])])) {
       return 0;
     }
     
@@ -1136,7 +1136,7 @@ class TestCase::R::OP::DoubleComplex {
       return 0;
     }
     
-    unless (&equals_double_complex($ret_ndarray->data, [Math->catanh($x_ndarray->data->[0]), Math->catanh($x_ndarray->data->[1])])) {
+    unless (R::Util->_equals_double_complex($ret_ndarray->data, [Math->catanh($x_ndarray->data->[0]), Math->catanh($x_ndarray->data->[1])])) {
       return 0;
     }
     
@@ -1173,7 +1173,7 @@ class TestCase::R::OP::DoubleComplex {
       return 0;
     }
     
-    unless (&equals_double_complex($ret_ndarray->data, [Math->cexp($x_ndarray->data->[0]), Math->cexp($x_ndarray->data->[1])])) {
+    unless (R::Util->_equals_double_complex($ret_ndarray->data, [Math->cexp($x_ndarray->data->[0]), Math->cexp($x_ndarray->data->[1])])) {
       return 0;
     }
     
@@ -1210,7 +1210,7 @@ class TestCase::R::OP::DoubleComplex {
       return 0;
     }
     
-    unless (&equals_double_complex($ret_ndarray->data, [Math->clog($x_ndarray->data->[0]), Math->clog($x_ndarray->data->[1])])) {
+    unless (R::Util->_equals_double_complex($ret_ndarray->data, [Math->clog($x_ndarray->data->[0]), Math->clog($x_ndarray->data->[1])])) {
       return 0;
     }
     
@@ -1247,7 +1247,7 @@ class TestCase::R::OP::DoubleComplex {
       return 0;
     }
     
-    unless (&equals_double_complex($ret_ndarray->data, [Math->csqrt($x_ndarray->data->[0]), Math->csqrt($x_ndarray->data->[1])])) {
+    unless (R::Util->_equals_double_complex($ret_ndarray->data, [Math->csqrt($x_ndarray->data->[0]), Math->csqrt($x_ndarray->data->[1])])) {
       return 0;
     }
     
@@ -1286,7 +1286,7 @@ class TestCase::R::OP::DoubleComplex {
       return 0;
     }
     
-    unless (&equals_double_complex($ret_ndarray->data, [Math->cpow($x_ndarray->data->[0], $x_ndarray->data->[1]), Math->cpow($y_ndarray->data->[0], $y_ndarray->data->[1])])) {
+    unless (R::Util->_equals_double_complex($ret_ndarray->data, [Math->cpow($x_ndarray->data->[0], $x_ndarray->data->[1]), Math->cpow($y_ndarray->data->[0], $y_ndarray->data->[1])])) {
       return 0;
     }
     
@@ -1349,7 +1349,7 @@ class TestCase::R::OP::DoubleComplex {
       return 0;
     }
     
-    unless (&equals_double_complex($ret_ndarray->data, [Math->complex(3, -3)])) {
+    unless (R::Util->_equals_double_complex($ret_ndarray->data, [Math->complex(3, -3)])) {
       return 0;
     }
     
@@ -1386,7 +1386,7 @@ class TestCase::R::OP::DoubleComplex {
       return 0;
     }
     
-    unless (&equals_double_complex($ret_ndarray->data, [Math->complex(1, -1), Math->complex(3, -3)])) {
+    unless (R::Util->_equals_double_complex($ret_ndarray->data, [Math->complex(1, -1), Math->complex(3, -3)])) {
       return 0;
     }
     
@@ -1434,7 +1434,7 @@ class TestCase::R::OP::DoubleComplex {
       return 0;
     }
     
-    unless (&equals_double_complex($ret_ndarray->data, [Math->cmul(Math->complex(2, -2), Math->complex(3, -3))])) {
+    unless (R::Util->_equals_double_complex($ret_ndarray->data, [Math->cmul(Math->complex(2, -2), Math->complex(3, -3))])) {
       return 0;
     }
     
@@ -1471,7 +1471,7 @@ class TestCase::R::OP::DoubleComplex {
       return 0;
     }
     
-    unless (&equals_double_complex($ret_ndarray->data, [Math->complex(2, -2), Math->cmul(Math->complex(2, -2), Math->complex(3, -3))])) {
+    unless (R::Util->_equals_double_complex($ret_ndarray->data, [Math->complex(2, -2), Math->cmul(Math->complex(2, -2), Math->complex(3, -3))])) {
       return 0;
     }
     
@@ -1518,7 +1518,7 @@ class TestCase::R::OP::DoubleComplex {
       return 0;
     }
     
-    unless (&equals_double_complex($ret_ndarray->data, [Math->complex(1, -1), Math->complex(3, -3)])) {
+    unless (R::Util->_equals_double_complex($ret_ndarray->data, [Math->complex(1, -1), Math->complex(3, -3)])) {
       return 0;
     }
     
@@ -1565,7 +1565,7 @@ class TestCase::R::OP::DoubleComplex {
       return 0;
     }
     
-    unless (&equals_double_complex($ret_ndarray->data, [Math->complex(0, 0)])) {
+    unless (R::Util->_equals_double_complex($ret_ndarray->data, [Math->complex(0, 0)])) {
       return 0;
     }
     
@@ -1604,7 +1604,7 @@ class TestCase::R::OP::DoubleComplex {
       return 0;
     }
     
-    unless (&equals_double_complex($ret_ndarray->data, [Math->complex(22, 0)])) {
+    unless (R::Util->_equals_double_complex($ret_ndarray->data, [Math->complex(22, 0)])) {
       return 0;
     }
     
@@ -1693,7 +1693,7 @@ class TestCase::R::OP::DoubleComplex {
       return 0;
     }
     
-    unless (&equals_double_complex($ret_ndarray->data, [Math->complex(0, -6), Math->complex(0, -12),Math->complex(0, -8),Math->complex(0, -16),Math->complex(0, -10),Math->complex(0, -20)])) {
+    unless (R::Util->_equals_double_complex($ret_ndarray->data, [Math->complex(0, -6), Math->complex(0, -12),Math->complex(0, -8),Math->complex(0, -16),Math->complex(0, -10),Math->complex(0, -20)])) {
       return 0;
     }
     
@@ -1766,7 +1766,7 @@ class TestCase::R::OP::DoubleComplex {
       return 0;
     }
     
-    unless (&equals_double_complex($ret_ndarray->data, [Math->complex(Math->PI, 0)])) {
+    unless (R::Util->_equals_double_complex($ret_ndarray->data, [Math->complex(Math->PI, 0)])) {
       return 0;
     }
     
@@ -1779,39 +1779,4 @@ class TestCase::R::OP::DoubleComplex {
     return 1;
   }
   
-  static method equals_double_complex : int ($x1_array : Complex_2d[], $x2_array : Complex_2d[]) {
-    
-    unless ($x1_array) {
-      die "The array \$x1_array must be defined.";
-    }
-    
-    unless ($x2_array) {
-      die "The array \$x2_array must be defined.";
-    }
-    
-    my $x1_array_length = @$x1_array;
-    
-    my $x2_array_length = @$x2_array;
-    
-    my $equals = 0;
-    
-    if ($x1_array_length == $x2_array_length) {
-      my $array_length = $x1_array_length;
-      
-      my $not_equals_elem = 0;
-      for (my $i = 0; $i < $array_length; $i++) {
-        unless ($x1_array->[$i]{re} == $x2_array->[$i]{re} && $x1_array->[$i]{im} == $x2_array->[$i]{im}) {
-          $not_equals_elem = 1;
-          last;
-        }
-      }
-      
-      unless ($not_equals_elem) {
-        $equals = 1;
-      }
-    }
-    
-    return $equals;
-  }
-
 }

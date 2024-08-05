@@ -9,7 +9,7 @@ require Exporter;
 use AutoLoader;
 
 our @ISA     = qw(Exporter);
-our $VERSION = '0.46';
+our $VERSION = '0.47';
 
 # Items to export into callers namespace by default. Note: do not export
 # names by default without a very good reason. Use EXPORT_OK instead.

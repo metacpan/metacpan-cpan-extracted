@@ -1,0 +1,94 @@
+#!/usr/bin/env perl
+# PODNAME: langertha_chat_openai
+# ABSTRACT: Simple chat with OpenAI
+
+use strict;
+use warnings;
+use Langertha::Engine::OpenAI;
+use Carp qw( croak );
+use Time::HiRes qw( time );
+
+binmode(STDOUT, ":utf8");
+binmode(STDERR, ":utf8");
+
+my $start = time;
+my $openai = Langertha::Engine::OpenAI->new(
+  $ENV{OPENAI_MODEL} ? ( model => $ENV{OPENAI_MODEL} ) : (),
+);
+print $openai->simple_chat(join(" ",@ARGV));
+my $end = time;
+printf("\n -- %.3f seconds (%s)\n", ($end - $start), $openai->model) unless $ENV{LANGERTHA_NO_TIME};
+
+__END__
+
+=pod
+
+=head1 NAME
+
+langertha_chat_openai - Simple chat with OpenAI
+
+=head1 VERSION
+
+version 0.001
+
+=head1 SYNOPSIS
+
+  bash$ langertha_chat_openai write a bash command that lists files older than
+  5 days
+
+  find /path/to/directory -type f -mtime +5 -exec ls -l {} \;
+   -- 12.542 seconds (gpt-3.5-turbo)
+
+=head1 DESCRIPTION
+
+Requires OPENAI_API_KEY environment to be set.
+
+=encoding utf8
+
+=head1 SUPPORT
+
+Repository
+
+  https://github.com/Getty/langertha
+  Pull request and additional contributors are welcome
+
+Issue Tracker
+
+  https://github.com/Getty/langertha/issues
+
+Discord
+
+  https://discord.gg/Y2avVYpquV
+
+IRC
+
+  irc://irc.perl.org/ai
+
+=cut
+
+=for :stopwords cpan testmatrix url bugtracker rt cpants kwalitee diff irc mailto metadata placeholders metacpan
+
+=head1 SUPPORT
+
+=head2 Source Code
+
+The code is open to the world, and available for you to hack on. Please feel free to browse it and play
+with it, or whatever. If you want to contribute patches, please send me a diff or prod me to pull
+from your repository :)
+
+L<https://github.com/Getty/langertha>
+
+  git clone https://github.com/Getty/langertha.git
+
+=head1 AUTHOR
+
+Torsten Raudssus <torsten@raudssus.de> L<https://raudss.us/>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2024 by Torsten Raudssus.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

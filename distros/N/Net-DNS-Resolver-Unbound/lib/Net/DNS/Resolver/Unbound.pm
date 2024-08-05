@@ -12,7 +12,7 @@ use base qw(Net::DNS::Resolver::Base DynaLoader), OS_CONF;
 our $VERSION;
 
 BEGIN {
-	$VERSION = '1.27';
+	$VERSION = '1.28';
 	eval { __PACKAGE__->bootstrap($VERSION) };
 }
 
@@ -23,6 +23,9 @@ use constant UB_VERSION => scalar eval {
 };
 
 use constant UB_CONTEXT => 'Net::DNS::Resolver::Unbound::Context';
+use constant IRRELEVENT => qw(igntc nameserver4 nameserver6 nameservers
+		persistent_tcp persistent_udp port retrans retry
+		srcaddr4 srcaddr6 srcport tcp_timeout udp_timeout usevc);
 
 use constant IP_PREF	 => UB_VERSION > 11100;
 use constant ADD_TA_AUTR => UB_CONTEXT->can('add_ta_autr');
@@ -101,6 +104,7 @@ sub new {
 	my ( $class, @args ) = @_;
 	my $self = $class->SUPER::new();
 	$self->nameservers( $self->SUPER::nameservers );
+	delete $self->{$_} for IRRELEVENT;
 	$self->_finalise_config;				# default configuration
 	$self->{update} = {} if @args;				# force context rebuild
 	while ( my $attr = shift @args ) {
@@ -127,8 +131,8 @@ sub new {
 	nameserver => '2001:4860:4860::8888@853#dns.google',
 	nameserver => '8.8.8.8@853#dns.google',
 	nameserver => '9.9.9.9@853#dns.quad9.net',
-	option     => [qw(tls-cert-bundle /etc/ssl/cert.pem)],
-	set_tls    => 1
+	option	   => [qw(tls-cert-bundle /etc/ssl/cert.pem)],
+	set_tls	   => 1
 	);
 
     $resolver->nameservers( '::1', '127.0.0.1', ... );
@@ -208,7 +212,7 @@ sub bgread {
 	my ( $self, $handle ) = @_;
 	return unless $handle;
 
-	$self->{ub_ctx}->ub_wait if &bgbusy;
+	$self->{ub_ctx}->ub_wait;
 	$self->errorstring( $handle->err );
 
 	my $reply = $self->_decode_result( $handle->result ) || return;
@@ -511,8 +515,9 @@ sub _decode_result {
 sub _config {
 	my ( $self, $name, @arg ) = @_;
 	my $entry = ( scalar(@arg) == 1 ) ? $arg[0] : [@arg];
-	$self->{test_ctx} = Net::DNS::Resolver::Unbound::Context->new() unless $self->{update};
-	$self->{test_ctx}->$name(@arg) if @arg;			# error check only
+	my $ctx	  = $self->{test_ctx};
+	$self->{test_ctx} = $ctx = Net::DNS::Resolver::Unbound::Context->new() unless $ctx;
+	$ctx->$name(@arg) if @arg;				# error check only
 	my $state = $self->{update}->{$name};
 	if ( defined $state ) {					# second and subsequent entries
 		$state = $self->{update}->{$name} = [$state] unless ref $state;
@@ -527,9 +532,10 @@ sub _config {
 sub _option {
 	my ( $self, $name, @arg ) = @_;
 	my ($entry) = @arg;
-	my $opt = "${name}:";
-	$self->{test_ctx} = Net::DNS::Resolver::Unbound::Context->new() unless $self->{update};
-	$self->{test_ctx}->set_option( $opt, @arg ) if defined $entry;	  # error check only
+	my $opt	    = "${name}:";
+	my $ctx	    = $self->{test_ctx};
+	$self->{test_ctx} = $ctx = Net::DNS::Resolver::Unbound::Context->new() unless $ctx;
+	$ctx->set_option( $opt, @arg ) if defined $entry;	# error check only
 	my $updopt = $self->{update}->{set_option};
 	my %option = map {$_} @$updopt;
 
@@ -569,7 +575,8 @@ sub _finalise_config {
 
 	my $update = delete $self->{update};
 	return unless $update;
-	my $ctx = $self->{ub_ctx} = Net::DNS::Resolver::Unbound::Context->new();
+	delete $self->{test_ctx};
+	delete $self->{ub_ctx};
 
 	my $config = $self->{config};
 	my $cfgopt = delete $config->{set_option};		# extract option lists
@@ -585,6 +592,7 @@ sub _finalise_config {
 	}
 	my @option = map { ( $_, $option{$_} ) } sort keys %option;    # rebuild option list
 
+	my $ctx = $self->{ub_ctx} = Net::DNS::Resolver::Unbound::Context->new();
 	foreach my $name ( keys %option ) {			# set unbound options
 		foreach my $value ( map { ref($_) ? @$_ : $_ } $option{$name} ) {
 			$ctx->set_option( $name, $value );

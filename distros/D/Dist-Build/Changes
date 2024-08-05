@@ -1,5 +1,20 @@
 Revision history for Dist-Build
 
+0.010     2024-08-04 00:41:56+02:00 Europe/Brussels
+          - Add missing prereqs due to misconfigured dist.ini
+
+0.009     2024-08-01 23:01:19+02:00 Europe/Brussels
+          - Make path portable in build tests
+
+0.008     2024-08-01 12:56:09+02:00 Europe/Brussels
+          - Add compilation configurator
+          - Only load Dist::Build::XS dependencies when necessary
+          - Remove curdir and inc/ from automatic include paths in Dist::Build::XS
+          - Allow file to be specified instead of module in Dist::Build::XS
+          - Allow sources to be a hash in Dist::Build::XS
+          - Extract script and lib logic out of base module
+          - Add clean and autoclean actions
+
 0.007     2024-07-20 15:19:09+02:00 Europe/Brussels
           - Properly depend on new ExtUtils::Builder::Compiler
           - Fix misspelling of extra_linker_flags

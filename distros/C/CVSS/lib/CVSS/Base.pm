@@ -7,7 +7,7 @@ use warnings;
 
 use Carp ();
 
-our $VERSION = '1.00';
+our $VERSION = '1.11';
 $VERSION =~ tr/_//d;    ## no critic
 
 use overload '""' => \&to_string, fallback => 1;
@@ -107,13 +107,32 @@ sub vector_string { $_[0]->{vector_string} || $_[0]->to_vector_string }
 sub metrics       { shift->{metrics} }
 sub scores        { shift->{scores} }
 
+
+# Scores & severities
 sub base_score    { shift->{scores}->{base} }
 sub base_severity { $_[0]->score_to_severity($_[0]->base_score) }
 
+# CVSS 2.0/3.x scores & severities
+sub temporal_score         { shift->{scores}->{temporal} }
+sub temporal_severity      { $_[0]->score_to_severity($_[0]->temporal_score) }
+sub environmental_score    { shift->{scores}->{environmental} }
+sub environmental_severity { $_[0]->score_to_severity($_[0]->environmental_score) }
+
+# Extra 2.0/3.x scores
+sub exploitability_score  { shift->{scores}->{exploitability} }
+sub impact_score          { shift->{scores}->{impact} }
+sub modified_impact_score { shift->{scores}->{modified_impact} }
+
+
 # JSON-style alias
-sub vectorString { shift->vector_string }
-sub baseScore    { shift->base_score }
-sub baseSeverity { shift->base_severity }
+sub vectorString          { shift->vector_string }
+sub baseScore             { shift->base_score }
+sub baseSeverity          { shift->base_severity }
+sub temporalScore         { shift->temporal_score }
+sub temporalSeverity      { shift->temporal_severity }
+sub environmentalScore    { shift->environmental_score }
+sub environmentalSeverity { shift->environmental_severity }
+
 
 sub metric_group_is_set {
 
@@ -296,9 +315,16 @@ Return the CVSS vector string.
 
 Return the HASH of CVSS metrics.
 
+=back
+
+
+=head3 SCORE & SEVERITY
+
+=over
+
 =item $cvss->scores
 
-Return the HASH of calculated score (base, impact, temporal).
+Return the HASH of calculated score (base, impact, temporal, etc.).
 
     $scores = $cvss->scores;
 
@@ -308,14 +334,6 @@ Return the HASH of calculated score (base, impact, temporal).
     #   "exploitability" => "1.6",
     #   "impact"         => "5.9" }
 
-=item $cvss->base_score
-
-Return the base score (0 - 10).
-
-=item $cvss->base_severity
-
-Return the base severity (LOW, MEDIUM, HIGH or CRITICAL).
-
 =item $cvss->calculate_score
 
 Performs the calculation of the score in accordance with the CVSS specification.
@@ -324,7 +342,44 @@ Performs the calculation of the score in accordance with the CVSS specification.
 
 Convert the score in severity
 
+=item $cvss->base_score
+
+Return the base score (0 - 10).
+
+=item $cvss->base_severity
+
+Return the base severity (LOW, MEDIUM, HIGH or CRITICAL).
+
+=item $cvss->temporal_score
+
+Return the temporal score (0 - 10) -- (CVSS 2.0/3.x)
+
+=item $cvss->temporal_severity
+
+Return the temporal severity (LOW, MEDIUM, HIGH or CRITICAL) -- (CVSS 2.0/3.x)
+
+=item $cvss->environmental_score
+
+Return the environmental score (0 - 10) -- (CVSS 2.0/3.x)
+
+=item $cvss->environmental_severity
+
+Return the environmental severity (LOW, MEDIUM, HIGH or CRITICAL) -- (CVSS 2.0/3.x)
+
+=item $cvss->impact_score
+
+Return the impact score (0 - 10) -- (CVSS 2.0/3.x)
+
+=item $cvss->exploitability_score
+
+Return the exploitability score (0 - 10) -- (CVSS 2.0/3.x)
+
+=item $cvss->modified_impact_score
+
+Return the modified impact score (0 - 10) -- (CVSS 2.0/3.x)
+
 =back
+
 
 =head3 METRICS
 

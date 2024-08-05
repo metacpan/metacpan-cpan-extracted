@@ -1,3 +1,13 @@
+0.023   2024-07-19  Released-By: PERLANCAR; Urgency: medium
+
+        - [bugfix] Fix new data (accidental newline).
+
+
+0.022   2024-07-19  Released-By: PERLANCAR; Urgency: medium
+
+        - Update data (2024-07-17).
+
+
 0.021   2024-04-19  Released-By: PERLANCAR; Urgency: medium
 
         - [ux] Add shorter alias for bpom-list-food-ingredients-rba:

@@ -3,7 +3,7 @@ use Object::Pad ':experimental(init_expr)';
 
 package OpenTelemetry::SDK::Trace::Span::Processor::Batch;
 
-our $VERSION = '0.022';
+our $VERSION = '0.024';
 
 class OpenTelemetry::SDK::Trace::Span::Processor::Batch
     :does(OpenTelemetry::Trace::Span::Processor)
@@ -111,16 +111,32 @@ class OpenTelemetry::SDK::Trace::Span::Processor::Batch
         $self->$report_dropped_spans( 'export-failure' => $count );
     }
 
-    method $maybe_process_batch ( $force = undef ) {
+    method process ( @items ) {
         my $batch = $lock->enter(
             sub {
-                return [] if @queue < $batch_size && !$force;
+                my $overflow = @queue + @items- $max_queue_size;
+                if ( $overflow > 0 ) {
+                    # If the buffer is full, we drop old spans first
+                    # The queue is always FIFO, even for dropped spans
+                    # This behaviour is not in the spec, but is
+                    # consistent with the Ruby implementation.
+                    # For context, the Go implementation instead
+                    # blocks until there is room in the buffer.
+                    splice @queue, 0, $overflow;
+                    $self->$report_dropped_spans(
+                        'buffer-full' => $overflow,
+                    );
+                }
+
+                push @queue, @items;
+
+                return [] if @queue < $batch_size;
 
                 $metrics->set_gauge_to(
                     buffer_use => @queue / $max_queue_size,
                 ) if @queue;
 
-                [ map $_->snapshot, splice @queue, 0, $batch_size ];
+                [ splice @queue, 0, $batch_size ];
             }
         );
 
@@ -143,32 +159,10 @@ class OpenTelemetry::SDK::Trace::Span::Processor::Batch
     method on_start ( $span, $context ) { }
 
     method on_end ($span) {
-        return if $done;
-
         try {
+            return if $done;
             return unless $span->context->trace_flags->sampled;
-
-            $lock->enter(
-                sub {
-                    my $overflow = @queue + 1 - $max_queue_size;
-                    if ( $overflow > 0 ) {
-                        # If the buffer is full, we drop old spans first
-                        # The queue is always FIFO, even for dropped spans
-                        # This behaviour is not in the spec, but is
-                        # consistent with the Ruby implementation.
-                        # For context, the Go implementation instead
-                        # blocks until there is room in the buffer.
-                        splice @queue, 0, $overflow;
-                        $self->$report_dropped_spans(
-                            'buffer-full' => $overflow,
-                        );
-                    }
-
-                    push @queue, $span;
-                }
-            );
-
-            $self->$maybe_process_batch;
+            $self->process( $span->snapshot );
         }
         catch ($e) {
             OpenTelemetry->handle_error(
@@ -176,8 +170,6 @@ class OpenTelemetry::SDK::Trace::Span::Processor::Batch
                 message   => 'unexpected error in ' . ref($self) . '->on_end',
             );
         }
-
-        return;
     }
 
     async method shutdown ( $timeout = undef ) {
@@ -220,7 +212,7 @@ class OpenTelemetry::SDK::Trace::Span::Processor::Batch
             my $remaining = maybe_timeout $timeout, $start;
             return TRACE_EXPORT_TIMEOUT if $timeout and !$remaining;
 
-            my $batch = [ map $_->snapshot, splice @stack, 0, $batch_size ];
+            my $batch = [ splice @stack, 0, $batch_size ];
             my $count = @$batch;
 
             try {

@@ -22,6 +22,9 @@ is_deeply(
 		['a', 'class', 'message-board-blank'],
 
 		['b', 'div'],
+		['a', 'class', 'new-message-board'],
+
+		['b', 'div'],
 		['a', 'class', 'title'],
 		['d', 'Add message board'],
 		['e', 'div'],
@@ -29,13 +32,19 @@ is_deeply(
 		['a', 'method', 'post'],
 		['b', 'textarea'],
 		['a', 'autofocus', 'autofocus'],
+		['a', 'id', 'message_board_message'],
+		['a', 'name', 'message_board_message'],
 		['a', 'rows', '6'],
 		['e', 'textarea'],
 		['b', 'button'],
-		['a', 'type', 'button'],
+		['a', 'type', 'submit'],
+		['a', 'name', 'action'],
+		['a', 'value', 'add_message_board'],
 		['d', 'Save'],
 		['e', 'button'],
 		['e', 'form'],
+
+		['e', 'div'],
 
 		['e', 'div'],
 	],
@@ -57,6 +66,9 @@ is_deeply(
 		['a', 'class', 'my-blank'],
 
 		['b', 'div'],
+		['a', 'class', 'new-message-board'],
+
+		['b', 'div'],
 		['a', 'class', 'title'],
 		['d', 'Add message board'],
 		['e', 'div'],
@@ -64,13 +76,19 @@ is_deeply(
 		['a', 'method', 'post'],
 		['b', 'textarea'],
 		['a', 'autofocus', 'autofocus'],
+		['a', 'id', 'message_board_message'],
+		['a', 'name', 'message_board_message'],
 		['a', 'rows', '6'],
 		['e', 'textarea'],
 		['b', 'button'],
-		['a', 'type', 'button'],
+		['a', 'type', 'submit'],
+		['a', 'name', 'action'],
+		['a', 'value', 'add_message_board'],
 		['d', 'Save'],
 		['e', 'button'],
 		['e', 'form'],
+
+		['e', 'div'],
 
 		['e', 'div'],
 	],
@@ -98,6 +116,9 @@ is_deeply(
 		['a', 'class', 'message-board-blank'],
 
 		['b', 'div'],
+		['a', 'class', 'new-message-board'],
+
+		['b', 'div'],
 		['a', 'class', 'title'],
 		['d', decode_utf8('Vytvořit nástěnku')],
 		['e', 'div'],
@@ -105,13 +126,19 @@ is_deeply(
 		['a', 'method', 'post'],
 		['b', 'textarea'],
 		['a', 'autofocus', 'autofocus'],
+		['a', 'id', 'message_board_message'],
+		['a', 'name', 'message_board_message'],
 		['a', 'rows', '6'],
 		['e', 'textarea'],
 		['b', 'button'],
-		['a', 'type', 'button'],
+		['a', 'type', 'submit'],
+		['a', 'name', 'action'],
+		['a', 'value', 'add_message_board'],
 		['d', decode_utf8('Uložit')],
 		['e', 'button'],
 		['e', 'form'],
+
+		['e', 'div'],
 
 		['e', 'div'],
 	],

@@ -3,6 +3,11 @@
 
 class R::Util {
   
+  # Temporary loaded.
+  use Complex_2f;
+  use Complex_2d;
+  use R::NDArray;
+  
   # Class Methods
   static method calc_data_length : int ($dim : int[]) {
     
@@ -10,14 +15,13 @@ class R::Util {
       die "The dimention \$dim must be defined.";
     }
     
+    unless (&is_normalized_dim($dim)) {
+      die "The dimensions \$dim must be normalized.";
+    }
+    
     my $length = 1;
     if (@$dim) {
       for my $dim_elem (@$dim) {
-        
-        unless ($dim_elem > 0) {
-          die "The elem of the dimention \$dim must be greater than 0.";
-        }
-        
         $length *= $dim_elem;
       }
     }
@@ -47,7 +51,7 @@ class R::Util {
         }
         
         unless ($dim_elem > 0) {
-          die "The elem of dim option or \$dim argument except for tail must be greater than 0.";
+          die "The dimensions \$dim except for tail elements must be greater than 0.";
         }
         
         $normalized_dim_list->unshift($dim_elem);
@@ -60,6 +64,35 @@ class R::Util {
     }
     
     return $normalized_dim;
+  }
+  
+  static method is_normalized_dim : int ($dim : int[]) {
+    
+    my $is_normalized_dim = 0;
+    
+    if ($dim) {
+      my $dim_length = @$dim;
+      
+      if ($dim_length == 0) {
+        $is_normalized_dim = 1;
+      }
+      else {
+        my $found_invalid_dim = 0;
+        for (my $i = 0; $i < $dim_length; $i++) {
+          my $dim_elem = $dim->[$i];
+          unless ($dim_elem > 0) {
+            $found_invalid_dim = 1;
+            last;
+          }
+        }
+        
+        unless ($found_invalid_dim) {
+          $is_normalized_dim = 1;
+        }
+      }
+    }
+    
+    return $is_normalized_dim;
   }
   
   static method check_length : void ($data : object, $dim : int[]) {
@@ -76,6 +109,10 @@ class R::Util {
       die "The dimensions \$dim must be defined.";
     }
     
+    unless (&is_normalized_dim($dim)) {
+      die "The dimensions \$dim must be normalized.";
+    }
+    
     my $length_from_data = R::Util->_get_array_length($data);
     
     my $length_from_dim = R::Util->calc_data_length($dim);
@@ -89,13 +126,17 @@ class R::Util {
   static method drop_dim : int[] ($dim : int[], $index : int = -1) {
     
     unless ($dim) {
-      die "The definsion \$dim must be defined.";
+      die "The dimensions \$dim must be defined.";
     }
     
     my $dim_length = @$dim;
     
-    unless (@$dim > 0) {
-      die "The length of the dimension \$dim must be greater than 0.";
+    unless (&is_normalized_dim($dim)) {
+      die "The dimensions \$dim must be normalized.";
+    }
+    
+    if (@$dim == 0) {
+      return new int[0];
     }
     
     unless ($index < $dim_length) {
@@ -145,13 +186,13 @@ class R::Util {
   static method expand_dim : int[] ($dim : int[], $index : int = -1) {
     
     unless ($dim) {
-      die "The definsion \$dim must be defined.";
+      die "The dimensions \$dim must be defined.";
     }
     
     my $dim_length = @$dim;
     
-    unless (@$dim > 0) {
-      die "The length of the dimension \$dim must be greater than 0.";
+    unless (&is_normalized_dim($dim)) {
+      die "The dimensions \$dim must be normalized.";
     }
     
     unless ($index <= $dim_length) {
@@ -167,6 +208,10 @@ class R::Util {
     
     for (my $i = 0; $i < @$dim; $i++) {
       my $dim_elem = $dim->[$i];
+      
+      unless ($dim_elem > 0) {
+        die "The element of the dimensions \$dim must be greater than 0.";
+      }
       
       if ($i == $index) {
         $dropped_dim_list->push(1);
@@ -186,6 +231,14 @@ class R::Util {
   
   static method equals_dim : int ($x_dim : int[], $y_dim : int[]) {
     
+    unless ($x_dim) {
+      die "The dimensions \$x_dim must be defined.";
+    }
+    
+    unless ($y_dim) {
+      die "The dimensions \$y_dim must be defined.";
+    }
+    
     my $equals_dim = 0;
     if ($x_dim && $y_dim) {
       my $x_dim_length = @$x_dim;
@@ -197,6 +250,14 @@ class R::Util {
         for (my $i = 0; $i < $x_dim_length; $i++) {
           my $x_dim_elem = $x_dim->[$i];
           my $y_dim_elem = $y_dim->[$i];
+          
+          unless ($x_dim_elem > 0) {
+            die "The element of the dimensions \$x_dim must be greater than 0.";
+          }
+          
+          unless ($y_dim_elem > 0) {
+            die "The element of the dimensions \$y_dim must be greater than 0.";
+          }
           
           unless ($x_dim_elem == $y_dim_elem) {
             $equals_dim_elems = 0;
@@ -337,6 +398,260 @@ class R::Util {
     my $object = (R::NDArray)Native::MethodCall->call_class_method($class_name, "new", [(object)$options]);
     
     return $object;
+  }
+  
+  # This method will be inplemented as Array#equals_float_complex
+  static method _equals_float_complex : int ($x1_array : Complex_2f[], $x2_array : Complex_2f[]) {
+    
+    unless ($x1_array) {
+      die "The array \$x1_array must be defined.";
+    }
+    
+    unless ($x2_array) {
+      die "The array \$x2_array must be defined.";
+    }
+    
+    my $x1_array_length = @$x1_array;
+    
+    my $x2_array_length = @$x2_array;
+    
+    my $equals = 0;
+    
+    if ($x1_array_length == $x2_array_length) {
+      my $array_length = $x1_array_length;
+      
+      my $not_equals_elem = 0;
+      for (my $i = 0; $i < $array_length; $i++) {
+        unless ($x1_array->[$i]{re} == $x2_array->[$i]{re} && $x1_array->[$i]{im} == $x2_array->[$i]{im}) {
+          $not_equals_elem = 1;
+          last;
+        }
+      }
+      
+      unless ($not_equals_elem) {
+        $equals = 1;
+      }
+    }
+    
+    return $equals;
+  }
+  
+  # This method will be inplemented as Array#equals_double_complex
+  static method _equals_double_complex : int ($x1_array : Complex_2d[], $x2_array : Complex_2d[]) {
+    
+    unless ($x1_array) {
+      die "The array \$x1_array must be defined.";
+    }
+    
+    unless ($x2_array) {
+      die "The array \$x2_array must be defined.";
+    }
+    
+    my $x1_array_length = @$x1_array;
+    
+    my $x2_array_length = @$x2_array;
+    
+    my $equals = 0;
+    
+    if ($x1_array_length == $x2_array_length) {
+      my $array_length = $x1_array_length;
+      
+      my $not_equals_elem = 0;
+      for (my $i = 0; $i < $array_length; $i++) {
+        unless ($x1_array->[$i]{re} == $x2_array->[$i]{re} && $x1_array->[$i]{im} == $x2_array->[$i]{im}) {
+          $not_equals_elem = 1;
+          last;
+        }
+      }
+      
+      unless ($not_equals_elem) {
+        $equals = 1;
+      }
+    }
+    
+    return $equals;
+  }
+  
+  # This method will be inplemented as Complex_2d#to_string method
+  static method _double_complex_to_string : string ($z : Complex_2d) {
+    
+    my $re = $z->{re};
+    
+    my $im = $z->{im};
+    
+    my $string = (string)undef;
+    
+    if ($im < 0) {
+      $string = "$re${im}i";
+    }
+    else {
+      $string = "$re+${im}i";
+    }
+    
+    return $string;
+  }
+  
+  # This method will be inplemented as Complex_2f#to_string method
+  static method _float_complex_to_string : string ($z : Complex_2f) {
+    
+    my $re = $z->{re};
+    
+    my $im = $z->{im};
+    
+    my $string = (string)undef;
+    
+    if ($im < 0) {
+      $string = "$re${im}i";
+    }
+    else {
+      $string = "$re+${im}i";
+    }
+    
+    return $string;
+  }
+  
+  # This method will be inplemented as Complex_2d#new_array_from_pairs
+  static method _Complex_2d_new_array_from_pairs : Complex_2d[] ($pairs : double[]) {
+    
+    unless ($pairs) {
+      die "The pairs \$pairs must be defined.";
+    }
+    
+    my $pairs_length = @$pairs;
+    
+    unless ($pairs_length % 2 == 0) {
+      die "The length of the pairs \$data must be an even number.";
+    }
+    
+    my $length = $pairs_length / 2;
+    
+    my $array = new Complex_2d[$length];
+    
+    Fn->memcpy($array, 0, $pairs, 0, 8 * 2 * $length);
+    
+    return $array;
+  }
+  
+  # This method will be inplemented as Complex_2d#new_array_from_re_array
+  static method _Complex_2d_new_array_from_re_array : Complex_2d[] ($re_array : double[]) {
+    
+    unless ($re_array) {
+      die "The real numbers array \$re_array must be defined.";
+    }
+    
+    my $length = @$re_array;
+    
+    my $array = new Complex_2d[$length];
+    
+    for (my $i = 0; $i < $length; $i++) {
+      $array->[$i]{re} = $re_array->[$i];
+    }
+    
+    return $array;
+  }
+  
+  # This method will be inplemented as Complex_2d#to_re_array
+  static method _Complex_2d_to_re_array : double[] ($array : Complex_2d[]) {
+    
+    unless ($array) {
+      die "The array \$array must be defined.";
+    }
+    
+    my $length = @$array;
+    
+    my $re_array = new double[$length];
+    
+    for (my $i = 0; $i < $length; $i++) {
+      $re_array->[$i] = $array->[$i]{re};
+    }
+    
+    return $re_array;
+  }
+  
+  # This method will be inplemented as Complex_2d#to_pairs
+  static method _Complex_2d_to_pairs : double[] ($array : Complex_2d[]) {
+    
+    my $length = @$array;
+    
+    my $pairs_length = $length * 2;
+    
+    my $pairs = new double[$pairs_length];
+    
+    Fn->memcpy($pairs, 0, $array, 0, 8 * 2 * $length);
+    
+    return $pairs;
+  }
+  
+  # This method will be inplemented as Complex_2f#new_array_from_pairs
+  static method _Complex_2f_new_array_from_pairs : Complex_2f[] ($pairs : float[]) {
+    
+    unless ($pairs) {
+      die "The pairs \$pairs must be defined.";
+    }
+    
+    my $pairs_length = @$pairs;
+    
+    unless ($pairs_length % 2 == 0) {
+      die "The length of the pairs \$data must be an even number.";
+    }
+    
+    my $length = $pairs_length / 2;
+    
+    my $array = new Complex_2f[$length];
+    
+    Fn->memcpy($array, 0, $pairs, 0, 4 * 2 * $length);
+    
+    return $array;
+  }
+  
+  # This method will be inplemented as Complex_2f#new_array_from_re_array
+  static method _Complex_2f_new_array_from_re_array : Complex_2f[] ($re_array : float[]) {
+    
+    unless ($re_array) {
+      die "The real numbers array \$re_array must be defined.";
+    }
+    
+    my $length = @$re_array;
+    
+    my $array = new Complex_2f[$length];
+    
+    for (my $i = 0; $i < $length; $i++) {
+      $array->[$i]{re} = $re_array->[$i];
+    }
+    
+    return $array;
+  }
+  
+  # This method will be inplemented as Complex_2f#to_re_array
+  static method _Complex_2f_to_re_array : float[] ($array : Complex_2f[]) {
+    
+    unless ($array) {
+      die "The array \$array must be defined.";
+    }
+    
+    my $length = @$array;
+    
+    my $re_array = new float[$length];
+    
+    for (my $i = 0; $i < $length; $i++) {
+      $re_array->[$i] = $array->[$i]{re};
+    }
+    
+    return $re_array;
+  }
+  
+  # This method will be inplemented as Complex_2f#to_pairs
+  static method _Complex_2f_to_pairs : float[] ($array : Complex_2f[]) {
+    
+    my $length = @$array;
+    
+    my $pairs_length = $length * 2;
+    
+    my $pairs = new float[$pairs_length];
+    
+    Fn->memcpy($pairs, 0, $array, 0, 4 * 2 * $length);
+    
+    return $pairs;
   }
   
 }

@@ -9,9 +9,9 @@ use Carp       ();
 use List::Util qw(any max min);
 
 use base 'CVSS::Base';
-use CVSS::Constants;
+use CVSS::Constants ();
 
-our $VERSION = '1.00';
+our $VERSION = '1.11';
 $VERSION =~ tr/_//d;    ## no critic
 
 use constant DEBUG => $ENV{CVSS_DEBUG};
@@ -646,7 +646,7 @@ __END__
 
 =head1 NAME
 
-CVSS::v4 - Parse and calculate CVSS v4 scores
+CVSS::v4 - Parse and calculate CVSS v4.0 scores
 
 
 =head1 DESCRIPTION

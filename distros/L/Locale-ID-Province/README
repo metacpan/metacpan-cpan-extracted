@@ -2,26 +2,19 @@ NAME
     Locale::ID::Province - List of provinces in Indonesia
 
 VERSION
-    This document describes version 0.110 of Locale::ID::Province (from Perl
-    distribution Locale-ID-Province), released on 2021-05-07.
+    This document describes version 0.111 of Locale::ID::Province (from Perl
+    distribution Locale-ID-Province), released on 2024-08-05.
 
 SYNOPSIS
      use Locale::ID::Province qw(list_idn_provinces);
      my $res = list_idn_provinces();
 
 DESCRIPTION
-    This module provides API access for list of provinces in Indonesia. Data
-    is currently retrieved from the gudang-data-interim repository at
-    https://github.com/sharyanto/gudang-data-interim/tree/master/data/ind_pr
-    ovince/
-
-    This module's functions has Rinci specs.
-
 FUNCTIONS
   list_idn_provinces
     Usage:
 
-     list_idn_provinces(%args) -> [status, msg, payload, meta]
+     list_idn_provinces(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
     Provinces in Indonesia.
 
@@ -144,6 +137,61 @@ FUNCTIONS
     *   fields => *array[str]*
 
         Select fields to return.
+
+    *   ind_abbrev => *str*
+
+        Only return records where the 'ind_abbrev' field equals specified
+        value.
+
+    *   ind_abbrev.contains => *str*
+
+        Only return records where the 'ind_abbrev' field contains specified
+        text.
+
+    *   ind_abbrev.in => *array[str]*
+
+        Only return records where the 'ind_abbrev' field is in the specified
+        values.
+
+    *   ind_abbrev.is => *str*
+
+        Only return records where the 'ind_abbrev' field equals specified
+        value.
+
+    *   ind_abbrev.isnt => *str*
+
+        Only return records where the 'ind_abbrev' field does not equal
+        specified value.
+
+    *   ind_abbrev.max => *str*
+
+        Only return records where the 'ind_abbrev' field is less than or
+        equal to specified value.
+
+    *   ind_abbrev.min => *str*
+
+        Only return records where the 'ind_abbrev' field is greater than or
+        equal to specified value.
+
+    *   ind_abbrev.not_contains => *str*
+
+        Only return records where the 'ind_abbrev' field does not contain
+        specified text.
+
+    *   ind_abbrev.not_in => *array[str]*
+
+        Only return records where the 'ind_abbrev' field is not in the
+        specified values.
+
+    *   ind_abbrev.xmax => *str*
+
+        Only return records where the 'ind_abbrev' field is less than
+        specified value.
+
+    *   ind_abbrev.xmin => *str*
+
+        Only return records where the 'ind_abbrev' field is greater than
+        specified value.
 
     *   ind_capital_name => *str*
 
@@ -365,9 +413,25 @@ FUNCTIONS
         Only return records where the 'iso3166_2_code' field is greater than
         specified value.
 
-    *   query => *str*
+    *   queries => *array[str]*
 
         Search.
+
+        This will search all searchable fields with one or more specified
+        queries. Each query can be in the form of "-FOO" (dash prefix
+        notation) to require that the fields do not contain specified
+        string, or "/FOO/" to use regular expression. All queries must match
+        if the "query_boolean" option is set to "and"; only one query should
+        match if the "query_boolean" option is set to "or".
+
+    *   query_boolean => *str* (default: "and")
+
+        Whether records must match all search queries ('and') or just one
+        ('or').
+
+        If set to "and", all queries must match; if set to "or", only one
+        query should match. See the "queries" option for more details on
+        searching.
 
     *   random => *bool* (default: 0)
 
@@ -451,12 +515,15 @@ FUNCTIONS
 
     Returns an enveloped result (an array).
 
-    First element (status) is an integer containing HTTP status code (200
-    means OK, 4xx caller error, 5xx function error). Second element (msg) is
-    a string containing error message, or 'OK' if status is 200. Third
-    element (payload) is optional, the actual result. Fourth element (meta)
-    is called result metadata and is optional, a hash that contains extra
-    information.
+    First element ($status_code) is an integer containing HTTP-like status
+    code (200 means OK, 4xx caller error, 5xx function error). Second
+    element ($reason) is a string containing error message, or something
+    like "OK" if status is 200. Third element ($payload) is the actual
+    result, but usually not present when enveloped result is an error
+    response ($status_code is not 2xx). Fourth element (%result_meta) is
+    called result metadata and is optional, a hash that contains extra
+    information, much like how HTTP response headers provide additional
+    metadata.
 
     Return value: (any)
 
@@ -468,28 +535,42 @@ SOURCE
     Source repository is at
     <https://github.com/perlancar/perl-Locale-ID-Province>.
 
+SEE ALSO
+    list-idn-provinces (from App::IndonesianLocaleUtils)
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+CONTRIBUTOR
+    Steven Haryanto <stevenharyanto@gmail.com>
+
+CONTRIBUTING
+    To contribute, you can send patches by email/via RT, or send pull
+    requests on GitHub.
+
+    Most of the time, you don't need to build the distribution yourself. You
+    can simply modify the code, then test via:
+
+     % prove -l
+
+    If you want to build the distribution (e.g. to try to install it locally
+    on your system), you can install Dist::Zilla,
+    Dist::Zilla::PluginBundle::Author::PERLANCAR,
+    Pod::Weaver::PluginBundle::Author::PERLANCAR, and sometimes one or two
+    other Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps
+    required beyond that are considered a bug and can be reported to me.
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2024, 2017, 2015, 2014, 2012 by perlancar
+    <perlancar@cpan.org>.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+
 BUGS
     Please report any bugs or feature requests on the bugtracker website
     <https://rt.cpan.org/Public/Dist/Display.html?Name=Locale-ID-Province>
 
     When submitting a bug or request, please include a test-file or a patch
     to an existing test-file that illustrates the bug or desired feature.
-
-SEE ALSO
-    list-idn-provinces
-
-    Gudang Data Interim project,
-    https://github.com/sharyanto/gudang-data-interim/
-
-    This API will also be available on GudangAPI, http://gudangapi.com/
-
-AUTHOR
-    perlancar <perlancar@cpan.org>
-
-COPYRIGHT AND LICENSE
-    This software is copyright (c) 2021, 2017, 2015, 2014, 2012 by
-    perlancar@cpan.org.
-
-    This is free software; you can redistribute it and/or modify it under
-    the same terms as the Perl 5 programming language system itself.
 

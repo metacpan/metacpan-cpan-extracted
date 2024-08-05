@@ -6,14 +6,15 @@ use warnings;
 
 use Test::More;
 
-plan tests => 5 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+plan tests => 6 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 my @module_files = (
     'Dist/Build.pm',
     'Dist/Build/Core.pm',
     'Dist/Build/Serializer.pm',
     'Dist/Build/ShareDir.pm',
-    'Dist/Build/XS.pm'
+    'Dist/Build/XS.pm',
+    'Dist/Build/XS/Conf.pm'
 );
 
 

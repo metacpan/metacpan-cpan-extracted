@@ -12,7 +12,7 @@ use Mo::utils 0.01 qw(check_required);
 use Mo::utils::CSS 0.02 qw(check_css_class);
 use Scalar::Util qw(blessed);
 
-our $VERSION = 0.05;
+our $VERSION = 0.06;
 
 # Constructor.
 sub new {
@@ -158,6 +158,7 @@ sub _process_css {
 		['d', 'padding', '20px'],
 		['d', 'border-radius', '8px'],
 		['d', 'box-shadow', '0 2px 4px rgba(0, 0, 0, 0.1)'],
+		['d', 'font-family', 'Arial, Helvetica, sans-serif'],
 		['e'],
 
 		['s', '.'.$self->{'css_class'}.' .version'],
@@ -552,6 +553,6 @@ BSD 2-Clause License
 
 =head1 VERSION
 
-0.05
+0.06
 
 =cut

@@ -1,0 +1,90 @@
+NAME
+
+    IPC::MicroSocket - minimal request/response or pub/sub mechanism
+
+DESCRIPTION
+
+    This distribution provides two main modules for implementing servers or
+    clients that communicate over a local UNIX socket, to exchange
+    messages. Each client connects to one server, and a server supports
+    multiple connected clients.
+
+      * To implement a client, see IPC::MicroSocket::Client.
+
+      * To implement a server, see IPC::MicroSocket::Server.
+
+MESSAGES
+
+    There are two supported kinds of message flows:
+
+ Request/Response
+
+    A client sends a request message to the server, which consists of a
+    command name and a list of arguments. The server eventually sends a
+    response to it, which contains a list of values. Responses are not
+    necessarily delivered in the requested order; servers are permitted to
+    respond asynchronously. Requests may also fail, sending a different
+    kind of failure response to the client instead.
+
+ Publish/Subscribe
+
+    A client subscribes to a given topic string on the server. The server
+    can emit messages to all the clients that subscribe to a particular
+    topic.
+
+DATA ENCODING
+
+    All transmitted strings are purely bytes. If you need to transmit
+    Unicode text, you must encode/decode it. If you need to send data
+    structures that are not plain byte strings, you must
+    serialise/deserialise them.
+
+FAQs
+
+ Why not ZeroMQ?
+
+    I found ZeroMQ to be a lot of effort to use from Perl, and most
+    critically it does not appear to support both request/response and
+    publish/subscribe message flows to share the same UNIX socket. To
+    support that in ZeroMQ it would appear to be necessary to create two
+    separate endpoints, one for each kind of message flow.
+
+ Why not JSON/YAML/your-favourite-serialisation?
+
+    I mostly built this for a few very-small use-cases involving simple
+    byte strings or plain ASCII text, for which the overhead of JSON, YAML,
+    or other kinds of serialisation would be unnecessary. As the presented
+    message semantics are just opaque byte buffers, you are free to layer
+    on top whatever kind of message serialisation you wish.
+
+ Why not IO::Async/Mojo/your-favourite-event-system?
+
+    I wanted to use this distribution as an exercise in writing "pure"
+    Future-driven event logic, as an experiment to test out
+    Future::Selector and other related design shapes.
+
+TODO
+
+    There are a number of additional features that this module could
+    support. Each will be considered if a use-case arises. Each would add
+    extra code and possible dependencies, and take away from the "micro"
+    nature of the module, so each would have to be considered on individual
+    merit.
+
+      * Configurations for encoding and serialisation of arguments.
+
+      * Unsubscribe from individual topics by request.
+
+      * Helper methods for other socket types, such as TCP sockets.
+
+      * Flexible matching of subscription topics; such as string prefixes
+      or delimited component paths.
+
+      * Other kinds of message flows, such as server-buffered streams with
+      atomic catchup-and-subscribe semantics ensuring clients receive all
+      the buffer.
+
+AUTHOR
+
+    Paul Evans <leonerd@leonerd.org.uk>
+

@@ -1,5 +1,12 @@
 Revision history for RT-Extension-FormTools
 
+1.12 2024-08-02
+ - Make remaining core ticket fields available to forms (Due Date, Time
+   Estimated)
+ - Add autocompletion to Owner form field
+ - Fixed bug where editing an existing form showed Owner as a custom
+   field, not a core field.
+
 1.11 2024-07-10
  - Exclude HTML::Mason::Commands from PAUSE indexing
  - Update French translations

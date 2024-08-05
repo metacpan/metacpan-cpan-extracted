@@ -41,7 +41,7 @@ class R::NDArray::DoubleComplex extends R::NDArray {
     
     my $elem = $data->[$data_index];
     
-    my $string = &double_complex_to_string($elem);
+    my $string = R::Util->_double_complex_to_string($elem);
     
     return $string;
   }
@@ -77,24 +77,6 @@ class R::NDArray::DoubleComplex extends R::NDArray {
     }
     
     return $ret_ndarray;
-  }
-  
-  private static method double_complex_to_string : string ($z : Complex_2d) {
-    
-    my $re = $z->{re};
-    
-    my $im = $z->{im};
-    
-    my $string = (string)undef;
-    
-    if ($im < 0) {
-      $string = "$re${im}i";
-    }
-    else {
-      $string = "$re+${im}i";
-    }
-    
-    return $string;
   }
   
 }

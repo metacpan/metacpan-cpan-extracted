@@ -1,5 +1,19 @@
 Revision history for OpenTelemetry-SDK
 
+0.024     2024-08-02 15:28:11+01:00 Europe/London
+
+    * Use bigfloat instead of bignum in TraceIDRatioBased sampler
+      to avoid complications in other code relaying on Math::BigInt
+      and friends. This adds a dependency on Math::BigInt 0.65.
+      See GH #16.
+
+0.023001  2024-07-18 10:38:35+01:00 Europe/London (TRIAL RELEASE)
+
+    * Add a `process` method to the Simple and Batch span processors
+      to prepare for an upcoming change to the API to support
+      OpenTelemetry logs. Their `on_end` methods now are thin wrappers
+      to these new methods.
+
 0.022     2024-04-19 11:46:54+01:00 Europe/London
 
     * Do not call start on the background function in the batch span

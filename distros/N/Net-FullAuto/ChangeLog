@@ -20,6 +20,12 @@
 #######################################################################
 
 
+2024-08-04  Brian M. Kelly <Brian.Kelly@fullauto.com>
+
+        * Version 1.0000681 released
+
+        * Fixed timeout in sub cmd()
+
 2024-07-29  Brian M. Kelly <Brian.Kelly@fullauto.com>
 
         * Version 1.0000680 released

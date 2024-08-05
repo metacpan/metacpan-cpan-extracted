@@ -1,0 +1,121 @@
+#!/usr/bin/env perl
+# PODNAME: langertha_chat_ollama
+# ABSTRACT: Simple chat with Ollama
+
+use strict;
+use warnings;
+use Langertha::Engine::Ollama;
+use Carp qw( croak );
+use Time::HiRes qw( time );
+
+binmode(STDOUT, ":utf8");
+binmode(STDERR, ":utf8");
+
+my $start = time;
+my $ollama = Langertha::Engine::Ollama->new(
+  $ENV{OLLAMA_MODEL} ? ( model => $ENV{OLLAMA_MODEL} ) : (),
+  $ENV{OLLAMA_URL} ? ( url => $ENV{OLLAMA_URL} ) : (),
+);
+print $ollama->simple_chat(join(" ",@ARGV));
+my $end = time;
+printf("\n -- %.3f seconds (%s)\n", ($end - $start), $ollama->model) unless $ENV{LANGERTHA_NO_TIME};
+
+__END__
+
+=pod
+
+=head1 NAME
+
+langertha_chat_ollama - Simple chat with Ollama
+
+=head1 VERSION
+
+version 0.001
+
+=head1 SYNOPSIS
+
+  bash$ langertha_chat_ollama write a bash command that lists files older than
+  5 days
+
+  Here is the Bash command to list files older than 5 days:
+
+  ```bash
+  find . -type f -mtime +5
+  ```
+
+  Explanation:
+
+  - `find`: This is the primary command for searching through directories and
+    their contents.
+  - `.`: Specifies that we want to search from the current directory.
+  - `-type f`: Tells find to only consider files (not directories).
+  - `-mtime +5`: Specifies that we're interested in files with a last modified
+    date more than 5 days ago. The `+` is used for "greater than", and `5`
+    specifies how many days.
+
+  Example Use Case:
+
+  To list all the PDFs older than 5 days from your current directory, you can
+  use this command:
+
+  ```bash
+  find . -type f -name "*.pdf" -mtime +5
+  ```
+
+  This will list all files with a `.pdf` extension that are more than 5 days
+  old.
+   -- 5.804 seconds (llama3.1)
+
+=head1 DESCRIPTION
+
+Alternative URL can be given via OLLAMA_URL environment.
+
+=encoding utf8
+
+=head1 SUPPORT
+
+Repository
+
+  https://github.com/Getty/langertha
+  Pull request and additional contributors are welcome
+
+Issue Tracker
+
+  https://github.com/Getty/langertha/issues
+
+Discord
+
+  https://discord.gg/Y2avVYpquV
+
+IRC
+
+  irc://irc.perl.org/ai
+
+=cut
+
+=for :stopwords cpan testmatrix url bugtracker rt cpants kwalitee diff irc mailto metadata placeholders metacpan
+
+=head1 SUPPORT
+
+=head2 Source Code
+
+The code is open to the world, and available for you to hack on. Please feel free to browse it and play
+with it, or whatever. If you want to contribute patches, please send me a diff or prod me to pull
+from your repository :)
+
+L<https://github.com/Getty/langertha>
+
+  git clone https://github.com/Getty/langertha.git
+
+=head1 AUTHOR
+
+Torsten Raudssus <torsten@raudssus.de> L<https://raudss.us/>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2024 by Torsten Raudssus.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

@@ -7,7 +7,7 @@ class TestCase::R {
   use R::NDArray::Double;
   use R::NDArray::FloatComplex;
   use R::NDArray::DoubleComplex;
-  use R::NDArray::Object;
+  use R::NDArray::AnyObject;
   
   use R::NDArray::Byte;
   use R::NDArray::Short;
@@ -33,7 +33,7 @@ class TestCase::R {
   use R::OP::Matrix;
   use R::OP::DataFrame;
   use R::OP::Matrix::Double as MDOP;
-  use R::OP::Object;
+  use R::OP::AnyObject;
   
   static method extra_old : int () {
     
@@ -826,14 +826,14 @@ class TestCase::R {
         }
       }
       
-      # R::OP::Object#c method
+      # R::OP::AnyObject#c method
       {
         {
           my $data = [(object)"1", "2", "3", "4", "5", "6"];
           my $dim = [2, 3];
-          my $ret_ndarray = R::OP::Object->c($data, $dim);
+          my $ret_ndarray = R::OP::AnyObject->c($data, $dim);
           
-          unless ($ret_ndarray is_type R::NDArray::Object) {
+          unless ($ret_ndarray is_type R::NDArray::AnyObject) {
             return 0;
           }
           
@@ -849,9 +849,9 @@ class TestCase::R {
         {
           my $data = [(object)"1", "2", "3", "4", "5", "6"];
           my $data_length = @$data;
-          my $ret_ndarray = R::OP::Object->c($data);
+          my $ret_ndarray = R::OP::AnyObject->c($data);
           
-          unless ($ret_ndarray is_type R::NDArray::Object) {
+          unless ($ret_ndarray is_type R::NDArray::AnyObject) {
             return 0;
           }
           

@@ -1,3 +1,9 @@
+0.002 2024-08-03
+  [Requirement Changes]
+    * Require -std=C++17 in gcc/clang compiler.
+  [Test Improvement]
+    * Add complex matrix tests.
+  
 0.001 2024-07-17
   [Changes]
     * First release.

@@ -19,6 +19,7 @@ use Sys::Hostname;
 use Proc::PID::File;
 use Pod::Usage;
 use Getopt::Long;
+use Web::ACL;
 
 =head1 NAME
 
@@ -26,12 +27,12 @@ suricata_extract_submit - Submits files extracted by Suricata to mojo_cape_submi
 
 =head1 VERSION
 
-0.1.0
+0.2.0
 
 =cut
 
 sub version {
-	print "suricata_extract_submit v. 0.1.0\n";
+	print "suricata_extract_submit v. 0.2.0\n";
 }
 
 =head1 SYNOPSIS
@@ -79,22 +80,70 @@ The config file used is '/usr/local/etc/suricata_extract_submit.ini'.
 
     # the API key to use if needed
     #apikey=
+
     # URL to find mojo_cape_submit at
     url=http://192.168.14.15:8080/
+
     # the group/client/whathaveya slug
     slug=foo
+
     # where Suricata has the file store at
     filestore=/var/log/suricata/files
+
     # a file of IPs or subnets to ignore SRC or DEST IPs of
     #ignore=
-    # a file of regex to use for checking host names go ignore
+
+    # a file of regex to use for checking host names to ignore
     #ignoreHosts=
+
+    # a file of regex to use for checking host names to ignore
+    #ignoreHosts=
+
+    # a file of regex to use for checking user agents to ignore
+    #ignoreUAs=
+
+    # a file of regex to use for checking path chunks of the URL to ignore
+    #ignorePaths=
+
+    # a JSON file to use for using with Web::ACL for checking for ignores
+    #ignoreWebACL=/usr/local/etc/suricata_extract_submit_webacl.json
+
     # if it should use HTTPS_PROXY and HTTP_PROXY from ENV or not
     env_proxy=0
+
     # stats file holding only the stats for the last run
     stats_file=/var/cache/suricata_extract_submit_stats.json
+
     # stats dir
     stats_dir=/var/cache/suricata_extract_submit_stats/
+
+=head2 example Web::ACL
+
+A example Web::ACL that ignores UAs matching "foo bar" and
+paths matching "/derp.exe".
+
+    {
+      "foo": {
+        "ua_auth": 1,
+        "path_auth": 1,
+        "ua_regex_allow": [
+          "^foo bar$"
+        ],
+        "paths_regex_allow": [
+          "^\\/derp.exe$"
+        ],
+        "final": 1
+      }
+    }
+
+Each key will be tests twice. First with the IP set to the src
+IP and then set to the client IP. The var mapping is as below.
+
+    .http.http_user_agent -> ua
+    .fileinfo.filename -> path
+
+    .dest_ip -> ip
+    .src_ip -> ip
 
 =cut
 
@@ -219,6 +268,9 @@ my $stats_default = {
 	ignored_ip_dest_delta => 0,
 	ignored_host          => 0,
 	ignored_host_delta    => 0,
+	ignored_ua            => 0,
+	ignored_webacl        => 0,
+	ignored_path          => 0,
 	truncated             => 0,
 	truncated_delta       => 0,
 	sub_size              => 0,
@@ -228,9 +280,9 @@ my $stats;
 
 # compute the deltas for these items
 my @to_delta = (
-	'sub',       'sub_fail', 'zero_sized',   'sub_2xx',    'sub_3xx',        'sub_4xx',
-	'sub_5xx',   'errors',   'ignored_host', 'ignored_ip', 'ignored_ip_src', 'ignored_ip_dest',
-	'truncated', 'sub_size',
+	'sub',       'sub_fail', 'zero_sized',   'sub_2xx',      'sub_3xx',        'sub_4xx',
+	'sub_5xx',   'errors',   'ignored_host', 'ignored_ip',   'ignored_ip_src', 'ignored_ip_dest',
+	'truncated', 'sub_size', 'ignored_ua',   'ignored_path', 'ignored_webacl',
 );
 
 # handle the stats file if it exists and is readable
@@ -270,7 +322,12 @@ my $ignore_file = $config->{_}->{ignore};
 my @to_ignore;
 if ( defined($ignore_file) && -f $ignore_file ) {
 	log_something( 'info', 'reading in ignore file... ' . $ignore_file );
-	my $ignore_raw = read_file($ignore_file);
+	my $ignore_raw;
+	eval { $ignore_raw = read_file($ignore_file); };
+	if ($@) {
+		log_something( 'info', 'reading in ignore failed... ' . $@ );
+		die($@);
+	}
 
 	my @to_ignore_raw = split( /\n/, $ignore_raw );
 	@to_ignore_raw = grep( !/^\w*\#/, @to_ignore_raw );
@@ -298,12 +355,17 @@ if ( defined($ignore_file) && -f $ignore_file ) {
 } ## end if ( defined($ignore_file) && -f $ignore_file)
 my $ip_ignore = subnet_matcher @to_ignore;
 
-# read in the file of IPs to ignore
+# read in the file of hosts to ignore
 my $ignoreHosts_file = $config->{_}->{ignoreHosts};
 my @hosts_to_ignore;
 if ( defined($ignoreHosts_file) && -f $ignoreHosts_file ) {
 	log_something( 'info', 'reading in ignoreHosts file... ' . $ignoreHosts_file );
-	my $ignoreHosts_raw = read_file($ignoreHosts_file);
+	my $ignoreHosts_raw;
+	eval { $ignoreHosts_raw = read_file($ignoreHosts_file); };
+	if ($@) {
+		log_something( 'info', 'reading in ignoreHosts failed... ' . $@ );
+		die($@);
+	}
 
 	@hosts_to_ignore = split( /\n/, $ignoreHosts_raw );
 	@hosts_to_ignore = grep( !/^\w*\#/, @hosts_to_ignore );
@@ -312,6 +374,68 @@ if ( defined($ignoreHosts_file) && -f $ignoreHosts_file ) {
 	my $found_regex = $#hosts_to_ignore;
 	log_something( 'info', $found_regex . ' regexs loaded to ignore for hosts' );
 } ## end if ( defined($ignoreHosts_file) && -f $ignoreHosts_file)
+
+# read in the file of UAs to ignore
+my $ignoreUAs_file = $config->{_}->{ignoreUA};
+my @UAs_to_ignore;
+if ( defined($ignoreUAs_file) && -f $ignoreUAs_file ) {
+	log_something( 'info', 'reading in ignoreUAs file... ' . $ignoreUAs_file );
+	my $ignoreUAs_raw;
+	eval { $ignoreUAs_raw = read_file($ignoreUAs_file); };
+	if ($@) {
+		log_something( 'err', 'reading in ignoreUAs failed... ' . $@ );
+		die($@);
+	}
+
+	@UAs_to_ignore = split( /\n/, $ignoreUAs_raw );
+	@UAs_to_ignore = grep( !/^\w*\#/, @UAs_to_ignore );
+	@UAs_to_ignore = grep( !/^\w*$/,  @UAs_to_ignore );
+
+	my $found_regex = $#UAs_to_ignore;
+	log_something( 'info', $found_regex . ' regexs loaded to ignore for UAs' );
+} ## end if ( defined($ignoreUAs_file) && -f $ignoreUAs_file)
+
+# read in the file of UAs to ignore
+my $ignorePaths_file = $config->{_}->{ignorePaths};
+my @paths_to_ignore;
+if ( defined($ignorePaths_file) && -f $ignorePaths_file ) {
+	log_something( 'info', 'reading in ignorePaths file... ' . $ignorePaths_file );
+	my $ignorePaths_raw;
+	eval { $ignorePaths_raw = read_file($ignorePaths_file); };
+	if ($@) {
+		log_something( 'err', 'reading in ignorePaths failed... ' . $@ );
+		die($@);
+	}
+
+	@paths_to_ignore = split( /\n/, $ignorePaths_raw );
+	@paths_to_ignore = grep( !/^\w*\#/, @paths_to_ignore );
+	@paths_to_ignore = grep( !/^\w*$/,  @paths_to_ignore );
+
+	my $found_regex = $#paths_to_ignore;
+	log_something( 'info', $found_regex . ' regexs loaded to ignore for paths' );
+} ## end if ( defined($ignorePaths_file) && -f $ignorePaths_file)
+
+# read in the file of UAs to ignore
+my $ignoreWebACL_file = $config->{_}->{ignoreWebACL};
+my $webacl;
+my @acls;
+if ( defined($ignoreWebACL_file) && -f $ignoreWebACL_file ) {
+	log_something( 'info', 'reading in ignoreWebACL file... ' . $ignoreWebACL_file );
+	my $parsed_acl;
+	eval {
+		my $raw_json = read_file($ignoreWebACL_file);
+		$parsed_acl = decode_json($raw_json);
+		@acls       = keys( %{$parsed_acl} );
+		$webacl     = Web::ACL->new( acl => $parsed_acl );
+	};
+	if ($@) {
+		log_something( 'err', 'reading in ignoreWebACL failed... ' . $@ );
+		die($@);
+	}
+
+	my $found_regex = $#acls;
+	log_something( 'info', $found_regex . ' ACLs loaded to ignore for WebACL' );
+} ## end if ( defined($ignoreWebACL_file) && -f $ignoreWebACL_file)
 
 # create a tmpdir and chdir to it
 my $tempdir = tempdir( CLEANUP => 1 );
@@ -429,7 +553,7 @@ foreach my $file (@files) {
 			$new_stats->{ignored_ip_src}++;
 			$add_it = 0;
 		} ## end if ( $ip_ignore->( $file_json->{src_ip} ) )
-		if ( $ip_ignore->( $file_json->{dest_ip} ) ) {
+		if ( $add_it && $ip_ignore->( $file_json->{dest_ip} ) ) {
 			my $file_hostname = '';
 			if ( defined( $file_json->{http} ) && defined( $file_json->{http}{hostname} ) ) {
 				$file_hostname = $file_json->{http}{hostname};
@@ -444,23 +568,116 @@ foreach my $file (@files) {
 			$new_stats->{ignored_ip}++;
 			$new_stats->{ignored_ip_dest}++;
 			$add_it = 0;
-		} ## end if ( $ip_ignore->( $file_json->{dest_ip} ))
-		foreach my $item (@hosts_to_ignore) {
-			if ( defined( $file_json->{http} ) && defined( $file_json->{http}{hostname} ) ) {
-				if ( $file_json->{http}{hostname} =~ /$item/ ) {
-					log_something( 'info',
-							  'Ignore Listed Host, "'
-							. $item . '": '
-							. $file_json->{http}{hostname}
-							. ' ... src_ip='
-							. $file_json->{dest_ip}
-							. ', dest_ip='
-							. $file_json->{dest_ip} );
-					$add_it = 0;
-					$new_stats->{ignored_host}++;
-				} ## end if ( $file_json->{http}{hostname} =~ /$item/)
-			} ## end if ( defined( $file_json->{http} ) && defined...)
-		} ## end foreach my $item (@hosts_to_ignore)
+		} ## end if ( $add_it && $ip_ignore->( $file_json->...))
+		if ($add_it) {
+			foreach my $item (@hosts_to_ignore) {
+				if ( defined( $file_json->{http} ) && defined( $file_json->{http}{hostname} ) ) {
+					if ( $file_json->{http}{hostname} =~ /$item/ ) {
+						log_something( 'info',
+								  'Ignore Listed Host, "'
+								. $item . '": '
+								. $file_json->{http}{hostname}
+								. ' ... src_ip='
+								. $file_json->{dest_ip}
+								. ', dest_ip='
+								. $file_json->{dest_ip} );
+						$add_it = 0;
+						$new_stats->{ignored_host}++;
+					} ## end if ( $file_json->{http}{hostname} =~ /$item/)
+				} ## end if ( defined( $file_json->{http} ) && defined...)
+			} ## end foreach my $item (@hosts_to_ignore)
+		} ## end if ($add_it)
+		if ($add_it) {
+			foreach my $item (@paths_to_ignore) {
+				if ( defined( $file_json->{fileinfo} ) && defined( $file_json->{fileinfo}{filename} ) ) {
+					if ( $file_json->{fileinfo}{filename} =~ /$item/ ) {
+						log_something( 'info',
+							'Ignore Listed Path, "' . $item . '": ' . $file_json->{fileinfo}{filename} );
+						$add_it = 0;
+						$new_stats->{ignored_path}++;
+					}
+				}
+			} ## end foreach my $item (@paths_to_ignore)
+		} ## end if ($add_it)
+		if ($add_it) {
+			foreach my $item (@UAs_to_ignore) {
+				if ( defined( $file_json->{http} ) && defined( $file_json->{http}{http_user_agent} ) ) {
+					if ( $file_json->{http}{http_user_agent} =~ /$item/ ) {
+						log_something( 'info',
+							'Ignore Listed UA, "' . $item . '": ' . $file_json->{http}{http_user_agent} );
+						$add_it = 0;
+						$new_stats->{ignored_ua}++;
+					}
+				}
+			} ## end foreach my $item (@UAs_to_ignore)
+		} ## end if ($add_it)
+		if ($add_it) {
+			foreach my $acl (@acls) {
+				if ( $add_it && defined( $file_json->{http} ) ) {
+					my $results = $webacl->check(
+						apikey => $acl,
+						ua     => $file_json->{http}{http_user_agent},
+						path   => $file_json->{fileinfo}{filename},
+						ip     => $file_json->{src_ip},
+					);
+					if ($results) {
+						$add_it = 0;
+						$new_stats->{ignored_webacl}++;
+						my $ua = '';
+						if ( defined( $file_json->{http}{http_user_agent} ) ) {
+							$ua = $file_json->{http}{http_user_agent};
+							$ua =~ s/\"/\\\"/g;
+						}
+						my $path = '';
+						if ( defined( $file_json->{http}{http_user_agent} ) ) {
+							$path = $file_json->{fileinfo}{filename};
+							$path =~ s/\"/\\\"/g;
+						}
+						log_something( 'info',
+								  'Ignore Listed WebACL, "'
+								. $acl
+								. '": src_ip="'
+								. $file_json->{src_ip}
+								. '", ua="'
+								. $ua
+								. '", path="'
+								. $path
+								. '"' );
+					} else {
+						$results = $webacl->check(
+							apikey => $acl,
+							ua     => $file_json->{http}{http_user_agent},
+							path   => $file_json->{fileinfo}{filename},
+							ip     => $file_json->{dest_ip},
+						);
+						if ($results) {
+							$add_it = 0;
+							$new_stats->{ignored_webacl}++;
+							my $ua = '';
+							if ( defined( $file_json->{http}{http_user_agent} ) ) {
+								$ua = $file_json->{http}{http_user_agent};
+								$ua =~ s/\"/\\\"/g;
+							}
+							my $path = '';
+							if ( defined( $file_json->{http}{http_user_agent} ) ) {
+								$path = $file_json->{fileinfo}{filename};
+								$path =~ s/\"/\\\"/g;
+							}
+							log_something( 'info',
+									  'Ignore Listed WebACL, "'
+									. $acl
+									. '": dest_ip="'
+									. $file_json->{dest_ip}
+									. '", ua="'
+									. $ua
+									. '", path="'
+									. $path
+									. '"' );
+						} ## end if ($results)
+					} ## end else [ if ($results) ]
+				} ## end if ( $add_it && defined( $file_json->{http...}))
+			} ## end foreach my $acl (@acls)
+		} ## end if ($add_it)
 
 		$name
 			= $file_json->{src_ip} . '-'

@@ -979,7 +979,7 @@ $do=1;
 if ($do==1) { # INSTALL LATEST VERSION OF PYTHON
    ($stdout,$stderr)=$handle->cwd('/opt/source');
    ($stdout,$stderr)=$handle->cmd($sudo.
-      'wget -qO- https://www.python.org/downloads/source');
+      'wget -qO- https://www.python.org/downloads/source/');
    $stdout=~s/^.*Latest Python 3 Release - Python (.*?)[<].*$/$1/s;
    my $version=$stdout;
    ($stdout,$stderr)=$handle->cmd(

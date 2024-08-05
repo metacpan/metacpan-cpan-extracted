@@ -42,9 +42,11 @@
    "release_status" : "stable",
    "resources" : {
       "repository" : {
-         "type" : "git"
+         "type" : "git",
+         "url" : "https://github.com/yuki-kimoto/SPVM-Resource-Eigen.git",
+         "web" : "https://github.com/yuki-kimoto/SPVM-Resource-Eigen"
       }
    },
-   "version" : "0.001",
+   "version" : "0.002",
    "x_serialization_backend" : "JSON::PP version 4.07"
 }

@@ -1,6 +1,6 @@
 package SPVM::R;
 
-our $VERSION = "0.016";
+our $VERSION = "0.019";
 
 1;
 
@@ -12,11 +12,11 @@ SPVM::R - Porting R language Features
 
 R class in L<SPVM> is a port of the L<R language|https://www.r-project.org/> features.
 
-B<WARNINGS:Tests are not yet done. All of method and field definitions in all classes will be changed.>
+B<WARNINGS:This distribution is under beta release. Some methods and fields will be changed.>.
 
 =head1 Usage
 
-=head2 Math Examples
+=head2 Math and Matrix Examples
 
   use R::OP::Double as DOP;
   use R::OP::Matrix::Double as DMOP;
@@ -53,6 +53,61 @@ B<WARNINGS:Tests are not yet done. All of method and field definitions in all cl
   my $mat1 = DMOP->matrix([1, 0, 0, 1], 2, 2);
   
   my $mat_ret = DMOP->mul($mat1, $vec1);
+
+See also L<examples of matrix|https://github.com/yuki-kimoto/SPVM-R/wiki/SPVM%3A%3AR-Matrix-Examples>.
+
+=head2 Data Frame Examples
+
+Create a data frame.
+
+  use R::DataFrame;
+  
+  my $data_frame = R::DataFrame->new;
+
+Add colunns:
+
+  use R::OP::String as STROP;
+  use R::OP::Int as IOP;
+  use R::OP::Double as DOP;
+  use R::OP::Time::Pirce as TPOP;
+  
+  $data_frame->set_col("Name" => STROP->c(["Mike, "Ken", "Yumi"]));
+  $data_frame->set_col("Age" => IOP->c([12, 20, 15]));
+  $data_frame->set_col("Height" => DOP->c([(double)160.7, 173.2, 153.3]));
+  $data_frame->set_col("Birth" => TPOP->c(["2010-10-15", "2000-07-08", "2020-02-08"]));
+
+Get columns and rows:
+
+  $data_frame->slice(["Name", "Age"], [IOP->c([0, 1, 2])]); 
+  
+Get rows using conditions:
+  
+  # Age > 12
+  my $conditions = IOP->gt($data_frame->col("Age"), IOP->rep(IOP->c(12), $data_frame->nrow);
+  $data_frame->slice(["Name", "Age"], [$conditions->to_indexes]);
+  
+  # Age > 12 && Height < 150.3
+  my $conditions = IOP->and(
+    IOP->gt($data_frame->col("Age"), IOP->rep(IOP->c(12), $data_frame->nrow)),
+    IOP->lt($data_frame->col("Height"), IOP->rep(IOP->c(150.3), $data_frame->nrow)),
+  );
+  $data_frame->slice(["Name", "Age"], [$conditions->to_indexes]);
+
+Sort rows:
+  
+  # Age asc
+  $data_frame->sort(["Age"]);
+
+  # Age desc
+  $data_frame->sort(["Age desc"]);
+
+  # Age asc, Height asc
+  $data_frame->sort(["Age", "Height"]);
+
+  # Age asc, Height desc
+  $data_frame->sort(["Age", "Height desc"]);
+
+See also L<examples of data frames|https://github.com/yuki-kimoto/SPVM-R/wiki/SPVM%3A%3AR-Data-Frame-Examples>.
 
 =head1 Tutorial
 

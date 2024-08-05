@@ -1,3 +1,4 @@
 runtime:
   requires:
-    ExtUtils::Builder::AutoDetect::C: 0.015
+    ExtUtils::Builder::AutoDetect::C: 0.016
+    ExtUtils::Builder::Conf: 0.016

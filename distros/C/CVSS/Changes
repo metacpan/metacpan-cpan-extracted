@@ -1,4 +1,10 @@
 Change history for CVSS
 
+1.11 2024-08-03
+    - Added pure-Perl implementation of C99 "round()" function (giterlizzi/perl-CVSS#1)
+
+1.10 2024-08-01
+    - Improved cvss(1) command and added new "score" methods in CVSS::Base
+
 1.00 2024-07-31
     - First release of CVSS

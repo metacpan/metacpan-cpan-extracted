@@ -6,4 +6,4 @@ use Test::More 'tests' => 2;
 use Test::NoWarnings;
 
 # Test.
-is($Tags::HTML::Footer::VERSION, 0.02, 'Version.');
+is($Tags::HTML::Footer::VERSION, 0.03, 'Version.');

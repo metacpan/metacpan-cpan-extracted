@@ -1,0 +1,5 @@
+MooseX-JSONSchema-*
+.build
+*.html
+*.tar.gz
+.bash_history

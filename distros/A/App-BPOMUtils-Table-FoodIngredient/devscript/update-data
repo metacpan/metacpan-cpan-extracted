@@ -1,2 +1,3 @@
-#!/usr/bin/env perl
-print "Use update-fragments-in-perl-module script from the gudangdata repo\n";
+#!/bin/bash
+#print "Use update-fragments-in-perl-module script from the gudangdata repo\n";
+~/proj/gd/bin/update-fragments-in-perl-module lib/App/BPOMUtils/Table/FoodIngredientRBA.pm

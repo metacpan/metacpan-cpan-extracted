@@ -36,6 +36,7 @@
             "Getopt::Long" : "0",
             "JSON" : "0",
             "Net::LastFM" : "0",
+            "Pod::Usage" : "0",
             "perl" : "5.026000"
          }
       }
@@ -51,6 +52,6 @@
          "web" : "https://github.com/davorg-cpan/app-laststats"
       }
    },
-   "version" : "v0.0.3",
+   "version" : "v0.0.6",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

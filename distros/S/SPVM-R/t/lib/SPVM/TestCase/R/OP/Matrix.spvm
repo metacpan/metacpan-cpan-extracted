@@ -1,0 +1,326 @@
+class TestCase::R::OP::Matrix {
+  
+  use R::OP::Double as DOP;
+  use R::OP::DoubleComplex as DCOP;
+  use R::OP::Matrix::Double as MDOP;
+  
+  static method cbind : int () {
+   
+    {
+      my $x_ndarray = MDOP->matrix(DOP->seq(1, 6), 2, 3);
+      my $y_ndarray = MDOP->matrix(DOP->seq(11, 16), 2, 3);
+      
+      my $ret_ndarray = MDOP->cbind($x_ndarray, $y_ndarray);
+      
+      unless ($ret_ndarray is_type R::NDArray::Double) {
+        return 0;
+      }
+      
+      unless (Array->equals_double($ret_ndarray->data, [(double)1, 2, 3, 4, 5, 6, 11, 12, 13, 14, 15, 16])) {
+        return 0;
+      }
+      
+      unless (Array->equals_int($ret_ndarray->dim, [2, 6])) {
+        return 0;
+      }
+    }
+    
+    {
+      my $x_ndarray = MDOP->matrix(DOP->seq(1, 6), 2, 3)->to_string_ndarray;
+      my $y_ndarray = MDOP->matrix(DOP->seq(11, 16), 2, 3)->to_string_ndarray;
+      
+      my $ret_ndarray = (R::NDArray::String)R::OP::Matrix->cbind($x_ndarray, $y_ndarray);
+      
+      unless ($ret_ndarray is_type R::NDArray::String) {
+        return 0;
+      }
+      
+      unless (Array->equals_string($ret_ndarray->data, [(string)1, 2, 3, 4, 5, 6, 11, 12, 13, 14, 15, 16])) {
+        return 0;
+      }
+      
+      unless (Array->equals_int($ret_ndarray->dim, [2, 6])) {
+        return 0;
+      }
+    }
+    
+    {
+      my $x_ndarray = MDOP->matrix(DOP->seq(1, 4), 2, 2);
+      my $y_ndarray = MDOP->matrix(DOP->seq(11, 16), 2, 3);
+      
+      my $ret_ndarray = MDOP->cbind($x_ndarray, $y_ndarray);
+      
+      unless ($ret_ndarray is_type R::NDArray::Double) {
+        return 0;
+      }
+      
+      unless (Array->equals_double($ret_ndarray->data, [(double)1, 2, 3, 4, 11, 12, 13, 14, 15, 16])) {
+        return 0;
+      }
+      
+      unless (Array->equals_int($ret_ndarray->dim, [2, 5])) {
+        return 0;
+      }
+    }
+    
+    {
+      my $x_ndarray = MDOP->matrix(DOP->seq(1, 6), 2, 3)->to_string_ndarray;
+      my $y_ndarray = MDOP->matrix(DOP->seq(11, 16), 2, 3)->to_string_ndarray;
+      
+      my $ret_ndarray = (R::NDArray::String)R::OP::Matrix->cbind($x_ndarray, $y_ndarray);
+      
+      unless ($ret_ndarray is_type R::NDArray::String) {
+        return 0;
+      }
+      
+      unless (Array->equals_string($ret_ndarray->data, [(string)1, 2, 3, 4, 5, 6, 11, 12, 13, 14, 15, 16])) {
+        return 0;
+      }
+      
+      unless (Array->equals_int($ret_ndarray->dim, [2, 6])) {
+        return 0;
+      }
+    }
+    
+    {
+      my $x_ndarray = MDOP->matrix(DOP->seq(1, 4), 2, 2)->to_string_ndarray;
+      my $y_ndarray = MDOP->matrix(DOP->seq(11, 16), 2, 3)->to_string_ndarray;
+      
+      my $ret_ndarray = (R::NDArray::String)R::OP::Matrix->cbind($x_ndarray, $y_ndarray);
+      
+      unless ($ret_ndarray is_type R::NDArray::String) {
+        return 0;
+      }
+      
+      unless (Array->equals_string($ret_ndarray->data, [(string)1, 2, 3, 4, 11, 12, 13, 14, 15, 16])) {
+        return 0;
+      }
+      
+      unless (Array->equals_int($ret_ndarray->dim, [2, 5])) {
+        return 0;
+      }
+    }
+    
+    # Exceptions:
+    {
+      {
+        my $x_ndarray = MDOP->matrix(DOP->seq(1, 6), 2, 3);
+        my $y_ndarray = MDOP->matrix(DOP->seq(11, 16), 2, 3);
+        
+        eval { MDOP->cbind(undef, $y_ndarray); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+      {
+        my $x_ndarray = DOP->c(DOP->seq(1, 6));
+        my $y_ndarray = MDOP->matrix(DOP->seq(11, 16), 2, 3);
+        
+        eval { MDOP->cbind($x_ndarray, $y_ndarray); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+      {
+        my $x_ndarray = MDOP->matrix(DOP->seq(1, 6), 2, 3);
+        my $y_ndarray = MDOP->matrix(DOP->seq(11, 16), 2, 3);
+        
+        eval { MDOP->cbind($x_ndarray, undef); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+      {
+        my $x_ndarray = MDOP->matrix(DOP->seq(1, 6), 2, 3);
+        my $y_ndarray = DOP->c(DOP->seq(11, 16));
+        
+        eval { MDOP->cbind($x_ndarray, $y_ndarray); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+      {
+        my $x_ndarray = MDOP->matrix(DOP->seq(1, 3), 1, 3);
+        my $y_ndarray = MDOP->matrix(DOP->seq(11, 16), 2, 3);
+        
+        eval { MDOP->cbind($x_ndarray, $y_ndarray); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+    }
+    
+    $@ = undef;
+    
+    return 1;
+  }
+  
+  static method rbind : int () {
+   
+    {
+      my $x_ndarray = MDOP->matrix(DOP->seq(1, 6), 2, 3);
+      my $y_ndarray = MDOP->matrix(DOP->seq(11, 16), 2, 3);
+      
+      my $ret_ndarray = MDOP->rbind($x_ndarray, $y_ndarray);
+      
+      unless ($ret_ndarray is_type R::NDArray::Double) {
+        return 0;
+      }
+      
+      unless (Array->equals_double($ret_ndarray->data, [(double)1, 2, 11, 12, 3, 4, 13, 14, 5, 6, 15, 16])) {
+        return 0;
+      }
+      
+      unless (Array->equals_int($ret_ndarray->dim, [4, 3])) {
+        return 0;
+      }
+    }
+    
+    {
+      my $x_ndarray = MDOP->matrix(DOP->seq(1, 6), 2, 3)->to_string_ndarray;
+      my $y_ndarray = MDOP->matrix(DOP->seq(11, 16), 2, 3)->to_string_ndarray;
+      
+      my $ret_ndarray = (R::NDArray::String)R::OP::Matrix->rbind($x_ndarray, $y_ndarray);
+      
+      unless ($ret_ndarray is_type R::NDArray::String) {
+        return 0;
+      }
+      
+      unless (Array->equals_string($ret_ndarray->data, [(string)1, 2, 11, 12, 3, 4, 13, 14, 5, 6, 15, 16])) {
+        return 0;
+      }
+      
+      unless (Array->equals_int($ret_ndarray->dim, [4, 3])) {
+        return 0;
+      }
+    }
+    
+    {
+      my $x_ndarray = MDOP->matrix(DOP->seq(1, 3), 1, 3);
+      my $y_ndarray = MDOP->matrix(DOP->seq(11, 16), 2, 3);
+      
+      my $ret_ndarray = MDOP->rbind($x_ndarray, $y_ndarray);
+      
+      unless ($ret_ndarray is_type R::NDArray::Double) {
+        return 0;
+      }
+      
+      unless (Array->equals_double($ret_ndarray->data, [(double)1, 11, 12, 2, 13, 14, 3, 15, 16])) {
+        return 0;
+      }
+      
+      unless (Array->equals_int($ret_ndarray->dim, [3, 3])) {
+        return 0;
+      }
+    }
+    
+    {
+      my $x_ndarray = MDOP->matrix(DOP->seq(1, 6), 2, 3)->to_string_ndarray;
+      my $y_ndarray = MDOP->matrix(DOP->seq(11, 16), 2, 3)->to_string_ndarray;
+      
+      my $ret_ndarray = (R::NDArray::String)R::OP::Matrix->rbind($x_ndarray, $y_ndarray);
+      
+      unless ($ret_ndarray is_type R::NDArray::String) {
+        return 0;
+      }
+      
+      unless (Array->equals_string($ret_ndarray->data, [(string)1, 2, 11, 12, 3, 4, 13, 14, 5, 6, 15, 16])) {
+        return 0;
+      }
+      
+      unless (Array->equals_int($ret_ndarray->dim, [4, 3])) {
+        return 0;
+      }
+    }
+    
+    {
+      my $x_ndarray = MDOP->matrix(DOP->seq(1, 3), 1, 3)->to_string_ndarray;
+      my $y_ndarray = MDOP->matrix(DOP->seq(11, 16), 2, 3)->to_string_ndarray;
+      
+      my $ret_ndarray = (R::NDArray::String)R::OP::Matrix->rbind($x_ndarray, $y_ndarray);
+      
+      unless ($ret_ndarray is_type R::NDArray::String) {
+        return 0;
+      }
+      
+      unless (Array->equals_string($ret_ndarray->data, [(string)1, 11, 12, 2, 13, 14, 3, 15, 16])) {
+        return 0;
+      }
+      
+      unless (Array->equals_int($ret_ndarray->dim, [3, 3])) {
+        return 0;
+      }
+    }
+    
+    # Exceptions:
+    {
+      {
+        my $x_ndarray = MDOP->matrix(DOP->seq(1, 6), 2, 3);
+        my $y_ndarray = MDOP->matrix(DOP->seq(11, 16), 2, 3);
+        
+        eval { MDOP->rbind(undef, $y_ndarray); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+      {
+        my $x_ndarray = DOP->c(DOP->seq(1, 6));
+        my $y_ndarray = MDOP->matrix(DOP->seq(11, 16), 2, 3);
+        
+        eval { MDOP->rbind($x_ndarray, $y_ndarray); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      {
+        my $x_ndarray = MDOP->matrix(DOP->seq(1, 6), 2, 3);
+        my $y_ndarray = MDOP->matrix(DOP->seq(11, 16), 2, 3);
+        
+        eval { MDOP->rbind($x_ndarray, undef); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+      {
+        my $x_ndarray = MDOP->matrix(DOP->seq(1, 6), 2, 3);
+        my $y_ndarray = DOP->c(DOP->seq(11, 16));
+        
+        eval { MDOP->rbind($x_ndarray, $y_ndarray); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      {
+        my $x_ndarray = MDOP->matrix(DOP->seq(1, 4), 2, 2);
+        my $y_ndarray = MDOP->matrix(DOP->seq(11, 16), 2, 3);
+        
+        eval { MDOP->rbind($x_ndarray, $y_ndarray); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+    }
+    
+    $@ = undef;
+    
+    return 1;
+  }
+  
+}

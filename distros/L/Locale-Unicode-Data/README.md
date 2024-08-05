@@ -1,0 +1,8527 @@
+# NAME
+
+Locale::Unicode::Data - Unicode CLDR SQL Data
+
+# SYNOPSIS
+
+    use Locale::Unicode::Data;
+    my $cldr = Locale::Unicode::Data->new;
+    # Do not decode SQL arrays into perl arrays. Defaults to true
+    # This uses JSON::XS
+    my $cldr = Locale::Unicode::Data->new( decode_sql_arrays => 0 );
+    my $datetime = $cldr->cldr_built;
+    my $str = $cldr->cldr_maintainer;
+    my $version = $cldr->cldr_version;
+    my $dbh = $cldr->database_handler;
+    my $sqlite_db_file = $cldr->datafile;
+    my $bool = $cldr->decode_sql_arrays;
+    # Deactivate automatic SQL arrays decoding
+    $cldr->decode_sql_arrays(0);
+    my $tree = $cldr->make_inheritance_tree( 'ja-JP' );
+    # ['ja-JP', 'ja', 'und']
+    my $tree = $cldr->make_inheritance_tree( 'es-Latn-001-valencia' );
+    # ['es-Latn-001-valencia', 'es-Latn-001', 'es-Latn', 'es', 'und']
+    # But...
+    my $tree = $cldr->make_inheritance_tree( 'pt-FR' );
+    # Because exceptionally, the parent of 'pt-FR' is not 'pt', but 'pt-PT'
+    # ['pt-FR', 'pt-PT', 'pt', 'und']
+    my $ref = $cldr->split_interval(
+        pattern => "E, MMM d, y – E, MMM d, y G",
+        greatest_diff => 'y',
+    );
+    # ["E, MMM d, y", " – ", "E, MMM d, y G", "E, MMM d, y"]
+
+    my $ref = $cldr->alias(
+        alias => 'fro',
+        type  => 'subdivision',
+    ); # For 'Hauts-de-France'
+    my $all = $cldr->aliases;
+    # 'type' can be one of territory, language, zone, subdivision, variant, script
+    my $all = $cldr->aliases( type => 'territory' );
+    my $ref = $cldr->annotation( annotation => '{', locale => 'en' );
+    my $all = $cldr->annotations;
+    # Get all annotations for locale 'en'
+    my $all = $cldr->annotations( locale => 'en' );
+    my $ref = $cldr->bcp47_currency( currid => 'jpy' );
+    my $all = $cldr->bcp47_currencies;
+    my $all = $cldr->bcp47_currencies( code => 'JPY' );
+    # Get all obsolete BCP47 currencies
+    my $all = $cldr->bcp47_currencies( is_obsolete => 1 );
+    my $ref = $cldr->bcp47_extension( extension => 'ca' );
+    my $all = $cldr->bcp47_extensions;
+    # Get all deprecated BCP47 extensions
+    my $all = $cldr->bcp47_extensions( deprecated => 1 );
+    my $ref = $cldr->bcp47_timezone( tzid => 'jptyo' );
+    my $all = $cldr->bcp47_timezones;
+    # Get all deprecated BCP47 timezones
+    my $all = $cldr->bcp47_timezones( deprecated => 1 );
+    # Returns information about Japanese Imperial calendar
+    my $ref = $cldr->bcp47_value( value => 'japanese' );
+    my $all = $cldr->bcp47_timezones;
+    # Get all the BCP47 values for the category 'calendar'
+    my $all = $cldr->bcp47_values( category => 'calendar' );
+    my $all = $cldr->bcp47_values( extension => 'ca' );
+    my $ref = $cldr->calendar( calendar => 'gregorian' );
+    my $all = $cldr->calendars;
+    # Known 'system' value: undef, lunar, lunisolar, other, solar
+    my $all = $cldr->calendars( system => 'solar' );
+    my $ref = $cldr->calendar_append_format(
+        locale      => 'en',
+        calendar    => 'gregorian',
+        format_id   => 'Day',
+    );
+    my $all = $cldr->calendar_append_formats;
+    my $all = $cldr->calendar_append_formats(
+        locale      => 'en',
+        calendar    => 'gregorian',
+    );
+    my $ref = $cldr->calendar_available_format(
+        locale      => 'en',
+        calendar    => 'gregorian',
+        format_id   => 'Hms',
+        count       => undef,
+        alt         => undef,
+    );
+    my $all = $cldr->calendar_available_formats;
+    my $all = $cldr->calendar_available_formats( locale => 'en', calendar => 'gregorian' );
+    my $ref = $cldr->calendar_cyclic_l10n(
+        locale          => 'und',
+        calendar        => 'chinese',
+        format_set      => 'dayParts',
+        format_type     => 'format',
+        format_length   => 'abbreviated',
+        format_id       => 1,
+    );
+    my $all = $cldr->calendar_cyclics_l10n;
+    my $all = $cldr->calendar_cyclics_l10n( locale => 'en' );
+    my $all = $cldr->calendar_cyclics_l10n(
+        locale          => 'en',
+        calendar        => 'chinese',
+        format_set      => 'dayParts',
+        # Not really needed since 'format' is the only value being currently used
+        # format_type   => 'format',
+        format_length   => 'abbreviated',
+    );
+    my $all = $cldr->calendar_datetime_formats;
+    my $all = $cldr->calendar_datetime_formats(
+        locale      => 'en',
+        calendar    => 'gregorian',
+    );
+    my $ref = $cldr->calendar_era(
+        calendar => 'japanese',
+        sequence => 236,
+    ); # Current era 'reiwa'
+    my $ref = $cldr->calendar_era(
+        calendar => 'japanese',
+        code => 'reiwa',
+    ); # Current era 'reiwa'
+    my $all = $cldr->calendar_eras;
+    my $all = $cldr->calendar_eras( calendar => 'hebrew' );
+    my $ref = $cldr->calendar_format_l10n(
+        locale => 'en',
+        calendar => 'gregorian',
+        format_type => 'date',
+        format_length => 'full',
+        format_id => 'yMEEEEd',
+    );
+    my $ref = $cldr->calendar_era_l10n(
+        locale => 'ja',
+        calendar => 'gregorian',
+        era_width => 'abbreviated',
+        alt => undef,
+        era_id => 0,
+    );
+    my $array_ref = $cldr->calendar_eras_l10n;
+    # Filter based on the 'locale' field value
+    my $array_ref = $cldr->calendar_eras_l10n( locale => 'en' );
+    # Filter based on the 'calendar' field value
+    my $array_ref = $cldr->calendar_eras_l10n( calendar => 'gregorian' );
+    # or a combination of multiple fields:
+    my $array_ref = $cldr->calendar_eras_l10n(
+        locale => 'en',
+        calendar => 'gregorian',
+        era_width => 'abbreviated',
+        alt => undef
+    );
+    my $ref = $cldr->calendar_format_l10n(
+        locale => 'en',
+        calendar => 'gregorian',
+        # date, time
+        format_type => 'date',
+        # full, long, medium, short
+        format_length => 'full',
+        format_id => 'yMEEEEd',
+    );
+    my $all = $cldr->calendar_formats_l10n;
+    my $all = $cldr->calendar_formats_l10n(
+        locale      => 'en',
+        calendar    => 'gregorian',
+    );
+    my $all = $cldr->calendar_formats_l10n(
+        locale => 'en',
+        calendar => 'gregorian',
+        format_type => 'date',
+        format_length => 'full',
+    );
+    my $ref = $cldr->calendar_interval_format(
+        locale              => 'en',
+        calendar            => 'gregorian',
+        greatest_diff_id    => 'd',
+        format_id           => 'GyMMMEd',
+        alt                 => undef,
+    );
+    my $all = $cldr->calendar_interval_formats;
+    my $all = $cldr->calendar_interval_formats(
+        locale      => 'en',
+        calendar    => 'gregorian',
+    );
+    my $ref = $cldr->calendar_term(
+        locale          => 'und',
+        calendar        => 'gregorian',
+        # format, stand-alone
+        term_context    => 'format',
+        # abbreviated, narrow, wide
+        term_width      => 'abbreviated',
+        term_name       => 'am',
+    );
+    my $array_ref = $cldr->calendar_terms;
+    my $array_ref = $cldr->calendar_terms(
+        locale => 'und',
+        calendar => 'japanese'
+    );
+    my $array_ref = $cldr->calendar_terms(
+        locale          => 'und',
+        calendar        => 'gregorian',
+        term_type       => 'day',
+        term_context    => 'format',
+        term_width      => 'abbreviated',
+    );
+    my $ref = $cldr->casing( locale => 'fr', token => 'currencyName' );
+    my $all = $cldr->casings;
+    my $all = $cldr->casings( locale => 'fr' );
+    my $ref = $cldr->code_mapping( code => 'US' );
+    my $all = $cldr->code_mappings;
+    my $all = $cldr->code_mappings( type => 'territory' );
+    my $all = $cldr->code_mappings( type => 'currency' );
+    my $all = $cldr->code_mappings( alpha3 => 'USA' );
+    my $all = $cldr->code_mappings( numeric => 840 ); # U.S.A.
+    my $all = $cldr->code_mappings( numeric => [">835", "<850"] ); # U.S.A.
+    my $all = $cldr->code_mappings( fips => 'JP' ); # Japan
+    my $all = $cldr->code_mappings( fips => undef, type => 'currency' );
+    my $ref = $cldr->collation( collation => 'ducet' );
+    my $all = $cldr->collations;
+    my $all = $cldr->collations( description => qr/Chinese/ );
+    my $ref = $cldr->collation_l10n( locale => 'en', collation => 'ducet' );
+    my $all = $cldr->collations_l10n( locale => 'en' );
+    my $all = $cldr->collations_l10n( locale => 'ja', locale_name => qr/中国語/ );
+    my $ref = $cldr->currency( currency => 'JPY' ); # Japanese Yen
+    my $all = $cldr->currencies;
+    my $all = $cldr->currencies( is_obsolete => 1 );
+    my $ref = $cldr->currency_info( territory => 'FR', currency => 'EUR' );
+    my $all = $cldr->currencies_info;
+    my $all = $cldr->currencies_info( territory => 'FR' );
+    my $all = $cldr->currencies_info( currency => 'EUR' );
+    my $ref = $cldr->currency_l10n(
+        locale      => 'en',
+        count       => undef,
+        currency    => 'JPY',
+    );
+    my $all = $cldr->currencies_l10n;
+    my $all = $cldr->currencies_l10n( locale => 'en' );
+    my $all = $cldr->currencies_l10n(
+        locale      => 'en',
+        currency    => 'JPY',
+    );
+    my $ref = $cldr->date_field_l10n(
+        locale          => 'en',
+        field_type      => 'day',
+        field_length    => 'narrow',
+        relative        => -1,
+    );
+    my $all = $cldr->date_fields_l10n;
+    my $all = $cldr->date_fields_l10n( locale => 'en' );
+    my $all = $cldr->date_fields_l10n(
+        locale          => 'en',
+        field_type      => 'day',
+        field_length    => 'narrow',
+    );
+    my $ref = $cldr->day_period( locale => 'fr', day_period => 'noon' );
+    my $all = $cldr->day_periods;
+    my $all = $cldr->day_periods( locale => 'ja' );
+    # Known values for day_period: afternoon1, afternoon2, am, evening1, evening2, 
+    # midnight, morning1, morning2, night1, night2, noon, pm
+    my $all = $cldr->day_periods( day_period => 'noon' );
+    my $ids = $cldr->interval_formats(
+        locale => 'en',
+        calendar => 'gregorian',
+    );
+    # Retrieve localised information for certain type of data
+    # Possible types are: annotation, calendar_append_format, calendar_available_format, 
+    # calendar_cyclic, calendar_era, calendar_format, calendar_interval_formats, 
+    # calendar_term, casing, currency, date_field, locale, number_format, number_symbol
+    # script, subdivision, territory, unit, variant
+    my $ref = $cldr->l10n(
+        type => 'annotation',
+        locale => 'en',
+        annotation => '{',
+    );
+    my $ref = $cldr->l10n(
+        # or just 'append'
+        type => 'calendar_append_format',
+        locale => 'en',
+        calendar => 'gregorian',
+        format_id => 'Day',
+    );
+    my $ref = $cldr->l10n(
+        # or just 'available'
+        type => 'calendar_available_format',
+        locale => 'ja',
+        calendar => 'japanese',
+        format_id => 'GyMMMEEEEd',
+    );
+    my $ref = $cldr->l10n(
+        # or just 'cyclic'
+        type => 'calendar_cyclic',
+        locale => 'ja',
+        calendar => 'chinese',
+        format_set => 'dayParts',
+        # 1..12
+        format_id => 1,
+    );
+    # Retrieve the information on current Japanese era (Reiwa)
+    my $ref = $cldr->l10n(
+        # or just 'era'
+        type => 'calendar_era',
+        locale => 'ja',
+        calendar => 'japanese',
+        # abbreviated, narrow
+        # 'narrow' contains less data than 'abbreviated'
+        era_width => 'abbreviated',
+        era_id => 236,
+    );
+    my $ref = $cldr->l10n(
+        type => 'calendar_format',
+        locale => 'ja',
+        calendar => 'gregorian',
+        format_id => 'yMEEEEd',
+    );
+    my $ref = $cldr->l10n(
+        # or just 'interval'
+        type => 'calendar_interval_format',
+        locale => 'ja',
+        calendar => 'gregorian',
+        format_id => 'yMMM',
+    );
+    my $ref = $cldr->l10n(
+        type => 'calendar_term',
+        locale => 'ja',
+        calendar => 'gregorian',
+        term_name => 'mon',
+    );
+    my $ref = $cldr->l10n(
+        type => 'casing',
+        locale => 'fr',
+        token => 'currencyName',
+    );
+    my $ref = $cldr->l10n(
+        type => 'currency',
+        locale => 'ja',
+        currency => 'EUR',
+    );
+    my $ref = $cldr->l10n(
+        # or just 'field'
+        type => 'date_field',
+        locale => 'ja',
+        # Other possible values:
+        # day, week, month, quarter, year, hour, minute, second,
+        # mon, tue, wed, thu, fri, sat, sun
+        field_type  => 'day',
+        # -1 for yesterday, 0 for today, 1 for tomorrow
+        relative => -1,
+    );
+    my $ref = $cldr->l10n(
+        type => 'locale',
+        locale => 'ja',
+        locale_id => 'fr',
+    );
+    my $ref = $cldr->l10n(
+        type => 'number_format',
+        locale => 'ja',
+        number_type => 'currency',
+        format_id => '10000',
+    );
+    my $ref = $cldr->l10n(
+        # or just 'symbol'
+        type => 'number_symbol',
+        locale => 'en',
+        number_system => 'latn',
+        property => 'decimal',
+    );
+    my $ref = $cldr->l10n(
+        type => 'script',
+        locale => 'ja',
+        script => 'Kore',
+    );
+    my $ref = $cldr->l10n(
+        type => 'subdivision',
+        locale => 'en',
+        subdivision => 'jp13', # Tokyo
+    );
+    my $ref = $cldr->l10n(
+        type => 'territory',
+        locale => 'en',
+        territory => 'JP', # Japan
+    );
+    my $ref = $cldr->l10n(
+        type => 'unit',
+        locale => 'en',
+        unit_id => 'power3',
+    );
+    my $ref = $cldr->l10n(
+        type => 'variant',
+        locale => 'en',
+        variant => 'valencia',
+    );
+    my $ref = $cldr->language( language => 'ryu' ); # Central Okinawan (Ryukyu)
+    my $all = $cldr->languages;
+    my $all = $cldr->languages( parent => 'gmw' );
+    my $all = $cldr->language_population( territory => 'JP' );
+    my $all = $cldr->language_populations;
+    my $all = $cldr->language_populations( official_status => 'official' );
+    my $ref = $cldr->likely_subtag( locale => 'ja' );
+    my $all = $cldr->likely_subtags;
+    my $ref = $cldr->locale( locale => 'ja' );
+    my $all = $cldr->locales;
+    my $ref = $cldr->locale_l10n(
+        locale      => 'en',
+        locale_id   => 'ja',
+        alt         => undef,
+    );
+    my $all = $cldr->locales_l10n;
+    # Returns an array reference of all locale information in English
+    my $all = $cldr->locales_l10n( locale => 'en' );
+    # Returns an array reference of all the way to write 'Japanese' in various languages
+    # This would typically return an array reference of something like 267 hash reference
+    my $all = $cldr->locales_l10n( locale_id => 'ja' );
+    # This is basically the same as with the method locale_l10n()
+    my $all = $cldr->locales_l10n(
+        locale      => 'en',
+        locale_id   => 'ja',
+        alt         => undef,
+    );
+    my $ref = $cldr->locales_info( property => 'quotation_start', locale => 'ja' );
+    my $all = $cldr->locales_infos;
+    my $ref = $cldr->number_format_l10n(
+        locale          => 'en',
+        number_system   => 'latn',
+        number_type     => 'currency',
+        format_length   => 'short',
+        format_type     => 'standard',
+        alt             => undef,
+        count           => 'one',
+        format_id       => 1000,
+    );
+    my $all = $cldr->number_formats_l10n;
+    my $all = $cldr->number_formats_l10n( locale => 'en' );
+    my $all = $cldr->number_formats_l10n(
+        locale          => 'en',
+        number_system   => 'latn',
+        number_type     => 'currency',
+        format_length   => 'short',
+        format_type     => 'standard',
+    );
+    my $ref = $cldr->number_symbol_l10n(
+        locale          => 'en',
+        number_system   => 'latn',
+        property        => 'decimal',
+        alt             => undef,
+    );
+    my $all = $cldr->number_symbols_l10n;
+    my $all = $cldr->number_symbols_l10n( locale => 'en' );
+    my $all = $cldr->number_symbols_l10n(
+        locale          => 'en',
+        number_system   => 'latn',
+    );
+    # See also using rbnf
+    my $ref = $cldr->number_system( number_system => 'jpan' );
+    my $all = $cldr->number_systems;
+    my $ref = $cldr->person_name_default( locale => 'ja' );
+    my $all = $cldr->person_name_defaults;
+    my $ref = $cldr->rbnf(
+        locale  => 'ja',
+        ruleset => 'spellout-cardinal',
+        rule_id => 7,
+    );
+    my $all = $cldr->rbnfs;
+    my $all = $cldr->rbnfs( locale => 'ko' );
+    my $all = $cldr->rbnfs( grouping => 'SpelloutRules' );
+    my $all = $cldr->rbnfs( ruleset => 'spellout-cardinal-native' );
+    my $ref = $cldr->reference( code => 'R1131' );
+    my $all = $cldr->references;
+    my $ref = $cldr->script( script => 'Jpan' );
+    my $all = $cldr->scripts;
+    # 'rtl' ('right-to-left' writing orientation)
+    my $all = $cldr->scripts( rtl => 1 );
+    my $all = $cldr->scripts( origin_country => 'FR' );
+    my $all = $cldr->scripts( likely_language => 'fr' );
+    my $ref = $cldr->script_l10n(
+        locale  => 'en',
+        script   => 'Latn',
+        alt     => undef,
+    );
+    my $all = $cldr->scripts_l10n;
+    my $all = $cldr->scripts_l10n( locale => 'en' );
+    my $all = $cldr->scripts_l10n(
+        locale  => 'en',
+        alt     => undef,
+    );
+    my $ref = $cldr->subdivision( subdivision => 'jp12' );
+    my $all = $cldr->subdivisions;
+    my $all = $cldr->subdivisions( territory => 'JP' );
+    my $all = $cldr->subdivisions( parent => 'US' );
+    my $all = $cldr->subdivisions( is_top_level => 1 );
+    my $ref = $cldr->subdivision_l10n(
+        locale      => 'en',
+        # Texas
+        subdivision => 'ustx',
+    );
+    my $all = $cldr->subdivisions_l10n;
+    my $all = $cldr->subdivisions_l10n( locale => 'en' );
+    my $ref = $cldr->territory( territory => 'FR' );
+    my $all = $cldr->territories;
+    my $all = $cldr->territories( parent => 150 );
+    my $ref = $cldr->territory_l10n(
+        locale      => 'en',
+        territory   => 'JP',
+        alt         => undef,
+    );
+    my $all = $cldr->territories_l10n;
+    my $all = $cldr->territories_l10n( locale => 'en' );
+    my $all = $cldr->territories_l10n(
+        locale  => 'en',
+        alt     => undef,
+    );
+    my $ref = $cldr->time_format( region => 'JP' );
+    my $all = $cldr->time_formats;
+    my $all = $cldr->time_formats( region => 'US' );
+    my $all = $cldr->time_formats( territory => 'JP' );
+    my $all = $cldr->time_formats( locale => undef );
+    my $all = $cldr->time_formats( locale => 'en' );
+    my $ref = $cldr->timezone( timezone => 'Asia/Tokyo' );
+    my $all = $cldr->timezones;
+    my $all = $cldr->timezones( territory => 'US' );
+    my $all = $cldr->timezones( region => 'Asia' );
+    my $all = $cldr->timezones( tzid => 'sing' );
+    my $all = $cldr->timezones( tz_bcpid => 'sgsin' );
+    my $all = $cldr->timezones( metazone => 'Singapore' );
+    my $all = $cldr->timezones( is_golden => undef );
+    my $all = $cldr->timezones( is_golden => 1 );
+    my $ref = $cldr->timezone_info(
+        timezone    => 'Asia/Tokyo',
+        start       => undef,
+    );
+    my $ref = $cldr->timezone_info(
+        timezone    => 'Europe/Simferopol',
+        start       => ['>1991-01-01', '<1995-01-01'],
+    );
+    my $all = $cldr->timezones_info;
+    my $all = $cldr->timezones_info( metazone => 'Singapore' );
+    my $all = $cldr->timezones_info( start => undef );
+    my $all = $cldr->timezones_info( until => undef );
+    my $ref = $cldr->unit_alias( alias => 'meter-per-second-squared' );
+    my $all = $cldr->unit_aliases;
+    my $ref = $cldr->unit_constant( constant => 'lb_to_kg' );
+    my $all = $cldr->unit_constants;
+    my $ref = $cldr->unit_conversion( source => 'kilogram' );
+    my $all = $cldr->unit_conversions;
+    my $all = $cldr->unit_conversions( base_unit => 'kilogram' );;
+    my $all = $cldr->unit_conversions( category => 'kilogram' );
+    my $ref = $cldr->unit_l10n(
+        locale          => 'en',
+        # long, narrow, short
+        format_length   => 'long',
+        # compound, regular
+        unit_type       => 'regular',
+        unit_id         => 'length-kilometer',
+        count           => 'one',
+        gender          => undef,
+        gram_case       => undef,
+    );
+    my $all = $cldr->units_l10n;
+    my $all = $cldr->units_l10n( locale => 'en' );
+    my $all = $cldr->units_l10n(
+        locale          => 'en',
+        format_length   => 'long',
+        unit_type       => 'regular',
+        unit_id         => 'length-kilometer',
+        pattern_type    => 'regular',
+    );
+    my $ref = $cldr->unit_prefix( unit_id => 'micro' );
+    my $all = $cldr->unit_prefixes;
+    my $ref = $cldr->unit_pref( unit_id => 'square-meter' );
+    my $all = $cldr->unit_prefs;
+    my $all = $cldr->unit_prefs( territory => 'US' );
+    my $all = $cldr->unit_prefs( category => 'area' );
+    my $ref = $cldr->unit_quantity( base_unit => 'kilogram' );
+    my $all = $cldr->unit_quantities;
+    my $all = $cldr->unit_quantities( quantity => 'mass' );
+    my $ref = $cldr->variant( variant => 'valencia' );
+    my $all = $cldr->variants;
+    my $ref = $cldr->variant_l10n(
+        locale  => 'en',
+        alt     => undef,
+        variant => 'valencia',
+    );
+    my $all = $cldr->variants_l10n;
+    my $all = $cldr->variants_l10n( locale => 'en' );
+    my $all = $cldr->variants_l10n(
+        locale  => 'en',
+        alt     => undef,
+    );
+    my $ref = $cldr->week_preference( locale => 'ja' );
+    my $all = $cldr->week_preferences;
+
+With advanced search:
+
+    my $all = $cldr->timezone_info(
+        timezone => 'Europe/Simferopol',
+        start => ['>1991-01-01','<1995-01-01'],
+    );
+    my $all = $cldr->time_formats(
+        region => '~^U.*',
+    );
+    my $all = $cldr->time_formats(
+        region => qr/^U.*/,
+    );
+
+# VERSION
+
+    v0.1.0
+
+# DESCRIPTION
+
+`Locale::Unicode::Data` provides access to all the data from the Unicode [CLDR](https://cldr.unicode.org/) (Common Locale Data Repository), using a SQLite database. This is the most extensive up-to-date [CLDR](https://cldr.unicode.org/) data you will find on `CPAN`. It is provided as SQLite data with a great many number of methods to access those data and make it easy for you to retrieve them. Thanks to SQLite, it is very fast.
+
+SQLite version `3.6.19` (2009-10-14) or higher is required, as this module relies on foreign keys, which were not fully supported before. If the version is anterior, the module will return an error upon object instantiation.
+
+It is designed to be extensive in the scope of data that can be accessed, while at the same time, memory-friendly. Access to each method returns data from the SQLite database on a need-basis.
+
+All the data in this SQLite database are sourced directly and exclusively from the Unicode official [CLDR](https://cldr.unicode.org/) data using a perl script available in this distribution under the `scripts` directory. Use `perldoc scripts/create_database.pl` or `scripts/create_database.pl --man` to access its POD documentation.
+
+The `CLDR` data includes, by design, outdated ones, such as outdated currencies, country codes, or timezones, that `CLDR` keeps in order to ensure consistency and reliability. For example, for timezones, the Unicode `LDML` (Locale Data Markup Language) states that "CLDR contains locale data using a time zone ID from the tz database as the key, stability of the IDs is critical." and "Not all TZDB links are in CLDR aliases. CLDR purposefully does not exactly match the Link structure in the TZDB.". See [https://unicode.org/reports/tr35/#Time\_Zone\_Identifiers](https://unicode.org/reports/tr35/#Time_Zone_Identifiers)
+
+In `CLDR` parlance, a [language](https://unicode.org/reports/tr35/tr35.html#Unicode_language_identifier) is a 2 to 3-characters identifier, whereas a `locale` includes more information, such as a `language`, a `script`, a `territory`, a `variant`, and possibly much more information. See for that the [Locale::Unicode](https://metacpan.org/pod/Locale%3A%3AUnicode) module and the [LDML specifications](https://unicode.org/reports/tr35/tr35.html#Unicode_language_identifier)
+
+Those locales also inherit data from their respective parents. For example, `sr-Cyrl-ME` would have the following inheritance tree: `sr-ME`, `sr`, and `und`
+
+You can build a `locale` inheritance tree using [make\_inheritance\_tree](#make_inheritance_tree), and I recommend [Locale::Unicode](https://metacpan.org/pod/Locale%3A%3AUnicode) to build, parse and manipulate locales.
+
+Also, in those `CLDR` data, there is not always a one-to-one match across all territories (countries) or languages, meaning that some territories or languages have more complete `CLDR` data than others.
+
+`CLDR` also uses some default values to avoid repetitions. Those default values are stored in the `World` territory with code `001` and special `language` code `und` (a.k.a. `unknown` also referred as `root`)
+
+Please note that the SQLite database is built to not be case sensitive in line with the `LDML` specifications.
+
+This module documentation is not meant to be a replacement for the Unicode `LDML` (`Locale Data Markup Language`) documentation, so please make sure to read [the LDML documentation](https://unicode.org/reports/tr35/) and the [CLDR specifications](https://cldr.unicode.org/index/cldr-spec).
+
+The data available from the `CLDR` via this module includes:
+
+- ISO 4217 [currencies](#table-currencies), including [BCP47 currencies](#table-bcp47_currencies), their [localised names](#table-currencies_l10n) and their [associated country historical usage](#table-currencies_info).
+- [Calendar IDs](#table-calendars) with description in English
+- [Calendar eras](#table-calendar_eras), for some calendar systems, such as the `japanese` one.
+- [Territories](#table-territories) (countries, or world regions)
+
+    This includes, for countries, additional information such as `GDP` (Gross Domestic Product), literacy percentage, population size, languages spoken, possible other ISO 3166 codes contained by this territory (essentially world regions identified as 3-digits code, or special codes like `EU` or `UN`), the official currency, a list of calendar IDs (not always available for all territories), the first day of the week, the first and last day of the week-end
+
+- [Localised territory names](#table-territories_l10n)
+
+    This provides the name of a `territory` for a given `locale`
+
+- Territories [currencies history](#table-currencies_info)
+- All [known locales](#table-locales)
+
+    This includes the `locale` status, which may be `regular`, `deprecated`, `special`, `reserved`, `private_use`, or `unknown`
+
+- Localised [names of locales](#table-locales_l10n)
+
+    This provides the name of a `locale` for a given `locale`
+
+- All [known languages](#table-languages)
+
+    This may include its associated `scripts` and `territories`, and its `parent` language, if any.
+
+    Its status may be `regular`, `deprecated`, `special`, `reserved`, `private_use`, or `unknown`
+
+- All [known scripts](#table-scripts)
+
+    This includes possibly the `script` ID, its rank, a sample character, line break letter, whether it is right-to-left direction, if it has casing, if it requires shapping, its density, possibly its origin territory and its likely locale.
+
+- [Localised scripts](#table-scripts_l10n)
+
+    This provides the name of a `script` for a given `locale`
+
+- All [known variants](#table-variants)
+
+    This includes the `variant` status, which may be `regular`, `deprecated`, `special`, `reserved`, `private_use`, or `unknown`
+
+- [Localised variants](#table-variants_l10n)
+
+    This provides the name of a `variant` for a given `locale`
+
+- [Time formats](#table-time_formats)
+
+    This includes the associated `territory` and `locale`, the default time format, such as `H` and the time allowed.
+
+- [Language population](#table-language_population)
+
+    This provides information for a given `territory` and `locale` about the percentage of the population using that `locale`, their literacy percentage, and percentage of the population using in writing the `locale`, and its official status, which may be `official`, `de_facto_official`, and `official_regional`
+
+- [Likely subtags](#table-likely_subtags)
+
+    This provides for a given `locale` the likely target locale to expand to.
+
+- [Aliases](#table-aliases)
+
+    This provides aliases for `languages`, `scripts`, `territories`, `subdivisions`, `variants`, and `timezones`
+
+- [Time zones](#table-timezones)
+
+    This provides IANA Olson time zones, but also some other time zones, such as `Etc/GMT`. The CLDR data also includes former time zones for consistency and stability.
+
+    The information includes possibly the associated `territory`, the `region` such as `America` or `Europe`, the time zone ID, such as `japa`, a meta zone, such as `Europe_Central`, a BCP47 time zone ID, and a boolean value whether the time zone is a `golden` time zone or not.
+
+- [Time zone information](#table-timezones_info)
+
+    This provides historical time zone information, such as when it started and ended.
+
+- [Subdivisions](#table-subdivisions)
+
+    Subdivisions are parts of a territory, such as a province like in Canada, a department like in France or a prefecture like in Japan.
+
+    The information here includes a `subdivision` ID, possibly a `parent`, a boolean whether this is a top level subdivision for the given territory, and a status, which may be `regular`, `deprecated`, `special`, `reserved`, `private_use`, or `unknown`
+
+- [Localised subdivisions](#table-subdivisions_l10n)
+
+    This contains the name of a `subdivision` for a given `locale`
+
+- [Numbering systems](#table-number_systems)
+
+    This provides information about numbering systems, including the numbering system ID, the digits from `0` to `9`
+
+- [Week preference](#table-week_preferences)
+
+    This contains the week ordering preferences for a given `locale`. Possible values are: `weekOfYear`, `weekOfDate`, `weekOfMonth`
+
+- [Day periods](#table-day_periods)
+
+    This contains the time representation of day period ID, such as `midnight`, `noon`, `morning1`, `morning2`, `afternoon1`, `afternoon2`, `evening1`, `evening2`, `night1`, `night2` with values in hour and minute, such as `12:00` set in a `start` and `until` field.
+
+- [Code mappings](#table-code_mappings)
+
+    This serves to map territory or currency codes with their well known equivalent in ISO and U.S. standard (FIPS10)
+
+- [Person name defaults](#table-person_name_defaults)
+
+    This specifies, for a given `locale`, whether a person's given name comes first before the surname, or after.
+
+- [References](#table-refs)
+
+    This contains all the references behind the CLDR data.
+
+- [BCP47 time zones](#table-bcp47_timezones)
+
+    This contains BCP 47 time zones along with possible aliases and preferred time zone
+
+- [BCP47 currencies](#table-bcp47_currencies)
+
+    This includes the currency ID, an ISO 4217 code, description and a boolean value whether it is obsolete or not.
+
+- [BCP47 extensions](#table-bcp47_extensions)
+
+    This contains the extension category, extension ID, possibly alias, value type and description, and whether it is deprecated,
+
+- [BCP47 extension values](#table-bcp47_values)
+
+    This includes an extension category, and extension ID, an extension value and description.
+
+- [Annotations](#table-annotations)
+
+    This provide annotations (single character like a symbol or an emoji) and default short description for a given `locale`
+
+- [RBNF (Rule-Based Number Format)](#table-rbnf)
+
+    This provides RBNF rules with its grouping value, such as `SpelloutRules` or `OrdinalRules`, the rule set ID such as `spellout-numbering-year` or `spellout-cardinal`, the rule ID such as `Inf` and the rule value.
+
+- [Casings](#table-casings)
+
+    This provides information about casing for a given `locale`
+
+    It includes the `locale`, a `token` such as `currencyName`, `language` and a `value`, such as `lowercase`, `titlecase`
+
+- [Localised calendar terms](#table-calendar_terms)
+
+    This provides localised terms used in different parts of a calendar system, for a given `locale` and `calendar` ID.
+
+- [Localised calendar eras](#table-calendar_eras)
+
+    This provides the localised era names for a given `locale` and `calendar` ID.
+
+- Localised [calendar date, time](#table-calendar_datetime_formats) and [interval formattings](#table-calendar_interval_formats)
+
+    This provides the `CLDR` `DateTime` formattings for a given `locale` and `calendar` ID.
+
+- [Language matching](#table-languages_match)
+
+    This provides a matching between a desired `locale` and what is actually supported, and a `distance` factor, which designed to be the opposite of a percentage, by Unicode. The desired `locale` can be a perl regular expression.
+
+- Unit [constants](#table-unit_constants)
+
+    Some constant values declared for certain measurement units.
+
+- [Unit quantities](#table-unit_quantities)
+
+    Defines the quantity type for certain units.
+
+- [Unit conversions](#table-unit_conversions)
+
+    Define a list of unit conversion from one unit to another.
+
+- [Unit preferences by territories](#unit_prefs)
+
+    Defines what units are preferred by territory.
+
+- [Unit aliases](#table-unit_aliases)
+
+    Provides some aliases for otherwise outdated units.
+
+- [Localised units](#table-units_l10n)
+
+    Localised unit formatting.
+
+- Locale [Number symbols](#table-number_symbols_l10n)
+
+    Value used for each locale for `approximately`, `currency_decimal`, `currency_group`, `decimal`, `exponential`, `group`, `infinity`, `list`, `minus`, `nan`, `per_mille`, `percent`, `plus`, `superscript`, and `time_separator`
+
+    Not every `locale` has a value for each of those property though.
+
+- [Locale number formatting](#table-number_formats_l10n)
+
+    Localised formatting for currency or decimal numbers.
+
+If you need a more granular access to the data, feel free to access the SQL data directly. You can retrieve a [database handler](#database_handler), as an instance of the [DBI](https://metacpan.org/pod/DBI) API, or you can instantiate a connection yourself using the [database file information](#datafile)
+
+# CONSTRUCTOR
+
+## new
+
+This takes some hash or hash reference of options, instantiates a new [Locale::Unicode::Data](https://metacpan.org/pod/Locale%3A%3AUnicode%3A%3AData) object, connects to the SQLite database file specified, or the default one, and returns the newly instantiated object.
+
+If an error occurred, an [error object](https://metacpan.org/pod/Locale%3A%3AUnicode%3A%3AData%3A%3AException) is created and `undef` is returned in scalar context, or an empty list in list context.
+
+Supported options are as follows. Each option can be later accessed or modified by their associated method.
+
+- `datafile`
+
+    The file path to the SQLite database file. If this option is not provided, the SQLite database file used will be the one set in the global variable `$DB_FILE`
+
+- `decode_sql_arrays`
+
+    Boolean value to enable or disable automatic decoding of SQL arrays into perl arrays using [JSON::XS](https://metacpan.org/pod/JSON%3A%3AXS)
+
+    This is enabled by default.
+
+    If you want to retrieve a lot of data and do not need access to those arrays, you should deactivate decoding to improve speed.
+
+If an error occurs, an [exception object](https://metacpan.org/pod/Locale%3A%3AUnicode%3A%3AData%3A%3AException) is set and `undef` is returned in scalar context, or an empty list in list context. The [exception object](https://metacpan.org/pod/Locale%3A%3AUnicode%3A%3AData%3A%3AException) can then be retrieved using [error](#error), such as:
+
+    my $cldr = Locale::Unicode::Data->new( $somthing_bad ) ||
+        die( Locale::Unicode::Data->error );
+
+# METHODS
+
+## alias
+
+    my $ref = $cldr->alias(
+        alias => 'i_klingon',
+        type  => 'language',
+    );
+
+This would return an hash reference containing:
+
+    {
+        alias_id    => 5,
+        alias       => 'i_klingon',
+        replacement => ["tlh"],
+        reason      => 'deprecated',
+        type        => 'language',
+        comment     => 'Klingon',
+    }
+
+Returns the `language`, `script`, `territory`, `subdivision`, `variant`, or `zone` aliases stored in table [aliases](#table-aliases) for a given `alias` and an alias `type`.
+
+See the [LDML specifications](https://unicode.org/reports/tr35/tr35-info.html#Supplemental_Alias_Information) for more information.
+
+The meaning of the fields are as follows:
+
+- `alias_id`
+
+    A unique incremental value provided by SQLite.
+
+- `alias`
+
+    The original value.
+
+- `replacement`
+
+    The replacement value for the `alias`
+
+- `reason`
+
+    Reason for the replacement.
+
+    Known reasons are `bibliographic`, `deprecated`, `legacy`, `macrolanguage`, `overlong`
+
+- `type`
+
+    The type of alias.
+
+    There are 6 types of aliases:
+
+    - 1. `language`
+    - 2. `script`
+    - 3. `subdivision`
+    - 4. `territory`
+    - 5. `variant`
+    - 6. `zone`
+
+- `comment`
+
+    A possible comment
+
+## aliases
+
+    my $array_ref = $cldr->aliases;
+    # Filtering based on type
+    my $array_ref = $cldr->aliases( type => 'language' );
+    my $array_ref = $cldr->aliases( type => 'script' );
+    my $array_ref = $cldr->aliases( type => 'subdivision' );
+    my $array_ref = $cldr->aliases( type => 'territory' );
+    my $array_ref = $cldr->aliases( type => 'variant' );
+    my $array_ref = $cldr->aliases( type => 'zone' );
+
+Returns all the data stored in table [aliases](#table-aliases) as an array reference of hash reference.
+
+If an `type` option is provided, it will return only all the data matching the given `type`.
+
+See the [LDML specifications](https://unicode.org/reports/tr35/tr35-info.html#Supplemental_Alias_Information) for more information.
+
+## annotation
+
+    my $ref = $cldr->annotation( locale => 'en', annotation => '{' );
+    # Returns an hash reference like this:
+    {
+        annotation_id   => 34686,
+        locale          => 'en',
+        annotation      => '{',
+        defaults        => ["brace", "bracket", "curly brace", "curly bracket", "gullwing", "open curly bracket"],
+        tts             => 'open curly bracket',
+    }
+
+Returns an hash reference of a `annotation` information from the table [annotations](#table-annotations) for a given `locale` ID, and `annotation` value.
+
+As per the [LDML specifications](https://unicode.org/reports/tr35/tr35-general.html#Annotations), "Annotations provide information about characters, typically used in input. For example, on a mobile keyboard they can be used to do completion. They are typically used for symbols, especially emoji characters."
+
+The meaning of the fields are as follows:
+
+- `annotation_id`
+
+    A unique incremental value automatically generated by SQLite.
+
+- `locale`
+
+    A `locale` ID as can be found in the table [locales](#table-locales)
+
+- `annotation`
+
+    A string representing the `annotation`
+
+- `defaults`
+
+    An array of short strings describing the annotation in the language specified by the `locale`
+
+- `tts`
+
+    A short string describing the `annotation`
+
+## annotations
+
+    my $array_ref = $cldr->annotations;
+    # Get all annotations for locale 'en'
+    my $array_ref = $cldr->annotations( locale => 'en' );
+
+Returns all annotations information for all known locales from the [table annotations](#table-annotations) as an array reference of hash reference.
+
+Alternatively, you can provide a `locale` to return all annotation information for that `locale`
+
+## bcp47\_currency
+
+    my $ref = $cldr->bcp47_currency( currid => 'jpy' );
+    # Returns an hash reference like this:
+    {
+        bcp47_curr_id   => 133,
+        currid          => 'jpy',
+        code            => 'JPY',
+        description     => 'Japanese Yen',
+        is_obsolete     => 0,
+    }
+
+Returns an hash reference of a BCP47 currency information from the table [bcp47\_currencies](#table-bcp47_currencies) for a given BCP47 currency ID `currid`.
+
+The meaning of the fields are as follows:
+
+- `bcp47_curr_id`
+
+    A unique incremental value automatically generated by SQLite.
+
+- `currid`
+
+    A string representing a BCP47 `currency` ID.
+
+- `code`
+
+    A string representing a ISO 4217 `currency` code, which could be outdated by the ISO standard, but still valid for `CLDR`
+
+- `description`
+
+    A text describing the `currency`
+
+- `is_obsolete`
+
+    A boolean value defining whether the `currency` is obsolete or not. Default to false.
+
+## bcp47\_currencies
+
+    my $array_ref = $cldr->bcp47_currencies;
+    # Filtering based on ISO4217 currency code
+    my $array_ref = $cldr->bcp47_currencies( code => 'JPY' );
+    # Filtering based on obsolete status: 1 = true, 0 = false
+    my $array_ref = $cldr->bcp47_currencies( is_obsolete => 1 );
+
+Returns all BCP47 currencies information from [table bcp47\_currencies](#table-bcp47_currencies) as an array reference of hash reference.
+
+A combination of the following fields may be provided to filter the information returned:
+
+- `code`
+
+    An ISO4217 currency code, such as `JPY`
+
+- `is_obsolete`
+
+    A boolean value. Use 1 for `true` and 0 for `false`
+
+## bcp47\_extension
+
+    my $ref = $cldr->bcp47_extension( extension => 'ca' );
+    # Returns an hash reference like this:
+    {
+        bcp47_ext_id    => 1,
+        category        => 'calendar',
+        extension       => 'ca',
+        alias           => 'calendar',
+        value_type      => 'incremental',
+        description     => 'Calendar algorithm key',
+    }
+
+Returns an hash reference of a [BCP47 extension](https://unicode.org/reports/tr35/tr35.html#u_Extension) information from the table [bcp47\_extensions](#table-bcp47_extensions) for a given BCP47 extension.
+
+The meaning of the fields are as follows:
+
+- `bcp47_ext_id`
+
+    A unique incremental value automatically generated by SQLite.
+
+- `category`
+
+    A string representing a BCP47 extension category.
+
+    Known values are: `calendar`, `collation`, `currency`, `measure`, `number`, `segmentation`, `timezone`, `transform`, `transform_destination`, `transform_hybrid`, `transform_ime`, `transform_keyboard`, `transform_mt`, `transform_private_use`, `variant`
+
+- `extension`
+
+    A short string representing a BCP47 extension.
+
+    Known values are: `ca`, `cf`, `co`, `cu`, `d0`, `dx`, `em`, `fw`, `h0`, `hc`, `i0`, `k0`, `ka`, `kb`, `kc`, `kf`, `kh`, `kk`, `kn`, `kr`, `ks`, `kv`, `lb`, `lw`, `m0`, `ms`, `mu`, `nu`, `rg`, `s0`, `sd`, `ss`, `t0`, `tz`, `va`, `vt`, `x0`
+
+- `alias`
+
+    A string representing an alias for this extension.
+
+    Known values are: `undef`, `calendar`, `colAlternate`, `colBackwards`, `colCaseFirst`, `colCaseLevel`, `colHiraganaQuaternary`, `collation`, `colNormalization`, `colNumeric`, `colReorder`, `colStrength`, `currency`, `hours`, `measure`, `numbers`, `timezone`, `variableTop`
+
+- `value_type`
+
+    A string representing a value type.
+
+    Known values are: `undef`, `any`, `incremental`, `multiple`, `single`
+
+- `description`
+
+    A text providing a description for this BCP47 extension.
+
+## bcp47\_extensions
+
+    my $array_ref = $cldr->bcp47_extensions;
+    # Filter based on the 'extension' field value
+    my $array_ref = $cldr->bcp47_extensions( extension => 'ca' );
+    # Filter based on the 'deprecated' field value; 1 = true, 0 = false
+    my $array_ref = $cldr->bcp47_extensions( deprecated => 0 );
+
+Returns all [BCP47 extensions](https://unicode.org/reports/tr35/tr35.html#u_Extension) information from [table bcp47\_extensions](#table-bcp47_extensions) as an array reference of hash reference.
+
+A combination of the following fields may be provided to filter the information returned:
+
+- `deprecated`
+
+    A boolean value. Use 1 for `true` and 0 for `false`
+
+- `extension`
+
+    A BCP47 extension, such as `ca`, `cf`, `co`, `cu`, `d0`, `dx`, `em`, `fw`, `h0`, `hc`, `i0`, `k0`, `ka`, `kb`, `kc`, `kf`, `kh`, `kk`, `kn`, `kr`, `ks`, `kv`, `lb`, `lw`, `m0`, `ms`, `mu`, `nu`, `rg`, `s0`, `sd`, `ss`, `t0`, `tz`, `va`, `vt`, `x0`
+
+## bcp47\_timezone
+
+    my $ref = $cldr->bcp47_timezone( tzid => 'jptyo' );
+    # Returns an hash reference like this:
+    {
+        bcp47_tz_id => 215,
+        tzid        => 'jptyo',
+        alias       => ["Asia/Tokyo", "Japan"],
+        preferred   => undef,
+        description => 'Tokyo, Japan',
+        deprecated  => undef,
+    }
+
+Returns an hash reference of a BCP47 timezone information from the table [bcp47\_timezones](#table-bcp47_timezones) for a given BCP47 timezone ID `tzid`.
+
+The meaning of the fields are as follows:
+
+- `bcp47_tz_id`
+
+    A unique incremental value automatically generated by SQLite.
+
+- `tzid`
+
+    A string representing a BCP47 timezone ID.
+
+- `alias`
+
+    An array of [IANA Olson timezones](https://www.iana.org/time-zones)
+
+- `preferred`
+
+    An string representing a preferred BCP47 timezone ID in lieu of the current one.
+
+    This is mostly `undef`
+
+- `description`
+
+    A text describing the BCP47 timezone
+
+- `deprecated`
+
+    A boolean value defining whether this timezone is deprecated or not. Defaults to false.
+
+## bcp47\_timezones
+
+    my $array_ref = $cldr->bcp47_timezones;
+    # Filter based on the 'deprecated' field value; 1 = true, 0 = false
+    my $array_ref = $cldr->bcp47_timezones( deprecated => 0 );
+
+Returns all BCP47 timezones information from [table bcp47\_timezones](#table-bcp47_timezones) as an array reference of hash reference.
+
+A combination of the following fields may be provided to filter the information returned:
+
+- `deprecated`
+
+    A boolean value. Use 1 for `true` and 0 for `false`
+
+## bcp47\_value
+
+    my $ref = $cldr->bcp47_value( value => 'japanese' );
+    # Returns an hash reference like this:
+    {
+        bcp47_value_id  => 16,
+        category        => 'calendar',
+        extension       => 'ca',
+        value           => 'japanese',
+        description     => 'Japanese Imperial calendar',
+    }
+
+Returns an hash reference of a BCP47 value information from the table [bcp47\_values](#table-bcp47_values) for a given BCP47 value.
+
+The meaning of the fields are as follows:
+
+- `bcp47_value_id`
+
+    A unique incremental value automatically generated by SQLite.
+
+- `category`
+
+    A string representing a BCP47 value category.
+
+    Known values are: `calendar`, `collation`, `currency`, `measure`, `number`, `segmentation`, `timezone`, `transform`, `transform_destination`, `transform_hybrid`, `transform_ime`, `transform_keyboard`, `transform_mt`, `transform_private_use`, `variant`
+
+- `extension`
+
+    A short string representing a BCP47 extension.
+
+    Known values are: `ca`, `cf`, `co`, `cu`, `d0`, `dx`, `em`, `fw`, `h0`, `hc`, `i0`, `k0`, `ka`, `kb`, `kc`, `kf`, `kh`, `kk`, `kn`, `kr`, `ks`, `kv`, `lb`, `lw`, `m0`, `ms`, `mu`, `nu`, `rg`, `s0`, `sd`, `ss`, `t0`, `tz`, `va`, `vt`, `x0`
+
+- `value`
+
+    Possible value for the current BCP47 extension. One `extension` may have multiple possible values.
+
+- `description`
+
+    A text describing the BCP47 extension value.
+
+## bcp47\_values
+
+    my $array_ref = $cldr->bcp47_values;
+    # Filter based on the 'category' field value
+    my $array_ref = $cldr->bcp47_timezones( category => 'calendar' );
+    # Filter based on the 'extension' field value
+    my $array_ref = $cldr->bcp47_timezones( extension => 'ca' );
+
+Returns all BCP47 values information from [table bcp47\_values](#table-bcp47_values) as an array reference of hash reference.
+
+A combination of the following fields may be provided to filter the information returned:
+
+- `category`
+
+    A BCP47 category ID, such as `calendar`, `collation`, `currency`, `measure`, `number`, `segmentation`, `timezone`, `transform_destination`, `transform`, `transform_hybrid`, `transform_ime`, `transform_keyboard`, `transform_mt`, `transform_private_use`, `variant`
+
+- `extension`
+
+    A BCP47 extension ID, such as `ca`, `cf`, `co`, `cu`, `d0`, `dx`, `em`, `fw`, `h0`, `hc`, `i0`, `k0`, `ka`, `kb`, `kc`, `kf`, `kh`, `kk`, `kn`, `kr`, `ks`, `kv`, `lb`, `lw`, `m0`, `ms`, `mu`, `nu`, `rg`, `s0`, `sd`, `ss`, `t0`, `tz`, `va`, `vt`, `x0`
+
+## calendar
+
+    my $ref = $cldr->calendar( calendar => 'gregorian' );
+    # Returns an hash reference like this:
+    {
+        calendar_id => 1,
+        calendar    => 'gregorian',
+        system      => 'solar',
+        inherits    => undef,
+        description => undef,
+    }
+
+Returns an hash reference of a calendar information from the table [calendars](#table-calendars) for a given `calendar` value.
+
+The meaning of the fields are as follows:
+
+- `calendar_id`
+
+    A unique incremental value automatically generated by SQLite.
+
+- `calendar`
+
+    A string representing a `calendar` ID.
+
+    Known calendar IDs are: `buddhist`, `chinese`, `coptic`, `dangi`, `ethiopic`, `ethiopic-amete-alem`, `generic`, `gregorian`, `hebrew`, `indian`, `islamic`, `islamic-civil`, `islamic-rgsa`, `islamic-tbla`, `islamic-umalqura`, `iso8601`, `japanese`, `persian`, `roc`
+
+- `system`
+
+    A string representing a `calendar` system.
+
+    Known values are: `undef`, `lunar`, `lunisolar`, `other`, `solar`
+
+- `inherits`
+
+    A string representing the `calendar` ID from which this calendar inherits from.
+
+    Currently, the only one known to use this is the `japanese` calendar inheriting from the `gregorian` calendar.
+
+- `description`
+
+    A text describing the `calendar`
+
+## calendars
+
+    my $array_ref = $cldr->calendars;
+    # Known 'system' value: undef, lunar, lunisolar, other, solar
+    my $array_ref = $cldr->calendars( system => 'solar' );
+    my $array_ref = $cldr->calendars( inherits => 'gregorian' );
+
+Returns all calendar information from [table calendars](#table-calendars) as an array reference of hash reference.
+
+A combination of the following fields may be provided to filter the information returned:
+
+- `inherits`
+
+    A calendar system this calendar inherits from, such as the Japanese calendar.
+
+- `system`
+
+    A calendar system, such as `lunar`, `lunisolar`, `other`, `solar`
+
+## calendar\_append\_format
+
+    my $ref = $cldr->calendar_append_format(
+        locale      => 'en',
+        calendar    => 'gregorian',
+        format_id   => 'Day',
+    );
+    # Returns an hash reference like this:
+    {
+        cal_append_fmt_id   => 12,
+        locale              => 'en',
+        calendar            => 'gregorian',
+        format_id           => 'Day',
+        format_pattern      => '{0} ({2}: {1})',
+    }
+
+Returns an hash reference of a `calendar` localised append format information from the table [calendar\_append\_formats](#table-calendar_append_formats) for a given format ID `format_id`, `locale` ID and `calendar` ID.
+
+The meaning of the fields are as follows:
+
+- `cal_append_fmt_id`
+
+    A unique incremental value automatically generated by SQLite.
+
+- `locale`
+
+    A `locale`, such as `en` or `ja-JP` as can be found in table [locales](#table-locales)
+
+- `calendar`
+
+    A `calendar` ID as can be found in the [table calendars](#table-calendars)
+
+    Known values are: `buddhist`, `chinese`, `coptic`, `dangi`, `ethiopic`, `ethiopic-amete-alem`, `generic`, `gregorian`, `hebrew`, `indian`, `islamic`, `islamic-civil`, `islamic-rgsa`, `islamic-tbla`, `islamic-umalqura`, `japanese`, `persian`, `roc`
+
+- `format_id`
+
+    A string representing a format ID.
+
+    Known values are: `Day`, `Day-Of-Week`, `Era`, `Hour`, `Minute`, `Month`, `Quarter`, `Second`, `Timezone`, `Week`, `Year`
+
+- `format_pattern`
+
+    A string representing the localised format pattern.
+
+See the [LDML specifications](https://unicode.org/reports/tr35/tr35-dates.html#availableFormats_appendItems) for more information.
+
+## calendar\_append\_formats
+
+    my $array_ref = $cldr->calendar_append_formats;
+    # Filter based on the 'locale' field value
+    my $array_ref = $cldr->calendar_append_formats( locale => 'en' );
+    # Filter based on the 'calendar' field value
+    my $array_ref = $cldr->calendar_append_formats( calendar => 'gregorian' );
+    # or a combination of those two:
+    my $array_ref = $cldr->calendar_append_formats(
+        locale => 'en',
+        calendar => 'gregorian'
+    );
+
+Returns all calendar appended formats information from [table calendar\_append\_formats](#table-calendar_append_formats) as an array reference of hash reference.
+
+A combination of the following fields may be provided to filter the information returned:
+
+- `calendar`
+
+    A `calendar` ID as can be found in table [calendars](#table-calendars), such as: `buddhist`, `chinese`, `coptic`, `dangi`, `ethioaa`, `ethiopic`, `gregory`, `hebrew`, `indian`, `islamic`, `islamic-civil`, `islamic-rgsa`, `islamic-tbla`, `islamic-umalqura`, `islamicc`, `iso8601`, `japanese`, `persian`, `roc`
+
+- `locale`
+
+    A `locale`, such as `en` or `ja-JP` as can be found in table [locales](#table-locales)
+
+See also the method [l10n](#l10n)
+
+## calendar\_available\_format
+
+    my $ref = $cldr->calendar_available_format(
+        locale      => 'en',
+        calendar    => 'gregorian',
+        format_id   => 'Hms',
+        # optional
+        count       => undef,
+        # optional
+        alt         => undef,
+    );
+    # Returns an hash reference like this:
+    {
+        cal_avail_fmt_id    => 2662,
+        locale              => 'en',
+        calendar            => 'gregorian',
+        format_id           => 'Hms',
+        format_pattern      => 'HH:mm:ss',
+        count               => undef,
+        alt                 => undef,
+    }
+
+Returns an hash reference of a `calendar` localised available format information from the table [calendar\_available\_formats](#table-calendar_available_formats) for a given format ID `format_id`, `calendar` ID and a `locale` ID.
+
+The meaning of the fields are as follows:
+
+- `cal_avail_fmt_id`
+
+    A unique incremental value automatically generated by SQLite.
+
+- `locale`
+
+    A `locale`, such as `en` or `ja-JP` as can be found in table [locales](#table-locales)
+
+- `calendar`
+
+    A `calendar` ID as can be found in the [table calendars](#table-calendars)
+
+    Known values are: `buddhist`, `chinese`, `coptic`, `dangi`, `ethiopic`, `ethiopic-amete-alem`, `generic`, `gregorian`, `hebrew`, `indian`, `islamic`, `islamic-civil`, `islamic-rgsa`, `islamic-tbla`, `islamic-umalqura`, `japanese`, `persian`, `roc`
+
+- `format_id`
+
+    A string representing a format ID.
+
+    There are currently 107 known and distinct format IDs.
+
+- `format_pattern`
+
+    A string representing a localised format pattern.
+
+- `count`
+
+    An optional string used to differentiate identical patterns.
+
+    Known values are: `undef`, `few`, `many`, `one`, `other`, `two`, `zero`
+
+- `alt`
+
+    An optional string used to provide alternative patterns.
+
+    Known values are: `undef`, `ascii`, `variant`
+
+See the [LDML specifications](https://unicode.org/reports/tr35/tr35-dates.html#availableFormats_appendItems) for more informations.
+
+## calendar\_available\_formats
+
+    my $array_ref = $cldr->calendar_available_formats;
+    # Filter based on the 'locale' field value
+    my $array_ref = $cldr->calendar_available_formats( locale => 'en' );
+    # Filter based on the 'calendar' field value
+    my $array_ref = $cldr->calendar_available_formats( calendar => 'gregorian' );
+    # or a combination of those two:
+    my $array_ref = $cldr->calendar_available_formats(
+        locale => 'en',
+        calendar => 'gregorian',
+    );
+
+Returns all calendar available formats information from [table calendar\_available\_formats](#table-calendar_available_formats) as an array reference of hash reference.
+
+A combination of the following fields may be provided to filter the information returned:
+
+- `calendar`
+
+    A `calendar` ID as can be found in table [calendars](#table-calendars), such as: `buddhist`, `chinese`, `coptic`, `dangi`, `ethioaa`, `ethiopic`, `gregory`, `hebrew`, `indian`, `islamic`, `islamic-civil`, `islamic-rgsa`, `islamic-tbla`, `islamic-umalqura`, `islamicc`, `iso8601`, `japanese`, `persian`, `roc`
+
+- `locale`
+
+    A `locale`, such as `en` or `ja-JP` as can be found in table [locales](#table-locales)
+
+See also the method [l10n](#l10n)
+
+## calendar\_cyclic\_l10n
+
+    my $ref = $cldr->calendar_cyclic_l10n(
+        locale          => 'und',
+        calendar        => 'chinese',
+        format_set      => 'dayParts',
+        format_type     => 'format',
+        format_length   => 'abbreviated',
+        format_id       => 1,
+    );
+    # Returns an hash reference like this:
+    {
+        cal_int_fmt_id  => 1014,
+        locale          => 'und',
+        calendar        => 'chinese',
+        format_set      => 'dayParts',
+        format_type     => 'format',
+        format_length   => 'abbreviated',
+        format_id       => 1,
+        format_pattern  => 'zi',
+    }
+
+Returns an hash reference of a `script` localised information from the table [scripts\_l10n](#table-scripts_l10n) for a given format ID `format_id`, ID a `locale` ID, a `calendar` ID, a format set `format_set`, a format type `format_type` and a format length `format_length`.
+
+The meaning of the fields are as follows:
+
+- `cal_int_fmt_id`
+
+    A unique incremental value automatically generated by SQLite.
+
+- `locale`
+
+    A `locale`, such as `en` or `ja-JP` as can be found in table [locales](#table-locales)
+
+- `calendar`
+
+    A `calendar` ID as can be found in the [table calendars](#table-calendars)
+
+    Known values are: `buddhist`, `chinese`, `coptic`, `dangi`, `ethiopic`, `ethiopic-amete-alem`, `generic`, `gregorian`, `hebrew`, `indian`, `islamic`, `islamic-civil`, `islamic-rgsa`, `islamic-tbla`, `islamic-umalqura`, `japanese`, `persian`, `roc`
+
+- `format_set`
+
+    A format set. Known values are: `dayParts`, `days`, `months`, `solarTerms`, `years`, `zodiacs`
+
+- `format_type`
+
+    A format type. The only known value is `format`
+
+- `format_length`
+
+    A format length.
+
+    Known values are; `abbreviated`, `narrow`, `wide`
+
+- `format_id`
+
+    A string representing a format ID.
+
+- `format_pattern`
+
+    A string representing a localised pattern.
+
+See the [LDML specifications](https://unicode.org/reports/tr35/tr35-dates.html#monthPatterns_cyclicNameSets) for more information.
+
+## calendar\_cyclics\_l10n
+
+    my $all = $cldr->calendar_cyclics_l10n;
+    my $all = $cldr->calendar_cyclics_l10n( locale => 'en' );
+    my $all = $cldr->calendar_cyclics_l10n(
+        locale          => 'en',
+        calendar        => 'chinese',
+        format_set      => 'dayParts',
+        # Not really needed since 'format' is the only value being currently used
+        # format_type   => 'format',
+        format_length   => 'abbreviated',
+    );
+
+Returns all `calendar` cyclic localised formats information from [table calendar\_cyclics\_l10n](#table-calendar_cyclics_l10n) as an array reference of hash reference.
+
+A combination of the following fields may be provided to filter the information returned:
+
+- `calendar`
+
+    A `calendar` ID as can be found in table [calendars](#table-calendars), such as: `buddhist`, `chinese`, `coptic`, `dangi`, `ethioaa`, `ethiopic`, `gregory`, `hebrew`, `indian`, `islamic`, `islamic-civil`, `islamic-rgsa`, `islamic-tbla`, `islamic-umalqura`, `islamicc`, `iso8601`, `japanese`, `persian`, `roc`
+
+- `locale`
+
+    A `locale`, such as `en` or `ja-JP` as can be found in table [locales](#table-locales)
+
+- `format_set`
+
+    A string representing a format set.
+
+    Known values are: `dayParts`, `days`, `months`, `solarTerms`, `years`, `zodiacs`
+
+- `format_type`
+
+    A format type. The only known value is `format`
+
+- `format_length`
+
+    A format length.
+
+    Known values are; `abbreviated`, `narrow`, `wide`
+
+## calendar\_datetime\_format
+
+    my $ref = $cldr->calendar_datetime_format(
+        locale          => 'en',
+        calendar        => 'gregorian',
+        format_length   => 'full',
+        format_type     => 'atTime',
+    );
+    # Returns an hash reference like this:
+    {
+        cal_dt_fmt_id   => 434,
+        locale          => 'en',
+        calendar        => 'gregorian',
+        format_length   => 'full',
+        format_type     => 'atTime',
+        format_pattern  => "{1} 'at' {0}",
+    }
+
+Returns an hash reference of a `calendar` localised datetime format information from the table [calendar\_datetime\_formats](#table-calendar_datetime_formats) for a given `locale` ID, `calendar` ID, `format_length`, and `format_type`.
+
+The meaning of the fields are as follows:
+
+- `cal_dt_fmt_id`
+
+    A unique incremental value automatically generated by SQLite.
+
+- `locale`
+
+    A `locale`, such as `en` or `ja-JP` as can be found in table [locales](#table-locales)
+
+- `calendar`
+
+    A `calendar` ID as can be found in the [table calendars](#table-calendars)
+
+    Known values are: `buddhist`, `chinese`, `coptic`, `dangi`, `ethiopic`, `ethiopic-amete-alem`, `generic`, `gregorian`, `hebrew`, `indian`, `islamic`, `islamic-civil`, `islamic-rgsa`, `islamic-tbla`, `islamic-umalqura`, `japanese`, `persian`, `roc`
+
+- `format_length`
+
+    A string representing a format length.
+
+    Known values are: `full`, `long`, `medium`, `short`
+
+- `format_type`
+
+    A string representing a format type.
+
+    Known values are: `atTime`, `standard`
+
+- `format_pattern`
+
+    A string representing a localised datetime format pattern according to the format type and `locale`
+
+## calendar\_datetime\_formats
+
+    my $array_ref = $cldr->calendar_datetime_formats;
+    # Filter based on the 'locale' field value
+    my $array_ref = $cldr->calendar_datetime_formats( locale => 'en' );
+    # Filter based on the 'calendar' field value
+    my $array_ref = $cldr->calendar_datetime_formats( calendar => 'gregorian' );
+    # or a combination of those two:
+    my $array_ref = $cldr->calendar_datetime_formats(
+        locale => 'en',
+        calendar => 'gregorian',
+    );
+
+Returns all calendar datetime formats information from [table calendar\_datetime\_formats](#table-calendar_datetime_formats) as an array reference of hash reference.
+
+A combination of the following fields may be provided to filter the information returned:
+
+- `calendar`
+
+    A `calendar` ID as can be found in table [calendars](#table-calendars), such as: `buddhist`, `chinese`, `coptic`, `dangi`, `ethioaa`, `ethiopic`, `gregory`, `hebrew`, `indian`, `islamic`, `islamic-civil`, `islamic-rgsa`, `islamic-tbla`, `islamic-umalqura`, `islamicc`, `iso8601`, `japanese`, `persian`, `roc`
+
+- `locale`
+
+    A `locale`, such as `en` or `ja-JP` as can be found in table [locales](#table-locales)
+
+See also the method [l10n](#l10n)
+
+## calendar\_era\_l10n
+
+    my $ref = $cldr->calendar_era_l10n(
+        locale => 'ja',
+        calendar => 'gregorian',
+        era_width => 'abbreviated',
+        alt => undef,
+        era_id => 0,
+    );
+    # Returns an hash reference like this:
+    {
+        cal_era_l10n_id => 2844,
+        locale          => 'ja',
+        calendar        => 'gregorian',
+        era_width       => 'abbreviated',
+        era_id          => 0,
+        alt             => undef,
+        locale_name     => '紀元前',
+    }
+
+Returns an hash reference of a calendar era information from the table [calendar\_eras\_l10n](#table-calendar_eras_l10n) for a given `calendar` value, a `locale`, a `era_width`, and a `era_id`. If no `alt` value is provided, it will default to `undef`
+
+The meaning of the fields are as follows:
+
+- `cal_era_l10n_id`
+
+    A unique incremental value automatically generated by SQLite.
+
+- `locale`
+
+    A `locale`, such as `en` or `ja-JP` as can be found in table [locales](#table-locales)
+
+- `calendar`
+
+    A `calendar` ID as can be found in the [table calendars](#table-calendars)
+
+    Known values used are: `buddhist`, `coptic`, `ethiopic`, `ethiopic-amete-alem`, `generic`, `gregorian`, `hebrew`, `indian`, `islamic`, `japanese`, `persian`, `roc`
+
+- `era_width`
+
+    An era width.
+
+    Known values are: `abbreviated`, `narrow`, `wide`
+
+- `era_id`
+
+    A string representing an era ID. This is actually always an integer with minimum value of `0` and maximum value of `99`
+
+- `alt`
+
+    A string to provide an alternative value for an era with the same ID.
+
+- `locale_name`
+
+    A string providing with a localised name for this era for the current `locale`
+
+## calendar\_eras\_l10n
+
+    my $array_ref = $cldr->calendar_eras_l10n;
+    # Filter based on the 'locale' field value
+    my $array_ref = $cldr->calendar_eras_l10n( locale => 'en' );
+    # Filter based on the 'calendar' field value
+    my $array_ref = $cldr->calendar_eras_l10n( calendar => 'gregorian' );
+    # or a combination of multiple fields:
+    my $array_ref = $cldr->calendar_eras_l10n(
+        locale => 'en',
+        calendar => 'gregorian',
+        era_width => 'abbreviated',
+        alt => undef
+    );
+
+Returns all calendar localised eras information from [table calendar\_eras\_l10n](#table-calendar_eras_l10n) as an array reference of hash reference.
+
+A combination of the following fields may be provided to filter the information returned:
+
+- `alt`
+
+    The alternative value, if any, which may be `variant` or `undef`, i.e., no value.
+
+- `calendar`
+
+    A `calendar` ID as can be found in table [calendars](#table-calendars), such as: `buddhist`, `chinese`, `coptic`, `dangi`, `ethioaa`, `ethiopic`, `gregory`, `hebrew`, `indian`, `islamic`, `islamic-civil`, `islamic-rgsa`, `islamic-tbla`, `islamic-umalqura`, `islamicc`, `iso8601`, `japanese`, `persian`, `roc`
+
+- `era_width`
+
+    Possible values are: `abbreviated`, `narrow`, `wide`
+
+- `locale`
+
+    A `locale`, such as `en` or `ja-JP` as can be found in table [locales](#table-locales)
+
+See also the method [l10n](#l10n)
+
+## calendar\_format\_l10n
+
+    my $ref = $cldr->calendar_format_l10n(
+        locale => 'ja',
+        calendar => 'gregorian',
+        # date, time
+        format_type => 'date',
+        # full, long, medium, short
+        format_length => 'full',
+    );
+    # Returns an hash reference like this:
+    {
+        cal_fmt_l10n_id => 906,
+        locale          => 'ja',
+        calendar        => 'gregorian',
+        format_type     => 'date',
+        format_length   => 'full',
+        alt             => undef,
+        format_id       => 'yMEEEEd',
+        format_pattern  => 'y年M月d日EEEE',
+    }
+
+Returns an hash reference of a calendar format information from the table [calendar\_formats\_l10n](#table-calendar_formats_l10n) for a given `calendar` value, a `locale`, a `format_type`, and a `format_length`.
+
+The meaning of the fields are as follows:
+
+- `cal_fmt_l10n_id`
+
+    A unique incremental value automatically generated by SQLite.
+
+- `locale`
+
+    A `locale`, such as `en` or `ja-JP` as can be found in table [locales](#table-locales)
+
+- `calendar`
+
+    A `calendar` ID as can be found in the [table calendars](#table-calendars)
+
+    Known values are: `buddhist`, `chinese`, `coptic`, `dangi`, `ethiopic`, `ethiopic-amete-alem`, `generic`, `gregorian`, `hebrew`, `indian`, `islamic`, `islamic-civil`, `islamic-rgsa`, `islamic-tbla`, `islamic-umalqura`, `japanese`, `persian`, `roc`
+
+- `format_type`
+
+    A string representing a format type.
+
+    Possible values are: `date` or `time`
+
+- `format_length`
+
+    A string representing a format length.
+
+    Known values are: `full`, `long`, `medium`, `short`
+
+- `alt`
+
+    A string to provide an alternative value for a format with the same ID.
+
+- `format_id`
+
+    A string representing a format ID.
+
+- `format_pattern`
+
+    A string representing a localised pattern.
+
+## calendar\_formats\_l10n
+
+    my $array_ref = $cldr->calendar_formats_l10n;
+    # Filter based on the 'locale' field value
+    my $array_ref = $cldr->calendar_formats_l10n( locale => 'en' );
+    # Filter based on the 'calendar' field value
+    my $array_ref = $cldr->calendar_formats_l10n( calendar => 'gregorian' );
+    # or a combination of multiple fields:
+    my $array_ref = $cldr->calendar_formats_l10n(
+        locale => 'en',
+        calendar => 'gregorian',
+        format_type => 'date',
+        format_length => 'full',
+    );
+
+Returns all calendar localised date and time formats information from [table calendar\_formats\_l10n](#table-calendar_formats_l10n) as an array reference of hash reference.
+
+A combination of the following fields may be provided to filter the information returned:
+
+- `calendar`
+
+    A `calendar` ID as can be found in table [calendars](#table-calendars), such as: `buddhist`, `chinese`, `coptic`, `dangi`, `ethioaa`, `ethiopic`, `gregory`, `hebrew`, `indian`, `islamic`, `islamic-civil`, `islamic-rgsa`, `islamic-tbla`, `islamic-umalqura`, `islamicc`, `iso8601`, `japanese`, `persian`, `roc`
+
+- `format_length`
+
+    Possible values are: `full`, `long`, `medium`, `short`
+
+- `format_type`
+
+    The format type, which may be `date` or `time`
+
+- `locale`
+
+    A `locale`, such as `en` or `ja-JP` as can be found in table [locales](#table-locales)
+
+See also the method [l10n](#l10n)
+
+## calendar\_interval\_format
+
+    my $ref = $cldr->calendar_interval_format(
+        locale              => 'en',
+        calendar            => 'gregorian',
+        greatest_diff_id    => 'd',
+        format_id           => 'GyMMMEd',
+        alt                 => undef,
+    );
+    # Returns an hash reference like this:
+    {
+        cal_int_fmt_id      => 3846,
+        locale              => 'en',
+        calendar            => 'gregorian',
+        format_id           => 'GyMMMEd',
+        greatest_diff_id    => 'd',
+        format_pattern      => 'E, MMM d – E, MMM d, y G',
+        alt                 => undef,
+        part1               => 'E, MMM d',
+        separator           => ' – ',
+        part2               => 'E, MMM d, y G',
+        repeating_field     => 'E, MMM d',
+    }
+
+Returns an hash reference of a `calendar` localised interval information from the table [calendar\_interval\_formats](#table-calendar_interval_formats) for a given `calendar` ID and a `locale` ID. If no `alt` value is provided, it will default to `undef`
+
+Pay particular attention to the fields `part1`, `separator` and `part2` that are designed to greatly make it easy for you to format and use the interval format pattern.
+
+Without those special fields, it would not be possible to properly format an interval.
+
+The meaning of the fields are as follows:
+
+- `cal_int_fmt_id`
+
+    A unique incremental value automatically generated by SQLite.
+
+- `locale`
+
+    A `locale`, such as `en` or `ja-JP` as can be found in table [locales](#table-locales)
+
+- `calendar`
+
+    A `calendar` ID as can be found in the [table calendars](#table-calendars)
+
+    Known values are: `buddhist`, `chinese`, `coptic`, `dangi`, `ethiopic`, `ethiopic-amete-alem`, `generic`, `gregorian`, `hebrew`, `indian`, `islamic`, `islamic-civil`, `islamic-rgsa`, `islamic-tbla`, `islamic-umalqura`, `japanese`, `persian`, `roc`
+
+- `format_id`
+
+    A string representing a format ID.
+
+- `greatest_diff_id`
+
+    A string representing an ID, itself representing the [interval greatest difference](https://unicode.org/reports/tr35/tr35-dates.html#intervalFormats)
+
+- `format_pattern`
+
+    A string representing a localised pattern.
+
+- `alt`
+
+    A string representing an alternative value.
+
+- `part1`
+
+    This is the first part of the interval format.
+
+- `separator`
+
+    This is the string representing the separator between the first and second part.
+
+- `part2`
+
+    This is the second part of the interval format.
+
+- `repeating_field`
+
+    This is the repeating field that was computed when building this database.
+
+    This, along with the `part1`, `separator` and `part2` are designed to make it easier for you to format the interval.
+
+See [LDML specifications](https://unicode.org/reports/tr35/tr35-dates.html#intervalFormats) for more information.
+
+## calendar\_interval\_formats
+
+    my $array_ref = $cldr->calendar_interval_formats;
+    # Filter based on the 'locale' field value
+    my $array_ref = $cldr->calendar_interval_formats( locale => 'en' );
+    # Filter based on the 'calendar' field value
+    my $array_ref = $cldr->calendar_interval_formats( calendar => 'gregorian' );
+    # or a combination of those two:
+    my $array_ref = $cldr->calendar_interval_formats(
+        locale      => 'en',
+        calendar    => 'gregorian',
+    );
+
+Returns all calendar interval formats information from [table calendar\_interval\_formats](#table-calendar_interval_formats) as an array reference of hash reference.
+
+A combination of the following fields may be provided to filter the information returned:
+
+- `calendar`
+
+    A `calendar` ID as can be found in table [calendars](#table-calendars), such as: `buddhist`, `chinese`, `coptic`, `dangi`, `ethioaa`, `ethiopic`, `gregory`, `hebrew`, `indian`, `islamic`, `islamic-civil`, `islamic-rgsa`, `islamic-tbla`, `islamic-umalqura`, `islamicc`, `iso8601`, `japanese`, `persian`, `roc`
+
+- `locale`
+
+    A `locale`, such as `en` or `ja-JP` as can be found in table [locales](#table-locales)
+
+- `greatest_diff_id`
+
+    A string representing an ID, itself representing the [interval greatest difference](https://unicode.org/reports/tr35/tr35-dates.html#intervalFormats)
+
+See also the method [l10n](#l10n)
+
+## calendar\_l10n
+
+    my $ref = $cldr->calendar_l10n(
+        locale => 'en',
+        caendar => 'japanese',
+    );
+    # Returns an hash reference like:
+    {
+        calendar_l10n_id => 506,
+        locale => 'en',
+        calendar => 'japanese',
+        locale_name => 'Japanese Calendar',
+    }
+
+Returns an hash reference of a calendar localised information from the table [calendars\_l10n](#table-calendars_l10n) for a given `locale` ID, and `calendar` ID.
+
+The meaning of the fields are as follows:
+
+- `calendar_l10n_id`
+
+    A unique incremental value automatically generated by SQLite.
+
+- `locale`
+
+    A `locale`, such as `en` or `ja-JP` as can be found in table [locales](#table-locales)
+
+- `calendar`
+
+    A `calendar` ID as can be found in the [table calendars](#table-calendars)
+
+    Known values are: `buddhist`, `chinese`, `coptic`, `dangi`, `ethiopic`, `ethiopic-amete-alem`, `generic`, `gregorian`, `hebrew`, `indian`, `islamic`, `islamic-civil`, `islamic-rgsa`, `islamic-tbla`, `islamic-umalqura`, `japanese`, `persian`, `roc`
+
+- `locale_name`
+
+    A string representing the localised name of the calendar.
+
+## calendars\_l10n
+
+    my $all = $cldr->calendars_l10n;
+    my $all = $cldr->calendars_l10n(
+        locale => 'en',
+    );
+
+Returns all calendar localised information from [table calendars\_l10n](#table-calendars_l10n) as an array reference of hash reference.
+
+A combination of the following fields may be provided to filter the information returned:
+
+- `locale`
+
+    A `locale`, such as `en` or `ja-JP` as can be found in table [locales](#table-locales)
+
+## calendar\_term
+
+    my $ref = $cldr->calendar_term(
+        locale          => 'und',
+        calendar        => 'gregorian',
+        # format, stand-alone
+        term_context    => 'format',
+        # abbreviated, narrow, wide
+        term_width      => 'abbreviated',
+        term_name       => 'am',
+    );
+    # Returns an hash reference like:
+    {
+        cal_term_id     => 23478,
+        locale          => 'und',
+        calendar        => 'gregorian',
+        term_type       => 'day_period',
+        term_context    => 'format',
+        term_width      => 'abbreviated',
+        alt             => undef,
+        yeartype        => undef,
+        term_name       => 'am',
+        term_value      => 'AM',
+    }
+
+Returns an hash reference of a calendar term information from the table [calendar\_terms](#table-calendar_terms) for a given `locale`, `calendar`, `term_context`, `term_width`, `term_name` value, `alt` and `yeartype` value. If no `alt` or `yeartype` value is provided, it will default to `undef`
+
+You can also query for multiple value at the same time, and this will return an array reference of hash reference instead:
+
+    my $all = $cldr->calendar_term(
+        locale          => 'und',
+        calendar        => 'gregorian',
+        # format, stand-alone
+        term_context    => 'format',
+        # abbreviated, narrow, wide
+        term_width      => 'abbreviated',
+        term_name       => [qw( am pm )],
+    );
+    # Returns an array reference like:
+    [
+        {
+            cal_term_id     => 23478,
+            locale          => 'und',
+            calendar        => 'gregorian',
+            term_type       => 'day_period',
+            term_context    => 'format',
+            term_width      => 'abbreviated',
+            alt             => undef,
+            yeartype        => undef,
+            term_name       => 'am',
+            term_value      => 'AM',
+        },
+        {
+            cal_term_id     => 23479,
+            locale          => 'und',
+            calendar        => 'gregorian',
+            term_type       => 'day_period',
+            term_context    => 'format',
+            term_width      => 'abbreviated',
+            alt             => undef,
+            yeartype        => undef,
+            term_name       => 'pm',
+            term_value      => 'PM',
+        },
+    ]
+
+See the section on ["Advanced Search"](#advanced-search) for more information.
+
+The meaning of the fields are as follows:
+
+- `cal_term_id`
+
+    A unique incremental value automatically generated by SQLite.
+
+- `locale`
+
+    A `locale`, such as `en` or `ja-JP` as can be found in table [locales](#table-locales)
+
+- `calendar`
+
+    A `calendar` ID as can be found in the [table calendars](#table-calendars)
+
+    Known values are: `buddhist`, `chinese`, `coptic`, `dangi`, `ethiopic`, `ethiopic-amete-alem`, `generic`, `gregorian`, `hebrew`, `indian`, `islamic`, `islamic-civil`, `islamic-rgsa`, `islamic-tbla`, `islamic-umalqura`, `japanese`, `persian`, `roc`
+
+- `term_type`
+
+    A string representing a term type.
+
+    Known values are: `day`, `day_period`, `month`, `quarter`
+
+- `term_context`
+
+    A string representing a term context.
+
+    Known values are: `format`, `stand-alone`
+
+- `term_width`
+
+    A string representing a term width.
+
+    Known values are: `abbreviated`, `narrow`, `short`, `wide`
+
+- `alt`
+
+    A string to provide an alternate representation of a term.
+
+- `yeartype`
+
+    A string to provide an alternate representation of a term when this is a leap year.
+
+    The usual value for this is `leap`
+
+- `term_name`
+
+    A string representing a term name.
+
+    Known values are: `1`, `2`, `3`, `4`, `5`, `6`, `7`, `8`, `9`, `10`, `11`, `12`, `13`, `afternoon1`, `afternoon2`, `evening1`, `evening2`, `midnight`, `morning1`, `morning2`, `night1`, `night2`, `noon`, `am`, `pm`, `mon`, `tue`, `wed`, `thu`, `fri`, `sat`, `sun`
+
+- `term_value`
+
+    A string representing the term value.
+
+See also the [Unicode LDMD specifications](https://unicode.org/reports/tr35/tr35-dates.html#months_days_quarters_eras)
+
+## calendar\_terms
+
+    my $array_ref = $cldr->calendar_terms;
+    my $array_ref = $cldr->calendar_terms(
+        locale => 'und',
+        calendar => 'japanese'
+    );
+    my $array_ref = $cldr->calendar_terms(
+        locale          => 'und',
+        calendar        => 'gregorian',
+        term_type       => 'day',
+        term_context    => 'format',
+        term_width      => 'abbreviated',
+    );
+
+Returns all calendar terms information from [table calendar\_terms](#table-calendar_terms) as an array reference of hash reference.
+
+A combination of the following fields may be provided to filter the information returned:
+
+- `calendar`
+
+    A `calendar` ID as can be found in table [calendars](#table-calendars), such as: `buddhist`, `chinese`, `coptic`, `dangi`, `ethioaa`, `ethiopic`, `gregory`, `hebrew`, `indian`, `islamic`, `islamic-civil`, `islamic-rgsa`, `islamic-tbla`, `islamic-umalqura`, `islamicc`, `iso8601`, `japanese`, `persian`, `roc`
+
+- `locale`
+
+    A `locale`, such as `en` or `ja-JP` as can be found in table [locales](#table-locales)
+
+See also the [Unicode LDMD specifications](https://unicode.org/reports/tr35/tr35-dates.html#months_days_quarters_eras)
+
+## casing
+
+    my $ref = $cldr->casing( locale => 'fr', token => 'currencyName' );
+    # Returns an hash reference like:
+    {
+        casing_id   => 926,
+        locale      => 'fr',
+        token       => 'currencyName',
+        value       => 'lowercase',
+    }
+
+Returns an hash reference of a calendar information from the table [casings](#table-casings) for a given `token` value.
+
+The meaning of the fields are as follows:
+
+- `casing_id`
+
+    A unique incremental value automatically generated by SQLite.
+
+- `locale`
+
+    A `locale`, such as `en` or `ja-JP` as can be found in table [locales](#table-locales)
+
+- `token`
+
+    Known values are: `calendar_field`, `currencyName`, `currencyName_count`, `day_format_except_narrow`, `day_narrow`, `day_standalone_except_narrow`, `era_abbr`, `era_name`, `era_narrow`, `key`, `keyValue`, `language`, `metazone_long`, `month_format_except_narrow`, `month_narrow`, `month_standalone_except_narrow`, `quarter_abbreviated`, `quarter_format_wide`, `quarter_narrow`, `quarter_standalone_wide`, `relative`, `script`, `symbol`, `territory`, `unit_pattern`, `variant`, `zone_exemplarCity`, `zone_long`, `zone_short`
+
+- `value`
+
+    A casing value.
+
+## casings
+
+    my $all = $cldr->casings;
+    my $all = $cldr->casings( locale => 'fr' );
+
+Returns all casing information from [table casings](#table-casings) as an array reference of hash reference.
+
+A combination of the following fields may be provided to filter the information returned:
+
+- `locale`
+
+    A `locale`, such as `en` or `ja-JP` as can be found in table [locales](#table-locales)
+
+## cldr\_built
+
+    my $datetime = $cldr->cldr_built; # 2024-07-01T05:57:29
+
+Return the ISO8601 datetime in GMT of when this data were built.
+
+Note, this is just a string, not a [DateTime](https://metacpan.org/pod/DateTime) object. If you want a [DateTime](https://metacpan.org/pod/DateTime) object, maybe do something like:
+
+    use DateTime::Format::Strptime;
+    my $fmt = DateTime::Format::Strptime->new( pattern => '%FT%T' );
+    my $dt = $fmt->parse_datetime( $cldr->cldr_built );
+
+## cldr\_maintainer
+
+    my $str = $cldr->cldr_maintainer; # Jacques Deguest
+
+Returns a string representing the name of the person who created this SQLite database of `CLDR` data.
+
+## cldr\_version
+
+    my $version = $cldr->cldr_version; # 45.0
+
+Return the Unicode CLDR version number of the data.
+
+Note, this is just a string. You may want to turn it into an object for comparison, such as:
+
+    use version;
+    my $vers = version->parse( $cldr->cldr_version );
+
+Or, maybe:
+
+    use Changes::Version;
+    my $vers = Changes::Version->new( $cldr->cldr_version );
+
+    say $vers > $other_version;
+
+## code\_mapping
+
+    my $ref = $cldr->code_mapping( code => 'US' );
+    # Returns an hash reference like:
+    {
+        code_mapping_id => 263,
+        code            => 'US',
+        alpha3          => 'USA',
+        numeric         => 840,
+        fips10          => undef,
+        type            => 'territory',
+    }
+
+Returns an hash reference of a code mapping information from the table [code\_mappings](#table-code_mappings) for a given `code` value.
+
+The meaning of the fields are as follows:
+
+- `code_mapping_id`
+
+    A unique incremental value automatically generated by SQLite.
+
+- `code`
+
+    A `code` for which there is a mapping with other American standards
+
+- `alpha3`
+
+    A 3-characters code
+
+- `numeric`
+
+    A numeric code
+
+- `fips10`
+
+    An American standard
+
+- `type`
+
+    The mapping &lt;type>
+
+## code\_mappings
+
+    my $all = $cldr->code_mappings;
+    my $all = $cldr->code_mappings( type => 'territory' );
+    my $all = $cldr->code_mappings( type => 'currency' );
+    my $all = $cldr->code_mappings( alpha3 => 'USA' );
+    my $all = $cldr->code_mappings( numeric => 840 ); # U.S.A.
+    my $all = $cldr->code_mappings( fips => 'JP' ); # Japan
+    my $all = $cldr->code_mappings( fips => undef, type => 'currency' );
+
+Returns all code mapping information from [table code\_mappings](#table-code_mappings) as an array reference of hash reference.
+
+A combination of the following fields may be provided to filter the information returned:
+
+- `alpha3`
+
+    A 3-characters code.
+
+- `fips`
+
+    A `fips` (U.S. [Federal Information Processing Standard](https://en.wikipedia.org/wiki/Federal_Information_Processing_Standards)) code
+
+- `numeric`
+
+    An integer code.
+
+- `type`
+
+    A `type`, such as `territory` or `currency`
+
+## collation
+
+    my $ref = $cldr->collation(
+        collation => 'ducet',
+    );
+    # Returns an hash reference like this:
+    {
+        collation => 'ducet',
+        description => 'Dictionary style ordering (such as in Sinhala)',
+    }
+
+Returns an hash reference of a `collation` information from the table [collations](#table-collations) for a given `collation` ID.
+
+The meaning of the fields are as follows:
+
+- `collation`
+
+    A string representing a `collation` ID.
+
+    Known values are: `big5han`, `compat`, `dict`, `direct`, `ducet`, `emoji`, `eor`, `gb2312`, `phonebk`, `phonetic`, `pinyin`, `reformed`, `search`, `searchjl`, `standard`, `stroke`, `trad`, `unihan`, `zhuyin`
+
+- `description`
+
+    A short text describing the collation.
+
+## collations
+
+    my $all = $cldr->collations;
+    my $all = $cldr->collations( collation => 'ducet' );
+    my $all = $cldr->collations( description => qr/Chinese/ );
+
+Returns all collations information from [table collations](#table-collations) as an array reference of hash reference.
+
+A combination of the following fields may be provided to filter the information returned:
+
+- `collation`
+
+    A `collation` ID
+
+- `description`
+
+    A short text describing the collation.
+
+    See the section on ["Advanced Search"](#advanced-search)
+
+## collation\_l10n
+
+    my $ref = $cldr->collation_l10n(
+        collation => 'ducet',
+        locale => 'en',
+    );
+    # Returns an hash reference like this:
+    {
+        collation_l10n_id   => 323,
+        locale              => 'en',
+        collation           => 'ducet',
+        locale_name         => 'Default Unicode Sort Order',
+    }
+
+Returns an hash reference of a `collation` localised information from the table [collations\_l10n](#table-collations_l10n) for a given `collation` ID and a `locale` ID.
+
+The meaning of the fields are as follows:
+
+- `collation_l10n_id`
+
+    A unique incremental value automatically generated by SQLite.
+
+- `locale`
+
+    A `locale`, such as `en` or `ja-JP` as can be found in table [locales](#table-locales)
+
+- `collation`
+
+    A `collation` ID as can be found in table [collations](#table-collations)
+
+- `locale_name`
+
+    A short text representing the localised `collation` name.
+
+## collations\_l10n
+
+    my $all = $cldr->collations_l10n;
+    my $all = $cldr->collations_l10n( locale => 'en' );
+    my $all = $cldr->collations_l10n(
+        locale => 'en',
+        collation => 'ducet',
+    );
+
+Returns all collations information from [table collations\_l10n](#table-collations_l10n) as an array reference of hash reference.
+
+A combination of the following fields may be provided to filter the information returned:
+
+- `locale`
+
+    A `locale`, such as `en` or `ja-JP` as can be found in table [locales](#table-locales)
+
+- `collation`
+
+    A `collation` ID as can be found in table [collations](#table-collations)
+
+## currency
+
+    my $ref = $cldr->currency( currency => 'JPY' ); # Japanese Yen
+    # Returns an hash reference like:
+    {
+        currency_id     => 133,
+        currency        => 'JPY',
+        digits          => 0,
+        rounding        => 0,
+        cash_digits     => undef,
+        cash_rounding   => undef,
+        is_obsolete     => 0,
+        status          => 'regular',
+    }
+
+Returns an hash reference of a code mapping information from the table [currencies](#table-currencies) for a given `currency` code.
+
+The meaning of the fields are as follows:
+
+- `currency_id`
+
+    A unique incremental value automatically generated by SQLite.
+
+- `currency`
+
+    A `currency` code
+
+- `digits`
+
+    Number of fractional digits.
+
+- `rounding`
+
+    Number of digits used for rounding.
+
+- `cash_digits`
+
+    Number of fractional digits for money representation.
+
+- `cash_rounding`
+
+    Number of digits used for rounding for money representation.
+
+- `is_obsolete`
+
+    A boolean defining whether the currency is obsolete.
+
+- `status`
+
+    A string representing the status for this currency.
+
+    Known values are: `deprecated`, `regular`, `unknown`
+
+## currencies
+
+    my $all = $cldr->currencies;
+    my $all = $cldr->currencies( is_obsolete => 1 );
+
+Returns all currencies information from [table currencies](#table-currencies) as an array reference of hash reference.
+
+A combination of the following fields may be provided to filter the information returned:
+
+- `is_obsolete`
+
+    A boolean value. Use 1 for `true` and 0 for `false`
+
+- `status`
+
+    Valid `status` values are, as per the CLDR:
+
+    - `regular`
+
+        This is the default and means the currency is valid.
+
+    - `deprecated`
+
+        The currency is deprecated.
+
+    - `unknown`
+
+        The status is unknown.
+
+## currency\_info
+
+    my $ref = $cldr->currency_info(
+        currency    => 'EUR',
+        territory'  => 'FR',
+    );
+    # Returns an hash reference like this:
+    {
+        currency_info_id    => 165,
+        territory           => 'FR',
+        currency            => 'EUR',
+        start               => '1999-01-01',
+        until               => undef,
+        is_tender           => 0,
+        hist_sequence       => undef,
+        is_obsolete         => 0,
+    }
+
+Returns an hash reference of a `currency` information from the table [currencies\_info](#table-currencies_infos) for a given \]`locale` ID.
+
+The meaning of the fields are as follows:
+
+- `currency_info_id`
+
+    A unique incremental value automatically generated by SQLite.
+
+- `territory`
+
+    A 2-to-3 characters string representing the territory code, which may be either 2-characters uppercase alphabet, or 3-digits code representing a world region.
+
+- `currency`
+
+    A 3-characters currency code.
+
+- `start`
+
+    The date at which this currency started to be in use for this `territory`.
+
+- `until`
+
+    The date at which this currency stopped being in use for this `territory`.
+
+- `is_tender`
+
+    Whether this currency was a legal tender, i.e. whether it bore the force of law to settle a public or private debt or meet a financial obligation.
+
+- `hist_sequence`
+
+    Integer representing the historical order. `CLDR` uses the attributes `tz` and then `to-tz` to link to following historical record when the old `to` date overlaps the new `from` date. Example: territory `SX`
+
+- `is_obsolete`
+
+    A boolean value expressing whether this currency is obsolete or not.
+
+See the [LDML specifications](https://www.unicode.org/reports/tr35/tr35-61/tr35-numbers.html#Supplemental_Currency_Data) for more information.
+
+## currencies\_info
+
+    my $all = $cldr->currencies_info;
+    my $all = $cldr->currencies_info( territory => 'FR' );
+    my $all = $cldr->currencies_info( currency => 'EUR' );
+
+Returns all currencies information from [table currencies\_info](#table-currencies_info) as an array reference of hash reference.
+
+A combination of the following fields may be provided to filter the information returned:
+
+- `territory`
+
+    A 2-characters code representing a `territory` as can be found in [table territories](#table-territories)
+
+- `currency`
+
+    A 3-characters code representing a `currency` as can be found in [table currencies](#table-currencies)
+
+## currency\_l10n
+
+    my $ref = $cldr->currency_l10n(
+        locale      => 'en',
+        count       => undef,
+        currency    => 'JPY',
+    );
+    # Returns an hash reference like this:
+    {
+        curr_l10n_id    => 20924,
+        locale          => 'en',
+        currency        => 'JPY',
+        count           => undef,
+        locale_name     => 'Japanese Yen',
+        symbol          => '¥',
+    }
+
+Returns an hash reference of a `currency` localised information from the table [currencies\_l10n](#table-currencies_l10n) for a given `currency` ID, `locale` ID and `count` value. If no `count` value is provided, it will default to `undef`
+
+The meaning of the fields are as follows:
+
+- `curr_l10n_id`
+
+    A unique incremental value automatically generated by SQLite.
+
+- `locale`
+
+    A `locale`, such as `en` or `ja-JP` as can be found in table [locales](#table-locales)
+
+- `currency`
+
+    A `currency` ID as can be found in the [table currencies](#table-currencies)
+
+    Note that the values used by the `CLDR` als includes currencies that are deprecated in ISO 4217 standard.
+
+- `count`
+
+    A string that specifies a distinctive value.
+
+    Known values are: `undef`, `few`, `many`, `one`, `other`, `two`, `zero`
+
+    For example, with the `EUR` `currency` in `locale` `en`, here are the possible `count` values and its associated localised string representation.
+
+    - `undef`
+
+        Euro
+
+    - `one`
+
+        euro
+
+    - `other`
+
+        euros
+
+    And here with the `JPY` `currency` and `locale` `pl`:
+
+    - `undef`
+
+        jen japoński
+
+    - `few`
+
+        jeny japońskie
+
+    - `many`
+
+        jenów japońskich
+
+    - `one`
+
+        jen japoński
+
+    - `other`
+
+        jena japońskiego
+
+    See the [LDML specifications about language plural rules](https://unicode.org/reports/tr35/tr35-numbers.html#Language_Plural_Rules) for more information.
+
+- `locale_name`
+
+    A string representing a localised currency name based on the value of `locale`.
+
+- `symbol`
+
+    An optional `currency` symbol.
+
+## currencies\_l10n
+
+    my $all = $cldr->currencies_l10n;
+    my $all = $cldr->currencies_l10n( locale => 'en' );
+    my $all = $cldr->currencies_l10n(
+        locale      => 'en',
+        currency    => 'JPY',
+    );
+
+Returns all currencies localised information from [table currencies\_l10n](#table-currencies_l10n) as an array reference of hash reference.
+
+A combination of the following fields may be provided to filter the information returned:
+
+- `locale`
+
+    A `locale`, such as `en` or `ja-JP` as can be found in table [locales](#table-locales)
+
+- `count`
+
+    A string representing a distinctive `count` for the `currency`
+
+    Known values are: `undef`, `few`, `many`, `one`, `other`, `two`, `zero`
+
+    See the [LDML specifications about language plural rules](https://unicode.org/reports/tr35/tr35-numbers.html#Language_Plural_Rules) for more information.
+
+- `currency`
+
+    A 3-characters `currency` ID as can be found in the table [currencies](#table-currencies)
+
+## database\_handler
+
+Returns the current database handler used by the `Locale::Unicode::Data` object instantiated.
+
+Please note that the database is opened in read-only. If you want to modify it, which I would advise against, you need to instantiate your own [DBI](https://metacpan.org/pod/DBI) connection. Something like this:
+
+    my $db_file = $cldr->datafile;
+    $dbh = DBI->connect( "dbi:SQLite:dbname=${db_file}", '', '' ) ||
+        die( "Unable to make connection to Unicode CLDR SQLite database file ${db_file}: ", $DBI::errstr );
+    # To enable foreign keys:
+    # See: <https://metacpan.org/release/ADAMK/DBD-SQLite-1.27/view/lib/DBD/SQLite.pm#Foreign-Keys>
+    $dbh->do("PRAGMA foreign_keys = ON");
+
+## datafile
+
+Sets or gets the file path to the SQLite database file. This defaults to the global variable `$DB_FILE`
+
+## date\_field\_l10n
+
+    my $ref = $cldr->date_field_l10n(
+        locale          => 'en',
+        field_type      => 'day',
+        field_length    => 'narrow',
+        relative        => -1,
+    );
+    # Returns an hash reference like this:
+    {
+        date_field_id   => 2087,
+        locale          => 'en',
+        field_type      => 'day',
+        field_length    => 'narrow',
+        relative        => -1,
+        locale_name     => 'yesterday',
+    }
+
+Returns an hash reference of a field localised information from the table [date\_fields\_l10n](#table-date_fields_l10n) for a given `locale` ID, `field_type`, `field_length` and `relative` value.
+
+The meaning of the fields are as follows:
+
+- `date_field_id`
+
+    A unique incremental value automatically generated by SQLite.
+
+- `locale`
+
+    A `locale`, such as `en` or `ja-JP` as can be found in table [locales](#table-locales)
+
+- `field_type`
+
+    A string representing a field type.
+
+    Known values are: `day`, `fri`, `hour`, `minute`, `mon`, `month`, `quarter`, `sat`, `second`, `sun`, `thu`, `tue`, `wed`, `week`, `year`
+
+- `field_length`
+
+    A string representing a field length.
+
+    Known values are: `narrow`, `short`, `standard`
+
+- `relative`
+
+    An integer representing the relative value of the field. For example, `0` being today, `-1` being a day period preceding the current one, and `1` being a day period following the current one.
+
+    Known values are: `-2`, `-1`, `0`, `1`, `2`, `3`
+
+- `locale_name`
+
+    A string containing the localised date field based on the `locale`
+
+See the [LDML specifications](https://unicode.org/reports/tr35/tr35-dates.html#Calendar_Fields) for more information.
+
+## date\_fields\_l10n
+
+    my $all = $cldr->date_fields_l10n;
+    my $all = $cldr->date_fields_l10n( locale => 'en' );
+    my $all = $cldr->date_fields_l10n(
+        locale          => 'en',
+        field_type      => 'day',
+        field_length    => 'narrow',
+    );
+
+Returns all date fields localised information from [table date\_fields\_l10n](#table-date_fields_l10n) as an array reference of hash reference.
+
+A combination of the following fields may be provided to filter the information returned:
+
+- `locale`
+
+    A `locale`, such as `en` or `ja-JP` as can be found in table [locales](#table-locales)
+
+- `field_type`
+
+    A string representing a field type.
+
+    Known values are: `day`, `fri`, `hour`, `minute`, `mon`, `month`, `quarter`, `sat`, `second`, `sun`, `thu`, `tue`, `wed`, `week`, `year`
+
+- `field_length`
+
+    A string representing a field length.
+
+    Known values are: `narrow`, `short`, `standard`
+
+## day\_period
+
+    my $ref = $cldr->day_period( locale => 'fr', day_period => 'noon' );
+    # Returns an hash reference like:
+    {
+        day_period_id   => 115,
+        locale          => 'fr',
+        day_period      => 'noon',
+        start           => '12:00',
+        until           => '12:00',
+    }
+
+Returns an hash reference of a day period information from the table [day\_periods](#table-day_periods) for a given `locale` code and `day_period` code.
+
+The meaning of the fields are as follows:
+
+- `day_period_id`
+
+    A unique incremental value automatically generated by SQLite.
+
+- `locale`
+
+    A `locale`, such as `en` or `ja-JP` as can be found in table [locales](#table-locales)
+
+- `day_period`
+
+    A string representing a day period.
+
+    Known values are: `afternoon1`, `afternoon2`, `am`, `evening1`, `evening2`, `midnight`, `morning1`, `morning2`, `night1`, `night2`, `noon`, `pm`
+
+- `start`
+
+    A time from which this day period starts.
+
+    Known values go from `00:00` until `23:00`
+
+- `until`
+
+    A time by which this day period stops.
+
+    Known values go from `00:00` until `24:00`
+
+## day\_periods
+
+    my $all = $cldr->day_periods;
+    my $all = $cldr->day_periods( locale => 'ja' );
+    # Known values for day_period: afternoon1, afternoon2, am, evening1, evening2,
+    # midnight, morning1, morning2, night1, night2, noon, pm
+    my $all = $cldr->day_periods( day_period => 'noon' );
+
+Returns all day periods information from [table day\_periods](#table-day_periods) as an array reference of hash reference.
+
+A combination of the following fields may be provided to filter the information returned:
+
+- `day_period`
+
+    A token representing a day period. Valid tokens are: `afternoon1`, `afternoon2`, `am`, `evening1`, `evening2`, `midnight`, `morning1`, `morning2`, `night1`, `night2`, `noon`, `pm`
+
+- `locale`
+
+    A `locale`, such as `en` or `ja-JP` as can be found in table [locales](#table-locales)
+
+## decode\_sql\_arrays
+
+    my $bool = $cldr->decode_sql_arrays;
+    $cldr->decode_sql_arrays(0); # off
+    $cldr->decode_sql_arrays(1); # on
+
+Sets or gets the boolean value used to specify whether you want this API to automatically decode SQL arrays into perl arrays using [JSON::XS](https://metacpan.org/pod/JSON%3A%3AXS)
+
+This is set to true by default, upon object instantiation.
+
+## error
+
+Used as a mutator, this sets and [exception object](https://metacpan.org/pod/Locale%3A%3AUnicode%3A%3AException) and returns an `Locale::Unicode::NullObject` in object context (such as when chaining), or `undef` in scalar context, or an empty list in list context.
+
+The `Locale::Unicode::NullObject` class prevents the perl error of `Can't call method "%s" on an undefined value` (see [perldiag](https://metacpan.org/pod/perldiag)). Upon the last method chained, `undef` is returned in scalar context or an empty list in list context.
+
+For example:
+
+    my $locale = Locale::Unicode->new( 'ja' );
+    $locale->translation( 'my-software' )->transform_locale( $bad_value )->tz( 'jptyo' ) ||
+        die( $locale->error );
+
+In this example, `jptyo` will never be set, because `transform_locale` triggered an exception that returned an `Locale::Unicode::NullObject` object catching all further method calls, but eventually we get the error and die.
+
+## interval\_formats
+
+    my $ref = $cldr->interval_formats(
+        locale => 'en',
+        calendar => 'gregorian',
+    );
+
+This would return something like:
+
+    {
+        Bh => [qw( B h )],
+        Bhm => [qw( B h m )],
+        d => ["d"],
+        default => ["default"],
+        Gy => [qw( G y )],
+        GyM => [qw( G M y )],
+        GyMd => [qw( d G M y )],
+        GyMEd => [qw( d G M y )],
+        GyMMM => [qw( G M y )],
+        GyMMMd => [qw( d G M y )],
+        GyMMMEd => [qw( d G M y )],
+        H => ["H"],
+        h => [qw( a h )],
+        hm => [qw( a h m )],
+        Hm => [qw( H m )],
+        hmv => [qw( a h m )],
+        Hmv => [qw( H m )],
+        Hv => ["H"],
+        hv => [qw( a h )],
+        M => ["M"],
+        Md => [qw( d M )],
+        MEd => [qw( d M )],
+        MMM => ["M"],
+        MMMd => [qw( d M )],
+        MMMEd => [qw( d M )],
+        y => ["y"],
+        yM => [qw( M y )],
+        yMd => [qw( d M y )],
+        yMEd => [qw( d M y )],
+        yMMM => [qw( M y )],
+        yMMMd => [qw( d M y )],
+        yMMMEd => [qw( d M y )],
+        yMMMM => [qw( M y )],
+    }
+
+This returns an hash reference of interval format ID with their associated [greatest difference token](https://unicode.org/reports/tr35/tr35-dates.html#intervalFormats) for the given `locale` ID and `calendar` ID.
+
+The `default` interval format pattern is something like `{0} – {1}`, but this changes depending on the `locale` and is not always available.
+
+`{0}` is the placeholder for the first datetime and `{1}` is the placeholder for the second one.
+
+## l10n
+
+Returns all localised information for certain type of data as an array reference of hash reference.
+
+The following core parameters must be provided:
+
+- `locale`
+
+    This is mandatory. This is a `locale`, such as `en` or `ja-JP` as can be found in table [locales](#table-locales)
+
+- `type`
+
+    A type of data. Valid types are: `annotation`, `calendar_append_format`, `calendar_available_format`, `calendar_cyclic`, `calendar_era`, `calendar_format`, `calendar_interval_formats`, `calendar_term`, `casing`, `currency`, `date_field`, `locale`, `number_format`, `number_symbol`, `script`, `subdivision`, `territory`, `unit`, `variant`
+
+Below are each type of data and their associated parameters:
+
+- `annotation`
+
+        my $ref = $cldr->l10n(
+            type => 'annotation',
+            locale => 'en',
+            annotation => '{',
+        );
+
+    Returns an hash reference of a annotation information from the table [annotations](#table-annotations) for a given `locale` code and `annotation` character.
+
+- `calendar_append_format`
+
+        my $ref = $cldr->l10n(
+            type => 'calendar_append_format',
+            locale => 'en',
+            calendar => 'gregorian',
+            format_id => 'Day',
+        );
+
+    Returns an hash reference of a calendar appended format information from the table [calendar\_append\_formats](#table-calendar_append_formats) for a given `locale`, and `calendar` code and a `format_id` ID.
+
+- `calendar_available_format`
+
+        my $ref = $cldr->l10n(
+            type => 'calendar_available_format',
+            locale => 'ja',
+            calendar => 'japanese',
+            format_id => 'GyMMMEEEEd',
+        );
+
+    Returns an hash reference of a calendar available format information from the table [calendar\_available\_formats](#table-calendar_available_formats) for a given `locale`, and `calendar` code and a `format_id` ID.
+
+- `calendar_cyclic`
+
+        my $ref = $cldr->l10n(
+            type => 'calendar_cyclic',
+            locale => 'ja',
+            calendar => 'chinese',
+            format_set => 'dayParts',
+            # 1..12
+            format_id => 1,
+        );
+
+    Returns an hash reference of a calendar available format information from the table [calendar\_cyclics\_l10n](#table-calendar_cyclics_l10n) for a given `locale`, and `calendar` code and a `format_set` token and a `format_id` ID.
+
+- `calendar_era`
+
+        my $ref = $cldr->l10n(
+            type => 'calendar_era',
+            locale => 'ja',
+            calendar => 'japanese',
+            # abbreviated, narrow
+            # 'narrow' contains less data than 'abbreviated'
+            era_width => 'abbreviated',
+            era_id => 236,
+        );
+
+    Returns an hash reference of a calendar available format information from the table [calendar\_eras\_l10n](#table-calendar_eras_l10n) for a given `locale`, and `calendar` code and a `era_width` width and a `era_id` ID.
+
+- `calendar_format`
+
+        my $ref = $cldr->l10n(
+            type => 'calendar_format',
+            locale => 'ja',
+            calendar => 'gregorian',
+            format_id => 'yMEEEEd',
+        );
+
+    Returns an hash reference of a calendar date or time format information from the table [calendar\_formats\_l10n](#table-calendar_formats_l10n) for a given `locale`, and `calendar` code and a `format_id` ID.
+
+- `calendar_interval_format`
+
+        my $ref = $cldr->l10n(
+            type => 'calendar_interval_format',
+            locale => 'ja',
+            calendar => 'gregorian',
+            format_id => 'yMMM',
+        );
+
+    Returns an hash reference of a calendar interval format information from the table [calendar\_interval\_formats](#table-calendar_interval_formats) for a given `locale`, and `calendar` code and a `format_id` ID.
+
+- `calendar_term`
+
+        my $ref = $cldr->l10n(
+            type => 'calendar_term',
+            locale => 'ja',
+            calendar => 'gregorian',
+            term_name => 'mon',
+        );
+
+    Returns an hash reference of a calendar term information from the table [calendar\_terms](#table-calendar_terms) for a given `locale`, and `calendar` code and a `term_name` token.
+
+    Known term names are: `mon`, `tue`, `wed`, `thu`, `fri`, `sat`, `sun`, `am`, `pm`, `1`, `2`, `3`, `4`, `5`, `6`, `7`, `8`, `9`, `10`, `11`, `12`, `13`, `midnight`, `morning1`, `morning2`, `noon`, `afternoon1`, `afternoon2`, `evening1`, `evening2`, `night1`, `night2`
+
+- `casing`
+
+        my $ref = $cldr->l10n(
+            type => 'casing',
+            locale => 'fr',
+            token => 'currencyName',
+        );
+
+    Returns an hash reference of a casing information from the table [casings](#table-casings) for a given `locale` code and a `token`.
+
+- `currency`
+
+        my $ref = $cldr->l10n(
+            type => 'currency',
+            locale => 'ja',
+            currency => 'EUR',
+        );
+
+    Returns an hash reference of a currency information from the table [currencies\_l10n](#table-currencies_l10n) for a given `locale` code and a `currency` code.
+
+- `date_field`
+
+        my $ref = $cldr->l10n(
+            type => 'date_field',
+            locale => 'ja',
+            # Other possible values:
+            # day, week, month, quarter, year, hour, minute, second,
+            # mon, tue, wed, thu, fri, sat, sun
+            field_type  => 'day',
+            # -1 for yesterday, 0 for today, 1 for tomorrow
+            relative => -1,
+        );
+
+    Returns an hash reference of a date field information from the table [date\_fields\_l10n](#table-date_fields_l10n) for a given `locale`, and a field type `field_type` and `relative` value.
+
+- `locale`
+
+        my $ref = $cldr->l10n(
+            type => 'locale',
+            locale => 'ja',
+            locale_id => 'fr',
+        );
+
+    Returns an hash reference of a locale information from the table [locales\_l10n](#table-locales_l10n) for a given `locale`, and a locale ID `locale_id`.
+
+- `number_format`
+
+        my $ref = $cldr->l10n(
+            type => 'number_format',
+            locale => 'ja',
+            number_type => 'currency',
+            format_id => '10000',
+        );
+
+    Returns an hash reference of a number format from the table [number\_formats\_l10n](#table-number_formats_l10n) for a given `locale`, a number type `number_type`, and a format ID `format_id`.
+
+    Known value for `number_type` are: `currency`, `decimal`, `misc`, `percent`, `scientific`
+
+- `number_symbol`
+
+        my $ref = $cldr->l10n(
+            type => 'number_symbol',
+            locale => 'en',
+            number_system => 'latn',
+            property => 'decimal',
+        );
+
+    Returns an hash reference of a number symbol information from the table [number\_symbols\_l10n](#table-number_symbols_l10n) for a given `locale`, a number system `number_system` as can be found in the [table number\_systems](#table-number_systems), and a `property` value.
+
+- `script`
+
+        my $ref = $cldr->l10n(
+            type => 'script',
+            locale => 'ja',
+            script => 'Kore',
+        );
+
+    Returns an hash reference of a script information from the table [scripts\_l10n](#table-scripts_l10n) for a given `locale`, a script value `script` as can be found in the [scripts table](#table-scripts).
+
+- `subdivision`
+
+        my $ref = $cldr->l10n(
+            type => 'subdivision',
+            locale => 'en',
+            subdivision => 'jp13', # Tokyo
+        );
+
+    Returns an hash reference of a subdivision information from the table [subdivisions\_l10n](#table-subdivisions_l10n) for a given `locale`, a subdivision value `subdivision` as can be found in the [subdivisions table](#table-subdivisions).
+
+- `territory`
+
+        my $ref = $cldr->l10n(
+            type => 'territory',
+            locale => 'en',
+            territory => 'JP', # Japan
+        );
+
+    Returns an hash reference of a territory information from the table [territories\_l10n](#table-territories_l10n) for a given `locale`, and a `territory` code as can be found in the [territories table](#table-territories).
+
+- `unit`
+
+        my $ref = $cldr->l10n(
+            type => 'unit',
+            locale => 'en',
+            unit_id => 'power3',
+        );
+
+    Returns an hash reference of a unit information from the table [units\_l10n](#table-units_l10n) for a given `locale`, and a `unit_id`.
+
+- `variant`
+
+        my $ref = $cldr->l10n(
+            type => 'variant',
+            locale => 'en',
+            variant => 'valencia',
+        );
+
+    Returns an hash reference of a variant information from the table [variants\_l10n](#table-variants_l10n) for a given `locale`, and a `variant` as can be found in the [table variants](#table-variants).
+
+## language
+
+    my $ref = $cldr->language( language => 'ryu' ); # Central Okinawan (Ryukyu)
+    # Returns an hash reference like this:
+    {
+        language_id => 6712,
+        language    => 'ryu',
+        scripts     => ["Kana"],
+        territories => ["JPY"],
+        parent      => undef,
+        alt         => undef,
+        status      => 'regular',
+    }
+
+Returns an hash reference of a `language` information from the table [languages](#table-languages) for a given `language` ID.
+
+The meaning of the fields are as follows:
+
+- `language_id`
+
+    A unique incremental value automatically generated by SQLite.
+
+- `language`
+
+    A `language` ID, which may be 2 to 3-characters long.
+
+- `scripts`
+
+    An array of `script` IDs as can be found in the [table scripts](#table-scripts), and that are associated with this `language`.
+
+- `territories`
+
+    An array of `territory` IDs as can be found in the [table territories](#table-territories), and that are associated with this `language`.
+
+- `format_pattern`
+
+    A string representing a localised pattern.
+
+## languages
+
+    my $all = $cldr->languages;
+    my $all = $cldr->languages( parent => 'gmw' );
+
+Returns all languages information from [table languages](#table-languages) as an array reference of hash reference.
+
+A combination of the following fields may be provided to filter the information returned:
+
+- `parent`
+
+    A parent `locale`, such as `en` or `ja-JP` as can be found in table [locales](#table-locales)
+
+    The `parent` value is set in 63% of the languages (over 8,700) in the table [languages](#table-languages)
+
+## language\_population
+
+    my $all = $cldr->language_population( territory => 'JP' );
+    # Returns an array reference of hash references like this:
+    [
+        {
+            language_pop_id     => 738,
+            territory           => 'JP',
+            locale              => 'ja',
+            population_percent  => 95,
+            literacy_percent    => undef,
+            writing_percent     => undef,
+            official_status     => 'official',
+        },
+        {
+            language_pop_id     => 739,
+            territory           => 'JP',
+            locale              => 'ryu',
+            population_percent  => 0.77,
+            literacy_percent    => undef,
+            writing_percent     => 5,
+            official_status     => undef,
+        },
+        {
+            language_pop_id     => 740,
+            territory           => 'JP',
+            locale              => 'ko',
+            population_percent  => 0.52,
+            literacy_percent    => undef,
+            writing_percent     => undef,
+            official_status     => undef,
+        }
+    ]
+
+Returns an array reference of hash references of a `language` population information from the table [language\_population](#table-language_population) for a given `territory` ID.
+
+The meaning of the fields are as follows:
+
+- `language_pop_id`
+
+    A unique incremental value automatically generated by SQLite.
+
+- `territory`
+
+    A `territory` code as can be found in the [table territories](#table-territories)
+
+- `locale`
+
+    A `locale`, such as `en` or `ja-JP` as can be found in table [locales](#table-locales)
+
+- `population_percent`
+
+    A percentage of the population as decimal.
+
+- `literacy_percent`
+
+    A percentage of the population as decimal.
+
+- `writing_percent`
+
+    A percentage of the population as decimal.
+
+- `official_status`
+
+    A string representing the official status for this usage of this `locale` in this `territory`
+
+    Known values are: `undef`, `official`, `official_regional`, `de_facto_officia`
+
+## language\_populations
+
+    my $all = $cldr->language_populations;
+    my $all = $cldr->language_populations( official_status => 'official' );
+
+Returns all language population information from [table language\_population](#table-language_population) as an array reference of hash reference.
+
+A combination of the following fields may be provided to filter the information returned:
+
+- `official_status`
+
+    A status string, such as `official`, `official_regional` or `de_facto_official`
+
+## likely\_subtag
+
+    my $ref = $cldr->likely_subtag( locale => 'ja' );
+    # Returns an hash reference like this:
+    {
+        likely_subtag_id    => 297,
+        locale              => 'ja',
+        target              => 'ja-Jpan-JP',
+    }
+
+Returns an hash reference for a likely `language` information from the table [likely\_subtags](#table-likely_subtags) for a given `locale` ID.
+
+The meaning of the fields are as follows:
+
+- `likely_subtag_id`
+
+    A unique incremental value automatically generated by SQLite.
+
+- `locale`
+
+    A `locale`, such as `en` or `ja-JP` as can be found in table [locales](#table-locales)
+
+- `target`
+
+    A string representing the `target` `locale`
+
+See the [LDML specifications](https://unicode.org/reports/tr35/tr35.html#Likely_Subtags) for more information.
+
+## likely\_subtags
+
+    my $all = $cldr->likely_subtags;
+
+Returns all likely subtag information from [table likely\_subtags](#table-likely_subtags) as an array reference of hash reference.
+
+No additional parameter is needed.
+
+## locale
+
+    my $ref = $cldr->locale( locale => 'ja' );
+    # Returns an hash reference like this:
+    {
+        locale_id   => 3985,
+        locale      => 'ja',
+        status      => 'regular',
+    }
+
+Returns an hash reference of `locale` information from the table [locales](#table-locales) for a given `locale` ID.
+
+The meaning of the fields are as follows:
+
+- `locale_id`
+
+    A unique incremental value automatically generated by SQLite.
+
+- `locale`
+
+    A `locale`, such as `en` or `ja-JP` as can be found in table [locales](#table-locales)
+
+- `status`
+
+    A string representing a status for this `locale`
+
+    Known values are: `undef`, `deprecated`, `private_use`, `regular`, `reserved`, `special`, `unknown`
+
+## locales
+
+    my $all = $cldr->locales;
+
+Returns all locale information from [table locales](#table-locales) as an array reference of hash reference.
+
+A combination of the following fields may be provided to filter the information returned:
+
+- `status`
+
+    A status string, such as `deprecated`, `private_use`, `regular`, `reserved`, `special`, `unknown` or `undef` if none is set.
+
+## locale\_l10n
+
+    my $ref = $cldr->locale_l10n(
+        locale      => 'en',
+        locale_id   => 'ja',
+        alt         => undef,
+    );
+    # Returns an hash reference like this:
+    {
+        locales_l10n_id => 16746,
+        locale          => 'en',
+        locale_id       => 'ja',
+        locale_name     => 'Japanese',
+        alt             => undef,
+    }
+
+Returns an hash reference of `locale` localised information from the table [locales\_l10n](#table-locales_l10n) for a given `locale` ID and a `locale_id` ID and an `alt` value. If no `alt` value is provided, it will default to `undef`.
+
+The `locale` value is the `language`, with possibly some additional subtags, in which the information is provided, and the `locale_id` the `locale` id whose name will be returned in the language specified by the `locale` argument.
+
+Valid locales that can be found in the [table locales\_l10n](#table-locales_l10n) are, for example: `asa`, `az-Arab` (using a `script`), `be-tarask` (using a `variant`), `ca-ES-valencia` (using a combination of `territory` and `variant`), `de-AT` (using a `territory`), `es-419` (using a `region` code)
+
+See [Locale::Unicode](https://metacpan.org/pod/Locale%3A%3AUnicode) for more information on locales.
+
+The meaning of the fields are as follows:
+
+- `locales_l10n_id`
+
+    A unique incremental value automatically generated by SQLite.
+
+- `locale`
+
+    A `locale`, such as `en` or `ja-JP` as can be found in table [locales](#table-locales)
+
+- `locale_id`
+
+    A `locale`, such as `en` or `ja-JP` as can be found in table [locales](#table-locales)
+
+- `locale_name`
+
+    A string representing the localised name of the `locale_id` according to the `locale` value.
+
+## locales\_l10n
+
+    my $all = $cldr->locales_l10n;
+    # Returns an array reference of all locale information in English
+    my $all = $cldr->locales_l10n( locale => 'en' );
+    # Returns an array reference of all the way to write 'Japanese' in various languages
+    # This would typically return an array reference of something like 267 hash reference
+    my $all = $cldr->locales_l10n( locale_id => 'ja' );
+    # This is basically the same as with the method locale_l10n()
+    my $all = $cldr->locales_l10n(
+        locale      => 'en',
+        locale_id   => 'ja',
+        alt         => undef,
+    );
+
+Returns all locale localised information from [table locales\_l10n](#table-locales_l10n) as an array reference of hash reference.
+
+A combination of the following fields may be provided to filter the information returned:
+
+- `alt`
+
+    This is used to differentiate when alternative values exist.
+
+    Known values for `alt` are `undef`, i.e. not set, or `long`, `menu`, `secondary`, `short`, `variant`
+
+- `locale`
+
+    A `locale` such as `en` or `ja-JP` as can be found in table [locales](#table-locales)
+
+    This is generally more a `language`, i.e. a 2 or 3-characters code than a `locale`
+
+- `locale_id`
+
+    A 2 to 3 characters `language` ID such as `en` as can be found in table [languages](#table-languages)
+
+## locales\_info
+
+    my $ref = $cldr->locales_info(
+        property => 'quotation_start',
+        locale => 'ja',
+    );
+    # Returns an hash reference like this:
+    {
+        locales_info_id => 361,
+        locale          => 'ja',
+        property        => 'quotation_start',
+        value           => '「',
+    }
+
+Returns an hash reference of `locale` properties information from the table [locales\_info](#table-locales_info) for a given `locale` ID and a `property` value.
+
+The meaning of the fields are as follows:
+
+- `locales_info_id`
+
+    A unique incremental value automatically generated by SQLite.
+
+- `locale`
+
+    A `locale`, such as `en` or `ja-JP` as can be found in table [locales](#table-locales)
+
+- `property`
+
+    A string representing a property.
+
+    Known properties are: `char_orientation`, `quotation2_end`, `quotation2_start`, `quotation_end`, `quotation_start`, `yes` and `no`
+
+- `value`
+
+    The `property` value for this `locale`
+
+## locales\_infos
+
+     my $all = $cldr->locales_infos;
+
+Returns all locale properties information from [table locales\_info](#table-locales_info) as an array reference of hash reference.
+
+No additional parameter is needed.
+
+## make\_inheritance\_tree
+
+This takes a `locale`, such as `ja` or `ja-JP`, or `es-ES-valencia` and it will return an array reference of [inheritance tree of locales](https://unicode.org/reports/tr35/tr35.html#Locale_Inheritance). This means the provided `locale`'s parent, its grand-parent, etc until it reaches the `root`, which, under the `LDML` specifications is defined by `und`
+
+For example:
+
+    # Japanese
+    my $tree = $cldr->make_inheritance_tree( 'ja-JP' );
+
+produces:
+
+    ['ja-JP', 'ja', 'und']
+
+However, there are exceptions and the path is not always linear.
+
+For example:
+
+    # Portugese in France
+    my $tree = $cldr->make_inheritance_tree( 'pt-FR' );
+
+produces:
+
+    ['pt-FR', 'pt-PT', 'pt', 'und']
+
+Why? Because the `CLDR` (Common Locale Data Repository) specifies a special parent for locale `pt-FR`. Those exceptions are defined in [common/supplemental/supplementalData.xml with xpath /supplementalData/parentLocales/parentLocale](https://github.com/unicode-org/cldr/blob/2dd06669d833823e26872f249aa304bc9d9d2a90/common/supplemental/supplementalData.xml#L5414)
+
+Another example:
+
+    # Traditional Chinese
+    my $tree = $cldr->make_inheritance_tree( 'yue-Hant' );
+
+Normally, this parent would be `yue`, which would lead to simplified Chinese, which would not be appropriate, so instead the `CLDR` provides `zh-Hant`
+
+    ['yue-Hant', 'zh-Hant', 'und']
+
+If an error occurred, it will set an [error object](https://metacpan.org/pod/Locale%3A%3AUnicode%3A%3AData%3A%3AException) and return `undef` in scalar context and an empty list in list context.
+
+See the [LDML specifications about inheritance](https://unicode.org/reports/tr35/tr35.html#Inheritance_and_Validity) and about [locale inheritance and matching](https://unicode.org/reports/tr35/tr35.html#Locale_Inheritance) for more information.
+
+## normalise
+
+This takes a Unicode `locale`, which can be quite complexe, and normalise it, by replacing outdated elements (`subtag`) in the `language`, `script`, `territory` or `variant` part.
+
+it returns a new [Locale::Unicode](https://metacpan.org/pod/Locale%3A%3AUnicode) object
+
+You can also call this method as `normalize`
+
+## number\_format\_l10n
+
+    my $ref = $cldr->number_format_l10n(
+        locale          => 'en',
+        number_system   => 'latn',
+        number_type     => 'currency',
+        format_length   => 'short',
+        format_type     => 'standard',
+        alt             => undef,
+        count           => 'one',
+        format_id       => 1000,
+    );
+    # Returns an hash reference like this:
+    {
+        number_format_id    => 2897,
+        locale              => 'en',
+        number_system       => 'latn',
+        number_type         => 'currency',
+        format_length       => 'short',
+        format_type         => 'standard',
+        format_id           => 1000,
+        format_pattern      => '¤0K',
+        alt                 => undef,
+        count               => 'one',
+    }
+
+Returns an hash reference of a number format localised information from the table [number\_formats\_l10n](#table-number_formats_l10n) for a given `locale` ID, [number system](#number_systems), `number_type`, `format_length`, `format_type`, `alt`, `count`, and `format_id`. If no `alt` value or `count` value is provided, it will default to `undef`
+
+The meaning of the fields are as follows:
+
+- `number_format_id`
+
+    A unique incremental value automatically generated by SQLite.
+
+- `locale`
+
+    A `locale`, such as `en` or `ja-JP` as can be found in table [locales](#table-locales)
+
+- `number_system`
+
+    A `number_system` ID as can be found in the [table number\_systems](#table-number_systems)
+
+- `number_type`
+
+    A string representing a number type.
+
+    Known values are: `currency`, `decimal`, `misc`, `percent`, `scientific`
+
+- `format_length`
+
+    A string representing a format length.
+
+    Known values are: `default`, `long`, `short`
+
+- `format_type`
+
+    A string representing a format type.
+
+    Known values are: `accounting`, `default`, `standard`
+
+- `format_id`
+
+    A string representing a format ID.
+
+    Known values are:
+
+    - `1000`
+
+        Thousand
+
+    - `10000`
+
+        10 thousand
+
+    - `100000`
+
+        100 thousand
+
+    - `1000000`
+
+        Million
+
+    - `10000000`
+
+        10 million
+
+    - `100000000`
+
+        100 million
+
+    - `1000000000`
+
+        Billion
+
+    - `10000000000`
+
+        10 billion
+
+    - `100000000000`
+
+        100 billion
+
+    - `1000000000000`
+
+        Trillion
+
+    - `10000000000000`
+
+        10 trillion
+
+    - `100000000000000`
+
+        100 trillion
+
+    - `1000000000000000`
+
+        Quadrillion
+
+    - `10000000000000000`
+
+        10 quadrillion
+
+    - `100000000000000000`
+
+        100 quadrillion
+
+    - `1000000000000000000`
+
+        Quintillion
+
+    - `10000000000000000000`
+
+        10 quintillion
+
+    - `atLeast`
+    - `atMost`
+    - `range`
+    - `default`
+    - `approximately`
+
+- `format_pattern`
+
+    A string representing a localised pattern.
+
+- `alt`
+
+    A string to specify an alternative value for the same `format_id`
+
+- `count`
+
+    A string representing a `count`
+
+    Known values are: `undef`, `1`, `few`, `many`, `one`, `other`, `two`, `zero`
+
+See the [LDML specifications](https://unicode.org/reports/tr35/tr35-numbers.html#Number_Formats) for more information.
+
+## number\_formats\_l10n
+
+    my $all = $cldr->number_formats_l10n;
+    my $all = $cldr->number_formats_l10n( locale => 'en' );
+    my $all = $cldr->number_formats_l10n(
+        locale          => 'en',
+        number_system   => 'latn',
+        number_type     => 'currency',
+        format_length   => 'short',
+        format_type     => 'standard',
+    );
+
+Returns all number formats localised information from [table number\_formats\_l10n](#table-number_formats_l10n) as an array reference of hash reference.
+
+A combination of the following fields may be provided to filter the information returned:
+
+- `locale`
+
+    A `locale`, such as `en` or `ja-JP` as can be found in table [locales](#table-locales)
+
+- `number_system`
+
+    A `number_system` ID as can be found in the [table number\_systems](#table-number_systems)
+
+- `number_type`
+
+    A string representing a number type.
+
+    Known values are: `currency`, `decimal`, `misc`, `percent`, `scientific`
+
+- `format_length`
+
+    A string representing a format length.
+
+    Known values are: `default`, `long`, `short`
+
+- `format_type`
+
+    A string representing a format type.
+
+    Known values are: `accounting`, `default`, `standard`
+
+## number\_symbol\_l10n
+
+    my $ref = $cldr->number_symbol_l10n(
+        locale          => 'en',
+        number_system   => 'latn',
+        property        => 'decimal',
+        alt             => undef,
+    );
+    # Returns an hash reference like this:
+    {
+        number_symbol_id    => 113,
+        locale              => 'en',
+        number_system       => 'latn',
+        property            => 'decimal',
+        value               => '.',
+        alt                 => undef,
+    }
+
+Returns an hash reference of a `script` localised information from the table [scripts\_l10n](#table-scripts_l10n) for a given `locale` ID, `number_system`, `property` value and `alt` value. If no `alt` value is provided, it will default to `undef`
+
+The meaning of the fields are as follows:
+
+- `number_symbol_id`
+
+    A unique incremental value automatically generated by SQLite.
+
+- `locale`
+
+    A `locale`, such as `en` or `ja-JP` as can be found in table [locales](#table-locales)
+
+- `number_system`
+
+    A `number_system` ID as can be found in the [table number\_systems](#table-number_systems)
+
+    There are 69 number systems used in this [table number\_symbols\_l10n](#table-number_symbols_l10n) out of the 88 known in the [table number\_systems](#table-number_systems)
+
+- `property`
+
+    A string representing a number property.
+
+    Known values are: `approximately`, `currency_decimal`, `currency_group`, `decimal`, `exponential`, `group`, `infinity`, `list`, `minus`, `nan`, `per_mille`, `percent`, `plus`, `superscript`, `time_separator`
+
+    Note that not all locales have all those properties defined.
+
+    For example, the `locale` `en` has the following properties defined for number system `latn`: `decimal`, `exponential`, `group`, `infinity`, `list`, `minus`, `nan`, `per_mille`, `percent`, `plus`, `superscript`
+
+    Whereas, the `locale` `ja` only has this property defined and only for the number system `latn`: `approximately`
+
+    This is because, it inherits from `root`, i.e. the special `locale` `und`
+
+- `alt`
+
+    A string specified to provide for an alternative property value for the same property name.
+
+## number\_symbols\_l10n
+
+    my $all = $cldr->number_symbols_l10n;
+    my $all = $cldr->number_symbols_l10n( locale => 'en' );
+    my $all = $cldr->number_symbols_l10n(
+        locale          => 'en',
+        number_system   => 'latn',
+    );
+
+Returns all number symbols localised information from [table number\_symbols\_l10n](#table-number_symbols_l10n) as an array reference of hash reference.
+
+A combination of the following fields may be provided to filter the information returned:
+
+- `locale`
+
+    A `locale`, such as `en` or `ja-JP` as can be found in table [locales](#table-locales)
+
+- `number_system`
+
+    A `number_system` ID as can be found in the [table number\_systems](#table-number_systems)
+
+## number\_system
+
+    my $ref = $cldr->number_system( number_system => 'jpan' );
+    # Returns an hash reference like this:
+    {
+        numsys_id       => 35,
+        number_system   => 'jpan',
+        digits          => ["〇", "一", "二", "三", "四", "五", "六", "七", "八", "九"],
+        type            => 'algorithmic',
+    }
+
+Returns an hash reference of a `number_system` information from the table [number\_systems](#table-number_systems) for a given `number_system` ID.
+
+There are 88 known number systems.
+
+The meaning of the fields are as follows:
+
+- `numsys_id`
+
+    A unique incremental value automatically generated by SQLite.
+
+- `number_system`
+
+    A string representing a number system ID.
+
+- `digits`
+
+    An array of digits in their locale form, from 0 to 9
+
+- `type`
+
+    A string representing the type for this number system.
+
+    Known types are: `algorithmic`, `numeric`
+
+## number\_systems
+
+     my $all = $cldr->number_systems;
+
+Returns all number systems information from [table number\_systems](#table-number_systems) as an array reference of hash reference.
+
+There are 88 known number systems:
+
+- `adlm`
+
+    Adlam Digits
+
+- `ahom`
+
+    Ahom Digits
+
+- `arab`
+
+    Arabic-Indic Digits
+
+- `arabext`
+
+    Extended Arabic-Indic Digits
+
+- `arabext`
+
+    X Arabic-Indic Digits
+
+- `armn`
+
+    Armenian Numerals
+
+- `armnlow`
+
+    Armenian Lowercase Numerals
+
+- `bali`
+
+    Balinese Digits
+
+- `beng`
+
+    Bangla Digits
+
+- `bhks`
+
+    Bhaiksuki Digits
+
+- `brah`
+
+    Brahmi Digits
+
+- `cakm`
+
+    Chakma Digits
+
+- `cham`
+
+    Cham Digits
+
+- `cyrl`
+
+    Cyrillic Numerals
+
+- `deva`
+
+    Devanagari Digits
+
+- `diak`
+
+    Dives Akuru Digits
+
+- `ethi`
+
+    Ethiopic Numerals
+
+- `fullwide`
+
+    Full-Width Digits
+
+- `geor`
+
+    Georgian Numerals
+
+- `gong`
+
+    Gunjala Gondi digits
+
+- `gonm`
+
+    Masaram Gondi digits
+
+- `grek`
+
+    Greek Numerals
+
+- `greklow`
+
+    Greek Lowercase Numerals
+
+- `gujr`
+
+    Gujarati Digits
+
+- `guru`
+
+    Gurmukhi Digits
+
+- `hanidays`
+
+    Chinese Calendar Day-of-Month Numerals
+
+- `hanidec`
+
+    Chinese Decimal Numerals
+
+- `hans`
+
+    Simplified Chinese Numerals
+
+- `hansfin`
+
+    Simplified Chinese Financial Numerals
+
+- `hant`
+
+    Traditional Chinese Numerals
+
+- `hantfin`
+
+    Traditional Chinese Financial Numerals
+
+- `hebr`
+
+    Hebrew Numerals
+
+- `hmng`
+
+    Pahawh Hmong Digits
+
+- `hmnp`
+
+    Nyiakeng Puachue Hmong Digits
+
+- `java`
+
+    Javanese Digits
+
+- `jpan`
+
+    Japanese Numerals
+
+- `jpanfin`
+
+    Japanese Financial Numerals
+
+- `jpanyear`
+
+    Japanese Calendar Gannen Year Numerals
+
+- `kali`
+
+    Kayah Li Digits
+
+- `kawi`
+
+    Kawi Digits
+
+- `khmr`
+
+    Khmer Digits
+
+- `knda`
+
+    Kannada Digits
+
+- `lana`
+
+    Tai Tham Hora Digits
+
+- `lanatham`
+
+    Tai Tham Tham Digits
+
+- `laoo`
+
+    Lao Digits
+
+- `latn`
+
+    Western Digits
+
+- `lepc`
+
+    Lepcha Digits
+
+- `limb`
+
+    Limbu Digits
+
+- `mathbold`
+
+    Mathematical Bold Digits
+
+- `mathdbl`
+
+    Mathematical Double-Struck Digits
+
+- `mathmono`
+
+    Mathematical Monospace Digits
+
+- `mathsanb`
+
+    Mathematical Sans-Serif Bold Digits
+
+- `mathsans`
+
+    Mathematical Sans-Serif Digits
+
+- `mlym`
+
+    Malayalam Digits
+
+- `modi`
+
+    Modi Digits
+
+- `mong`
+
+    Mongolian Digits
+
+- `mroo`
+
+    Mro Digits
+
+- `mtei`
+
+    Meetei Mayek Digits
+
+- `mymr`
+
+    Myanmar Digits
+
+- `mymrshan`
+
+    Myanmar Shan Digits
+
+- `mymrtlng`
+
+    Myanmar Tai Laing Digits
+
+- `nagm`
+
+    Nag Mundari Digits
+
+- `newa`
+
+    Newa Digits
+
+- `nkoo`
+
+    N’Ko Digits
+
+- `olck`
+
+    Ol Chiki Digits
+
+- `orya`
+
+    Odia Digits
+
+- `osma`
+
+    Osmanya Digits
+
+- `rohg`
+
+    Hanifi Rohingya digits
+
+- `roman`
+
+    Roman Numerals
+
+- `romanlow`
+
+    Roman Lowercase Numerals
+
+- `saur`
+
+    Saurashtra Digits
+
+- `segment`
+
+    Segmented Digits
+
+- `shrd`
+
+    Sharada Digits
+
+- `sind`
+
+    Khudawadi Digits
+
+- `sinh`
+
+    Sinhala Lith Digits
+
+- `sora`
+
+    Sora Sompeng Digits
+
+- `sund`
+
+    Sundanese Digits
+
+- `takr`
+
+    Takri Digits
+
+- `talu`
+
+    New Tai Lue Digits
+
+- `taml`
+
+    Traditional Tamil Numerals
+
+- `tamldec`
+
+    Tamil Digits
+
+- `telu`
+
+    Telugu Digits
+
+- `thai`
+
+    Thai Digits
+
+- `tibt`
+
+    Tibetan Digits
+
+- `tirh`
+
+    Tirhuta Digits
+
+- `tnsa`
+
+    Tangsa Digits
+
+- `vaii`
+
+    Vai Digits
+
+- `wara`
+
+    Warang Citi Digits
+
+- `wcho`
+
+    Wancho Digits
+
+## number\_system\_l10n
+
+    my $ref = $cldr->number_system_l10n(
+        number_system => 'jpan',
+        locale => 'en',
+    );
+    # Returns an hash reference like this:
+    {
+        num_sys_l10n_id => 1335,
+        locale          => 'en',
+        number_system   => 'jpan',
+        locale_name     => 'Japanese Numerals',
+        alt             => undef,
+    }
+
+Returns an hash reference of a `number_system` localised information from the table [number\_systems\_l10n](#table-number_systems_l10n) for a given `number_system` ID and a `locale` ID.
+
+There are 190 known localised information for number systems.
+
+The meaning of the fields are as follows:
+
+- `num_sys_l10n_id`
+
+    A unique incremental value automatically generated by SQLite.
+
+- `number_system`
+
+    A string representing a number system ID.
+
+- `locale_name`
+
+    A string representing the number system in the `locale`
+
+- `alt`
+
+    A string specifying an alternative version for an otherwise same number system.
+
+## number\_systems\_l10n
+
+     my $all = $cldr->number_systems_l10n;
+
+Returns all number systems localised information from [table number\_systems\_l10n](#table-number_systems_l10n) as an array reference of hash reference.
+
+## person\_name\_default
+
+    my $ref = $cldr->person_name_default( locale => 'ja' );
+    # Returns an hash reference like this:
+    {
+        pers_name_def_id    => 3,
+        locale              => 'ja',
+        value               => 'surnameFirst',
+    }
+
+Returns an hash reference of a person name defaults information from the table [person\_name\_defaults](#table-person_name_defaults) for a given `locale` ID.
+
+Be aware that there are very few data. This is because the entry for locale `und` (undefined), contains the default value. Thus, if there is no data for the desired locale, you should fallback to `und`
+
+This is the way the Unicode CLDR data is structured.
+
+## person\_name\_defaults
+
+    my $all = $cldr->person_name_defaults;
+
+Returns all person name defaults information from [table person\_name\_defaults](#table-person_name_defaults) as an array reference of hash reference.
+
+## rbnf
+
+    my $ref = $cldr->rbnf(
+        locale => 'ja',
+        ruleset => 'spellout-cardinal',
+        rule_id => 7,
+    );
+    # Returns an hash reference like this:
+    {
+        rbnf_id     => 7109,
+        locale      => 'ja',
+        grouping    => 'SpelloutRules',
+        ruleset     => 'spellout-cardinal',
+        rule_id     => '7',
+        rule_value  => '七;',
+    }
+
+Returns an hash reference of a RBNF (Rule-Based Number Format) information from the table [rbnf](#table-rbnf) for a given `locale` ID, a rule set `ruleset` and a rule ID `rule_id`.
+
+The meaning of the fields are as follows:
+
+- `rbnf_id`
+
+    A unique incremental value automatically generated by SQLite.
+
+- `locale`
+
+    A `locale`, such as `en` or `ja-JP` as can be found in table [locales](#table-locales)
+
+- `grouping`
+
+    A string representing a `RBNF` grouping.
+
+    Known values are: `NumberingSystemRules`, `OrdinalRules`, `SpelloutRules`
+
+- `ruleset`
+
+    A string representing the rule set name.
+
+- `rule_id`
+
+    A string representing the rule ID.
+
+- `rule_value`
+
+    A string containing the rule value.
+
+    Make sure to read the `LDML` documentation, as it may contain information to alias this rule on another one.
+
+## rbnfs
+
+    my $all = $cldr->rbnfs;
+    my $all = $cldr->rbnfs( locale => 'ko' );
+    my $all = $cldr->rbnfs( grouping => 'SpelloutRules' );
+    my $all = $cldr->rbnfs( ruleset => 'spellout-cardinal-native' );
+
+Returns all RBNF (Rule-Based Number Format) information from [table rbnf](#table-rbnf) as an array reference of hash reference.
+
+A combination of the following fields may be provided to filter the information returned:
+
+- `grouping`
+
+    A group value. Known values are: `NumberingSystemRules`, `OrdinalRules` and `SpelloutRules`
+
+- `locale`
+
+    A `locale` such as `en` or `ja-JP` as can be found in table [locales](#table-locales)
+
+- `ruleset`
+
+    The name of a rule set.
+
+## reference
+
+    my $ref = $cldr->reference( code => 'R1131' );
+    # Returns an hash reference like this:
+    {
+        ref_id  => 132,
+        code    => 'R1131',
+        uri     => 'http://en.wikipedia.org/wiki/Singapore',
+        description => 'English is the first language learned by half the children by the time they reach preschool age; using 92.6% of pop for the English figure',
+    }
+
+Returns an hash reference of a reference information from the table [refs](#table-refs) for a given `code`.
+
+## references
+
+    my $all = $cldr->references;
+
+Returns all reference information from [table refs](#table-refs) as an array reference of hash reference.
+
+No additional parameter is needed.
+
+## script
+
+    my $ref = $cldr->script( script => 'Jpan' );
+    # Returns an hash reference like this:
+    {
+        script_id       => 73,
+        script          => 'Jpan',
+        rank            => 5,
+        sample_char     => '3048',
+        id_usage        => 'RECOMMENDED',
+        rtl             => 0,
+        lb_letters      => 1,
+        has_case        => 0,
+        shaping_req     => 0,
+        ime             => 1,
+        density         => 2,
+        origin_country  => 'JP',
+        likely_language => 'ja',
+        status          => 'regular',
+    }
+
+Returns an hash reference of a script information from the table [scripts](#table-scripts) for a given `script` ID.
+
+The meaning of the fields are as follows:
+
+The information is quoted directly from the `CLDR` data.
+
+- `script_id`
+
+    A unique incremental value automatically generated by SQLite.
+
+- `script`
+
+    A string representing a `script` ID
+
+- `rank`
+
+    "The approximate rank of this script from a large sample of the web, in terms of the number of characters found in that script. Below 32 the ranking is not statistically significant."
+
+- `sample_char`
+
+    "A sample character for use in "Last Resort" style fonts. For printing the combining mark for Zinh in a chart, U+25CC can be prepended. See http://unicode.org/policies/lastresortfont\_eula.html"
+
+- `id_usage`
+
+    "The usage for IDs (tables 4-7) according to UAX #31."
+
+    For a description of values, see
+
+    [http://unicode.org/reports/tr31/#Table\_Candidate\_Characters\_for\_Exclusion\_from\_Identifiers](http://unicode.org/reports/tr31/#Table_Candidate_Characters_for_Exclusion_from_Identifiers)
+
+- `rtl`
+
+    True "if the script is RTL. Derived from whether the script contains RTL letters according to the Bidi\_Class property"
+
+- `lb_letters`
+
+    True "if the major languages using the script allow linebreaks between letters (excluding hyphenation). Derived from LB property."
+
+- `has_case`
+
+    True "if in modern (or most recent) usage case distinctions are customary."
+
+- `shaping_req`
+
+    True "if shaping is required for the major languages using that script for NFC text. This includes not only ligation (and Indic conjuncts), Indic vowel splitting/reordering, and Arabic-style contextual shaping, but also cases where NSM placement is required, like Thai. MIN if NSM placement is sufficient, not the more complex shaping. The NSM placement may only be necessary for some major languages using the script."
+
+- `ime`
+
+    Input Method Engine.
+
+    True "if the major languages using the script require IMEs. In particular, users (of languages for that script) would be accustomed to using IMEs (such as Japanese) and typical commercial products for those languages would need IME support in order to be competitive."
+
+- `density`
+
+    "The approximate information density of characters in this script, based on comparison of bilingual texts."
+
+- `origin_country`
+
+    "The approximate area where the script originated, expressed as a BCP47 region code."
+
+- `likely_language`
+
+    The likely `language` associated with this `script`
+
+- `status`
+
+    A string representing the status for this `script`
+
+    Known values are: `deprecated`, `private_use`, `regular`, `reserved`, `special`, `unknown`
+
+See also the [Unicode list of known scripts](https://www.unicode.org/iso15924/iso15924-codes.html)
+
+## scripts
+
+    my $all = $cldr->scripts;
+    my $all = $cldr->scripts( rtl => 1 );
+    my $all = $cldr->scripts( origin_country => 'FR' );
+    my $all = $cldr->scripts( likely_language => 'fr' );
+
+Returns all scripts information from [table scripts](#table-scripts) as an array reference of hash reference.
+
+A combination of the following fields may be provided to filter the information returned:
+
+- `likely_language`
+
+    A `locale` such as `en` or `ja-JP` as can be found in table [locales](#table-locales)
+
+- `origin_country`
+
+    A `territory` code as can be found in table [territories](#table-territories)
+
+- `rtl`
+
+    A boolean value. `0` for false and `1` for true.
+
+## script\_l10n
+
+    my $ref = $cldr->script_l10n(
+        locale  => 'en',
+        script   => 'Latn',
+        alt     => undef,
+    );
+    # Returns an hash reference like this:
+    {
+        scripts_l10n_id => 3636,
+        locale          => 'en',
+        script          => 'Latn',
+        locale_name     => 'Latin',
+        alt             => undef,
+    }
+
+Returns an hash reference of a `script` localised information from the table [scripts\_l10n](#table-scripts_l10n) for a given `script` ID and a `locale` ID and a `alt` value. If no `alt` value is provided, it will default to `undef`
+
+The meaning of the fields are as follows:
+
+- `scripts_l10n_id`
+
+    This is a unique incremental integer automatically generated by SQLite.
+
+- `locale`
+
+    A `locale` such as `en` or `ja-JP` as can be found in table [locales](#table-locales)
+
+- `script`
+
+    A 3 to 4-characters script ID as can be found in the [table scripts](#table-scripts)
+
+- `locale_name`
+
+    The localised script name based on the `locale` specified.
+
+- `alt`
+
+    A string, that is optional, and is used to provide an alternative version. Known `alt` values are: `undef`, `secondary`, `short`, `stand-alone`, `variant`
+
+## scripts\_l10n
+
+    my $all = $cldr->scripts_l10n;
+    my $all = $cldr->scripts_l10n( locale => 'en' );
+    my $all = $cldr->scripts_l10n(
+        locale  => 'en',
+        alt     => undef,
+    );
+
+Returns all localised scripts information from [table scripts\_l10n](#table-scripts_l10n) as an array reference of hash reference.
+
+A combination of the following fields may be provided to filter the information returned:
+
+- `locale`
+
+    A `locale` such as `en` or `ja-JP` as can be found in table [locales](#table-locales)
+
+- `alt`
+
+    A string, that is optional, and is used to provide an alternative version. Known `alt` values are: `undef`, `secondary`, `short`, `stand-alone`, `variant`
+
+## split\_interval
+
+    my $ref = $cldr->split_interval(
+        pattern => $string,
+        greatest_diff => 'd',
+    ) || die( $cldr->error );
+
+This takes an hash or hash reference of options and it returns a 4-elements array reference containing:
+
+- 1. first part of the pattern
+- 2. the separator, which may be an empty string
+- 3. second part of the pattern
+- 4. the best repeating pattern found
+
+The required options are:
+
+- `greatest_diff`
+
+    A token representing the greatest difference.
+
+    Known values are: `B`, `G`, `H`, `M`, `a`, `d`, `h`, `m`, `y`
+
+    See ["Format Patterns"](#format-patterns) for their meaning.
+
+- `pattern`
+
+    A interval pattern, such as one you can get with the method [calendar\_interval\_format](#calendar_interval_format)
+
+This method is provided as a convenience, but the [interval formats data](#calendar_interval_format) in [the database](#table-calendar_interval_formats) have already been pre-processed, so you do not have to do it.
+
+## subdivision
+
+    my $ref = $cldr->subdivision( subdivision => 'jp12' );
+    # Returns an hash reference like this:
+    {
+        subdivision_id  => 2748,
+        territory       => 'JP',
+        subdivision     => 'jp12',
+        parent          => 'JP',
+        is_top_level    => 1,
+        status          => 'regular',
+    }
+
+Returns an hash reference of a subdivision information from the table [subdivisions](#table-subdivisions) for a given `subdivision` ID.
+
+The meaning of the fields are as follows:
+
+- `subdivision_id`
+
+    A unique incremental value automatically generated by SQLite.
+
+- `territory`
+
+    A `territory` ID, such as can be found in table [territories](#table-territories)
+
+- `subdivision`
+
+    A string representing a `subdivision` ID
+
+- `parent`
+
+    A string representing a parent for this `subdivision`. It can be either another `subdivision` ID, or a `territory` ID, if this is a top `subdivision`
+
+- `is_top_level`
+
+    A boolean value representing whether this `subdivision` is directly under a `territory` or rather under another `subdivision`
+
+- `status`
+
+    A string representing the status for this `subdivision`.
+
+    Known values are: `deprecated`, `regular`, `unknown`
+
+## subdivisions
+
+    my $all = $cldr->subdivisions;
+    my $all = $cldr->subdivisions( territory => 'JP' );
+    my $all = $cldr->subdivisions( parent => 'US' );
+    my $all = $cldr->subdivisions( is_top_level => 1 );
+
+Returns all subdivisions information from [table subdivisions](#table-subdivisions) as an array reference of hash reference.
+
+A combination of the following fields may be provided to filter the information returned:
+
+- `is_top_level`
+
+    A boolean value. `0` for false and `1` for true.
+
+- `parent`
+
+    A `territory` code as can be found in table [territories](#table-territories)
+
+- `territory`
+
+    A `territory` code as can be found in table [territories](#table-territories)
+
+## subdivision\_l10n
+
+    my $ref = $cldr->subdivision_l10n(
+        locale      => 'en',
+        # Texas
+        subdivision => 'ustx',
+    );
+    # Returns an hash reference like this:
+    {
+        subdiv_l10n_id  => 56463,
+        locale          => 'en',
+        subdivision     => 'ustx',
+        locale_name     => 'Texas',
+    }
+
+Returns an hash reference of a `script` localised information from the table [scripts\_l10n](#table-scripts_l10n) for a given `subdivision` ID and a `locale` ID.
+
+The meaning of the fields are as follows:
+
+- `subdiv_l10n_id`
+
+    A unique incremental value automatically generated by SQLite.
+
+- `locale`
+
+    A `locale`, such as `en` or `ja-JP` as can be found in table [locales](#table-locales)
+
+- `subdivision`
+
+    A `subdivision` ID as can be found from the [table subdivisions](#table-subdivision)
+
+- `locale_name`
+
+    A string representing the localised name of the `subdivision` in the `locale` specified.
+
+See the [LDML specifications](https://unicode.org/reports/tr35/tr35.html#Unicode_Subdivision_Codes) for more information.
+
+## subdivisions\_l10n
+
+    my $all = $cldr->subdivisions_l10n;
+    my $all = $cldr->subdivisions_l10n( locale => 'en' );
+
+Returns all subdivisions localised information from [table subdivisions\_l10n](#table-subdivisions_l10n) as an array reference of hash reference.
+
+A combination of the following fields may be provided to filter the information returned:
+
+- `locale`
+
+    A `locale`, such as `en` or `ja-JP` as can be found in table [locales](#table-locales)
+
+## territory
+
+    my $ref = $cldr->territory( territory => 'FR' );
+    # Returns an hash reference like this:
+    {
+        territory_id        => 118,
+        territory           => 'FR',
+        parent              => 155,
+        gdp                 => 2856000000000,
+        literacy_percent    => 99,
+        population          => 67848200,
+        languages           => ["fr", "en", "es", "de", "oc", "it", "pt", "pcd", "gsw", "br", "co", "hnj", "ca", "eu", "nl", "frp", "ia"],
+        contains            => undef,
+        currency            => 'EUR',
+        calendars           => undef,
+        min_days            => 4,
+        first_day           => 1,
+        weekend             => undef,
+        status              => 'regular',
+    }
+
+Returns an hash reference of a territory information from the table [territories](#table-territories) for a given `territory` ID.
+
+The meaning of the fields are as follows:
+
+- `territory`
+
+    A 2-characters code designating a country code, which may not necessarily be an active ISO 3166 code, because the CLDR keeps outdated ones for consistency.
+
+    It can also be a 3-digits world region code.
+
+- `parent`
+
+    A `parent` territory, if one is defined. For example, France (`FR`) has parent `155` representing Western Europe, which has parent `150`, representing Europe, which, itself, has parent `001`, representing the world.
+
+- `gdp`
+
+    The territory GDP (Gross Domestic Product), which may be `undef`, especially for world region.
+
+- `literacy_percent`
+
+    The literacy percentage of the population expressed as a decimal. For example, a value of `99` means 99%
+
+- `population`
+
+    The territory population as an integer.
+
+- `languages`
+
+    The languages known to be spoken in this territory, as an array of `language` IDs. For significant languages, you can get more information, such as their share of the population with [language\_population](#language_population)
+
+- `contains`
+
+    An array of `territory` codes contained by this territory. This may be `undef`
+
+    This value is typically set for world `region` codes and for special territories like `EU`, `EZ`, `QO` and `UN`
+
+- `currency`
+
+    The official `currency` used in this territory. This may be `undef` such as for world regions.
+
+- `calendars`
+
+    An array of [calendar systems](#calendar) used in this `territory`
+
+- `min_days`
+
+    This is used to decide if the week starting with `first_day` is to ne included in the calendar as the first week of the new yer or last week of the previous year.
+
+    See the [LDML specifications](https://unicode.org/reports/tr35/tr35-dates.html#Week_Data)
+
+- `first_day`
+
+    The first day of the week. Although in the Unicode LDML, the _weekday names are identified with short strings, since there is no universally-accepted numeric designation_, here the value used is an integer from `1` (Monday) to `7` (Sunday)
+
+- `weekend`
+
+    An array of week days (identified by integers as explained in `first_day`). This value may be null, in which case, the default value to be used is the one set in the World region (`001`), which is `[6,7]`, i.e. Saturday and Sunday.
+
+- `status`
+
+    A string representing the `status` for this territory.
+
+    Known `status` values are: `deprecated`, `macroregion`, `private_use`, `regular`, `reserved`, `special`, `unknown`
+
+## territories
+
+    my $all = $cldr->territories;
+    my $all = $cldr->territories( parent => 150 );
+
+Returns all territories information from [table territories](#table-territories) as an array reference of hash reference.
+
+A combination of the following fields may be provided to filter the information returned:
+
+- `parent`
+
+    A `territory` code as can be found in table [territories](#table-territories)
+
+## territory\_l10n
+
+    my $ref = $cldr->territory_l10n(
+        locale      => 'en',
+        territory   => 'JP',
+        alt         => undef,
+    );
+    # Returns an hash reference like this:
+    {
+        terr_l10n_id    => 13385,
+        locale          => 'en',
+        territory       => 'JP',
+        locale_name     => 'Japan',
+        alt             => undef,
+    }
+
+Returns an hash reference of a territory localised information from the table [territories\_l10n](#table-territories_l10n) for a given `territory` ID and a `locale` ID and an `alt` value. If no `alt` value is provided, it will default to `undef`
+
+The meaning of the fields are as follows:
+
+- `terr_l10n_id`
+
+    This is a unique incremental integer automatically generated by SQLite.
+
+- `locale`
+
+    A `locale` such as `en` or `ja-JP` as can be found in table [locales](#table-locales)
+
+- `territory`
+
+    A 2-characters country code or a 3-digits region code as can be found in the [table territories](#table-territories)
+
+- `locale_name`
+
+    The localised territory name based on the `locale` specified.
+
+- `alt`
+
+    A string, that is optional, and is used to provide an alternative version. Known `alt` values are: `undef`, `biot`, `chagos`, `short`, `variant`
+
+## territories\_l10n
+
+    my $all = $cldr->territories_l10n;
+    my $all = $cldr->territories_l10n( locale => 'en' );
+    my $all = $cldr->territories_l10n(
+        locale  => 'en',
+        alt     => undef,
+    );
+
+Returns all localised territories information from [table territories\_l10n](#table-territories_l10n) as an array reference of hash reference.
+
+A combination of the following fields may be provided to filter the information returned:
+
+- `locale`
+
+    A `locale` such as `en` or `ja-JP` as can be found in table [locales](#table-locales)
+
+- `alt`
+
+    A string, that is optional, and is used to provide an alternative version. Known `alt` values are: `undef`, `biot`, `chagos`, `short`, `variant`
+
+## time\_format
+
+    my $ref = $cldr->time_format( region => 'JP' );
+    # Returns an hash reference like this:
+    {
+        time_format_id  => 86,
+        region          => 'JP',
+        territory       => 'JP',
+        locale          => undef,
+        time_format     => 'H',
+        time_allowed    =>  ["H", "K", "h"],
+    }
+
+Returns an hash reference of a time format information from the table [time\_formats](#table-time_formats) for a given `region` ID.
+
+The meaning of the fields are as follows:
+
+- `time_format_id`
+
+    A unique incremental value automatically generated by SQLite.
+
+- `region`
+
+    A string representing a `region`, which can be a `territory` code, such as `US` or `419`, or a `language` ID with a `territory` ID, such as `it-CH` or `en-001`.
+
+- `territory`
+
+    A string representing the `territory` part of the `region` as can be found in [table territories](#tabke-territories)
+
+- `locale`
+
+    A string representing the `locale` part of the `region` value.
+
+    A `locale`, such as `en` or `ja-JP` as can be found in table [locales](#table-locales)
+
+- `time_format`
+
+    A short string representing a time format.
+
+    Known values are: `H` and `h`
+
+- `time_allowed`
+
+    An array of format allowed.
+
+    For example:
+
+        ["H","h","hB","hb"]
+
+See the [LDML specifications](https://unicode.org/reports/tr35/tr35-dates.html#Time_Data) for more information.
+
+## time\_formats
+
+    my $all = $cldr->time_formats;
+    my $all = $cldr->time_formats( region => 'US' );
+    my $all = $cldr->time_formats( territory => 'JP' );
+    my $all = $cldr->time_formats( locale => undef );
+    my $all = $cldr->time_formats( locale => 'en' );
+
+Returns all time formats information from [table time\_formats](#table-time_formats) as an array reference of hash reference.
+
+A combination of the following fields may be provided to filter the information returned:
+
+- `locale`
+
+    A `locale` such as `en` or `ja-JP` as can be found in table [locales](#table-locales)
+
+- `region`
+
+    A `territory` code as can be found in table [territories](#table-territories)
+
+- `territory`
+
+    A `territory` code as can be found in table [territories](#table-territories)
+
+## timezone
+
+    my $ref = $cldr->timezone( timezone => 'Asia/Tokyo' );
+    # Returns an hash reference like this:
+    {
+        timezone_id => 281,
+        timezone    => 'Asia/Tokyo',
+        territory   => 'JP',
+        region      => 'Asia',
+        tzid        => 'japa',
+        metazone    => 'Japan',
+        tz_bcpid    => 'jptyo',
+        is_golden   => 1,
+    }
+
+Returns an hash reference of a time zone information from the table [timezones](#table-timezones) based on the `timezone` ID provided.
+
+The meaning of the fields are as follows:
+
+- `timezone_id`
+
+    A unique incremental value automatically generated by SQLite.
+
+- `timezone`
+
+    A `timezone` ID
+
+- `territory`
+
+    A string representing a `territory` code as can be found in [table territories](#table-territories)
+
+- `region`
+
+    A string representing a world region.
+
+    Known regions are; `Africa`, `America`, `Antarctica`, `Arctic`, `Asia`, `Atlantic`, `Australia`, `CST6CDT`, `EST5EDT`, `Etc`, `Europe`, `Indian`, `MST7MDT`, `PST8PDT`, `Pacific`
+
+- `tzid`
+
+    A string representing a timezone ID
+
+- `metazone`
+
+    A string representing a metazone ID
+
+- `tz_bcpid`
+
+    A boolean specifying whether this timezone ID is also a BCP47 `timezone`.
+
+- `is_golden`
+
+    A boolean specifying whether this timezone is a golden timezone.
+
+## timezones
+
+    my $array_ref = $cldr->timezones;
+    # Or, providing with some filtering arguments
+    # Returns all the timezones for the country code 'JP'
+    my $array_ref = $cldr->timezones( territory => 'JP' );
+    # Returns all the timezones for the region code 'Asia'
+    my $array_ref = $cldr->timezones( region => 'Asia' );
+     # Returns all the timezones that match the CLDR timezone ID 'japa'
+    my $array_ref = $cldr->timezones( tzid => 'japa' );
+     # Returns all the timezones that match the BCP47 timezone ID 'jptyo'
+    my $array_ref = $cldr->timezones( tz_bcpid => 'jptyo' );
+     # Returns all the timezones that have the CLDR metazone 'Japan'
+    my $array_ref = $cldr->timezones( metazone => 'Japan' );
+    # Returns all the timezones that are 'golden' timezones
+    my $array_ref = $cldr->timezones( is_golden => 1 );
+
+Returns all the `timezone` information as an array reference of hash reference from the [table timezones](#table-timezones)
+
+You can adjust the data return by using a combination of the following filtering arguments:
+
+- `territory`
+
+    A `territory` code as can be found in table [territories](#table-territories)
+
+- `region`
+
+    A world region. Known values are: `Africa`, `America`, `Antarctica`, `Arctic`, `Asia`, `Atlantic`, `Australia`, `CST6CDT`, `EST5EDT`, `Etc`, `Europe`, `Indian`, `MST7MDT`, `PST8PDT`, `Pacific`
+
+- `tzid`
+
+    A Unicode timezone ID
+
+- `tz_bcpid`
+
+    A Unicode BCP47 timezone ID.
+
+- `metazone`
+
+    A Unicode metazone ID.
+
+- `is_golden`
+
+    A boolean expressing whether this time zone is `golden` (in Unicode parlance), or not. `1` for true, and `0` for false.
+
+## timezone\_info
+
+    my $ref = $cldr->timezone_info(
+        timezone    => 'Europe/Simferopol',
+        start       => '1994-04-30T21:00:00',
+    );
+    # Returns an hash reference like this:
+    {
+        tzinfo_id   => 594,
+        timezone    => 'Europe/Simferopol',
+        metazone    => 'Moscow',
+        start       => '1994-04-30T21:00:00',
+        until       => '1997-03-30T01:00:00',
+    }
+
+or, maybe, simpler, using the [advanced search](#advanced-search):
+
+    my $ref = $cldr->timezone_info(
+        timezone    => 'Europe/Simferopol',
+        start       => ['>1992-01-01', '<1995-01-01'],
+    );
+
+That way, you do not need to know the exact date.
+
+Returns an hash reference of a `timezone` historical information from the table [timezones\_info](#table-timezones_info) for a given `timezone` ID and a `start` datetime. If no `start` value is provided, it will default to `undef`
+
+The meaning of the fields are as follows:
+
+- `tzinfo_id`
+
+    A unique incremental value automatically generated by SQLite.
+
+- `timezone`
+
+    A `timezone`, such as `Asia/Tokyo` table [timezones](#table-timezones)
+
+- `metazone`
+
+    A `metazone` ID
+
+    There are 190 known `metazone` IDs
+
+- `start`
+
+    An ISO8601 start datetime value for this timezone.
+
+    This may be `undef`
+
+- `until`
+
+    An ISO8601 datetime value representing the date and time until which this timezone was valid.
+
+    It may be `undef`
+
+## timezones\_info
+
+    my $all = $cldr->timezones_info;
+    my $all = $cldr->timezones_info( timezone => 'Europe/Simferopol' );
+    my $all = $cldr->timezones_info( metazone => 'Singapore' );
+    my $all = $cldr->timezones_info( start => undef );
+    my $all = $cldr->timezones_info( until => undef );
+
+Returns all the `timezone` information as an array reference of hash reference from the [table timezones\_info](#table-timezones_info)
+
+You can adjust the data return by using a combination of the following filtering arguments:
+
+- `metazone`
+
+    A Unicode `metazone` ID
+
+- `start`
+
+    An ISO8601 date and time from which to find data. For example: `2014-10-25T14:00:00`
+
+- `timezone`
+
+    A `timezone` value.
+
+- `until`
+
+    An ISO8601 date and time until which to find data. For example: `2016-03-26T18:00:00`
+
+## unit\_alias
+
+    my $ref = $cldr->unit_alias( alias => 'meter-per-second-squared' );
+    # Returns an hash reference like this:
+    {
+        unit_alias_id   => 3,
+        alias           => 'meter-per-second-squared',
+        target          => 'meter-per-square-second',
+        reason          => 'deprecated',
+    }
+
+Or, maybe simpler, using the [advanced search](#advanced-search):
+
+    my $ref = $cldr->unit_alias( alias => '~^meter.*' );
+
+or
+
+    my $ref = $cldr->unit_alias( alias => qr/^meter.*/ );
+
+Returns an hash reference of a unit alias information from the table [unit\_aliases](#table-unit_aliases) based on the `alias` ID provided.
+
+## unit\_aliases
+
+    my $all = $cldr->unit_aliases;
+
+Returns all the unit alias information as an array reference of hash reference from the [table unit\_aliases](#table-unit_aliases)
+
+No additional parameter is needed.
+
+## unit\_constant
+
+    my $ref = $cldr->unit_constant( constant => 'lb_to_kg' );
+    # Returns an hash reference like this:
+    {
+        unit_constant_id    => 1,
+        constant            => 'lb_to_kg',
+        expression          => 0.45359237,
+        value               => 0.45359237,
+        description         => undef,
+        status              => undef,
+    }
+
+Returns an hash reference of a unit constant information from the table [unit\_constants](#table-unit_constants) based on the `constant` ID provided.
+
+The meaning of the fields are as follows:
+
+- `unit_constant_id`
+
+    A unique incremental value automatically generated by SQLite.
+
+- `constant`
+
+    The unit constant ID.
+
+- `expression`
+
+    The constant expression as defined in `CLDR`
+
+- `value`
+
+    The constant resolved value, computed from the `expression` specified.
+
+- `description`
+
+    A string describing the constant.
+
+- `status`
+
+    A string representing the `status` for this `constant`
+
+## unit\_constants
+
+    my $all = $cldr->unit_constants;
+
+Returns all the unit constants information as an array reference of hash reference from the [table unit\_constants](#table-unit_constants)
+
+No additional parameter is needed.
+
+## unit\_conversion
+
+    my $ref = $cldr->unit_conversion( source => 'kilogram' );
+    # Returns an hash reference like this:
+    {
+        unit_conversion_id  => 9,
+        source              => 'kilogram',
+        base_unit           => 'kilogram',
+        expression          => undef,
+        factor              => undef,
+        systems             => ["si", "metric"],
+        category            => 'mass',
+    }
+
+Returns an hash reference of a unit conversion information from the table [unit\_conversions](#table-unit_conversions) based on the `source` ID provided.
+
+The meaning of the fields are as follows:
+
+- `unit_conversion_id`
+
+    A unique incremental value automatically generated by SQLite.
+
+- `source`
+
+    A string representing the unit source.
+
+- `base_unit`
+
+    A string representing the base unit for this unit conversion
+
+- `expression`
+
+    A string representing the unit expression, if any.
+
+- `factor`
+
+    A string representing the unit factor value, if any.
+
+- `systems`
+
+    An array of string representing the unit conversion systems.
+
+- `category`
+
+    A string representing the unit conversion category.
+
+    Known category values are: `acceleration`, `angle`, `area`, `catalytic-activity`, `concentration-mass`, `digital`, `electric-capacitance`, `electric-charge`, `electric-conductance`, `electric-current`, `electric-inductance`, `electric-resistance`, `energy`, `force`, `frequency`, `graphics`, `ionizing-radiation`, `length`, `luminance`, `luminous-flux`, `luminous-intensity`, `magnetic-flux`, `magnetic-induction`, `mass`, `portion`, `power`, `pressure`, `pressure-per-length`, `radioactivity`, `solid-angle`, `speed`, `substance-amount`, `temperature`, `th`, `time`, `typewidth`, `voltage`, `volume`, `year-duration`
+
+## unit\_conversions
+
+    my $all = $cldr->unit_conversions;
+    my $all = $cldr->unit_conversions( base_unit => 'kilogram' );;
+    my $all = $cldr->unit_conversions( category => 'mass' );
+
+Returns all the unit conversion information as an array reference of hash reference from the [table unit\_conversions](#table-unit_conversions)
+
+A combination of the following fields may be provided to filter the information returned:
+
+- `base_unit`
+
+    A base unit ID.
+
+- `category`
+
+    A category ID. Known categories are: `acceleration`, `angle`, `area`, `catalytic-activity`, `concentration-mass`, `digital`, `electric-capacitance`, `electric-charge`, `electric-conductance`, `electric-current`, `electric-inductance`, `electric-resistance`, `energy`, `force`, `frequency`, `graphics`, `ionizing-radiation`, `length`, `luminance`, `luminous-flux`, `luminous-intensity`, `magnetic-flux`, `magnetic-induction`, `mass`, `portion`, `power`, `pressure`, `pressure-per-length`, `radioactivity`, `solid-angle`, `speed`, `substance-amount`, `temperature`, `th`, `time`, `typewidth`, `voltage`, `volume`, `year-duration`
+
+## unit\_l10n
+
+    my $ref = $cldr->unit_l10n(
+        unit_id         => 'length-kilometer',
+        locale          => 'en',
+        # long, narrow, short
+        format_length   => 'long',
+        # compound, regular
+        unit_type       => 'regular',
+        count           => 'one',
+        gender          => undef,
+        gram_case       => undef,
+    );
+    # Returns an hash reference like this:
+    {
+        units_l10n_id   => 25599,
+        locale          => 'en',
+        format_length   => 'long',
+        unit_type       => 'regular',
+        unit_id         => 'length-kilometer',
+        unit_pattern    => '{0} kilometer',
+        pattern_type    => 'regular',
+        locale_name     => 'kilometers',
+        count           => 'one',
+        gender          => undef,
+        gram_case       => undef,
+    }
+
+Returns an hash reference of a `unit` localised information from the table [units\_l10n](#table-units_l10n) for a given `locale` ID, `format_length`, `unit_type`, `unit_id`, `count`, `gender`, `gram_case`.
+
+If no `count`, `gender`, or `gram_case` value is provided, it will default to `undef`
+
+The meaning of the fields are as follows:
+
+- `units_l10n_id`
+
+    A unique incremental value automatically generated by SQLite.
+
+- `locale`
+
+    A `locale`, such as `en` or `ja-JP` as can be found in table [locales](#table-locales)
+
+- `format_length`
+
+    A string representing the unit format length
+
+    Known values are: `long`, `narrow`, `short`
+
+- `unit_type`
+
+    A string representing a `unit` type.
+
+    Known values are: `compound` and `regular`
+
+- `unit_id`
+
+    A string representing a `unit` ID.
+
+- `unit_pattern`
+
+    A string representing a localised `unit` pattern.
+
+- `pattern_type`
+
+    A string representing a pattern type.
+
+    Known values are: `per-unit`, `prefix`, `regular`
+
+- `locale_name`
+
+    A string containing the localised representation of this `unit`
+
+    Note that there is no `locale_name` value for `unit` of type `compound` in the `CLDR` data.
+
+- `count`
+
+    A string used to differentiate identical values.
+
+    Known values are: `undef`, `one`, `other`, `zero`, `two`, `few`, `many`
+
+- `gender`
+
+    A string representing the `gender` associated with the `unit`
+
+    The locales that are known to use `gender` information for units are:
+
+    - `ar`
+
+        Arabic
+
+    - `ca`
+
+        Catalan
+
+    - `cs`
+
+        Czech
+
+    - `da`
+
+        Danish
+
+    - `de`
+
+        German
+
+    - `el`
+
+        Greek
+
+    - `es`
+
+        Spanish
+
+    - `fr`
+
+        French
+
+    - `fr-CA`
+
+        Canadian French
+
+    - `gu`
+
+        Gujarati
+
+    - `he`
+
+        Hebrew
+
+    - `hi`
+
+        Hindi
+
+    - `hr`
+
+        Croatian
+
+    - `is`
+
+        Icelandic
+
+    - `it`
+
+        Italian
+
+    - `kn`
+
+        Kannada
+
+    - `lt`
+
+        Lithuanian
+
+    - `lv`
+
+        Latvian
+
+    - `ml`
+
+        Malayalam
+
+    - `mr`
+
+        Marathi
+
+    - `nl`
+
+        Dutch
+
+    - `nn`
+
+        Norwegian Nynorsk
+
+    - `no`
+
+        Norwegian
+
+    - `pa`
+
+        Punjabi
+
+    - `pl`
+
+        Polish
+
+    - `pt`
+
+        Portuguese
+
+    - `ro`
+
+        Romanian
+
+    - `ru`
+
+        Russian
+
+    - `sk`
+
+        Slovak
+
+    - `sl`
+
+        Slovenian
+
+    - `sr`
+
+        Serbian
+
+    - `sv`
+
+        Swedish
+
+    - `uk`
+
+        Ukrainian
+
+    - `ur`
+
+        Urdu
+
+- `gram_case`
+
+    A string representing a grammatical case.
+
+    Known values are: `ablative`, `accusative`, `dative`, `elative`, `ergative`, `genitive`, `illative`, `instrumental`, `locative`, `oblique`, `partitive`, `prepositional`, `sociative`, `terminative`, `translative`, `vocative`
+
+See the [LDML specifications](https://unicode.org/reports/tr35/tr35-general.html#Unit_Elements) for more information.
+
+## units\_l10n
+
+    my $all = $cldr->units_l10n;
+    my $all = $cldr->units_l10n( locale => 'en' );
+    my $all = $cldr->units_l10n(
+        locale          => 'en',
+        format_length   => 'long',
+        unit_type       => 'regular',
+        unit_id         => 'length-kilometer',
+        pattern_type    => 'regular',
+    );
+
+Returns all the unit prefixes information as an array reference of hash reference from the [table units\_l10n](#table-units_l10n)
+
+A combination of the following fields may be provided to filter the information returned:
+
+- `locale`
+
+    A `locale`, such as `en` or `ja-JP` as can be found in table [locales](#table-locales)
+
+- `format_length`
+
+    A string representing the unit format length
+
+    Known values are: `long`, `narrow`, `short`
+
+- `unit_type`
+
+    A string representing a `unit` type.
+
+    Known values are: `compound` and `regular`
+
+- `unit_id`
+
+    A string representing a `unit` ID.
+
+- `pattern_type`
+
+    A string representing a pattern type.
+
+    Known values are: `per-unit`, `prefix`, `regular`
+
+## unit\_prefix
+
+    my $ref = $cldr->unit_prefix( unit_id => 'micro' );
+    # Returns an hash reference like this:
+    {
+        unit_prefix_id  => 9,
+        unit_id         => 'micro',
+        symbol          => 'μ',
+        power           => 10,
+        factor          => -6,
+    }
+
+Returns an hash reference of a unit prefix information from the table [unit\_prefixes](#table-unit_prefixes) based on the `unit_id` ID provided.
+
+The meaning of the fields are as follows:
+
+- `unit_prefix_id`
+
+    A unique incremental value automatically generated by SQLite.
+
+- `unit_id`
+
+    A `unit` ID
+
+- `symbol`
+
+    A string representing the unit symbol.
+
+- `power`
+
+    A value representing the unit power
+
+- `factor`
+
+    A value representing the unit factor.
+
+## unit\_prefixes
+
+    my $all = $cldr->unit_prefixes;
+
+Returns all the unit prefixes information as an array reference of hash reference from the [table unit\_prefixes](#table-unit_prefixes)
+
+No additional parameter is needed.
+
+## unit\_pref
+
+    my $ref = $cldr->unit_pref( unit_id => 'square-meter' );
+    # Returns an hash reference like this:
+    {
+        unit_pref_id    => 3,
+        unit_id         => 'square-meter',
+        territory       => '001',
+        category        => 'area',
+        usage           => 'default',
+        geq             => undef,
+        skeleton        => undef,
+    }
+
+Returns an hash reference of a unit preference information from the table [unit\_prefs](#table-unit_prefs) based on the `unit_id` ID provided.
+
+## unit\_prefs
+
+    my $all = $cldr->unit_prefs;
+    my $all = $cldr->unit_prefs( territory => 'US' );
+    my $all = $cldr->unit_prefs( category => 'area' );
+
+Returns all the unit preferences information as an array reference of hash reference from the [table unit\_prefs](#table-unit_prefs)
+
+A combination of the following fields may be provided to filter the information returned:
+
+- `territory`
+
+    A `territory` code as can be found in table [territories](#table-territories)
+
+- `category`
+
+    A category ID. Known categories are: `area`, `concentration`, `consumption`, `duration`, `energy`, `length`, `mass`, `mass-density`, `power`, `pressure`, `speed`, `temperature`, `volume`, `year-duration`
+
+## unit\_quantity
+
+    my $ref = $cldr->unit_quantity( base_unit => 'kilogram' );
+    # Returns an hash reference like this:
+    {
+        unit_quantity_id    => 4,
+        base_unit           => 'kilogram',
+        quantity            => 'mass',
+        status              => 'simple',
+        comment             => undef,
+    }
+
+Returns an hash reference of a unit quantities information from the table [unit\_quantities](#table-unit_quantities) based on the `unit_id` ID provided.
+
+The meaning of the fields are as follows:
+
+- `unit_quantity_id`
+
+    A unique incremental value automatically generated by SQLite.
+
+- `base_unit`
+
+    A string representing the base unit.
+
+- `quantity`
+
+    A string representing the unit quantity.
+
+    Known values are: `acceleration`, `angle`, `area`, `catalytic-activity`, `concentration`, `concentration-mass`, `consumption`, `current-density`, `digital`, `duration`, `electric-capacitance`, `electric-charge`, `electric-conductance`, `electric-current`, `electric-inductance`, `electric-resistance`, `energy`, `force`, `frequency`, `graphics`, `illuminance`, `ionizing-radiation`, `length`, `luminous-flux`, `luminous-intensity`, `magnetic-field-strength`, `magnetic-flux`, `magnetic-induction`, `mass`, `mass-density`, `mass-fraction`, `portion`, `power`, `pressure`, `pressure-per-length`, `radioactivity`, `resolution`, `solid-angle`, `specific-volume`, `speed`, `substance-amount`, `temperature`, `typewidth`, `voltage`, `volume`, `wave-number`, `year-duration`
+
+- `status`
+
+    A string representing the unit status.
+
+    Known values are: `undef` and `simple`
+
+- `comment`
+
+    A text providing some comments about this unit quantity.
+
+## unit\_quantities
+
+    my $all = $cldr->unit_quantities;
+    my $all = $cldr->unit_quantities( quantity => 'mass' );
+
+Returns all the unit quantities information as an array reference of hash reference from the [table unit\_quantities](#table-unit_quantities)
+
+A combination of the following fields may be provided to filter the information returned:
+
+- `quantity`
+
+    A `quantity` ID. Known `quantity` ID are: `acceleration`, `angle`, `area`, `catalytic-activity`, `concentration`, `concentration-mass`, `consumption`, `current-density`, `digital`, `duration`, `electric-capacitance`, `electric-charge`, `electric-conductance`, `electric-current`, `electric-inductance`, `electric-resistance`, `energy`, `force`, `frequency`, `graphics`, `illuminance`, `ionizing-radiation`, `length`, `luminous-flux`, `luminous-intensity`, `magnetic-field-strength`, `magnetic-flux`, `magnetic-induction`, `mass`, `mass-density`, `mass-fraction`, `portion`, `power`, `pressure`, `pressure-per-length`, `radioactivity`, `resolution`, `solid-angle`, `specific-volume`, `speed`, `substance-amount`, `temperature`, `typewidth`, `voltage`, `volume`, `wave-number`, `year-duration`
+
+## variant
+
+    my $ref = $cldr->variant( variant => 'valencia' );
+    # Returns an hash reference like this:
+    {
+        variant_id  => 111,
+        variant     => 'valencia',
+        status      => 'regular',
+    }
+
+Returns an hash reference of a variant information from the table [variants](#table-variants) based on the `variant` ID provided.
+
+The meaning of the fields are as follows:
+
+- `variant_id`
+
+    A unique incremental value automatically generated by SQLite.
+
+- `variant`
+
+    A `variant` ID
+
+- `status`
+
+    A string representing a status for this variant.
+
+    Known values are: `undef`, `deprecated`, `regular`
+
+## variants
+
+    my $all = $cldr->variants;
+
+Returns all the variants information as an array reference of hash reference from the [table variants](#table-variants)
+
+No additional parameter is needed.
+
+## variant\_l10n
+
+    my $ref = $cldr->variant_l10n(
+        variant => 'valencia',
+        locale  => 'en',
+        alt     => undef,
+    );
+    # Returns an hash reference like this:
+    {
+        var_l10n_id => 771,
+        locale      => 'en',
+        variant     => 'valencia',
+        locale_name => 'Valencian',
+        alt         => undef,
+    }
+
+Returns an hash reference of a `variant` localised information from the table [variants\_l10n](#table-variants_l10n) for a given `variant` ID and a `locale` ID and an `alt` value. If no `alt` value is provided, it will default to `undef`
+
+The meaning of the fields are as follows:
+
+- `var_l10n_id`
+
+    A unique incremental value automatically generated by SQLite.
+
+- `locale`
+
+    A `locale`, such as `en` or `ja-JP` as can be found in table [locales](#table-locales)
+
+- `variant`
+
+    A `variant` ID as can be found in the [table variants](#table-variants)
+
+- `locale_name`
+
+    A string representing the localised `variant` name based on the `locale`
+
+- `alt`
+
+    An alternative value identifier to distinguish a variant with the same name.
+
+    Known values are: `undef` and `secondary`
+
+## variants\_l10n
+
+    my $all = $cldr->variants_l10n;
+    my $all = $cldr->variants_l10n( locale => 'en' );
+    my $all = $cldr->variants_l10n(
+        locale  => 'en',
+        alt     => undef,
+    );
+
+Returns all the variants localised information as an array reference of hash reference from the [table variants\_l10n](#table-variants_l10n)
+
+## week\_preference
+
+    my $ref = $cldr->week_preference( locale => 'ja' );
+    # Returns an hash reference like this:
+    {
+        week_pref_id    => 32,
+        locale          => 'ja',
+        ordering        => ["weekOfDate", "weekOfMonth"],
+    }
+
+Returns an hash reference of a week preference information from the table [week\_preferences](#table-week_preferences) for a given `locale` ID.
+
+The meaning of the fields are as follows:
+
+- `week_pref_id`
+
+    A unique incremental value automatically generated by SQLite.
+
+- `locale`
+
+    A `locale`, such as `en` or `ja-JP` as can be found in table [locales](#table-locales)
+
+- `ordering`
+
+    This is "an ordered list of the preferred types of week designations for that"\[[1](https://unicode.org/reports/tr35/tr35-dates.html#Week_Data)\]
+
+    It is provided as an array of tokens.
+
+    Known values in the array are:
+
+    - `weekOfYear`
+    - `weekOfMonth`
+    - `weekOfDate`
+    - `weekOfInterval`
+
+See the [LDML specifications](https://unicode.org/reports/tr35/tr35-dates.html#Week_Data) for more information.
+
+## week\_preferences
+
+    my $all = $cldr->week_preferences;
+
+Returns all the week preferences information as an array reference of hash reference from the [table week\_preferences](#table-week_preferences)
+
+# SQL Schema
+
+The SQLite SQL schema is available in the file `scripts/cldr-schema.sql`
+
+The data are populated into the SQLite database using the script located in `scripts/create_database.pl` and the data accessible from [https://github.com/unicode-org/cldr](https://github.com/unicode-org/cldr) or from [https://cldr.unicode.org/index/downloads/](https://cldr.unicode.org/index/downloads/)
+
+# Tables
+
+The SQL schema used to create the SQLite database is available in the `scripts` directory of this distribution in the file `cldr-schema.sql`
+
+The tables used are as follows, in alphabetical order:
+
+## Table aliases
+
+- `alias_id`
+
+    A integer field.
+
+- `alias`
+
+    A string field.
+
+- `replacement`
+
+    A string array field.
+
+- `reason`
+
+    A string field.
+
+- `type`
+
+    A string field.
+
+- `comment`
+
+    A string field.
+
+## Table annotations
+
+- `annotation_id`
+
+    A integer field.
+
+- `locale`
+
+    A string field.
+
+- `annotation`
+
+    A string field.
+
+- `defaults`
+
+    A string array field.
+
+- `tts`
+
+    A string field.
+
+## Table bcp47\_currencies
+
+- `bcp47_curr_id`
+
+    A integer field.
+
+- `currid`
+
+    A string field.
+
+- `code`
+
+    A string field.
+
+- `description`
+
+    A string field.
+
+- `is_obsolete`
+
+    A boolean field.
+
+## Table bcp47\_extensions
+
+- `bcp47_ext_id`
+
+    A integer field.
+
+- `category`
+
+    A string field.
+
+- `extension`
+
+    A string field.
+
+- `alias`
+
+    A string field.
+
+- `value_type`
+
+    A string field.
+
+- `description`
+
+    A string field.
+
+- `deprecated`
+
+    A boolean field.
+
+## Table bcp47\_timezones
+
+- `bcp47_tz_id`
+
+    A integer field.
+
+- `tzid`
+
+    A string field.
+
+- `alias`
+
+    A string array field.
+
+- `preferred`
+
+    A string field.
+
+- `description`
+
+    A string field.
+
+- `deprecated`
+
+    A boolean field.
+
+## Table bcp47\_values
+
+- `bcp47_value_id`
+
+    A integer field.
+
+- `category`
+
+    A string field.
+
+- `extension`
+
+    A string field.
+
+- `value`
+
+    A string field.
+
+- `description`
+
+    A string field.
+
+## Table calendar\_append\_formats
+
+- `cal_append_fmt_id`
+
+    A integer field.
+
+- `locale`
+
+    A string field.
+
+- `calendar`
+
+    A string field.
+
+- `format_id`
+
+    A string field.
+
+- `format_pattern`
+
+    A string field.
+
+## Table calendar\_available\_formats
+
+- `cal_avail_fmt_id`
+
+    A integer field.
+
+- `locale`
+
+    A string field.
+
+- `calendar`
+
+    A string field.
+
+- `format_id`
+
+    A string field.
+
+- `format_pattern`
+
+    A string field.
+
+- `count`
+
+    A string field.
+
+- `alt`
+
+    A string field.
+
+## Table calendar\_cyclics\_l10n
+
+- `cal_int_fmt_id`
+
+    A integer field.
+
+- `locale`
+
+    A string field.
+
+- `calendar`
+
+    A string field.
+
+- `format_set`
+
+    A string field.
+
+- `format_type`
+
+    A string field.
+
+- `format_length`
+
+    A string field.
+
+- `format_id`
+
+    A integer field.
+
+- `format_pattern`
+
+    A string field.
+
+## Table calendar\_datetime\_formats
+
+- `cal_dt_fmt_id`
+
+    A integer field.
+
+- `locale`
+
+    A string field.
+
+- `calendar`
+
+    A string field.
+
+- `format_length`
+
+    A string field.
+
+- `format_type`
+
+    A string field.
+
+- `format_pattern`
+
+    A string field.
+
+## Table calendar\_eras
+
+- `calendar_era_id`
+
+    A integer field.
+
+- `calendar`
+
+    A string field.
+
+- `sequence`
+
+    A integer field.
+
+- `code`
+
+    A string field.
+
+- `aliases`
+
+    A string array field.
+
+- `start`
+
+    A date field.
+
+- `until`
+
+    A date field.
+
+## Table calendar\_eras\_l10n
+
+- `cal_era_l10n_id`
+
+    A integer field.
+
+- `locale`
+
+    A string field.
+
+- `calendar`
+
+    A string field.
+
+- `era_width`
+
+    A string field.
+
+- `era_id`
+
+    A string field.
+
+- `alt`
+
+    A string field.
+
+- `locale_name`
+
+    A string field.
+
+## Table calendar\_formats\_l10n
+
+- `cal_fmt_l10n_id`
+
+    A integer field.
+
+- `locale`
+
+    A string field.
+
+- `calendar`
+
+    A string field.
+
+- `format_type`
+
+    A string field.
+
+- `format_length`
+
+    A string field.
+
+- `alt`
+
+    A string field.
+
+- `format_id`
+
+    A string field.
+
+- `format_pattern`
+
+    A string field.
+
+## Table calendar\_interval\_formats
+
+- `cal_int_fmt_id`
+
+    A integer field.
+
+- `locale`
+
+    A string field.
+
+- `calendar`
+
+    A string field.
+
+- `format_id`
+
+    A string field.
+
+- `greatest_diff_id`
+
+    A string field.
+
+- `format_pattern`
+
+    A string field.
+
+- `alt`
+
+    A string field.
+
+- `part1`
+
+    A string field.
+
+- `separator`
+
+    A string field.
+
+- `part2`
+
+    A string field.
+
+- `repeating_field`
+
+    A string field.
+
+## Table calendar\_terms
+
+- `cal_term_id`
+
+    A integer field.
+
+- `locale`
+
+    A string field.
+
+- `calendar`
+
+    A string field.
+
+- `term_type`
+
+    A string field.
+
+- `term_context`
+
+    A string field.
+
+- `term_width`
+
+    A string field.
+
+- `alt`
+
+    A string field.
+
+- `yeartype`
+
+    A string field.
+
+- `term_name`
+
+    A string field.
+
+- `term_value`
+
+    A string field.
+
+## Table calendars
+
+- `calendar_id`
+
+    A integer field.
+
+- `calendar`
+
+    A string field.
+
+- `system`
+
+    A string field.
+
+- `inherits`
+
+    A string field.
+
+- `description`
+
+    A string field.
+
+## Table calendars\_l10n
+
+- `calendar_l10n_id`
+
+    A integer field.
+
+- `locale`
+
+    A string field.
+
+- `calendar`
+
+    A string field.
+
+- `locale_name`
+
+    A string field.
+
+## Table casings
+
+- `casing_id`
+
+    A integer field.
+
+- `locale`
+
+    A string field.
+
+- `token`
+
+    A string field.
+
+- `value`
+
+    A string field.
+
+## Table code\_mappings
+
+- `code_mapping_id`
+
+    A integer field.
+
+- `code`
+
+    A string field.
+
+- `alpha3`
+
+    A string field.
+
+- `numeric`
+
+    A integer field.
+
+- `fips10`
+
+    A string field.
+
+- `type`
+
+    A string field.
+
+## Table collations\_l10n
+
+- `collation_l10n_id`
+
+    A integer field.
+
+- `locale`
+
+    A string field.
+
+- `collation`
+
+    A string field.
+
+- `locale_name`
+
+    A string field.
+
+## Table currencies
+
+- `currency_id`
+
+    A integer field.
+
+- `currency`
+
+    A string field.
+
+- `digits`
+
+    A integer field.
+
+- `rounding`
+
+    A integer field.
+
+- `cash_digits`
+
+    A integer field.
+
+- `cash_rounding`
+
+    A integer field.
+
+- `is_obsolete`
+
+    A boolean field.
+
+- `status`
+
+    A string field.
+
+## Table currencies\_info
+
+- `currency_info_id`
+
+    A integer field.
+
+- `territory`
+
+    A string field.
+
+- `currency`
+
+    A string field.
+
+- `start`
+
+    A date field.
+
+- `until`
+
+    A date field.
+
+- `is_tender`
+
+    A boolean field.
+
+- `hist_sequence`
+
+    A integer field.
+
+- `is_obsolete`
+
+    A boolean field.
+
+## Table currencies\_l10n
+
+- `curr_l10n_id`
+
+    A integer field.
+
+- `locale`
+
+    A string field.
+
+- `currency`
+
+    A string field.
+
+- `count`
+
+    A string field.
+
+- `locale_name`
+
+    A string field.
+
+- `symbol`
+
+    A string field.
+
+## Table date\_fields\_l10n
+
+- `date_field_id`
+
+    A integer field.
+
+- `locale`
+
+    A string field.
+
+- `field_type`
+
+    A string field.
+
+- `field_length`
+
+    A string field.
+
+- `relative`
+
+    A integer field.
+
+- `locale_name`
+
+    A string field.
+
+## Table day\_periods
+
+- `day_period_id`
+
+    A integer field.
+
+- `locale`
+
+    A string field.
+
+- `day_period`
+
+    A string field.
+
+- `start`
+
+    A string field.
+
+- `until`
+
+    A string field.
+
+## Table language\_population
+
+- `language_pop_id`
+
+    A integer field.
+
+- `territory`
+
+    A string field.
+
+- `locale`
+
+    A string field.
+
+- `population_percent`
+
+    A decimal field.
+
+- `literacy_percent`
+
+    A decimal field.
+
+- `writing_percent`
+
+    A decimal field.
+
+- `official_status`
+
+    A string field.
+
+## Table languages
+
+- `language_id`
+
+    A integer field.
+
+- `language`
+
+    A string field.
+
+- `scripts`
+
+    A string array field.
+
+- `territories`
+
+    A string array field.
+
+- `parent`
+
+    A string field.
+
+- `alt`
+
+    A string field.
+
+- `status`
+
+    A string field.
+
+## Table languages\_match
+
+- `lang_match_id`
+
+    A integer field.
+
+- `desired`
+
+    A string field.
+
+- `supported`
+
+    A string field.
+
+- `distance`
+
+    A integer field.
+
+- `is_symetric`
+
+    A boolean field.
+
+- `is_regexp`
+
+    A boolean field.
+
+- `sequence`
+
+    A integer field.
+
+## Table likely\_subtags
+
+- `likely_subtag_id`
+
+    A integer field.
+
+- `locale`
+
+    A string field.
+
+- `target`
+
+    A string field.
+
+## Table locales
+
+- `locale_id`
+
+    A integer field.
+
+- `locale`
+
+    A string field.
+
+- `parent`
+
+    A string field.
+
+- `status`
+
+    A string field.
+
+## Table locales\_info
+
+- `locales_info_id`
+
+    A integer field.
+
+- `locale`
+
+    A string field.
+
+- `property`
+
+    A string field.
+
+- `value`
+
+    A string field.
+
+## Table locales\_l10n
+
+- `locales_l10n_id`
+
+    A integer field.
+
+- `locale`
+
+    A string field.
+
+- `locale_id`
+
+    A string field.
+
+- `locale_name`
+
+    A string field.
+
+- `alt`
+
+    A string field.
+
+## Table metainfos
+
+- `meta_id`
+
+    A integer field.
+
+- `property`
+
+    A string field.
+
+- `value`
+
+    A string field.
+
+## Table number\_formats\_l10n
+
+- `number_format_id`
+
+    A integer field.
+
+- `locale`
+
+    A string field.
+
+- `number_system`
+
+    A string field.
+
+- `number_type`
+
+    A string field.
+
+- `format_length`
+
+    A string field.
+
+- `format_type`
+
+    A string field.
+
+- `format_id`
+
+    A string field.
+
+- `format_pattern`
+
+    A string field.
+
+- `alt`
+
+    A string field.
+
+- `count`
+
+    A string field.
+
+## Table number\_symbols\_l10n
+
+- `number_symbol_id`
+
+    A integer field.
+
+- `locale`
+
+    A string field.
+
+- `number_system`
+
+    A string field.
+
+- `property`
+
+    A string field.
+
+- `value`
+
+    A string field.
+
+- `alt`
+
+    A string field.
+
+## Table number\_systems
+
+- `numsys_id`
+
+    A integer field.
+
+- `number_system`
+
+    A string field.
+
+- `digits`
+
+    A string array field.
+
+- `type`
+
+    A string field.
+
+## Table number\_systems\_l10n
+
+- `num_sys_l10n_id`
+
+    A integer field.
+
+- `locale`
+
+    A string field.
+
+- `number_system`
+
+    A string field.
+
+- `locale_name`
+
+    A string field.
+
+- `alt`
+
+    A string field.
+
+## Table person\_name\_defaults
+
+- `pers_name_def_id`
+
+    A integer field.
+
+- `locale`
+
+    A string field.
+
+- `value`
+
+    A string field.
+
+## Table rbnf
+
+- `rbnf_id`
+
+    A integer field.
+
+- `locale`
+
+    A string field.
+
+- `grouping`
+
+    A string field.
+
+- `ruleset`
+
+    A string field.
+
+- `rule_id`
+
+    A string field.
+
+- `rule_value`
+
+    A string field.
+
+## Table refs
+
+- `ref_id`
+
+    A integer field.
+
+- `code`
+
+    A string field.
+
+- `uri`
+
+    A string field.
+
+- `description`
+
+    A string field.
+
+## Table scripts
+
+- `script_id`
+
+    A integer field.
+
+- `script`
+
+    A string field.
+
+- `rank`
+
+    A integer field.
+
+- `sample_char`
+
+    A string field.
+
+- `id_usage`
+
+    A string field.
+
+- `rtl`
+
+    A boolean field.
+
+- `lb_letters`
+
+    A boolean field.
+
+- `has_case`
+
+    A boolean field.
+
+- `shaping_req`
+
+    A boolean field.
+
+- `ime`
+
+    A boolean field.
+
+- `density`
+
+    A integer field.
+
+- `origin_country`
+
+    A string field.
+
+- `likely_language`
+
+    A string field.
+
+- `status`
+
+    A string field.
+
+## Table scripts\_l10n
+
+- `scripts_l10n_id`
+
+    A integer field.
+
+- `locale`
+
+    A string field.
+
+- `script`
+
+    A string field.
+
+- `locale_name`
+
+    A string field.
+
+- `alt`
+
+    A string field.
+
+## Table subdivisions
+
+- `subdivision_id`
+
+    A integer field.
+
+- `territory`
+
+    A string field.
+
+- `subdivision`
+
+    A string field.
+
+- `parent`
+
+    A string field.
+
+- `is_top_level`
+
+    A boolean field.
+
+- `status`
+
+    A string field.
+
+## Table subdivisions\_l10n
+
+- `subdiv_l10n_id`
+
+    A integer field.
+
+- `locale`
+
+    A string field.
+
+- `subdivision`
+
+    A string field.
+
+- `locale_name`
+
+    A string field.
+
+## Table territories
+
+- `territory_id`
+
+    A integer field.
+
+- `territory`
+
+    A string field.
+
+- `parent`
+
+    A string field.
+
+- `gdp`
+
+    A integer field.
+
+- `literacy_percent`
+
+    A decimal field.
+
+- `population`
+
+    A integer field.
+
+- `languages`
+
+    A string array field.
+
+- `contains`
+
+    A string array field.
+
+- `currency`
+
+    A string field.
+
+- `calendars`
+
+    A string array field.
+
+- `min_days`
+
+    A integer field.
+
+- `first_day`
+
+    A integer field.
+
+- `weekend`
+
+    A integer array field.
+
+- `status`
+
+    A string field.
+
+## Table territories\_l10n
+
+- `terr_l10n_id`
+
+    A integer field.
+
+- `locale`
+
+    A string field.
+
+- `territory`
+
+    A string field.
+
+- `locale_name`
+
+    A string field.
+
+- `alt`
+
+    A string field.
+
+## Table time\_formats
+
+- `time_format_id`
+
+    A integer field.
+
+- `region`
+
+    A string field.
+
+- `territory`
+
+    A string field.
+
+- `locale`
+
+    A string field.
+
+- `time_format`
+
+    A string field.
+
+- `time_allowed`
+
+    A string array field.
+
+## Table timezones
+
+- `timezone_id`
+
+    A integer field.
+
+- `timezone`
+
+    A string field.
+
+- `territory`
+
+    A string field.
+
+- `region`
+
+    A string field.
+
+- `tzid`
+
+    A string field.
+
+- `metazone`
+
+    A string field.
+
+- `tz_bcpid`
+
+    A string field.
+
+- `is_golden`
+
+    A boolean field.
+
+## Table timezones\_info
+
+- `tzinfo_id`
+
+    A integer field.
+
+- `timezone`
+
+    A string field.
+
+- `metazone`
+
+    A string field.
+
+- `start`
+
+    A datetime field.
+
+- `until`
+
+    A datetime field.
+
+## Table unit\_aliases
+
+- `unit_alias_id`
+
+    A integer field.
+
+- `alias`
+
+    A string field.
+
+- `target`
+
+    A string field.
+
+- `reason`
+
+    A string field.
+
+## Table unit\_constants
+
+- `unit_constant_id`
+
+    A integer field.
+
+- `constant`
+
+    A string field.
+
+- `expression`
+
+    A string field.
+
+- `value`
+
+    A decimal field.
+
+- `description`
+
+    A string field.
+
+- `status`
+
+    A string field.
+
+## Table unit\_conversions
+
+- `unit_conversion_id`
+
+    A integer field.
+
+- `source`
+
+    A string field.
+
+- `base_unit`
+
+    A string field.
+
+- `expression`
+
+    A string field.
+
+- `factor`
+
+    A decimal field.
+
+- `systems`
+
+    A string array field.
+
+- `category`
+
+    A string field.
+
+## Table unit\_prefixes
+
+- `unit_prefix_id`
+
+    A integer field.
+
+- `unit_id`
+
+    A string field.
+
+- `symbol`
+
+    A string field.
+
+- `power`
+
+    A integer field.
+
+- `factor`
+
+    A integer field.
+
+## Table unit\_prefs
+
+- `unit_pref_id`
+
+    A integer field.
+
+- `unit_id`
+
+    A string field.
+
+- `territory`
+
+    A string field.
+
+- `category`
+
+    A string field.
+
+- `usage`
+
+    A string field.
+
+- `geq`
+
+    A decimal field.
+
+- `skeleton`
+
+    A string field.
+
+## Table unit\_quantities
+
+- `unit_quantity_id`
+
+    A integer field.
+
+- `base_unit`
+
+    A string field.
+
+- `quantity`
+
+    A string field.
+
+- `status`
+
+    A string field.
+
+- `comment`
+
+    A string field.
+
+## Table units\_l10n
+
+- `units_l10n_id`
+
+    A integer field.
+
+- `locale`
+
+    A string field.
+
+- `format_length`
+
+    A string field.
+
+- `unit_type`
+
+    A string field.
+
+- `unit_id`
+
+    A string field.
+
+- `unit_pattern`
+
+    A string field.
+
+- `pattern_type`
+
+    A string field.
+
+- `locale_name`
+
+    A string field.
+
+- `count`
+
+    A string field.
+
+- `gender`
+
+    A string field.
+
+- `gram_case`
+
+    A string field.
+
+## Table variants
+
+- `variant_id`
+
+    A integer field.
+
+- `variant`
+
+    A string field.
+
+- `status`
+
+    A string field.
+
+## Table variants\_l10n
+
+- `var_l10n_id`
+
+    A integer field.
+
+- `locale`
+
+    A string field.
+
+- `variant`
+
+    A string field.
+
+- `locale_name`
+
+    A string field.
+
+- `alt`
+
+    A string field.
+
+## Table week\_preferences
+
+- `week_pref_id`
+
+    A integer field.
+
+- `locale`
+
+    A string field.
+
+- `ordering`
+
+    A string array field.
+
+# Format Patterns
+
+The following is taken directly from the [Unicode LDML specifications](https://unicode.org/reports/tr35/tr35-dates.html#table-date-field-symbol-table) and placed here for your convenience.
+
+Examples:
+
+- `yyyy.MM.dd G 'at' HH:mm:ss zzz`
+
+    1996.07.10 AD at 15:08:56 PDT
+
+- `EEE, MMM d, ''yy`
+
+    Wed, July 10, '96
+
+- `h:mm a`
+
+    12:08 PM
+
+- `hh 'o''clock' a, zzzz`
+
+    12 o'clock PM, Pacific Daylight Time
+
+- `K:mm a, z`
+
+    0:00 PM, PST
+
+- `yyyyy.MMMM.dd GGG hh:mm aaa`
+
+    01996.July.10 AD 12:08 PM
+
+See the [date field symbols table](https://unicode.org/reports/tr35/tr35-dates.html#Date_Field_Symbol_Table) for more details.
+
+- `a` period
+
+    **AM, PM**
+
+    May be upper or lowercase depending on the locale and other options. The wide form may be the same as the short form if the “real” long form (eg ante meridiem) is not customarily used. The narrow form must be unique, unlike some other fields. See also Parsing Dates and Times.
+
+    Examples:
+
+    - `a..aaa` (Abbreviated)
+
+        am. \[e.g. 12 am.\]
+
+    - `aaaa` (Wide)
+
+        am. \[e.g. 12 am.\]
+
+    - `aaaaa` (Narrow)
+
+        a \[e.g. 12a\]
+
+- `A` second
+
+    Milliseconds in day (numeric). This field behaves exactly like a composite of all time-related fields, not including the zone fields. As such, it also reflects discontinuities of those fields on DST transition days. On a day of DST onset, it will jump forward. On a day of DST cessation, it will jump backward. This reflects the fact that it must be combined with the offset field to obtain a unique local time value. The field length specifies the minimum number of digits, with zero-padding as necessary.
+
+    Examples:
+
+    - `A+`
+
+        69540000
+
+- `b` period
+
+    **am, pm, noon, midnight**
+
+    May be upper or lowercase depending on the locale and other options. If the locale doesn't have the notion of a unique "noon" = 12:00, then the PM form may be substituted. Similarly for "midnight" = 00:00 and the AM form. The narrow form must be unique, unlike some other fields.
+
+    Examples:
+
+    - `b..bbb` (Abbreviated)
+
+        mid. \[e.g. 12 mid.\]
+
+    - `bbbb` (Wide)
+
+        midnight
+
+        \[e.g. 12 midnight\]
+
+    - `bbbbb` (Narrow)
+
+        md \[e.g. 12 md\]
+
+- `B` period
+
+    **flexible day periods**
+
+    May be upper or lowercase depending on the locale and other options. Often there is only one width that is customarily used.
+
+    Examples:
+
+    - `B..BBB` (Abbreviated)
+
+        at night
+
+        \[e.g. 3:00 at night\]
+
+    - `BBBB` (Wide)
+
+        at night
+
+        \[e.g. 3:00 at night\]
+
+    - `BBBBB` (Narrow)
+
+        at night
+
+        \[e.g. 3:00 at night\]
+
+- `c` week day
+
+    Stand-Alone local day of week number/name.
+
+    Examples:
+
+    - `c..cc`
+
+        2
+
+        Numeric: 1 digit
+
+    - `ccc` (Abbreviated)
+
+        Tue
+
+    - `cccc` (Wide)
+
+        Tuesday
+
+    - `ccccc` (Narrow)
+
+        T
+
+    - `cccccc` (Short)
+
+        Tu
+
+- `C`
+
+    **Input skeleton symbol**
+
+    It must not occur in pattern or skeleton data. Instead, it is reserved for use in skeletons passed to APIs doing flexible date pattern generation. In such a context, like 'j', it requests the preferred hour format for the locale. However, unlike 'j', it can also select formats such as hb or hB, since it is based not on the preferred attribute of the hours element in supplemental data, but instead on the first element of the allowed attribute (which is an ordered preferrence list). For example, with "Cmm", 18:00 could appear as “6:00 in the afternoon”.
+
+    Example:
+
+    - `C`
+
+        `8`
+
+        `8` (morning)
+
+        Numeric hour (minimum digits), abbreviated dayPeriod if used
+
+    - `CC`
+
+        `08`
+
+        `08` (morning)
+
+        Numeric hour (2 digits, zero pad if needed), abbreviated dayPeriod if used
+
+    - `CCC`
+
+        `8`
+
+        `8` in the morning
+
+        Numeric hour (minimum digits), wide dayPeriod if used
+
+    - `CCCC`
+
+        `08`
+
+        `08` in the morning
+
+        Numeric hour (2 digits, zero pad if needed), wide dayPeriod if used
+
+    - `CCCCC`
+
+        `8`
+
+        `8` (morn.)
+
+        Numeric hour (minimum digits), narrow dayPeriod if used
+
+    - `CCCCCC`
+
+        `08`
+
+        `08` (morn.)
+
+        Numeric hour (2 digits, zero pad if needed), narrow dayPeriod if used
+
+- `d` day
+
+    Day of month (numeric).
+
+    Example:
+
+    - `d`
+
+        1
+
+        Numeric: minimum digits
+
+    - `dd`
+
+        01
+
+        Numeric: 2 digits, zero pad if needed
+
+- `D` day
+
+    The field length specifies the minimum number of digits, with zero-padding as necessary.
+
+    Example:
+
+    - `D...DDD` day
+
+        345	Day of year (numeric).
+
+- `e` week day
+
+    Local day of week number/name, format style. Same as E except adds a numeric value that will depend on the local starting day of the week. For this example, Monday is the first day of the week.
+
+    Example:
+
+    - `e`
+
+        2
+
+        Numeric: 1 digit
+
+    - `ee`
+
+        02
+
+        Numeric: 2 digits + zero pad
+
+    - `eee` (Abbreviated)
+
+        Tue
+
+    - `eeee` (Wide)
+
+        Tuesday
+
+    - `eeeee` (Narrow)
+
+        T
+
+    - `eeeeee` (Short)
+
+        Tu
+
+- `E` week day
+
+    Day of week name, format style.
+
+    Example:
+
+    - `E..EEE` (Abbreviated)
+
+        Tue
+
+    - `EEEE` (Wide)
+
+        Tuesday
+
+    - `EEEEE` (Narrow)
+
+        T
+
+    - `EEEEEE` (Short)
+
+        Tu
+
+- `F` day
+
+    Day of Week in Month (numeric). The example is for the 2nd Wed in July
+
+    Example:
+
+    - `F`
+
+        2
+
+- `g`
+
+    Modified Julian day (numeric). This is different from the conventional Julian day number in two regards. First, it demarcates days at local zone midnight, rather than noon GMT. Second, it is a local number; that is, it depends on the local time zone. It can be thought of as a single number that encompasses all the date-related fields. The field length specifies the minimum number of digits, with zero-padding as necessary.
+
+    Example:
+
+    - `g+`
+
+        2451334
+
+- `G` era
+
+    Era name.
+
+    Example:
+
+    - `G..GGG` (Abbreviated)
+
+        AD
+
+        \[variant: CE\]
+
+    - `GGGG` (Wide)
+
+        Anno Domini
+
+        \[variant: Common Era\]
+
+    - `GGGGG` (Narrow)
+
+        A
+
+- `h` hour
+
+    Hour \[1-12\]. When used in skeleton data or in a skeleton passed in an API for flexible date pattern generation, it should match the 12-hour-cycle format preferred by the locale (h or K); it should not match a 24-hour-cycle format (H or k).
+
+    Example:
+
+    - `h`
+
+        1, 12
+
+        Numeric: minimum digits
+
+    - `hh`
+
+        01, 12
+
+        Numeric: 2 digits, zero pad if needed
+
+- `H` hour
+
+    Hour \[0-23\]. When used in skeleton data or in a skeleton passed in an API for flexible date pattern generation, it should match the 24-hour-cycle format preferred by the locale (H or k); it should not match a 12-hour-cycle format (h or K).
+
+    Example:
+
+    - `H`
+
+        `0`, `23`
+
+        Numeric: minimum digits
+
+    - `HH`
+
+        `00`, `23`
+
+        Numeric: 2 digits, zero pad if needed
+
+- `j`
+
+    **Input skeleton symbol**
+
+    It must not occur in pattern or skeleton data. Instead, it is reserved for use in skeletons passed to APIs doing flexible date pattern generation. In such a context, it requests the preferred hour format for the locale (h, H, K, or k), as determined by the preferred attribute of the hours element in supplemental data. In the implementation of such an API, 'j' must be replaced by h, H, K, or k before beginning a match against availableFormats data.
+
+    Note that use of 'j' in a skeleton passed to an API is the only way to have a skeleton request a locale's preferred time cycle type (12-hour or 24-hour).
+
+    Example:
+
+    - `j`
+
+        `8`
+
+        `8 AM`
+
+        `13`
+
+        `1 PM`
+
+        Numeric hour (minimum digits), abbreviated dayPeriod if used
+
+    - `jj`
+
+        `08`
+
+        `08 AM`
+
+        `13`
+
+        `01 PM`
+
+        Numeric hour (2 digits, zero pad if needed), abbreviated dayPeriod if used
+
+    - `jjj`
+
+        `8`
+
+        `8 A.M.`
+
+        `13`
+
+        `1 P.M.`
+
+        Numeric hour (minimum digits), wide dayPeriod if used
+
+    - `jjjj`
+
+        `08`
+
+        `08 A.M.`
+
+        `13`
+
+        `01 P.M.`
+
+        Numeric hour (2 digits, zero pad if needed), wide dayPeriod if used
+
+    - `jjjjj`
+
+        `8`
+
+        `8a`
+
+        `13`
+
+        `1p`
+
+        Numeric hour (minimum digits), narrow dayPeriod if used
+
+    - `jjjjjj`
+
+        `08`
+
+        `08a`
+
+        `13`
+
+        `01p`
+
+        Numeric hour (2 digits, zero pad if needed), narrow dayPeriod if used
+
+- `J`
+
+    **Input skeleton symbol**
+
+    It must not occur in pattern or skeleton data. Instead, it is reserved for use in skeletons passed to APIs doing flexible date pattern generation. In such a context, like 'j', it requests the preferred hour format for the locale (h, H, K, or k), as determined by the **preferred** attribute of the hours element in supplemental data. However, unlike 'j', it requests no dayPeriod marker such as “am/pm” (it is typically used where there is enough context that that is not necessary). For example, with "jmm", 18:00 could appear as “6:00 PM”, while with "Jmm", it would appear as “6:00” (no PM).
+
+    Example:
+
+    - `J`
+
+        `8`
+
+        `8`
+
+        Numeric hour (minimum digits)
+
+    - `JJ`
+
+        `08`
+
+        `08`
+
+        Numeric hour (2 digits, zero pad if needed)
+
+- `k` hour
+
+    Hour \[1-24\]. When used in a skeleton, only matches k or H, see above.
+
+    Example:
+
+    - `k`
+
+        `1`, `24`
+
+        Numeric: minimum digits
+
+    - `kk`
+
+        `01`, `24`
+
+        Numeric: 2 digits, zero pad if needed
+
+- `K` hour
+
+    Hour \[0-11\]. When used in a skeleton, only matches K or h, see above.
+
+    Example:
+
+    - `K`
+
+        0, 11
+
+        Numeric: minimum digits
+
+    - `KK`
+
+        00, 11
+
+        Numeric: 2 digits, zero pad if needed
+
+- `L` month
+
+    Stand-Alone month number/name: For use when the month is displayed by itself, and in any other date pattern (e.g. just month and year, e.g. "LLLL y") that shares the same form of the month name. For month names, this is typically the nominative form. See discussion of month element.
+
+    See also the symbol `M` for month.
+
+    Example:
+
+    - `L`
+
+        9, 12
+
+        Numeric: minimum digits
+
+    - `LL`
+
+        09, 12	Numeric: 2 digits, zero pad if needed
+
+    - `LLL` (Abbreviated)
+
+        Sep
+
+    - `LLLL` (Wide)
+
+        September
+
+    - `LLLLL` (Narrow)
+
+        S
+
+- `M` month
+
+    Numeric: minimum digits	Format style month number/name: The format style name is an additional form of the month name (besides the stand-alone style) that can be used in contexts where it is different than the stand-alone form. For example, depending on the language, patterns that combine month with day-of month (e.g. "d MMMM") may require the month to be in genitive form. See discussion of month element. If a separate form is not needed, the format and stand-alone forms can be the same.
+
+    See also `L`
+
+    Example:
+
+    - `M`
+
+        9, 12
+
+    - `MM`
+
+        09, 12	Numeric: 2 digits, zero pad if needed
+
+    - `MMM` (Abbreviated)
+
+        Sep
+
+    - `MMMM` (Wide)
+
+        September
+
+    - `MMMMM` (Narrow)
+
+        S
+
+- `m` minute
+
+    Minute (numeric). Truncated, not rounded.
+
+    Examples:
+
+    - `m`
+
+        `8`, `59`
+
+        Numeric: minimum digits
+
+    - `mm`
+
+        `08`, `59`
+
+        Numeric: 2 digits, zero pad if needed
+
+- `O` zone
+
+    Examples:
+
+    - `O`
+
+        `GMT-8`
+
+        The short localized GMT format.
+
+    - `OOOO`
+
+        `GMT-08:00`
+
+        The long localized GMT format.
+
+- `q` quarter
+
+    Stand-Alone Quarter number/name.
+
+    Examples:
+
+    - `q`
+
+        `2`
+
+        Numeric: 1 digit
+
+    - `qq`
+
+        `02`
+
+        Numeric: 2 digits + zero pad
+
+    - `qqq` (Abbreviated)
+
+        `Q2`
+
+    - `qqqq` (Wide)
+
+        `2nd quarter`
+
+    - `qqqqq` (Narrow)
+
+        `2`
+
+- `Q` quarter
+
+    Quarter number/name.
+
+    Examples:
+
+    - `Q`
+
+        `2`
+
+        Numeric: 1 digit
+
+    - `QQ`
+
+        `02`
+
+        Numeric: 2 digits + zero pad
+
+    - `QQQ` (Abbreviated)
+
+        `Q2`
+
+    - `QQQQ` (Wide)
+
+        `2nd quarter`
+
+    - `QQQQQ` (Narrow)
+
+        `2`
+
+- `r`
+
+    Related Gregorian year (numeric). For non-Gregorian calendars, this corresponds to the extended Gregorian year in which the calendar’s year begins. Related Gregorian years are often displayed, for example, when formatting dates in the Japanese calendar — e.g. “2012(平成24)年1月15日” — or in the Chinese calendar — e.g. “2012壬辰年腊月初四”. The related Gregorian year is usually displayed using the "latn" numbering system, regardless of what numbering systems may be used for other parts of the formatted date. If the calendar’s year is linked to the solar year (perhaps using leap months), then for that calendar the ‘r’ year will always be at a fixed offset from the ‘u’ year. For the Gregorian calendar, the ‘r’ year is the same as the ‘u’ year. For ‘r’, all field lengths specify a minimum number of digits; there is no special interpretation for “rr”.
+
+    Example:
+
+    - `r+`
+
+        `2017`
+
+- `s` second
+
+    Second (numeric). Truncated, not rounded.
+
+    Example:
+
+    - `s`
+
+        `8`, `12`
+
+        Numeric: minimum digits
+
+    - `ss`
+
+        `08`, `12`
+
+        Numeric: 2 digits, zero pad if needed
+
+- `S` second
+
+    Fractional Second (numeric). Truncates, like other numeric time fields, but in this case to the number of digits specified by the field length. (Example shows display using pattern SSSS for seconds value 12.34567)
+
+    Example:
+
+    - `S+`
+
+        3456
+
+- `u`
+
+    Extended year (numeric). This is a single number designating the year of this calendar system, encompassing all supra-year fields. For example, for the Julian calendar system, year numbers are positive, with an era of BCE or CE. An extended year value for the Julian calendar system assigns positive values to CE years and negative values to BCE years, with 1 BCE being year 0. For ‘u’, all field lengths specify a minimum number of digits; there is no special interpretation for “uu”.
+
+    Example:
+
+    - `u+`
+
+        `4601`
+
+- `U`
+
+    Cyclic year name. Calendars such as the Chinese lunar calendar (and related calendars) and the Hindu calendars use 60-year cycles of year names. If the calendar does not provide cyclic year name data, or if the year value to be formatted is out of the range of years for which cyclic name data is provided, then numeric formatting is used (behaves like 'y').
+
+    Currently the data only provides abbreviated names, which will be used for all requested name widths.
+
+    Example:
+
+    - `U..UUU` (Abbreviated)
+
+        `甲子`
+
+    - `UUUU` (Wide)
+
+        `甲子` \[for now\]
+
+    - `UUUUU` (Narrow)
+
+        `甲子` \[for now\]
+
+- `v` zone
+
+    Example:
+
+    - `v`
+
+        `PT`
+
+        The short generic non-location format Where that is unavailable, falls back to the generic location format ("VVVV"), then the short localized GMT format as the final fallback.
+
+    - `vvvv`
+
+        `Pacific Time`
+
+        The long generic non-location format. Where that is unavailable, falls back to generic location format ("VVVV").
+
+- `V` zone
+
+    Example:
+
+    - `V`
+
+        `uslax`
+
+        The short time zone ID. Where that is unavailable, the special short time zone ID unk (Unknown Zone) is used.
+        Note: This specifier was originally used for a variant of the short specific non-location format, but it was deprecated in the later version of this specification. In CLDR 23, the definition of the specifier was changed to designate a short time zone ID.
+
+    - `VV`
+
+        `America/Los_Angeles`
+
+        The long time zone ID.
+
+    - `VVV`
+
+        `Los Angeles`
+
+        The exemplar city (location) for the time zone. Where that is unavailable, the localized exemplar city name for the special zone Etc/Unknown is used as the fallback (for example, "Unknown City").
+
+    - `VVVV`
+
+        `Los Angeles Time`
+
+        The generic location format. Where that is unavailable, falls back to the long localized GMT format ("OOOO"; Note: Fallback is only necessary with a GMT-style Time Zone ID, like Etc/GMT-830.)
+
+        This is especially useful when presenting possible timezone choices for user selection, since the naming is more uniform than the "v" format.
+
+- `w`
+
+    Week of Year (numeric). When used in a pattern with year, use ‘Y’ for the year field instead of ‘y’.
+
+    Example:
+
+    - `w`
+
+        `8`, `27`
+
+        Numeric: minimum digits
+
+    - `ww`
+
+        `08`, `27`
+
+        Numeric: 2 digits, zero pad if needed
+
+- `W`
+
+    Week of Month (numeric)
+
+    Example:
+
+    - `W`
+
+        `3`
+
+        Numeric: 1 digit
+
+- `x` zone
+
+    Example:
+
+    - `x`
+
+        `-08`
+
+        `+0530`
+
+        `+00`
+
+        The ISO8601 basic format with hours field and optional minutes field. (The same as X, minus "Z".)
+
+    - `xx`
+
+        `-0800`
+
+        `+0000`
+
+        The ISO8601 basic format with hours and minutes fields. (The same as XX, minus "Z".)
+
+    - `xxx`
+
+        `-08:00`
+
+        `+00:00`
+
+        The ISO8601 extended format with hours and minutes fields. (The same as XXX, minus "Z".)
+
+    - `xxxx`
+
+        `-0800`
+
+        `-075258`
+
+        `+0000`
+
+        The ISO8601 basic format with hours, minutes and optional seconds fields. (The same as XXXX, minus "Z".)
+
+        Note: The seconds field is not supported by the ISO8601 specification.
+
+    - `xxxxx`
+
+        `-08:00`
+
+        `-07:52:58`
+
+        `+00:00`
+
+        The ISO8601 extended format with hours, minutes and optional seconds fields. (The same as XXXXX, minus "Z".)
+
+        Note: The seconds field is not supported by the ISO8601 specification.
+
+- `X` zone
+
+    Example:
+
+    - `X`
+
+        `-08`
+
+        `+0530`
+
+        `Z`
+
+        The ISO8601 basic format with hours field and optional minutes field. The ISO8601 UTC indicator "Z" is used when local time offset is 0. (The same as x, plus "Z".)
+
+    - `XX`
+
+        `-0800`
+
+        `Z`
+
+        The ISO8601 basic format with hours and minutes fields. The ISO8601 UTC indicator "Z" is used when local time offset is 0. (The same as xx, plus "Z".)
+
+    - `XXX`
+
+        `-08:00`
+
+        `Z`
+
+        The ISO8601 extended format with hours and minutes fields. The ISO8601 UTC indicator "Z" is used when local time offset is 0. (The same as xxx, plus "Z".)
+
+    - `XXXX`
+
+        `-0800`
+
+        `-075258`
+
+        `Z`
+
+        The ISO8601 basic format with hours, minutes and optional seconds fields. The ISO8601 UTC indicator "Z" is used when local time offset is 0. (The same as xxxx, plus "Z".)
+
+        Note: The seconds field is not supported by the ISO8601 specification.
+
+    - `XXXXX`
+
+        `-08:00`
+
+        `-07:52:58`
+
+        `Z`
+
+        The ISO8601 extended format with hours, minutes and optional seconds fields. The ISO8601 UTC indicator "Z" is used when local time offset is 0. (The same as xxxxx, plus "Z".)
+
+        Note: The seconds field is not supported by the ISO8601 specification.
+
+- `y`
+
+    Calendar year (numeric). In most cases the length of the y field specifies the minimum number of digits to display, zero-padded as necessary; more digits will be displayed if needed to show the full year. However, “yy” requests just the two low-order digits of the year, zero-padded as necessary. For most use cases, “y” or “yy” should be adequate.
+
+    Example:
+
+    - `y`
+
+        `2`, `20`, `201`, `2017`, `20173`
+
+    - `yy`
+
+        `02`, `20`, `01`, `17`, `73`
+
+    - `yyy`
+
+        `002`, `020`, `201`, `2017`, `20173`
+
+    - `yyyy`
+
+        `0002`, `0020`, `0201`, `2017`, `20173`
+
+    - `yyyyy+`
+
+        ...
+
+- `Y`
+
+    Year in “Week of Year” based calendars in which the year transition occurs on a week boundary; may differ from calendar year ‘y’ near a year transition. This numeric year designation is used in conjunction with pattern character ‘w’ in the ISO year-week calendar as defined by ISO 8601, but can be used in non-Gregorian based calendar systems where week date processing is desired. The field length is interpreted in the same was as for ‘y’; that is, “yy” specifies use of the two low-order year digits, while any other field length specifies a minimum number of digits to display.
+
+    Example:
+
+    - `Y`
+
+        `2`, `20`, `201`, `2017`, `20173`
+
+    - `YY`
+
+        `02`, `20`, `01`, `17`, `73`
+
+    - `YYY`
+
+        `002`, `020`, `201`, `2017`, `20173`
+
+    - `YYYY`
+
+        `0002`, `0020`, `0201`, `2017`, `20173`
+
+    - `YYYYY+`
+
+        ...
+
+- `z` zone
+
+    The short specific non-location format. Where that is unavailable, falls back to the short localized GMT format ("O").
+    zzzz	Pacific Daylight Time 	The long specific non-location format. Where that is unavailable, falls back to the long localized GMT format ("OOOO").
+
+    Examples:
+
+    - `z..zzz`
+
+        `PDT`
+
+- `Z`
+
+    The ISO8601 basic format with hours, minutes and optional seconds fields. The format is equivalent to RFC 822 zone format (when optional seconds field is absent). This is equivalent to the "xxxx" specifier.
+
+    Examples:
+
+    - `Z..ZZZ`
+
+        `-0800`
+
+    - `ZZZZ`
+
+        `GMT-8:00`
+
+        The long localized GMT format. This is equivalent to the "OOOO" specifier.
+
+    - `ZZZZZ`
+
+        `-08:00`
+
+        `-07:52:58`
+
+        The ISO8601 extended format with hours, minutes and optional seconds fields. The ISO8601 UTC indicator "Z" is used when local time offset is 0. This is equivalent to the "XXXXX" specifier.
+
+See the [LDML specifications](https://unicode.org/reports/tr35/tr35-dates.html#Date_Format_Patterns) for more information on the date and time formatting.
+
+# Locale Inheritance
+
+When performing data look-ups, some data, such as width, may be missing and the default `wide` should be used, and sometime, the data is aliased. For example, `narrow` would be aliased to `abbreviated`.
+
+Then, there is also a vertical inheritance, whereby a locale `fr-CA` would lookup up data in its parent `fr`. When the inheritance is not natural, the `LDML` specifies a `parent`. This information can be found in table [locales](#table-locales). Ultimately, the root `locale` with value `und` is to be used.
+
+See the [LDML specifications](https://unicode.org/reports/tr35/tr35.html#Parent_Locales) for more information.
+
+# Errors
+
+This module does not die upon errors. Instead it sets an [error object](https://metacpan.org/pod/Locale%3A%3AUnicode%3A%3AData%3A%3AException) that can be retrieved.
+
+When an error occurred, an [error object](https://metacpan.org/pod/Locale%3A%3AUnicode%3A%3AData%3A%3AException) will be set and the method will return `undef` in scalar context and an empty list in list context.
+
+The only occasions when this module will die is when there is an internal design error, which would be my fault.
+
+# Advanced Search
+
+You can specify an operator other than the default `=` when providing arguments values, by placing it just before the argument value.
+
+Possible explicit operators are:
+
+- `=`
+- `!=`
+- `<`
+- `<=`
+- `>`
+- `>=`
+- `~`
+
+    Will enable the use of regular expression.
+
+    Alternatively, you can use a perl regular expression using the perl operator [qr](https://metacpan.org/pod/perlop#Regexp-Quote-Like-Operators)
+
+For example:
+
+    my $all = $cldr->timezone_info(
+        timezone => 'Europe/Simferopol',
+        start => ['>1991-01-01','<1995-01-01'],
+    );
+
+This would result in:
+
+    {
+        tzinfo_id   => 594,
+        timezone    => 'Europe/Simferopol',
+        metazone    => 'Moscow',
+        start       => '1994-04-30T21:00:00',
+        until       => '1997-03-30T01:00:00',
+    }
+
+or, using the `~` operator:
+
+    my $all = $cldr->time_formats(
+        region => '~^U.*',
+    );
+    my $all = $cldr->time_formats(
+        region => qr/^U.*/,
+    );
+
+would result in:
+
+    [
+        {
+            time_format_id => 141,
+            region => "UA",
+            territory => "UA",
+            locale => undef,
+            time_format => "H",
+            time_allowed => [qw( H hB h )],
+        },
+        {
+            time_format_id => 142,
+            region => "UZ",
+            territory => "UZ",
+            locale => undef,
+            time_format => "H",
+            time_allowed => [qw( H hB h )],
+        },
+        {
+            time_format_id => 155,
+            region => "UG",
+            territory => "UG",
+            locale => undef,
+            time_format => "H",
+            time_allowed => [qw( hB hb H h )],
+        },
+        {
+            time_format_id => 194,
+            region => "UY",
+            territory => "UY",
+            locale => undef,
+            time_format => "h",
+            time_allowed => [qw( h H hB hb )],
+        },
+        {
+            time_format_id => 226,
+            region => "UM",
+            territory => "UM",
+            locale => undef,
+            time_format => "h",
+            time_allowed => [qw( h hb H hB )],
+        },
+        {
+            time_format_id => 227,
+            region => "US",
+            territory => "US",
+            locale => undef,
+            time_format => "h",
+            time_allowed => [qw( h hb H hB )],
+        },
+    ]
+
+For single result methods, i.e. the methods that only return an hash reference, you can provide an array reference instead of a regular string for the primary field you are trying to query. So, for example, using the example above with the `timezone` info:
+
+    my $all = $cldr->timezone_info(
+        timezone => 'Europe/Simferopol',
+        start => ['>1991-01-01','<1995-01-01'],
+    );
+
+or, querying the [calendar terms](#calendar_term):
+
+    my $all = $cldr->calendar_term(
+        locale          => 'und',
+        calendar        => 'gregorian',
+        # format, stand-alone
+        term_context    => 'format',
+        # abbreviated, narrow, wide
+        term_width      => 'abbreviated',
+        term_name       => [qw( am pm )],
+    );
+    # Returns an array reference like:
+    [
+        {
+            cal_term_id     => 23478,
+            locale          => 'und',
+            calendar        => 'gregorian',
+            term_type       => 'day_period',
+            term_context    => 'format',
+            term_width      => 'abbreviated',
+            alt             => undef,
+            term_name       => 'am',
+            term_value      => 'AM',
+        },
+        {
+            cal_term_id     => 23479,
+            locale          => 'und',
+            calendar        => 'gregorian',
+            term_type       => 'day_period',
+            term_context    => 'format',
+            term_width      => 'abbreviated',
+            alt             => undef,
+            term_name       => 'pm',
+            term_value      => 'PM',
+        },
+    ]
+
+Of course, instead of returning an hash reference, as it normally would, it will return an array reference of hash reference.
+
+You can also ensure a certain order based on a field value. For example, you want to retrieve the `day` terms using [calendar\_term](#calendar_term), but the `term_name` are string, and we want to ensure the results are sorted in this order: `mon`, `tue`, `wed`, `thu`, `fri`, `sat` and `sun`
+
+    my $terms = $cldr->calendar_terms(
+        locale => 'en',
+        calendar => 'gregorian',
+        term_type => 'day',
+        term_context => 'format',
+        term_width => 'wide',
+        order_by_value => [term_name => [qw( mon tue wed thu fri sat sun )]],
+    );
+    my @weekdays = map( $_->{term_name}, @$terms );
+    # Monday, Tuesday, Wednesday, Thursday, Friday, Saturday, Sunday
+
+If we had wanted to put Sunday first, we would have done:
+
+    my $terms = $cldr->calendar_terms(
+        locale => 'en',
+        calendar => 'gregorian',
+        term_type => 'day',
+        term_context => 'format',
+        term_width => 'wide',
+        order_by_value => [term_name => [qw( sun mon tue wed thu fri sat )]],
+    );
+
+The parameter `order_by_value` supersedes the parameter `order` that may be provided.
+
+You can specify a particular data type to sort the values returned by SQLite, by providing the argument `order`, such as:
+
+    my $months = $cldr->calendar_terms(
+        locale => 'en',
+        calendar => 'gregorian',
+        term_type => 'month',
+        term_context => 'format',
+        term_width => 'wide',
+        order => [term_name => 'integer'],
+    );
+
+or, alternatively, using an hash reference with a single key:
+
+    my $months = $cldr->calendar_terms(
+        locale => 'en',
+        calendar => 'gregorian',
+        term_type => 'month',
+        term_context => 'format',
+        term_width => 'wide',
+        order => { term_name => 'integer' },
+    );
+    my @month_names = map( $_->{term_name}, @$months );
+    # January, February, March, April, May, June, July, August, September, October, November, December
+
+# AUTHOR
+
+Jacques Deguest <`jack@deguest.jp`>
+
+# SEE ALSO
+
+[Locale::Unicode](https://metacpan.org/pod/Locale%3A%3AUnicode), [DateTime::Locale::FromCLDR](https://metacpan.org/pod/DateTime%3A%3ALocale%3A%3AFromCLDR), [DateTime::Formatter::Unicode](https://metacpan.org/pod/DateTime%3A%3AFormatter%3A%3AUnicode), [DateTime::Locale::FromData](https://metacpan.org/pod/DateTime%3A%3ALocale%3A%3AFromData), [DateTime::Format::CLDR](https://metacpan.org/pod/DateTime%3A%3AFormat%3A%3ACLDR)
+
+# COPYRIGHT & LICENSE
+
+Copyright(c) 2024 DEGUEST Pte. Ltd.
+
+All rights reserved
+
+This program is free software; you can redistribute it and/or modify it under the same terms as Perl itself.

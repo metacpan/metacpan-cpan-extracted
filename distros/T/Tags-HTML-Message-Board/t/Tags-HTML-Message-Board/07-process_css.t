@@ -21,6 +21,11 @@ is_deeply(
 	$ret_ar,
 	[
 		# Main CSS.
+		['s', '.message-board'],
+		['d', 'font-family', 'Arial, Helvetica, sans-serif'],
+		['d', 'margin', '1em'],
+		['e'],
+
 		['s', '.message-board .main-message'],
 		['d', 'border', '1px solid #ccc'],
 		['d', 'padding', '20px'],
@@ -63,6 +68,7 @@ is_deeply(
 
 		['s', '.message-board .text'],
 		['d', 'margin-top', '10px'],
+		['d', 'white-space', 'pre-wrap'],
 		['e'],
 
 		# Textarea.
@@ -124,6 +130,11 @@ is_deeply(
 	$ret_ar,
 	[
 		# Main CSS.
+		['s', '.message-board'],
+		['d', 'font-family', 'Arial, Helvetica, sans-serif'],
+		['d', 'margin', '1em'],
+		['e'],
+
 		['s', '.message-board .main-message'],
 		['d', 'border', '1px solid #ccc'],
 		['d', 'padding', '20px'],
@@ -166,6 +177,7 @@ is_deeply(
 
 		['s', '.message-board .text'],
 		['d', 'margin-top', '10px'],
+		['d', 'white-space', 'pre-wrap'],
 		['e'],
 	],
 	'Message board CSS code (without add comment form).',
@@ -185,6 +197,11 @@ is_deeply(
 	$ret_ar,
 	[
 		# Main CSS.
+		['s', '.my-board'],
+		['d', 'font-family', 'Arial, Helvetica, sans-serif'],
+		['d', 'margin', '1em'],
+		['e'],
+
 		['s', '.my-board .main-message'],
 		['d', 'border', '1px solid #ccc'],
 		['d', 'padding', '20px'],
@@ -227,6 +244,7 @@ is_deeply(
 
 		['s', '.my-board .text'],
 		['d', 'margin-top', '10px'],
+		['d', 'white-space', 'pre-wrap'],
 		['e'],
 
 		# Textarea.

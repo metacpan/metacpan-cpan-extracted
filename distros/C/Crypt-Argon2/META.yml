@@ -3,11 +3,10 @@ abstract: 'Perl interface to the Argon2 key derivation functions'
 author:
   - 'Leon Timmermans <leont@cpan.org>'
 build_requires:
-  Module::Build: '0.3604'
   Test::More: '0.90'
   perl: '5.006'
 configure_requires:
-  Module::Build: '0.3604'
+  Dist::Build: '0.010'
   perl: '5.006'
 dynamic_config: 0
 generated_by: 'Dist::Zilla version 6.031, CPAN::Meta::Converter version 2.150010'
@@ -19,7 +18,7 @@ name: Crypt-Argon2
 provides:
   Crypt::Argon2:
     file: lib/Crypt/Argon2.pm
-    version: '0.022'
+    version: '0.028'
 requires:
   Exporter: '5.57'
   Time::HiRes: '0'
@@ -30,7 +29,7 @@ requires:
 resources:
   bugtracker: https://github.com/Leont/crypt-argon2/issues
   repository: git://github.com/Leont/crypt-argon2.git
-version: '0.022'
+version: '0.028'
 x_generated_by_perl: v5.38.0
 x_serialization_backend: 'YAML::Tiny version 1.74'
 x_spdx_expression: Apache-2.0

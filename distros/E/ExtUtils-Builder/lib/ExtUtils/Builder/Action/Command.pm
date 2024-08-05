@@ -1,5 +1,5 @@
 package ExtUtils::Builder::Action::Command;
-$ExtUtils::Builder::Action::Command::VERSION = '0.008';
+$ExtUtils::Builder::Action::Command::VERSION = '0.011';
 use strict;
 use warnings;
 
@@ -17,23 +17,34 @@ sub _preference_map {
 sub to_code {
 	my ($self, %args) = @_;
 	require Data::Dumper;
-	my $serialized = Data::Dumper->new([$self->{command}])->Terse(1)->Indent(0)->Dump;
-	$serialized =~ s/ \A \[ (.*?) \] \z /$1/xms;
-	return qq{system($serialized) and die "Could not run command " . join ' ', $serialized};
+	if (ref $self->{command}) {
+		my $serialized = Data::Dumper->new([$self->{command}])->Terse(1)->Indent(0)->Dump;
+		$serialized =~ s/ \A \[ (.*?) \] \z /$1/xms;
+		return qq{system($serialized) and die "Could not run command " . join ' ', $serialized};
+	} else {
+		my $serialized = Data::Dumper->new([$self->{command}])->Terse(1)->Indent(0)->Dump;
+		return qq{system($serialized) and die "Could not run command $serialized"};
+	}
 }
 
 sub to_command {
 	my $self = shift;
-	return [ @{ $self->{command} } ];
+	return ref $self->{command} ? [ @{ $self->{command} } ] : $self->{command};
 }
 
 my $quote = $^O eq 'MSWin32' ? do { require Win32::ShellQuote; \&Win32::ShellQuote::quote_system_list } : sub { @_ };
 sub execute {
 	my ($self, %opts) = @_;
-	my @command = @{ $self->{command} };
-	my $message = join ' ', map { my $arg = $_; $arg =~ s/ (?= ['#] ) /\\/gx ? "'$arg'" : $arg } @command;
-	print "$message\n" if not $opts{quiet};
-	system($quote->(@command)) and die "Could not run command @command" if not $opts{dry_run};
+	if (ref $self->{command}) {
+		my @command = @{ $self->{command} };
+		my $message = join ' ', map { my $arg = $_; $arg =~ s/ (?= ['#] ) /\\/gx ? "'$arg'" : $arg } @command;
+		print "$message\n" if not $opts{quiet};
+		system($quote->(@command)) and die "Could not run command @command" if not $opts{dry_run};
+	} else {
+		my $command = $self->{command};
+		print "$command\n" if not $opts{quiet};
+		system($command) and die "Could not run command $command" if not $opts{dry_run};
+	}
 	return;
 }
 
@@ -53,7 +64,7 @@ ExtUtils::Builder::Action::Command - An action object for external commands
 
 =head1 VERSION
 
-version 0.008
+version 0.011
 
 =head1 SYNOPSIS
 

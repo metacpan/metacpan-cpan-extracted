@@ -4,7 +4,7 @@
       "Graham Barr <gbarr@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "ExtUtils::MakeMaker version 7.64, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -49,10 +49,10 @@
       },
       "repository" : {
          "type" : "git",
-         "url" : "https://github.com/Scalar-List-Utils/Scalar-List-Utils.git",
-         "web" : "https://github.com/Scalar-List-Utils/Scalar-List-Utils"
+         "url" : "https://github.com/Dual-Life/Scalar-List-Utils.git",
+         "web" : "https://github.com/Dual-Life/Scalar-List-Utils"
       }
    },
-   "version" : "1.63",
-   "x_serialization_backend" : "JSON::PP version 4.07"
+   "version" : "1.64",
+   "x_serialization_backend" : "JSON::PP version 4.16"
 }

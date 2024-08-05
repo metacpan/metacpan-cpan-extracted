@@ -1,5 +1,17 @@
 Revision history for ExtUtils-Builder
 
+0.011     2024-08-04 20:37:12+02:00 Europe/Brussels
+          - Fix CRLF translation for Windows further
+
+0.010     2024-08-01 22:50:19+02:00 Europe/Brussels
+          - Fix CRLF translation for Windows in test
+
+0.009     2024-08-01 12:54:19+02:00 Europe/Brussels
+          - Add single arg command option
+          - Add jobs and new_planner helpers to EU::B::MakeMaker
+          - Add require_module to export list of ExtUtils::Builder::Util
+          - Allow redefinitions of delegates
+
 0.008     2024-07-15 21:02:09+02:00 Europe/Brussels
           - Fix function() helper in DSLs
           - Eliminate logger callback

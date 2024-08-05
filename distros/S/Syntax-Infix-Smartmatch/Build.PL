@@ -4,6 +4,6 @@ use warnings;
 
 
 use 5.014;
-use Dist::Build 0.001;
+use Dist::Build 0.010;
 Build_PL(\@ARGV, \%ENV);
 

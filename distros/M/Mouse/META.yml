@@ -11,7 +11,7 @@ build_requires:
   Test::Requires: '0'
   Try::Tiny: '0'
 configure_requires:
-  Devel::PPPort: '3.42'
+  Devel::PPPort: '3.59'
   ExtUtils::ParseXS: '3.22'
   Module::Build: '0.4005'
   Module::Build::XSUtil: '0.19'
@@ -21,7 +21,7 @@ conflicts:
   MouseX::AttributeHelpers: '< 0.06'
   MouseX::NativeTraits: '< 1.00'
 dynamic_config: 0
-generated_by: 'Minilla/v3.1.9, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Minilla/v3.1.24, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -39,7 +39,7 @@ no_index:
 provides:
   Mouse:
     file: lib/Mouse.pm
-    version: v2.5.10
+    version: v2.5.11
   Mouse::Exporter:
     file: lib/Mouse/Exporter.pm
   Mouse::Meta::Attribute:
@@ -76,15 +76,15 @@ provides:
     file: lib/Mouse/PurePerl.pm
   Mouse::Role:
     file: lib/Mouse/Role.pm
-    version: v2.5.10
+    version: v2.5.11
   Mouse::Spec:
     file: lib/Mouse/Spec.pm
-    version: v2.5.10
+    version: v2.5.11
   Mouse::TypeRegistry:
     file: lib/Mouse/TypeRegistry.pm
   Mouse::Util:
     file: lib/Mouse/Util.pm
-    version: v2.5.10
+    version: v2.5.11
   Mouse::Util::MetaRole:
     file: lib/Mouse/Util/MetaRole.pm
   Mouse::Util::TypeConstraints:
@@ -104,8 +104,8 @@ requires:
 resources:
   bugtracker: https://github.com/xslate/p5-Mouse/issues
   homepage: https://github.com/xslate/p5-Mouse
-  repository: git://github.com/xslate/p5-Mouse.git
-version: v2.5.10
+  repository: https://github.com/xslate/p5-Mouse.git
+version: v2.5.11
 x_contributors:
   - 'Aleksandr Matveev <a.matveev@corp.mail.ru>'
   - 'Alex Solovey <a.solovey@gmail.com>'
@@ -135,6 +135,7 @@ x_contributors:
   - 'Michael G. Schwern <schwern@pobox.com>'
   - 'NAKAGAWA Masaki <masaki.nakagawa@gmail.com>'
   - 'Nick Woolley <nick@noodlefactory.co.uk>'
+  - 'Nicolas R <nicolas@atoomic.org>'
   - 'Piotr Roszatycki <piotr.roszatycki@gmail.com>'
   - 'Reini Urban <rurban@cpan.org>'
   - 'Reini Urban <rurban@cpanel.net>'
@@ -143,10 +144,10 @@ x_contributors:
   - 'Sergiy Zuban <s.zuban@trackingsoft.com>'
   - 'Shawn M Moore <sartak@bestpractical.com>'
   - 'Shawn M Moore <sartak@gmail.com>'
+  - 'Shohei YOSHIDA <syohex@gmail.com>'
   - 'Shoichi Kaji <skaji@cpan.org>'
   - 'Shoichi Kaji <skaji@outlook.com>'
   - 'Stanislaw Pusep <creaktive@gmail.com>'
-  - 'Syohei YOSHIDA <syohex@gmail.com>'
   - 'Todd Rinaldo <toddr@cpan.org>'
   - 'Todd Rinaldo <toddr@cpanel.net>'
   - 'Tokuhiro Matsuno <tokuhirom@gmail.com>'

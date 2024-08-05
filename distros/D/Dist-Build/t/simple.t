@@ -64,6 +64,7 @@ if ($has_compiler) {
 	$dist->add_file('planner/xs.pl', undent(<<'		---'));
 		load_module("Dist::Build::XS");
 		add_xs(
+			include_dirs  => [ 'include' ],
 			extra_sources => [ glob 'src/*.c' ],
 		);
 		---
@@ -118,7 +119,8 @@ sub _slurp { do { local (@ARGV,$/)=$_[0]; <> } }
   my $output = do { local $/; <$in> };
   is( waitpid($pid, 0), $pid, 'Could run Build');
   is($?, 0, 'Build returned 0');
-  like( $output, qr{lib/Foo/Bar\.pm}, 'Build output looks correctly');
+  my $filename = catfile(qw/lib Foo Bar.pm/);
+  like($output, qr{\Q$filename}, 'Build output looks correctly');
   ok( -d 'blib',        "created blib" );
   ok( -d 'blib/lib',    "created blib/lib" );
   ok( -d 'blib/script', "created blib/script" );
@@ -161,6 +163,12 @@ sub _slurp { do { local (@ARGV,$/)=$_[0]; <> } }
   if ($has_compiler) {
     XSLoader::load('Foo::Bar');
     is(Foo::Bar::foo(), "Hello World!\n", 'Can run XSub Foo::Bar::foo');
+    if (defined &DynaLoader::dl_unload_file) {
+        my $module = pop @DynaLoader::dl_modules;
+        warn "Confused" if $module ne 'Foo::Bar';
+        my $libref = pop @DynaLoader::dl_librefs;
+        DynaLoader::dl_unload_file($libref);
+    }
   }
 
   require CPAN::Meta;
@@ -189,4 +197,9 @@ sub _slurp { do { local (@ARGV,$/)=$_[0]; <> } }
   ok( -f 'install/bin/simple', 'Script is installed');
 }
 
+{
+  ok( open2(my($in, $out), $^X, Build => 'clean'), 'Could run Build clean' );
+  my $output = do { local $/; <$in> };
+  like($output, qr{lib[\\/]Foo[\\/]Bar.c}, 'clean also cleans source file');
+}
 done_testing;

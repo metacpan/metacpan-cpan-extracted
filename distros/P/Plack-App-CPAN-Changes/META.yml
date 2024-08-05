@@ -30,11 +30,11 @@ no_index:
 requires:
   Plack::Component::Tags::HTML: 0
   Plack::Util::Accessor: 0
-  Tags::HTML::CPAN::Changes: 0.02
+  Tags::HTML::CPAN::Changes: 0.06
   perl: 5.8.0
 resources:
   bugtracker: https://github.com/michal-josef-spacek/Plack-App-CPAN-Changes/issues
   homepage: https://github.com/michal-josef-spacek/Plack-App-CPAN-Changes
   license: http://opensource.org/licenses/bsd-license.php
   repository: git://github.com/michal-josef-spacek/Plack-App-CPAN-Changes
-version: '0.01'
+version: '0.03'

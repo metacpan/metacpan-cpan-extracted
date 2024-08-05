@@ -1,5 +1,8 @@
 Revision history for POSIX-RT-Timer
 
+0.019     2024-08-05 12:46:55+02:00 Europe/Brussels
+          - Cleanup code
+
 0.018     2022-08-05 01:58:13+02:00 Europe/Amsterdam
           - Add realtime_alarm, boottime_alarm and tai clocks
 

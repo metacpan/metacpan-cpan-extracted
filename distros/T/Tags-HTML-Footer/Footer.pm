@@ -14,7 +14,7 @@ use Unicode::UTF8 qw(decode_utf8);
 Readonly::Array our @TEXT_KEYS => qw(version);
 Readonly::Scalar our $DEFAULT_HEIGHT => '40px';
 
-our $VERSION = 0.02;
+our $VERSION = 0.03;
 
 # Constructor.
 sub new {
@@ -164,6 +164,7 @@ sub _process_css {
 		['d', 'bottom', 0],
 		['d', 'width', '100%'],
 		['d', 'height', $height],
+		['d', 'font-family', 'Arial, Helvetica, sans-serif'],
 		['e'],
 	);
 
@@ -539,6 +540,6 @@ BSD 2-Clause License
 
 =head1 VERSION
 
-0.02
+0.03
 
 =cut

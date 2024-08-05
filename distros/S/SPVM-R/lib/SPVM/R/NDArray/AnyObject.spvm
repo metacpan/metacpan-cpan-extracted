@@ -6,6 +6,8 @@
 
 class R::NDArray::AnyObject extends R::NDArray {
   
+  use Stringable;
+  
   # Fields
   method data : object[] () {
     

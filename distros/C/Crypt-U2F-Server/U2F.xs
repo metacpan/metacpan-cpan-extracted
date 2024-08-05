@@ -83,6 +83,6 @@ u2fclib_verifyRegistration(ctx, buf)
 		}
 		else {
 			strncpy(kh,result,1000);
-			XPUSHs(sv_2mortal(newSVpvn(pk,65)));
+			XPUSHs(sv_2mortal(newSVpvn((const char * const)pk,65)));
 			XPUSHs(sv_2mortal(newSVpvn(kh,strlen(kh))));
 		}

@@ -1,0 +1,596 @@
+class TestCase::R::Util {
+  
+  use R::Util;
+  
+  static method calc_data_length : int () {
+    
+    {
+      my $dim = new int[0];
+      my $data_length = R::Util->calc_data_length($dim);
+      
+      unless ($data_length == 0) {
+        return 0;
+      }
+    }
+    
+    {
+      my $dim = [1];
+      my $data_length = R::Util->calc_data_length($dim);
+      
+      unless ($data_length == 1) {
+        return 0;
+      }
+    }
+    
+    {
+      my $dim = [1, 1];
+      my $data_length = R::Util->calc_data_length($dim);
+      
+      unless ($data_length == 1) {
+        return 0;
+      }
+    }
+    
+    {
+      my $dim = [2, 3, 4];
+      my $data_length = R::Util->calc_data_length($dim);
+      
+      unless ($data_length == 24) {
+        return 0;
+      }
+    }
+    
+    # Exceptions
+    {
+      {
+        my $dim = [2, 3, 4];
+        eval { R::Util->calc_data_length(undef); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+      {
+        my $dim = [0];
+        eval { R::Util->calc_data_length($dim); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+    }
+    
+    $@ = undef;
+    
+    return 1;
+  }
+  
+  static method normalize_dim : int () {
+    
+    {
+      my $dim = (int[])undef;
+      my $normalized_dim = R::Util->normalize_dim($dim);
+      
+      unless (Array->equals_int($normalized_dim, new int [0])) {
+        return 0;
+      }
+    }
+    
+    {
+      my $dim = [0];
+      my $normalized_dim = R::Util->normalize_dim($dim);
+      
+      unless (Array->equals_int($normalized_dim, new int [0])) {
+        return 0;
+      }
+    }
+    
+    {
+      my $dim = [1, 0];
+      my $normalized_dim = R::Util->normalize_dim($dim);
+      
+      unless (Array->equals_int($normalized_dim, [1])) {
+        return 0;
+      }
+    }
+    
+    {
+      my $dim = [1, 0, 0];
+      my $normalized_dim = R::Util->normalize_dim($dim);
+      
+      unless (Array->equals_int($normalized_dim, [1])) {
+        return 0;
+      }
+    }
+    
+    {
+      my $dim = [2, 1, 0, 0];
+      my $normalized_dim = R::Util->normalize_dim($dim);
+      
+      unless (Array->equals_int($normalized_dim, [2, 1])) {
+        return 0;
+      }
+    }
+    
+    # Exceptions
+    {
+      {
+        my $dim = [1, 0, 1];
+        eval { R::Util->normalize_dim($dim); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+    }
+    
+    $@ = undef;
+    
+    return 1;
+  }
+  
+  static method is_normalized_dim : int () {
+    
+    {
+      my $dim = (int[])undef;
+      my $is_normalized_dim = R::Util->is_normalized_dim($dim);
+      
+      if ($is_normalized_dim) {
+        return 0;
+      }
+    }
+    
+    {
+      my $dim = new int[0];
+      my $is_normalized_dim = R::Util->is_normalized_dim($dim);
+      
+      unless ($is_normalized_dim) {
+        return 0;
+      }
+    }
+    
+    {
+      my $dim = [1];
+      my $is_normalized_dim = R::Util->is_normalized_dim($dim);
+      
+      unless ($is_normalized_dim) {
+        return 0;
+      }
+    }
+    
+    {
+      my $dim = [2, 1];
+      my $is_normalized_dim = R::Util->is_normalized_dim($dim);
+      
+      unless ($is_normalized_dim) {
+        return 0;
+      }
+    }
+    
+    {
+      my $dim = [2, 1, 0];
+      my $is_normalized_dim = R::Util->is_normalized_dim($dim);
+      
+      if ($is_normalized_dim) {
+        return 0;
+      }
+    }
+    
+    return 1;
+  }
+  
+  static method check_length : int () {
+    
+    {
+      my $data = new int[24];
+      my $dim = [2, 1, 3, 4];
+      R::Util->check_length($data, $dim);
+    }
+    
+    {
+      my $data = new string[24];
+      my $dim = [2, 1, 3, 4];
+      R::Util->check_length($data, $dim);
+    }
+    
+    {
+      my $data = new Complex_2d[24];
+      my $dim = [2, 1, 3, 4];
+      R::Util->check_length($data, $dim);
+    }
+    
+    # Exceptions
+    {
+      {
+        my $data = new int[23];
+        my $dim = [2, 1, 3, 4];
+        eval { R::Util->check_length($data, $dim); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+      {
+        my $data = new int[24];
+        my $dim = [2, 1, 3, 4];
+        eval { R::Util->check_length(undef, $dim); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+      {
+        my $data = new int[24];
+        my $dim = [2, 1, 3, 4];
+        eval { R::Util->check_length($data, undef); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+      {
+        my $data = Int->new(1);
+        my $dim = [1];
+        eval { R::Util->check_length($data, $dim); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+      {
+        my $data = new int[0];
+        my $dim = [2, 0, 3, 4];
+        eval { R::Util->check_length($data, $dim); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+    }
+    
+    $@ = undef;
+    
+    return 1;
+  }
+  
+  static method drop_dim : int () {
+    
+    {
+      my $dim = [1, 2, 1, 3, 1];
+      my $dropped_dim = R::Util->drop_dim($dim);
+      
+      unless (Array->equals_int($dropped_dim, [2, 3])) {
+        return 0;
+      }
+    }
+    
+    {
+      my $dim = [1, 2, 1, 3, 1];
+      my $index = 2;
+      my $dropped_dim = R::Util->drop_dim($dim, $index);
+      
+      unless (Array->equals_int($dropped_dim, [1, 2, 3, 1])) {
+        return 0;
+      }
+    }
+    
+    {
+      my $dim = [1, 2, 1, 3, 1];
+      my $index = 2;
+      my $dropped_dim = R::Util->drop_dim($dim, $index);
+      
+      unless (Array->equals_int($dropped_dim, [1, 2, 3, 1])) {
+        return 0;
+      }
+    }
+    
+    {
+      my $dim = [1, 1];
+      my $dropped_dim = R::Util->drop_dim($dim);
+      
+      unless (Array->equals_int($dropped_dim, [1])) {
+        return 0;
+      }
+    }
+    
+    {
+      my $dim = new int[0];
+      my $dropped_dim = R::Util->drop_dim($dim);
+      
+      unless (Array->equals_int($dropped_dim, new int[0])) {
+        return 0;
+      }
+    }
+    
+    # Exceptions
+    {
+      {
+        my $dim = [2, 1, 3, 4];
+        eval { R::Util->drop_dim(undef); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+      {
+        my $dim = [2];
+        my $index = 1;
+        eval { R::Util->drop_dim($dim, $index); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+      {
+        my $dim = [2];
+        my $index = 0;
+        eval { R::Util->drop_dim($dim, $index); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+      {
+        my $dim = [2, 0, 3, 4];
+        eval { R::Util->drop_dim($dim); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+    }
+    
+    $@ = undef;
+    
+    return 1;
+  }
+  
+  static method expand_dim : int () {
+    
+    {
+      my $dim = new int[0];
+      my $expandped_dim = R::Util->expand_dim($dim);
+      
+      unless (Array->equals_int($expandped_dim, [1])) {
+        return 0;
+      }
+    }
+    
+    {
+      my $dim = [2];
+      my $expandped_dim = R::Util->expand_dim($dim);
+      
+      unless (Array->equals_int($expandped_dim, [2, 1])) {
+        return 0;
+      }
+    }
+    
+    {
+      my $dim = [2];
+      my $index = 1;
+      my $expandped_dim = R::Util->expand_dim($dim, $index);
+      
+      unless (Array->equals_int($expandped_dim, [2, 1])) {
+        return 0;
+      }
+    }
+    
+    {
+      my $dim = [2, 3];
+      my $index = 2;
+      my $expandped_dim = R::Util->expand_dim($dim, $index);
+      
+      unless (Array->equals_int($expandped_dim, [2, 3, 1])) {
+        return 0;
+      }
+    }
+    
+    {
+      my $dim = [2, 3];
+      my $index = 1;
+      my $expandped_dim = R::Util->expand_dim($dim, $index);
+      
+      unless (Array->equals_int($expandped_dim, [2, 1, 3])) {
+        return 0;
+      }
+    }
+    
+    # Exceptions
+    {
+      {
+        my $dim = [2, 1, 3, 4];
+        eval { R::Util->expand_dim(undef); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+      {
+        my $dim = [2, 3];
+        my $index = 3;
+        eval { R::Util->expand_dim($dim, $index); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+      {
+        my $dim = [2, 0];
+        eval { R::Util->expand_dim($dim); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+    }
+    
+    $@ = undef;
+    
+    return 1;
+  }
+  
+  static method equals_dim : int () {
+    
+    {
+      my $x_dim = [2, 3];
+      my $y_dim = [2, 3];
+      my $equals_dim = R::Util->equals_dim($x_dim, $y_dim);
+      
+      unless ($equals_dim) {
+        return 0;
+      }
+    }
+    
+    {
+      my $x_dim = [2, 3];
+      my $y_dim = [2, 3, 1];
+      my $equals_dim = R::Util->equals_dim($x_dim, $y_dim);
+      
+      if ($equals_dim) {
+        return 0;
+      }
+    }
+    
+    {
+      my $x_dim = new int[0];
+      my $y_dim = new int[0];
+      my $equals_dim = R::Util->equals_dim($x_dim, $y_dim);
+      
+      unless ($equals_dim) {
+        return 0;
+      }
+    }
+    
+    # Exceptions
+    {
+      {
+        my $x_dim = [2, 1, 3, 4];
+        my $y_dim = [2, 1, 3, 4];
+        eval { R::Util->equals_dim($x_dim, undef); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+      {
+        my $x_dim = [0, 1, 3, 4];
+        my $y_dim = [2, 1, 3, 4];
+        eval { R::Util->equals_dim($x_dim, $y_dim); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+      {
+        my $x_dim = [2, 1, 3, 4];
+        my $y_dim = [0, 1, 3, 4];
+        eval { R::Util->equals_dim($x_dim, $y_dim); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+    }
+    
+    $@ = undef;
+    
+    return 1;
+  }
+  
+  static method equals_dropped_dim : int () {
+    
+    {
+      my $x_dim = [2, 3];
+      my $y_dim = [2, 3];
+      my $equals_dropped_dim = R::Util->equals_dropped_dim($x_dim, $y_dim);
+      
+      unless ($equals_dropped_dim) {
+        return 0;
+      }
+    }
+    
+    {
+      my $x_dim = [2, 3];
+      my $y_dim = [2, 3, 1];
+      my $equals_dropped_dim = R::Util->equals_dropped_dim($x_dim, $y_dim);
+      
+      unless ($equals_dropped_dim) {
+        return 0;
+      }
+    }
+    
+    {
+      my $x_dim = [2, 3, 1];
+      my $y_dim = [2, 3];
+      my $equals_dropped_dim = R::Util->equals_dropped_dim($x_dim, $y_dim);
+      
+      unless ($equals_dropped_dim) {
+        return 0;
+      }
+    }
+    
+    {
+      my $x_dim = new int[0];
+      my $y_dim = new int[0];
+      my $equals_dropped_dim = R::Util->equals_dropped_dim($x_dim, $y_dim);
+      
+      unless ($equals_dropped_dim) {
+        return 0;
+      }
+    }
+    
+    # Exceptions
+    {
+      {
+        my $x_dim = [2, 1, 3, 4];
+        my $y_dim = [2, 1, 3, 4];
+        eval { R::Util->equals_dropped_dim($x_dim, undef); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+      {
+        my $x_dim = [0, 1, 3, 4];
+        my $y_dim = [2, 1, 3, 4];
+        eval { R::Util->equals_dropped_dim($x_dim, $y_dim); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+      {
+        my $x_dim = [2, 1, 3, 4];
+        my $y_dim = [0, 1, 3, 4];
+        eval { R::Util->equals_dropped_dim($x_dim, $y_dim); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+    }
+    
+    $@ = undef;
+    
+    return 1;
+  }
+}

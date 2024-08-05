@@ -296,31 +296,39 @@ class R::OP::Matrix::Double {
       die "The n-dimensional array \$x_ndarray must be a squre matrix.";
     }
     
+    my $eigen_vectors_data_ref = new Complex_2d[][1];
+    
+    my $eigen_values_data_ref = new Complex_2d[][1];
+    
+    my $eigen_vectors_nrow = -1;
+    
+    my $eigen_vectors_ncol = -1;
+    
+    my $eigen_values_nrow = -1;
+    
+    my $eigen_values_ncol = -1;
+    
     my $x_data = (double[])$x_ndarray->data;
     
     my $x_nrow = $x_ndarray->nrow;
     
     my $x_ncol = $x_ndarray->ncol;
     
-    my $eigen_vectors_data_ref = new double[][1];
-    
-    my $eigen_values_data_ref = new double[][1];
-    
-    my $eigen_vectors_row = -1;
-    
-    my $eigen_vectors_column = -1;
-    
-    &_eigen($eigen_vectors_data_ref, \$eigen_vectors_row, \$eigen_vectors_column, $x_data, $x_nrow, $x_ncol, $eigen_values_data_ref);
+    &_eigen($eigen_vectors_data_ref, \$eigen_vectors_nrow, \$eigen_vectors_ncol, $eigen_values_data_ref, \$eigen_values_nrow, \$eigen_values_ncol, $x_data, $x_nrow, $x_ncol);
     
     my $eigen_vectors_data = $eigen_vectors_data_ref->[0];
     
-    my $eigen_vectors_dim = [$eigen_vectors_row, $eigen_vectors_column];
+    my $eigen_vectors_dim = [$eigen_vectors_nrow, $eigen_vectors_ncol];
     
-    my $eigen_vectors_ndarray = R::OP::Double->c($eigen_vectors_data, $eigen_vectors_dim);
+    my $eigen_vectors_ndarray = R::OP::DoubleComplex->c($eigen_vectors_data, $eigen_vectors_dim);
     
     my $eigen_values_data = $eigen_values_data_ref->[0];
     
-    my $eigen_values_ndarray = R::OP::Double->c($eigen_values_data);
+    my $eigen_values_dim = [$eigen_values_nrow, $eigen_values_ncol];
+    
+    my $eigen_values_ndarray = R::OP::DoubleComplex->c($eigen_values_data, $eigen_values_dim);
+    
+    $eigen_values_ndarray->drop_dim;
     
     my $ret_ndarray_hash = R::NDArray::Hash->new;
     
@@ -340,5 +348,5 @@ class R::OP::Matrix::Double {
   
   private native static method _solve : void ($ret_data_ref : double[][], $ret_nrow_ref : int*, $ret_ncol_ref : int*, $x_data : double[], $x_nrow :int, $x_ncol : int);
   
-  private native static method _eigen : void ($ret_data_ref : double[][], $ret_nrow_ref : int*, $ret_ncol_ref : int*, $x_data : double[], $x_nrow : int, $x_ncol : int, $eigen_values_data_ref : double[][]);
+  private native static method _eigen : void ($eigen_vectors_data_ref : Complex_2d[][], $eigen_vectors_nrow_ref : int*, $eigen_vectors_ncol_ref : int*, $eigen_values_data_ref : Complex_2d[][], $eigen_values_nrow_ref : int*, $eigen_values_ncol_ref : int*, $x_data : double[], $x_nrow : int, $x_ncol : int);
 }

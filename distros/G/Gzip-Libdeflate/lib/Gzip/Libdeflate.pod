@@ -25,14 +25,14 @@ produces output
     ABCDEFGABCDEFG
 
 
-(This example is included as L<F<synopsis.pl>|https://fastapi.metacpan.org/source/BKB/Gzip-Libdeflate-0.08/examples/synopsis.pl> in the distribution.)
+(This example is included as L<F<synopsis.pl>|https://fastapi.metacpan.org/source/BKB/Gzip-Libdeflate-0.09/examples/synopsis.pl> in the distribution.)
 
 
 =head1 VERSION
 
-This documents version 0.08 of Gzip-Libdeflate
-corresponding to L<git commit 6efe47bdda02829ec3ba584893e5b269e51e6194|https://github.com/benkasminbullock/gzip-libdeflate/commit/6efe47bdda02829ec3ba584893e5b269e51e6194> released on Sat Mar 30 10:16:25 2024 +0900. This
-distribution also includes libdeflate version 1.20. 
+This documents version 0.09 of Gzip-Libdeflate
+corresponding to L<git commit b9c89732037088204db21ff48cc6e7aaed85bf4b|https://github.com/benkasminbullock/gzip-libdeflate/commit/b9c89732037088204db21ff48cc6e7aaed85bf4b> released on Mon Aug 5 07:37:43 2024 +0900. This
+distribution also includes libdeflate version 1.21. 
 
 =head1 DESCRIPTION
 
@@ -215,7 +215,7 @@ information.
 
 =head1 AUTHOR
 
-Ben Bullock, <bkb@cpan.org>
+Ben Bullock, <benkasminbullock@gmail.com>
 
 =head1 COPYRIGHT & LICENCE
 
@@ -233,6 +233,7 @@ Licence.
 Libdeflate's copyright and licence are as follows.
 
 Copyright 2016 Eric Biggers
+Copyright 2024 Google LLC
 
 Permission is hereby granted, free of charge, to any person
 obtaining a copy of this software and associated documentation files

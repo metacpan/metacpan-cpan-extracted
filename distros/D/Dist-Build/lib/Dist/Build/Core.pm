@@ -1,19 +1,21 @@
 package Dist::Build::Core;
-$Dist::Build::Core::VERSION = '0.007';
+$Dist::Build::Core::VERSION = '0.010';
 use strict;
 use warnings;
 
 use parent 'ExtUtils::Builder::Planner::Extension';
 
 use Exporter 5.57 'import';
-our @EXPORT_OK = qw/copy mkdir make_executable manify tap_harness install/;
+our @EXPORT_OK = qw/copy mkdir rm_r make_executable manify tap_harness install/;
 
 use Carp qw/croak/;
+use ExtUtils::Helpers 0.007 qw/man1_pagename man3_pagename/;
 use ExtUtils::Install ();
 use File::Basename qw/dirname/;
 use File::Copy ();
-use File::Path qw/make_path/;
-use File::Spec::Functions qw/catdir rel2abs/;
+use File::Find ();
+use File::Path qw/make_path remove_tree/;
+use File::Spec::Functions qw/catdir catfile abs2rel rel2abs/;
 use Parse::CPAN::Meta;
 
 use ExtUtils::Builder::Node;
@@ -29,64 +31,78 @@ sub new_action {
 	);
 }
 
+sub find {
+	my ($pattern, $dir) = @_;
+	my @ret;
+	File::Find::find(sub { push @ret, abs2rel($File::Find::name) if /$pattern/ && -f }, $dir) if -d $dir;
+	return @ret;
+}
+
+sub contains_pod {
+	my ($file) = @_;
+	open my $fh, '<:utf8', $file;
+	my $content = do { local $/; <$fh> };
+	return $content =~ /^\=(?:head|pod|item)/m;
+}
+
 sub add_methods {
 	my ($self, $planner) = @_;
 
-	$self->add_delegate($planner, 'copy_file', sub {
-		my ($source, $destination) = @_;
+	$planner->add_delegate('copy_file', sub {
+		my (undef, $source, $destination) = @_;
 		my $copy = new_action('copy', $source, $destination);
-		ExtUtils::Builder::Node->new(
+		$planner->create_node(
 			target       => $destination,
 			dependencies => [ $source ],
 			actions      => [ $copy ],
 		);
 	});
 
-	$self->add_delegate($planner, 'copy_executable', sub {
-		my ($source, $destination) = @_;
+	$planner->add_delegate('copy_executable', sub {
+		my (undef, $source, $destination) = @_;
 		my $copy = new_action('copy', $source, $destination);
 		my $make_executable = new_action('make_executable', $destination);
-		ExtUtils::Builder::Node->new(
+		$planner->create_node(
 			target       => $destination,
 			dependencies => [ $source ],
 			actions      => [ $copy, $make_executable ],
 		);
 	});
 
-	$self->add_delegate($planner, 'manify', sub {
-		my ($source, $destination, $section) = @_;
+	$planner->add_delegate('manify', sub {
+		my (undef, $source, $destination, $section) = @_;
 		my $manify = new_action('manify', $source, $destination, $section);
 		my $dirname = dirname($destination);
-		ExtUtils::Builder::Node->new(
+		$planner->create_node(
 			target       => $destination,
 			dependencies => [ $source, $dirname ],
 			actions      => [ $manify ],
 		);
 	});
 
-	$self->add_delegate($planner, 'mkdir', sub {
-		my ($target, %options) = @_;
-		ExtUtils::Builder::Node->new(
+	$planner->add_delegate('mkdir', sub {
+		my (undef, $target, %options) = @_;
+		$planner->create_node(
 			target  => $target,
 			actions => [ new_action('mkdir', $target, %options) ],
 		);
 	});
 
-	$self->add_delegate($planner, 'tap_harness', sub {
-		my ($target, %options) = @_;
-		ExtUtils::Builder::Node->new(
+	$planner->add_delegate('tap_harness', sub {
+		my (undef, $target, %options) = @_;
+		$planner->create_node(
 			target       => $target,
 			dependencies => $options{dependencies},
 			phony        => 1,
 			actions      => [
-				new_action('tap_harness', test_files => $options{test_files} ),
+				new_action('tap_harness', test_dir => $options{test_dir} ),
 			],
 		);
 	});
 
-	$self->add_delegate($planner, 'install', sub {
-		my ($target, %options) = @_;
-		ExtUtils::Builder::Node->new(
+	$planner->add_delegate('install', sub {
+		my (undef, $target, %options) = @_;
+		$planner->create_node(
 			target       => $target,
 			dependencies => $options{dependencies},
 			phony        => 1,
@@ -96,9 +112,9 @@ sub add_methods {
 		);
 	});
 
-	$self->add_delegate($planner, 'dump_binary', sub {
-		my ($target, %options) = @_;
-		ExtUtils::Builder::Node->new(
+	$planner->add_delegate('dump_binary', sub {
+		my (undef, $target, %options) = @_;
+		$planner->create_node(
 			target       => $target,
 			dependencies => $options{dependencies},
 			actions      => [
@@ -107,9 +123,9 @@ sub add_methods {
 		);
 	});
 
-	$self->add_delegate($planner, 'dump_text', sub {
-		my ($target, %options) = @_;
-		ExtUtils::Builder::Node->new(
+	$planner->add_delegate('dump_text', sub {
+		my (undef, $target, %options) = @_;
+		$planner->create_node(
 			target       => $target,
 			dependencies => $options{dependencies},
 			actions      => [
@@ -118,9 +134,9 @@ sub add_methods {
 		);
 	});
 
-	$self->add_delegate($planner, 'dump_json', sub {
-		my ($target, %options) = @_;
-		ExtUtils::Builder::Node->new(
+	$planner->add_delegate('dump_json', sub {
+		my (undef, $target, %options) = @_;
+		$planner->create_node(
 			target       => $target,
 			dependencies => $options{dependencies},
 			actions      => [
@@ -129,6 +145,91 @@ sub add_methods {
 		);
 	});
 
+	$planner->add_delegate('script_files', sub {
+		my ($planner, @files) = @_;
+		my %scripts = map { $_ => catfile('blib', $_) } @files;
+		my %sdocs   = map { $_ => delete $scripts{$_} } grep { /.pod$/ } keys %scripts;
+
+		for my $source (keys %sdocs) {
+			$planner->copy_file($source, $scripts{$source});
+		}
+
+		for my $source (keys %scripts) {
+			$planner->copy_executable($source, $scripts{$source});
+		}
+
+		my (%man1);
+		if ($planner->install_paths->is_default_installable('bindoc')) {
+			my $section1 = $planner->config->get('man1ext');
+			my @files = keys %scripts, keys %sdocs;
+			for my $source (@files) {
+				next unless contains_pod($source);
+				my $destination = catfile('blib', 'bindoc', man1_pagename($source));
+				$planner->manify($source, $destination, $section1);
+				$man1{$source} = $destination;
+			}
+		}
+
+		$planner->create_phony('code', values %scripts);
+		$planner->create_phony('manify', values %man1);
+	});
+
+	$planner->add_delegate('script_dir', sub {
+		my ($planner, $dir) = @_;
+
+		my @files = find(qr/(?!\.)/, 'script');
+		$planner->script_files(@files);
+	});
+
+	$planner->add_delegate('lib_files', sub {
+		my ($planner, @files) = @_;
+		my %modules = map { $_ => catfile('blib', $_) } @files;
+
+		for my $source (keys %modules) {
+			$planner->copy_file($source, $modules{$source});
+		}
+
+		my %man3;
+		if ($planner->install_paths->is_default_installable('libdoc')) {
+			my $section3 = $planner->config->get('man3ext');
+			my @files = grep { contains_pod($_) } keys %modules;
+			for my $source (@files) {
+				my $destination = catfile('blib', 'libdoc', man3_pagename($source));
+				$planner->manify($source, $destination, $section3);
+				$man3{$source} = $destination;
+			}
+		}
+		$planner->create_phony('code', 'config', values %modules);
+		$planner->create_phony('manify', 'config', values %man3);
+	});
+
+	$planner->add_delegate('lib_dir', sub {
+		my ($planner, $dir) = @_;
+		my @files = find(qr/\.p(?:m|od)$/, $dir);
+		$planner->lib_files(@files);
+	});
+
+	$planner->add_delegate('autoclean', sub {
+		my ($planner) = @_;
+		my @targets = grep { !/^blib\b/ } map { $_->target } grep { ! $_->phony } $planner->materialize->nodes;
+
+		$planner->create_node(
+			target       => 'clean',
+			phony        => 1,
+			actions      => [
+				new_action('rm_r', 'blib', @targets),
+			],
+		);
+
+		$planner->create_node(
+			target       => 'realclean',
+			phony        => 1,
+			dependencies => [ 'clean' ],
+			actions      => [
+				new_action('rm_r', 'Build', '_build', 'MYMETA.json', 'MYMETA.yml'),
+			],
+		);
+	});
 }
 
 sub copy {
@@ -150,6 +251,12 @@ sub mkdir {
 	return;
 }
 
+sub rm_r {
+	my (@sources) = @_;
+	remove_tree(@sources);
+	return;
+}
+
 sub make_executable {
 	my ($target) = @_;
 	ExtUtils::Helpers::make_executable($target);
@@ -166,7 +273,13 @@ my @default_libs = map { catdir('blib', $_) } qw/arch lib/;
 
 sub tap_harness {
 	my (%args) = @_;
-	my @test_files = @{ delete $args{test_files} };
+	my @test_files;
+	if ($args{test_files}) {
+		@test_files = @{ delete $args{test_files} };
+	} else {
+		my $dir = delete $args{test_dir} // 't';
+		@test_files = sort +find(qr/\.t$/, $dir);
+	}
 	my @libs = $args{libs} ? @{ $args{libs} } : @default_libs;
 	my %test_args = (
 		(color => 1) x !!-t STDOUT,
@@ -223,7 +336,7 @@ Dist::Build::Core - core functions for Dist::Build
 
 =head1 VERSION
 
-version 0.007
+version 0.010
 
 =head1 DESCRIPTION
 

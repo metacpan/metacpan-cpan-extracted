@@ -1,0 +1,22 @@
+CHANGES
+CONTRIBUTING.md
+lib/Locale/Unicode/Data.pm
+lib/Locale/Unicode/Data/Boolean.pod
+lib/Locale/Unicode/Data/Exception.pod
+lib/Locale/Unicode/unicode_cldr.sqlite3
+LICENSE
+Makefile.PL
+MANIFEST
+README
+README.md
+scripts/cldr-schema.sql
+scripts/create_database.pl
+t/00.load.t
+t/01.locale-data.t
+t/90.pod.t
+t/91.coverage.t
+t/92.signature.t
+t/99.kwalitee.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)
+SIGNATURE                                Public-key signature (added by MakeMaker)

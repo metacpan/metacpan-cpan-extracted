@@ -1,5 +1,9 @@
 Revision history for Perl extension Crypt::U2F::Server.
 
+0.47  Sun Aug 04 07:17:23 2024 (GMT +4)
+    - cast variable type to expectations, fixes GCC-14 issue
+      see https://bugs.debian.org/1075161. Thanks to Étienne Mollier
+
 0.46  Thu May 02 14:16:31 2024 (GMT +2)
     - Patch https://rt.cpan.org/Ticket/Display.html?id=150508
       Fixes potential buffer overflow

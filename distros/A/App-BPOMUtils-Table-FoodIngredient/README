@@ -3,9 +3,9 @@ NAME
     processed food division
 
 VERSION
-    This document describes version 0.021 of
+    This document describes version 0.023 of
     App::BPOMUtils::Table::FoodIngredient (from Perl distribution
-    App-BPOMUtils-Table-FoodIngredient), released on 2024-04-19.
+    App-BPOMUtils-Table-FoodIngredient), released on 2024-07-19.
 
 DESCRIPTION
     This distribution contains the following CLIs:

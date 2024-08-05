@@ -1,10 +1,10 @@
 package ExtUtils::Builder::Util;
-$ExtUtils::Builder::Util::VERSION = '0.008';
+$ExtUtils::Builder::Util::VERSION = '0.011';
 use strict;
 use warnings;
 
 use Exporter 5.57 'import';
-our @EXPORT_OK = qw/get_perl/;
+our @EXPORT_OK = qw/get_perl require_module/;
 
 use Config;
 use ExtUtils::Config;
@@ -49,7 +49,7 @@ ExtUtils::Builder::Util - Utility functions for ExtUtils::Builder
 
 =head1 VERSION
 
-version 0.008
+version 0.011
 
 =head1 DESCRIPTION
 

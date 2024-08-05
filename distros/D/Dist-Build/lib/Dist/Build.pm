@@ -1,5 +1,5 @@
 package Dist::Build;
-$Dist::Build::VERSION = '0.007';
+$Dist::Build::VERSION = '0.010';
 use strict;
 use warnings;
 
@@ -37,7 +37,7 @@ sub save_json {
 	return;
 }
 
-my @options = qw/install_base=s install_path=s% installdirs=s destdir=s prefix=s config=s% uninst:1 verbose:1 dry_run:1 pureperl_only|pureperl-only:1 create_packlist=i jobs=i/;
+my @options = qw/install_base=s install_path=s% installdirs=s destdir=s prefix=s config=s% uninst:1 verbose:1 dry_run:1 pureperl_only|pureperl-only:1 create_packlist=i jobs=i allow_mb_mismatch:1/;
 
 sub get_config {
 	my ($meta_name, @arguments) = @_;
@@ -54,20 +54,6 @@ sub get_config {
 	return %options;
 }
 
-sub find {
-	my ($pattern, $dir) = @_;
-	my @ret;
-	File::Find::find(sub { push @ret, abs2rel($File::Find::name) if /$pattern/ && -f }, $dir) if -d $dir;
-	return @ret;
-}
-
-sub contains_pod {
-	my ($file) = @_;
-	open my $fh, '<:utf8', $file;
-	my $content = do { local $/; <$fh> };
-	return $content =~ /^\=(?:head|pod|item)/m;
-}
-
 sub Build_PL {
 	my ($args, $env) = @_;
 
@@ -79,51 +65,16 @@ sub Build_PL {
 	my $planner = ExtUtils::Builder::Planner->new;
 	$planner->load_module('Dist::Build::Core');
 
-	my %modules = map { $_ => catfile('blib', $_) } find(qr/\.pm$/, 'lib');
-	my %docs    = map { $_ => catfile('blib', $_) } find(qr/\.pod$/, 'lib');
-	my %scripts = map { $_ => catfile('blib', $_) } find(qr/(?:)/, 'script');
-	my %sdocs   = map { $_ => delete $scripts{$_} } grep { /.pod$/ } keys %scripts;
-
-	my %most = (%modules, %docs, %sdocs);
-
-	for my $source (keys %most) {
-		$planner->copy_file($source, $most{$source});
-	}
-
-	for my $source (keys %scripts) {
-		$planner->copy_executable($source, $scripts{$source});
-	}
-
-	my (%man1, %man3);
-	if ($options{install_paths}->is_default_installable('bindoc')) {
-		my $section1 = $options{config}->get('man1ext');
-		my @files = grep { contains_pod($_) } keys %scripts, keys %sdocs;
-		for my $source (@files) {
-			my $destination = catfile('blib', 'bindoc', man1_pagename($source));
-			$planner->manify($source, $destination, $section1);
-			$man1{$source} = $destination;
-		}
-	}
-	if ($options{install_paths}->is_default_installable('libdoc')) {
-		my $section3 = $options{config}->get('man3ext');
-		my @files = grep { contains_pod($_) } keys %modules, keys %docs;
-		for my $source (@files) {
-			my $destination = catfile('blib', 'libdoc', man3_pagename($source));
-			$planner->manify($source, $destination, $section3);
-			$man3{$source} = $destination;
-		}
-	}
-
 	my @blibs = map { catfile('blib', $_) } qw/lib arch bindoc libdoc script bin/;
 	$planner->mkdir($_) for @blibs;
 	$planner->create_phony('config', @blibs);
-	$planner->create_phony('code', 'config', values %most, values %scripts);
-	$planner->create_phony('manify', 'config', values %man1, values %man3);
+	$planner->create_phony('code', 'config');
+	$planner->create_phony('manify', 'config');
 	$planner->create_phony('dynamic');
 	$planner->create_phony('pure_all', 'code', 'manify', 'dynamic');
 	$planner->create_phony('build', 'pure_all');
 
-	$planner->tap_harness('test', dependencies => [ 'pure_all' ], test_files => [ sort +find(qr/\.t$/, 't')]);
+	$planner->tap_harness('test', dependencies => [ 'pure_all' ], test_dir => 't');
 	$planner->install('install', dependencies => [ 'pure_all' ], install_map => $options{install_paths}->install_map);
 
 	$planner->add_delegate('meta', sub { $meta });
@@ -142,12 +93,17 @@ sub Build_PL {
 		return $inner;
 	});
 
+	$planner->lib_dir('lib');
+	$planner->script_dir('script');
+
 	for my $file (glob 'planner/*.pl') {
 		my $inner = $planner->new_scope;
 		$inner->add_delegate('self', sub { $inner });
 		$inner->add_delegate('outer', sub { $planner });
 		$inner->run_dsl($file);
 	}
+
+	$planner->autoclean;
 
 	my $plan = $planner->materialize;
 
@@ -204,7 +160,7 @@ Dist::Build - A modern module builder, author tools not included!
 
 =head1 VERSION
 
-version 0.007
+version 0.010
 
 =head1 SYNOPSIS
 

@@ -11,9 +11,11 @@ WriteMakefile(
         'Net::LastFM' => 0,
         'Getopt::Long' => 0,
         'JSON' => 0,
+        'Pod::Usage' => 0,
         'Feature::Compat::Class' => 0,
         ($^V < v5.38 ? ('Object::Pad' => 0) : ()),
     },
+    EXE_FILES    => [ 'bin/laststats' ],
     META_MERGE        => {
         'meta-spec' => { version => 2 },
         resources => {

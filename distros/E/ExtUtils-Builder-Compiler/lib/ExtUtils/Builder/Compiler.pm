@@ -1,5 +1,5 @@
 package ExtUtils::Builder::Compiler;
-$ExtUtils::Builder::Compiler::VERSION = '0.015';
+$ExtUtils::Builder::Compiler::VERSION = '0.018';
 use strict;
 use warnings;
 
@@ -97,7 +97,7 @@ ExtUtils::Builder::Compiler - An interface around different compilers.
 
 =head1 VERSION
 
-version 0.015
+version 0.018
 
 =head1 DESCRIPTION
 

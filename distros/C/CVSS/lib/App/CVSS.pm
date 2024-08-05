@@ -11,9 +11,13 @@ use Carp         ();
 use JSON::PP     ();
 use Data::Dumper ();
 
-use CVSS;
+use CVSS ();
 
 our $VERSION = $CVSS::VERSION;
+
+my %options = (format => 'json');
+
+sub _print { print(($_[0] || '') . (defined $options{null} ? "\0" : "\n")) }
 
 sub cli_error {
     my ($error) = @_;
@@ -25,8 +29,6 @@ sub run {
 
     my ($class, @args) = @_;
 
-    my %options = (format => 'json');
-
     GetOptionsFromArray(
         \@args, \%options, qw(
             help|h
@@ -36,10 +38,20 @@ sub run {
             vector-string=s
 
             severity
+            score
+
+            base-score
             base-severity
 
-            score
-            base-score
+            temporal-score
+            temporal-severity
+
+            environmental-score
+            environmental-severity
+
+            exploitability-score
+            impact-score
+            modified-impact-score
 
             null|0
             format=s
@@ -90,13 +102,52 @@ VERSION
     }
 
     if ($options{'base-severity'}) {
-        print $cvss->base_severity . (defined $options{null} ? "\0" : "\n");
+        _print $cvss->base_severity;
         return 0;
     }
 
     if ($options{'base-score'}) {
-        print $cvss->base_score . (defined $options{null} ? "\0" : "\n");
+        _print $cvss->base_score;
         return 0;
+    }
+
+    if ($cvss->version <= 3.1) {
+
+        if ($options{'environmental-score'}) {
+            _print $cvss->environmental_score;
+            return 0;
+        }
+
+        if ($options{'environmental-severity'}) {
+            _print $cvss->environmental_severity;
+            return 0;
+        }
+
+        if ($options{'temporal-score'}) {
+            _print $cvss->temporal_score;
+            return 0;
+        }
+
+        if ($options{'temporal-severity'}) {
+            _print $cvss->temporal_severity;
+            return 0;
+        }
+
+        if ($options{'impact-score'}) {
+            _print $cvss->impact_score;
+            return 0;
+        }
+
+        if ($options{'exploitability-score'}) {
+            _print $cvss->exploitability_score;
+            return 0;
+        }
+
+        if ($options{'modified-impact-score'}) {
+            _print $cvss->modified_impact_score;
+            return 0;
+        }
+
     }
 
     if ($options{format} eq 'json') {

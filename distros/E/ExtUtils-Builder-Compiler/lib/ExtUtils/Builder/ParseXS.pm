@@ -1,5 +1,5 @@
 package ExtUtils::Builder::ParseXS;
-$ExtUtils::Builder::ParseXS::VERSION = '0.015';
+$ExtUtils::Builder::ParseXS::VERSION = '0.018';
 use strict;
 use warnings;
 
@@ -13,8 +13,8 @@ sub add_methods {
 
 	my $config = $options{config} || ($planner->can('config') ? $planner->config : ExtUtils::Config->new);
 
-	$self->add_delegate($planner, 'parse_xs', sub {
-		my ($source, $destination, %options) = @_;
+	$planner->add_delegate('parse_xs', sub {
+		my (undef, $source, $destination, %options) = @_;
 
 		my @actions;
 		if ($options{mkdir}) {
@@ -27,41 +27,44 @@ sub add_methods {
 				message   => "mkdir $dirname",
 			);
 		}
+		my %args = (
+			filename     => $source,
+			output       => $destination,
+			prototypes   => 0,
+			die_on_error => 1,
+		);
+		$args{$_} = $options{$_} for grep { defined $options{$_} } qw/typemap hiertype versioncheck linenumbers optimize prototypes/;
+
 		push @actions, ExtUtils::Builder::Action::Function->new(
 			module    => 'ExtUtils::ParseXS',
 			function  => 'process_file',
-			arguments => [ filename => $source, prototypes => 0, output => $destination ],
+			arguments => [ %args ],
 			message   => "parse-xs $source",
 		);
 
 		my @dependencies = @{ $options{dependencies} || [] };
+		$args{typemap} ||= 'typemap' if -f 'typemap';
+		push @dependencies, $args{typemap} if $args{typemap};
 
-		ExtUtils::Builder::Node->new(
+		$planner->create_node(
 			target       => $destination,
 			dependencies => [ $source, @dependencies ],
 			actions      => \@actions,
 		);
 	});
 
-	$self->add_helper($planner, 'c_file_for_xs', sub {
-		my ($source, $outdir) = @_;
+	$planner->add_delegate('c_file_for_xs', sub {
+		my (undef, $source, $outdir) = @_;
 		$outdir ||= dirname($source);
 		my $file_base = basename($source, '.xs');
 		return catfile($outdir, "$file_base.c");
 	});
 
-	$self->add_helper($planner, 'module_for_xs', sub {
-		my ($source, $relative) = @_;
-		my @parts = splitdir(dirname(abs2rel($source, $relative)));
-		push @parts, basename($source, '.xs');
-		return join '::', @parts;
-	});
-
 	require DynaLoader;
 	my $mod2fname = defined &DynaLoader::mod2fname ? \&DynaLoader::mod2fname : sub { return $_[0][-1] };
 
-	$self->add_helper($planner, 'extension_filename', sub {
-		my ($module) = @_;
+	$planner->add_delegate('extension_filename', sub {
+		my (undef, $module) = @_;
 		my @parts = split '::', $module;
 		my $archdir = catdir(qw/blib arch auto/, @parts);
 
@@ -87,7 +90,7 @@ ExtUtils::Builder::ParseXS - Essential functions for implementing XS in a Plan
 
 =head1 VERSION
 
-version 0.015
+version 0.018
 
 =head1 SYNOPSIS
 
@@ -115,6 +118,14 @@ If set this will mkdir the base of the target before running the parse.
 =item * dependencies
 
 This lists additional dependencies that will be added to the target.
+
+=item * typemap
+
+The name of the typemap file. Defaults to C<typemap> if that file exists.
+
+=item * hiertype
+
+Allow hierarchical types (with double colons) such as used in C++.
 
 =back
 

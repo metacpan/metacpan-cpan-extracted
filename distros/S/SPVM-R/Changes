@@ -1,3 +1,62 @@
+0.019 2024-08-05
+  [Bug Fix]
+    * Fix a bug that R::OP::Matrix#rbind method does not work well.
+    * Fix a bug that R::OP::Matrix::Float#diag method allows only matrix argument.
+    * Fix a bug that R::OP::Matrix::FloatComplex#diag method allows only matrix argument.
+    * Fix a bug that R::OP::Matrix::DoubleComplex#diag method allows only matrix argument.
+    * Fix a bug that R::OP::Matrix::Float#solve method allows determinent 0 matrix argument.
+    * Fix a bug that R::OP::Matrix::FloatComplex#solve method allows determinent 0 matrix argument.
+    * Fix a bug that R::OP::Matrix::DoubleComplex#solve method allows determinent 0 matrix argument.
+    * Fix a bug that R::OP::Matrix::DoubleComplex#det method allows non-square matrix argument.
+    * Fix a bug that R::OP::Matrix::DoubleComplex#solve method allows determinent 0 matrix argument.
+  [Test Improvement]
+    * Add tests for R::OP::Matrix#cbind method.
+    * Add tests for R::OP::Matrix#rbind method.
+    * Add and cleanup tests for R::OP::Matrix::Double#diag method.
+    * Add tests for R::OP::Matrix::Double#slice_diag method.
+    * Add tests for R::OP::Matrix::Double#identity method.
+    * Add tests for R::OP::Matrix::Double#mul method.
+    * Add tests for R::OP::Matrix::Double#t method.
+    * Add tests for R::OP::Matrix::Double#det method.
+    * Add tests for R::OP::Matrix::Double#solve method.
+    * Add tests for R::OP::Matrix::Double#eigen method.
+    * Add tests for R::OP::Matrix::Float#diag method.
+    * Add tests for R::OP::Matrix::Float#slice_diag method.
+    * Add tests for R::OP::Matrix::Float#identity method.
+    * Add tests for R::OP::Matrix::Float#mul method.
+    * Add tests for R::OP::Matrix::Float#t method.
+    * Add tests for R::OP::Matrix::Float#det method.
+    * Add tests for R::OP::Matrix::Float#solve method.
+    * Add tests for R::OP::Matrix::Float#eigen method.
+    * Add tests for R::OP::Matrix::DoubleComplex#slice_diag method.
+    * Add tests for R::OP::Matrix::DoubleComplex#identity method.
+    * Add tests for R::OP::Matrix::DoubleComplex#mul method.
+    * Add tests for R::OP::Matrix::DoubleComplex#t method.
+    * Add tests for R::OP::Matrix::DoubleComplex#det method.
+    * Add tests for R::OP::Matrix::DoubleComplex#solve method.
+    * Add tests for R::OP::Matrix::DoubleComplex#eigen method.
+    * Add tests for R::OP::Matrix::FloatComplex#slice_diag method.
+    * Add tests for R::OP::Matrix::FloatComplex#identity method.
+    * Add tests for R::OP::Matrix::FloatComplex#mul method.
+    * Add tests for R::OP::Matrix::FloatComplex#t method.
+    * Add tests for R::OP::Matrix::FloatComplex#det method.
+    * Add tests for R::OP::Matrix::FloatComplex#solve method.
+    * Add tests for R::OP::Matrix::FloatComplex#eigen method.
+  [Document Improvement]
+    * Add docs for R::OP::Matrix class.
+    
+0.018 2024-08-03
+  [Requirement Changes]
+    * Require -std=C++17 in gcc/clang compiler.
+  [Test Improvement]
+    * Add CIs.
+  [Test Bug Fix]
+    * Fix bugs that old R::NDArray::Object and R::OP::Object is loaded in test codes.
+0.017 2024-08-01
+  [Test Improvement]
+    * Add many tests.
+  [Bug Fix]
+    * Fix some bugs.
 0.016 2024-07-31
   [Test Improvement]
     * Add many tests.

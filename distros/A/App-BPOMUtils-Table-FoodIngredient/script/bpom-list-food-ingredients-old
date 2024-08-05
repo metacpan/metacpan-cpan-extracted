@@ -11,9 +11,9 @@ use Log::ger;
 use Perinci::CmdLine::Any;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2024-04-19'; # DATE
+our $DATE = '2024-07-19'; # DATE
 our $DIST = 'App-BPOMUtils-Table-FoodIngredient'; # DIST
-our $VERSION = '0.021'; # VERSION
+our $VERSION = '0.023'; # VERSION
 
 my $cmdline = Perinci::CmdLine::Any->new(
     url => "/App/BPOMUtils/Table/FoodIngredient/bpom_list_food_ingredients_old",
@@ -40,7 +40,7 @@ bpom-list-food-ingredients-old - List ingredients in BPOM processed food divisio
 
 =head1 VERSION
 
-This document describes version 0.021 of bpom-list-food-ingredients-old (from Perl distribution App-BPOMUtils-Table-FoodIngredient), released on 2024-04-19.
+This document describes version 0.023 of bpom-list-food-ingredients-old (from Perl distribution App-BPOMUtils-Table-FoodIngredient), released on 2024-07-19.
 
 =head1 SYNOPSIS
 

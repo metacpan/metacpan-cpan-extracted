@@ -69,7 +69,7 @@ my %MM_ARGS = ();
 ## DYNAMIC PREREQS ###########################################################
 
 if (! parse_args()->{PUREPERL_ONLY} && can_compile_loadable_object(quiet => 1)) {
-  $MM_ARGS{PREREQ_PM}{'Cpanel::JSON::XS'} = '2.3310';
+  $MM_ARGS{PREREQ_PM}{'Cpanel::JSON::XS'} = "$]" >= 5.036 ? '4.38' : '2.3310';
 }
 
 use Text::ParseWords;

@@ -11,8 +11,7 @@ dist.ini
 include/argon2.h
 lib/Crypt/Argon2.pm
 lib/Crypt/Argon2.xs
-opt/opt.c
-ref/ref.c
+planner/xs.pl
 script/argon2-calibrate
 src/argon2.c
 src/blake2/blake2-impl.h
@@ -24,6 +23,9 @@ src/core.c
 src/core.h
 src/encoding.c
 src/encoding.h
+src/opt.c
+src/ref.c
+src/switch.c
 src/thread.c
 src/thread.h
 t/test.t

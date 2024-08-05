@@ -1,0 +1,53 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.88.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: RIPEMD160
+
+SHA256 17b39c814070300c428c08a21ba474bb424dc4b8ebd57fdcf8d14ca63de10a72 CHANGES
+SHA256 605efee994a69ecc81dde4327bfcc5279bb86c557b5677e0f2ce47361eb34fd4 CONTRIBUTING.md
+SHA256 4bb36edd2bcafef11ca615f69607953a31ee05ae172b69990aee317e95653456 LICENSE
+SHA256 4e788a26a8a652e9fa84d51a6bcc411970027dde00ada35e3cce7ad55a50ff21 MANIFEST
+SHA256 91202fdd209557d031ea60d6a37d9de9455fbd81b807d6e62b4e665d7c8690d4 META.json
+SHA256 48939af89149ab6fb7181354fce742b6dc4c6d3727ea1bd916f0141f15c953b1 META.yml
+SHA256 9f8d68de7835b22d6bbf9b3916c7de475ac9521a4ed16f92031159b697f2d168 Makefile.PL
+SHA256 5fdcac1b61c58f9100a3c31e1e1095f6ee780b044b29fa62079e5cc7ff2d9c3b README
+SHA256 94d0b3b17437886574ce1a308a47bceab3cbc73d613cfbb425fa42859bb71747 README.md
+SHA256 865c25bec698680f5cdfb41df9ffd1debd6fece4f45730e88428d34004a1fba9 lib/Locale/Unicode/Data.pm
+SHA256 15b42acef2f0e8b4f9e0edf142b8330da9cb5525ce0fba45e2c2017e013860af lib/Locale/Unicode/Data/Boolean.pod
+SHA256 2b6cc16531183db892a94fe0c6cc4ef56a6f8fda2e15a61e36b93874e59fcc1d lib/Locale/Unicode/Data/Exception.pod
+SHA256 da9b53af8e3f948e36f6847e19a1f52d1b6d25a7bb4bc97d0076d2a2e9535a5e lib/Locale/Unicode/unicode_cldr.sqlite3
+SHA256 e440c7ec6744aa51e156ce76506d9dc28301bd3d7adbf9c432c824fd320ea4ee scripts/cldr-schema.sql
+SHA256 1d26fae773d375a313ab12676adee0c14e0479f0c5d90058d670373501748f75 scripts/create_database.pl
+SHA256 baa58bd133c6ea0048271280b1251db32902c154b5c30ebe367e7a0f5642ad5b t/00.load.t
+SHA256 3cc9d5474d693e267dd924c81816c14ac4d88653b3adf925df3edceef468463d t/01.locale-data.t
+SHA256 782ba6082394e4a417a721a39ab4d6be999251ef81ff3c226193d244eafa493e t/90.pod.t
+SHA256 2a03746524d3f545c1b59edb3742a692f8e80e01a307a7a8f7354075986afb75 t/91.coverage.t
+SHA256 64e814a0d0388a94035330a9c8141270f26bfffa87cf75d261bdbd0f4e993cdd t/92.signature.t
+SHA256 7a418ce0ef2d6be8ccaf059a31ad7367c2731e251894d83a2525dcaafb71ab5a t/99.kwalitee.t
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBAwAdFiEENa28Ovg1XoRROdiWXzwCYc2y51IFAmattPoACgkQXzwCYc2y
+51JZsQ/+JGrUskam1ZVAYmo0/TlKE6y9YuoFHrben/LeyP/Ws5qDAWwnVvk1/N3N
+0+iw+F3tPfpSITb6Vm23RPSxgZfsXbI8RB+sQnYEPNbDI/qwhaeifzhS8sTTxJzI
+h4eLqM0acslAD906V+/xk4FqjNTAstStxPoCeoLFuoU5AS6TENsT1cYTZnEHfmkX
+NcavsQ2Tu3h+IYCrKRmnct70rV/De6eGyINmGP4NRXqxinRHAFFsa5fvSncuCfIp
+OE21jpK/km7Efi5tJT45vQY/UBpD1s5Gf0rVeeNJOBZE3W/l+qAMYb2Ifdus6NLB
+7vgVEjxNf9I9R9oBVfLiVUZzrG81U3G+nifSiGB1mx84npITxnHqgFodAsNwoITD
+iiLbPGTTuR6Kxk5AXPYK2HK0cpalWAF92iOgcm9OeUkxtAFZDFteh5d/lwxyfTlP
+aNijwMhumZbcvPAazGJkSCrNwMzy9JKVC9GqIDrFxwZnMpJhvOKZCKJ8pwIfaj6I
+h3FETfELfBMU+S0vfe9nUiyGBkW6PRgt6ViCpQSwu8QIoUpA+p8KpRLUvLaMg+uD
+19nwTluKrLFMi9I1/yjXt3P7uBgaUkkNV+CWJrER6cWIHnwlkhPEAc4DdCiMx7uj
+fM2KIOHbr3D5SoKMVgNvbwaGF7e9mEZ8v66Y+jeo/uBk2sqkO94=
+=z8YI
+-----END PGP SIGNATURE-----

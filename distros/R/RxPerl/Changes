@@ -1,5 +1,9 @@
 Revision history for Perl extension RxPerl
 
+v6.29.3 2024-08-04T04:12:04Z
+
+    - fixed tests
+
 v6.29.2 2024-07-25T14:49:00Z
 
     - no changes

@@ -1,0 +1,43 @@
+---
+abstract: 'DateTime Localised Data from Unicode CLDR'
+author:
+  - 'Jacques Deguest (jack@deguest.jp)'
+build_requires:
+  DBD::SQLite: '1.27'
+  DateTime: '0.42'
+  ExtUtils::MakeMaker: '0'
+  File::Find: '0'
+  Test::More: '1.302120'
+  Test::Pod: '1.52'
+  lib: '0.63'
+  utf8: '0'
+  version: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: DateTime-Locale-FromCLDR
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Locale::Unicode: v0.3.5
+  Locale::Unicode::Data: v0.1.0
+  Scalar::Util: '0'
+  Want: '0.17'
+  overload: '1.06'
+  perl: '5.010000'
+  strict: '0'
+  vars: '0'
+  warnings: '0'
+  warnings::register: '0'
+resources:
+  bugtracker: https://gitlab.com/jackdeguest/DateTime-Locale-FromCLDR/issues
+  repository: https://gitlab.com/jackdeguest/DateTime-Locale-FromCLDR
+version: v0.1.1
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

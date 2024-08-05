@@ -9,9 +9,9 @@ use Carp       ();
 use List::Util qw(min);
 
 use base 'CVSS::Base';
-use CVSS::Constants;
+use CVSS::Constants ();
 
-our $VERSION = '1.00';
+our $VERSION = '1.11';
 $VERSION =~ tr/_//d;    ## no critic
 
 use constant DEBUG => $ENV{CVSS_DEBUG};
@@ -26,19 +26,6 @@ sub METRIC_GROUPS       { CVSS::Constants->CVSS2_METRIC_GROUPS }
 sub METRIC_NAMES        { CVSS::Constants->CVSS2_METRIC_NAMES }
 
 sub version {'2.0'}
-
-sub temporal_score    { shift->{scores}->{temporal} }
-sub temporal_severity { $_[0]->score_to_severity($_[0]->temporal_score) }
-
-sub environmental_score    { shift->{scores}->{environmental} }
-sub environmental_severity { $_[0]->score_to_severity($_[0]->environmental_score) }
-
-# JSON-style alias
-sub temporalScore    { shift->temporal_score }
-sub temporalSeverity { shift->temporal_severity }
-
-sub environmentalScore    { shift->environmental_score }
-sub environmentalSeverity { shift->environmental_severity }
 
 sub weight {
 
@@ -162,7 +149,7 @@ __END__
 
 =head1 NAME
 
-CVSS::v2 - Parse and calculate CVSS v2 scores
+CVSS::v2 - Parse and calculate CVSS v2.0 scores
 
 =head1 SYNOPSIS
 
@@ -180,25 +167,7 @@ CVSS::v2 - Parse and calculate CVSS v2 scores
 
 L<CVSS::v2> inherits all methods from L<CVSS::Base> and implements the following new ones.
 
-=head3 SCORES
-
 =over
-
-=item $cvss->temporal_score
-
-Return the temporal score (0 - 10).
-
-=item $cvss->temporal_severity
-
-Return the temporal severity (LOW, MEDIUM, HIGH or CRITICAL).
-
-=item $cvss->environmental_score
-
-Return the environmental score (0 - 10).
-
-=item $cvss->environmental_severity
-
-Return the environmental severity (LOW, MEDIUM, HIGH or CRITICAL).
 
 =item $cvss-weight ( $metric )
 

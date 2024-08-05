@@ -1,3 +1,15 @@
+0.05 2024-08-04T18:14:32+02:00
+ - Add margin to message board page.
+ - Add margin to message board blank page.
+ - Change all fonts to sans-serif.
+
+0.04 2024-08-04T13:11:56+02:00
+ - Change message from div element to pre with wrapping.
+
+0.03 2024-08-04T12:46:18+02:00
+ - Add identifications for textarea and button elements.
+ - Remove obsolete code from Blank.
+
 0.02 2024-07-14T12:43:42+02:00
  - Add Tags helper for message board blank page.
  - Improve CSS to wrap classes inside.

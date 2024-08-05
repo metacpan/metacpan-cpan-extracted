@@ -4,17 +4,22 @@ use strict;
 use warnings;
 
 use Getopt::Long;
+use Pod::Usage;
 
 use App::LastStats;
+
+my %opts;
+GetOptions(\%opts, 'user=s', 'count=i', 'format=s', 'period=s', 'help');
+
+if ($opts{help}) {
+  pod2usage(1);
+}
 
 my $laststats;
 
 if (@ARGV == 1) {
   $laststats = App::LastStats->new(username => $ARGV[0]);
 } else {
-  my %opts;
-  GetOptions(\%opts, 'user=s', 'count=i', 'format=s', 'period=s');
-
   $laststats = App::LastStats->new(%opts);
 }
 
@@ -53,6 +58,13 @@ The format to display results in. Can be "text", "html" or "json" (defaults to "
 =item B<--period>
 
 The time period for the stats. Can be "overall", "7day", "1month", "3month", "6month", "12month" (defaults to "7day")
+
+=item B<--api-key> B<--api-secret>
+
+The authorisation details you need in order to use the Last.fm API. These can
+either be passed as arguments to the constructor or, if omitted, they are
+read from environment variables called C<LASTFM_API_KEY> and
+C<LASTFM_API_SECRET>.
 
 =back
 

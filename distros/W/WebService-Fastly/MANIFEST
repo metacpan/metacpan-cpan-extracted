@@ -22,6 +22,7 @@ docs/AclResponseAllOf.md
 docs/ApexRedirect.md
 docs/ApexRedirectAllOf.md
 docs/ApexRedirectApi.md
+docs/AsyncResponse.md
 docs/AutomationToken.md
 docs/AutomationTokenCreateRequest.md
 docs/AutomationTokenCreateRequestAttributes.md
@@ -58,6 +59,7 @@ docs/BillingResponseLineItem.md
 docs/BillingStatus.md
 docs/BillingTotal.md
 docs/BillingTotalExtras.md
+docs/BillingUsageMetricsApi.md
 docs/BulkUpdateAclEntriesRequest.md
 docs/BulkUpdateAclEntry.md
 docs/BulkUpdateAclEntryAllOf.md
@@ -89,11 +91,20 @@ docs/ContactResponse.md
 docs/ContactResponseAllOf.md
 docs/Content.md
 docs/ContentApi.md
+docs/CreateDashboardRequest.md
 docs/CreateResponseObjectRequest.md
 docs/Customer.md
 docs/CustomerApi.md
 docs/CustomerResponse.md
 docs/CustomerResponseAllOf.md
+docs/Dashboard.md
+docs/DashboardItem.md
+docs/DashboardItemPropertyDataSource.md
+docs/DashboardItemPropertyDataSourcePropertyConfig.md
+docs/DashboardItemPropertyVisualization.md
+docs/DashboardItemPropertyVisualizationPropertyConfig.md
+docs/DashboardPropertyCreatedBy.md
+docs/DashboardPropertyUpdatedBy.md
 docs/DefaultSettings.md
 docs/DefaultSettingsError.md
 docs/DefaultSettingsResponse.md
@@ -131,6 +142,7 @@ docs/EnabledProductResponseLinks.md
 docs/EnabledProductResponseProduct.md
 docs/EnabledProductResponseService.md
 docs/EnabledProductsApi.md
+docs/EomInvoiceResponse.md
 docs/Error.md
 docs/ErrorResponseData.md
 docs/Event.md
@@ -140,6 +152,8 @@ docs/EventResponse.md
 docs/EventsApi.md
 docs/EventsResponse.md
 docs/GenericTokenError.md
+docs/GetServiceLevelUsageResponse.md
+docs/GetServiceLevelUsageTypesResponse.md
 docs/Gzip.md
 docs/GzipApi.md
 docs/GzipResponse.md
@@ -195,6 +209,8 @@ docs/IamUserGroup.md
 docs/IamUserGroupAllOf.md
 docs/IamUserGroupsApi.md
 docs/ImageOptimizerDefaultSettingsApi.md
+docs/IncludedWithTlsConfiguration.md
+docs/IncludedWithTlsConfigurationItem.md
 docs/IncludedWithWafActiveRuleItem.md
 docs/IncludedWithWafExclusionItem.md
 docs/IncludedWithWafFirewallVersionItem.md
@@ -223,7 +239,6 @@ docs/InvitationsApi.md
 docs/InvitationsResponse.md
 docs/InvitationsResponseAllOf.md
 docs/Invoice.md
-docs/InvoiceResponse.md
 docs/Invoicelineitems.md
 docs/KvStoreApi.md
 docs/KvStoreItemApi.md
@@ -245,7 +260,8 @@ docs/LegacyWafUpdateStatus.md
 docs/LegacyWafUpdateStatusApi.md
 docs/LineItemData.md
 docs/LineItemDataReadOnlyInvoiceId.md
-docs/ListInvoicesResponse.md
+docs/ListDashboardsResponse.md
+docs/ListEomInvoicesResponse.md
 docs/Listinvoices.md
 docs/LoggingAddressAndPort.md
 docs/LoggingAzureblobAdditional.md
@@ -349,6 +365,9 @@ docs/LoggingTlsCommon.md
 docs/LoggingUseTlsString.md
 docs/Metadata.md
 docs/ModelPackage.md
+docs/MtdInvoiceResponse.md
+docs/Mtdinvoice.md
+docs/Mtdlineitems.md
 docs/MutualAuthentication.md
 docs/MutualAuthenticationApi.md
 docs/MutualAuthenticationData.md
@@ -360,6 +379,7 @@ docs/MutualAuthenticationResponseData.md
 docs/MutualAuthenticationResponseDataAllOf.md
 docs/MutualAuthenticationsResponse.md
 docs/MutualAuthenticationsResponseAllOf.md
+docs/ObservabilityCustomDashboardsApi.md
 docs/OriginInspector.md
 docs/OriginInspectorDimensions.md
 docs/OriginInspectorEntry.md
@@ -425,6 +445,12 @@ docs/RecordedTimestamp.md
 docs/RelationshipCommonName.md
 docs/RelationshipCustomer.md
 docs/RelationshipCustomerCustomer.md
+docs/RelationshipDefaultEcdsaTlsCertificate.md
+docs/RelationshipDefaultEcdsaTlsCertificateDefaultEcdsaCertificate.md
+docs/RelationshipDefaultEcdsaTlsCertificateDefaultEcdsaCertificateData.md
+docs/RelationshipDefaultTlsCertificate.md
+docs/RelationshipDefaultTlsCertificateDefaultCertificate.md
+docs/RelationshipDefaultTlsCertificateDefaultCertificateData.md
 docs/RelationshipMemberCustomer.md
 docs/RelationshipMemberMutualAuthentication.md
 docs/RelationshipMemberService.md
@@ -433,7 +459,6 @@ docs/RelationshipMemberTlsActivation.md
 docs/RelationshipMemberTlsBulkCertificate.md
 docs/RelationshipMemberTlsCertificate.md
 docs/RelationshipMemberTlsConfiguration.md
-docs/RelationshipMemberTlsDnsRecord.md
 docs/RelationshipMemberTlsDomain.md
 docs/RelationshipMemberTlsPrivateKey.md
 docs/RelationshipMemberTlsSubscription.md
@@ -469,9 +494,12 @@ docs/RelationshipTlsConfigurationForTlsSubscription.md
 docs/RelationshipTlsConfigurationTlsConfiguration.md
 docs/RelationshipTlsConfigurations.md
 docs/RelationshipTlsConfigurationsTlsConfigurations.md
-docs/RelationshipTlsDnsRecord.md
-docs/RelationshipTlsDnsRecordDnsRecord.md
-docs/RelationshipTlsDnsRecords.md
+docs/RelationshipTlsDnsRecordsRequest.md
+docs/RelationshipTlsDnsRecordsRequestDnsRecords.md
+docs/RelationshipTlsDnsRecordsRequestDnsRecordsData.md
+docs/RelationshipTlsDnsRecordsResponse.md
+docs/RelationshipTlsDnsRecordsResponseDnsRecords.md
+docs/RelationshipTlsDnsRecordsResponseDnsRecordsData.md
 docs/RelationshipTlsDomain.md
 docs/RelationshipTlsDomainTlsDomain.md
 docs/RelationshipTlsDomains.md
@@ -579,6 +607,11 @@ docs/ServiceResponse.md
 docs/ServiceResponseAllOf.md
 docs/ServiceVersionDetail.md
 docs/ServiceVersionDetailOrNull.md
+docs/Serviceusagemetric.md
+docs/Serviceusagemetrics.md
+docs/ServiceusagemetricsData.md
+docs/Serviceusagetype.md
+docs/Serviceusagetypes.md
 docs/Settings.md
 docs/SettingsApi.md
 docs/SettingsResponse.md
@@ -629,6 +662,7 @@ docs/TlsBulkCertificatesApi.md
 docs/TlsBulkCertificatesResponse.md
 docs/TlsBulkCertificatesResponseAllOf.md
 docs/TlsCertificate.md
+docs/TlsCertificateBlobResponse.md
 docs/TlsCertificateData.md
 docs/TlsCertificateDataAttributes.md
 docs/TlsCertificateResponse.md
@@ -723,6 +757,7 @@ docs/TypeWafRuleRevision.md
 docs/TypeWafTag.md
 docs/UpdateBillingAddressRequest.md
 docs/UpdateBillingAddressRequestData.md
+docs/UpdateDashboardRequest.md
 docs/User.md
 docs/UserApi.md
 docs/UserResponse.md
@@ -829,6 +864,7 @@ lib/WebService/Fastly/BackendApi.pm
 lib/WebService/Fastly/BillingAddressApi.pm
 lib/WebService/Fastly/BillingApi.pm
 lib/WebService/Fastly/BillingInvoicesApi.pm
+lib/WebService/Fastly/BillingUsageMetricsApi.pm
 lib/WebService/Fastly/CacheSettingsApi.pm
 lib/WebService/Fastly/ConditionApi.pm
 lib/WebService/Fastly/ConfigStoreApi.pm
@@ -906,6 +942,7 @@ lib/WebService/Fastly/Object/AclResponse.pm
 lib/WebService/Fastly/Object/AclResponseAllOf.pm
 lib/WebService/Fastly/Object/ApexRedirect.pm
 lib/WebService/Fastly/Object/ApexRedirectAllOf.pm
+lib/WebService/Fastly/Object/AsyncResponse.pm
 lib/WebService/Fastly/Object/AutomationToken.pm
 lib/WebService/Fastly/Object/AutomationTokenCreateRequest.pm
 lib/WebService/Fastly/Object/AutomationTokenCreateRequestAttributes.pm
@@ -968,10 +1005,19 @@ lib/WebService/Fastly/Object/Contact.pm
 lib/WebService/Fastly/Object/ContactResponse.pm
 lib/WebService/Fastly/Object/ContactResponseAllOf.pm
 lib/WebService/Fastly/Object/Content.pm
+lib/WebService/Fastly/Object/CreateDashboardRequest.pm
 lib/WebService/Fastly/Object/CreateResponseObjectRequest.pm
 lib/WebService/Fastly/Object/Customer.pm
 lib/WebService/Fastly/Object/CustomerResponse.pm
 lib/WebService/Fastly/Object/CustomerResponseAllOf.pm
+lib/WebService/Fastly/Object/Dashboard.pm
+lib/WebService/Fastly/Object/DashboardItem.pm
+lib/WebService/Fastly/Object/DashboardItemPropertyDataSource.pm
+lib/WebService/Fastly/Object/DashboardItemPropertyDataSourcePropertyConfig.pm
+lib/WebService/Fastly/Object/DashboardItemPropertyVisualization.pm
+lib/WebService/Fastly/Object/DashboardItemPropertyVisualizationPropertyConfig.pm
+lib/WebService/Fastly/Object/DashboardPropertyCreatedBy.pm
+lib/WebService/Fastly/Object/DashboardPropertyUpdatedBy.pm
 lib/WebService/Fastly/Object/DefaultSettings.pm
 lib/WebService/Fastly/Object/DefaultSettingsError.pm
 lib/WebService/Fastly/Object/DefaultSettingsResponse.pm
@@ -1002,6 +1048,7 @@ lib/WebService/Fastly/Object/EnabledProductResponse.pm
 lib/WebService/Fastly/Object/EnabledProductResponseLinks.pm
 lib/WebService/Fastly/Object/EnabledProductResponseProduct.pm
 lib/WebService/Fastly/Object/EnabledProductResponseService.pm
+lib/WebService/Fastly/Object/EomInvoiceResponse.pm
 lib/WebService/Fastly/Object/Error.pm
 lib/WebService/Fastly/Object/ErrorResponse.pm
 lib/WebService/Fastly/Object/ErrorResponseData.pm
@@ -1012,6 +1059,8 @@ lib/WebService/Fastly/Object/EventResponse.pm
 lib/WebService/Fastly/Object/EventsResponse.pm
 lib/WebService/Fastly/Object/EventsResponseAllOf.pm
 lib/WebService/Fastly/Object/GenericTokenError.pm
+lib/WebService/Fastly/Object/GetServiceLevelUsageResponse.pm
+lib/WebService/Fastly/Object/GetServiceLevelUsageTypesResponse.pm
 lib/WebService/Fastly/Object/Gzip.pm
 lib/WebService/Fastly/Object/GzipResponse.pm
 lib/WebService/Fastly/Object/Header.pm
@@ -1074,6 +1123,8 @@ lib/WebService/Fastly/Object/IamServiceGroup.pm
 lib/WebService/Fastly/Object/IamServiceGroupAllOf.pm
 lib/WebService/Fastly/Object/IamUserGroup.pm
 lib/WebService/Fastly/Object/IamUserGroupAllOf.pm
+lib/WebService/Fastly/Object/IncludedWithTlsConfiguration.pm
+lib/WebService/Fastly/Object/IncludedWithTlsConfigurationItem.pm
 lib/WebService/Fastly/Object/IncludedWithWafActiveRuleItem.pm
 lib/WebService/Fastly/Object/IncludedWithWafExclusionItem.pm
 lib/WebService/Fastly/Object/IncludedWithWafFirewallVersionItem.pm
@@ -1113,6 +1164,8 @@ lib/WebService/Fastly/Object/LegacyWafTag.pm
 lib/WebService/Fastly/Object/LegacyWafUpdateStatus.pm
 lib/WebService/Fastly/Object/LineItemData.pm
 lib/WebService/Fastly/Object/LineItemDataReadOnlyInvoiceId.pm
+lib/WebService/Fastly/Object/ListDashboardsResponse.pm
+lib/WebService/Fastly/Object/ListEomInvoicesResponse.pm
 lib/WebService/Fastly/Object/ListInvoicesResponse.pm
 lib/WebService/Fastly/Object/Listinvoices.pm
 lib/WebService/Fastly/Object/LoggingAddressAndPort.pm
@@ -1242,6 +1295,9 @@ lib/WebService/Fastly/Object/LoggingUseTls.pm
 lib/WebService/Fastly/Object/LoggingUseTlsString.pm
 lib/WebService/Fastly/Object/Metadata.pm
 lib/WebService/Fastly/Object/ModelPackage.pm
+lib/WebService/Fastly/Object/MtdInvoiceResponse.pm
+lib/WebService/Fastly/Object/Mtdinvoice.pm
+lib/WebService/Fastly/Object/Mtdlineitems.pm
 lib/WebService/Fastly/Object/MutualAuthentication.pm
 lib/WebService/Fastly/Object/MutualAuthenticationData.pm
 lib/WebService/Fastly/Object/MutualAuthenticationDataAttributes.pm
@@ -1311,6 +1367,12 @@ lib/WebService/Fastly/Object/RecordedTimestamp.pm
 lib/WebService/Fastly/Object/RelationshipCommonName.pm
 lib/WebService/Fastly/Object/RelationshipCustomer.pm
 lib/WebService/Fastly/Object/RelationshipCustomerCustomer.pm
+lib/WebService/Fastly/Object/RelationshipDefaultEcdsaTlsCertificate.pm
+lib/WebService/Fastly/Object/RelationshipDefaultEcdsaTlsCertificateDefaultEcdsaCertificate.pm
+lib/WebService/Fastly/Object/RelationshipDefaultEcdsaTlsCertificateDefaultEcdsaCertificateData.pm
+lib/WebService/Fastly/Object/RelationshipDefaultTlsCertificate.pm
+lib/WebService/Fastly/Object/RelationshipDefaultTlsCertificateDefaultCertificate.pm
+lib/WebService/Fastly/Object/RelationshipDefaultTlsCertificateDefaultCertificateData.pm
 lib/WebService/Fastly/Object/RelationshipMemberCustomer.pm
 lib/WebService/Fastly/Object/RelationshipMemberMutualAuthentication.pm
 lib/WebService/Fastly/Object/RelationshipMemberService.pm
@@ -1358,6 +1420,12 @@ lib/WebService/Fastly/Object/RelationshipTlsConfigurationsTlsConfigurations.pm
 lib/WebService/Fastly/Object/RelationshipTlsDnsRecord.pm
 lib/WebService/Fastly/Object/RelationshipTlsDnsRecordDnsRecord.pm
 lib/WebService/Fastly/Object/RelationshipTlsDnsRecords.pm
+lib/WebService/Fastly/Object/RelationshipTlsDnsRecordsRequest.pm
+lib/WebService/Fastly/Object/RelationshipTlsDnsRecordsRequestDnsRecords.pm
+lib/WebService/Fastly/Object/RelationshipTlsDnsRecordsRequestDnsRecordsData.pm
+lib/WebService/Fastly/Object/RelationshipTlsDnsRecordsResponse.pm
+lib/WebService/Fastly/Object/RelationshipTlsDnsRecordsResponseDnsRecords.pm
+lib/WebService/Fastly/Object/RelationshipTlsDnsRecordsResponseDnsRecordsData.pm
 lib/WebService/Fastly/Object/RelationshipTlsDomain.pm
 lib/WebService/Fastly/Object/RelationshipTlsDomainTlsDomain.pm
 lib/WebService/Fastly/Object/RelationshipTlsDomains.pm
@@ -1461,6 +1529,11 @@ lib/WebService/Fastly/Object/ServiceResponse.pm
 lib/WebService/Fastly/Object/ServiceResponseAllOf.pm
 lib/WebService/Fastly/Object/ServiceVersionDetail.pm
 lib/WebService/Fastly/Object/ServiceVersionDetailOrNull.pm
+lib/WebService/Fastly/Object/Serviceusagemetric.pm
+lib/WebService/Fastly/Object/Serviceusagemetrics.pm
+lib/WebService/Fastly/Object/ServiceusagemetricsData.pm
+lib/WebService/Fastly/Object/Serviceusagetype.pm
+lib/WebService/Fastly/Object/Serviceusagetypes.pm
 lib/WebService/Fastly/Object/Settings.pm
 lib/WebService/Fastly/Object/SettingsResponse.pm
 lib/WebService/Fastly/Object/SigningKey.pm
@@ -1505,6 +1578,7 @@ lib/WebService/Fastly/Object/TlsBulkCertificateResponseDataAllOf.pm
 lib/WebService/Fastly/Object/TlsBulkCertificatesResponse.pm
 lib/WebService/Fastly/Object/TlsBulkCertificatesResponseAllOf.pm
 lib/WebService/Fastly/Object/TlsCertificate.pm
+lib/WebService/Fastly/Object/TlsCertificateBlobResponse.pm
 lib/WebService/Fastly/Object/TlsCertificateData.pm
 lib/WebService/Fastly/Object/TlsCertificateDataAttributes.pm
 lib/WebService/Fastly/Object/TlsCertificateResponse.pm
@@ -1594,6 +1668,7 @@ lib/WebService/Fastly/Object/TypeWafRuleRevision.pm
 lib/WebService/Fastly/Object/TypeWafTag.pm
 lib/WebService/Fastly/Object/UpdateBillingAddressRequest.pm
 lib/WebService/Fastly/Object/UpdateBillingAddressRequestData.pm
+lib/WebService/Fastly/Object/UpdateDashboardRequest.pm
 lib/WebService/Fastly/Object/User.pm
 lib/WebService/Fastly/Object/UserResponse.pm
 lib/WebService/Fastly/Object/UserResponseAllOf.pm
@@ -1681,6 +1756,7 @@ lib/WebService/Fastly/Object/WafTagsResponseDataItem.pm
 lib/WebService/Fastly/Object/WsMessageFormat.pm
 lib/WebService/Fastly/ObjectStoreApi.pm
 lib/WebService/Fastly/ObjectStoreItemApi.pm
+lib/WebService/Fastly/ObservabilityCustomDashboardsApi.pm
 lib/WebService/Fastly/OriginInspectorHistoricalApi.pm
 lib/WebService/Fastly/OriginInspectorRealtimeApi.pm
 lib/WebService/Fastly/PackageApi.pm

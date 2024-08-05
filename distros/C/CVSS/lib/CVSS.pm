@@ -10,13 +10,13 @@ use Exporter qw(import);
 
 use constant DEBUG => $ENV{CVSS_DEBUG};
 
-use CVSS::v2;
-use CVSS::v3;
-use CVSS::v4;
+use CVSS::v2 ();
+use CVSS::v3 ();
+use CVSS::v4 ();
 
 our @EXPORT = qw(encode_cvss decode_cvss cvss_to_xml);
 
-our $VERSION = '1.00';
+our $VERSION = '1.11';
 $VERSION =~ tr/_//d;    ## no critic
 
 my $CVSS_CLASSES = {'2.0' => 'CVSS::v2', '3.0' => 'CVSS::v3', '3.1' => 'CVSS::v3', '4.0' => 'CVSS::v4'};

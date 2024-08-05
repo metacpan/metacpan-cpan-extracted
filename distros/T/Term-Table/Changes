@@ -1,3 +1,11 @@
+0.020     2024-08-05 07:11:23-07:00 America/Los_Angeles
+
+    - Fix test broken on Test::More
+
+0.019     2024-08-05 07:07:59-07:00 America/Los_Angeles
+
+    - Fix use cycle between Test-Simple and Term::Table now that Test2::Suite was merged into Test-Simple
+
 0.018     2023-10-22 21:55:51-07:00 America/Los_Angeles
 
     - Merged doc fix PR

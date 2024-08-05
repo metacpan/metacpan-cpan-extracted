@@ -26,6 +26,7 @@ do { my $x = {
                                       'Mutex' => '0',
                                       'Object::Pad' => '0.74',
                                       'OpenTelemetry' => '0.010',
+                                      'bigfloat' => '0.65',
                                       'perl' => 'v5.32.0'
                                     }
                     },

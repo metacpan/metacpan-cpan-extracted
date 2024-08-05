@@ -1,5 +1,10 @@
 Revision history for CAPE-Utils
 
+2.9.0   2024-08-01/16:20
+		 - Remove unused depend on YAML. Thanks @perlpunk in issues/2.
+		 - Add support for ignoring stuff using Web::ACL.
+		 - Add ignore support for paths and UAs via a file of regexs
+
 2.8.0   2023-11-27/11:00
 		- convert to Pod::Usage
 		- replace CryptX with cli utils

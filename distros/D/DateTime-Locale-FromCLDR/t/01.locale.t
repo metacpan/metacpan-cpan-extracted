@@ -1,0 +1,665 @@
+#!perl
+BEGIN
+{
+    use strict;
+    use warnings;
+    use lib './lib';
+    use open ':std' => ':utf8';
+    use vars qw( $DEBUG );
+    use utf8;
+    use version;
+    use Test::More;
+    use DBD::SQLite;
+    if( version->parse( $DBD::SQLite::sqlite_version ) < version->parse( '3.6.19' ) )
+    {
+        plan skip_all => 'SQLite driver version 3.6.19 or higher is required. You have version ' . $DBD::SQLite::sqlite_version;
+    }
+    our $DEBUG = exists( $ENV{AUTHOR_TESTING} ) ? $ENV{AUTHOR_TESTING} : 0;
+};
+
+BEGIN
+{
+    use_ok( 'DateTime::Locale::FromCLDR' ) || BAIL_OUT( 'Unable to load DateTime::Locale::FromCLDR' );
+};
+
+use strict;
+use warnings;
+use utf8;
+
+my $locale = DateTime::Locale::FromCLDR->new( 'en' );
+isa_ok( $locale, 'DateTime::Locale::FromCLDR' );
+
+# To generate this list:
+# perl -lnE '/^sub (?!new|[A-Z]|_)/ and say "can_ok( \$locale, \''", [split(/\s+/, $_)]->[1], "\'' );"' ./lib/DateTime/Locale/FromCLDR.pm
+can_ok( $locale, 'am_pm_abbreviated' );
+can_ok( $locale, 'as_string' );
+can_ok( $locale, 'available_formats' );
+can_ok( $locale, 'calendar' );
+can_ok( $locale, 'code' );
+can_ok( $locale, 'date_at_time_format_full' );
+can_ok( $locale, 'date_at_time_format_long' );
+can_ok( $locale, 'date_at_time_format_medium' );
+can_ok( $locale, 'date_at_time_format_short' );
+can_ok( $locale, 'date_format_default' );
+can_ok( $locale, 'date_format_full' );
+can_ok( $locale, 'date_format_long' );
+can_ok( $locale, 'date_format_medium' );
+can_ok( $locale, 'date_format_short' );
+can_ok( $locale, 'date_formats' );
+can_ok( $locale, 'datetime_format' );
+can_ok( $locale, 'datetime_format_default' );
+can_ok( $locale, 'datetime_format_full' );
+can_ok( $locale, 'datetime_format_long' );
+can_ok( $locale, 'datetime_format_medium' );
+can_ok( $locale, 'datetime_format_short' );
+can_ok( $locale, 'day_format_abbreviated' );
+can_ok( $locale, 'day_format_narrow' );
+can_ok( $locale, 'day_format_short' );
+can_ok( $locale, 'day_format_wide' );
+can_ok( $locale, 'day_stand_alone_abbreviated' );
+can_ok( $locale, 'day_stand_alone_narrow' );
+can_ok( $locale, 'day_stand_alone_short' );
+can_ok( $locale, 'day_stand_alone_wide' );
+can_ok( $locale, 'default_date_format_length' );
+can_ok( $locale, 'default_time_format_length' );
+can_ok( $locale, 'era_abbreviated' );
+can_ok( $locale, 'era_narrow' );
+can_ok( $locale, 'era_wide' );
+can_ok( $locale, 'first_day_of_week' );
+can_ok( $locale, 'format_for' );
+can_ok( $locale, 'interval_format' );
+can_ok( $locale, 'interval_formats' );
+can_ok( $locale, 'interval_greatest_diff' );
+can_ok( $locale, 'language' );
+can_ok( $locale, 'language_code' );
+can_ok( $locale, 'locale' );
+can_ok( $locale, 'month_format_abbreviated' );
+can_ok( $locale, 'month_format_narrow' );
+can_ok( $locale, 'month_format_wide' );
+can_ok( $locale, 'month_stand_alone_abbreviated' );
+can_ok( $locale, 'month_stand_alone_narrow' );
+can_ok( $locale, 'month_stand_alone_wide' );
+can_ok( $locale, 'name' );
+can_ok( $locale, 'native_language' );
+can_ok( $locale, 'native_name' );
+can_ok( $locale, 'native_script' );
+can_ok( $locale, 'native_territory' );
+can_ok( $locale, 'native_variant' );
+can_ok( $locale, 'native_variants' );
+can_ok( $locale, 'prefers_24_hour_time' );
+can_ok( $locale, 'quarter_format_abbreviated' );
+can_ok( $locale, 'quarter_format_narrow' );
+can_ok( $locale, 'quarter_format_wide' );
+can_ok( $locale, 'quarter_stand_alone_abbreviated' );
+can_ok( $locale, 'quarter_stand_alone_narrow' );
+can_ok( $locale, 'quarter_stand_alone_wide' );
+can_ok( $locale, 'script' );
+can_ok( $locale, 'script_code' );
+can_ok( $locale, 'territory' );
+can_ok( $locale, 'territory_code' );
+can_ok( $locale, 'time_format_default' );
+can_ok( $locale, 'time_format_full' );
+can_ok( $locale, 'time_format_long' );
+can_ok( $locale, 'time_format_medium' );
+can_ok( $locale, 'time_format_short' );
+can_ok( $locale, 'time_formats' );
+can_ok( $locale, 'variant' );
+can_ok( $locale, 'variant_code' );
+can_ok( $locale, 'variants' );
+can_ok( $locale, 'version' );
+
+like( $locale->version, qr/^\d+\.\d+$/, 'version' );
+
+# NOTE: core test data
+my $tests = [
+    {
+        am_pm_abbreviated => ["AM", "PM"],
+        as_string => q{en},
+        available_formats => ["Bh", "Bhm", "Bhms", "d", "E", "EBhm", "EBhms", "Ed", "Ehm", "EHm", "Ehms", "EHms", "Gy", "GyMd", "GyMMM", "GyMMMd", "GyMMMEd", "h", "H", "hm", "Hm", "hms", "Hms", "hmsv", "Hmsv", "hmv", "Hmv", "M", "Md", "MEd", "MMM", "MMMd", "MMMEd", "MMMMd", "MMMMW", "ms", "y", "yM", "yMd", "yMEd", "yMMM", "yMMMd", "yMMMEd", "yMMMM", "yQQQ", "yQQQQ", "yw"],
+        code => q{en},
+        date_at_time_format_full => q{EEEE, MMMM d, y 'at' h:mm:ss a zzzz},
+        date_at_time_format_long => q{MMMM d, y 'at' h:mm:ss a z},
+        date_at_time_format_medium => q{MMM d, y, h:mm:ss a},
+        date_at_time_format_short => q{M/d/yy, h:mm a},
+        date_format_default => q{MMM d, y},
+        date_format_full => q{EEEE, MMMM d, y},
+        date_format_long => q{MMMM d, y},
+        date_format_medium => q{MMM d, y},
+        date_format_short => q{M/d/yy},
+        date_formats => {
+	        full => "EEEE, MMMM d, y",
+	        long => "MMMM d, y",
+	        medium => "MMM d, y",
+	        short => "M/d/yy",
+	    },
+        datetime_format => q{MMM d, y, h:mm:ss a},
+        datetime_format_default => q{MMM d, y, h:mm:ss a},
+        datetime_format_full => q{EEEE, MMMM d, y, h:mm:ss a zzzz},
+        datetime_format_long => q{MMMM d, y, h:mm:ss a z},
+        datetime_format_medium => q{MMM d, y, h:mm:ss a},
+        datetime_format_short => q{M/d/yy, h:mm a},
+        day_format_abbreviated => ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"],
+        day_format_narrow => ["M", "T", "W", "T", "F", "S", "S"],
+        day_format_short => ["Mo", "Tu", "We", "Th", "Fr", "Sa", "Su"],
+        day_format_wide => ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"],
+        day_stand_alone_abbreviated => ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"],
+        day_stand_alone_narrow => ["M", "T", "W", "T", "F", "S", "S"],
+        day_stand_alone_short => ["Mo", "Tu", "We", "Th", "Fr", "Sa", "Su"],
+        day_stand_alone_wide => ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"],
+        default_date_format_length => q{medium},
+        default_time_format_length => q{medium},
+        era_abbreviated => ["BC", "AD"],
+        era_narrow => ["B", "A"],
+        era_wide => ["Before Christ", "Anno Domini"],
+        first_day_of_week => q{7},
+        language => q{English},
+        language_code => q{en},
+        locale => q{en},
+        month_format_abbreviated => ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"],
+        month_format_narrow => ["J", "F", "M", "A", "M", "J", "J", "A", "S", "O", "N", "D"],
+        month_format_wide => ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"],
+        month_stand_alone_abbreviated => ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"],
+        month_stand_alone_narrow => ["J", "F", "M", "A", "M", "J", "J", "A", "S", "O", "N", "D"],
+        month_stand_alone_wide => ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"],
+        name => q{English},
+        native_language => q{English},
+        native_name => q{English},
+        native_script => undef,
+        native_territory => undef,
+        native_variant => undef,
+        native_variants => [],
+        prefers_24_hour_time => q{0},
+        quarter_format_abbreviated => ["Q1", "Q2", "Q3", "Q4"],
+        quarter_format_narrow => ["1", "2", "3", "4"],
+        quarter_format_wide => ["1st quarter", "2nd quarter", "3rd quarter", "4th quarter"],
+        quarter_stand_alone_abbreviated => ["Q1", "Q2", "Q3", "Q4"],
+        quarter_stand_alone_narrow => ["1", "2", "3", "4"],
+        quarter_stand_alone_wide => ["1st quarter", "2nd quarter", "3rd quarter", "4th quarter"],
+        script => undef,
+        script_code => undef,
+        territory => undef,
+        territory_code => undef,
+        time_format_default => q{h:mm:ss a},
+        time_format_full => q{h:mm:ss a zzzz},
+        time_format_long => q{h:mm:ss a z},
+        time_format_medium => q{h:mm:ss a},
+        time_format_short => q{h:mm a},
+        time_formats => {
+	        full => "h:mm:ss a zzzz",
+	        long => "h:mm:ss a z",
+	        medium => "h:mm:ss a",
+	        short => "h:mm a",
+	    },
+        variant => undef,
+        variant_code => undef,
+        variants => [],
+    },
+    {
+        am_pm_abbreviated => ["am", "pm"],
+        as_string => q{en-GB},
+        available_formats => ["GyMd", "GyMMMEEEEd", "MMMEEEEd", "MMMMEEEEd", "yMMMEEEEd", "yMMMMEEEEd"],
+        code => q{en-GB},
+        date_at_time_format_full => q{EEEE d MMMM y 'at' HH:mm:ss zzzz},
+        date_at_time_format_long => q{d MMMM y 'at' HH:mm:ss z},
+        date_at_time_format_medium => q{d MMM y, HH:mm:ss},
+        date_at_time_format_short => q{dd/MM/y, HH:mm},
+        date_format_default => q{d MMM y},
+        date_format_full => q{EEEE d MMMM y},
+        date_format_long => q{d MMMM y},
+        date_format_medium => q{d MMM y},
+        date_format_short => q{dd/MM/y},
+        date_formats => {
+	        full => "EEEE d MMMM y",
+	        long => "d MMMM y",
+	        medium => "d MMM y",
+	        short => "dd/MM/y",
+	    },
+        datetime_format => q{d MMM y, HH:mm:ss},
+        datetime_format_default => q{d MMM y, HH:mm:ss},
+        datetime_format_full => q{EEEE d MMMM y, HH:mm:ss zzzz},
+        datetime_format_long => q{d MMMM y, HH:mm:ss z},
+        datetime_format_medium => q{d MMM y, HH:mm:ss},
+        datetime_format_short => q{dd/MM/y, HH:mm},
+        day_format_abbreviated => ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"],
+        day_format_narrow => ["M", "T", "W", "T", "F", "S", "S"],
+        day_format_short => ["Mo", "Tu", "We", "Th", "Fr", "Sa", "Su"],
+        day_format_wide => ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"],
+        day_stand_alone_abbreviated => ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"],
+        day_stand_alone_narrow => ["M", "T", "W", "T", "F", "S", "S"],
+        day_stand_alone_short => ["Mo", "Tu", "We", "Th", "Fr", "Sa", "Su"],
+        day_stand_alone_wide => ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"],
+        default_date_format_length => q{medium},
+        default_time_format_length => q{medium},
+        era_abbreviated => ["BC", "AD"],
+        era_narrow => ["B", "A"],
+        era_wide => ["Before Christ", "Anno Domini"],
+        first_day_of_week => q{1},
+        language => q{English},
+        language_code => q{en},
+        locale => q{en-GB},
+        month_format_abbreviated => ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"],
+        month_format_narrow => ["J", "F", "M", "A", "M", "J", "J", "A", "S", "O", "N", "D"],
+        month_format_wide => ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"],
+        month_stand_alone_abbreviated => ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"],
+        month_stand_alone_narrow => ["J", "F", "M", "A", "M", "J", "J", "A", "S", "O", "N", "D"],
+        month_stand_alone_wide => ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"],
+        name => q{British English},
+        native_language => q{English},
+        native_name => q{British English},
+        native_script => undef,
+        native_territory => q{United Kingdom},
+        native_variant => undef,
+        native_variants => [],
+        prefers_24_hour_time => q{1},
+        quarter_format_abbreviated => ["Q1", "Q2", "Q3", "Q4"],
+        quarter_format_narrow => ["1", "2", "3", "4"],
+        quarter_format_wide => ["1st quarter", "2nd quarter", "3rd quarter", "4th quarter"],
+        quarter_stand_alone_abbreviated => ["Q1", "Q2", "Q3", "Q4"],
+        quarter_stand_alone_narrow => ["1", "2", "3", "4"],
+        quarter_stand_alone_wide => ["1st quarter", "2nd quarter", "3rd quarter", "4th quarter"],
+        script => undef,
+        script_code => undef,
+        territory => q{United Kingdom},
+        territory_code => q{GB},
+        time_format_default => q{HH:mm:ss},
+        time_format_full => q{HH:mm:ss zzzz},
+        time_format_long => q{HH:mm:ss z},
+        time_format_medium => q{HH:mm:ss},
+        time_format_short => q{HH:mm},
+        time_formats => {
+	        full => "HH:mm:ss zzzz",
+	        long => "HH:mm:ss z",
+	        medium => "HH:mm:ss",
+	        short => "HH:mm",
+	    },
+        variant => undef,
+        variant_code => undef,
+        variants => [],
+    },
+    {
+        am_pm_abbreviated => ["a. m.", "p. m."],
+        as_string => q{es-005-valencia},
+        available_formats => ["Ed", "Ehm", "EHm", "Ehms", "EHms", "Gy", "GyMd", "GyMMM", "GyMMMd", "GyMMMEd", "GyMMMM", "GyMMMMd", "GyMMMMEd", "h", "H", "hm", "Hm", "hms", "Hms", "hmsv", "Hmsv", "hmsvvvv", "Hmsvvvv", "hmv", "Hmv", "Md", "MEd", "MMd", "MMdd", "MMMd", "MMMEd", "MMMMd", "MMMMEd", "MMMMW", "yM", "yMd", "yMEd", "yMM", "yMMM", "yMMMd", "yMMMEd", "yMMMM", "yMMMMd", "yMMMMEd", "yQQQ", "yQQQQ", "yw"],
+        code => q{es-005-valencia},
+        date_at_time_format_full => q{EEEE, d 'de' MMMM 'de' y H:mm:ss (zzzz)},
+        date_at_time_format_long => q{d 'de' MMMM 'de' y H:mm:ss z},
+        date_at_time_format_medium => q{d MMM y H:mm:ss},
+        date_at_time_format_short => q{d/M/yy H:mm},
+        date_format_default => q{d MMM y},
+        date_format_full => q{EEEE, d 'de' MMMM 'de' y},
+        date_format_long => q{d 'de' MMMM 'de' y},
+        date_format_medium => q{d MMM y},
+        date_format_short => q{d/M/yy},
+        date_formats => {
+	        full => "EEEE, d 'de' MMMM 'de' y",
+	        long => "d 'de' MMMM 'de' y",
+	        medium => "d MMM y",
+	        short => "d/M/yy",
+	    },
+        datetime_format => q{d MMM y, H:mm:ss},
+        datetime_format_default => q{d MMM y, H:mm:ss},
+        datetime_format_full => q{EEEE, d 'de' MMMM 'de' y, H:mm:ss (zzzz)},
+        datetime_format_long => q{d 'de' MMMM 'de' y, H:mm:ss z},
+        datetime_format_medium => q{d MMM y, H:mm:ss},
+        datetime_format_short => q{d/M/yy, H:mm},
+        day_format_abbreviated => ["lun", "mar", "mié", "jue", "vie", "sáb", "dom"],
+        day_format_narrow => ["lunes", "martes", "miércoles", "jueves", "viernes", "sábado", "domingo"],
+        day_format_short => ["LU", "MA", "MI", "JU", "VI", "SA", "DO"],
+        day_format_wide => ["lunes", "martes", "miércoles", "jueves", "viernes", "sábado", "domingo"],
+        day_stand_alone_abbreviated => ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"],
+        day_stand_alone_narrow => ["L", "M", "X", "J", "V", "S", "D"],
+        day_stand_alone_short => ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"],
+        day_stand_alone_wide => ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"],
+        default_date_format_length => q{medium},
+        default_time_format_length => q{medium},
+        era_abbreviated => ["a. C.", "d. C."],
+        era_narrow => ["antes de Cristo", "después de Cristo"],
+        era_wide => ["antes de Cristo", "después de Cristo"],
+        first_day_of_week => q{1},
+        language => q{Spanish},
+        language_code => q{es},
+        locale => q{es-005-valencia},
+        month_format_abbreviated => ["ene", "feb", "mar", "abr", "may", "jun", "jul", "ago", "sept", "oct", "nov", "dic"],
+        month_format_narrow => ["enero", "febrero", "marzo", "abril", "mayo", "junio", "julio", "agosto", "septiembre", "octubre", "noviembre", "diciembre"],
+        month_format_wide => ["enero", "febrero", "marzo", "abril", "mayo", "junio", "julio", "agosto", "septiembre", "octubre", "noviembre", "diciembre"],
+        month_stand_alone_abbreviated => ["M01", "M02", "M03", "M04", "M05", "M06", "M07", "M08", "M09", "M10", "M11", "M12"],
+        month_stand_alone_narrow => ["E", "F", "M", "A", "M", "J", "J", "A", "S", "O", "N", "D"],
+        month_stand_alone_wide => ["M01", "M02", "M03", "M04", "M05", "M06", "M07", "M08", "M09", "M10", "M11", "M12"],
+        name => q{Spanish},
+        native_language => q{español},
+        native_name => q{español},
+        native_script => undef,
+        native_territory => q{Sudamérica},
+        native_variant => q{Valenciano},
+        native_variants => ["Valenciano"],
+        prefers_24_hour_time => q{1},
+        quarter_format_abbreviated => ["T1", "T2", "T3", "T4"],
+        quarter_format_narrow => ["1.er trimestre", "2.º trimestre", "3.er trimestre", "4.º trimestre"],
+        quarter_format_wide => ["1.er trimestre", "2.º trimestre", "3.er trimestre", "4.º trimestre"],
+        quarter_stand_alone_abbreviated => ["Q1", "Q2", "Q3", "Q4"],
+        quarter_stand_alone_narrow => ["1", "2", "3", "4"],
+        quarter_stand_alone_wide => ["Q1", "Q2", "Q3", "Q4"],
+        script => undef,
+        script_code => undef,
+        territory => q{South America},
+        territory_code => q{005},
+        time_format_default => q{H:mm:ss},
+        time_format_full => q{H:mm:ss (zzzz)},
+        time_format_long => q{H:mm:ss z},
+        time_format_medium => q{H:mm:ss},
+        time_format_short => q{H:mm},
+        time_formats => {
+	        full => "H:mm:ss (zzzz)",
+	        long => "H:mm:ss z",
+	        medium => "H:mm:ss",
+	        short => "H:mm",
+	    },
+        variant => q{Valencian},
+        variant_code => q{valencia},
+        variants => ["valencia"],
+    },
+    {
+        am_pm_abbreviated => ["午前", "午後"],
+        as_string => q{ja-Latn-fonipa-hepburn-heploc},
+        available_formats => ["Bh", "Bhm", "Bhms", "d", "EBhm", "EBhms", "Ed", "EEEEd", "Ehm", "EHm", "Ehms", "EHms", "Gy", "GyMd", "GyMMM", "GyMMMd", "GyMMMEd", "GyMMMEEEEd", "h", "H", "hm", "Hm", "hms", "Hms", "hmsv", "Hmsv", "hmv", "Hmv", "M", "Md", "MEd", "MEEEEd", "MMM", "MMMd", "MMMEd", "MMMEEEEd", "MMMMd", "MMMMW", "y", "yM", "yMd", "yMEd", "yMEEEEd", "yMM", "yMMM", "yMMMd", "yMMMEd", "yMMMEEEEd", "yMMMM", "yQQQ", "yQQQQ", "yw"],
+        code => q{ja-Latn-fonipa-hepburn-heploc},
+        date_at_time_format_full => q{y年M月d日EEEE H時mm分ss秒 zzzz},
+        date_at_time_format_long => q{y年M月d日 H:mm:ss z},
+        date_at_time_format_medium => q{y/MM/dd H:mm:ss},
+        date_at_time_format_short => q{y/MM/dd H:mm},
+        date_format_default => q{y/MM/dd},
+        date_format_full => q{y年M月d日EEEE},
+        date_format_long => q{y年M月d日},
+        date_format_medium => q{y/MM/dd},
+        date_format_short => q{y/MM/dd},
+        date_formats => {
+	        full => "y年M月d日EEEE",
+	        long => "y年M月d日",
+	        medium => "y/MM/dd",
+	        short => "y/MM/dd",
+	    },
+        datetime_format => q{y/MM/dd H:mm:ss},
+        datetime_format_default => q{y/MM/dd H:mm:ss},
+        datetime_format_full => q{y年M月d日EEEE H時mm分ss秒 zzzz},
+        datetime_format_long => q{y年M月d日 H:mm:ss z},
+        datetime_format_medium => q{y/MM/dd H:mm:ss},
+        datetime_format_short => q{y/MM/dd H:mm},
+        day_format_abbreviated => ["月", "火", "水", "木", "金", "土", "日"],
+        day_format_narrow => ["月曜日", "火曜日", "水曜日", "木曜日", "金曜日", "土曜日", "日曜日"],
+        day_format_short => ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"],
+        day_format_wide => ["月曜日", "火曜日", "水曜日", "木曜日", "金曜日", "土曜日", "日曜日"],
+        day_stand_alone_abbreviated => ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"],
+        day_stand_alone_narrow => ["月", "火", "水", "木", "金", "土", "日"],
+        day_stand_alone_short => ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"],
+        day_stand_alone_wide => ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"],
+        default_date_format_length => q{medium},
+        default_time_format_length => q{medium},
+        era_abbreviated => ["紀元前", "西暦"],
+        era_narrow => ["BC", "AD"],
+        era_wide => ["BCE", "CE"],
+        first_day_of_week => q{7},
+        language => q{Japanese},
+        language_code => q{ja},
+        locale => q{ja-Latn-fonipa-hepburn-heploc},
+        month_format_abbreviated => ["1月", "2月", "3月", "4月", "5月", "6月", "7月", "8月", "9月", "10月", "11月", "12月"],
+        month_format_narrow => ["1月", "2月", "3月", "4月", "5月", "6月", "7月", "8月", "9月", "10月", "11月", "12月"],
+        month_format_wide => ["1月", "2月", "3月", "4月", "5月", "6月", "7月", "8月", "9月", "10月", "11月", "12月"],
+        month_stand_alone_abbreviated => ["M01", "M02", "M03", "M04", "M05", "M06", "M07", "M08", "M09", "M10", "M11", "M12"],
+        month_stand_alone_narrow => ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12"],
+        month_stand_alone_wide => ["M01", "M02", "M03", "M04", "M05", "M06", "M07", "M08", "M09", "M10", "M11", "M12"],
+        name => q{Japanese},
+        native_language => q{日本語},
+        native_name => q{日本語},
+        native_script => q{ラテン文字},
+        native_territory => undef,
+        native_variant => q{国際音声記号},
+        native_variants => ["国際音声記号", "ヘボン式ローマ字", ""],
+        prefers_24_hour_time => q{1},
+        quarter_format_abbreviated => ["Q1", "Q2", "Q3", "Q4"],
+        quarter_format_narrow => ["第1四半期", "第2四半期", "第3四半期", "第4四半期"],
+        quarter_format_wide => ["第1四半期", "第2四半期", "第3四半期", "第4四半期"],
+        quarter_stand_alone_abbreviated => ["Q1", "Q2", "Q3", "Q4"],
+        quarter_stand_alone_narrow => ["1", "2", "3", "4"],
+        quarter_stand_alone_wide => ["Q1", "Q2", "Q3", "Q4"],
+        script => q{Latin},
+        script_code => q{Latn},
+        territory => undef,
+        territory_code => undef,
+        time_format_default => q{H:mm:ss},
+        time_format_full => q{H時mm分ss秒 zzzz},
+        time_format_long => q{H:mm:ss z},
+        time_format_medium => q{H:mm:ss},
+        time_format_short => q{H:mm},
+        time_formats => {
+	        full => "H時mm分ss秒 zzzz",
+	        long => "H:mm:ss z",
+	        medium => "H:mm:ss",
+	        short => "H:mm",
+	    },
+        variant => q{},
+        variant_code => q{fonipa-hepburn-heploc},
+        variants => ["fonipa", "hepburn", "heploc"],
+    },
+];
+
+# NOTE: available formats data
+my $available_formats = {
+    en => {
+        Bh => "h B",
+        Bhm => "h:mm B",
+        Bhms => "h:mm:ss B",
+        d => "d",
+        E => "ccc",
+        EBhm => "E h:mm B",
+        EBhms => "E h:mm:ss B",
+        Ed => "d E",
+        Ehm => "E h:mm a",
+        EHm => "E HH:mm",
+        Ehms => "E h:mm:ss a",
+        EHms => "E HH:mm:ss",
+        Gy => "y G",
+        GyMd => "M/d/y G",
+        GyMMM => "MMM y G",
+        GyMMMd => "MMM d, y G",
+        GyMMMEd => "E, MMM d, y G",
+        h => "h a",
+        H => "HH",
+        hm => "h:mm a",
+        Hm => "HH:mm",
+        Hms => "HH:mm:ss",
+        hms => "h:mm:ss a",
+        Hmsv => "HH:mm:ss v",
+        hmsv => "h:mm:ss a v",
+        Hmv => "HH:mm v",
+        hmv => "h:mm a v",
+        M => "L",
+        Md => "M/d",
+        MEd => "E, M/d",
+        MMM => "LLL",
+        MMMd => "MMM d",
+        MMMEd => "E, MMM d",
+        MMMMd => "MMMM d",
+        MMMMW => "'week' W 'of' MMMM",
+        ms => "mm:ss",
+        y => "y",
+        yM => "M/y",
+        yMd => "M/d/y",
+        yMEd => "E, M/d/y",
+        yMMM => "MMM y",
+        yMMMd => "MMM d, y",
+        yMMMEd => "E, MMM d, y",
+        yMMMM => "MMMM y",
+        yQQQ => "QQQ y",
+        yQQQQ => "QQQQ y",
+        yw => "'week' w 'of' Y",
+    },
+    "en-GB" => {
+        GyMd => "dd/MM/y G",
+        GyMMMEEEEd => "EEEE d MMM y G",
+        MMMEEEEd => "EEEE d MMM",
+        MMMMEEEEd => "EEEE d MMMM",
+        yMMMEEEEd => "EEEE d MMM y",
+        yMMMMEEEEd => "EEEE d MMMM y",
+    },
+    "es-005-valencia" => {
+        Ed => "E d",
+        EHm => "E, H:mm",
+        Ehm => "E, h:mm a",
+        EHms => "E, H:mm:ss",
+        Ehms => "E, h:mm:ss a",
+        Gy => "y G",
+        GyMd => "d/M/y GGGGG",
+        GyMMM => "MMM y G",
+        GyMMMd => "d MMM y G",
+        GyMMMEd => "E, d MMM y G",
+        GyMMMM => "MMMM 'de' y G",
+        GyMMMMd => "d 'de' MMMM 'de' y G",
+        GyMMMMEd => "E, d 'de' MMMM 'de' y G",
+        H => "H",
+        h => "h a",
+        Hm => "H:mm",
+        hm => "h:mm a",
+        hms => "h:mm:ss a",
+        Hms => "H:mm:ss",
+        hmsv => "h:mm:ss a v",
+        Hmsv => "H:mm:ss v",
+        hmsvvvv => "h:mm:ss a (vvvv)",
+        Hmsvvvv => "H:mm:ss (vvvv)",
+        hmv => "h:mm a v",
+        Hmv => "H:mm v",
+        Md => "d/M",
+        MEd => "E, d/M",
+        MMd => "d/M",
+        MMdd => "d/M",
+        MMMd => "d MMM",
+        MMMEd => "E, d MMM",
+        MMMMd => "d 'de' MMMM",
+        MMMMEd => "E, d 'de' MMMM",
+        MMMMW => "'semana' W 'de' MMMM",
+        yM => "M/y",
+        yMd => "d/M/y",
+        yMEd => "EEE, d/M/y",
+        yMM => "M/y",
+        yMMM => "MMM y",
+        yMMMd => "d MMM y",
+        yMMMEd => "EEE, d MMM y",
+        yMMMM => "MMMM 'de' y",
+        yMMMMd => "d 'de' MMMM 'de' y",
+        yMMMMEd => "EEE, d 'de' MMMM 'de' y",
+        yQQQ => "QQQ y",
+        yQQQQ => "QQQQ 'de' y",
+        yw => "'semana' w 'de' Y",
+    },
+    "ja-Latn-fonipa-hepburn-heploc" => {
+        Bh => "BK時",
+        Bhm => "BK:mm",
+        Bhms => "BK:mm:ss",
+        d => "d日",
+        EBhm => "BK:mm (E)",
+        EBhms => "BK:mm:ss (E)",
+        Ed => "d日(E)",
+        EEEEd => "d日EEEE",
+        Ehm => "aK:mm (E)",
+        EHm => "H:mm (E)",
+        Ehms => "aK:mm:ss (E)",
+        EHms => "H:mm:ss (E)",
+        Gy => "Gy年",
+        GyMd => "Gy/M/d",
+        GyMMM => "Gy年M月",
+        GyMMMd => "Gy年M月d日",
+        GyMMMEd => "Gy年M月d日(E)",
+        GyMMMEEEEd => "Gy年M月d日EEEE",
+        H => "H時",
+        h => "aK時",
+        Hm => "H:mm",
+        hm => "aK:mm",
+        hms => "aK:mm:ss",
+        Hms => "H:mm:ss",
+        hmsv => "aK:mm:ss v",
+        Hmsv => "H:mm:ss v",
+        hmv => "aK:mm v",
+        Hmv => "H:mm v",
+        M => "M月",
+        Md => "M/d",
+        MEd => "M/d(E)",
+        MEEEEd => "M/dEEEE",
+        MMM => "M月",
+        MMMd => "M月d日",
+        MMMEd => "M月d日(E)",
+        MMMEEEEd => "M月d日EEEE",
+        MMMMd => "M月d日",
+        MMMMW => "M月第W週",
+        y => "y年",
+        yM => "y/M",
+        yMd => "y/M/d",
+        yMEd => "y/M/d(E)",
+        yMEEEEd => "y/M/dEEEE",
+        yMM => "y/MM",
+        yMMM => "y年M月",
+        yMMMd => "y年M月d日",
+        yMMMEd => "y年M月d日(E)",
+        yMMMEEEEd => "y年M月d日EEEE",
+        yMMMM => "y年M月",
+        yQQQ => "y/QQQ",
+        yQQQQ => "y年QQQQ",
+        yw => "Y年第w週",
+    },
+};
+
+foreach my $def ( @$tests )
+{
+    my $locale = DateTime::Locale::FromCLDR->new( $def->{locale} );
+    subtest $def->{locale} => sub
+    {
+        SKIP:
+        {
+            if( !defined( $locale ) )
+            {
+                diag( "Error instantiating DateTime::Locale::FromCLDR object for locale '$def->{locale}': ", DateTime::Locale::FromCLDR->error );
+                skip( DateTime::Locale::FromCLDR->error, 1 );
+            }
+            foreach my $meth ( sort( keys( %$def ) ) )
+            {
+                my $ref = $locale->can( $meth );
+                if( !$ref )
+                {
+                    fail( "The method '${meth}' is not supported by DateTime::Locale::FromCLDR" );
+                    next;
+                }
+                my $val = $ref->( $locale );
+                if( !defined( $val ) )
+                {
+                    is( $val, $def->{ $meth }, "${meth} -> undef" );
+                }
+                elsif( ref( $val ) eq 'HASH' )
+                {
+                    foreach my $k ( sort( keys( %$val ) ) )
+                    {
+                        is( $val->{ $k }, $def->{ $meth }->{ $k }, "${meth} -> ${k} -> '" . ( $def->{ $meth }->{ $k } // 'undef' ) . "'" );
+                    }
+                }
+                elsif( ref( $val ) eq 'ARRAY' )
+                {
+                    local $" = ' ';
+                    is( "@$val", "@{$def->{$meth}}", "${meth} -> @{$def->{$meth}}" );
+                }
+            }
+        };
+        foreach my $format ( @{$def->{available_formats}} )
+        {
+            my $val = $locale->format_for( $format );
+            if( !defined( $val ) &&
+                $locale->error )
+            {
+                diag( "Error getting the available format pattern for locale $def->{locale} and format ID '${format}': ", $locale->error );
+                fail( $locale->error );
+                next;
+            }
+            is( $val, $available_formats->{ $def->{locale} }->{ $format }, "format_for( ${format} ) -> " . ( $available_formats->{ $def->{locale} }->{ $format } // 'undef' ) );
+        }
+    };
+}
+
+done_testing();
+
+__END__

@@ -1,5 +1,5 @@
 package Dist::Build::XS;
-$Dist::Build::XS::VERSION = '0.007';
+$Dist::Build::XS::VERSION = '0.010';
 use strict;
 use warnings;
 
@@ -24,24 +24,29 @@ sub add_methods {
 		my $pureperl_only = $args{pureperl_only} // $planner->pureperl_only;
 		die "Can't build xs files under --pureperl-only\n" if $pureperl_only;
 
-		my $module_name = $args{module_name} // do {
-			(my $dist_name = $planner->dist_name) =~ s/-/::/g;
-			$dist_name;
-		};
+		my $xs_base = $args{xs_base} || 'lib';
+		my ($module_name, $xs_file);
+		if (defined $args{module_name}) {
+			$module_name = $args{module_name};
+			$xs_file = $args{file} // catfile($xs_base, split /::/, $module_name) . '.xs';
+		} elsif (defined $args{file}) {
+			$xs_file = $args{file};
+			$module_name = $planner->module_for_xs($xs_file, $xs_base);
+		} else {
+			($module_name = $planner->dist_name) =~ s/-/::/g;
+			$xs_file = catfile($xs_base, split /::/, $module_name) . '.xs';
+		}
 		my $module_version = $args{module_version} // $planner->dist_version;
 
 		$planner = $planner->new_scope;
 
-		$planner->load_module('ExtUtils::Builder::ParseXS');
-		$planner->load_module('ExtUtils::Builder::AutoDetect::C');
+		$planner->load_module('ExtUtils::Builder::ParseXS') unless $planner->can('parse_xs');
+		$planner->load_module('ExtUtils::Builder::AutoDetect::C') unless $planner->can('compile');
 
-		my $xs_file = $args{file} // catfile('lib', split /::/, $module_name) . '.xs';
 		my $xs_dir = dirname($xs_file);
 		my $c_file = $planner->c_file_for_xs($xs_file, $xs_dir);
 
-		my @dependencies = -f 'typemap' ? 'typemap' : ();
-
-		$planner->parse_xs($xs_file, $c_file, dependencies => \@dependencies);
+		$planner->parse_xs($xs_file, $c_file, %args);
 
 		my $o_file = $planner->obj_file(basename($c_file, '.c'), $xs_dir);
 
@@ -50,31 +55,36 @@ sub add_methods {
 			VERSION    => qq/"$module_version"/,
 			XS_VERSION => qq/"$module_version"/,
 		);
-		my @include_dirs = (curdir, dirname($xs_file), 'include', @{ $args{include_dirs} || [] });
 
 		my $compiler_flags = get_flags($args{extra_compiler_flags});
 		$planner->compile($c_file, $o_file,
 			type         => 'loadable-object',
 			profile      => '@Perl',
 			defines      => \%defines,
-			include_dirs => \@include_dirs,
+			include_dirs => [ dirname($xs_file), @{ $args{include_dirs} || [] } ],
 			extra_args   => $compiler_flags,
 		);
 
-		my @objects = ($o_file, @{ $args{extra_objects} || [] });
+		my @objects = $o_file;
 
 		for my $source (@{ $args{extra_sources} }) {
-			my $dirname = dirname($source);
-			my $object = $planner->obj_file(basename($source, '.c'), $dirname);
-			$planner->compile($source, $object,
+			my %options = ref $source ? %{ $source } : (source => $source);
+			my $dirname = dirname($options{source});
+			my $object  = $options{object} || $planner->obj_file(basename($options{source}, '.c'), $dirname);
+			my %defines = (%{ $args{defines} || {} }, %{ $options{defines} || {} });
+			my @include_dirs = (@{ $args{include_dirs} || [] }, @{ $options{include_dirs} || [] });
+			my @compiler_flags = (@{ $compiler_flags || [] }, @{ $options{flags} || [] });
+			$planner->compile($options{source}, $object,
 				type         => 'loadable-object',
 				profile      => '@Perl',
-				defines      => $args{defines},
+				defines      => \%defines,
 				include_dirs => \@include_dirs,
-				extra_args   => $compiler_flags,
+				extra_args   => \@compiler_flags,
 			);
 			push @objects, $object;
 		}
+
+		push @objects, @{ $args{extra_objects} } if $args{extra_objects};
 
 		my $lib_file = $planner->extension_filename($module_name);
 		$planner->link(\@objects, $lib_file,
@@ -107,7 +117,7 @@ Dist::Build::XS - An XS implementation for Dist::Build
 
 =head1 VERSION
 
-version 0.007
+version 0.010
 
 =head1 SYNOPSIS
 
@@ -134,7 +144,7 @@ This method takes the following named arguments, all optional:
 
 =item * module_name
 
-The name of the module to be compiled. This defaults to C<$dist_name =~ s/-/::/gr>.
+The name of the module to be compiled. This defaults to C<$dist_name =~ s/-/::/gr> unless C<file> is given, in which case the name is derived from the path.
 
 =item * module_version
 
@@ -150,11 +160,35 @@ This hash contains defines for the C files. E.g. C<< { DEBUG => 1 } >>.
 
 =item * include_dirs
 
-A list of directories to add to the include path. The root directory of the distribution, the directory the XS file is in and C<include/> are automatically in this list.
+A list of directories to add to the include path. For the xs file the directory it is in is automatically added to this list.
 
 =item * extra_sources
 
-A list of C files to compile with this module.
+A list of C files to compile with this module. Instead of just a name, entries can also be a hash with the following entries:
+
+=over 4
+
+=item * source
+
+The name of the input file. Mandatory.
+
+=item * object
+
+The name of the object that will be compiled. Will be derive from the source name by default.
+
+=item * include_dirs
+
+An array containing additional include directories for this objects
+
+=item * defines
+
+A hash containing additional defines for this object.
+
+=item * flags
+
+An array containing additional flags for this compilation.
+
+=back
 
 =item * extra_objects
 

@@ -736,7 +736,7 @@ my $title = loc("Modify form [_1]", $form_attribute->Description);
 my $nav_type = 'pill'; # 'tab' or 'pill'
 
 my @html_components = qw( h1 h2 h3 hr p html );
-my @core_components = qw( Requestors Owner Subject Content );
+my @core_components = qw( Requestors Cc AdminCc Owner Subject Content Due TimeEstimated);
 
 my $queue = RT::Queue->new($session{'CurrentUser'});
 $queue->Load($form->{queue});

@@ -21,9 +21,11 @@ class R::OP::Matrix {
       die "The n-dimention array \$y_ndarray must be a matrix.";
     }
     
+    # TODO: use is_type, currently is_type may has bugs.
     unless (type_name $x_ndarray eq type_name $y_ndarray) {
-      die "The class name of the n-dimention array \$x_ndarray must be eqaul to the class name of the n-dimention array \$x_ndarray.";
+      die "The type of the n-dimention array \$x_ndarray must be eqaul to the type of the n-dimention array \$y_ndarray.";
     }
+    
     my $x_nrow = $x_ndarray->nrow;
     
     my $x_ncol = $x_ndarray->ncol;
@@ -33,7 +35,7 @@ class R::OP::Matrix {
     my $y_ncol = $y_ndarray->ncol;
     
     unless ($x_nrow == $y_nrow) {
-      die "The row of the n-dimention array \$x_ndarray must be equal to the row of the n-dimention array \$y_ndarray.";
+      die "The row numbers of the n-dimention array \$x_ndarray must be equal to the row numbers of the n-dimention array \$y_ndarray.";
     }
     
     my $ret_nrow = $x_nrow;
@@ -83,7 +85,7 @@ class R::OP::Matrix {
     }
     
     unless (type_name $x_ndarray eq type_name $y_ndarray) {
-      die "The class name of the n-dimention array \$x_ndarray must be eqaul to the class name of the n-dimention array \$x_ndarray.";
+      die "The type of the n-dimention array \$x_ndarray must be eqaul to the typee of the n-dimention array \$y_ndarray.";
     }
     my $x_nrow = $x_ndarray->nrow;
     
@@ -94,7 +96,7 @@ class R::OP::Matrix {
     my $y_ncol = $y_ndarray->ncol;
     
     unless ($x_ncol == $y_ncol) {
-      die "The column of the n-dimention array \$x_ndarray must be equal to the column of the n-dimention array \$y_ndarray.";
+      die "The column numbers of the n-dimention array \$x_ndarray must be equal to the column numbers of the n-dimention array \$y_ndarray.";
     }
     
     my $ret_nrow = $x_nrow + $y_nrow;
@@ -125,7 +127,7 @@ class R::OP::Matrix {
         Array->memcpy_object_address((object[])$ret_data, $ret_data_index + $x_nrow, (object[])$y_data, $y_nrow * $col, $y_nrow);
       }
       
-      $ret_data_index += $x_nrow * $y_nrow;
+      $ret_data_index += $ret_nrow;
     }
     
     return $ret_ndarray;

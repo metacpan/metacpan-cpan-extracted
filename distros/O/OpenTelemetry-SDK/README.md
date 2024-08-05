@@ -57,6 +57,10 @@ Following is a basic example (although bear in mind this interface is still
 being drafted, so some details might still change):
 
 ``` perl
+use strict;
+use warnings;
+use feature 'signatures';
+
 # Importing the SDK will configure it with default export and context
 # propagation formats.
 use OpenTelemetry::SDK;
@@ -96,10 +100,11 @@ $tracer->in_span( foo => sub ( $span, $ ) {
     # Set an attribute
     $span->set_attribute(  platform => 'osx' );
     # Add an event
-    $span->add_event('event in bar');
+    $span->add_event( name => 'event in foo' );
     # Create bar as child of foo
-    $tracer->in_span( bar => sub { $child_span, $ ) {
+    $tracer->in_span( bar => sub ( $child_span, $ ) {
         # Inspect the span
+        use DDP;
         p $child_span;
     })
 });

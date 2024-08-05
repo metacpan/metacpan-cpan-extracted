@@ -59,8 +59,8 @@ class R::OP::Matrix::Float {
       die "The n-dimensional array \$x_ndarray must be defined.";
     }
     
-    unless ($x_ndarray->is_matrix) {
-      die "The n-dimensional array \$x_ndarray must be a matrix.";
+    unless ($x_ndarray->is_vector) {
+      die "The n-dimensional array \$x_ndarray must be a vector.";
     }
     
     my $x_data = (float[])$x_ndarray->data;
@@ -76,6 +76,36 @@ class R::OP::Matrix::Float {
     my $x_index = 0;
     for (my $row = 0; $row < $x_length; $row++) {
       $ret_data->[$x_length * $row + $row] = $x_data->[$row];
+    }
+    
+    return $ret_ndarray;
+  }
+  
+  static method slice_diag : R::NDArray::Float ($x_ndarray : R::NDArray::Float) {
+    
+    unless ($x_ndarray) {
+      die "The n-dimensional array \$x_ndarray must be defined.";
+    }
+    
+    unless ($x_ndarray->is_square_matrix) {
+      die "The n-dimensional array \$x_ndarray must be a matrix.";
+    }
+    
+    my $x_data = (float[])$x_ndarray->data;
+    
+    my $x_nrow = $x_ndarray->nrow;
+    
+    my $x_ncol = $x_ndarray->ncol;
+    
+    my $ret_dim = [$x_nrow];
+    
+    my $ret_ndarray = R::OP::Float->c(undef, $ret_dim);
+    
+    my $ret_data = $ret_ndarray->data;
+    
+    my $x_index = 0;
+    for (my $row = 0; $row < $x_nrow; $row++) {
+      $ret_data->[$row] = $x_data->[$x_ncol * $row + $row];
     }
     
     return $ret_ndarray;
@@ -212,7 +242,7 @@ class R::OP::Matrix::Float {
     
     my $ret_data = $ret_data_ref->[0];
     
-    my $ret_dim = [$ret_nrow, $ret_ncol];
+    my $ret_dim = [$ret_nrow];
     
     my $ret_ndarray = R::OP::Float->c($ret_data, $ret_dim);
     
@@ -227,6 +257,10 @@ class R::OP::Matrix::Float {
     
     unless ($x_ndarray->is_square_matrix) {
       die "The n-dimensional array \$x_ndarray must be a squre matrix.";
+    }
+    
+    if (&det($x_ndarray)->data->[0] == 0) {
+      die "The determinant of the n-dimensional array(matrix) \$x_ndarray must not be equal to 0.";
     }
     
     my $x_data = (float[])$x_ndarray->data;
@@ -262,31 +296,39 @@ class R::OP::Matrix::Float {
       die "The n-dimensional array \$x_ndarray must be a squre matrix.";
     }
     
+    my $eigen_vectors_data_ref = new Complex_2f[][1];
+    
+    my $eigen_values_data_ref = new Complex_2f[][1];
+    
+    my $eigen_vectors_nrow = -1;
+    
+    my $eigen_vectors_ncol = -1;
+    
+    my $eigen_values_nrow = -1;
+    
+    my $eigen_values_ncol = -1;
+    
     my $x_data = (float[])$x_ndarray->data;
     
     my $x_nrow = $x_ndarray->nrow;
     
     my $x_ncol = $x_ndarray->ncol;
     
-    my $eigen_vectors_data_ref = new float[][1];
-    
-    my $eigen_values_data_ref = new float[][1];
-    
-    my $eigen_vectors_row = -1;
-    
-    my $eigen_vectors_column = -1;
-    
-    &_eigen($eigen_vectors_data_ref, \$eigen_vectors_row, \$eigen_vectors_column, $x_data, $x_nrow, $x_ncol, $eigen_values_data_ref);
+    &_eigen($eigen_vectors_data_ref, \$eigen_vectors_nrow, \$eigen_vectors_ncol, $eigen_values_data_ref, \$eigen_values_nrow, \$eigen_values_ncol, $x_data, $x_nrow, $x_ncol);
     
     my $eigen_vectors_data = $eigen_vectors_data_ref->[0];
     
-    my $eigen_vectors_dim = [$eigen_vectors_row, $eigen_vectors_column];
+    my $eigen_vectors_dim = [$eigen_vectors_nrow, $eigen_vectors_ncol];
     
-    my $eigen_vectors_ndarray = R::OP::Float->c($eigen_vectors_data, $eigen_vectors_dim);
+    my $eigen_vectors_ndarray = R::OP::FloatComplex->c($eigen_vectors_data, $eigen_vectors_dim);
     
     my $eigen_values_data = $eigen_values_data_ref->[0];
     
-    my $eigen_values_ndarray = R::OP::Float->c($eigen_values_data);
+    my $eigen_values_dim = [$eigen_values_nrow, $eigen_values_ncol];
+    
+    my $eigen_values_ndarray = R::OP::FloatComplex->c($eigen_values_data, $eigen_values_dim);
+    
+    $eigen_values_ndarray->drop_dim;
     
     my $ret_ndarray_hash = R::NDArray::Hash->new;
     
@@ -306,5 +348,5 @@ class R::OP::Matrix::Float {
   
   private native static method _solve : void ($ret_data_ref : float[][], $ret_nrow_ref : int*, $ret_ncol_ref : int*, $x_data : float[], $x_nrow :int, $x_ncol : int);
   
-  private native static method _eigen : void ($ret_data_ref : float[][], $ret_nrow_ref : int*, $ret_ncol_ref : int*, $x_data : float[], $x_nrow : int, $x_ncol : int, $eigen_values_data_ref : float[][]);
+  private native static method _eigen : void ($eigen_vectors_data_ref : Complex_2f[][], $eigen_vectors_nrow_ref : int*, $eigen_vectors_ncol_ref : int*, $eigen_values_data_ref : Complex_2f[][], $eigen_values_nrow_ref : int*, $eigen_values_ncol_ref : int*, $x_data : float[], $x_nrow : int, $x_ncol : int);
 }

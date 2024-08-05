@@ -1,0 +1,64 @@
+0.010   2024-08-03  Released-By: PERLANCAR; Urgency: medium
+
+        - Rename dist Sah-Schema{s,Bundle}-* for consistency with others.
+
+
+0.009   2020-03-08  Released-By: PERLANCAR; Urgency: medium
+
+        - No functional changes.
+
+	- [build] Rebuild with updated Pod::Weaver plugin [-Sah::Schemas] to
+          correctly show examples.
+
+	- Also add examples for filesize/bandwidth/dataquota (from their
+	  base schema).
+
+
+0.008   2020-03-04  Released-By: PERLANCAR; Urgency: medium
+
+	- Update property names in examples (data -> value, res ->
+	  validated_value).
+
+
+0.007   2020-03-04  Released-By: PERLANCAR; Urgency: medium
+
+	- Update examples, use 'value' instead of 'data'.
+
+
+0.006   2020-03-03  Released-By: PERLANCAR; Urgency: high
+
+	- [bugfix] Fix stupid mistake: used ^ instead of ** for
+	  exponentiation.
+
+	- Rename filesize to datasize, make filesize an alias for datasize.
+
+	- Add schemas: dataspeed, dataquota, bandwidth.
+
+	- [datasize] Recognize zetta and yotta prefixes.
+
+
+0.005   2020-03-02  Released-By: PERLANCAR; Urgency: low
+
+        - No functional changes.
+
+        - Move tests to examples.
+
+
+0.004   2019-11-29  Released-By: PERLANCAR; Urgency: medium
+
+	- Add test and explicit dependency to Data::Sah::Coerce 0.034+.
+
+
+0.003   2019-11-28  Released-By: PERLANCAR; Urgency: medium
+
+	- Rename coerce rule modules (Data::Sah::Coerce 0.037+).
+
+
+0.002   2019-07-25  Released-By: PERLANCAR; Urgency: medium
+
+	- Update metadata version 3->4.
+
+
+0.001   2019-01-16  Released-By: PERLANCAR
+
+        - First release.

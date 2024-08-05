@@ -3,7 +3,7 @@ use Object::Pad ':experimental(init_expr)';
 
 package OpenTelemetry::SDK::Trace::Sampler::TraceIDRatioBased;
 
-our $VERSION = '0.022';
+our $VERSION = '0.024';
 
 use OpenTelemetry::SDK::Trace::Sampler::Result;
 
@@ -50,7 +50,7 @@ class OpenTelemetry::SDK::Trace::Sampler::TraceIDRatioBased
         # can be compared directly with the one derived from the Trace ID,
         # in the range from 0 (never sample) to 2**64 (always sample)
         $threshold = do {
-            use bignum;
+            use bigfloat;
             # Since Math::BigFloat 1.999840 onwards, the shift operators are
             # exclusively integer-based, so we enforce precedent here
             ( $ratio * ( 1 << 64 ) )->bceil;

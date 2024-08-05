@@ -184,6 +184,8 @@ t/Dpkg_OpenPGP_KeyHandle.t
 t/Dpkg_Package.t
 t/Dpkg_Path.t
 t/Dpkg_Shlibs.t
+t/Dpkg_Shlibs/anglebrackets.cpp
+t/Dpkg_Shlibs/anglebrackets.symbols
 t/Dpkg_Shlibs/basictags.c
 t/Dpkg_Shlibs/basictags.symbols
 t/Dpkg_Shlibs/ld.so.conf
@@ -191,6 +193,7 @@ t/Dpkg_Shlibs/ld.so.conf.d/inf_recurse.conf
 t/Dpkg_Shlibs/ld.so.conf.d/normal.conf
 t/Dpkg_Shlibs/ld.so.conf.d/recursive.conf
 t/Dpkg_Shlibs/ld.so.conf_2
+t/Dpkg_Shlibs/objdump.anglebrackets
 t/Dpkg_Shlibs/objdump.basictags-amd64
 t/Dpkg_Shlibs/objdump.basictags-i386
 t/Dpkg_Shlibs/objdump.basictags-mips

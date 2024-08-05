@@ -1,5 +1,19 @@
 Revision history for ExtUtils-Builder-Compiler
 
+0.018     2024-08-05 16:00:45+02:00 Europe/Brussels
+          - Add try_find_library_dirs_for
+          - Fix find_libs_for to pass library correctly
+          - Rename find_libs_for to find_libraries_for
+          - Fix basename in try_compile_run
+
+0.017     2024-08-04 20:57:12+02:00 Europe/Brussels
+          - Fix missing prereq declarations
+          - Remove superfluous debugging output in EUB::Conf
+
+0.016     2024-08-01 12:55:40+02:00 Europe/Brussels
+          - Add ExtUtils::Builder::Conf
+          - Add typemap and hiertype arguments to parse-xs
+
 0.015     2024-07-20 15:18:22+02:00 Europe/Brussels
           - Add exe_file helper to EU::B::Autodetect::C
           - Add missing argument in MSCV manifesting

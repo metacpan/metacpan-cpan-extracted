@@ -61,11 +61,11 @@
    "provides" : {
       "App::BPOMUtils::Table::FoodIngredient" : {
          "file" : "lib/App/BPOMUtils/Table/FoodIngredient.pm",
-         "version" : "0.021"
+         "version" : "0.023"
       },
       "App::BPOMUtils::Table::FoodIngredientRBA" : {
          "file" : "lib/App/BPOMUtils/Table/FoodIngredientRBA.pm",
-         "version" : "0.021"
+         "version" : "0.023"
       }
    },
    "release_status" : "stable",
@@ -80,7 +80,7 @@
          "web" : "https://github.com/perlancar/perl-App-BPOMUtils-Table-FoodIngredient"
       }
    },
-   "version" : "0.021",
+   "version" : "0.023",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.038002"
@@ -108,7 +108,7 @@
          },
          {
             "class" : "Dist::Zilla::Plugin::GenPericmdScript",
-            "name" : "GenPericmdScript bpomif",
+            "name" : "GenPericmdScript bpomfi",
             "version" : "0.425"
          },
          {

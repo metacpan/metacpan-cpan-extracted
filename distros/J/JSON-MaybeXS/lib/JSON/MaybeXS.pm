@@ -4,7 +4,7 @@ use strict;
 use warnings FATAL => 'all';
 use base qw(Exporter);
 
-our $VERSION = '1.004005';
+our $VERSION = '1.004007';
 $VERSION =~ tr/_//d;
 
 sub _choose_json_module {
@@ -52,11 +52,15 @@ sub new {
 }
 
 use Scalar::Util ();
+use constant HAVE_BUILTIN => "$]" >= 5.036;
+use if HAVE_BUILTIN, experimental => 'builtin';
 
 sub is_bool {
-  die 'is_bool is not a method' if $_[1];
+  die 'is_bool is not a method' if @_ > 1;
 
-  Scalar::Util::blessed($_[0])
+  HAVE_BUILTIN and builtin::is_bool($_[0])
+  or
+  !!Scalar::Util::blessed($_[0])
     and ($_[0]->isa('JSON::PP::Boolean')
       or $_[0]->isa('Cpanel::JSON::XS::Boolean')
       or $_[0]->isa('JSON::XS::Boolean'));

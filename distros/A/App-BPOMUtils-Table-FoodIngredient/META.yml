@@ -19,10 +19,10 @@ name: App-BPOMUtils-Table-FoodIngredient
 provides:
   App::BPOMUtils::Table::FoodIngredient:
     file: lib/App/BPOMUtils/Table/FoodIngredient.pm
-    version: '0.021'
+    version: '0.023'
   App::BPOMUtils::Table::FoodIngredientRBA:
     file: lib/App/BPOMUtils/Table/FoodIngredientRBA.pm
-    version: '0.021'
+    version: '0.023'
 requires:
   Data::Sah::Compiler::perl::TH::array: '0.914'
   Data::Sah::Compiler::perl::TH::bool: '0.914'
@@ -42,7 +42,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=App-BPOMUtils-Table-FoodIngredient
   homepage: https://metacpan.org/release/App-BPOMUtils-Table-FoodIngredient
   repository: git://github.com/perlancar/perl-App-BPOMUtils-Table-FoodIngredient.git
-version: '0.021'
+version: '0.023'
 x_Dist_Zilla:
   perl:
     version: '5.038002'
@@ -65,7 +65,7 @@ x_Dist_Zilla:
       version: '0.425'
     -
       class: Dist::Zilla::Plugin::GenPericmdScript
-      name: 'GenPericmdScript bpomif'
+      name: 'GenPericmdScript bpomfi'
       version: '0.425'
     -
       class: Dist::Zilla::Plugin::InsertExecsList

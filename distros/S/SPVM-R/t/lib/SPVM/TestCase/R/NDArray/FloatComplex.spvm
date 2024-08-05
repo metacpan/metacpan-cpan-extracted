@@ -54,7 +54,7 @@ class TestCase::R::NDArray::FloatComplex {
         return 0;
       }
       
-      unless (&equals_float_complex($default_data, new Complex_2f[0])) {
+      unless (R::Util->_equals_float_complex($default_data, new Complex_2f[0])) {
         return 0;
       }
     }
@@ -69,7 +69,7 @@ class TestCase::R::NDArray::FloatComplex {
         return 0;
       }
       
-      unless (&equals_float_complex($default_data, new Complex_2f[0])) {
+      unless (R::Util->_equals_float_complex($default_data, new Complex_2f[0])) {
         return 0;
       }
     }
@@ -84,7 +84,7 @@ class TestCase::R::NDArray::FloatComplex {
         return 0;
       }
       
-      unless (&equals_float_complex($default_data, [Math->complexf(0f, -0f), Math->complexf(0f, -0f)])) {
+      unless (R::Util->_equals_float_complex($default_data, [Math->complexf(0f, -0f), Math->complexf(0f, -0f)])) {
         return 0;
       }
     }
@@ -259,7 +259,7 @@ class TestCase::R::NDArray::FloatComplex {
         return 0;
       }
       
-      unless (&equals_float_complex($ret_ndarray->data, $ndarray->data)) {
+      unless (R::Util->_equals_float_complex($ret_ndarray->data, $ndarray->data)) {
         return 0;
       }
       
@@ -284,7 +284,7 @@ class TestCase::R::NDArray::FloatComplex {
         return 0;
       }
       
-      unless (&equals_float_complex($ret_ndarray->data, $ndarray->data)) {
+      unless (R::Util->_equals_float_complex($ret_ndarray->data, $ndarray->data)) {
         return 0;
       }
       
@@ -310,7 +310,7 @@ class TestCase::R::NDArray::FloatComplex {
         return 0;
       }
       
-      unless (&equals_float_complex($ret_ndarray->data, [Math->complexf(3f, -3f), Math->complexf(4f, -4f)])) {
+      unless (R::Util->_equals_float_complex($ret_ndarray->data, [Math->complexf(3f, -3f), Math->complexf(4f, -4f)])) {
         return 0;
       }
       
@@ -339,7 +339,7 @@ class TestCase::R::NDArray::FloatComplex {
         return 0;
       }
       
-      unless (&equals_double_complex($ret_ndarray->data, [Math->complex(1f, -1f), Math->complex(2f, -2f), Math->complex(3f, -3f)])) {
+      unless (R::Util->_equals_double_complex($ret_ndarray->data, [Math->complex(1f, -1f), Math->complex(2f, -2f), Math->complex(3f, -3f)])) {
         return 0;
       }
       
@@ -351,74 +351,4 @@ class TestCase::R::NDArray::FloatComplex {
     return 1;
   }
   
-  static method equals_float_complex : int ($x1_array : Complex_2f[], $x2_array : Complex_2f[]) {
-    
-    unless ($x1_array) {
-      die "The array \$x1_array must be defined.";
-    }
-    
-    unless ($x2_array) {
-      die "The array \$x2_array must be defined.";
-    }
-    
-    my $x1_array_length = @$x1_array;
-    
-    my $x2_array_length = @$x2_array;
-    
-    my $equals = 0;
-    
-    if ($x1_array_length == $x2_array_length) {
-      my $array_length = $x1_array_length;
-      
-      my $not_equals_elem = 0;
-      for (my $i = 0; $i < $array_length; $i++) {
-        unless ($x1_array->[$i]{re} == $x2_array->[$i]{re} && $x1_array->[$i]{im} == $x2_array->[$i]{im}) {
-          $not_equals_elem = 1;
-          last;
-        }
-      }
-      
-      unless ($not_equals_elem) {
-        $equals = 1;
-      }
-    }
-    
-    return $equals;
-  }
-
-  static method equals_double_complex : int ($x1_array : Complex_2d[], $x2_array : Complex_2d[]) {
-    
-    unless ($x1_array) {
-      die "The array \$x1_array must be defined.";
-    }
-    
-    unless ($x2_array) {
-      die "The array \$x2_array must be defined.";
-    }
-    
-    my $x1_array_length = @$x1_array;
-    
-    my $x2_array_length = @$x2_array;
-    
-    my $equals = 0;
-    
-    if ($x1_array_length == $x2_array_length) {
-      my $array_length = $x1_array_length;
-      
-      my $not_equals_elem = 0;
-      for (my $i = 0; $i < $array_length; $i++) {
-        unless ($x1_array->[$i]{re} == $x2_array->[$i]{re} && $x1_array->[$i]{im} == $x2_array->[$i]{im}) {
-          $not_equals_elem = 1;
-          last;
-        }
-      }
-      
-      unless ($not_equals_elem) {
-        $equals = 1;
-      }
-    }
-    
-    return $equals;
-  }
-
 }

@@ -1,7 +1,12 @@
+0.111   2024-08-05  Released-By: PERLANCAR; Urgency: medium
+
+        - Update data (33 -> 38 provinces), add ind_abbrev column.
+
+
 0.110   2021-05-07  Released-By: PERLANCAR; Urgency: medium; Backward-Incompatible: yes
 
-	- [incompatible change] Rename functions (*_id_* to *_idn_*) to
-	  avoid ambiguity of 'id'.
+        - [incompatible change] Rename functions (*_id_* to *_idn_*) to
+          avoid ambiguity of 'id'.
 
 
 0.10    2017-07-10  Released-By: PERLANCAR

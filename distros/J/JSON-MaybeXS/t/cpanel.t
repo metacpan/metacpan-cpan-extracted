@@ -18,6 +18,10 @@ is( \&decode_json,
     'Correct encode_json function'
 );
 
+my ($zero, $one) = (0, 1);
+ok(JSON::MaybeXS::is_bool(bless(\$zero, 'Cpanel::JSON::XS::Boolean')), 'Cpanel::JSON::XS::Boolean true');
+ok(JSON::MaybeXS::is_bool(bless(\$one, 'Cpanel::JSON::XS::Boolean')), 'Cpanel::JSON::XS::Boolean false');
+
 require './t/lib/is_bool.pm';
 
 done_testing;

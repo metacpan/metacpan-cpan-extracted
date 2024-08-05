@@ -70,7 +70,7 @@ my $regex_header = qr{
 # day of week ($6), date-time ($7) and this into month name ($8).
 my $regex_trailer = qr<
     ^
-    \ \-\-                              # Trailer marker
+    \ --                                # Trailer marker
     \ (.*)                              # Maintainer name
     \ \<(.*)\>                          # Maintainer email
     (\ \ ?)                             # Blanks
@@ -84,7 +84,7 @@ my $regex_trailer = qr<
       )
     )
     \s*$                                # Trailing space
->xo;
+>x;
 
 my %week_day = map { $_ => 1 } qw(Mon Tue Wed Thu Fri Sat Sun);
 my @month_abbrev = qw(

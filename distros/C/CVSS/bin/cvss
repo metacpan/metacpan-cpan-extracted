@@ -27,10 +27,20 @@ cvss - CVSS (Common Vulnerability Scoring System) command line interface
           -v                        Print version
 
           --score                   Base score
-          --base-score              
+          --severity                Base severity
 
-		  --severity				Base severity
-		  --base-severity
+          --base-score
+          --base-severity
+
+          --temporal-score
+          --temporal-severity
+
+          --environmental-score
+          --environmental-severity
+
+          --exploitability-score
+          --impact-score
+          --modified-impact-score
 
       -0, --null                    Return NULL char instead of new line
 

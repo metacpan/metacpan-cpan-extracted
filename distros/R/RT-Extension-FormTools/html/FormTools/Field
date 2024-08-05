@@ -249,6 +249,8 @@ $input_name         => undef
 %   }
 % }
 
+% } elsif ($name eq "Owner" ) {
+<& /Elements/SelectOwner, Name => $name, QueueObj => $queue, Default => $default, DefaultValue => 0 &>
 % } elsif ($name =~ /^(Requestors|Cc|AdminCc)$/ ) {
 <& /Elements/EmailInput,
     Name                 => $name,
@@ -258,6 +260,8 @@ $input_name         => undef
 &>
 % } elsif ( $name eq "Due" ) {
 <& /Elements/SelectDate, Name => $name, Default => $default, current => 0, (defined $cols ? (Size => $cols) : ()) &>
+% } elsif ( $name eq "TimeEstimated" ) {
+<& /Elements/EditTimeValue, Name => $name, Default => $default &>
 % } else {
 <input class="form-control" type="text" name="<%$name%>" size="<% $cols || 20 %>" value="<%$default%>">
 % }

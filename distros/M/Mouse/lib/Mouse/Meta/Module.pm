@@ -78,6 +78,7 @@ sub get_attribute_list{ keys   %{$_[0]->{attributes}} }
 my %foreign = map{ $_ => undef } qw(
     Mouse Mouse::Role Mouse::Util Mouse::Util::TypeConstraints
     Carp Scalar::Util List::Util
+    builtin
 );
 sub _get_method_body {
     my($self, $method_name) = @_;
@@ -311,7 +312,7 @@ Mouse::Meta::Module - The common base class of Mouse::Meta::Class and Mouse::Met
 
 =head1 VERSION
 
-This document describes Mouse version v2.5.10
+This document describes Mouse version v2.5.11
 
 =head1 DESCRIPTION
 

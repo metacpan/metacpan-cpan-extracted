@@ -1,5 +1,5 @@
 package ExtUtils::Builder::Planner;
-$ExtUtils::Builder::Planner::VERSION = '0.008';
+$ExtUtils::Builder::Planner::VERSION = '0.011';
 use strict;
 use warnings;
 
@@ -74,6 +74,7 @@ sub add_delegate {
 	my ($self, $name, $sub) = @_;
 	my $full_name = ref($self) . '::' . $name;
 	no strict 'refs';
+	no warnings 'redefine';
 	*{$full_name} = $sub;
 	return;
 }
@@ -157,7 +158,7 @@ ExtUtils::Builder::Planner - An ExtUtils::Builder Plan builder
 
 =head1 VERSION
 
-version 0.008
+version 0.011
 
 =head1 SYNOPSIS
 

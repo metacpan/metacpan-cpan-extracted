@@ -1,4 +1,8 @@
 .gitattributes
+.github/workflows/linux-ubuntu-latest.yml
+.github/workflows/macos-latest.yml
+.github/workflows/windows-2019.yml
+.github/workflows/windows-latest.yml
 .gitignore
 Changes
 development.txt
@@ -114,11 +118,16 @@ t/lib/SPVM/TestCase/R/OP/Float.spvm
 t/lib/SPVM/TestCase/R/OP/FloatComplex.spvm
 t/lib/SPVM/TestCase/R/OP/Int.spvm
 t/lib/SPVM/TestCase/R/OP/Long.spvm
+t/lib/SPVM/TestCase/R/OP/Matrix.spvm
 t/lib/SPVM/TestCase/R/OP/Matrix/Double.spvm
+t/lib/SPVM/TestCase/R/OP/Matrix/DoubleComplex.spvm
+t/lib/SPVM/TestCase/R/OP/Matrix/Float.spvm
+t/lib/SPVM/TestCase/R/OP/Matrix/FloatComplex.spvm
 t/lib/SPVM/TestCase/R/OP/Short.spvm
 t/lib/SPVM/TestCase/R/OP/String.spvm
 t/lib/SPVM/TestCase/R/OP/StringBuffer.spvm
 t/lib/SPVM/TestCase/R/OP/Time/Piece.spvm
+t/lib/SPVM/TestCase/R/Util.spvm
 t/R-DataFrame.t
 t/R-NDArray-AnyObject.t
 t/R-NDArray-Byte.t
@@ -143,9 +152,15 @@ t/R-OP-FloatComplex.t
 t/R-OP-Int.t
 t/R-OP-Long.t
 t/R-OP-Matrix-Double.t
+t/R-OP-Matrix-DoubleComplex.t
+t/R-OP-Matrix-Float.t
+t/R-OP-Matrix-FloatComplex.t
+t/R-OP-Matrix.t
 t/R-OP-Short.t
 t/R-OP-String.t
 t/R-OP-StringBuffer.t
 t/R-OP-Time-Piece.t
+t/R-Util.t
+t/R.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

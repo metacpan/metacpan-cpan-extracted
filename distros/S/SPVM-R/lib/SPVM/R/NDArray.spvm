@@ -10,6 +10,7 @@ class R::NDArray {
   use R::Util;
   use R::OP;
   use Sort;
+  use R::NDArray::String;
   
   # Fields
   has data : protected ro object;

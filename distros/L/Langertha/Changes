@@ -1,0 +1,183 @@
+==================================================
+Changes from 1750-10-20 00:00:00 +0000 to present.
+==================================================
+
+------------------------------------------
+version 0.001 at 2024-08-03 20:55:03 +0000
+------------------------------------------
+
+  Change: 33c8e6d4b10c8a4b7574d4b607753280fcdb1136
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2024-08-03 22:47:33 +0000
+
+    Removed unnecessary requirement 
+
+  Change: 8e2ce727d529eeab0e1db8a777ea04e1188a4e9c
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2024-08-03 22:44:38 +0000
+
+    Added missing abstract 
+
+  Change: e46f87b56835d05e65fefaf4a43e8a1f00e1b321
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2024-08-03 22:39:47 +0000
+
+    Fixed names of testfiles 
+
+  Change: 3a3f08165e617072f939e6587a2499da89c905ba
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2024-08-03 22:37:05 +0000
+
+    Adding README and adapting dist.ini for making first quick releaes 
+
+  Change: 4b9715d255fba770f3e091ad21967433ce8afd29
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2024-08-01 14:35:52 +0000
+
+    Removing unused Moose class 
+
+  Change: d911fd39e278c5107de6a9149d4989f168b6b653
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2024-08-01 06:47:55 +0000
+
+    Fixing constructor for Request HTTP, tests for ollama special
+    requests 
+
+  Change: 2cb7fa95aeef21e9555b3a82a954e44655179ab2
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2024-08-01 06:09:34 +0000
+
+    Adding OpenAI compatibility for Ollama 
+
+  Change: 268b03c8ec6c3b4addbdc006b9bbb4a3aa114f5f
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2024-07-31 01:14:25 +0000
+
+    Fixing some more refactoring related bugs 
+
+  Change: 0802c83b8263648282c574061aed1ae8a873eca3
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2024-07-31 00:11:20 +0000
+
+    Better examples 
+
+  Change: c79c9999918f7ed872a9a510b2e873f20db80463
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2024-07-30 23:57:39 +0000
+
+    Cleanup of WIP files and adapting details for proper UTF8 output on
+    simple chat tools. 
+
+  Change: 990170fb540cb7a96377fa1d3107b052d0e7c4df
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2024-07-26 06:46:42 +0000
+
+    Trying to integrate the tags call to Ollama for getting model list,
+    WIP 
+
+  Change: a6da8b8e2671d4214de258a5ec658128bef2baed
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2024-07-26 06:21:49 +0000
+
+    bin tools for easy access 
+
+  Change: 09121777e9ee002bc8cd4f5022483ce04ddd360b
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2024-07-26 06:04:29 +0000
+
+    Turn ex/embedding into a speed test 
+
+  Change: a0148779afb019d61874fdc9f7b5a9c1674cc9b7
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2024-07-26 05:49:24 +0000
+
+    Implementing Embedding proper with request testing 
+
+  Change: ebe320bfa28ad2af7a930cc5cab26dd0c0ac72a0
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2024-07-26 05:16:47 +0000
+
+    Adding tests for base requests 
+
+  Change: 151f5e2a3e263e939006880635200fd3ac83686d
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2024-07-26 04:44:49 +0000
+
+    Remove legacy test examples 
+
+  Change: cfdf95dd5e65296c2f0ab1e4083b4bb8cd68ff63
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2024-07-26 04:43:41 +0000
+
+    Restructuring and simplification to get to a v0.001, no mercy! 
+
+  Change: bc407be547d726fb78a06992b957120451bff4ab
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2024-07-04 04:43:49 +0000
+
+    Ollama with tools synopsis example, still WIP 
+
+  Change: c3426d2f5bb50efaaea7d9b3a0dab98f8ab2bee1
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2024-07-03 05:59:32 +0000
+
+    Updated Synopsis of Langertha::OpenAI 
+
+  Change: f8d7e391e3327659b1ff94a1c953fa7ef19fbea9
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2024-07-03 05:55:53 +0000
+
+    Implementing tools on OpenAI, some minor adaptions. Examples with
+    results. 
+
+  Change: 9db6a225f0b7e9f0783c24b676cb4330124dbd98
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2024-07-03 03:01:34 +0000
+
+    Basic chat implementation made for Ollama and OpenAI 
+
+  Change: d329fa9fd30644e10b6b22e4111a6e3c74a51bea
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2024-07-02 06:08:57 +0000
+
+    Next structural steps, introducing usage of WWW::Chain classes 
+
+  Change: 1356e3c160386d988c3d123eb939dd1d2465c4a6
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2024-06-21 05:34:06 +0000
+
+    Next steps for the API evolution, still WIP 
+
+  Change: 2f94304db23b31bfdd673d9ae5e83bb2556939eb
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2024-06-17 00:56:53 +0000
+
+    More structure 
+
+  Change: 959375d1ac36845dbae98b445306ba250f48bcbd
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2024-06-16 07:08:51 +0000
+
+    Fixing tests, small details 
+
+  Change: bbc84c27d5198b5b1bfdd06c0477e5064f087224
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2024-06-16 06:45:03 +0000
+
+    More classes, more roles, more samples and more OpenAPI definitions 
+
+  Change: 8ceaa30cfbe024cae5227d82fb2fb92ba23b62e2
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2024-06-15 19:26:53 +0000
+
+    More Langertha, more requirements, more testing, more OpenAPI 
+
+  Change: 53c058d40f14f9c6dcc5c6a8c84ff1131e626c92
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2024-06-14 17:51:38 +0000
+
+    initial commit 
+
+================
+End of releases.
+================

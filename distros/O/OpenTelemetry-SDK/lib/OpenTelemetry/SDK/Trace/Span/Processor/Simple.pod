@@ -43,8 +43,24 @@ Called when a span is started. In this class, this method does nothing.
 
     $processor->on_end( $span );
 
-Called when a span is ended. Calling this will convert the span into a
-readable instance and forward it to the configured exporter.
+Called when a span is ended, with the span that has just ended as its only
+parameter. This should be called I<after> the span has been ended.
+
+This method internally passes the span to L</process>, described in more
+detail below.
+
+=head2 process
+
+    $processor->process( @spans );
+
+Takes a list of spans that are ready for processing. Once called, this method
+will convert them into a readable instances and pass them to the configured
+exporter.
+
+This processor handles each span as it becomes ready and blocks during the
+export step. For a non-blocking processor that batches spans for eventual
+processing (and is therefore more suitable for production environments), see
+L<OpenTelemetry::SDK::Trace::Processor::Batch>.
 
 =head2 force_flush
 
@@ -73,6 +89,8 @@ exporter and returns a L<Future> that will hold the result of that operation.
 =item L<OpenTelemetry::Trace::Span>
 
 =item L<OpenTelemetry::Trace::Span::Processor>
+
+=item L<OpenTelemetry::Trace::Span::Processor::Batch>
 
 =back
 

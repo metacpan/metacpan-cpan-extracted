@@ -16,6 +16,7 @@ lib/ExtUtils/Builder/Compiler.pm
 lib/ExtUtils/Builder/Compiler/MSVC.pm
 lib/ExtUtils/Builder/Compiler/Unixy.pm
 lib/ExtUtils/Builder/Compiler/VMS.pm
+lib/ExtUtils/Builder/Conf.pm
 lib/ExtUtils/Builder/Linker.pm
 lib/ExtUtils/Builder/Linker/Ar.pm
 lib/ExtUtils/Builder/Linker/COFF.pm

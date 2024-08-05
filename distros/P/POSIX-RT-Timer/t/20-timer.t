@@ -2,7 +2,7 @@
 
 use strict;
 use warnings;
-use Test::More tests => 14;
+use Test::More tests => 15;
 
 use Time::HiRes qw/alarm sleep/;
 use POSIX::RT::Clock;
@@ -54,6 +54,8 @@ my $hasmodules = eval { require POSIX::RT::Signal; require Signal::Mask; POSIX::
 	};
 
 	pause for 1..3;
+
+	is($counter, 3, 'After 3 pauses, the counter is 3');
 
 	alarm 0;
 

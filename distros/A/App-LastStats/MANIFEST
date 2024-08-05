@@ -1,3 +1,4 @@
+README.md
 Makefile.PL
 lib/App/LastStats.pm
 bin/laststats

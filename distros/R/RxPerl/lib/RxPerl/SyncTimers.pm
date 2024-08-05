@@ -13,7 +13,7 @@ use Exporter 'import';
 our @EXPORT_OK = (@RxPerl::EXPORT_OK);
 our %EXPORT_TAGS = (%RxPerl::EXPORT_TAGS);
 
-our $VERSION = "v6.29.2";
+our $VERSION = "v6.29.3";
 
 foreach my $func_name (@EXPORT_OK) {
     set_subname __PACKAGE__."::$func_name", \&{$func_name};

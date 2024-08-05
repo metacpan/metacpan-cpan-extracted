@@ -24,7 +24,7 @@ my $res = $test->request(HTTP::Request->new(GET => '/'));
 my $right_ret = <<"END";
 <!DOCTYPE html>
 <html lang="en"><head><meta http-equiv="Content-Type" content="text/html; charset=utf-8" /><meta name="generator" content="Plack::App::CPAN::Changes; Version: $Plack::App::CPAN::Changes::VERSION" /><meta name="viewport" content="width=device-width, initial-scale=1.0" /><title>Changes</title><style type="text/css">
-*{box-sizing:border-box;margin:0;padding:0;}.changes{max-width:800px;margin:auto;background:#fff;padding:20px;border-radius:8px;box-shadow:0 2px 4px rgba(0, 0, 0, 0.1);}.changes .version{border-bottom:2px solid #eee;padding-bottom:20px;margin-bottom:20px;}.changes .version:last-child{border-bottom:none;}.changes .version h2,.changes .version h3{color:#007BFF;margin-top:0;}.changes .version-changes{list-style-type:none;padding-left:0;}.changes .version-change{background-color:#f8f9fa;margin:10px 0;padding:10px;border-left:4px solid #007BFF;border-radius:4px;}
+*{box-sizing:border-box;margin:0;padding:0;}.changes{max-width:800px;margin:auto;background:#fff;padding:20px;border-radius:8px;box-shadow:0 2px 4px rgba(0, 0, 0, 0.1);font-family:Arial, Helvetica, sans-serif;}.changes .version{border-bottom:2px solid #eee;padding-bottom:20px;margin-bottom:20px;}.changes .version:last-child{border-bottom:none;}.changes .version h2,.changes .version h3{color:#007BFF;margin-top:0;}.changes .version-changes{list-style-type:none;padding-left:0;}.changes .version-change{background-color:#f8f9fa;margin:10px 0;padding:10px;border-left:4px solid #007BFF;border-radius:4px;}
 </style></head><body><div class="changes"><h1>Revision history for perl module Foo::Bar</h1></div></body></html>
 END
 chomp $right_ret;
@@ -66,6 +66,7 @@ $right_ret = <<"END";
 	padding: 20px;
 	border-radius: 8px;
 	box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+	font-family: Arial, Helvetica, sans-serif;
 }
 .changes .version {
 	border-bottom: 2px solid #eee;
@@ -141,6 +142,7 @@ $right_ret = <<'END';
 	padding: 20px;
 	border-radius: 8px;
 	box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+	font-family: Arial, Helvetica, sans-serif;
 }
 .changes .version {
 	border-bottom: 2px solid #eee;
@@ -190,12 +192,12 @@ $app = Plack::App::CPAN::Changes->new(
 );
 $test = Plack::Test->create($app);
 $res = $test->request(HTTP::Request->new(GET => '/'));
-$right_ret = <<'END';
+$right_ret = <<"END";
 <!DOCTYPE html>
 <html lang="en">
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <meta name="generator" content="Plack::App::CPAN::Changes; Version: 0.01"
+    <meta name="generator" content="Plack::App::CPAN::Changes; Version: $Plack::App::CPAN::Changes::VERSION"
       />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>

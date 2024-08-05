@@ -13,8 +13,8 @@ WriteMakefile(
     MIN_PERL_VERSION   => 5.010,
     PL_FILES           => {},
     CONFIGURE_REQUIRES => {'ExtUtils::MakeMaker' => '0'},
-    TEST_REQUIRES      => {'Test::More' => '0', 'JSON::PP'   => '0'},
-    PREREQ_PM          => {'List::Util' => '0'},
+    TEST_REQUIRES      => {'Test::More' => '0', 'JSON::PP' => '0'},
+    PREREQ_PM          => {'List::Util' => '0', 'JSON::PP' => '0'},
     META_MERGE         => {
         'meta-spec' => {version => 2},
         'resources' => {

@@ -45,6 +45,11 @@ is_deeply(
 
 		# Main CSS.
 		['s', '.message-board-blank'],
+		['d', 'margin', '1em'],
+		['e'],
+
+		['s', '.message-board-blank .new-message-board'],
+		['d', 'font-family', 'Arial, Helvetica, sans-serif'],
 		['d', 'max-width', '600px'],
 		['d', 'margin', 'auto'],
 		['e'],
@@ -101,6 +106,11 @@ is_deeply(
 
 		# Main CSS.
 		['s', '.my-blank'],
+		['d', 'margin', '1em'],
+		['e'],
+
+		['s', '.my-blank .new-message-board'],
+		['d', 'font-family', 'Arial, Helvetica, sans-serif'],
 		['d', 'max-width', '600px'],
 		['d', 'margin', 'auto'],
 		['e'],

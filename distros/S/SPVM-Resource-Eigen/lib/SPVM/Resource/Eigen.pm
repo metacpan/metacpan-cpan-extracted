@@ -1,6 +1,6 @@
 package SPVM::Resource::Eigen;
 
-our $VERSION = "0.001";
+our $VERSION = "0.002";
 
 1;
 
@@ -16,7 +16,7 @@ Resource::Eigen in L<SPVM> is a L<resouce|SPVM::Document::Resource> for L<C++ Ei
 
 MyClass.config:
   
-  my $config = SPVM::Builder::Config->new_cpp(file => __FILE__);
+  my $config = SPVM::Builder::Config->new_cpp17(file => __FILE__);
   
   $config->use_resource('Resource::Eigen');
   
@@ -51,6 +51,10 @@ L<Eigen|https://eigen.tuxfamily.org/index.php>
 =head1 Language
 
 C++
+
+=head1 Language Specification
+
+C++17
 
 =head1 Header Files
 

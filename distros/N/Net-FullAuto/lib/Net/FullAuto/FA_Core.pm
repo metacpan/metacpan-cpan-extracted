@@ -17090,12 +17090,12 @@ sub cmd
       if $Net::FullAuto::FA_Core::log &&
       -1<index $Net::FullAuto::FA_Core::LOG,'*';
    my $escape=0;
-   my $cmd='';my $cmtimeout=$timeout;my $delay=0;
+   my $cmd='';my $cmd_timeout=$timeout;my $delay=0;
    if (defined $_[1] && $_[1]) {
       if ($_[1]=~/^[0-9]+$/) {
-         $cmtimeout=$_[1];
+         $cmd_timeout=$_[1];
          if (-1<index $self,'HASH') {
-            $_[1]=$cmtimeout=$Hosts{$self->{_hostlabel}->[0]}{'Timeout'}
+            $_[1]=$cmd_timeout=$Hosts{$self->{_hostlabel}->[0]}{'Timeout'}
                if exists $Hosts{$self->{_hostlabel}->[0]}{'Timeout'};
          }
       } elsif ($_[1] eq '__escape__') {
@@ -17108,8 +17108,8 @@ sub cmd
    }
    if (defined $_[2] && $_[2]) {
       if ($_[2]=~/^[0-9]+$/) {
-         $cmtimeout=$_[2];
-         $_[1]=$cmtimeout=$Hosts{$self->{_hostlabel}->[0]}{'Timeout'}
+         $cmd_timeout=$_[2];
+         $_[1]=$cmd_timeout=$Hosts{$self->{_hostlabel}->[0]}{'Timeout'}
             if exists $Hosts{$self->{_hostlabel}->[0]}{'Timeout'};
       } elsif ($_[2] eq '__escape__') {
          $escape=1;
@@ -17227,12 +17227,12 @@ print $Net::FullAuto::FA_Core::LOG "main::cmd() LAUNCING ***NEW*** HANDLE=",
             or &Net::FullAuto::FA_Core::handle_error(
             "couldn't launch cmd subprocess");
          $cmd_handle=Net::Telnet->new(Fhopen => $cmd_handle,
-            Timeout => $cmtimeout);
+            Timeout => $cmd_timeout);
          $cmd_handle->telnetmode(0);
          $cmd_handle->binmode(1);
          my $first=0;
          eval {
-            while (my $line=$cmd_handle->get(Timeout=>$cmtimeout)) {
+            while (my $line=$cmd_handle->get(Timeout=>$cmd_timeout)) {
                $line=~tr/\0-\11\13-\37\177-\377//d;
                chomp($line);
                next if $line=~/^\s*$/ && !$first;
@@ -17256,7 +17256,7 @@ print $Net::FullAuto::FA_Core::LOG "main::cmd() LAUNCING ***NEW*** HANDLE=",
          my $sedpath=$Net::FullAuto::FA_Core::gbp->('sed');
          $cmd="$self | ${sedpath}sed -e \'s/^/stdout: /\' 2>&1";
       }
-      ($stdout,$stderr)=&setuid_cmd($cmd,$cmtimeout);
+      ($stdout,$stderr)=&setuid_cmd($cmd,$cmd_timeout);
       &handle_error($stderr,'-1') if $stderr;
    }
    if ($all) {
@@ -29950,7 +29950,7 @@ sub cmd
    my $command=$_[1];$command||='';my $delay=0;
    my $ftp=0;my $live=0;my $display=0;my $log=0;
    my $wantarray= wantarray ? wantarray : '';
-   my $cmtimeout='X';my $svtimeout='X';my $sem='';
+   my $cmd_timeout='X';my $sav_timeout='X';my $sem='';
    my $notrap=0;my $ignore='';my $login_retry=0;
    my $allow_no_output=0;my $return_all_output=0;
    my $debug=0;my $lock_label='';
@@ -29959,11 +29959,11 @@ sub cmd
       foreach my $i (2..$#_) {
          $_[$i]||='';
          if ($_[$i]=~/^[0-9]+/) {
-            $timeout=$_[$i];
+            $cmd_timeout=$_[$i];
          } elsif ($_[$i]=~/__to__[=]?(.*)$/i) {
-            $timeout=$1;
+            $cmd_timeout=$1;
          } elsif ($_[$i]=~/__timeout__[=]?(.*)$/i) {
-            $timeout=$1;
+            $cmd_timeout=$1;
          } elsif ($_[$i]=~/__delay__[=]?(.*)$/i) {
             $delay=$1;
          } elsif (lc($_[$i]) eq '__log__') {
@@ -30013,20 +30013,20 @@ sub cmd
       $cmd_prompt=substr($self->{_cmd_handle}->prompt,1,-2);
    }
    while (1) {
-      if ($cmtimeout eq 'X') {
+      if ($cmd_timeout eq 'X') {
          if ($ftp) {
-            $cmtimeout=$self->{_ftp_handle}->timeout;
-            $svtimeout=$self->{_ftp_handle}->timeout;
+            $cmd_timeout=$self->{_ftp_handle}->timeout;
+            $sav_timeout=$self->{_ftp_handle}->timeout;
          } else {
-            $cmtimeout=$self->{_cmd_handle}->timeout;
-            $svtimeout=$self->{_cmd_handle}->timeout;
+            $cmd_timeout=$self->{_cmd_handle}->timeout;
+            $sav_timeout=$self->{_cmd_handle}->timeout;
          }
       } elsif ($ftp) {
-         $svtimeout=$self->{_ftp_handle}->timeout;
-         $self->{_ftp_handle}->timeout($cmtimeout);
+         $sav_timeout=$self->{_ftp_handle}->timeout;
+         $self->{_ftp_handle}->timeout($cmd_timeout);
       } else {
-         $svtimeout=$self->{_cmd_handle}->timeout;
-         $self->{_cmd_handle}->timeout($cmtimeout);
+         $sav_timeout=$self->{_cmd_handle}->timeout;
+         $self->{_cmd_handle}->timeout($cmd_timeout);
       }
       my $caller=(caller(1))[3];
       $caller='' unless defined $caller;
@@ -30105,17 +30105,17 @@ sub cmd
             print $Net::FullAuto::FA_Core::LOG
                "\n+++++++ RUNNING FULLAUTO MODIFIED COMMAND +++++++: ".
                "==>$live_command<==\n       and ",
-               "SELECT_TIMEOUT=$cmtimeout and KEYSSELF=",
+               "SELECT_TIMEOUT=$cmd_timeout and KEYSSELF=",
                (join ' ',@{[keys %{$self}]}),"\n\n"
                if $Net::FullAuto::FA_Core::log &&
                -1<index $Net::FullAuto::FA_Core::LOG,'*';
             print "\n+++++++ RUNNING FULLAUTO MODIFIED COMMAND +++++++: ".
                "==>$live_command<==\n       ",
-               "and ", "SELECT_TIMEOUT=$cmtimeout and KEYSSELF=",
+               "and ", "SELECT_TIMEOUT=$cmd_timeout and KEYSSELF=",
                (join ' ',@{[keys %{$self}]}),"\n\n"
                if !$Net::FullAuto::FA_Core::cron &&
                ($Net::FullAuto::FA_Core::debug || $debug);
-            $self->{_cmd_handle}->timeout($cmtimeout);
+            $self->{_cmd_handle}->timeout($cmd_timeout);
             $live_command=~s/\\$//mg;
             $self->{_cmd_handle}->print($live_command);
             my $growoutput='';my $ready='';my $firstout=0;
@@ -30135,18 +30135,18 @@ sub cmd
                   print "INFO: ======= AT THE TOP OF MAIN OUTPUT LOOP =======;".
                      " at Line ".__LINE__."\n" if $first || $starttime;
                   print "INFO: STARTTIME=$starttime and TIMENOW=",time(),
-                     " and TIMEOUT=$cmtimeout and Diff=$tim\n";
+                     " and TIMEOUT=$cmd_timeout and Diff=$tim\n";
                }
                print $Net::FullAuto::FA_Core::LOG
                      "INFO: ======= AT THE TOP OF MAIN OUTPUT LOOP =======;".
                      " at Line ".__LINE__."\n",
                      "INFO: STARTTIME=$starttime and TIMENOW=",time(),
-                     " and TIMEOUT=$cmtimeout and Diff=$tim and ",
+                     " and TIMEOUT=$cmd_timeout and Diff=$tim and ",
                      "SELECT_TIMEOUT=$select_timeout\n"
                      if $Net::FullAuto::FA_Core::log &&
                      -1<index $Net::FullAuto::FA_Core::LOG,'*';
                if ($select_timeout!=2 && $select_timeout==$tim
-                     && (!$cmtimeout || $tim<=$cmtimeout)) {
+                     && (!$cmd_timeout || $tim<=$cmd_timeout)) {
                   my $errhost='';
                   if ($hostlabel eq "__Master_${$}__") {
                      $errhost=$Net::FullAuto::FA_Core::local_hostname;
@@ -30155,7 +30155,7 @@ sub cmd
                             ."\n\n       -> $live_command"
                             ."\n\n       invoked on \'$errhost\'"
                             ."\n\n       Current Timeout "
-                            ."Setting is ->  $cmtimeout seconds"
+                            ."Setting is ->  $cmd_timeout seconds"
                             ."\n\n       Increase the timeout?\n\n";
                   print $errmsg;
                   sleep 2;
@@ -30164,7 +30164,7 @@ sub cmd
                      &Net::FullAuto::FA_Core::clean_filehandle(
                      $self->{_cmd_handle},$tim,$command);
                   my $lv_errmsg=$growoutput.$errmsg;
-                  $self->{_cmd_handle}->timeout($svtimeout);
+                  $self->{_cmd_handle}->timeout($sav_timeout);
                   if ($wantarray) {
                      &Net::FullAuto::FA_Core::die($lv_errmsg);
                   } else {
@@ -30681,7 +30681,7 @@ sub cmd
                      -1<index $Net::FullAuto::FA_Core::LOG,'*';
                   if (15<length $growoutput &&
                         unpack('a16',$growoutput) eq '?Invalid command') {
-                     $self->{_cmd_handle}->timeout($svtimeout);
+                     $self->{_cmd_handle}->timeout($sav_timeout);
                      &Net::FullAuto::FA_Core::handle_error(
                         "?Invalid Command ftp> -> $live_command");
                   } elsif (-1<index lc($growoutput),'killed by signal 15') {
@@ -30990,7 +30990,7 @@ print $Net::FullAuto::FA_Core::LOG "GRO_GONNA_LOOP==>$growoutput<==\n"
                         &Net::FullAuto::FA_Core::getpasswd(
                         $hostlabel,$username));
                   } else {
-                     $starttime=time();$select_timeout=$cmtimeout;
+                     $starttime=time();$select_timeout=$cmd_timeout;
                      $restart_attempt=1;
                   }
                   $command_stripped_from_output=1;
@@ -31000,7 +31000,7 @@ print $Net::FullAuto::FA_Core::LOG "PAST THE ALARM4\n"
 print $Net::FullAuto::FA_Core::LOG "GRO_OUT AT THE BOTTOM==>$growoutput<==\n"
    if $Net::FullAuto::FA_Core::log &&
    (-1<index $Net::FullAuto::FA_Core::LOG,'*') && $loop_count<$loop_max;
-               } elsif ($starttime && (($cmtimeout<time()-$starttime)
+               } elsif ($starttime && (($cmd_timeout<time()-$starttime)
                      || ($select_timeout<time()-$starttime))) {
                   if (!$restart_attempt) {
 print "GOING TO INT EIGHTZZZ\n";
@@ -31015,8 +31015,8 @@ print "GOING TO INT EIGHTZZZ\n";
                                   ."\n\n       -> $live_command"
                                   ."\n\n       invoked on \'$hostlabel\'"
                                   ."\n\n       Current Timeout "
-                                  ."Setting is ->  $cmtimeout seconds.\n\n";
-                     $self->{_cmd_handle}->timeout($svtimeout);
+                                  ."Setting is ->  $cmd_timeout seconds.\n\n";
+                     $self->{_cmd_handle}->timeout($sav_timeout);
                      if ($wantarray) {
                         die $lv_errmsg;
                      } else {
@@ -31024,11 +31024,11 @@ print "GOING TO INT EIGHTZZZ\n";
                      }
                   } else {
                      $restart_attempt=0;
-                     $starttime=time();$select_timeout=$cmtimeout;
+                     $starttime=time();$select_timeout=$cmd_timeout;
                      $self->{_cmd_handle}->print;
                   }
                } elsif (!$starttime) {
-                  $starttime=time();$select_timeout=$cmtimeout;
+                  $starttime=time();$select_timeout=$cmd_timeout;
                   $restart_attempt=1;
                }
             } # END OF FETCH LOOP
@@ -31074,9 +31074,9 @@ print $Net::FullAuto::FA_Core::LOG "cmd() STDERRBOTTOM=$stderr<== and LASTLINE=$
          $eval_error=$@;undef $@;
       }
       if ($ftp) {
-         $self->{_ftp_handle}->timeout($svtimeout);
+         $self->{_ftp_handle}->timeout($sav_timeout);
       } else {
-         $self->{_cmd_handle}->timeout($svtimeout);
+         $self->{_cmd_handle}->timeout($sav_timeout);
       }
       $eval_error=$stderr if $stderr && !$eval_error; 
       if ($eval_error) {
@@ -31119,7 +31119,7 @@ print $Net::FullAuto::FA_Core::LOG "cmd() STDERRBOTTOM=$stderr<== and LASTLINE=$
             $self->{_cmd_handle}->close;
             if (!exists $same_host_as_Master{$self->{_hostlabel}->[0]}) {
                ($self,$stderr)=&Net::FullAuto::FA_Core::connect_host(
-                  $self->{_hostlabel}->[0],$cmtimeout);
+                  $self->{_hostlabel}->[0],$cmd_timeout);
             } else {
                ($self,$stderr)=
                   Rem_Command::new('Rem_Command',
@@ -31435,7 +31435,7 @@ sub display
    my $testel=sub {
       my $line=$_[0];
       my $lastline=$line;
-      $lastline=~/^(.*)\n(.*)$/s;
+      $lastline=~/^(.*\n)(.*)$/s;
       $line=$1||'';$lastline=$2||'';
       unless ($lastline eq 'stdout') {
          unless ($lastline eq 'stdou') {
@@ -31565,7 +31565,7 @@ sub display
          my ($l,$ll)=$testel->($line);
          if ($l) {
             $save=$ll;
-            print $line;
+            print $l;
             return $save;
          }
          if ($print_line_debugging) {

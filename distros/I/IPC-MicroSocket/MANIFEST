@@ -1,0 +1,17 @@
+.editorconfig
+Build.PL
+Changes
+lib/IPC/MicroSocket.pm
+lib/IPC/MicroSocket/Client.pm
+lib/IPC/MicroSocket/Server.pm
+MANIFEST			This list of files
+t/00use.t
+t/01connection.t
+t/02client.t
+t/10serverconnection.t
+t/11server.t
+t/99pod.t
+README
+LICENSE
+META.yml
+META.json

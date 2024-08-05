@@ -1,0 +1,53 @@
+==================================================
+Changes from 1750-10-20 00:00:00 +0000 to present.
+==================================================
+
+------------------------------------------
+version 0.001 at 2024-08-03 20:36:00 +0000
+------------------------------------------
+
+  Change: c1886047bcf268e1cb92b2d5f3bf001e6bf20dd7
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2024-08-03 22:34:15 +0000
+
+    I need to update the pluginbundle 
+
+  Change: 2fc9e774a04d2adf6fc37e2d14760a84863f8f94
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2024-08-03 22:28:33 +0000
+
+    Better README 
+
+  Change: b6a047610e0df5052c11ea8f931c48220fd4ddaf
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2024-08-03 22:26:19 +0000
+
+    Custom Attributes and a README 
+
+  Change: e49430eb3c11a342e5621bc72724e9d85278f6ff
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2024-07-31 03:14:49 +0000
+
+    More POD 
+
+  Change: 9ad1cbb3655219c69c8cf1d1244a92504bfc78d3
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2024-07-31 02:56:44 +0000
+
+    Removed unrelated function 
+
+  Change: 50c5749dcf14ae48bb33aff4482f761b0dc681f9
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2024-07-31 02:54:47 +0000
+
+    Basic implementation for first release 
+
+  Change: cd189e5e8ecfcfd2151f739c1ef217bbce68c19e
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2024-07-31 01:32:36 +0000
+
+    initial commit 
+
+================
+End of releases.
+================

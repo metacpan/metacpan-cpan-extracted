@@ -22,9 +22,41 @@ R::OP::Matrix class in L<SPVM> has methods for operations for n-dimension arrays
 
 C<static method cbind : R::NDArray ($x_ndarray : L<R::NDArray|SPVM::R::NDArray>, $y_ndarray : L<R::NDArray|SPVM::R::NDArray>);>
 
+Creates a new L<R::NDArray> of the same type as the n-dimension array $x_ndarray, adds all columns of $x_ndarray and all columns of $y_ndarray are added to the new n-dimensional array in order, and returns the new n-dimensional array.
+
+Exceptions:
+
+The n-dimention array $x_ndarray must be defined. Otherwise, an exception is thrown.
+
+The n-dimention array $x_ndarray must be a matrix. Otherwise, an exception is thrown.
+
+The n-dimention array $y_ndarray must be defined. Otherwise, an exception is thrown.
+
+The n-dimention array $y_ndarray must be a matrix. Otherwise, an exception is thrown.
+
+The type of the n-dimention array $x_ndarray must be eqaul to the type of the n-dimention array $y_ndarray. Otherwise, an exception is thrown.
+
+The row numbers of the n-dimention array $x_ndarray must be equal to the row numbers of the n-dimention array $y_ndarray. Otherwise, an exception is thrown.
+
 =head2 rbind
 
 C<static method rbind : R::NDArray ($x_ndarray : L<R::NDArray|SPVM::R::NDArray>, $y_ndarray : L<R::NDArray|SPVM::R::NDArray>);>
+
+Creates a new L<R::NDArray> of the same type as the n-dimension array $x_ndarray, adds all rows of $x_ndarray and all rows of $y_ndarray are added to the new n-dimensional array in order, and returns the new n-dimensional array.
+
+Exceptions:
+
+The n-dimention array $x_ndarray must be defined. Otherwise, an exception is thrown.
+
+The n-dimention array $x_ndarray must be a matrix. Otherwise, an exception is thrown.
+
+The n-dimention array $y_ndarray must be defined. Otherwise, an exception is thrown.
+
+The n-dimention array $y_ndarray must be a matrix. Otherwise, an exception is thrown.
+
+The type of the n-dimention array $x_ndarray must be eqaul to the type of the n-dimention array $y_ndarray. Otherwise, an exception is thrown.
+
+The column numbers of the n-dimention array $x_ndarray must be equal to the column numbers of the n-dimention array $y_ndarray. Otherwise, an exception is thrown.
 
 =head1 Related Modules
 

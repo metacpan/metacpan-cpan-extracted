@@ -26,6 +26,10 @@ C<static method calc_data_length : int ($dim : int[]);>
 
 C<static method normalize_dim : int[] ($dim : int[]);>
 
+=head2 is_normalized_dim
+
+C<static method is_normalized_dim : int ($dim : int[]);>
+
 =head2 check_length
 
 C<static method check_length : void ($data : object, $dim : int[]);>

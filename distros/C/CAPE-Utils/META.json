@@ -55,7 +55,7 @@
             "Sys::Syslog" : "0",
             "Text::ANSITable" : "0.608",
             "Time::Piece" : "0",
-            "YAML" : "0",
+            "Web::ACL" : "v0.1.0",
             "perl" : "5.006"
          }
       },
@@ -72,6 +72,6 @@
          "web" : "https://github.com/LilithSec/CAPE-Utils"
       }
    },
-   "version" : "v2.8.0",
+   "version" : "v2.9.0",
    "x_serialization_backend" : "JSON::PP version 4.07"
 }
