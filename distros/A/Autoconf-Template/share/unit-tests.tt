@@ -1,0 +1,28 @@
+UNIT_TESTS = [% makefile_am_list(unit_tests.$unit_test_list) %]
+
+RUNIT_TESTS = $(UNIT_TESTS:.t.in=.t)
+
+GUNIT_TESTS = $(RUNIT_TESTS:.t=.test)
+
+TESTS = $(GUNIT_TESTS)
+
+# this was a tough one...VPATH builds are fun
+# prove.sh is actually built by configure.ac
+#
+%.test: %.t
+	test -d "$$(dirname "$@")" || $(INSTALL) -d "$$(dirname "$@")"
+	ln -sf $(abs_top_builddir)/autotools/prove.sh $@
+	chmod +x $@
+
+$(GUNIT_TESTS): $(UNIT_TESTS)
+
+$(RUNIT_TEST): $(UNIT_TESTS)
+
+# we need to build .t files from .t.in files simply to get .t files
+# into the build directory for VPATH builds (make distcheck)
+%.t: %.t.in
+	test -d "$$(dirname "$@")" || $(INSTALL) -d "$$(dirname "$@")"
+	cp $< $(abs_builddir)/$@
+
+UNIT_TESTS_LOGS=$(UNIT_TESTS:.t=.log)
+UNIT_TESTS_TRS=$(UNIT_TESTS:.t=.trs)

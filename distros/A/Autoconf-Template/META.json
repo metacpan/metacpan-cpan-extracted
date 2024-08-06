@@ -1,0 +1,93 @@
+{
+   "abstract" : "autoconfiscation help scripts",
+   "author" : [
+      "Rob Lauer <rlauer6@comcast.net>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.44, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Autoconf-Template",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.64",
+            "File::ShareDir::Install" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.64",
+            "File::ShareDir::Install" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Capture::Tiny" : "0.48",
+            "Config::IniFiles" : "3.000003",
+            "Date::Format" : "2.24",
+            "File::ShareDir" : "1.118",
+            "JSON" : "4.07",
+            "List::Util" : "1.33",
+            "Log::Log4perl" : "1.55",
+            "Markdown::Render" : "1.04",
+            "Module::ScanDeps::Static" : "0.10",
+            "Readonly" : "2.05",
+            "Template" : "3.100",
+            "Term::ProgressBar" : "2.23",
+            "Text::ASCIITable::EasyTable" : "1.003",
+            "YAML" : "1.30",
+            "perl" : "5.010"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Autoconf::Template" : {
+         "file" : "lib/Autoconf/Template.pm",
+         "version" : "v2.1.0"
+      },
+      "Autoconf::Template::Constants" : {
+         "file" : "lib/Autoconf/Template/Constants.pm",
+         "version" : "v2.1.0"
+      },
+      "Autoconf::Template::UnitTests" : {
+         "file" : "lib/Autoconf/Template/UnitTests.pm",
+         "version" : "0"
+      },
+      "Autoconf::Template::Utils" : {
+         "file" : "lib/Autoconf/Template/Utils.pm",
+         "version" : "0"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "mailto" : "rlauer6@comcast.net",
+         "web" : "http://github.com/rlauer6/autoconf-template-perl/issues"
+      },
+      "homepage" : "http://github.com/rlauer6/autoconf-template-perl",
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/rlauer6/autoconf-tempate-perl.git",
+         "web" : "http://github.com/rlauer6/autoconf-template-perl"
+      }
+   },
+   "version" : "v2.1.0",
+   "x_serialization_backend" : "JSON::PP version 4.10"
+}

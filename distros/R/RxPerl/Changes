@@ -1,5 +1,9 @@
 Revision history for Perl extension RxPerl
 
+v6.29.4 2024-08-06T08:55:33Z
+
+    - fixed issue #2 on gitlab (https://gitlab.com/karjala/rxperl/-/issues/2)
+
 v6.29.3 2024-08-04T04:12:04Z
 
     - fixed tests

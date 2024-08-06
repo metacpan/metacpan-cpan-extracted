@@ -4,9 +4,9 @@ use strict;
 use 5.010001;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2023-10-04'; # DATE
+our $DATE = '2024-08-05'; # DATE
 our $DIST = 'App-IndonesianNumberUtils'; # DIST
-our $VERSION = '0.032'; # VERSION
+our $VERSION = '0.033'; # VERSION
 
 1;
 # ABSTRACT: CLIs related to Indonesian numbers (NIK, NOPPBB, NPWP, etc)
@@ -23,7 +23,7 @@ App::IndonesianNumberUtils - CLIs related to Indonesian numbers (NIK, NOPPBB, NP
 
 =head1 VERSION
 
-This document describes version 0.032 of App::IndonesianNumberUtils (from Perl distribution App-IndonesianNumberUtils), released on 2023-10-04.
+This document describes version 0.033 of App::IndonesianNumberUtils (from Perl distribution App-IndonesianNumberUtils), released on 2024-08-05.
 
 =head1
 
@@ -33,17 +33,19 @@ This distribution contains several CLI's related to Indonesian numbers:
 
 =item 1. L<parse-bpom-reg-code>
 
-=item 2. L<parse-nik>
+=item 2. L<parse-idn-vehicle-plate-number>
 
-=item 3. L<parse-nkk>
+=item 3. L<parse-nik>
 
-=item 4. L<parse-nop-pbb>
+=item 4. L<parse-nkk>
 
-=item 5. L<parse-npwp>
+=item 5. L<parse-nop-pbb>
 
-=item 6. L<parse-pom-reg-code>
+=item 6. L<parse-npwp>
 
-=item 7. L<parse-sim>
+=item 7. L<parse-pom-reg-code>
+
+=item 8. L<parse-sim>
 
 =back
 
@@ -81,7 +83,7 @@ that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2023, 2019, 2018, 2016, 2015 by perlancar <perlancar@cpan.org>.
+This software is copyright (c) 2024, 2023, 2019, 2018, 2016, 2015 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

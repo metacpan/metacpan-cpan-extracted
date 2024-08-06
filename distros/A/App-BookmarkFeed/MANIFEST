@@ -1,0 +1,12 @@
+Changes
+lib/App/BookmarkFeed.pm
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+script/bookmark-feed
+t/2016-11-14_Trump.md
+t/basic.t
+t/colon.md
+t/colon.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

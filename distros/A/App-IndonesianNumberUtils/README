@@ -3,20 +3,21 @@ NAME
     NOPPBB, NPWP, etc)
 
 VERSION
-    This document describes version 0.032 of App::IndonesianNumberUtils
+    This document describes version 0.033 of App::IndonesianNumberUtils
     (from Perl distribution App-IndonesianNumberUtils), released on
-    2023-10-04.
+    2024-08-05.
 
 
     This distribution contains several CLI's related to Indonesian numbers:
 
     1. parse-bpom-reg-code
-    2. parse-nik
-    3. parse-nkk
-    4. parse-nop-pbb
-    5. parse-npwp
-    6. parse-pom-reg-code
-    7. parse-sim
+    2. parse-idn-vehicle-plate-number
+    3. parse-nik
+    4. parse-nkk
+    5. parse-nop-pbb
+    6. parse-npwp
+    7. parse-pom-reg-code
+    8. parse-sim
 
 HOMEPAGE
     Please visit the project's homepage at
@@ -47,8 +48,8 @@ CONTRIBUTING
     required beyond that are considered a bug and can be reported to me.
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2023, 2019, 2018, 2016, 2015 by perlancar
-    <perlancar@cpan.org>.
+    This software is copyright (c) 2024, 2023, 2019, 2018, 2016, 2015 by
+    perlancar <perlancar@cpan.org>.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.

@@ -1,0 +1,40 @@
+define MAN_PAGE_BUILD_RECIPE
+	target_name="$@";\
+	tname=$$(echo "$${target_name}" | sed -e 's/\.1man$$//') ;\
+	"$(POD2MAN)"  $< \
+	--center="$(PACKAGE)" \
+	--name="$${tname}" \
+	--release=$(PACKAGE)-$(VERSION) \
+	--section=1man > "$${target_name}" || true
+endef
+
+%.3man : %.pm
+	$(MAN_PAGE_BUILD_RECIPE)
+
+%.1man : %.pl
+	$(MAN_PAGE_BUILD_RECIPE)
+
+%.1man : %.cgi
+	$(MAN_PAGE_BUILD_RECIPE)
+
+%.tman : %.pl
+	$(MAN_PAGE_BUILD_RECIPE)
+
+%.tman : %.cgi
+	$(MAN_PAGE_BUILD_RECIPE)
+
+TEMP_MANPAGES = $(GALLSCRIPTS:.pl=.tman)
+
+GMANPAGES = $(MANPAGES:.pl.in=.1man)
+
+$(GMANPAGES): $(TEMP_MANPAGES)
+	set -x; \
+	src=$$(echo $@ | sed 's/-/\//'); \
+	tman=$$(dirname $$src)/$$(basename $$src .1man).tman; \
+	if test -e $$tman; then \
+	  cp $$tman $@; \
+	else \
+	  cp $$(basename $@ .1man).tman $@; \
+	fi
+
+G1MANPAGES = $(GMANPAGES:.tman=.1man)

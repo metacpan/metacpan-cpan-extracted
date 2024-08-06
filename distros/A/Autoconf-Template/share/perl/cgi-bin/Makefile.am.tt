@@ -1,0 +1,50 @@
+#-*- mode: makefile-gmake; -*-
+
+SUBDIRS = .
+
+include $(top_srcdir)/includes/apache-directories.inc
+include $(top_srcdir)/includes/directories.inc
+include $(top_srcdir)/includes/perlcritic.inc
+include $(top_srcdir)/includes/perl-cgi-bin.inc
+
+[% unit_test_list = "cgi" %]
+[% INCLUDE "unit-tests.tt" %]
+
+all:
+
+CLEANFILES = \
+    $(GPERLSCRIPTS) \
+    $(GPERLCRITIC_CGI) \
+    $(GALLSCRIPTS:.pl=.cgi) \
+    $(TEMP_MANPAGES)
+
+man1_MANS = $(G1MANPAGES)
+
+.PHONY: clean-local
+clean-local:
+	$(MAKE) clean-generated-man-pages
+	rm -f *.log
+
+.PHONY: clean-generated-man-pages
+clean-generated-man-pages:
+	for mpath in $(G1MANPAGES); do \
+	rm -f "$${mpath}" ;\
+	test $$? -eq 0 || exit 1 ;\
+	done
+
+dist_noinst_DATA = $(ALLSCRIPTS) $(UNIT_TESTS)
+
+if DISTCHECK_HACK
+else
+endif
+
+if RPM_BUILD_MODE
+else
+install-data-hook:
+
+uninstall-local:
+endif
+
+[% FOREACH section IN custom_sections %]
+[% section.join("\n") %]
+[% END %]

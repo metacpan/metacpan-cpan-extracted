@@ -48,7 +48,7 @@
    "provides" : {
       "Crypt::Argon2" : {
          "file" : "lib/Crypt/Argon2.pm",
-         "version" : "0.028"
+         "version" : "0.029"
       }
    },
    "release_status" : "stable",
@@ -62,7 +62,7 @@
          "web" : "https://github.com/Leont/crypt-argon2"
       }
    },
-   "version" : "0.028",
+   "version" : "0.029",
    "x_generated_by_perl" : "v5.38.0",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.36",
    "x_spdx_expression" : "Apache-2.0"

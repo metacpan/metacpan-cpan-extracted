@@ -1,0 +1,27 @@
+---
+project:
+  description: Simple command line script accelerator
+  author:
+    name: [% author %]
+    mailto: [% email %]
+pm_module: [% cpan_module_name %]
+min-perl-version: 5.010
+dependencies:
+  test_requires: test-requires
+  requires: requires
+path:
+  pm_module: src/main/perl/lib
+  tests: src/main/perl/lib/t
+  exe_files: src/main/bash/bin
+extra-files:
+  - ChangeLog
+provides:
+resources:
+  homepage: 
+  bugtracker:
+    web: http://github.com/[% repo_name %]/perl-[% cpan_dist_name %]
+    mailto: [% email %]
+  repository:
+    url: git://github.com/[% repo_name %]/perl-[% cpan_dist_name %]
+    web: http://github.com/[% repo_name %]/perl-[% cpan_dist_name %]
+    type: 'git'

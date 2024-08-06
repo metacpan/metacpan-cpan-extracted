@@ -32,6 +32,15 @@ subtest 'rx_interval' => sub {
 subtest 'rx_timer' => sub {
     my $o = rx_timer(3, 1)->pipe( op_take(5) );
     obs_is $o, ['---01234'], 'timer(3, 1)';
+
+    $o = rx_timer(0, 1)->pipe( op_take(1) );
+    obs_is $o, ['0'], 'timer(0, 1)->pipe( op_take(1) )';
+
+    $o = rx_timer(0, 0)->pipe( op_take(1) );
+    obs_is $o, ['0'], 'timer(0, 0)->pipe( op_take(1) )';
+
+    $o = rx_timer(0, 0)->pipe( op_take(2) );
+    obs_is $o, ['(01)'], 'timer(0, 0)->pipe( op_take(2) )';
 };
 
 subtest 'rx_combine_latest' => sub {

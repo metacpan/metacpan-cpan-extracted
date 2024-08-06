@@ -1,5 +1,5 @@
 package ExtUtils::Builder::Conf;
-$ExtUtils::Builder::Conf::VERSION = '0.018';
+$ExtUtils::Builder::Conf::VERSION = '0.019';
 use strict;
 use warnings;
 
@@ -79,6 +79,8 @@ sub add_methods {
 		my $dir = tempdir(CLEANUP => 1);
 
 		my ($source_file, $c_file) = tempfile('try_compilerXXXX', DIR => $dir, SUFFIX => '.c');
+
+		print $source_file $args{source};
 
 		my $inner = $self->new_planner;
 		$inner->load_module('ExtUtils::Builder::AutoDetect::C', 0.015);
@@ -232,7 +234,7 @@ ExtUtils::Builder::Conf - Configure-time utilities for using C headers, librarie
 
 =head1 VERSION
 
-version 0.018
+version 0.019
 
 =head1 SYNOPSIS
 

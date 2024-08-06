@@ -1,0 +1,180 @@
+#!/usr/bin/env perl
+# -*- mode: perl; -*-
+
+# create an m4 macro for new options
+
+use strict;
+use warnings;
+
+use Autoconf::Template::Constants qw(:all);
+use Autoconf::Template::Utils qw(:all);
+use Carp;
+use Data::Dumper;
+use English qw(-no_match_vars);
+use File::Basename qw(basename fileparse dirname);
+use Getopt::Long qw(:config no_ignore_case);
+use List::Util qw(none any);
+use Log::Log4perl qw(:easy get_logger);
+use JSON;
+use YAML qw(LoadFile);
+
+our $VERSION = '2.1.0'; ## no critic (RequireInterpolation)
+
+caller or __PACKAGE__->main();
+
+########################################################################
+sub main {
+########################################################################
+  my %options;
+
+  my @option_specs = qw(
+    default|D=s
+    description|d=s
+    force|f
+    help
+    log-level|l=s
+    option|o=s
+    reconf|r!
+    root=s
+    target-description|t=s
+  );
+
+  GetOptions( \%options, @option_specs );
+
+  init_logger( $options{'log-level'} );
+
+  return help()
+    if $options{help};
+
+  return version($VERSION)
+    if $options{version};
+
+  my $root = $options{root};
+
+  if ( !$root ) {
+    my ( $project, $destdir ) = find_root_dir();
+    $root = "$destdir/$project";
+  }
+
+  my $meta_data = eval { LoadFile("$root/project.yaml"); };
+  $meta_data //= {};
+
+  my $extra_opts      = [];
+  my $extra_opts_file = "$root/ax-extra-opts.json";
+
+  if ( -e "$extra_opts_file" ) {
+    $extra_opts = eval { decode_json( slurp_file($extra_opts_file) ); };
+
+    croak "could not read $extra_opts_file: $EVAL_ERROR\n"
+      if $EVAL_ERROR;
+  }
+
+  my $ac_option = $options{option} // $EMPTY;
+  $ac_option =~ s/\-/_/gxsm;
+
+  croak "option already exists - use -f to replace\n"
+    if !$options{force} && any { $ac_option eq $_->{am_variable} }
+    @{$extra_opts};
+
+  if ($ac_option) {
+    my $ac_option_name = $ac_option;
+    $ac_option_name =~ s/[_]/-/gxsm;
+
+    my %arg_with = (
+      am_variable_name        => $ac_option_name,
+      am_variable             => $ac_option,
+      am_variable_description => $options{description},
+      am_variable_default     => $options{default},
+      am_variable_target      => $options{'target-description'},
+    );
+
+    # remove dupes
+    my @options_list
+      = grep { $_->{am_variable} ne $ac_option } @{$extra_opts};
+
+    push @options_list, \%arg_with;
+
+    $extra_opts = \@options_list;
+  }
+
+  my %timestamp = timestamp();
+
+  my %parameters = (
+    timestamp  => $timestamp{timestamp},
+    generator  => basename($PROGRAM_NAME),
+    version    => $VERSION,
+    extra_opts => $extra_opts,
+    project    => $meta_data->{project},
+    email      => $meta_data->{email},
+  );
+
+  my $outfile = "$root/autotools/ax-extra-opts.m4";
+
+  render_tt_template(
+    { template   => 'ax-extra-opts.m4.tt',
+      parameters => \%parameters,
+      outfile    => $outfile
+    }
+  );
+
+  if ($ac_option) {
+    system 'autoreconf', '-f', '-i';
+
+    # update ax-extra-opts.json
+    open my $fh, '>', $extra_opts_file
+      or croak "could not open $extra_opts_file for writing\n";
+
+    print {$fh} JSON->new->pretty->encode($extra_opts);
+
+    close $fh;
+  }
+
+  return;
+}
+
+########################################################################
+sub help {
+########################################################################
+  my $name = basename $PROGRAM_NAME;
+
+  return print <<"END_OF_HELP";
+usage: $name options
+
+This utility is part of the `autoconf-template-perl` toolchain. It will
+create an m4 macro that adds a new option to the `configure' script.
+
+Options
+-------
+-h, --help                 help
+-d, --default              default value
+-D, --description          description that will be shown
+-f, --force                replace existing option
+-o, --option               option name - Example: s3-bucket-name
+-r, --root                 project root
+-R, --reconf               re-run autoreconf (default: true)
+-t, --target-description   the stuff after '='
+-v, --version              script version
+
+* project root will be automatically detected if you are in the project hierarchy
+* only -o is a required option
+
+Example: autoconf-ax-extra-opts -o s3-bucket-name \
+                                -t 'bucket-name' \
+                                -d none \
+                                -D "S3 bucket name"
+
+Use ./configure --help to see the new option...
+
+ --with-s3-bucket-name=bucket-name S3 bucket name (default: none)
+
+Use it your config files as \@s3_bucket_name\@
+
+See `perldoc Autoconf::Template` for more of the gory details.
+
+$COPYRIGHT
+END_OF_HELP
+}
+
+1;
+
+__END__

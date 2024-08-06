@@ -1,0 +1,5 @@
+[% timestamp %] <[% email %]>
+
+   [BigBang]:
+[% FOREACH file IN files %]
+   * [% file %]: new[% END %]

@@ -3,7 +3,7 @@ package Perlsac::rwsac ;
 use strict ;
 use warnings ;
 
-our $VERSION = 0.02 ;
+our $VERSION = 0.03 ;
 
 our @map ;
 $map[0] = "delta" ;
@@ -253,7 +253,7 @@ MIT
 
 Using C<cpan>:
 
-    $ cpan Perlsac
+    $ cpan install Perlsac::rwsac
 
 Manual install:
 
@@ -261,6 +261,38 @@ Manual install:
     $ make
     $ make install
 
+=head1 TUTORIAL
+
+Printing out time and data.
+
+    $ #!/usr/bin/env perl
+    $ 
+    $ use strict ;
+    $ use warnings ;
+    $ use Perlsac::rwsac ;
+    $ 
+    $ my %h = Perlsac::rwsac::rsac("example.sac") ;
+    $ 
+    $ for (my $n=0; $n<$h{npts}; $n++){
+    $     print "$h{t}[$n] $h{d}[$n]\n" ;
+    $ }
+    $ 
+
+Dividing data by 'depmax' in headers and writing a new sac file.
+
+    $ #!/usr/bin/env perl
+    $ 
+    $ use strict ;
+    $ use warnings ;
+    $ use Perlsac::rwsac ;
+    $ 
+    $ my %h = Perlsac::rwsac::rsac("example.sac") ;
+    $ 
+    $ for (my $n=0; $n<$h{npts}; $n++){
+    $     $h{d}[$n] /= $h{depmax} ;
+    $ }
+    $ 
+    $ &Perlsac::rwsac::wsac("example.sac.div",%h) ;
 
 =cut
 

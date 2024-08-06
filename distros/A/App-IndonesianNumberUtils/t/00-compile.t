@@ -6,7 +6,7 @@ use warnings;
 
 use Test::More;
 
-plan tests => 8 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+plan tests => 9 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 my @module_files = (
     'App/IndonesianNumberUtils.pm'
@@ -14,6 +14,7 @@ my @module_files = (
 
 my @scripts = (
     'script/parse-bpom-reg-code',
+    'script/parse-idn-vehicle-plate-number',
     'script/parse-nik',
     'script/parse-nkk',
     'script/parse-nop-pbb',

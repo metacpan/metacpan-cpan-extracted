@@ -36,8 +36,7 @@ static void (*resolve_fill_segment(void))(const argon2_instance_t *instance, arg
 	return fill_segment_ref;
 }
 
-void fill_segment(const argon2_instance_t *instance, argon2_position_t position)
-     __attribute__ ((ifunc ("resolve_fill_segment")));
+void fill_segment(const argon2_instance_t *instance, argon2_position_t position) __attribute__ ((ifunc ("resolve_fill_segment")));
 #else
 void fill_segment(const argon2_instance_t *instance, argon2_position_t position) {
 #ifdef HAVE_AVX512

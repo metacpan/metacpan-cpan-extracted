@@ -1,0 +1,21 @@
+# README
+
+This is the README for the `[% project %]` project.
+
+# Overview
+
+[% description %]
+
+# Author
+
+[% author %] <[% email %]>
+
+# License
+
+Copyright (C) [% author %]
+License GPLv2+: GNU GPL version 2 or later <https://gnu.org/licenses/gpl-2.0.html>
+This is free software: you are free to change and redistribute it.
+There is NO WARRANTY, to the extent permitted by law.
+
+Written by [% author %] <[% email %]>
+

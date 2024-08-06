@@ -8,7 +8,7 @@ use RxPerl::Subscription;
 
 use Scalar::Util 'weaken';
 
-our $VERSION = "v6.29.3";
+our $VERSION = "v6.29.4";
 
 sub new {
     my ($class, $source, $subject_factory) = @_;

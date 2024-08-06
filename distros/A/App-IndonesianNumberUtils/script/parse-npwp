@@ -11,9 +11,9 @@ use Log::ger;
 use Perinci::CmdLine::Any;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2023-10-04'; # DATE
+our $DATE = '2024-08-05'; # DATE
 our $DIST = 'App-IndonesianNumberUtils'; # DIST
-our $VERSION = '0.032'; # VERSION
+our $VERSION = '0.033'; # VERSION
 
 my $cmdline = Perinci::CmdLine::Any->new(
     url => "/Business/ID/NPWP/parse_npwp",
@@ -40,7 +40,7 @@ parse-npwp - Parse Indonesian taxpayer registration number (NPWP)
 
 =head1 VERSION
 
-This document describes version 0.032 of parse-npwp (from Perl distribution App-IndonesianNumberUtils), released on 2023-10-04.
+This document describes version 0.033 of parse-npwp (from Perl distribution App-IndonesianNumberUtils), released on 2024-08-05.
 
 =head1 SYNOPSIS
 
@@ -48,7 +48,7 @@ B<parse-npwp> B<L<--help|/"--help, -h, -?">> (or B<L<-h|/"--help, -h, -?">>, B<L
 
 B<parse-npwp> B<L<--version|/"--version, -v">> (or B<L<-v|/"--version, -v">>)
 
-B<parse-npwp> [B<L<--debug|/"--debug">>|B<L<--log-level|/"--log-level=s">>=I<level>|B<L<--quiet|/"--quiet">>|B<L<--trace|/"--trace">>|B<L<--verbose|/"--verbose">>] [B<L<--format|/"--format=s">>=I<name>|B<L<--json|/"--json">>] [B<L<--(no)naked-res|/"--naked-res">>] [B<L<--page-result|/"--page-result">>[=I<program>]|B<L<--view-result|/"--view-result">>[=I<program>]] -- E<lt>I<L<npwp|/"--npwp=s*">>E<gt>
+B<parse-npwp> [B<L<--allow-nik|/"--allow-nik">>|B<L<--disallow-nik|/"--allow-nik">>] [B<L<--debug|/"--debug">>|B<L<--log-level|/"--log-level=s">>=I<level>|B<L<--quiet|/"--quiet">>|B<L<--trace|/"--trace">>|B<L<--verbose|/"--verbose">>] [B<L<--format|/"--format=s">>=I<name>|B<L<--json|/"--json">>] [B<L<--(no)naked-res|/"--naked-res">>] [B<L<--page-result|/"--page-result">>[=I<program>]|B<L<--view-result|/"--view-result">>[=I<program>]] -- E<lt>I<L<npwp|/"--npwp=s*">>E<gt>
 
 =head1 OPTIONS
 
@@ -57,6 +57,18 @@ C<*> marks required options.
 =head2 Main options
 
 =over
+
+=item B<--allow-nik>
+
+Based on PMK 112 Tahun 2022, Indonesian citizenship registration number (NIK -
+nomor induk kependudukan) is also allowed as NPWP. NIK has 16 digits, while the
+traditional NPWP is 15 digits. A prefix 0 will be added later so all NPWP will
+be 16 digits in the future.
+
+By default, NPWP is allowed to have 16 digits but the first digit must be 0. If
+this setting is set to true, NPWP with the first digit other than 0 is also
+allowed but will be checked for NIK validness.
+
 
 =item B<--npwp>=I<s>*
 
@@ -245,7 +257,7 @@ that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2023, 2019, 2018, 2016, 2015 by perlancar <perlancar@cpan.org>.
+This software is copyright (c) 2024, 2023, 2019, 2018, 2016, 2015 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

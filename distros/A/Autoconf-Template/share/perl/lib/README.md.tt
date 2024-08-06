@@ -1,0 +1,8 @@
+# Perl Module Index for `[% project %]` generated on [% timestamp %]
+
+| Module Name | Module Path (`src/main/perl/lib/...`) | Description |
+| ----------- | ----------- | ----------- |
+[% FOREACH module IN modules.module_names -%]
+| [[% module %]]([% modules.module_index.$module.readme %]) | [[% modules.module_index.$module.short_path %]]([%  modules.module_index.$module.path %]) | [% modules.module_index.$module.description %] |
+[% END -%]
+

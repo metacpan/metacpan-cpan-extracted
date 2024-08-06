@@ -1,0 +1,60 @@
+{
+   "abstract" : "Create a RSS feed from Markdown files",
+   "author" : [
+      "Alex Schroeder"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "agpl_3"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "App-BookmarkFeed",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.52"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "CommonMark" : "0",
+            "DateTime" : "0",
+            "DateTime::Format::ISO8601" : "0",
+            "File::Slurper" : "0",
+            "Mojo::SQLite" : "0",
+            "Mojolicious" : "0",
+            "perl" : "5.036000"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "XML::RSS" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "url" : "https://src.alexschroeder.ch/bookmark-feed.git",
+         "web" : "https://src.alexschroeder.ch/bookmark-feed.git"
+      }
+   },
+   "version" : 1,
+   "x_serialization_backend" : "JSON::PP version 4.16"
+}

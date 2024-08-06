@@ -1,0 +1,145 @@
+#!/usr/bin/perl
+# Copyright (C) 2024  Alex Schroeder <alex@gnu.org>
+#
+# This program is free software: you can redistribute it and/or modify it under
+# the terms of the GNU Affero General Public License as published by the Free
+# Software Foundation, either version 3 of the License, or (at your option) any
+# later version.
+#
+# This program is distributed in the hope that it will be useful, but WITHOUT
+# ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+# FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+# details.
+#
+# You should have received a copy of the GNU Affero General Public License along
+# with this program. If not, see <http://www.gnu.org/licenses/>.
+
+=encoding utf8
+
+=head1 NAME
+
+bookmark-feed - generate a feed from Markdown files
+
+=head1 SYNOPSIS
+
+B<bookmark-feed> I<markdown-files...> I<feed-file>
+
+=head1 DESCRIPTION
+
+The bookmark-feed turns external links in a bunch of Markdown pages into a RSS
+feed.
+
+The arguments are all file names. All but the last file are existing Markdown
+files to be checked for new links. The last file is the resulting feed file. It
+is overwritten.
+
+If you keep bookmarks in Markdown files, they might be big or small. A simple
+setup might just be a list of links:
+
+    * [Alex Schroeder](https://alexschroeder.ch/)
+    * [Emacs Wiki](https://www.emacswiki.org/)
+
+Or your might be using quotes, like this:
+
+    > Seventy eight percent of Americans—including 66% of Republicans—are
+    > concerned about climate change, a number that has increased dramatically
+    > in the last 3 years. … The lack of public discussion reinforces the norm
+    > that others are not concerned and hampers the likelihood of collective
+    > organization to address climate change. Misconceptions take on an even
+    > larger significance when we remember that those in positions of power are
+    > people too. – [To create serious movement on climate change, we must
+    > dispel the myth of
+    > indifference](https://www.nature.com/articles/s41467-022-32413-x) (2022),
+    > by Cynthia McPherson Frantz, in Nature Communications
+
+When parsing Markdown files, each link with a schema of I<http>, I<https>,
+I<gemini> or I<gopher> is an "item". Each item has a link, a link text, and a
+description. The description is the paragraph, block quote or list item that
+contains the link.
+
+Note that only a single paragraph or list item is used. In the following
+example, the paragraph break means that the first sentence is not used.
+
+    > This is a paragraph.
+    >
+    > This is another paragraph. – [Link](https://example.org/)
+
+Links in a paragraph that ends in a colon are ignored. The goal is to ignore the
+first paragraph in the following example:
+
+    The [foo](http://example.org/) said:
+
+    > It's terrible. – [bar](http://example.com/)
+
+This means that the following would produce no item because the paragraph with
+the link ends in a colon and the paragraph with the quote contains no link:
+
+    The [foo](http://example.org/) said:
+
+    > It's terrible.
+
+The following would also produce no item since the paragraph with the link ends
+in a colon and the list items contain no link.
+
+    The [foo](http://example.org/) said:
+
+    - something
+    - another thing
+
+=head1 NOTES
+
+The bookmarks have no timestamps: There is no date on which a particular link
+was added to the Markdown file. This is where the database comes in. Every time
+the program runs, new links are added to the database with the last-modified
+date of the file the link was found in. Therefore, if a file has multiple new
+links between two runs, the new links all share the same timestamp.
+
+This also means that a subsequent run with fewer Markdown files doesn't
+necessarily remove items from the feed. The items in the Markdown files are
+added to the database and the feed is produced from the database. The old items
+from Markdown files that are no longer supplied or items that were deleted from
+the Markdown files remain in the database. If you need to remove items, you must
+remove them from the database directly.
+
+=head1 FILES
+
+The name of the SQLite database file is computed by removing the suffix C<.rss>
+from the feed file and appending the suffix C<.db>. It contains a single table
+called C<items> with columns C<date>, C<url>, C<title> and C<description>.
+
+Open the file:
+
+    sqlite3 bookmarks.db
+
+Select the items created in the last 24h:
+
+    select * from items where date >= date('now', '-1 day');
+
+Delete the item containing the phrase "The whole AI thing":
+
+    delete from items where description like '%The whole AI thing%';
+
+Delete items older than 60 days:
+
+    delete from items where date < date('now', '-60 day');
+
+=head1 EXAMPLES
+
+This adds new links to a feed called F<bookmarks.rss>:
+
+    bookmark-feed *-bookmarks.md *_Bookmarks.md bookmarks.rss
+
+The name of the database file for all the seen links is derived from the feed
+filename: F<bookmarks.db>.
+
+=head1 REFERENCES
+
+RSS 2.0 Specification, U<https://cyber.harvard.edu/rss/rss.html>
+
+L<App::BookmarkFeed>
+
+=cut
+
+use App::BookmarkFeed;
+
+App::BookmarkFeed::main(@ARGV);

@@ -1,0 +1,377 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+
+# SCANDEPS=scandeps-static.pl --no-core --no-include-require
+
+use Autoconf::Template::Constants qw(:all);
+use Autoconf::Template::Utils qw(:all);
+use Carp;
+use Data::Dumper;
+use English qw(-no_match_vars);
+use File::Find;
+use File::Basename qw(basename);
+use Getopt::Long;
+use JSON;
+use List::Util qw(pairs any);
+use Log::Log4perl qw(:easy);
+use Module::ScanDeps::Static;
+use Scalar::Util qw(reftype);
+
+our $VERSION = '2.1.0'; ## no critic (RequireInterpolation)
+
+########################################################################
+sub get_required_modules {
+########################################################################
+  my ( $options, $path, $type ) = @_;
+
+  my $logger = Log::Log4perl->get_logger;
+
+  my @files = find_files( $path, $type );
+
+  $logger->debug( sprintf "scanning %d files:\n%s",
+    scalar(@files), join "\n", @files );
+
+  my @dependencies;
+  my @names;
+
+  foreach my $file (@files) {
+
+    $logger->info( sprintf 'dependency scan for %s:', $file );
+
+    my $scanner
+      = Module::ScanDeps::Static->new( { core => 0, path => $file } );
+
+    $scanner->parse;
+
+    my @required;
+
+    for my $r ( $scanner->get_dependencies() ) {
+
+      next if any { $r->{name} eq $_ } map { $_->{name} } @dependencies;
+      $r->{version} ||= $EMPTY;
+
+      push @dependencies, $r;
+    }
+  }
+
+  return [ map { { path => $path, %{$_} } } @dependencies ];
+}
+
+########################################################################
+sub create_ax_requirements_check {
+########################################################################
+  my ( $required, $options ) = @_;
+
+  my $template = <<'END_OF_TEMPLATE';
+AC_DEFUN([AX_REQUIREMENTS_CHECK],[
+[% FOREACH module IN required %]
+  ads_PERL_MODULE([[% module.name %]], [], [[% module.version %]])[% END %]
+])
+END_OF_TEMPLATE
+  my $output;
+
+  if ( @{$required} ) {
+    $output = render_tt_template(
+      { template   => \$template,
+        parameters =>
+          { required => [ sort { $a->{name} cmp $b->{name} } @{$required} ] },
+        outfile => $options->{outfile}
+      }
+    );
+  }
+
+  return $output;
+}
+
+########################################################################
+sub get_provided_modules {
+########################################################################
+  my ($path) = @_;
+
+  my @provided;
+
+  $path //= 'src/main/perl';
+
+  find(
+    sub {
+      return if $File::Find::name !~ /[.]p[ml][.]in$/xsm;
+      push @provided, $File::Find::name;
+    },
+    $path
+  );
+
+  return @provided;
+}
+
+########################################################################
+sub remove_provided_modules {
+########################################################################
+  my ( $dependencies, $path ) = @_;
+
+  my @required;
+
+  for my $dependency ( @{$dependencies} ) {
+
+    my $module = $dependency->{name};
+    next if $module eq 'perl';
+
+    my $module_path = $module;
+    $module_path =~ s/::/\//xsmg;
+    $module_path = sprintf '%s/src/main/perl/lib/%s.pm.in', $path,
+      $module_path;
+
+    TRACE Dumper( [ 'testing ', $dependency, $module, $module_path, $path ] );
+
+    next if -e $module_path;
+
+    push @required, $dependency;
+  }
+
+  return \@required;
+}
+
+########################################################################
+sub find_dependencies {
+########################################################################
+  my ( $options, $root ) = @_;
+
+  my $dependencies = [];
+
+  for my $p ( pairs qw(cgi-bin pl bin pl lib pm) ) {
+    my $path = sprintf '%s/src/main/perl/%s', $root, $p->[0];
+    next if !-d $path;
+
+    DEBUG 'looking for dependencies for files in ' . $path;
+
+    my @modules = @{ get_required_modules( $options, $path, $p->[1] ) };
+    push @{$dependencies}, @modules;
+  }
+
+  return $dependencies;
+}
+
+########################################################################
+sub help {
+########################################################################
+  my $name = basename $PROGRAM_NAME;
+
+  return print <<"END_OF_HELP";
+usage: $name options
+
+Finds Perl module dependencies for the scripts and modules in your 
+project directories
+
+- use the --format m4 option to create or replace the m4 macro that
+  checks for your Perl module dependencies
+- use the --format json option to create a JSON formatted requirements file
+- use the --format text option to create a simple listing of requirements
+
+Options
+-------
+-h, --help                help
+-a, --add-version-numbers default: true
+-f, --format              format of output (default: m4)
+-i, --infile              either a .json or .txt requirements file (*)
+-l, --log-level           logging level, (default: info)
+-o, --outfile             name of the output file
+-q, --quiet               do not report progress
+-r, --root-dir            root directory of project
+-u, --update              update requires files
+-v, --version             report script version
+
+* - .txt requirements files should be of the form:
+
+    module version
+   
+  - .json requirements files should be an array of hashes containg th
+    name and version of the module
+
+    { "name" : "Module::Name", "version" : "0.01" }
+
+
+This utility is part of the `autoconf-template-perl` toolchain.
+See `perldoc Autoconf::Template` for more of the gory details.
+
+$COPYRIGHT
+END_OF_HELP
+}
+
+########################################################################
+sub main {
+########################################################################
+  my %options;
+  my @options_specs = qw(
+    help
+    add-version-numbers!
+    format=s
+    root-dir=s
+    outfile=s
+    version
+    infile=s
+    log-level=s
+    update
+    quiet
+  );
+
+  GetOptions( \%options, @options_specs );
+
+  return help()
+    if $options{help};
+
+  return version($VERSION)
+    if $options{version};
+
+  my $outfile = $options{'outfile'};
+  my $infile  = $options{'infile'};
+
+  $options{'add-version-numbers'} //= $TRUE;
+
+  my %actions = (
+    m4 => sub {
+      my $output = create_ax_requirements_check(@_);
+      return $outfile ? $EMPTY : $output;
+    },
+    json => sub {
+      my ($required) = @_;
+      my %output;
+
+      for ( @{$required} ) {
+        $output{ $_->{name} } = $_->{version};
+      }
+
+      return JSON->new->pretty->encode( \%output );
+    },
+    text => sub {
+      my ($required) = @_;
+
+      return join "\n",
+        map { sprintf '%s %s', $_->{name}, $_->{version} || '0' }
+        sort { $a->{name} cmp $b->{name} } @{$required};
+    },
+    dmp => sub {
+      my ($required) = @_;
+
+      local $Data::Dumper::Terse  = $FALSE;
+      local $Data::Dumper::Purity = $TRUE;
+
+      return Dumper($required);
+    },
+  );
+
+  my $format = lc( $options{format} //= 'm4' );
+
+  croak "unknown format $format"
+    if !$actions{$format};
+
+  init_logger( $options{'log-level'} );
+
+  my $required;
+
+  my $root = $options{'root-dir'};
+
+  if ( !$root ) {
+    my ( $project, $dir ) = find_root_dir( \%options );
+    $root = "$dir/$project";
+  }
+
+  if ( !$infile ) {
+
+    croak "this doesn't look much like a project directory\n"
+      if !-d "$root/src/main/perl/lib";
+
+    my $dependencies = find_dependencies( \%options, $root );
+
+    DEBUG Dumper($dependencies);
+
+    $required = remove_provided_modules( $dependencies, $root );
+  }
+  else {
+
+    if ( $infile =~ /[.]json$/xsm ) {
+      $required = slurp_file( $infile, type => 'json' );
+
+      if ( ref $required && reftype($required) eq 'HASH' ) {
+        $required = [
+          map { { name => $_, version => $required->{$_} } }
+            keys %{$required}
+        ];
+      }
+    }
+    else {
+      my $modules = slurp_file($infile);
+
+      $required = [];
+
+      foreach ( split /\n/xsm, $modules ) {
+        my ( $name, $version ) = split /\s+/xsm, $_;
+        push @{$required}, { name => $name, version => $version };
+      }
+    }
+  }
+
+  DEBUG Dumper($required);
+
+  if ( !$options{'add-version-numbers'} ) {
+    for ( @{$required} ) {
+      $_->{version} = $EMPTY;
+    }
+  }
+
+  if ( $options{update} ) {
+
+    my @output_files = (
+      m4   => 'autotools/ax_requirements_check.m4',
+      text => 'requires.txt',
+      json => 'requires.json',
+    );
+
+    for my $p ( pairs @output_files ) {
+      my ( $format, $outfile ) = @{$p};
+      my $output = $actions{$format}->( $required, \%options );
+
+      write_output_file( $output, "$root/$outfile" );
+    }
+  }
+  else {
+    my $output = $actions{$format}->( $required, \%options );
+
+    write_output_file( $output, $outfile );
+  }
+
+  return;
+}
+
+########################################################################
+sub write_output_file {
+########################################################################
+  my ( $output, $outfile ) = @_;
+
+  return
+    if !$output;
+
+  if ($outfile) {
+
+    DEBUG 'creating ' . $outfile . ' with ' . $output;
+
+    open my $fh, '>', $outfile
+      or croak "could not open $outfile for writing\n";
+
+    print {$fh} $output;
+
+    close $fh;
+
+  }
+  else {
+    print {*STDOUT} $output;
+  }
+
+  return;
+}
+
+main();
+
+1;
+
+__END__

@@ -1,3 +1,8 @@
+0.033   2024-08-05  Released-By: PERLANCAR; Urgency: medium
+
+        - Add script: parse-idn-vehicle-plate-number.
+
+
 0.032   2023-10-03  Released-By: PERLANCAR; Urgency: low
 
         - No functional changes.

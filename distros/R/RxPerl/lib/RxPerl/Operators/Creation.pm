@@ -23,7 +23,7 @@ our @EXPORT_OK = qw/
 /;
 our %EXPORT_TAGS = (all => \@EXPORT_OK);
 
-our $VERSION = "v6.29.3";
+our $VERSION = "v6.29.4";
 
 sub rx_observable;
 
@@ -599,12 +599,13 @@ sub rx_timer {
         my $counter = 0;
         my $timer_int;
         my $timer = $timer_sub->($after, sub {
-            $subscriber->{next}->($counter++) if defined $subscriber->{next};
             if (defined $period) {
                 $timer_int = $interval_sub->($period, sub {
                     $subscriber->{next}->($counter++) if defined $subscriber->{next};
                 });
+                $subscriber->{next}->($counter++) if defined $subscriber->{next};
             } else {
+                $subscriber->{next}->($counter++) if defined $subscriber->{next};
                 $subscriber->{complete}->() if defined $subscriber->{complete};
             }
         });

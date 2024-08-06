@@ -1,5 +1,8 @@
 Revision history for ExtUtils-Builder-Compiler
 
+0.019     2024-08-05 21:04:22+02:00 Europe/Brussels
+          - Revert critical breakage in try_compile_run
+
 0.018     2024-08-05 16:00:45+02:00 Europe/Brussels
           - Add try_find_library_dirs_for
           - Fix find_libs_for to pass library correctly

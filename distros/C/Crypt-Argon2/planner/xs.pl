@@ -27,7 +27,7 @@ sub add_source {
 
 sub try_optimized {
 	my ($name, $flag, $code) = @_;
-	my $can_build = try_compile_run(source => $code, define => "HAVE_\U$name", extra_compiler_flags => [ $flag ], run => 0);
+	my $can_build = try_compile_run(source => $code, define => "HAVE_\U$name", extra_compiler_flags => [ $flag ]);
 	add_source($name, 'opt', $flag) if $can_build;
 }
 
@@ -37,28 +37,31 @@ my $has_sse3 = try_optimized('sse3', '-msse3', <<'EOF');
 #include <immintrin.h>
 int main () {
     __m128i input, output;
-	output = _mm_loadu_si128(&input);
+	if (__builtin_cpu_supports("sse3"))
+		output = _mm_loadu_si128(&input);
 }
 EOF
 
 if ($has_sse3) {
 	try_optimized('avx2', '-march=haswell', <<'EOF');
 #include <immintrin.h>
-	int main () {
-		__m256i input, output;
+int main () {
+	__m256i input, output;
+	if (__builtin_cpu_supports("avx2"))
 		output = _mm256_loadu_si256(&input);
-	}
+}
 EOF
 
 	try_optimized('avx512', '-march=skylake-avx512', <<'EOF');
 #include <immintrin.h>
-	int main () {
-		__m512i input, output;
+int main () {
+	__m512i input, output;
+	if (__builtin_cpu_supports("avx512f"))
 		output = _mm512_loadu_si512(&input);
-	}
+}
 EOF
 
-	try_compile_run(source => <<'EOF', define => 'HAVE_IFUNC', run => 1);
+	try_compile_run(source => <<'EOF', define => 'HAVE_IFUNC');
 #include <stddef.h>
 
 void fill_segment_sse3(const int *instance, size_t position) {
@@ -74,13 +77,12 @@ static void (*resolve_fill_segment(void))(const int *instance, size_t position) 
 	return fill_segment_ref;
 }
 
-void fill_segment(const int *instance, size_t position)
-     __attribute__ ((ifunc ("resolve_fill_segment")));
+void fill_segment(const int *instance, size_t position) __attribute__ ((ifunc ("resolve_fill_segment")));
 
-	int main() {
-		fill_segment(NULL, 0);
-		return 0;
-	}
+int main() {
+	fill_segment(NULL, 0);
+	return 0;
+}
 EOF
 }
 

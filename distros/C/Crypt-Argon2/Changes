@@ -1,5 +1,8 @@
 Revision history for Crypt-Argon2
 
+0.029     2024-08-05 23:18:21+02:00 Europe/Brussels
+          - Add runtime CPU checks to compile time checks
+
 0.028     2024-08-05 10:57:59+02:00 Europe/Brussels
           - Call switched function in ifunc check
 
