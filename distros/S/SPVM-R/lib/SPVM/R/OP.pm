@@ -35,11 +35,15 @@ C<static method equals_dropped_dim : int ($x_ndarray : L<R::NDArray|SPVM::R::NDA
 
 =head2 rep
 
-C<static method rep : R::NDArray ($x_ndarray : L<R::NDArray|SPVM::R::NDArray>, $times : int);>
+C<static method rep : L<R::NDArray|SPVM::R::NDArray> ($x_ndarray : L<R::NDArray|SPVM::R::NDArray>, $times : int);>
 
 =head2 rep_length
 
-C<static method rep_length : R::NDArray ($x_ndarray : L<R::NDArray|SPVM::R::NDArray>, $length : int);>
+C<static method rep_length : L<R::NDArray|SPVM::R::NDArray> ($x_ndarray : L<R::NDArray|SPVM::R::NDArray>, $length : int);>
+
+=head2 is_na
+
+C<static method is_na : L<R::NDArray::Int|SPVM::R::NDArray::Int> ($x_ndarray : L<R::NDArray|SPVM::R::NDArray>);>
 
 =head1 Related Modules
 

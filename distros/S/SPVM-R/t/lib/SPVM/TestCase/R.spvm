@@ -34,6 +34,12 @@ class TestCase::R {
   use R::OP::DataFrame;
   use R::OP::Matrix::Double as MDOP;
   use R::OP::AnyObject;
+  use R::OP::DataFrame as DFOP;
+  use Math;
+  
+  static method extra : int () {
+    return 1;
+  }
   
   static method extra_old : int () {
     

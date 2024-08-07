@@ -84,6 +84,16 @@ class R::NDArray::StringBuffer extends R::NDArray {
     return $cmp;
   }
   
+  method elem_is_na : int ($data : StringBuffer[], $data_index : int) {
+    
+    my $elem_is_na = 0;
+    if (!$data->[$data_index]) {
+      $elem_is_na = 1;
+    }
+    
+    return $elem_is_na;
+  }
+  
   method clone : R::NDArray::StringBuffer ($shallow : int = 0) {
     return (R::NDArray::StringBuffer)$self->SUPER::clone($shallow);
   }

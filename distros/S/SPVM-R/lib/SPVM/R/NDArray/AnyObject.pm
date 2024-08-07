@@ -62,7 +62,15 @@ Assigns the element $src_data at index $src_data_index to the element $dist_data
 
 C<method elem_clone : void ($dist_data : object[], $dist_data_index : int, $src_data : object[], $src_data_index : int);>
 
-Copies the element $src_data at index $src_data_indext to the element $dist_data at index $dist_data_index.
+Copies the element $src_data at index $src_data_index to the element $dist_data at index $dist_data_index.
+
+=head2 elem_is_na
+
+C<method elem_is_na : int ($data : object[], $data_index : int);>
+
+Checks if an element represets NA.
+
+If the element $data at index $data_index is not defined, returns 1, otherwise returns 0.
 
 =head2 clone
 

@@ -93358,3 +93358,11 @@ L/LE/LEONT/Crypt-Argon2-0.029.tar.gz
 L/LE/LEONT/ExtUtils-Builder-Compiler-0.019.tar.gz
 H/HI/HIREPLAN/Perlsac-rwsac-0.03.tar.gz
 K/KA/KARJALA/RxPerl-v6.29.4.tar.gz
+P/PE/PERLANCAR/Business-ID-VehiclePlate-0.001.tar.gz
+T/TR/TRIZEN/Compression-Util-0.10.tar.gz
+P/PE/PEVANS/Scalar-List-Utils-1.65.tar.gz
+M/MR/MRUEDA/Pheno-Ranker-0.10.tar.gz
+K/KA/KARJALA/RxPerl-Extras-v0.0.3.tar.gz
+K/KI/KIMOTO/SPVM-R-0.020.tar.gz
+D/DA/DANBERR/Sys-Virt-v10.6.0.tar.gz
+E/EX/EXODIST/Term-Table-0.022.tar.gz

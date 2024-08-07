@@ -57,6 +57,13 @@ class R::NDArray::Long extends R::NDArray {
     return $cmp;
   }
   
+  method elem_is_na : int ($data : long[], $data_index : int) {
+    
+    my $elem_is_na = 0;
+    
+    return $elem_is_na;
+  }
+  
   method clone : R::NDArray::Long ($shallow : int = 0) {
     return (R::NDArray::Long)$self->SUPER::clone($shallow);
   }

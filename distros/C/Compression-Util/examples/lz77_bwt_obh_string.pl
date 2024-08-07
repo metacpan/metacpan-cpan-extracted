@@ -22,7 +22,7 @@ foreach my $file (__FILE__, $^X) {
 
     # Compression
     my $enc = do {
-        my ($uncompressed, $lengths, $matches, $distances) = lz77_encode($str);
+        my ($uncompressed, $distances, $lengths, $matches) = lz77_encode($str);
         bwt_compress(symbols2string($uncompressed))
           . fibonacci_encode($lengths)
           . create_huffman_entry($matches)
@@ -36,7 +36,7 @@ foreach my $file (__FILE__, $^X) {
         my $lengths      = fibonacci_decode($fh);
         my $matches      = decode_huffman_entry($fh);
         my $distances    = obh_decode($fh, \&mrl_decompress_symbolic);
-        lz77_decode($uncompressed, $lengths, $matches, $distances);
+        lz77_decode($uncompressed, $distances, $lengths, $matches);
     };
 
     say "Original size  : ", length($str);

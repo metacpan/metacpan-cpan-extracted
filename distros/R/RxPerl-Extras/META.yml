@@ -1,0 +1,42 @@
+---
+abstract: 'original extra operators for RxPerl'
+author:
+  - 'Alexander Karelas <karjala@cpan.org>'
+build_requires:
+  Mojo::IOLoop: '0'
+  Mojo::Promise: '0'
+  Test2::V0: '0'
+configure_requires:
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v3.1.23, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: RxPerl-Extras
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  RxPerl::Extras:
+    file: lib/RxPerl/Extras.pm
+    version: v0.0.3
+requires:
+  RxPerl: '0'
+  perl: '5.010'
+resources:
+  bugtracker: https://gitlab.com/karjala/rxperl-extras/issues
+  homepage: https://gitlab.com/karjala/rxperl-extras
+  repository: https://gitlab.com/karjala/rxperl-extras.git
+version: v0.0.3
+x_authority: cpan:KARJALA
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+x_static_install: 1

@@ -27,7 +27,7 @@ exit;
 
 sub process_csv {
 
-    my $VERSION   = '0.08';
+    my $VERSION   = '0.09';
     my $array_sep = '\|';
 
     # Reading arguments
@@ -223,104 +223,104 @@ sub read_csv {
     say "Reading <$input> completed!" if $self->{verbose};
 
     ###################
-    # END READING CSV #
-    ###################
+  # END READING CSV #
+  ###################
 
-    # Load array/non-array
-    my @array = keys %array;
+  # Load array/non-array
+  my @array = keys %array;
 
-    # Filter the original array to exclude elements found in the @array
-    my @non_array = grep { !$array{$_} } @$headers;
+  # Filter the original array to exclude elements found in the @array
+  my @non_array = grep { !$array{$_} } @$headers;
 
-    # Re-arrange array variables
-    split_array_fields( \@rows, \@array, $array_sep );
+  # Re-arrange array variables
+  split_array_fields( \@rows, \@array, $array_sep );
 
-    return ( \@rows, \@array, \@non_array );
+  return ( \@rows, \@array, \@non_array );
 }
 
 sub split_array_fields {
 
-    my ( $rows, $array, $array_sep ) = @_;
+  my ( $rows, $array, $array_sep ) = @_;
 
-    # Split array fields (comma-separated values) into an array_ref
-    # Modify the original data structure directly
-    for my $row (@$rows) {
-        for my $key (@$array) {
-            $row->{$key} = [ split /$array_sep/, $row->{$key} ];
-        }
-    }
-    return 1;
+  # Split array fields (comma-separated values) into an array_ref
+  # Modify the original data structure directly
+  for my $row (@$rows) {
+      for my $key (@$array) {
+          $row->{$key} = [ split /$array_sep/, $row->{$key} ];
+      }
+  }
+  return 1;
 }
 
 sub create_config {
 
-    my ( $self, $array, $non_array ) = @_;
-    my $primary_key_name = $self->{primary_key_name};
+  my ( $self, $array, $non_array ) = @_;
+  my $primary_key_name = $self->{primary_key_name};
 
-    my @arrays     = sort @$array;
-    my @non_arrays = sort @$non_array;
+  my @arrays     = sort @$array;
+  my @non_arrays = sort @$non_array;
 
-    # Convert arrays to hashes for quick look up
-    my %arrays_hash     = map { $_ => 1 } @arrays;
-    my %non_arrays_hash = map { $_ => 1 } @non_arrays;
+  # Convert arrays to hashes for quick look up
+  my %arrays_hash     = map { $_ => 1 } @arrays;
+  my %non_arrays_hash = map { $_ => 1 } @non_arrays;
 
-    # Set primary key
-    if ( defined $primary_key_name ) {
-        die "Primary-key <$primary_key_name> not found\n"
-          unless ( exists $arrays_hash{$primary_key_name}
-            || exists $non_arrays_hash{$primary_key_name} );
-    }
+  # Set primary key
+  if ( defined $primary_key_name ) {
+      die "Primary-key <$primary_key_name> not found\n"
+        unless ( exists $arrays_hash{$primary_key_name}
+          || exists $non_arrays_hash{$primary_key_name} );
+  }
 
-    else {
-        $primary_key_name = exists $non_arrays_hash{id} ? 'id' : $non_arrays[0];
-    }
+  else {
+      $primary_key_name = exists $non_arrays_hash{id} ? 'id' : $non_arrays[0];
+  }
 
-    # Default for non-arrays
-    my $config = {
-        format        => 'CSV',
-        primary_key   => $primary_key_name,
-        allowed_terms => [@non_arrays]
-    };
+  # Default for non-arrays
+  my $config = {
+      format        => 'CSV',
+      primary_key   => $primary_key_name,
+      allowed_terms => [@non_arrays]
+  };
 
-    # Update for arrays
-    if ( scalar @arrays ) {
+  # Update for arrays
+  if ( scalar @arrays ) {
 
-        # NB: Can't use $array more than once in the hash ref below. Need to deref
-        $config->{array_terms} = [@arrays];
+      # NB: Can't use $array more than once in the hash ref below. Need to deref
+      $config->{array_terms} = [@arrays];
 
-        # @non_arrays, @arrays are sorted, but if we merge them we need to re-sort
-        $config->{allowed_terms}     = [ sort @non_arrays, @arrays ];
-        $config->{id_correspondence} = {
-            CSV => [
-                map {
-                    my $val = { $_ => $_ };
-                    $val
-                } @arrays
-            ]
-        };
+      # @non_arrays, @arrays are sorted, but if we merge them we need to re-sort
+      $config->{allowed_terms}     = [ sort @non_arrays, @arrays ];
+      $config->{id_correspondence} = {
+          CSV => [
+              map {
+                  my $val = { $_ => $_ };
+                  $val
+              } @arrays
+          ]
+      };
 
-    }
-    return $config;
+  }
+  return $config;
 }
 
 sub define_separator {
 
-    my ( $filepath, $sep ) = @_;
+  my ( $filepath, $sep ) = @_;
 
-    # Define split record separator from file extension
-    my @exts = qw(.csv .tsv);
-    my ( $undef, undef, $ext ) = fileparse( $filepath, @exts );
+  # Define split record separator from file extension
+  my @exts = qw(.csv .tsv);
+  my ( $undef, undef, $ext ) = fileparse( $filepath, @exts );
 
-    # Defining separator character
-    my $separator =
-        defined($sep)  ? $sep
-      : $ext eq '.csv' ? ','
-      :                          # Use comma for csv files
-      $ext eq '.tsv' ? "\t" :    # Use tab for tsv files
-      ',';                       # Default to comma if no extension match or $sep is undefined
+  # Defining separator character
+  my $separator =
+      defined($sep)  ? $sep
+    : $ext eq '.csv' ? ','
+    :                          # Use comma for csv files
+    $ext eq '.tsv' ? "\t" :    # Use tab for tsv files
+    ',';                       # Default to comma if no extension match or $sep is undefined
 
-    # Return separator
-    return $separator;
+  # Return separator
+  return $separator;
 }
 
 1;
@@ -331,25 +331,24 @@ csv2pheno-ranker: A script to convert a CSV to an input suitable for Pheno-Ranke
 
 =head1 SYNOPSIS
 
-csv2pheno-ranker -i <input.csv> [-options]
+ csv2pheno-ranker -i <input.csv> [-options]
 
-     Arguments:
-       -i, --input <input.csv>        CSV file
+   Arguments:
+     -i, --input <input.csv>          CSV file
 
-     Options:
-       -generate-primary-key          Generates a primary key if absent. Use --primary-key-name to set its name
-       -primary-key-name <name>       Sets the name for the primary key. Must be a single, non-array field
-       -sep, --separator <char>       Delimiter for CSV fields [;] (e.g., --sep $'\t' for tabs)
-       -array-separator <char>        Delimiter for nested arrays [|] (e.g., --array-separator ';' for semicolons)
-       -output-dir <directory>        Specify the directory where output files will be stored. If not specified, outputs will be placed in the same directory as the input file
+   Options:
+     -generate-primary-key            Generates a primary key if absent. Use --primary-key-name to set its name
+     -primary-key-name <name>         Sets the name for the primary key. Must be a single, non-array field
+     -sep, --separator <char>         Delimiter for CSV fields [;] (e.g., --sep $'\t' for tabs)
+     -array-separator <char>          Delimiter for nested arrays [|] (e.g., --array-separator ';' for semicolons)
+     -output-dir <directory>          Specify the directory where output files will be stored. If not specified, outputs will be placed in the same directory as the input file
 
-     Generic Options:
-       -debug <level>                 Print debugging (from 1 to 5, being 5 max)
-       -h, --help                     Brief help message
-       -man                           Full documentation
-       -v, --verbose                  Verbosity on
-       -V, --version                  Print version
-
+   Generic Options:
+     -debug <level>                   Print debugging (from 1 to 5, being 5 max)
+     -h, --help                       Brief help message
+     -man                             Full documentation
+     -v, --verbose                    Verbosity on
+     -V, --version                    Print version
 
 =head1 DESCRIPTION
 

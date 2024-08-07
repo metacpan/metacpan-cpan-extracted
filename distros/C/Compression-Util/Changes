@@ -1,5 +1,21 @@
 Revision history for Compression-Util
 
+0.10    2024-08-07
+
+        [ADDITIONS]
+
+        - Added the `mrl_compress()` and `mrl_decompress()` functions, for compressing/decompressing strings.
+        - Added the `bytes2int()` and `bytes2int_lsb()` functions.
+
+        [CHANGES]
+
+        - Changed the order of values returned by `lz77_encode()`.
+        - Changed the order of arguments accepted by `lz77_decode()`.
+
+        [FIXES]
+
+        - Fixed an issue in `lzb_decompress($fh)`, when there is more data after the LZB block.
+
 0.09    2024-06-26
 
         - Generalized `make_deflate_tables()` to generate tables for arbitrarily large distances and match lengths.

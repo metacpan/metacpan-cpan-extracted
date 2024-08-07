@@ -1,0 +1,15 @@
+Revision history for Perl extension RxPerl-Extras
+
+v0.0.3 2024-08-06T14:08:18Z
+
+    - fixed mistakes in the examples of the documentation
+
+v0.0.2 2024-08-06T13:38:58Z
+
+    - added op_exhaust_all_with_latest, op_throttle_time_with_both_leading_and_trailing and
+        op_throttle_with_both_leading_and_trailing
+    - update DESCRIPTION section in documentation
+
+v0.0.1 2024-08-06T10:17:38Z
+
+    - original version with one exportable function

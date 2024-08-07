@@ -295,6 +295,18 @@ C<method elem_clone : void ($dist_data : object, $dist_data_index : int, $src_da
 
 C<method elem_cmp : int ($data : object, $a_data_index : int, $b_data_index : int);>
 
+=head2 elem_is_na
+
+C<method elem_is_na : int ($data : object, $data_index : int);>
+
+Checks if an element represets NA.
+
+This method will be implemented in a child class.
+
+Exceptions:
+
+This method is not implemented.
+
 =head2 to_string_ndarray
 
 C<method to_string_ndarray : L<R::NDArray::String|SPVM::R::NDArray::String> ();>

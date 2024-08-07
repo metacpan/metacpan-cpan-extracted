@@ -28,7 +28,7 @@ sub matrix2graph {
     my $graph_stats = $arg->{graph_stats};
 
     # Open the matrix file to read
-    open( my $matrix_fh, '<', $input );
+    open( my $matrix_fh, '<:encoding(UTF-8)', $input );
 
     # Read the first line to get node IDs (headers)
     my $header_line = <$matrix_fh>;
@@ -113,22 +113,22 @@ sub cytoscape2graph {
     my $verbose   = $arg->{verbose};
     my $jaccard   = $metric eq 'jaccard' ? 1 : 0;
 
-    my @nodes = @{ $json_data->{elements}->{nodes} };
-    my @edges = @{ $json_data->{elements}->{edges} };
+    my @nodes = @{ $json_data->{elements}{nodes} };
+    my @edges = @{ $json_data->{elements}{edges} };
 
     # Create a new Graph object
     my $graph = Graph->new( undirected => 1 );
 
     # Add nodes and edges to the graph
     foreach my $node (@nodes) {
-        $graph->add_vertex( $node->{data}->{id} );
+        $graph->add_vertex( $node->{data}{id} );
     }
 
     foreach my $edge (@edges) {
         $graph->add_weighted_edge(
-            $edge->{data}->{source},
-            $edge->{data}->{target},
-            $jaccard ? 1 - $edge->{data}->{weight} : $edge->{data}->{weight}
+            $edge->{data}{source},
+            $edge->{data}{target},
+            $jaccard ? 1 - $edge->{data}{weight} : $edge->{data}{weight}
         );
     }
 
@@ -143,7 +143,7 @@ sub graph_stats {
 
     # Open the output file
     say "Writting <$output> file " if $verbose;
-    open( my $fh, '>', $output );
+    open( my $fh, '>:encoding(UTF-8)', $output );
 
     # Basic stats
     print $fh "Metric: ",             ucfirst($metric), "\n";

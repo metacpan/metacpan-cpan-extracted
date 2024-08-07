@@ -4,24 +4,24 @@ csv2pheno-ranker: A script to convert a CSV to an input suitable for Pheno-Ranke
 
 # SYNOPSIS
 
-csv2pheno-ranker -i &lt;input.csv> \[-options\]
+    csv2pheno-ranker -i <input.csv> [-options]
 
-     Arguments:
-       -i, --input <input.csv>        CSV file
+      Arguments:
+        -i, --input <input.csv>          CSV file
 
-     Options:
-       -generate-primary-key          Generates a primary key if absent. Use --primary-key-name to set its name
-       -primary-key-name <name>       Sets the name for the primary key. Must be a single, non-array field
-       -sep, --separator <char>       Delimiter for CSV fields [;] (e.g., --sep $'\t' for tabs)
-       -array-separator <char>        Delimiter for nested arrays [|] (e.g., --array-separator ';' for semicolons)
-       -output-dir <directory>        Specify the directory where output files will be stored. If not specified, outputs will be placed in the same directory as the input file
+      Options:
+        -generate-primary-key            Generates a primary key if absent. Use --primary-key-name to set its name
+        -primary-key-name <name>         Sets the name for the primary key. Must be a single, non-array field
+        -sep, --separator <char>         Delimiter for CSV fields [;] (e.g., --sep $'\t' for tabs)
+        -array-separator <char>          Delimiter for nested arrays [|] (e.g., --array-separator ';' for semicolons)
+        -output-dir <directory>          Specify the directory where output files will be stored. If not specified, outputs will be placed in the same directory as the input file
 
-     Generic Options:
-       -debug <level>                 Print debugging (from 1 to 5, being 5 max)
-       -h, --help                     Brief help message
-       -man                           Full documentation
-       -v, --verbose                  Verbosity on
-       -V, --version                  Print version
+      Generic Options:
+        -debug <level>                   Print debugging (from 1 to 5, being 5 max)
+        -h, --help                       Brief help message
+        -man                             Full documentation
+        -v, --verbose                    Verbosity on
+        -V, --version                    Print version
 
 # DESCRIPTION
 

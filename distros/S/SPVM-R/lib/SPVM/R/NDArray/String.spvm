@@ -75,6 +75,16 @@ class R::NDArray::String extends R::NDArray {
     return $cmp;
   }
   
+  method elem_is_na : int ($data : string[], $data_index : int) {
+    
+    my $elem_is_na = 0;
+    if (!$data->[$data_index]) {
+      $elem_is_na = 1;
+    }
+    
+    return $elem_is_na;
+  }
+  
   method clone : R::NDArray::String ($shallow : int = 0) {
     return (R::NDArray::String)$self->SUPER::clone($shallow);
   }

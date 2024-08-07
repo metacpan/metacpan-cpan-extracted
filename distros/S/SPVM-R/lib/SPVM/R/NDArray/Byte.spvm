@@ -62,6 +62,13 @@ class R::NDArray::Byte extends R::NDArray {
     return $cmp;
   }
   
+  method elem_is_na : int ($data : byte[], $data_index : int) {
+    
+    my $elem_is_na = 0;
+    
+    return $elem_is_na;
+  }
+  
   method clone : R::NDArray::Byte ($shallow : int = 0) {
     return (R::NDArray::Byte)$self->SUPER::clone($shallow);
   }

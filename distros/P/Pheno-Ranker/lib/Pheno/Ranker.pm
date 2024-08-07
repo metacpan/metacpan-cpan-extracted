@@ -13,6 +13,7 @@ use Moo;
 use Types::Standard qw(Str Int Num Enum ArrayRef HashRef Undef Bool);
 use File::ShareDir::ProjectDistDir qw(dist_dir);
 use List::Util qw(all);
+use Hash::Util qw(lock_hash);
 use Pheno::Ranker::IO;
 use Pheno::Ranker::Align;
 use Pheno::Ranker::Stats;
@@ -27,7 +28,7 @@ $SIG{__DIE__}  = sub { die BOLD RED "Error: ", @_ };
 
 # Global variables:
 $Data::Dumper::Sortkeys = 1;
-our $VERSION   = '0.09';
+our $VERSION   = '0.10';
 our $share_dir = dist_dir('Pheno-Ranker');
 
 # Set developoent mode
@@ -35,8 +36,7 @@ use constant DEVEL_MODE => 0;
 
 # Misc variables
 my ( $config_sort_by, $config_similarity_metric_cohort,
-    $config_max_out, $config_max_number_var,
-    $config_seed,    @config_allowed_terms );
+    $config_max_out, $config_max_number_var, @config_allowed_terms );
 my $default_config_file = catfile( $share_dir, 'conf', 'config.yaml' );
 
 ############################################
@@ -55,6 +55,7 @@ has 'config_file' => (
         my $config = read_yaml($config_file);
 
         # Set basic configuration parameters
+        # NB: Global variables
         $self->_set_basic_config($config);
 
         # Validate and set exclusive configuration parameters
@@ -62,6 +63,9 @@ has 'config_file' => (
 
         # Set additional configuration parameters on $self
         $self->_set_additional_config( $config, $config_file );
+
+        # Lock config data (keys+values)
+        lock_hash(%$config);
     }
 );
 
@@ -74,10 +78,6 @@ sub _set_basic_config {
       // 'hamming';
     $config_max_out        = $config->{max_out}        // 50;
     $config_max_number_var = $config->{max_number_var} // 10_000;
-    $config_seed =
-      ( defined $config->{seed} && Int->check( $config->{seed} ) )
-      ? $config->{seed}
-      : 123456789;
 }
 
 # Private Method: _validate_and_set_exclusive_config
@@ -112,9 +112,12 @@ sub _set_additional_config {
     $self->{array_terms_regex_str} =
       '^(' . join( '|', map { "\Q$_\E" } @{ $self->{array_terms} } ) . '):';   # setter (TBV)
     $self->{array_terms_regex_qr} = qr/$self->{array_terms_regex_str}/;        # setter (TBV)
-    $self->{format}               = $config->{format};                         #setter
+    $self->{format}               = $config->{format};                         # setter
+    $self->{seed} =                                                            # setter
+      ( defined $config->{seed} && Int->check( $config->{seed} ) )
+      ? $config->{seed}
+      : 123456789;
 
-    # Validate $config->{id_correspondence} for "real" array_terms
     if ( $self->{array_terms}[0] ne 'foo' ) {
         unless ( exists $config->{id_correspondence}
             && HashRef->check( $config->{id_correspondence} ) )
@@ -230,7 +233,7 @@ sub BUILD {
     my $self = shift;
 
     # ************************
-    # Start Miscellanea checks
+    # Start miscellanea checks
     # ************************
 
     # Check append_prefixes if provided
@@ -254,7 +257,7 @@ sub BUILD {
     }
 
     # **********************
-    # End Miscellanea checks
+    # End miscellanea checks
     # **********************
 }
 
@@ -393,6 +396,9 @@ sub run {
     $self->add_attribute( 'format', check_format($ref_data) )
       unless defined $self->{format};    # setter via sub
 
+    # Re-structure interpretations if PXF
+    restructure_pxf_interpretations( $ref_data, $self );
+
     # First we create:
     # - $glob_hash => hash with all the COHORT keys possible
     # - $ref_hash  => BIG hash with all individiduals' keys "flattened"
@@ -459,10 +465,13 @@ sub run {
 "Sorry, <$target_file> does not contain primary_key <$primary_key>. Are you using the right config file?\n"
           unless exists $tar_data->{$primary_key};
 
+        # Re-structure interpretations if PXF
+        restructure_pxf_interpretations($tar_data, $self);
+
         # We store {primary_key} as a variable as it might be deleted from $tar_data (--exclude-terms id)
         my $tar_data_id = $tar_data->{$primary_key};
 
-        # Now we load the rest of the hashes
+        # Now we load the rest of the hash
         my $tar_hash = {
             $tar_data_id => remap_hash(
                 {
@@ -589,7 +598,7 @@ Written by Manuel Rueda, PhD. Info about CNAG can be found at L<https://www.cnag
 
 =head1 METHODS
 
-There is only method named c<run>. See above the syntax.
+There is only method named C<run>. See above the syntax.
 
 For more information check the documentation:
 

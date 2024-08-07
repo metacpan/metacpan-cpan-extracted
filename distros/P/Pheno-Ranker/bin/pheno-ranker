@@ -223,44 +223,43 @@ pheno-ranker: A script that performs semantic similarity in PXF/BFF data structu
 
 =head1 SYNOPSIS
 
-pheno-ranker -r <individuals.json> -t <patient.json> [-options]
+ pheno-ranker -r <individuals.json> -t <patient.json> [-options]
 
-     Arguments:
-       * Cohort mode:
-         -r, --reference <file>       BFF/PXF file(s) in JSON or YAML format (array or object)
+   Arguments:
+     * Cohort mode:
+       -r, --reference <file>         BFF/PXF file(s) in JSON or YAML format (array or object)
 
-       * Patient mode:
-         -t, --target <file>          BFF/PXF file in JSON or YAML format (object or array of 1 object)
+     * Patient mode:
+       -t, --target <file>            BFF/PXF file in JSON or YAML format (object or array of 1 object)
 
-     Options:
-       -age                           Include age-related variables; excludes agent-like terms (BFF/PXF-only) [>no-age|age]
-       -a, --align [path/basename]    Write alignment file(s). If not specified, default filenames are used [default: alignment.*]
-       -append-prefixes <prefixes>    Prefixes for primary_key when #cohorts >= 2 [default: C]
-       -config <file>                 YAML config file to modify default parameters [default: share/conf/config.yaml]
-       -cytoscape-json [file]         Serializes the pairwise comparison matrix as an undirected graph in JSON, compatible with Cytoscape [default: graph.json]
-       -e, --export [path/basename]   Export miscellaneous JSON files. If not specified, default filenames are used [default: export.*]
-       -exclude-terms <terms>         Exclude BFF/PXF terms (e.g., --exclude-terms sex, id)
-       -graph-stats [file]            Generates a text file with key graph metrics, for use with <-cytoscape-json>
-       -include-hpo-ascendants        Include ascendant terms from the Human Phenotype Ontology (HPO)
-       -include-terms <terms>         Include BFF/PXF terms (e.g., --include-terms diseases)
-       -max-number-var <number>       Maximum variables for binary string [default: 10000]
-       -max-out <number>              Print only N comparisons [default: 50]
-       -o, --out-file <file>          Output file path [default: -r matrix.txt | -t rank.txt]
-       -poi, --patients-of-interest <id_list>   Export JSON files for the selected individual IDs during a dry-run
-       -poi-out-dir <directory>       Directory for JSON files (used with --poi)
-       -similarity-metric-cohort <metric>  Similarity metric for cohort mode [>hamming|jaccard]
-       -sort-by <metric>              Sort by Hamming distance or Jaccard index [>hamming|jaccard]
-       -w, --weights <file>           YAML file with weights
+   Options:
+     -age                             Include age-related variables; excludes agent-like terms (BFF/PXF-only) [>no-age|age]
+     -a, --align [path/basename]      Write alignment file(s). If not specified, default filenames are used [default: alignment.*]
+     -append-prefixes <prefixes>      Prefixes for primary_key when #cohorts >= 2 [default: C]
+     -config <file>                   YAML config file to modify default parameters [default: share/conf/config.yaml]
+     -cytoscape-json [file]           Serializes the pairwise comparison matrix as an undirected graph in JSON, compatible with Cytoscape [default: graph.json]
+     -e, --export [path/basename]     Export miscellaneous JSON files. If not specified, default filenames are used [default: export.*]
+     -exclude-terms <terms>           Exclude BFF/PXF terms (e.g., --exclude-terms sex, id)
+     -graph-stats [file]              Generates a text file with key graph metrics, for use with <-cytoscape-json>
+     -include-hpo-ascendants          Include ascendant terms from the Human Phenotype Ontology (HPO)
+     -include-terms <terms>           Include BFF/PXF terms (e.g., --include-terms diseases)
+     -max-number-var <number>         Maximum variables for binary string [default: 10000]
+     -max-out <number>                Print only N comparisons [default: 50]
+     -o, --out-file <file>            Output file path [default: -r matrix.txt | -t rank.txt]
+     -poi, --patients-of-interest <id_list>   Export JSON files for the selected individual IDs during a dry-run
+     -poi-out-dir <directory>         Directory for JSON files (used with --poi)
+     -similarity-metric-cohort <metric>  Similarity metric for cohort mode [>hamming|jaccard]
+     -sort-by <metric>                Sort by Hamming distance or Jaccard index [>hamming|jaccard]
+     -w, --weights <file>             YAML file with weights
 
-     Generic Options:
-       -debug <level>                 Print debugging (from 1 to 5, being 5 max)
-       -h, --help                     Brief help message
-       -log                           Save log file [default: pheno-ranker-log.json]
-       -man                           Full documentation
-       -no-color                      Toggle color output [>color|no-color]
-       -v, --verbose                  Verbosity on
-       -V, --version                  Print version
-
+   Generic Options:
+     -debug <level>                   Print debugging (from 1 to 5, being 5 max)
+     -h, --help                       Brief help message
+     -log                             Save log file [default: pheno-ranker-log.json]
+     -man                             Full documentation
+     -no-color                        Toggle color output [>color|no-color]
+     -v, --verbose                    Verbosity on
+     -V, --version                    Print version
 
 =head1 DESCRIPTION
 
@@ -390,6 +389,7 @@ To ensure Perl recognizes your local modules every time you start a new terminal
 =head3 System requirements
 
   * Ideally a Debian-based distribution (Ubuntu or Mint), but any other (e.g., CentOs, OpenSuse) should do as well.
+    (It should also work on macOS and Windows Server, but we are only providing information for Linux here)
   * Perl 5 (>= 5.26 core; installed by default in most Linux distributions). Check the version with "perl -v".
   * >= 4GB of RAM
   * 1 core

@@ -8,7 +8,7 @@ require Exporter;
 
 our @ISA = qw(Exporter);
 
-our $VERSION = '0.09';
+our $VERSION = '0.10';
 our $VERBOSE = 0;        # verbose mode
 
 our $LZ_MIN_LEN       = 4;      # minimum match length in LZ parsing
@@ -36,6 +36,9 @@ our %EXPORT_TAGS = (
           bits2int
           bits2int_lsb
 
+          bytes2int
+          bytes2int_lsb
+
           string2symbols
           symbols2string
 
@@ -55,6 +58,9 @@ our %EXPORT_TAGS = (
 
           bwt_compress_symbolic
           bwt_decompress_symbolic
+
+          mrl_compress
+          mrl_decompress
 
           mrl_compress_symbolic
           mrl_decompress_symbolic
@@ -104,6 +110,7 @@ our %EXPORT_TAGS = (
 
           lzss_encode
           lzss_encode_fast
+          lzss_encode_fast_symbolic
           lzss_decode
 
           lzss_encode_symbolic
@@ -190,8 +197,7 @@ sub read_bit_lsb ($fh, $bitstring) {
 
 sub read_bits ($fh, $bits_len) {
 
-    my $data = '';
-    read($fh, $data, $bits_len >> 3);
+    read($fh, (my $data), $bits_len >> 3);
     $data = unpack('B*', $data);
 
     while (length($data) < $bits_len) {
@@ -207,8 +213,7 @@ sub read_bits ($fh, $bits_len) {
 
 sub read_bits_lsb ($fh, $bits_len) {
 
-    my $data = '';
-    read($fh, $data, $bits_len >> 3);
+    read($fh, (my $data), $bits_len >> 3);
     $data = unpack('b*', $data);
 
     while (length($data) < $bits_len) {
@@ -230,10 +235,22 @@ sub int2bits_lsb ($value, $size) {
     scalar reverse sprintf("%0*b", $size, $value);
 }
 
+sub bytes2int($fh, $n) {
+    my $bytes = '';
+    $bytes .= getc($fh) for (1 .. $n);
+    oct('0b' . unpack('B*', $bytes));
+}
+
+sub bytes2int_lsb ($fh, $n) {
+    my $bytes = '';
+    $bytes .= getc($fh) for (1 .. $n);
+    oct('0b' . reverse unpack('b*', $bytes));
+}
+
 sub bits2int ($fh, $size, $buffer) {
 
     if ($size % 8 == 0 and ($$buffer // '') eq '') {    # optimization
-        return oct('0b' . read_bits($fh, $size));
+        return bytes2int($fh, $size >> 3);
     }
 
     my $bitstring = '0b';
@@ -246,7 +263,7 @@ sub bits2int ($fh, $size, $buffer) {
 sub bits2int_lsb ($fh, $size, $buffer) {
 
     if ($size % 8 == 0 and ($$buffer // '') eq '') {    # optimization
-        return oct('0b' . reverse(read_bits_lsb($fh, $size)));
+        return bytes2int_lsb($fh, $size >> 3);
     }
 
     my $bitstring = '';
@@ -1567,6 +1584,8 @@ sub mrl_compress_symbolic ($symbols, $entropy_sub = \&create_huffman_entry) {
     encode_alphabet($alphabet) . $entropy_sub->($rle4);
 }
 
+*mrl_compress = \&mrl_compress_symbolic;
+
 sub mrl_decompress_symbolic ($fh, $entropy_sub = \&decode_huffman_entry) {
 
     if (ref($fh) eq '') {
@@ -1584,6 +1603,10 @@ sub mrl_decompress_symbolic ($fh, $entropy_sub = \&decode_huffman_entry) {
     my $symbols = mtf_decode($mtf, $alphabet);
 
     return $symbols;
+}
+
+sub mrl_decompress($fh, $entropy_sub = \&decode_huffman_entry) {
+    symbols2string(mrl_decompress_symbolic($fh, $entropy_sub));
 }
 
 ############################################################
@@ -1614,7 +1637,7 @@ sub bwt_decompress ($fh, $entropy_sub = \&decode_huffman_entry) {
         return __SUB__->($fh2, $entropy_sub);
     }
 
-    my $idx      = bits2int($fh, 32, \my $buffer);
+    my $idx      = bytes2int($fh, 4);
     my $alphabet = decode_alphabet($fh);
 
     $VERBOSE && say STDERR "BWT index = $idx";
@@ -1658,7 +1681,7 @@ sub bwt_decompress_symbolic ($fh, $entropy_sub = \&decode_huffman_entry) {
         return __SUB__->($fh2, $entropy_sub);
     }
 
-    my $idx      = bits2int($fh, 32, \my $buffer);
+    my $idx      = bytes2int($fh, 4);
     my $alphabet = decode_alphabet($fh);
 
     $VERBOSE && say STDERR "BWT index = $idx";
@@ -1916,7 +1939,7 @@ sub decode_huffman_entry ($fh) {
     my $code_lengths = delta_decode($fh);
     my (undef, $rev_dict) = huffman_from_code_lengths($code_lengths);
 
-    my $enc_len = bits2int($fh, 32, \my $buffer);
+    my $enc_len = bytes2int($fh, 4);
     $VERBOSE && say STDERR "Encoded length: $enc_len\n";
 
     if ($enc_len > 0) {
@@ -2200,17 +2223,8 @@ sub lzss_encode_symbolic ($symbols) {
         my $best_n = 1;
         my $best_p = $la;
 
-        my @lookahead_symbols;
-        if ($la + $min_len - 1 <= $end) {
-            push @lookahead_symbols, @{$symbols}[$la .. $la + $min_len - 1];
-        }
-        else {
-            for (my $j = 0 ; ($j < $min_len and $la + $j <= $end) ; ++$j) {
-                push @lookahead_symbols, $symbols->[$la + $j];
-            }
-        }
-
-        my $lookahead = join(' ', @lookahead_symbols);
+        my $upto      = $la + $min_len - 1;
+        my $lookahead = join(' ', @{$symbols}[$la .. ($upto > $end ? $end : $upto)]);
 
         if (exists($table{$lookahead})) {
 
@@ -2220,7 +2234,7 @@ sub lzss_encode_symbolic ($symbols) {
 
                 my $n = $min_len;
 
-                while ($n <= $max_len and $la + $n <= $end and $symbols->[$la + $n - 1] == $symbols->[$p + $n - 1]) {
+                while ($la + $n <= $end and $symbols->[$la + $n - 1] == $symbols->[$p + $n - 1] and $n <= $max_len) {
                     ++$n;
                 }
 
@@ -2231,15 +2245,19 @@ sub lzss_encode_symbolic ($symbols) {
             }
 
             my @matched = @{$symbols}[$la .. $la + $best_n - 1];
+            my @key_arr = @matched[0 .. $min_len - 1];
 
             foreach my $i (0 .. scalar(@matched) - $min_len) {
 
-                my $key = join(' ', @matched[$i .. $i + $min_len - 1]);
+                my $key = join(' ', @key_arr);
                 unshift @{$table{$key}}, $la + $i;
 
                 if (scalar(@{$table{$key}}) > $max_chain_len) {
                     pop @{$table{$key}};
                 }
+
+                shift(@key_arr);
+                push @key_arr, $matched[$i + $min_len];
             }
         }
 
@@ -2255,11 +2273,16 @@ sub lzss_encode_symbolic ($symbols) {
 
             $la += $best_n - 1;
         }
+        elsif ($best_n == 1) {
+            push @lengths,   0;
+            push @distances, 0;
+            push @literals,  $symbols->[$la++];
+        }
         else {
 
             push @lengths,   (0) x $best_n;
             push @distances, (0) x $best_n;
-            push @literals, @$symbols[$best_p .. $best_p + $best_n - 1];
+            push @literals, @{$symbols}[$la .. $la + $best_n - 1];
 
             $la += $best_n;
         }
@@ -2281,8 +2304,8 @@ sub lzss_decode_symbolic ($literals, $distances, $lengths) {
             next;
         }
 
-        my $length = $lengths->[$i];
-        my $dist   = $distances->[$i];
+        my $length = $lengths->[$i]   // die "bad input";
+        my $dist   = $distances->[$i] // die "bad input";
 
         if ($dist >= $length) {    # non-overlapping matches
             push @data, @data[$data_len - $dist .. $data_len - $dist + $length - 1];
@@ -2338,7 +2361,7 @@ sub lzss_encode ($str) {
 
                 my $n = $min_len;
 
-                while ($n <= $max_len and $la + $n <= $end and $symbols[$la + $n - 1] == $symbols[$p + $n - 1]) {
+                while ($la + $n <= $end and $symbols[$la + $n - 1] == $symbols[$p + $n - 1] and $n <= $max_len) {
                     ++$n;
                 }
 
@@ -2373,11 +2396,16 @@ sub lzss_encode ($str) {
 
             $la += $best_n - 1;
         }
+        elsif ($best_n == 1) {
+            push @lengths,   0;
+            push @distances, 0;
+            push @literals,  $symbols[$la++];
+        }
         else {
 
             push @lengths,   (0) x $best_n;
             push @distances, (0) x $best_n;
-            push @literals, @symbols[$best_p .. $best_p + $best_n - 1];
+            push @literals, @symbols[$la .. $la + $best_n - 1];
 
             $la += $best_n;
         }
@@ -2399,18 +2427,18 @@ sub lzss_decode ($literals, $distances, $lengths) {
             next;
         }
 
-        my $length = $lengths->[$i];
-        my $dist   = $distances->[$i];
+        my $length = $lengths->[$i]   // die "bad input";
+        my $dist   = $distances->[$i] // die "bad input";
 
         if ($dist >= $length) {    # non-overlapping matches
-            $data .= substr($data, $data_len - $dist, $length);
+            $data .= substr($data, $data_len - $dist, $length) // die "bad input";
         }
         elsif ($dist == 1) {       # run-length of last character
             $data .= substr($data, -1) x $length;
         }
         else {                     # overlapping matches
             foreach my $i (1 .. $length) {
-                $data .= substr($data, $data_len + $i - $dist - 1, 1);
+                $data .= substr($data, $data_len + $i - $dist - 1, 1) // die "bad input";
             }
         }
 
@@ -2424,12 +2452,14 @@ sub lzss_decode ($literals, $distances, $lengths) {
 # LZSSF Compression
 ###################
 
-sub lzss_encode_fast($str) {
+sub lzss_encode_fast_symbolic ($symbols) {
 
-    my @symbols = (ref($str) eq 'ARRAY') ? @$str : unpack('C*', $str);
+    if (ref($symbols) eq '') {
+        return lzss_encode_fast($symbols);
+    }
 
     my $la  = 0;
-    my $end = $#symbols;
+    my $end = $#$symbols;
 
     my $min_len  = $LZ_MIN_LEN;     # minimum match length
     my $max_len  = $LZ_MAX_LEN;     # maximum match length
@@ -2442,24 +2472,15 @@ sub lzss_encode_fast($str) {
         my $best_n = 1;
         my $best_p = $la;
 
-        my @lookahead_symbols;
-        if ($la + $min_len - 1 <= $end) {
-            push @lookahead_symbols, @symbols[$la .. $la + $min_len - 1];
-        }
-        else {
-            for (my $j = 0 ; ($j < $min_len and $la + $j <= $end) ; ++$j) {
-                push @lookahead_symbols, $symbols[$la + $j];
-            }
-        }
-
-        my $lookahead = join(' ', @lookahead_symbols);
+        my $upto      = $la + $min_len - 1;
+        my $lookahead = join(' ', @{$symbols}[$la .. ($upto > $end ? $end : $upto)]);
 
         if (exists($table{$lookahead}) and $la - $table{$lookahead} <= $max_dist) {
 
             my $p = $table{$lookahead};
             my $n = $min_len;
 
-            while ($n <= $max_len and $la + $n <= $end and $symbols[$la + $n - 1] == $symbols[$p + $n - 1]) {
+            while ($la + $n <= $end and $symbols->[$la + $n - 1] == $symbols->[$p + $n - 1] and $n <= $max_len) {
                 ++$n;
             }
 
@@ -2477,11 +2498,82 @@ sub lzss_encode_fast($str) {
 
             $la += $best_n - 1;
         }
+        elsif ($best_n == 1) {
+            push @lengths,   0;
+            push @distances, 0;
+            push @literals,  $symbols->[$la++];
+        }
         else {
 
             push @lengths,   (0) x $best_n;
             push @distances, (0) x $best_n;
-            push @literals, @symbols[$best_p .. $best_p + $best_n - 1];
+            push @literals, @{$symbols}[$la .. $la + $best_n - 1];
+
+            $la += $best_n;
+        }
+    }
+
+    return (\@literals, \@distances, \@lengths);
+
+}
+
+sub lzss_encode_fast($str) {
+
+    if (ref($str) eq 'ARRAY') {
+        return lzss_encode_fast_symbolic($str);
+    }
+
+    my @symbols = unpack('C*', $str);
+
+    my $la  = 0;
+    my $end = $#symbols;
+
+    my $min_len  = $LZ_MIN_LEN;     # minimum match length
+    my $max_len  = $LZ_MAX_LEN;     # maximum match length
+    my $max_dist = $LZ_MAX_DIST;    # maximum offset distance
+
+    my (@literals, @distances, @lengths, %table);
+
+    while ($la <= $end) {
+
+        my $best_n = 1;
+        my $best_p = $la;
+
+        my $lookahead = substr($str, $la, $min_len);
+
+        if (exists($table{$lookahead}) and $la - $table{$lookahead} <= $max_dist) {
+
+            my $p = $table{$lookahead};
+            my $n = $min_len;
+
+            while ($la + $n <= $end and $symbols[$la + $n - 1] == $symbols[$p + $n - 1] and $n <= $max_len) {
+                ++$n;
+            }
+
+            $best_p = $p;
+            $best_n = $n;
+        }
+
+        $table{$lookahead} = $la;
+
+        if ($best_n > $min_len) {
+
+            push @lengths,   $best_n - 1;
+            push @distances, $la - $best_p;
+            push @literals,  undef;
+
+            $la += $best_n - 1;
+        }
+        elsif ($best_n == 1) {
+            push @lengths,   0;
+            push @distances, 0;
+            push @literals,  $symbols[$la++];
+        }
+        else {
+
+            push @lengths,   (0) x $best_n;
+            push @distances, (0) x $best_n;
+            push @literals, @symbols[$la .. $la + $best_n - 1];
 
             $la += $best_n;
         }
@@ -2523,7 +2615,9 @@ sub lz77_encode($chunk, $lzss_encode_sub = \&lzss_encode) {
             $literals_length -= 255;
         }
 
-        push @symbols, @{$literals}[$j .. $i - 1];
+        if ($i > $j) {
+            push @symbols, @{$literals}[$j .. $i - 1];
+        }
 
         while ($match_len >= 0) {
             push @match_symbols, ($match_len >= 255 ? 255 : $match_len);
@@ -2533,12 +2627,12 @@ sub lz77_encode($chunk, $lzss_encode_sub = \&lzss_encode) {
         push @dist_symbols, $distances->[$i] // 0;
     }
 
-    return (\@symbols, \@len_symbols, \@match_symbols, \@dist_symbols);
+    return (\@symbols, \@dist_symbols, \@len_symbols, \@match_symbols);
 }
 
 *lz77_encode_symbolic = \&lz77_encode;
 
-sub lz77_decode($symbols, $len_symbols, $match_symbols, $dist_symbols) {
+sub lz77_decode($symbols, $dist_symbols, $len_symbols, $match_symbols) {
 
     my $data     = '';
     my $data_len = 0;
@@ -2550,14 +2644,14 @@ sub lz77_decode($symbols, $len_symbols, $match_symbols, $dist_symbols) {
 
     while (@symbols) {
 
-        my $len_byte = shift(@match_symbols);
+        my $len_byte = shift(@match_symbols) // die "bad input";
 
         my $literals_length = $len_byte >> 5;
         my $match_len       = $len_byte & 0b11111;
 
         if ($literals_length == 7) {
             while (1) {
-                my $byte_len = shift(@len_symbols);
+                my $byte_len = shift(@len_symbols) // die "bad input";
                 $literals_length += $byte_len;
                 last if $byte_len != 255;
             }
@@ -2570,23 +2664,23 @@ sub lz77_decode($symbols, $len_symbols, $match_symbols, $dist_symbols) {
 
         if ($match_len == 31) {
             while (1) {
-                my $byte_len = shift(@match_symbols);
+                my $byte_len = shift(@match_symbols) // die "bad input";
                 $match_len += $byte_len;
                 last if $byte_len != 255;
             }
         }
 
-        my $dist = shift(@dist_symbols);
+        my $dist = shift(@dist_symbols) // die "bad input";
 
         if ($dist >= $match_len) {    # non-overlapping matches
-            $data .= substr($data, $data_len - $dist, $match_len);
+            $data .= substr($data, $data_len - $dist, $match_len) // die "bad input";
         }
         elsif ($dist == 1) {          # run-length of last character
             $data .= substr($data, -1) x $match_len;
         }
         else {                        # overlapping matches
             foreach my $i (1 .. $match_len) {
-                $data .= substr($data, $data_len + $i - $dist - 1, 1);
+                $data .= substr($data, $data_len + $i - $dist - 1, 1) // die "bad input";
             }
         }
 
@@ -2596,7 +2690,7 @@ sub lz77_decode($symbols, $len_symbols, $match_symbols, $dist_symbols) {
     return $data;
 }
 
-sub lz77_decode_symbolic($symbols, $len_symbols, $match_symbols, $dist_symbols) {
+sub lz77_decode_symbolic($symbols, $dist_symbols, $len_symbols, $match_symbols) {
 
     my @data;
     my $data_len = 0;
@@ -2608,14 +2702,14 @@ sub lz77_decode_symbolic($symbols, $len_symbols, $match_symbols, $dist_symbols) 
 
     while (@symbols) {
 
-        my $len_byte = shift(@match_symbols);
+        my $len_byte = shift(@match_symbols) // die "bad input";
 
         my $literals_length = $len_byte >> 5;
         my $match_len       = $len_byte & 0b11111;
 
         if ($literals_length == 7) {
             while (1) {
-                my $byte_len = shift(@len_symbols);
+                my $byte_len = shift(@len_symbols) // die "bad input";
                 $literals_length += $byte_len;
                 last if $byte_len != 255;
             }
@@ -2628,13 +2722,13 @@ sub lz77_decode_symbolic($symbols, $len_symbols, $match_symbols, $dist_symbols) 
 
         if ($match_len == 31) {
             while (1) {
-                my $byte_len = shift(@match_symbols);
+                my $byte_len = shift(@match_symbols) // die "bad input";
                 $match_len += $byte_len;
                 last if $byte_len != 255;
             }
         }
 
-        my $dist = shift(@dist_symbols);
+        my $dist = shift(@dist_symbols) // die "bad input";
 
         if ($dist >= $match_len) {    # non-overlapping matches
             push @data, @data[scalar(@data) - $dist .. scalar(@data) - $dist + $match_len - 1];
@@ -2655,7 +2749,7 @@ sub lz77_decode_symbolic($symbols, $len_symbols, $match_symbols, $dist_symbols) 
 }
 
 sub lz77_compress($chunk, $entropy_sub = \&create_huffman_entry, $lzss_encoding_sub = \&lzss_encode) {
-    my ($symbols, $len_symbols, $match_symbols, $dist_symbols) = lz77_encode($chunk, $lzss_encoding_sub);
+    my ($symbols, $dist_symbols, $len_symbols, $match_symbols) = lz77_encode($chunk, $lzss_encoding_sub);
     $entropy_sub->($symbols) . $entropy_sub->($len_symbols) . $entropy_sub->($match_symbols) . obh_encode($dist_symbols, $entropy_sub);
 }
 
@@ -2673,7 +2767,7 @@ sub lz77_decompress($fh, $entropy_sub = \&decode_huffman_entry) {
     my $match_symbols = $entropy_sub->($fh);
     my $dist_symbols  = obh_decode($fh, $entropy_sub);
 
-    lz77_decode($symbols, $len_symbols, $match_symbols, $dist_symbols);
+    lz77_decode($symbols, $dist_symbols, $len_symbols, $match_symbols);
 }
 
 sub lz77_decompress_symbolic($fh, $entropy_sub = \&decode_huffman_entry) {
@@ -2688,21 +2782,29 @@ sub lz77_decompress_symbolic($fh, $entropy_sub = \&decode_huffman_entry) {
     my $match_symbols = $entropy_sub->($fh);
     my $dist_symbols  = obh_decode($fh, $entropy_sub);
 
-    lz77_decode_symbolic($symbols, $len_symbols, $match_symbols, $dist_symbols);
+    lz77_decode_symbolic($symbols, $dist_symbols, $len_symbols, $match_symbols);
 }
 
 #########################
 # LZSS + DEFLATE encoding
 #########################
 
-sub lzss_compress_symbolic($symbols, $entropy_sub = \&create_huffman_entry, $lzss_encoding_sub = \&lzss_encode_symbolic) {
+sub lzss_compress($chunk, $entropy_sub = \&create_huffman_entry, $lzss_encoding_sub = \&lzss_encode) {
+    my ($literals, $distances, $lengths) = $lzss_encoding_sub->($chunk);
+    deflate_encode($literals, $distances, $lengths, $entropy_sub);
+}
 
-    if (ref($symbols) eq '') {
-        $symbols = string2symbols($symbols);
+*lzss_compress_symbolic = \&lzss_compress;
+
+sub lzss_decompress($fh, $entropy_sub = \&decode_huffman_entry) {
+
+    if (ref($fh) eq '') {
+        open my $fh2, '<:raw', \$fh;
+        return __SUB__->($fh2, $entropy_sub);
     }
 
-    my ($literals, $distances, $lengths) = $lzss_encoding_sub->($symbols);
-    deflate_encode($literals, $distances, $lengths, $entropy_sub);
+    my ($literals, $distances, $lengths) = deflate_decode($fh, $entropy_sub);
+    lzss_decode($literals, $distances, $lengths);
 }
 
 sub lzss_decompress_symbolic($fh, $entropy_sub = \&decode_huffman_entry) {
@@ -2714,27 +2816,6 @@ sub lzss_decompress_symbolic($fh, $entropy_sub = \&decode_huffman_entry) {
 
     my ($literals, $distances, $lengths) = deflate_decode($fh, $entropy_sub);
     lzss_decode_symbolic($literals, $distances, $lengths);
-}
-
-sub lzss_compress($chunk, $entropy_sub = \&create_huffman_entry, $lzss_encoding_sub = \&lzss_encode) {
-
-    if (ref($chunk) eq 'ARRAY') {
-        return lzss_compress_symbolic($chunk, $entropy_sub, $lzss_encoding_sub);
-    }
-
-    my ($literals, $distances, $lengths) = $lzss_encoding_sub->($chunk);
-    deflate_encode($literals, $distances, $lengths, $entropy_sub);
-}
-
-sub lzss_decompress($fh, $entropy_sub = \&decode_huffman_entry) {
-
-    if (ref($fh) eq '') {
-        open my $fh2, '<:raw', \$fh;
-        return __SUB__->($fh2, $entropy_sub);
-    }
-
-    my ($literals, $distances, $lengths) = deflate_decode($fh, $entropy_sub);
-    lzss_decode($literals, $distances, $lengths);
 }
 
 #########################################
@@ -2759,9 +2840,7 @@ sub lzb_compress ($chunk, $lzss_encoding_sub = \&lzss_encode) {
         }
 
         my $literals_length = $i - $j;
-
-        my $dist      = $distances->[$i] // 0;
-        my $match_len = $lengths->[$i]   // 0;
+        my $match_len       = $lengths->[$i] // 0;
 
         $data .= chr((($literals_length >= 7 ? 7 : $literals_length) << 5) | ($match_len >= 31 ? 31 : $match_len));
 
@@ -2782,10 +2861,10 @@ sub lzb_compress ($chunk, $lzss_encoding_sub = \&lzss_encode) {
             $match_len -= 255;
         }
 
-        $data .= pack('B*', sprintf('%016b', $dist));
+        $data .= pack('B*', sprintf('%016b', $distances->[$i] // 0));
     }
 
-    return $data;
+    return fibonacci_encode([length $data]) . $data;
 }
 
 sub lzb_decompress($fh) {
@@ -2799,37 +2878,37 @@ sub lzb_decompress($fh) {
     my $search_window      = '';
     my $search_window_size = 1 << 16;
 
-    while (!eof($fh)) {
+    my $block_size = fibonacci_decode($fh)->[0] // die "decompression error";
+    read($fh, (my $block), $block_size);
 
-        my $len_byte = ord(getc($fh));
+    while ($block ne '') {
+
+        my $len_byte = ord substr($block, 0, 1, '');
 
         my $literals_length = $len_byte >> 5;
         my $match_len       = $len_byte & 0b11111;
 
         if ($literals_length == 7) {
             while (1) {
-                my $byte_len = ord(getc($fh));
+                my $byte_len = ord substr($block, 0, 1, '');
                 $literals_length += $byte_len;
                 last if $byte_len != 255;
             }
         }
 
-        my $literals = '';
         if ($literals_length > 0) {
-            read($fh, $literals, $literals_length);
+            $search_window .= substr($block, 0, $literals_length, '');
         }
 
         if ($match_len == 31) {
             while (1) {
-                my $byte_len = ord(getc($fh));
+                my $byte_len = ord substr($block, 0, 1, '');
                 $match_len += $byte_len;
                 last if $byte_len != 255;
             }
         }
 
-        my $offset = oct('0b' . unpack('B*', getc($fh) . getc($fh)));
-
-        $search_window .= $literals;
+        my $offset = oct('0b' . unpack('B*', substr($block, 0, 2, '')));
 
         if ($offset >= $match_len) {    # non-overlapping matches
             $search_window .= substr($search_window, length($search_window) - $offset, $match_len);
@@ -3122,7 +3201,7 @@ These package variables can also be imported as:
 
 Minimum length of a match in LZ parsing. The value must be an integer greater than or equal to C<2>. Larger values will result in faster parsing, but lower compression ratio.
 
-By default, <$LZ_MIN_LEN> is set to C<4>.
+By default, C<$LZ_MIN_LEN> is set to C<4>.
 
 B<NOTE:> for C<lzss_encode_fast()> is recommended to set C<$LZ_MIN_LEN = 5>, which will result in slightly better compression ratio.
 
@@ -3130,7 +3209,7 @@ B<NOTE:> for C<lzss_encode_fast()> is recommended to set C<$LZ_MIN_LEN = 5>, whi
 
 Maximum length of a match in LZ parsing. The value must be an integer greater than or equal to C<0>.
 
-By default, <$LZ_MAX_LEN> is set to C<258>.
+By default, C<$LZ_MAX_LEN> is set to C<258>.
 
 B<NOTE:> the functions C<lz77_encode()> and C<lzb_compress()> will ignore this value and will always use unlimited match lengths.
 
@@ -3161,7 +3240,10 @@ B<NOTE:> the function C<lzss_encode_fast()> will ignore this value, always using
       create_adaptive_ac_entry(\@symbols)  # Create an Adaptive Arithmetic Coding block
       decode_adaptive_ac_entry($fh)        # Decode an Adaptive Arithmetic Coding block
 
-      mrl_compress_symbolic(\@symbols)     # MRL compression (MTF+ZRLE+RLE4+Huffman coding)
+      mrl_compress($string)                # MRL compression (MTF+ZRLE+RLE4+Huffman coding)
+      mrl_decompress($fh)                  # Inverse of the above method
+
+      mrl_compress_symbolic(\@symbols)     # Symbolic MRL compression (MTF+ZRLE+RLE4+Huffman coding)
       mrl_decompress_symbolic($fh)         # Inverse of the above method
 
       bwt_compress($string)                # Bzip2-like compression (RLE4+BWT+MTF+ZRLE+Huffman coding)
@@ -3173,7 +3255,7 @@ B<NOTE:> the function C<lzss_encode_fast()> will ignore this value, always using
       lzss_compress($string)               # LZSS + DEFLATE-like encoding of lengths and distances
       lzss_decompress($fh)                 # Inverse of the above method
 
-      lzss_compress_symbolic($string)      # Symbolic LZSS + DEFLATE-like encoding of lengths and distances
+      lzss_compress_symbolic(\@symbols)    # Symbolic LZSS + DEFLATE-like encoding of lengths and distances
       lzss_decompress_symbolic($fh)        # Inverse of the above method
 
       lz77_compress($string)               # LZ77 + Huffman coding of lengths and literals + OBH for distances
@@ -3250,10 +3332,13 @@ B<NOTE:> the function C<lzss_encode_fast()> will ignore this value, always using
       read_bits_lsb($fh, $len)             # Read `$len` bits from file-handle (LSB)
 
       int2bits($symbol, $size)             # Convert an integer to bits of width `$size` (MSB)
-      int2bits_lsb($symbol, $size)         # Convert an integer to bits of width `$size) (LSB)
+      int2bits_lsb($symbol, $size)         # Convert an integer to bits of width `$size` (LSB)
 
       bits2int($fh, $size, \$buffer)       # Inverse of `int2bits()`
       bits2int_lsb($fh, $size, \$buffer)   # Inverse of `int2bits_lsb()`
+
+      bytes2int($fh, $n)                   # Read `$n` bytes from file-handle as an integer (MSB)
+      bytes2int_lsb($fh, $n)               # Read `$n` bytes from file-handle as an integer (LSB)
 
       string2symbols($string)              # Returns an array-ref of code points
       symbols2string(\@symbols)            # Returns a string, given an array of code points
@@ -3477,13 +3562,15 @@ Similar to C<bwt_compress()>, except that it accepts an arbitrary array-ref of n
 
 Inverse of C<bwt_compress_symbolic()>.
 
-=head2 mrl_compress_symbolic
+=head2 mrl_compress / mrl_compress_symbolic
 
     # Does Huffman coding
-    my $string = mrl_compress_symbolic(\@symbols);
+    my $enc = mrl_compress($str);
+    my $enc = mrl_compress(\@symbols);
 
     # Does Arithmetic coding
-    my $string = mrl_compress_symbolic(\@symbols, \&create_ac_entry);
+    my $enc = mrl_compress($str, \&create_ac_entry);
+    my $enc = mrl_compress(\@symbols, \&create_ac_entry);
 
 A fast compression method, using the following pipeline:
 
@@ -3494,17 +3581,21 @@ A fast compression method, using the following pipeline:
 
 It accepts an arbitrary array-ref of non-negative integer values as input.
 
-=head2 mrl_decompress_symbolic
+=head2 mrl_decompress / mrl_decompress_symbolic
 
-    # Using Huffman coding
+    # With Huffman coding
+    my $data = mrl_decompress($fh);
+    my $data = mrl_decompress($string);
+
+    # Symbolic, with Huffman coding
     my $symbols = mrl_decompress_symbolic($fh);
     my $symbols = mrl_decompress_symbolic($string);
 
-    # Using Arithmetic coding
+    # Symbolic, with Arithmetic coding
     my $symbols = mrl_decompress_symbolic($fh, \&decode_ac_entry);
     my $symbols = mrl_decompress_symbolic($string, \&decode_ac_entry);
 
-Inverse of C<mrl_compress_symbolic()>.
+Inverse of C<mrl_decompress()> and C<mrl_compress_symbolic()>.
 
 =head1 INTERFACE FOR MEDIUM-LEVEL FUNCTIONS
 
@@ -3859,6 +3950,18 @@ Read C<$size> bits from file-handle C<$fh> and convert them to an integer, in LS
 
 The function stores the extra bits inside the C<$buffer>, reading one character at a time from the file-handle.
 
+=head2 bytes2int
+
+    my $integer = bytes2int($fh, $n);
+
+Read C<$n> bytes from file-handle C<$fh> and convert them to an integer, in MSB order.
+
+=head2 bytes2int_lsb
+
+    my $integer = bytes2int_lsb($fh, $n);
+
+Read C<$n> bytes from file-handle C<$fh> and convert them to an integer, in LSB order.
+
 =head2 string2symbols
 
     my $symbols = string2symbols($string)
@@ -3971,30 +4074,30 @@ The function returns the decoded sequence of symbols as an array-ref.
 
 =head2 lz77_encode / lz77_encode_symbolic
 
-    my ($literals, $lengths, $matches, $distances) = lz77_encode($string);
-    my ($literals, $lengths, $matches, $distances) = lz77_encode(\@symbols);
+    my ($literals, $distances, $lengths, $matches) = lz77_encode($string);
+    my ($literals, $distances, $lengths, $matches) = lz77_encode(\@symbols);
 
 Low-level function that combines LZSS with ideas from the LZ4 method.
 
 The function returns four values:
 
     $literals   # array-ref of uncompressed symbols
+    $distances  # array-ref of back-reference distances
     $lengths    # array-ref of literal lengths
     $matches    # array-ref of match lengths
-    $distances  # array-ref of back-reference distances
 
 The output can be decoded with C<lz77_decode()> and C<lz77_decode_symbolic()>, respectively.
 
 =head2 lz77_decode / lz77_decode_symbolic
 
-    my $string  = lz77_decode(\@literals, \@lengths, \@matches, \@distances);
-    my $symbols = lz77_decode_symbolic(\@literals, \@lengths, \@matches, \@distances);
+    my $string  = lz77_decode(\@literals, \@distances, \@lengths, \@matches);
+    my $symbols = lz77_decode_symbolic(\@literals, \@distances, \@lengths, \@matches);
 
 Low-level function that performs decoding using the provided literals, lengths, matches and distances of matched sub-strings.
 
 Inverse of C<lz77_encode()> and C<lz77_encode_symbolic()>, respectively.
 
-=head2 lzss_encode / lzss_encode_symbolic / lzss_encode_fast
+=head2 lzss_encode / lzss_encode_fast / lzss_encode_symbolic / lzss_encode_fast_symbolic
 
     # Standard version
     my ($literals, $distances, $lengths) = lzss_encode($data);
@@ -4021,7 +4124,7 @@ The output can be decoded with C<lzss_decode()> and C<lzss_decode_symbolic>, res
 
 Low-level function that decodes the LZSS encoding, using the provided literals, distances, and lengths of matched sub-strings.
 
-Inverse of C<lzss_encode()>, C<lzss_encode_symbolic> and C<lzss_encode_fast()>.
+Inverse of C<lzss_encode()> and C<lzss_encode_fast()>.
 
 =head2 deflate_encode
 
@@ -4074,35 +4177,45 @@ By specifying the B<:all> keyword, will export all the exportable functions:
 
 Nothing is exported by default.
 
-=head2 EXAMPLES
+=head1 EXAMPLES
 
 The functions can be combined in various ways, easily creating novel compression methods, as illustrated in the following examples.
 
-Combining LZSS + MRL compression:
+=head2 Combining LZSS + MRL compression:
 
     my $enc = lzss_compress($str, \&mrl_compress_symbolic);
     my $dec = lzss_decompress($enc, \&mrl_decompress_symbolic);
 
-Combining LZ77 + OBH encoding:
+=head2 Combining LZ77 + OBH encoding:
 
     my $enc = lz77_compress($str, \&obh_encode);
     my $dec = lz77_decompress($enc, \&obh_decode);
 
-Combining LZSS + BWT compression:
+=head2 Combining LZSS + symbolic BWT compression:
 
     my $enc = lzss_compress($str, \&bwt_compress_symbolic);
     my $dec = lzss_decompress($enc, \&bwt_decompress_symbolic);
 
-Combining LZW + Fibonacci encoding:
+=head2 Combining BWT + symbolic LZSS:
+
+    my $enc = bwt_compress($str, \&lzss_compress_symbolic);
+    my $dec = bwt_decompress($enc, \&lzss_decompress_symbolic);
+
+=head2 Combining LZW + Fibonacci encoding:
 
     my $enc = lzw_compress($str, \&fibonacci_encode);
     my $dec = lzw_decompress($enc, \&fibonacci_decode);
 
-Combining LZ77 + BWT compression + Fibonacci encoding + Huffman coding + OBH encoding + MRL compression:
+=head2 Combining BWT + symbolic LZ77 + symbolic MRL:
+
+    my $enc = bwt_compress($str, sub ($s) { lz77_compress_symbolic($s, \&mrl_compress_symbolic) });
+    my $dec = bwt_decompress($enc, sub ($s) { lz77_decompress_symbolic($s, \&mrl_decompress_symbolic) });
+
+=head2 Combining LZ77 + BWT compression + Fibonacci encoding + Huffman coding + OBH encoding + MRL compression:
 
     # Compression
     my $enc = do {
-        my ($literals, $lengths, $matches, $distances) = lz77_encode($str);
+        my ($literals, $distances, $lengths, $matches) = lz77_encode($str);
         bwt_compress(symbols2string($literals))
           . fibonacci_encode($lengths)
           . create_huffman_entry($matches)
@@ -4116,7 +4229,7 @@ Combining LZ77 + BWT compression + Fibonacci encoding + Huffman coding + OBH enc
         my $lengths   = fibonacci_decode($fh);
         my $matches   = decode_huffman_entry($fh);
         my $distances = obh_decode($fh, \&mrl_decompress_symbolic);
-        lz77_decode($literals, $lengths, $matches, $distances);
+        lz77_decode($literals, $distances, $lengths, $matches);
     };
 
 =head1 SEE ALSO

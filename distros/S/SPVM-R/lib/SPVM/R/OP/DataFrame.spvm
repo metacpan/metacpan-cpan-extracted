@@ -58,7 +58,7 @@ class R::OP::DataFrame {
     my $y_ncol = $y_data_frame->ncol;
     
     unless ($x_ncol == $y_ncol) {
-      die "The length of the columns of the data frame \$x_data_frame must be equal to the length of the columns of the data frame \$y_data_frame.";
+      die "The column numbers of the data frame \$x_data_frame must be equal to the column numbers of the data frame \$y_data_frame.";
     }
     
     my $ncol = $x_ncol;
@@ -76,11 +76,11 @@ class R::OP::DataFrame {
       my $y_ndarray = $y_data_frame->col_by_index($i);
       
       unless ($x_colname eq $y_colname) {
-        die "The col name at col index $i of the data frame \$x_data_frame must be equal to the col name at col index $i of the data frame \$y_data_frame.";
+        die "The column name at column index $i of the data frame \$x_data_frame must be equal to the column name at column index $i of the data frame \$y_data_frame.";
       }
       
       unless (type_name $x_ndarray eq type_name $y_ndarray) {
-        die "The n-dimensional array class name at col index $i of the data frame \$x_data_frame must be equal to the n-dimensional array class name at col index $i of the data frame \$y_data_frame.";
+        die "The type of the n-dimensional array at column index $i of the data frame \$x_data_frame must be equal to the type of the n-dimensional array at column index $i of the data frame \$y_data_frame.";
       }
       
       my $colname = $x_colname;
@@ -91,6 +91,58 @@ class R::OP::DataFrame {
     }
     
     return $ret_data_frame;
+  }
+  
+  static method subset : R::DataFrame ($x_data_frame : R::DataFrame, $indexes : R::NDArray::Int, $options : object[] = undef) {
+    
+    unless ($x_data_frame) {
+      die "The data frame \$x_data_frame must be defined.";
+    }
+    
+    if ($x_data_frame->ncol > 0) {
+      my $first_ndarray = $x_data_frame->first_col;
+      
+      unless ($first_ndarray->is_vector) {
+        die "The first column of \$x_data_frame must be a vector if columns exists.";
+      }
+    }
+    
+    Fn->check_option_names($options, ["select"]);
+    
+    my $options_h = Hash->new($options);
+    
+    my $colnames = (string[])$options_h->get_or_default("select", undef);
+    
+    my $ret_ndarray = $x_data_frame->slice($colnames, [$indexes]);
+    
+    return $ret_ndarray;
+  }
+  
+  static method na_omit : R::DataFrame ($x_data_frame : R::DataFrame) {
+    
+    unless ($x_data_frame) {
+      die "The data frame \$x_data_frame must be defined.";
+    }
+    
+    my $colnames = $x_data_frame->colnames;
+    
+    my $nrow = $x_data_frame->nrow;
+    
+    my $is_na_or = R::OP::Int->rep(R::OP::Int->c(0), $nrow);
+    
+    for my $colname (@$colnames) {
+      my $ndarray = $x_data_frame->col($colname);
+      
+      my $is_na = R::OP->is_na($ndarray);
+      
+      $is_na_or = R::OP::Int->or($is_na_or, $is_na);
+    }
+    
+    my $is_not_na_or = R::OP::Int->not($is_na_or);
+    
+    my $ret_ndarray = &subset($x_data_frame, $is_not_na_or->to_indexes);
+    
+    return $ret_ndarray;
   }
   
 }

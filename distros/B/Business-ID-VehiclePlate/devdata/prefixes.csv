@@ -1,0 +1,57 @@
+prefix,summary,region,iso_prov_codes
+BL,Aceh,Sumatera,ID-AC
+BB,Sumatera Utara bagian barat,Sumatera,ID-SU
+BK,Sumatera Utara bagian timur,Sumatera,ID-SU
+BA,Sumatera Barat,Sumatera,ID-SB
+BM,Riau,Sumatera,ID-RI
+BH,Jambi,Sumatera,ID-JA
+BD,Bengkulu,Sumatera,ID-BE
+BP,Kepulauan Riau,Sumatera,ID-KR
+BG,Sumatera Selatan,Sumatera,ID-SS
+BN,Bangka-Belitung,Sumatera,ID-BB
+BE,Lampung,Sumatera,ID-LA
+A,"Banten, Cilegon, Serang, Pandeglang, Lebak, Tangerang",Banten,ID-BT
+B,"Jakarta, Depok, Bekasi",DKI,"ID-JK,ID-JB"
+D,Bandung,Jawa Barat,ID-JB
+E,"Cirebon, Majalengka, Indramayu, Kuningan",Jawa Barat,ID-JB
+F,"Bogor, Cianjur,
+Sukabumi",Jawa Barat,ID-JB
+T,"Purwakarta, Karawang, Subang",Jawa Barat,ID-JB
+Z,"Garut, Sumedang, Tasikmalaya, Pangandaran, Ciamis, Banjar",Jawa Barat,ID-JB
+G,"Pekalongan, Pemalang, Batang, Tegal, Brebes",Jawa Tengah,ID-JT
+H,"Semarang, Kendal, Salatiga, Demak",Jawa Tengah,ID-JT
+K,"Pati, Jepara, Kudus, Blora, Rembang, Grombogan",Jawa Tengah,ID-JT
+R,"Banyumas, Purbalingga, Cilacap, Banjarnegara",Jawa Tengah,ID-JT
+AA,"Magelang, Purworejo, Temanggung, Kebumen, Wonosobo",Jawa Tengah,ID-JT
+AD,"Surakarta, Sukoharjo, Boyolali, Klaten, Karanganyar, Sragen, Wonogiri",Jawa Tengah,ID-JT
+AB,"Yogyakarta, Bantul, Gunung Kidul, Sleman, Kulon Progo",DIY,ID-YO
+L,Surabaya,Jawa Timur,ID-JI
+M,Madura,Jawa Timur,ID-JI
+N,"Malang, Pasuruan, Probolinggo, Lumajang",Jawa Timur,ID-JI
+P,"Bondowoso, Jember, Situbondo, Banyuwangi",Jawa Timur,ID-JI
+S,"Bojonegoro, Tuban, Mojokerto, Lamongan, Jombang",Jawa Timur,ID-JI
+W,"Gresik, Sidoarjo",Jawa Timur,ID-JI
+AE,"Madiun, Ngawi, Ponorogo, Magetan, Pacitan",Jawa Timur,ID-JI
+AG,"Kediri, Blitar, Nganjuk, Tulungagung, Trenggalek",Jawa Timur,ID-JI
+DK,Bali,Bali & NT,ID-BA
+DR,"Pulau Lombok, Mataram",Bali & NT,ID-NB
+EA,Pulau Sumbawa,Bali & NT,ID-NB
+DH,"Pulau Timor, Kupang",Bali & NT,ID-NT
+EB,Pulau Flores,Bali & NT,ID-NT
+ED,Pulau Sumba,Bali & NT,ID-NT
+KB,"Singkawang, Pontianak",Kalimantan,ID-KB
+DA,Banjarmasin,Kalimantan,ID-KS
+KH,"Palangkaraya, Kotawaringin, Barito",Kalimantan,ID-KT
+KT,"Balikpapan, Kutai Kartanegara, Samarinda, Bontang, Kutai",Kalimantan,ID-KI
+KU,Kalimantan Utara,Kalimantan,ID-KU
+DB,"Manado, Bolaang Mongondow, Minahasa, Bitung",Sulawesi,ID-SA
+DL,"Sahinge, Sitaro, Talaud",Sulawesi,ID-SA
+DM,"Gorontalo, Bone Bolango",Sulawesi,ID-GO
+DN,"Donggala, Palu, Poso",Sulawesi,ID-ST
+DT,"Kolaka, Konawe, Wakatobi, Buton, Kendari",Sulawesi,ID-SG
+DD,"Makassar, Takalar, Giwa, Bantaeng",Sulawesi,ID-SN
+DC,"Majumu, Polewari Mandar, Majene",Sulawesi,ID-SR
+DE,"Maluku, Serang, Ambon, Tual",Maluku & Papua,ID-MA
+DG,"Ternate, Halmahera, Tidore, Murotai",Maluku & Papua,ID-MU
+PA,"Jayapura, Merauke, Mimika, Paniai",Maluku & Papua,ID-PA
+PB,Papua Barat,Maluku & Papua,ID-PB

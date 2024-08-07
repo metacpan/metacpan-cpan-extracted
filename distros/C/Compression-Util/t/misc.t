@@ -5,7 +5,7 @@ use Test::More;
 use Compression::Util qw(:all);
 use List::Util        qw(shuffle);
 
-plan tests => 639;
+plan tests => 641;
 
 ##################################
 
@@ -219,14 +219,6 @@ is_deeply(lzss_decompress_symbolic(lzss_compress_symbolic([])),  []);
 ##############################################
 
 {
-    my $int    = int(rand(1e6));
-    my $binary = pack('b*', int2bits_lsb($int, 32));
-    open my $fh, '<:raw', \$binary;
-    my $dec = bits2int_lsb($fh, 32, \my $buffer);
-    is($int, $dec);
-}
-
-{
     my $int1 = int(rand(1 << 5));
     my $int2 = int(rand(1 << 6));
     my $int3 = int(rand(1e6));
@@ -256,7 +248,39 @@ is_deeply(lzss_decompress_symbolic(lzss_compress_symbolic([])),  []);
     my $int    = int(rand(1e6));
     my $binary = pack('B*', int2bits($int, 32));
     open my $fh, '<:raw', \$binary;
+    my $dec = oct('0b' . read_bits($fh, 32));
+    is($int, $dec);
+}
+
+{
+    my $int    = int(rand(1e6));
+    my $binary = pack('B*', int2bits($int, 32));
+    open my $fh, '<:raw', \$binary;
     my $dec = bits2int($fh, 32, \my $buffer);
+    is($int, $dec);
+}
+
+{
+    my $int    = int(rand(1e6));
+    my $binary = pack('b*', int2bits_lsb($int, 32));
+    open my $fh, '<:raw', \$binary;
+    my $dec = bits2int_lsb($fh, 32, \my $buffer);
+    is($int, $dec);
+}
+
+{
+    my $int    = int(rand(1e6));
+    my $binary = pack('N', $int);
+    open my $fh, '<:raw', \$binary;
+    my $dec = bytes2int($fh, 4);
+    is($int, $dec);
+}
+
+{
+    my $int    = int(rand(1e6));
+    my $binary = pack('b*', int2bits_lsb($int, 32));
+    open my $fh, '<:raw', \$binary;
+    my $dec = bytes2int_lsb($fh, 4);
     is($int, $dec);
 }
 
@@ -276,14 +300,6 @@ is_deeply(lzss_decompress_symbolic(lzss_compress_symbolic([])),  []);
     is($int1, $dec1);
     is($int2, $dec2);
     is($int3, $dec3);
-}
-
-{
-    my $int    = int(rand(1e6));
-    my $binary = pack('B*', int2bits($int, 32));
-    open my $fh, '<:raw', \$binary;
-    my $dec = oct('0b' . read_bits($fh, 32));
-    is($int, $dec);
 }
 
 ##############################################

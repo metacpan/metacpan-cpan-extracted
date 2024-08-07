@@ -114,7 +114,7 @@ class R::OP::Matrix::Double {
   static method identity : R::NDArray::Double ($nrow : int) {
     
     unless ($nrow > 0) {
-      die "The row \$nrow must be greater than 0.";
+      die "The row numbers \$nrow must be greater than 0.";
     }
     
     my $ncol = $nrow;
@@ -163,7 +163,7 @@ class R::OP::Matrix::Double {
     my $y_ncol = $y_ndarray->ncol;
     
     unless ($x_ncol == $y_nrow) {
-      die "The column of the matrix \$x_ndarray must be equal to the row of the matrix \$y_ndarray.";
+      die "The column numbers of the matrix \$x_ndarray must be equal to the row numbers of the matrix \$y_ndarray.";
     }
     
     my $ret_data_ref = new double[][1];
@@ -223,7 +223,7 @@ class R::OP::Matrix::Double {
     }
     
     unless ($x_ndarray->is_square_matrix) {
-      die "The n-dimensional array \$x_ndarray must be a squre matrix.";
+      die "The n-dimensional array \$x_ndarray must be a square matrix.";
     }
     
     my $x_data = (double[])$x_ndarray->data;
@@ -256,11 +256,11 @@ class R::OP::Matrix::Double {
     }
     
     unless ($x_ndarray->is_square_matrix) {
-      die "The n-dimensional array \$x_ndarray must be a squre matrix.";
+      die "The n-dimensional array \$x_ndarray must be a square matrix.";
     }
     
     if (&det($x_ndarray)->data->[0] == 0) {
-      die "The determinant of the n-dimensional array(matrix) \$x_ndarray must not be equal to 0.";
+      die "The determinant of the n-dimensional \$x_ndarray that is a matrix must not be equal to 0.";
     }
     
     my $x_data = (double[])$x_ndarray->data;
@@ -293,7 +293,7 @@ class R::OP::Matrix::Double {
     }
     
     unless ($x_ndarray->is_square_matrix) {
-      die "The n-dimensional array \$x_ndarray must be a squre matrix.";
+      die "The n-dimensional array \$x_ndarray must be a square matrix.";
     }
     
     my $eigen_vectors_data_ref = new Complex_2d[][1];

@@ -39,8 +39,10 @@ t/individuals.json
 t/individuals_random_100.json
 t/individuals_random_100_ontologies.json
 t/inter_cohort_matrix_ref.txt
+t/interpretations_pxf.json
 t/json.t
 t/matrix_ref.txt
+t/matrix_ref_interpretations_pxf.txt
 t/matrix_ref_jaccard.txt
 t/matrix_ref_weights_zero.txt
 t/movies.json

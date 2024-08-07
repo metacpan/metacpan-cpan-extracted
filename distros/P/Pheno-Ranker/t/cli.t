@@ -4,7 +4,7 @@ use warnings;
 use autodie;
 use File::Spec::Functions qw(catfile);
 use File::Temp qw{ tempfile };    # core
-use Test::More tests => 8;        # Indicate the number of tests you want to run
+use Test::More tests => 9;        # Indicate the number of tests you want to run
 use File::Compare;
 use List::MoreUtils qw(pairwise);
 use lib ( './lib', '../lib' );
@@ -331,6 +331,67 @@ SKIP: {
         );
     }
 
+}
+
+##########
+# TEST 9 #
+##########
+# interpretations
+
+{
+    my $input_file = catfile( 't', 'interpretations_pxf.json' );
+
+    # The reference file to compare the output with
+    my $reference_file = catfile( 't', 'matrix_ref_interpretations_pxf.txt' );
+
+    # The generated output file
+    my ( undef, $tmp_file ) =
+      tempfile( DIR => 't', SUFFIX => ".json", UNLINK => 1 );
+
+    my $ranker = Pheno::Ranker->new(
+        {
+            "age"             => 0,
+            "align"           => "",
+            "align_basename"  => "t/tar_align",
+            "append_prefixes" => [],
+
+            #"cli"                    => undef,
+            "config_file"              => undef,
+            "debug"                    => undef,
+            "exclude_terms"            => [],
+            "export"                   => undef,
+            "hpo_file"                 => undef,
+            "include_hpo_ascendants"   => undef,
+            "include_terms"            => [],
+            "log"                      => "",
+            "max_number_var"           => undef,
+            "max_out"                  => 36,
+            "out_file"                 => $tmp_file,
+            "patients_of_interest"     => [],
+            "poi_out_dir"              => undef,
+            "reference_files"          => [$input_file],
+            "sort_by"                  => undef,
+            "similarity_metric_cohort" => undef,
+            "target_file"              => undef,
+            "verbose"                  => undef,
+            "weights_file"             => undef
+        }
+    );
+
+    # Method 'run'
+    $ranker->run;
+
+    # Run the command line script with the input file, and redirect the output to the output_file
+    # *** IMPORTANT ***
+    # Tests performed via system("foo") are not read by Devel::Cover
+    # my $script = catfile( './bin', 'pheno-ranker' );
+    # system("$script -r $input_file -o $tmp_file");
+
+    # Compare the output_file and the reference_file
+    ok(
+        compare( $tmp_file, $reference_file ) == 0,
+        qq/Output matches the <$reference_file> file/
+    );
 }
 
 sub compare_sorted_files {

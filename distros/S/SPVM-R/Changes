@@ -1,3 +1,22 @@
+0.020 2024-08-07
+  [Document Improvement]
+    * Add docs for R::OP::Matrix::Double class.
+    * Add docs for R::OP::Matrix::Float class.
+    * Add docs for R::OP::Matrix::DoubleComplex class.
+    * Add docs for R::OP::Matrix::FloatComplex class.
+    * Fix docs for R::NDArray::DoubleComplex class.
+    
+  [Exception Message Improvement]
+    * Improve exception messages in R::OP::Matrix::Double class.
+    * Improve exception messages in R::OP::Matrix::Float class.
+    * Improve exception messages in R::OP::Matrix::DoubleComplex class.
+    * Improve exception messages in R::OP::Matrix::FloatComplex class.
+  
+  [New Features]
+    * R::DataFrame#slice method sets $colnames arguemnt to all column names if this is not defined.
+    * Add R::OP::DataFrame#subset method.
+    * Add R::OP::DataFrame#na_omit method.
+    
 0.019 2024-08-05
   [Bug Fix]
     * Fix a bug that R::OP::Matrix#rbind method does not work well.

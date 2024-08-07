@@ -53,6 +53,6 @@
          "web" : "https://github.com/Dual-Life/Scalar-List-Utils"
       }
    },
-   "version" : "1.64",
+   "version" : "1.65",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

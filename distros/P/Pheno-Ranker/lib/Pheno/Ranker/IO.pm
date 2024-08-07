@@ -8,13 +8,15 @@ use Path::Tiny;
 use File::Basename;
 use File::Spec::Functions qw(catdir catfile);
 use List::Util qw(any);
+use Hash::Util qw(lock_hash);
 use YAML::XS qw(LoadFile DumpFile);
 use JSON::XS;
+#use Data::Dumper;
 
 #use Sort::Naturally qw(nsort);
 use Exporter 'import';
 our @EXPORT =
-  qw(serialize_hashes write_alignment io_yaml_or_json read_json read_yaml write_json write_array2txt array2object validate_json write_poi coverage_stats check_existence_of_include_terms append_and_rename_primary_key);
+  qw(serialize_hashes write_alignment io_yaml_or_json read_json read_yaml write_json write_array2txt array2object validate_json write_poi coverage_stats check_existence_of_include_terms append_and_rename_primary_key restructure_pxf_interpretations);
 use constant DEVEL_MODE => 0;
 
 #########################
@@ -85,10 +87,10 @@ sub read_json {
 
     my $file = shift;
 
-    # NB: file -bi hp.json 
+    # NB: file -bi hp.json
     # text/plain; charset=utf-8
     # malformed UTF-8 character in JSON string, at character offset 680 (before "\x{fffd}r"\n      },...")
-    
+
     # Load file contents
     my $str = path($file)->slurp;
     return decode_json($str);    # Decode (utf-8) to Perl data structure
@@ -208,6 +210,9 @@ sub validate_json {
         my $msg = join "\n", @errors;
         die qq/$msg\n/;
     }
+
+    # Lock config data (keys+values)
+    lock_hash(%$data);
 
     # return data if ok
     return $data;
@@ -339,4 +344,102 @@ sub check_null_primary_key {
     return 1;
 }
 
-1;
+sub restructure_pxf_interpretations {
+
+    my ( $data, $self ) = @_;
+
+    # Premature return if the format is not 'PXF'
+    return unless $self->{format} eq 'PXF';
+
+    # Premature return if "interpretations" is excluded
+    return if (grep { $_ eq 'interpretations' } @{ $self->{exclude_terms} });
+
+    say "Restructuring <interpretations> in PXFs..." if defined $self->{verbose};
+
+    # Function to restructure individual interpretation
+    my $restructure_interpretation = sub {
+        my $interpretation     = shift;
+        my $disease_id         = $interpretation->{diagnosis}{disease}{id};
+        my $new_interpretation = {
+            progressStatus         => $interpretation->{progressStatus},
+            genomicInterpretations => {}
+        };
+
+        foreach my $genomic_interpretation (
+            @{ $interpretation->{diagnosis}{genomicInterpretations} } )
+        {
+            my $gene_id;
+            my $interpretation_data;
+
+            if ( exists $genomic_interpretation->{variantInterpretation} ) {
+                my $variant_interpretation =
+                  $genomic_interpretation->{variantInterpretation};
+
+                # Check if geneContext with valueId exists
+                if (
+                    exists $variant_interpretation->{variationDescriptor}
+                    {geneContext}{valueId} )
+                {
+                    $gene_id = $variant_interpretation->{variationDescriptor}
+                      {geneContext}{valueId};
+                }
+
+                # Check if id within variationDescriptor exists as an alternative
+                elsif (
+                    exists $variant_interpretation->{variationDescriptor}{id} )
+                {
+                    $gene_id =
+                      $variant_interpretation->{variationDescriptor}{id};
+                }
+
+                $interpretation_data = $variant_interpretation;
+            }
+            elsif ( exists $genomic_interpretation->{geneDescriptor} ) {
+                $gene_id = $genomic_interpretation->{geneDescriptor}{valueId};
+                $interpretation_data =
+                  $genomic_interpretation->{geneDescriptor};
+            }
+
+            $new_interpretation->{genomicInterpretations}{$gene_id} = {
+                interpretationStatus =>
+                  $genomic_interpretation->{interpretationStatus},
+                (
+                    exists $genomic_interpretation->{variantInterpretation}
+                    ? ( variantInterpretation => $interpretation_data )
+                    : ( geneDescriptor => $interpretation_data )
+                )
+            };
+        }
+
+        return ( $disease_id, $new_interpretation );
+    };
+
+    # Helper function to process a data structure
+    my $process_data = sub {
+        my $data = shift;
+        return unless exists $data->{interpretations};
+
+        my $new_data = {};
+
+        foreach my $interpretation ( @{ $data->{interpretations} } ) {
+            my ( $disease_id, $new_interpretation ) =
+              $restructure_interpretation->($interpretation);
+            $new_data->{$disease_id} = $new_interpretation;
+        }
+
+        $data->{interpretations} = $new_data;
+    };
+
+    # Process $data if it's an array or a single object
+    if ( ref($data) eq 'ARRAY' ) {
+        foreach my $entry (@$data) {
+            $process_data->($entry) if ref($entry) eq 'HASH';
+        }
+    }
+    elsif ( ref($data) eq 'HASH' ) {
+        $process_data->($data);
+    }
+
+    return 1;
+}
+

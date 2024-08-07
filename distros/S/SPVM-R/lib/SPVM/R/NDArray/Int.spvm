@@ -63,6 +63,13 @@ class R::NDArray::Int extends R::NDArray {
     return $cmp;
   }
   
+  method elem_is_na : int ($data : int[], $data_index : int) {
+    
+    my $elem_is_na = 0;
+    
+    return $elem_is_na;
+  }
+  
   method clone : R::NDArray::Int ($shallow : int = 0) {
     return (R::NDArray::Int)$self->SUPER::clone($shallow);
   }

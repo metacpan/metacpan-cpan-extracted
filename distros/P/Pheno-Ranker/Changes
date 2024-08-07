@@ -1,12 +1,17 @@
 Revision history for Perl distribution Pheno-Ranker
 
+0.10 2024-08-07T00:00:00Z (Manuel Rueda <mrueda@cpan.org>)
+
+ - Fixed UTF-8 printing issue for primary_key in STDOUT
+ - Added native support for interpretations nested properties up to 2D in PXF
+
 0.09 2024-05-04T00:00:00Z (Manuel Rueda <mrueda@cpan.org>)
 
  - Enhanced the csv2pheno-ranker's guessing mechanism for array fields; now evaluates all rows instead of just the first one
  - New module added: lib/Pheno/Ranker/Graph.pm
- - Introduced a new command-line option '--cytoscape-json' to generate graphs compatible with Cytoscape
- - Added a new option '--graph-stats' to compute basic statistics using the Graph CPAN module
- - Updated cpanfile to include the Graph module
+ - Introduced option --cytoscape-json to generate graphs compatible with Cytoscape
+ - Added option --graph-stats to compute basic statistics using the Graph CPAN module
+ - Updated cpanfile and Makefile.PL to include the Graph module
 
 0.08 2024-04-24T00:00:00Z (Manuel Rueda <mrueda@cpan.org>)
 
@@ -38,7 +43,7 @@ Revision history for Perl distribution Pheno-Ranker
 
 0.04 2023-12-26T00:00:00Z (Manuel Rueda <mrueda@cpan.org>)
 
- - Added List::MoreUtils to cpanfile and Makefile.PL
+ - Added List::MoreUtils to cpanfile/Makefile.PL
  - Added error when --include-terms does not exist in cohort(s)
  - Added t/die.t for the above condition (+others)
  - Refactored code in .t and .pm to enhance readability and maintainability

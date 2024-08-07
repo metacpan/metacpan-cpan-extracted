@@ -1,0 +1,79 @@
+{
+   "abstract" : "original extra operators for RxPerl",
+   "author" : [
+      "Alexander Karelas <karjala@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v3.1.23",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "RxPerl-Extras",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.035"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion::Fast" : "0.04",
+            "Test::PAUSE::Permissions" : "0.07",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "RxPerl" : "0",
+            "perl" : "5.010"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Mojo::IOLoop" : "0",
+            "Mojo::Promise" : "0",
+            "Test2::V0" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "RxPerl::Extras" : {
+         "file" : "lib/RxPerl/Extras.pm",
+         "version" : "v0.0.3"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://gitlab.com/karjala/rxperl-extras/issues"
+      },
+      "homepage" : "https://gitlab.com/karjala/rxperl-extras",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://gitlab.com/karjala/rxperl-extras.git",
+         "web" : "https://gitlab.com/karjala/rxperl-extras"
+      }
+   },
+   "version" : "v0.0.3",
+   "x_authority" : "cpan:KARJALA",
+   "x_serialization_backend" : "JSON::PP version 4.16",
+   "x_static_install" : 1
+}

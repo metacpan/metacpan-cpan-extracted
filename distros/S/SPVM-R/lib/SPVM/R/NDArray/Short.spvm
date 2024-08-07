@@ -59,6 +59,13 @@ class R::NDArray::Short extends R::NDArray {
     return $cmp;
   }
   
+  method elem_is_na : int ($data : short[], $data_index : int) {
+    
+    my $elem_is_na = 0;
+    
+    return $elem_is_na;
+  }
+  
   method clone : R::NDArray::Short ($shallow : int = 0) {
     return (R::NDArray::Short)$self->SUPER::clone($shallow);
   }

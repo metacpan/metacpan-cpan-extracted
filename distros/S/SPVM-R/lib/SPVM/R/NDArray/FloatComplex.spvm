@@ -52,6 +52,16 @@ class R::NDArray::FloatComplex extends R::NDArray {
     $dist_data->[$dist_data_index] = $src_data->[$src_data_index];
   }
   
+  method elem_is_na : int ($data : Complex_2f[], $data_index : int) {
+    
+    my $elem_is_na = 0;
+    if (Math->isnan($data->[$data_index]->{re}) || Math->isnan($data->[$data_index]->{im})) {
+      $elem_is_na = 1;
+    }
+    
+    return $elem_is_na;
+  }
+  
   precompile method to_double_complex_ndarray : R::NDArray::DoubleComplex () {
     
     my $length = $self->length;

@@ -59,7 +59,7 @@ sub cohort_comparison {
     my $switch    = $num_items > $max_items ? 1 : 0;
 
     # Opening file for output
-    open( my $fh, ">", $out_file );
+    open( my $fh, '>:encoding(UTF-8)', $out_file );
     say $fh "\t", join "\t", @sorted_keys_ref_binary_hash;
 
     # Initialize matrix for storing similarity
@@ -460,15 +460,12 @@ sub create_glob_and_ref_hashes {
 
         # For consistency, we obtain the primary_key for both BFF/PXF
         # from $_->{id} (not from subject.id)
-        my $id = $element->{$primary_key};
-
-        # die if an individual does not have primary_key defined
-        die
-"Sorry but the JSON document [$count] does not have the primary_key <$primary_key> defined\n"
-          unless defined $id;
+        my $id = $element->{$primary_key} 
+           or die "Sorry but the JSON document [$count] does not have the primary_key <$primary_key> defined\n";
 
         # Remapping hash
         say "Flattening and remapping <id:$id> ..." if $self->{verbose};
+
         my $ref_hash = remap_hash(
             {
                 hash   => $element,
@@ -551,17 +548,23 @@ sub undef_excluded_phenotypicFeatures {
 
     my $hash = shift;
 
-    # Setting the property to undef (it will be discarded later)
-    if ( exists $hash->{phenotypicFeatures} ) {
-        @{ $hash->{phenotypicFeatures} } =
-          map { $_->{excluded} ? undef : $_ } @{ $hash->{phenotypicFeatures} };
-    }
-
     # *** IMPORTANT ***
-    # Because of setting to undef the excludd properties, it can happen that in
-    # the stats file we have phenotypicFeatures = 100% but t hen it turns out
-    # that some individuals have phenotypicFeatures = {} (all excluded)
-    return $hash;
+    # Due to properties being set to undef, it's possible for the coverage file to
+    # report phenotypicFeatures as 100%. However, this might be misleading because
+    # some individuals might actually have phenotypicFeatures = {} (indicating all
+    # features are excluded).
+    # Attempting to add the --enable-excluded-phenotypicFeatures option was considered
+    # to address this, but it made the implementation too convoluted for BFF/PXF.
+
+    if ( exists $hash->{phenotypicFeatures} ) {
+        for my $item ( @{ $hash->{phenotypicFeatures} } ) {
+
+            # exists and true
+            $item = undef
+              if ( exists $item->{excluded} && $item->{excluded} );
+        }
+    }
+    return 1;
 }
 
 sub remap_hash {
@@ -600,7 +603,8 @@ sub remap_hash {
     #  - Works across any JSON data structure (without specific key requirements)
     #  - BUT profiling shows it's ~5-10% slower than 'Array to Hash then Fold'
     #  - Does not accommodate specific remappings like 'interpretations.diagnosis.genomicInterpretations'
-    $hash = fold( undef_excluded_phenotypicFeatures($hash) );
+    undef_excluded_phenotypicFeatures($hash);
+    $hash = fold($hash);
 
     # Load the hash that points to the hierarchy for ontology-term-id
     #  *** IMPORTANT ***

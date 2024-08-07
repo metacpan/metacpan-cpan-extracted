@@ -60,6 +60,16 @@ class R::NDArray::DoubleComplex extends R::NDArray {
     return (R::NDArray::DoubleComplex)$self->SUPER::slice($asix_indexes_product);
   }
   
+  method elem_is_na : int ($data : Complex_2d[], $data_index : int) {
+    
+    my $elem_is_na = 0;
+    if (Math->isnan($data->[$data_index]->{re}) || Math->isnan($data->[$data_index]->{im})) {
+      $elem_is_na = 1;
+    }
+    
+    return $elem_is_na;
+  }
+  
   precompile method to_float_complex_ndarray : R::NDArray::FloatComplex () {
     
     my $length = $self->length;

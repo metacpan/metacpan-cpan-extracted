@@ -13,7 +13,8 @@ SPVM::R::DataFrame - Short Description
 The R::DataFrame class in L<SPVM> represents a data frame.
 
 =head1 Usage
-
+  
+  use R::DataFrame;
   use R::OP::DataFrame as DFOP;
   use R::OP::Int as IOP;
   use R::OP::Double as DOP;
@@ -21,7 +22,7 @@ The R::DataFrame class in L<SPVM> represents a data frame.
   use R::OP::Time::Piece as TPOP;
   
   # Create a R::DataFrame object
-  my $data_frame = DFOP->data_frame;
+  my $data_frame = R::DataFrame->new;
   
   $data_frame->set_col("name", STROP->c(["Ken", "Yuki", "Mike"]));
   $data_frame->set_col("age", IOP->c([19, 43, 50]));

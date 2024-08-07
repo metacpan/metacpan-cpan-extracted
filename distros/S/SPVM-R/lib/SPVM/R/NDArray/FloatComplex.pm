@@ -32,7 +32,7 @@ R::NDArray::FloatComplex class in L<SPVM> represents n-dimensional array of floa
 
 L<R::NDArray|SPVM::R::NDArray>
 
-=head1 Field
+=head1 Fields
 
 =head2 data
 
@@ -73,6 +73,14 @@ Assigns the element $src_data at index $src_data_index to the element $dist_data
 C<method elem_clone : void ($dist_data : L<Complex_2f|SPVM::Complex_2f>[], $dist_data_index : int, $src_data : L<Complex_2f|SPVM::Complex_2f>[], $src_data_index : int);>
 
 Copies the element $src_data at index $src_data_indext to the element $dist_data at index $dist_data_index.
+
+=head2 elem_is_na
+
+C<method elem_is_na : int ($data : L<Complex_2f|SPVM::Complex_2f>[], $data_index : int);>
+
+Checks if an element represets NA.
+
+If the real number or the image number of the element $data at index $data_index is NaN, returns 1, otherwise returns 0.
 
 =head2 clone
 

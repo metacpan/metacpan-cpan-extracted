@@ -1,0 +1,10 @@
+requires 'perl', '5.010';
+
+requires 'RxPerl';
+
+on 'test' => sub {
+    requires 'Test2::V0';
+    # Promise::ES6 is broken in new Perls
+    requires 'Mojo::Promise';
+    requires 'Mojo::IOLoop';
+};

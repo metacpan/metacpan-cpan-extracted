@@ -309,6 +309,10 @@ class R::DataFrame {
     
     my $colobjs_indexes_h = $self->{colobjs_indexes_h};
     
+    unless ($colnames) {
+      $colnames = $self->colnames;
+    }
+    
     my $ret_data_frame = R::DataFrame->new;
     for my $colname (@$colnames) {
       my $ndarray = $self->col($colname);

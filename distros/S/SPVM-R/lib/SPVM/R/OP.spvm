@@ -113,4 +113,26 @@ class R::OP {
     return $ret_ndarray;
   }
   
+  precompile static method is_na : R::NDArray::Int ($x_ndarray : R::NDArray) {
+    
+    unless ($x_ndarray) {
+      die "The n-dimensional array \$x_ndarray must be defined.";
+    }
+    
+    my $length = $x_ndarray->length;
+    
+    my $x_dim = $x_ndarray->dim;
+    
+    my $ret_ndarray = R::OP::Int->c(undef, $x_dim);
+    
+    my $x_data = $x_ndarray->data;
+    my $ret_data = $ret_ndarray->data;
+    
+    for (my $i = 0; $i < $length; $i++) {
+      $ret_data->[$i] = $x_ndarray->elem_is_na($x_data, $i);
+    }
+    
+    return $ret_ndarray;
+  }
+  
 }

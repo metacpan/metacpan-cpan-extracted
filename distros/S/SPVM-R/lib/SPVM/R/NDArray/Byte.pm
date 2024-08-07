@@ -70,6 +70,14 @@ C<method elem_cmp : int ($data : byte[], $a_data_index : int, $b_data_index : in
 
 Compares the element $data at index $a_data_index and the element $data at index $b_data_index and returns the result.
 
+=head2 elem_is_na
+
+C<method elem_is_na : int ($data : byte[], $data_index : int);>
+
+Checks if an element represets NA.
+
+Returns 0.
+
 =head2 clone
 
 C<method clone : L<R::NDArray::Byte|SPVM::R::NDArray::Byte> ($shallow : int = 0);>

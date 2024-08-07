@@ -2,5 +2,5 @@
 # MIT License
 
 class R {
-  version "0.019";
+  version "0.020";
 }

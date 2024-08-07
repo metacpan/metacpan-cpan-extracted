@@ -243,6 +243,8 @@ class R::NDArray {
   
   method elem_cmp : int ($data : object, $a_data_index : int, $b_data_index : int) { die "Not implemented."; }
   
+  method elem_is_na : int ($data : object, $data_index : int) { die "Not implemented."; }
+  
   precompile method to_string_ndarray : R::NDArray::String () {
     
     unless ($self) {

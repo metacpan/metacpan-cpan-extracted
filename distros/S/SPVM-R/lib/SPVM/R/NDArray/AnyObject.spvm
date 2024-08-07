@@ -59,6 +59,16 @@ class R::NDArray::AnyObject extends R::NDArray {
     return (R::NDArray::AnyObject)$self->SUPER::clone($shallow);
   }
   
+  method elem_is_na : int ($data : object[], $data_index : int) {
+    
+    my $elem_is_na = 0;
+    if (!$data->[$data_index]) {
+      $elem_is_na = 1;
+    }
+    
+    return $elem_is_na;
+  }
+  
   method slice : R::NDArray::AnyObject ($asix_indexes_product : R::NDArray::Int[]) {
     return (R::NDArray::AnyObject)$self->SUPER::slice($asix_indexes_product);
   }

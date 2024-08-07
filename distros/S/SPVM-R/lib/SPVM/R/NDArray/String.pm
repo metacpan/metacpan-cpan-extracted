@@ -70,6 +70,14 @@ C<method elem_cmp : int ($data : string[], $a_data_index : int, $b_data_index : 
 
 Compares the element $data at index $a_data_index and the element $data at index $b_data_index and returns the result.
 
+=head2 elem_is_na
+
+C<method elem_is_na : int ($data : object, $data_index : int);>
+
+Checks if an element represets NA.
+
+If the element $data at index $data_index is not defined, returns 1, otherwise returns 0.
+
 =head2 clone
 
 C<method clone : L<R::NDArray::String|SPVM::R::NDArray::String> ($shallow : int = 0);>

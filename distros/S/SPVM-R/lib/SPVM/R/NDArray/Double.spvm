@@ -63,6 +63,16 @@ class R::NDArray::Double extends R::NDArray {
     return $cmp;
   }
   
+  method elem_is_na : int ($data : double[], $data_index : int) {
+    
+    my $elem_is_na = 0;
+    if (Math->isnan($data->[$data_index])) {
+      $elem_is_na = 1;
+    }
+    
+    return $elem_is_na;
+  }
+  
   method clone : R::NDArray::Double ($shallow : int = 0) {
     return (R::NDArray::Double)$self->SUPER::clone($shallow);
   }
