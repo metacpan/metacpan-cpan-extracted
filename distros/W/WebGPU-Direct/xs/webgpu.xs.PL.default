@@ -1,0 +1,267 @@
+{
+  # Constants, by a name, are scalar refs, and are fixed up later
+  BlendComponent => {
+    operation => \'BlendOperation->add',
+    srcFactor => \'BlendFactor->one',
+    dstFactor => \'BlendFactor->zero',
+  },
+  BufferBindingLayout => {
+    type             => \'BufferBindingType->uniform',
+    hasDynamicOffset => 0,
+    minBindingSize   => 0,
+  },
+  BufferDescriptor => {
+    mappedAtCreation => 0,
+  },
+  ColorTargetState => {
+    blend     => undef,
+    writeMask => \'ColorWriteMask->all',
+  },
+  DepthStencilState => {
+    depthBias           => 0,
+    depthBiasClamp      => 0,
+    depthBiasSlopeScale => 0,
+    stencilReadMask     => 0xFFFFFFFF,
+    stencilWriteMask    => 0xFFFFFFFF,
+  },
+  Extent3D => {
+    height             => 1,
+    depthOrArrayLayers => 1,
+  },
+  ImageCopyBuffer => {
+    offset => 0,
+  },
+  ImageCopyTexture => {
+    mipLevel => 0,
+    aspect   => \'TextureAspect->all',
+  },
+  MultisampleState => {
+    count                  => 1,
+    mask                   => 0xFFFFFFFF,
+    alphaToCoverageEnabled => 0,
+  },
+  Origin3D => {
+    x => 0,
+    y => 0,
+    z => 0,
+  },
+  PrimitiveState => {
+    topology  => \'PrimitiveTopology->triangleList',
+    frontFace => \'FrontFace->CCW',
+    cullMode  => \'CullMode->none',
+  },
+  RenderBundleEncoderDescriptor => {
+    sampleCount     => 1,
+    depthReadOnly   => 0,
+    stencilReadOnly => 0,
+  },
+  RenderPassDescriptorMaxDrawCount => {
+    maxDrawCount => 50000000,
+  },
+  RequestAdapterOptions => {
+    forceFallbackAdapter => 0,
+  },
+  RequiredLimits => {
+    maxTextureDimension1D                     => 8192,
+    maxTextureDimension2D                     => 8192,
+    maxTextureDimension3D                     => 2048,
+    maxTextureArrayLayers                     => 256,
+    maxBindGroups                             => 4,
+    maxBindingsPerBindGroup                   => 640,
+    maxDynamicUniformBuffersPerPipelineLayout => 8,
+    maxDynamicStorageBuffersPerPipelineLayout => 4,
+    maxSampledTexturesPerShaderStage          => 16,
+    maxSamplersPerShaderStage                 => 16,
+    maxStorageBuffersPerShaderStage           => 8,
+    maxStorageTexturesPerShaderStage          => 4,
+    maxUniformBuffersPerShaderStage           => 12,
+    maxUniformBufferBindingSize               => 65536,
+    maxStorageBufferBindingSize               => 134217728,
+    minUniformBufferOffsetAlignment           => 256,
+    minStorageBufferOffsetAlignment           => 256,
+    maxVertexBuffers                          => 8,
+    maxBufferSize                             => 268435456,
+    maxVertexAttributes                       => 16,
+    maxVertexBufferArrayStride                => 2048,
+    maxInterStageShaderComponents             => 60,
+    maxInterStageShaderVariables              => 16,
+    maxColorAttachments                       => 8,
+    maxColorAttachmentBytesPerSample          => 32,
+    maxComputeWorkgroupStorageSize            => 16384,
+    maxComputeInvocationsPerWorkgroup         => 256,
+    maxComputeWorkgroupSizeX                  => 256,
+    maxComputeWorkgroupSizeY                  => 256,
+    maxComputeWorkgroupSizeZ                  => 64,
+    maxComputeWorkgroupsPerDimension          => 65535,
+  },
+  SamplerDescriptor => {
+    addressModeU  => \'AddressMode->clampToEdge',
+    addressModeV  => \'AddressMode->clampToEdge',
+    addressModeW  => \'AddressMode->clampToEdge',
+    magFilter     => \'FilterMode->nearest',
+    minFilter     => \'FilterMode->nearest',
+    mipmapFilter  => \'MipmapFilterMode->nearest',
+    lodMinClamp   => 0,
+    lodMaxClamp   => 32,
+    maxAnisotropy => 1,
+  },
+  StencilFaceState => {
+    compare     => \'CompareFunction->always',
+    failOp      => \'StencilOperation->keep',
+    depthFailOp => \'StencilOperation->keep',
+    passOp      => \'StencilOperation->keep',
+  },
+  SurfaceConfiguration => {
+    alphaMode => \'CompositeAlphaMode->auto',
+    usage     => \'TextureUsage->renderAttachment',
+  },
+  TextureDescriptor => {
+    dimension     => \'TextureDimension->_2D',
+    size          => { height => 1, depthOrArrayLayers => 1 },
+    mipLevelCount => 1,
+    sampleCount   => 1,
+  },
+  TextureViewDescriptor => {
+    aspect         => \'TextureAspect->all',
+    baseArrayLayer => 0,
+    baseMipLevel   => 0,
+  },
+  VertexBufferLayout => {
+    stepMode => \'VertexStepMode->vertex',
+  },
+
+  # Structs that can be constructed with an array
+  ARRAY => {
+    Color    => [qw/ r g b a /],
+    Extent3D => [qw/width height depthOrArrayLayers/],
+  },
+
+  # XS Function and function documentation of defaults
+  Adapter => {
+    requestDevice => {
+      descriptor => 'undef',
+      callback   => 'undef',
+      userdata   => '{}',
+    },
+  },
+
+  Buffer => {
+    getConstMappedRange => {
+      offset => 0,
+      size   => 'GetSize() - offset',
+    },
+    getMappedRange => {
+      offset => 0,
+      size   => 'GetSize() - offset',
+    },
+    mapAsync => {
+      offset   => 0,
+      size     => 'GetSize() - offset',
+      userdata => '{}',
+    },
+  },
+
+  CommandEncoder => {
+    beginComputePass => {
+      descriptor => '{}',
+    },
+    clearBuffer => {
+      offset => 0,
+      size   => 'buffer->getSize() - offset',
+    },
+    finish => {
+      descriptor => '{}',
+    },
+  },
+
+  ComputePassEncoder => {
+    dispatchWorkgroups => {
+      workgroupCountY => 1,
+      workgroupCountZ => 1,
+    },
+    setBindGroup => {
+      dynamicOffsets => '[]',
+    },
+  },
+
+  Device => {
+    createCommandEncoder => {
+      descriptor => '{}',
+    },
+    createSampler => {
+      descriptor => '{}',
+    },
+  },
+
+  Instance => {
+    requestAdapter => {
+      options  => 'undef',
+      callback => 'undef',
+      userdata => '{}',
+    },
+  },
+
+  RenderBundleEncoder => {
+    draw => {
+      instanceCount => 1,
+      firstVertex   => 0,
+      firstInstance => 0,
+    },
+    drawIndexed => {
+      instanceCount => 1,
+      firstIndex    => 0,
+      baseVertex    => 0,
+      firstInstance => 0,
+    },
+    setBindGroup => {
+      dynamicOffsets => '[]',
+    },
+    setIndexBuffer => {
+      offset => 0,
+      size   => 'buffer->getSize() - offset',
+    },
+    setVertexBuffer => {
+      offset => 0,
+      size   => 'buffer->getSize() - offset',
+    },
+  },
+
+  RenderPassEncoder => {
+    draw => {
+      instanceCount => 1,
+      firstVertex   => 0,
+      firstInstance => 0,
+    },
+    drawIndexed => {
+      instanceCount => 1,
+      firstIndex    => 0,
+      baseVertex    => 0,
+      firstInstance => 0,
+    },
+    setBindGroup => {
+      dynamicOffsets => '[]',
+    },
+    setIndexBuffer => {
+      offset => 0,
+      size   => 'buffer->getSize() - offset',
+    },
+    setVertexBuffer => {
+      offset => 0,
+      size   => 'buffer->getSize() - offset',
+    },
+  },
+
+  Surface => {
+    getCurrentTexture => {
+      surfaceTexture => 'undef',
+    },
+  },
+
+  Texture => {
+    createView => {
+      descriptor => '{}',
+    },
+  },
+}
+
+# vim: syn=perl

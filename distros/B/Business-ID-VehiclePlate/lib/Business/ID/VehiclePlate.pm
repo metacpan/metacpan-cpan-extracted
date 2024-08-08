@@ -10,7 +10,7 @@ use Exporter 'import';
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
 our $DATE = '2024-08-05'; # DATE
 our $DIST = 'Business-ID-VehiclePlate'; # DIST
-our $VERSION = '0.001'; # VERSION
+our $VERSION = '0.002'; # VERSION
 
 our @EXPORT_OK = qw(parse_idn_vehicle_plate_number);
 
@@ -312,8 +312,11 @@ sub parse_idn_vehicle_plate_number {
 
     # XXX check whether main number is a pretty number
 
-    return [400, "Missing suffix (1-3 letters after main number)"] unless $num =~ s/\A([A-Z]{1,3})//;
-    my $suffix = $1;
+    my $suffix = "";
+  GET_SUFFIX: {
+        last unless $num =~ s/\A([A-Z]{1,3})//;
+        $suffix = $1;
+    }
     $res->{suffix} = $suffix;
 
   CHECK_RF_SUFFIX: {
@@ -400,7 +403,7 @@ Business::ID::VehiclePlate - Parse Indonesian vehicle plate number
 
 =head1 VERSION
 
-This document describes version 0.001 of Business::ID::VehiclePlate (from Perl distribution Business-ID-VehiclePlate), released on 2024-08-05.
+This document describes version 0.002 of Business::ID::VehiclePlate (from Perl distribution Business-ID-VehiclePlate), released on 2024-08-05.
 
 =head1 SYNOPSIS
 

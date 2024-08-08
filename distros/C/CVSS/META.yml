@@ -26,6 +26,6 @@ requires:
 resources:
   bugtracker: https://github.com/giterlizzi/perl-CVSS/issues
   repository: git://github.com/giterlizzi/perl-CVSS
-version: '1.11'
+version: '1.12'
 x_purl: pkg:cpan/GDT/CVSS
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

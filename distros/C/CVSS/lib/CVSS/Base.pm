@@ -7,7 +7,7 @@ use warnings;
 
 use Carp ();
 
-our $VERSION = '1.11';
+our $VERSION = '1.12';
 $VERSION =~ tr/_//d;    ## no critic
 
 use overload '""' => \&to_string, fallback => 1;
@@ -83,11 +83,12 @@ sub from_vector_string {
 }
 
 sub ATTRIBUTES          { {} }
-sub SEVERITY            { {} }
+sub SCORE_SEVERITY      { {} }
 sub NOT_DEFINED_VALUE   { }
 sub VECTOR_STRING_REGEX {qw{}}
 sub METRIC_GROUPS       { {} }
 sub METRIC_NAMES        { {} }
+sub METRIC_VALUES       { {} }
 
 
 sub _metric_name_to_value {
@@ -159,10 +160,10 @@ sub score_to_severity {
 
     return unless (!!$score);
 
-    my $SEVERITY = $self->SEVERITY;
+    my $SCORE_SEVERITY = $self->SCORE_SEVERITY;
 
-    foreach (keys %{$SEVERITY}) {
-        my $range = $SEVERITY->{$_};
+    foreach (keys %{$SCORE_SEVERITY}) {
+        my $range = $SCORE_SEVERITY->{$_};
         if ($score >= $range->{min} && $score <= $range->{max}) {
             return $_;
         }
@@ -338,7 +339,7 @@ Return the HASH of calculated score (base, impact, temporal, etc.).
 
 Performs the calculation of the score in accordance with the CVSS specification.
 
-=item score_to_severity ( $score )
+=item $cvss->score_to_severity ( $score )
 
 Convert the score in severity
 
@@ -490,6 +491,41 @@ Convert the L<CVSS> object in JSON format in according of CVSS JSON Schema.
     #    "vectorString" : "CVSS:3.1/AV:A/AC:L/PR:L/UI:R/S:U/C:H/I:H/A:H",
     #    "version" : "3.1"
     # }
+
+=back
+
+=head2 CONSTANTS
+
+=over
+
+=item $cvss->ATTRIBUTES
+
+Returns the HASH of all metrics in C<{ "JSON name" =E<gt> "metric", ... }> format.
+
+=item $cvss->METRIC_GROUPS
+
+Returns the HASH of the metric group (base, environmental, temporal, etc.) and its metrics.
+
+=item $cvss->METRIC_NAMES
+
+Returns the HASH of the names of all metric values.
+
+=item $cvss->METRIC_VALUES
+
+Returns the HASH of all metric values.
+
+=item $cvss->NOT_DEFINED_VALUE
+
+Returns the NOT_DEFINED vector value (C<ND> or C<X>).
+
+=item $cvss->SCORE_SEVERITY
+
+Returns the HASH of C<{ severity =E<gt> { min =E<gt> score, max =E<gt> score }, ... }>
+used by C<score_to_severity>.
+
+=item $cvss->VECTOR_STRING_REGEX
+
+Return the Vector String REGEX.
 
 =back
 

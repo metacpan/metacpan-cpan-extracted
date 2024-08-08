@@ -33,6 +33,11 @@ or app that uses Mojo::IOLoop.
 
 The documentation at [RxPerl](https://metacpan.org/pod/RxPerl) applies to this module too.
 
+# NOTE
+
+Due to a bug in [Mojo::Promise](https://metacpan.org/pod/Mojo%3A%3APromise) which was fixed in [Mojolicious](https://metacpan.org/pod/Mojolicious) 8.15, RxPerl's two promise functions
+([first\_value\_from](https://metacpan.org/pod/RxPerl#first_value_from) and [last\_value\_from](https://metacpan.org/pod/RxPerl#last_value_from)) require Mojolicious 8.15 or above.
+
 # NOTIFICATIONS FOR NEW RELEASES
 
 You can start receiving emails for new releases of this, or other, modules, over at [https://perlmodules.net](https://perlmodules.net).

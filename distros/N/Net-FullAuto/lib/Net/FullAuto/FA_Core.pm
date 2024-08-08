@@ -21254,19 +21254,19 @@ sub cwd
             if (-1<index $target_dir,' ') {
                ($output,$stderr)=$self->cmd("cd \'$target_dir\'",
                   '__delay__=200');
-               print "self->cmd cd \"$target_dir\" ",
-                  "OUTPUT:\n==>$output<==\nat LINE ",__LINE__,"\n"
-                  if ((!$Net::FullAuto::FA_Core::cron &&
-                  $Net::FullAuto::FA_Core::debug) ||
-                  $debug);
+               if ($stderr) {
+                  if (wantarray) {
+                     return '',$stderr;
+                  } else { &Net::FullAuto::FA_Core::handle_error($stderr) }
+               }
             } else {
                ($output,$stderr)=$self->cmd("cd $target_dir",
                   '__delay__=200');
-               print "self->cmd cd $target_dir ",
-                  "OUTPUT:\n==>$output<==\nat LINE ",__LINE__,"\n"
-                  if ((!$Net::FullAuto::FA_Core::cron &&
-                  $Net::FullAuto::FA_Core::debug) ||
-                  $debug);
+               if ($stderr) {
+                  if (wantarray) {
+                     return '',$stderr;
+                  } else { &Net::FullAuto::FA_Core::handle_error($stderr) }
+               }
             }
             my $pwd='';
 	    ($pwd,$stderr)=$self->cmd('pwd','__delay__=200');
@@ -31492,6 +31492,7 @@ sub display
             $save=$line;
             return $save;
          }
+         $line=~s/^stdout:(\s+)$/$1/s;
          if ($print_line_debugging) {
             print $log "display() CALLER=",(join " ",caller),"\n";
             print $log "display() ORIGINAL LINE=$_[0]<==\n";

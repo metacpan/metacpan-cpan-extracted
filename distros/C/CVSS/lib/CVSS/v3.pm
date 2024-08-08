@@ -12,7 +12,7 @@ use Carp       ();
 use base 'CVSS::Base';
 use CVSS::Constants ();
 
-our $VERSION = '1.11';
+our $VERSION = '1.12';
 $VERSION =~ tr/_//d;    ## no critic
 
 use constant DEBUG => $ENV{CVSS_DEBUG};
@@ -20,11 +20,12 @@ use constant DEBUG => $ENV{CVSS_DEBUG};
 my $WEIGHTS = CVSS::Constants->CVSS3_WEIGHTS;
 
 sub ATTRIBUTES          { CVSS::Constants->CVSS3_ATTRIBUTES }
-sub SEVERITY            { CVSS::Constants->CVSS3_SEVERITY }
+sub SCORE_SEVERITY      { CVSS::Constants->CVSS3_SCORE_SEVERITY }
 sub NOT_DEFINED_VALUE   { CVSS::Constants->CVSS3_NOT_DEFINED_VALUE }
 sub VECTOR_STRING_REGEX { CVSS::Constants->CVSS3_VECTOR_STRING_REGEX }
 sub METRIC_GROUPS       { CVSS::Constants->CVSS3_METRIC_GROUPS }
 sub METRIC_NAMES        { CVSS::Constants->CVSS3_METRIC_NAMES }
+sub METRIC_VALUES       { CVSS::Constants->CVSS3_METRIC_VALUES }
 
 sub weight {
 

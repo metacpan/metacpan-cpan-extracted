@@ -5,13 +5,13 @@ use strict;
 use utf8;
 use warnings;
 
-our $VERSION = '1.11';
+our $VERSION = '1.12';
 $VERSION =~ tr/_//d;    ## no critic
 
 
 # CVSS v2.0 constants
 
-use constant CVSS2_SEVERITY => {
+use constant CVSS2_SCORE_SEVERITY => {
     NONE   => {min => 0.0, max => 0.0},
     LOW    => {min => 0.1, max => 3.9},
     MEDIUM => {min => 4.0, max => 6.9},
@@ -72,6 +72,27 @@ use constant CVSS2_ATTRIBUTES => {
 
 };
 
+use constant CVSS2_METRIC_VALUES => {
+
+    AV => [qw(N A L)],
+    AC => [qw(H M L)],
+    Au => [qw(M S N)],
+    C  => [qw(N P C)],
+    I  => [qw(N P C)],
+    A  => [qw(N P C)],
+
+    E  => [qw(U POC F H ND)],
+    RL => [qw(OF TF W U ND)],
+    RC => [qw(UC UR C ND)],
+
+    CDP => [qw(N L LM MH H ND)],
+    TD  => [qw(N L M H ND)],
+    CR  => [qw(L M H ND)],
+    IR  => [qw(L M H ND)],
+    AR  => [qw(L M H ND)],
+
+};
+
 sub CVSS2_METRIC_NAMES {
 
     my $ND = 'NOT_DEFINED';
@@ -121,7 +142,7 @@ sub CVSS2_METRIC_NAMES {
 
 # CVSS v3.x constans
 
-use constant CVSS3_SEVERITY => {
+use constant CVSS3_SCORE_SEVERITY => {
     NONE     => {min => 0.0, max => 0.0},
     LOW      => {min => 0.1, max => 3.9},
     MEDIUM   => {min => 4.0, max => 6.9},
@@ -222,16 +243,45 @@ use constant CVSS3_ATTRIBUTES => {
 
 };
 
+use constant CVSS3_METRIC_VALUES => {
+
+    AV => [qw(N A L P)],
+    AC => [qw(L H)],
+    PR => [qw(N L H)],
+    UI => [qw(N R)],
+    S  => [qw(U C)],
+    C  => [qw(N L H)],
+    I  => [qw(N L H)],
+    A  => [qw(N L H)],
+
+    E  => [qw(X U P F H)],
+    RL => [qw(X O T W U)],
+    RC => [qw(X U R C)],
+
+    MAV => [qw(X N A L P)],
+    MAC => [qw(X L H)],
+    MPR => [qw(X N L H)],
+    MUI => [qw(X N R)],
+    MS  => [qw(X U C)],
+    MC  => [qw(X N L H)],
+    MI  => [qw(X N L H)],
+    MA  => [qw(X N L H)],
+    CR  => [qw(X L M H)],
+    IR  => [qw(X L M H)],
+    AR  => [qw(X L M H)],
+
+};
+
 sub CVSS3_METRIC_NAMES {
 
-    my $AV = {N => 'NETWORK',   A => 'ADJACENT_NETWORK', L => 'LOCAL', P => 'PHYSICAL', X => 'NOT_DEFINED'};
-    my $AC = {H => 'HIGH',      L => 'LOW',      X => 'NOT_DEFINED'};
-    my $PR = {N => 'NONE',      L => 'LOW',      H => 'HIGH', X => 'NOT_DEFINED'};
-    my $UI = {N => 'NONE',      R => 'REQUIRED', X => 'NOT_DEFINED'};
-    my $S  = {U => 'UNCHANGED', C => 'CHANGED',  X => 'NOT_DEFINED'};
-    my $C  = {N => 'NONE',      L => 'LOW',      H => 'HIGH', X => 'NOT_DEFINED'};
-    my $I  = {N => 'NONE',      L => 'LOW',      H => 'HIGH', X => 'NOT_DEFINED'};
-    my $A  = {N => 'NONE',      L => 'LOW',      H => 'HIGH', X => 'NOT_DEFINED'};
+    my $AV = {N => 'NETWORK',   A => 'ADJACENT_NETWORK', L => 'LOCAL', P => 'PHYSICAL'};
+    my $AC = {H => 'HIGH',      L => 'LOW'};
+    my $PR = {N => 'NONE',      L => 'LOW', H => 'HIGH'};
+    my $UI = {N => 'NONE',      R => 'REQUIRED'};
+    my $S  = {U => 'UNCHANGED', C => 'CHANGED'};
+    my $C  = {N => 'NONE',      L => 'LOW', H => 'HIGH'};
+    my $I  = {N => 'NONE',      L => 'LOW', H => 'HIGH'};
+    my $A  = {N => 'NONE',      L => 'LOW', H => 'HIGH'};
 
     my $E  = {X => 'NOT_DEFINED', U => 'UNPROVEN',     P => 'PROOF_OF_CONCEPT', F => 'FUNCTIONAL', H => 'HIGH'};
     my $RL = {X => 'NOT_DEFINED', O => 'OFFICIAL_FIX', T => 'TEMPORARY_FIX',    W => 'WORKAROUND', U => 'UNAVAILABLE'};
@@ -248,6 +298,8 @@ sub CVSS3_METRIC_NAMES {
     my $MC  = {N => 'NONE',        L => 'LOW',              H => 'HIGH', X => 'NOT_DEFINED'};
     my $MI  = {N => 'NONE',        L => 'LOW',              H => 'HIGH', X => 'NOT_DEFINED'};
     my $MA  = {N => 'NONE',        L => 'LOW',              H => 'HIGH', X => 'NOT_DEFINED'};
+
+    my @AV = (qw[N A L P]);
 
     return {
         # Base
@@ -284,7 +336,7 @@ sub CVSS3_METRIC_NAMES {
 
 # CVSS v4.0 constants
 
-use constant CVSS4_SEVERITY => CVSS3_SEVERITY();
+use constant CVSS4_SCORE_SEVERITY => CVSS3_SCORE_SEVERITY();
 
 use constant CVSS4_NOT_DEFINED_VALUE => 'X';
 
@@ -323,29 +375,29 @@ use constant CVSS4_MAX_COMPOSED => {
 };
 
 use constant CVSS4_LOOKUP_GLOBAL => {
-    '000000' => 10,
+    '000000' => 10.0,
     '000001' => 9.9,
     '000010' => 9.8,
     '000011' => 9.5,
     '000020' => 9.5,
     '000021' => 9.2,
-    '000100' => 10,
+    '000100' => 10.0,
     '000101' => 9.6,
     '000110' => 9.3,
     '000111' => 8.7,
     '000120' => 9.1,
     '000121' => 8.1,
     '000200' => 9.3,
-    '000201' => 9,
+    '000201' => 9.0,
     '000210' => 8.9,
-    '000211' => 8,
+    '000211' => 8.0,
     '000220' => 8.1,
     '000221' => 6.8,
     '001000' => 9.8,
     '001001' => 9.5,
     '001010' => 9.5,
     '001011' => 9.2,
-    '001020' => 9,
+    '001020' => 9.0,
     '001021' => 8.4,
     '001100' => 9.3,
     '001101' => 9.2,
@@ -354,9 +406,9 @@ use constant CVSS4_LOOKUP_GLOBAL => {
     '001120' => 8.1,
     '001121' => 6.5,
     '001200' => 8.8,
-    '001201' => 8,
+    '001201' => 8.0,
     '001210' => 7.8,
-    '001211' => 7,
+    '001211' => 7.0,
     '001220' => 6.9,
     '001221' => 4.8,
     '002001' => 9.2,
@@ -364,7 +416,7 @@ use constant CVSS4_LOOKUP_GLOBAL => {
     '002021' => 7.2,
     '002101' => 7.9,
     '002111' => 6.9,
-    '002121' => 5,
+    '002121' => 5.0,
     '002201' => 6.9,
     '002211' => 5.5,
     '002221' => 2.7,
@@ -376,7 +428,7 @@ use constant CVSS4_LOOKUP_GLOBAL => {
     '010021' => 8.5,
     '010100' => 9.5,
     '010101' => 9.1,
-    '010110' => 9,
+    '010110' => 9.0,
     '010111' => 8.3,
     '010120' => 8.4,
     '010121' => 7.1,
@@ -394,16 +446,16 @@ use constant CVSS4_LOOKUP_GLOBAL => {
     '011021' => 7.3,
     '011100' => 9.2,
     '011101' => 8.2,
-    '011110' => 8,
+    '011110' => 8.0,
     '011111' => 7.2,
-    '011120' => 7,
+    '011120' => 7.0,
     '011121' => 5.9,
     '011200' => 8.4,
-    '011201' => 7,
+    '011201' => 7.0,
     '011210' => 7.1,
     '011211' => 5.2,
-    '011220' => 5,
-    '011221' => 3,
+    '011220' => 5.0,
+    '011221' => 3.0,
     '012001' => 8.6,
     '012011' => 7.5,
     '012021' => 5.2,
@@ -442,7 +494,7 @@ use constant CVSS4_LOOKUP_GLOBAL => {
     '101110' => 7.4,
     '101111' => 5.8,
     '101120' => 5.9,
-    '101121' => 5,
+    '101121' => 5.0,
     '101200' => 7.2,
     '101201' => 5.7,
     '101210' => 5.7,
@@ -450,7 +502,7 @@ use constant CVSS4_LOOKUP_GLOBAL => {
     '101220' => 5.2,
     '101221' => 2.5,
     '102001' => 8.3,
-    '102011' => 7,
+    '102011' => 7.0,
     '102021' => 5.4,
     '102101' => 6.5,
     '102111' => 5.8,
@@ -459,12 +511,12 @@ use constant CVSS4_LOOKUP_GLOBAL => {
     '102211' => 2.1,
     '102221' => 1.3,
     '110000' => 9.5,
-    '110001' => 9,
+    '110001' => 9.0,
     '110010' => 8.8,
     '110011' => 7.6,
     '110020' => 7.6,
-    '110021' => 7,
-    '110100' => 9,
+    '110021' => 7.0,
+    '110100' => 9.0,
     '110101' => 7.7,
     '110110' => 7.5,
     '110111' => 6.2,
@@ -475,7 +527,7 @@ use constant CVSS4_LOOKUP_GLOBAL => {
     '110210' => 6.8,
     '110211' => 5.9,
     '110220' => 5.2,
-    '110221' => 3,
+    '110221' => 3.0,
     '111000' => 8.9,
     '111001' => 7.8,
     '111010' => 7.6,
@@ -496,7 +548,7 @@ use constant CVSS4_LOOKUP_GLOBAL => {
     '111221' => 1.6,
     '112001' => 7.1,
     '112011' => 5.9,
-    '112021' => 3,
+    '112021' => 3.0,
     '112101' => 5.8,
     '112111' => 2.6,
     '112121' => 1.5,
@@ -515,11 +567,11 @@ use constant CVSS4_LOOKUP_GLOBAL => {
     '200111' => 6.1,
     '200120' => 5.6,
     '200121' => 3.4,
-    '200200' => 7,
+    '200200' => 7.0,
     '200201' => 5.4,
     '200210' => 5.2,
-    '200211' => 4,
-    '200220' => 4,
+    '200211' => 4.0,
+    '200220' => 4.0,
     '200221' => 2.2,
     '201000' => 8.5,
     '201001' => 7.5,
@@ -541,7 +593,7 @@ use constant CVSS4_LOOKUP_GLOBAL => {
     '201221' => 0.8,
     '202001' => 6.4,
     '202011' => 5.1,
-    '202021' => 2,
+    '202021' => 2.0,
     '202101' => 4.7,
     '202111' => 2.1,
     '202121' => 1.1,
@@ -552,31 +604,31 @@ use constant CVSS4_LOOKUP_GLOBAL => {
     '210001' => 7.5,
     '210010' => 7.3,
     '210011' => 5.3,
-    '210020' => 6,
-    '210021' => 5,
+    '210020' => 6.0,
+    '210021' => 5.0,
     '210100' => 7.3,
     '210101' => 5.5,
     '210110' => 5.9,
-    '210111' => 4,
+    '210111' => 4.0,
     '210120' => 4.1,
-    '210121' => 2,
+    '210121' => 2.0,
     '210200' => 5.4,
     '210201' => 4.3,
     '210210' => 4.5,
     '210211' => 2.2,
-    '210220' => 2,
+    '210220' => 2.0,
     '210221' => 1.1,
     '211000' => 7.5,
     '211001' => 5.5,
     '211010' => 5.8,
     '211011' => 4.5,
-    '211020' => 4,
+    '211020' => 4.0,
     '211021' => 2.1,
     '211100' => 6.1,
     '211101' => 5.1,
     '211110' => 4.8,
     '211111' => 1.8,
-    '211120' => 2,
+    '211120' => 2.0,
     '211121' => 0.9,
     '211200' => 4.6,
     '211201' => 1.8,
@@ -590,7 +642,7 @@ use constant CVSS4_LOOKUP_GLOBAL => {
     '212101' => 2.4,
     '212111' => 1.2,
     '212121' => 0.5,
-    '212201' => 1,
+    '212201' => 1.0,
     '212211' => 0.3,
     '212221' => 0.1,
 };
@@ -651,6 +703,46 @@ use constant CVSS4_ATTRIBUTES => {
     valueDensity                => 'V',
     vulnerabilityResponseEffort => 'RE',
     providerUrgency             => 'U',
+
+};
+
+use constant CVSS4_METRIC_VALUES => {
+
+    AV => [qw(N A L P)],
+    AC => [qw(L H)],
+    AT => [qw(N P)],
+    PR => [qw(N L H)],
+    UI => [qw(N P A)],
+    VC => [qw(H L N)],
+    VI => [qw(H L N)],
+    VA => [qw(H L N)],
+    SC => [qw(H L N)],
+    SI => [qw(H L N)],
+    SA => [qw(H L N)],
+
+    E => [qw(X A P U)],
+
+    CR  => [qw(X H M L)],
+    IR  => [qw(X H M L)],
+    AR  => [qw(X H M L)],
+    MAV => [qw(X N A L P)],
+    MAC => [qw(X L H)],
+    MAT => [qw(X N P)],
+    MPR => [qw(X N L H)],
+    MUI => [qw(X N P A)],
+    MVC => [qw(X H L N)],
+    MVI => [qw(X H L N)],
+    MVA => [qw(X H L N)],
+    MSC => [qw(X H L N)],
+    MSI => [qw(X S H L N)],
+    MSA => [qw(X S H L N)],
+
+    S  => [qw(X N P)],
+    AU => [qw(X N Y)],
+    R  => [qw(X A U I)],
+    V  => [qw(X D C)],
+    RE => [qw(X L M H)],
+    U  => [qw(X Clear Green Amber Red)],
 
 };
 

@@ -4,7 +4,7 @@
       "Alexander Karelas <karjala@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Minilla/v3.1.12",
+   "generated_by" : "Minilla/v3.1.23",
    "license" : [
       "perl_5"
    ],
@@ -58,7 +58,7 @@
    "provides" : {
       "RxPerl::Mojo" : {
          "file" : "lib/RxPerl/Mojo.pm",
-         "version" : "v6.8.1"
+         "version" : "v6.8.2"
       }
    },
    "release_status" : "stable",
@@ -68,12 +68,13 @@
       },
       "homepage" : "https://gitlab.com/karjala/rxperl-mojo-for-perl",
       "repository" : {
-         "url" : "git://gitlab.com/karjala/rxperl-mojo-for-perl.git",
+         "type" : "git",
+         "url" : "https://gitlab.com/karjala/rxperl-mojo-for-perl.git",
          "web" : "https://gitlab.com/karjala/rxperl-mojo-for-perl"
       }
    },
-   "version" : "v6.8.1",
+   "version" : "v6.8.2",
    "x_authority" : "cpan:KARJALA",
-   "x_serialization_backend" : "JSON::PP version 4.06",
+   "x_serialization_backend" : "JSON::PP version 4.16",
    "x_static_install" : 1
 }

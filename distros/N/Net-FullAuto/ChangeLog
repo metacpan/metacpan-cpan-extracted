@@ -20,6 +20,12 @@
 #######################################################################
 
 
+2024-08-07  Brian M. Kelly <Brian.Kelly@fullauto.com>
+
+        * Version 1.0000682 released
+
+        * Returning proper error in cwd()
+
 2024-08-04  Brian M. Kelly <Brian.Kelly@fullauto.com>
 
         * Version 1.0000681 released

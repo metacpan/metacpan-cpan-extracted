@@ -69,7 +69,7 @@ sub run {
         (my $progname = $0) =~ s/.*\///;
 
         say <<"VERSION";
-$progname version $URI::PackageURL::VERSION
+$progname version $VERSION
 
 Copyright 2023-2024, Giuseppe Di Terlizzi <gdt\@cpan.org>
 

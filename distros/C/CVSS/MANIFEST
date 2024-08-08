@@ -17,6 +17,7 @@ t/10-cvss2.t
 t/10-cvss3.t
 t/10-cvss4.t
 t/11-builder.t
+t/20-cli.t
 t/kwalitee.t
 t/manifest.t
 t/pod-coverage.t

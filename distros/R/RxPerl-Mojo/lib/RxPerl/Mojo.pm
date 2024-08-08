@@ -14,7 +14,7 @@ use Exporter 'import';
 our @EXPORT_OK = @RxPerl::EXPORT_OK;
 our %EXPORT_TAGS = %RxPerl::EXPORT_TAGS;
 
-our $VERSION = "v6.8.1";
+our $VERSION = "v6.8.2";
 
 our $promise_class = 'Mojo::Promise';
 
@@ -99,6 +99,11 @@ or app that uses Mojo::IOLoop.
 =head1 DOCUMENTATION
 
 The documentation at L<RxPerl> applies to this module too.
+
+=head1 NOTE
+
+Due to a bug in L<Mojo::Promise> which was fixed in L<Mojolicious> 8.15, RxPerl's two promise functions
+(L<first_value_from|RxPerl/first_value_from> and L<last_value_from|RxPerl/last_value_from>) require Mojolicious 8.15 or above.
 
 =head1 NOTIFICATIONS FOR NEW RELEASES
 

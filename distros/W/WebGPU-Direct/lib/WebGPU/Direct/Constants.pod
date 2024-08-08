@@ -1,0 +1,1000 @@
+
+=head1 WebGPU::Direct::AdapterType
+
+=over
+
+=item * discreteGPU
+
+=item * integratedGPU
+
+=item * CPU
+
+=item * unknown
+
+=back
+
+=head1 WebGPU::Direct::AddressMode
+
+=over
+
+=item * repeat
+
+=item * mirrorRepeat
+
+=item * clampToEdge
+
+=back
+
+=head1 WebGPU::Direct::BackendType
+
+=over
+
+=item * undefined
+
+=item * null
+
+=item * webGPU
+
+=item * D3D11
+
+=item * D3D12
+
+=item * metal
+
+=item * vulkan
+
+=item * openGL
+
+=item * openGLES
+
+=back
+
+=head1 WebGPU::Direct::BlendFactor
+
+=over
+
+=item * zero
+
+=item * one
+
+=item * src
+
+=item * oneMinusSrc
+
+=item * srcAlpha
+
+=item * oneMinusSrcAlpha
+
+=item * dst
+
+=item * oneMinusDst
+
+=item * dstAlpha
+
+=item * oneMinusDstAlpha
+
+=item * srcAlphaSaturated
+
+=item * constant
+
+=item * oneMinusConstant
+
+=back
+
+=head1 WebGPU::Direct::BlendOperation
+
+=over
+
+=item * add
+
+=item * subtract
+
+=item * reverseSubtract
+
+=item * min
+
+=item * max
+
+=back
+
+=head1 WebGPU::Direct::BufferBindingType
+
+=over
+
+=item * undefined
+
+=item * uniform
+
+=item * storage
+
+=item * readOnlyStorage
+
+=back
+
+=head1 WebGPU::Direct::BufferMapAsyncStatus
+
+=over
+
+=item * success
+
+=item * validationError
+
+=item * unknown
+
+=item * deviceLost
+
+=item * destroyedBeforeCallback
+
+=item * unmappedBeforeCallback
+
+=item * mappingAlreadyPending
+
+=item * offsetOutOfRange
+
+=item * sizeOutOfRange
+
+=back
+
+=head1 WebGPU::Direct::BufferMapState
+
+=over
+
+=item * unmapped
+
+=item * pending
+
+=item * mapped
+
+=back
+
+=head1 WebGPU::Direct::BufferUsage
+
+=over
+
+=item * none
+
+=item * mapRead
+
+=item * mapWrite
+
+=item * copySrc
+
+=item * copyDst
+
+=item * index
+
+=item * vertex
+
+=item * uniform
+
+=item * storage
+
+=item * indirect
+
+=item * queryResolve
+
+=back
+
+=head1 WebGPU::Direct::ColorWriteMask
+
+=over
+
+=item * none
+
+=item * red
+
+=item * green
+
+=item * blue
+
+=item * alpha
+
+=item * all
+
+=back
+
+=head1 WebGPU::Direct::CompareFunction
+
+=over
+
+=item * undefined
+
+=item * never
+
+=item * less
+
+=item * lessEqual
+
+=item * greater
+
+=item * greaterEqual
+
+=item * equal
+
+=item * notEqual
+
+=item * always
+
+=back
+
+=head1 WebGPU::Direct::CompilationInfoRequestStatus
+
+=over
+
+=item * success
+
+=item * error
+
+=item * deviceLost
+
+=item * unknown
+
+=back
+
+=head1 WebGPU::Direct::CompilationMessageType
+
+=over
+
+=item * error
+
+=item * warning
+
+=item * info
+
+=back
+
+=head1 WebGPU::Direct::CompositeAlphaMode
+
+=over
+
+=item * auto
+
+=item * opaque
+
+=item * premultiplied
+
+=item * unpremultiplied
+
+=item * inherit
+
+=back
+
+=head1 WebGPU::Direct::CreatePipelineAsyncStatus
+
+=over
+
+=item * success
+
+=item * validationError
+
+=item * internalError
+
+=item * deviceLost
+
+=item * deviceDestroyed
+
+=item * unknown
+
+=back
+
+=head1 WebGPU::Direct::CullMode
+
+=over
+
+=item * none
+
+=item * front
+
+=item * back
+
+=back
+
+=head1 WebGPU::Direct::DeviceLostReason
+
+=over
+
+=item * undefined
+
+=item * destroyed
+
+=back
+
+=head1 WebGPU::Direct::ErrorFilter
+
+=over
+
+=item * validation
+
+=item * outOfMemory
+
+=item * internal
+
+=back
+
+=head1 WebGPU::Direct::ErrorType
+
+=over
+
+=item * noError
+
+=item * validation
+
+=item * outOfMemory
+
+=item * internal
+
+=item * unknown
+
+=item * deviceLost
+
+=back
+
+=head1 WebGPU::Direct::FeatureName
+
+=over
+
+=item * undefined
+
+=item * depthClipControl
+
+=item * depth32FloatStencil8
+
+=item * timestampQuery
+
+=item * textureCompressionBC
+
+=item * textureCompressionETC2
+
+=item * textureCompressionASTC
+
+=item * indirectFirstInstance
+
+=item * shaderF16
+
+=item * RG11B10UfloatRenderable
+
+=item * BGRA8UnormStorage
+
+=item * float32Filterable
+
+=back
+
+=head1 WebGPU::Direct::FilterMode
+
+=over
+
+=item * nearest
+
+=item * linear
+
+=back
+
+=head1 WebGPU::Direct::FrontFace
+
+=over
+
+=item * CCW
+
+=item * CW
+
+=back
+
+=head1 WebGPU::Direct::IndexFormat
+
+=over
+
+=item * undefined
+
+=item * uint16
+
+=item * uint32
+
+=back
+
+=head1 WebGPU::Direct::LoadOp
+
+=over
+
+=item * undefined
+
+=item * clear
+
+=item * load
+
+=back
+
+=head1 WebGPU::Direct::MapMode
+
+=over
+
+=item * none
+
+=item * read
+
+=item * write
+
+=back
+
+=head1 WebGPU::Direct::MipmapFilterMode
+
+=over
+
+=item * nearest
+
+=item * linear
+
+=back
+
+=head1 WebGPU::Direct::PowerPreference
+
+=over
+
+=item * undefined
+
+=item * lowPower
+
+=item * highPerformance
+
+=back
+
+=head1 WebGPU::Direct::PresentMode
+
+=over
+
+=item * fifo
+
+=item * fifoRelaxed
+
+=item * immediate
+
+=item * mailbox
+
+=back
+
+=head1 WebGPU::Direct::PrimitiveTopology
+
+=over
+
+=item * pointList
+
+=item * lineList
+
+=item * lineStrip
+
+=item * triangleList
+
+=item * triangleStrip
+
+=back
+
+=head1 WebGPU::Direct::QueryType
+
+=over
+
+=item * occlusion
+
+=item * timestamp
+
+=back
+
+=head1 WebGPU::Direct::QueueWorkDoneStatus
+
+=over
+
+=item * success
+
+=item * error
+
+=item * unknown
+
+=item * deviceLost
+
+=back
+
+=head1 WebGPU::Direct::RequestAdapterStatus
+
+=over
+
+=item * success
+
+=item * unavailable
+
+=item * error
+
+=item * unknown
+
+=back
+
+=head1 WebGPU::Direct::RequestDeviceStatus
+
+=over
+
+=item * success
+
+=item * error
+
+=item * unknown
+
+=back
+
+=head1 WebGPU::Direct::SType
+
+=over
+
+=item * invalid
+
+=item * surfaceDescriptorFromMetalLayer
+
+=item * surfaceDescriptorFromWindowsHWND
+
+=item * surfaceDescriptorFromXlibWindow
+
+=item * surfaceDescriptorFromCanvasHTMLSelector
+
+=item * shaderModuleSPIRVDescriptor
+
+=item * shaderModuleWGSLDescriptor
+
+=item * primitiveDepthClipControl
+
+=item * surfaceDescriptorFromWaylandSurface
+
+=item * surfaceDescriptorFromAndroidNativeWindow
+
+=item * surfaceDescriptorFromXcbWindow
+
+=item * renderPassDescriptorMaxDrawCount
+
+=back
+
+=head1 WebGPU::Direct::SamplerBindingType
+
+=over
+
+=item * undefined
+
+=item * filtering
+
+=item * nonFiltering
+
+=item * comparison
+
+=back
+
+=head1 WebGPU::Direct::ShaderStage
+
+=over
+
+=item * none
+
+=item * vertex
+
+=item * fragment
+
+=item * compute
+
+=back
+
+=head1 WebGPU::Direct::StencilOperation
+
+=over
+
+=item * keep
+
+=item * zero
+
+=item * replace
+
+=item * invert
+
+=item * incrementClamp
+
+=item * decrementClamp
+
+=item * incrementWrap
+
+=item * decrementWrap
+
+=back
+
+=head1 WebGPU::Direct::StorageTextureAccess
+
+=over
+
+=item * undefined
+
+=item * writeOnly
+
+=item * readOnly
+
+=item * readWrite
+
+=back
+
+=head1 WebGPU::Direct::StoreOp
+
+=over
+
+=item * undefined
+
+=item * store
+
+=item * discard
+
+=back
+
+=head1 WebGPU::Direct::SurfaceGetCurrentTextureStatus
+
+=over
+
+=item * success
+
+=item * timeout
+
+=item * outdated
+
+=item * lost
+
+=item * outOfMemory
+
+=item * deviceLost
+
+=back
+
+=head1 WebGPU::Direct::TextureAspect
+
+=over
+
+=item * all
+
+=item * stencilOnly
+
+=item * depthOnly
+
+=back
+
+=head1 WebGPU::Direct::TextureDimension
+
+=over
+
+=item * _1D
+
+=item * _2D
+
+=item * _3D
+
+=back
+
+=head1 WebGPU::Direct::TextureFormat
+
+=over
+
+=item * undefined
+
+=item * R8Unorm
+
+=item * R8Snorm
+
+=item * R8Uint
+
+=item * R8Sint
+
+=item * R16Uint
+
+=item * R16Sint
+
+=item * R16Float
+
+=item * RG8Unorm
+
+=item * RG8Snorm
+
+=item * RG8Uint
+
+=item * RG8Sint
+
+=item * R32Float
+
+=item * R32Uint
+
+=item * R32Sint
+
+=item * RG16Uint
+
+=item * RG16Sint
+
+=item * RG16Float
+
+=item * RGBA8Unorm
+
+=item * RGBA8UnormSrgb
+
+=item * RGBA8Snorm
+
+=item * RGBA8Uint
+
+=item * RGBA8Sint
+
+=item * BGRA8Unorm
+
+=item * BGRA8UnormSrgb
+
+=item * RGB10A2Uint
+
+=item * RGB10A2Unorm
+
+=item * RG11B10Ufloat
+
+=item * RGB9E5Ufloat
+
+=item * RG32Float
+
+=item * RG32Uint
+
+=item * RG32Sint
+
+=item * RGBA16Uint
+
+=item * RGBA16Sint
+
+=item * RGBA16Float
+
+=item * RGBA32Float
+
+=item * RGBA32Uint
+
+=item * RGBA32Sint
+
+=item * stencil8
+
+=item * depth16Unorm
+
+=item * depth24Plus
+
+=item * depth24PlusStencil8
+
+=item * depth32Float
+
+=item * depth32FloatStencil8
+
+=item * BC1RGBAUnorm
+
+=item * BC1RGBAUnormSrgb
+
+=item * BC2RGBAUnorm
+
+=item * BC2RGBAUnormSrgb
+
+=item * BC3RGBAUnorm
+
+=item * BC3RGBAUnormSrgb
+
+=item * BC4RUnorm
+
+=item * BC4RSnorm
+
+=item * BC5RGUnorm
+
+=item * BC5RGSnorm
+
+=item * BC6HRGBUfloat
+
+=item * BC6HRGBFloat
+
+=item * BC7RGBAUnorm
+
+=item * BC7RGBAUnormSrgb
+
+=item * ETC2RGB8Unorm
+
+=item * ETC2RGB8UnormSrgb
+
+=item * ETC2RGB8A1Unorm
+
+=item * ETC2RGB8A1UnormSrgb
+
+=item * ETC2RGBA8Unorm
+
+=item * ETC2RGBA8UnormSrgb
+
+=item * EACR11Unorm
+
+=item * EACR11Snorm
+
+=item * EACRG11Unorm
+
+=item * EACRG11Snorm
+
+=item * ASTC4x4Unorm
+
+=item * ASTC4x4UnormSrgb
+
+=item * ASTC5x4Unorm
+
+=item * ASTC5x4UnormSrgb
+
+=item * ASTC5x5Unorm
+
+=item * ASTC5x5UnormSrgb
+
+=item * ASTC6x5Unorm
+
+=item * ASTC6x5UnormSrgb
+
+=item * ASTC6x6Unorm
+
+=item * ASTC6x6UnormSrgb
+
+=item * ASTC8x5Unorm
+
+=item * ASTC8x5UnormSrgb
+
+=item * ASTC8x6Unorm
+
+=item * ASTC8x6UnormSrgb
+
+=item * ASTC8x8Unorm
+
+=item * ASTC8x8UnormSrgb
+
+=item * ASTC10x5Unorm
+
+=item * ASTC10x5UnormSrgb
+
+=item * ASTC10x6Unorm
+
+=item * ASTC10x6UnormSrgb
+
+=item * ASTC10x8Unorm
+
+=item * ASTC10x8UnormSrgb
+
+=item * ASTC10x10Unorm
+
+=item * ASTC10x10UnormSrgb
+
+=item * ASTC12x10Unorm
+
+=item * ASTC12x10UnormSrgb
+
+=item * ASTC12x12Unorm
+
+=item * ASTC12x12UnormSrgb
+
+=back
+
+=head1 WebGPU::Direct::TextureSampleType
+
+=over
+
+=item * undefined
+
+=item * float
+
+=item * unfilterableFloat
+
+=item * depth
+
+=item * sint
+
+=item * uint
+
+=back
+
+=head1 WebGPU::Direct::TextureUsage
+
+=over
+
+=item * none
+
+=item * copySrc
+
+=item * copyDst
+
+=item * textureBinding
+
+=item * storageBinding
+
+=item * renderAttachment
+
+=back
+
+=head1 WebGPU::Direct::TextureViewDimension
+
+=over
+
+=item * undefined
+
+=item * _1D
+
+=item * _2D
+
+=item * _2DArray
+
+=item * cube
+
+=item * cubeArray
+
+=item * _3D
+
+=back
+
+=head1 WebGPU::Direct::VertexFormat
+
+=over
+
+=item * undefined
+
+=item * uint8x2
+
+=item * uint8x4
+
+=item * sint8x2
+
+=item * sint8x4
+
+=item * unorm8x2
+
+=item * unorm8x4
+
+=item * snorm8x2
+
+=item * snorm8x4
+
+=item * uint16x2
+
+=item * uint16x4
+
+=item * sint16x2
+
+=item * sint16x4
+
+=item * unorm16x2
+
+=item * unorm16x4
+
+=item * snorm16x2
+
+=item * snorm16x4
+
+=item * float16x2
+
+=item * float16x4
+
+=item * float32
+
+=item * float32x2
+
+=item * float32x3
+
+=item * float32x4
+
+=item * uint32
+
+=item * uint32x2
+
+=item * uint32x3
+
+=item * uint32x4
+
+=item * sint32
+
+=item * sint32x2
+
+=item * sint32x3
+
+=item * sint32x4
+
+=back
+
+=head1 WebGPU::Direct::VertexStepMode
+
+=over
+
+=item * vertex
+
+=item * instance
+
+=item * vertexBufferNotUsed
+
+=back

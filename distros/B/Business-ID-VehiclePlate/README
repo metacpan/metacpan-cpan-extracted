@@ -2,7 +2,7 @@ NAME
     Business::ID::VehiclePlate - Parse Indonesian vehicle plate number
 
 VERSION
-    This document describes version 0.001 of Business::ID::VehiclePlate
+    This document describes version 0.002 of Business::ID::VehiclePlate
     (from Perl distribution Business-ID-VehiclePlate), released on
     2024-08-05.
 

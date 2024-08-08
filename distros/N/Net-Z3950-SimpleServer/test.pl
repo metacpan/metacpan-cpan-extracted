@@ -20,6 +20,15 @@ print "ok 2\n";
 print "not " if Net::Z3950::SimpleServer::yaz_diag_bib1_to_srw(3) != 48;
 print "ok 3\n";
 
+
+my $res = system('yaz-client -V');
+if ($res < 0) {
+    # See https://rt.cpan.org/Public/Bug/Display.html?id=154702
+    print "ok 4 (skipped due to absence of yaz-client)\n";
+    exit 0;
+}
+
+
 # Insert your test code below (better if it prints "ok 13"
 # (correspondingly "not ok 13") depending on the success of chunk 13
 # of the test code):

@@ -1,5 +1,9 @@
 Change history for CVSS
 
+1.12 2024-08-07
+    - Improved documentation
+    - Removed use of "List::Util::any" for old Perl versions (giterlizzi/perl-CVSS#3) 
+
 1.11 2024-08-03
     - Added pure-Perl implementation of C99 "round()" function (giterlizzi/perl-CVSS#1)
 

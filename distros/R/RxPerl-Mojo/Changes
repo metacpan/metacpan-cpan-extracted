@@ -1,5 +1,9 @@
 Revision history for Perl extension RxPerl-Mojo
 
+v6.8.2 2024-08-07T11:33:30Z
+
+    - wrote note in the documentation about a Mojolicious pre-8.15 bug
+
 v6.8.1 2021-12-26T11:17:23Z
 
     - added dependency to 'parent' module for perl v5.10

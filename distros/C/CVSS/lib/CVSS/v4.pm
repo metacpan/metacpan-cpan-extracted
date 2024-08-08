@@ -6,22 +6,23 @@ use utf8;
 use warnings;
 
 use Carp       ();
-use List::Util qw(any max min);
+use List::Util qw(max min);
 
 use base 'CVSS::Base';
 use CVSS::Constants ();
 
-our $VERSION = '1.11';
+our $VERSION = '1.12';
 $VERSION =~ tr/_//d;    ## no critic
 
 use constant DEBUG => $ENV{CVSS_DEBUG};
 
 sub ATTRIBUTES          { CVSS::Constants->CVSS4_ATTRIBUTES }
-sub SEVERITY            { CVSS::Constants->CVSS4_SEVERITY }
+sub SCORE_SEVERITY      { CVSS::Constants->CVSS4_SCORE_SEVERITY }
 sub NOT_DEFINED_VALUE   { CVSS::Constants->CVSS4_NOT_DEFINED_VALUE }
 sub VECTOR_STRING_REGEX { CVSS::Constants->CVSS4_VECTOR_STRING_REGEX }
 sub METRIC_GROUPS       { CVSS::Constants->CVSS4_METRIC_GROUPS }
 sub METRIC_NAMES        { CVSS::Constants->CVSS4_METRIC_NAMES }
+sub METRIC_VALUES       { CVSS::Constants->CVSS4_METRIC_VALUES }
 
 my $MAX_COMPOSED       = CVSS::Constants->CVSS4_MAX_COMPOSED;
 my $CVSS_LOOKUP_GLOBAL = CVSS::Constants->CVSS4_LOOKUP_GLOBAL;
@@ -257,7 +258,7 @@ sub calculate_score {
     my $IR_levels = {H => 0.0, M => 0.1, L => 0.2};
     my $AR_levels = {H => 0.0, M => 0.1, L => 0.2};
 
-    my $E_levels = {U => 0.2, P => 0.1, A => 0};
+    my $E_levels = {U => 0.2, P => 0.1, A => 0.0};
 
     if (   $self->M('VC') eq 'N'
         && $self->M('VI') eq 'N'
@@ -266,7 +267,7 @@ sub calculate_score {
         && $self->M('SI') eq 'N'
         && $self->M('SA') eq 'N')
     {
-        $self->{base_score} = '0.0';
+        $self->{scores}->{base} = '0.0';
         return 1;
     }
 
@@ -418,8 +419,9 @@ DISTANCE: foreach my $max_vector (@max_vectors) {
         );
 
         # if any is less than zero this is not the right max
-
-        next DISTANCE if (any { $_ < 0 } @check);
+        foreach (@check) {
+            next DISTANCE if ($_ < 0);
+        }
 
         # if multiple maxes exist to reach it it is enough the first one
         last;
@@ -521,10 +523,16 @@ DISTANCE: foreach my $max_vector (@max_vectors) {
             / $n_existing_lower;
     }
 
+    # /
+
+    DEBUG and say STDERR "-- Value: $value - MeanDistance: $mean_distance";
+
     # 3. The score of the vector is the score of the MacroVector
     #    (i.e. the score of the highest severity vector) minus the mean
     #    distance so computed. This score is rounded to one decimal place.
     $value -= $mean_distance;
+
+    DEBUG and say STDERR "-- Value $value";
 
     $value = max(0.0, $value);
     $value = min(10.0, $value);

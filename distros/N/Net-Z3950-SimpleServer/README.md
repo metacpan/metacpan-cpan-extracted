@@ -21,6 +21,22 @@ The server will take care of managing the network connections for you,
 and it will spawn a new process (or thread, in some environments)
 whenever a new connection is received.
 
+### Note on dynamic linking
+
+For reasons that I do not yet understand -- see
+[ZF-103](https://folio-org.atlassian.net/browse/ZF-103) and [this
+PerlMonks discussion](https://perlmonks.org/?node_id=11160817) --
+dynamic linking does not work on recent versions of MacOS
+(e.g. Monterey 12.7.5) due to premature hardening of the program and
+the resulting refusal to load libraries from relative paths. If you
+are running on such a platform and tests fail with "relative path not
+allowed in hardened program", just skip the tests and move straight to
+"make install".
+
+For the same reason, if installation using the `cpan` utility fails
+with this message, install using `cpan -T Net::Z3950::SimpleServer`,
+which skips tests.
+
 ### AUTHORS
 
  Anders Sønderberg <sondberg@indexdata.dk>

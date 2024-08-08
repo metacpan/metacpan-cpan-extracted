@@ -1,0 +1,32 @@
+Revision history for WebGPU-Direct
+
+0.15  2024-08-07 23:41:34 EDT
+        - Add array constructor for Color and Extent3D
+        - Add rotating cube example
+        - Fix the blessed scalar value of opaque types
+        - Fix the accidental reuse of arrays when blessing
+
+0.14  2024-07-26 23:42:48 EDT
+        - Additional documentation fixes
+        - Add and fix issues for a compute example
+        - Improve defaults system and documentation
+        - Add WebGPU packing functions
+        - Package catchable errors into perl exceptions
+        - The great lcfirst-ining of functions and enums
+        - Allow some functions to return arrayrefs
+        - Clean up what can't actually be called
+
+0.13-TRIAL  2024-04-18 23:09:56 EDT
+        - Automatic documentation generation improvements
+
+0.12-TRIAL  2024-03-11 22:52:32 EDT
+        - Continued documentation improvements
+        - Remove Force32 as a usable constant
+
+0.11-TRIAL  2024-03-08 00:48:18 EST
+        - Add inital wayland support
+        - Add debugging informational and usage warnings
+        - Include generated documenation
+
+0.10-TRIAL  2024-01-28 22:39:34 EST
+        - Initial release

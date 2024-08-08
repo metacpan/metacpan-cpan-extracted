@@ -1,0 +1,12 @@
+{
+  BYTES_PER_i32 => 4,
+  BYTES_PER_u32 => 4,
+  BYTES_PER_f32 => 4,
+  BYTES_PER_f16 => 2,
+  ALIGN_OF_i32 => 4,
+  ALIGN_OF_u32 => 4,
+  ALIGN_OF_f32 => 4,
+  ALIGN_OF_f16 => 2,
+}
+
+# vim: syn=perl

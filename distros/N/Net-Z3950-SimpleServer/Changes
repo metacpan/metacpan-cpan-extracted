@@ -1,5 +1,9 @@
 Revision history for Perl extension Net::Z3950::SimpleServer
 
+1.29  Wed  7 Aug 15:28:57 BST 2024
+	* Skip most tests if yaz-client is not installed.
+	  Fixes https://rt.cpan.org/Ticket/Display.html?id=154702
+
 1.28  Wed 31 Jul 2024 18:28:11 BST
 	* Revert ZOOM-31, which prevented installation from
 	  working. See https://folio-org.atlassian.net/browse/ZF-103
