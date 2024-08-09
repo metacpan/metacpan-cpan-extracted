@@ -5,9 +5,9 @@ use strict;
 use warnings;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2024-03-06'; # DATE
+our $DATE = '2024-08-06'; # DATE
 our $DIST = 'App-SahUtils'; # DIST
-our $VERSION = '0.484'; # VERSION
+our $VERSION = '0.485'; # VERSION
 
 our %SPEC;
 
@@ -348,7 +348,7 @@ App::SahUtils - Collection of CLI utilities for Sah and Data::Sah
 
 =head1 VERSION
 
-This document describes version 0.484 of App::SahUtils (from Perl distribution App-SahUtils), released on 2024-03-06.
+This document describes version 0.485 of App::SahUtils (from Perl distribution App-SahUtils), released on 2024-08-06.
 
 =head1 SYNOPSIS
 

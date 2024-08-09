@@ -6,7 +6,7 @@ use strict;
 use warnings;
 no  warnings 'syntax';
 
-our $VERSION = '2017060201';
+our $VERSION = '2024080801';
 our %RE;
 our %sub_interface;
 our $AUTOLOAD;
@@ -830,14 +830,14 @@ Damian Conway (damian@conway.org)
 
 =head1 MAINTENANCE
 
-This package is maintained by Abigail S<(I<regexp-common@abigail.be>)>.
+This package is maintained by Abigail S<(I<regexp-common@abigail.freedom.nl>)>.
 
 =head1 BUGS AND IRRITATIONS
 
 Bound to be plenty.
 
 For a start, there are many common regexes missing.
-Send them in to I<regexp-common@abigail.be>.
+Send them in to I<regexp-common@abigail.freedom.nl>.
 
 There are some POD issues when installing this module using a pre-5.6.0 perl;
 some manual pages may not install, or may not install correctly using a perl
@@ -861,7 +861,7 @@ bug. If you want the pattern to be anchored, use something like:
 
 =head1 LICENSE and COPYRIGHT
 
-This software is Copyright (c) 2001 - 2017, Damian Conway and Abigail.
+This software is Copyright (c) 2001 - 2024, Damian Conway and Abigail.
 
 This module is free software, and maybe used under any of the following
 licenses:

@@ -217,6 +217,23 @@ METHODS
     method with no arguments, therefore scrolls to the very bottom of the
     display.
 
+ scroll_to_visible
+
+       $scroller->scroll_to_visible( $item_or_idx, $itemline, %opts );
+
+    Since version 0.33.
+
+    If the requested line of the requested item is already visible on the
+    display, this method does nothing. Otherwise, it scrolls up or down by
+    the smallest amount possible so that it becomes visible. If the line
+    was previously above then it scrolls just sufficient to bring that line
+    to the top-most of the display. If it was below, it scrolls to bring it
+    to the bottom-most.
+
+    If the optional margin named argument it set to a value larger than
+    zero, it causes that number of the top-most and bottom-most lines not
+    to count for purposes of visibility or scrolling.
+
  line2item
 
        $itemidx = $scroller->line2item( $line );

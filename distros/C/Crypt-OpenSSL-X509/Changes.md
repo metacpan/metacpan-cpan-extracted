@@ -1,8 +1,19 @@
 # Revision history for Perl extension Crypt::OpenSSL::X509
 
+## 2.0.1 2024-08-09
+
+- Trimming the distribution tarball, removing files not needed for the distribution, see issue [#120](https://github.com/dsully/perl-crypt-openssl-x509/issues/120) reported by @gregoa. Addressed via PR [#121](https://github.com/dsully/perl-crypt-openssl-x509/pull/121) by @jonasbn
+
+## 2.0.0 2024-07-03
+
+- Applied PR [#119](https://github.com/dsully/perl-crypt-openssl-x509/pull/119) from @timlegge improving detection of OpenSSL libraries under if not installed in standard locations
+
+- I am changing the versioning scheme to be more in line with the [Semantic Versioning](https://semver.org/) specification. I am bumping the major version number to 2, since the version number change might cause problems. See:
+  [perlhacks: Bumping Version Numbers](https://perlhacks.com/2016/12/version-numbers/)
+
 ## 1.9.15 2023-06-16
 
-- Applied patch for issue [#112](https://github.com/dsully/perl-crypt-openssl-x509/issues/112) from @dakkar, via PR [#113]((https://github.com/dsully/perl-crypt-openssl-x509/pull/113) by @jonasbn
+- Applied patch for issue [#112](https://github.com/dsully/perl-crypt-openssl-x509/issues/112) from @dakkar, via PR [#113](https://github.com/dsully/perl-crypt-openssl-x509/pull/113) by @jonasbn
 
 ## 1.9.14 2022-05-03
 

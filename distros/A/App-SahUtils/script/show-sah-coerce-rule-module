@@ -6,9 +6,9 @@ use warnings;
 use Perinci::CmdLine::Any;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2024-03-06'; # DATE
+our $DATE = '2024-08-06'; # DATE
 our $DIST = 'App-SahUtils'; # DIST
-our $VERSION = '0.484'; # VERSION
+our $VERSION = '0.485'; # VERSION
 
 our %SPEC;
 
@@ -99,7 +99,7 @@ show-sah-coerce-rule-module - List Sah coerce rule modules
 
 =head1 VERSION
 
-This document describes version 0.484 of show-sah-coerce-rule-module (from Perl distribution App-SahUtils), released on 2024-03-06.
+This document describes version 0.485 of show-sah-coerce-rule-module (from Perl distribution App-SahUtils), released on 2024-08-06.
 
 =head1 SYNOPSIS
 

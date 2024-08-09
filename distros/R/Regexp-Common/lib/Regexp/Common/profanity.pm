@@ -8,7 +8,7 @@ no  warnings 'syntax';
 
 use Regexp::Common qw /pattern clean no_defaults/;
 
-our $VERSION = '2017060201';
+our $VERSION = '2024080801';
 
 my $profanity = '(?:cvff(?:\\ gnxr|\\-gnxr|gnxr|r(?:ef|[feq])|vat|l)?|dhvzf?|fuvg(?:g(?:r(?:ef|[qe])|vat|l)|r(?:ef|[fqel])|vat|[fr])?|g(?:heqf?|jngf?)|jnax(?:r(?:ef|[eq])|vat|f)?|n(?:ef(?:r(?:\\ ubyr|\\-ubyr|ubyr|[fq])|vat|r)|ff(?:\\ ubyrf?|\\-ubyrf?|rq|ubyrf?|vat))|o(?:hyy(?:\\ fuvg(?:g(?:r(?:ef|[qe])|vat)|f)?|\\-fuvg(?:g(?:r(?:ef|[qe])|vat)|f)?|fuvg(?:g(?:r(?:ef|[qe])|vat)|f)?)|ybj(?:\\ wbof?|\\-wbof?|wbof?))|p(?:bpx(?:\\ fhpx(?:ref?|vat)|\\-fhpx(?:ref?|vat)|fhpx(?:ref?|vat))|enc(?:c(?:r(?:ef|[eq])|vat|l)|f)?|h(?:agf?|z(?:vat|zvat|f)))|qvpx(?:\\ urnq|\\-urnq|rq|urnq|vat|yrff|f)|s(?:hpx(?:rq|vat|f)?|neg(?:r[eq]|vat|[fl])?|rygpu(?:r(?:ef|[efq])|vat)?)|un(?:eq[\\-\\ ]?ba|ys(?:\\ n[fe]|\\-n[fe]|n[fe])frq)|z(?:bgure(?:\\ shpx(?:ref?|vat)|\\-shpx(?:ref?|vat)|shpx(?:ref?|vat))|hgu(?:n(?:\\ shpx(?:ref?|vat|[nnn])|\\-shpx(?:ref?|vat|[nnn])|shpx(?:ref?|vat|[nnn]))|re(?:\\ shpx(?:ref?|vat)|\\-shpx(?:ref?|vat)|shpx(?:ref?|vat)))|reqr?))';
 
@@ -93,18 +93,18 @@ Damian Conway (damian@conway.org)
 
 =head1 MAINTENANCE
 
-This package is maintained by Abigail S<(I<regexp-common@abigail.be>)>.
+This package is maintained by Abigail S<(I<regexp-common@abigail.freedom.nl>)>.
 
 =head1 BUGS AND IRRITATIONS
 
 Bound to be plenty.
 
 For a start, there are many common regexes missing.
-Send them in to I<regexp-common@abigail.be>.
+Send them in to I<regexp-common@abigail.freedom.nl>.
 
 =head1 LICENSE and COPYRIGHT
 
-This software is Copyright (c) 2001 - 2017, Damian Conway and Abigail.
+This software is Copyright (c) 2001 - 2024, Damian Conway and Abigail.
 
 This module is free software, and maybe used under any of the following
 licenses:

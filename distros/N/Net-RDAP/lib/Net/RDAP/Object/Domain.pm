@@ -22,13 +22,23 @@ access to all that module's methods.
 
 Other methods include:
 
-    $name = $nameserver->name;
+    $name = $domain->name;
 
 Returns a L<Net::DNS::Domain> representing the name of the nameserver.
 
 =cut
 
 sub name { Net::DNS::Domain->new($_[0]->{'ldhName'}) }
+
+=pod
+
+    $name = $domain->unicodeName;
+
+Returns a string containing the DNS Unicode name of the domain (or C<undef>).
+
+=cut
+
+sub unicodeName { $_[0]->{'unicodeName'} }
 
 =pod
 
@@ -133,6 +143,17 @@ corresponding to the domain.
 =cut
 
 sub network { Net::RDAP::Obect::IPNetwork->new($_[0]->{'network'}) }
+
+=pod
+
+    my @variants = $domain->variants;
+
+Returns a (potentially empty) array of L<Net::RDAP::Variant> objects
+representing variants of the domain name.
+
+=cut
+
+sub variants { $_[0]->objects('Net::RDAP::Variant', $_[0]->{'variants'}) }
 
 =pod
 

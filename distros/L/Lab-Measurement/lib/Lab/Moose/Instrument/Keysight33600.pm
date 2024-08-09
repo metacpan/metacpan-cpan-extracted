@@ -1,5 +1,5 @@
 package Lab::Moose::Instrument::Keysight33600;
-$Lab::Moose::Instrument::Keysight33600::VERSION = '3.902';
+$Lab::Moose::Instrument::Keysight33600::VERSION = '3.903';
 #ABSTRACT: Keysight 33500/33600 series Function/Arbitrary Waveform Generator (work in progress)
 
 use v5.20;
@@ -59,7 +59,7 @@ Lab::Moose::Instrument::Keysight33600 - Keysight 33500/33600 series Function/Arb
 
 =head1 VERSION
 
-version 3.902
+version 3.903
 
 =head1 SYNOPSIS
 

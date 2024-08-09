@@ -1,5 +1,5 @@
 ==============================================================================
-               Release of version 2017060201 of Regexp::Common
+               Release of version 2024080801 of Regexp::Common
 ==============================================================================
 
 IMPORTANT NOTICE:
@@ -105,17 +105,17 @@ INSTALLATION
 AUTHORS
 
     Damian Conway (damian@cs.monash.edu.au) and Abigail
-    (regexp-common@abigail.be)
+    (regexp-common@abigail.freedom.nl)
 
 
 MAINTAINER
 
-    Abigail (regexp-common@abigail.be)
+    Abigail (regexp-common@abigail.freedom.nl)
 
 
 COPYRIGHT and LICENSE
 
-    This software is Copyright (c) 2001 - 2017, Damian Conway and Abigail.
+    This software is Copyright (c) 2001 - 2024, Damian Conway and Abigail.
 
     This module is free software, and maybe used under any of the following
     licenses:

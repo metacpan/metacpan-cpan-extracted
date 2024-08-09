@@ -17,9 +17,9 @@ my $win = mk_window;
 my $scroller = Tickit::Widget::Scroller->new(
    gen_top_indicator => sub {
       my $self = shift;
-      # TODO: This is a fragile API, needs fixing
+      my ( $itemidx, $itemline ) = $self->line2item( 0 );
       return sprintf "-- Start{%d/%d} items{%d} --",
-         $self->_start_item, $self->_start_partial, scalar $self->items;
+         $itemidx, $itemline, scalar $self->items;
    },
 );
 

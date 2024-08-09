@@ -8,7 +8,7 @@ no  warnings 'syntax';
 
 use Regexp::Common qw /pattern clean no_defaults/;
 
-our $VERSION = '2017060201';
+our $VERSION = '2024080801';
 
 =begin does_not_exist
 
@@ -123,18 +123,18 @@ Damian Conway and Abigail.
 
 =head1 MAINTENANCE
 
-This package is maintained by Abigail S<(I<regexp-common@abigail.be>)>.
+This package is maintained by Abigail S<(I<regexp-common@abigail.freedom.nl>)>.
 
 =head1 BUGS AND IRRITATIONS
 
 Bound to be plenty.
 
 For a start, there are many common regexes missing.
-Send them in to I<regexp-common@abigail.be>.
+Send them in to I<regexp-common@abigail.freedom.nl>.
 
 =head1 LICENSE and COPYRIGHT
 
-This software is Copyright (c) 2001 - 2017, Damian Conway and Abigail.
+This software is Copyright (c) 2001 - 2024, Damian Conway and Abigail.
 
 This module is free software, and maybe used under any of the following
 licenses:

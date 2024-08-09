@@ -26,11 +26,9 @@ available to that module.
 # object was loaded from
 #
 sub new {
-    my ($package, $args, $document_url) = @_;
+    my ($package, $args, $document_url, $parent) = @_;
 
-    my $self = $package->SUPER::new($args, $document_url);
-
-    return $self;
+    return $package->SUPER::new($args, $document_url, $parent);
 }
 
 =pod
@@ -51,7 +49,7 @@ in a response.
 
 sub conformance {
     my $self = shift;
-    return @{$self->{'rdapConformance'}};
+    return @{$self->{'rdapConformance'} || []};
 }
 
 =pod

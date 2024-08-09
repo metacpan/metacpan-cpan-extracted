@@ -30,4 +30,15 @@ sub mutate {
     $response_type);
 }
 
+sub remove_automatically_created_assets {
+  my $self          = shift;
+  my $request_body  = shift;
+  my $http_method   = 'POST';
+  my $request_path  = 'v17/{+adGroupAd}:removeAutomaticallyCreatedAssets';
+  my $response_type = '';
+
+  return $self->SUPER::call($http_method, $request_path, $request_body,
+    $response_type);
+}
+
 1;

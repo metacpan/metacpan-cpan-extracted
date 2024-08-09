@@ -1,5 +1,11 @@
 Revision history for App-sdview-Output-Tickit
 
+0.10    2024-08-08
+        [CHANGES]
+         * Initial attempt at supporting tables
+         * Improved percentage progress indicator on scrolling
+         * Optional whole-word only matches when searching
+
 0.09    2024-07-26
         [CHANGES]
          * Less jumpy scrolling when moving between search matches

@@ -1,5 +1,12 @@
 Revision history for perl module Net::RDAP:
 
+0.28 - 2024-08-08
+  - all RDAP objects now know their position in the object hierarchy of the RDAP
+    record that they appear in, and provide the parent(), top() and chain()
+    methods.
+  - added support for variants of domains using the variants() method which
+    returns Net::RDAP::Variant objects.
+
 0.27 - 2024-07-03
   - all RDAP objects will keep track of the URL of the enclosing RDAP record,
     which can be accessed using the document_url() method.

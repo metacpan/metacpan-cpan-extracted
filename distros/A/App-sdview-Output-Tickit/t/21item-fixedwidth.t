@@ -22,11 +22,6 @@ my $rb = Tickit::RenderBuffer->new( lines => 10, cols => 30 );
 
    is( $item->height_for_width( 30 ), 3, 'item is 3 lines tall' );
 
-   is( $item->line_for_char( 5 ), 0,
-      'char 5 is on line 0' );
-   is( $item->line_for_char( 15 ), 1,
-      'char 15 is on line 1' );
-
    $item->render( $rb,
       firstline => 0,
       lastline => 2,
@@ -61,6 +56,11 @@ clear_term;
    is( $e->start,  5,   '$e->start' );
    is( $e->length, 1,   '$e->length' );
    is( $e->substr, "e", '$e->substr' );
+
+   is( $item->line_for_pos( $e ), 1,
+      'match[0] is on line 1' );
+   is( $item->line_for_pos( $matches[1]->[1] ), 3,
+      'match[1] is on line 3' );
 
    $item->render( $rb,
       firstline => 0,

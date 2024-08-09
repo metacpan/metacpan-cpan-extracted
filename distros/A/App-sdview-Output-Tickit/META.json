@@ -27,7 +27,7 @@
             "Tickit" : "0",
             "Tickit::Style" : "0",
             "Tickit::Widget::FloatBox" : "0",
-            "Tickit::Widget::Scroller" : "0.32",
+            "Tickit::Widget::Scroller" : "0.33",
             "Tickit::Widget::Scroller::Item::RichText" : "0",
             "Tickit::Widget::Static" : "0",
             "perl" : "5.026"
@@ -42,7 +42,7 @@
    "provides" : {
       "App::sdview::Output::Tickit" : {
          "file" : "lib/App/sdview/Output/Tickit.pm",
-         "version" : "0.09"
+         "version" : "0.10"
       }
    },
    "release_status" : "stable",
@@ -51,6 +51,6 @@
          "http://dev.perl.org/licenses/"
       ]
    },
-   "version" : "0.09",
+   "version" : "0.10",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

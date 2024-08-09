@@ -9,7 +9,7 @@ use utf8;
 
 use Object::Pad 0.805;
 
-package App::sdview::Output::Tickit 0.09;
+package App::sdview::Output::Tickit 0.10;
 class App::sdview::Output::Tickit
    :strict(params);
 
@@ -111,7 +111,7 @@ to be tested against the body text of the document. Each paragraph is tested
 individually and all matches are highlighted. Pressing C<< <Enter> >> will
 select the first match. Use the C<< <n> >> and C<< <p> >> keys to jump between
 them. Press C<< <Escape> >> to clear the highlights. Press C<< <Alt-i> >> to
-toggle case-insensitivity.
+toggle case-insensitivity. Press C<< <Alt-w> >> to toggle whole-word matching.
 
 =cut
 
@@ -153,13 +153,16 @@ ADJUST
    $t->bind_key( q => sub { $t->stop; } );
 
    require Tickit::Widget::Scroller;
-   Tickit::Widget::Scroller->VERSION( '0.32' );
+   Tickit::Widget::Scroller->VERSION( '0.33' );
    $scroller = Tickit::Widget::Scroller->new;
 
    $scroller->set_gen_bottom_indicator(
       sub ( $scroller ) {
+         # It feels better for progress if we claim the percentage of ofscreen
+         # lines that are above the screen.
          my $lines_above = $scroller->lines_above;
-         my $lines_total = $lines_above + $scroller->window->lines + $scroller->lines_below;
+         my $lines_total = $lines_above + $scroller->lines_below;
+         return "" if $lines_total < 1;
          return sprintf( "%d of %d (%d%%)",
             $lines_above, $lines_total, 100 * $lines_above / $lines_total );
       }
@@ -260,8 +263,8 @@ method output ( @paragraphs )
             push @hlmatches, $item->apply_highlight( $searchre );
          }
          foreach my $match ( @hlmatches ) {
-            my ( $item, $e ) = @$match;
-            my $startline = $item->line_for_char( $e->start );
+            my ( $item, $pos ) = @$match;
+            my $startline = $item->line_for_pos( $pos );
             my $where = ( $scroller->item2line( $item, $startline ) )[1] // "";
 
             next if $where eq "above";
@@ -279,12 +282,19 @@ method output ( @paragraphs )
          foreach my $item ( @items ) {
             push @matches, $item->apply_highlight( $searchre );
          }
-         if( @matches ) {
-            $self->select_and_jump( 0 ); # TODO pick the first one visible
+         foreach my $match ( @matches ) {
+            my ( $item, $pos ) = @$match;
+            my $startline = $item->line_for_pos( $pos );
+            my $where = ( $scroller->item2line( $item, $startline ) )[1] // "";
+
+            next if $where eq "above";
+
+            $scroller->scroll_to( 2, $item, $startline ) if $where eq "below";
+            last;
          }
-         else {
-            $matchposfloat->hide;
-         }
+
+         $matchposfloat->hide if !@matches;
+
          $scroller->redraw;
       },
    );
@@ -342,16 +352,10 @@ method select_and_jump ( $new_idx )
 
       $matchposstatic->set_text( sprintf "%d of %d", $matchidx+1, scalar @matches );
 
-      my ( $item, $e ) = $matches[$matchidx]->@*;
-      my $startline = $item->line_for_char( $e->start );
+      my ( $item, $pos ) = $matches[$matchidx]->@*;
+      my $startline = $item->line_for_pos( $pos );
 
-      # Is the target line already visible?
-      my $physline = $scroller->item2line( $item, $startline );
-
-      $scroller->scroll_to( 2, $item, $startline )
-         # Only scroll if the item is offscreen, or too close to the edge
-         if !defined $physline or $physline < 2 or $physline > ( $scroller->window->lines - 2 );
-
+      $scroller->scroll_to_visible( $item, $startline, margin => 2 );
       $scroller->redraw; # to adjust highlights
    }
 }
@@ -365,6 +369,8 @@ method select_and_jump ( $new_idx )
 *output_plain = \&_output_para;
 
 *output_verbatim = \&_output_para;
+
+*output_table = \&_output_para;
 
 *output_item = \&_output_para;
 
@@ -380,7 +386,6 @@ method _output_para ( $para, %opts )
 
    my %parastyle = App::sdview::Style->para_style( $para->type )->%*;
 
-   my $text = App::sdview::Style->convert_str( $para->text );
 
    my $itempen = Tickit::Pen->new;
    $itempen->chattr( b  => 1 ) if defined $parastyle{bold};
@@ -396,8 +401,6 @@ method _output_para ( $para, %opts )
    $margin += ( $parastyle{margin} // 0 );
    $indent //= 0;
 
-   my @lines = $text->split( qr/\n/ );
-
    if( defined $leader ) {
       my $leaderlen = Tickit::Utils::textwidth( $leader );
 
@@ -406,13 +409,11 @@ method _output_para ( $para, %opts )
          for qw( fg bg bold under italic monospace );
    }
 
-   @lines or @lines = ( String::Tagged->new( "" ) ); # placate String::Tagged->join bug
-
-   $text = String::Tagged->join( "\n", @lines );
-
    my $item;
    if( $para->type eq "verbatim" ) {
       # This handily deals with the paragraph bg too
+      my $text = App::sdview::Style->convert_str( $para->text );
+
       $item = App::sdview::Output::Tickit::_FixedWidthItem->new(
          text         => $text,
          margin_left  => $margin + $indent,
@@ -420,7 +421,17 @@ method _output_para ( $para, %opts )
          pen          => $itempen,
       );
    }
+   elsif( $para->type eq "table" ) {
+      $item = App::sdview::Output::Tickit::_TableItem->new(
+         rows         => [ $para->rows ],
+         margin_left  => $margin + $indent,
+         margin_right => 1,
+         pen          => $itempen,
+      );
+   }
    else {
+      my $text = App::sdview::Style->convert_str( $para->text );
+
       $item = App::sdview::Output::Tickit::_ParagraphItem->new(
          text         => $text,
          leader       => $leader,
@@ -432,6 +443,7 @@ method _output_para ( $para, %opts )
    }
 
    if( $para->type =~ m/^head(\d+)/ ) {
+      my @lines = $para->text->split( qr/\n/ );
       my $level = $1;
       my $itemidx = $scroller->items;
       $outlinetree->add_item( "$lines[0]", $level, $itemidx );
@@ -574,8 +586,9 @@ class App::sdview::Output::Tickit::_ParagraphItem
       push @_lineruns, [ $start, $end, $is_softhyphen ];
    }
 
-   method line_for_char ( $char )
+   method line_for_pos ( $pos )
    {
+      my $char = $pos->start;
       my $line = 0;
       $line++ while $line < $#_lineruns and $_lineruns[$line][1] < $char;
       return $line;
@@ -704,18 +717,18 @@ class App::sdview::Output::Tickit::_ParagraphItem
          only => [qw( highlight )],
       );
 
+      return unless defined $re;
+
       my @ret;
 
-      if( defined $re ) {
-         foreach my $e ( defined $_leader ? $_leader->match_extents( $re ) : () ) {
-            push @ret, [ $self, $e, 0 ];
-            $_leader->apply_tag( $e, highlight => \$ret[-1][2] );
-         }
+      foreach my $e ( defined $_leader ? $_leader->match_extents( $re ) : () ) {
+         push @ret, [ $self, $e, 0 ];
+         $_leader->apply_tag( $e, highlight => \$ret[-1][2] );
+      }
 
-         foreach my $e ( $_text->match_extents( $re ) ) {
-            push @ret, [ $self, $e, 0 ];
-            $_text->apply_tag( $e, highlight => \$ret[-1][2] );
-         }
+      foreach my $e ( $_text->match_extents( $re ) ) {
+         push @ret, [ $self, $e, 0 ];
+         $_text->apply_tag( $e, highlight => \$ret[-1][2] );
       }
 
       return @ret;
@@ -750,8 +763,9 @@ class App::sdview::Output::Tickit::_FixedWidthItem
 
    method height_for_width ( $ ) { return scalar @_lineruns; }
 
-   method line_for_char ( $char )
+   method line_for_pos ( $pos )
    {
+      my $char = $pos->start;
       my $line = 0;
       $line++ while $line < $#_lineruns and $_lineruns[$line][1] < $char;
       return $line;
@@ -805,12 +819,138 @@ class App::sdview::Output::Tickit::_FixedWidthItem
          only => [qw( highlight )],
       );
 
+      return unless defined $re;
+
       my @ret;
 
-      if( defined $re ) {
-         foreach my $e ( $_text->match_extents( $re ) ) {
-            push @ret, [ $self, $e, 0 ];
-            $_text->apply_tag( $e, highlight => \$ret[-1][2] );
+      foreach my $e ( $_text->match_extents( $re ) ) {
+         push @ret, [ $self, $e, 0 ];
+         $_text->apply_tag( $e, highlight => \$ret[-1][2] );
+      }
+
+      return @ret;
+   }
+}
+
+class App::sdview::Output::Tickit::_TableItem
+   :strict(params)
+{
+   use Tickit::Utils qw( textwidth );
+   use Tickit::RenderBuffer qw( LINE_SINGLE );
+
+   field @_rows;
+   ADJUST :params ( :$rows, ) { @_rows = @$rows; }
+
+   field $_pen          :param = undef;
+   field $_margin_left  :param = 0;
+   field $_margin_right :param = 0;
+
+   field @_colwidth;
+   field @_colstart;
+
+   method line_for_pos ( $pos )
+   {
+      my ( $rowidx, $colidx, $e ) = @$pos;
+      # TODO: this logic will get a lot more complex when cell wrapping is
+      # implemented, but for now it's very simple
+      return 1 + 2 * $rowidx;
+   }
+
+   method height_for_width ( $width )
+   {
+      @_colwidth = ();
+      foreach my $row ( @_rows ) {
+         foreach my $colidx ( 0 .. $#$row ) {
+            my $cellwidth = textwidth $row->[$colidx]->text;
+            $_colwidth[$colidx] = $cellwidth if $cellwidth > ( $_colwidth[$colidx] // 0 );
+         }
+      }
+
+      @_colstart = ( $_margin_left + 1 );
+      $_colstart[$_+1] = $_colstart[$_] + $_colwidth[$_] + 3 for 0 .. $#_colwidth;
+
+      return 1 + 2 * @_rows;
+   }
+
+   method render ( $rb, %args )
+   {
+      $rb->erase_at( $_, 0, $args{width} ) for $args{firstline} .. $args{lastline};
+
+      my $width = $_colstart[ scalar @_colwidth ];
+      my $height = 1 + 2 * @_rows;
+
+      # Draw all the lines first
+      foreach my $rowidx ( 0 .. $#_rows+1 ) {
+         $rb->hline_at( 2 * $rowidx, $_margin_left, $width-1, LINE_SINGLE );
+      }
+      foreach my $colidx ( 0 .. $#_colwidth+1 ) {
+         $rb->vline_at( 0, $height-1, $_colstart[$colidx]-1, LINE_SINGLE );
+      }
+
+      foreach my $rowidx ( 0 .. $#_rows ) {
+         foreach my $colidx ( 0 .. $#_colwidth ) {
+            my $cell = $_rows[$rowidx]->[$colidx];
+            my $text = $cell->text->clone;
+
+            my %cellstyle;
+            %cellstyle = ( App::sdview::Style->para_style( "table-heading" )->%*, %cellstyle )
+               if $cell->heading;
+
+            defined $cellstyle{$_} and $text->apply_tag( 0, -1, $_ => $cellstyle{$_} )
+               for keys %cellstyle;
+
+            $text = $text->clone( convert_tags => \%convert_tags );
+
+            $rb->goto( 1 + 2 * $rowidx, $_colstart[$colidx] );
+
+            $rb->erase( 1 );
+            my $align = $cell->align;
+            if( $align ne "left" ) {
+               my $spare = $_colwidth[$colidx] - textwidth $text;
+               $spare /= 2 if $align eq "centre";
+               $rb->erase( $spare );
+            }
+
+            $text->iter_substr_nooverlap(
+               sub ( $substr, %tags )
+               {
+                  if( exists $tags{highlight} ) {
+                     %tags = ( %tags, @HIGHLIGHT_PEN );
+                     %tags = ( %tags, @SELECT_PEN ) if $tags{highlight}->$*;
+                  }
+                  my $pen = Tickit::Pen::Immutable->new_from_attrs( \%tags );
+                  $rb->text( $substr, $pen );
+               },
+            );
+         }
+      }
+   }
+
+   method apply_highlight ( $re )
+   {
+      foreach my $row ( @_rows ) {
+         foreach my $cell ( @$row ) {
+            my $text = $cell->text;
+            $text->iter_extents(
+               sub ( $e, $t, $v ) {
+                  $text->delete_tag( $e, $t );
+               },
+               only => [qw( highlight )],
+            );
+         }
+      }
+
+      return unless defined $re;
+
+      my @ret;
+
+      foreach my $rowidx ( 0 .. $#_rows ) {
+         foreach my $colidx ( 0 .. $#{ $_rows[$rowidx] } ) {
+            my $text = $_rows[$rowidx][$colidx]->text;
+            foreach my $e ( $text->match_extents( $re ) ) {
+               push @ret, [ $self, [ $rowidx, $colidx, $e ], 0 ];
+               $text->apply_tag( $e, highlight => \$ret[-1][2] );
+            }
          }
       }
 
@@ -1050,6 +1190,7 @@ class App::sdview::Output::Tickit::_SearchBox
    field $text = "";
 
    field $is_ignorecase;
+   field $is_wholeword;
 
    field $ok = 1;
 
@@ -1089,6 +1230,10 @@ class App::sdview::Output::Tickit::_SearchBox
          $rb->goto( 0, $self->window->right - 2 - length $counttext );
          $rb->text( "/i" );
       }
+      if( $is_wholeword ) {
+         $rb->goto( 0, $self->window->right - 4 - length $counttext );
+         $rb->text( "W" );
+      }
       $rb->goto( 0, $self->window->right - length $counttext );
       $rb->text( $counttext );
    }
@@ -1122,6 +1267,11 @@ class App::sdview::Output::Tickit::_SearchBox
          $self->_update_pattern;
          $self->redraw;
       }
+      elsif( $key eq "M-w" ) {
+         $is_wholeword = !$is_wholeword;
+         $self->_update_pattern;
+         $self->redraw;
+      }
       else {
          return 0;
       }
@@ -1133,8 +1283,13 @@ class App::sdview::Output::Tickit::_SearchBox
    {
       my $patternok = 0;
       if( defined $text and length $text ) {
+         my $flags = "";
+         $flags .= "i" if $is_ignorecase;
+         my $re = "(?$flags:$text)";
+         $re = "\\b$re\\b" if $is_wholeword;
+
          # Compiling the pattern might not succeed; if not just keep the previous
-         eval { $searchre = $is_ignorecase ? qr/$text/i : qr/$text/; $patternok = 1 };
+         eval { $searchre = qr/$re/; $patternok = 1 };
       }
 
       $self->redraw if $patternok != $ok; $ok = $patternok;

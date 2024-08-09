@@ -1,6 +1,15 @@
 Revision history for e
 
 =================
+1.27 - 2024-08-08
+=================
+
+Added command: clone.
+Added command: post (p from ojo).
+Added commands: runio, runf, runt.
+Updated pod.
+
+=================
 1.26 - 2024-07-27
 =================
 

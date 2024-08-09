@@ -10,8 +10,13 @@ use ExtUtils::MakeMaker;
 use Config;
 use Crypt::OpenSSL::Guess qw(openssl_lib_paths openssl_inc_paths);
 
+my $libs = ' -lssl -lcrypto';
+if ($Config{osname} eq 'aix') {
+  $libs = $libs . ' -lz';
+}
+
 my %args = (
-  LIBS => [openssl_lib_paths().' -lssl -lcrypto'],
+  LIBS => [openssl_lib_paths(). $libs],
   INC => openssl_inc_paths(),
 );
 
@@ -65,12 +70,13 @@ my %WriteMakefileArgs = (
   "LICENSE" => "perl",
   "NAME" => "Crypt::OpenSSL::X509",
   "PREREQ_PM" => {
-    "Convert::ASN1" => "0.33"
+    "Convert::ASN1" => "0.33",
+    "version" => "0.77"
   },
   "TEST_REQUIRES" => {
     "Test::Pod" => "1.00"
   },
-  "VERSION" => "1.915",
+  "VERSION" => "2.0.1",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -83,7 +89,8 @@ my %WriteMakefileArgs = (
 
 my %FallbackPrereqs = (
   "Convert::ASN1" => "0.33",
-  "Test::Pod" => "1.00"
+  "Test::Pod" => "1.00",
+  "version" => "0.77"
 );
 
 unless ( eval { ExtUtils::MakeMaker->VERSION('6.63_03') } ) {

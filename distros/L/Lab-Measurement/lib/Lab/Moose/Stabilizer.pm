@@ -1,5 +1,5 @@
 package Lab::Moose::Stabilizer;
-$Lab::Moose::Stabilizer::VERSION = '3.902';
+$Lab::Moose::Stabilizer::VERSION = '3.903';
 #ABSTRACT: Sensor stabilizer subroutine
 
 use v5.20;
@@ -24,7 +24,7 @@ sub stabilize {
         $instrument, $setpoint, $getter, $tolerance_setpoint,
         $tolerance_std_dev,
         $measurement_interval, $observation_time, $max_stabilization_time,
-        $verbose
+        $on_fail, $verbose
         )
         = validated_list(
         \@_,
@@ -37,6 +37,7 @@ sub stabilize {
         observation_time     => { isa => 'Lab::Moose::PosNum' },
         max_stabilization_time =>
             { isa => 'Maybe[Lab::Moose::PosNum]', optional => 1 },
+        on_fail              => { isa => 'CodeRef | Str', optional => 1 },
         verbose => { isa => 'Bool' },
         );
 
@@ -117,6 +118,9 @@ sub stabilize {
                 printf(
                     "Reached maximum stabilization time                   \n"
                 );
+                if ( defined $on_fail ) {
+                    $on_fail->();
+                };
                 last;
             }
         }
@@ -140,7 +144,7 @@ Lab::Moose::Stabilizer - Sensor stabilizer subroutine
 
 =head1 VERSION
 
-version 3.902
+version 3.903
 
 =head1 DESCRIPTION
 
@@ -160,6 +164,8 @@ Routine for sensor (temperature, magnetic field, ...) stabilization.
      measurement_interval => 2,     # time (s) between calls of getter
      observation_time => 20,        # length of window (s) for median/std_dev
      max_stabilization_time => 100, # abort stabilization after (s, optional)
+     on_fail => sub { ... },        # if max_stabilization_time is reached,
+                                    # run this
      verbose => 1
  );
 
@@ -173,6 +179,7 @@ This software is copyright (c) 2024 by the Lab::Measurement team; in detail:
 
   Copyright 2018       Andreas K. Huettel, Simon Reinhardt
             2019       Simon Reinhardt
+            2024       Andreas K. Huettel
 
 
 This is free software; you can redistribute it and/or modify it under

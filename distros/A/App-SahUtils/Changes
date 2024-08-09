@@ -1,3 +1,8 @@
+0.485   2024-08-06  Released-By: PERLANCAR; Urgency: medium
+
+        - [cli list-sah-filter-rule-modules] [ux] Add --perl and --js.
+
+
 0.484   2024-03-06  Released-By: PERLANCAR; Urgency: medium
 
         - Rename scripts: list-sah-schemas-modules ->

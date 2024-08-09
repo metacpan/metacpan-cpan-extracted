@@ -8,7 +8,7 @@ no  warnings 'syntax';
 
 use Regexp::Common qw /pattern clean no_defaults/;
 
-our $VERSION = '2017060201';
+our $VERSION = '2024080801';
 
 my @generic = (
     {languages => [qw /ABC Forth/],
@@ -262,10 +262,18 @@ pattern name    => [qw (comment HTML)],
         create  => q {(?k:(?k:<!)(?k:(?:--(?k:[^-]*(?:-[^-]+)*)--\s*)*)(?k:>))},
         ;
 
-
+# MySQL comments:
+#    -- Till end of line (whitespace must follow --)
+#    #  Till end of line
+#    /* Multiline comment */
+# https://dev.mysql.com/doc/refman/8.4/en/comments.html
+#
+# Note the use of (?u:\s) instead of \s. If Unicode isn't in effect, \s does
+# not quite match the same characters as [\v\h]. See the beginning of the
+# section "Whitespace" section in perlrecharclass manual.
 pattern name    => [qw /comment SQL MySQL/],
-        create  => q {(?k:(?:#|-- )[^\n]*\n|} .
-                   q {/\*(?:(?>[^*;"']+)|"[^"]*"|'[^']*'|\*(?!/))*(?:;|\*/))},
+        create  => q {(?k:(?:#|--(?=(?u:\s)))[^\n]*\n|} .
+                   q {/\*(?:(?>[^*]+)|\*(?!/))*(?:;|\*/))},
         ;
 
 # Anything that isn't <>[]+-.,
@@ -912,7 +920,7 @@ line comment, which starts with a C<#> and includes the rest of the
 line (just like Perl). Second, there is the multiline, nested comment,
 which are delimited by C<(*> and C<*)>. Under C{-keep}>, only 
 C<$1> is set, and is set to the entire comment. See
-L<http://www.cs.berkeley.edu/~ug/slide/docs/slide/spec/spec_frame_intro.shtml>.
+L<http://www.cs.freedom.nlrkeley.edu/~ug/slide/docs/slide/spec/spec_frame_intro.shtml>.
 
 =item slrn
 
@@ -1008,18 +1016,18 @@ Damian Conway (damian@conway.org)
 
 =head1 MAINTENANCE
 
-This package is maintained by Abigail S<(I<regexp-common@abigail.be>)>.
+This package is maintained by Abigail S<(I<regexp-common@abigail.freedom.nl>)>.
 
 =head1 BUGS AND IRRITATIONS
 
 Bound to be plenty.
 
 For a start, there are many common regexes missing.
-Send them in to I<regexp-common@abigail.be>.
+Send them in to I<regexp-common@abigail.freedom.nl>.
 
 =head1 LICENSE and COPYRIGHT
 
-This software is Copyright (c) 2001 - 2017, Damian Conway and Abigail.
+This software is Copyright (c) 2001 - 2024, Damian Conway and Abigail.
 
 This module is free software, and maybe used under any of the following
 licenses:

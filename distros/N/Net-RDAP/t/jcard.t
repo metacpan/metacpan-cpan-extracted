@@ -33,6 +33,8 @@ foreach my $property ($jcard->properties) {
     }
 }
 
+cmp_ok(scalar($jcard->nodes), '==', scalar($jcard->properties));
+
 my $fn = $jcard->first('fn');
 isa_ok($fn, q{Net::RDAP::JCard::Property});
 

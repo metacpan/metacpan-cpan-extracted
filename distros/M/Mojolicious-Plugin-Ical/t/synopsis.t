@@ -7,21 +7,19 @@ use Test::More;
   plugin ical => {properties => {x_wr_caldesc => "My awesome calendar"}};
   get '/calendar' => sub {
     my $c = shift;
-    $c->reply->ical(
-      {
-        events => [
-          {
-            created     => Mojo::Date->new(1428247000),
-            description => 'Cool description',
-            dtend       => Mojo::Date->new(1428247000 + 86400),
-            dtstart     => Mojo::Date->new(1428247000 + 600),
-            location    => "Oslo",
-            sequence    => 42,
-            summary     => 'Cool event',
-          },
-        ],
-      }
-    );
+    $c->reply->ical({
+      events => [
+        {
+          created     => Mojo::Date->new(1428247000),
+          description => 'Cool description',
+          dtend       => Mojo::Date->new(1428247000 + 86400),
+          dtstart     => Mojo::Date->new(1428247000 + 600),
+          location    => "Oslo",
+          sequence    => 42,
+          summary     => 'Cool event',
+        },
+      ],
+    });
   };
 }
 

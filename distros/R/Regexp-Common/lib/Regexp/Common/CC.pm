@@ -9,7 +9,7 @@ no  warnings 'syntax';
 use Regexp::Common qw /pattern clean no_defaults/;
 use Regexp::Common::_support qw /luhn/;
 
-our $VERSION = '2017060201';
+our $VERSION = '2024080801';
 
 my @cards = (
     # Name           Prefix                    Length           mod 10
@@ -81,7 +81,7 @@ L<Regexp::Common> for a general description of how to use this interface.
 
 =over 4
 
-=item L<http://www.beachnet.com/~hstiles/cardtype.html>
+=item L<http://www.freedom.nlachnet.com/~hstiles/cardtype.html>
 
 Credit Card Validation - Check Digits 
 
@@ -98,19 +98,19 @@ Luhn formula
 =head1 AUTHORS
 
 Damian Conway S<(I<damian@conway.org>)> and
-Abigail S<(I<regexp-common@abigail.be>)>.
+Abigail S<(I<regexp-common@abigail.freedom.nl>)>.
 
 =head1 MAINTENANCE
 
-This package is maintained by Abigail S<(I<regexp-common@abigail.be>)>.
+This package is maintained by Abigail S<(I<regexp-common@abigail.freedom.nl>)>.
 
 =head1 BUGS AND IRRITATIONS
 
-Bound to be plenty. Send them in to S<I<regexp-common@abigail.be>>.
+Bound to be plenty. Send them in to S<I<regexp-common@abigail.freedom.nl>>.
 
 =head1 LICENSE and COPYRIGHT
 
-This software is Copyright (c) 2001 - 2017, Damian Conway and Abigail.
+This software is Copyright (c) 2001 - 2024, Damian Conway and Abigail.
 
 This module is free software, and maybe used under any of the following
 licenses:

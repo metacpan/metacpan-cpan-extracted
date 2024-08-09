@@ -1,5 +1,5 @@
 package Lab::Moose::Instrument::Synctek_MCL1_540;
-$Lab::Moose::Instrument::Synctek_MCL1_540::VERSION = '3.902';
+$Lab::Moose::Instrument::Synctek_MCL1_540::VERSION = '3.903';
 #ABSTRACT: Synctek MCL1-540 Lock-in Amplifier
 
 use v5.20;
@@ -362,7 +362,7 @@ Lab::Moose::Instrument::Synctek_MCL1_540 - Synctek MCL1-540 Lock-in Amplifier
 
 =head1 VERSION
 
-version 3.902
+version 3.903
 
 =head1 SYNOPSIS
 

@@ -1,3 +1,7 @@
+Version 2024080801 Thu Aug  8 19:06:47 CEST 2024
++ Eliminate 'use vars'.
++ Update the MySQL comment pattern.
+
 Version 2017060201 Fri Jun  2 23:48:32 CEST 2017
 + Prepare for 5.26: don't rely on '.' being present in @INC when testing.
 

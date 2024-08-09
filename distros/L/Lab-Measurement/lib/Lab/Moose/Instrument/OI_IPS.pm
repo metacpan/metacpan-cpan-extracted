@@ -1,5 +1,5 @@
 package Lab::Moose::Instrument::OI_IPS;
-$Lab::Moose::Instrument::OI_IPS::VERSION = '3.902';
+$Lab::Moose::Instrument::OI_IPS::VERSION = '3.903';
 #ABSTRACT: Oxford Instruments IPS Intelligent Power Supply
 
 use v5.20;
@@ -445,7 +445,7 @@ Lab::Moose::Instrument::OI_IPS - Oxford Instruments IPS Intelligent Power Supply
 
 =head1 VERSION
 
-version 3.902
+version 3.903
 
 =head1 SYNOPSIS
 

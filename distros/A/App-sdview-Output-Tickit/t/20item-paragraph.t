@@ -30,9 +30,6 @@ my $rb = Tickit::RenderBuffer->new( lines => 10, cols => 30 );
    is( $item->height_for_width( 30 ), 1,
       'item is 1 line tall at width=30' );
 
-   is( $item->line_for_char( 21 ), 0,
-      'char 21 is on line 0' );
-
    $item->render( $rb,
       firstline => 0,
       lastline => 0,
@@ -51,9 +48,6 @@ my $rb = Tickit::RenderBuffer->new( lines => 10, cols => 30 );
 
    is( $item->height_for_width( 25 ), 2,
       'item is 2 lines tall at width=25' );
-
-   is( $item->line_for_char( 21 ), 1,
-      'char 21 is on line 1' );
 
    $item->render( $rb,
       firstline => 0,
@@ -233,6 +227,9 @@ clear_term;
    is( $e->start,  3,   '$e->start' );
    is( $e->length, 1,   '$e->length' );
    is( $e->substr, "e", '$e->substr' );
+
+   is( $item->line_for_pos( $e ), 0,
+      'match[0] is on line 0' );
 
    $item->render( $rb,
       firstline => 0,

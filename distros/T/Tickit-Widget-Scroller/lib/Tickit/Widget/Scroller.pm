@@ -1,13 +1,13 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2011-2023 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2011-2024 -- leonerd@leonerd.org.uk
 
 use v5.26; # signatures
 use warnings;
 use Object::Pad 0.800 ':experimental(adjust_params)';
 
-package Tickit::Widget::Scroller 0.32;
+package Tickit::Widget::Scroller 0.33;
 class Tickit::Widget::Scroller
    :strict(params)
    :isa(Tickit::Widget);
@@ -155,11 +155,6 @@ field @_itemheights;
 
 field $_start_item = 0;
 field $_start_partial = 0;
-
-# accessor methods for t/30indicator.t to use
-# TODO: Should think about whether these should be made public
-method _start_item    { $_start_item }
-method _start_partial { $_start_partial }
 
 # We're going to cache window height because we need pre-resize height
 # during resize event
@@ -701,6 +696,46 @@ arguments, therefore scrolls to the very bottom of the display.
 method scroll_to_bottom ( $item_or_idx = -1, $itemline = -1 )
 {
    $self->scroll_to( -1, $item_or_idx, $itemline );
+}
+
+=head2 scroll_to_visible
+
+   $scroller->scroll_to_visible( $item_or_idx, $itemline, %opts );
+
+I<Since version 0.33.>
+
+If the requested line of the requested item is already visible on the display,
+this method does nothing. Otherwise, it scrolls up or down by the B<smallest>
+amount possible so that it becomes visible. If the line was previously above
+then it scrolls just sufficient to bring that line to the top-most of the
+display. If it was below, it scrolls to bring it to the bottom-most.
+
+If the optional C<margin> named argument it set to a value larger than zero,
+it causes that number of the top-most and bottom-most lines not to count for
+purposes of visibility or scrolling.
+
+=cut
+
+method scroll_to_visible ( $item_or_idx, $itemline = 0, %opts )
+{
+   my $height = $self->window->lines;
+   my $max_margin = int( ( $height - 1 ) / 2 );
+
+   my $margin = $opts{margin} // 0;
+   $margin = $max_margin if $margin > $max_margin;
+
+   my ( $visline, $offscreen ) = $self->item2line( $item_or_idx, $itemline );
+   $offscreen //= ""; # quiet warnings from eq
+
+   if( $offscreen eq "above" or $offscreen eq "" and $visline < $margin ) {
+      # Scroll so requested line is at the top
+      $self->scroll_to( $margin, $item_or_idx, $itemline );
+   }
+   elsif( $offscreen eq "below" or $offscreen eq "" and $visline >= $height - $margin ) {
+      # Scroll so requested line is at the bottom
+      $self->scroll_to( -1 - $margin, $item_or_idx, $itemline );
+   }
+   # else was already visible, so nothing to do
 }
 
 =head2 line2item

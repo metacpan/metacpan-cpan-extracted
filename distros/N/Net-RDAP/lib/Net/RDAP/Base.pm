@@ -9,22 +9,24 @@ use Net::RDAP::Object::Entity;
 use Net::RDAP::Object::IPNetwork;
 use Net::RDAP::Object::Nameserver;
 use Net::RDAP::Remark;
+use Net::RDAP::Variant;
 use strict;
 
 #
 # Constructor method. Expects a hashref as an argument.
 #
 sub new {
-    my ($package, $args, $document_url) = @_;
+    my ($package, $args, $document_url, $parent) = @_;
     my %self = %{$args};
 
+    $self{_parent} = $parent if ($parent);
     $self{_document_url} = $document_url if ($document_url);
 
     return bless(\%self, $package);
 }
 
 #
-# Returns a (potentially empty) array of <$class> objects
+# Returns a (potentially empty) array of C<$class> objects
 # generated from the hashrefs in C<$ref>, which is
 # expected to be a reference to an array.
 #
@@ -39,7 +41,7 @@ sub objects {
 
     if (defined($ref) && 'ARRAY' eq ref($ref)) {
         foreach my $item (@{$ref}) {
-            push(@list, $class->new($item, $document_url));
+            push(@list, $class->new($item, $document_url, $self));
         }
     }
 
@@ -116,6 +118,61 @@ sub document_url {
 
 =pod
 
+=head2 PARENT OBJECT
+
+    $parent = $object->parent;
+
+Returns the object in which this object is embedded, or C<undef> if this object
+is the topmost object in the RDAP response.
+
+=cut
+
+sub parent { $_[0]->{_parent} }
+
+=pod
+
+=head2 TOPMOST OBJECT
+
+    $top = $object->top;
+
+Returns the topmost object in the RDAP response.
+
+=cut
+
+sub top {
+    my $self = shift;
+    return $self->parent || $self;
+}
+
+=pod
+
+=head2 OBJECT CHAIN
+
+    @chain = $object->chain;
+
+Returns an array containing the hierarchy of objects that enclose this object.
+So for example, the registrar entity of host object of a domain name will have a
+chain that looks like C<[Net::RDAP::Object::Entity,
+Net::RDAP::Object::Nameserver, Net::RDAP::Object::Domain]>. If the object is the
+topmost object of the RDAP response, the array will be empty.
+
+=cut
+
+sub chain {
+    my $self = shift;
+
+    my $parent = $self->parent;
+    if (!$parent) {
+        return $self;
+
+    } else {
+        return ($self, $parent->chain);
+
+    }
+}
+
+=pod
+
 =head1 C<TO_JSON()>
 
 C<Net::RDAP::Base> provides a C<TO_JSON()> so that any RDAP object can be
@@ -129,6 +186,7 @@ sub TO_JSON {
     my %hash = %{$self};
 
     delete($hash{_document_url});
+    delete($hash{_parent});
 
     return \%hash;
 }

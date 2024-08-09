@@ -9,7 +9,7 @@ configure_requires:
   Crypt::OpenSSL::Guess: '0'
   ExtUtils::MakeMaker: '0'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.030, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Zilla version 6.032, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -17,15 +17,16 @@ meta-spec:
 name: Crypt-OpenSSL-X509
 requires:
   Convert::ASN1: '0.33'
+  version: '0.77'
 resources:
   bugtracker: https://github.com/dsully/perl-crypt-openssl-x509/issues
   homepage: https://github.com/dsully/perl-crypt-openssl-x509
   repository: https://github.com/dsully/perl-crypt-openssl-x509.git
-version: '1.915'
+version: 2.0.1
 x_contributors:
   - 'TIMLEGGE <timlegge@cpan.org>'
   - 'SKAJI <skaji@cpan.org>'
-x_generated_by_perl: v5.36.1
+x_generated_by_perl: v5.40.0
 x_maintainers:
   - 'JONASBN <jonasbn@cpan.org>'
 x_serialization_backend: 'YAML::Tiny version 1.74'

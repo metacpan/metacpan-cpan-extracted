@@ -3,6 +3,7 @@ use 5.006;
 use strict;
 use warnings;
 use Test::More;
+use Config;
 use e;
 
 sub run {
@@ -90,6 +91,23 @@ is_deeply
   yml( "---\na: 1" ),
   { a => 1 },
   "yml - yml string to ref";
+
+# Storable's deep clone.
+{
+    my $arr1 = [ 1 .. 3 ];
+    my $arr2 = clone $arr1;
+    $arr2->[0] = 111;
+
+    is_deeply
+      $arr1,
+      [ 1, 2, 3 ],
+      "clone - original array";
+
+    is_deeply
+      $arr2,
+      [ 111, 2, 3 ],
+      "clone - cloned array";
+}
 
 # UTF-8.
 is
@@ -278,6 +296,30 @@ is
       join( "", map { "$_\n" } @expected ),
       "table - void context";
 
+}
+
+######################################
+#           Asynchronous
+######################################
+
+{
+    my @actions =
+      map {
+        my $num = $_;
+        sub { ( $num => "Got $num" ) };
+      } 1 .. 3;
+    my %expected = map { $_->() } @actions;
+
+    is_deeply { runio @actions }, \%expected, "runio - simple return";
+
+    is_deeply { runf @actions }, \%expected, "runf - simple return";
+
+    if ( $Config{useithreads} ) {
+        is_deeply { runt @actions }, \%expected, "runt - simple return";
+    }
+    else {
+        pass "[SKIPPED - threading not supported] runt - simple return";
+    }
 }
 
 ######################################

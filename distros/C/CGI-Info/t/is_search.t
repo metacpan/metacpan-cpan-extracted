@@ -82,11 +82,17 @@ SEARCH: {
 		ok(!defined($cache->get("12.159.106.42/$ENV{HTTP_USER_AGENT}")));
 	}
 
+	# Verify sub-classing works
+	{
+		package CGI::Info::Test;
+		use base qw(CGI::Info);
+	}
+
 	$ENV{'HTTP_USER_AGENT'} = 'A nonsense user agent string';
 	$ENV{'REMOTE_ADDR'} = '212.159.106.41';
-	$i = new_ok('CGI::Info' => [
+	$i = new_ok('CGI::Info::Test' => [{
 		cache => $cache,
-	]);
+	}]);
 	ok($i->is_search_engine() == 0);
 	ok($i->browser_type() eq 'robot');
 	SKIP: {

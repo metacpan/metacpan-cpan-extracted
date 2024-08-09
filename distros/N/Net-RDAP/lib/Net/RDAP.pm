@@ -6,6 +6,7 @@ use File::Spec;
 use HTTP::Request::Common;
 use JSON;
 use MIME::Base64;
+use Net::ASN;
 use Net::RDAP::Error;
 use Net::RDAP::Help;
 use Net::RDAP::Object::Autnum;
@@ -23,7 +24,7 @@ use vars qw($VERSION);
 use constant DEFAULT_CACHE_TTL => 3600;
 use strict;
 
-$VERSION = 0.27;
+$VERSION = 0.28;
 
 =pod
 
@@ -643,7 +644,7 @@ RDAP-related modules that all work together. They are:
 
 =over
 
-=item * L<Net::RDAP::Base>, and its submodules:
+=item * L<Net::RDAP::Base>
 
 =over
 
@@ -651,7 +652,7 @@ RDAP-related modules that all work together. They are:
 
 =item * L<Net::RDAP::ID>
 
-=item * L<Net::RDAP::Object>, and its submodules:
+=item * L<Net::RDAP::Object>
 
 =over
 
@@ -673,7 +674,7 @@ RDAP-related modules that all work together. They are:
 
 =back
 
-=item * L<Net::RDAP::Remark>, and its submodule:
+=item * L<Net::RDAP::Remark>
 
 =over
 
@@ -708,6 +709,10 @@ RDAP-related modules that all work together. They are:
 =item * L<Net::RDAP::UA>
 
 =item * L<Net::RDAP::Values>
+
+=item * L<Net::RDAP::Variant>
+
+=item * L<Net::RDAP::VariantName>
 
 =back
 

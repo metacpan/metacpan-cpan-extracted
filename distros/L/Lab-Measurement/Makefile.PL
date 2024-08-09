@@ -90,7 +90,7 @@ my %WriteMakefileArgs = (
     "lib" => 0,
     "parent" => 0
   },
-  "VERSION" => "3.902",
+  "VERSION" => "3.903",
   "test" => {
     "TESTS" => "t/*.t t/Lab/Test/*.t t/Moose/*.t t/Moose/Connection/*.t t/Moose/DataFile/*.t t/Moose/DataFile/Gnuplot/*.t t/Moose/Instrument/*.t t/Moose/Instrument/OI_Mercury/*.t"
   }

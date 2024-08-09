@@ -35,15 +35,15 @@
    "provides" : {
       "Tickit::Widget::Scroller" : {
          "file" : "lib/Tickit/Widget/Scroller.pm",
-         "version" : "0.32"
+         "version" : "0.33"
       },
       "Tickit::Widget::Scroller::Item::RichText" : {
          "file" : "lib/Tickit/Widget/Scroller/Item/RichText.pm",
-         "version" : "0.32"
+         "version" : "0.33"
       },
       "Tickit::Widget::Scroller::Item::Text" : {
          "file" : "lib/Tickit/Widget/Scroller/Item/Text.pm",
-         "version" : "0.32"
+         "version" : "0.33"
       }
    },
    "release_status" : "stable",
@@ -53,6 +53,6 @@
       ],
       "x_IRC" : "irc://irc.freenode.net/#tickit"
    },
-   "version" : "0.32",
-   "x_serialization_backend" : "JSON::PP version 4.07"
+   "version" : "0.33",
+   "x_serialization_backend" : "JSON::PP version 4.16"
 }

@@ -3,26 +3,28 @@
    "author" : [
       "Jan Henning Thorsen <jhthorsen@cpan.org>"
    ],
-   "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.04, CPAN::Meta::Converter version 2.150001",
+   "dynamic_config" : 0,
+   "generated_by" : "ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "artistic_2"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Mojolicious-Plugin-Ical",
    "no_index" : {
       "directory" : [
          "t",
-         "inc"
+         "inc",
+         "examples",
+         "t"
       ]
    },
    "prereqs" : {
       "build" : {
          "requires" : {
-            "Test::More" : "0.88"
+            "ExtUtils::MakeMaker" : "0"
          }
       },
       "configure" : {
@@ -32,8 +34,14 @@
       },
       "runtime" : {
          "requires" : {
-            "Mojolicious" : "5.41",
-            "Text::vFile::asData" : "0.08"
+            "Mojolicious" : "9.00",
+            "Text::vFile::asData" : "0.08",
+            "perl" : "5.016"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "1.30"
          }
       }
    },
@@ -43,9 +51,20 @@
          "web" : "https://github.com/jhthorsen/mojolicious-plugin-ical/issues"
       },
       "homepage" : "https://github.com/jhthorsen/mojolicious-plugin-ical",
+      "license" : [
+         "http://www.opensource.org/licenses/artistic-license-2.0"
+      ],
       "repository" : {
-         "url" : "https://github.com/jhthorsen/mojolicious-plugin-ical.git"
+         "type" : "git",
+         "url" : "https://github.com/jhthorsen/mojolicious-plugin-ical.git",
+         "web" : "https://github.com/jhthorsen/mojolicious-plugin-ical"
+      },
+      "x_IRC" : {
+         "url" : "irc://irc.libera.chat/#convos",
+         "web" : "https://web.libera.chat/#convos"
       }
    },
-   "version" : "0.05"
+   "version" : "1.00",
+   "x_contributors" : [],
+   "x_serialization_backend" : "JSON::PP version 4.16"
 }

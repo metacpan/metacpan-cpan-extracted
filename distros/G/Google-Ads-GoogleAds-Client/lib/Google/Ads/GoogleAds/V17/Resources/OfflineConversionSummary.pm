@@ -25,6 +25,7 @@ sub new {
   my $self = {
     failedCount     => $args->{failedCount},
     jobId           => $args->{jobId},
+    pendingCount    => $args->{pendingCount},
     successfulCount => $args->{successfulCount},
     uploadDate      => $args->{uploadDate}};
 

@@ -216,10 +216,10 @@ project is hosted here:
 The [Net::RDAP](https://metacpan.org/pod/Net%3A%3ARDAP) CPAN distribution contains a large number of
 RDAP-related modules that all work together. They are:
 
-- [Net::RDAP::Base](https://metacpan.org/pod/Net%3A%3ARDAP%3A%3ABase), and its submodules:
+- [Net::RDAP::Base](https://metacpan.org/pod/Net%3A%3ARDAP%3A%3ABase)
     - [Net::RDAP::Event](https://metacpan.org/pod/Net%3A%3ARDAP%3A%3AEvent)
     - [Net::RDAP::ID](https://metacpan.org/pod/Net%3A%3ARDAP%3A%3AID)
-    - [Net::RDAP::Object](https://metacpan.org/pod/Net%3A%3ARDAP%3A%3AObject), and its submodules:
+    - [Net::RDAP::Object](https://metacpan.org/pod/Net%3A%3ARDAP%3A%3AObject)
         - [Net::RDAP::Error](https://metacpan.org/pod/Net%3A%3ARDAP%3A%3AError)
         - [Net::RDAP::Help](https://metacpan.org/pod/Net%3A%3ARDAP%3A%3AHelp)
         - [Net::RDAP::Object::Autnum](https://metacpan.org/pod/Net%3A%3ARDAP%3A%3AObject%3A%3AAutnum)
@@ -228,7 +228,7 @@ RDAP-related modules that all work together. They are:
         - [Net::RDAP::Object::IPNetwork](https://metacpan.org/pod/Net%3A%3ARDAP%3A%3AObject%3A%3AIPNetwork)
         - [Net::RDAP::Object::Nameserver](https://metacpan.org/pod/Net%3A%3ARDAP%3A%3AObject%3A%3ANameserver)
         - [Net::RDAP::SearchResult](https://metacpan.org/pod/Net%3A%3ARDAP%3A%3ASearchResult)
-    - [Net::RDAP::Remark](https://metacpan.org/pod/Net%3A%3ARDAP%3A%3ARemark), and its submodule:
+    - [Net::RDAP::Remark](https://metacpan.org/pod/Net%3A%3ARDAP%3A%3ARemark)
         - [Net::RDAP::Notice](https://metacpan.org/pod/Net%3A%3ARDAP%3A%3ANotice)
 - [Net::RDAP::EPPStatusMap](https://metacpan.org/pod/Net%3A%3ARDAP%3A%3AEPPStatusMap)
 - [Net::RDAP::JCard](https://metacpan.org/pod/Net%3A%3ARDAP%3A%3AJCard)
@@ -241,6 +241,8 @@ RDAP-related modules that all work together. They are:
 - [Net::RDAP::Link](https://metacpan.org/pod/Net%3A%3ARDAP%3A%3ALink)
 - [Net::RDAP::UA](https://metacpan.org/pod/Net%3A%3ARDAP%3A%3AUA)
 - [Net::RDAP::Values](https://metacpan.org/pod/Net%3A%3ARDAP%3A%3AValues)
+- [Net::RDAP::Variant](https://metacpan.org/pod/Net%3A%3ARDAP%3A%3AVariant)
+- [Net::RDAP::VariantName](https://metacpan.org/pod/Net%3A%3ARDAP%3A%3AVariantName)
 
 # REFERENCES
 

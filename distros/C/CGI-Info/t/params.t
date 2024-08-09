@@ -2,7 +2,7 @@
 
 use strict;
 use warnings;
-use Test::Most tests => 173;
+use Test::Most tests => 174;
 use Test::NoWarnings;
 use File::Spec;
 use lib 't/lib';
@@ -106,6 +106,7 @@ PARAMS: {
 	%p = %{$i->params()};
 	ok($p{'username'} eq 'admin');
 	ok($p{'password'} eq 'foo');
+	cmp_ok(scalar(keys %p), '==', 2, 'Params returns correct number of keys');
 
 	$ENV{'QUERY_STRING'} = 'foo%41=%20bar';
 	$i = new_ok('CGI::Info');

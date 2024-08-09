@@ -15,7 +15,7 @@ my $build = Module::Build->new(
       'Tickit' => 0,
       'Tickit::Style' => 0,
       'Tickit::Widget::FloatBox' => 0,
-      'Tickit::Widget::Scroller' => '0.32',
+      'Tickit::Widget::Scroller' => '0.33',
       'Tickit::Widget::Scroller::Item::RichText' => 0,
       'Tickit::Widget::Static' => 0,
    },

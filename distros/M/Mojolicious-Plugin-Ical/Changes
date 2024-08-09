@@ -1,5 +1,13 @@
 Revision history for perl distribution Mojolicious-Plugin-Ical
 
+1.00 2024-08-08T22:16:16
+ - About time to bump the version number, after seven years
+
+0.06 2024-08-07T20:53:02
+ - Fix failing tests
+ - Updated syntax
+ - Module is back on CPAN
+
 0.05 2015-07-11T12:31:12+0200
  - Skip test since regex fail with long hostname
 

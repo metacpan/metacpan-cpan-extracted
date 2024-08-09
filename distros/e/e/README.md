@@ -26,7 +26,7 @@
               ⠹⡽⣾⣿⠹⣿⣆⣾⢯⣿⣿ ⡞ ⠻⣿⣿⣿⠁ ⢠⣿⢏  ⡀ ⡟  ⢀⣴⣿⠃⢁⡼⠁ ⠈
                 ⠈⠛ ⢻⣿⣧⢸⢟⠶⢾⡇  ⣸⡿⠁ ⢠⣾⡟⢼  ⣷ ⡇ ⣰⠋⠙⠁
                    ⠈⣿⣻⣾⣦⣇⢸⣇⣀⣶⡿⠁⣀⣀⣾⢿⡇⢸  ⣟⡦⣧⣶⠏ unleashed
-                    ⠸⢿⡍⠛⠻⠿⠿⠿⠋⣠⡾⢋⣾⣏⣸⣷⡸⣇⢰⠟⠛⠻⡄  v1.26
+                    ⠸⢿⡍⠛⠻⠿⠿⠿⠋⣠⡾⢋⣾⣏⣸⣷⡸⣇⢰⠟⠛⠻⡄  v1.27
                       ⢻⡄   ⠐⠚⠋⣠⡾⣧⣿⠁⠙⢳⣽⡟
                       ⠈⠳⢦⣤⣤⣀⣤⡶⠛ ⠈⢿⡆  ⢿⡇
                             ⠈    ⠈⠓  ⠈
@@ -233,6 +233,16 @@ Turn HTML/XML input into [Mojo::DOM](https://metacpan.org/pod/Mojo%3A%3ADOM) obj
 
     $ perl -Me -e 'say x("<div>hey</dev>")->at("div")->text'
 
+Force HTML semantics:
+
+    $ perl -Me -e 'say x->xml(0)->parse("<Tag>Name</Tag>")'
+    <tag>Name</tag>
+
+Force XML semantics (case sensitive tags and more):
+
+    $ perl -Me -e 'say x->xml(1)->parse("<Tag>Name</Tag>")'
+    <Tag>Name</Tag>
+
 ### yml
 
 YAML parser.
@@ -244,6 +254,38 @@ Convert Perl object to YAML string:
 Convert YAML string to Perl object:
 
     $ perl -Me -e 'p yml "---\na:\n- 1\n- 2\n- 3"'
+
+### clone
+
+Storable's deep clone.
+
+    $ perl -Me -e '
+        my $arr1   = [ 1..3 ];
+        my $arr2   = clone $arr1;
+        $arr2->[0] = 111;
+
+        say $arr1;
+        p $arr1;
+
+        say "";
+        say $arr2;
+        p $arr2;
+    '
+
+    # Output:
+    ARRAY(0x5d0b8a408518)
+    [
+        [0] 1,
+        [1] 2,
+        [2] 3,
+    ]
+
+    ARRAY(0x5d0b8a42d9e0)
+    [
+        [0] 111,
+        [1] 2,
+        [2] 3,
+    ]
 
 ### enc
 
@@ -299,7 +341,6 @@ Turn list into a [Set::Scalar](https://metacpan.org/pod/Set%3A%3AScalar) object.
 
     $ perl -Me -e 'say set(2,4,6,2)'
     (2 4 6)
-    
 
 Get elements:
 
@@ -309,9 +350,15 @@ Get elements:
     4
     6
 
+Check for existence of an element:
+
+    $ perl -Me -e 'say set(2,4,6,2)->has(7)'
+    $ perl -Me -e 'say set(2,4,6,2)->has(4)'
+    1
+
 Intersection:
 
-    $ perl -Ilib/ -Me -e 'say set(2,4,6,2) * set(3,4,5,6)'
+    $ perl -Me -e 'say set(2,4,6,2) * set(3,4,5,6)'
     (4 6)
 
 Create a new universe:
@@ -356,7 +403,7 @@ Turn string into a [Mojo::File](https://metacpan.org/pod/Mojo%3A%3AFile) object.
 
 ### say
 
-Print with newline.
+Obnoxious print with a newline.
 
     $ perl -Me -e 'say 123'
     $ perl -Me -e 'say for 1..3'
@@ -444,6 +491,17 @@ Perform `GET` request with ["get" in Mojo::UserAgent](https://metacpan.org/pod/M
 
     $ perl -Me -e 'say g("mojolicious.org")->dom("h1")->map("text")->join("\n")'
 
+### post
+
+    my $res = post('example.com');
+    my $res = post('http://example.com' => {Accept => '*/*'} => 'Hi!');
+    my $res = post('http://example.com' => {Accept => '*/*'} => form => {a => 'b'});
+    my $res = post('http://example.com' => {Accept => '*/*'} => json => {a => 'b'});
+
+Perform `POST` request with ["get" in Mojo::UserAgent](https://metacpan.org/pod/Mojo%3A%3AUserAgent#get) and return resulting [Mojo::Message::Response](https://metacpan.org/pod/Mojo%3A%3AMessage%3A%3AResponse) object.
+
+    $ perl -Me -e 'say post("mojolicious.org")->dom("h1")->map("text")->join("\n")'
+
 ### l
 
 Work with URLs.
@@ -453,6 +511,113 @@ Work with URLs.
 Turn a string into a [Mojo::URL](https://metacpan.org/pod/Mojo%3A%3AURL) object.
 
     $ perl -Me -e 'say l("/perldoc")->to_abs(l("https://mojolicious.org"))'
+
+## Asynchronous
+
+This sector includes commands to run asynchronous
+(or pseudo-async) operations.
+
+It is not exturely clear with method to always use.
+
+Typically using threads (with `runt`) is the fastest.
+
+Some statistics using different run commands:
+
+    $ gitb status -d
+           s/iter   runt  runio   runf series
+    runt     1.74     --   -35%   -59%   -74%
+    runio    1.12    55%     --   -36%   -59%
+    runf    0.716   142%    56%     --   -36%
+    series  0.456   281%   146%    57%     --
+
+    $ gitb branch -d
+              Rate   runt   runf series  runio
+    runt   0.592/s     --   -71%   -81%   -83%
+    runf    2.02/s   240%     --   -34%   -42%
+    series  3.05/s   415%    51%     --   -12%
+    runio   3.47/s   486%    72%    14%     --
+
+    $ gitb pull -d
+           s/iter  runio series   runt   runf
+    runio    4.27     --    -7%   -21%   -33%
+    series   3.97     8%     --   -15%   -28%
+    runt     3.38    26%    17%     --   -15%
+    runf     2.87    49%    38%    18%     --
+
+### runf
+
+Run tasks in parallel using [Parallel::ForkManager](https://metacpan.org/pod/Parallel%3A%3AForkManager).
+
+Returns the results.
+
+    $ perl -Me -e '
+        p {
+            runf
+            map {
+                my $n = $_;
+                sub{ $n => $n**2 };
+            } 1..5
+        }
+    '
+    {
+        1 => 1,
+        2 => 4,
+        3 => 9,
+        4 => 16,
+        5 => 25,
+    }
+
+Takes much overhead to start up!
+
+### runio
+
+Run tasks in parallel using [Mojo::IOLoop](https://metacpan.org/pod/Mojo%3A%3AIOLoop).
+
+Returns the results.
+
+    $ perl -Me -e '
+        p {
+            runio
+            map {
+                my $n = $_;
+                sub{ $n => $n**2 };
+            } 1..5
+        }
+    '
+    {
+        1 => 1,
+        2 => 4,
+        3 => 9,
+        4 => 16,
+        5 => 25,
+    }
+
+This is apparently better to use for IO related tasks.
+
+### runt
+
+Run tasks in parallel using [threads](https://metacpan.org/pod/threads).
+
+Returns the results.
+
+    $ perl -Me -e '
+        p {
+            runt
+            map {
+                my $n = $_;
+                sub{ $n => $n**2 };
+            } 1..5
+        }
+    '
+    {
+        1 => 1,
+        2 => 4,
+        3 => 9,
+        4 => 16,
+        5 => 25,
+    }
+
+This is the fastest run\* command usually.
 
 ## Package Tools
 

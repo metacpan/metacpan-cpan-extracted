@@ -5,7 +5,7 @@ use Test::More;
 {
   use Mojolicious::Lite;
   plugin ical => {properties => {x_wr_caldesc => "My awesome calendar"}};
-  get '/calendar' => sub {
+  get '/calendar', [format => [qw(ical json)]] => sub {
     my $c    = shift;
     my $ical = {
       events => [

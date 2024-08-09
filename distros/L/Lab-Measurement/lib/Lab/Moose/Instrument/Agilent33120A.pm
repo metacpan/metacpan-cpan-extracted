@@ -1,5 +1,5 @@
 package Lab::Moose::Instrument::Agilent33120A;
-$Lab::Moose::Instrument::Agilent33120A::VERSION = '3.902';
+$Lab::Moose::Instrument::Agilent33120A::VERSION = '3.903';
 #ABSTRACT: Agilent 33120A 15MHz arbitrary waveform generator
 
 use v5.20;
@@ -26,7 +26,7 @@ Lab::Moose::Instrument::Agilent33120A - Agilent 33120A 15MHz arbitrary waveform 
 
 =head1 VERSION
 
-version 3.902
+version 3.903
 
 =head1 DESCRIPTION
 

@@ -4,6 +4,9 @@ History for the Lab-Measurement Perl distribution
 This document is work in progress (in the sense of adding
 historical information).
 
+3.903 2024-08-09
+  * Add Stabilizer feature to call sub on failure
+
 3.902 2024-07-30
   * Add occasional nag message to encourage citation
 

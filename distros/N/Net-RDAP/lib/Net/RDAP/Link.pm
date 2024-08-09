@@ -34,9 +34,10 @@ objects.
 =cut
 
 sub new {
-    my ($package, $args, $document_url) = @_;
+    my ($package, $args, $document_url, $parent) = @_;
     my %self = %{$args};
 
+    $self{_document_url} = $document_url if ($document_url);
     $self{_document_url} = $document_url if ($document_url);
 
     return bless(\%self, $package);
@@ -196,6 +197,7 @@ sub TO_JSON {
     my %hash = %{$self};
 
     delete($hash{_document_url});
+    delete($hash{_parent});
 
     return \%hash;
 }

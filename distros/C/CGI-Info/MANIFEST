@@ -20,6 +20,7 @@ t/carp.t
 t/changes.t
 t/comment-spelling.t
 t/cookies.t
+t/cover.t
 t/critic.t
 t/cv.t
 t/dependent-modules.t
@@ -40,6 +41,7 @@ t/logdir.t
 t/manifest.t
 t/metrics.t
 t/minimum.t
+t/modules-used.t
 t/namespaces.t
 t/no404s.t
 t/noopentickets.t
@@ -66,7 +68,6 @@ t/taint.t
 t/tmpdir.t
 t/untaint.t
 t/unused.t
-t/used.t
 t/vars.t
 t/version.t
 t/xml.t

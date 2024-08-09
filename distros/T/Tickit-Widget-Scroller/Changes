@@ -1,5 +1,9 @@
 Revision history for Tickit-Widget-Scroller
 
+0.33    2024-08-08
+        [CHANGES]
+         * Added `->scroll_to_visible` method
+
 0.32    2023-10-02
         [CHANGES]
          * Allow items to be specified by index, reverse index, or direct

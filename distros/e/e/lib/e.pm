@@ -30,7 +30,7 @@ package e;
            ⠹⡽⣾⣿⠹⣿⣆⣾⢯⣿⣿ ⡞ ⠻⣿⣿⣿⠁ ⢠⣿⢏  ⡀ ⡟  ⢀⣴⣿⠃⢁⡼⠁ ⠈
              ⠈⠛ ⢻⣿⣧⢸⢟⠶⢾⡇  ⣸⡿⠁ ⢠⣾⡟⢼  ⣷ ⡇ ⣰⠋⠙⠁
                 ⠈⣿⣻⣾⣦⣇⢸⣇⣀⣶⡿⠁⣀⣀⣾⢿⡇⢸  ⣟⡦⣧⣶⠏ unleashed
-                 ⠸⢿⡍⠛⠻⠿⠿⠿⠋⣠⡾⢋⣾⣏⣸⣷⡸⣇⢰⠟⠛⠻⡄  v1.26
+                 ⠸⢿⡍⠛⠻⠿⠿⠿⠋⣠⡾⢋⣾⣏⣸⣷⡸⣇⢰⠟⠛⠻⡄  v1.27
                    ⢻⡄   ⠐⠚⠋⣠⡾⣧⣿⠁⠙⢳⣽⡟
                    ⠈⠳⢦⣤⣤⣀⣤⡶⠛ ⠈⢿⡆  ⢿⡇
                          ⠈    ⠈⠓  ⠈
@@ -45,7 +45,7 @@ use 5.006;
 use strict;
 use warnings;
 
-our $VERSION = '1.26';
+our $VERSION = '1.27';
 
 =head1 SYNOPSIS
 
@@ -253,6 +253,16 @@ Turn HTML/XML input into L<Mojo::DOM> object.
 
     $ perl -Me -e 'say x("<div>hey</dev>")->at("div")->text'
 
+Force HTML semantics:
+
+    $ perl -Me -e 'say x->xml(0)->parse("<Tag>Name</Tag>")'
+    <tag>Name</tag>
+
+Force XML semantics (case sensitive tags and more):
+
+    $ perl -Me -e 'say x->xml(1)->parse("<Tag>Name</Tag>")'
+    <Tag>Name</Tag>
+
 =head3 yml
 
 YAML parser.
@@ -264,6 +274,38 @@ Convert Perl object to YAML string:
 Convert YAML string to Perl object:
 
     $ perl -Me -e 'p yml "---\na:\n- 1\n- 2\n- 3"'
+
+=head3 clone
+
+Storable's deep clone.
+
+    $ perl -Me -e '
+        my $arr1   = [ 1..3 ];
+        my $arr2   = clone $arr1;
+        $arr2->[0] = 111;
+
+        say $arr1;
+        p $arr1;
+
+        say "";
+        say $arr2;
+        p $arr2;
+    '
+
+    # Output:
+    ARRAY(0x5d0b8a408518)
+    [
+        [0] 1,
+        [1] 2,
+        [2] 3,
+    ]
+
+    ARRAY(0x5d0b8a42d9e0)
+    [
+        [0] 111,
+        [1] 2,
+        [2] 3,
+    ]
 
 =head3 enc
 
@@ -323,7 +365,7 @@ Turn list into a L<Set::Scalar> object.
 
     $ perl -Me -e 'say set(2,4,6,2)'
     (2 4 6)
-    
+
 Get elements:
 
     $ perl -Me -e 'say for sort(set(2,4,6,2)->elements)'
@@ -332,9 +374,15 @@ Get elements:
     4
     6
 
+Check for existence of an element:
+
+    $ perl -Me -e 'say set(2,4,6,2)->has(7)'
+    $ perl -Me -e 'say set(2,4,6,2)->has(4)'
+    1
+
 Intersection:
 
-    $ perl -Ilib/ -Me -e 'say set(2,4,6,2) * set(3,4,5,6)'
+    $ perl -Me -e 'say set(2,4,6,2) * set(3,4,5,6)'
     (4 6)
 
 Create a new universe:
@@ -383,7 +431,7 @@ Turn string into a L<Mojo::File> object.
 
 =head3 say
 
-Print with newline.
+Obnoxious print with a newline.
 
     $ perl -Me -e 'say 123'
     $ perl -Me -e 'say for 1..3'
@@ -473,6 +521,17 @@ Perform C<GET> request with L<Mojo::UserAgent/"get"> and return resulting L<Mojo
 
     $ perl -Me -e 'say g("mojolicious.org")->dom("h1")->map("text")->join("\n")'
 
+=head3 post
+
+    my $res = post('example.com');
+    my $res = post('http://example.com' => {Accept => '*/*'} => 'Hi!');
+    my $res = post('http://example.com' => {Accept => '*/*'} => form => {a => 'b'});
+    my $res = post('http://example.com' => {Accept => '*/*'} => json => {a => 'b'});
+
+Perform C<POST> request with L<Mojo::UserAgent/"get"> and return resulting L<Mojo::Message::Response> object.
+
+    $ perl -Me -e 'say post("mojolicious.org")->dom("h1")->map("text")->join("\n")'
+
 =head3 l
 
 Work with URLs.
@@ -482,6 +541,115 @@ Work with URLs.
 Turn a string into a L<Mojo::URL> object.
 
     $ perl -Me -e 'say l("/perldoc")->to_abs(l("https://mojolicious.org"))'
+
+=cut
+
+=head2 Asynchronous
+
+This sector includes commands to run asynchronous
+(or pseudo-async) operations.
+
+It is not exturely clear with method to always use.
+
+Typically using threads (with C<runt>) is the fastest.
+
+Some statistics using different run commands:
+
+    $ gitb status -d
+           s/iter   runt  runio   runf series
+    runt     1.74     --   -35%   -59%   -74%
+    runio    1.12    55%     --   -36%   -59%
+    runf    0.716   142%    56%     --   -36%
+    series  0.456   281%   146%    57%     --
+
+    $ gitb branch -d
+              Rate   runt   runf series  runio
+    runt   0.592/s     --   -71%   -81%   -83%
+    runf    2.02/s   240%     --   -34%   -42%
+    series  3.05/s   415%    51%     --   -12%
+    runio   3.47/s   486%    72%    14%     --
+
+    $ gitb pull -d
+           s/iter  runio series   runt   runf
+    runio    4.27     --    -7%   -21%   -33%
+    series   3.97     8%     --   -15%   -28%
+    runt     3.38    26%    17%     --   -15%
+    runf     2.87    49%    38%    18%     --
+
+=head3 runf
+
+Run tasks in parallel using L<Parallel::ForkManager>.
+
+Returns the results.
+
+    $ perl -Me -e '
+        p {
+            runf
+            map {
+                my $n = $_;
+                sub{ $n => $n**2 };
+            } 1..5
+        }
+    '
+    {
+        1 => 1,
+        2 => 4,
+        3 => 9,
+        4 => 16,
+        5 => 25,
+    }
+
+Takes much overhead to start up!
+
+=head3 runio
+
+Run tasks in parallel using L<Mojo::IOLoop>.
+
+Returns the results.
+
+    $ perl -Me -e '
+        p {
+            runio
+            map {
+                my $n = $_;
+                sub{ $n => $n**2 };
+            } 1..5
+        }
+    '
+    {
+        1 => 1,
+        2 => 4,
+        3 => 9,
+        4 => 16,
+        5 => 25,
+    }
+
+This is apparently better to use for IO related tasks.
+
+=head3 runt
+
+Run tasks in parallel using L<threads>.
+
+Returns the results.
+
+    $ perl -Me -e '
+        p {
+            runt
+            map {
+                my $n = $_;
+                sub{ $n => $n**2 };
+            } 1..5
+        }
+    '
+    {
+        1 => 1,
+        2 => 4,
+        3 => 9,
+        4 => 16,
+        5 => 25,
+    }
+
+This is the fastest run* command usually.
 
 =cut
 
@@ -673,6 +841,14 @@ sub import {
               : YAML::XS::Load( $thing );
         },
 
+        # Storable's deep clone.
+        clone => sub {
+            if ( !$imported{$caller}{"Storable"}++ ) {
+                require Storable;
+            }
+            Storable::dclone( $_[0] );
+        },
+
         # UTF-8 conversions.
         enc => sub {
             if ( !$imported{$caller}{"Encode"}++ ) {
@@ -851,12 +1027,83 @@ sub import {
             $ua->get( @_ )->result;
         },
 
+        # POST Request.
+        post => sub {
+            if ( !$imported{$caller}{"Mojo::UserAgent"}++ ) {
+                require Mojo::UserAgent;
+            }
+            my $ua = Mojo::UserAgent->new;
+            $ua->max_redirects( 10 ) unless defined $ENV{MOJO_MAX_REDIRECTS};
+            $ua->proxy->detect       unless defined $ENV{MOJO_PROXY};
+            $ua->post( @_ )->result;
+        },
+
         # URL.
         l => sub {
             if ( !$imported{$caller}{"Mojo::URL"}++ ) {
                 require Mojo::URL;
             }
             Mojo::URL->new( @_ );
+        },
+
+        ######################################
+        #           Asynchronous
+        ######################################
+
+        runio => sub {
+            if ( !$imported{$caller}{"Mojo::IOLoop"}++ ) {
+                require Mojo::IOLoop;
+            }
+
+            my $ioloop = Mojo::IOLoop->new;
+            my @res;
+
+            for my $cb ( @_ ) {
+                $ioloop->timer( 0 => sub { push @res, $cb->() } );
+            }
+
+            $ioloop->start;
+
+            @res;
+        },
+
+        runf => sub {
+            if ( !$imported{$caller}{"Parallel::ForkManager"}++ ) {
+                require Parallel::ForkManager;
+            }
+
+            my $pm = Parallel::ForkManager->new( ~~ @_ );
+            my @res;
+
+            $pm->run_on_finish(
+                sub {
+                    push @res, @{ $_[-1] };
+                }
+            );
+            for my $cb ( @_ ) {
+                $pm->start and next;
+                $pm->finish( 0, [ $cb->() ] );
+            }
+            $pm->wait_all_children;
+
+            @res;
+        },
+
+        runt => sub {
+            if ( !$imported{$caller}{"Config"}++ ) {
+                require Config;
+            }
+
+            if ( !$Config::Config{useithreads} ) {
+                die "Threading not supported!\n";
+            }
+
+            if ( !$imported{$caller}{"threads"}++ ) {
+                require threads;
+            }
+
+            map { $_->join }
+            map { threads->create( $_ ) } @_;
         },
 
         ######################################

@@ -8,8 +8,7 @@ use Regexp::Common::URI::RFC2396 qw /$host $port $ftp_segments $userinfo
 use strict;
 use warnings;
 
-use vars qw /$VERSION/;
-$VERSION = '2017060201';
+our $VERSION = '2024080801';
 
 
 my $ftp_uri = "(?k:(?k:ftp)://(?:(?k:$userinfo)(?k:)\@)?(?k:$host)" .
@@ -185,7 +184,7 @@ Damian Conway (damian@conway.org)
 
 =head1 MAINTENANCE
 
-This package is maintained by Abigail S<(I<regexp-common@abigail.be>)>.
+This package is maintained by Abigail S<(I<regexp-common@abigail.freedom.nl>)>.
 
 =head1 BUGS AND IRRITATIONS
 
@@ -193,7 +192,7 @@ Bound to be plenty.
 
 =head1 LICENSE and COPYRIGHT
 
-This software is Copyright (c) 2001 - 2017, Damian Conway and Abigail.
+This software is Copyright (c) 2001 - 2024, Damian Conway and Abigail.
 
 This module is free software, and maybe used under any of the following
 licenses:

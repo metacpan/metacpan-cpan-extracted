@@ -1,5 +1,5 @@
 package Lab::Moose::Connection::Mock;
-$Lab::Moose::Connection::Mock::VERSION = '3.902';
+$Lab::Moose::Connection::Mock::VERSION = '3.903';
 #ABSTRACT: Mock connection, supplying instrument responses from a log file
 
 use v5.20;
@@ -123,7 +123,7 @@ Lab::Moose::Connection::Mock - Mock connection, supplying instrument responses f
 
 =head1 VERSION
 
-version 3.902
+version 3.903
 
 =head1 SYNOPSIS
 

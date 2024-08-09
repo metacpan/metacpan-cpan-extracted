@@ -63,7 +63,8 @@ DESCRIPTION
     paragraph is tested individually and all matches are highlighted.
     Pressing <Enter> will select the first match. Use the <n> and <p> keys
     to jump between them. Press <Escape> to clear the highlights. Press
-    <Alt-i> to toggle case-insensitivity.
+    <Alt-i> to toggle case-insensitivity. Press <Alt-w> to toggle
+    whole-word matching.
 
 TODO
 

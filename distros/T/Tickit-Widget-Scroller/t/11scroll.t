@@ -375,6 +375,34 @@ is_display( [ [TEXT("which is long")],
               [TEXT("which is long")] ],
             'Display after ->scroll(+2) x 2' );
 
-is( $scrolled_delta, 13, '$scrolled_delta before EOF' );
+# scroll_to_visible
+{
+   is( [ $scroller->line2item( 0 ) ], [ 6, 1 ],
+      'Scroller topline before ->scroll_to_visible tests' );
+
+   $scroller->scroll_to_visible( 7 );
+   is( [ $scroller->line2item( 0 ) ], [ 6, 1 ],
+      'Scroller topline unchanged after ->scroll_to_visible of already visible' );
+
+   $scroller->scroll_to_visible( 2 );
+   is( [ $scroller->line2item( 0 ) ], [ 2, 0 ],
+      'Scroller topline after ->scroll_to_visible 2' );
+
+   $scroller->scroll_to_visible( 3 );
+   is( [ $scroller->line2item( 0 ) ], [ 2, 0 ],
+      'Scroller topline after ->scroll_to_visible 3' );
+
+   $scroller->scroll_to_visible( 6, 1 );
+   is( [ $scroller->line2item( 0 ) ], [ 4, 1 ],
+      'Scroller topline after ->scroll_to_visible 6, 1' );
+
+   $scroller->scroll_to_visible( 2, 0, margin => 1 );
+   is( [ $scroller->line2item( 0 ) ], [ 1, 1 ],
+      'Scroller topline after ->scroll_to_visible 2, 0 margin 1' );
+
+   $scroller->scroll_to_visible( 7, 0, margin => 1 );
+   is( [ $scroller->line2item( 0 ) ], [ 5, 1 ],
+      'Scroller topline after ->scroll_to_visible 7, 0 margin 1' );
+}
 
 done_testing;

@@ -26,15 +26,20 @@ lib/Net/RDAP/SearchResult.pm
 lib/Net/RDAP/Service.pm
 lib/Net/RDAP/UA.pm
 lib/Net/RDAP/Values.pm
+lib/Net/RDAP/Variant.pm
+lib/Net/RDAP/VariantName.pm
 LICENSE
 Makefile.PL
 MANIFEST			This list of files
 README.md
+t/00.use.t
+t/chain.t
 t/document_url.t
 t/jcard.json
 t/jcard.t
+t/objects.t
 t/redacted.json
 t/redaction.t
-t/use.t
+t/search.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

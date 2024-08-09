@@ -2,7 +2,7 @@
 -[![Appveyor Status](https://ci.appveyor.com/api/projects/status/1t1yhvagx00c2qi8?svg=true)](https://ci.appveyor.com/project/nigelhorne/cgi-info)
 -[![Coveralls Status](https://coveralls.io/repos/github/nigelhorne/CGI-Info/badge.svg?branch=master)](https://coveralls.io/github/nigelhorne/CGI-Info?branch=master)
 -[![CPAN](https://img.shields.io/cpan/v/CGI-Info.svg)](http://search.cpan.org/~nhorne/CGI-Info/)
--[![Tweet](https://img.shields.io/twitter/url/http/shields.io.svg?style=social)](https://twitter.com/intent/tweet?text=Information+about+the+CGI+Environment+#perl+#CGI&url=https://github.com/nigelhorne/cgi-info&via=nigelhorne)
+-[![Tweet](https://img.shields.io/twitter/url/http/shields.io.svg?style=social)](https://x.com/intent/tweet?text=Information+about+the+CGI+Environment+#perl+#CGI&url=https://github.com/nigelhorne/cgi-info&via=nigelhorne)
 
 # NAME
 
@@ -10,7 +10,7 @@ CGI::Info - Information about the CGI environment
 
 # VERSION
 
-Version 0.81
+Version 0.82
 
 # SYNOPSIS
 

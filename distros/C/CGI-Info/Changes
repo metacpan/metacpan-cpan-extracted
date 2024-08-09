@@ -1,5 +1,11 @@
 Revision history for CGI-Info
 
+0.82	Thu Aug  8 07:51:02 EDT 2024
+	Mark ClaudeBot as a robot
+	Mark YaK/1.0 as a robot
+	Mark trendictionbot as a robot
+	Added helper routine _get_params() and use it
+
 0.81	Tue Apr  9 10:08:29 EDT 2024
 	Use Test::Needs
 	Added t/version.t
@@ -10,7 +16,7 @@ Revision history for CGI-Info
 
 0.80	Fri Jan 19 08:05:29 EST 2024
 	Added documentroot() as a synonym to rootdir()
-		For compatability with Apache
+		For compatibility with Apache
 	Allow "use lib CGI::Info::script_dir() . '../lib';"
 	Mark Facebook as a search engine, not a robot
 
@@ -24,7 +30,7 @@ Revision history for CGI-Info
 
 0.78	Fri Oct  6 13:59:51 EDT 2023
 	Set HTTP status to 403 on HTTP_USER_AGENT SQL injection attack
-	Test::Exception hasn't been used for sometime, so removed dependancy
+	Test::Exception hasn't been used for sometime, so removed dependency
 
 0.77	Tue Aug 15 16:49:51 EDT 2023
 	Reduce the size of the cache
@@ -355,7 +361,7 @@ Revision history for CGI-Info
 	Only attempt to read POSTed data when there is some to read
 	Better path handling on Windows
 	Added t/critit.t and t/snippets.t
-	Documented and tested compatability with CGI::Untaint
+	Documented and tested compatibility with CGI::Untaint
 
 0.13	Thu Aug 11 13:30:38 EDT 2011
 	Added tmpdir function
@@ -383,7 +389,7 @@ Revision history for CGI-Info
 		under CGI
 	Corrected the HTML in the documentation
 	Added many tests
-	Fixed incompability with cgi_buffer, http://www.mnot.net/cgi_buffer/
+	Fixed incompatibility with cgi_buffer, http://www.mnot.net/cgi_buffer/
 
 0.07	Thu Mar 24 10:40:17 EDT 2011
 	Ensure that Test:More >= 0.82 for new_ok
