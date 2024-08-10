@@ -1,7 +1,7 @@
 package Langertha::Request::HTTP;
 our $AUTHORITY = 'cpan:GETTY';
 # ABSTRACT: A HTTP Request inside of Langertha
-$Langertha::Request::HTTP::VERSION = '0.001';
+$Langertha::Request::HTTP::VERSION = '0.002';
 use Moose;
 use MooseX::NonMoose;
 
@@ -34,13 +34,15 @@ __END__
 
 =pod
 
+=encoding UTF-8
+
 =head1 NAME
 
 Langertha::Request::HTTP - A HTTP Request inside of Langertha
 
 =head1 VERSION
 
-version 0.001
+version 0.002
 
 =for :stopwords cpan testmatrix url bugtracker rt cpants kwalitee diff irc mailto metadata placeholders metacpan
 

@@ -47,7 +47,7 @@
       },
       "runtime" : {
          "requires" : {
-            "App::Greple" : "9.0902",
+            "App::Greple" : "9.15",
             "App::Greple::msdoc" : "1.05",
             "App::optex::textconv" : "1.04",
             "App::sdif" : "4.29",
@@ -57,7 +57,7 @@
             "JSON" : "0",
             "List::Util" : "1.56",
             "Text::ANSI::Fold" : "2.2104",
-            "perl" : "v5.14.0"
+            "perl" : "v5.18.2"
          }
       },
       "test" : {
@@ -69,7 +69,7 @@
    "provides" : {
       "App::Greple::xlate" : {
          "file" : "lib/App/Greple/xlate.pm",
-         "version" : "0.3101"
+         "version" : "0.3201"
       },
       "App::Greple::xlate::Cache" : {
          "file" : "lib/App/Greple/xlate/Cache.pm"
@@ -79,15 +79,19 @@
       },
       "App::Greple::xlate::deepl" : {
          "file" : "lib/App/Greple/xlate/deepl.pm",
-         "version" : "0.3101"
+         "version" : "0.3201"
       },
       "App::Greple::xlate::gpt3" : {
          "file" : "lib/App/Greple/xlate/gpt3.pm",
-         "version" : "0.3101"
+         "version" : "0.3201"
       },
       "App::Greple::xlate::gpt4" : {
          "file" : "lib/App/Greple/xlate/gpt4.pm",
-         "version" : "0.3101"
+         "version" : "0.3201"
+      },
+      "App::Greple::xlate::null" : {
+         "file" : "lib/App/Greple/xlate/null.pm",
+         "version" : "0.3201"
       }
    },
    "release_status" : "stable",
@@ -102,7 +106,7 @@
          "web" : "https://github.com/kaz-utashiro/App-Greple-xlate"
       }
    },
-   "version" : "0.3101",
+   "version" : "0.3201",
    "x_authority" : "cpan:UTASHIRO",
    "x_contributors" : [
       "Kazumasa Utashiro <kaz@utashiro.com>"

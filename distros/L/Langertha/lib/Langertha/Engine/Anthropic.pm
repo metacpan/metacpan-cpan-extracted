@@ -1,7 +1,7 @@
 package Langertha::Engine::Anthropic;
 our $AUTHORITY = 'cpan:GETTY';
 # ABSTRACT: Anthropic API
-$Langertha::Engine::Anthropic::VERSION = '0.001';
+$Langertha::Engine::Anthropic::VERSION = '0.002';
 use Moose;
 use Carp qw( croak );
 use JSON::MaybeXS;
@@ -93,13 +93,15 @@ __END__
 
 =pod
 
+=encoding UTF-8
+
 =head1 NAME
 
 Langertha::Engine::Anthropic - Anthropic API
 
 =head1 VERSION
 
-version 0.001
+version 0.002
 
 =head1 SYNOPSIS
 

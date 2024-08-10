@@ -10,7 +10,7 @@ App::Greple::xlate - module d'aide à la traduction pour greple
 
 # VERSION
 
-Version 0.3101
+Version 0.3201
 
 # DESCRIPTION
 
@@ -40,15 +40,31 @@ Par défaut, les textes originaux et traduits sont imprimés dans le format "mar
 
 Si vous souhaitez traduire un texte entier, utilisez l'option **--match-all**. Il s'agit d'un raccourci pour spécifier le modèle `(?s).+` qui correspond à un texte entier.
 
-Les données au format marqueur de conflit peuvent être visualisées côte à côte par la commande `sdif` avec l'option `-V`. Étant donné qu'il est absurde de comparer les données par chaîne, il est recommandé d'utiliser l'option `--no-cdif`. Si vous n'avez pas besoin de colorer le texte, spécifiez `--no-color` ou `--cm 'TEXT*='`.
+Les données du format de marqueur de conflit peuvent être visualisées côte à côte par la commande `sdif` avec l'option `-V`. Étant donné qu'il est absurde de comparer les données par chaîne, il est recommandé d'utiliser l'option `--no-cdif`. Si vous n'avez pas besoin de colorer le texte, spécifiez `--no-textcolor` (ou `--no-tc`).
 
-    sdif -V --cm '*TEXT=' --no-cdif data_shishin.deepl-EN-US.cm
+    sdif -V --no-tc --no-cdif data_shishin.deepl-EN-US.cm
 
 <div>
     <p>
     <img width="750" src="https://raw.githubusercontent.com/kaz-utashiro/App-Greple-xlate/main/images/sdif-cm-view.png">
     </p>
 </div>
+
+# NORMALIZATION
+
+Le traitement se fait par unités spécifiées, mais dans le cas d'une séquence de plusieurs lignes de texte non vide, elles sont converties ensemble en une seule ligne. Cette opération s'effectue comme suit :
+
+- Supprimer les espaces blancs au début et à la fin de chaque ligne.
+- Si une ligne se termine par un caractère de pleine largeur et que la ligne suivante commence par un caractère de pleine largeur, concaténer les lignes.
+- Si la fin ou le début d'une ligne n'est pas un caractère de pleine largeur, concaténer les lignes en insérant un caractère d'espacement.
+
+Les données mises en cache sont gérées sur la base du texte normalisé, de sorte que même si des modifications sont apportées sans affecter les résultats de la normalisation, les données de traduction mises en cache resteront effectives.
+
+Ce processus de normalisation n'est effectué que pour le premier (0e) motif et les motifs pairs. Ainsi, si deux motifs sont spécifiés comme suit, le texte correspondant au premier motif sera traité après normalisation, et aucun processus de normalisation ne sera effectué sur le texte correspondant au second motif.
+
+    greple Mxlate -E normalized -E not-normalized
+
+Par conséquent, il convient d'utiliser le premier motif pour le texte qui doit être traité en combinant plusieurs lignes en une seule et d'utiliser le second motif pour le texte préformaté. S'il n'y a pas de texte à faire correspondre au premier motif, alors un motif qui ne correspond à rien, tel que `( ?!)`.
 
 # OPTIONS
 

@@ -10,7 +10,7 @@ App::Greple::xlate - Übersetzungsunterstützungsmodul für Greple
 
 # VERSION
 
-Version 0.3101
+Version 0.3201
 
 # DESCRIPTION
 
@@ -30,7 +30,7 @@ In diesem Befehl bedeutet die Zeichenkette `^(\w.*\n)+` aufeinanderfolgende Zeil
 
 Fügen Sie dann die Option `--xlate` hinzu, um den ausgewählten Bereich zu übersetzen. Dann werden die gewünschten Abschnitte gefunden und durch die Ausgabe des Befehls **deepl** ersetzt.
 
-Standardmäßig werden der ursprüngliche und der übersetzte Text im Format "conflict marker" gedruckt, das mit [git(1)](http://man.he.net/man1/git) kompatibel ist. Wenn Sie das `ifdef`-Format verwenden, können Sie den gewünschten Teil mit dem Befehl [unifdef(1)](http://man.he.net/man1/unifdef) leicht erhalten. Das Ausgabeformat kann mit der Option **--xlate-format** festgelegt werden.
+Standardmäßig werden der ursprüngliche und der übersetzte Text im Format "Konfliktmarkierung" ausgegeben, das mit [git(1)](http://man.he.net/man1/git) kompatibel ist. Wenn Sie das Format `ifdef` verwenden, können Sie den gewünschten Teil mit dem Befehl [unifdef(1)](http://man.he.net/man1/unifdef) leicht erhalten. Das Ausgabeformat kann mit der Option **--xlate-format** festgelegt werden.
 
 <div>
     <p>
@@ -40,15 +40,31 @@ Standardmäßig werden der ursprüngliche und der übersetzte Text im Format "co
 
 Wenn Sie den gesamten Text übersetzen wollen, verwenden Sie die Option **--match-all**. Dies ist eine Abkürzung zur Angabe des Musters `(?s).+`, das auf den gesamten Text passt.
 
-Daten im Konfliktmarkierungsformat können mit dem Befehl `sdif` mit der Option `-V` nebeneinander angezeigt werden. Da es keinen Sinn macht, die Daten pro Zeichenfolge zu vergleichen, wird die Option `--no-cdif` empfohlen. Wenn Sie den Text nicht einfärben wollen, geben Sie `--no-color` oder `--cm 'TEXT*='` an.
+Daten im Konfliktmarkerformat können mit dem Befehl `sdif` und der Option `-V` nebeneinander angezeigt werden. Da es keinen Sinn macht, die Daten pro Zeichenfolge zu vergleichen, wird die Option `--no-cdif` empfohlen. Wenn Sie den Text nicht einfärben müssen, geben Sie `--no-textcolor` (oder `--no-tc`) an.
 
-    sdif -V --cm '*TEXT=' --no-cdif data_shishin.deepl-EN-US.cm
+    sdif -V --no-tc --no-cdif data_shishin.deepl-EN-US.cm
 
 <div>
     <p>
     <img width="750" src="https://raw.githubusercontent.com/kaz-utashiro/App-Greple-xlate/main/images/sdif-cm-view.png">
     </p>
 </div>
+
+# NORMALIZATION
+
+Die Verarbeitung erfolgt in den angegebenen Einheiten, aber im Falle einer Folge von mehreren nicht leeren Textzeilen werden diese zusammen in eine einzige Zeile umgewandelt. Dieser Vorgang wird wie folgt durchgeführt:
+
+- Am Anfang und am Ende jeder Zeile wird der Leerraum entfernt.
+- Wenn eine Zeile mit einem Zeichen voller Breite endet und die nächste Zeile mit einem Zeichen voller Breite beginnt, werden die Zeilen verkettet.
+- Wenn entweder das Ende oder der Anfang einer Zeile kein Zeichen mit voller Breite ist, verketten Sie sie durch Einfügen eines Leerzeichens.
+
+Die Cache-Daten werden auf der Grundlage des normalisierten Textes verwaltet. Selbst wenn Änderungen vorgenommen werden, die sich nicht auf die Normalisierungsergebnisse auswirken, sind die im Cache gespeicherten Übersetzungsdaten weiterhin gültig.
+
+Dieser Normalisierungsprozess wird nur für das erste (0.) und geradzahlige Muster durchgeführt. Wenn also zwei Muster wie folgt angegeben werden, wird der Text, der dem ersten Muster entspricht, nach der Normalisierung verarbeitet, und für den Text, der dem zweiten Muster entspricht, wird kein Normalisierungsprozess durchgeführt.
+
+    greple Mxlate -E normalized -E not-normalized
+
+Verwenden Sie daher das erste Muster für Text, der durch Kombination mehrerer Zeilen in einer einzigen Zeile verarbeitet werden soll, und das zweite Muster für vorformatierten Text. Wenn das erste Muster keinen Text enthält, der übereinstimmt, wird ein Muster verwendet, das mit nichts übereinstimmt, wie z. B. `(?!)`.
 
 # OPTIONS
 
@@ -59,7 +75,7 @@ Daten im Konfliktmarkierungsformat können mit dem Befehl `sdif` mit der Option 
 
     Rufen Sie den Übersetzungsprozess für jeden übereinstimmenden Bereich auf.
 
-    Ohne diese Option verhält sich **greple** wie ein normaler Suchbefehl. Sie können also prüfen, welcher Teil der Datei Gegenstand der Übersetzung sein wird, bevor Sie die eigentliche Arbeit aufrufen.
+    Ohne diese Option verhält sich **greple** wie ein normaler Suchbefehl. Sie können also überprüfen, welcher Teil der Datei Gegenstand der Übersetzung sein wird, bevor Sie die eigentliche Arbeit aufrufen.
 
     Das Ergebnis des Befehls wird im Standard-Output ausgegeben, also leiten Sie es bei Bedarf in eine Datei um oder verwenden Sie das Modul [App::Greple::update](https://metacpan.org/pod/App%3A%3AGreple%3A%3Aupdate).
 
@@ -69,12 +85,12 @@ Daten im Konfliktmarkierungsformat können mit dem Befehl `sdif` mit der Option 
 
 - **--xlate-engine**=_engine_
 
-    Gibt die zu verwendende Übersetzungs-Engine an. Wenn Sie das Engine-Modul direkt angeben, wie z.B. `-Mxlate::deepl`, brauchen Sie diese Option nicht zu verwenden.
+    Gibt das zu verwendende Übersetzungsmodul an. Wenn Sie das Modul direkt angeben, z. B. `-Mxlate::deepl`, müssen Sie diese Option nicht verwenden.
 
 - **--xlate-labor**
 - **--xlabor**
 
-    Anstatt die Übersetzungsmaschine aufzurufen, wird von Ihnen erwartet, dass Sie für sie arbeiten. Nachdem der zu übersetzende Text vorbereitet wurde, wird er in die Zwischenablage kopiert. Es wird erwartet, dass Sie sie in das Formular einfügen, das Ergebnis in die Zwischenablage kopieren und Return drücken.
+    Anstatt die Übersetzungsmaschine aufzurufen, wird von Ihnen erwartet, dass Sie für arbeiten. Nachdem Sie den zu übersetzenden Text vorbereitet haben, wird er in die Zwischenablage kopiert. Es wird erwartet, dass Sie sie in das Formular einfügen, das Ergebnis in die Zwischenablage kopieren und die Eingabetaste drücken.
 
 - **--xlate-to** (Default: `EN-US`)
 
@@ -82,11 +98,11 @@ Daten im Konfliktmarkierungsformat können mit dem Befehl `sdif` mit der Option 
 
 - **--xlate-format**=_format_ (Default: `conflict`)
 
-    Geben Sie das Ausgabeformat für den Originaltext und den übersetzten Text an.
+    Legen Sie das Ausgabeformat für den ursprünglichen und den übersetzten Text fest.
 
     - **conflict**, **cm**
 
-        Original und konvertierter Text werden im Format [git(1)](http://man.he.net/man1/git) conflict marker gedruckt.
+        Original und konvertierter Text werden im Format [git(1)](http://man.he.net/man1/git) conflict marker ausgegeben.
 
             <<<<<<< ORIGINAL
             original text
@@ -100,7 +116,7 @@ Daten im Konfliktmarkierungsformat können mit dem Befehl `sdif` mit der Option 
 
     - **ifdef**
 
-        Original und konvertierter Text werden im [cpp(1)](http://man.he.net/man1/cpp) `#ifdef` Format gedruckt.
+        Original und konvertierter Text werden im Format [cpp(1)](http://man.he.net/man1/cpp) `#ifdef` ausgedruckt.
 
             #ifdef ORIGINAL
             original text
@@ -109,7 +125,7 @@ Daten im Konfliktmarkierungsformat können mit dem Befehl `sdif` mit der Option 
             translated Japanese text
             #endif
 
-        Mit dem Befehl **unifdef** können Sie nur den japanischen Text wiederherstellen:
+        Mit dem Befehl **unifdef** können Sie nur japanischen Text wiederherstellen:
 
             unifdef -UORIGINAL -DJA foo.ja.pm
 
@@ -123,11 +139,11 @@ Daten im Konfliktmarkierungsformat können mit dem Befehl `sdif` mit der Option 
 
 - **--xlate-maxlen**=_chars_ (Default: 0)
 
-    Geben Sie die maximale Länge des Textes an, der auf einmal an die API gesendet werden soll. Der Standardwert ist wie beim kostenlosen DeepL account service: 128K für die API (**--xlate**) und 5000 für die Zwischenablage-Schnittstelle (**--xlate-labor**). Sie können diese Werte ändern, wenn Sie den Pro-Dienst verwenden.
+    Geben Sie die maximale Länge des Textes an, der auf einmal an die API gesendet werden soll. Der Standardwert ist wie beim kostenlosen DeepL account service eingestellt: 128K für die API (**--xlate**) und 5000 für die Zwischenablage-Schnittstelle (**--xlate-labor**). Sie können diese Werte ändern, wenn Sie den Pro-Service nutzen.
 
 - **--**\[**no-**\]**xlate-progress** (Default: True)
 
-    Sehen Sie das Ergebnis der Übersetzung in Echtzeit in der STDERR-Ausgabe.
+    Sie können das Ergebnis der Übertragung in Echtzeit in der STDERR-Ausgabe sehen.
 
 - **--match-all**
 
@@ -135,16 +151,16 @@ Daten im Konfliktmarkierungsformat können mit dem Befehl `sdif` mit der Option 
 
 # CACHE OPTIONS
 
-Das Modul **xlate** kann den übersetzten Text für jede Datei im Cache speichern und vor der Ausführung lesen, um den Overhead durch Anfragen an den Server zu vermeiden. Bei der Standard-Cache-Strategie `auto` werden die Cache-Daten nur beibehalten, wenn die Cache-Datei für die Zieldatei existiert.
+Das Modul **xlate** kann den Text der Übersetzung für jede Datei im Cache speichern und vor der Ausführung lesen, um den Overhead durch die Anfrage an den Server zu vermeiden. Bei der Standard-Cache-Strategie `auto` werden die Cache-Daten nur dann beibehalten, wenn die Cache-Datei für die Zieldatei existiert.
 
 - --cache-clear
 
-    Die Option **--cache-clear** kann verwendet werden, um die Cache-Verwaltung zu starten oder um alle vorhandenen Cache-Daten zu aktualisieren. Wenn diese Option ausgeführt wird, wird eine neue Cache-Datei erstellt, falls noch keine vorhanden ist, und anschließend automatisch beibehalten.
+    Die Option **--cache-clear** kann verwendet werden, um die Cache-Verwaltung zu starten oder um alle vorhandenen Cache-Daten zu aktualisieren. Nach der Ausführung dieser Option wird eine neue Cachedatei erstellt, falls noch keine vorhanden ist, und anschließend automatisch beibehalten.
 
 - --xlate-cache=_strategy_
     - `auto` (Default)
 
-        Behalten Sie die Cache-Datei bei, wenn sie vorhanden ist.
+        Cache-Datei beibehalten, wenn sie vorhanden ist.
 
     - `create`
 
@@ -160,25 +176,25 @@ Das Modul **xlate** kann den übersetzten Text für jede Datei im Cache speicher
 
     - `never`, `no`, `0`
 
-        Cache-Datei nie verwenden, auch wenn sie vorhanden ist.
+        Niemals die Cache-Datei verwenden, selbst wenn sie vorhanden ist.
 
     - `accumulate`
 
-        In der Standardeinstellung werden nicht verwendete Daten aus der Cache-Datei entfernt. Wenn Sie sie nicht entfernen und in der Datei behalten wollen, verwenden Sie `accumulate`.
+        Standardmäßig werden nicht verwendete Daten aus der Cache-Datei entfernt. Wenn Sie sie nicht entfernen und in der Datei behalten wollen, verwenden Sie `accumulate`.
 
 # COMMAND LINE INTERFACE
 
-Sie können dieses Modul einfach von der Kommandozeile aus verwenden, indem Sie den in der Distribution enthaltenen Befehl `xlate` benutzen. Informationen zur Verwendung finden Sie in der `xlate`-Hilfe.
+Sie können dieses Modul ganz einfach von der Kommandozeile aus benutzen, indem Sie den Befehl `xlate` verwenden, der in der Distribution enthalten ist. Siehe die `xlate`-Hilfeinformationen zur Verwendung.
 
-Der Befehl `xlate` arbeitet mit der Docker-Umgebung zusammen, d.h. selbst wenn Sie nichts installiert haben, können Sie ihn verwenden, solange Docker verfügbar ist. Verwenden Sie die Option `-D` oder `-C`.
+Der Befehl `xlate` arbeitet mit der Docker-Umgebung zusammen, d. h. selbst wenn Sie nichts installiert haben, können Sie ihn verwenden, solange Docker verfügbar ist. Verwenden Sie die Option `-D` oder `-C`.
 
-Da Makefiles für verschiedene Dokumentstile zur Verfügung gestellt werden, ist auch die Übersetzung in andere Sprachen ohne besondere Angaben möglich. Verwenden Sie die Option `-M`.
+Da Makefiles für verschiedene Dokumentstile zur Verfügung gestellt werden, ist auch eine Übersetzung in andere Sprachen ohne besondere Angaben möglich. Verwenden Sie die Option `-M`.
 
 Sie können auch die Optionen Docker und make kombinieren, so dass Sie make in einer Docker-Umgebung ausführen können.
 
-Ein Aufruf wie `xlate -GC` startet eine Shell mit dem aktuellen Git-Repository.
+Mit `xlate -GC` wird eine Shell gestartet, in der das aktuelle Git-Repository eingebunden ist.
 
-Lesen Sie den japanischen Artikel im Abschnitt ["SEE ALSO"](#see-also) für weitere Einzelheiten.
+Lesen Sie den japanischen Artikel im Abschnitt ["SEE ALSO"](#see-also) für weitere Details.
 
     xlate [ options ] -t lang file [ greple options ]
         -h   help
@@ -217,7 +233,7 @@ Lesen Sie den japanischen Artikel im Abschnitt ["SEE ALSO"](#see-also) für weit
 
 # EMACS
 
-Laden Sie die Datei `xlate.el` aus dem Repository, um den Befehl `xlate` im Emacs-Editor zu verwenden. Die Funktion `xlate-region` übersetzt die angegebene Region. Die Standardsprache ist `EN-US` und Sie können die Sprache mit dem Präfix-Argument angeben.
+Laden Sie die im Repository enthaltene Datei `xlate.el`, um den Befehl `xlate` im Emacs-Editor zu verwenden. Die Funktion `xlate-region` übersetzt die angegebene Region. Die Standardsprache ist `EN-US` und Sie können die Sprache mit dem Präfix-Argument angeben.
 
 # ENVIRONMENT
 
@@ -237,7 +253,7 @@ Laden Sie die Datei `xlate.el` aus dem Repository, um den Befehl `xlate` im Emac
 
 ## TOOLS
 
-Sie müssen die Kommandozeilentools für DeepL und ChatGPT installieren.
+Sie müssen die Befehlszeilentools für DeepL und ChatGPT installieren.
 
 [https://github.com/DeepLcom/deepl-python](https://github.com/DeepLcom/deepl-python)
 
@@ -249,7 +265,7 @@ Sie müssen die Kommandozeilentools für DeepL und ChatGPT installieren.
 
 [App::Greple::xlate::deepl](https://metacpan.org/pod/App%3A%3AGreple%3A%3Axlate%3A%3Adeepl)
 
-[App::Greple::xlate::gpt3](https://metacpan.org/pod/App%3A%3AGreple%3A%3Axlate%3A%3Agpt3)
+[Anwendung::Greple::xlate::gpt3](https://metacpan.org/pod/Anwendung%3A%3AGreple%3A%3Axlate%3A%3Agpt3)
 
 [https://hub.docker.com/r/tecolicom/xlate](https://hub.docker.com/r/tecolicom/xlate)
 
@@ -267,7 +283,7 @@ Sie müssen die Kommandozeilentools für DeepL und ChatGPT installieren.
 
 - [App::Greple](https://metacpan.org/pod/App%3A%3AGreple)
 
-    Lesen Sie das Handbuch **greple** für Details über Zieltextmuster. Verwenden Sie die Optionen **--inside**, **--outside**, **--include**, **--exclude**, um den Suchbereich einzuschränken.
+    Siehe das **greple**-Handbuch für Details über Zieltextmuster. Verwenden Sie die Optionen **--inside**, **--outside**, **--include**, **--exclude**, um den passenden Bereich einzuschränken.
 
 - [App::Greple::update](https://metacpan.org/pod/App%3A%3AGreple%3A%3Aupdate)
 

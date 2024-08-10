@@ -1,7 +1,10 @@
 #!/usr/bin/env perl
-# ABSTRACT: Embedding examples
+# ABSTRACT: Ollama feature examples
 
 $|=1;
+
+use FindBin;
+use lib "$FindBin::Bin/../lib";
 
 use utf8;
 use open ':std', ':encoding(UTF-8)';

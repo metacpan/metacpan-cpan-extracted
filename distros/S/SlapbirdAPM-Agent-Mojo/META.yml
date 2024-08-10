@@ -1,0 +1,37 @@
+---
+abstract: 'Agent software for the Perl application performance monitor, Slapbird. slapbirdapm.com'
+author:
+  - 'Rawley Fowler, Mollusc Labs'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010'
+license: mit
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: SlapbirdAPM-Agent-Mojo
+no_index:
+  directory:
+    - t
+    - inc
+    - examples
+    - t
+requires:
+  Carp: '0'
+  Const::Fast: '0.014'
+  IPC::Open2: '0'
+  Mojolicious: '0'
+  Time::HiRes: '1.9764'
+  Time::Piece: '1.3401'
+  Try::Tiny: '0.31'
+  namespace::clean: '0.27'
+  perl: '5.024'
+resources:
+  bugtracker: https://github.com/mollusc-labs/slapbird/issues
+  license: http://www.opensource.org/licenses/mit
+  repository: https://github.com/mollusc-labs/slapbird
+version: 0.002
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

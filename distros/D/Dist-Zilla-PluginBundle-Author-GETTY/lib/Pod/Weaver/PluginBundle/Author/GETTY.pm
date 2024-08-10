@@ -1,9 +1,10 @@
-use strict;
-use warnings;
 package Pod::Weaver::PluginBundle::Author::GETTY;
 our $AUTHORITY = 'cpan:GETTY';
 # ABSTRACT: GETTY's default Pod::Weaver config
-$Pod::Weaver::PluginBundle::Author::GETTY::VERSION = '0.116';
+$Pod::Weaver::PluginBundle::Author::GETTY::VERSION = '0.120';
+use strict;
+use warnings;
+
 
 use Pod::Weaver::Config::Assembler;
 sub _exp { Pod::Weaver::Config::Assembler->expand_package($_[0]) }
@@ -11,15 +12,15 @@ sub _exp { Pod::Weaver::Config::Assembler->expand_package($_[0]) }
 sub mvp_bundle_config {
   my @plugins;
   push @plugins, (
-    [ '@GETTY/CorePrep',    _exp('@CorePrep'), {} ],
-    [ '@GETTY/Name',        _exp('Name'),      {} ],
-    [ '@GETTY/Version',     _exp('Version'),   {} ],
+    [ '@GETTY/CorePrep',       _exp('@CorePrep'), {} ],
+    [ '@GETTY/SingleEncoding', _exp('-SingleEncoding'), {} ],
+    [ '@GETTY/Name',           _exp('Name'),      {} ],
+    [ '@GETTY/Version',        _exp('Version'),   {} ],
 
     [ '@GETTY/Prelude',     _exp('Region'),  { region_name => 'prelude'     } ],
     [ '@GETTY/Synopsis',    _exp('Generic'), { header      => 'SYNOPSIS'    } ],
     [ '@GETTY/Description', _exp('Generic'), { header      => 'DESCRIPTION' } ],
     [ '@GETTY/Overview',    _exp('Generic'), { header      => 'OVERVIEW'    } ],
-
     [ '@GETTY/Stability',   _exp('Generic'), { header      => 'STABILITY'   } ],
   );
 
@@ -56,13 +57,15 @@ __END__
 
 =pod
 
+=encoding UTF-8
+
 =head1 NAME
 
 Pod::Weaver::PluginBundle::Author::GETTY - GETTY's default Pod::Weaver config
 
 =head1 VERSION
 
-version 0.116
+version 0.120
 
 =head1 DESCRIPTION
 

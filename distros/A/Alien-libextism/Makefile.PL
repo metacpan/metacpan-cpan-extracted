@@ -3,7 +3,14 @@ use strict;
 use warnings;
 use ExtUtils::MakeMaker;
 use Alien::Build::MM;
- 
+use Config;
+
+# https://docs.wasmtime.dev/stability-platform-support.html#platform-support
+$^O =~ /^(linux|darwin|windows)$/ or die 'OS unsupported';
+if ($^O eq 'linux') {
+    $Config{archname} =~ /(x86_64|aarch64|s390x|riscv64)/ or die 'OS unsupported';
+}
+
 my $abmm = Alien::Build::MM->new;
 
 my %WriteMakefileArgs = (

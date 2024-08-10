@@ -10,7 +10,7 @@ App::Greple::xlate - greple的翻译支持模块
 
 # VERSION
 
-Version 0.3101
+Version 0.3201
 
 # DESCRIPTION
 
@@ -40,15 +40,31 @@ Version 0.3101
 
 如果要翻译整个文本，请使用 **--match-all** 选项。这是指定匹配整个文本的模式 `(?s).+` 的快捷方式。
 
-冲突标记格式数据可以通过带有 `-V` 选项的 `sdif` 命令并排查看。由于按字符串进行比较毫无意义，因此建议使用 `--no-cdif` 选项。如果不需要给文本着色，可指定 `--no-color` 或 `--cm 'TEXT*='`。
+冲突标记格式数据可以通过带有 `-V` 选项的 `sdif` 命令并排查看。由于按字符串进行比较毫无意义，因此建议使用 `--no-cdif` 选项。如果不需要给文本着色，可指定 `--no-textcolor`（或 `--no-tc`）。
 
-    sdif -V --cm '*TEXT=' --no-cdif data_shishin.deepl-EN-US.cm
+    sdif -V --no-tc --no-cdif data_shishin.deepl-EN-US.cm
 
 <div>
     <p>
     <img width="750" src="https://raw.githubusercontent.com/kaz-utashiro/App-Greple-xlate/main/images/sdif-cm-view.png">
     </p>
 </div>
+
+# NORMALIZATION
+
+处理是以指定单位进行的，但如果是多行非空文本序列，则会一起转换为单行。具体操作如下
+
+- 删除每行开头和结尾的空白。
+- 如果一行以全角字符结束，而下一行以全角字符开始，则将这两行连接起来。
+- 如果一行的末尾或开头不是全宽字符，则通过插入空格字符将它们连接起来。
+
+缓存数据是根据规范化文本进行管理的，因此即使进行了不影响规范化结果的修改，缓存的翻译数据仍然有效。
+
+此规范化处理只针对第一个（第 0 个）和偶数模式。因此，如果指定了以下两个模式，则匹配第一个模式的文本将在规范化后处理，而不对匹配第二个模式的文本执行规范化处理。
+
+    greple Mxlate -E normalized -E not-normalized
+
+因此，对于要将多行合并为一行进行处理的文本，请使用第一个模式，而对于预格式化文本，请使用第二个模式。如果第一种模式中没有要匹配的文本，那么就使用不匹配任何内容的模式，如 `(?!)`。
 
 # OPTIONS
 

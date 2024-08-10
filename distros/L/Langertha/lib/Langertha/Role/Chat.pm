@@ -1,7 +1,7 @@
 package Langertha::Role::Chat;
 our $AUTHORITY = 'cpan:GETTY';
 # ABSTRACT: Role for APIs with normal chat functionality
-$Langertha::Role::Chat::VERSION = '0.001';
+$Langertha::Role::Chat::VERSION = '0.002';
 use Moose::Role;
 use Carp qw( croak );
 
@@ -53,13 +53,15 @@ __END__
 
 =pod
 
+=encoding UTF-8
+
 =head1 NAME
 
 Langertha::Role::Chat - Role for APIs with normal chat functionality
 
 =head1 VERSION
 
-version 0.001
+version 0.002
 
 =for :stopwords cpan testmatrix url bugtracker rt cpants kwalitee diff irc mailto metadata placeholders metacpan
 

@@ -24,10 +24,12 @@ lib/App/Greple/xlate/Lang.pm
 lib/App/Greple/xlate/deepl.pm
 lib/App/Greple/xlate/gpt3.pm
 lib/App/Greple/xlate/gpt4.pm
+lib/App/Greple/xlate/null.pm
 minil.toml
 script/xlate
 share/XLATE.mk
 share/xlate.el
 t/00_compile.t
+t/01_unit.t
 META.yml
 MANIFEST

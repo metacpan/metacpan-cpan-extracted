@@ -4,9 +4,10 @@ use 5.006;
 no strict;
 no warnings;
 use DBI;
+use IO::Handle;
 use Time::HiRes;
 
-our $VERSION = "0.11";
+our $VERSION = "0.12";
 our %opts = (
     file => $file,
     trace => 0,
@@ -105,6 +106,9 @@ sub import {
             $file2 =~ s{^~/}{$home/};
         }
         open $opts{fh}, ">>", $file2 or die "Can't open $opts{file}: $!\n";
+        # autoflush so that tailing to watch queries being performed works
+        # as you'd expect
+        $opts{fh}->autoflush(1);
     }
 }
 
@@ -287,7 +291,11 @@ sub to_json {
         $out = $val;
     }
     else {
-        $val =~ s/"/\"/g;
+        # Make the value suitable to use in a JSON string - no newlines, escape
+        # control characters and double quotes.
+        $val =~ s/"/\\"/g;
+        $val =~ s/\n/ /g;
+        $val =~ s/([\x00-\x1F])/sprintf("\\u%04x", ord($1))/eg;
         $out = "\"$val\"";
     }
 

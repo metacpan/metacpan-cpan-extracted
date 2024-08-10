@@ -1,7 +1,7 @@
 package Dist::Zilla::PluginBundle::Author::GETTY;
 our $AUTHORITY = 'cpan:GETTY';
 # ABSTRACT: BeLike::GETTY when you build your dists
-$Dist::Zilla::PluginBundle::Author::GETTY::VERSION = '0.116';
+$Dist::Zilla::PluginBundle::Author::GETTY::VERSION = '0.120';
 use Moose;
 use Moose::Autobox;
 use Dist::Zilla;
@@ -371,13 +371,15 @@ __END__
 
 =pod
 
+=encoding UTF-8
+
 =head1 NAME
 
 Dist::Zilla::PluginBundle::Author::GETTY - BeLike::GETTY when you build your dists
 
 =head1 VERSION
 
-version 0.116
+version 0.120
 
 =head1 SYNOPSIS
 

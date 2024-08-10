@@ -1,11 +1,5 @@
 Changes
 COPYING
-debian/changelog
-debian/control
-debian/copyright
-debian/NOTES.debian
-debian/README.debian
-debian/rules
 examples/ccurve
 examples/movingeye
 examples/README.examples
@@ -16,7 +10,7 @@ INSTALL
 Libplot.pm
 Libplot.xs
 Makefile.PL
-MANIFEST
+MANIFEST			This list of files
 README
 test.pl
 typemap

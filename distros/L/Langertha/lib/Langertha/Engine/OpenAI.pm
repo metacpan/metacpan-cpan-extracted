@@ -1,7 +1,7 @@
 package Langertha::Engine::OpenAI;
 our $AUTHORITY = 'cpan:GETTY';
 # ABSTRACT: OpenAI API
-$Langertha::Engine::OpenAI::VERSION = '0.001';
+$Langertha::Engine::OpenAI::VERSION = '0.002';
 use Moose;
 use File::ShareDir::ProjectDistDir qw( :all );
 use Carp qw( croak );
@@ -15,6 +15,7 @@ with 'Langertha::Role::'.$_ for (qw(
   SystemPrompt
   Chat
   Embedding
+  Transcription
 ));
 
 sub all_models {qw(
@@ -38,8 +39,7 @@ has api_key => (
 sub _build_api_key {
   my ( $self ) = @_;
   return $ENV{LANGERTHA_OPENAI_API_KEY}
-    || $ENV{OPENAI_API_KEY}
-    || croak "".(ref $self)." requires OPENAI_API_KEY";
+    || croak "".(ref $self)." requires LANGERTHA_OPENAI_API_KEY or api_key set";
 }
 
 sub update_request {
@@ -49,6 +49,7 @@ sub update_request {
 
 sub default_model { 'gpt-4o-mini' }
 sub default_embedding_model { 'text-embedding-3-large' }
+sub default_transcription_model { 'whisper-1' }
 
 sub openapi_file { yaml => dist_file('Langertha','openai.yaml') };
 
@@ -72,7 +73,7 @@ sub embedding_response {
 sub chat_request {
   my ( $self, $messages, %extra ) = @_;
   return $self->generate_request( createChatCompletion => sub { $self->chat_response(shift) },
-    model => $self->model,
+    model => $self->chat_model,
     messages => $messages,
     stream => JSON->false,
     # $self->has_seed ? ( seed => $self->seed )
@@ -89,11 +90,28 @@ sub chat_response {
   return $messages[0]->{content};
 }
 
+sub transcription_request {
+  my ( $self, $file, %extra ) = @_;
+  return $self->generate_request( createTranscription => sub { $self->transcription_response(shift) },
+    file => [ $file ],
+    $self->transcription_model ? ( model => $self->transcription_model ) : (),
+    %extra,
+  );
+}
+
+sub transcription_response {
+  my ( $self, $response ) = @_;
+  my $data = $self->parse_response($response);
+  return $data->{text};
+}
+
 __PACKAGE__->meta->make_immutable;
 
 __END__
 
 =pod
+
+=encoding UTF-8
 
 =head1 NAME
 
@@ -101,11 +119,11 @@ Langertha::Engine::OpenAI - OpenAI API
 
 =head1 VERSION
 
-version 0.001
+version 0.002
 
 =head1 SYNOPSIS
 
-  use Langertha::OpenAI;
+  use Langertha::Engine::OpenAI;
 
   my $openai = Langertha::Engine::OpenAI->new(
     api_key => $ENV{OPENAI_API_KEY},

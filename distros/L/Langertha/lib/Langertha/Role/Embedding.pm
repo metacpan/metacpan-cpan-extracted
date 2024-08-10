@@ -1,7 +1,7 @@
 package Langertha::Role::Embedding;
 our $AUTHORITY = 'cpan:GETTY';
 # ABSTRACT: Role for APIs with embedding functionality
-$Langertha::Role::Embedding::VERSION = '0.001';
+$Langertha::Role::Embedding::VERSION = '0.002';
 use Moose::Role;
 use Carp qw( croak );
 
@@ -19,7 +19,7 @@ sub _build_embedding_model {
   my ( $self ) = @_;
   croak "".(ref $self)." can't handle models!" unless $self->does('Langertha::Role::Models');
   return $self->default_embedding_model if $self->can('default_embedding_model');
-  return $self->default_model;
+  return $self->model;
 }
 
 sub embedding {
@@ -40,13 +40,15 @@ __END__
 
 =pod
 
+=encoding UTF-8
+
 =head1 NAME
 
 Langertha::Role::Embedding - Role for APIs with embedding functionality
 
 =head1 VERSION
 
-version 0.001
+version 0.002
 
 =for :stopwords cpan testmatrix url bugtracker rt cpants kwalitee diff irc mailto metadata placeholders metacpan
 

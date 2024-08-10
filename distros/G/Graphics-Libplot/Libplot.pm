@@ -21,7 +21,7 @@ require AutoLoader;
 #	__END_DECLS
 #	___const
 #);
-$VERSION = '2.2.3';
+$VERSION = '2.2.4';
 
 sub AUTOLOAD {
     # This AUTOLOAD is used to 'autoload' constants from the constant()

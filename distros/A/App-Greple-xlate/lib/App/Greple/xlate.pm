@@ -1,6 +1,6 @@
 package App::Greple::xlate;
 
-our $VERSION = "0.3101";
+our $VERSION = "0.3201";
 
 =encoding utf-8
 
@@ -16,7 +16,7 @@ App::Greple::xlate - translation support module for greple
 
 =head1 VERSION
 
-Version 0.3101
+Version 0.3201
 
 =head1 DESCRIPTION
 
@@ -60,14 +60,56 @@ text.
 Conflict marker format data can be viewed in side-by-side style by
 C<sdif> command with C<-V> option.  Since it makes no sense to compare
 on a per-string basis, the C<--no-cdif> option is recommended.  If you
-do not need to color the text, specify C<--no-color> or C<--cm
-'TEXT*='>.
+do not need to color the text, specify C<--no-textcolor> (or
+C<--no-tc>).
 
-    sdif -V --cm '*TEXT=' --no-cdif data_shishin.deepl-EN-US.cm
+    sdif -V --no-tc --no-cdif data_shishin.deepl-EN-US.cm
 
 =for html <p>
 <img width="750" src="https://raw.githubusercontent.com/kaz-utashiro/App-Greple-xlate/main/images/sdif-cm-view.png">
 </p>
+
+=head1 NORMALIZATION
+
+Processing is done in specified units, but in the case of a sequence
+of multiple lines of non-empty text, they are converted together into
+a single line.  This operation is performed as follows:
+
+=over
+
+=item *
+
+Remove white space at the beginning and end of each line.
+
+=item *
+
+If a line ends with a full-width character and the next line begins
+with a full-width character, concatenate the lines.
+
+=item *
+
+If either the end or the beginning of a line is not a full-width
+character, concatenate them by inserting a space character.
+
+=back
+
+Cache data is managed based on the normalized text, so even if
+modifications are made that do not affect the normalization results,
+the cached translation data will still be effective.
+
+This normalization process is performed only for the first (0th) and
+even-numbered pattern.  Thus, if two patterns are specified as
+follows, the text matching the first pattern will be processed after
+normalization, and no normalization process will be performed on the
+text matching the second pattern.
+
+    greple Mxlate -E normalized -E not-normalized
+
+Therefore, use the first pattern for text that is to be processed by
+combining multiple lines into a single line, and use the second
+pattern for pre-formatted text.  If there is no text to match in the
+first pattern, then a pattern that does not match anything, such as
+C<(?!)>.
 
 =head1 OPTIONS
 
@@ -402,6 +444,7 @@ it under the same terms as Perl itself.
 
 use v5.14;
 use warnings;
+use utf8;
 
 use Data::Dumper;
 
@@ -496,10 +539,22 @@ sub setup {
 }
 
 sub normalize {
-    $_[0] =~ s{^.+(?:\n.+)*}{
+    local $_ = shift;
+    my $paragraph = shift;
+    if (not $paragraph) {
+	return
+	s{^.+}{
+	    ${^MATCH}
+		=~ s/\A\s+|\s+\z//gr
+	}pmger;
+    }
+    s{^.+(?:\n.+)*}{
 	${^MATCH}
+	# remove leading/trailing spaces
 	    =~ s/\A\s+|\s+\z//gr
+	# join Japanese lines without space
 	    =~ s/(?<=\p{InFullwidth})\n(?=\p{InFullwidth})//gr
+	# join ASCII lines with single space
 	    =~ s/\s+/ /gr
     }pmger;
 }
@@ -510,7 +565,8 @@ sub postgrep {
     for my $r ($grep->result) {
 	my($b, @match) = @$r;
 	for my $m (@match) {
-	    my $key = normalize $grep->cut(@$m);
+	    my($s, $e, $i) = @$m;
+	    my $key = normalize $grep->cut(@$m), $i % 2 == 0;
 	    if (not exists $cache{$key}) {
 		$cache{$key} = undef;
 		push @miss, $key;
@@ -521,19 +577,28 @@ sub postgrep {
 }
 
 sub _progress {
-    print STDERR @_ if opt('progress');
+    my $opt = ref $_[0] ? shift : {};
+    opt('progress') or return;
+    if (my $label = $opt->{label}) { print STDERR "[xlate.pm] $label:\n" }
+    for (my @s = @_) {
+	my $i =()= /^/mg;
+	my @m = ($i == 1 ? '╶' : '│') x $i ;
+	@m[0,-1] = qw(┌ └) if $i > 1;
+	s/^/sprintf "%7s ", shift(@m)/mge;
+	print STDERR $_;
+    }
 }
 
 sub cache_update {
     binmode STDERR, ':encoding(utf8)';
 
     my @from = @_;
-    # _progress("From:\n", map s/^/\t< /mgr, @from);
+    _progress({label => "From"}, @from);
     return @from if $dryrun;
 
     my @to = &XLATE(@from);
 
-    # _progress("To:\n", map s/^/\t> /mgr, @to);
+    _progress({label => "To"}, @to);
     die "Unmatched response:\n@to" if @from != @to;
     @cache{@from} = @to;
 }
@@ -551,10 +616,49 @@ sub fold_lines {
     $_;
 }
 
+sub strip {
+    my($text, $paragraph) = @_;
+    goto &paragraph_strip if $paragraph;
+    my @text = $text =~ /.*\n|.+\z/g;
+    my @space = map {
+	[ s/\A(\s+)// ? $1 : '', s/(\h+)$//  ? $1 : ''  ]
+    } @text;
+    $_[0] = join '', @text;
+    sub { # unstrip
+	for (@_) {
+	    my @text = /.*\n|.+\z/g;
+	    if (@space == @text + 1) {
+		push @text, '';
+	    }
+	    die "UNMATCH:\n".Dumper(\@text, \@space) if @text != @space;
+	    for my $i (keys @text) {
+		my($head, $tail) = @{$space[$i]};
+		$text[$i] =~ s/\A/$head/ if length $head > 0;
+		$text[$i] =~ s/\Z/$tail/ if length $tail > 0;
+	    }
+	    $_ = join '', @text;
+	}
+    };
+}
+sub paragraph_strip {
+    local *_ = \$_[0];
+    my $head = s/\A(\s+)// ? $1 : '' ;
+    my $tail = s/(\h+)$//  ? $1 : '' ;
+    sub {
+	for (@_) {
+	    s/\A/$head/ if length $head > 0;
+	    s/\Z/$tail/ if length $tail > 0;
+	}
+    };
+}
 sub xlate {
-    my $text = shift;
-    my $key = normalize $text;
+    my $param = { @_ };
+    my($index, $text) = @{$param}{qw(index match)};
+    my $paragraph = $index % 2 == 0;
+    my $unstrip = strip($text, $paragraph);
+    my $key = normalize($text, $paragraph);
     my $s = $cache{$key} // "!!! TRANSLATION ERROR !!!\n";
+    $unstrip->($text, $s);
     $s = fold_lines $s if $fold_line;
     if (state $formatter = $formatter{$output_format}) {
 	return $formatter->($text, $s);
@@ -562,8 +666,7 @@ sub xlate {
 	return $s;
     }
 }
-sub colormap { xlate $_ }
-sub callback { xlate { @_ }->{match} }
+sub callback { goto &xlate }
 
 sub cache_file {
     my $file = sprintf("%s.xlate-%s-%s.json",
@@ -635,7 +738,7 @@ builtin xlate-prompt=s     $prompt
 builtin deepl-auth-key=s   $App::Greple::xlate::deepl::auth_key
 builtin deepl-method=s     $App::Greple::xlate::deepl::method
 
-option default --ci=A --cm=/544E,/454E,/445E,/455E,/545E,/554E
+option default --need=1 --no-regioncolor --cm=/544E,/454E,/533E,/353E
 
 option --xlate-setopt --prologue &__PACKAGE__::setopt($<shift>)
 

@@ -1,5 +1,8 @@
 Revision history for DBI::Log
 
+0.12 Fri Aug  9 11:22:57 EDT 2024
+    - Fixup the JSON logging
+
 0.11 Tue Jan 31 10:20:54 CST 2023
     - Add JSON output format
 

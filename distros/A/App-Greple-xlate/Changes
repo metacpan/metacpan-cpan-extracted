@@ -1,5 +1,13 @@
 Revision history for Perl extension App-Greple-xlate
 
+0.3201 2024-08-09T23:44:53Z
+
+    - requires perl v5.18.2
+
+0.32 2024-08-09T09:17:36Z
+
+    - introduce different patterns for normalized and non-normalized text
+
 0.3101 2024-03-21T03:43:52Z
 
     - fix bug in xlate.el

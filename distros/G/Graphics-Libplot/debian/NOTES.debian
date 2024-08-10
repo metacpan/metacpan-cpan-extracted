@@ -1,4 +1,0 @@
-I use the script trans in ./util to generate xs
-code fro the plot.h .  I few of the variables with
-the const modifier are not done correctly-- I correct
-them by hand.

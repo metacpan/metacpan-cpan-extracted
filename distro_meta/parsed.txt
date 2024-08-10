@@ -93387,3 +93387,17 @@ T/TE/TEODESIAN/Net-OpenSSH-More-1.00.tar.gz
 G/GB/GBROWN/Net-RDAP-0.28.tar.gz
 A/AB/ABIGAIL/Regexp-Common-2024080801.tar.gz
 P/PE/PEVANS/Tickit-Widget-Scroller-0.33.tar.gz
+E/EX/EXTISM/Alien-libextism-v0.1.1.tar.gz
+I/IN/INGY/Alien-YAMLScript-0.1.70.tar.gz
+P/PE/PERLANCAR/App-genpw-0.014.tar.gz
+U/UT/UTASHIRO/App-Greple-9.15.tar.gz
+U/UT/UTASHIRO/App-Greple-xlate-0.3201.tar.gz
+P/PE/PERLANCAR/App-prefixcat-0.001.tar.gz
+R/RE/REEDFISH/Net-FullAuto-1.0000683.tar.gz
+J/JA/JACOBG/DBI-Log-0.12.tar.gz
+G/GE/GETTY/Dist-Zilla-PluginBundle-Author-GETTY-0.120.tar.gz
+E/ET/ETJ/Graphics-Libplot-2.2.4.tar.gz
+G/GE/GETTY/Langertha-0.002.tar.gz
+R/RA/RAWLEYFOW/SlapbirdAPM-Agent-Mojo-0.002.tar.gz
+H/HM/HMBRAND/Text-CSV_XS-1.56.tgz
+I/IN/INGY/YAMLScript-0.1.70.tar.gz

@@ -812,6 +812,12 @@ static void cx_SetupCsv (pTHX_ csv_t *csv, HV *self, SV *pself) {
 	csv->utf8 = 1;
     if (csv->quo_len > 1 && is_utf8_string ((U8 *)(csv->quo), csv->quo_len))
 	csv->utf8 = 1;
+
+    if (csv->strict
+	  && !csv->strict_n
+	  && (svp = hv_fetchs (self, "_COLUMN_NAMES", FALSE))
+	  && _is_arrayref (*svp))
+	csv->strict_n = av_len ((AV *)(SvRV (*svp)));
     } /* SetupCsv */
 
 #define Print(csv,dst)		cx_Print (aTHX_ csv, dst)
@@ -2042,6 +2048,8 @@ EOLX:
 #if MAINT_DEBUG > 5
 			(void)fprintf (stderr, "# %04d COMMENT, SKIPPED\n", __LINE__);
 #endif
+			unless (csv->useIO)
+			    csv->has_ahead = 214;	/* abuse */
 			if (c == EOF)
 			    break;
 			goto restart;
@@ -2095,7 +2103,12 @@ EOLX:
 	}
 
     if (waitingForField) {
-	if (seenSomething || !csv->useIO) {
+	unless (csv->useIO) {
+	    if (csv->has_ahead == 214)
+		return TRUE;
+	    seenSomething++;
+	    }
+	if (seenSomething) {
 	    NewField;
 	    if (csv->blank_is_undef || csv->empty_is_undef)
 		SvSetUndef (sv);
@@ -2214,7 +2227,8 @@ static int cx_c_xsParse (pTHX_ csv_t csv, HV *hv, AV *av, AV *avf, SV *src, bool
 #if MAINT_DEBUG > 6
 		ErrorDiag (&csv);
 #endif
-		unless (last_error) ParseError (&csv, 2014, csv.used);
+		unless (last_error || (!csv.useIO && csv.has_ahead))
+		    ParseError (&csv, 2014, csv.used);
 		}
 	    if (last_error) /* an error callback can reset and accept */
 		result = FALSE;

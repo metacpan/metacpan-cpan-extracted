@@ -11,7 +11,7 @@ App::Greple::xlate - translation support module for greple
 
 # VERSION
 
-Version 0.3101
+Version 0.3201
 
 # DESCRIPTION
 
@@ -59,16 +59,46 @@ text.
 Conflict marker format data can be viewed in side-by-side style by
 `sdif` command with `-V` option.  Since it makes no sense to compare
 on a per-string basis, the `--no-cdif` option is recommended.  If you
-do not need to color the text, specify `--no-color` or `--cm
-'TEXT*='`.
+do not need to color the text, specify `--no-textcolor` (or
+`--no-tc`).
 
-    sdif -V --cm '*TEXT=' --no-cdif data_shishin.deepl-EN-US.cm
+    sdif -V --no-tc --no-cdif data_shishin.deepl-EN-US.cm
 
 <div>
     <p>
     <img width="750" src="https://raw.githubusercontent.com/kaz-utashiro/App-Greple-xlate/main/images/sdif-cm-view.png">
     </p>
 </div>
+
+# NORMALIZATION
+
+Processing is done in specified units, but in the case of a sequence
+of multiple lines of non-empty text, they are converted together into
+a single line.  This operation is performed as follows:
+
+- Remove white space at the beginning and end of each line.
+- If a line ends with a full-width character and the next line begins
+with a full-width character, concatenate the lines.
+- If either the end or the beginning of a line is not a full-width
+character, concatenate them by inserting a space character.
+
+Cache data is managed based on the normalized text, so even if
+modifications are made that do not affect the normalization results,
+the cached translation data will still be effective.
+
+This normalization process is performed only for the first (0th) and
+even-numbered pattern.  Thus, if two patterns are specified as
+follows, the text matching the first pattern will be processed after
+normalization, and no normalization process will be performed on the
+text matching the second pattern.
+
+    greple Mxlate -E normalized -E not-normalized
+
+Therefore, use the first pattern for text that is to be processed by
+combining multiple lines into a single line, and use the second
+pattern for pre-formatted text.  If there is no text to match in the
+first pattern, then a pattern that does not match anything, such as
+`(?!)`.
 
 # OPTIONS
 

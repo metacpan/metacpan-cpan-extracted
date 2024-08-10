@@ -20,3 +20,13 @@ gather [
     [ 'pkg-config --cflags --static extism-static', \'%{.runtime.cflags_static}'  ],
     [ 'pkg-config --libs --static extism-static', \'%{.runtime.libs_static}'    ],
 ];
+
+# Hack rewrite static linking to avoid referring to filename
+# ExtUtils::MakeMaker strips /path/to/libextism.a from LIBS
+after 'gather' => sub {
+    my ($hash) =  @_;
+    if ($hash->{runtime_prop}{libs_static} =~ /libextism\.a/) {
+        my $libextismdir = $hash->{install_prop}{prefix}.'/lib';
+        $hash->{runtime_prop}{libs_static} =~ s/[^ ]+libextism\.a/-L$libextismdir -lextism/;
+    }
+};

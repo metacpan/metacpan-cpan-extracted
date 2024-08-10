@@ -1,9 +1,31 @@
 ==================================================
-Changes from 1750-10-20 00:00:00 +0000 to present.
+Changes from 1750-10-27 00:00:00 +0000 to present.
 ==================================================
 
 ------------------------------------------
-version 0.001 at 2024-08-03 20:55:03 +0000
+version 0.002 at 2024-08-10 00:22:37 +0000
+------------------------------------------
+
+  Change: b3db34a5a0f982ca073ca709aa333980001d83f8
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2024-08-10 02:22:12 +0000
+
+    Little adapting for encoding 
+
+  Change: 884f2991e8ff644030132ea59de6aac09f5d700c
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2024-08-10 01:33:02 +0000
+
+    More engines, Transcription API 
+
+  Change: 302f9b4152a9bdd723f789c3f42392366e0cb1a0
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2024-08-08 19:36:53 +0000
+
+    JSON Grammar example, more emoji! 
+
+------------------------------------------
+version 0.001 at 2024-08-03 20:47:33 +0000
 ------------------------------------------
 
   Change: 33c8e6d4b10c8a4b7574d4b607753280fcdb1136

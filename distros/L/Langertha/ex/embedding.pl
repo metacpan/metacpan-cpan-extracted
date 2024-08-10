@@ -3,6 +3,9 @@
 
 $|=1;
 
+use FindBin;
+use lib "$FindBin::Bin/../lib";
+
 use utf8;
 use open ':std', ':encoding(UTF-8)';
 use strict;
@@ -11,6 +14,11 @@ use Data::Dumper;
 
 use Langertha::Engine::Ollama;
 use Langertha::Engine::OpenAI;
+
+if ($ENV{OPENAI_API_KEY}) {
+  warn "Will be using your OPENAI_API_KEY environment variable, which may produce cost.";
+  sleep 5;
+}
 
 my @names_list = qw(
   Harley Ramirez
@@ -52,7 +60,7 @@ while (@names_list) {
     }
 
     my $end = time;
-    printf("\n\n%u\n\n", $end - $start);
+    printf("\n -- %u seconds\n", ($end - $start));
   }
 }
 
@@ -70,7 +78,7 @@ while (@names_list) {
     }
 
     my $end = time;
-    printf("\n\n%u\n\n", $end - $start);
+    printf("\n -- %u seconds\n", ($end - $start));
   }
 }
 

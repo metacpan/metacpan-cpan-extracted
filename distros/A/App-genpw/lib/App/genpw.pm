@@ -10,9 +10,9 @@ use Log::ger;
 use Random::Any 'rand', -warn => 1;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2024-01-16'; # DATE
+our $DATE = '2024-08-06'; # DATE
 our $DIST = 'App-genpw'; # DIST
-our $VERSION = '0.013'; # VERSION
+our $VERSION = '0.014'; # VERSION
 
 our %SPEC;
 
@@ -94,7 +94,12 @@ Available conversions:
          - "arraydata:NAME" (for getting the words from an <pm:ArrayData> module, the
            Role::TinyCommons::Collection::PickItems::RandomPos will be applied).
 
-Filters are modules in the `Data::Sah::Filter::perl::` namespace.
+Filter names are modules in the `Data::Sah::Filter::perl::` namespace (without
+the prefix). To list available filters, you can use <prog:pmlist> or
+<prog:list-sah-filter-rule-modules>:
+
+    % pmlist 'Data::Sah::Filter::perl::**'
+    % list-sah-filter-rule-modules --perl
 
 MARKDOWN
         cmdline_aliases => {p=>{}},
@@ -322,6 +327,11 @@ then:
     % genpw -P guid
     008869fa-177e-3a46-24d6-0900a00e56d5
 
+Even more (real-world) examples:
+
+    # Generate a few random Tokopedia/Shopee voucher codes (5 alphanumeric characters)
+    % genpw -p '%()(Str::uppercase)5a' 4
+
 Keywords: generate, pattern, wordlist
 
 MARKDOWN
@@ -429,7 +439,7 @@ App::genpw - (Gen)erate random password/strings, with (p)atterns and (w)ordlists
 
 =head1 VERSION
 
-This document describes version 0.013 of App::genpw (from Perl distribution App-genpw), released on 2024-01-16.
+This document describes version 0.014 of App::genpw (from Perl distribution App-genpw), released on 2024-08-06.
 
 =head1 SYNOPSIS
 
@@ -523,6 +533,11 @@ then:
  % genpw -P guid
  008869fa-177e-3a46-24d6-0900a00e56d5
 
+Even more (real-world) examples:
+
+ # Generate a few random Tokopedia/Shopee voucher codes (5 alphanumeric characters)
+ % genpw -p '%()(Str::uppercase)5a' 4
+
 Keywords: generate, pattern, wordlist
 
 This function is not exported.
@@ -612,7 +627,12 @@ Available conversions:
       - "arraydata:NAME" (for getting the words from an L<ArrayData> module, the
         Role::TinyCommons::Collection::PickItems::RandomPos will be applied).
 
-Filters are modules in the C<Data::Sah::Filter::perl::> namespace.
+Filter names are modules in the C<Data::Sah::Filter::perl::> namespace (without
+the prefix). To list available filters, you can use L<pmlist> or
+L<list-sah-filter-rule-modules>:
+
+ % pmlist 'Data::Sah::Filter::perl::**'
+ % list-sah-filter-rule-modules --perl
 
 
 =back

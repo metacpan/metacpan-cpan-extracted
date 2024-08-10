@@ -1,7 +1,7 @@
 package Langertha::Engine::Ollama;
 our $AUTHORITY = 'cpan:GETTY';
 # ABSTRACT: Ollama API
-$Langertha::Engine::Ollama::VERSION = '0.001';
+$Langertha::Engine::Ollama::VERSION = '0.002';
 use Moose;
 use File::ShareDir::ProjectDistDir qw( :all );
 use Carp qw( croak );
@@ -129,17 +129,19 @@ __END__
 
 =pod
 
+=encoding UTF-8
+
 =head1 NAME
 
 Langertha::Engine::Ollama - Ollama API
 
 =head1 VERSION
 
-version 0.001
+version 0.002
 
 =head1 SYNOPSIS
 
-  use Langertha::Ollama;
+  use Langertha::Engine::Ollama;
 
   my $ollama = Langertha::Engine::Ollama->new(
     url => $ENV{OLLAMA_URL},

@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use parent qw( Alien::Base );
 use version 0.77;
-our $VERSION = qv(v0.1.0);
+our $VERSION = qv(v0.1.1);
 
 1;
 

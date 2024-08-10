@@ -1,0 +1,110 @@
+#!/usr/bin/env perl
+# ABSTRACT: Simple transcription with a Whisper compatible server or OpenAI
+# PODNAME: langertha_whisper
+
+use strict;
+use warnings;
+use Langertha::Engine::Whisper;
+use Langertha::Engine::OpenAI;
+use Carp qw( croak );
+use Time::HiRes qw( time );
+use Path::Tiny;
+
+binmode(STDOUT, ":utf8");
+binmode(STDERR, ":utf8");
+
+my $engine;
+
+if ($ENV{LANGERTHA_WHISPER_OPENAI_API_KEY}) {
+  $engine = Langertha::Engine::OpenAI->new(
+    api_key => $ENV{LANGERTHA_WHISPER_OPENAI_API_KEY},
+  );
+} elsif ($ENV{LANGERTHA_WHISPER_WHISPER_URL}) {
+  $engine = Langertha::Engine::Whisper->new(
+    url => $ENV{LANGERTHA_WHISPER_WHISPER_URL},
+    $ENV{LANGERTHA_WHISPER_WHISPER_MODEL} ? ( model => $ENV{LANGERTHA_WHISPER_WHISPER_MODEL} ) : (),
+  );  
+} else {
+  die "Requires LANGERTHA_WHISPER_WHISPER_URL or LANGERTHA_WHISPER_OPENAI_API_KEY";
+}
+
+my $start = time;
+print $engine->simple_transcription(path($ARGV[0]));
+my $end = time;
+printf("\n -- %.3f seconds (%s)\n", ($end - $start), (ref $engine)) unless $ENV{LANGERTHA_NO_TIME};
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+langertha_whisper - Simple transcription with a Whisper compatible server or OpenAI
+
+=head1 VERSION
+
+version 0.002
+
+=head1 SYNOPSIS
+
+  bash$ LANGERTHA_WHISPER_WHISPER_URL=http://10.0.0.8:8000/v1 langertha_whisper sample.ogg
+  This is an example sound file in AugVorbis format from Wikipedia, the free encyclopedia.
+   -- 13 seconds
+
+=head1 DESCRIPTION
+
+Simple transcription with a Whisper compatible server or OpenAI.
+
+=head1 HOW TO INSTALL FASTER WHISPER
+
+L<https://github.com/fedirz/faster-whisper-server>
+
+=head1 SUPPORT
+
+Repository
+
+  https://github.com/Getty/langertha
+  Pull request and additional contributors are welcome
+
+Issue Tracker
+
+  https://github.com/Getty/langertha/issues
+
+Discord
+
+  https://discord.gg/Y2avVYpquV 🤖
+
+IRC
+
+  irc://irc.perl.org/ai 🤖
+
+=cut
+
+=for :stopwords cpan testmatrix url bugtracker rt cpants kwalitee diff irc mailto metadata placeholders metacpan
+
+=head1 SUPPORT
+
+=head2 Source Code
+
+The code is open to the world, and available for you to hack on. Please feel free to browse it and play
+with it, or whatever. If you want to contribute patches, please send me a diff or prod me to pull
+from your repository :)
+
+L<https://github.com/Getty/langertha>
+
+  git clone https://github.com/Getty/langertha.git
+
+=head1 AUTHOR
+
+Torsten Raudssus <torsten@raudssus.de> L<https://raudss.us/>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2024 by Torsten Raudssus.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

@@ -33,7 +33,7 @@
       },
       "configure" : {
          "requires" : {
-            "Alien::Build" : "1.19",
+            "Alien::Build" : "1.40",
             "Alien::Build::MM" : "0.25",
             "ExtUtils::MakeMaker" : "0",
             "Sort::Versions" : "0"
@@ -63,9 +63,9 @@
          "web" : "https://github.com/extism/perl-sdk"
       }
    },
-   "version" : "v0.1.0",
+   "version" : "v0.1.1",
    "x_alienfile" : {
-      "generated_by" : "Alien::Build::MM version 2.80",
+      "generated_by" : "Alien::Build::MM version 2.83",
       "requires" : {
          "share" : {
             "Alien::Build::Plugin::Gather::IsolateDynamic" : "0.48",

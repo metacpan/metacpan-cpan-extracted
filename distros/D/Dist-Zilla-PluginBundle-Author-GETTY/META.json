@@ -27,7 +27,7 @@
       "runtime" : {
          "requires" : {
             "App::cpanminus" : "1.6002",
-            "Dist::Zilla" : "4.300030",
+            "Dist::Zilla" : "6.032",
             "Dist::Zilla::Plugin::Alien" : "0.011",
             "Dist::Zilla::Plugin::Authority" : "1.006",
             "Dist::Zilla::Plugin::Deprecated" : "0.007",
@@ -63,7 +63,7 @@
          "web" : "https://github.com/Getty/p5-dist-zilla-pluginbundle-author-getty"
       }
    },
-   "version" : "0.116",
+   "version" : "0.120",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.036000"
@@ -254,72 +254,77 @@
                      {
                         "class" : "Pod::Weaver::Plugin::EnsurePod5",
                         "name" : "@CorePrep/EnsurePod5",
-                        "version" : "4.019"
+                        "version" : "4.020"
                      },
                      {
                         "class" : "Pod::Weaver::Plugin::H1Nester",
                         "name" : "@CorePrep/H1Nester",
-                        "version" : "4.019"
+                        "version" : "4.020"
+                     },
+                     {
+                        "class" : "Pod::Weaver::Plugin::Encoding",
+                        "name" : "@GETTY/Encoding",
+                        "version" : "0.03"
                      },
                      {
                         "class" : "Pod::Weaver::Section::Name",
                         "name" : "@GETTY/Name",
-                        "version" : "4.019"
+                        "version" : "4.020"
                      },
                      {
                         "class" : "Pod::Weaver::Section::Version",
                         "name" : "@GETTY/Version",
-                        "version" : "4.019"
+                        "version" : "4.020"
                      },
                      {
                         "class" : "Pod::Weaver::Section::Region",
                         "name" : "@GETTY/Prelude",
-                        "version" : "4.019"
+                        "version" : "4.020"
                      },
                      {
                         "class" : "Pod::Weaver::Section::Generic",
                         "name" : "@GETTY/Synopsis",
-                        "version" : "4.019"
+                        "version" : "4.020"
                      },
                      {
                         "class" : "Pod::Weaver::Section::Generic",
                         "name" : "@GETTY/Description",
-                        "version" : "4.019"
+                        "version" : "4.020"
                      },
                      {
                         "class" : "Pod::Weaver::Section::Generic",
                         "name" : "@GETTY/Overview",
-                        "version" : "4.019"
+                        "version" : "4.020"
                      },
                      {
                         "class" : "Pod::Weaver::Section::Generic",
                         "name" : "@GETTY/Stability",
-                        "version" : "4.019"
+                        "version" : "4.020"
                      },
                      {
                         "class" : "Pod::Weaver::Section::Collect",
                         "name" : "Attributes",
-                        "version" : "4.019"
+                        "version" : "4.020"
                      },
                      {
                         "class" : "Pod::Weaver::Section::Collect",
                         "name" : "Methods",
-                        "version" : "4.019"
+                        "version" : "4.020"
                      },
                      {
                         "class" : "Pod::Weaver::Section::Collect",
                         "name" : "Functions",
-                        "version" : "4.019"
+                        "version" : "4.020"
                      },
                      {
                         "class" : "Pod::Weaver::Section::Leftovers",
                         "name" : "@GETTY/Leftovers",
-                        "version" : "4.019"
+                        "version" : "4.020"
                      },
                      {
                         "class" : "Pod::Weaver::Section::Region",
                         "name" : "@GETTY/postlude",
-                        "version" : "4.019"
+                        "version" : "4.020"
                      },
                      {
                         "class" : "Pod::Weaver::Section::Support",
@@ -329,22 +334,22 @@
                      {
                         "class" : "Pod::Weaver::Section::Bugs",
                         "name" : "@GETTY/Bugs",
-                        "version" : "4.019"
+                        "version" : "4.020"
                      },
                      {
                         "class" : "Pod::Weaver::Section::Authors",
                         "name" : "@GETTY/Authors",
-                        "version" : "4.019"
+                        "version" : "4.020"
                      },
                      {
                         "class" : "Pod::Weaver::Section::Legal",
                         "name" : "@GETTY/Legal",
-                        "version" : "4.019"
+                        "version" : "4.020"
                      },
                      {
                         "class" : "Pod::Weaver::Plugin::Transformer",
                         "name" : "@GETTY/List",
-                        "version" : "4.019"
+                        "version" : "4.020"
                      }
                   ]
                }
@@ -408,7 +413,7 @@
                   "branch" : null,
                   "changelog" : "Changes",
                   "signed" : 0,
-                  "tag" : "0.116",
+                  "tag" : "0.120",
                   "tag_format" : "%v",
                   "tag_message" : "v%V"
                },

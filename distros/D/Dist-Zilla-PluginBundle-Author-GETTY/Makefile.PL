@@ -17,7 +17,7 @@ my %WriteMakefileArgs = (
   "NAME" => "Dist::Zilla::PluginBundle::Author::GETTY",
   "PREREQ_PM" => {
     "App::cpanminus" => "1.6002",
-    "Dist::Zilla" => "4.300030",
+    "Dist::Zilla" => "6.032",
     "Dist::Zilla::Plugin::Alien" => "0.011",
     "Dist::Zilla::Plugin::Authority" => "1.006",
     "Dist::Zilla::Plugin::Deprecated" => "0.007",
@@ -40,7 +40,7 @@ my %WriteMakefileArgs = (
   "TEST_REQUIRES" => {
     "Test::More" => "0.96"
   },
-  "VERSION" => "0.116",
+  "VERSION" => "0.120",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -49,7 +49,7 @@ my %WriteMakefileArgs = (
 
 my %FallbackPrereqs = (
   "App::cpanminus" => "1.6002",
-  "Dist::Zilla" => "4.300030",
+  "Dist::Zilla" => "6.032",
   "Dist::Zilla::Plugin::Alien" => "0.011",
   "Dist::Zilla::Plugin::Authority" => "1.006",
   "Dist::Zilla::Plugin::Deprecated" => "0.007",

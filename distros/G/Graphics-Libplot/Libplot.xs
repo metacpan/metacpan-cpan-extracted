@@ -86,18 +86,6 @@ int arg;
     case 'Z':
 	break;
     case '_':
-	if (strEQ(name, "__BEGIN_DECLS"))
-#ifdef __BEGIN_DECLS
-	    return __BEGIN_DECLS;
-#else
-	    goto not_there;
-#endif
-	if (strEQ(name, "__END_DECLS"))
-#ifdef __END_DECLS
-	    return __END_DECLS;
-#else
-	    goto not_there;
-#endif
 	if (strEQ(name, "___const"))
 #ifdef ___const
 	    return ___const;

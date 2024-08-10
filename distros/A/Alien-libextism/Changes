@@ -1,4 +1,6 @@
 Revision history for Alien-libextism
+v0.1.1  2024-08-09
+        Add hack to rewrite static linking
 
 v0.1.0  2024-06-05
         First version, released on an unsuspecting world.

@@ -13,7 +13,7 @@ install_share dist => "share";
 
 
 my %WriteMakefileArgs = (
-  "ABSTRACT" => "The clan of fierce vikings with axe and shield to AId your rAId",
+  "ABSTRACT" => "The clan of fierce vikings with \x{1fa93} and \x{1f6e1}\x{fe0f} to AId your rAId",
   "AUTHOR" => "Torsten Raudssus <torsten\@raudssus.de> L<https://raudss.us/>",
   "CONFIGURE_REQUIRES" => {
     "ExtUtils::MakeMaker" => 0,
@@ -22,7 +22,8 @@ my %WriteMakefileArgs = (
   "DISTNAME" => "Langertha",
   "EXE_FILES" => [
     "bin/langertha_chat_ollama",
-    "bin/langertha_chat_openai"
+    "bin/langertha_chat_openai",
+    "bin/langertha_whisper"
   ],
   "LICENSE" => "perl",
   "NAME" => "Langertha",
@@ -45,7 +46,7 @@ my %WriteMakefileArgs = (
     "Module::Runtime" => 0,
     "Test2::Suite" => 0
   },
-  "VERSION" => "0.001",
+  "VERSION" => "0.002",
   "test" => {
     "TESTS" => "t/*.t"
   }

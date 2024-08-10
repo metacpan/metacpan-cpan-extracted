@@ -36,10 +36,10 @@
             "Data::Sah::Compiler::perl::TH::array" : "0.914",
             "Data::Sah::Compiler::perl::TH::int" : "0.914",
             "Data::Sah::Compiler::perl::TH::str" : "0.914",
-            "Data::Sah::Filter" : "0.015",
+            "Data::Sah::Filter" : "0.024",
             "List::Util" : "1.54",
             "Log::ger" : "0.038",
-            "Module::Load::Util" : "0.009",
+            "Module::Load::Util" : "0.011",
             "Perinci::CmdLine::Any" : "0.154",
             "Perinci::CmdLine::Lite" : "1.924",
             "Random::Any" : "0.003",
@@ -61,7 +61,7 @@
    "provides" : {
       "App::genpw" : {
          "file" : "lib/App/genpw.pm",
-         "version" : "0.013"
+         "version" : "0.014"
       }
    },
    "release_status" : "stable",
@@ -76,7 +76,7 @@
          "web" : "https://github.com/perlancar/perl-App-genpw"
       }
    },
-   "version" : "0.013",
+   "version" : "0.014",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.038002"
@@ -448,7 +448,7 @@
                      {
                         "class" : "Pod::Weaver::Plugin::AppendPrepend",
                         "name" : "@Author::PERLANCAR/AppendPrepend",
-                        "version" : "0.01"
+                        "version" : "0.021"
                      },
                      {
                         "class" : "Pod::Weaver::Plugin::EnsureUniqueSections",

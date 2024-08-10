@@ -1,7 +1,8 @@
 package Langertha;
 our $AUTHORITY = 'cpan:GETTY';
-# ABSTRACT: The clan of fierce vikings with axe and shield to AId your rAId
-$Langertha::VERSION = '0.001';
+# ABSTRACT: The clan of fierce vikings with 🪓 and 🛡️ to AId your rAId
+$Langertha::VERSION = '0.002';
+use utf8;
 use strict;
 use warnings;
 
@@ -11,13 +12,15 @@ __END__
 
 =pod
 
+=encoding UTF-8
+
 =head1 NAME
 
-Langertha - The clan of fierce vikings with axe and shield to AId your rAId
+Langertha - The clan of fierce vikings with 🪓 and 🛡️ to AId your rAId
 
 =head1 VERSION
 
-version 0.001
+version 0.002
 
 =head1 SYNOPSIS
 
@@ -80,11 +83,11 @@ Issue Tracker
 
 Discord
 
-  https://discord.gg/Y2avVYpquV
+  https://discord.gg/Y2avVYpquV 🤖
 
 IRC
 
-  irc://irc.perl.org/ai
+  irc://irc.perl.org/ai 🤖
 
 =cut
 

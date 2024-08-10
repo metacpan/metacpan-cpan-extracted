@@ -1,3 +1,6 @@
+2.2.4 2024-08-10
+- drop spurious constants - thanks @gregoa
+
 2.2.3 2021-10-14
 - fix for no . in @INC
 - build updates

@@ -19,15 +19,15 @@ name: App-genpw
 provides:
   App::genpw:
     file: lib/App/genpw.pm
-    version: '0.013'
+    version: '0.014'
 requires:
   Data::Sah::Compiler::perl::TH::array: '0.914'
   Data::Sah::Compiler::perl::TH::int: '0.914'
   Data::Sah::Compiler::perl::TH::str: '0.914'
-  Data::Sah::Filter: '0.015'
+  Data::Sah::Filter: '0.024'
   List::Util: '1.54'
   Log::ger: '0.038'
-  Module::Load::Util: '0.009'
+  Module::Load::Util: '0.011'
   Perinci::CmdLine::Any: '0.154'
   Perinci::CmdLine::Lite: '1.924'
   Random::Any: '0.003'
@@ -39,7 +39,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=App-genpw
   homepage: https://metacpan.org/release/App-genpw
   repository: git://github.com/perlancar/perl-App-genpw.git
-version: '0.013'
+version: '0.014'
 x_Dist_Zilla:
   perl:
     version: '5.038002'
@@ -333,7 +333,7 @@ x_Dist_Zilla:
             -
               class: Pod::Weaver::Plugin::AppendPrepend
               name: '@Author::PERLANCAR/AppendPrepend'
-              version: '0.01'
+              version: '0.021'
             -
               class: Pod::Weaver::Plugin::EnsureUniqueSections
               name: '@Author::PERLANCAR/EnsureUniqueSections'
