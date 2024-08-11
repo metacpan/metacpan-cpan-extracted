@@ -38,6 +38,7 @@ __EOP__
       url => $ENV{OLLAMA_URL},
       model => 'llama3.1',
       system_prompt => $system_prompt,
+      context_size => 4096,
     );
 
     my $prompt = 'Do you wanna build a snowman?';

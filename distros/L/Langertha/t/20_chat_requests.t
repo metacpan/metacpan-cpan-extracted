@@ -19,6 +19,8 @@ my $ollama = Langertha::Engine::Ollama->new(
   url => $ollama_testurl,
   model => 'model',
   system_prompt => 'systemprompt',
+  context_size => 4096,
+  temperature => 0.5,
 );
 my $ollama_request = $ollama->chat('testprompt');
 is($ollama_request->uri, $ollama_testurl.'/api/chat', 'Ollama request uri is correct');
@@ -32,7 +34,10 @@ is_deeply($ollama_data, {
     content => "testprompt", role => "user",
   }],
   model => "model",
-  options => {},
+  options => {
+    temperature => 0.5,
+    num_ctx => 4096,
+  },
   stream => JSON->false,
 }, 'Ollama request body is correct');
 
@@ -40,6 +45,7 @@ my $openai = Langertha::Engine::OpenAI->new(
   api_key => 'apikey',
   model => 'gpt-4o-mini',
   system_prompt => 'systemprompt',
+  temperature => 0.5,
 );
 my $openai_request = $openai->chat('testprompt');
 is($openai_request->uri, 'https://api.openai.com/v1/chat/completions', 'OpenAI request uri is correct');
@@ -55,6 +61,7 @@ is_deeply($openai_data, {
   }],
   model => "gpt-4o-mini",
   stream => JSON->false,
+  temperature => 0.5,
 }, 'OpenAI request body is correct');
 
 my $anthropic = Langertha::Engine::Anthropic->new(
@@ -62,7 +69,8 @@ my $anthropic = Langertha::Engine::Anthropic->new(
   model => 'claude-3-5-sonnet-20240620',
   system_prompt => 'systemprompt',
   api_version => '2024-02-04',
-  max_tokens => 2048,
+  context_size => 2048,
+  temperature => 0.5,
 );
 my $anthropic_request = $anthropic->chat('testprompt');
 is($anthropic_request->uri, 'https://api.anthropic.com/v1/messages', 'Anthropic request uri is correct');
@@ -72,6 +80,7 @@ is($anthropic_request->header('Anthropic-Version'), '2024-02-04', 'Anthropic req
 my $anthropic_data = $json->decode($anthropic_request->content);
 is_deeply($anthropic_data, {
   max_tokens => 2048,
+  temperature => 0.5,
   messages => [{
     content => 'testprompt',
     role => 'user',
@@ -85,6 +94,7 @@ my $ollama_for_openai = Langertha::Engine::Ollama->new(
   url => $ollama_openai_testurl,
   model => 'model',
   system_prompt => 'systemprompt',
+  temperature => 0.5,
 );
 my $ollama_openai = $ollama_for_openai->openai;
 my $ollama_openai_request = $ollama_openai->chat('testprompt');
@@ -101,6 +111,7 @@ is_deeply($ollama_openai_data, {
   }],
   model => "model",
   stream => JSON->false,
+  temperature => 0.5,
 }, 'Ollama OpenAI request body is correct');
 
 done_testing;

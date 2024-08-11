@@ -19,7 +19,6 @@ hax/sv_setrv.c.inc
 include/class.h
 include/field.h
 include/linnet.h
-include/object_pad.h
 include/suspended_compcv.h
 lib/Object/mop-class.xsi
 lib/Object/mop-field.xsi
@@ -27,7 +26,6 @@ lib/Object/mop-method.xsi
 lib/Object/Pad.pm
 lib/Object/Pad.xs
 lib/Object/Pad/ExtensionBuilder.pm
-lib/Object/Pad/ExtensionBuilder_data.pm.PL
 lib/Object/Pad/MetaFunctions.pm
 lib/Object/Pad/MOP/Class.pm
 lib/Object/Pad/MOP/Field.pm
@@ -38,6 +36,7 @@ MANIFEST			This list of files
 META.json
 META.yml
 README
+share/include/object_pad.h
 src/class.c
 src/field.c
 src/suspended_compcv.c

@@ -15,6 +15,7 @@ bin/langertha_whisper
 cpanfile
 dist.ini
 docker-entrypoint.sh
+ex/ctx.pl
 ex/embedding.pl
 ex/json_grammar.pl
 ex/ollama.pl
@@ -29,6 +30,7 @@ lib/Langertha/Engine/Whisper.pm
 lib/Langertha/Engine/vLLM.pm
 lib/Langertha/Request/HTTP.pm
 lib/Langertha/Role/Chat.pm
+lib/Langertha/Role/ContextSize.pm
 lib/Langertha/Role/Embedding.pm
 lib/Langertha/Role/HTTP.pm
 lib/Langertha/Role/JSON.pm
@@ -36,6 +38,7 @@ lib/Langertha/Role/Models.pm
 lib/Langertha/Role/OpenAPI.pm
 lib/Langertha/Role/Seed.pm
 lib/Langertha/Role/SystemPrompt.pm
+lib/Langertha/Role/Temperature.pm
 lib/Langertha/Role/Transcription.pm
 lib/LangerthaX.pm
 share/banner

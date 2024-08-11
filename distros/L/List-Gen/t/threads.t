@@ -3,12 +3,7 @@ use strict;
 use warnings;
 $|=1;
 BEGIN {
-    $] < 5.013 or eval q{
-        use Test::More skip_all => 'threads not yet supported in perl 5.13+';
-        exit;
-    };
     eval q{
-        use 5.010_001;
         BEGIN {die if %Devel::Cover::}
         use threads;
         use threads::shared;

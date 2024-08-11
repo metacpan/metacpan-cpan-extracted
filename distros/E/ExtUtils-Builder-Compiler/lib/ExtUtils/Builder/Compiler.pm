@@ -1,5 +1,5 @@
 package ExtUtils::Builder::Compiler;
-$ExtUtils::Builder::Compiler::VERSION = '0.019';
+$ExtUtils::Builder::Compiler::VERSION = '0.020';
 use strict;
 use warnings;
 
@@ -97,11 +97,11 @@ ExtUtils::Builder::Compiler - An interface around different compilers.
 
 =head1 VERSION
 
-version 0.019
+version 0.020
 
 =head1 DESCRIPTION
 
-This is an interface wrapping around different compilers. It's usually not used directly but by a portability layer like L<ExtUtils:Builder::Autodetect::C>.
+This is an interface wrapping around different compilers. It's usually not used directly but by a portability layer like L<ExtUtils::Builder::Autodetect::C>.
 
 =head1 METHODS
 

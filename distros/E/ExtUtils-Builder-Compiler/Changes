@@ -1,5 +1,9 @@
 Revision history for ExtUtils-Builder-Compiler
 
+0.020     2024-08-10 18:16:16+02:00 Europe/Brussels
+          - Correctly pass lddlflags in Linker creation
+          - Pass ld instead of cc to linker except on AIX
+
 0.019     2024-08-05 21:04:22+02:00 Europe/Brussels
           - Revert critical breakage in try_compile_run
 

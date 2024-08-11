@@ -172,7 +172,7 @@ static void register_field_attribute(const char *name, const struct FieldHookFun
   fieldattrs = reg;
 }
 
-void ObjectPad_mop_field_apply_attribute(pTHX_ FieldMeta *fieldmeta, const char *name, SV *value)
+static void apply_attribute(pTHX_ FieldMeta *fieldmeta, const char *name, bool parse_value, SV *value)
 {
   HV *hints = GvHV(PL_hintgv);
 
@@ -199,6 +199,9 @@ void ObjectPad_mop_field_apply_attribute(pTHX_ FieldMeta *fieldmeta, const char 
   if((reg->funcs->flags & OBJECTPAD_FLAG_ATTR_MUST_VALUE) && !value)
     croak("Attribute :%s requires a value", name);
 
+  if(parse_value && reg->funcs->parse)
+    value = (*reg->funcs->parse)(aTHX_ fieldmeta, value, reg->funcdata);
+
   SV *attrdata = value;
 
   if(reg->funcs->apply) {
@@ -222,6 +225,16 @@ void ObjectPad_mop_field_apply_attribute(pTHX_ FieldMeta *fieldmeta, const char 
   };
 
   av_push(fieldmeta->hooks, (SV *)hook);
+}
+
+void ObjectPad_mop_field_apply_attribute(pTHX_ FieldMeta *fieldmeta, const char *name, SV *value)
+{
+  apply_attribute(aTHX_ fieldmeta, name, false, value);
+}
+
+void ObjectPad_mop_field_parse_and_apply_attribute(pTHX_ FieldMeta *fieldmeta, const char *name, SV *value)
+{
+  apply_attribute(aTHX_ fieldmeta, name, true, value);
 }
 
 static FieldAttributeRegistration *get_active_registration(pTHX_ const char *name)
@@ -413,11 +426,33 @@ static OP *S_gen_field_init_op(pTHX_ FieldMeta *fieldmeta)
           valueop = newHELEMEXISTSOROP(OPpHELEMEXISTSOR_DELETE << 8, helemop, valueop);
       }
 
-      if(valueop)
+      if(valueop) {
         op = newBINOP(OP_SASSIGN, 0,
           valueop,
           /* $fields[$idx] */
           newFIELDSVOP(OPf_MOD | opf_special_if_role, fieldmeta->fieldix));
+
+        /* Can't just
+         *   MOP_FIELD_RUN_HOOKS(fieldmeta, gen_valueassert_op, ...)
+         * because of collecting up the return values
+         */
+        U32 hooki;
+        for(hooki = 0; fieldmeta->hooks && hooki < av_count(fieldmeta->hooks); hooki++) {
+          struct FieldHook *h = (struct FieldHook *)AvARRAY(fieldmeta->hooks)[hooki];         \
+          if(!h->funcs->gen_valueassert_op)
+            continue;
+
+          OP *assertop = (*h->funcs->gen_valueassert_op)(aTHX_ fieldmeta, h->attrdata, h->funcdata,
+            newFIELDSVOP(opf_special_if_role, fieldmeta->fieldix));
+
+          if(!assertop)
+            continue;
+
+          op = op_append_elem(OP_LINESEQ, op,
+            assertop);
+        }
+      }
+
       break;
     }
     case '@':
@@ -845,7 +880,20 @@ static bool fieldhook_inheritble_apply(pTHX_ FieldMeta *fieldmeta, SV *value, SV
 
 static struct FieldHookFuncs fieldhooks_inheritable = {
   .ver   = OBJECTPAD_ABIVERSION,
+  .flags = OBJECTPAD_FLAG_ATTR_NO_VALUE,
   .apply = &fieldhook_inheritble_apply,
+};
+
+struct FieldHookFuncs_v76 {
+  U32 ver;
+  U32 flags;
+  const char *permit_hintkey;
+  bool (*apply)(pTHX_ FieldMeta *fieldmeta, SV *value, SV **attrdata_ptr, void *funcdata);
+  void (*seal)(pTHX_ FieldMeta *fieldmeta, SV *attrdata, void *funcdata);
+  void (*gen_accessor_ops)(pTHX_ FieldMeta *fieldmeta, SV *attrdata, void *funcdata,
+          enum AccessorType type, struct AccessorGenerationCtx *ctx);
+  void (*post_makefield)(pTHX_ FieldMeta *fieldmeta, SV *attrdata, void *funcdata, SV *field);
+  void (*post_construct)(pTHX_ FieldMeta *fieldmeta, SV *attrdata, void *funcdata, SV *field);
 };
 
 void ObjectPad_register_field_attribute(pTHX_ const char *name, const struct FieldHookFuncs *funcs, void *funcdata)
@@ -862,6 +910,26 @@ void ObjectPad_register_field_attribute(pTHX_ const char *name, const struct Fie
 
   if(!funcs->permit_hintkey)
     croak("Third-party field attributes require a permit hinthash key");
+
+  if(funcs->ver < OBJECTPAD_ABIVERSION) {
+    const struct FieldHookFuncs_v76 *funcs_v76 = (const struct FieldHookFuncs_v76 *)funcs;
+
+    struct FieldHookFuncs *funcs_v810;
+    Newx(funcs_v810, 1, struct FieldHookFuncs);
+
+    *funcs_v810 = (struct FieldHookFuncs){
+      .ver              = OBJECTPAD_ABIVERSION,
+      .flags            = funcs_v76->flags,
+      .permit_hintkey   = funcs_v76->permit_hintkey,
+      .apply            = funcs_v76->apply,
+      .seal             = funcs_v76->seal,
+      .gen_accessor_ops = funcs_v76->gen_accessor_ops,
+      .post_makefield   = funcs_v76->post_makefield,
+      .post_construct   = funcs_v76->post_construct,
+    };
+
+    funcs = funcs_v810;
+  }
 
   register_field_attribute(name, funcs, funcdata);
 }

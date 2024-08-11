@@ -6,6 +6,10 @@ App::Greple::tee - moodul sobitatud teksti asendamiseks välise käsu tulemusega
 
     greple -Mtee command -- ...
 
+# VERSION
+
+Version 1.00
+
 # DESCRIPTION
 
 Greple'i **-Mtee** moodul saadab sobitatud tekstiosa antud filtrikomandole ja asendab need käsu tulemusega. Idee on tuletatud käsust nimega **teip**. See on nagu osaliste andmete edastamine välise filtri käsule.
@@ -16,18 +20,14 @@ Filtri käsk järgneb moodulideklaratsioonile (`-Mtee`) ja lõpeb kahe kriipsuga
 
 Ülaltoodud käsk teisendab kõik sobitatud sõnad väiketähtedest suurtähtedeks. Tegelikult ei ole see näide iseenesest nii kasulik, sest **greple** saab sama asja tõhusamalt teha valikuga **--cm**.
 
-Vaikimisi täidetakse käsk ühe protsessina ja kõik sobitatud andmed saadetakse sellele segamini. Kui sobitatud tekst ei lõpe newline'iga, lisatakse see enne ja eemaldatakse pärast. Andmed kaardistatakse rea kaupa, nii et sisend- ja väljundandmete ridade arv peab olema identne.
+Vaikimisi täidetakse käsk ühe protsessina ja kõik sobivad andmed saadetakse protsessile segamini. Kui sobitatud tekst ei lõpe newline'iga, lisatakse see enne saatmist ja eemaldatakse pärast vastuvõtmist. Sisend- ja väljundandmed kaardistatakse rea kaupa, seega peab sisend- ja väljundridade arv olema identne.
 
-Valiku **--diskreetne** abil kutsutakse iga sobitatud osa jaoks eraldi käsk. Erinevust saab eristada järgmiste käskude abil.
+Valiku **--diskreetne** abil kutsutakse iga sobitatud tekstiala jaoks eraldi käsk. Erinevust saab eristada järgmiste käskude abil.
 
     greple -Mtee cat -n -- copyright LICENSE
     greple -Mtee cat -n -- copyright LICENSE --discrete
 
 Sisend- ja väljundandmete read ei pea olema identsed, kui kasutatakse valikut **--diskreetne**.
-
-# VERSION
-
-Version 0.9902
 
 # OPTIONS
 
@@ -35,9 +35,18 @@ Version 0.9902
 
     Kutsuge uus käsk eraldi iga sobitatud osa jaoks.
 
+- **--bulkmode**
+
+    Valiku <--diskreetne> puhul täidetakse iga käsk nõudmisel. Käskkiri
+    <--bulkmode> option causes all conversions to be performed at once.
+
+- **--crmode**
+
+    See valik asendab kõik uue rea märgid iga ploki keskel vagunipöördumismärkidega. Käsu täitmise tulemuses sisalduvad vagunipöörded tagastatakse uusjoonemärkideks. Seega saab mitmest reast koosnevaid plokke töödelda partiidena ilma **--diskreetse** valikuta.
+
 - **--fillup**
 
-    Kombineerib mittetühjad read üheks reaks enne nende edastamist käsule filter. Laiade tähemärkide vahel olevad read kustutatakse ja muud read asendatakse tühikutega.
+    Ühendage mittetäielike ridade jada üheks reaks enne nende edastamist filtri käsule. Laiade laiade märkide vahel olevad read kustutatakse ja muud read asendatakse tühikutega.
 
 - **--blocks**
 
@@ -88,10 +97,9 @@ Järgmine käsk leiab mingi sissekirjutatud osa LICENSE dokumendist.
       a) distribute a Standard Version of the executables and library files,
          together with instructions (in the manual page or equivalent) on where to
          get the Standard Version.
-    
+
       b) accompany the distribution with the machine-readable source of the Package
          with your modifications.
-    
 
 Seda osa saab ümber vormindada, kasutades **tee** moodulit koos **ansifold** käsuga:
 
@@ -102,12 +110,12 @@ Seda osa saab ümber vormindada, kasutades **tee** moodulit koos **ansifold** k�
          together with instructions (in the
          manual page or equivalent) on where
          to get the Standard Version.
-    
+
       b) accompany the distribution with the
          machine-readable source of the
          Package with your modifications.
 
-Valiku `--diskreet` kasutamine on aeganõudev. Seega võite kasutada `--separate '\r'` valikut koos `ansifold`, mis toodab ühe rea, kasutades CR-märki NL-i asemel.
+Valikuga --diskreetne käivitatakse mitu protsessi, seega võtab protsessi täitmine kauem aega. Seega võite kasutada valikut `--separate '\r'` koos `ansifold`, mis toodab ühe rea, kasutades CR-märki NL-i asemel.
 
     greple -Mtee ansifold -rsw40 --prefix '     ' --separate '\r' --
 
@@ -117,13 +125,13 @@ Seejärel teisendage CR märk NL-ks pärast seda käsuga [tr(1)](http://man.he.n
 
 # EXAMPLE 3
 
-Mõelge olukorrale, kus te soovite grep'i abil leida stringid mitte-pealkirjaridadest. Näiteks võite soovida otsida pilte `docker image ls` käsust, kuid jätta pealkirjarida alles. Saate seda teha järgmise käsuga.
+Mõelge olukorrale, kus te soovite grep'i abil leida stringid mitte-pealkirjaridadest. Näiteks võite soovida otsida Docker image'i nimesid käsust `docker image ls`, kuid jätta pealkirjarida alles. Saate seda teha järgmise käsuga.
 
     greple -Mtee grep perl -- -Mline -L 2: --discrete --all
 
-Valik `-Mline -L 2:` otsib välja eelviimased read ja saadab need käsule `grep perl`. Vajalik on valik `--diskreet`, kuid seda kutsutakse ainult üks kord, nii et see ei kahjusta jõudlust.
+Valik `-Mline -L 2:` otsib välja eelviimased read ja saadab need käsule `grep perl`. Valik --diskreetne on vajalik, sest sisendi ja väljundi ridade arv muutub, kuid kuna käsk täidetakse ainult üks kord, ei ole tulemuslikkuse puudujääki.
 
-Sellisel juhul annab `teip -l 2- -- grep` vea, sest väljundis olevate ridade arv on väiksem kui sisend. Tulemus on siiski üsna rahuldav :)
+Kui püüda sama asja teha käsuga **teip**, annab `teip -l 2- -- grep` vea, sest väljundridade arv on väiksem kui sisendridade arv. Saadud tulemusega ei ole aga mingit probleemi.
 
 # INSTALL
 
@@ -145,7 +153,7 @@ Sellisel juhul annab `teip -l 2- -- grep` vea, sest väljundis olevate ridade ar
 
 # BUGS
 
-Valik `--fillup` ei pruugi koreakeelse teksti puhul korrektselt töötada.
+Valik `--fillup` eemaldab korea keele teksti liidestamisel Hangul-märkide vahel olevad tühikud.
 
 # AUTHOR
 
@@ -153,7 +161,7 @@ Kazumasa Utashiro
 
 # LICENSE
 
-Copyright © 2023 Kazumasa Utashiro.
+Copyright © 2023-2024 Kazumasa Utashiro.
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.

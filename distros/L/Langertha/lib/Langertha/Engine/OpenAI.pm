@@ -1,7 +1,7 @@
 package Langertha::Engine::OpenAI;
 our $AUTHORITY = 'cpan:GETTY';
 # ABSTRACT: OpenAI API
-$Langertha::Engine::OpenAI::VERSION = '0.002';
+$Langertha::Engine::OpenAI::VERSION = '0.003';
 use Moose;
 use File::ShareDir::ProjectDistDir qw( :all );
 use Carp qw( croak );
@@ -12,6 +12,7 @@ with 'Langertha::Role::'.$_ for (qw(
   HTTP
   OpenAPI
   Models
+  Temperature
   SystemPrompt
   Chat
   Embedding
@@ -75,6 +76,7 @@ sub chat_request {
   return $self->generate_request( createChatCompletion => sub { $self->chat_response(shift) },
     model => $self->chat_model,
     messages => $messages,
+    $self->has_temperature ? ( temperature => $self->temperature ) : (),
     stream => JSON->false,
     # $self->has_seed ? ( seed => $self->seed )
     #   : $self->randomize_seed ? ( seed => round(rand(100_000_000)) ) : (),
@@ -119,7 +121,7 @@ Langertha::Engine::OpenAI - OpenAI API
 
 =head1 VERSION
 
-version 0.002
+version 0.003
 
 =head1 SYNOPSIS
 
@@ -129,6 +131,7 @@ version 0.002
     api_key => $ENV{OPENAI_API_KEY},
     model => 'gpt-4o-mini',
     system_prompt => 'You are a helpful assistant',
+    temperature => 0.5,
   );
 
   print($openai->simple_chat('Say something nice'));

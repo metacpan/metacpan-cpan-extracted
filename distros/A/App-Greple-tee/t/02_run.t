@@ -118,6 +118,33 @@ __DATA__
 
      1	El veloz murciélago hindú comía feliz cardillo y kiwi.
      2	La cigüeña tocaba el saxofón detrás del palenque de paja.
+@@ greple -Mtee cat -n -- '^([A-Z].*\n)(.+\n)*' t/SAMPLE.txt --all --discrete --bulkmode
+     1	The quick brown fox
+     2	jumps over the lazy dog.
+     3	1234567890
+
+いろはにほへとちりぬるを
+わかよたれそつねならむ
+うゐのおくやまけふこえて
+あさきゆめみしゑひもせすん
+
+色は匂へど散りぬるを
+我が世誰そ常ならむ
+有為の奥山今日越えて
+浅き夢見じ酔ひもせず.
+
+     1	Ma la volpe col suo balzo ha raggiunto il quieto Fido.
+
+     1	Sylvia wagt quick den Jux bei Pforzheim.
+
+     1	Victor jagt zwölf Boxkämpfer quer über den großen Sylter Deich.
+
+     1	Le cœur déçu mais l'âme plutôt naïve,
+     2	Louÿs rêva de crapaüter en canoë au delà des îles,
+     3	près du mälströn où brûlent les novæ.
+
+     1	El veloz murciélago hindú comía feliz cardillo y kiwi.
+     2	La cigüeña tocaba el saxofón detrás del palenque de paja.
 @@ greple -Mtee perl -CSAD -pE '$_="($.)$_"' -- '\S+' t/SAMPLE.txt --all
 (1)The (2)quick (3)brown (4)fox
 (5)jumps (6)over (7)the (8)lazy (9)dog.
@@ -173,6 +200,33 @@ PRÈS DU MÄLSTRÖN OÙ BRÛLENT LES NOVÆ.
 EL VELOZ MURCIÉLAGO HINDÚ COMÍA FELIZ CARDILLO Y KIWI.
 LA CIGÜEÑA TOCABA EL SAXOFÓN DETRÁS DEL PALENQUE DE PAJA.
 @@ greple -Mtee perl -CSAD -pE '$_=uc' -- '^([A-Z].*\n)(.+\n)*' t/SAMPLE.txt --all --discrete
+THE QUICK BROWN FOX
+JUMPS OVER THE LAZY DOG.
+1234567890
+
+いろはにほへとちりぬるを
+わかよたれそつねならむ
+うゐのおくやまけふこえて
+あさきゆめみしゑひもせすん
+
+色は匂へど散りぬるを
+我が世誰そ常ならむ
+有為の奥山今日越えて
+浅き夢見じ酔ひもせず.
+
+MA LA VOLPE COL SUO BALZO HA RAGGIUNTO IL QUIETO FIDO.
+
+SYLVIA WAGT QUICK DEN JUX BEI PFORZHEIM.
+
+VICTOR JAGT ZWÖLF BOXKÄMPFER QUER ÜBER DEN GROSSEN SYLTER DEICH.
+
+LE CŒUR DÉÇU MAIS L'ÂME PLUTÔT NAÏVE,
+LOUŸS RÊVA DE CRAPAÜTER EN CANOË AU DELÀ DES ÎLES,
+PRÈS DU MÄLSTRÖN OÙ BRÛLENT LES NOVÆ.
+
+EL VELOZ MURCIÉLAGO HINDÚ COMÍA FELIZ CARDILLO Y KIWI.
+LA CIGÜEÑA TOCABA EL SAXOFÓN DETRÁS DEL PALENQUE DE PAJA.
+@@ greple -Mtee perl -CSAD -pE '$_=uc' -- '^([A-Z].*\n)(.+\n)*' t/SAMPLE.txt --all --discrete --bulkmode
 THE QUICK BROWN FOX
 JUMPS OVER THE LAZY DOG.
 1234567890
@@ -275,3 +329,46 @@ EL VELOZ MURCIÉLAGO HINDÚ COMÍA FELIZ CARDILLO Y KIWI. LA CIGÜEÑA TOCABA EL
      1	Le cœur déçu mais l'âme plutôt naïve, Louÿs rêva de crapaüter en canoë au delà des îles, près du mälströn où brûlent les novæ.
 
      1	El veloz murciélago hindú comía feliz cardillo y kiwi. La cigüeña tocaba el saxofón detrás del palenque de paja.
+@@ greple -Mtee cat -n -- '^(.+\n)+' t/SAMPLE.txt --all --fillup --discrete --bulkmode
+     1	The quick brown fox jumps over the lazy dog. 1234567890
+
+     1	いろはにほへとちりぬるをわかよたれそつねならむうゐのおくやまけふこえてあさきゆめみしゑひもせすん
+
+     1	色は匂へど散りぬるを我が世誰そ常ならむ有為の奥山今日越えて浅き夢見じ酔ひもせず.
+
+     1	Ma la volpe col suo balzo ha raggiunto il quieto Fido.
+
+     1	Sylvia wagt quick den Jux bei Pforzheim.
+
+     1	Victor jagt zwölf Boxkämpfer quer über den großen Sylter Deich.
+
+     1	Le cœur déçu mais l'âme plutôt naïve, Louÿs rêva de crapaüter en canoë au delà des îles, près du mälströn où brûlent les novæ.
+
+     1	El veloz murciélago hindú comía feliz cardillo y kiwi. La cigüeña tocaba el saxofón detrás del palenque de paja.
+@@ greple -Mtee perl -CSAD -E 'print sort <>' -- '^(.+\n)+' t/SAMPLE.txt --all --crmode
+El veloz murciélago hindú comía feliz cardillo y kiwi.
+La cigüeña tocaba el saxofón detrás del palenque de paja.
+
+Le cœur déçu mais l'âme plutôt naïve,
+Louÿs rêva de crapaüter en canoë au delà des îles,
+près du mälströn où brûlent les novæ.
+
+Ma la volpe col suo balzo ha raggiunto il quieto Fido.
+
+Sylvia wagt quick den Jux bei Pforzheim.
+
+The quick brown fox
+jumps over the lazy dog.
+1234567890
+
+Victor jagt zwölf Boxkämpfer quer über den großen Sylter Deich.
+
+いろはにほへとちりぬるを
+わかよたれそつねならむ
+うゐのおくやまけふこえて
+あさきゆめみしゑひもせすん
+
+色は匂へど散りぬるを
+我が世誰そ常ならむ
+有為の奥山今日越えて
+浅き夢見じ酔ひもせず.

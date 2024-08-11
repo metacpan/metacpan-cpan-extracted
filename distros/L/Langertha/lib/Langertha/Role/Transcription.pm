@@ -1,7 +1,7 @@
 package Langertha::Role::Transcription;
 our $AUTHORITY = 'cpan:GETTY';
 # ABSTRACT: Role for APIs with transcription functionality
-$Langertha::Role::Transcription::VERSION = '0.002';
+$Langertha::Role::Transcription::VERSION = '0.003';
 use Moose::Role;
 use Carp qw( croak );
 
@@ -48,7 +48,7 @@ Langertha::Role::Transcription - Role for APIs with transcription functionality
 
 =head1 VERSION
 
-version 0.002
+version 0.003
 
 =for :stopwords cpan testmatrix url bugtracker rt cpants kwalitee diff irc mailto metadata placeholders metacpan
 

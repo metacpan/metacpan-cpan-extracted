@@ -6,7 +6,7 @@ use Module::Build;
 use XS::Parse::Keyword::Builder;
 use XS::Parse::Sublike::Builder;
 
-my @extra_compiler_flags = qw( -Iinclude -Ihax );
+my @extra_compiler_flags = qw( -Ishare/include -Iinclude -Ihax );
 
 # Perl 5.36 made -std=c99 standard; before then we'll have to request it specially
 push @extra_compiler_flags, qw( -std=c99 ) if $^V lt v5.36.0;
@@ -40,6 +40,9 @@ my $build = Module::Build->new(
       'Module::Build' => '0.4004', # test_requires
       'XS::Parse::Keyword::Builder' => '0.39',
       'XS::Parse::Sublike::Builder' => '0.15',
+   },
+   share_dir => {
+      module => { 'Object::Pad' => [ 'share' ] },
    },
    license => 'perl',
    create_license => 1,

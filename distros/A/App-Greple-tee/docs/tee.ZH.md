@@ -6,6 +6,10 @@ App::Greple::tee - 用外部命令结果替换匹配文本的模块
 
     greple -Mtee command -- ...
 
+# VERSION
+
+Version 1.00
+
 # DESCRIPTION
 
 Greple的**-Mtee**模块将匹配的文本部分发送到给定的过滤命令，并以命令结果替换它们。这个想法来自于名为**teip**的命令。它就像绕过部分数据到外部过滤命令。
@@ -16,18 +20,14 @@ Greple的**-Mtee**模块将匹配的文本部分发送到给定的过滤命令�
 
 上述命令将所有匹配的单词从小写转换为大写。事实上，这个例子本身并不那么有用，因为**greple**可以用**--cm**选项更有效地做同样的事情。
 
-默认情况下，该命令是作为一个单独的进程执行的，所有匹配的数据被混合在一起发送给它。如果匹配的文本不以换行结尾，就会在前面添加，后面删除。数据是逐行映射的，所以输入和输出数据的行数必须是相同的。
+默认情况下，命令作为单个进程执行，所有匹配的数据会混合发送到该进程。如果匹配的文本不是以换行结束，则会在发送前添加，并在接收后删除。输入和输出数据是逐行映射的，因此输入和输出的行数必须相同。
 
-使用**--discrete**选项，每一个匹配的零件都被调用单独的命令。你可以通过以下命令来区分。
+使用 **--discrete** 选项时，每个匹配的文本区域都会调用单独的命令。你可以通过以下命令来区分。
 
     greple -Mtee cat -n -- copyright LICENSE
     greple -Mtee cat -n -- copyright LICENSE --discrete
 
 使用**--discrete**选项时，输入和输出数据的行数不一定相同。
-
-# VERSION
-
-Version 0.9902
 
 # OPTIONS
 
@@ -35,9 +35,18 @@ Version 0.9902
 
     为每个匹配的零件单独调用新的命令。
 
+- **--bulkmode**
+
+    使用 <--discrete> 选项时，每条命令都会按需执行。回车符
+    <--bulkmode> option causes all conversions to be performed at once.
+
+- **--crmode**
+
+    该选项将每个程序块中间的换行符替换为回车符。执行命令的结果中包含的回车符将还原为换行符。因此，可以批量处理由多行组成的数据块，而无需使用 **--discrete**选项。
+
 - **--fillup**
 
-    将一连串的非空行合并为一行，然后再传递给过滤命令。宽字符之间的换行符被删除，其他换行符被替换成空格。
+    将一连串非空行合并为一行，然后再传递给过滤命令。宽窄字符之间的换行符会被删除，其他换行符会被空格替换。
 
 - **--blocks**
 
@@ -88,10 +97,9 @@ Version 0.9902
       a) distribute a Standard Version of the executables and library files,
          together with instructions (in the manual page or equivalent) on where to
          get the Standard Version.
-    
+
       b) accompany the distribution with the machine-readable source of the Package
          with your modifications.
-    
 
 你可以通过使用**tee**模块和**ansifold**命令来重新格式化这部分内容。
 
@@ -102,12 +110,12 @@ Version 0.9902
          together with instructions (in the
          manual page or equivalent) on where
          to get the Standard Version.
-    
+
       b) accompany the distribution with the
          machine-readable source of the
          Package with your modifications.
 
-使用`--discrete`选项是很耗时的。因此，你可以使用`--separate '\r'`选项和`ansifold`来产生单行，使用CR字符而不是NL。
+离散选项会启动多个进程，因此进程的执行时间会更长。因此，你可以使用 `--separate '\r'`选项和 `ansifold`，后者会使用 CR 字符而不是 NL 字符生成单行。
 
     greple -Mtee ansifold -rsw40 --prefix '     ' --separate '\r' --
 
@@ -117,13 +125,13 @@ Version 0.9902
 
 # EXAMPLE 3
 
-考虑一种情况，你想从非标题行中搜索字符串。例如，你可能想从`docker image ls`命令中搜索图片，但留下标题行。你可以通过以下命令来实现。
+考虑一下要从非标题行中搜索字符串的情况。例如，你可能想搜索 `docker image ls` 命令中的 Docker 镜像名称，但要保留标题行。你可以通过以下命令来实现。
 
     greple -Mtee grep perl -- -Mline -L 2: --discrete --all
 
-选项`-Mline -L 2:` 检索第二至最后一行，并将其发送到`grep perl`命令。选项`--discrete`是必需的，但它只被调用一次，所以在性能上没有什么缺陷。
+选项 `-Mline -L 2:` 会检索倒数第二行，并将其发送给 `grep perl` 命令。需要使用选项 --discrete 是因为输入和输出的行数会发生变化，但由于命令只执行一次，因此不会影响性能。
 
-在这种情况下，`teip -l 2- -- grep`会产生错误，因为输出的行数比输入的少。然而，结果是相当令人满意的:)
+如果尝试用 **teip** 命令做同样的事情，`teip -l 2- -- grep` 会出错，因为输出行数少于输入行数。不过，得到的结果没有问题。
 
 # INSTALL
 
@@ -133,7 +141,7 @@ Version 0.9902
 
 # SEE ALSO
 
-[App::Greple::Tee](https://metacpan.org/pod/App%3A%3AGreple%3A%3ATee), [https://github.com/kaz-utashiro/App-Greple-tee](https://github.com/kaz-utashiro/App-Greple-tee)
+[App::Greple::tee](https://metacpan.org/pod/App%3A%3AGreple%3A%3Atee), [https://github.com/kaz-utashiro/App-Greple-tee](https://github.com/kaz-utashiro/App-Greple-tee)
 
 [https://github.com/greymd/teip](https://github.com/greymd/teip)
 
@@ -141,11 +149,11 @@ Version 0.9902
 
 [https://github.com/tecolicom/Greple](https://github.com/tecolicom/Greple)
 
-[App::Greple::xlate](https://metacpan.org/pod/App%3A%3AGreple%3A%3Axlate).
+[App::Greple::xlate](https://metacpan.org/pod/App%3A%3AGreple%3A%3Axlate)
 
 # BUGS
 
-`--fillup`选项对韩文文本可能无法正确工作。
+在连接韩文文本时，`-fillup` 选项将删除韩文字符之间的空格。
 
 # AUTHOR
 
@@ -153,7 +161,7 @@ Kazumasa Utashiro
 
 # LICENSE
 
-Copyright © 2023 Kazumasa Utashiro.
+Copyright © 2023-2024 Kazumasa Utashiro.
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.

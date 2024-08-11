@@ -87,7 +87,7 @@ DESCRIPTION
     
        use Object::Pad ':experimental(inherit_field)';
     
-       use Object::Pad ':experimental';  # all of the above
+       use Object::Pad ':experimental(:all)';  # all of the above
 
     Since version 0.64.
 
@@ -95,6 +95,10 @@ DESCRIPTION
     multiple names in the parens, separated by spaces:
 
        use Object::Pad ':experimental(mop custom_field_attr)';
+
+    Since version 0.810 attempting to request all of the experiments at
+    once by using an empty :experimental() is currently accepted, but
+    yields a warning. This may be removed in future.
 
  Automatic Construction
 

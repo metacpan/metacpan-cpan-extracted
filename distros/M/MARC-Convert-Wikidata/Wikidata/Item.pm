@@ -26,7 +26,7 @@ Readonly::Hash our %EXT_ID_MAPPING => (
 	'lccn' => 'P243',
 );
 
-our $VERSION = 0.13;
+our $VERSION = 0.14;
 
 # Constructor.
 sub new {
@@ -201,6 +201,9 @@ sub wikidata_external_ids {
 	my @ret;
 	foreach my $external_id (@{$self->{'transform_object'}->external_ids}) {
 		push @ret, Wikibase::Datatype::Statement->new(
+			$external_id->deprecated ? (
+				'rank' => 'deprecated',
+			) : (),
 			'references' => [$self->wikidata_reference],
 			'snak' => Wikibase::Datatype::Snak->new(
 				'datatype' => 'external-id',
@@ -209,7 +212,7 @@ sub wikidata_external_ids {
 				),
 				'property' => $EXT_ID_MAPPING{$external_id->name},
 			),
-			defined $external_id->deprecated ? (
+			$external_id->deprecated ? (
 				'property_snaks' => [
 					Wikibase::Datatype::Snak->new(
 						'datatype' => 'wikibase-item',

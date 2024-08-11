@@ -1,5 +1,77 @@
 /* vi: set ft=c : */
 
+#define svflags_dump(sv)  S_svflags_dump(aTHX_ sv)
+static const char *svtypes[SVt_LAST] = {
+  [SVt_NULL]   = "NULL",
+  [SVt_IV]     = "IV",
+  [SVt_NV]     = "NV",
+  [SVt_PV]     = "PV",
+  [SVt_PVIV]   = "PVIV",
+  [SVt_PVNV]   = "PVNV",
+  [SVt_PVMG]   = "PVMG",
+  [SVt_REGEXP] = "REGEXP",
+  [SVt_PVGV]   = "PVGV",
+  [SVt_PVLV]   = "PVLV",
+  [SVt_PVAV]   = "PVAV",
+  [SVt_PVHV]   = "PVHV",
+  [SVt_PVCV]   = "PVCV",
+  [SVt_PVFM]   = "PVFM",
+  [SVt_PVIO]   = "PVIO",
+};
+
+static struct {
+  const char *name;
+  U32 bits;
+} svflag[] = {
+  /* common flags */
+  { "IOK",  SVf_IOK }, /* 0x00000100 */
+  { "NOK",  SVf_NOK },
+  { "POK",  SVf_POK },
+  { "ROK",  SVf_ROK },
+  { "pIOK", SVp_IOK },
+  { "pNOK", SVp_NOK },
+  { "pPOK", SVp_POK },
+
+  { "PROTECT",  SVf_PROTECT }, /* 0x00010000 */
+  { "PADTMP",   SVs_PADTMP },
+  { "PADSTALE", SVs_PADSTALE },
+  { "TEMP",     SVs_TEMP },
+  { "OBJECT",   SVs_OBJECT },
+  { "GMG",      SVs_GMG },
+  { "SMG",      SVs_SMG },
+  { "RMG",      SVs_RMG },
+
+  { "FAKE",     SVf_FAKE }, /* 0x01000000 */
+  { "OOK",      SVf_OOK },
+  { "BREAK",    SVf_BREAK },
+  { "READONLY", SVf_READONLY },
+
+  { NULL, 0 },
+};
+static void S_svflags_dump(pTHX_ SV *sv)
+{
+  U32 flags = SvFLAGS(sv);
+  U8  type  = SvTYPE(sv);
+
+  flags &= ~SVTYPEMASK;
+
+  if(type < SVt_LAST && svtypes[type])
+    fprintf(stderr, "SvTYPE=%s", svtypes[type]);
+  else
+    fprintf(stderr, "SvTYPE=(%02X)", type);
+
+  for(int i = 0; svflag[i].name; i++) {
+    U32 bits = svflag[i].bits;
+    if(!(flags & bits))
+      continue;
+    fprintf(stderr, ",%s", svflag[i].name);
+    flags &= ~bits;
+  }
+
+  if(flags)
+    fprintf(stderr, ",%04X", flags);
+}
+
 #define padlist_dump_depth(pl, depth)  S_padlist_dump_depth(aTHX_ pl, depth)
 static void S_padlist_dump_depth(pTHX_ PADLIST *padlist, I32 depth)
 {
@@ -36,7 +108,17 @@ static void S_padlist_dump_depth(pTHX_ PADLIST *padlist, I32 depth)
           COP_SEQ_RANGE_LOW(pn), COP_SEQ_RANGE_HIGH(pn));
     }
 
-    fprintf(stderr, " = %p\n", PadARRAY(pad)[padix]);
+    if(PadnameFLAGS(pn))
+      fprintf(stderr, " {PadnameFLAGS=%04X}", PadnameFLAGS(pn));
+
+    SV *sv;
+    fprintf(stderr, " = %p\n", sv = PadARRAY(pad)[padix]);
+
+    if(sv && SvFLAGS(sv)) {
+      fprintf(stderr, "     {");
+      svflags_dump(sv);
+      fprintf(stderr, "}\n");
+    }
   }
 }
 
@@ -96,7 +178,7 @@ static void S_debug_sv_summary(pTHX_ const SV *sv)
 
   switch(SvTYPE(sv)) {
     case SVt_PVAV:
-      fprintf(stderr, ",FILL=%d", AvFILL((AV *)sv));
+      fprintf(stderr, ",FILL=%zd", AvFILL((AV *)sv));
       break;
 
     default:
@@ -109,7 +191,7 @@ static void S_debug_sv_summary(pTHX_ const SV *sv)
         if(SvUOK(sv))
           fprintf(stderr, ",UV=%" UVuf, SvUVX(sv));
         if(SvPOK(sv)) {
-          fprintf(stderr, ",PVX=\"%.10s\"", SvPVX((SV *)sv));
+          fprintf(stderr, ",PVX=\"%.10s\",CUR=%zd", SvPVX((SV *)sv), SvCUR(sv));
           if(SvCUR(sv) > 10)
             fprintf(stderr, "...");
         }

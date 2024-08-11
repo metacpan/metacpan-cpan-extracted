@@ -1,9 +1,9 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2019-2023 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2019-2024 -- leonerd@leonerd.org.uk
 
-package Object::Pad 0.809;
+package Object::Pad 0.810;
 
 use v5.14;
 use warnings;
@@ -115,7 +115,7 @@ module to only silence the module's warnings selectively:
 
    use Object::Pad ':experimental(inherit_field)';
 
-   use Object::Pad ':experimental';  # all of the above
+   use Object::Pad ':experimental(:all)';  # all of the above
 
 I<Since version 0.64.>
 
@@ -123,6 +123,10 @@ Multiple experimental features can be enabled at once by giving multiple names
 in the parens, separated by spaces:
 
    use Object::Pad ':experimental(mop custom_field_attr)';
+
+I<Since version 0.810> attempting to request all of the experiments at once
+by using an empty C<:experimental()> is currently accepted, but yields a
+warning. This may be removed in future.
 
 =head2 Automatic Construction
 
@@ -1352,11 +1356,18 @@ sub _import_experimental
       my $sym = $syms->[$i];
 
       if( $sym eq ":experimental" ) {
+         carp "Enabling all Object::Pad experiments with an unqualified :experimental";
          $enabled{$_}++ for @experiments;
       }
       elsif( $sym =~ m/^:experimental\((.*)\)$/ ) {
-         my $tags = $1 =~ s/^\s+|\s+$//gr; # trim
-         $enabled{$_}++ for split m/\s+/, $tags;
+         foreach my $tag ( split m/\s+/, $1 =~ s/^\s+|\s+$//gr ) {
+            if( $tag eq ":all" ) {
+               $enabled{$_}++ for @experiments;
+            }
+            else {
+               $enabled{$tag}++;
+            }
+         }
       }
       else {
          $i++;

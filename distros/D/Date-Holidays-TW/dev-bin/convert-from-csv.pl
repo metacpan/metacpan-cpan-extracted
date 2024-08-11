@@ -7,11 +7,11 @@ The CSV can be downloaded from:
 
      https://data.gov.tw/dataset/14718
 
-Download the one named: 111年中華民國政府行政機關辦公日曆表
+Download the one named: 114年中華民國政府行政機關辦公日曆表
 
-After converting that from Big5 to UTF-8, feed it to this program.
+The text in that CSV file is already encoded as UTF-8 and can be directly fed to this progrm:
 
-    perl ./dev-bin/convert-from-csv.pl  <( piconv -f big5 -t utf8 ~/Downloads/111年 中華民國政府行政機關辦公日曆表.csv )
+    perl ./dev-bin/convert-from-csv.pl ~/Downloads/111年 中華民國政府行政機關辦公日曆表.csv
 
 =cut
 

@@ -126,4 +126,14 @@ EOPERL
 # and all we get is "parse failed--compilation aborted at ..." so there's no
 # point like()-testing $@ here
 
+# RT154639 - fields should not be visible to :common methods
+my $e = eval <<'EOPERL' ? undef : $@;
+   class FieldInCommonMethod {
+      field $x;
+      method m :common { $x }
+   }
+EOPERL
+like( $e, qr/^Global symbol "\$x" requires explicit package name /,
+   'fields are not visible to :common methods' );
+
 done_testing;

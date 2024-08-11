@@ -34,7 +34,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=JSON-MaybeXS
   license: http://dev.perl.org/licenses/
   repository: https://github.com/p5sagit/JSON-MaybeXS.git
-version: '1.004007'
+version: '1.004008'
 x_contributors:
   - 'Clinton Gormley <develop@traveljury.com>'
   - 'Graham Knop <haarg@haarg.org>'

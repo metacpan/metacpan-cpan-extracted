@@ -1,5 +1,5 @@
 package ExtUtils::Builder::Conf;
-$ExtUtils::Builder::Conf::VERSION = '0.019';
+$ExtUtils::Builder::Conf::VERSION = '0.020';
 use strict;
 use warnings;
 
@@ -32,19 +32,8 @@ sub add_methods {
 	}
 
 	$planner->add_delegate(define => sub {
-		my ($self, $symbol) = @_;
-
-		if ($self->{defines_to}) {
-			unless ($self->{defines_fh}) {
-				open $self->{defines_fh}, '>', $self->{defines_to};
-				$self->{defines_fh}->autoflush(1);
-			}
-
-			$self->{defines_fh}->print("#define $symbol /**/\n");
-		}
-		else {
-			$self->{defines}{$symbol} = '',
-		}
+		my ($self, $symbol, $value) = @_;
+		$self->{defines}{$symbol} = $value // '';
 	});
 
 	$planner->add_delegate(defines => sub {
@@ -234,7 +223,7 @@ ExtUtils::Builder::Conf - Configure-time utilities for using C headers, librarie
 
 =head1 VERSION
 
-version 0.019
+version 0.020
 
 =head1 SYNOPSIS
 

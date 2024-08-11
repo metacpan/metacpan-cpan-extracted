@@ -745,7 +745,7 @@ static int build_field(pTHX_ OP **out, XSParseKeywordPiece *args[], size_t nargs
 
       inplace_trim_whitespace(attrval);
 
-      mop_field_apply_attribute(fieldmeta, SvPVX(attrname), attrval);
+      mop_field_parse_and_apply_attribute(fieldmeta, SvPVX(attrname), attrval);
 
       if(attrval)
         SvREFCNT_dec(attrval);

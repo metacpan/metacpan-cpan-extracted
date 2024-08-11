@@ -51,4 +51,12 @@ class BClass {
       'Roles are built once only even if implemented multiple times' );
 }
 
+# RT154494
+{
+   use Object::Pad ':experimental(composed_adjust)';
+
+   role RT154494Role { }
+   pass( 'Managed to compile a role under :experimental(composed_adjust)' );
+}
+
 done_testing;

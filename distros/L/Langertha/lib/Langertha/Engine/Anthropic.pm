@@ -1,7 +1,7 @@
 package Langertha::Engine::Anthropic;
 our $AUTHORITY = 'cpan:GETTY';
 # ABSTRACT: Anthropic API
-$Langertha::Engine::Anthropic::VERSION = '0.002';
+$Langertha::Engine::Anthropic::VERSION = '0.003';
 use Moose;
 use Carp qw( croak );
 use JSON::MaybeXS;
@@ -11,14 +11,12 @@ with 'Langertha::Role::'.$_ for (qw(
   HTTP
   Models
   Chat
+  Temperature
+  ContextSize
   SystemPrompt
 ));
 
-has max_tokens => (
-  is => 'ro',
-  lazy_build => 1,
-);
-sub _build_max_tokens { 1024 }
+sub default_context_size { 1024 }
 
 has api_key => (
   is => 'ro',
@@ -73,7 +71,8 @@ sub chat_request {
   return $self->generate_http_request( POST => $self->url.'/v1/messages', sub { $self->chat_response(shift) },
     model => $self->chat_model,
     messages => \@msgs,
-    max_tokens => $self->max_tokens,
+    max_tokens => $self->get_context_size,
+    $self->has_temperature ? ( temperature => $self->temperature ) : (),
     $system ? ( system => $system ) : (),
     %extra,
   );
@@ -101,7 +100,7 @@ Langertha::Engine::Anthropic - Anthropic API
 
 =head1 VERSION
 
-version 0.002
+version 0.003
 
 =head1 SYNOPSIS
 
@@ -110,7 +109,8 @@ version 0.002
   my $claude = Langertha::Engine::Anthropic->new(
     api_key => $ENV{ANTHROPIC_API_KEY},
     model => 'claude-3-5-sonnet-20240620',
-    max_tokens => 2048,
+    context_size => 2048,
+    temperature => 0.5,
   );
 
   print($claude->simple_chat('Generate Perl Moose classes to represent GeoJSON data types'));

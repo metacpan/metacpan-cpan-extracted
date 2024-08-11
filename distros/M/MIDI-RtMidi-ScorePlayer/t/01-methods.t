@@ -3,8 +3,8 @@ use strict;
 use warnings;
 
 use Test::More;
-use Test::Exception;
-use MIDI::Util qw(setup_score);
+# use Test::Exception;
+# use MIDI::Util qw(setup_score);
 
 use_ok 'MIDI::RtMidi::ScorePlayer';
 

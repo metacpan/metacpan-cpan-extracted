@@ -8,6 +8,10 @@ App::Greple::tee - module to replace matched text by the external command result
 
     greple -Mtee command -- ...
 
+=head1 VERSION
+
+Version 1.00
+
 =head1 DESCRIPTION
 
 Greple's B<-Mtee> module sends matched text part to the given filter
@@ -26,23 +30,19 @@ Actually this example itself is not so useful because B<greple> can do
 the same thing more effectively with B<--cm> option.
 
 By default, the command is executed as a single process, and all
-matched data is sent to it mixed together.  If the matched text does
-not end with newline, it is added before and removed after.  Data are
-mapped line by line, so the number of lines of input and output data
-must be identical.
+matched data is sent to the process mixed together.  If the matched
+text does not end with newline, it is added before sending and removed
+after receiving.  Input and output data are mapped line by line, so
+the number of lines of input and output must be identical.
 
 Using B<--discrete> option, individual command is called for each
-matched part.  You can tell the difference by following commands.
+matched text area.  You can tell the difference by following commands.
 
     greple -Mtee cat -n -- copyright LICENSE
     greple -Mtee cat -n -- copyright LICENSE --discrete
 
 Lines of input and output data do not have to be identical when used
 with B<--discrete> option.
-
-=head1 VERSION
-
-Version 0.9902
 
 =head1 OPTIONS
 
@@ -52,12 +52,25 @@ Version 0.9902
 
 Invoke new command individually for every matched part.
 
+=item B<--bulkmode>
+
+With the <--discrete> option, each command is executed on demand.  The
+<--bulkmode> option causes all conversions to be performed at once.
+
+=item B<--crmode>
+
+This option replaces all newline characters in the middle of each
+block with carriage return characters.  Carriage returns contained in
+the result of executing the command are reverted back to the newline
+character. Thus, blocks consisting of multiple lines can be processed
+in batches without using the B<--discrete> option.
+
 =item B<--fillup>
 
 Combine a sequence of non-blank lines into a single line before
 passing them to the filter command.  Newline characters between wide
-characters are deleted, and other newline characters are replaced with
-spaces.
+width characters are deleted, and other newline characters are
+replaced with spaces.
 
 =item B<--blocks>
 
@@ -126,10 +139,10 @@ Next command will find some indented part in LICENSE document.
       a) distribute a Standard Version of the executables and library files,
          together with instructions (in the manual page or equivalent) on where to
          get the Standard Version.
-    
+
       b) accompany the distribution with the machine-readable source of the Package
          with your modifications.
-    
+
 You can reformat this part by using B<tee> module with B<ansifold>
 command:
 
@@ -140,14 +153,15 @@ command:
          together with instructions (in the
          manual page or equivalent) on where
          to get the Standard Version.
-    
+
       b) accompany the distribution with the
          machine-readable source of the
          Package with your modifications.
 
-Using C<--discrete> option is time consuming.  So you can use
-C<--separate '\r'> option with C<ansifold> which produce single line
-using CR character instead of NL.
+The --discrete option will start multiple processes, so the process
+will take longer to execute.  So you can use C<--separate '\r'> option
+with C<ansifold> which produce single line using CR character instead
+of NL.
 
     greple -Mtee ansifold -rsw40 --prefix '     ' --separate '\r' --
 
@@ -158,19 +172,21 @@ Then convert CR char to NL after by L<tr(1)> command or some.
 =head1 EXAMPLE 3
 
 Consider a situation where you want to grep for strings from
-non-header lines. For example, you may want to search for images from
-the C<docker image ls> command, but leave the header line.  You can do
-it by following command.
+non-header lines. For example, you may want to search for Docker image
+names from the C<docker image ls> command, but leave the header line.
+You can do it by following command.
 
     greple -Mtee grep perl -- -Mline -L 2: --discrete --all
 
 Option C<-Mline -L 2:> retrieves the second to last lines and sends
-them to the C<grep perl> command. Option C<--discrete> is required,
-but this is called only once, so there is no performance drawback.
+them to the C<grep perl> command.  The option --discrete is required
+because the number of lines of input and output changes, but since the
+command is only executed once, there is no performance drawback.
 
-In this case, C<teip -l 2- -- grep> produces error because the number
-of lines in the output is less than input. However, result is quite
-satisfactory :)
+If you try to do the same thing with the B<teip> command,
+C<teip -l 2- -- grep> will give an error because the number of output
+lines is less than the number of input lines. However, there is no
+problem with the result obtained.
 
 =head1 INSTALL
 
@@ -192,7 +208,8 @@ L<App::Greple::xlate>
 
 =head1 BUGS
 
-The C<--fillup> option may not work correctly for Korean text.
+The C<--fillup> option will remove spaces between Hangul characters when 
+concatenating Korean text.
 
 =head1 AUTHOR
 
@@ -200,7 +217,7 @@ Kazumasa Utashiro
 
 =head1 LICENSE
 
-Copyright © 2023 Kazumasa Utashiro.
+Copyright © 2023-2024 Kazumasa Utashiro.
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.
@@ -209,7 +226,7 @@ it under the same terms as Perl itself.
 
 package App::Greple::tee;
 
-our $VERSION = "0.9902";
+our $VERSION = "1.00";
 
 use v5.14;
 use warnings;
@@ -225,6 +242,8 @@ our $discrete;
 our $fillup;
 our $debug;
 our $squeeze;
+our $bulkmode;
+our $crmode;
 
 my($mod, $argv);
 
@@ -255,7 +274,7 @@ sub fillup_paragraphs {
 sub call {
     my $data = shift;
     $command // return $data;
-    state $exec = App::cdif::Command->new;
+    my $exec = App::cdif::Command->new;
     if ($discrete and $fillup) {
 	fillup_paragraphs $data;
     }
@@ -300,7 +319,7 @@ sub postgrep {
 	      } $grep->result
 	    ] ];
     }
-    return if $discrete;
+    return if $discrete and not $bulkmode;
     @bundle = my @block = ();
     for my $r ($grep->result) {
 	my($b, @match) = @$r;
@@ -308,11 +327,26 @@ sub postgrep {
 	    push @block, $grep->cut(@$m);
 	}
     }
-    @bundle = bundle_call @block if @block;
+
+    if ($crmode) {
+	s/\n(?!\z)/\r/g for @block;
+    }
+
+    @bundle = do {
+	if ($discrete) {
+	    map { call $_ } @block;
+	} else {
+	    bundle_call @block;
+	}
+    } if @block;
+
+    if ($crmode) {
+	s/\r/\n/g for @bundle;
+    }
 }
 
 sub callback {
-    if ($discrete) {
+    if ($discrete and not $bulkmode) {
 	call { @_ }->{match};
     }
     else {
@@ -324,11 +358,13 @@ sub callback {
 
 __DATA__
 
-builtin --blocks    $blocks
-builtin --discrete! $discrete
-builtin --fillup!   $fillup
-builtin --debug     $debug
-builtin --squeeze   $squeeze
+builtin tee-debug $debug
+builtin blocks    $blocks
+builtin discrete! $discrete
+builtin bulkmode! $bulkmode
+builtin crmode!   $crmode
+builtin fillup!   $fillup
+builtin squeeze   $squeeze
 
 option default \
 	--postgrep &__PACKAGE__::postgrep \

@@ -6,6 +6,10 @@ App::Greple::tee - eşleşen metni harici komut sonucu ile değiştiren modül
 
     greple -Mtee command -- ...
 
+# VERSION
+
+Version 1.00
+
 # DESCRIPTION
 
 Greple'ın **-Mtee** modülü, eşleşen metin parçasını verilen filtre komutuna gönderir ve bunları komut sonucuyla değiştirir. Bu fikir **teip** adlı komuttan türetilmiştir. Kısmi verileri harici filtre komutuna atlamak gibidir.
@@ -16,18 +20,14 @@ Filtre komutu modül bildirimini (`-Mtee`) takip eder ve iki tire (`--`) ile son
 
 Yukarıdaki komut eşleşen tüm kelimeleri küçük harften büyük harfe dönüştürür. Aslında bu örneğin kendisi çok kullanışlı değildir çünkü **greple** aynı şeyi **--cm** seçeneği ile daha etkili bir şekilde yapabilir.
 
-Varsayılan olarak, komut tek bir işlem olarak yürütülür ve eşleşen tüm veriler karışık olarak gönderilir. Eşleşen metin satırsonu ile bitmiyorsa, önce eklenir ve sonra kaldırılır. Veriler satır satır eşlenir, bu nedenle girdi ve çıktı verilerinin satır sayısı aynı olmalıdır.
+Varsayılan olarak, komut tek bir süreç olarak yürütülür ve eşleşen tüm veriler sürece karışık olarak gönderilir. Eşleşen metin satırsonu ile bitmiyorsa, gönderilmeden önce eklenir ve alındıktan sonra kaldırılır. Girdi ve çıktı verileri satır satır eşleştirilir, bu nedenle girdi ve çıktı satırlarının sayısı aynı olmalıdır.
 
-**--discrete** seçeneği kullanıldığında, eşleşen her parça için ayrı bir komut çağrılır. Farkı aşağıdaki komutlarla anlayabilirsiniz.
+**--discrete** seçeneği kullanıldığında, eşleşen her metin alanı için ayrı bir komut çağrılır. Farkı aşağıdaki komutlarla anlayabilirsiniz.
 
     greple -Mtee cat -n -- copyright LICENSE
     greple -Mtee cat -n -- copyright LICENSE --discrete
 
 **--discrete** seçeneği kullanıldığında giriş ve çıkış verilerinin satırları aynı olmak zorunda değildir.
-
-# VERSION
-
-Version 0.9902
 
 # OPTIONS
 
@@ -35,9 +35,18 @@ Version 0.9902
 
     Eşleşen her parça için ayrı ayrı yeni komut çağırın.
 
+- **--bulkmode**
+
+    <--ayrık> seçeneği ile her komut isteğe bağlı olarak yürütülür. Bu durumda
+    <--bulkmode> option causes all conversions to be performed at once.
+
+- **--crmode**
+
+    Bu seçenek, her bloğun ortasındaki tüm satırsonu karakterlerini satırbaşı karakterleriyle değiştirir. Komutun çalıştırılması sonucunda bulunan satır başları yeni satır karakterine geri döndürülür. Böylece, birden fazla satırdan oluşan bloklar **--ayrık** seçeneği kullanılmadan toplu olarak işlenebilir.
+
 - **--fillup**
 
-    Bir dizi boş olmayan satırı filtre komutuna geçirmeden önce tek bir satırda birleştirir. Geniş karakterler arasındaki yeni satır karakterleri silinir ve diğer yeni satır karakterleri boşluklarla değiştirilir.
+    Bir dizi boş olmayan satırı filtre komutuna geçirmeden önce tek bir satırda birleştirin. Geniş karakterler arasındaki yeni satır karakterleri silinir ve diğer yeni satır karakterleri boşluklarla değiştirilir.
 
 - **--blocks**
 
@@ -88,10 +97,9 @@ Sonraki komut LICENSE belgesinde bazı girintili kısımlar bulacaktır.
       a) distribute a Standard Version of the executables and library files,
          together with instructions (in the manual page or equivalent) on where to
          get the Standard Version.
-    
+
       b) accompany the distribution with the machine-readable source of the Package
          with your modifications.
-    
 
 Bu kısmı **tee** modülünü **ansifold** komutu ile kullanarak yeniden biçimlendirebilirsiniz:
 
@@ -102,12 +110,12 @@ Bu kısmı **tee** modülünü **ansifold** komutu ile kullanarak yeniden biçim
          together with instructions (in the
          manual page or equivalent) on where
          to get the Standard Version.
-    
+
       b) accompany the distribution with the
          machine-readable source of the
          Package with your modifications.
 
-`--ayrık` seçeneğini kullanmak zaman alıcıdır. Bu nedenle, NL yerine CR karakteri kullanarak tek satır üreten `ansifold` ile `--separate '\r'` seçeneğini kullanabilirsiniz.
+Ayrık seçeneği birden fazla işlem başlatır, bu nedenle işlemin yürütülmesi daha uzun sürer. Bu yüzden NL yerine CR karakterini kullanarak tek satır üreten `ansifold` ile `--separate '\r'` seçeneğini kullanabilirsiniz.
 
     greple -Mtee ansifold -rsw40 --prefix '     ' --separate '\r' --
 
@@ -117,13 +125,13 @@ Daha sonra CR karakterini [tr(1)](http://man.he.net/man1/tr) komutu veya başka 
 
 # EXAMPLE 3
 
-Başlık olmayan satırlardaki dizeler için grep yapmak istediğiniz bir durumu düşünün. Örneğin, `docker image ls` komutundaki resimleri aramak, ancak başlık satırını bırakmak isteyebilirsiniz. Bunu aşağıdaki komutla yapabilirsiniz.
+Başlık olmayan satırlardaki dizeler için grep yapmak istediğiniz bir durumu düşünün. Örneğin, `docker image ls` komutundan Docker görüntü adlarını aramak, ancak başlık satırını bırakmak isteyebilirsiniz. Bunu aşağıdaki komutla yapabilirsiniz.
 
     greple -Mtee grep perl -- -Mline -L 2: --discrete --all
 
-`-Mline -L 2:` seçeneği sondan ikinci satırları alır ve bunları `grep perl` komutuna gönderir. `--discrete` seçeneği gereklidir, ancak bu yalnızca bir kez çağrılır, bu nedenle performans dezavantajı yoktur.
+`-Mline -L 2:` seçeneği sondan ikinci satırları alır ve bunları `grep perl` komutuna gönderir. Girdi ve çıktı satırlarının sayısı değiştiği için --discrete seçeneği gereklidir, ancak komut yalnızca bir kez çalıştırıldığı için performans açısından bir dezavantajı yoktur.
 
-Bu durumda, `teip -l 2- -- grep` hata üretir çünkü çıktıdaki satır sayısı girdiden azdır. Ancak sonuç oldukça tatmin edicidir :)
+Aynı şeyi **teip** komutuyla yapmaya çalışırsanız, `teip -l 2- -- grep` hata verecektir çünkü çıktı satırlarının sayısı girdi satırlarının sayısından azdır. Ancak elde edilen sonuçta bir sorun yoktur.
 
 # INSTALL
 
@@ -145,7 +153,7 @@ Bu durumda, `teip -l 2- -- grep` hata üretir çünkü çıktıdaki satır sayı
 
 # BUGS
 
-`--fillup` seçeneği Korece metin için doğru çalışmayabilir.
+`--fillup` seçeneği Korece metni birleştirirken Hangul karakterleri arasındaki boşlukları kaldıracaktır.
 
 # AUTHOR
 
@@ -153,7 +161,7 @@ Kazumasa Utashiro
 
 # LICENSE
 
-Copyright © 2023 Kazumasa Utashiro.
+Copyright © 2023-2024 Kazumasa Utashiro.
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.

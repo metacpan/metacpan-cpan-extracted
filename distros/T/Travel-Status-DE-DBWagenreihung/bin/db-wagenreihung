@@ -4,7 +4,7 @@ use warnings;
 use 5.020;
 use utf8;
 
-our $VERSION = '0.16';
+our $VERSION = '0.17';
 
 use Getopt::Long;
 use List::Util qw(min);
@@ -151,16 +151,12 @@ print $wr->direction == 100 ? '>' : '<';
 print "\n\n";
 
 for my $group ( $wr->groups ) {
-	if ( $group->has_sectors ) {
-		printf( "%s (%s)\n",
-			$group->description || 'Zug',
-			join( q{}, $group->sectors ) );
-	}
-	else {
-		say $group->description || 'Zug';
-	}
+	printf( "%s%s%s\n",
+		$group->description || 'Zug',
+		$group->designation ? ' „' . $group->designation . '“'          : q{},
+		$group->has_sectors ? ' (' . join( q{}, $group->sectors ) . ')' : q{} );
 	printf( "%s %s  → %s\n\n",
-		$wr->train_type, $group->train_no, $group->destination );
+		$group->train_type, $group->train_no, $group->destination );
 
 	for my $wagon ( $group->carriages ) {
 		printf(
@@ -188,7 +184,7 @@ B<db-wagenreihung> I<station> I<train-number>
 
 =head1 VERSION
 
-version 0.16
+version 0.17
 
 This is beta software: API and output format may change without notice.
 

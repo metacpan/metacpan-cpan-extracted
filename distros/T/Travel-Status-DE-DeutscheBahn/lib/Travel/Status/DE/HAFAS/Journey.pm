@@ -11,7 +11,7 @@ use DateTime::Format::Strptime;
 use List::Util qw(any uniq);
 use Travel::Status::DE::HAFAS::Stop;
 
-our $VERSION = '6.03';
+our $VERSION = '6.04';
 
 Travel::Status::DE::HAFAS::Journey->mk_ro_accessors(
 	qw(datetime sched_datetime rt_datetime tz_offset
@@ -66,8 +66,7 @@ sub new {
 		my ( $date_ref, $parse_fmt );
 		if ( $jid =~ /#/ ) {
 
-			# ÖBB Journey ID - technically we ought to use Europe/Vienna tz
-			#  but let's not get into that...
+			# modern trip ID, used e.g. by DB and ÖBB
 			$date_ref  = ( split( /#/, $jid ) )[12];
 			$parse_fmt = '%d%m%y';
 			if ( length($date_ref) < 5 ) {
@@ -80,7 +79,7 @@ sub new {
 			}
 		}
 		else {
-			# DB Journey ID
+			# old (legacy?) trip ID
 			$date_ref  = ( split( qr{[|]}, $jid ) )[4];
 			$parse_fmt = '%d%m%Y';
 			if ( length($date_ref) < 7 ) {
@@ -159,7 +158,7 @@ sub new {
 		}
 		$ref->{is_additional} = $journey->{stbStop}{isAdd};
 	}
-	else {
+	elsif ( $stops[0]{loc} ) {
 		$ref->{route_start} = $stops[0]{loc}->name;
 	}
 
@@ -222,7 +221,16 @@ sub new {
 		my %tco;
 		for my $tco_id ( @{ $journey->{stbStop}{dTrnCmpSX}{tcocX} // [] } ) {
 			my $tco_kv = $tcocL[$tco_id];
-			$tco{ $tco_kv->{c} } = $tco_kv->{r};
+
+			# BVG has rRT (real-time?) and r (prognosed?); others only have r
+			my $load = $tco_kv->{rRT} // $tco_kv->{r};
+
+			# BVG uses 11 .. 13 rather than 1 .. 4
+			if ( defined $load and $load > 10 ) {
+				$load -= 10;
+			}
+
+			$tco{ $tco_kv->{c} } = $load;
 		}
 		if (%tco) {
 			$ref->{load} = \%tco;
@@ -429,7 +437,7 @@ journey received by Travel::Status::DE::HAFAS
 
 =head1 VERSION
 
-version 6.03
+version 6.04
 
 =head1 DESCRIPTION
 

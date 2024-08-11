@@ -1,5 +1,5 @@
 package ExtUtils::Builder::AutoDetect::C;
-$ExtUtils::Builder::AutoDetect::C::VERSION = '0.019';
+$ExtUtils::Builder::AutoDetect::C::VERSION = '0.020';
 use strict;
 use warnings;
 
@@ -86,7 +86,7 @@ sub _unix_flags {
 	my %ldflags = map { ($_ => 1) } _split_conf($opts->{config}, 'ldflags');
 	my @lddlflags = grep { not $ldflags{$_} } split_like_shell($lddlflags);
 	my @cc = _split_conf($opts->{config}, 'ccdlflags');
-	return (cc => \@cc, ldd_flags => \@lddlflags )
+	return (cc => \@cc, lddlflags => \@lddlflags )
 }
 
 sub _get_linker {
@@ -97,11 +97,11 @@ sub _get_linker {
 	my $ld = $opts->{config}->get('ld');
 	my ($module, $link, %opts) =
 		$args{type} eq 'static-library' ? ('Ar', $opts->{config}->get('ar')) :
-		$os eq 'darwin' ? ('Mach::GCC', $cc) :
+		$os eq 'darwin' ? ('Mach::GCC', $ld) :
 		_is_gcc($opts->{config}, $ld, $opts) ?
-		$os eq 'MSWin32' ? ('PE::GCC', $cc) : ('ELF::GCC', $cc) :
+		$os eq 'MSWin32' ? ('PE::GCC', $cc) : ('ELF::GCC', $ld) :
 		$os eq 'aix' ? ('XCOFF', $cc) :
-		is_os_type('Unix', $os) ? ('ELF', $cc, $self->_unix_flags($opts)) :
+		is_os_type('Unix', $os) ? ('ELF', $ld, $self->_unix_flags($opts)) :
 		$os eq 'MSWin32' ? ('PE::MSVC', $ld) :
 		croak 'Linking is not supported yet on your platform';
 	return ("Linker::$module", ld => $link, %opts, %args);
@@ -193,7 +193,7 @@ ExtUtils::Builder::AutoDetect::C - compiler configuration, derived from perl's c
 
 =head1 VERSION
 
-version 0.019
+version 0.020
 
 =head1 SYNOPSIS
 

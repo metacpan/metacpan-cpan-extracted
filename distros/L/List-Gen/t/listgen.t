@@ -4,6 +4,9 @@ use warnings;
 $|=1;
 use Scalar::Util 'weaken';
 use Test::More tests => 1153;
+use FindBin;
+use Cwd;
+
 my $srand;
 BEGIN {
     my $max = 2**16;
@@ -495,18 +498,23 @@ t 'glob: early exit',
        is_deeply => \@vals, [map $_*2 => 0 .. 50]
    };
 
-t 'glob: <*.t>',
-   is_deeply => [sort <*.t>], do {
-       opendir my $dir, '.';
-       [sort grep /\.t$/, readdir $dir]
-   };
+   {
+    my $cwd = Cwd::cwd;
+    chdir($FindBin::RealBin);
+    t 'glob: <*.t>',
+       is_deeply => [sort <*.t>], do {
+           opendir my $dir, '.';
+           [sort grep /\.t$/, readdir $dir]
+       };
 
-t 'glob: <../*>',
-   is_deeply => [sort <../*>], do {
-        my $path = '../'; #'
-       opendir my($dir), $path or die $!;
-       [sort map $path.$_, grep !/^\.+/, readdir $dir]
-   };
+    t 'glob: <../*>',
+       is_deeply => [sort <../*>], do {
+            my $path = '../'; #'
+           opendir my($dir), $path or die $!;
+           [sort map $path.$_, grep !/^\.+/, readdir $dir]
+       };
+    chdir($cwd);
+}
 
 t 'glob: <{a,b}{1,2,3}>',
     is => join(' ' => <{a,b}{1,2,3}>), 'a1 a2 a3 b1 b2 b3';
@@ -1966,9 +1974,9 @@ t 'cycle',
 t '->pick',
     is => do {$srand->(999); <1..10>->pick,          '2'},
     is => do {$srand->(999); <1..10>->pick(1),       '2'},
-    is => do {$srand->(999); <1..10>->pick(3)->str,  '2 3 10'},
-    is => do {$srand->(999); <1..10>->pick(10)->str, '2 3 10 9 8 1 4 7 6 5'},
-    is => do {$srand->(999); <1..7000>->pick(1000)->sort('<=>')->take(5)->str, '13 14 16 17 22'};
+    is => do {$srand->(999); <1..10>->pick(3)->str,  '2 10 8'},
+    is => do {$srand->(999); <1..10>->pick(10)->str, '2 10 8 7 5 1 6 3 9 4'},
+    is => do {$srand->(999); <1..7000>->pick(1000)->sort('<=>')->take(5)->str, '11 13 15 16 22'};
 
 t '->perl',
     is => list(<1..>, <2..>, <3..>)->perl(3),        '[[1, 2, 3], [2, 3, 4], [3, 4, 5]]',

@@ -58,7 +58,7 @@
          "web" : "https://github.com/Getty/langertha"
       }
    },
-   "version" : "0.002",
+   "version" : "0.003",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.036000"
@@ -243,9 +243,9 @@
                         "version" : "4.020"
                      },
                      {
-                        "class" : "Pod::Weaver::Plugin::Encoding",
-                        "name" : "@GETTY/Encoding",
-                        "version" : "0.03"
+                        "class" : "Pod::Weaver::Plugin::SingleEncoding",
+                        "name" : "@GETTY/SingleEncoding",
+                        "version" : "4.020"
                      },
                      {
                         "class" : "Pod::Weaver::Section::Name",
@@ -394,7 +394,7 @@
                   "branch" : null,
                   "changelog" : "Changes",
                   "signed" : 0,
-                  "tag" : "0.002",
+                  "tag" : "0.003",
                   "tag_format" : "%v",
                   "tag_message" : "v%V"
                },

@@ -7,6 +7,10 @@ App::Greple::tee - module to replace matched text by the external command result
 
     greple -Mtee command -- ...
 
+# VERSION
+
+Version 1.00
+
 # DESCRIPTION
 
 Greple's **-Mtee** module sends matched text part to the given filter
@@ -25,13 +29,13 @@ Actually this example itself is not so useful because **greple** can do
 the same thing more effectively with **--cm** option.
 
 By default, the command is executed as a single process, and all
-matched data is sent to it mixed together.  If the matched text does
-not end with newline, it is added before and removed after.  Data are
-mapped line by line, so the number of lines of input and output data
-must be identical.
+matched data is sent to the process mixed together.  If the matched
+text does not end with newline, it is added before sending and removed
+after receiving.  Input and output data are mapped line by line, so
+the number of lines of input and output must be identical.
 
 Using **--discrete** option, individual command is called for each
-matched part.  You can tell the difference by following commands.
+matched text area.  You can tell the difference by following commands.
 
     greple -Mtee cat -n -- copyright LICENSE
     greple -Mtee cat -n -- copyright LICENSE --discrete
@@ -39,22 +43,31 @@ matched part.  You can tell the difference by following commands.
 Lines of input and output data do not have to be identical when used
 with **--discrete** option.
 
-# VERSION
-
-Version 0.9902
-
 # OPTIONS
 
 - **--discrete**
 
     Invoke new command individually for every matched part.
 
+- **--bulkmode**
+
+    With the <--discrete> option, each command is executed on demand.  The
+    <--bulkmode> option causes all conversions to be performed at once.
+
+- **--crmode**
+
+    This option replaces all newline characters in the middle of each
+    block with carriage return characters.  Carriage returns contained in
+    the result of executing the command are reverted back to the newline
+    character. Thus, blocks consisting of multiple lines can be processed
+    in batches without using the **--discrete** option.
+
 - **--fillup**
 
     Combine a sequence of non-blank lines into a single line before
     passing them to the filter command.  Newline characters between wide
-    characters are deleted, and other newline characters are replaced with
-    spaces.
+    width characters are deleted, and other newline characters are
+    replaced with spaces.
 
 - **--blocks**
 
@@ -121,10 +134,9 @@ Next command will find some indented part in LICENSE document.
       a) distribute a Standard Version of the executables and library files,
          together with instructions (in the manual page or equivalent) on where to
          get the Standard Version.
-    
+
       b) accompany the distribution with the machine-readable source of the Package
          with your modifications.
-    
 
 You can reformat this part by using **tee** module with **ansifold**
 command:
@@ -136,14 +148,15 @@ command:
          together with instructions (in the
          manual page or equivalent) on where
          to get the Standard Version.
-    
+
       b) accompany the distribution with the
          machine-readable source of the
          Package with your modifications.
 
-Using `--discrete` option is time consuming.  So you can use
-`--separate '\r'` option with `ansifold` which produce single line
-using CR character instead of NL.
+The --discrete option will start multiple processes, so the process
+will take longer to execute.  So you can use `--separate '\r'` option
+with `ansifold` which produce single line using CR character instead
+of NL.
 
     greple -Mtee ansifold -rsw40 --prefix '     ' --separate '\r' --
 
@@ -154,19 +167,21 @@ Then convert CR char to NL after by [tr(1)](http://man.he.net/man1/tr) command o
 # EXAMPLE 3
 
 Consider a situation where you want to grep for strings from
-non-header lines. For example, you may want to search for images from
-the `docker image ls` command, but leave the header line.  You can do
-it by following command.
+non-header lines. For example, you may want to search for Docker image
+names from the `docker image ls` command, but leave the header line.
+You can do it by following command.
 
     greple -Mtee grep perl -- -Mline -L 2: --discrete --all
 
 Option `-Mline -L 2:` retrieves the second to last lines and sends
-them to the `grep perl` command. Option `--discrete` is required,
-but this is called only once, so there is no performance drawback.
+them to the `grep perl` command.  The option --discrete is required
+because the number of lines of input and output changes, but since the
+command is only executed once, there is no performance drawback.
 
-In this case, `teip -l 2- -- grep` produces error because the number
-of lines in the output is less than input. However, result is quite
-satisfactory :)
+If you try to do the same thing with the **teip** command,
+`teip -l 2- -- grep` will give an error because the number of output
+lines is less than the number of input lines. However, there is no
+problem with the result obtained.
 
 # INSTALL
 
@@ -188,7 +203,8 @@ satisfactory :)
 
 # BUGS
 
-The `--fillup` option may not work correctly for Korean text.
+The `--fillup` option will remove spaces between Hangul characters when 
+concatenating Korean text.
 
 # AUTHOR
 
@@ -196,7 +212,7 @@ Kazumasa Utashiro
 
 # LICENSE
 
-Copyright © 2023 Kazumasa Utashiro.
+Copyright © 2023-2024 Kazumasa Utashiro.
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.

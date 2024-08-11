@@ -1,5 +1,5 @@
 package ExtUtils::Builder::Linker::COFF;
-$ExtUtils::Builder::Linker::COFF::VERSION = '0.019';
+$ExtUtils::Builder::Linker::COFF::VERSION = '0.020';
 use strict;
 use warnings;
 
@@ -39,7 +39,7 @@ ExtUtils::Builder::Linker::COFF
 
 =head1 VERSION
 
-version 0.019
+version 0.020
 
 =head1 AUTHOR
 

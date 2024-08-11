@@ -6,6 +6,10 @@ App::Greple::tee - module om gematchte tekst te vervangen door het externe opdra
 
     greple -Mtee command -- ...
 
+# VERSION
+
+Version 1.00
+
 # DESCRIPTION
 
 Greple's **-Mtee** module stuurt gematchte tekstdelen naar het gegeven filtercommando, en vervangt ze door het resultaat van het commando. Het idee is afgeleid van het commando **teip**. Het is als het omzeilen van gedeeltelijke gegevens naar het externe filtercommando.
@@ -16,18 +20,14 @@ Het filtercommando volgt op de moduleverklaring (`-Mtee`) en eindigt met twee st
 
 Bovenstaand commando zet alle overeenkomende woorden om van kleine letters naar hoofdletters. Eigenlijk is dit voorbeeld zelf niet zo nuttig omdat **greple** hetzelfde effectiever kan doen met de optie **--cm**.
 
-Standaard wordt het commando uitgevoerd als een enkel proces, en alle gematchte gegevens worden erdoor gemengd. Als de gematchte tekst niet eindigt met een newline, wordt hij ervoor toegevoegd en erna verwijderd. De gegevens worden regel voor regel in kaart gebracht, dus het aantal regels invoer- en uitvoergegevens moet identiek zijn.
+Standaard wordt de opdracht als een enkel proces uitgevoerd en worden alle gematchte gegevens door elkaar naar het proces gestuurd. Als de gematchte tekst niet eindigt met een newline, wordt deze toegevoegd voor het verzenden en verwijderd na het ontvangen. Invoer- en uitvoergegevens worden regel voor regel in kaart gebracht, dus het aantal regels invoer en uitvoer moet identiek zijn.
 
-Met de optie **--discreet** wordt voor elk gematcht onderdeel een afzonderlijk commando opgeroepen. U kunt het verschil zien aan de hand van de volgende commando's.
+Met de optie **--discrete** wordt voor elk gematcht tekstgebied een afzonderlijk commando aangeroepen. Je kunt het verschil zien aan de hand van de volgende opdrachten.
 
     greple -Mtee cat -n -- copyright LICENSE
     greple -Mtee cat -n -- copyright LICENSE --discrete
 
 Bij gebruik van de optie **--discreet** hoeven de regels invoer- en uitvoergegevens niet identiek te zijn.
-
-# VERSION
-
-Version 0.9902
 
 # OPTIONS
 
@@ -35,9 +35,18 @@ Version 0.9902
 
     Roep nieuw commando individueel op voor elk onderdeel.
 
+- **--bulkmode**
+
+    Met de optie <--discrete> wordt elk commando op verzoek uitgevoerd. De
+    <--bulkmode> option causes all conversions to be performed at once.
+
+- **--crmode**
+
+    Deze optie vervangt alle newline-tekens in het midden van elk blok door carriage return-tekens. Carriage returns in het resultaat van het uitvoeren van de opdracht worden teruggezet naar het newline karakter. Zo kunnen blokken die uit meerdere regels bestaan in batches worden verwerkt zonder de optie **--discrete** te gebruiken.
+
 - **--fillup**
 
-    Combineer een reeks niet lege regels tot één regel voordat je ze doorgeeft aan de filteropdracht. Newline-tekens tussen brede tekens worden verwijderd en andere newline-tekens worden vervangen door spaties.
+    Combineer een reeks niet-blanke regels tot één regel voordat je ze doorgeeft aan de filteropdracht. Newline-tekens tussen tekens met een grote breedte worden verwijderd en andere newline-tekens worden vervangen door spaties.
 
 - **--blocks**
 
@@ -88,10 +97,9 @@ Het volgende commando vindt een ingesprongen deel in het LICENSE document.
       a) distribute a Standard Version of the executables and library files,
          together with instructions (in the manual page or equivalent) on where to
          get the Standard Version.
-    
+
       b) accompany the distribution with the machine-readable source of the Package
          with your modifications.
-    
 
 U kunt dit deel opnieuw formatteren door de module **tee** te gebruiken met het commando **ansifold**:
 
@@ -102,12 +110,12 @@ U kunt dit deel opnieuw formatteren door de module **tee** te gebruiken met het 
          together with instructions (in the
          manual page or equivalent) on where
          to get the Standard Version.
-    
+
       b) accompany the distribution with the
          machine-readable source of the
          Package with your modifications.
 
-Het gebruik van de optie `--discrete` is tijdrovend. Dus je kunt de optie `--separate '\r'` gebruiken met `ansifold` die een enkele regel produceert met CR-karakters in plaats van NL.
+De --discrete optie zal meerdere processen starten, dus het proces zal langer duren om uit te voeren. Je kunt dus de optie `--separate '\r'` gebruiken met `ansifold`, die een enkele regel produceert met het karakter CR in plaats van NL.
 
     greple -Mtee ansifold -rsw40 --prefix '     ' --separate '\r' --
 
@@ -117,13 +125,13 @@ Converteer vervolgens CR naar NL met [tr(1)](http://man.he.net/man1/tr) of iets 
 
 # EXAMPLE 3
 
-Overweeg een situatie waarin je wilt grepen naar tekenreeksen buiten de koptekstregels. Bijvoorbeeld, je wilt zoeken naar afbeeldingen van het `docker image ls` commando, maar laat de header regel staan. Je kunt dit doen met het volgende commando.
+Denk aan een situatie waarin je wilt grepen naar tekenreeksen buiten de kopregels. Bijvoorbeeld, je wilt zoeken naar Docker image namen van het `docker image ls` commando, maar laat de header regel staan. Je kunt dit doen met het volgende commando.
 
     greple -Mtee grep perl -- -Mline -L 2: --discrete --all
 
-Optie `-Mline -L 2:` haalt de voorlaatste regels op en stuurt ze naar het commando `grep perl`. Optie `--discrete` is vereist, maar deze wordt maar één keer aangeroepen, dus er is geen prestatieverlies.
+De optie `-Mline -L 2:` haalt de voorlaatste regels op en stuurt ze naar het commando `grep perl`. De optie --discrete is nodig omdat het aantal regels van invoer en uitvoer verandert, maar omdat het commando maar één keer wordt uitgevoerd, is er geen nadeel voor de prestaties.
 
-In dit geval geeft `teip -l 2- -- grep` een foutmelding omdat het aantal regels in de uitvoer minder is dan de invoer. Het resultaat is echter heel bevredigend :)
+Als je hetzelfde probeert te doen met het **teip** commando, zal `teip -l 2- -- grep` een foutmelding geven omdat het aantal uitvoerregels minder is dan het aantal invoerregels. Er is echter geen probleem met het verkregen resultaat.
 
 # INSTALL
 
@@ -145,7 +153,7 @@ In dit geval geeft `teip -l 2- -- grep` een foutmelding omdat het aantal regels 
 
 # BUGS
 
-De optie `-fillup` werkt mogelijk niet correct voor Koreaanse tekst.
+De optie `--fillup` verwijdert spaties tussen Hangul-tekens bij het aaneenschakelen van Koreaanse tekst.
 
 # AUTHOR
 
@@ -153,7 +161,7 @@ Kazumasa Utashiro
 
 # LICENSE
 
-Copyright © 2023 Kazumasa Utashiro.
+Copyright © 2023-2024 Kazumasa Utashiro.
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.

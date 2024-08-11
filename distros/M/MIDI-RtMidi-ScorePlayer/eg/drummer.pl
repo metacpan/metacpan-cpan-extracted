@@ -6,6 +6,7 @@ use warnings;
 # Use The Source, Luke.
 # Patches welcome!
 
+use Data::Dumper::Compact qw(ddc);
 use IO::Async::Loop ();
 use MIDI::Drummer::Tiny ();
 use MIDI::RtMidi::ScorePlayer ();
@@ -16,7 +17,9 @@ use Time::HiRes qw(time);
 my $verbose = shift || 0;
 
 my %common;
+my @all_parts;
 my @parts;
+my @sections;
 my ($bpm, $dura, $mode, $repeats) = (100, 'qn', 'parallel', 1);
 print "State: BPM=$bpm, Duration=$dura, Mode=$mode, Repeats=$repeats\n";
 my $loop = IO::Async::Loop->new;
@@ -38,32 +41,40 @@ my $tka  = Term::TermKey::Async->new(
         file => 'rt-drummer.mid',
       );
       $common{drummer} = $d;
-      $common{parts}   = \@parts;
-      my $parts = [];
-      if ($mode eq 'serial') {
-        $parts = [ sub {
-          my (%args) = @_;
-          return sub { $args{$_}->(%args) for $args{parts}->@* };
-        } ];
+      $common{parts}   = \@all_parts;
+warn __PACKAGE__,' L',__LINE__,' ',ddc(\@all_parts, {max_width=>128});
+      my %by_name;
+      for my $part (@all_parts) {
+        # my ($name) = split /\./, $part;
+warn __PACKAGE__,' L',__LINE__,' ',,"$part: $common{$part}\n";
+        $by_name{$part} = $common{$part};
       }
-      elsif ($mode eq 'parallel') {
-        my %by_name;
-        for my $part (@parts) {
-          my ($name) = split /\./, $part;
-          push $by_name{$name}->@*, $common{$part};
+warn __PACKAGE__,' L',__LINE__,' ',ddc(\%by_name, {max_width=>128});
+      my $parts = [];
+      for my $section (@sections) {
+        if (ref($section) eq 'ARRAY') {
+          my @temp;
+          for my $s (@$section) {
+            push @temp, sub {
+              my (%args) = @_;
+              return sub { $by_name{$s}->(%args) };
+            };
+          }
+          push @$parts, \@temp;
         }
-        for my $part (keys %by_name) {
-          my $p = sub {
+        else {
+warn __PACKAGE__,' L',__LINE__,' ',,"$section\n";
+warn __PACKAGE__,' L',__LINE__,' ',ref($by_name{$section}),"\n";
+          push @$parts, sub {
             my (%args) = @_;
-            return sub { $_->(%args) for $by_name{$part}->@* };
+            return sub { $by_name{$section}->(%args) };
           };
-          push @$parts, $p;
         }
       }
       MIDI::RtMidi::ScorePlayer->new(
         score    => $d->score,
         common   => \%common,
-        parts    => [ $parts ],
+        parts    => $parts,
         sleep    => 0,
         infinite => 0,
         # dump     => 1,
@@ -73,14 +84,27 @@ my $tka  = Term::TermKey::Async->new(
     elsif ($pressed eq 'r') {
       print "Reset state\n" if $verbose;
       ($bpm, $dura, $mode, $repeats) = (100, 'qn', 'serial', 1);
-      %common = ();
-      @parts  = ();
+      %common    = ();
+      @all_parts = ();
+      @parts     = ();
+      @sections  = ();
     }
     # WRITE SCORE TO FILE
     elsif ($pressed eq 'w') {
       my $file = $common{drummer}->file;
       $common{drummer}->write;
       print "Wrote to $file\n" if $verbose;
+    }
+    # CUT SECTION
+    elsif ($pressed eq 'n') {
+      if (@parts > 1) {
+          push @sections, [ @parts ];
+      }
+      else {
+          push @sections, @parts;
+      }
+      @parts = ();
+      print "Section added\n" if $verbose;
     }
     # SERIAL MODE
     elsif ($pressed eq 'm') {
@@ -211,7 +235,9 @@ my $tka  = Term::TermKey::Async->new(
       $common{ "$name.duration.$id" } = $dura;
       $common{ "$name.repeats.$id" } = $repeats;
       $common{ "$name.$id" } = $part;
+      $common{'tick.durations'} = [ ($common{ "$name.duration.$id" }) x 2 ];
       push @parts, "$name.$id";
+      push @all_parts, "$name.$id";
       snippit($part, \%common);
     }
     # BASIC BEAT REST
@@ -229,7 +255,9 @@ my $tka  = Term::TermKey::Async->new(
       $common{ "$name.duration.$id" } = $dura;
       $common{ "$name.repeats.$id" } = $repeats;
       $common{ "$name.$id" } = $part;
+      $common{'tick.durations'} = [ ($common{ "$name.duration.$id" }) x 2 ];
       push @parts, "$name.$id";
+      push @all_parts, "$name.$id";
     }
     # DOUBLE KICK BEAT
     elsif ($pressed eq 'X') {
@@ -249,7 +277,9 @@ my $tka  = Term::TermKey::Async->new(
       $common{ "$name.duration.$id" } = $dura;
       $common{ "$name.repeats.$id" } = $repeats;
       $common{ "$name.$id" } = $part;
+      $common{'tick.durations'} = [ ($common{ "$name.duration.$id" }) x 2 ];
       push @parts, "$name.$id";
+      push @all_parts, "$name.$id";
       snippit($part, \%common);
     }
     # FINISH
@@ -289,7 +319,9 @@ sub play_patch {
   $common{ "$name.duration.$id" } = $dura;
   $common{ "$name.repeats.$id" } = $repeats;
   $common{ "$name.$id" } = $part;
+  $common{'tick.durations'} = [ ($common{ "$name.duration.$id" }) x $common{ "$name.repeats.$id" } ];
   push @parts, "$name.$id";
+  push @all_parts, "$name.$id";
   snippit($part, \%common);
 }
 
@@ -305,5 +337,7 @@ sub rest_patch {
   $common{ "$name.duration.$id" } = $dura;
   $common{ "$name.repeats.$id" } = $repeats;
   $common{ "$name.$id" } = $part;
+  $common{'tick.durations'} = [ ($common{ "$name.duration.$id" }) x $common{ "$name.repeats.$id" } ];
   push @parts, "$name.$id";
+  push @all_parts, "$name.$id";
 }

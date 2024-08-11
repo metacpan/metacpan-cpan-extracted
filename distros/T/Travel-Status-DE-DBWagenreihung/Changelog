@@ -1,3 +1,8 @@
+Travel::Status::DE::DBWagenreihung 0.17 - Sat Aug 10 2024
+
+    * Group: Fix ->name accessor (thanks to Caß Dingenskirchen)
+    * Group: Add ->designation accessor (data courtesy of bahn.expert)
+
 Travel::Status::DE::DBWagenreihung 0.16 - Wed Jul 31 2024
 
     * Carriage: (re-)add amenity and first/second class accessors

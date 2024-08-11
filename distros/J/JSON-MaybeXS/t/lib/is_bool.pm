@@ -30,12 +30,14 @@ SKIP: {
   test_is_bool(!!1, 'native boolean true is a bool');
 }
 
+my $zero = 0;
+test_is_bool(bless(\$zero, $_), "$_ object is a boolean") foreach qw(
+    JSON::PP::Boolean
+    Cpanel::JSON::XS::Boolean
+    JSON::XS::Boolean
+  );
+
 test_isnt_bool(bless({}, 'Local::Foo'), 'other blessed objects are not booleans');
-TODO: {
-  local $TODO = 'Scalar::Util::blessed does not yet return a native bool';
-    # ... if !eval { Scalar::Util->VERSION(<fixed version>) };
-  test_is_bool(Scalar::Util::blessed('hi'), 'blessed() returns a bool');
-}
 
 my $data = JSON::MaybeXS->new->decode('{"foo": true, "bar": false, "baz": 1}');
 diag 'true is: ', explain $data->{foo};
@@ -69,12 +71,10 @@ is(
     JSON() . ': false method encodes as correct boolean',
 );
 
-if ("$]" >= 5.036) {
+SKIP: {
+  skip ('these tests are only valid for perl 5.36+', 2) if "$]" < 5.036;
   test_is_bool(!!0, 'is_bool recognizes new stablebool false');
   test_is_bool(!!1, 'is_bool recognizes new stablebool true');
-}
-else {
-  diag 'tests for 5.36+ are skipped';
 }
 
 test_isnt_bool(0, 'numeric 0 is not a bool');

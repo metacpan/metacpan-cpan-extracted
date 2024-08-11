@@ -1,3 +1,7 @@
+0.14 2024-08-10T23:13:54+02:00
+ - Add deprecated rank to deprecated values.
+ - Fix deprecated value.
+
 0.13 2024-07-05T00:26:05+02:00
  - Add look_for_external_id() method to Wikidata.
  - Rename internal subroutine _oclc() to _lccn().

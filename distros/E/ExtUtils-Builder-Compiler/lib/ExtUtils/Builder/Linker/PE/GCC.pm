@@ -1,5 +1,5 @@
 package ExtUtils::Builder::Linker::PE::GCC;
-$ExtUtils::Builder::Linker::PE::GCC::VERSION = '0.019';
+$ExtUtils::Builder::Linker::PE::GCC::VERSION = '0.020';
 use strict;
 use warnings;
 
@@ -52,7 +52,7 @@ ExtUtils::Builder::Linker::PE::GCC
 
 =head1 VERSION
 
-version 0.019
+version 0.020
 
 =head1 AUTHOR
 

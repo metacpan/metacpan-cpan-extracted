@@ -87,7 +87,7 @@ package List::Gen;
 
     my $MAX_IDX = eval {require POSIX; POSIX::DBL_MAX()} || 2**53 - 1;
 
-    our $VERSION = '0.975';
+    our $VERSION = '0.976';
 
 =head1 NAME
 
@@ -95,7 +95,7 @@ List::Gen - provides functions for generating lists
 
 =head1 VERSION
 
-version 0.975
+version 0.976
 
 =head1 SYNOPSIS
 
@@ -2069,22 +2069,22 @@ support other versions are welcome.
             $x
         }})
     }
+
     sub shuffle {
         my $src   = shift;
         my $size  = $src->size;
         my $fetch = tied(@$src)->can('FETCH');
-        my (%seen, %map);
+        my (%ovly, %map);
         $src->tail_size($size) if $src->is_mutable;
+        $size = $MAX_IDX if $size >= 9**9**9;
         &List::Gen::gen(sub {
             return $fetch->(undef, $map{$_}) if exists $map{$_};
-            while (keys %seen < $size) {
-                my $i = int rand ($size >= 9**9**9 ? $MAX_IDX : $size);
-                my $start = $i;
-                $i++ while $i < $size-1 and $seen{$i};
-                $i = $start              if $seen{$i};
-                $i-- while $i > 0       and $seen{$i};
-                $seen{$i}++ or return $fetch->(undef, $map{$_} = $i)
-            }
+            my $rand = int rand $size;
+            $map{$_} = $ovly{$rand} // $rand;
+            $ovly{$rand} = $ovly{$size - 1} // ($size - 1);
+            delete $ovly{$size - 1};
+            $size--;
+            return $fetch->(undef, $map{$_});
         })->size_from($src)
     }
 
@@ -2612,7 +2612,6 @@ support other versions are welcome.
         sub DESTROY {$_[0]->threads_stop if delete $threaded{$_[0]}}
 
         sub threads_start {
-            $] < 5.013 or Carp::croak "threads not yet supported in perl 5.13+";
             $threaded{$_[0]} = 1;
             my $self = tied @{$_[0]};
             return if $$self{thread_queue};

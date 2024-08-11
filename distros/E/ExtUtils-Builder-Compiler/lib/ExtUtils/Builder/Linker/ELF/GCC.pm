@@ -1,5 +1,5 @@
 package ExtUtils::Builder::Linker::ELF::GCC;
-$ExtUtils::Builder::Linker::ELF::GCC::VERSION = '0.019';
+$ExtUtils::Builder::Linker::ELF::GCC::VERSION = '0.020';
 use strict;
 use warnings;
 
@@ -34,7 +34,7 @@ ExtUtils::Builder::Linker::ELF::GCC
 
 =head1 VERSION
 
-version 0.019
+version 0.020
 
 =head1 AUTHOR
 

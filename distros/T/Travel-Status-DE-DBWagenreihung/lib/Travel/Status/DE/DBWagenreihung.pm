@@ -15,7 +15,7 @@ use Travel::Status::DE::DBWagenreihung::Group;
 use Travel::Status::DE::DBWagenreihung::Sector;
 use Travel::Status::DE::DBWagenreihung::Carriage;
 
-our $VERSION = '0.16';
+our $VERSION = '0.17';
 
 Travel::Status::DE::DBWagenreihung->mk_ro_accessors(
 	qw(direction platform train_type));
@@ -83,15 +83,14 @@ sub get_wagonorder {
 			number           => $train_number,
 			time             => $time
 		};
-		my ( $content, $err ) = $self->get_with_cache(
-			$cache,
-			$api_base . '?'
-			  . join( '&',
-				map { $_ . '=' . $self->{param}{$_} } keys %{ $self->{param} } )
-		);
+		my $url
+		  = $api_base . '?'
+		  . join( '&',
+			map { $_ . '=' . $self->{param}{$_} } keys %{ $self->{param} } );
+		my ( $content, $err ) = $self->get_with_cache( $cache, $url );
 
 		if ($err) {
-			$self->{errstr} = "Failed to fetch station data: $err";
+			$self->{errstr} = "GET $url: $err";
 			return;
 		}
 		$json = $self->{from_json} = $self->{json}->utf8->decode($content);
@@ -332,7 +331,7 @@ Travel::Status::DE::DBWagenreihung - Interface to Deutsche Bahn carriage formati
 
 =head1 VERSION
 
-version 0.16
+version 0.17
 
 This is beta software. The API may change without notice.
 

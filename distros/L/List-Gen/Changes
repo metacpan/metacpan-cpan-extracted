@@ -51,3 +51,8 @@ Revision history for List-Gen
 0.975   2024.05.17
         modify tests according to recent perl version.
         fix bug https://rt.cpan.org/Ticket/Display.html?id=105758.
+
+0.976   2024.08.10
+        fix file tests, see https://rt.cpan.org/Ticket/Display.html?id=76484
+        use Fisher/Yates/Durstenfeld shuffle, see https://rt.cpan.org/Ticket/Display.html?id=74245
+        minimum perl version 5.10.0

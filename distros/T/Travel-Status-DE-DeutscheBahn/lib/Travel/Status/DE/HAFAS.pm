@@ -21,7 +21,7 @@ use Travel::Status::DE::HAFAS::Polyline qw(decode_polyline);
 use Travel::Status::DE::HAFAS::Product;
 use Travel::Status::DE::HAFAS::StopFinder;
 
-our $VERSION = '6.03';
+our $VERSION = '6.04';
 
 # {{{ Endpoint Definition
 
@@ -126,6 +126,29 @@ my %hafas_instance = (
 			auth => {
 				type => 'AID',
 				aid  => '3jkAncud78HSo' . 'qclmN54812A',
+			},
+			lang => 'deu',
+		},
+	},
+	BVG => {
+		stopfinder  => 'https://bvg-apps-ext.hafas.de/bin/ajax-getstop.exe',
+		mgate       => 'https://bvg-apps-ext.hafas.de/bin/mgate.exe',
+		name        => 'Berliner Verkehrsbetriebe',
+		productbits => [qw[s u tram bus]],
+		languages   => [qw[de en]],
+		request     => {
+			client => {
+				type => 'WEB',
+				id   => 'VBB',
+				v    => 10002,
+				name => 'webapp',
+				l    => 'vs_webapp',
+			},
+			ext  => 'BVG.1',
+			ver  => '1.72',
+			auth => {
+				type => 'AID',
+				aid  => 'dVg4TZbW8anjx9z' . 'tPwe2uk4LVRi9wO',
 			},
 			lang => 'deu',
 		},
@@ -365,6 +388,27 @@ my %hafas_instance = (
 			auth => {
 				type => 'AID',
 				aid  => 'kaoxIXLn' . '03zCr2KR',
+			},
+			lang => 'deu',
+		},
+	},
+	VOS => {
+		stopfinder  => 'https://fahrplan.vos.info/bin/ajax-getstop.exe',
+		mgate       => 'https://fahrplan.vos.info/bin/mgate.exe',
+		name        => 'Verkehrsgemeinschaft Osnabrück',
+		productbits => [qw[ice ic_ec d regio s bus ferry u tram ondemand]],
+		languages   => [qw[de]],
+		request     => {
+			client => {
+				id   => 'SWO',
+				type => 'WEB',
+				name => 'webapp',
+				l    => 'vs_swo',
+			},
+			ver  => '1.72',
+			auth => {
+				type => 'AID',
+				aid  => 'PnYowCQ' . 'P7Tp1V'
 			},
 			lang => 'deu',
 		},
@@ -1225,7 +1269,7 @@ monitors
 
 =head1 VERSION
 
-version 6.03
+version 6.04
 
 =head1 DESCRIPTION
 

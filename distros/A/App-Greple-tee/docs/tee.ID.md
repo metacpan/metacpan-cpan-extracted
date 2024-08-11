@@ -6,6 +6,10 @@ App::Greple::tee - modul untuk mengganti teks yang cocok dengan hasil perintah e
 
     greple -Mtee command -- ...
 
+# VERSION
+
+Version 1.00
+
 # DESCRIPTION
 
 Modul **-Mtee** dari Greple mengirimkan bagian teks yang cocok dengan perintah filter yang diberikan, dan menggantinya dengan hasil perintah. Idenya berasal dari perintah yang disebut **teip**. Ini seperti melewatkan sebagian data ke perintah filter eksternal.
@@ -16,18 +20,14 @@ Perintah filter mengikuti deklarasi modul (`-Mtee`) dan diakhiri dengan dua tand
 
 Perintah di atas mengubah semua kata yang cocok dari huruf kecil menjadi huruf besar. Sebenarnya contoh ini sendiri tidak begitu berguna karena **greple** dapat melakukan hal yang sama secara lebih efektif dengan opsi **--cm**.
 
-Secara default, perintah ini dijalankan sebagai satu proses, dan semua data yang cocok dikirim ke proses tersebut secara bersamaan. Jika teks yang dicocokkan tidak diakhiri dengan baris baru, maka teks tersebut akan ditambahkan sebelum dan dihapus setelahnya. Data dipetakan baris demi baris, sehingga jumlah baris data input dan output harus sama.
+Secara default, perintah ini dijalankan sebagai satu proses, dan semua data yang cocok akan dikirim ke proses yang digabungkan. Jika teks yang dicocokkan tidak diakhiri dengan baris baru, maka teks tersebut akan ditambahkan sebelum dikirim dan dihapus setelah diterima. Data input dan output dipetakan baris demi baris, sehingga jumlah baris input dan output harus identik.
 
-Dengan menggunakan opsi **--discrete**, perintah individual dipanggil untuk setiap bagian yang cocok. Anda dapat mengetahui perbedaannya dengan perintah berikut.
+Dengan menggunakan opsi **--discrete**, perintah individual dipanggil untuk setiap area teks yang cocok. Anda dapat mengetahui perbedaannya dengan perintah berikut.
 
     greple -Mtee cat -n -- copyright LICENSE
     greple -Mtee cat -n -- copyright LICENSE --discrete
 
 Baris data input dan output tidak harus identik ketika digunakan dengan opsi **--discrete**.
-
-# VERSION
-
-Version 0.9902
 
 # OPTIONS
 
@@ -35,9 +35,18 @@ Version 0.9902
 
     Memanggil perintah baru satu per satu untuk setiap bagian yang cocok.
 
+- **--bulkmode**
+
+    Dengan opsi <--discrete>, setiap perintah dieksekusi sesuai permintaan. Opsi
+    <--bulkmode> option causes all conversions to be performed at once.
+
+- **--crmode**
+
+    Opsi ini mengganti semua karakter baris baru di tengah setiap blok dengan karakter carriage return. Carriage return yang terdapat dalam hasil eksekusi perintah dikembalikan ke karakter baris baru. Dengan demikian, blok yang terdiri dari beberapa baris dapat diproses secara batch tanpa menggunakan opsi **--discrete**.
+
 - **--fillup**
 
-    Menggabungkan urutan baris yang tidak kosong menjadi satu baris sebelum meneruskannya ke perintah filter. Karakter baris baru di antara karakter lebar dihapus, dan karakter baris baru lainnya diganti dengan spasi.
+    Gabungkan urutan baris yang tidak kosong menjadi satu baris sebelum meneruskannya ke perintah filter. Karakter baris baru di antara karakter lebar akan dihapus, dan karakter baris baru lainnya diganti dengan spasi.
 
 - **--blocks**
 
@@ -88,10 +97,9 @@ Perintah selanjutnya akan menemukan beberapa bagian yang menjorok ke dalam dokum
       a) distribute a Standard Version of the executables and library files,
          together with instructions (in the manual page or equivalent) on where to
          get the Standard Version.
-    
+
       b) accompany the distribution with the machine-readable source of the Package
          with your modifications.
-    
 
 Anda dapat memformat ulang bagian ini dengan menggunakan modul **tee** dengan perintah **ansifold**:
 
@@ -102,12 +110,12 @@ Anda dapat memformat ulang bagian ini dengan menggunakan modul **tee** dengan pe
          together with instructions (in the
          manual page or equivalent) on where
          to get the Standard Version.
-    
+
       b) accompany the distribution with the
          machine-readable source of the
          Package with your modifications.
 
-Menggunakan opsi `--discrete` memakan waktu. Jadi, Anda dapat menggunakan opsi `--pisah '\r'` dengan `ansifold` yang menghasilkan satu baris menggunakan karakter CR, bukan NL.
+Opsi --discrete akan memulai beberapa proses, sehingga prosesnya akan memakan waktu lebih lama untuk dieksekusi. Jadi, Anda dapat menggunakan opsi `--pisah '\r'` dengan `ansifold` yang menghasilkan satu baris menggunakan karakter CR, bukan NL.
 
     greple -Mtee ansifold -rsw40 --prefix '     ' --separate '\r' --
 
@@ -117,13 +125,13 @@ Kemudian ubah karakter CR menjadi NL setelahnya dengan perintah [tr(1)](http://m
 
 # EXAMPLE 3
 
-Pertimbangkan situasi di mana Anda ingin mencari string dari baris yang bukan header. Sebagai contoh, Anda mungkin ingin mencari gambar dari perintah `docker image ls`, tetapi meninggalkan baris header. Anda dapat melakukannya dengan perintah berikut.
+Pertimbangkan situasi di mana Anda ingin mencari string dari baris non-header. Sebagai contoh, Anda mungkin ingin mencari nama citra Docker dari perintah `docker image ls`, tetapi meninggalkan baris header. Anda dapat melakukannya dengan perintah berikut.
 
     greple -Mtee grep perl -- -Mline -L 2: --discrete --all
 
-Opsi `-Mline -L 2:` mengambil baris kedua hingga terakhir dan mengirimkannya ke perintah `grep perl`. Opsi `--discrete` diperlukan, tetapi ini hanya dipanggil sekali, sehingga tidak ada kekurangan dalam hal performa.
+Opsi `-Mline -L 2:` mengambil baris kedua hingga terakhir dan mengirimkannya ke perintah `grep perl`. Opsi --discrete diperlukan karena jumlah baris dari input dan output berubah, tetapi karena perintah ini hanya dieksekusi satu kali, maka tidak ada kekurangan dalam hal performa.
 
-Dalam kasus ini, `teip -l 2- - grep` menghasilkan kesalahan karena jumlah baris pada output lebih sedikit dari input. Namun, hasilnya cukup memuaskan :)
+Jika Anda mencoba melakukan hal yang sama dengan perintah **teip**, `teip -l 2- - grep` akan memberikan kesalahan karena jumlah baris output kurang dari jumlah baris input. Namun, tidak ada masalah dengan hasil yang diperoleh.
 
 # INSTALL
 
@@ -145,7 +153,7 @@ Dalam kasus ini, `teip -l 2- - grep` menghasilkan kesalahan karena jumlah baris 
 
 # BUGS
 
-Opsi `--fillup` mungkin tidak bekerja dengan baik untuk teks bahasa Korea.
+Opsi `--fillup` akan menghilangkan spasi di antara karakter Hangul saat menggabungkan teks bahasa Korea.
 
 # AUTHOR
 
@@ -153,7 +161,7 @@ Kazumasa Utashiro
 
 # LICENSE
 
-Copyright © 2023 Kazumasa Utashiro.
+Copyright © 2023-2024 Kazumasa Utashiro.
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.

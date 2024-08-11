@@ -7,12 +7,13 @@ SRCDIR := src
 
 MODS   := $(wildcard $(LIB)/*.pm)
 PM     := $(notdir $(MODS))
+POD    := $(PM:.pm=.pod)
 NAME   := $(patsubst %.pm,%,$(firstword $(PM)))
-SRC    := $(PM:%=$(if $(SRCDIR),$(SRCDIR)/,)%)
-PMS    := $(foreach lang,$(LANGS),$(SRC:.pm=.$(lang).pm))
-MDS    := $(foreach lang,$(LANGS),$(PM:.pm=.$(lang).md))
+SRC    := $(POD:%=$(if $(SRCDIR),$(SRCDIR)/,)%)
+PODS   := $(foreach lang,$(LANGS),$(SRC:.pod=.$(lang).pod))
+MDS    := $(foreach lang,$(LANGS),$(POD:.pod=.$(lang).md))
 RM_MDS := $(RM_LANGS:%=../README.%.md)
-ALL    := $(PMS) $(MDS) README.md $(RM_MDS)
+ALL    := $(PODS) $(MDS) README.md $(RM_MDS)
 
 all: $(ALL)
 
@@ -23,7 +24,9 @@ endif
 SRCPATH := $(if $(SRCDIR),$(SRCDIR)/,)
 
 PODIFY := greple -Mperl --nocolor --le :pod
-$(foreach mod,$(MODS),$(eval $(SRCPATH)$(notdir $(mod)): $(mod) Makefile; $(PODIFY) $$< > $$@ ))
+$(foreach mod,$(MODS),$(eval \
+  $(SRCPATH)$(subst .pm,.pod,$(notdir $(mod))): $(mod) Makefile; $(PODIFY) $$< > $$@ \
+))
 
 ifdef IGNORE
 $(foreach ignore,$(IGNORE),$(eval \
@@ -33,7 +36,7 @@ endif
 
 XLATE := xlate $(if $(USEAPI),-a)
 
-DESUMASU := GPTY
+DESUMASU := NO
 ifeq ($(DESUMASU),GREPLE)
 JA_FORM   ?= dearu
 JA_DICT   := $(wildcard *.dict)
@@ -50,12 +53,13 @@ JA_FILTER := perl -I../lib -S greple \
 		-s '語尾の部分だけを「である調」から「ですます調」に換える' \
 		- -- \
 	-Mperl --pod -E '^(\w.*\n)+' \
-	--debug $(EXCLUDE) \
+	--discrete --bulkmode \
+	$(EXCLUDE) \
 	--all --no-color
 endif
 
-define LANG_PM
-  $(SRCPATH)%.$1.pm: $(SRCPATH)%.pm Makefile
+define LANG_POD
+  $(SRCPATH)%.$1.pod: $(SRCPATH)%.pod Makefile
   ifdef $1_FILTER
 	$$(XLATE) -t $1 $$< | $$($1_FILTER) > $$@
   else
@@ -63,9 +67,9 @@ define LANG_PM
   endif
 endef
 
-$(foreach lang,$(LANGS),$(eval $(call LANG_PM,$(lang))))
+$(foreach lang,$(LANGS),$(eval $(call LANG_POD,$(lang))))
 
-%.md: $(SRCPATH)%.pm
+%.md: $(SRCPATH)%.pod
 	pod2markdown $< > $@
 
 define LANG_README

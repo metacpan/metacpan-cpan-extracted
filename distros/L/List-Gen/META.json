@@ -27,14 +27,36 @@
       },
       "configure" : {
          "requires" : {
-            "ExtUtils::MakeMaker" : "0"
+            "ExtUtils::MakeMaker" : "6.64"
          }
       },
       "runtime" : {
-         "requires" : {}
+         "requires" : {
+            "Benchmark" : "0",
+            "Filter::Simple" : "0",
+            "List::Util" : "0",
+            "Scalar::Util" : "0",
+            "Symbol" : "0",
+            "Tie::File" : "0",
+            "perl" : "5.010"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Cwd" : "0",
+            "FindBin" : "0",
+            "Test::More" : "0"
+         }
       }
    },
    "release_status" : "stable",
-   "version" : "0.975",
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/jo-37/list-gen.git",
+         "web" : "https://github.com/jo-37/list-gen.git"
+      }
+   },
+   "version" : "0.976",
    "x_serialization_backend" : "JSON::PP version 4.06"
 }

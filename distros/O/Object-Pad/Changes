@@ -1,5 +1,19 @@
 Revision history for Object-Pad
 
+0.810   2024-08-10
+        [CHANGES]
+         * Use `File::ShareDir` for storing .h include file, rather than
+           storing the contents in the `__DATA__` section of the build helper
+         * Added field hook function `gen_valueassert_op`
+         * Warn when enabling all experiments at once with an unqualified
+           `:experimental` import
+
+        [BUGFIXES]
+         * Don't attempt to reserve the embedding slot in the pad twice when
+           making roles under composed_adjust (RT154494)
+         * Ensure that field variables are not visible at compiletime of
+           :common methods (RT154639)
+
 0.809   2024-07-14
         [CHANGES]
          * Experimental attempt at supporting anonymous `class` syntax

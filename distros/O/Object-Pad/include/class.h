@@ -47,6 +47,7 @@ struct ClassMeta {
 
   COP *tmpcop;         /* a COP to use during generated constructor */
   CV *methodscope;     /* a temporary CV used just during compilation of a `method` */
+  U32 methodscope_seq; /* PL_cop_seqmax at the time methodscope was created */
 
   SuspendedCompCVBuffer initfields_compcv; /* temporary PL_compcv + associated state during initfields */
   OP *initfields_lines;                    /* temporary OP_LINESEQ to contain the initfield ops */

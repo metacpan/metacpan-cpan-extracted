@@ -45,6 +45,12 @@
       STMT_START { ((XPVNV*)SvANY(sv))->xnv_u.xpad_cop_seq.xlow = (val); } STMT_END
 #endif
 
+#ifndef COP_SEQMAX_INC
+#define COP_SEQMAX_INC \
+    (PL_cop_seqmax++, \
+        (void)(PL_cop_seqmax == PERL_PADSEQ_INTRO && PL_cop_seqmax++))
+#endif
+
 #define need_PLparser()  ObjectPad__need_PLparser(aTHX)
 void ObjectPad__need_PLparser(pTHX); /* in Object/Pad.xs */
 
@@ -532,9 +538,11 @@ void ObjectPad__prepare_method_parse(pTHX_ ClassMeta *meta)
   PL_comppad_name = PadlistNAMES(CvPADLIST(methodscope));
   PL_curpad  = AvARRAY(PL_comppad);
 
-  add_fields_to_pad(meta, 0);
-
-  intro_my();
+  /* We can't actually add the fields yet because we don't know if it'll be
+   * a :common method. Just save the seqnum for what they would be
+   */
+  meta->methodscope_seq = PL_cop_seqmax;
+  COP_SEQMAX_INC;
 
   LEAVE;
 }
@@ -552,9 +560,31 @@ void ObjectPad__start_method_parse(pTHX_ ClassMeta *meta, bool is_common)
 
   CvOUTSIDE(PL_compcv) = methodscope;
 
-  if(!is_common)
+  if(!is_common) {
     /* instance method */
     extend_pad_vars(meta);
+    intro_my();
+
+    ENTER;
+    SAVESPTR(PL_comppad);
+    SAVESPTR(PL_comppad_name);
+    SAVESPTR(PL_curpad);
+
+    PL_comppad = PadlistARRAY(CvPADLIST(methodscope))[1];
+    PL_comppad_name = PadlistNAMES(CvPADLIST(methodscope));
+    PL_curpad  = AvARRAY(PL_comppad);
+
+    /* Pretend we saw these variables at an earlier time */
+    assert(meta->methodscope_seq < CvOUTSIDE_SEQ(PL_compcv));
+    SAVEI32(PL_cop_seqmax);
+    PL_cop_seqmax = meta->methodscope_seq;
+
+    add_fields_to_pad(meta, 0);
+
+    intro_my();
+
+    LEAVE;
+  }
   else {
     /* :common method */
     PADOFFSET padix;
@@ -562,6 +592,7 @@ void ObjectPad__start_method_parse(pTHX_ ClassMeta *meta, bool is_common)
     padix = pad_add_name_pvs("$class", 0, NULL, NULL);
     if(padix != PADIX_SELF)
       croak("ARGH: Expected that padix[$class] = 1");
+    intro_my();
   }
 
   if(meta->type == METATYPE_ROLE) {
@@ -579,8 +610,6 @@ void ObjectPad__start_method_parse(pTHX_ ClassMeta *meta, bool is_common)
       PadARRAY(pad1)[PADIX_EMBEDDING] = &PL_sv_undef;
     }
   }
-
-  intro_my();
 }
 
 void ObjectPad__add_fields_to_pad(pTHX_ ClassMeta *meta, U32 since_field)
@@ -846,8 +875,9 @@ OP *ObjectPad__finish_method_parse(pTHX_ ClassMeta *meta, bool is_common, OP *bo
 
 void ObjectPad__prepare_adjust_params(pTHX_ ClassMeta *meta)
 {
-  /* Skip the PADIX_EMBEDDING slot */
-  pad_add_name_pvs("", 0, NULL, NULL);
+  /* Skip the PADIX_EMBEDDING slot if not already done so */
+  if(meta->type != METATYPE_ROLE)
+    pad_add_name_pvs("", 0, NULL, NULL);
 
   PADOFFSET params_padix = pad_add_name_pvs("%(params)", 0, NULL, NULL);
   assert(params_padix == PADIX_PARAMS);
@@ -2361,11 +2391,11 @@ ClassMeta *ObjectPad_mop_create_class(pTHX_ enum MetaType type, SV *name)
 
     start_method_parse(meta, FALSE);
 
-    suspend_compcv(&meta->adjust_compcv);
-    meta->adjust_methodscope = meta->methodscope;
-
     prepare_adjust_params(meta);
     meta->adjust_params = newAV();
+
+    suspend_compcv(&meta->adjust_compcv);
+    meta->adjust_methodscope = meta->methodscope;
 
     meta->next_field_for_adjust = 0;
 

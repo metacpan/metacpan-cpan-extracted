@@ -1,7 +1,7 @@
 package Langertha::Role::HTTP;
 our $AUTHORITY = 'cpan:GETTY';
 # ABSTRACT: Role for HTTP APIs
-$Langertha::Role::HTTP::VERSION = '0.002';
+$Langertha::Role::HTTP::VERSION = '0.003';
 use Moose::Role;
 
 use Carp qw( croak );
@@ -118,7 +118,7 @@ Langertha::Role::HTTP - Role for HTTP APIs
 
 =head1 VERSION
 
-version 0.002
+version 0.003
 
 =for :stopwords cpan testmatrix url bugtracker rt cpants kwalitee diff irc mailto metadata placeholders metacpan
 

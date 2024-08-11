@@ -1,4 +1,4 @@
-requires 'perl', '5.014';
+requires 'perl', 'v5.18.2';
 
 requires 'App::Greple', '9.07';
 requires 'App::sdif', '4.25.1';

@@ -6,6 +6,10 @@ App::Greple::tee - modul de înlocuire a textului cu rezultatul unei comenzi ext
 
     greple -Mtee command -- ...
 
+# VERSION
+
+Version 1.00
+
 # DESCRIPTION
 
 Modulul **-Mtee** al lui Greple trimite partea de text potrivit la comanda de filtrare dată și le înlocuiește cu rezultatul comenzii. Ideea este derivată din comanda numită **teip**. Este ca și cum ar ocoli datele parțiale către comanda de filtrare externă.
@@ -16,18 +20,14 @@ Comanda de filtrare urmează după declarația modulului (`-Mtee`) și se termin
 
 Comanda de mai sus convertește toate cuvintele potrivite din minuscule în majuscule. De fapt, acest exemplu în sine nu este atât de util, deoarece **greple** poate face același lucru mai eficient cu opțiunea **--cm**.
 
-În mod implicit, comanda este executată ca un singur proces, iar toate datele potrivite sunt trimise către acesta amestecate împreună. În cazul în care textul potrivit nu se termină cu newline, acesta este adăugat înainte și eliminat după. Datele sunt mapate linie cu linie, astfel încât numărul de linii de date de intrare și de ieșire trebuie să fie identic.
+În mod implicit, comanda este executată ca un singur proces, iar toate datele corespunzătoare sunt trimise la proces amestecate împreună. În cazul în care textul potrivit nu se termină cu newline, acesta este adăugat înainte de trimitere și eliminat după primire. Datele de intrare și de ieșire sunt mapate linie cu linie, astfel încât numărul de linii de intrare și de ieșire trebuie să fie identic.
 
-Utilizând opțiunea **--discret**, se apelează o comandă individuală pentru fiecare piesă care se potrivește. Puteți face diferența prin următoarele comenzi.
+Utilizând opțiunea **--discret**, comanda individuală este apelată pentru fiecare zonă de text potrivit. Puteți face diferența prin următoarele comenzi.
 
     greple -Mtee cat -n -- copyright LICENSE
     greple -Mtee cat -n -- copyright LICENSE --discrete
 
 Liniile de date de intrare și de ieșire nu trebuie să fie identice atunci când se utilizează opțiunea **--discrete**.
-
-# VERSION
-
-Version 0.9902
 
 # OPTIONS
 
@@ -35,9 +35,18 @@ Version 0.9902
 
     Invocarea unei noi comenzi individuale pentru fiecare piesă care se potrivește.
 
+- **--bulkmode**
+
+    Cu opțiunea <--discrete>, fiecare comandă este executată la cerere. Opțiunea
+    <--bulkmode> option causes all conversions to be performed at once.
+
+- **--crmode**
+
+    Această opțiune înlocuiește toate caracterele newline din mijlocul fiecărui bloc cu caractere carriage return. Carriage returns conținute în rezultatul executării comenzii sunt returnate la caracterul newline. Astfel, blocurile formate din mai multe linii pot fi procesate în loturi fără a utiliza opțiunea **--discrete**.
+
 - **--fillup**
 
-    Combină o secvență de linii care nu sunt goale într-o singură linie înainte de a le transmite comenzii de filtrare. Caracterele newline dintre caracterele largi sunt șterse, iar alte caractere newline sunt înlocuite cu spații.
+    Combină o secvență de linii care nu sunt goale într-o singură linie înainte de a le trece la comanda de filtrare. Caracterele newline dintre caracterele de lățime mare sunt șterse, iar celelalte caractere newline sunt înlocuite cu spații.
 
 - **--blocks**
 
@@ -88,10 +97,9 @@ Următoarea comandă va găsi o parte indentată în documentul LICENȚĂ.
       a) distribute a Standard Version of the executables and library files,
          together with instructions (in the manual page or equivalent) on where to
          get the Standard Version.
-    
+
       b) accompany the distribution with the machine-readable source of the Package
          with your modifications.
-    
 
 Puteți reformata această parte utilizând modulul **tee** cu comanda **ansifold**:
 
@@ -102,12 +110,12 @@ Puteți reformata această parte utilizând modulul **tee** cu comanda **ansifol
          together with instructions (in the
          manual page or equivalent) on where
          to get the Standard Version.
-    
+
       b) accompany the distribution with the
          machine-readable source of the
          Package with your modifications.
 
-Utilizarea opțiunii `--discrete` necesită mult timp. Deci, puteți utiliza opțiunea `--separate '\r'` cu `ansifold` care produce o singură linie folosind caracterul CR în loc de NL.
+Opțiunea --discrete va porni mai multe procese, astfel încât procesul va dura mai mult timp pentru a se executa. Astfel, puteți utiliza opțiunea `--separate '\r'` cu `ansifold` care produce o singură linie folosind caracterul CR în loc de NL.
 
     greple -Mtee ansifold -rsw40 --prefix '     ' --separate '\r' --
 
@@ -117,13 +125,13 @@ Apoi, convertiți caracterul CR în NL prin comanda [tr(1)](http://man.he.net/ma
 
 # EXAMPLE 3
 
-Luați în considerare o situație în care doriți să căutați prin grep șiruri de caractere din liniile fără antet. De exemplu, este posibil să doriți să căutați imagini din comanda `docker image ls`, dar să lăsați linia de antet. Puteți face acest lucru prin următoarea comandă.
+Luați în considerare o situație în care doriți să căutați prin grep șiruri de caractere din liniile fără antet. De exemplu, este posibil să doriți să căutați numele imaginilor Docker din comanda `docker image ls`, dar să lăsați linia de antet. Puteți face acest lucru prin următoarea comandă.
 
     greple -Mtee grep perl -- -Mline -L 2: --discrete --all
 
-Opțiunea `-Mline -L 2:` recuperează penultima linie și o trimite la comanda `grep perl`. Opțiunea `--discrete` este necesară, dar aceasta este apelată o singură dată, deci nu există niciun dezavantaj de performanță.
+Opțiunea `-Mline -L 2:` recuperează penultima linie și o trimite la comanda `grep perl`. Opțiunea --discrete este necesară deoarece numărul de linii de intrare și de ieșire se modifică, dar, deoarece comanda este executată o singură dată, nu există niciun dezavantaj de performanță.
 
-În acest caz, `teip -l 2- -- grep` produce o eroare deoarece numărul de linii de la ieșire este mai mic decât cel de la intrare. Cu toate acestea, rezultatul este destul de satisfăcător :)
+Dacă încercați să faceți același lucru cu comanda **teip**, `teip -l 2- -- grep` va da o eroare deoarece numărul de linii de ieșire este mai mic decât numărul de linii de intrare. Cu toate acestea, nu există nicio problemă cu rezultatul obținut.
 
 # INSTALL
 
@@ -145,7 +153,7 @@ Opțiunea `-Mline -L 2:` recuperează penultima linie și o trimite la comanda `
 
 # BUGS
 
-Este posibil ca opțiunea `--fillup` să nu funcționeze corect pentru textul coreean.
+Opțiunea `--fillup` va elimina spațiile dintre caracterele Hangul la concatenarea textului coreean.
 
 # AUTHOR
 
@@ -153,7 +161,7 @@ Kazumasa Utashiro
 
 # LICENSE
 
-Copyright © 2023 Kazumasa Utashiro.
+Copyright © 2023-2024 Kazumasa Utashiro.
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.

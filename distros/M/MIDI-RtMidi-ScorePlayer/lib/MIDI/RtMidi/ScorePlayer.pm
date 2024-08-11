@@ -3,7 +3,7 @@ our $AUTHORITY = 'cpan:GENE';
 
 # ABSTRACT: Play a MIDI score in real-time
 
-our $VERSION = '0.0201';
+our $VERSION = '0.0202';
 
 use strict;
 use warnings;
@@ -156,7 +156,7 @@ MIDI::RtMidi::ScorePlayer - Play a MIDI score in real-time
 
 =head1 VERSION
 
-version 0.0201
+version 0.0202
 
 =head1 SYNOPSIS
 
@@ -165,24 +165,29 @@ version 0.0201
 
   my $score = setup_score();
 
+  # arguments given to the part functions
   my %common = (score => $score, seen => {}, etc => '...',);
 
+  # 2 measure parts
   sub treble {
       my (%args) = @_;
       ...; # Setup things
       my $treble = sub {
-          if ($args{_part} % 2) {
-              $args{score}->n('...');
-          }
-          else {
-              $args{score}->r('...');
+          for my $i (1 .. 8) {
+              if ($i % 2) {
+                  $args{score}->n('qn', '...');
+              }
+              else {
+                  $args{score}->r('qn', '...');
+              }
           }
       };
       return $treble;
   }
   sub bass {
       my (%args) = @_;
-      $common{'tick.durations'} = [ ('hn') x 4 ]; # for a silent companion part
+      # to play alone, this is needed:
+      $common{'tick.durations'} = [ ('hn') x 4 ];
       my $bass = sub {
       ...; # As above but different!
       };
@@ -198,7 +203,7 @@ version 0.0201
       loop     => 4, # loop limit if finite (default: 1)
       infinite => 0, # loop infinitely (default: 1)
       deposit  => 'path/prefix-', # optionally make a file after each loop
-      vebose   => 0, # print out text events (default: 0)
+      verbose  => 0, # print out text events (default: 0)
       dump     => 0, # dump the score before each play (default: 0)
   )->play;
 

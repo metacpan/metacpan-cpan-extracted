@@ -8,7 +8,7 @@ use 5.014;
 
 use parent 'Class::Accessor';
 
-our $VERSION = '6.03';
+our $VERSION = '6.04';
 
 Travel::Status::DE::HAFAS::Stop->mk_ro_accessors(
 	qw(loc
@@ -135,7 +135,16 @@ sub new {
 	$ref->{load} = {};
 	for my $tco_id ( @{ $stop->{dTrnCmpSX}{tcocX} // [] } ) {
 		my $tco_kv = $common->{tcocL}[$tco_id];
-		$ref->{load}{ $tco_kv->{c} } = $tco_kv->{r};
+
+		# BVG has rRT (real-time?) and r (prognosed?); others only have r
+		my $load = $tco_kv->{rRT} // $tco_kv->{r};
+
+		# BVG uses 11 .. 13 rather than 1 .. 4
+		if ( defined $load and $load > 10 ) {
+			$load -= 10;
+		}
+
+		$ref->{load}{ $tco_kv->{c} } = $load;
 	}
 
 	return $ref;
@@ -218,7 +227,7 @@ Travel::Status::DE::HAFAS::Stop - Information about a HAFAS stop.
 
 =head1 VERSION
 
-version 6.03
+version 6.04
 
 =head1 DESCRIPTION
 

@@ -37,7 +37,7 @@ Readonly::Hash our %PEOPLE_TYPE => {
 	'trl' => 'translators',
 };
 
-our $VERSION = 0.13;
+our $VERSION = 0.14;
 
 # Constructor.
 sub new {
