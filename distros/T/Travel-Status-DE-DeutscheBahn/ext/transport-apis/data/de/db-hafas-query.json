@@ -1,0 +1,66 @@
+{
+  "name": "Deutsche Bahn (DB)",
+  "type": {
+    "hafasQuery": true
+  },
+  "supportedLanguages": [
+    "en",
+    "de",
+    "fr",
+    "es"
+  ],
+  "timezone": "Europe/Berlin",
+  "attribution": {
+    "name": "DB Fernverkehr AG",
+    "homepage": "https://www.bahn.de/",
+    "isProprietary": true
+  },
+  "coverage": {
+    "realtimeCoverage": {
+      "region": ["DE", "LU", "CH", "LI", "AT"]
+    },
+    "regularCoverage": {
+      "region": ["PL", "CZ", "SK", "HU", "SI", "RO", "BE"]
+    },
+    "anyCoverage": {
+      "region": ["FI", "UA", "HR", "BG", "IT", "FR", "ES", "PT", "GB", "DK", "SE", "LT", "LV", "RS", "ME", "NO"]
+    }
+  },
+  "options": {
+    "endpoint": "https://reiseauskunft.bahn.de/bin/",
+    "lineModeMap": {
+      "1": "Long-distance train (ICE)",
+      "128": "Metro",
+      "16": "Rapid Transit (S)",
+      "2": "Long-Distance Train (IC/EC)",
+      "256": "Tram",
+      "32": "Bus",
+      "4": "Local Train (D)",
+      "512": "Taxi",
+      "64": "Ferry",
+      "8": "Local Train (RE/RB)"
+    },
+    "locationIdentifierType": "db",
+    "standardLocationIdentifierCountries": [
+      51,
+      53,
+      54,
+      55,
+      56,
+      70,
+      71,
+      74,
+      76,
+      80,
+      81,
+      82,
+      83,
+      84,
+      85,
+      86,
+      87,
+      88
+    ],
+    "standardLocationIdentifierType": "ibnr"
+  }
+}

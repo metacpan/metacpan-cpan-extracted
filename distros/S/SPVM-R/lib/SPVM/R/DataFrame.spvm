@@ -55,7 +55,7 @@ class R::DataFrame {
     my $colobjs_list = $self->{colobjs_list};
     
     unless ($col >= 0 && $col < $colobjs_list->length) {
-      die "The column at index $col is not found.";
+      die "The column at index $col dose not exist.";
     }
     
     my $colobj = (R::DataFrame::Column)$colobjs_list->get($col);
@@ -78,7 +78,7 @@ class R::DataFrame {
       }
     }
     
-    die "The column specified by the column name \"$colname\" does not found.";
+    die "The column named \"$colname\" does not exists.";
   }
   
   method col_by_index : R::NDArray ($col : int) {
@@ -86,7 +86,7 @@ class R::DataFrame {
     my $colobjs_list = $self->{colobjs_list};
     
     unless ($col >= 0 && $col < $colobjs_list->length) {
-      die "The column at index $col is not found.";
+      die "The column at index $col does not exists.";
     }
     
     my $colobj = (R::DataFrame::Column)$colobjs_list->get($col);
@@ -104,7 +104,7 @@ class R::DataFrame {
   method col : R::NDArray ($colname : string) {
     
     unless ($self->exists_col($colname)) {
-      die "The column which name is \"$colname\" is not found.";
+      die "The column named \"$colname\" dose not exist.";
     }
     
     my $col = $self->colindex($colname);
@@ -146,14 +146,12 @@ class R::DataFrame {
     my $exists_col = $self->exists_col($colname);
     
     if ($exists_col) {
-      die "The column with the name \$colname already exists.";
+      die "The column named \"$colname\" already exists.";
     }
     
     if ($self->ncol > 0) {
-      my $nrow = $self->nrow;
-      
-      unless (R::OP->equals_dim($ndarray, $self->col_by_index(0))) {
-        die "The dimension of the n-dimensional array \$ndarray must be equal to the dimension of the n-dimensional array which is the invocant.";
+      unless (R::OP->equals_dim($ndarray, $self->first_col)) {
+        die "The dimensions of the n-dimensional array \$ndarray must be equal to the dimensions of the n-dimensional array of the first column of this data frame.";
       }
     }
     
@@ -177,21 +175,6 @@ class R::DataFrame {
     $self->update_colobjs_indexes_h($col);
   }
   
-  method remove_col : void ($colname : string) {
-    
-    my $col = $self->colindex($colname);
-    
-    my $colobjs_list = $self->{colobjs_list};
-    
-    $colobjs_list->remove($col);
-    
-    my $colobjs_indexes_h = $self->{colobjs_indexes_h};
-    
-    $colobjs_indexes_h->delete($colname);
-    
-    $self->update_colobjs_indexes_h($col);
-  }
-  
   method ncol : int () {
     
     my $colobjs_list = $self->{colobjs_list};
@@ -207,10 +190,30 @@ class R::DataFrame {
     
     my $nrow = 0;
     if ($ncol > 0) {
-      $nrow = $self->col_by_index(0)->length;
+      
+      unless ($self->first_col->is_vector) {
+        die "The n-dimensional array of the first column of this data frame must be a vector.";
+      }
+      
+      $nrow = $self->first_col->length;
     }
     
     return $nrow;
+  }
+  
+  method remove_col : void ($colname : string) {
+    
+    my $col = $self->colindex($colname);
+    
+    my $colobjs_list = $self->{colobjs_list};
+    
+    $colobjs_list->remove($col);
+    
+    my $colobjs_indexes_h = $self->{colobjs_indexes_h};
+    
+    $colobjs_indexes_h->delete($colname);
+    
+    $self->update_colobjs_indexes_h($col);
   }
   
   method clone : R::DataFrame ($shallow : int = 0) {
@@ -241,7 +244,7 @@ class R::DataFrame {
       $string_buffer->push("Empty");
     }
     else {
-      my $first_ndarray = $self->col_by_index(0);
+      my $first_ndarray = $self->first_col;
       
       my $first_dim = $first_ndarray->dim;
       
@@ -303,7 +306,7 @@ class R::DataFrame {
     return $string;
   }
   
-  method slice : R::DataFrame ($colnames : string[], $asix_indexes_product : R::NDArray::Int[]) {
+  method slice : R::DataFrame ($colnames : string[], $axis_indexes_product : R::NDArray::Int[]) {
     
     my $ncol = $self->ncol;
     
@@ -317,7 +320,7 @@ class R::DataFrame {
     for my $colname (@$colnames) {
       my $ndarray = $self->col($colname);
       
-      my $ret_ndarray = $ndarray->slice($asix_indexes_product);
+      my $ret_ndarray = $ndarray->slice($axis_indexes_product);
       
       $ret_data_frame->insert_col($colname, $ret_ndarray);
     }
@@ -325,56 +328,52 @@ class R::DataFrame {
     return $ret_data_frame;
   }
   
-  method set_order : void ($indexes_ndarray : R::NDArray::Int) {
+  method set_order : void ($data_indexes_ndarray : R::NDArray::Int) {
     
     my $ncol = $self->ncol;
     
     for (my $col = 0; $col < $ncol; $col++) {
       my $ndarray = $self->col_by_index($col);
       
-      $ndarray->set_order($indexes_ndarray);
+      $ndarray->set_order($data_indexes_ndarray);
     }
   }
   
-  method sort : void ($colnames_with_order_by : string[]) {
+  method sort : void ($colnames_with_sort_order : string[]) {
     
-    my $order_ndarray = $self->order($colnames_with_order_by);
+    my $order_ndarray = $self->order($colnames_with_sort_order);
     
     $self->set_order($order_ndarray);
   }
   
-  method order : R::NDArray::Int ($colnames_with_order_by : string[]) {
+  method order : R::NDArray::Int ($colnames_with_sort_order : string[]) {
     
-    unless ($colnames_with_order_by) {
-      die "The column names \$colnames_with_order_by must be defined.";
+    unless ($colnames_with_sort_order) {
+      die "The column names \$colnames_with_sort_order must be defined.";
     }
     
     my $ncol = $self->ncol;
     
     unless ($ncol > 0) {
-      die "The length of columns must be greater than 0.";
+      die "The column numbers of this data frame must be greater than 0.";
     }
     
-    my $first_ndarray = $self->col_by_index(0);
+    my $first_ndarray = $self->first_col;
     
-    unless ($first_ndarray->is_vector) {
-      die "The n-dimensional array of the instance must be a vector.";
-    }
+    my $data_length = $self->first_col->length;
     
-    my $nrow = $self->nrow;
+    my $order_data_indexes_ndarray = R::OP::Int->seq(0, $data_length - 1);
     
-    my $order_ndarray = R::OP::Int->seq(0, $nrow - 1);
+    my $order_data = $order_data_indexes_ndarray->data;
     
-    my $order_data = $order_ndarray->data;
-    
-    my $colnames_length = @$colnames_with_order_by;
+    my $colnames_length = @$colnames_with_sort_order;
     
     my $colnames = new string[$colnames_length];
     
     my $order_by_desc_h = Hash->new;
     
     for (my $col = 0; $col < $colnames_length; $col++) {
-      my $colname_with_order_by = $colnames_with_order_by->[$col];
+      my $colname_with_order_by = $colnames_with_sort_order->[$col];
       
       my $ret = Fn->split(" ", $colname_with_order_by);
       
@@ -389,11 +388,11 @@ class R::DataFrame {
       }
       
       unless ($self->exists_col($colname)) {
-        die "The column which name is \"$colname\" does not eixsts.";
+        die "The column named \"$colname\" does not exist.";
       }
       
       unless (@$ret >= 1 && @$ret <= 2 && ($order_by eq "asc" || $order_by eq "desc")) {
-        die "The column name \"$colname_with_order_by\" is invalid format.";
+        die "The column name with the sort order \"$colname_with_order_by\" is invalid format.";
       }
       
       $colnames->[$col] = $colname;
@@ -430,7 +429,7 @@ class R::DataFrame {
       return $cmp;
     });
     
-    return $order_ndarray;
+    return $order_data_indexes_ndarray;
   }
   
   # Private Class Methods

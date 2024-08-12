@@ -3,8 +3,8 @@ NAME
     filename
 
 VERSION
-    This document describes version 0.001 of App::prefixcat (from Perl
-    distribution App-prefixcat), released on 2024-08-09.
+    This document describes version 0.002 of App::prefixcat (from Perl
+    distribution App-prefixcat), released on 2024-08-11.
 
 SYNOPSIS
     See the command-line script prefixcat.

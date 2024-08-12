@@ -1,5 +1,8 @@
 Revision history for Perl module Nice::Try.
 
+v1.3.11 2024-08-11T19:59:07+0900
+    - Corrected bug whereby embedded try-catch blocks inside a consecutive try-catch block would not be recognised.
+
 v1.3.10 2024-03-26T09:32:14+0900
     - Unit testing adjustments for sub prototype and signatures
 

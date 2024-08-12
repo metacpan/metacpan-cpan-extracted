@@ -29,21 +29,63 @@ The R::OP class in L<SPVM> has methods for operations for L<R::NDArray|SPVM::R::
 
 C<static method equals_dim : int ($x_ndarray : L<R::NDArray|SPVM::R::NDArray>, $y_ndarray : L<R::NDArray|SPVM::R::NDArray>);>
 
+If the dimensions of $x_ndarray is equal to the dimensions of $x_ndarray, returns 1, otherwise returns 0.
+
+Exceptions:
+
+The n-dimensional array $x_ndarray must be defined. Otherwise an exception is thrown.
+
+The n-dimensional array $y_ndarray must be defined. Otherwise an exception is thrown.
+
 =head2 equals_dropped_dim
 
 C<static method equals_dropped_dim : int ($x_ndarray : L<R::NDArray|SPVM::R::NDArray>, $y_ndarray : L<R::NDArray|SPVM::R::NDArray>);>
+
+If the dimensions of $x_ndarray on which L<R::Util#drop_dim|SPVM::R::Util/"drop_dim"> method is performed is equal to the dimensions of $x_ndarray on which L<R::Util#drop_dim|SPVM::R::Util/"drop_dim"> method is performed, returns 1, otherwise returns 0.
+
+Exceptions:
+
+The n-dimensional array $x_ndarray must be defined. Otherwise an exception is thrown.
+
+The n-dimensional array $y_ndarray must be defined. Otherwise an exception is thrown.
 
 =head2 rep
 
 C<static method rep : L<R::NDArray|SPVM::R::NDArray> ($x_ndarray : L<R::NDArray|SPVM::R::NDArray>, $times : int);>
 
+Creates a new L<R::NDArray|SPVM::R::NDArray> object by repeating the data of $x_ndarray $times times.
+
+The type of new object is the same as the type of $x_ndarray, and the dimensions is C<[$length * $times]>. ($leghth is the length of $x_ndarray).
+
+Exceptions:
+
+The n-dimensional array $x_ndarray must be defined. Otherwise an exception is thrown.
+
+The repeat count $times must be greater than or equal to 0. Otherwise an exception is thrown.
+
 =head2 rep_length
 
 C<static method rep_length : L<R::NDArray|SPVM::R::NDArray> ($x_ndarray : L<R::NDArray|SPVM::R::NDArray>, $length : int);>
 
+Creates a new L<R::NDArray|SPVM::R::NDArray> object by repeating the data of $x_ndarray up to length $length.
+
+The type of new object is the same as the type of $x_ndarray, and the dimensions is C<[$length]>.
+
+Exceptions:
+
+The length $length must be greater than or equal to 0. Otherwise an exception is thrown.
+
+The length $length must be devided by the length of the n-dimensional array $x_ndarray. Otherwise an exception is thrown.
+
 =head2 is_na
 
 C<static method is_na : L<R::NDArray::Int|SPVM::R::NDArray::Int> ($x_ndarray : L<R::NDArray|SPVM::R::NDArray>);>
+
+Creates a new L<R::NDArray::Int|SPVM::R::NDArray::Int> object by performing L<R::NDArray#elem_is_na|SPVM::R::NDArray/"elem_is_na"> on all elements of the n-dimensional array $x_ndarray.
+
+Exceptions:
+
+The n-dimensional array $x_ndarray must be defined. Otherwise an exception is thrown.
 
 =head1 Related Modules
 

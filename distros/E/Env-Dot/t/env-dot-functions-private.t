@@ -12,7 +12,7 @@ use File::Spec;
 use File::Temp ();
 use Cwd        qw( getcwd abs_path );
 
-use Env::Dot::Functions qw( );
+use Env::Dot::Functions ();
 
 # $File::Temp::KEEP_ALL = 1;
 # $File::Temp::DEBUG = 1;
@@ -60,6 +60,14 @@ my $CASE_ONE_SUBDIR_ENV = <<"END_OF_FILE";
 SUBDIR_VAR="subdir"
 COMMON_VAR="subdir"
 SUBDIR_COMMON_VAR="subdir"
+END_OF_FILE
+
+my $CASE_TWO_DIR_ENV = <<"END_OF_FILE";
+DIR_VAR="dir"
+COMMON_VAR="dir"
+DIR_COMMON_VAR="dir"
+# envdot (broken:option)
+SUBDIR_COMMON_VAR="dir"
 END_OF_FILE
 
 subtest 'Private Subroutine _interpret_opts()' => sub {
@@ -129,8 +137,22 @@ END_OF_TEXT
 
         like(
             dies { Env::Dot::Functions::_interpret_dotenv( split qr{\n}msx, $dotenv ) },
-            qr/^Unknown \s envdot \s option: \s unknown:option .*/msx,
-            'Died because of unknown option',
+            qr{^ Unknown \s envdot \s option: \s 'unknown:option'! \s line \s 1 .* $}msx,
+            'Died because of unknown option error',
+        );
+    }
+
+    # ###############################################################
+    {
+        my $dotenv = <<'END_OF_TEXT';
+FIRST_VAR='My first var'
+# envdot (bad:option)
+END_OF_TEXT
+
+        like(
+            dies { Env::Dot::Functions::_interpret_dotenv( split qr{\n}msx, $dotenv ) },
+            qr{^ Unknown \s envdot \s option: \s 'bad:option'! \s line \s 2 .* $}msx,
+            'Died because of bad option error',
         );
     }
 
@@ -193,6 +215,7 @@ SIXTH_VAR=123.456
 export SEVENTH_VAR=7654321
 
 END_OF_TEXT
+
         my %r        = Env::Dot::Functions::_interpret_dotenv( split qr{\n}msx, $dotenv );
         my @vars     = @{ $r{'vars'} };
         my %opts     = %{ $r{'opts'} };
@@ -229,6 +252,7 @@ END_OF_TEXT
 FIFTH_VAR=123
 SIXTH_VAR=123.456
 END_OF_TEXT
+
         my %r        = Env::Dot::Functions::_interpret_dotenv( split qr{\n}msx, $dotenv );
         my @vars     = @{ $r{'vars'} };
         my %opts     = %{ $r{'opts'} };
@@ -252,6 +276,32 @@ END_OF_TEXT
             'dotenv file correctly interpreted: opts'
         );
     }
+    done_testing;
+};
+
+subtest 'Private subroutine _read_dotenv_file_recursively()' => sub {
+    my ( $temp_dir, $temp_dir_path ) = create_case_one( $CASE_ONE_ROOT_ENV, $CASE_TWO_DIR_ENV, $CASE_ONE_SUBDIR_ENV, );
+
+    # my $dir_path = File::Spec->catdir( $temp_dir_path, 'root', 'dir' );
+    my $dir_filepath    = File::Spec->catdir( $temp_dir_path, 'root', 'dir', '.env' );
+    my $subdir_path     = File::Spec->catdir( $temp_dir_path, 'root', 'dir', 'subdir' );
+    my $subdir_filepath = File::Spec->catdir( $temp_dir_path, 'root', 'dir', 'subdir', '.env' );
+
+    # Save cwd, cd to subdir, the bottom in the hierarcy.
+    my $org_dir = getcwd;
+    chdir $subdir_path || croak;
+
+    like(
+        ## no critic (RegularExpressions::ProhibitComplexRegexes)
+        dies { Env::Dot::Functions::_read_dotenv_file_recursively($subdir_filepath) },
+
+        # qr/Unknown \s envdot \s option: \s 'broken:option' \s row \s 4 \s file \s $dir_filepath .*$/msx,
+        qr{^ Unknown \s envdot \s option: \s 'broken:option'! \s line \s 4 \s file \s '$dir_filepath' .* $}msx,
+        'Died because of unknown option error',
+    );
+
+    chdir $org_dir || croak;
+
     done_testing;
 };
 
@@ -283,11 +333,36 @@ subtest 'Private subroutine _get_parent_dotenv_filepath()' => sub {
 
     # Jump over middle directory.
     unlink $dir_filepath;
+
+    # diag "Env::Dot::Functions::_get_parent_dotenv_filepath($subdir_filepath)";
     $parent_filepath = Env::Dot::Functions::_get_parent_dotenv_filepath($subdir_filepath);
     is( $parent_filepath, $root_filepath, 'correct parent dir and .env file' );
 
     chdir $org_dir || croak;
 
+    done_testing;
+};
+
+subtest 'Private subroutine _validate_opts' => sub {
+    {
+        my %opts = (
+            'read:from_parent' => 0,
+            'file:type'        => 'shell',
+        );
+        ok( lives { Env::Dot::Functions::_validate_opts( \%opts ); }, 'Opts okay', );
+    }
+
+    {
+        my %opts = (
+            'unknown:option' => 1,
+            'file:type'      => 'shell',
+        );
+        like(
+            dies { Env::Dot::Functions::_validate_opts( \%opts ); },
+            qr{^ Unknown \s envdot \s option: \s 'unknown:option'! .* $}msx,
+            'Croaked because of unknown option error',
+        );
+    }
     done_testing;
 };
 

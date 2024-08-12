@@ -1,5 +1,5 @@
 package Dist::Build::Core;
-$Dist::Build::Core::VERSION = '0.010';
+$Dist::Build::Core::VERSION = '0.011';
 use strict;
 use warnings;
 
@@ -336,7 +336,7 @@ Dist::Build::Core - core functions for Dist::Build
 
 =head1 VERSION
 
-version 0.010
+version 0.011
 
 =head1 DESCRIPTION
 

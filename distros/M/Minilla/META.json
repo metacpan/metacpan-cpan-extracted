@@ -4,7 +4,7 @@
       "Tokuhiro Matsuno < tokuhirom@gmail.com >"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Minilla/v3.1.23",
+   "generated_by" : "Minilla/v3.1.24",
    "license" : [
       "perl_5"
    ],
@@ -103,7 +103,7 @@
    "provides" : {
       "Minilla" : {
          "file" : "lib/Minilla.pm",
-         "version" : "v3.1.24"
+         "version" : "v3.1.25"
       },
       "Minilla::CLI" : {
          "file" : "lib/Minilla/CLI.pm"
@@ -265,7 +265,7 @@
          "web" : "https://github.com/tokuhirom/Minilla"
       }
    },
-   "version" : "v3.1.24",
+   "version" : "v3.1.25",
    "x_contributors" : [
       "Alex Kapranoff <alex@kapranoff.ru>",
       "Alex Kapranoff <kappa@yandex.ru>",
@@ -320,6 +320,7 @@
       "kazhiramatsu <kazhiramatsu.github@gmail.com>",
       "keita.iseki <keita.iseki@gmail.com>",
       "kfly8 <kfly@cpan.org>",
+      "kobaken <kentafly88@gmail.com>",
       "mattn <mattn.jp@gmail.com>",
       "moznion <moznion@gmail.com>",
       "sago35 <sago35@gmail.com>",

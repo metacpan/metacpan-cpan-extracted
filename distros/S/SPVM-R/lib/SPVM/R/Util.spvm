@@ -11,10 +11,6 @@ class R::Util {
   # Class Methods
   static method calc_data_length : int ($dim : int[]) {
     
-    unless ($dim) {
-      die "The dimention \$dim must be defined.";
-    }
-    
     unless (&is_normalized_dim($dim)) {
       die "The dimensions \$dim must be normalized.";
     }
@@ -51,7 +47,7 @@ class R::Util {
         }
         
         unless ($dim_elem > 0) {
-          die "The dimensions \$dim except for tail elements must be greater than 0.";
+          die "All element of the dimensions \$dim except the last one must be greater than 0.";
         }
         
         $normalized_dim_list->unshift($dim_elem);
@@ -73,22 +69,17 @@ class R::Util {
     if ($dim) {
       my $dim_length = @$dim;
       
-      if ($dim_length == 0) {
-        $is_normalized_dim = 1;
+      my $found_invalid_dim = 0;
+      for (my $i = 0; $i < $dim_length; $i++) {
+        my $dim_elem = $dim->[$i];
+        unless ($dim_elem > 0) {
+          $found_invalid_dim = 1;
+          last;
+        }
       }
-      else {
-        my $found_invalid_dim = 0;
-        for (my $i = 0; $i < $dim_length; $i++) {
-          my $dim_elem = $dim->[$i];
-          unless ($dim_elem > 0) {
-            $found_invalid_dim = 1;
-            last;
-          }
-        }
-        
-        unless ($found_invalid_dim) {
-          $is_normalized_dim = 1;
-        }
+      
+      unless ($found_invalid_dim) {
+        $is_normalized_dim = 1;
       }
     }
     
@@ -103,10 +94,6 @@ class R::Util {
     
     unless (Fn->is_array($data)) {
       die "The data \$data must be an array.";
-    }
-    
-    unless ($dim) {
-      die "The dimensions \$dim must be defined.";
     }
     
     unless (&is_normalized_dim($dim)) {
@@ -125,15 +112,11 @@ class R::Util {
   
   static method drop_dim : int[] ($dim : int[], $index : int = -1) {
     
-    unless ($dim) {
-      die "The dimensions \$dim must be defined.";
-    }
-    
-    my $dim_length = @$dim;
-    
     unless (&is_normalized_dim($dim)) {
       die "The dimensions \$dim must be normalized.";
     }
+    
+    my $dim_length = @$dim;
     
     if (@$dim == 0) {
       return new int[0];
@@ -185,15 +168,11 @@ class R::Util {
   
   static method expand_dim : int[] ($dim : int[], $index : int = -1) {
     
-    unless ($dim) {
-      die "The dimensions \$dim must be defined.";
-    }
-    
-    my $dim_length = @$dim;
-    
     unless (&is_normalized_dim($dim)) {
       die "The dimensions \$dim must be normalized.";
     }
+    
+    my $dim_length = @$dim;
     
     unless ($index <= $dim_length) {
       die "The index \$index must be less than or equal to the length of the dimension \$dim.";
@@ -231,45 +210,15 @@ class R::Util {
   
   static method equals_dim : int ($x_dim : int[], $y_dim : int[]) {
     
-    unless ($x_dim) {
-      die "The dimensions \$x_dim must be defined.";
+    unless (&is_normalized_dim($x_dim)) {
+      die "The dimensions \$x_dim must be normalized.";
     }
     
-    unless ($y_dim) {
-      die "The dimensions \$y_dim must be defined.";
+    unless (&is_normalized_dim($y_dim)) {
+      die "The dimensions \$y_dim must be normalized.";
     }
     
-    my $equals_dim = 0;
-    if ($x_dim && $y_dim) {
-      my $x_dim_length = @$x_dim;
-      
-      my $y_dim_length = @$y_dim;
-      
-      if ($x_dim_length == $y_dim_length) {
-        my $equals_dim_elems = 1;
-        for (my $i = 0; $i < $x_dim_length; $i++) {
-          my $x_dim_elem = $x_dim->[$i];
-          my $y_dim_elem = $y_dim->[$i];
-          
-          unless ($x_dim_elem > 0) {
-            die "The element of the dimensions \$x_dim must be greater than 0.";
-          }
-          
-          unless ($y_dim_elem > 0) {
-            die "The element of the dimensions \$y_dim must be greater than 0.";
-          }
-          
-          unless ($x_dim_elem == $y_dim_elem) {
-            $equals_dim_elems = 0;
-            last;
-          }
-        }
-        $equals_dim = $equals_dim_elems;
-      }
-    }
-    elsif (!$x_dim && !$y_dim) {
-      $equals_dim = 1;
-    }
+    my $equals_dim = Array->equals_int($x_dim, $y_dim);
     
     return $equals_dim;
   }

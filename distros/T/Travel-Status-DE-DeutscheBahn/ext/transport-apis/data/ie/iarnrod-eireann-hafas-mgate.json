@@ -1,0 +1,58 @@
+{
+  "name": "Iarnród Éireann (Irish Rail)",
+  "type": {
+    "hafasMgate": true
+  },
+  "supportedLanguages": [
+    "en",
+    "ga"
+  ],
+  "timezone": "Europe/Dublin",
+  "attribution": {
+    "name": "Iarnród Éireann – Irish Rail",
+    "homepage": "https://www.irishrail.ie/",
+    "isProprietary": true
+  },
+  "coverage": {
+    "realtimeCoverage": {
+      "region": ["IE", "GB-NIR"]
+    }
+  },
+  "options": {
+    "endpoint": "https://journeyplanner.irishrail.ie/bin/mgate.exe",
+    "client": {
+      "type": "IPA",
+      "id": "IRISHRAIL",
+      "v": "4000100",
+      "name": "IrishRailPROD-APPSTORE",
+      "os": "iOS 12.4.8"
+    },
+    "ver": "1.18",
+    "auth": {
+      "type": "AID",
+      "aid": "P9bplgVCGnozdgQE"
+    },
+    "products": [
+      {
+        "id": "intercity",
+        "bitmasks": [2],
+        "name": "InterCity"
+      },
+      {
+        "id": "commuter",
+        "bitmasks": [8],
+        "name": "Commuter"
+      },
+      {
+        "id": "dart",
+        "bitmasks": [16],
+        "name": "Dublin Area Rapid Transit"
+      },
+      {
+        "id": "luas",
+        "bitmasks": [64],
+        "name": "LUAS Tram"
+      }
+    ]
+  }
+}

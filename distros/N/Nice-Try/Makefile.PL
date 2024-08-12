@@ -2,6 +2,18 @@ use ExtUtils::MakeMaker;
 use strict;
 use warnings;
 
+sub MY::distsignature
+{
+    return << 'EOT';
+distsignature : distmeta
+	$(NOECHO) ./dev/cleanup.pl
+	$(NOECHO) cd $(DISTVNAME) && $(ABSPERLRUN) -MExtUtils::Manifest=maniadd -e 'eval { maniadd({q{SIGNATURE} => q{Public-key signature (added by MakeMaker)}}) }' \
+	  -e '	  or die "Could not add SIGNATURE to MANIFEST: $${'\''@'\''}"' --
+	$(NOECHO) cd $(DISTVNAME) && $(TOUCH) SIGNATURE
+	cd $(DISTVNAME) && cpansign -s
+EOT
+}
+
 my %WriteMakefileArgs = (
     NAME                => 'Nice::Try',
     AUTHOR              => 'Jacques Deguest (jack@deguest.jp)',

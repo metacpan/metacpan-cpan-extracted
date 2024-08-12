@@ -87,8 +87,22 @@ class TestCase::R::DataFrame {
       }
     }
     
+    # Exceptions
+    {
+      my $data_frame = R::DataFrame->new;
+      
+      eval { $data_frame->colindex("Name1"); }
+      
+      unless ($@) {
+        return 0;
+      }
+    }
+    
+    $@ = undef;
+    
     return 1;
   }
+  
   static method col_by_index : int () {
     
     {
@@ -103,6 +117,51 @@ class TestCase::R::DataFrame {
         return 0;
       }
     }
+    
+    {
+      my $data_frame = R::DataFrame->new;
+      
+      $data_frame->set_col("Name0", my $ndarray = IOP->c([1, 2, 3]));
+      $data_frame->set_col("Name1", IOP->c([1, 2, 3]));
+      
+      my $ret_ndarray = $data_frame->col_by_index(0);
+      
+      unless ($ret_ndarray == $ndarray) {
+        return 0;
+      }
+    }
+    
+    # Exceptions
+    {
+      {
+        my $data_frame = R::DataFrame->new;
+        
+        $data_frame->set_col("Name0", IOP->c([1, 2, 3]));
+        $data_frame->set_col("Name1", IOP->c([1, 2, 3]));
+        
+        eval { $data_frame->col_by_index(-1); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+      {
+        my $data_frame = R::DataFrame->new;
+        
+        $data_frame->set_col("Name0", IOP->c([1, 2, 3]));
+        $data_frame->set_col("Name1", IOP->c([1, 2, 3]));
+        
+        eval { $data_frame->col_by_index(2); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+    }
+    
+    $@ = undef;
     
     return 1;
   }
@@ -124,6 +183,7 @@ class TestCase::R::DataFrame {
     
     return 1;
   }
+  
   static method col : int () {
     
     {
@@ -139,8 +199,25 @@ class TestCase::R::DataFrame {
       }
     }
     
+    # Exceptions
+    {
+      {
+        my $data_frame = R::DataFrame->new;
+        
+        eval { $data_frame->col("Name0"); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+    }
+    
+    $@ = undef;
+    
     return 1;
   }
+  
   static method set_col : int () {
     
     {
@@ -204,6 +281,22 @@ class TestCase::R::DataFrame {
         return 0;
       }
     }
+    
+    # Exceptions
+    {
+      {
+        my $data_frame = R::DataFrame->new;
+        
+        eval { $data_frame->col("Name0"); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+    }
+    
+    $@ = undef;
     
     return 1;
   }
@@ -272,6 +365,54 @@ class TestCase::R::DataFrame {
       }
     }
     
+    # Exceptions
+    {
+      {
+        my $data_frame = R::DataFrame->new;
+        
+        eval { $data_frame->insert_col("", IOP->c([1, 2, 3])); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+      {
+        my $data_frame = R::DataFrame->new;
+        
+        eval { $data_frame->insert_col(undef, IOP->c([1, 2, 3])); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+      {
+        my $data_frame = R::DataFrame->new;
+        
+        eval { $data_frame->insert_col("Name0", undef); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+      {
+        my $data_frame = R::DataFrame->new;
+        
+        $data_frame->insert_col("Name0", IOP->c([1, 2, 3]));
+        
+        eval { $data_frame->insert_col("Name1", IOP->c([1, 2, 3], [1, 3])); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+    }
+    
+    $@ = undef;
+    
     return 1;
   }
   
@@ -329,6 +470,17 @@ class TestCase::R::DataFrame {
         return 0;
       }
     }
+    
+    # Exceptions
+    {
+      my $data_frame = R::DataFrame->new;
+      
+      $data_frame->set_col("Name0", IOP->c([1, 2, 3], [1, 3]));
+      
+      eval { $data_frame->nrow; }
+    }
+    
+    $@ = undef;
     
     return 1;
   }
@@ -623,7 +775,92 @@ class TestCase::R::DataFrame {
       }
       
     }
+    
+    {
+      my $data_frame = R::DataFrame->new;
       
+      $data_frame->set_col("Name1", IOP->c([3, 3, 1, 1, 2, 2], [2, 3]));
+      $data_frame->set_col("Name2", my $col2 = IOP->c([5, 6, 3, 4, 1, 2], [2, 3]));
+      
+      my $order_ndarray = $data_frame->order(["Name1", "Name2 desc"]);
+      
+      unless (Array->equals_int($order_ndarray->data, [3, 2, 5, 4, 1, 0])) {
+        return 0;
+      }
+      
+      $data_frame->set_order($order_ndarray);
+      
+      unless (Array->equals_int($data_frame->col("Name1")->(R::NDArray::Int)->data, [1, 1, 2, 2, 3, 3])) {
+        return 0;
+      }
+      
+      unless (Array->equals_int($data_frame->col("Name2")->(R::NDArray::Int)->data, [4, 3, 2, 1, 6, 5])) {
+        return 0;
+      }
+      
+    }
+    # Exceptions
+    {
+      {
+        my $data_frame = R::DataFrame->new;
+        
+        $data_frame->set_col("Name1", IOP->c([3, 3, 1, 1, 2, 2]));
+        $data_frame->set_col("Name2", my $col2 = IOP->c([5, 6, 3, 4, 1, 2]));
+        
+        eval { $data_frame->order(["Name2 desc"]); }
+      }
+      
+      {
+        my $data_frame = R::DataFrame->new;
+        
+        $data_frame->set_col("Name1", IOP->c([3, 3, 1, 1, 2, 2]));
+        $data_frame->set_col("Name2", my $col2 = IOP->c([5, 6, 3, 4, 1, 2]));
+        
+        eval { $data_frame->order(undef); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+      {
+        my $data_frame = R::DataFrame->new;
+        
+        eval { $data_frame->order(["Name2 desc"]); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+      {
+        my $data_frame = R::DataFrame->new;
+        
+        $data_frame->set_col("Name1", IOP->c([3, 3, 1, 1, 2, 2]));
+        
+        eval { $data_frame->order(["Name2"]); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+      {
+        my $data_frame = R::DataFrame->new;
+        
+        $data_frame->set_col("Name1", IOP->c([3, 3, 1, 1, 2, 2]));
+        
+        eval { $data_frame->order(["Name1 dasc"]); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+    }
+    
+    $@ = undef;
+    
     return 1;
   }
   

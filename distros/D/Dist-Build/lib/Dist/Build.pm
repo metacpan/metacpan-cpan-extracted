@@ -1,5 +1,5 @@
 package Dist::Build;
-$Dist::Build::VERSION = '0.010';
+$Dist::Build::VERSION = '0.011';
 use strict;
 use warnings;
 
@@ -42,7 +42,7 @@ my @options = qw/install_base=s install_path=s% installdirs=s destdir=s prefix=s
 sub get_config {
 	my ($meta_name, @arguments) = @_;
 	my %options;
-	GetOptionsFromArray([ @$_ ], \%options, @options) or die "Could not parse arguments" for @arguments;
+	GetOptionsFromArray($_, \%options, @options) or die "Could not parse arguments" for @arguments;
 
 	$options{$_} = detildefy($options{$_}) for grep { exists $options{$_} } qw/install_base destdir prefix/;
 	if ($options{install_path}) {
@@ -60,7 +60,7 @@ sub Build_PL {
 	my $meta = CPAN::Meta->load_file('META.json', { lazy_validation => 0 });
 
 	my @env = defined $env->{PERL_MB_OPT} ? split_like_shell($env->{PERL_MB_OPT}) : ();
-	my %options = get_config($meta->name, $args, \@env);
+	my %options = get_config($meta->name, [ @{$args} ], [ @env ]);
 
 	my $planner = ExtUtils::Builder::Planner->new;
 	$planner->load_module('Dist::Build::Core');
@@ -80,6 +80,8 @@ sub Build_PL {
 	$planner->add_delegate('meta', sub { $meta });
 	$planner->add_delegate('dist_name', sub { $meta->name });
 	$planner->add_delegate('dist_version', sub { $meta->version });
+	(my $main_module = $meta->name) =~ s/-/::/g;
+	$planner->add_delegate('main_module_name', sub { $main_module });
 	$planner->add_delegate('release_status', sub { $meta->release_status });
 	$planner->add_delegate('perl_path', sub { get_perl(%options) });
 
@@ -160,7 +162,7 @@ Dist::Build - A modern module builder, author tools not included!
 
 =head1 VERSION
 
-version 0.010
+version 0.011
 
 =head1 SYNOPSIS
 

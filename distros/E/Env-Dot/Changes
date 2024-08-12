@@ -1,5 +1,14 @@
 Revision history for Env-Dot
 
+0.014     2024-08-11 20:55:37+02:00 Europe/Stockholm
+            * Fix link in docs.
+            * Change how errors are produced and propagated upwards.
+            * Correct indentation.
+            * Fix Perl::Critic testing.
+            * Specify exact dependency for Test::Script version.
+            * Correct whitespace in Changes file.
+            * Add more libraries to SEE ALSO section in Dot::Env.
+
 0.013     2024-03-31 10:17:59+03:00 Europe/Helsinki
             * Fix test code to use Cwd::abs_path().
             * Remove tests, remove needless diag.
@@ -22,9 +31,9 @@ Revision history for Env-Dot
             * Change DEFAULT_OPTION_READ_FROM_STDIO to DEFAULT_OPTION_READ_FROM_STDIN.
             * Change var from $dotenv_filepath_var to $var_name.
             * Add test to test synopsis example of environment override.
-			* Fix test to run with `dzil test`; rename dot files so Dist::Zilla copies them to test dir.
-			* Add Test2::Require::OS::Linux to t/lib.
-			* Start testing script/envdot.
+            * Fix test to run with `dzil test`; rename dot files so Dist::Zilla copies them to test dir.
+            * Add Test2::Require::OS::Linux to t/lib.
+            * Start testing script/envdot.
 
 0.008     2024-02-13 00:27:14+01:00 Europe/Stockholm
             * Documentation Correction. (David Kaufman <david@gigawatt.org>)

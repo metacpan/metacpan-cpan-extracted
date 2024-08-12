@@ -1,7 +1,7 @@
 <%init>
 return unless RT->Config->Get('EnableOAuth2');
 </%init>
-<div class="button-row">
+<div id="authen-oauth-login">
 % my $next_state = $session{NextPage}->{$ARGS{next} || ''};
 % $next_state = $next_state->{url} if ref $next_state;
 <span class="input"><a

@@ -32,7 +32,7 @@ no_index:
 provides:
   App::Prove::Plugin::TestArgs:
     file: lib/App/Prove/Plugin/TestArgs.pm
-    version: v2.1.0
+    version: v2.1.1
 requires:
   Carp: '1.32'
   Class::Method::Modifiers: '1.08'
@@ -44,4 +44,4 @@ requires:
 resources:
   bugtracker: https://github.com/XSven/App-Prove-Plugin-TestArgs/issues
   repository: git://github.com/XSven/App-Prove-Plugin-TestArgs.git
-version: 2.1.0
+version: 2.1.1

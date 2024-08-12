@@ -1,3 +1,18 @@
+0.021 2024-08-12
+  [Test Improvement]
+    * Add tests for R::DataFrame.
+    * Add tests for R::OP.
+  [Changes]
+    * Allow R::NDArray#order method to receive non-vector n-dimentional array.
+    * Allow R::OP#rep method receive non-vector n-dimentional array.
+  [Document Improvement]
+    * Add docs for R::DataFrame class.
+    * Add docs for R::OP::DataFrame class.
+    * Add docs for R::Util class.
+    * Add docs for R::OP.
+  [Internal Changes]
+    * Cleanup exception logic in methods in R::Util class.
+    
 0.020 2024-08-07
   [Document Improvement]
     * Add docs for R::OP::Matrix::Double class.

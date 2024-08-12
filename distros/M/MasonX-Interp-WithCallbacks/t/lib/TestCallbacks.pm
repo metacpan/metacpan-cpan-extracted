@@ -127,7 +127,7 @@ sub count {
     $params->{result}++;
 }
 
-my $url = 'http://example.com/';
+my $url = 'https://example.com/';
 sub redir {
     my $cb = shift;
     my $wait = $cb->value;

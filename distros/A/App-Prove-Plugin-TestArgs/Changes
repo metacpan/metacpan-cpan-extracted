@@ -1,5 +1,11 @@
 Release history for App-Prove-Plugin-TestArgs
 
+2.1.1     2024-08-12
+          - fix link in pod documentation
+          - improve test because perl 5.8.9 uses a different
+            diagnostic message
+          - document caveat
+
 2.1.0     2024-07-29
           - introduce an advanced onfiguration scheme
           - use YAML::PP instead of Config::Any and YAML

@@ -1,8 +1,11 @@
+use utf8;
 use strict;
 use warnings;
 no warnings 'uninitialized';
+use FindBin;
+use File::Temp qw();
 
-use Test::More tests => 30 ;
+use Test::More;
 
 diag( "Testing File::Tabular $File::Tabular::VERSION, Perl $], $^X" );
 
@@ -12,7 +15,7 @@ BEGIN {use_ok("File::Tabular");}
 
 unlink $tmpJournal;
 
-my $f = new File::Tabular("t/htmlEntities.txt", 
+my $f = new File::Tabular("$FindBin::Bin/htmlEntities.txt", 
 			  {avoidMatchKey => 1});
 isa_ok($f, 'File::Tabular', "open DATA");
 
@@ -36,9 +39,14 @@ is($., 0, 'rewind');
 # same thing, more complex filter
 $rows = $f->fetchall(where => '+Description:(+accent -o -*cu* ) -Name=~"^E"');
 
-
 is($rows->[0]{Name}, 'Agrave', 'Agrave');
 is(scalar(@$rows), 7, 'complex filter n lines');
+$f->rewind;
+
+# use a regex in query # as of v0.72, fails with Perl >= 5.22
+$rows = $f->fetchall(where => '+Name~[a-z]*');
+is($rows->[0]{Name}, 'amp', 'amp (regex in query)');
+is(scalar(@$rows), 67, 'all rows (regex in query)');
 $f->rewind;
 
 
@@ -65,10 +73,10 @@ $rows = $f->fetchall(where => 'circumflex', key => 'Name');
 isa_ok($rows, 'HASH', "fetchall rows Name");
 my $r = $rows->{ucirc};
 isa_ok($r, 'HASH');
-is($r->{Char}, 'û', 'ucirc');
+is($r->{Char}, 'Ã»', 'ucirc');
 
 # open a new file for writing and write some lines
-my $w = new File::Tabular("+>", undef, # temporary file, see perlfunc/open
+my $w = new File::Tabular("+>", File::Temp->new->filename, 
 		       {fieldSep => '&',
 			headers => [$f->{ht}->names],
 		        autoNumField => 'Num',
@@ -138,7 +146,7 @@ close $w->{journal}{FH}; # need explicit close for flush before playJournal
 
 
 # open a new file for replaying journal
-my $w2 = new File::Tabular("+>", undef, # temporary file
+my $w2 = new File::Tabular("+>", File::Temp->new->filename, 
 		       {fieldSep => '&',
 			headers => [$f->{ht}->names],
 		        autoNumField => 'Num'});
@@ -153,3 +161,6 @@ is_deeply($rows, $rows2, "journal");
 ok($f->stat->{size} > 0, "nonempty size");
 ok($f->stat->{mode} > 0, "nonempty block size");
 ok(defined($f->mtime->{hour}), "mtime hour");
+
+done_testing;
+

@@ -1,5 +1,9 @@
 Revision history for RT-Authen-OAuth
 
+0.12 2024-08-11
+ - Use Interface::Web::RequestENV to get the origin IP addresses(Thanks to Benoit Plessis and Mukund Sivaraman)
+ - Reposition Google login button
+
 0.11 2019-03-21
  - Fix image src for non-empty web path
 

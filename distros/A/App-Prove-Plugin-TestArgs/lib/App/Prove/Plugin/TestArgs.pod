@@ -104,13 +104,22 @@ configuration scheme that helps us to overcome this drawback.
   Result: PASS
 
 The C<scripts> key points to the test scripts mapping. The C<name> key points
-to a L<functions/sprintf> like format. The allowed conversions are C<%s> (full
-path to the test script) and C<%a> (test alias). The format tells C<prove> what
-to use as the test name in its test output. The C<name> key is optional. If it
-is omitted the C<scripts> key can be omitted too and this brings us back to the
-original configuration scheme.
+to a L<sprintf|perlfunc/"sprintf FORMAT, LIST"> like format. The allowed
+conversions are C<%s> (full path to the test script) and C<%a> (test alias).
+The format tells C<prove> what to use as the test name in its test output. The
+C<name> key is optional. If it is omitted the C<scripts> key can be omitted too
+and this brings us back to the original configuration scheme.
 
-=head1 AUTHORS
+=head1 CAVEAT
+
+Note that a key of the C<scripts> mapping is recognized only, if it is equal to
+one of the test scripts collected by C<prove>. Counterexample: If I<t/foo.t> is
+one of the keys of the C<scripts> mapping and I<./t/foo.t> is the test script
+passed to C<prove> the I<./> prefix is the significant difference. I was not
+able yet to implement an improved version of this plugin that overcomes this
+weakness.
+
+=head1 AUTHOR
 
 Sven Willenbuecher, E<lt>sven.willenbuecher@gmx.deE<gt>
 

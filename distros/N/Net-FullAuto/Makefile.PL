@@ -26,7 +26,7 @@
 ################################################################
 
 
-our $VERSION='1.0000683';
+our $VERSION='1.0000685';
 
 
 if ($ENV{'AUTOMATED_TESTING'}) {
@@ -2057,7 +2057,7 @@ if ($^O ne 'MSWin32' && $^O ne 'MSWin64') {
    &fa_install_module('HTML::Parser','install','Makefile');
    &fa_install_module('URI','install','Makefile');
    &fa_install_module('HTTP::Date','install','Makefile');
-   &fa_install_module('Digest::MD5','install','Makefile');
+   &fa_install_module('Digest::SHA','install','Makefile');
    &fa_install_module('LWP::MediaTypes','install','Makefile');
    &fa_install_module('Encode::Locale','install','Makefile');
    &fa_install_module('IO::HTML','install','Makefile');
@@ -2703,7 +2703,8 @@ require Term::ReadKey;
 require Term::RawInput;
 
 my $last_known_good_location=
-      "https://download.oracle.com/berkeley-db/db-6.2.32.tar.gz";
+      "https://download.oracle.com/berkeley-db/db-18.1.40.tar.gz";
+# https://github.com/Homebrew/homebrew-core/blob/master/Formula/b/berkeley-db.rb
 
 my $process_id='';my $PREFIX='';
 $process_id=pop @ARGV if $ARGV[$#ARGV-1]=~/^\d+$/;
@@ -3739,10 +3740,10 @@ END
                       '\'Task::Weaken\')}\""');
                fa_system('export CYGWIN=nodosfilewarning & '.
                       "cmd /c $clo\\\\bin\\\\bash -lc ".
-                      '"/usr/bin/perl -e \"eval { require Digest::MD5;1 }'.
+                      '"/usr/bin/perl -e \"eval { require Digest::SHA;1 }'.
                       ' or do {require CPAN and '.
                       'CPAN::Shell-^^^>notest(\'install\','.
-                      '\'Digest::MD5\')}\""');
+                      '\'Digest::SHA\')}\""');
                fa_system('export CYGWIN=nodosfilewarning & '.
                       "cmd /c $clo\\\\bin\\\\bash -lc ".
                       '"/usr/bin/perl -e \"eval { require B::Utils;1 }'.
@@ -4375,7 +4376,7 @@ if ($get_BerkeleyDB && $^O ne 'cygwin') {
             foreach my $f (@files) {
                next if $f eq '.';
                next if $f eq '..';
-               if (-1==index $f,'.md5') {
+               if (-1==index $f,'.sha') {
                   $file=$f;
                   last;
                }
@@ -4453,7 +4454,7 @@ if (grep { /-*(?:add|all)[-_]?dependencies/i } @ARGV) {
    File::Copy::move($download[0],
       "dependencies/BerkeleyDB/$download[2].tar.gz");
    File::Copy::move($download[1],
-      "dependencies/BerkeleyDB/$download[2].tar.gz.md5");
+      "dependencies/BerkeleyDB/$download[2].tar.gz.sha256");
    require File::Copy;
    open(MO,"<MANIFEST");
    open(MN,">MANIFEST_NEW");
@@ -4609,7 +4610,7 @@ sub download_berkeleydb {
                  '400'=>'Bad request found',
                  '302'=>'Redirected URL'
    );
-   my $md5filename='';my $req='';my $res='';
+   my $shafilename='';my $req='';my $res='';
    my $already_downloaded=0;
    my $site='download.oracle.com';
    $source=~
@@ -4653,16 +4654,16 @@ print "SOURCE=$source<==\n";
       }
       print(qq{ + saved content to $filename \n})
          if $CPAN::DEBUG;
-      my $md5fh='';
-      ($md5fh,$md5filename)=get_temp_file($file,$suffix.'.md5');
-      $req = HTTP::Request->new(GET => $source.'.md5');
+      my $shafh='';
+      ($shafh,$shafilename)=get_temp_file($file,$suffix.'.sha256');
+      $req = HTTP::Request->new(GET => $source.'.sha256');
       $req->header('Accept-Encoding' => 'gzip, compress');
       $res = $Ua->request($req);
       if ($res->is_success) {
          print " + request successful.\n"
             if $CPAN::DEBUG;
-         print $md5fh $res->content;
-         close $md5fh;
+         print $shafh $res->content;
+         close $shafh;
       } else {
          my $status_line=$res->status_line;
          ($status_line) = ($status_line =~ /(\d+)/);
@@ -4682,24 +4683,24 @@ print "SOURCE=$source<==\n";
          }
          fa_die();
       }
-      print(qq{ + saved md5 content to $md5filename \n})
+      print(qq{ + saved sha256 content to $shafilename \n})
          if $CPAN::DEBUG;
-      open(MH,"<$md5filename") || fa_die($!);
+      open(MH,"<$shafilename") || fa_die($!);
       my $mhf=<MH>;
       close(MH);
       my $checksum=$mhf;
       $checksum=~s/^\s*(\S+)\s+.*$/$1/s;
       open(FILE, $filename) or fa_die("Can't open '$file': $!");
       binmode(FILE);
-      require Digest::MD5;
-      import Digest::MD5;
-      my $digestmd5=Digest::MD5->new->addfile(*FILE)->hexdigest;
-      if ($checksum eq $digestmd5) {
+      require Digest::SHA;
+      import Digest::SHA;
+      my $digestsha=Digest::SHA->new(256)->addfile(*FILE)->hexdigest;
+      if ($checksum eq $digestsha) {
          print(qq{ + CHECKSUM Test for $filename *PASSED* \n})
             if $CPAN::DEBUG;
       } else {
          print "CHECKSUM test for $filename *FAILED*\n";
-         print "CALCULATED=$digestmd5 and ",
+         print "CALCULATED=$digestsha and ",
                "DOWNLOADED=$checksum\n";
          print "\nPress ANY key to terminate FullAuto ",
                "installation ...\n";
@@ -4710,7 +4711,7 @@ print "SOURCE=$source<==\n";
       close(FILE);
       if (grep { /-*(?:add|all)[-_]?dependencies/i } @ARGV) {
          Term::ReadKey::ReadMode(0);
-         return $filename,$md5filename,$file;
+         return $filename,$shafilename,$file;
       } else {
          cpan_gunzip_and_untar();
          unless (keys %amazon) {

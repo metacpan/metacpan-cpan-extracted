@@ -1,5 +1,5 @@
 package Gherkin::Line;
-$Gherkin::Line::VERSION = '28.0.0';
+$Gherkin::Line::VERSION = '29.0.0';
 use strict;
 use warnings;
 
@@ -86,9 +86,12 @@ sub _split_table_cells_iterator {
                     return ( $cell, $start_col );
                 }
             } elsif ( $char eq "\\" ) {
-                $row =~ s/^(.)// || die "Unpossible";
-                $col += 1;
-                $cell .= '\\' . $1;
+                if ($row =~ s/^(.)//) {
+                    $col += 1;
+                    $cell .= '\\' . $1;
+                } else {
+                    $cell .= '\\';
+                }
             } elsif ( defined $char ) {
                 $cell .= $char;
             } else {

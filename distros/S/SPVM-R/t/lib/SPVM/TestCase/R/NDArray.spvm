@@ -1366,6 +1366,7 @@ class TestCase::R::NDArray {
     return 1;
   }
   static method order : int () {
+    
     {
       my $data = [1, 2, 3, 4, 5];
       
@@ -1476,6 +1477,20 @@ class TestCase::R::NDArray {
       $ret_ndarray->sort_desc;
       
       unless (Array->equals_int($ret_ndarray->data, [30, 20, 10])) {
+        return 0;
+      }
+    }
+    
+    {
+      my $data = [1, 2, 3, 4, 5, 6];
+      
+      my $dim = [2, 3];
+      
+      my $ndarray = IOP->c($data, $dim);
+      
+      my $ret_ndarray = $ndarray->order;
+      
+      unless (Array->equals_int($ret_ndarray->data, [0, 1, 2, 3, 4, 5])) {
         return 0;
       }
     }

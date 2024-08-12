@@ -1,0 +1,61 @@
+{
+    "name": "Verkehrsverbund Vorarlberg (VVV)",
+    "coverage": {
+        "realtimeCoverage": {
+            "area": {
+                "coordinates": [
+                  [
+                    [
+                      [10.22, 47.1],
+                      [10.3, 47.4],
+                      [10.26, 47.46],
+                      [10.16, 47.44],
+                      [10.16, 47.48],
+                      [10.13, 47.51],
+                      [9.83, 47.66],
+                      [9.8, 47.66],
+                      [9.56, 47.6],
+                      [9.51, 47.6],
+                      [9.47, 47.53],
+                      [9.58, 47.4],
+                      [9.48, 47.31],
+                      [9.46, 47.27],
+                      [9.55, 47.04],
+                      [9.56, 47.0],
+                      [9.81, 46.96],
+                      [9.81, 46.92],
+                      [9.83, 46.88],
+                      [10.08, 46.78],
+                      [10.16, 46.75],
+                      [10.22, 47.1]
+                    ]
+                  ]
+                ],
+                "type": "MultiPolygon"
+            },
+            "region": [ "AT-8" ]
+        }
+    },
+    "options": {
+        "auth": {
+            "aid": "and20201hf7mcf9bv3nv8g5f",
+            "pw": "87a6f8ZbnBih32",
+            "type": "USER",
+            "user": "mobile"
+        },
+        "client": {
+            "id": "VAO",
+            "l": "vs_vvv",
+            "type": "AND"
+        },
+        "endpoint": "https://fahrplan.vmobil.at/bin/mgate.exe",
+        "ext": "VAO.11",
+        "micMacSalt": "6633673735743766726667323938336A",
+        "ver": "1.27"
+    },
+    "supportedLanguages": [ "de", "en" ],
+    "timezone": "Europe/Vienna",
+    "type": {
+        "hafasMgate": true
+    }
+}

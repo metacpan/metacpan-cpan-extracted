@@ -8,9 +8,9 @@ use App::prefixcat;
 use Getopt::Long;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2024-08-09'; # DATE
+our $DATE = '2024-08-11'; # DATE
 our $DIST = 'App-prefixcat'; # DIST
-our $VERSION = '0.001'; # VERSION
+our $VERSION = '0.002'; # VERSION
 
 my %Opts = (
     eval         => undef,
@@ -63,13 +63,28 @@ prefixcat - Like Unix `cat` but by default prefix each line with filename
 
 =head1 VERSION
 
-This document describes version 0.001 of prefixcat (from Perl distribution App-prefixcat), released on 2024-08-09.
+This document describes version 0.002 of prefixcat (from Perl distribution App-prefixcat), released on 2024-08-11.
 
 =head1 SYNOPSIS
 
- prefixcat [OPTION]... [FILE]...
+ % prefixcat [OPTION]... [FILE]...
+
+See examples in L</EXAMPLES>.
 
 =head1 DESCRIPTION
+
+This utility is like the Unix B<cat> command but by default it prefixes each
+output line with filename. I wrote this utility because this feature is
+surprisingly absent in C<cat> and rather cumbersome to accomplish using the
+traditional Unix toolbox. [1] The simplest is using C<grep '.*' FILE...> but it
+highlights the lines by default.
+
+B<prefixcat> offers a few options. You can choose the string to print to
+separate the filename prefix and the output line (C<-s>). You can format the
+filename using a C<sprintf()> template (C<-f>). And for maximum flexibility you
+can specify a Perl code to do the formatting.
+
+[1] L<https://serverfault.com/questions/977831/how-to-add-the-filename-as-prefix-to-each-line-of-the-text-file-batch-processi>
 
 =head1 EXIT CODES
 
@@ -104,11 +119,41 @@ Additionally, C<$main::filename> will be set to the current input filename,
 C<$main::filenum> to the current index of input files (1-based), and
 C<$main::linenum> to the current input line (1-based).
 
-Overrides L<--separator, -s>.
+Overrides L</"--separator, -s"> and L</"--format, -f">.
 
 =back
 
 =head1 FAQ
+
+=head1 EXAMPLES
+
+=head2 Print filename
+
+ % prefixcat f1.txt f2.txt
+
+Sample output:
+
+ f1.txt:line 1
+ f1.txt:line 2
+ f1.txt:line 3
+ f2.txt:line 1
+ f2.txt:line 2
+
+=head2 Print line number as well
+
+ % prefixcat -e '"$filename:$linenum:$_"' f1.txt f2.txt
+
+Sample output:
+
+ f1.txt:1:line 1
+ f1.txt:2:line 2
+ f1.txt:3:line 3
+ f2.txt:1:line 1
+ f2.txt:2:line 2
+
+=head2 Filter lines (skip blank lines)
+
+ % prefixcat -e '/\S/ ? "$filename:$linenum:$_" : ""' f1.txt f2.txt
 
 =head1 HOMEPAGE
 

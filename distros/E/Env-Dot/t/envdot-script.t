@@ -8,7 +8,7 @@ use Test2::V0;
 use Cwd;
 use File::Spec;
 
-use Test::Script;
+use Test::Script 1.28;
 
 subtest 'Script compiles' => sub {
     script_compiles('script/envdot');
@@ -109,6 +109,29 @@ ENVDOT_SCRIPT_COMMON='first'; export ENVDOT_SCRIPT_COMMON
 EOF
     script_runs( [ 'script/envdot', ], { stdout => \$stdout, }, 'Verify output' );
     is( $stdout, $stdout_result, 'Correct stdout' );
+
+    done_testing;
+};
+
+subtest 'Script fails due to faulty option' => sub {
+    my $file     = 't/envdot-script-third.env';
+    my $filepath = File::Spec->rel2abs($file);
+    script_fails( [ 'script/envdot', '--dotenv', $file, ], { exit => 22, }, 'Fails because of faulty option' );
+
+    ## no critic (RegularExpressions::ProhibitComplexRegexes)
+    script_stderr_like(
+        qr{^ Error: \s Unknown \s envdot \s option: \s 'read:faulty_option' \s line \s 3 \s file \s '$filepath' $}msx,
+        'Fails with correct output' );
+
+    done_testing;
+};
+
+subtest 'Script fails due to missing dotenv file' => sub {
+    my $file     = 't/envdot-script-not-existing.env';
+    my $filepath = File::Spec->rel2abs($file);
+    script_fails( [ 'script/envdot', '--dotenv', $file, ], { exit => 2, }, 'Fails because of missing dotenv file' );
+
+    script_stderr_like( qr{^ Error: \s File \s not \s found: \s '$file' $}msx, 'Fails with correct output' );
 
     done_testing;
 };

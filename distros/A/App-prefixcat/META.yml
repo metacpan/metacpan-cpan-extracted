@@ -19,7 +19,7 @@ name: App-prefixcat
 provides:
   App::prefixcat:
     file: lib/App/prefixcat.pm
-    version: '0.001'
+    version: '0.002'
 requires:
   Getopt::Long: '2.50'
   perl: '5.010001'
@@ -29,7 +29,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=App-prefixcat
   homepage: https://metacpan.org/release/App-prefixcat
   repository: git://github.com/perlancar/perl-App-prefixcat.git
-version: '0.001'
+version: '0.002'
 x_Dist_Zilla:
   perl:
     version: '5.038002'

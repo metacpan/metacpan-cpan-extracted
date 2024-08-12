@@ -1,5 +1,9 @@
 Revision history for Dist-Build
 
+0.011     2024-08-11 23:19:50+02:00 Europe/Brussels
+          - Let get_config modify build stage arguments
+          - Add main_module_name helper
+
 0.010     2024-08-04 00:41:56+02:00 Europe/Brussels
           - Add missing prereqs due to misconfigured dist.ini
 

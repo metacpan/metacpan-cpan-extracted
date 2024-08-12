@@ -6,22 +6,18 @@ package File::Tabular;
 #        -optimize: postpone preMatch/postMatch until display time
 #        -escaping fieldSep : make it optional
 
-#        - synopsis : example of file cloning with select (e.g. year=2004)
-
-
-
-our $VERSION = "0.72"; 
-
 use strict;
 use warnings;
 no  warnings 'uninitialized';
 use locale;
 use Carp;
-# use Carp::Assert; # dropped because not really needed and not in Perl core
 use Fcntl ':flock';
 use Hash::Type;
 use Search::QueryParser 0.92;
 use File::Temp;
+
+our $VERSION = "0.73"; 
+
 
 =head1 NAME
 
@@ -30,7 +26,7 @@ File::Tabular - searching and editing flat tabular files
 =head1 SYNOPSIS
 
   use File::Tabular;
-  my $f = new File::Tabular($filename);
+  my $f = File::Tabular->new($filename);
 
   my $row = $f->fetchrow;
   print $row->{field1}, $row->{field2};
@@ -53,10 +49,10 @@ File::Tabular - searching and editing flat tabular files
   print $hashRows->{someKey}{someOtherField};
 
   # open for updates, and remember the updates in a journal file
-  $f = new File::Tabular("+<$filename", {journal => ">>$journalFile"});
+  $f = File::Tabular->new("+<$filename", {journal => $journalFile});
 
   # updates at specific positions (line numbers)
-  $f->splices(4  => 2, undef,	# delete 2 lines from position 4
+  $f->splices(4  => 2, undef,   # delete 2 lines from position 4
               7  => 1, {f1 => $v1, f2 => $v2, ...}, # replace line 7
               9  => 0, { ...},   # insert 1 new line at position 9
               22 => 0, [{...}, {...}, ...] # insert several lines at pos. 22
@@ -70,7 +66,7 @@ File::Tabular - searching and editing flat tabular files
   $f->append($f->ht->new($v1, $v2, ...)); 
 
 
-  $f->clear;			# removes all data (but keeps the header line)
+  $f->clear;                    # removes all data (but keeps the header line)
 
   # updates at specific keys, corresponding to @keyFields
   $f->writeKeys({key1 => {f1 => $v1, f2 => $v2, ...}, # add or update
@@ -80,7 +76,7 @@ File::Tabular - searching and editing flat tabular files
 
 
   # replay the updates on a backup file
-  my $bck = new File::Tabular("+<$backupFile");
+  my $bck = File::Tabular->new("+<$backupFile");
   $bck->playJournal($journalFile);
 
   # get info from associated filehandle
@@ -148,7 +144,7 @@ frequent write operations.
 Creates a new tabular file object. 
 The list of arguments C<open1, open2, ...> is  fed directly to
 L<perlfunc/open> for opening the associated file. 
-Can also be a reference to an already opened filehandle.
+A reference to an already opened filehandle can also be given instead.
 
 The final hash ref is a collection of optional parameters, taken
 from the following list :
@@ -163,6 +159,12 @@ Escape sequences like C<\t> are admitted.
 =item recordSep
 
 record separator ('\n' by default).
+
+=item crlf
+
+if true, filehandles use the L<PerlIO> layer C<:crlf>.
+This is the default, for unfortunate historical reasons.
+
 
 =item fieldSepRepl
 
@@ -202,7 +204,7 @@ this will be LOCK_EX if B<open1> contains 'E<gt>' or
 
 =item flockAttempts
 
-Number of attempts to lock the file,
+number of attempts to lock the file,
 at 1 second intervals, before returning an error.
 Zero by default.
 If nonzero, LOCK_NB is added to flockMode;
@@ -273,9 +275,9 @@ application, and we don't want users to match a purely technical
 field. 
 
 This search behaviour will not apply to regex searches. So requests like
-C<< $ft->fetchall(where => qr/\b(123|456)\b/) >> 
-or 
-C<< $ft->fetchall(where => ' ~ 123 OR ~ 456') >> 
+C<< $ft->fetchall(where => qr/\b(123|456)\b/) >>
+or
+C<< $ft->fetchall(where => ' ~ 123 OR ~ 456') >>
 will actually find the record with key 123.
 
 =back
@@ -291,26 +293,25 @@ use constant BUFSIZE => 1 << 21; # 2MB, used in copyData
 use constant DEFAULT => {
   fieldSep      => '|',
   recordSep     => "\n",
-  autoNumField  => undef, 			
-  autoNumChar   => '#', 			
-  autoNum       => 1, 			
+  crlf          => 1,
+  autoNumField  => undef,
+  autoNumChar   => '#',
+  autoNum       => 1,
   lockAttempts  => 0,
   rxNum         => qr/^[-+]?\d+(?:\.\d*)?$/,
   rxDate        => qr/^\d\d?\.\d\d?\.\d\d\d?\d?$/,
-  date2str      => sub {my ($d, $m, $y) = 
-			  ($_[0] =~ /(\d\d?)\.(\d\d?)\.(\d\d\d?\d?)$/);
-		        $y += ($y > 50) ? 1900 : 2000 
-			  if defined($y) && $y < 100;
-		        return sprintf "%04d%02d%02d", $y, $m, $d;},
+  date2str      => sub {my ($d, $m, $y) = ($_[0] =~ /(\d\d?)\.(\d\d?)\.(\d\d\d?\d?)$/);
+                        $y += ($y > 50) ? 1900 : 2000 if defined($y) && $y < 100;
+                        return sprintf "%04d%02d%02d", $y, $m, $d;},
   preMatch      => '',
   postMatch     => '',
-  avoidMatchKey => undef
+  avoidMatchKey => undef,
 };
 
 
 use constant {
- statType => Hash::Type->new(qw(dev ino mode nlink uid gid rdev size 
-				atime mtime ctime blksize blocks)),
+ statType => Hash::Type->new(qw(dev ino mode nlink uid gid rdev size
+                                atime mtime ctime blksize blocks)),
  timeType => Hash::Type->new(qw(sec min hour mday mon year wday yday isdst))
 };
 
@@ -325,9 +326,7 @@ sub new {
 
   # create object with default values
   my $self = bless {};
-  foreach my $option (qw(fieldSep recordSep autoNumField autoNumChar autoNum  
-                         rxDate rxNum date2str preMatch postMatch 
-                         avoidMatchKey)) {
+  foreach my $option (keys %{DEFAULT()}) {
     $self->{$option} = $args->{$option} || DEFAULT->{$option};
   }
 
@@ -338,19 +337,16 @@ sub new {
 
   # field and record separators
   croak "can't use '%' as field separator" if $self->{fieldSep} =~ /%/;
-  
-  $self->{recordSepRepl} = $args->{recordSepRepl} || 
-                           urlEncode($self->{recordSep});
-  $self->{fieldSepRepl} = $args->{fieldSepRepl} || 
-                           urlEncode($self->{fieldSep});
-  $self->{rxFieldSep} = qr/\Q$self->{fieldSep}\E/;
+
+  $self->{recordSepRepl} = $args->{recordSepRepl} || urlEncode($self->{recordSep});
+  $self->{fieldSepRepl}  = $args->{fieldSepRepl}  || urlEncode($self->{fieldSep});
+  $self->{rxFieldSep}    = qr/\Q$self->{fieldSep}\E/;
 
 
   # open file and get lock
-  _open($self->{FH}, @_) or croak "open @_ : $! $^E";
+  $self->_open($self->{FH}, @_) or croak "open @_ : $! $^E";
   my $flockAttempts =  $args->{flockAttempts} || 0;
-  my $flockMode =  $args->{flockMode} ||
-    $_[0] =~ />|\+</ ? LOCK_EX : LOCK_SH;
+  my $flockMode     =  $args->{flockMode}     || ($_[0] =~ />|\+</ ? LOCK_EX : LOCK_SH);
   $flockMode |= LOCK_NB if $flockAttempts > 0;
   for (my $n = $flockAttempts; $n >= 1; $n--) {
     last if flock $self->{FH}, $flockMode; # exit loop if flock succeeded
@@ -360,23 +356,23 @@ sub new {
   # setup journaling
   if (exists $args->{journal}) { 
     my $j = {}; # create a fake object for _printRow
-    $j->{$_} = $self->{$_} foreach qw(fieldSep recordSep 
-				      fieldSepRepl recordSepRepl);
-    _open($j->{FH}, ref $args->{journal} eq 'ARRAY' ? @{$args->{journal}}
-	                                            : ">>$args->{journal}")
+    $j->{$_} = $self->{$_} foreach qw(fieldSep     recordSep
+                                      fieldSepRepl recordSepRepl);
+    $self->_open($j->{FH}, ref $args->{journal} eq 'ARRAY' ? @{$args->{journal}}
+                                                           : ">>$args->{journal}")
       or croak "open journal $args->{journal} : $^E";
     $self->{journal} = bless $j;
   }
 
   # field headers
   my $h = $args->{headers} || [split($self->{rxFieldSep}, $self->_getLine, -1)];
-  $self->{ht} = new Hash::Type(@$h);
-  $self->_printRow(@$h) if 
-    exists $args->{printHeaders} ? $args->{printHeaders} : ($_[0] =~ />/);
+  $self->{ht} = Hash::Type->new(@$h);
+  my $must_print_headers = exists $args->{printHeaders} ? $args->{printHeaders} : ($_[0] =~ />/);
+  $self->_printRow(@$h) if $must_print_headers;
 
   # ready for reading data lines
   $self->{dataStart} = tell($self->{FH});
-  $. = 0;	# setting line counter to zero for first dataline
+  $. = 0;       # setting line counter to zero for first dataline
 
 
   # create a closure which takes a (already chomped) line and returns a record
@@ -392,17 +388,15 @@ sub new {
 }
 
 
-sub _open { # stupid : because of 'open' strange prototyping, 
-            # cannot pass an array directly
-  my $result = (ref $_[1] eq 'GLOB') ? $_[0] = $_[1]                         : 
+sub _open { # CORE::open is prototyped, so it cannot take args from an array. This is a workaround
+  my $self   = shift;
+  my $result = (ref $_[1] eq 'GLOB') ? $_[0] = $_[1]                         :
                @_ > 3                ? open($_[0], $_[1], $_[2], @_[3..$#_]) :
-               @_ > 2                ? open($_[0], $_[1], $_[2])             : 
+               @_ > 2                ? open($_[0], $_[1], $_[2])             :
                                        open($_[0], $_[1]);
-  binmode($_[0], ":crlf") if $result; # portably open text file, see PerlIO
+  binmode($_[0], ":crlf") if $result && $self->{crlf};
   return $result;
 }
-
-
 
 
 sub _getLine { 
@@ -421,16 +415,19 @@ sub _printRow { # Internal function to print a data row and automatically deal w
                 # autonumbering, if necessary. 
   my ($self, @vals) = @_;
 
-  if ($self->{autoNumField}) { # autoNumbering
+  # autoNumbering
+  if ($self->{autoNumField}) {
     my $ix = $self->{ht}{$self->{autoNumField}} - 1;
     if ($vals[$ix] =~ s/$self->{autoNumChar}/$self->{autoNum}/) {
       $self->{autoNum} += 1;
-    } 
+    }
     elsif ($vals[$ix] =~ m/(\d+)/) {
-      $self->{autoNum} = $1 + 1 if $1 + 1 > $self->{autoNum};
-    } 
+      my $next_autonum = $1 + 1;
+      $self->{autoNum} = $next_autonum if $next_autonum > $self->{autoNum};
+    }
   }
 
+  # build row and print it
   s/\Q$self->{fieldSep}\E/$self->{fieldSepRepl}/ foreach @vals;
   my $line = join $self->{fieldSep}, @vals;
   $line =~ s/\Q$self->{recordSep}\E/$self->{recordSepRepl}/g;
@@ -562,7 +559,7 @@ sub fetchall {
   my $filter = $args{where};
   $filter = $self->compileFilter($filter) if $filter and not ref $filter eq 'CODE';
 
-  if (@k) {			# will return a hash of rows 
+  if (@k) {                     # will return a hash of rows 
     croak "fetchall : 'orderBy' not allowed  with 'key'" if $args{orderBy};
     croak "fetchall in list context : not allowed with 'key'" if wantarray;
     my $rows = {};
@@ -571,7 +568,7 @@ sub fetchall {
     }
     return $rows;
   }
-  else {			# will return an array of rows
+  else {                        # will return an array of rows
     my ($rows, $line_nos) = ([], []);
     while (my $row = $self->fetchrow($filter)) {
       push @$rows, $row;  
@@ -582,8 +579,8 @@ sub fetchall {
       croak "fetchall in list context : not allowed with 'orderBy'" if wantarray;
       my $tmp = ref $args{orderBy};
       my $cmpFunc = $tmp eq 'ARRAY' ? $self->{ht}->cmp(@{$args{orderBy}}) :
-	            $tmp eq 'CODE'  ? $args{orderBy} :
-	                              $self->{ht}->cmp($args{orderBy});
+                    $tmp eq 'CODE'  ? $args{orderBy} :
+                                      $self->{ht}->cmp($args{orderBy});
       $rows = [sort $cmpFunc @$rows];
     }
     return wantarray ? ($rows, $line_nos) : $rows;    
@@ -722,12 +719,12 @@ must L<rewind> the file first.
 
 
 sub splices {
-  my $self = shift;
-  my $args = ref $_[0] eq 'ARRAY' ? $_[0] : \@_;
+  my $self  = shift;
+  my $args  = ref $_[0] eq 'ARRAY' ? $_[0] : \@_;
   my $nArgs = @$args;
   croak "splices : number of arguments must be multiple of 3" if $nArgs % 3;
 
-  my $TMP = undef;	# handle for a tempfile
+  my $TMP = undef;      # handle for a tempfile
 
   my $i;
   for ($i=0; $i < $nArgs; $i+=3 ) {
@@ -737,14 +734,14 @@ sub splices {
 
     if ($pos == -1) { # we want to append new data at end of file
       $TMP ?  # if we have a tempfile ...
-	     copyData($TMP, $self->{FH}) # copy back all remaining data
-	   : seek $self->{FH}, 0, 2;     # otherwise goto end of file
+             copyData($TMP, $self->{FH}) # copy back all remaining data
+           : seek $self->{FH}, 0, 2;     # otherwise goto end of file
       $pos = $.; # sync positions (because of test 12 lines below)
     }
     elsif (           # we want to put data in the middle of file and ..
            not $TMP and $self->stat->{size} > $self->{dataStart}) { 
-      $TMP = new File::Temp or croak "no tempfile: $^E";
-      binmode($TMP, ":crlf");
+      $TMP = File::Temp->new or croak "no tempfile: $^E";
+      binmode($TMP, ":crlf") if $self->{crlf};
 
       $self->rewind;
       copyData($self->{FH}, $TMP);
@@ -843,8 +840,8 @@ sub writeKeys {
   my $clone = bless {%$self}; 
   $clone->{journal} = undef;
   $clone->{FH} = undef;  
-  $clone->{FH} = new File::Temp or croak "no tempfile: $^E";
-  binmode($clone->{FH}, ":crlf");
+  $clone->{FH} = File::Temp->new or croak "no tempfile: $^E";
+  binmode($clone->{FH}, ":crlf") if $self->{crlf};
 
   seek $self->{FH}, 0, 0; # rewind to start of FILE (not start of DATA)
   copyData($self->{FH}, $clone->{FH});
@@ -911,7 +908,7 @@ sub playJournal {
   my $self = shift;
   croak "cannot playJournal while journaling is on!" if $self->{journal};
   my $J;
-  _open($J, @_) or croak "open @_: $^E";
+  $self->_open($J, @_) or croak "open @_: $^E";
 
   my @rows = ();
   my @splices = ();
@@ -927,26 +924,24 @@ sub playJournal {
     s/$self->{fieldSepRepl}/$self->{fieldSep}/g foreach @vals;
 
     for ($ins) {
-      /^CLEAR/   and do {$self->clear; next };
-      /^ROW/     and do {push @rows, $self->{ht}->new(@vals); next};
-      /^SPLICE/  and do {my $nRows = pop @vals;
-			carp "invalid number of data rows in journal at $line"
-			  if ($nRows||0) != @rows;
-		        push @splices, @vals, $nRows ? [@rows] : undef;
-		        @rows = ();
-		        next };
+      /^CLEAR/      and do {$self->clear; next };
+      /^ROW/        and do {push @rows, $self->{ht}->new(@vals); next};
+      /^SPLICE/     and do {my $nRows = pop @vals;
+                            carp "invalid number of data rows in journal at $line" if ($nRows||0) != @rows;
+                           push @splices, @vals, $nRows ? [@rows] : undef;
+                           @rows = ();
+                           next };
       /^ENDSPLICES/ and do {$self->splices(@splices); 
-			    @splices = (); 
-			    next};
-      /^KEY/     and do {my $nRows = pop @vals;
-			 carp "invalid number of data rows in journal at $line"
-			  if ($nRows||0) > 1;
-			 push @writeKeys, $vals[0], $nRows ? $rows[0] : undef;
-			 @rows = ();
-			 next };
-      /^ENDKEYS/ and do {$self->writeKeys({@writeKeys}, @vals); 
-			 @writeKeys = (); 
-			 next};
+                            @splices = ();
+                            next};
+      /^KEY/        and do {my $nRows = pop @vals;
+                            carp "invalid number of data rows in journal at $line" if ($nRows||0) > 1;
+                            push @writeKeys, $vals[0], $nRows ? $rows[0] : undef;
+                            @rows = ();
+                            next };
+      /^ENDKEYS/    and do {$self->writeKeys({@writeKeys}, @vals);
+                            @writeKeys = ();
+                            next};
     }
   }
 }
@@ -1065,7 +1060,7 @@ sub compileFilter {
   }
 
   my $code = $self->_cplQ($query);
-  eval 'sub {no warnings "numeric"; (' .$code. ') ? $_[0] : undef;}' 
+  eval 'sub {no warnings "numeric"; (' .$code. ') ? $_[0] : undef;}'
     or croak $@;
 }
 
@@ -1101,8 +1096,8 @@ sub _cplSubQ {
     # Either a list of  subqueries...
     /^\(\)$/ 
       and do {# assert(ref $subQ->{value} eq 'HASH' and not $subQ->{field}) 
-	      #   if DEBUG;
-	      return $self->_cplQ($subQ->{value}); };
+              #   if DEBUG;
+              return $self->_cplQ($subQ->{value}); };
 
     # ...or a comparison operator with a word or list of words. 
     # In that case we need to do some preparation for the source of comparison.
@@ -1113,47 +1108,47 @@ sub _cplSubQ {
     my $src = qq{\$_[0]->{line}}; # ... by default, the whole line ;
     if ($subQ->{field}) {         # ... or an individual field.
       if ($subQ->{field} eq 'K_E_Y') { # Special pseudo field (in first position) :
-	$subQ->{op} = '~';	       # cheat, replace ':' by a regex operation.
-	$subQ->{value} = "^$subQ->{value}(?:\\Q$self->{fieldSep}\\E|\$)";
+        $subQ->{op} = '~';             # cheat, replace ':' by a regex operation.
+        $subQ->{value} = "^$subQ->{value}(?:\\Q$self->{fieldSep}\\E|\$)";
       }
       else {
-	my $fieldNum = $self->ht->{$subQ->{field}} or
-	  croak "invalid field name $subQ->{field} in request";
-	$src = qq{_getField(\$_[0], $fieldNum)};
+        my $fieldNum = $self->ht->{$subQ->{field}} or
+          croak "invalid field name $subQ->{field} in request";
+        $src = qq{_getField(\$_[0], $fieldNum)};
       }
     }
 
     /^:$/
       and do {my $s = $subQ->{value};
 
-	      my $noHighlights =            # no result highlighting if ...
-		$s eq '*'                   # .. request matches anything
-	        || ! ($self->{preMatch} || $self->{postMatch}) 
-		                            # .. or no highlight was requested
-		|| $subQ->{field};          # .. or request is on specific field
+              my $noHighlights =            # no result highlighting if ...
+                $s eq '*'                   # .. request matches anything
+                || ! ($self->{preMatch} || $self->{postMatch}) 
+                                            # .. or no highlight was requested
+                || $subQ->{field};          # .. or request is on specific field
 
-	      $s =~ s[\*][\\w*]g;             # replace star by \w* regex
-	      $s =~ s{[\[\]\(\)+?]}{\Q$&\E}g; # escape other regex chars
-	      $s =~ s[\s+][\\s+]g;            # replace spaces by \s+ regex
+              $s =~ s[\*][\\w*]g;             # replace star by \w* regex
+              $s =~ s{[\[\]\(\)+?]}{\Q$&\E}g; # escape other regex chars
+              $s =~ s[\s+][\\s+]g;            # replace spaces by \s+ regex
 
 
-	      $s =~ s/з/[зc]/g;
-	      $s =~ s/([бавд])/[a$1]/ig;
-	      $s =~ s/([йикл])/[e$1]/ig;
-	      $s =~ s/([нмоп])/[i$1]/ig;
-	      $s =~ s/([утфц])/[o$1]/ig;
-	      $s =~ s/([ъщыь])/[u$1]/ig;
-	      $s =~ s/([эя])/[y$1]/ig;
+              $s =~ s/з/[зc]/g;
+              $s =~ s/([бавд])/[a$1]/ig;
+              $s =~ s/([йикл])/[e$1]/ig;
+              $s =~ s/([нмоп])/[i$1]/ig;
+              $s =~ s/([утфц])/[o$1]/ig;
+              $s =~ s/([ъщыь])/[u$1]/ig;
+              $s =~ s/([эя])/[y$1]/ig;
 
-	      my $wdIni = ($s =~ /^\w/) ? '\b' : '';
-	      my $wdEnd = ($s =~ /\w$/) ? '\b' : '';
-	      my $lineIni = "";
-	      $lineIni = "(?<!^)" if $self->{avoidMatchKey} and not $subQ->{field};
-	      $s = "$lineIni$wdIni$s$wdEnd";
+              my $wdIni = ($s =~ /^\w/) ? '\b' : '';
+              my $wdEnd = ($s =~ /\w$/) ? '\b' : '';
+              my $lineIni = "";
+              $lineIni = "(?<!^)" if $self->{avoidMatchKey} and not $subQ->{field};
+              $s = "$lineIni$wdIni$s$wdEnd";
 
-	      return $noHighlights ? "($src =~ m[$s]i)" :
-		"($src =~ s[$s][$self->{preMatch}\$&$self->{postMatch}]ig)";
-	      };
+              return $noHighlights ? "($src =~ m[$s]i)" :
+                "($src =~ s[$s][$self->{preMatch}\$&$self->{postMatch}]ig)";
+              };
 
 
 
@@ -1185,13 +1180,9 @@ sub _cplSubQ {
     (/^(!)~$/ or /^()=?~$/)  and return "$1($src =~ m[$subQ->{value}])";
 
     # choose proper comparison according to datatype of $subQ->{value}
-    my $cmp = ($subQ->{value} =~ $self->{rxDate}) ? 
-                  "(\$self->{date2str}($src) cmp q{" . 
-		    $self->{date2str}($subQ->{value}) . "})" :
-	      ($subQ->{value} =~ $self->{rxNum})  ? 
-		  "($src <=> $subQ->{value})" :
-               # otherwise
-                  "($src cmp q{$subQ->{value}})";
+    my $cmp = ($subQ->{value} =~ $self->{rxDate}) ? "(\$self->{date2str}($src) cmp q{" . $self->{date2str}($subQ->{value}) . "})" :
+              ($subQ->{value} =~ $self->{rxNum})  ? "($src <=> $subQ->{value})"                                                   :
+                                                    "($src cmp q{$subQ->{value}})";
 
     /^=?=$/       and return "$cmp == 0";
     /^(?:!=|<>)$/ and return "$cmp != 0";

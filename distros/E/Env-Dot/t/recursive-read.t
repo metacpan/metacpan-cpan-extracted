@@ -138,6 +138,7 @@ subtest 'Missing parent file, not okay' => sub {
     ($this) = $this =~ /(.+)/msx;    # Make it non-tainted
 
     my $subdir_path = abs_path( File::Spec->catdir( $dir_path, 'root', 'dir', 'subdir' ) );
+    my $subdir_env  = abs_path( File::Spec->catdir( $dir_path, 'root', 'dir', 'subdir', '.env' ) );
 
     # CD to subdir, the bottom in the hierarcy.
     chdir $subdir_path || croak;
@@ -154,7 +155,11 @@ subtest 'Missing parent file, not okay' => sub {
     local $EVAL_ERROR = undef;
     my $r = eval 'use Env::Dot; 1';    ## no critic [BuiltinFunctions::ProhibitStringyEval]
     ## no critic (RegularExpressions::ProhibitComplexRegexes)
-    like( $EVAL_ERROR, qr/^Error:[\s]No[\s]parent\s[.]env\sfile[.]\sChild\s[.]env:\s$subdir_path/msx, 'use Env::Dot failed' );
+    like(
+        $EVAL_ERROR,
+        qr/^Error: \s No \s parent \s [.]env \s file \s found \s for \s child \s file \s '$subdir_env' .* $/msx,
+        'use Env::Dot failed'
+    );
     is( $r, U(), 'eval failed' );
 
     chdir $this;
@@ -194,6 +199,7 @@ subtest 'Missing parent file 2, not okay' => sub {
     ($this) = $this =~ /(.+)/msx;    # Make it non-tainted
 
     my $dir_path    = abs_path( File::Spec->catdir( $tmp_dir_path, 'root', 'dir' ) );
+    my $dir_env     = abs_path( File::Spec->catdir( $tmp_dir_path, 'root', 'dir', '.env' ) );
     my $subdir_path = abs_path( File::Spec->catdir( $tmp_dir_path, 'root', 'dir', 'subdir' ) );
 
     # CD to subdir, the bottom in the hierarcy.
@@ -211,7 +217,11 @@ subtest 'Missing parent file 2, not okay' => sub {
     local $EVAL_ERROR = undef;
     my $r = eval 'use Env::Dot; 1';    ## no critic [BuiltinFunctions::ProhibitStringyEval]
     ## no critic (RegularExpressions::ProhibitComplexRegexes)
-    like( $EVAL_ERROR, qr/^Error:[\s]No[\s]parent\s[.]env\sfile[.]\sChild\s[.]env:\s$dir_path.*/msx, 'use Env::Dot failed' );
+    like(
+        $EVAL_ERROR,
+        qr/^Error: \s No \s parent \s [.]env \s file \s found \s for \s child \s file \s '$dir_env' .* $/msx,
+        'use Env::Dot failed'
+    );
     is( $r, U(), 'eval failed' );
 
     chdir $this;

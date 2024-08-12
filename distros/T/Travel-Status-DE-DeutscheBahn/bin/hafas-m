@@ -3,7 +3,7 @@ use strict;
 use warnings;
 use 5.014;
 
-our $VERSION = '6.04';
+our $VERSION = '6.06';
 
 use utf8;
 use DateTime;
@@ -176,7 +176,7 @@ sub parse_mot_options {
 				for my $mot ( @{ $desc->{productbits} } ) {
 					if ( ref($mot) eq 'ARRAY' ) {
 						if ( $mot->[0] ne '_' ) {
-							printf( "%-10s %s\n", @{$mot} );
+							printf( "%-20s (%s)\n", @{$mot} );
 						}
 					}
 					elsif ( $mot ne '_' ) {
@@ -684,7 +684,7 @@ B<hafas-m> [B<-s> I<service>] [B<-l> I<language>] B<!>I<query>|I<journeyID>
 
 =head1 VERSION
 
-version 6.04
+version 6.06
 
 =head1 DESCRIPTION
 

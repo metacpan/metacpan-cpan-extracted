@@ -20,6 +20,18 @@
 #######################################################################
 
 
+2024-08-11  Brian M. Kelly <Brian.Kelly@fullauto.com>
+
+        * Version 1.0000685 released
+
+        * In Makefile.PL changed md5 to sha256
+
+2024-08-11  Brian M. Kelly <Brian.Kelly@fullauto.com>
+
+        * Version 1.0000684 released
+
+        * Using latest berkeley db version 18.1.40
+
 2024-08-09  Brian M. Kelly <Brian.Kelly@fullauto.com>
 
         * Version 1.0000683 released

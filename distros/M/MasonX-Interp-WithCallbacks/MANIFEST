@@ -12,11 +12,11 @@ t/06object_request.t
 t/07combined.t
 t/08apache.t
 t/09cgi.t
-t/10pod.t
 t/conf/extra.conf.in
 t/htdocs/alt.mc
 t/htdocs/dhandler
 t/lib/TestCallbacks.pm
 t/lib/TieOut.pm
+Makefile.PL
 META.yml
 META.json

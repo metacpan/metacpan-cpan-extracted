@@ -4,9 +4,9 @@ use strict;
 use warnings;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2024-08-09'; # DATE
+our $DATE = '2024-08-11'; # DATE
 our $DIST = 'App-prefixcat'; # DIST
-our $VERSION = '0.001'; # VERSION
+our $VERSION = '0.002'; # VERSION
 
 sub run {
     my %opts = @_;
@@ -68,7 +68,7 @@ App::prefixcat - Like Unix `cat` but by default prefix each line with filename
 
 =head1 VERSION
 
-This document describes version 0.001 of App::prefixcat (from Perl distribution App-prefixcat), released on 2024-08-09.
+This document describes version 0.002 of App::prefixcat (from Perl distribution App-prefixcat), released on 2024-08-11.
 
 =head1 SYNOPSIS
 

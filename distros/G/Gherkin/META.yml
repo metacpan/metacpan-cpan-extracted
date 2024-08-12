@@ -13,7 +13,7 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: '7.1101'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.031, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Zilla version 6.032, CPAN::Meta::Converter version 2.150010'
 license: mit
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -22,88 +22,88 @@ name: Gherkin
 provides:
   App::gherkin:
     file: lib/App/gherkin.pm
-    version: v28.0.0
+    version: v29.0.0
   Gherkin:
     file: lib/Gherkin.pm
-    version: v28.0.0
+    version: v29.0.0
   Gherkin::AstBuilder:
     file: lib/Gherkin/AstBuilder.pm
-    version: v28.0.0
+    version: v29.0.0
   Gherkin::AstNode:
     file: lib/Gherkin/AstNode.pm
-    version: v28.0.0
+    version: v29.0.0
   Gherkin::Dialect:
     file: lib/Gherkin/Dialect.pm
-    version: v28.0.0
+    version: v29.0.0
   Gherkin::Exceptions:
     file: lib/Gherkin/Exceptions.pm
-    version: v28.0.0
+    version: v29.0.0
   Gherkin::Exceptions::AstBuilder:
     file: lib/Gherkin/Exceptions.pm
-    version: v28.0.0
+    version: v29.0.0
   Gherkin::Exceptions::CompositeParser:
     file: lib/Gherkin/Exceptions.pm
-    version: v28.0.0
+    version: v29.0.0
   Gherkin::Exceptions::NoSuchLanguage:
     file: lib/Gherkin/Exceptions.pm
-    version: v28.0.0
+    version: v29.0.0
   Gherkin::Exceptions::Parser:
     file: lib/Gherkin/Exceptions.pm
-    version: v28.0.0
+    version: v29.0.0
   Gherkin::Exceptions::SingleParser:
     file: lib/Gherkin/Exceptions.pm
-    version: v28.0.0
+    version: v29.0.0
   Gherkin::Exceptions::UnexpectedEOF:
     file: lib/Gherkin/Exceptions.pm
-    version: v28.0.0
+    version: v29.0.0
   Gherkin::Exceptions::UnexpectedToken:
     file: lib/Gherkin/Exceptions.pm
-    version: v28.0.0
+    version: v29.0.0
   Gherkin::Generated::Languages:
     file: lib/Gherkin/Generated/Languages.pm
-    version: v28.0.0
+    version: v29.0.0
   Gherkin::Generated::Parser:
     file: lib/Gherkin/Generated/Parser.pm
-    version: v28.0.0
+    version: v29.0.0
   Gherkin::Line:
     file: lib/Gherkin/Line.pm
-    version: v28.0.0
+    version: v29.0.0
   Gherkin::Parser:
     file: lib/Gherkin/Parser.pm
-    version: v28.0.0
+    version: v29.0.0
   Gherkin::ParserBase:
     file: lib/Gherkin/ParserBase.pm
-    version: v28.0.0
+    version: v29.0.0
   Gherkin::ParserContext:
     file: lib/Gherkin/ParserContext.pm
-    version: v28.0.0
+    version: v29.0.0
   Gherkin::Pickles::Compiler:
     file: lib/Gherkin/Pickles/Compiler.pm
-    version: v28.0.0
+    version: v29.0.0
   Gherkin::Token:
     file: lib/Gherkin/Token.pm
-    version: v28.0.0
+    version: v29.0.0
   Gherkin::TokenFormatterBuilder:
     file: lib/Gherkin/TokenFormatterBuilder.pm
-    version: v28.0.0
+    version: v29.0.0
   Gherkin::TokenMatcher:
     file: lib/Gherkin/TokenMatcher.pm
-    version: v28.0.0
+    version: v29.0.0
   Gherkin::TokenScanner:
     file: lib/Gherkin/TokenScanner.pm
-    version: v28.0.0
+    version: v29.0.0
 requires:
   Class::XSAccessor: '0'
   Cpanel::JSON::XS: '0'
   Cucumber::Messages: '>= v22.0.0, < v23.0.0'
   Data::UUID: '0'
-  Getopt::Long: '2.57'
-  List::Util: '1.63'
+  Getopt::Long: '2.58'
+  List::Util: '1.65'
   perl: v5.14.4
 resources:
   bugtracker: https://github.com/cucumber/cucumber/issues
   repository: https://github.com/cucumber/gherkin.git
-version: 28.0.0
+version: 29.0.0
 x_generated_by_perl: v5.34.0
 x_serialization_backend: 'YAML::Tiny version 1.74'
 x_spdx_expression: MIT

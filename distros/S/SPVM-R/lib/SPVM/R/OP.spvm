@@ -54,10 +54,6 @@ class R::OP {
     
     my $x_dim = $x_ndarray->dim;
     
-    unless ($x_ndarray->is_vector) {
-      die "The n-dimensional array \$x_ndarray must be a vector.";
-    }
-    
     unless ($times >= 0) {
       die "The repeat count \$times must be greater than or equal to 0.";
     }
@@ -94,19 +90,17 @@ class R::OP {
     my $x_length = $x_ndarray->length;
     
     unless ($length >= 0) {
-      die "The length \$length must be greater than 0.";
+      die "The length \$length must be greater than or equal to 0.";
     }
     
     my $times = 0;
     if ($length > 0) {
       unless ($length % $x_length == 0) {
-        die "The length \$length must be devided by the length of n-dimensional array \$x_ndarray.";
+        die "The length \$length must be devided by the length of the n-dimensional array \$x_ndarray.";
       }
       
       $times = $length / $x_length;
     }
-    
-    my $ret_length = $x_length * $length;
     
     my $ret_ndarray = &rep($x_ndarray, $times);
     

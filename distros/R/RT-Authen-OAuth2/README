@@ -6,7 +6,7 @@ DESCRIPTION
     External authentication for OAuth2 sources.
 
 RT VERSION
-    Works with RT 4.4
+    Works with RT 4.4 and 5
 
 DEPENDENCIES
     Requires Net::OAuth2::Profile::WebServer
@@ -41,7 +41,7 @@ BUGS
         L<rt.cpan.org|http://rt.cpan.org/Public/Dist/Display.html?Name=RT-Authen-OAuth2>.
 
 LICENSE AND COPYRIGHT
-    This software is Copyright (c) 2016-2019 by Best Practical Solutions LLC
+    This software is Copyright (c) 2016-2024 by Best Practical Solutions LLC
 
     This is free software, licensed under:
 

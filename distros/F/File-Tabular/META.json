@@ -1,0 +1,49 @@
+{
+   "abstract" : "searching and editing flat tabular files",
+   "author" : [
+      "Laurent Dami <dami AT cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4234",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "File-Tabular",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "Fcntl" : "0",
+            "File::Temp" : "0",
+            "Hash::Type" : "1.0",
+            "Search::QueryParser" : "0.92"
+         }
+      }
+   },
+   "provides" : {
+      "File::Tabular" : {
+         "file" : "lib/File/Tabular.pm",
+         "version" : "0.73"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "url" : "https://github.com/damil/File-Tabular"
+      }
+   },
+   "version" : "0.73",
+   "x_serialization_backend" : "JSON::PP version 4.16"
+}

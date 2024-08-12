@@ -61,7 +61,7 @@
    "provides" : {
       "App::Prove::Plugin::TestArgs" : {
          "file" : "lib/App/Prove/Plugin/TestArgs.pm",
-         "version" : "v2.1.0"
+         "version" : "v2.1.1"
       }
    },
    "release_status" : "stable",
@@ -75,5 +75,5 @@
          "web" : "https://github.com/XSven/App-Prove-Plugin-TestArgs"
       }
    },
-   "version" : "2.1.0"
+   "version" : "2.1.1"
 }

@@ -1,8 +1,9 @@
 Changes
-Makefile.PL
+Build.PL
 MANIFEST
-README
 t/File-Tabular.t
 t/htmlEntities.txt
 lib/File/Tabular.pm
-META.yml                                 Module meta-data (added by MakeMaker)
+META.yml                                 Module meta-data 
+META.json
+

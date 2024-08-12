@@ -110,6 +110,7 @@ t/lib/SPVM/TestCase/R/NDArray/Short.spvm
 t/lib/SPVM/TestCase/R/NDArray/String.spvm
 t/lib/SPVM/TestCase/R/NDArray/StringBuffer.spvm
 t/lib/SPVM/TestCase/R/NDArray/Time/Piece.spvm
+t/lib/SPVM/TestCase/R/OP.spvm
 t/lib/SPVM/TestCase/R/OP/Byte.spvm
 t/lib/SPVM/TestCase/R/OP/DataFrame.spvm
 t/lib/SPVM/TestCase/R/OP/Double.spvm
@@ -160,6 +161,7 @@ t/R-OP-Short.t
 t/R-OP-String.t
 t/R-OP-StringBuffer.t
 t/R-OP-Time-Piece.t
+t/R-OP.t
 t/R-Util.t
 t/R.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)

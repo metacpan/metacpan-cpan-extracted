@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## A real Try Catch Block Implementation Using Perl Filter - ~/lib/Nice/Try.pm
-## Version v1.3.10
+## Version v1.3.11
 ## Copyright(c) 2024 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2020/05/17
-## Modified 2024/03/26
+## Modified 2024/08/11
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -21,14 +21,12 @@ BEGIN
         $CATCH $DIED $EXCEPTION $FINALLY $HAS_CATCH @RETVAL $SENTINEL $TRY $WANTARRAY
         $VERSION $ERROR
     );
-    # XXX Only for debugging
-    # use Devel::Confess;
     use PPI 1.277;
     use Filter::Util::Call;
     use Scalar::Util ();
     use List::Util ();
     use Want ();
-    our $VERSION = 'v1.3.10';
+    our $VERSION = 'v1.3.11';
     our $ERROR;
     our( $CATCH, $DIED, $EXCEPTION, $FINALLY, $HAS_CATCH, @RETVAL, $SENTINEL, $TRY, $WANTARRAY );
 }
@@ -119,7 +117,6 @@ sub filter
     return( $line ) if( !$line );
     unless( $status < 0 )
     {
-        # $self->_message( 5, "Processing at line $line code:\n$code" );
         # 2021-06-05 (Jacques): fixes the issue No. 3 <https://gitlab.com/jackdeguest/Nice-Try/issues/3>
         # Make sure there is at least a space at the beginning
         $code = ' ' . $code;
@@ -139,7 +136,6 @@ sub filter
             # Rollback
             else
             {
-                # $self->_message( 5, "Nothing found, restoring code to '$code'" );
                 $_ = $code;
     #             $status = -1;
     #             filter_del();
@@ -147,7 +143,7 @@ sub filter
         }
         else
         {
-            $self->_message( 4, "There does not seem to be any try block in this code, so skipping." );
+            $self->_message( 4, "There does not seem to be any try block in this code, so skipping." ) if( $self->{debug} >= 4 );
             $_ = $code;
         }
         
@@ -160,12 +156,11 @@ sub filter
     {
         while( $status = filter_read() )
         {
-            $self->_message( 4, "Reading more line: $_" );
+            $self->_message( 4, "Reading more line: $_" ) if( $self->{debug} >= 4 );
             return( $status ) if( $status < 0 );
             $line++;
         }
     }
-    # $self->_message( 3, "Returning status '$line' with \$_ set to '$_'." );
     if( $self->{debug_file} )
     {
         if( open( my $fh, ">$self->{debug_file}" ) )
@@ -175,7 +170,6 @@ sub filter
             close( $fh );
         }
     }
-    # filter_del();
     return( $line );
 }
 
@@ -219,13 +213,13 @@ sub _browse
     my $level = shift( @_ ) || 0;
     if( $self->{debug} >= 4 )
     {
-        $self->_message( 4, "Checking code: ", $self->_serialize( $elem ) );
-        $self->_messagef( 4, "PPI element of class %s has children property '%s'.", $elem->class, $elem->{children} );
+        $self->_message( 4, "Checking code: ", $self->_serialize( $elem ) ) if( $self->{debug} >= 4 );
+        $self->_messagef( 4, "PPI element of class %s has children property '%s'.", $elem->class, $elem->{children} ) if( $self->{debug} >= 4 );
     }
     return if( !$elem->children );
     foreach my $e ( $elem->elements )
     {
-        printf( STDERR "%sElement: [%d] class %s, value %s\n", ( '.' x $level ), $e->line_number, $e->class, $e->content );
+        printf( STDERR "%sElement: [%d] class %s, value %s\n", ( '.' x $level ), ( $e->line_number // 'undef' ), ( $e->class // 'undef' ), ( $e->content // 'undef' ) );
         if( $e->can('children') && $e->children )
         {
             $self->_browse( $e, $level + 1 );
@@ -294,207 +288,258 @@ sub _parse
     {
         return( $self->_error( "Element provided to parse is not a PPI::Node object" ) );
     }
-    
-    my $ref = $elem->find(sub
+
+    my $check_consecutive_blocks;
+    $check_consecutive_blocks = sub
     {
-        my( $top, $this ) = @_;
-        return( $this->class eq 'PPI::Statement' && substr( $this->content, 0, 3 ) eq 'try' );
-    });
-    return( $self->_error( "Failed to find any try-catch clause: $@" ) ) if( !defined( $ref ) );
-    $self->_messagef( 4, "Found %d match(es)", scalar( @$ref ) ) if( $ref && ref( $ref ) && $self->{debug} >= 4 );
-    return if( !$ref || !scalar( @$ref ) );
+        my $top_elem = shift( @_ );
+        my $level = shift( @_ );
+        my $ref = $top_elem->find(sub
+        {
+            my( $top, $this ) = @_;
+            return( $this->class eq 'PPI::Statement' && substr( $this->content, 0, 3 ) eq 'try' ? 1 : 0 );
+        });
+        return( $self->_error( "Failed to find any try-catch clause: $@" ) ) if( !defined( $ref ) );
+        $self->_messagef( 4, "[blocks check level ${level}] Found %d match(es) for try statement", scalar( @$ref ) ) if( $ref && ref( $ref ) && $self->{debug} >= 4 );
+        return if( !$ref || !scalar( @$ref ) );
+        # We will store the additional blocks here, and we will dig deeper into them recursively.
+        my $has_additional_blocks = 0;
     
-    # 2020-09-13: PPI will return 2 or more consecutive try-catch block as 1 statement
-    # It does not tell them apart, so we need to post process the result to effectively search within for possible for other try-catch blocks and update the @$ref array consequently
-    # Array to contain the new version of the $ref array.
-    my $alt_ref = [];
-    $self->_message( 3, "Checking for consecutive try-catch blocks in results found by PPI" ) if( $self->{debug} >= 3 );
-    foreach my $this ( @$ref )
-    {
-        my( @block_children ) = $this->children;
-        next if( !scalar( @block_children ) );
-        my $tmp_ref = [];
-        ## to contain all the nodes to move
-        my $tmp_nodes = [];
-        my $prev_sib = $block_children[0];
-        push( @$tmp_nodes, $prev_sib );
-        my $sib;
-        while( $sib = $prev_sib->next_sibling )
+        # NOTE: Checking for consecutive try-catch block statements
+        # 2020-09-13: PPI will return 2 or more consecutive try-catch block as 1 statement
+        # It does not tell them apart, so we need to post process the result to effectively search within for possible for other try-catch blocks and update the @$ref array consequently
+        # Array to contain the new version of the $ref array.
+        my $alt_ref = [];
+        $self->_message( 3, "[blocks check level ${level}] Checking for consecutive try-catch blocks in ", scalar( @$ref ), " results found by PPI" ) if( $self->{debug} >= 3 );
+        foreach my $this ( @$ref )
         {
-            # We found a try-catch block. Move the buffer to $alt_ref
-            if( $sib->class eq 'PPI::Token::Word' && $sib->content eq 'try' )
+            $self->_message( 3, "[blocks check level ${level}] Getting children from object '", overload::StrVal( $this ), "'" ) if( $self->{debug} >= 3 );
+            $self->_message( 3, "[blocks check level ${level}] Checking if following code has children" ) if( $self->{debug} >= 3 );
+            # my( @block_children ) = ( exists( $this->{children} ) && ref( $this->{children} // '' ) eq 'ARRAY' ) ? $this->children : ();
+            # Stringifying forces PPI to set the object children somehow
+            my $ct = "$this";
+            my( @block_children ) = $this->children;
+            next if( !scalar( @block_children ) );
+            my $tmp_ref = [];
+            ## to contain all the nodes to move
+            my $tmp_nodes = [];
+            my $prev_sib = $block_children[0];
+            push( @$tmp_nodes, $prev_sib );
+            my $sib;
+            while( $sib = $prev_sib->next_sibling )
             {
-                # Look ahead for a block...
-                my $next = $sib->snext_sibling;
-                if( $next && $next->class eq 'PPI::Structure::Block' )
+                # We found a try-catch block. Move the buffer to $alt_ref
+                if( $sib->class eq 'PPI::Token::Word' && $sib->content eq 'try' )
                 {
-                    $self->_message( 3, "Found consecutive try-block." ) if( $self->{debug} >= 3 );
-                    # Push the previous statement $st to the stack $alt_ref
-                    $self->_messagef( 3, "Saving previous %d nodes collected.", scalar( @$tmp_nodes ) ) if( $self->{debug} >= 3 );
-                    push( @$tmp_ref, $tmp_nodes );
-                    $tmp_nodes = [];
-                }
-            }
-            push( @$tmp_nodes, $sib );
-            $prev_sib = $sib;
-        }
-        $self->_messagef( 3, "Saving last %d nodes collected.", scalar( @$tmp_nodes ) ) if( $self->{debug} >= 3 );
-        push( @$tmp_ref, $tmp_nodes );
-        $self->_messagef( 3, "Found %d try-catch block(s) in initial PPI result.", scalar( @$tmp_ref ) ) if( $self->{debug} >= 3 );
-        # If we did find consecutive try-catch blocks, we add each of them after the nominal one and remove the nominal one after. The nominal one should be empty by then
-        if( scalar( @$tmp_ref ) > 1 )
-        {
-            my $last_obj = $this;
-            my $spaces = [];
-            foreach my $arr ( @$tmp_ref )
-            {
-                $self->_message( 3, "Adding statement block with ", scalar( @$arr ), " children after '$last_obj'" ) if( $self->{debug} >= 3 );
-                # 2021-06-05 (Jacques): Fixing issue No. 2: <https://gitlab.com/jackdeguest/Nice-Try/issues/2>
-                # Find the last block that belongs to us
-                $self->_message( 4, "Checking first level objects collected." ) if( $self->{debug} >= 4 );
-                my $last_control = '';
-                my $last_block;
-                my $last = {};
-                foreach my $o ( @$arr )
-                {
-                    # $self->_message( 4, "Found object '$o' of class '", $o->class, "' (", overload::StrVal( $o ), ")." );
-                    if( $o->class eq 'PPI::Structure::Block' && $last_control )
+                    # Look ahead for a block...
+                    my $next = $sib->snext_sibling;
+                    if( $next && $next->class eq 'PPI::Structure::Block' )
                     {
-                        $last->{block} = $o;
-                        $last->{control} = $last_control;
-                        $last_control = '';
+                        $has_additional_blocks++;
+                        $self->_messagef( 3, "[blocks check level ${level}] Found consecutive try-block at line %d.", $sib->line_number ) if( $self->{debug} >= 3 );
+                        # Push the previous statement $st to the stack $alt_ref
+                        $self->_messagef( 3, "[blocks check level ${level}] Saving previous %d nodes collected.", scalar( @$tmp_nodes ) ) if( $self->{debug} >= 3 );
+                        push( @$tmp_ref, $tmp_nodes );
+                        $tmp_nodes = [];
                     }
-                    elsif( $o->class eq 'PPI::Token::Word' )
+                }
+                push( @$tmp_nodes, $sib );
+                $prev_sib = $sib;
+            }
+            $self->_messagef( 3, "[blocks check level ${level}] Saving last %d nodes collected.", scalar( @$tmp_nodes ) ) if( $self->{debug} >= 3 );
+            push( @$tmp_ref, $tmp_nodes );
+            $self->_messagef( 3, "[blocks check level ${level}] Found %d try-catch block(s) in initial PPI result.", scalar( @$tmp_ref ) ) if( $self->{debug} >= 3 );
+            # If we did find consecutive try-catch blocks, we add each of them after the nominal one and remove the nominal one after. The nominal one should be empty by then
+            if( scalar( @$tmp_ref ) > 1 )
+            {
+                my $last_obj = $this;
+                my $spaces = [];
+                foreach my $arr ( @$tmp_ref )
+                {
+                    $self->_message( 3, "[blocks check level ${level}] Adding statement block with ", scalar( @$arr ), " children after one at line ", $last_obj->line_number, ": '", substr( $last_obj, 0, 255 ), "'" ) if( $self->{debug} >= 3 );
+                    # 2021-06-05 (Jacques): Fixing issue No. 2: <https://gitlab.com/jackdeguest/Nice-Try/issues/2>
+                    # Find the last block that belongs to us
+                    $self->_message( 4, "[blocks check level ${level}] Checking first level objects collected." ) if( $self->{debug} >= 4 );
+                    my $last_control = '';
+                    my $last_block;
+                    my $last = {};
+                    foreach my $o ( @$arr )
                     {
-                        my $ct = $o->content;
-                        if( $ct eq 'try' || $ct eq 'catch' || $ct eq 'finally' )
+                        if( $o->class eq 'PPI::Structure::Block' && $last_control )
                         {
-                            $last_control = $o;
+                            $last->{block} = $o;
+                            $last->{control} = $last_control;
+                            $last_control = '';
+                        }
+                        elsif( $o->class eq 'PPI::Token::Word' )
+                        {
+                            my $ct = $o->content;
+                            if( $ct eq 'try' || $ct eq 'catch' || $ct eq 'finally' )
+                            {
+                                $last_control = $o;
+                            }
                         }
                     }
-                }
-                # $self->_message( 4, "Last control was '$last->{control}' and last block '$last->{block}' (", overload::StrVal( $last->{block} ), ")." );
-                
-                # Get the trailing insignificant elements at the end of the statement and move them out of the statement
-                my $insignificants = [];
-                while( scalar( @$arr ) > 0 )
-                {
-                    my $o = $arr->[-1];
-                    # $self->_message( 4, "Checking trailing object with class '", $o->class, "' and value '$o'" );
-                    # 2021-06-05 (Jacques): We don't just look for the last block, because
-                    # that was making a bad assumption that the last trailing block would be our
-                    # try-catch block.
-                    # Following issue No. 2 reported with a trailing anonymous subroutine,
-                    # We remove everything up until our known last block that belongs to us.
-                    last if( $o->class eq 'PPI::Structure::Block' && Scalar::Util::refaddr( $o ) eq Scalar::Util::refaddr( $last->{block} ) );
-                    unshift( @$insignificants, pop( @$arr )->remove );
-                }
-                $self->_messagef( 3, "%d insignificant objects found.", scalar( @$insignificants ) ) if( $self->{debug} >= 3 );
-                
-                my $new_code = join( '', map( "$_", @$arr ) );
-                # $self->_message( 4, "New code is: '$new_code'" );
-                # 2021-06-05 (Jacques): It is unfortunately difficult to simply add a new PPI::Statement object
-                # Instead, we have PPI parse our new code and we grab what we need.
-                my $new_block = PPI::Document->new( \$new_code, readonly => 1 );
-                # $self->_message( 4, "New block code is: '$new_block'" );
-                # $self->_browse( $new_block );
-                my $st = $new_block->{children}->[0]->remove;
-                # $self->_message( 4, "Statemnt now contains: '$st'" );
-                
-                # $self->_messagef( 3, "Adding the updated statement objects with %d children.", scalar( @$arr ) );
-                foreach my $o ( @$arr )
-                {
-                    # We remove the object from its parent, now that it has become useless
-                    my $old = $o->remove || die( "Unable to remove element '$o'\n" );
-                }
-                my $err = '';
-                $self->_messagef( 3, "Adding the statement object after last object '%s' of class '%s' with parent with class '%s'.", Scalar::Util::refaddr( $last_obj ), ( defined( $last_obj ) ? $last_obj->class : 'undefined class' ), ( defined( $last_obj ) ? $last_obj->parent->class : 'undefined parent class' ) ) if( $self->{debug} >= 3 );
-                $self->_message( 4, "In other word, adding:\n'$st'\nAFTER:\n'$last_obj'" ) if( $self->{debug} >= 4 );
-                # my $rc = $last_obj->insert_after( $st );
-                my $rc;
-                if( $last_obj->class eq 'PPI::Token::Whitespace' )
-                {
-                    $rc = $last_obj->__insert_after( $st );
-                }
-                else
-                {
-                    $rc = $last_obj->insert_after( $st );
-                }
-                
-                if( !defined( $rc ) )
-                {
-                    $err = sprintf( 'Object to be added after last try-block statement must be a PPI::Element. Class provided is \"%s\".', $st->class );
-                }
-                elsif( !$rc )
-                {
-                    $err = sprintf( "Object of class \"%s\" could not be added after object '%s' of class '%s' with parent '%s' with class '%s': '$last_obj'.", $st->class, Scalar::Util::refaddr( $last_obj ), $last_obj->class, Scalar::Util::refaddr( $last_obj->parent ), $last_obj->parent->class );
-                }
-                else
-                {
-                    $last_obj = $st;
-                    if( scalar( @$insignificants ) )
+                    
+                    # Get the trailing insignificant elements at the end of the statement and move them out of the statement
+                    my $insignificants = [];
+                    while( scalar( @$arr ) > 0 )
                     {
-                        $self->_messagef( 4, "Adding %d trailing insignificant objects after last element of class '%s'", scalar( @$insignificants ), $last_obj->class ) if( $self->{debug} >= 4 );
-                        foreach my $o ( @$insignificants )
+                        my $o = $arr->[-1];
+                        # 2021-06-05 (Jacques): We don't just look for the last block, because
+                        # that was making a bad assumption that the last trailing block would be our
+                        # try-catch block.
+                        # Following issue No. 2 reported with a trailing anonymous subroutine,
+                        # We remove everything up until our known last block that belongs to us.
+                        last if( $o->class eq 'PPI::Structure::Block' && Scalar::Util::refaddr( $o ) eq Scalar::Util::refaddr( $last->{block} ) );
+                        unshift( @$insignificants, pop( @$arr )->remove );
+                    }
+                    $self->_messagef( 3, "[blocks check level ${level}] %d insignificant objects found.", scalar( @$insignificants ) ) if( $self->{debug} >= 3 );
+                    
+                    my $new_code = join( '', map( "$_", @$arr ) );
+                    $self->_message( 3, "[blocks check level ${level}] Parsing new code to extract statement:\n${new_code}" ) if( $self->{debug} >= 3 );
+                    # 2021-06-05 (Jacques): It is unfortunately difficult to simply add a new PPI::Statement object
+                    # Instead, we have PPI parse our new code and we grab what we need.
+                    my $new_block = PPI::Document->new( \$new_code, readonly => 1 );
+                    # my $st = $new_block->{children}->[0]->remove;
+                    my $st;
+                    for( my $i = 0; $i < scalar( @{$new_block->{children}} ); $i++ )
+                    {
+                        if( Scalar::Util::blessed( $new_block->{children}->[$i] ) &&
+                            $new_block->{children}->[$i]->isa( 'PPI::Statement' ) )
                         {
-                            $self->_messagef( 4, "Adding trailing insignificant object of class '%s' after last element of class '%s'", $o->class, $last_obj->class ) if( $self->{debug} >= 4 );
-                            ## printf( STDERR "Inserting object '%s' (%s) of type '%s' after object '%s' (%s) of type %s who has parent '%s' of type '%s'\n", overload::StrVal( $o ), Scalar::Util::refaddr( $o ), ref( $o ), overload::StrVal( $last_obj), Scalar::Util::refaddr( $last_obj ), ref( $last_obj ), overload::StrVal( $last_obj->parent ), ref( $last_obj->parent ) );
-                            CORE::eval
+                            $st = $new_block->{children}->[$i]->remove;
+                            last;
+                        }
+                    }
+                    
+                    foreach my $o ( @$arr )
+                    {
+                        # We remove the object from its parent, now that it has become useless
+                        my $old = $o->remove || die( "Unable to remove element '$o'\n" );
+                    }
+                    my $err = '';
+                    $self->_messagef( 3, "[blocks check level ${level}] Adding the statement object after last object '%s' of class '%s' with parent with class '%s'.", Scalar::Util::refaddr( $last_obj ), ( defined( $last_obj ) ? $last_obj->class : 'undefined class' ), ( defined( $last_obj ) ? $last_obj->parent->class : 'undefined parent class' ) ) if( $self->{debug} >= 3 );
+                    # my $rc = $last_obj->insert_after( $st );
+                    my $rc;
+                    if( $last_obj->class eq 'PPI::Token::Whitespace' )
+                    {
+                        $rc = $last_obj->__insert_after( $st );
+                    }
+                    elsif( $last_obj->class eq 'PPI::Token::Comment' )
+                    {
+                        # $rc = $last_obj->parent->__insert_after_child( $last_obj, $st );
+                        $rc = $last_obj->__insert_after( $st );
+                    }
+                    else
+                    {
+                        $rc = $last_obj->insert_after( $st );
+                    }
+                    
+                    if( !defined( $rc ) )
+                    {
+                        $err = sprintf( 'Object to be added after last try-block statement must be a PPI::Element. Class provided is \"%s\".', $st->class );
+                    }
+                    elsif( !$rc )
+                    {
+                        my $requires;
+                        if( $last_obj->isa( 'PPI::Structure' ) ||
+                            $last_obj->isa( 'PPI::Token' ) )
+                        {
+                            $requires = 'PPI::Structure or PPI::Token';
+                        }
+                        elsif( $last_obj->isa( 'PPI::Statement' ) )
+                        {
+                            $requires = 'PPI::Statement or PPI::Token';
+                        }
+                        $err = sprintf( "Object of class \"%s\" could not be added after object with address '%s' and of class '%s' with parent '%s' with class '%s': '$last_obj'. The object of class '%s' must be a ${requires} object.", $st->class, Scalar::Util::refaddr( $last_obj ), $last_obj->class, Scalar::Util::refaddr( $last_obj->parent ), $last_obj->parent->class, $st->class );
+                    }
+                    else
+                    {
+                        $last_obj = $st;
+                        if( scalar( @$insignificants ) )
+                        {
+                            $self->_messagef( 4, "[blocks check level ${level}] Adding %d trailing insignificant objects after last element of class '%s'", scalar( @$insignificants ), $last_obj->class ) if( $self->{debug} >= 4 );
+                            foreach my $o ( @$insignificants )
                             {
-                                $rc = $last_obj->insert_after( $o ) ||
-                                do
+                                $self->_messagef( 4, "[blocks check level ${level}] Adding trailing insignificant object of class '%s' after last element of class '%s'", $o->class, $last_obj->class ) if( $self->{debug} >= 4 );
+                                # printf( STDERR "Inserting object '%s' (%s) of type '%s' after object '%s' (%s) of type %s who has parent '%s' of type '%s'\n", overload::StrVal( $o ), Scalar::Util::refaddr( $o ), ref( $o ), overload::StrVal( $last_obj), Scalar::Util::refaddr( $last_obj ), ref( $last_obj ), overload::StrVal( $last_obj->parent ), ref( $last_obj->parent ) );
+                                CORE::eval
                                 {
-                                    warn( "Failed to insert object of class '", $o->class, "' before last object of class '", $st->class, "'\n" ) if( $self->{debug} );
+                                    $rc = $last_obj->insert_after( $o ) ||
+                                    do
+                                    {
+                                        warn( "Failed to insert object of class '", $o->class, "' before last object of class '", $st->class, "'\n" ) if( $self->{debug} );
+                                    };
                                 };
-                            };
-                            if( $@ )
-                            {
-                                if( ref( $o ) )
+                                if( $@ )
                                 {
-                                    warn( "Failed to insert object of class '", $o->class, "' before last object of class '", $st->class, "': $@\n" ) if( $self->{debug} );
+                                    if( ref( $o ) )
+                                    {
+                                        warn( "Failed to insert object of class '", $o->class, "' before last object of class '", $st->class, "': $@\n" ) if( $self->{debug} );
+                                    }
+                                    else
+                                    {
+                                        warn( "Was expecting an object to insert before last object of class '", $st->class, "', but instead got '$o': $@\n" ) if( $self->{debug} );
+                                    }
                                 }
-                                else
+                                elsif( !defined( $rc ) )
                                 {
-                                    warn( "Was expecting an object to insert before last object of class '", $st->class, "', but instead got '$o': $@\n" ) if( $self->{debug} );
+                                    warn( sprintf( 'Object to be added after last try-block statement must be a PPI::Element. Class provided is \"%s\".', $o->class ) ) if( $self->{debug} );
                                 }
+                                elsif( !$rc )
+                                {
+                                    warn( sprintf( "Object of class \"%s\" could not be added after object of class '%s': '$last_obj'.", $o->class, $last_obj->class ) ) if( $self->{debug} );
+                                }
+                                # printf( STDERR "Object inserted '%s' (%s) of class '%s' now has parent '%s' (%s) of class '%s'\n", overload::StrVal( $o ), Scalar::Util::refaddr( $o ), ref( $o ), overload::StrVal( $o->parent ), Scalar::Util::refaddr( $o->parent ), ref( $o->parent ) );
+                                $o->parent( $last_obj->parent ) if( !$o->parent );
+                                $last_obj = $o;
                             }
-                            elsif( !defined( $rc ) )
-                            {
-                                warn( sprintf( 'Object to be added after last try-block statement must be a PPI::Element. Class provided is \"%s\".', $o->class ) ) if( $self->{debug} );
-                            }
-                            elsif( !$rc )
-                            {
-                                warn( sprintf( "Object of class \"%s\" could not be added after object of class '%s': '$last_obj'.", $o->class, $last_obj->class ) ) if( $self->{debug} );
-                            }
-                            ## printf( STDERR "Object inserted '%s' (%s) of class '%s' now has parent '%s' (%s) of class '%s'\n", overload::StrVal( $o ), Scalar::Util::refaddr( $o ), ref( $o ), overload::StrVal( $o->parent ), Scalar::Util::refaddr( $o->parent ), ref( $o->parent ) );
-                            $o->parent( $last_obj->parent ) if( !$o->parent );
-                            $last_obj = $o;
                         }
                     }
+                    die( $err ) if( length( $err ) );
+                    push( @$alt_ref, $st );
                 }
-                die( $err ) if( length( $err ) );
-                push( @$alt_ref, $st );
+                my $parent = $this->parent;
+                # Completely destroy it; it is now replaced by our updated code
+                $this->delete;
             }
-            my $parent = $this->parent;
-            ## Completely destroy it; it is now replaced by our updated code
-            $this->delete;
+            else
+            {
+                push( @$alt_ref, $this );
+            }
+        }
+        $self->_messagef( 3, "[blocks check level ${level}] Results found increased from %d to %d results.", scalar( @$ref ), scalar( @$alt_ref ) ) if( $self->{debug} >= 3 );
+
+        if( $has_additional_blocks )
+        {
+            $self->_message( 3, "[blocks check level ${level}] Consecutive block search now found ", scalar( @$alt_ref ), " try blocks." ) if( $self->{debug} >= 3 );
+            my $more = [];
+            foreach my $el ( @$alt_ref )
+            {
+                push( @$more, $el );
+                my $rv = $check_consecutive_blocks->( $el, ( $level + 1 ) );
+                if( ref( $rv ) && scalar( @$rv ) )
+                {
+                    push( @$more, @$rv );
+                }
+            }
+            return( $more );
         }
         else
         {
-            push( @$alt_ref, $this );
+            return( $ref );
         }
-    }
-    $self->_messagef( 3, "Results found increased from %d to %d results.", scalar( @$ref ), scalar( @$alt_ref ) ) if( $self->{debug} >= 3 );
-    @$ref = @$alt_ref if( scalar( @$alt_ref ) > scalar( @$ref ) );
+    };
+    my $ref = $check_consecutive_blocks->( $elem => 0 );
+    return if( !$ref || !scalar( @$ref ) );
     
-    # $self->_message( 3, "Script code is now:\n'$elem'" );
-    
+    $self->_messagef( 3, "Implementing try-catch for %d try-catch blocks.", scalar( @$ref ) ) if( $self->{debug} >= 3 );
+    # NOTE: processing implementation of our try-catch
     foreach my $this ( @$ref )
     {
         $self->_browse( $this ) if( $self->{debug} >= 5 );
-        # $self->_message( 4, "\$this is of class '", $this->class, "' and its parent of class '", $this->parent->class, "'." );
         my $element_before_try = $this->previous_sibling;
-        # $self->_message( 4, "Is \$element_before_try defined ? ", defined( $element_before_try ) ? 'Yes' : 'No', "(", overload::StrVal( $element_before_try ), ") -> '$element_before_try'" );
         my $try_block_ref = [];
         # Contains the finally block reference
         my $fin_block_ref = [];
@@ -507,7 +552,6 @@ sub _parse
         # There is a weird bug in PPI that I have searched but could not find
         # If I don't attempt to stringify, I may end up with a PPI::Statement object that has no children as an array reference
         my $ct = "$this";
-        # $self->_message( 3, "Checking sibling elements for '$ct'" );
         my( @block_children ) = $this->children;
         next if( !scalar( @block_children ) );
         my $prev_sib = $block_children[0];
@@ -521,10 +565,8 @@ sub _parse
         my $sib;
         while( $sib = $prev_sib->next_sibling )
         {
-            # $self->_messagef( 3, "Try sibling at line %d with class '%s': '%s'", $sib->line_number, $sib->class, $sib->content );
             if( !scalar( @$try_block_ref ) )
             {
-                # $self->_message( 3, "\tWorking on the initial try block." );
                 if( $sib->class eq 'PPI::Structure::Block' &&
                     substr( "$sib", 0, 1 ) eq "\{" &&
                     substr( "$sib", -1, 1 ) eq "\}" )
@@ -541,11 +583,10 @@ sub _parse
                 }
                 elsif( $sib->class eq 'PPI::Token::Whitespace' && $sib->content =~ /[\015\012]+/ )
                 {
-                    ## $self->_messagef( 4, "\tTry -> Found open new line at line %d", $sib->line_number );
                     $temp->{open_curly_nl}++;
                     push( @$buff, $sib );
                 }
-                ## We skip anything else until we find that try block
+                # We skip anything else until we find that try block
                 else
                 {
                     push( @$buff, $sib );
@@ -565,7 +606,6 @@ sub _parse
             }
             elsif( $inside_catch )
             {
-                # $self->_message( 3, "\tWorking on a catch block." );
                 # This is the catch list as in catch( $e ) or catch( Exception $e )
                 if( $sib->class eq 'PPI::Structure::List' )
                 {
@@ -591,7 +631,6 @@ sub _parse
                 }
                 elsif( $sib->class eq 'PPI::Token::Whitespace' && $sib->content =~ /[\015\012]+/ )
                 {
-                    # $self->_messagef( 4, "\tCatch -> Found open new line at line %d", $sib->line_number );
                     $temp->{open_curly_nl}++;
                     push( @$nodes_to_replace, $sib );
                 }
@@ -612,8 +651,7 @@ sub _parse
             }
             elsif( $inside_finally )
             {
-                ## $self->_message( 3, "\tWorking on a finally block." );
-                ## We could ignore it, but it is best to let the developer know in case he/she counts on it somehow
+                # We could ignore it, but it is best to let the developer know in case he/she counts on it somehow
                 if( $sib->class eq 'PPI::Structure::List' )
                 {
                     die( sprintf( "the finally block does not accept any list parameters at line %d\n", $sib->line_number ) );
@@ -641,7 +679,6 @@ sub _parse
                 }
                 elsif( $sib->class eq 'PPI::Token::Whitespace' && $sib->content =~ /[\015\012]+/ )
                 {
-                    ## $self->_messagef( 4, "\tFinally -> Found open new line at line %d", $sib->line_number );
                     $temp->{open_curly_nl}++;
                     push( @$nodes_to_replace, $sib );
                 }
@@ -659,7 +696,6 @@ sub _parse
             # This could also be new lines following the last catch block
             elsif( $sib->class eq 'PPI::Token::Whitespace' && $sib->content =~ /[\015\012]+/ )
             {
-                # $self->_messagef( 4, "Between -> Found closing new line at line %d", $sib->line_number );
                 $nl_counter++;
                 push( @$buff, $sib );
             }
@@ -710,19 +746,9 @@ EOT
         # Found any try block at all?
         if( scalar( @$try_block_ref ) )
         {
-            # $self->_message( 3, "Original code to remove is:\n", join( '', @$nodes_to_replace ) );
-            # $self->_message( 3, "Try definition: ", $try_block_ref->[0]->{block}->content );
-            # $self->_messagef( 3, "%d catch clauses found", scalar( @$catch_def ) );
-            foreach my $c ( @$catch_def )
-            {
-                # $self->_message( 3, "Catch variable assignment: ", $c->{var} );
-                # $self->_message( 3, "Catch block: ", $c->{block} );
-            }
             my $try_def = $try_block_ref->[0];
-            # $self->_messagef( 3, "Try new lines before block: %d, after block %d", $try_def->{open_curly_nl}, $try_def->{close_curly_nl} );
             
             # Checking for embedded try-catch
-            # $self->_message( 4, "Checking for embedded try-catch in ", $try_def->{block} );
             if( my $emb = $self->_parse( $try_def->{block} ) )
             {
                 $try_def->{block} = $emb;
@@ -733,7 +759,7 @@ EOT
             $self->_process_sub_token( $try_def->{block} );
             $self->_process_caller( try => $try_def->{block} );
             
-            ## my $try_block = $try_def->{block}->content;
+            # my $try_block = $try_def->{block}->content;
             my $try_block = $self->_serialize( $try_def->{block} );
             $try_block =~ s/^\{[[:blank:]]*|[[:blank:]]*\}$//gs;
             
@@ -903,7 +929,6 @@ EOT
         }
         else
         {
-            # $self->_message( 3, "** No try block found!!" );
             next;
         }
         
@@ -924,14 +949,12 @@ EOT
         push( @$catch_repl, $if_start );
         if( scalar( @$catch_def ) )
         {
-            # $self->_messagef( 3, "Found %d catch blocks", scalar( @$catch_def ) );
             my $total_catch = scalar( @$catch_def );
             # To count how many times we have else's – obviously we should not have more than 1
             my $else = 0;
             for( my $i = 0; $i < $total_catch; $i++ )
             {
                 my $cdef = $catch_def->[$i];
-                # $self->_messagef( 3, "Catch No ${i} new lines before block: %d, after block %d", $cdef->{open_curly_nl}, $cdef->{close_curly_nl} );
                 # Checking for embedded try-catch
                 if( my $emb = $self->_parse( $cdef->{block} ) )
                 {
@@ -944,7 +967,7 @@ EOT
                 {
                     $cdef->{var}->prune( 'PPI::Token::Comment' );
                     $cdef->{var}->prune( 'PPI::Token::Pod' );
-                    $self->_messagef( 3, "Catch assignment is: '%s'", $cdef->{var}->content );
+                    $self->_messagef( 3, "Catch assignment is: '%s'", $cdef->{var}->content ) if( $self->{debug} >= 3 );
                     # my $str = $cdef->{var}->content;
                     my $str = $self->_serialize( $cdef->{var} );
                     $str =~ s/^\([[:blank:]\h\v]*|[[:blank:]]*\)$//g;
@@ -976,16 +999,16 @@ EOT
                 }
                 else
                 {
-                    # $self->_message( 3, "No Catch assignment found" );
+                    # $self->_message( 3, "No Catch assignment found" ) if( $self->{debug} >= 3 );
                 }
                 
                 if( $cdef->{block} )
                 {
-                    # $self->_messagef( 3, "Catch block is:\n%s", $cdef->{block}->content );
+                    # $self->_messagef( 3, "Catch block is:\n%s", $cdef->{block}->content ) if( $self->{debug} >= 3 );
                 }
                 else
                 {
-                    # $self->_message( 3, "No catch block found!" );
+                    # $self->_message( 3, "No catch block found!" ) if( $self->{debug} >= 3 );
                     next;
                 }
                 my $cond;
@@ -1005,7 +1028,6 @@ EOT
                 {
                     $cond = 'elsif';
                 }
-                # $self->_message( 3, "\$i = $i, \$total_catch = $total_catch and cond = '$cond'" );
                 # my $block = $cdef->{block}->content;
                 $self->_process_loop_breaks( $cdef->{block} );
                 $self->_process_sub_token( $cdef->{block} );
@@ -1130,7 +1152,6 @@ EOT
                     # No class, just variable assignment like $e or something
                     else
                     {
-                        # $self->_message( 3, "Called here for fallback for element No $i" );
                         if( ++$else > 1 )
                         {
                             # CORE::warn( "Cannot have more than one falllback catch clause for block: ", $cdef->{block}->content, "\n" ) if( warnings::enabled );
@@ -1139,7 +1160,6 @@ EOT
                             next;
                         }
                         $cond = "${cond}( 1 )" if( $cond eq 'if' || $cond eq 'elsif' );
-                        # push( @$catch_repl, <<EOT );
                         $catch_section = <<EOT;
         ${cond}
         {
@@ -1340,7 +1360,7 @@ EOT
         push( @$repl, $last_return_block );
         my $try_catch_code = join( '', @$repl );
         # my $token = PPI::Token->new( "; \{ $try_catch_code \}" ) || die( "Unable to create token" );
-        # XXX 2021-05-11 (Jacques): Need to remove blocks so that next or last statements can be effective.
+        # NOTE: 2021-05-11 (Jacques): Need to remove blocks so that next or last statements can be effective.
         my $envelop = <<EOT;
 ; CORE::local( \$Nice::Try::BREAK, \@Nice::Try::LAST_VAL );
 \{
@@ -1368,16 +1388,11 @@ EOT
         $envelop =~ s/__TRY_CATCH_CODE__/$try_catch_code/;
         my $token = PPI::Token->new( $envelop ) || die( "Unable to create token" );
         $token->set_class( 'Structure' );
-        # $self->_messagef( 3, "Token is '$token' and of class '%s' and inherit from PPI::Token? %s", $token->class, ($token->isa( 'PPI::Token' ) ? 'yes' : 'no' ) );
         my $struct = PPI::Structure->new( $token ) || die( "Unable to create PPI::Structure element" );
-        # $self->_message( 3, "Resulting try-catch block is:\n'$token'" );
         my $orig_try_catch_block = join( '', @$nodes_to_replace );
-        # $self->_message( 3, "Original try-catch block is:\n'$orig_try_catch_block'" );
-        # $self->_messagef( 3, "Element before our try-catch block is of class %s with value '%s'", $element_before_try->class, $element_before_try->content );
         my $rc;
         if( !( $rc = $element_before_try->insert_after( $token ) ) )
         {
-            # $self->_message( 3, "Return code is defined? ", CORE::defined( $rc ) ? 'yes' : 'no', " and is it a PPI::Element object? ", $token->isa( 'PPI::Element' ) ? 'yes' : 'no' );
             $self->_error( "Failed to add replacement code of class '", $token->class, "' after '$element_before_try'" );
             next;
         }
@@ -1386,13 +1401,11 @@ EOT
         for( my $k = 0; $k < scalar( @$nodes_to_replace ); $k++ )
         {
             my $e = $nodes_to_replace->[$k];
-            ## $self->_messagef( 4, "[$k] Removing node: $e" );
             $e->delete || warn( "Could not remove node No $k: '$e'\n" );
         }
     }
     # End foreach catch found
     
-    # $self->_message( 3, "\n\nResulting code is\n", $elem->content );
     return( $elem );
 }
 
@@ -1412,11 +1425,9 @@ sub _process_caller
     foreach my $e ( $elem->elements )
     {
         my $content = $e->content // '';
-        # $self->_messagef( 6, "Checking element: [%d] class %s with %d children and value '%s'\n", $e->line_number, $e->class, ( $e->can('elements') ? scalar( $e->elements ) : 0 ), $content );
         my $class = $e->class;
         if( $class eq 'PPI::Token::Word' && $content =~ /^(?:CORE\::)?(?:GLOBAL\::)?caller$/ )
         {
-            # $self->_message( 4, "Found caller, replacing with ", 'Nice::Try::caller_' . $where );
             $e->set_content( 'Nice::Try::caller_' . $where );
         }
         
@@ -1425,8 +1436,6 @@ sub _process_caller
             $self->_process_caller( $where => $e );
         }
     }
-    # $self->_message( 5, "Element now is: '$elem'" );
-    # $self->_browse( $elem );
     return( $elem );
 }
 
@@ -1444,7 +1453,7 @@ sub _process_loop_breaks
         index( $ct, 'goto' ) == -1 &&
         index( $ct, 'return' ) == -1 )
     {
-        $self->_message( 4, "There is nothing to be done. Key words last, next, redo or goto are not found." );
+        $self->_message( 4, "There is nothing to be done. Key words last, next, redo or goto are not found." ) if( $self->{debug} >= 4 );
         return( '' );
     }
     $self->_message( 5, "Checking loop breaks in ", scalar( $elem->elements ), " elements for '$elem'" ) if( $self->{debug} >= 5 );
@@ -1459,7 +1468,6 @@ sub _process_loop_breaks
               CORE::defined( $e->first_element->content ) && 
               $e->first_element->content =~ /^(for|foreach|while)$/ ) )
         {
-            # $self->_message( 6, "Skipping it. Its first word was '", $e->first_element->content, "'" );
             next;
         }
         elsif( $class eq 'PPI::Token::Word' && $content =~ /^(?:CORE\::)?(?:GLOBAL\::)?(next|last|redo)$/ )
@@ -1470,7 +1478,6 @@ sub _process_loop_breaks
             my $break_code = q{$Nice::Try::BREAK='} . $1 . qq{', return;};
             my $break_doc = PPI::Document->new( \$break_code, readonly => 1 );
             my $new_elem = $break_doc->first_element;
-            # $self->_browse( $new_elem );
             $new_elem->remove;
             $self->_message( 5, "New element is object '", sub{ overload::StrVal( $new_elem ) }, "' -> $new_elem" ) if( $self->{debug} >= 5 );
             # Not yet implemented as of 2021-05-11 dixit PPI, so we use a hack to make it available anyhow
@@ -1485,7 +1492,6 @@ sub _process_loop_breaks
             my $word2 = ( scalar( @$words ) > 1 ? $words->[1]->content // '' : '' );
             $self->_message( 5, "Word 1 -> ", $word1 ) if( $self->{debug} >= 5 );
             $self->_message( 5, "Word 2 -> ", $word2 ) if( $self->{debug} >= 5 && scalar( @$words ) > 1 );
-            # $self->_browse( $e );
             # If we found a break word without a label, i.e. next, last, redo, 
             # we replace it with a special return statement
             if( (
@@ -1519,7 +1525,6 @@ sub _process_loop_breaks
                 
                 my $break_doc = PPI::Document->new( \$break_code, readonly => 1 );
                 my $new_elem = $break_doc->first_element;
-                # $self->_browse( $new_elem );
                 $new_elem->remove;
                 $self->_message( 5, "New element is object '", sub{ overload::StrVal( $new_elem ) }, "' -> $new_elem" ) if( $self->{debug} >= 5 );
                 # Not yet implemented as of 2021-05-11 dixit PPI, so we use a hack to make it available anyhow
@@ -1529,7 +1534,6 @@ sub _process_loop_breaks
                 # PPI (at least with PPI::Node version 1.270) will refuse to add our element
                 # if the 'return' word is 'CORE::return' so, we add it without and change it after
                 # $new_elem->first_element->set_content( 'CORE::return' );
-                # $self->_message( 5, "return litteral value is: ", $new_elem->first_element->content );
             }
             next;
         }
@@ -1539,9 +1543,6 @@ sub _process_loop_breaks
             $self->_process_loop_breaks( $e );
         }
     }
-    # $self->_message( 5, "Element now is: '", sub{ $elem->content }, "'" );
-    # $self->_message( 5, "Element now is: '$elem'" );
-    # $self->_browse( $elem );
     return( $elem );
 }
 
@@ -1617,12 +1618,10 @@ PERL
         my $sub_token_doc = PPI::Document->new( \$sub_token_code, readonly => 1 );
         my @new_elems = $sub_token_doc->elements;
         # my $new_elem = $sub_token_doc;
-        # $self->_browse( $new_elem );
         # $new_elem->remove;
         $_->remove for( @new_elems );
         $self->_message( 5, "New elements is object '", sub{ join( ', ', map( overload::StrVal( $_ ), @new_elems ) ) }, "' -> $_" ) if( $self->{debug} >= 5 );
         # $block->replace( $new_elem );
-        # $self->_message( 5, "New element is a PPI::Element ? -> ", ( $new_elem->isa( 'PPI::Element' ) ? 'yes' : 'no' ) );
         # Not yet implemented as of 2021-05-11 dixit PPI, so we use a hack to make it available anyhow
         my $rv;
         my @children = $block->children;
@@ -1680,7 +1679,7 @@ PERL
     return( $elem );
 }
 
-## Taken from PPI::Document
+# Taken from PPI::Document
 sub _serialize 
 {
     my $self   = shift( @_ );
@@ -1859,25 +1858,25 @@ sub _serialize
 }
 
 {
+    # NOTE: Nice::Try::ObjectContext
     package
         Nice::Try::ObjectContext;
 
     sub new
     {
         my $that = shift( @_ );
-        # print( STDERR "Got here in Nice::Try::ObjectContext->new with args '", join( "', '", @_ ), "'\n" );
         return( bless( { val => [@_] } => ( ref( $that ) || $that ) ) );
     }
 
     sub callback
     {
         my $self = shift( @_ );
-        # print( STDERR "Got here in Nice::Try::ObjectContext->dummy with args '", join( "', '", @_ ), "'\n" );
         return( $self->{val}->[0] );
     }
 }
 
 {
+    # NOTE: PPI::Element
     package
         PPI::Element;
     
@@ -2040,7 +2039,7 @@ And you also have granular power in the catch block to filter which exception to
 
 =head1 VERSION
 
-    v1.3.10
+    v1.3.11
 
 =head1 DESCRIPTION
 
@@ -2788,7 +2787,7 @@ Other cases are:
 
 See L<Want> for more information on how you can benefit from it.
 
-Currently lvalues are no implemented and will be in future releases. Also note that L<Want> does not work within tie-handlers. It would trigger a segmentation fault. L<Nice::Try> detects this and disable automatically support for L<Want> if used inside a tie-handler, reverting to regular L<perlfunc/wantarray> context.
+Currently lvalues are not implemented and will be in future releases. Also note that L<Want> does not work within tie-handlers. It would trigger a segmentation fault. L<Nice::Try> detects this and disable automatically support for L<Want> if used inside a tie-handler, reverting to regular L<perlfunc/wantarray> context.
 
 Also, for this rich context awareness to be used, obviously try-catch would need to be inside a subroutine, otherwise there is no rich context other than the one the regular L<perlfunc/wantarray> provides.
 
@@ -2814,7 +2813,7 @@ Before version C<v1.3.5>, there was a limitation on using signature on a subrout
     sub foo ($f = test()) { 1 }
 
     try {
-        my $k = sub ($f = foo()) {}; # <-- this sub routine attribute inside try-catch block will disrupt Nice::Try and make it fail.
+        my $k = sub ($f = foo()) {}; # <-- this sub routine attribute inside try-catch block used to disrupt Nice::Try and make it fail.
         print( "worked\n" );
     }
     catch($e) {
@@ -2918,7 +2917,7 @@ L<JavaScript implementation of nice-try|https://javascript.info/try-catch>
 
 =head1 COPYRIGHT & LICENSE
 
-Copyright (c) 2020-2023 DEGUEST Pte. Ltd.
+Copyright (c) 2020-2024 DEGUEST Pte. Ltd.
 
 You can use, copy, modify and redistribute this package and associated files under the same terms as Perl itself.
 

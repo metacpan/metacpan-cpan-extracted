@@ -473,28 +473,24 @@ class R::NDArray {
   
   method order : R::NDArray::Int () {
     
-    unless ($self->is_vector) {
-      die "The instance must be a vector.";
-    }
-    
     my $length = $self->length;
     
-    my $order_ndarray = R::OP::Int->seq(0, $length - 1);
+    my $order_data_indexes_ndarray = R::OP::Int->seq(0, $length - 1);
     
-    my $order_data = $order_ndarray->data;
+    my $order_data_indexes = $order_data_indexes_ndarray->data;
     
-    Sort->sort_int($order_data, [has that : R::NDArray = $self] method : int ($a_data_index : int, $b_data_index : int) {
+    Sort->sort_int($order_data_indexes, [has that : R::NDArray = $self] method : int ($a_data_index : int, $b_data_index : int) {
       return $self->{that}->elem_cmp($self->{that}->data, $a_data_index, $b_data_index);
     });
     
-    return $order_ndarray;
+    return $order_data_indexes_ndarray;
   }
   
-  method set_order : void ($indexes_ndarray : R::NDArray::Int) {
+  method set_order : void ($data_indexes_ndarray : R::NDArray::Int) {
     
-    $self->check_set_order_args($indexes_ndarray);
+    $self->check_set_order_args($data_indexes_ndarray);
     
-    my $indexes = $indexes_ndarray->data;
+    my $data_indexes = $data_indexes_ndarray->data;
     
     my $data = $self->{data};
     
@@ -504,9 +500,9 @@ class R::NDArray {
     
     my $length = $self->length;
     for (my $i = 0; $i < $length; $i++) {
-      my $order_index = $indexes->[$i];
+      my $order_data_index = $data_indexes->[$i];
       
-      $self->elem_assign($data, $i, $tmp_data, $order_index);
+      $self->elem_assign($data, $i, $tmp_data, $order_data_index);
     }
   }
   
@@ -796,14 +792,6 @@ class R::NDArray {
     
     unless ($indexes_ndarray) {
       die "The indexes \$indexes_ndarray must be defined.";
-    }
-    
-    unless ($indexes_ndarray->is_vector) {
-      die "The indexes \$indexes_ndarray must be a vector.";
-    }
-    
-    unless ($self->is_vector) {
-      die "The invocant must be a vector.";
     }
     
     my $length = $self->length;

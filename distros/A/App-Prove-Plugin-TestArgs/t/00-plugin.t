@@ -18,7 +18,8 @@ subtest 'provoke fatal perl diagnostics' => sub {
 
   like exception { $plugin_name->load }, qr/\ACan't use an undefined value as/, 'pass no aruments';
 
-  like exception { $plugin_name->load( [] ) }, qr/\ANot a HASH reference/, 'pass wrong reference type';
+  like exception { $plugin_name->load( [] ) },
+    $] == 5.008009 ? qr/\ACan't coerce array into hash/ : qr/\ANot a HASH reference/, 'pass wrong reference type';
 
   like exception { $plugin_name->load( 'file' ) }, qr/\ACan't use string/, 'pass string(scalar) argument';
 };

@@ -1,14 +1,14 @@
 package MasonX::Interp::WithCallbacks;
 
 use strict;
-use HTML::Mason qw(1.23);
+use HTML::Mason 1.23;
 use HTML::Mason::Interp;
 use HTML::Mason::Exceptions ();
 use Params::CallbackRequest;
 
 use vars qw($VERSION @ISA);
 @ISA = qw(HTML::Mason::Interp);
-$VERSION = '1.19';
+$VERSION = '1.20';
 
 Params::Validate::validation_options
   ( on_fail => sub { HTML::Mason::Exception::Params->throw( join '', @_ ) } );
@@ -848,6 +848,14 @@ In this example, we have overridden the component path determined by the
 Mason resolver in favor of an alternate component, which will be executed,
 instead.
 
+=head3 make_request
+
+Overrides and re-dispatches to L<HTML::Mason::Interp/"make_request">.
+
+=head3 purge_code_cache
+
+Overrides and re-dispatches to L<HTML::Mason::Interp/"purge_code_cache">.
+
 =head2 Requester
 
 The MasonX::Interp::WithCallbacks object is available in all callback methods
@@ -875,14 +883,12 @@ request, just as with C<< $r->pnotes >>.
 
 =head1 SUPPORT
 
-This module is stored in an open L<GitHub
-repository|http://github.com/theory/masonx-interp-withcallbacks/>. Feel free
-to fork and contribute!
+This module is stored in a public
+L<GitHub repository|https://github.com/theory/masonx-interp-withcallbacks/>. Feel free to
+fork and contribute!
 
-Please file bug reports via L<GitHub
-Issues|http://github.com/theory/masonx-interp-withcallbacks/issues/> or by
-sending mail to
-L<bug-MasonX-Interp-WithCallbacks.cpan.org|mailto:bug-MasonX-Interp-WithCallbacks.cpan.org>.
+Please file bug reports via
+L<GitHub Issues|https://github.com/theory/masonx-interp-withcallbacks/issues/>.
 
 =head1 SEE ALSO
 
@@ -899,7 +905,7 @@ create callback classes and methods.
 
 This module works with L<HTML::Mason|HTML::Mason> by subclassing
 L<HTML::Mason::Interp|HTML::Mason::Interp>. Inspired by the implementation of
-callbacks in Bricolage (L<http://bricolage.cc/>), it is however a completely
+callbacks in Bricolage (L<http://bricolagecms.org/>), it is however a completely
 new code base with a rather different approach.
 
 =head1 AUTHOR
@@ -908,7 +914,7 @@ David E. Wheeler <david@justatheory.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright 2003-2011 by David E. Wheeler. Some Rights Reserved.
+Copyright 2003-2024 by David E. Wheeler. Some Rights Reserved.
 
 This library is free software; you can redistribute it and/or modify it under
 the same terms as Perl itself.

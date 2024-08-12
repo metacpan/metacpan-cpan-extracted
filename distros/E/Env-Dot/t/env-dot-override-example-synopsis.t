@@ -20,7 +20,7 @@ use lib "$lib_path";
 
 use Test2::Require::OS::Linux;
 
-use Test::Script;
+use Test::Script 1.28;
 
 subtest 'Script runs --version' => sub {
     my $stdout;

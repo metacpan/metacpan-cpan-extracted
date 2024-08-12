@@ -192,7 +192,7 @@ SKIP: {
                 ),
         "Get redirect response" );
     is( $res->code, 302, "Check redirect response code" );
-    is( $res->header('Location'), 'http://example.com/',
+    is( $res->header('Location'), 'https://example.com/',
         "Check redirect location" );
     is( $res->header('Age'), undef, "Check redirect Age header" );
 
@@ -205,7 +205,7 @@ SKIP: {
                 ),
         "Get redirect without abort response" );
     is( $res->code, 302, "Check redirect without abort response code" );
-    is( $res->header('Location'), 'http://example.com/',
+    is( $res->header('Location'), 'https://example.com/',
         "Check redirect without abort location" );
     is( $res->header('Age'), 42, "Check redirect without abort Age header" );
 }

@@ -1,5 +1,11 @@
 Revision history for Perl extension File::Tabular.
 
+0.73 11.08.2024
+  - new parameter 'crlf' for controlling whether perlio ':crlf' layer should be applied or not (true by default)
+  - tests use File::Temp instead of builtin open($fh, $mode, undef) since it no longer works in perl 5.40
+  - Fixed doc bug :   File::Tabular->new(..., {journal => $journalFile});
+  - replaced ExtUtils::MakeMaker by Module::Build
+
 0.72 04.11.2008
   - no warnings 'numeric' when applying numeric filters on empty fields
 

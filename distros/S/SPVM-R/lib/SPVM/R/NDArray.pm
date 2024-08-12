@@ -363,7 +363,7 @@ C<method order : R::NDArray::Int ();>
 
 =head2 set_order
 
-C<method set_order : void ($indexes_ndarray : L<R::NDArray::Int|SPVM::R::NDArray::Int>);>
+C<method set_order : void ($data_indexes_ndarray : L<R::NDArray::Int|SPVM::R::NDArray::Int>);>
 
 =head2 sort_asc
 

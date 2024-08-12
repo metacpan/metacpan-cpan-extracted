@@ -1,12 +1,13 @@
-MasonX/Interp/WithCallbacks version 1.19
+MasonX/Interp/WithCallbacks version 1.20
 ========================================
 
+[![🧅 CPAN version](https://badge.fury.io/pl/MasonX-Interp-WithCallbacks.svg)](https://badge.fury.io/pl/MasonX-Interp-WithCallbacks)
+[![✅ Build Status](https://github.com/theory/masonx-interp-withcallbacks/actions/workflows/ci.yml/badge.svg)](https://github.com/theory/masonx-interp-withcallbacks/actions/workflows/ci.yml)
+
 MasonX::Interp::WithCallbacks subclasses HTML::Mason::Interp in order to
-provide a [Mason](http://search.cpan.org/dist/HTML-Mason) callback system
-built on
-[Params::CallbackRequest](http://search.cpan.org/dist/params-callbackrequest/).
+provide a [Mason] callback system built on [Params::CallbackRequest].
 Callbacks may be either code references provided to the `new()` constructor,
-or methods defined in subclasses of Params::Callback. Callbacks are triggered
+or methods defined in subclasses of [Params::Callback]. Callbacks are triggered
 either for every request or by specially named keys in the Mason request
 arguments, and all callbacks are executed at the beginning of a request, just
 before Mason creates and executes the request component stack.
@@ -57,7 +58,12 @@ Testing of this module with HTML::Mason::ApacheHandler requires:
 Copyright and License
 ---------------------
 
-Copyright (c) 2003-2011 David E. Wheeler. Some Rights Reserved.
+Copyright (c) 2003-2024 David E. Wheeler. Some Rights Reserved.
 
 This library is free software; you can redistribute it and/or modify it under
 the same terms as Perl itself.
+
+  [HTML::Mason::Interp]: https://metacpan.org/pod/HTML::Mason::Interp
+  [Mason]: https://metacpan.org/dist/HTML-Mason
+  [Params::CallbackRequest]: https://metacpan.org/pod/Params::CallbackRequest
+  [Params::Callback]: https://metacpan.org/pod/Params::Callback
