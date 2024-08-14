@@ -38,7 +38,8 @@ __EOP__
       url => $ENV{OLLAMA_URL},
       model => 'llama3.1',
       system_prompt => $system_prompt,
-      context_size => 4096,
+      context_size => 2048,
+      temperature => 0.5,
     );
 
     my $prompt = 'Do you wanna build a snowman?';
@@ -94,7 +95,7 @@ __EOP__
     my $claude = Langertha::Engine::Anthropic->new(
       api_key => $ENV{ANTHROPIC_API_KEY},
       model => 'claude-3-5-sonnet-20240620',
-      max_tokens => 2048,
+      response_size => 512,
     );
 
     my $prompt = 'Generate Perl Moose classes to represent GeoJSON data types';

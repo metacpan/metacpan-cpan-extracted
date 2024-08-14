@@ -9,7 +9,7 @@ use strict;
 use warnings;
 
 package Playwright::APIRequest;
-$Playwright::APIRequest::VERSION = '1.431';
+$Playwright::APIRequest::VERSION = '1.460';
 use parent 'Playwright::Base';
 
 sub new {
@@ -76,7 +76,7 @@ Playwright::APIRequest - Automatically generated class for Playwright::APIReques
 
 =head1 VERSION
 
-version 1.431
+version 1.460
 
 =head1 CONSTRUCTOR
 

@@ -1,0 +1,36 @@
+---
+abstract: 'Fetch either the latest or a particular named version of a file in a release from github'
+author:
+  - 'George S. Baugh <george@troglodyne.net>'
+build_requires:
+  Test2::V0: '0'
+  Test::Mock::HTTP::Tiny: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.032, CPAN::Meta::Converter version 2.150010'
+license: mit
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Github-ReleaseFetcher
+provides:
+  Github::ReleaseFetcher:
+    file: lib/Github/ReleaseFetcher.pm
+    version: '1.001'
+requires:
+  Carp::Always: '0'
+  File::Basename: '0'
+  HTML::TreeBuilder::Select: '0'
+  HTTP::Tiny: '0'
+  perl: v5.14.0
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/teodesian/perl-Github-ReleaseFetcher/issues
+  homepage: https://github.com/teodesian/perl-Github-ReleaseFetcher
+  repository: https://github.com/teodesian/perl-Github-ReleaseFetcher.git
+version: '1.001'
+x_generated_by_perl: v5.30.0
+x_serialization_backend: 'YAML::Tiny version 1.73'
+x_spdx_expression: MIT

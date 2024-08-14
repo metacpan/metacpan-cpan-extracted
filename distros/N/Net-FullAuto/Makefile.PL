@@ -26,7 +26,7 @@
 ################################################################
 
 
-our $VERSION='1.0000685';
+our $VERSION='1.0000686';
 
 
 if ($ENV{'AUTOMATED_TESTING'}) {
@@ -115,6 +115,8 @@ END
 
 }
 
+our $aws;
+our %amazon;
 BEGIN { # FullAuto© MICROSOFT WINDOWS INSTALLER
 
    # All the code in this BEGIN block is used exclusively by the
@@ -191,11 +193,35 @@ BEGIN { # FullAuto© MICROSOFT WINDOWS INSTALLER
       }
       @INC=@TMPINC;
    }
+   # Bullet Proof Test for AWS EC2
+   # https://serverfault.com/questions/462903/how-to-know-if-a-machine-is-an-ec2-instance
+   $aws=`/bin/bash -c 'if [ -f /sys/hypervisor/uuid ];then if [ \`/bin/head -c 3 /sys/hypervisor/uuid\`=="ec2" ];then echo yes;else echo no;fi;elif [ -r /sys/devices/virtual/dmi/id/product_uuid ];then if [ \`/bin/head -c 3 /sys/devices/virtual/dmi/id/product_uuid\` == "EC2" ]; then echo yes;else echo no;fi;else if \$(curl -s -m 5 http://169.254.169.254/latest/dynamic/instance-identity/document | grep -q availabilityZone);then echo yes;else echo no;fi;fi'`;
+   $aws=(-1<index $aws,'yes')?1:0;
+   if ($aws) {
+      my $token=`curl -X PUT  -s "http://169.254.169.254/latest/api/token" -H "X-aws-ec2-metadata-token-ttl-seconds: 21600"`;
+      my $instance_type=`curl -s -H "X-aws-ec2-metadata-token: $token" http://169.254.169.254/latest/meta-data/instance-type`;
+      $amazon{instance_type}=$instance_type;
+   }
 
 };
 
+sub check_for_cpan {
+
+   my $check=`perl -MCPAN -e 1 2>&1`;
+   if (-1<index $check,"Can't locate CPAN") {
+      if ($aws) {
+         system('sudo dnf -y install cpan');
+      } else {
+         my $die="Can't locate CPAN.pm in \@INC ".
+                 "(you may need to install the CPAN module)\n$!";
+         die $die;
+      }
+   } return 1;
+
+}
+
 use Config;
-use CPAN;
+use if (check_for_cpan()),'CPAN';
 unshift @ExtUtils::MakeMaker::Overridable, 'pm_to_blib'; # this enables
          # pm_to_blib to be overwritten in Makefile rather than ignored
 *{MyClass::_using_sudo} = sub { return 1 }; # Override default local::lib
@@ -281,15 +307,20 @@ END
 #
 # BEGIN Amazon EC2 specific code
 
-our %amazon=();
 if ($ARGV[0]=~/\.pem/) {
    push @{$amazon{argv}},$ARGV[0];
 }
 our $system_type='';
 # Bullet Proof Test for AWS EC2
 # https://serverfault.com/questions/462903/how-to-know-if-a-machine-is-an-ec2-instance
-my $aws=`/bin/bash -c 'if [ -f /sys/hypervisor/uuid ];then if [ \`/bin/head -c 3 /sys/hypervisor/uuid\`=="ec2" ];then echo yes;else echo no;fi;elif [ -r /sys/devices/virtual/dmi/id/product_uuid ];then if [ \`/bin/head -c 3 /sys/devices/virtual/dmi/id/product_uuid\` == "EC2" ]; then echo yes;else echo no;fi;else if \$(curl -s -m 5 http://169.254.169.254/latest/dynamic/instance-identity/document | grep -q availabilityZone);then echo yes;else echo no;fi;fi'`;
-$aws=(-1<index $aws,'yes')?1:0;
+#my $aws=`/bin/bash -c 'if [ -f /sys/hypervisor/uuid ];then if [ \`/bin/head -c 3 /sys/hypervisor/uuid\`=="ec2" ];then echo yes;else echo no;fi;elif [ -r /sys/devices/virtual/dmi/id/product_uuid ];then if [ \`/bin/head -c 3 /sys/devices/virtual/dmi/id/product_uuid\` == "EC2" ]; then echo yes;else echo no;fi;else if \$(curl -s -m 5 http://169.254.169.254/latest/dynamic/instance-identity/document | grep -q availabilityZone);then echo yes;else echo no;fi;fi'`;
+#$aws=(-1<index $aws,'yes')?1:0;
+#if ($aws) {
+#   my $token=`curl -X PUT  -s "http://169.254.169.254/latest/api/token" -H "X-aws-ec2-metadata-token-ttl-seconds: 21600"`;
+#   my $instance_type=`curl -s -H "X-aws-ec2-metadata-token: $token" http://169.254.169.254/latest/meta-data/instance-type`;
+#   $amazon{instance_type}=$instance_type;
+#}
+
 if (($^O eq 'linux' || $^O eq 'freebsd') && !(grep { /SKIP/i } @ARGV)) {
    if ((-e "/etc/system-release-cpe") &&
          ((-1<index `cat /etc/system-release-cpe`,'amazon:linux') ||
@@ -1853,8 +1884,17 @@ sub fa_install_mod {
          print FH $newmakefile;
          close FH;
          if ($butil eq 'Makefile') {
-            print "*** Running ${sudo}make install\n";
-            fa_system("cd \"$dir\";${sudo}make install");
+            if ($p eq 'BerkeleyDB') {
+               print "*** Running ${sudo}make\n";
+               fa_system("cd \"$dir\";${sudo}make");
+               print "*** Running ${sudo}make test\n";
+               fa_system("cd \"$dir\";${sudo}make test");
+               print "*** Running ${sudo}make install\n";
+               fa_system("cd \"$dir\";${sudo}make install");
+            } else {
+               print "*** Running ${sudo}make install\n";
+               fa_system("cd \"$dir\";${sudo}make install");
+            }
          } else {
             print "*** Running ${sudo}Build install\n";
             fa_system("cd \"$dir\";./Build build;${sudo}./Build install");
@@ -2118,9 +2158,22 @@ if ($^O ne 'MSWin32' && $^O ne 'MSWin64') {
    package?
 END
       &fa_install_module('Net::SSLeay','get');
-      my $dir=&fa_find_latest('Net-SSLeay');
+      my $dir=&fa_find_latest('Net-SSLeay');my $nano_flag=0;
       fa_system("(cd \"$dir\";echo n | $^X Makefile.PL) 2>&1");
+      if (exists $amazon{instance_type} && $amazon{instance_type}=~/micro/) {
+         my $ulimit=`ulimit -s`;
+         $ulimit=32768;
+         my $micro_nano_adjust="(cd \"$dir\";sed -i '/^CCFLAGS/ s/\$/ ".
+                               "--param ggc-min-expand=1 ".
+                               "--param ggc-min-heapsize=$ulimit/' ".
+                               "Makefile) 2>&1";
+         fa_system($micro_nano_adjust);
+      } elsif (exists $amazon{instance_type} && $amazon{instance_type}=~/nano/) {
+         fa_system('sudo dnf -y install perl-Net-SSLeay.x86_64');
+         $nano_flag=1;
+      }
       SSL: while (1) {
+         last if $nano_flag;
          open(FH, "(cd \"$dir\";make install) 2>&1|");
          while (my $line=<FH>) {
             if (-1<index $line,
@@ -4496,32 +4549,12 @@ if (grep { /-*(?:add|all)[-_]?dependencies/i } @ARGV) {
    File::Copy::move('MANIFEST_NEW','MANIFEST');
 }
 
-chdir $cwd;
+#chdir $cwd;
 
-if ($get_BerkeleyDB) {
+&fa_install_module('BerkeleyDB','install','Makefile')
+   if $get_BerkeleyDB;
 
-   do {
-      local $SIG{__DIE__}; # No sigdie handler;
-      my $p='BerkeleyDB';
-      eval "use $p;1" or
-      do {
-         print"==> $p required."
-         and print "*** Installing $p\n"
-         and
-         do {
-            eval{
-               local $SIG{__DIE__}; # No sigdie handler
-               require CPAN;
-               CPAN::Shell->force('install',$p);
-            };
-            #eval "use $p;1" ||
-            #   fa_die("$@ *** Please manually install $p from cpan.org first...\n");
-         }
-      }
-   }
-}
-
-chdir $cwd;
+#chdir $cwd;
 
 my $x=1;
 if ($x==0) {

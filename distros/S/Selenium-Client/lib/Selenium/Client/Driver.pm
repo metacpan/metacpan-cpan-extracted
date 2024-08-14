@@ -1,5 +1,5 @@
 package Selenium::Client::Driver;
-$Selenium::Client::Driver::VERSION = '2.00';
+$Selenium::Client::Driver::VERSION = '2.01';
 use strict;
 use warnings;
 
@@ -199,10 +199,64 @@ sub _execute_script_suffix ( $self, $suffix = undef ) {
 sub new ( $class, %options ) {
     my $self = bless( { %options, is_wd3 => 1 }, $class );
 
-    # TODO should probably map the options here
+    # map the options
+    my %optmap = (
+
+        # SRD / common options
+        browser_name       => 'browser',
+        debug              => 'debug',
+        remote_server_addr => 'host',
+        port               => 'port',
+        auto_close         => 'auto_close',
+        ua                 => 'ua',
+
+        # Stuff that does not work from SRD:
+
+        # version - good luck getting random versions of browsers to work!!! LOL!!!!
+        # platform - TODO currently unsupported
+        # accept_ssl_certs - NOT IN THE SPEC, U CAN POUND SAND IF U AINT AN INTERMEDIATE SIGNER, HA HA HA HA.
+        # firefox_provile - NOT IN THE SPEC
+        # javascript      - piss off, use mechanize if you want this off
+        # default_finder  - TODO currently unsupported
+        # session_id      - TODO currently unsupported
+        # pageLoadStrategy - NOT IN THE SPEC
+        # extra_capabilities - NOT IN THE SPEC
+        # base_url - TODO currently unsupported
+        # inner window size - XXX well, this function doesn't even work on selenium 4 so we *can't* support it.
+        # error_handler - TODO will probably have to shim this, may not be possible idk
+        # webelement_class- just no.
+        # proxy - TODO currently unsupported, not sure this is even in the spec.
+
+        # SCD exclusive options
+        driver         => 'driver',
+        driver_version => 'driver_version',
+        headless       => 'headless',
+        fatal          => 'fatal',
+        post_callbacks => 'post_callbacks',
+        normalize      => 'normalize',
+        prefix         => 'prefix',
+        scheme         => 'scheme',
+        nofetch        => 'nofetch',
+        client_dir     => 'client_dir',
+        post_callbacks => 'post_callbacks',    # TODO see error_handler note above
+    );
+
     my $driver = $self->driver();
     if ( !$driver ) {
-        $driver = Selenium::Client->new(%options);
+
+        my %actual;
+        foreach my $option ( keys(%options) ) {
+            if ( !exists $optmap{$option} ) {
+                warn "Passed unsupported option '$option', which has been dropped.";
+                next;
+            }
+            $actual{ $optmap{$option} } = $options{$option};
+        }
+
+        # Set the version explicitly, as these are conflicting names between the two modules.
+        $actual{version} = 'stable';
+
+        $driver = Selenium::Client->new(%actual);
         $self->driver($driver);
     }
     my $status = $driver->Status();
@@ -360,26 +414,112 @@ Selenium::Client::Driver - Drop-In replacement for Selenium::Remote::Driver that
 
 =head1 VERSION
 
-version 2.00
+version 2.01
 
 =head1 DESCRIPTION
 
-(Mostly) drop-in replacement for Selenium::Remote::Driver which supports selenium 4.
+Drop-in replacement for L<Selenium::Remote::Driver> which supports selenium 4.
 
-See the documentation for Selenium::Remote::Driver for how to use this module unless otherwise noted below.
+See the documentation for L<Selenium::Remote::Driver> for how to use this module unless otherwise noted below.
 
-The primary difference here is that we do not support direct driver usage without intermediation by the SeleniumHQ JAR any longer.
+Also, we support all valid L<Selenium::Client> constructor arguments, so you will likely want to consult those.
 
-=head1 AUTHOR
+There are also a number of constructor options from L<Selenium::Remote::Driver> which are either entirely incompatible with selenium 4, are unimplemented or were bad ideas in the first place:
+
+=over 4
+
+=item C<platform> - TODO. Will have to work in Selenium::Client first.
+
+=item C<default_finder>  - TODO.  Will need a shim in Selenium::Client::Commands.
+
+=item C<extra_capabilities> - TODO. Use the options relevant to Selenium::Client instead
+
+=item C<base_url> - TODO. Will have to work in Selenium::Client first.
+
+=item C<session_id> - TODO. I don't even know if you can do this with the W3C spec.
+
+=item C<inner_window_size> - TODO. This function doesn't work right on any browser so we could only do a "best effort" try.
+
+=item C<error_handler> - TODO.  While post_callbacks are supported, there is no shim to make old error_handler subs work as post_callbacks.
+
+=item C<proxy> - TODO. not sure this is even possible with S4 caps.
+
+=item C<accept_ssl_certs> - Not in the W3C spec.  Just make a self-signed CA and slap that sucker in /etc/ssl/certs, then use that to issue your self-signed certs.
+
+=item C<firefox_profile> - Not in the W3C spec.  If you can't get it done with moz:firefoxOptions, it ain't getting done.
+
+=item C<pageLoadStrategy> - Not in the W3C spec.  If you want to properly wait on page loads, you will need either a view-source based state-machine or executing scripts.  Welcome to hell.
+
+=item C<webelement_class> - Subclass Selenium::Client::Driver instead
+
+=item C<javascript> - Are you really using selenium to disable javascript?  Seek Help.
+
+=item C<version> - good luck getting random versions of browsers to work!!! LOL!!!!  Playwright patches them rather than rely on perpetually broken driver binaries.
+
+=back
+
+Furthermore, selenium 4 totally fails at dealing with cookies and alerts.
+
+=head1 ALTERNATIVES
+
+My advice is to give up on this nonsense and...
+
+    use Playwright;
+
+Instead.  Or, wait until someone implements a WC3 compliant selenium server using playwright and we can end the madness.
+
+=head1 SEE ALSO
+
+Please see those modules/websites for more information related to this module.
+
+=over 4
+
+=item *
+
+L<Selenium::Client|Selenium::Client>
+
+=back
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website
+L<https://github.com/troglodyne-internet-widgets/selenium-client-perl/issues>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
+
+=head1 AUTHORS
+
+Current Maintainers:
+
+=over 4
+
+=item *
 
 George S. Baugh <george@troglodyne.net>
 
+=back
+
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2023 by George S. Baugh.
+Copyright (c) 2024 Troglodyne LLC
 
-This is free software, licensed under:
 
-  The MIT (X11) License
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
 
 =cut

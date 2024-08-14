@@ -1,9 +1,20 @@
 ==================================================
-Changes from 1750-10-27 00:00:00 +0000 to present.
+Changes from 1750-10-30 00:00:00 +0000 to present.
 ==================================================
 
 ------------------------------------------
-version 0.003 at 2024-08-10 22:21:29 +0000
+version 0.004 at 2024-08-13 21:12:45 +0000
+------------------------------------------
+
+  Change: ae525aa4b1af0b6379ad15ec603b05b06540cd55
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2024-08-13 23:10:57 +0000
+
+    Fixing interpretation of max_tokens on Anthropic (thought its
+    context, but its response size), adapted code and tests 
+
+------------------------------------------
+version 0.003 at 2024-08-10 22:21:01 +0000
 ------------------------------------------
 
   Change: b12b1eaecd2a565a4b58caafe7293ff494bae03f

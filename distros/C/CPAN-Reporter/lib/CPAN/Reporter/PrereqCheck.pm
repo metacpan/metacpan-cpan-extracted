@@ -1,7 +1,7 @@
 use strict;
 package CPAN::Reporter::PrereqCheck;
 
-our $VERSION = '1.2019';
+our $VERSION = '1.2020';
 
 use ExtUtils::MakeMaker 6.36;
 use File::Spec;
@@ -252,7 +252,7 @@ CPAN::Reporter::PrereqCheck - Modulino for prerequisite tests
 
 =head1 VERSION
 
-version 1.2019
+version 1.2020
 
 =head1 SYNOPSIS
 

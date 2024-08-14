@@ -1,5 +1,5 @@
 package Selenium::Client;
-$Selenium::Client::VERSION = '2.00';
+$Selenium::Client::VERSION = '2.01';
 # ABSTRACT: Module for communicating with WC3 standard selenium servers
 
 use strict;
@@ -391,12 +391,12 @@ sub _objectify ( $self, $result, $inject ) {
 
 
 package Selenium::Capabilities;
-$Selenium::Capabilities::VERSION = '2.00';
+$Selenium::Capabilities::VERSION = '2.01';
 use parent qw{Selenium::Subclass};
 1;
 
 package Selenium::Session;
-$Selenium::Session::VERSION = '2.00';
+$Selenium::Session::VERSION = '2.01';
 sub session_id {
     my $self = shift;
     return $self->{sessionId} // $self->{sessionid};
@@ -412,7 +412,7 @@ use parent qw{Selenium::Subclass};
 1;
 
 package Selenium::Element;
-$Selenium::Element::VERSION = '2.00';
+$Selenium::Element::VERSION = '2.01';
 use parent qw{Selenium::Subclass};
 1;
 
@@ -428,7 +428,7 @@ Selenium::Client - Module for communicating with WC3 standard selenium servers
 
 =head1 VERSION
 
-version 2.00
+version 2.01
 
 =head1 CONSTRUCTOR
 
@@ -718,16 +718,62 @@ If you are comparing output from selenium calls against UTF-8 glyphs, `use utf8`
 
 George S. Baugh <george@troglodyne.net>
 
-=head1 AUTHOR
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website
+L<https://github.com/troglodyne-internet-widgets/selenium-client-perl/issues>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
+
+=head1 AUTHORS
+
+Current Maintainers:
+
+=over 4
+
+=item *
 
 George S. Baugh <george@troglodyne.net>
 
+=back
+
+=head1 CONTRIBUTORS
+
+=for stopwords Chris Faylor Manni Heumann
+
+=over 4
+
+=item *
+
+Chris Faylor <cgf@realedsolutions.com>
+
+=item *
+
+Manni Heumann <heumann@strato.de>
+
+=back
+
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2023 by George S. Baugh.
+Copyright (c) 2024 Troglodyne LLC
 
-This is free software, licensed under:
 
-  The MIT (X11) License
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
 
 =cut

@@ -27,22 +27,23 @@ no_index:
 provides:
   Mojolicious::Plugin::Cron:
     file: lib/Mojolicious/Plugin/Cron.pm
-    version: '0.034'
+    version: '0.035'
 requires:
   Algorithm::Cron: '0.10'
-  Mojolicious: '9.35'
+  Mojolicious: '9.37'
   perl: '5.020001'
 resources:
   bugtracker: https://github.com/dmanto/Mojolicious-Plugin-Cron/issues
   homepage: https://github.com/dmanto/Mojolicious-Plugin-Cron
   repository: https://github.com/dmanto/Mojolicious-Plugin-Cron.git
-version: '0.034'
+version: '0.035'
 x_contributors:
   - 'Daniel Mantovani <daniel@MBP-daniel.local>'
   - 'Daniel Mantovani <daniel@gmail.com>'
   - 'Daniel Mantovani <dmanto@gmail.com>'
   - 'Mohammad S Anwar <mohammad.anwar@yahoo.com>'
   - 'Sébastien Feugère <smonff@users.noreply.github.com>'
+  - 'rawleyfowler <rawleyfowler@proton.me>'
   - 'vagrant <vagrant@vagrant.vm>'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
 x_static_install: 1

@@ -2,7 +2,7 @@ NAME
     CPAN::Reporter - Adds CPAN Testers reporting to CPAN.pm
 
 VERSION
-    version 1.2019
+    version 1.2020
 
 SYNOPSIS
     From the CPAN shell:
@@ -220,13 +220,17 @@ CONTRIBUTORS
 
     *   Graham Knop <haarg@haarg.org>
 
+    *   HÃ¥kon HÃ¦gland <hakon.hagland@gmail.com>
+
     *   James E Keenan <jkeenan@cpan.org>
 
     *   J. Maslak <jmaslak@antelope.net>
 
-    *   José Joaquín Atria <jjatria@cpan.org>
+    *   JosÃ© JoaquÃ­n Atria <jjatria@cpan.org>
 
     *   Kent Fredric <kentfredric@gmail.com>
+
+    *   Leon Timmermans <fawaka@gmail.com>
 
     *   Matthew Musgrove <mr.muskrat@gmail.com>
 

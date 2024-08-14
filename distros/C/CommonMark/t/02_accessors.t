@@ -1,5 +1,6 @@
 use strict;
 use warnings;
+use File::Spec::Functions qw(catfile);
 
 use Test::More tests => 28;
 
@@ -7,7 +8,7 @@ BEGIN {
     use_ok('CommonMark', ':all');
 }
 
-my $filename = 't/files/test.md';
+my $filename = catfile(qw(t files test.md));
 open(my $file, '<', $filename)
     or die("$filename: $!");
 my $doc = CommonMark->parse_file($file);

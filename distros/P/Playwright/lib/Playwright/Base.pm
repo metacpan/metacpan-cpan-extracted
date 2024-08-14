@@ -1,5 +1,5 @@
 package Playwright::Base;
-$Playwright::Base::VERSION = '1.431';
+$Playwright::Base::VERSION = '1.460';
 use strict;
 use warnings;
 
@@ -112,7 +112,7 @@ Playwright::Base - Object representing Playwright pages
 
 =head1 VERSION
 
-version 1.431
+version 1.460
 
 =head2 DESCRIPTION
 

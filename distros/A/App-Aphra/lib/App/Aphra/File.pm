@@ -125,11 +125,20 @@ sub process {
       document_string => $template_text,
     );
 
+    my $front_matter_hashref = $front_matter->frontmatter_hashref // {};
+    my $orig_layout;
+    if ($front_matter_hashref->{layout}) {
+      $orig_layout = $self->app->template->{SERVICE}{WRAPPER};
+      $self->app->template->{SERVICE}{WRAPPER} = [ $front_matter_hashref->{layout} ];
+    }
+
     $self->app->template->process($template, {
-      page => ($front_matter->frontmatter_hashref // {}),
+      page => $front_matter_hashref,
       file => $self,
     }, $out)
       or croak $self->app->template->error;
+
+    $orig_layout and $self->app->template->{SERVICE}{WRAPPER} = $orig_layout;
   } else {
     my $file = $self->full_name;
     debug("Copy: $file -> ", $self->destination_dir);

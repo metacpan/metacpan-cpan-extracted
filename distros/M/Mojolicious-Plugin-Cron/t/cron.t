@@ -90,7 +90,7 @@ ff(Algorithm::Cron->new(base => 'utc', crontab => '0 15 * * *')->next_time(time)
 
 undef %global_tstamps;
 my @utc_at13pm = gmtime;
-my $gday = substr fmt_time(@utc_at13pm), 0, 10;
+my $gday       = substr fmt_time(@utc_at13pm), 0, 10;
 
 ff(3610);    # 1 h 30 secs from 3PM
 
@@ -104,8 +104,8 @@ is \%global_tstamps, {
   "$gday 15:50" => {sched1 => 1},
   "$gday 15:58" => {sched3 => 1},
   "$gday 15:59" => {
-    sched3 => 1,                                  # means locking works
-    sched4 => 2                                   # means all_proc flag works
+    sched3 => 1,    # means locking works
+    sched4 => 2     # means all_proc flag works
   },    # no more because hour is always 15 utc
   },
   'exact tstamps';

@@ -69,7 +69,7 @@ my $anthropic = Langertha::Engine::Anthropic->new(
   model => 'claude-3-5-sonnet-20240620',
   system_prompt => 'systemprompt',
   api_version => '2024-02-04',
-  context_size => 2048,
+  response_size => 2048,
   temperature => 0.5,
 );
 my $anthropic_request = $anthropic->chat('testprompt');

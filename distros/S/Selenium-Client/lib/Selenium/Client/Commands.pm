@@ -1,5 +1,5 @@
 package Selenium::Client::Commands;
-$Selenium::Client::Commands::VERSION = '2.00';
+$Selenium::Client::Commands::VERSION = '2.01';
 # ABSTRACT: Map commands from Selenium 3 to 4
 
 use strict;
@@ -63,8 +63,10 @@ my %command_map = (
                 delete $params->{$key} unless $params->{$key};
             }
 
-            my %in  = %$params ? ( capabilities => { alwaysMatch => $params } ) : ();
-            my @ret = $driver->NewSession(%in);
+            my %in = %$params ? ( capabilities => { alwaysMatch => $params } ) : ();
+
+            #XXX TODO the params we build here are worse than what is autobuilt by default.  Ignore them totally.
+            my @ret = $driver->NewSession();
             return [@ret];
         },
         parse => sub {
@@ -138,11 +140,7 @@ my %command_map = (
     },
     'maximizeWindow' => {
         execute => \&_sess_uc,
-        parse   => \&_emit_null_ok,
-    },
-    'maximizeWindow' => {
-        execute => \&_sess_uc,
-        parse   => \&_emit_null_ok,
+        parse   => \&_emit,
     },
     'minimizeWindow' => {
         execute => \&_sess_uc,
@@ -150,7 +148,7 @@ my %command_map = (
     },
     'fullscreenWindow' => {
         execute => \&_sess_uc,
-        parse   => \&_emit_null_ok,
+        parse   => \&_emit,
     },
     'setWindowSize' => {
         execute => sub {
@@ -393,7 +391,7 @@ my %command_map = (
     'close' => {
         execute => sub {
             my ( $session, $params ) = @_;
-            $session->closeWindow(%$params);
+            $session->CloseWindow(%$params);
         },
         parse => \&_emit_null_ok,
     },
@@ -555,18 +553,60 @@ Selenium::Client::Commands - Map commands from Selenium 3 to 4
 
 =head1 VERSION
 
-version 2.00
+version 2.01
 
-=head1 AUTHOR
+=head1 SEE ALSO
+
+Please see those modules/websites for more information related to this module.
+
+=over 4
+
+=item *
+
+L<Selenium::Client|Selenium::Client>
+
+=back
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website
+L<https://github.com/troglodyne-internet-widgets/selenium-client-perl/issues>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
+
+=head1 AUTHORS
+
+Current Maintainers:
+
+=over 4
+
+=item *
 
 George S. Baugh <george@troglodyne.net>
 
+=back
+
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2023 by George S. Baugh.
+Copyright (c) 2024 Troglodyne LLC
 
-This is free software, licensed under:
 
-  The MIT (X11) License
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
 
 =cut

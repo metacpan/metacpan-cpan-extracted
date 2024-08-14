@@ -135,7 +135,7 @@ of simultaneous scheduled tasks to just one on a multi-host environment.
     # Execute some job every 5 minutes, only on one of the existing hosts
 
     plugin Cron => ( '*/5 * * * *' => sub {
-        my $target_epoch = shift;
+        my ($target_epoch, $app) = @_;
         my $last_epoch = some_kind_of_atomic_swap_function(
           key => "some id key for this crontab",
           value => $target_epoch
@@ -164,7 +164,7 @@ Daniel Mantovani, `dmanto@cpan.org`
 
 # COPYRIGHT AND LICENCE
 
-Copyright (C) 2018-2021, Daniel Mantovani.
+Copyright (C) 2018-2024, Daniel Mantovani.
 
 This library is free software; you may redistribute it and/or modify it under
 the terms of the Artistic License version 2.0.

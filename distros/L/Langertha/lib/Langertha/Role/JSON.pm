@@ -1,7 +1,7 @@
 package Langertha::Role::JSON;
 our $AUTHORITY = 'cpan:GETTY';
 # ABSTRACT: Role for JSON
-$Langertha::Role::JSON::VERSION = '0.003';
+$Langertha::Role::JSON::VERSION = '0.004';
 use Moose::Role;
 
 sub json { shift->_json }
@@ -25,7 +25,7 @@ Langertha::Role::JSON - Role for JSON
 
 =head1 VERSION
 
-version 0.003
+version 0.004
 
 =for :stopwords cpan testmatrix url bugtracker rt cpants kwalitee diff irc mailto metadata placeholders metacpan
 

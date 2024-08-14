@@ -1,6 +1,6 @@
 package App::Greple::xlate;
 
-our $VERSION = "0.3201";
+our $VERSION = "0.3202";
 
 =encoding utf-8
 
@@ -16,7 +16,7 @@ App::Greple::xlate - translation support module for greple
 
 =head1 VERSION
 
-Version 0.3201
+Version 0.3202
 
 =head1 DESCRIPTION
 
@@ -75,7 +75,7 @@ Processing is done in specified units, but in the case of a sequence
 of multiple lines of non-empty text, they are converted together into
 a single line.  This operation is performed as follows:
 
-=over
+=over 2
 
 =item *
 
@@ -103,7 +103,7 @@ follows, the text matching the first pattern will be processed after
 normalization, and no normalization process will be performed on the
 text matching the second pattern.
 
-    greple Mxlate -E normalized -E not-normalized
+    greple -Mxlate -E normalized -E not-normalized
 
 Therefore, use the first pattern for text that is to be processed by
 combining multiple lines into a single line, and use the second

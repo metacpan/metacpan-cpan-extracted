@@ -10,7 +10,7 @@ App::Greple::xlate - Übersetzungsunterstützungsmodul für greple
 
 # VERSION
 
-Version 0.3201
+Version 0.3202
 
 # DESCRIPTION
 
@@ -62,7 +62,7 @@ Cache-Daten werden basierend auf dem normalisierten Text verwaltet, sodass auch 
 
 Dieser Normalisierungsprozess wird nur für das erste (0.) und für gerade nummerierte Muster durchgeführt. Wenn also zwei Muster wie folgt angegeben sind, wird der Text, der dem ersten Muster entspricht, nach der Normalisierung verarbeitet, und es wird kein Normalisierungsprozess für den Text durchgeführt, der dem zweiten Muster entspricht.
 
-    greple Mxlate -E normalized -E not-normalized
+    greple -Mxlate -E normalized -E not-normalized
 
 Verwenden Sie daher das erste Muster für Text, der verarbeitet werden soll, indem mehrere Zeilen zu einer einzigen Zeile kombiniert werden, und verwenden Sie das zweite Muster für vorformatierten Text. Wenn es keinen Text gibt, der dem ersten Muster entspricht, dann ein Muster, das nichts entspricht, wie z.B. `(?!)`.
 

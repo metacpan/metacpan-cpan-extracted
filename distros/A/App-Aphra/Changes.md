@@ -1,6 +1,12 @@
 # Change Log
 
-## [0.1.4] - 2024-07-01
+## [0.2.1] - 2024-08-13
+
+### Added
+
+- Support for overriding layouts
+
+## [0.2.0] - 2024-07-01
 
 ### Added
 

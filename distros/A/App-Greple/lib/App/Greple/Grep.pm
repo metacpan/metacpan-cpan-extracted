@@ -87,6 +87,7 @@ sub prepare {
 		Getopt::EX::Func->new(\&match_regions,
 				      pattern => $pat->regex,
 				      group => $self->{group_match},
+				      index => $self->{group_index},
 		    );
 	    }
 	};
@@ -248,12 +249,15 @@ sub compose {
     ##
     my @list = ();
     for my $bi (@effective_index) {
-	## now don't connect side-by-side pattern
-	my @matched = merge_regions({nojoin => $self->{only} || 1,
-				     destructive => 1},
+	my @matched = merge_regions({ nojoin => 1, destructive => 1 },
 				    @{$mp->[$bi][MUST_LIST]},
 				    @{$mp->[$bi][POSI_LIST]},
 				    @{$mp->[$bi][NEGA_LIST]});
+	if ($self->{stretch}) {
+	    my $b = $bp->[$bi];
+	    my $m = $matched[0];
+	    @matched = [ $b->[0], $b->[1], $m->[2], $m->[3] ];
+	}
 	$self->{MATCHED} += @matched;
 	if ($self->{only}) {
 	    push @list, map({ [ $_, $_ ] } @matched);

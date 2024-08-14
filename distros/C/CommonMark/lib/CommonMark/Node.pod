@@ -34,6 +34,8 @@ provide a more powerful interface.
 
 =head2 Rendering
 
+=head3 C<render>
+
     my $result = $node->render(
         format        => $string,
         sourcepos     => $bool,    # Optional
@@ -43,13 +45,30 @@ provide a more powerful interface.
         width         => $int,     # Optional
     );
 
-Convenience function to render documents. Supported formats are C<'html'>,
+Convenience function to render documents. Supported C<format>s are C<'html'>,
 C<'xml'>, C<'man'>, C<'commonmark'>, and C<'latex'>.
 
-C<sourcepos>, C<hardbreaks>, C<nobreaks>, and C<unsafe> enable the respective
-render options.
+The C<width> specifies the number of characters at which lines are broken, and
+is passed to renderers that support it. A value of 0 disables line wrapping.
+The default is 0.
 
-C<width> is passed to renderers that support it.
+The remaining options enable the respective L<render options|/"Render options">:
+
+=over
+
+=item * C<sourcepos>
+
+=item * C<hardbreaks>
+
+=item * C<unsafe>
+
+=item * C<nobreaks>
+
+=item * C<safe> (no-op as of libcmark 0.29)
+
+=back
+
+=head3 C<render_*>
 
     my $html  = $node->render_html( [$options] )
     my $xml   = $node->render_xml( [$options] )
@@ -59,39 +78,52 @@ C<width> is passed to renderers that support it.
 
 These methods render the contents of the node in the respective format.
 
-C<$options> is a bit field created by ORing the following constants:
+C<$options> is a bit field created by ORing
+L<render options|/"Render options">. It may be omitted and defaults to
+C<OPT_DEFAULT>.
 
-    CommonMark::OPT_DEFAULT => 0
-    CommonMark::OPT_SOURCEPOS
-    CommonMark::OPT_HARDBREAKS
-    CommonMark::OPT_UNSAFE
-    CommonMark::OPT_NOBREAKS
+C<$width> specifies the number of characters at which lines are broken. A
+value of 0 disables line wrapping.
+The default is 0.
+
+=head2 Render options
 
 Render options can be imported from L<CommonMark> with tag C<opt>.
 
     use CommonMark qw(:opt);
 
-C<$options> may be omitted and defaults to C<OPT_DEFAULT>.
+=over
 
-C<SOURCEPOS> adds information about line numbers in the source file to the
-XML and HTML formats.
+=item C<OPT_SOURCEPOS>
 
-C<HARDBREAKS> translates "softbreak" nodes (typically corresponding to
-newlines in the input) to hard line breaks. This is only supported by some
-renderers. The HTML renderer, for example, generates a C<E<lt>br /E<gt>>
-instead of a newline character.
+Adds information about line numbers in the source file to the XML and HTML
+formats.
 
-C<NOBREAKS> translates "softbreak" nodes to spaces. Requires libcmark
-0.25 or higher.
+=item C<OPT_HARDBREAKS>
 
-C<UNSAFE> only affects the HTML renderer. It allows raw HTML blocks and
-some dangerous links.
+Translates "softbreak" nodes (typically corresponding to newlines in the
+input) to hard line breaks. This is only supported by some renderers. The
+HTML renderer, for example, generates a C<E<lt>br /E<gt>> instead of a
+newline character.
+
+=item C<OPT_NOBREAKS>
+
+Translates "softbreak" nodes to spaces. Requires libcmark 0.26 or higher.
+
+=item C<OPT_UNSAFE>
+
+Only affects the HTML renderer. It allows raw HTML blocks and some dangerous
+links.
+
+=item C<OPT_OPT_SAFE>
+
+Replaces raw HTML with a placeholder HTML comment. This option has no effect
+with libcmark 0.29 or higher, where "Safe" mode is the default.
+
+=back
 
 See the documentation of I<libcmark> for a more detailed explanation of the
 render options.
-
-C<$width> specifies the number of characters at which lines are broken.
-A value of 0 disables line wrapping. The default is 0.
 
 =head2 Accessors
 
@@ -232,4 +264,3 @@ This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
 
 =cut
-

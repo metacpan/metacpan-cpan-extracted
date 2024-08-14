@@ -8,7 +8,7 @@ use Algorithm::Cron;
 
 use Carp 'croak';
 
-our $VERSION = "0.034";
+our $VERSION = "0.035";
 use constant CRON_DIR => 'mojo_cron_';
 my $crondir;
 
@@ -28,16 +28,17 @@ sub register {
 
       # special case, plugin => 'mm hh dd ...' => sub {}
       $self->_cron($app->moniker,
-        {crontab => (keys %$cronhashes)[0], code => (values %$cronhashes)[0]});
+        {crontab => (keys %$cronhashes)[0], code => (values %$cronhashes)[0]},
+        $app);
     }
     else {
-      $self->_cron($_, $cronhashes->{$_}) for keys %$cronhashes;
+      $self->_cron($_, $cronhashes->{$_}, $app) for keys %$cronhashes;
     }
   });
 }
 
 sub _cron {
-  my ($self, $sckey, $cronhash) = @_;
+  my ($self, $sckey, $cronhash, $app) = @_;
   my $code     = delete $cronhash->{code};
   my $all_proc = delete $cronhash->{all_proc} // '';
   my $test_key
@@ -82,7 +83,7 @@ sub _cron {
           undef $dat;
           undef $sem;                                       # unlock
         }
-        $code->($time) if $fire;
+        $code->($time, $app) if $fire;
         $task->();
       }
     );
@@ -234,7 +235,7 @@ of simultaneous scheduled tasks to just one on a multi-host environment.
   # Execute some job every 5 minutes, only on one of the existing hosts
 
   plugin Cron => ( '*/5 * * * *' => sub {
-      my $target_epoch = shift;
+      my ($target_epoch, $app) = @_;
       my $last_epoch = some_kind_of_atomic_swap_function(
         key => "some id key for this crontab",
         value => $target_epoch
@@ -263,7 +264,7 @@ Daniel Mantovani, C<dmanto@cpan.org>
 
 =head1 COPYRIGHT AND LICENCE
 
-Copyright (C) 2018-2021, Daniel Mantovani.
+Copyright (C) 2018-2024, Daniel Mantovani.
 
 This library is free software; you may redistribute it and/or modify it under
 the terms of the Artistic License version 2.0.

@@ -1,5 +1,9 @@
 Revision history for Perl extension App-Greple-xlate
 
+0.3202 2024-08-13T12:24:41Z
+
+    - fix a bug of --xlate-labor option not to work
+
 0.3201 2024-08-09T23:44:53Z
 
     - requires perl v5.18.2

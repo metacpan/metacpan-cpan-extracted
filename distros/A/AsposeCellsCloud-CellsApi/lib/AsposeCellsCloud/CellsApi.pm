@@ -10189,6 +10189,41 @@ sub post_add_text_content{
 }
 
 #
+# PostTrimContentRequest
+#
+# 
+# 
+# @trimContentOptions  TrimContentOptions (required)     
+#
+{
+    my $params = {
+       'request' =>{
+            data_type => 'PostTrimContentRequest',
+            description => 'PostTrimContent Request.',
+            required => '0',
+       }
+    };
+    __PACKAGE__->method_documentation->{ 'post_trim_content' } = { 
+    	summary => '',
+        params => $params,
+        returns => 'FileInfo',
+    };
+}
+#
+# @return FileInfo
+#
+sub post_trim_content{
+    my ($self, %args) = @_;
+    my $request = $args{'request'};
+    my $response = $request->run_http_request('client' => $self->{api_client} );
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('FileInfo', $response);
+    return $_response_object;
+}
+
+#
 # GetWorkbookDefaultStyleRequest
 #
 # Retrieve the description of the default style for the workbook .

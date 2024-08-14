@@ -23,7 +23,7 @@ class CheckerAsPackage {
    ok( defined $obj, 'CheckerAsPackage->new with numbers OK' );
 
    like( dies { CheckerAsPackage->new( x => "hello" ) },
-      qr/^Field \$x requires a value satisfying :Checked\('Numerical'\) at / );
+      qr/^Field \$x requires a value satisfying Numerical at / );
 }
 
 # :writer
@@ -34,7 +34,7 @@ class CheckerAsPackage {
    ok( $obj->x, 20, '$obj->x modified after successful ->set_x' );
 
    like( dies { $obj->set_x( "hello" ) },
-      qr/^Field \$x requires a value satisfying :Checked\('Numerical'\) at /,
+      qr/^Field \$x requires a value satisfying Numerical at /,
       '$p->set_x rejects invalid values' );
    ok( $obj->x, 20, '$obj->x unmodified after rejected ->set_x' );
 }
@@ -49,7 +49,7 @@ class CheckerAsPackage {
    ok( $obj->acc_x, 20, '$obj->acc_x modified after successful ->acc_x' );
 
    like( dies { $obj->acc_x( "hello" ) },
-      qr/^Field \$x requires a value satisfying :Checked\('Numerical'\) at /,
+      qr/^Field \$x requires a value satisfying Numerical at /,
       '$p->acc_x rejects invalid values' );
    ok( $obj->acc_x, 20, '$obj->acc_x unmodified after rejected ->acc_x' );
 }
@@ -64,12 +64,13 @@ class CheckerAsPackage {
    ok( $obj->mut_x, 20, '$obj->mut_x modified after successful ->mut_x' );
 
    like( dies { $obj->mut_x = "hello" },
-      qr/^Field \$x requires a value satisfying :Checked\('Numerical'\) at /,
+      qr/^Field \$x requires a value satisfying Numerical at /,
       '$p->mut_x rejects invalid values' );
    ok( $obj->mut_x, 20, '$obj->mut_x unmodified after rejected ->mut_x' );
 }
 
 package ArrayRefChecker {
+   use overload '""' => sub { "ArrayRef" };
    sub check { return ref($_[1]) eq "ARRAY" }
 }
 
@@ -87,7 +88,7 @@ class CheckerAsObject {
    ok( defined $obj, 'CheckerAsObject->new with arrayref OK' );
 
    like( dies { CheckerAsObject->new( points => "hello" ) },
-      qr/^Field \$points requires a value satisfying :Checked\(ArrayRef\) at / );
+      qr/^Field \$points requires a value satisfying ArrayRef at / );
 }
 
 my $CHECKER;
@@ -101,7 +102,7 @@ class CheckerFromVariable {
    ok( defined $obj, 'CheckerFromVariable->new with arrayref OK' );
 
    like( dies { CheckerFromVariable->new( f => "hello" ) },
-      qr/^Field \$f requires a value satisfying :Checked\(\$CHECKER\) at / );
+      qr/^Field \$f requires a value satisfying ArrayRef at / );
 }
 
 class InternalsCanViolate {
@@ -119,26 +120,6 @@ class InternalsCanViolate {
    ok( lives { $o->test },
       'Object internally can violate its own :Checked constraint' ) or
       diag( "$@" );
-}
-
-class CheckerAsCoderef {
-   field $name :param :reader :writer :Checked(sub { length $_[0] });
-}
-
-{
-   my $obj = CheckerAsCoderef->new( name => "str" );
-   ok( defined $obj, 'CheckerAsCoderef->new with string OK' );
-
-   ok( lives { $obj->set_name( "new-string" ) },
-      '$obj->set_name accepts good values' );
-
-   my $re = qr/^Field \$name requires a value satisfying :Checked\(sub \{ length \$_\[0\] \}\) /;
-
-   like( dies { $obj->set_name( "" ) }, $re,
-      '$obj->set_name rejects bad values' );
-
-   like( dies { CheckerAsCoderef->new( name => "" ) }, $re,
-      'CheckerAsCoderef->new rejects bad values' );
 }
 
 done_testing;

@@ -2,7 +2,7 @@ package Test2::Plugin::UUID;
 use strict;
 use warnings;
 
-our $VERSION = '0.002008';
+our $VERSION = '0.002009';
 
 use Carp qw/croak/;
 use Test2::API qw/test2_add_uuid_via/;

@@ -1,3 +1,8 @@
+Travel::Status::DE::DBWagenreihung 0.18 - Mon Aug 12 2024
+
+    * Group: IC2 trains have designations as well
+    * Group: Add static name_to_designation accessor
+
 Travel::Status::DE::DBWagenreihung 0.17 - Sat Aug 10 2024
 
     * Group: Fix ->name accessor (thanks to Caß Dingenskirchen)

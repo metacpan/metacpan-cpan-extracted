@@ -22,7 +22,7 @@ is(CommonMark->markdown_to_html($md, OPT_HARDBREAKS), "<p>a<br />\nb</p>\n",
    'HARDBREAKS');
 SKIP: {
     skip('NOBREAKS not supported by libcmark', 1)
-        if CommonMark->version < 0x001900;
+        if CommonMark->version < 0x001A00;
     is(CommonMark->markdown_to_html($md, OPT_NOBREAKS), "<p>a b</p>\n",
        'NOBREAKS');
 }

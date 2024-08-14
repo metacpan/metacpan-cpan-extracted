@@ -1,3 +1,8 @@
+0.03 2024-08-13
+    * Fix SHAddRecentFileW(), add tests for it
+    * Make tests more modular and actually test what they should test
+    * Cygwin does not work
+
 0.02 2024-07-31
     * make tests somewhat more resilient
     * Provide raw SHAddRecentFileW()

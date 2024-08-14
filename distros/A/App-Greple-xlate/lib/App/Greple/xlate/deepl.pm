@@ -1,6 +1,6 @@
 package App::Greple::xlate::deepl;
 
-our $VERSION = "0.3201";
+our $VERSION = "0.3202";
 
 use v5.14;
 use warnings;
@@ -16,7 +16,7 @@ use App::Greple::xlate::Lang qw(%LANGNAME);
 our $lang_from //= 'ORIGINAL';
 our $lang_to   //= 'JA';
 our $auth_key;
-our $method = 'deepl';
+our $method //= 'deepl';
 
 my %param = (
     deepl     => { max => 128 * 1024, sub => \&deepl },

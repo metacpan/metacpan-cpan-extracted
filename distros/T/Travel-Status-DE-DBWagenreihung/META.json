@@ -42,19 +42,19 @@
    "provides" : {
       "Travel::Status::DE::DBWagenreihung" : {
          "file" : "lib/Travel/Status/DE/DBWagenreihung.pm",
-         "version" : "0.17"
+         "version" : "0.18"
       },
       "Travel::Status::DE::DBWagenreihung::Carriage" : {
          "file" : "lib/Travel/Status/DE/DBWagenreihung/Carriage.pm",
-         "version" : "0.17"
+         "version" : "0.18"
       },
       "Travel::Status::DE::DBWagenreihung::Group" : {
          "file" : "lib/Travel/Status/DE/DBWagenreihung/Group.pm",
-         "version" : "0.17"
+         "version" : "0.18"
       },
       "Travel::Status::DE::DBWagenreihung::Sector" : {
          "file" : "lib/Travel/Status/DE/DBWagenreihung/Sector.pm",
-         "version" : "0.17"
+         "version" : "0.18"
       }
    },
    "release_status" : "stable",
@@ -66,6 +66,6 @@
          "url" : "https://github.com/derf/Travel-Status-DE-DBWagenreihung"
       }
    },
-   "version" : "0.17",
+   "version" : "0.18",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

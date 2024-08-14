@@ -1,3 +1,8 @@
+0.242 2024-08-12
+    . Don't test for apostrophe as package separator on Perl versions
+      after 5.41 (contributed by Tony Cook)
+    . Protect against modules changing @_
+
 0.241 2023-02-14
     . Actually manually add the changes since I messed up the last release
     . No code changes, no need to upgrade

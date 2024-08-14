@@ -10,7 +10,7 @@ App::Greple::xlate - greple的翻译支持模块
 
 # VERSION
 
-Version 0.3201
+Version 0.3202
 
 # DESCRIPTION
 
@@ -62,7 +62,7 @@ Version 0.3201
 
 此规范化处理只针对第一个（第 0 个）和偶数模式。因此，如果指定了以下两个模式，则匹配第一个模式的文本将在规范化后处理，而不对匹配第二个模式的文本执行规范化处理。
 
-    greple Mxlate -E normalized -E not-normalized
+    greple -Mxlate -E normalized -E not-normalized
 
 因此，对于要将多行合并为一行进行处理的文本，请使用第一个模式，而对于预格式化文本，请使用第二个模式。如果第一种模式中没有要匹配的文本，那么就使用不匹配任何内容的模式，如 `(?!)`。
 

@@ -4,7 +4,7 @@ Geo::Coder::Abbreviations - Quick and Dirty Interface to https://github.com/mapb
 
 # VERSION
 
-Version 0.08
+Version 0.09
 
 # SYNOPSIS
 
@@ -34,6 +34,12 @@ Abbreviate a place.
 ## normalize
 
 Normalize and abbreviate street names - useful for comparisons
+
+    print $abbr->normalize({ street => '10 Downing Street' }), "\n";    # prints '10 DOWNING ST'
+
+Can be run as a class method
+
+    print Geo::Coder::Abbreviations('1600 Pennsylvania Avenue NW'), "\n";       # prints '1600 Pennsylvia Ave NW'
 
 # SEE ALSO
 

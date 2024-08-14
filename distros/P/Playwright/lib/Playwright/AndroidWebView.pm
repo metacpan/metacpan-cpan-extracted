@@ -9,7 +9,7 @@ use strict;
 use warnings;
 
 package Playwright::AndroidWebView;
-$Playwright::AndroidWebView::VERSION = '1.431';
+$Playwright::AndroidWebView::VERSION = '1.460';
 use parent 'Playwright::Base';
 
 sub new {
@@ -22,11 +22,11 @@ sub spec {
     return $Playwright::spec->{'AndroidWebView'}{members};
 }
 
-sub pkg {
+sub close {
     my $self = shift;
     return $self->_api_request(
         args    => [@_],
-        command => 'pkg',
+        command => 'close',
         object  => $self->{guid},
         type    => $self->{type}
     );
@@ -42,11 +42,11 @@ sub page {
     );
 }
 
-sub close {
+sub pkg {
     my $self = shift;
     return $self->_api_request(
         args    => [@_],
-        command => 'close',
+        command => 'pkg',
         object  => $self->{guid},
         type    => $self->{type}
     );
@@ -106,7 +106,7 @@ Playwright::AndroidWebView - Automatically generated class for Playwright::Andro
 
 =head1 VERSION
 
-version 1.431
+version 1.460
 
 =head1 CONSTRUCTOR
 
@@ -117,11 +117,11 @@ Instead it should be returned to you as the result of calls on Playwright object
 
 =head1 METHODS
 
-=head2 pkg(@args)
+=head2 close(@args)
 
-Execute the AndroidWebView::pkg playwright routine.
+Execute the AndroidWebView::close playwright routine.
 
-See L<https://playwright.dev/docs/api/class-AndroidWebView#AndroidWebView-pkg> for more information.
+See L<https://playwright.dev/docs/api/class-AndroidWebView#AndroidWebView-close> for more information.
 
 =head2 page(@args)
 
@@ -129,11 +129,11 @@ Execute the AndroidWebView::page playwright routine.
 
 See L<https://playwright.dev/docs/api/class-AndroidWebView#AndroidWebView-page> for more information.
 
-=head2 close(@args)
+=head2 pkg(@args)
 
-Execute the AndroidWebView::close playwright routine.
+Execute the AndroidWebView::pkg playwright routine.
 
-See L<https://playwright.dev/docs/api/class-AndroidWebView#AndroidWebView-close> for more information.
+See L<https://playwright.dev/docs/api/class-AndroidWebView#AndroidWebView-pkg> for more information.
 
 =head2 pid(@args)
 

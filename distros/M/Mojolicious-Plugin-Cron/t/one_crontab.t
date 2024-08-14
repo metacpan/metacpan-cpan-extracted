@@ -11,10 +11,11 @@ $ENV{MOJO_MODE} = 'test';
 my %local_tstamps;
 
 my $last_epoch;
+my $app;
 
 plugin Cron => (
   '*/10 15 * * *' => sub {
-    $last_epoch = shift;
+    ($last_epoch, $app) = @_;
     $local_tstamps{fmt_time(localtime)}++;
     Mojo::IOLoop->stop;
   }
@@ -30,7 +31,7 @@ ff(Algorithm::Cron->new(base => 'local', crontab => '0 15 * * *')
     ->next_time(time) - time);
 undef %local_tstamps;
 my @local_at13pm = localtime;
-my $lday = substr fmt_time(@local_at13pm), 0, 10;
+my $lday         = substr fmt_time(@local_at13pm), 0, 10;
 ff(3630);    # 1 h 30 secs from 3PM, local time
 is \%local_tstamps,
   {
@@ -41,6 +42,8 @@ is \%local_tstamps,
   "$lday 15:50" => 1,
   },         # no more because hour is always 15 local
   'exact tstamps';
+ok $app, 'is app passed?';
+is ref($app), 'Mojolicious::Lite', 'is app correct type?';
 
 # check that new $epock parameter is available on callback
 ok defined $last_epoch && $last_epoch =~ /^\d{10}$/, "got epoch on callback";

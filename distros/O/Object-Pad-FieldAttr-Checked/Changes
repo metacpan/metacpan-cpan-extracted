@@ -1,5 +1,15 @@
 Revision history for Object-Pad-FieldAttr-Checked
 
+0.12    2024-08-12
+        [CHANGES]
+         * Don't document or test plain code references as constraint checkers
+         * Simplified assert messages, just name the constraint
+         * Use automatic constraint name generation for assert messages
+         * Use the split parse/apply stages of field attributes in
+           Object::Pad v0.810
+         * Use the `gen_valueassert_op` field hook of Object::Pad v0.810 to
+           avoid needing temporary magic during constructor
+
 0.11    2024-07-03
         [CHANGES]
          * Adjust docs, examples, unit tests to prefer Data::Checks

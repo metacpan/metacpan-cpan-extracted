@@ -1,7 +1,7 @@
 use strict;
 package CPAN::Reporter::History;
 
-our $VERSION = '1.2019';
+our $VERSION = '1.2020';
 
 use vars qw/@ISA @EXPORT_OK/;
 
@@ -346,7 +346,7 @@ CPAN::Reporter::History - Read or write a CPAN::Reporter history log
 
 =head1 VERSION
 
-version 1.2019
+version 1.2020
 
 =head1 SYNOPSIS
 

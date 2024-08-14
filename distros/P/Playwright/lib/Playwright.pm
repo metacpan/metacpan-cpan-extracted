@@ -1,5 +1,5 @@
 package Playwright;
-$Playwright::VERSION = '1.431';
+$Playwright::VERSION = '1.460';
 use strict;
 use warnings;
 
@@ -17,6 +17,7 @@ use Sub::Install();
 use Net::EmptyPort();
 use JSON::MaybeXS();
 use File::Which();
+use File::Temp();
 use Capture::Tiny qw{capture_merged capture_stderr};
 use Carp          qw{confess};
 
@@ -38,16 +39,19 @@ sub _check_node {
     confess("node must exist, be in your PATH and executable")
       unless $node_bin && -x $node_bin;
 
-    my $path2here =
-      File::Basename::dirname( Cwd::abs_path( $INC{'Playwright.pm'} ) );
-
     # Make sure it's possible to start the server
     $server_bin = File::Which::which('playwright_server');
+
+    # If it's not in $PATH, it should be in ../bin
+    $server_bin //= Playwright::Util::find_playwright_server();
+
     confess(
         "Can't locate playwright_server!
     Please ensure it is installed in your PATH.
     If you installed this module from CPAN, it should already be."
     ) unless $server_bin && -x $server_bin;
+
+    $server_bin = Cwd::abs_path($server_bin);
 
     # Attempt to start the server.  If we can't do this, we almost certainly have dependency issues.
     my $output = '';
@@ -110,19 +114,18 @@ sub new ( $class, %options ) {
     my $port    = $options{port}    // Net::EmptyPort::empty_port();
     my $cdp_uri = $options{cdp_uri} // '';
     my $timeout = $options{timeout} // 30;
-    my $self    = bless(
+    my $cleanup =
+      ( $options{cleanup} // !( $options{port} || $options{host} ) ) ? 1 : 0;
+    my $self = bless(
         {
             ua      => $options{ua}   // LWP::UserAgent->new(),
             host    => $options{host} // 'localhost',
             port    => $port,
             cdp_uri => $cdp_uri,
             debug   => $options{debug},
-            cleanup =>
-              ( $options{cleanup} || !$options{port} || !$options{host} ) // 1,
-            pid => $options{host} ? "REUSE" : _start_server(
-                $port,    $cdp_uri,
-                $timeout, $options{debug},
-                $options{cleanup} // 1
+            cleanup => $cleanup,
+            pid     => $options{host} ? "REUSE" : _start_server(
+                $port, $cdp_uri, $timeout, $options{debug}, $cleanup
             ),
             parent  => $$ // 'bogus',    # Oh lawds, this can be undef sometimes
             timeout => $timeout,
@@ -240,8 +243,11 @@ sub quit ($self) {
     $self->{killed} = 1;
     print "Attempting to terminate server process...\n" if $self->{debug};
 
-    Playwright::Util::request( 'GET', 'shutdown', $self->{host}, $self->{port},
-        $self->{ua} );
+    # Best effort to whack this, we can't make guarantees during global destruction
+    eval {
+        Playwright::Util::request( 'GET', 'shutdown', $self->{host},
+            $self->{port}, $self->{ua} );
+    } if $self->{ua};
 
     return $self->_kill_playwright_server_windows() if IS_WIN;
 
@@ -271,11 +277,15 @@ sub DESTROY ($self) {
 
 sub _wait_port ( $port, $timeout, $debug ) {
 
+    #XXX unusedvars is wigging
+    $debug = $debug;
+    my $result;
+    $result = $result;
+
     # Check if the port is already live, and short-circuit if this is the case.
     if (IS_WIN) {
-        my $result;
         for ( 0 .. $timeout ) {
-            my $result = qx{netstat -na | findstr "$port"};
+            $result = qx{netstat -na | findstr "$port"};
             print "Waiting on port $port: $result\n" if $debug;
             last                                     if $result;
             sleep 1;
@@ -326,7 +336,7 @@ sub _start_server ( $port, $cdp_uri, $timeout, $debug, $cleanup ) {
     # Orphan the process in the event that cleanup => 0
     if ( !$cleanup ) {
         print "Detaching child process...\n";
-        chdir '/';
+        chdir File::Temp::tempdir( CLEANUP => 1 );
         require POSIX;
         die "Cannot detach playwright_server process for persistence"
           if POSIX::setsid() < 0;
@@ -341,9 +351,10 @@ sub _start_server_windows ( $port, $timeout, $debug, $cleanup, @args ) {
     my $pid       = qq/playwright-server:$port/;
     my @cmdprefix = ( "start /MIN", qq{"$pid"} );
 
-    my $node_bin   = File::Which::which('node');
-    my $server_bin = File::Which::which('playwright_server');
-    my $cmdstring  = join( ' ', @cmdprefix, @args );
+    # Test::UnusedVars hack
+    $cleanup = '';
+
+    my $cmdstring = join( ' ', @cmdprefix, @args );
     print "$cmdstring\n" if $debug;
     system($cmdstring);
     _wait_port( $port, $timeout, $debug );
@@ -371,7 +382,7 @@ Playwright - Perl client for Playwright
 
 =head1 VERSION
 
-version 1.431
+version 1.460
 
 =head1 SYNOPSIS
 
@@ -825,9 +836,13 @@ George S. Baugh <teodesian@gmail.com>
 
 =head1 CONTRIBUTORS
 
-=for stopwords reneeb Yanick Champoux
+=for stopwords Keith Carangelo reneeb Yanick Champoux
 
 =over 4
+
+=item *
+
+Keith Carangelo <mail@kcaran.com>
 
 =item *
 

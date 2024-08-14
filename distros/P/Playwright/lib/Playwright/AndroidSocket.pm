@@ -9,7 +9,7 @@ use strict;
 use warnings;
 
 package Playwright::AndroidSocket;
-$Playwright::AndroidSocket::VERSION = '1.431';
+$Playwright::AndroidSocket::VERSION = '1.460';
 use parent 'Playwright::Base';
 
 sub new {
@@ -96,7 +96,7 @@ Playwright::AndroidSocket - Automatically generated class for Playwright::Androi
 
 =head1 VERSION
 
-version 1.431
+version 1.460
 
 =head1 CONSTRUCTOR
 

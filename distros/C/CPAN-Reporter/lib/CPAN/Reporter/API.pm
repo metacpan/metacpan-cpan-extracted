@@ -1,7 +1,7 @@
 use strict; # make CPANTS happy
 package CPAN::Reporter::API;
 
-our $VERSION = '1.2019';
+our $VERSION = '1.2020';
 
 1;
 
@@ -19,7 +19,7 @@ CPAN::Reporter::API - Programmer's interface to CPAN::Reporter
 
 =head1 VERSION
 
-version 1.2019
+version 1.2020
 
 =head1 FUNCTIONS
 

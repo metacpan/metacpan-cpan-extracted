@@ -19,7 +19,8 @@ CommonMark - Interface to the CommonMark C library
 =head1 DESCRIPTION
 
 This module is a wrapper around the official CommonMark C library
-I<libcmark>. It closely follows the original API.
+L<I<libcmark>|https://github.com/commonmark/cmark/>. It closely follows the
+original API.
 
 The main module provides some entry points to parse documents and convenience
 functions for node creation. The bulk of features is available through
@@ -32,9 +33,9 @@ tree. L<CommonMark::Parser> provides a push parser interface.
 =head3 Installation of libcmark
 
 Please note that the I<libcmark> API isn't stable yet. This version of the
-Perl bindings is known to work with all releases between 0.21.0 and 0.29.0,
+Perl bindings is known to work with all releases between 0.21.0 and 0.31.1,
 but there's no guarantee that it can be compiled with later versions. Also
-note that upgrading a dynamically linked version of libcmark may require
+note that upgrading a dynamically linked version of I<libcmark> may require
 recompilation of the Perl distribution.
 
 It is recommended to use the I<libcmark> packages provided by recent Linux
@@ -46,11 +47,15 @@ On Red Hat or CentOS, run:
 
     sudo yum install cmark-devel
 
+On macOS using L<Homebrew|https://brew.sh>, run:
+
+    brew install cmark
+
 To install I<libcmark> from source:
 
-    curl -LJO https://github.com/commonmark/cmark/archive/0.29.0.tar.gz
-    tar xzf cmark-0.29.0.tar.gz
-    cd cmark-0.29.0
+    curl -LJO https://github.com/commonmark/cmark/archive/0.31.1.tar.gz
+    tar xzf cmark-0.31.1.tar.gz
+    cd cmark-0.31.1
     make [INSTALL_PREFIX=/prefix]
     make test
     make install
@@ -66,7 +71,16 @@ If I<libcmark> is in a standard location:
     make test
     make install
 
-Otherwise:
+On macOS using Homebrew, specify the include and library locations:
+
+    perl Makefile.PL \
+        INC="-I$(brew --prefix)/include" \
+        LIBS="-L$(brew --prefix)/lib -lcmark"
+    make
+    make test
+    make install
+
+Otherwise, specify the include and library locations:
 
     perl Makefile.PL \
         INC="-I/prefix/include" \
@@ -97,12 +111,38 @@ so you can use the standard build process as well.
     my $html = CommonMark->markdown_to_html( $markdown, [$options] );
 
 Converts a Markdown string to HTML. C<$options> is a bit field
-containing the parser and render options. It defaults to zero
-(C<OPT_DEFAULT>).
+containing the L<parse options|/Parser options> and
+L<render options|CommonMark::Node/Render options> ORed together. It defaults
+to zero (C<OPT_DEFAULT>).
 
-Equivalent to
+This method is the equivalent to calling C<parse_document> and then
+L<C<render_html>|CommonMark::Node/C<render_*>> on the resulting document,
+or calling C<parse> and then L<C<render>|CommonMark::Node/C<render>>:
 
+    my $html = CommonMark->markdown_to_html( $markdown );
     my $html = CommonMark->parse_document($markdown)->render_html;
+    my $html = CommonMark->parse(string => $markdown)->render(format => 'html');
+
+Equivalent calls with parser and rendering options, which can all be passed
+to C<markdown_to_html()> but must be sent separately to the parse and render
+methods:
+
+    my $html = CommonMark->markdown_to_html(
+        $markdown,
+        OPT_UNSAFE | OPT_SMART,
+    );
+
+    my $html = CommonMark->parse_document(
+        $markdown, OPT_SMART,
+    )->render_html(OPT_UNSAFE);
+
+    my $html = CommonMark->parse(
+        string => $markdown,
+        smart  => 1,
+    )->render(
+        format => 'html',
+        unsafe => 1,
+    );
 
 =head2 parse
 
@@ -122,9 +162,18 @@ Equivalent to
 
 Convenience function to parse documents. Exactly one of the C<string> or
 C<file> options must be provided. When given a string, calls
-L</parse_document>. When given a file, calls L</parse_file>. C<normalize>,
-C<smart>, and C<validate_utf8> enable the respective
-L<parser options|/"Parser options">.
+L</parse_document>. When given a file, calls L</parse_file>. The remaining
+options enable the respective L<parser options|/"Parser options">:
+
+=over
+
+=item * C<smart>
+
+=item * C<validate_utf8>
+
+=item * C<normalize> (no-op as of libcmark 0.28)
+
+=back
 
 Returns the L<CommonMark::Node> of the root document.
 
@@ -146,7 +195,8 @@ containing the parser options. It defaults to zero (C<OPT_DEFAULT>).
 
 =head2 Parser options
 
-The parser options are a bit field created by ORing the following constants:
+The parser and rendering options are a bit field created by ORing the
+following constants:
 
     CommonMark::OPT_DEFAULT => 0
     CommonMark::OPT_NORMALIZE
@@ -156,22 +206,34 @@ The parser options are a bit field created by ORing the following constants:
 Parser options can be imported from L<CommonMark> with tag C<opt>.
 
     use CommonMark qw(:opt);
+    my $doc = CommonMark->parse_document(
+        $markdown,
+        OPT_SMART | OPT_VALIDATE_UTF8,
+    );
 
-C<OPT_NORMALIZE> makes sure that adjacent text nodes are merged in the parse
-tree. This option has no effect with libcmark 0.28 or higher which always
-normalizes text nodes.
+=over
 
-C<OPT_SMART> enables the "smart quote" feature which turns vertical into
-typographic quotation marks, double and triple hyphens into en and em dashes,
-and triple periods into ellipses.
+=item C<OPT_NORMALIZE>
 
-C<OPT_VALIDATE_UTF8> turns on UTF-8 validation. Normally, this shouldn't be
-necessary because Perl strings should always contain valid UTF-8. But it is
-possible to create strings flagged as UTF-8 that contain invalid UTF-8, for
-example with XS. The option may be used if you don't trust the input data
-and want to make absolutely sure that the output is valid UTF-8. If invalid
-bytes are found, they are replaced with the Unicode replacement character
-U+FFFD.
+Makes sure that adjacent text nodes are merged in the parse tree. This option
+has no effect with libcmark 0.28 or higher which always normalizes text nodes.
+
+=item C<OPT_SMART>
+
+Enables the "smart quote" feature which turns vertical into typographic
+quotation marks, double and triple hyphens into en and em dashes, and triple
+periods into ellipses.
+
+=item C<OPT_VALIDATE_UTF8>
+
+Turns on UTF-8 validation. Normally, this shouldn't be necessary because Perl
+strings should always contain valid UTF-8. But it is possible to create
+strings flagged as UTF-8 that contain invalid UTF-8, for example with XS. The
+option may be used if you don't trust the input data and want to make
+absolutely sure that the output is valid UTF-8. If invalid bytes are found,
+they are replaced with the Unicode replacement character C<U+FFFD>.
+
+=back
 
 =head2 Node creation
 
@@ -278,4 +340,3 @@ This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
 
 =cut
-

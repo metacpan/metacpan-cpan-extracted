@@ -1,6 +1,8 @@
 [![Build Status](https://github.com/davorg-cpan/app-aphra/actions/workflows/perltest.yml/badge.svg?branch=master)](https://github.com/davorg-cpan/app-aphra/actions/workflows/perltest.yml) [![Coverage Status](https://coveralls.io/repos/github/davorg-cpan/app-aphra/badge.svg?branch=master)](https://coveralls.io/github/davorg-cpan/app-aphra?branch=master)
 
-> Aphra Behn (/ˈæfrə bɛn/; 14 December 1640? – 16 April 1689) was a British
+![Aphra Behn](https://aphra.perlhacks.com/img/aphra.webp "Aphra Behn")
+
+> **Aphra Behn** (/ˈæfrə bɛn/; 14 December 1640? – 16 April 1689) was a British
 > playwright, poet, translator and fiction writer from the Restoration era. As
 > one of the first English women to earn her living by her writing, she broke
 > cultural barriers and served as a literary role model for later generations
@@ -15,7 +17,7 @@
 > of the Stuart line, she declined an invitation from Bishop Burnet to write
 > a welcoming poem to the new king William III. She died shortly after.
 > 
-> She is famously remembered in Virginia Woolf's A Room of One's Own: "All
+> She is famously remembered in Virginia Woolf's *A Room of One's Own*: "All
 > women together ought to let flowers fall upon the tomb of Aphra Behn which
 > is, most scandalously but rather appropriately, in Westminster Abbey, for
 > it was she who earned them the right to speak their minds." Her grave

@@ -9,7 +9,7 @@ use strict;
 use warnings;
 
 package Playwright::PlaywrightAssertions;
-$Playwright::PlaywrightAssertions::VERSION = '1.431';
+$Playwright::PlaywrightAssertions::VERSION = '1.460';
 use parent 'Playwright::Base';
 
 sub new {
@@ -22,11 +22,21 @@ sub spec {
     return $Playwright::spec->{'PlaywrightAssertions'}{members};
 }
 
-sub expectLocator {
+sub expectPage {
     my $self = shift;
     return $self->_api_request(
         args    => [@_],
-        command => 'expectLocator',
+        command => 'expectPage',
+        object  => $self->{guid},
+        type    => $self->{type}
+    );
+}
+
+sub setDefaultAssertionTimeout {
+    my $self = shift;
+    return $self->_api_request(
+        args    => [@_],
+        command => 'setDefaultAssertionTimeout',
         object  => $self->{guid},
         type    => $self->{type}
     );
@@ -52,21 +62,11 @@ sub expectGeneric {
     );
 }
 
-sub expectPage {
+sub expectLocator {
     my $self = shift;
     return $self->_api_request(
         args    => [@_],
-        command => 'expectPage',
-        object  => $self->{guid},
-        type    => $self->{type}
-    );
-}
-
-sub setDefaultAssertionTimeout {
-    my $self = shift;
-    return $self->_api_request(
-        args    => [@_],
-        command => 'setDefaultAssertionTimeout',
+        command => 'expectLocator',
         object  => $self->{guid},
         type    => $self->{type}
     );
@@ -116,7 +116,7 @@ Playwright::PlaywrightAssertions - Automatically generated class for Playwright:
 
 =head1 VERSION
 
-version 1.431
+version 1.460
 
 =head1 CONSTRUCTOR
 
@@ -127,11 +127,17 @@ Instead it should be returned to you as the result of calls on Playwright object
 
 =head1 METHODS
 
-=head2 expectLocator(@args)
+=head2 expectPage(@args)
 
-Execute the PlaywrightAssertions::expectLocator playwright routine.
+Execute the PlaywrightAssertions::expectPage playwright routine.
 
-See L<https://playwright.dev/docs/api/class-PlaywrightAssertions#PlaywrightAssertions-expectLocator> for more information.
+See L<https://playwright.dev/docs/api/class-PlaywrightAssertions#PlaywrightAssertions-expectPage> for more information.
+
+=head2 setDefaultAssertionTimeout(@args)
+
+Execute the PlaywrightAssertions::setDefaultAssertionTimeout playwright routine.
+
+See L<https://playwright.dev/docs/api/class-PlaywrightAssertions#PlaywrightAssertions-setDefaultAssertionTimeout> for more information.
 
 =head2 expectAPIResponse(@args)
 
@@ -145,17 +151,11 @@ Execute the PlaywrightAssertions::expectGeneric playwright routine.
 
 See L<https://playwright.dev/docs/api/class-PlaywrightAssertions#PlaywrightAssertions-expectGeneric> for more information.
 
-=head2 expectPage(@args)
+=head2 expectLocator(@args)
 
-Execute the PlaywrightAssertions::expectPage playwright routine.
+Execute the PlaywrightAssertions::expectLocator playwright routine.
 
-See L<https://playwright.dev/docs/api/class-PlaywrightAssertions#PlaywrightAssertions-expectPage> for more information.
-
-=head2 setDefaultAssertionTimeout(@args)
-
-Execute the PlaywrightAssertions::setDefaultAssertionTimeout playwright routine.
-
-See L<https://playwright.dev/docs/api/class-PlaywrightAssertions#PlaywrightAssertions-setDefaultAssertionTimeout> for more information.
+See L<https://playwright.dev/docs/api/class-PlaywrightAssertions#PlaywrightAssertions-expectLocator> for more information.
 
 =head2 on(@args)
 

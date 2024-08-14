@@ -1,5 +1,6 @@
 use strict;
 use warnings;
+use File::Spec::Functions qw(catfile);
 
 use Test::More tests => 11;
 
@@ -8,7 +9,7 @@ BEGIN {
 }
 
 {
-    my $filename = 't/files/test.md';
+    my $filename = catfile(qw(t files test.md));
     my $file;
 
     open($file, '<', $filename) or die("$filename: $!");

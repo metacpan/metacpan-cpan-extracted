@@ -19,17 +19,6 @@
 
 #include "DataChecks.h"
 
-static int magic_set(pTHX_ SV *sv, MAGIC *mg)
-{
-  struct DataChecks_Checker *checker = (struct DataChecks_Checker *)mg->mg_ptr;
-  assert_value(checker, sv);
-  return 1;
-}
-
-static const MGVTBL vtbl = {
-  .svt_set = &magic_set,
-};
-
 static int checkmagic_get(pTHX_ SV *sv, MAGIC *mg)
 {
   SV *fieldsv = mg->mg_obj;
@@ -66,43 +55,47 @@ static OP *pp_wrap_checkmagic(pTHX)
   RETURN;
 }
 
-static bool checked_apply(pTHX_ FieldMeta *fieldmeta, SV *value, SV **attrdata_ptr, void *_funcdata)
+static SV *checked_parse(pTHX_ FieldMeta *fieldmeta, SV *valuesrc, void *_funcdata)
 {
-  SV *checkspec;
-
   if(mop_field_get_sigil(fieldmeta) != '$')
     croak("Can only apply the :Checked attribute to scalar fields");
 
-  {
-    dSP;
+  dSP;
 
-    ENTER;
-    SAVETMPS;
+  ENTER;
+  SAVETMPS;
 
-    /* eval_sv() et.al. will forgets what package we're actually running in
-     * because during compiletime, CopSTASH(PL_curcop == &PL_compiling) isn't
-     * accurate. We need to help it along
-     */
+  /* eval_sv() et.al. will forgets what package we're actually running in
+   * because during compiletime, CopSTASH(PL_curcop == &PL_compiling) isn't
+   * accurate. We need to help it along
+   */
 
-    SAVECOPSTASH_FREE(PL_curcop);
-    CopSTASH_set(PL_curcop, PL_curstash);
+  SAVECOPSTASH_FREE(PL_curcop);
+  CopSTASH_set(PL_curcop, PL_curstash);
 
-    compilerun_sv(value, G_SCALAR);
+  compilerun_sv(valuesrc, G_SCALAR);
 
-    SPAGAIN;
+  SPAGAIN;
 
-    checkspec = SvREFCNT_inc(POPs);
+  SV *ret = SvREFCNT_inc(POPs);
 
-    FREETMPS;
-    LEAVE;
-  }
+  FREETMPS;
+  LEAVE;
 
-  struct DataChecks_Checker *checker = make_checkdata(checkspec);
-  SvREFCNT_dec(checkspec);
+  return ret;
+}
+
+static bool checked_apply(pTHX_ FieldMeta *fieldmeta, SV *value, SV **attrdata_ptr, void *_funcdata)
+{
+  if(mop_field_get_sigil(fieldmeta) != '$')
+    croak("Can only apply the :Checked attribute to scalar fields");
+
+  struct DataChecks_Checker *checker = make_checkdata(value);
+  SvREFCNT_dec(value);
 
   gen_assertmess(checker,
     sv_2mortal(newSVpvf("Field %" SVf, SVfARG(mop_field_get_name(fieldmeta)))),
-    sv_2mortal(newSVpvf(":Checked(%" SVf ")", SVfARG(value))));
+    NULL);
 
   *attrdata_ptr = (SV *)checker;
 
@@ -166,24 +159,12 @@ static void checked_gen_accessor_ops(pTHX_ FieldMeta *fieldmeta, SV *attrdata, v
   }
 }
 
-/* Object::Pad doesn't currently offer a way to pre-check the values assigned
- * into fields before assigning them. The best we can do is *temporarily*
- * apply magic on the field SV itself, check it in the .set callback, then
- * remove that magic at the end of the constructor.
- *
- * This is awkward as it'll still apply the checking to post-:param mutations
- * inside ADJUST blocks and the like. Fixing that will require more field hook
- * functions in O:P though
- */
-
-static void checked_post_makefield(pTHX_ FieldMeta *fieldmeta, SV *attrdata, void *_funcdata, SV *field)
+static OP *checked_gen_valueassert_op(pTHX_ FieldMeta *fieldmeta, SV *attrdata, void *_funcdata,
+    OP *valueop)
 {
-  sv_magicext(field, NULL, PERL_MAGIC_ext, &vtbl, (char *)attrdata, 0);
-}
+  struct DataChecks_Checker *checker = (struct DataChecks_Checker *)attrdata;
 
-static void checked_post_construct(pTHX_ FieldMeta *fieldmeta, SV *hookdata, void *_funcdata, SV *field)
-{
-  sv_unmagicext(field, PERL_MAGIC_ext, (MGVTBL *)&vtbl);
+  return make_assertop(checker, valueop);
 }
 
 static const struct FieldHookFuncs checked_hooks = {
@@ -191,15 +172,15 @@ static const struct FieldHookFuncs checked_hooks = {
   .flags = OBJECTPAD_FLAG_ATTR_MUST_VALUE,
   .permit_hintkey = "Object::Pad::FieldAttr::Checked/Checked",
 
-  .apply            = &checked_apply,
-  .gen_accessor_ops = &checked_gen_accessor_ops,
-  .post_makefield   = &checked_post_makefield,
-  .post_construct   = &checked_post_construct,
+  .parse              = &checked_parse,
+  .apply              = &checked_apply,
+  .gen_accessor_ops   = &checked_gen_accessor_ops,
+  .gen_valueassert_op = &checked_gen_valueassert_op,
 };
 
 MODULE = Object::Pad::FieldAttr::Checked    PACKAGE = Object::Pad::FieldAttr::Checked
 
 BOOT:
-  boot_data_checks(0.02);
+  boot_data_checks(0.09);
 
   register_field_attribute("Checked", &checked_hooks, NULL);

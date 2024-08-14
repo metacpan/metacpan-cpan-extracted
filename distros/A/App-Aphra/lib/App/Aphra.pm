@@ -39,7 +39,7 @@ use URI;
 
 use App::Aphra::File;
 
-our $VERSION = '0.2.0';
+our $VERSION = '0.2.1';
 
 has commands => (
   isa => 'HashRef',

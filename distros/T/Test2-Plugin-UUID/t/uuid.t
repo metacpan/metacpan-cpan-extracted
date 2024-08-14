@@ -10,8 +10,8 @@ use Test2::Util::UUID qw/looks_like_uuid/;
 my %backends = (
     'UUID'           => [0.35,  []],
     'Data::UUID::MT' => [undef, []],
-    'UUID::Tiny'     => [undef, ["Using UUID::Tiny for uuid generation. UUID::Tiny is significantly slower than the 'UUID' or 'Data::UUID::MT' modules, please install 'UUID' or 'Data::UUID::MT' if possible.\n"]],
-    'Data::UUID'     => [undef, ["Using Data::UUID to generate UUIDs, this works, but the UUIDs will not be suitible as database keys. Please install the 'UUID', 'Data::UUID::MT' or the slower but pure perl 'UUID::Tiny' cpan modules for better UUIDs.\n"]],
+    'UUID::Tiny'     => [undef, ["Using UUID::Tiny for uuid generation. UUID::Tiny is significantly slower than the 'UUID' or 'Data::UUID::MT' modules, please install 'UUID' or 'Data::UUID::MT' if possible. If you insist on using UUID::Tiny you can set the TEST2_UUID_NO_WARN environment variable.\n"]],
+    'Data::UUID'     => [undef, ["Using Data::UUID to generate UUIDs, this works, but the UUIDs will not be suitible as database keys. Please install the 'UUID', 'Data::UUID::MT' or the slower but pure perl 'UUID::Tiny' cpan modules for better UUIDs. If you insist on using Data::UUID you can set the TEST2_UUID_NO_WARN environment variable.\n"]],
 );
 
 for my $backend (sort keys %backends) {

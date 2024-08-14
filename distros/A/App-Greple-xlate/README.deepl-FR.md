@@ -10,7 +10,7 @@ App::Greple::xlate - module d'aide à la traduction pour greple
 
 # VERSION
 
-Version 0.3201
+Version 0.3202
 
 # DESCRIPTION
 
@@ -62,7 +62,7 @@ Les données mises en cache sont gérées sur la base du texte normalisé, de so
 
 Ce processus de normalisation n'est effectué que pour le premier (0e) motif et les motifs pairs. Ainsi, si deux motifs sont spécifiés comme suit, le texte correspondant au premier motif sera traité après normalisation, et aucun processus de normalisation ne sera effectué sur le texte correspondant au second motif.
 
-    greple Mxlate -E normalized -E not-normalized
+    greple -Mxlate -E normalized -E not-normalized
 
 Par conséquent, il convient d'utiliser le premier motif pour le texte qui doit être traité en combinant plusieurs lignes en une seule et d'utiliser le second motif pour le texte préformaté. S'il n'y a pas de texte à faire correspondre au premier motif, alors un motif qui ne correspond à rien, tel que `( ?!)`.
 

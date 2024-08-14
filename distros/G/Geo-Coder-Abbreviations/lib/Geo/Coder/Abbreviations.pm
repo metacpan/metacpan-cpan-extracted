@@ -11,12 +11,12 @@ Geo::Coder::Abbreviations - Quick and Dirty Interface to https://github.com/mapb
 
 =head1 VERSION
 
-Version 0.08
+Version 0.09
 
 =cut
 
 our %abbreviations;
-our $VERSION = '0.08';
+our $VERSION = '0.09';
 
 # This is giving 404 errors at the moment
 #	https://github.com/mapbox/mapbox-java/issues/1460
@@ -128,28 +128,60 @@ sub abbreviate {
 
 Normalize and abbreviate street names - useful for comparisons
 
+    print $abbr->normalize({ street => '10 Downing Street' }), "\n";	# prints '10 DOWNING ST'
+
+Can be run as a class method
+
+    print Geo::Coder::Abbreviations('1600 Pennsylvania Avenue NW'), "\n";	# prints '1600 Pennsylvia Ave NW'
+
 =cut
 
 sub normalize
 {
 	my $self = shift;
-        my $street = shift;
+	my %params;
 
-        $street = uc($street);
-        if($street =~ /(.+)\s+(.+)\s+(.+)/) {
-                my $a;
-                if((lc($2) ne 'cross') && ($a = $self->abbreviate($2))) {
-                        $street = "$1 $a $3";
-                } elsif($a = $self->abbreviate($3)) {
-                        $street = "$1 $2 $a";
-                }
-        } elsif($street =~ /(.+)\s(.+)$/) {
-                if(my $a = $self->abbreviate($2)) {
-                        $street = "$1 $a";
-                }
-        }
-        $street =~ s/^0+//;     # Turn 04th St into 4th St
-        return $street;
+	# Try hard to support whatever API that the user wants to use
+	if(!ref($self)) {
+		if(scalar(@_)) {
+			return(__PACKAGE__->new()->normalize(@_));
+		} elsif(!defined($self)) {
+			# Geo::Coder::Abbreviations->normalize()
+			Carp::croak('Usage: ', __PACKAGE__, '::normalize(street => $street)');
+		} elsif($self eq __PACKAGE__) {
+			Carp::croak("Usage: $self", '::normalize(street => $street)');
+		}
+		return(__PACKAGE__->new()->normalize($self));
+	} elsif(ref($self) eq 'HASH') {
+		return(__PACKAGE__->new()->noralize($self));
+	} elsif(ref($_[0]) eq 'HASH') {
+		%params = %{$_[0]};
+	# } elsif(ref($_[0]) && (ref($_[0] !~ /::/))) {
+	} elsif(ref($_[0])) {
+		Carp::croak('Usage: ', __PACKAGE__, '::normalize(street => $street)');
+	} elsif(scalar(@_) && (scalar(@_) % 2 == 0)) {
+		%params = @_;
+	} else {
+		$params{'street'} = shift;
+	}
+
+	my $street = $params{'street'};
+
+	$street = uc($street);
+	if($street =~ /(.+)\s+(.+)\s+(.+)/) {
+		my $a;
+		if((lc($2) ne 'cross') && ($a = $self->abbreviate($2))) {
+			$street = "$1 $a $3";
+		} elsif($a = $self->abbreviate($3)) {
+			$street = "$1 $2 $a";
+		}
+	} elsif($street =~ /(.+)\s(.+)$/) {
+		if(my $a = $self->abbreviate($2)) {
+			$street = "$1 $a";
+		}
+	}
+	$street =~ s/^0+//;     # Turn 04th St into 4th St
+	return $street;
 }
 
 =head1 SEE ALSO

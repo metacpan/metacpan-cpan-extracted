@@ -1,7 +1,7 @@
 package Langertha::Engine::Anthropic;
 our $AUTHORITY = 'cpan:GETTY';
 # ABSTRACT: Anthropic API
-$Langertha::Engine::Anthropic::VERSION = '0.003';
+$Langertha::Engine::Anthropic::VERSION = '0.004';
 use Moose;
 use Carp qw( croak );
 use JSON::MaybeXS;
@@ -12,11 +12,11 @@ with 'Langertha::Role::'.$_ for (qw(
   Models
   Chat
   Temperature
-  ContextSize
+  ResponseSize
   SystemPrompt
 ));
 
-sub default_context_size { 1024 }
+sub default_response_size { 1024 }
 
 has api_key => (
   is => 'ro',
@@ -25,8 +25,7 @@ has api_key => (
 sub _build_api_key {
   my ( $self ) = @_;
   return $ENV{LANGERTHA_ANTHROPIC_API_KEY}
-    || $ENV{ANTHROPIC_API_KEY}
-    || croak "".(ref $self)." requires ANTHROPIC_API_KEY";
+    || croak "".(ref $self)." requires LANGERTHA_ANTHROPIC_API_KEY or api_key set";
 }
 
 has api_version => (
@@ -56,6 +55,7 @@ sub chat_request {
   my $system = "";
   for my $message (@{$messages}) {
     if ($message->{role} eq 'system') {
+      $system .= "\n\n" if length $system;
       $system .= $message->{content};
     } else {
       push @msgs, $message;
@@ -71,7 +71,7 @@ sub chat_request {
   return $self->generate_http_request( POST => $self->url.'/v1/messages', sub { $self->chat_response(shift) },
     model => $self->chat_model,
     messages => \@msgs,
-    max_tokens => $self->get_context_size,
+    max_tokens => $self->get_response_size, # must be always set
     $self->has_temperature ? ( temperature => $self->temperature ) : (),
     $system ? ( system => $system ) : (),
     %extra,
@@ -100,7 +100,7 @@ Langertha::Engine::Anthropic - Anthropic API
 
 =head1 VERSION
 
-version 0.003
+version 0.004
 
 =head1 SYNOPSIS
 
@@ -109,7 +109,7 @@ version 0.003
   my $claude = Langertha::Engine::Anthropic->new(
     api_key => $ENV{ANTHROPIC_API_KEY},
     model => 'claude-3-5-sonnet-20240620',
-    context_size => 2048,
+    response_size => 512,
     temperature => 0.5,
   );
 

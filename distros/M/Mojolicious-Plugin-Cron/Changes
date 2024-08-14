@@ -1,3 +1,8 @@
+0.035 2024-08-12T21:45:45Z
+
+    - exposes $app on code sub, allowing helper accesses on cron jobs (@rayleyfowler)
+    - update dependences (Mojolicious@9.36)
+
 0.034 2024-01-18T23:06:53Z
 
     - update dependences (mainly Mojolicious@9.35)

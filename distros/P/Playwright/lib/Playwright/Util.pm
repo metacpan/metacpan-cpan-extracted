@@ -1,5 +1,5 @@
 package Playwright::Util;
-$Playwright::Util::VERSION = '1.431';
+$Playwright::Util::VERSION = '1.460';
 use strict;
 use warnings;
 
@@ -11,6 +11,8 @@ use Sereal::Encoder;
 use Sereal::Decoder;
 use File::Temp;
 use POSIX();
+use Scalar::Util qw{reftype};
+use Cwd();
 
 #ABSTRACT: Common utility functions for the Playwright module
 
@@ -23,10 +25,11 @@ sub request ( $method, $url, $host, $port, $ua, %args ) {
     my $fullurl = "http://$host:$port/$url";
 
     # Handle passing Playwright elements as arguments
+    # Seems we also pass Playwright pages to get CDP Handles
     if ( ref $args{args} eq 'ARRAY' ) {
         @{ $args{args} } = map {
             my $transformed = $_;
-            if ( ref($_) eq 'Playwright::ElementHandle' ) {
+            if ( ref $_ && reftype $_ eq 'HASH' && exists $_->{guid} ) {
                 $transformed = { uuid => $_->{guid} };
             }
             $transformed;
@@ -86,6 +89,26 @@ sub await ($to_wait) {
     return Sereal::Decoder->decode_from_file( $to_wait->{file}->filename );
 }
 
+# Make author tests work
+sub find_node_modules {
+    return _find('node_modules');
+}
+
+sub find_playwright_server {
+    return _find('bin/playwright_server');
+}
+
+sub _find {
+    my $to_find = shift;
+    my $dir =
+      File::Basename::dirname( Cwd::abs_path( $INC{'Playwright/Util.pm'} ) );
+    while ( !-e "$dir/$to_find" ) {
+        $dir = Cwd::abs_path("$dir/..");
+        last if $dir eq '/';
+    }
+    return Cwd::abs_path("$dir/$to_find");
+}
+
 1;
 
 __END__
@@ -100,7 +123,7 @@ Playwright::Util - Common utility functions for the Playwright module
 
 =head1 VERSION
 
-version 1.431
+version 1.460
 
 =head2 request(STRING method, STRING url, STRING host, INTEGER port, LWP::UserAgent ua, HASH args) = HASH
 

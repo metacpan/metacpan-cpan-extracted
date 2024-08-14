@@ -1,5 +1,5 @@
 requires 'perl', '5.020001';
-requires 'Mojolicious', '9.35';
+requires 'Mojolicious', '9.37';
 requires 'Algorithm::Cron', '0.10';
 
 on test => sub {

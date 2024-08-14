@@ -10,7 +10,7 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.030, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Zilla version 6.032, CPAN::Meta::Converter version 2.150010'
 license: mit
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -19,55 +19,55 @@ name: Selenium-Client
 provides:
   Selenium::Capabilities:
     file: lib/Selenium/Client.pm
-    version: '2.00'
+    version: '2.01'
   Selenium::Client:
     file: lib/Selenium/Client.pm
-    version: '2.00'
+    version: '2.01'
   Selenium::Client::Commands:
     file: lib/Selenium/Client/Commands.pm
-    version: '2.00'
+    version: '2.01'
   Selenium::Client::Driver:
     file: lib/Selenium/Client/Driver.pm
-    version: '2.00'
+    version: '2.01'
   Selenium::Client::WDKeys:
     file: lib/Selenium/Client/WDKeys.pm
-    version: '2.00'
+    version: '2.01'
   Selenium::Client::WebElement:
     file: lib/Selenium/Client/WebElement.pm
-    version: '2.00'
+    version: '2.01'
   Selenium::Driver::Auto:
     file: lib/Selenium/Driver/Auto.pm
-    version: '2.00'
+    version: '2.01'
   Selenium::Driver::Chrome:
     file: lib/Selenium/Driver/Chrome.pm
-    version: '2.00'
+    version: '2.01'
   Selenium::Driver::Edge:
     file: lib/Selenium/Driver/Edge.pm
-    version: '2.00'
+    version: '2.01'
   Selenium::Driver::Gecko:
     file: lib/Selenium/Driver/Gecko.pm
-    version: '2.00'
+    version: '2.01'
   Selenium::Driver::Safari:
     file: lib/Selenium/Driver/Safari.pm
-    version: '2.00'
+    version: '2.01'
   Selenium::Driver::SeleniumHQ::Jar:
     file: lib/Selenium/Driver/SeleniumHQ/Jar.pm
-    version: '2.00'
+    version: '2.01'
   Selenium::Driver::WinApp:
     file: lib/Selenium/Driver/WinApp.pm
-    version: '2.00'
+    version: '2.01'
   Selenium::Element:
     file: lib/Selenium/Client.pm
-    version: '2.00'
+    version: '2.01'
   Selenium::Session:
     file: lib/Selenium/Client.pm
-    version: '2.00'
+    version: '2.01'
   Selenium::Specification:
     file: lib/Selenium/Specification.pm
-    version: '2.00'
+    version: '2.01'
   Selenium::Subclass:
     file: lib/Selenium/Subclass.pm
-    version: '2.00'
+    version: '2.01'
 requires:
   Capture::Tiny: '0'
   Carp: '0'
@@ -83,6 +83,7 @@ requires:
   File::Spec: '0'
   File::Which: '0'
   Getopt::Long: '0'
+  Github::ReleaseFetcher: '0'
   HTML::Parser: '0'
   HTTP::Tiny: '0'
   JSON: '0'
@@ -108,10 +109,10 @@ resources:
   bugtracker: https://github.com/troglodyne-internet-widgets/selenium-client-perl/issues
   homepage: https://github.com/troglodyne-internet-widgets/selenium-client-perl
   repository: https://github.com/troglodyne-internet-widgets/selenium-client-perl.git
-version: '2.00'
+version: '2.01'
 x_contributors:
   - 'Chris Faylor <cgf@realedsolutions.com>'
   - 'Manni Heumann <heumann@strato.de>'
-x_generated_by_perl: v5.34.0
+x_generated_by_perl: v5.30.0
 x_serialization_backend: 'YAML::Tiny version 1.73'
 x_spdx_expression: MIT

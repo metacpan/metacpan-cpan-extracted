@@ -1,7 +1,7 @@
 package Langertha::Engine::Ollama;
 our $AUTHORITY = 'cpan:GETTY';
 # ABSTRACT: Ollama API
-$Langertha::Engine::Ollama::VERSION = '0.003';
+$Langertha::Engine::Ollama::VERSION = '0.004';
 use Moose;
 use File::ShareDir::ProjectDistDir qw( :all );
 use Carp qw( croak );
@@ -17,6 +17,7 @@ with 'Langertha::Role::'.$_ for (qw(
   Seed
   Temperature
   ContextSize
+  ResponseSize
   SystemPrompt
   Chat
   Embedding
@@ -36,6 +37,7 @@ sub openai {
     compatibility_for_engine => $self,
     supported_operations => [qw(
       createChatCompletion
+      createEmbedding
     )],
     %args,
   );
@@ -92,6 +94,7 @@ sub chat_request {
     options => {
       $self->has_temperature ? ( temperature => $self->temperature ) : (),
       $self->has_context_size ? ( num_ctx => $self->get_context_size ) : (),
+      $self->get_response_size ? ( num_predict => $self->get_response_size ) : (),
       $self->has_seed ? ( seed => $self->seed )
         : $self->randomize_seed ? ( seed => $self->random_seed ) : (),
       $extra{options} ? (%{delete $extra{options}}) : (),
@@ -162,7 +165,7 @@ Langertha::Engine::Ollama - Ollama API
 
 =head1 VERSION
 
-version 0.003
+version 0.004
 
 =head1 SYNOPSIS
 
@@ -172,7 +175,7 @@ version 0.003
     url => $ENV{OLLAMA_URL},
     model => 'llama3.1',
     system_prompt => 'You are a helpful assistant',
-    context_size => 4096,
+    context_size => 2048,
     temperature => 0.5,
   );
 

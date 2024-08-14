@@ -9,10 +9,13 @@ META.json
 META.yml
 t/compile-time-file.t
 t/compile-time.t
+t/gh1.t
 t/lib/Dummy.pm
 t/lib/Dummy/Outside.pm
 t/lib/Dummy2.plugin
 t/lib/FileThatOnlyExistsAsPMC.pmc
+t/lib/localize_A.pm
+t/lib/localize_B.pm
 t/lib/ReturnsFalse.pm
 t/parent-classfromclassfile.t
 t/parent-classfromfile.t

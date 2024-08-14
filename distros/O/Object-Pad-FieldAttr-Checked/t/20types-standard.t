@@ -28,7 +28,7 @@ class Point {
    ok( $p->x, 20, '$p->x modified after successful ->set_x' );
 
    like( dies { $p->set_x( "hello" ) },
-      qr/^Field \$x requires a value satisfying :Checked\(Num\) at /,
+      qr/^Field \$x requires a value satisfying Num at /,
       '$p->set_x rejects invalid values' );
    ok( $p->x, 20, '$p->x unmodified after rejected ->set_x' );
 }
@@ -44,7 +44,7 @@ class MaybePoint {
    ok( defined $p, 'MaybePoint->new permits undef for Maybe[Num] field' );
 
    like( dies { $p->set_x( "hello" ) },
-      qr/^Field \$x requires a value satisfying :Checked\(Maybe\[Num\]\) at /,
+      qr/^Field \$x requires a value satisfying Maybe\[Num\] at /,
       '$p->set_x rejects invalid values' );
 }
 

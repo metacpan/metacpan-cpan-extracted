@@ -1,7 +1,7 @@
 use strict;
 package CPAN::Reporter;
 
-our $VERSION = '1.2019';
+our $VERSION = '1.2020';
 
 use Config;
 use Capture::Tiny qw/ capture tee_merged /;
@@ -927,6 +927,9 @@ sub _parse_tap_harness {
     elsif ( $line =~ m{Bailout called\.\s+Further testing stopped}ms ) {
         return ( 'fail', 'Bailed out of tests');
     }
+    elsif ( $line =~ m{FAILED--Further testing stopped}ms ) { # TAP::Harness 3.49+
+        return ( 'fail', 'Bailed out of tests');
+    }
     return;
 }
 
@@ -1591,7 +1594,7 @@ CPAN::Reporter - Adds CPAN Testers reporting to CPAN.pm
 
 =head1 VERSION
 
-version 1.2019
+version 1.2020
 
 =head1 SYNOPSIS
 
@@ -1844,7 +1847,7 @@ David Golden <dagolden@cpan.org>
 
 =head1 CONTRIBUTORS
 
-=for stopwords Alexandr Ciornii Breno G. de Oliveira Christian Walde David Cantrell Ed J Graham Knop James E Keenan J. Maslak José Joaquín Atria Kent Fredric Matthew Musgrove Patrice Clement Reini Urban Scott Wiersdorf Slaven Rezic
+=for stopwords Alexandr Ciornii Breno G. de Oliveira Christian Walde David Cantrell Ed J Graham Knop Håkon Hægland James E Keenan J. Maslak José Joaquín Atria Kent Fredric Leon Timmermans Matthew Musgrove Patrice Clement Reini Urban Scott Wiersdorf Slaven Rezic
 
 =over 4
 
@@ -1874,6 +1877,10 @@ Graham Knop <haarg@haarg.org>
 
 =item *
 
+Håkon Hægland <hakon.hagland@gmail.com>
+
+=item *
+
 James E Keenan <jkeenan@cpan.org>
 
 =item *
@@ -1887,6 +1894,10 @@ José Joaquín Atria <jjatria@cpan.org>
 =item *
 
 Kent Fredric <kentfredric@gmail.com>
+
+=item *
+
+Leon Timmermans <fawaka@gmail.com>
 
 =item *
 

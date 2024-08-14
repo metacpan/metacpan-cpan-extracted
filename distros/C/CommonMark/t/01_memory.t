@@ -7,6 +7,10 @@ BEGIN {
     use_ok('CommonMark');
 }
 
+diag sprintf "cmark compile time version: %s\ncmark runtime version: %s",
+    CommonMark->compile_time_version_string,
+    CommonMark->version_string;
+
 my $md = <<EOF;
 # Header
 

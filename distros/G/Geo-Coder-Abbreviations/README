@@ -1,4 +1,4 @@
-Geo-Coder-Abbreviation Release 0.08
+Geo-Coder-Abbreviation Release 0.09
 
 INSTALLATION
 
@@ -23,9 +23,6 @@ You can also look for information at:
 
     AnnoCPAN, Annotated CPAN documentation
         http://annocpan.org/dist/Geo-Coder-Abbreviation
-
-    CPAN Ratings
-        http://cpanratings.perl.org/d/Geo-Coder-Abbreviation
 
     Search CPAN
         http://search.cpan.org/dist/Geo-Coder-Abbreviation/

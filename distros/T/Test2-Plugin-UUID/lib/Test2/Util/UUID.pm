@@ -2,7 +2,7 @@ package Test2::Util::UUID;
 use strict;
 use warnings;
 
-our $VERSION = '0.002008';
+our $VERSION = '0.002009';
 
 use Carp qw/croak/;
 
@@ -123,7 +123,7 @@ sub _gen_uuid_tiny {
 
     return undef unless eval { require UUID::Tiny; 1 };
 
-    warn "Using UUID::Tiny for uuid generation. UUID::Tiny is significantly slower than the 'UUID' or 'Data::UUID::MT' modules, please install 'UUID' or 'Data::UUID::MT' if possible.\n"
+    warn "Using UUID::Tiny for uuid generation. UUID::Tiny is significantly slower than the 'UUID' or 'Data::UUID::MT' modules, please install 'UUID' or 'Data::UUID::MT' if possible. If you insist on using UUID::Tiny you can set the TEST2_UUID_NO_WARN environment variable.\n"
         if $warn;
 
     return {
@@ -140,7 +140,7 @@ sub _gen_data_uuid {
     local $@;
     return undef unless eval { require Data::UUID; 1 };
 
-    warn "Using Data::UUID to generate UUIDs, this works, but the UUIDs will not be suitible as database keys. Please install the 'UUID', 'Data::UUID::MT' or the slower but pure perl 'UUID::Tiny' cpan modules for better UUIDs.\n"
+    warn "Using Data::UUID to generate UUIDs, this works, but the UUIDs will not be suitible as database keys. Please install the 'UUID', 'Data::UUID::MT' or the slower but pure perl 'UUID::Tiny' cpan modules for better UUIDs. If you insist on using Data::UUID you can set the TEST2_UUID_NO_WARN environment variable.\n"
         if $warn;
 
     my ($UG, $UG_PID);

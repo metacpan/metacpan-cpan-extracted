@@ -58,6 +58,7 @@ my %module = (
     },
     TEST_REQUIRES => {
         'Test2::V0'    => 0,
+        'Encode'       => 0,
     },
 
     dist                => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },

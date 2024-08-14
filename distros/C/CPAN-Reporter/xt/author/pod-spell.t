@@ -27,12 +27,15 @@ Fredric
 Golden
 Graham
 History
+Håkon
+Hægland
 James
 Joaquín
 José
 Keenan
 Kent
 Knop
+Leon
 Maslak
 Matthew
 Musgrove
@@ -44,6 +47,7 @@ Reporter
 Rezic
 Scott
 Slaven
+Timmermans
 Urban
 Walde
 Wiersdorf
@@ -53,8 +57,10 @@ dagolden
 david
 de
 exe
+fawaka
 garu
 haarg
+hakon
 jjatria
 jkeenan
 jmaslak

@@ -254,8 +254,8 @@ file.
 =head1 FRONT MATTER IN INDIVIDUAL PAGES
 
 At the start of the template for a page, you can add a data section which
-contains variable defintions. This section is preceded and followed by lines
-consisting of three dashed. The variables are defined using YAML format. The
+contains variable definitions. This section is preceded and followed by lines
+consisting of three dashes. The variables are defined using YAML format. The
 variables defined in this section are available within templates by using the
 `page` variable. For example, your template could start with this definition:
 
@@ -266,6 +266,12 @@ variables defined in this section are available within templates by using the
 And you could access that text inside your templates with markdown like this:
 
     ## <% page.title %>
+
+=head2 Special values in front matter
+
+If your front matter includes a variable called C<layout>, then that will
+override the default layout for this single page. You should ensure there
+is a file of the correct name in the C<layouts> directory.
 
 =cut
 

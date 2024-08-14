@@ -4,7 +4,7 @@
       "David Golden <dagolden@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.030, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.032, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "apache_2_0"
    ],
@@ -114,27 +114,27 @@
    "provides" : {
       "CPAN::Reporter" : {
          "file" : "lib/CPAN/Reporter.pm",
-         "version" : "1.2019"
+         "version" : "1.2020"
       },
       "CPAN::Reporter::API" : {
          "file" : "lib/CPAN/Reporter/API.pm",
-         "version" : "1.2019"
+         "version" : "1.2020"
       },
       "CPAN::Reporter::Config" : {
          "file" : "lib/CPAN/Reporter/Config.pm",
-         "version" : "1.2019"
+         "version" : "1.2020"
       },
       "CPAN::Reporter::FAQ" : {
          "file" : "lib/CPAN/Reporter/FAQ.pm",
-         "version" : "1.2019"
+         "version" : "1.2020"
       },
       "CPAN::Reporter::History" : {
          "file" : "lib/CPAN/Reporter/History.pm",
-         "version" : "1.2019"
+         "version" : "1.2020"
       },
       "CPAN::Reporter::PrereqCheck" : {
          "file" : "lib/CPAN/Reporter/PrereqCheck.pm",
-         "version" : "1.2019"
+         "version" : "1.2020"
       }
    },
    "release_status" : "stable",
@@ -149,7 +149,7 @@
          "web" : "https://github.com/cpan-testers/CPAN-Reporter"
       }
    },
-   "version" : "1.2019",
+   "version" : "1.2020",
    "x_authority" : "cpan:DAGOLDEN",
    "x_contributors" : [
       "Alexandr Ciornii <alexchorny@gmail.com>",
@@ -158,18 +158,20 @@
       "David Cantrell <david@cantrell.org.uk>",
       "Ed J <mohawk2@users.noreply.github.com>",
       "Graham Knop <haarg@haarg.org>",
+      "H\u00e5kon H\u00e6gland <hakon.hagland@gmail.com>",
       "James E Keenan <jkeenan@cpan.org>",
       "J. Maslak <jmaslak@antelope.net>",
       "Jos\u00e9 Joaqu\u00edn Atria <jjatria@cpan.org>",
       "Kent Fredric <kentfredric@gmail.com>",
+      "Leon Timmermans <fawaka@gmail.com>",
       "Matthew Musgrove <mr.muskrat@gmail.com>",
       "Patrice Clement <monsieurp@gentoo.org>",
       "Reini Urban <rurban@cpanel.net>",
       "Scott Wiersdorf <scott@perlcode.org>",
       "Slaven Rezic <slaven@rezic.de>"
    ],
-   "x_generated_by_perl" : "v5.36.0",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.30",
+   "x_generated_by_perl" : "v5.38.2",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.38",
    "x_spdx_expression" : "Apache-2.0"
 }
 

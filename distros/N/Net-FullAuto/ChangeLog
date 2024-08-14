@@ -20,6 +20,12 @@
 #######################################################################
 
 
+2024-08-13  Brian M. Kelly <Brian.Kelly@fullauto.com>
+
+        * Version 1.0000686 released
+
+        * Now installs in AWS micro and nano instances
+
 2024-08-11  Brian M. Kelly <Brian.Kelly@fullauto.com>
 
         * Version 1.0000685 released

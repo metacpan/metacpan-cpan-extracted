@@ -254,8 +254,8 @@ BOOT:
             { "OPT_SOURCEPOS", CMARK_OPT_SOURCEPOS },
             { "OPT_HARDBREAKS", CMARK_OPT_HARDBREAKS },
             { "OPT_SAFE", CMARK_OPT_SAFE },
-#if CMARK_VERSION >= 0x001900
-            /* libcmark 0.25.0 */
+#if CMARK_VERSION >= 0x001A00
+            /* libcmark 0.26.0 */
             { "OPT_NOBREAKS", CMARK_OPT_NOBREAKS },
 #else
             { "OPT_NOBREAKS", 0 },

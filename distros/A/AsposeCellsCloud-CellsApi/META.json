@@ -63,7 +63,7 @@
       },
       "AsposeCellsCloud::CellsApi" : {
          "file" : "lib/AsposeCellsCloud/CellsApi.pm",
-         "version" : "24.7"
+         "version" : "24.8"
       },    
       "AsposeCellsCloud::Configuration" : {
          "file" : "lib/AsposeCellsCloud/Configuration.pm"
@@ -1024,6 +1024,15 @@
       },
       "AsposeCellsCloud::Object::BaseOperateOptions" : {
          "file" : "lib/AsposeCellsCloud/Object/BaseOperateOptions.pm"
+      },
+      "AsposeCellsCloud::Object::ScopeItem" : {
+         "file" : "lib/AsposeCellsCloud/Object/ScopeItem.pm"
+      },
+      "AsposeCellsCloud::Object::ScopeOptions" : {
+         "file" : "lib/AsposeCellsCloud/Object/ScopeOptions.pm"
+      },
+      "AsposeCellsCloud::Object::TrimContentOptions" : {
+         "file" : "lib/AsposeCellsCloud/Object/TrimContentOptions.pm"
       },
       "AsposeCellsCloud::Object::CellValue" : {
          "file" : "lib/AsposeCellsCloud/Object/CellValue.pm"
@@ -2066,6 +2075,9 @@
       "AsposeCellsCloud::Request::PostAddTextContentRequest" : {
          "file" : "lib/AsposeCellsCloud/Request/PostAddTextContentRequest.pm"
       },
+      "AsposeCellsCloud::Request::PostTrimContentRequest" : {
+         "file" : "lib/AsposeCellsCloud/Request/PostTrimContentRequest.pm"
+      },
       "AsposeCellsCloud::Request::GetWorkbookDefaultStyleRequest" : {
          "file" : "lib/AsposeCellsCloud/Request/GetWorkbookDefaultStyleRequest.pm"
       },
@@ -2323,6 +2335,6 @@
       }
    },
    "release_status" : "stable",
-   "version" : "24.7",
+   "version" : "24.8",
    "x_serialization_backend" : "JSON::PP version 2.27400"
 }

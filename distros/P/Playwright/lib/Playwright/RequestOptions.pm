@@ -9,7 +9,7 @@ use strict;
 use warnings;
 
 package Playwright::RequestOptions;
-$Playwright::RequestOptions::VERSION = '1.431';
+$Playwright::RequestOptions::VERSION = '1.460';
 use parent 'Playwright::Base';
 
 sub new {
@@ -22,71 +22,11 @@ sub spec {
     return $Playwright::spec->{'RequestOptions'}{members};
 }
 
-sub setForm {
+sub setQueryParam {
     my $self = shift;
     return $self->_api_request(
         args    => [@_],
-        command => 'setForm',
-        object  => $self->{guid},
-        type    => $self->{type}
-    );
-}
-
-sub setHeader {
-    my $self = shift;
-    return $self->_api_request(
-        args    => [@_],
-        command => 'setHeader',
-        object  => $self->{guid},
-        type    => $self->{type}
-    );
-}
-
-sub setData {
-    my $self = shift;
-    return $self->_api_request(
-        args    => [@_],
-        command => 'setData',
-        object  => $self->{guid},
-        type    => $self->{type}
-    );
-}
-
-sub setMethod {
-    my $self = shift;
-    return $self->_api_request(
-        args    => [@_],
-        command => 'setMethod',
-        object  => $self->{guid},
-        type    => $self->{type}
-    );
-}
-
-sub setFailOnStatusCode {
-    my $self = shift;
-    return $self->_api_request(
-        args    => [@_],
-        command => 'setFailOnStatusCode',
-        object  => $self->{guid},
-        type    => $self->{type}
-    );
-}
-
-sub create {
-    my $self = shift;
-    return $self->_api_request(
-        args    => [@_],
-        command => 'create',
-        object  => $self->{guid},
-        type    => $self->{type}
-    );
-}
-
-sub setTimeout {
-    my $self = shift;
-    return $self->_api_request(
-        args    => [@_],
-        command => 'setTimeout',
+        command => 'setQueryParam',
         object  => $self->{guid},
         type    => $self->{type}
     );
@@ -102,21 +42,11 @@ sub setMultipart {
     );
 }
 
-sub setMaxRedirects {
+sub setMethod {
     my $self = shift;
     return $self->_api_request(
         args    => [@_],
-        command => 'setMaxRedirects',
-        object  => $self->{guid},
-        type    => $self->{type}
-    );
-}
-
-sub setQueryParam {
-    my $self = shift;
-    return $self->_api_request(
-        args    => [@_],
-        command => 'setQueryParam',
+        command => 'setMethod',
         object  => $self->{guid},
         type    => $self->{type}
     );
@@ -127,6 +57,86 @@ sub setIgnoreHTTPSErrors {
     return $self->_api_request(
         args    => [@_],
         command => 'setIgnoreHTTPSErrors',
+        object  => $self->{guid},
+        type    => $self->{type}
+    );
+}
+
+sub setTimeout {
+    my $self = shift;
+    return $self->_api_request(
+        args    => [@_],
+        command => 'setTimeout',
+        object  => $self->{guid},
+        type    => $self->{type}
+    );
+}
+
+sub setData {
+    my $self = shift;
+    return $self->_api_request(
+        args    => [@_],
+        command => 'setData',
+        object  => $self->{guid},
+        type    => $self->{type}
+    );
+}
+
+sub setHeader {
+    my $self = shift;
+    return $self->_api_request(
+        args    => [@_],
+        command => 'setHeader',
+        object  => $self->{guid},
+        type    => $self->{type}
+    );
+}
+
+sub setMaxRetries {
+    my $self = shift;
+    return $self->_api_request(
+        args    => [@_],
+        command => 'setMaxRetries',
+        object  => $self->{guid},
+        type    => $self->{type}
+    );
+}
+
+sub setForm {
+    my $self = shift;
+    return $self->_api_request(
+        args    => [@_],
+        command => 'setForm',
+        object  => $self->{guid},
+        type    => $self->{type}
+    );
+}
+
+sub setFailOnStatusCode {
+    my $self = shift;
+    return $self->_api_request(
+        args    => [@_],
+        command => 'setFailOnStatusCode',
+        object  => $self->{guid},
+        type    => $self->{type}
+    );
+}
+
+sub setMaxRedirects {
+    my $self = shift;
+    return $self->_api_request(
+        args    => [@_],
+        command => 'setMaxRedirects',
+        object  => $self->{guid},
+        type    => $self->{type}
+    );
+}
+
+sub create {
+    my $self = shift;
+    return $self->_api_request(
+        args    => [@_],
+        command => 'create',
         object  => $self->{guid},
         type    => $self->{type}
     );
@@ -176,7 +186,7 @@ Playwright::RequestOptions - Automatically generated class for Playwright::Reque
 
 =head1 VERSION
 
-version 1.431
+version 1.460
 
 =head1 CONSTRUCTOR
 
@@ -187,47 +197,11 @@ Instead it should be returned to you as the result of calls on Playwright object
 
 =head1 METHODS
 
-=head2 setForm(@args)
+=head2 setQueryParam(@args)
 
-Execute the RequestOptions::setForm playwright routine.
+Execute the RequestOptions::setQueryParam playwright routine.
 
-See L<https://playwright.dev/docs/api/class-RequestOptions#RequestOptions-setForm> for more information.
-
-=head2 setHeader(@args)
-
-Execute the RequestOptions::setHeader playwright routine.
-
-See L<https://playwright.dev/docs/api/class-RequestOptions#RequestOptions-setHeader> for more information.
-
-=head2 setData(@args)
-
-Execute the RequestOptions::setData playwright routine.
-
-See L<https://playwright.dev/docs/api/class-RequestOptions#RequestOptions-setData> for more information.
-
-=head2 setMethod(@args)
-
-Execute the RequestOptions::setMethod playwright routine.
-
-See L<https://playwright.dev/docs/api/class-RequestOptions#RequestOptions-setMethod> for more information.
-
-=head2 setFailOnStatusCode(@args)
-
-Execute the RequestOptions::setFailOnStatusCode playwright routine.
-
-See L<https://playwright.dev/docs/api/class-RequestOptions#RequestOptions-setFailOnStatusCode> for more information.
-
-=head2 create(@args)
-
-Execute the RequestOptions::create playwright routine.
-
-See L<https://playwright.dev/docs/api/class-RequestOptions#RequestOptions-create> for more information.
-
-=head2 setTimeout(@args)
-
-Execute the RequestOptions::setTimeout playwright routine.
-
-See L<https://playwright.dev/docs/api/class-RequestOptions#RequestOptions-setTimeout> for more information.
+See L<https://playwright.dev/docs/api/class-RequestOptions#RequestOptions-setQueryParam> for more information.
 
 =head2 setMultipart(@args)
 
@@ -235,23 +209,65 @@ Execute the RequestOptions::setMultipart playwright routine.
 
 See L<https://playwright.dev/docs/api/class-RequestOptions#RequestOptions-setMultipart> for more information.
 
-=head2 setMaxRedirects(@args)
+=head2 setMethod(@args)
 
-Execute the RequestOptions::setMaxRedirects playwright routine.
+Execute the RequestOptions::setMethod playwright routine.
 
-See L<https://playwright.dev/docs/api/class-RequestOptions#RequestOptions-setMaxRedirects> for more information.
-
-=head2 setQueryParam(@args)
-
-Execute the RequestOptions::setQueryParam playwright routine.
-
-See L<https://playwright.dev/docs/api/class-RequestOptions#RequestOptions-setQueryParam> for more information.
+See L<https://playwright.dev/docs/api/class-RequestOptions#RequestOptions-setMethod> for more information.
 
 =head2 setIgnoreHTTPSErrors(@args)
 
 Execute the RequestOptions::setIgnoreHTTPSErrors playwright routine.
 
 See L<https://playwright.dev/docs/api/class-RequestOptions#RequestOptions-setIgnoreHTTPSErrors> for more information.
+
+=head2 setTimeout(@args)
+
+Execute the RequestOptions::setTimeout playwright routine.
+
+See L<https://playwright.dev/docs/api/class-RequestOptions#RequestOptions-setTimeout> for more information.
+
+=head2 setData(@args)
+
+Execute the RequestOptions::setData playwright routine.
+
+See L<https://playwright.dev/docs/api/class-RequestOptions#RequestOptions-setData> for more information.
+
+=head2 setHeader(@args)
+
+Execute the RequestOptions::setHeader playwright routine.
+
+See L<https://playwright.dev/docs/api/class-RequestOptions#RequestOptions-setHeader> for more information.
+
+=head2 setMaxRetries(@args)
+
+Execute the RequestOptions::setMaxRetries playwright routine.
+
+See L<https://playwright.dev/docs/api/class-RequestOptions#RequestOptions-setMaxRetries> for more information.
+
+=head2 setForm(@args)
+
+Execute the RequestOptions::setForm playwright routine.
+
+See L<https://playwright.dev/docs/api/class-RequestOptions#RequestOptions-setForm> for more information.
+
+=head2 setFailOnStatusCode(@args)
+
+Execute the RequestOptions::setFailOnStatusCode playwright routine.
+
+See L<https://playwright.dev/docs/api/class-RequestOptions#RequestOptions-setFailOnStatusCode> for more information.
+
+=head2 setMaxRedirects(@args)
+
+Execute the RequestOptions::setMaxRedirects playwright routine.
+
+See L<https://playwright.dev/docs/api/class-RequestOptions#RequestOptions-setMaxRedirects> for more information.
+
+=head2 create(@args)
+
+Execute the RequestOptions::create playwright routine.
+
+See L<https://playwright.dev/docs/api/class-RequestOptions#RequestOptions-create> for more information.
 
 =head2 on(@args)
 

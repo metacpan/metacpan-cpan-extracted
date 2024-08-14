@@ -63,7 +63,7 @@ greple - extensible grep with lexical expression and region control
 =head1 VERSION
 
 
-Version 9.1301
+Version 9.1501
 
 
 =head1 SYNOPSIS
@@ -85,6 +85,7 @@ B<greple> [B<-M>I<module>] [ B<-options> ] pattern [ file... ]
   MATCH
     -i, --ignore-case    ignore case
     -G, --capture-group  match capture groups rather than whole pattern
+    -S, --stretch        stretch matched area to the enclosing block
     --need=[+-]n         required positive match count
     --allow=[+-]n        acceptable negative match count
     --matchcount=n[,m]   required match count for each block
@@ -117,7 +118,7 @@ B<greple> [B<-M>I<module>] [ B<-options> ] pattern [ file... ]
     --colormap=color     R, G, B, C, M, Y etc.
     --colorsub=...       shortcut for --colormap="sub{...}"
     --colorful           use default multiple colors
-    --colorindex=flags   color index method: Ascend/Descend/Block/Random
+    --colorindex=flags   color index method: Ascend/Descend/Block/Random/Group
     --ansicolor=s        ANSI color 16, 256 or 24bit
     --[no]256            same as --ansicolor 256 or 16
     --regioncolor        use different color for inside/outside regions
@@ -231,6 +232,7 @@ newopt
     ' allow                  =s ' => \ my @opt_allow ,
     ' matchcount         |mc =s ' => \ my $opt_matchcount ,
     ' capture-group      |G  !  ' => \ my $opt_capture_group ,
+    ' stretch            |S  !  ' => \ my $opt_stretch ,
 
     ##
     ## STYLE
@@ -1233,12 +1235,14 @@ sub grep_data {
 	only         =>  $opt_o,
 	all          =>  $opt_all,
 	block        => \@opt_block,
+	stretch      =>  $opt_stretch,
 	must         =>  $count_must,
 	need         =>  $count_need,
 	countcheck   =>  $count_match_sub,
 	allow        =>  $count_allow,
 	strict       =>  $opt_strict,
 	group_match  =>  $opt_capture_group,
+	group_index  =>  $opt_colorindex =~ /G/i ? 1 : 0,
 	region_index =>  $opt_regioncolor,
 	stat         => \%stat,
 	callback     => \@opt_callback,
@@ -1852,9 +1856,20 @@ to individual capture groups are searched, not the entire pattern.  If
 the pattern does not contain any capturing groups, it matches the
 entire pattern.
 
-For each match, a corresponding capture group number is assigned as an
-index (0 for entire match).  This will cause the strings corresponding
-to each capture group to be displayed in a different color.
+If C<G> is specified in the B<--colorindex> option, a corresponding
+capture group number is assigned as an index (0 for entire match).
+This will cause the strings corresponding to each capture group to be
+displayed in a different color.
+
+=item B<-S>, B<--stretch>
+
+Forget the information about the individual match strings and act as if 
+the block containing them matched.
+
+The following command will match an entire line containing all of
+C<foo>, C<bar>, and C<baz> in any order.
+
+    greple --stretch 'foo bar baz'
 
 =item B<--need>=I<n>
 
@@ -2377,6 +2392,11 @@ Shuffle indexed color.
 =item R (Random)
 
 Use random color index every time.
+
+=item G (Group)
+
+Valid only when used with the B<--capture-group> (or B<-G>)
+option. Assigns an index number corresponding to each captuer group.
 
 =item N (Normal)
 

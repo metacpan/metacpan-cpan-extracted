@@ -11,7 +11,7 @@ App::Greple::xlate - translation support module for greple
 
 # VERSION
 
-Version 0.3201
+Version 0.3202
 
 # DESCRIPTION
 
@@ -92,7 +92,7 @@ follows, the text matching the first pattern will be processed after
 normalization, and no normalization process will be performed on the
 text matching the second pattern.
 
-    greple Mxlate -E normalized -E not-normalized
+    greple -Mxlate -E normalized -E not-normalized
 
 Therefore, use the first pattern for text that is to be processed by
 combining multiple lines into a single line, and use the second

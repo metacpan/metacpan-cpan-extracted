@@ -9,7 +9,7 @@ use strict;
 use warnings;
 
 package Playwright::AndroidInput;
-$Playwright::AndroidInput::VERSION = '1.431';
+$Playwright::AndroidInput::VERSION = '1.460';
 use parent 'Playwright::Base';
 
 sub new {
@@ -20,6 +20,16 @@ sub new {
 
 sub spec {
     return $Playwright::spec->{'AndroidInput'}{members};
+}
+
+sub swipe {
+    my $self = shift;
+    return $self->_api_request(
+        args    => [@_],
+        command => 'swipe',
+        object  => $self->{guid},
+        type    => $self->{type}
+    );
 }
 
 sub drag {
@@ -47,16 +57,6 @@ sub tap {
     return $self->_api_request(
         args    => [@_],
         command => 'tap',
-        object  => $self->{guid},
-        type    => $self->{type}
-    );
-}
-
-sub swipe {
-    my $self = shift;
-    return $self->_api_request(
-        args    => [@_],
-        command => 'swipe',
         object  => $self->{guid},
         type    => $self->{type}
     );
@@ -116,7 +116,7 @@ Playwright::AndroidInput - Automatically generated class for Playwright::Android
 
 =head1 VERSION
 
-version 1.431
+version 1.460
 
 =head1 CONSTRUCTOR
 
@@ -126,6 +126,12 @@ You shouldn't have to call this directly.
 Instead it should be returned to you as the result of calls on Playwright objects, or objects it returns.
 
 =head1 METHODS
+
+=head2 swipe(@args)
+
+Execute the AndroidInput::swipe playwright routine.
+
+See L<https://playwright.dev/docs/api/class-AndroidInput#AndroidInput-swipe> for more information.
 
 =head2 drag(@args)
 
@@ -144,12 +150,6 @@ See L<https://playwright.dev/docs/api/class-AndroidInput#AndroidInput-type> for 
 Execute the AndroidInput::tap playwright routine.
 
 See L<https://playwright.dev/docs/api/class-AndroidInput#AndroidInput-tap> for more information.
-
-=head2 swipe(@args)
-
-Execute the AndroidInput::swipe playwright routine.
-
-See L<https://playwright.dev/docs/api/class-AndroidInput#AndroidInput-swipe> for more information.
 
 =head2 press(@args)
 

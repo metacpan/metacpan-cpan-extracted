@@ -1,4 +1,4 @@
-package Win32API::RecentFiles 0.02;
+package Win32API::RecentFiles 0.03;
 use 5.020;
 use experimental 'signatures';
 use Exporter 'import';
@@ -7,7 +7,7 @@ our @ISA = qw(Exporter DynaLoader);
 
 our @EXPORT_OK = qw(SHAddToRecentDocsA SHAddToRecentDocsU SHAddToRecentDocsW);
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 bootstrap Win32API::RecentFiles;
 1;

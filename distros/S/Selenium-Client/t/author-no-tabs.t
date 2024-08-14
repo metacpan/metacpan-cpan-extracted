@@ -37,7 +37,6 @@ my @files = (
     't/author-minimum-version.t',
     't/author-mojibake.t',
     't/author-no-tabs.t',
-    't/author-pod-coverage.t',
     't/author-pod-linkcheck.t',
     't/author-pod-syntax.t',
     't/author-portability.t',
@@ -46,8 +45,7 @@ my @files = (
     't/release-cpan-changes.t',
     't/release-dist-manifest.t',
     't/release-kwalitee.t',
-    't/release-meta-json.t',
-    't/release-unused-vars.t'
+    't/release-meta-json.t'
 );
 
 notabs_ok($_) foreach @files;

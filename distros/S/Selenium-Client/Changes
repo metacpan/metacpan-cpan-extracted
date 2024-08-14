@@ -1,5 +1,8 @@
 Revision history for Selenium-Client
 
+2.01 2024-08-13 TEODESIAN
+    - Fixes a number of bugs with Selenium::Client::Driver & improves its documentation.
+
 2.00 2024-02-05 TEODESIAN
     [NEW FEATURES]
     - Add a drop-in replacement for Selenium::Remote::Driver called Selenium::Client::Driver.

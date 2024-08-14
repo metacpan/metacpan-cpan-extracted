@@ -3,6 +3,7 @@ abstract: 'recently accessed file API functions on Windows'
 author:
   - 'Max Maischein <corion@cpan.org>'
 build_requires:
+  Encode: '0'
   ExtUtils::MakeMaker: '0'
   Test2::V0: '0'
 configure_requires:
@@ -29,6 +30,6 @@ resources:
   bugtracker: https://github.com/Corion/Win32API-RecentFiles/issues
   license: https://dev.perl.org/licenses/
   repository: git://github.com/Corion/Win32API-RecentFiles.git
-version: '0.02'
+version: '0.03'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
 x_static_install: 0

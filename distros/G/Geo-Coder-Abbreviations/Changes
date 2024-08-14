@@ -1,5 +1,8 @@
 Revision history for Geo::Coder::Abbreviations
 
+0.09	Tue Aug 13 21:14:53 EDT 2024
+	normalize() now has a number of APIs - whichever the caller wishes to use
+
 0.08	Tue Jul  2 16:56:34 EDT 2024
 	Allow CACHE_DIR as well as CACHEDIR
 	Default cache location is now ~/.cache instead of /tmp/cache

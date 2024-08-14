@@ -9,7 +9,7 @@ use strict;
 use warnings;
 
 package Playwright::Dialog;
-$Playwright::Dialog::VERSION = '1.431';
+$Playwright::Dialog::VERSION = '1.460';
 use parent 'Playwright::Base';
 
 sub new {
@@ -22,26 +22,6 @@ sub spec {
     return $Playwright::spec->{'Dialog'}{members};
 }
 
-sub defaultValue {
-    my $self = shift;
-    return $self->_api_request(
-        args    => [@_],
-        command => 'defaultValue',
-        object  => $self->{guid},
-        type    => $self->{type}
-    );
-}
-
-sub page {
-    my $self = shift;
-    return $self->_api_request(
-        args    => [@_],
-        command => 'page',
-        object  => $self->{guid},
-        type    => $self->{type}
-    );
-}
-
 sub accept {
     my $self = shift;
     return $self->_api_request(
@@ -52,11 +32,11 @@ sub accept {
     );
 }
 
-sub dismiss {
+sub message {
     my $self = shift;
     return $self->_api_request(
         args    => [@_],
-        command => 'dismiss',
+        command => 'message',
         object  => $self->{guid},
         type    => $self->{type}
     );
@@ -72,11 +52,31 @@ sub type {
     );
 }
 
-sub message {
+sub dismiss {
     my $self = shift;
     return $self->_api_request(
         args    => [@_],
-        command => 'message',
+        command => 'dismiss',
+        object  => $self->{guid},
+        type    => $self->{type}
+    );
+}
+
+sub page {
+    my $self = shift;
+    return $self->_api_request(
+        args    => [@_],
+        command => 'page',
+        object  => $self->{guid},
+        type    => $self->{type}
+    );
+}
+
+sub defaultValue {
+    my $self = shift;
+    return $self->_api_request(
+        args    => [@_],
+        command => 'defaultValue',
         object  => $self->{guid},
         type    => $self->{type}
     );
@@ -126,7 +126,7 @@ Playwright::Dialog - Automatically generated class for Playwright::Dialog
 
 =head1 VERSION
 
-version 1.431
+version 1.460
 
 =head1 CONSTRUCTOR
 
@@ -137,29 +137,17 @@ Instead it should be returned to you as the result of calls on Playwright object
 
 =head1 METHODS
 
-=head2 defaultValue(@args)
-
-Execute the Dialog::defaultValue playwright routine.
-
-See L<https://playwright.dev/docs/api/class-Dialog#Dialog-defaultValue> for more information.
-
-=head2 page(@args)
-
-Execute the Dialog::page playwright routine.
-
-See L<https://playwright.dev/docs/api/class-Dialog#Dialog-page> for more information.
-
 =head2 accept(@args)
 
 Execute the Dialog::accept playwright routine.
 
 See L<https://playwright.dev/docs/api/class-Dialog#Dialog-accept> for more information.
 
-=head2 dismiss(@args)
+=head2 message(@args)
 
-Execute the Dialog::dismiss playwright routine.
+Execute the Dialog::message playwright routine.
 
-See L<https://playwright.dev/docs/api/class-Dialog#Dialog-dismiss> for more information.
+See L<https://playwright.dev/docs/api/class-Dialog#Dialog-message> for more information.
 
 =head2 type(@args)
 
@@ -167,11 +155,23 @@ Execute the Dialog::type playwright routine.
 
 See L<https://playwright.dev/docs/api/class-Dialog#Dialog-type> for more information.
 
-=head2 message(@args)
+=head2 dismiss(@args)
 
-Execute the Dialog::message playwright routine.
+Execute the Dialog::dismiss playwright routine.
 
-See L<https://playwright.dev/docs/api/class-Dialog#Dialog-message> for more information.
+See L<https://playwright.dev/docs/api/class-Dialog#Dialog-dismiss> for more information.
+
+=head2 page(@args)
+
+Execute the Dialog::page playwright routine.
+
+See L<https://playwright.dev/docs/api/class-Dialog#Dialog-page> for more information.
+
+=head2 defaultValue(@args)
+
+Execute the Dialog::defaultValue playwright routine.
+
+See L<https://playwright.dev/docs/api/class-Dialog#Dialog-defaultValue> for more information.
 
 =head2 on(@args)
 

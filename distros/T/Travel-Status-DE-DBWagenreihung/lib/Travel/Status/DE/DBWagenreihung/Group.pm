@@ -8,7 +8,7 @@ use utf8;
 use parent 'Class::Accessor';
 use List::Util qw(uniq);
 
-our $VERSION = '0.17';
+our $VERSION = '0.18';
 
 Travel::Status::DE::DBWagenreihung::Group->mk_ro_accessors(
 	qw(designation name train_no train_type description desc_short destination has_sectors model series start_percent end_percent)
@@ -354,7 +354,7 @@ sub new {
 		train_no    => $json{transport}{number},
 	};
 
-	if ( $ref->{name} =~ m{ ^ ICE 0* (\d+) $ }x and exists $ice_name{$1} ) {
+	if ( $ref->{name} =~ m{ ^ IC[DE] 0* (\d+) $ }x and exists $ice_name{$1} ) {
 		$ref->{designation} = $ice_name{$1};
 	}
 
@@ -652,6 +652,12 @@ sub parse_description {
 
 	$self->{desc_short}  = $short;
 	$self->{description} = $ret;
+}
+
+sub name_to_designation {
+	my ($self) = @_;
+
+	return %ice_name;
 }
 
 sub sectors {

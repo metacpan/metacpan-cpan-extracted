@@ -36,6 +36,7 @@ lib/Langertha/Role/HTTP.pm
 lib/Langertha/Role/JSON.pm
 lib/Langertha/Role/Models.pm
 lib/Langertha/Role/OpenAPI.pm
+lib/Langertha/Role/ResponseSize.pm
 lib/Langertha/Role/Seed.pm
 lib/Langertha/Role/SystemPrompt.pm
 lib/Langertha/Role/Temperature.pm

@@ -5,7 +5,7 @@ greple - extensible grep with lexical expression and region control
 
 # VERSION
 
-Version 9.1301
+Version 9.1501
 
 # SYNOPSIS
 
@@ -25,6 +25,7 @@ Version 9.1301
     MATCH
       -i, --ignore-case    ignore case
       -G, --capture-group  match capture groups rather than whole pattern
+      -S, --stretch        stretch matched area to the enclosing block
       --need=[+-]n         required positive match count
       --allow=[+-]n        acceptable negative match count
       --matchcount=n[,m]   required match count for each block
@@ -57,7 +58,7 @@ Version 9.1301
       --colormap=color     R, G, B, C, M, Y etc.
       --colorsub=...       shortcut for --colormap="sub{...}"
       --colorful           use default multiple colors
-      --colorindex=flags   color index method: Ascend/Descend/Block/Random
+      --colorindex=flags   color index method: Ascend/Descend/Block/Random/Group
       --ansicolor=s        ANSI color 16, 256 or 24bit
       --[no]256            same as --ansicolor 256 or 16
       --regioncolor        use different color for inside/outside regions
@@ -477,9 +478,20 @@ If you don't want these conversion, use `-E` (or `--re`) option.
     the pattern does not contain any capturing groups, it matches the
     entire pattern.
 
-    For each match, a corresponding capture group number is assigned as an
-    index (0 for entire match).  This will cause the strings corresponding
-    to each capture group to be displayed in a different color.
+    If `G` is specified in the **--colorindex** option, a corresponding
+    capture group number is assigned as an index (0 for entire match).
+    This will cause the strings corresponding to each capture group to be
+    displayed in a different color.
+
+- **-S**, **--stretch**
+
+    Forget the information about the individual match strings and act as if 
+    the block containing them matched.
+
+    The following command will match an entire line containing all of
+    `foo`, `bar`, and `baz` in any order.
+
+        greple --stretch 'foo bar baz'
 
 - **--need**=_n_
 - **--allow**=_n_
@@ -970,6 +982,11 @@ If you don't want these conversion, use `-E` (or `--re`) option.
     - R (Random)
 
         Use random color index every time.
+
+    - G (Group)
+
+        Valid only when used with the **--capture-group** (or **-G**)
+        option. Assigns an index number corresponding to each captuer group.
 
     - N (Normal)
 

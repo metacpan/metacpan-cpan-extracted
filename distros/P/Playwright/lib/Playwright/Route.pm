@@ -9,7 +9,7 @@ use strict;
 use warnings;
 
 package Playwright::Route;
-$Playwright::Route::VERSION = '1.431';
+$Playwright::Route::VERSION = '1.460';
 use parent 'Playwright::Base';
 
 sub new {
@@ -42,6 +42,16 @@ sub fulfill {
     );
 }
 
+sub fetch {
+    my $self = shift;
+    return $self->_api_request(
+        args    => [@_],
+        command => 'fetch',
+        object  => $self->{guid},
+        type    => $self->{type}
+    );
+}
+
 sub abort {
     my $self = shift;
     return $self->_api_request(
@@ -57,16 +67,6 @@ sub fallback {
     return $self->_api_request(
         args    => [@_],
         command => 'fallback',
-        object  => $self->{guid},
-        type    => $self->{type}
-    );
-}
-
-sub fetch {
-    my $self = shift;
-    return $self->_api_request(
-        args    => [@_],
-        command => 'fetch',
         object  => $self->{guid},
         type    => $self->{type}
     );
@@ -126,7 +126,7 @@ Playwright::Route - Automatically generated class for Playwright::Route
 
 =head1 VERSION
 
-version 1.431
+version 1.460
 
 =head1 CONSTRUCTOR
 
@@ -149,6 +149,12 @@ Execute the Route::fulfill playwright routine.
 
 See L<https://playwright.dev/docs/api/class-Route#Route-fulfill> for more information.
 
+=head2 fetch(@args)
+
+Execute the Route::fetch playwright routine.
+
+See L<https://playwright.dev/docs/api/class-Route#Route-fetch> for more information.
+
 =head2 abort(@args)
 
 Execute the Route::abort playwright routine.
@@ -160,12 +166,6 @@ See L<https://playwright.dev/docs/api/class-Route#Route-abort> for more informat
 Execute the Route::fallback playwright routine.
 
 See L<https://playwright.dev/docs/api/class-Route#Route-fallback> for more information.
-
-=head2 fetch(@args)
-
-Execute the Route::fetch playwright routine.
-
-See L<https://playwright.dev/docs/api/class-Route#Route-fetch> for more information.
 
 =head2 continue(@args)
 

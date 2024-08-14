@@ -1,0 +1,361 @@
+#!/opt/perl/bin/perl
+
+use 5.010;
+
+use strict;
+use warnings;
+no  warnings 'syntax';
+
+use feature  'current_sub';
+use feature  'signatures';
+no  warnings 'experimental::signatures';
+
+use Getopt::Long;
+
+my $PDF2TXT = "/opt/local/bin/pdftotext";
+
+sub extract_raw_data;
+sub extract_australia_data;
+sub extract_luxembourg_data;
+sub extract_geonames_data;
+sub make_pattern;
+sub make_ranges;
+
+GetOptions "country|c=s"    =>  \my $country,
+           "file|f=s"       =>  \my $file,
+           "type=s"         =>  \my $type,
+;
+
+$file //= shift;
+
+if ($file && !defined $country) {
+    if ($file =~ /^(..)-/) {
+        $country = $1;
+    }
+}
+
+
+die "Both --country and --file are required\n" unless defined $country &&
+                                                      defined $file;
+$type //= "regexp";
+
+my @list = extract_raw_data $file, $country;
+
+
+if ($type =~ /^(?:regexp?|pattern)$/) {
+    say make_pattern @list;
+}
+elsif ($type =~ /^(ranges?)$/) {
+    say make_ranges @list;
+}
+else {
+    die "No idea what to do with type $type\n";
+}
+
+
+#
+# Find the country, and dispatch
+#
+sub extract_raw_data ($file, $country) {
+    die "Cannot read file $file\n" unless -f $file;
+
+    my @list;
+
+    if ($country =~ /^(?:Australia|Aus?)$/i) {
+        @list = extract_australia_data $file;
+    }
+    elsif ($country =~ /^(?:Luxembourg|Lu)$/i) {
+        @list = extract_luxembourg_data $file;
+    }
+    else {
+        @list = extract_geonames_data $file;
+    }
+
+    my %seen;
+    sort {$a <=> $b} grep {!$seen {$_} ++} @list;
+}
+
+
+#
+# Extract zip codes for Australia. They're in a PDF file.
+#
+sub extract_australia_data ($file) {
+    my @list;
+    my @lines = `$PDF2TXT $file -`;
+
+    my $postcodes = 0;
+    my %zips;
+    foreach my $line (@lines) {
+        $postcodes ++ if $line =~ /^Postcodes$/;
+        next unless $postcodes >= 2;
+        next if $line =~ /\bBoxes/i;   # Don't trigger on 'PO Boxes'.
+        $zips {$1} = 1 if $line =~ /\s([0-9]{4})$/;
+    }
+
+    keys %zips;
+}
+
+
+#
+# Extract Luxembourg data. This data is the third column of a csv file,
+# which uses a semi colon as separator, and quotes all values in all 
+# columns (using double quotes)
+#
+sub extract_luxembourg_data ($file) {
+    open my $fh, "<", $file or die "open $file: $!";
+    <$fh>;  # Ignore first line with column headers.
+
+    my @list;
+
+    while (<$fh>) {
+        /^"[^"]+";"[^"]+";"L-([0-9]{4})"/
+            or die "Failed to parse $_";
+        push @list => $1;
+    }
+
+    return @list;
+}
+
+#
+# Extract zip codes for various countries. They're in the second columns of a 
+# tab separated file.
+#
+sub extract_geonames_data ($file) {
+    open my $fh, "<", $file or die "open $file: $!";
+
+    my @list;
+
+    while (<$fh>) {
+        my (undef, $zip) = split;
+        push @list => $zip;
+    }
+
+    if ($file =~ /^li/) {
+        push @list => "9489";               # Missing postal code.
+    }
+    elsif ($file =~ /^ch/) {
+        @list = grep {$_ ne "9489"} @list;  # Postal code belongs to LI.
+    }
+
+    return @list;
+}
+
+
+
+
+#
+# Given a list of digits, return a character class matching them
+#
+sub character_class (@list) {
+    my %seen;
+    @list = sort {$a <=> $b} grep {!$seen {$_} ++} @list;
+
+    if (@list == 0) {return ""}
+    if (@list == 1) {return $list [0]}
+    my $out = "[";
+    for (my $i = 0; $i < @list; $i ++) {
+        my $j = $i + 2;
+        if ($j < @list && $list [$j] - $list [$i] == 2) {
+            while ($j + 1 < @list &&
+                            $list [$j + 1] - $list [$i] == $j + 1 - $i) {
+                $j ++;
+            }
+            $out .= $list [$i] . "-" . $list [$j];
+            $i = $j;
+        }
+        else {
+            $out .= $list [$i];
+        }
+    }
+    $out .= "]";
+    return $out;
+}
+
+
+#
+# Given a list of numbers (all of the same length), return a regular
+# expression matching them
+#
+sub _make_pattern ($list, $split_size) {
+    my %seen;
+    my @list = sort {$a <=> $b} grep {!$seen {$_} ++} @$list;
+
+    return "" unless @list;
+    return $list [0] if @list == 1;
+
+    my $length = length ($list [0]);
+    for (my $i = 1; $i < @list; $i ++) {
+        die "All elements must be of the same length (@list)\n"
+             unless length $list [$i] == $length;
+    }
+
+    #
+    # Is there a common prefix?
+    #
+    my $common_prefix = $list [0];
+    for (my $i = 0; $i < @list && length $common_prefix; $i ++) {
+        my $c = 0;
+        $c ++ while $c < length $common_prefix &&
+                    substr ($common_prefix, 0, $c + 1) eq
+                    substr ($list [$i], 0, $c + 1);
+        $common_prefix = substr $common_prefix, 0, $c;
+    }
+
+    #
+    # Chop off the common prefix
+    #
+    if (length $common_prefix) {
+        my $c = length $common_prefix;
+        foreach my $elem (@list) {
+            substr ($elem, 0, $c) = "";
+        }
+    }
+
+    #
+    # If what's left, is one character wide, return a character class
+    #
+    if (length ($list [0]) == 1) {
+        return $common_prefix . character_class @list;
+    }
+
+    #
+    # Else, bucketize on first character, recurse and combine.
+    # Note that we put the head in the buckets, so we can take
+    # advantages if there's a longer common prefix.
+    #
+    my %buckets;
+    foreach my $elem (@list) {
+        my $head = substr $elem => 0, 1;
+        push @{$buckets {$head}} => $elem;
+    }
+
+    my @clauses;
+
+    foreach my $head (sort {$a <=> $b} keys %buckets) {
+        my $pattern = &{+__SUB__} ($buckets {$head}, $split_size);
+        push @clauses => "$pattern";
+    }
+
+    local $" = "|";
+    my $pat = "$common_prefix(?:@clauses)";
+    $pat .= "\n" if length ($list [0]) == $split_size;
+    return $pat;
+}
+
+
+sub make_pattern (@list) {
+    my $pat = _make_pattern \@list, length ($list [0]) - 2;
+
+    #
+    # Do some post-processing. For now, assume we have 4 digits.
+    #
+
+    $pat =~ s/\n\|/|\n              /g;
+    $pat =~ s/\n\)\|/)\n\n         |/g;
+    $pat =~ s/^\(\?:/      (?k:/;
+    $pat =~ s/\n\)\)\n?/)\n    )\n/;
+
+    my @lines = split /\n/ => $pat;
+
+    my @lines2;
+    foreach my $line (@lines) {
+        if (length ($line) < 74) {
+            push @lines2 => $line;
+            next;
+        }
+        if ($line =~ /^(.{1,71}\|)(.+)/) {
+            push @lines2 => $1;
+            $line = "                  $2";
+            redo;
+        }
+        push @lines => $line;
+    }
+    @lines = @lines2;
+
+    # Put inside quotes
+    s/^(\s*)(.+)$/$1"$2"/ for @lines;
+
+    # Add concat operator, lined up
+    foreach my $line (@lines) {
+        next unless $line =~ /\S/;
+        if (length $line < 76) {
+            $line .= " " x (76 - length $line);
+        }
+        $line .= " .";
+    }
+    $pat = join "\n" => @lines;
+    $pat =~ s/\s*\.$/\n/;
+
+    return $pat;
+}
+
+
+#
+# Turn a sort list of integers in ranges.
+#
+sub make_ranges (@list) {
+    my @out;
+    my $w = length $list [-1];
+
+    for (my $i = 0; $i < @list; $i ++) {
+        my $j = $i;
+        for (; ($j + 1) < @list &&
+                          $list [$j + 1] - $list [$i] == $j + 1 - $i; $j ++) {
+            ;
+        }
+        if ($i == $j) {
+            push @out => $list [$i];
+        }
+        else {
+            push @out => [$list [$i], $list [$j]];
+        }
+        $i = $j;
+    }
+
+    my $out;
+    my $col = 0;
+    for (my $i = 0; $i < @out; $i ++) {
+        my $entry = $out [$i];
+        if ($col == 0) {
+            $out .= " ";
+        }
+        if (ref $entry) {
+            if ($col % 2) {
+                $out .= "    " . (" " x $w);
+                $col ++;
+            }
+            $out .= sprintf "   %${w}d .. %${w}d" => $$entry [0], $$entry [1];
+            $col ++;
+        }
+        else {
+            $out .= sprintf "   %${w}d" => $entry;
+        }
+        $out .= ",";
+
+        if ($i + 1 < @out && 
+               substr ((ref ($out [$i])     ? $out [$i]     [0]
+                                            : $out [$i]     ), 0, 1) ne
+               substr ((ref ($out [$i + 1]) ? $out [$i + 1] [0]
+                                            : $out [$i + 1]), 0, 1)) {
+            $out .= "\n\n";
+            $col = 0;
+        }
+        elsif ($col >= 7 ||
+               $col == 6 && $i + 1 < @out && ref $out [$i + 1]) {
+            $out .= "\n";
+            $col = 0;
+        }
+        else {
+            $col ++;
+        }
+    }
+    $out .= "\n" unless $out =~ /\n$/;
+    $out;
+}
+
+
+
+
+
+
+__END__

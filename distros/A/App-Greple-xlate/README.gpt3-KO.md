@@ -10,7 +10,7 @@ App::Greple::xlate - greple을 위한 번역 지원 모듈
 
 # VERSION
 
-Version 0.3201
+Version 0.3202
 
 # DESCRIPTION
 
@@ -62,7 +62,7 @@ Version 0.3201
 
 이 정규화 과정은 첫 번째(0번째) 및 짝수 번째 패턴에 대해서만 수행됩니다. 따라서 두 개의 패턴이 다음과 같이 지정된 경우, 첫 번째 패턴과 일치하는 텍스트는 정규화 후 처리되며, 두 번째 패턴과 일치하는 텍스트에는 정규화 과정이 수행되지 않습니다.
 
-    greple Mxlate -E normalized -E not-normalized
+    greple -Mxlate -E normalized -E not-normalized
 
 따라서 여러 줄을 한 줄로 결합하여 처리해야 하는 텍스트에는 첫 번째 패턴을 사용하고, 서식이 적용된 텍스트에는 두 번째 패턴을 사용하십시오. 첫 번째 패턴에 일치하는 텍스트가 없는 경우, 아무것도 일치하지 않는 패턴인 `(?!)`을 사용하십시오.
 

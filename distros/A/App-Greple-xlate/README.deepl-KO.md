@@ -10,7 +10,7 @@ App::Greple::xlate - Greple용 번역 지원 모듈
 
 # VERSION
 
-Version 0.3201
+Version 0.3202
 
 # DESCRIPTION
 
@@ -62,7 +62,7 @@ Perl의 포드 스타일로 작성된 문서에서 일반 텍스트 블록을 �
 
 이 정규화 프로세스는 첫 번째(0번째) 및 짝수 패턴에 대해서만 수행됩니다. 따라서 다음과 같이 두 개의 패턴을 지정하면 첫 번째 패턴과 일치하는 텍스트는 정규화 후 처리되고 두 번째 패턴과 일치하는 텍스트에는 정규화 프로세스가 수행되지 않습니다.
 
-    greple Mxlate -E normalized -E not-normalized
+    greple -Mxlate -E normalized -E not-normalized
 
 따라서 여러 줄을 한 줄로 합쳐서 처리할 텍스트에는 첫 번째 패턴을 사용하고, 미리 서식이 지정된 텍스트에는 두 번째 패턴을 사용합니다. 첫 번째 패턴에 일치하는 텍스트가 없는 경우 `(?!)`와 같이 아무것도 일치하지 않는 패턴을 사용합니다.
 

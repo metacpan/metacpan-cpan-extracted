@@ -1,7 +1,7 @@
 package Langertha::Role::OpenAPI;
 our $AUTHORITY = 'cpan:GETTY';
 # ABSTRACT: Role for APIs with OpenAPI definition
-$Langertha::Role::OpenAPI::VERSION = '0.003';
+$Langertha::Role::OpenAPI::VERSION = '0.004';
 use Moose::Role;
 
 use Carp qw( croak );
@@ -90,7 +90,7 @@ Langertha::Role::OpenAPI - Role for APIs with OpenAPI definition
 
 =head1 VERSION
 
-version 0.003
+version 0.004
 
 =for :stopwords cpan testmatrix url bugtracker rt cpants kwalitee diff irc mailto metadata placeholders metacpan
 
