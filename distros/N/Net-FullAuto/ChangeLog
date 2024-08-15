@@ -19,6 +19,25 @@
 #
 #######################################################################
 
+2024-08-14  Brian M. Kelly <Brian.Kelly@fullauto.com>
+
+        * Version 1.0000689 released
+
+        * Added Memory printout for Makefile.PL
+
+2024-08-14  Brian M. Kelly <Brian.Kelly@fullauto.com>
+
+        * Version 1.0000688 released
+
+        * More Makefile.PL changes for
+          AWS micro and nano instances
+
+2024-08-14  Brian M. Kelly <Brian.Kelly@fullauto.com>
+
+        * Version 1.0000687 released
+
+        * More Makefile.PL changes for
+	  AWS micro and nano instances
 
 2024-08-13  Brian M. Kelly <Brian.Kelly@fullauto.com>
 

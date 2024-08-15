@@ -3,11 +3,11 @@
 use v5.26;
 use warnings;
 
-use Test::More;
+use Test2::V0;
 
 use Future::AsyncAwait 0.47;
 use Future::IO;
-use Object::Pad 0.19;
+use Object::Pad 0.800;
 
 my $run_count;
 my $run_f;
@@ -85,7 +85,7 @@ $app->parse_argv( [ "-A", "TestAdapter", "--best-effort", "TestChip" ] );
    $run_f = $app->run;
    $run_f->failure and $run_f->get;
 
-   is_deeply( \@saw_values, [ undef, undef, undef ], '--best-effort turns failures into undef' );
+   is( \@saw_values, [ undef, undef, undef ], '--best-effort turns failures into undef' );
    is( $failcount, 3, 'on_sensor_fail is invoked' );
 
    undef $FAILURE;
@@ -96,7 +96,7 @@ $app->parse_argv( [ "-A", "TestAdapter", "--best-effort", "TestChip" ] );
    $run_f->failure and $run_f->get;
    $run_f->await;
 
-   is_deeply( \@saw_values, [ undef, undef, undef, 123 ], 'attempts again after failure is cleared' );
+   is( \@saw_values, [ undef, undef, undef, 123 ], 'attempts again after failure is cleared' );
    is( $okcount, 1, 'on_sensor_ok is invoked' );
 }
 

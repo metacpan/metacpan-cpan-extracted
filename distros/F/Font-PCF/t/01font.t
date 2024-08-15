@@ -1,9 +1,9 @@
 #!/usr/bin/perl
 
-use strict;
+use v5.26;
 use warnings;
 
-use Test::More;
+use Test2::V0;
 
 use Font::PCF;
 
@@ -19,7 +19,7 @@ ok( my $glyph = $font->get_glyph_for_char( "X" ),
 
 # This test is sensitive to the exact glyph bitmap in the file but it should
 # hopefully be portable enough.
-is_deeply( $glyph->bitmap,
+is( $glyph->bitmap,
    [ 0, 0,
      0b10000010000000000000000000000000,
      0b10000010000000000000000000000000,

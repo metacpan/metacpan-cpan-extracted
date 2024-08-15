@@ -8,7 +8,7 @@ use warnings;
 
 use Carp;
 
-our $VERSION = 0.09; 
+our $VERSION = 0.11; 
 
 require XSLoader;
 XSLoader::load( __PACKAGE__, $VERSION );
@@ -43,7 +43,7 @@ Syntax::Keyword::Combine::Keys - ckeys keyword
 
 =head1 VERSION
 
-Version 0.09
+Version 0.11
 
 =cut
 

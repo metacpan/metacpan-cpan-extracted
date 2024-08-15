@@ -1,0 +1,42 @@
+---
+abstract: 'assert keyword for Perl'
+author:
+  - 'kobaken <kentafly88@gmail.com>'
+build_requires:
+  Test2::V0: '0.000147'
+configure_requires:
+  Module::Build: '0.4005'
+  XS::Parse::Keyword::Builder: '0.36'
+dynamic_config: 0
+generated_by: 'Minilla/v3.1.25, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Syntax-Keyword-Assert
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Syntax::Keyword::Assert:
+    file: lib/Syntax/Keyword/Assert.pm
+    version: '0.10'
+requires:
+  Devel::StrictMode: '0.003'
+  XS::Parse::Keyword: '0.36'
+  perl: '5.016000'
+resources:
+  bugtracker: https://github.com/kfly8/Syntax-Keyword-Assert/issues
+  homepage: https://github.com/kfly8/Syntax-Keyword-Assert
+  repository: https://github.com/kfly8/Syntax-Keyword-Assert.git
+version: '0.10'
+x_authority: cpan:KFLY
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+x_static_install: 0

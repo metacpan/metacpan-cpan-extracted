@@ -1,10 +1,11 @@
 #!/usr/bin/perl
 
-use strict;
+use v5.26;
 use warnings;
 
-use Test::More;
+use Test2::V0;
 
-use_ok( 'Font::PCF' );
+require Font::PCF;
 
+pass( 'Modules loaded' );
 done_testing;

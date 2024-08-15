@@ -1,9 +1,11 @@
 #!/usr/bin/perl
 
 use v5.14;
+use warnings;
 
-use Test::More;
+use Test2::V0;
 
-use_ok( 'App::Device::Chip::sensor' );
+require App::Device::Chip::sensor;
 
+pass( 'Modules loaded' );
 done_testing;

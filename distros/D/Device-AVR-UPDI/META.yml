@@ -18,18 +18,19 @@ name: Device-AVR-UPDI
 provides:
   Device::AVR::UPDI:
     file: lib/Device/AVR/UPDI.pm
-    version: '0.14'
+    version: '0.15'
 requires:
   Commandable: '0.08'
   File::ShareDir: '1.00'
   Future::AsyncAwait: '0'
   Future::IO: '0.03'
   IO::Termios: '0'
-  Object::Pad: '0.800'
+  Object::Pad: '0.807'
   Object::Pad::ClassAttr::Struct: '0.04'
+  Sublike::Extended: '0'
   YAML: '0'
   perl: '5.026'
 resources:
   license: http://dev.perl.org/licenses/
-version: '0.14'
+version: '0.15'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

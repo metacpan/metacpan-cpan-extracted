@@ -3,12 +3,11 @@
 use v5.26;
 use warnings;
 
-use Test::More;
-use Test::Deep;
+use Test2::V0;
 
 use Future::AsyncAwait 0.47;
 use Future::IO;
-use Object::Pad 0.57;
+use Object::Pad 0.800;
 
 my $run_f;
 

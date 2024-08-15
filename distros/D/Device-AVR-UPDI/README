@@ -122,6 +122,8 @@ METHODS
 
  read_asi_sys_status
 
+       $status = await $updi->read_asi_sys_status;
+
     Reads the ASI_SYS_STATUS register.
 
  read_sib
@@ -204,6 +206,8 @@ METHODS
     EEPROM address space.
 
  write_eeprom_page
+
+       await $updi->write_eeprom_page( $addr, $data );
 
     Similar to "write_flash_page" but issues a combined erase-and-write
     command and $addr is within the EEPROM address space.

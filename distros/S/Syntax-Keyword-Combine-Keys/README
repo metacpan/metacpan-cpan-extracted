@@ -2,7 +2,7 @@ NAME
     Syntax::Keyword::Combine::Keys - ckeys keyword
 
 VERSION
-    Version 0.09
+    Version 0.11
 
 SYNOPSIS
             use Syntax::Keyword::Combine::Keys;

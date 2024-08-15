@@ -8,9 +8,9 @@ use warnings;
 
 use Object::Pad 0.800;
 use Future::AsyncAwait;
+use Sublike::Extended;
 
-package Future::Selector 0.03;
-class Future::Selector;
+class Future::Selector 0.04;
 
 use Carp;
 use Scalar::Util qw( refaddr );
@@ -150,7 +150,7 @@ events and workflow when those things are represented by futures.
 
 The main waiting call, L</select>, is a method that returns a future. This
 could be returned from some module or component of a program, to be awaited on
-by another outer  C<Future::Selector> instance. The applicaation is not
+by another outer  C<Future::Selector> instance. The application is not
 limited to exactly one as would be the case for blocking system calls, but can
 instead create a hierarchical structure out of as many instances as are
 required.
@@ -238,27 +238,18 @@ continue watching. This continues until the generator returns C<undef>.
 
 =cut
 
-method add ( %params )
+extended method add ( :$data, :$f = undef, :$gen = undef )
 {
-   exists $params{data} or # undef is permitted; why not?
-      croak "Require 'data'";
-
-   my $f;
-   my $gen;
-
-   if( $params{f} ) {
-      $f = $params{f};
-   }
-   elsif( $gen = $params{gen} ) {
+   if( $gen and !$f ) {
       # TODO: Consider if we should do this immediately at all?
       $f = $gen->();
    }
-   else {
+   elsif( !$f ) {
       croak "Require 'f' or 'gen'";
    }
 
    my $item = Future::Selector::_Item->new(
-      data => $params{data},
+      data => $data,
       f    => $f,
       gen  => $gen,
    );

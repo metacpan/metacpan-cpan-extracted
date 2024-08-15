@@ -1,13 +1,15 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2019-2022 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2019-2024 -- leonerd@leonerd.org.uk
 
 use v5.26;
-use Object::Pad 0.64 ':experimental(init_expr)';
+use warnings;
+use Object::Pad 0.800;
+use Sublike::Extended;
 use Syntax::Keyword::Match;
 
-package Font::PCF 0.03;
+package Font::PCF 0.04;
 class Font::PCF;
 
 use List::Util 1.33 qw( any first );
@@ -15,7 +17,7 @@ use PerlIO::gzip;
 
 use IO::Handle::Packable;
 
-use Object::Pad::ClassAttr::Struct;
+use Object::Pad::ClassAttr::Struct 0.04;
 
 =head1 NAME
 
@@ -56,21 +58,21 @@ useful for other use-cases as well, but may required more methods adding.
 #   https://fontforge.github.io/en-US/documentation/reference/pcf-format/
 
 class Font::PCF::_Table :Struct {
-   has $type;
-   has $format;
-   has $size;
-   has $offset;
+   field $type;
+   field $format;
+   field $size;
+   field $offset;
 }
 
 class Font::PCF::_Glyph :Struct {
-   has $bitmap               { [] };
-   has $left_side_bearing  = undef;
-   has $right_side_bearing = undef;
-   has $width              = undef;
-   has $ascent             = undef;
-   has $descent            = undef;
-   has $attrs              = undef;
-   has $name               = undef;
+   field $bitmap             = [];
+   field $left_side_bearing  = undef;
+   field $right_side_bearing = undef;
+   field $width              = undef;
+   field $ascent             = undef;
+   field $descent            = undef;
+   field $attrs              = undef;
+   field $name               = undef;
 }
 
 use constant {
@@ -114,11 +116,11 @@ the data from it. Throws an exception if an error occurs.
 =cut
 
 # class method
-sub open ( $class, $path, %opts )
+extended sub open ( $class, $path, :$gzip = 0 )
 {
-   $opts{gzip} = 1 if $path =~ m/\.gz$/;
+   $gzip = 1 if $path =~ m/\.gz$/;
 
-   open my $fh, $opts{gzip} ? "<:gzip" : "<", $path or
+   open my $fh, $gzip ? "<:gzip" : "<", $path or
       die "Cannot open font at $path - $!";
    bless $fh, "IO::Handle::Packable";
 
@@ -129,7 +131,7 @@ sub open ( $class, $path, %opts )
    return $self;
 }
 
-has $_fh :param;
+field $_fh :param;
 
 =head1 METHODS
 
@@ -142,9 +144,7 @@ method read_data ()
 
    my @tables = map {
       my @v = $_fh->unpack( "i< i< i< i<" );
-      Font::PCF::_Table->new(
-         type => $v[0], format => $v[1], size => $v[2], offset => $v[3],
-      )
+      Font::PCF::_Table->new_values( @v );
    } 1 .. $table_count;
 
    foreach my $table ( @tables ) {
@@ -243,7 +243,7 @@ method read_bitmaps_table ( $table )
    }
 }
 
-has @_encoding_to_glyph;
+field @_encoding_to_glyph;
 
 method read_encodings_table ( $table )
 {
@@ -299,7 +299,7 @@ method read_glyph_names_table ( $table )
 
 =head2 get_glyph_for_char
 
-   $glyph = $font->get_glyph_for_char( $char )
+   $glyph = $font->get_glyph_for_char( $char );
 
 Returns a Glyph struct representing the unicode character; given as a
 character string.
@@ -315,7 +315,7 @@ method get_glyph_for_char ( $char )
    return $self->get_glyph( $index );
 }
 
-has @_glyphs;
+field @_glyphs;
 
 method get_glyph ( $index )
 {

@@ -44,7 +44,7 @@ METHODS
 
  get_glyph_for_char
 
-       $glyph = $font->get_glyph_for_char( $char )
+       $glyph = $font->get_glyph_for_char( $char );
 
     Returns a Glyph struct representing the unicode character; given as a
     character string.

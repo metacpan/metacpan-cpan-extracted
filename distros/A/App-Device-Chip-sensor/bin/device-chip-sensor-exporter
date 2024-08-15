@@ -83,10 +83,14 @@ class MyApp :isa(App::Device::Chip::sensor)
          delete $config->{port};
       }
 
-      foreach my $opt (qw( interval best_effort mid3 )) {
+      foreach my $opt (qw( interval best_effort filter )) {
          exists $config->{$opt} and
             $self->$opt = delete $config->{$opt};
       }
+
+      # Legacy support
+      exists $config->{mid3} and
+         $self->filter = "mid3", delete $config->{mid3};
 
       die "Unrecognised config file items " . join( ", ", sort keys %$config ) . "\n"
          if keys %$config;
@@ -105,8 +109,14 @@ class MyApp :isa(App::Device::Chip::sensor)
 
          # Convert some common characters that Prometheus will get upset by
          if( defined $units ) {
+            $units =~ s{/}{_per_};
+
             $units =~ s/%/percentage/g;
             $units =~ s/°/degrees/g;
+            $units =~ s/µ/micro/g;
+
+            $units =~ s/m²/square_metre/g;
+            $units =~ s/m³/cubic_metre/g;
          }
 
          $got{$name}++ and next;
@@ -145,7 +155,7 @@ class MyApp :isa(App::Device::Chip::sensor)
                  ( $sensor->type eq "counter" ) ? "inc_counter_by" :
                                                   die "Unrecognised sensor type";
          $metrics->$m( $sensor->name,
-            $sensor->format( $value ), [ chip => $chipname ] );
+            $self->_format_reading( $sensor, $value ), [ chip => $chipname ] );
       }
 
       foreach my $chipaddr ( keys %failures_per_chip ) {

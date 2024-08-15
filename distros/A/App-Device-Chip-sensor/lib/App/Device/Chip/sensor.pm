@@ -1,25 +1,26 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2020-2022 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2020-2024 -- leonerd@leonerd.org.uk
 
 use v5.26;
-use Object::Pad 0.76;
+use warnings;
+use Object::Pad 0.800;
 
-package App::Device::Chip::sensor 0.06;
-class App::Device::Chip::sensor;
+class App::Device::Chip::sensor 0.07;
 
 use Carp;
 
 use Feature::Compat::Defer;
 use Feature::Compat::Try;
 use Future::AsyncAwait;
+use Sublike::Extended;
 
 use Device::Chip::Adapter;
 use Device::Chip::Sensor 0.19; # ->type
 use Future::IO 0.08; # ->alarm
 use Getopt::Long qw( GetOptionsFromArray );
-use List::Util 1.29 qw( all max pairgrep );
+use List::Util 1.29 qw( max pairgrep );
 use Scalar::Util qw( refaddr );
 
 =head1 NAME
@@ -80,11 +81,15 @@ Adapter configuration string to pass to L<Device::Chip::Adapter/new_from_descrip
 to construct the chip adapter used for communication with the actual chip
 hardware.
 
+=item * --filter, -F STR
+
+Specifies the kind of filtering to apply to gauge values. See L</FILTERING>
+for more detail.
+
 =item * --mid3, -m
 
 Enable "middle-of-3" filtering of gauge values, to reduce sensor noise from
-unreliable sensors. At each round of readings, the most recent three values
-from the sensor are sorted numerically and the middle one is reported.
+unreliable sensors. This is equivalent to setting C<-F mid3>.
 
 =item * --best-effort, -B
 
@@ -104,7 +109,7 @@ field $_interval :mutator = 10;
 
 field $_best_effort :mutator;
 
-field $_mid3 :mutator;
+field $_filter :mutator;
 
 method OPTSPEC
 {
@@ -113,7 +118,9 @@ method OPTSPEC
 
       'i|interval=i' => \$_interval,
 
-      'm|mid3' => \$_mid3,
+      'F|filter=s' => \$_filter,
+
+      'm|mid3' => sub { $_filter = "mid3" },
 
       'B|best-effort' => \$_best_effort,
    );
@@ -128,8 +135,8 @@ or applications to invoke.
 
 =head2 parse_argv
 
-   $app->parse_argv()
-   $app->parse_argv( \@argv )
+   $app->parse_argv();
+   $app->parse_argv( \@argv );
 
 Provides a list of commandline arguments for parsing, either from a given
 array reference or defaulting to the process C<@ARGV> if not supplied.
@@ -202,7 +209,7 @@ Required L<Device::Chip::Adapter> instance.
 
 =item mountopts => HASH
 
-Optional hASH reference containing extra mount parameters.
+Optional HASH reference containing extra mount parameters.
 
 =item config => HASH
 
@@ -213,12 +220,13 @@ the C<configure> method once mounted.
 
 =cut
 
-method add_chip ( %config )
+extended method add_chip ( :$type, :$adapter, %config )
 {
-   $config{type}    // croak "Require 'type'";
-   $config{adapter} // croak "Require 'adapter'";
-
-   push @_CHIPCONFIGS, { pairgrep { defined $b } %config{qw( type adapter mountopts config )} };
+   push @_CHIPCONFIGS, {
+      type    => $type,
+      adapter => $adapter,
+      pairgrep { defined $b } %config{qw( mountopts config )}
+   };
 }
 
 =head2 chips
@@ -267,7 +275,7 @@ async method chips
    return @$_chips;
 }
 
-=head2 chips
+=head2 sensors
 
    @sensors = await $app->sensors;
 
@@ -317,6 +325,8 @@ or similar techniques.
 
 =cut
 
+field %filters_by_sensor;
+
 async method run ()
 {
    my @chips = await $self->chips;
@@ -333,8 +343,6 @@ async method run ()
    }
 
    my @sensors = await $self->sensors;
-
-   my %readings_by_sensor;
 
    my $waittime = Time::HiRes::time();
    while(1) {
@@ -359,24 +367,12 @@ async method run ()
          } @sensors
       );
 
-      if( $_mid3 ) {
-         foreach my $idx ( 0 .. $#sensors ) {
-            my $sensor = $sensors[$idx];
-            my $value  = $values[$idx];
+      foreach my $idx ( 0 .. $#sensors ) {
+         my $sensor = $sensors[$idx];
 
-            next unless $sensor->type eq "gauge";
+         my $filter = $filters_by_sensor{ refaddr $sensor } //= $self->make_filter_for_sensor( $sensor );
 
-            # Accumulate the past 3 readings
-            my $readings = $readings_by_sensor{ refaddr $sensor } //= [];
-            push @$readings, $value;
-            shift @$readings while @$readings > 3;
-
-            # Take the middle of the 3
-            if( @$readings == 3 and all { defined } @$readings ) {
-               my @sorted = sort { $a <=> $b } @$readings;
-               $values[$idx] = $sorted[1];
-            }
-         }
+         $values[$idx] = $filter->filter( $values[$idx] );
       }
 
       $self->output_readings( $now, \@sensors, \@values );
@@ -386,14 +382,43 @@ async method run ()
    }
 }
 
+method make_filter_for_sensor ( $sensor )
+{
+   # We only filter gauges currently
+   return App::Device::Chip::sensor::Filter::Null->new if $sensor->type ne "gauge";
+
+   if( !length $_filter or $_filter eq "null" ) {
+      return App::Device::Chip::sensor::Filter::Null->new;
+   }
+   elsif( $_filter =~ m/^mid(\d+)$/ ) {
+      return App::Device::Chip::sensor::Filter::MidN->new( n => $1 );
+   }
+   elsif( $_filter =~ m/^ravg(\d+)$/ ) {
+      return App::Device::Chip::sensor::Filter::Ravg->new( alpha => 2 ** -$1 );
+   }
+   else {
+      die "Unrecognised filter name $_filter";
+   }
+}
+
 =head2 print_readings
 
-   $app->print_readings( $sensors, $values )
+   $app->print_readings( $sensors, $values );
 
 Prints the sensor names and current readings in a human-readable format to the
 currently-selected output handle (usually C<STDOUT>).
 
 =cut
+
+method _format_reading ( $sensor, $value )
+{
+   return undef if !defined $value;
+
+   # Take account of extra precision required due to filtering
+   my $filter = $filters_by_sensor{ refaddr $sensor };
+   my $extra_digits = $filter ? $filter->extra_digits : 0;
+   return sprintf "%.*f", $sensor->precision + $extra_digits, $value;
+}
 
 method print_readings ( $sensors, $values )
 {
@@ -412,10 +437,10 @@ method print_readings ( $sensors, $values )
          $valuestr = "<undef>";
       }
       elsif( $sensor->type eq "gauge" ) {
-         $valuestr = sprintf "%s%s", $sensor->format( $value ), $units // "";
+         $valuestr = sprintf "%s%s", $self->_format_reading( $sensor, $value ), $units // "";
       }
       else {
-         $valuestr = sprintf "%s%s/sec", $sensor->format( $value / $self->interval ), $units // "";
+         $valuestr = sprintf "%s%s/sec", $self->_format_reading( $sensor, $value / $self->interval ), $units // "";
       }
 
       printf "% *s/% *s: %s\n",
@@ -487,7 +512,7 @@ L<Object::Pad> C<field> keyword:
 
 =head2 after_sensors
 
-   await $app->after_sensors( @sensors )
+   await $app->after_sensors( @sensors );
 
 This method is invoked once on startup by the L</run> method, after it has
 configured the chip adapter and chips and obtained their individual sensor
@@ -499,7 +524,7 @@ types, or other such behaviours.
 
 =head2 on_sensor_ok
 
-   $app->on_sensor_ok( $sensor )
+   $app->on_sensor_ok( $sensor );
 
 This method is invoked in C<--best-effort> mode after a successful reading
 from sensor; typically this is used to clear a failure state.
@@ -512,12 +537,12 @@ method on_sensor_ok ( $sensor ) { }
 
 =head2 on_sensor_fail
 
-   $app->on_sensor_fail( $sensor, $failure )
+   $app->on_sensor_fail( $sensor, $failure );
 
 This method is invoked in C<--best-effort> mode after a failure of the given
 sensor. The caught exception is passed as C<$failure>.
 
-The defaullt implementation prints this as a warning using the core C<warn()>
+The default implementation prints this as a warning using the core C<warn()>
 function.
 
 =cut
@@ -528,6 +553,76 @@ method on_sensor_fail ( $sensor, $failure )
    my $chipname   = ref ( $sensor->chip );
 
    warn "Unable to read ${sensorname} of ${chipname}: $failure";
+}
+
+=head1 FILTERING
+
+The C<--filter> setting accepts the following filter names
+
+=cut
+
+=head2 null
+
+No filtering is applied. Each sensor reading is reported as it stands.
+
+=cut
+
+class App::Device::Chip::sensor::Filter::Null
+{
+   use constant extra_digits => 0;
+
+   method filter ( $value ) { return $value }
+}
+
+=head2 midI<n>
+
+The most recent I<n> values are sorted, and the middle of these is reported.
+To be well-behaved, I<n> should be an odd number. (C<mid3>, C<mid5>, C<mid7>,
+etc...)
+
+=cut
+
+class App::Device::Chip::sensor::Filter::MidN
+{
+   use List::Util 1.29 qw( all );
+
+   field $n :param;
+   field @readings;
+
+   use constant extra_digits => 0;
+
+   method filter ( $value )
+   {
+      # Accumulate the past 3 readings
+      push @readings, $value;
+      shift @readings while @readings > $n;
+
+      # Take the middle of the 3
+      return $value unless @readings == $n and all { defined } @readings;
+
+      my @sorted = sort { $a <=> $b } @readings;
+      return $sorted[($n-1) / 2];
+   }
+}
+
+=head2 ravgI<n>
+
+Recursive average with weighting of C<2 ** -n>.
+
+=cut
+
+class App::Device::Chip::sensor::Filter::Ravg
+{
+   field $alpha :param;
+   field $prev;
+
+   use constant extra_digits => 2;
+
+   method filter ( $value )
+   {
+      return $prev = $value if !defined $prev;
+      return $prev = $prev + $alpha * ( $value - $prev );
+   }
 }
 
 =head1 AUTHOR

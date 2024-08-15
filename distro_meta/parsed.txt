@@ -93452,3 +93452,15 @@ D/DE/DERF/Travel-Status-DE-DBWagenreihung-0.18.tar.gz
 D/DE/DERF/Travel-Status-DE-DeutscheBahn-6.07.tar.gz
 C/CO/CORION/Win32API-RecentFiles-0.03.tar.gz
 I/IN/INGY/YAMLScript-0.1.71.tar.gz
+P/PE/PEVANS/App-Device-Chip-sensor-0.07.tar.gz
+O/OL/OLIVER/App-Netdisco-2.077000.tar.gz
+R/RE/REEDFISH/Net-FullAuto-1.0000689.tar.gz
+C/CU/CUKEBOT/Cucumber-Messages-26.0.0.tar.gz
+P/PE/PEVANS/Device-AVR-UPDI-0.15.tar.gz
+P/PE/PEVANS/Font-PCF-0.04.tar.gz
+P/PE/PEVANS/Future-Selector-0.04.tar.gz
+A/AB/ABRAXXA/Net-Silverpeak-Orchestrator-0.014000.tar.gz
+L/LN/LNATION/Number-Iterator-XS-0.04.tar.gz
+K/KI/KIMOTO/SPVM-R-0.022.tar.gz
+K/KF/KFLY/Syntax-Keyword-Assert-0.10.tar.gz
+L/LN/LNATION/Syntax-Keyword-Combine-Keys-0.11.tar.gz

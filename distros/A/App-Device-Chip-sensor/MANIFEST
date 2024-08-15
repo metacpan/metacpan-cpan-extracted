@@ -1,3 +1,4 @@
+.editorconfig
 bin/device-chip-sensor
 bin/device-chip-sensor-datalogger
 bin/device-chip-sensor-exporter
@@ -14,6 +15,6 @@ t/10args.t
 t/11chips.t
 t/12readings.t
 t/13print_readings.t
-t/20mid3.t
+t/20filter.t
 t/21reliability.t
 t/99pod.t

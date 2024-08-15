@@ -3,10 +3,10 @@
 use v5.26;
 use warnings;
 
-use Test::More;
+use Test2::V0;
 
 use Future::AsyncAwait 0.47;
-use Object::Pad 0.57;
+use Object::Pad 0.800;
 
 my $after_sensors_arg;
 class TestApp :isa(App::Device::Chip::sensor)
@@ -60,7 +60,7 @@ $INC{"Device/Chip/_ATestChip.pm"} = __FILE__;
 
    is( await $sensors[0]->read, 1234, '$sensors[0]->read' );
 
-   is_deeply( $after_sensors_arg, \@sensors,
+   is( $after_sensors_arg, \@sensors,
       'List of sensors passed to $app->after_sensors' );
 }
 

@@ -39,7 +39,7 @@ class R::NDArray::StringBuffer extends R::NDArray {
     my $elem = $data->[$data_index];
     
     unless ($elem) {
-      return "undef";
+      return undef;
     }
     
     my $string = $elem->to_string;
@@ -64,16 +64,16 @@ class R::NDArray::StringBuffer extends R::NDArray {
     }
   }
   
-  method elem_cmp : int ($data : StringBuffer[], $a_data_index : int, $b_data_index : int) {
+  method elem_cmp : int ($a_data : StringBuffer[], $a_data_index : int, $b_data : StringBuffer[], $b_data_index : int) {
     
-    my $a_elem = $data->[$a_data_index];
+    my $a_elem = $a_data->[$a_data_index];
     
     my $a_string = (string)undef;
     if ($a_elem) {
       $a_string = $a_elem->to_string;
     }
     
-    my $b_elem = $data->[$b_data_index];
+    my $b_elem = $b_data->[$b_data_index];
     my $b_string = (string)undef;
     if ($b_elem) {
       $b_string = $b_elem->to_string;

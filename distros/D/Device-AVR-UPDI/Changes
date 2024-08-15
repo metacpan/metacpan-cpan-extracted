@@ -1,5 +1,10 @@
 Revision history for Device-AVR-UPDI
 
+0.15    2024-08-14
+        [CHANGES]
+         * Update to Object::Pad v0.807
+         * Use named parameter support of Sublike::Extended
+
 0.14    2023-09-13
         [CHANGES]
          * Updates for Object::Pad v0.800

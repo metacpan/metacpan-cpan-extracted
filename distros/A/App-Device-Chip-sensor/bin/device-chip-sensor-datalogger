@@ -90,7 +90,7 @@ Defaults to C<"%Y-%m-%d %H:%M:%S">.
    method output_readings ( $now, $sensors, $values )
    {
       $_csv->say( $_outh,
-         [ strftime( $_TIMESTAMP, localtime $now ), map { $sensors->[$_]->format( $values->[$_] ) } 0 .. $#$sensors ]
+         [ strftime( $_TIMESTAMP, localtime $now ), map { $self->_format_reading( $sensors->[$_], $values->[$_] ) } 0 .. $#$sensors ]
       );
    }
 }

@@ -55,9 +55,9 @@ class R::NDArray::Byte extends R::NDArray {
     $dist_data->[$dist_data_index] = $src_data->[$src_data_index];
   }
   
-  method elem_cmp : int ($data : byte[], $a_data_index : int, $b_data_index : int) {
+  method elem_cmp : int ($a_data : byte[], $a_data_index : int, $b_data : byte[], $b_data_index : int) {
     
-    my $cmp = $data->[$a_data_index] <=> $data->[$b_data_index];
+    my $cmp = $a_data->[$a_data_index] <=> $b_data->[$b_data_index];
     
     return $cmp;
   }

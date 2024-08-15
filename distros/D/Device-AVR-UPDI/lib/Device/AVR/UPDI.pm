@@ -1,19 +1,20 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2019-2023 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2019-2024 -- leonerd@leonerd.org.uk
 
 use v5.26;
 use warnings;
-use Object::Pad 0.800 ':experimental(adjust_params)';
+use Object::Pad 0.807;
 
-package Device::AVR::UPDI 0.14;
+package Device::AVR::UPDI 0.15;
 class Device::AVR::UPDI :strict(params);
 
 use Carp;
 
 use Future::AsyncAwait;
 use Future::IO 0.03; # ->sysread_exactly
+use Sublike::Extended;
 
 use File::ShareDir qw( module_dir );
 use YAML ();
@@ -551,6 +552,8 @@ async method read_updirev ()
 
 =head2 read_asi_sys_status
 
+   $status = await $updi->read_asi_sys_status;
+
 Reads the C<ASI_SYS_STATUS> register.
 
 =cut
@@ -656,13 +659,13 @@ may be required e.g. to recover from a bad C<SYSCFG0> fuse setting.
 
 =cut
 
-async method erase_chip ( %opts )
+extended async method erase_chip ( :$no_reset = 0 )
 {
    await $self->key( KEY_CHIPERASE );
 
    die "Failed to set CHIPERASE key\n" unless ASI_KEY_CHIPERASE & await $self->ldcs( REG_ASI_KEY_STATUS );
 
-   return if $opts{no_reset};
+   return if $no_reset;
 
    await $self->request_reset( 1 );
    await $self->request_reset( 0 );
@@ -766,6 +769,8 @@ async method read_eeprom_page ( $addr, $len )
 
 =head2 write_eeprom_page
 
+   await $updi->write_eeprom_page( $addr, $data );
+
 Similar to L</write_flash_page> but issues a combined erase-and-write
 command and C<$addr> is within the EEPROM address space.
 
@@ -841,7 +846,9 @@ role # hide from indexer
 }
 
 class # hide from indexer
-   Device::AVR::UPDI::_NVMCtrlv0 :does(Device::AVR::UPDI::_NVMCtrl) {
+   Device::AVR::UPDI::_NVMCtrlv0{
+
+   apply Device::AVR::UPDI::_NVMCtrl;
 
    use Carp;
 
@@ -928,7 +935,9 @@ class # hide from indexer
 }
 
 class # hide from indexer
-   Device::AVR::UPDI::_NVMCtrlv2 :does(Device::AVR::UPDI::_NVMCtrl) {
+   Device::AVR::UPDI::_NVMCtrlv2 {
+
+   apply Device::AVR::UPDI::_NVMCtrl;
 
    use Carp;
 

@@ -42,10 +42,6 @@ class R::NDArray::String extends R::NDArray {
     
     my $elem = $data->[$data_index];
     
-    unless ($elem) {
-      return "undef";
-    }
-    
     my $string = copy $elem;
     
     return $string;
@@ -68,9 +64,9 @@ class R::NDArray::String extends R::NDArray {
     }
   }
   
-  method elem_cmp : int ($data : string[], $a_data_index : int, $b_data_index : int) {
+  method elem_cmp : int ($a_data : string[], $a_data_index : int, $b_data : string[], $b_data_index : int) {
     
-    my $cmp = $data->[$a_data_index] cmp $data->[$b_data_index];
+    my $cmp = $a_data->[$a_data_index] cmp $b_data->[$b_data_index];
     
     return $cmp;
   }

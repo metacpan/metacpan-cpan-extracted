@@ -24,7 +24,7 @@ class R::OP::Byte {
         $data = $data->(R::NDArray::Byte)->data;
       }
       else {
-        die "The type of the data \data must be Byte, byte[], or R::NDArray::Byte.";
+        die "The type of the data \$data must be Byte, byte[], or R::NDArray::Byte if defined.";
       }
     }
     

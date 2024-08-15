@@ -130,7 +130,7 @@ DESCRIPTION
       * The main waiting call, "select", is a method that returns a future.
       This could be returned from some module or component of a program, to
       be awaited on by another outer Future::Selector instance. The
-      applicaation is not limited to exactly one as would be the case for
+      application is not limited to exactly one as would be the case for
       blocking system calls, but can instead create a hierarchical
       structure out of as many instances as are required.
 

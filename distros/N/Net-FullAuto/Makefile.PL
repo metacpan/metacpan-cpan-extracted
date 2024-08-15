@@ -26,7 +26,7 @@
 ################################################################
 
 
-our $VERSION='1.0000686';
+our $VERSION='1.0000689';
 
 
 if ($ENV{'AUTOMATED_TESTING'}) {
@@ -201,6 +201,8 @@ BEGIN { # FullAuto© MICROSOFT WINDOWS INSTALLER
       my $token=`curl -X PUT  -s "http://169.254.169.254/latest/api/token" -H "X-aws-ec2-metadata-token-ttl-seconds: 21600"`;
       my $instance_type=`curl -s -H "X-aws-ec2-metadata-token: $token" http://169.254.169.254/latest/meta-data/instance-type`;
       $amazon{instance_type}=$instance_type;
+      print `sudo cat /proc/meminfo | grep MemFree`;
+      print `sudo cat /proc/meminfo | grep MemAvailable`;
    }
 
 };
@@ -1891,6 +1893,23 @@ sub fa_install_mod {
                fa_system("cd \"$dir\";${sudo}make test");
                print "*** Running ${sudo}make install\n";
                fa_system("cd \"$dir\";${sudo}make install");
+            } elsif (($p eq 'Compress::Raw::Zlib') || ($p eq 'HTML::Parser')) {
+               if (exists $amazon{instance_type} && $amazon{instance_type}=~/micro/) {
+                  my $ulimit=`ulimit -s`;
+                  $ulimit=32768;
+                  my $micro_nano_adjust="(cd \"$dir\";${sudo}sed -i '/^CCFLAGS/ s/\$/ ".
+                                        "--param ggc-min-expand=1 ".
+                                        "--param ggc-min-heapsize=$ulimit/' ".
+                                        "Makefile) 2>&1";
+                  fa_system($micro_nano_adjust);
+                  fa_system("cd \"$dir\";${sudo}make install");
+               } elsif (exists $amazon{instance_type} && $amazon{instance_type}=~/nano/) {
+                  if ($p eq 'Compress::Raw::Zlib') {
+                     fa_system("${sudo}dnf -y install perl-Compress-Raw-Zlib.x86_64");
+                  } elsif ($p eq 'HTML::Parser') {
+                     fa_system("${sudo}dnf -y install perl-HTML-Parser.x86_64");
+                  }
+               }
             } else {
                print "*** Running ${sudo}make install\n";
                fa_system("cd \"$dir\";${sudo}make install");

@@ -415,10 +415,10 @@ class R::DataFrame {
         my $desc = $order_by_desc_h->get_int($colname);
         
         if ($desc) {
-          $cmp = $ndarray->elem_cmp($ndarray->data, $b_data_index, $a_data_index);
+          $cmp = $ndarray->elem_cmp($ndarray->data, $b_data_index, $ndarray->data, $a_data_index);
         }
         else {
-          $cmp = $ndarray->elem_cmp($ndarray->data, $a_data_index, $b_data_index);
+          $cmp = $ndarray->elem_cmp($ndarray->data, $a_data_index, $ndarray->data, $b_data_index);
         }
         
         unless ($cmp == 0) {

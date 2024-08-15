@@ -24,7 +24,7 @@ class R::OP::Short {
         $data = $data->(R::NDArray::Short)->data;
       }
       else {
-        die "The type of the data \data must be Short, short[], or R::NDArray::Short.";
+        die "The type of the data \$data must be Short, short[], or R::NDArray::Short.";
       }
     }
     

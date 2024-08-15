@@ -3,12 +3,11 @@
 use v5.26;
 use warnings;
 
-use Test::More;
-use Test::Deep;
+use Test2::V0;
 
 use Future::AsyncAwait 0.47;
 use Future::IO;
-use Object::Pad 0.57;
+use Object::Pad 0.800;
 
 my $run_count;
 my $run_f;
@@ -67,7 +66,7 @@ $app->parse_argv( [ "-A", "TestAdapter", "TestChip" ] );
    $run_f = $app->run;
    $run_f->await;
 
-   is_deeply( \@saw_values, [ 1234 ], 'values passed to ->output_readings' );
+   is( \@saw_values, [ 1234 ], 'values passed to ->output_readings' );
 }
 
 {
@@ -77,7 +76,7 @@ $app->parse_argv( [ "-A", "TestAdapter", "TestChip" ] );
    $run_f = $app->run;
    $run_f->failure and $run_f->get;
 
-   is_deeply( \@saw_values, [ 1234, 1234, 1234 ], 'values passed to ->output_readings 3 times' );
+   is( \@saw_values, [ 1234, 1234, 1234 ], 'values passed to ->output_readings 3 times' );
 }
 
 done_testing;

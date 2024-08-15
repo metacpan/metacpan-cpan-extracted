@@ -9,7 +9,7 @@ class R::OP::StringBuffer {
   use R::OP::String;
   
   # Class Methods
-  static method c : R::NDArray::StringBuffer ($data : object of StringBuffer|StringBuffer[]|R::NDArray::StringBuffer, $dim : int[] = undef) {
+  static method c : R::NDArray::StringBuffer ($data : object of StringBuffer|StringBuffer[]|R::NDArray::StringBuffer|string|string[]|R::NDArray::String, $dim : int[] = undef) {
     
     if ($data) {
       if ($data is_type StringBuffer) {
@@ -26,15 +26,10 @@ class R::OP::StringBuffer {
         $data = $data->(R::NDArray::StringBuffer)->data;
       }
       elsif ($data is_type string) {
-        my $string_buffer = StringBuffer->new((string)$data);
-        
-        $data = [$string_buffer];
+        $data = [StringBuffer->new((string)$data)];
       }
       elsif ($data is_type string[]) {
-        
-        my $string_ndarray = R::OP::String->c((string[])$data);
-        
-        $data = $string_ndarray->to_string_buffer_ndarray->data;
+        $data = R::OP::String->c((string[])$data)->to_string_buffer_ndarray->data;
       }
       elsif ($data is_type R::NDArray::String) {
         unless ($dim) {
@@ -44,7 +39,7 @@ class R::OP::StringBuffer {
         $data = $data->(R::NDArray::String)->to_string_buffer_ndarray->data;
       }
       else {
-        die "The type of the data \data must be StringBuffer, StringBuffer[], or R::NDArray::StringBuffer.";
+        die "The type of the data \$data must be StringBuffer, StringBuffer[], R::NDArray::StringBuffer, string, string[], R::NDArray::String if defined.";
       }
     }
     
@@ -66,7 +61,7 @@ class R::OP::StringBuffer {
     my $equals_dim = R::OP->equals_dim($x_ndarray, $y_ndarray);
     
     unless ($equals_dim) {
-      die "The dim field of \$x_ndarray must be the same as the dim field of \$y_ndarray.";
+      die "The dimensions of \$x_ndarray must be the same as the dimensions of \$y_ndarray.";
     }
     
     my $length = $x_ndarray->length;
@@ -77,24 +72,7 @@ class R::OP::StringBuffer {
     my $y_data = $y_ndarray->data;
     
     for (my $i = 0; $i < $length; $i++) {
-      
-      my $x_elem_string = (StringBuffer)undef;
-      if ($x_data->[$i]) {
-        $x_elem_string = $x_data->[$i];
-      }
-      else {
-        $x_elem_string = StringBuffer->new;
-      }
-      
-      my $y_elem_string = (string)undef;
-      if ($y_data->[$i]) {
-        $y_elem_string = $y_data->[$i];
-      }
-      else {
-        $y_elem_string = "";
-      }
-      
-      $x_elem_string->push($y_elem_string);
+      eval { $x_data->[$i]->push($y_data->[$i]); }
     }
   }
   
@@ -111,7 +89,7 @@ class R::OP::StringBuffer {
     my $equals_dim = R::OP->equals_dim($x_ndarray, $y_ndarray);
     
     unless ($equals_dim) {
-      die "The dim field of \$x_ndarray must be the same as the dim field of \$y_ndarray.";
+      die "The dimensions of \$x_ndarray must be the same as the dimensions of \$y_ndarray.";
     }
     
     my $length = $x_ndarray->length;
@@ -125,17 +103,8 @@ class R::OP::StringBuffer {
     my $y_data = $y_ndarray->data;
     
     for (my $i = 0; $i < $length; $i++) {
-      my $x_elem_string = (string)undef;
-      if ($x_data->[$i]) {
-        $x_elem_string = $x_data->[$i]->to_string;
-      }
-      
-      my $y_elem_string = (string)undef;
-      if ($y_data->[$i]) {
-        $y_elem_string = $y_data->[$i]->to_string;
-      }
-      
-      $ret_data->[$i] = $x_elem_string eq $y_elem_string;
+      my $cmp = $x_ndarray->elem_cmp($x_data, $i, $y_data, $i);
+      $ret_data->[$i] = $cmp == 0;
     }
     
     return $ret_ndarray;
@@ -154,7 +123,7 @@ class R::OP::StringBuffer {
     my $equals_dim = R::OP->equals_dim($x_ndarray, $y_ndarray);
     
     unless ($equals_dim) {
-      die "The dim field of \$x_ndarray must be the same as the dim field of \$y_ndarray.";
+      die "The dimensions of \$x_ndarray must be the same as the dimensions of \$y_ndarray.";
     }
     
     my $length = $x_ndarray->length;
@@ -168,17 +137,8 @@ class R::OP::StringBuffer {
     my $y_data = $y_ndarray->data;
     
     for (my $i = 0; $i < $length; $i++) {
-      my $x_elem_string = (string)undef;
-      if ($x_data->[$i]) {
-        $x_elem_string = $x_data->[$i]->to_string;
-      }
-      
-      my $y_elem_string = (string)undef;
-      if ($y_data->[$i]) {
-        $y_elem_string = $y_data->[$i]->to_string;
-      }
-      
-      $ret_data->[$i] = $x_elem_string ne $y_elem_string;
+      my $cmp = $x_ndarray->elem_cmp($x_data, $i, $y_data, $i);
+      $ret_data->[$i] = $cmp != 0;
     }
     
     return $ret_ndarray;
@@ -197,7 +157,7 @@ class R::OP::StringBuffer {
     my $equals_dim = R::OP->equals_dim($x_ndarray, $y_ndarray);
     
     unless ($equals_dim) {
-      die "The dim field of \$x_ndarray must be the same as the dim field of \$y_ndarray.";
+      die "The dimensions of \$x_ndarray must be the same as the dimensions of \$y_ndarray.";
     }
     
     my $length = $x_ndarray->length;
@@ -211,17 +171,8 @@ class R::OP::StringBuffer {
     my $y_data = $y_ndarray->data;
     
     for (my $i = 0; $i < $length; $i++) {
-      my $x_elem_string = (string)undef;
-      if ($x_data->[$i]) {
-        $x_elem_string = $x_data->[$i]->to_string;
-      }
-      
-      my $y_elem_string = (string)undef;
-      if ($y_data->[$i]) {
-        $y_elem_string = $y_data->[$i]->to_string;
-      }
-      
-      $ret_data->[$i] = $x_elem_string gt $y_elem_string;
+      my $cmp = $x_ndarray->elem_cmp($x_data, $i, $y_data, $i);
+      $ret_data->[$i] = $cmp > 0;
     }
     
     return $ret_ndarray;
@@ -240,7 +191,7 @@ class R::OP::StringBuffer {
     my $equals_dim = R::OP->equals_dim($x_ndarray, $y_ndarray);
     
     unless ($equals_dim) {
-      die "The dim field of \$x_ndarray must be the same as the dim field of \$y_ndarray.";
+      die "The dimensions of \$x_ndarray must be the same as the dimensions of \$y_ndarray.";
     }
     
     my $length = $x_ndarray->length;
@@ -254,17 +205,8 @@ class R::OP::StringBuffer {
     my $y_data = $y_ndarray->data;
     
     for (my $i = 0; $i < $length; $i++) {
-      my $x_elem_string = (string)undef;
-      if ($x_data->[$i]) {
-        $x_elem_string = $x_data->[$i]->to_string;
-      }
-      
-      my $y_elem_string = (string)undef;
-      if ($y_data->[$i]) {
-        $y_elem_string = $y_data->[$i]->to_string;
-      }
-      
-      $ret_data->[$i] = $x_elem_string ge $y_elem_string;
+      my $cmp = $x_ndarray->elem_cmp($x_data, $i, $y_data, $i);
+      $ret_data->[$i] = $cmp >= 0;
     }
     
     return $ret_ndarray;
@@ -283,7 +225,7 @@ class R::OP::StringBuffer {
     my $equals_dim = R::OP->equals_dim($x_ndarray, $y_ndarray);
     
     unless ($equals_dim) {
-      die "The dim field of \$x_ndarray must be the same as the dim field of \$y_ndarray.";
+      die "The dimensions of \$x_ndarray must be the same as the dimensions of \$y_ndarray.";
     }
     
     my $length = $x_ndarray->length;
@@ -297,17 +239,8 @@ class R::OP::StringBuffer {
     my $y_data = $y_ndarray->data;
     
     for (my $i = 0; $i < $length; $i++) {
-      my $x_elem_string = (string)undef;
-      if ($x_data->[$i]) {
-        $x_elem_string = $x_data->[$i]->to_string;
-      }
-      
-      my $y_elem_string = (string)undef;
-      if ($y_data->[$i]) {
-        $y_elem_string = $y_data->[$i]->to_string;
-      }
-      
-      $ret_data->[$i] = $x_elem_string lt $y_elem_string;
+      my $cmp = $x_ndarray->elem_cmp($x_data, $i, $y_data, $i);
+      $ret_data->[$i] = $cmp < 0;
     }
     
     return $ret_ndarray;
@@ -326,7 +259,7 @@ class R::OP::StringBuffer {
     my $equals_dim = R::OP->equals_dim($x_ndarray, $y_ndarray);
     
     unless ($equals_dim) {
-      die "The dim field of \$x_ndarray must be the same as the dim field of \$y_ndarray.";
+      die "The dimensions of \$x_ndarray must be the same as the dimensions of \$y_ndarray.";
     }
     
     my $length = $x_ndarray->length;
@@ -340,17 +273,8 @@ class R::OP::StringBuffer {
     my $y_data = $y_ndarray->data;
     
     for (my $i = 0; $i < $length; $i++) {
-      my $x_elem_string = (string)undef;
-      if ($x_data->[$i]) {
-        $x_elem_string = $x_data->[$i]->to_string;
-      }
-      
-      my $y_elem_string = (string)undef;
-      if ($y_data->[$i]) {
-        $y_elem_string = $y_data->[$i]->to_string;
-      }
-      
-      $ret_data->[$i] = $x_elem_string le $y_elem_string;
+      my $cmp = $x_ndarray->elem_cmp($x_data, $i, $y_data, $i);
+      $ret_data->[$i] = $cmp <= 0;
     }
     
     return $ret_ndarray;

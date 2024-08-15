@@ -164,9 +164,9 @@ is($orchestrator->get_vrf_zones_map,
 
 is(my $vrf_security_policy = $orchestrator->get_vrf_security_policies_by_ids(0, 0),
     hash {
-        field data      => hash {
+        field data      => in_set(U(), hash {
             etc();
-        };
+        });
         field settings  => hash {
             etc();
         };
@@ -176,7 +176,8 @@ is(my $vrf_security_policy = $orchestrator->get_vrf_security_policies_by_ids(0, 
         end();
     },
     'get_vrf_security_policies_by_ids ok');
-
+$vrf_security_policy->{data} = {}
+    unless defined $vrf_security_policy->{data};
 ok($orchestrator->update_vrf_security_policies_by_ids(0, 0, $vrf_security_policy),
     'update_vrf_security_policies_by_ids ok');
 
@@ -232,6 +233,8 @@ SKIP: {
     skip "No reachable appliance found"
         unless defined $test_appliance;
 
+    diag "using appliance $test_appliance->{hostName} for tests";
+
     is($orchestrator->get_appliance($test_appliance->{id}),
         hash {
             etc();
@@ -269,6 +272,18 @@ SKIP: {
             etc();
         },
         'get_appliance_ipsla_states ok');
+
+    is($orchestrator->get_appliance_bgp_system_config($test_appliance->{id}),
+        hash {
+            etc();
+        },
+        'get_appliance_bgp_system_config ok');
+
+    is($orchestrator->get_appliance_bgp_neighbors($test_appliance->{id}),
+        hash {
+            etc();
+        },
+        'get_appliance_bgp_neighbors ok');
 
     is($orchestrator->list_applianceids_by_templategroupname(
         $ENV{NET_SILVERPEAK_ORCHESTRATOR_POLICY}),

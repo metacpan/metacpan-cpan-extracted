@@ -40,7 +40,7 @@ class R::OP::Long {
         $data = $data->(R::NDArray::Long)->data;
       }
       else {
-        die "The type of the data \data must be Long, long[], or R::NDArray::Long.";
+        die "The type of the data \$data must be Long, long[], or R::NDArray::Long.";
       }
     }
     
@@ -62,7 +62,7 @@ class R::OP::Long {
     my $equals_dim = R::OP->equals_dim($x_ndarray, $y_ndarray);
     
     unless ($equals_dim) {
-      die "The dim field of \$x_ndarray must be the same as the dim field of \$y_ndarray.";
+      die "The dimensions of \$x_ndarray must be the same as the dimensions of \$y_ndarray.";
     }
     
     my $length = $x_ndarray->length;
@@ -95,7 +95,7 @@ class R::OP::Long {
     my $equals_dim = R::OP->equals_dim($x_ndarray, $y_ndarray);
     
     unless ($equals_dim) {
-      die "The dim field of \$x_ndarray must be the same as the dim field of \$y_ndarray.";
+      die "The dimensions of \$x_ndarray must be the same as the dimensions of \$y_ndarray.";
     }
     
     my $length = $x_ndarray->length;
@@ -128,7 +128,7 @@ class R::OP::Long {
     my $equals_dim = R::OP->equals_dim($x_ndarray, $y_ndarray);
     
     unless ($equals_dim) {
-      die "The dim field of \$x_ndarray must be the same as the dim field of \$y_ndarray.";
+      die "The dimensions of \$x_ndarray must be the same as the dimensions of \$y_ndarray.";
     }
     
     my $length = $x_ndarray->length;
@@ -193,7 +193,7 @@ class R::OP::Long {
     my $equals_dim = R::OP->equals_dim($x_ndarray, $y_ndarray);
     
     unless ($equals_dim) {
-      die "The dim field of \$x_ndarray must be the same as the dim field of \$y_ndarray.";
+      die "The dimensions of \$x_ndarray must be the same as the dimensions of \$y_ndarray.";
     }
     
     my $length = $x_ndarray->length;
@@ -258,7 +258,7 @@ class R::OP::Long {
     my $equals_dim = R::OP->equals_dim($x_ndarray, $y_ndarray);
     
     unless ($equals_dim) {
-      die "The dim field of \$x_ndarray must be the same as the dim field of \$y_ndarray.";
+      die "The dimensions of \$x_ndarray must be the same as the dimensions of \$y_ndarray.";
     }
     
     my $length = $x_ndarray->length;
@@ -291,7 +291,7 @@ class R::OP::Long {
     my $equals_dim = R::OP->equals_dim($x_ndarray, $y_ndarray);
     
     unless ($equals_dim) {
-      die "The dim field of \$x_ndarray must be the same as the dim field of \$y_ndarray.";
+      die "The dimensions of \$x_ndarray must be the same as the dimensions of \$y_ndarray.";
     }
     
     my $length = $x_ndarray->length;
@@ -324,7 +324,7 @@ class R::OP::Long {
     my $equals_dim = R::OP->equals_dim($x_ndarray, $y_ndarray);
     
     unless ($equals_dim) {
-      die "The dim field of \$x_ndarray must be the same as the dim field of \$y_ndarray.";
+      die "The dimensions of \$x_ndarray must be the same as the dimensions of \$y_ndarray.";
     }
     
     my $length = $x_ndarray->length;
@@ -449,7 +449,7 @@ class R::OP::Long {
     my $equals_dim = R::OP->equals_dim($x_ndarray, $y_ndarray);
     
     unless ($equals_dim) {
-      die "The dim field of \$x_ndarray must be the same as the dim field of \$y_ndarray.";
+      die "The dimensions of \$x_ndarray must be the same as the dimensions of \$y_ndarray.";
     }
     
     my $length = $x_ndarray->length;
@@ -482,7 +482,7 @@ class R::OP::Long {
     my $equals_dim = R::OP->equals_dim($x_ndarray, $y_ndarray);
     
     unless ($equals_dim) {
-      die "The dim field of \$x_ndarray must be the same as the dim field of \$y_ndarray.";
+      die "The dimensions of \$x_ndarray must be the same as the dimensions of \$y_ndarray.";
     }
     
     my $length = $x_ndarray->length;
@@ -515,7 +515,7 @@ class R::OP::Long {
     my $equals_dim = R::OP->equals_dim($x_ndarray, $y_ndarray);
     
     unless ($equals_dim) {
-      die "The dim field of \$x_ndarray must be the same as the dim field of \$y_ndarray.";
+      die "The dimensions of \$x_ndarray must be the same as the dimensions of \$y_ndarray.";
     }
     
     my $length = $x_ndarray->length;
@@ -548,7 +548,7 @@ class R::OP::Long {
     my $equals_dim = R::OP->equals_dim($x_ndarray, $y_ndarray);
     
     unless ($equals_dim) {
-      die "The dim field of \$x_ndarray must be the same as the dim field of \$y_ndarray.";
+      die "The dimensions of \$x_ndarray must be the same as the dimensions of \$y_ndarray.";
     }
     
     my $length = $x_ndarray->length;
@@ -581,7 +581,7 @@ class R::OP::Long {
     my $equals_dim = R::OP->equals_dim($x_ndarray, $y_ndarray);
     
     unless ($equals_dim) {
-      die "The dim field of \$x_ndarray must be the same as the dim field of \$y_ndarray.";
+      die "The dimensions of \$x_ndarray must be the same as the dimensions of \$y_ndarray.";
     }
     
     my $length = $x_ndarray->length;
@@ -614,7 +614,7 @@ class R::OP::Long {
     my $equals_dim = R::OP->equals_dim($x_ndarray, $y_ndarray);
     
     unless ($equals_dim) {
-      die "The dim field of \$x_ndarray must be the same as the dim field of \$y_ndarray.";
+      die "The dimensions of \$x_ndarray must be the same as the dimensions of \$y_ndarray.";
     }
     
     my $length = $x_ndarray->length;

@@ -10,7 +10,7 @@ SPVM::R::Util - Utilities for N-Dimensional Array
 
 =head1 Description
 
-The R::Util class in L<SPVM> has utility methods for n-dimensional array.
+R::Util class in L<SPVM> has utility methods for n-dimensional array.
 
 =head1 Usage
 

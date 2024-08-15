@@ -40,7 +40,7 @@ class R::NDArray::Time::Piece extends R::NDArray {
     my $elem = $data->[$data_index];
     
     unless ($elem) {
-      return "undef";
+      return undef;
     }
     
     my $string = $elem->strftime("%Y-%m-%d %H:%M:%S");
@@ -65,22 +65,26 @@ class R::NDArray::Time::Piece extends R::NDArray {
     }
   }
   
-  method elem_cmp : int ($data : Time::Piece[], $a_data_index : int, $b_data_index : int) {
+  method elem_cmp : int ($a_data : Time::Piece[], $a_data_index : int, $b_data : Time::Piece[], $b_data_index : int) {
     
-    my $a_elem = $data->[$a_data_index];
+    my $a_elem = $a_data->[$a_data_index];
     
-    my $a_epoch = Fn->LONG_MIN;
-    if ($a_elem) {
-      $a_epoch = $a_elem->epoch;
+    my $b_elem = $b_data->[$b_data_index];
+    
+    my $cmp = 0;
+    if ($a_elem && $b_elem) {
+      my $a_epoch = $a_elem->epoch;
+      
+      my $b_epoch = $b_elem->epoch;
+      
+      $cmp = $a_epoch <=> $b_epoch;
     }
-    
-    my $b_elem = $data->[$b_data_index];
-    my $b_epoch = Fn->LONG_MIN;
-    if ($b_elem) {
-      $b_epoch = $b_elem->epoch;
+    elsif ($a_elem) {
+      $cmp = 1;
     }
-    
-    my $cmp = $a_epoch <=> $b_epoch;
+    elsif ($b_elem) {
+      $cmp = -1;
+    }
     
     return $cmp;
   }

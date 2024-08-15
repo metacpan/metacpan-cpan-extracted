@@ -4,7 +4,7 @@
       "Paul Evans <leonerd@leonerd.org.uk>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.4231",
+   "generated_by" : "Module::Build version 0.4234",
    "license" : [
       "perl_5"
    ],
@@ -23,23 +23,24 @@
          "requires" : {
             "IO::Handle::Packable" : "0",
             "List::Util" : "1.33",
-            "Object::Pad" : "0.64",
-            "Object::Pad::ClassAttr::Struct" : "0",
+            "Object::Pad" : "0.800",
+            "Object::Pad::ClassAttr::Struct" : "0.04",
             "PerlIO::gzip" : "0",
+            "Sublike::Extended" : "0",
             "Syntax::Keyword::Match" : "0",
             "perl" : "5.026"
          }
       },
       "test" : {
          "requires" : {
-            "Test::More" : "0.88"
+            "Test2::V0" : "0"
          }
       }
    },
    "provides" : {
       "Font::PCF" : {
          "file" : "lib/Font/PCF.pm",
-         "version" : "0.03"
+         "version" : "0.04"
       }
    },
    "release_status" : "stable",
@@ -48,6 +49,6 @@
          "http://dev.perl.org/licenses/"
       ]
    },
-   "version" : "0.03",
-   "x_serialization_backend" : "JSON::PP version 4.06"
+   "version" : "0.04",
+   "x_serialization_backend" : "JSON::PP version 4.16"
 }

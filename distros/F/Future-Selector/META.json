@@ -24,6 +24,7 @@
             "Future::AsyncAwait" : "0",
             "Object::Pad" : "0.800",
             "Scalar::Util" : "0",
+            "Sublike::Extended" : "0",
             "perl" : "5.026"
          }
       },
@@ -36,7 +37,7 @@
    "provides" : {
       "Future::Selector" : {
          "file" : "lib/Future/Selector.pm",
-         "version" : "0.03"
+         "version" : "0.04"
       }
    },
    "release_status" : "stable",
@@ -45,6 +46,6 @@
          "http://dev.perl.org/licenses/"
       ]
    },
-   "version" : "0.03",
-   "x_serialization_backend" : "JSON::PP version 4.07"
+   "version" : "0.04",
+   "x_serialization_backend" : "JSON::PP version 4.16"
 }

@@ -1,5 +1,13 @@
 Revision history for App-Device-Chip-sensor
 
+0.07    2024-08-14
+        [CHANGES]
+         * Updated for Object::Pad v0.805
+         * Swap unit tests from Test::More & friends to Test2::V0
+         * Support more generic filtering - midN for any N; recursive average
+         * More unit name conversions to keep Prometheus happy
+         * Use named parameter support of Sublike::Extended
+
 0.06    2022-12-18
         [CHANGES]
          * Use Object::Pad v0.76 to avoid needing to enable

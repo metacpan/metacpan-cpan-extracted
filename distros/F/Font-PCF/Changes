@@ -1,5 +1,11 @@
 Revision history for Font-PCF
 
+0.04    2024-08-14
+        [CHANGES]
+         * Updated for Object::Pad v0.800
+         * Swap unit tests from Test::More to Test2::V0
+         * Use named parameter support of Sublike::Extended
+
 0.03    2022-04-21
         [CHANGES]
          * More details on printed output of examples/show-glyph

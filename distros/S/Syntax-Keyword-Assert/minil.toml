@@ -1,0 +1,13 @@
+name = "Syntax-Keyword-Assert"
+badges = ["github-actions/test.yml", "coveralls", "metacpan"]
+authority="cpan:KFLY"
+
+module_maker="ModuleBuild"
+static_install = "auto"
+markdown_maker = "Pod::Markdown::Github"
+
+[build]
+build_class = "builder::MyBuilder"
+
+[release]
+branch='main'

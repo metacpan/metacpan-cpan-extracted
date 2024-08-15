@@ -161,7 +161,7 @@ class TestCase::R::NDArray::Float {
     
     my $b_data_index = 1;
     
-    my $ret_cmp = $ndarray->elem_cmp($data, $a_data_index, $b_data_index);
+    my $ret_cmp = $ndarray->elem_cmp($data, $a_data_index, $data, $b_data_index);
     
     unless ($ret_cmp == ($data->[$a_data_index] <=> $data->[$b_data_index])) {
       return 0;

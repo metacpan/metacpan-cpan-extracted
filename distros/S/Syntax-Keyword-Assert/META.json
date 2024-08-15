@@ -1,0 +1,79 @@
+{
+   "abstract" : "assert keyword for Perl",
+   "author" : [
+      "kobaken <kentafly88@gmail.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v3.1.25",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Syntax-Keyword-Assert",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.4005",
+            "XS::Parse::Keyword::Builder" : "0.36"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion::Fast" : "0.04",
+            "Test::PAUSE::Permissions" : "0.07",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Devel::StrictMode" : "0.003",
+            "XS::Parse::Keyword" : "0.36",
+            "perl" : "5.016000"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test2::V0" : "0.000147"
+         }
+      }
+   },
+   "provides" : {
+      "Syntax::Keyword::Assert" : {
+         "file" : "lib/Syntax/Keyword/Assert.pm",
+         "version" : "0.10"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/kfly8/Syntax-Keyword-Assert/issues"
+      },
+      "homepage" : "https://github.com/kfly8/Syntax-Keyword-Assert",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/kfly8/Syntax-Keyword-Assert.git",
+         "web" : "https://github.com/kfly8/Syntax-Keyword-Assert"
+      }
+   },
+   "version" : "0.10",
+   "x_authority" : "cpan:KFLY",
+   "x_serialization_backend" : "JSON::PP version 4.16",
+   "x_static_install" : 0
+}

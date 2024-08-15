@@ -1,3 +1,26 @@
+0.022 2024-08-13
+  [Document Improvement]
+    * Add docs for R::OP::Byte class.
+    * Add docs for R::OP::Short class.
+    * Add docs for R::OP::Int class.
+    * Add docs for R::OP::Long class.
+    * Add docs for R::OP::Double class.
+    * Add docs for R::OP::Float class.
+    * Add docs for R::OP::DoubleComplex class.
+    * Add docs for R::OP::FloatComplex class.
+    * Add docs for R::OP::AnyObject class.
+    * Add docs for R::OP::String class.
+    * Add docs for R::OP::StringBuffer class.
+    * Add docs for R::OP::Time::Piece class.
+  [Incompatible Changes]
+    * If concatnation C<.> operation throw an exceptions R::OP::String#concat method, the element is set to C<undef>.
+    * elem_to_string method in R::OP::String, R::OP::StringBuffer, R::OP::TimePiece, R::OP::AnyObject returns undef instead of "undef" if the input data is undef.
+    * Improve R::NDArray::Time::Piece#elem_cmp logic. LONG_MIN is not used.
+    * Change an argument of R::NDArray#elem_cmp method and the same methods inf its child classes.
+      [Before]
+      method elem_cmp : int ($data : object, $a_data_index : int, $b_data_index : int);
+      [After]
+      method elem_cmp : int ($a_data : object, $a_data_index : int, $b_data : object, $b_data_index : int);
 0.021 2024-08-12
   [Test Improvement]
     * Add tests for R::DataFrame.

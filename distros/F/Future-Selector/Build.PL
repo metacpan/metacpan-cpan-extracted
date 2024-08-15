@@ -10,6 +10,7 @@ my $build = Module::Build->new(
       'perl' => '5.026',
       'Future::AsyncAwait' => 0,
       'Object::Pad' => '0.800',
+      'Sublike::Extended' => 0,
 
       'Scalar::Util' => 0,
    },

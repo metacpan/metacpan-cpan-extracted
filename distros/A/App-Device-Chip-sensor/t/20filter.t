@@ -3,13 +3,13 @@
 use v5.26;
 use warnings;
 
-use Test::More;
+use Test2::V0;
 
 use Future::AsyncAwait 0.47;
 use Future::IO;
-use Object::Pad 0.19;
+use Object::Pad 0.800;
 
-my $run_count;
+my @sensor_values;
 my $run_f;
 my @saw_values;
 
@@ -26,7 +26,7 @@ class TestApp :isa(App::Device::Chip::sensor)
    {
       push @saw_values, @$values;
 
-      --$run_count or $run_f->cancel;
+      @sensor_values or $run_f->cancel;
    }
 }
 
@@ -38,6 +38,7 @@ class Device::Chip::Adapter::TestAdapter :does(Device::Chip::Adapter)
 }
 $INC{"Device/Chip/Adapter/TestAdapter.pm"} = __FILE__;
 
+
 class Device::Chip::TestChip :isa(Device::Chip)
 {
    use Device::Chip::Sensor -declare;
@@ -48,27 +49,56 @@ class Device::Chip::TestChip :isa(Device::Chip)
    declare_sensor asensor =>
       units => "";
 
-   has $value = 0;
+   field $value = 0;
 
    async method read_asensor
    {
       await Test::Future::Deferred->done_later;
-      return ( $value += 100 );
+      return shift @sensor_values;
    }
 }
 $INC{"Device/Chip/TestChip.pm"} = __FILE__;
 
-my $app = TestApp->new;
-$app->parse_argv( [ "-A", "TestAdapter", "--mid3", "TestChip" ] );
-
+# mid3
 {
-   $run_count = 3;
+   my $app = TestApp->new;
+   $app->parse_argv( [ "-A", "TestAdapter", "--mid3", "TestChip" ] );
+
+   @sensor_values = ( 100, 200, 300, 400, 200 );
    @saw_values = ();
 
    $run_f = $app->run;
    $run_f->failure and $run_f->get;
 
-   is_deeply( \@saw_values, [ 100, 200, 200 ], 'mid3 filtering' );
+   is( \@saw_values, [ 100, 200, 200, 300, 300 ], 'mid3 filtering' );
+}
+
+# mid5
+{
+   my $app = TestApp->new;
+   $app->parse_argv( [ "-A", "TestAdapter", "-F", "mid5", "TestChip" ] );
+
+   @sensor_values = ( 100, 200, 300, 400, 500, 600, 700 );
+   @saw_values = ();
+
+   $run_f = $app->run;
+   $run_f->failure and $run_f->get;
+
+   is( \@saw_values, [ 100, 200, 300, 400, 300, 400, 500 ], 'mid5 filtering' );
+}
+
+# ravg2
+{
+   my $app = TestApp->new;
+   $app->parse_argv( [ "-A", "TestAdapter", "-F", "ravg2", "TestChip" ] );
+
+   @sensor_values = ( 100, 200, 200, 200 );
+   @saw_values = ();
+
+   $run_f = $app->run;
+   $run_f->failure and $run_f->get;
+
+   is( \@saw_values, [ 100, 125, 143.75, 157.8125 ], 'ravg2 filtering' );
 }
 
 done_testing;

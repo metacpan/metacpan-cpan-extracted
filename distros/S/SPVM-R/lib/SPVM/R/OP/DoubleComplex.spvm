@@ -31,7 +31,7 @@ class R::OP::DoubleComplex {
         my $pairs_length = @$pairs;
         
         unless ($pairs_length % 2 == 0) {
-          die "The pairs \$data must be devided by even number.";
+          die "The length of pairs \$data must be an even number if the type of \$data is double[].";
         }
         
         my $length = $pairs_length / 2;
@@ -50,7 +50,7 @@ class R::OP::DoubleComplex {
         $data = $data->(R::NDArray::DoubleComplex)->data;
       }
       else {
-        die "The type of the data \data must be Complex_2d[] or R::NDArray::DoubleComplex.";
+        die "The type of the data \$data must be double[], Complex_2d[] or R::NDArray::DoubleComplex.";
       }
     }
     
@@ -72,7 +72,7 @@ class R::OP::DoubleComplex {
     my $equals_dim = R::OP->equals_dim($x_ndarray, $y_ndarray);
     
     unless ($equals_dim) {
-      die "The dim field of \$x_ndarray must be the same as the dim field of \$y_ndarray.";
+      die "The dimensions of \$x_ndarray must be the same as the dimensions of \$y_ndarray.";
     }
     
     my $length = $x_ndarray->length;
@@ -105,7 +105,7 @@ class R::OP::DoubleComplex {
     my $equals_dim = R::OP->equals_dim($x_ndarray, $y_ndarray);
     
     unless ($equals_dim) {
-      die "The dim field of \$x_ndarray must be the same as the dim field of \$y_ndarray.";
+      die "The dimensions of \$x_ndarray must be the same as the dimensions of \$y_ndarray.";
     }
     
     my $length = $x_ndarray->length;
@@ -138,7 +138,7 @@ class R::OP::DoubleComplex {
     my $equals_dim = R::OP->equals_dim($x_ndarray, $y_ndarray);
     
     unless ($equals_dim) {
-      die "The dim field of \$x_ndarray must be the same as the dim field of \$y_ndarray.";
+      die "The dimensions of \$x_ndarray must be the same as the dimensions of \$y_ndarray.";
     }
     
     my $length = $x_ndarray->length;
@@ -203,7 +203,7 @@ class R::OP::DoubleComplex {
     my $equals_dim = R::OP->equals_dim($x_ndarray, $y_ndarray);
     
     unless ($equals_dim) {
-      die "The dim field of \$x_ndarray must be the same as the dim field of \$y_ndarray.";
+      die "The dimensions of \$x_ndarray must be the same as the dimensions of \$y_ndarray.";
     }
     
     my $length = $x_ndarray->length;
@@ -410,7 +410,7 @@ class R::OP::DoubleComplex {
     my $equals_dim = R::OP->equals_dim($x_ndarray, $y_ndarray);
     
     unless ($equals_dim) {
-      die "The dim field of \$x_ndarray must be the same as the dim field of \$y_ndarray.";
+      die "The dimensions of \$x_ndarray must be the same as the dimensions of \$y_ndarray.";
     }
     
     my $length = $x_ndarray->length;
@@ -443,7 +443,7 @@ class R::OP::DoubleComplex {
     my $equals_dim = R::OP->equals_dim($x_ndarray, $y_ndarray);
     
     unless ($equals_dim) {
-      die "The dim field of \$x_ndarray must be the same as the dim field of \$y_ndarray.";
+      die "The dimensions of \$x_ndarray must be the same as the dimensions of \$y_ndarray.";
     }
     
     my $length = $x_ndarray->length;
@@ -814,7 +814,7 @@ class R::OP::DoubleComplex {
     my $equals_dim = R::OP->equals_dim($x_ndarray, $y_ndarray);
     
     unless ($equals_dim) {
-      die "The dim field of \$x_ndarray must be the same as the dim field of \$y_ndarray.";
+      die "The dimensions of \$x_ndarray must be the same as the dimensions of \$y_ndarray.";
     }
     
     my $length = $x_ndarray->length;

@@ -41,6 +41,8 @@ Same as L<R::NDArray#data|SPVM::R::NDArray/"data"> method, but the return type i
 
 =head1 Class Methods
 
+=head2 new
+
 C<static method new : L<R::NDArray::StringBuffer|SPVM::R::NDArray::StringBuffer> ($options : object[] = undef);>
 
 Creates a new L<R::NDArray::StringBuffer|SPVM::R::NDArray::StringBuffer> and returns it.
@@ -75,9 +77,9 @@ Copies the element $src_data at index $src_data_indext to the element $dist_data
 
 =head2 elem_cmp
 
-C<method elem_cmp : int ($data : StringBuffer[], $a_data_index : int, $b_data_index : int);>
+C<method elem_cmp : int ($a_data : StringBuffer[], $a_data_index : int, $b_data : StringBuffer[], $b_data_index : int);>
 
-Compares the element $data at index $a_data_index and the element $data at index $b_data_index and returns the result.
+Compares the element $a_data at index $a_data_index and the element $b_data at index $b_data_index and returns the result.
 
 =head2 elem_is_na
 

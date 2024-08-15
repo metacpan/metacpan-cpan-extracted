@@ -94,16 +94,28 @@ class TestCase::R::NDArray::String {
   
   static method elem_to_string : int () {
     
-    my $ndarray = R::NDArray::String->new;
-    
-    my $data = [(string)1, 2];
-    
-    my $data_index = 1;
-    
-    my $string = $ndarray->elem_to_string($data, $data_index);
-    
-    unless ($string eq (string)$data->[$data_index]) {
-      return 0;
+    {
+      my $ndarray = R::NDArray::String->new;
+      
+      my $data = [(string)1, 2, undef];
+      
+      {
+        my $data_index = 1;
+        my $string = $ndarray->elem_to_string($data, $data_index);
+        
+        unless ($string eq (string)$data->[$data_index]) {
+          return 0;
+        }
+      }
+      
+      {
+        my $data_index = 2;
+        my $string = $ndarray->elem_to_string($data, $data_index);
+        
+        unless ($string eq (string)undef) {
+          return 0;
+        }
+      }
     }
     
     return 1;
@@ -165,7 +177,7 @@ class TestCase::R::NDArray::String {
     
     my $b_data_index = 1;
     
-    my $ret_cmp = $ndarray->elem_cmp($data, $a_data_index, $b_data_index);
+    my $ret_cmp = $ndarray->elem_cmp($data, $a_data_index, $data, $b_data_index);
     
     unless ($ret_cmp == ($data->[$a_data_index] cmp $data->[$b_data_index])) {
       return 0;

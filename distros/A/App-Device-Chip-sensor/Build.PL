@@ -1,5 +1,6 @@
 #!/usr/bin/perl
 
+use v5;
 use strict;
 use warnings;
 
@@ -12,7 +13,8 @@ my $build = Module::Build->new(
       'Feature::Compat::Defer' => 0,
       'Feature::Compat::Try' => 0,
       'Future::AsyncAwait' => 0,
-      'Object::Pad' => '0.76',
+      'Object::Pad' => '0.805',
+      'Sublike::Extended' => 0,
 
       'Device::Chip::Adapter' => 0,
       'Device::Chip::Sensor' => '0.19',
@@ -21,8 +23,7 @@ my $build = Module::Build->new(
       'List::Util' => '1.29',
    },
    test_requires => {
-      'Test::More' => '0.88', # done_testing
-      'Test::Deep' => 0,
+      'Test2::V0' => 0,
       'Test::Future::Deferred' => 0,
    },
    configure_requires => {

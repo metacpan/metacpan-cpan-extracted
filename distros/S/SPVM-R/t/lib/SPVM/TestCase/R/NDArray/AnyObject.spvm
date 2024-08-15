@@ -3,7 +3,7 @@ class TestCase::R::NDArray::AnyObject {
   use R::NDArray::AnyObject;
   use R::OP::Int as IOP;
   
-  use R::OP::AnyObject as BUFOP;
+  use R::OP::AnyObject as AOP;
   
   use Point;
   
@@ -104,7 +104,38 @@ class TestCase::R::NDArray::AnyObject {
     return 1;
   }
   
-  static method elem_to_string : int () { return 1; }
+  static method elem_to_string : int () {
+    
+    {
+      my $ndarray = R::NDArray::AnyObject->new;
+      
+      my $data = AOP->c([(object)Point->new(1, 1), Point->new(2, 2)])->data;
+      
+      my $data_index = 1;
+      
+      my $string = $ndarray->elem_to_string($data, $data_index);
+      
+      unless ($string eq Point->new(2, 2)->to_string) {
+        return 0;
+      }
+    }
+    
+    {
+      my $ndarray = R::NDArray::AnyObject->new;
+      
+      my $data = AOP->c([(object)undef])->data;
+      
+      my $data_index = 0;
+      
+      my $string = $ndarray->elem_to_string($data, $data_index);
+      
+      unless ($string eq (string)undef) {
+        return 0;
+      }
+    }
+    
+    return 1;
+  }
   
   static method elem_assign : int () { return 1; }
   

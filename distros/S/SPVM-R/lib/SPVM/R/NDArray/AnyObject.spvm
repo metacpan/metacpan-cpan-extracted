@@ -40,7 +40,9 @@ class R::NDArray::AnyObject extends R::NDArray {
     
     my $elem = $data->[$data_index];
     
-    my $string = $elem->(Stringable)->to_string;
+    my $string = (string)undef;
+    
+    eval { $string = $elem->(Stringable)->to_string; }
     
     return $string;
   }

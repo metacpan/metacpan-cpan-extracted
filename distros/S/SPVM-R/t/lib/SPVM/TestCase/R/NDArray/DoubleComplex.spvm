@@ -213,7 +213,7 @@ class TestCase::R::NDArray::DoubleComplex {
     
     my $b_data_index = 1;
     
-    eval { $ndarray->elem_cmp($data, $a_data_index, $b_data_index); }
+    eval { $ndarray->elem_cmp($data, $a_data_index, $data, $b_data_index); }
     
     unless ($@) {
       return 0;

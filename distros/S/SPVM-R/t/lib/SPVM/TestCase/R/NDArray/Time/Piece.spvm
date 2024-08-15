@@ -104,16 +104,32 @@ class TestCase::R::NDArray::Time::Piece {
   
   static method elem_to_string : int () {
     
-    my $ndarray = R::NDArray::Time::Piece->new;
+    {
+      my $ndarray = R::NDArray::Time::Piece->new;
+      
+      my $data = TPOP->c([(string)"2000-01-01", "2000-01-02"])->data;
+      
+      my $data_index = 1;
+      
+      my $string = $ndarray->elem_to_string($data, $data_index);
+      
+      unless ($string eq $data->[$data_index]->strftime("%Y-%m-%d %H:%M:%S")) {
+        return 0;
+      }
+    }
     
-    my $data = TPOP->c([(string)"2000-01-01", "2000-01-02"])->data;
-    
-    my $data_index = 1;
-    
-    my $string = $ndarray->elem_to_string($data, $data_index);
-    
-    unless ($string eq $data->[$data_index]->strftime("%Y-%m-%d %H:%M:%S")) {
-      return 0;
+    {
+      my $ndarray = R::NDArray::Time::Piece->new;
+      
+      my $data = TPOP->c([(string)undef])->data;
+      
+      my $data_index = 0;
+      
+      my $string = $ndarray->elem_to_string($data, $data_index);
+      
+      unless ($string eq (string)undef) {
+        return 0;
+      }
     }
     
     return 1;
@@ -167,18 +183,68 @@ class TestCase::R::NDArray::Time::Piece {
   
   static method elem_cmp : int () {
     
-    my $ndarray = R::NDArray::Time::Piece->new;
+    {
+      my $ndarray = R::NDArray::Time::Piece->new;
+      
+      my $data = TPOP->c([(string)"2000-01-01", "2000-01-02"])->data;
+      
+      my $a_data_index = 0;
+      
+      my $b_data_index = 1;
+      
+      my $ret_cmp = $ndarray->elem_cmp($data, $a_data_index, $data, $b_data_index);
+      
+      unless ($ret_cmp == ($data->[$a_data_index]->epoch <=> $data->[$b_data_index]->epoch)) {
+        return 0;
+      }
+    }
     
-    my $data = TPOP->c([(string)"2000-01-01", "2000-01-02"])->data;
+    {
+      my $ndarray = R::NDArray::Time::Piece->new;
+      
+      my $x_data = TPOP->c([(string)"2000-01-01"])->data;
+      
+      my $y_data = TPOP->c([(string)undef])->data;
+      
+      my $data_index = 0;
+      
+      my $ret_cmp = $ndarray->elem_cmp($x_data, $data_index, $y_data, $data_index);
+      
+      unless ($ret_cmp == 1) {
+        return 0;
+      }
+    }
     
-    my $a_data_index = 0;
+    {
+      my $ndarray = R::NDArray::Time::Piece->new;
+      
+      my $x_data = TPOP->c([(string)undef])->data;
+      
+      my $y_data = TPOP->c([(string)"2000-01-01"])->data;
+      
+      my $data_index = 0;
+      
+      my $ret_cmp = $ndarray->elem_cmp($x_data, $data_index, $y_data, $data_index);
+      
+      unless ($ret_cmp == -1) {
+        return 0;
+      }
+    }
     
-    my $b_data_index = 1;
-    
-    my $ret_cmp = $ndarray->elem_cmp($data, $a_data_index, $b_data_index);
-    
-    unless ($ret_cmp == ($data->[$a_data_index]->epoch <=> $data->[$b_data_index]->epoch)) {
-      return 0;
+    {
+      my $ndarray = R::NDArray::Time::Piece->new;
+      
+      my $x_data = TPOP->c([(string)undef])->data;
+      
+      my $y_data = TPOP->c([(string)undef])->data;
+      
+      my $data_index = 0;
+      
+      my $ret_cmp = $ndarray->elem_cmp($x_data, $data_index, $y_data, $data_index);
+      
+      unless ($ret_cmp == 0) {
+        return 0;
+      }
     }
     
     return 1;

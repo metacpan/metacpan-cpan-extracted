@@ -10,7 +10,7 @@ SPVM::R::OP - N-Dimensional Array Operations
 
 =head1 Description
 
-The R::OP class in L<SPVM> has methods for operations for L<R::NDArray|SPVM::R::NDArray>.
+R::OP class in L<SPVM> has methods for operations for L<R::NDArray|SPVM::R::NDArray>.
 
 =head1 Usage
 

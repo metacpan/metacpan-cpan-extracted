@@ -4,7 +4,7 @@ use 5.006;
 use strict;
 use warnings;
 
-our $VERSION = '0.02';
+our $VERSION = '0.04';
 
 require XSLoader;
 XSLoader::load('Number::Iterator::XS', $VERSION);
@@ -19,10 +19,11 @@ Number::Iterator::XS - iterate numbers faster
 
 =head1 VERSION
 
-Version 0.02
+Version 0.04
+
+=cut
 
 =head1 SYNOPSIS
-
  
         use Number::Iterator::XS;
  
@@ -32,16 +33,14 @@ Version 0.02
  
         $iter--;
  
-        $iter->iterate;
- 
-        $iter->deiterate;
- 
-        $iter->value;
- 
-        $iter->interval;
- 
-...
- 
+        print "$iter";
+
+=head1 METHODS
+
+=head2 new
+
+Instantiate a new Number::Iterator object. 
+
         my $iter = Number::Iterator::XS->new(
                 interval => 50,
                 iterate => sub {
@@ -54,6 +53,25 @@ Version 0.02
                 }
         );
 
+=head2 iterate
+
+	$iter++;
+	$iter->iterate;
+
+=head2 deiterate
+
+	$iter--;
+	$iter->deiterate;
+
+=head2 value
+
+	"$iter";
+	$iter->value;
+
+=head2 interval
+
+	$iter->interval;
+	$iter->interval(50);
 
 =head1 BENCHMARK
 

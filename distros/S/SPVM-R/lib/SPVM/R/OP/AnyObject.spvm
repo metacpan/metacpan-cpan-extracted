@@ -20,15 +20,7 @@ class R::OP::AnyObject {
         $data = $data->(R::NDArray::AnyObject)->data;
       }
       else {
-        my $is_type_ok = $data is_type object[];
-        my $isa_ok = $data isa object[];
-        
-        warn $is_type_ok;
-        warn $isa_ok;
-        
-        warn type_name $data;
-        
-        die "The type of the data \data must be an object array or R::NDArray::AnyObject.";
+        die "The type of the data \$data must be an object array or R::NDArray::AnyObject.";
       }
     }
     

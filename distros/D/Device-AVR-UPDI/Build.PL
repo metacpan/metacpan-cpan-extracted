@@ -11,8 +11,9 @@ my $build = Module::Build->new(
    requires => {
       'perl' => '5.026',
       'Future::AsyncAwait' => 0,
-      'Object::Pad' => '0.800',
+      'Object::Pad' => '0.807',
       'Object::Pad::ClassAttr::Struct' => '0.04',
+      'Sublike::Extended' => 0,
 
       'Commandable' => '0.08',
       'File::ShareDir' => 0,

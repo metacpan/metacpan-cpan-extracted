@@ -38,7 +38,7 @@ class R::OP::Time::Piece {
         $data = $data->(R::NDArray::String)->to_time_piece_ndarray->data;
       }
       else {
-        die "The type of the data \data must be Time::Piece, Time::Piece[], or R::NDArray::Time::Piece.";
+        die "The type of the data \$data must be Time::Piece, Time::Piece[], R::NDArray::Time::Piece, string, string[], or R::NDArray::String.";
       }
     }
     
@@ -60,7 +60,7 @@ class R::OP::Time::Piece {
     my $equals_dim = R::OP->equals_dim($x_ndarray, $y_ndarray);
     
     unless ($equals_dim) {
-      die "The dim field of \$x_ndarray must be the same as the dim field of \$y_ndarray.";
+      die "The dimensions of \$x_ndarray must be the same as the dimensions of \$y_ndarray.";
     }
     
     my $length = $x_ndarray->length;
@@ -74,17 +74,8 @@ class R::OP::Time::Piece {
     my $y_data = $y_ndarray->data;
     
     for (my $i = 0; $i < $length; $i++) {
-      my $x_elem_epoch = (long)Fn->LONG_MIN;
-      if ($x_data->[$i]) {
-        $x_elem_epoch = $x_data->[$i]->epoch;
-      }
-      
-      my $y_elem_epoch = (long)Fn->LONG_MIN;
-      if ($y_data->[$i]) {
-        $y_elem_epoch = $y_data->[$i]->epoch;
-      }
-      
-      $ret_data->[$i] = $x_elem_epoch == $y_elem_epoch;
+      my $cmp = $x_ndarray->elem_cmp($x_data, $i, $y_data, $i);
+      $ret_data->[$i] = $cmp == 0;
     }
     
     return $ret_ndarray;
@@ -103,7 +94,7 @@ class R::OP::Time::Piece {
     my $equals_dim = R::OP->equals_dim($x_ndarray, $y_ndarray);
     
     unless ($equals_dim) {
-      die "The dim field of \$x_ndarray must be the same as the dim field of \$y_ndarray.";
+      die "The dimensions of \$x_ndarray must be the same as the dimensions of \$y_ndarray.";
     }
     
     my $length = $x_ndarray->length;
@@ -117,17 +108,8 @@ class R::OP::Time::Piece {
     my $y_data = $y_ndarray->data;
     
     for (my $i = 0; $i < $length; $i++) {
-      my $x_elem_epoch = (long)Fn->LONG_MIN;
-      if ($x_data->[$i]) {
-        $x_elem_epoch = $x_data->[$i]->epoch;
-      }
-      
-      my $y_elem_epoch = (long)Fn->LONG_MIN;
-      if ($y_data->[$i]) {
-        $y_elem_epoch = $y_data->[$i]->epoch;
-      }
-      
-      $ret_data->[$i] = $x_elem_epoch != $y_elem_epoch;
+      my $cmp = $x_ndarray->elem_cmp($x_data, $i, $y_data, $i);
+      $ret_data->[$i] = $cmp != 0;
     }
     
     return $ret_ndarray;
@@ -146,7 +128,7 @@ class R::OP::Time::Piece {
     my $equals_dim = R::OP->equals_dim($x_ndarray, $y_ndarray);
     
     unless ($equals_dim) {
-      die "The dim field of \$x_ndarray must be the same as the dim field of \$y_ndarray.";
+      die "The dimensions of \$x_ndarray must be the same as the dimensions of \$y_ndarray.";
     }
     
     my $length = $x_ndarray->length;
@@ -160,17 +142,8 @@ class R::OP::Time::Piece {
     my $y_data = $y_ndarray->data;
     
     for (my $i = 0; $i < $length; $i++) {
-      my $x_elem_epoch = (long)Fn->LONG_MIN;
-      if ($x_data->[$i]) {
-        $x_elem_epoch = $x_data->[$i]->epoch;
-      }
-      
-      my $y_elem_epoch = (long)Fn->LONG_MIN;
-      if ($y_data->[$i]) {
-        $y_elem_epoch = $y_data->[$i]->epoch;
-      }
-      
-      $ret_data->[$i] = $x_elem_epoch > $y_elem_epoch;
+      my $cmp = $x_ndarray->elem_cmp($x_data, $i, $y_data, $i);
+      $ret_data->[$i] = $cmp > 0;
     }
     
     return $ret_ndarray;
@@ -189,7 +162,7 @@ class R::OP::Time::Piece {
     my $equals_dim = R::OP->equals_dim($x_ndarray, $y_ndarray);
     
     unless ($equals_dim) {
-      die "The dim field of \$x_ndarray must be the same as the dim field of \$y_ndarray.";
+      die "The dimensions of \$x_ndarray must be the same as the dimensions of \$y_ndarray.";
     }
     
     my $length = $x_ndarray->length;
@@ -203,17 +176,8 @@ class R::OP::Time::Piece {
     my $y_data = $y_ndarray->data;
     
     for (my $i = 0; $i < $length; $i++) {
-      my $x_elem_epoch = (long)Fn->LONG_MIN;
-      if ($x_data->[$i]) {
-        $x_elem_epoch = $x_data->[$i]->epoch;
-      }
-      
-      my $y_elem_epoch = (long)Fn->LONG_MIN;
-      if ($y_data->[$i]) {
-        $y_elem_epoch = $y_data->[$i]->epoch;
-      }
-      
-      $ret_data->[$i] = $x_elem_epoch >= $y_elem_epoch;
+      my $cmp = $x_ndarray->elem_cmp($x_data, $i, $y_data, $i);
+      $ret_data->[$i] = $cmp >= 0;
     }
     
     return $ret_ndarray;
@@ -232,7 +196,7 @@ class R::OP::Time::Piece {
     my $equals_dim = R::OP->equals_dim($x_ndarray, $y_ndarray);
     
     unless ($equals_dim) {
-      die "The dim field of \$x_ndarray must be the same as the dim field of \$y_ndarray.";
+      die "The dimensions of \$x_ndarray must be the same as the dimensions of \$y_ndarray.";
     }
     
     my $length = $x_ndarray->length;
@@ -246,17 +210,8 @@ class R::OP::Time::Piece {
     my $y_data = $y_ndarray->data;
     
     for (my $i = 0; $i < $length; $i++) {
-      my $x_elem_epoch = (long)Fn->LONG_MIN;
-      if ($x_data->[$i]) {
-        $x_elem_epoch = $x_data->[$i]->epoch;
-      }
-      
-      my $y_elem_epoch = (long)Fn->LONG_MIN;
-      if ($y_data->[$i]) {
-        $y_elem_epoch = $y_data->[$i]->epoch;
-      }
-      
-      $ret_data->[$i] = $x_elem_epoch < $y_elem_epoch;
+      my $cmp = $x_ndarray->elem_cmp($x_data, $i, $y_data, $i);
+      $ret_data->[$i] = $cmp < 0;
     }
     
     return $ret_ndarray;
@@ -275,7 +230,7 @@ class R::OP::Time::Piece {
     my $equals_dim = R::OP->equals_dim($x_ndarray, $y_ndarray);
     
     unless ($equals_dim) {
-      die "The dim field of \$x_ndarray must be the same as the dim field of \$y_ndarray.";
+      die "The dimensions of \$x_ndarray must be the same as the dimensions of \$y_ndarray.";
     }
     
     my $length = $x_ndarray->length;
@@ -289,17 +244,8 @@ class R::OP::Time::Piece {
     my $y_data = $y_ndarray->data;
     
     for (my $i = 0; $i < $length; $i++) {
-      my $x_elem_epoch = (long)Fn->LONG_MIN;
-      if ($x_data->[$i]) {
-        $x_elem_epoch = $x_data->[$i]->epoch;
-      }
-      
-      my $y_elem_epoch = (long)Fn->LONG_MIN;
-      if ($y_data->[$i]) {
-        $y_elem_epoch = $y_data->[$i]->epoch;
-      }
-      
-      $ret_data->[$i] = $x_elem_epoch <= $y_elem_epoch;
+      my $cmp = $x_ndarray->elem_cmp($x_data, $i, $y_data, $i);
+      $ret_data->[$i] = $cmp <= 0;
     }
     
     return $ret_ndarray;

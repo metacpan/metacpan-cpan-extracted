@@ -241,7 +241,7 @@ class R::NDArray {
   
   method elem_clone : void ($dist_data : object, $dist_data_index : int, $src_data : object, $src_data_index : int) { die "Not impelmented."; }
   
-  method elem_cmp : int ($data : object, $a_data_index : int, $b_data_index : int) { die "Not implemented."; }
+  method elem_cmp : int ($a_data : object, $a_data_index : int, $b_data : object, $b_data_index : int) { die "Not implemented."; }
   
   method elem_is_na : int ($data : object, $data_index : int) { die "Not implemented."; }
   
@@ -384,7 +384,7 @@ class R::NDArray {
     my $equals_dropped_dim = R::Util->equals_dropped_dim($ndarray->dim, $ret_dim);
     
     unless ($equals_dropped_dim) {
-      die "The dim field of \$ndarray must be compatible with dim created by \$asix_indexes_product.";
+      die "The dimensions of \$ndarray must be compatible with dim created by \$asix_indexes_product.";
     }
     
     $self->slice_set_data($data_indexes, $ndarray->data);
@@ -408,6 +408,9 @@ class R::NDArray {
       for (my $i = 0; $i < $data_length; $i++) {
         $string_buffer->push("[$i]\t");
         my $elem_string = $self->elem_to_string($data, $i);
+        unless ($elem_string) {
+          $elem_string = "undef";
+        }
         $string_buffer->push($elem_string);
         
         unless ($i == $data_length - 1) {
@@ -440,6 +443,9 @@ class R::NDArray {
           my $data_index = &convert_coordinate_to_data_index($coordinate, $dim);
           
           my $elem_string = $self->elem_to_string($data, $data_index);
+          unless ($elem_string) {
+            $elem_string = "undef";
+          }
           
           $string_buffer->push($elem_string);
           
@@ -480,7 +486,7 @@ class R::NDArray {
     my $order_data_indexes = $order_data_indexes_ndarray->data;
     
     Sort->sort_int($order_data_indexes, [has that : R::NDArray = $self] method : int ($a_data_index : int, $b_data_index : int) {
-      return $self->{that}->elem_cmp($self->{that}->data, $a_data_index, $b_data_index);
+      return $self->{that}->elem_cmp($self->{that}->data, $a_data_index, $self->{that}->data, $b_data_index);
     });
     
     return $order_data_indexes_ndarray;
@@ -703,7 +709,11 @@ class R::NDArray {
             
             my $data_index = &convert_coordinate_to_data_index($coordinate, $dim);
             
-            $elem_strings_list->push($self->elem_to_string($data, $data_index));
+            my $elem_string = $self->elem_to_string($data, $data_index);
+            unless ($elem_string) {
+              $elem_string = "undef";
+            }
+            $elem_strings_list->push($elem_string);
           }
           
           $string_buffer->push(Fn->join("\t", $elem_strings_list->to_array) . "\n");

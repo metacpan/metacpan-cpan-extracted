@@ -54,12 +54,15 @@ COMMANDLINE OPTIONS
       Device::Chip::Adapter to construct the chip adapter used for
       communication with the actual chip hardware.
 
+      * --filter, -F STR
+
+      Specifies the kind of filtering to apply to gauge values. See
+      "FILTERING" for more detail.
+
       * --mid3, -m
 
       Enable "middle-of-3" filtering of gauge values, to reduce sensor
-      noise from unreliable sensors. At each round of readings, the most
-      recent three values from the sensor are sorted numerically and the
-      middle one is reported.
+      noise from unreliable sensors. This is equivalent to setting -F mid3.
 
       * --best-effort, -B
 
@@ -75,8 +78,8 @@ PROVIDED METHODS
 
  parse_argv
 
-       $app->parse_argv()
-       $app->parse_argv( \@argv )
+       $app->parse_argv();
+       $app->parse_argv( \@argv );
 
     Provides a list of commandline arguments for parsing, either from a
     given array reference or defaulting to the process @ARGV if not
@@ -104,7 +107,7 @@ PROVIDED METHODS
 
     mountopts => HASH
 
-      Optional hASH reference containing extra mount parameters.
+      Optional HASH reference containing extra mount parameters.
 
     config => HASH
 
@@ -119,7 +122,7 @@ PROVIDED METHODS
     instances, whose class names are taken from the remaining commandline
     arguments after the options are parsed.
 
- chips
+ sensors
 
        @sensors = await $app->sensors;
 
@@ -145,7 +148,7 @@ PROVIDED METHODS
 
  print_readings
 
-       $app->print_readings( $sensors, $values )
+       $app->print_readings( $sensors, $values );
 
     Prints the sensor names and current readings in a human-readable format
     to the currently-selected output handle (usually STDOUT).
@@ -209,7 +212,7 @@ OVERRIDABLE METHODS
 
  after_sensors
 
-       await $app->after_sensors( @sensors )
+       await $app->after_sensors( @sensors );
 
     This method is invoked once on startup by the "run" method, after it
     has configured the chip adapter and chips and obtained their individual
@@ -219,7 +222,7 @@ OVERRIDABLE METHODS
 
  on_sensor_ok
 
-       $app->on_sensor_ok( $sensor )
+       $app->on_sensor_ok( $sensor );
 
     This method is invoked in --best-effort mode after a successful reading
     from sensor; typically this is used to clear a failure state.
@@ -228,13 +231,31 @@ OVERRIDABLE METHODS
 
  on_sensor_fail
 
-       $app->on_sensor_fail( $sensor, $failure )
+       $app->on_sensor_fail( $sensor, $failure );
 
     This method is invoked in --best-effort mode after a failure of the
     given sensor. The caught exception is passed as $failure.
 
-    The defaullt implementation prints this as a warning using the core
+    The default implementation prints this as a warning using the core
     warn() function.
+
+FILTERING
+
+    The --filter setting accepts the following filter names
+
+ null
+
+    No filtering is applied. Each sensor reading is reported as it stands.
+
+ midn
+
+    The most recent n values are sorted, and the middle of these is
+    reported. To be well-behaved, n should be an odd number. (mid3, mid5,
+    mid7, etc...)
+
+ ravgn
+
+    Recursive average with weighting of 2 ** -n.
 
 AUTHOR
 

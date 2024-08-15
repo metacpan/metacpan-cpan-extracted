@@ -71,7 +71,7 @@ static OP *pp_keys(pTHX)
 		pk = POPs;
 		if (pk && SvOK(pk) && !hv_exists_ent(dedupe, pk, 0)) {
 			hv_store_ent(dedupe, sv_mortalcopy(pk), sv_mortalcopy(pv), 0);
-			av_push(keys, pk);
+			av_push(keys, newSVsv(pk));
 		}
 	}
 	SAVESPTR(dedupe);
@@ -109,29 +109,18 @@ static OP *pp_loop(pTHX)
 	dSP;
 	dPOPss;
 	int len, i, loop;
-	/* an LNATION hack to get all returned params - I don't know how to do this correctly :) */
-	/* create an empty array to store returned params */
 	AV *returned = newAV();
-	/* itterate while loop is true */
 	loop = 1;
 	while (loop) {
-		/* push the last returned item on the stack into the array */
-		/* last item is always the returned value from the black */
 		av_push(returned, sv_mortalcopy(sv));
-		/* check the next returned item from the stack */
 		sv = POPs; 
-		/* if it equals the last list item and the next item on the stack is not the last list */
-		/* item then this is the last itteration */
 		if ( sv_cmp(sv, PL_stack_base[list_length - 2]) == 0 && sv_cmp(TOPs, PL_stack_base[list_length - 2]) != 0 )  {
-			/* push the sv back onto the stack */
 			PUSHs(sv);
-			/* end the loop */
 			loop = 0;
 		}
 	}
 
 	len = av_len(returned) + 1;
-	/* pop to get the correct order */
  	for (i = 0; i < len; i++) av_push(real_evil, av_pop(returned));	
 
 	if (itter < list_length) {
@@ -152,7 +141,7 @@ static OP *pp_loop(pTHX)
 	hv_undef(dedupe);
 	PUSHMARK(sp);
 	len = av_len(real_evil) + 1;
-	for (i = 0; i < len; i++) PUSHs(av_shift(real_evil));	
+	for (i = 0; i < len; i++) PUSHs(newSVsv(av_shift(real_evil)));	
 	SAVETMPS;
 	PUTBACK;
 
