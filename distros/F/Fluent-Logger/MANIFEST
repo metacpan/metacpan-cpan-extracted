@@ -15,6 +15,7 @@ t/04_live.t
 t/05_prefer_integer.t
 t/06_fork.t
 t/07_str_bin.t
+t/07_str_utf8.t
 t/08_udp.t
 t/09_buffer_overflow_handler.t
 t/10_truncate_buffet_at_overflow.t

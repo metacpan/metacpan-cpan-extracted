@@ -1,7 +1,7 @@
 /*  You may distribute under the terms of either the GNU General Public License
  *  or the Artistic License (the same terms as Perl itself)
  *
- *  (C) Paul Evans, 2023 -- leonerd@leonerd.org.uk
+ *  (C) Paul Evans, 2023-2024 -- leonerd@leonerd.org.uk
  */
 
 #include "EXTERN.h"
@@ -11,6 +11,7 @@
 #include "XSParseSublike.h"
 
 static struct XSParseSublikeHooks hooks_extended = {
+  .ver            = XSPARSESUBLIKE_ABI_VERSION,
   .permit_hintkey = "Sublike::Extended/extended",
   .flags = XS_PARSE_SUBLIKE_FLAG_PREFIX|
     XS_PARSE_SUBLIKE_FLAG_SIGNATURE_NAMED_PARAMS|

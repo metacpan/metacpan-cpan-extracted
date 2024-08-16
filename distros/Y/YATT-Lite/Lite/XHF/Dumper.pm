@@ -12,8 +12,16 @@ use Carp;
 
 use YATT::Lite::XHF qw($cc_name);
 
+our $TRIM_TRAILING_NEWLINES = 1;
+
 sub dump_xhf {
   shift;
+  _dump_pairs(@_);
+}
+
+sub dump_strict_xhf {
+  shift;
+  local $TRIM_TRAILING_NEWLINES = 0;
   _dump_pairs(@_);
 }
 
@@ -49,8 +57,13 @@ sub _dump_value {
 
 sub escape {
   my ($str) = @_;
+  my $use_verbatim = do {
+    ($TRIM_TRAILING_NEWLINES and $str =~ s/\n\z//)
+      or
+      ($str =~ /^\s+|\s+$/s)
+  };
   my $sep = do {
-    if ($str =~ s/\n$// or $str =~ /^\s+|\s+$/s) {
+    if ($use_verbatim) {
       "\n "
     } else {
       " "
@@ -62,13 +75,15 @@ sub escape {
 
 sub dump_array {
   my ($item) = @_;
-  "[\n" . join("\n", do {
-    if (@$item and @$item % 2 == 0 and looks_like_hash($item)) {
-      _dump_pairs(@$item);
+  "[\n" . do {
+    if (not @$item) {
+      "";
+    } elsif (@$item % 2 == 0 and looks_like_hash($item)) {
+      _dump_pairs(@$item)."\n";
     } else {
-      map {_dump_value($_, '-')} @$item
+      join("\n", map {_dump_value($_, '-')} @$item)."\n";
     }
-  }) . "\n]";
+  } . "]";
 }
 
 sub looks_like_hash {
@@ -81,7 +96,13 @@ sub looks_like_hash {
 
 sub dump_hash {
   my ($item) = @_;
-  "{\n" . _dump_pairs(map {$_, $item->{$_}} sort keys %$item) . "\n}";
+  "{\n" . do {
+    if (not %$item) {
+      "";
+    } else {
+      _dump_pairs(map {$_, $item->{$_}} sort keys %$item)."\n";
+    }
+  }. "}";
 }
 
 __END__

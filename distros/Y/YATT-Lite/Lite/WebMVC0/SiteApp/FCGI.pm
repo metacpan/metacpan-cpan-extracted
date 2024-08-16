@@ -3,6 +3,8 @@ package YATT::Lite::WebMVC0::SiteApp::FCGI;
 use strict;
 use warnings qw(FATAL all NONFATAL misc);
 
+use FCGI;
+
 use YATT::Lite::WebMVC0::SiteApp; # To make lint happy, this is required.
 use YATT::Lite::WebMVC0::SiteApp::CGI;
 
@@ -17,28 +19,21 @@ package YATT::Lite::WebMVC0::SiteApp;
 #
 ########################################
 
-# runas_fcgi() is designed for single process app.
-# If you want psgi.multiprocess, use Plack's own FCGI instead.
+sub _prepare_config_for_fcgi {
+  (my MY $self, my ($opts)) = @_;
 
-sub _runas_fcgi {
-  (my MY $self, my $fhset, my Env $init_env, my ($args, %opts)) = @_;
-  # $fhset is either stdout or [\*STDIN, \*STDOUT, \*STDERR].
-  # $init_env is just discarded.
-  # $args = \@ARGV
-  # %opts is fcgi specific options.
-
-  local $self->{cf_is_psgi} = 1;
+  $self->{cf_is_psgi} = 1;
 
   # In suexec fcgi, $0 will not be absolute path.
-  my $progname = do {
-    if (-r (my $fn = delete $opts{progname} || $0)) {
+  $self->{cf_progname} //= do {
+    if (-r (my $fn = delete $opts->{progname} || $0)) {
       $self->rel2abs($fn);
     } else {
       croak "progname is empty!";
     }
   };
 
-  if ((my $dn = $progname) =~ s{/html/cgi-bin/[^/]+$}{}) {
+  if ((my $dn = $self->{cf_progname}) =~ s{/html/cgi-bin/[^/]+$}{}) {
     $self->{cf_app_root} //= $dn;
     $self->{cf_doc_root} //= "$dn/html";
     push @{$self->{tmpldirs}}, $self->{cf_doc_root}
@@ -46,17 +41,31 @@ sub _runas_fcgi {
     #print STDERR "Now:", terse_dump($self->{cf_app_root}, $self->{cf_doc_root}
     #				    , $self->{tmpldirs}), "\n";
   }
+}
 
-  $self->prepare_app;
+# callas_fcgi() and runas_fcgi() is designed for single process app.
+# If you want psgi.multiprocess, use Plack's own FCGI instead.
 
-  my $dir = dirname($progname);
-  my $age = -M $progname;
+#
+# Check timestamp for $self->{cf_progname} and exit when modified.
+# (Outer processmanager is responsible to restart).
+#
+sub _callas_fcgi {
+  (my MY $self, my $app, my $fhset, my Env $init_env, my ($args, %opts)) = @_;
+  # $fhset is either stdout or [\*STDIN, \*STDOUT, \*STDERR].
+  # $init_env is just discarded.
+  # $args = \@ARGV
+  # %opts is fcgi specific options.
+
+  $self->_prepare_config_for_fcgi(\%opts);
+
+  my $dir = dirname($self->{cf_progname});
+  my $age = -M $self->{cf_progname};
 
   my ($stdin, $stdout, $stderr) = ref $fhset eq 'ARRAY' ? @$fhset
     : (\*STDIN, $fhset
        , ((delete $opts{isolate_stderr}) // 1) ? \*STDERR : $fhset);
 
-  require FCGI;
   my $sock = do {
     if (my $sockfile = delete $opts{listen}) {
       unless (-e (my $d = dirname($sockfile))) {
@@ -91,7 +100,7 @@ sub _runas_fcgi {
     }
 
     my $res;
-    if (my $err = catch { $res = $self->call($env) }) {
+    if (my $err = catch { $res = $app->($env) }) {
       # XXX: Should I do error specific things?
       $res = $err;
     }
@@ -122,29 +131,23 @@ sub _runas_fcgi {
     $request->Finish;
 
     # Exit if bootscript is modified.
-    last if -e $progname and -M $progname < $age;
+    last if -e $self->{cf_progname} and -M $self->{cf_progname} < $age;
   }
 }
 
-sub psgi_fcgi_newenv {
-  (my MY $self, my Env $init_env, my ($stdin, $stderr)) = @_;
-  require Plack::Util;
-  require Plack::Request;
-  my Env $env = +{ %$init_env };
-  $env->{'psgi.version'} = [1,1];
-  $env->{'psgi.url_scheme'}
-    = ($init_env->{HTTPS}||'off') =~ /^(?:on|1)$/i ? 'https' : 'http';
-  $env->{'psgi.input'}        = $stdin  || *STDIN;
-  $env->{'psgi.errors'}       = $stderr || *STDERR;
-  $env->{'psgi.multithread'}  = &Plack::Util::FALSE;
-  $env->{'psgi.multiprocess'} = &Plack::Util::FALSE; # XXX:
-  $env->{'psgi.run_once'}     = &Plack::Util::FALSE;
-  $env->{'psgi.streaming'}    = &Plack::Util::FALSE; # XXX: Todo.
-  $env->{'psgi.nonblocking'}  = &Plack::Util::FALSE;
-  # delete $env->{HTTP_CONTENT_TYPE};
-  # delete $env->{HTTP_CONTENT_LENGTH};
-  $env;
+sub _runas_fcgi {
+  (my MY $self, my $fhset, my Env $init_env, my ($args, %opts)) = @_;
+
+  # This will be called again in _callas_fcgi, but it will not harm.
+  $self->_prepare_config_for_fcgi(\%opts);
+
+  $self->prepare_app;
+
+  $self->_callas_fcgi($self->to_app, $fhset, $init_env, $args, %opts);
 }
+
+*psgi_fcgi_newenv = *psgi_cgi_newenv;
+*psgi_fcgi_newenv = *psgi_cgi_newenv;
 
 sub fcgi_handle_response {
     my ($self, $res) = @_;

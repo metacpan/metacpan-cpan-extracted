@@ -1,9 +1,9 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2020-2021 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2020-2024 -- leonerd@leonerd.org.uk
 
-package XS::Parse::Sublike::Builder 0.22;
+package XS::Parse::Sublike::Builder 0.23;
 
 use v5.14;
 use warnings;
@@ -70,7 +70,8 @@ sub extra_compiler_flags
 
    require File::ShareDir;
    require File::Spec;
-   return "-I" . File::Spec->catdir( File::ShareDir::dist_dir( "XS-Parse-Sublike" ), "include" );
+   require XS::Parse::Sublike;
+   return "-I" . File::Spec->catdir( File::ShareDir::module_dir( "XS::Parse::Sublike" ), "include" );
 }
 
 =head2 extend_module_build

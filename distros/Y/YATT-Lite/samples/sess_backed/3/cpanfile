@@ -1,0 +1,3 @@
+requires 'YATT::Lite';
+requires 'Plack::Middleware::Session';
+requires 'DBD::SQLite';

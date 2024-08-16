@@ -1,12 +1,15 @@
 TO DO:
     . Unbundle the Dancer sample application
 
-0.03 20131121
+0.04 2024-08-15
+    . isn't() -> isnt() in the tests; no code changes, no need to upgrade
+
+0.03 2013-11-21
     . Fix prerequisites
 
-0.02 20130726
+0.02 2013-07-26
     + Precedence "return and" fix, spotted and patched
       by Reini Urban
 
-0.01 20130222
+0.01 2013-02-22
     + Initial released

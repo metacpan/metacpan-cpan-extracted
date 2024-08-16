@@ -26,8 +26,9 @@
 ################################################################
 
 
-our $VERSION='1.0000689';
+our $VERSION='1.0000701';
 
+#print `env`,"\n\n\n";
 
 if ($ENV{'AUTOMATED_TESTING'}) {
 #if (1) {
@@ -203,6 +204,11 @@ BEGIN { # FullAuto© MICROSOFT WINDOWS INSTALLER
       $amazon{instance_type}=$instance_type;
       print `sudo cat /proc/meminfo | grep MemFree`;
       print `sudo cat /proc/meminfo | grep MemAvailable`;
+      if ($instance_type=~/micro|nano/) {
+         `sudo su -c 'echo 3 > /proc/sys/vm/drop_caches'`
+      }
+      print `sudo cat /proc/meminfo | grep MemFree`;
+      print `sudo cat /proc/meminfo | grep MemAvailable`;
    }
 
 };
@@ -223,7 +229,9 @@ sub check_for_cpan {
 }
 
 use Config;
+print "GOING TO LOAD CPAN\n";
 use if (check_for_cpan()),'CPAN';
+print "DONE LOADING CPAN\n";
 unshift @ExtUtils::MakeMaker::Overridable, 'pm_to_blib'; # this enables
          # pm_to_blib to be overwritten in Makefile rather than ignored
 *{MyClass::_using_sudo} = sub { return 1 }; # Override default local::lib
@@ -236,6 +244,7 @@ $ENV{'CYGWIN'}='nodosfilewarning' if $^O eq 'cygwin';
 use lib '.';
 use subs qw/version name sign author license perl_version/;
 use inc::Module::Install;
+print "PAST INC MODULE\n";
 
 use if (($^O eq 'cygwin' && eval { 
    local $SIG{__DIE__};require 'Win32::RunAsAdmin' })
@@ -663,6 +672,7 @@ END
    }
 };
 use POSIX qw/strftime/;
+print "PAST POSIX\n";
 my $mycpantest=0; 
 our $cwd=&cwd;
 our $PARdir=$cwd;
@@ -685,21 +695,22 @@ if (exists $ENV{PAR_TEMP}) {
       if -e $ENV{PAR_TEMP}.'/inc/inc/Module/Install.pm';
    $PARdir=$ENV{PAR_TEMP};
 }
+print "ARGVS=",join " ", @ARGV,"\n";
 unless (exists $ENV{FA_EDITOR} || grep { /Encrypted|SKIP/i } @ARGV) {
    print $fa_banner;
    sleep 2;
    unless (exists $ENV{PAR_TEMP} || keys %amazon) {
-      my $message=<<END;
+      my $message=<<'END';
     ___                     _            _     _
    |_ _|_ __  _ __  ___ _ _| |_ __ _ _ _| |_  | | This message times out in
-    | || '  \\| '_ \\/ _ \\ '_|  _/ _` | ' \\  _| |_| 2 minutes so the FullAuto
-   |___|_|_|_| .__/\\___/_|  \\__\\__,_|_||_\\__| (_) install can continue.
+    | || '  \| '_ \/ _ \ '_|  _/ _` | ' \  _| |_| 2 minutes so the FullAuto
+   |___|_|_|_| .__/\___/_|  \__\__,_|_||_\__| (_) install can continue.
              |_| 
                    The FullAuto install behaves differently than other CPAN
    module installations. Normally CPAN will NOT update a dependency module
    if it already exists on the system, even if it is an older version. CPAN
    will NOT remove the same module found in more than one location, even if
-   the old one has precedence in \@INC (meaning it will always load the old
+   the old one has precedence in @INC (meaning it will always load the old
    one.) FullAuto does not work with "local::lib" - so this install **WILL**
    UPDATE ALL DEPENDENCIES (over 100 of them) and remove any duplicates. If
    this is not acceptable to you, then do not install FullAuto on this host,
@@ -727,7 +738,8 @@ END
          };
       } print "\n\n   FullAuto install continues . . .\n\n";
    }
-} elsif (grep { /SKIP/i } @ARGV) {
+} elsif ((grep { /SKIP/i } @ARGV) && !(grep { /CPAN|Net::SSLeay|figlet/ } @ARGV)
+      && $ARGV[$#ARGV]=~/^\d+$/) {
    $exec_cnt=$ARGV[$#ARGV];
    $exec_cnt++;
    my $module_fail=$ARGV[$#ARGV-1];
@@ -749,7 +761,7 @@ END
    ($cpanfil=$mod_info)=~s/^.*CPAN_FILE\s+([^\s]+).*$/$1/s;
    my $cpanver='';
    ($cpanver=$mod_info)=~s/^.*CPAN_VERSION\s+([^\s]+).*$/$1/s;
-   if ($exec_cnt==1 && $cpanver ne $instver) {
+   if ($exec_cnt==1 && ($cpanver ne $instver)) {
       # Amazon's AMI has Pod::Man installed in the vendor_perl
       # directory which has precedence over the system directory
       # this module actually belongs in. The only solution is to
@@ -913,19 +925,21 @@ if ($^O eq 'cygwin') {
          $packs.="$pack ";
       }
       if ($packs) {
-         my $message=<<END;
+         my $message=<<'END';
 
     __  __ _       _              ___                 _
-   |  \\/  (_)_____(_)_ _  __ _   / __|  _ __ ___ __ _(_)_ _
-   | |\\/| | (_-<_-< | ' \\/ _` | | (_| || / _` \\ V  V / | ' \\
-   |_|  |_|_/__/__/_|_||_\\__, |  \\___\\_, \\__, |\\_/\\_/|_|_||_|
+   |  \/  (_)_____(_)_ _  __ _   / __|  _ __ ___ __ _(_)_ _
+   | |\/| | (_-<_-< | ' \/ _` | | (_| || / _` \ V  V / | ' \
+   |_|  |_|_/__/__/_|_||_\__, |  \___\_, \__, |\_/\_/|_|_||_|
                          |___/       |__/|___/
     ___               _                       _      _
-   | _ \\___ __ _ _  _(_)_ _ ___ _ __  ___ _ _| |_ __| |
-   |   / -_) _` | || | | '_/ -_) '  \\/ -_) ' \\  _(_-<_|
-   |_|_\\___\\__, |\\_,_|_|_| \\___|_|_|_\\___|_||_\\__/__(_)
+   | _ \___ __ _ _  _(_)_ _ ___ _ __  ___ _ _| |_ __| |
+   |   / -_) _` | || | | '_/ -_) '  \/ -_) ' \  _(_-<_|
+   |_|_\___\__, |\_,_|_|_| \___|_|_|_\___|_||_\__/__(_)
               |_|
 
+END
+         my $message.=<<END;
    The following Cygwin packages are missing from your
    installation:
 
@@ -1192,15 +1206,15 @@ END
    # to install Net::FullAuto on an EC2 image have consented to this,
    # especially since Admin privileges are needed to do this.
 
-   my $message=<<END;
+   my $message=<<'END';
 
    ======================================================================
    This message times out in two minutes so FullAuto Install can continue
    ====================================================================== 
       _                            ___ ___ ___   _    _
-     /_\\  _ __  __ _ ______ _ _   | __/ __|_  ) | |  (_)_ _ _  ___ __
-    / _ \\| '  \\/ _` |_ / _ \\ ' \\  | _| (__ / /  | |__| | ' \\ || \\ \\ /
-   /_/ \\_\\_|_|_\\__,_/__\\___/_||_| |___\\___/___| |____|_|_||_\\_,_/_\\_\
+     /_\  _ __  __ _ ______ _ _   | __/ __|_  ) | |  (_)_ _ _  ___ __
+    / _ \| '  \/ _` |_ / _ \ ' \  | _| (__ / /  | |__| | ' \ || \ \ /
+   /_/ \_\_|_|_\__,_/__\___/_||_| |___\___/___| |____|_|_||_\_,_/_\_\
 
    In order to install FullAuto on Amazon EC2 Linux servers, a number of
    prerequisite dependencies must be installed or present. Allow
@@ -1265,29 +1279,35 @@ END
          my $cmd="tar zxvf dependencies/FIGlet_fonts/fig*gz;".
                  "cd figlet-2.2.5;make install";
          fa_system($cmd);
+         if (exists $amazon{instance_type} && $amazon{instance_type}=~/micro|nano/) {
+            unless (grep { /figlet/ } @ARGV) {
+               my $argvs=join " ", @ARGV;
+               exec "sudo su -c 'echo 3 > /proc/sys/vm/drop_caches';$^X Makefile.PL SKIP $argvs figlet 1",
+            }
+         }
       }
    }
    unless (-1<index $yins,'nano') {
       fa_system("sudo yum -y install 'nano'");
    }
 
-} elsif ((exists $amazon{'amazon_linux'}) || (exists $amazon{'centos'}) ||
-      $system_type eq 'centos') {
+} elsif (((exists $amazon{'amazon_linux'}) || (exists $amazon{'centos'}) ||
+      ($system_type eq 'centos')) && !grep { /SKIP/i } @ARGV) {
 
    # Most Linux systems need a lot of helper software like compilers
    # to install all module dependencies. It is assumed users attempting
    # to install Net::FullAuto on a Linux system have consented to this,
    # especially since Admin privileges are needed to do this.
 
-         my $message=<<END;
+    my $message=<<'END';
 
    ======================================================================
    This message times out in two minutes so FullAuto Install can continue
    ======================================================================
     ___     _ _   _       _                    _    _
-   | __|  _| | | /_\\ _  _| |_ ___   ___ _ _   | |  (_)_ _ _  ___ __
-   | _| || | | |/ _ \\ || |  _/ _ \\ / _ \\ ' \\  | |__| | ' \\ || \\ \\ /
-   |_| \\_,_|_|_/_/ \\_\\_,_|\\__\\___/ \\___/_||_| |____|_|_||_\\_,_/_\\_\\
+   | __|  _| | | /_\ _  _| |_ ___   ___ _ _   | |  (_)_ _ _  ___ __
+   | _| || | | |/ _ \ || |  _/ _ \ / _ \ ' \  | |__| | ' \ || \ \ /
+   |_| \_,_|_|_/_/ \_\_,_|\__\___/ \___/_||_| |____|_|_||_\_,_/_\_\
 
    In order to install FullAuto on Linux servers, a number of
    prerequisite dependencies must be installed or present. Allow
@@ -1295,7 +1315,6 @@ END
    (Default is 'yes')
 
 END
-
    my $timeout=120;
    my $fae="No   (FullAuto Setup will exit)";
    {
@@ -1332,6 +1351,12 @@ END
          my $cmd="tar zxvf dependencies/FIGlet_fonts/fig*gz;".
                  "cd figlet-2.2.5;make install";
          fa_system($cmd);
+         if (exists $amazon{instance_type} && $amazon{instance_type}=~/micro|nano/) {
+            unless (grep { /figlet/ } @ARGV) {
+               my $argvs=join " ", @ARGV;
+               exec "sudo su -c 'echo 3 > /proc/sys/vm/drop_caches';$^X Makefile.PL SKIP $argvs figlet 1",
+            }
+         }
       }
    }
    unless (-1<index $yins,'nano') {
@@ -1386,13 +1411,13 @@ END
    # to install Net::FullAuto on an EC2 image have consented to this,
    # especially since Admin privileges are needed to do this.
 
-   my $message=<<END;
+   my $message=<<'END';
 
    This message times out in two minutes so FullAuto Install can continue
       _                            _   _ _             _
-     /_\\  _ __  __ _ ______ _ _   | | | | |__ _  _ _ _| |_ _  _
-    / _ \\| '  \\/ _` |_ / _ \\ ' \\  | |_| | '_ \\ || | ' \\  _| || |
-   /_/ \\_\\_|_|_\\__,_/__\\___/_||_|  \\___/|_.__/\\_,_|_||_\\__|\\_,_|
+     /_\  _ __  __ _ ______ _ _   | | | | |__ _  _ _ _| |_ _  _
+    / _ \| '  \/ _` |_ / _ \ ' \  | |_| | '_ \ || | ' \  _| || |
+   /_/ \_\_|_|_\__,_/__\___/_||_|  \___/|_.__/\_,_|_||_\__|\_,_|
 
    In order to install FullAuto on Amazon Ubuntu servers, a number of
    prerequisite dependencies must be installed or present. Allow
@@ -1515,14 +1540,14 @@ my $awscli=`aws 2>&1`;
 if ((-1==index $awscli,'usage') && (exists $amazon{'amazon_linux'} ||
       exists $amazon{'ubuntu'} || exists $amazon{'centos'} ||
       exists $amazon{'rhel'})) {
-   my $message=<<END;
+   my $message=<<'END';
 
    This message times out in two minutes so FullAuto Install can continue
 
       _                             ___ _       ___ _ _         _
-     /_\\  _ __  __ _ ______ _ _    / __| |     / __| (_)___ _ _| |_
-    / _ \\| '  \\/ _` |_ / _ \\ ' \\  | (__| |__  | (__| | / -_) ' \\  _|
-   /_/ \\_\\_|_|_\\__,_/__\\___/_||_|  \\___|____|  \\___|_|_\\___|_||_\\__|
+     /_\  _ __  __ _ ______ _ _    / __| |     / __| (_)___ _ _| |_
+    / _ \| '  \/ _` |_ / _ \ ' \  | (__| |__  | (__| | / -_) ' \  _|
+   /_/ \_\_|_|_\__,_/__\___/_||_|  \___|____|  \___|_|_\___|_||_\__|
 
    In order to automate Amazon AWS Cloud infrastructure, the Amazon
    AWS Command Line Client (AWS CLI) needs to installed. Install
@@ -1686,6 +1711,7 @@ sub look_inside_dir {
 sub fa_install_mod {
    
    my $p=$_[0];
+   return '' if grep { /Net::SSLeay/i } @ARGV;
    my $task=$_[1];
    my $butil=$_[2]||'';
    my $force=$_[3]||'';
@@ -1893,7 +1919,9 @@ sub fa_install_mod {
                fa_system("cd \"$dir\";${sudo}make test");
                print "*** Running ${sudo}make install\n";
                fa_system("cd \"$dir\";${sudo}make install");
-            } elsif (($p eq 'Compress::Raw::Zlib') || ($p eq 'HTML::Parser')) {
+            } elsif (($p eq 'Compress::Raw::Zlib') ||
+                     ($p eq 'HTML::Parser') ||
+                     ($p eq 'Digest::SHA')) {
                if (exists $amazon{instance_type} && $amazon{instance_type}=~/micro/) {
                   my $ulimit=`ulimit -s`;
                   $ulimit=32768;
@@ -1908,6 +1936,8 @@ sub fa_install_mod {
                      fa_system("${sudo}dnf -y install perl-Compress-Raw-Zlib.x86_64");
                   } elsif ($p eq 'HTML::Parser') {
                      fa_system("${sudo}dnf -y install perl-HTML-Parser.x86_64");
+                  } elsif ($p eq 'Digest::SHA') {
+                     fa_system("${sudo}dnf -y install perl-Digest-SHA.x86_64");
                   }
                }
             } else {
@@ -1945,11 +1975,7 @@ sub fa_install_mod {
          my $argvs=join " ", @ARGV;
          select STDOUT;
          $log->close() if $log && -1<index $log,'*';
-         if ($sudo) {
-            exec "sudo $^X Makefile.PL $argvs SKIP $p $exec_cnt";
-         } else {
-            exec "$^X Makefile.PL SKIP $argvs $p $exec_cnt";
-         }
+         exec "$sudo$^X Makefile.PL SKIP $argvs $p $exec_cnt";
       }
    } else {
       print "*** $p Loaded Successfully\n";
@@ -1959,6 +1985,7 @@ sub fa_install_mod {
 }
    
 sub fa_install_module {
+    return '' if grep { /Net::SSLeay/i } @ARGV;
     my $stdout='';my $stderr='';
     eval {
        local $SIG{__DIE__}; # No sigdie handler 
@@ -2019,6 +2046,12 @@ sub size_fmt {
 }
 
 my $stdout='';my $stderr='';
+if (exists $amazon{instance_type} && $amazon{instance_type}=~/micro/) {
+   unless (grep { /CPAN|SKIP/ } @ARGV) {
+      my $argvs=join " ", @ARGV;
+      exec "sudo su -c 'echo 3 > /proc/sys/vm/drop_caches';$^X Makefile.PL SKIP $argvs CPAN 1",
+   }
+}
 if ($^O ne 'MSWin32' && $^O ne 'MSWin64') {
    &fa_install_mod('ExtUtils::MakeMaker','install','Makefile');
    &fa_install_mod('File::Which','install','Makefile');
@@ -2165,6 +2198,22 @@ if ($^O ne 'MSWin32' && $^O ne 'MSWin64') {
       require Net::SSLeay;
    };
    if ($@) {
+      my $argvs='';
+      if (exists $amazon{instance_type} && $amazon{instance_type}=~/micro/) {
+         unless (grep { /Net::SSLeay/ } @ARGV) {
+            if ($ARGV[$#ARGV]=~/^\d+$/) {
+               pop @ARGV;pop @ARGV;
+            }
+	    shift @ARGV if $ARGV[0] eq 'SKIP';
+	    my $argvs=join ' ', @ARGV if -1<$#ARGV;
+            exec "sudo $^X Makefile.PL SKIP $argvs Net::SSLeay 1",
+         } else {
+            if ($ARGV[$#ARGV]=~/^\d+$/) {
+               pop @ARGV;pop @ARGV;
+            }
+            #shift @ARGV if $ARGV[0] eq 'SKIP';
+         }
+      }
       my $ssleay_error_banner=<<END;
 
          *** THIS SCREEN WILL TIMEOUT AND FULLAUTO SETUP WILL EXIT
@@ -2187,6 +2236,11 @@ END
                                "--param ggc-min-heapsize=$ulimit/' ".
                                "Makefile) 2>&1";
          fa_system($micro_nano_adjust);
+         print `sudo cat /proc/meminfo | grep MemFree`;
+         print `sudo cat /proc/meminfo | grep MemAvailable`;
+         fa_system("sudo su -c 'echo 3 > /proc/sys/vm/drop_caches'");
+         print `sudo cat /proc/meminfo | grep MemFree`;
+         print `sudo cat /proc/meminfo | grep MemAvailable`;
       } elsif (exists $amazon{instance_type} && $amazon{instance_type}=~/nano/) {
          fa_system('sudo dnf -y install perl-Net-SSLeay.x86_64');
          $nano_flag=1;
@@ -4781,10 +4835,10 @@ print "SOURCE=$source<==\n";
             select STDOUT;
             $log->close() if $log && -1<index $log,'*';
             if (grep { /-*(?:add|all)[-_]?dependencies/i } @ARGV) {
-               exec 'sudo',$^X,'Makefile.PL','add_dependencies',
+               exec 'sudo',$^X,'Makefile.PL','SKIP','add_dependencies',
                     'BDB',$filename;
             } else {
-               exec 'sudo',$^X,'Makefile.PL','BDB',$filename;
+               exec 'sudo',$^X,'Makefile.PL','SKIP','BDB',$filename;
             }
          }
          my $so=fa_system($CPAN::Config->{gzip}." -d $filename");
@@ -4801,10 +4855,10 @@ print "SOURCE=$source<==\n";
             select STDOUT;
             $log->close() if $log && -1<index $log,'*';
             if (grep { /-*(?:add|all)[-_]?dependencies/i } @ARGV) {
-               exec 'sudo',$^X,'Makefile.PL','add_dependencies',
+               exec 'sudo',$^X,'Makefile.PL','SKIP','add_dependencies',
                     'BDB',$filename;
             } else {
-               exec 'sudo',$^X,'Makefile.PL','BDB',
+               exec 'sudo',$^X,'Makefile.PL','SKIP','BDB',
                     $filename;
             }
          }

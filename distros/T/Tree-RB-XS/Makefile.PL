@@ -44,7 +44,7 @@ $dep->add_pm(map { my $n= $_; $n =~ s/^lib/\$(INST_LIB)/; $_ => $n } <lib/*/*.pm
 $dep->add_typemaps('typemap');
 
 my %WriteMakefileArgs = (
-  "ABSTRACT" => "Red/Black Tree container with similar API to Tree::RB",
+  "ABSTRACT" => "Red/Black Tree and LRU Cache implemented in C",
   "AUTHOR" => "Michael Conrad <mike\@nrdvana.net>",
   "CONFIGURE_REQUIRES" => {
     "ExtUtils::Depends" => "0.405",
@@ -63,6 +63,7 @@ my %WriteMakefileArgs = (
   },
   "TEST_REQUIRES" => {
     "FindBin" => 0,
+    "Storable" => 0,
     "Test2::Suite" => "0.000139",
     "Test2::Tools::Subtest" => 0,
     "Test2::V0" => 0,
@@ -70,7 +71,7 @@ my %WriteMakefileArgs = (
     "lib" => 0,
     "parent" => 0
   },
-  "VERSION" => "0.12",
+  "VERSION" => "0.13",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -86,6 +87,7 @@ my %FallbackPrereqs = (
   "Exporter" => 0,
   "FindBin" => 0,
   "Scalar::Util" => 0,
+  "Storable" => 0,
   "Test2::Suite" => "0.000139",
   "Test2::Tools::Subtest" => 0,
   "Test2::V0" => 0,

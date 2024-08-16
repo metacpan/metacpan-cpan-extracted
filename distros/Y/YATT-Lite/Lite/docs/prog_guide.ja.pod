@@ -50,9 +50,9 @@ yatt はテンプレートを perl の関数の集まりへと変換し、
 
 C<< $yatt->render >>が呼ばれた時、yatt は以下のような perl package を
 動的に生成し、
-C<< MyApp::EntNS->render_(...) >> を呼び出します。
+C<< MyYATT::EntNS->render_(...) >> を呼び出します。
 
-  package MyApp::EntNS;
+  package MyYATT::EntNS;
   sub render_ {
     my ($this, $CON, $x, $y, $body) = @_;
     print $CON (q|<h2>|, YATT::Lite::Util::escape($x), q|</h2>|, "\n");
@@ -172,7 +172,7 @@ yatt の widget には、宣言した引数以外に, 先頭に C<$this> と C<$
 残る C<$CON> は、perl の IO Handle 互換のオブジェクトです。
 概念的には以下のように呼び出されます
 
-    MyApp::EntNS->render_hello(\*STDOUT, "foo", undef);
+    MyYATT::EntNS->render_hello(\*STDOUT, "foo", undef);
 
 
 =head3 Why stream writer
@@ -290,7 +290,7 @@ X<app_ns>
 
 yatt が生成した perl スクリプトには、オプション C<app_ns>
 で指定した package 名が付けられます。
-デフォルト値は C<default_app_ns> メソッドで定義されており、 C<MyApp::> になっています。
+デフォルト値は C<default_app_ns> メソッドで定義されており、 C<MyYATT::> になっています。
 
 同一プロセス内で複数の yatt インスタンスを用いる時には、
 次節の L</Factory> を使うか、
@@ -301,7 +301,7 @@ yatt が生成した perl スクリプトには、オプション C<app_ns>
 
   my $yatt1 = new YATT::Lite(vfs => [data => $template_1]);
   my $yatt2 = new YATT::Lite(vfs => [data => $template_1]);
-  my $yatt3 = new YATT::Lite(app_ns => 'MyApp3', vfs => [data => $template_1]);
+  my $yatt3 = new YATT::Lite(app_ns => 'MyYATT3', vfs => [data => $template_1]);
 
   # OK.
   print $yatt1->render('', {x => "foo", y => "bar"});
@@ -329,17 +329,17 @@ Webアプリをモジュール化しやすくなります。
   use FindBin;
   use YATT::Lite::Factory -as_base;
   {
-    my $factory = MY->new(app_ns => 'MyApp', doc_root => "$FindBin::Bin/html");
+    my $factory = MY->new(app_ns => 'MyYATT', doc_root => "$FindBin::Bin/html");
 
     my $y1 = $factory->get_yatt('/');
     print $y1->render(index => {x => "foo"});   # /index.yatt
     print ref $y1, ", ", $y1->cget('app_ns'), "\n";
-    #>> MyApp::INST1, MyApp::INST1
+    #>> MyYATT::INST1, MyYATT::INST1
 
     my $y2 = $factory->get_yatt('/auth');
     print $y2->render(login => {nx => "/bbs"}); # /auth/login.yatt
     print ref $y2, ", ", $y2->cget('app_ns'), "\n";
-    #>> MyApp::INST2, MyApp::INST2
+    #>> MyYATT::INST2, MyYATT::INST2
   }
 
 
@@ -347,11 +347,11 @@ Webアプリをモジュール化しやすくなります。
 X<doc_root> X<get_yatt>
 
 Factory を構築する時はオプション C<app_ns>, C<doc_root> を渡します。
-app_ns 省略時のデフォルト値は MyApp です。
+app_ns 省略時のデフォルト値は MyYATT です。
 doc_root 以下の各ディレクトリの yatt インスタンスを取り出すには、
 サブディレクトリパスを引数として C<get_yatt()> を呼びます。
 
-  my $factory = MY->new(app_ns => 'MyApp', doc_root => "$FindBin::Bin/html");
+  my $factory = MY->new(app_ns => 'MyYATT', doc_root => "$FindBin::Bin/html");
 
   my $y1 = $factory->get_yatt('/');     # $FindBin::Bin/html/
 
@@ -368,18 +368,18 @@ Factory が yatt インスタンスを生成する手順は以下のようにな
 
 =over 4
 
-=item C<< require MyApp >>
+=item C<< require MyYATT >>
 
-最初に一度だけ、app_ns で指定されたパッケージ(MyApp)の読み込みを試みます。
+最初に一度だけ、app_ns で指定されたパッケージ(MyYATT)の読み込みを試みます。
 もし有れば、それが C<YATT::Lite> を継承しているか確認します。
-無かった場合は C<YATT::Lite> のサブクラスとして MyApp を自動生成します。
+無かった場合は C<YATT::Lite> のサブクラスとして MyYATT を自動生成します。
 
 =item インスタンス固有クラスの生成
 
 新たな yatt インスタンスが必要になる度に、
-C<MyApp::INST1>, C<MyApp::INST2>, ... のように、
+C<MyYATT::INST1>, C<MyYATT::INST2>, ... のように、
 そのインスタンス固有のクラスを生成します。
-(各々の親クラスは C<MyApp> になります)
+(各々の親クラスは C<MyYATT> になります)
 
 =item F<.htyattrc.pl> の読み込み
 
@@ -393,7 +393,7 @@ C<MyApp::INST1>, C<MyApp::INST2>, ... のように、
 
 =item new
 
-そして、C<< MyApp::INST1->new(app_ns => 'MyApp::INST1', @config) >> ... のように
+そして、C<< MyYATT::INST1->new(app_ns => 'MyYATT::INST1', @config) >> ... のように
 インスタンスを生成します。
 
 =back
@@ -410,19 +410,19 @@ L<MY エイリアス|YATT::Lite::docs::whyfields/MY> の設定が同時に済み
 
 
    # Works, but is not interesting.
-   package MyApp1 {
+   package MyYATT1 {
      require YATT::Lite::Factory;
      my $factory = YATT::Lite::Factory->new(...);
    }
 
    # Not enough good.
-   package MyApp2 {
+   package MyYATT2 {
      use base qw/YATT::Lite::Factory/;
      my $factory = YATT::Lite::Factory->new(...);
    }
 
    # Recommended.
-   package MyApp3 {
+   package MyYATT3 {
      use YATT::Lite::Factory -as_base;
      use YATT::Lite qw/Entity/; # XXX: Should be removed in future release.
      my $factory = MY->new(...);

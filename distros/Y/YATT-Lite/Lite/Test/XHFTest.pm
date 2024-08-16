@@ -37,10 +37,12 @@ use Encode;
 		cf_PARAM
 		cf_OUT
 		cf_ERROR
+                cf_ERROR_BODY
 
 		cf_REQUIRE
 
 		cf_TAG
+                cf_CON_CLASS
 	      /;
 
   sub is_runnable { shift->ntests }

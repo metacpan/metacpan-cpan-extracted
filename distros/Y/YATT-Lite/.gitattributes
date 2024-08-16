@@ -1,0 +1,3 @@
+*.yatt  linguist-language=HTML
+*.ytmpl linguist-language=HTML
+*.ydo   linguist-language=Perl

@@ -47,8 +47,10 @@ unless (-r $passfile) {
 
 plan tests => 1;
 
-ok do_mysql($passfile, <<END), "test user is deleted";
-delete from user where login = 'hkoba'
+ok do_mysql($passfile, <<END), "test tables are dropped";
+drop table user;
+drop table entry;
+drop table address;
 END
 
 
@@ -70,7 +72,10 @@ sub do_mysql {
   require DBI;
   my $dbh = DBI->connect("dbi:mysql:database=$dbname", $dbuser, $dbpass
 			 , {PrintError => 0, RaiseError => 1, AutoCommit => 0});
-  $dbh->do($sql);
+  foreach my $statement (split /\n/, $sql) {
+    next unless $statement =~ /\S/;
+    $dbh->do($statement);
+  }
   $dbh->commit;
   1;
 }

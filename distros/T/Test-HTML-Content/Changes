@@ -1,5 +1,8 @@
 Revision history for Perl extension Test::HTML::Content.
 
+0.13 2024-08-15
+    - isn't() -> isnt()
+
 0.12 2023-07-23
     - Fix test output/diagnostics between XML::LibXML and XML::Parser
 

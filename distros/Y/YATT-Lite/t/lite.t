@@ -7,6 +7,16 @@ use FindBin; BEGIN { do "$FindBin::Bin/t_lib.pl" }
 #----------------------------------------
 
 use Test::More;
+use File::Temp qw(tempdir);
+use autodie qw(mkdir chdir);
+use YATT::Lite::Util::File qw(mkfile);
+use YATT::Lite::Util qw(appname catch);
+
+my $TMP = tempdir(CLEANUP => $ENV{NO_CLEANUP} ? 0 : 1);
+END {
+  chdir('/');
+}
+
 use YATT::Lite::Test::TestUtil;
 use YATT::Lite::Breakpoint ();
 
@@ -40,11 +50,11 @@ sub err_like (@) {
 }
 
 {
-  my $theme = "infra";
+  my $theme = "[infra]";
   is(YATT::Lite->EntNS, "YATT::Lite::EntNS", "[$theme] YL->EntNS");
   is_deeply [list_isa("YATT::Lite::EntNS", 1)]
       , [['YATT::Lite::Entities']]
-	, "[$theme] YL EntNS isa tree";
+	, "$theme YL EntNS isa tree";
 }
 
 {
@@ -96,12 +106,21 @@ END
     err_like sub {
       $yatt->find_part_handler([foo => page => 'qux']);
     }, qr{^No such page in file foo: qux}
-      , "Error diag for misspelled widget";
+      , "$theme Error diag for misspelled widget";
 
     err_like sub {
       $yatt->find_part_handler([foo => action => 'hoe']);
     }, qr{^No such action in file foo: hoe}
-      , "Error diag for misspelled action";
+      , "$theme Error diag for misspelled action";
+
+    $yatt->add_to(implicit_then_explicit_args => <<'END');
+FOO
+<!yatt:args>
+BAR
+END
+
+    is $yatt->render('implicit_then_explicit_args'), "FOO\nBAR\n", "$theme implicit_then_explicit_args => merged";
+
   }
 
   {
@@ -143,6 +162,7 @@ END
 
   {
     my $SUB = 'pos';
+    $theme = "[positional arguments]";
     ok(my $pos_t = $yatt->add_to(pos => <<'END'), "$theme add_to $SUB");
 <!yatt:args>
 <yatt:posargs c="foo" "bar" 'baz'/>
@@ -162,6 +182,7 @@ END
 
   {
     my $SUB = 'dobody';
+    $theme = "[$SUB]";
     ok(my $pos_t = $yatt->add_to(dobody => <<'END'), "$theme add_to $SUB");
 <!yatt:args>
 <yatt:dobody "AAA" 'bbb'>
@@ -182,6 +203,7 @@ END
 
   {
     my $SUB = 'elematt';
+    $theme = "[$SUB]";
     ok(my $pos_t = $yatt->add_to($SUB => <<'END'), "$theme add_to $SUB");
 <yatt:elematt>
 <:yatt:title>TITLE</:yatt:title>
@@ -229,6 +251,7 @@ END
   }
 
   {
+    $theme = "[delegate]";
     my $SUB = 'dodelegate';
     ok(my $pos_t = $yatt->add_to(dodelegate => <<'END'), "$theme add_to $SUB");
 <!yatt:args foo bar>
@@ -257,7 +280,30 @@ END
   }
 
   {
+    $theme = "[delegate attlist]";
+    my $SUB = 'delegate_except';
+    ok(my $pos_t = $yatt->add_to($SUB => <<'END'), "$theme add_to $SUB");
+<!yatt:widget base1 x y=! z="?foo" w>
+z=&yatt:z;
+
+<!yatt:widget main base1=[delegate -y z="?bar"]>
+<yatt:base1 y="ignore"/>
+END
+
+    ok my $part = $yatt->find_part($SUB => "main")
+      , "$theme find_part <yatt:${SUB}:main>";
+
+    is_deeply $part->{arg_order}, [qw/x z w body/]
+      , "$theme Argument list of <yatt:${SUB}:main>, synthesized from delegate type";
+
+    my $pos_p = $yatt->find_product(perl => $pos_t);
+    eq_or_diff captured($pos_p => render_main => ())
+      , "z=bar\n\n", "$theme $SUB render_main. (default value is overridden)";
+  }
+
+  {
     my $SUB = 'error';
+    $theme = "[$SUB]";
     ok($yatt->add_to(error => <<'END'), "$theme add_to $SUB");
 <!yatt:args error>
 <h2>&yatt:error:reason();</h2>
@@ -325,7 +371,7 @@ END
     }
 
     my $SUB = 'l10nmsg';
-
+    $theme = "[$SUB]";
     my $mkmsg = sub {
       my ($msgid, $msgstr, @rest) = @_;
       Locale::PO->new(-msgid => $msgid, -msgstr => $msgstr, @rest);
@@ -518,6 +564,139 @@ END
     , "$theme use YATT::Lite -as_base fills *FIELDS";
   ok my $f = *{$sym}{HASH}, "$theme FIELDS hash exists";
   is_deeply $f, \%YATT::Lite::FIELDS, "$theme FIELDS hash became same.";
+}
+
+{
+  my $theme = "[render_as_bytes]";
+
+  my $template = <<END;
+<!yatt:args x y>
+漢字&yatt:x;ひらがな&yatt:y;<br>
+END
+
+  {
+    my $yatt_bytes = new YATT::Lite(app_ns => myapp(++$i),
+                                    render_as_bytes => 1,
+                                    vfs => [data => $template, public => 1],
+                                    debug_cgen => $ENV{DEBUG});
+
+    my $res = $yatt_bytes->render('', ['かんじ','平仮名']);
+    is Encode::is_utf8($res), '', "$theme on: is_utf8 is off";
+    is $res, "\xe6\xbc\xa2\xe5\xad\x97\xe3\x81\x8b\xe3\x82\x93\xe3\x81\x98\xe3\x81\xb2\xe3\x82\x89\xe3\x81\x8c\xe3\x81\xaa\xe5\xb9\xb3\xe4\xbb\xae\xe5\x90\x8d\x3c\x62\x72\x3e\x0a", "$theme on: result matches exactly";
+  }
+
+  {
+    use utf8;
+    my $yatt_utf8 = new YATT::Lite(app_ns => myapp(++$i),
+                                   # output_encoding => 'utf8',
+                                   vfs => [data => Encode::decode_utf8($template),
+                                           public => 1],
+                                   debug_cgen => $ENV{DEBUG});
+
+    my $res = $yatt_utf8->render('', ['かんじ','平仮名']);
+    is Encode::is_utf8($res), 1, "$theme off: is_utf8 is on";
+    is $res, "漢字かんじひらがな平仮名<br>\n", "$theme off: result matches exactly";
+  }
+}
+
+++$i;
+{
+  my $THEME = "[find_file, refresh and reset]";
+  my $docroot = "$TMP/app$i";
+
+  MY->mkfile("$docroot/index.yatt", <<'END');
+<!yatt:args x y>
+x=&yatt:x; y=&yatt:y;
+
+<!yatt:widget foo>
+bar
+END
+
+  my $yatt = new YATT::Lite(app_ns => myapp($i)
+                            , vfs => [dir => $docroot]);
+
+  my $core = $yatt->get_trans;
+
+  ok my $tmpl = $core->find_file('index.yatt'), "core->find_file is ok";
+
+  # Direct Template->refresh to interested code path.
+  undef $tmpl->{cf_mtime};
+  ok $tmpl->refresh($core), "Template->refresh is safe still";
+}
+
+++$i;
+{
+  my $theme = "[name-less (default) action]";
+
+  my $template = <<'END';
+<!yatt:action '' x y>
+print $CON "hello!\n";
+print $CON "x=", $x // '(none)', "\n";
+print $CON "y=", $y // '(none)', "\n";
+END
+
+  my $yatt = new YATT::Lite(app_ns => myapp(++$i),
+                            vfs => [data => $template, public => 1],
+                            debug_cgen => $ENV{DEBUG});
+  {
+    my $res = $yatt->render(['', action => ''], {x => 3, y => 8});
+    is $res, <<END, "$theme correctly invoked";
+hello!
+x=3
+y=8
+END
+  }
+
+  {
+    err_like sub {
+      $yatt->add_to(dup_args => <<'END');
+<!yatt:args>
+foo
+<!yatt:args>
+bar
+END
+
+    }, qr{^<!yatt:args> at line 1 conflicts with <!yatt:args> at file dup_args line 3}
+      , "$theme - args then name-less action => should raise error";
+
+    err_like sub {
+
+      $yatt->add_to(explicit2 => <<'END');
+<!yatt:action ''>
+print $CON 'bar';
+<!yatt:args>
+foo
+END
+
+    }, qr{^<!yatt:action ''> at line 1 conflicts with <!yatt:args> at file explicit2 line 3}
+      , "$theme - name-less action then args => should raise error";
+
+  }
+
+  {
+    err_like sub {
+      $yatt->add_to(explicit1 => <<'END');
+<!yatt:args>
+foo
+<!yatt:action ''>
+print $CON 'bar';
+END
+
+    }, qr{^<!yatt:args> at line 1 conflicts with <!yatt:action ''> at file explicit1 line 3}
+      , "$theme - args then name-less action => should raise error";
+
+
+    err_like sub {
+
+      $yatt->add_to(implicit => <<'END');
+foo
+<!yatt:action ''>
+print $CON 'bar';
+END
+
+    }, qr{^<!yatt:action ''> conflicts with name-less default widget at file implicit line 2}
+      , "$theme - name-less widget then actionname-less  then => should raise error";
+  }
 }
 
 done_testing();

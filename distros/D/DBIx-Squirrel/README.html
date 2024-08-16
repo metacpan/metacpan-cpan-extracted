@@ -1,0 +1,597 @@
+<?xml version="1.0" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title></title>
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rev="made" href="mailto:icampbell@eeyore.local" />
+</head>
+
+<body>
+
+
+
+<ul id="index">
+  <li><a href="#NAME">NAME</a></li>
+  <li><a href="#VERSION">VERSION</a></li>
+  <li><a href="#SYNOPSIS">SYNOPSIS</a></li>
+  <li><a href="#DESCRIPTION">DESCRIPTION</a>
+    <ul>
+      <li><a href="#Importing-the-package">Importing the package</a>
+        <ul>
+          <li><a href="#Database-Entity-Helper-Functions">Database Entity Helper Functions</a>
+            <ul>
+              <li><a href="#Examples">Examples</a></li>
+            </ul>
+          </li>
+        </ul>
+      </li>
+      <li><a href="#Connecting-to-databases">Connecting to databases</a>
+        <ul>
+          <li><a href="#Cloning-database-connections">Cloning database connections</a></li>
+        </ul>
+      </li>
+      <li><a href="#Preparing-statements">Preparing statements</a>
+        <ul>
+          <li><a href="#Placeholders">Placeholders</a>
+            <ul>
+              <li><a href="#Examples1">Examples</a></li>
+            </ul>
+          </li>
+        </ul>
+      </li>
+      <li><a href="#Iterators">Iterators</a></li>
+      <li><a href="#Processing-results">Processing results</a></li>
+    </ul>
+  </li>
+  <li><a href="#COPYRIGHT-AND-LICENSE">COPYRIGHT AND LICENSE</a></li>
+  <li><a href="#SUPPORT-WARRANTY">SUPPORT / WARRANTY</a></li>
+</ul>
+
+<h1 id="NAME">NAME</h1>
+
+<p>DBIx::Squirrel - A <code>DBI</code> extension</p>
+
+<h1 id="VERSION">VERSION</h1>
+
+<p>version 1.2.5</p>
+
+<h1 id="SYNOPSIS">SYNOPSIS</h1>
+
+<pre><code># ------------------
+# Import the package
+# ------------------
+
+use DBIx::Squirrel;
+
+# We still have the freedom to accomplish tasks the familiar DBI-way.
+#
+$dbh = DBIx::Squirrel-&gt;connect($dsn, $user, $pass, \%attr);
+$sth = $dbh-&gt;prepare(&#39;SELECT * FROM product WHERE Name=?&#39;);
+
+if ( $sth-&gt;execute(&#39;Acme Rocket&#39;) ) {
+    $row = $sth-&gt;fetchrow_hashref
+    print $row-&gt;{Name}, &quot;\n&quot;;
+    $sth-&gt;finish
+}
+
+# ------------------------------
+# Import the package (variation)
+# ------------------------------
+
+use DBIx::Squirrel database_entities =&gt; [qw/db product/];
+
+# Associate &quot;db&quot; with a database connection, then use &quot;db&quot; to reference
+# it in future.
+#
+db(DBIx::Squirrel-&gt;connect($dsn, $user, $pass, \%attr));
+
+# First, we need to associate &quot;product&quot; with a result set, then use
+# &quot;product&quot; to reference itt in future. The next time arguments are
+# passed, they are treated as bind-values when the statement is
+# executed.
+#
+product(db-&gt;results(&#39;SELECT * FROM product WHERE Name=?&#39;));
+
+# Print the named product if there is one. The &quot;single&quot; method will
+# finish the statement automatically.
+#
+print $_-&gt;Name, &quot;\n&quot; if product(&#39;Acme Rocket&#39;)-&gt;single;
+
+# ----------------------------
+# Cloning database connections
+# ----------------------------
+
+# Cloning connections created by the DBI, DBIx::Squirrel or their
+# subclasses is permitted.
+#
+$dbh = DBI-&gt;connect($dsn, $user, $pass, \%attr);
+$clone = DBIx::Squirrel-&gt;connect($dbh);
+
+# -----------------------------------------
+# Parameter placeholders and binding values
+# -----------------------------------------
+
+# Several commonly used placeholder styles are supported and just work!
+#
+# Use the style you prefer. DBIx::Squirrel doesn&#39;t care about the DBD
+# engine you are using. By the time the statement is prepared, it will
+# have been normalised to use the legacy (&quot;?&quot;) style.
+#
+# Oracle
+$sth = $dbh-&gt;prepare(&#39;SELECT * FROM product WHERE id=:id&#39;);
+$sth = $dbh-&gt;prepare(&#39;SELECT * FROM product WHERE id=:1&#39;);
+
+# Postgres
+$sth = $dbh-&gt;prepare(&#39;SELECT * FROM product WHERE id=$1&#39;);
+
+# SQLite
+$sth = $dbh-&gt;prepare(&#39;SELECT * FROM product WHERE id=?1&#39;);
+
+# MySQL, MariaDB and legacy
+$sth = $dbh-&gt;prepare(&#39;SELECT * FROM product WHERE id=?&#39;);
+
+# Able to bind values to individual parameters for both positional
+# and named placeholder schemes.
+
+# Use either of these calling styles when binding a value to a
+# named placeholder; both are ok.
+#
+$sth-&gt;bind_param(id =&gt; &#39;1001099&#39;);
+$sth-&gt;bind_param(&#39;:id&#39;, &#39;1001099&#39;);
+
+# Use this calling styles when binding a values to a positional
+# placeholder.
+#
+$sth-&gt;bind_param(1, &#39;1001099&#39;);
+
+# Or, bind all values in one call.
+#
+$sth-&gt;bind( id =&gt; &#39;1001099&#39;, ... );
+$sth-&gt;bind( &#39;:id&#39; =&gt; &#39;1001099&#39;, ... );
+$sth-&gt;bind( &#39;1001099&#39;, ... );
+
+# References are ok, too.
+#
+$sth-&gt;bind( { id =&gt; &#39;1001099&#39;, ... } );
+$sth-&gt;bind( { &#39;:id&#39; =&gt; &#39;1001099&#39;, ... } );
+$sth-&gt;bind( [ &#39;1001099&#39;, ... ] );
+
+# You can also pass the bind values in the same manner to
+# the &quot;execute&quot; and &quot;iterate&quot; methods.
+#
+$res = $sth-&gt;execute(...);
+$res = $itr-&gt;execute(...);
+$itr = $itr-&gt;iterate(...);
+
+# --------------------------------------------
+# The database connection object&#39;s &quot;do&quot; method
+# --------------------------------------------
+
+# WHEN CALLED IN SCALAR-CONTEXT, the &quot;do&quot; method is used exactly as
+# it would when working with the DBI. The only difference is that
+# the DBIx::Squirrel interface allows for more options in how
+# bind-values are passed.
+#
+$res = $dbh-&gt;do(&#39;SELECT * FROM product WHERE id=?&#39;, &#39;1001099&#39;);
+$res = $dbh-&gt;do(&#39;SELECT * FROM product WHERE id=?&#39;, [&#39;1001099&#39;]);
+$res = $dbh-&gt;do(&#39;SELECT * FROM product WHERE id=:id&#39;, id =&gt; &#39;1001099&#39;);
+$res = $dbh-&gt;do(&#39;SELECT * FROM product WHERE id=:id&#39;, &#39;:id&#39; =&gt; &#39;1001099&#39;);
+
+# You must supply hash reference to the statement attributes (or &quot;undef&quot;),
+# when bind-values are presented as a hash reference.
+#
+$res = $dbh-&gt;do(
+    &#39;SELECT * FROM product WHERE id=:id&#39;,
+    undef | \%attr,
+    { &#39;:id&#39; =&gt; &#39;1001099&#39;}
+);
+$res = $dbh-&gt;do(
+    &#39;SELECT * FROM product WHERE id=:id&#39;,
+    undef | \%attr,
+    { id =&gt; &#39;1001099&#39; },
+);
+
+# WHEN CALLED IN LIST-CONTEXT, however, the &quot;do&quot; method works as
+# described previously, but returns both the statement&#39;s execution
+# result and its handle (in that order).
+#
+($res, $sth) = $dbh-&gt;do(...);
+
+# -----------------
+# Statement objects
+# -----------------
+
+# Statement objects can be used to generate two kinds of iterator.
+#
+# Database objects, too, use methods of the same name to generate
+# iterators.
+
+# A basic iterator.
+#
+$itr = $sth-&gt;iterate(...);
+$itr = $sth-&gt;iterate(...)-&gt;reset({});
+
+# A fancy iterator (or result set).
+#
+$itr = $sth-&gt;results(...);
+$itr = $sth-&gt;results(...)-&gt;reset({});
+
+# ---------
+# Iterators
+# ---------
+
+# We only expect one row and require the statement to be finished. 
+#
+# Will emit a warning if there are more rows to fetch as a reminder 
+# to use &quot;LIMIT 1&quot; in your query.
+#
+$row = $itr-&gt;single(OPTIONAL-NEW-BIND-VALUES)
+  or die &quot;No matching row!&quot;;
+
+$row = $itr-&gt;one(OPTIONAL-NEW-BIND-VALUES)
+  or die &quot;No matching row!&quot;;
+
+# As above, but won&#39;t whinge if there were unexpectedly more rows
+# available to be fetched.
+#
+$row = $itr-&gt;find(OPTIONAL-NEW-BIND-VALUES)
+  or die &quot;No matching row!&quot;;
+
+# Populate an array using &quot;next&quot;.
+#
+@ary = ();
+push @ary, $_ while $itr-&gt;next;
+
+@ary = $itr-&gt;first;
+push @ary, $_ while $itr-&gt;next;
+
+# Get everything at once.
+#
+@ary = $itr-&gt;first;
+push @ary, $itr-&gt;remaining;
+
+@ary = $itr-&gt;all;
+
+# Having &quot;all&quot; return a reference is faster!
+#
+$ary_ref = $itr-&gt;all;
+
+# Get the number of records. More memory efficient than &quot;count_all&quot;, 
+# since &quot;next&quot; is called after each record is read and discarded.
+#
+$num = $itr-&gt;count();
+
+# Get the number of records. Not as memory efficient as &quot;count&quot;, since
+# all rows are fetched at once and the size of the resulting array
+# is returned.
+#
+$num = $itr-&gt;count_all();
+
+# Reset the iterator
+#
+$itr = $itr-&gt;reset();
+
+# Reset the iterator, and decide how to slice rows.
+#
+$itr = $itr-&gt;reset({});
+$itr = $itr-&gt;reset([]);
+
+# Reset the iterator, and decide how many rows to buffer up at a time.
+#
+$itr = $itr-&gt;reset(10);
+
+# Reset the iterator. Also decide how many rows to buffer up at a time
+# and how to slice up the rows.
+#
+$itr = $itr-&gt;reset($slice, $row_count);
+$itr = $itr-&gt;reset($row_count, $slice);
+
+# --------------------
+# Working with results
+# --------------------
+
+# Accessing column values using basic iterators.
+#
+$itr = $dbh-&gt;iterate(&#39;SELECT Id, Name FROM product WHERE Name=?&#39;)-&gt;reset([]);
+if ($row = $itr-&gt;iterate(&#39;Acme Rocket&#39;)-&gt;single) {
+    print &quot;Id: $row-&gt;[0]\n&quot;
+}
+
+$itr = $dbh-&gt;iterate(&#39;SELECT Id, Name FROM product WHERE Name=?&#39;)-&gt;reset({});
+if ($row = $itr-&gt;iterate(&#39;Acme Rocket&#39;)-&gt;single) {
+    print &quot;Id: $row-&gt;{Id}\n&quot;
+}
+
+# Accessing column values using using fancy iterators can be accomplished
+# as shown above. Fancy iterators, however, don&#39;t care how your rows are
+# sliced, because they also provide access to column values via on-demand
+# accessors. You can use any case for accessors as they all resolve to
+# the same column.
+#
+$itr = $dbh-&gt;results(&#39;SELECT Id, Name FROM product WHERE Name=?&#39;);
+if ($row = $itr-&gt;iterate(&#39;Acme Rocket&#39;)-&gt;single) {
+    print &quot;Id: &quot;, $row-&gt;Id, &quot;\n&quot;
+}
+
+$itr = $dbh-&gt;results(&#39;SELECT Id, Name FROM product WHERE Name=?&#39;);
+if ($row = $itr-&gt;iterate(&#39;Acme Rocket&#39;)-&gt;single) {
+    print &quot;Id: &quot;, $row-&gt;ID, &quot;\n&quot;
+}
+
+$itr = $dbh-&gt;results(&#39;SELECT Id, Name FROM product WHERE Name=?&#39;);
+if ($row = $itr-&gt;iterate(&#39;Acme Rocket&#39;)-&gt;single) {
+    print &quot;Id: &quot;, $row-&gt;id, &quot;\n&quot;
+}
+
+# ---------------
+# Transformations
+# ---------------
+
+# A transformation is a sequence of one or more trailing code references
+# that are passed to the method that generates the iterator. The initial
+# result enters the first stage of the transformation as $_[0] (and $_),
+# and the result of that transformation is passed onto the next stage,
+# or returned to the caller,  using a &quot;return&quot; statement or the result
+# of the final expression.
+#
+# Transformations are a great way to declare, in one place, the common
+# processing logic that should be applied to results.
+#
+$itr = $dbh-&gt;iterate(
+    &#39;SELECT Id, Name FROM product WHERE Name=?&#39; =&gt; sub {$_-&gt;[0]},
+)-&gt;reset([]);
+if ($id = $itr-&gt;iterate(&#39;Acme Rocket&#39;)-&gt;single) {
+    print &quot;Id: $id\n&quot;
+}
+
+$itr = $dbh-&gt;iterate(
+    &#39;SELECT Id, Name FROM product WHERE Name=?&#39; =&gt; sub {$_-&gt;[Id]},
+)-&gt;reset({});
+if ($id = $itr-&gt;iterate(&#39;Acme Rocket&#39;)-&gt;single) {
+    print &quot;Id: $id\n&quot;
+}
+
+$itr = $dbh-&gt;results(
+    &#39;SELECT Id, Name FROM product WHERE Name=?&#39; =&gt; sub {$_-&gt;Id},
+);
+if ($id = $itr-&gt;iterate(&#39;Acme Rocket&#39;)-&gt;single) {
+    print &quot;Id: $id\n&quot;
+}
+
+# Multiple transformations may be chained together.
+#
+$itr = $dbh-&gt;results(
+    &#39;SELECT Id, Name FROM product WHERE Name=?&#39; =&gt; sub {
+        $_-&gt;Id;
+    } =&gt; sub {
+        my $result = $_;
+        print &quot;Id: $result\n&quot;;
+        return $result;
+    },
+);
+$id = $itr-&gt;iterate(&#39;Acme Rocket&#39;)-&gt;single;</code></pre>
+
+<h1 id="DESCRIPTION">DESCRIPTION</h1>
+
+<p>The <code>DBIx::Squirrel</code> package extends the <code>DBI</code>, by providing a few extra conveniences that are subtle and additive in nature, and, hopefully, quite useful.</p>
+
+<h2 id="Importing-the-package">Importing the package</h2>
+
+<p>In the simplest case, just import the package as you would any other:</p>
+
+<pre><code>use DBIx::Squirrel;</code></pre>
+
+<p>Any symbols and tags that you would typically import from the <code>DBI</code> can also be requested via <code>DBIx::Squirrel</code>:</p>
+
+<pre><code>use DBIx::Squirrel DBI-IMPORT-LIST;</code></pre>
+
+<p>If required (and in addition to any <code>DBI</code> imports), <code>DBIx::Squirrel</code> can create and import Database Entity Helper functions for you:</p>
+
+<pre><code>use DBIx::Squirrel database_entity=&gt;NAME;
+use DBIx::Squirrel database_entities=&gt;[NAMES];</code></pre>
+
+<h3 id="Database-Entity-Helper-Functions">Database Entity Helper Functions</h3>
+
+<p>A database entity helper is nothing more than a standard function providing some syntactic sugar in the form of a polymorphic interface for interacting with database entities such as database connections, statements and iterators.</p>
+
+<p>While it is not absolutely necessary to use them&mdash;you could just as easily use scalar references&mdash;helper functions do possess the advantage of being shared more easily among package namespaces than, say, lexical variables.</p>
+
+<p>Helper semantics deal with three common types of interaction:</p>
+
+<ul>
+
+<li><p><b>Establishing an association</b></p>
+
+<p>Before it can be used, a helper must first be associated with a database entity. This is accomplished by passing the function single argument: a reference to the associated object.</p>
+
+<p>Once established, associations are <i>sticky</i> and cannot easily be undone. You should take care to create them once only, in a sensible place.</p>
+
+<p>Use Perl&#39;s standard importing mechanisms (as shown above) to share associations among different package namespaces.</p>
+
+</li>
+<li><p><b>Resolving an association</b></p>
+
+<p>Fetching the reference to the associated database entity is accomplished by calling the helper function without any arguments.</p>
+
+<p>When no association exists in this scenario, a helper returns <code>undef</code>.</p>
+
+</li>
+<li><p><b>Addressing an association</b></p>
+
+<p>Addressing an association amounts to doing something meaningful with it, and we accomplish this by calling the helper function with one or more arguments.</p>
+
+<p>Once associated with a database entity, a helper function will any arguments that are passed to it and send a version of these to the database entity method that imbues meaning to the interaction.</p>
+
+<p>Meaning in this context is determined by the type of association:</p>
+
+<ul>
+
+<li><p>for a database connection, a statement is prepared using the <code>prepare</code> method;</p>
+
+</li>
+<li><p>for statements and iterators, these are executed with the <code>execute</code> and <code>iterate</code> methods respectively.</p>
+
+</li>
+</ul>
+
+<p><b>Clearly there is a paradox here</b>, which centres around those statements and iterators expecting <i>no bind-values</i>. In order to smooth-out this wrinkle, you can opt to enclose arguments inside an anonymous array or hash. When no bind-values are expected, you can coerce the helper into performing the execution by passing an empty array or hash reference. Alternatively, you could just resolve the association and call the relevant method manually.</p>
+
+</li>
+</ul>
+
+<h4 id="Examples">Examples</h4>
+
+<ul>
+
+<li><p>Let us do a full worked example. We will connect to a database, create and work with two result sets, one of which expects a single bind-value. Some concepts will be expanded upon and improved later, but it might be helpful to dip a toe in the water ahead of time:</p>
+
+<pre><code>use DBIx::Squirrel database_entities =&gt; [ qw/db artists artist/ ];
+
+# Associate helper (&quot;db&quot;) with our database connection:
+
+@connect_args = ( &#39;dbi:SQLite:dbname=chinook.db&#39;, &#39;&#39;, &#39;&#39;, { sqlite_unicode =&gt; 1 } );
+db( DBIx::Squirrel-&gt;connect(@connection_args) );
+
+# Resolve the database connection helper (&quot;db&quot;), using it to
+# associate helpers (&quot;artist&quot; and &quot;artists&quot;) with different
+# result sets:
+
+artist( db-&gt;results(&#39;SELECT * FROM artists WHERE Name=? LIMIT 1&#39;) );
+artists( db-&gt;results(&#39;SELECT * FROM artists&#39;) );
+
+# Address the helper (&quot;artist&quot;), passing it a bind-value, to get
+# the ArtistId of the artist whose name is &quot;Aerosmith&quot;.
+#
+# We could have called &quot;next&quot; to get the only matching record, but by
+# calling &quot;single&quot; (or &quot;first&quot;) we can ensure that there are no warnings
+# about dangling active statements emitted when we disconnect from the
+# database.
+
+print artist(&#39;Aerosmith&#39;)-&gt;single-&gt;ArtistId, &quot;\n&quot;;
+
+# Iterate over the &quot;artists&quot; result set, printing the Name-column for
+# each artist. We don&#39;t need to trigger execution manually because
+# the &quot;next&quot; method will do that for us, if it is necessary.
+
+while ( artists-&gt;next ) {
+    print $_-&gt;Name, &quot;\n&quot;;
+};</code></pre>
+
+</li>
+</ul>
+
+<h2 id="Connecting-to-databases">Connecting to databases</h2>
+
+<p>Connecting to a database using <code>DBIx::Squirrel</code> may be done exactly as it would when using the <code>DBI</code>&#39;s <code>connect_cached</code> and <code>connect</code> methods.</p>
+
+<h3 id="Cloning-database-connections">Cloning database connections</h3>
+
+<p>The <code>connect</code> method implemented by the <code>DBIx::Squirrel</code> package offers an alternative form:</p>
+
+<pre><code>$new_dbh = DBIx::Squirrel-&gt;connect($original_dbh, \%attr);</code></pre>
+
+<p>This form clones another connection object and returns a brand object that is blessed using the same class that invoked the <code>connect</code> method. Objects being cloned are allowed to be those created by the <code>DBI</code> or any of its subclasses, <code>DBIx::Squirrel</code> being one of those.</p>
+
+<h2 id="Preparing-statements">Preparing statements</h2>
+
+<p>Preparing a statement using <code>DBIx::Squirrel</code> may be done exactly as it would be done using the <code>DBI</code>&#39;s <code>prepare_cached</code> and <code>prepare</code> methods.</p>
+
+<h3 id="Placeholders">Placeholders</h3>
+
+<p>A nice quality-of-life improvement offered by <code>DBIx::Squirrel</code>&#39;s own implementation of the <code>prepare_cached</code> and <code>prepare</code> methods is the built-in support for different placeholder styles:</p>
+
+<ul>
+
+<li><p>named (<code>:name</code>);</p>
+
+</li>
+<li><p>positional (<code>:number</code>, <code>$number</code>, <code>?number</code>);</p>
+
+</li>
+<li><p>legacy (<code>?</code>)</p>
+
+</li>
+</ul>
+
+<p>Regardless of your <code>DBD</code> driver, or your preferred style, statements will be normalised to the legacy placeholder (<code>?</code>) by the time they are executed.</p>
+
+<p>Use your preferred style, or the style that most helps your query to be reasoned by others.</p>
+
+<h4 id="Examples1">Examples</h4>
+
+<ul>
+
+<li><p>Legacy placeholders (<code>?</code>):</p>
+
+<pre><code>$sth = $dbh-&gt;prepare(&#39;SELECT * FROM artists WHERE Name=? LIMIT 1&#39;);
+
+# Any of the following value-binding styles will work:
+$res = $sth-&gt;execute(&#39;Aerosmith&#39;);
+$res = $sth-&gt;execute([ &#39;Aerosmith&#39; ]);</code></pre>
+
+</li>
+<li><p>SQLite positional placeholders (<code>?number</code>):</p>
+
+<pre><code>$sth = $dbh-&gt;prepare(&#39;SELECT * FROM artists WHERE Name=?1 LIMIT 1&#39;);
+
+# Any of the following value-binding styles will work:
+$res = $sth-&gt;execute(&#39;Aerosmith&#39;);
+$res = $sth-&gt;execute([ &#39;Aerosmith&#39; ]);</code></pre>
+
+</li>
+<li><p>PostgreSQL positional placeholders (<code>$number</code>):</p>
+
+<pre><code>$sth = $dbh-&gt;prepare(&#39;SELECT * FROM artists WHERE Name=$1 LIMIT 1&#39;);
+
+# Any of the following value-binding styles will work:
+$res = $sth-&gt;execute(&#39;Aerosmith&#39;);
+$res = $sth-&gt;execute([ &#39;Aerosmith&#39; ]);</code></pre>
+
+</li>
+<li><p>Oracle positional placeholders (<code>:number</code>):</p>
+
+<pre><code>$sth = $dbh-&gt;prepare(&#39;SELECT * FROM artists WHERE Name=:1 LIMIT 1&#39;);
+
+# Any of the following value-binding styles will work:
+$res = $sth-&gt;execute(&#39;Aerosmith&#39;);
+$res = $sth-&gt;execute([ &#39;Aerosmith&#39; ]);</code></pre>
+
+</li>
+<li><p>Oracle named placeholders (<code>:number</code>):</p>
+
+<pre><code>$sth = $dbh-&gt;prepare(&#39;SELECT * FROM artists WHERE Name=:Name LIMIT 1&#39;);
+
+# Any of the following value-binding styles will work:
+$res = $sth-&gt;execute( Name =&gt; &#39;Aerosmith&#39; );
+$res = $sth-&gt;execute({ Name =&gt; &#39;Aerosmith&#39; });
+$res = $sth-&gt;execute( &#39;:Name&#39; =&gt; &#39;Aerosmith&#39; );
+$res = $sth-&gt;execute({ &#39;:Name&#39; =&gt; &#39;Aerosmith&#39; });</code></pre>
+
+</li>
+</ul>
+
+<h2 id="Iterators">Iterators</h2>
+
+<p>(TO DO)</p>
+
+<h2 id="Processing-results">Processing results</h2>
+
+<p>(TO DO)</p>
+
+<h1 id="COPYRIGHT-AND-LICENSE">COPYRIGHT AND LICENSE</h1>
+
+<p>The DBIx::Squirrel module is Copyright (c) 2020-2014 Iain Campbell. All rights reserved.</p>
+
+<p>You may distribute under the terms of either the GNU General Public License or the Artistic License, as specified in the Perl 5.10.0 README file.</p>
+
+<h1 id="SUPPORT-WARRANTY">SUPPORT / WARRANTY</h1>
+
+<p>DBIx::Squirrel is free Open Source software. IT COMES WITHOUT WARRANTY OF ANY KIND.</p>
+
+
+</body>
+
+</html>
+
+

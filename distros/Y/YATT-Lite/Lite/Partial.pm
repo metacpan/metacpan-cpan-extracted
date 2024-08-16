@@ -25,7 +25,7 @@ sub define_partial_class {
   my ($pack, $callpack, @args) = @_;
 
   mro::set_mro($callpack => 'c3');
-  # $pack->add_isa_to($callpack, $pack->Base);
+  $pack->add_isa_to($callpack, $pack->Base);
 
   my Meta $meta = $pack->get_meta($callpack);
   my $fields = fields_hash(ref $meta);
@@ -107,8 +107,9 @@ sub export_partial_class_to {
 
   if (my @requires = lexpand($partial->{cf_requires})) {
     my @missing = grep {not $fullclass->can($_)} @requires;
-    croak "User class of Partital '$partial->{cf_package}' must implement: "
-      . join(", ", sort @missing) if @missing;
+    croak "package '$fullclass' used '$partial->{cf_package}'"
+      . " but not implemented required methods: "
+      . join(", ", map {"$_()"} sort @missing) if @missing;
   }
 
   YATT::Lite::MFields->add_isa_to($fullclass, $partial->{cf_package})

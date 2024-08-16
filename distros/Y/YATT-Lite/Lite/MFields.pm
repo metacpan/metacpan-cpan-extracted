@@ -3,6 +3,8 @@ use strict;
 use warnings qw(FATAL all NONFATAL misc);
 use 5.009; # For real hash only. (not works for pseudo-hash)
 
+use constant DEBUG_IMPORT => $ENV{DEBUG_YATT_IMPORT} // 0;
+
 use parent qw/YATT::Lite::Object/;
 
 sub Decl () {'YATT::Lite::MFields::Decl'}
@@ -15,6 +17,7 @@ BEGIN {
        cf_package
        cf_default
        cf_doc cf_label
+       cf_only_if_missing
       /;
 }
 
@@ -25,10 +28,12 @@ BEGIN {
 
 use YATT::Lite::Util qw/globref look_for_globref list_isa fields_hash
 			lexpand
+                        terse_dump
 		       /;
 use Carp;
 
 sub import {
+  Carp::carp(scalar caller, " calls $_[0]->import()") if DEBUG_IMPORT;
   my $pack = shift;
   my $callpack = caller;
   $pack->define_fields($callpack, @_);
@@ -108,6 +113,8 @@ sub import_fields_from {
       } elsif (not UNIVERSAL::isa($existing, $self->Decl)) {
 	croak "Importing $class.$name onto raw field"
 	  . " (defined in $self->{cf_package}) is prohibited";
+      } elsif ($importing->{cf_only_if_missing}) {
+        ; # import $importing only if it is missing in target package.
       } elsif ($importing != $existing) {
 	croak "Conflicting import $class.$name"
 	  . " (defined in $importing->{cf_package}) "
@@ -185,16 +192,30 @@ sub add_isa_to {
     *$sym = $isa = [];
   }
 
+  my $using_c3 = mro::get_mro($target) eq 'c3';
   foreach my $base (@base) {
-    next if grep {$_ eq $base} @$isa;
-#    if (my $err = do {local $@; eval {
+    my $cur_linear = mro::get_linear_isa($target);
+    next if grep {$_ eq $base} @$cur_linear;
+    if ($using_c3) {
+      my $adding = mro::get_linear_isa($base);
+
+      local $@;
+      eval {
+        unshift @$isa, $base;
+      };
+      if (my $err = $@) {
+        croak "Can't add base '$base' to '$target'!\n"
+          .  "  Target '$target' ISA (\n    ".join("\n    ", map {
+            YATT::Lite::Util::ns_filename($_)
+          } @$cur_linear).")\n"
+          .  "  Adding '$base' ISA (\n    ".join("\n    ", map {
+            YATT::Lite::Util::ns_filename($_)
+          } @$adding)
+          ."\n) because of this error: " . $err;
+      }
+    } else {
       push @$isa, $base
-#    }; $@}) {
-#      if ($err =~ /^Inconsistent hierarchy during C3 merge of class/) {
-#	print "[inserting $base to $target] $err";
-#	next;
-#      }
-#    }
+    }
   }
 
   $pack;

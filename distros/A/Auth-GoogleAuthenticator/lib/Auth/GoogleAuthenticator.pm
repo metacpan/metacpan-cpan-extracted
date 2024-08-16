@@ -6,14 +6,20 @@ use Math::Random::MT 'rand'; # to generate good passcodes
 use URI::Escape;
 
 use vars qw($VERSION);
-$VERSION= '0.03';
+$VERSION= '0.04';
+
+=head1 NAME
+
+Auth::GoogleAuthenticator - Authenticate through Google Authenticator
+
+=cut
 
 sub new {
     my ($class, %args) = @_;
     if( $args{ secret_base32 }) {
         $args{ secret } = decode_base32( delete $args{ secret_base32 });
     };
-    
+
     $args{ auth } ||= Authen::OATH->new();
     bless \%args => $class;
 }

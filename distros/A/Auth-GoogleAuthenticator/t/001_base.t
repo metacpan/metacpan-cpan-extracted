@@ -11,5 +11,5 @@ my $auth= Auth::GoogleAuthenticator->new(
 
 is $auth->totp(1352146604), 434872,
     "Simple value works";
-isn't $auth->totp(1352146604+30), 434872,
+isnt $auth->totp(1352146604+30), 434872,
     "Simple value changes after 30 seconds";

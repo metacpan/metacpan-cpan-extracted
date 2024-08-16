@@ -173,10 +173,6 @@ PARSE HOOKS
     The structure has a flags field, which controls various optional parts
     of operation. The following flags are defined.
 
-    XS_PARSE_SUBLIKE_FLAG_FILTERATTRS
-
-      If set, the optional filter_attr stage will be invoked.
-
     XS_PARSE_SUBLIKE_FLAG_BODY_OPTIONAL
 
       If not set, the require_parts field will imply the
@@ -294,17 +290,16 @@ PARSE HOOKS
     At this point the optional sub attributes are parsed and filled into
     the attrs field of the context, then block_start() is called.
 
- The optional filter_attr Stage
+ The filter_attr Stage
 
        bool (*filter_attr)(pTHX_ struct XSParseSublikeContext *ctx,
           SV *attr, SV *val, void *hookdata);
 
-    If the flags field includes XS_PARSE_SUBLIKE_FLAG_FILTERATTRS then each
-    individual attribute is passed through this optional filter function
-    immediately as each is parsed. attr will be a string SV containing the
-    name of the attribute, and val will either be NULL, or a string SV
-    containing the contents of the parens after its name (without the
-    parens themselves).
+    If this optional stage is defined, then each individual attribute is
+    passed through this optional filter function immediately as each is
+    parsed. attr will be a string SV containing the name of the attribute,
+    and val will either be NULL, or a string SV containing the contents of
+    the parens after its name (without the parens themselves).
 
     If the filter returns true, it indicates that it has in some way
     handled the attribute and it should not be added to the list given to

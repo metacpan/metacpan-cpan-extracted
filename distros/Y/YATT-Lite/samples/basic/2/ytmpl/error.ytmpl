@@ -153,7 +153,7 @@ sub _read_file_range {
   my $end   = $linenum + ($after // 3);
 
   $start = $start < 1 ? 1 : $start;
-  open my $fh, '<', $file
+  open my $fh, '<:utf8', $file
     or die "cannot open $file:$!";
 
   my $cur_line = 0;

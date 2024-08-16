@@ -10,7 +10,9 @@ README.md
 TreeRBXS.xs
 dist.ini
 dzil-prove
+example/newest-files
 lib/Tree/RB/XS.pm
+lib/Tree/RB/XS/Node.pm
 ppport.h
 t/10-constructor.t
 t/15-insert.t
@@ -23,6 +25,7 @@ t/21-iter.t
 t/22-tie.t
 t/25-recent-tracking.t
 t/30-cmp-numsplit.t
+t/40-freeze-thaw.t
 t/author-pod-coverage.t
 t/author-pod-syntax.t
 t/lib/Test2WithExplain.pm

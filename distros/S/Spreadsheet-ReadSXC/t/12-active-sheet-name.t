@@ -20,5 +20,5 @@ for my $test (sort keys %tests) {
     my $workbook = Spreadsheet::ParseODS->new()->parse($test);
 
     is $workbook->_settings->active_sheet_name, $name, "$test active sheet is $name";
-    isn't $workbook->get_active_sheet, undef, "We find a sheet named '$name'";
+    isnt $workbook->get_active_sheet, undef, "We find a sheet named '$name'";
 }

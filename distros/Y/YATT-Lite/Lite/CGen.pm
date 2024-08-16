@@ -6,7 +6,7 @@ use Carp;
 use constant DEBUG_REBUILD => $ENV{DEBUG_YATT_REBUILD};
 
 use base qw(YATT::Lite::VarMaker);
-use fields qw/curtmpl curwidget curtoks
+use YATT::Lite::MFields qw/curtmpl curwidget curtoks
 	      altgen needs_escaping depth
 	      cf_cgen_loader
 	      cf_only_parse
@@ -14,11 +14,22 @@ use fields qw/curtmpl curwidget curtoks
 	      no_last_newline
 	      cf_vfs cf_parser cf_sink scope
 	      cf_lcmsg_sink
-	     /;
+	      cf_prefer_call_for_entity
+			  /
+  ;
 
-use YATT::Lite::Core qw(Template Part);
+use YATT::Lite::Core qw(Template Part Folder);
 use YATT::Lite::Constants;
 use YATT::Lite::Util qw(callerinfo numLines);
+
+sub ensure_generated_for_folders {
+  (my MY $self, my $spec) = splice @_, 0, 2;
+  foreach my Folder $folder (@_) {
+    if ($folder->can_generate_code) {
+      $self->ensure_generated($spec, $folder);
+    }
+  }
+}
 
 sub ensure_generated {
   (my MY $self, my $spec, my Template $tmpl) = @_;
@@ -30,13 +41,14 @@ sub ensure_generated {
   if (not defined $tmpl->{product}{$type}) {
     croak "package for product $type of $tmpl->{cf_path} is not defined!";
   } else {
-    print STDERR "# generating $pkg for $type code of $tmpl->{cf_path}\n"
+    print STDERR "# generating $pkg for $type code of "
+      . ($tmpl->{cf_path} // "(undef)") . "\n"
       if DEBUG_REBUILD;
   }
   $self->{cf_parser}->parse_body($tmpl)
     if not $kind or not $self->{cf_only_parse}
       or $self->{cf_only_parse}{$kind};
-  $self->setup_inheritance($tmpl);
+  $self->setup_inheritance_for($spec, $tmpl);
   my @res = $self->generate($tmpl, $kind);
   if (my $sub = $self->{cf_sink}) {
     $sub->({folder => $tmpl, package => $pkg, kind => 'body'
@@ -46,10 +58,22 @@ sub ensure_generated {
   $pkg;
 }
 
+sub with_template {
+  (my MY $self, my Template $tmpl, my ($task, @args)) = @_;
+  local $self->{curtmpl} = $tmpl;
+  local $self->{curline} = 1;
+  if (ref $task eq 'CODE') {
+    $task->($self, @args);
+  } else {
+    my ($meth, @rest) = YATT::Lite::Util::lexpand($task);
+    $self->$meth(@rest, @args);
+  }
+}
+
 sub generate {
   (my MY $self, my Template $tmpl) = splice @_, 0, 2;
-  # XXX: localize した方がいいかも。 というか、 curtmpl との区別が紛らわしいか。
   my $kind = shift if @_;
+  # XXX: Rewrite this with with_template
   local $self->{curtmpl} = $tmpl;
   local $self->{curline} = 1;
   ($self->generate_preamble($self->{curtmpl})
@@ -67,7 +91,10 @@ sub generate {
   } @{$tmpl->{partlist}});
 }
 
-sub setup_inheritance {}
+sub setup_inheritance_for {
+  (my MY $self, my $spec, my Template $tmpl) = @_;
+  $self->ensure_generated_for_folders($spec, $tmpl->list_base);
+}
 
 #========================================
 sub altgen {
@@ -151,7 +178,8 @@ sub cut_next_nl {
   my MY $self = shift;
   # undef は返したくないので。
   return wantarray ? () : ''
-    unless @{$self->{curtoks}} and $self->{curtoks}[0] =~ /^\r?\n$/;
+    unless $self->{curtoks}
+    and @{$self->{curtoks}} and $self->{curtoks}[0] =~ /^\r?\n$/;
   return wantarray ? () : ''
     if @{$self->{curtoks}} == 1; # 最後の一個の改行は、残す。これは "}\n" のため
   $self->{curline}++;

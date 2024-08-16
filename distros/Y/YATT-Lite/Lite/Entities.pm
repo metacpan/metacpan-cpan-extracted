@@ -3,12 +3,23 @@ use strict;
 use warnings qw(FATAL all NONFATAL misc);
 use Carp;
 
-#use mro 'c3';
+use constant DEBUG_IMPORT => $ENV{DEBUG_YATT_IMPORT} // 0;
+
+use mro 'c3';
 # XXX: 残念ながら、要整理。
 
 require YATT::Lite::MFields;
 
-use YATT::Lite::Util qw/globref terse_dump url_encode/;
+use YATT::Lite::Util qw/
+                         globref terse_dump url_encode
+                         raise_response
+                         raise_download
+                         raise_psgi_error
+                         raise_psgi_dump
+                         secure_text_plain
+                         psgi_text
+			 build_nested_query
+                       /;
 
 sub default_export { qw(*YATT) }
 
@@ -23,6 +34,7 @@ sub DIR { $YATT }
 our $SYS;
 sub symbol_SYS { return *SYS }
 sub SYS { $SYS }
+sub SYSTEM { $SYS }
 sub SITE { $SYS }
 
 # Connection
@@ -33,6 +45,7 @@ sub CON { return $CON }
 
 sub import {
   my ($pack, @opts) = @_;
+  Carp::carp(scalar caller, " calls $_[0]->import()") if DEBUG_IMPORT;
   @opts = $pack->default_export unless @opts;
   my $callpack = caller;
   my (%opts, @task);
@@ -71,6 +84,8 @@ sub declare_as_base {
   my ($myPack, $opts, $callpack) = @_;
   # ckrequire($myPack); # Not needed because $myPack is just used!
 
+  mro::set_mro($callpack, 'c3');
+
   # Fill $callpack's %FIELDS, by current ISA.
   YATT::Lite::MFields->add_isa_to($callpack, $myPack)
       ->define_fields($callpack);
@@ -100,13 +115,50 @@ sub entity_breakpoint {
   &YATT::Lite::Breakpoint::breakpoint();
 }
 
+#
+# Identity. This helps learning about entity path expression.
+#
+sub entity_val {
+  my ($this, $val) = @_;
+  $val;
+}
+
+#
+# Hiding return value is another important idiom.
+#
+sub entity_ignore {
+  ();
+}
+
+sub entity_param {
+  shift;
+  $CON->param(@_);
+}
+
+sub entity_set_param {
+  my ($this, $name, $value) = @_;
+  $CON->param($name, $value);
+  '';
+}
+
+sub entity_delete_param {
+  shift;
+  $CON->delete_param(@_);
+}
+
 sub entity_concat {
   my $this = shift;
   join '', @_;
 }
 
-# coalesce
-*entity_coalesce = *entity_default; *entity_coalesce = *entity_default;
+sub entity_coalesce {
+  my $this = shift;
+  foreach my $str (@_) {
+    return $str if defined $str;
+  }
+  '';
+}
+
 sub entity_default {
   my $this = shift;
   foreach my $str (@_) {
@@ -178,8 +230,10 @@ sub entity_dump {
 }
 
 sub entity_can_render {
-  my ($this, $widget) = @_;
-  $this->can("render_$widget");
+  my ($this, $wspec) = @_;
+  my @nsegs = YATT::Lite::Util::lexpand($wspec);
+  my $wname = join _ => map {defined $_ ? $_ : ''} @nsegs;
+  $this->can("render_$wname");
 }
 
 sub entity_uc { shift; uc($_[0]) }
@@ -208,6 +262,18 @@ sub entity_datetime {
   DateTime->$method(@args);
 }
 
+sub entity_localtime {
+  my ($this, $time) = @_;
+  require Time::Piece;
+  Time::Piece->localtime($time);
+}
+
+sub entity_gmtime {
+  my ($this, $time) = @_;
+  require Time::Piece;
+  Time::Piece->gmtime($time);
+}
+
 sub entity_redirect {
   my ($this) = shift;
   $CON->redirect(@_);
@@ -229,6 +295,40 @@ sub entity_inspector {
   my ($this, $code) = @_;
   croak "Not a code ref" unless ref $code;
   Sub::Inspector->new($code);
+}
+
+sub raise_dump {
+  my ($this, @args) = @_;
+  $this->raise_response($this->psgi_text(500, terse_dump(@args)));
+}
+
+sub entity_raise_dump {shift->raise_dump(@_)}
+
+sub entity_query_string {
+  my $this = shift;
+  my $args = (@_ == 1 ? $_[0] : +{@_});
+  # XXX: check unknown options... statically?! ← entmacro?
+  $args->{sep} //= $args->{separator} // ';';
+  my $hash = do {
+    my $h = $args->{of} // $args->{in} // $CON->as_hash;
+    if (my $sub = UNIVERSAL::can($h, 'clone')) {
+      $sub->($h);
+    } else {
+      YATT::Lite::Util::ixhash(%$h);
+    }
+  };
+  if (my $merge = $args->{merge}) {
+    $hash->{$_} = $merge->{$_} for keys %$merge;
+  }
+  if (my $delete = $args->{delete}) {
+    delete $hash->{$_} for YATT::Lite::Util::lexpand($delete);
+  }
+  $this->build_nested_query($hash, $args);
+}
+
+sub entity_build_nested_query {
+  my ($this, $hash, $args) = @_;
+  $this->build_nested_query($hash, $args);
 }
 
 use YATT::Lite::Breakpoint ();

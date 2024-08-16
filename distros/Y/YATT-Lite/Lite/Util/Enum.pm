@@ -15,8 +15,12 @@ sub import {
   } qw(EXPORT EXPORT_OK);
   while (@_ and my ($prefix, $enumList) = splice @_, 0, 2) {
     my $offset = 0;
+    my @names;
+    *{globref($callpack, $prefix)} = \@names;
     foreach my $item (@$enumList) {
+      my $primary;
       foreach my $name (split /=/, $item) {
+        $primary //= $name;
 	my $shortName = $prefix . $name;
 	my $fullName = $callpack . "::" . $shortName;
 	# print STDERR "$fullName\n";
@@ -28,9 +32,12 @@ sub import {
 	  push @$export, $shortName;
 	}
       }
+      push @names, $primary;
     } continue {
       $offset++;
     }
+
+    # push @$export_ok, $prefix, '@'.$prefix;
   }
 }
 

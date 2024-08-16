@@ -1,9 +1,9 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2023 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2023-2024 -- leonerd@leonerd.org.uk
 
-package Sublike::Extended 0.22;
+package Sublike::Extended 0.23;
 
 use v5.14;
 use warnings;
@@ -16,6 +16,8 @@ XSLoader::load( __PACKAGE__, our $VERSION );
 C<Sublike::Extended> - enable extended features when parsing C<sub>-like syntax
 
 =head1 SYNOPSIS
+
+=for highlighter language=perl
 
    use v5.26;
    use Sublike::Extended;
@@ -40,12 +42,12 @@ versions of Perl.
 
 =head2 Named parameters
 
-Extended subroutines can be declare named parameters in the signature, after
-any positional ones. These take the form of a name prefixed by a colon
-character. The caller of such a function should pass values for these
-parameters by the usual name-value pair syntax that would be used for passing
-into a regular hash. Within the body of the subroutine the values passed into
-these are unpacked into regular lexical variables.
+Extended subroutines can declare named parameters in the signature, after any
+positional ones. These take the form of a name prefixed by a colon character.
+The caller of such a function should pass values for these parameters by the
+usual name-value pair syntax that would be used for passing into a regular
+hash. Within the body of the subroutine the values passed into these are
+unpacked into regular lexical variables.
 
    extended sub colour (:$red, :$green, :$blue) {
       ... # $red, $green and $blue are available as regular lexicals
@@ -61,6 +63,13 @@ used instead.
 
    extended sub f (:$x0, :$x1, :$x2 = 0) { ... }
    # The caller must provide x0 and x1, but x2 is optional
+
+I<Since version 0.23> named parameters can be given defaulting expressions
+with the C<//=> or C<||=> operators, meaning their defaults apply also if the
+caller passed a present-but-undef, or present-but-false value.
+
+   extended sub f (:$x0, :$x1, :$x2 //= 0) { ... }
+   # $x2 will be set to 0 even if the caller passes  x2 => undef
 
 An optional slurpy hash is also permitted after all of these. It will contain
 the values of any other name-value pairs given by the caller, after those
@@ -112,6 +121,17 @@ sub unimport
 {
    delete $^H{"Sublike::Extended/extended"};
 }
+
+=head1 TODO
+
+=over 4
+
+=item *
+
+Support defined-or and true-or positional parameters even on versions of Perl
+before they were officially added (v5.38).
+
+=back
 
 =head1 AUTHOR
 

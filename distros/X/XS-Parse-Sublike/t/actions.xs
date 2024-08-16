@@ -23,6 +23,7 @@ static void action_pre_subparse(pTHX_ struct XSParseSublikeContext *ctx, void *_
 }
 
 static const struct XSParseSublikeHooks parse_action_hooks = {
+  .ver            = XSPARSESUBLIKE_ABI_VERSION,
   .permit_hintkey = "t::actions/action",
   .flags         = XS_PARSE_SUBLIKE_COMPAT_FLAG_DYNAMIC_ACTIONS,
   .require_parts = XS_PARSE_SUBLIKE_PART_NAME,

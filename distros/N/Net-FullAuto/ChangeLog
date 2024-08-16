@@ -19,6 +19,79 @@
 #
 #######################################################################
 
+
+2024-08-15  Brian M. Kelly <Brian.Kelly@fullauto.com>
+
+        * Version 1.0000701 released
+
+        * More debug for Makefile.PL
+
+2024-08-15  Brian M. Kelly <Brian.Kelly@fullauto.com>
+
+        * Version 1.0000700 released
+
+        * More debug for Makefile.PL
+
+2024-08-15  Brian M. Kelly <Brian.Kelly@fullauto.com>
+
+        * Version 1.0000699 released
+
+        * More debug for Makefile.PL
+
+2024-08-15  Brian M. Kelly <Brian.Kelly@fullauto.com>
+
+        * Version 1.0000698 released
+
+        * More debug for Makefile.PL
+
+2024-08-15  Brian M. Kelly <Brian.Kelly@fullauto.com>
+
+        * Version 1.0000697 released
+
+        * Remove debug Makefile.PL
+
+2024-08-15  Brian M. Kelly <Brian.Kelly@fullauto.com>
+
+        * Version 1.0000696 released
+
+        * Added more to debug Makefile.PL
+
+2024-08-15  Brian M. Kelly <Brian.Kelly@fullauto.com>
+
+        * Version 1.0000695 released
+
+        * Added more to debug Makefile.PL
+
+2024-08-15  Brian M. Kelly <Brian.Kelly@fullauto.com>
+
+        * Version 1.0000694 released
+
+        * Added more to debug Makefile.PL
+
+2024-08-15  Brian M. Kelly <Brian.Kelly@fullauto.com>
+
+        * Version 1.0000693 released
+
+        * Added more to debug Makefile.PL
+
+2024-08-15  Brian M. Kelly <Brian.Kelly@fullauto.com>
+
+        * Version 1.0000692 released
+
+        * Added echo statements to debug Makefile.PL
+
+2024-08-15  Brian M. Kelly <Brian.Kelly@fullauto.com>
+
+        * Version 1.0000691 released
+
+        * Fixed Makefile.PL bug
+
+2024-08-15  Brian M. Kelly <Brian.Kelly@fullauto.com>
+
+        * Version 1.0000690 released
+
+        * Added Memory management for AWS micro/nano
+
 2024-08-14  Brian M. Kelly <Brian.Kelly@fullauto.com>
 
         * Version 1.0000689 released

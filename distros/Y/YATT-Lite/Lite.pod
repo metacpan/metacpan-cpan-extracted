@@ -22,7 +22,7 @@ YATT::Lite - Template with "use strict"
   };
 
   # string based templating.
-  my $yatt = YATT::Lite->new(vfs => [data => $tmpl], app_ns => "MyApp");
+  my $yatt = YATT::Lite->new(vfs => [data => $tmpl], app_ns => "MyYATT");
 
   # to invoke above template, call 'render' method.
   print $yatt->render("", {title => "My First YATT"}), "\n";
@@ -32,13 +32,13 @@ YATT::Lite - Template with "use strict"
 
   # Multiple template.
   my $yatt2 = YATT::Lite->new(vfs => [data => {foo => "..", bar => ".."}]
-                             , app_ns => "MyApp2");
+                             , app_ns => "MyYATT2");
   print $yatt2->render(foo => [1,2]);
   print $yatt2->render(bar => [3,4]);
 
   # And filesystem based templating.
-  my $yatt3 = YATT::Lite->new(vfs => [file => "my.yatt"], app_ns => "MyApp3");
-  my $yatt4 = YATT::Lite->new(vfs => [dir  => "my.ytmpl"], app_ns => "MyApp4");
+  my $yatt3 = YATT::Lite->new(vfs => [file => "my.yatt"], app_ns => "MyYATT3");
+  my $yatt4 = YATT::Lite->new(vfs => [dir  => "my.ytmpl"], app_ns => "MyYATT4");
 
 =head1 DESCRIPTION
 

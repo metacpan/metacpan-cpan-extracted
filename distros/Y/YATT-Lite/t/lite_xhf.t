@@ -27,9 +27,13 @@ use YATT::Lite::Test::TestUtil;
 #========================================
 use YATT::t::t_preload; # To make Devel::Cover happy.
 
-use YATT::Lite;
-use YATT::Lite::Util qw(lexpand);
-use YATT::Lite::Util qw(appname);
+use YATT::Lite qw/*CON/;
+use YATT::Lite::Util qw/
+                         lexpand
+                         appname
+                         is_done
+                         terse_dump
+                     /;
 sub myapp {join _ => MyTest => appname($0), @_}
 
 use YATT::Lite::Breakpoint;
@@ -119,48 +123,82 @@ foreach my MY $sect (@section) {
 	skip "Module @missing is not installed", $test->ntests;
       }
       if ($test->{cf_BREAK}) {
-	breakpoint();
+        $DB::single = 1; 1 if $DB::single;
       }
       if ($test->{cf_OUT}) {
-	my $error;
 	unless ($test->{realfile}) {
 	  die "test realfile is undef!";
 	}
-	local $SIG{__DIE__} = sub {$error = @_ > 1 ? [@_] : shift};
-	local $SIG{__WARN__} = sub {$error = @_ > 1 ? [@_] : shift};
-	my ($pkg) = eval {
-	  my $tmpl = $yatt->find_file($test->{realfile});
+	my ($pkg, $compile_error) = do {
+          my $error;
+          local $SIG{__DIE__} = sub {$error = @_ > 1 ? [@_] : shift};
+          local $SIG{__WARN__} = sub {$error = @_ > 1 ? [@_] : shift};
+          my $pkg = eval {
+            my $tmpl = $yatt->find_file($test->{realfile});
 
-	  #
-	  # Workaround for false failure caused by Devel::Cover.
-	  #
-	  local $SIG{__WARN__} = sub {
-	    my ($msg) = @_;
-	    return if $msg =~ /^Devel::Cover: Can't open \S+ for MD5 digest:/;
-	    die $msg;
-	  };
+            #
+            # Workaround for false failure caused by Devel::Cover.
+            #
+            local $SIG{__WARN__} = sub {
+              my ($msg) = @_;
+              return if $msg =~ /^Devel::Cover: Can't open \S+ for MD5 digest:/;
+              die $msg;
+            };
 
-	  $yatt->find_product(perl => $tmpl);
-	};
-	is $error, undef, "$title - compiled.";
-	if ($error) {
+            $yatt->find_product(perl => $tmpl);
+          };
+
+          is $error, undef, "$title - compiled.";
+
+          ($pkg, $error);
+        };
+	if ($compile_error) {
 	  skip "not compiled - $title", 1;
 	} else {
+          my $error;
+          local $SIG{__DIE__} = sub {$error = @_ > 1 ? [@_] : shift};
+          local $SIG{__WARN__} = sub {$error = @_ > 1 ? [@_] : shift};
+
+          my $buffer = "";
 	  eval {
-	    eq_or_diff captured($pkg => render_ => lexpand($test->{cf_PARAM}))
-	      , encode(utf8 => $test->{cf_OUT}), "$title";
+            {
+              local $CON = do {
+                if (my $class = $test->{cf_CON_CLASS}) {
+                  YATT::Lite::Util::ckrequire($class);
+                  $class->create(
+                    undef,
+                    noheader => 1,
+                    buffer => \ $buffer,
+                    parameters => YATT::Lite::Util::ixhash(lexpand($test->{cf_PARAM})),
+                  );
+                } else {
+                  open my $fh, '>:utf8', \ $buffer;
+                  $fh;
+                }
+              };
+              $pkg->render_($CON, lexpand($test->{cf_PARAM}));
+            }
 	  };
-	  if ($@) {
-	    fail "$title: runtime error: $@";
+
+          if ($error and not is_done($error)) {
+	    fail "$title: runtime error: ".terse_dump($error);
+          } else {
+            eq_or_diff $buffer, encode(utf8 => $test->{cf_OUT}), "$title";
 	  }
 	}
-      } elsif ($test->{cf_ERROR}) {
+      } elsif ($test->{cf_ERROR} or $test->{cf_ERROR_BODY}) {
 	eval {
 	  my $tmpl = $yatt->find_file($test->{realfile});
 	  my $pkg = $yatt->find_product(perl => $tmpl);
 	  captured($pkg => render_ => lexpand($test->{cf_PARAM}));
 	};
-	like $@, qr{^$test->{cf_ERROR}}, $title;
+        if (ref $test->{cf_ERROR_BODY}) {
+          is_deeply $@->[2], $test->{cf_ERROR_BODY}, $title;
+        } elsif (ref $test->{cf_ERROR}) {
+          is_deeply $@, $test->{cf_ERROR}, $title;
+        } else {
+          like $@, qr{^$test->{cf_ERROR}}, $title;
+        }
       }
     }
     $last_title = $test->{cf_TITLE} if $test->{cf_TITLE};

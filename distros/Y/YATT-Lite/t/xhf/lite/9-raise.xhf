@@ -1,0 +1,11 @@
+# -*- coding: utf-8 -*-
+
+TITLE: raise_dump()
+IN:
+ AAA
+ &yatt:raise_dump([foo,bar]);
+ BBB
+ERROR_BODY[
+- foo
+- bar
+]

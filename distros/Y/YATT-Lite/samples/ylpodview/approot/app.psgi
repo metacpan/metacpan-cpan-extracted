@@ -66,7 +66,7 @@ use Config '%Config';
   }
 
   my $dispatcher = MY->new
-    (app_ns => 'MyApp'
+    (app_ns => 'MyYATT'
      , app_root => $app_root
      , doc_root => "$app_root/html"
      , (-d "$app_root/ytmpl" ? (app_base => '@ytmpl') : ())

@@ -1,0 +1,120 @@
+#!/usr/bin/env perl
+# -*- coding: utf-8 -*-
+#----------------------------------------
+use strict;
+use warnings qw(FATAL all NONFATAL misc);
+use FindBin; BEGIN {do "$FindBin::RealBin/libdir.pl"}
+#----------------------------------------
+
+use CGI;
+use YATT::Lite::Factory;
+use YATT::Lite::Entities qw(*YATT *CON *SYS);
+use YATT::Lite::Util::CmdLine qw(parse_opts parse_params);
+use YATT::Lite::Util qw(rootname
+			catch try_invoke);
+use YATT::Lite::CGen::Perl; # Just for debugging aid.
+use YATT::Lite::Breakpoint;
+
+use YATT::Lite::Util::FindMethods; # For debugging aid.
+# Try x FindMethods($this, qr/^entity_/)
+
+use YATT::Lite::PSGIEnv;
+
+#========================================
+sub usage {
+  my $scriptFn = File::Basename::basename($0);
+  die join("", @_, <<END);
+Usage: $scriptFn FILE K=V...
+       $scriptFn [--header] [--path_info] [--HTTP_PARAM=VALUE] FILE K=V...
+END
+}
+
+#========================================
+
+MY->parse_opts(\@ARGV, \ my %opts);
+
+my $path_info_mode = delete $opts{path_info};
+my $header_mode = delete $opts{header};
+
+if (keys %opts) {
+  die "Unknown opts: ".join(", ", sort keys %opts);
+}
+
+$SYS = my $dispatcher = YATT::Lite::Factory->load_factory_offline || do {
+  require YATT::Lite::WebMVC0::SiteApp;
+  YATT::Lite::WebMVC0::SiteApp->new
+      (app_ns => 'MyYATT'
+       , namespace => ['yatt', 'perl', 'js']
+       , header_charset => 'utf-8'
+       , debug_cgen => $ENV{DEBUG}
+       , debug_cgi  => $ENV{DEBUG_CGI}
+       # , is_gateway => $ENV{GATEWAY_INTERFACE} # Too early for FastCGI.
+       # , tmpl_encoding => 'utf-8'
+      );
+};
+
+{
+  my @http = MY->parse_opts(\@ARGV); # --NAME=VALUE for http parameters
+
+  my $path = shift
+    or usage();
+
+  MY->parse_params(\@ARGV, \ my %param); # name=value for query parameters
+
+  my Env $env = do {
+
+    my Env $e = Env->psgi_simple_env;
+
+    if ($path_info_mode) {
+      $e->{PATH_INFO} = $path;
+    } else {
+      $e->{PATH_TRANSLATED} = $dispatcher->rel2abs($path);
+      $e->{REDIRECT_STATUS} = 200;
+    }
+
+    # XXX: query_string handling.
+    # XXX: method and other http parameters
+
+    $e;
+  };
+
+  #========================================
+  $dispatcher->prepare_app;
+
+  # Note: YATT::Lite::Util::catch returns only $@.
+  my ($result, $nerror);
+  my $err = catch {
+    $result = $dispatcher->call($env);
+  };
+
+  if ($result) {
+    if (ref $result eq 'ARRAY') {
+      my ($status, $header, $body) = @$result;
+      my $cb = $status == 200
+        ? sub { print $_[0] }
+        : (++$nerror && sub { print STDERR $_[0] });
+
+      if ($header_mode) {
+        print "Status: $status\n";
+        while (my ($n, $v) = splice @$header, 0, 2) {
+          print $n, ": ", $v, "\n";
+        }
+        print "\n";
+      }
+
+      if (defined $body) {
+        Plack::Util::foreach($body, $cb);
+      } else {
+        ...
+      }
+    } elsif (ref $result eq 'CODE') {
+      ...
+    }
+  } elsif ($err) {
+    die $err;
+  } else {
+    die "really??"
+  }
+
+  exit 1 if $nerror;
+}

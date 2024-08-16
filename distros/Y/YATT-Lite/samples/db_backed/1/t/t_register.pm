@@ -11,7 +11,12 @@ require encoding;
 #use encoding qw(:locale), map {$_ => _get_locale_encoding()} qw(STDOUT STDERR);
 # binmode STDERR, sprintf ":encoding(%s)", _get_locale_encoding();
 
-use YATT::Lite::WebMVC0::SiteApp;
+{
+  package
+    t_register_app;
+  use YATT::Lite::WebMVC0::SiteApp -as_base;
+  use YATT::Lite::WebMVC0::Partial::Session;
+}
 use YATT::Lite::Test::TestUtil;
 use Test::More;
 use YATT::Lite::Util qw(lexpand read_file);
@@ -22,7 +27,6 @@ sub do_test {
   # XXX: Should directly read 1-basic.xhf first paragraph.
   foreach my $mod (qw(Plack
 		      DBIx::Class::Schema
-		      DBD::mysql
 		      CGI::Session
 		      Email::Simple
 		      Email::Sender
@@ -39,8 +43,8 @@ sub do_test {
 
   plan tests => 4;
 
-  my $app = YATT::Lite::WebMVC0::SiteApp->new
-    (app_ns => 'MyApp'
+  my $app = t_register_app->new
+    (app_ns => 'MyYATT'
      , app_root => $app_root
      , doc_root => "$app_root/html"
     );
@@ -68,32 +72,32 @@ END
 </head>
 <body>
 <div id="wrapper">
-  <center>
+<center>
 <div id="body">
   <div id="topnav">
     <h2>Registration Form</h2>
   </div>
-      <form method="POST">
+<form method="POST">
   <table>
     <tr>
       <th>User ID:</th>
-      <td><input type="text" name="login" size="15"></td>
+      <td><input type="text" name=".login" size="15"></td>
     </tr>
     <tr>
       <th>Password:</th>
-      <td><input type="password" name="password" size="15"></td>
+      <td><input type="password" name=".password" size="15"></td>
     </tr>
     <tr>
       <th>(Retype password):</th>
-      <td><input type="password" name="password2" size="15"></td>
+      <td><input type="password" name=".password2" size="15"></td>
     </tr>
     <tr>
       <th>Email:</th>
-      <td><input type="text" name="email" size="30"></td>
+      <td><input type="text" name=".email" size="30"></td>
     </tr>
     <tr>
       <td colspan="2">
-        <input type="hidden" name="nx" value="index.yatt"/>
+        <input type="hidden" name=".nx" value="index.yatt"/>
         <input type="submit" name="!register"/>
       </td>
     </tr>
@@ -109,11 +113,11 @@ END
 
   local $ENV{EMAIL_SENDER_TRANSPORT} = 'YATT_TEST';
   $got = nocr($app->render(['/register.yatt', action => 'register']
-			   , {qw(login     hkoba
-				 password  foo
-				 password2 foo
-				 email     hkoba@foo.bar
-				 nx      index.yatt)}));
+			   , {qw(.login     hkoba
+				 .password  foo
+				 .password2 foo
+				 .email     hkoba@foo.bar
+				 .nx      index.yatt)}));
 
   eq_or_diff($got, <<'END', 'register.yatt !register');
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
@@ -124,12 +128,12 @@ END
 </head>
 <body>
 <div id="wrapper">
-  <center>
+<center>
 <div id="body">
   <div id="topnav">
     <h2></h2>
   </div>
-        <h2>Confirmation Email is Sent to you.</h2>
+  <h2>Confirmation Email is Sent to you.</h2>
   <a href="index.yatt">back</a>    
 </div>
 </center>
@@ -173,7 +177,7 @@ please dispose this mail.
 </head>
 <body>
 <div id="wrapper">
-      <div class="login">
+    <div class="login">
       <b>hkoba</b> | <a href="logout.ydo?nx=register.yatt">logout</a>
     </div>
   <center>
@@ -181,7 +185,7 @@ please dispose this mail.
   <div id="topnav">
     <h2></h2>
   </div>
-        <h2>Welcome! Your registration is successfully completed.</h2>
+  <h2>Welcome! Your registration is successfully completed.</h2>
   <a href="./">Top</a>    
 </div>
 </center>

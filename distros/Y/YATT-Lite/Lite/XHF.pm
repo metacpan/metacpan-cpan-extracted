@@ -6,12 +6,16 @@ use utf8;
 
 our $VERSION = "0.03";
 
+use constant TRACE => $ENV{TRACE_XHF_PARSER};
+
 use base qw(YATT::Lite::Object);
 use fields qw(cf_FH cf_filename cf_string cf_tokens
 	      fh_configured
 	      cf_allow_empty_name
 	      cf_encoding cf_crlf
 	      cf_nocr cf_subst
+              cf_first_lineno
+              _depth
 	      cf_skip_comment cf_bytes);
 
 use Exporter qw(import);
@@ -19,7 +23,7 @@ our @EXPORT = qw(read_file_xhf);
 our @EXPORT_OK = (@EXPORT, qw(parse_xhf $cc_name));
 
 use YATT::Lite::Util;
-use YATT::Lite::Util::Enum _ => [qw(NAME SIGIL VALUE)];
+use YATT::Lite::Util::Enum _ => [qw(NAME SIGIL VALUE LINENO)];
 
 our $cc_name  = qr{[0-9A-Za-z_\.\-/~!]};
 our $re_suffix= qr{\[$cc_name*\]};
@@ -38,8 +42,17 @@ sub after_new {
 }
 
 sub read_file_xhf {
-  my ($pack, $fn, @rest) = @_;
-  MY->new(filename => $fn, encoding => 'utf8', @rest)->read;
+  my ($pack, $fn, %rest) = @_;
+  my $method = do {
+    my $single = delete $rest{single};
+    my $all = delete $rest{all} // 1;
+    if ($single or not $all) {
+      'read';
+    } else {
+      'read_all';
+    }
+  };
+  MY->new(filename => $fn, encoding => 'utf8', %rest)->$method;
 }
 
 sub parse_xhf {
@@ -55,6 +68,11 @@ sub configure_filename {
   $self->{fh_configured} = 0;
   $self->{cf_filename} = $fn;
   $self;
+}
+
+sub configure_filename_for_error {
+  (my MY $self, my ($fn)) = @_;
+  $self->{cf_filename} = $fn;
 }
 
 # To accept in-stream encoding spec.
@@ -78,6 +96,23 @@ sub configure_string {
   open $self->{cf_FH}, '<', \ $self->{cf_string}
     or croak "Can't create string stream: $!";
   $self;
+}
+
+sub trace {
+  (my MY $reader, my ($msg, @desc)) = @_;
+  print STDERR "  " x $reader->{_depth}, $msg, terse_dump(@desc), "\n";
+}
+
+sub read_all {
+  (my MY $self) = @_;
+  my @res;
+  while (my @block = $self->read) {
+    push @res, @block;
+  }
+  wantarray ? @res : do {
+    my %dict = @res;
+    \%dict;
+  };
 }
 
 # XXX: Should I rename this to read_one()?
@@ -128,6 +163,7 @@ sub tokenize_1 {
     *_ =  \ $_[0];
     $sub->($_);
   }
+  my $lineno = $reader->{cf_first_lineno} // 1;
   my ($pos, $ncomments, @tokens, @result);
   foreach my $token (@tokens = split /(?<=\n)(?=[^\ \t])/, $_[0]) {
     $pos++;
@@ -137,15 +173,17 @@ sub tokenize_1 {
     }
 
     unless ($token =~ s{^($cc_name*$re_suffix*) ($cc_sigil) (?:($cc_tabsp)|(\n|$))}{}x) {
-      croak "Invalid XHF token '$token': line " . token_lineno(\@tokens, $pos);
+      croak "Invalid XHF token '$token' ".$reader->fileinfo_lineno($lineno)."\n";
     }
     my ($name, $sigil, $tabsp, $eol) = ($1, $2, $3, $4);
 
     if ($name eq '') {
-      croak "Invalid XHF token(name is empty for '$token')"
+      croak "Invalid XHF token(name is empty for '$token') "
+        .$reader->fileinfo_lineno($lineno)."\n"
 	if $sigil eq ':' and not $reader->{cf_allow_empty_name};
     } elsif ($NAME_LESS{$sigil}) {
-      croak "Invalid XHF token('$sigil' should not be prefixed by name '$name')"
+      croak "Invalid XHF token('$sigil' should not be prefixed by name '$name') "
+        .$reader->fileinfo_lineno($lineno)."\n";
     }
 
     # Comment fields are ignored.
@@ -164,14 +202,17 @@ sub tokenize_1 {
     } else {
       # Deny:  name{ foo
       # Allow: name[ foo
-      croak "Invalid XHF token(container with value): "
+      croak "Invalid XHF token(container with value) "
 	. join("", grep {defined $_} $name, $sigil, $tabsp, $token)
-	  if $sigil eq '{' and $token ne "";
+        . $reader->fileinfo_lineno($lineno)."\n"
+        if $sigil eq '{' and $token ne "";
 
       # Trim leading space for $tabsp eq "\n".
       $token =~ s/^[\ \t]//;
     }
-    push @result, [$name, $sigil, $token];
+    push @result, [$name, $sigil, $token, $lineno];
+  } continue {
+    $lineno++;
   }
 
   # Comment only paragraph should return nothing.
@@ -180,26 +221,35 @@ sub tokenize_1 {
   wantarray ? @result : \@result;
 }
 
-sub token_lineno {
-  my ($tokens, $pos) = @_;
-  my $lineno = 1;
-  $lineno += tr|\n|| for grep {defined} @$tokens[0 .. $pos];
-  $lineno;
+sub fileinfo {
+  (my MY $reader, my $desc) = @_;
+  $reader->fileinfo_lineno($desc->[_LINENO]);
+}
+
+sub fileinfo_lineno {
+  (my MY $reader, my $lineno) = @_;
+  sprintf("at %s line %d"
+          , $reader->{cf_filename} // "(unknown)"
+          , $lineno);
 }
 
 sub organize {
   my MY $reader = shift;
+  local $reader->{_depth} = -1;
+  my $pos = 0;
   my @result;
-  while (@_) {
-    my $desc = shift;
+  while ($pos < @_) {
+    my $desc = $_[$pos++];
     unless (defined $desc->[_NAME]) {
-      croak "Invalid XHF: Field close '$desc->[_SIGIL]' without open!";
+      croak "Invalid XHF: Field close '$desc->[_SIGIL]'"
+        ." (line $desc->[_LINENO]) without open! "
+        .$reader->fileinfo($desc)."\n";
     }
     push @result, $desc->[_NAME] if $desc->[_NAME] ne ''
       or $ALLOW_EMPTY_NAME{$desc->[_SIGIL]};
     if (my $sub = $OPN{$desc->[_SIGIL]}) {
       # sigil がある時、value を無視して、良いのか?
-      push @result, $sub->($reader, \@_, $desc);
+      push @result, $sub->($reader, \$pos, \@_, $desc);
     } else {
       push @result, $desc->[_VALUE];
     }
@@ -214,82 +264,100 @@ sub organize {
 
 # '[' block
 sub organize_array {
-  (my MY $reader, my ($tokens, $first)) = @_;
+  (my MY $reader, my ($posref, $tokens, $first)) = @_;
+  local $reader->{_depth} = $reader->{_depth} + 1;
+  $reader->trace("> ", $first) if TRACE;
   my @result;
   push @result, $first->[_VALUE] if defined $first and $first->[_VALUE] ne '';
-  while (@$tokens) {
-    my $desc = shift @$tokens;
+  while ($$posref < @$tokens) {
+    my $desc = $tokens->[$$posref++];
     # NAME
     unless (defined $desc->[_NAME]) {
       if ($desc->[_SIGIL] ne ']') {
-	croak "Invalid XHF: paren mismatch. '[' is closed by '$desc->[_SIGIL]'";
+	croak "Invalid XHF: paren mismatch. '['"
+          ." (line $first->[_LINENO]) is closed by '$desc->[_SIGIL]' "
+          .$reader->fileinfo($desc)."\n";
       }
+      $reader->trace("< ", $first, $desc) if TRACE;
       return \@result;
     }
     elsif ($desc->[_NAME] ne '') {
+      $reader->trace("| ", $desc) if TRACE;
       push @result, $desc->[_NAME];
     }
     # VALUE
     if (my $sub = $OPN{$desc->[_SIGIL]}) {
       # sigil がある時、value があったらどうするかは、子供次第。
-      push @result, $sub->($reader, $tokens, $desc);
+      push @result, $sub->($reader, $posref, $tokens, $desc);
     }
     else {
+      $reader->trace("| ", $desc) if TRACE;
       push @result, $desc->[_VALUE];
     }
   }
-  croak "Invalid XHF: Missing close ']'";
+  croak "Invalid XHF: Missing close ']' for '[' "
+    .$reader->fileinfo($first)."\n";
 }
 
 # '{' block.
 sub organize_hash {
-  (my MY $reader, my ($tokens, $first)) = @_;
-  die "Invalid XHF hash block beginning! ". join("", @$first)
+  (my MY $reader, my ($posref, $tokens, $first)) = @_;
+  croak "Invalid XHF hash block beginning! "
+    . join("", @$first).$reader->fileinfo($first)."\n"
     if defined $first and $first->[_VALUE] ne '';
+  local $reader->{_depth} = $reader->{_depth} + 1;
+  $reader->trace("> ", $first) if TRACE;
   my %result;
-  while (@$tokens) {
-    my $desc = shift @$tokens;
+  while ($$posref < @$tokens) {
+    my $desc = $tokens->[$$posref++];
     # NAME
     unless (defined $desc->[_NAME]) {
       if ($desc->[_SIGIL] ne '}') {
-	croak "Invalid XHF: paren mismatch. '{' is closed by '$desc->[_SIGIL]'";
+	croak "Invalid XHF: paren mismatch. '{'"
+          ." (line $first->[_LINENO]) is closed by '$desc->[_SIGIL]' "
+          .$reader->fileinfo($desc)."\n";
       }
+      $reader->trace("< ", $first, $desc) if TRACE;
       return \%result;
     }
     elsif ($desc->[_SIGIL] eq '-') {
       # Should treat two lines as one key value pair.
-      unless (@$tokens) {
+      unless ($$posref < @$tokens) {
 	croak "Invalid XHF hash:"
-	  ." key '- $desc->[_VALUE]' doesn't have value!";
+	  ." key '- $desc->[_VALUE]' doesn't have value! "
+          .$reader->fileinfo($desc)."\n";
       }
-      my $valdesc = shift @$tokens;
+      my $valdesc = $tokens->[$$posref++];
       my $value = do {
 	if (my $sub = $OPN{$valdesc->[_SIGIL]}) {
-	  $sub->($reader, $tokens, $valdesc);
+	  $sub->($reader, $posref, $tokens, $valdesc);
 	} elsif ($valdesc->[_SIGIL] eq '-') {
 	  $valdesc->[_VALUE];
 	} else {
 	  croak "Invalid XHF hash value:"
-	    . " key '$desc->[_VALUE]' has invalid sigil '$valdesc->[_SIGIL]'";
+	    . " key '$desc->[_VALUE]' has invalid sigil '$valdesc->[_SIGIL]' "
+            .$reader->fileinfo($valdesc)."\n"
 	}
       };
       $reader->add_value($result{$desc->[_VALUE]}, $value);
     } else {
+      $reader->trace("| ", $desc) if TRACE;
       if (my $sub = $OPN{$desc->[_SIGIL]}) {
 	# sigil がある時、value を無視して、良いのか?
-	$desc->[_VALUE] = $sub->($reader, $tokens, $desc);
+	$desc->[_VALUE] = $sub->($reader, $posref, $tokens, $desc);
       }
       $reader->add_value($result{$desc->[_NAME]}, $desc->[_VALUE]);
     }
   }
-  croak "Invalid XHF: Missing close '}'";
+  croak "Invalid XHF: Missing close '}' for '{' "
+    .$reader->fileinfo($first)."\n";
 }
 
 # '=' value
 sub _undef {undef}
 our %EXPR = (null => \&_undef, 'undef' => \&_undef);
 sub organize_expr {
-  (my MY $reader, my ($tokens, $first)) = @_;
+  (my MY $reader, my ($posref, $tokens, $first)) = @_;
   if ((my $val = $first->[_VALUE]) =~ s/^\#(\w+)\s*//) {
     my $sub = $EXPR{$1}
       or croak "Invalid XHF keyword: '= #$1'";

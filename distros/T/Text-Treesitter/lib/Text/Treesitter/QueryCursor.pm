@@ -1,15 +1,17 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2023 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2023-2024 -- leonerd@leonerd.org.uk
 
 use v5.26;
 use warnings;
 use Object::Pad 0.800;
 
-package Text::Treesitter::QueryCursor 0.12;
+package Text::Treesitter::QueryCursor 0.13;
 class Text::Treesitter::QueryCursor
    :strict(params);
+
+use Sublike::Extended;
 
 use Carp;
 
@@ -83,10 +85,8 @@ the object itself and can be iterated using L</next_match>.
 
 =cut
 
-method exec
+method exec ( $query, $node )
 {
-   my ( $query, $node ) = @_;
-
    $querycursor->_exec( $query, $node->_node );
    $_current_tree = $node->tree;
    $_current_query = $query;
@@ -102,7 +102,7 @@ of L<Text::Treesitter::QueryMatch>.
 
 =cut
 
-method next_match
+method next_match ()
 {
    my $querymatch = $querycursor->_next_match or return undef;
 
@@ -133,12 +133,8 @@ strings that are the result of C<#set!> directives found in the query.
 
 =cut
 
-method next_match_captures ( %options )
+extended method next_match_captures ( :$multi = 0 )
 {
-   my $multi = delete $options{multi};
-   keys %options and
-      croak "Unrecognised options to ->next_captures: " . join( ", ", keys %options );
-
    {
       my $match = $self->next_match or return undef;
 

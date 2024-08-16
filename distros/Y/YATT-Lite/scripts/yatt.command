@@ -24,7 +24,7 @@ GetOptions("if_can" => \ my $if_can
 my $dispatcher = YATT::Lite::Factory->load_factory_offline || do {
     require YATT::Lite::WebMVC0::SiteApp;
     YATT::Lite::WebMVC0::SiteApp->new
-	(app_ns => 'MyApp'
+	(app_ns => 'MyYATT'
 	 , namespace => ['yatt', 'perl', 'js']
 	 , header_charset => 'utf-8'
 	 , tmpldirs => [grep {-d} "ytmpl"]

@@ -14,7 +14,9 @@ use Test::More;
 use YATT::Lite::Util::File qw(mkfile);
 
 BEGIN {
-  use_ok('YATT::Lite::Util', qw(split_path lookup_path));
+  use_ok('YATT::Lite::Util', qw(split_path lookup_path
+                                trim_common_suffix_from
+                             ));
 }
 
 my $BASE = tempdir(CLEANUP => $ENV{NO_CLEANUP} ? 0 : 1);
@@ -190,6 +192,48 @@ $i++;
 	    , [$tmpl, '/', 'filevsdir.yatt', '/virt/bar']);
     $test->('/filevsdir/virt/bar'
 	    , [$tmpl, '/filevsdir/', 'index.yatt', '/virt/bar']);
+  }
+}
+
+{
+  my $test = sub {
+    my ($script_name, $script_filename, $expect) = @_;
+    is(trim_common_suffix_from($script_name, $script_filename)
+       , $expect
+       , "trim_common_suffix_from($script_name, $script_filename) => $expect");
+  };
+
+  $test->('/foo/cgi-bin/dispatch.cgi'
+          , '/var/www/foo/html/cgi-bin/dispatch.cgi'
+          => '/foo');
+
+  $test->('/cgi-bin/dispatch.cgi'
+          , '/var/www/cgi-bin/dispatch.cgi'
+          => '');
+
+  $test->('/experimental/foobar/1/-/cgi-bin/runplack.cgi'
+          , '/var/www/experimental/apps/foobar/1/cgi-bin/runplack.cgi'
+          => '/experimental/foobar/1/-');
+
+}
+
+{
+  # Shamelessly stolen from Dancer2/t/file_utils.t
+  my $paths = [
+    [ undef          => 'undef' ],
+    [ '/foo/./bar/'  => '/foo/bar/' ],
+    [ '/foo/../bar' => '/bar' ],
+    [ '/foo/bar/..'  => '/foo/' ],
+    [ '/a/b/c/d/A/B/C' => '/a/b/c/d/A/B/C' ],
+    [ '/a/b/c/d/../A/B/C' => '/a/b/c/A/B/C' ],
+    [ '/a/b/c/d/../../A/B/C' => '/a/b/A/B/C' ],
+    [ '/a/b/c/d/../../../A/B/C' => '/a/A/B/C' ],
+    [ '/a/b/c/d/../../../../A/B/C' => '/A/B/C' ],
+  ];
+
+  for my $case ( @$paths ) {
+    is YATT::Lite::Util::normalize_path( $case->[0] ), $case->[1]
+      , YATT::Lite::Util::terse_dump($case);
   }
 }
 

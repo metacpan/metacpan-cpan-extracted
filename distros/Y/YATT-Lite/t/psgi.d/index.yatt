@@ -1,11 +1,11 @@
-<!yatt:args "/{any:.*}">
-<yatt:hello id="content">
-World&yatt:any;
-</yatt:hello>
-
 <!yatt:page other="/baz/:id">
 <yatt:hello id="other">
 ok?(&yatt:id;)
+</yatt:hello>
+
+<!yatt:args "/{any:.*}" any="?;-)">
+<yatt:hello id="content">
+World&yatt:any;
 </yatt:hello>
 
 <!yatt:page qux any>

@@ -1,0 +1,5 @@
+<!yatt:action ''>
+print $CON "OK";
+
+<!yatt:page other>
+hoehoe

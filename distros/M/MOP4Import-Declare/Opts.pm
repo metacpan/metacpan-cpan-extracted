@@ -27,6 +27,12 @@ use fields
    # original caller info. This may be empty for faked m4i_opts()
    , 'caller'
 
+   # closures which are called at the each end of MOP4Import handling.
+   , 'delayed_tasks'
+
+   # default value for json_type. 'string' if not specified
+   , 'default_json_type'
+
    , qw/filename line/
  );
 
@@ -46,6 +52,8 @@ sub new {
     ($opts->{callpack}, $opts->{filename}, $opts->{line})
       = ref $caller ? @$caller : ($caller, '', '');
   }
+
+  $opts->{delayed_tasks} = [];
 
   $opts->{$_} = $opts{$_} for keys %opts;
 

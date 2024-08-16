@@ -7,11 +7,51 @@ use YATT::Lite::WebMVC0::SiteApp; # To make lint happy, this is required.
 
 package YATT::Lite::WebMVC0::SiteApp;
 
+#
+# For debugging only (at least for now).
+#
+sub _callas_cgi {
+  (my MY $self, my $app, my $fh, my Env $init_env, my ($args, %opts)) = @_;
+
+  my Env $env = $self->psgi_cgi_newenv($init_env, $fh);
+
+  my $res;
+  if ($self->{cf_noheader}) {
+    require Cwd;
+    local $env->{GATEWAY_INTERFACE} = 'CGI/YATT';
+    local $env->{REQUEST_METHOD} //= 'GET';
+    local @{$env}{qw(PATH_TRANSLATED REDIRECT_STATUS)}
+      = (Cwd::abs_path(shift @$args), 200)
+      if @_;
+
+    if (my $err = catch { $res = $app->($env) }) {
+      # XXX: Should I do error specific things?
+      $res = $err;
+    }
+
+  } elsif ($env->{GATEWAY_INTERFACE}) {
+    if (my $err = catch { $res = $app->($env) }) {
+      $res = $err;
+    }
+  } else {
+    $res = $app->($env);
+    print terse_dump($res);
+  }
+
+  print terse_dump($res);
+}
+
 sub _runas_cgi {
   (my MY $self, my $fh, my Env $env, my ($args, %opts)) = @_;
-  if (-e ".htdebug_env") {
+
+  if ($self->has_htdebug("env")) {
     $self->printenv($fh, $env);
     return;
+  }
+
+  # This flag is useful to debug "malformed header from script" case.
+  if ($self->has_htdebug("dumb_header")) {
+    print $fh "\n\n";
   }
 
   $self->init_by_env($env);
@@ -43,11 +83,12 @@ sub _runas_cgi {
     };
 
     $self->cgi_process_error($error, $con, $fh, $env);
+    $con->header_was_sent if $con;
 
   } else {
     # dispatch without catch.
     my @params = $self->make_cgi($env, $args, \%opts);
-    my $con = $self->make_connection($fh, @params);
+    my $con = $self->make_connection($fh, @params, no_auto_flush_headers => 1);
     $self->cgi_dirhandler($con, @params);
   }
 }
@@ -81,7 +122,7 @@ sub cgi_dirhandler {
 
 sub make_cgi {
   (my MY $self, my Env $env, my ($args, $opts)) = @_;
-  my ($cgi, $root, $loc, $file, $trailer);
+  my ($cgi, $root, $loc, $file, $trailer, $is_index);
   unless ($self->{cf_noheader}) {
     $cgi = do {
       if (ref $args and UNIVERSAL::can($args, 'param')) {
@@ -91,7 +132,7 @@ sub make_cgi {
       }
     };
 
-    ($root, $loc, $file, $trailer) = my @pi = $self->split_path_info($env);
+    ($root, $loc, $file, $trailer, $is_index) = my @pi = $self->split_path_info($env);
 
     unless (@pi) {
       # XXX: This is too early for fatal to browser. mmm
@@ -114,8 +155,16 @@ sub make_cgi {
       $path = Cwd::abs_path($path) // die "No such file: $path\n";
     }
     # XXX: widget 直接呼び出しは？ cgi じゃなしに、直接パラメータ渡しは？ =>
-    ($root, $loc, $file, $trailer) = split_path($path, $self->{cf_app_root});
+    ($root, $loc, $file, $trailer, $is_index) = split_path($path, $self->{cf_app_root});
     $cgi = $self->new_cgi(@$args);
+  }
+
+  if ($self->has_htdebug("path_info")) {
+    $self->raise_psgi_dump([loc     => $loc]
+                           , [file    => $file]
+                           , [trailer => $trailer]
+                           , [is_index => $is_index]
+                         );
   }
 
   (env => $env, $self->connection_quad(["$root$loc", $loc, $file, $trailer])
@@ -134,7 +183,10 @@ sub new_cgi {
   my (@params) = do {
     unless (@_) {
       ()
+    } elsif (@_ == 1 and defined $_[0] and not ref $_[0] and $_[0] =~ /[&;]/) {
+      $_[0]; # Raw query string
     } elsif (@_ > 1 or defined $_[0] and not ref $_[0]) {
+      # k=v list
       $self->parse_params(\@_, {})
     } elsif (not defined $_[0]) {
       ();
@@ -180,7 +232,6 @@ sub cgi_process_error {
 
   } else {
     # Unknown error.
-    $con->header_was_sent if $con;
     $self->show_error($fh, $error, $env);
   }
 }
@@ -220,6 +271,26 @@ sub show_error {
     print $fh "\n";
   }
   print $fh "\n". ($error // "");
+}
+
+sub psgi_cgi_newenv {
+  (my MY $self, my Env $init_env, my ($stdin, $stderr)) = @_;
+  require Plack::Util;
+  require Plack::Request;
+  my Env $env = +{ %$init_env };
+  $env->{'psgi.version'} = [1,1];
+  $env->{'psgi.url_scheme'}
+    = ($init_env->{HTTPS}||'off') =~ /^(?:on|1)$/i ? 'https' : 'http';
+  $env->{'psgi.input'}        = $stdin  || *STDIN;
+  $env->{'psgi.errors'}       = $stderr || *STDERR;
+  $env->{'psgi.multithread'}  = &Plack::Util::FALSE;
+  $env->{'psgi.multiprocess'} = &Plack::Util::FALSE; # XXX:
+  $env->{'psgi.run_once'}     = &Plack::Util::FALSE;
+  $env->{'psgi.streaming'}    = &Plack::Util::FALSE; # XXX: Todo.
+  $env->{'psgi.nonblocking'}  = &Plack::Util::FALSE;
+  # delete $env->{HTTP_CONTENT_TYPE};
+  # delete $env->{HTTP_CONTENT_LENGTH};
+  $env;
 }
 
 &YATT::Lite::Breakpoint::break_load_dispatcher_cgi;

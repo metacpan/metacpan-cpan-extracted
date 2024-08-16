@@ -8,7 +8,7 @@ use Object::Pad 0.807;
 use Future::AsyncAwait;
 use Syntax::Keyword::Match;
 
-package IPC::MicroSocket 0.01;
+package IPC::MicroSocket 0.02;
 
 =head1 NAME
 

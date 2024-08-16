@@ -1,0 +1,21 @@
+trail_eq	lvalue	match	action
+-	-	nest	parse_attlist (for nest)
+-	has_lvalue	nest	parse_attlist (for nest)
+-	-	nestclo	create: nameless nested att
+-	has_lvalue	nestclo	create: named nested att
+-	-	bare_sq_dq	create: nameless text att
+-	has_lvalue	bare_sq_dq	create: named text att
+-	-	entity_special	create: nameless text att
+-	has_lvalue	entity_special	create: named text att
+-	-	macro	parse_attmacro
+-	has_lvalue	macro	error: X = %yatt:
+has_equal	-	nest	error: [=
+has_equal	-	nestclo	create: nested lvalue; parse_attlist
+has_equal	-	bare_sq_dq	push bare; sq, dq is error
+has_equal	-	entity_special	error: &yatt:=
+has_equal	-	macro	error: %...=
+has_equal	has_lvalue	nest	error: X = [=
+has_equal	has_lvalue	nestclo	error: X = ]=
+has_equal	has_lvalue	bare_sq_dq	error: X = ".."=
+has_equal	has_lvalue	entity_special	error: X = &yatt:=
+has_equal	has_lvalue	macro	error: X = %...=

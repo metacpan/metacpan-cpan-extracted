@@ -30,7 +30,7 @@ is to explicitly save the current position:
 use strict;
 use warnings FATAL => 'all';
 
-our $VERSION = '0.7';
+our $VERSION = '0.9';
 
 use Symbol ();
 use IO::File ();
@@ -231,7 +231,7 @@ sub _save_offset_to_status {
 	my $log_filename = *$self->{filename};
 	my $status_fh = *$self->{status_fh};
 	my $checksum = $self->_get_current_checksum();
-	$status_fh->seek(0, 0);
+	$status_fh->seek(0, 0) if defined $status_fh;
 	my $archive_text = defined *$self->{archive} ? " archive [@{[ *$self->{archive} ]}]" : '';
 	$status_fh->printflush("File [$log_filename]$archive_text offset [$offset] checksum [$checksum]\n");
 	$status_fh->truncate($status_fh->tell);
@@ -368,6 +368,8 @@ sub _getline {
 				# next one
 				my ($newer_fh, $newer_archive) = $self->_get_archive(*$self->{archive}, 'newer');
 				if (not defined $newer_fh) {
+					# clear the EOF flag to allow for repeated read
+					$fh->seek(0, 1);
 					return;
 				}
 				*$self->{_fh}->close();
@@ -376,6 +378,9 @@ sub _getline {
 				*$self->{data_length} = 0;
 				*$self->{archive} = $newer_archive;
 				goto DO_GETLINE;
+			} else {
+				# clear the EOF flag to allow for repeated read
+				$fh->seek(0, 1);
 			}
 			return;
 		}
@@ -575,7 +580,7 @@ Line <$fh> in list context.
 
 =head1 AUTHOR AND LICENSE
 
-Copyright (c) 2010 Jan Pazdziora.
+Copyright (c) 2010--2024 Jan Pazdziora.
 
 Logfile::Tail is free software. You can redistribute it and/or modify
 it under the terms of either:

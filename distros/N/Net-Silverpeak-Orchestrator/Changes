@@ -1,5 +1,8 @@
 Revision history for Net-Silverpeak-Orchestrator
 
+0.015000  2024-08-16 09:37:50+02:00 Europe/Vienna
+    - add get_appliance_bgp_system_config_allvrfs
+
 0.014000  2024-08-14 14:35:22+02:00 Europe/Vienna
     - add get_appliance_bgp_system_config
     - add get_appliance_bgp_neighbors

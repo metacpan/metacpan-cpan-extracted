@@ -21,24 +21,24 @@ BODY:
    </div>
  
    <div id="body">
-   <div style="float: left; width: 65%;">
+ <div style="float: left; width: 65%;">
  <form method="POST">
  <div>
-   <div class="item">
+ <div class="item">
  <label for="name">
      Your Name
    </label><input type="text" id="name" name="name"  size="35" value="">
  
  </div>
  
-   <div class="item">
+ <div class="item">
  <label for="email">
      E-Mail
    </label><input type="text" id="email" name="email"  size="35" value="">
  
  </div>
  
-   <div class="item">
+ <div class="item">
      <label>Gender</label>
      <select name="gender">
        <option value="0">-</option>
@@ -49,7 +49,7 @@ BODY:
  
  </div>
  
-   <div class="item">
+ <div class="item">
      <label>Favorite Fruits</label>
      <table>
        <tr>
@@ -57,72 +57,62 @@ BODY:
  	<th class="top">Choose all you like</th>
  	<th class="top">Most Favorite</th>
        </tr>
-       
        <tr>
  	<th class="left">Apple</th>
  	<td class="center"><input type="checkbox" name="fruits[1]" /></td>
  	<td class="center"><input type="radio" name="fond_fruits" value="1" /></td>
        </tr>
-       
        <tr>
  	<th class="left">Banana</th>
  	<td class="center"><input type="checkbox" name="fruits[2]" /></td>
  	<td class="center"><input type="radio" name="fond_fruits" value="2" /></td>
        </tr>
-       
        <tr>
  	<th class="left">Grape</th>
  	<td class="center"><input type="checkbox" name="fruits[3]" /></td>
  	<td class="center"><input type="radio" name="fond_fruits" value="3" /></td>
        </tr>
-       
        <tr>
  	<th class="left">Grapefruit</th>
  	<td class="center"><input type="checkbox" name="fruits[4]" /></td>
  	<td class="center"><input type="radio" name="fond_fruits" value="4" /></td>
        </tr>
-       
        <tr>
  	<th class="left">Kiwifruit</th>
  	<td class="center"><input type="checkbox" name="fruits[5]" /></td>
  	<td class="center"><input type="radio" name="fond_fruits" value="5" /></td>
        </tr>
-       
        <tr>
  	<th class="left">Lemon</th>
  	<td class="center"><input type="checkbox" name="fruits[6]" /></td>
  	<td class="center"><input type="radio" name="fond_fruits" value="6" /></td>
        </tr>
-       
        <tr>
  	<th class="left">Mango</th>
  	<td class="center"><input type="checkbox" name="fruits[7]" /></td>
  	<td class="center"><input type="radio" name="fond_fruits" value="7" /></td>
        </tr>
-       
        <tr>
  	<th class="left">Orange</th>
  	<td class="center"><input type="checkbox" name="fruits[8]" /></td>
  	<td class="center"><input type="radio" name="fond_fruits" value="8" /></td>
        </tr>
-       
        <tr>
  	<th class="left">Pineapple</th>
  	<td class="center"><input type="checkbox" name="fruits[9]" /></td>
  	<td class="center"><input type="radio" name="fond_fruits" value="9" /></td>
        </tr>
-       
        <tr>
  	<th class="left">Strawberry</th>
  	<td class="center"><input type="checkbox" name="fruits[10]" /></td>
  	<td class="center"><input type="radio" name="fond_fruits" value="10" /></td>
        </tr>
-           </table>
+     </table>
    
  
  </div>
  
-   <div class="item">
+ <div class="item">
  <label for="message">
      Message
    </label><textarea name="message" id="message"  rows="5"  cols="70"></textarea>
@@ -130,7 +120,7 @@ BODY:
  </div>
  
    <div class="submit">
-           <input type="submit" name="~confirm" value="Confirm"/>
+       <input type="submit" name="~confirm" value="Confirm"/>
      
    </div>
  </div>
@@ -189,12 +179,12 @@ BODY:
    </div>
  
    <div id="body">
-   
+ 
  
  <h2>Is this ok?</h2>
  <form method="POST">
  <div>
-   <div class="item">
+ <div class="item">
  <label for="name">
      Your Name
    </label><div class="input">
@@ -203,7 +193,7 @@ BODY:
  
  </div>
  
-   <div class="item">
+ <div class="item">
  <label for="email">
      E-Mail
    </label><div class="input">
@@ -212,7 +202,7 @@ BODY:
  
  </div>
  
-   <div class="item">
+ <div class="item">
      <label>Gender</label>
      <select name="gender">
        <option value="0">-</option>
@@ -223,7 +213,7 @@ BODY:
  
  </div>
  
-   <div class="item">
+ <div class="item">
      <label>Favorite Fruits</label>
      <table>
        <tr>
@@ -231,72 +221,62 @@ BODY:
  	<th class="top">Choose all you like</th>
  	<th class="top">Most Favorite</th>
        </tr>
-       
        <tr>
  	<th class="left">Apple</th>
  	<td class="center"><input type="checkbox" name="fruits[1]" checked /></td>
  	<td class="center"><input type="radio" name="fond_fruits" value="1" /></td>
        </tr>
-       
        <tr>
  	<th class="left">Banana</th>
  	<td class="center"><input type="checkbox" name="fruits[2]" checked /></td>
  	<td class="center"><input type="radio" name="fond_fruits" value="2" /></td>
        </tr>
-       
        <tr>
  	<th class="left">Grape</th>
  	<td class="center"><input type="checkbox" name="fruits[3]" /></td>
  	<td class="center"><input type="radio" name="fond_fruits" value="3" /></td>
        </tr>
-       
        <tr>
  	<th class="left">Grapefruit</th>
  	<td class="center"><input type="checkbox" name="fruits[4]" /></td>
  	<td class="center"><input type="radio" name="fond_fruits" value="4" /></td>
        </tr>
-       
        <tr>
  	<th class="left">Kiwifruit</th>
  	<td class="center"><input type="checkbox" name="fruits[5]" checked /></td>
  	<td class="center"><input type="radio" name="fond_fruits" value="5" /></td>
        </tr>
-       
        <tr>
  	<th class="left">Lemon</th>
  	<td class="center"><input type="checkbox" name="fruits[6]" checked /></td>
  	<td class="center"><input type="radio" name="fond_fruits" value="6" /></td>
        </tr>
-       
        <tr>
  	<th class="left">Mango</th>
  	<td class="center"><input type="checkbox" name="fruits[7]" checked /></td>
  	<td class="center"><input type="radio" name="fond_fruits" value="7" checked /></td>
        </tr>
-       
        <tr>
  	<th class="left">Orange</th>
  	<td class="center"><input type="checkbox" name="fruits[8]" /></td>
  	<td class="center"><input type="radio" name="fond_fruits" value="8" /></td>
        </tr>
-       
        <tr>
  	<th class="left">Pineapple</th>
  	<td class="center"><input type="checkbox" name="fruits[9]" /></td>
  	<td class="center"><input type="radio" name="fond_fruits" value="9" /></td>
        </tr>
-       
        <tr>
  	<th class="left">Strawberry</th>
  	<td class="center"><input type="checkbox" name="fruits[10]" /></td>
  	<td class="center"><input type="radio" name="fond_fruits" value="10" /></td>
        </tr>
-           </table>
+     </table>
    
  
  </div>
  
-   <div class="item">
+ <div class="item">
  <label for="message">
      Message
    </label><div class="input">
@@ -307,7 +287,7 @@ BODY:
  </div>
  
    <div class="submit">
-           <input type="submit" name="~" value="Back"/>
+       <input type="submit" name="~" value="Back"/>
        <input type="submit" name="!register" value="Proceed"/>
        
    </div>
@@ -351,24 +331,24 @@ BODY:
    </div>
  
    <div id="body">
-   <div style="float: left; width: 65%;">
+ <div style="float: left; width: 65%;">
  <form method="POST">
  <div>
-   <div class="item">
+ <div class="item">
  <label for="name">
      Your Name
    </label><input type="text" id="name" name="name"  size="35" value="foo">
  
  </div>
  
-   <div class="item">
+ <div class="item">
  <label for="email">
      E-Mail
    </label><input type="text" id="email" name="email"  size="35" value="bar">
  
  </div>
  
-   <div class="item">
+ <div class="item">
      <label>Gender</label>
      <select name="gender">
        <option value="0">-</option>
@@ -379,7 +359,7 @@ BODY:
  
  </div>
  
-   <div class="item">
+ <div class="item">
      <label>Favorite Fruits</label>
      <table>
        <tr>
@@ -387,72 +367,62 @@ BODY:
  	<th class="top">Choose all you like</th>
  	<th class="top">Most Favorite</th>
        </tr>
-       
        <tr>
  	<th class="left">Apple</th>
  	<td class="center"><input type="checkbox" name="fruits[1]" checked /></td>
  	<td class="center"><input type="radio" name="fond_fruits" value="1" /></td>
        </tr>
-       
        <tr>
  	<th class="left">Banana</th>
  	<td class="center"><input type="checkbox" name="fruits[2]" checked /></td>
  	<td class="center"><input type="radio" name="fond_fruits" value="2" /></td>
        </tr>
-       
        <tr>
  	<th class="left">Grape</th>
  	<td class="center"><input type="checkbox" name="fruits[3]" /></td>
  	<td class="center"><input type="radio" name="fond_fruits" value="3" /></td>
        </tr>
-       
        <tr>
  	<th class="left">Grapefruit</th>
  	<td class="center"><input type="checkbox" name="fruits[4]" /></td>
  	<td class="center"><input type="radio" name="fond_fruits" value="4" /></td>
        </tr>
-       
        <tr>
  	<th class="left">Kiwifruit</th>
  	<td class="center"><input type="checkbox" name="fruits[5]" checked /></td>
  	<td class="center"><input type="radio" name="fond_fruits" value="5" /></td>
        </tr>
-       
        <tr>
  	<th class="left">Lemon</th>
  	<td class="center"><input type="checkbox" name="fruits[6]" checked /></td>
  	<td class="center"><input type="radio" name="fond_fruits" value="6" /></td>
        </tr>
-       
        <tr>
  	<th class="left">Mango</th>
  	<td class="center"><input type="checkbox" name="fruits[7]" checked /></td>
  	<td class="center"><input type="radio" name="fond_fruits" value="7" checked /></td>
        </tr>
-       
        <tr>
  	<th class="left">Orange</th>
  	<td class="center"><input type="checkbox" name="fruits[8]" /></td>
  	<td class="center"><input type="radio" name="fond_fruits" value="8" /></td>
        </tr>
-       
        <tr>
  	<th class="left">Pineapple</th>
  	<td class="center"><input type="checkbox" name="fruits[9]" /></td>
  	<td class="center"><input type="radio" name="fond_fruits" value="9" /></td>
        </tr>
-       
        <tr>
  	<th class="left">Strawberry</th>
  	<td class="center"><input type="checkbox" name="fruits[10]" /></td>
  	<td class="center"><input type="radio" name="fond_fruits" value="10" /></td>
        </tr>
-           </table>
+     </table>
    
  
  </div>
  
-   <div class="item">
+ <div class="item">
  <label for="message">
      Message
    </label><textarea name="message" id="message"  rows="5"  cols="70">This is &lt;b&gt;test&lt;/b&gt;
@@ -461,7 +431,7 @@ BODY:
  </div>
  
    <div class="submit">
-           <input type="submit" name="~confirm" value="Confirm"/>
+       <input type="submit" name="~confirm" value="Confirm"/>
      
    </div>
  </div>
@@ -521,12 +491,12 @@ BODY:
    </div>
  
    <div id="body">
-   
+ 
  
  <h2>Is this ok?</h2>
  <form method="POST">
  <div>
-   <div class="item">
+ <div class="item">
  <label for="name">
      Your Name
    </label><div class="input">
@@ -535,7 +505,7 @@ BODY:
  
  </div>
  
-   <div class="item">
+ <div class="item">
  <label for="email">
      E-Mail
    </label><div class="input">
@@ -544,7 +514,7 @@ BODY:
  
  </div>
  
-   <div class="item">
+ <div class="item">
      <label>Gender</label>
      <select name="gender">
        <option value="0">-</option>
@@ -555,7 +525,7 @@ BODY:
  
  </div>
  
-   <div class="item">
+ <div class="item">
      <label>Favorite Fruits</label>
      <table>
        <tr>
@@ -563,72 +533,62 @@ BODY:
  	<th class="top">Choose all you like</th>
  	<th class="top">Most Favorite</th>
        </tr>
-       
        <tr>
  	<th class="left">Apple</th>
  	<td class="center"><input type="checkbox" name="fruits[1]" checked /></td>
  	<td class="center"><input type="radio" name="fond_fruits" value="1" /></td>
        </tr>
-       
        <tr>
  	<th class="left">Banana</th>
  	<td class="center"><input type="checkbox" name="fruits[2]" checked /></td>
  	<td class="center"><input type="radio" name="fond_fruits" value="2" /></td>
        </tr>
-       
        <tr>
  	<th class="left">Grape</th>
  	<td class="center"><input type="checkbox" name="fruits[3]" /></td>
  	<td class="center"><input type="radio" name="fond_fruits" value="3" /></td>
        </tr>
-       
        <tr>
  	<th class="left">Grapefruit</th>
  	<td class="center"><input type="checkbox" name="fruits[4]" /></td>
  	<td class="center"><input type="radio" name="fond_fruits" value="4" /></td>
        </tr>
-       
        <tr>
  	<th class="left">Kiwifruit</th>
  	<td class="center"><input type="checkbox" name="fruits[5]" checked /></td>
  	<td class="center"><input type="radio" name="fond_fruits" value="5" /></td>
        </tr>
-       
        <tr>
  	<th class="left">Lemon</th>
  	<td class="center"><input type="checkbox" name="fruits[6]" checked /></td>
  	<td class="center"><input type="radio" name="fond_fruits" value="6" /></td>
        </tr>
-       
        <tr>
  	<th class="left">Mango</th>
  	<td class="center"><input type="checkbox" name="fruits[7]" checked /></td>
  	<td class="center"><input type="radio" name="fond_fruits" value="7" checked /></td>
        </tr>
-       
        <tr>
  	<th class="left">Orange</th>
  	<td class="center"><input type="checkbox" name="fruits[8]" /></td>
  	<td class="center"><input type="radio" name="fond_fruits" value="8" /></td>
        </tr>
-       
        <tr>
  	<th class="left">Pineapple</th>
  	<td class="center"><input type="checkbox" name="fruits[9]" /></td>
  	<td class="center"><input type="radio" name="fond_fruits" value="9" /></td>
        </tr>
-       
        <tr>
  	<th class="left">Strawberry</th>
  	<td class="center"><input type="checkbox" name="fruits[10]" /></td>
  	<td class="center"><input type="radio" name="fond_fruits" value="10" /></td>
        </tr>
-           </table>
+     </table>
    
  
  </div>
  
-   <div class="item">
+ <div class="item">
  <label for="message">
      Message
    </label><div class="input">
@@ -639,7 +599,7 @@ BODY:
  </div>
  
    <div class="submit">
-           <input type="submit" name="~" value="Back"/>
+       <input type="submit" name="~" value="Back"/>
        <input type="submit" name="!register" value="Proceed"/>
        
    </div>

@@ -144,7 +144,7 @@ OUT:
    </head>
  <body>
    <h2>foobar</h2>
-   Hello world!
+ Hello world!
  </body>
  </html>
 # XXX: 改行に不満あり
@@ -416,9 +416,9 @@ OUT:
  <div id="foobar">
    <h2><b>B</b>old</h2>
    <div class="article">
-    <span class="emph">foobar</span>  </div>
+ <span class="emph">foobar</span>  </div>
    <div class="footer">
-   <span class="small">myfooter</span>  </div>
+ <span class="small">myfooter</span>  </div>
  </div>
  
 
@@ -488,21 +488,21 @@ IN:
  <yatt:foo x/>
  <!yatt:widget foo x=value>
  &yatt:x;
-ERROR: ^valueless arg 'x' 
+ERROR: ^argument 'x' requires value expression like '=...'
 
 TITLE: valueless value for list => error.
 IN:
  <yatt:foo x/>
  <!yatt:widget foo x=list>
  &yatt:x;
-ERROR: ^valueless arg 'x' 
+ERROR: ^argument 'x' requires value expression like '=...'
 
 TITLE: valueless arg for text => error.
 IN:
  <yatt:foo x/>
  <!yatt:widget foo x>
  &yatt:x;
-ERROR: ^valueless arg 'x'
+ERROR: ^argument 'x' requires value expression like '=...'
 
 
 TITLE: valueless arg pass thru (text -> html)
@@ -699,5 +699,47 @@ IN:
 OUT:
  <h2>bar: qux</h2>
  quux
+ 
+
+TITLE: [GH #167] Too many arguments error
+IN:
+ <yatt:foo "xxx" 'yyy'   "zzz"/>
+ 
+ <!yatt:widget foo>
+ERROR: Too many arguments for widget <yatt:foo>: "xxx" 'yyy'   "zzz"
+
+
+TITLE: (prohibited use of) positional code argument should raise (somewhat) understandable error
+IN:
+ <yatt:foo "print $CON 'bar'"/>
+ 
+ <!yatt:widget foo mycode="code">
+ <yatt:mycode/>
+ERROR: Invalid text expression for variable 'mycode': print \$CON 'bar'
+
+
+TITLE: suppressed implicit default part
+IN:
+ |
+ FOO
+ |
+ <!yatt:widget bar>
+ BAR
+ <!yatt:args>
+ BAZ <?perl= __LINE__?>
+OUT:
+ BAZ 7
+
+
+TITLE: [delegate] can be written as "delegate" too
+IN:
+ <yatt:bar x=3/>
+ <!yatt:widget foo x>
+ <h2>foo &yatt:x;</h2>
+ <!yatt:widget bar foo="delegate">
+ <yatt:foo/>
+OUT:
+ <h2>foo 3</h2>
+ 
  
 

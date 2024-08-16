@@ -87,7 +87,7 @@ sub session_sid {
   my $sid_name = $self->session_sid_name;
   my $ck = $con->cookies_in->{$sid_name}
     or return undef;
-  $ck->value;
+  ref $ck ? $ck->value : $ck;
 }
 
 sub session_regenerate_id {

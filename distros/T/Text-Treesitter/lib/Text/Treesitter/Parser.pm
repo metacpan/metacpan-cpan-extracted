@@ -3,12 +3,14 @@
 #
 #  (C) Paul Evans, 2023 -- leonerd@leonerd.org.uk
 
-package Text::Treesitter::Parser 0.12;
+package Text::Treesitter::Parser 0.13;
 
 use v5.14;
 use warnings;
 
 require Text::Treesitter::_XS;
+
+use File::Slurper qw( read_text );
 
 =head1 NAME
 
@@ -51,6 +53,8 @@ L<Text::Treesitter::Tree> instance).
 Returns a new parser instance. A language must be set (by calling
 L</set_language>) before parsing can be performed.
 
+=cut
+
 =head1 METHODS
 
 =head2 set_language
@@ -80,6 +84,24 @@ sub parse_string
       tree => $self->_parse_string( $str ),
       text => $str,
    );
+}
+
+=head2 parse_file
+
+   $tree = $parser->parse_file( $path );
+
+I<Since version 0.13.>
+
+Reads the file content as a string, then applies L</parse_string> on it.
+
+=cut
+
+sub parse_file
+{
+   my $self = shift;
+   my ( $path ) = @_;
+
+   return $self->parse_string( read_text( $path ) );
 }
 
 =head2 reset

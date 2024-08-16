@@ -12,7 +12,7 @@ use lib ($app_root = File::Basename::dirname(File::Spec->rel2abs(__FILE__)))
 use YATT::Lite::WebMVC0::SiteApp;
 
 my $dispatcher = YATT::Lite::WebMVC0::SiteApp->new
-  (app_ns => 'MyApp'
+  (app_ns => 'MyYATT'
    , app_root => $app_root
    , doc_root => "$app_root/html"
    , (-d "$app_root/ytmpl" ? (app_base => '@ytmpl') : ())

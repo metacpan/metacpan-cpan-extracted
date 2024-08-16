@@ -11,7 +11,7 @@ function die { warn $@; return 1 }
 progname=$0
 function usage {
     cat <<EOF 1>&2
-Usage: \$yl_scripts/${progname:t} [-n | -q] [--datadir=DIR] [--myapp=MyApp] DESTDIR
+Usage: \$yl_scripts/${progname:t} [-n | -q] [--datadir=DIR] [--myapp=MyYATT] DESTDIR
 
 This script will setup cgi-bin/runyatt.cgi and .htaccess in DESTDIR.
 Short options:
@@ -19,7 +19,7 @@ Short options:
   -q   quiet.
 Long options:
   --datadir[=DIR]   prepare secure data saving directory.
-  --myapp[=MyApp]   create mock MyApp.pm in cgi-bin/runyatt.lib/MyApp.pm.
+  --myapp[=MyYATT]   create mock MyYATT.pm in cgi-bin/runyatt.lib/MyYATT.pm.
 EOF
     exit ${1:-0}
 }
@@ -291,7 +291,7 @@ fi
 # XXX: only if missing.
 if (($+opts[--myapp])); then
     # XXX: Must modify runyatt.cgi appns!
-    myapp=${opts[--myapp][2,-1]:-MyApp}
+    myapp=${opts[--myapp][2,-1]:-MyYATT}
     mkfile -m a+x $cgi_bin/$driver_name.lib/$myapp.pm <<EOF
 #!/usr/bin/perl -w
 package $myapp; sub MY () {__PACKAGE__}

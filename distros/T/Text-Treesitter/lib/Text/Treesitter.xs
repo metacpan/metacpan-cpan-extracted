@@ -482,7 +482,7 @@ void print_dot_graph_stdout(Text::Treesitter::_Tree self)
     print_dot_graph_stdout = 1
     print_dot_graph_stderr = 2
   CODE:
-    ts_tree_print_dot_graph(self, ix == 1 ? stdout : stderr);
+    ts_tree_print_dot_graph(self, ix);
 
 Text::Treesitter::_Node _root_node(Text::Treesitter::_Tree self)
   CODE:

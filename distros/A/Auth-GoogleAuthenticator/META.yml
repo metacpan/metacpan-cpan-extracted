@@ -1,30 +1,38 @@
 ---
 abstract: 'Authenticate through Google Authenticator'
 author:
-  - L<mailto:corion@corion.net>
+  - 'Max Maischein <corion@cpan.org>'
 build_requires:
-  ExtUtils::MakeMaker: 0
+  ExtUtils::MakeMaker: '0'
+  Test::More: '0'
 configure_requires:
-  ExtUtils::MakeMaker: 0
-dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 6.66, CPAN::Meta::Converter version 2.120921'
-license: perl
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'ExtUtils::MakeMaker version 7.64, CPAN::Meta::Converter version 2.150010'
+license: artistic_2
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
-  version: 1.4
+  version: '1.4'
 name: Auth-GoogleAuthenticator
 no_index:
   directory:
     - t
     - inc
 requires:
-  Authen::OATH: 0
-  Convert::Base32: 0
-  Dancer: 1.3097
-  Dancer::Plugin::FlashMessage: 0
-  Math::Random::MT: 0
-  Template: 2
-  Test::More: 0
-  URI::Escape: 0
-  YAML: 0
-version: 0.03
+  Authen::OATH: '0'
+  Convert::Base32: '0'
+  Dancer: '1.3097'
+  Dancer::Plugin::FlashMessage: '0'
+  Dancer::Test: '1.3097'
+  Math::Random::MT: '0'
+  Template: '2'
+  URI::Escape: '0'
+  YAML: '0'
+  perl: '5.010'
+resources:
+  bugtracker: https://github.com/Corion/Auth-GoogleAuthenticator/issues
+  license: https://dev.perl.org/licenses/
+  repository: git://github.com/Corion/Auth-GoogleAuthenticator.git
+version: '0.04'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+x_static_install: 1

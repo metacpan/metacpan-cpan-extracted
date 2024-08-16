@@ -1,5 +1,8 @@
 Revision history for Perl module Locale::Unicode
 
+v0.3.6 2024-08-16T11:34:58+0900
+    - Added the 'fatal' object option to force exceptions to be fatal
+
 v0.3.5 2024-07-29T07:30:08+0900
     - Minor correction in canonical
     - Added the method 'base'

@@ -20,6 +20,12 @@ sub import {
 
   $myPack->dispatch_pairs_as_declare(type => $opts, @_);
 
+  my $tasks;
+  if ($tasks = $opts->{delayed_tasks} and @$tasks) {
+    print STDERR " Calling delayed tasks for $opts->{destpkg}\n" if DEBUG;
+    $_->($opts) for @$tasks;
+  }
+
   m4i_log_end($opts->{callpack}) if DEBUG;
 }
 

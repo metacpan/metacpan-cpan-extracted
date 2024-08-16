@@ -21,6 +21,7 @@ static void no_body_post_newcv(pTHX_ struct XSParseSublikeContext *ctx, void *_)
 }
 
 static const struct XSParseSublikeHooks parse_no_body_hooks = {
+  .ver            = XSPARSESUBLIKE_ABI_VERSION,
   .permit_hintkey = "t::flags/no_body",
   .flags = XS_PARSE_SUBLIKE_FLAG_BODY_OPTIONAL,
 

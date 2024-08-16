@@ -12,6 +12,34 @@ use YATT::Lite::Test::TestUtil;
 use YATT::Lite::Util qw(catch);
 use YATT::Lite::Constants;
 
+use YATT::Lite::LRXML::ParseBody;
+
+use Test::Differences;
+use YATT::Lite::XHF::Dumper;
+
+
+BEGIN {
+  foreach my $req (qw(File::AddInc MOP4Import::Base::CLI_JSON)) {
+    unless (eval qq{require $req}) {
+      plan skip_all => "$req is not installed."; exit;
+    }
+  }
+}
+
+use YATT::Lite::LRXML::AltTree;
+sub alt_tree_for {
+  my ($string, $tree) = @_;
+  [YATT::Lite::LRXML::AltTree->new(
+    string => $string,
+    with_text => 1,
+    with_range => 0,
+  )->convert_tree($tree)];
+}
+sub alt_tree_xhf_for {
+  YATT::Lite::XHF::Dumper->dump_strict_xhf(alt_tree_for(@_))."\n";
+}
+
+
 my $CLASS = 'YATT::Lite::LRXML';
 use_ok($CLASS);
 
@@ -55,22 +83,57 @@ BAZ
     my $i = -1;
     is $w->{tree}[++$i], "FOO\n", "render_$name node $i";
     is_deeply $tmpl->node_source($w->{tree}[++$i])
-      , '<yatt:foo x y>', "render_$name node $i";
+      , q{<yatt:foo x y>
+bar
+</yatt:foo>}, "render_$name node $i";
     is $w->{tree}[++$i], "\nBAZ", "render_$name node $i"; # XXX \n が嬉しくない
 
-    is_deeply $w->{tree}, [
-'FOO
-', [TYPE_ELEMENT, 27, 41, 3, [qw(yatt foo)]
-, [TYPE_ATTRIBUTE, undef, undef, 3, body => [
-'
-', 'bar', '
-'
-]], [[TYPE_ATTRIBUTE, 37, 38, 3, 'x'], [TYPE_ATTRIBUTE, 39, 40, 3, 'y']]
-, undef, undef, 42, 45]
-, '
-BAZ', '
-'
-], "nodetree $name";
+    # print STDERR alt_tree_xhf_for($tmpl->{cf_string}, $w->{tree}), "\n"; exit;
+    
+    eq_or_diff alt_tree_xhf_for($tmpl->{cf_string}, $w->{tree}), <<'END';
+[
+-
+ FOO
+ 
+{
+kind: ELEMENT
+path[
+yatt: foo
+]
+source: <yatt:foo x y>
+ bar
+ </yatt:foo>
+subtree[
+{
+kind: ATTRIBUTE
+path: x
+source: x
+value= #null
+}
+{
+kind: ATTRIBUTE
+path: y
+source: y
+value= #null
+}
+-
+ 
+ 
+- bar
+-
+ 
+ 
+]
+}
+-
+ 
+ BAZ
+-
+ 
+ 
+]
+END
+
   }
 
   {
@@ -94,10 +157,42 @@ BAZ', '
     is_deeply $tmpl->node_source($w->{tree}[++$i])
       , '&yatt:y;', "render_$name node $i";
 
-    is_deeply $w->{tree}, [
-'<h2>', [TYPE_ENTITY, 90, 98, 9, 'yatt', [var => 'x']], '</h2>
-', [TYPE_ENTITY, 104, 112, 10, 'yatt', [var => 'y']], '
-'], "nodetree $name";
+    # print STDERR alt_tree_xhf_for($tmpl->{cf_string}, $w->{tree}), "\n";
+
+    eq_or_diff alt_tree_xhf_for($tmpl->{cf_string}, $w->{tree}), <<'END';
+[
+- <h2>
+{
+kind: entpath
+source: &yatt:x;
+subtree[
+{
+kind: var
+path: x
+source: :x
+}
+]
+}
+-
+ </h2>
+ 
+{
+kind: entpath
+source: &yatt:y;
+subtree[
+{
+kind: var
+path: y
+source: :y
+}
+]
+}
+-
+ 
+ 
+]
+END
+
   }
 }
 
@@ -158,7 +253,11 @@ BAZ
 
     my @test
       = ([2, q|<?yatt A ?>|]
-	 , [4, q|<yatt:foo x y>|]
+	 , [4, q{<yatt:foo x y>
+ <!--#yatt 2 -->
+  <yatt:bar x y/>
+<!--#yatt 3 -->
+</yatt:foo>}]
 	 , [7, q|<?yatt B ?>|]
 	);
 
@@ -168,32 +267,136 @@ BAZ
 	, "render_$name node $i ($want)";
     }
 
-    is_deeply $w->{tree}, [
-'FOO
-', [TYPE_COMMENT, 37, 53, 3, yatt => 1, ' 1 ']
-, [TYPE_PI, 53, 64, 4, ['yatt'], ' A ']
-, '
-', [TYPE_ELEMENT, 65, 79, 5, [qw(yatt foo)]
-, [TYPE_ATTRIBUTE, undef, undef, 7, body => [
-'
-', ' ', [TYPE_COMMENT, 81, 97, 6, yatt => 1, ' 2 '], '  '
-, [TYPE_ELEMENT, 99, 114, 7, [qw(yatt bar)], undef
-, [[TYPE_ATTRIBUTE, 109, 110, 7, 'x'],[TYPE_ATTRIBUTE, 111, 112, 7, 'y']]
-, undef, undef, 115
-], '
-', [TYPE_COMMENT, 115, 131, 8, yatt => 1, ' 3 ']
-]]
-, [[TYPE_ATTRIBUTE, 75, 76, 5, 'x'], [TYPE_ATTRIBUTE, 77, 78, 5, 'y']]
-, undef, undef, 80, 130]
-, '
-BAZ
-'
-, [TYPE_COMMENT, 147, 163, 11, yatt => 1, ' 4 ']
-, [TYPE_PI,      163, 174, 12, ['yatt'], ' B ']
-, '
-'
+    # print STDERR alt_tree_xhf_for($tmpl->{cf_string}, $w->{tree}), "\n";exit;
+
+    eq_or_diff alt_tree_xhf_for($tmpl->{cf_string}, $w->{tree}), <<'END';
+[
+-
+ FOO
+ 
+{
+kind: COMMENT
+path: yatt
+source:
+ <!--#yatt 1 -->
+ 
+value:
+  1 
+}
+{
+kind: PI
+path[
+- yatt
 ]
-, "nodetree $name";
+source: <?yatt A ?>
+value:
+  A 
+}
+-
+ 
+ 
+{
+kind: ELEMENT
+path[
+yatt: foo
+]
+source: <yatt:foo x y>
+  <!--#yatt 2 -->
+   <yatt:bar x y/>
+ <!--#yatt 3 -->
+ </yatt:foo>
+subtree[
+{
+kind: ATTRIBUTE
+path: x
+source: x
+value= #null
+}
+{
+kind: ATTRIBUTE
+path: y
+source: y
+value= #null
+}
+-
+ 
+ 
+-
+  
+{
+kind: COMMENT
+path: yatt
+source:
+ <!--#yatt 2 -->
+ 
+value:
+  2 
+}
+-
+   
+{
+kind: ELEMENT
+path[
+yatt: bar
+]
+source: <yatt:bar x y/>
+subtree[
+{
+kind: ATTRIBUTE
+path: x
+source: x
+value= #null
+}
+{
+kind: ATTRIBUTE
+path: y
+source: y
+value= #null
+}
+]
+}
+-
+ 
+ 
+{
+kind: COMMENT
+path: yatt
+source:
+ <!--#yatt 3 -->
+ 
+value:
+  3 
+}
+]
+}
+-
+ 
+ BAZ
+ 
+{
+kind: COMMENT
+path: yatt
+source:
+ <!--#yatt 4 -->
+ 
+value:
+  4 
+}
+{
+kind: PI
+path[
+- yatt
+]
+source: <?yatt B ?>
+value:
+  B 
+}
+-
+ 
+ 
+]
+END
+
   }
 
   {
@@ -220,7 +423,11 @@ BAZ
 
     my @test
       = ([2, q|<?yatt A ?>|]
-	 , [4, q|<yatt:foo x y>|]
+	 , [4, q{<yatt:foo x y>
+ <!--#yatt 2 -->
+  <yatt:bar x y/>
+<!--#yatt 3 -->
+</yatt:foo>}]
 	 , [7, q|<?yatt B ?>|]
 	);
 
@@ -230,32 +437,135 @@ BAZ
 	, "render_$name node $i ($want)";
     }
 
-    is_deeply $w->{tree}, [
-'FOO
-', [TYPE_COMMENT, 220, 236, 17, yatt => 1, ' 1 ']
-, [TYPE_PI, 236, 247, 18, ['yatt'], ' A ']
-, '
-', [TYPE_ELEMENT, 248, 262, 19, [qw(yatt foo)]
-, [TYPE_ATTRIBUTE, undef, undef, 21, body => [
-'
-', ' ', [TYPE_COMMENT, 264, 280, 20, yatt => 1, ' 2 ']
-, '  ', [TYPE_ELEMENT, 282, 297, 21, [qw(yatt bar)], undef
-, [[TYPE_ATTRIBUTE, 292, 293, 21, 'x'], [TYPE_ATTRIBUTE, 294, 295, 21, 'y']]
-, undef, undef, 298]
-, '
-', [TYPE_COMMENT, 298, 314, 22, yatt => 1, ' 3 ']
-]]
-, [[TYPE_ATTRIBUTE, 258, 259, 19, 'x']
-, [TYPE_ATTRIBUTE, 260, 261, 19, 'y']]
-, undef, undef, 263, 313
+    # print STDERR alt_tree_xhf_for($tmpl->{cf_string}, $w->{tree}), "\n";exit;
+    eq_or_diff alt_tree_xhf_for($tmpl->{cf_string}, $w->{tree}), <<'END';
+[
+-
+ FOO
+ 
+{
+kind: COMMENT
+path: yatt
+source:
+ <!--#yatt 1 -->
+ 
+value:
+  1 
+}
+{
+kind: PI
+path[
+- yatt
 ]
-, '
-BAZ
-', [TYPE_COMMENT, 330, 346, 25, 'yatt', 1, ' 4 ']
-, [TYPE_PI, 346, 357, 26, ['yatt'], ' B ']
-, '
-'
-], "nodetree $name";
+source: <?yatt A ?>
+value:
+  A 
+}
+-
+ 
+ 
+{
+kind: ELEMENT
+path[
+yatt: foo
+]
+source: <yatt:foo x y>
+  <!--#yatt 2 -->
+   <yatt:bar x y/>
+ <!--#yatt 3 -->
+ </yatt:foo>
+subtree[
+{
+kind: ATTRIBUTE
+path: x
+source: x
+value= #null
+}
+{
+kind: ATTRIBUTE
+path: y
+source: y
+value= #null
+}
+-
+ 
+ 
+-
+  
+{
+kind: COMMENT
+path: yatt
+source:
+ <!--#yatt 2 -->
+ 
+value:
+  2 
+}
+-
+   
+{
+kind: ELEMENT
+path[
+yatt: bar
+]
+source: <yatt:bar x y/>
+subtree[
+{
+kind: ATTRIBUTE
+path: x
+source: x
+value= #null
+}
+{
+kind: ATTRIBUTE
+path: y
+source: y
+value= #null
+}
+]
+}
+-
+ 
+ 
+{
+kind: COMMENT
+path: yatt
+source:
+ <!--#yatt 3 -->
+ 
+value:
+  3 
+}
+]
+}
+-
+ 
+ BAZ
+ 
+{
+kind: COMMENT
+path: yatt
+source:
+ <!--#yatt 4 -->
+ 
+value:
+  4 
+}
+{
+kind: PI
+path[
+- yatt
+]
+source: <?yatt B ?>
+value:
+  B 
+}
+-
+ 
+ 
+]
+END
+
   }
 }
 
@@ -274,33 +584,116 @@ END
   is ref (my $w = $tmpl->{Item}{$name}), 'YATT::Lite::Core::Widget'
     , "tmpl Item '$name'";
 
-  {
-    is_deeply $w->{tree}
-, ['<h2>Hello</h2>
-', [TYPE_ELEMENT, 30, 62, 3, [qw(yatt if)]
-    #------:body
-    , [TYPE_ATTRIBUTE, undef, undef, 3, body => [" space!\n"]]
-    #------:attlist
-    , [[TYPE_ATT_TEXT, 39, 61, 3, undef
-	, ['not defined '
-	   , [TYPE_ENTITY, 73, 20, 3, yatt => [qw(var x)]]
-	  ]]]
-    #------:head
-    , undef
-    #------:foot
-    , [[TYPE_ATT_NESTED, 70, 102, 4, [qw(yatt else)]
-	, [" world!\n"]
-	, [[TYPE_ATT_TEXT, 82, 100, 4
-	    , if => [[TYPE_ENTITY, 100, 8, 4, yatt => [qw(var x)]], ' >= 2']]]
-	, undef, undef, 102]
-       ,  [TYPE_ATT_NESTED, 110, 123, 5, [qw(yatt else)]
-	   , [' decades!', "\n"]
-	   , undef, undef, undef, 123]]
-    #-----:info
-    , 62, 132
-   ]
-   , '
-'], "[Inline attelem bug] nodetree $name";
+  TODO: {
+    # local $TODO = "Not yet solved";
+    # print STDERR alt_tree_xhf_for($tmpl->{cf_string}, $w->{tree}), "\n";exit;
+
+    eq_or_diff alt_tree_xhf_for($tmpl->{cf_string}, $w->{tree}), <<'END';
+[
+-
+ <h2>Hello</h2>
+ 
+{
+kind: ELEMENT
+path[
+yatt: if
+]
+source: <yatt:if "not defined &yatt:x;"> space!
+ <:yatt:else if="&yatt:x; >= 2"/> world!
+ <:yatt:else/> decades!
+ </yatt:if>
+subtree[
+{
+kind: ATT_TEXT
+path= #null
+source: "not defined &yatt:x;"
+subtree[
+-
+ not defined 
+{
+kind: entpath
+source: &yatt:x;
+subtree[
+{
+kind: var
+path: x
+source: :x
+}
+]
+}
+]
+}
+-
+  space!
+ 
+{
+kind: ATT_NESTED
+path[
+yatt: else
+]
+source:
+ <:yatt:else if="&yatt:x; >= 2"/> world!
+ 
+subtree[
+{
+kind: ATT_TEXT
+path: if
+source: if="&yatt:x; >= 2"
+subtree[
+{
+kind: entpath
+source: &yatt:x;
+subtree[
+{
+kind: var
+path: x
+source: :x
+}
+]
+}
+-
+  >= 2
+]
+symbol_range{
+end{
+character: 14
+line: 3
+}
+start{
+character: 12
+line: 3
+}
+}
+}
+-
+  world!
+ 
+]
+}
+{
+kind: ATT_NESTED
+path[
+yatt: else
+]
+source:
+ <:yatt:else/> decades!
+ 
+subtree[
+-
+  decades!
+-
+ 
+ 
+]
+}
+]
+}
+-
+ 
+ 
+]
+END
+
   }
 }
 
@@ -320,18 +713,76 @@ END
     , "tmpl Item '$name'";
 
   {
-    is_deeply $w->{tree}
-, [[TYPE_ELEMENT, 13, 37, 2, [qw(yatt foo)], undef
-   , [[TYPE_ATT_TEXT, 23, 28, 2, 'a', '
-'], [TYPE_ATT_TEXT, 29, 34, 3, 'b', '
-']]
-   , undef, undef, 38]
-   , '
-', [TYPE_PI, 38, 54, 5, ['perl'], '===undef']
- , '
-'
-   ]
-   , "[long widget call bug] nodetree $name";;
+    # print STDERR alt_tree_xhf_for($tmpl->{cf_string}, $w->{tree}), "\n";exit;
+
+    eq_or_diff alt_tree_xhf_for($tmpl->{cf_string}, $w->{tree}), <<'END';
+[
+{
+kind: ELEMENT
+path[
+yatt: foo
+]
+source: <yatt:foo a='
+ ' b="
+ " />
+subtree[
+{
+kind: ATT_TEXT
+path: a
+source: a='
+ '
+symbol_range{
+end{
+character: 11
+line: 1
+}
+start{
+character: 10
+line: 1
+}
+}
+value:
+ 
+ 
+}
+{
+kind: ATT_TEXT
+path: b
+source: b="
+ "
+symbol_range{
+end{
+character: 3
+line: 2
+}
+start{
+character: 2
+line: 2
+}
+}
+value:
+ 
+ 
+}
+]
+}
+-
+ 
+ 
+{
+kind: PI
+path[
+- perl
+]
+source: <?perl===undef?>
+value: ===undef
+}
+-
+ 
+ 
+]
+END
+
   }
 }
 
@@ -351,13 +802,40 @@ END
     , "tmpl Item '$name'";
 
   {
-    is_deeply $w->{tree}
-, [[TYPE_ELEMENT, 0, 26, 1, [qw(yatt foo)], undef, undef, undef, undef, 27]
-, '
-', [TYPE_PI, 27, 43, 6, ['perl'], '===undef']
-, '
-'
-], "newline and comment in call."
+    # print STDERR alt_tree_xhf_for($tmpl->{cf_string}, $w->{tree}), "\n";
+
+    eq_or_diff alt_tree_xhf_for($tmpl->{cf_string}, $w->{tree}), <<'END';
+[
+{
+kind: ELEMENT
+path[
+yatt: foo
+]
+source: <yatt:foo
+ 
+ --  foo ---
+ 
+ />
+subtree[
+]
+}
+-
+ 
+ 
+{
+kind: PI
+path[
+- perl
+]
+source: <?perl===undef?>
+value: ===undef
+}
+-
+ 
+ 
+]
+END
+
 }
 }
 
@@ -380,18 +858,162 @@ END
   is ref (my $w = $tmpl->{Item}{$name}), 'YATT::Lite::Core::Widget'
     , "tmpl Item '$name'";
 
-  is_deeply $w->{tree}
-, [[TYPE_ELEMENT, 0, 10, 1, [qw(yatt foo)]
-    , [TYPE_ATTRIBUTE, undef, undef, 1, body => ['
-', [TYPE_ELEMENT, 11, 21, 2, [qw(yatt bar)]
-      , [TYPE_ATTRIBUTE, undef, undef, 2, body => ['
-', [TYPE_ENTITY, 22, 30, 3, yatt => [qw(var x)]], '', '
-']]
-      , undef, undef, undef, 22, 30], '', '
-']]
-    , undef, undef, undef, 11, 42], '
-'
-], "var in nested body."
+  # print STDERR alt_tree_xhf_for($tmpl->{cf_string}, $w->{tree}), "\n";
+
+  eq_or_diff alt_tree_xhf_for($tmpl->{cf_string}, $w->{tree}), <<'END';
+[
+{
+kind: ELEMENT
+path[
+yatt: foo
+]
+source: <yatt:foo>
+ <yatt:bar>
+ &yatt:x;
+ </yatt:bar>
+ </yatt:foo>
+subtree[
+-
+ 
+ 
+{
+kind: ELEMENT
+path[
+yatt: bar
+]
+source: <yatt:bar>
+ &yatt:x;
+ </yatt:bar>
+subtree[
+-
+ 
+ 
+{
+kind: entpath
+source: &yatt:x;
+subtree[
+{
+kind: var
+path: x
+source: :x
+}
+]
+}
+- 
+-
+ 
+ 
+]
+}
+- 
+-
+ 
+ 
+]
+}
+-
+ 
+ 
+]
+END
+
+}
+
+{
+  my $tmpl = $CLASS->Template->new;
+  $CLASS->load_string_into($tmpl, my $cp = <<END, all => 1);
+<yatt:my [code:code src:source]>
+  <h2>&yatt:x;</h2>
+  &yatt:y;
+</yatt:my>
+END
+
+  my $name = '';
+  is ref (my $w = $tmpl->{Item}{$name}), 'YATT::Lite::Core::Widget'
+    , "tmpl Item '$name'";
+
+  #print STDERR alt_tree_xhf_for($tmpl->{cf_string}, $w->{tree}), "\n";exit;
+
+  eq_or_diff alt_tree_xhf_for($tmpl->{cf_string}, $w->{tree}), <<'END';
+[
+{
+kind: ELEMENT
+path[
+yatt: my
+]
+source: <yatt:my [code:code src:source]>
+   <h2>&yatt:x;</h2>
+   &yatt:y;
+ </yatt:my>
+subtree[
+{
+kind: ATT_NESTED
+path= #null
+source: [code:code src:source]
+subtree[
+{
+kind: ATTRIBUTE
+path[
+code: code
+]
+source: code:code
+value= #null
+}
+{
+kind: ATTRIBUTE
+path[
+src: source
+]
+source: src:source
+value= #null
+}
+]
+}
+-
+ 
+ 
+-
+   <h2>
+{
+kind: entpath
+source: &yatt:x;
+subtree[
+{
+kind: var
+path: x
+source: :x
+}
+]
+}
+-
+ </h2>
+ 
+-
+   
+{
+kind: entpath
+source: &yatt:y;
+subtree[
+{
+kind: var
+path: y
+source: :y
+}
+]
+}
+- 
+-
+ 
+ 
+]
+}
+-
+ 
+ 
+]
+END
+
+
 }
 
 if (1) {
@@ -410,34 +1032,261 @@ END
   is ref (my $w = $tmpl->{Item}{$name}), 'YATT::Lite::Core::Widget'
     , "tmpl Item '$name'";
 
-  is_deeply $w->{tree}
-, ['<h2>'
-   , [TYPE_LCMSG, 4, 39, 1, [qw(yatt)]
-      , [["Hello "
-	 , [TYPE_ENTITY, 18, 30, 1, yatt => [qw/var world/]]
-	 , "!"
-	]]]
-   , "</h2>\n"
-   , "\n"
-   , "<p>"
-   , [TYPE_LCMSG, 49, 180, 3, [qw(yatt num)]
-      , [["\n", "  "
-	  , [TYPE_ENTITY, 64, 72, 4, yatt => [qw/var n/]]
-	  , " file removed from directory "
-	  , [TYPE_ENTITY, 101, 111, 4, yatt => [qw/var dir/]]
-	  , "\n"
-	 ]
-	 , ["\n", "  "
-	  , [TYPE_ENTITY, 123, 131, 6, yatt => [qw/var n/]]
-	  , " files removed from directory "
-	  , [TYPE_ENTITY, 161, 171, 6, yatt => [qw/var dir/]]
-	  , "\n"
-	 ]
-	]
-     ]
-   , "</p>"
-   , "\n"
-], "Embeded l10n message.";
+  # print STDERR alt_tree_xhf_for($tmpl->{cf_string}, $w->{tree}), "\n";
+
+  eq_or_diff alt_tree_xhf_for($tmpl->{cf_string}, $w->{tree}), <<'END';
+[
+- <h2>
+{
+kind: LCMSG
+path[
+- yatt
+]
+source: &yatt[[;Hello &yatt:world;!&yatt]];
+subtree[
+-
+ Hello 
+{
+kind: entpath
+source: &yatt:world;
+subtree[
+{
+kind: var
+path: world
+source: :world
+}
+]
+}
+- !
+]
+}
+-
+ </h2>
+ 
+-
+ 
+ 
+- <p>
+{
+kind: LCMSG
+path[
+yatt: num
+]
+source: &yatt#num[[;
+   &yatt:n; file removed from directory &yatt:dir;
+ &yatt||;
+   &yatt:n; files removed from directory &yatt:dir;
+ &yatt]];
+subtree[
+-
+ 
+ 
+-
+   
+{
+kind: entpath
+source: &yatt:n;
+subtree[
+{
+kind: var
+path: n
+source: :n
+}
+]
+}
+-
+  file removed from directory 
+{
+kind: entpath
+source: &yatt:dir;
+subtree[
+{
+kind: var
+path: dir
+source: :dir
+}
+]
+}
+-
+ 
+ 
+]
+}
+- </p>
+-
+ 
+ 
+]
+END
+
+
+}
+
+{
+  my $tmpl = $CLASS->Template->new;
+  my $err = catch {$CLASS->load_string_into($tmpl, my $cp = <<END, all => 1)};
+<yatt:my [x y :::z]="1..8"; />
+END
+
+  like $err, qr{^\QGarbage before CLO(>) for: <yatt:my, rest: '; />'}
+    , "Garbage before CLO(>) should be rejected by LRXML parser";
+}
+
+{
+  my $tmpl = $CLASS->Template->new;
+  $CLASS->load_string_into($tmpl, my $cp = <<END, all => 1);
+<yatt:my [x y :::z]="1..8" />
+x=&yatt:x;
+y=&yatt:y;
+z=&yatt:z;
+END
+
+  my $name = '';
+  is ref (my $w = $tmpl->{Item}{$name}), 'YATT::Lite::Core::Widget'
+    , "tmpl Item '$name'";
+
+  # print STDERR alt_tree_xhf_for($tmpl->{cf_string}, $w->{tree}), "\n";
+
+  TODO: {
+    local $TODO = "Not yet solved";
+    eq_or_diff alt_tree_xhf_for($tmpl->{cf_string}, $w->{tree}), <<'END';
+[
+{
+kind: ELEMENT
+path[
+yatt: my
+]
+source: <yatt:my [x y :::z]="1..8" />
+subtree[
+{
+kind: ATT_TEXT
+path[
+{
+kind: ATTRIBUTE
+path: x
+source: x
+value= #null
+}
+{
+kind: ATTRIBUTE
+path: y
+source: y
+value= #null
+}
+{
+kind: ATTRIBUTE
+path[
+- 
+- 
+- 
+- z
+]
+source: :::z
+value= #null
+}
+]
+source: [x y :::z]="1..8"
+symbol_range{
+end{
+character: 28
+line: 0
+}
+start{
+character: 8
+line: 0
+}
+}
+value: 1..8
+}
+]
+}
+-
+ 
+ 
+- x=
+{
+kind: entpath
+source: &yatt:x;
+subtree[
+{
+kind: var
+path: x
+source: :x
+}
+]
+}
+-
+ 
+ 
+- y=
+{
+kind: entpath
+source: &yatt:y;
+subtree[
+{
+kind: var
+path: y
+source: :y
+}
+]
+}
+-
+ 
+ 
+- z=
+{
+kind: entpath
+source: &yatt:z;
+subtree[
+{
+kind: var
+path: z
+source: :z
+}
+]
+}
+-
+ 
+ 
+]
+END
+
+  }
+
+}
+
+{
+  my $tmpl = $CLASS->Template->new;
+  eval {
+    $CLASS->load_string_into($tmpl, my $cp = <<END, all => 1);
+<!yatt:args
+
+END
+  };
+  like $@, qr/^Declarator '<!yatt:args' is not closed with '>'/
+    , "Unclosed <!yatt:args";
+}
+
+{
+  my $tmpl = $CLASS->Template->new;
+  eval {
+    $CLASS->load_string_into($tmpl, my $cp = <<END, all => 1);
+<!yatt:args
+&yatt:foo;
+END
+  };
+  like $@, qr/^yatt:args got wrong token for route spec: ENTITY/, "Unclosed <!yatt:args\\n &yatt:foo;";
+}
+
+{
+  my $tmpl = $CLASS->Template->new;
+  eval {
+    $CLASS->load_string_into($tmpl, my $cp = <<END, all => 1);
+<!yatt:widget
+&yatt:foo;
+END
+  };
+  like $@, qr/^yatt:widget got wrong token for route spec: ENTITY/, "Unclosed <!yatt:widget\\n &yatt:foo;";
 }
 
 # (- (region-end) (region-beginning))

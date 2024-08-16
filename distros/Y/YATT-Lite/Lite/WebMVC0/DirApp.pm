@@ -2,12 +2,18 @@ package YATT::Lite::WebMVC0::DirApp; sub MY () {__PACKAGE__}
 use strict;
 use warnings qw(FATAL all NONFATAL misc);
 use Carp;
+use mro 'c3';
 
-use YATT::Lite -as_base, qw/*SYS
+use constant DEBUG_ERROR => $ENV{DEBUG_YATT_ERROR};
+
+use YATT::Lite -as_base, qw/*SYS *CON
 			    Entity/;
 use YATT::Lite::MFields qw/cf_dir_config
 			   cf_use_subpath
 			   cf_overwrite_status_code_for_errors_as
+                           cf_ext_public_action
+                           _ignore_warn
+                           _ignore_die
 
 			   Action/;
 
@@ -24,6 +30,12 @@ use YATT::Lite::Util qw/cached_in ckeval
 
 use YATT::Lite::Error;
 
+sub after_new {
+  (my MY $self) = @_;
+  $self->SUPER::after_new;
+  $self->{cf_ext_public_action} //= $self->default_ext_public_action;
+}
+
 # sub handle_ydo, _do, _psgi...
 
 sub handle {
@@ -32,17 +44,50 @@ sub handle {
     or die "Can't chdir '$self->{cf_dir}': $!";
   local $SIG{__WARN__} = sub {
     my ($msg) = @_;
+    if ($self->{_ignore_warn}) {
+      print STDERR "# ignore __WARN__ $msg\n" if DEBUG_ERROR;
+      return;
+    }
+    print STDERR "# from __WARN__ $msg\n" if DEBUG_ERROR;
     die $self->raise(warn => $_[0]);
   };
   local $SIG{__DIE__} = sub {
     my ($err) = @_;
-    die $err if ref $err;
+    if ($self->{_ignore_die}) {
+      print STDERR "# ignore __DIE__ $err\n" if DEBUG_ERROR;
+      return;
+    }
+    unless ($^S) {
+      print STDERR "# interp state is falsy: ignore __DIE__ $err\n" if DEBUG_ERROR;
+      return;
+    }
+    if (ref $err) {
+      print STDERR Carp::longmess("# in __DIE__, got ref error: "
+                                  , terse_dump($err)), "\n" if DEBUG_ERROR;
+      die $err;
+    } else {
+      print STDERR "# from __DIE__ $err\n" if DEBUG_ERROR;
+    }
+    local $self->{cf_in_sig_die} = 1;
     die $self->error({ignore_frame => [undef, __FILE__, __LINE__]}, $err);
   };
   if (my $charset = $self->header_charset) {
     $con->set_charset($charset);
   }
   $self->SUPER::handle($type, $con, $file);
+}
+
+sub with_ignoring_die {
+  (my MY $self, my ($sub, @args)) = @_;
+  local $self->{_ignore_warn} = 1;
+  local $self->{_ignore_die} = 1;
+  $sub->(@args);
+}
+
+sub with_ignoring_warn {
+  (my MY $self, my ($sub, @args)) = @_;
+  local $self->{_ignore_warn} = 1;
+  $sub->(@args);
 }
 
 #
@@ -65,30 +110,26 @@ sub prepare_part_handler {
   }
 
   if (not defined $type
-      and $self->{cf_use_subpath} and my $subpath = $prop->{cf_subpath}) {
-    my $tmpl = $trans->find_file($file) or do {
-      croak $self->error("No such file: %s", $file);
-    };
-    ($part, my ($formal, $actual)) = $tmpl->match_subroutes($subpath) or do {
-      # XXX: Is this secure against XSS? <- how about URI encoding?
-      # die $self->psgi_error(404, "No such subpath: ". $subpath);
-      die $self->psgi_error(404, "No such subpath");
-    };
-    $pkg = $trans->find_product(perl => $tmpl) or do {
-      croak $self->error("Can't compile template file: %s", $file);
-    };
-    my $name = $part->cget('name');
-    $sub = $pkg->can("render_$name") or do {
-      croak $self->error("Can't find page %s for file: %s", $name, $file);
-    };
-    @args = $part->reorder_cgi_params($con, $actual)
-      unless $self->{cf_dont_map_args};
+      and $self->{cf_use_subpath} and $prop->{cf_subpath}
+      and (my $tmpl, $part, my ($formal, $actual)) = $self->find_subpath_handler(
+        $trans, $file, $prop->{cf_subpath}
+      )) {
 
+      $pkg = $trans->find_product(perl => $tmpl) or do {
+        croak $self->error("Can't compile template file: %s", $file);
+      };
+
+      $sub = $pkg->can($part->method_name) or do {
+        croak $self->error("Can't find %s %s for file: %s"
+                           , $part->cget('kind'), $part->public_name, $file);
+      };
+      @args = $trans->reorder_cgi_params($part, $con, $actual)
+        unless $self->{cf_dont_map_args};
   } else {
     ($part, $sub, $pkg) = $trans->find_part_handler([$file, $type, $item]);
 
-    @args = $part->reorder_cgi_params($con)
-      unless $self->{cf_dont_map_args} || $part->isa($trans->Action);
+    @args = $trans->reorder_cgi_params($part, $con)
+      unless $self->{cf_dont_map_args};
   }
 
   unless ($part->public) {
@@ -99,9 +140,29 @@ sub prepare_part_handler {
   ($part, $sub, $pkg, \@args);
 }
 
+sub find_subpath_handler {
+  (my MY $self, my ($trans, $file, $subpath)) = @_;
+
+  my $tmpl = $trans->find_file($file) or do {
+    croak $self->error("No such file: %s", $file);
+  };
+
+  if (my @found = $tmpl->match_subroutes($subpath)) {
+    return ($tmpl, @found);
+  } else {
+    if ($subpath ne '/') {
+      die $self->psgi_error(404, "No such subpath:: ". $subpath
+                            . " in file " . $tmpl->{cf_path});
+    }
+  }
+  return;
+}
+
 #========================================
 # Action handling
 #========================================
+
+sub default_ext_public_action {'ydo'}
 
 sub find_handler {
   (my MY $self, my ($ext, $file, $con)) = @_;
@@ -141,6 +202,7 @@ sub get_action_handler {
     ($self->{Action} //= {}, $path, $self, undef, sub {
        # first time.
        my ($self, $sys, $path) = @_;
+       return undef unless $path =~ m{\.$self->{cf_ext_public_action}\z};
        my $age = -M $path;
        return undef if not defined $age and $can_be_missing;
        my $sub = compile_file_in(ref $self, $path);
@@ -208,50 +270,118 @@ sub fn_msgfile {
 }
 
 #========================================
+# Following code is for per-DirApp error handling.
+# Since this complicates error handling too much, I might drop this code near(?) future.
+#
 sub error_handler {
   (my MY $self, my $type, my Error $err) = @_;
   # どこに出力するか、って問題も有る。 $CON を rewind すべき？
-  my $errcon = do {
-    if (my $con = $self->CON) {
-      $con->as_error;
-    } elsif ($SYS) {
-      $SYS->make_connection(\*STDOUT, yatt => $self, noheader => 1);
-    } else {
-      \*STDERR;
-    }
+  my $errcon = try_invoke($self->CON, 'as_error') || do {
+    my $con = $SYS
+      ? $SYS->make_connection(undef, yatt => $self, noheader => 1)
+      : $self->CON;
+    try_invoke($con, 'as_error');
+    $con;
   };
-  if (my $code = $err->{cf_http_status_code}) {
-    $errcon->configure(status => $code);
-  } elsif ($code = $errcon->cget('status')) {
-    $err->{cf_http_status_code} = $code;
+
+  $errcon->add_error($err);
+
+  my $error_status = $self->{cf_overwrite_status_code_for_errors_as}
+    // $err->{cf_http_status_code}
+    // try_invoke($errcon, [cget => 'status'])
+    // 500;
+
+  $errcon->configure(status => $error_status);
+  $err->{cf_http_status_code} = $error_status;
+
+  my $msg = $err->message;
+
+  # yatt/ytmpl 用の Code generator がまだ無いので、素直に raise.
+  # XXX: 本当は正しくロードできる可能性もあるが,
+  #  そこで更に fail すると真のエラーが隠されてしまうため、頑張らない。
+  unless ($self->is_default_cgen_ready) {
+    print STDERR "# error_handler(with cgen): $msg\n" if DEBUG_ERROR;
+    die $err;
   }
+
+  #
+  # For [GH #172] - to avoid 'ARRAY(0x5575a6c9c2a8)Compilation failed in require'
+  #
+  if ($self->{cf_in_sig_die}) {
+    print STDERR "# error_handler(sig die): $msg\n" if DEBUG_ERROR;
+    die $err;
+  }
+
+  print STDERR "# error_handler(normal): $msg\n" if DEBUG_ERROR;
+
+  my $is_psgi = $self->CON->cget('is_psgi');
+
   # error.ytmpl を探し、あれば呼び出す。
   my ($sub, $pkg);
   ($sub, $pkg) = $self->find_renderer($type => ignore_error => 1) or do {
-    if ($err->{cf_http_status_code}
-	|| $self->{cf_overwrite_status_code_for_errors_as}) {
-       ($sub, $pkg) = (sub {
-			 my ($this, $errcon, $err) = @_;
-			 print {*$errcon} $err->reason;
-		       }, $self->EntNS);
-     } else {
-       die $err;
-     }
+    print {*$errcon} $err->reason;
+    if ($is_psgi) {
+      $self->DONE;
+    } else {
+      die $err->reason;
+    }
   };
   $sub->($pkg, $errcon, $err);
-  try_invoke($errcon, 'flush_headers');
-  $self->raise_psgi_html($self->{cf_overwrite_status_code_for_errors_as}
-			 // $errcon->cget('status')
-			 // 500
-			 , $errcon->buffer); # ->DONE was not ok.
+
+  if ($is_psgi) {
+    $self->raise_psgi_html($error_status
+                           , $errcon->buffer); # ->DONE was not ok.
+  } else {
+    try_invoke($errcon, 'flush_headers');
+    $self->DONE;
+  }
 }
 
+# dir_config should be fetched from target dirapp for this request($CON)
+# instead from container of called template($this)
+# because widgets can be abstracted out to library dirs.
+
 Entity dir_config => sub {
-  my ($this, $name, $default) = @_;
-  my MY $self = $this->YATT;
-  return $self->{cf_dir_config} unless defined $name;
-  $self->{cf_dir_config}{$name} // $default;
+  my $this = shift;
+  $CON->YATT->dir_config(@_);
 };
+
+sub dir_config {
+  (my MY $self, my ($name, $default)) = @_;
+
+  my PROP $prop = $CON->prop;
+  my $cache = $prop->{dir_config_cache} //= +{};
+  # This ensures every request has a fresh cache for dir_config
+  # and every request tests the cache at most once.
+
+  my $config = $cache->{$self->{cf_app_name}};
+
+  unless ($config) {
+    my $cfg = $self->{cf_dir_config} || +{};
+
+    # If dirapp_config exist, merge it onto original dir_config.
+    if (my $dirapp_config = $SYS->dirapp_config_for($self)) {
+      $cfg->{$_} = $dirapp_config->{$_} for keys %$dirapp_config;
+    }
+    $config = $cache->{$self->{cf_app_name}} = $cfg;
+  }
+
+  return $config unless defined $name;
+
+  $config->{$name} // $default;
+}
+
+sub merged_dir_config {
+  (my MY $self, my $name) = @_;
+
+  my $all_config = $self->dir_config;
+
+  my $base = $all_config->{$name} // +{};
+
+  YATT::Lite::Util::merge_hash_renaming {
+    /^${name}[_\.](.*)/
+  } $base, $all_config;
+}
 
 use YATT::Lite::Breakpoint;
 YATT::Lite::Breakpoint::break_load_dirhandler();

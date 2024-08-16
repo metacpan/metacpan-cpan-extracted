@@ -3,7 +3,7 @@
 #
 #  (C) Paul Evans, 2020-2021 -- leonerd@leonerd.org.uk
 
-package XS::Parse::Sublike 0.22;
+package XS::Parse::Sublike 0.23;
 
 use v5.14;
 use warnings;
@@ -31,6 +31,8 @@ and subject to change. Later versions may break ABI compatibility, requiring
 changes or at least a rebuild of any module that depends on it.
 
 =head1 XS FUNCTIONS
+
+=for highlighter language=c
 
 =head2 boot_xs_parse_sublike
 
@@ -186,10 +188,6 @@ operation. The following flags are defined.
 
 =over 4
 
-=item XS_PARSE_SUBLIKE_FLAG_FILTERATTRS
-
-If set, the optional C<filter_attr> stage will be invoked.
-
 =item XS_PARSE_SUBLIKE_FLAG_BODY_OPTIONAL
 
 If B<not> set, the I<require_parts> field will imply the
@@ -309,16 +307,16 @@ Invoked just before C<start_subparse()> is called.
 At this point the optional sub attributes are parsed and filled into the
 C<attrs> field of the context, then C<block_start()> is called.
 
-=head2 The optional C<filter_attr> Stage
+=head2 The C<filter_attr> Stage
 
    bool (*filter_attr)(pTHX_ struct XSParseSublikeContext *ctx,
       SV *attr, SV *val, void *hookdata);
 
-If the I<flags> field includes C<XS_PARSE_SUBLIKE_FLAG_FILTERATTRS> then each
-individual attribute is passed through this optional filter function
-immediately as each is parsed. I<attr> will be a string SV containing the name
-of the attribute, and I<val> will either be C<NULL>, or a string SV containing
-the contents of the parens after its name (without the parens themselves).
+If this optional stage is defined, then each individual attribute is passed
+through this optional filter function immediately as each is parsed. I<attr>
+will be a string SV containing the name of the attribute, and I<val> will
+either be C<NULL>, or a string SV containing the contents of the parens after
+its name (without the parens themselves).
 
 If the filter returns C<true>, it indicates that it has in some way handled
 the attribute and it should not be added to the list given to C<newATTRSUB()>.

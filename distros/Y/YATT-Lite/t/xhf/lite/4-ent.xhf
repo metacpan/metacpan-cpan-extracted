@@ -177,13 +177,10 @@ PARAM[
 OUT:
  header
  <ol class="ordered">
-  
   <li>apple</li>
-  
   <li>lemon</li>
-  
   <li>orange</li>
-  
+ 
  </ol>
  
  footer
@@ -314,3 +311,166 @@ x: Y
 ]
 OUT:
  http://0:5000/baz?x=Y
+
+
+TITLE: query_string()
+CON_CLASS: YATT::Lite::WebMVC0::Connection
+PARAM[
+x: foo
+y: bar
+]
+IN:
+ &yatt:query_string;
+OUT:
+ x=foo;y=bar
+
+
+TITLE: query_string(separator,(&))
+CON_CLASS: YATT::Lite::WebMVC0::Connection
+PARAM[
+x: FOO
+y: BAR
+]
+TODO: It's too late to change. You need :HTML()
+IN:
+ &yatt:query_string(separator,(&));
+OUT:
+ x=FOO&y=BAR
+
+
+TITLE: :HTML(query_string(separator,(&)))
+CON_CLASS: YATT::Lite::WebMVC0::Connection
+PARAM[
+x: aaa
+y: bbb
+]
+IN:
+ &yatt:HTML(:query_string(separator,(&)));
+OUT:
+ x=aaa&y=bbb
+
+
+TITLE: query_string(merge,HASH)
+CON_CLASS: YATT::Lite::WebMVC0::Connection
+PARAM[
+x: foo
+y: bar
+]
+IN:
+ &yatt:query_string(merge,{y,BAZ});
+OUT:
+ x=foo;y=BAZ
+
+
+TITLE: query_string(of,HASH,delete,[a,b])
+IN:
+ <yatt:my dict:value="{a => 'xxx', b => 'yyy', x => 'foo'}"/>
+ &yatt:query_string(of,:dict,delete,[a,b]);
+ &yatt:dict;
+OUT:
+ x=foo
+ {
+   'a' => 'xxx',
+   'b' => 'yyy',
+   'x' => 'foo'
+ }
+ 
+
+TITLE: :default(,,none) => none
+PARAM[
+]
+IN:
+ <!yatt:args x y z="?none">
+ &yatt:default(:x,:y,:z);
+OUT:
+ none
+
+
+TITLE: :default(,0,none) => 0
+PARAM[
+- 
+- 0
+]
+OUT:
+ 0
+
+TITLE: :default(ok,0,none) => ok
+PARAM[
+- ok
+- 0
+]
+OUT:
+ ok
+
+
+TITLE: :coalesce(=undef,=undef,none) => none
+PARAM[
+]
+IN:
+ <!yatt:args x y z="?none">
+ &yatt:coalesce(:x,:y,:z);
+OUT:
+ none
+
+
+TITLE: :coalesce(=undef,,none) => (empty)
+PARAM[
+- 
+- 
+]
+OUT:
+ 
+
+TITLE: :coalesce(ok,0,none) => ok
+PARAM[
+- ok
+- 0
+]
+OUT:
+ ok
+
+
+TITLE: Direct entity definitions in yatt
+IN:
+ <h2>&yatt:add(3,8);</h2>
+ &yatt:mul(3,8);
+ <!yatt:entity add x y>
+ $x + $y
+ <!yatt:entity mul x y>
+ $x * $y
+OUT:
+ <h2>11</h2>
+ 24
+
+
+TITLE: Direct entity with $CON reference
+CON_CLASS: YATT::Lite::WebMVC0::Connection
+IN:
+ <h2>&yatt:foo();</h2>
+ 
+ <!yatt:entity foo>
+ $CON->param('.x') * $CON->param('.y')
+PARAM{
+.x: 3
+.y: 8
+}
+OUT:
+ <h2>24</h2>
+
+
+
+TITLE: :val()
+IN:
+ &yatt:val(1);
+ &yatt:val();
+ &yatt:val(foo,bar);
+ &yatt:val(:val([]));
+ &yatt:val(:val(:val({})));
+OUT:
+ 1
+ 
+ foo
+ []
+ 
+ {}
+ 

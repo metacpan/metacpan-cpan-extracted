@@ -11,8 +11,10 @@ Makefile$
 ^cover_db
 ^.*\.log
 ^.*\.swp$
+^\.prove$
+^\.github/
 ^MYMETA.*
 Thumbs.db$
 .releaserc$
 ^Auth-GoogleAuthenticator-.*.tar.gz$
-^Auth-GoogleAuthenticator/
+^Auth-GoogleAuthenticator-.*/

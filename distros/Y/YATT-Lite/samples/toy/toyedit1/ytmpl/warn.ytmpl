@@ -1,0 +1,6 @@
+<!yatt:args err>
+<yatt:if "&yatt:is_debug_allowed_ip();">
+<yatt:error:error_trace err/>
+<:yatt:else/>
+<yatt:error:public_error err/>
+</yatt:if>

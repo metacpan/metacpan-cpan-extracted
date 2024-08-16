@@ -144,3 +144,46 @@ IN:
 OUT:
  You should see empty line:
  
+
+TITLE: Each arm of yatt:if should create separate scope for yatt:my
+IN:
+ <!yatt:args foo bar baz>
+ <yatt:if "&yatt:foo;">
+   <yatt:my x=foo/>
+   <yatt:test x/>
+ <:yatt:else if="&yatt:bar;"/>
+   <yatt:my x=bar/>
+   <yatt:test x/>
+ <:yatt:else if="&yatt:baz;"/>
+   <yatt:my x=baz/>
+   <yatt:test x/>
+ <:yatt:else/>
+ NONE
+ </yatt:if>
+ 
+ <!yatt:widget test x>
+ &yatt:x;
+OUT:
+ NONE
+ 
+
+TITLE: wrong else if should raise error
+IN:
+ <yatt:my foo = 2 />
+ <yatt:if "&yatt:foo; == 1">
+ foo is 1.
+ <:yatt:else if "&yatt:foo; == 2" />
+ foo is 2.
+ </yatt:if>
+ERROR: You may forgot '=' between if and "&yatt:foo; == 2"
+
+
+TITLE: wrong option should raise error
+IN:
+ <yatt:my bar = 2 />
+ <yatt:if "&yatt:bar; == 1">
+ bar is 1.
+ <:yatt:elsif "&yatt:foo; == 2" />
+ bar is 2.
+ </yatt:if>
+ERROR: Unknown option for <yatt:if>: elsif

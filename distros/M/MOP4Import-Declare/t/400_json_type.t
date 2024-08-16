@@ -89,8 +89,9 @@ use Test::More;
     my t3::T3 $t3 = +{};
     @{$t3}{qw(e1 e2 e3 e4)} = (10, "10", 10.25, "12");
     my $expect = '{"e1":10,"e2":10,"e3":"10.25","e4":12}';
+    my $typeSpec = MOP4Import::Util::JSON_TYPE->lookup_json_type(t3::T3);
     my $json = JSON()->new->canonical->allow_nonref # ->require_types
-      ->encode($t3, MOP4Import::Util::JSON_TYPE->lookup_json_type(t3::T3));
+      ->encode($t3, $typeSpec);
     is($json, $expect, "raw HASH: $expect");
   }
 

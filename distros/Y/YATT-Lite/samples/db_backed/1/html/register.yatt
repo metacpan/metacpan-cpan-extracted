@@ -5,23 +5,23 @@
   <table>
     <tr>
       <th>User ID:</th>
-      <td><input type="text" name="login" size="15"></td>
+      <td><input type="text" name=".login" size="15"></td>
     </tr>
     <tr>
       <th>Password:</th>
-      <td><input type="password" name="password" size="15"></td>
+      <td><input type="password" name=".password" size="15"></td>
     </tr>
     <tr>
       <th>(Retype password):</th>
-      <td><input type="password" name="password2" size="15"></td>
+      <td><input type="password" name=".password2" size="15"></td>
     </tr>
     <tr>
       <th>Email:</th>
-      <td><input type="text" name="email" size="30"></td>
+      <td><input type="text" name=".email" size="30"></td>
     </tr>
     <tr>
       <td colspan="2">
-        <input type="hidden" name="nx" value="&yatt:nx;"/>
+        <input type="hidden" name=".nx" value="&yatt:nx;"/>
         <input type="submit" name="!register"/>
       </td>
     </tr>
@@ -33,16 +33,16 @@
 my ($this, $con) = @_;
 
 my $login = $con->param_type
-  ('login', qr{^\w{4,12}$ }x
+  ('.login', qr{^\w{4,12}$ }x
    , 'Login name is alphabet + number only, length 4 to 12');
 
 if ($this->YATT->is_user($login)) {
   die "Login name $login is already used, please choose another name";
 }
 
-my $pass1 = $con->param('password')
+my $pass1 = $con->param('.password')
   or die "Password is empty";
-my $pass2 = $con->param('password2')
+my $pass2 = $con->param('.password2')
   or die "Password2 is empty";
 
 unless ($pass1 eq $pass2) {
@@ -50,7 +50,7 @@ unless ($pass1 eq $pass2) {
 }
 
 my $email = $con->param_type
-  ('email', qr{^[\w\.\-]+\@[\w\.\-]+$ }x
+  ('.email', qr{^[\w\.\-]+\@[\w\.\-]+$ }x
    , 'Email should be written like: username@domain.name');
 
 my ($user, $token) = $this->YATT->add_user($login, $pass1, $email);
@@ -58,7 +58,7 @@ my ($user, $token) = $this->YATT->add_user($login, $pass1, $email);
 # XXX: query 追加の API も用意すべきでは?
 my $url = $con->mkurl(undef, ['!confirm' => 1, token => $token]);
 
-my $back = $con->param('nx') || 'index.yatt';
+my $back = $con->param('.nx') || 'index.yatt';
 
 if ($this->YATT->sendmail($con, $this, email => $email, $url)) {
   $this->render_sent($con, $back);
@@ -91,10 +91,11 @@ please dispose this mail.
   <a href="&yatt:back;">back</a>
 </yatt:envelope>
 
-<!yatt:action confirm token=!>
-my ($this, $con) = @_;
-
-my $token = $con->param_type(token => word => 'Token should be a word.');
+<!yatt:action confirm token>
+;
+unless (defined $token and $token ne '') {
+  die $CON->error_with_status(400, 'Token is empty');
+}
 
 my $user = $this->entity_resultset('user')->find({confirm_token => $token})
   or die "Invalid token!";
@@ -104,7 +105,7 @@ $user->update;
 
 $this->entity_set_logged_in($user->login);
 
-$this->render_success($con, $user);
+$this->render_success($CON, $user);
 
 <!yatt:widget success user>
 <yatt:envelope>

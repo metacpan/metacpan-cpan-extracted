@@ -27,6 +27,17 @@ sub FindMethods {
       }
     }
     my $glob = $symtab->{$orig};
+    next if ref $glob;
+    # {
+    #   local $@;
+    #   # To avoid 'Not a GLOB reference'.
+    #   my $is_code = eval {*{$glob}{CODE}};
+    #   if ($@) {
+    #     next;
+    #   } elsif (not $is_code) {
+    #     next;
+    #   }
+    # }
     next unless *{$glob}{CODE};
     $found->{$_} //= $class;
   }

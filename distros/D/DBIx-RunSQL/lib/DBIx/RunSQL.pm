@@ -4,7 +4,7 @@ use warnings;
 use DBI;
 use Module::Load 'load';
 
-our $VERSION = '0.24';
+our $VERSION = '0.25';
 
 =encoding utf8
 

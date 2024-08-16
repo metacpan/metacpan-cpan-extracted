@@ -3,7 +3,7 @@ package MOP4Import::Declare;
 use 5.010;
 use strict;
 use warnings qw(FATAL all NONFATAL misc);
-our $VERSION = '0.053';
+our $VERSION = '0.060';
 use Carp;
 use mro qw/c3/;
 
@@ -43,6 +43,12 @@ sub import :MetaOnly {
   @decls = $myPack->default_exports unless @decls;
 
   $myPack->dispatch_declare($opts, $myPack->always_exports, @decls);
+
+  my $tasks;
+  if ($tasks = $opts->{delayed_tasks} and @$tasks) {
+    print STDERR " Calling delayed tasks for $opts->{destpkg}\n" if DEBUG;
+    $_->($opts) for @$tasks;
+  }
 
   m4i_log_end($opts->{callpack}) if DEBUG;
 }
@@ -244,7 +250,7 @@ sub declare_parent :MetaOnly {
   (my $myPack, my Opts $opts, my (@base)) = m4i_args(@_);
 
   foreach my $fn (@base) {
-    (my $cp = $fn) =~ s{::|'}{/}g;
+    (my $cp = $fn) =~ s{::|\'}{/}g;
     require "$cp.pm";
   }
 
@@ -376,10 +382,14 @@ sub declare_fields :MetaOnly {
   my $extended = fields_hash($opts->{objpkg});
   my $fields_array = fields_array($opts->{objpkg});
 
+  my $isFirst = not $myPack->JSON_TYPE_HANDLER->lookup_json_type($opts->{objpkg});
+
   # Import all fields from super class
   foreach my $super_class (@{*{globref($opts->{objpkg}, 'ISA')}{ARRAY}}) {
     my $super = fields_hash($super_class);
     next unless $super;
+
+
     my $super_names = fields_array($super_class);
     my @names = @$super_names ? @$super_names : keys %$super;
     foreach my $name (@names) {
@@ -392,15 +402,10 @@ sub declare_fields :MetaOnly {
         ref $origin ? $origin->clone : $origin;
       };
       push @$fields_array, $name;
-      if (ref $anyFieldSpec) {
-        my FieldSpec $fs = $anyFieldSpec;
-        if ($fs->{json_type}) {
-          $myPack->declare___field_with_json_type(
-            $opts, $fs, json_type => $fs->{json_type}
-          );
-        }
-      }
     }
+
+    $myPack->JSON_TYPE_HANDLER->inherit_json_type($opts->{objpkg}, $super_class) if $isFirst;
+
   }
 
   {
@@ -424,6 +429,8 @@ sub declare_fields :MetaOnly {
   };
 
   print STDERR "  FieldSpec is: $field_class\n" if DEBUG;
+
+  $myPack->JSON_TYPE_HANDLER->declare_json_type_record($opts->{objpkg});
 
   $myPack->declare___field($opts, $field_class, ref $_ ? @$_ : $_) for @fields;
 
@@ -455,15 +462,15 @@ sub declare___field :MetaOnly {
       . ".$k";
   }
 
-  my FieldSpec $obj = $extended->{$name}
+  my FieldSpec $fs = $extended->{$name}
     = $field_class->new(@early, name => $name);
-  $obj->{package} = $opts->{objpkg};
-  print STDERR " with $myPack $field_class => ", terse_dump($obj), "\n"
+  $fs->{package} = $opts->{objpkg};
+  print STDERR " with $myPack $field_class => ", terse_dump($fs), "\n"
     if DEBUG;
   push @$fields_array, $name;
 
   # Create accessor for all public fields.
-  if ($name =~ /^[a-z]/i and not $obj->{no_getter}) {
+  if ($name =~ /^[a-z]/i and not $fs->{no_getter}) {
     if (my $sym = MOP4Import::Util::symtab($opts->{objpkg})->{$name}) {
       if (*{$sym}{CODE}) {
         croak "Accessor $opts->{objpkg}::$name is redefined!\nIf you really want to define the accessor by hand, please specify fields spec like: [$name => no_getter => 1, ...].";
@@ -477,10 +484,17 @@ sub declare___field :MetaOnly {
 
   foreach my $delayed (@delayed) {
     my ($sub, $k, $v) = @$delayed;
-    $sub->($myPack, $opts, $obj, $k, $v);
+    $sub->($myPack, $opts, $fs, $k, $v);
   }
 
-  $obj;
+  if ($fs->{name} !~ /^_/) {
+    $myPack->JSON_TYPE_HANDLER->register_json_type_of_field(
+      $opts, $opts->{objpkg}, $fs->{name},
+      $fs->{json_type} || $opts->{default_json_type} || 'string'
+    );
+  }
+
+  $fs;
 }
 
 sub declare___field_with_default :MetaOnly {
@@ -498,18 +512,6 @@ sub declare___field_with_default :MetaOnly {
 sub JSON_TYPE_HANDLER {
   require MOP4Import::Util::JSON_TYPE;
   'MOP4Import::Util::JSON_TYPE';
-}
-
-sub declare___field_with_json_type :MetaOnly {
-  (my $myPack, my Opts $opts, my FieldSpec $fs, my ($kw, $typeSpec)) = m4i_args(@_);
-
-  print STDERR "  $fs->{name} json_type: spec=", terse_dump($typeSpec), "\n" if DEBUG;
-
-  my $json_type = $myPack->JSON_TYPE_HANDLER
-    ->register_json_type_of_field($opts->{objpkg}, $fs->{name}, $typeSpec);
-  $fs->{json_type} = $json_type;
-
-  #" result=", terse_dump($json_type), "\n"
 }
 
 sub declare_alias :MetaOnly {

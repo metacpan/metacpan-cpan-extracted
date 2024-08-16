@@ -44,10 +44,11 @@ sub is_or_like($$;$) {
   my $site = YATT::Lite::WebMVC0::SiteApp
     ->new(app_root => $FindBin::Bin
 	  , doc_root => "$rootname.d"
-	  , app_ns => 'MyApp'
+	  , app_ns => 'MyYATT'
 	  , app_base => ['@psgi.ytmpl']
 	  , namespace => ['yatt', 'perl', 'js']
 	  , use_subpath => 1
+          # , match_argsroute_first => 0
 	  , (psgi_fallback => YATT::Lite::WebMVC0::SiteApp
 	     ->psgi_file_app("$rootname.d.fallback"))
 	 );
@@ -83,31 +84,80 @@ sub is_or_like($$;$) {
       is $con->param('foo'), 'bar', "param('foo')";
     } GET "/virt?foo=bar";
 
-    sub test_psgi (&@) {
-      my ($subref, $request, %params) = @_;
+    undef *test_action; # To free $site ref
+  }
 
-      my $path = $request->uri->path;
+  {
+    # mount_psgi and PATH_INFO test.
+    my $t = sub {
+      my ($mount_path, $req_path, $want_pathinfo, $more_desc) = @_;
 
-      $site->mount_psgi($path => sub {$subref->(@_); [200, [], "OK"]});
+      $site->mount_psgi(
+        $mount_path,
+        sub {
+          my ($env) = @_;
+          is $env->{PATH_INFO}, $want_pathinfo
+            , "mount psgi $mount_path, GET $req_path => PT($want_pathinfo)"
+              . ($more_desc // '')
+              ;
+          [200, [], "OK"]
+        }
+      );
 
-      $client->request($request, %params);
-    }
+      Plack::Test->create($app)->request(GET $req_path)
+    };
 
-    test_psgi {
-      (my Env $env) = @_;
-      is $env->{PATH_INFO}, "/mpsgi", "mount psgi path_info";
-    } GET "/mpsgi";
+    $t->("/mnt"  => "/mnt"  => ""
+           , ": PT maybe '' for root");
 
-    test_psgi {
-      (my Env $env) = @_;
-      is $env->{PATH_INFO}, "/mpsgi2", "mount psgi path_info, 2";
-    } GET "/mpsgi2";
+    $t->("/mnt"  => "/mnt/"  => "/"
+           , ": Nonempty PT must start with /");
 
-    test_psgi {
-      (my Env $env) = @_;
-      is $env->{PATH_INFO}, "/mpsgi", "mount psgi path_info, overwritten";
-    } GET "/mpsgi";
+    $t->("/mnt/" => "/mnt/" => "/"
+           , ": Last / in mount path is not trimmed from PT");
 
+    $t->("/mnt2" => "/mnt2"  => ""
+           , ": mnt2, not mnt. Longest must win.");
+  }
+
+  {
+    use Plack::Test;
+
+    # mount_psgi and PATH_INFO test.
+    use Plack::App::CGIBin;
+    # /cgi-bin outside of doc_root.
+    $site->mount_psgi(
+      "/cgi-bin/",
+      Plack::App::CGIBin->new(root => "$rootname.cgi-bin")
+    );
+
+    test_psgi $site->to_app, sub {
+      my ($cb) = @_;
+      my $res = $cb->(GET "/cgi-bin/test1.cgi?foo=bar");
+      is $res->content, "\nQUERY_STRING: foo=bar\n";
+    };
+
+    # /cgi-bin inside of doc_root.
+    $site->mount_psgi(
+      "/cgi-bin/",
+      Plack::App::CGIBin->new(root => "$rootname.d/cgi-bin")
+    );
+
+    test_psgi $site->to_app, sub {
+      my ($cb) = @_;
+      my $res = $cb->(GET "/cgi-bin/test1.cgi?x=y");
+      is $res->content, "\nUnder doc_root, QUERY_STRING: x=y\n";
+    };
+  }
+
+  {
+    ;;
+    $site->mount_static("/static" => "$rootname.static");
+    test_psgi $site->to_app, sub {
+      my ($cb) = @_;
+      my $res = $cb->(GET "/static/test.yatt");
+      is $res->content, "<?perl die?>\n";
+    };
   }
 
   my $hello = sub {
@@ -121,7 +171,7 @@ sub is_or_like($$;$) {
 END
   };
 
-  my $out_index = $hello->(content => 'World');
+  my $out_index = $hello->(content => 'World;-)');
   my $out_beta = $hello->(beta => "world line");
 
   # XXX: subdir
@@ -134,6 +184,10 @@ END
      , ["/index.yatt/foo/bar", 200, $hello->(content => "Worldfoo/bar")]
      , ["/index/foo/bar", 200, $hello->(content => "Worldfoo/bar")]
      , ["/index/baz/1234", 200, $hello->(other => "ok?(1234)")]
+     , ["/defaction.yatt?!!=", 200, "OK"]
+     , ["/defaction.yatt", 200, "OK"]
+     , ["/mid_defaction.yatt?!!=", 200, "OK2"]
+     , ["/mid_defaction.yatt", 200, "OK2"]
      , ["/baz/5678", 200, $hello->(other => "ok?(5678)")]
      , ["/no_subpath/foobar", 404, qr{No such subpath}]
      , ["/test.lib/Foo.pm", 403, qr{Forbidden}]
@@ -152,7 +206,8 @@ END
 	, "<h2>Fallback contents, outside of document root</h2>\n"]
     ) {
     unless (defined $test) {
-      &YATT::Lite::Breakpoint::breakpoint();
+      $DB::single = 1;
+      1 if $DB::single; # To suppress warning
       next;
     }
     my ($path_or_spec, $code, $body, $header) = @$test;
@@ -231,6 +286,32 @@ END
 	  , "$theme $p body";
     }
   }
+  {
+    ;
+    my $theme = "[route matching order]";
+    my $get_env = sub {
+      my ($path) = @_;
+      my Env $env = Env->psgi_simple_env;
+      $env->{PATH_INFO} = $path;
+      $env->{SCRIPT_NAME} = '';
+      $env;
+    };
+    {
+      my $res = $app->($get_env->("/index2/doc/".(my $p = "hello.md")));
+      is $res->[0], 200, "$theme $p status";
+      is_or_like join("", @{$res->[2]})
+	, "<h2>Render doc: hello.md</h2>\n"
+	  , "$theme $p body";
+    }
+    {
+      my $theme = "First action should match";
+      my $res = $app->($get_env->("/index2/doc/".(my $p = "hello.gif")));
+      is $res->[0], 200, "$theme $p status";
+      is_or_like join("", @{$res->[2]})
+	, "Action: $p"
+	  , "$theme $p body";
+    }
+  }
 }
 
 {
@@ -262,14 +343,32 @@ END
   my $app = YATT::Lite::WebMVC0::SiteApp
     ->new(app_root => $FindBin::Bin
 	  , doc_root => "$rootname.d"
-	  , app_ns => 'MyApp2'
+	  , app_ns => 'MyYATT2'
 	  , backend => $backend
 	 )
       ->to_app;
 
   is_deeply [$backend->paths]
-    , ['', qw|/beta /test.lib|]
+    , ['', qw|/beta /cgi-bin /test.lib|]
     , "backend startup is called";
+}
+
+{
+  my $t = sub {
+    is_deeply [YATT::Lite::Factory->n_created, YATT::Lite::Factory->n_destroyed]
+      , [2, 2], "Site apps are destroyed correctly.";
+  };
+
+  if ($] >= 5.018
+      and not grep(defined && /^-MDevel::Cover/, $ENV{HARNESS_PERL_SWITCHES})
+    ) {
+    $t->();
+  } else {
+    TODO: {
+      local $TODO = "Perl before 5.018 has problem about this test.";
+      $t->();
+    }
+  }
 }
 
 done_testing();

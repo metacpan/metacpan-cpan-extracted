@@ -124,6 +124,11 @@ S_find_runcv_name(pTHX)
   return sv;
 }
 
+enum {
+  OPp_NAMEDARGDEFELEM_IF_UNDEF = 1,
+  OPp_NAMEDARGDEFELEM_IF_FALSE = 2,
+};
+
 static OP *pp_namedargdefelem(pTHX)
 {
   dSP;
@@ -136,7 +141,22 @@ static OP *pp_namedargdefelem(pTHX)
   /* TODO: we could precompute the hash and store it in the ANY vector */
   SV *value = hv_delete_ent(slurpy_hv, keysv, 0, 0);
 
-  if(value) {
+  bool ok = false;
+  switch(PL_op->op_private & 3) {
+    case 0:
+      ok = !!value;
+      break;
+
+    case OPp_NAMEDARGDEFELEM_IF_UNDEF:
+      ok = value && SvOK(value);
+      break;
+
+    case OPp_NAMEDARGDEFELEM_IF_FALSE:
+      ok = value && SvTRUE(value);
+      break;
+  }
+
+  if(ok) {
     EXTEND(SP, 1);
     PUSHs(value);
     RETURN;
@@ -361,10 +381,10 @@ static OP *S_parse_sigelem(pTHX_ struct SignatureParsingContext *ctx, U32 flags)
       parser->sig_elems++;
     }
 
-    if(lex_peek_unichar(0) == '=') {
-      lex_read_unichar(0);
-      lex_read_space(0);
-
+    bool default_if_undef = false, default_if_false = false;
+    if(lex_consume("=") ||
+        (default_if_undef = lex_consume("//=")) ||
+        (default_if_false = lex_consume("||="))) {
       if(!paramctx.is_named)
         parser->sig_optelems++;
 
@@ -372,11 +392,28 @@ static OP *S_parse_sigelem(pTHX_ struct SignatureParsingContext *ctx, U32 flags)
 
       if(paramctx.is_named) {
         paramctx.defop = (OP *)alloc_LOGOP_ANY(OP_CUSTOM, defexpr, LINKLIST(defexpr));
+        paramctx.defop->op_private =
+          default_if_undef ? OPp_NAMEDARGDEFELEM_IF_UNDEF :
+          default_if_false ? OPp_NAMEDARGDEFELEM_IF_FALSE :
+                            0;
         paramctx.defop->op_ppaddr = &pp_namedargdefelem;
       }
       else {
+        U8 private = 0;
+#ifdef OPpARG_IF_UNDEF
+        if(default_if_undef) private |= OPpARG_IF_UNDEF;
+        if(default_if_false) private |= OPpARG_IF_FALSE;
+#else
+        if(default_if_undef || default_if_false)
+          /* TODO: This would be possible with a custom op but we'd basically
+           * have to copy the behaviour of pp_argdefelem in that case
+           */
+          yyerror("This Perl version cannot handle if_undef/if_false defaulting expressions on positional parameters");
+#endif
+
         paramctx.defop = (OP *)alloc_LOGOP(OP_ARGDEFELEM, defexpr, LINKLIST(defexpr));
         paramctx.defop->op_targ = (PADOFFSET)(parser->sig_elems - 1);
+        paramctx.defop->op_private = private;
       }
 
       paramctx.varop->op_flags |= OPf_STACKED;

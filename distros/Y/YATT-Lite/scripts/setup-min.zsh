@@ -234,12 +234,12 @@ fi
 
 dn=$cgi_bin/$driver_name.ytmpl
 if ! [[ -e $dn ]]; then
-    ln $o_verbose -nsf $sampletmpl $dn
+    x ln $o_verbose -nsf $sampletmpl $dn
 fi
 
 x ln $o_verbose -nsf $driver_name.cgi $cgi_bin/$driver_name.fcgi
 
-((!wo_apache)) || mkfile $cgi_bin/.htaccess <<EOF
+((wo_apache)) || mkfile $cgi_bin/.htaccess <<EOF
 Options +ExecCGI
 EOF
 
@@ -248,6 +248,9 @@ if [[ -d $dn ]]; then
     dirs=($dn/*/tmp(/N))
     if (($#dirs && $#o_clean)); then
 	rm -rf $dirs
+    fi
+    if (cd $dn && git rev-parse --is-inside-work-tree >/dev/null); then
+        x git checkout $dn
     fi
     x chgrp -R $APACHE_RUN_GROUP $dn
     if (($#dirs && $#o_clean)); then

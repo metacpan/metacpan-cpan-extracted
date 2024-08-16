@@ -1,5 +1,5 @@
 #
-# $Id: OPP.pm,v 689580a0e0f8 2023/07/17 09:34:26 gomor $
+# $Id: OPP.pm,v 3a89adb8d30e 2024/08/09 08:44:28 gomor $
 #
 package OPP;
 use strict;
@@ -38,6 +38,9 @@ sub is_nested {
    my ($field) = @_;
 
    croak("is_nested: need field arg") unless defined($field);
+
+   my $fields = $self->nested;
+   return 0 unless defined($fields);
 
    my $nested = { map { $_ => 1 } @{$self->nested} };
 
@@ -189,6 +192,71 @@ sub unflatten {
    return \@new;
 }
 
+sub pipeone {
+   my $self = shift;
+   my ($input, $opp) = @_;
+
+   $input = ref($input) eq 'ARRAY' ? $input : [ $input ];
+
+   return $input unless defined($opp);
+
+   $opp =~ s{(?:^\s*|\s*$)}{}g;
+
+   my @cmd = split(/\s*(?<!\\)\|\s*/, $opp);
+   croak("pipeone: no query, aborting") if @cmd == 0;
+
+   print STDERR "pipeone: cmdlist[@cmd] count[".scalar(@cmd)."]\n" if $debug;
+
+   my $idx = 0;
+   $self->output->add($self->flatten($input));
+   for my $this (@cmd) {
+      print STDERR "pipeone: cmd[$this]\n" if $debug;
+      my @proc = $this =~ m{^(\S+)(?:\s+(.+))?$};
+      if (! defined($proc[0])) {
+         print STDERR "pipeone: parse failed for [$this]\n" if $debug;
+         return;
+      }
+
+      # Load proc
+      my $module = 'OPP::Proc::'.ucfirst(lc($proc[0]));
+      eval("use $module;");
+      if ($@) {
+         chomp($@);
+         print STDERR "pipeone: use proc failed [$proc[0]]: $@\n";
+         return;
+      }
+      my $proc = $module->new;
+      if (!defined($proc)) {
+         print STDERR "pipeone: load proc failed [$proc[0]]\n";
+         return;
+      }
+      $proc->idx($idx);
+      $proc->nested($self->nested);
+      $proc->state($self->state);
+      $proc->output($proc->clone($self->output)->init);
+
+      my $argument = $proc[1];
+      my $options = $proc->parse($argument);
+      $proc->options($options);
+
+      print STDERR "pipeone: proc[$proc]\n" if $debug;
+
+      for my $input (@{$self->output->docs}) {
+         $proc->process($input);
+      }
+      $self->output->docs($proc->output->docs);
+      $idx++;
+   }
+
+   if (defined($self->output->docs)) {
+      my $docs = $self->unflatten($self->output->docs);
+      $self->output->flush;
+      return $docs;
+   }
+
+   return;
+}
+
 sub pipeline {
    my $self = shift;
    my ($input, $opp) = @_;
@@ -265,7 +333,15 @@ sub to_json {
    for (@$doc) {
       my $docs = $self->order($_) or next;
       for my $doc (@$docs) {
-         push @json, encode_json($doc);
+         my $json;
+         eval {
+            $json = encode_json($doc);
+         };
+         if ($@) {  # Silently discard in case of error
+            next;
+         }
+         next unless defined $json;
+         push @json, $json;
       }
    }
 
@@ -274,12 +350,22 @@ sub to_json {
 
 sub from_json {
    my $self = shift;
-   my ($doc) = @_;
+   my ($docs) = @_;
 
-   $doc = ref($doc) eq 'ARRAY' ? $doc : [ $doc ];
+   $docs = ref($docs) eq 'ARRAY' ? $docs : [ $docs ];
 
    my @json = ();
-   push @json, decode_json($_) for @$doc;
+   for my $doc (@$docs) {
+      my $json;
+      eval {
+         $json = decode_json($doc);
+      };
+      if ($@) {  # Silently discard in case of error
+         next;
+      }
+      next unless defined $json;
+      push @json, $json;
+   }
 
    return $self->order(\@json);
 }

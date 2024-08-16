@@ -1,0 +1,4 @@
+<!yatt:args err>
+ERROR: <pre>
+&yatt:err:reason();
+</pre>

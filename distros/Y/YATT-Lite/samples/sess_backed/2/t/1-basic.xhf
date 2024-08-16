@@ -1,0 +1,80 @@
+# -*- coding: utf-8 -*-
+USE_COOKIE: 1
+
+TITLE: 1st index
+FILE: session
+BODY:
+ <!doctype html>
+ <html>
+ <meta charset="utf-8">
+ <body>
+ <h2>Session2 test1</h2>
+ 
+ 
+ <pre id="session_content">session content={}
+ </pre><form method="POST">
+   <dl>
+     <dt>foo</dt>
+     <dd><input name=".foo" value=""></dd>
+     <dt>bar</dt>
+     <dd><input name=".bar" value=""></dd>
+     <dt>baz</dt>
+     <dd><input name=".baz" value=""></dd>
+   </dl>
+   <input type="submit" name="!set">
+ </form></body>
+ </html>
+
+TITLE: Set
+FILE: session
+METHOD: POST
+PARAM[
+!set: set
+.foo: xxx
+.bar: yyy
+.baz: zzz
+]
+HEADER[
+Location: ^http://localhost/session\z
+]
+
+
+TITLE: After session set
+FILE: session
+BODY:
+ <!doctype html>
+ <html>
+ <meta charset="utf-8">
+ <body>
+ <h2>Session2 test1</h2>
+ 
+ 
+ <pre id="session_content">session content={
+   'bar' => 'yyy',
+   'baz' => 'zzz',
+   'foo' => 'xxx'
+ }
+ </pre><form method="POST">
+   <dl>
+     <dt>foo</dt>
+     <dd><input name=".foo" value="xxx"></dd>
+     <dt>bar</dt>
+     <dd><input name=".bar" value="yyy"></dd>
+     <dt>baz</dt>
+     <dd><input name=".baz" value="zzz"></dd>
+   </dl>
+   <input type="submit" name="!set">
+ </form></body>
+ </html>
+
+
+
+TITLE: No session_start() must be safe too.
+FILE: index
+BODY:
+ <h2>Ok</h2>
+
+
+ACTION[
+remove: ../var/db/site.db*
+]

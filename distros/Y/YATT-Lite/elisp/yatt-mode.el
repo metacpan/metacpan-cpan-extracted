@@ -12,6 +12,7 @@
 ;; (add-to-list 'auto-mode-alist '("\\.ydo\\'" . perl-mode))
 ;;
 
+(require 'cl-lib)
 (require 'advice)
 (require 'mmm-mode)
 (require 'mmm-sample)
@@ -20,6 +21,15 @@
 (require 'cperl-mode)
 
 (require 'yatt-lint-any-mode)
+
+(defvar yatt-mode-use-lsp t
+  "Use lsp if available")
+
+(defvar yatt-mode-use-yatt-lint-with-lsp t
+  "Use yatt-lint too even if lsp is available")
+
+(defvar yatt-mode-lsp-client 'eglot
+  "LSP client mode")
 
 (defvar yatt-mode-hook nil
   "yatt で書かれたテンプレートを編集するためのモード")
@@ -44,6 +54,15 @@
       html-js ,css-class))
   "Default mmm-classes for *.yatt files.")
 
+(defun yatt-mode-ls-command ()
+  "Generate the language server startup command."
+  (let* ((app-dir (locate-dominating-file "." "app.psgi"))
+         (yatt-lib (cond (app-dir
+                          (concat app-dir "lib/YATT/"))
+                         (t
+                          yatt-mode-YATT-dir))))
+    (list (concat yatt-lib "Lite/LanguageServer.pm") "server")))
+
 ;;========================================
 ;; 通常の html 部分
 (define-derived-mode yatt-mode html-mode "YATT"
@@ -58,10 +77,27 @@
       (js--update-quick-match-re))
     (setq mmm-submode-decoration-level 2)
     (make-variable-buffer-local 'process-environment)
-    (yatt-lint-any-mode 1)
+    (when yatt-mode-use-lsp
+      (yatt-mode-ensure-lsp))
+    (when (or (not yatt-mode-use-lsp)
+              yatt-mode-use-yatt-lint-with-lsp)
+      (yatt-lint-any-mode 1))
     (yatt-mode-ensure-file-coding)
     (ad-activate 'mmm-refontify-maybe)
+
+    ;; I want to set comment-start, comment-end... here,
+    ;; but it doesn't take effect because it is overriden via
+    ;; (get 'yatt-mode 'mmm-local-variables)
+    (yatt-mode--set-local-vars
+     (yatt-mode-comment-style))
+
     (mmm-mode-on)
+
+    ;; So I also update the property directly.
+    (yatt-mode--update-assoc
+     (get 'yatt-mode 'mmm-local-variables)
+     (yatt-mode-comment-style))
+
     (mmm-refontify-maybe)
     ;; cperl-mode にする中で、 buffer-modified-p が立ってる... かと思いきや...
     ;; 分からん！
@@ -69,16 +105,80 @@
     ;; (yatt-mode-multipart-refontify)
     (run-hooks 'yatt-mode-hook)))
 
-(define-derived-mode yatt-declaration-mode html-mode "YATT decl"
-  "yatt:* タグの、宣言部分")
+(defun yatt-mode-comment-style ()
+  ;; XXX: get namespace from workspace config
+  (list
+   '(comment-start "<!--#yatt ")
+   '(comment-continue " # ")
+   '(comment-end " #-->")
+   '(comment-style extra-line)))
+
+(defun yatt-mode--set-local-vars (spec-assoc)
+  (dolist (spec spec-assoc)
+    (set (make-variable-buffer-local (car spec)) (car (cdr spec)))))
+
+(defun yatt-mode--update-assoc (dest-assoc spec-assoc)
+  (dolist (spec spec-assoc)
+    (let ((k (car spec))
+          (l (cdr spec))
+          dest)
+      (when (setq dest (assoc k dest-assoc))
+            (setcdr dest l)))))
+
+
+(defun yatt-mode-ensure-lsp ()
+  (when (require yatt-mode-lsp-client nil t)
+    (cond ((eq yatt-mode-lsp-client 'eglot)
+           (dolist (m '(yatt-mode yatt-declaration-mode))
+             (add-to-list 'eglot-server-programs
+                          (cons m (yatt-mode-ls-command))))
+           (eglot-ensure))
+          ((eq yatt-mode-lsp-client 'lsp)
+           (dolist (m '(yatt-mode yatt-declaration-mode))
+             (add-to-list 'lsp-language-id-configuration
+                          (cons m "yatt")))
+           (require 'lsp-yatt)
+           (lsp)
+           ;; To avoid "Flycheck cannot use lsp in this buffer, type M-x flycheck-verify-setup for more details" error
+           (lsp-flycheck-add-mode 'yatt-declaration-mode))
+          (t
+           (error "Unknown value for yatt-mode-lsp-client: %s" yatt-mode-lsp-client)
+           ))))
+
+;;; Below is stolen and modified from recent sgml-mode to revert old behavior
+;;;
+(eval-and-compile
+  (defconst yatt-declaration-syntax-propertize-rules
+    (syntax-propertize-precompile-rules
+     ;; Use the `b' style of comments to avoid interference with the -- ... --
+     ;; comments recognized when `sgml-specials' includes ?-.
+     ;; FIXME: beware of <!--> blabla <!--> !!
+     ("\\(<\\)!--" (1 "< b"))
+     ("--[ \t\n]*\\(>\\)" (1 "> b"))
+     ;; Double quotes outside of tags should not introduce strings.
+     ;; Be careful to call `syntax-ppss' on a position before the one we're
+     ;; going to change, so as not to need to flush the data we just computed.
+     ("\"" (0 (if (prog1 (zerop (car (syntax-ppss (match-beginning 0))))
+                    (goto-char (match-end 0)))
+                  (string-to-syntax ".")))))))
+
+(defun yatt-declaration-syntax-propertize (start end)
+  (funcall
+   (syntax-propertize-rules yatt-declaration-syntax-propertize-rules)
+   start end))
+
+(define-derived-mode yatt-declaration-mode sgml-mode "YATT decl"
+  "yatt:* タグの、宣言部分"
+    (setq-local syntax-propertize-function #'yatt-declaration-syntax-propertize)
+  )
 
 ;;----------------------------------------
 (defface yatt-declaration-submode-face
-  '((t (:background "#d2d4f1")))
+  '((t (:background "#d2d4f1" :extend t)))
   "Face used for yatt declaration block (<!yatt:...>)")
 
 (defface yatt-action-submode-face
-  '((t (:background "#f4f2f5")))
+  '((t (:background "#f4f2f5" :extend t)))
   "Face used for yatt action part (<!yatt:...>)")
 
 (defface yatt-pi-perl-raw-output-submode-face
@@ -141,7 +241,7 @@
       (setq sym (caar part) start (cadr part) finish (caddr part))
       (case sym
 	(widget)
-	(action
+	((action entity)
 	 ;; XXX: mmm-ify-region は良くないかも。 interactive だと。
 	 (mmm-make-region 'cperl-mode start finish
 			  :face 'yatt-action-submode-face)
@@ -154,33 +254,53 @@
 	   (restore-buffer-modified-p nil)))))))
 
 (defun yatt-mode-multipart-list ()
-  (do* (result
-	(regions (mmm-regions-in (point-min) (point-max))
-		 next)
-	(reg (car regions) (car regions))
-	(next (cdr regions) (cdr regions))
-	(section `((default) ,(cadr (car regions))))
-	reg)
+  (cl-do* (result
+	   (regions (mmm-regions-in (point-min) (point-max))
+		    next)
+	   (reg (car regions) (car regions))
+	   (next (cdr regions) (cdr regions))
+	   (section
+            (if (not (eq (car reg) 'yatt-declaration-mode))
+                `((default)
+                  ,(cadr (car regions)))))
+           )
       ;; 次が無いなら、最後の section を詰めて返す
       ((not next)
        (reverse (cons (append section (list (caddr reg))) result)))
     (when (eq (car reg) 'yatt-declaration-mode)
       (setq begin (cadr reg) end (caddr reg)
 	    ;; ここまでを登録しつつ、
-	    result (cons (append section (list begin))
-			 result)
+	    result (if section
+                       (cons (append section (list begin))
+                             result))
 	    ;; 新しい section を始める
 	    section (list (yatt-mode-decltype reg) end)))))
 
-(defun yatt-mode-decltype (region)
-  (let* ((min (cadr region)) (max (caddr region))
+;;; mmm-region is usually:
+;;; (yatt-declaration-mode 1 20 #<overlay from 1 to 20 in test1_w_a.yatt>)
+(defun yatt-mode-decltype (mmm-region)
+  (let* ((min (cadr mmm-region)) (max (caddr mmm-region))
+         ;; XXX: rewrite above with seq-let.
 	 (start (next-single-property-change min 'face (current-buffer) max))
 	 (end (next-single-property-change start 'face (current-buffer) max))
-	 (decl (buffer-substring-no-properties start end))
+         decl
 	 pos
 	 )
     ;; XXX: !yatt: で始まらなかったら?
     (save-match-data
+      (when (and (= max end)
+                 (equal (char-after start) ?\n))
+        ;; workaround
+        (save-excursion
+          (goto-char min)
+          (search-forward "<")
+          (setq start (point))
+          (re-search-forward "[ \t]")
+          (setq end (1- (point)))))
+      (setq decl (buffer-substring-no-properties start end))
+      ;; decl typically contains "!yatt:widget"
+      ;; In this case, return value is ('widget "yatt")
+      ;; XXX: rewrite below with split-string. (This changes returning structure though).
       (cond ((setq pos (string-match ":" decl))
 	     (list
 	      (intern (substring decl (1+ pos)))
@@ -196,7 +316,8 @@
 	(old-coding buffer-file-coding-system))
     (setq new-coding (or new-coding yatt-mode-file-coding))
     (when (and new-coding
-	       (not (eq old-coding new-coding)))
+	       (not (eq (coding-system-base old-coding)
+			(coding-system-base new-coding))))
       (set-buffer-file-coding-system new-coding nil)
       (set-buffer-modified-p modified)
       (message "coding is changed from %s to %s, modified is now %s"
@@ -206,19 +327,19 @@
 ;; Debugging aid.
 
 (defun yatt-mode-called-from-p (fsym)
-  (do* ((i 0 (1+ i))
-	(frame (backtrace-frame i) (backtrace-frame i)))
+  (cl-do* ((i 0 (1+ i))
+	   (frame (backtrace-frame i) (backtrace-frame i)))
       ((not frame))
     (when (eq (cadr frame) fsym)
-      (return t))))
+      (cl-return t))))
 
 (defun yatt-mode-from-hook-p (hooksym)
-  (do* ((i 0 (1+ i))
-	(frame (backtrace-frame i) (backtrace-frame i)))
+  (cl-do* ((i 0 (1+ i))
+	   (frame (backtrace-frame i) (backtrace-frame i)))
       ((not frame))
     (when (and (eq (cadr frame) 'run-hooks)
 	       (eq (caddr frame) hooksym))
-      (return t))))
+      (cl-return t))))
 
 (defun yatt-mode-backtrace (msg &rest args)
   (let ((standard-output (get-buffer-create "*yatt-debug*")))

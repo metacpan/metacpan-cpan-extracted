@@ -1,4 +1,7 @@
 Revision history for Perl extension Spreadsheet::ReadSXC.
+0.39  2024-08-15
+    * Move from Test::More::isn't() to ::isnt()
+
 0.38  2023-07-21
     * Various test suite updates, no code changes, no need to upgrade
 

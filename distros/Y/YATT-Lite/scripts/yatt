@@ -11,21 +11,27 @@ use YATT::Lite::MFields
   (()
    , [cf_help => doc => "show help messages"]
    , [cf_script_path => doc => "script search path for yatt subcommands"]
+   , [cf_debug => doc => "run in perldebugger"]
   );
 # XXX: Should use doc strings in help message.
 
 use YATT::Lite;
 use YATT::Lite::Util::CmdLine qw/parse_opts/;
+use List::Util qw/uniq/;
 
 {
-  my MY $self = MY->new(MY->parse_opts(\@ARGV, undef, {h => "help"}));
+  my MY $self = MY->new(MY->parse_opts(\@ARGV, undef, {h => "help", d => "debug"}));
 
   my $cmd = shift // 'help';
 
   if (my $sub = $self->can("cmd_$cmd")) {
     $sub->($self, @ARGV);
-  } elsif (-x (my $fn = $self->subcmd_path($cmd))) {
-    exec $fn, @ARGV or die "couldn't exec $fn: $!";
+  } elsif (my $fn = $self->subcmd_path($cmd)) {
+    if ($self->{cf_debug}) {
+      exec $^X, "-d", $fn, @ARGV or die "couldn't exec $fn: $!";
+    } else {
+      exec $fn, @ARGV or die "couldn't exec $fn: $!";
+    }
   } else {
     $self->usage("No such command: $cmd");
   }
@@ -51,13 +57,36 @@ END
 
 sub subcmd_list {
   (my MY $self) = @_;
-  my $prefix = "$self->{cf_script_path}yatt.";
-  map {substr($_, length($prefix))} glob("$prefix*")
+  my $prefix = "$self->{cf_script_path}yatt";
+  my %hidden; $hidden{$_} = 1
+    for qw(backend call command dispatcher
+           lintany lintpm lintrc
+           xgettext xhftest);
+  grep {
+    not $hidden{$_}
+  }
+  uniq sort map {
+    my $rest = substr($_, length($prefix));
+    if ($rest =~ s/^\.//) {
+      $rest;
+    } elsif ($rest =~ /^-([-\w]+)/) {
+      $1;
+    } else {
+      ();
+    }
+  }
+  grep {-x}
+  glob("$prefix*");
 }
 
 sub subcmd_path {
   (my MY $self, my $subcmd) = @_;
-  "$self->{cf_script_path}yatt.$subcmd";
+  foreach my $fnPat (qw(yatt-%s*  yatt.%s)) {
+    my $glob = $self->{cf_script_path}. sprintf($fnPat, $subcmd);
+    foreach my $fn (glob($glob)) {
+      return $fn if -x $fn;
+    }
+  }
 }
 
 sub find_libdir {

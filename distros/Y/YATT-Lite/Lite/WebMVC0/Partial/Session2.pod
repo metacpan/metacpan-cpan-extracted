@@ -1,0 +1,164 @@
+# -*- coding: utf-8 -*-
+
+=encoding utf-8
+
+=head1 NAME
+
+YATT::Lite::WebMVC0::Partial::Session2 -- (Revised) Session support for YL
+
+=head1 SYNOPSIS
+
+=for code perl
+
+In app.psgi:
+
+  use YATT::Lite::WebMVC0::SiteApp -as_base; # As usual.
+  #
+  # Below imports definitions of &yatt:session_start(); and
+  # session_state/session_store options with multiple inheritance.
+  #
+  use YATT::Lite::WebMVC0::Partial::Session2 -as_base;
+  #
+  # Then create site app as usual.
+  #
+  use Plack::Session::State::Cookie ();
+  use Plack::Session::Store::DBI ();
+  #
+  my MY $site = MY->load_factory_for_psgi(
+    $0,
+    doc_root => "$FindBin::Bin/public",
+
+    session_state => Plack::Session::State::Cookie->new(),
+    session_store => [DBI => get_dbh => sub { DBI->connect(...) } ],
+  );
+  #
+  return $site->to_app;
+
+=for code yatt
+
+In *.yatt:
+
+  &yatt:session_start(); # Optional
+
+  <h2>Hello &yatt:psgix_session(){user};</h2>
+
+=head1 DESCRIPTION
+
+This module is a session plugin for site apps of YATT::Lite,
+based on L<Plack::Session> family.
+
+Internally, it creates L<Plack::Middleware::Session> at startup.
+Then it emulates C<Plack::Middleware::Session#get_session>
+on each call to L<&yatt:session_start();|session_start>
+and emulates C<Plack::Middleware::Session#finalize>
+on response finalization.
+
+=head1 OPTIONS
+
+Following options are imported to the site app.
+
+=head2 session_state = C<Plack::Session::State::Cookie> | C<< [$NAME => @ARGS] >>
+X<session_state>
+
+This option can take one value of following two types:
+
+=over 4
+
+=item An instance of L<Plack::Session::State::Cookie> compatible object.
+
+=item An ARRAY which consists of C<[$NAME, @ARGS]>
+
+In this case, C<$NAME> is used to load specific session state class
+using L<Plack::Util::load_class($NAME, 'Plack::Session::State')|Plack::Util/load_class>.
+
+=back
+
+If no option is provided the default Plack::Session::State::Cookie will be used.
+
+=head2 session_store = C<Plack::Session::Store> | C<< [$NAME => @ARGS] >>
+X<session_store>
+
+This option can take one value of following two types:
+
+=over 4
+
+=item An instance of L<Plack::Session::Store> compatible object.
+
+=item An ARRAY which consists of C<[$NAME, @ARGS]>
+
+In this case, C<$NAME> is used to load specific session state class
+using L<Plack::Util::load_class($NAME, 'Plack::Session::Store')|Plack::Util/load_class>.
+
+=back
+
+If no option is provided the default Plack::Session::Store will be used.
+
+=head2 session_middleware_class = $CLASS_NAME
+X<session_middleware_class>
+
+=head1 ENTITY FUNCTIONS
+
+=head2 session_start
+
+Explicitly start session. L<psgix_session> calls this automatically.
+
+=head2 session_state_id
+
+Extract state id from cookie without starting session.
+Returns undef if not exists.
+
+=head2 session_state_exists
+
+Test if session state id exists.
+
+=head2 Raw C<psgix.session> interface
+
+=head3 psgix_session
+
+C<< $env->{psgix.session} >>
+
+=head3 psgix_session_options
+
+C<< $env->{psgix.session.options} >>
+
+=head3 psgix_session_exists
+
+C<< $env->{psgix.session.options}{id} >>
+
+=head2 C<plack.session> (Plack::Session) interface
+
+=head3 session
+
+C<< $env->{plack.session} >>
+
+=head3 session_id
+
+L<< Plack::Session->id()|Plack::Session/id >>
+
+=head3 session_get
+
+L<< Plack::Session->get()|Plack::Session/get >>
+
+=head3 session_set
+
+L<< Plack::Session->set()|Plack::Session/set >>
+
+=head3 session_remove
+
+L<< Plack::Session->remove()|Plack::Session/remove >>
+
+=head3 session_keys
+
+L<< Plack::Session->keys()|Plack::Session/keys >>
+
+=head3 session_expire
+
+L<< Plack::Session->expire()|Plack::Session/expire >>
+
+=head1 SEE ALSO
+
+L<Plack::Session::State::Cookie>, L<Plack::Session::Store>
+
+=head1 AUTHOR
+
+hkoba

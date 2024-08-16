@@ -279,6 +279,12 @@ SKIP: {
         },
         'get_appliance_bgp_system_config ok');
 
+    is($orchestrator->get_appliance_bgp_system_config_allvrfs($test_appliance->{id}),
+        hash {
+            etc();
+        },
+        'get_appliance_bgp_system_config_allvrfs ok');
+
     is($orchestrator->get_appliance_bgp_neighbors($test_appliance->{id}),
         hash {
             etc();

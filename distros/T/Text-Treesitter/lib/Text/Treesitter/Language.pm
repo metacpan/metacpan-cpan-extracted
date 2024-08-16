@@ -3,10 +3,12 @@
 #
 #  (C) Paul Evans, 2023 -- leonerd@leonerd.org.uk
 
-package Text::Treesitter::Language 0.12;
+package Text::Treesitter::Language 0.13;
 
 use v5.14;
 use warnings;
+
+use Object::Pad 0.800;
 
 require Text::Treesitter::_XS;
 
@@ -197,14 +199,13 @@ class having the following accessors::
 
 =cut
 
-package Text::Treesitter::Language::_Symbol {
-   sub new { my $class = shift; return bless [ @_ ], $class; }
-   sub id   { shift->[0] }
-   sub name { shift->[1] }
-   sub type { shift->[2] }
-   sub type_is_regular   { shift->[2] == TSSymbolTypeRegular() }
-   sub type_is_anonymous { shift->[2] == TSSymbolTypeAnonymous() }
-   sub type_is_auxiliary { shift->[2] == TSSymbolTypeAuxiliary() }
+class Text::Treesitter::Language::_Symbol {
+   field $id   :param :reader;
+   field $name :param :reader;
+   field $type :param :reader;
+   method type_is_regular   () { $type == TSSymbolTypeRegular() }
+   method type_is_anonymous () { $type == TSSymbolTypeAnonymous() }
+   method type_is_auxiliary () { $type == TSSymbolTypeAuxiliary() }
 }
 
 sub symbols
@@ -216,7 +217,9 @@ sub symbols
    my @symbols;
    foreach my $id ( 0 .. $count - 1 ) {
       push @symbols, Text::Treesitter::Language::_Symbol->new(
-         $id, $self->symbol_name( $id ), $self->symbol_type( $id ),
+         id   => $id,
+         name => $self->symbol_name( $id ),
+         type => $self->symbol_type( $id ),
       );
    }
 
@@ -241,10 +244,9 @@ class having the following accessors:
 
 =cut
 
-package Text::Treesitter::Language::_Field {
-   sub new { my $class = shift; return bless [ @_ ], $class; }
-   sub id   { shift->[0] }
-   sub name { shift->[1] }
+class Text::Treesitter::Language::_Field {
+   field $id   :param :reader;
+   field $name :param :reader;
 }
 
 sub fields
@@ -256,7 +258,8 @@ sub fields
    my @fields;
    foreach my $id ( 1 .. $count ) { # fields are 1-indexed
       push @fields, Text::Treesitter::Language::_Field->new(
-         $id, $self->field_name_for_id( $id ),
+         id   => $id,
+         name => $self->field_name_for_id( $id ),
       );
    }
 

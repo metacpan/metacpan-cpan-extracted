@@ -3,6 +3,9 @@ use strict;
 use warnings qw(FATAL all NONFATAL misc);
 use base qw(File::Spec); sub MY () {__PACKAGE__}
 use File::Basename;
+use FindBin;
+
+my $distLibDir = MY->catdir(map { @{$_}[0..$#$_-2] } [MY->splitdir($FindBin::Bin)]);
 
 defined (my $file = shift)
   or die "Usage: $0 MODULE_FILE\n";
@@ -10,7 +13,10 @@ defined (my $file = shift)
 defined (my $modname = file_module($file))
   or die "Can't extract module name from $file\n";
 
-my @inc_opt = inc_opt($file, $modname);
+my $inc_dir = inc_dir($file, $modname);
+my @inc_opt = inc_opt($inc_dir);
+push @inc_opt, inc_opt($distLibDir) unless -d "$inc_dir/YATT";
+
 
 if ((system $^X, @inc_opt, -we => "require $modname") == 0) {
   print "Module $modname is OK";
@@ -46,6 +52,11 @@ sub file_module {
 }
 
 sub inc_opt {
+  my ($inc_dir) = @_;
+  "-I$inc_dir";
+}
+
+sub inc_dir {
   my ($file, $modname) = @_;
   (my $no_pm = $file) =~ s/\.\w+$//;
   my @filepath = MY->splitdir(MY->rel2abs($no_pm));
@@ -58,7 +69,7 @@ sub inc_opt {
   if (@modpath) {
     die "Can't find library root directory of $modname in file $file\n@modpath\n";
   }
-  '-I' . MY->catdir(@filepath);
+  MY->catdir(@filepath);
 }
 
 sub rootname { my $fn = shift; $fn =~ s/\.\w+$//; join "", $fn, @_ }

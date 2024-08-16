@@ -23,7 +23,10 @@ sub add_slot_to {
 BEGIN {
   our @fields = qw(type
 		   varname argno
-		   lineno quote dflag default);
+		   lineno quote dflag default
+                   from_route
+                   is_body_argument
+                );
   my $slotNum = 0;
   foreach my $name (@fields) {
     # accessor
@@ -36,6 +39,10 @@ BEGIN {
     $slotNum++;
   }
   # our @EXPORT = our @EXPORT_OK;
+}
+
+sub list_field_names {
+  our @fields;
 }
 
 {
@@ -58,6 +65,24 @@ BEGIN {
     my $type = shift->[VSLOT_TYPE];
     my $want = shift;
     $type->[0] eq $want;
+  }
+  sub YATT::Lite::VarTypes::Base::mark_body_argument {
+    shift->[VSLOT_IS_BODY_ARGUMENT] = 1;
+  }
+  sub YATT::Lite::VarTypes::Base::is_unsafe_param {
+    my ($var) = @_;
+    $var->[VSLOT_IS_BODY_ARGUMENT]
+      ||
+    $var->[VSLOT_TYPE][0] eq 'code';
+  }
+  sub YATT::Lite::VarTypes::Base::default_dflag_default {
+    ();
+  }
+  sub YATT::Lite::VarTypes::Base::spec_string {
+    my ($var) = @_;
+    my $type = join(":", @{$var->[VSLOT_TYPE]});
+    $type . (defined $var->[VSLOT_DFLAG]
+             ? ($var->[VSLOT_DFLAG] . ($var->[VSLOT_DEFAULT] // '')) : '');
   }
 }
 
@@ -82,10 +107,9 @@ BEGIN {
 	my $val = $consts->{$key};
 	my $glob = *{globref($fullName, $key)};
 	if (ref $val eq 'CODE') {
-	  *glob = $val
-	} else {
-	  define_const($glob, $val);
+          die "Unsupported type!";
 	}
+        define_const($glob, $val);
       }
     }
     if (@slots) {
@@ -99,6 +123,11 @@ BEGIN {
 
 # widget だけ lvalue sub にするのも、一つの手ではないか?
 {
+  package YATT::Lite::VarTypes::t_html;
+  sub default_dflag_default {
+    ('?', '');
+  }
+
   package YATT::Lite::VarTypes::t_delegate;
   sub weakened_set_widget {
     my $self = shift;

@@ -82,6 +82,8 @@ sub setup {
 	$config->define('review_template', 'The template name to be used for the review page. Can be one of "full" (full editing capabilities) or "confirm" (confirmation only). Defaults to "full", unless the talk was injected, in which case it defaults to "confirm".', undef);
 	$config->define('inject_fatal_checks', 'Checks to be run on an uploaded video. When a check fails, the upload is rejected. Same syntax as for inject_transcode_skip_checks.', {});
 
+	$config->define('force_preview_transcode', 'If set to nonzero, forces sreview-previews to transcode the video, even if the input video file is HTML video compatible. Use this if the input video format uses a very large bitrate.', 0);
+
 	# Values for encoder scripts
 	$config->define('pubdir', 'The directory on the file system where files served by the webinterface should be stored', '/srv/sreview/web/public');
 	$config->define('workdir', 'A directory where encoder jobs can create a subdirectory for temporary files', '/tmp');
@@ -99,6 +101,7 @@ sub setup {
 	$config->define('normalizer', 'The implementation used to normalize audio. Can be one of: ffmpeg, bs1770gain, or none to disable normalization altogether.', 'ffmpeg');
 	$config->define('web_pid_file', 'The PID file for the webinterface, when running under hypnotoad.','/var/run/sreview/sreview-web.pid');
 	$config->define('autoreview_detect', 'The script to run when using sreview-autoreview', undef);
+	$config->define('video_multi_profiles', 'A hash table of profiles that benefit from multi-pass encoding. AV1 does not support that at the time of writing, and multi-pass is useless for a copy profile. Most other situations do benefit.', {"av1" => 0,"copy" => 0});
 
 	# Values for detection script
 	$config->define('inputglob', 'A filename pattern (glob) that tells SReview where to find new files', '/srv/sreview/incoming/*/*/*');
@@ -130,7 +133,7 @@ sub setup {
 	$config->define('notify_final_email_template', 'A filename of a Mojo::Template template to process, returning the email body used in final review notifications. Required, but defaults to the value of email_template', undef);
 	$config->define('email_from', 'The data for the From: header in any email. Required if notify_actions, notify_final_actions, or announce_actions includes email.', undef);
 	$config->define('notify_email_subject', 'The data for the Subject: header in the email. Required if notify_actions includes email.', undef);
-	$config->define('announce_email_subject', 'The data for the Subject: header in the email. Required if announc_actions includes email.', undef);
+	$config->define('announce_email_subject', 'The data for the Subject: header in the email. Required if announce_actions includes email.', undef);
 	$config->define('notify_final_email_subject', 'The data for the Subject: header in the email. Required if notify_final_actions includes email.', undef);
 	$config->define('urlbase', 'The URL on which SReview runs. Note that this is used by sreview-notify to generate URLs, not by sreview-web.', '');
 	$config->define('notify_commands', 'An array of commands to run to perform notifications. Each component is passed through Mojo::Template before processing. To avoid quoting issues, it is a two-dimensional array, so that no shell will be called to run this.', [['echo', '<%== $title %>', 'is', 'available', 'at', '<%== $url %>']]);

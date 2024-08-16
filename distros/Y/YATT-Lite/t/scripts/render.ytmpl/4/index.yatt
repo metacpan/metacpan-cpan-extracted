@@ -1,0 +1,3 @@
+<!yatt:args x y>
+arg x=(&yatt:x;) arg y=(&yatt:y;)
+query x=(&yatt:param(x);) y=(&yatt:CON:param(y);)

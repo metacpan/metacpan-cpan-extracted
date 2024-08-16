@@ -13,6 +13,9 @@ if (defined $ENV{HARNESS_PERL_SWITCHES}) {
 }
 
 my $script = './blib/script/logfile-tail';
+if (defined $ENV{LOGFILE_TAIL_SCRIPT}) {
+	$script = $ENV{LOGFILE_TAIL_SCRIPT};
+}
 my ($pipe, $data);
 
 ok(open($pipe, '-|', $^X, @opts, $script, '-h'), 'check that logfile-tail has the -h (--help) option');

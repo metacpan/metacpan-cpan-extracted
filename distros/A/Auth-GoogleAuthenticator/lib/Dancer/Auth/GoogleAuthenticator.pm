@@ -10,7 +10,7 @@ Dancer::Auth::GoogleAuthenticator - Two-Factor demo app
 
 =cut
 
-$VERSION= '0.03';
+$VERSION= '0.04';
 
 my %users = (
     test => { name => 'test',
@@ -30,9 +30,9 @@ my %users = (
 # Map a user to its authenticator
 sub get_otp_auth {
     my ($user) = @_;
-    
+
     return unless $user;
-    
+
     my ($otp_secret) = $user->{otp_secret};
     if( $otp_secret ) {
         return Auth::GoogleAuthenticator->new( secret => $otp_secret );
@@ -64,11 +64,11 @@ hook before => sub {
 
 post '/auth/setup' => sub {
     my ($user) = session->{user};
-    
+
     my $action= params->{action} || '';
     my $enable= $action eq 'regenerate';
     my $have_otp= $users{ $user }->{otp_secret};
-    
+
     if( 'deactivate' eq $action ) {
         warning "Erasing OTP secret for $user->{name}";
         delete $user->{otp_secret};
@@ -79,18 +79,18 @@ post '/auth/setup' => sub {
         my @letters = ('a'..'z','0'..'9');
         $user->{otp_secret} = join '', map { $letters[rand @letters]} 1..10;
     };
-    
+
     redirect '/auth/setup';
 };
 
 get '/auth/setup' => sub {
     my ($user) = session->{user};
-    
+
     my ($otp_secret) = $user->{otp_secret};
     my $auth = get_otp_auth( $user );
     warning "Have auth for $user->{name}"
         if $auth;
-    
+
     # Display otp_secret if we have it
     # XX Maybe this should be over SSL only
     template 'setup_twofactor', {
@@ -102,15 +102,15 @@ get '/auth/setup' => sub {
 
 get '/auth/setup/qrcode.png' => sub {
     my ($user) = session->{user};
-    
+
     my ($otp_secret) = $user->{otp_secret};
-    
+
     if( $otp_secret ) {
         my $auth = get_otp_auth( $user );
-        
+
         if( $auth ) {
             warning $auth->registration_url($user->{name});
-        
+
             my $qr = $auth->registration_qr_code( "$user->{name}" );
             return send_file( \$qr, content_type => 'image/png' );
         } else {
@@ -123,7 +123,7 @@ get '/auth/setup/qrcode.png' => sub {
 
 get '/auth/login' => sub {
     my $return = vars->{requested_path} || '';
-    
+
     # XX Should only store relative URLs here, or at least
     #     only site-local URLs
     session->{return_url} = $return;
@@ -135,7 +135,7 @@ get '/auth/login' => sub {
 post '/auth/login' => sub {
     my ($user_id,$pass,$otp) = (params->{user}, params->{pass}, params->{otp});
     my $return = vars->{requested_path} || session->{return_url} || '';
-    
+
     my $user= $users{ $user_id };
     if(     $user and $user->{pass}
         and $pass and $pass eq $user->{pass} ) {
@@ -165,7 +165,7 @@ post '/auth/login' => sub {
         warning "Wrong password for user '$user_id'";
         flash error => "User unknown or wrong password/OTP";
     };
-    
+
     return redirect $return
         if( session('user') and $return );
     template 'login';

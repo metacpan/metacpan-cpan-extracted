@@ -1,0 +1,92 @@
+<!yatt:args dont_start>
+<!--#yatt
+    :session_state_exists checks existence of cookie sid without starting a session.
+  -->
+<yatt:if "not &yatt:dont_start; and &yatt:session_state_exists();">
+
+  <!--#yatt
+      :session_start() initializes session subsystem.
+      -->
+  &yatt:session_start();
+
+  <yatt:my tp:value="&yatt:with_ignoring_die(:localtime(:psgix_session(){logged_in_at}));"/>
+  <h2>Logged in at &yatt:tp:strftime((%Y-%m-%d %H:%M:%S %z));</h2>
+  <h3>other_value = &yatt:session_get(other_value);</h3>
+
+</yatt:if>
+
+<yatt:session_state/>
+
+<h3>nav</h3>
+<ul id="nav">
+  <li>
+    <form method="POST">
+      Put new value: <input type="text" name="other_value" value="XXX">
+      <button type="submit" name="~start">session start</button>
+    </form>
+  </li>
+  <li><a id="change_id" href="?~~=change_id">change id (keeping current state)</a></li>  
+  <li><a id="fresh_session" href="?~~=fresh_session">change id (with new state)</a>
+  <li><a id="logout" href="?~~=logout">logout</a></li>
+</ul>
+
+<!yatt:page start other_value="?XXX">
+
+&yatt:session_start();
+
+<!--#yatt
+    :session_set(name,value) is Plack::Session#set($name, $value).
+    In this example, we use '=' prefix to use raw host language(perl) expression.
+  -->
+&yatt:session_set(logged_in_at,=time);
+
+<!--#yatt
+    :psgix_session() returns raw $env->{'psgix.session'}
+  -->
+<yatt:my sess:value="&yatt:psgix_session();"/>
+<?perl $sess->{other_value} = $other_value ?>
+
+<yatt:session_state/>
+
+<a id="go_top" href="?">Top</a>
+
+<!yatt:page change_id>
+
+&yatt:session_start();
+
+<!--#yatt
+    :session_change_id() changes id and returns new id.
+    Normally you need to hide it, so wrap the call by :ignore()
+    like &yatt:ignore(:session_change_id());
+    -->
+New sid: &yatt:session_change_id();
+
+<yatt:session_state/>
+
+<a id="go_top" href="?">Top</a>
+
+<!yatt:page fresh_session>
+
+New sid: &yatt:session_change_id();
+&yatt:session_set(logged_in_at,=time);
+
+<yatt:session_state/>
+
+<a id="go_top" href="?">Top</a>
+
+
+<!yatt:widget session_state>
+<h3>info</h3>
+<ul id="info">
+  <li>&yatt:if(:psgix_session_exists(),Has,No); session state</li>
+  <li>&yatt:if(:session_state_exists(),Has,No); sid cookie: &yatt:session_state_id();</li>
+</ul>
+
+<!yatt:page logout>
+
+<!--#yatt
+    :session_expire() removes store and expires cookie.
+    -->
+&yatt:session_expire();
+
+<a id="go_top" href="?">Top</a>

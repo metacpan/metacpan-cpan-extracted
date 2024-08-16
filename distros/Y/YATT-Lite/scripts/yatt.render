@@ -7,6 +7,7 @@ use FindBin; BEGIN {do "$FindBin::RealBin/libdir.pl"}
 #----------------------------------------
 
 use CGI;
+use Hash::MultiValue;
 use YATT::Lite::Factory;
 use YATT::Lite::Entities qw(*YATT *CON *SYS);
 use YATT::Lite::Util::CmdLine qw(parse_opts parse_params);
@@ -27,7 +28,7 @@ my $direct_mode = delete $opts{direct};
 $SYS = my $dispatcher = YATT::Lite::Factory->load_factory_offline || do {
   require YATT::Lite::WebMVC0::SiteApp;
   YATT::Lite::WebMVC0::SiteApp->new
-      (app_ns => 'MyApp'
+      (app_ns => 'MyYATT'
        , namespace => ['yatt', 'perl', 'js']
        , header_charset => 'utf-8'
        , debug_cgen => $ENV{DEBUG}
@@ -37,30 +38,22 @@ $SYS = my $dispatcher = YATT::Lite::Factory->load_factory_offline || do {
       );
 };
 
+$dispatcher->prepare_app;
+
 # [1] Compile all.
 my @command;
 {
   while (@ARGV) {
     my $file = shift @ARGV;
-    my %param = %common;
-    MY->parse_params(\@ARGV, \%param);
+    my %params = %common;
+    MY->parse_params(\@ARGV, \%params);
+    my $parameters = Hash::MultiValue->new(%params);
 
     my $dir = dirname($dispatcher->rel2abs($file));
     $dir =~ s,/*$,/,;
     my $dirhandler = $dispatcher->get_dirhandler($dir)
       or die "Can't find dirhandler for $dir";
-    # XXX: そもそも、ここでの DONE に疑問が.
-    local $dirhandler->{cf_at_done} = sub {
-      # ここで at_done が呼ばれるのは error_handler からだけ。
-      exit;
-    };
-
-    my $trans = $dirhandler->open_trans;
-
-    my ($part, $sub, $pkg) = $trans->find_part_handler(basename($file));
-    # XXX: cgi mode.
-    push @command, [$dirhandler, $file, $sub, $pkg
-		    , $part->reorder_hash_params(\%param)];
+    push @command, [$dirhandler, $file, $parameters];
   }
 }
 
@@ -68,15 +61,29 @@ my @command;
 
 my $nerror;
 foreach my $cmd (@command) {
-  my ($dirhandler, $file, $sub, $this, @args) = @$cmd;
+  my ($dirhandler, $file, $parameters) = @$cmd;
+
+    # XXX: そもそも、ここでの DONE に疑問が.
+  local $dirhandler->{cf_at_done} = sub {
+    # ここで at_done が呼ばれるのは error_handler からだけ。
+    exit;
+  };
+
   local $YATT = $dirhandler;
   local $dirhandler->{cf_at_done} = sub {};
   # $dirhandler->fconfigure_encoding(\*STDOUT, \*STDERR);
   local $CON = $dispatcher->make_connection
-    (\*STDOUT, cgi => CGI->new({}), file => $file, noheader => 1
+    (\*STDOUT
+     , parameters => $parameters
+     , file => $file, noheader => 1
+     , env => \%ENV
      , system => $SYS, yatt => $YATT);
+
+  my ($part, $sub, $this, $args)
+    = $dirhandler->prepare_part_handler($CON, basename($file));
+
   my $err = catch {
-    $sub->($this, $CON, @args);
+    $sub->($this, $CON, @$args);
   };
 
   try_invoke($CON, 'flush_headers');

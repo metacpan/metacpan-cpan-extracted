@@ -32,3 +32,14 @@ WriteMakefile(
 	},
 );
 
+sub MY::postamble {
+    return <<'EOS';
+README.md:
+	( echo '# Logfile::Tail and logfile-tail' ; echo ) > README.md
+	perldoc -o Markdown lib/Logfile/Tail.pm | sed '/^# NAME/,/^$$/d' | sed 's/^#/###/;1s/^.*/## &/;' >> README.md
+	( echo ; echo '***' ; echo ) | sed 's/^#/##/' >> README.md
+	perldoc -o Markdown bin/logfile-tail | sed '/^# NAME/,/^$$/d' | sed 's/^#/###/;1s/^.*/## &/;' >> README.md
+
+.PHONY: README.md
+EOS
+}

@@ -34,7 +34,7 @@ BODY:
  </div>
  <center style="text-align: center;">
  <div id="body" style="text-align: left;">
-   
+ 
  <h3>Add new file:</h3>
  <form method="POST" action="save.ydo">
  <table cellspacing=0 cellpadding=0>
@@ -58,13 +58,13 @@ BODY:
  
  <h3>List of current files:</h3>
  <ul>
- 
    <li>
      <a href="edit.yatt?fnum=1">
        (1)
        漢字の投稿
      </a>
-   </li></ul>
+   </li>
+ </ul>
  
  <h4>Template age: 1</h4></div>
  </center>

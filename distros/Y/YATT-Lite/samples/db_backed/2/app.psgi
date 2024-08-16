@@ -62,12 +62,14 @@ use List::MoreUtils qw/last_index/;
   use YATT::Lite::WebMVC0::SiteApp -as_base;
   use YATT::Lite qw/Entity *CON/; # For Entity and $CON.
 
+  use YATT::Lite::WebMVC0::Partial::Session;
+
   # To add other option, use MFields like this:
   # use YATT::Lite::MFields qw/cf_dbi_dsn cf_auto_deploy /;
   #
 
   my $site = MY->load_factory_for_psgi
-    (__FILE__, app_ns => 'MyApp'
+    (__FILE__, app_ns => 'MyYATT'
      , namespace => ['yatt', 'perl', 'js']
      , header_charset => 'utf-8'
      , use_subpath => 1

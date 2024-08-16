@@ -1,0 +1,6 @@
+<!yatt:page other>
+hoehoe
+
+<!yatt:action ''>
+print $CON "OK2";
+

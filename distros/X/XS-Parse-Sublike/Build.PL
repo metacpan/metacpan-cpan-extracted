@@ -32,7 +32,7 @@ my $build = Module::Build::with::XSTests->new(
       'Module::Build' => '0.4004', # test_requires
    },
    share_dir => {
-      dist => [ 'share' ],
+      module => { 'XS::Parse::Sublike' => [ 'share' ] },
    },
    license => 'perl',
    create_license => 1,

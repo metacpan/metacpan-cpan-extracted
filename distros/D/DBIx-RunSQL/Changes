@@ -1,3 +1,6 @@
+0.25 2024-08-15
+    * Don't use Test::More::isn't() anymore, in favour of Test::More::isnt()
+
 0.24 2023-06-09
     * We don't support 5.8.x due to use of //
 

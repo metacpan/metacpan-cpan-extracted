@@ -9,7 +9,7 @@ use XML::Twig::XPath;
 use Carp qw(croak);
 use List::Util 'max';
 
-our $VERSION = '0.38';
+our $VERSION = '0.39';
 our @CARP_NOT = (qw(XML::Twig));
 
 use Filter::signatures;
@@ -734,7 +734,7 @@ Mohammad S Anwar C<manwar@cpan.org>
 
 =head1 COPYRIGHT (c)
 
-Copyright 2019-2023 by Max Maischein C<corion@cpan.org>.
+Copyright 2019-2024 by Max Maischein C<corion@cpan.org>.
 
 =head1 LICENSE
 

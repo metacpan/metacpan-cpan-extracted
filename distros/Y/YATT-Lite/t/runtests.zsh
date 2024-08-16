@@ -136,7 +136,7 @@ function plenv_install_missings {
     fi
     local m
     for m in $wants; do
-	plenv exec perl -M$m -e0 >&/dev/null || missings+=($m)
+	plenv exec perldoc -ml $m >&/dev/null || missings+=($m)
     done
     if (($#missings)); then
         confirm "Following modules are not yet installed for plenv:\n----\n${(F)missings}\n----\n$c_em[1]Install (with plenv exec cpanm) now? "\
@@ -169,8 +169,12 @@ if (($+PERL)); then
     fi
 fi
 
+$plenv_exec ${PERL:-perl} -v
+
 typeset -T HARNESS_PERL_SWITCHES harness ' '
 export HARNESS_PERL_SWITCHES
+
+(($+DEBUG_YATT_REFCNT)) || export DEBUG_YATT_REFCNT=1
 
 if [[ -n $o_taint ]]; then
     echo "[with taint check]"
@@ -195,7 +199,7 @@ if [[ -n $o_cover ]]; then
 	ignore+=(-ignore_re "^$d")
     done
 
-    harness+=(-MDevel::Cover=-db,$cover_db,${(j/,/)ignore})
+    harness+=(-MDevel::Cover=-db,$cover_db,${(j/,/)ignore},+select,'^Lite')
 
     (($+libdir)) && harness+=(-I$libdir)
 
@@ -220,7 +224,9 @@ else
 fi
 
 : ${docroot:=/var/www/html}
-if [[ -n $o_cover ]] && [[ -d $cover_db ]]; then
+if [[ -n $o_cover ]] && [[ -d $cover_db ]] &&
+       ! (($+GITHUB_TOKEN))
+then
     # ``t/cover'' is modified to accpet charset option.
     $plenv_exec $bindir/cover -charset $charset $ignore $cover_db
 

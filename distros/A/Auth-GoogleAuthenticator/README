@@ -1,0 +1,38 @@
+Auth::GoogleAuthenticator - Authenticate through Google Authenticator
+
+
+This document describes version 0.04.
+
+
+INSTALLATION
+
+This is a Perl module distribution. It should be installed with whichever
+tool you use to manage your installation of Perl, e.g. any of
+
+  cpanm .
+  cpan  .
+  cpanp -i .
+
+Consult https://www.cpan.org/modules/INSTALL.html for further instruction.
+Should you wish to install this module manually, the procedure is
+
+  perl Makefile.PL
+  make
+  make test
+  make install
+
+
+
+
+
+
+
+
+SEE ALSO
+
+TOTP: Time-Based One-Time Password Algorithm
+
+L<http://tools.ietf.org/html/rfc6238>
+
+
+

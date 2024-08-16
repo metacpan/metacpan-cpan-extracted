@@ -1,5 +1,5 @@
 package Net::Silverpeak::Orchestrator;
-$Net::Silverpeak::Orchestrator::VERSION = '0.014000';
+$Net::Silverpeak::Orchestrator::VERSION = '0.015000';
 # ABSTRACT: Silverpeak Orchestrator REST API client library
 
 use 5.024;
@@ -348,6 +348,16 @@ sub get_appliance_bgp_system_config ($self, $id, $params = {}) {
 }
 
 
+sub get_appliance_bgp_system_config_allvrfs ($self, $id, $params = {}) {
+    my $res = $self->_is_version_93
+        ? $self->get("/gms/rest/bgp/config/allVrfs/system?nePk=$id", $params)
+        : $self->get("/gms/rest/bgp/config/allVrfs/system/$id", $params);
+    $self->_error_handler($res)
+        unless $res->code == 200;
+    return $res->data;
+}
+
+
 sub get_appliance_bgp_neighbors ($self, $id, $params = {}) {
     my $res = $self->_is_version_93
         ? $self->get("/gms/rest/bgp/config/allVrfs/neighbor?nePk=$id", $params)
@@ -575,7 +585,7 @@ Net::Silverpeak::Orchestrator - Silverpeak Orchestrator REST API client library
 
 =head1 VERSION
 
-version 0.014000
+version 0.015000
 
 =head1 SYNOPSIS
 
@@ -751,6 +761,12 @@ Returns a hashref containing all IP SLA states.
 Takes an appliance id and an optional hashref with additional query parameters.
 
 Returns a hashref containing the BGP system config.
+
+=head2 get_appliance_bgp_system_config_allvrfs
+
+Takes an appliance id and an optional hashref with additional query parameters.
+
+Returns a hashref containing the BGP system config for all VRFs indexed by VRF ID.
 
 =head2 get_appliance_bgp_neighbors
 

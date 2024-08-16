@@ -21,12 +21,12 @@ BODY:
  </head>
  <body>
  <div id="wrapper">
-   <center>
+ <center>
  <div id="body">
    <div id="topnav">
      <h2>DB backed, member only site sample</h2>
    </div>
-       <h2>Please login</h2>
+     <h2>Please login</h2>
      <form action="login.ydo" method="POST">
        <table >
  	<tr>
@@ -81,7 +81,7 @@ BODY:
  </head>
  <body>
  <div id="wrapper">
-       <div class="login">
+     <div class="login">
        <b>hkoba</b> | <a href="logout.ydo?nx=index.yatt">logout</a>
      </div>
    <center>
@@ -89,7 +89,7 @@ BODY:
    <div id="topnav">
      <h2>DB backed, member only site sample</h2>
    </div>
-       
+ 
    Hello, hkoba!<br>
      
  </div>
@@ -123,12 +123,12 @@ BODY:
  </head>
  <body>
  <div id="wrapper">
-   <center>
+ <center>
  <div id="body">
    <div id="topnav">
      <h2>DB backed, member only site sample</h2>
    </div>
-       <h2>Please login</h2>
+     <h2>Please login</h2>
      <form action="login.ydo" method="POST">
        <table >
  	<tr>

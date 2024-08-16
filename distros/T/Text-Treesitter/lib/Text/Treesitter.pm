@@ -1,13 +1,13 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2023 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2023-2024 -- leonerd@leonerd.org.uk
 
 use v5.26;
 use warnings;
-use Object::Pad 0.800 ':experimental(adjust_params)';
+use Object::Pad 0.805;
 
-package Text::Treesitter 0.12;
+package Text::Treesitter 0.13;
 class Text::Treesitter
    :strict(params);
 
@@ -325,6 +325,25 @@ method parse_string_range ( $str, %options )
    return $_parser->parse_string( $str );
 }
 
+=head2 parse_file
+
+   $tree = $ts->parse_file( $path );
+
+I<Since version 0.13.>
+
+Reads the file content as a string, then applies L</parse_string> on it.
+
+=cut
+
+method parse_file ( $path )
+{
+   require Text::Treesitter::Tree;
+
+   $_parser->reset;
+   $_parser->set_included_ranges();
+   return $_parser->parse_file( $path );
+}
+
 =head2 load_query_string
 
    $query = $ts->load_query_string( $str );
@@ -342,7 +361,7 @@ method load_query_string ( $src )
 
 =head2 query_file_path
 
-   $path = %ts->query_file_path( $name );
+   $path = $ts->query_file_path( $name );
 
 If a file exists of the given path, then it is returned directly. Otherwise,
 returns a path within the language directory given by C<lang_dir>; either

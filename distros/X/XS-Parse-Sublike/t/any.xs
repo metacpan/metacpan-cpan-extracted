@@ -39,7 +39,8 @@ static void func_post_newcv(pTHX_ struct XSParseSublikeContext *ctx, void *_logs
 }
 
 static const struct XSParseSublikeHooks parse_func_hooks = {
-  .permit_hintkey = "t::any/func",
+  .ver             = XSPARSESUBLIKE_ABI_VERSION,
+  .permit_hintkey  = "t::any/func",
   .pre_subparse    = func_pre_subparse,
   .post_blockstart = func_post_blockstart,
   .pre_blockend    = func_pre_blockend,
@@ -71,6 +72,7 @@ static void prefixed_post_newcv(pTHX_ struct XSParseSublikeContext *ctx, void *_
 }
 
 static const struct XSParseSublikeHooks parse_prefixed_hooks = {
+  .ver             = XSPARSESUBLIKE_ABI_VERSION,
   .pre_subparse    = prefixed_pre_subparse,
   .post_blockstart = prefixed_post_blockstart,
   .pre_blockend    = prefixed_pre_blockend,

@@ -10,7 +10,7 @@ use HTML::TokeParser;
 eval 'use warnings;' if ($] >= 5.006);
 use vars qw( $HTML_PARSER_StripsTags $VERSION @exports );
 
-$VERSION = '0.12';
+$VERSION = '0.13';
 
 BEGIN {
   # Check whether HTML::Parser is v3 and delivers the comments starting

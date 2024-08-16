@@ -17,6 +17,8 @@ BEGIN {
 	  PATH_INFO
 	  PATH_TRANSLATED
 	  REDIRECT_STATUS
+          REDIRECT_HANDLER
+          REDIRECT_URL
 	  REQUEST_URI
 	  DOCUMENT_URI
 
@@ -45,6 +47,7 @@ BEGIN {
 	  HTTP_X_REAL_IP
 	  HTTP_X_CLIENT_IP
 	  HTTP_X_FORWARDED_FOR
+          HTTP_X_FORWARDED_PROTO
 
 	  psgi.version
 	  psgi.url_scheme
@@ -55,9 +58,12 @@ BEGIN {
 	  psgi.run_once
 	  psgi.nonblocking
 	  psgi.streaming
+          plack.session
 	  psgix.session
 	  psgix.session.options
 	  psgix.logger
+
+          yatt.script_name
        /;
   our %FIELDS = map {$_ => ''} @PSGI_FIELDS;
 }

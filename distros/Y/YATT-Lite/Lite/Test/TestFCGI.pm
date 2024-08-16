@@ -243,7 +243,9 @@ my $Test = Test::Builder->new;
     require FCGI::Client;
     my $client = FCGI::Client::Connection->new
       (sock => $self->mkclientsock($self->{sockfile})
-       , timeout => ($self->is_coverage_mode ? 120 : 10));
+       , (timeout => (YATT::Lite::Util::is_debugging() ? 1800 :
+                      $self->is_coverage_mode ? 120 : 10))
+     );
 
     my $env = {REQUEST_METHOD    => uc($method)
 	       , GATEWAY_INTERFACE => "FCGI::Client"

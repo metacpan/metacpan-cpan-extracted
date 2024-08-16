@@ -5,6 +5,7 @@ use warnings qw(FATAL all NONFATAL misc);
 use FindBin; BEGIN {do "$FindBin::RealBin/libdir.pl"}
 #----------------------------------------
 
+use mro 'c3';
 use YATT::Lite qw/*SYS/;
 use YATT::Lite::Factory;
 use YATT::Lite::Breakpoint;
@@ -28,7 +29,7 @@ my Opts $opts = Opts->new(MY->parse_opts(\@ARGV));
 $SYS = my $dispatcher = YATT::Lite::Factory->load_factory_offline || do {
   require YATT::Lite::WebMVC0::SiteApp;
   YATT::Lite::WebMVC0::SiteApp->new
-      (app_ns => 'MyApp'
+      (app_ns => 'MyYATT'
        , namespace => ['yatt', 'perl', 'js']
        , header_charset => 'utf-8'
        , debug_cgen => $ENV{DEBUG}
@@ -93,11 +94,12 @@ foreach my $fn (@ARGV) {
 exit 1 if $nerror;
 
 sub format_error {
+  use YATT::Lite::Util::AllowRedundantSprintf;
   (my $type, my YATT::Lite::Error $err) = splice @_, 0, 2;
   my @lineinfo = ("[file] ".default($err->{cf_tmpl_file}, '-')
 		  , "[line] ".default($err->{cf_tmpl_line}, '-'));
   my $msg = $type . " [@lineinfo]\n "
-    .sprintf($err->{cf_format}, @{$err->{cf_args}});
+    . ($err->{cf_reason} // sprintf($err->{cf_format}, @{$err->{cf_args}}));
   $msg .= "\n" unless $msg =~ m{\n\Z};
   $msg;
 };

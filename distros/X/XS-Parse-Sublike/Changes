@@ -1,5 +1,16 @@
 Revision history for XS-Parse-Sublike
 
+0.23    2024-08-15
+        [CHANGES]
+         * New ABI version 6
+            + Adds a `ver` field to the `XSParseSublikeHooks` structure
+         * Support named parameters using defined-or and true-or defaulting
+           operators
+         * Support positional parameters using defined-or and true-or
+           defaulting operators in extension parser, on Perl version 5.38+
+         * Store the `File::ShareDir` data in the per-module path, not the
+           per-dist path
+
 0.22    2024-07-08
         [CHANGES]
          * Use `File::ShareDir` for storing .h include file, rather than

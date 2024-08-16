@@ -28,7 +28,6 @@ END
 - foo
 END
      #
-     , undef
      , [<<END, '' => 'bar']
 - 
 - bar
@@ -54,6 +53,7 @@ foo: bar
 baz: qux
 END
 
+     , undef
      , [<<END, foo => "bar\nbaz\n"]
 foo:
  bar
@@ -130,6 +130,17 @@ bang= #null
 foo: bar
 }
 END
+
+   , [<<END, []]
+[
+]
+END
+
+   , [<<END, {}]
+{
+}
+END
+
     );
 
 my @dumponly =
@@ -146,30 +157,57 @@ END
 
   );
 
-plan tests => 2 + 3*grep(defined $_, @tests) + @dumponly;
+my @no_trailing_nl = (
+  [<<END, [foo => "bar\n"]]
+foo:
+ bar
+ 
+END
+);
+
+plan tests => 2 + 3*grep(defined $_, @tests) + @dumponly + @no_trailing_nl;
 
 use_ok($LOADER);
 use_ok($DUMPER);
 
 sub breakpoint {}
 
+my $T = 0;
 foreach my $data (@tests) {
   unless (defined $data) {
     breakpoint();
     next;
   }
 
+  ++$T;
+
   my ($exp, @data) = @$data;
   my $title = join(", ", Data::Dumper->new(\@data)->Terse(1)->Indent(0)->Dump);
-  eq_or_diff my $got = $DUMPER->dump_xhf(@data)."\n", $exp, "dump: $title";
-  is_deeply [$LOADER->new(string => $got)->read], \@data, "read: $title";
-  is_deeply [$LOADER->new(string => $exp)->read], \@data, "read_exp: $title";
+  eq_or_diff my $got = $DUMPER->dump_xhf(@data)."\n", $exp, "<T$T> dump: $title";
+  is_deeply [$LOADER->new(string => $got)->read], \@data, "<T$T> read: $title";
+  is_deeply [$LOADER->new(string => $exp)->read], \@data, "<T$T> read_exp: $title";
 }
 
+my $D = 0;
 foreach my $data (@dumponly) {
+  ++$D;
   my ($exp, @data) = @$data;
   my $title = join(", ", Data::Dumper->new(\@data)->Terse(1)->Indent(0)->Dump);
-  eq_or_diff my $got = $DUMPER->dump_xhf(@data)."\n", $exp, "dump: $title";
+  eq_or_diff my $got = $DUMPER->dump_xhf(@data)."\n", $exp, "<D$D> dump: $title";
+}
+
+{
+  my $O = 0;
+  my $test = sub {
+    my ($exp, $data) = @_;
+    my $title = join(", ", Data::Dumper->new($data)->Terse(1)->Indent(0)->Dump);
+    ++$O;
+    eq_or_diff $DUMPER->dump_strict_xhf(@$data)."\n", $exp, "<O$O> dump: $title";
+  };
+
+  foreach my $t (@no_trailing_nl) {
+    $test->(@$t);
+  }
 }
 
 {

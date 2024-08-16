@@ -70,6 +70,12 @@ IN:
  </yatt:foreach></ul>
 ERROR: ^yatt:foreach - x should be list type
 
+TITLE: foreach list pass through, unknown variable.
+IN:
+ <ul>
+ <yatt:foreach my=i list=x><li>&yatt:i;</li>
+ </yatt:foreach></ul>
+ERROR: ^Unknown variable for foreach list: 'x'
 
 TITLE: foreach $_
 IN:

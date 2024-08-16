@@ -16,8 +16,10 @@ use YATT::Lite::Types
 			     cf_FILE_READABLE
 			   )]]
    , [Item => -fields => [qw(cf_TITLE cf_FILE cf_METHOD cf_ACTION
+                             cf_STATUS
 			     cf_BREAK
 			     cf_SKIP_IF_ERROR
+                             cf_ACCEPT_ERROR
 			     cf_SAME_RESULT
 			     cf_PERL_MINVER
 			     cf_SITE_CONFIG
@@ -185,6 +187,10 @@ sub mechanized {
     my $last_body;
     foreach my Item $item (@{$sect->{items}}) {
 
+      if ($item->{cf_BREAK}) {
+        YATT::Lite::Breakpoint::breakpoint();
+      }
+
       if (my $action = $item->{cf_ACTION}) {
 	my ($method, @args) = @$action;
 	my $sub = $tests->can("action_$method")
@@ -207,8 +213,25 @@ sub mechanized {
 	      and $error =~ m{$item->{cf_SKIP_IF_ERROR}}) {
 	    my $skip_count = $tests->skipcount_for_request_error($item);
 	    skip $error, $skip_count;
-	  } else {
-	    fail "[$sect_name] $T Unknown error: $error";
+          } elsif ($item->{cf_ACCEPT_ERROR}
+                   and grep {$error =~ $_} lexpand($item->{cf_ACCEPT_ERROR})) {
+            # ok
+	  }
+          elsif (not $res->is_success
+                 and defined (my $content = $res->decoded_content)
+                 and ($item->{cf_ERROR} or $item->{cf_BODY})
+               ) {
+            if ($item->{cf_ERROR}) {
+              like $content, qr{$item->{cf_ERROR}}, "[$sect_name] $T HTTP Error should match $item->{cf_ERROR}";
+
+              next;
+            } else {
+              # fall through to BODY test
+            }
+          }
+          else {
+	    fail "[$sect_name] $T Unknown error: $error "
+              . $tests->item_url($item);
 	    next;
 	  }
 	}
@@ -294,16 +317,15 @@ sub mkformref_if_post {
 sub mech_request {
   (my Tests $tests, my ($mech, $item)) = @_;
   my $url = $tests->item_url($item);
-  given ($tests->item_method($item)) {
-    when ('GET') {
-      return $mech->get($url);
-    }
-    when ('POST') {
-      return $mech->post($url, $item->{cf_PARAM});
-    }
-    default {
-      die "Unknown test method: $_\n";
-    }
+  my $method = $tests->item_method($item);
+  if ($method eq 'GET') {
+    return $mech->get($url);
+  }
+  elsif ($method eq 'POST') {
+    return $mech->post($url, $item->{cf_PARAM});
+  }
+  else {
+    die "Unknown test method: $method\n";
   }
 }
 

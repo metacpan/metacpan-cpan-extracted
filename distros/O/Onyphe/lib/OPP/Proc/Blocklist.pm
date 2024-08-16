@@ -1,5 +1,5 @@
 #
-# $Id: Blocklist.pm,v a6091d726551 2023/04/05 15:44:32 gomor $
+# $Id: Blocklist.pm,v 1a6ad59d015b 2024/02/16 09:27:25 gomor $
 #
 package OPP::Proc::Blocklist;
 use strict;
@@ -14,13 +14,12 @@ use File::Slurp qw(read_file);
 use Text::CSV_XS;
 use Net::IPv4Addr qw(ipv4_in_network);
 
-# Load CSV data here, one time
-my $csv;
-my $match_fields;  # Support all fields as a match (AND match)
-
 sub _load {
    my $self = shift;
    my ($file) = @_;
+
+   my $csv = $self->state->value('csv', $self->idx);
+   my $match_fields = $self->state->value('match_fields', $self->idx);
 
    # Load CSV lookup:
    unless (defined($csv)) {
@@ -44,12 +43,15 @@ sub _load {
          my $h = {};
          my $idx = 0;
          for my $this (@$header) {
-            $h->{$this} = $line->[$idx++];
+            $h->{$this} = lc($line->[$idx++]);
          }
          push @$csv, $h if keys %$h;
       }
 
       #print STDERR Data::Dumper::Dumper($csv)."\n";
+
+      $self->state->add('csv', $csv, $self->idx);
+      $self->state->add('match_fields', $match_fields, $self->idx);
    }
 
    return [ $csv, $match_fields ];
@@ -73,9 +75,9 @@ sub process {
 
    my $cidr = $options->{cidr} || 'ip';  # Use ip field by default for cidr matches
 
-   my $loaded = $self->_load($file);
-   $csv = $loaded->[0];
-   $match_fields = $loaded->[1];
+   my $r = $self->_load($file);
+   my $csv = $r->[0];
+   my $match_fields = $r->[1];
 
    # Touch nothing when matching fields are not found in input:
    for my $field (@$match_fields) {
@@ -104,7 +106,7 @@ sub process {
          else {  # Exact field match mode
             for my $v (@$values) {
                #print STDERR "*** match field [$field] vs v[$v]\n";
-               if (defined($line->{$field}) && $v eq $line->{$field}) {
+               if (defined($line->{$field}) && lc($v) eq $line->{$field}) {
                   $this_skip++;
                   last;
                }
@@ -137,7 +139,7 @@ OPP::Proc::Blocklist - blocklist processor
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (c) 2023, Patrice E<lt>GomoRE<gt> Auffret
+Copyright (c) 2024, Patrice E<lt>GomoRE<gt> Auffret
 
 You may distribute this module under the terms of The BSD 3-Clause License.
 See LICENSE file in the source distribution archive.

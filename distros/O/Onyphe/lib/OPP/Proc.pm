@@ -1,5 +1,5 @@
 #
-# $Id: Proc.pm,v 58d7ce835577 2023/03/25 10:34:10 gomor $
+# $Id: Proc.pm,v c0575c37c27d 2024/05/06 13:15:26 james $
 #
 package OPP::Proc;
 use strict;
@@ -166,7 +166,7 @@ sub delete {
 #
 sub set {
    my $self = shift;
-   my ($flat, $field, $value) = @_;
+   my ($flat, $field, $value, $asarray) = @_;
 
    croak("set: need flat argument") unless defined($flat);
    croak("set: need field argument") unless defined($field);
@@ -176,14 +176,25 @@ sub set {
    if (my $split = $self->is_nested($field)) {
       my $root = $split->[0];
       my $leaf = $split->[1];
-      # Delete at the leaf level:
+      # Set at the leaf level:
       if (defined($leaf)) {
          $flat->{$root} = [ { $leaf => $value } ];
       }
    }
    # Handle standard fields:
    else {
-      $flat->{$field} = $value;
+      if ($asarray) {
+         $flat->{$field} ||= [];
+         $flat->{$field} = ref($flat->{$field}) eq 'ARRAY'
+            ? $flat->{$field} : [ $flat->{$field} ];
+         push @{$flat->{$field}}, $value;
+         #print STDERR Data::Dumper::Dumper($flat->{$field})."\n";
+         my %h = map { $_ => 1 } @{$flat->{$field}};
+         $flat->{$field} = [ sort { $a cmp $b } keys %h ];  # Make uniq
+      }
+      else {
+         $flat->{$field} = $value;
+      }
    }
 
    return $flat;
@@ -242,9 +253,9 @@ sub placeholder {
       my $values = $self->value($flat, $holder);
       for my $value (@$values) {
          while ($copy =~ s{(\S+)\s*:\s*\$$holder}{$1:$value}) { }
-         $searches{$copy}++;  # Make them unique
       }
    }
+   $searches{$copy}++;  # Make them unique
 
    return [ keys %searches ];
 }
@@ -257,19 +268,15 @@ __END__
 
 OPP::Proc - base class for OPP's processors
 
-=head1 SYNOPSIS
-
-=head1 DESCRIPTION
-
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (c) 2023, Patrice E<lt>GomoRE<gt> Auffret
+Copyright (c) 2024, ONYPHE SAS
 
 You may distribute this module under the terms of The BSD 3-Clause License.
 See LICENSE file in the source distribution archive.
 
 =head1 AUTHOR
 
-Patrice E<lt>GomoRE<gt> Auffret
+ONYPHE E<lt>contact_at_onyphe.ioE<gt>
 
 =cut

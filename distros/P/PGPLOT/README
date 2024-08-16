@@ -1,5 +1,3 @@
-
-
 PGPLOT module for Perl
 ----------------------
 
@@ -51,3 +49,8 @@ Problems - see the file HELP
 
 News - see the file CHANGES for new features/bug fixes.
 
+NOTES FOR LUT TABLES
+--------------------
+The colour tables were taken from STARLINK's GAIA distribution, where they
+have the GNU copyleft. Further information on STARLINK and GAIA can be found
+via http://star-www.rl.ac.uk/ and http://star-www.dur.ac.uk/~pdraper/.

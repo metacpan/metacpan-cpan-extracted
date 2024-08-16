@@ -45,6 +45,19 @@ BEGIN { $^H{"t::func/nfunc"}++ }
    is( withy(),           "Y", 'named param applies default' );
 }
 
+# named params can use //= and ||=
+{
+   nfunc withdefined(:$x //= "default") { return $x }
+
+   is( withdefined( x => "value" ), "value",   'named param with defined-or' );
+   is( withdefined( x => undef ),   "default", 'named param with defined-or defaulting' );
+
+   nfunc withtrue(:$x ||= "default") { return $x }
+
+   is( withtrue( x => "value" ), "value",   'named param with true-or' );
+   is( withtrue( x => "" ),      "default", 'named param with true-or defaulting' );
+}
+
 # named params still work without a slurpy
 {
    nfunc withz(:$z) { return $z }

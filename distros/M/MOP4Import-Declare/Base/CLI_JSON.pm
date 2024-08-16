@@ -28,8 +28,11 @@ use MOP4Import::Base::CLI -as_base
      , ['binary' => default => 0, doc => "keep STDIN/OUT/ERR binary friendly"
         , json_type => 'bool'
       ]
-     , '_cli_json'
    ];
+
+use JSON::MaybeXS;
+use MOP4Import::Base::JSON -as_base;
+
 use MOP4Import::Opts;
 use MOP4Import::Util qw/lexpand globref take_locked_opts_of lock_keys_as/;
 
@@ -37,12 +40,6 @@ use open ();
 
 print STDERR "Using (file '" . __FILE__ . "')\n"
   if DEBUG and DEBUG >= 2;
-
-use JSON::MaybeXS;
-use constant USING_CPANEL_JSON_XS => JSON()->isa("Cpanel::JSON::XS");
-
-# Only works with Cpanel::JSON::XS. JSON::XS prohibits use of restricted hash.
-sub TO_JSON { +{%{shift()}} }
 
 sub cli_precmd {
   (my MY $self) = @_;
@@ -423,63 +420,21 @@ sub cli_write_fh {
 
 sub cli_json { JSON() }
 
-sub cli_json_type {
-  (my MY $self) = @_;
-  $self->cli_json_type_of($self);
-}
-
-sub cli_json_type_of {
-  (my MY $self, my $objOrTypeName) = @_;
-  $self->JSON_TYPE_HANDLER->lookup_json_type(ref $objOrTypeName || $objOrTypeName);
-}
-
 sub cli_decode_json {
   (my MY $self, my $string) = @_;
   $self->cli_decoder_from__json->($string);
 }
 
-sub cli_encode_json_as_bytes {
-  (my MY $self, my ($obj, $json_type)) = @_;
-  my $codec = $self->{_cli_json} //= $self->cli_json_encoder;
-  my @opts;
-  my $json = do {
-    if (not USING_CPANEL_JSON_XS) {
-      $codec->encode($obj);
-    } else {
-      push @opts, do {
-        if (defined $json_type) {
-          $self->cli_json_type_of($json_type) // $json_type;
-        } elsif (ref $obj) {
-          $self->cli_json_type_of(ref $obj);
-        } else {
-          ();
-        }
-      };
-      if (not (my $sub = UNIVERSAL::can($obj, 'TO_JSON'))) {
-        $codec->encode($obj, @opts);
-      } elsif (ref (my $conv = $sub->($obj))) {
-        $codec->encode($conv, @opts);
-      } else {
-        $conv;
-      }
-    }
-  };
-  $json;
-}
-
 sub cli_encode_json {
   (my MY $self, my ($obj, $json_type)) = @_;
-  my $json = $self->cli_encode_json_as_bytes($obj, $json_type);
+  my $json = $self->SUPER::cli_encode_json($obj, $json_type);
   Encode::_utf8_on($json) unless $self->{binary};
   $json;
 }
 
 sub cli_json_encoder {
   (my MY $self) = @_;
-  my $js = JSON()->new->canonical->allow_nonref;
-  if (USING_CPANEL_JSON_XS) {
-    $js->convert_blessed;
-  }
+  my $js = $self->SUPER::cli_json_encoder;
   $js->utf8 unless $self->{binary};
   $js;
 }

@@ -1,0 +1,8 @@
+use strict;
+
+use Hoehoe::Long::Wrong::Missing::Module;
+
+return sub {
+  my ($this, $con) = @_;
+  print $con "OK";
+};

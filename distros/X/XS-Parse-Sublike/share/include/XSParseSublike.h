@@ -1,7 +1,7 @@
 #ifndef __XS_PARSE_SUBLIKE_H__
 #define __XS_PARSE_SUBLIKE_H__
 
-#define XSPARSESUBLIKE_ABI_VERSION 5
+#define XSPARSESUBLIKE_ABI_VERSION 6
 
 struct XSParseSublikeContext {
   SV *name;  /* may be NULL for anon subs */
@@ -21,7 +21,7 @@ struct XSParseSublikeContext {
 };
 
 enum {
-  XS_PARSE_SUBLIKE_FLAG_FILTERATTRS   = 1<<0,
+  XS_PARSE_SUBLIKE_FLAG_FILTERATTRS   = 1<<0, /* API v4 flag, no longer used */
   XS_PARSE_SUBLIKE_FLAG_BODY_OPTIONAL = 1<<1,
   XS_PARSE_SUBLIKE_FLAG_PREFIX        = 1<<2,
 
@@ -50,6 +50,7 @@ enum {
 };
 
 struct XSParseSublikeHooks {
+  U32  ver;  /* caller must initialise to XSPARSESUBLIKE_ABI_VERSION */
   U16  flags;
   U8   require_parts;
   U8   skip_parts;
@@ -59,12 +60,10 @@ struct XSParseSublikeHooks {
   bool (*permit)(pTHX_ void *hookdata);
 
   void (*pre_subparse)   (pTHX_ struct XSParseSublikeContext *ctx, void *hookdata);
+  bool (*filter_attr)    (pTHX_ struct XSParseSublikeContext *ctx, SV *attr, SV *val, void *hookdata);
   void (*post_blockstart)(pTHX_ struct XSParseSublikeContext *ctx, void *hookdata);
   void (*pre_blockend)   (pTHX_ struct XSParseSublikeContext *ctx, void *hookdata);
   void (*post_newcv)     (pTHX_ struct XSParseSublikeContext *ctx, void *hookdata);
-
-  /* if flags & XS_PARSE_SUBLIKE_FLAG_FILTERATTRS */
-  bool (*filter_attr)    (pTHX_ struct XSParseSublikeContext *ctx, SV *attr, SV *val, void *hookdata);
 };
 
 static int (*parse_xs_parse_sublike_func)(pTHX_ const struct XSParseSublikeHooks *hooks, void *hookdata, OP **op_ptr);
@@ -156,13 +155,13 @@ static void S_boot_xs_parse_sublike(pTHX_ double ver) {
         abi_ver, XSPARSESUBLIKE_ABI_VERSION);
 
   parse_xs_parse_sublike_func = INT2PTR(int (*)(pTHX_ const struct XSParseSublikeHooks *, void *, OP**),
-      SvUV(*hv_fetchs(PL_modglobal, "XS::Parse::Sublike/parse()@4", 0)));
+      SvUV(*hv_fetchs(PL_modglobal, "XS::Parse::Sublike/parse()@6", 0)));
 
   register_xs_parse_sublike_func = INT2PTR(void (*)(pTHX_ const char *, const struct XSParseSublikeHooks *, void *),
-      SvUV(*hv_fetchs(PL_modglobal, "XS::Parse::Sublike/register()@4", 0)));
+      SvUV(*hv_fetchs(PL_modglobal, "XS::Parse::Sublike/register()@6", 0)));
 
   parseany_xs_parse_sublike_func = INT2PTR(int (*)(pTHX_ const struct XSParseSublikeHooks *, void *, OP**),
-      SvUV(*hv_fetchs(PL_modglobal, "XS::Parse::Sublike/parseany()@4", 0)));
+      SvUV(*hv_fetchs(PL_modglobal, "XS::Parse::Sublike/parseany()@6", 0)));
 
   register_xps_signature_attribute_func = INT2PTR(void (*)(pTHX_ const char *, const struct XPSSignatureAttributeFuncs *, void *),
       SvUV(*hv_fetchs(PL_modglobal, "XS::Parse::Sublike/register_sigattr()@5", 0)));

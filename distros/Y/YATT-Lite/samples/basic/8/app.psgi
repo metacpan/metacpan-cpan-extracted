@@ -67,7 +67,7 @@ use List::MoreUtils qw/last_index/;
   #
 
   my $site = MY->load_factory_for_psgi
-    (__FILE__, app_ns => 'MyApp'
+    (__FILE__, app_ns => 'MyYATT'
      , namespace => ['yatt', 'perl', 'js']
      , header_charset => 'utf-8'
      , use_subpath => 1

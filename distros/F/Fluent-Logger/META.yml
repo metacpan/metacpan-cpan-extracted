@@ -13,7 +13,7 @@ build_requires:
 configure_requires:
   Module::Build::Tiny: '0.035'
 dynamic_config: 0
-generated_by: 'Minilla/v3.1.4, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Minilla/v3.1.18, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -32,7 +32,7 @@ no_index:
 provides:
   Fluent::Logger:
     file: lib/Fluent/Logger.pm
-    version: '0.28'
+    version: '0.29'
   Fluent::Logger::UDP:
     file: lib/Fluent/Logger/UDP.pm
 requires:
@@ -44,13 +44,13 @@ requires:
 resources:
   bugtracker: https://github.com/fluent/fluent-logger-perl/issues
   homepage: https://github.com/fluent/fluent-logger-perl
-  repository: git://github.com/fluent/fluent-logger-perl.git
-version: '0.28'
+  repository: https://github.com/fluent/fluent-logger-perl.git
+version: '0.29'
 x_contributors:
   - 'Alexandr Ciornii <alexchorny@gmail.com>'
   - 'Brian Fraser <fraserbn@gmail.com>'
   - 'DQNEO <dqneoo@gmail.com>'
-  - 'FUJIWARA Shunichiro <fujiwara.shunichiro@gmail.com>'
+  - 'FUJIWARA Shunichiro <67804+fujiwara@users.noreply.github.com>'
   - 'HIROSE Masaaki <hirose31@gmail.com>'
   - 'José Joaquín Atria <jjatria@gmail.com>'
   - 'Kiyoto Tamura <me@ktamura.com>'
@@ -61,6 +61,7 @@ x_contributors:
   - 'Tokuhiro Matsuno <tokuhirom@gmail.com>'
   - 'Tomohiro Hosaka <bokutin@bokut.in>'
   - 'cho45 <cho45@lowreal.net>'
+  - 'fujiwara <fujiwara.shunichiro@gmail.com>'
   - 'koji_magi <kadal_keys@hotmail.co.jp>'
   - 'lestrrat <lestrrat+github@gmail.com>'
   - 'yoheimuta <yoheimuta@gmail.com>'

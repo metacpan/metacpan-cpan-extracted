@@ -91,7 +91,7 @@ Entity mh_load => sub {
   unless (-r $fn) {
     die "Can't read '$fn'\n";
   }
-  $yatt->read_file_xhf($fn);
+  $yatt->read_file_xhf($fn, single => 1); # or all => 0
 };
 
 sub escape_nl {
@@ -113,7 +113,9 @@ sub cmd_setup {
 
 sub after_new {
   my MY $self = shift;
-  # $self->SUPER::after_new(); # Should call, but without this, should work.
+
+  $self->SUPER::after_new(); # **REQUIRED**
+
   # XXX: rewrite with (future) abstract path api.
   $self->{cf_datadir} //= $self->app_path_var('data');
   $self->{cf_tmpdir}  //= $self->app_path_var_tmp;

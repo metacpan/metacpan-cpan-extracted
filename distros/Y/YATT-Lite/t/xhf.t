@@ -117,7 +117,7 @@ y: 2
 END
     , [[foo => 1, bar => "\n2\n", baz => 3], [x => 1, y => 2]];
 
-  test_parser [parser(<<END)->read]
+  test_parser [parser(<<END, filename_for_error => __FILE__, first_lineno => __LINE__+1)->read]
 foo: 1
 bar{
 x: 2.1
@@ -243,27 +243,27 @@ foo{
 - y
 END
 
-  test_error <<END, qr/paren mismatch. '\[' is closed by '\}'/, "Mismatching [} ";
+  test_error <<END, qr/paren mismatch. '\[' (?:\(line \d+\) )?is closed by '\}'/, "Mismatching [} ";
 foo[
 - x
 - y
 }
 END
 
-  test_error <<END, qr/paren mismatch. '\{' is closed by '\]'/, "Mismatching {]";
+  test_error <<END, qr/paren mismatch. '\{' (?:\(line \d+\) )?is closed by '\]'/, "Mismatching {]";
 foo{
 - x
 - y
 ]
 END
 
-  test_error <<END, qr/Field close '\]' without open!/, "close without open";
+  test_error <<END, qr/Field close '\]' (?:\(line \d+\) )?without open!/, "close without open";
 - x
 - y
 ]
 END
 
-  test_error <<END, qr/Field close '\}' without open!/, "close without open";
+  test_error <<END, qr/Field close '\}' (?:\(line \d+\) )?without open!/, "close without open";
 - x
 - y
 }

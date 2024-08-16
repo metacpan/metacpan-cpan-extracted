@@ -1,3 +1,8 @@
+Travel::Status::DE::DeutscheBahn 6.08 - Mon Aug 12 2024
+
+    * HAFAS: Add DSB (Rejseplanen), TPG and ZVV service definitions
+    * HAFAS: Update endpoint URL for BLS service
+
 Travel::Status::DE::DeutscheBahn 6.07 - Mon Aug 12 2024
 
     * HAFAS: Fix enum error in ÖBB service

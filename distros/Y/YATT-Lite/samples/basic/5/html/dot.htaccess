@@ -1,0 +1,11 @@
+allow from all
+Action x-yatt-handler @DRIVER@
+AddHandler x-yatt-handler .yatt .ydo .ytmpl
+
+Options -Indexes -Includes -ExecCGI
+DirectoryIndex index.yatt index.html
+
+# Test for accidentally visible *.ytmpl.
+<Files *.ytmpl>
+allow from all
+</Files>

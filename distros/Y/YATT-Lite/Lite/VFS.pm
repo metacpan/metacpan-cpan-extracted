@@ -1,11 +1,14 @@
 package YATT::Lite::VFS;
 use strict;
 use warnings qw(FATAL all NONFATAL misc);
+use mro 'c3';
 use Exporter qw(import);
 use Scalar::Util qw(weaken);
 use Carp;
 use constant DEBUG_VFS => $ENV{DEBUG_YATT_VFS};
 use constant DEBUG_REBUILD => $ENV{DEBUG_YATT_REBUILD};
+use constant DEBUG_MRO => $ENV{DEBUG_YATT_MRO};
+use constant DEBUG_LOOKUP => $ENV{DEBUG_YATT_VFS_LOOKUP};
 
 require File::Spec;
 require File::Basename;
@@ -16,11 +19,13 @@ require File::Basename;
 {
   sub MY () {__PACKAGE__}
   use YATT::Lite::Types
-    ([Item => -fields => [qw(cf_name cf_public)]
+    ([Item => -fields => [qw(cf_name cf_public cf_type)]
+      , -constants => [[can_generate_code => 0], [item_category => '']]
       , [Folder => -fields => [qw(Item cf_path cf_parent cf_base
 				  cf_entns)]
 	 , -eval => q{use YATT::Lite::Util qw(cached_in);}
-	 , [File => -fields => [qw(partlist cf_string cf_overlay
+	 , [File => -fields => [qw(partlist cf_string cf_overlay cf_imported
+                                   cf_nlines
 				   dependency
 				)]
 	    , -alias => 'vfs_file']
@@ -28,11 +33,20 @@ require File::Basename;
 	    , -alias => 'vfs_dir']]]);
 
   sub YATT::Lite::VFS::Item::after_create {}
+  sub YATT::Lite::VFS::Item::item_key {
+    (my Item $item) = @_;
+    $item->{cf_name};
+  }
   sub YATT::Lite::VFS::Folder::configure_parent {
     my MY $self = shift;
     # 循環参照対策
     # XXX: Item に移すべきかもしれない。そうすれば、 Widget->parent が引ける。
     weaken($self->{cf_parent} = shift);
+  }
+  sub YATT::Lite::VFS::Folder::get_linear_isa_of_entns {
+    (my Folder $folder) = @_;
+    my $isa = mro::get_linear_isa($folder->{cf_entns});
+    wantarray ? @$isa : $isa;
   }
 
   package YATT::Lite::VFS; BEGIN {$INC{"YATT/Lite/VFS.pm"} = 1}
@@ -40,14 +54,16 @@ require File::Basename;
   use parent qw(YATT::Lite::Object);
   use YATT::Lite::MFields qw/cf_ext_private cf_ext_public cf_cache cf_no_auto_create
 		cf_facade cf_base
+		cf_import
 		cf_entns
 		cf_always_refresh_deps
+		cf_no_mro_c3
 		on_memory
 		root extdict
 		cf_mark
 		n_creates
-		pkg2folder/;
-  use YATT::Lite::Util qw(lexpand rootname terse_dump);
+		cf_entns2vfs_item/;
+  use YATT::Lite::Util qw(lexpand rootname extname);
   sub default_ext_public {'yatt'}
   sub default_ext_private {'ytmpl'}
   sub new {
@@ -76,28 +92,113 @@ require File::Basename;
     my MY $self = shift;
     confess __PACKAGE__ . ": facade is empty!" unless $self->{cf_facade};
     weaken($self->{cf_facade});
+
+    $self->refresh_import if $self->{cf_import};
   }
   sub error {
     my MY $self = shift;
     $self->{cf_facade}->error(@_);
   }
   #========================================
+
+  sub find_neighbor_file {
+    (my VFS $vfs, my ($path)) = @_;
+    my VFS $other_vfs = $vfs->{cf_facade}->find_neighbor_vfs
+      (File::Basename::dirname($path));
+    $other_vfs->find_file(File::Basename::basename($path));
+  }
+  sub find_neighbor_type {
+    (my VFS $vfs, my ($kind, $path)) = @_;
+    $kind //= -d $path ? 'dir' : 'file';
+    if ($kind eq 'file') {
+      $vfs->find_neighbor_file($path);
+    } elsif ($kind eq 'dir') {
+      $vfs->{cf_facade}->find_neighbor($path);
+    } else {
+      croak "Unknown vfs type=$kind path=$path";
+    }
+  }
+
+  sub refresh_import {
+    (my VFS $vfs) = @_;
+    my Folder $root = $vfs->{root};
+
+    my @files = grep {
+      -f $_ && defined $vfs->{extdict}{extname($_)}
+    } map {
+      my $fn = "$root->{cf_path}/$_";
+      1 while $fn =~ s,/[^/\.]+/\.\./,/,g;
+      glob($fn);
+    } lexpand($vfs->{cf_import});
+
+    if (DEBUG_VFS) {
+      printf STDERR "# vfs-import to %s from %s (actually: %s)\n"
+	, $root->{cf_path}, sorted_dump($vfs->{cf_import}), sorted_dump(\@files);
+    }
+
+    foreach my $fn (@files) {
+      my Folder $file = $vfs->find_neighbor_file($fn);
+
+      # Skip if it exists.
+      next if $root->lookup_1($vfs, $file->{cf_name});
+
+      # 
+      $root->{Item}{$file->{cf_name}}
+	= $vfs->create(file => $file->{cf_path}, parent => $root
+		       , imported => 1
+		     );
+    }
+  }
+
+  #========================================
   sub find_file {
     (my VFS $vfs, my $filename) = @_;
     # XXX: 拡張子をどうしたい？
     my ($name) = $filename =~ m{^(\w+)}
       or croak "Can't extract part name from filename '$filename'";
-    $vfs->{root}->lookup($vfs, $name);
+    my $nameSpec = length($name) == length($filename)
+      ? $name : [$name => $filename];
+    $vfs->{root}->lookup($vfs, $nameSpec);
+  }
+  sub list_all_names {
+    (my VFS $vfs) = @_;
+    $vfs->{root}->list_all_names($vfs);
   }
   sub list_items {
     (my VFS $vfs) = @_;
     $vfs->{root}->list_items($vfs);
   }
+  sub list_base {
+    (my VFS $vfs) = @_;
+    map {
+      my Folder $folder = $_; # Actually, only folders can be a 'base'.
+      $folder->{cf_path};
+    } $vfs->list_internal_base_folders;
+  }
+
+  # XXX: Incontrast to list_items, list_internal_base_items returns internal VFS items
+  sub list_internal_base_folders {
+    (my VFS $vfs) = @_;
+    $vfs->{root}->list_base($vfs);
+  }
   sub resolve_path_from {
-    (my VFS $vfs, my Folder $folder, my $fn) = @_;
+    (my VFS $vfs, my Folder $from, my $fn) = @_;
+    my Folder $folder = $from->dirobj;
     my $dirname = $folder->dirname
       or return undef;
-    File::Spec->rel2abs($fn, $dirname)
+    my $abs = do {
+      if ($fn =~ /^@/) {
+        $vfs->{cf_facade}->app_path_expand($fn);
+      } elsif ($fn =~ s!^((?:\.\./)+)!!) {
+	# leading upward relpath is treated specially.
+	my $up = length($1) / 3;
+	my @dirs = File::Spec->splitdir($dirname);
+	File::Spec->catfile(@dirs[0.. $#dirs - $up], $fn);
+      } else {
+	File::Spec->rel2abs($fn, $dirname);
+      }
+    };
+    $abs;
   }
 
   #========================================
@@ -115,10 +216,31 @@ require File::Basename;
     }
   }
 
+  sub find_part_from_entns {
+    (my VFS $vfs, my $entns) = splice @_, 0, 2;
+    my Folder $folder = $vfs->{cf_entns2vfs_item}{$entns}
+      or croak "Unknown entns $entns!";
+    $vfs->find_part_from($folder, @_);
+  }
+
   # To limit call of refresh atmost 1, use this.
   sub reset_refresh_mark {
     (my VFS $vfs) = shift;
     $vfs->{cf_mark} = @_ ? shift : {};
+  }
+
+  sub re_ext {
+    (my VFS $vfs) = @_;
+    my $ext = join("|", grep {defined}
+                   $vfs->{cf_ext_public}, $vfs->{cf_ext_private});
+    qr{$ext};
+  }
+
+  sub YATT::Lite::VFS::Folder::lookup {
+    print STDERR "# VFS: root->lookup(", sorted_dump(@_[2..$#_]), ")\n"
+      if DEBUG_LOOKUP;
+    $_[0]->lookup_1(@_[1..$#_])
+      // $_[0]->lookup_base(@_[1..$#_])
   }
 
   sub YATT::Lite::VFS::Dir::dirobj { $_[0] }
@@ -148,39 +270,67 @@ require File::Basename;
     $file->{cf_path} // $file->{cf_name};
   }
 
-  sub YATT::Lite::VFS::File::lookup {
-    (my vfs_file $file, my VFS $vfs, my $name) = splice @_, 0, 3;
+  sub YATT::Lite::VFS::File::lookup_1 {
+    (my vfs_file $file, my VFS $vfs, my $nameSpec) = splice @_, 0, 3;
+    print STDERR "# VFS:   $file->lookup_1("
+      , sorted_dump($nameSpec, @_), ") in (", sorted_dump($file->{cf_path}), ")\n"
+      if DEBUG_LOOKUP;
     unless (@_) {
       # ファイルの中には、深さ 1 の name しか無いはずだから。
       # mtime, refresh
       $file->refresh($vfs) unless $vfs->{cf_mark}{refaddr($file)}++;
+      my ($name) = lexpand($nameSpec);
       my Item $item = $file->{Item}{$name};
       return $item if $item;
     }
-    # 深さが 2 以上の (name, @_) については、継承先から探す。
-    $file->lookup_base($vfs, $name, @_);
+    undef;
   }
-  sub YATT::Lite::VFS::Dir::lookup {
-    (my vfs_dir $dir, my VFS $vfs, my $name) = splice @_, 0, 3;
+  sub YATT::Lite::VFS::Dir::lookup_1 {
+    (my vfs_dir $dir, my VFS $vfs, my $nameSpec) = splice @_, 0, 3;
+    print STDERR "# VFS:   $dir->lookup_1("
+      , sorted_dump($nameSpec, @_), ") in (", sorted_dump($dir->{cf_path}), ")\n"
+      if DEBUG_LOOKUP;
     if (my Item $item = $dir->cached_in
-	($dir->{Item} //= {}, $name, $vfs, $vfs->{cf_mark})) {
+	($dir->{Item} //= {}, $nameSpec, $vfs, $vfs->{cf_mark})) {
       if ((not ref $item or not UNIVERSAL::isa($item, Item))
 	  and not $vfs->{cf_no_auto_create}) {
+	# Special case (mostly for test)
+	# data vfs can contain vfs spec (string, array, hash).
+        my ($name) = lexpand($nameSpec);
 	$item = $dir->{Item}{$name} = $vfs->create
 	  (data => $item, parent => $dir, name => $name);
       }
       return $item unless @_;
-      $item = $item->lookup($vfs, @_);
+      if (not $vfs->{cf_no_mro_c3} and $dir->{cf_entns}) {
+	$item = $item->lookup_1($vfs, @_);
+      } else {
+	$item = $item->lookup($vfs, @_);
+      }
       return $item if $item;
     }
-    $dir->lookup_base($vfs, $name, @_);
+    undef;
   }
   sub YATT::Lite::VFS::Folder::lookup_base {
-    (my Folder $item, my VFS $vfs, my $name) = splice @_, 0, 3;
-    my @super = $item->list_base;
-    foreach my $super (@super) {
-      my $ans = $super->lookup($vfs, $name, @_) or next;
-      return $ans;
+    (my Folder $item, my VFS $vfs, my $nameSpec) = splice @_, 0, 3;
+    print STDERR "# VFS:      $item->lookup_base("
+      , sorted_dump($item->{cf_path}) ,")(", sorted_dump($nameSpec, @_), ")\n"
+      if DEBUG_LOOKUP;
+
+    if (not $vfs->{cf_no_mro_c3} and $item->{cf_entns}) {
+      (undef, my @super_ns) = @{mro::get_linear_isa($item->{cf_entns})};
+      my @super = map {
+        my $o = $vfs->{cf_entns2vfs_item}{$_}; $o ? $o : ()
+      } @super_ns;
+      foreach my $super (@super) {
+	my $ans = $super->lookup_1($vfs, $nameSpec, @_) or next;
+	return $ans;
+      }
+    } else {
+      my @super = $item->list_base;
+      foreach my $super (@super) {
+	my $ans = $super->lookup($vfs, $nameSpec, @_) or next;
+	return $ans;
+      }
     }
     undef;
   }
@@ -191,21 +341,60 @@ require File::Basename;
     my vfs_file $file = shift;
 
     # $dir/$file.yatt inherits its own base decl,
-    my @super = $file->YATT::Lite::VFS::Folder::list_base;
+    my (@local, @otherdir);
+    foreach my Folder $super ($file->YATT::Lite::VFS::Folder::list_base) {
+      if ($super->{cf_parent} and $file->{cf_parent} == $super->{cf_parent}) {
+	push @local, $super;
+      } else {
+	push @otherdir, $super;
+      }
+    }
 
-    # $dir ($dir's bases will be called in $dir->lookup),
-    push @super, $file->{cf_parent} if $file->{cf_parent};
+    push @local, grep {$_} $file->{cf_parent}, $file->{cf_overlay};
 
-    # and then directory named $dir/$file.ytmpl (or "$dir/$file")
-    push @super, $file->{cf_overlay} if $file->{cf_overlay};
-
-    @super;
+    if ($file->{cf_entns} and mro::get_mro($file->{cf_entns}) eq 'c3') {
+      print STDERR "use c3 for $file->{cf_entns}"
+	, "\n ".sorted_dump([local => map {
+	  my Folder $f = $_;
+	  mro::get_linear_isa($f->{cf_entns})
+	} @local])
+	, "\n ".sorted_dump([other => map {
+	  my Folder $f = $_;
+	  mro::get_linear_isa($f->{cf_entns})
+	} @otherdir])
+	, "\n" if DEBUG_MRO;
+      return (@local, @otherdir);
+    } else {
+      print STDERR "use dfs for $file->{cf_entns}\n" if DEBUG_MRO;
+      return (@otherdir, @local);
+    }
   }
   sub YATT::Lite::VFS::File::list_items {
-    die "NIMPL";
+    croak "NIMPL";
+  }
+  sub YATT::Lite::VFS::Dir::list_all_names {
+    (my vfs_dir $in, my VFS $vfs) = @_;
+    croak "BUG: vfs is undef!" unless defined $vfs;
+    return unless defined $in->{cf_path};
+    my (@names, %seen);
+    {
+      use 5.012;
+      my $extRe = $vfs->re_ext;
+      local $_;
+      opendir my $dh, "$in->{cf_path}/";
+      while (readdir $dh) {
+        /^(\w+)(?:\.$extRe)?\z/
+          or next;
+        next if $seen{$1}++;
+        push @names, $1;
+      }
+      closedir $dh;
+    }
+    @names;
   }
   sub YATT::Lite::VFS::Dir::list_items {
     (my vfs_dir $in, my VFS $vfs) = @_;
+    croak "BUG: vfs is undef!" unless defined $vfs;
     return unless defined $in->{cf_path};
     my %dup;
     my @exts = map {
@@ -222,19 +411,38 @@ require File::Basename;
   }
   #----------------------------------------
   sub YATT::Lite::VFS::Dir::load {
-    (my vfs_dir $in, my VFS $vfs, my $partName) = @_;
+    (my vfs_dir $in, my VFS $vfs, my $nameSpec) = @_;
     return unless defined $in->{cf_path};
-    my $vfsname = "$in->{cf_path}/$partName";
+    print STDERR "# VFS:   Dir::load(", sorted_dump($nameSpec), ") in $in\n"
+      if DEBUG_LOOKUP;
+    my ($partName, $realFile) = lexpand($nameSpec);
+
+    # When $partName contains NUL like 'do\0action',
+    # we should avoid filesystem testings.
+    if ($partName =~ /\0/) {
+      print STDERR "# VFS:   -> avoid fs lookup for \\0 in $in\n"
+        if DEBUG_LOOKUP;
+      return;
+    }
+
+    $realFile ||= $partName;
+
+    my $vfsname = "$in->{cf_path}/$realFile";
     my @opt = (name => $partName, parent => $in);
     my ($kind, $path, @other) = do {
-      if (my $fn = $vfs->find_ext($vfsname, $vfs->{cf_ext_public})) {
+      if (ref $nameSpec) {
+        my $ext = extname($vfsname);
+        (file => $vfsname
+         , ($ext eq $vfs->{cf_ext_public}
+            ? (public => 1) : ()));
+      } elsif (my $fn = $vfs->find_ext($vfsname, $vfs->{cf_ext_public})) {
 	(file => $fn, public => 1);
       } elsif ($fn = $vfs->find_ext($vfsname, $vfs->{cf_ext_private})) {
 	# dir の場合、 new_tmplpkg では？
 	my $kind = -d $fn ? 'dir' : 'file';
 	($kind => $fn);
       } elsif (-d $vfsname) {
-	return $vfs->{cf_facade}->create_neighbor($vfsname);
+	return $vfs->{cf_facade}->find_neighbor($vfsname);
       } else {
 	return undef;
       }
@@ -254,7 +462,7 @@ require File::Basename;
     (my File $file) = @_;
     undef $file->{partlist};
     undef $file->{Item};
-    undef $file->{cf_string};
+    # undef $file->{cf_string};
     undef $file->{cf_base};
     $file->{dependency} = +{};
   }
@@ -321,8 +529,9 @@ require File::Basename;
 	(data => {}, name => $name, parent => $folder);
     }
     # XXX: path を足すと、memory 動作の時に困る
-    $folder->{Item}{$lastName} = $vfs->create
-	(data => $data, name => $lastName, parent => $folder);
+    my Item $item = $vfs->create
+      (data => $data, name => $lastName, parent => $folder);
+    $folder->{Item}{$item->item_key} = $item;
   }
   #========================================
   sub root {(my VFS $vfs) = @_; $vfs->{root}}
@@ -337,21 +546,37 @@ require File::Basename;
     (my VFS $vfs, my ($kind, $primary, %rest)) = @_;
     # XXX: $vfs は className の時も有る。
     if (my $sub = $vfs->can("create_$kind")) {
-      $vfs->fixup_created(\@_, $sub->($vfs, $primary, %rest));
+      $vfs->fixup_created(\@_, $sub->($vfs, $primary, %rest, type => $kind));
     } else {
       $vfs->{cf_cache}{$primary} ||= do {
 	# XXX: Really??
 	$rest{entns} //= $vfs->{cf_entns};
 	$vfs->fixup_created
-	  (\@_, $vfs->can("vfs_$kind")->()->new(%rest, path => $primary));
+	  (\@_, $vfs->can("vfs_$kind")->()->new(%rest, path => $primary
+						, type => $kind
+					      ));
       };
     }
   }
+  sub sorted_dump {
+    require Data::Dumper;
+    join ", ", map {
+      Data::Dumper->new([$_])->Maxdepth(2)->Terse(1)->Indent(0)
+        ->Sortkeys(1)->Dump;
+    } @_;
+  }
   sub fixup_created {
     (my VFS $vfs, my $info, my Folder $folder) = @_;
-    printf STDERR "# VFS::create(%s) => %s(0x%x)\n"
-      , terse_dump(@{$info}[1..$#$info])
-      , ref $folder, ($folder+0) if DEBUG_VFS;
+    if (DEBUG_VFS) {
+      printf STDERR "# VFS::create(%s) => %s(0x%x)\n"
+        , sorted_dump(@{$info}[1..$#$info])
+        , ref $folder, ($folder+0);
+    } elsif (DEBUG_LOOKUP) {
+      print STDERR "# VFS: created: $folder (path="
+        , sorted_dump($folder->{cf_path}), ")\n";
+    } else {
+      # XXX: This is required for perl 5.18 and before.
+    }
     # create の直後、 after_create より前に、mark を打つ。そうしないと、 delegate で困る。
     if (ref $vfs) {
       $vfs->{n_creates}++;
@@ -371,12 +596,29 @@ require File::Basename;
 	# XXX: base 指定だけで済むべきだが、Factory を呼んでないので出来ないorz...
 	YATT::Lite::MFields->add_isa_to
 	    ($folder->{cf_entns}, $parent->{cf_entns});
-	$vfs->{pkg2folder}{$folder->{cf_entns}} = $folder;
       }
+    }
+    if ($folder->{cf_entns}) {
+      if (not $vfs->{cf_no_mro_c3}) {
+	mro::set_mro($folder->{cf_entns}, 'c3');
+      }
+      if (defined (my Folder $old = $vfs->{cf_entns2vfs_item}{$folder->{cf_entns}})) {
+	if ($old != $folder) {
+	  croak "EntNS confliction for $folder->{cf_entns}! old=$old->{cf_path} vs new=$folder->{cf_path}";
+	}
+      }
+      $vfs->{cf_entns2vfs_item}{$folder->{cf_entns}} = $folder;
     }
     $folder->after_create($vfs);
     $folder;
   }
+
+  # XXX: <=> find_part_from_entns
+  sub find_template_from_package {
+    (my MY $self, my $pkg) = @_;
+    $self->{cf_entns2vfs_item}{$pkg};
+  }
+
   sub create_data {
     (my VFS $vfs, my ($primary)) = splice @_, 0, 2;
     if (ref $primary) {
@@ -388,19 +630,24 @@ require File::Basename;
       $vfs->vfs_file->new(public => 1, @_, string => $primary);
     }
   }
+
+  #
+  # This converts all descriptors in Folder->base into real item objects.
+  #
   sub YATT::Lite::VFS::Folder::vivify_base_descs {
     (my Folder $folder, my VFS $vfs) = @_;
     foreach my Folder $desc (@{$folder->{cf_base}}) {
       if (ref $desc eq 'ARRAY') {
-	# XXX: Dirty workaround.
+	#
+	# This $desc structure *may* come from Factory->_list_base_spec_in
+	#
 	if ($desc->[0] eq 'dir') {
 	  # To create YATT::Lite with .htyattconfig.xhf, Factory should be involved.
-	  $desc = $vfs->{cf_facade}->create_neighbor($desc->[1]);
+	  $desc = $vfs->{cf_facade}->find_neighbor($desc->[1]);
 	} else {
 	  $desc = $vfs->create(@$desc);
 	}
       }
-      $desc = $vfs->create(@$desc) if ref $desc eq 'ARRAY';
       # parent がある == parent から指されている。なので、 weaken する必要が有る。
       weaken($desc) if $desc->{cf_parent};
     }
@@ -433,7 +680,7 @@ require File::Basename;
     $file->{cf_overlay} = do {
       my ($public, $path) = @{$found[0]};
       if ($public) {
-	$vfs->{cf_facade}->create_neighbor($path);
+	$vfs->{cf_facade}->find_neighbor($path);
       } else {
 	$vfs->create
 	  (dir => $path, parent => $file->{cf_parent});

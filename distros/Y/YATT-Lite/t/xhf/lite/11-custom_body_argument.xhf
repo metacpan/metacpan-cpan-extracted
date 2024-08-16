@@ -1,0 +1,48 @@
+# -*- coding: utf-8 -*-
+YATT_CONFIG[
+body_argument: content
+body_argument_type: html
+]
+
+
+TITLE: body_argument: content, with type html. (entity var only.)
+IN:
+ <!yatt:args title>
+ <h2>&yatt:title;</h2>
+ &yatt:content;
+PARAM[
+- foo
+- <div class="bar">baz</div>
+]
+OUT:
+ <h2>foo</h2>
+ <div class="bar">baz</div>
+
+
+TITLE: default value of body_argument
+PARAM[
+- bar
+]
+OUT:
+ <h2>bar</h2>
+ 
+
+
+TITLE: widgets can have content argument too.
+IN:
+ <!yatt:args x>
+ <yatt:foo>&yatt:x;</yatt:foo>
+ 
+ <!yatt:widget foo>
+ <div class="foo">
+   &yatt:content;
+ </div>
+PARAM[
+- bar
+]
+OUT:
+ <div class="foo">
+   bar
+ </div>
+ 
+

@@ -38,6 +38,8 @@ BEGIN {
 use Plack::Test;
 use Plack::Util;
 
+use Test::Refcount;
+
 use YATT::Lite::Breakpoint;
 use YATT::Lite::Util qw(lexpand);
 use YATT::Lite::Test::XHFTest2;
@@ -48,13 +50,17 @@ my MY $tests = MY->load_tests([dir => "$FindBin::Bin/../html"]
 			      , @ARGV ? @ARGV : $FindBin::Bin);
 $tests->enter;
 
-plan $tests->test_plan(1);
+plan $tests->test_plan(+4); # Run 4 additional test.
 
 use Cwd;
 $ENV{YATT_DOCUMENT_ROOT} = cwd;
 use YATT::Lite::Factory; sub Factory () {'YATT::Lite::Factory'}
+
+{
 ok(my $site = Factory->load_factory_script("$FindBin::Bin/../app.psgi")
    , "load_psgi");
+
+is_refcount($site, 2, "refcount after load_factory_script(includes sub2self)");
 
 test_psgi $site->to_app, sub {
   my ($cb) = shift;
@@ -94,7 +100,9 @@ test_psgi $site->to_app, sub {
 	  like $str, qr{$item->{cf_ERROR}}
 	    , "[$sect_name] $T ERROR $item->{cf_METHOD} $item->{cf_FILE}";
 	  next;
-	} elsif ($res->code >= 300 && $res->code <= 500) {
+	} elsif ($item->{cf_STATUS}
+                 ? $item->{cf_STATUS} == $res->code
+                 : $res->code >= 300 && $res->code < 500) {
 	  # fall through
 	} elsif ($res->code != 200) {
 	  Test::More::fail $item->{cf_FILE};
@@ -124,6 +132,12 @@ test_psgi $site->to_app, sub {
     }
   }
 };
+
+is_refcount($site, 1, "refcount after test_psgi");
+}
+
+is_deeply [YATT::Lite::Factory->n_created, YATT::Lite::Factory->n_destroyed]
+  , [1, 1], "Site apps are destroyed correctly.";
 
 sub base_url {
   shift; "http://localhost/";

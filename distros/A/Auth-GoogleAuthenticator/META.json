@@ -1,16 +1,16 @@
 {
    "abstract" : "Authenticate through Google Authenticator",
    "author" : [
-      "L<mailto:corion@corion.net>"
+      "Max Maischein <corion@cpan.org>"
    ],
-   "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 6.66, CPAN::Meta::Converter version 2.120921",
+   "dynamic_config" : 0,
+   "generated_by" : "ExtUtils::MakeMaker version 7.64, CPAN::Meta::Converter version 2.150010",
    "license" : [
-      "perl_5"
+      "artistic_2"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Auth-GoogleAuthenticator",
    "no_index" : {
@@ -36,14 +36,35 @@
             "Convert::Base32" : "0",
             "Dancer" : "1.3097",
             "Dancer::Plugin::FlashMessage" : "0",
+            "Dancer::Test" : "1.3097",
             "Math::Random::MT" : "0",
             "Template" : "2",
-            "Test::More" : "0",
             "URI::Escape" : "0",
-            "YAML" : "0"
+            "YAML" : "0",
+            "perl" : "5.010"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0"
          }
       }
    },
    "release_status" : "stable",
-   "version" : "0.03"
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/Corion/Auth-GoogleAuthenticator/issues"
+      },
+      "license" : [
+         "https://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/Corion/Auth-GoogleAuthenticator.git",
+         "web" : "https://github.com/Corion/Auth-GoogleAuthenticator"
+      }
+   },
+   "version" : "0.04",
+   "x_serialization_backend" : "JSON::PP version 4.07",
+   "x_static_install" : 1
 }

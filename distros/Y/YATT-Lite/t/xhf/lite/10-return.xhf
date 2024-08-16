@@ -1,0 +1,117 @@
+# -*- coding: utf-8 -*-
+
+TITLE: return if=x
+IN:
+ <!yatt:args x y>
+ <yatt:return if="&yatt:x;">
+   x=&yatt:x;
+ </yatt:return>
+ 
+ <yatt:return if="&yatt:y;">
+   y=&yatt:y;
+ </yatt:return>
+ 
+ none of the above.
+PARAM[
+- X
+]
+OUT:
+   x=X
+
+
+TITLE: return if=y
+PARAM[
+-
+- Y
+]
+OUT:
+   y=Y
+
+
+TITLE: return none of the above.
+OUT:
+ 
+ 
+ 
+ none of the above.
+
+
+TITLE: return unless=x
+IN:
+ <!yatt:args x y>
+ <yatt:return unless="&yatt:x;">
+   x=&yatt:x;
+ </yatt:return>
+ 
+ <yatt:return unless="&yatt:y;">
+   y=&yatt:y;
+ </yatt:return>
+ 
+ none of the above.
+PARAM[
+- X
+- Y
+]
+OUT:
+ 
+ 
+ 
+ none of the above.
+
+
+
+TITLE: return unless=y
+PARAM[
+- X
+]
+OUT:
+   y=
+
+TITLE: return unless=x
+OUT:
+   x=
+
+
+
+
+TITLE: unconditional return in the middle
+IN:
+ FOO
+ <yatt:return>
+ BAR
+ </yatt:return>
+ BAZ
+OUT:
+ BAR
+
+
+TITLE: non-local return from widget (with output rewinding)
+IN:
+ FOO
+ <yatt:bar/>
+ BAZ
+ <!yatt:widget bar>
+ <yatt:return>
+ BAR
+ </yatt:return>
+ hogee
+OUT:
+ BAR
+
+
+TITLE: local return from widget(which does not rewind)
+IN:
+ FOO
+ <yatt:bar/>
+ BAZ
+ <!yatt:widget bar>
+ hoehoe
+ <yatt:return local>
+ BAR
+ </yatt:return>
+ hogee
+OUT:
+ FOO
+ hoehoe
+ BAR
+ BAZ

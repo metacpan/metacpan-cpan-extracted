@@ -1,11 +1,9 @@
 #!/usr/bin/env perl
 #
-# $Id: onyphe,v 689580a0e0f8 2023/07/17 09:34:26 gomor $
+# $Id: onyphe,v b6fb1a68219a 2024/08/15 11:22:51 gomor $
 #
 use strict;
 use warnings;
-
-our $VERSION = '4.00';
 
 use Getopt::Long;
 use Onyphe::Api;
@@ -41,9 +39,15 @@ GetOptions(
    "key=s" => \$lopts{key},               # -key XXX
    #"poll" => \$lopts{poll},               # -poll
    "maxscantime=i" => \$lopts{'maxscantime'}, # -maxscantime 120
+   "aslines=i" => \$lopts{'aslines'}, # -aslines 1
+   "full=i" => \$lopts{'full'}, # -full 1
    "urlscan=i" => \$lopts{'urlscan'}, # -urlscan 1
    "vulnscan=i" => \$lopts{'vulnscan'}, # -vulnscan 1
+   "riskscan=i" => \$lopts{'riskscan'}, # -riskscan 1
+   "asm=i" => \$lopts{'asm'}, # -asm 1
    "import=i" => \$lopts{'import'}, # -import 1
+   "count" => \$lopts{'count'}, # -count
+   "trusted=i" => \$lopts{'trusted'}, # -trusted 0
    # APIs:
    "user" => \$lopts{user},                     # -user
    "summary=s" => \$lopts{summary},             # -summary ip|domain|hostname
@@ -56,6 +60,7 @@ GetOptions(
    "search" => \$lopts{search},               # -search
    "postsearch" => \$lopts{postsearch},       # -postsearch
    "export" => \$lopts{export},               # -export
+   "postexport" => \$lopts{postexport},       # -postexport
    "alert-list" => \$lopts{'alert-list'},              # -alert-list
    "alert-add" => \$lopts{'alert-add'},                # -alert-add
    "alert-del=s" => \$lopts{'alert-del'},              # -alert-del 0
@@ -66,9 +71,15 @@ GetOptions(
    "ondemand-scope-ip-bulk=s" => \$lopts{'ondemand-scope-ip-bulk'}, # -ondemand-scope-ip-bulk INPUT.txt
    "ondemand-scope-domain=s" => \$lopts{'ondemand-scope-domain'}, # -ondemand-scope-domain DOMAIN
    "ondemand-scope-domain-bulk=s" => \$lopts{'ondemand-scope-domain-bulk'}, # -ondemand-scope-domain-bulk INPUT.txt
+   "ondemand-scope-hostname=s" => \$lopts{'ondemand-scope-hostname'}, # -ondemand-scope-hostname HOSTNAME
+   "ondemand-scope-hostname-bulk=s" => \$lopts{'ondemand-scope-hostname-bulk'}, # -ondemand-scope-hostname-bulk INPUT.txt
+   "ondemand-scope-port=s" => \$lopts{'ondemand-scope-port'}, # -ondemand-scope-port PORT
    "ondemand-scope-result=s" => \$lopts{'ondemand-scope-result'}, # -ondemand-scope-result ID
    "ondemand-resolver-domain=s" => \$lopts{'ondemand-resolver-domain'}, # -ondemand-resolver-domain DOMAIN
    "ondemand-resolver-result=s" => \$lopts{'ondemand-resolver-result'}, # -ondemand-resolver-result ID
+   "asd-tld=s" => \$lopts{'asd-tld'},  # -asd-tld DOMAIN1,DOMAIN2 | input.txt
+   "asd-ns=s" => \$lopts{'asd-ns'},  # -asd-ns DOMAIN1,DOMAIN2 | input.txt
+   "asd-task=s" => \$lopts{'asd-task'},  # -asd-task TASKID
 ) or exit(0);
 
 if ($lopts{help}) {
@@ -205,6 +216,11 @@ elsif ($lopts{discovery}) {
 elsif ($lopts{search}) {
    my $params;
    $params->{size} = $lopts{size} if defined($lopts{size});
+   if ($lopts{count}) {
+      $params->{size} = 1;
+      $lopts{maxpage} = 1;
+      $params->{count} = 1;
+   }
    $oa->search($oql, 1, $lopts{maxpage}, $params, $opp_perl_cb, $opl);  # But is also in config()
 }
 elsif ($lopts{postsearch}) {
@@ -215,6 +231,11 @@ elsif ($lopts{postsearch}) {
 elsif ($lopts{export}) {
    my $params;
    $oa->export($oql, $params, $opp_json_cb, $opl);
+}
+elsif ($lopts{postexport}) {
+   my $params;
+   $params->{size} = $lopts{size} if defined($lopts{size});
+   $oa->post_export($oql, $params, $opp_json_cb, $opl);  # But is also in config()
 }
 elsif ($lopts{'alert-list'}) {
    $oa->alert_list($opp_perl_cb, $opl);
@@ -241,6 +262,8 @@ elsif (defined($lopts{'ondemand-scope-ip'})) {
    $param->{maxscantime} = $lopts{maxscantime} if defined $lopts{maxscantime};
    $param->{urlscan} = $lopts{urlscan} if defined $lopts{urlscan};
    $param->{vulnscan} = $lopts{vulnscan} if defined $lopts{vulnscan};
+   $param->{riskscan} = $lopts{riskscan} if defined $lopts{riskscan};
+   $param->{asm} = $lopts{asm} if defined $lopts{asm};
    $param->{import} = $lopts{import} if defined $lopts{import};
    #my $scan_id;
    #if ($lopts{poll}) {
@@ -266,8 +289,17 @@ elsif (defined($lopts{'ondemand-scope-ip-bulk'})) {
    $param->{maxscantime} = $lopts{maxscantime} if defined $lopts{maxscantime};
    $param->{urlscan} = $lopts{urlscan} if defined $lopts{urlscan};
    $param->{vulnscan} = $lopts{vulnscan} if defined $lopts{vulnscan};
+   $param->{riskscan} = $lopts{riskscan} if defined $lopts{riskscan};
+   $param->{asm} = $lopts{asm} if defined $lopts{asm};
    $param->{import} = $lopts{import} if defined $lopts{import};
    $oa->ondemand_scope_ip_bulk($v, $param, $opp_perl_cb, $opl);
+}
+elsif (defined($lopts{'ondemand-scope-port'})) {
+   my $v = $lopts{'ondemand-scope-port'};
+   my $param;
+   $param->{maxscantime} = 24*60*60;  # 24-hours forced
+   $param->{import} = $lopts{import} if defined $lopts{import};
+   $oa->ondemand_scope_port($v, $param, $opp_perl_cb, $opl);
 }
 elsif (defined($lopts{'ondemand-scope-domain'})) {
    my $v = $lopts{'ondemand-scope-domain'};
@@ -275,6 +307,8 @@ elsif (defined($lopts{'ondemand-scope-domain'})) {
    $param->{maxscantime} = $lopts{maxscantime} if defined $lopts{maxscantime};
    $param->{urlscan} = $lopts{urlscan} if defined $lopts{urlscan};
    $param->{vulnscan} = $lopts{vulnscan} if defined $lopts{vulnscan};
+   $param->{riskscan} = $lopts{riskscan} if defined $lopts{riskscan};
+   $param->{asm} = $lopts{asm} if defined $lopts{asm};
    $param->{import} = $lopts{import} if defined $lopts{import};
    $oa->ondemand_scope_domain($v, $param, $opp_perl_cb, $opl);
 }
@@ -284,12 +318,44 @@ elsif (defined($lopts{'ondemand-scope-domain-bulk'})) {
    $param->{maxscantime} = $lopts{maxscantime} if defined $lopts{maxscantime};
    $param->{urlscan} = $lopts{urlscan} if defined $lopts{urlscan};
    $param->{vulnscan} = $lopts{vulnscan} if defined $lopts{vulnscan};
+   $param->{riskscan} = $lopts{riskscan} if defined $lopts{riskscan};
+   $param->{asm} = $lopts{asm} if defined $lopts{asm};
    $param->{import} = $lopts{import} if defined $lopts{import};
    $oa->ondemand_scope_domain_bulk($v, $param, $opp_perl_cb, $opl);
 }
+elsif (defined($lopts{'ondemand-scope-hostname'})) {
+   my $v = $lopts{'ondemand-scope-hostname'};
+   my $param;
+   $param->{maxscantime} = $lopts{maxscantime} if defined $lopts{maxscantime};
+   $param->{urlscan} = $lopts{urlscan} if defined $lopts{urlscan};
+   $param->{vulnscan} = $lopts{vulnscan} if defined $lopts{vulnscan};
+   $param->{riskscan} = $lopts{riskscan} if defined $lopts{riskscan};
+   $param->{asm} = $lopts{asm} if defined $lopts{asm};
+   $param->{import} = $lopts{import} if defined $lopts{import};
+   $oa->ondemand_scope_hostname($v, $param, $opp_perl_cb, $opl);
+}
+elsif (defined($lopts{'ondemand-scope-hostname-bulk'})) {
+   my $v = $lopts{'ondemand-scope-hostname-bulk'};
+   my $param;
+   $param->{maxscantime} = $lopts{maxscantime} if defined $lopts{maxscantime};
+   $param->{urlscan} = $lopts{urlscan} if defined $lopts{urlscan};
+   $param->{vulnscan} = $lopts{vulnscan} if defined $lopts{vulnscan};
+   $param->{riskscan} = $lopts{riskscan} if defined $lopts{riskscan};
+   $param->{asm} = $lopts{asm} if defined $lopts{asm};
+   $param->{import} = $lopts{import} if defined $lopts{import};
+   $oa->ondemand_scope_hostname_bulk($v, $param, $opp_perl_cb, $opl);
+}
 elsif (defined($lopts{'ondemand-scope-result'})) {
    my $v = $lopts{'ondemand-scope-result'};
-   $oa->ondemand_scope_result($v, undef, $opp_perl_cb, $opl);
+   my $param;
+   $param->{aslines} = $lopts{aslines} if defined $lopts{aslines};
+   $param->{full} = $lopts{full} if defined $lopts{full};
+   if ($param->{aslines}) {
+      $oa->ondemand_scope_result($v, $param, $opp_json_cb, $opl);
+   }
+   else {
+      $oa->ondemand_scope_result($v, $param, $opp_perl_cb, $opl);
+   }
 }
 elsif (defined($lopts{'ondemand-resolver-domain'})) {
    my $v = $lopts{'ondemand-resolver-domain'};
@@ -299,7 +365,65 @@ elsif (defined($lopts{'ondemand-resolver-domain'})) {
 }
 elsif (defined($lopts{'ondemand-resolver-result'})) {
    my $v = $lopts{'ondemand-resolver-result'};
-   $oa->ondemand_resolver_result($v, undef, $opp_perl_cb, $opl);
+   my $param;
+   $param->{aslines} = $lopts{aslines} if defined $lopts{aslines};
+   $param->{full} = $lopts{full} if defined $lopts{full};
+   if ($param->{aslines}) {
+      $oa->ondemand_resolver_result($v, $param, $opp_json_cb, $opl);
+   }
+   else {
+      $oa->ondemand_resolver_result($v, $param, $opp_perl_cb, $opl);
+   }
+}
+elsif (defined($lopts{'asd-tld'})) {
+   my $v = $lopts{'asd-tld'};
+   my $param;
+   $param->{aslines} = $lopts{aslines} if defined $lopts{aslines};
+   $param->{trusted} = $lopts{trusted} if defined $lopts{trusted};
+   if (-f $v) {  # If its a file, we create the list of values to push
+      my $list = $oa->asd_load_input($v);
+      unless (defined($list) && @$list) {
+         print STDERR "VERBOSE: asd_load_input: failed from bad content or empty content\n";
+         exit(1);
+      }
+      $v = $list;
+   }
+   if ($param->{aslines}) {
+      $oa->asd_tld($v, $param, $opp_json_cb, $opl);
+   }
+   else {
+      $oa->asd_tld($v, $param, $opp_perl_cb, $opl);
+   }
+}
+elsif (defined($lopts{'asd-ns'})) {
+   my $v = $lopts{'asd-ns'};
+   my $param;
+   $param->{aslines} = $lopts{aslines} if defined $lopts{aslines};
+   if (-f $v) {  # If its a file, we create the list of values to push
+      my $list = $oa->asd_load_input($v);
+      unless (defined($list) && @$list) {
+         print STDERR "VERBOSE: asd_load_input: failed from bad content or empty content\n";
+         exit(1);
+      }
+      $v = $list;
+   }
+   if ($param->{aslines}) {
+      $oa->asd_ns($v, $param, $opp_json_cb, $opl);
+   }
+   else {
+      $oa->asd_ns($v, $param, $opp_perl_cb, $opl);
+   }
+}
+elsif (defined($lopts{'asd-task'})) {
+   my $v = $lopts{'asd-task'};
+   my $param;
+   $param->{aslines} = $lopts{aslines} if defined $lopts{aslines};
+   if ($param->{aslines}) {
+      $oa->asd_task($v, $param, $opp_json_cb, $opl);
+   }
+   else {
+      $oa->asd_task($v, $param, $opp_perl_cb, $opl);
+   }
 }
 else {
    usage();
@@ -316,7 +440,9 @@ sub usage {
 
 Usage: onyphe [options] -user
        onyphe [options] -search 'OQL'
+       onyphe [options] -postsearch 'OQL'
        onyphe [options] -export 'OQL'
+       onyphe [options] -postexport 'OQL'
        onyphe [options] -discovery datascan 'input.txt'
        onyphe [options] -simple datascan 'IP'
        onyphe [options] -simple-best whois 'IP'
@@ -340,17 +466,23 @@ API options:
    -trackquery <0|1>                       add trackquery field into results (default: 0)
    -calculated <0|1>                       add calculated fields into results (default: 0)
    -keepalive <0|1>                        use a keepalive message (default: 0)
-   -keepalive <0|1>                        use a keepalive message (default: 0)
    -maxscantime <1|120|...|0>              maximum duration for a scan in seconds (default: 120)
+   -aslines <0|1>                          output scan results as lines of JSON
+   -full <0|1>                             output full scan results instead of a selected list of fields
    -urlscan <0|1>                          turn off/on URL scanning step in scan mode
    -vulnscan <0|1>                         turn off/on vulnerability scanning step in scan mode
+   -riskscan <0|1>                         turn off/on riskscan detection step in scan mode
+   -asm <0|1>                              turn off/on ASM step in scan mode
    -import <0|1>                           turn off/on import of results into ONYPHE
+   -trusted <0|1>                          turn off/on trusted results from ONYPHE ASD APIs
 
 APIs:
 
    -user '| OPP'                                get information on your license
    -search 'OQL | OPP'                          use Search API for query
+   -postsearch 'OQL | OPP'                      use Search API for query, POST version
    -export 'OQL | OPP'                          use Export API for query
+   -postexport 'OQL | OPP'                      use Export API for query, POST version
    -discovery CATEGORY 'input.txt | OPP'        use Discovery API on CATEGORY for query
    -simple CATEGORY 'OQL | OPP'                 use Simple API on CATEGORY for query
    -simple-best CATEGORY 'OQL | OPP'            use Simple Best API on CATEGORY for query
@@ -367,9 +499,15 @@ APIs:
    -ondemand-scope-ip-bulk 'input.txt'                   use Ondemand Scope Ip Bulk API to launch a scan against a given list of IPs from an input file
    -ondemand-scope-domain 'DOMAIN'                       use Ondemand Scope Domain API to launch a scan against given domain
    -ondemand-scope-domain-bulk 'input.txt'               use Ondemand Scope Domain Bulk API to launch a scan against a given list of domain from an input file
+   -ondemand-scope-hostname 'HOSTNAME'                   use Ondemand Scope Hostname API to launch a scan against given hostname
+   -ondemand-scope-hostname-bulk 'input.txt'             use Ondemand Scope Hostname Bulk API to launch a scan against a given list of hostname from an input file
+   -ondemand-scope-port PORT                             use Ondemand Scope Port API to launch a scan against a given port on full IPv4 address space
    -ondemand-scope-result \$scan_id                       use Ondemand Scope Result API with Scan ID
    -ondemand-resolver-domain 'DOMAIN'                    use Ondemand Resolver Domain API to launch a DNS enumeration and resolution against given domain
    -ondemand-resolver-result \$scan_id                    use Ondemand Resolver Result API with Scan ID
+   -asd-tld DOMAIN1,DOMAIN2,...|input.txt                use ASD Tld API to find related domains by TLDs
+   -asd-ns DOMAIN1,DOMAIN2,...|input.txt                use ASD Ns API to find related domains by using nameservers
+   -asd-task TASKID                                     use ASD Task API to retrieve an ASD Task results
 
 EOF
 ;
@@ -387,7 +525,7 @@ ONYPHE - ONYPHE Command Line Interface
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (c) 2023, ONYPHE
+Copyright (c) 2024, ONYPHE SAS
 
 You may distribute this module under the terms of The BSD 3-Clause License.
 See LICENSE file in the source distribution archive.

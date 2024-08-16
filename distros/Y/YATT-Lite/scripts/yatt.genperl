@@ -9,15 +9,22 @@ use YATT::Lite::Entities qw/*SYS/;
 use YATT::Lite::Factory;
 use YATT::Lite::Breakpoint;
 use YATT::Lite::Util qw(rootname);
+use YATT::Lite::Util::CmdLine;
+
 use YATT::Lite::CGen::Perl; # Just for debugging aid.
 # XXX: 各ディレクトリに .htyattcf.xhf が有ったら？ rc が有ったら?
 # XXX: それらが無い状態で、 Web::* 環境での動作検証をしたいときは？
+
+use YATT::Lite::Types
+  ([Opts => -fields => [qw/cf_all/]]);
+
+my Opts $opts = Opts->new(MY->parse_opts(\@ARGV));
 
 local $SYS = my $dispatcher = YATT::Lite::Factory->load_factory_offline
   || do {
   require YATT::Lite::WebMVC0::SiteApp;
   YATT::Lite::WebMVC0::SiteApp->new
-      (app_ns => 'MyApp'
+      (app_ns => 'MyYATT'
        , namespace => ['yatt', 'perl', 'js']
        , header_charset => 'utf-8'
        , debug_cgen => $ENV{DEBUG}
@@ -41,7 +48,9 @@ foreach my $fn (@ARGV) {
   # XXX: encoding
   my $pkg = $trans->find_product(perl => $tmpl, sink => sub {
 					my ($info, @script) = @_;
-					return unless $info->{'depth'} == 1;
+					if (not $opts->{cf_all}) {
+					  return unless $info->{'depth'} == 1;
+				        }
 					print @script;
 				      });
 }

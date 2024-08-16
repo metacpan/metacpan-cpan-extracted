@@ -1,5 +1,9 @@
 Revision history for Perl extension MOP4Import::Declare
 
+0.060 2024-08-16
+    * GH-86 - MOP4Import::Types [extends => 'Type']
+    * MOP4Import::Util::maybe_fields_hash and maybe_globref
+
 0.053 2020-12-02
     * GH-84 - Adapt FETCH_CODE_ATTRIBUTES
 

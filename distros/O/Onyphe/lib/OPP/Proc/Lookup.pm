@@ -1,5 +1,5 @@
 #
-# $Id: Lookup.pm,v 69a3d7308875 2023/04/05 15:11:02 gomor $
+# $Id: Lookup.pm,v 5e734a29f87b 2024/02/16 09:27:57 gomor $
 #
 package OPP::Proc::Lookup;
 use strict;
@@ -13,15 +13,15 @@ our $VERSION = '1.00';
 use File::Slurp qw(read_file);
 use Text::CSV_XS;
 use Net::IPv4Addr qw(ipv4_in_network);
-
-# Load CSV data here, one time
-my $csv;
-my $match_fields;  # Prepare for supporting matching with AND filters
-my $lookup_field;  # Support only last column as a match
+use Data::Dumper;
 
 sub _load {
    my $self = shift;
    my ($file) = @_;
+
+   my $csv = $self->state->value('csv', $self->idx);
+   my $match_fields = $self->state->value('match_fields', $self->idx);
+   my $lookup_field = $self->state->value('lookup_field', $self->idx);
 
    # Load CSV lookup:
    unless (defined($csv)) {
@@ -41,17 +41,24 @@ sub _load {
       #print STDERR Data::Dumper::Dumper($header)."\n";
       my $lookup = pop @$header;  # Last field is the data to add
       $lookup_field = $lookup;
+      # Prepare for supporting matching with AND filters:
       $match_fields = [ sort { $a cmp $b } @$header ];
       $header = join('+', sort { $a cmp $b } @$header);
 
       while (my $line = $csvxs->getline($fd)) {
          my $last = pop @$line;  # Last field is the data to add
          my $key = join('+', sort { $a cmp $b } @$line);
-         $csv->{$header}{$key} = { $lookup_field => $last };
+         $csv->{$header}{lc($key)} = { $lookup_field => $last };
       }
 
-      #print STDERR Data::Dumper::Dumper($csv)."\n";
+      $self->state->add('csv', $csv, $self->idx);
+      $self->state->add('match_fields', $match_fields, $self->idx);
+      $self->state->add('lookup_field', $lookup_field, $self->idx);
+      #print STDERR "match_fields[".Data::Dumper::Dumper($match_fields)."]\n";
+      #print STDERR "lookup_field[$lookup_field]\n";
    }
+
+   #print STDERR Data::Dumper::Dumper($csv)."\n";
 
    return [ $csv, $match_fields, $lookup_field ];
 }
@@ -78,7 +85,10 @@ sub process {
 
    my $cidr = $options->{cidr} || 'ip';  # Use ip field by default for cidr matches
 
-   $self->_load($file);
+   my $r = $self->_load($file);
+   my $csv = $r->[0];
+   my $match_fields = $r->[1];
+   my $lookup_field = $r->[2];
 
    # Touch nothing when matching fields are not found in input:
    for my $field (@$match_fields) {
@@ -91,13 +101,14 @@ sub process {
 
    # All fields to match against were found in input, we can search a match:
    for my $field (@$match_fields) {
+      #print STDERR "field1[$field]\n";
       my $values = $self->value($input, $field) or next;
       if ($field eq $cidr) {  # CIDR match mode
          for my $v (@$values) {
             for my $this (keys %{$csv->{$cidr}}) {
                if (ipv4_in_network($this, $v)) {
                   for my $k (keys %{$csv->{$field}{$this}}) {
-                     $self->set($input, $k, $csv->{$field}{$this}{$k});
+                     $self->set($input, $k, $csv->{$field}{$this}{$k}, 1);  # As ARRAY
                   }
                }
             }
@@ -105,9 +116,12 @@ sub process {
       }
       else {  # Exact match mode
          for my $v (@$values) {
-            if (defined($csv->{$field}) && defined($csv->{$field}{$v})) {
-               for my $k (keys %{$csv->{$field}{$v}}) {
-                  $self->set($input, $k, $csv->{$field}{$v}{$k});
+            #print STDERR "field2[$field] v[$v]\n";
+            if (defined($csv->{$field}) && defined($csv->{$field}{lc($v)})) {
+               #print STDERR "match\n";
+               for my $k (keys %{$csv->{$field}{lc($v)}}) {
+                  #print STDERR "field[$field] v[$v] k[$k]\n";
+                  $self->set($input, $k, $csv->{$field}{lc($v)}{$k}, 1); # As ARRAY
                }
             }
          }
@@ -133,7 +147,7 @@ OPP::Proc::Lookup - lookup processor
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (c) 2023, Patrice E<lt>GomoRE<gt> Auffret
+Copyright (c) 2024, Patrice E<lt>GomoRE<gt> Auffret
 
 You may distribute this module under the terms of The BSD 3-Clause License.
 See LICENSE file in the source distribution archive.

@@ -26,7 +26,7 @@ require_ok(VFS);
   sub error {
     shift; die @_;
   }
-  sub create_neighbor {
+  sub find_neighbor {
     (my MY $self, my $dir) = @_;
     YATT::Lite::VFS->new([dir => $dir], facade => $self, @{$self->{cf_opts}})
 	->root;

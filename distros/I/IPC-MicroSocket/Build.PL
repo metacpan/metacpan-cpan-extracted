@@ -10,6 +10,7 @@ my $build = Module::Build->new(
       'perl' => '5.036',
       'Future::AsyncAwait' => 0,
       'Object::Pad' => '0.809',
+      'Sublike::Extended' => '0.23',
       'Syntax::Keyword::Match' => 0,
 
       'Future::Buffer' => '0.03',
@@ -17,7 +18,7 @@ my $build = Module::Build->new(
       'Future::Selector' => '0.02',
    },
    test_requires => {
-      'Test::Future::IO' => '0.05',
+      'Test::Future::IO' => '0.06',
       'Test2::V0' => 0,
    },
    configure_requires => {

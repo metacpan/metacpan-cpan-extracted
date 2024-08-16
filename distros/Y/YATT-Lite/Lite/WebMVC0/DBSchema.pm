@@ -14,7 +14,6 @@ use fields (qw/table_list table_dict dbtype cf_DBH
 	       cf_connection_spec
 	       cf_connect_atstart
 	       cf_verbose
-	       cf_dbtype
 	       cf_NULL
 	       cf_name
 	       cf_no_header
@@ -215,6 +214,11 @@ sub parse_connect_when {
   }
 }
 
+sub configure_dbtype {
+  (my MY $schema, my $value) = @_;
+  $schema->{dbtype} = $value;
+}
+
 #
 # This must fill cf_DBH.
 #
@@ -250,12 +254,18 @@ sub connect_to {
   }
 }
 
-sub connect_to_dbi {
-  (my MY $schema, my ($dbi, @args)) = @_;
+sub dbtype_of_dbi_dsn {
+  (my MY $schema, my $dbi) = @_;
   my ($driver) = $dbi =~ m{^dbi:([^:]+):}i
     or croak "Unknown driver spec in DBI DSN! $dbi";
+  $driver;
+}
+
+sub connect_to_dbi {
+  (my MY $schema, my ($dbi, @args)) = @_;
+  my $driver = $schema->dbtype_of_dbi_dsn($dbi);
+  $schema->{dbtype} = lc($driver);
   if (my $sub = $schema->can("connect_to_\L$driver")) {
-    $schema->{dbtype} = lc($driver);
     $sub->($schema, $dbi, @args);
   } else {
     $schema->dbi_connect($dbi, @args);
@@ -313,6 +323,20 @@ sub create {
   #
   $schema->ensure_created_on($dbh) unless $schema->{cf_auto_create};
   $schema;
+}
+
+sub sql_schema {
+  (my MY $schema) = @_;
+  my @sql;
+  foreach my Table $table ($schema->list_tables(raw => 1)) {
+    foreach my $create ($schema->sql_create_table($table)) {
+      push @sql, $create;
+    }
+  }
+  foreach my Table $view ($schema->list_views(raw => 1)) {
+    push @sql, "CREATE VIEW $view->{cf_name}\nAS $view->{cf_view}";
+  }
+  @sql;
 }
 
 sub ensure_created_on {
@@ -382,7 +406,10 @@ sub ensure_table_populated {
 sub sqlite_begin_create {
   (my MY $schema) = @_;
   # To speedup create statements.
-  $schema->dbh->do("PRAGMA synchronous = OFF");
+  my $dbh = $schema->dbh;
+  if ($dbh->{AutoCommit}) {
+    $dbh->do("PRAGMA synchronous = OFF");
+  }
 }
 
 sub expand_codevalue {
@@ -700,7 +727,7 @@ sub default_dbtype {'sqlite'}
 sub sql_create_table {
   (my MY $schema, my Table $tab, my $opts) = @_;
   my (@cols, @indices);
-  my $dbtype = $opts->{dbtype} || $schema->default_dbtype;
+  my $dbtype = $opts->{dbtype} || $schema->{dbtype} || $schema->default_dbtype;
   my $sub = $schema->can($dbtype.'_sql_create_column')
     || $schema->can('sql_create_column');
 
@@ -769,7 +796,7 @@ sub sql_create_column {
        , $schema->map_coltype($col->{cf_type})
        , ($col->{cf_primary_key} ? "primary key" : ())
        , ($col->{cf_unique} ? "unique" : ())
-       , ($col->{cf_autoincrement} ? "autoincrement" : ()));
+       , ($col->{cf_autoincrement} ? "auto_increment" : ()));
 }
 
 sub sqlite_sql_create_column {

@@ -16,6 +16,7 @@ Makefile$
 ^cover_db
 ^.*\.log
 ^.*\.swp$
+^Todo.pm$
 ^jar/
 ^cpan/
 ^MYMETA

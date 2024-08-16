@@ -4,7 +4,6 @@ author:
   - 'Paul Evans <leonerd@leonerd.org.uk>'
 build_requires:
   ExtUtils::CBuilder: '0'
-  File::Slurper: '0'
   Test2::V0: '0'
 configure_requires:
   Module::Build: '0.4004'
@@ -19,36 +18,38 @@ name: Text-Treesitter
 provides:
   Text::Treesitter:
     file: lib/Text/Treesitter.pm
-    version: '0.12'
+    version: '0.13'
   Text::Treesitter::Language:
     file: lib/Text/Treesitter/Language.pm
-    version: '0.12'
+    version: '0.13'
   Text::Treesitter::Node:
     file: lib/Text/Treesitter/Node.pm
-    version: '0.12'
+    version: '0.13'
   Text::Treesitter::Parser:
     file: lib/Text/Treesitter/Parser.pm
-    version: '0.12'
+    version: '0.13'
   Text::Treesitter::Query:
     file: lib/Text/Treesitter/Query.pm
-    version: '0.12'
+    version: '0.13'
   Text::Treesitter::QueryCursor:
     file: lib/Text/Treesitter/QueryCursor.pm
-    version: '0.12'
+    version: '0.13'
   Text::Treesitter::QueryMatch:
     file: lib/Text/Treesitter/QueryMatch.pm
-    version: '0.12'
+    version: '0.13'
   Text::Treesitter::Tree:
     file: lib/Text/Treesitter/Tree.pm
-    version: '0.12'
+    version: '0.13'
 requires:
   ExtUtils::CppGuess: '0'
+  File::Slurper: '0'
   JSON::MaybeUTF8: '0'
   List::Util: '1.29'
-  Object::Pad: '0.800'
+  Object::Pad: '0.805'
+  Sublike::Extended: '0'
   Syntax::Keyword::Match: '0'
   perl: '5.026'
 resources:
   license: http://dev.perl.org/licenses/
-version: '0.12'
+version: '0.13'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

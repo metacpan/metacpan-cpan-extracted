@@ -1,5 +1,5 @@
 use Test;
-BEGIN { plan(tests => 24) }
+BEGIN { plan(tests => 26) }
 
 ok(sub { eval("use OPP::Proc::Uniq"); $@ ? 0 : 1 }, 1, $@);
 ok(sub { eval("use OPP::Proc::Dedup"); $@ ? 0 : 1 }, 1, $@);
@@ -25,3 +25,5 @@ ok(sub { eval("use OPP::Proc::Regex"); $@ ? 0 : 1 }, 1, $@);
 ok(sub { eval("use OPP::Proc::Lookup"); $@ ? 0 : 1 }, 1, $@);
 ok(sub { eval("use OPP::Proc::Blocklist"); $@ ? 0 : 1 }, 1, $@);
 ok(sub { eval("use OPP::Proc::Allowlist"); $@ ? 0 : 1 }, 1, $@);
+ok(sub { eval("use OPP::Proc::Addfield"); $@ ? 0 : 1 }, 1, $@);
+ok(sub { eval("use OPP::Proc::Exists"); $@ ? 0 : 1 }, 1, $@);

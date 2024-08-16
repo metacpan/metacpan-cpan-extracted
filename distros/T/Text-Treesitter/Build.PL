@@ -10,10 +10,12 @@ my $build = Module::Build::Using::PkgConfig->new(
    module_name => 'Text::Treesitter',
    requires => {
       'perl' => '5.026',
-      'Object::Pad' => '0.800',
+      'Object::Pad' => '0.805',
+      'Sublike::Extended' => 0,
       'Syntax::Keyword::Match' => 0,
 
       'ExtUtils::CppGuess' => 0,
+      'File::Slurper' => 0,
       'JSON::MaybeUTF8' => 0,
       'List::Util' => '1.29',
    },
@@ -22,7 +24,6 @@ my $build = Module::Build::Using::PkgConfig->new(
       'Module::Build::Using::PkgConfig' => 0,
    },
    test_requires => {
-      'File::Slurper' => 0,
       'Test2::V0' => 0,
    },
    license => 'perl',

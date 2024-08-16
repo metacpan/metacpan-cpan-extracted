@@ -37,7 +37,7 @@ use vars qw( $tidy );
   xpath_ok no_xpath xpath_count
   );
 
-$VERSION = '0.12';
+$VERSION = '0.13';
 
 my $Test = Test::Builder->new;
 

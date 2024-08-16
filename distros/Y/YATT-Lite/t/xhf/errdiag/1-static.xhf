@@ -165,3 +165,12 @@ SKIP: Changed
 IN:
  &yatt:array[func(x,:y)];
 ERROR: ^Can't parse entity_path group .*?, at file \S+ line 1\n$
+
+TITLE: line number after pi
+IN:
+ <yatt:foo "bar">
+ <?perl
+    print "something";
+ ?>
+ </yatt:bar>
+ERROR: TAG Mismatch! <yatt:foo> closed by </yatt:bar> line 5,

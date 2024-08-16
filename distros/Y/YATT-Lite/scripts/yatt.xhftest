@@ -76,21 +76,17 @@ sub mode_http_localhost {
     foreach my TestItem $item (@{$sect->{items}}) {
       my $url = join '', 'http://localhost', $base_url, $item->{cf_FILE};
       $item->{cf_METHOD} //= 'GET';
-      given ($item->{cf_METHOD}) {
-	when ('GET') {
-	  my $res = $mech->get($url);
-	  eq_or_diff trimlast(nocr($mech->content)), $item->{cf_BODY}
-	    , "[$sect_name] $_ $item->{cf_FILE}";
-	}
-	when ('POST') {
-	  my $res = $mech->post($url, $item->{cf_PARAM});
-	  my $pat = join("|", @{$item->{cf_HEADER}});
-	  like $res->previous->as_string, qr{$pat}sm
-	    , "[$sect_name] $_ $item->{cf_FILE}";
-	}
-	default {
-	  die "Unknown test method: $_\n";
-	}
+      if ($item->{cf_METHOD} eq 'GET') {
+        my $res = $mech->get($url);
+        eq_or_diff trimlast(nocr($mech->content)), $item->{cf_BODY}
+          , "[$sect_name] $_ $item->{cf_FILE}";
+      } elsif ($item->{cf_METHOD} eq 'POST') {
+        my $res = $mech->post($url, $item->{cf_PARAM});
+        my $pat = join("|", @{$item->{cf_HEADER}});
+        like $res->previous->as_string, qr{$pat}sm
+          , "[$sect_name] $_ $item->{cf_FILE}";
+      } else {
+        die "Unknown test method: $_\n";
       }
     }
   }
@@ -105,7 +101,7 @@ sub mode_internal {
   my $dispatcher = YATT::Lite::Factory->load_factory_offline || do {
     require YATT::Lite::WebMVC0::SiteApp;
     YATT::Lite::WebMVC0::SiteApp->new
-	(app_ns => 'MyApp'
+	(app_ns => 'MyYATT'
 	 , namespace => ['yatt', 'perl', 'js']
 	 , header_charset => 'utf-8'
 	 , debug_cgen => $ENV{DEBUG}

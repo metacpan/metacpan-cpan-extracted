@@ -1,0 +1,8 @@
+<!yatt:args "/doc/{doc:.+\.md\z}">
+<h2>Render doc: &yatt:doc;</h2>
+
+<!yatt:action doc="/doc/{doc:.+}">
+print $CON qq{Action: $doc};
+
+<!yatt:page toc>
+<h2>Toc</h2>

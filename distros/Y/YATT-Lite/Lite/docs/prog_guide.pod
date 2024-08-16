@@ -50,9 +50,9 @@ And our program is like following:
 
 Then, when C<< $yatt->render >> is called, yatt generates
 following perl script (package) and invoke it as
-C<< MyApp::EntNS->render_(...) >>.
+C<< MyYATT::EntNS->render_(...) >>.
 
-  package MyApp::EntNS;
+  package MyYATT::EntNS;
   sub render_ {
     my ($this, $CON, $x, $y, $body) = @_;
     print $CON (q|<h2>|, YATT::Lite::Util::escape($x), q|</h2>|, "\n");

@@ -6,10 +6,11 @@
 use v5.36;
 use Object::Pad 0.809;  # method :common embeddable bugfix
 use Future::AsyncAwait;
+use Sublike::Extended 0.23;  # //= in named params
 
 use IPC::MicroSocket;
 
-package IPC::MicroSocket::Server 0.01;  # this 'package' statement just to keep CPAN indexers happy
+package IPC::MicroSocket::Server 0.02;  # this 'package' statement just to keep CPAN indexers happy
 role IPC::MicroSocket::Server;
 
 use Carp;
@@ -84,12 +85,9 @@ Sets the size of the C<listen(2)> queue; defaults to 5 if not specified.
 
 =cut
 
-method new_unix :common ( %args )
+extended method new_unix :common ( :$path, :$listen //= 5 )
 {
    require IO::Socket::UNIX;
-
-   my $path   = $args{path};
-   my $listen = $args{listen} // 5;
 
    my $listensock = IO::Socket::UNIX->new(
       Local => $path,

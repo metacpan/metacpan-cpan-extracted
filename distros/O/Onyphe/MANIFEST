@@ -21,12 +21,14 @@ lib/Onyphe.pm
 lib/OPP/Output.pm
 lib/OPP.pm
 lib/OPP/Proc/Addcount.pm
+lib/OPP/Proc/Addfield.pm
 lib/OPP/Proc/Allowlist.pm
 lib/OPP/Proc/Blocklist.pm
 lib/OPP/Proc/Count.pm
 lib/OPP/Proc/Dedup.pm
 lib/OPP/Proc/Discovery.pm
 lib/OPP/Proc/Exec.pm
+lib/OPP/Proc/Exists.pm
 lib/OPP/Proc/Expand.pm
 lib/OPP/Proc/Fieldcount.pm
 lib/OPP/Proc/Fields.pm
@@ -35,6 +37,7 @@ lib/OPP/Proc/Flatten.pm
 lib/OPP/Proc/Lookup.pm
 lib/OPP/Proc/Merge.pm
 lib/OPP/Proc/Noop.pm
+lib/OPP/Proc/Orlookup.pm
 lib/OPP/Proc/Output.pm
 lib/OPP/Proc/Pivots.pm
 lib/OPP/Proc.pm

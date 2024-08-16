@@ -12,7 +12,7 @@ use OPP::State;
 use OPP::Output;
 
 my $opp = OPP->new;
-$opp->nested([ 'app.http.component' ]);
+$opp->nested([ qw(app.http.component app.http.header alert) ]);
 $opp->state(OPP::State->new->init);
 $opp->output(OPP::Output->new->init);
 

@@ -11,4 +11,5 @@ t/4-script.t
 t/5-error.t
 t/6-sanity.t
 t/lib.pl
-META.yml                                 Module meta-data (added by MakeMaker)
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

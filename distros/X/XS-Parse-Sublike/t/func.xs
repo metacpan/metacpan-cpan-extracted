@@ -15,15 +15,18 @@
 #endif
 
 static const struct XSParseSublikeHooks parse_func_hooks = {
+  .ver            = XSPARSESUBLIKE_ABI_VERSION,
   .permit_hintkey = "t::func/func",
 };
 
 static const struct XSParseSublikeHooks parse_nfunc_hooks = {
+  .ver            = XSPARSESUBLIKE_ABI_VERSION,
   .permit_hintkey = "t::func/nfunc",
   .flags = XS_PARSE_SUBLIKE_FLAG_SIGNATURE_NAMED_PARAMS,
 };
 
 static const struct XSParseSublikeHooks parse_afunc_hooks = {
+  .ver            = XSPARSESUBLIKE_ABI_VERSION,
   .permit_hintkey = "t::func/afunc",
   .flags = XS_PARSE_SUBLIKE_FLAG_SIGNATURE_PARAM_ATTRIBUTES,
 };

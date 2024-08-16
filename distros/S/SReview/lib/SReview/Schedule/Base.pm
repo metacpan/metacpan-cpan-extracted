@@ -2,6 +2,13 @@ package SReview::Schedule::Base::Speaker;
 
 use Moose;
 
+has 'talk_object' => (
+	is => 'ro',
+	isa => 'SReview::Schedule::Base::Talk',
+	weak_ref => 1,
+	required => 1,
+);
+
 has 'name' => (
 	is => 'ro',
 	isa => 'Str',
@@ -37,6 +44,13 @@ package SReview::Schedule::Base::Room;
 
 use Moose;
 
+has 'event_object' => (
+	is => 'ro',
+	isa => 'SReview::Schedule::Base::Event',
+	weak_ref => 1,
+	required => 1,
+);
+
 has 'name' => (
 	is => 'ro',
 	isa => 'Maybe[Str]',
@@ -49,7 +63,7 @@ sub _load_name {
 }
 
 has 'altname' => (
-	is => 'ro',
+	is => 'rw',
 	isa => 'Maybe[Str]',
 	lazy => 1,
 	builder => '_load_altname',
@@ -60,7 +74,7 @@ sub _load_altname {
 }
 
 has 'outputname' => (
-	is => 'ro',
+	is => 'rw',
 	isa => 'Maybe[Str]',
 	lazy => 1,
 	builder => '_load_outputname',
@@ -74,6 +88,13 @@ package SReview::Schedule::Base::Track;
 
 use Moose;
 use Mojo::Util 'slugify';
+
+has 'talk_object' => (
+	is => 'ro',
+	isa => 'SReview::Schedule::Base::Talk',
+	weak_ref => 1,
+	required => 1,
+);
 
 has 'name' => (
 	is => 'ro',
@@ -115,6 +136,13 @@ use Mojo::Util 'slugify';
 use DateTime;
 use DateTime::Duration;
 
+has 'event_object' => (
+	is => 'ro',
+	isa => 'SReview::Schedule::Base::Event',
+	weak_ref => 1,
+	required => 1,
+);
+
 has 'room' => (
 	is => 'ro',
 	isa => 'SReview::Schedule::Base::Room',
@@ -123,7 +151,8 @@ has 'room' => (
 );
 
 sub _load_room {
-	return SReview::Schedule::Base::Room->new;
+	my $self = shift;
+	return $self->event_object->root_object->room_type->new(event_object => $self->event_object);
 }
 
 has 'slug' => (
@@ -273,6 +302,13 @@ package SReview::Schedule::Base::Event;
 use Moose;
 use DateTime::TimeZone;
 
+has 'root_object' => (
+	isa => 'SReview::Schedule::Base',
+	is => 'ro',
+	weak_ref => 1,
+	required => 1,
+);
+
 has 'talks' => (
 	is => 'ro',
 	lazy => 1,
@@ -345,6 +381,61 @@ sub _load_raw {
 	my $res = $ua->get($self->url)->result;
 	die "Could not access " . $self->url . ": " . $res->code . " " . $res->message unless $res->is_success;
 	return $res->body;
+}
+
+has 'speaker_type' => (
+	is => 'ro',
+	isa => 'Str',
+	lazy => 1,
+	builder => '_load_speaker_type',
+);
+
+sub _load_speaker_type {
+	return 'SReview::Schedule::Base::Speaker';
+}
+
+has 'room_type' => (
+	is => 'ro',
+	isa => 'Str',
+	lazy => 1,
+	builder => '_load_room_type',
+);
+
+sub _load_room_type {
+	return 'SReview::Schedule::Base::Room';
+}
+
+has 'track_type' => (
+	is => 'ro',
+	isa => 'Str',
+	lazy => 1,
+	builder => '_load_track_type',
+);
+
+sub _load_track_type {
+	return 'SReview::Schedule::Base::Track';
+}
+
+has 'talk_type' => (
+	is => 'ro',
+	isa => 'Str',
+	lazy => 1,
+	builder => '_load_talk_type',
+);
+
+sub _load_talk_type {
+	return 'SReview::Schedule::Base::Talk';
+}
+
+has 'event_type' => (
+	is => 'ro',
+	isa => 'Str',
+	lazy => 1,
+	builder => '_load_event_type',
+);
+
+sub _load_event_type {
+	return 'SReview::Schedule::Base::Event';
 }
 
 has 'events' => (

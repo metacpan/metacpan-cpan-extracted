@@ -13,6 +13,7 @@
 static bool parts_permit(pTHX_ void *_);
 
 static struct XSParseSublikeHooks parse_parts_hooks = {
+  .ver    = XSPARSESUBLIKE_ABI_VERSION,
   .permit = parts_permit,
 };
 

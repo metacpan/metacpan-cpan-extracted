@@ -9,6 +9,12 @@ use YATT::Lite::Partial fields => [qw/cf_^app_root/]
 
 # Note: Do *not* use YATT::Lite. YATT::Lite *uses* this.
 
+sub app_path_expand {
+  (my MY $self, my ($path, $in)) = @_;
+  $self->app_path_is_replaced($path);
+  $self->app_path_normalize($path, $in // $self->{cf_app_root});
+}
+
 sub app_path_is_replaced {
   my MY $self = shift;
   $_[0] =~ s|^\@|$self->{cf_app_root}/|;

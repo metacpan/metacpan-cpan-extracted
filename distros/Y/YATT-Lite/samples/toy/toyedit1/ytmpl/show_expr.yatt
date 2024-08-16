@@ -1,0 +1,3 @@
+<!yatt:args expr value="value">
+<dt class="show_expr">&yatt:expr;</dt>
+<dd class="show_expr">&yatt:value;</dd>

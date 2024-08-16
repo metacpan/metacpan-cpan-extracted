@@ -22,9 +22,11 @@ use YATT::Lite::MFields
 
    # To suppress HTTP header, set this.
    , 'cf_noheader'
+   # To suppress flush_header on DESTROY, set this.
+   , 'cf_no_auto_flush_headers'
 
    # To distinguish error state.
-   , qw/is_error raised oldbuf/
+   , qw/is_error raised oldbuf diag_list error_list/
 
    # Session store
    , qw/session stash debug_stash/
@@ -52,10 +54,18 @@ use YATT::Lite::MFields
    , qw/cf_lang/
   );
 
-use YATT::Lite::Util qw(globref lexpand fields_hash incr_opt terse_dump);
+use YATT::Lite::Util qw(
+                         globref lexpand fields_hash incr_opt terse_dump
+                         raise_response
+                     );
 use YATT::Lite::PSGIEnv;
 
 sub prop { *{shift()}{HASH} }
+
+sub YATT {
+  my PROP $prop = prop(my $glob = shift);
+  $prop->{cf_yatt};
+}
 
 # # XXX: Experimental. This can slowdown 20%! the code like: print $CON (text);
 # use overload qw/%{}  as_hash
@@ -174,11 +184,16 @@ sub cf_pairs {
 
 #========================================
 
+sub is_error {
+  my PROP $prop = prop(my $glob = shift);
+  $prop->{is_error};
+}
+
 sub as_error {
   my PROP $prop = prop(my $glob = shift);
-  $prop->{is_error} = 1;
+  $prop->{is_error}++;
   if (my $buf = $prop->{cf_buffer}) {
-    $prop->{oldbuf} = $$buf;
+    push @{$prop->{oldbuf}}, $$buf if $$buf ne '';
     $glob->rewind;
   }
   $glob->configure(@_) if @_;
@@ -187,7 +202,7 @@ sub as_error {
 
 sub error_with_status {
   my ($glob, $code) = splice @_, 0, 2;
-  $glob->configure(status => $code)
+  $glob->as_error->configure(status => $code)
     ->raise(error => incr_opt(depth => \@_), @_);
 }
 
@@ -284,7 +299,8 @@ DESTROY {
   local $@;
 
   my PROP $prop = prop(my $glob = shift);
-  $glob->flush_headers;
+  $glob->flush_headers
+    unless $prop->{cf_no_auto_flush_headers};
   if (my $backend = delete $prop->{cf_backend}) {
     if ($prop->{cf_debug} and my $errfh = $glob->error_fh) {
       print $errfh "DEBUG: Connection->backend is detached($backend)\n";
@@ -313,11 +329,18 @@ sub flush_headers {
 
   return if $prop->{header_was_sent}++;
 
+  my $was_error = $prop->{is_error};
+
   $glob->finalize_headers;
 
   if (not $prop->{cf_noheader}) {
     my $fh = $prop->{cf_parent_fh} // $glob;
-    print $fh $glob->mkheader;
+    my $header = $glob->mkheader;
+    if (not $was_error and my ($err) = $glob->error_list) {
+      die "\n\nError during first call of flush_headers(): $err\n";
+    } else {
+      print $fh $header;
+    }
   }
   $glob->flush;
 }
@@ -349,15 +372,15 @@ sub rewind {
 }
 
 #========================================
-# (Possibly obsoleted) Cookie support, based on CGI::Cookie (works under PSGI mode too)
+# Cookie support, based on Cookie::Baker
 
 sub cookies_in {
   my PROP $prop = (my $glob = shift)->prop;
   my Env $env = $prop->{cf_env};
   $prop->{cookies_in} ||= do {
     if (defined $env->{HTTP_COOKIE}) {
-      require CGI::Cookie;
-      CGI::Cookie->parse($env->{HTTP_COOKIE});
+      YATT::Lite::Util::permissive_require('Cookie::Baker');
+      Cookie::Baker::crush_cookie($env->{HTTP_COOKIE});
     } else {
       +{};
     }
@@ -368,8 +391,15 @@ sub set_cookie {
   my PROP $prop = (my $glob = shift)->prop;
   if (@_ == 1 and ref $_[0]) {
     my $cookie = shift;
-    my $name = $cookie->name;
-    $prop->{cookies_out}{$name} = $cookie;
+    if (ref $cookie eq 'HASH') {
+      defined (my $name = $cookie->{name}) or do {
+        Carp::croak "set_cookie: name is undef!";
+      };
+      $prop->{cookies_out}{$name} = $cookie;
+    } else {
+      my $name = $cookie->name;
+      $prop->{cookies_out}{$name} = $cookie;
+    }
   } else {
     my $name = shift;
     $prop->{cookies_out}{$name} = $glob->new_cookie($name, @_);
@@ -378,16 +408,20 @@ sub set_cookie {
 
 sub new_cookie {
   my $glob = shift;		# not used.
-  my ($name, $value) = splice @_, 0, 2;
-  require CGI::Cookie;
-  CGI::Cookie->new(-name => $name, -value => $value, @_);
+  my ($name, $value, @opts) = @_;
+  YATT::Lite::Util::permissive_require('Cookie::Baker');
+  my $baked = {value => $value};
+  while (my ($k, $v) = splice @opts, 0, 2) {
+    $k =~ s/^-//; # For backward compatibility with CGI::Cookie style options.
+    $baked->{$k} = $v;
+  }
+  Cookie::Baker::bake_cookie($name, $baked);
 }
 
 sub finalize_cookies {
   my PROP $prop = (my $glob = shift)->prop;
   return unless $prop->{cookies_out};
-  $prop->{headers}{'Set-Cookie'} = [map {$_->as_string}
-				    values %{$prop->{cookies_out}}];
+  $prop->{headers}{'Set-Cookie'} = [values %{$prop->{cookies_out}}];
 }
 #========================================
 
@@ -398,10 +432,47 @@ sub buffer {
   ${$prop->{cf_buffer}}
 }
 
+sub diag_list {
+  my PROP $prop = prop(my $glob = shift);
+  my $list = $prop->{diag_list}
+    or return;
+  wantarray ? @$list : $list;
+}
+
+sub add_diag {
+  my PROP $prop = prop(my $glob = shift);
+  push @{$prop->{diag_list}}, shift;
+  $glob;
+}
+
+sub error_list {
+  my PROP $prop = prop(my $glob = shift);
+  my $list = $prop->{error_list}
+    or return;
+  wantarray ? @$list : $list;
+}
+
+sub add_error {
+  my PROP $prop = prop(my $glob = shift);
+  push @{$prop->{error_list}}, my $err = shift;
+  $glob->add_diag($err->reason);
+  $glob;
+}
+
+sub oldbuf {
+  my PROP $prop = prop(my $glob = shift);
+  my $oldbuf = $prop->{oldbuf}
+    or return;
+  wantarray ? @$oldbuf : $oldbuf;
+}
+
 sub mkheader {
   my PROP $prop = (my $glob = shift)->prop;
   my ($code) = shift // $prop->{cf_status} // 200;
-  require HTTP::Headers;
+
+  # For GH-200 (to avoid "Can't locate Clone.pm" from HTTP::Headers)
+  YATT::Lite::Util::permissive_require('HTTP::Headers');
+
   my $headers = HTTP::Headers->new("Content-type", $glob->_mk_content_type
 				   , map($_ ? %$_ : (), $prop->{headers})
 				   , @_);
@@ -472,6 +543,12 @@ sub set_charset {
 }
 
 #========================================
+
+sub configure_stash {
+  my PROP $prop = prop(my $glob = shift);
+  my ($value) = @_;
+  $prop->{stash} = $value;
+}
 
 sub stash {
   my PROP $prop = prop(my $glob = shift);

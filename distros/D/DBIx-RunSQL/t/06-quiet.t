@@ -33,7 +33,7 @@ SQL
     ]
 );
 
-isn't $output, '', "We get output if rows are found";
+isnt $output, '', "We get output if rows are found";
 
 $output = '';
 $exitcode = DBIx::RunSQL->handle_command_line(

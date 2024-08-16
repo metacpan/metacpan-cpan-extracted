@@ -18,7 +18,7 @@ print Dumper [ map { $book_h_ref->{$_} } sort keys %$book_h_ref ];
 
 my $book_a_ref = read_sxc( $file, { OrderBySheet => 1 } );
 
-isn't $book_a_ref->[0], undef, "When ordering by sheet name, we don't lose the sheets";
+isnt $book_a_ref->[0], undef, "When ordering by sheet name, we don't lose the sheets";
 
 use Data::Dumper; print Dumper $book_a_ref;
 # Output original:

@@ -6,7 +6,7 @@
 
 ;; TODO: lint *before* real file saving, for safer operation.
 
-(require 'cl)
+(require 'cl-lib)
 
 (require 'plist-bind "yatt-utils")
 
@@ -37,31 +37,33 @@
     )
   "Auto lint filename mapping for yatt and related files.")
 
-(defvar yatt-lint-any-mode-blacklist '(perl-minlint-mode
-				       flymake-mode flycheck-mode)
+(defvar yatt-lint-any-mode-blacklist '(flymake-mode flycheck-mode)
   "Avoid yatt-lint if any of modes in this list are t")
 
 (defvar yatt-lint-any-perl-mode 'yatt-lint-any-handle-perl-script
   "Check every perl-mode buffer even if it is not related to yatt.
 To disable, set to nil.")
 
+(defun yatt-lint-any-has-perlminlint ()
+  "Check if perlminlint is available"
+  (executable-find "perlminlint"))
+
 (defun yatt-lint-any-mode-blacklistp ()
-  (let ((ok t) (lst yatt-lint-any-mode-blacklist)
-	i)
-    (while (and ok lst)
-      (setq i (car lst))
-      (setq ok (and ok (not (cond ((and (symbolp i) (boundp i))
-				   (symbol-value i))
-				  ((listp i)
-				   (funcall i))
-				  (t nil)))))
-      (setq lst (cdr lst)))))
+  (cl-some (lambda (i)
+	      (cond ((and (symbolp i))
+		     (and (boundp i)
+			  (symbol-value i)))
+		    ((listp i)
+		     (funcall i))
+		    (t
+		     (error "Unknown type blacklist item: %s" i))))
+	    yatt-lint-any-mode-blacklist))
 
 (defun yatt-lint-any-mode-unless-blacklisted ()
-  (cond ((yatt-lint-any-mode-blacklistp)
+  (cond ((not (yatt-lint-any-mode-blacklistp))
 	 (yatt-lint-any-mode t))
 	(yatt-lint-any-mode
-	 (yatt-lint-any-mode nil))))
+	 (yatt-lint-any-mode -1))))
 
 (defvar yatt-lint-any-mode-map (make-sparse-keymap))
 (define-key yatt-lint-any-mode-map [f5] 'yatt-lint-any-after)
@@ -72,16 +74,28 @@ To disable, set to nil.")
   :lighter "<F5 lint>"
   :global nil
   (let ((hook 'after-save-hook) (fn 'yatt-lint-any-after)
-	(buf (current-buffer)))
+	(buf (current-buffer))
+	(is-perl-minlint (and (boundp 'perl-minlint-mode) perl-minlint-mode))
+	(has-app-psgi (and
+		       (buffer-file-name (current-buffer))
+		       (yatt-lint-any-find-upward "app.psgi"))))
     (cond ((or (yatt-lint-any-mode-blacklistp)
 	       (and (boundp 'mmm-temp-buffer-name)
 		    (equal (buffer-name) mmm-temp-buffer-name)))
 	   (message "skipping yatt-lint-any-mode for %s" buf)
 	   nil)
 	  (yatt-lint-any-mode
-	   (message "enabling yatt-lint-any-mode for %s" buf)
-	   (add-hook hook fn nil nil)
-	   (make-variable-buffer-local 'yatt-lint-any-driver-path))
+	   (cond ((and is-perl-minlint (not has-app-psgi))
+		  (message "Disable yatt-lint-any-mode since perl-minlint-mode is enabled and app.psgi is missing")
+		  (yatt-lint-any-mode -1))
+		 (t
+		  (cond (is-perl-minlint
+			 (message "Use yatt-lint-any-mode instead of perl-minlint-mode for %s" buf)
+			 (perl-minlint-mode -1))
+			(t
+			 (message "enabling yatt-lint-any-mode for %s" buf)))
+		  (add-hook hook fn nil nil)
+		  (make-variable-buffer-local 'yatt-lint-any-driver-path))))
 	  (t
 	   (message "disabling yatt-lint-any-mode for %s" buf)
 	   (remove-hook hook fn nil)))))
@@ -96,6 +110,7 @@ To disable, set to nil.")
    (setq yatt-lint-any-driver-path
 	 (let ((htaccess ".htaccess")
 	       (htyattcf ".htyattconfig.xhf") config
+               app_psgi
 	       action driver libdir yattdir)
 	   (cond ((and
 		   ;; For vhost and non-standard DocumentRoot case,
@@ -104,6 +119,11 @@ To disable, set to nil.")
 		   (setq libdir (yatt-xhf-fetch htyattcf "info" "libdir"))
 		   (file-exists-p (setq yattdir (concat libdir "/YATT/"))))
 		  yattdir)
+
+                 ((and
+                   (setq app_psgi (yatt-lint-any-find-upward "app.psgi"))
+                   (file-exists-p (setq yattdir (concat (file-name-directory app_psgi) "lib/YATT/"))))
+                  yattdir)
 
 		 ((setq libdir (yatt-lint-any-find-upward "YATT"))
 		  (concat libdir "/"))
@@ -168,10 +188,10 @@ To disable, set to nil.")
 	  (unwind-protect
 	      (progn
 		(goto-char 0)
-		(block loop
+		(cl-block loop
 		  (while (setq found (re-search-forward pat nil t))
 		    (end-of-line)
-		    (return-from loop (buffer-substring found (point))))))
+		    (cl-return-from loop (buffer-substring found (point))))))
 	    (kill-buffer (current-buffer))))))))
 
 '(yatt-lint-any-action-libdir
@@ -214,10 +234,10 @@ Currently only RHEL is supported."
 (defun yatt-lint-any-lookup (bufname &optional registry)
   (setq registry (or registry yatt-lint-any-registry))
   (save-match-data
-    (block loop
+    (cl-block loop
       (while registry
 	(when (string-match (caar registry) bufname)
-	  (return-from loop (cdar registry)))
+	  (cl-return-from loop (cdar registry)))
 	(setq registry (cdr registry))))))
 
 (defun yatt-lint-any-run (handler buffer)
@@ -229,8 +249,9 @@ Currently only RHEL is supported."
 	       (not (equal (expand-file-name file)
 			   (yatt-lint-tramp-localname buffer)))
 	       (not (equal file "-")))
-	(message "opening error file: %s" file)
-	(find-file-other-window file))
+      (setq file (concat (yatt-lint-tramp-prefix buffer) file))
+      (message "opening error file: %s" file)
+      (find-file-other-window file))
     (when (and file line)
       (goto-line (string-to-number line)))
     (message "%s"
@@ -288,12 +309,17 @@ Currently only RHEL is supported."
 
 (defun yatt-lint-any-handle-perl-module (buffer)
   (yatt-lint-any-perl-error-by
-   (yatt-lint-cmdfile "scripts/yatt.lintpm") buffer))
+   (if (yatt-lint-any-has-perlminlint) "perlminlint"
+     (yatt-lint-cmdfile "scripts/yatt.lintpm"))
+    buffer))
 
 (defun yatt-lint-any-handle-perl-script (buffer)
   (if (member major-mode '(perl-mode cperl-mode))
       ;; XXX: Should add -T if shbang has -T
-      (yatt-lint-any-perl-error-by "perl -wc " buffer)))
+      (yatt-lint-any-perl-error-by
+       (concat (if (yatt-lint-any-has-perlminlint) "perlminlint" "perl")
+               " -wc ")
+       buffer)))
 
 (defun yatt-lint-any-perl-error-by (command buffer)
   (plist-bind (rc err)
@@ -318,8 +344,14 @@ Currently only RHEL is supported."
 ;; Other utils
 ;;========================================
 (defun yatt-lint-cmdfile (cmdfile &optional nocheck)
-  (let ((cmd (concat (or (yatt-lint-any-find-driver)
-			 yatt-lint-any-YATT-dir) cmdfile)))
+  (let ((driver (yatt-lint-any-find-driver))
+        (fn (buffer-file-name (current-buffer)))
+        cmd)
+    (unless driver
+      (if (not (yatt-lint-is-tramp fn))
+          (setq driver yatt-lint-any-YATT-dir)
+        (error "Can't find yatt driver for %s!" fn)))
+    (setq cmd (concat driver cmdfile))
     (if (and (not nocheck)
 	     (not (file-exists-p cmd)))
 	(error "Can't find yatt command: %s" cmd))
@@ -373,13 +405,21 @@ Currently only RHEL is supported."
 		  (t
 		   (error "Invalid argument %s" fn-or-buf)))))
     (if (yatt-lint-is-tramp fn)
-	(let ((vec (tramp-dissect-file-name fn)))
-	  (tramp-make-tramp-file-name
-	   (tramp-file-name-method vec)
-	   (tramp-file-name-user vec)
-	   (tramp-file-name-host vec)
-	   ""))
-      "")))
+	(let ((vec (tramp-dissect-file-name fn))
+              (version (version-to-list tramp-version)))
+          (if (version-list-< version (version-to-list "2.3.2"))
+              (tramp-make-tramp-file-name
+	       (tramp-file-name-method vec)
+	       (tramp-file-name-user vec)
+	       (tramp-file-name-host vec)
+	       "")
+            (tramp-make-tramp-file-name
+	       (tramp-file-name-method vec)
+	       (tramp-file-name-user vec)
+	       (tramp-file-name-domain vec)
+	       (tramp-file-name-host vec)
+	       (tramp-file-name-port vec)
+	       ""))))))
 
 
 (defun yatt-lint-is-tramp (fn)

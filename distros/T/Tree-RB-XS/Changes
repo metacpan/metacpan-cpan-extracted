@@ -1,3 +1,12 @@
+Version 0.13 - 2024-08-16
+  - Support for Storable freeze/thaw on trees and nodes (but not iterators)
+  - More complete XS constructor is faster and allows more things to be
+    initialized, including the "recent" list, and "keys" without values.
+    Warns on unknown attribute names, now.
+  - Fix null pointer bugs accessing certain attributes of pruned nodes
+  - example "newest-files"
+  - Documentation updates
+
 Version 0.12 - 2024-07-09
   - Fix fatal bug in prev_inserted_trend optimization
 

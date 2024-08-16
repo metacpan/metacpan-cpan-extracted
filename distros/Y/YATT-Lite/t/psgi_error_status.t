@@ -48,6 +48,18 @@ sub action_response (&;@) {
   $client->request(GET $URL.$params);
 }
 
+describe 'To preload CGen class', sub {
+  my $res = $client->request(GET "/empty");
+
+  it "should have code == 200", sub {
+    expect($res->code)->to_be(200);
+  };
+
+  it "should contain Hello World", sub {
+    expect($res->content)->to_match(qr/Hello World/);
+  };
+};
+
 describe '$CON->error_with_status($code, $msg, @args...)', sub {
 
   describe "200 with reason as content", sub {
@@ -57,11 +69,11 @@ describe '$CON->error_with_status($code, $msg, @args...)', sub {
       $con->error_with_status(200, "From error");
     };
 
-    it "should has code == 200", sub {
+    it "should have code == 200", sub {
       expect($res->code)->to_be(200);
     };
 
-    it "should has raised content", sub {
+    it "should have raised content", sub {
       expect($res->content)->to_be("From error");
     };
   };
@@ -73,11 +85,11 @@ describe '$CON->error_with_status($code, $msg, @args...)', sub {
       $con->error_with_status(200);
     };
 
-    it "should has code == 200", sub {
+    it "should have code == 200", sub {
       expect($res->code)->to_be(200);
     };
 
-    it "should has raised content", sub {
+    it "should have raised content", sub {
       expect($res->content)->to_be('Unknown reason!');
     };
   };
@@ -89,11 +101,11 @@ describe '$CON->error_with_status($code, $msg, @args...)', sub {
       $con->error_with_status(404, "Not found xxx");
     };
 
-    it "should has code == 404", sub {
+    it "should have code == 404", sub {
       expect($res->code)->to_be(404);
     };
 
-    it "should has raised content", sub {
+    it "should have raised content", sub {
       expect($res->content)->to_be('Not found xxx');
     };
   };
@@ -107,11 +119,11 @@ describe '$dirapp->error_with_status($code, $msg, @args...)', sub {
       $this->YATT->error_with_status(200, "From error");
     };
 
-    it "should has code == 200", sub {
+    it "should have code == 200", sub {
       expect($res->code)->to_be(200);
     };
 
-    it "should has raised content", sub {
+    it "should have raised content", sub {
       expect($res->content)->to_be("From error");
     };
   };
@@ -123,11 +135,11 @@ describe '$dirapp->error_with_status($code, $msg, @args...)', sub {
       $this->YATT->error_with_status(200);
     };
 
-    it "should has code == 200", sub {
+    it "should have code == 200", sub {
       expect($res->code)->to_be(200);
     };
 
-    it "should has raised content", sub {
+    it "should have raised content", sub {
       expect($res->content)->to_be('Unknown reason!');
     };
   };
@@ -139,11 +151,11 @@ describe '$dirapp->error_with_status($code, $msg, @args...)', sub {
       $this->YATT->error_with_status(404, "Not found xxx");
     };
 
-    it "should has code == 404", sub {
+    it "should have code == 404", sub {
       expect($res->code)->to_be(404);
     };
 
-    it "should has raised content", sub {
+    it "should have raised content", sub {
       expect($res->content)->to_be('Not found xxx');
     };
   };
@@ -156,11 +168,11 @@ describe '$site->error_with_status($code, $msg, @args...)', sub {
       $site->error_with_status(200, "From error");
     };
 
-    it "should has code == 200", sub {
+    it "should have code == 200", sub {
       expect($res->code)->to_be(200);
     };
 
-    it "should has raised content", sub {
+    it "should have raised content", sub {
       expect($res->content)->to_be("From error");
     };
   };
@@ -171,11 +183,11 @@ describe '$site->error_with_status($code, $msg, @args...)', sub {
       $site->error_with_status(200);
     };
 
-    it "should has code == 200", sub {
+    it "should have code == 200", sub {
       expect($res->code)->to_be(200);
     };
 
-    it "should has raised content", sub {
+    it "should have raised content", sub {
       expect($res->content)->to_be('Unknown reason!');
     };
   };
@@ -186,11 +198,11 @@ describe '$site->error_with_status($code, $msg, @args...)', sub {
       $site->error_with_status(404, "Not found xxx");
     };
 
-    it "should has code == 404", sub {
+    it "should have code == 404", sub {
       expect($res->code)->to_be(404);
     };
 
-    it "should has raised content", sub {
+    it "should have raised content", sub {
       expect($res->content)->to_be('Not found xxx');
     };
   };
@@ -220,10 +232,10 @@ describe "Request errors", sub {
 	$con->param_type(foo => 'name');
       };
 
-      it "should has 400 Bad Request", sub {
+      it "should have 400 Bad Request", sub {
 	expect($res->code)->to_be(400);
       };
-      it "should has diag message", sub {
+      it "should have diag message", sub {
 	expect($res->content)->to_be(q{Parameter 'foo' is missing!});
       };
     };
@@ -235,10 +247,10 @@ describe "Request errors", sub {
 	$con->param_type(foo => 'name');
       } "?foo=a-b";
 
-      it "should has 400 Bad Request", sub {
+      it "should have 400 Bad Request", sub {
 	expect($res->code)->to_be(400);
       };
-      it "should has diag message", sub {
+      it "should have diag message", sub {
 	expect($res->content)->to_be(q{Parameter 'foo' must match name!: 'a-b'});
       };
     };
@@ -251,11 +263,11 @@ describe "General internal server errors", sub {
 
     my $res = action_response { my $foo; $foo * $foo };
 
-    it "should has code == 500", sub {
+    it "should have code == 500", sub {
       expect($res->code)->to_be(500);
     };
 
-    it "should has diag content", sub {
+    it "should have diag content", sub {
       expect($res->content)->to_match(qr/^Use of uninitialized/);
     };
   };
@@ -269,11 +281,11 @@ describe "Same with overwrite_status_code_for_errors_as => 200", sub {
 
     my $res = action_response { my $foo; $foo * $foo };
 
-    it "should has code == 200", sub {
+    it "should have code == 200", sub {
       expect($res->code)->to_be(200);
     };
 
-    it "should has diag content", sub {
+    it "should have diag content", sub {
       expect($res->content)->to_match(qr/^Use of uninitialized/);
     };
   };

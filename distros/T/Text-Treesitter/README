@@ -157,6 +157,14 @@ METHODS
       Alternative to specifying the four values given above, where they are
       all taken from the given Text::Treesitter::Node instance directly.
 
+ parse_file
+
+       $tree = $ts->parse_file( $path );
+
+    Since version 0.13.
+
+    Reads the file content as a string, then applies "parse_string" on it.
+
  load_query_string
 
        $query = $ts->load_query_string( $str );
@@ -167,7 +175,7 @@ METHODS
 
  query_file_path
 
-       $path = %ts->query_file_path( $name );
+       $path = $ts->query_file_path( $name );
 
     If a file exists of the given path, then it is returned directly.
     Otherwise, returns a path within the language directory given by

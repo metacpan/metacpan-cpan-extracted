@@ -1,11 +1,11 @@
 #
-# $Id: Api.pm,v e8e4d5336c13 2023/09/06 12:20:39 gomor $
+# $Id: Api.pm,v cc27ffa878bb 2024/08/15 09:32:51 gomor $
 #
 package Onyphe::Api;
 use strict;
 use warnings;
 
-our $VERSION = '4.11';
+our $VERSION = '4.15';
 
 use experimental qw(signatures);
 
@@ -19,7 +19,7 @@ __PACKAGE__->cgBuildIndices;
 use File::Temp qw(tempfile);
 use File::Slurp qw(read_file);
 use Mojo::URL;
-use JSON::XS qw(encode_json);
+use JSON::XS qw(encode_json decode_json);
 use Mojo::UserAgent;
 use Mojo::Util qw(b64_encode url_escape);
 
@@ -64,6 +64,11 @@ sub _headers ($self, $apikey, $ct = undef) {
       $headers->{Authorization} = 'Basic '.$auth;
    }
    return $headers;
+}
+
+sub get_total ($self, $json) {
+   my $total = $json->{total};
+   return defined($total) && $total ? $total : 0;
 }
 
 sub get_maxpage ($self, $json) {
@@ -167,7 +172,13 @@ sub request ($self, $api, $input = undef, $page = undef, $maxpage = undef, $para
       }
       unless ($res->is_success) {
          my $code = $res->code;
-         my $text = $res->json->{text};
+         # Not JSON result:
+         unless (defined($res->json)) {
+            my $text = $res->message;
+            print STDERR "ERROR: Request API call failed: $code, $text\n";
+            return;
+         }
+         my $json = $res->json;
          # If code 429, retry with some sleep:
          if ($code == 429) {
             print STDERR "WARNING: Too fast, sleeping before retry...\n" unless $self->silent;
@@ -175,11 +186,20 @@ sub request ($self, $api, $input = undef, $page = undef, $maxpage = undef, $para
             goto RETRY;
          }
          # Otherwise, stops and display error:
-         print STDERR "ERROR: Request API call failed: $code, $text\n" unless $self->silent;
+         print STDERR "ERROR: Request API call failed: $code, ".encode_json($json)."\n"
+            unless $self->silent;
          return;
       }
 
       my $json = $res->json;
+
+      # When asking for a count only, display and stop:
+      if (defined($params) && $params->{count}) {
+         my $total = $self->get_total($json);
+         $cb->([{ "total" => $total } ], $cb_args);
+         return 1;
+      }
+
       # Fetch max_page value so we can iterate:
       $this_max_page = $self->get_maxpage($json) unless defined $this_max_page;
       if (defined($input) && !$this_max_page) {
@@ -246,8 +266,6 @@ sub post_request ($self, $api, $input = undef, $page = undef, $maxpage = undef, 
 
       print STDERR "VERBOSE: Calling API: $path\n" if $self->verbose;
 
-      $input = url_escape($input) if defined $input;
-
    RETRY:
       my $res;
       eval {
@@ -260,7 +278,13 @@ sub post_request ($self, $api, $input = undef, $page = undef, $maxpage = undef, 
       }
       unless ($res->is_success) {
          my $code = $res->code;
-         my $text = $res->json->{text};
+         # Not JSON result:
+         unless (defined($res->json)) {
+            my $text = $res->message;
+            print STDERR "ERROR: Request API call failed: $code, $text\n";
+            return;
+         }
+         my $json = $res->json;
          # If code 429, retry with some sleep:
          if ($code == 429) {
             print STDERR "WARNING: Too fast, sleeping before retry...\n" unless $self->silent;
@@ -268,7 +292,8 @@ sub post_request ($self, $api, $input = undef, $page = undef, $maxpage = undef, 
             goto RETRY;
          }
          # Otherwise, stops and display error:
-         print STDERR "ERROR: Request API call failed: $code, $text\n" unless $self->silent;
+         print STDERR "ERROR: Request API call failed: $code, ".encode_json($json)."\n"
+            unless $self->silent;
          return;
       }
 
@@ -349,11 +374,14 @@ sub _cb_stream ($self, $results = undef, $cb_args = undef) {
 }
 
 sub _on_read ($self, $cb = undef, $cb_args = undef, $buf = \'') {
-   # XXX: handle is_success and render ERROR
    return sub {
       my ($content, $bytes) = @_;
       $bytes = $$buf.$bytes;  # Complete from previously incomplete lines
       my ($this, $tail) = $bytes =~ m/^(.*\n)(.*)$/s;
+      # Check errors:
+      if (defined($bytes) && $bytes =~ m{"status":"nok"}) {
+         return $cb->($bytes, $cb_args);
+      }
       # One line is not complete, add to buf and go to next:
       if (!defined($this)) {
          $buf = \$bytes;
@@ -379,10 +407,15 @@ sub stream ($self, $method, $api, $input, $params = undef, $cb = undef, $cb_args
 
    my $ua = $self->_ua();
    my $headers = $self->_headers($apikey);
+   if ($method eq 'POST') {
+      $headers = $self->_headers($apikey, 'application/x-www-form-urlencoded');
+   }
 
    my $path = $endpoint.$api;
    unless (-f $input) {
-      $path .= '/'.url_escape($input);   # Build with OQL string
+      if ($method eq 'GET') {
+         $path .= '/'.url_escape($input);   # Build with OQL string
+      }
    }
 
    my $p= [];
@@ -404,7 +437,13 @@ sub stream ($self, $method, $api, $input, $params = undef, $cb = undef, $cb_args
    my $url = Mojo::URL->new($path);
 
    my $buf = '';  # Will store incomplete lines for later processing
-   my $tx = $ua->build_tx($method => $url => $headers);
+   my $tx;
+   if ($method eq 'GET') {
+      $tx = $ua->build_tx($method => $url => $headers);
+   }
+   elsif ($method eq 'POST') {
+      $tx = $ua->build_tx($method => $url => $headers => form => { query => $input });
+   }
    # Replace "read" events to disable default content parser:
    $tx->res->content->unsubscribe('read')->on(read => $self->_on_read($cb, $cb_args, \$buf));
 
@@ -430,9 +469,8 @@ sub post_stream ($self, $method, $api, $input, $params = undef, $cb = undef, $cb
    my $headers = $self->_headers($apikey, 'application/x-www-form-urlencoded');
 
    my $path = $endpoint.$api;
-   $input = url_escape($input);   # Build with OQL string
 
-   my $p= [];
+   my $p = [];
    push @$p, { k => 'k', v => $apikey };
    push @$p, { k => 'trackquery', v => 'true' } if $global->{api_trackquery};
    push @$p, { k => 'calculated', v => 'true' } if $global->{api_calculated};
@@ -588,7 +626,13 @@ RETRY:
    }
    unless ($res->is_success) {
       my $code = $res->code;
-      my $text = $res->json->{text};
+      # Not JSON result:
+      unless (defined($res->json)) {
+         my $text = $res->message;
+         print STDERR "ERROR: Alert API call failed: $code, $text\n";
+         return;
+      }
+      my $json = $res->json;
       # If code 429, retry with some sleep:
       if ($code == 429) {
          print STDERR "WARNING: Too fast, sleeping before retry...\n" unless $self->silent;
@@ -596,7 +640,8 @@ RETRY:
          goto RETRY;
       }
       # Otherwise, stops and display error:
-      print STDERR "ERROR: Alert API call failed: $code, $text\n" unless $self->silent;
+      print STDERR "ERROR: Alert API call failed: $code, ".encode_json($json)."\n"
+         unless $self->silent;
       return;
    }
 
@@ -657,8 +702,12 @@ sub ondemand ($self, $method, $api, $param, $post, $cb = undef, $cb_args = undef
 
    if (defined($param)) {
       $post->{maxscantime} = $param->{maxscantime} if defined $param->{maxscantime};
+      $post->{aslines} = $param->{aslines} ? 'true' : 'false' if defined $param->{aslines};
+      $post->{full} = $param->{full} ? 'true' : 'false' if defined $param->{full};
       $post->{urlscan} = $param->{urlscan} ? 'true' : 'false' if defined $param->{urlscan};
       $post->{vulnscan} = $param->{vulnscan} ? 'true' : 'false' if defined $param->{vulnscan};
+      $post->{riskscan} = $param->{riskscan} ? 'true' : 'false' if defined $param->{riskscan};
+      $post->{asm} = $param->{asm} ? 'true' : 'false' if defined $param->{asm};
       $post->{import} = $param->{import} ? 'true' : 'false' if defined $param->{import};
    }
 
@@ -683,8 +732,14 @@ RETRY:
    }
    unless ($res->is_success) {
       my $code = $res->code;
+      # Not JSON result:
+      unless (defined($res->json)) {
+         my $text = $res->message;
+         print STDERR "ERROR: Request API call failed: $code, $text\n";
+         return;
+      }
       #print Data::Dumper::Dumper($res->body)."\n";
-      my $text = $res->json->{text};
+      my $json = $res->json;
       # If code 429, retry with some sleep:
       if ($code == 429) {
          print STDERR "WARNING: Too fast, sleeping before retry...\n" unless $self->silent;
@@ -692,12 +747,20 @@ RETRY:
          goto RETRY;
       }
       # Otherwise, stops and display error:
-      print STDERR "ERROR: Ondemand API call failed: $code, $text\n" unless $self->silent;
+      print STDERR "ERROR: Ondemand API call failed: $code, ".encode_json($json)."\n"
+         unless $self->silent;
       return;
    }
 
-   my $json = $res->json;
-   $cb->($json, $cb_args);
+   my $data;
+   if (defined($param) && $param->{aslines}) {
+      my @lines = split(/\r?\n/, $res->body);
+      $data = \@lines;
+   }
+   else {
+      $data = $res->json;
+   }
+   $cb->($data, $cb_args);
 
    return 1;
 }
@@ -706,8 +769,16 @@ sub ondemand_scope_ip ($self, $target, $param = undef, $cb = undef, $cb_args = u
    return $self->ondemand('post', '/ondemand/scope/ip/single', $param, { ip => $target }, $cb, $cb_args);
 }
 
+sub ondemand_scope_port ($self, $target, $param = undef, $cb = undef, $cb_args = undef) {
+   return $self->ondemand('post', '/ondemand/scope/port/single', $param, { port => $target }, $cb, $cb_args);
+}
+
 sub ondemand_scope_domain ($self, $target, $param = undef, $cb = undef, $cb_args = undef) {
    return $self->ondemand('post', '/ondemand/scope/domain/single', $param, { domain => $target }, $cb, $cb_args);
+}
+
+sub ondemand_scope_hostname ($self, $target, $param = undef, $cb = undef, $cb_args = undef) {
+   return $self->ondemand('post', '/ondemand/scope/hostname/single', $param, { hostname => $target }, $cb, $cb_args);
 }
 
 sub ondemand_scope_ip_bulk ($self, $file, $param = undef, $cb = undef, $cb_args = undef) {
@@ -746,6 +817,24 @@ sub ondemand_scope_domain_bulk ($self, $file, $param = undef, $cb = undef, $cb_a
    return $self->ondemand('post', '/ondemand/scope/domain/bulk', $param, { domain => $target }, $cb, $cb_args);
 }
 
+sub ondemand_scope_hostname_bulk ($self, $file, $param = undef, $cb = undef, $cb_args = undef) {
+   if (! -f $file) {
+      print STDERR "ERROR: Ondemand Scope Hostname Bulk needs a file as input\n"
+         unless $self->silent;
+   }
+
+   my @lines = read_file($file);
+   for (@lines) { chomp };
+   unless (@lines) {
+      print STDERR "ERROR: Ondemand Scope Hostname Bulk needs a file with content\n"
+         unless $self->silent;
+   }
+
+   my $target = join(',', @lines);
+
+   return $self->ondemand('post', '/ondemand/scope/hostname/bulk', $param, { hostname => $target }, $cb, $cb_args);
+}
+
 sub ondemand_scope_result ($self, $scan_id, $param = undef, $cb = undef, $cb_args = undef) {
    return $self->ondemand('get', '/ondemand/scope/result/'.$scan_id, $param, undef, $cb, $cb_args);
 }
@@ -766,6 +855,122 @@ sub ondemand_resolver_result ($self, $scan_id, $param = undef, $cb = undef, $cb_
    return $self->ondemand('get', '/ondemand/resolver/result/'.$scan_id, $param, undef, $cb, $cb_args);
 }
 
+#
+# ASD APIs:
+#
+sub _cb_asd ($self, $results = undef, $cb_args = undef) {
+   return sub ($results, $cb_args) {
+      $results = ref($results) eq 'ARRAY' ? $results : [ $results ];
+      for (@$results) {
+         print $self->encode($_)."\n";
+      }
+   };
+}
+
+sub asd ($self, $method, $api, $param, $post, $cb = undef, $cb_args = undef) {
+   my $global = $self->config->{''};
+   my $endpoint = $global->{api_asd_endpoint} || $self->endpoint;
+   my $apikey = $global->{api_asd_key} || $self->apikey;
+
+   # Use default callback when none given:
+   $cb ||= $self->_cb_asd;
+
+   my $ua = $self->_ua();
+   my $headers = $self->_headers($apikey);
+
+   $api =~ s{^/*}{/}g;
+
+   my $path = $endpoint.$api;
+   $path .= '?k='.$apikey;
+
+   if (defined($param)) {
+      $post->{domain} = $param->{domain} if defined $param->{domain};
+      $post->{aslines} = $param->{aslines} ? 'true' : 'false' if defined $param->{aslines};
+      $post->{trusted} = $param->{trusted} ? 'true' : 'false' if defined $param->{trusted};
+   }
+
+   print STDERR "VERBOSE: Calling API: $path\n" if $self->verbose;
+
+   my $url = Mojo::URL->new($path);
+
+   my @args = ( $url => $headers );
+   @args = ( $url => $headers => json => $post ) if defined $post;
+
+   #print STDERR "DEBUG: args: ".Data::Dumper::Dumper(\@args)."\n";
+
+RETRY:
+   my $res;
+   eval {
+      $res = $ua->$method(@args)->result;
+   };
+   if ($@) {
+      chomp($@);
+      print STDERR "WARNING: ASD API call failed: [$@], retrying...\n" unless $self->silent;
+      goto RETRY;
+   }
+   unless ($res->is_success) {
+      my $code = $res->code;
+      # Not JSON result:
+      unless (defined($res->json)) {
+         my $text = $res->message;
+         print STDERR "ERROR: ASD API call failed: $code, $text\n";
+         return;
+      }
+      #print Data::Dumper::Dumper($res->body)."\n";
+      my $json = $res->json;
+      # If code 429, retry with some sleep:
+      if ($code == 429) {
+         print STDERR "WARNING: Too fast, sleeping before retry...\n" unless $self->silent;
+         sleep 1;
+         goto RETRY;
+      }
+      # Otherwise, stops and display error:
+      print STDERR "ERROR: ASD API call failed: $code, ".encode_json($json)."\n"
+         unless $self->silent;
+      return;
+   }
+
+   my $data;
+   if (defined($param) && $param->{aslines}) {
+      my @lines = split(/\r?\n/, $res->body);
+      $data = \@lines;
+   }
+   else {
+      $data = $res->json;
+   }
+   $cb->($data, $cb_args);
+
+   return 1;
+}
+
+sub asd_tld ($self, $target, $param = undef, $cb = undef, $cb_args = undef) {
+   return $self->asd('post', '/asd/tld', $param, { domain => $target }, $cb, $cb_args);
+}
+
+sub asd_ns ($self, $target, $param = undef, $cb = undef, $cb_args = undef) {
+   return $self->asd('post', '/asd/ns', $param, { domain => $target }, $cb, $cb_args);
+}
+
+sub asd_task ($self, $taskid, $param = undef, $cb = undef, $cb_args = undef) {
+   return $self->asd('get', '/asd/task/'.$taskid, $param, undef, $cb, $cb_args);
+}
+
+sub asd_load_input ($self, $input) {
+   my $docs = [];
+   my @lines = read_file($input);
+   for (@lines) {
+      chomp;
+      s{(?:^\s*|\s*)$}{}g;
+      #utf8::encode($line);  # Not required, already in UTF-8
+      my ($k, $v) = split(/\s*[=:]\s*/, $_, 2);
+      next unless (defined($k) && defined($v));
+      $v =~ s{(?:^["']|["']$)}{}g;
+      push @$docs, $v;
+   }
+
+   return $docs;
+}
+
 1;
 
 __END__
@@ -776,7 +981,7 @@ Onyphe::Api - ONYPHE API
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (c) 2023, ONYPHE
+Copyright (c) 2024, ONYPHE SAS
 
 You may distribute this module under the terms of The BSD 3-Clause License.
 See LICENSE file in the source distribution archive.

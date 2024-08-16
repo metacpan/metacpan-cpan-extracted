@@ -21,11 +21,17 @@ package YATT::Lite::LRXML; use YATT::Lite::LRXML;
 #   [aref => [[var => i], [var => j]]
 
 sub _parse_text_entities {
-  (my MY $self, local $_, my $proceed) = @_;
+  my MY $self = shift;
+  $self->_parse_text_entities_at($self->{curpos}, @_);
+}
+sub _parse_text_entities_at {
+  my MY $self = $_[0];
+  local ($self->{curpos}, $_) = @_[1,2];
   my ($curpos, $endpos) = ($self->{curpos});
+  my $offset = $curpos;
   my @result;
   {
-    local $self->{curpos};
+
     my $total = length $_;
     while (s{^(.*?)$$self{re_entopn}}{}xs) {
       if (length $1) {
@@ -35,12 +41,9 @@ sub _parse_text_entities {
       }
       push @result, my $node = $self->mkentity($curpos, undef, $self->{endln});
       $curpos = $total - length $_;
-      $node->[NODE_END] = $curpos;
+      $node->[NODE_END] = $curpos + $offset;
     }
     $endpos = $self->{curpos};
-  }
-  if ($proceed) {
-    $self->{curpos} = $endpos;
   }
   if (@result) {
     push @result, $_ if length $_;
@@ -88,6 +91,9 @@ sub _parse_entpath {
 }
 sub _parse_pipeline {
   (my MY $self) = @_;
+  unless (defined $_) {
+    Carp::confess "parse_pipeline for undefined \$_!";
+  }
   my @pipe;
   while (s{^ : (?<var>\w+) (?<open>\()?
 	 | ^ (?<open>\[)
@@ -96,14 +102,14 @@ sub _parse_pipeline {
     my $type = $+{open} ? $table->{$+{open}}
       : @pipe ? 'prop' : 'var';
     push @pipe, do {
-      if (not @pipe and $+{hash}) {
-	[$type, $self->_parse_hash]
-      } else {
+      # if (not @pipe and $+{hash}) {
+      #   [$type, $self->_parse_hash]
+      # } else {
 	[$type, defined $+{var} ? $+{var} : ()
 	 , $+{open}
 	 ? $self->_parse_entgroup($close_ch{$+{open}}, $for_expr{$type})
 	 : ()];
-      }
+      # }
     };
   }
   if (wantarray) {

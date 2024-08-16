@@ -102,8 +102,9 @@ sub _build_datetime {
 sub _load_room {
 	my $self = shift;
 	return $self->SUPER::_load_room unless exists($self->schedref->{room});
-	return SReview::Schedule::Yaml::Room->new(schedref => $self->schedref->{room}) if (ref $self->schedref->{room} eq "HASH");
-	return SReview::Schedule::Base::Room->new(name => $self->schedref->{room});
+	return $self->event_object->root_object->room_type->new(schedref => $self->schedref->{room}, event_object => $self->event_object) if (ref $self->schedref->{room} eq "HASH");
+	# Not $self->room_type here, because we're falling back on the Base type
+	return SReview::Schedule::Base::Room->new(name => $self->schedref->{room}, event_object => $self->event__object);
 }
 
 sub _load_slug {
@@ -163,7 +164,7 @@ sub _load_upstreamid {
 sub _load_track {
 	my $self = shift;
 	if(exists $self->schedref->{track}) {
-		return SReview::Schedule::Yaml::Track->new(schedref => $self->schedref->{track});
+		return $self->event_object->root_object->track_type->new(schedref => $self->schedref->{track}, talk_object => $self);
 	} else {
 		return $self->SUPER::_load_track;
 	}
@@ -193,9 +194,10 @@ sub _load_speakers {
 	my $rv = [];
 	foreach my $speaker(@{$self->schedref->{speakers}}) {
 		if(ref $speaker eq 'HASH') {
-			push @$rv, SReview::Schedule::Base::Speaker->new(%$speaker);
+			push @$rv, $self->event_object->root_object->speaker_type->new(%$speaker, talk_object => $self);
 		} else {
-			push @$rv, SReview::Schedule::Base::Speaker->new(name => $speaker);
+			# Fall back on base implemetentation
+			push @$rv, SReview::Schedule::Base::Speaker->new(name => $speaker, talk_object => $self);
 		}
 	}
 	return $rv;
@@ -224,7 +226,10 @@ sub _load_talks {
 	my $self = shift;
 	my $tz = $self->schedref->{timezone};
 	foreach my $talk(@{$self->schedref->{talks}}) {
-		push @$rv, SReview::Schedule::Yaml::Talk->new(schedref => $talk, timezone => $self->timezone);
+		push @$rv, $self->root_object->talk_type->new(schedref => $talk,
+						 timezone => $self->timezone,
+						 event_object => $self,
+					 );
 	}
 	return $rv;
 }
@@ -253,11 +258,28 @@ sub _load_events {
 	my $yaml = Load($self->_get_raw);
 	my %args = (
 		schedref => $yaml,
+		root_object => $self,
 	);
 	if($self->has_timezone) {
 		$args{timezone} = $self->timezone;
 	}
-	return [SReview::Schedule::Yaml::Event->new(%args)];
+	return [$self->event_type->new(%args)];
+}
+
+sub _load_event_type {
+	return "SReview::Schedule::Yaml::Event";
+}
+
+sub _load_talk_type {
+	return "SReview::Schedule::Yaml::Talk";
+}
+
+sub _load_room_type {
+	return "SReview::Schedule::Yaml::Room";
+}
+
+sub _load_track_type {
+	return "SReview::Schedule::Yaml::Track";
 }
 
 no Moose;

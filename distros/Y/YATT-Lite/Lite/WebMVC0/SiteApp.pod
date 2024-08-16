@@ -62,7 +62,7 @@ Usually, F<$FindBin::Bin/html>
 
 =head2 app_ns
 
-Namespace of per-directory L<YATT::Lite> class. Default is C<MyApp>.
+Namespace of per-directory L<YATT::Lite> class. Default is C<MyYATT>.
 This will also be used as a base class of each C<YATT::Lite> instances.
 This class will be loaded at startup (but can be missing).
 If it exists, it must be a subclass of C<YATT::Lite>.

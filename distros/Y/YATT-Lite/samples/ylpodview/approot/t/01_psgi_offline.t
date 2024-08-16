@@ -38,7 +38,6 @@ ok(my $SITE = YATT::Lite::Factory->find_load_factory_script
 $SITE->configure(debug_psgi => 0
 		 , debug_backend => 0
 		 , debug_connection => 0
-		 , session_debug => 0
 		 , logfile => undef
                  , site_prefix => ""
 		);

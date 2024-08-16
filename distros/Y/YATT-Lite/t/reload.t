@@ -25,7 +25,9 @@ describe "mode: reload requested only", sub {
   MY->mkfile("$dir/html/bar.yatt", qq{<h2>bar</h2>});
 
   my $site = YATT::Lite::WebMVC0::SiteApp
-    ->new(app_ns => "Test$testno", app_root => $dir, doc_root => "$dir/html");
+    ->new(app_ns => "Test$testno", app_root => $dir, doc_root => "$dir/html"
+          , always_refresh_deps => 0
+        );
 
   my $yatt_vfs = $site->get_yatt('/')->get_vfs;
 

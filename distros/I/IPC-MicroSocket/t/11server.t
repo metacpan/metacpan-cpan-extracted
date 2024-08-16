@@ -3,7 +3,7 @@
 use v5.36;
 
 use Test2::V0;
-use Test::Future::IO 0.05;
+use Test::Future::IO 0.06;
 
 use Object::Pad 0.800;
 use Future::AsyncAwait;

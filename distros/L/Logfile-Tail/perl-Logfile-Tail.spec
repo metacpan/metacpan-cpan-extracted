@@ -1,5 +1,5 @@
 Name:           perl-Logfile-Tail
-Version:        0.7
+Version:        0.9
 Release:        1%{?dist}
 Summary:        Tail log files
 License:        GPLv2+ and Artistic 2.0
@@ -8,6 +8,11 @@ URL:            http://www.adelton.com/perl/Logfile-Tail/
 Source0:        http://www.adelton.com/perl/Logfile-Tail/Logfile-Tail-%{version}.tar.gz
 BuildRoot:      %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 BuildArch:      noarch
+BuildRequires:  make
+%if 0%{?rhel} > 7 || 0%{?rhel} == 0
+BuildRequires:  perl-generators
+%endif
+BuildRequires:  perl-interpreter
 BuildRequires:  perl(Digest::SHA)
 BuildRequires:  perl(ExtUtils::MakeMaker)
 BuildRequires:  perl(Test::More)
@@ -41,9 +46,6 @@ find $RPM_BUILD_ROOT -depth -type d -exec rmdir {} 2>/dev/null \;
 %check
 make test
 
-%clean
-rm -rf $RPM_BUILD_ROOT
-
 %files
 %defattr(-,root,root,-)
 %{_bindir}/logfile-tail
@@ -53,6 +55,10 @@ rm -rf $RPM_BUILD_ROOT
 %{_mandir}/man3/*
 
 %changelog
+* Fri Aug 16 2024 Jan Pazdziora 0.9-1
+- Clear the EOF flag to allow for repeated read,
+  fixing compatibility issue with latest perls.
+
 * Tue Mar 13 2012 Jan Pazdziora 0.7-1
 - Renamed module to Logfile::Tail and the script to logfile-tail.
 

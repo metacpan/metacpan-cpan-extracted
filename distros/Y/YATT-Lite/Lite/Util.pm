@@ -3,10 +3,13 @@ use strict;
 use warnings qw(FATAL all NONFATAL misc);
 use constant DEBUG_LOOKUP_PATH => $ENV{DEBUG_YATT_UTIL_LOOKUP_PATH};
 
+use Encode ();
+
 use URI::Escape ();
 use Tie::IxHash;
 
 require Scalar::Util;
+require File::Spec;
 
 {
   package YATT::Lite::Util;
@@ -17,9 +20,11 @@ require Scalar::Util;
 		     untaint_any ckeval ckrequire untaint_unless_tainted
 		     dict_sort terse_dump catch
 		     nonempty
+		     empty
 		     subname
 		     pkg2pm
 		     globref_default
+                     dumpout
 		   /;
   }
   use Carp;
@@ -37,6 +42,9 @@ require Scalar::Util;
 
   sub nonempty {
     defined $_[0] && $_[0] ne '';
+  }
+  sub empty {
+    not defined $_[0] or $_[0] eq '';
   }
 
   sub define_const {
@@ -73,11 +81,31 @@ require Scalar::Util;
     return undef unless defined $symtab->{$name};
     globref($class, $name);
   }
+  sub call_ns_function_or_default {
+    my ($class, $funcname, $default) = @_;
+    my $symtab = symtab($class);
+    my ($glob, $code);
+    if (defined ($glob = $symtab->{$funcname})
+        and ($code = *{$glob}{CODE})) {
+      $code->()
+    } else {
+      $default;
+    }
+  }
+  sub ns_filename {
+    my ($ns) = @_;
+    if (my $fn = call_ns_function_or_default($ns, 'filename')) {
+      "$ns \[$fn]"
+    } else {
+      $ns;
+    }
+  }
   sub fields_hash {
     my $sym = look_for_globref(shift, 'FIELDS')
       or return undef;
     *{$sym}{HASH};
   }
+  # XXX: should be renamed to lhexpand
   sub lexpand {
     # lexpand can be used to counting.
     unless (defined $_[0]) {
@@ -147,12 +175,24 @@ require Scalar::Util;
   sub ckrequire {
     ckeval("require $_[0]");
   }
+
+  #
+  # permissive_require($modName) allows you to load other module without worrying
+  # about their internal use of `eval { require OtherMod }` which misfires the error_handler of
+  # YATT::Lite::WebMVC0::DirApp.
+  #
+  sub permissive_require {
+    local ($SIG{__DIE__}, $SIG{__WARN__});
+    ckrequire($_[0]);
+  }
+
   use Scalar::Util qw(refaddr);
   sub cached_in {
-    my ($dir, $dict, $name, $sys, $mark, $loader, $refresher) = @_;
+    my ($dir, $dict, $nameSpec, $sys, $mark, $loader, $refresher) = @_;
+    my ($name) = lexpand($nameSpec);
     if (not exists $dict->{$name}) {
-      my $item = $dict->{$name} = $loader ? $loader->($dir, $sys, $name)
-	: $dir->load($sys, $name);
+      my $item = $dict->{$name} = $loader ? $loader->($dir, $sys, $nameSpec)
+	: $dir->load($sys, $nameSpec);
       $mark->{refaddr($item)} = 1 if $item and $mark;
       $item;
     } else {
@@ -161,7 +201,7 @@ require Scalar::Util;
 	      and (not $mark or not $mark->{refaddr($item)}++)) {
 	# nop
       } elsif ($refresher) {
-	$refresher->($item, $sys, $name)
+	$refresher->($item, $sys, $nameSpec)
       } elsif (my $sub = UNIVERSAL::can($item, 'refresh')) {
 	$sub->($item, $sys);
       }
@@ -234,13 +274,14 @@ require Scalar::Util;
   }
 
   sub lookup_path {
-    my ($path_info, $dirlist, $index_name, $want_ext, $use_subpath) = @_;
+    my ($path_info, $dirlist, $index_name, $ext_list, $use_subpath) = @_;
     $index_name //= 'index';
-    $want_ext //= '.yatt';
-    my $ixfn = $index_name . $want_ext;
+    my ($ext1, @ext) = lexpand($ext_list);
+    $ext1 //= "yatt";
+    my $ixfn = $index_name . ".$ext1";
     my @dirlist = grep {defined $_ and -d $_} @$dirlist;
     print STDERR "dirlist" => terse_dump(@dirlist), "\n" if DEBUG_LOOKUP_PATH;
-    my $pi = $path_info;
+    my $pi = normalize_path($path_info);
     my ($loc, $cur, $ext) = ("", "");
   DIG:
     while ($pi =~ s{^/+([^/]+)}{}) {
@@ -255,16 +296,21 @@ require Scalar::Util;
 	} elsif ($pi =~ m{^/} and -d $base) {
 	  # path_info has '/' and directory exists.
 	  next; # candidate
-	} elsif (-r (my $fn = "$base$want_ext")) {
-	  return ($dir, "$loc/", "$cur$want_ext", $pi);
-	} elsif ($use_subpath
-		 and -r (my $alt = "$dir$loc/$ixfn")) {
-	  $ext //= "";
-	  return ($dir, "$loc/", $ixfn, "/$cur$ext$pi", 1);
 	} else {
-	  # Neither dir nor $cur$want_ext exists, it should be ignored.
-	  undef $dir;
-	}
+          foreach my $want_ext ($ext1, @ext) {
+            if (-r (my $fn = "$base.$want_ext")) {
+              return ($dir, "$loc/", "$cur.$want_ext", $pi);
+            }
+          }
+          if ($use_subpath
+              and -r (my $alt = "$dir$loc/$ixfn")) {
+            $ext //= "";
+            return ($dir, "$loc/", $ixfn, "/$cur$ext$pi", 1);
+          } else {
+            # Neither dir nor $cur$want_ext exists, it should be ignored.
+            undef $dir;
+          }
+        }
       }
     } continue {
       $loc .= "/$cur";
@@ -282,6 +328,37 @@ require Scalar::Util;
 
       print STDERR terse_dump('at_last'), "\n" if DEBUG_LOOKUP_PATH;
     return;
+  }
+
+  # Shamelessly stolen (with slight mod) from Dancer2::FileUtils::normalize_path
+  our $seqregex = qr{
+                      [^/]*       # anything without a slash
+                      /\.\.(/|\z) # that is accompanied by two dots as such
+                  }x;
+  sub normalize_path {
+
+    # this is a revised version of what is described in
+    # http://www.linuxjournal.com/content/normalizing-path-names-bash
+    # by Mitch Frazier
+    my $path = shift or return;
+
+    $path =~ s{/\./}{/}g;
+    1 while $path =~ s{$seqregex}{};
+
+    #see https://rt.cpan.org/Public/Bug/Display.html?id=80077
+    $path =~ s{^//}{/};
+    return $path;
+  }
+
+
+  sub trim_common_suffix_from {
+    @_ == 2 or Carp::croak "trim_common_suffix_from(FROM, COMPARE)";
+    my @from = File::Spec->splitdir($_[0]);
+    my @comp = File::Spec->splitdir($_[1]);
+    while (@from and @comp and $from[-1] eq $comp[-1]) {
+      pop @from; pop @comp;
+    }
+    File::Spec->catfile(@from);
   }
 
   sub dict_order {
@@ -305,18 +382,51 @@ require Scalar::Util;
   sub dict_sort (@) {
     map {$_->[0]} sort {dict_order($a,$b)} map {[$_, split /(\d+)/]} @_;
   }
+  sub dict_sort_by_nth ($@) {
+    my $nth = shift;
+    map {$_->[0]}
+    sort {dict_order($a,$b)}
+    map {[$_, split /(\d+)/, $$_[$nth]]} @_;
+  }
 
-  sub captured (&) {
-    my ($code) = @_;
-    open my $fh, '>', \ (my $buffer = "") or die "Can't create capture buf:$!";
-    $code->($fh);
+  sub combination (@) {
+    my $comb; $comb = sub {
+      my $prefix = shift;
+      return $prefix unless @_;
+      my ($list, @rest) = @_;
+      if (@rest) {
+        map {$comb->([@$prefix, $_], @rest)} @$list;
+      } else {
+        map {[@$prefix, $_]} @$list;
+      }
+    };
+    $comb->([], @_);
+  }
+
+  sub captured (&;$) {
+    my ($code, $keep_utf8) = @_;
+    my $buffer = "";
+    {
+      open my $fh, '>:utf8', \ $buffer
+        or die "Can't create capture buf:$!";
+      $code->($fh);
+    }
+    if ($keep_utf8 // 1) {
+      Encode::_utf8_on($buffer);
+    }
     $buffer;
   }
 
   sub terse_dump {
     require Data::Dumper;
     join ", ", map {
-      Data::Dumper->new([$_])->Terse(1)->Indent(0)->Dump;
+      Data::Dumper->new([$_])->Terse(1)->Indent(0)->Sortkeys(1)->Dump;
+    } @_;
+  }
+  sub indented_dump {
+    require Data::Dumper;
+    join ", ", map {
+      Data::Dumper->new([$_])->Terse(1)->Indent(1)->Sortkeys(1)->Dump;
     } @_;
   }
 
@@ -331,6 +441,17 @@ require Scalar::Util;
     eval { $sub->() };
     $@;
   }
+}
+
+sub add_entity_into {
+  my ($pack, $destns, $name, $sub, $allow_ignore) = @_;
+  my $longname = join "::", $destns, "entity_$name";
+  my $glob = globref($destns, "entity_$name");
+  if (*{$glob}{CODE} and $allow_ignore) {
+    return;
+  }
+  subname($longname, $sub);
+  *$glob = $sub;
 }
 
 sub dofile_in {
@@ -399,7 +520,7 @@ BEGIN {
 	} else {
 	  # XXX: Is this secure???
 	  # XXX: Should be JSON?
-	  my $copy = terse_dump($str);
+	  my $copy = indented_dump($str);
 	  $copy =~ s{([<\"]|-->)}{$escape{$1}}g; # XXX: Minimum. May be insecure.
 	  $copy;
 	}
@@ -470,7 +591,7 @@ sub named_attr {
 		     , radio => [1, 0]
 		     , checkbox => [2, 1]);
   sub att_value_in {
-    my ($in, $type, $name, $formal_value, $as_value) = @_;
+    my ($in, $type, $name, $formal_value, $as_value, $is_default) = @_;
     defined (my $spec = $input_spec{$type})
       or croak "Unknown type: $type";
 
@@ -503,7 +624,7 @@ sub named_attr {
       push @res, qq|value="@{[escape($as_value)]}"|;
     }
 
-    if (find_value_in($in, $name, $formal_value)) {
+    if (find_value_in($in, $name, $formal_value, $is_default)) {
       push @res, $typeid ? "checked" : "selected";
     }
 
@@ -511,20 +632,22 @@ sub named_attr {
   }
 
   sub find_value_in {
-    my ($in, $name, $formal_value) = @_;
+    my ($in, $name, $formal_value, $is_default) = @_;
+
+    if (ref $in eq 'HASH') {
+      return $in->{$formal_value};
+    }
 
     my $actual_value = do {
-      if (my $sub = $in->can("param")) {
+      if (my $sub = UNIVERSAL::can($in, "param")) {
 	$sub->($in, $name);
-      } elsif (ref $in eq 'HASH') {
-	$in->{$name};
       } else {
-	croak "Can't extract parameter from $in";
+	undef;
       }
     };
 
     if (not defined $actual_value) {
-      0
+      $is_default ? 1 : 0
     } elsif (not ref $actual_value) {
       $actual_value eq $formal_value
     } elsif (ref $actual_value eq 'HASH') {
@@ -538,17 +661,24 @@ sub named_attr {
 }
 
 # Verbatimly stolen from CGI::Simple
+# XXX: not used?
 sub url_decode {
   my ( $self, $decode ) = @_;
   return () unless defined $decode;
   $decode =~ tr/+/ /;
   $decode =~ s/%([a-fA-F0-9]{2})/ pack "C", hex $1 /eg;
+  # XXX: should set utf8 flag too?
   return $decode;
 }
 
 sub url_encode {
   my ( $self, $encode ) = @_;
   return () unless defined $encode;
+
+  if (Encode::is_utf8($encode)) {
+    $encode = Encode::encode_utf8($encode);
+  }
+
   # XXX: Forward slash (and ':') is allowed, for cleaner url. This may break...
   $encode
     =~ s{([^A-Za-z0-9\-_.!~*'() /:])}{ uc sprintf "%%%02x",ord $1 }eg;
@@ -578,7 +708,7 @@ sub encode_query {
       my @res;
       while (my ($k, $v) = splice @param, 0, 2) {
 	my $ek = url_encode($self, $k);
-	push @res, $ek . '='. url_encode($self, $_)
+	push @res, $ek . '='. (url_encode($self, $_) // '')
 	  for ref $v ? @$v : $v;
       }
       @res;
@@ -684,7 +814,8 @@ sub try_invoke {
   my $obj = shift;
   my ($method, @args) = lexpand(shift);
   my $default = shift;
-  if (my $sub = UNIVERSAL::can($obj, $method)) {
+  if (defined $obj
+      and my $sub = UNIVERSAL::can($obj, $method)) {
     $sub->($obj, @args);
   } else {
     wantarray ? () : $default;
@@ -748,9 +879,68 @@ sub secure_text_plain {
    );
 }
 
+#========================================
+
+# Just a wrapper (and hook) for die. $self is ignored.
+sub raise_response {
+  my ($self, $response) = @_;
+  die $response;
+}
+
+#
+# $this->raise_download($fileName, $bytesOrBytesRef, ?[@header]?)
+#
+sub raise_download {
+  my $this = $_[0];
+  my $filename = $_[1];
+  my $bytesRef = ref $_[2] eq 'SCALAR' ? $_[2] : \$_[2];
+  my @header = ("Content-type" => qq{application/octet-stream},
+                , "Content-Length" => length($$bytesRef));
+  push @header, "Content-Disposition" => qq{attachment; filename="$filename"}
+    if defined $filename and $filename ne '';
+  if (defined $_[3] and ref $_[3]) {
+    push @header, lexpand($_[3]);
+  }
+
+  $this->raise_response([200, \@header, [$$bytesRef]]);
+}
+
+#========================================
+
+foreach my $what (qw(error text dump)) {
+  my $actual = "psgi_$what";
+  my $sub = __PACKAGE__->can($actual);
+  my $method = "raise_$actual";
+  *{globref($method)} = sub {
+    my $self = shift;
+    $self->raise_response($sub->($self, @_));
+  };
+}
+
 sub psgi_error {
   my ($self, $status, $msg, @rest) = @_;
-  return [$status, [$self->secure_text_plain, @rest], [escape($msg)]];
+  my $escaped = escape($msg);
+  Encode::_utf8_off($escaped);
+  return [$status, [$self->secure_text_plain, @rest]
+          , [$escaped
+             , $msg =~ /\n\z/ ? () : "\n" ]];
+}
+
+sub psgi_text {
+  my ($self, $statusAndHeader, @args) = @_;
+  my ($status, @header) = ref $statusAndHeader ? @$statusAndHeader : $statusAndHeader;
+  return [$status, [$self->secure_text_plain, @header], \@args];
+}
+
+sub psgi_dump {
+  my $self = shift;
+  [200
+   , [$self->secure_text_plain]
+   , [join("\n", map {terse_dump($_)} @_)."\n"]];
+}
+
+sub dumpout (@) {
+  __PACKAGE__->raise_psgi_dump(@_);
 }
 
 sub ixhash {
@@ -784,6 +974,9 @@ sub parse_nested_query {
 
 sub normalize_params {
   my ($params, $name, $v) = @_;
+  if ($name eq '[]' and defined $v) {
+    return [$v];
+  }
   my ($k) = $name =~ m(\A[\[\]]*([^\[\]]+)\]*)
     or return;
 
@@ -817,10 +1010,115 @@ sub normalize_params {
   $params;
 }
 
+# Ported (with API modification) from: Rack::Utils.build_nested_query
+sub build_nested_query {
+  my ($self, $hash, $opts) = @_;
+  my $ignore = ref $opts->{ignore} eq 'HASH'
+    ? $opts->{ignore}
+    : +{map {$_ => 1} @{$opts->{ignore}}};
+  join $opts->{sep} // '&'
+    , map {
+      if ($ignore and $ignore->{$_}) {
+        ()
+      } else {
+	my $v = $hash->{$_};
+	my $k = url_encode($self, $_); # URI::Escape::uri_escape does too much.
+	$k =~ tr/ /+/;
+        build_nested_query_value($self, $v, $k);
+      }
+    } keys %$hash;
+}
+
+sub build_nested_query_value {
+  my ($self, $value, $prefix) = @_;
+  if (not defined $value) {
+    $prefix;
+  } elsif (ref $value eq 'ARRAY') {
+    map {
+      build_nested_query_value($self, $_, $prefix."[]");
+    } @$value;
+  } elsif (ref $value eq 'HASH' or UNIVERSAL::can($value, 'keys')) {
+    map {
+      my $escaped = URI::Escape::uri_escape_utf8($_);
+      my $key = $prefix ? $prefix."[$escaped]" : $escaped;
+      $key =~ tr/ /+/;
+      build_nested_query_value($self, $value->{$_}, $key);
+    } keys %$value;
+  } elsif (not defined $prefix) {
+    Carp::croak "value must be a Hash: ". terse_dump($value);
+  } else {
+    $prefix."=".URI::Escape::uri_escape_utf8($value);
+  }
+}
+
 sub pkg2pm {
   my ($pack) = @_;
   $pack =~ s{::|'}{/}g;
   "$pack.pm";
+}
+
+sub dputs {
+  (undef, undef, my $line) = caller(0);
+  (undef, undef, undef, my $func) = caller(1);
+  print STDERR "# $func $line: ", (map {
+    if (defined $_ and not ref $_) {
+      $_
+    } else {
+      terse_dump($_)
+    }
+  } @_), "\n";
+}
+
+sub is_done {
+  defined $_[0] and ref $_[0] eq 'SCALAR' and not ref ${$_[0]}
+    and ${$_[0]} eq 'DONE';
+}
+
+sub rewind {
+  if ($_[0]->can("rewind")) {
+    $_[0]->rewind
+  } else {
+    seek $_[0], 0, 0;
+    truncate $_[0], 0;
+  }
+}
+
+sub merge_hash_renaming (&@) {
+  my ($code, $base, @overlay) = @_;
+  my $result = +{%$base};
+  foreach my $hash (@overlay) {
+    local $_;
+    foreach (keys %$hash) {
+      if ($code) {
+        my ($renamed) = $code->($_)
+          or next;
+        $result->{$renamed} = $hash->{$_};
+      } else {
+        $result->{$_} = $hash->{$_};
+      }
+    }
+  }
+  $result;
+}
+
+sub trimleft_length {
+  shift;
+  return $_[0] unless length $_[0];
+  substr($_[0], length($_[1]));
+}
+
+sub reencode_malformed_utf8 {
+  my ($str, $fallback_flag) = @_;
+  Encode::_utf8_off($str);
+  my $bytes = Encode::decode_utf8($str, $fallback_flag // Encode::FB_XMLCREF);
+  Encode::_utf8_on($bytes);
+  $bytes;
+}
+
+sub get_entity_symbol {
+  my ($pack, $entns, $entity_name) = @_;
+  my $symbol_name = join("_", entity => $entity_name);
+  look_for_globref($entns, $symbol_name);
 }
 
 #

@@ -32,10 +32,24 @@ sub safe_globref {
   globref($pack_or_obj, $name);
 }
 
+sub maybe_globref {
+  my ($pack_or_obj, $name) = @_;
+  unless (defined symtab($pack_or_obj)->{$name}) {
+    return undef;
+  }
+  globref($pack_or_obj, $name);
+}
+
 sub fields_hash {
   my $sym = fields_symbol(@_);
   # XXX: return \%{*$sym}; # If we use this, we get "used only once" warning.
   ensure_symbol_has_hash($sym);
+}
+
+sub maybe_fields_hash {
+  my $sym = maybe_globref($_[0], 'FIELDS')
+    or return undef;
+  *{$sym}{HASH};
 }
 
 sub safe_fields_hash {

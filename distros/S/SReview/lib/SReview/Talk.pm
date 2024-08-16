@@ -195,6 +195,29 @@ sub _load_comment {
         return $row->{comments};
 }
 
+=head2 first_comment
+
+The most recent comment entered in the "other brokenness" field.
+
+=cut
+
+has 'first_comment' => (
+	lazy => 1,
+	is => 'rw',
+	builder => '_load_first_comment',
+	clearer => 'clear_first_comment',
+	predicate => 'has_first_comment',
+);
+
+sub _load_first_comment {
+	my $self = shift;
+
+	my $st = $pg->db->dbh->prepare("WITH orderedlog(talk, comment) AS (SELECT talk, comment FROM commentlog ORDER BY logdate DESC) SELECT talk, logdate FROM orderedlog WHERE talk = ? LIMIT 1");
+	$st->execute($self->talkid);
+	my $row = $st->fetchrow_hashref;
+	return $row->{comment};
+}
+
 =head2 corrected_times
 
 The start- and endtime of the talk, with corrections (if any) applied.
@@ -320,7 +343,14 @@ has 'event_output' => (
 );
 
 sub _load_event_output {
-	return shift->_get_pathinfo->{raw}{event_output};
+	my $self = shift;
+
+	my $rv = $self->_get_pathinfo->{raw}{event_output};
+	if(!defined($rv) || length($rv) == 0) {
+		$rv = $self->_get_pathinfo->{raw}{event};
+		$rv =~ s/[^a-zA-Z0-9]/-/g;
+	}
+	return $rv;
 }
 
 =head2 progress
@@ -754,6 +784,7 @@ sub _load_eventurl {
 			event => $self->eventname,
 			event_output => $self->event_output,
 			talk => $self,
+			room_output => $self->_get_pathinfo->{raw}{room_output} // $self->_get_pathinfo->{raw}{room},
 			year => $self->_get_pathinfo->{raw}{year}});
 		chomp $rv;
 		return $rv;

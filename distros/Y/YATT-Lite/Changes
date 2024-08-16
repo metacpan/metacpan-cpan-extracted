@@ -1,5 +1,198 @@
 Revision history for YATT::Lite
 
+0.110 2024-08-16
+    * GH-216, GH-217 - More LRXML parser fix (for Language Server)
+
+0.101_103 2023-12-05
+    * GH-214 - Drop use of deprecated `given` syntax
+    * GH-211 - Allow `*.ydo` to reurn PSGI tuple directly
+    * GH-209 - Fix incorrect error of dynamic module loading while rendering
+    * GH-207 - Fix error_response handling for per_role_docroot mode
+    * GH-206 - Fix is_index mis-detection
+    * GH-205 - `&yatt:script_uri;` now cares HTTP_X_FORWARDED_PROTO
+    * GH-204 - (Emacs) fix yatt-mode background face
+    * GH-203 - Allow loading multiple app.psgi in a process
+
+    * Drop perl 5.10
+
+0.101_102 2020-10-17
+    * GH-202 - fixed some test failures
+
+0.101_100 2020-10-15
+    * Security fixes
+         - GH-197 - fix relative path traversal in path_info mode (which is not normally used until recently) 
+
+    * (Possibly breaking) API changes
+         - GH-191 - EXPERIMENTAL SYNTAX CHANGE. `:` is no longer key-pair separator in hash literals 
+         - GH-173 - Change default encoding to utf-8 
+         - GH-171 - subpath '/' should be silently ignored (if no match rule is defined)
+         - GH-166 - `ydo` filename extensions should be omissible as like `yatt` is.
+         - GH-158 - Change Session2 to State::Cookie only for better cookie support
+         - GH-150 - Treat request sigils in query_string of POST as default choice
+         - GH-139 - Entpath `:value:name` should be interpreted as `$value->name` rather than `$value->{name}`, at least by default
+         - GH-121 - Change default app_ns from MyApp to MyYATT 
+         - GH-95 - Introduce new session API (Session2)
+         - GH-45 - YATT::Lite::Factory->render() now returns decoded string
+         - GH-19 - Change YATT::Lite::Util::find_value_in() - Simplify HASH case behavior
+         - GH-1 - Automatic reloading of *.ytmpl, .htyattrc.pl is now enabled by default
+
+    * New/changed YATT site-wide features/options
+
+         - GH-155 - New option: use_sibling_config_dir to put config files outside of app_root
+         - GH-126 - app.site_config.yml support
+         - GH-114 - Session::ExpiryFriendly support
+         - GH-109 - Alternative store for dir_config()
+         - GH-103, GH-18 - Filter out and/or gather (unknown) request parameters to `$env->{yatt.unknown_params}`
+         - GH-97 - Accept `config/$ENV{PLACK_ENV}.pl` as an alternative config script
+
+    * New/changed YATT Declarations
+         - GH-185 - Allow AppPath like `@ytmpl/foo.yatt` in `<!yatt:base>` 
+         - GH-192 - var="delegate" should be allowed too. 
+         - GH-179 - Allow yatt:action to be default handler in .yatt files
+         - GH-167 - Error diags for 'Too many arguments' 
+         - GH-128, GH-14 - Fix broken auto mapping of yatt:action parameters 
+         - GH-125 - `!yatt:entity` in yatt templates
+         - GH-120 - html type argument now behaves as "html?" by default 
+
+    * New/changed YATT Widgets
+         - GH-195 - yatt:foreach line number problem
+         - GH-193 - better syntax error reporting for garbage before CLO
+         - GH-170 - yatt:if now detects more syntax errors
+         - GH-153 - better error reporting for foreach list=xxx typo 
+         - GH-145 - newline after `<yatt:foreach>` should be omitted from template outputs
+         - GH-107 - change YATT::Lite::Util::escape() to use indentation. 
+         - GH-105 - Add destructuring bind and split operator
+         - GH-104 - New tag(macro): <yatt:return if="cond">...</yatt:return> 
+         - GH-101 - Each arm of yatt:if should create separate scope for yatt:my
+
+    * New/changed YATT Entities
+
+         - GH-174 - &yatt:localtime(); raises error
+         - GH-190 - :query_string({merge,...}) should not currupt original query parameters 
+         - GH-186 - Add merge option for `:query_string()` 
+         - GH-189 - Add :session_middleware and :session_csrf_token 
+         - GH-175 - Add :with_ignoring_die() entmacro, with suppress __DIE__ and __WARN__ handlers 
+         - GH-163 - Add :scalar() entmacro 
+         - GH-162 - Fix :file_location() to include dirapp name. 
+         - GH-152 - Change :mkhidden() to return all params by default. 
+         - GH-156 - :psgix_session() should call session_start() 
+         - GH-147 - :abspath(); and :absrequest();
+         - GH-142 - New entity macro - :not(), :and(), :or(), :undef(expr)
+         - GH-141 - :show_expr(..expr..) entmacro. 
+         - GH-140 - :__WIDGET__ entmacro. 
+         - GH-137 - :query_string(of,:hash_or_request,ignore,:name_list_or_hash,separator,:str)
+         - GH-108 :redirect() should set http status to 400 (Bad Request) for unexpected external URI
+         - GH-100 - :raise_dump(any_object,...) for debugging aid.
+         - GH-92 - :script_name() - reliable entity for path abstraction.
+         - GH-78 - Allow :name (without ()) as entmacro when option entity_prefer_call_over_hashref GH-139 is on. 
+
+    * New/changed CLI
+         - GH-194 - expose %ENV from yatt.render (but how about query_string?) 
+         - GH-160 - Add request sigil support for yatt render CLI. 
+         - GH-168 - yatt.lint dies when it gets `$cgen->generror($msg)`
+         - GH-134 - yatt info list_widgets
+         - GH-115 - WIP: `yatt call` to emulate PSGI offline. 
+
+    * Emacs/IDE support
+         - GH-188 - Add eglot support and use it as default. 
+         - GH-180 - Explicitly disable perl-minlint-mode for `*ydo` files 
+         - GH-161 (wip) - LSP(Language Server Protocol) support
+         - GH-146 - yatt:action section is not handled as perl-mode with recent sgml-mode + mmm-mode
+         - GH-143 - fix yatt-lint-any-mode to support tramp-version >= 2.3.2 
+         - GH-136 - tolerate yatt-mode-file-coding to nil by default. 
+         - GH-102 - fix yatt-mode yatt:action detection bug 
+
+
+    * Miscellaneous helper functions/methods.
+         - GH-200 - Add YATT::Lite::Util::permissive_require($modName) 
+         - GH-196 - Add `$factory->invoke_sub_in($loc, $args, $sub)` 
+         - GH-177 - Add `$site->get_entity_symbol($entns, $entity_name)` 
+         - GH-159 - `$YATT->render()` - add support for deep:widget:path 
+         - GH-138 - Port Rack::Utils.build_nested_query for serialization
+         - GH-131 Add `YATT::Lite::Util::dumpout()` with default export. 
+         - GH-106 - Change YATT::Lite::XHF->read_file_xhf to use `read_all` instead of `read` by default
+         - GH-82 - Introduce Connection->raise_response($psgi)
+
+    * Internal Enhancement
+         - GH-182 - Add support for HTTP_X_FORWARDED_PROTO to `$CON->mkurl` 
+         - GH-164 - alternative representation for internal node tree
+         - GH-122 - Now $vfs->find_file($fn) accepts "index.html.yatt" like multiple extension (to cooperate well with Mojolicious, Dancer2)
+         - GH-119 - New option body_argument, body_argument_type to customize `body` argument (to cooperate with Mojolicious and Dancer2).
+         - GH-117 - (wip) Overhaul `action` handling
+         - GH-111 - Merge debug_allowed_ip and allow_debug_from 
+         - GH-110 - Add support for REDIRECT_STATUS 
+         - GH-98 - Make terse_dump HASH output stable with Sortkeys. 
+         - GH-96 - `use ... -as_base` should set c3 mro.
+         - GH-26 - Make "use ... -as_base" behavior consistent
+
+    * Other Bug fixes
+
+         - GH-201 - prepare for error during flush_headers 
+         - GH-199 - DBSchema::DBIC - Add is_auto_increment if -autoincrement is specified.
+         - GH-198 - "package cl is deprecated" in emacs27. 
+         - GH-184 - show better error diag when POST parameters and QUERY_STRING conflicts 
+         - GH-181 - Remove forgotten DB::single
+         - GH-172 - Unreadable error diag "ARRAY(0x5609f9891f70)BEGIN failed--compilation aborted"
+         - GH-169 - fix xhf dump for empty arrays/hashes orz... 
+         - GH-165 - Add dump_strict_xhf() (xhf dump should not trim trailing newlines)
+         - GH-157 - Replace CGI::Cookie with Cookie::Baker 
+         - GH-151 - mount_static was broken after GH-124
+         - GH-148 - ErrorReporter should care error string with malformed utf8
+         - GH-144 - fix libdir.pl to care symlinked lib/YATT 
+         - GH-135 - session3 cookie
+         - GH-133 - fix broken tests 
+         - GH-132 - yattup now works again. 
+         - GH-130 - YATT::Lite->render() should not emit header. 
+         - GH-129 - YATT::Lite->render() should behave consistently with YATT::Lite::Factory->render()
+         - GH-124 - Fix mount_psgi
+         - GH-118 - fix lack of `SUPER::after_new()` calls.
+         - GH-113 - Fix tests for CGI mode
+         - GH-112 - BUG: `index.html` is passed to action_handler instead of yatt_handler when ext_public = `html`
+         - GH-99 - Now just plackup is enough for session2 example.
+
+
+
+0.101_001 2017-06-17
+    * (Possibly breaking) API changes
+         - [GH #84] Now yatt:args "/URL/{PATTERN}" is tested in written order.
+         - [GH #64] Use c3 mro for widget search by default.
+
+    * New/changed YATT Declarations
+         - [GH #54] <!yatt:base "file_or_directory">
+         - [GH #14] <!yatt:action "/URL/{PATTERN}">
+
+    * New/changed YATT Entities
+         - [GH #92] &yatt:script_name(); now respects Apache's Action+AddHandler
+         - [GH #74] &yatt:param(); is now equiv of &yatt:CON:param();.
+         - [GH #73] &yatt:coalesce(); now behaves like SQL's coalesce().
+         - [GH #70] &yatt:file_location(); and &yatt:is_current_page(page)
+
+    * Enhancement
+         - [GH #91] Better error reporting for XHF parser
+         - [GH #82] Add support for bufferedstreaming in raised response.
+         - [GH #80] Allow declaring types for routed args
+         - [GH #79] Site-wide special_entities
+         - [GH #71] Now delegate type can have argument list.
+         - [GH #69] YATT::Lite::Macro is now visible from subclasses.
+         - [GH #63] `Action NAME => SUB` support in `.htyattrc.pl`
+
+    * Miscellaneous helper functions.
+         - [GH #94] YATT::Lite::XHF->read_all()
+         - [GH #90] WebMVC0::Connection->delete_param
+         - [GH #82] Lite::Connection->raise_response($psgi_response).
+         - [GH #68] YATT::Lite::Factory->wrapped_by($outer_app) for Plack::Middleware.
+
+    * Bug fixes
+         - [GH #93] yatt:action arg detection should care DOS crlf too.
+         - [GH #83] Fix for bug "Safety level may not be changed inside a transaction"
+         - [GH #77] :CON:mkquery() now encode utf8 correctly.
+         - [GH #76] yatt:my code works for wide chars.
+         - [GH #75] Avoid use of error.ytmpl until code-generator becomes ready.
+         - [GH #74] Now yatt.render sets :CON:param() too.
+         - [GH #72] BUG: "Inconsistent hierarchy during C3 merge" occurs for complex inheritance.
+         - [GH #61] Adapt sprintf redundant arg warnings(5.22)
+
+
 0.101     2016-05-24
     * Just tagged 0.101 (from 0.100_003)
 

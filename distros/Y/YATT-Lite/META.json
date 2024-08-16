@@ -4,13 +4,13 @@
       "\"KOBAYASI, Hiroaki\" <hkoba@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.4214",
+   "generated_by" : "Module::Build version 0.4234",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "YATT-Lite",
    "prereqs" : {
@@ -22,20 +22,31 @@
       },
       "runtime" : {
          "recommends" : {
+            "AnyEvent::AIO" : "0",
             "B::Utils" : "!= 0.26",
+            "Coro" : "0",
+            "Coro::AIO" : "0",
             "Devel::StackTrace::WithLexicals" : "0.08",
+            "IO::AIO" : "0",
+            "Sub::Identify" : "0",
             "Sub::Inspector" : "0",
-            "YAML::Tiny" : "0"
+            "Test::Requires" : "0",
+            "Text::Glob" : "0",
+            "Time::Piece" : "0"
          },
          "requires" : {
-            "CGI" : "0",
+            "CGI" : "4.40",
+            "Cookie::Baker" : "0",
             "Devel::StackTrace" : "0",
+            "File::AddInc" : "0",
             "File::Path" : "0",
             "HTML::Entities" : "0",
             "Hash::MultiValue" : "0",
+            "JSON::MaybeXS" : "0",
             "List::MoreUtils" : "0",
             "List::Util" : "0",
             "Locale::PO" : "0",
+            "MOP4Import::Declare" : "0.052",
             "Plack" : "0",
             "Tie::IxHash" : "0",
             "URI::Escape" : "0",
@@ -47,9 +58,10 @@
       },
       "test" : {
          "requires" : {
+            "CGI::Compile" : "0",
+            "CGI::Emulate::PSGI" : "0",
             "CGI::Session" : "0",
             "DBD::SQLite" : "0",
-            "DBD::mysql" : "0",
             "DBIx::Class" : "0",
             "Email::Sender" : "0",
             "Email::Simple" : "0",
@@ -58,15 +70,18 @@
             "File::Temp" : "0",
             "File::stat" : "0",
             "HTML::Entities" : "0",
-            "HTTP::Cookies" : "0",
+            "HTTP::Cookies" : "6.02",
             "HTTP::Headers" : "0",
+            "Plack::Middleware::Session" : "0",
             "Plack::Test" : "0",
             "Pod::Simple::SimpleTree" : "0",
-            "Test::Differences" : "0",
+            "Test::Differences" : "0.67",
             "Test::Kantan" : "0",
             "Test::More" : "0",
+            "Test::Refcount" : "0",
             "Test::WWW::Mechanize::PSGI" : "0",
-            "Time::HiRes" : "0"
+            "Time::HiRes" : "0",
+            "YAML::Tiny" : "0"
          }
       }
    },
@@ -74,7 +89,11 @@
    "resources" : {
       "license" : [
          "http://dev.perl.org/licenses/"
-      ]
+      ],
+      "repository" : {
+         "url" : "https://github.com/hkoba/yatt_lite"
+      }
    },
-   "version" : "0.101"
+   "version" : "0.110",
+   "x_serialization_backend" : "JSON::PP version 4.16"
 }

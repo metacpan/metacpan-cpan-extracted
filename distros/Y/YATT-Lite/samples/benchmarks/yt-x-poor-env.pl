@@ -99,7 +99,7 @@ TEST: {
         file_cache_dir    => '.xslate_cache',
     );
 
-    my $yt = YATT::Lite->new(app_ns => 'MyApp'
+    my $yt = YATT::Lite->new(app_ns => 'MyYATT'
 			     , vfs => [dir => $path]);
 
     my $expected = $tx->render("$tmpl.tx", $vars);
@@ -159,7 +159,7 @@ TEST: {
             file_cache_dir    => '.xslate_cache',
         );
 
-    my $yt = YATT::Lite->new(app_ns => 'MyApp2'
+    my $yt = YATT::Lite->new(app_ns => 'MyYATT2'
 			     , vfs => [dir => $path]);
 
 

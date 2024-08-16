@@ -1,4 +1,4 @@
-(provide 'plist-bind)
+(require 'cl-lib)
 
 (defmacro plist-bind (vars form &rest body)
   "Extract specified VARS from FORM result
@@ -19,12 +19,13 @@ is expanded into:
 
   ;; This code is heavily borrowed from cl-macs.el:multiple-value-bind
   (let ((temp (make-symbol "--plist-bind-var--")))
-    (list* 'let* (cons (list temp form)
-		       (mapcar (function
-				(lambda (v)
-				  (list v (list 'plist-get temp `(quote ,v)))))
-			       vars))
-	   body)))
+    (cl-list* 'let*
+              (cons (list temp form)
+		    (mapcar (function
+			     (lambda (v)
+			       (list v (list 'plist-get temp `(quote ,v)))))
+			    vars))
+	      body)))
 
 (unless (get 'plist-bind 'edebug-form-spec)
   (put 'plist-bind 'edebug-form-spec '((&rest symbolp) form &rest form)))
@@ -34,3 +35,5 @@ is expanded into:
 ;; (macroexpand
 ;;  '(plist-bind (file line err) (list 'file "foo" 'line 3 'err "ERR")
 ;; 	      (message "file: %s line: %s err: %s" file line err)))
+
+(provide 'plist-bind)

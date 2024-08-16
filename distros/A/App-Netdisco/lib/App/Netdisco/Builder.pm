@@ -11,7 +11,7 @@ our $home;
 
 BEGIN {
     $home = ($ENV{NETDISCO_HOME} || $ENV{HOME});
-    $ENV{POETRY_CACHE_DIR} = File::Spec->catdir($home, 'python', 'cache', 'pypoetry');
+    $ENV{POETRY_CACHE_DIR} ||= File::Spec->catdir($home, 'python', 'cache', 'pypoetry');
 }
 
 sub ACTION_poetry {

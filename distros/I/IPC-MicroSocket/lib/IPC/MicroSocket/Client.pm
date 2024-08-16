@@ -6,11 +6,12 @@
 use v5.36;
 use Object::Pad 0.807;
 use Future::AsyncAwait;
+use Sublike::Extended;
 use Syntax::Keyword::Match;
 
 use IPC::MicroSocket;
 
-class IPC::MicroSocket::Client 0.01;
+class IPC::MicroSocket::Client 0.02;
 
 use Carp;
 
@@ -57,11 +58,10 @@ UNIX socket path.
 =cut
 
 # class method
-sub new_unix ( $class, %args )
+extended sub new_unix ( $class, :$path )
 {
    require IO::Socket::UNIX;
 
-   my $path = $args{path};
    my $sock = IO::Socket::UNIX->new( Peer => $path ) or
       croak "Cannot connect to server - $@";
 

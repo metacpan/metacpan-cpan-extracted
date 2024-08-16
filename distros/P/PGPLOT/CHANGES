@@ -1,3 +1,6 @@
+2.31 2024-08-15
+- move PDL::Graphics::LUT to this distro
+
 2.30 2024-07-29
 - restructure .pm under "lib", CI and doc tweaks
 

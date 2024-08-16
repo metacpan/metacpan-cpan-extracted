@@ -15,9 +15,21 @@ my $dist_root = "$FindBin::Bin/..";
 
 use File::Find;
 
+my @CORO = qw/Coro Coro::AIO AnyEvent/;
+my @M4I = qw/File::AddInc MOP4Import::Base::CLI_JSON/;
+
 my %prereq
   = ('YATT::Lite::WebMVC0::DBSchema::DBIC' => [qw/DBIx::Class::Schema/]
      , 'YATT::Lite::Test::TestFCGI' => [qw/HTTP::Response/]
+     , 'YATT::Lite::WebMVC0::Partial::Session3' => [qw/Session::ExpiryFriendly/]
+
+     , 'YATT::Lite::Inspector' => [@M4I, qw/Text::Glob/]
+     , 'YATT::Lite::LanguageServer' => [@M4I, @CORO]
+     , 'YATT::Lite::LanguageServer::Generic' => [@M4I, @CORO]
+     , 'YATT::Lite::LanguageServer::Protocol' => [@M4I]
+     , 'YATT::Lite::LanguageServer::SpecParser' => [@M4I]
+     , 'YATT::Lite::LanguageServer::Spec2Types' => [@M4I]
+     , 'YATT::Lite::LRXML::AltTree' => [@M4I]
     );
 
 my %ignore; map ++$ignore{$_}, ();
@@ -29,7 +41,7 @@ find {
   no_chdir => 1,
   wanted => sub {
   my $name = $File::Find::name;
-  return unless $name =~ m{\.pm$};
+  return unless $name =~ m{(?:^|/)\w+\.pm$};
   $name =~ s{^\Q$dist_root\E/}{YATT/};
   $name =~ s{/}{::}g;
   $name =~ s{\.pm$}{}g;

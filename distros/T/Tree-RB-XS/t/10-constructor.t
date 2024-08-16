@@ -82,6 +82,26 @@ subtest type_by_name => sub {
 	is( $tree->key_type, KEY_TYPE_BSTR, 'key_type' );
 };
 
+{ package Mock::Array;
+  sub TIEARRAY {
+    bless [], 'Mock::Array';
+  }
+  sub FETCH { "el_$_[1]" }
+  sub STORE { }
+  sub FETCHSIZE { 10 }
+  sub STORESIZE {}
+  sub EXTEND {}
+  sub EXISTS { 0 <= $_[0] && $_[0] < 10 }
+  sub DELETE {}
+  sub PUSH {}
+  sub POP {}
+  sub SHIFT {}
+  sub UNSHIFT {}
+  sub SPLICE {}
+  sub UNTIE {}
+  sub DESTROY {}
+}
+
 subtest initial_kv_list => sub {
 	my $tree= Tree::RB::XS->new(kv => [1..10]);
 	is( $tree->size, 5, 'added 5 nodes' );
@@ -89,6 +109,22 @@ subtest initial_kv_list => sub {
 	is( $tree, object { call size => 1; call min => object { call value => 3; }; }, 'overwrite value' );
 	$tree= Tree::RB::XS->new(kv => [1,2,1,3], allow_duplicates => 1);
 	is( $tree, object { call size => 2; call min => object { call value => 2; }; }, 'dup keys' );
+
+	tie my @array, 'Mock::Array';
+	$tree= Tree::RB::XS->new(kv => \@array);
+	is( $tree, object {
+		call size => 5;
+		call iter => object { call sub { [ $_[0]->next_kv(10) ] } => [ map "el_$_", 0..9 ] };
+	}, 'from tied array' );
+};
+
+subtest initial_keys => sub {
+	my $tree= Tree::RB::XS->new(keys => [1..10]);
+	is( $tree->size, 10, 'added 10 nodes' );
+	$tree= Tree::RB::XS->new(keys => [1,2,1,3]);
+	is( $tree, object { call size => 3; call [nth => 1] => object { call key => 2; }; }, 'no dup keys' );
+	$tree= Tree::RB::XS->new(keys => [1,2,1,3], allow_duplicates => 1);
+	is( $tree, object { call size => 4; call [nth => 1] => object { call key => 1; }; }, 'dup keys' );
 };
 
 done_testing;

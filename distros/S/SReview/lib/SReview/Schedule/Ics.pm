@@ -33,7 +33,8 @@ has 'room_name' => (
 );
 
 sub _load_room {
-	return SReview::Schedule::Base::Room->new(name => shift->room_name);
+	my $self = shift;
+	return $self->event_object->root_object->room_type->new(name => $self->room_name, event_object => $self->event_object);
 }
 
 has 'track_name' => (
@@ -43,7 +44,8 @@ has 'track_name' => (
 );
 
 sub _load_track {
-	return SReview::Schedule::Ics::Track->new(name => shift->track_name);
+	my $self = shift;
+	return $self->event_object->root_object->track_type->new(name => $self->track_name, talk_object => $self);
 }
 
 has 'speaker_name' => (
@@ -55,7 +57,7 @@ has 'speaker_name' => (
 sub _load_speakers {
 	my $self = shift;
 	if($self->have_speaker_name) {
-		return [SReview::Schedule::Ics::Speaker->new(name => $self->speaker_name)];
+		return [$self->event_object->root_object->speaker_type->new(name => $self->speaker_name, talk_object => $self)];
 	}
 	return undef;
 }
@@ -113,7 +115,7 @@ sub _load_talks {
 		foreach my $month(values %$year) {
 			foreach my $day(values %$month) {
 				foreach my $talk(values %$day) {
-					my $talk_obj = SReview::Schedule::Ics::Talk->new(schedref => $talk, %$talk_opts);
+					my $talk_obj = $self->root_object->talk_type->new(schedref => $talk, %$talk_opts, event_object => $self);
 					if($self->have_regex) {
 						my $summary = $talk->{SUMMARY};
 						next unless $summary =~ $self->summary_regex;
@@ -154,12 +156,28 @@ has "event_opts" => (
 	default => sub { {} },
 );
 
+sub _load_talk_type {
+	return "SReview::Schedule::Ics::Talk";
+}
+
+sub _load_speaker_type {
+	return "SReview::Schedule::Ics::Speaker";
+}
+
+sub _load_track_type {
+	return "SReview::Schedule::Ics::Track";
+}
+
+sub _load_event_type {
+	return "SReview::Schedule::Ics::Event";
+}
+
 sub _load_events {
 	my $self = shift;
 	my $ics = iCal::Parser->new;
 	$ics->parse_strings($self->_get_raw);
 	my $event_opts = $self->event_opts;
-	return [SReview::Schedule::Ics::Event->new(schedref => $ics->calendar, %$event_opts)];
+	return [$self->event_type->new(schedref => $ics->calendar, %$event_opts, root_object => $self)];
 }
 
 1;

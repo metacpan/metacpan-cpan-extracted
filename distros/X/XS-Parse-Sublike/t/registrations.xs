@@ -18,6 +18,7 @@ static void red_pre_blockend(pTHX_ struct XSParseSublikeContext *ctx, void *_)
 }
 
 static const struct XSParseSublikeHooks parse_red_hooks = {
+  .ver            = XSPARSESUBLIKE_ABI_VERSION,
   .permit_hintkey = "t::registrations/red",
   .pre_blockend = red_pre_blockend,
 };
@@ -30,6 +31,7 @@ static void blue_pre_blockend(pTHX_ struct XSParseSublikeContext *ctx, void *_)
 }
 
 static const struct XSParseSublikeHooks parse_blue_hooks = {
+  .ver            = XSPARSESUBLIKE_ABI_VERSION,
   .permit_hintkey = "t::registrations/blue",
   .pre_blockend = blue_pre_blockend,
 };

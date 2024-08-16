@@ -1,13 +1,13 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2023 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2023-2024 -- leonerd@leonerd.org.uk
 
 use v5.26;
 use warnings;
 use Object::Pad 0.800;
 
-package Text::Treesitter::Node 0.12;
+package Text::Treesitter::Node 0.13;
 class Text::Treesitter::Node
    :strict(params);
 
@@ -126,7 +126,7 @@ characters.
 
 =head2 end_point
 
-   ( $row, $col ) = $node->start_point;
+   ( $row, $col ) = $node->end_point;
 
 Returns the position in the input text just past where this node's extent
 finishes, split into a row (line) and column number (both 0-based).
@@ -265,13 +265,13 @@ BEGIN {
          is_named is_missing is_extra has_error child_count
       )) {
 
-      $mop->add_method( $meth => method { $node->$meth( @_ ) } );
+      $mop->add_method( $meth => method () { $node->$meth } );
    }
 }
 
-method start_char { return $tree->byte_to_char( $self->start_byte ) }
+method start_char () { return $tree->byte_to_char( $self->start_byte ) }
 
-method end_char   { return $tree->byte_to_char( $self->end_byte ) }
+method end_char   () { return $tree->byte_to_char( $self->end_byte ) }
 
 method parent ()
 {

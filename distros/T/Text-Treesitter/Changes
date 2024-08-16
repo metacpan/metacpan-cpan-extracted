@@ -1,5 +1,11 @@
 Revision history for Text-Treesitter
 
+0.13    2024-08-15
+        [CHANGES]
+         * Added a `->parse_file` shortcut wrapper method
+         * Added a whole-file mode to examples/viewtree.pl
+         * Use named parameter support of Sublike::Extended
+
 0.12    2023-12-28
         [CHANGES]
          * Implement the `#set!` directive in queries

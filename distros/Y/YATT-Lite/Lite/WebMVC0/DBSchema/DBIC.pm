@@ -160,6 +160,7 @@ sub build_dbic {
       foreach my Column $col (@{$tab->{col_list}}) {
 	# dbic_opts;
 	my %dbic_opts = (data_type => $col->{cf_type}
+                         , ($col->{cf_autoincrement} ? (is_auto_increment => 1) : ())
 			 , map(defined $_ ? %$_ : (), $col->{cf_dbic_opts}));
 	push @colSpecs, $col->{cf_name} => \%dbic_opts;
 	push @constraints, [$col->{cf_name}] if $col->{cf_unique};

@@ -7,7 +7,7 @@ use base qw(YATT::Lite::Connection);
 use YATT::Lite::MFields
 (qw/cf_cgi
     cf_is_psgi cf_hmv
-    params_hash
+    cf_parameters
 
     cf_site_prefix
 
@@ -15,9 +15,14 @@ use YATT::Lite::MFields
 
     cf_no_unicode_params
 
+    dir_config_cache
+    _site_config_is_examined
+
+    _sigil_type_item
+
     current_user
    /);
-use YATT::Lite::Util qw(globref url_encode nonempty lexpand);
+use YATT::Lite::Util qw(globref url_encode nonempty empty rootname lexpand);
 use YATT::Lite::PSGIEnv;
 
 use YATT::Lite::Util::CGICompat;
@@ -72,7 +77,7 @@ BEGIN {
     };
   }
 
-  foreach my $name (qw(file subpath)) {
+  foreach my $name (qw(file subpath parameters)) {
     my $cf = "cf_$name";
     *{globref(PROP, $name)} = sub {
       my PROP $prop = (my $glob = shift)->prop;
@@ -85,7 +90,7 @@ BEGIN {
 
 sub param {
   my PROP $prop = (my $glob = shift)->prop;
-  if (my $ixh = $prop->{params_hash}) {
+  if (my $ixh = $prop->{cf_parameters}) {
     return keys %$ixh unless @_;
     defined (my $key = shift)
       or croak "undefined key!";
@@ -96,7 +101,7 @@ sub param {
 	$ixh->{$key} = shift;
       }
     } else {
-      # If params_hash is enabled, value is returned AS-IS.
+      # If cf_parameters is enabled, value is returned AS-IS.
       $ixh->{$key};
     }
   } elsif (my $hmv = $prop->{cf_hmv}) {
@@ -117,11 +122,11 @@ sub param {
 # Annoying multi_param support.
 sub multi_param {
   my PROP $prop = (my $glob = shift)->prop;
-  if (my $ixh = $prop->{params_hash}) {
+  if (my $ixh = $prop->{cf_parameters}) {
     return keys %$ixh unless @_;
     defined (my $key = shift)
       or croak "undefined key!";
-    # If params_hash is enabled, value is returned AS-IS.
+    # If cf_parameters is enabled, value is returned AS-IS.
     $ixh->{$key};
 
   } elsif (my $hmv = ($prop->{cf_hmv} // do {
@@ -136,17 +141,196 @@ sub multi_param {
   }
 }
 
-sub queryobj {
+#========================================
+
+sub sigil_type_item {
   my PROP $prop = (my $glob = shift)->prop;
-  $prop->{params_hash} || $prop->{cf_hmv} || $prop->{cf_cgi};
+
+  @{$prop->{_sigil_type_item} // []};
+}
+
+sub collect_request_sigil_by {
+  my ($glob, $cutter, @list) = @_;
+  my %dict;
+  foreach my $name (grep {defined} @list) {
+    my ($sigil, $word) = $name =~ /^([~!])(\1|\w*)$/
+      or next;
+    defined (my $value = $cutter->($name))
+      or next;
+    push @{$dict{$sigil}}, do {
+      if ($sigil eq $word) {
+        $value;
+      } else {
+        $word;
+      }
+    };
+  };
+  \%dict;
+}
+
+sub parse_request_sigil_psgi {
+  my PROP $prop = (my $glob = shift)->prop;
+  my ($req) = @_;
+
+
+  my Env $env = $prop->{cf_env};
+
+  if ($env->{CONTENT_TYPE} and defined $env->{CONTENT_LENGTH}) {
+    $prop->{_sigil_type_item} = do {
+      my @bodyParams = $glob->extract_sigil_from_hmv($req->body_parameters);
+      my @queryParams = $glob->extract_sigil_from_hmv($req->query_parameters);
+      if (@bodyParams) {
+        \@bodyParams
+      } else {
+        \@queryParams
+      }
+    };
+  } else {
+    $glob->parse_request_sigil_hmv($req->parameters);
+  }
+}
+
+sub parse_request_sigil_hmv {
+  my PROP $prop = (my $glob = shift)->prop;
+  my ($hmvOrRawHash) = @_;
+  my $hmv = ref $hmvOrRawHash eq 'HASH' ? Hash::MultiValue->new(%$hmvOrRawHash)
+    : $hmvOrRawHash;
+  $prop->{_sigil_type_item} = [$glob->extract_sigil_from_hmv($hmv)];
+}
+
+sub extract_sigil_from_hmv {
+  my ($glob, $hmv) = @_;
+
+  my $sigilsDict = $glob->collect_request_sigil_by(
+    sub {
+      my $value = $hmv->{$_[0]};
+      $hmv->remove($_[0]);
+      $value;
+    }, $hmv->keys);
+  $glob->validate_request_sigils_dict($sigilsDict);
+}
+
+sub parse_request_sigil_cgi {
+  my PROP $prop = (my $glob = shift)->prop;
+  my ($cgi) = @_;
+  my $sigilsDict = $glob->collect_request_sigil_by(
+    sub {
+      my $value = $cgi->param($_[0]);
+      $cgi->delete($_[0]);
+      $value;
+    }, $cgi->param());
+  $prop->{_sigil_type_item}
+    = [$glob->validate_request_sigils_dict($sigilsDict)];
+}
+
+sub validate_request_sigils_dict {
+  my PROP $prop = (my $glob = shift)->prop;
+  my ($sigilsDict) = @_;
+
+  my ($subpage, $action);
+  if (my $names = $sigilsDict->{'~'}) {
+    if (@$names >= 2) {
+      $glob->error("Multiple subpage sigils in request!: %s"
+                     , join(", ", @$names));
+    }
+    $subpage = $names->[0];
+  }
+  if (my $names = $sigilsDict->{'!'}) {
+    if (@$names >= 2) {
+      $glob->error("Multiple action sigils in request!: %s"
+                     , join(", ", @$names));
+    }
+    $action = $names->[0];
+  }
+  if (defined $subpage and defined $action) {
+    # XXX: Reserved for future use.
+    $glob->error("Can't use subpage and action at one time: %s vs %s"
+		 , $subpage, $action);
+  } elsif (defined $subpage) {
+    (page => $subpage);
+  } elsif (defined $action) {
+    (action => $action);
+  } else {
+    ();
+  }
 }
 
 #========================================
+
+sub queryobj {
+  my PROP $prop = (my $glob = shift)->prop;
+  $prop->{cf_parameters} || $prop->{cf_hmv} || $prop->{cf_cgi};
+}
+
+sub param_exists {
+  my ($glob, $name) = @_;
+  exists $glob->as_hash->{$name};
+}
+
+sub as_hash {
+  my PROP $prop = (my $glob = shift)->prop;
+  $prop->{cf_parameters} // $prop->{cf_hmv} // do {
+    if ($prop->{cf_is_psgi}) {
+      $prop->{cf_cgi}->parameters
+    } else {
+      $prop->{cf_cgi}->Vars
+    }
+  };
+}
+
+*remove_param = *delete_param; *remove_param = *delete_param;
+sub delete_param {
+  my PROP $prop = (my $glob = shift)->prop;
+  my ($key) = @_;
+  unless (defined $key) {
+    croak "Undefined key!";
+  }
+  if (my $dict = $prop->{cf_parameters}) {
+    # For nested_query (array_param)
+    delete $dict->{$key};
+  } elsif ($dict = $prop->{cf_hmv}) {
+    # For direct Hash::MultiValue.
+    $dict->remove($key);
+  } elsif (($dict = $prop->{cf_cgi})->can("parameters")) {
+    # For Plack::Request
+    $dict->parameters->remove($key);
+  } elsif ($dict->can("delete")) {
+    # For CGI family.
+    $dict->delete($key);
+  } else {
+    croak "No queryobj found!";
+  }
+}
+
+#========================================
+
+sub after_create {
+  my PROP $prop = (my $glob = shift)->prop;
+  $glob->SUPER::after_create();
+
+  # If cf_cgi is empty and cf_parameters is given,
+  # request sigils are collected via parse_request_sigil_hmv.
+  #
+  if (not $prop->{cf_cgi} and $prop->{cf_parameters}) {
+    $glob->parse_request_sigil_hmv($prop->{cf_parameters});
+  }
+}
 
 sub configure_cgi {
   my PROP $prop = (my $glob = shift)->prop;
   $prop->{cf_cgi} = my $cgi = shift;
   return unless $glob->is_form_content_type($cgi->content_type);
+  return if $prop->{cf_parameters};
+
+  #
+  # parse_request_sigil should be called before parse_nested_query.
+  #
+  if ($prop->{cf_is_psgi}) {
+    $glob->parse_request_sigil_psgi($cgi);
+  } else {
+    $glob->parse_request_sigil_cgi($cgi);
+  }
+
   unless ($prop->{cf_no_nested_query}) {
     if ($prop->{cf_is_psgi}) {
       $glob->convert_array_param_psgi($cgi);
@@ -183,20 +367,21 @@ sub convert_array_param_psgi {
   my PROP $prop = (my $glob = shift)->prop;
   my ($req) = @_;
   my Env $env = $prop->{cf_env};
-  $prop->{params_hash} = do {
+  $prop->{cf_parameters} = do {
     if ($env->{CONTENT_TYPE} and defined $env->{CONTENT_LENGTH}) {
       my $body = $glob->parse_nested_query([$req->body_parameters->flatten]);
-      my $qs = $glob->parse_nested_query($env->{QUERY_STRING});
+      my $qs = $glob->parse_nested_query([$req->query_parameters->flatten]);
       foreach my $key (keys %$qs) {
 	if (exists $body->{$key}) {
-	  die $glob->error("Attempt to overwrite post param '%s' by qs"
+	  die $glob->error("Attempt to overwrite a POST parameter '%s'"
+                           . " by the same one in QUERY_STRING"
 			   , $key);
 	}
 	$body->{$key} = $qs->{$key};
       }
       $body;
     } else {
-      $glob->parse_nested_query($env->{QUERY_STRING});
+      $glob->parse_nested_query([$req->query_parameters->flatten]);
     }
   };
 }
@@ -205,19 +390,22 @@ sub convert_array_param_cgi {
   my PROP $prop = (my $glob = shift)->prop;
   my ($cgi) = @_;
   return if ($cgi->content_type // "") eq "application/json";
-  $prop->{params_hash}
+  $prop->{cf_parameters}
     = $glob->parse_nested_query($cgi->query_string);
 }
 
 # Location(path part of url) of overall SiteApp.
 sub site_location {
-  my PROP $prop = (my $glob = shift)->prop;
-  $prop->{cf_site_prefix} . '/';
+  shift->site_prefix . '/';
 }
 *site_loc = *site_location; *site_loc = *site_location;
 sub site_prefix {
   my PROP $prop = (my $glob = shift)->prop;
-  $prop->{cf_site_prefix};
+  # Note: This is safe because site_prefix 0 is meaningless(I hope).
+  $prop->{cf_site_prefix} || do {
+    my Env $env = $prop->{cf_env};
+    $env->{'yatt.script_name'} // ''
+  }
 }
 
 # Location of DirApp
@@ -257,7 +445,7 @@ sub mkurl {
 
   my $path = do {
     if (defined $file and $file =~ m!^/!) {
-      $prop->{cf_site_prefix}.$file;
+      $glob->site_prefix.$file;
     } else {
       my ($orig, $dir) = ('');
       if (($dir = $req) =~ s{([^/]+)$}{}) {
@@ -284,16 +472,35 @@ sub mkurl {
 
 sub mkprefix {
   my PROP $prop = (my $glob = shift)->prop;
-  my $scheme = $prop->{cf_env}{'psgi.url_scheme'} || $prop->{cf_cgi}->protocol;
+  my Env $env = $prop->{cf_env};
+  my $scheme
+    = $env->{HTTP_X_FORWARDED_PROTO}
+    || $env->{'psgi.url_scheme'} || $prop->{cf_cgi}->protocol;
   my $host = $glob->mkhost($scheme);
   $scheme . '://' . $host . join("", @_);
+}
+
+sub http_host_domain {
+  my PROP $prop = (my $glob = shift)->prop;
+  my Env $env = $prop->{cf_env};
+  my $host = $env->{HTTP_HOST}
+    or return undef;
+  $host =~ s/:\d+$//;
+  $host;
+}
+
+sub server_name_or_localhost {
+  my PROP $prop = (my $glob = shift)->prop;
+  my ($default) = @_;
+  my Env $env = $prop->{cf_env};
+  $env->{SERVER_NAME} || ($default // 'localhost');
 }
 
 sub mkhost {
   my PROP $prop = (my $glob = shift)->prop;
   my ($scheme) = @_;
   $scheme ||= 'http';
-  my $env = $prop->{cf_env};
+  my Env $env = $prop->{cf_env};
 
   # XXX? Is this secure?
   return $env->{HTTP_HOST} if nonempty($env->{HTTP_HOST});
@@ -336,6 +543,9 @@ sub mkquery {
 	for $fgetall->($param, $key);
     }
   } elsif (ref $param eq 'ARRAY') {
+    if (grep {not defined} @$param) {
+      croak "Undef found in mkquery()! " . YATT::Lite::Util::terse_dump($param);
+    }
     my @list = @$param;
     while (my ($key, $value) = splice @list, 0, 2) {
       push @enc_param, $self->url_encode($key).'='.$self->url_encode($value);
@@ -346,6 +556,52 @@ sub mkquery {
     wantarray ? () : '';
   } else {
     wantarray ? @enc_param : '?'.join($sep, @enc_param);
+  }
+}
+
+sub dir_location {
+  my PROP $prop = (my $glob = shift)->prop;
+  my Env $env = $prop->{cf_env};
+  ($env->{'yatt.script_name'} // '').($prop->{cf_location} // "/");
+}
+
+# script_name + path_info - subpage
+# (script_name == location of this dir (DirApp))
+#
+sub file_location {
+  my PROP $prop = (my $glob = shift)->prop;
+  my Env $env = $prop->{cf_env};
+  my $loc = $glob->dir_location;
+  if (not $prop->{cf_is_index}
+      and my $fn = $prop->{cf_file}) {
+    $fn =~ s/\..*//;
+    $loc .= $fn;
+  }
+  $loc;
+}
+
+# XXX: not yet tested.
+sub is_current_file {
+  my PROP $prop = (my $glob = shift)->prop;
+  my ($fn) = @_;
+  $glob->file_location eq $fn
+}
+
+sub is_current_page {
+  my PROP $prop = (my $glob = shift)->prop;
+  my ($file, $page) = do {
+    @_ <= 1 ? (rootname($prop->{cf_file}), $_[0]) : @_;
+  };
+  rootname($prop->{cf_file}) eq $file
+    or return 0;
+  $page //= '';
+  $page =~ s{^/}{}; # Treat /foo as foo.
+  if (empty(my $subpath = $prop->{cf_subpath})) {
+    $page eq '';
+  } elsif ($page eq '') {
+    0
+  } else {
+    $subpath =~ m{^/$page};
   }
 }
 
@@ -377,8 +633,8 @@ sub request_path {
 
 sub request_uri {
   my PROP $prop = (my $glob = shift)->prop;
-  if ($prop->{cf_env}) {
-    $prop->{cf_env}{REQUEST_URI};
+  if (my Env $env = $prop->{cf_env}) {
+    $env->{REQUEST_URI};
   } elsif ($prop->{cf_cgi}
       and my $sub = $prop->{cf_cgi}->can('request_uri')) {
     $sub->($prop->{cf_cgi});
@@ -400,7 +656,9 @@ sub redirect {
       $$arg;
     } elsif ($_[0] =~ m{^(?:\w+:)?//([^/]+)}
 	     and $1 ne ($glob->mkhost // '')) {
-      die $glob->error("External redirect is not allowed: %s", $_[0]);
+      die $glob->error_with_status(
+        400, "External redirect is not allowed: %s", $_[0]
+      );
     } else {
       # taint check
       shift;

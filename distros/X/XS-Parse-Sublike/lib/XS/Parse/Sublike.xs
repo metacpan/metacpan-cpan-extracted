@@ -1,7 +1,7 @@
 /*  You may distribute under the terms of either the GNU General Public License
  *  or the Artistic License (the same terms as Perl itself)
  *
- *  (C) Paul Evans, 2019-2023 -- leonerd@leonerd.org.uk
+ *  (C) Paul Evans, 2019-2024 -- leonerd@leonerd.org.uk
  */
 
 #include "EXTERN.h"
@@ -164,7 +164,7 @@ static int parse(pTHX_
       bool handled = FALSE;
 
       FOREACH_HOOKS_FORWARD {
-        if((hooks->flags & XS_PARSE_SUBLIKE_FLAG_FILTERATTRS) && (hooks->filter_attr))
+        if(hooks->filter_attr)
           handled |= (*hooks->filter_attr)(aTHX_ &ctx, attr, val, hookdata);
       }
 
@@ -427,20 +427,14 @@ static int parse(pTHX_
   return (ctx.actions & XS_PARSE_SUBLIKE_ACTION_RET_EXPR) ? KEYWORD_PLUGIN_EXPR : KEYWORD_PLUGIN_STMT;
 }
 
-static int IMPL_xs_parse_sublike_v4(pTHX_ const struct XSParseSublikeHooks *hooks, void *hookdata, OP **op_ptr)
+static int IMPL_xs_parse_sublike_v6(pTHX_ const struct XSParseSublikeHooks *hooks, void *hookdata, OP **op_ptr)
 {
   struct HooksAndData hd = { .hooks = hooks, .data = hookdata };
   return parse(aTHX_ &hd, 1, op_ptr);
 }
 
-static int IMPL_xs_parse_sublike_v3(pTHX_ const void *hooks, void *hookdata, OP **op_ptr)
-{
-  croak("XS::Parse::Sublike ABI v3 is no longer supported; the caller should be rebuilt to use v4");
-}
-
 struct Registration;
 struct Registration {
-  int ver;
   struct Registration *next;
   const char *kw;
   STRLEN      kwlen;
@@ -457,14 +451,20 @@ struct Registration {
 
 static struct Registration *registrations;
 
-static void register_sublike(pTHX_ const char *kw, const void *hooks, void *hookdata, int ver)
+static void register_sublike(pTHX_ const char *kw, const struct XSParseSublikeHooks *hooks, void *hookdata, int ver)
 {
+  if(ver < 4)
+    croak("Mismatch in sublike keyword registration ABI version field: module wants %u; we require >= 4\n",
+      ver);
+  if(ver > XSPARSESUBLIKE_ABI_VERSION)
+    croak("Mismatch in sublike keyword registration ABI version field: module wants %u; we support <= %d\n",
+      ver, XSPARSESUBLIKE_ABI_VERSION);
+
   struct Registration *reg;
   Newx(reg, 1, struct Registration);
 
   reg->kw = savepv(kw);
   reg->kwlen = strlen(kw);
-  reg->ver = ver;
   reg->hooks = hooks;
   reg->hookdata = hookdata;
 
@@ -484,14 +484,16 @@ static void register_sublike(pTHX_ const char *kw, const void *hooks, void *hook
   REGISTRATIONS_UNLOCK;
 }
 
-static void IMPL_register_xs_parse_sublike_v4(pTHX_ const char *kw, const struct XSParseSublikeHooks *hooks, void *hookdata)
+static void IMPL_register_xs_parse_sublike_v6(pTHX_ const char *kw, const struct XSParseSublikeHooks *hooks, void *hookdata)
 {
-  register_sublike(aTHX_ kw, hooks, hookdata, 4);
-}
+  int ver = hooks->ver;
+  if(!ver)
+    /* Caller forgot to set .ver but for source-level compat we'll presume they
+     * wanted version 6, the first ABI version that added the .ver field
+     */
+    ver = 6;
 
-static void IMPL_register_xs_parse_sublike_v3(pTHX_ const char *kw, const void *hooks, void *hookdata)
-{
-  croak("XS::Parse::Sublike ABI v3 is no longer supported; the caller should be rebuilt to use v4");
+  register_sublike(aTHX_ kw, hooks, hookdata, ver);
 }
 
 static const struct Registration *find_permitted(pTHX_ const char *kw, STRLEN kwlen)
@@ -518,7 +520,7 @@ static const struct Registration *find_permitted(pTHX_ const char *kw, STRLEN kw
   return NULL;
 }
 
-static int IMPL_xs_parse_sublike_any_v4(pTHX_ const struct XSParseSublikeHooks *hooksA, void *hookdataA, OP **op_ptr)
+static int IMPL_xs_parse_sublike_any_v6(pTHX_ const struct XSParseSublikeHooks *hooksA, void *hookdataA, OP **op_ptr)
 {
   SV *kwsv = lex_scan_ident();
   if(!kwsv || !SvCUR(kwsv))
@@ -553,11 +555,6 @@ static int IMPL_xs_parse_sublike_any_v4(pTHX_ const struct XSParseSublikeHooks *
   return parse(aTHX_ hd, 1 + !!reg, op_ptr);
 }
 
-static int IMPL_xs_parse_sublike_any_v3(pTHX_ const void *hooksA, void *hookdataA, OP **op_ptr)
-{
-  croak("XS::Parse::Sublike ABI v3 is no longer supported; the caller should be rebuilt to use v4");
-}
-
 static void IMPL_register_xps_signature_attribute(pTHX_ const char *name, const struct XPSSignatureAttributeFuncs *funcs, void *funcdata)
 {
   if(funcs->ver < 5)
@@ -588,8 +585,9 @@ static void pre_subparse_core_method(pTHX_ struct XSParseSublikeContext *ctx, vo
 }
 
 static const struct XSParseSublikeHooks hooks_core_method = {
-  .permit = &permit_core_method,
-  .pre_subparse = &pre_subparse_core_method,
+  .ver           = XSPARSESUBLIKE_ABI_VERSION,
+  .permit        = &permit_core_method,
+  .pre_subparse  = &pre_subparse_core_method,
   .require_parts = XS_PARSE_SUBLIKE_PART_SIGNATURE, /* enable signatures feature */
 };
 #endif
@@ -653,6 +651,80 @@ static int my_keyword_plugin(pTHX_ char *kw, STRLEN kwlen, OP **op_ptr)
   return parse(aTHX_ hd, nhooks, op_ptr);
 }
 
+/* API v3 back-compat */
+
+static int IMPL_xs_parse_sublike_v3(pTHX_ const void *hooks, void *hookdata, OP **op_ptr)
+{
+  croak("XS::Parse::Sublike ABI v3 is no longer supported; the caller should be rebuilt to use v4");
+}
+
+static void IMPL_register_xs_parse_sublike_v3(pTHX_ const char *kw, const void *hooks, void *hookdata)
+{
+  croak("XS::Parse::Sublike ABI v3 is no longer supported; the caller should be rebuilt to use v4");
+}
+
+static int IMPL_xs_parse_sublike_any_v3(pTHX_ const void *hooksA, void *hookdataA, OP **op_ptr)
+{
+  croak("XS::Parse::Sublike ABI v3 is no longer supported; the caller should be rebuilt to use v4");
+}
+
+/* API v4 back-compat */
+
+struct XSParseSublikeHooks_v4 {
+  U16  flags;
+  U8   require_parts;
+  U8   skip_parts;
+  const char *permit_hintkey;
+  bool (*permit)(pTHX_ void *hookdata);
+  void (*pre_subparse)   (pTHX_ struct XSParseSublikeContext *ctx, void *hookdata);
+  void (*post_blockstart)(pTHX_ struct XSParseSublikeContext *ctx, void *hookdata);
+  void (*pre_blockend)   (pTHX_ struct XSParseSublikeContext *ctx, void *hookdata);
+  void (*post_newcv)     (pTHX_ struct XSParseSublikeContext *ctx, void *hookdata);
+  bool (*filter_attr)    (pTHX_ struct XSParseSublikeContext *ctx, SV *attr, SV *val, void *hookdata);
+};
+
+#define STRUCT_XSPARSESUBLIKEHOOKS_FROM_v4(hooks_v4)     \
+  (struct XSParseSublikeHooks){                          \
+        .ver             = 4,                            \
+        .flags           = hooks_v4->flags,              \
+        .require_parts   = hooks_v4->require_parts,      \
+        .skip_parts      = hooks_v4->skip_parts,         \
+        .permit_hintkey  = hooks_v4->permit_hintkey,     \
+        .permit          = hooks_v4->permit,             \
+        .pre_subparse    = hooks_v4->pre_subparse,       \
+        .filter_attr     = (hooks_v4->flags & XS_PARSE_SUBLIKE_FLAG_FILTERATTRS)  \
+                             ? hooks_v4->filter_attr     \
+                             : NULL,                     \
+        .post_blockstart = hooks_v4->post_blockstart,    \
+        .pre_blockend    = hooks_v4->pre_blockend,       \
+        .post_newcv      = hooks_v4->post_newcv,         \
+      }
+
+static int IMPL_xs_parse_sublike_v4(pTHX_ const struct XSParseSublikeHooks_v4 *hooks_v4, void *hookdata, OP **op_ptr)
+{
+  return IMPL_xs_parse_sublike_v6(aTHX_
+    &STRUCT_XSPARSESUBLIKEHOOKS_FROM_v4(hooks_v4),
+    hookdata,
+    op_ptr);
+}
+
+static void IMPL_register_xs_parse_sublike_v4(pTHX_ const char *kw, const struct XSParseSublikeHooks_v4 *hooks_v4, void *hookdata)
+{
+  struct XSParseSublikeHooks *hooks;
+  Newx(hooks, 1, struct XSParseSublikeHooks);
+  *hooks = STRUCT_XSPARSESUBLIKEHOOKS_FROM_v4(hooks_v4);
+
+  register_sublike(aTHX_ kw, hooks, hookdata, 4);
+}
+
+static int IMPL_xs_parse_sublike_any_v4(pTHX_ const struct XSParseSublikeHooks_v4 *hooksA_v4, void *hookdataA, OP **op_ptr)
+{
+  return IMPL_xs_parse_sublike_any_v6(aTHX_
+    &STRUCT_XSPARSESUBLIKEHOOKS_FROM_v4(hooksA_v4),
+    hookdataA,
+    op_ptr);
+}
+
 MODULE = XS::Parse::Sublike    PACKAGE = XS::Parse::Sublike
 
 BOOT:
@@ -667,8 +739,11 @@ BOOT:
   sv_setiv(*hv_fetchs(PL_modglobal, "XS::Parse::Sublike/ABIVERSION_MAX", 1), XSPARSESUBLIKE_ABI_VERSION);
 
   sv_setuv(*hv_fetchs(PL_modglobal, "XS::Parse::Sublike/parse()@4",    1), PTR2UV(&IMPL_xs_parse_sublike_v4));
+  sv_setuv(*hv_fetchs(PL_modglobal, "XS::Parse::Sublike/parse()@6",    1), PTR2UV(&IMPL_xs_parse_sublike_v6));
+  sv_setuv(*hv_fetchs(PL_modglobal, "XS::Parse::Sublike/register()@6", 1), PTR2UV(&IMPL_register_xs_parse_sublike_v6));
   sv_setuv(*hv_fetchs(PL_modglobal, "XS::Parse::Sublike/register()@4", 1), PTR2UV(&IMPL_register_xs_parse_sublike_v4));
   sv_setuv(*hv_fetchs(PL_modglobal, "XS::Parse::Sublike/parseany()@4", 1), PTR2UV(&IMPL_xs_parse_sublike_any_v4));
+  sv_setuv(*hv_fetchs(PL_modglobal, "XS::Parse::Sublike/parseany()@6", 1), PTR2UV(&IMPL_xs_parse_sublike_any_v6));
 
   sv_setuv(*hv_fetchs(PL_modglobal, "XS::Parse::Sublike/register_sigattr()@5", 1), PTR2UV(&IMPL_register_xps_signature_attribute));
 #ifdef HAVE_FEATURE_CLASS

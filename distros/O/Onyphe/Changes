@@ -1,5 +1,40 @@
 Revision history for Perl extension Onyphe.
 
+4.15 Thu 15 Aug 13:22:56 CEST 2024
+  - New: Onyphe::Api: Ondemand Scope Port Single API
+  - New: Onyphe::Api: ASD Tld API
+  - New: Onyphe::Api: ASD Ns API
+  - New: Onyphe::Api: ASD Task API
+  - New: Onyphe::Api: added support for ASD Tld API
+  - New: Onyphe::Api: support for displaying total number of results when using Search API
+  - New: Onyphe::Api: support for POST Export API calls
+  - New: onyphe: -trusted argument
+  - Bugfix: OPP: catch errors on decoding or encoding JSON content
+
+4.14 Thu 28 Mar 11:24:29 CET 2024
+  - New: Onyphe::Api: Ondemand Scope Hostname API
+  - New: Onyphe::Api: Ondemand Scope Hostname Bulk API
+  - New proc added: orlookup
+  - Bugfix: on printing errors from API calls (now handling text & JSON responses)
+  - Bugfix: lookup/allowlist/blocklist procs to be case insensitive
+  - Update: OPP::Proc: set() to accept writing fields as ARRAYs
+  - Update: addfield proc to support adding data to an existing field
+  - Update: OPP: pipeone() needs output flush at each round
+
+4.13 Sun 11 Feb 17:46:49 CET 2024
+  - New: pipeone() function in OPP
+  - New proc added: exists
+  - New: added -aslines, -full, -riskscan & -asm arguments
+  - Bugfix: lookup proc to support state so we can call it multiple times
+  - Bugfix: do not double escape POST content (like for -postsearch)
+  - Bugfix: handle HTTP errors when error is not in JSON format
+
+4.12 Sun 15 Oct 13:54:00 CEST 2023
+  - New proc added: addfield
+  - Update pivots proc: added app.http.tracker.newrelic as a pivot
+  - Bugfix: handle errors from API with Discovery API
+  - Bugfix: added nested fields for app.http.header & alert objects
+
 4.11 Wed  6 Sep 14:20:17 CEST 2023
   - Bugfix: do not encode in UTF-8 a second time input file for Discovery API
 

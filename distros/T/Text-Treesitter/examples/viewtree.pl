@@ -24,6 +24,7 @@ GetOptions(
    'language|l=s'   => \( my $LANGUAGE = "c" ),
    'unrecognised|u' => \( my $PRINT_UNRECOGNISED ),
    'directory|d=s'  => \( my $LANGUAGE_DIR ),
+   'file|f=s'       => \( my $FILE ),
 ) or exit 1;
 
 my $ts = Text::Treesitter->new(
@@ -61,7 +62,7 @@ sub build_leader_string
 
 sub print_tree_flamegraph
 {
-   my ( $line, @namednodes ) = @_;
+   my ( $line, $lineidx, @namednodes ) = @_;
 
    my @children;
    foreach my $p ( @namednodes ) {
@@ -70,7 +71,7 @@ sub print_tree_flamegraph
       push @children, pairs $node->field_names_with_child_nodes;
    }
 
-   print_tree_flamegraph( $line, @children ) if @children;
+   print_tree_flamegraph( $line, $lineidx, @children ) if @children;
 
    # Column numbers are all 0-based
 
@@ -81,8 +82,14 @@ sub print_tree_flamegraph
 
       my $has_children = $node->child_count > 0;
 
-      my ( undef, $col ) = $node->start_point;
-      my ( undef, $endcol ) = $node->end_point;
+      my ( $startrow, $col ) = $node->start_point;
+      my ( $endrow, $endcol ) = $node->end_point;
+
+      next if $startrow > $lineidx or $endrow < $lineidx;
+
+      # Clamp col range
+      $col = 0 if $startrow < $lineidx;
+      $endcol = length $line if $endrow > $lineidx;
 
       my $len = $endcol - $col
          or next;
@@ -117,10 +124,64 @@ sub print_tree_flamegraph
    print build_leader_string( \@positions ), "\n";
 }
 
+sub extract_nodes_on_line
+{
+   my ( $lineidx, $node ) = @_;
+
+   return ( $node ) if $node->start_row == $lineidx and $node->end_row == $lineidx;
+
+   my @ret;
+   foreach my $child ( $node->child_nodes ) {
+      my $childstart = $child->start_row;
+      last if $childstart > $lineidx;
+
+      my $childend = $child->end_row;
+      next if $childend < $lineidx;
+
+      push @ret, extract_nodes_on_line( $lineidx, $child ) if
+         $childstart <= $lineidx and $childend >= $lineidx;
+   }
+
+   # If @ret is empty that means $node is the leaf node that covered the
+   # -entire- line
+   return $node if !@ret;
+
+   return @ret;
+}
+
+if( defined $FILE ) {
+   my $tree = $ts->parse_file( $FILE );
+   my $root = $tree->root_node;
+
+   # We can't call print_tree_flamegraph on text spanning multiple lines. Also
+   # the output will be huge and unusable. Split it per line and only output
+   # the nodes contained entirely within each line.
+   my @lines = split m/\n/, $root->text;
+
+   foreach my $lineidx ( 0 .. $#lines ) {
+      my $line = $lines[$lineidx];
+
+      if( !length $line ) {
+         print "\n";
+         next;
+      }
+
+      my @linenodes = extract_nodes_on_line( $lineidx, $root );
+
+      if( @linenodes ) {
+         print "\n" if $lineidx > 0;
+         print_tree_flamegraph( $line, $lineidx, map { [ undef, $_ ] } @linenodes );
+      }
+      print "$line\n";
+   }
+
+   exit;
+}
+
 while( defined( my $line = $term->readline( "> " ) ) ) {
    my $tree = $ts->parse_string( $line );
 
-   print_tree_flamegraph( $line, [ undef, $tree->root_node ] );
+   print_tree_flamegraph( $line, 0, [ undef, $tree->root_node ] );
 
    print "$line\n";
 }

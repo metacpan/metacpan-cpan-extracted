@@ -30,6 +30,13 @@ use Test::More;
 }
 
 {
+  use utf8;
+  my $enc = sub {YATT::Lite::Util->url_encode($_[0])};
+  is $enc->("\x{6f22}\x{5b57}"), q{%E6%BC%A2%E5%AD%97}
+    , q{url_encode(\x{6f22}\x{5b57}) => %E6%BC%A2%E5%AD%97};
+}
+
+{
   package
     t_test1;
   sub render_q1 {
@@ -67,6 +74,22 @@ use Test::More;
     YATT::Lite::Util::safe_render(__PACKAGE__, __PACKAGE__, unknown => "unk2");
   }; $@}, qr/^DUMMY\[Can't find widget 'unknown'\]/
     , "safe_render with raise-able connection";
+}
+
+{
+  package
+    t_entns1;
+  sub entity_foo { "FOO" }
+
+  package main;
+  is(YATT::Lite::Util->get_entity_symbol('t_entns1', 'foo'), \*t_entns1::entity_foo
+     , "YATT::Lite::Util->get_entity_symbol"
+   );
+
+  is(YATT::Lite::Util->get_entity_symbol('t_entns1', 'missing'), undef
+     , "YATT::Lite::Util->get_entity_symbol for unknown name"
+   );
+
 }
 
 done_testing();

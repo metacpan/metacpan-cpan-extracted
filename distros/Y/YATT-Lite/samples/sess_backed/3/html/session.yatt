@@ -1,0 +1,41 @@
+<!yatt:args dump="value/1">
+
+<yatt:layout>
+<h2>Session3 test1</h2>
+&yatt:session_start();
+
+<yatt:if "&yatt:dump;">
+<pre id="session_content">session content=&yatt:psgix_session();</pre>
+</yatt:if>
+
+<form method="POST">
+  <dl>
+  <yatt:foreach my=name list="qw/foo bar baz/">
+    <dt>&yatt:name;</dt>
+    <dd><input name=".&yatt:name;" value="&yatt:psgix_session(){:name};"></dd>
+  </yatt:foreach>
+  </dl>
+  <input type="submit" name="!set">
+</form>
+</yatt:layout>
+
+<!yatt:action set>
+  
+$this->entity_session_start;
+
+my $env = $CON->env->{'psgix.session'};
+
+foreach my $name (qw/foo bar baz/) {
+  $env->{$name} = $CON->param(".".$name);
+}
+
+$CON->redirect($CON->mkurl);
+
+<!yatt:widget layout>
+<!doctype html>
+<html>
+<meta charset="utf-8">
+<body>
+<yatt:body/>
+</body>
+</html>

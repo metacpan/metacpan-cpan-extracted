@@ -1,0 +1,60 @@
+
+[![Windows](https://github.com/Corion/Auth-GoogleAuthenticator/workflows/windows/badge.svg)](https://github.com/Corion/Auth-GoogleAuthenticator/actions?query=workflow%3Awindows)
+[![MacOS](https://github.com/Corion/Auth-GoogleAuthenticator/workflows/macos/badge.svg)](https://github.com/Corion/Auth-GoogleAuthenticator/actions?query=workflow%3Amacos)
+[![Linux](https://github.com/Corion/Auth-GoogleAuthenticator/workflows/linux/badge.svg)](https://github.com/Corion/Auth-GoogleAuthenticator/actions?query=workflow%3Alinux)
+
+# NAME
+
+Auth::GoogleAuthenticator - Authenticate through Google Authenticator
+
+# WORKFLOW
+
+- Install Google Authenticator
+- Visit the "Install Two Factor Authentication" page
+- Display the secret key there
+
+        ->registration_qr_code
+        ->registration_key
+
+    Display the "Panic" OTPs there so that the user can print them out
+    on paper and store them in a secure location:
+
+        my @recovery_passwords = generate_recovery_strings( 3 );
+        for my $pass ( @recovery_passwords ) {
+          print $pass, "\n";
+        };
+
+- Photograph the QR code
+
+    or
+
+    Manually enter the key into the Authenticator
+
+- On the Login page enter the password
+and the OTP code from the Authenticator
+or on the Recovery page, enter one of the panic keys.
+
+# PASSWORD STORAGE
+
+The password should be stored as a hash.
+
+The shared authenticator secret needs to be stored as plaintext.
+
+# RECOVERY
+
+As phones tend to get lost, the recovery passphrases become
+important. They also are password equivalent. So, my recommendation
+is to store the recovery passphrases only as hashes, just
+like you store passwords.
+
+# COMPATIBILITY
+
+At least on iDevices, using `<` or `>` made registering
+the generated accounts through QRcodes fail. The QRcodes work
+with Android devices.
+
+# SEE ALSO
+
+TOTP: Time-Based One-Time Password Algorithm
+
+[http://tools.ietf.org/html/rfc6238](http://tools.ietf.org/html/rfc6238)

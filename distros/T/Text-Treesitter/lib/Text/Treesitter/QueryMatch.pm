@@ -1,13 +1,13 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2023 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2023-2024 -- leonerd@leonerd.org.uk
 
 use v5.26;
 use warnings;
 use Object::Pad 0.800;
 
-package Text::Treesitter::QueryMatch 0.12;
+package Text::Treesitter::QueryMatch 0.13;
 class Text::Treesitter::QueryMatch
    :strict(params);
 
@@ -117,7 +117,7 @@ class Text::Treesitter::QueryMatch::_Capture :strict(params) {
    field $capture_id :param :reader;
 }
 
-method captures
+method captures ()
 {
    my $count = $querymatch->capture_count;
    return $count unless wantarray;

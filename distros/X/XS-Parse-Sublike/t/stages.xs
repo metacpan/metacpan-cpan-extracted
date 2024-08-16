@@ -62,14 +62,13 @@ static bool stage_filter_attr(pTHX_ struct XSParseSublikeContext *ctx, SV *attr,
 }
 
 static const struct XSParseSublikeHooks parse_stages_hooks = {
-  .flags           = XS_PARSE_SUBLIKE_FLAG_FILTERATTRS,
+  .ver             = XSPARSESUBLIKE_ABI_VERSION,
   .permit          = stage_permit,
   .pre_subparse    = stage_pre_subparse,
+  .filter_attr     = stage_filter_attr,
   .post_blockstart = stage_post_blockstart,
   .pre_blockend    = stage_pre_blockend,
   .post_newcv      = stage_post_newcv,
-
-  .filter_attr     = stage_filter_attr,
 };
 
 MODULE = t::stages  PACKAGE = t::stages

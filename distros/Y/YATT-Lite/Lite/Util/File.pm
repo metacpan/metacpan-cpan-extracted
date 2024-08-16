@@ -32,12 +32,29 @@ sub mkfile {
   @slept;
 }
 
-#
+# This works, but not so useful. Try wait_if_near_deadline instead.
 sub wait_for_time {
   my ($time) = @_;
   my $now = Time::HiRes::time;
   my $diff = $time - $now;
   return if $diff <= 0;
+  usleep(int($diff * 1000 * 1000));
+  $diff;
+}
+
+# sleep if ($deadline - $hires_now) < $threshold
+# Use like following:
+#
+#   if (my $slept = wait_if_near_deadline(time+1, 0.1)) {
+#     diag "slept: $slept";
+#   }
+#
+sub wait_if_near_deadline {
+  my ($deadline, $threshold) = @_;
+  $threshold //= 0.2;
+  my $now = Time::HiRes::time;
+  my $diff = $deadline - $now;
+  return if $diff > $threshold;
   usleep(int($diff * 1000 * 1000));
   $diff;
 }

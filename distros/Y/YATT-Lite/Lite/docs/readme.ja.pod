@@ -264,24 +264,12 @@ XXX: To be written about: F<./lib/YATT/scripts/yatt>
 
 =head3 Emacs Lisp
 
-Emacs 用の編集モードファイルが F<./lib/YATT/elisp> の下にあります。
-このディレクトリを emacs の C<load-path> に加えるなどした上で、 F<.emacs> に
-
-=for code lisp
-
-   (load "yatt-autoload")
-
-を加えてください。これにより、以下の機能が autoload に設定されます。
-
 =over 4
 
-=item yatt-mode
+=item L<poly-yatt|https://github.com/hkoba/poly-yatt>
 
-yatt の構文着色付き編集モード。
-L<mmm|http://www.emacswiki.org/emacs/MmmMode>
-と
-L<cperl|http://www.emacswiki.org/emacs/CPerlMode>
-に依存しています。
+L<polymode|https://polymode.github.io/> をベースにした編集モードです。
+
 
 =item yatt-lint-any-mode
 
@@ -290,19 +278,6 @@ L<cperl|http://www.emacswiki.org/emacs/CPerlMode>
 自動的に起動し、エラーが有ればその行にジャンプします。
 
 =back
-
-=head3 dotcloud
-
-F<vendor> ディレクトリに L<dotcloud|http://www.dotcloud.com>
-用のサンプルを用意してあります。コピーしてお使い下さい。
-
-=for code sh
-
-  cp -va YATT/vendor/dotcloud ~/myapp
-  cd ~/myapp
-  git init
-  git submodule add git://github.com/hkoba/yatt_lite.git approot/lib/YATT
-  plackup approot/app.psgi
 
 =head2 Benchmark results:
 X<benchmark>

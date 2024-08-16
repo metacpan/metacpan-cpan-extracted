@@ -9,13 +9,22 @@ use FindBin; BEGIN {do "$FindBin::RealBin/libdir.pl"}
 use mro 'c3'; # XXX: Not fully compatible.
 use parent qw/YATT::Lite::Object/;
 use YATT::Lite::MFields qw/dispatcher
-			   cf_linear/;
+                           cf_dir
+			   cf_linear
+                           cf_from
+                          /;
 
-use YATT::Lite::Util qw/globref look_for_globref/;
+use YATT::Lite::Util qw/globref look_for_globref lexpand/;
 use YATT::Lite::Util::CmdLine qw/run/;
 
 
+use YATT::Lite;
 use YATT::Lite::Factory;
+use YATT::Lite::LRXML;
+use YATT::Lite::Core;
+use YATT::Lite::CGen::Perl;
+
+use YATT::Lite::Walker;
 
 {
   my $disp = YATT::Lite::Factory->load_factory_offline
@@ -28,29 +37,31 @@ use YATT::Lite::Factory;
 }
 
 sub cmd_isa {
-  (my MY $self, my ($path)) = @_;
+  (my MY $self, my (@path)) = @_;
 
   my $disp = $self->{dispatcher};
 
-  unless (defined $path) {
+  if (not @path) {
     $self->show_isa(dispatcher => ref $disp);
   } else {
-    my ($dir, $file) = do {
-      if (-d $path) {
-	($path)
-      } else {
-	(dirname($path), basename($path));
-      }
-    };
-    my $dh = $disp->get_dirhandler($dir);
+    foreach my $path (@path) {
+      my ($dir, $file) = do {
+	if (-d $path) {
+	  ($path)
+	} else {
+	  (dirname($path), basename($path));
+	}
+      };
+      my $dh = $disp->get_dirhandler($dir);
 
-    if (defined $file) {
-      my ($part, $sub, $pkg) = $dh->open_trans->find_part_handler($file);
-      $self->show_isa(File => $pkg);
-#      my ($tmpl) = $dh->open_trans->find_file($file);
-#      $self->show_isa(File => $tmpl->cget('entns'));
-    } else {
-      $self->show_isa(DirApp => ref $dh);
+      if (defined $file) {
+	my ($part, $sub, $pkg) = $dh->open_trans->find_part_handler($file);
+	$self->show_isa(File => $pkg);
+	#      my ($tmpl) = $dh->open_trans->find_file($file);
+	#      $self->show_isa(File => $tmpl->cget('entns'));
+      } else {
+	$self->show_isa(DirApp => ref $dh);
+      }
     }
   }
 }
@@ -60,7 +71,8 @@ sub show_isa {
   if ($self->{cf_linear}) {
     print "$title=$class\n";
     foreach my $super (@{mro::get_linear_isa($class)}) {
-      print "  $super\n";
+      my $fn = $self->get_class_filename($super);
+      print "  ", $super, "\t", $fn ? "[$fn]" : "", "\n";
     }
   } else {
     print $class;
@@ -98,4 +110,64 @@ sub get_class_filename {
   my $sub = *{$fnsym}{CODE}
     or return $default;
   $sub->() // $default;
+}
+
+sub is_in_template_dir {
+  (my MY $self, my $path) = @_;
+  foreach my $dir (lexpand($self->{dispatcher}->{tmpldirs})) {
+    if (length $dir <= length $path
+        and substr($dir, 0, length $path) eq $path) {
+      return 1;
+    }
+  }
+  return 0;
+}
+
+sub list_target_dirs {
+  (my MY $self, my $dirSpec) = @_;
+
+  if ($dirSpec) {
+    $self->rel2abs($dirSpec)
+  } else {
+    my $cwd = Cwd::getcwd;
+    if ($self->is_in_template_dir($cwd)) {
+      $cwd;
+    } else {
+      $self->{dispatcher}->cget('doc_root') // do {
+        if (my $dir = $self->{dispatcher}->cget('per_role_docroot')) {
+          [glob("$dir/[a-z]*")];
+        } else {
+          Carp::croak "doc_root is empty!"
+        }
+      }
+    }
+  }
+}
+
+sub cmd_list_widgets {
+  (my MY $self, my ($widgetNameGlob)) = @_;
+
+  my $cwdOrFileList = $self->list_target_dirs($self->{cf_from});
+
+  require Text::Glob;
+
+  walk(
+    factory => $self->{dispatcher},
+    from => $cwdOrFileList,
+    ($widgetNameGlob ? (
+      (name_match => Text::Glob::glob_to_regex($widgetNameGlob))
+    ) : ()),
+    widget => sub {
+      my ($args) = @_;
+      print ":$args->{name}\n";
+    },
+    item => sub {
+      my ($args) = @_;
+      print "# ", $args->{tree}->cget('path'), "\n";
+    },
+  );
+
+  # $yatt->get_trans->list_items
+  # $yatt->get_trans->find_file('index')
+  # $yatt->get_trans->find_file('index')->list_parts
 }

@@ -9,9 +9,11 @@ use mro 'c3'; # XXX: Is this ok?
 use YATT::Lite::Partial
   (requires => [qw/error/]
    , fields => [qw/cf_lang_list
-		   cf_default_lang
 		   cf_debug_lang
-		  /]
+		  /
+                , [cf_default_lang => only_if_missing => 1]
+
+              ]
    , -Entity, -CON, -SYS
   );
 

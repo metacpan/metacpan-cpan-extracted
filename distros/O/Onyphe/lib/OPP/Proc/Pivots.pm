@@ -1,5 +1,5 @@
 #
-# $Id: Pivots.pm,v 58d7ce835577 2023/03/25 10:34:10 gomor $
+# $Id: Pivots.pm,v 2ad8bf49f5cd 2023/10/15 11:55:27 gomor $
 #
 package OPP::Proc::Pivots;
 use strict;
@@ -24,7 +24,7 @@ sub process {
       domain organization geolocus.netname netname subject.organization
       subject.email issuer.organization
       app.http.tracker.ga app.http.tracker.gaw app.http.tracker.gpub
-      app.http.tracker.fbq app.http.tracker.snaptr
+      app.http.tracker.fbq app.http.tracker.snaptr app.http.tracker.newrelic
    ) ];
 
    my $rewrite = {

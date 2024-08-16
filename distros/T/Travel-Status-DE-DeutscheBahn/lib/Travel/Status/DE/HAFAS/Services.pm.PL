@@ -134,7 +134,8 @@ my %hafas_instance = (
 			lang => 'deu'
 		},
 	},
-	IE => {
+	DSB => { load_instance( 'dk/rejseplanen', lang => 'deu' ), },
+	IE  => {
 		load_instance(
 			'ie/iarnrod-eireann',
 			lang => 'en',
@@ -170,6 +171,7 @@ my %hafas_instance = (
 	RMV  => { load_instance( 'de/rmv',  lang => 'deu' ), },
 	RSAG => { load_instance( 'de/rsag', lang => 'deu' ), },
 	STV  => { load_instance( 'at/stv',  lang => 'deu', ver => '1.32' ), },
+	TPG  => { load_instance( 'ch/tpg',  lang => 'deu', ver => '1.40' ), },
 	VBB  => {
 		load_instance( 'de/vbb', lang => 'deu' ),
 		stopfinder => 'https://fahrinfo.vbb.de/bin/ajax-getstop.exe',
@@ -201,7 +203,8 @@ my %hafas_instance = (
 		),
 		stopfinder => 'https://fahrplan.vos.info/bin/ajax-getstop.exe',
 	},
-	VRN => { load_instance( 'de/vrn', lang => 'deu' ), }
+	VRN => { load_instance( 'de/vrn', lang => 'deu' ), },
+	ZVV => { load_instance( 'ch/zvv', lang => 'deu' ), },
 );
 
 my $perlobj = Data::Dumper->new( [ \%hafas_instance ], ['hafas_instance'] );
@@ -219,7 +222,7 @@ use warnings;
 use 5.014;
 use utf8;
 
-our $VERSION = '6.07';
+our $VERSION = '6.08';
 
 # Most of these have been adapted from
 # <https://github.com/public-transport/transport-apis> and

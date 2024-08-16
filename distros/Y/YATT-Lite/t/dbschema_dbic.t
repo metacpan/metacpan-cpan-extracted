@@ -164,7 +164,7 @@ my $DBNAME = shift || ':memory:';
   use YATT::Lite::WebMVC0::DBSchema::DBIC
     (__PACKAGE__, verbose => $ENV{DEBUG_DBSCHEMA}
      , [User => undef
-	, uid => [integer => -primary_key]
+	, uid => [integer => -primary_key, -autoincrement]
 	, fname => 'text'
 	, lname => 'text'
 	, email => 'text'
@@ -172,7 +172,7 @@ my $DBNAME = shift || ':memory:';
 	, tmppass => 'text'
 	, [-has_many
 	   , [Address => undef
-	    , addrid => [integer => -primary_key]
+	    , addrid => [integer => -primary_key, -autoincrement]
 	    , owner =>  [int => [belongs_to => 'User']]
 	    , country => 'text'
 	    , zip => 'text'
@@ -181,7 +181,7 @@ my $DBNAME = shift || ':memory:';
 	    , address => 'text']]
 	, [-has_many
 	   , [Entry => undef
-	      , eid => [integer => -primary_key]
+	      , eid => [integer => -primary_key, -autoincrement]
 	      , owner => [int => [belongs_to => 'User']]
 	      , title => 'text'
 	      , text  => 'text']]
@@ -215,7 +215,7 @@ my $DBNAME = shift || ':memory:';
 	       , user => [int => [belongs_to => 'user']]
 	       , address => [int => [belongs_to =>
 				     [address => undef
-				      , id => [int => -primary_key]
+				      , id => [int => -primary_key, -autoincrement]
 				      , street => 'text'
 				      , town => 'text'
 				      , area_code => 'text'

@@ -1,0 +1,18 @@
+# -*- coding: utf-8 -*-
+
+FILE: index.yatt
+PARAM: .q1[]=foo&.q1[]=bar&.q2=baz&.q2=qux
+BODY:
+ <input type="hidden" name=".q1[]" value="foo">
+ <input type="hidden" name=".q1[]" value="bar">
+ <input type="hidden" name=".q2" value="qux">
+ <input type="hidden" name=".q3" value="">
+
+
+FILE: index.yatt
+PARAM: .q1[a]=1&.q1[b]=1&.q2[c]=1&.q3[d]=1
+BODY:
+ <input type="hidden" name=".q1[a]" value="1">
+ <input type="hidden" name=".q1[b]" value="1">
+ <input type="hidden" name=".q2[c]" value="1">
+ <input type="hidden" name=".q3[d]" value="1">

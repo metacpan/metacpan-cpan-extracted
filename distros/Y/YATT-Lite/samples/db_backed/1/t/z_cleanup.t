@@ -39,7 +39,7 @@ BEGIN {
   }
 }
 
-my $dbfn = "$app_root/data/.htdata.db";
+my $dbfn = "$app_root/var/data/.htdata.db";
 
 unless (-r $dbfn and -s $dbfn) {
   plan skip_all => "There is no test database to cleanup.";

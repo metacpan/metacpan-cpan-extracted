@@ -1,0 +1,6 @@
+<?perl use utf8; ?>
+<yatt:my utf8_text_longer_than_32bytes="あいうえおかきくけこさしすせそたちつてと"/>
+
+Following line should raise error
+like<pre>Can't use string ("あいうえおかきくけこ\x{00E3}"...) as a SCALAR ref while "strict refs" in use</pre>
+<?perl= $$utf8_text_longer_than_32bytes?>

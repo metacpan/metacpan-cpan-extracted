@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Unicode Locale Identifier - ~/lib/Locale/Unicode.pm
-## Version v0.3.5
+## Version v0.3.6
 ## Copyright(c) 2024 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2024/05/11
-## Modified 2024/07/28
+## Modified 2024/08/16
 ## All rights reserved
 ## 
 ## 
@@ -19,7 +19,7 @@ BEGIN
     use warnings;
     use warnings::register;
     use vars qw(
-        $ERROR $VERSION $DEBUG
+        $ERROR $VERSION $DEBUG $FATAl_EXCEPTIONS
         $LOCALE_BCP47_RE $LOCALE_BCP47_NAMELESS_RE $LOCALE_RE $LOCALE_UNICODE_SUBTAG_RE
         $LOCALE_EXTENSIONS_RE $LOCALE_TRANSFORM_PARAMETERS_RE $GRANDFATHERED_IRREGULAR
         $GRANDFATHERED_REGULAR
@@ -407,7 +407,7 @@ BEGIN
     our $PROP_TO_SUB = {};
     # False, by default
     our $EXPLICIT_BOOLEAN = 0;
-    our $VERSION = 'v0.3.5';
+    our $VERSION = 'v0.3.6';
 };
 
 use strict;
@@ -436,6 +436,7 @@ sub new
     # u-em
     $self->{emoji}              = undef;
     $self->{extended}           = undef;
+    $self->{fatal}              = ( $FATAl_EXCEPTIONS // 0 );
     # u-fw
     $self->{first_day}          = undef;
     $self->{grandfathered_irregular} = undef;
@@ -494,11 +495,22 @@ sub new
         ref( $args[0] ) eq 'HASH' )
     {
         my $opts = shift( @args );
+        # We need to set up early, so we can use it soon after
+        $self->{fatal} = delete( $opts->{fatal} ) if( exists( $opts->{fatal} ) );
         @args = %$opts;
     }
     elsif( ( scalar( @args ) % 2 ) )
     {
         return( $self->error( sprintf( "Uneven number of parameters provided (%d). Should receive key => value pairs. Parameters provided are: %s", scalar( @args ), join( ', ', @args ) ) ) );
+    }
+
+    for( my $i = 0; $i < scalar( @args ); $i += 2 )
+    {
+        if( $args[$i] eq 'fatal' )
+        {
+            $self->{fatal} = $args[$i + 1];
+            last;
+        }
     }
 
     # If the locale provided contains any subtags, parse it
@@ -1031,9 +1043,16 @@ sub error
             skip_frames => 1,
             message => $msg,
         });
-        warn( $msg ) if( warnings::enabled() );
-        rreturn( Locale::Unicode::NullObject->new ) if( Want::want( 'OBJECT' ) );
-        return;
+        if( $self->fatal )
+        {
+            die( $self->{error} );
+        }
+        else
+        {
+            warn( $msg ) if( warnings::enabled() );
+            rreturn( Locale::Unicode::NullObject->new ) if( Want::want( 'OBJECT' ) );
+            return;
+        }
     }
     return( ref( $self ) ? $self->{error} : $ERROR );
 }
@@ -1041,6 +1060,8 @@ sub error
 sub extended { return( shift->reset(@_)->_set_get_prop( 'extended', @_ ) ); }
 
 sub false { return( $Locale::Unicode::Boolean::false ); }
+
+sub fatal { return( shift->_set_get_prop( 'fatal', @_ ) ); }
 
 # u-fw
 sub first_day { return( shift->reset(@_)->_set_get_prop( 'first_day', @_ ) ); }
@@ -3875,6 +3896,20 @@ Locale::Unicode - Unicode Locale Identifier compliant with BCP47 and CLDR
     say $locale; # und-Cyrl-t-und-latn-m0-ungegn-2007
     # A locale in Cyrillic, transformed from Latin, according to a UNGEGN specification dated 2007.
 
+    # Enabling fatal exceptions
+    use v5.34;
+    use experimental 'try';
+    no warnings 'experimental';
+    try
+    {
+        my $locale = Locale::Unicode->new( 'x', fatal => 1 );
+        # More code
+    }
+    catch( $e )
+    {
+        say "Oops: ", $e->message;
+    }
+
 This API detects when methods are called in object context and return the current object:
 
     $locale->translation( 'my-software' )->tz( 'jptyo' )->ca( 'japanese' )
@@ -3886,7 +3921,7 @@ In Scalar or in list context, the value returned is the last value set.
 
 =head1 VERSION
 
-    v0.3.5
+    v0.3.6
 
 =head1 DESCRIPTION
 
@@ -4425,9 +4460,26 @@ The regular expression in L<Locale::Unicode> supports the C<extended> language s
 
 This is read-only and returns a L<Locale::Unicode::Boolean> object representing a false value.
 
-=head2 fw
+=head2 fatal
 
-This is an alias for L</first_day>
+    $locale->fatal(1); # Enable fatal exceptions
+    $locale->fatal(0); # Disable fatal exceptions
+    my $bool = $locale->fatal;
+
+Sets or get the boolean value, whether to die upon exception, or not. If set to true, then instead of setting an L<exception object|Locale::Unicode::Exception>, this module will die with an L<exception object|Locale::Unicode::Exception>. You can catch the exception object then after using C<try>. For example:
+
+    use v.5.34; # to be able to use try-catch blocks in perl
+    use experimental 'try';
+    no warnings 'experimental';
+    try
+    {
+        my $locale = Locale::Unicode->new( 'x', fatal => 1 );
+    }
+    catch( $e )
+    {
+        say "Error occurred: ", $e->message;
+        # Error occurred: Invalid locale value "x" provided.
+    }
 
 =head2 first_day
 
@@ -4436,6 +4488,10 @@ This is a Unicode First Day Identifier that specifies the preferred first day of
 Sets or gets the Unicode extension C<fw>.
 
 Its values are C<sun>, C<mon>, etc... C<sat>
+
+=head2 fw
+
+This is an alias for L</first_day>
 
 =head2 grandfathered
 
@@ -5210,9 +5266,9 @@ Sets or gets the Unicode extension C<va>.
 
 =head2 variants
 
-This returns the C<variant> part of the C<locale> as an array reference of C<variants>.
+This returns the C<variant> part of the C<locale> as an array reference of C<variant> subtags.
 
-It will always return an array reference whether any variant is set or not.
+It will always return an array reference whether any C<variant> is set or not.
 
     my $locale = Locale::Unicode->new( 'en-fonipa-scouse' );
     my $ref = $locale->variants; # ['fonipa', 'scouse']
@@ -9446,6 +9502,14 @@ Sets the parameter key for the variable top.
 B<This is deprecated by the LDML standard.>
 
 =back
+
+=head1 EXCEPTIONS
+
+This module does not die upon errors, unless you have set L<fatal|/fatal> to a true value. Instead it sets an L<error object|Locale::Unicode::Exception> that can be retrieved.
+
+When an error occurred, an L<error object|Locale::Unicode::Exception> will be set and the method will return C<undef> in scalar context and an empty list in list context.
+
+Otherwise, the only occasions when this module will die is when there is an internal design error, which would be my fault.
 
 =head1 SERIALISATION
 

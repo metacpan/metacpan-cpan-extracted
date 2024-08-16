@@ -15,7 +15,7 @@ use MOP4Import::t::t_lib qw/no_error expect_script_error/;
 describe "MOP4Import::Types", sub {
 
   describe "require MOP4Import::Types", sub {
-    it "should loaded correctly", sub {
+    it "should be loaded correctly", sub {
       ok { require MOP4Import::Types };
       # This will help debugging.
     };
@@ -121,7 +121,7 @@ sub m3 {OtherConst}
 
   };
 
-  describe "subtypes", sub {
+  describe "pragma [subtypes]", sub {
     it "should have no error", no_error q{
 package Test2;
 use MOP4Import::Types
@@ -160,6 +160,88 @@ $bar->{bar} = $baz->{name};
 		   , {name => 'baz', baz => 'baz'}]);
       };
     };
+
+    describe "type Foo", sub {
+      it "should have correct fields", sub {
+        expect([sort keys %{MOP4Import::Util::fields_hash('Test2::Foo')}])->to_be([qw/foo name/])
+      };
+    };
+    describe "type Bar", sub {
+      it "should have correct fields", sub {
+        expect([sort keys %{MOP4Import::Util::fields_hash('Test2::Bar')}])->to_be([qw/bar foo name/])
+      };
+    };
+    describe "type Baz", sub {
+      it "should have correct fields", sub {
+        expect([sort keys %{MOP4Import::Util::fields_hash('Test2::Baz')}])->to_be([qw/baz name/])
+      };
+    };
+  };
+
+  describe "pragma [extends]", sub {
+    it "should have no error", no_error q{
+package Test3;
+use MOP4Import::Types
+   Base => [
+     [fields => qw/name/],
+   ],
+   Foo => [
+     [extends => qw/Base/],
+     [fields => qw/FOO/],
+   ],
+   Bar => [
+     [extends => qw/Foo/],
+     [fields => qw/BAR/],
+   ],
+   Baz => [
+     [extends => qw/Bar/],
+     [fields => qw/BAZ/],
+   ],
+   FromTest2Bar => [
+     [extends => qw/Test2::Bar/],
+     [fields => qw/fromtest2/],
+   ]
+   ;
+1;
+};
+
+    describe "type Foo", sub {
+      it "should have correct fields", sub {
+        expect([sort keys %{MOP4Import::Util::fields_hash('Test3::Foo')}])->to_be([qw/FOO name/])
+      };
+    };
+    describe "type Bar", sub {
+      it "should have correct fields", sub {
+        expect([sort keys %{MOP4Import::Util::fields_hash('Test3::Bar')}])->to_be([qw/BAR FOO name/])
+      };
+    };
+    describe "type Baz", sub {
+      it "should have correct fields", sub {
+        expect([sort keys %{MOP4Import::Util::fields_hash('Test3::Baz')}])->to_be([qw/BAR BAZ FOO name/])
+      };
+    };
+    describe "type FromTest2Bar", sub {
+      it "should have correct fields", sub {
+        expect([sort keys %{MOP4Import::Util::fields_hash('Test3::FromTest2Bar')}])->to_be([qw/bar foo fromtest2 name/])
+      };
+    };
+
+    describe "extends hand-written base class", sub {
+      {
+        package Test4::Inner::Base;
+        use MOP4Import::Base::Configure -as_base
+          , [fields => qw/foo bar/];
+      }
+      it "should have no error", no_error q{
+package Test4;
+use MOP4Import::Types
+Baz => [
+[extends => "Test4::Inner::Base"],
+[fields => qw/baz/],
+],
+};
+    };
+
   };
 };
 

@@ -3,7 +3,7 @@
 TITLE: var in toplevel
 IN:
  <!yatt:args x=html>
- &yatt:x;
+ <?perl undef $html_x;?> &yatt:x;
 PARAM[
 ]
 ERROR: ^Use of uninitialized value (?:\$html_x )?in print at \S+ line 2,
@@ -12,13 +12,13 @@ TITLE: var in widget
 IN:
  <yatt:foo/>
  <!yatt:widget foo x=html>
- &yatt:x;
+ <?perl undef $html_x;?> &yatt:x;
 ERROR: ^Use of uninitialized value (?:\$html_x )?in print at \S+ line 3,
 
 TITLE: var in body
 IN:
  <yatt:foo>
-  &yatt:x;
+  <?perl undef $html_x;?> &yatt:x;
  </yatt:foo>
  
  <!yatt:widget foo body = [code x=html]>
@@ -29,7 +29,7 @@ TITLE: var in nested body
 IN:
  <yatt:foo>
  <yatt:bar>
- &yatt:x;
+ <?perl undef $html_x;?> &yatt:x;
  </yatt:bar>
  </yatt:foo>
  
@@ -42,7 +42,7 @@ ERROR: ^Use of uninitialized value (?:\$html_x )?in print at \S+ line 3,
 TITLE: pi var in body
 IN:
  <yatt:foo>
- <?perl===&yatt:x;?>
+ <?perl=== undef $html_x; &yatt:x;?>
  </yatt:foo>
  
  <!yatt:widget foo body = [code x=html]>

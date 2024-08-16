@@ -63,7 +63,7 @@
         <UML:Attribute visibility="protected" isSpecification="false" xmi.id="nX0ps0OgKkah" name="$CON"/>
        </UML:Classifier.feature>
       </UML:Class>
-      <UML:Class visibility="public" isSpecification="false" namespace="Logical View" isAbstract="false" isLeaf="false" isRoot="false" xmi.id="vD8c54GYRnqT" name="(MyApp) (for all-dir, omissible)">
+      <UML:Class visibility="public" isSpecification="false" namespace="Logical View" isAbstract="false" isLeaf="false" isRoot="false" xmi.id="vD8c54GYRnqT" name="(MyYATT) (for all-dir, omissible)">
        <UML:GeneralizableElement.generalization>
         <UML:Generalization xmi.idref="DrpCvNgPmm1L"/>
        </UML:GeneralizableElement.generalization>
@@ -94,7 +94,7 @@
       <UML:Package visibility="public" isSpecification="false" namespace="Logical View" isAbstract="false" isLeaf="false" isRoot="false" xmi.id="1KFhkc4zvKvD" name="YATT::Lite::WebMVC0::">
        <UML:Namespace.ownedElement/>
       </UML:Package>
-      <UML:Package visibility="public" isSpecification="false" namespace="Logical View" isAbstract="false" isLeaf="false" isRoot="false" xmi.id="fu4Uhm3HVqTu" name="MyApp::">
+      <UML:Package visibility="public" isSpecification="false" namespace="Logical View" isAbstract="false" isLeaf="false" isRoot="false" xmi.id="fu4Uhm3HVqTu" name="MyYATT::">
        <UML:Namespace.ownedElement/>
       </UML:Package>
       <UML:Class visibility="public" isSpecification="false" namespace="Logical View" isAbstract="false" isLeaf="false" isRoot="false" xmi.id="isHEMrBtO5RN" name="(.htyattrc.pl) (per-dir controller)">
@@ -173,7 +173,7 @@
          <boxwidget width="451" showstereotype="1" x="40" usesdiagramusefillcolor="1" y="140" usesdiagramfillcolor="1" isinstance="0" fillcolor="none" height="127" linecolor="#000000" xmi.id="ZrRs8LMYz3G9" textcolor="#000000" usefillcolor="1" linewidth="none" font="Sans Serif,10,-1,5,50,0,0,0,0,0"/>
          <floatingtext linecolor="none" usesdiagramfillcolor="1" linewidth="none" textcolor="#000000" usesdiagramusefillcolor="1" x="210" showstereotype="1" y="140" text="YATT::Lite::WebMVC0" font="Sans Serif,10,-1,5,50,0,0,0,0,0" pretext="" role="700" width="137" isinstance="0" posttext="" usefillcolor="1" fillcolor="none" xmi.id="scX8XBF42ew9" height="21"/>
          <boxwidget width="744" showstereotype="1" x="40" usesdiagramusefillcolor="1" y="290" usesdiagramfillcolor="1" isinstance="0" fillcolor="none" height="148" linecolor="#000000" xmi.id="5inMcq6Iys5Z" textcolor="#000000" usefillcolor="1" linewidth="none" font="Sans Serif,10,-1,5,50,0,0,0,0,0"/>
-         <floatingtext linecolor="none" usesdiagramfillcolor="1" linewidth="none" textcolor="#000000" usesdiagramusefillcolor="1" x="210" showstereotype="1" y="410" text="Per-installation, user written app.psgi(MySite), MyApp, index.yatt..." font="Sans Serif,10,-1,5,50,0,0,0,0,0" pretext="" role="700" width="430" isinstance="0" posttext="" usefillcolor="1" fillcolor="none" xmi.id="oXDqHOkd6nUx" height="21"/>
+         <floatingtext linecolor="none" usesdiagramfillcolor="1" linewidth="none" textcolor="#000000" usesdiagramusefillcolor="1" x="210" showstereotype="1" y="410" text="Per-installation, user written app.psgi(MySite), MyYATT, index.yatt..." font="Sans Serif,10,-1,5,50,0,0,0,0,0" pretext="" role="700" width="430" isinstance="0" posttext="" usefillcolor="1" fillcolor="none" xmi.id="oXDqHOkd6nUx" height="21"/>
          <classwidget linecolor="none" usesdiagramfillcolor="1" linewidth="none" showoperations="1" textcolor="#000000" usesdiagramusefillcolor="1" showpubliconly="0" showpackage="1" x="290" showattsigs="601" showstereotype="1" y="300" showattributes="1" font="Sans Serif,10,-1,5,75,0,0,0,0,0" width="236" isinstance="0" usefillcolor="1" fillcolor="none" xmi.id="vD8c54GYRnqT" showscope="1" height="40" showopsigs="601"/>
         </widgets>
         <messages/>

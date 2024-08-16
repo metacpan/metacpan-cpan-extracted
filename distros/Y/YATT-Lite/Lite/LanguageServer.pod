@@ -1,0 +1,51 @@
+=encoding utf-8
+
+=head1 NAME
+
+YATT::Lite::LanguageServer - Language Server for YATT::Lite
+
+=head1 SYNOPSIS
+
+  % ./lib/YATT/Lite/LanguageServer.pm server
+  # server started
+  # start aio read header.
+  {"jsonrpc":"2.0","id":1,"method":"initialize","params":{}}
+  # end aio read header. is_utf8=no cnt=80
+  
+  sepPos=18
+  # got header: {"Content-Length":"58"}
+  # enter read body.
+  # finished read body. len=58.
+  # processing request: {"id":1,"jsonrpc":"2.0","method":"initialize","params":{}}
+  # call_method: lspcall__initialize '{}'
+  # sending response: {"id":1,"jsonrpc":"2.0","result":{"capabilities":{"definitionProvider":true,"documentSymbolProvider":true,"hoverProvider":true,"implementationProvider":true,"textDocumentSync":{"change":2,"openClose":true,"save":true}}}}
+  # start aio read header.
+  # sent response
+  
+  {"id":1,"jsonrpc":"2.0","result":{"capabilities":{"definitionProvider":true,"documentSymbolProvider":true,"hoverProvider":true,"implementationProvider":true,"textDocumentSync":{"change":2,"openClose":true,"save":true}}}
+
+
+=head1 DESCRIPTION
+
+YATT::Lite::LanguageServer is a Modulino to provide a Language Server for YATT::Lite.
+
+=head2 Editor Integration
+
+=over 4
+
+=item * Emacs (via Eglot)
+
+L<poly-yatt|https://github.com/hkoba/poly-yatt>
+
+=item * VS Code
+
+L<wip-vscode-yatt|https://github.com/hkoba/wip-vscode-yatt>
+
+=back
+
+
+=head1 AUTHOR
+
+"KOBAYASI, Hiroaki" <hkoba@cpan.org>
+
+=cut

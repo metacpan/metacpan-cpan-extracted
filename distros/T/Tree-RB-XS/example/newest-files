@@ -1,0 +1,51 @@
+#!perl
+use v5.20;
+use warnings;
+use autouse 'Pod::Usage' => 'pod2usage';
+use Time::Piece;
+use File::Find;
+use Tree::RB::XS 0.12;
+use Getopt::Long;
+
+=head1 USAGE
+
+  newest-files [-n COUNT=10] PATH
+
+Display the newest (by mtime) COUNT files anywhere under a PATH.
+
+=cut
+
+GetOptions(
+   'n=i' => \(my $n= 10),
+   'each' => \my $opt_each,
+   'help' => sub { pod2usage(1) },
+) && @ARGV
+   or pod2usage(2);
+
+-e $_ or pod2usage(-message => "$_ does not exist")
+   for @ARGV;
+
+my $t= Tree::RB::XS->new(compare_fn => "int", allow_duplicates => 1);
+
+sub show_topN {
+   my $i= $t->rev_iter;
+   while (my ($time, $name)= $i->next_kv(1)) {
+      my $t= localtime($time);
+      printf "%s %s %s\n", $t->ymd, $t->hms, $name;
+   }
+}
+
+for my $path (@ARGV) {
+   find(sub{
+      my $mtime= (lstat($_))[9]
+         or do { warn "Can't stat $File::Find::name\n"; return; };
+      $t->insert($mtime, $File::Find::name) unless -d _;
+      $t->min_node->prune if $t->size > $n;
+   }, $path);
+   if ($opt_each) {
+      show_topN;
+      $t->clear;
+   }
+}
+
+show_topN unless $opt_each;

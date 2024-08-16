@@ -6,6 +6,10 @@ use warnings qw(FATAL all NONFATAL misc);
 use FindBin; BEGIN { do "$FindBin::Bin/t_lib.pl" }
 #----------------------------------------
 
+#
+# Note: To see generated perl codes, run this test with DEBUG=2.
+#
+
 use Test::More;
 use YATT::Lite::Test::TestUtil;
 
@@ -330,6 +334,33 @@ END
 
   my $pkg = $yatt->find_product(perl => $tmpl);
   run_list($THEME, \@list, $pkg, render_ => ());
+}
+
+$i = 9;
+{
+  my $THEME = "foreach";
+  my $yatt = new YATT::Lite(app_ns => myapp($i), vfs => [data => {}], @OPT);
+  my $SUB = 'index';
+  ok(my $tmpl = $yatt->add_to($SUB => inject <<'END', \ my @list), "$THEME - add_to $SUB");
+<!yatt:args list="list">
+
+<table><!--3-->
+<yatt:foreach my:list=row list>
+<tr><!--5-->
+<yatt:foreach my=col list=row>
+<td><!--7-->
+&yatt:col;
+</td>
+</yatt:foreach>
+</tr><!--11-->
+</yatt:foreach>
+</table><!--13-->
+END
+
+  $yatt->ensure_parsed($yatt->find_part($SUB, ''));
+
+  my $pkg = $yatt->find_product(perl => $tmpl);
+  run_list($THEME, \@list, $pkg, render_ => ([["FOO"]]));
 }
 
 done_testing();

@@ -243,7 +243,7 @@ X<MY> X<MY-alias>
 C<my> に加えて C<MY> を書き加えるだけで
 strict 検査を効かせることが出来ます。
 
-  package MyApp::Model::Company::LongLongProductName {
+  package MyYATT::Model::Company::LongLongProductName {
     sub MY () {__PACKAGE__};
     use fields qw/price/;
 
