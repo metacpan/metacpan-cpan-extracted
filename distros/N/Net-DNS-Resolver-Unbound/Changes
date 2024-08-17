@@ -1,10 +1,15 @@
 Revision history for Perl extension Net::DNS::Resolver::Unbound.
 
 
+**** 1.29  Aug 16, 2024
+
+	Add import list -register option to replace resolver base.
+
+
 **** 1.28  Aug 3, 2024
 
 	Unbound 1.9.0 ub_ctx_create() can fail with SEGV.
-	Test fixed to avoid failure, but UB bug remains.
+	Tests fixed to avoid failure, but the risk remains.
 
 
 **** 1.27  Jul 23, 2024

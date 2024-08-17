@@ -1,5 +1,5 @@
 package ExtUtils::Config::MakeMaker;
-$ExtUtils::Config::MakeMaker::VERSION = '0.009';
+$ExtUtils::Config::MakeMaker::VERSION = '0.010';
 use strict;
 use warnings;
 
@@ -73,7 +73,7 @@ ExtUtils::Config::MakeMaker - A ExtUtils::Config compatible wrapper for ExtUtils
 
 =head1 VERSION
 
-version 0.009
+version 0.010
 
 =head1 SYNOPSIS
 

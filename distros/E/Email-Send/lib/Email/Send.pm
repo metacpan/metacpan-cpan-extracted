@@ -1,13 +1,14 @@
 package Email::Send;
-use strict;
+use v5.14.0;
 
-use vars qw[$VERSION];
-$VERSION   = '2.201';
+our $VERSION   = '2.202';
+$VERSION = eval $VERSION;
 
 use Email::Simple 1.92;
 use Module::Pluggable 2.97
   search_path => 'Email::Send',
   except      => $Email::Send::__plugin_exclusion;
+
 BEGIN {
   local $Return::Value::NO_CLUCK = 1;
   require Return::Value;
@@ -36,14 +37,14 @@ well-tested.  Please consider using it instead for any new work.
   To: recipient@example.com
   From: sender@example.com
   Subject: Hello there folks
-  
+
   How are you? Enjoy!
   __MESSAGE__
 
   my $sender = Email::Send->new({mailer => 'SMTP'});
   $sender->mailer_args([Host => 'smtp.example.com']);
   $sender->send($message);
-  
+
   # more complex
   my $bulk = Email::Send->new;
   for ( qw[SMTP Sendmail Qmail] ) {
@@ -54,7 +55,7 @@ well-tested.  Please consider using it instead for any new work.
       my ($sender, $message, $to) = @_;
       $message->header_set(To => qq[$to\@geeknest.com])
   });
-  
+
   my @to = qw[casey chastity evelina casey_jr marshall];
   my $rv = $bulk->send($message, $_) for @to;
 
@@ -298,7 +299,7 @@ __END__
       use Net::Example;
       Net::Example->do_it($message) or return;
   }
-  
+
   1;
 
 Writing new mailers is very simple. If you want to use a short name
@@ -319,7 +320,7 @@ Here's an example of a mailer that sends email to a URL.
 
   use vars qw[$AGENT $URL $FIELD];
   use Return::Value;
-  
+
   sub is_available {
       eval { use LWP::UserAgent }
   }
@@ -345,7 +346,7 @@ This example will keep a UserAgent singleton unless new arguments are
 passed to C<send>. It is used by calling C<Email::Send::send>.
 
   my $sender = Email::Send->new({ mailer => 'HTTP::Post' });
-  
+
   $sender->mailer_args([ 'http://example.com/incoming', 'message' ]);
 
   $sender->send($message);
@@ -370,14 +371,27 @@ L<http://emailproject.perl.org/wiki/Email::Send>
 
 =head1 AUTHOR
 
-Current maintainer: Ricardo SIGNES, <F<rjbs@cpan.org>>.
+Casey West, <F<casey@geeknest.com>>.
 
-Original author: Casey West, <F<casey@geeknest.com>>.
+=head1 CONTRIBUTORS
 
-=head1 COPYRIGHT
+=over
 
-  Copyright (c) 2005 Casey West.  All rights reserved.
-  This module is free software; you can redistribute it and/or modify it
-  under the same terms as Perl itself.
+=item *
+
+Chase Whitener, <F<capoeirab@cpan.org>>.
+
+=item *
+
+Ricardo SIGNES, <F<rjbs@cpan.org>>.
+
+=back
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (c) 2004 Casey West.  All rights reserved.
+
+This module is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
 
 =cut

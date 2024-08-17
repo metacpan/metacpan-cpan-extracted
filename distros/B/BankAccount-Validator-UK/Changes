@@ -1,5 +1,10 @@
 Revision history for BankAccount::Validator::UK
 
+0.66  2022-08-16T21:45:00:+00:00
+      - Happy CPAN Day !!!
+      - Updated the valacdos.txt (v7.90)
+      - Added sort code range: 040335-040339, 043926-043935
+
 0.65  2022-08-09T20:30:00:+00:00
       - Updated the valacdos.txt (v7.30)
       - Deleted sort code range: 406460-406460

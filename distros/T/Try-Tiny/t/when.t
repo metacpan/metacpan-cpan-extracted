@@ -6,6 +6,7 @@ use Test::More;
 BEGIN {
   plan skip_all => 'Perl 5.010 is required' unless "$]" >= '5.010';
   plan skip_all => 'Tests skipped on perl 5.27.{7,8,9} when smartmatch behaviour changed' if "$]" >= '5.027007' and "$]" < '5.027010';
+  plan skip_all => 'given/when have been removed in perl 5.42' if "$]" >= '5.041003';
   plan tests => 5;
 }
 

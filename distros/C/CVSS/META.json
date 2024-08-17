@@ -55,7 +55,7 @@
          "web" : "https://github.com/giterlizzi/perl-CVSS"
       }
    },
-   "version" : "1.12",
+   "version" : "1.13",
    "x_purl" : "pkg:cpan/GDT/CVSS",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

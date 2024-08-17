@@ -1,5 +1,8 @@
 Change history for CVSS
 
+1.13 2024-08-16
+    - Return undef in "to_vector_string" if any of "base" metrics is missing
+
 1.12 2024-08-07
     - Improved documentation
     - Removed use of "List::Util::any" for old Perl versions (giterlizzi/perl-CVSS#3) 

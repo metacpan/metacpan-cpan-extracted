@@ -19,6 +19,47 @@
 #
 #######################################################################
 
+2024-08-16  Brian M. Kelly <Brian.Kelly@fullauto.com>
+
+        * Version 1.0000708 released
+
+        * Build Data::Dump::Streamer via exec
+
+2024-08-16  Brian M. Kelly <Brian.Kelly@fullauto.com>
+
+        * Version 1.0000707 released
+
+        * Help Data::Dump::Streamer on AWS micro & nano
+
+2024-08-16  Brian M. Kelly <Brian.Kelly@fullauto.com>
+
+        * Version 1.0000706 released
+
+        * CPAN install on micro & nano AWS instances
+
+2024-08-16  Brian M. Kelly <Brian.Kelly@fullauto.com>
+
+        * Version 1.0000705 released
+
+        * More debug for Makefile.PL
+
+2024-08-16  Brian M. Kelly <Brian.Kelly@fullauto.com>
+
+        * Version 1.0000704 released
+
+        * More debug for Makefile.PL
+
+2024-08-16  Brian M. Kelly <Brian.Kelly@fullauto.com>
+
+        * Version 1.0000703 released
+
+        * More debug for Makefile.PL
+
+2024-08-16  Brian M. Kelly <Brian.Kelly@fullauto.com>
+
+        * Version 1.0000702 released
+
+        * More debug for Makefile.PL
 
 2024-08-15  Brian M. Kelly <Brian.Kelly@fullauto.com>
 

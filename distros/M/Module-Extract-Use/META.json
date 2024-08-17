@@ -62,6 +62,6 @@
          "web" : "https://github.com/briandfoy/module-extract-use"
       }
    },
-   "version" : "1.052",
+   "version" : "1.053",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

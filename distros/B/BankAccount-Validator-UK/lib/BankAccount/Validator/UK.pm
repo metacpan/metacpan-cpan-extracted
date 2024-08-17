@@ -1,6 +1,6 @@
 package BankAccount::Validator::UK;
 
-$BankAccount::Validator::UK::VERSION   = '0.65';
+$BankAccount::Validator::UK::VERSION   = '0.66';
 $BankAccount::Validator::UK::AUTHORITY = 'cpan:MANWAR';
 
 =head1 NAME
@@ -9,7 +9,7 @@ BankAccount::Validator::UK - Interface to validate UK bank account.
 
 =head1 VERSION
 
-Version 0.65
+Version 0.66
 
 =cut
 
@@ -36,7 +36,7 @@ has sort_code  => (is => 'ro', default => sub { BankAccount::Validator::UK::Rule
 The module uses the algorithm provided by VOCALINK to validate the bank sort code
 and account number.  It is  done by modulus  checking  method as specified in the
 document which is available on their website L<VOCALINK|https://www.vocalink.com/tools/modulus-checking/>
-It currently supports the document L<v7.30|https://www.vocalink.com/media/5gbdhdhe/validating-account-numbers-uk-modulus-checkingv7-3.pdf> drafted 24th June 2022.
+It currently supports the document L<v7.90|https://www.vocalink.com/media/a2febq5m/validating-account-numbers-uk-modulus-checking-v7-90.pdf> drafted 27th June 2024.
 
 Institutions covered by this document are below:
 
@@ -609,8 +609,7 @@ L<https://github.com/manwar/BankAccount-Validator-UK>
 
 =head1 BUGS
 
-Please  report  any bugs or feature requests to C<bug-bankaccount-validator-uk at
-rt.cpan.org>, or through the web interface at L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=BankAccount-Validator-UK>.
+Please  report any bugs or feature requests through the web interface at L<https://github.com/manwar/BankAccount-Validator-UK/issues>.
 I will be notified, and then you'll automatically be notified of progress on your
 bug as I make changes.
 
@@ -624,15 +623,19 @@ You can also look for information at:
 
 =over 4
 
-=item * RT: CPAN's request tracker (report bugs here)
+=item * BUG Report
 
-L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=BankAccount-Validator-UK>
+L<https://github.com/manwar/BankAccount-Validator-UK/issues>
+
+=item * AnnoCPAN: Annotated CPAN documentation
+
+L<http://annocpan.org/dist/BankAccount-Validator-UK>
 
 =item * CPAN Ratings
 
 L<http://cpanratings.perl.org/d/BankAccount-Validator-UK>
 
-=item * MetaCPAN
+=item * Search MetaCPAN
 
 L<https://metacpan.org/dist/BankAccount-Validator-UK>
 
@@ -640,7 +643,7 @@ L<https://metacpan.org/dist/BankAccount-Validator-UK>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (C) 2012 - 2021 Mohammad S Anwar.
+Copyright (C) 2012 - 2024 Mohammad Sajid Anwar.
 
 This program  is  free software; you can redistribute it and / or modify it under
 the  terms  of the the Artistic License  (2.0). You may obtain a copy of the full

@@ -33,5 +33,5 @@ resources:
   bugtracker: https://github.com/briandfoy/module-extract-use/issues
   homepage: https://github.com/briandfoy/module-extract-use
   repository: https://github.com/briandfoy/module-extract-use
-version: '1.052'
+version: '1.053'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -4,42 +4,31 @@ BEGIN {
 }
 
 use Test::Most;
-use Capture::Tiny (
-    'capture_merged',
-    'capture_stdout',
-    'capture_stderr',
-    'capture',
-    'tee_merged',
-    'tee_stdout',
-    'tee_stderr',
-    'tee'
-);
+use Capture::Tiny ('capture_merged', 'capture_stdout', 'capture_stderr', 'capture', 'tee_merged', 'tee_stdout',
+    'tee_stderr', 'tee',);
 use Cwd 'realpath';
 use Data::Dumper::Concise;
 use DBI;
 use DBIx::Squirrel::util (':all');
-use DBIx::Squirrel (
-    ':utils',
-    database_entities => [ 'db', 'st', 'it', 'rs', 'artist', 'artists' ],
-);
+use DBIx::Squirrel       (':utils', database_entities => ['db', 'st', 'it', 'rs', 'artist', 'artists'],);
 
 use lib realpath("$FindBin::Bin/../lib");
 use T::Database ':all';
 
-our ( $stdout, $stderr, $merged );
-our ( $res,    @res );
-our ( $got,    $exp );
-our ( @arr,    %hash );
-our ( $aref,   $href );
-our ( $cref,   $crefs );
-our (@args);
+our($stdout, $stderr, $merged);
+our($res,    @res);
+our($got,    $exp);
+our(@arr,    %hash);
+our($aref,   $href);
+our($cref,   $crefs);
+our(@args);
 
 subtest 'get_trimmed_sql_and_digest' => sub {
-    is( get_trimmed_sql_and_digest("  \n\t  SELECT * \nFROM t  \n  "), "SELECT *\nFROM t" );
+    is(get_trimmed_sql_and_digest("  \n\t  SELECT * \nFROM t  \n  "), "SELECT *\nFROM t");
 };
 
 subtest 'connect' => sub {
-    no strict 'subs';  ## no critic
+    no strict 'subs';    ## no critic
 
     my $dbi_dbh = DBI->connect(@T_DB_CONNECT_ARGS);
     my $dbi_sth = $dbi_dbh->prepare("  SELECT * FROM media_types  ");
@@ -48,41 +37,41 @@ subtest 'connect' => sub {
     my $ekorn_dbh = DBIx::Squirrel->connect(@T_DB_CONNECT_ARGS);
     my $ekorn_sth = $ekorn_dbh->prepare('  SELECT COUNT(*) AS foo FROM media_types  ');
 
-    ok( !defined db );
+    ok(!defined(db));
     db $ekorn_dbh;
-    isa_ok( db, 'DBIx::Squirrel::db' );
+    isa_ok(db, 'DBIx::Squirrel::db');
     undef $DBIx::Squirrel::db;
 
-    ok( !defined st );
+    ok(!defined(st));
     st $ekorn_sth;
-    isa_ok( st, 'DBIx::Squirrel::st' );
+    isa_ok(st, 'DBIx::Squirrel::st');
     undef $DBIx::Squirrel::st;
 
-    ok( !defined it );
+    ok(!defined(it));
     it $ekorn_sth->it;
-    isa_ok( it, 'DBIx::Squirrel::it' );
+    isa_ok(it, 'DBIx::Squirrel::it');
     undef $DBIx::Squirrel::it;
 
-    ok( !defined rs );
+    ok(!defined(rs));
     rs $ekorn_sth->rs;
-    isa_ok( rs, 'DBIx::Squirrel::rs' );
+    isa_ok(rs, 'DBIx::Squirrel::rs');
     undef $DBIx::Squirrel::rs;
 
-    ok( defined &neat );
-    is( neat('foo'), "'foo'" );
+    ok(defined(&neat));
+    is(neat('foo'), "'foo'");
 
     $ekorn_dbh->disconnect;
 };
 
 subtest 'example_1' => sub {
-    db do { DBIx::Squirrel->connect(@T_DB_CONNECT_ARGS) };
-    isa_ok( db, 'DBIx::Squirrel::db' );
+    db do {DBIx::Squirrel->connect(@T_DB_CONNECT_ARGS)};
+    isa_ok(db, 'DBIx::Squirrel::db');
 
     # Using the "db" association, associate the "artists" and "artist"
     # helpers with their prepared statements:
 
-    artists do { db->results('SELECT * FROM artists') };
-    isa_ok( artists, 'DBIx::Squirrel::rs' );
+    artists do {db->results('SELECT * FROM artists')};
+    isa_ok(artists, 'DBIx::Squirrel::rs');
 
     artist do {
         db->results(
@@ -94,15 +83,15 @@ subtest 'example_1' => sub {
         );
     };
 
-    isa_ok( artist, 'DBIx::Squirrel::rs' );
+    isa_ok(artist, 'DBIx::Squirrel::rs');
 
     # Have the statement helpers to execute their queries.
 
     @arr = artists->all;
-    is( $arr[0]->Name,                         'AC/DC' );
-    is( $arr[-1]->Name,                        'Philip Glass Ensemble' );
+    is($arr[0]->Name,  'AC/DC');
+    is($arr[-1]->Name, 'Philip Glass Ensemble');
     artist('Aerosmith')->single;
-    is( $_->ArtistId, 3 );
+    is($_->ArtistId, 3);
 
     db->disconnect;
 };
@@ -148,17 +137,11 @@ subtest 'cbargs' => sub {
         'sub2' => sub {2},
     );
 
-    is_deeply( [ cbargs( 1 .. 5 ) ], [ [], 1 .. 5 ] );
+    is_deeply([cbargs(1 .. 5)], [[], 1 .. 5]);
 
-    is_deeply(
-        [ cbargs( 1 .. 5, $hash{'sub1'} ) ],
-        [ [ $hash{'sub1'} ], 1 .. 5 ]
-    );
+    is_deeply([cbargs(1 .. 5, $hash{'sub1'})], [[$hash{'sub1'}], 1 .. 5],);
 
-    is_deeply(
-        [ cbargs( 1 .. 5, $hash{'sub1'}, $hash{'sub2'} ) ],
-        [ [ $hash{'sub1'}, $hash{'sub2'}, ], 1 .. 5 ]
-    );
+    is_deeply([cbargs(1 .. 5, $hash{'sub1'}, $hash{'sub2'})], [[$hash{'sub1'}, $hash{'sub2'},], 1 .. 5],);
 };
 
 subtest 'cbargs_using' => sub {
@@ -167,136 +150,96 @@ subtest 'cbargs_using' => sub {
         'sub2' => sub {2},
     );
 
-    is_deeply( [ cbargs_using( undef, 1 .. 5 ) ], [ [], 1 .. 5 ] );
+    is_deeply([cbargs_using(undef, 1 .. 5)], [[], 1 .. 5]);
 
-    is_deeply( [ cbargs_using( [], 1 .. 5 ) ], [ [], 1 .. 5 ] );
+    is_deeply([cbargs_using([], 1 .. 5)], [[], 1 .. 5]);
 
-    is_deeply(
-        [ cbargs_using( [], 1 .. 5, $hash{'sub1'} ) ],
-        [ [ $hash{'sub1'} ], 1 .. 5 ]
-    );
+    is_deeply([cbargs_using([], 1 .. 5, $hash{'sub1'})], [[$hash{'sub1'}], 1 .. 5],);
 
-    is_deeply(
-        [ cbargs_using( [], 1 .. 5, $hash{'sub1'}, $hash{'sub2'} ) ],
-        [ [ $hash{'sub1'}, $hash{'sub2'}, ], 1 .. 5 ]
-    );
+    is_deeply([cbargs_using([], 1 .. 5, $hash{'sub1'}, $hash{'sub2'})], [[$hash{'sub1'}, $hash{'sub2'},], 1 .. 5],);
 
-    is_deeply(
-        [ cbargs_using( [ $hash{'sub2'} ], 1 .. 5, $hash{'sub1'}, ) ],
-        [ [ $hash{'sub1'}, $hash{'sub2'}, ], 1 .. 5 ]
-    );
+    is_deeply([cbargs_using([$hash{'sub2'}], 1 .. 5, $hash{'sub1'},)], [[$hash{'sub1'}, $hash{'sub2'},], 1 .. 5],);
 };
 
 subtest 'transform' => sub {
-    is_deeply( [ transform() ], [] );
+    is_deeply([transform()], []);
 
-    is_deeply( [ transform( [] ) ], [] );
+    is_deeply([transform([])], []);
 
-    is_deeply( [ transform( [], 99 ) ], [99] );
+    is_deeply([transform([], 99)], [99]);
 
-    is_deeply( [ transform( [], 98, 99 ) ], [ 98, 99 ] );
+    is_deeply([transform([], 98, 99)], [98, 99]);
 
-    is_deeply(
-        [ transform( sub { $_ + 1 }, 99 ) ],
-        [100]
-    );
+    is_deeply([transform(sub {$_ + 1}, 99)], [100],);
 
-    is_deeply(
-        [ transform( sub { $_[0] + 1 }, 99 ) ],
-        [100]
-    );
+    is_deeply([transform(sub {$_[0] + 1}, 99)], [100],);
 
-    is_deeply(
-        [ transform( [ sub { $_ + 1 } ], 99 ) ],
-        [100]
-    );
+    is_deeply([transform([sub {$_ + 1}], 99)], [100],);
 
-    is_deeply(
-        [ transform( [ sub { $_[0] + 1 } ], 99 ) ],
-        [100]
-    );
+    is_deeply([transform([sub {$_[0] + 1}], 99)], [100],);
 
-    is_deeply(
-        [   transform(
-                [   sub {
-                        map { $_ + 1 } @_;
-                    }
-                ],
+    is_deeply([
+            transform(
+                [sub {
+                    map {$_ + 1} @_;
+                }],
                 98,
-                99
+                99,
             )
         ],
-        [ 99, 100 ]
+        [99, 100],
     );
 
-    is_deeply(
-        [   transform(
-                [   sub { $_ + 1 },
-                    sub { $_ - 2 }
-                ],
-                99
-            )
-        ],
-        [98]
-    );
+    is_deeply([transform([sub {$_ + 1}, sub {$_ - 2},], 99,)], [98],);
 
-    is_deeply(
-        [   transform(
-                [   sub { $_[0] + 1 },
-                    sub { $_[0] - 2 }
-                ],
-                99
-            )
-        ],
-        [98]
-    );
+    is_deeply([transform([sub {$_[0] + 1}, sub {$_[0] - 2},], 99,)], [98],);
 
-    is_deeply(
-        [   transform(
-                [   sub {
-                        map { $_ + 1 } @_;
+    is_deeply([
+            transform([
+                    sub {
+                        map {$_ + 1} @_;
                     },
                     sub {
-                        map { $_ - 2 } @_;
+                        map {$_ - 2} @_;
                     },
                 ],
                 98,
-                99
+                99,
             )
         ],
-        [ 97, 98 ]
+        [97, 98],
     );
 };
 
 subtest 'throw' => sub {
-    eval { throw undef };
-    like( $@, qr/\AException at / );
+    eval {throw undef};
+    like($@, qr/\AException at /);
 
-    eval { throw 'Got an exception' };
-    like( $@, qr/\AGot an exception at / );
+    eval {throw 'Got an exception'};
+    like($@, qr/\AGot an exception at /);
 
-    eval { throw 'Exception %d, %d, %d', 1, 2, 3 };
-    like( $@, qr/\AException 1, 2, 3 at/ );
+    eval {throw 'Exception %d, %d, %d', 1, 2, 3};
+    like($@, qr/\AException 1, 2, 3 at/);
 
     eval {
         $@ = 'Rethrow this';
         throw;
     };
-    like( $@, qr/\ARethrow this at/ );
+    like($@, qr/\ARethrow this at/);
 };
 
 subtest 'whine' => sub {
-    $stderr = capture_stderr { whine undef };
-    like( $stderr, qr/\AWarning at / );
+    $stderr = capture_stderr {whine undef};
+    like($stderr, qr/\AWarning at /);
 
-    $stderr = capture_stderr { whine 'Got a warning' };
-    like( $stderr, qr/\AGot a warning at / );
+    $stderr = capture_stderr {whine 'Got a warning'};
+    like($stderr, qr/\AGot a warning at /);
 
-    $stderr = capture_stderr { whine 'Warning %d, %d, %d', 1, 2, 3 };
-    like( $stderr, qr/\AWarning 1, 2, 3 at/ );
+    $stderr = capture_stderr {whine 'Warning %d, %d, %d', 1, 2, 3};
+    like($stderr, qr/\AWarning 1, 2, 3 at/);
 
     $stderr = capture_stderr {whine};
-    like( $stderr, qr/\AWarning at/ );
+    like($stderr, qr/\AWarning at/);
 };
 
 ok 1, __FILE__ . ' complete';

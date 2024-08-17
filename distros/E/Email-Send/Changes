@@ -1,5 +1,15 @@
 Revision history for Email-Send
 
+2.202     2024-08-16
+          ** PLEASE CONSIDER USING EMAIL-SENDER INSTEAD **
+
+          - Updated documentation to add contributors list.
+          - Common git and build files added to keep the repo clean.
+          - Updated distribution to keep author tests in xt/author.
+          - Updated distribution to keep release tests in xt/release.
+          - Make use of 'our' instead of use vars since 5.6 is a minimum.
+          - Add a README.md
+
 2.201     2015-03-05
           ** PLEASE CONSIDER USING EMAIL-SENDER INSTEAD **
 

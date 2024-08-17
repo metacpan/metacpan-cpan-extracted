@@ -333,9 +333,8 @@ sub _maxrows {
 sub _slice {
     my $self = shift;
     unless (@_) {
-        unless (defined $self->{'Slice'}) {
-            $self->{'Slice'} = DEFAULT_SLICE;
-        }
+        $self->{'Slice'} = DEFAULT_SLICE
+          unless defined($self->{'Slice'});
         return $self->_private_attributes({'slice' => $self->{'Slice'}});
     }
     if (defined($_[0])) {

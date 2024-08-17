@@ -1,5 +1,8 @@
 # Version/Revision history
 
+1.03 Sat 17 Aug 2024 07:00:14 MSK
+    * Now configuration file not required and it is optional
+
 1.02 Fri 17 Nov 2023 13:48:50 MSK
     * Added 'noload' option
 

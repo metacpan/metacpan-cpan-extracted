@@ -1,5 +1,8 @@
 Revision history for ExtUtils-Config
 
+0.010     2024-08-16 19:43:45+02:00 Europe/Brussels
+          Fix regression in serialize method
+
 0.009     2024-04-25 12:22:53+02:00 Europe/Brussels
           - Add a but method
           - Add ExtUtils::Config::MakeMaker

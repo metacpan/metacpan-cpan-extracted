@@ -1,5 +1,8 @@
 Revision history for Perl module Module::Extract::Use
 
+1.053 2024-08-17T06:37:31Z
+	* changing over to BRIANDFOY and updating email, etc
+
 1.052 2024-02-05T21:29:59Z
 	* refresh distro, update email addresses
 

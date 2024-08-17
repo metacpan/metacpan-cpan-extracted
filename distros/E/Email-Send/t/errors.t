@@ -16,8 +16,8 @@ BEGIN { use_ok('Email::Send', 'Test'); }
   { # mailer module that won't load
     my $sender = Email::Send->new;
 
-    my $rv = $sender->mailer_available("Test::Email::Send::Won't::Exist");
-    
+    my $rv = $sender->mailer_available("Test::Email::Send::Does::Not::Exist");
+
     ok(!$rv, "failed to load mailer (doesn't exist)"),
     like("$rv", qr/can't locate/i, "and got correct exception");
   }
@@ -26,7 +26,7 @@ BEGIN { use_ok('Email::Send', 'Test'); }
     my $sender = Email::Send->new;
 
     my $rv = $sender->mailer_available("BadMailer");
-    
+
     ok(!$rv, "failed to load mailer BadMailer"),
     like("$rv", qr/doesn't report avail/i, "and got correct failure");
   }

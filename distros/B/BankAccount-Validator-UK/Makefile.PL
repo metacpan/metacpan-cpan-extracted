@@ -10,7 +10,7 @@ install_share dist => 'share';
 
 WriteMakefile(
     NAME               => 'BankAccount::Validator::UK',
-    AUTHOR             => q{Mohammad S Anwar <mohammad.anwar@yahoo.com>},
+    AUTHOR             => q{Mohammad Sajid Anwar <mohammad.anwar@yahoo.com>},
     VERSION_FROM       => 'lib/BankAccount/Validator/UK.pm',
     ABSTRACT_FROM      => 'lib/BankAccount/Validator/UK.pm',
     LICENSE            => 'artistic_2',
@@ -34,8 +34,8 @@ WriteMakefile(
     (eval { ExtUtils::MakeMaker->VERSION(6.46) } ? (META_MERGE => {
         'meta-spec' => { version => 2 },
         provides    => {
-            'BankAccount::Validator::UK'       => { file => 'lib/BankAccount/Validator/UK.pm'     , version => '0.65' },
-            'BankAccount::Validator::UK::Rule' => { file => 'lib/BankAccount/Validator/UK/Rule.pm', version => '0.65' },
+            'BankAccount::Validator::UK'       => { file => 'lib/BankAccount/Validator/UK.pm'     , version => '0.66' },
+            'BankAccount::Validator::UK::Rule' => { file => 'lib/BankAccount/Validator/UK/Rule.pm', version => '0.66' },
         },
         resources => {
             repository => {

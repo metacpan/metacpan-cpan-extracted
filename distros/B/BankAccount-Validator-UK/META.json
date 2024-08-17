@@ -1,10 +1,10 @@
 {
    "abstract" : "Interface to validate UK bank account.",
    "author" : [
-      "Mohammad S Anwar <mohammad.anwar@yahoo.com>"
+      "Mohammad Sajid Anwar <mohammad.anwar@yahoo.com>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "artistic_2"
    ],
@@ -45,11 +45,11 @@
    "provides" : {
       "BankAccount::Validator::UK" : {
          "file" : "lib/BankAccount/Validator/UK.pm",
-         "version" : "0.65"
+         "version" : "0.66"
       },
       "BankAccount::Validator::UK::Rule" : {
          "file" : "lib/BankAccount/Validator/UK/Rule.pm",
-         "version" : "0.65"
+         "version" : "0.66"
       }
    },
    "release_status" : "stable",
@@ -60,6 +60,6 @@
          "web" : "https://github.com/manwar/BankAccount-Validator-UK"
       }
    },
-   "version" : "0.65",
-   "x_serialization_backend" : "JSON::PP version 4.02"
+   "version" : "0.66",
+   "x_serialization_backend" : "JSON::PP version 4.16"
 }

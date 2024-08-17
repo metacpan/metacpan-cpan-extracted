@@ -39,7 +39,7 @@ sub _private_attributes {
           if wantarray;
         return $self->{'private_ekorn'};
     }
-    unless (defined $_[0]) {
+    unless (defined($_[0])) {
         delete $self->{'private_ekorn'};
         shift;
     }
@@ -186,7 +186,7 @@ sub do {
 
 
 BEGIN {
-    *iterate = *it = sub {
+    *iterate = *iterator = *it = sub {
         my $self      = shift;
         my $statement = shift;
         my $sth       = do {
@@ -223,7 +223,7 @@ BEGIN {
         return $sth->iterate(@_);
     };
 
-    *results = *rs = sub {
+    *results = *resultset = *rs = sub {
         my $self      = shift;
         my $statement = shift;
         my $sth       = do {

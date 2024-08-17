@@ -1,7 +1,7 @@
 use Modern::Perl;
 
 package DBIx::Squirrel;
-$DBIx::Squirrel::VERSION = '1.2.5';
+$DBIx::Squirrel::VERSION = '1.2.8';
 =pod
 
 =encoding UTF-8
@@ -12,7 +12,7 @@ DBIx::Squirrel - A C<DBI> extension
 
 =head1 VERSION
 
-version 1.2.5
+version 1.2.8
 
 =head1 SYNOPSIS
 
@@ -60,7 +60,7 @@ version 1.2.5
     # Cloning database connections
     # ----------------------------
 
-    # Cloning connections created by the DBI, DBIx::Squirrel or their
+    # Cloning connections created by the DBI, DBIx::Squirrel and
     # subclasses is permitted.
     #
     $dbh = DBI->connect($dsn, $user, $pass, \%attr);
@@ -74,7 +74,8 @@ version 1.2.5
     #
     # Use the style you prefer. DBIx::Squirrel doesn't care about the DBD
     # engine you are using. By the time the statement is prepared, it will
-    # have been normalised to use the legacy ("?") style.
+    # have been normalised to use the legacy style ("?") supported by all
+    # engines.
     #
     # Oracle
     $sth = $dbh->prepare('SELECT * FROM product WHERE id=:id');
@@ -136,7 +137,7 @@ version 1.2.5
     $res = $dbh->do('SELECT * FROM product WHERE id=:id', id => '1001099');
     $res = $dbh->do('SELECT * FROM product WHERE id=:id', ':id' => '1001099');
 
-    # You must supply hash reference to the statement attributes (or "undef"),
+    # You must supply hash reference (or "undef") as the statement attributes,
     # when bind-values are presented as a hash reference.
     #
     $res = $dbh->do(
@@ -156,33 +157,29 @@ version 1.2.5
     #
     ($res, $sth) = $dbh->do(...);
 
-    # -----------------
-    # Statement objects
-    # -----------------
-
-    # Statement objects can be used to generate two kinds of iterator.
-    #
-    # Database objects, too, use methods of the same name to generate
-    # iterators.
-
-    # A basic iterator.
-    #
-    $itr = $sth->iterate(...);
-    $itr = $sth->iterate(...)->reset({});
-
-    # A fancy iterator (or result set).
-    #
-    $itr = $sth->results(...);
-    $itr = $sth->results(...)->reset({});
-
     # ---------
     # Iterators
     # ---------
 
-    # We only expect one row and require the statement to be finished. 
+    # Both database and statement objects can be used to generate two
+    # kinds of iterator.
     #
-    # Will emit a warning if there are more rows to fetch as a reminder 
-    # to use "LIMIT 1" in your query.
+    # A basic iterator.
+    #
+    $itr = $dbh->iterate($query, \%attr, ...);
+    $itr = $sth->iterate(...);
+
+    # A fancy iterator (or result set).
+    #
+    $itr = $dbh->results($query, \%attr, ...);
+    $itr = $sth->results(...);
+
+    # When we only expect one row, and we require the statement to be
+    # finished after that row is fetched, we can call the "single"
+    # method (or its alias "one").
+    #
+    # This method will emit a warning if there are more rows to fetch
+    # as a reminder to use "LIMIT 1" in your query.
     #
     $row = $itr->single(OPTIONAL-NEW-BIND-VALUES)
       or die "No matching row!";
@@ -215,7 +212,7 @@ version 1.2.5
     #
     $ary_ref = $itr->all;
 
-    # Get the number of records. More memory efficient than "count_all", 
+    # Get the number of records. More memory efficient than "count_all",
     # since "next" is called after each record is read and discarded.
     #
     $num = $itr->count();
@@ -226,21 +223,21 @@ version 1.2.5
     #
     $num = $itr->count_all();
 
-    # Reset the iterator
+    # Reset an iterator so that it will be executed again.
     #
     $itr = $itr->reset();
 
-    # Reset the iterator, and decide how to slice rows.
+    # Reset the iterator. Also set the slice-style.
     #
     $itr = $itr->reset({});
     $itr = $itr->reset([]);
 
-    # Reset the iterator, and decide how many rows to buffer up at a time.
+    # Reset the iterator. Also specify how many rows to slurp at a time.
     #
     $itr = $itr->reset(10);
 
-    # Reset the iterator. Also decide how many rows to buffer up at a time
-    # and how to slice up the rows.
+    # Reset the iterator. Set the slice style and how slurpy our row fetches
+    # are.
     #
     $itr = $itr->reset($slice, $row_count);
     $itr = $itr->reset($row_count, $slice);
@@ -287,14 +284,15 @@ version 1.2.5
     # ---------------
 
     # A transformation is a sequence of one or more trailing code references
-    # that are passed to the method that generates the iterator. The initial
-    # result enters the first stage of the transformation as $_[0] (and $_),
-    # and the result of that transformation is passed onto the next stage,
-    # or returned to the caller,  using a "return" statement or the result
-    # of the final expression.
+    # passed to the method that generates the iterator. The initial result
+    # enters the first stage of the transformation as $_ (and in $_[0]). The
+    # result of that transformation is passed on to the next stage (or to the
+    # caller), with an explicit "return" statement or as the result of the
+    # sfinal expression.
     #
-    # Transformations are a great way to declare, in one place, the common
-    # processing logic that should be applied to results.
+    # Transformations are a great way to declare, in one place, any common
+    # processing logic that should be applied automatically to results as
+    # they are fetched.
     #
     $itr = $dbh->iterate(
         'SELECT Id, Name FROM product WHERE Name=?' => sub {$_->[0]},
@@ -304,7 +302,7 @@ version 1.2.5
     }
 
     $itr = $dbh->iterate(
-        'SELECT Id, Name FROM product WHERE Name=?' => sub {$_->[Id]},
+        'SELECT Id, Name FROM product WHERE Name=?' => sub {$_->{Id}},
     )->reset({});
     if ($id = $itr->iterate('Acme Rocket')->single) {
         print "Id: $id\n"
@@ -317,7 +315,7 @@ version 1.2.5
         print "Id: $id\n"
     }
 
-    # Multiple transformations may be chained together.
+    # Transformation squences.
     #
     $itr = $dbh->results(
         'SELECT Id, Name FROM product WHERE Name=?' => sub {
@@ -403,7 +401,7 @@ sub import {
     for my $name (@{$helpers}) {
         my $symbol = $class . '::' . $name;
         my $helper = sub {
-            unless (defined ${$symbol}) {
+            unless (defined(${$symbol})) {
                 if (@_) {
                     throw E_BAD_ENT_BIND
                       unless UNIVERSAL::isa($_[0], 'DBI::db')
@@ -413,7 +411,7 @@ sub import {
                     return ${$symbol};
                 }
             }
-            return unless defined ${$symbol};
+            return unless defined(${$symbol});
             if (@_) {
                 my @params = do {
                     if (@_ == 1 && ref $_[0]) {
@@ -448,7 +446,7 @@ sub import {
         };
         *{$symbol} = subname($name => $helper);
         *{$caller . '::' . $name} = subname($caller . '::' . $name => \&{$symbol})
-          unless defined &{$caller . '::' . $name};
+          unless defined(&{$caller . '::' . $name});
     }
     if (@{$dbi}) {
         DBI->import(@{$dbi});
@@ -529,9 +527,9 @@ Addressing an association amounts to doing something meaningful with it,
 and we accomplish this by calling the helper function with one or more
 arguments.
 
-Once associated with a database entity, a helper function will any arguments
-that are passed to it and send a version of these to the database entity
-method that imbues meaning to the interaction.
+Once associated with a database entity, a helper function will consume
+any arguments that are passed to it and send a version of these to the
+database entity method that imparts meaning to the interaction.
 
 Meaning in this context is determined by the type of association:
 
@@ -548,12 +546,13 @@ methods respectively.
 
 =back
 
-B<Clearly there is a paradox here>, which centres around those statements
-and iterators expecting I<no bind-values>. In order to smooth-out this wrinkle,
-you can opt to enclose arguments inside an anonymous array or hash. When no
-bind-values are expected, you can coerce the helper into performing the
-execution by passing an empty array or hash reference. Alternatively, you
-could just resolve the association and call the relevant method manually.
+B<Clearly there is a paradox here>, and itcentres around those statements
+and iterators that take no parameters and expect no bind-values. In order
+to smooth-out this wrinkle, you can opt to enclose arguments inside an
+anonymous array or hash. When no bind-values are expected, you can coerce
+the helper into performing the execution by passing an empty ARRAYREF or
+HASHREF. Alternatively, you could just resolve the association and call
+the relevant method manually.
 
 =back
 
@@ -614,10 +613,10 @@ an alternative form:
 
     $new_dbh = DBIx::Squirrel->connect($original_dbh, \%attr);
 
-This form clones another connection object and returns a brand object that
-is blessed using the same class that invoked the C<connect> method. Objects
-being cloned are allowed to be those created by the C<DBI> or any of its
-subclasses, C<DBIx::Squirrel> being one of those.
+This form clones another connection object and returns a brand new object
+that is blessed using the same class that invoked the C<connect> method.
+The method will allow you to clone database connections created by the
+C<DBI> and any subclasses (C<DBIx::Squirrel> being one).
 
 =head2 Preparing statements
 
@@ -628,8 +627,8 @@ methods.
 =head3 Placeholders
 
 A nice quality-of-life improvement offered by C<DBIx::Squirrel>'s own
-implementation of the C<prepare_cached> and C<prepare> methods is the
-built-in support for different placeholder styles:
+implementation of the C<prepare_cached> and C<prepare> methods is their
+built-in ability to cope with a number of different placeholder styles:
 
 =over
 
@@ -641,12 +640,14 @@ built-in support for different placeholder styles:
 
 =back
 
-Regardless of your C<DBD> driver, or your preferred style, statements
-will be normalised to the legacy placeholder (C<?>) by the time they
-are executed.
+It does not matter what style your C<DBD>-driver supports, C<DBIx::Squirrel>
+will happily deal with all of the above styles. Just pick the one that
+you prefer to work with, or use the one that is most suitable for the
+task at hand.
 
-Use your preferred style, or the style that most helps your query to
-be reasoned by others.
+By the time your statement is passed to the C<DBD>-driver for execution,
+both it and its bind-values will have been normalised to use the legacy
+style (C<?>) supported by all drivers.
 
 =head4 Examples
 
@@ -660,7 +661,7 @@ Legacy placeholders (C<?>):
 
     # Any of the following value-binding styles will work:
     $res = $sth->execute('Aerosmith');
-    $res = $sth->execute([ 'Aerosmith' ]);
+    $res = $sth->execute(['Aerosmith']);
 
 =item *
 
@@ -670,7 +671,7 @@ SQLite positional placeholders (C<?number>):
 
     # Any of the following value-binding styles will work:
     $res = $sth->execute('Aerosmith');
-    $res = $sth->execute([ 'Aerosmith' ]);
+    $res = $sth->execute(['Aerosmith']);
 
 =item *
 
@@ -680,7 +681,7 @@ PostgreSQL positional placeholders (C<$number>):
 
     # Any of the following value-binding styles will work:
     $res = $sth->execute('Aerosmith');
-    $res = $sth->execute([ 'Aerosmith' ]);
+    $res = $sth->execute(['Aerosmith']);
 
 =item *
 
@@ -690,29 +691,245 @@ Oracle positional placeholders (C<:number>):
 
     # Any of the following value-binding styles will work:
     $res = $sth->execute('Aerosmith');
-    $res = $sth->execute([ 'Aerosmith' ]);
+    $res = $sth->execute(['Aerosmith']);
 
 =item *
 
-Oracle named placeholders (C<:number>):
+Oracle named placeholders (C<:name>):
 
     $sth = $dbh->prepare('SELECT * FROM artists WHERE Name=:Name LIMIT 1');
 
     # Any of the following value-binding styles will work:
-    $res = $sth->execute( Name => 'Aerosmith' );
-    $res = $sth->execute({ Name => 'Aerosmith' });
-    $res = $sth->execute( ':Name' => 'Aerosmith' );
-    $res = $sth->execute({ ':Name' => 'Aerosmith' });
+    $res = $sth->execute(Name => 'Aerosmith');
+    $res = $sth->execute( ':Name' => 'Aerosmith');
+    $res = $sth->execute({Name => 'Aerosmith'});
+    $res = $sth->execute({':Name' => 'Aerosmith'});
 
 =back
 
 =head2 Iterators
 
-(TO DO)
+In addition to statement objects, C<DBIx::Squirrel> provides two kinds
+of iterator:
 
-=head2 Processing results
+=over
 
-(TO DO)
+=item * Basic
+
+=item * Fancy, I<or Result Sets>
+
+=back
+
+=head3 Basic Iterators
+
+Basic iterators present row data as ARRAYREFs or HASHREFs depending
+on the slice-style currently in use. Column values are accessed either
+by column-index when using the ARRAYREF-slicing, or by column-name
+when using the HASHREF-slicing.
+
+The default, row data is sliced as an ARRAYREF. The iterator "reset"
+method may be used to alter this behaviour.
+
+=head4 How to create a basic iterator
+
+    $itr = $dbh->iterate(
+        $query,
+        [undef|\%attr,]
+        [@bindvalues,]
+        [@transforms]
+    );
+
+    $itr = $sth->iterate(
+        [@bindvalues,]
+        [@transforms]
+    );
+
+The C<iterate> methods may be replaced by either of the C<it> or C<iterator>
+aliases, if preferred.
+
+=head3 Fancy Iterators
+
+Fancy iterators behave just like their basic alternatives, but the
+row data they present is blessed. Column values may continue to be
+accessed as they would be with basic iterators, but accessor methods
+may also be used to get column values. Such accessor methods are
+created the first time they are used.
+
+=head4 How to create a fancy iterator
+
+    $itr = $dbh->results(
+        $query,
+        [undef|\%attr,]
+        [@bindvalues,]
+        [@transforms]
+    );
+
+    $itr = $sth->results(
+        [@bindvalues,]
+        [@transforms]
+    );
+
+The C<results> methods may be replaced by either of the C<rs> or C<resultset>
+aliases, if preferred.
+
+=head2 Transforming results
+
+All C<DBIx::Squirrel> iterators support an optional processing step called
+I<transformation>.
+
+Transformation can be summarised as the automatic, just-in-time processing,
+re-shaping or filtering of results, as they are fetched from the database
+and before they are handed-off to the caller.
+
+A transformation is comprised of one or more processing stages. Each stage
+receives its version of the result, changes it or does something else it,
+and finally hands it off to the next stage, or to the caller if there are
+no more stages.
+
+Recall that there are two kinds of iterator, and two methods to construct
+each:
+
+    Basic Iterators              |  Fancy Iterators
+    -----------------------------|------------------------------
+    $itr = $dbh->iterate(        |  $itr = $dbh->results(
+        $query,                  |      $query,
+        [undef|\%attr,]          |      [undef|\%attr,]
+        [@bindvalues,]           |      [@bindvalues,]
+        [@transforms]            |      [@transforms]
+    );                           |  );
+                                 |
+    $itr = $sth->iterate(        |  $itr = $sth->results(
+        [@bindvalues,]           |      [@bindvalues,]
+        [@transforms]            |      [@transforms]
+    );                           |  );
+
+The final element of each constructor's argument-list is the transformation
+pipeline (C<[@transforms]>). Each stage of this pipeline is an individual
+processing step, represented by a CODEREF (or a call that returns a CODEREF).
+
+Each stage of a transformation receives the latest version of the result via
+the argument-list (C<$_[0]> to be precise). For the sake of convenience (and
+for convention), this result is also available as C<$_>. If you prefer to
+rely on something like C<$_>, but would like something much less ephemeral,
+just C<use DBIx::Squirrel::util 'result'> and use the C<result> function
+inside your transformation stage.
+
+Handing off to the next stage, or the caller, is with an explicit C<return>
+statement, or the result of evaluating the unit's final expression. Returning
+nothingE<mdash>either C<()>, or a bare C<return>E<mdash>from a processing
+step will filter the result out entirely, and no further processing steps
+will apply to it.
+
+=head3 Examples
+
+=over
+
+=item 1.
+
+See script C<examples/transformations_1.pl>:
+
+    use DBIx::Squirrel database_entities => [qw/db get_artist_id_by_name/];
+
+    db do {
+        DBIx::Squirrel->connect(
+            "dbi:SQLite:dbname=./t/data/chinook.db",
+            "",
+            "",
+            {   PrintError     => !!0,
+                RaiseError     => !!1,
+                sqlite_unicode => !!1,
+            },
+        );
+    };
+
+    get_artist_id_by_name do {
+        db->results(
+            "SELECT ArtistId, Name FROM artists WHERE Name=? LIMIT 1" => sub {
+                my($artist) = @_;
+                print "----\n";
+                print "Name: ", $artist->Name, "\n";
+                return $artist;
+            } => sub {$_->ArtistId}
+        );
+    };
+
+    foreach my $name ("AC/DC", "Aerosmith", "Darling West", "Rush") {
+        if (get_artist_id_by_name($name)->single) {
+            print "ArtistId: $_\n";
+        }
+    }
+
+    db->disconnect();
+
+The script is comprised of four parts:
+
+=over
+
+=item *
+
+B<Connect to the database>
+
+Here, I am not just connecting to the database. I am associating the resulting
+database connection handle with the C<db> helper function, meaning I can refer
+to it as C<db> in future.
+
+=item *
+
+B<Create the C<get_artist_id_by_name> helper function>
+
+Here, I am constructing a fancy iterator and also associating it with the
+C<get_artist_id_by_name> helper function. This means I can just call the
+C<get_artist_id_by_name> function to execute the iterator in future.
+
+Also here, I describe the the kind of processing I want applied to every
+single result produced by this iterator, expressed as a transformation
+pipeline that is comprised of two separate stages:
+
+=over
+
+=item *
+
+I want the names of matched artists printed nicely on the console;
+
+=item *
+
+I am only intersted in getting back the artist's id.
+
+=back
+
+=item *
+
+B<Query the database and process the results>
+
+Here, I'm executing the query once for each one of four artists to get and
+print their artist ids.
+
+=item *
+
+B<Disconnect from the database>
+
+Just as we would with the C<DBI>.
+
+=back
+
+Find the script and run it:
+
+    $ perl -I./lib ./examples/transformations_1.pl
+    ----
+    Name: AC/DC
+    ArtistId: 1
+    ----
+    Name: Aerosmith
+    ArtistId: 3
+    ----
+    Name: Rush
+    ArtistId: 128
+
+Notice that we got nothing back for one of our artists? That's because
+the artist in question is not in our database, and we cannot apply a
+transformation to nothing.
+
+=back
 
 =head1 COPYRIGHT AND LICENSE
 

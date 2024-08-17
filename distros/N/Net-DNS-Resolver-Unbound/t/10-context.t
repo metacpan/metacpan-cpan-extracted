@@ -6,7 +6,7 @@ use warnings;
 use IO::File;
 use Test::More tests => 10;
 
-use Net::DNS::Resolver::Unbound;
+use Net::DNS::Resolver::Unbound -register;
 
 
 ok( Net::DNS::Resolver::Unbound->string(), 'default configuration' );

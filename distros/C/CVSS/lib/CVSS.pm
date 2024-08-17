@@ -16,7 +16,7 @@ use CVSS::v4 ();
 
 our @EXPORT = qw(encode_cvss decode_cvss cvss_to_xml);
 
-our $VERSION = '1.12';
+our $VERSION = '1.13';
 $VERSION =~ tr/_//d;    ## no critic
 
 my $CVSS_CLASSES = {'2.0' => 'CVSS::v2', '3.0' => 'CVSS::v3', '3.1' => 'CVSS::v3', '4.0' => 'CVSS::v4'};

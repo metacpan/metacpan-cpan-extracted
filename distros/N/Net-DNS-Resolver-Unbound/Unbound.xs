@@ -1,11 +1,11 @@
 
 =head1 NAME
 
-Unbound.xs - Perl binding for NLnetLabs libunbound
+Unbound.xs - Perl bindings for NLnetLabs libunbound
 
 =head1 DESCRIPTION
 
-Perl XS extension providing access to the libunbound resolver library.
+Perl XS extension providing bindings for the libunbound resolver library.
 
 This implementation is intended to support Net::DNS::Resolver::Unbound.
 It is NOT, nor will it ever be, suitable for general use.
@@ -13,7 +13,7 @@ It is NOT, nor will it ever be, suitable for general use.
 
 =head1 COPYRIGHT
 
-Copyright (c)2022-2023 Dick Franks
+Copyright (c)2022-2024 Dick Franks
 
 All Rights Reserved
 

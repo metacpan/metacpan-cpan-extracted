@@ -1,4 +1,39 @@
 package Email::Send::Test;
+use strict;
+
+our $VERSION   = '2.202';
+$VERSION = eval $VERSION;
+
+# No longer allow direct access to the array
+my @DELIVERIES = ();
+
+# This mailer is always available
+sub is_available { 1 }
+
+sub send {
+  my ($self, $email, @rest) = @_;
+
+  push @DELIVERIES, [ $self, $email, \@rest ];
+	return 1;
+}
+
+sub emails {
+  return scalar @DELIVERIES unless wantarray;
+  return map { $_->[1] } @DELIVERIES;
+}
+
+sub clear {
+	@DELIVERIES = ();
+	return 1;
+}
+
+sub deliveries {
+  @DELIVERIES
+}
+
+1;
+
+__END__
 
 =pod
 
@@ -11,16 +46,16 @@ Email::Send::Test - Captures emails sent via Email::Send for testing
   # Load as normal
   use Email::Send;
   use Email::Send::Test;
-  
+
   # Always clear the email trap before each test to prevent unexpected
   # results, and thus spurious test results.
   Email::Send::Test->clear;
-  
+
   ### BEGIN YOUR CODE TO BE TESTED (example follows)
   my $sender = Email::Send->new({ mailer => 'Test' });
   $sender->send( $message );
   ### END YOUR CODE TO BE TESTED
-  
+
   # Check that the number and type (and content) of mails
   # matched what you expect.
   my @emails = Email::Send::Test->emails;
@@ -63,24 +98,6 @@ access the array directly if you wish, or use the methods provided.
 
 =head1 METHODS
 
-=cut
-
-use 5.005;
-use strict;
-
-use vars qw{$VERSION};
-BEGIN {
-	$VERSION = '2.201';
-}
-
-# No longer allow direct access to the array
-my @DELIVERIES = ();
-
-# This mailer is always available
-sub is_available { 1 }
-
-=pod
-
 =head2 send $message
 
 As for every other L<Email::Send> mailer, C<send> takes the message to be
@@ -98,17 +115,6 @@ Of course, this doesn't prevent any tampering by Email::Send itself :)
 
 Always returns true.
 
-=cut
-
-sub send {
-  my ($self, $email, @rest) = @_;
-
-  push @DELIVERIES, [ $self, $email, \@rest ];
-	return 1;
-}
-
-=pod
-
 =head2 emails
 
 The C<emails> method is the preferred and recommended method of getting
@@ -117,15 +123,6 @@ access to the email trap.
 In list context, returns the content of the trap array as a list.
 
 In scalar context, returns the number of items in the trap.
-
-=cut
-
-sub emails {
-  return scalar @DELIVERIES unless wantarray;
-  return map { $_->[1] } @DELIVERIES;
-}
-
-=pod
 
 =head2 clear
 
@@ -136,13 +133,6 @@ test to ensure any existing emails are removed and don't
 create a spurious test result.
 
 Always returns true.
-
-=cut
-
-sub clear {
-	@DELIVERIES = ();
-	return 1;
-}
 
 =head2 deliveries
 
@@ -155,37 +145,29 @@ The first element is the invocant on which C<send> was called.  The second is
 the email that was given to C<send>.  The third is the rest of the arguments
 given to C<send>.
 
-=cut
+=head1 AUTHOR
 
-sub deliveries {
-  @DELIVERIES
-}
+Adam Kennedy <F<cpan@ali.as>>, L<http://ali.as/>.
 
-1;
+=head1 CONTRIBUTORS
 
-=pod
+=over
 
-=head1 SUPPORT
+=item *
 
-All bugs should be filed via the CPAN bug tracker at
+Chase Whitener, <F<capoeirab@cpan.org>>.
 
-L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Email-Send-Test>
+=item *
 
-For other issues, or commercial enhancement or support, contact the author.
+Ricardo SIGNES, <F<rjbs@cpan.org>>.
 
-=head1 AUTHORS
+=back
 
-Current maintainer: Ricardo SIGNES, <F<rjbs@cpan.org>>.
-
-Original author: Adam Kennedy E<lt>cpan@ali.asE<gt>, L<http://ali.as/>
-
-=head1 COPYRIGHT
+=head1 COPYRIGHT AND LICENSE
 
 Copyright (c) 2004 - 2005 Adam Kennedy. All rights reserved.
-This program is free software; you can redistribute
-it and/or modify it under the same terms as Perl itself.
 
-The full text of the license can be found in the
-LICENSE file included with this module.
+This module is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
 
 =cut

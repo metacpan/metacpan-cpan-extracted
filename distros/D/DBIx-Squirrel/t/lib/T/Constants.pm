@@ -28,7 +28,7 @@ use Cwd 'realpath';
 our ( $T_LIB, $T_LIB_DATA, $T_DATABASE ) = do {
 	( my $module = __PACKAGE__ )          =~ s/::/\//g;
 	( my $lib    = realpath( __FILE__ ) ) =~ s/\/$module\.pm$//i;
-	( "$lib", "$lib/data", "$lib/data/chinook.db" );
+	( "$lib", "$lib/../data", "$lib/../data/chinook.db" );
 };
 
 our @T_DB_CONNECT_ARGS = (
@@ -37,10 +37,10 @@ our @T_DB_CONNECT_ARGS = (
 		"",
 		"",
 		{
-		  AutoCommit     => 0,
-		  PrintError     => 0,
-		  RaiseError     => 1,
-		  sqlite_unicode => 1,
+		  AutoCommit     => !!0,
+		  PrintError     => !!0,
+		  RaiseError     => !!1,
+		  sqlite_unicode => !!1,
 		},
 	)
 );

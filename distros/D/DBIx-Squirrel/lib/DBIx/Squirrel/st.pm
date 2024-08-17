@@ -169,9 +169,9 @@ sub bind_param {
 
 
 BEGIN {
-    *iterate  = *it   = sub {DBIx::Squirrel::it->new(@_)};
-    *results  = *rs   = sub {DBIx::Squirrel::rs->new(@_)};
-    *iterator = *itor = sub {shift->_private_attributes->{'Iterator'}};
+    *iterate = *iterator  = *it = sub {DBIx::Squirrel::it->new(@_)};
+    *results = *resultset = *rs = sub {DBIx::Squirrel::rs->new(@_)};
+    *itor    = sub {shift->_private_attributes->{'Iterator'}};
 }
 
 1;

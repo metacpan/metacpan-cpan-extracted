@@ -7,7 +7,7 @@ use warnings;
 
 use Carp ();
 
-our $VERSION = '1.12';
+our $VERSION = '1.13';
 $VERSION =~ tr/_//d;    ## no critic
 
 use overload '""' => \&to_string, fallback => 1;
@@ -191,6 +191,7 @@ sub to_vector_string {
     }
 
     foreach my $metric (@{$self->METRIC_GROUPS->{base}}) {
+        return if (!$metrics->{$metric});
         push @vectors, sprintf('%s:%s', $metric, $metrics->{$metric});
     }
 

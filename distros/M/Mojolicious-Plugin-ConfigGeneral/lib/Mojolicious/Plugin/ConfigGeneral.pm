@@ -37,10 +37,10 @@ Mojolicious::Plugin::ConfigGeneral is a L<Config::General> Configuration Plugin 
 
 This plugin supports the following options
 
-=head2 default
+=head2 defaults
 
     # Mojolicious::Lite
-    plugin ConfigGeneral => {default => {foo => 'bar'}};
+    plugin ConfigGeneral => {defaults => {foo => 'bar'}};
 
 Default configuration
 
@@ -59,10 +59,10 @@ C<MOJO_CONFIG> environment variable or C<$moniker.conf> in the application home 
 
 This option disables loading config file
 
-=head2 opts
+=head2 options
 
     # Mojolicious::Lite
-    plugin ConfigGeneral => {opts => {'-AutoTrue' => 0}};
+    plugin ConfigGeneral => {options => {'-AutoTrue' => 0}};
     plugin ConfigGeneral => {options => {'-AutoTrue' => 0}};
 
 Sets the L<Config::General> options directly
@@ -141,7 +141,7 @@ Serż Minus (Sergey Lepenkov) L<https://www.serzik.com> E<lt>abalama@cpan.orgE<g
 
 =head1 COPYRIGHT
 
-Copyright (C) 1998-2023 D&D Corporation. All Rights Reserved
+Copyright (C) 1998-2024 D&D Corporation. All Rights Reserved
 
 =head1 LICENSE
 
@@ -152,7 +152,7 @@ See C<LICENSE> file and L<https://dev.perl.org/licenses/>
 
 =cut
 
-our $VERSION = '1.02';
+our $VERSION = '1.03';
 
 use Mojo::Base 'Mojolicious::Plugin';
 use Config::General qw//;
@@ -178,7 +178,8 @@ sub register {
     my $file = $args->{file} || $ENV{MOJO_CONFIG};
        $file ||= $app->home->child($app->moniker . '.conf'); # Relative to the home directory by default
     unless ($noload) {
-        die sprintf("Configuration file \"%s\" not found", $file) unless -r $file;
+        # Configuration file not found
+        $noload = 1 unless -r $file;
     }
 
     # Config::General Options
@@ -193,7 +194,8 @@ sub register {
     unless ($noload) {
         my $cfg = eval { Config::General->new(%options) };
         die sprintf("Can't load configuration from file \"%s\": %s", $file, $@) if $@;
-        die sprintf("Configuration file \"%s\" did not return a Config::General object", $file) unless ref $cfg eq 'Config::General';
+        die sprintf("Configuration file \"%s\" did not return a Config::General object", $file)
+            unless ref $cfg eq 'Config::General';
         %config = $cfg->getall;
         @files = $cfg->files;
     }
@@ -260,13 +262,13 @@ sub register {
     };
 
     # Set conf helpers
-    $app->helper('conf.get'         => $_conf_get);
-    $app->helper('conf.first'       => $_conf_fisrt);
-    $app->helper('conf.latest'      => $_conf_latest);
-    $app->helper('conf.array'       => $_conf_array);
-    $app->helper('conf.list'        => $_conf_array);
-    $app->helper('conf.hash'        => $_conf_hash);
-    $app->helper('conf.object'      => $_conf_hash);
+    $app->helper('conf.get'     => $_conf_get);
+    $app->helper('conf.first'   => $_conf_fisrt);
+    $app->helper('conf.latest'  => $_conf_latest);
+    $app->helper('conf.array'   => $_conf_array);
+    $app->helper('conf.list'    => $_conf_array);
+    $app->helper('conf.hash'    => $_conf_hash);
+    $app->helper('conf.object'  => $_conf_hash);
 
     # Return
     return wantarray ? (%config) : \%config;

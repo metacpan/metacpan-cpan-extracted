@@ -12,7 +12,7 @@ use base qw(Net::DNS::Resolver::Base DynaLoader), OS_CONF;
 our $VERSION;
 
 BEGIN {
-	$VERSION = '1.28';
+	$VERSION = '1.29';
 	eval { __PACKAGE__->bootstrap($VERSION) };
 }
 
@@ -81,6 +81,31 @@ In particular, the queryID returned by Unbound is always zero.
 =back
 
 
+=head1 REPLACING C<Net::DNS::Resolver> DEFAULT BEHAVIOUR
+
+By placing C<-register> in the import list to C<Net::DNS::Resolver::Unbound>,
+it will register itself with L<Net::DNS::Resolver> as the base class.
+
+    use Net::DNS::Resolver::Unbound -register;
+
+    my $resolver = Net::DNS::Resolver->new( ) or die "Cannot create resolver";
+
+    print "Created a resolver of type " . ref($resolver) . "\n";
+
+Note that "-register" is a global setting that applies to the entire
+program; it cannot be applied only for certain callers, removed, or
+limited by lexical scope.
+
+
+=cut
+
+sub import {
+	my ( $pkg, @import ) = @_;
+	my @symbol = grep { $_ ne '-register' } @import;
+	@Net::DNS::Resolver::ISA = $pkg if scalar(@import) != scalar(@symbol);
+}
+
+
 =head1 METHODS
 
 =head2 new
@@ -102,7 +127,7 @@ Returns a new Net::DNS::Resolver::Unbound resolver object.
 
 sub new {
 	my ( $class, @args ) = @_;
-	my $self = $class->SUPER::new();
+	my $self = __PACKAGE__->SUPER::new();
 	$self->nameservers( $self->SUPER::nameservers );
 	delete $self->{$_} for IRRELEVENT;
 	$self->_finalise_config;				# default configuration
@@ -350,7 +375,7 @@ sub add_ta {
 
 =head2 add_ta_file
 
-    $resolver->add_ta_file( 'filename' );
+    $resolver->add_ta_file( '/var/lib/unbound/root.key' );
 
 Pass the name of a file containing DS and DNSKEY records
 (as from dig or drill).

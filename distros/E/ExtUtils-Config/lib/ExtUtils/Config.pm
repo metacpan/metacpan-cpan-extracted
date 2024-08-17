@@ -1,5 +1,5 @@
 package ExtUtils::Config;
-$ExtUtils::Config::VERSION = '0.009';
+$ExtUtils::Config::VERSION = '0.010';
 use strict;
 use warnings;
 use Config;
@@ -34,7 +34,7 @@ sub all_config {
 sub serialize {
 	my $self = shift;
 	require Data::Dumper;
-	return $self->{serialized} ||= Data::Dumper->new($self->{values})->Terse(1)->Sortkeys(1)->Dump;
+	return $self->{serialized} ||= Data::Dumper->new([ $self->{values} ])->Terse(1)->Sortkeys(1)->Dump;
 }
 
 sub but {
@@ -67,7 +67,7 @@ ExtUtils::Config - A wrapper for perl's configuration
 
 =head1 VERSION
 
-version 0.009
+version 0.010
 
 =head1 SYNOPSIS
 
