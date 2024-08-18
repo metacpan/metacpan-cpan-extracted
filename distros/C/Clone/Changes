@@ -1,5 +1,8 @@
 Revision history for Perl module Clone
 
+0.47 2024-08-17 12:30:00 atoomic
+  - Stop using quote as package separator
+
 0.46 2022-10-18 20:23:00 garu
   - fix backwards compatibility with older perls (haarg)
   - bump MANIFEST to include extra tests

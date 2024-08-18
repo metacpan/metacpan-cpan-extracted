@@ -1,3 +1,6 @@
+Version 0.14 - 2024-08-17
+  - Fix threaded perl support
+
 Version 0.13 - 2024-08-16
   - Support for Storable freeze/thaw on trees and nodes (but not iterators)
   - More complete XS constructor is faster and allows more things to be

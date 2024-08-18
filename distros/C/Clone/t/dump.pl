@@ -27,7 +27,7 @@ package dump;
 );
 
 # Given an object, dump its transitive data closure
-sub main'dump {
+sub main::dump {
 	my ($object) = @_;
 	die "Not a reference!" unless ref($object);
 	local %dumped;

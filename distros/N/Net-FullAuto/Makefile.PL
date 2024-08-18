@@ -25,8 +25,7 @@
 #
 ################################################################
 
-
-our $VERSION='1.0000708';
+our $VERSION='1.0000723';
 
 #print `env`,"\n\n\n";
 
@@ -1715,7 +1714,6 @@ sub look_inside_dir {
 sub fa_install_mod {
    
    my $p=$_[0];
-   #return '' if grep { /Net::SSLeay/i } @ARGV;
    my $task=$_[1];
    my $butil=$_[2]||'';
    my $force=$_[3]||'';
@@ -1747,7 +1745,9 @@ sub fa_install_mod {
          "authors/id/$let/$lett/$distribution");
    }
    my $mod_info='';my $instfile='';my $cpanfil='';
-   if (!$version || (grep {
+   if (-1<index $ENV{LOADED_MODULES},$p) {
+      return '';
+   } elsif (!$version || (grep {
          /(?:use[-_]?)?internet|online|connect_to_internet_ok/i
          } @ARGV)) {
       local $SIG{__DIE__}; # No sigdie handler
@@ -1893,6 +1893,21 @@ sub fa_install_mod {
             open(FH,">$dir/OLE.xs");
             print FH $newole;
             close FH;
+         } elsif (($p eq 'List::MoreUtils') ||
+                  ($p eq 'strictures')) {
+            if (exists $amazon{instance_type} && $amazon{instance_type}=~/micro/) {
+               if ($ARGV[$#ARGV]=~/^(\d+)$/) {
+                  pop @ARGV;pop @ARGV;
+               }
+               shift @ARGV if $ARGV[0] eq 'SKIP';
+               my $argvs=join ' ', @ARGV if -1<$#ARGV;
+               my $exec_cmd="sudo su -c 'sync;echo 3 > /proc/sys/vm/drop_caches';"
+                           ."cd \"$dir\";$^X Makefile.PL;make install;"
+                           ."cd \"$cwd\";$^X Makefile.PL SKIP $argvs";
+               exec $exec_cmd;
+            }
+         } elsif ($p eq 'LWP') {
+            $dir=&fa_find_latest('libwww-perl');
          }
          $env="export $env;" if $env;
          my $s='';
@@ -1913,20 +1928,25 @@ sub fa_install_mod {
          close FH;
          if ($butil eq 'Makefile') {
             if ($p eq 'BerkeleyDB') {
-               print "*** Running ${sudo}make\n";
-               fa_system("cd \"$dir\";${sudo}make");
-               print "*** Running ${sudo}make test\n";
-               fa_system("cd \"$dir\";${sudo}make test");
-               print "*** Running ${sudo}make install\n";
-               fa_system("cd \"$dir\";${sudo}make install");
-            } elsif (($p eq 'Net::SSLeay') ||
-                     ($p eq 'Compress::Raw::Zlib') ||
-                     ($p eq 'HTML::Parser') ||
-                     ($p eq 'B::Utils') ||
-                     ($p eq 'Digest::SHA') ||
-                     ($p eq 'JSON::XS')) {
-               if ($p eq 'Net::SSLeay') {
-                  my $ssleay_error_banner=<<END;
+               if (exists $amazon{instance_type} && $amazon{instance_type}=~/micro/) {
+                  if ($ARGV[$#ARGV]=~/^(\d+)$/) {
+                     pop @ARGV;pop @ARGV;
+                  }
+                  shift @ARGV if $ARGV[0] eq 'SKIP';
+                  my $argvs=join ' ', @ARGV if -1<$#ARGV;
+                  my $exec_cmd="cd \"$dir\";make;make test;make install;"
+                              ."cd \"$cwd\";$^X Makefile.PL SKIP $argvs";
+                  exec $exec_cmd;
+               } else {
+                  print "*** Running ${sudo}make\n";
+                  fa_system("cd \"$dir\";${sudo}make");
+                  print "*** Running ${sudo}make test\n";
+                  fa_system("cd \"$dir\";${sudo}make test");
+                  print "*** Running ${sudo}make install\n";
+                  fa_system("cd \"$dir\";${sudo}make install");
+               }
+            } elsif ($p eq 'Net::SSLeay') {
+               my $ssleay_error_banner=<<END;
 
          *** THIS SCREEN WILL TIMEOUT AND FULLAUTO SETUP WILL EXIT
                     IN 5 MINUTES IF NO CHOICE IS MADE ***
@@ -1937,141 +1957,124 @@ sub fa_install_mod {
    be installed. Would you like FullAuto Setup to attempt installing this
    package?
 END
-                  &fa_install_module('Net::SSLeay','get') if $ARGV[$#ARGV]!~/2/;
-		  my $argvs='';
-                  if (grep { /Net::SSLeay/ } @ARGV) {
-                     my $num=0;
-                     if ($ARGV[$#ARGV]=~/^(\d+)$/) {
-                        $num=$1;
-                        pop @ARGV;pop @ARGV;
-                     }
-                     shift @ARGV if $ARGV[0] eq 'SKIP';
-                     $argvs=join ' ', @ARGV if -1<$#ARGV;
-		     print "NUM=$num\n";
-                     if ($num!=2) {
-			     print "WE ARE GOING TO EXEC\n";
-                        exec "sudo $^X Makefile.PL SKIP $argvs Net::SSLeay 2",
-                     } else {
-                        #print `sudo cat /proc/meminfo | grep MemFree`;
-                        #print `sudo cat /proc/meminfo | grep MemAvailable`;
-                        fa_system("sudo su -c 'sync;echo 3 > /proc/sys/vm/drop_caches'");
-                        #print `sudo cat /proc/meminfo | grep MemFree`;
-                        #print `sudo cat /proc/meminfo | grep MemAvailable`;
-                     }
-                  } else {
-                     if ($ARGV[$#ARGV]=~/^\d+$/) {
-                        pop @ARGV;pop @ARGV;
-                     }
+               &fa_install_module('Net::SSLeay','get') if $ARGV[$#ARGV]!~/2/;
+	       my $argvs='';
+               if (grep { /Net::SSLeay/ } @ARGV) {
+                  my $num=0;
+                  if ($ARGV[$#ARGV]=~/^(\d+)$/) {
+                     $num=$1;
+                     pop @ARGV;pop @ARGV;
                   }
-                  my $dir=&fa_find_latest('Net-SSLeay');my $nano_flag=0;
-                  fa_system("(cd \"$dir\";echo n | $^X Makefile.PL) 2>&1");
-                  if (exists $amazon{instance_type} && $amazon{instance_type}=~/micro/) {
-                     my $ulimit=`ulimit -s`;
-                     $ulimit=32768;
-                     my $micro_nano_adjust="(cd \"$dir\";sed -i '/^CCFLAGS/ s/\$/ ".
-                                           "--param ggc-min-expand=1 ".
-                                           "--param ggc-min-heapsize=$ulimit/' ".
-                                           "Makefile) 2>&1";
-                     fa_system($micro_nano_adjust);
+                  shift @ARGV if $ARGV[0] eq 'SKIP';
+                  $argvs=join ' ', @ARGV if -1<$#ARGV;
+                  if ($num!=2) {
+                     exec "sudo $^X Makefile.PL SKIP $argvs Net::SSLeay 2",
+                  } else {
                      #print `sudo cat /proc/meminfo | grep MemFree`;
                      #print `sudo cat /proc/meminfo | grep MemAvailable`;
                      fa_system("sudo su -c 'sync;echo 3 > /proc/sys/vm/drop_caches'");
                      #print `sudo cat /proc/meminfo | grep MemFree`;
                      #print `sudo cat /proc/meminfo | grep MemAvailable`;
-		     exec "sudo su -c 'sync;echo 3 > /proc/sys/vm/drop_caches';cd \"$dir\";make install;cd \"$cwd\";$^X Makefile.PL SKIP $argvs";
-                  } elsif (exists $amazon{instance_type} && $amazon{instance_type}=~/nano/) {
-                     fa_system('sudo dnf -y install perl-Net-SSLeay.x86_64');
-                     $nano_flag=1;
                   }
-                  SSL: while (1) {
-                     last if $nano_flag;
-                     open(FH, "(cd \"$dir\";make install) 2>&1|");
-                     while (my $line=<FH>) {
-                        if (-1<index $line,
-                              'error: openssl/err.h: No such file or directory') {
-                           my $timeout=300;my $selection='';
-                           {
-                              local $SIG{__DIE__}; # No sigdie handler
-                              eval {
-                                 local $SIG{ALRM} = sub { die "alarm\n" }; # NB: \n required
-                                 alarm $timeout;
-                                 my $fae="No   (FullAuto Setup will exit)";
-                                 my $menu1 = [
-                                             $ssleay_error_banner,
-                                             [ "Yes", sub{ return 'Yes' } ],
-                                             [ $fae, sub{ return 'No' } ],
-                                             ];
-                                 $selection=&menu($menu1);
-                                 exit if $selection eq ']quit[';
-                                 alarm 0;
-                              };
-                              if ($@) {
-                                 # timed out
-                                 $selection = 'No';
-                              }
-                              if ($selection=~/No/) {
-                                 exit;
-                              } alarm 0;
-                           };
-                           if (($system_type eq 'amazon_linux') ||
-                                 ($system_type eq 'rhel') ||
-                                 ($system_type eq 'centos') ||
-                                 ($system_type eq 'fedora')) {
-                              fa_system("sudo yum -y install 'openssl-devel'");
-                              next SSL;
-                           } elsif ($system_type eq 'suse') {
-                              fa_system("zypper -n install openssl-devel");
-                              next SSL;
-                           } elsif ($system_type eq 'ubuntu') {
-                              fa_system("sudo apt-get -y install 'libssl-dev'");
-                              next SSL;
-                           }
-                        }
-                        print $line;
-                     } last;
+               } else {
+                  if ($ARGV[$#ARGV]=~/^\d+$/) {
+                     pop @ARGV;pop @ARGV;
                   }
-                  close FH;
-               } elsif (exists $amazon{instance_type} && $amazon{instance_type}=~/micro/) {
+               }
+               my $dir=&fa_find_latest('Net-SSLeay');my $nano_flag=0;
+               fa_system("(cd \"$dir\";echo n | $^X Makefile.PL) 2>&1");
+               if (exists $amazon{instance_type} && $amazon{instance_type}=~/micro/) {
                   my $ulimit=`ulimit -s`;
                   $ulimit=32768;
-                  my $micro_nano_adjust="(cd \"$dir\";${sudo}sed -i '/^CCFLAGS/ s/\$/ ".
+                  my $micro_nano_adjust="(cd \"$dir\";sed -i '/^CCFLAGS/ s/\$/ ".
                                         "--param ggc-min-expand=1 ".
                                         "--param ggc-min-heapsize=$ulimit/' ".
                                         "Makefile) 2>&1";
                   fa_system($micro_nano_adjust);
-                  #print `sudo cat /proc/meminfo | grep MemFree`;
-                  #print `sudo cat /proc/meminfo | grep MemAvailable`;
-                  fa_system("sudo su -c 'sync;echo 3 > /proc/sys/vm/drop_caches'");
-                  #print `sudo cat /proc/meminfo | grep MemFree`;
-                  #print `sudo cat /proc/meminfo | grep MemAvailable`;
-                  fa_system("cd \"$dir\";${sudo}make install");
+	          exec "sudo su -c 'sync;echo 3 > /proc/sys/vm/drop_caches';cd \"$dir\";make install;cd \"$cwd\";$^X Makefile.PL SKIP $argvs";
                } elsif (exists $amazon{instance_type} && $amazon{instance_type}=~/nano/) {
-                  if ($p eq 'Compress::Raw::Zlib') {
-                     fa_system("${sudo}dnf -y install perl-Compress-Raw-Zlib.x86_64");
-                  } elsif ($p eq 'HTML::Parser') {
-                     fa_system("${sudo}dnf -y install perl-HTML-Parser.x86_64");
-                  } elsif ($p eq 'Digest::SHA') {
-                     fa_system("${sudo}dnf -y install perl-Digest-SHA.x86_64");
-                  }
-               } else {
-                  print "*** Running ${sudo}make install\n";
-                  fa_system("cd \"$dir\";${sudo}make install");
+                  fa_system('sudo dnf -y install perl-Net-SSLeay.x86_64');
+                  $nano_flag=1;
                }
+               SSL: while (1) {
+                  last if $nano_flag;
+                  open(FH, "(cd \"$dir\";make install) 2>&1|");
+                  while (my $line=<FH>) {
+                     if (-1<index $line,
+                           'error: openssl/err.h: No such file or directory') {
+                        my $timeout=300;my $selection='';
+                        {
+                           local $SIG{__DIE__}; # No sigdie handler
+                           eval {
+                              local $SIG{ALRM} = sub { die "alarm\n" }; # NB: \n required
+                              alarm $timeout;
+                              my $fae="No   (FullAuto Setup will exit)";
+                              my $menu1 = [
+                                          $ssleay_error_banner,
+                                          [ "Yes", sub{ return 'Yes' } ],
+                                          [ $fae, sub{ return 'No' } ],
+                                          ];
+                              $selection=&menu($menu1);
+                              exit if $selection eq ']quit[';
+                              alarm 0;
+                           };
+                           if ($@) {
+                              # timed out
+                              $selection = 'No';
+                           }
+                           if ($selection=~/No/) {
+                              exit;
+                           } alarm 0;
+                        };
+                        if (($system_type eq 'amazon_linux') ||
+                              ($system_type eq 'rhel') ||
+                              ($system_type eq 'centos') ||
+                              ($system_type eq 'fedora')) {
+                           fa_system("sudo yum -y install 'openssl-devel'");
+                           next SSL;
+                        } elsif ($system_type eq 'suse') {
+                           fa_system("zypper -n install openssl-devel");
+                           next SSL;
+                        } elsif ($system_type eq 'ubuntu') {
+                           fa_system("sudo apt-get -y install 'libssl-dev'");
+                           next SSL;
+                        }
+                     }
+                     print $line;
+                  } last;
+               }
+               close FH;
+            } elsif (exists $amazon{instance_type} && $amazon{instance_type}=~/micro|nano/) {
+               print "*** Running ${sudo}make install\n";
+               if ($ARGV[$#ARGV]=~/^(\d+)$/) {
+                  pop @ARGV;pop @ARGV;
+               }
+               shift @ARGV if $ARGV[0] eq 'SKIP';
+               my $argvs=join ' ', @ARGV if -1<$#ARGV;
+               my $exec_cmd="sudo su -c 'sync;echo 3 > /proc/sys/vm/drop_caches';"
+                           ."cd \"$dir\";make install;"
+                           ."cd \"$cwd\";$^X Makefile.PL SKIP $argvs";
+               exec $exec_cmd;
             } else {
                print "*** Running ${sudo}make install\n";
                fa_system("cd \"$dir\";${sudo}make install");
             }
-         } elsif ($p eq 'Data::Dump::Streamer') {
-            if ($ARGV[$#ARGV]=~/^(\d+)$/) {
-               pop @ARGV;pop @ARGV;
-            }
-            shift @ARGV if $ARGV[0] eq 'SKIP';
-            my $argvs=join ' ', @ARGV if -1<$#ARGV;
-            print "*** Running ${sudo}Build install\n";
-            exec "sudo su -c 'sync;echo 3 > /proc/sys/vm/drop_caches';cd \"$dir\";./Build build;./Build install;cd \"$cwd\";$^X Makefile.PL SKIP $argvs";
          } else {
-            print "*** Running ${sudo}Build install\n";
-            fa_system("cd \"$dir\";./Build build;${sudo}./Build install");
+            if (exists $amazon{instance_type} && $amazon{instance_type}=~/micro/) {
+               print "*** Running sudo Build install\n";
+               if ($ARGV[$#ARGV]=~/^(\d+)$/) {
+                  pop @ARGV;pop @ARGV;
+               }
+               shift @ARGV if $ARGV[0] eq 'SKIP';
+               my $argvs=join ' ', @ARGV if -1<$#ARGV;
+               my $exec_cmd="sudo su -c 'sync;echo 3 > /proc/sys/vm/drop_caches';"
+                           ."cd \"$dir\";./Build build;./Build install;"
+                           ."cd \"$cwd\";$^X Makefile.PL SKIP $argvs";
+               exec $exec_cmd;
+            } else {
+               print "*** Running Build install\n";
+               fa_system("cd \"$dir\";./Build build;./Build install");
+            }
          }
       }
       chdir $cwd;
@@ -2087,6 +2090,11 @@ END
             warn $@;
          } else {
             print "*** $p Loaded Successfully\n";
+            if (defined $ENV{LOADED_MODULES}) {
+               $ENV{LOADED_MODULES}.="|$p";
+            } else {
+               $ENV{LOADED_MODULES}=$p;
+            }
             $exec_cnt=0;
          }
       } elsif (lc($task) eq 'install') {
@@ -2102,8 +2110,22 @@ END
          $log->close() if $log && -1<index $log,'*';
          exec "$sudo$^X Makefile.PL SKIP $argvs $p $exec_cnt";
       }
+   } elsif (exists $amazon{instance_type} && $amazon{instance_type}=~/micro|nano/) { 
+      #fa_system("sudo su -c 'sync;echo 1 > /proc/sys/vm/drop_caches'"); 
+      print "*** $p Loaded Successfully\n";
+      if (defined $ENV{LOADED_MODULES}) {
+         $ENV{LOADED_MODULES}.="|$p";
+      } else {
+         $ENV{LOADED_MODULES}=$p;
+      }
+      $exec_cnt=0;
    } else {
       print "*** $p Loaded Successfully\n";
+      if (defined $ENV{LOADED_MODULES}) {
+         $ENV{LOADED_MODULES}.="|$p";
+      } else {
+         $ENV{LOADED_MODULES}=$p;
+      }
       $exec_cnt=0;
    }
    return '';
@@ -2177,7 +2199,7 @@ if (exists $amazon{instance_type} && $amazon{instance_type}=~/micro/) {
       exec "sudo su -c 'sync;echo 3 > /proc/sys/vm/drop_caches';$^X Makefile.PL SKIP $argvs CPAN 1",
    }
 }
-if ($^O ne 'MSWin32' && $^O ne 'MSWin64') {
+if (($^O ne 'MSWin32') && ($^O ne 'MSWin64') && !grep { /^GETBERK$/ } @ARGV) {
    &fa_install_mod('ExtUtils::MakeMaker','install','Makefile');
    &fa_install_mod('File::Which','install','Makefile');
    &fa_install_module('Term::ReadKey','install','Makefile');
@@ -2382,7 +2404,19 @@ if ($^O ne 'MSWin32' && $^O ne 'MSWin64') {
       unless (grep { /-*(?:add|all)[-_]?dependencies/i } @ARGV) {
          my $dir=&fa_find_latest('Data-Dump-Streamer');
          fa_system("cd \"$dir\";$^X Build.PL NODDS;");
-         fa_system("cd \"$dir\";./Build install;");
+         if ($ARGV[$#ARGV]=~/^(\d+)$/) {
+            pop @ARGV;pop @ARGV;
+         }
+         shift @ARGV if $ARGV[0] eq 'SKIP';
+         my $argvs=join ' ', @ARGV if -1<$#ARGV;
+         print "*** Running Build install\n";
+	 if (exists $amazon{instance_type} && $amazon{instance_type}=~/micro|nano/) {
+            print "*** Running sudo ./Build install\n";
+            exec "sudo su -c 'sync;echo 3 > /proc/sys/vm/drop_caches';cd \"$dir\";./Build install;cd \"$cwd\";$^X Makefile.PL SKIP $argvs";
+         } else {
+            print "*** Running ./Build install\n";
+	    fa_system("cd \"$dir\";./Build install;");
+         }
       }
    }
    &fa_install_module('Capture::Tiny','install','Makefile');
@@ -4394,7 +4428,19 @@ eval {
    local $SIG{__DIE__}; # No sigdie handler
    require BerkeleyDB;
 };
-$get_BerkeleyDB=1 if $@;
+if ($@) {
+   $get_BerkeleyDB=1;
+   if (exists $amazon{instance_type} && $amazon{instance_type}=~/micro|nano/) {
+      unless (grep { /^GETBERK$/ } @ARGV) {
+         if ($ARGV[$#ARGV]=~/^\d+$/) {
+            pop @ARGV;pop @ARGV;
+         }
+         shift @ARGV if $ARGV[0] eq 'SKIP';
+         my $argvs=join ' ', @ARGV if -1<$#ARGV;
+         exec "sudo $^X Makefile.PL SKIP GETBERK $argvs",
+      }
+   }
+}
 my $cpan_error='';
 eval {
    local $SIG{__DIE__}; # No sigdie handler
@@ -4771,7 +4817,7 @@ sub download_berkeleydb {
    my $file=$2;
    my $file=substr($file,(index $file,'/')+1,-7);
    my $fh='';my $filename='';my $suffix='.tar.gz';
-   if (grep  { /BDB/ } @ARGV) {
+   if (grep  { /^BDB$/ } @ARGV) {
       $already_downloaded=1;
       $filename=$ARGV[$#ARGV];
    } else {

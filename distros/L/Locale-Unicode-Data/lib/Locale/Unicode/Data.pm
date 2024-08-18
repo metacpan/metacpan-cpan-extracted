@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Unicode Locale Identifier - ~/lib/Locale/Unicode/Data.pm
-## Version v0.1.1
+## Version v0.2.0
 ## Copyright(c) 2024 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2024/06/15
-## Modified 2024/08/03
+## Modified 2024/08/05
 ## All rights reserved
 ## 
 ## 
@@ -19,30 +19,39 @@ BEGIN
     use warnings;
     use warnings::register;
     use vars qw(
-        $ERROR $VERSION $DEBUG
-        $CLDR_VERSION $DB_FILE $STHS
+        $ERROR $VERSION $DEBUG $FATAl_EXCEPTIONS
+        $CLDR_VERSION $DB_FILE $DBH $STHS
     );
     use version;
     use Exporter ();
     use DBD::SQLite;
-    use DBD::SQLite::Constants;
     use DBI qw( :sql_types );
     use Encode ();
     use File::Spec;
     use JSON;
     use Locale::Unicode v0.3.5;
     use Scalar::Util ();
+    use URI::file ();
     use Want;
-    use constant MISSING_AUTO_UTF8_DECODING => ( version->parse( $DBD::SQLite::VERSION ) < 1.68 ? 1 : 0 );
+    use constant {
+        HAS_CONSTANTS => ( version->parse( $DBD::SQLite::VERSION ) >= 1.48 ? 1 : 0 ),
+        MISSING_AUTO_UTF8_DECODING => ( version->parse( $DBD::SQLite::VERSION ) < 1.68 ? 1 : 0 ),
+    };
     our $CLDR_VERSION = '45.0';
+    our $DBH = {};
     our $STHS = {};
-    our $VERSION = 'v0.1.1';
+    our $VERSION = 'v0.2.0';
 };
 
 sub INIT
 {
     my( $vol, $parent, $file ) = File::Spec->splitpath(__FILE__);
     $DB_FILE = File::Spec->catpath( $vol, $parent, 'unicode_cldr.sqlite3' );
+    unless( File::Spec->file_name_is_absolute( $DB_FILE ) )
+    {
+        my $cwd = URI->new( URI::file->cwd )->file( $^O );
+        $DB_FILE = URI::file->new( $DB_FILE )->abs( $cwd )->file( $^O );
+    }
 };
 
 use strict;
@@ -54,6 +63,7 @@ sub new
     my $self = bless( {} => ( ref( $this ) || $this ) );
     $self->{datafile} = $DB_FILE;
     $self->{decode_sql_arrays} = 1;
+    $self->{fatal} = ( $FATAl_EXCEPTIONS // 0 );
     my @args = @_;
     if( scalar( @args ) == 1 &&
         defined( $args[0] ) &&
@@ -65,6 +75,15 @@ sub new
     elsif( ( scalar( @args ) % 2 ) )
     {
         return( $self->error( sprintf( "Uneven number of parameters provided (%d). Should receive key => value pairs. Parameters provided are: %s", scalar( @args ), join( ', ', @args ) ) ) );
+    }
+
+    for( my $i = 0; $i < scalar( @args ); $i += 2 )
+    {
+        if( $args[$i] eq 'fatal' )
+        {
+            $self->{fatal} = $args[$i + 1];
+            last;
+        }
     }
 
     # Then, if the user provided with an hash or hash reference of options, we apply them
@@ -257,13 +276,14 @@ sub calendar_era
         {
             return( $self->error( "The calendar era sequence provided (", ( $opts->{sequence} // 'undef' ), ") does not look like an integer." ) );
         }
-        unless( $sth = $STHS->{calendar_era_with_sequence} )
+        unless( $sth = $self->_get_cached_statement( 'calendar_era_with_sequence' ) )
         {
             my $dbh = $self->_dbh || return( $self->pass_error );
-            $sth = $STHS->{calendar_era_with_sequence} = eval
+            $sth = eval
             {
-                $dbh->prepare_cached( "SELECT * FROM calendar_eras WHERE calendar = ? AND sequence = ?" )
+                $dbh->prepare( "SELECT * FROM calendar_eras WHERE calendar = ? AND sequence = ?" )
             } || return( $self->error( "Unable to prepare SQL query to retrieve calendar era information for a given calendar and sequence: ", ( $@ || $dbh->errstr ) ) );
+            $self->_set_cached_statement( calendar_era_with_sequence => $sth );
         }
         eval
         {
@@ -277,13 +297,14 @@ sub calendar_era
         {
             return( $self->error( "The calendar era code provided (", ( $opts->{code} // 'undef' ), ") contains illegal characters." ) );
         }
-        unless( $sth = $STHS->{calendar_era_with_code} )
+        unless( $sth = $self->_get_cached_statement( 'calendar_era_with_code' ) )
         {
             my $dbh = $self->_dbh || return( $self->pass_error );
-            $sth = $STHS->{calendar_era_with_code} = eval
+            $sth = eval
             {
-                $dbh->prepare_cached( "SELECT * FROM calendar_eras WHERE calendar = ? AND code = ?" )
+                $dbh->prepare( "SELECT * FROM calendar_eras WHERE calendar = ? AND code = ?" )
             } || return( $self->error( "Unable to prepare SQL query to retrieve calendar era information for a given calendar and code: ", ( $@ || $dbh->errstr ) ) );
+            $self->_set_cached_statement( calendar_era_with_code => $sth );
         }
         eval
         {
@@ -309,24 +330,26 @@ sub calendar_eras
     local $@;
     if( $opts->{calendar} )
     {
-        unless( $sth = $STHS->{calendar_eras_with_calendar} )
+        unless( $sth = $self->_get_cached_statement( 'calendar_eras_with_calendar' ) )
         {
             my $dbh = $self->_dbh || return( $self->pass_error );
-            $sth = $STHS->{calendar_eras_with_calendar} = eval
+            $sth = eval
             {
-                $dbh->prepare_cached( "SELECT * FROM calendar_eras WHERE calendar = ?" )
+                $dbh->prepare( "SELECT * FROM calendar_eras WHERE calendar = ?" )
             } || return( $self->error( "Unable to prepare SQL query to retrieve all calendar eras information for a given calendar': ", ( $@ || $dbh->errstr ) ) );
+            $self->_set_cached_statement( calendar_eras_with_calendar => $sth );
         }
     }
     else
     {
-        unless( $sth = $STHS->{calendar_eras} )
+        unless( $sth = $self->_get_cached_statement( 'calendar_eras' ) )
         {
             my $dbh = $self->_dbh || return( $self->pass_error );
-            $sth = $STHS->{calendar_eras} = eval
+            $sth = eval
             {
-                $dbh->prepare_cached( "SELECT * FROM calendar_eras" )
+                $dbh->prepare( "SELECT * FROM calendar_eras" )
             } || return( $self->error( "Unable to prepare SQL query to retrieve all calendar eras information: ", ( $@ || $dbh->errstr ) ) );
+            $self->_set_cached_statement( calendar_eras => $sth );
         }
     }
 
@@ -554,12 +577,21 @@ sub error
             skip_frames => 1,
             message => $msg,
         });
-        warn( $msg ) if( warnings::enabled() );
-        rreturn( Locale::Unicode::Data::NullObject->new ) if( Want::want( 'OBJECT' ) );
-        return;
+        if( $self->fatal )
+        {
+            die( $self->{error} );
+        }
+        else
+        {
+            warn( $msg ) if( warnings::enabled() );
+            rreturn( Locale::Unicode::Data::NullObject->new ) if( Want::want( 'OBJECT' ) );
+            return;
+        }
     }
     return( ref( $self ) ? $self->{error} : $ERROR );
 }
+
+sub fatal { return( shift->_set_get_prop( 'fatal', @_ ) ); }
 
 sub interval_formats
 {
@@ -733,13 +765,14 @@ sub l10n
     local $@;
     my $sth;
     my $sth_id = "l10n_${table}" . ( scalar( @$requires ) ? '_' . join( '_', @$requires ) : '' );
-    unless( $sth = $STHS->{ $sth_id } )
+    unless( $sth = $self->_get_cached_statement( $sth_id ) )
     {
         my $dbh = $self->_dbh || return( $self->pass_error );
-        $sth = $STHS->{ $sth_id } = eval
+        $sth = eval
         {
-            $dbh->prepare_cached( "SELECT * FROM ${table} WHERE ${field} = ?" . ( scalar( @$requires ) ? ' AND ' . join( ' AND ', map( "$_ = ?", @$requires ) ) : '' ) . ' ORDER BY rowid' );
+            $dbh->prepare( "SELECT * FROM ${table} WHERE ${field} = ?" . ( scalar( @$requires ) ? ' AND ' . join( ' AND ', map( "$_ = ?", @$requires ) ) : '' ) . ' ORDER BY rowid' );
         } || return( $self->error( "Unable to prepare SQL query to retrieve data from the table ${table} with field ${field}: ", ( $@ || $dbh->errstr ) ) );
+        $self->_set_cached_statement( $sth_id => $sth );
     }
     eval
     {
@@ -830,6 +863,19 @@ sub locales_info { return( shift->_fetch_one({
 sub locales_infos { return( shift->_fetch_all({
     id          => 'locales_info',
     table       => 'locales_info',
+}, @_ ) ); }
+
+sub locale_number_system { return( shift->_fetch_one({
+    id          => 'get_locale_number_system',
+    field       => 'locale',
+    table       => 'locale_number_systems',
+    requires    => [qw()],
+}, @_ ) ); }
+
+sub locale_number_systems { return( shift->_fetch_all({
+    id          => 'locale_number_systems',
+    table       => 'locale_number_systems',
+    by          => [qw( number_system native traditional finance )],
 }, @_ ) ); }
 
 # <https://unicode.org/reports/tr35/tr35.html#Locale_Inheritance>
@@ -948,6 +994,34 @@ sub make_inheritance_tree
     push( @$tree, 'und' ) unless( $tree->[-1] eq 'und' );
     return( $tree );
 }
+
+sub metazone { return( shift->_fetch_one({
+    id          => 'get_metazone',
+    field       => 'metazone',
+    table       => 'metazones',
+    has_array   => [qw( territories timezones )],
+}, @_ ) ); }
+
+sub metazones { return( shift->_fetch_all({
+    id          => 'metazones',
+    table       => 'metazones',
+    by          => [],
+    has_array   => [qw( territories timezones )],
+}, @_ ) ); }
+
+sub metazone_names { return( shift->_fetch_one({
+    id          => 'get_metazone_names',
+    field       => 'metazone',
+    table       => 'metazones_names',
+    requires    => [qw( locale width )],
+    default     => { start => undef },
+}, @_ ) ); }
+
+sub metazones_names { return( shift->_fetch_all({
+    id          => 'metazones_names',
+    table       => 'metazones_names',
+    by          => [qw( locale metazone width )],
+}, @_ ) ); }
 
 # <https://unicode.org/reports/tr35/tr35.html#5.-canonicalizing-syntax>
 # <https://unicode.org/reports/tr35/tr35.html#4.-replacement>
@@ -1533,15 +1607,102 @@ sub time_formats { return( shift->_fetch_all({
 }, @_ ) ); }
 
 sub timezone { return( shift->_fetch_one({
-    id      => 'get_timezone',
-    field   => 'timezone',
-    table   => 'timezones',
+    id          => 'get_timezone',
+    field       => 'timezone',
+    table       => 'timezones',
+    has_array   => [qw( alias )],
 }, @_ ) ); }
 
 sub timezones { return( shift->_fetch_all({
     id          => 'timezones',
     table       => 'timezones',
     by          => [qw( territory region tzid tz_bcpid metazone is_golden )],
+    has_array   => [qw( alias )],
+}, @_ ) ); }
+
+sub timezone_canonical
+{
+    my $self = shift( @_ );
+    my $tz = shift( @_ ) ||
+        return( $self->error( "No timezone was provided to get its canonical version." ) );
+    my $dbh = $self->_dbh || return( $self->pass_error );
+    my $sth_id = 'sth_get_timezone';
+    local $@;
+    my $sth;
+    unless( $sth = $self->_get_cached_statement( $sth_id ) )
+    {
+        # try-catch
+        $sth = eval
+        {
+            $dbh->prepare( "SELECT * FROM timezones WHERE timezone = ?" )
+        } || return( $self->error( "Unable to prepare SQL query with statement ID ${sth_id} to retrieve the given timezone information: ", ( $@ || $dbh->errstr ) ) );
+        $self->_set_cached_statement( $sth_id => $sth );
+    }
+
+    # try-catch
+    eval
+    {
+        $sth->execute( $tz );
+    } || return( $self->error( "Error executing SQL query '$sth->{Statement}' with statement ID ${sth_id} to retrieve the given timezone information:", ( $@ || $sth->errstr ), " with SQL query: ", $sth->{Statement} ) );
+    my $ref = $sth->fetchrow_hashref;
+    return( $self->error( "No timezone '${tz}' exists in the Locale::Unicode::Data database." ) ) if( !$ref );
+    $self->_decode_utf8( $ref ) if( MISSING_AUTO_UTF8_DECODING );
+    $self->_decode_sql_arrays( ['alias'], $ref );
+    if( $ref->{is_canonical} )
+    {
+        return( $ref->{timezone} );
+    }
+    elsif( $ref->{alias} &&
+           ref( $ref->{alias} ) eq 'ARRAY' &&
+           scalar( @{$ref->{alias}} ) )
+    {
+        $sth_id = 'sth_get_timezone_multi_' . scalar( @{$ref->{alias}} );
+        unless( $sth = $self->_get_cached_statement( $sth_id ) )
+        {
+            # try-catch
+            $sth = eval
+            {
+                $dbh->prepare( "SELECT * FROM timezones WHERE " . join( ' OR ', map{ "timezone = ?" } @{$ref->{alias}} ) )
+            } || return( $self->error( "Unable to prepare SQL query with statement ID ${sth_id} to retrieve one of " . scalar( @{$ref->{alias}} ) . " timezone(s) information: ", ( $@ || $dbh->errstr ) ) );
+            $self->_set_cached_statement( $sth_id => $sth );
+        }
+        # try-catch
+        eval
+        {
+            $sth->execute( @{$ref->{alias}} );
+        } || return( $self->error( "Error executing SQL query '$sth->{Statement}' with statement ID ${sth_id} to retrieve one of " . scalar( @{$ref->{alias}} ) . " timezone(s) information:", ( $@ || $sth->errstr ), " with SQL query: ", $sth->{Statement} ) );
+        $ref = $sth->fetchrow_hashref;
+        return( $ref->{timezone} ) if( $ref->{is_canonical} );
+    }
+    return( '' );
+}
+
+sub timezone_city { return( shift->_fetch_one({
+    id          => 'get_timezone_city',
+    field       => 'timezone',
+    table       => 'timezones_cities',
+    requires    => [qw( locale alt )],
+    default     => { alt => undef },
+}, @_ ) ); }
+
+sub timezones_cities { return( shift->_fetch_all({
+    id          => 'timezones_cities',
+    table       => 'timezones_cities',
+    by          => [qw( locale alt )],
+}, @_ ) ); }
+
+sub timezone_formats { return( shift->_fetch_one({
+    id          => 'get_timezone_formats',
+    field       => 'type',
+    table       => 'timezones_formats',
+    requires    => [qw( locale subtype )],
+    default     => { subtype => undef },
+}, @_ ) ); }
+
+sub timezones_formats { return( shift->_fetch_all({
+    id          => 'timezones_formats',
+    table       => 'timezones_formats',
+    by          => [qw( locale type subtype format_pattern )],
 }, @_ ) ); }
 
 sub timezone_info { return( shift->_fetch_one({
@@ -1556,6 +1717,20 @@ sub timezones_info { return( shift->_fetch_all({
     id          => 'timezones_info',
     table       => 'timezones_info',
     by          => [qw( timezone metazone start until )],
+}, @_ ) ); }
+
+sub timezone_names { return( shift->_fetch_one({
+    id          => 'get_timezone_names',
+    field       => 'timezone',
+    table       => 'timezones_names',
+    requires    => [qw( locale width )],
+    default     => { start => undef },
+}, @_ ) ); }
+
+sub timezones_names { return( shift->_fetch_all({
+    id          => 'timezones_names',
+    table       => 'timezones_names',
+    by          => [qw( locale timezone width )],
 }, @_ ) ); }
 
 sub unit_alias { return( shift->_fetch_one({
@@ -1687,16 +1862,19 @@ sub _dbh
 {
     my $self = shift( @_ );
     my $opts = $self->_get_args_as_hash( @_ );
-    my $dbh = $self->{_dbh};
-    if( $dbh && 
-        Scalar::Util::blessed( $dbh ) &&
-        $dbh->isa( 'DBI' ) &&
-        $dbh->ping )
+    my $file = $opts->{datafile} || $self->datafile || $DB_FILE;
+    my $dbh;
+    if( $DBH &&
+        ref( $DBH ) eq 'HASH' &&
+        exists( $DBH->{ $file } ) &&
+        $DBH->{ $file } &&
+        Scalar::Util::blessed( $DBH->{ $file } ) &&
+        $DBH->{ $file }->isa( 'DBI::db' ) &&
+        $DBH->{ $file }->ping )
     {
-        return( $dbh );
+        return( $DBH->{ $file } );
     }
 
-    my $file = $opts->{datafile} || $self->datafile || $DB_FILE;
 
     if( !-e( $file ) )
     {
@@ -1718,9 +1896,15 @@ sub _dbh
     {
         return( $self->error( "SQLite driver version 3.6.19 or higher is required. You have version ", $DBD::SQLite::sqlite_version ) );
     }
+
+    if( HAS_CONSTANTS )
+    {
+        require DBD::SQLite::Constants;
+    }
+
     my $params =
     {
-        sqlite_open_flags => DBD::SQLite::Constants::SQLITE_OPEN_READONLY,
+        ( HAS_CONSTANTS ? ( sqlite_open_flags => DBD::SQLite::Constants::SQLITE_OPEN_READONLY ) : () ),
     };
     $dbh = DBI->connect( "dbi:SQLite:dbname=${file}", '', '', $params ) ||
         return( $self->error( "Unable to make connection to Unicode CLDR SQLite database file ${file}: ", $DBI::errstr ) );
@@ -1731,7 +1915,7 @@ sub _dbh
     {
         $dbh->{sqlite_string_mode} = DBD::SQLite::Constants::DBD_SQLITE_STRING_MODE_UNICODE_FALLBACK;
     }
-    return( $dbh );
+    return( $DBH->{ $file } = $dbh );
 }
 
 sub _decode_sql_arrays
@@ -2041,24 +2225,26 @@ sub _fetch_all
     local $@;
     if( $by_key )
     {
-        unless( $sth = $STHS->{ $sth_id } )
+        unless( $sth = $self->_get_cached_statement( $sth_id ) )
         {
             my $dbh = $self->_dbh || return( $self->pass_error );
-            $sth = $STHS->{ $sth_id } = eval
+            $sth = eval
             {
-                $dbh->prepare_cached( "SELECT * FROM ${table} WHERE " . join( ' AND ', @$skeleton ) . " ORDER BY ${order}" )
+                $dbh->prepare( "SELECT * FROM ${table} WHERE " . join( ' AND ', @$skeleton ) . " ORDER BY ${order}" )
             } || return( $self->error( "Unable to prepare SQL query to retrieve all ${what} information for fields @$by: ", ( $@ || $dbh->errstr ) ) );
+            $self->_set_cached_statement( $sth_id => $sth );
         }
     }
     else
     {
-        unless( $sth = $STHS->{ $sth_id } )
+        unless( $sth = $self->_get_cached_statement( $sth_id ) )
         {
             my $dbh = $self->_dbh || return( $self->pass_error );
-            $sth = $STHS->{ $sth_id } = eval
+            $sth = eval
             {
-                $dbh->prepare_cached( "SELECT * FROM ${table} ORDER BY ${order}" )
+                $dbh->prepare( "SELECT * FROM ${table} ORDER BY ${order}" )
             } || return( $self->error( "Unable to prepare SQL query to retrieve all ${what} information: ", ( $@ || $dbh->errstr ) ) );
+            $self->_set_cached_statement( $sth_id => $sth );
         }
     }
 
@@ -2217,13 +2403,14 @@ sub _fetch_one
     $sth_id .= '_' . $requires_key if( $requires_key );
     my $sth;
     local $@;
-    unless( $sth = $STHS->{ $sth_id } )
+    unless( $sth = $self->_get_cached_statement( $sth_id ) )
     {
         my $dbh = $self->_dbh || return( $self->pass_error );
-        $sth = $STHS->{ $sth_id } = eval
+        $sth = eval
         {
-            $dbh->prepare_cached( "SELECT * FROM ${table} WHERE (" . join( ' OR ', @$field_skel ) . ') ' . ( scalar( @$required_skel ) ? ' AND ' . join( ' AND ', @$required_skel ) : '' ) . ( $def->{multi} ? ' ORDER BY rowid' : '' ) )
+            $dbh->prepare( "SELECT * FROM ${table} WHERE (" . join( ' OR ', @$field_skel ) . ') ' . ( scalar( @$required_skel ) ? ' AND ' . join( ' AND ', @$required_skel ) : '' ) . ( $def->{multi} ? ' ORDER BY rowid' : '' ) )
         } || return( $self->error( "Unable to prepare SQL query with statement ID ${sth_id} to retrieve a ${what} information: ", ( $@ || $dbh->errstr ) ) );
+        $self->_set_cached_statement( $sth_id => $sth );
     }
 
     eval
@@ -2243,18 +2430,36 @@ sub _fetch_one
     return( $ref );
 }
 
+sub _get_cached_statement
+{
+    my $self = shift( @_ );
+    my $id = shift( @_ );
+    die( "No statement ID was provided to get its cached object." ) if( !length( $id // '' ) );
+    my $file = $self->datafile || $DB_FILE;
+    $STHS->{ $file } //= {};
+    if( exists( $STHS->{ $file }->{ $id } ) &&
+        defined( $STHS->{ $file }->{ $id } ) &&
+        Scalar::Util::blessed( $STHS->{ $file }->{ $id } ) &&
+        $STHS->{ $file }->{ $id }->isa( 'DBI::st' ) )
+    {
+        return( $STHS->{ $file }->{ $id } );
+    }
+    return;
+}
+
 sub _get_metadata
 {
     my $self = shift( @_ );
     my $prop = shift( @_ ) || die( "No metadata property provided." );
     my $dbh = $self->_dbh || return( $self->pass_error );
     my $sth;
-    unless( $sth = $STHS->{cldr_metadata} )
+    unless( $sth = $self->_get_cached_statement( 'cldr_metadata' ) )
     {
-        $sth = $STHS->{cldr_metadata} = eval
+        $sth = eval
         {
-            $dbh->prepare_cached( "SELECT value FROM metainfos WHERE property = ?" )
+            $dbh->prepare( "SELECT value FROM metainfos WHERE property = ?" )
         } || return( $self->error( "Unable to prepare query to get the CLDR built datetime from the SQLite database at ", $self->datafile, ": ", ( $@ || $dbh->errstr ) ) );
+        $self->_set_cached_statement( cldr_metadata => $sth );
     }
 
     local $@;
@@ -2281,6 +2486,27 @@ sub _locale_object
     }
     return( $locale );
 }
+sub _set_cached_statement
+{
+    my $self = shift( @_ );
+    my $id = shift( @_ );
+    my $sth = shift( @_ );
+    die( "No statement ID was provided to cache its object." ) if( !length( $id // '' ) );
+    if( !$sth )
+    {
+        die( "No DBI statement handler was provided to cache with ID '${id}'" );
+    }
+    elsif( !Scalar::Util::blessed( $sth ) ||
+           !$sth->isa( 'DBI::st' ) )
+    {
+        die( "Value provided (", overload::StrVal( $sth ), ") is not a DBI statement object." );
+    }
+    my $file = $self->datafile || $DB_FILE;
+    $STHS->{ $file } //= {};
+    $STHS->{ $file }->{ $id } = $sth;
+    return( $sth );
+}
+
 sub _set_get_prop
 {
     my $self = shift( @_ );
@@ -2384,6 +2610,25 @@ sub _get_args_as_hash
     }
     return( $ref );
 }
+
+# NOTE: END
+END
+{
+    if( defined( $STHS ) && ref( $STHS ) eq 'HASH' )
+    {
+        foreach my $db ( keys( %$STHS ) )
+        {
+            foreach my $sth ( keys( %{$STHS->{ $db }} ) )
+            {
+                if( defined( $sth ) &&
+                    Scalar::Util::blessed( $sth ) )
+                {
+                    $sth->finish;
+                }
+            }
+        }
+    }
+};
 
 sub FREEZE
 {
@@ -3189,6 +3434,8 @@ Locale::Unicode::Data - Unicode CLDR SQL Data
     );
     my $ref = $cldr->locales_info( property => 'quotation_start', locale => 'ja' );
     my $all = $cldr->locales_infos;
+    my $ref = $cldr->metazone( metazone => 'Japan' );
+    my $all = $cldr->metazones;
     my $ref = $cldr->number_format_l10n(
         locale          => 'en',
         number_system   => 'latn',
@@ -3294,6 +3541,11 @@ Locale::Unicode::Data - Unicode CLDR SQL Data
     my $all = $cldr->timezones( metazone => 'Singapore' );
     my $all = $cldr->timezones( is_golden => undef );
     my $all = $cldr->timezones( is_golden => 1 );
+    my $ref = $cldr->timezone_city(
+        locale => 'fr',
+        timezone => 'Asia/Tokyo',
+    );
+    my $all = $cldr->timezones_cities;
     my $ref = $cldr->timezone_info(
         timezone    => 'Asia/Tokyo',
         start       => undef,
@@ -3372,9 +3624,44 @@ With advanced search:
         region => qr/^U.*/,
     );
 
+Enabling fatal exceptions:
+
+    use v5.34;
+    use experimental 'try';
+    no warnings 'experimental';
+    try
+    {
+        my $locale = Locale::Unicode::Data->new( fatal => 1 );
+        # Missing the 'width' argument
+        my $str = $cldr->timezone_names( timezone => 'Asia/Tokyo', locale => 'en' );
+        # More code
+    }
+    catch( $e )
+    {
+        say "Oops: ", $e->message;
+    }
+
+Or, you could set the global variable C<$FATAl_EXCEPTIONS> instead:
+
+    use v5.34;
+    use experimental 'try';
+    no warnings 'experimental';
+    $Locale::Unicode::Data::FATAl_EXCEPTIONS = 1;
+    try
+    {
+        my $locale = Locale::Unicode::Data->new;
+        # Missing the 'width' argument
+        my $str = $cldr->timezone_names( timezone => 'Asia/Tokyo', locale => 'en' );
+        # More code
+    }
+    catch( $e )
+    {
+        say "Oops: ", $e->message;
+    }
+
 =head1 VERSION
 
-    v0.1.1
+    v0.2.0
 
 =head1 DESCRIPTION
 
@@ -4315,7 +4602,9 @@ See also the method L<l10n|/l10n>
         format_pattern  => 'zi',
     }
 
-Returns an hash reference of a C<script> localised information from the table L<scripts_l10n|/"Table scripts_l10n"> for a given format ID C<format_id>, ID a C<locale> ID, a C<calendar> ID, a format set C<format_set>, a format type C<format_type> and a format length C<format_length>.
+Returns an hash reference of a C<calendar> cyclic localised information from the table L<calendar_cyclics_l10n|/"Table calendar_cyclics_l10n"> for a given format ID C<format_id>, ID a C<locale> ID, a C<calendar> ID, a format set C<format_set>, a format type C<format_type> and a format length C<format_length>.
+
+This is typical of calendars such as: C<chinese> and C<dangi>
 
 The meaning of the fields are as follows:
 
@@ -5838,6 +6127,29 @@ For example:
 
 In this example, C<jptyo> will never be set, because C<transform_locale> triggered an exception that returned an C<Locale::Unicode::NullObject> object catching all further method calls, but eventually we get the error and die.
 
+=head2 fatal
+
+    $cldr->fatal(1); # Enable fatal exceptions
+    $cldr->fatal(0); # Disable fatal exceptions
+    my $bool = $cldr->fatal;
+
+Sets or get the boolean value, whether to die upon exception, or not. If set to true, then instead of setting an L<exception object|Locale::Unicode::Data::Exception>, this module will die with an L<exception object|Locale::Unicode::Data::Exception>. You can catch the exception object then after using C<try>. For example:
+
+    use v.5.34; # to be able to use try-catch blocks in perl
+    use experimental 'try';
+    no warnings 'experimental';
+    try
+    {
+        my $cldr = Locale::Unicode::Data->new( fatal => 1 );
+        # Forgot the 'width':
+        my $str = $cldr->timezone_names( timezone => 'Asia/Tokyo', locale => 'en' );
+    }
+    catch( $e )
+    {
+        say "Error occurred: ", $e->message;
+        # Error occurred: No value for width was provided.
+    }
+
 =head2 interval_formats
 
     my $ref = $cldr->interval_formats(
@@ -6497,6 +6809,85 @@ Returns all locale properties information from L<table locales_info|/"Table loca
 
 No additional parameter is needed.
 
+=head2 locale_number_system
+
+    my $ref = $cldr->locale_number_system( locale => 'ja' );
+    # Returns an hash reference like this:
+    {
+        locale_num_sys_id => 26,
+        locale => 'ja',
+        number_system => undef,
+        native => undef,
+        traditional => 'jpan',
+        finance => 'jpanfin',
+    }
+
+As a reminder, the numbering system can be explicitly specified with the Unicode BCP47 extension C<nu>. For example:
+
+=over 4
+
+=item * C<hi-IN-u-nu-native>
+
+Explicitly specifying the native digits for numeric formatting in Hindi language.
+
+=item * C<zh-u-nu-finance>
+
+Explicitly specifying the appropriate financial numerals in Chinese language.
+
+=item * C<ta-u-nu-traditio>
+
+Explicitly specifying the traditional Tamil numerals in Tamil language.
+
+=item * C<ar-u-nu-latn>
+
+Explicitly specifying the western digits 0-9 in Arabic language.
+
+=back
+
+Returns an hash reference of a given C<locale> number systems available from the table L<locale_number_systems|/"Table locale_number_systems">.
+
+TLDR; if C<number_system> and C<native> are the same, then it is ok to also use C<latn> as numbering system. When C<traditional> is not available, use C<native>. When C<finance> is not available, use the default C<number_system>
+
+The meaning of the fields are as follows:
+
+=over 4
+
+=item * C<locale_num_sys_id>
+
+A unique incremental value automatically generated by SQLite.
+
+=item * C<locale>
+
+A C<locale>, such as C<en> or C<ja-JP> as can be found in table L<locales|/"Table locales">
+
+=item * C<number_system>
+
+A string representing a number system as can be found in the table L<number_systems|/"Table number_systems">, and "used for presentation of numeric quantities in the given locale" (L<LDML specifications|https://unicode.org/reports/tr35/tr35-numbers.html#defaultNumberingSystem>)
+
+In L<LDML specifications|https://unicode.org/reports/tr35/tr35-numbers.html#defaultNumberingSystem>, this is named C<default>, but C<default> is a reserved keyword in SQL terminology.
+
+=item * C<native>
+
+Quoting from the L<LDML specifications|https://unicode.org/reports/tr35/tr35-numbers.html#otherNumberingSystems>: "Defines the L<numbering system|/number_system> used for the native digits, usually defined as a part of the L<script|/script> used to write the language. The C<native> L<numbering system|/number_system> can only be a numeric positional decimal-digit L<numbering system|/number_system>, using digits with General_Category=Decimal_Number. Note: In locales where the C<native> L<numbering system|/number_system> is the default, it is assumed that the L<numbering system|/number_system> C<latn> (Western digits 0-9) is always acceptable, and can be selected using the C<-nu> keyword as part of a L<Unicode locale identifier|/locale>."
+
+=item * C<traditional>
+
+Quoting from the L<LDML specifications|https://unicode.org/reports/tr35/tr35-numbers.html#otherNumberingSystems>: "Defines the C<traditional> numerals for a L<locale|/locale>. This L<numbering system|/number_system> may be numeric or algorithmic. If the C<traditional> L<numbering system|/number_system> is not defined, applications should use the C<native> numbering system as a fallback."
+
+=item * C<finance>
+
+Quoting from the L<LDML specifications|https://unicode.org/reports/tr35/tr35-numbers.html#otherNumberingSystems>: "Defines the L<numbering system|/number_system> used for financial quantities. This L<numbering system|/number_system> may be numeric or algorithmic. This is often used for ideographic languages such as Chinese, where it would be easy to alter an amount represented in the default numbering system simply by adding additional strokes. If the financial L<numbering system|/number_system> is not specified, applications should use the default L<numbering system|/number_system> as a fallback."
+
+=back
+
+=head2 locale_number_systems
+
+    my $all = $cldr->locale_number_systems;
+
+Returns all locales L<numbering systems|/number_system> information from L<table locale_number_systems|/"Table locale_number_systems"> as an array reference of hash reference.
+
+No additional parameter is needed.
+
 =head2 make_inheritance_tree
 
 This takes a C<locale>, such as C<ja> or C<ja-JP>, or C<es-ES-valencia> and it will return an array reference of L<inheritance tree of locales|https://unicode.org/reports/tr35/tr35.html#Locale_Inheritance>. This means the provided C<locale>'s parent, its grand-parent, etc until it reaches the C<root>, which, under the C<LDML> specifications is defined by C<und>
@@ -6535,6 +6926,143 @@ Normally, this parent would be C<yue>, which would lead to simplified Chinese, w
 If an error occurred, it will set an L<error object|Locale::Unicode::Data::Exception> and return C<undef> in scalar context and an empty list in list context.
 
 See the L<LDML specifications about inheritance|https://unicode.org/reports/tr35/tr35.html#Inheritance_and_Validity> and about L<locale inheritance and matching|https://unicode.org/reports/tr35/tr35.html#Locale_Inheritance> for more information.
+
+=head2 metazone
+
+    my $ref = $cldr->metazone( metazone => 'Japan' ); # Japan Standard Time
+    # Returns an hash reference like this:
+    {
+        metazone_id => 98,
+        metazone    => 'Japan',
+        territories => ["001"],
+        timezones   => ["Asia/Tokyo"],
+    }
+
+Returns an hash reference of a C<metazone> information from the table L<metazones|/"Table metazones"> for a given C<metazone> ID.
+
+Quoting from the L<LDML specifications|https://unicode.org/reports/tr35/tr35-dates.html#Metazone_Names>: "A metazone is a grouping of one or more internal TZIDs that share a common display name in current customary usage, or that have shared a common display name during some particular time period. For example, the zones Europe/Paris, Europe/Andorra, Europe/Tirane, Europe/Vienna, Europe/Sarajevo, Europe/Brussels, Europe/Zurich, Europe/Prague, Europe/Berlin, and so on are often simply designated Central European Time (or translated equivalent)."
+
+Also: "Metazones are used with the 'z', 'zzzz', 'v', and 'vvvv' date time pattern characters, and not with the 'Z', 'ZZZZ', 'VVVV' and other pattern characters for time zone formatting."
+
+The meaning of the fields are as follows:
+
+=over 4
+
+=item * C<metazone_id>
+
+A unique incremental value automatically generated by SQLite.
+
+=item * C<metazone>
+
+A C<metazone> ID as defined by the L<LDML specifications|https://unicode.org/reports/tr35/tr35-dates.html#Metazone_Names>
+
+=item * C<territory>
+
+An array of C<territory> IDs as can be found in the L<table territories|/"Table territories">, and that are associated with this C<metazone>.
+
+=item * C<timezones>
+
+An array of C<timezone> IDs as can be found in the L<table timezones|/"Table timezones">, and that are associated with this C<metazone>.
+
+=back
+
+=head2 metazones
+
+    my $all = $cldr->metazones;
+
+Returns all metazones information from L<table metazones|/"Table metazones"> as an array reference of hash reference.
+
+No additional parameter is needed.
+
+=head2 metazone_names
+
+    my $ref = $cldr->metazone_names(
+        locale      => 'en',
+        metazone    => 'Japan',
+        width       => 'long',
+    );
+    # Returns an hash reference like this:
+    {
+        metatz_name_id  => 4822,
+        locale          => 'ja',
+        metazone        => 'Japan',
+        width           => 'long',
+        generic         => 'Japan Time',
+        standard        => 'Japan Standard Time',
+        daylight        => 'Japan Daylight Time',
+    }
+
+Returns an hash reference of a C<metazone> names localised information from the table L<metazones_names|/"Table metazones_names"> for a given C<locale> ID, C<metazone> and C<width> value.
+
+The meaning of the fields are as follows:
+
+=over 4
+
+=item * C<metatz_name_id>
+
+A unique incremental value automatically generated by SQLite.
+
+=item * C<locale>
+
+A C<locale>, such as C<en> or C<ja-JP> as can be found in table L<locales|/"Table locales">
+
+=item * C<metazone>
+
+A C<metazone> such as can be found in table L<metazones|/"Table metazones">
+
+=item * C<width>
+
+A C<metazone> localised name C<width>, which can be either C<long> or C<short>
+
+Note that not all metazones names have both C<width> defined.
+
+=item * C<generic>
+
+The C<metazone> C<generic> name.
+
+=item * C<standard>
+
+The C<metazone> C<standard> name.
+
+=item * C<standard>
+
+The C<metazone> C<daylight> name defined if the C<metazone> use daylight saving time system.
+
+=back
+
+See the L<LDML specifications|https://unicode.org/reports/tr35/tr35-dates.html#Metazone_Names> for more information.
+
+=head2 metazones_names
+
+    my $all = $cldr->metazones_names;
+    my $all = $cldr->metazones_names( locale => 'ja' );
+    my $all = $cldr->metazones_names( width => 'long' );
+    my $all = $cldr->metazones_names(
+        locale  => 'ja',
+        width   => 'long',
+    );
+
+Returns all C<metazone> localised formats from L<table metazones_names|/"Table metazones_names"> as an array reference of hash reference.
+
+A combination of the following fields may be provided to filter the information returned:
+
+=over 4
+
+=item * C<locale>
+
+A C<locale>, such as C<en> or C<ja-JP> as can be found in table L<locales|/"Table locales">
+
+=item * C<metazone>
+
+A C<metazone> such as can be found in table L<metazones|/"Table metazones">
+
+=item * C<width>
+
+A C<metazone> localised name C<width>, which can be either C<long> or C<short>
+
+Note that not all timezones names have both C<width> defined.
+
+=back
 
 =head2 normalise
 
@@ -6778,7 +7306,7 @@ Known values are: C<accounting>, C<default>, C<standard>
         alt                 => undef,
     }
 
-Returns an hash reference of a C<script> localised information from the table L<scripts_l10n|/"Table scripts_l10n"> for a given C<locale> ID, C<number_system>, C<property> value and C<alt> value. If no C<alt> value is provided, it will default to C<undef>
+Returns an hash reference of a number symbol localised information from the table L<number_symbols_l10n|/"Table number_symbols_l10n"> for a given C<locale> ID, C<number_system>, C<property> value and C<alt> value. If no C<alt> value is provided, it will default to C<undef>
 
 The meaning of the fields are as follows:
 
@@ -7441,7 +7969,7 @@ No additional parameter is needed.
         status          => 'regular',
     }
 
-Returns an hash reference of a script information from the table L<scripts|/"Table scripts"> for a given C<script> ID.
+Returns an hash reference of a C<script> information from the table L<scripts|/"Table scripts"> for a given C<script> ID.
 
 The meaning of the fields are as follows:
 
@@ -7548,7 +8076,7 @@ A boolean value. C<0> for false and C<1> for true.
 
     my $ref = $cldr->script_l10n(
         locale  => 'en',
-        script   => 'Latn',
+        script  => 'Latn',
         alt     => undef,
     );
     # Returns an hash reference like this:
@@ -7743,7 +8271,7 @@ A C<territory> code as can be found in table L<territories|/"Table territories">
         locale_name     => 'Texas',
     }
 
-Returns an hash reference of a C<script> localised information from the table L<scripts_l10n|/"Table scripts_l10n"> for a given C<subdivision> ID and a C<locale> ID.
+Returns an hash reference of a C<subdivision> localised information from the table L<subdivisions_l10n|/"Table subdivisions_l10n"> for a given C<subdivision> ID and a C<locale> ID.
 
 The meaning of the fields are as follows:
 
@@ -8057,6 +8585,8 @@ A C<territory> code as can be found in table L<territories|/"Table territories">
         metazone    => 'Japan',
         tz_bcpid    => 'jptyo',
         is_golden   => 1,
+        is_preferred => 0,
+        is_canonical => 0,
     }
 
 Returns an hash reference of a time zone information from the table L<timezones|/"Table timezones"> based on the C<timezone> ID provided.
@@ -8098,6 +8628,18 @@ A boolean specifying whether this timezone ID is also a BCP47 C<timezone>.
 =item * C<is_golden>
 
 A boolean specifying whether this timezone is a golden timezone.
+
+A C<timezone> is deemed C<golden> if it is specified in the C<CLDR> as part of the L<primaryZones|https://unicode.org/reports/tr35/tr35-dates.html#Primary_Zones> or if the C<timezone> territory is C<001> (World).
+
+As explained in the L<LDML specifications|https://unicode.org/reports/tr35/tr35-dates.html#Using_Time_Zone_Names>, "[t]he golden zones are those in mapZone supplemental data under the territory "001"."
+
+=item * C<is_preferred>
+
+A boolean specifying whether this timezone is the preferred timezone for this C<metazone>
+
+=item * C<is_canonical>
+
+A boolean specifying whether this timezone is the canonical timezone, since it can have multiple aliases.
 
 =back
 
@@ -8147,6 +8689,217 @@ A Unicode metazone ID.
 =item * C<is_golden>
 
 A boolean expressing whether this time zone is C<golden> (in Unicode parlance), or not. C<1> for true, and C<0> for false.
+
+=back
+
+=head2 timezone_canonical
+
+    my $str = $cldr->timezone_canonical( 'Europe/Paris' );
+    # Europe/Paris
+    my $str = $cldr->timezone_canonical( 'America/Atka' );
+    # America/Adak
+    my $str = $cldr->timezone_canonical( 'US/Aleutian' );
+    # America/Adak
+
+Provided with a C<timezone>, and this returns the canonical timezone corresponding.
+
+If no matching C<timezone> could be found, an empty string is returned.
+
+If an error occurred, this sets an L<exception object|Locale::Unicode::Data::Exception>, and returns C<undef> in scalar context, and an empty list in list context.
+
+=head2 timezone_city
+
+    my $ref = $cldr->timezone_city(
+        locale   => 'de',
+        timezone => 'Asia/Tokyo',
+    );
+    # Returns an hash reference like this:
+    {
+        tz_city_id  => 7486,
+        locale      => 'de',
+        timezone    => 'Asia/Tokyo',
+        city        => 'Tokio',
+        alt         => undef,
+    }
+
+Returns an hash reference of a C<timezone> localised exemplar city from the table L<timezones_cities|/"Table timezones_cities"> for a given C<locale> ID, C<timezone> and C<alt> value. If no C<alt> value is provided, it will default to C<undef>
+
+The meaning of the fields are as follows:
+
+=over 4
+
+=item * C<tz_city_id>
+
+A unique incremental value automatically generated by SQLite.
+
+=item * C<locale>
+
+A C<locale>, such as C<en> or C<ja-JP> as can be found in table L<locales|/"Table locales">
+
+=item * C<timezone>
+
+A C<timezone> ID as can be found in the L<table timezones|/"Table timezones">
+
+=item * C<city>
+
+A localised version of a representative city for this given C<timezone>.
+
+Note that not all locales have a localised city for all timezones.
+
+=item * C<alt>
+
+A string specified to provide for an alternative city value for the same city name.
+
+Known values are: C<undef> and C<secondary>
+
+=back
+
+=head2 timezones_cities
+
+    my $all = $cldr->timezones_cities;
+    my $all = $cldr->timezones_cities( locale => 'ja' );
+    my $all = $cldr->timezones_cities(
+        locale  => 'ja',
+        alt     => undef,
+    );
+
+Returns all timezone localised representative city name from L<table timezones_cities|/"Table timezones_cities"> as an array reference of hash reference.
+
+A combination of the following fields may be provided to filter the information returned:
+
+=over 4
+
+=item * C<locale>
+
+A C<locale>, such as C<en> or C<ja-JP> as can be found in table L<locales|/"Table locales">
+
+=item * C<alt>
+
+A string used to differentiate two version of a localised city name.
+
+Known values are: C<undef> and C<secondary>
+
+=back
+
+=head2 timezone_formats
+
+    my $ref = $cldr->timezone_formats(
+        locale  => 'en',
+        type    => 'region',
+        subtype => 'standard',
+    );
+    # Returns an hash reference like this:
+    {
+        tz_fmt_id       => 145,
+        locale          => 'en',
+        type            => 'region',
+        subtype         => 'standard',
+        format_pattern  => '{0} Standard Time',
+    }
+
+Returns an hash reference of a C<timezone> formats localised information from the table L<timezones_formats|/"Table timezones_formats"> for a given C<locale> ID, C<type> and optional C<subtype> value. If no C<subtype> value is provided, it will default to C<undef>
+
+The meaning of the fields are as follows:
+
+=over 4
+
+=item * C<tz_fmt_id>
+
+A unique incremental value automatically generated by SQLite.
+
+=item * C<locale>
+
+A C<locale>, such as C<en> or C<ja-JP> as can be found in table L<locales|/"Table locales">
+
+=item * C<type>
+
+A format type. This can be either: C<fallback>, C<gmt>, C<gmt_zero>, C<hour> and C<region>
+
+=over 4
+
+=item * C<fallback>
+
+Quoting the L<LDML specifications|https://unicode.org/reports/tr35/tr35-dates.html#fallbackFormat>: "a formatting string such as C<{1} ({0})>, where C<{1}> is the metazone, and C<{0}> is the country or city."
+
+For example: C<{1} ({0})>, which would yield in English: C<Pacific Time (Canada)>
+
+=item * C<gmt>
+
+A formatting string, such as C<GMT{0}>, where C<{0}> is the GMT offset in hour, minute, and possibly seconds, using the C<hour> formatting.
+
+For example: C<GMT{0}>, which would yield in English: C<GMT-0800>
+
+=item * C<hour>
+
+2 formatting strings separated by a semicolon; one for the positive offset formatting and the other for the negative offset formatting.
+
+See the section on L<formatting patterns|/"Format Patterns"> for the significance of the letters used in formatting.
+
+For example: C<+HHmm;-HHmm>, which would yield in English: C<+1200>
+
+=item * C<gmt_zero>
+
+For example: C<GMT>
+
+This specifies how GMT/UTC with no explicit offset (implied 0 offset) should be represented.
+
+=item * C<region>
+
+Quoting the L<LDML specifications|https://unicode.org/reports/tr35/tr35-dates.html#Time_Zone_Format_Terminology>: "a formatting string such as C<{0} Time>, where C<{0}> is the country or city."
+
+For example: C<{0} Daylight Time>, which would yield in English: C<France Daylight Time>, or in Spanish, the pattern C<horario de verano de {0}>, which would yield C<horario de verano de Francia>
+
+=back
+
+=item * C<subtype>
+
+A C<timezone> format subtype, such as C<daylight>, C<standard>
+
+Note that not all timezones and locales have a localised C<daylight> or C<standard> format
+
+=item * C<format_pattern>
+
+A string representing the format pattern.
+
+=back
+
+See the L<LDML specifications|https://unicode.org/reports/tr35/tr35-dates.html#Using_Time_Zone_Names> and L<specifications about fallback formats|https://unicode.org/reports/tr35/tr35-dates.html#timeZoneNames_Elements_Used_for_Fallback> for more information.
+
+=head2 timezones_formats
+
+    my $all = $cldr->timezones_formats;
+    my $all = $cldr->timezones_formats( locale => 'ja' );
+    my $all = $cldr->timezones_formats(
+        locale  => 'ja',
+        type    => 'region',
+    );
+    my $all = $cldr->timezones_formats(
+        locale  => 'ja',
+        subtype => 'standard',
+    );
+    my $all = $cldr->timezones_formats(
+        format_pattern  => '{0} Daylight Time',
+    );
+
+Returns all C<timezone> localised formats from L<table timezones_formats|/"Table timezones_formats"> as an array reference of hash reference.
+
+A combination of the following fields may be provided to filter the information returned:
+
+=over 4
+
+=item * C<locale>
+
+A C<locale>, such as C<en> or C<ja-JP> as can be found in table L<locales|/"Table locales">
+
+=item * C<type>
+
+A format type. This can be either: C<fallback>, C<gmt>, C<gmt_zero>, C<hour> and C<region>
+
+=item * C<subtype>
+
+A C<timezone> format subtype, such as C<daylight>, C<standard>
+
+Note that not all timezones and locales have a localised C<daylight> or C<standard> format
 
 =back
 
@@ -8237,6 +8990,96 @@ A C<timezone> value.
 =item * C<until>
 
 An ISO8601 date and time until which to find data. For example: C<2016-03-26T18:00:00>
+
+=back
+
+=head2 timezone_names
+
+    my $ref = $cldr->timezone_names(
+        locale      => 'ja',
+        timezone    => 'Europe/London',
+        width       => 'long',
+    );
+    # Returns an hash reference like this:
+    {
+        tz_name_id      => 85,
+        locale          => 'ja',
+        timezone        => 'Europe/London',
+        width           => 'long',
+        generic         => undef,
+        standard        => undef,
+        daylight        => '英国夏時間',
+    }
+
+Returns an hash reference of a C<timezone> names localised information from the table L<timezones_names|/"Table timezones_names"> for a given C<locale> ID, C<timezone> and C<width> value.
+
+The meaning of the fields are as follows:
+
+=over 4
+
+=item * C<tz_name_id>
+
+A unique incremental value automatically generated by SQLite.
+
+=item * C<locale>
+
+A C<locale>, such as C<en> or C<ja-JP> as can be found in table L<locales|/"Table locales">
+
+=item * C<timezone>
+
+A C<timezone> such as can be found in table L<timezones|/"Table timezones">
+
+=item * C<width>
+
+A C<timezone> localised name C<width>, which can be either C<long> or C<short>
+
+Note that not all timezones names have both C<width> defined.
+
+=item * C<generic>
+
+The C<timezone> C<generic> name.
+
+=item * C<standard>
+
+The C<timezone> C<standard> name.
+
+=item * C<standard>
+
+The C<timezone> C<daylight> name defined if the C<timezone> use daylight saving time system.
+
+=back
+
+See the L<LDML specifications|https://unicode.org/reports/tr35/tr35-dates.html#Time_Zone_Names> for more information.
+
+=head2 timezones_names
+
+    my $all = $cldr->timezones_names;
+    my $all = $cldr->timezones_names( locale => 'ja' );
+    my $all = $cldr->timezones_names( width => 'long' );
+    my $all = $cldr->timezones_names(
+        locale  => 'ja',
+        width   => 'long',
+    );
+
+Returns all C<timezone> localised formats from L<table timezones_names|/"Table timezones_names"> as an array reference of hash reference.
+
+A combination of the following fields may be provided to filter the information returned:
+
+=over 4
+
+=item * C<locale>
+
+A C<locale>, such as C<en> or C<ja-JP> as can be found in table L<locales|/"Table locales">
+
+=item * C<timezone>
+
+A C<timezone> such as can be found in table L<timezones|/"Table timezones">
+
+=item * C<width>
+
+A C<timezone> localised name C<width>, which can be either C<long> or C<short>
+
+Note that not all timezones names have both C<width> defined.
 
 =back
 
@@ -8977,1812 +9820,6 @@ See the L<LDML specifications|https://unicode.org/reports/tr35/tr35-dates.html#W
     my $all = $cldr->week_preferences;
 
 Returns all the week preferences information as an array reference of hash reference from the L<table week_preferences|/"Table week_preferences">
-
-=head1 SQL Schema
-
-The SQLite SQL schema is available in the file C<scripts/cldr-schema.sql>
-
-The data are populated into the SQLite database using the script located in C<scripts/create_database.pl> and the data accessible from L<https://github.com/unicode-org/cldr> or from L<https://cldr.unicode.org/index/downloads/>
-
-=head1 Tables
-
-The SQL schema used to create the SQLite database is available in the C<scripts> directory of this distribution in the file C<cldr-schema.sql>
-
-The tables used are as follows, in alphabetical order:
-
-=head2 Table aliases
-
-=over 4
-
-=item * C<alias_id>
-
-A integer field.
-
-=item * C<alias>
-
-A string field.
-
-=item * C<replacement>
-
-A string array field.
-
-=item * C<reason>
-
-A string field.
-
-=item * C<type>
-
-A string field.
-
-=item * C<comment>
-
-A string field.
-
-=back
-
-=head2 Table annotations
-
-=over 4
-
-=item * C<annotation_id>
-
-A integer field.
-
-=item * C<locale>
-
-A string field.
-
-=item * C<annotation>
-
-A string field.
-
-=item * C<defaults>
-
-A string array field.
-
-=item * C<tts>
-
-A string field.
-
-=back
-
-=head2 Table bcp47_currencies
-
-=over 4
-
-=item * C<bcp47_curr_id>
-
-A integer field.
-
-=item * C<currid>
-
-A string field.
-
-=item * C<code>
-
-A string field.
-
-=item * C<description>
-
-A string field.
-
-=item * C<is_obsolete>
-
-A boolean field.
-
-=back
-
-=head2 Table bcp47_extensions
-
-=over 4
-
-=item * C<bcp47_ext_id>
-
-A integer field.
-
-=item * C<category>
-
-A string field.
-
-=item * C<extension>
-
-A string field.
-
-=item * C<alias>
-
-A string field.
-
-=item * C<value_type>
-
-A string field.
-
-=item * C<description>
-
-A string field.
-
-=item * C<deprecated>
-
-A boolean field.
-
-=back
-
-=head2 Table bcp47_timezones
-
-=over 4
-
-=item * C<bcp47_tz_id>
-
-A integer field.
-
-=item * C<tzid>
-
-A string field.
-
-=item * C<alias>
-
-A string array field.
-
-=item * C<preferred>
-
-A string field.
-
-=item * C<description>
-
-A string field.
-
-=item * C<deprecated>
-
-A boolean field.
-
-=back
-
-=head2 Table bcp47_values
-
-=over 4
-
-=item * C<bcp47_value_id>
-
-A integer field.
-
-=item * C<category>
-
-A string field.
-
-=item * C<extension>
-
-A string field.
-
-=item * C<value>
-
-A string field.
-
-=item * C<description>
-
-A string field.
-
-=back
-
-=head2 Table calendar_append_formats
-
-=over 4
-
-=item * C<cal_append_fmt_id>
-
-A integer field.
-
-=item * C<locale>
-
-A string field.
-
-=item * C<calendar>
-
-A string field.
-
-=item * C<format_id>
-
-A string field.
-
-=item * C<format_pattern>
-
-A string field.
-
-=back
-
-=head2 Table calendar_available_formats
-
-=over 4
-
-=item * C<cal_avail_fmt_id>
-
-A integer field.
-
-=item * C<locale>
-
-A string field.
-
-=item * C<calendar>
-
-A string field.
-
-=item * C<format_id>
-
-A string field.
-
-=item * C<format_pattern>
-
-A string field.
-
-=item * C<count>
-
-A string field.
-
-=item * C<alt>
-
-A string field.
-
-=back
-
-=head2 Table calendar_cyclics_l10n
-
-=over 4
-
-=item * C<cal_int_fmt_id>
-
-A integer field.
-
-=item * C<locale>
-
-A string field.
-
-=item * C<calendar>
-
-A string field.
-
-=item * C<format_set>
-
-A string field.
-
-=item * C<format_type>
-
-A string field.
-
-=item * C<format_length>
-
-A string field.
-
-=item * C<format_id>
-
-A integer field.
-
-=item * C<format_pattern>
-
-A string field.
-
-=back
-
-=head2 Table calendar_datetime_formats
-
-=over 4
-
-=item * C<cal_dt_fmt_id>
-
-A integer field.
-
-=item * C<locale>
-
-A string field.
-
-=item * C<calendar>
-
-A string field.
-
-=item * C<format_length>
-
-A string field.
-
-=item * C<format_type>
-
-A string field.
-
-=item * C<format_pattern>
-
-A string field.
-
-=back
-
-=head2 Table calendar_eras
-
-=over 4
-
-=item * C<calendar_era_id>
-
-A integer field.
-
-=item * C<calendar>
-
-A string field.
-
-=item * C<sequence>
-
-A integer field.
-
-=item * C<code>
-
-A string field.
-
-=item * C<aliases>
-
-A string array field.
-
-=item * C<start>
-
-A date field.
-
-=item * C<until>
-
-A date field.
-
-=back
-
-=head2 Table calendar_eras_l10n
-
-=over 4
-
-=item * C<cal_era_l10n_id>
-
-A integer field.
-
-=item * C<locale>
-
-A string field.
-
-=item * C<calendar>
-
-A string field.
-
-=item * C<era_width>
-
-A string field.
-
-=item * C<era_id>
-
-A string field.
-
-=item * C<alt>
-
-A string field.
-
-=item * C<locale_name>
-
-A string field.
-
-=back
-
-=head2 Table calendar_formats_l10n
-
-=over 4
-
-=item * C<cal_fmt_l10n_id>
-
-A integer field.
-
-=item * C<locale>
-
-A string field.
-
-=item * C<calendar>
-
-A string field.
-
-=item * C<format_type>
-
-A string field.
-
-=item * C<format_length>
-
-A string field.
-
-=item * C<alt>
-
-A string field.
-
-=item * C<format_id>
-
-A string field.
-
-=item * C<format_pattern>
-
-A string field.
-
-=back
-
-=head2 Table calendar_interval_formats
-
-=over 4
-
-=item * C<cal_int_fmt_id>
-
-A integer field.
-
-=item * C<locale>
-
-A string field.
-
-=item * C<calendar>
-
-A string field.
-
-=item * C<format_id>
-
-A string field.
-
-=item * C<greatest_diff_id>
-
-A string field.
-
-=item * C<format_pattern>
-
-A string field.
-
-=item * C<alt>
-
-A string field.
-
-=item * C<part1>
-
-A string field.
-
-=item * C<separator>
-
-A string field.
-
-=item * C<part2>
-
-A string field.
-
-=item * C<repeating_field>
-
-A string field.
-
-=back
-
-=head2 Table calendar_terms
-
-=over 4
-
-=item * C<cal_term_id>
-
-A integer field.
-
-=item * C<locale>
-
-A string field.
-
-=item * C<calendar>
-
-A string field.
-
-=item * C<term_type>
-
-A string field.
-
-=item * C<term_context>
-
-A string field.
-
-=item * C<term_width>
-
-A string field.
-
-=item * C<alt>
-
-A string field.
-
-=item * C<yeartype>
-
-A string field.
-
-=item * C<term_name>
-
-A string field.
-
-=item * C<term_value>
-
-A string field.
-
-=back
-
-=head2 Table calendars
-
-=over 4
-
-=item * C<calendar_id>
-
-A integer field.
-
-=item * C<calendar>
-
-A string field.
-
-=item * C<system>
-
-A string field.
-
-=item * C<inherits>
-
-A string field.
-
-=item * C<description>
-
-A string field.
-
-=back
-
-=head2 Table calendars_l10n
-
-=over 4
-
-=item * C<calendar_l10n_id>
-
-A integer field.
-
-=item * C<locale>
-
-A string field.
-
-=item * C<calendar>
-
-A string field.
-
-=item * C<locale_name>
-
-A string field.
-
-=back
-
-=head2 Table casings
-
-=over 4
-
-=item * C<casing_id>
-
-A integer field.
-
-=item * C<locale>
-
-A string field.
-
-=item * C<token>
-
-A string field.
-
-=item * C<value>
-
-A string field.
-
-=back
-
-=head2 Table code_mappings
-
-=over 4
-
-=item * C<code_mapping_id>
-
-A integer field.
-
-=item * C<code>
-
-A string field.
-
-=item * C<alpha3>
-
-A string field.
-
-=item * C<numeric>
-
-A integer field.
-
-=item * C<fips10>
-
-A string field.
-
-=item * C<type>
-
-A string field.
-
-=back
-
-=head2 Table collations_l10n
-
-=over 4
-
-=item * C<collation_l10n_id>
-
-A integer field.
-
-=item * C<locale>
-
-A string field.
-
-=item * C<collation>
-
-A string field.
-
-=item * C<locale_name>
-
-A string field.
-
-=back
-
-=head2 Table currencies
-
-=over 4
-
-=item * C<currency_id>
-
-A integer field.
-
-=item * C<currency>
-
-A string field.
-
-=item * C<digits>
-
-A integer field.
-
-=item * C<rounding>
-
-A integer field.
-
-=item * C<cash_digits>
-
-A integer field.
-
-=item * C<cash_rounding>
-
-A integer field.
-
-=item * C<is_obsolete>
-
-A boolean field.
-
-=item * C<status>
-
-A string field.
-
-=back
-
-=head2 Table currencies_info
-
-=over 4
-
-=item * C<currency_info_id>
-
-A integer field.
-
-=item * C<territory>
-
-A string field.
-
-=item * C<currency>
-
-A string field.
-
-=item * C<start>
-
-A date field.
-
-=item * C<until>
-
-A date field.
-
-=item * C<is_tender>
-
-A boolean field.
-
-=item * C<hist_sequence>
-
-A integer field.
-
-=item * C<is_obsolete>
-
-A boolean field.
-
-=back
-
-=head2 Table currencies_l10n
-
-=over 4
-
-=item * C<curr_l10n_id>
-
-A integer field.
-
-=item * C<locale>
-
-A string field.
-
-=item * C<currency>
-
-A string field.
-
-=item * C<count>
-
-A string field.
-
-=item * C<locale_name>
-
-A string field.
-
-=item * C<symbol>
-
-A string field.
-
-=back
-
-=head2 Table date_fields_l10n
-
-=over 4
-
-=item * C<date_field_id>
-
-A integer field.
-
-=item * C<locale>
-
-A string field.
-
-=item * C<field_type>
-
-A string field.
-
-=item * C<field_length>
-
-A string field.
-
-=item * C<relative>
-
-A integer field.
-
-=item * C<locale_name>
-
-A string field.
-
-=back
-
-=head2 Table day_periods
-
-=over 4
-
-=item * C<day_period_id>
-
-A integer field.
-
-=item * C<locale>
-
-A string field.
-
-=item * C<day_period>
-
-A string field.
-
-=item * C<start>
-
-A string field.
-
-=item * C<until>
-
-A string field.
-
-=back
-
-=head2 Table language_population
-
-=over 4
-
-=item * C<language_pop_id>
-
-A integer field.
-
-=item * C<territory>
-
-A string field.
-
-=item * C<locale>
-
-A string field.
-
-=item * C<population_percent>
-
-A decimal field.
-
-=item * C<literacy_percent>
-
-A decimal field.
-
-=item * C<writing_percent>
-
-A decimal field.
-
-=item * C<official_status>
-
-A string field.
-
-=back
-
-=head2 Table languages
-
-=over 4
-
-=item * C<language_id>
-
-A integer field.
-
-=item * C<language>
-
-A string field.
-
-=item * C<scripts>
-
-A string array field.
-
-=item * C<territories>
-
-A string array field.
-
-=item * C<parent>
-
-A string field.
-
-=item * C<alt>
-
-A string field.
-
-=item * C<status>
-
-A string field.
-
-=back
-
-=head2 Table languages_match
-
-=over 4
-
-=item * C<lang_match_id>
-
-A integer field.
-
-=item * C<desired>
-
-A string field.
-
-=item * C<supported>
-
-A string field.
-
-=item * C<distance>
-
-A integer field.
-
-=item * C<is_symetric>
-
-A boolean field.
-
-=item * C<is_regexp>
-
-A boolean field.
-
-=item * C<sequence>
-
-A integer field.
-
-=back
-
-=head2 Table likely_subtags
-
-=over 4
-
-=item * C<likely_subtag_id>
-
-A integer field.
-
-=item * C<locale>
-
-A string field.
-
-=item * C<target>
-
-A string field.
-
-=back
-
-=head2 Table locales
-
-=over 4
-
-=item * C<locale_id>
-
-A integer field.
-
-=item * C<locale>
-
-A string field.
-
-=item * C<parent>
-
-A string field.
-
-=item * C<status>
-
-A string field.
-
-=back
-
-=head2 Table locales_info
-
-=over 4
-
-=item * C<locales_info_id>
-
-A integer field.
-
-=item * C<locale>
-
-A string field.
-
-=item * C<property>
-
-A string field.
-
-=item * C<value>
-
-A string field.
-
-=back
-
-=head2 Table locales_l10n
-
-=over 4
-
-=item * C<locales_l10n_id>
-
-A integer field.
-
-=item * C<locale>
-
-A string field.
-
-=item * C<locale_id>
-
-A string field.
-
-=item * C<locale_name>
-
-A string field.
-
-=item * C<alt>
-
-A string field.
-
-=back
-
-=head2 Table metainfos
-
-=over 4
-
-=item * C<meta_id>
-
-A integer field.
-
-=item * C<property>
-
-A string field.
-
-=item * C<value>
-
-A string field.
-
-=back
-
-=head2 Table number_formats_l10n
-
-=over 4
-
-=item * C<number_format_id>
-
-A integer field.
-
-=item * C<locale>
-
-A string field.
-
-=item * C<number_system>
-
-A string field.
-
-=item * C<number_type>
-
-A string field.
-
-=item * C<format_length>
-
-A string field.
-
-=item * C<format_type>
-
-A string field.
-
-=item * C<format_id>
-
-A string field.
-
-=item * C<format_pattern>
-
-A string field.
-
-=item * C<alt>
-
-A string field.
-
-=item * C<count>
-
-A string field.
-
-=back
-
-=head2 Table number_symbols_l10n
-
-=over 4
-
-=item * C<number_symbol_id>
-
-A integer field.
-
-=item * C<locale>
-
-A string field.
-
-=item * C<number_system>
-
-A string field.
-
-=item * C<property>
-
-A string field.
-
-=item * C<value>
-
-A string field.
-
-=item * C<alt>
-
-A string field.
-
-=back
-
-=head2 Table number_systems
-
-=over 4
-
-=item * C<numsys_id>
-
-A integer field.
-
-=item * C<number_system>
-
-A string field.
-
-=item * C<digits>
-
-A string array field.
-
-=item * C<type>
-
-A string field.
-
-=back
-
-=head2 Table number_systems_l10n
-
-=over 4
-
-=item * C<num_sys_l10n_id>
-
-A integer field.
-
-=item * C<locale>
-
-A string field.
-
-=item * C<number_system>
-
-A string field.
-
-=item * C<locale_name>
-
-A string field.
-
-=item * C<alt>
-
-A string field.
-
-=back
-
-=head2 Table person_name_defaults
-
-=over 4
-
-=item * C<pers_name_def_id>
-
-A integer field.
-
-=item * C<locale>
-
-A string field.
-
-=item * C<value>
-
-A string field.
-
-=back
-
-=head2 Table rbnf
-
-=over 4
-
-=item * C<rbnf_id>
-
-A integer field.
-
-=item * C<locale>
-
-A string field.
-
-=item * C<grouping>
-
-A string field.
-
-=item * C<ruleset>
-
-A string field.
-
-=item * C<rule_id>
-
-A string field.
-
-=item * C<rule_value>
-
-A string field.
-
-=back
-
-=head2 Table refs
-
-=over 4
-
-=item * C<ref_id>
-
-A integer field.
-
-=item * C<code>
-
-A string field.
-
-=item * C<uri>
-
-A string field.
-
-=item * C<description>
-
-A string field.
-
-=back
-
-=head2 Table scripts
-
-=over 4
-
-=item * C<script_id>
-
-A integer field.
-
-=item * C<script>
-
-A string field.
-
-=item * C<rank>
-
-A integer field.
-
-=item * C<sample_char>
-
-A string field.
-
-=item * C<id_usage>
-
-A string field.
-
-=item * C<rtl>
-
-A boolean field.
-
-=item * C<lb_letters>
-
-A boolean field.
-
-=item * C<has_case>
-
-A boolean field.
-
-=item * C<shaping_req>
-
-A boolean field.
-
-=item * C<ime>
-
-A boolean field.
-
-=item * C<density>
-
-A integer field.
-
-=item * C<origin_country>
-
-A string field.
-
-=item * C<likely_language>
-
-A string field.
-
-=item * C<status>
-
-A string field.
-
-=back
-
-=head2 Table scripts_l10n
-
-=over 4
-
-=item * C<scripts_l10n_id>
-
-A integer field.
-
-=item * C<locale>
-
-A string field.
-
-=item * C<script>
-
-A string field.
-
-=item * C<locale_name>
-
-A string field.
-
-=item * C<alt>
-
-A string field.
-
-=back
-
-=head2 Table subdivisions
-
-=over 4
-
-=item * C<subdivision_id>
-
-A integer field.
-
-=item * C<territory>
-
-A string field.
-
-=item * C<subdivision>
-
-A string field.
-
-=item * C<parent>
-
-A string field.
-
-=item * C<is_top_level>
-
-A boolean field.
-
-=item * C<status>
-
-A string field.
-
-=back
-
-=head2 Table subdivisions_l10n
-
-=over 4
-
-=item * C<subdiv_l10n_id>
-
-A integer field.
-
-=item * C<locale>
-
-A string field.
-
-=item * C<subdivision>
-
-A string field.
-
-=item * C<locale_name>
-
-A string field.
-
-=back
-
-=head2 Table territories
-
-=over 4
-
-=item * C<territory_id>
-
-A integer field.
-
-=item * C<territory>
-
-A string field.
-
-=item * C<parent>
-
-A string field.
-
-=item * C<gdp>
-
-A integer field.
-
-=item * C<literacy_percent>
-
-A decimal field.
-
-=item * C<population>
-
-A integer field.
-
-=item * C<languages>
-
-A string array field.
-
-=item * C<contains>
-
-A string array field.
-
-=item * C<currency>
-
-A string field.
-
-=item * C<calendars>
-
-A string array field.
-
-=item * C<min_days>
-
-A integer field.
-
-=item * C<first_day>
-
-A integer field.
-
-=item * C<weekend>
-
-A integer array field.
-
-=item * C<status>
-
-A string field.
-
-=back
-
-=head2 Table territories_l10n
-
-=over 4
-
-=item * C<terr_l10n_id>
-
-A integer field.
-
-=item * C<locale>
-
-A string field.
-
-=item * C<territory>
-
-A string field.
-
-=item * C<locale_name>
-
-A string field.
-
-=item * C<alt>
-
-A string field.
-
-=back
-
-=head2 Table time_formats
-
-=over 4
-
-=item * C<time_format_id>
-
-A integer field.
-
-=item * C<region>
-
-A string field.
-
-=item * C<territory>
-
-A string field.
-
-=item * C<locale>
-
-A string field.
-
-=item * C<time_format>
-
-A string field.
-
-=item * C<time_allowed>
-
-A string array field.
-
-=back
-
-=head2 Table timezones
-
-=over 4
-
-=item * C<timezone_id>
-
-A integer field.
-
-=item * C<timezone>
-
-A string field.
-
-=item * C<territory>
-
-A string field.
-
-=item * C<region>
-
-A string field.
-
-=item * C<tzid>
-
-A string field.
-
-=item * C<metazone>
-
-A string field.
-
-=item * C<tz_bcpid>
-
-A string field.
-
-=item * C<is_golden>
-
-A boolean field.
-
-=back
-
-=head2 Table timezones_info
-
-=over 4
-
-=item * C<tzinfo_id>
-
-A integer field.
-
-=item * C<timezone>
-
-A string field.
-
-=item * C<metazone>
-
-A string field.
-
-=item * C<start>
-
-A datetime field.
-
-=item * C<until>
-
-A datetime field.
-
-=back
-
-=head2 Table unit_aliases
-
-=over 4
-
-=item * C<unit_alias_id>
-
-A integer field.
-
-=item * C<alias>
-
-A string field.
-
-=item * C<target>
-
-A string field.
-
-=item * C<reason>
-
-A string field.
-
-=back
-
-=head2 Table unit_constants
-
-=over 4
-
-=item * C<unit_constant_id>
-
-A integer field.
-
-=item * C<constant>
-
-A string field.
-
-=item * C<expression>
-
-A string field.
-
-=item * C<value>
-
-A decimal field.
-
-=item * C<description>
-
-A string field.
-
-=item * C<status>
-
-A string field.
-
-=back
-
-=head2 Table unit_conversions
-
-=over 4
-
-=item * C<unit_conversion_id>
-
-A integer field.
-
-=item * C<source>
-
-A string field.
-
-=item * C<base_unit>
-
-A string field.
-
-=item * C<expression>
-
-A string field.
-
-=item * C<factor>
-
-A decimal field.
-
-=item * C<systems>
-
-A string array field.
-
-=item * C<category>
-
-A string field.
-
-=back
-
-=head2 Table unit_prefixes
-
-=over 4
-
-=item * C<unit_prefix_id>
-
-A integer field.
-
-=item * C<unit_id>
-
-A string field.
-
-=item * C<symbol>
-
-A string field.
-
-=item * C<power>
-
-A integer field.
-
-=item * C<factor>
-
-A integer field.
-
-=back
-
-=head2 Table unit_prefs
-
-=over 4
-
-=item * C<unit_pref_id>
-
-A integer field.
-
-=item * C<unit_id>
-
-A string field.
-
-=item * C<territory>
-
-A string field.
-
-=item * C<category>
-
-A string field.
-
-=item * C<usage>
-
-A string field.
-
-=item * C<geq>
-
-A decimal field.
-
-=item * C<skeleton>
-
-A string field.
-
-=back
-
-=head2 Table unit_quantities
-
-=over 4
-
-=item * C<unit_quantity_id>
-
-A integer field.
-
-=item * C<base_unit>
-
-A string field.
-
-=item * C<quantity>
-
-A string field.
-
-=item * C<status>
-
-A string field.
-
-=item * C<comment>
-
-A string field.
-
-=back
-
-=head2 Table units_l10n
-
-=over 4
-
-=item * C<units_l10n_id>
-
-A integer field.
-
-=item * C<locale>
-
-A string field.
-
-=item * C<format_length>
-
-A string field.
-
-=item * C<unit_type>
-
-A string field.
-
-=item * C<unit_id>
-
-A string field.
-
-=item * C<unit_pattern>
-
-A string field.
-
-=item * C<pattern_type>
-
-A string field.
-
-=item * C<locale_name>
-
-A string field.
-
-=item * C<count>
-
-A string field.
-
-=item * C<gender>
-
-A string field.
-
-=item * C<gram_case>
-
-A string field.
-
-=back
-
-=head2 Table variants
-
-=over 4
-
-=item * C<variant_id>
-
-A integer field.
-
-=item * C<variant>
-
-A string field.
-
-=item * C<status>
-
-A string field.
-
-=back
-
-=head2 Table variants_l10n
-
-=over 4
-
-=item * C<var_l10n_id>
-
-A integer field.
-
-=item * C<locale>
-
-A string field.
-
-=item * C<variant>
-
-A string field.
-
-=item * C<locale_name>
-
-A string field.
-
-=item * C<alt>
-
-A string field.
-
-=back
-
-=head2 Table week_preferences
-
-=over 4
-
-=item * C<week_pref_id>
-
-A integer field.
-
-=item * C<locale>
-
-A string field.
-
-=item * C<ordering>
-
-A string array field.
-
-=back
 
 =head1 Format Patterns
 
@@ -11954,11 +10991,11 @@ See the L<LDML specifications|https://unicode.org/reports/tr35/tr35.html#Parent_
 
 =head1 Errors
 
-This module does not die upon errors. Instead it sets an L<error object|Locale::Unicode::Data::Exception> that can be retrieved.
+This module does not die upon errors, unless you have set L<fatal|/fatal> to a true value. Instead it sets an L<error object|Locale::Unicode::Data::Exception> that can be retrieved.
 
 When an error occurred, an L<error object|Locale::Unicode::Data::Exception> will be set and the method will return C<undef> in scalar context and an empty list in list context.
 
-The only occasions when this module will die is when there is an internal design error, which would be my fault.
+Otherwise, the only occasions when this module will die is when there is an internal design error, which would be my fault.
 
 =head1 Advanced Search
 
@@ -12162,6 +11199,1996 @@ or, alternatively, using an hash reference with a single key:
     );
     my @month_names = map( $_->{term_name}, @$months );
     # January, February, March, April, May, June, July, August, September, October, November, December
+
+=head1 SQL Schema
+
+The SQLite SQL schema is available in the file C<scripts/cldr-schema.sql>
+
+The data are populated into the SQLite database using the script located in C<scripts/create_database.pl> and the data accessible from L<https://github.com/unicode-org/cldr> or from L<https://cldr.unicode.org/index/downloads/>
+
+=head1 Tables
+
+The SQL schema used to create the SQLite database is available in the C<scripts> directory of this distribution in the file C<cldr-schema.sql>
+
+The tables used are as follows, in alphabetical order:
+
+=head2 Table aliases
+
+=over 4
+
+=item * C<alias_id>
+
+An integer field.
+
+=item * C<alias>
+
+A string field.
+
+=item * C<replacement>
+
+A string array field.
+
+=item * C<reason>
+
+A string field.
+
+=item * C<type>
+
+A string field.
+
+=item * C<comment>
+
+A string field.
+
+=back
+
+=head2 Table annotations
+
+=over 4
+
+=item * C<annotation_id>
+
+An integer field.
+
+=item * C<locale>
+
+A string field.
+
+=item * C<annotation>
+
+A string field.
+
+=item * C<defaults>
+
+A string array field.
+
+=item * C<tts>
+
+A string field.
+
+=back
+
+=head2 Table bcp47_currencies
+
+=over 4
+
+=item * C<bcp47_curr_id>
+
+An integer field.
+
+=item * C<currid>
+
+A string field.
+
+=item * C<code>
+
+A string field.
+
+=item * C<description>
+
+A string field.
+
+=item * C<is_obsolete>
+
+A boolean field.
+
+=back
+
+=head2 Table bcp47_extensions
+
+=over 4
+
+=item * C<bcp47_ext_id>
+
+An integer field.
+
+=item * C<category>
+
+A string field.
+
+=item * C<extension>
+
+A string field.
+
+=item * C<alias>
+
+A string field.
+
+=item * C<value_type>
+
+A string field.
+
+=item * C<description>
+
+A string field.
+
+=item * C<deprecated>
+
+A boolean field.
+
+=back
+
+=head2 Table bcp47_timezones
+
+=over 4
+
+=item * C<bcp47_tz_id>
+
+An integer field.
+
+=item * C<tzid>
+
+A string field.
+
+=item * C<alias>
+
+A string array field.
+
+=item * C<preferred>
+
+A string field.
+
+=item * C<description>
+
+A string field.
+
+=item * C<deprecated>
+
+A boolean field.
+
+=back
+
+=head2 Table bcp47_values
+
+=over 4
+
+=item * C<bcp47_value_id>
+
+An integer field.
+
+=item * C<category>
+
+A string field.
+
+=item * C<extension>
+
+A string field.
+
+=item * C<value>
+
+A string field.
+
+=item * C<description>
+
+A string field.
+
+=back
+
+=head2 Table calendar_append_formats
+
+=over 4
+
+=item * C<cal_append_fmt_id>
+
+An integer field.
+
+=item * C<locale>
+
+A string field.
+
+=item * C<calendar>
+
+A string field.
+
+=item * C<format_id>
+
+A string field.
+
+=item * C<format_pattern>
+
+A string field.
+
+=back
+
+=head2 Table calendar_available_formats
+
+=over 4
+
+=item * C<cal_avail_fmt_id>
+
+An integer field.
+
+=item * C<locale>
+
+A string field.
+
+=item * C<calendar>
+
+A string field.
+
+=item * C<format_id>
+
+A string field.
+
+=item * C<format_pattern>
+
+A string field.
+
+=item * C<count>
+
+A string field.
+
+=item * C<alt>
+
+A string field.
+
+=back
+
+=head2 Table calendar_cyclics_l10n
+
+=over 4
+
+=item * C<cal_int_fmt_id>
+
+An integer field.
+
+=item * C<locale>
+
+A string field.
+
+=item * C<calendar>
+
+A string field.
+
+=item * C<format_set>
+
+A string field.
+
+=item * C<format_type>
+
+A string field.
+
+=item * C<format_length>
+
+A string field.
+
+=item * C<format_id>
+
+An integer field.
+
+=item * C<format_pattern>
+
+A string field.
+
+=back
+
+=head2 Table calendar_datetime_formats
+
+=over 4
+
+=item * C<cal_dt_fmt_id>
+
+An integer field.
+
+=item * C<locale>
+
+A string field.
+
+=item * C<calendar>
+
+A string field.
+
+=item * C<format_length>
+
+A string field.
+
+=item * C<format_type>
+
+A string field.
+
+=item * C<format_pattern>
+
+A string field.
+
+=back
+
+=head2 Table calendar_eras
+
+=over 4
+
+=item * C<calendar_era_id>
+
+An integer field.
+
+=item * C<calendar>
+
+A string field.
+
+=item * C<sequence>
+
+An integer field.
+
+=item * C<code>
+
+A string field.
+
+=item * C<aliases>
+
+A string array field.
+
+=item * C<start>
+
+A date field.
+
+=item * C<until>
+
+A date field.
+
+=back
+
+=head2 Table calendar_eras_l10n
+
+=over 4
+
+=item * C<cal_era_l10n_id>
+
+An integer field.
+
+=item * C<locale>
+
+A string field.
+
+=item * C<calendar>
+
+A string field.
+
+=item * C<era_width>
+
+A string field.
+
+=item * C<era_id>
+
+A string field.
+
+=item * C<alt>
+
+A string field.
+
+=item * C<locale_name>
+
+A string field.
+
+=back
+
+=head2 Table calendar_formats_l10n
+
+=over 4
+
+=item * C<cal_fmt_l10n_id>
+
+An integer field.
+
+=item * C<locale>
+
+A string field.
+
+=item * C<calendar>
+
+A string field.
+
+=item * C<format_type>
+
+A string field.
+
+=item * C<format_length>
+
+A string field.
+
+=item * C<alt>
+
+A string field.
+
+=item * C<format_id>
+
+A string field.
+
+=item * C<format_pattern>
+
+A string field.
+
+=back
+
+=head2 Table calendar_interval_formats
+
+=over 4
+
+=item * C<cal_int_fmt_id>
+
+An integer field.
+
+=item * C<locale>
+
+A string field.
+
+=item * C<calendar>
+
+A string field.
+
+=item * C<format_id>
+
+A string field.
+
+=item * C<greatest_diff_id>
+
+A string field.
+
+=item * C<format_pattern>
+
+A string field.
+
+=item * C<alt>
+
+A string field.
+
+=item * C<part1>
+
+A string field.
+
+=item * C<separator>
+
+A string field.
+
+=item * C<part2>
+
+A string field.
+
+=item * C<repeating_field>
+
+A string field.
+
+=back
+
+=head2 Table calendar_terms
+
+=over 4
+
+=item * C<cal_term_id>
+
+An integer field.
+
+=item * C<locale>
+
+A string field.
+
+=item * C<calendar>
+
+A string field.
+
+=item * C<term_type>
+
+A string field.
+
+=item * C<term_context>
+
+A string field.
+
+=item * C<term_width>
+
+A string field.
+
+=item * C<alt>
+
+A string field.
+
+=item * C<yeartype>
+
+A string field.
+
+=item * C<term_name>
+
+A string field.
+
+=item * C<term_value>
+
+A string field.
+
+=back
+
+=head2 Table calendars
+
+=over 4
+
+=item * C<calendar_id>
+
+An integer field.
+
+=item * C<calendar>
+
+A string field.
+
+=item * C<system>
+
+A string field.
+
+=item * C<inherits>
+
+A string field.
+
+=item * C<description>
+
+A string field.
+
+=back
+
+=head2 Table calendars_l10n
+
+=over 4
+
+=item * C<calendar_l10n_id>
+
+An integer field.
+
+=item * C<locale>
+
+A string field.
+
+=item * C<calendar>
+
+A string field.
+
+=item * C<locale_name>
+
+A string field.
+
+=back
+
+=head2 Table casings
+
+=over 4
+
+=item * C<casing_id>
+
+An integer field.
+
+=item * C<locale>
+
+A string field.
+
+=item * C<token>
+
+A string field.
+
+=item * C<value>
+
+A string field.
+
+=back
+
+=head2 Table code_mappings
+
+=over 4
+
+=item * C<code_mapping_id>
+
+An integer field.
+
+=item * C<code>
+
+A string field.
+
+=item * C<alpha3>
+
+A string field.
+
+=item * C<numeric>
+
+An integer field.
+
+=item * C<fips10>
+
+A string field.
+
+=item * C<type>
+
+A string field.
+
+=back
+
+=head2 Table collations_l10n
+
+=over 4
+
+=item * C<collation_l10n_id>
+
+An integer field.
+
+=item * C<locale>
+
+A string field.
+
+=item * C<collation>
+
+A string field.
+
+=item * C<locale_name>
+
+A string field.
+
+=back
+
+=head2 Table currencies
+
+=over 4
+
+=item * C<currency_id>
+
+An integer field.
+
+=item * C<currency>
+
+A string field.
+
+=item * C<digits>
+
+An integer field.
+
+=item * C<rounding>
+
+An integer field.
+
+=item * C<cash_digits>
+
+An integer field.
+
+=item * C<cash_rounding>
+
+An integer field.
+
+=item * C<is_obsolete>
+
+A boolean field.
+
+=item * C<status>
+
+A string field.
+
+=back
+
+=head2 Table currencies_info
+
+=over 4
+
+=item * C<currency_info_id>
+
+An integer field.
+
+=item * C<territory>
+
+A string field.
+
+=item * C<currency>
+
+A string field.
+
+=item * C<start>
+
+A date field.
+
+=item * C<until>
+
+A date field.
+
+=item * C<is_tender>
+
+A boolean field.
+
+=item * C<hist_sequence>
+
+An integer field.
+
+=item * C<is_obsolete>
+
+A boolean field.
+
+=back
+
+=head2 Table currencies_l10n
+
+=over 4
+
+=item * C<curr_l10n_id>
+
+An integer field.
+
+=item * C<locale>
+
+A string field.
+
+=item * C<currency>
+
+A string field.
+
+=item * C<count>
+
+A string field.
+
+=item * C<locale_name>
+
+A string field.
+
+=item * C<symbol>
+
+A string field.
+
+=back
+
+=head2 Table date_fields_l10n
+
+=over 4
+
+=item * C<date_field_id>
+
+An integer field.
+
+=item * C<locale>
+
+A string field.
+
+=item * C<field_type>
+
+A string field.
+
+=item * C<field_length>
+
+A string field.
+
+=item * C<relative>
+
+An integer field.
+
+=item * C<locale_name>
+
+A string field.
+
+=back
+
+=head2 Table day_periods
+
+=over 4
+
+=item * C<day_period_id>
+
+An integer field.
+
+=item * C<locale>
+
+A string field.
+
+=item * C<day_period>
+
+A string field.
+
+=item * C<start>
+
+A string field.
+
+=item * C<until>
+
+A string field.
+
+=back
+
+=head2 Table language_population
+
+=over 4
+
+=item * C<language_pop_id>
+
+An integer field.
+
+=item * C<territory>
+
+A string field.
+
+=item * C<locale>
+
+A string field.
+
+=item * C<population_percent>
+
+A decimal field.
+
+=item * C<literacy_percent>
+
+A decimal field.
+
+=item * C<writing_percent>
+
+A decimal field.
+
+=item * C<official_status>
+
+A string field.
+
+=back
+
+=head2 Table languages
+
+=over 4
+
+=item * C<language_id>
+
+An integer field.
+
+=item * C<language>
+
+A string field.
+
+=item * C<scripts>
+
+A string array field.
+
+=item * C<territories>
+
+A string array field.
+
+=item * C<parent>
+
+A string field.
+
+=item * C<alt>
+
+A string field.
+
+=item * C<status>
+
+A string field.
+
+=back
+
+=head2 Table languages_match
+
+=over 4
+
+=item * C<lang_match_id>
+
+An integer field.
+
+=item * C<desired>
+
+A string field.
+
+=item * C<supported>
+
+A string field.
+
+=item * C<distance>
+
+An integer field.
+
+=item * C<is_symetric>
+
+A boolean field.
+
+=item * C<is_regexp>
+
+A boolean field.
+
+=item * C<sequence>
+
+An integer field.
+
+=back
+
+=head2 Table likely_subtags
+
+=over 4
+
+=item * C<likely_subtag_id>
+
+An integer field.
+
+=item * C<locale>
+
+A string field.
+
+=item * C<target>
+
+A string field.
+
+=back
+
+=head2 Table locale_number_systems
+
+=over 4
+
+=item * C<locale_num_sys_id>
+
+An integer field.
+
+=item * C<locale>
+
+A string field.
+
+=item * C<number_system>
+
+A string field.
+
+=item * C<native>
+
+A string field.
+
+=item * C<traditional>
+
+A string field.
+
+=item * C<finance>
+
+A string field.
+
+=back
+
+=head2 Table locales
+
+=over 4
+
+=item * C<locale_id>
+
+An integer field.
+
+=item * C<locale>
+
+A string field.
+
+=item * C<parent>
+
+A string field.
+
+=item * C<status>
+
+A string field.
+
+=back
+
+=head2 Table locales_info
+
+=over 4
+
+=item * C<locales_info_id>
+
+An integer field.
+
+=item * C<locale>
+
+A string field.
+
+=item * C<property>
+
+A string field.
+
+=item * C<value>
+
+A string field.
+
+=back
+
+=head2 Table locales_l10n
+
+=over 4
+
+=item * C<locales_l10n_id>
+
+An integer field.
+
+=item * C<locale>
+
+A string field.
+
+=item * C<locale_id>
+
+A string field.
+
+=item * C<locale_name>
+
+A string field.
+
+=item * C<alt>
+
+A string field.
+
+=back
+
+=head2 Table metainfos
+
+=over 4
+
+=item * C<meta_id>
+
+An integer field.
+
+=item * C<property>
+
+A string field.
+
+=item * C<value>
+
+A string field.
+
+=back
+
+=head2 Table metazones
+
+=over 4
+
+=item * C<metazone_id>
+
+An integer field.
+
+=item * C<metazone>
+
+A string field.
+
+=item * C<territories>
+
+A string array field.
+
+=item * C<timezones>
+
+A string array field.
+
+=back
+
+=head2 Table metazones_names
+
+=over 4
+
+=item * C<metatz_name_id>
+
+An integer field.
+
+=item * C<locale>
+
+A string field.
+
+=item * C<metazone>
+
+A string field.
+
+=item * C<width>
+
+A string field.
+
+=item * C<generic>
+
+A string field.
+
+=item * C<standard>
+
+A string field.
+
+=item * C<daylight>
+
+A string field.
+
+=back
+
+=head2 Table number_formats_l10n
+
+=over 4
+
+=item * C<number_format_id>
+
+An integer field.
+
+=item * C<locale>
+
+A string field.
+
+=item * C<number_system>
+
+A string field.
+
+=item * C<number_type>
+
+A string field.
+
+=item * C<format_length>
+
+A string field.
+
+=item * C<format_type>
+
+A string field.
+
+=item * C<format_id>
+
+A string field.
+
+=item * C<format_pattern>
+
+A string field.
+
+=item * C<alt>
+
+A string field.
+
+=item * C<count>
+
+A string field.
+
+=back
+
+=head2 Table number_symbols_l10n
+
+=over 4
+
+=item * C<number_symbol_id>
+
+An integer field.
+
+=item * C<locale>
+
+A string field.
+
+=item * C<number_system>
+
+A string field.
+
+=item * C<property>
+
+A string field.
+
+=item * C<value>
+
+A string field.
+
+=item * C<alt>
+
+A string field.
+
+=back
+
+=head2 Table number_systems
+
+=over 4
+
+=item * C<numsys_id>
+
+An integer field.
+
+=item * C<number_system>
+
+A string field.
+
+=item * C<digits>
+
+A string array field.
+
+=item * C<type>
+
+A string field.
+
+=back
+
+=head2 Table number_systems_l10n
+
+=over 4
+
+=item * C<num_sys_l10n_id>
+
+An integer field.
+
+=item * C<locale>
+
+A string field.
+
+=item * C<number_system>
+
+A string field.
+
+=item * C<locale_name>
+
+A string field.
+
+=item * C<alt>
+
+A string field.
+
+=back
+
+=head2 Table person_name_defaults
+
+=over 4
+
+=item * C<pers_name_def_id>
+
+An integer field.
+
+=item * C<locale>
+
+A string field.
+
+=item * C<value>
+
+A string field.
+
+=back
+
+=head2 Table rbnf
+
+=over 4
+
+=item * C<rbnf_id>
+
+An integer field.
+
+=item * C<locale>
+
+A string field.
+
+=item * C<grouping>
+
+A string field.
+
+=item * C<ruleset>
+
+A string field.
+
+=item * C<rule_id>
+
+A string field.
+
+=item * C<rule_value>
+
+A string field.
+
+=back
+
+=head2 Table refs
+
+=over 4
+
+=item * C<ref_id>
+
+An integer field.
+
+=item * C<code>
+
+A string field.
+
+=item * C<uri>
+
+A string field.
+
+=item * C<description>
+
+A string field.
+
+=back
+
+=head2 Table scripts
+
+=over 4
+
+=item * C<script_id>
+
+An integer field.
+
+=item * C<script>
+
+A string field.
+
+=item * C<rank>
+
+An integer field.
+
+=item * C<sample_char>
+
+A string field.
+
+=item * C<id_usage>
+
+A string field.
+
+=item * C<rtl>
+
+A boolean field.
+
+=item * C<lb_letters>
+
+A boolean field.
+
+=item * C<has_case>
+
+A boolean field.
+
+=item * C<shaping_req>
+
+A boolean field.
+
+=item * C<ime>
+
+A boolean field.
+
+=item * C<density>
+
+An integer field.
+
+=item * C<origin_country>
+
+A string field.
+
+=item * C<likely_language>
+
+A string field.
+
+=item * C<status>
+
+A string field.
+
+=back
+
+=head2 Table scripts_l10n
+
+=over 4
+
+=item * C<scripts_l10n_id>
+
+An integer field.
+
+=item * C<locale>
+
+A string field.
+
+=item * C<script>
+
+A string field.
+
+=item * C<locale_name>
+
+A string field.
+
+=item * C<alt>
+
+A string field.
+
+=back
+
+=head2 Table subdivisions
+
+=over 4
+
+=item * C<subdivision_id>
+
+An integer field.
+
+=item * C<territory>
+
+A string field.
+
+=item * C<subdivision>
+
+A string field.
+
+=item * C<parent>
+
+A string field.
+
+=item * C<is_top_level>
+
+A boolean field.
+
+=item * C<status>
+
+A string field.
+
+=back
+
+=head2 Table subdivisions_l10n
+
+=over 4
+
+=item * C<subdiv_l10n_id>
+
+An integer field.
+
+=item * C<locale>
+
+A string field.
+
+=item * C<subdivision>
+
+A string field.
+
+=item * C<locale_name>
+
+A string field.
+
+=back
+
+=head2 Table territories
+
+=over 4
+
+=item * C<territory_id>
+
+An integer field.
+
+=item * C<territory>
+
+A string field.
+
+=item * C<parent>
+
+A string field.
+
+=item * C<gdp>
+
+An integer field.
+
+=item * C<literacy_percent>
+
+A decimal field.
+
+=item * C<population>
+
+An integer field.
+
+=item * C<languages>
+
+A string array field.
+
+=item * C<contains>
+
+A string array field.
+
+=item * C<currency>
+
+A string field.
+
+=item * C<calendars>
+
+A string array field.
+
+=item * C<min_days>
+
+An integer field.
+
+=item * C<first_day>
+
+An integer field.
+
+=item * C<weekend>
+
+An integer array field.
+
+=item * C<status>
+
+A string field.
+
+=back
+
+=head2 Table territories_l10n
+
+=over 4
+
+=item * C<terr_l10n_id>
+
+An integer field.
+
+=item * C<locale>
+
+A string field.
+
+=item * C<territory>
+
+A string field.
+
+=item * C<locale_name>
+
+A string field.
+
+=item * C<alt>
+
+A string field.
+
+=back
+
+=head2 Table time_formats
+
+=over 4
+
+=item * C<time_format_id>
+
+An integer field.
+
+=item * C<region>
+
+A string field.
+
+=item * C<territory>
+
+A string field.
+
+=item * C<locale>
+
+A string field.
+
+=item * C<time_format>
+
+A string field.
+
+=item * C<time_allowed>
+
+A string array field.
+
+=back
+
+=head2 Table timezones
+
+=over 4
+
+=item * C<timezone_id>
+
+An integer field.
+
+=item * C<timezone>
+
+A string field.
+
+=item * C<territory>
+
+A string field.
+
+=item * C<region>
+
+A string field.
+
+=item * C<tzid>
+
+A string field.
+
+=item * C<metazone>
+
+A string field.
+
+=item * C<tz_bcpid>
+
+A string field.
+
+=item * C<is_golden>
+
+A boolean field.
+
+=item * C<is_preferred>
+
+A boolean field.
+
+=item * C<is_canonical>
+
+A boolean field.
+
+=item * C<alias>
+
+A string array field.
+
+=back
+
+=head2 Table timezones_cities
+
+=over 4
+
+=item * C<tz_city_id>
+
+An integer field.
+
+=item * C<locale>
+
+A string field.
+
+=item * C<timezone>
+
+A string field.
+
+=item * C<city>
+
+A string field.
+
+=item * C<alt>
+
+A string field.
+
+=back
+
+=head2 Table timezones_formats
+
+=over 4
+
+=item * C<tz_fmt_id>
+
+An integer field.
+
+=item * C<locale>
+
+A string field.
+
+=item * C<type>
+
+A string field.
+
+=item * C<subtype>
+
+A string field.
+
+=item * C<format_pattern>
+
+A string field.
+
+=back
+
+=head2 Table timezones_info
+
+=over 4
+
+=item * C<tzinfo_id>
+
+An integer field.
+
+=item * C<timezone>
+
+A string field.
+
+=item * C<metazone>
+
+A string field.
+
+=item * C<start>
+
+A datetime field.
+
+=item * C<until>
+
+A datetime field.
+
+=back
+
+=head2 Table timezones_names
+
+=over 4
+
+=item * C<tz_name_id>
+
+An integer field.
+
+=item * C<locale>
+
+A string field.
+
+=item * C<timezone>
+
+A string field.
+
+=item * C<width>
+
+A string field.
+
+=item * C<generic>
+
+A string field.
+
+=item * C<standard>
+
+A string field.
+
+=item * C<daylight>
+
+A string field.
+
+=back
+
+=head2 Table unit_aliases
+
+=over 4
+
+=item * C<unit_alias_id>
+
+An integer field.
+
+=item * C<alias>
+
+A string field.
+
+=item * C<target>
+
+A string field.
+
+=item * C<reason>
+
+A string field.
+
+=back
+
+=head2 Table unit_constants
+
+=over 4
+
+=item * C<unit_constant_id>
+
+An integer field.
+
+=item * C<constant>
+
+A string field.
+
+=item * C<expression>
+
+A string field.
+
+=item * C<value>
+
+A decimal field.
+
+=item * C<description>
+
+A string field.
+
+=item * C<status>
+
+A string field.
+
+=back
+
+=head2 Table unit_conversions
+
+=over 4
+
+=item * C<unit_conversion_id>
+
+An integer field.
+
+=item * C<source>
+
+A string field.
+
+=item * C<base_unit>
+
+A string field.
+
+=item * C<expression>
+
+A string field.
+
+=item * C<factor>
+
+A decimal field.
+
+=item * C<systems>
+
+A string array field.
+
+=item * C<category>
+
+A string field.
+
+=back
+
+=head2 Table unit_prefixes
+
+=over 4
+
+=item * C<unit_prefix_id>
+
+An integer field.
+
+=item * C<unit_id>
+
+A string field.
+
+=item * C<symbol>
+
+A string field.
+
+=item * C<power>
+
+An integer field.
+
+=item * C<factor>
+
+An integer field.
+
+=back
+
+=head2 Table unit_prefs
+
+=over 4
+
+=item * C<unit_pref_id>
+
+An integer field.
+
+=item * C<unit_id>
+
+A string field.
+
+=item * C<territory>
+
+A string field.
+
+=item * C<category>
+
+A string field.
+
+=item * C<usage>
+
+A string field.
+
+=item * C<geq>
+
+A decimal field.
+
+=item * C<skeleton>
+
+A string field.
+
+=back
+
+=head2 Table unit_quantities
+
+=over 4
+
+=item * C<unit_quantity_id>
+
+An integer field.
+
+=item * C<base_unit>
+
+A string field.
+
+=item * C<quantity>
+
+A string field.
+
+=item * C<status>
+
+A string field.
+
+=item * C<comment>
+
+A string field.
+
+=back
+
+=head2 Table units_l10n
+
+=over 4
+
+=item * C<units_l10n_id>
+
+An integer field.
+
+=item * C<locale>
+
+A string field.
+
+=item * C<format_length>
+
+A string field.
+
+=item * C<unit_type>
+
+A string field.
+
+=item * C<unit_id>
+
+A string field.
+
+=item * C<unit_pattern>
+
+A string field.
+
+=item * C<pattern_type>
+
+A string field.
+
+=item * C<locale_name>
+
+A string field.
+
+=item * C<count>
+
+A string field.
+
+=item * C<gender>
+
+A string field.
+
+=item * C<gram_case>
+
+A string field.
+
+=back
+
+=head2 Table variants
+
+=over 4
+
+=item * C<variant_id>
+
+An integer field.
+
+=item * C<variant>
+
+A string field.
+
+=item * C<status>
+
+A string field.
+
+=back
+
+=head2 Table variants_l10n
+
+=over 4
+
+=item * C<var_l10n_id>
+
+An integer field.
+
+=item * C<locale>
+
+A string field.
+
+=item * C<variant>
+
+A string field.
+
+=item * C<locale_name>
+
+A string field.
+
+=item * C<alt>
+
+A string field.
+
+=back
+
+=head2 Table week_preferences
+
+=over 4
+
+=item * C<week_pref_id>
+
+An integer field.
+
+=item * C<locale>
+
+A string field.
+
+=item * C<ordering>
+
+A string array field.
+
+=back
 
 =head1 AUTHOR
 

@@ -31,14 +31,14 @@ my %WriteMakefileArgs = (
     "Encode" => 0,
     "HTTP::Body" => 0,
     "Hash::MultiValue" => 0,
-    "Test::More" => "0.94",
+    "Test::More" => "0.98",
     "URI" => "1.36",
     "WWW::Form::UrlEncoded" => 0
   },
   "TEST_REQUIRES" => {
     "URI::Escape" => "1.31"
   },
-  "VERSION" => "3.31",
+  "VERSION" => "3.32",
   "clean" => {
     "FILES" => [
       "t/TEST"
@@ -55,13 +55,13 @@ my %FallbackPrereqs = (
   "Encode" => 0,
   "HTTP::Body" => 0,
   "Hash::MultiValue" => 0,
-  "Test::More" => "0.94",
+  "Test::More" => "0.98",
   "URI" => "1.36",
   "URI::Escape" => "1.31",
   "WWW::Form::UrlEncoded" => 0
 );
 
-# inserted by Dist::Zilla::Plugin::DynamicPrereqs 0.039
+# inserted by Dist::Zilla::Plugin::DynamicPrereqs 0.040
 if ($mp_version == 2) {     requires('mod_perl2', '1.999022'); } elsif ($mp_version == 1) {     requires('mod_perl', '1.27'); }
 
 unless ( eval { ExtUtils::MakeMaker->VERSION('6.63_03') } ) {
@@ -112,7 +112,7 @@ sub mod_perl_version {
     return 2;
 }
 
-# inserted by Dist::Zilla::Plugin::DynamicPrereqs 0.039
+# inserted by Dist::Zilla::Plugin::DynamicPrereqs 0.040
 sub _add_prereq {
   my ($mm_key, $module, $version_or_range) = @_;
   $version_or_range ||= 0;

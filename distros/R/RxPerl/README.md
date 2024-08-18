@@ -1321,7 +1321,7 @@ or a [Future](https://metacpan.org/pod/Future) object (when using with [RxPerl::
     is rejected.
 
         use RxPerl::AnyEvent ':all';
-        RxPerl::AnyEvent->set_promise_class('Promise::ES6');
+        RxPerl::AnyEvent->set_promise_class('Promise::ES6'); # Mojo::Promise works also
 
         my $o = ...; # an observable
         first_value_from($o)->then( ... );
@@ -1333,7 +1333,7 @@ or a [Future](https://metacpan.org/pod/Future) object (when using with [RxPerl::
     promise is rejected.
 
         use RxPerl::AnyEvent ':all';
-        RxPerl::AnyEvent->set_promise_class('Promise::ES6');
+        RxPerl::AnyEvent->set_promise_class('Promise::ES6'); # Mojo::Promise works also
 
         my $o = ...; # an observable
         last_value_from($o)->then( ... );
@@ -1434,12 +1434,12 @@ ReactiveX to cater for web developers already familiar with rxjs.
 
 - [RxJS Top Ten - Code This, Not That](https://www.youtube.com/watch?v=ewcoEYS85Co)
 - [Ultimate RxJS courses](https://ultimatecourses.com/courses/rxjs) _(paid)_
-- [egghead RxJS courses](https://egghead.io/browse/libraries/rxjs) _(paid)_
+- [egghead RxJS courses](https://egghead.io/q/rxjs) _(paid)_
 - [Rx Marbles](https://rxmarbles.com/)
 
 # SEE ALSO
 
-- [Ryu](https://metacpan.org/pod/Ryu)
+[Ryu](https://metacpan.org/pod/Ryu), [RxPerl::Extras](https://metacpan.org/pod/RxPerl%3A%3AExtras)
 
 # NOTIFICATIONS FOR NEW RELEASES
 

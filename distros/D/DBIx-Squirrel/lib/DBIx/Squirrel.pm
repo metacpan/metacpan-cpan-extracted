@@ -1,7 +1,7 @@
 use Modern::Perl;
 
 package DBIx::Squirrel;
-$DBIx::Squirrel::VERSION = '1.2.8';
+$DBIx::Squirrel::VERSION = '1.2.9';
 =pod
 
 =encoding UTF-8
@@ -12,7 +12,7 @@ DBIx::Squirrel - A C<DBI> extension
 
 =head1 VERSION
 
-version 1.2.8
+version 1.2.9
 
 =head1 SYNOPSIS
 
@@ -465,7 +465,7 @@ __END__
 
 =head1 DESCRIPTION
 
-The C<DBIx::Squirrel> package extends the C<DBI>, by providing a few extra
+The C<DBIx::Squirrel> package extends the C<DBI> by providing a few extra
 conveniences that are subtle and additive in nature, and, hopefully, quite
 useful.
 
@@ -826,7 +826,7 @@ will apply to it.
 
 =item 1.
 
-See script C<examples/transformations_1.pl>:
+See script C<examples/transformations/01.pl>:
 
     use DBIx::Squirrel database_entities => [qw/db get_artist_id_by_name/];
 
@@ -914,7 +914,7 @@ Just as we would with the C<DBI>.
 
 Find the script and run it:
 
-    $ perl -I./lib ./examples/transformations_1.pl
+    $ perl -Ilib examples/transformations/1.pl
     ----
     Name: AC/DC
     ArtistId: 1

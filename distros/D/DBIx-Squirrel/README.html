@@ -71,7 +71,7 @@
 
 <h1 id="VERSION">VERSION</h1>
 
-<p>version 1.2.8</p>
+<p>version 1.2.9</p>
 
 <h1 id="SYNOPSIS">SYNOPSIS</h1>
 
@@ -389,7 +389,7 @@ $id = $itr-&gt;iterate(&#39;Acme Rocket&#39;)-&gt;single;</code></pre>
 
 <h1 id="DESCRIPTION">DESCRIPTION</h1>
 
-<p>The <code>DBIx::Squirrel</code> package extends the <code>DBI</code>, by providing a few extra conveniences that are subtle and additive in nature, and, hopefully, quite useful.</p>
+<p>The <code>DBIx::Squirrel</code> package extends the <code>DBI</code> by providing a few extra conveniences that are subtle and additive in nature, and, hopefully, quite useful.</p>
 
 <h2 id="Importing-the-package">Importing the package</h2>
 
@@ -676,7 +676,7 @@ $itr = $sth-&gt;iterate(        |  $itr = $sth-&gt;results(
 
 <ol>
 
-<li><p>See script <code>examples/transformations_1.pl</code>:</p>
+<li><p>See script <code>examples/transformations/01.pl</code>:</p>
 
 <pre><code>use DBIx::Squirrel database_entities =&gt; [qw/db get_artist_id_by_name/];
 
@@ -751,7 +751,7 @@ db-&gt;disconnect();</code></pre>
 
 <p>Find the script and run it:</p>
 
-<pre><code>$ perl -I./lib ./examples/transformations_1.pl
+<pre><code>$ perl -Ilib examples/transformations/1.pl
 ----
 Name: AC/DC
 ArtistId: 1

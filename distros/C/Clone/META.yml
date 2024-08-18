@@ -23,5 +23,5 @@ resources:
   bugtracker: https://github.com/garu/Clone/issues
   license: http://dev.perl.org/licenses/
   repository: http://github.com/garu/Clone
-version: '0.46'
+version: '0.47'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

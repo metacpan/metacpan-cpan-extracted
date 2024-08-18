@@ -8,7 +8,7 @@ configure_requires:
   Apache::Test: '1.39'
   ExtUtils::MakeMaker: '0'
 dynamic_config: 1
-generated_by: 'Dist::Zilla version 6.024, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Zilla version 6.031, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -17,31 +17,31 @@ name: Apache-AuthCookie
 provides:
   Apache2::AuthCookie:
     file: lib/Apache2/AuthCookie.pm
-    version: '3.31'
+    version: '3.32'
   Apache2::AuthCookie::Base:
     file: lib/Apache2/AuthCookie/Base.pm
-    version: '3.31'
+    version: '3.32'
   Apache2::AuthCookie::Params:
     file: lib/Apache2/AuthCookie/Params.pm
-    version: '3.31'
+    version: '3.32'
   Apache2_4::AuthCookie:
     file: lib/Apache2_4/AuthCookie.pm
-    version: '3.31'
+    version: '3.32'
   Apache::AuthCookie:
     file: lib/Apache/AuthCookie.pm
-    version: '3.31'
+    version: '3.32'
   Apache::AuthCookie::Params:
     file: lib/Apache/AuthCookie/Params.pm
-    version: '3.31'
+    version: '3.32'
   Apache::AuthCookie::Params::Base:
     file: lib/Apache/AuthCookie/Params/Base.pm
-    version: '3.31'
+    version: '3.32'
   Apache::AuthCookie::Params::CGI:
     file: lib/Apache/AuthCookie/Params/CGI.pm
-    version: '3.31'
+    version: '3.32'
   Apache::AuthCookie::Util:
     file: lib/Apache/AuthCookie/Util.pm
-    version: '3.31'
+    version: '3.32'
 recommends:
   WWW::Form::UrlEncoded::XS: '0'
 requires:
@@ -50,14 +50,14 @@ requires:
   Encode: '0'
   HTTP::Body: '0'
   Hash::MultiValue: '0'
-  Test::More: '0.94'
+  Test::More: '0.98'
   URI: '1.36'
   WWW::Form::UrlEncoded: '0'
 resources:
   bugtracker: https://github.com/mschout/apache-authcookie/issues
   homepage: https://github.com/mschout/apache-authcookie
   repository: https://github.com/mschout/apache-authcookie.git
-version: '3.31'
-x_generated_by_perl: v5.30.3
-x_serialization_backend: 'YAML::Tiny version 1.73'
+version: '3.32'
+x_generated_by_perl: v5.38.2
+x_serialization_backend: 'YAML::Tiny version 1.74'
 x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

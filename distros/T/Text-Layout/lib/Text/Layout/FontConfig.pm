@@ -8,7 +8,7 @@ package Text::Layout::FontConfig;
 
 use Carp;
 
- our $VERSION = "0.037";
+ our $VERSION = "0.038";
 
 use Text::Layout::FontDescriptor;
 
@@ -264,13 +264,14 @@ or
 =cut
 
 sub register_aliases {
+    use Storable qw(dclone);
     shift if UNIVERSAL::isa( $_[0], __PACKAGE__ );
     my ( $family, @aliases ) = @_;
     carp("Unknown font family: $family")
       unless exists $fonts{lc $family};
     foreach ( @aliases ) {
 	foreach ( split( /\s*,\s*/, $_ ) ) {
-	    $fonts{lc $_} = $fonts{lc $family};
+	    $fonts{lc $_} = dclone( $fonts{lc $family} );
 	}
     }
 }
@@ -578,8 +579,8 @@ On Linux, fallback using fontconfig.
 
 =cut
 
-my $stylep  = qr/^( (?:heavy|bold|semi(?:bold)?|medium|book|light)? (?:oblique|italic)  )$/ix;
-my $weightp = qr/^( (?:heavy|bold|semi(?:bold)?|medium|book|light)  (?:oblique|italic)? )$/ix;
+my $stylep  = qr/^(?:heavy|bold|semi(?:bold)?|medium|book|light)? (oblique|italic)$/ix;
+my $weightp = qr/^(heavy|bold|semi(?:bold)?|medium|book|light) (?:oblique|italic)?$/ix;
 
 sub from_string {
     shift if UNIVERSAL::isa( $_[0], __PACKAGE__ );
@@ -625,9 +626,11 @@ sub parse {
 	}
 	elsif ( $t =~ $stylep ) {
 	    $style = "italic";
+	    $weight = $1 if $t =~ $weightp;
 	}
 	elsif ( $t =~ $weightp ) {
 	    $weight = $1;
+	    $style = $1 if $t =~ $stylep;
 	}
 	elsif ( $t eq "normal" ) {
 	    $style = $weight = "";

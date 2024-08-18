@@ -8,12 +8,18 @@ use parent 'RxPerl::Base';
 use RxPerl ':all';
 
 use Sub::Util 'set_subname';
+use Module::Load 'load';
 
 use Exporter 'import';
 our @EXPORT_OK = (@RxPerl::EXPORT_OK);
 our %EXPORT_TAGS = (%RxPerl::EXPORT_TAGS);
 
-our $VERSION = "v6.29.4";
+our $VERSION = "v6.29.5";
+
+my $mojo_loaded = eval {
+    load 'Mojo::IOLoop';
+    1;
+};
 
 foreach my $func_name (@EXPORT_OK) {
     set_subname __PACKAGE__."::$func_name", \&{$func_name};
@@ -47,6 +53,7 @@ sub start {
         while (my $item = shift @{ $_timeline{$time} }) {
             delete $_timed_events{$item->{id}};
             $item->{sub}->();
+            Mojo::IOLoop->start if $mojo_loaded;
         }
         delete $_timeline{$time};
     }

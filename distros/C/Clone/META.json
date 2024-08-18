@@ -49,6 +49,6 @@
          "url" : "http://github.com/garu/Clone"
       }
    },
-   "version" : "0.46",
+   "version" : "0.47",
    "x_serialization_backend" : "JSON::PP version 4.07"
 }

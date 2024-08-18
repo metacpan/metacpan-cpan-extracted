@@ -1,5 +1,10 @@
 Revision history for Apache::AuthCookie
 
+3.32  2024-08-17
+   - Fix small typo in documentation (github #18, thanks Damyan Ivanov)
+   - Capitalize Apache in POD (thanks Ed Sabol)
+   - Fix warning due to quoted version in import under Perl 5.40
+
 3.31  2022-01-05
    - Fix uninitialized variable warning if "Satisfy" was not set (github #15, thanks yewtc)
 

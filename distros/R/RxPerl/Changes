@@ -1,5 +1,12 @@
 Revision history for Perl extension RxPerl
 
+v6.29.5 2024-08-18T09:47:21Z
+
+    - fixed the behavior of op_concat_map, and wrote its test
+    - instantaneous tests can now deal with Mojo::Promise
+    - use of constants to increase performance
+    - increased minimum version of Mojolicious in test dependency, to avoid a bug in earlier versions of Mojo::Promise
+
 v6.29.4 2024-08-06T08:55:33Z
 
     - fixed issue #2 on gitlab (https://gitlab.com/karjala/rxperl/-/issues/2)

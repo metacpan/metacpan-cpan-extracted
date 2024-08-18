@@ -1,0 +1,16 @@
+.editorconfig
+Changes
+lib/OpenFeature/Client.pm
+lib/OpenFeature/EvaluationContext.pm
+lib/OpenFeature/InMemoryProvider.pm
+lib/OpenFeature/ProviderRegistry.pm
+lib/OpenFeature/SDK.pm
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+OpenFeature-SDK-/META.json
+OpenFeature-SDK-/META.yml
+pipelight.toml
+t/setup.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

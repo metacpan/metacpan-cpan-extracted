@@ -17,7 +17,7 @@ Apache::AuthCookie::FAQ - Frequently Asked Questions about Apache::AuthCookie.
 
 =head1 VERSION
 
-version 3.31
+version 3.32
 
 =head1 DESCRIPTION
 
@@ -46,8 +46,8 @@ handler is C</LOGIN>, then you need to use something like the following:
 
 =head1 SOURCE
 
-The development version is on github at L<https://https://github.com/mschout/apache-authcookie>
-and may be cloned from L<git://https://github.com/mschout/apache-authcookie.git>
+The development version is on github at L<https://github.com/mschout/apache-authcookie>
+and may be cloned from L<https://github.com/mschout/apache-authcookie.git>
 
 =head1 BUGS
 

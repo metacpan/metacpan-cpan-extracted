@@ -1,4 +1,10 @@
 # Text::Layout
+![Version](https://img.shields.io/github/v/release/sciurius/perl-Text-Layout)
+![GitHub issues](https://img.shields.io/github/issues/sciurius/perl-Text-Layout)
+[![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](http://makeapullrequest.com)
+![Language Perl](https://img.shields.io/badge/Language-Perl-blue)
+
+
 
 **WARNING: Some parts of the API are changing in incompatible ways. If you
 (want to) use this module for serious work please contact me.**
@@ -10,11 +16,11 @@ behaviour as their Pango counterparts.
 Text::Layout uses backend modules to render the marked up text.
 Backends are included for:
 
-  PDF::API2  (functional)
-  PDF::Builder  (functional)
-  Pango  (under construction)
-  Cairo  (under construction)
-  Markdown  (minimal functionality)
+*  PDF::API2  (functional)
+*  PDF::Builder  (functional)
+*  Markdown  (minimal functionality)
+
+Note that the Pango and Cairo backends are discontinued.
 
 The package uses Text::Layout::FontConfig (included) to organize fonts
 by description.
@@ -22,7 +28,7 @@ by description.
 If module HarfBuzz::Shaper is installed, Text::Layout can use it for
 text shaping.
 
-Example:
+## Example
 
     # Create a PDF document.
     my $pdf = PDF::API2->new;	# or PDF::Builder->new
@@ -48,7 +54,7 @@ Example:
     # Render it, passing the text context.
     $layout->show( $x, $y, $ctx );
 
-SEE ALSO
+# SEE ALSO
 
 Description of the Pango Markup Language:
 https://docs.gtk.org/Pango/pango_markup.html#pango-markup.
@@ -56,7 +62,15 @@ https://docs.gtk.org/Pango/pango_markup.html#pango-markup.
 Documentation of the Pango Layout class:
 https://docs.gtk.org/Pango/class.Layout.html.
 
-INSTALLATION
+# FUTURE DIRECTIONS
+
+Text::Layout was originally inspired by the Pango Markup Language 
+and provided a Pango compatibility mode.
+However, both implementations have significantly diversed.
+As a result, the Pango compatibility mode will be removed in some
+future version.
+
+# INSTALLATION
 
 To install this module, run the following commands:
 
@@ -65,7 +79,7 @@ To install this module, run the following commands:
 	make test
 	make install
 
-SUPPORT AND DOCUMENTATION
+# SUPPORT AND DOCUMENTATION
 
 Development of this module takes place on GitHub:
 https://github.com/sciurius/perl-Text-Layout.
@@ -77,7 +91,7 @@ You can find documentation for this module with the perldoc command.
 Please report any bugs or feature requests using the issue tracker on
 GitHub.
 
-COPYRIGHT AND LICENCE
+# COPYRIGHT AND LICENCE
 
 Copyright (C) 2019,2024 Johan Vromans
 

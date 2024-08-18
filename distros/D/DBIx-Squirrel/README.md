@@ -4,7 +4,7 @@ DBIx::Squirrel - A `DBI` extension
 
 # VERSION
 
-version 1.2.8
+version 1.2.9
 
 # SYNOPSIS
 
@@ -322,7 +322,7 @@ version 1.2.8
 
 # DESCRIPTION
 
-The `DBIx::Squirrel` package extends the `DBI`, by providing a few extra
+The `DBIx::Squirrel` package extends the `DBI` by providing a few extra
 conveniences that are subtle and additive in nature, and, hopefully, quite
 useful.
 
@@ -635,7 +635,7 @@ will apply to it.
 
 ### Examples
 
-1. See script `examples/transformations_1.pl`:
+1. See script `examples/transformations/01.pl`:
 
         use DBIx::Squirrel database_entities => [qw/db get_artist_id_by_name/];
 
@@ -702,7 +702,7 @@ will apply to it.
 
     Find the script and run it:
 
-        $ perl -I./lib ./examples/transformations_1.pl
+        $ perl -Ilib examples/transformations/1.pl
         ----
         Name: AC/DC
         ArtistId: 1

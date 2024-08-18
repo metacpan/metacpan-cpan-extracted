@@ -5,6 +5,7 @@ author:
 build_requires:
   Capture::Tiny: '0'
   Cwd: '0'
+  DBD::SQLite: '0'
   FindBin: '0'
   Test::More: '0'
   Test::Most: '0'
@@ -24,18 +25,21 @@ name: DBIx-Squirrel
 requires:
   Carp: '0'
   DBI: '0'
+  Data::Dumper: '0'
   Data::Dumper::Concise: '0'
   Digest::SHA: '0'
   Exporter: '0'
+  JSON::Syck: '0'
   Memoize: '0'
   Modern::Perl: '0'
   SQL::Abstract: '0'
   Scalar::Util: '0'
   Sub::Name: '0'
+  YAML::Syck: '0'
   constant: '0'
   namespace::autoclean: '0'
   strict: '0'
-version: 1.2.8
+version: 1.2.9
 x_generated_by_perl: v5.38.2
 x_serialization_backend: 'YAML::Tiny version 1.74'
 x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

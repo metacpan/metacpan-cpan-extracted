@@ -55,7 +55,7 @@
    "provides" : {
       "Net::sFlow" : {
          "file" : "lib/Net/sFlow.pm",
-         "version" : "0.13"
+         "version" : "0.14"
       }
    },
    "release_status" : "stable",
@@ -70,12 +70,13 @@
          "web" : "https://github.com/fooelisa/perl-net-sflow"
       }
    },
-   "version" : "0.13",
+   "version" : "0.14",
    "x_contributors" : [
       "Andrew Feren <acferen@gmail.com>",
       "Elisa Jasinska <elisa@jasinska.de>",
       "Elisa Jasinska <“elisa@jasinska.de”>",
       "Ryan Rawdon <ryarawdo@publicisgroupe.net>",
+      "Steven Bakker <steven.bakker@ams-ix.net>",
       "elisa <elisa@f0c0b545-b121-db11-b787-00e081619514>"
    ],
    "x_serialization_backend" : "JSON::PP version 4.06",

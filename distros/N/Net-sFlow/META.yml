@@ -26,7 +26,7 @@ no_index:
 provides:
   Net::sFlow:
     file: lib/Net/sFlow.pm
-    version: '0.13'
+    version: '0.14'
 requires:
   Math::BigInt: '2.003003'
   perl: '5.008001'
@@ -34,12 +34,13 @@ resources:
   bugtracker: https://github.com/fooelisa/perl-net-sflow/issues
   homepage: https://github.com/fooelisa/perl-net-sflow
   repository: https://github.com/fooelisa/perl-net-sflow.git
-version: '0.13'
+version: '0.14'
 x_contributors:
   - 'Andrew Feren <acferen@gmail.com>'
   - 'Elisa Jasinska <elisa@jasinska.de>'
   - 'Elisa Jasinska <“elisa@jasinska.de”>'
   - 'Ryan Rawdon <ryarawdo@publicisgroupe.net>'
+  - 'Steven Bakker <steven.bakker@ams-ix.net>'
   - 'elisa <elisa@f0c0b545-b121-db11-b787-00e081619514>'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
 x_static_install: 1

@@ -187,6 +187,7 @@ CREATE TABLE scripts (
     -- regular, deprecated, special, reserved, private_use, unknown
     ,status             VARCHAR(20)
     ,PRIMARY KEY(script_id)
+    ,CHECK( script REGEXP '^[a-zA-Z][a-zA-Z0-9]+$' )
     ,CHECK( status REGEXP '^[a-zA-Z][a-zA-Z0-9\_]+$' )
     ,FOREIGN KEY(origin_country) REFERENCES territories(territory) ON UPDATE CASCADE ON DELETE RESTRICT
     ,FOREIGN KEY(likely_language) REFERENCES locales(locale) ON UPDATE CASCADE ON DELETE RESTRICT
@@ -218,6 +219,8 @@ CREATE TABLE time_formats (
     ,time_format        VARCHAR(1) DEFAULT 'H'
     ,time_allowed       TEXT[] DEFAULT '{"H", "h"}'
     ,PRIMARY KEY(time_format_id)
+    ,CHECK( region REGEXP '^[a-zA-Z0-9\-]+$' )
+    ,CHECK( time_format REGEXP '^[a-zA-Z]$' )
     ,FOREIGN KEY(territory) REFERENCES territories(territory) ON UPDATE CASCADE ON DELETE RESTRICT
     ,FOREIGN KEY(locale) REFERENCES locales(locale) ON UPDATE CASCADE ON DELETE RESTRICT
 );
@@ -263,9 +266,24 @@ CREATE TABLE aliases (
     ,type               VARCHAR(17)
     ,comment            TEXT
     ,PRIMARY KEY(alias_id)
+    ,CHECK( alias REGEXP '^[a-zA-Z0-9\/\_\-]+$' )
 );
 CREATE UNIQUE INDEX idx_aliases_unique ON aliases(alias,type);
 
+-- Source: supplemental/metaZones.xml/supplementalData/metaZones/metazoneInfo/timezone[@type]
+-- Source: bcp47/timezone.xml/ldmlBCP47/keyword/key[name="tz"]/type
+CREATE TABLE metazones (
+     metazone_id        INTEGER
+     -- Europe_Central, Japan, Israel, Korea
+    ,metazone           VARCHAR(42) NOT NULL COLLATE NOCASE
+    ,territories        TEXT[] NOT NULL COLLATE NOCASE
+    ,timezones          TEXT[] NOT NULL COLLATE NOCASE
+    ,PRIMARY KEY(metazone_id)
+    ,CHECK( metazone REGEXP '^[a-zA-Z0-9\_]+$' )
+);
+CREATE UNIQUE INDEX idx_metazones_unique ON metazones(metazone);
+
+-- Source: supplemental/metaZones.xml/supplementalData/metaZones/mapTimezones/mapZone[@other]
 CREATE TABLE timezones (
      timezone_id        INTEGER
      -- Example: Asia/Tokyo
@@ -282,8 +300,19 @@ CREATE TABLE timezones (
     -- CLDR misuses the territory code '001' as a mean to specify whether a time zone is 'golden'.
     -- See <https://www.unicode.org/reports/tr35/tr35-dates.html#Using_Time_Zone_Names>
     ,is_golden          BOOLEAN DEFAULT FALSE
+    -- Is the preferred time zone for this territory
+    ,is_preferred       BOOLEAN DEFAULT FALSE
+    -- Is this timezone the canonical one?
+    -- <https://unicode.org/reports/tr35/tr35.html#Time_Zone_Identifiers>
+    ,is_canonical       BOOLEAN DEFAULT FALSE
+    ,alias              TEXT[]
     ,PRIMARY KEY(timezone_id)
+    ,CHECK( timezone REGEXP '^[a-zA-Z0-9\/\_\-\+]+$' )
+    ,CHECK( region REGEXP '^[a-zA-Z0-9\-]+$' )
+    ,CHECK( tzid REGEXP '^[a-zA-Z0-9]+$' )
+    ,CHECK( tz_bcpid REGEXP '^[a-zA-Z0-9]+$' )
     ,FOREIGN KEY(territory) REFERENCES territories(territory) ON UPDATE CASCADE ON DELETE RESTRICT
+    ,FOREIGN KEY(metazone) REFERENCES metazones(metazone) ON UPDATE CASCADE ON DELETE RESTRICT
 );
 CREATE UNIQUE INDEX idx_timezones_unique ON timezones(timezone);
 
@@ -589,6 +618,63 @@ CREATE TABLE currencies_l10n (
     ,FOREIGN KEY(currency) REFERENCES currencies(currency) ON UPDATE CASCADE ON DELETE RESTRICT
 );
 CREATE UNIQUE INDEX idx_currencies_l10n_unique ON currencies_l10n(locale, currency, count);
+
+-- NOTE: Source: main/*.xml->/ldml/dates/timeZoneNames/zone[@type]
+CREATE TABLE timezones_cities (
+     tz_city_id         INTEGER
+    ,locale             VARCHAR(20) NOT NULL COLLATE NOCASE
+    ,timezone           VARCHAR(42) NOT NULL COLLATE NOCASE
+    ,city               TEXT NOT NULL
+    ,alt                VARCHAR(20)
+    ,PRIMARY KEY(tz_city_id)
+    ,FOREIGN KEY(locale) REFERENCES locales(locale) ON UPDATE CASCADE ON DELETE RESTRICT
+    ,FOREIGN KEY(timezone) REFERENCES timezones(timezone) ON UPDATE CASCADE ON DELETE RESTRICT
+);
+CREATE UNIQUE INDEX idx_timezones_cities_unique ON timezones_cities(locale, timezone, IFNULL(alt, ''));
+
+-- NOTE: Source: main/*.xml->/ldml/dates/timeZoneNames/zone[@type]
+CREATE TABLE timezones_formats (
+     tz_fmt_id          INTEGER
+    ,locale             VARCHAR(20) NOT NULL COLLATE NOCASE
+    ,type               VARCHAR(12) NOT NULL COLLATE NOCASE
+    ,subtype            VARCHAR(12) COLLATE NOCASE
+    ,format_pattern     TEXT NOT NULL
+    ,PRIMARY KEY(tz_fmt_id)
+    ,FOREIGN KEY(locale) REFERENCES locales(locale) ON UPDATE CASCADE ON DELETE RESTRICT
+);
+CREATE UNIQUE INDEX idx_timezones_formats_unique ON timezones_formats(locale, type, format_pattern, IFNULL(subtype, ''));
+
+-- NOTE: Source: main/*.xml->/ldml/dates/timeZoneNames/zone[@type]
+CREATE TABLE timezones_names (
+     tz_name_id         INTEGER
+    ,locale             VARCHAR(20) NOT NULL COLLATE NOCASE
+    ,timezone           VARCHAR(42) NOT NULL COLLATE NOCASE
+    -- long, short
+    ,width              VARCHAR(7) NOT NULL
+    ,generic            TEXT
+    ,standard           TEXT
+    ,daylight           TEXT
+    ,PRIMARY KEY(tz_name_id)
+    ,FOREIGN KEY(locale) REFERENCES locales(locale) ON UPDATE CASCADE ON DELETE RESTRICT
+    ,FOREIGN KEY(timezone) REFERENCES timezones(timezone) ON UPDATE CASCADE ON DELETE RESTRICT
+);
+CREATE UNIQUE INDEX idx_timezones_names_unique ON timezones_names(locale, timezone, width);
+
+-- NOTE: Source: main/*.xml->/ldml/dates/timeZoneNames/metazone[@type]
+CREATE TABLE metazones_names (
+     metatz_name_id     INTEGER
+    ,locale             VARCHAR(20) NOT NULL COLLATE NOCASE
+    ,metazone           VARCHAR(42) NOT NULL COLLATE NOCASE
+    -- long, short
+    ,width              VARCHAR(7) NOT NULL
+    ,generic            TEXT
+    ,standard           TEXT
+    ,daylight           TEXT
+    ,PRIMARY KEY(metatz_name_id)
+    ,FOREIGN KEY(locale) REFERENCES locales(locale) ON UPDATE CASCADE ON DELETE RESTRICT
+    ,FOREIGN KEY(metazone) REFERENCES metazones(metazone) ON UPDATE CASCADE ON DELETE RESTRICT
+);
+CREATE UNIQUE INDEX idx_metazones_names_unique ON metazones_names(locale, metazone, width);
 
 -- Contains the localised terms used in different parts of a calendar system
 -- Source: main/*.xml/ldml/dates/calendars/calendar[@type]/*[local-name()="months" or local-name()="days" or local-name()="quarters" or local-name()="dayPeriods"]
@@ -969,6 +1055,27 @@ CREATE TABLE units_l10n (
     ,FOREIGN KEY(locale) REFERENCES locales(locale) ON UPDATE CASCADE ON DELETE RESTRICT
 );
 CREATE UNIQUE INDEX idx_units_l10n_unique ON units_l10n(locale, format_length, unit_type, unit_id, IFNULL(count, ''), IFNULL(gender, ''), IFNULL(gram_case, ''));
+
+-- Source: main/*.xml/ldml/numbers/defaultNumberingSystem
+-- Source: main/*.xml/ldml/numbers/otherNumberingSystems/*[local-name()="native" or local-name()="traditional" or local-name()="finance"]
+-- <https://unicode.org/reports/tr35/tr35-numbers.html#defaultNumberingSystem>
+-- <https://unicode.org/reports/tr35/tr35-numbers.html#otherNumberingSystems>
+CREATE TABLE locale_number_systems (
+     locale_num_sys_id  INTEGER
+    ,locale             VARCHAR(20) NOT NULL COLLATE NOCASE
+    -- The default numbering system for this locale
+    ,number_system      VARCHAR(10)
+    ,native             VARCHAR(10)
+    ,traditional        VARCHAR(10)
+    ,finance            VARCHAR(10)
+    ,PRIMARY KEY(locale_num_sys_id)
+    ,FOREIGN KEY(locale) REFERENCES locales(locale) ON UPDATE CASCADE ON DELETE RESTRICT
+    ,FOREIGN KEY(number_system) REFERENCES number_systems(number_system) ON UPDATE CASCADE ON DELETE RESTRICT
+    ,FOREIGN KEY(native) REFERENCES number_systems(number_system) ON UPDATE CASCADE ON DELETE RESTRICT
+    ,FOREIGN KEY(traditional) REFERENCES number_systems(number_system) ON UPDATE CASCADE ON DELETE RESTRICT
+    ,FOREIGN KEY(finance) REFERENCES number_systems(number_system) ON UPDATE CASCADE ON DELETE RESTRICT
+);
+CREATE UNIQUE INDEX idx_locale_number_systems_unique ON locale_number_systems(locale, IFNULL(number_system, ''));
 
 -- Source: main/*.xml/ldml/numbers/symbols
 CREATE TABLE number_symbols_l10n (

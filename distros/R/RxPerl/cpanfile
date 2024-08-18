@@ -6,7 +6,6 @@ requires 'parent';
 
 on 'test' => sub {
     requires 'Test2::V0';
-    # Promise::ES6 is broken in new Perls
-    requires 'Mojo::Promise';
-    requires 'Mojo::IOLoop';
+    # Since Promise::ES6 is broken in perl v5.40:
+    requires 'Mojolicious', '8.15'; # for Mojo::Promise and Mojo::IOLoop
 };

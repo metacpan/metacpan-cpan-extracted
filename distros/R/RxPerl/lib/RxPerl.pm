@@ -15,7 +15,7 @@ our @EXPORT_OK = (
 );
 our %EXPORT_TAGS = (all => \@EXPORT_OK);
 
-our $VERSION = "v6.29.4";
+our $VERSION = "v6.29.5";
 
 1;
 __END__
@@ -1355,7 +1355,7 @@ as soon as it gets emitted. If no value is emitted before the observable's compl
 is rejected.
 
     use RxPerl::AnyEvent ':all';
-    RxPerl::AnyEvent->set_promise_class('Promise::ES6');
+    RxPerl::AnyEvent->set_promise_class('Promise::ES6'); # Mojo::Promise works also
 
     my $o = ...; # an observable
     first_value_from($o)->then( ... );
@@ -1367,7 +1367,7 @@ as soon as the observable completes. If no value is emitted before the observabl
 promise is rejected.
 
     use RxPerl::AnyEvent ':all';
-    RxPerl::AnyEvent->set_promise_class('Promise::ES6');
+    RxPerl::AnyEvent->set_promise_class('Promise::ES6'); # Mojo::Promise works also
 
     my $o = ...; # an observable
     last_value_from($o)->then( ... );
@@ -1490,7 +1490,7 @@ ReactiveX to cater for web developers already familiar with rxjs.
 
 =item * L<Ultimate RxJS courses|https://ultimatecourses.com/courses/rxjs> I<(paid)>
 
-=item * L<egghead RxJS courses|https://egghead.io/browse/libraries/rxjs> I<(paid)>
+=item * L<egghead RxJS courses|https://egghead.io/q/rxjs> I<(paid)>
 
 =item * L<Rx Marbles|https://rxmarbles.com/>
 
@@ -1498,11 +1498,7 @@ ReactiveX to cater for web developers already familiar with rxjs.
 
 =head1 SEE ALSO
 
-=over
-
-=item * L<Ryu>
-
-=back
+L<Ryu>, L<RxPerl::Extras>
 
 =head1 NOTIFICATIONS FOR NEW RELEASES
 

@@ -91,6 +91,7 @@ can_ok( $cldr, 'day_period' );
 can_ok( $cldr, 'day_periods' );
 can_ok( $cldr, 'decode_sql_arrays' );
 can_ok( $cldr, 'error' );
+can_ok( $cldr, 'interval_formats' );
 can_ok( $cldr, 'l10n' );
 can_ok( $cldr, 'language' );
 can_ok( $cldr, 'languages' );
@@ -104,7 +105,14 @@ can_ok( $cldr, 'locale_l10n' );
 can_ok( $cldr, 'locales_l10n' );
 can_ok( $cldr, 'locales_info' );
 can_ok( $cldr, 'locales_infos' );
+can_ok( $cldr, 'locale_number_system' );
+can_ok( $cldr, 'locale_number_systems' );
 can_ok( $cldr, 'make_inheritance_tree' );
+can_ok( $cldr, 'metazone' );
+can_ok( $cldr, 'metazones' );
+can_ok( $cldr, 'metazone_names' );
+can_ok( $cldr, 'metazones_names' );
+can_ok( $cldr, 'normalise' );
 can_ok( $cldr, 'number_format_l10n' );
 can_ok( $cldr, 'number_formats_l10n' );
 can_ok( $cldr, 'number_symbol_l10n' );
@@ -124,6 +132,7 @@ can_ok( $cldr, 'script' );
 can_ok( $cldr, 'scripts' );
 can_ok( $cldr, 'script_l10n' );
 can_ok( $cldr, 'scripts_l10n' );
+can_ok( $cldr, 'split_interval' );
 can_ok( $cldr, 'subdivision' );
 can_ok( $cldr, 'subdivisions' );
 can_ok( $cldr, 'subdivision_l10n' );
@@ -136,8 +145,15 @@ can_ok( $cldr, 'time_format' );
 can_ok( $cldr, 'time_formats' );
 can_ok( $cldr, 'timezone' );
 can_ok( $cldr, 'timezones' );
+can_ok( $cldr, 'timezone_canonical' );
+can_ok( $cldr, 'timezone_city' );
+can_ok( $cldr, 'timezones_cities' );
+can_ok( $cldr, 'timezone_formats' );
+can_ok( $cldr, 'timezones_formats' );
 can_ok( $cldr, 'timezone_info' );
 can_ok( $cldr, 'timezones_info' );
+can_ok( $cldr, 'timezone_names' );
+can_ok( $cldr, 'timezones_names' );
 can_ok( $cldr, 'unit_alias' );
 can_ok( $cldr, 'unit_aliases' );
 can_ok( $cldr, 'unit_constant' );
@@ -194,12 +210,14 @@ SKIP:
         collations_l10n currencies currencies_info
         currencies_l10n date_fields_l10n day_periods
         language_population languages languages_match
-        likely_subtags locales locales_info locales_l10n
-        metainfos number_formats_l10n number_symbols_l10n
+        likely_subtags locale_number_systems locales
+        locales_info locales_l10n metainfos metazones
+        metazones_names number_formats_l10n number_symbols_l10n
         number_systems number_systems_l10n person_name_defaults
         rbnf refs scripts scripts_l10n subdivisions
         subdivisions_l10n territories territories_l10n
-        time_formats timezones timezones_info unit_aliases
+        time_formats timezones timezones_cities timezones_formats
+        timezones_info timezones_names unit_aliases
         unit_constants unit_conversions unit_prefixes unit_prefs
         unit_quantities units_l10n variants variants_l10n
         week_preferences
@@ -1579,6 +1597,47 @@ my $tests =
             expect      => 'array',
         },
     ],
+    # NOTE: metazones
+    metazones =>
+    [
+        {
+            method      => 'metazone',
+            args        => [metazone => 'Japan'],
+            expect      =>
+            {
+                metazone    => 'Japan',
+                territories => ["001"],
+                timezones   => ["Asia/Tokyo"],
+            },
+        },
+        {
+            method      => 'metazones',
+            args        => [],
+            expect      => 'array',
+        },
+    ],
+    # NOTE: metazone_names
+    metazones_names =>
+    [
+        {
+            method      => 'metazone_names',
+            args        => [metazone => 'Japan', locale => 'en', width => 'long'],
+            expect      =>
+            {
+                locale      => 'en',
+                metazone    => 'Japan',
+                width       => 'long',
+                generic     => 'Japan Time',
+                standard    => 'Japan Standard Time',
+                daylight    => 'Japan Daylight Time',
+            },
+        },
+        {
+            method      => 'metazones_names',
+            args        => [],
+            expect      => 'array',
+        },
+    ],
     # NOTE: number_formats_l10n
     number_formats_l10n =>
     [
@@ -2004,14 +2063,16 @@ my $tests =
             args        => [timezone => 'Asia/Tokyo'],
             expect      =>
             {
-                region      => 'JP',
-                timezone    => 'Asia/Tokyo',
-                territory   => 'JP',
-                region      => 'Asia',
-                tzid        => 'japa',
-                metazone    => 'Japan',
-                tz_bcpid    => 'jptyo',
-                is_golden   => 1,
+                region          => 'JP',
+                timezone        => 'Asia/Tokyo',
+                territory       => 'JP',
+                region          => 'Asia',
+                tzid            => 'japa',
+                metazone        => 'Japan',
+                tz_bcpid        => 'jptyo',
+                is_golden       => 1,
+                is_preferred    => 0,
+                alias           => ["Japan"],
             },
         },
         {
@@ -2047,6 +2108,105 @@ my $tests =
         {
             method      => 'timezones',
             args        => [is_golden => 1],
+            expect      => 'array',
+        },
+    ],
+    # NOTE: timezones_l10n
+    timezones_cities =>
+    [
+        {
+            method      => 'timezone_city',
+            args        => [timezone => 'Etc/Unknown', locale => 'en'],
+            expect      =>
+            {
+                locale      => 'en',
+                timezone    => 'Etc/Unknown',
+                city        => 'Unknown City',
+            },
+        },
+        {
+                method      => 'timezones_cities',
+            args        => [],
+            expect      => 'array',
+        },
+    ],
+    # NOTE: timezones_formats
+    timezones_formats =>
+    [
+        {
+            method      => 'timezone_formats',
+            args        => [locale => 'en', type => 'fallback'],
+            expect      =>
+            {
+                locale          => 'en',
+                type            => 'fallback',
+                subtype         => undef,
+                format_pattern  => '{1} ({0})',
+            },
+        },
+        {
+            method      => 'timezone_formats',
+            args        => [locale => 'en', type => 'gmt'],
+            expect      =>
+            {
+                locale          => 'en',
+                type            => 'gmt',
+                subtype         => undef,
+                format_pattern  => 'GMT{0}',
+            },
+        },
+        {
+            method      => 'timezone_formats',
+            args        => [locale => 'en', type => 'gmt_zero'],
+            expect      => '',
+        },
+        {
+            method      => 'timezone_formats',
+            args        => [locale => 'en', type => 'hour'],
+            expect      =>
+            {
+                locale          => 'en',
+                type            => 'hour',
+                subtype         => undef,
+                format_pattern  => '+HH:mm;-HH:mm',
+            },
+        },
+        {
+            method      => 'timezone_formats',
+            args        => [locale => 'en', type => 'region'],
+            expect      =>
+            {
+                locale          => 'en',
+                type            => 'region',
+                subtype         => undef,
+                format_pattern  => '{0} Time',
+            },
+        },
+        {
+            method      => 'timezone_formats',
+            args        => [locale => 'en', type => 'region', subtype => 'daylight'],
+            expect      =>
+            {
+                locale          => 'en',
+                type            => 'region',
+                subtype         => 'daylight',
+                format_pattern  => '{0} Daylight Time',
+            },
+        },
+        {
+            method      => 'timezone_formats',
+            args        => [locale => 'en', type => 'region', subtype => 'standard'],
+            expect      =>
+            {
+                locale          => 'en',
+                type            => 'region',
+                subtype         => 'standard',
+                format_pattern  => '{0} Standard Time',
+            },
+        },
+        {
+            method      => 'timezones_formats',
+            args        => [],
             expect      => 'array',
         },
     ],
@@ -2098,6 +2258,28 @@ my $tests =
         {
             method      => 'timezones_info',
             args        => ['until' => undef],
+            expect      => 'array',
+        },
+    ],
+    # NOTE: timezones_names
+    timezones_names =>
+    [
+        {
+            method      => 'timezone_names',
+            args        => [timezone => 'Europe/London', locale => 'en', width => 'long'],
+            expect      =>
+            {
+                locale      => 'en',
+                timezone    => 'Europe/London',
+                width       => 'long',
+                generic     => undef,
+                standard    => undef,
+                daylight    => 'British Summer Time',
+            },
+        },
+        {
+            method      => 'timezones_names',
+            args        => [],
             expect      => 'array',
         },
     ],
@@ -2359,12 +2541,14 @@ my $tests =
     ],
 };
 
+# NOTE: core tests
 foreach my $test_name ( sort( keys( %$tests ) ) )
 {
     # Taking a cue at how perl itself handled this issue:
     # <https://github.com/Perl/perl5/issues/17134>
     # <https://github.com/Perl/perl5/issues/17853>
-    if( $Config{uselongdouble} && ( $test_name eq 'language_populations' || $test_name eq 'unit_constants' ) )
+    if( ( $Config{uselongdouble} || ( exists( $Config{uselongdouble} ) && !defined( $Config{uselongdouble} ) ) ) && 
+        ( $test_name eq 'language_populations' || $test_name eq 'unit_constants' ) )
     {
         pass( "Skipping test ${test_name} under $^O due to perl compilation with 'uselongdouble'" );
         next;
@@ -2392,8 +2576,8 @@ foreach my $test_name ( sort( keys( %$tests ) ) )
                     skip( "Unsupported method \"$def->{method}\" in Locale::Unicode::Data", 1 );
                 }
                 my $rv = $code->( $cldr, @{$def->{args}} );
-                ok( $rv, "Calling $def->{method} with " . ( scalar( @{$def->{args}} ) ? "arguments '" . join( "', '", map( $_ // 'undef', @{$def->{args}} ) ) . "'" : 'no argument' ) );
-                if( !defined( $rv ) )
+                ok( ( defined( $rv ) || ( !defined( $rv ) && !$cldr->error ) ), "Calling $def->{method} with " . ( scalar( @{$def->{args}} ) ? "arguments '" . join( "', '", map( $_ // 'undef', @{$def->{args}} ) ) . "'" : 'no argument' ) );
+                if( !defined( $rv ) && $cldr->error )
                 {
                     diag( "Error occurred calling $def->{method}: ", $cldr->error );
                     skip( "Error with $def->{method}", 1 );
@@ -2470,13 +2654,14 @@ foreach my $test_name ( sort( keys( %$tests ) ) )
                 # string 'array'
                 elsif( !ref( $expect ) )
                 {
-                    is( lc( ref( $rv ) // '' ) => $expect, "$def->{method} returned ${expect}" );
+                    is( lc( ref( $rv ) // '' ) => $expect, "$def->{method} returned " . ( $expect // 'undef' ) );
                 }
             };
         }
     };
 }
 
+# NOTE: inheritance tree
 subtest 'inheritance tree' => sub
 {
     my $tests =
@@ -2494,6 +2679,7 @@ subtest 'inheritance tree' => sub
     }
 };
 
+# NOTE: normalise
 # <https://unicode.org/reports/tr35/tr35.html#Language_Tag_to_Locale_Identifier>
 # <https://unicode.org/reports/tr35/tr35.html#4.-replacement>
 subtest 'normalise' => sub
@@ -2522,6 +2708,19 @@ subtest 'normalise' => sub
         isa_ok( $l => 'Locale::Unicode', 'normalise() returns an Locale::Unicode object' );
         is( "$l", $def->{expect}, "normalise( $def->{locale} ) -> $def->{expect}" );
     }
+};
+
+# NOTE: timezone_canonical
+subtest 'timezone_canonical' => sub
+{
+    my $str = $cldr->timezone_canonical( 'Europe/Paris' );
+    is( $str => 'Europe/Paris', 'timezone_canonical( "Europe/Paris" ) -> "Europe/Paris"' );
+    $str = $cldr->timezone_canonical( 'America/Atka' );
+    is( $str => 'America/Adak', 'timezone_canonical( "America/Atka" ) -> "America/Adak"' );
+    $str = $cldr->timezone_canonical( 'US/Aleutian' );
+    is( $str => 'America/Adak', 'timezone_canonical( "US/Aleutian" ) -> "America/Adak"' );
+    $str = $cldr->timezone_canonical( 'Canada/Pacific' );
+    is( $str => 'America/Vancouver', 'timezone_canonical( "Canada/Pacific" ) -> "America/Vancouver"' );
 };
 
 done_testing();

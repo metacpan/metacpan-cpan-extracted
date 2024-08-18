@@ -23,11 +23,12 @@ our @EXPORT_OK = qw/
 /;
 our %EXPORT_TAGS = (all => \@EXPORT_OK);
 
-our $VERSION = "v6.29.4";
+our $VERSION = "v6.29.5";
 
-sub rx_observable;
-
-sub rx_behavior_subject { "RxPerl::BehaviorSubject" }
+use constant rx_observable => 'RxPerl::Observable';
+use constant rx_behavior_subject => 'RxPerl::BehaviorSubject';
+use constant rx_replay_subject => 'RxPerl::ReplaySubject';
+use constant rx_subject => 'RxPerl::Subject';
 
 sub rx_combine_latest {
     my ($sources) = @_;
@@ -429,8 +430,6 @@ sub rx_NEVER {
     state $rx_never = rx_observable->new(sub { return });
 }
 
-sub rx_observable { "RxPerl::Observable" }
-
 sub rx_of {
     my (@values) = @_;
 
@@ -570,10 +569,6 @@ sub rx_range {
         return;
     });
 }
-
-sub rx_replay_subject { "RxPerl::ReplaySubject" }
-
-sub rx_subject { "RxPerl::Subject" }
 
 sub rx_throw_error {
     my ($error) = @_;

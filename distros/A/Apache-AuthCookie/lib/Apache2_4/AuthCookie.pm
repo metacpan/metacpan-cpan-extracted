@@ -1,5 +1,5 @@
 package Apache2_4::AuthCookie;
-$Apache2_4::AuthCookie::VERSION = '3.31';
+$Apache2_4::AuthCookie::VERSION = '3.32';
 # ABSTRACT: Perl Authentication and Authorization via cookies for Apache 2.4
 
 use strict;
@@ -60,7 +60,7 @@ Apache2_4::AuthCookie - Perl Authentication and Authorization via cookies for Ap
 
 =head1 VERSION
 
-version 3.31
+version 3.32
 
 =head1 SYNOPSIS
 
@@ -563,7 +563,7 @@ saved login.  I use a database to store the session key and retrieve it later.
 
 I upgraded to Apache 2.4 and now AuthCookie doesn't work!
 
-Apache 2.4 radically changed the authenciation and authorization API.  You will
+Apache 2.4 radically changed the authentication and authorization API.  You will
 need to port your AuthCookie subclass over to the Apache 2.4 API.  See the POD
 documentation in L<README.apache-2.4> for more information, but the quick
 rundown is you need to:
@@ -581,7 +581,7 @@ Remove all C<PerlAuthzHandler> configuration entries.
 =item *
 
 Write Authz Provider methods for any C<Requires> directives that you are using
-that apache does not provide for already (e.g. apache already handles C<user>
+that Apache does not provide for already (e.g. Apache already handles C<user>
 and C<valid-user>) and register them with something like.
 
  PerlAddAuthzProvier species Sample::AuthCookieHandler->authz_species
@@ -650,8 +650,8 @@ L<Apache2::AuthCookie::Base>
 
 =head1 SOURCE
 
-The development version is on github at L<https://https://github.com/mschout/apache-authcookie>
-and may be cloned from L<git://https://github.com/mschout/apache-authcookie.git>
+The development version is on github at L<https://github.com/mschout/apache-authcookie>
+and may be cloned from L<https://github.com/mschout/apache-authcookie.git>
 
 =head1 BUGS
 

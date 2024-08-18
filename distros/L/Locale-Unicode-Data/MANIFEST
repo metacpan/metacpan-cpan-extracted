@@ -13,6 +13,7 @@ scripts/cldr-schema.sql
 scripts/create_database.pl
 t/00.load.t
 t/01.locale-data.t
+t/02.fatal.t
 t/90.pod.t
 t/91.coverage.t
 t/92.signature.t

@@ -1,7 +1,20 @@
 Revision history for Perl module Locale::Unicode::Data
 
+v0.2.0 2024-08-18T12:12:26+0900
+    - Added more data from CLDR with 5 new tables: metazones, timezones_city, timezones_formats, timezones_names and metazones_names, and their method to support the 'v' and 'V' formatting pattern
+    - Improved the documentation
+    - Corrected some bugs in the database creation perl script.
+    - Corrected timezone region in table timezones when timezone is GMT*
+    - Made the database file path global variable absolute
+    - Corrected an ISA check in _dbh
+    - Added method 'timezone_canonical'
+    - Added table locale_number_systems, method locale_number_system and locale_number_systems and their documentation
+    - Added the 'fatal' object option to force exceptions to be fatal
+    - Changed the database handler to be a global re-usable object
+    - Improved statements cache mechanism
+
 v0.1.1 2024-08-03T13:40:30+0900
-    - Minor unit test correction for perl compiled with uselongdouble (NetBSD?)
+    - Minor unit test correction for perl compiled with uselongdouble (NetBSD?). GitLab #1
 
 v0.1.0 2024-08-02T07:39:07+0900
     - Initial release

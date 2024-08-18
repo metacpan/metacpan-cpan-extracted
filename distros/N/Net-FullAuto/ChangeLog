@@ -19,6 +19,97 @@
 #
 #######################################################################
 
+
+2024-08-18  Brian M. Kelly <Brian.Kelly@fullauto.com>
+
+        * Version 1.0000723 released
+
+        * Build BerkeleyDB via exec
+
+2024-08-18  Brian M. Kelly <Brian.Kelly@fullauto.com>
+
+        * Version 1.0000722 released
+
+        * Changed GETBDB to GETBERK
+
+2024-08-17  Brian M. Kelly <Brian.Kelly@fullauto.com>
+
+        * Version 1.0000721 released
+
+        * Fixed test for BDB
+
+2024-08-17  Brian M. Kelly <Brian.Kelly@fullauto.com>
+
+        * Version 1.0000720 released
+
+        * Do exec when GETBDB
+
+2024-08-17  Brian M. Kelly <Brian.Kelly@fullauto.com>
+
+        * Version 1.0000719 released
+
+        * Look for libwww-perl dir when LWP
+
+2024-08-17  Brian M. Kelly <Brian.Kelly@fullauto.com>
+
+        * Version 1.0000718 released
+
+        * Fixed module skipping
+
+2024-08-17  Brian M. Kelly <Brian.Kelly@fullauto.com>
+
+        * Version 1.0000717 released
+
+        * exec for Makefile.PL for strictures
+
+2024-08-17  Brian M. Kelly <Brian.Kelly@fullauto.com>
+
+        * Version 1.0000716 released
+
+        * Clean mem after each load
+
+2024-08-17  Brian M. Kelly <Brian.Kelly@fullauto.com>
+
+        * Version 1.0000715 released
+
+        * Expanding the use of exec when installing
+
+2024-08-17  Brian M. Kelly <Brian.Kelly@fullauto.com>
+
+        * Version 1.0000714 released
+
+        * Expanding the use of exec when installing
+
+2024-08-17  Brian M. Kelly <Brian.Kelly@fullauto.com>
+
+        * Version 1.0000713 released
+
+        * More fa_module_module converted vs fa_module_mod
+
+2024-08-17  Brian M. Kelly <Brian.Kelly@fullauto.com>
+
+        * Version 1.0000712 released
+
+        * Expanding the use of exec when installing
+
+2024-08-17  Brian M. Kelly <Brian.Kelly@fullauto.com>
+
+        * Version 1.0000711 released
+
+        * Testing fa_module_mod vs fa_module_module 
+
+2024-08-17  Brian M. Kelly <Brian.Kelly@fullauto.com>
+
+        * Version 1.0000710 released
+
+        * Added List::Util to get gcc mem treatment
+
+2024-08-17  Brian M. Kelly <Brian.Kelly@fullauto.com>
+
+        * Version 1.0000709 released
+
+        * Corrected Data::Dump::Streamer bug via exec
+
 2024-08-16  Brian M. Kelly <Brian.Kelly@fullauto.com>
 
         * Version 1.0000708 released

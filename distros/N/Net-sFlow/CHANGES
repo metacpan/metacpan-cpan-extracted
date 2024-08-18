@@ -1,6 +1,9 @@
 Revision history for Perl extension Net-sFlow
 
-0.13 2024-07-02T11:02:20Z
+
+0.14 2024-08-18T10:18:52Z
+  + fix bugs in _decodeIPv6Data() and _decodeNatData()
+    thanks steven! :D
 
 0.13 2024-07-02T10:51:40Z
   + decode sample type 2201 (http_counters)

@@ -1,5 +1,5 @@
 package Tree::RB::XS;
-$Tree::RB::XS::VERSION = '0.13';
+$Tree::RB::XS::VERSION = '0.14';
 # VERSION
 # ABSTRACT: Red/Black Tree and LRU Cache implemented in C
 
@@ -324,9 +324,31 @@ Whether L</lookup> and L</get> methods automatically mark a node as the most rec
 
 C<kv>
 
-An initial list of C<key,value> pairs to initialize the tree with.  If allow_duplicates
+An initial arrayref of C<key,value> pairs to initialize the tree with.  If allow_duplicates
 is requested, this uses L</insert_multi>, else it uses L</put_multi> (so later duplicate
 keys replace the values of earlier ones).
+
+=item *
+
+C<keys>
+
+An arrayref of keys to use to initialize the tree.  If C<values> are not provided, the value
+of each node will be C<undef>.
+
+=item *
+
+C<values>
+
+An arrayref of values to use to initialize the tree.  If provided, it must be the same length
+as C<keys>.
+
+=item *
+
+C<recent>
+
+Specifies a list of integers which initialize the list used by the "track_recent" feature,
+overriding the order seen in C<keys> or C<kv>.  The integer refers to the L</nth> node of the
+assembled tree.  The list does not need to include all the nodes.
 
 =back
 
@@ -357,7 +379,7 @@ comparison functions.
 Boolean, read/write.  Controls whether L</insert> will allow additional nodes with
 keys that already exist in the tree.  This does not change the behavior of L</put>,
 only L</insert>.  If you set this to false, it does not remove duplicates that
-already existed.  The initial value is false.
+already exist in the tree.  The initial value is false.
 
 =head2 compat_list_get
 
@@ -1041,7 +1063,7 @@ The fastest pure-perl module on CPAN for ordered hashes / LRU caches.
 
 =head1 VERSION
 
-version 0.13
+version 0.14
 
 =head1 AUTHOR
 

@@ -1962,7 +1962,7 @@ STORABLE_freeze(tree, cloning)
 						name? name : "NULL"
 					);
 				av_push(attrs, newSVpvs("compare_fn"));
-				av_push(attrs, newSVpvf(pTHX_ "%s::%s", HvNAME(stash), name));
+				av_push(attrs, newSVpvf("%s::%s", HvNAME(stash), name));
 			}
 		}
 

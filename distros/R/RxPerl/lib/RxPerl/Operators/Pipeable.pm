@@ -5,7 +5,7 @@ use warnings;
 use RxPerl::Operators::Creation qw/
     rx_observable rx_subject rx_concat rx_of rx_interval rx_combine_latest rx_concat
     rx_throw_error rx_zip rx_merge rx_on_error_resume_next rx_race rx_timer
-    rx_behavior_subject
+    rx_behavior_subject rx_defer
 /;
 use RxPerl::ConnectableObservable;
 use RxPerl::Utils qw/ get_timer_subs /;
@@ -29,7 +29,7 @@ our @EXPORT_OK = qw/
 /;
 our %EXPORT_TAGS = (all => \@EXPORT_OK);
 
-our $VERSION = "v6.29.4";
+our $VERSION = "v6.29.5";
 
 sub op_audit {
     my ($duration_selector) = @_;
@@ -267,7 +267,13 @@ sub op_concat_map {
         my ($source) = @_;
 
         return $source->pipe(
-            op_map($observable_factory),
+            op_map(sub {
+                my @args = @_;
+                return rx_defer(sub {
+                    local $_ = $args[0];
+                    $observable_factory->(@args);
+                });
+            }),
             op_concat_all(),
         );
     };

@@ -8,9 +8,13 @@ README
 README.html
 README.md
 dist.ini
-echo
-examples/transformations_1.pl
+examples/transformations/01.pl
+examples/transformations/02.pl
 lib/DBIx/Squirrel.pm
+lib/DBIx/Squirrel/Transform/Data/Dumper.pm
+lib/DBIx/Squirrel/Transform/IO.pm
+lib/DBIx/Squirrel/Transform/JSON/Syck.pm
+lib/DBIx/Squirrel/Transform/YAML/Syck.pm
 lib/DBIx/Squirrel/db.pm
 lib/DBIx/Squirrel/dr.pm
 lib/DBIx/Squirrel/it.pm

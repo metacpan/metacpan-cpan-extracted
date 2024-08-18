@@ -12,13 +12,16 @@ use Const::Fast;
 use Carp;
 use IPC::Open2;
 use SlapbirdAPM::Trace;
+use System::Info;
 use namespace::clean;
 
+$Carp::Internal{__PACKAGE__} = 1;
+
 const my $SLAPBIRD_APM_URI => $ENV{SLAPBIRD_APM_DEV}
-  ? 'slapbirdapm.com:3000/apm'
+  ? $ENV{SLAPBIRD_APM_URI} . '/apm'
   : 'https://slapbirdapm.com/apm';
 const my $SLAPBIRD_APM_NAME_URI => $ENV{SLAPBIRD_APM_DEV}
-  ? 'slapbirdapm.com:3000/apm/name'
+  ? $ENV{SLAPBIRD_APM_URI} . '/apm/name'
   : 'https://slapbirdapm.com/apm/name';
 const my $UA => Mojo::UserAgent->new();
 
@@ -26,7 +29,7 @@ my $should_request = 1;
 my $next_timestamp;
 
 sub _call_home {
-    my ( $json, $key, $app ) = @_;
+    my ( $json, $key, $app, $quiet ) = @_;
     return $UA->post_p(
         $SLAPBIRD_APM_URI,
         { 'x-slapbird-apm' => $key },
@@ -42,7 +45,7 @@ sub _call_home {
                     $next_timestamp = $t + ( 86400 - $t );
                     $app->log->warn(
 "You've hit your maximum number of requests for today. Please visit slapbirdapm.com to upgrade your plan."
-                    );
+                    ) unless $quiet;
                     return;
                 }
                 $app->log->warn(
@@ -91,9 +94,10 @@ sub _enable_mojo_ua_tracking {
 sub register {
     my ( $self, $app, $conf ) = @_;
     my $key             = $conf->{key} // $ENV{SLAPBIRDAPM_API_KEY};
-    my $topology        = exists $conf->{topology} ? 1 : $conf->{topology};
+    my $topology        = exists $conf->{topology} ? $conf->{topology} : 1;
     my $ignored_headers = $conf->{ignored_headers};
     my $no_trace        = $conf->{no_trace};
+    my $quiet           = $conf->{quiet};
     my $stack           = [];
     my $in_request      = 0;
 
@@ -160,9 +164,10 @@ sub register {
                     requestor => $c->req->headers->header('x-slapbird-name')
                       // 'UNKNOWN',
                     handler => $controller_name,
-                    stack   => $stack
+                    stack   => $stack,
+                    os      => System::Info->new->os
                 },
-                $key, $app
+                $key, $app, $quiet
             );
 
             $in_request = 0;
@@ -176,8 +181,9 @@ sub register {
     my $name;
     try {
         $name =
-          _ua()->get( $SLAPBIRD_APM_NAME_URI => { 'x-slapbird-apm' => $key } )
-          ->result()->json()->{name};
+          Mojo::UserAgent->new->get(
+            $SLAPBIRD_APM_NAME_URI => { 'x-slapbird-apm' => $key } )->result()
+          ->json()->{name};
         _enable_mojo_ua_tracking($name) if $topology;
     }
     catch {

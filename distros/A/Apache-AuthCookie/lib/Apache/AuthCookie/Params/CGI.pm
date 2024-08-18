@@ -1,5 +1,5 @@
 package Apache::AuthCookie::Params::CGI;
-$Apache::AuthCookie::Params::CGI::VERSION = '3.31';
+$Apache::AuthCookie::Params::CGI::VERSION = '3.32';
 # ABSTRACT: Internal CGI Params Subclass
 
 use strict;
@@ -182,7 +182,7 @@ Apache::AuthCookie::Params::CGI - Internal CGI Params Subclass
 
 =head1 VERSION
 
-version 3.31
+version 3.32
 
 =head1 SYNOPSIS
 
@@ -253,8 +253,8 @@ header is not present.
 
 =head1 SOURCE
 
-The development version is on github at L<https://https://github.com/mschout/apache-authcookie>
-and may be cloned from L<git://https://github.com/mschout/apache-authcookie.git>
+The development version is on github at L<https://github.com/mschout/apache-authcookie>
+and may be cloned from L<https://github.com/mschout/apache-authcookie.git>
 
 =head1 BUGS
 

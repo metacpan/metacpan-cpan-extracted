@@ -1,7 +1,7 @@
 #!/usr/bin/env perl
 ##----------------------------------------------------------------------------
 ## Unicode CLDR SQL Data - ~/scripts/create_database.pl
-## Version v0.1.0
+## Version v0.1.1
 ## Copyright(c) 2024 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2024/06/15
@@ -19,6 +19,7 @@ use utf8;
 use vars qw( $VERSION $DEBUG $VERBOSE $LOG_LEVEL $PROG_NAME $MAINTAINER
              $opt $opts
              $out $err @argv );
+use Clone ();
 use Data::Pretty qw( dump );
 use DateTime;
 use DateTime::Format::Strptime;
@@ -34,7 +35,7 @@ use Module::Generic::Array;
 use Pod::Usage;
 use Scalar::Util qw( looks_like_number );
 use XML::LibXML;
-our $VERSION = 'v0.1.0';
+our $VERSION = 'v0.1.1';
 our $DEBUG = 0;
 our $VERBOSE = 0;
 our $LOG_LEVEL = 0;
@@ -302,7 +303,10 @@ sub process
         locales => "INSERT INTO locales (locale, parent, status) VALUES(?, ?, ?)",
         locales_info => "INSERT INTO locales_info (locale, property, value) VALUES(?, ?, ?)",
         locales_l10n => "INSERT INTO locales_l10n (locale, locale_id, locale_name, alt) VALUES(?, ?, ?, ?)",
+        locale_number_systems => "INSERT INTO locale_number_systems (locale, number_system, native, traditional, finance) VALUES(?, ?, ?, ?, ?)",
         metainfos => "INSERT INTO metainfos (property, value) VALUES(?, ?)",
+        metazones => "INSERT INTO metazones (metazone, territories, timezones) VALUES(?, ?, ?)",
+        metazones_names => "INSERT INTO metazones_names (locale, metazone, width, generic, standard, daylight) VALUES(?, ?, ?, ?, ?, ?)",
         number_formats_l10n => "INSERT INTO number_formats_l10n (locale, number_system, number_type, format_length, format_type, format_id, format_pattern, alt, count) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?)",
         number_symbols_l10n => "INSERT INTO number_symbols_l10n (locale, number_system, property, value, alt) VALUES(?, ?, ?, ?, ?)",
         number_systems => "INSERT INTO number_systems (number_system, digits, type) VALUES(?, ?, ?)",
@@ -318,8 +322,11 @@ sub process
         territories => "INSERT INTO territories (territory, parent, gdp, literacy_percent, population, languages, contains, currency, calendars, min_days, first_day, weekend, status) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
         territories_l10n => "INSERT INTO territories_l10n (locale, territory, locale_name, alt) VALUES(?, ?, ?, ?)",
         time_formats => "INSERT INTO time_formats (region, territory, locale, time_format, time_allowed) VALUES(?, ?, ?, ?, ?)",
-        timezones => "INSERT INTO timezones (timezone, territory, region, tzid, metazone, tz_bcpid, is_golden) VALUES(?, ?, ?, ?, ?, ?, ?)",
+        timezones => "INSERT INTO timezones (timezone, territory, region, tzid, metazone, tz_bcpid, is_golden, is_preferred,is_canonical,  alias) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+        timezones_cities => "INSERT INTO timezones_cities (locale, timezone, city, alt) VALUES(?, ?, ?, ?)",
+        timezones_formats => "INSERT INTO timezones_formats (locale, type, subtype, format_pattern) VALUES(?, ?, ?, ?)",
         timezones_info => "INSERT INTO timezones_info (timezone, metazone, start, until) VALUES(?, ?, ?, ?)",
+        timezones_names => "INSERT INTO timezones_names (locale, timezone, width, generic, standard, daylight) VALUES(?, ?, ?, ?, ?, ?)",
         unit_aliases => "INSERT INTO unit_aliases (alias, target, reason) VALUES(?, ?, ?)",
         unit_constants => "INSERT INTO unit_constants (constant, expression, value, description, status) VALUES(?, ?, ?, ?, ?)",
         unit_conversions => "INSERT INTO unit_conversions (source, base_unit, expression, factor, systems, category) VALUES(?, ?, ?, ?, ?, ?)",
@@ -726,7 +733,7 @@ sub process
     # NOTE: Collecting territories data
     &log( "Collecting territories data." );
     $n = 0;
-    my $terrRes = $suppDoc->findnodes( '//territoryInfo/territory' ) ||
+    my $terrRes = $suppDoc->findnodes( '/supplementalData/territoryInfo/territory' ) ||
         die( "Unable to get the territories information in ${supplemental_data_file}" );
     if( !$terrRes->size )
     {
@@ -746,6 +753,7 @@ sub process
             population => $el->getAttribute( 'population' ),
         };
         my $langs = {};
+        my $langs_order = [];
         my @langPop = $el->getElementsByTagName( 'languagePopulation' );
         foreach my $lel ( @langPop )
         {
@@ -761,8 +769,10 @@ sub process
                 writing_percent => $lel->getAttribute( 'writingPercent' ),
                 official_status => $lel->getAttribute( 'officialStatus' ),
             };
+            push( @$langs_order, $lang );
         }
         $territoryInfo->{ $code }->{language_population} = $langs;
+        $territoryInfo->{ $code }->{_langs} = $langs_order;
     }
     
     # NOTE: Adding missing territory codes
@@ -1323,7 +1333,10 @@ sub process
     {
         my $def = $territoryInfo->{ $code };
         # This territory languages sorted by usage popularity
-        my $langs = [sort{ $def->{language_population}->{ $b }->{population_percent} <=> $def->{language_population}->{ $a }->{population_percent} } keys( %{$def->{language_population}} )];
+        # Too unreliable
+        # my $langs = [sort{ $def->{language_population}->{ $b }->{population_percent} <=> $def->{language_population}->{ $a }->{population_percent} } keys( %{$def->{language_population}} )];
+        # A private property in which we stored the language in the order it was in the XML file
+        my $langs = $def->{_langs};
         $out->print( "[${code}] " ) if( $DEBUG );
         if( !defined( $def->{parent} ) ||
             !length( $def->{parent} // '' ) )
@@ -2094,6 +2107,40 @@ sub process
     
     my $zone_file = $basedir->child( 'supplemental/metaZones.xml' );
     my $zoneDoc = load_xml( $zone_file );
+
+    # NOTE: Loading metazones
+    &log( "Loading metazones." );
+    my $metazonesRes = $zoneDoc->findnodes( '/supplementalData/metaZones/mapTimezones/mapZone[@type]' );
+    if( !$metazonesRes->size )
+    {
+        die( "No metazone data found in file ${zone_file}" );
+    }
+    $sth = $sths->{metazones} || die( "Unable to get the statement object for table \"metazones\"." );
+    my $metazones = {};
+    # <mapZone other="Acre" territory="001" type="America/Rio_Branco"/>
+    while( my $el = $metazonesRes->shift )
+    {
+        my $id = $el->getAttribute( 'other' ) || die( "Unable to get the metazone from the attribute 'other' for this element: ", $el->toString() );
+        my $territory = $el->getAttribute( 'territory' );
+        my $timezone = $el->getAttribute( 'type' );
+        $metazones->{ $id } ||= 
+        {
+            metazone => $id,
+            territories => [],
+            timezones => [],
+        };
+        push( @{$metazones->{ $id }->{territories}}, $territory );
+        push( @{$metazones->{ $id }->{timezones}}, $timezone );
+    }
+    foreach my $zone ( sort( keys( %$metazones ) ) )
+    {
+        my $def = $metazones->{ $zone };
+        eval
+        {
+            $sth->execute( $def->{metazone}, to_array( $def->{territories} ), to_array( $def->{timezones} ) );
+        } || die( "Error adding metazone information for metazone '$def->{metazone}': ", ( $@ || $sth->errstr ), "\n", dump( $def ) );
+    }
+
     # NOTE: Loading the IANA Olson time zone database
     &log( "Loading the IANA Olson time zone database." );
     # Those time zones have the territory set to 001, because the CLDR misuses that property to flag them as "golden" time zones. We instead set a 'is_golden' field in the timezones table
@@ -2215,7 +2262,17 @@ sub process
     {
         die( "No primary timezones found in ${zone_file}" );
     }
-    my $tzs = {};
+    my $tzs = 
+    {
+        # Default value used in localised data
+        'Etc/Unknown' => 
+        {
+            timezone => 'Etc/Unknown',
+            territory => 'ZZ',
+            region => 'Etc',
+            is_golden => 0,
+        }
+    };
     
     # NOTE: Pre-loading time zone information
     &log( "Pre-loading time zone information." );
@@ -2241,6 +2298,8 @@ sub process
             $tzs->{ $tz }->{region} = [split( /\//, $tz )]->[0] if( index( $tz, '/' ) != -1 );
             $out->print( "Collected ${tz}\n" ) if( $DEBUG );
         }
+        # We set the value of metazone to the most recent one, and for that we use DateTime to compare DateTime object.
+        my( $metazone, $metazone_from, $metazone_to );
         my @metaZones = $el->getChildrenByTagName( 'usesMetazone' );
         # Example: <usesMetazone to="1979-10-25 23:00" from="1977-10-20 23:00" mzone="Europe_Central"/>
         foreach my $el_meta ( @metaZones )
@@ -2250,10 +2309,12 @@ sub process
                 timezone => $tz,
                 metazone => ( $el_meta->getAttribute( 'mzone' ) || die( "No attribute 'mzone' found on this 'usesMetazone' tag: ", $el_meta->toString() ) ),
                 ( $el_meta->hasAttribute( 'from' ) ? ( start => $el_meta->getAttribute( 'from' ) ) : () ),
-                ( $el_meta->hasAttribute( 'to' ) ? ( until => $el_meta->getAttribute( 'to' ) ) : () ),
+                ( $el_meta->hasAttribute( 'to' ) ? ( 'until' => $el_meta->getAttribute( 'to' ) ) : () ),
             };
             # The first 'usesMetazone' is the most recent, so if it is already set, we ignore
-            $tzs->{ $tz }->{metazone} = $def->{metazone} unless( $tzs->{ $tz }->{metazone} );
+            # This turned out to be too simple.
+            # $tzs->{ $tz }->{metazone} = $def->{metazone} unless( $tzs->{ $tz }->{metazone} );
+            my $metadt = {};
             foreach my $prop ( qw( start until ) )
             {
                 if( exists( $def->{ $prop } ) &&
@@ -2263,6 +2324,7 @@ sub process
                     {
                         my $re = {%+};
                         $def->{ $prop } = sprintf( '%4d-%02d-%02dT%02d:%02d:00', @$re{qw( year month day hour minute )} );
+                        $metadt->{ $prop } = DateTime->new( %$re, time_zone => 'floating' );
                     }
                     else
                     {
@@ -2271,8 +2333,41 @@ sub process
                 }
             }
             push( @{$tz_infos->{ $tz }}, $def );
+            if( exists( $metadt->{start} ) ||
+                exists( $metadt->{until} ) )
+            {
+                if( !defined( $metazone_from ) &&
+                    !defined( $metazone_to ) )
+                {
+                    $metazone_from = $metadt->{start};
+                    $metazone_to = $metadt->{until};
+                    $metazone = $def->{metazone};
+                }
+                elsif( defined( $metadt->{start} ) )
+                {
+                    if( defined( $metazone_to ) &&
+                        $metadt->{start} >= $metazone_to )
+                    {
+                        $metazone = $def->{metazone};
+                    }
+                    else
+                    {
+                        warn( "Warning only: weirdly enough, this meta zone '$def->{metazone}' for the zone ID '$def->{timezone}' is not historically the first one, and yet its start datetime ($def->{from}) is not higher than the previous metazone end datetime (", $metazone_to->iso8601, "): ", dump( $def ) );
+                    }
+                }
+                else
+                {
+                    die( "Time zone ID ${tz} has metazone $def->{metazone}, which is not historically the first one, and yet I could not get a start datetime: ", dump( $def ) );
+                }
+            }
+            else
+            {
+                $metazone = $def->{metazone};
+            }
             ++$n;
         }
+        # End checking each metazone for this timezone
+        $tzs->{ $tz }->{metazone} = $metazone;
     }
     &log( "${n} time zone information pre-loaded." );
     
@@ -2295,11 +2390,6 @@ sub process
         }
         my $territory = $el->getAttribute( 'iso3166' ) ||
             die( "No territory code defined for this primary zone '${tz}': ", $el->toString() );
-    #     if( !exists( $tzs->{ $tz } ) )
-    #     {
-    #         $tzs->{ $tz } = { timezone => $tz };
-    #         $tzs->{ $tz }->{region} = [split( /\//, $tz )]->[0] if( index( $tz, '/' ) != -1 );
-    #     }
         $tzs->{ $tz }->{is_golden} = 1;
         $tzs->{ $tz }->{territory} = $territory unless( $tzs->{ $tz }->{territory} );
     }
@@ -2336,13 +2426,45 @@ sub process
         if( $def->{territory} =~ /^\d{1,3}$/ )
         {
             $def->{territory} = sprintf( '%03d', int( $def->{territory} ) );
+            # "The golden zones are those in mapZone supplemental data under the territory "001"."
+            # <https://unicode.org/reports/tr35/tr35-dates.html#Using_Time_Zone_Names>
             $def->{is_golden} = 1;
         }
+        else
+        {
+            # This is the preferred timezone for this territory
+            # <https://unicode.org/reports/tr35/tr35-dates.html#Time_Zone_Format_Terminology>
+            $def->{is_preferred} = 1;
+        }
+
         foreach my $prop ( keys( %$def ) )
         {
-            $tzs->{ $tz }->{ $prop } = $def->{ $prop };
+            if( $prop eq 'is_golden' ||
+                !exists( $tzs->{ $tz }->{ $prop } ) ||
+                !length( $tzs->{ $tz }->{ $prop } // '' ) )
+            {
+                $tzs->{ $tz }->{ $prop } = $def->{ $prop };
+            }
         }
-        $metazone_to_dict->{ $def->{metazone} } = $tzs->{ $tz };
+        $metazone_to_dict->{ $def->{metazone} } ||= [];
+        push( @{$metazone_to_dict->{ $def->{metazone} }}, $def );
+    }
+
+    # Associating metazone information to timezone that somehow were left out from the metazone to timezone mapping
+    &log( "Setting timezones missing 'territory' and 'is_golden' data" );
+    foreach my $tz ( keys( %$tzs ) )
+    {
+        my $this = $tzs->{ $tz };
+        if( $this->{metazone} && 
+            !$this->{territory} &&
+            exists( $metazone_to_dict->{ $this->{metazone} } ) &&
+            ref( $metazone_to_dict->{ $this->{metazone} } ) &&
+            scalar( @{$metazone_to_dict->{ $this->{metazone} }} ) == 1 )
+        {
+            $out->print( "\tTimezone '${tz}' does not have a territory set, using the entry for metazone '", $this->{metazone}, "' to get the information.\n" ) if( $DEBUG );
+            $this->{territory} = $metazone_to_dict->{ $this->{metazone} }->[0]->{territory};
+            # $this->{is_golden} = $metazone_to_dict->{ $this->{metazone} }->[0]->{is_golden};
+        }
     }
     
     # NOTE: Collecting timezone IDs from metaZones.xml//metaZones/metazoneIds/metazoneId
@@ -2355,8 +2477,12 @@ sub process
         {
             die( "Unable to find the meta zone '${metazone}' in our previously built map." );
         }
-        $metazone_to_dict->{ $metazone }->{tzid} = $id;
-        $out->print( "Set ID '${id}' to metazone '${metazone}' (", $metazone_to_dict->{ $metazone }->{timezone}, "). Time zone now has this tzid (", $tzs->{ $metazone_to_dict->{ $metazone }->{timezone} }->{tzid}, ")\n" ) if( $DEBUG );
+        foreach my $tz_ref ( @{$metazone_to_dict->{ $metazone }} )
+        {
+            my $tz = $tz_ref->{timezone} || die( "Error: no timezone is set: ", dump( $tz_ref ) );
+            $tzs->{ $tz }->{tzid} = $id;
+            $out->print( "Set ID '${id}' to metazone '${metazone}' (", $tzs->{ $tz }->{timezone}, "). Time zone now has this tzid (", $tzs->{ $tz }->{tzid}, ")\n" ) if( $DEBUG );
+        }
     }
     
     # NOTE: Loading additional information from windowsZones
@@ -2383,7 +2509,7 @@ sub process
                 if( !exists( $tzs->{ $zone }->{territory} ) ||
                     !length( $tzs->{ $zone }->{territory} // '' ) ||
                     (
-                        # territory for a time zone may have been set to 001 (WOrld), or some region code,
+                        # territory for a time zone may have been set to 001 (World), or some region code,
                         # but next iteration could allocate a more accurate territory, such as an ISO3166 code
                         length( $tzs->{ $zone }->{territory} // '' ) &&
                         $tzs->{ $zone }->{territory} =~ /^\d{1,3}$/
@@ -2457,14 +2583,48 @@ sub process
         {
             $def->{alias} = [split( /[[:blank:]\h\v]+/, $def->{alias} )];
             # We check each of the IANA timezone ID, and if we find it in the list of timezones previously built, we add our BCP47 timezone ID to it dictionary definition.
+            my $main_tz;
             foreach my $tz ( @{$def->{alias}} )
             {
                 if( exists( $tzs->{ $tz } ) )
                 {
                     $tzs->{ $tz }->{tz_bcpid} = $def->{tzid};
+                    $tzs->{ $tz }->{alias} = [grep( $_ ne $tz, @{$def->{alias}} )];
+                    $tzs->{ $tz }->{is_preferred} = 0 unless( defined( $tzs->{ $tz }->{is_preferred} ) );
+                    $tzs->{ $tz }->{is_canonical} = 0 unless( defined( $tzs->{ $tz }->{is_canonical} ) );
                     $out->print( "alias added to time zone '${tz}'. " ) if( $DEBUG );
+                    $main_tz = $tz if( !defined( $main_tz ) );
+                }
+                else
+                {
+                    $out->print( "Unknown time zone '${tz}' found in BCP47 time zones for BCP47 tz ID '$def->{tzid}', adding it to our list of known timezones.\n" ) if( $DEBUG );
+                    unless( defined( $main_tz ) )
+                    {
+                        foreach my $tz ( @{$def->{alias}} )
+                        {
+                            if( exists( $tzs->{ $tz } ) )
+                            {
+                                $main_tz = $tz;
+                                last;
+                            }
+                        }
+                    }
+                    if( !defined( $main_tz ) )
+                    {
+                        die( "This timezone ID '${tz}' is not known to us yet, and none of its aliases are either: '", join( "', '", @{$def->{alias}} ), "'" );
+                    }
+                    my $tz_info = Clone::clone( $tzs->{ $main_tz } );
+                    $tz_info->{timezone} = $tz;
+                    $tz_info->{region} = [split( '/', $tz )]->[0];
+                    $tz_info->{tz_bcpid} = $def->{tzid};
+                    $tz_info->{alias} = [grep( $_ ne $tz, @{$def->{alias}} )];
+                    $tz_info->{is_preferred} = 0;
+                    $tz_info->{is_canonical} = 0;
+                    $tzs->{ $tz } = $tz_info;
                 }
             }
+            # The first one is the canonical timezone as per the LDML specifications
+            $tzs->{ $def->{alias}->[0] }->{is_canonical} = 1;
         }
     
         eval
@@ -2480,6 +2640,7 @@ sub process
     my $tz_debug_file = $script_dir->child( 'timezones.json' );
     $tz_debug_file->unload_json( $tzs => { pretty => 1, canonical => 1 } ) || die( $tz_debug_file->error );
     
+    # NOTE: Loading time zones
     &log( "Loading time zones." );
     $n = 0;
     $sth = $sths->{timezones} || die( "No SQL statement object for timezones" );
@@ -2513,6 +2674,10 @@ sub process
                 die( "Missing 'territory' property for time zone '${tz}': ", dump( $def ) );
             }
         }
+        elsif( substr( $tz, 0, 3 ) eq 'GMT' )
+        {
+            $def->{region} = 'World';
+        }
         eval
         {
             $sth->bind_param( 1, $def->{timezone}, SQL_VARCHAR );
@@ -2522,6 +2687,9 @@ sub process
             $sth->bind_param( 5, $def->{metazone}, SQL_VARCHAR );
             $sth->bind_param( 6, $def->{tz_bcpid}, SQL_VARCHAR );
             $sth->bind_param( 7, $def->{is_golden}, SQL_BOOLEAN );
+            $sth->bind_param( 8, $def->{is_preferred}, SQL_BOOLEAN );
+            $sth->bind_param( 9, $def->{is_canonical}, SQL_BOOLEAN );
+            $sth->bind_param( 10, to_array( $def->{alias} ), SQL_VARCHAR );
             $sth->execute;
         } || die( "Error adding time zone information for time zone '${tz}': ", ( $@ || $sth->errstr ), "\n", dump( $def ) );
         $out->print( "ok\n" ) if( $DEBUG );
@@ -3242,7 +3410,7 @@ sub process
         my $rbnfRes = $rbnfDoc->findnodes( '//rbnf/rulesetGrouping' );
         if( !$rbnfRes->size )
         {
-            warn( "Warning only: unable to get the RBNF groupings for locale '${locale}' in file $f" );
+            warn( "Warning only: no RBNF grouping found for locale '${locale}' in file $f" );
             $out->print( "ignored\n" ) if( $DEBUG );
             next;
         }
@@ -3548,9 +3716,14 @@ sub process
     my $sth_cyclic = $sths->{calendar_cyclics_l10n} || die( "No SQL statement object for calendar_cyclics_l10n" );
     my $sth_field = $sths->{date_fields_l10n} || die( "No SQL statement object for date_fields_l10n" );
     my $sth_locale_info = $sths->{locales_info} || die( "No SQL statement object for locales_info" );
+    my $sth_locale_num_sys = $sths->{locale_number_systems} || die( "No SQL statement object for locale_number_systems" );
     my $sth_num_sys_l10n = $sths->{number_systems_l10n} || die( "No SQL statement object for number_systems_l10n" );
     my $sth_cals_l10n = $sths->{calendars_l10n} || die( "No SQL statement object for calendars_l10n" );
     my $sth_collation_l10n = $sths->{collations_l10n} || die( "No SQL statement object for collations_l10n" );
+    my $sth_timezone_city = $sths->{timezones_cities} || die( "No SQL statement object for timezones_cities" );
+    my $sth_tz_formats = $sths->{timezones_formats} || die( "No SQL statement object for timezones_formats" );
+    my $sth_tz_names = $sths->{timezones_names} || die( "No SQL statement object for timezones_names" );
+    my $sth_metatz_names = $sths->{metazones_names} || die( "No SQL statement object for metazones_names" );
     my $patch =
     {
         '45.0' =>
@@ -3610,6 +3783,7 @@ sub process
 
     # calendar_id -> date|time -> full|long|medium|short = datetimeSkeleton
     my $calendars_date_time_skeletons = {};
+    $out->printf( "Processing %d localised data files.\n", scalar( @files ) ) if( $DEBUG );
     foreach my $f ( @files )
     {
         next unless( $f->extension eq 'xml' );
@@ -3642,11 +3816,11 @@ sub process
         if( $hasData->size )
         {
             # NOTE: Loading locales L10N
-            &log( "\tLoading Locales L10N for locale ${locale}." );
+            &log( "[${locale}] Loading Locales L10N for locale ${locale}." );
             $localesRes = $mainDoc->findnodes( '//localeDisplayNames/languages/language[@type]' );
             if( !$localesRes->size )
             {
-                warn( "Warning only: unable to get the localised names for locale '${locale}' for locales in file $f" );
+                warn( "Warning only: no locales localised names found for locale '${locale}' in file $f" );
             }
             # Example: <language type="ja">japonais</language>
             while( my $el = $localesRes->shift )
@@ -3706,7 +3880,7 @@ sub process
             $localesRes = $mainDoc->findnodes( '//localeDisplayNames/scripts/script[@type]' );
             if( !$localesRes->size )
             {
-                warn( "Warning only: unable to get the localised names for locale '${locale}' for scripts in file $f" );
+                warn( "Warning only: no scripts localised names found for locale '${locale}' in file $f" );
             }
             # Example: <script type="Jpan">japonais</script>
             while( my $el = $localesRes->shift )
@@ -3737,7 +3911,7 @@ sub process
             $localesRes = $mainDoc->findnodes( '//localeDisplayNames/territories/territory[@type]' );
             if( !$localesRes->size )
             {
-                warn( "Warning only: unable to get the localised names for locale '${locale}' for territories in file $f" );
+                warn( "Warning only: no territories localised names found for locale '${locale}' in file $f" );
             }
             # Example: <territory type="JP">Japon</territory>
             while( my $el = $localesRes->shift )
@@ -3772,7 +3946,7 @@ sub process
             $localesRes = $mainDoc->findnodes( '//localeDisplayNames/variants/variant[@type]' );
             if( !$localesRes->size )
             {
-                warn( "Warning only: unable to get the localised names for locale '${locale}' for variants in file $f" );
+                warn( "Warning only: no variants localised names found for locale '${locale}' in file $f" );
             }
             # Example: <variant type="VALENCIA">valencien</variant>
             while( my $el = $localesRes->shift )
@@ -3831,7 +4005,7 @@ sub process
                 my $namesRes = $el->findnodes( './displayName' );
                 if( !$namesRes->size )
                 {
-                    warn( "Warning only: currency '${id}' exists for locale ${locale}, but no localised names is defined in file $f for this element: ", $el->toString() );
+                    warn( "Warning only: currency '${id}' exists for locale ${locale}, but no localised names is defined in file $f for this element: ", $el->toString() ) unless( $locale eq 'und' );
                 }
                 while( my $el_name = $namesRes->shift )
                 {
@@ -3866,7 +4040,7 @@ sub process
             # next;
         }
     
-        # NOTE: Load calendar terms, locale eras, formats and more
+        # NOTE: Load calendar terms, locale eras, formats, timezones and more
         &log( "\tLoad calendar terms, locale eras, formats and more." );
         my $calLocalesDatesRes = $mainDoc->findnodes( '/ldml/dates' );
         if( $calLocalesDatesRes->size )
@@ -4083,14 +4257,14 @@ sub process
                 # <timeFormatLength type="long">
                 foreach my $type ( sort( keys( %$cal_date_time_map ) ) )
                 {
-                    $out->print( "Checking for formats for ${type}\n" ) if( $DEBUG );
+                    $out->print( "\t\tChecking for formats for ${type}\n" ) if( $DEBUG );
                     my $this = $cal_date_time_map->{ $type };
                     # A cache of pattern value to their ID (skeleton) so we can lookup a missing skeleton for an identical pattern
                     my $cache_values = {};
                     my $calDateOrTimeContainerRes = $el->findnodes( $this->{xpath_container} );
                     if( !$calDateOrTimeContainerRes->size )
                     {
-                        $out->print( "\tno format of type ${type} found for locale ${locale} for calendar ${cal_id}\n" ) if( $DEBUG );
+                        $out->print( "\t\tno format of type ${type} found for locale ${locale} for calendar ${cal_id}\n" ) if( $DEBUG );
                         next;
                     }
                     my $el_container = $calDateOrTimeContainerRes->shift;
@@ -4118,7 +4292,7 @@ sub process
                         my $calDateOrTimeFormatRes = $el_len->findnodes( $this->{xpath_fmt} );
                         if( !$calDateOrTimeFormatRes->size )
                         {
-                            $out->print( "\tno calendar ${cal_id} formats found for length ${len} for locale ${locale}\n" ) if( $DEBUG );
+                            $out->print( "\t\t\tno calendar ${cal_id} formats found for length ${len} for locale ${locale}\n" ) if( $DEBUG );
                             next;
                         }
                         my $el_fmt = $calDateOrTimeFormatRes->shift;
@@ -4152,7 +4326,7 @@ sub process
                             # If we are processing the root locale, we keep a record of the pattern ID for this length and calendar
                             if( $locale eq 'und' )
                             {
-                                $out->print( "\t[root] Saving pattern ID '${pattern_id}' for length '${len}' for type '${type}', and calendar ID '${cal_id}'\n" ) if( $DEBUG );
+                                $out->print( "\t\t\t[root] Saving pattern ID '${pattern_id}' for length '${len}' for type '${type}', and calendar ID '${cal_id}'\n" ) if( $DEBUG );
                                 $calendars_date_time_skeletons->{ $cal_id } ||= {};
                                 $calendars_date_time_skeletons->{ $cal_id }->{ $type } ||= {};
                                 $calendars_date_time_skeletons->{ $cal_id }->{ $type }->{ $len } = $pattern_id;
@@ -4218,7 +4392,7 @@ sub process
                     my $calDateTimeHasAliasRes = $el_container->findnodes( './alias[@path]' );
                     if( $calDateTimeHasAliasRes->size )
                     {
-                        $out->print( "DateTime container for calendar ${cal_id} is aliased for locale ${locale}, resolving it.\n" ) if( $DEBUG );
+                        $out->print( "\t\tDateTime container for calendar ${cal_id} is aliased for locale ${locale}, resolving it.\n" ) if( $DEBUG );
                         $el_container = resolve_alias( $calDateTimeHasAliasRes ) ||
                             die( "DateTime container for calendar ${cal_id} is aliased, but could not resolve its path for locale ${locale} in file ${f}" );
                     }
@@ -4231,7 +4405,7 @@ sub process
                         my $calDtLengthHasAliasRes = $el_len->findnodes( './alias[@path]' );
                         if( $calDtLengthHasAliasRes->size )
                         {
-                            $out->print( "\tthe DateTime format length ${len} tag is aliased, resolving it.\n" ) if( $DEBUG );
+                            $out->print( "\t\t\tthe DateTime format length ${len} tag is aliased, resolving it.\n" ) if( $DEBUG );
                             $el_len = resolve_alias( $calDtLengthHasAliasRes ) ||
                                 die( "The DateTime format length ${len} for calendar ${cal_id} is aliased, but I am unable to resolve it for locale ${locale} in file ${f} for this element: ", $el_len->toString() );
                         }
@@ -4250,7 +4424,7 @@ sub process
                             my $calDtFormatHasAliasRes = $el_fmt->findnodes( './alias[@path]' );
                             if( $calDtFormatHasAliasRes->size )
                             {
-                                $out->print( "\tThe calendar ${cal_id} DateTime format length ${len} format is aliased, resolving it.\n" ) if( $DEBUG );
+                                $out->print( "\t\t\t\tThe calendar ${cal_id} DateTime format length ${len} format is aliased, resolving it.\n" ) if( $DEBUG );
                                 $el_fmt = resolve_alias( $calDtFormatHasAliasRes ) ||
                                     die( "The calendar ${cal_id} DateTime format length ${len} format is aliased, but I am unable to resolve it for locale ${locale} in file ${f} for this element: ", $el_len->toString() );
                             }
@@ -4332,7 +4506,7 @@ sub process
                         my $calDateTimeAppendHasAliasRes = $el_append->findnodes( './alias[@path]' );
                         if( $calDateTimeAppendHasAliasRes->size )
                         {
-                            $out->print( "Calendar ${cal_id} append formats is aliased, resolving it.\n" ) if( $DEBUG );
+                            $out->print( "\t\tCalendar ${cal_id} append formats is aliased, resolving it.\n" ) if( $DEBUG );
                             $el_append = resolve_alias( $calDateTimeAppendHasAliasRes ) ||
                                 die( "Calendar ${cal_id} append formats is aliased, but I cannot resolve it for locale ${locale} in file ${f} for this element: ", $el_container->toString() );
                         }
@@ -4572,7 +4746,7 @@ sub process
             my $calDateFieldsRes = $el_dates->findnodes( './fields' );
             if( $calDateFieldsRes->size )
             {
-                &log( sprintf( "%d locale date fields found.", $calDateFieldsRes->size ) );
+                &log( sprintf( "\t%d locale date fields found.", $calDateFieldsRes->size ) );
                 my $el_fields = $calDateFieldsRes->shift;
                 my $calDateFieldRes = $el_fields->findnodes( './field[@type]' );
                 while( my $el_field = $calDateFieldRes->shift )
@@ -4610,6 +4784,201 @@ sub process
             else
             {
                 $out->print( "\tno localised date fields for locale ${locale} in file ${f}\n" ) if( $DEBUG );
+            }
+
+            my $tzNamesContainerRes = $el_dates->findnodes( './timeZoneNames' );
+            if( $tzNamesContainerRes->size )
+            {
+                my $el = $tzNamesContainerRes->shift;
+                my $tzNamesAliasRes = $el->findnodes( './alias[@path]' );
+                # Example: <alias source="locale" path="../symbols[@numberSystem='latn']"/>
+                if( $tzNamesAliasRes->size )
+                {
+                    # XXX Remove this
+                    die( "I found an alias for the locale timezone/metazones for locale '${locale}' in file ${f}" );
+                    $el = resolve_alias( $tzNamesAliasRes ) ||
+                        die( "This timezones and metazones names is aliased, but I could not resolve it for locale ${locale} in file ${f} for this element." );
+                }
+
+                # NOTE: Checking locale time zone formats
+                &log( "\tChecking locale time zone formats." );
+                # <https://unicode.org/reports/tr35/tr35-dates.html#Time_Zone_Names>
+                # <regionFormat type="daylight">{0} Daylight Time</regionFormat>
+                my $tzFormatsRes = $el->findnodes( './*[local-name()="hourFormat" or local-name()="gmtFormat" or local-name()="gmtZeroFormat" or local-name()="regionFormat" or local-name()="fallbackFormat"]' );
+                if( $tzFormatsRes->size )
+                {
+                    $out->printf( "\t\tProcessing %d time zone formats for locale '${locale}'\n", $tzFormatsRes->size ) if( $DEBUG );
+                    my $tz_fmt_map =
+                    {
+                        hourFormat => 'hour',
+                        gmtFormat => 'gmt',
+                        gmtZeroFormat => 'gmt_zero',
+                        regionFormat => 'region',
+                        fallbackFormat => 'fallback',
+                    };
+                    my $c = 0;
+                    while( my $el_tz_fmt = $tzFormatsRes->shift )
+                    {
+                        my $tag = $el_tz_fmt->nodeName;
+                        $out->print( "\t\tAdding time zone format of type '${tag}': " ) if( $DEBUG );
+                        if( !exists( $tz_fmt_map->{ $tag } ) )
+                        {
+                            die( "Tag \"${tag}\" is not in our internal type map." );
+                        }
+                        my $def = 
+                        {
+                            locale => $locale,
+                            type => $tz_fmt_map->{ $tag },
+                            format_pattern => trim( $el_tz_fmt->textContent ),
+                        };
+                        if( $el_tz_fmt->hasAttribute( 'type' ) )
+                        {
+                            $def->{subtype} = $el_tz_fmt->getAttribute( 'type' );
+                        }
+    
+                        eval
+                        {
+                            $sth_tz_formats->execute( @$def{qw( locale type subtype format_pattern )} );
+                        } || die( "Error executing query to add timezone format of type '$def->{type}' for locale '${locale}' from file ${f}: ", ( $@ || $sth_tz_formats->errstr ), "\nwith query: ", $sth_tz_formats->{Statement}, "\n", dump( $def ) );
+                        $c++;
+                        $out->print( "ok\n" );
+                    }
+                    $out->print( "\t\t${c} time zone format(s) added.\n" ) if( $DEBUG );
+                }
+                else
+                {
+                    $out->print( "\t\tthe locale ${locale} has no time zone formats set.\n" ) if( $DEBUG );
+                }
+
+                # NOTE: Checking locale time zone sample cities
+                &log( "\tChecking locale time zone sample cities for locale ${locale}." );
+                my $TimeZonesRes = $el->findnodes( './zone[@type]' );
+                my $tz_tags_map =
+                {
+                    exemplarCity => 'city',
+                    long => 'long',
+                    short => 'short',
+                };
+                if( $TimeZonesRes->size )
+                {
+                    &log( sprintf( "\t\t%d locale time zone sample cities found for locale ${locale}.", $TimeZonesRes->size ) );
+                    while( my $el_tz = $TimeZonesRes->shift )
+                    {
+                        my $timezone = $el_tz->getAttribute( 'type' ) || die( "No timezone ID value defined for this element: ", $el->toString() );
+                        $out->print( "\t\t\t[${timezone}]\n" ) if( $DEBUG );
+                        my @kids = $el_tz->nonBlankChildNodes;
+                        $out->printf( "\t\t\t\t%d children nodes found: %s\n", scalar( @kids ), join( ', ', map{ $_->nodeName } @kids ) ) if( $DEBUG );
+                        foreach my $el_kid ( @kids )
+                        {
+                            my $tag = $el_kid->nodeName;
+                            if( !exists( $tz_tags_map->{ $tag } ) )
+                            {
+                                die( "Found tag ${tag} as child of this time zones list, but it is unknown to us for time zone '${timezone}' for locale ${locale} in file ${f} for this element: ", $el_kid->toString() );
+                            }
+                            my $prop = $tz_tags_map->{ $tag } ||
+                                die( "Unable to find an equivalence in our timezone map for the tag ${tag}: ", $el->toString() );
+                            if( $prop eq 'city' )
+                            {
+                                my $def =
+                                {
+                                    locale => $locale,
+                                    timezone => $timezone,
+                                    city => trim( $el_kid->textContent ),
+                                };
+                                if( $el_kid->hasAttribute( 'alt' ) )
+                                {
+                                    $def->{alt} = $el_kid->getAttribute( 'alt' );
+                                }
+                                $out->print( "\t\t\t\tFound sample city '$def->{city}' for timezone '${timezone}' for locale ${locale}\n" ) if( $DEBUG );
+
+                                eval
+                                {
+                                    $sth_timezone_city->execute( @$def{qw( locale timezone city alt )} );
+                                } || die( "Error executing query to add timezone $def->{timezone} sample city '$def->{city}' for locale '${locale}' from file ${f}: ", ( $@ || $sth_timezone_city->errstr ), "\nwith query: ", $sth_timezone_city->{Statement}, "\n", dump( $def ) );
+                                $added->{timezones_cities}++;
+                            }
+                            elsif( $prop eq 'short' || $prop eq 'long' )
+                            {
+                                my $def =
+                                {
+                                    locale => $locale,
+                                    timezone => $timezone,
+                                    width => $prop,
+                                };
+                                my @tz_name_kids = $el_kid->nonBlankChildNodes;
+                                $out->printf( "\t\t\t\tFound ${prop} timezone name definition for timezone '${timezone}' for locale ${locale} with %d children\n", scalar( @tz_name_kids ) ) if( $DEBUG );
+                                if( !scalar( @tz_name_kids ) )
+                                {
+                                    die( "Locale '${locale}' has the time zone '${timezone}' set with time zone name of width '$def->{width}', but no data could be found in file ${f} for this element: ", $el_tz->toString() );
+                                }
+                                foreach my $el_tz_kid ( @tz_name_kids )
+                                {
+                                    my $name_type = $el_tz_kid->nodeName;
+                                    my $name_value = trim( $el_tz_kid->textContent );
+                                    $def->{ $name_type } = $name_value;
+                                }
+                                eval
+                                {
+                                    $sth_tz_names->execute( @$def{qw( locale timezone width generic standard daylight )} );
+                                } || die( "Error executing query to add timezone $def->{timezone} locale names for locale '${locale}' from file ${f}: ", ( $@ || $sth_tz_names->errstr ), "\nwith query: ", $sth_tz_names->{Statement}, "\n", dump( $def ) );
+                            }
+                        }
+                    }
+                }
+                else
+                {
+                    $out->print( "\tno localised time zone sample cities for locale ${locale} in file ${f}\n" ) if( $DEBUG );
+                }
+    
+                # NOTE: Checking for locale metazones
+                &log( "\tChecking for locale metazones." );
+                my $MetazonesRes = $el_dates->findnodes( './timeZoneNames/metazone[@type]' );
+                if( $MetazonesRes->size )
+                {
+                    &log( sprintf( "\t%d locale metazone found.", $MetazonesRes->size ) );
+                    while( my $el_metatz = $MetazonesRes->shift )
+                    {
+                        my $metazone = $el_metatz->getAttribute( 'type' ) ||
+                            die( "No value found for metazone attribute 'type' for this element: ", $el->toString() );
+                        my $MetaTzNamesRes = $el_metatz->findnodes( './*[local-name()="long" or local-name()="short"]' );
+                        $out->printf( "\t\tfound %d metazone long/short localised name(s) for metazone '${metazone}'\n", $MetaTzNamesRes->size ) if( $DEBUG );
+                        while( my $el_tz_width = $MetaTzNamesRes->shift )
+                        {
+                            # 'long' or 'short'
+                            my $tz_name_width = $el_tz_width->nodeName;
+                            my $def =
+                            {
+                                locale => $locale,
+                                metazone => $metazone,
+                                width => $tz_name_width,
+                            };
+                            my $tzNamesTypesRes = $el_tz_width->findnodes( './*[local-name()="generic" or local-name()="standard" or local-name()="daylight"]' );
+                            if( !$tzNamesTypesRes->size )
+                            {
+                                die( "Locale '${locale}' has the metazone '${metazone}' set with metazone name of width '${tz_name_width}', but no data could be found in file ${f} for this element: ", $el->toString() );
+                            }
+                            while( my $el_tz_name = $tzNamesTypesRes->shift )
+                            {
+                                my $name_type = $el_tz_name->nodeName;
+                                my $name_value = trim( $el_tz_name->textContent );
+                                $def->{ $name_type } = $name_value;
+                            }
+                            
+                            eval
+                            {
+                                $sth_metatz_names->execute( @$def{qw( locale metazone width generic standard daylight )} );
+                            } || die( "Error executing query to add timezone $def->{timezone} locale names for locale '${locale}' from file ${f}: ", ( $@ || $sth_metatz_names->errstr ), "\nwith query: ", $sth_metatz_names->{Statement}, "\n", dump( $def ) );
+                        }
+                    }
+                }
+                else
+                {
+                    $out->print( "\t\tno localised metazone found for locale ${locale} in file ${f}\n" ) if( $DEBUG );
+                }
+            }
+            else
+            {
+                $out->print( "\t\tno localised timezones and metazones for locale ${locale} in file ${f}\n" ) if( $DEBUG );
             }
         }
     
@@ -4721,9 +5090,9 @@ sub process
     
         # NOTE: Adding locale number system properties (punctuation, percent, group, etc)
         &log( "\tAdding locale number system symbols (punctuation, percent, group, etc)." );
-        my $localeNumbelSymbolRes = $mainDoc->findnodes( '/ldml/numbers/symbols[@numberSystem]' );
+        my $localeNumberSymbolRes = $mainDoc->findnodes( '/ldml/numbers/symbols[@numberSystem]' );
         $j = 0;
-        if( $localeNumbelSymbolRes->size )
+        if( $localeNumberSymbolRes->size )
         {
             $sth = $sths->{number_symbols_l10n} || die( "No statement object set for table 'number_symbols_l10n'." );
             # Example:
@@ -4765,7 +5134,7 @@ sub process
                 timeSeparator           => 'time_separator',
             };
             my $symbols_data = {};
-            while( my $el = $localeNumbelSymbolRes->shift )
+            while( my $el = $localeNumberSymbolRes->shift )
             {
                 my $sys_id = $el->getAttribute( 'numberSystem' ) ||
                     die( "Unable to get the number system ID for this symbol in attribute 'numberSystem' for locale ${locale} in file ${f} for this element: ", $el->toString() );
@@ -4785,7 +5154,7 @@ sub process
                 {
                     die( "Symbols for number system '${sys_id}' is being redefined for number system ${sys_id} and for locale ${locale} in file ${f} for this element: ", $el->toString() );
                 }
-    
+
                 my @kids = $el->nonBlankChildNodes;
                 foreach my $el_kid ( @kids )
                 {
@@ -4884,6 +5253,8 @@ sub process
         {
             my $el = $numbersRes->shift;
             my( $default_num_system, $other_num_system );
+            # NOTE: Checking for locale default and other numbering systems
+            &log( "Checking for locale default and other numbering systems." );
             # More than one may be defined, but we use only the first one
             my $defNumberingSysRes = $el->findnodes( './defaultNumberingSystem' );
             if( $defNumberingSysRes->size )
@@ -4896,18 +5267,54 @@ sub process
                     die( "A default numbering system ID has been declared with tag 'defaultNumberingSystem', but is actually empty for locale ${locale} in file ${f}" );
                 }
             }
-            my $otherNumberingSysRes = $el->findnodes( './otherNumberingSystems/native' );
+            my $otherNumberingSysRes = $el->findnodes( './otherNumberingSystems' );
             if( $otherNumberingSysRes->size )
             {
                 my $el_other_num_sys = $otherNumberingSysRes->shift;
-                $other_num_system = trim( $el_other_num_sys->textContent );
-                if( !defined( $other_num_system ) ||
-                    !length( $other_num_system // '' ) )
+                my $otherNumberingSysHasAliasRes = $el_other_num_sys->findnodes( './alias[@path]' );
+                if( $otherNumberingSysHasAliasRes->size )
                 {
-                    die( "Other numbering system ID has been declared with tag 'otherNumberingSystems', but is actually empty for locale ${locale} in file ${f}" );
+                    $el_other_num_sys = resolve_alias( $otherNumberingSysHasAliasRes ) ||
+                        die( "Unable to resolve alias for locale other number system for locale ${locale} in file ${f}" );
+                }
+                my @other_num_sys = $el_other_num_sys->nonBlankChildNodes;
+                # <otherNumberingSystems>
+                #     <traditional>jpan</traditional>
+                #     <finance>jpanfin</finance>
+                # </otherNumberingSystems>
+                foreach my $el_other_num_sys ( @other_num_sys )
+                {
+                    my $num_sys_name = $el_other_num_sys->nodeName;
+                    if( $num_sys_name ne 'native' &&
+                        $num_sys_name ne 'traditional' &&
+                        $num_sys_name ne 'finance' )
+                    {
+                        die( "Unknown other numbering system '${num_sys_name}' declared in locale '${locale}' in file ${f} for this element: ", $el_other_num_sys->toString() );
+                    }
+                    $other_num_system //= {};
+                    $other_num_system->{ $num_sys_name } = trim( $el_other_num_sys->textContent );
+                    if( !length( $other_num_system->{ $num_sys_name } // '' ) )
+                    {
+                        die( "Other numbering system ID '${num_sys_name}' has been declared, but is actually empty for locale ${locale} in file ${f} for this element: ", $el_other_num_sys->toString() );
+                    }
+                }
+                if( defined( $default_num_system ) || defined( $other_num_system ) )
+                {
+                    my $def =
+                    {
+                        locale => $locale,
+                        number_system => $default_num_system,
+                        native => $other_num_system->{native},
+                        traditional => $other_num_system->{traditional},
+                        finance => $other_num_system->{finance},
+                    };
+                    eval
+                    {
+                        $sth_locale_num_sys->execute( @$def{qw( locale number_system native traditional finance )} );
+                    } || die( "Error executing SQL query to add locale's numbering systems used for locale ${locale} in file ${f}: ", ( $@ || $sth_locale_num_sys->errstr ), "\nSQL Query: ", $sth_locale_num_sys->{Statement}, "\n", dump( $def ) );
                 }
             }
-    
+
             foreach my $n_type ( sort( keys( %$number_format_map ) ) )
             {
                 $j = 0;
@@ -4936,17 +5343,17 @@ sub process
                             $sys_id = $default_num_system;
                         }
                     }
-                    elsif( defined( $other_num_system ) )
+                    elsif( defined( $other_num_system ) && $other_num_system->{native} )
                     {
-                        my $isDeuplicateRes = $el->findnodes( $this->{xpath_container} . '[@numberSystem="' . $other_num_system . '"]' );
+                        my $isDeuplicateRes = $el->findnodes( $this->{xpath_container} . '[@numberSystem="' . $other_num_system->{native} . '"]' );
                         if( $isDeuplicateRes->size )
                         {
-                            &log( "The number format of type ${type} has no 'numberSystem' attribute set, and the default 'numberSystem' value '${other_num_system}' exists already, so we skip it to avoid creating a duplicate in the database for locale ${locale} in file ${f}" );
+                            &log( "The number format of type ${type} has no 'numberSystem' attribute set, and the default 'numberSystem' value '$other_num_system->{native}' exists already, so we skip it to avoid creating a duplicate in the database for locale ${locale} in file ${f}" );
                             next;
                         }
                         else
                         {
-                            $sys_id = $other_num_system;
+                            $sys_id = $other_num_system->{native};
                         }
                     }
                     else
@@ -5116,9 +5523,9 @@ sub process
                         } || die( "Error executing query to add locale numbering system pattern for locale ${locale} in file ${f}: ", ( $@ || $sth->errstr ), "\nwith query: ", $sth->{Statement}, "\n", dump( $def ) );
                         $j++;
                         $k++;
-                        $out->print( "${k}/${total}\r" ) if( $DEBUG );
+                        $out->print( "${k}/${total}\r" ) if( $DEBUG > 1 );
                     }
-                    $out->print( "\n" ) if( $DEBUG );
+                    $out->print( "\n" ) if( $DEBUG > 1 );
                 }
                 $out->printf( "\t%d ${type} number format patterns added.\n", $j ) if( $DEBUG );
             }
@@ -5208,7 +5615,7 @@ sub process
                 my $unitsRes = $el->findnodes( $this->{xpath_unit} );
                 if( !$unitsRes->size )
                 {
-                    warn( "Warning only: unable to get any unit definition for units of type ${type} with length ${len} for locale ${locale} in file ${f} for this element: ", $el->toString() );
+                    warn( "Warning only: no unit definition found for units of type ${type} with length ${len} for locale ${locale} in file ${f}" );
                     next;
                 }
                 # Example: <compoundUnit type="10p-1">
@@ -5341,10 +5748,12 @@ sub process
                 $def->{alt} = $el->getAttribute( 'alt' );
             }
             $out->print( "\t[$def->{number_system}] " ) if( $DEBUG );
-    
+
+            # finance, native and traditional are part of other possible numbering systems, but undefined in the CLDR
+            # <https://unicode.org/reports/tr35/tr35-numbers.html#otherNumberingSystems>
             if( !exists( $number_systems->{ $def->{number_system} } ) )
             {
-                warn( "Warning only: the number system '$def->{number_system}' used in localised data for locale '${locale}' is unknown to us in file ${f} for element: ", $el->toString() );
+                warn( "Warning only: the number system '$def->{number_system}' used in localised data for locale '${locale}' is unknown to us in file ${f} for element: ", $el->toString() ) unless( $def->{number_system} eq 'native' || $def->{number_system} eq 'traditional' or $def->{number_system} eq 'finance' );
                 $out->print( "unknown, skipping.\n" ) if( $DEBUG );
                 next;
             }
@@ -5981,6 +6390,7 @@ sub process
     {
         $tmpfile->move( $live_db_file, overwrite => 1 ) || die( $tmpfile->error );
     }
+    return(1);
 }
 
 sub find_interval_repeating_field
@@ -5988,7 +6398,7 @@ sub find_interval_repeating_field
     my $ref = shift( @_ );
     my $greatest_diff = $ref->{greatest_diff};
     my $pat = $ref->{pattern};
-    $out->print( "Checking string '$pat' with greatest difference '${greatest_diff}'\n" ) if( $DEBUG );
+    $out->print( "Checking string '$pat' with greatest difference '${greatest_diff}'\n" ) if( $DEBUG > 1 );
     # {0} – {1}
     if( $pat =~ /^(?<p1>\{\d\})(?<sep>[^\{]+)(?<p2>\{\d\})$/ )
     {
@@ -5999,7 +6409,7 @@ sub find_interval_repeating_field
     my $spaces = [];
     if( index( $pat, "'" ) != -1 )
     {
-        $out->print( "Removing quoted literals from pattern: ${pat}\n" ) if( $DEBUG );
+        $out->print( "Removing quoted literals from pattern: ${pat}\n" ) if( $DEBUG > 1 );
         my $n = 0;
         $pat =~ s{
             (?<!\')(\'(?:[^\']+(?!=\'))\')
@@ -6011,7 +6421,7 @@ sub find_interval_repeating_field
             }
             $literals->{ $1 } . '__';
         }gexs;
-        $out->print( "Pattern string is now: ${pat}\n" ) if( $DEBUG );
+        $out->print( "Pattern string is now: ${pat}\n" ) if( $DEBUG > 1 );
     }
     $pat =~ s{
         ([[:blank:]\h]+)
@@ -6050,7 +6460,7 @@ sub find_interval_repeating_field
             if( exists( $equivalent->{ $check } ) &&
                 $pos == -1 )
             {
-                $out->print( "\tFound an equivalent string '", $equivalent->{ $check }, "' for '$check'\n" ) if( $DEBUG );
+                $out->print( "\tFound an equivalent string '", $equivalent->{ $check }, "' for '$check'\n" ) if( $DEBUG > 1 );
                 $pos = index( $pat, $equivalent->{ $check }, $i + length( $equivalent->{ $check } ) );
                 $check = $equivalent->{ $check } if( $pos != -1 );
             }
@@ -6079,7 +6489,7 @@ sub find_interval_repeating_field
     my $best;
     if( scalar( @bests ) > 1 && length( $bests[1] ) == $max_len )
     {
-        $out->printf( "\tFound %d best candidates, checking which is the real best using the greatest difference field '${greatest_diff}'\n", scalar( @bests ) ) if( $DEBUG );
+        $out->printf( "\tFound %d best candidates, checking which is the real best using the greatest difference field '${greatest_diff}'\n", scalar( @bests ) ) if( $DEBUG > 1 );
         my $found;
         foreach my $this ( @bests )
         {
@@ -6102,7 +6512,7 @@ sub find_interval_repeating_field
     {
         $best = $bests[0];
     }
-    $out->print( "\tBest match is '$best'\n" ) if( $DEBUG );
+    $out->print( "\tBest match is '$best'\n" ) if( $DEBUG > 1 );
     my( $start1, $start2 ) = @{$matches->{ $best }};
     if( $DEBUG >= 4 )
     {
@@ -6135,8 +6545,8 @@ sub find_interval_repeating_field
         }
     }
 
-    $out->print( "\tFirst part is '$part1' and second part is '$part2'\n" ) if( $DEBUG );
-    $out->print( "\tSeparator is: '", $sep, "' (", length( $sep ), " bytes)\n" ) if( $DEBUG );
+    $out->print( "\tFirst part is '$part1' and second part is '$part2'\n" ) if( $DEBUG > 1 );
+    $out->print( "\tSeparator is: '", $sep, "' (", length( $sep ), " bytes)\n" ) if( $DEBUG > 1 );
     return( $part1, $sep, $part2, $best );
 }
 
@@ -6455,13 +6865,15 @@ sub resolve_alias
         warn( "Resolved alias for xpath ${xpath} resulted in no element found.\n" );
         return;
     }
+    # "Aliases must be resolved recursively."
+    # <https://www.unicode.org/reports/tr35/#Alias_Elements>
     # Maybe the resolved alias itself is aliased?
     # For example main/root.xml/ldml/dates/fields
     # week-narrow -> week-short -> week
     my $aliasHasAliasRes = $el_resolved->findnodes( './alias[@path]' );
     if( $aliasHasAliasRes->size )
     {
-        warn( "The resolved alias points to another alias, following it." );
+        warn( "The resolved alias with xpath '${xpath}' points to another alias (", $aliasHasAliasRes->get_node(1)->getAttribute( 'path' ), "), following it." );
         return( resolve_alias( $aliasHasAliasRes ) );
     }
     return( $el_resolved );

@@ -1,9 +1,9 @@
 package Apache2::AuthCookie::Base;
-$Apache2::AuthCookie::Base::VERSION = '3.31';
+$Apache2::AuthCookie::Base::VERSION = '3.32';
 # ABSTRACT: Common Methods Shared by Apache2 and Apache2_4 AuthCookie Subclasses.
 
 use strict;
-use mod_perl2 '1.99022';
+use mod_perl2 1.99022;
 use Carp;
 
 use Apache::AuthCookie::Util qw(is_blank is_local_destination);
@@ -568,7 +568,7 @@ Apache2::AuthCookie::Base - Common Methods Shared by Apache2 and Apache2_4 AuthC
 
 =head1 VERSION
 
-version 3.31
+version 3.32
 
 =head1 DESCRIPTION
 
@@ -740,8 +740,8 @@ uris, only special hosts or only limited set of characters.
 
 =head1 SOURCE
 
-The development version is on github at L<https://https://github.com/mschout/apache-authcookie>
-and may be cloned from L<git://https://github.com/mschout/apache-authcookie.git>
+The development version is on github at L<https://github.com/mschout/apache-authcookie>
+and may be cloned from L<https://github.com/mschout/apache-authcookie.git>
 
 =head1 BUGS
 

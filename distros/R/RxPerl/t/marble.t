@@ -693,6 +693,19 @@ subtest 'op_concat_all' => sub {
     obs_is $o, ['--0120120120'];
 };
 
+subtest 'op_concat_map' => sub {
+    my $o = rx_timer(0, 1)->pipe(
+        op_take(3),
+        op_concat_map(sub {
+            my $v = $_;
+            my $p = Mojo::Promise->new;
+            rx_timer(3)->subscribe(sub { $p->resolve($v) });
+            return rx_from($p);
+        }),
+    );
+    obs_is $o, ['---0--1--2'], 'with promises';
+};
+
 subtest 'op_exhaust_map' => sub {
     my $o = rx_interval(3)->pipe(
         op_map(sub {

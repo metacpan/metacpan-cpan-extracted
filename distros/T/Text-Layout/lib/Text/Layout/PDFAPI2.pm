@@ -494,7 +494,7 @@ sub load_font {
 					     -dokern => 1,
 					     $fd->{nosubset}
 					     ? ( -nosubset => 1 )
-					     : (),
+					     : ( -nosubset => 0 ),
 					   );
 	};
     }

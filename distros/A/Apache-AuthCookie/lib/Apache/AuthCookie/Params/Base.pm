@@ -1,5 +1,5 @@
 package Apache::AuthCookie::Params::Base;
-$Apache::AuthCookie::Params::Base::VERSION = '3.31';
+$Apache::AuthCookie::Params::Base::VERSION = '3.32';
 # ABSTRACT: Internal CGI AuthCookie Params Base Class
 
 use strict;
@@ -57,7 +57,7 @@ Apache::AuthCookie::Params::Base - Internal CGI AuthCookie Params Base Class
 
 =head1 VERSION
 
-version 3.31
+version 3.32
 
 =head1 SYNOPSIS
 
@@ -78,8 +78,8 @@ because libapreq2 does not have any support for unicode.
 
 =head1 SOURCE
 
-The development version is on github at L<https://https://github.com/mschout/apache-authcookie>
-and may be cloned from L<git://https://github.com/mschout/apache-authcookie.git>
+The development version is on github at L<https://github.com/mschout/apache-authcookie>
+and may be cloned from L<https://github.com/mschout/apache-authcookie.git>
 
 =head1 BUGS
 

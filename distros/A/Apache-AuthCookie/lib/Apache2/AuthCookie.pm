@@ -1,5 +1,5 @@
 package Apache2::AuthCookie;
-$Apache2::AuthCookie::VERSION = '3.31';
+$Apache2::AuthCookie::VERSION = '3.32';
 # ABSTRACT: Perl Authentication and Authorization via cookies
 
 use strict;
@@ -118,7 +118,7 @@ Apache2::AuthCookie - Perl Authentication and Authorization via cookies
 
 =head1 VERSION
 
-version 3.31
+version 3.32
 
 =head1 SYNOPSIS
 
@@ -696,8 +696,8 @@ L<Apache2::AuthCookie::Base>
 
 =head1 SOURCE
 
-The development version is on github at L<https://https://github.com/mschout/apache-authcookie>
-and may be cloned from L<git://https://github.com/mschout/apache-authcookie.git>
+The development version is on github at L<https://github.com/mschout/apache-authcookie>
+and may be cloned from L<https://github.com/mschout/apache-authcookie.git>
 
 =head1 BUGS
 
