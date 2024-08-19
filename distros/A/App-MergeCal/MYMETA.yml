@@ -19,7 +19,7 @@ no_index:
     - t
     - inc
 requires:
-  Feature::Compat::Class: '0'
+  Feature::Compat::Class: '0.04'
   JSON: '0'
   LWP::Simple: '0'
   Text::vFile::asData: '0'
@@ -27,5 +27,5 @@ requires:
 resources:
   bugtracker: https://github.com/davorg-cpan/app-mergecal/issues
   repository: https://github.com/davorg-cpan/app-mergecal.git
-version: v0.0.4
+version: v0.0.5
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

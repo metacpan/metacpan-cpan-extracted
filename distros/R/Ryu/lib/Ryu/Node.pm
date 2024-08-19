@@ -3,7 +3,7 @@ package Ryu::Node;
 use strict;
 use warnings;
 
-our $VERSION = '3.005'; # VERSION
+our $VERSION = '4.000'; # VERSION
 our $AUTHORITY = 'cpan:TEAM'; # AUTHORITY
 
 =head1 NAME
@@ -43,7 +43,8 @@ like C<< from->combine_latest->count >>.
 # It'd be nice if L<Future> already provided a method for this, maybe I should suggest it
 sub describe {
     my ($self) = @_;
-    ($self->parent ? $self->parent->describe . '=>' : '') . $self->label . '(' . $self->completed->state . ')';
+    my $completed = $self->completed;
+    ($self->parent ? $self->parent->describe . '=>' : '') . '[' . ($self->label // 'unknown') . '](' . ($completed ? $completed->state : 'inactive') . ')';
 }
 
 =head2 completed
@@ -54,30 +55,29 @@ Returns a L<Future> indicating completion (or failure) of this stream.
 
 sub completed {
     my ($self) = @_;
-    return $self->{without_cancel} //= do {
-        my $completion = $self->_completed;
-        $completion->without_cancel->on_ready(sub {
-            my $f = shift;
-            if($f->state ne $completion->state) {
-                warn "Completed state does not match internal state - if you are calling ->completed->@{[$f->state]}, this will not work: use ->finish or ->fail instead";
-            }
-        });
-    };
+    my $completion = $self->_completed
+        or return undef;
+    return $completion->without_cancel->on_ready(sub {
+        my $f = shift;
+        my ($expected) = $f->state =~ /^(\S+)/;
+        my ($actual) = $completion->state =~ /^(\S+)/;
+        if($expected ne $actual) {
+            warn "Completed state $actual does not match internal state $expected - if you are calling ->completed->$expected, this will not work: use ->finish or ->fail instead";
+        }
+    });
 }
 
 # Internal use only, since it's cancellable
 sub _completed {
     my ($self) = @_;
-    $self->{completed} //= do {
-        my $f = $self->new_future(
-            'completion'
-        );
-        $f->on_ready(
-            $self->curry::weak::cleanup
-        ) if $self->can('cleanup');
-        $self->prepare_await if $self->can('prepare_await');
-        $f
-    }
+    return $self->{completed} if $self->{completed};
+    $self->{completed} = my $f = $self->new_future(
+        'completion'
+    );
+    $f->on_ready(
+        $self->curry::weak::cleanup
+    ) if $self->can('cleanup');
+    $f
 }
 
 =head2 pause
@@ -171,9 +171,16 @@ sub is_paused {
 
 sub flow_control {
     my ($self) = @_;
-    $self->{flow_control} //= Ryu::Source->new(
+    return $self->{flow_control} if $self->{flow_control};
+    $self->{flow_control} = my $fc = Ryu::Source->new(
         new_future => $self->{new_future}
-    )
+    );
+    $self->_completed->on_ready(sub {
+        my $fc = delete $self->{flow_control}
+            or return;
+        $fc->finish;
+    });
+    $fc
 }
 
 sub label { shift->{label} }
@@ -204,5 +211,5 @@ Tom Molesworth <TEAM@cpan.org>
 
 =head1 LICENSE
 
-Copyright Tom Molesworth 2011-2023. Licensed under the same terms as Perl itself.
+Copyright Tom Molesworth 2011-2024. Licensed under the same terms as Perl itself.
 

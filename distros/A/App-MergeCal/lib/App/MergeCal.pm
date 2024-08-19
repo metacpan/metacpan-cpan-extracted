@@ -24,7 +24,7 @@ package App::MergeCal; # For PAUSE
 
 class App::MergeCal {
 
-  our $VERSION = '0.0.4';
+  our $VERSION = '0.0.5';
 
   use Encode 'encode_utf8';
   use Text::vFile::asData;

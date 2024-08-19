@@ -71,7 +71,7 @@
 
 <h1 id="VERSION">VERSION</h1>
 
-<p>version 1.2.9</p>
+<p>version 1.2.10</p>
 
 <h1 id="SYNOPSIS">SYNOPSIS</h1>
 
@@ -751,7 +751,7 @@ db-&gt;disconnect();</code></pre>
 
 <p>Find the script and run it:</p>
 
-<pre><code>$ perl -Ilib examples/transformations/1.pl
+<pre><code>$ perl -Ilib examples/transformations/01.pl
 ----
 Name: AC/DC
 ArtistId: 1
@@ -762,7 +762,7 @@ ArtistId: 3
 Name: Rush
 ArtistId: 128</code></pre>
 
-<p>Notice that we got nothing back for one of our artists? That&#39;s because the artist in question is not in our database, and we cannot apply a transformation to nothing.</p>
+<p>Notice that we got nothing back for one of our artists? That&#39;s because the artist in question is not in our database and we cannot apply a transformation to nothing, so nothing is returned.</p>
 
 </li>
 </ol>

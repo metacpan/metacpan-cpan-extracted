@@ -10,6 +10,7 @@ lib/Media/Convert/Asset/ProfileFactory.pm
 lib/Media/Convert/AvSync.pm
 lib/Media/Convert/CodecMap.pm
 lib/Media/Convert/FfmpegInfo.pm
+lib/Media/Convert/KeyframeFinder.pm
 lib/Media/Convert/Map.pm
 lib/Media/Convert/Normalizer.pm
 lib/Media/Convert/Normalizer/Bs1770gain.pm
@@ -28,6 +29,7 @@ t/codecs.t
 t/concat.t
 t/convert.t
 t/copy.t
+t/keyframes.t
 t/normalize.t
 t/pnggen.t
 t/probe.t

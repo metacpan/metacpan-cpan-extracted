@@ -5,7 +5,7 @@ use warnings FATAL => 'all';
 use Scalar::Util 'weaken';
 use Carp 'croak';
 
-our $VERSION = "v0.0.3";
+our $VERSION = "v0.0.4";
 
 sub TIEHASH {
     my ($class, $mbp) = @_;

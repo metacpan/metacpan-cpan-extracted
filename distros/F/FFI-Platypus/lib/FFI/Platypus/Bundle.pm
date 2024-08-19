@@ -6,7 +6,7 @@ use 5.008004;
 use Carp ();
 
 # ABSTRACT: Bundle foreign code with your Perl module
-our $VERSION = '2.08'; # VERSION
+our $VERSION = '2.09'; # VERSION
 
 
 package FFI::Platypus;
@@ -150,7 +150,7 @@ FFI::Platypus::Bundle - Bundle foreign code with your Perl module
 
 =head1 VERSION
 
-version 2.08
+version 2.09
 
 =head1 SYNOPSIS
 
@@ -782,6 +782,8 @@ szTheory
 José Joaquín Atria (JJATRIA)
 
 Pete Houston (openstrike, HOUSTON)
+
+Lukas Mai (MAUKE)
 
 =head1 COPYRIGHT AND LICENSE
 

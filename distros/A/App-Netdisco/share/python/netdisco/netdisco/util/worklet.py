@@ -7,18 +7,23 @@ for writing Python worklets. The context manages stash/vars and status, as well 
 access to job metadata. For convenience netdisco.util.log.debug() is also shared.
 """
 
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 import netdisco.util.log as log
 import netdisco.util.job as job
 import netdisco.util.stash as stash
 import netdisco.util.status as status
+import netdisco.util.config as config
 
 
 @dataclass(frozen=True)
 class Context:
-    job: object = job.job
-    stash: object = stash.stash
-    status: object = status.status
+    job = job.job
+    stash = stash.stash
+    status = status.status
+
+    @staticmethod
+    def setting(name):
+        return config.setting(name)
 
 
 debug = log.debug

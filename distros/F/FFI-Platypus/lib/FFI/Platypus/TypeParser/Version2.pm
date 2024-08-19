@@ -7,7 +7,7 @@ use parent qw( FFI::Platypus::TypeParser::Version1 );
 use constant _version => 2;
 
 # ABSTRACT: FFI Type Parser Version Two
-our $VERSION = '2.08'; # VERSION
+our $VERSION = '2.09'; # VERSION
 
 
 1;
@@ -24,7 +24,7 @@ FFI::Platypus::TypeParser::Version2 - FFI Type Parser Version Two
 
 =head1 VERSION
 
-version 2.08
+version 2.09
 
 =head1 SYNOPSIS
 
@@ -102,6 +102,8 @@ szTheory
 José Joaquín Atria (JJATRIA)
 
 Pete Houston (openstrike, HOUSTON)
+
+Lukas Mai (MAUKE)
 
 =head1 COPYRIGHT AND LICENSE
 

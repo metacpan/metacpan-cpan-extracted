@@ -18,13 +18,13 @@ use Vote::Count::Matrix;
 
 no warnings 'experimental';
 
-our $VERSION='2.02';
+our $VERSION='2.04';
 
 =head1 NAME
 
 Vote::Count - a tool kit for preferential ballots
 
-=head1 VERSION 2.02
+=head1 VERSION 2.04
 
 =head2 A Toolkit for Resolving Preferential Ballots.
 

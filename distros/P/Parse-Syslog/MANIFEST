@@ -1,11 +1,15 @@
 Changes
+License
 Makefile.PL
 MANIFEST
 README
 lib/Parse/Syslog.pm
+t/cpan-meta.t
+t/critic.t
 t/filetail.t
 t/gmt.t
 t/linux.t
+t/linux-rfc3339syslog
 t/linux-syslog
 t/linux-parsed
 t/metalog.t
@@ -14,6 +18,8 @@ t/metalog-parsed
 t/misc.t
 t/misc-parsed
 t/misc-syslog
+t/rfc3339.t
+t/perlcriticrc
 t/solaris26.t
 t/solaris26-syslog
 t/solaris26-parsed
@@ -29,3 +35,4 @@ t/locale-syslog
 t/dst.t
 t/io-stringy.t
 META.yml                                 Module meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

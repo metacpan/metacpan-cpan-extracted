@@ -8,7 +8,7 @@ build_requires:
 configure_requires:
   Module::Build::Tiny: '0.035'
 dynamic_config: 0
-generated_by: 'Minilla/v3.1.10, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Minilla/v3.1.23, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -27,16 +27,16 @@ no_index:
 provides:
   Data::ManBearPig:
     file: lib/Data/ManBearPig.pm
-    version: v0.0.3
+    version: v0.0.4
   Data::WeakMap:
     file: lib/Data/WeakMap.pm
-    version: v0.0.3
+    version: v0.0.4
   Data::WeakMap::Key::Tie:
     file: lib/Data/WeakMap/Key/Tie.pm
-    version: v0.0.3
+    version: v0.0.4
   Data::WeakMap::Tie:
     file: lib/Data/WeakMap/Tie.pm
-    version: v0.0.3
+    version: v0.0.4
 requires:
   Carp: '0'
   Scalar::Util: '0'
@@ -44,8 +44,8 @@ requires:
 resources:
   bugtracker: https://github.com/akarelas/Data-WeakMap-perl/issues
   homepage: https://github.com/akarelas/Data-WeakMap-perl
-  repository: git://github.com/akarelas/Data-WeakMap-perl.git
-version: v0.0.3
+  repository: https://github.com/akarelas/Data-WeakMap-perl.git
+version: v0.0.4
 x_authority: cpan:KARJALA
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
 x_static_install: 1

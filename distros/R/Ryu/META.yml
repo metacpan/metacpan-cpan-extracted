@@ -19,7 +19,7 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.031, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Zilla version 6.032, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -35,28 +35,28 @@ no_index:
 provides:
   Ryu:
     file: lib/Ryu.pm
-    version: '3.005'
+    version: '4.000'
   Ryu::Buffer:
     file: lib/Ryu/Buffer.pm
-    version: '3.005'
+    version: '4.000'
   Ryu::Exception:
     file: lib/Ryu/Exception.pm
-    version: '3.005'
+    version: '4.000'
   Ryu::Node:
     file: lib/Ryu/Node.pm
-    version: '3.005'
+    version: '4.000'
   Ryu::Observable:
     file: lib/Ryu/Observable.pm
-    version: '3.005'
+    version: '4.000'
   Ryu::Sink:
     file: lib/Ryu/Sink.pm
-    version: '3.005'
+    version: '4.000'
   Ryu::Source:
     file: lib/Ryu/Source.pm
-    version: '3.005'
+    version: '4.000'
   Ryu::Stream:
     file: lib/Ryu/Stream.pm
-    version: '3.005'
+    version: '4.000'
 recommends:
   JSON::MaybeUTF8: '1.002'
   MIME::Base64: '0'
@@ -82,7 +82,7 @@ resources:
   bugtracker: https://github.com/team-at-cpan/Ryu/issues
   homepage: https://github.com/team-at-cpan/Ryu
   repository: https://github.com/team-at-cpan/Ryu.git
-version: '3.005'
+version: '4.000'
 x_authority: cpan:TEAM
 x_contributors:
   - 'Binary-Mohanad <mohanad@binary.com>'
@@ -91,6 +91,6 @@ x_contributors:
   - 'Eyad Arnabeh <eyadof@gmail.com>'
   - 'Mohammad S Anwar <mohammad.anwar@yahoo.com>'
   - 'Mohanad Zarzour <51309057+Binary-Mohanad@users.noreply.github.com>'
-x_generated_by_perl: v5.38.0
+x_generated_by_perl: v5.40.0
 x_serialization_backend: 'YAML::Tiny version 1.74'
 x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

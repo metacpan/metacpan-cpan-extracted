@@ -4,6 +4,8 @@ use JSON::MaybeXS qw(decode_json);
 use Moose;
 use Carp;
 
+use autodie qw/:all/;
+
 =head1 NAME
 
 Media::Convert::Pipe - class to generate ffmpeg command lines with Media::Convert::Asset
@@ -248,6 +250,8 @@ sub run_progress {
 		/^(\w+)=(.*)$/;
 		$vals{$1} = $2;
 		if($1 eq 'progress') {
+                        next if $vals{out_time_ms} eq "N/A";
+                        next if $length eq "N/A";
 			my $perc = int($vals{out_time_ms} / $length * 100);
 			if($vals{progress} eq 'end') {
 				$perc = 100;

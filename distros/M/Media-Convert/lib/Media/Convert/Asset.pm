@@ -9,6 +9,8 @@ our $VERSION;
 use Media::Convert;
 use Carp;
 
+use autodie qw/:all/;
+
 =head1 NAME
 
 Media::Convert::Asset - Media::Convert representation of a media asset
@@ -651,21 +653,21 @@ has blackspots => (
 sub _probe_blackspots {
 	my $self = shift;
 	my $blacks = [];
-	pipe R, W;
+	pipe my $R, my $W;
 	if(fork == 0) {
-		open STDERR, ">", "&W";
-		open STDOUT, ">", "&W";
+		open STDERR, ">", "$W";
+		open STDOUT, ">", "$W";
 		my @cmd = ("ffmpeg", "-threads", "1", "-nostats", "-i", $self->url, "-vf", "blackdetect=d=0:pix_th=.01", "-f", "null", "/dev/null");
 		exec @cmd;
 		die "exec failed";
 	}
-	close W;
-	while(<R>) {
+	close $W;
+	while(<$R>) {
 		if(/blackdetect.*black_start:(?<start>[\d\.]+)\sblack_end:(?<end>[\d\.]+)\sblack_duration:(?<duration>[\d\.]+)/) {
 			push @$blacks, { %+ };
 		}
 	}
-	close(R);
+	close($R);
 	return $blacks;
 }
 
@@ -968,13 +970,16 @@ sub _probe {
 	if($self->has_reference) {
 		return $self->reference->_get_probedata;
 	}
-	open my $jsonpipe, "-|:encoding(UTF-8)", "ffprobe", "-loglevel", "quiet", "-print_format", "json", "-show_format", "-show_streams", $self->url;
-	my $json = "";
-	while(<$jsonpipe>) {
-		$json .= $_;
+	if(-e $self->url) {
+		open my $jsonpipe, "-|:encoding(UTF-8)", "ffprobe", "-loglevel", "quiet", "-print_format", "json", "-show_format", "-show_streams", $self->url;
+		my $json = "";
+		while(<$jsonpipe>) {
+			$json .= $_;
+		}
+		close $jsonpipe;
+		return decode_json($json);
 	}
-	close $jsonpipe;
-	return decode_json($json);
+	return {};
 }
 
 sub _probe_audiodata {

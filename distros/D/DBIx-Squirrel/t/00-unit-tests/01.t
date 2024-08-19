@@ -406,12 +406,12 @@ sub test_the_basics
       or dump_val { exp => $exp, got => $got };
 
     ( $exp, $got ) = (
-        { 'n1' => 'a', 'n2' => 'b' },
+        { n1 => 'a', n2 => 'b' },
         {
             @{
                 DBIx::Squirrel::st::_map_placeholders_to_values(
                     { 1 => ':n1', 2 => ':n2' },
-                    ( 'n1' => 'a', 'n2' => 'b' ),
+                    ( n1 => 'a', n2 => 'b' ),
                 )
             }
         },
@@ -420,12 +420,12 @@ sub test_the_basics
       or dump_val { exp => $exp, got => $got };
 
     ( $exp, $got ) = (
-        { 'n1' => 'a', 'n2' => 'b' },
+        { n1 => 'a', n2 => 'b' },
         {
             @{
                 DBIx::Squirrel::st::_map_placeholders_to_values(
                     { 1 => ':n1', 2 => ':n2' },
-                    [ 'n1' => 'a', 'n2' => 'b' ],
+                    [ n1 => 'a', n2 => 'b' ],
                 )
             }
         },
@@ -434,12 +434,12 @@ sub test_the_basics
       or dump_val { exp => $exp, got => $got };
 
     ( $exp, $got ) = (
-        { 'n1' => 'a', 'n2' => 'b' },
+        { n1 => 'a', n2 => 'b' },
         {
             @{
                 DBIx::Squirrel::st::_map_placeholders_to_values(
                     { 1    => ':n1', 2    => ':n2' },
-                    { 'n1' => 'a',   'n2' => 'b' },
+                    { n1 => 'a',   n2 => 'b' },
                 )
             }
         },
@@ -723,7 +723,7 @@ sub test_the_basics
     isa_ok $it, 'DBIx::Squirrel::it';
 
     ( $exp, $got ) = (
-        bless( { 'MaxRows' => 10, 'Slice' => [], }, 'DBIx::Squirrel::it' ),
+        bless( { MaxRows => 10, Slice => [], }, 'DBIx::Squirrel::it' ),
         $it,
     );
     is_deeply $got, $exp, 'iterate'
@@ -731,7 +731,7 @@ sub test_the_basics
 
     ( $exp, $got ) = (
         {
-            'Iterator'   => $it,
+            Iterator   => $it,
             Placeholders => {
                 1 => ":name",
             },
@@ -739,7 +739,7 @@ sub test_the_basics
             NormalisedStatement => "SELECT * FROM media_types WHERE Name = ?",
             Hash => DBIx::Squirrel::util::hash_sql_string("SELECT * FROM media_types WHERE Name = :name"),
         },
-        $sth->{'private_ekorn'},
+        $sth->{private_ekorn},
     );
     is_deeply $got, $exp, 'iterate'
       or dump_val { exp => $exp, got => $got };
@@ -837,7 +837,7 @@ sub test_the_basics
     );
 
     ( $exp, $got ) = (
-        bless( { 'MaxRows' => 100, 'Slice' => {} }, 'DBIx::Squirrel::rs' ),
+        bless( { MaxRows => 100, Slice => {} }, 'DBIx::Squirrel::rs' ),
         do {
             my $sth = $standard_ekorn_dbh->prepare(
                 join ' ', (
@@ -852,7 +852,7 @@ sub test_the_basics
       or dump_val { exp => $exp, got => $got };
 
     ( $exp, $got ) = (
-        bless( { 'MaxRows' => 100, 'Slice' => [] }, 'DBIx::Squirrel::rs' ),
+        bless( { MaxRows => 100, Slice => [] }, 'DBIx::Squirrel::rs' ),
         do {
             my $sth = $standard_ekorn_dbh->prepare(
                 join ' ', (
@@ -867,7 +867,7 @@ sub test_the_basics
       or dump_val { exp => $exp, got => $got };
 
     ( $exp, $got ) = (
-        bless( { 'MaxRows' => 10, 'Slice' => [] }, 'DBIx::Squirrel::rs' ),
+        bless( { MaxRows => 10, Slice => [] }, 'DBIx::Squirrel::rs' ),
         $sth->rs->_maxrows(10),
     );
     is_deeply $got, $exp, 'results'

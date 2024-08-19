@@ -9,7 +9,7 @@ use Text::ParseWords ();
 use FFI::Build::Platform;
 
 # ABSTRACT: Probe runner builder for FFI
-our $VERSION = '2.08'; # VERSION
+our $VERSION = '2.09'; # VERSION
 
 
 sub new
@@ -251,7 +251,7 @@ FFI::Probe::Runner::Builder - Probe runner builder for FFI
 
 =head1 VERSION
 
-version 2.08
+version 2.09
 
 =head1 SYNOPSIS
 
@@ -418,6 +418,8 @@ szTheory
 José Joaquín Atria (JJATRIA)
 
 Pete Houston (openstrike, HOUSTON)
+
+Lukas Mai (MAUKE)
 
 =head1 COPYRIGHT AND LICENSE
 

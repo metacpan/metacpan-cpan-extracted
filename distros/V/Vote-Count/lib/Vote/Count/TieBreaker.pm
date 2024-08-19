@@ -17,13 +17,13 @@ use List::Util qw( min max sum);
 use Carp;
 use Try::Tiny;
 
-our $VERSION='2.02';
+our $VERSION='2.04';
 
 =head1 NAME
 
 Vote::Count::TieBreaker
 
-=head1 VERSION 2.02
+=head1 VERSION 2.04
 
 =head1 Synopsis
 

@@ -22,6 +22,48 @@
 
 2024-08-18  Brian M. Kelly <Brian.Kelly@fullauto.com>
 
+        * Version 1.0000730 released
+
+        * More code cleanup
+
+2024-08-18  Brian M. Kelly <Brian.Kelly@fullauto.com>
+
+        * Version 1.0000729 released
+
+        * More code cleanup
+
+2024-08-18  Brian M. Kelly <Brian.Kelly@fullauto.com>
+
+        * Version 1.0000728 released
+
+        * More code cleanup
+
+2024-08-18  Brian M. Kelly <Brian.Kelly@fullauto.com>
+
+        * Version 1.0000727 released
+
+        * More debug cleanup
+
+2024-08-18  Brian M. Kelly <Brian.Kelly@fullauto.com>
+
+        * Version 1.0000726 released
+
+        * Fixed Data::Dump::Streamer install
+
+2024-08-18  Brian M. Kelly <Brian.Kelly@fullauto.com>
+
+        * Version 1.0000725 released
+
+        * Cleanup debug code after many changes
+
+2024-08-18  Brian M. Kelly <Brian.Kelly@fullauto.com>
+
+        * Version 1.0000724 released
+
+        * Load CPAN::Mini earlier
+
+2024-08-18  Brian M. Kelly <Brian.Kelly@fullauto.com>
+
         * Version 1.0000723 released
 
         * Build BerkeleyDB via exec

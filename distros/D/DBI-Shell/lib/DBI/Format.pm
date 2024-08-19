@@ -22,7 +22,7 @@ use strict;
 
 package DBI::Format;
 
-our $VERSION = '11.97'; # VERSION
+our $VERSION = '11.98'; # VERSION
 
 use Text::Abbrev;
 

@@ -10,13 +10,13 @@ use Moose::Role;
 no warnings 'experimental';
 use Carp;
 
-our $VERSION='2.02';
+our $VERSION='2.04';
 
 =head1 NAME
 
 Vote::Count::Approval
 
-=head1 VERSION 2.02
+=head1 VERSION 2.04
 
 =cut
 

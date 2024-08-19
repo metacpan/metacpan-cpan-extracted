@@ -1,5 +1,8 @@
 Revision history for Music-ScaleNote
 
+0.0804 2024-08-18 16:01:29
+    - Specify the right version of Array::Circular.
+
 0.0803 2024-07-27 16:28:38
     - See if not specifying A::C as a prereq will install it...
 

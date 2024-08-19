@@ -4,7 +4,7 @@
       "Alexander Karelas <karjala@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Minilla/v3.1.10",
+   "generated_by" : "Minilla/v3.1.23",
    "license" : [
       "perl_5"
    ],
@@ -57,19 +57,19 @@
    "provides" : {
       "Data::ManBearPig" : {
          "file" : "lib/Data/ManBearPig.pm",
-         "version" : "v0.0.3"
+         "version" : "v0.0.4"
       },
       "Data::WeakMap" : {
          "file" : "lib/Data/WeakMap.pm",
-         "version" : "v0.0.3"
+         "version" : "v0.0.4"
       },
       "Data::WeakMap::Key::Tie" : {
          "file" : "lib/Data/WeakMap/Key/Tie.pm",
-         "version" : "v0.0.3"
+         "version" : "v0.0.4"
       },
       "Data::WeakMap::Tie" : {
          "file" : "lib/Data/WeakMap/Tie.pm",
-         "version" : "v0.0.3"
+         "version" : "v0.0.4"
       }
    },
    "release_status" : "stable",
@@ -79,12 +79,13 @@
       },
       "homepage" : "https://github.com/akarelas/Data-WeakMap-perl",
       "repository" : {
-         "url" : "git://github.com/akarelas/Data-WeakMap-perl.git",
+         "type" : "git",
+         "url" : "https://github.com/akarelas/Data-WeakMap-perl.git",
          "web" : "https://github.com/akarelas/Data-WeakMap-perl"
       }
    },
-   "version" : "v0.0.3",
+   "version" : "v0.0.4",
    "x_authority" : "cpan:KARJALA",
-   "x_serialization_backend" : "JSON::PP version 4.02",
+   "x_serialization_backend" : "JSON::PP version 4.16",
    "x_static_install" : 1
 }

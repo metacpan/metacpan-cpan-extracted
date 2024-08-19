@@ -13,7 +13,7 @@ use DBIx::Squirrel;
 use lib realpath("$FindBin::Bin/../lib");
 use T::Database ':all';
 
-subtest 'test' => sub {
+subtest test => sub {
     my $dbh = DBIx::Squirrel->connect(@T_DB_CONNECT_ARGS);
 
     my @albums = $dbh->results('SELECT * FROM albums')->_slice([])->all;

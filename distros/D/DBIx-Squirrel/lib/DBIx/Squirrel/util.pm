@@ -8,14 +8,14 @@ BEGIN {
     require Exporter;
     @DBIx::Squirrel::util::ISA         = 'Exporter';
     %DBIx::Squirrel::util::EXPORT_TAGS = (
-        'constants'   => ['E_EXP_STATEMENT', 'E_EXP_STH',    'E_EXP_REF',],
-        'diagnostics' => ['Dumper',          'throw',        'whine',],
-        'transform'   => ['cbargs',          'cbargs_using', 'transform',],
-        'sql'         =>
+        constants   => ['E_EXP_STATEMENT', 'E_EXP_STH',    'E_EXP_REF',],
+        diagnostics => ['Dumper',          'throw',        'whine',],
+        transform   => ['cbargs',          'cbargs_using', 'transform',],
+        sql         =>
           ['get_trimmed_sql_and_digest', 'normalise_statement', 'study_statement', 'trim_sql_string', 'hash_sql_string',],
     );
     @DBIx::Squirrel::util::EXPORT_OK = @{
-        $DBIx::Squirrel::util::EXPORT_TAGS{'all'} = [
+        $DBIx::Squirrel::util::EXPORT_TAGS{all} = [
             qw/uniq result/,
             do {
                 my %seen;
@@ -120,7 +120,7 @@ sub get_trimmed_sql_and_digest {
     my $sql_string        = do {
         if (ref $sth_or_sql_string) {
             if (UNIVERSAL::isa($sth_or_sql_string, 'DBIx::Squirrel::st')) {
-                trim_sql_string($sth_or_sql_string->_private_attributes->{'OriginalStatement'});
+                trim_sql_string($sth_or_sql_string->_private_attributes->{OriginalStatement});
             }
             elsif (UNIVERSAL::isa($sth_or_sql_string, 'DBI::st')) {
                 trim_sql_string($sth_or_sql_string->{Statement});

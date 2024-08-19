@@ -2,7 +2,7 @@ package Data::ManBearPig;
 use strict;
 use warnings FATAL => 'all';
 
-our $VERSION = "v0.0.3";
+our $VERSION = "v0.0.4";
 
 use overload '%{}'  => sub { ${$_[0]}->{dummy} }, fallback => 1;
 use overload 'bool' => sub { 1 }, fallback => 1;

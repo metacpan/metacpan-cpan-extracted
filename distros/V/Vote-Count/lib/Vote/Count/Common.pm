@@ -13,13 +13,13 @@ use Path::Tiny;
 
 # ABSTRACT: Role shared by Count and Matrix for common functionality. See Vote::Count Documentation.
 
-our $VERSION='2.02';
+our $VERSION='2.04';
 
 =head1 NAME
 
 Vote::Count::Common
 
-=head1 VERSION 2.02
+=head1 VERSION 2.04
 
 =head1 Synopsis
 

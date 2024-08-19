@@ -12,7 +12,7 @@ WriteMakefile(
         'Getopt::Long' => 0,
         'JSON' => 0,
         'Pod::Usage' => 0,
-        'Feature::Compat::Class' => 0,
+        'Feature::Compat::Class' => 0.06,
         ($^V < v5.38 ? ('Object::Pad' => 0) : ()),
     },
     EXE_FILES    => [ 'bin/laststats' ],

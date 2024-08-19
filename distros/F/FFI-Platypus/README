@@ -5,7 +5,7 @@ NAME
 
 VERSION
 
-    version 2.08
+    version 2.09
 
 SYNOPSIS
 
@@ -2617,6 +2617,8 @@ AUTHOR
     José Joaquín Atria (JJATRIA)
 
     Pete Houston (openstrike, HOUSTON)
+
+    Lukas Mai (MAUKE)
 
 COPYRIGHT AND LICENSE
 

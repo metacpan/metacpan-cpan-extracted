@@ -4,7 +4,7 @@ DBIx::Squirrel - A `DBI` extension
 
 # VERSION
 
-version 1.2.9
+version 1.2.10
 
 # SYNOPSIS
 
@@ -702,7 +702,7 @@ will apply to it.
 
     Find the script and run it:
 
-        $ perl -Ilib examples/transformations/1.pl
+        $ perl -Ilib examples/transformations/01.pl
         ----
         Name: AC/DC
         ArtistId: 1
@@ -714,8 +714,8 @@ will apply to it.
         ArtistId: 128
 
     Notice that we got nothing back for one of our artists? That's because
-    the artist in question is not in our database, and we cannot apply a
-    transformation to nothing.
+    the artist in question is not in our database and we cannot apply a
+    transformation to nothing, so nothing is returned.
 
 # COPYRIGHT AND LICENSE
 

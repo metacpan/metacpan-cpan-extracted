@@ -29,6 +29,10 @@ This is currently of limited utility.
 
 Given a source, will attach it as the input for this sink.
 
+The key difference between L</from> and L</drain_from> is that this method will mark the sink as completed
+when the source is finished. L</drain_from> allows sequencing of multiple sources, keeping the sink active
+as each of those completes.
+
 =head1 INHERITED METHODS
 
 =over 4
@@ -45,5 +49,5 @@ Tom Molesworth <TEAM@cpan.org>
 
 =head1 LICENSE
 
-Copyright Tom Molesworth 2011-2023. Licensed under the same terms as Perl itself.
+Copyright Tom Molesworth 2011-2024. Licensed under the same terms as Perl itself.
 

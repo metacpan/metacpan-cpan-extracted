@@ -22,6 +22,7 @@
    "prereqs" : {
       "build" : {
          "requires" : {
+            "Alien::Build" : "2.83",
             "Alien::Build::MM" : "0.25",
             "File::ShareDir::Dist" : "0.07",
             "HTTP::Tiny" : "0.044",
@@ -34,21 +35,20 @@
       },
       "configure" : {
          "requires" : {
-            "Alien::Build" : "1.19",
+            "Alien::Build" : "2.83",
             "Alien::Build::MM" : "0.25"
          }
       },
       "runtime" : {
          "requires" : {
-            "Alien::Base" : "0",
-            "Alien::Build" : "0.25"
+            "Alien::Build" : "2.83"
          }
       }
    },
    "release_status" : "stable",
-   "version" : "1.000003",
+   "version" : "1.000005",
    "x_alienfile" : {
-      "generated_by" : "Alien::Build::MM version 2.80",
+      "generated_by" : "Alien::Build::MM version 2.83",
       "requires" : {
          "share" : {
             "HTTP::Tiny" : "0.044",

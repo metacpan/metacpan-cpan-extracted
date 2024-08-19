@@ -18,7 +18,7 @@ use strict;
 
 package DBI::Format::SQLMinus;
 
-our $VERSION = '11.97'; # VERSION
+our $VERSION = '11.98'; # VERSION
 
 @DBI::Format::SQLMinus::ISA = qw(DBI::Format::Base);
 

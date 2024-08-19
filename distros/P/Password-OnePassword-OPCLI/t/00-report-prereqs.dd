@@ -18,6 +18,8 @@ do { my $x = {
                                       'Carp' => '0',
                                       'IPC::Run' => '0',
                                       'JSON::MaybeXS' => '0',
+                                      'Moo' => '0',
+                                      'URI::Escape' => '0',
                                       'perl' => 'v5.36.0'
                                     }
                     },

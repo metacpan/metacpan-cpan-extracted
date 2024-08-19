@@ -38,7 +38,7 @@ use Carp;
 @ISA = qw(Exporter DBI::Shell::Std);
 @EXPORT = qw(shell);
 
-our $VERSION = '11.97'; # VERSION
+our $VERSION = '11.98'; # VERSION
 
 sub new {
 	my $class = shift;

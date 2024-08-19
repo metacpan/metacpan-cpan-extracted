@@ -1,7 +1,7 @@
 ---
 abstract: 'get items out of 1Password with the "op" CLI'
 author:
-  - 'Ricardo Signes <rjbs@semiotic.systems>'
+  - 'Ricardo Signes <cpan@semiotic.systems>'
 build_requires:
   ExtUtils::MakeMaker: '0'
   File::Spec: '0'
@@ -21,12 +21,14 @@ requires:
   Carp: '0'
   IPC::Run: '0'
   JSON::MaybeXS: '0'
+  Moo: '0'
+  URI::Escape: '0'
   perl: v5.36.0
 resources:
   bugtracker: https://github.com/rjbs/Password-OnePassword-OPCLI/issues
   homepage: https://github.com/rjbs/Password-OnePassword-OPCLI
   repository: https://github.com/rjbs/Password-OnePassword-OPCLI.git
-version: '0.001'
+version: '0.002'
 x_Dist_Zilla:
   perl:
     version: '5.038000'
@@ -44,7 +46,7 @@ x_Dist_Zilla:
         Dist::Zilla::Plugin::Git::GatherDir:
           include_untracked: 0
       name: '@RJBS/Git::GatherDir'
-      version: '2.049'
+      version: '2.051'
     -
       class: Dist::Zilla::Plugin::CheckPrereqsIndexed
       name: '@RJBS/CheckPrereqsIndexed'
@@ -120,16 +122,16 @@ x_Dist_Zilla:
       name: '@RJBS/@Filter/ConfirmRelease'
       version: '6.032'
     -
+      class: Dist::Zilla::Plugin::UploadToCPAN
+      name: '@RJBS/@Filter/UploadToCPAN'
+      version: '6.032'
+    -
       class: Dist::Zilla::Plugin::MakeMaker
       config:
         Dist::Zilla::Role::TestRunner:
           default_jobs: 9
       name: '@RJBS/MakeMaker'
       version: '6.032'
-    -
-      class: Dist::Zilla::Plugin::UploadToCPAN::OnePassword
-      name: '@RJBS/UploadToCPAN::OnePassword'
-      version: '5.027'
     -
       class: Dist::Zilla::Plugin::AutoPrereqs
       name: '@RJBS/AutoPrereqs'
@@ -142,10 +144,10 @@ x_Dist_Zilla:
           version_by_branch: 1
           version_regexp: (?^:^([0-9]+\.[0-9]+)$)
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.44.0
+          git_version: 2.45.2
           repo_root: .
       name: '@RJBS/Git::NextVersion'
-      version: '2.049'
+      version: '2.051'
     -
       class: Dist::Zilla::Plugin::PkgVersion
       name: '@RJBS/PkgVersion'
@@ -281,7 +283,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::RJBSMisc
       name: '@RJBS/RJBSMisc'
-      version: '5.027'
+      version: '5.033'
     -
       class: Dist::Zilla::Plugin::GithubMeta
       name: '@RJBS/GithubMeta'
@@ -298,10 +300,10 @@ x_Dist_Zilla:
           allow_dirty_match: []
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.44.0
+          git_version: 2.45.2
           repo_root: .
       name: '@RJBS/@Git/Check'
-      version: '2.049'
+      version: '2.051'
     -
       class: Dist::Zilla::Plugin::Git::Commit
       config:
@@ -316,12 +318,12 @@ x_Dist_Zilla:
           allow_dirty_match: []
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.44.0
+          git_version: 2.45.2
           repo_root: .
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
       name: '@RJBS/@Git/Commit'
-      version: '2.049'
+      version: '2.051'
     -
       class: Dist::Zilla::Plugin::Git::Tag
       config:
@@ -329,16 +331,16 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: '0.001'
+          tag: '0.002'
           tag_format: '%v'
           tag_message: v%V
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.44.0
+          git_version: 2.45.2
           repo_root: .
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
       name: '@RJBS/@Git/Tag'
-      version: '2.049'
+      version: '2.051'
     -
       class: Dist::Zilla::Plugin::Git::Push
       config:
@@ -347,15 +349,15 @@ x_Dist_Zilla:
             - 'github :'
           remotes_must_exist: 0
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.44.0
+          git_version: 2.45.2
           repo_root: .
       name: '@RJBS/@Git/Push'
-      version: '2.049'
+      version: '2.051'
     -
       class: Dist::Zilla::Plugin::Git::Contributors
       config:
         Dist::Zilla::Plugin::Git::Contributors:
-          git_version: 2.44.0
+          git_version: 2.45.2
           include_authors: 0
           include_releaser: 1
           order_by: name
@@ -407,6 +409,8 @@ x_Dist_Zilla:
     config:
       is_trial: 0
     version: '6.032'
+x_contributors:
+  - 'Ricardo Signes <rjbs@semiotic.systems>'
 x_generated_by_perl: v5.38.0
 x_rjbs_perl_window: standard
 x_serialization_backend: 'YAML::Tiny version 1.74'

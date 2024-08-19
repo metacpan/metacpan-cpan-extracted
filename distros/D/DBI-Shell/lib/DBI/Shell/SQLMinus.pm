@@ -5,7 +5,7 @@
 
 package DBI::Shell::SQLMinus;
 
-our $VERSION = '11.97'; # VERSION
+our $VERSION = '11.98'; # VERSION
 
 use strict;
 use Text::Abbrev ();

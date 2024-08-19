@@ -211,3 +211,10 @@ Revision history for Dios
 
         * Documented failure under Perl 5.20 and
           Keyword::Simple 0.3 requirement under Perl 5.14 and 5.16
+
+
+0.002013  Mon Aug 19 08:29:26 2024
+
+        * Removed vestigal use of ~~
+          which no longer works in Perl 5.41+
+          (Thanks, James)

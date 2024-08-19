@@ -1,5 +1,8 @@
 Revision history for Map::Tube::Plugin::Graph
 
+0.43  2024-08-18T23:45:00+00:00
+      - Pod changes about installation, thanks @mohawk2.
+
 0.42  2019-09-13T17:25:00+00:00
       - Moved author test scripts to xt/ subfolder.
 

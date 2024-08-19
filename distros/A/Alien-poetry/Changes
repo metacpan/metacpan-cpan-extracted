@@ -1,3 +1,15 @@
+1.000005 - 2024-08-19
+
+  [BUG FIXES]
+
+  * repackage due to broken tarball
+
+1.000004 - 2024-08-18
+
+  [BUG FIXES]
+
+  * rt#154924 build fails on old version of Alien::Build
+
 1.000003 - 2024-07-15
 
   [BUG FIXES]

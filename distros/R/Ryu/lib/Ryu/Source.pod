@@ -407,6 +407,14 @@ The backpressure (low/high) values default to undefined, meaning
 no backpressure is applied: the buffer will continue to fill
 indefinitely.
 
+=head2 as_last
+
+Returns a L<Future> which resolves to the last value received.
+
+=head2 as_void
+
+Returns a L<Future> which resolves to an empty list.
+
 =head2 combine_latest
 
 Takes the most recent item from one or more L<Ryu::Source>s, and emits
@@ -673,7 +681,11 @@ Will skip non-blessed items.
 
 Emits the given item.
 
+=head2 emit_batch
+
 =head2 each
+
+=head2 each_batch
 
 =head2 each_as_source
 
@@ -765,5 +777,5 @@ Tom Molesworth <TEAM@cpan.org>
 
 =head1 LICENSE
 
-Copyright Tom Molesworth 2011-2023. Licensed under the same terms as Perl itself.
+Copyright Tom Molesworth 2011-2024. Licensed under the same terms as Perl itself.
 

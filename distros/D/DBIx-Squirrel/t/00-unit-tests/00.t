@@ -23,11 +23,11 @@ our($aref,   $href);
 our($cref,   $crefs);
 our(@args);
 
-subtest 'get_trimmed_sql_and_digest' => sub {
+subtest get_trimmed_sql_and_digest => sub {
     is(get_trimmed_sql_and_digest("  \n\t  SELECT * \nFROM t  \n  "), "SELECT *\nFROM t");
 };
 
-subtest 'connect' => sub {
+subtest connect => sub {
     no strict 'subs';    ## no critic
 
     my $dbi_dbh = DBI->connect(@T_DB_CONNECT_ARGS);
@@ -63,7 +63,7 @@ subtest 'connect' => sub {
     $ekorn_dbh->disconnect;
 };
 
-subtest 'example_1' => sub {
+subtest example_1 => sub {
     db do {DBIx::Squirrel->connect(@T_DB_CONNECT_ARGS)};
     isa_ok(db, 'DBIx::Squirrel::db');
 
@@ -96,7 +96,7 @@ subtest 'example_1' => sub {
     db->disconnect;
 };
 
-subtest 'normalise_statement' => sub {
+subtest normalise_statement => sub {
     undef $DBIx::Squirrel::NORMALISE_SQL;
 
     is( normalise_statement('   SELECT * FROM media_types WHERE MediatypeId = ?   '),
@@ -131,37 +131,37 @@ subtest 'normalise_statement' => sub {
     );
 };
 
-subtest 'cbargs' => sub {
+subtest cbargs => sub {
     %hash = (
-        'sub1' => sub {1},
-        'sub2' => sub {2},
+        sub1 => sub {1},
+        sub2 => sub {2},
     );
 
     is_deeply([cbargs(1 .. 5)], [[], 1 .. 5]);
 
-    is_deeply([cbargs(1 .. 5, $hash{'sub1'})], [[$hash{'sub1'}], 1 .. 5],);
+    is_deeply([cbargs(1 .. 5, $hash{sub1})], [[$hash{sub1}], 1 .. 5],);
 
-    is_deeply([cbargs(1 .. 5, $hash{'sub1'}, $hash{'sub2'})], [[$hash{'sub1'}, $hash{'sub2'},], 1 .. 5],);
+    is_deeply([cbargs(1 .. 5, $hash{sub1}, $hash{sub2})], [[$hash{sub1}, $hash{sub2},], 1 .. 5],);
 };
 
-subtest 'cbargs_using' => sub {
+subtest cbargs_using => sub {
     %hash = (
-        'sub1' => sub {1},
-        'sub2' => sub {2},
+        sub1 => sub {1},
+        sub2 => sub {2},
     );
 
     is_deeply([cbargs_using(undef, 1 .. 5)], [[], 1 .. 5]);
 
     is_deeply([cbargs_using([], 1 .. 5)], [[], 1 .. 5]);
 
-    is_deeply([cbargs_using([], 1 .. 5, $hash{'sub1'})], [[$hash{'sub1'}], 1 .. 5],);
+    is_deeply([cbargs_using([], 1 .. 5, $hash{sub1})], [[$hash{sub1}], 1 .. 5],);
 
-    is_deeply([cbargs_using([], 1 .. 5, $hash{'sub1'}, $hash{'sub2'})], [[$hash{'sub1'}, $hash{'sub2'},], 1 .. 5],);
+    is_deeply([cbargs_using([], 1 .. 5, $hash{sub1}, $hash{sub2})], [[$hash{sub1}, $hash{sub2},], 1 .. 5],);
 
-    is_deeply([cbargs_using([$hash{'sub2'}], 1 .. 5, $hash{'sub1'},)], [[$hash{'sub1'}, $hash{'sub2'},], 1 .. 5],);
+    is_deeply([cbargs_using([$hash{sub2}], 1 .. 5, $hash{sub1},)], [[$hash{sub1}, $hash{sub2},], 1 .. 5],);
 };
 
-subtest 'transform' => sub {
+subtest transform => sub {
     is_deeply([transform()], []);
 
     is_deeply([transform([])], []);
@@ -211,7 +211,7 @@ subtest 'transform' => sub {
     );
 };
 
-subtest 'throw' => sub {
+subtest throw => sub {
     eval {throw undef};
     like($@, qr/\AException at /);
 
@@ -228,7 +228,7 @@ subtest 'throw' => sub {
     like($@, qr/\ARethrow this at/);
 };
 
-subtest 'whine' => sub {
+subtest whine => sub {
     $stderr = capture_stderr {whine undef};
     like($stderr, qr/\AWarning at /);
 

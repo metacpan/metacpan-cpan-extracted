@@ -10,7 +10,7 @@ Vote::Count::Overview
 
 An Overview of Alternative Voting and Preferential Methods and Introduction to Vote::Count.
 
-=head1 VERSION 2.02
+=head1 VERSION 2.04
 
 =head2 A Toolkit for determining the outcome of Preferential Ballots.
 

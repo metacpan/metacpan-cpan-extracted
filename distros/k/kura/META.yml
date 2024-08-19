@@ -1,0 +1,40 @@
+---
+abstract: 'Store constraints for Data::Checks, Type::Tiny, Moose and more.'
+author:
+  - 'kobaken <kentafly88@gmail.com>'
+build_requires:
+  Test2::V0: '0.000147'
+configure_requires:
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v3.1.25, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: kura
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  kura:
+    file: lib/kura.pm
+    version: '0.02'
+requires:
+  Sub::Util: '1.40'
+  perl: '5.016000'
+resources:
+  bugtracker: https://github.com/kfly8/kura/issues
+  homepage: https://github.com/kfly8/kura
+  repository: https://github.com/kfly8/kura.git
+version: '0.02'
+x_authority: cpan:KFLY
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+x_static_install: 1

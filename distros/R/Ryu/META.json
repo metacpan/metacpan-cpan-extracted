@@ -4,7 +4,7 @@
       "Tom Molesworth <TEAM@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.031, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.032, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -102,35 +102,35 @@
    "provides" : {
       "Ryu" : {
          "file" : "lib/Ryu.pm",
-         "version" : "3.005"
+         "version" : "4.000"
       },
       "Ryu::Buffer" : {
          "file" : "lib/Ryu/Buffer.pm",
-         "version" : "3.005"
+         "version" : "4.000"
       },
       "Ryu::Exception" : {
          "file" : "lib/Ryu/Exception.pm",
-         "version" : "3.005"
+         "version" : "4.000"
       },
       "Ryu::Node" : {
          "file" : "lib/Ryu/Node.pm",
-         "version" : "3.005"
+         "version" : "4.000"
       },
       "Ryu::Observable" : {
          "file" : "lib/Ryu/Observable.pm",
-         "version" : "3.005"
+         "version" : "4.000"
       },
       "Ryu::Sink" : {
          "file" : "lib/Ryu/Sink.pm",
-         "version" : "3.005"
+         "version" : "4.000"
       },
       "Ryu::Source" : {
          "file" : "lib/Ryu/Source.pm",
-         "version" : "3.005"
+         "version" : "4.000"
       },
       "Ryu::Stream" : {
          "file" : "lib/Ryu/Stream.pm",
-         "version" : "3.005"
+         "version" : "4.000"
       }
    },
    "release_status" : "stable",
@@ -145,7 +145,7 @@
          "web" : "https://github.com/team-at-cpan/Ryu"
       }
    },
-   "version" : "3.005",
+   "version" : "4.000",
    "x_authority" : "cpan:TEAM",
    "x_contributors" : [
       "Binary-Mohanad <mohanad@binary.com>",
@@ -155,8 +155,8 @@
       "Mohammad S Anwar <mohammad.anwar@yahoo.com>",
       "Mohanad Zarzour <51309057+Binary-Mohanad@users.noreply.github.com>"
    ],
-   "x_generated_by_perl" : "v5.38.0",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.37",
+   "x_generated_by_perl" : "v5.40.0",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.38",
    "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"
 }
 

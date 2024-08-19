@@ -18,7 +18,7 @@ WriteMakefile(
 
   PREREQ_PM    => {
     ($^V lt v5.38 ? ('Object::Pad' => 0) : ()),
-    'Feature::Compat::Class' => 0,
+    'Feature::Compat::Class' => 0.04,
     'Text::vFile::asData'    => 0,
     'LWP::Simple'            => 0,
     'JSON'                   => 0,

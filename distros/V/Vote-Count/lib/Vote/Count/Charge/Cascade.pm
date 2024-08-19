@@ -22,13 +22,13 @@ use Path::Tiny;
 use Carp;
 use Vote::Count::Helper::FullCascadeCharge;
 
-our $VERSION='2.02';
+our $VERSION='2.04';
 
 =head1 NAME
 
 Vote::Count::Charge::Cascade
 
-=head1 VERSION 2.02
+=head1 VERSION 2.04
 
 =cut
 

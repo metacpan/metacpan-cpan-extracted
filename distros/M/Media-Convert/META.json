@@ -33,6 +33,7 @@
       "runtime" : {
          "requires" : {
             "Alien::ffmpeg" : "0",
+            "IPC::System::Simple" : "0",
             "JSON::MaybeXS" : "0",
             "Moose" : "0",
             "MooseX::Singleton" : "0",
@@ -53,6 +54,6 @@
          "web" : "https://salsa.debian.org/wouter/media-convert"
       }
    },
-   "version" : "v1.1.1",
+   "version" : "v1.2.0",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

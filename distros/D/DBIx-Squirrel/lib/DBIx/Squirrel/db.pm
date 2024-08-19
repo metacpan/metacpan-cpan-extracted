@@ -32,28 +32,28 @@ sub _private_attributes {
     my $self = shift;
     return
       unless ref($self);
-    $self->{'private_ekorn'} = {}
-      unless defined($self->{'private_ekorn'});
+    $self->{private_ekorn} = {}
+      unless defined($self->{private_ekorn});
     unless (@_) {
-        return $self->{'private_ekorn'}, $self
+        return $self->{private_ekorn}, $self
           if wantarray;
-        return $self->{'private_ekorn'};
+        return $self->{private_ekorn};
     }
     unless (defined($_[0])) {
-        delete $self->{'private_ekorn'};
+        delete $self->{private_ekorn};
         shift;
     }
     if (@_) {
-        $self->{'private_ekorn'} = {}
-          unless defined($self->{'private_ekorn'});
+        $self->{private_ekorn} = {}
+          unless defined($self->{private_ekorn});
         if (UNIVERSAL::isa($_[0], 'HASH')) {
-            $self->{'private_ekorn'} = {%{$self->{'private_ekorn'}}, %{$_[0]}};
+            $self->{private_ekorn} = {%{$self->{private_ekorn}}, %{$_[0]}};
         }
         elsif (UNIVERSAL::isa($_[0], 'ARRAY')) {
-            $self->{'private_ekorn'} = {%{$self->{'private_ekorn'}}, @{$_[0]}};
+            $self->{private_ekorn} = {%{$self->{private_ekorn}}, @{$_[0]}};
         }
         else {
-            $self->{'private_ekorn'} = {%{$self->{'private_ekorn'}}, @_};
+            $self->{private_ekorn} = {%{$self->{private_ekorn}}, @_};
         }
     }
     return $self;
@@ -108,10 +108,10 @@ sub prepare {
       unless defined($sth);
     bless $sth, $self->_root_class . '::st';
     $sth->_private_attributes({
-        'Placeholders'        => $placeholders,
-        'NormalisedStatement' => $normalised_statement,
-        'OriginalStatement'   => $original_statement,
-        'Hash'                => $digest,
+        Placeholders        => $placeholders,
+        NormalisedStatement => $normalised_statement,
+        OriginalStatement   => $original_statement,
+        Hash                => $digest,
     });
     return $sth;
 }
@@ -128,11 +128,11 @@ sub prepare_cached {
       unless defined($sth);
     bless $sth, $self->_root_class . '::st';
     $sth->_private_attributes({
-        'Placeholders'        => $placeholders,
-        'NormalisedStatement' => $normalised_statement,
-        'OriginalStatement'   => $original_statement,
-        'Hash'                => $digest,
-        'CacheKey'            => join('#', (caller(0))[1, 2]),
+        Placeholders        => $placeholders,
+        NormalisedStatement => $normalised_statement,
+        OriginalStatement   => $original_statement,
+        Hash                => $digest,
+        CacheKey            => join('#', (caller(0))[1, 2]),
     });
     return $sth;
 }

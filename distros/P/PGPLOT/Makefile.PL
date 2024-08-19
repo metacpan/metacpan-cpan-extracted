@@ -246,10 +246,22 @@ if ( $is_vms ) {
 
 }
 
+my @prereq;
+my %min_version = (
+  'PDL' => '2.089', # broadcast_define, no PGPLOT
+);
+for my $opt_dep (sort keys %min_version) {
+  (my $file = $opt_dep) =~ s#::#/#g;
+  next if !eval { require "$file.pm"; 1 }; # not installed, fine
+  next if eval { $opt_dep->VERSION($min_version{$opt_dep}); 1 };
+  push @prereq, $opt_dep => $min_version{$opt_dep};
+}
+
 WriteMakefile(
     'NAME'	=> 'PGPLOT',
     'CONFIGURE_REQUIRES' => { 'ExtUtils::F77' => 1.13, 'Devel::CheckLib' => '1.14' },
     'TEST_REQUIRES' => { 'Test::More' => '0.88' },
+    PREREQ_PM => { @prereq },
     'VERSION_FROM'	=> 'lib/PGPLOT.pm',
     'dist'      => { COMPRESS=>"gzip", SUFFIX=>"gz" },
     'depend'    => { '$(OBJECT)' => q[pgfun.c arrays.c PGPLOT.c]},
@@ -269,6 +281,10 @@ WriteMakefile(
              requires => {
                 'CPAN::Changes' => '0',
              },
+          },
+          runtime => {
+             recommends => \%min_version,
+             requires => {},
           },
        },
        x_IRC => 'irc://irc.perl.org/#pdl',

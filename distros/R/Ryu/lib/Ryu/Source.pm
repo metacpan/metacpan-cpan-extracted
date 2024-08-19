@@ -5,7 +5,7 @@ use warnings;
 
 use parent qw(Ryu::Node);
 
-our $VERSION = '3.005'; # VERSION
+our $VERSION = '4.000'; # VERSION
 our $AUTHORITY = 'cpan:TEAM'; # AUTHORITY
 
 =head1 NAME
@@ -217,6 +217,8 @@ Note that this is rarely called directly, see L</from>, L</empty> and L</never> 
 sub new {
     my ($self, %args) = @_;
     $args{label} //= 'unknown';
+    $args{on_item} //= [];
+    $args{on_batch} //= [];
     $self->SUPER::new(%args);
 }
 
@@ -265,8 +267,11 @@ sub from {
         }
     } elsif(my $ref = ref($_[0])) {
         if($ref eq 'ARRAY') {
+            my $data = $_[0];
             $src->{on_get} = sub {
-                $src->emit($_) for @{$_[0]};
+                while($data->@*) {
+                    $src->emit(shift $data->@*);
+                }
                 $src->finish;
             };
             return $src;
@@ -809,6 +814,7 @@ sub buffer {
     $self->_completed->on_ready(sub {
         shift->on_ready($src->_completed) unless $src->_completed->is_ready or @pending;
     });
+    my $fc = $src->flow_control;
     my $item_handler = do {
         Scalar::Util::weaken(my $weak_self = $self);
         Scalar::Util::weaken(my $weak_src = $src);
@@ -822,19 +828,18 @@ sub buffer {
                 while @pending
                 and not($src->is_paused)
                 and @{$self->{children}};
-            if($self) {
-                $self->resume($src) if @pending < $args{low} and $self->is_paused($src);
+            $self->resume($src) if @pending < $args{low} and $self->is_paused($src);
 
-                # It's common to have a situation where the parent chain completes while we're
-                # paused waiting for the queue to drain. In this situation, we want to propagate
-                # completion only once the queue is empty.
-                $self->_completed->on_ready($src->_completed)
-                    if $self->_completed->is_ready and not @pending and not $src->_completed->is_ready;
-            }
+            return if @pending;
+
+            # It's common to have a situation where the parent chain completes while we're
+            # paused waiting for the queue to drain. In this situation, we want to propagate
+            # completion only once the queue is empty.
+            $self->_completed->on_ready($src->_completed)
+                if $self->_completed->is_ready and not $src->_completed->is_ready;
         }
     };
-    $src->flow_control
-        ->each($item_handler)->retain;
+    $fc->each($item_handler)->retain;
     $self->each(my $code = sub {
         push @pending, $_;
         $item_handler->()
@@ -845,9 +850,24 @@ sub buffer {
         my $addr = Scalar::Util::refaddr($code);
         my $count = List::UtilsBy::extract_by { $addr == Scalar::Util::refaddr($_) } @{$self->{on_item}};
         $f->on_ready($src->_completed) unless $src->is_ready;
-        $log->tracef("->each_while_source completed on %s for refaddr 0x%x, removed %d on_item handlers", $self->describe, Scalar::Util::refaddr($self), $count);
+        $log->tracef("->buffer completed on %s for refaddr 0x%x, removed %d on_item handlers", $self->describe, Scalar::Util::refaddr($self), $count);
     });
     $src;
+}
+
+sub remove_handler {
+    my ($self, $code) = @_;
+    my $addr = Scalar::Util::refaddr($code);
+    my $count = List::UtilsBy::extract_by {
+        $addr == Scalar::Util::refaddr($_)
+    } @{$self->{on_item}};
+    $log->tracef(
+        "Removing handler on %s with refaddr 0x%x, matched %d total",
+        $self->describe,
+        Scalar::Util::refaddr($self),
+        $count
+    );
+    return $self;
 }
 
 sub retain {
@@ -1016,6 +1036,32 @@ sub as_buffer {
         $src->resume if $low and $buf->size <= $low;
     }, $src);
     return $buffer;
+}
+
+=head2 as_last
+
+Returns a L<Future> which resolves to the last value received.
+
+=cut
+
+sub as_last {
+    my ($self) = @_;
+    my $v;
+    $self->each(sub {
+        $v = $_;
+    });
+    $self->_completed->transform(done => sub { $v })
+}
+
+=head2 as_void
+
+Returns a L<Future> which resolves to an empty list.
+
+=cut
+
+sub as_void {
+    my ($self) = @_;
+    $self->_completed->transform(done => sub { () })
 }
 
 =head2 combine_latest
@@ -1994,7 +2040,8 @@ Emits the given item.
 sub emit {
     my $self = shift;
     my $completion = $self->_completed;
-    my @handlers = @{$self->{on_item} || []} or return $self;
+    my @handlers = $self->{on_item}->@*
+        or return $self;
     for (@_) {
         die 'already completed' if $completion->is_ready;
         for my $code (@handlers) {
@@ -2011,6 +2058,37 @@ sub emit {
     $self
 }
 
+=head2 emit_batch
+
+=cut
+
+sub emit_batch {
+    my $self = shift;
+    my $completion = $self->_completed;
+    if(my @handlers = $self->{on_batch}->@*) {
+        for (@_) {
+            die 'already completed' if $completion->is_ready;
+            for my $code (@handlers) {
+                try {
+                    $code->($_);
+                } catch {
+                    my $ex = $@;
+                    $log->warnf("Exception raised in %s - %s", (eval { $self->describe } // "<failed>"), "$ex");
+                    $completion->fail($ex, source => 'exception in on_batch callback');
+                    die $ex;
+                }
+            }
+        }
+    }
+
+    # Support item-at-a-time callbacks if we have any
+    return $self unless $self->{on_item}->@*;
+    for my $batch (@_) {
+        $self->emit($_) for $batch->@*;
+    }
+    return $self;
+}
+
 =head2 each
 
 =cut
@@ -2018,6 +2096,16 @@ sub emit {
 sub each : method {
     my ($self, $code, %args) = @_;
     push @{$self->{on_item}}, $code;
+    $self;
+}
+
+=head2 each_batch
+
+=cut
+
+sub each_batch : method {
+    my ($self, $code, %args) = @_;
+    push @{$self->{on_batch}}, $code;
     $self;
 }
 
@@ -2053,7 +2141,8 @@ sub cleanup {
     $log->tracef("Cleanup for %s (f = %s)", $self->describe, 0 + $self->_completed);
     $_->cancel for values %{$self->{cancel_on_ready} || {}};
     $self->parent->notify_child_completion($self) if $self->parent;
-    delete @{$self}{qw(on_item cancel_on_ready)};
+    splice $self->{on_item}->@*;
+    delete @{$self->{cancel_on_ready}}{keys %{$self->{cancel_on_ready}}};
     $log->tracef("Finished cleanup for %s", $self->describe);
 }
 
@@ -2124,7 +2213,7 @@ sub next : method {
         delete $self->{cancel_on_ready}{$f};
     }));
     $self->{cancel_on_ready}{$f} = $f;
-    push @{$self->{on_item} ||= []}, sub {
+    push @{$self->{on_item}}, sub {
         $f->done(shift) unless $f->is_ready;
     };
     return $f;
@@ -2248,7 +2337,7 @@ sub each_while_source {
     $self->_completed->on_ready(sub {
         my ($f) = @_;
         $args{cleanup}->($f, $src) if exists $args{cleanup};
-        $f->on_ready($src->_completed) unless $src->is_ready;
+        $f->on_ready($src->_completed) unless $src->is_ready or !($args{finish_source} // 1);
     });
     $src
 }
@@ -2314,5 +2403,5 @@ Tom Molesworth <TEAM@cpan.org>
 
 =head1 LICENSE
 
-Copyright Tom Molesworth 2011-2023. Licensed under the same terms as Perl itself.
+Copyright Tom Molesworth 2011-2024. Licensed under the same terms as Perl itself.
 

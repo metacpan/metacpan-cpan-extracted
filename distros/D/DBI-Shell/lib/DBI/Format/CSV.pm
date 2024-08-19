@@ -13,7 +13,7 @@ use strict;
 
 package DBI::Format::CSV;
 
-our $VERSION = '11.97'; # VERSION
+our $VERSION = '11.98'; # VERSION
 
 @DBI::Format::CSV::ISA = qw(DBI::Format::Base);
 

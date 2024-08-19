@@ -9,15 +9,15 @@ WriteMakefile($abmm->mm_args(
   NAME               => 'Alien::poetry',
   VERSION_FROM       => 'lib/Alien/poetry.pm',
   CONFIGURE_REQUIRES => {
-    'Alien::Build::MM' => 0,
+    'Alien::Build' => '2.83', # Alien::Build::Plugin...
   },
   BUILD_REQUIRES => {
-    'Alien::Build::MM' => 0,
+    'Alien::Build' => '2.83', # Alien::Build::MM
     'Path::Tiny' => '0.144',
     'File::ShareDir::Dist' => '0.07',
   },
   PREREQ_PM => {
-    'Alien::Base' => 0,
+    'Alien::Build' => '2.83', # Alien::Base
   },
   # If you are going to write the recommended
   # tests you will will want these:

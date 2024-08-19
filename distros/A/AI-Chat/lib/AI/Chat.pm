@@ -7,7 +7,7 @@ use Carp;
 use HTTP::Tiny;
 use JSON::PP;
 
-our $VERSION = '0.5';
+our $VERSION = '0.6';
 $VERSION = eval $VERSION;
 
 my $http = HTTP::Tiny->new;
@@ -23,7 +23,7 @@ sub new {
     $attr{'error'}      = 'Invalid API' unless $attr{'api'} eq 'OpenAI';
     $attr{'error'}      = 'API Key missing' unless $attr{'key'};
 
-    $attr{'model'}      = 'gpt-3.5-turbo-0125' unless $attr{'model'};
+    $attr{'model'}      = 'gpt-4o-mini' unless $attr{'model'};
 
     return bless \%attr, $class;
 }
@@ -130,7 +130,7 @@ AI::Chat - Interact with AI Chat APIs
 
 =head1 VERSION
 
-Version 0.5 
+Version 0.6 
 
 =head1 SYNOPSIS
 
@@ -139,7 +139,7 @@ Version 0.5
   my $chat  = AI::Chat->new(
       key   => 'your-api-key',
       api   => 'OpenAI',
-      model => 'gpt-3.5-turbo-0125',
+      model => 'gpt-4o-mini',
   );
 
   my $reply = $chat->prompt("What is the meaning of life?");
@@ -166,8 +166,10 @@ A free OpenAI API can be obtained from L<https://platform.openai.com/account/api
 
 Although the API Key is free, each use incurs a cost.  This is dependent on the
 number of tokens in the prompt and the reply.  Different models have different costs.
-The default model C<gpt-3.5-turbo-0125> is the lowest cost of the useful models and
-is a good place to start using this module.
+The default model C<gpt-4o-mini> is the lowest cost of the useful models and
+is a good place to start using this module.  Previous versions of this module
+defaulted to C<gpt-3.5-turbo-0125> but the current default is cheaper and
+quicker. For most purposes, the default model should be used.
 
 See also L<https://platform.openai.com/docs/models/overview>
 
@@ -193,7 +195,7 @@ The API to use (currently only 'OpenAI' is supported).
 
 =item model
 
-The language model to use (default: 'gpt-3.5-turbo-0125').
+The language model to use (default: 'gpt-4o-mini').
 
 See L<https://platform.openai.com/docs/models/overview>
 

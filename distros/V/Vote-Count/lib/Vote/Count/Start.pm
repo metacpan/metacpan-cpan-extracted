@@ -13,13 +13,13 @@ use Try::Tiny;
 use Vote::Count;
 use Vote::Count::ReadBallots 'read_ballots';
 
-our $VERSION='2.02';
+our $VERSION='2.04';
 
 =head1 NAME
 
 Vote::Count::Start
 
-=head1 VERSION 2.02
+=head1 VERSION 2.04
 
 =cut
 

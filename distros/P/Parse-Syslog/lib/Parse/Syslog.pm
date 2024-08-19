@@ -6,8 +6,9 @@ use Time::Local;
 use IO::File;
 use strict;
 use vars qw($VERSION);
+use warnings;
 
-$VERSION = '1.10';
+$VERSION = '1.11';
 
 my %months_map = (
     'Jan' => 0, 'Feb' => 1, 'Mar' => 2,
@@ -20,7 +21,7 @@ my %months_map = (
     'oct' => 9, 'nov' =>10, 'dec' =>11,
 );
 
-sub is_dst_switch($$$)
+sub is_dst_switch
 {
     my ($self, $t, $time) = @_;
 
@@ -62,7 +63,7 @@ sub is_dst_switch($$$)
 # fast timelocal, cache minute's timestamp
 # don't cache more than minute because of daylight saving time switch
 # 0: sec, 1: min, 2: h, 3: day, 4: month, 5: year
-sub str2time($$$$$$$$)
+sub str2time
 {
     my $self = shift @_;
     my $GMT = pop @_;
@@ -82,6 +83,12 @@ sub str2time($$$$$$$$)
     my $time;
     if($GMT) {
         $time = timegm(@_);
+        # with explicit timezone:
+        if($GMT =~ /^([\+\-])(\d\d):(\d\d)$/) {
+          my $off_secs = 60 * (60*$2 + $3);
+          $off_secs *= -1 if ($1 eq '+');
+          $time += $off_secs;
+        }
     }
     else {
         $time = timelocal(@_);
@@ -120,7 +127,7 @@ sub str2time($$$$$$$$)
     return $time+($self->{dst_comp}||0);
 }
 
-sub _use_locale($)
+sub _use_locale
 {
     use POSIX qw(locale_h strftime);
     my $old_locale = setlocale(LC_TIME);
@@ -134,7 +141,7 @@ sub _use_locale($)
 }
 
 
-sub new($$;%)
+sub new
 {
     my ($class, $file, %data) = @_;
     croak "new() requires one argument: file" unless defined $file;
@@ -154,11 +161,11 @@ sub new($$;%)
     }
     elsif(! ref $file) {
         if($file eq '-') {
-            my $io = new IO::Handle;
+            my $io = IO::Handle->new();
             $data{file} = $io->fdopen(fileno(STDIN),"r");
         }
         else {
-            $data{file} = new IO::File($file, "<");
+            $data{file} = IO::File->new($file, "<");
             defined $data{file} or croak "can't open $file: $!";
         }
     }
@@ -181,7 +188,7 @@ sub new($$;%)
     return bless \%data, $class;
 }
 
-sub _year_increment($$)
+sub _year_increment
 {
     my ($self, $mon) = @_;
 
@@ -202,7 +209,7 @@ sub _year_increment($$)
     $self->{_last_mon} = $mon;
 }
 
-sub _next_line($)
+sub _next_line
 {
     my $self = shift;
     my $f = $self->{file};
@@ -214,7 +221,7 @@ sub _next_line($)
     }
 }
 
-sub _next_syslog($)
+sub _next_syslog
 {
     my ($self) = @_;
 
@@ -236,19 +243,33 @@ sub _next_syslog($)
             \s+
             (?:\[LOG_[A-Z]+\]\s+)?  # FreeBSD
             (.*)                 # text  -- 7
+            $/x or
+        $str =~ /^
+            (\d\d\d\d)-(\d\d)-(\d\d)       # RFC3339 or syslog-ng ISO date  -- 1, 2, 3
+            T
+            (\d+):(\d+):(\d+)(?:\.\d+)?    # time (optional frac_sec)  -- 4, 5, 6
+            (Z|[\+\-]\d\d:\d\d)            # TZ -- 7
+            \s
+            ([-\w\.\@:]+)        # host  -- 8
+            \s+
+            (.*)                 # text  -- 9
             $/x or do
         {
             warn "WARNING: line not in syslog format: $str";
             next line;
         };
-        
-        my $mon = $months_map{$1};
-        defined $mon or croak "unknown month $1\n";
-
-        $self->_year_increment($mon);
-
+        my ($time, $host, $text);
         # convert to unix time
-        my $time = $self->str2time($5,$4,$3,$2,$mon,$self->{year}-1900,$self->{GMT});
+        if (defined($months_map{$1})) { # BSD Syslog
+          my $mon = $months_map{$1};
+          defined $mon or croak "unknown month $1\n";
+          $self->_year_increment($mon);
+          $time = $self->str2time($5,$4,$3,$2,$mon,$self->{year}-1900,$self->{GMT});
+          ($host, $text) = ($6, $7);
+        } else { # RFC3339/syslog-ng
+          $time = $self->str2time($6,$5,$4,$3,$2-1,$1-1900,$7);
+          ($host, $text) = ($8, $9);
+        }
         if(not $self->{allow_future}) {
             # accept maximum one day in the present future
             if($time - time > 86400) {
@@ -256,9 +277,6 @@ sub _next_syslog($)
                 next line;
             }
         }
-
-        my ($host, $text) = ($6, $7);
-
         # last message repeated ... times
         if($text =~ /^(?:last message repeated|above message repeats) (\d+) time/) {
             next line if defined $self->{repeat} and not $self->{repeat};
@@ -322,7 +340,7 @@ sub _next_syslog($)
     return undef;
 }
 
-sub _next_metalog($)
+sub _next_metalog
 {
     my ($self) = @_;
     my $file = $self->{file};
@@ -384,7 +402,7 @@ sub _next_metalog($)
     return undef;
 }
 
-sub next($)
+sub next
 {
     my ($self) = @_;
     if($self->{type} eq 'syslog') {

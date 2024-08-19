@@ -1,0 +1,12 @@
+2001-08-12T06:55:36Z hathi last message repeated 6 times
+2001-08-12T06:55:06Z hathi sshd[1966]: error: Hm, dispatch protocol error: type 32 plen 4
+2001-08-12T06:55:36Z hathi last message repeated 6 times
+2001-08-12T06:56:36.123456Z hathi last message repeated 12 times
+2001-08-12T06:59:16Z hathi last message repeated 8 times
+2001-08-12T08:59:19+02:00 avalon avalon snort[2176]: IDS552/web-iis_IIS ISAPI Overflow ida: 212.217.33.195:4850 -> 192.168.17.1:80 
+2001-08-12T07:59:19+01:00 avalon avalon snort[2176]: IDS243/web-cgi_http-cgi-pipe: 212.217.33.195:4850 -> 192.168.17.1:80 
+2001-08-12T02:59:21.0-04:00 hathi sshd[1966]: error: Hm, dispatch protocol error: type 32 plen 4
+2001-08-12T02:59:56.98-04:00 hathi last message repeated 7 times
+2001-08-12T16:00:01+09:00 hathi sshd[1966]: error: Hm, dispatch protocol error: type 32 plen 4
+2001-01-27T18:59:28+00:00 saturne keytable: Loading keymap: fr-latin1 succeeded
+2001-01-28T20:21:28+03:30 pluton syslogd 1.3-3#33.1: restart (remote reception).

@@ -32,7 +32,7 @@
       },
       "runtime" : {
          "requires" : {
-            "Feature::Compat::Class" : "0",
+            "Feature::Compat::Class" : "0.06",
             "Getopt::Long" : "0",
             "JSON" : "0",
             "Net::LastFM" : "0",
@@ -52,6 +52,6 @@
          "web" : "https://github.com/davorg-cpan/app-laststats"
       }
    },
-   "version" : "v0.0.6",
+   "version" : "v0.0.7",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

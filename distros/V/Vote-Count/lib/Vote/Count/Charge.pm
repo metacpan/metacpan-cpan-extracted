@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 use 5.024;
-use feature qw /postderef signatures switch/;
+use feature qw /postderef signatures/;
 
 package Vote::Count::Charge;
 use namespace::autoclean;
@@ -20,7 +20,7 @@ use Cpanel::JSON::XS;
 use YAML::XS;
 # use Storable 3.15 'dclone';
 
-our $VERSION='2.02';
+our $VERSION='2.04';
 
 has 'Seats' => (
   is       => 'ro',
@@ -246,12 +246,10 @@ sub Reinstate ( $I, @choices ) {
   my @reinstated = ();
 REINSTATELOOP:
   for my $choice (@choices) {
-  # I'm a fan of the give/when construct, but go to lengths not to use it
-  # because of past issues and that after 15 years it is still experimental.
-    given ($I->{'choice_status'}{$choice}{'state'}){
-      when ( 'suspended') { }
-      when ( 'deferred' )  { }
-      default { next REINSTATELOOP }
+    for my $state ($I->{'choice_status'}{$choice}{'state'}){
+      if ( $state eq 'suspended') { }
+      elsif ( $state eq 'deferred' )  { }
+      else { next REINSTATELOOP }
     };
     ($I->{'suspended'}->@*) = grep ( !/^$choice$/, $I->{'suspended'}->@* );
     ($I->{'deferred'}->@*) = grep ( !/^$choice$/, $I->{'deferred'}->@* );
@@ -377,7 +375,7 @@ sub SetQuota ($I, $style='droop') {
 
 Vote::Count::Charge
 
-=head1 VERSION 2.02
+=head1 VERSION 2.04
 
 =cut
 

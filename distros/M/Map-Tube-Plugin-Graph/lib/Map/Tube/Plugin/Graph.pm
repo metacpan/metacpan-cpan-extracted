@@ -1,6 +1,6 @@
 package Map::Tube::Plugin::Graph;
 
-$Map::Tube::Plugin::Graph::VERSION   = '0.42';
+$Map::Tube::Plugin::Graph::VERSION   = '0.43';
 $Map::Tube::Plugin::Graph::AUTHORITY = 'cpan:MANWAR';
 
 =head1 NAME
@@ -9,7 +9,7 @@ Map::Tube::Plugin::Graph - Graph plugin for Map::Tube.
 
 =head1 VERSION
 
-Version 0.42
+Version 0.43
 
 =cut
 
@@ -51,31 +51,12 @@ Moo Role. Once installed, it gets plugged into Map::Tube::* family.
 
 =head1 INSTALLATION
 
-The plugin primarily depends on GraphViz2 library. But  the GraphViz2 can only be
-installed  if the perl v5.014002 or above is installed. If your perl  environment
-satisfies this requirement then ignore the rest of instructions.
+The plugin primarily depends on GraphViz2 library. But GraphViz2 as of 2.61 can
+only be installed on perl v5.008008 or above.
 
-Having said that I still managed to install GraphViz2 on my box with perl 5.10.1.
-It requires a  bit of nasty hack. If you are willing to do then follow the steps
-below:
+For example, on my Windows 11 box running WSL2 (Ubuntu 24.04 LTS), try this:
 
-=over 2
-
-=item * Download the tar ball from CPAN.
-        e.g.
-        wget http://search.cpan.org/CPAN/authors/id/R/RS/RSAVAGE/GraphViz2-2.34.tgz
-
-=item * Extract the tar ball i.e. tar -xvzf GraphViz2-2.34.tgz
-
-=item * Change directory to GraphViz2-2.34 i.e. cd GraphViz2-2.34
-
-=item * Edit the Makefile.PL and comment the line (no: 11) that says:
-        require 5.014002; # For the utf8 stuff.
-
-=item * Now follow the usual command to make/test/install. If it complains about
-        missing package then install it on demand one at a time.
-
-=back
+    $ sudo apt install libgraphviz2-perl
 
 =head1 METHODS
 
@@ -123,12 +104,13 @@ L<https://github.com/manwar/Map-Tube-Plugin-Graph>
 
 =item * Gisbert W. Selke
 
+=item * Ed J
+
 =back
 
 =head1 BUGS
 
-Please report any bugs or feature requests to C<bug-map-tube at rt.cpan.org>,  or
-through the web interface at L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Map-Tube-Plugin-Graph>.
+Please report any bugs or feature requests through the web interface at L<https://github.com/manwar/Map-Tube-Plugin-Graph/issues>.
 I will  be notified and then you'll automatically be notified of progress on your
 bug as I make changes.
 
@@ -142,9 +124,9 @@ You can also look for information at:
 
 =over 4
 
-=item * RT: CPAN's request tracker (report bugs here)
+=item * BUG Report
 
-L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=Map-Tube-Plugin-Graph>
+L<https://github.com/manwar/Map-Tube-Plugin-Graph/issues>
 
 =item * AnnoCPAN: Annotated CPAN documentation
 
@@ -154,15 +136,15 @@ L<http://annocpan.org/dist/Map-Tube-Plugin-Graph>
 
 L<http://cpanratings.perl.org/d/Map-Tube-Plugin-Graph>
 
-=item * Search CPAN
+=item * Search MetaCPAN
 
-L<http://search.cpan.org/dist/Map-Tube-Plugin-Graph/>
+L<https://metacpan.org/dist/Map-Tube-Plugin-Graph>
 
 =back
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (C) 2015 - 2017 Mohammad S Anwar.
+Copyright (C) 2015 - 2024 Mohammad Sajid Anwar.
 
 This program  is  free software; you can redistribute it and / or modify it under
 the  terms  of the the Artistic License (2.0). You may obtain a  copy of the full

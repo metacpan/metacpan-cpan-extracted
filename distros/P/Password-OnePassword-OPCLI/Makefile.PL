@@ -8,7 +8,7 @@ use ExtUtils::MakeMaker 6.78;
 
 my %WriteMakefileArgs = (
   "ABSTRACT" => "get items out of 1Password with the \"op\" CLI",
-  "AUTHOR" => "Ricardo Signes <rjbs\@semiotic.systems>",
+  "AUTHOR" => "Ricardo Signes <cpan\@semiotic.systems>",
   "CONFIGURE_REQUIRES" => {
     "ExtUtils::MakeMaker" => "6.78"
   },
@@ -19,7 +19,9 @@ my %WriteMakefileArgs = (
   "PREREQ_PM" => {
     "Carp" => 0,
     "IPC::Run" => 0,
-    "JSON::MaybeXS" => 0
+    "JSON::MaybeXS" => 0,
+    "Moo" => 0,
+    "URI::Escape" => 0
   },
   "TEST_REQUIRES" => {
     "ExtUtils::MakeMaker" => 0,
@@ -28,7 +30,7 @@ my %WriteMakefileArgs = (
     "strict" => 0,
     "warnings" => 0
   },
-  "VERSION" => "0.001",
+  "VERSION" => "0.002",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -41,7 +43,9 @@ my %FallbackPrereqs = (
   "File::Spec" => 0,
   "IPC::Run" => 0,
   "JSON::MaybeXS" => 0,
+  "Moo" => 0,
   "Test::More" => "0.96",
+  "URI::Escape" => 0,
   "strict" => 0,
   "warnings" => 0
 );

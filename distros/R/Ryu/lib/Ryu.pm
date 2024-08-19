@@ -6,7 +6,7 @@ use warnings;
 # Older versions cannot complete the test suite successfully
 use 5.018;
 
-our $VERSION = '3.005';
+our $VERSION = '4.000';
 our $AUTHORITY = 'cpan:TEAM'; # AUTHORITY
 
 =encoding utf8
@@ -104,7 +104,8 @@ have much documentation - in practice, the L<Ryu::Source> implementation covers 
 =head2 So what does this module do?
 
 Nothing. It's just a top-level loader for pulling in all the other components.
-You wanted L<Ryu::Source> instead, or possibly L<Ryu::Buffer>.
+You wanted L<Ryu::Source> instead, or possibly L<Ryu::Buffer>. The other half of a
+L<Ryu::Source> is a L<Ryu::Sink>.
 
 =head2 Some notes that might not relate to anything
 
@@ -143,6 +144,7 @@ is equivalent to
 use Exporter qw(import export_to_level);
 
 use Ryu::Source;
+use Ryu::Sink;
 
 our $ryu = __PACKAGE__->new;
 
@@ -287,5 +289,5 @@ Tom Molesworth C<< <TEAM@cpan.org> >> with contributions from:
 
 =head1 LICENSE
 
-Copyright Tom Molesworth 2011-2023. Licensed under the same terms as Perl itself.
+Copyright Tom Molesworth 2011-2024. Licensed under the same terms as Perl itself.
 

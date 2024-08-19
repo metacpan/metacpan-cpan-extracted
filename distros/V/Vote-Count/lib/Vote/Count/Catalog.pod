@@ -2,7 +2,7 @@
 
 =pod
 
-=head1 VERSION 2.02
+=head1 VERSION 2.04
 
 =head1 NAME
 

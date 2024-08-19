@@ -41,7 +41,7 @@ subtest 'where { block() }' => sub {
 subtest 'where [0..9]' => sub {
     plan tests => 4;
 
-    func range_int (Int $n where {$n~~[0..9]} //= 0) {
+    func range_int (Int $n where {$n >= 0 && $n <= 9} //= 0) {
         ok defined $n, "range_int($n) has defined value";
         ok 0 <= $n && $n <= 9, "range_int($n) has value in range";
         return 1;

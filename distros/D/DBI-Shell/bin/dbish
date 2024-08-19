@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-our $VERSION = '11.97'; # VERSION
+our $VERSION = '11.98'; # VERSION
 
 use DBI::Shell;
 my $sh = DBI::Shell->new(@ARGV)->run;

@@ -1,4 +1,7 @@
 Revision history for Password-OnePassword-OPCLI
 
+0.002     2024-08-18 14:15:49-04:00 America/New_York
+        - add the get_otp method
+
 0.001     2024-05-25 11:21:03-04:00 America/New_York
         - first release

@@ -19,9 +19,12 @@ no_index:
   directory:
     - t
     - inc
+recommends:
+  PDL: '2.089'
+requires: {}
 resources:
   bugtracker: https://github.com/PDLPorters/perl5-PGPLOT/issues
   repository: git://github.com/PDLPorters/perl5-PGPLOT.git
-version: '2.31'
+version: '2.32'
 x_IRC: irc://irc.perl.org/#pdl
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

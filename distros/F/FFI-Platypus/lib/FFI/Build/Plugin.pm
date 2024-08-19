@@ -6,7 +6,7 @@ use autodie;
 use File::Spec::Functions qw( catdir catfile );
 
 # ABSTRACT: Platform and local customizations of FFI::Build
-our $VERSION = '2.08'; # VERSION
+our $VERSION = '2.09'; # VERSION
 
 
 sub new
@@ -72,7 +72,7 @@ FFI::Build::Plugin - Platform and local customizations of FFI::Build
 
 =head1 VERSION
 
-version 2.08
+version 2.09
 
 =head1 SYNOPSIS
 
@@ -135,6 +135,8 @@ szTheory
 José Joaquín Atria (JJATRIA)
 
 Pete Houston (openstrike, HOUSTON)
+
+Lukas Mai (MAUKE)
 
 =head1 COPYRIGHT AND LICENSE
 

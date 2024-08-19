@@ -47,13 +47,15 @@ sub run {
 	my $json = "";
 	my $reading_json = 0;
 	while(<$ffmpeg>) {
+		if(/{/) {
+			$reading_json++;
+		}
 		if($reading_json) {
 			$json .= $_;
-			next;
 		}
-		if(/Parsed_loudnorm/) {
-			$reading_json = 1;
-		}
+                if(/}/) {
+                        $reading_json--;
+                }
 	}
 	$json = decode_json($json);
 
