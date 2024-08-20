@@ -33,9 +33,7 @@ class R::NDArray::Float extends R::NDArray {
   
   method elem_to_string : string ($data : float[], $data_index : int) {
     
-    my $elem = $data->[$data_index];
-    
-    my $string = (string)(float)$elem;
+    my $string = (string)$data->[$data_index];
     
     return $string;
   }
@@ -71,8 +69,8 @@ class R::NDArray::Float extends R::NDArray {
     return (R::NDArray::Float)$self->SUPER::clone($shallow);
   }
   
-  method slice : R::NDArray::Float ($asix_indexes_product : R::NDArray::Int[]) {
-    return (R::NDArray::Float)$self->SUPER::slice($asix_indexes_product);
+  method slice : R::NDArray::Float ($indexes_product : R::NDArray::Int[]) {
+    return (R::NDArray::Float)$self->SUPER::slice($indexes_product);
   }
   
   precompile method to_int_ndarray : R::NDArray::Int () {
@@ -141,7 +139,7 @@ class R::NDArray::Float extends R::NDArray {
     my $ret_data = $ret_ndarray->data;
     
     for (my $i = 0; $i < $length; $i++) {
-      $ret_data->[$i]{re} = (float)$data->[$i];
+      $ret_data->[$i]{re} = $data->[$i];
       $ret_data->[$i]{im} = 0f;
     }
     

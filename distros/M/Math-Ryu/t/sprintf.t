@@ -4,6 +4,7 @@ use strict;
 use warnings;
 use Config;
 use Math::BigInt;
+use Math::BigFloat;
 use Math::Ryu qw(:all);
 use Test::More;
 
@@ -80,5 +81,12 @@ else {
   # It will be handled as an NV, with no loss of precision or value.
   cmp_ok(  $str, 'eq', '-9223372036854775810.0', "3: '-9223372036854775810' is handled as expected");
 }
+
+my $mbf1 = Math::BigFloat->new(2);
+my $mbf2 = Math::BigFloat->new(2);
+cmp_ok(spanyf($mbf1, ' ', $mbf1->bsqrt), 'eq',
+       sprintf ("%s%s%s", $mbf2, ' ', $mbf2->bsqrt),                  "Test A: spany and sprintf agree on multi-arg");
+cmp_ok(spanyf(Math::BigFloat->new(2), ' ', $mbf1->bsqrt), 'eq',
+       sprintf ("%s%s%s", Math::BigFloat->new(2), ' ', $mbf2->bsqrt), "Test B: spany and sprintf agree on multi-arg");
 
 done_testing();

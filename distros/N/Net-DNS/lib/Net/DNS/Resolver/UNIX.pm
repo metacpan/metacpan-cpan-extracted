@@ -2,7 +2,7 @@ package Net::DNS::Resolver::UNIX;
 
 use strict;
 use warnings;
-our $VERSION = (qw$Id: UNIX.pm 1972 2024-04-21 08:13:19Z willem $)[2];
+our $VERSION = (qw$Id: UNIX.pm 1981 2024-06-17 13:22:14Z willem $)[2];
 
 
 =head1 NAME
@@ -10,9 +10,6 @@ our $VERSION = (qw$Id: UNIX.pm 1972 2024-04-21 08:13:19Z willem $)[2];
 Net::DNS::Resolver::UNIX - Unix resolver class
 
 =cut
-
-
-use base qw(Net::DNS::Resolver::Base);
 
 
 my @config_file = grep { -f $_ && -r _ } '/etc/resolv.conf';
@@ -27,12 +24,12 @@ local $ENV{PATH} = join ':', grep {$_} qw(/bin /usr/bin), $path;
 my $uname = eval {`uname -n 2>/dev/null`} || '';
 chomp $uname;
 my ( $host, @domain ) = split /\./, $uname, 2;
-__PACKAGE__->domain(@domain);
 
 
 sub _init {
 	my $defaults = shift->_defaults;
 
+	$defaults->domain(@domain);
 	$defaults->_read_config_file($_) foreach @config_file;
 
 	%$defaults = Net::DNS::Resolver::Base::_untaint(%$defaults);

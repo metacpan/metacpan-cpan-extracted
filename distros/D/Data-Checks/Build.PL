@@ -21,9 +21,10 @@ my $build = Module::Build::with::XSTests->new(
       'Module::Build' => '0.4004', # test_requires
    },
    share_dir => {
-      dist => [ 'share' ],
+      module => { "Data::Checks" => [ 'share' ] },
    },
-   extra_compiler_flags => [qw( -Ishare/include -Ihax )],
+   extra_compiler_flags => [qw( -Ishare/include -Iinclude -Ihax )],
+   c_source => [ "src/" ],
    license => 'perl',
    create_license => 1,
    create_readme  => 1,

@@ -1,7 +1,7 @@
 use Modern::Perl;
 
 package DBIx::Squirrel;
-$DBIx::Squirrel::VERSION = '1.2.10';
+$DBIx::Squirrel::VERSION = '1.2.11';
 =pod
 
 =encoding UTF-8
@@ -12,7 +12,7 @@ DBIx::Squirrel - A C<DBI> extension
 
 =head1 VERSION
 
-version 1.2.10
+version 1.2.11
 
 =head1 SYNOPSIS
 
@@ -45,7 +45,7 @@ version 1.2.10
     db(DBIx::Squirrel->connect($dsn, $user, $pass, \%attr));
 
     # First, we need to associate "product" with a result set, then use
-    # "product" to reference itt in future. The next time arguments are
+    # "product" to reference it in future. The next time arguments are
     # passed, they are treated as bind-values when the statement is
     # executed.
     #
@@ -341,7 +341,6 @@ use DBIx::Squirrel::rs   ();
 use DBIx::Squirrel::rc   ();
 use DBIx::Squirrel::util qw/throw uniq/;
 
-
 BEGIN {
     @DBIx::Squirrel::ISA                          = 'DBI';
     *DBIx::Squirrel::EXPORT_OK                    = *DBI::EXPORT_OK;
@@ -365,7 +364,6 @@ BEGIN {
 
 use constant E_BAD_ENT_BIND     => 'Cannot associate with an invalid object';
 use constant E_EXP_HASH_ARR_REF => 'Expected a reference to a HASH or ARRAY';
-
 
 sub _partition_imports_into_helpers_and_dbi_imports {
     my $class = shift;
@@ -391,7 +389,6 @@ sub _partition_imports_into_helpers_and_dbi_imports {
     }
     return (\@helpers, \@dbi);
 }
-
 
 sub import {
     no strict 'refs';    ## no critic

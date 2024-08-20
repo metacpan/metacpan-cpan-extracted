@@ -3,7 +3,7 @@
 #
 #  (C) Paul Evans, 2024 -- leonerd@leonerd.org.uk
 
-package Data::Checks 0.09;
+package Data::Checks 0.10;
 
 use v5.22;
 use warnings;
@@ -201,6 +201,15 @@ This choice is made so that a set of C<NumRange> constraints can easily be
 created that cover distinct sets of numbers:
 
    NumRange(0, 10), NumRange(10, 20), NumRange(20, 30), ...
+
+To implement checks with both lower and upper bounds but other kinds of
+inclusivity, use two C<Num...> checks combined with an C<All()>. For example,
+to test between 0 and 100 inclusive at both ends:
+
+   All(NumGE(0), NumLE(100))
+
+Combinations like this are internally implemented as efficiently as a single
+C<NumRange()> constraint.
 
 =head2 NumEq
 
@@ -422,13 +431,22 @@ stored message string. Neither SV is retained by the checker directly.
 
    OP *make_assertop(struct DataChecks_Checker *checker, OP *argop);
 
+Shortcut to calling L</make_assertop_flags> with I<flags> set to zero.
+
+=head2 make_assertop_flags
+
+   OP *make_assertop_flags(struct DataChecks_Checker *checker, U32 flags, OP *argop);
+
 Creates an optree fragment for a value check assertion operation.
 
 Given an optree fragment in scalar context that generates an argument value
 (I<argop>), constructs a larger optree fragment that consumes it and checks
 that the value is accepted by the constraint check given by I<checker>. The
-returned optree fragment will operate in void context (i.e. it does I<not>
-yield the argument value itself).
+behaviours of the returned optree fragment will depend on the I<flags>.
+
+If I<flags> is C<OPf_WANT_VOID> the returned optree will yield nothing.
+
+If I<flags> is zero, the return behaviour is not otherwise specified.
 
 =head2 check_value
 
@@ -458,6 +476,10 @@ C<Num>, some reference types, etc...
 =item *
 
 Structural constraints - C<HashOf>, C<ArrayOf>, etc...
+
+=item *
+
+Think about a convenient name for inclusive-bounded numerical constraints.
 
 =item *
 

@@ -2,7 +2,7 @@ package Net::DNS::Resolver::MSWin32;
 
 use strict;
 use warnings;
-our $VERSION = (qw$Id: MSWin32.pm 1961 2024-01-25 11:04:57Z willem $)[2];
+our $VERSION = (qw$Id: MSWin32.pm 1981 2024-06-17 13:22:14Z willem $)[2];
 
 
 =head1 NAME
@@ -12,7 +12,6 @@ Net::DNS::Resolver::MSWin32 - MS Windows resolver class
 =cut
 
 
-use base qw(Net::DNS::Resolver::Base);
 use Carp;
 
 use constant WINHLP => defined eval 'require Win32::IPHelper';	## no critic

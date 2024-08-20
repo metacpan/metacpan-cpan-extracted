@@ -704,6 +704,27 @@ subtest 'op_concat_map' => sub {
         }),
     );
     obs_is $o, ['---0--1--2'], 'with promises';
+
+    $o = rx_of(10, 20, 30)->pipe(
+        op_concat_map(sub {
+            my ($d) = @_;
+            rx_interval(1)->pipe(
+                op_take(3),
+                op_map(sub { $d + $_ }),
+            );
+        }),
+    );
+    obs_is $o, ['-abcdefghi', {
+        a => 10,
+        b => 11,
+        c => 12,
+        d => 20,
+        e => 21,
+        f => 22,
+        g => 30,
+        h => 31,
+        i => 32,
+    }], 'source may complete early';
 };
 
 subtest 'op_exhaust_map' => sub {
@@ -899,6 +920,33 @@ subtest 'op_skip_last' => sub {
         op_skip_last(2),
     );
     obs_is $o, ['-------a-b--'];
+};
+
+subtest 'op_catch_error' => sub {
+    my $o = rx_concat(
+        rx_of(1, 2, 3),
+        rx_throw_error('foo')
+    )->pipe(
+        op_catch_error(sub {
+            my ($err, $caught) = @_;
+            $caught;
+        }),
+        op_take(10),
+    );
+    obs_is $o, ['(1231231231)'], 'repeat mode with $caught';
+
+    $o = rx_throw_error('foo')->pipe(
+        op_catch_error(sub { rx_throw_error; }),
+    );
+    obs_is $o, ['#'], 'error in error';
+
+    $o = rx_concat(
+        rx_of(1, 2, 3),
+        rx_throw_error('foo')
+    )->pipe(
+        op_catch_error(sub { rx_of(4) }),
+    );
+    obs_is $o, ['(1234)'], 'emit next value';
 };
 
 done_testing();

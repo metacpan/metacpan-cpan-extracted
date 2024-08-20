@@ -11,7 +11,7 @@ else { warn "\nCompiler HAS_UINT128: 0\n" }
 warn "PV_NV_BUG: ", Math::Ryu::PV_NV_BUG, "\n";
 warn "MAX_DEC_DIG: ", Math::Ryu::MAX_DEC_DIG, "\n";
 
-cmp_ok($Math::Ryu::VERSION, 'eq', '1.04', "\$Math::Ryu::VERSION is as expected");
+cmp_ok($Math::Ryu::VERSION, 'eq', '1.05', "\$Math::Ryu::VERSION is as expected");
 
 cmp_ok(Math::Ryu::MAX_DEC_DIG, '!=', 0, "MAX_DEC_DIG is non-zero");
 

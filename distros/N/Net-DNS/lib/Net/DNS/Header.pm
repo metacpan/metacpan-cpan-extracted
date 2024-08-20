@@ -3,7 +3,7 @@ package Net::DNS::Header;
 use strict;
 use warnings;
 
-our $VERSION = (qw$Id: Header.pm 1970 2024-03-22 01:51:29Z willem $)[2];
+our $VERSION = (qw$Id: Header.pm 1982 2024-07-23 16:16:53Z willem $)[2];
 
 
 =head1 NAME
@@ -66,15 +66,16 @@ sub string {
 	my $an	   = $self->ancount;
 	my $ns	   = $self->nscount;
 	my $ar	   = $self->arcount;
+	my $dispid = defined $id ? $id : 'undef';
 	return <<"QQ" if $opcode eq 'DSO';
-;;	id = $id
-;;	qr = $qr		opcode = $opcode	rcode = $rcode
-;;	qdcount = $qd	ancount = $an	nscount = $ns	arcount = $ar
+;;	id = $dispid	qr = $qr
+;;	opcode = $opcode	rcode = $rcode
 QQ
 	return <<"QQ" if $opcode eq 'UPDATE';
-;;	id = $id
-;;	qr = $qr		opcode = $opcode	rcode = $rcode
-;;	zocount = $qd	prcount = $an	upcount = $ns	adcount = $ar
+;;	id = $dispid	qr = $qr
+;;	opcode = $opcode	rcode = $rcode
+;;	zocount = $qd	prcount = $an
+;;	upcount = $ns	adcount = $ar
 QQ
 	my $aa = $self->aa;
 	my $tc = $self->tc;
@@ -86,11 +87,12 @@ QQ
 	my $do = $self->do;
 	my $co = $self->co;
 	return <<"QQ";
-;;	id = $id
+;;	id = $dispid
 ;;	qr = $qr	aa = $aa	tc = $tc	rd = $rd	opcode = $opcode
 ;;	ra = $ra	z  = $zz	ad = $ad	cd = $cd	rcode  = $rcode
-;;	qdcount = $qd	ancount = $an	nscount = $ns	arcount = $ar
 ;;	do = $do	co = $co
+;;	qdcount = $qd	ancount = $an
+;;	nscount = $ns	arcount = $ar
 QQ
 }
 
@@ -116,21 +118,12 @@ sub print {
 
 Gets or sets the query identification number.
 
-A random value is assigned if the argument value is undefined.
-
 =cut
-
-my ( $cache1, $cache2, $limit );				# two layer cache
 
 sub id {
 	my ( $self, @value ) = @_;
 	for (@value) { $$self->{id} = $_ }
-	my $ident = $$self->{id};
-	return $ident if defined($ident);
-	( $cache1, $cache2, $limit ) = ( {0 => 1}, $cache1, 50 ) unless $limit--;
-	$ident = int rand(0xffff);				# preserve short-term uniqueness
-	$ident = int rand(0xffff) while $cache1->{$ident}++ + exists( $cache2->{$ident} );
-	return $$self->{id} = $ident;
+	return $$self->{id};
 }
 
 
@@ -514,7 +507,7 @@ DEALINGS IN THE SOFTWARE.
 =head1 SEE ALSO
 
 L<perl> L<Net::DNS> L<Net::DNS::Packet> L<Net::DNS::RR::OPT>
-L<RFC1035(4.1.1)|https://tools.ietf.org/html/rfc1035>
+L<RFC1035(4.1.1)|https://iana.org/go/rfc1035#section-4.1.1>
 
 =cut
 

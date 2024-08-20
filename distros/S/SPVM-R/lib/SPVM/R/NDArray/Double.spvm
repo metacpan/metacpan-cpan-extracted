@@ -39,9 +39,7 @@ class R::NDArray::Double extends R::NDArray {
   
   method elem_to_string : string ($data : double[], $data_index : int) {
     
-    my $elem = $data->[$data_index];
-    
-    my $string = (string)(double)$elem;
+    my $string = (string)$data->[$data_index];
     
     return $string;
   }
@@ -77,8 +75,8 @@ class R::NDArray::Double extends R::NDArray {
     return (R::NDArray::Double)$self->SUPER::clone($shallow);
   }
   
-  method slice : R::NDArray::Double ($asix_indexes_product : R::NDArray::Int[]) {
-    return (R::NDArray::Double)$self->SUPER::slice($asix_indexes_product);
+  method slice : R::NDArray::Double ($indexes_product : R::NDArray::Int[]) {
+    return (R::NDArray::Double)$self->SUPER::slice($indexes_product);
   }
   
   precompile method to_int_ndarray : R::NDArray::Int () {
@@ -147,7 +145,7 @@ class R::NDArray::Double extends R::NDArray {
     my $ret_data = $ret_ndarray->data;
     
     for (my $i = 0; $i < $length; $i++) {
-      $ret_data->[$i]{re} = (double)$data->[$i];
+      $ret_data->[$i]{re} = $data->[$i];
       $ret_data->[$i]{im} = 0;
     }
     

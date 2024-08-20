@@ -168,6 +168,15 @@ CONSTRAINTS
 
        NumRange(0, 10), NumRange(10, 20), NumRange(20, 30), ...
 
+    To implement checks with both lower and upper bounds but other kinds of
+    inclusivity, use two Num... checks combined with an All(). For example,
+    to test between 0 and 100 inclusive at both ends:
+
+       All(NumGE(0), NumLE(100))
+
+    Combinations like this are internally implemented as efficiently as a
+    single NumRange() constraint.
+
  NumEq
 
        NumEq($n)
@@ -357,13 +366,23 @@ XS FUNCTIONS
 
        OP *make_assertop(struct DataChecks_Checker *checker, OP *argop);
 
+    Shortcut to calling "make_assertop_flags" with flags set to zero.
+
+ make_assertop_flags
+
+       OP *make_assertop_flags(struct DataChecks_Checker *checker, U32 flags, OP *argop);
+
     Creates an optree fragment for a value check assertion operation.
 
     Given an optree fragment in scalar context that generates an argument
     value (argop), constructs a larger optree fragment that consumes it and
     checks that the value is accepted by the constraint check given by
-    checker. The returned optree fragment will operate in void context
-    (i.e. it does not yield the argument value itself).
+    checker. The behaviours of the returned optree fragment will depend on
+    the flags.
+
+    If flags is OPf_WANT_VOID the returned optree will yield nothing.
+
+    If flags is zero, the return behaviour is not otherwise specified.
 
  check_value
 
@@ -385,6 +404,9 @@ TODO
       Num, some reference types, etc...
 
       * Structural constraints - HashOf, ArrayOf, etc...
+
+      * Think about a convenient name for inclusive-bounded numerical
+      constraints.
 
       * Look into making const-folding work with the MIN .. MAX flip-flop
       operator

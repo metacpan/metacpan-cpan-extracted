@@ -2,7 +2,7 @@ package Net::DNS::Resolver::Base;
 
 use strict;
 use warnings;
-our $VERSION = (qw$Id: Base.pm 1969 2024-03-07 16:29:36Z willem $)[2];
+our $VERSION = (qw$Id: Base.pm 1982 2024-07-23 16:16:53Z willem $)[2];
 
 
 #
@@ -23,6 +23,11 @@ our $VERSION = (qw$Id: Base.pm 1969 2024-03-07 16:29:36Z willem $)[2];
 #
 # Olaf Kolkman, RIPE NCC, December 2003.
 # [Revised March 2016, June 2018]
+
+
+use constant OS_SPEC => defined eval "require Net::DNS::Resolver::$^O";	## no critic
+use constant OS_CONF => join '::', 'Net::DNS::Resolver', OS_SPEC ? $^O : 'UNIX';
+use base OS_CONF;
 
 
 use constant USE_SOCKET_IP => defined eval 'use IO::Socket::IP 0.38; 1;';	## no critic
@@ -413,7 +418,7 @@ sub search {
 sub send {
 	my ( $self, @argument ) = @_;
 	my $packet	= $self->_make_query_packet(@argument);
-	my $packet_data = $packet->data;
+	my $packet_data = $packet->encode;
 
 	$self->_reset_errorstring;
 
@@ -555,7 +560,7 @@ NAMESERVER: foreach my $ns (@ns) {
 sub bgsend {
 	my ( $self, @argument ) = @_;
 	my $packet	= $self->_make_query_packet(@argument);
-	my $packet_data = $packet->data;
+	my $packet_data = $packet->encode;
 
 	$self->_reset_errorstring;
 
@@ -640,7 +645,7 @@ sub bgbusy {				## no critic		# overwrites user UDP handle
 	return unless $ans->header->tc;
 
 	$self->_diag('packet truncated: retrying using TCP');
-	my $tcp = $self->_bgsend_tcp( $query, $query->data ) || return;
+	my $tcp = $self->_bgsend_tcp( $query, $query->encode ) || return;
 	return defined( $_[1] = $tcp );				# caller's UDP handle now TCP
 }
 
@@ -761,7 +766,7 @@ sub axfr_next {				## historical
 
 sub _axfr_start {
 	my ( $self, $request ) = @_;
-	my $content = $request->data;
+	my $content = $request->encode;
 	my $TCP_msg = pack 'n a*', length($content), $content;
 
 	my ( $select, $reply, $rcode );
@@ -974,10 +979,7 @@ sub _make_query_packet {
 	my ( $self, @argument ) = @_;
 
 	my ($packet) = @argument;
-	if ( ref($packet) ) {
-		my $edns = $packet->edns;			# advertise UDPsize for local stack
-		$edns->udpsize( $self->{udppacketsize} ) unless defined $edns->{udpsize};
-	} else {
+	unless ( ref($packet) ) {
 		$packet = Net::DNS::Packet->new(@argument);
 		$packet->edns->udpsize( $self->{udppacketsize} );
 

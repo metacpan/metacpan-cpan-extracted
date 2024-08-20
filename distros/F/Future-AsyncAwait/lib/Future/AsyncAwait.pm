@@ -1,9 +1,9 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2016-2021 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2016-2024 -- leonerd@leonerd.org.uk
 
-package Future::AsyncAwait 0.66;
+package Future::AsyncAwait 0.67;
 
 use v5.14;
 use warnings;
@@ -13,13 +13,7 @@ use Carp;
 require XSLoader;
 XSLoader::load( __PACKAGE__, our $VERSION );
 
-require Future; Future->VERSION( '0.48' );
-
-if( !Future->can( "AWAIT_WAIT" ) ) {
-   no strict 'refs';
-   # Future 0.48 had this method; newer futures already provide AWAIT_WAIT
-   *{"Future::AWAIT_WAIT"} = Future->can( "get" );
-}
+require Future; Future->VERSION( '0.49' );
 
 =head1 NAME
 

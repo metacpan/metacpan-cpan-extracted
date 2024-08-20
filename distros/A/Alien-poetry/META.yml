@@ -28,7 +28,7 @@ no_index:
     - inc
 requires:
   Alien::Build: '2.83'
-version: '1.000005'
+version: '1.000006'
 x_alienfile:
   generated_by: 'Alien::Build::MM version 2.83'
   requires:

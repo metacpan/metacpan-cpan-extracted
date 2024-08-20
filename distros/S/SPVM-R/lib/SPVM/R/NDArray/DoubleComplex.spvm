@@ -56,8 +56,8 @@ class R::NDArray::DoubleComplex extends R::NDArray {
     $dist_data->[$dist_data_index] = $src_data->[$src_data_index];
   }
   
-  method slice : R::NDArray::DoubleComplex ($asix_indexes_product : R::NDArray::Int[]) {
-    return (R::NDArray::DoubleComplex)$self->SUPER::slice($asix_indexes_product);
+  method slice : R::NDArray::DoubleComplex ($indexes_product : R::NDArray::Int[]) {
+    return (R::NDArray::DoubleComplex)$self->SUPER::slice($indexes_product);
   }
   
   method elem_is_na : int ($data : Complex_2d[], $data_index : int) {

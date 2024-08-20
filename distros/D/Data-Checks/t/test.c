@@ -260,12 +260,20 @@ XS_EUPXS(XS_t__test_make_asserter_sub); /* prototype to pass -Wmissing-prototype
 XS_EUPXS(XS_t__test_make_asserter_sub)
 {
     dVAR; dXSARGS;
-    if (items != 1)
-       croak_xs_usage(cv,  "checker");
+    if (items < 1 || items > 2)
+       croak_xs_usage(cv,  "checker, flagname= &PL_sv_undef");
     {
 	SV *	RETVAL;
 	struct DataChecks_Checker *	checker = INT2PTR(struct DataChecks_Checker *,SvIV(ST(0)))
 ;
+	SV *	flagname;
+
+	if (items < 2)
+	    flagname = &PL_sv_undef;
+	else {
+	    flagname = ST(1)
+;
+	}
 #line 39 "t/test.xs"
   {
     if(!PL_parser) {
@@ -280,12 +288,20 @@ XS_EUPXS(XS_t__test_make_asserter_sub)
       PL_parser->preambling = NOLINE;
     }
 
+    U32 flags = 0;
+    if(flagname && SvOK(flagname)) {
+      if(SvPOK(flagname) && strEQ(SvPVX(flagname), "void"))
+        flags = OPf_WANT_VOID;
+    }
+
     I32 floorix = start_subparse(FALSE, 0);
-    OP *body = make_assertop(checker, newSLUGOP(0));
+    OP *body = newLISTOPn(OP_RETURN, 0,
+      make_assertop_flags(checker, flags, newSLUGOP(0)),
+      NULL);
     CV *cv = newATTRSUB(floorix, NULL, NULL, NULL, body);
     RETVAL = newRV_noinc((SV *)cv);
   }
-#line 289 "t/test.c"
+#line 305 "t/test.c"
 	RETVAL = sv_2mortal(RETVAL);
 	ST(0) = RETVAL;
     }
@@ -328,10 +344,10 @@ XS_EXTERNAL(boot_t__test)
 
     /* Initialisation Section */
 
-#line 61 "t/test.xs"
+#line 69 "t/test.xs"
   boot_data_checks(0);
 
-#line 335 "t/test.c"
+#line 351 "t/test.c"
 
     /* End of Initialisation Section */
 

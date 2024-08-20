@@ -2,7 +2,7 @@ package Net::DNS::Resolver::Recurse;
 
 use strict;
 use warnings;
-our $VERSION = (qw$Id: Recurse.pm 1965 2024-02-14 09:19:32Z willem $)[2];
+our $VERSION = (qw$Id: Recurse.pm 1981 2024-06-17 13:22:14Z willem $)[2];
 
 
 =head1 NAME
@@ -23,12 +23,12 @@ Net::DNS::Resolver::Recurse - DNS recursive resolver
 
 =head1 DESCRIPTION
 
-This module is a subclass of Net::DNS::Resolver.
+This module resolves queries by following the delegation path from the DNS root.
 
 =cut
 
 
-use base qw(Net::DNS::Resolver);
+use base qw(Net::DNS::Resolver::Base);
 
 
 =head1 METHODS

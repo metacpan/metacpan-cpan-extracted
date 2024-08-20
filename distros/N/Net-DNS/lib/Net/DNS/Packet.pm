@@ -3,7 +3,7 @@ package Net::DNS::Packet;
 use strict;
 use warnings;
 
-our $VERSION = (qw$Id: Packet.pm 1959 2024-01-17 08:55:01Z willem $)[2];
+our $VERSION = (qw$Id: Packet.pm 1982 2024-07-23 16:16:53Z willem $)[2];
 
 
 =head1 NAME
@@ -75,16 +75,14 @@ sub new {
 }
 
 
-#=head2 decode
-
-=pod
+=head2 decode
 
     $packet = Net::DNS::Packet->decode( \$data );
     $packet = Net::DNS::Packet->decode( \$data, 1 );	# debug
     $packet = Net::DNS::Packet->new( \$data ... );
 
-If passed a reference to a scalar containing DNS packet data, a new
-packet object is created by decoding the data.
+A new packet object is created by decoding the DNS packet data
+contained in the scalar referenced by the first argument.
 The optional second boolean argument enables debugging output.
 
 Returns undef if unable to create a packet object.
@@ -107,7 +105,7 @@ or corrupted during transmission.
 use constant HEADER_LENGTH => length pack 'n6', (0) x 6;
 
 sub decode {
-	my $class = shift;					# uncoverable pod
+	my $class = shift;
 	my $data  = shift;
 	my $debug = shift || 0;
 
@@ -180,10 +178,10 @@ sub decode {
 }
 
 
-=head2 data
+=head2 encode
 
-    $data = $packet->data;
-    $data = $packet->data( $size );
+    $data = $packet->encode;
+    $data = $packet->encode( $size );
 
 Returns the packet data in binary format, suitable for sending as a
 query or update request to a nameserver.
@@ -193,11 +191,11 @@ Truncation may be specified using a non-zero optional size argument.
 =cut
 
 sub data {
-	return &encode;
+	return &encode;						# uncoverable pod
 }
 
 sub encode {
-	my ( $self, $size ) = @_;				# uncoverable pod
+	my ( $self, $size ) = @_;
 
 	my $edns = $self->edns;					# EDNS support
 	my @addl = grep { !$_->isa('Net::DNS::RR::OPT') } @{$self->{additional}};
@@ -207,7 +205,7 @@ sub encode {
 
 	my @part = qw(question answer authority additional);
 	my @size = map { scalar @{$self->{$_}} } @part;
-	my $data = pack 'n6', $self->header->id, $self->{status}, @size;
+	my $data = pack 'n6', $self->_quid, $self->{status}, @size;
 	$self->{count} = [];
 
 	my $hash = {};						# packet body
@@ -824,7 +822,7 @@ sub truncate {
 
 	my @part = qw(question answer authority additional);
 	my @size = map { scalar @{$self->{$_}} } @part;
-	return pack 'n6 a*', $self->header->id, $self->{status}, @size, substr( $data, HEADER_LENGTH );
+	return pack 'n6 a*', $self->_quid, $self->{status}, @size, substr( $data, HEADER_LENGTH );
 }
 
 
@@ -838,6 +836,20 @@ sub dump {				## print internal data structure
 	local $Data::Dumper::Useqq    = $Data::Dumper::Useqq	|| 1;
 	print Data::Dumper::Dumper(@data);
 	return;
+}
+
+
+my ( $cache1, $cache2, $limit );
+
+sub _quid {				## generate (short-term) unique query ID
+	my $self = shift;
+	my $id	 = $self->{id};
+	$cache1->{$id}++ if $id;				# cache non-zero ID
+	return $id if defined $id;
+	( $cache2, $cache1, $limit ) = ( $cache1, {0 => 1}, 50 ) unless $limit--;
+	$id = int rand(0xffff);					# two layer ID cache
+	$id = int rand(0xffff) while $cache1->{$id}++ + exists( $cache2->{$id} );
+	return $self->{id} = $id;
 }
 
 
@@ -879,11 +891,12 @@ DEALINGS IN THE SOFTWARE.
 
 =head1 SEE ALSO
 
-L<perl> L<Net::DNS> L<Net::DNS::Update> L<Net::DNS::Header>
+L<perl> L<Net::DNS> L<Net::DNS::Header>
 L<Net::DNS::Question> L<Net::DNS::RR> L<Net::DNS::RR::TSIG>
-L<RFC1035(4.1)|https://tools.ietf.org/html/rfc1035>
-L<RFC2136(2)|https://tools.ietf.org/html/rfc2136>
-L<RFC8945|https://tools.ietf.org/html/rfc8945>
+L<RFC1035(4.1)|https://iana.org/go/rfc1035#section-4.1>
+L<RFC2136|https://iana.org/go/rfc2136#section-2>
+L<RFC8490|https://iana.org/go/rfc8490>
+L<RFC8945|https://iana.org/go/rfc8945>
 
 =cut
 

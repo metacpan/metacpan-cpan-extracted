@@ -1,5 +1,11 @@
 Revision history for Data-Checks
 
+0.10    2024-08-19
+        [CHANGES]
+         * Optional flags arguments to `make_assertop`
+         * Neater use in optrees by passing OPf_WANT_VOID to `make_assertop`
+         * Optimise `All()` combinations of multiple number bounds checks
+
 0.09    2024-07-31
         [CHANGES]
          * Deprecate the use of plain CODE references as constraint checkers

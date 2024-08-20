@@ -3,7 +3,6 @@ use Modern::Perl;
 package    # hide from PAUSE
   DBIx::Squirrel::st;
 
-
 BEGIN {
     require DBIx::Squirrel
       unless defined($DBIx::Squirrel::VERSION);
@@ -16,7 +15,6 @@ use DBIx::Squirrel::util qw/throw whine/;
 
 use constant E_INVALID_PLACEHOLDER => 'Cannot bind invalid placeholder (%s)';
 use constant W_ODD_NUMBER_OF_ARGS  => 'Check bind values match placeholder scheme';
-
 
 sub _private_attributes {
     my $self = shift;
@@ -47,12 +45,10 @@ sub _private_attributes {
     return $self;
 }
 
-
 sub prepare {
     my $self = shift;
     return $self->{Database}->prepare($self->{Statement}, @_);
 }
-
 
 sub bind_param {
     my($attr, $self) = shift->_private_attributes;
@@ -85,7 +81,6 @@ sub bind_param {
     return \@bind_param_args;
 }
 
-
 sub _map_placeholders_to_values {
     my $placeholders = shift;
     my @mappings     = do {
@@ -113,7 +108,6 @@ sub _map_placeholders_to_values {
     return \@mappings;
 }
 
-
 sub _placeholders_are_positional {
     my $placeholders = shift;
     return
@@ -126,7 +120,6 @@ sub _placeholders_are_positional {
       if $all_placeholders_are_positional;
     return;
 }
-
 
 sub bind {
     my($attr, $self) = shift->_private_attributes;
@@ -162,7 +155,6 @@ sub bind {
     return $self;
 }
 
-
 sub execute {
     my $self = shift;
     $self->finish
@@ -171,7 +163,6 @@ sub execute {
       if @_;
     return $self->SUPER::execute;
 }
-
 
 BEGIN {
     *iterate = *iterator  = *it = sub {DBIx::Squirrel::it->new(@_)};

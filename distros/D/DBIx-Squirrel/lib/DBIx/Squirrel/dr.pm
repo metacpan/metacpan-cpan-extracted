@@ -3,7 +3,6 @@ use Modern::Perl;
 package    # hide from PAUSE
   DBIx::Squirrel::dr;
 
-
 BEGIN {
     require DBIx::Squirrel
       unless defined($DBIx::Squirrel::VERSION);
@@ -13,7 +12,6 @@ BEGIN {
 
 use namespace::autoclean;
 
-
 sub _root_class {
     my $root_class = ref($_[0]) || $_[0];
     $root_class =~ s/::\w+$//;
@@ -21,7 +19,6 @@ sub _root_class {
       if wantarray;
     return $root_class;
 }
-
 
 sub _clone_connection {
     my $invocant = shift;
@@ -32,7 +29,6 @@ sub _clone_connection {
     return $connection->clone({%{$attributes}, __PACKAGE__->_root_class});
 }
 
-
 sub connect {
     goto &_clone_connection
       if UNIVERSAL::isa($_[1], 'DBI::db');
@@ -40,7 +36,6 @@ sub connect {
     my $attributes = @_ && UNIVERSAL::isa($_[$#_], 'HASH') ? pop : {};
     return $invocant->DBI::connect(@_, {%{$attributes}, __PACKAGE__->_root_class});
 }
-
 
 sub connect_cached {
     my $invocant   = shift;

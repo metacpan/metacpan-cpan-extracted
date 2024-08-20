@@ -1,5 +1,5 @@
 #!/usr/bin/perl
-# $Id: 01-resolver-config.t 1910 2023-03-30 19:16:30Z willem $	-*-perl-*-
+# $Id: 01-resolver-config.t 1981 2024-06-17 13:22:14Z willem $	-*-perl-*-
 #
 
 use strict;
@@ -23,9 +23,8 @@ eval {
 my $resolver = Net::DNS::Resolver->new();
 my $class    = ref($resolver);
 
-for (@Net::DNS::Resolver::ISA) {
-	diag $_ unless /::UNIX$/;
-}
+my $isa = $resolver->OS_CONF;
+diag $isa unless $isa =~ /::UNIX$/;
 
 ok( $resolver->isa('Net::DNS::Resolver'), 'new() created object' );
 

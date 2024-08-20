@@ -35,7 +35,7 @@ L<R::NDArray|SPVM::R::NDArray>
 
 =head2 data
 
-C<method data : Time::Piece[] ();>
+C<method data : L<Time::Piece|SPVM::Time::Piece>[] ();>
 
 Same as L<R::NDArray#data|SPVM::R::NDArray/"data"> method, but the return type is different.
 
@@ -45,7 +45,7 @@ Same as L<R::NDArray#data|SPVM::R::NDArray/"data"> method, but the return type i
 
 C<static method new : L<R::NDArray::Time::Piece|SPVM::R::NDArray::Time::Piece> ($options : object[] = undef);>
 
-Creates a new L<R::NDArray::Time::Piece|SPVM::R::NDArray::Time::Piece> and returns it.
+Creates a new L<R::NDArray::Time::Piece|SPVM::R::NDArray::Time::Piece> given the options $options and returns it.
 
 This method calls L<R::NDArray#init|SPVM::R::NDArray/"init"> method given the options $options.
 
@@ -53,33 +53,68 @@ This method calls L<R::NDArray#init|SPVM::R::NDArray/"init"> method given the op
 
 =head2 create_default_data
 
-C<method create_default_data : Time::Piece[] ($length : int = 0);>
+C<method create_default_data : L<Time::Piece|SPVM::Time::Piece>[] ($length : int = 0);>
 
 Creates a default data given the length $length and returns it.
 
+The default data is created by the following code.
+
+  my $default_data = new Time::Piece[$length];
+
+Exceptions:
+
+The length $length must be more than or equal to 0. Otherwise an exception is thrown.
+
 =head2 elem_to_string
 
-C<method elem_to_string : string ($data : Time::Piece[], $data_index : int);>
+C<method elem_to_string : string ($data : L<Time::Piece|SPVM::Time::Piece>[], $data_index : int);>
 
 Converts an element $data at index $data_index to a string and returns it.
 
+  my $string = (string)undef;
+  if ($data->[$data_index]) {
+    $string = $data->[$data_index]->strftime("%Y-%m-%d %H:%M:%S");
+  }
+
 =head2 elem_assign
 
-C<method elem_assign : void ($dist_data : Time::Piece[], $dist_data_index : int, $src_data : Time::Piece[], $src_data_index : int);>
+C<method elem_assign : void ($dist_data : L<Time::Piece|SPVM::Time::Piece>[], $dist_data_index : int, $src_data : L<Time::Piece|SPVM::Time::Piece>[], $src_data_index : int);>
 
 Assigns the element $src_data at index $src_data_index to the element $dist_data at index $dist_data_index.
 
 =head2 elem_clone
 
-C<method elem_clone : void ($dist_data : Time::Piece[], $dist_data_index : int, $src_data : Time::Piece[], $src_data_index : int);>
+C<method elem_clone : void ($dist_data : L<Time::Piece|SPVM::Time::Piece>[], $dist_data_index : int, $src_data : L<Time::Piece|SPVM::Time::Piece>[], $src_data_index : int);>
 
-Copies the element $src_data at index $src_data_indext to the element $dist_data at index $dist_data_index.
+Clones the element $src_data at index $src_data_indext to the element $dist_data at index $dist_data_index.
+
+The clone is created by the following code.
+  
+  $dist_data->[$dist_data_index] = (Time::Piece)undef;
+  if ($src_data->[$src_data_index]) {
+    $dist_data->[$dist_data_index] = $src_data->[$src_data_index]->clone;
+  }
 
 =head2 elem_cmp
 
-C<method elem_cmp : int ($a_data : Time::Piece[], $a_data_index : int, $b_data : Time::Piece[], $b_data_index : int);>
+C<method elem_cmp : int ($a_data : L<Time::Piece|SPVM::Time::Piece>[], $a_data_index : int, $b_data : L<Time::Piece|SPVM::Time::Piece>[], $b_data_index : int);>
 
-Compares the element $a_data at index $a_data_index and the element $b_data at index $b_data_index and returns the result.
+Compares the element $a_data at index $a_data_index and the element $b_data at index $b_data_index using the following comparison code and returns the result.
+
+  my $cmp = 0;
+  if ($a_data->[$a_data_index] && $b_data->[$b_data_index]) {
+    my $a_epoch = $a_data->[$a_data_index]->epoch;
+    
+    my $b_epoch = $b_data->[$b_data_index]->epoch;
+    
+    $cmp = $a_epoch <=> $b_epoch;
+  }
+  elsif ($a_data->[$a_data_index]) {
+    $cmp = 1;
+  }
+  elsif ($b_data->[$b_data_index]) {
+    $cmp = -1;
+  }
 
 =head2 clone
 
@@ -89,15 +124,21 @@ Same as L<R::NDArray#clone|SPVM::R::NDArray/"clone"> method, but the return type
 
 =head2 slice
 
-C<method slice : L<R::NDArray::Time::Piece|SPVM::R::NDArray::Time::Piece> ($asix_indexes_product : L<R::NDArray::Int|SPVM::R::NDArray::Int>[]);>
+C<method slice : L<R::NDArray::Time::Piece|SPVM::R::NDArray::Time::Piece> ($indexes_product : L<R::NDArray::Int|SPVM::R::NDArray::Int>[]);>
 
 Same as L<R::NDArray#slice|SPVM::R::NDArray/"slice"> method, but the return type is different.
 
-=head2 to_long_ndarray
+=head1 See Also
 
-C<method to_long_ndarray : L<R::NDArray::Long|SPVM::R::NDArray::Long> ();>
+=over 2
 
-Converts this n-dimensional array to a n-dimensional array of L<R::NDArray::Long|SPVM::R::NDArray::Long> using L<Time::Piece#epoch|SPVM::Time::Piece#/"epoch"> method and returns it.
+=item * L<R::OP::Time::Piece|SPVM::R::OP::Time::Piece>
+
+=item * L<R::NDArray|SPVM::R::NDArray>
+
+=item * L<R|SPVM::R>
+
+=back
 
 =head1 Copyright & License
 

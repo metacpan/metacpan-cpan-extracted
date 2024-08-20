@@ -53,7 +53,7 @@ if ($get_new_list) {
     $list_uri->query_form({ raw => 1 });
     my %options = (
         headers => {
-            "If-Modified-Since" => "Fri, 17 May 2013 00:00:00 UTC"
+            "If-Modified-Since" => "Wed, 14 Aug 2024 01:25:59 GMT"
         }
     );
     my $response = $http->get($list_uri, \%options);

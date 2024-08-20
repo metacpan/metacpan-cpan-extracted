@@ -49,31 +49,31 @@ test_constraint 'All' => All,
       'object',        => BaseClass->new,
    ];
 
-is( Data::Checks::Debug::inspect_constraint( Maybe(Str) ), "Maybe(Str)",
-   'debug inspect Maybe(Str)' );
-is( Data::Checks::Debug::inspect_constraint( Any(Str, Object) ), "Any(Str, Object)",
-   'debug inspect Any(Str, Object)' );
-is( Data::Checks::Debug::inspect_constraint( All(Str, Object) ), "All(Str, Object)",
-   'debug inspect All(Str, Object)' );
-is( Data::Checks::Debug::inspect_constraint( All() ), "All",
-   'debug inspect All()' );
+is( Data::Checks::Debug::stringify_constraint( Maybe(Str) ), "Maybe(Str)",
+   'debug stringify Maybe(Str)' );
+is( Data::Checks::Debug::stringify_constraint( Any(Str, Object) ), "Any(Str, Object)",
+   'debug stringify Any(Str, Object)' );
+is( Data::Checks::Debug::stringify_constraint( All(Str, Object) ), "All(Str, Object)",
+   'debug stringify All(Str, Object)' );
+is( Data::Checks::Debug::stringify_constraint( All() ), "All",
+   'debug stringify All()' );
 
 # Any() or All() of 1 item might as well just be the thing
-is( Data::Checks::Debug::inspect_constraint( Any(Str) ), "Str",
-   'debug inspect Any(Str)' );
-is( Data::Checks::Debug::inspect_constraint( All(Str) ), "Str",
-   'debug inspect All(Str)' );
+is( Data::Checks::Debug::stringify_constraint( Any(Str) ), "Str",
+   'debug stringify Any(Str)' );
+is( Data::Checks::Debug::stringify_constraint( All(Str) ), "Str",
+   'debug stringify All(Str)' );
 
 # Flatten trees of nested Any/Any or All/All
-is( Data::Checks::Debug::inspect_constraint( Any(Str, Any(Str, Str)) ), "Any(Str, Str, Str)",
-   'debug inspect Any(Str, Any(Str, Str))' );
-is( Data::Checks::Debug::inspect_constraint( All(Str, All(Str, Str)) ), "All(Str, Str, Str)",
-   'debug inspect All(Str, All(Str, Str))' );
+is( Data::Checks::Debug::stringify_constraint( Any(Str, Any(Str, Str)) ), "Any(Str, Str, Str)",
+   'debug stringify Any(Str, Any(Str, Str))' );
+is( Data::Checks::Debug::stringify_constraint( All(Str, All(Str, Str)) ), "All(Str, Str, Str)",
+   'debug stringify All(Str, All(Str, Str))' );
 
 # Infix | operator acts like Any()
-is( Data::Checks::Debug::inspect_constraint( Str|Object ), "Any(Str, Object)",
-   'debug inspect Str|Object' );
-is( Data::Checks::Debug::inspect_constraint( Str|Str|Str ), "Any(Str, Str, Str)",
-   'debug inspect Str|Str|Str' );
+is( Data::Checks::Debug::stringify_constraint( Str|Object ), "Any(Str, Object)",
+   'debug stringify Str|Object' );
+is( Data::Checks::Debug::stringify_constraint( Str|Str|Str ), "Any(Str, Str, Str)",
+   'debug stringify Str|Str|Str' );
 
 done_testing;

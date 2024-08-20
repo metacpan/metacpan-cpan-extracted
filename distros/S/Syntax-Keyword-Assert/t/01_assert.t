@@ -36,6 +36,28 @@ subtest 'Test `assert` keyword with STRICT enabled' => sub {
             $x + $y == 100;
         };
     }, qr/\AAssertion failed/, 'assert block with multiple statements';
+
+};
+
+subtest 'Test `assert` with Carp::Verbose' => sub {
+    subtest 'When Carp::Verbose is enabled' => sub {
+        my $error = dies {
+            assert {
+                local $Carp::Verbose = 1;
+                0;
+            }
+        };
+        my @errors = split /\n/, $error;
+        ok @errors > 1;
+    };
+
+    subtest 'When Carp::Verbose is disabled' => sub {
+        my $error = dies {
+            assert { 0 } # Default is Carp::Verbose = 0
+        };
+        my @errors = split /\n/, $error;
+        is @errors, 1;
+    };
 };
 
 done_testing;

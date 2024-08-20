@@ -1,9 +1,9 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2022 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2022-2024 -- leonerd@leonerd.org.uk
 
-package Future::AsyncAwait::ExtensionBuilder 0.66;
+package Future::AsyncAwait::ExtensionBuilder 0.67;
 
 use v5.14;
 use warnings;
@@ -39,34 +39,25 @@ C<Future::AsyncAwait> extension API.
 
 =cut
 
-require Future::AsyncAwait::ExtensionBuilder_data;
-
 =head1 FUNCTIONS
 
 =cut
 
 =head2 write_AsyncAwait_h
 
-   Future::AsyncAwait::ExtensionBuilder->write_AsyncAwait_h
+   Future::AsyncAwait::ExtensionBuilder->write_AsyncAwait_h;
 
-Writes the F<AsyncAwait.h> file to the current working directory. To cause
-the compiler to actually find this file, see L</extra_compiler_flags>.
+This method no longer does anything I<since version 0.67>.
 
 =cut
 
 sub write_AsyncAwait_h
 {
-   shift;
-
-   open my $out, ">", "AsyncAwait.h" or
-      die "Cannot open AsyncAwait.h for writing - $!\n";
-
-   $out->print( Future::AsyncAwait::ExtensionBuilder_data->ASYNCAWAIT_H );
 }
 
 =head2 extra_compiler_flags
 
-   @flags = Future::AsyncAwait::ExtensionBuilder->extra_compiler_flags
+   @flags = Future::AsyncAwait::ExtensionBuilder->extra_compiler_flags;
 
 Returns a list of extra flags that the build scripts should add to the
 compiler invocation. This enables the C compiler to find the
@@ -77,12 +68,16 @@ F<AsyncAwait.h> file.
 sub extra_compiler_flags
 {
    shift;
-   return "-I.";
+
+   require File::ShareDir;
+   require File::Spec;
+   require Future::AsyncAwait;
+   return "-I" . File::Spec->catdir( File::ShareDir::module_dir( "Future::AsyncAwait" ), "include" );
 }
 
 =head2 extend_module_build
 
-   Future::AsyncAwait::ExtensionBuilder->extend_module_build( $build )
+   Future::AsyncAwait::ExtensionBuilder->extend_module_build( $build );
 
 A convenient shortcut for performing all the tasks necessary to make a
 L<Module::Build>-based distribution use the helper.
@@ -93,11 +88,6 @@ sub extend_module_build
 {
    my $self = shift;
    my ( $build ) = @_;
-
-   eval { $self->write_AsyncAwait_h } or do {
-      warn $@;
-      return;
-   };
 
    # preserve existing flags
    my @flags = @{ $build->extra_compiler_flags };

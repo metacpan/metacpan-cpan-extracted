@@ -93,4 +93,12 @@ BEGIN {
    is( await $f2, "second", 'Second call OK' );
 }
 
+# RT151046
+if( $^V ge v5.26 ) {
+   eval <<'EOPERL' or die $@;
+role RT151046 { async method foo(); }
+EOPERL
+   pass( 'Required method declarations may be declared as async' );
+}
+
 done_testing;

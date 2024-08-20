@@ -2,7 +2,7 @@ package Net::DNS::Resolver::os2;
 
 use strict;
 use warnings;
-our $VERSION = (qw$Id: os2.pm 1972 2024-04-21 08:13:19Z willem $)[2];
+our $VERSION = (qw$Id: os2.pm 1981 2024-06-17 13:22:14Z willem $)[2];
 
 
 =head1 NAME
@@ -10,9 +10,6 @@ our $VERSION = (qw$Id: os2.pm 1972 2024-04-21 08:13:19Z willem $)[2];
 Net::DNS::Resolver::os2 - OS2 resolver class
 
 =cut
-
-
-use base qw(Net::DNS::Resolver::Base);
 
 
 my $config_file = 'resolv';

@@ -25,7 +25,7 @@
 #
 ################################################################
 
-our $VERSION='1.0000730';
+our $VERSION='1.0000740';
 
 #print `env`,"\n\n\n";
 
@@ -36,7 +36,7 @@ if ($ENV{'AUTOMATED_TESTING'}) {
 
       DEAR CPAN TESTERS:
 
-      Net::FullAuto has over 100 CPAN module dependencies. 
+      Net::FullAuto has nearly 200 CPAN module dependencies. 
 
       One of the major goals of Net::FullAuto is easy and reliable
       installation on all Linux/Unix and Windows/Cygwin hosts.
@@ -104,7 +104,7 @@ if ($ENV{'AUTOMATED_TESTING'}) {
 
       Thank you,
       Brian Kelly
-      March 27, 2016
+      August 19, 2024
 
       Brian.Kelly@FullAuto.com
 
@@ -1756,6 +1756,7 @@ sub fa_install_mod {
    } elsif (!$version || (grep {
          /(?:use[-_]?)?internet|online|connect_to_internet_ok/i
          } @ARGV)) {
+      print "\n";
       local $SIG{__DIE__}; # No sigdie handler
       CPAN::Shell->m($p);
       eval {
@@ -2123,19 +2124,24 @@ END
       print "*** $p Loaded Successfully\n";
       $ENV{LOADED_MODULES}.="|$p";
       $exec_cnt=0;
-      print `sudo cat /proc/meminfo | grep MemFree`;
-      print `sudo cat /proc/meminfo | grep MemAvailable`;
-      fa_system("sudo su -c 'sync;echo 3 > /proc/sys/vm/drop_caches'");
-      print `sudo cat /proc/meminfo | grep MemFree`;
-      print `sudo cat /proc/meminfo | grep MemAvailable`;
-      #if ($ARGV[$#ARGV]=~/^(\d+)$/) {
-      #   pop @ARGV;pop @ARGV;
-      #}
-      #shift @ARGV if $ARGV[0] eq 'SKIP';
-      #my $argvs=join ' ', @ARGV if -1<$#ARGV;
-      #my $exec_cmd="sudo su -c 'sync;echo 1 > /proc/sys/vm/drop_caches';"
-      #            ."$^X Makefile.PL SKIP $argvs";
-      #exec $exec_cmd;
+      #fa_system("sudo su -c 'sync;echo 3 > /proc/sys/vm/drop_caches';swapoff -a && swapon -a");
+      print "\n",`sudo cat /proc/meminfo | grep MemFree`;
+      my $memavail=`sudo cat /proc/meminfo | grep MemAvailable`;
+      print $memavail;
+      $memavail=~s/^.*?(\d+).*$/$1/s;
+      if (int($memavail)<300000) {
+         if ($ARGV[$#ARGV]=~/^(\d+)$/) {
+            pop @ARGV;pop @ARGV;
+         }
+         shift @ARGV if $ARGV[0] eq 'SKIP';
+         my $argvs=join ' ', @ARGV if -1<$#ARGV;
+         my $exec_cmd="sudo su -c 'sync;echo 3 > /proc/sys/vm/drop_caches';"
+	             ."swapoff -a && swapon -a;"
+                     ."cd \"$cwd\";$^X Makefile.PL SKIP $argvs";
+         exec $exec_cmd;
+      } else {
+         print "\n";
+      }
    } else {
       print "*** $p Loaded Successfully\n";
       $ENV{LOADED_MODULES}.="|$p";
@@ -2204,23 +2210,35 @@ sub size_fmt {
    }
    return sprintf("%.2f TB",$size / (1024*1024*1024*1024));
 }
-
-my $stdout='';my $stderr='';
-if (exists $amazon{instance_type} && $amazon{instance_type}=~/micro/) {
+if (exists $amazon{instance_type} && $amazon{instance_type}=~/micro|nano/) {
    unless (grep { /CPAN|SKIP/ } @ARGV) {
+      my $cwd=&cwd;
       my $argvs=join " ", @ARGV;
       my $exec_cmd="sudo su -c 'sync;echo 3 > /proc/sys/vm/drop_caches';"
-                  ."$^X Makefile.PL $argvs CPAN";
+                  ."cd \"$cwd\";$^X Makefile.PL $argvs CPAN";
       exec $exec_cmd;
    } elsif (!grep { /SKIP/ } @ARGV) {
       pop @ARGV;
-      CPAN::Shell->reload('cpan');
+      fa_system('sudo dnf -y install perl-Net-SSLeay.x86_64 perl-JSON.noarch');
+      eval {
+         local $SIG{__DIE__}; # No sigdie handler;
+         require CPAN;
+         {
+            CPAN::Shell->get('Capture::Tiny');
+         }
+      };
    }
 }
 print "\n";
 if (($^O ne 'MSWin32') && ($^O ne 'MSWin64') && !grep { /^GETBERK$/ } @ARGV) {
    &fa_install_module('Capture::Tiny','install','Makefile');
+   &fa_install_module('Spiffy','install','Makefile');
+   &fa_install_module('Test::Base','install','Makefile');
+   &fa_install_module('Test::YAML','install','Makefile');
+   &fa_install_module('YAML','install','Makefile');
+   &fa_install_module('YAML::Tiny','install','Makefile');
    &fa_install_module('Test::LeakTrace','install','Makefile');
+   &fa_install_module('Time::Zone','install','Makefile');
    &fa_install_module('HTTP::Date','install','Makefile');
    &fa_install_module('File::Listing','install','Makefile');
    &fa_install_module('HTML::Tagset','install','Makefile');
@@ -2237,9 +2255,22 @@ if (($^O ne 'MSWin32') && ($^O ne 'MSWin64') && !grep { /^GETBERK$/ } @ARGV) {
    &fa_install_module('Clone','install','Makefile');
    &fa_install_module('Try::Tiny','install','Makefile');
    &fa_install_module('Test::Fatal','install','Makefile');
+   &fa_install_module('Test::Needs','install','Makefile');
    &fa_install_module('HTTP::Message','install','Makefile');
    &fa_install_module('HTTP::Cookies','install','Makefile');
    &fa_install_module('Test::RequiresInternet','install','Makefile');
+   &fa_install_module('HTTP::Negotiate','install','Makefile');
+   &fa_install_module('Net::HTTP','install','Makefile');
+   &fa_install_module('WWW::RobotRules','install','Makefile');
+   &fa_install_module('ExtUtils::Helpers','install','Makefile');
+   &fa_install_module('ExtUtils::Config','install','Makefile');
+   &fa_install_module('ExtUtils::InstallPaths','install','Makefile');
+   &fa_install_module('Test::Harness','install','Makefile','','3.33');
+   &fa_install_module('Module::Build::Tiny','install','Build');
+   if ($^O ne 'cygwin'
+         || grep { /-*(?:add|all)[-_]?dependencies/i } @ARGV) {
+      &fa_install_module('HTTP::Daemon','install','Build');
+   }
    &fa_install_module('LWP','install','Makefile');
    &fa_install_module('CPAN::Mini','install','Makefile');
    &fa_install_module('ExtUtils::MakeMaker','install','Makefile');
@@ -2267,14 +2298,12 @@ if (($^O ne 'MSWin32') && ($^O ne 'MSWin64') && !grep { /^GETBERK$/ } @ARGV) {
    &fa_install_module('IPC::Cmd','install','Makefile');
    &fa_install_module('ExtUtils::CBuilder','install','Makefile');
    &fa_install_module('Mo','install','Makefile');
-   &fa_install_module('YAML','install','Makefile');
-   &fa_install_module('YAML::Tiny','install','Makefile');
    &fa_install_module('Algorithm::Diff','install','Makefile');
    &fa_install_module('Text::Diff','install','Makefile');
    &fa_install_module('PAR::Dist','install','Makefile');
-   &fa_install_module('IO::Compress::Base::Common','install','Makefile');
    &fa_install_module('Compress::Raw::Bzip2','install','Makefile');
    &fa_install_module('Compress::Raw::Zlib','install','Makefile');
+   &fa_install_module('IO::Compress::Base::Common','install','Makefile');
    &fa_install_module('Compress::Zlib','install','Makefile');
    &fa_install_module('CPAN::Meta::YAML','install','Makefile');
    &fa_install_module('Parse::CPAN::Meta','install','Makefile');
@@ -2331,31 +2360,29 @@ if (($^O ne 'MSWin32') && ($^O ne 'MSWin64') && !grep { /^GETBERK$/ } @ARGV) {
    }
    &fa_install_module('IO::Tee','install','Makefile');
    &fa_install_module('HTML::Parser','install','Makefile');
+   &fa_install_module('Test::Warnings','install','Makefile');
    &fa_install_module('URI','install','Makefile');
-   &fa_install_module('ExtUtils::Config','install','Makefile');
-   &fa_install_module('ExtUtils::InstallPaths','install','Makefile');
-   &fa_install_module('ExtUtils::Helpers','install','Makefile');
-   &fa_install_module('Test::Harness','install','Makefile','','3.33');
+   &fa_install_module('ExtUtils::HasCompiler','install','Makefile');
    &fa_install_module('CPAN::Requirements::Dynamic','install','Makefile');
-   &fa_install_module('Module::Build::Tiny','install','Build');
    &fa_install_module('IO::Socket::IP','install','Build');
-   &fa_install_module('Test::Needs','install','Makefile');
-   if ($^O ne 'cygwin'
-         || grep { /-*(?:add|all)[-_]?dependencies/i } @ARGV) {
-      &fa_install_module('HTTP::Daemon','install','Build');
-   }
-   &fa_install_module('WWW::RobotRules','install','Makefile');
    &fa_install_module('Date::Format','install','Makefile');
    &fa_install_module('Date::Parse','install','Makefile');
    &fa_install_module('Mail::Internet','install','Makefile');
    &fa_install_module('Mail::Header','install','Makefile');
    &fa_install_module('Mail::Field','install','Makefile');
    &fa_install_module('Test::NoWarnings','install','Makefile');
+   &fa_install_module('File::Slurp','install','Makefile');
+   &fa_install_module('Test::Differences','install','Makefile');
+   &fa_install_module('Class::Data::Inheritable','install','Makefile');
+   &fa_install_module('Devel::StackTrace','install','Makefile');
+   &fa_install_module('Sub::Uplevel','install','Makefile');
+   &fa_install_module('Exception::Class','install','Makefile');
+   &fa_install_module('Test::Warn','install','Makefile');
+   &fa_install_module('Test::Exception','install','Makefile');
+   &fa_install_module('Test::Most','install','Makefile');
    &fa_install_module('Convert::BinHex','install','Makefile');
    &fa_install_module('MIME::Base64','install','Makefile');
    &fa_install_module('MIME::Entity','install','Makefile');
-   &fa_install_module('HTTP::Negotiate','install','Makefile');
-   &fa_install_module('Net::HTTP','install','Makefile');
    &fa_install_module('Data::Dump','install','Makefile');
    &fa_install_module('File::HomeDir','install','Makefile');
    &fa_install_module('Want','install','Makefile');
@@ -2448,6 +2475,30 @@ if (($^O ne 'MSWin32') && ($^O ne 'MSWin64') && !grep { /^GETBERK$/ } @ARGV) {
    }
    &fa_install_module('Term::Menus','install','Makefile');
    &fa_install_module('IO::String','install','Makefile');
+   &fa_install_module('Digest::HMAC','install','Makefile');
+   &fa_install_module('Digest::SHA3','install','Makefile');
+   &fa_install_module('Types::Standard','install','Makefile');
+   &fa_install_module('Exporter::Tiny','install','Makefile');
+   &fa_install_module('Type::Tiny','install','Makefile');
+   &fa_install_module('Crypt::Cipher::AES','install','Makefile');
+   &fa_install_module('Sub::Defer','install','Makefile');
+   &fa_install_module('Sub::Quote','install','Makefile');
+   &fa_install_module('Role::Tiny','install','Makefile');
+   &fa_install_module('Moo','install','Makefile');
+   &fa_install_module('Moo::Role','install','Makefile');
+   &fa_install_module('Module::Runtime','install','Makefile');
+   &fa_install_module('Sub::Exporter::Progressive','install','Makefile');
+   &fa_install_module('Variable::Magic','install','Makefile');
+   &fa_install_module('CPAN::Meta::Check','install','Makefile');
+   &fa_install_module('Package::Stash::XS','install','Makefile');
+   &fa_install_module('Package::Stash','install','Makefile');
+   &fa_install_module('Module::Implementation','install','Makefile');
+   &fa_install_module('namespace::clean','install','Makefile');
+   &fa_install_module('B::Hooks::EndOfScope','install','Makefile');
+   &fa_install_module('Sub::Identify','install','Makefile');
+   &fa_install_module('namespace::autoclean','install','Makefile');
+   &fa_install_module('strictures','install','Makefile');
+   &fa_install_module('Crypt::PBKDF2','install','Makefile');
    &fa_install_module('Crypt::CBC','install','Makefile');
    &fa_install_module('Crypt::DES','install','Makefile');
    &fa_install_module('Test::Manifest','install','Makefile');
@@ -2455,6 +2506,7 @@ if (($^O ne 'MSWin32') && ($^O ne 'MSWin64') && !grep { /^GETBERK$/ } @ARGV) {
    &fa_install_module('File::Remove','install','Makefile');
    &fa_install_module('Exporter::Tiny','install','Makefile');
    &fa_install_module('List::Util','install','Makefile');
+   &fa_install_module('List::MoreUtils::XS','install','Makefile');
    &fa_install_module('List::MoreUtils','install','Makefile');
    &fa_install_module('Params::Util','install','Makefile');
    &fa_install_module('Test::Object','install','Makefile');
@@ -2477,19 +2529,12 @@ if (($^O ne 'MSWin32') && ($^O ne 'MSWin64') && !grep { /^GETBERK$/ } @ARGV) {
    &fa_install_module('multidimensional','install','Makefile');
    &fa_install_module('bareword::filehandles','install','Makefile');
    &fa_install_module('indirect','install','Makefile');
-   &fa_install_module('strictures','install','Makefile');
-   &fa_install_module('Role::Tiny','install','Makefile');
    &fa_install_module('Devel::GlobalDestruction','install','Makefile');
-   &fa_install_module('Module::Runtime','install','Makefile');
    &fa_install_module('Import::Into','install','Makefile');
    &fa_install_module('Sub::Exporter','install','Makefile');
    &fa_install_module('Sub::Exporter::Util','install','Makefile');
-   &fa_install_module('Sub::Defer','install','Makefile');
-   &fa_install_module('Sub::Quote','install','Makefile');
-   &fa_install_module('Moo','install','Makefile');
    &fa_install_module('MooX::Types::MooseLike','install','Makefile');
    &fa_install_module('MooX::Types::MooseLike::Base','install','Makefile');
-   &fa_install_module('Devel::StackTrace','install','Makefile');
    &fa_install_module('Throwable','install','Makefile');
    &fa_install_module('Time::Local','install','Makefile');
    &fa_install_module('Email::Date::Format','install','Makefile');
@@ -4464,7 +4509,7 @@ if ($@) {
          shift @ARGV if $ARGV[0] eq 'SKIP';
          my $argvs=join ' ', @ARGV if -1<$#ARGV;
          my $exec_cmd="sudo su -c 'sync;echo 3 > /proc/sys/vm/drop_caches';"
-                     ."$^X Makefile.PL SKIP GETBERK $argvs";
+                     ."cd \"$cwd\";$^X Makefile.PL SKIP GETBERK $argvs";
          exec $exec_cmd;
       }
    }
@@ -4631,7 +4676,8 @@ if ($get_BerkeleyDB && $^O ne 'cygwin') {
             my $filenm=$file;
             $file=~s/.tar.gz$//;
             $filename="${file}_${$}.tar.gz";
-            File::Copy::copy("$dir/$filenm",&cwd."/$filename");
+            sleep 2;
+	    fa_system("cp -v \"$dir/$filenm\" \"",&cwd."/$filename\"");
             my $so=fa_system($CPAN::Config->{gzip}." -d $filename");
             if ($so==-1) {
                fa_die("Cannot gunzip $filename: $!\n");
@@ -4643,7 +4689,8 @@ if ($get_BerkeleyDB && $^O ne 'cygwin') {
             $filename=~/^(.*)_(\d+).tar$/;
             $filename=$1;
             my $uniq=$2;
-            File::Copy::move("$filename","${filename}_$uniq");
+            sleep 2;
+	    fa_system("mv -v \"$filename\" \"${filename}_$uniq\""); 
             my $ver=$filenm;
             $ver=~s/_.*$//;
             $ver=~s/^.*db-(\d+[.]\d+).*$/$1/;
@@ -4698,11 +4745,10 @@ if (grep { /-*(?:add|all)[-_]?dependencies/i } @ARGV) {
    `mkdir -p 'dependencies/BerkeleyDB'` unless
       -e 'dependencies/BerkeleyDB';
    `rm -rf dependencies/BerkeleyDB/*`;
-   File::Copy::move($download[0],
-      "dependencies/BerkeleyDB/$download[2].tar.gz");
-   File::Copy::move($download[1],
-      "dependencies/BerkeleyDB/$download[2].tar.gz.sha256");
-   require File::Copy;
+   fa_system("mv -v \"$download[0]\" ".
+      "\"dependencies/BerkeleyDB/$download[2].tar.gz\"");
+   fa_system("mv -v \"$download[1]\" ".
+      "\"dependencies/BerkeleyDB/$download[2].tar.gz.sha256\"");
    open(MO,"<MANIFEST");
    open(MN,">MANIFEST_NEW");
    while (my $file=<MO>) {
@@ -4712,7 +4758,7 @@ if (grep { /-*(?:add|all)[-_]?dependencies/i } @ARGV) {
       print MN $file;
    }
    close MO;close MN;
-   File::Copy::move('MANIFEST_NEW','MANIFEST');
+   fa_system("mv -v MANIFEST_NEW MANIFEST");
    open(MF,">>MANIFEST") || fa_die("Cannot open MANIFEST: $!\n");
    my $found=`find dependencies/CPAN -type f`;
    $found.=`find dependencies/BerkeleyDB -type f`;
@@ -4731,7 +4777,6 @@ if (grep { /-*(?:add|all)[-_]?dependencies/i } @ARGV) {
    print MF "demo/puttyyes.exe\n";
    close MF;
 } else {
-   require File::Copy;
    open(MO,"<MANIFEST");
    open(MN,">MANIFEST_NEW");
    while (my $file=<MO>) {
@@ -4740,7 +4785,7 @@ if (grep { /-*(?:add|all)[-_]?dependencies/i } @ARGV) {
       print MN $file;
    }
    close MO;close MN;
-   File::Copy::move('MANIFEST_NEW','MANIFEST');
+   fa_system("mv -v MANIFEST_NEW MANIFEST");
 }
 
 #chdir $cwd;
@@ -4845,14 +4890,11 @@ sub download_berkeleydb {
    my $file=$2;
    my $file=substr($file,(index $file,'/')+1,-7);
    my $fh='';my $filename='';my $suffix='.tar.gz';
-print "ARGV=",join ' ',@ARGV,"\n";sleep 5;
+   sleep 5;
    if (grep  { /^BDB$/ } @ARGV) {
-print "WE ARE IN AND SETTING ALREADY DONWLOADED\n";
       $already_downloaded=1;
       $filename=$ARGV[$#ARGV];
-print "BDB FILENAME=$filename<==\n";
    } else {
-print "FILE *NOT* DOWNLOADED\n";
       $req = HTTP::Request->new(GET => $source);
       $req->header('Accept-Encoding' => 'gzip, compress');
       $res = $Ua->request($req);
@@ -5004,16 +5046,16 @@ print "FILE *NOT* DOWNLOADED\n";
          $CPAN::Config->{tar}," xvf $filename\n";
       fa_system($CPAN::Config->{tar}." xvf $filename");
    }
+   sleep 5;
    $filename=~/^.*\/(.*)_(.*).tar$/;
    $filename=$1;
    my $uniq=$2;
-   File::Copy::move("$filename","${filename}_$uniq");
+   fa_system("mv -v \"$filename\" \"${filename}_$uniq\"");
    my $ver=$file;
    $ver=~s/_.*$//;
    $ver=~s/^.*db-(\d+[.]\d+).*$/$1/;
    my $pre="/usr/local/BerkeleyDB.$ver";
    $pre=$PREFIX."BerkeleyDB$ver" if $PREFIX;
-print "FILENAME NOW GOING TO BUILD_BERKELEYDB=$filename & UNIQ=$uniq and PRE=$pre and PREFIX=$PREFIX\n";sleep 5;
    build_berkeleydb($filename,$uniq,$pre,$PREFIX,'');
    unless (exists $ENV{'BERKELEYDB_INCLUDE'} &&
          $ENV{'BERKELEYDB_INCLUDE'}) {
@@ -5052,7 +5094,6 @@ sub build_berkeleydb {
       $args.=' --prefix="'.$PREFIX.'"';
    }
    my $one=1;
-print "WE GOT HEREEEEEEEEEEEEE and PWD=",`pwd`,"\n";
    WH: while ($one) {
       open(FH,
          "cd ${filename}_$uniq/build_unix;".
@@ -5068,7 +5109,6 @@ print "WE GOT HEREEEEEEEEEEEEE and PWD=",`pwd`,"\n";
       last;
    }
    close FH;
-print "DONE WITH CONFIG and PWD=",`pwd`,"\n";
    unless ($CPAN::Config->{make}) {
       if (-e '/usr/bin/make') {
          $CPAN::Config->{make}='/usr/bin/make';
@@ -5077,7 +5117,6 @@ print "DONE WITH CONFIG and PWD=",`pwd`,"\n";
       }
    }
    print "*** Starting Encrypted BerkeleyDB build\n";
-print "WANT TO CHANGE TO ${filename}_$uniq/build_unix<==\n";
    fa_system("(cd ${filename}_$uniq/build_unix;".
          $CPAN::Config->{make}." install) 2>&1")
       || warn $!;

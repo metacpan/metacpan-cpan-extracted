@@ -1,6 +1,6 @@
 package SPVM::R;
 
-our $VERSION = "0.022";
+our $VERSION = "0.100";
 
 1;
 
@@ -11,8 +11,6 @@ SPVM::R - Porting R language Features
 =head1 Description
 
 R class in L<SPVM> is a port of the L<R language|https://www.r-project.org/> features.
-
-B<WARNINGS:This distribution is under beta release. Some methods and fields will be changed.>.
 
 =head1 Usage
 
@@ -79,7 +77,7 @@ Add colunns:
 Get columns and rows:
 
   $data_frame->slice(["Name", "Age"], [IOP->c([0, 1, 2])]); 
-  
+
 Get rows using conditions:
   
   # Age > 12

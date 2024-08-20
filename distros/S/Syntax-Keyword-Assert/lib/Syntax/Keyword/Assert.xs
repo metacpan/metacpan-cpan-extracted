@@ -39,7 +39,7 @@ static OP *make_xcroak(pTHX_ OP *msg)
 
 static int build_assert(pTHX_ OP **out, XSParseKeywordPiece *arg0, void *hookdata)
 {
-    if (is_strict()) {
+    if (is_strict(aTHX_)) {
         // build the following code:
         //
         //   Syntax::Keyword::Assert::_croak "Assertion failed"

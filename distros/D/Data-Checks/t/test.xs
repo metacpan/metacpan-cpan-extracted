@@ -34,7 +34,7 @@ bool check_value(struct DataChecks_Checker *checker, SV *value)
 
 void assert_value(struct DataChecks_Checker *checker, SV *value)
 
-SV *make_asserter_sub(struct DataChecks_Checker *checker)
+SV *make_asserter_sub(struct DataChecks_Checker *checker, SV *flagname = &PL_sv_undef)
   CODE:
   {
     if(!PL_parser) {
@@ -49,8 +49,16 @@ SV *make_asserter_sub(struct DataChecks_Checker *checker)
       PL_parser->preambling = NOLINE;
     }
 
+    U32 flags = 0;
+    if(flagname && SvOK(flagname)) {
+      if(SvPOK(flagname) && strEQ(SvPVX(flagname), "void"))
+        flags = OPf_WANT_VOID;
+    }
+
     I32 floorix = start_subparse(FALSE, 0);
-    OP *body = make_assertop(checker, newSLUGOP(0));
+    OP *body = newLISTOPn(OP_RETURN, 0,
+      make_assertop_flags(checker, flags, newSLUGOP(0)),
+      NULL);
     CV *cv = newATTRSUB(floorix, NULL, NULL, NULL, body);
     RETVAL = newRV_noinc((SV *)cv);
   }

@@ -4,7 +4,7 @@ use warnings;
 
 use Scalar::Util 'blessed', 'reftype', 'weaken';
 
-our $VERSION = "v6.29.5";
+our $VERSION = "v6.29.6";
 
 sub new {
     my ($class) = @_;
@@ -70,6 +70,19 @@ sub _add_to_subscribers {
     }
 }
 
+sub _cleanup_base_subrefs {
+    my ($self) = @_;
+
+    $self->{subrefs} or return;
+
+    foreach my $key (keys %{ $self->{subrefs} }) {
+        my $item = $self->{subrefs}{$key};
+        if (defined blessed($item) and $item->isa('RxPerl::Subscription') and $item->{closed}) {
+            delete $self->{subrefs}{$key};
+        }
+    }
+}
+
 sub add {
     my ($self, @subrefs) = @_;
 
@@ -77,6 +90,7 @@ sub add {
     @subrefs = grep ref ne '', @subrefs;
 
     if (! $self->{closed}) {
+        $self->_cleanup_base_subrefs;
         $self->{subrefs}{$_} = $_ foreach @subrefs;
     } else {
         $self->_execute_item(\@subrefs);

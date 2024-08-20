@@ -1,10 +1,10 @@
 #!/usr/bin/perl
-# $Id: 03-header.t 1970 2024-03-22 01:51:29Z willem $
+# $Id: 03-header.t 1980 2024-06-02 10:16:33Z willem $
 #
 
 use strict;
 use warnings;
-use Test::More tests => 79;
+use Test::More tests => 78;
 use TestToolkit;
 
 use Net::DNS::Packet;
@@ -27,24 +27,18 @@ sub toggle {
 }
 
 
-my $newid = Net::DNS::Packet->new()->header->id(undef);
-ok( $newid, 'expected non-zero packet ID' );
+is( $header->id, undef, 'packet header ID initially undefined' );
+toggle( $header, 'id', 123, 1234, 12345 );
 
-toggle( $header, 'opcode', qw(QUERY UPDATE DSO) );
-toggle( $header, 'id',	   $header->id, 0, $header->id );	# Zero ID => DSO unidirectional
 toggle( $header, 'opcode', qw(QUERY) );
-toggle( $header, 'id',	   $header->id, $newid, $header->id );
-
-toggle( $header, 'rcode', qw(REFUSED FORMERR NOERROR) );
-
-toggle( $header, 'qr', 1, 0, 1, 0 );
-toggle( $header, 'aa', 1, 0, 1, 0 );
-toggle( $header, 'tc', 1, 0, 1, 0 );
-toggle( $header, 'rd', 0, 1, 0, 1 );
-toggle( $header, 'ra', 1, 0, 1, 0 );
-toggle( $header, 'ad', 1, 0, 1, 0 );
-toggle( $header, 'cd', 1, 0, 1, 0 );
-
+toggle( $header, 'rcode',  qw(REFUSED FORMERR NOERROR) );
+toggle( $header, 'qr',	   1, 0, 1, 0 );
+toggle( $header, 'aa',	   1, 0, 1, 0 );
+toggle( $header, 'tc',	   1, 0, 1, 0 );
+toggle( $header, 'rd',	   0, 1, 0, 1 );
+toggle( $header, 'ra',	   1, 0, 1, 0 );
+toggle( $header, 'ad',	   1, 0, 1, 0 );
+toggle( $header, 'cd',	   1, 0, 1, 0 );
 
 #
 #  Is $header->string remotely sane?
@@ -55,15 +49,12 @@ like( $header->string, '/ancount = 0/',	   'string() has ancount correct' );
 like( $header->string, '/nscount = 0/',	   'string() has nscount correct' );
 like( $header->string, '/arcount = 0/',	   'string() has arcount correct' );
 
-$header->opcode('UPDATE');
+toggle( $header, 'opcode', qw(UPDATE) );
 like( $header->string, '/opcode = UPDATE/', 'string() has UPDATE opcode' );
 like( $header->string, '/zocount = 1/',	    'string() has zocount correct' );
 like( $header->string, '/prcount = 0/',	    'string() has prcount correct' );
 like( $header->string, '/upcount = 0/',	    'string() has upcount correct' );
 like( $header->string, '/adcount = 0/',	    'string() has adcount correct' );
-
-$header->opcode('DSO');
-like( $header->string, '/opcode = DSO/', 'string() has DSO opcode' );
 
 
 #
@@ -81,13 +72,19 @@ is( $header->upcount, $header->nscount, 'upcount value matches nscount' );
 is( $header->adcount, $header->arcount, 'adcount value matches arcount' );
 
 
-my $data = $packet->data;
+my $data = $packet->encode;
 
 my $packet2 = Net::DNS::Packet->new( \$data );
 
 my $string = $packet->header->string;
 
 is( $packet2->header->string, $string, 'encode/decode transparent' );
+
+
+my $dso = Net::DNS::Packet->new();
+toggle( $dso->header, 'opcode', qw(DSO) );
+toggle( $header, 'id', 0, 1, 0 );				# ID => DSO direction
+like( $dso->header->string, '/opcode = DSO/', 'string() has DSO opcode' );
 
 
 SKIP: {
@@ -97,14 +94,14 @@ SKIP: {
 
 	skip( 'EDNS header extensions not supported', 10 ) unless $edns->isa('Net::DNS::RR::OPT');
 
-	toggle( $header, 'do', 0, 1, 0, 1 );
-	toggle( $header, 'co', 0, 1, 0, 1 );
+	toggle( $header, 'do',	  0, 1, 0, 1 );
+	toggle( $header, 'co',	  0, 1, 0, 1 );
 	toggle( $header, 'rcode', qw(BADVERS BADMODE BADNAME FORMERR NOERROR) );
 
 	my $packet = Net::DNS::Packet->new();			# empty EDNS size solicitation
 	my $udplim = 1280;
 	$packet->edns->UDPsize($udplim);
-	my $encoded = $packet->data;
+	my $encoded = $packet->encode;
 	my $decoded = Net::DNS::Packet->new( \$encoded );
 	is( $decoded->edns->UDPsize, $udplim, 'EDNS size request assembled correctly' );
 }

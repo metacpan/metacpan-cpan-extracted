@@ -3,7 +3,6 @@ use Modern::Perl;
 package    # hide from PAUSE
   DBIx::Squirrel::Transform::IO;
 
-
 BEGIN {
     require DBIx::Squirrel
       unless defined($DBIx::Squirrel::VERSION);
@@ -14,7 +13,6 @@ BEGIN {
 }
 
 use DBIx::Squirrel::util qw/result/;
-
 
 sub stdout {
     if (@_) {
@@ -31,7 +29,6 @@ sub stdout {
         }
     }
 }
-
 
 sub stderr {
     if (@_) {

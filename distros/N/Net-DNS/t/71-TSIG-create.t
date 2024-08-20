@@ -1,5 +1,5 @@
 #!/usr/bin/perl
-# $Id: 71-TSIG-create.t 1909 2023-03-23 11:36:16Z willem $	-*-perl-*-
+# $Id: 71-TSIG-create.t 1980 2024-06-02 10:16:33Z willem $	-*-perl-*-
 #
 
 use strict;
@@ -55,7 +55,7 @@ for my $tsig ( $class->create($tsigkey) ) {
 
 for my $packet ( Net::DNS::Packet->new('query.example') ) {
 	$packet->sign_tsig($tsigkey);
-	$packet->data;
+	$packet->encode;
 
 	my $tsig = $class->create($packet);
 	is( ref($tsig),	      $class,			 'create TSIG from packet->sigrr' );

@@ -38,6 +38,7 @@ my %WriteMakefileArgs = (
     "Capture::Tiny" => 0,
     "Cwd" => 0,
     "DBD::SQLite" => 0,
+    "DBD::SQLite::Constants" => 0,
     "FindBin" => 0,
     "Test::More" => 0,
     "Test::Most" => 0,
@@ -45,7 +46,7 @@ my %WriteMakefileArgs = (
     "lib" => 0,
     "warnings" => 0
   },
-  "VERSION" => "1.2.10",
+  "VERSION" => "1.2.11",
   "test" => {
     "TESTS" => "t/*.t t/00-unit-tests/*.t"
   }
@@ -57,6 +58,7 @@ my %FallbackPrereqs = (
   "Carp" => 0,
   "Cwd" => 0,
   "DBD::SQLite" => 0,
+  "DBD::SQLite::Constants" => 0,
   "DBI" => 0,
   "Data::Dumper" => 0,
   "Data::Dumper::Concise" => 0,

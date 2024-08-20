@@ -2271,13 +2271,14 @@ static void parse_post_blockstart(pTHX_ struct XSParseSublikeContext *ctx, void 
 
 static void parse_pre_blockend(pTHX_ struct XSParseSublikeContext *ctx, void *hookdata)
 {
-  /* body might be NULL if an error happened; we check that below so for now
-   * just be defensive
+  /* body might be NULL if an error happened, or if this was a bodyless
+   * prototype or required method declaration
    */
-  if(ctx->body) {
-    COP *last_cop = PL_curcop;
-    check_optree(aTHX_ ctx->body, NO_FORBID, &last_cop);
-  }
+  if(!ctx->body)
+    return;
+
+  COP *last_cop = PL_curcop;
+  check_optree(aTHX_ ctx->body, NO_FORBID, &last_cop);
 
 #ifdef HAVE_OP_ARGCHECK
   /* If the sub body is using signatures, we want to pull the OP_ARGCHECK
@@ -2352,13 +2353,14 @@ static void parse_pre_blockend(pTHX_ struct XSParseSublikeContext *ctx, void *ho
 
 static void parse_post_newcv(pTHX_ struct XSParseSublikeContext *ctx, void *hookdata)
 {
-  if(CvLVALUE(ctx->cv))
+  if(ctx->cv && CvLVALUE(ctx->cv))
     warn("Pointless use of :lvalue on async sub");
 }
 
 static struct XSParseSublikeHooks hooks_async = {
+  .ver            = XSPARSESUBLIKE_ABI_VERSION,
   .permit_hintkey = "Future::AsyncAwait/async",
-  .flags = XS_PARSE_SUBLIKE_FLAG_PREFIX,
+  .flags = XS_PARSE_SUBLIKE_FLAG_PREFIX|XS_PARSE_SUBLIKE_FLAG_BODY_OPTIONAL,
 
   .post_blockstart = parse_post_blockstart,
   .pre_blockend    = parse_pre_blockend,
@@ -2502,7 +2504,7 @@ BOOT:
   Perl_custom_op_register(aTHX_ &pp_pushcancel, &xop_pushcancel);
 
   boot_xs_parse_keyword(0.13);
-  boot_xs_parse_sublike(0.14);
+  boot_xs_parse_sublike(0.23);
 
   register_xs_parse_sublike("async", &hooks_async, NULL);
 

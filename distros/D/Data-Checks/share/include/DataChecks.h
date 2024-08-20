@@ -15,7 +15,7 @@ static rettype S_DataChecks_##name args                   \
 }
 #endif
 
-#define DATACHECKS_ABI_VERSION 0
+#define DATACHECKS_ABI_VERSION 1
 
 struct DataChecks_Checker;
 
@@ -31,9 +31,10 @@ DECLARE_FUNCTION(free_checkdata,
 DECLARE_FUNCTION(gen_assertmess,
     void, (pTHX_ struct DataChecks_Checker *checker, SV *name, SV *constraint), (aTHX_ checker, name, constraint))
 
-#define make_assertop(checker, argop)  S_DataChecks_make_assertop(aTHX_ checker, argop)
-DECLARE_FUNCTION(make_assertop,
-    OP *, (pTHX_ struct DataChecks_Checker *checker, OP *argop), (aTHX_ checker, argop))
+#define make_assertop(checker, argop)               S_DataChecks_make_assertop_flags(aTHX_ checker, 0,     argop)
+#define make_assertop_flags(checker, flags, argop)  S_DataChecks_make_assertop_flags(aTHX_ checker, flags, argop)
+DECLARE_FUNCTION(make_assertop_flags,
+    OP *, (pTHX_ struct DataChecks_Checker *checker, U32 flags, OP *argop), (aTHX_ checker, flags, argop))
 
 #define check_value(checker, value)  S_DataChecks_check_value(aTHX_ checker, value)
 DECLARE_FUNCTION(check_value,
@@ -84,8 +85,8 @@ static void S_boot_data_checks(pTHX_ double ver) {
       must_SvUV_from_modglobal("Data::Checks/free_checkdata()@0"));
   gen_assertmess_func = INT2PTR(void (*)(pTHX_ struct DataChecks_Checker *checker, SV *name, SV *constraint),
       must_SvUV_from_modglobal("Data::Checks/gen_assertmess()@0"));
-  make_assertop_func = INT2PTR(OP *(*)(pTHX_ struct DataChecks_Checker *checker, OP *argop),
-      must_SvUV_from_modglobal("Data::Checks/make_assertop()@0"));
+  make_assertop_flags_func = INT2PTR(OP *(*)(pTHX_ struct DataChecks_Checker *checker, U32 flags, OP *argop),
+      must_SvUV_from_modglobal("Data::Checks/make_assertop()@1"));
   check_value_func = INT2PTR(bool (*)(pTHX_ struct DataChecks_Checker *checker, SV *value),
       must_SvUV_from_modglobal("Data::Checks/check_value()@0"));
   assert_value_func = INT2PTR(void (*)(pTHX_ struct DataChecks_Checker *checker, SV *value),

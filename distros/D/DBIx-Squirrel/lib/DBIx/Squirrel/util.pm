@@ -3,7 +3,6 @@ use Modern::Perl;
 package    # hide from PAUSE
   DBIx::Squirrel::util;
 
-
 BEGIN {
     require Exporter;
     @DBIx::Squirrel::util::ISA         = 'Exporter';
@@ -11,8 +10,7 @@ BEGIN {
         constants   => ['E_EXP_STATEMENT', 'E_EXP_STH',    'E_EXP_REF',],
         diagnostics => ['Dumper',          'throw',        'whine',],
         transform   => ['cbargs',          'cbargs_using', 'transform',],
-        sql         =>
-          ['get_trimmed_sql_and_digest', 'normalise_statement', 'study_statement', 'trim_sql_string', 'hash_sql_string',],
+        sql => ['get_trimmed_sql_and_digest', 'normalise_statement', 'study_statement', 'trim_sql_string', 'hash_sql_string',],
     );
     @DBIx::Squirrel::util::EXPORT_OK = @{
         $DBIx::Squirrel::util::EXPORT_TAGS{all} = [
@@ -38,7 +36,6 @@ use constant E_EXP_STH       => 'Expected a statement handle';
 use constant E_EXP_REF       => 'Expected a reference to a HASH or ARRAY';
 use constant E_BAD_CB_LIST   => 'Expected a reference to a list of code-references, a code-reference, or undefined';
 
-
 sub throw {
     @_ = do {
         if (@_) {
@@ -56,7 +53,6 @@ sub throw {
     };
     goto &Carp::confess;
 }
-
 
 sub whine {
     @_ = do {
@@ -78,7 +74,6 @@ sub whine {
 
 memoize('uniq');
 
-
 sub uniq {
     my %seen;
     return grep {!$seen{$_}++} @_;
@@ -86,13 +81,11 @@ sub uniq {
 
 memoize('is_viable_sql_string');
 
-
 sub is_viable_sql_string {
     return defined($_[0]) && length($_[0]) && $_[0] =~ m/\S/;
 }
 
 memoize('study_statement');
-
 
 sub study_statement {
     my($normalised, $trimmed_sql, $digest) = &normalise_statement;
@@ -105,7 +98,6 @@ sub study_statement {
     return $mapped_positions, $normalised, $trimmed_sql, $digest;
 }
 
-
 sub normalise_statement {
     my($trimmed_sql, $digest) = &get_trimmed_sql_and_digest;
     my $normalised = $trimmed_sql;
@@ -113,7 +105,6 @@ sub normalise_statement {
     return $normalised unless wantarray;
     return $normalised, $trimmed_sql, $digest;
 }
-
 
 sub get_trimmed_sql_and_digest {
     my $sth_or_sql_string = shift;
@@ -139,7 +130,6 @@ sub get_trimmed_sql_and_digest {
 
 memoize('trim_sql_string');
 
-
 sub trim_sql_string {
     return do {
         if (&is_viable_sql_string) {
@@ -157,7 +147,6 @@ sub trim_sql_string {
 
 memoize('hash_sql_string');
 
-
 sub hash_sql_string {
     return do {
         if (&is_viable_sql_string) {
@@ -169,11 +158,9 @@ sub hash_sql_string {
     };
 }
 
-
 sub cbargs {
     return cbargs_using([], @_);
 }
-
 
 sub cbargs_using {
     my($c, @t) = do {
@@ -200,7 +187,6 @@ sub cbargs_using {
 our $_result;
 
 sub result {$_result}
-
 
 sub transform {
     my @transforms = do {

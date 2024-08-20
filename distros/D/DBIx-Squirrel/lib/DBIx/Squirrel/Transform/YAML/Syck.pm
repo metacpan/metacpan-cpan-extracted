@@ -3,7 +3,6 @@ use Modern::Perl;
 package    # hide from PAUSE
   DBIx::Squirrel::Transform::YAML::Syck;
 
-
 BEGIN {
     require DBIx::Squirrel
       unless defined($DBIx::Squirrel::VERSION);
@@ -14,7 +13,6 @@ BEGIN {
 }
 
 use YAML::Syck;
-
 
 sub as_yaml {
     return sub {

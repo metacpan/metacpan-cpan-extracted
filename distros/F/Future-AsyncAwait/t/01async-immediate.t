@@ -90,4 +90,10 @@ use Future::AsyncAwait;
    is( async, "normal function", 'async() parses as a normal function call' );
 }
 
+# (related to) RT151046
+{
+   async sub forward_decl;
+   pass( 'Forward declaration of a sub permits async keyword' );
+}
+
 done_testing;

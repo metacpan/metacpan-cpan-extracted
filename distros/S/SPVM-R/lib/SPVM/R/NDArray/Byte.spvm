@@ -31,16 +31,14 @@ class R::NDArray::Byte extends R::NDArray {
       die "The length \$length must be more than or equal to 0.";
     }
     
-    my $data = new byte[$length];
+    my $default_data = new byte[$length];
     
-    return $data;
+    return $default_data;
   }
   
   method elem_to_string : string ($data : byte[], $data_index : int) {
     
-    my $elem = $data->[$data_index];
-    
-    my $string = (string)(byte)$elem;
+    my $string = (string)$data->[$data_index];
     
     return $string;
   }
@@ -73,8 +71,8 @@ class R::NDArray::Byte extends R::NDArray {
     return (R::NDArray::Byte)$self->SUPER::clone($shallow);
   }
   
-  method slice : R::NDArray::Byte ($asix_indexes_product : R::NDArray::Int[]) {
-    return (R::NDArray::Byte)$self->SUPER::slice($asix_indexes_product);
+  method slice : R::NDArray::Byte ($indexes_product : R::NDArray::Int[]) {
+    return (R::NDArray::Byte)$self->SUPER::slice($indexes_product);
   }
   
   precompile method to_int_ndarray : R::NDArray::Int () {
@@ -88,8 +86,8 @@ class R::NDArray::Byte extends R::NDArray {
     my $data = $self->data;
     my $ret_data = $ret_ndarray->data;
     
-    for (my $i = 0; $i < $length; $i++) {
-      $ret_data->[$i] = (int)$data->[$i];
+    for (my $data_index = 0; $data_index < $length; $data_index++) {
+      $ret_data->[$data_index] = (int)$data->[$data_index];
     }
     
     return $ret_ndarray;

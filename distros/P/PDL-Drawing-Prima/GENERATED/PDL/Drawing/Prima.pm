@@ -14,7 +14,7 @@ use PDL::Exporter;
 use DynaLoader;
 
 
-   our $VERSION = '0.18';
+   our $VERSION = '0.19';
    our @ISA = ( 'PDL::Exporter','DynaLoader' );
    push @PDL::Core::PP, __PACKAGE__;
    bootstrap PDL::Drawing::Prima $VERSION;
@@ -24,8 +24,8 @@ use DynaLoader;
 
 
 
-#line 11 "prima.pd"
 
+#line 11 "prima.pd"
 
 use strict;
 use warnings;
@@ -179,12 +179,8 @@ sub piddle_of_patterns_for {
 
 	return $to_return;
 }
-#line 180 "Prima.pm"
-
-
 
 #line 178 "prima.pd"
-
 
 =head1 METHODS
 
@@ -195,10 +191,7 @@ about that, though, because they will resemble normal signatures close enough
 that you should be able to understand them, I hope.
 
 =cut
-#line 196 "Prima.pm"
-
-
-
+#line 192 "Prima.pm"
 
 
 
@@ -211,25 +204,20 @@ that you should be able to understand them, I hope.
 # This is a list of the number of arguments for each property. It is based on the
 # pars_args_for hash which is built in the .pd file associated with this module
 my %N_args_for = qw(
-	rop2s                1
-	clipRects            4
-	lineJoins            1
-	backColors           1
 	splinePrecisions     1
 	linePatterns         1
+	lineJoins            1
+	rop2s                1
+	clipRects            4
+	lineWidths           1
 	fillPatterns         1
+	backColors           1
+	rops                 1
 	fillModes            1
 	colors               1
-	rops                 1
-	lineWidths           1
 );
-#line 227 "Prima.pm"
-
-
 
 #line 1417 "prima.pd"
-
-
 sub get_sorted_args_with_defaults {
 	my ($self, $arg_names, $given) = @_;
 
@@ -275,12 +263,7 @@ sub get_sorted_args_with_defaults {
 	}
 	return @to_return;
 }
-#line 279 "Prima.pm"
-
-
-
-#line 949 "/usr/local/lib/x86_64-linux-gnu/perl/5.34.0/PDL/PP.pm"
-
+#line 267 "Prima.pm"
 
 
 =head2 pdl_arcs
@@ -334,20 +317,15 @@ Spline drawing provides a similar functionality, though more complex and
 more powerful. There are no PDL bindings for the spline functions yet.
 See L<Prima::Drawable/spline> for more information.
 
-
-
 =for bad
 
 pdl_arcs does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 355 "Prima.pm"
 
 
 
-#line 950 "/usr/local/lib/x86_64-linux-gnu/perl/5.34.0/PDL/PP.pm"
 
 our @arcs_props = qw(colors backColors linePatterns lineWidths rops rop2s);
 our @arcs_args = qw(x y x_diameter y_diameter start_angle end_angle);
@@ -400,11 +378,8 @@ sub Prima::Drawable::pdl_arcs {
 	}
 	
 }
-#line 412 "Prima.pm"
 
 
-
-#line 949 "/usr/local/lib/x86_64-linux-gnu/perl/5.34.0/PDL/PP.pm"
 
 
 
@@ -442,20 +417,15 @@ Compare to the Prima method L<Prima::Drawable/bar>. See also
 L</pdl_rectangles>, which is the unfilled equivalent, and L</pdl_clears>,
 which is sorta the opposite of this.
 
-
-
 =for bad
 
 pdl_bars does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 470 "Prima.pm"
 
 
 
-#line 950 "/usr/local/lib/x86_64-linux-gnu/perl/5.34.0/PDL/PP.pm"
 
 our @bars_props = qw(colors backColors clipRects fillPatterns rops rop2s);
 our @bars_args = qw(x1 y1 x2 y2);
@@ -506,11 +476,8 @@ sub Prima::Drawable::pdl_bars {
 	}
 	
 }
-#line 525 "Prima.pm"
 
 
-
-#line 949 "/usr/local/lib/x86_64-linux-gnu/perl/5.34.0/PDL/PP.pm"
 
 
 
@@ -571,20 +538,15 @@ L</pdl_arcs> and L</pdl_sectors>. See also L</pdl_fill_sectors>,
 L</pdl_ellipses>, and L</pdl_fill_ellipses>, as well as
 L<Prima::Drawable/spline>.
 
-
-
 =for bad
 
 pdl_chords does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 607 "Prima.pm"
 
 
 
-#line 950 "/usr/local/lib/x86_64-linux-gnu/perl/5.34.0/PDL/PP.pm"
 
 our @chords_props = qw(colors backColors clipRects linePatterns lineWidths rops rop2s);
 our @chords_args = qw(x y x_diameter y_diameter start_angle end_angle);
@@ -637,11 +599,8 @@ sub Prima::Drawable::pdl_chords {
 	}
 	
 }
-#line 664 "Prima.pm"
 
 
-
-#line 949 "/usr/local/lib/x86_64-linux-gnu/perl/5.34.0/PDL/PP.pm"
 
 
 
@@ -678,20 +637,15 @@ Compare to the Prima method L<Prima::Drawable/clear>. In practice I
 suppose this might be considered the opposite of L</pdl_bars>, though
 technically this is meant for erasing, not drawing.
 
-
-
 =for bad
 
 pdl_clears does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 721 "Prima.pm"
 
 
 
-#line 950 "/usr/local/lib/x86_64-linux-gnu/perl/5.34.0/PDL/PP.pm"
 
 our @clears_props = qw(colors backColors clipRects linePatterns lineWidths rops rop2s);
 our @clears_args = qw(x1 y1 x2 y2);
@@ -742,11 +696,8 @@ sub Prima::Drawable::pdl_clears {
 	}
 	
 }
-#line 776 "Prima.pm"
 
 
-
-#line 949 "/usr/local/lib/x86_64-linux-gnu/perl/5.34.0/PDL/PP.pm"
 
 
 
@@ -791,20 +742,15 @@ and L</pdl_sectors> as well as L</pdl_fill_chords> and
 L</pdl_fill_sectors>. You may also be interested in L<Prima::Drawable/spline>,
 which does not yet have a PDL interface.
 
-
-
 =for bad
 
 pdl_ellipses does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 841 "Prima.pm"
 
 
 
-#line 950 "/usr/local/lib/x86_64-linux-gnu/perl/5.34.0/PDL/PP.pm"
 
 our @ellipses_props = qw(colors backColors clipRects linePatterns lineWidths rops rop2s);
 our @ellipses_args = qw(x y x_diameter y_diameter);
@@ -855,11 +801,8 @@ sub Prima::Drawable::pdl_ellipses {
 	}
 	
 }
-#line 896 "Prima.pm"
 
 
-
-#line 949 "/usr/local/lib/x86_64-linux-gnu/perl/5.34.0/PDL/PP.pm"
 
 
 
@@ -890,20 +833,15 @@ equivalent is L</pdl_chords>. Closely related to L</pdl_fill_ellipses>
 and L</pdl_fill_sectors>. See also L</pdl_arcs>, L</pdl_ellipses>,
 and L</pdl_sectors>.
 
-
-
 =for bad
 
 pdl_fill_chords does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 948 "Prima.pm"
 
 
 
-#line 950 "/usr/local/lib/x86_64-linux-gnu/perl/5.34.0/PDL/PP.pm"
 
 our @fill_chords_props = qw(colors backColors clipRects fillPatterns rops rop2s);
 our @fill_chords_args = qw(x y x_diameter y_diameter start_angle end_angle);
@@ -956,11 +894,8 @@ sub Prima::Drawable::pdl_fill_chords {
 	}
 	
 }
-#line 1005 "Prima.pm"
 
 
-
-#line 949 "/usr/local/lib/x86_64-linux-gnu/perl/5.34.0/PDL/PP.pm"
 
 
 
@@ -1003,20 +938,15 @@ See also L</pdl_arcs>, L</pdl_ellipses>, and L</pdl_sectors>. Also,
 check out L<Prima::Drawable/fill_spline>, which does not yet have
 PDL bindings.
 
-
-
 =for bad
 
 pdl_fill_ellipses does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 1068 "Prima.pm"
 
 
 
-#line 950 "/usr/local/lib/x86_64-linux-gnu/perl/5.34.0/PDL/PP.pm"
 
 our @fill_ellipses_props = qw(colors backColors clipRects fillPatterns rops rop2s);
 our @fill_ellipses_args = qw(x y x_diameter y_diameter);
@@ -1067,11 +997,8 @@ sub Prima::Drawable::pdl_fill_ellipses {
 	}
 	
 }
-#line 1123 "Prima.pm"
 
 
-
-#line 949 "/usr/local/lib/x86_64-linux-gnu/perl/5.34.0/PDL/PP.pm"
 
 
 
@@ -1128,22 +1055,17 @@ Resizing the window will result in a similar rendering that fits the aspect
 ratio of your (resized) window.
 
 Compare to the Prima method L<Prima::Drawable/fillpoly>. See also
-L</pdl_bars> and L<pdl_polylines>.
-
-
+L</pdl_bars> and L</pdl_polylines>.
 
 =for bad
 
 pdl_fillpolys processes bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 1202 "Prima.pm"
 
 
 
-#line 950 "/usr/local/lib/x86_64-linux-gnu/perl/5.34.0/PDL/PP.pm"
 
 our @fillpolys_props = qw(colors backColors clipRects fillPatterns fillModes rops rop2s);
 our @fillpolys_args = qw(x y);
@@ -1192,11 +1114,8 @@ sub Prima::Drawable::pdl_fillpolys {
 	}
 	
 }
-#line 1255 "Prima.pm"
 
 
-
-#line 949 "/usr/local/lib/x86_64-linux-gnu/perl/5.34.0/PDL/PP.pm"
 
 
 
@@ -1241,20 +1160,15 @@ equivalent is L</pdl_sectors>. This is closely related to C</pdl_fill_chords>
 and C</pdl_fill_ellipses>. See also L</pdl_arcs>, L</pdl_chords>, and
 L</pdl_ellipses>.
 
-
-
 =for bad
 
 pdl_fill_sectors does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 1321 "Prima.pm"
 
 
 
-#line 950 "/usr/local/lib/x86_64-linux-gnu/perl/5.34.0/PDL/PP.pm"
 
 our @fill_sectors_props = qw(colors backColors clipRects fillPatterns rops rop2s);
 our @fill_sectors_args = qw(x y x_diameter y_diameter start_angle end_angle);
@@ -1307,11 +1221,8 @@ sub Prima::Drawable::pdl_fill_sectors {
 	}
 	
 }
-#line 1378 "Prima.pm"
 
 
-
-#line 949 "/usr/local/lib/x86_64-linux-gnu/perl/5.34.0/PDL/PP.pm"
 
 
 
@@ -1370,22 +1281,17 @@ both shapes filled. Resizing the window will lead to randomly changed
 positions for those space-ship looking things.
 
 Compare to the Prima method L<Prima::Drawable/flood_fill>. See also
-L<pdl_clears> and the various fill-based drawing methods.
-
-
+L</pdl_clears> and the various fill-based drawing methods.
 
 =for bad
 
 pdl_flood_fills does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 1459 "Prima.pm"
 
 
 
-#line 950 "/usr/local/lib/x86_64-linux-gnu/perl/5.34.0/PDL/PP.pm"
 
 our @flood_fills_props = qw(colors backColors clipRects fillPatterns rops rop2s);
 our @flood_fills_args = qw(x y color singleborder);
@@ -1436,11 +1342,8 @@ sub Prima::Drawable::pdl_flood_fills {
 	}
 	
 }
-#line 1514 "Prima.pm"
 
 
-
-#line 949 "/usr/local/lib/x86_64-linux-gnu/perl/5.34.0/PDL/PP.pm"
 
 
 
@@ -1458,7 +1361,7 @@ lineJoins, linePatterns, lineWidths, rops, rop2s.
 In contrast to polylines, which are supposed to be connected, these
 lines are meant to be independent. Also note that this method does make an
 effort to handle bad values, both the IEEE sort (nan, inf) and the official
-PDL bad values. See L<pdl_polylines> for a discussion of what might constitute
+PDL bad values. See L</pdl_polylines> for a discussion of what might constitute
 proper bad value handling.
 
 =for example
@@ -1466,22 +1369,17 @@ proper bad value handling.
  working here
 
 Compare to the Prima methods L<Prima::Drawable/lines> and
-L<Prima::Drawable/lines>. See also L<pdl_polylines>.
-
-
+L<Prima::Drawable/lines>. See also L</pdl_polylines>.
 
 =for bad
 
 pdl_lines processes bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 1562 "Prima.pm"
 
 
 
-#line 950 "/usr/local/lib/x86_64-linux-gnu/perl/5.34.0/PDL/PP.pm"
 
 our @lines_props = qw(colors backColors clipRects lineJoins linePatterns lineWidths rops rop2s);
 our @lines_args = qw(x1 y1 x2 y2);
@@ -1532,11 +1430,8 @@ sub Prima::Drawable::pdl_lines {
 	}
 	
 }
-#line 1617 "Prima.pm"
 
 
-
-#line 949 "/usr/local/lib/x86_64-linux-gnu/perl/5.34.0/PDL/PP.pm"
 
 
 
@@ -1604,23 +1499,18 @@ do better to use L<PDL::Graphics::Prima> to create plots):
  my $y = ( sin($x / 20) + 1 ) * 50;
  $canvas->pdl_polylines($x, $y);
 
-Compare to the Prima method L<Prima::Drawable/polyline>. See also L<pdl_lines>
-and L<pdl_fillpolys>.
-
-
+Compare to the Prima method L<Prima::Drawable/polyline>. See also L</pdl_lines>
+and L</pdl_fillpolys>.
 
 =for bad
 
 pdl_polylines processes bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 1708 "Prima.pm"
 
 
 
-#line 950 "/usr/local/lib/x86_64-linux-gnu/perl/5.34.0/PDL/PP.pm"
 
 our @polylines_props = qw(colors backColors clipRects lineJoins linePatterns lineWidths rops rop2s);
 our @polylines_args = qw(x y);
@@ -1669,11 +1559,8 @@ sub Prima::Drawable::pdl_polylines {
 	}
 	
 }
-#line 1761 "Prima.pm"
 
 
-
-#line 949 "/usr/local/lib/x86_64-linux-gnu/perl/5.34.0/PDL/PP.pm"
 
 
 
@@ -1713,20 +1600,15 @@ draws a line from (x1, y1) to (x2, y2) instead. Also, there is a Prima
 method that does not (yet) have a pdl-based equivalent known as
 L<Prima::Drawable/rects3d>, which draws beveled edges around a rectangle.
 
-
-
 =for bad
 
 pdl_rectangles does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 1821 "Prima.pm"
 
 
 
-#line 950 "/usr/local/lib/x86_64-linux-gnu/perl/5.34.0/PDL/PP.pm"
 
 our @rectangles_props = qw(colors backColors clipRects linePatterns lineWidths rops rop2s);
 our @rectangles_args = qw(x1 y1 x2 y2);
@@ -1777,11 +1659,8 @@ sub Prima::Drawable::pdl_rectangles {
 	}
 	
 }
-#line 1876 "Prima.pm"
 
 
-
-#line 949 "/usr/local/lib/x86_64-linux-gnu/perl/5.34.0/PDL/PP.pm"
 
 
 
@@ -1835,24 +1714,19 @@ or glass-half-empty sort of person.
 
 Compare to the Prima method L<Prima::Drawable/sector>. The filled equivalent
 is L</pdl_fill_sectors>. There is a whole slew of arc-based drawing methods
-including L</pdl_arcs>, L</pdl_chords>, and L<pdl_ellipses> along with their
+including L</pdl_arcs>, L</pdl_chords>, and L</pdl_ellipses> along with their
 filled equivalents. You may also be interested in L<Prima::Drawable/spline>,
 which does not yet have a PDL interface.
-
-
 
 =for bad
 
 pdl_sectors does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 1955 "Prima.pm"
 
 
 
-#line 950 "/usr/local/lib/x86_64-linux-gnu/perl/5.34.0/PDL/PP.pm"
 
 our @sectors_props = qw(colors backColors clipRects linePatterns lineWidths rops rop2s);
 our @sectors_args = qw(x y x_diameter y_diameter start_angle end_angle);
@@ -1905,24 +1779,18 @@ sub Prima::Drawable::pdl_sectors {
 	}
 	
 }
-#line 2012 "Prima.pm"
+
 
 
 
 #line 3119 "prima.pd"
-
 
 =head2 PDL-ONLY METHODS
 
 These are drawing methods that have no analogous Prima::Drawable function.
 
 =cut
-#line 2024 "Prima.pm"
-
-
-
-#line 949 "/usr/local/lib/x86_64-linux-gnu/perl/5.34.0/PDL/PP.pm"
-
+#line 1883 "Prima.pm"
 
 
 =head2 pdl_symbols
@@ -2071,7 +1939,6 @@ the center.> In other words, create an asterisk:
 </figure>
 <!--
 
-
                            second point
 
                third            /
@@ -2138,20 +2005,15 @@ line to determine the line width.
 Bad values are handled by C<pdl_symbols>. If any of the values you pass in
 are bad, the symbol is not drawn at that x/y coordinate.
 
-
-
 =for bad
 
 pdl_symbols processes bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 2261 "Prima.pm"
 
 
 
-#line 950 "/usr/local/lib/x86_64-linux-gnu/perl/5.34.0/PDL/PP.pm"
 
 our @symbols_props = qw(colors backColors clipRects fillPatterns fillModes linePatterns lineWidths rops rop2s);
 our @symbols_args = qw(x y N_points orientation filled size skip);
@@ -2205,14 +2067,13 @@ sub Prima::Drawable::pdl_symbols {
 	}
 	
 }
-#line 2319 "Prima.pm"
+
 
 
 
 
 
 #line 3474 "prima.pd"
-
 
 =head1 ERROR MESSAGE
 
@@ -2279,10 +2140,7 @@ Dmitry for that module because it gave me a working template for this module,
 including a working Makefile.PL. Thanks Dmitry!
 
 =cut
-#line 2393 "Prima.pm"
-
-
-
+#line 2239 "Prima.pm"
 
 # Exit with OK status
 

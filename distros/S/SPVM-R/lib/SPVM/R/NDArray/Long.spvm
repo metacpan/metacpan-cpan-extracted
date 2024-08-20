@@ -33,9 +33,7 @@ class R::NDArray::Long extends R::NDArray {
   
   method elem_to_string : string ($data : long[], $data_index : int) {
     
-    my $elem = $data->[$data_index];
-    
-    my $string = (string)(long)$elem;
+    my $string = (string)$data->[$data_index];
     
     return $string;
   }
@@ -68,8 +66,8 @@ class R::NDArray::Long extends R::NDArray {
     return (R::NDArray::Long)$self->SUPER::clone($shallow);
   }
   
-  method slice : R::NDArray::Long ($asix_indexes_product : R::NDArray::Int[]) {
-    return (R::NDArray::Long)$self->SUPER::slice($asix_indexes_product);
+  method slice : R::NDArray::Long ($indexes_product : R::NDArray::Int[]) {
+    return (R::NDArray::Long)$self->SUPER::slice($indexes_product);
   }
   
   precompile method to_int_ndarray : R::NDArray::Int () {

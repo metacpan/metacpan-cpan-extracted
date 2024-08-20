@@ -81,8 +81,8 @@ class R::NDArray::FloatComplex extends R::NDArray {
     return $ret_ndarray;
   }
   
-  method slice : R::NDArray::FloatComplex ($asix_indexes_product : R::NDArray::Int[]) {
-    return (R::NDArray::FloatComplex)$self->SUPER::slice($asix_indexes_product);
+  method slice : R::NDArray::FloatComplex ($indexes_product : R::NDArray::Int[]) {
+    return (R::NDArray::FloatComplex)$self->SUPER::slice($indexes_product);
   }
   
   method clone : R::NDArray::FloatComplex ($shallow : int = 0) {

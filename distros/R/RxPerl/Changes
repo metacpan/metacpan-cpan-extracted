@@ -1,11 +1,16 @@
 Revision history for Perl extension RxPerl
 
+v6.29.6 2024-08-20T08:48:53Z
+
+    - fixed a bug in op_catch_error where its callback wasn't allowed to return an error-emitting observable
+    - removed a possibility of memory leaks
+
 v6.29.5 2024-08-18T09:47:21Z
 
-    - fixed the behavior of op_concat_map, and wrote its test
-    - instantaneous tests can now deal with Mojo::Promise
-    - use of constants to increase performance
-    - increased minimum version of Mojolicious in test dependency, to avoid a bug in earlier versions of Mojo::Promise
+    - fixed a bug in op_concat_map which made it behave differently that rxjs
+    - tests can now contain promises
+    - slight performance increase
+    - updated Mojolicious version in tests to avoid a bug in old versions of Mojo::Promise
 
 v6.29.4 2024-08-06T08:55:33Z
 

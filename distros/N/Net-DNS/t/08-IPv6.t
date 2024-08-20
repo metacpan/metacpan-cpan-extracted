@@ -1,5 +1,5 @@
 #!/usr/bin/perl
-# $Id: 08-IPv6.t 1965 2024-02-14 09:19:32Z willem $ -*-perl-*-
+# $Id: 08-IPv6.t 1980 2024-06-02 10:16:33Z willem $ -*-perl-*-
 #
 
 use strict;
@@ -87,7 +87,7 @@ NonFatalBegin();
 	ok( $resolver->send($packet), '$resolver->send(...)	UDP' );
 
 	$packet->edns->option( PADDING => ( 'OPTION-LENGTH' => 500 ) );	   # force TCP
-
+	delete $packet->{id};
 	ok( $resolver->send($packet), '$resolver->send(...)	TCP' );
 }
 
@@ -119,7 +119,7 @@ NonFatalBegin();
 	ok( $resolver->bgread($udp), '$resolver->bgread($udp)' );
 
 	$packet->edns->option( PADDING => ( 'OPTION-LENGTH' => 500 ) );	   # force TCP
-
+	delete $packet->{id};
 	my $tcp = $resolver->bgsend($packet);
 	ok( $tcp, '$resolver->bgsend(...)	TCP' );
 	while ( $resolver->bgbusy($tcp) ) { sleep 1; }
@@ -274,6 +274,7 @@ SKIP: {
 	my $update   = Net::DNS::Update->new(qw(example.com));
 	ok( $resolver->send($update), '$resolver->send($update) UDP' );
 	$resolver->usevc(1);
+	delete $update->{id};
 	ok( $resolver->send($update), '$resolver->send($update) TCP' );
 }
 
@@ -363,6 +364,7 @@ SKIP: {
 
 	my $query = Net::DNS::Packet->new(qw(. SOA IN));
 	ok( $resolver->bgsend($query), '$resolver->bgsend() + automatic TSIG' );
+	delete $query->{id};
 	ok( $resolver->bgsend($query), '$resolver->bgsend() + existing TSIG' );
 }
 
@@ -380,7 +382,7 @@ SKIP: {
 	exception( 'TCP time out', sub { $resolver->_axfr_next( IO::Select->new ) } );
 
 	my $packet = Net::DNS::Packet->new(qw(net-dns.org SOA));
-	my $socket = $resolver->_bgsend_tcp( $packet, $packet->data );
+	my $socket = $resolver->_bgsend_tcp( $packet, $packet->encode );
 	my $select = IO::Select->new($socket);
 	while ( $resolver->bgbusy($socket) ) { sleep 1 }
 	my $discarded = '';		## [size][id][status]	[qdcount]...
@@ -396,7 +398,7 @@ SKIP: {
 	$resolver->tcp_timeout(10);
 
 	my $packet = $resolver->_make_query_packet(qw(net-dns.org SOA));
-	my $socket = $resolver->_bgsend_tcp( $packet, $packet->data );
+	my $socket = $resolver->_bgsend_tcp( $packet, $packet->encode );
 	my $tsigrr = $packet->sigrr;
 	skip( 'verify fail', 1 ) unless $tsigrr;
 
@@ -409,9 +411,10 @@ SKIP: {
 	my $resolver = Net::DNS::Resolver->new( nameservers => $IP, retry => 1 );
 	my $original = Net::DNS::Packet->new(qw(net-dns.org SOA));
 	my $mismatch = Net::DNS::Packet->new(qw(net-dns.org SOA));
-	ok( !$resolver->_send_tcp( $original, $mismatch->data ), '_send_tcp()	id mismatch' );
-	ok( !$resolver->_send_udp( $original, $mismatch->data ), '_send_udp()	id mismatch' );
-	my $handle = $resolver->_bgsend_udp( $original, $mismatch->data );
+	$original->encode;
+	ok( !$resolver->_send_tcp( $original, $mismatch->encode ), '_send_tcp()	id mismatch' );
+	ok( !$resolver->_send_udp( $original, $mismatch->encode ), '_send_udp()	id mismatch' );
+	my $handle = $resolver->_bgsend_udp( $original, $mismatch->encode );
 	$resolver->udp_timeout(1);
 	ok( !$resolver->bgread($handle),	     'bgread()	id mismatch' );
 	ok( !$resolver->bgread( ref($handle)->new ), 'bgread()	timeout' );

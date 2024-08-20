@@ -40,9 +40,7 @@ class R::NDArray::String extends R::NDArray {
   
   method elem_to_string : string ($data : string[], $data_index : int) {
     
-    my $elem = $data->[$data_index];
-    
-    my $string = copy $elem;
+    my $string = copy $data->[$data_index];
     
     return $string;
   }
@@ -54,14 +52,7 @@ class R::NDArray::String extends R::NDArray {
   
   method elem_clone : void ($dist_data : string[], $dist_data_index : int, $src_data : string[], $src_data_index : int) {
     
-    my $src_elem = $src_data->[$src_data_index];
-    
-    if ($src_elem) {
-      $dist_data->[$dist_data_index] = copy $src_elem;
-    }
-    else {
-      $dist_data->[$dist_data_index] = undef;
-    }
+    $dist_data->[$dist_data_index] = copy $src_data->[$src_data_index];
   }
   
   method elem_cmp : int ($a_data : string[], $a_data_index : int, $b_data : string[], $b_data_index : int) {
@@ -85,8 +76,8 @@ class R::NDArray::String extends R::NDArray {
     return (R::NDArray::String)$self->SUPER::clone($shallow);
   }
   
-  method slice : R::NDArray::String ($asix_indexes_product : R::NDArray::Int[]) {
-    return (R::NDArray::String)$self->SUPER::slice($asix_indexes_product);
+  method slice : R::NDArray::String ($indexes_product : R::NDArray::Int[]) {
+    return (R::NDArray::String)$self->SUPER::slice($indexes_product);
   }
   
   precompile method to_string_buffer_ndarray : R::NDArray::StringBuffer () {
@@ -101,13 +92,8 @@ class R::NDArray::String extends R::NDArray {
     my $ret_data = $ret_ndarray->data;
     
     for (my $i = 0; $i < $length; $i++) {
-      my $elem = $data->[$i];
-      
-      if ($elem) {
+      if ($data->[$i]) {
         $ret_data->[$i] = StringBuffer->new($data->[$i]);
-      }
-      else {
-        $ret_data->[$i] = undef;
       }
     }
     
@@ -126,31 +112,12 @@ class R::NDArray::String extends R::NDArray {
     my $ret_data = $ret_ndarray->data;
     
     for (my $i = 0; $i < $length; $i++) {
-      my $elem = $data->[$i];
-      
-      if ($elem) {
-        if (length $elem == 10) {
-          
-          my $tp = (Time::Piece)undef;
-          
-          eval { $tp = Time::Piece->strptime($data->[$i], "%Y-%m-%d"); }
-          
-          $ret_data->[$i] = $tp;
+      if ($data->[$i]) {
+        eval { $ret_data->[$i] = Time::Piece->strptime($data->[$i], "%Y-%m-%d %H:%M:%S"); }
+        
+        unless ($ret_data->[$i]) {
+          eval { $ret_data->[$i] = Time::Piece->strptime($data->[$i], "%Y-%m-%d"); }
         }
-        elsif (length $elem == 19) {
-          
-          my $tp = (Time::Piece)undef;
-          
-          eval { $tp = Time::Piece->strptime($data->[$i], "%Y-%m-%d %H:%M:%S"); }
-          
-          $ret_data->[$i] = $tp;
-        }
-        else {
-          die "The string \"$elem\" is invalid date or datetime format.";
-        }
-      }
-      else {
-        $ret_data->[$i] = undef;
       }
     }
     

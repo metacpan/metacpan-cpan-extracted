@@ -11,7 +11,7 @@ use DateTime::Format::Strptime;
 use List::Util qw(any uniq);
 use Travel::Status::DE::HAFAS::Stop;
 
-our $VERSION = '6.08';
+our $VERSION = '6.09';
 
 Travel::Status::DE::HAFAS::Journey->mk_ro_accessors(
 	qw(datetime sched_datetime rt_datetime tz_offset
@@ -158,7 +158,7 @@ sub new {
 		}
 		$ref->{is_additional} = $journey->{stbStop}{isAdd};
 	}
-	elsif ( $stops[0]{loc} ) {
+	elsif ( $stops[0] and $stops[0]{loc} ) {
 		$ref->{route_start} = $stops[0]{loc}->name;
 	}
 
@@ -307,7 +307,7 @@ sub polyline {
 sub route {
 	my ($self) = @_;
 
-	if ( $self->{route} ) {
+	if ( $self->{route} and @{ $self->{route} } ) {
 		if ( $self->{route}[0] and $self->{route}[0]{stop} ) {
 			$self->{route}
 			  = [ map { Travel::Status::DE::HAFAS::Stop->new( %{$_} ) }
@@ -437,7 +437,7 @@ journey received by Travel::Status::DE::HAFAS
 
 =head1 VERSION
 
-version 6.08
+version 6.09
 
 =head1 DESCRIPTION
 

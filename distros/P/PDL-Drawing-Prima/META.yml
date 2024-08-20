@@ -8,9 +8,9 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: '0'
   PDL: '2.037'
-  Prima: '1.57'
+  Prima: '1.74'
 dynamic_config: 0
-generated_by: 'ExtUtils::MakeMaker version 7.62, CPAN::Meta::Converter version 2.150010'
+generated_by: 'ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -32,5 +32,5 @@ resources:
   IRC: irc://irc.perl.org/#pdl
   bugtracker: https://github.com/PDLPorters/PDL-Drawing-Prima/issues
   repository: https://github.com/dk/PDL-Drawing-Prima
-version: '0.18'
+version: '0.19'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

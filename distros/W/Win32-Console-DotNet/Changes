@@ -1,0 +1,67 @@
+Revision history for Win32::Console::DotNet
+
+0.5   2024-08-20
+        - Add 'Encode::Encoding' support (instead of using a code pages)
+        - Add Windows code page aliases to the built-in encodings
+        - Add 'Type::Tiny' support (if installed)
+        - Add/Change Tests
+        - Change 'ReadKey' returns 'ConsoleKeyInfo' (blessed HashRef)
+        - Change 'Write/WriteLine' suppress "uninitialized" warning
+        - Change meaning of '_DEBUG' (only enabled if EXTENDED_TESTING is true)
+        - Update type check in the constructor of 'ConsoleKeyInfo'
+        - Update (POD) documentation
+        - Update Samples
+
+0.4.4   2024-08-19
+        - Bugfix Retrieval of 'Title' with a length of exactly 1024 characters
+        - Bugfix 'MoveBufferArea' dies without error code on 1x1 regions
+
+0.4.3   2024-08-13
+        - Bugfix 'GetBufferInfo' incorrect check on argument '$succeeded'
+        - Add/Change Samples, Tests
+
+0.4.2   2024-08-12
+        - Bugfix 'Read' identification of 'eof'
+        - Bugfix 'StdConUnicodeEncoding' UTF-16 endianess
+        - Bugfix 'ConsoleKeyInfo' constructor definition
+        - Bugfix 'Input/OutputEncoding' dies when console is detached
+
+0.4.1   2024-07-29
+        - Bugfix 'ResizeTest' in '04ManualTest.t'
+        - Bugfix 'ReadKey' return value
+
+0.4     2024-07-28
+        - Add 'ConsoleColor' and 'ConsoleKey' constants
+        - Add 'ConsoleKeyInfo' Object
+        - Add 'In/Out/Error' support of various Code Page Identifiers
+        - Add/Change Samples, Tests
+        - Update 'Read' flush on input after receiving 'eof'
+        - Change 'DebugOutputTextWriter' to 'IO::DebugOutputTextWriter'
+
+0.3.2   2024-07-28
+        - Bugfix 'SetWindowSize/SetWindowPosition' set incorrect attributes
+        - Bugfix 'ReadKey' meaning of 'KeyDown' event
+        - Bugfix 'ReadKey' dies if event type is not 'KEY_EVENT/MOUSE_EVENT'
+        - Bugfix 'Readline' does not return 'undef' for 'eof'
+
+0.3.1   2024-07-05
+        - Bugfix 'Beep', 'ReadKey', 'ReadLine'
+        - Update (POD) documentation
+
+0.3     2024-07-03
+        - Add 'lock' for the use with threads
+        - Add Use of 'IO::Handle'
+        - Add '%RessourceStrings' for exceptions
+
+0.2.1   2024-06-25
+        - Bugfix of 'GetBufferInfo'
+        - Bugfix of some test cases
+
+0.2     2024-02-26
+        - Change from 'Moo' to 'Class::Tiny::Antlers'
+        - Change from 'namespace::autoclean' to 'namespace::sweep'
+        - Add use of 'Type::Nano'
+        - Remove some dependencies
+
+0.1     2024-02-18
+        - First release.

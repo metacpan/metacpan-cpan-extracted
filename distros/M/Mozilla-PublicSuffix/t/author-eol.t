@@ -19,6 +19,7 @@ my @files = (
     't/00-compile.t',
     't/01-psuffix.t',
     't/author-critic.t',
+    't/author-distmeta.t',
     't/author-eol.t',
     't/author-minimum-version.t',
     't/author-mojibake.t',
@@ -32,9 +33,7 @@ my @files = (
     't/author-test-version.t',
     't/release-cpan-changes.t',
     't/release-dist-manifest.t',
-    't/release-distmeta.t',
-    't/release-kwalitee.t',
-    't/release-unused-vars.t'
+    't/release-kwalitee.t'
 );
 
 eol_unix_ok($_, { trailing_whitespace => 1 }) foreach @files;

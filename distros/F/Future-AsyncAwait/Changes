@@ -1,5 +1,17 @@
 Revision history for Future-AsyncAwait
 
+0.67    2024-08-19
+        [CHANGES]
+         * Use `File::ShareDir` for storing .h include file, rather than
+           storing the contents in the `__DATA__` section of the build helper
+         * Updates for XS::Parse::Sublike v0.23:
+            + add .ver hooks struct field
+         * Pod style updates
+
+        [BUGFIXES]
+         * Permit `async` keyword on bodyless sub or method declarations
+           (RT151046)
+
 0.66    2023-09-08
         [CHANGES]
          * Add a unit test to check that `async method` works on core perl

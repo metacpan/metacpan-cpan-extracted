@@ -2,7 +2,7 @@ package Net::DNS::Resolver::cygwin;
 
 use strict;
 use warnings;
-our $VERSION = (qw$Id: cygwin.pm 1856 2021-12-02 14:36:25Z willem $)[2];
+our $VERSION = (qw$Id: cygwin.pm 1981 2024-06-17 13:22:14Z willem $)[2];
 
 
 =head1 NAME
@@ -12,7 +12,6 @@ Net::DNS::Resolver::cygwin - Cygwin resolver class
 =cut
 
 
-use base qw(Net::DNS::Resolver::Base);
 use IO::File;
 
 

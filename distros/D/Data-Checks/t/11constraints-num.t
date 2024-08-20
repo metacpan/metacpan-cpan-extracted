@@ -90,22 +90,22 @@ test_constraint Num => Num,
    ok( !t::test::check_value( $checker_zero, undef ), 'NumEq zero rejects undef' );
 }
 
-# Debug inspection
-is( Data::Checks::Debug::inspect_constraint( Num ), "Num",
-   'debug inspect Num' );
-is( Data::Checks::Debug::inspect_constraint( NumGT(10) ), "NumGT(10)",
-   'debug inspect NumGT(10)' );
-is( Data::Checks::Debug::inspect_constraint( NumGE(10) ), "NumGE(10)",
-   'debug inspect NumGE(10)' );
-is( Data::Checks::Debug::inspect_constraint( NumLE(10) ), "NumLE(10)",
-   'debug inspect NumLE(10)' );
-is( Data::Checks::Debug::inspect_constraint( NumLT(10) ), "NumLT(10)",
-   'debug inspect NumLT(10)' );
-is( Data::Checks::Debug::inspect_constraint( NumRange(10, 20) ), "NumRange(10, 20)",
-   'debug inspect NumRange(10, 20)' );
-is( Data::Checks::Debug::inspect_constraint( NumEq(10) ), "NumEq(10)",
-   'debug inspect NumEq(10)' );
-is( Data::Checks::Debug::inspect_constraint( NumEq(10, 20) ), "NumEq(10, 20)",
-   'debug inspect NumEq(10, 20)' );
+# Stringify
+is( Data::Checks::Debug::stringify_constraint( Num ), "Num",
+   'debug stringify Num' );
+is( Data::Checks::Debug::stringify_constraint( NumGT(10) ), "NumGT(10)",
+   'debug stringify NumGT(10)' );
+is( Data::Checks::Debug::stringify_constraint( NumGE(10) ), "NumGE(10)",
+   'debug stringify NumGE(10)' );
+is( Data::Checks::Debug::stringify_constraint( NumLE(10) ), "NumLE(10)",
+   'debug stringify NumLE(10)' );
+is( Data::Checks::Debug::stringify_constraint( NumLT(10) ), "NumLT(10)",
+   'debug stringify NumLT(10)' );
+is( Data::Checks::Debug::stringify_constraint( NumRange(10, 20) ), "NumRange(10, 20)",
+   'debug stringify NumRange(10, 20)' );
+is( Data::Checks::Debug::stringify_constraint( NumEq(10) ), "NumEq(10)",
+   'debug stringify NumEq(10)' );
+is( Data::Checks::Debug::stringify_constraint( NumEq(10, 20) ), "NumEq(10, 20)",
+   'debug stringify NumEq(10, 20)' );
 
 done_testing;

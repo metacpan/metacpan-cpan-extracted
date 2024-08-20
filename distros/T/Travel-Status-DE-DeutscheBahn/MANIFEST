@@ -124,7 +124,7 @@ t/21-db-journeymatch.t
 t/22-db-journey.t
 t/30-db-journey-platformchange.t
 t/31-db-journey-daychange.t
-'t/in/DB.Berlin Jannowitzbrücke.json'
+'t/in/DB.Berlin Jannowitzbruecke.json'
 t/in/DB.Chop.wat.json
 t/in/DB.EC392.journey.json
 t/in/DB.EC392.journey.txt

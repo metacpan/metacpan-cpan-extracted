@@ -51,18 +51,18 @@ test_constraint 'StrMatch(qr/^[A-Z]/i)' => StrMatch(qr/^[A-Z]/i),
       'non-matching string' => "123",
    ];
 
-# Debug inspection
-is( Data::Checks::Debug::inspect_constraint( Str ), "Str",
-   'debug inspect Str' );
-is( Data::Checks::Debug::inspect_constraint( StrEq("A") ), "StrEq(\"A\")",
-   'debug inspect StrEq("A")' );
-is( Data::Checks::Debug::inspect_constraint( StrEq("A", "B") ), "StrEq(\"A\", \"B\")",
-   'debug inspect StrEq("A", "B")' );
-is( Data::Checks::Debug::inspect_constraint( StrEq('"quoted value"') ), q(StrEq("\\"quoted value\\"")),
-   'debug inspect StrEq(\'"quoted value"\')' );
-is( Data::Checks::Debug::inspect_constraint( StrEq('literal $dollar') ), q(StrEq("literal \\$dollar")),
-   'debug inspect StrEq(\'literal $dollar\')' );
-is( Data::Checks::Debug::inspect_constraint( StrMatch(qr/ABC/) ), "StrMatch(qr/(?^u:ABC)/)",
-   'debug inspect StrMatch(qr/ABC/)' );
+# Stringify
+is( Data::Checks::Debug::stringify_constraint( Str ), "Str",
+   'debug stringify Str' );
+is( Data::Checks::Debug::stringify_constraint( StrEq("A") ), "StrEq(\"A\")",
+   'debug stringify StrEq("A")' );
+is( Data::Checks::Debug::stringify_constraint( StrEq("A", "B") ), "StrEq(\"A\", \"B\")",
+   'debug stringify StrEq("A", "B")' );
+is( Data::Checks::Debug::stringify_constraint( StrEq('"quoted value"') ), q(StrEq("\\"quoted value\\"")),
+   'debug stringify StrEq(\'"quoted value"\')' );
+is( Data::Checks::Debug::stringify_constraint( StrEq('literal $dollar') ), q(StrEq("literal \\$dollar")),
+   'debug stringify StrEq(\'literal $dollar\')' );
+is( Data::Checks::Debug::stringify_constraint( StrMatch(qr/ABC/) ), "StrMatch(qr/(?^u:ABC)/)",
+   'debug stringify StrMatch(qr/ABC/)' );
 
 done_testing;

@@ -1,9 +1,9 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2020-2023 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2020-2024 -- leonerd@leonerd.org.uk
 
-package Test::Future::AsyncAwait::Awaitable 0.66;
+package Test::Future::AsyncAwait::Awaitable 0.67;
 
 use v5.14;
 use warnings;
@@ -47,7 +47,7 @@ to check that the implementation is valid.
 
 =head2 test_awaitable
 
-   test_awaitable( $title, %args )
+   test_awaitable( $title, %args );
 
 Runs the API conformance tests. C<$title> is printed in the test description
 output so should be some human-friendly string.
@@ -72,7 +72,7 @@ This argument is optional; if not provided the tests will simply try to invoke
 the regular C<new> constructor on the given class name. For most
 implementations this should be sufficient.
 
-   $f = $new->()
+   $f = $new->();
 
 =item cancel => CODE
 
@@ -81,7 +81,7 @@ the implementation provides cancellation semantics. If this callback is
 provided then an extra subtest suite is run to check the API around
 cancellation.
 
-   $cancel->( $f )
+   $cancel->( $f );
 
 =item force => CODE
 
@@ -93,7 +93,7 @@ perhaps until the next tick of an event loop or similar. In the latter case,
 these implementations should provide a way for the test to wait for this to
 happen.
 
-   $force->( $f )
+   $force->( $f );
 
 =back
 

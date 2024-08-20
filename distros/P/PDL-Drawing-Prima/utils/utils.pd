@@ -302,7 +302,7 @@ use of that notation.
 
 The first dimension of the piddles holding the hsv and rgb values must be size
 3, i.e. the dimensions must look like (3, m, n, ...). The resulting piddle is
-suitable for input into L<rgb_to_color> as well as manual manipulation.
+suitable for input into L</rgb_to_color> as well as manual manipulation.
 
 The code for this routine is based on C<hsv2rgb> from L<Prima::colorDialog>.
 
@@ -448,7 +448,7 @@ simply returns a hue value of 0.
 
 The first dimension of the piddles holding the hsv and rgb values must be size
 3, i.e. the dimensions must look like (3, m, n, ...). The resulting piddle is
-suitable for manual manipulation and input into L<hsv_to_rgb>.
+suitable for manual manipulation and input into L</hsv_to_rgb>.
 
 The code for this routine is based on C<rgb2hsv> from L<Prima::colorDialog>.
 

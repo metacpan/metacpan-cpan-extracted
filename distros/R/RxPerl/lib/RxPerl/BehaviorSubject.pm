@@ -8,7 +8,7 @@ use base 'RxPerl::Subject';
 use Carp 'croak';
 use Scalar::Util 'weaken';
 
-our $VERSION = "v6.29.5";
+our $VERSION = "v6.29.6";
 
 sub _on_subscribe {
     my ($self, $subscriber) = @_;

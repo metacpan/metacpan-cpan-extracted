@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 
-our $VERSION = '0.18';
+our $VERSION = '0.19';
 pp_setversion($VERSION);
 
 use Carp qw(croak confess);
@@ -1650,7 +1650,7 @@ DOC_STRING
 
 my @properties = extract_properties_from($doc_string);
 pp_def('prima_arcs',
-	Pars => 'int x(); int y(); int x_diameter(); int y_diameter();
+	Pars => 'double x(); double y(); double x_diameter(); double y_diameter();
 			start_angle(); end_angle(); ' . generate_pars_args_for(@properties),
 	OtherPars => $default_other_pars,
 	GenericTypes => ['D'],
@@ -1669,8 +1669,8 @@ pp_def('prima_arcs',
 		# properties:
 		. generate_switch_loop_for(@properties)
 		. pp_line_numbers(__LINE__, q[
-			/* Call apricot's arc function */
-			my->arc(widget_handle, $x(), $y(), $x_diameter(),
+			call_perl( widget_handle, "arc", "nnnnnn",
+				$x(), $y(), $x_diameter(),
 				$y_diameter(), $start_angle(), $end_angle());
 		%}
 	])
@@ -1724,7 +1724,7 @@ DOC_STRING
 
 @properties = extract_properties_from($doc_string);
 pp_def('prima_bars',
-	Pars => 'x1(); y1(); x2(); y2(); ' . generate_pars_args_for(@properties),
+	Pars => 'double x1(); double y1(); double x2(); double y2(); ' . generate_pars_args_for(@properties),
 	OtherPars => $default_other_pars,
 	GenericTypes => ['D'],
 	PMFunc => undef,
@@ -1819,8 +1819,8 @@ DOC_STRING
 
 @properties = extract_properties_from $doc_string;
 pp_def('prima_chords',
-	Pars => 'int x(); int y(); int x_diameter(); int y_diameter();
-			start_angle(); end_angle(); ' . generate_pars_args_for(@properties),
+	Pars => 'double x(); double y(); double x_diameter(); double y_diameter();
+			double start_angle(); double end_angle(); ' . generate_pars_args_for(@properties),
 	OtherPars => $default_other_pars,
 	GenericTypes => ['D'],
 	PMFunc => undef,
@@ -1838,8 +1838,8 @@ pp_def('prima_chords',
 		# properties:
 		. generate_switch_loop_for(@properties)
 		. pp_line_numbers(__LINE__, q[
-			/* Call apricot's chord function */
-			my->chord(widget_handle, $x(), $y(), $x_diameter(),
+			call_perl( widget_handle, "chord", "nnnnnn",
+				$x(), $y(), $x_diameter(),
 				$y_diameter(), $start_angle(), $end_angle());
 		%}
 	])
@@ -1977,7 +1977,7 @@ DOC_STRING
 
 @properties = qw(colors backColors clipRects linePatterns lineWidths rops rop2s );
 pp_def('prima_ellipses',
-	Pars => 'int x(); int y(); int x_diameter(); int y_diameter();'
+	Pars => 'double x(); double y(); double x_diameter(); double y_diameter();'
 			. generate_pars_args_for(@properties),
 	OtherPars => $default_other_pars,
 	GenericTypes => ['L'],
@@ -1996,9 +1996,8 @@ pp_def('prima_ellipses',
 		# properties:
 		. generate_switch_loop_for(@properties)
 		. pp_line_numbers(__LINE__, q[
-			/* Call apricot's ellipse function */
-			my->ellipse(widget_handle, $x(), $y(), $x_diameter(),
-				$y_diameter());
+			call_perl( widget_handle, "ellipse", "nnnn",
+				$x(), $y(), $x_diameter(), $y_diameter());
 		%}
 	])
 	. generate_cleanup_code_for(@properties),
@@ -2045,7 +2044,7 @@ DOC_STRING
 
 @properties = extract_properties_from($doc_string);
 pp_def('prima_fill_chords',
-	Pars => 'int x(); int y(); int x_diameter(); int y_diameter();
+	Pars => 'double x(); double y(); double x_diameter(); double y_diameter();
 			start_angle(); end_angle(); ' . generate_pars_args_for(@properties),
 	OtherPars => $default_other_pars,
 	GenericTypes => ['D'],
@@ -2065,8 +2064,8 @@ pp_def('prima_fill_chords',
 		# properties:
 		. generate_switch_loop_for(@properties)
 		. pp_line_numbers(__LINE__, q[
-			/* Call apricot's fill_chord function */
-			my->fill_chord(widget_handle, $x(), $y(), $x_diameter(),
+			call_perl( widget_handle, "fill_chord", "nnnnnn",
+				$x(), $y(), $x_diameter(),
 				$y_diameter(), $start_angle(), $end_angle());
 		%}
 	])
@@ -2126,7 +2125,7 @@ DOC_STRING
 
 @properties = extract_properties_from($doc_string);
 pp_def('prima_fill_ellipses',
-	Pars => 'int x(); int y(); int x_diameter(); int y_diameter();' . generate_pars_args_for(@properties),
+	Pars => 'double x(); double y(); double x_diameter(); double y_diameter();' . generate_pars_args_for(@properties),
 	OtherPars => $default_other_pars,
 	GenericTypes => ['L'],
 	PMFunc => undef,
@@ -2145,8 +2144,8 @@ pp_def('prima_fill_ellipses',
 		# properties:
 		. generate_switch_loop_for(@properties)
 		. pp_line_numbers(__LINE__, q[
-			/* Call apricot's fill_ellipse function */
-			my->fill_ellipse(widget_handle, $x(), $y(), $x_diameter(), $y_diameter());
+			call_perl( widget_handle, "fill_ellipse", "nnnn",
+				$x(), $y(), $x_diameter(), $y_diameter());
 		%}
 	])
 	. generate_cleanup_code_for(@properties),
@@ -2213,7 +2212,7 @@ Resizing the window will result in a similar rendering that fits the aspect
 ratio of your (resized) window.
 
 Compare to the Prima method L<Prima::Drawable/fillpoly>. See also
-L</pdl_bars> and L<pdl_polylines>.
+L</pdl_bars> and L</pdl_polylines>.
 
 =cut
 
@@ -2373,8 +2372,8 @@ DOC_STRING
 
 @properties = extract_properties_from($doc_string);
 pp_def('prima_fill_sectors',
-	Pars => 'int x(); int y(); int x_diameter(); int y_diameter();
-			start_angle(); end_angle(); ' . generate_pars_args_for(@properties),
+	Pars => 'double x(); double y(); double x_diameter(); double y_diameter();
+			double start_angle(); double end_angle(); ' . generate_pars_args_for(@properties),
 	OtherPars => $default_other_pars,
 	GenericTypes => ['D'],
 	PMFunc => undef,
@@ -2392,8 +2391,8 @@ pp_def('prima_fill_sectors',
 		# properties:
 		. generate_switch_loop_for(@properties)
 		. pp_line_numbers(__LINE__, q[
-			/* Call apricot's arc function */
-			my->fill_sector(widget_handle, $x(), $y(), $x_diameter(),
+			call_perl( widget_handle, "fill_sector", "nnnnnn",
+				$x(), $y(), $x_diameter(),
 				$y_diameter(), $start_angle(), $end_angle());
 		%}
 	])
@@ -2469,7 +2468,7 @@ both shapes filled. Resizing the window will lead to randomly changed
 positions for those space-ship looking things.
 
 Compare to the Prima method L<Prima::Drawable/flood_fill>. See also
-L<pdl_clears> and the various fill-based drawing methods.
+L</pdl_clears> and the various fill-based drawing methods.
 
 =cut
 
@@ -2524,7 +2523,7 @@ lineJoins, linePatterns, lineWidths, rops, rop2s.
 In contrast to polylines, which are supposed to be connected, these
 lines are meant to be independent. Also note that this method does make an
 effort to handle bad values, both the IEEE sort (nan, inf) and the official
-PDL bad values. See L<pdl_polylines> for a discussion of what might constitute
+PDL bad values. See L</pdl_polylines> for a discussion of what might constitute
 proper bad value handling.
 
 =for example
@@ -2532,7 +2531,7 @@ proper bad value handling.
  working here
 
 Compare to the Prima methods L<Prima::Drawable/lines> and
-L<Prima::Drawable/lines>. See also L<pdl_polylines>.
+L<Prima::Drawable/lines>. See also L</pdl_polylines>.
 
 =cut
 
@@ -2782,8 +2781,8 @@ do better to use L<PDL::Graphics::Prima> to create plots):
  my $y = ( sin($x / 20) + 1 ) * 50;
  $canvas->pdl_polylines($x, $y);
 
-Compare to the Prima method L<Prima::Drawable/polyline>. See also L<pdl_lines>
-and L<pdl_fillpolys>.
+Compare to the Prima method L<Prima::Drawable/polyline>. See also L</pdl_lines>
+and L</pdl_fillpolys>.
 
 =cut
 
@@ -3054,7 +3053,7 @@ or glass-half-empty sort of person.
 
 Compare to the Prima method L<Prima::Drawable/sector>. The filled equivalent
 is L</pdl_fill_sectors>. There is a whole slew of arc-based drawing methods
-including L</pdl_arcs>, L</pdl_chords>, and L<pdl_ellipses> along with their
+including L</pdl_arcs>, L</pdl_chords>, and L</pdl_ellipses> along with their
 filled equivalents. You may also be interested in L<Prima::Drawable/spline>,
 which does not yet have a PDL interface.
 
@@ -3064,8 +3063,8 @@ DOC_STRING
 
 @properties = extract_properties_from($doc_string);
 pp_def('prima_sectors',
-	Pars => 'int x(); int y(); int x_diameter(); int y_diameter();
-			start_angle(); end_angle(); ' . generate_pars_args_for(@properties),
+	Pars => 'double x(); double y(); double x_diameter(); double y_diameter();
+			double start_angle(); double end_angle(); ' . generate_pars_args_for(@properties),
 	OtherPars => $default_other_pars,
 	GenericTypes => ['D'],
 	PMFunc => undef,
@@ -3084,7 +3083,8 @@ pp_def('prima_sectors',
 		. generate_switch_loop_for(@properties)
 		. pp_line_numbers(__LINE__, q[
 			/* Call apricot's arc function */
-			my->sector(widget_handle, $x(), $y(), $x_diameter(),
+			call_perl( widget_handle, "sector", "nnnnnn",
+				$x(), $y(), $x_diameter(),
 				$y_diameter(), $start_angle(), $end_angle());
 		%}
 	])
@@ -3384,10 +3384,10 @@ $code = 	q{
 			else if ($N_points() == 0 || $N_points() == 1) {
 				/* Handle the circle case up-front */
 				if ($filled() == 0) {
-					my->ellipse(widget_handle, $x(), $y(), 2*$size(), 2*$size());
+					call_perl( widget_handle, "ellipse", "nnii", $x(), $y(), 2*$size(), 2*$size());
 				}
 				else {
-					my->fill_ellipse(widget_handle, $x(), $y(), 2*$size(), 2*$size());
+					call_perl( widget_handle, "fill_ellipse", "nnii", $x(), $y(), 2*$size(), 2*$size());
 				}
 			}
 			else if (

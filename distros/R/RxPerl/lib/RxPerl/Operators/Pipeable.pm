@@ -29,7 +29,7 @@ our @EXPORT_OK = qw/
 /;
 our %EXPORT_TAGS = (all => \@EXPORT_OK);
 
-our $VERSION = "v6.29.5";
+our $VERSION = "v6.29.6";
 
 sub op_audit {
     my ($duration_selector) = @_;
@@ -197,34 +197,6 @@ sub op_buffer_time {
     return op_buffer(rx_interval($buffer_time_span));
 }
 
-sub _op_catch_error_helper {
-    my ($source, $selector, $subscriber, $dependents, $error) = @_;
-
-    my $new_observable;
-    if (@_ == 4) {
-        $new_observable = $source;
-    } else {
-        eval { $new_observable = $selector->($error, $source) };
-        if (my $e = $@) {
-            $subscriber->{error}->($e) if defined $subscriber->{error};
-            return;
-        }
-    }
-
-    my $own_subscription = RxPerl::Subscription->new;
-    @$dependents = ($own_subscription);
-    my $own_subscriber = {
-        new_subscription => $own_subscription,
-        next     => $subscriber->{next},
-        error    => sub {
-            _op_catch_error_helper($source, $selector, $subscriber, $dependents, $_[0]);
-        },
-        complete => $subscriber->{complete},
-    };
-
-    $new_observable->subscribe($own_subscriber);
-}
-
 sub op_catch_error {
     my ($selector) = @_;
 
@@ -234,12 +206,33 @@ sub op_catch_error {
         return rx_observable->new(sub {
             my ($subscriber) = @_;
 
-            my $dependents = [];
-            $subscriber->subscription->add($dependents);
+            my $own_subscription = RxPerl::Subscription->new;
+            my $own_subscriber = {
+                new_subscription => $own_subscription,
+                %$subscriber,
+                error            => sub {
+                    my ($err) = @_;
 
-            _op_catch_error_helper(
-                $source, $selector, $subscriber, $dependents,
-            );
+                    my $new_o = do {
+                        local $_ = $err;
+                        $selector->(
+                            $err,
+                            $source->pipe(op_catch_error($selector)),
+                        );
+                    };
+
+                    my $new_subscriber = {
+                        new_subscription => (my $new_subscription = RxPerl::Subscription->new),
+                        %$subscriber,
+                    };
+                    $subscriber->subscription->add($new_subscription);
+                    $new_o->subscribe($new_subscriber);
+                },
+            };
+
+            $subscriber->subscription->add($own_subscription);
+
+            $source->subscribe($own_subscriber);
 
             return;
         });

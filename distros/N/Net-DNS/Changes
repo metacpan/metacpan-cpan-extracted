@@ -1,9 +1,16 @@
-$Id: Changes 1977 2024-05-02 09:55:06Z willem $                       -*-text-*-
+$Id: Changes 1989 2024-08-19 14:37:51Z willem $                       -*-text-*-
+
+
+**** 1.46 Aug 19, 2024
+
+	Resync with IANA DNS Parameters registry.
+	Revise documentation for Packet.pm and Header.pm.
+	Random ID cache moved from header->id to packet->encode.
+	Restructure resolver method inheritance tree.
 
 
 **** 1.45 May 2, 2024
 
-	Resync with IANA DNS Parameters registry.
 	Resync with IANA DNSSEC Algorithm Numbers registry.
 	Resync with IANA DS Digest Algorithms registry.
 	Add support for EDNS CO flag.

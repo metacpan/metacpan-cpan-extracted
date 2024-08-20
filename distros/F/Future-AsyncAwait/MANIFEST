@@ -10,18 +10,17 @@ hax/perl-additions.c.inc
 hax/perl-backcompat.c.inc
 hax/README
 hax/save_clearpadrange.c.inc
-lib/Future/AsyncAwait.h
 lib/Future/AsyncAwait.pm
 lib/Future/AsyncAwait.xs
 lib/Future/AsyncAwait/Awaitable.pm
 lib/Future/AsyncAwait/ExtensionBuilder.pm
-lib/Future/AsyncAwait/ExtensionBuilder_data.pm.PL
 lib/Test/Future/AsyncAwait/Awaitable.pm
 LICENSE
 MANIFEST			This list of files
 META.json
 META.yml
 README
+share/include/AsyncAwait.h
 t/00use.t
 t/01async-immediate.t
 t/02await-immediate.t

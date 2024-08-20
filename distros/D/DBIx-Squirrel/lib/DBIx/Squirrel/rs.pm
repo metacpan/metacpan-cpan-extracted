@@ -3,7 +3,6 @@ use Modern::Perl;
 package    # hide from PAUSE
   DBIx::Squirrel::rs;
 
-
 BEGIN {
     require DBIx::Squirrel
       unless defined($DBIx::Squirrel::VERSION);
@@ -14,7 +13,6 @@ BEGIN {
 use namespace::autoclean;
 use Scalar::Util qw/weaken/;
 use Sub::Name;
-
 
 sub _fetch_row {
     my($attr, $self) = shift->_private_attributes;
@@ -29,7 +27,6 @@ sub _fetch_row {
       if @{$attr->{callbacks}};
     return $self->_rebless($head);
 }
-
 
 sub _rebless {
     no strict 'refs';    ## no critic
@@ -52,14 +49,12 @@ sub _rebless {
     return $row_class->new($row);
 }
 
-
 sub _undef_autoloaded_accessors {
     no strict 'refs';    ## no critic
     my $self = shift;
     undef &{$_} foreach @{$self->row_class . '::AUTOLOAD_ACCESSORS'};
     return $self;
 }
-
 
 sub _slice {
     my($attr, $self) = shift->_private_attributes;
@@ -73,22 +68,18 @@ sub _slice {
     return $self;
 }
 
-
 sub row_class {
     my $self = shift;
     return sprintf('DBIx::Squirrel::rs_0x%x', 0+ $self);
 }
 
-
 sub result_class {
     return 'DBIx::Squirrel::rc';
 }
 
-
 BEGIN {
     *row_base_class = *result_class;
 }
-
 
 sub DESTROY {
     no strict 'refs';    ## no critic

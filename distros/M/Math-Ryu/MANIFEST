@@ -13,6 +13,7 @@ s2d.c
 
 t/1_basic.t
 t/d2s.t
+t/is_NV.t
 t/mpfr_cross_checks.t
 t/PVNV.t
 t/round_trip.t

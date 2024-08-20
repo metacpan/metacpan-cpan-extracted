@@ -26,6 +26,10 @@ sub load_instance {
 			client => $data->{options}{client},
 			auth   => $data->{options}{auth},
 		},
+		coverage => {
+		  area => $data->{coverage}{realtimeCoverage}{area},
+		  regions => $data->{coverage}{realtimeCoverage}{region} // []
+		 },
 
 		#coverage => {
 		#	area => $data->{coverage}{realtimeCoverage}{area},
@@ -46,7 +50,12 @@ sub load_instance {
 			for ( 1 .. $skipped ) {
 				push( @{ $ret{productbits} }, [ "_", undef ] );
 			}
-			push( @{ $ret{productbits} }, [ $p->{id}, $p->{name} ] );
+			if ( $p->{name} ) {
+				push( @{ $ret{productbits} }, [ $p->{id}, $p->{name} ] );
+			}
+			else {
+				push( @{ $ret{productbits} }, $p->{id} );
+			}
 		}
 		else {
 			$skipped += 1;
@@ -168,11 +177,12 @@ my %hafas_instance = (
 		),
 		stopfinder => 'https://fahrplan.oebb.at/bin/ajax-getstop.exe',
 	},
-	RMV  => { load_instance( 'de/rmv',  lang => 'deu' ), },
-	RSAG => { load_instance( 'de/rsag', lang => 'deu' ), },
-	STV  => { load_instance( 'at/stv',  lang => 'deu', ver => '1.32' ), },
-	TPG  => { load_instance( 'ch/tpg',  lang => 'deu', ver => '1.40' ), },
-	VBB  => {
+	Resrobot => { load_instance( 'se/resrobot', lang => 'sve' ), },
+	RMV      => { load_instance( 'de/rmv',      lang => 'deu' ), },
+	RSAG     => { load_instance( 'de/rsag',     lang => 'deu' ), },
+	STV      => { load_instance( 'at/stv', lang => 'deu', ver => '1.32' ), },
+	TPG      => { load_instance( 'ch/tpg', lang => 'deu', ver => '1.40' ), },
+	VBB      => {
 		load_instance( 'de/vbb', lang => 'deu' ),
 		stopfinder => 'https://fahrinfo.vbb.de/bin/ajax-getstop.exe',
 	},
@@ -222,7 +232,7 @@ use warnings;
 use 5.014;
 use utf8;
 
-our $VERSION = '6.08';
+our $VERSION = '6.09';
 
 # Most of these have been adapted from
 # <https://github.com/public-transport/transport-apis> and

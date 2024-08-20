@@ -14,7 +14,7 @@ use Exporter 'import';
 our @EXPORT_OK = (@RxPerl::EXPORT_OK);
 our %EXPORT_TAGS = (%RxPerl::EXPORT_TAGS);
 
-our $VERSION = "v6.29.5";
+our $VERSION = "v6.29.6";
 
 my $mojo_loaded = eval {
     load 'Mojo::IOLoop';

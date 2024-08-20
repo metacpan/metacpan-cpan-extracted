@@ -1,5 +1,5 @@
 #!/usr/bin/perl
-# $Id: 01-resolver.t 1965 2024-02-14 09:19:32Z willem $	-*-perl-*-
+# $Id: 01-resolver.t 1980 2024-06-02 10:16:33Z willem $	-*-perl-*-
 #
 
 use strict;
@@ -50,8 +50,10 @@ ok( !$resolver->search(''),		'$resolver->search() root label' );
 
 
 my $query = Net::DNS::Packet->new('.');	## exercise _accept_reply()
+$query->encode;
 my $reply = Net::DNS::Packet->new('.');
 $reply->header->qr(1);
+$reply->encode;
 
 ok( !$resolver->_accept_reply(undef), '_accept_reply()	no reply' );
 

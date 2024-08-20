@@ -1,5 +1,5 @@
 ---
-abstract: 'Wheel scroll panes filled with widgets'
+abstract: 'Wheel scroll anything that scrolls'
 author:
   - 'Hans Jeuken <hanje at cpan dot org>'
 build_requires:
@@ -22,5 +22,5 @@ requires:
   Tk: '804.023'
 resources:
   repository: git://github.com/haje61/Tk-DynaMouseWheelBind.git
-version: 0.05
+version: 0.06
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

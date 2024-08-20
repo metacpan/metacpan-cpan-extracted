@@ -2,7 +2,7 @@ package Net::DNS::RR::TSIG;
 
 use strict;
 use warnings;
-our $VERSION = (qw$Id: TSIG.pm 1972 2024-04-21 08:13:19Z willem $)[2];
+our $VERSION = (qw$Id: TSIG.pm 1980 2024-06-02 10:16:33Z willem $)[2];
 
 use base qw(Net::DNS::RR);
 
@@ -62,13 +62,12 @@ sub _decode_rdata {			## decode rdata from wire-format octet string
 sub _encode_rdata {			## encode rdata as wire-format octet string
 	my $self = shift;
 
-	my $offset = shift;
-	my $undef  = shift;
-	my $packet = shift;
-	my $macbin = $self->macbin;
+	my $offset  = shift;
+	my $undef   = shift;
+	my $message = shift;
+	my $macbin  = $self->macbin;
 	unless ($macbin) {
-		$self->original_id( $packet->header->id );
-		my $sigdata = $self->sig_data($packet);		# form data to be signed
+		my $sigdata = $self->sig_data($message);	# form data to be signed
 		$macbin = $self->macbin( $self->_mac_function($sigdata) );
 	}
 
@@ -257,9 +256,11 @@ sub sig_data {
 			my $hbin = pack 'n6', $self->original_id, $message->{status}, @size;
 			$message = join '', $hbin, substr $$rawref, length $hbin;
 		} else {
-			my $data = $message->data;
-			my $hbin = pack 'n6', $message->{id}, $message->{status}, @size;
+			my $data = $message->encode;
+			my $id	 = $message->header->id;
+			my $hbin = pack 'n6', $id, $message->{status}, @size;
 			$message = join '', $hbin, substr $data, length $hbin;
+			$self->original_id($id);
 		}
 	}
 

@@ -1,5 +1,5 @@
 #!/usr/bin/perl
-# $Id: 04-packet-truncate.t 1910 2023-03-30 19:16:30Z willem $ -*-perl-*-
+# $Id: 04-packet-truncate.t 1980 2024-06-02 10:16:33Z willem $ -*-perl-*-
 #
 
 use strict;
@@ -17,7 +17,7 @@ for my $packet ( Net::DNS::Packet->new('query.example.') ) {
 	$packet->push( answer	  => @rr );
 	$packet->push( authority  => @rr );
 	$packet->push( additional => @rr );
-	my $unlimited = length $packet->data;
+	my $unlimited = length $packet->encode;
 	my %before    = map { ( $_, scalar $packet->$_ ) } qw(answer authority additional);
 	my $truncated = length $packet->truncate($unlimited);
 	ok( $truncated == $unlimited, "unconstrained packet length $unlimited" );
@@ -35,7 +35,7 @@ for my $packet ( Net::DNS::Packet->new('query.example.') ) {
 	$packet->push( answer	  => @rr );
 	$packet->push( authority  => @rr );
 	$packet->push( additional => @rr );
-	my $unlimited = length $packet->data;
+	my $unlimited = length $packet->encode;
 	my %before    = map { ( $_, scalar $packet->$_ ) } qw(answer authority additional);
 	my $truncated = length $packet->truncate;		# exercise default size
 	ok( $truncated < $unlimited, "long packet was $unlimited, now $truncated" );
@@ -58,9 +58,9 @@ for my $packet ( Net::DNS::Packet->new('query.example.') ) {
 
 	my $tsig = eval { $packet->sign_tsig($keyrr) };
 
-	my $unlimited = length $packet->data;
+	my $unlimited = length $packet->encode;
 	my %before    = map { ( $_, scalar $packet->$_ ) } qw(answer authority additional);
-	my $truncated = length $packet->data(512);		# explicit minimum size
+	my $truncated = length $packet->encode(512);		# explicit minimum size
 	ok( $truncated < $unlimited, "signed packet was $unlimited, now $truncated" );
 
 	foreach my $section (qw(answer authority additional)) {
@@ -79,7 +79,7 @@ for my $packet ( Net::DNS::Packet->new('query.example.') ) {
 	$packet->unique_push( authority => @auth );
 	$packet->push( additional => @rr );
 	$packet->edns->UDPsize(2048);				# + all bells and whistles
-	my $unlimited = length $packet->data;
+	my $unlimited = length $packet->encode;
 	my %before    = map { ( $_, scalar $packet->$_ ) } qw(answer authority additional);
 	my $truncated = length $packet->truncate;
 	ok( $truncated < $unlimited, "referral packet was $unlimited, now $truncated" );
@@ -101,7 +101,7 @@ for my $packet ( Net::DNS::Packet->new('query.example.') ) {
 
 for my $packet ( Net::DNS::Packet->new('query.example.') ) {
 	$packet->push( additional => @rr, @rr );		# two of everything
-	my $unlimited = length $packet->data;
+	my $unlimited = length $packet->encode;
 	my $truncated = length $packet->truncate( $unlimited >> 1 );
 	ok( $truncated, "check RRsets in truncated additional section" );
 

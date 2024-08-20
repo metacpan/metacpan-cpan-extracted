@@ -3,7 +3,7 @@ package Net::DNS::Resolver;
 use strict;
 use warnings;
 
-our $VERSION = (qw$Id: Resolver.pm 1895 2023-01-16 13:38:08Z willem $)[2];
+our $VERSION = (qw$Id: Resolver.pm 1981 2024-06-17 13:22:14Z willem $)[2];
 
 
 =head1 NAME
@@ -13,11 +13,7 @@ Net::DNS::Resolver - DNS resolver class
 =cut
 
 
-use constant CONFIG => defined eval "require Net::DNS::Resolver::$^O";	  ## no critic
-
-use constant OS_CONF => join '::', __PACKAGE__, CONFIG ? $^O : 'UNIX';
-
-use base OS_CONF;
+use base qw(Net::DNS::Resolver::Base);
 
 
 1;
@@ -749,11 +745,11 @@ DEALINGS IN THE SOFTWARE.
 
 =head1 SEE ALSO
 
-L<perl> L<Net::DNS> L<Net::DNS::Packet> L<Net::DNS::Update>
-L<Net::DNS::Header> L<Net::DNS::Question> L<Net::DNS::RR>
+L<perl> L<Net::DNS> L<Net::DNS::Packet> L<Net::DNS::Header>
+L<Net::DNS::Question> L<Net::DNS::RR>
 L<resolver(5)>
-L<RFC1034|https://tools.ietf.org/html/rfc1034>
-L<RFC1035|https://tools.ietf.org/html/rfc1035>
+L<RFC1034|https://iana.org/go/rfc1034>
+L<RFC1035|https://iana.org/go/rfc1035>
 
 =cut
 

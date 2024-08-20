@@ -131,6 +131,13 @@ Math::Ryu - perl interface to Ryu (sane NV-to-string conversion).
     in the format 'mantissaEexponent' - eg '1E-1' (for 0.1) and
     '1.4142135623730950488016887242096982E0' (for square root of 2).
 
+  $bool = is_NV($arg);
+    Returns 1 if $arg should be deemed an NV (perl scalar floating
+    value) for the purposes of this module.
+    Else returns 0.
+    (If is_NV($arg) returns 0, then calling nv2s($arg) might not
+    return a useful representation.)
+
   $str = fmtpy($s);
     ( Originally a pure perl sub - still accessible as fmtpy_pp(). )
     The argument $s is a string as returned by either d2s() or ld2s()
@@ -139,14 +146,15 @@ Math::Ryu - perl interface to Ryu (sane NV-to-string conversion).
     NOTE: Doing 'fmtpy(d2s($nv))' or 'fmtpy(ld2s($nv))' or
           'fmtpy(q2s($nv))' is equivalent to doing 'nv2s($nv))'.
 
-   $bool = ryu_lln($sv);
+  $bool = ryu_lln($sv);
    This is an interface to the API function 'looks_like_number'.
    Returns 1 if $sv looks like a number, else returns 0.
    There's not really any reason to export this subroutine, but
    it's there to use if it's ever helpful.
+   It's NOT identical to Scalar::Util::looks_like_number().
 
-   $bool = ryu_SvIOK($sv);
-   $bool = ryu_SvNOK($sv);
+  $bool = ryu_SvIOK($sv);
+  $bool = ryu_SvNOK($sv);
     Return 1 if the IOK (respectively, NOK) flag of $sv is set.
     Else return 0.
 
@@ -179,19 +187,19 @@ Math::Ryu - perl interface to Ryu (sane NV-to-string conversion).
 
   pany(@args); # "p"rint "any"
   sany(@args); # "s"ay   "any"
-   Both functions print out $arg if the perl API function
+   Both functions simply do a "print $arg;" if the perl API function
    looks_like_number($arg) returns true && either:
      a) the POK flag is set;
      or
      b) the IOK flag is set.
 
-   If that looks_like_number($arg) returns true but both the POK and
+   If looks_like_number($arg) returns true but both the POK and
    IOK flags are unset, then $arg must be an NV.
    If that NV fits into an IV, then cast it to an IV, and print out
    that (IV) value. Else print out nv2s($arg).
 
    For all other arguments (ie those for which looks_like_number($arg)
-   has returned false), we simply print($arg).
+   has returned false), simply "print $arg;".
 
    After sany() has printed the final arg, a terminating "\n" is printed.
    Otherwise sany() and pany() are identical.
@@ -203,16 +211,27 @@ Math::Ryu - perl interface to Ryu (sane NV-to-string conversion).
    Of course, if you really do want to print out an NV as stringified
    by perl (as opposed to being stringified by nv2s) then you'll need
    to use print/say, not pany()/sany().
+
    Unlike "print" and "say", which are generally called without
    bracketed args, "pany()" and "sany()" should be called with their
-   argument(s) enclosed in brackets.
+   argument(s) enclosed in brackets if any of the arguments are
+   object constructors - eg Math::BigInt->new(42).
+   Otherwise it's probably safe to dispense with the brackets - though,
+   for safety, I recommend using the brackets, anyway.
+
+   To demonstrate this failing, try the following one-liner:
+
+   > perl -MMath::Ryu=":all" -MMath::BigInt -e "pany Math::BigInt->new(1);"
+   Can't locate object method "pany" via package "Math::BigInt" at -e line 1.
 
 =head1 SPRINTF FUNCTION
 
   $str = spanyf(@args); # No "format" arg - not *really* a "sprintf"
-   Return the string that pany(@args) would have printed.
-   Note that the arguments given to spanyf() should be enclosed in
-   brackets, just as with pany() and sany().
+   Return the string that pany(@args) would print.
+   Note that the arguments given to spanyf() should, for safety be
+   enclosed in brackets, just as with pany() and sany() - though again
+   this may well be unnecessary if the argument(s) don't include
+   an object constructor.
 
 =head1 LICENSE
 

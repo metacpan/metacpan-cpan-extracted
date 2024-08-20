@@ -20,6 +20,66 @@
 #######################################################################
 
 
+2024-08-19  Brian M. Kelly <Brian.Kelly@fullauto.com>
+
+        * Version 1.0000740 released
+
+        * Corrected more module dependencies
+
+2024-08-19  Brian M. Kelly <Brian.Kelly@fullauto.com>
+
+        * Version 1.0000739 released
+
+        * Corrected more module dependencies
+
+2024-08-19  Brian M. Kelly <Brian.Kelly@fullauto.com>
+
+        * Version 1.0000738 released
+
+        * Corrected more module dependencies
+
+2024-08-19  Brian M. Kelly <Brian.Kelly@fullauto.com>
+
+        * Version 1.0000737 released
+
+        * Corrected more module dependencies
+
+2024-08-19  Brian M. Kelly <Brian.Kelly@fullauto.com>
+
+        * Version 1.0000736 released
+
+        * Corrected more module dependencies
+
+2024-08-19  Brian M. Kelly <Brian.Kelly@fullauto.com>
+
+        * Version 1.0000735 released
+
+        * Corrected more module dependencies
+
+2024-08-19  Brian M. Kelly <Brian.Kelly@fullauto.com>
+
+        * Version 1.0000734 released
+
+        * Corrected multiple module dependencies
+
+2024-08-19  Brian M. Kelly <Brian.Kelly@fullauto.com>
+
+        * Version 1.0000733 released
+
+        * Removed failed reload index experiment
+
+2024-08-19  Brian M. Kelly <Brian.Kelly@fullauto.com>
+
+        * Version 1.0000732 released
+
+        * Fixed File::Copy::move issue
+
+2024-08-19  Brian M. Kelly <Brian.Kelly@fullauto.com>
+
+        * Version 1.0000731 released
+
+        * More code cleanup
+
 2024-08-18  Brian M. Kelly <Brian.Kelly@fullauto.com>
 
         * Version 1.0000730 released

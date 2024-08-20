@@ -4,7 +4,7 @@ DBIx::Squirrel - A `DBI` extension
 
 # VERSION
 
-version 1.2.10
+version 1.2.11
 
 # SYNOPSIS
 
@@ -37,7 +37,7 @@ version 1.2.10
     db(DBIx::Squirrel->connect($dsn, $user, $pass, \%attr));
 
     # First, we need to associate "product" with a result set, then use
-    # "product" to reference itt in future. The next time arguments are
+    # "product" to reference it in future. The next time arguments are
     # passed, they are treated as bind-values when the statement is
     # executed.
     #
@@ -728,4 +728,4 @@ License or the Artistic License, as specified in the Perl 5.10.0 README file.
 # SUPPORT / WARRANTY
 
 DBIx::Squirrel is free Open Source software. IT COMES WITHOUT WARRANTY OF ANY KIND.
-<br><br>!["Logo"](resources/images/ekorn-small.png)
+<br><br>![Logo](resources/images/ekorn-small.png)

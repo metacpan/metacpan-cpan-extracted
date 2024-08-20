@@ -21,8 +21,8 @@ use DynaLoader;
 
 
 
-#line 7 "utils.pd"
 
+#line 7 "utils.pd"
 
 =head1 NAME
 
@@ -41,18 +41,12 @@ somewhere in that module, but they reside here at the moment.
 #line 42 "Utils.pm"
 
 
-
-
-
-
 =head1 FUNCTIONS
 
 =cut
 
 
 
-
-#line 949 "/usr/local/lib/x86_64-linux-gnu/perl/5.34.0/PDL/PP.pm"
 
 
 
@@ -61,7 +55,6 @@ somewhere in that module, but they reside here at the moment.
 =for sig
 
   Signature: (int color(); int [o] rgb(n=3))
-
 
 =pod
 
@@ -76,8 +69,6 @@ suitable for use in C<rgb_to_color> or C<rgb_to_hsv>.
 
 The code for this routine is based on C<value2rgb> from L<Prima::colorDialog>.
 
-
-
 =for bad
 
 =for bad
@@ -86,21 +77,15 @@ If C<color_to_rgb> encounters a bad value in the input, the output piddle will
 be marked as bad and the associated rgb values will all be marked with the bad
 value.
 
-
-
 =cut
-#line 93 "Utils.pm"
 
 
 
-#line 951 "/usr/local/lib/x86_64-linux-gnu/perl/5.34.0/PDL/PP.pm"
 
 *color_to_rgb = \&PDL::color_to_rgb;
-#line 100 "Utils.pm"
 
 
 
-#line 949 "/usr/local/lib/x86_64-linux-gnu/perl/5.34.0/PDL/PP.pm"
 
 
 
@@ -109,7 +94,6 @@ value.
 =for sig
 
   Signature: (int rgb(n=3); int [o] color())
-
 
 =pod
 
@@ -128,8 +112,6 @@ suitable for use when specifying colors to drawing primitives.
 
 The code for this routine is based on C<rgb2value> from L<Prima::colorDialog>.
 
-
-
 =for bad
 
 =for bad
@@ -138,21 +120,15 @@ If C<rgb_to_color> encounters a bad value in any of the red, green, or blue
 values of the input, the output piddle will be marked as bad and the associated
 color values will all be marked as bad.
 
-
-
 =cut
-#line 145 "Utils.pm"
 
 
 
-#line 951 "/usr/local/lib/x86_64-linux-gnu/perl/5.34.0/PDL/PP.pm"
 
 *rgb_to_color = \&PDL::rgb_to_color;
-#line 152 "Utils.pm"
 
 
 
-#line 949 "/usr/local/lib/x86_64-linux-gnu/perl/5.34.0/PDL/PP.pm"
 
 
 
@@ -161,7 +137,6 @@ color values will all be marked as bad.
 =for sig
 
   Signature: (float+ hsv(n=3); int [o]rgb(m=3))
-
 
 =pod
 
@@ -183,11 +158,9 @@ use of that notation.
 
 The first dimension of the piddles holding the hsv and rgb values must be size
 3, i.e. the dimensions must look like (3, m, n, ...). The resulting piddle is
-suitable for input into L<rgb_to_color> as well as manual manipulation.
+suitable for input into L</rgb_to_color> as well as manual manipulation.
 
 The code for this routine is based on C<hsv2rgb> from L<Prima::colorDialog>.
-
-
 
 =for bad
 
@@ -197,21 +170,15 @@ If C<hsv_to_rgb> encounters a bad value in any of the hue, saturation, or value
 quantities, the output piddle will be marked as bad and the associated rgb
 color values will all be marked as bad.
 
-
-
 =cut
-#line 204 "Utils.pm"
 
 
 
-#line 951 "/usr/local/lib/x86_64-linux-gnu/perl/5.34.0/PDL/PP.pm"
 
 *hsv_to_rgb = \&PDL::hsv_to_rgb;
-#line 211 "Utils.pm"
 
 
 
-#line 949 "/usr/local/lib/x86_64-linux-gnu/perl/5.34.0/PDL/PP.pm"
 
 
 
@@ -220,7 +187,6 @@ color values will all be marked as bad.
 =for sig
 
   Signature: (int rgb(n=3); float+ [o]hsv(m=3))
-
 
 =pod
 
@@ -241,11 +207,9 @@ simply returns a hue value of 0.
 
 The first dimension of the piddles holding the hsv and rgb values must be size
 3, i.e. the dimensions must look like (3, m, n, ...). The resulting piddle is
-suitable for manual manipulation and input into L<hsv_to_rgb>.
+suitable for manual manipulation and input into L</hsv_to_rgb>.
 
 The code for this routine is based on C<rgb2hsv> from L<Prima::colorDialog>.
-
-
 
 =for bad
 
@@ -255,21 +219,15 @@ If C<rgb_to_hsv> encounters a bad value in any of the red, green, or blue values
 the output piddle will be marked as bad and the associated hsv values will all
 be marked as bad.
 
-
-
 =cut
-#line 262 "Utils.pm"
 
 
 
-#line 951 "/usr/local/lib/x86_64-linux-gnu/perl/5.34.0/PDL/PP.pm"
 
 *rgb_to_hsv = \&PDL::rgb_to_hsv;
-#line 269 "Utils.pm"
 
 
 
-#line 949 "/usr/local/lib/x86_64-linux-gnu/perl/5.34.0/PDL/PP.pm"
 
 
 
@@ -278,8 +236,6 @@ be marked as bad.
 =for sig
 
   Signature: (x(n); y(n); [o] min_x(); [o] min_y(); [o] max_x(); [o] max_y())
-
-
 
 =pod
 
@@ -310,7 +266,6 @@ hack something, but if some of the y-data is bad you you will have a hard time
 picking out the good pairs, and getting the min/max from them. That is the
 purpose of this function.
 
-
 	
 
 =for bad
@@ -319,22 +274,17 @@ purpose of this function.
 
 Output is set bad if no pair of x/y data is good.
 
-
 	
 
 =cut
-#line 327 "Utils.pm"
 
-
-
-#line 951 "/usr/local/lib/x86_64-linux-gnu/perl/5.34.0/PDL/PP.pm"
-
-*minmaxforpair = \&PDL::minmaxforpair;
-#line 334 "Utils.pm"
 
 
 
-#line 949 "/usr/local/lib/x86_64-linux-gnu/perl/5.34.0/PDL/PP.pm"
+*minmaxforpair = \&PDL::minmaxforpair;
+
+
+
 
 
 
@@ -346,20 +296,15 @@ Output is set bad if no pair of x/y data is good.
 
 =for ref
 
-
-
 =for bad
 
 collate_min_max_wrt_many processes bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 359 "Utils.pm"
 
 
 
-#line 950 "/usr/local/lib/x86_64-linux-gnu/perl/5.34.0/PDL/PP.pm"
 
 
 =head2 collate_min_max_wrt_many
@@ -496,18 +441,14 @@ sub PDL::collate_min_max_wrt_many {
 	# Return the results
 	return ($min, $max);
 }
-#line 500 "Utils.pm"
 
-
-
-#line 951 "/usr/local/lib/x86_64-linux-gnu/perl/5.34.0/PDL/PP.pm"
-
-*collate_min_max_wrt_many = \&PDL::collate_min_max_wrt_many;
-#line 507 "Utils.pm"
 
 
 
-#line 949 "/usr/local/lib/x86_64-linux-gnu/perl/5.34.0/PDL/PP.pm"
+*collate_min_max_wrt_many = \&PDL::collate_min_max_wrt_many;
+
+
+
 
 
 
@@ -516,8 +457,6 @@ sub PDL::collate_min_max_wrt_many {
 =for sig
 
   Signature: (minima(m, a=3); int [o] min_mask(m))
-
-
 
 =pod
 
@@ -528,7 +467,6 @@ Returns a mask to trim a collated list of minima so that the resulting
 
 working here - this needs documentation
 
-
 	
 
 =for bad
@@ -536,20 +474,15 @@ working here - this needs documentation
 trim_collated_min does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 542 "Utils.pm"
 
 
 
-#line 951 "/usr/local/lib/x86_64-linux-gnu/perl/5.34.0/PDL/PP.pm"
 
 *trim_collated_min = \&PDL::trim_collated_min;
-#line 549 "Utils.pm"
 
 
 
-#line 949 "/usr/local/lib/x86_64-linux-gnu/perl/5.34.0/PDL/PP.pm"
 
 
 
@@ -558,8 +491,6 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 =for sig
 
   Signature: (maxima(n, a=3); int [o] max_mask(n))
-
-
 
 =pod
 
@@ -570,7 +501,6 @@ entries are in strictly decreasing extremeness with increasing index.
 
 working here - this needs documentation
 
-
 	
 
 =for bad
@@ -578,16 +508,13 @@ working here - this needs documentation
 trim_collated_max does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
-
 =cut
-#line 584 "Utils.pm"
 
 
 
-#line 951 "/usr/local/lib/x86_64-linux-gnu/perl/5.34.0/PDL/PP.pm"
 
 *trim_collated_max = \&PDL::trim_collated_max;
-#line 591 "Utils.pm"
+
 
 
 

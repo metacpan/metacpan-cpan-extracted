@@ -1,5 +1,5 @@
 #!/usr/bin/perl
-# $Id: 72-TSIG-verify.t 1909 2023-03-23 11:36:16Z willem $	-*-perl-*-
+# $Id: 72-TSIG-verify.t 1980 2024-06-02 10:16:33Z willem $	-*-perl-*-
 #
 
 use strict;
@@ -45,7 +45,7 @@ close($fh_tsigkey);
 
 for my $packet ( Net::DNS::Packet->new('query.example') ) {
 	$packet->sign_tsig($tsigkey);
-	$packet->data;
+	$packet->encode;
 
 	my $verified  = $packet->verify();
 	my $verifyerr = $packet->verifyerr();
@@ -56,7 +56,7 @@ for my $packet ( Net::DNS::Packet->new('query.example') ) {
 
 for my $packet ( Net::DNS::Packet->new('query.example') ) {
 	$packet->sign_tsig($tsigkey);
-	$packet->data;
+	$packet->encode;
 	$packet->push( update => rr_add( type => 'NULL' ) );
 
 	my $verified  = $packet->verify();
@@ -68,11 +68,11 @@ for my $packet ( Net::DNS::Packet->new('query.example') ) {
 
 for my $query ( Net::DNS::Packet->new('query.example') ) {
 	$query->sign_tsig($tsigkey);
-	$query->data;
+	$query->encode;
 
 	my $reply = $query->reply;
 	$reply->sign_tsig($query);
-	$reply->data;
+	$reply->encode;
 
 	my $verified  = $reply->verify($query);
 	my $verifyerr = $reply->verifyerr();
@@ -85,7 +85,7 @@ for my $query ( Net::DNS::Packet->new('query.example') ) {
 	my $signed = $tsigkey;
 	foreach my $packet (@packet) {
 		$signed = $packet->sign_tsig($signed);
-		$packet->data;
+		$packet->encode;
 		is( ref($signed), $class, 'sign multi-packet' );
 	}
 
@@ -111,7 +111,7 @@ for my $query ( Net::DNS::Packet->new('query.example') ) {
 
 for my $packet ( Net::DNS::Packet->new('query.example') ) {
 	$packet->sign_tsig( $tsigkey, fudge => 0 );
-	my $encoded = $packet->data;
+	my $encoded = $packet->encode;
 	sleep 2;						# guarantee one complete second delay
 
 	my $query = Net::DNS::Packet->new( \$encoded );
@@ -123,7 +123,7 @@ for my $packet ( Net::DNS::Packet->new('query.example') ) {
 for my $packet ( Net::DNS::Packet->new() ) {
 	$packet->sign_tsig($tsigkey);
 	$packet->sigrr->error('BADTIME');
-	my $encoded = $packet->data;
+	my $encoded = $packet->encode;
 	my $decoded = Net::DNS::Packet->new( \$encoded );
 	ok( $decoded->sigrr->other, 'time appended to BADTIME response' );
 }
@@ -131,11 +131,11 @@ for my $packet ( Net::DNS::Packet->new() ) {
 
 for my $query ( Net::DNS::Packet->new('query.example') ) {
 	$query->sign_tsig($tsigkey);
-	$query->data;
+	$query->encode;
 
 	my $reply = $query->reply;
 	$reply->sign_tsig($query);
-	$reply->data;
+	$reply->encode;
 	$reply->sigrr->algorithm('hmac-sha1');
 
 	my $verified  = $reply->verify($query);
@@ -146,7 +146,7 @@ for my $query ( Net::DNS::Packet->new('query.example') ) {
 
 for my $packet ( Net::DNS::Packet->new('query.example') ) {
 	$packet->sign_tsig($tsigkey);
-	$packet->data;
+	$packet->encode;
 
 	my $tsig = $packet->reply->sign_tsig($tsigkey);
 	$tsig->algorithm('hmac-sha1');
@@ -159,7 +159,7 @@ for my $packet ( Net::DNS::Packet->new('query.example') ) {
 
 for my $packet ( Net::DNS::Packet->new() ) {
 	$packet->sign_tsig($tsigkey);
-	$packet->data;
+	$packet->encode;
 	$packet->sigrr->macbin( substr $packet->sigrr->macbin, 0, 9 );
 
 	$packet->verify();
@@ -169,7 +169,7 @@ for my $packet ( Net::DNS::Packet->new() ) {
 
 for my $packet ( Net::DNS::Packet->new() ) {
 	$packet->sign_tsig($tsigkey);
-	$packet->data;
+	$packet->encode;
 	my $macbin = $packet->sigrr->macbin;
 	$packet->sigrr->macbin( join '', $packet->sigrr->macbin, 'x' );
 

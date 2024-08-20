@@ -111,7 +111,7 @@ YAML
             instanceLocation => '/request/uri/path',
             keywordLocation => '/paths',
             absoluteKeywordLocation => $t->$abs_uri->fragment('/paths')->to_string,
-            error => 'no match found for URI path "/foo/hi/there"',
+            error => 'no match found for URI "/foo/hi/there"',
           },
         ],
       },

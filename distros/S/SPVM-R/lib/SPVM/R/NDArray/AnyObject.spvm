@@ -71,8 +71,8 @@ class R::NDArray::AnyObject extends R::NDArray {
     return $elem_is_na;
   }
   
-  method slice : R::NDArray::AnyObject ($asix_indexes_product : R::NDArray::Int[]) {
-    return (R::NDArray::AnyObject)$self->SUPER::slice($asix_indexes_product);
+  method slice : R::NDArray::AnyObject ($indexes_product : R::NDArray::Int[]) {
+    return (R::NDArray::AnyObject)$self->SUPER::slice($indexes_product);
   }
   
 }

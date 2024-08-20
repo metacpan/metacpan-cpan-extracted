@@ -1,10 +1,10 @@
 #!/usr/bin/perl
-# $Id: 04-packet.t 1947 2023-11-23 09:40:45Z willem $	-*-perl-*-
+# $Id: 04-packet.t 1980 2024-06-02 10:16:33Z willem $	-*-perl-*-
 #
 
 use strict;
 use warnings;
-use Test::More tests => 103;
+use Test::More tests => 104;
 use TestToolkit;
 
 
@@ -52,9 +52,10 @@ ok( $q->isa('Net::DNS::Question'), 'list element is a question object' );
 is( $q->string, $question->string, 'question object correct' );
 
 
-#	data() method returns non-empty scalar
-my $packet_data = $packet->data;
-ok( $packet_data, 'packet->data() method works' );
+#	encode() method returns non-empty scalar
+my $packet_data = $packet->encode;
+ok( $packet_data,  'packet->encode() method works' );
+ok( $packet->data, 'packet->data() alias works' );
 
 
 #	new(\$data) class constructor method returns object of appropriate class
@@ -62,15 +63,15 @@ my $packet2 = Net::DNS::Packet->new( \$packet_data );
 ok( $packet2->isa('Net::DNS::Packet'), 'new(\$data) object' );
 is( $packet2->string, $packet->string, 'decoded packet matches original' );
 
-is( unpack( 'H*', $packet2->data ), unpack( 'H*', $packet_data ), 'retransmitted packet matches original' );
+is( unpack( 'H*', $packet2->encode ), unpack( 'H*', $packet_data ), 'retransmitted packet matches original' );
 
-my $empty_packet = Net::DNS::Packet->new()->data;
-ok( Net::DNS::Packet->new( \$empty_packet )->string, 'decoded empty packet' );
+my $empty_packet = Net::DNS::Packet->new()->encode;
+ok( Net::DNS::Packet->decode( \$empty_packet )->string, 'decoded empty packet' );
 
 my $dso = Net::DNS::Packet->new();
 $dso->header->opcode('DSO');
-my $dso_packet = $dso->data . pack( 'n2H*', 1, 2, 'beef' );
-ok( Net::DNS::Packet->new( \$dso_packet )->string, 'decoded DSO packet' );
+my $dso_packet = $dso->encode . pack( 'n2H*', 1, 2, 'beef' );
+ok( Net::DNS::Packet->decode( \$dso_packet )->string, 'decoded DSO packet' );
 
 
 #	Use push() to add RRs to each section
@@ -108,9 +109,9 @@ $update->push( 'answer', Net::DNS::RR->new('XY TXT ""') );
 $update->push( 'answer', Net::DNS::RR->new('VW.XY TXT ""') );
 
 #	Decode data buffer and compare with original
-my $buffer  = $update->data;
-my $decoded = eval { Net::DNS::Packet->new( \$buffer ) };
-ok( $decoded, 'new() from data buffer works' );
+my $buffer  = $update->encode;
+my $decoded = eval { Net::DNS::Packet->decode( \$buffer ) };
+ok( $decoded, 'decode() from data buffer works' );
 is( $decoded->size, length($buffer), '$decoded->size() works' );
 $decoded->from('local');
 ok( $decoded->from(),	'$decoded->from() works' );
@@ -158,7 +159,7 @@ my $BIND = pack( 'H*',
 '22cc85000001000000010001056461636874036e657400001e0001c00c0006000100000e100025026e730472697065c012046f6c6166c02a7754e1ae0000a8c0000038400005460000001c2000002910000000800000050000000130'
 	);
 
-my $bind = Net::DNS::Packet->new( \$BIND );
+my $bind = Net::DNS::Packet->decode( \$BIND );
 
 is( $bind->header->qdcount, 1, 'check question count in synthetic packet header' );
 is( $bind->header->ancount, 0, 'check answer count in synthetic packet header' );
@@ -172,7 +173,7 @@ for my $packet ( Net::DNS::Packet->new('example.com') ) {
 
 	my $udpmax = 2048;
 	$packet->edns->udpsize($udpmax);
-	$packet->data;
+	$packet->encode;
 	is( $packet->reply($udpmax)->edns->udpsize(), $udpmax, 'packet->reply() supports EDNS' );
 }
 
@@ -198,7 +199,7 @@ eval {					## no critic		# exercise dump and debug diagnostics
 	local $Data::Dumper::Sortkeys;
 	local $Data::Dumper::Useqq;
 	my $packet  = Net::DNS::Packet->new();
-	my $buffer  = $packet->data;
+	my $buffer  = $packet->encode;
 	my $corrupt = substr $buffer, 0, 10;
 	my $file    = '04-packet.txt';
 	my $handle  = IO::File->new( $file, '>' ) || die "Could not open $file for writing";
@@ -207,15 +208,15 @@ eval {					## no critic		# exercise dump and debug diagnostics
 	$Data::Dumper::Sortkeys = 1;
 	$Data::Dumper::Useqq	= 1;
 	select( ( select($handle), $packet->dump )[0] );
-	select( ( select($handle), Net::DNS::Packet->new( \$buffer,  1 )->dump )[0] );
-	select( ( select($handle), Net::DNS::Packet->new( \$corrupt, 1 ) )[0] );
+	select( ( select($handle), Net::DNS::Packet->decode( \$buffer,	1 )->dump )[0] );
+	select( ( select($handle), Net::DNS::Packet->decode( \$corrupt, 1 ) )[0] );
 	close($handle);
 	unlink($file);
 };
 
 
 for my $packet ( Net::DNS::Packet->new(qw(example.com. A IN)) ) {
-	my $wire = $packet->data;
+	my $wire = $packet->encode;
 	while ( length($wire) ) {
 		chop($wire);
 		my $n = length($wire);	## Note: need to re-raise exception trapped by constructor

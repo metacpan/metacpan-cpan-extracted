@@ -3,7 +3,7 @@
 #
 #  (C) Paul Evans, 2024 -- leonerd@leonerd.org.uk
 
-package Data::Checks::Builder 0.43;
+package Data::Checks::Builder 0.44;
 
 use v5.22;
 use warnings;
@@ -54,7 +54,8 @@ sub extra_compiler_flags
 
    require File::ShareDir;
    require File::Spec;
-   return "-I" . File::Spec->catdir( File::ShareDir::dist_dir( "Data-Checks" ), "include" );
+   require Data::Checks;
+   return "-I" . File::Spec->catdir( File::ShareDir::module_dir( "Data::Checks" ), "include" );
 }
 
 =head2 extend_module_build

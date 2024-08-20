@@ -4,7 +4,6 @@ no strict 'subs';    ## no critic
 package              # hide from PAUSE
   DBIx::Squirrel::db;
 
-
 BEGIN {
     require DBIx::Squirrel
       unless defined($DBIx::Squirrel::VERSION);
@@ -18,7 +17,6 @@ use DBIx::Squirrel::util qw/:constants :sql throw/;
 
 use constant E_BAD_SQL_ABSTRACT_METHOD => 'Unimplemented SQL::Abstract method';
 
-
 sub _root_class {
     my $root_class = ref($_[0]) || $_[0];
     $root_class =~ s/::\w+$//;
@@ -26,7 +24,6 @@ sub _root_class {
       if wantarray;
     return $root_class;
 }
-
 
 sub _private_attributes {
     my $self = shift;
@@ -61,7 +58,6 @@ sub _private_attributes {
 
 our $SQL_ABSTRACT = SQL::Abstract->new;
 
-
 sub abstract {
     my $self        = shift;
     my $method_name = shift;
@@ -71,31 +67,26 @@ sub abstract {
     return $self->do($method->($SQL_ABSTRACT, @_));
 }
 
-
 sub delete {
     my $self = shift;
     return scalar $self->abstract('delete', @_);
 }
-
 
 sub insert {
     my $self = shift;
     return scalar $self->abstract('insert', @_);
 }
 
-
 sub update {
     my $self = shift;
     return scalar $self->abstract('update', @_);
 }
-
 
 sub select {
     my $self = shift;
     my(undef, $result,) = $self->abstract('select', @_);
     return $result;
 }
-
 
 sub prepare {
     my $self      = shift;
@@ -115,7 +106,6 @@ sub prepare {
     });
     return $sth;
 }
-
 
 sub prepare_cached {
     my $self      = shift;
@@ -137,7 +127,6 @@ sub prepare_cached {
     return $sth;
 }
 
-
 sub execute {
     my $self      = shift;
     my $statement = shift;
@@ -146,7 +135,6 @@ sub execute {
       if wantarray;
     return $sth;
 }
-
 
 sub do {
     my $self      = shift;
@@ -183,7 +171,6 @@ sub do {
       if wantarray;
     return $sth->execute(@_);
 }
-
 
 BEGIN {
     *iterate = *iterator = *it = sub {

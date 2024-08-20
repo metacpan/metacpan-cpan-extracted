@@ -15,7 +15,7 @@ $hash{PM}{$_} = "\$(INST_LIBDIR)/Prima/$_" for glob 'pod/*.png';
 
 # Link to Prima's dynamic library if there are any linker settings.
 # (Big shout out to Dmitry, Rob, and Chris for helping me solve this!!)
-$hash{LIBS}[0] .= " $Prima::Config::Config{libs}"
+$hash{LIBS}[0] .= qq{ "$Prima::Config::Config{libs}"} # for "place with space"
 	if $Prima::Config::Config{libs};
 
 WriteMakefile(
@@ -25,7 +25,7 @@ WriteMakefile(
 	CONFIGURE_REQUIRES => {
 		'ExtUtils::MakeMaker' => 0,
 		PDL            => '2.037',
-		Prima          => '1.57',
+		Prima          => '1.74',
 	},
 	PREREQ_PM => {
 		PDL            => '2.037',

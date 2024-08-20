@@ -9,7 +9,7 @@ BEGIN {
   # perl bug that can set the POK flag when it should not.
   use B qw(svref_2object);
 
-  if($] < 5.035010) {
+  if($] < 5.035010) { # TODO - Check if this value can be reduced (to around 5.02 ?)
     my %flags;
     {
       no strict 'refs';
@@ -65,12 +65,13 @@ require Exporter;
 *import = \&Exporter::import;
 require DynaLoader;
 
-our $VERSION = '1.04';
+our $VERSION = '1.05';
 
 DynaLoader::bootstrap Math::Ryu $VERSION;
 
 my @tagged = qw(
   d2s ld2s q2s nv2s
+  is_NV
   pn pnv pany sn snv sany
   spanyf
   n2s
@@ -237,45 +238,21 @@ sub snv {
 }
 
 sub pany { # "p"rint "any"
-  for my $arg (@_) {
-    if(ryu_lln($arg)) {
-      if(_SvPOK($arg) || ryu_SvIOK($arg)) { print $arg }
-      else {
-        # At this point we know that $arg looks like a number
-        # and neither its POK flag nor its NOK flag is set.
-        # It must be an NV.
-        if(_NV_fits_IV($arg)) { print _from_NV($arg) }
-        else { print nv2s($arg) }
-      }
-    }
-    else {
-      print $arg;
-    }
-  }
+  print spanyf(@_)
 }
 
 sub sany {
-  pany(@_);
-  print "\n";
+  print spanyf(@_) . "\n";
 }
 
 sub spanyf {
-  # Returns the string that pany() would have
-  # printed, given the same argument(s).
+  # Prepares the string that pany/sany will print.
   my $ret = '';
+
   for my $arg (@_) {
-    if(PV_NV_BUG && _SvPOK($arg) && ryu_SvNOK($arg) && !_SvIOKp($arg)) {
-      $ret .= nv2s($arg);
-    }
-    elsif(ryu_lln($arg)) {
-      if(_SvPOK($arg) || ryu_SvIOK($arg)) { $ret .= "$arg" }
-      else {
-        # At this point we know that $arg looks like a number
-        # and neither its POK flag nor its NOK flag is set.
-        # It must be an NV.
-        if(_NV_fits_IV($arg)) { $ret .= _from_NV($arg) }
-        else { $ret .= nv2s($arg) }
-      }
+    if(is_NV($arg)) {
+      if(_NV_fits_IV($arg)) { $ret .= _from_NV($arg) } # nv2s($arg) would append a ".0"
+      else { $ret .= nv2s($arg) }
     }
     else {
       $ret .= "$arg";
@@ -289,6 +266,25 @@ sub _NV_fits_IV {
   my $nv = shift;
   return 0 if $nv != int($nv);
   return 1 if ( $nv <= RYU_MAX_INT && $nv >= RYU_MIN_INT );
+  return 0;
+}
+
+sub is_NV {
+  my $arg = shift;
+
+  return 1
+    if(PV_NV_BUG && _SvPOK($arg) && ryu_SvNOK($arg) && !_SvIOKp($arg));
+
+  if(ryu_lln($arg)) { # Wraps the perl API function looks_like_number(),
+                      # which differs from Scalar::Util::looks_like_number().
+    return 0
+      if(_SvPOK($arg) || ryu_SvIOK($arg));
+
+    # At this point we know that $arg looks like a number
+    # and neither its POK flag nor its IOK flag is set.
+    # It must be an NV.
+    return 1;
+  }
   return 0;
 }
 

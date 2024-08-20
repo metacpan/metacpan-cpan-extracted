@@ -1,3 +1,29 @@
+0.100 2024-08-20
+  [Major Release]
+    * All tests are finished.
+    * All documentations are finised.
+    * This release is major release. The features are more stable.
+  [Document Improvement]
+    * Improve docs for R::NDArray::Byte class.
+    * Improve docs for R::NDArray::Short class.
+    * Improve docs for R::NDArray::Int class.
+    * Improve docs for R::NDArray::Long class.
+    * Improve docs for R::NDArray::Float class.
+    * Improve docs for R::NDArray::Double class.
+    * Improve docs for R::NDArray::FloatComplex class.
+    * Improve docs for R::NDArray::DoubleComplex class.
+    * Improve docs for R::NDArray::AnyObject class.
+    * Improve docs for R::NDArray::Sring class.
+    * Improve docs for R::NDArray::SringBuffer class.
+    * Improve docs for R::NDArray::Time::Piece class.
+    * Add docs for R::NDArray::Hash class.
+    * Improve docs for R::NDArray class.
+  [Incompatible Changes]
+    * Remove R::NDArray::Time::Piece#to_long_ndarray method.
+  [Changes]
+    * Add an exception for R::NDArray#normalize_indexes_product method.
+    * R::NDArray#normalize_indexes_product method becomes a public method.
+    
 0.022 2024-08-13
   [Document Improvement]
     * Add docs for R::OP::Byte class.

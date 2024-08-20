@@ -8,7 +8,7 @@ use URI::_idna;
 
 our @EXPORT_OK = qw(public_suffix);
 
-our $VERSION = 'v1.0.6'; # VERSION
+our $VERSION = 'v1.0.7'; # VERSION
 # ABSTRACT: Get a domain name's public suffix via the Mozilla Public Suffix List
 
 my $dn_re = do {
@@ -94,6 +94,8 @@ sub _find_rule {
 }
 
 1;
+
+
 =encoding utf8
 
 =head1 NAME

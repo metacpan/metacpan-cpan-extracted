@@ -11,6 +11,7 @@ hax/sv_numcmp.c.inc
 hax/sv_regexp_match.c.inc
 hax/sv_streq.c.inc
 inc/Module/Build/with/XSTests.pm
+include/constraints.h
 lib/Data/Checks.pm
 lib/Data/Checks.xs
 lib/Data/Checks/Builder.pm
@@ -20,6 +21,7 @@ META.json
 META.yml
 README
 share/include/DataChecks.h
+src/constraints.c
 t/00use.t
 t/01check-obj.t
 t/02check-pkg.t
@@ -29,6 +31,8 @@ t/11constraints-num.t
 t/12constraints-str.t
 t/13constraints-structural.t
 t/20inline-constraints.t
+t/21assertop.t
+t/22optimise-numbounds.t
 t/80checks+field.t
 t/80checks+signature.t
 t/80match-is.t

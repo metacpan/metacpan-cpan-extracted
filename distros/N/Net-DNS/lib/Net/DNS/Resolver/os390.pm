@@ -2,7 +2,7 @@ package Net::DNS::Resolver::os390;
 
 use strict;
 use warnings;
-our $VERSION = (qw$Id: os390.pm 1972 2024-04-21 08:13:19Z willem $)[2];
+our $VERSION = (qw$Id: os390.pm 1981 2024-06-17 13:22:14Z willem $)[2];
 
 
 =head1 NAME
@@ -12,7 +12,6 @@ Net::DNS::Resolver::os390 - IBM OS/390 resolver class
 =cut
 
 
-use base qw(Net::DNS::Resolver::Base);
 use IO::File;
 
 my $path = $ENV{PATH};

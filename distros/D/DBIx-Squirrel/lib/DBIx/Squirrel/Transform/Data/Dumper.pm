@@ -3,7 +3,6 @@ use Modern::Perl;
 package    # hide from PAUSE
   DBIx::Squirrel::Transform::Data::Dumper;
 
-
 BEGIN {
     require DBIx::Squirrel
       unless defined($DBIx::Squirrel::VERSION);
@@ -14,7 +13,6 @@ BEGIN {
 }
 
 use Data::Dumper;
-
 
 sub as_perl {
     return sub {

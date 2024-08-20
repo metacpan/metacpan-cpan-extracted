@@ -4,9 +4,9 @@ use strict;
 use warnings;
 
 our $VERSION;
-$VERSION = '1.45';
+$VERSION = '1.46';
 $VERSION = eval {$VERSION};
-our $SVNVERSION = (qw$Id: DNS.pm 1977 2024-05-02 09:55:06Z willem $)[2];
+our $SVNVERSION = (qw$Id: DNS.pm 1989 2024-08-19 14:37:51Z willem $)[2];
 
 
 =head1 NAME
@@ -656,7 +656,7 @@ Net::DNS was created in 1997 by Michael Fuhr.
 
 L<perl> L<Net::DNS::Resolver> L<Net::DNS::Question> L<Net::DNS::RR>
 L<Net::DNS::Packet> L<Net::DNS::Update>
-L<RFC1035|https://tools.ietf.org/html/rfc1035>
+L<RFC1035|https://iana.org/go/rfc1035>
 
 =cut
 

@@ -1,5 +1,6 @@
 use Test2::V0;
 use Test2::Require::Module 'Syntax::Operator::Is', '0.02';
+use Test2::Require::Module 'XS::Parse::Infix', '0.44';
 
 BEGIN {
     $ENV{PERL_STRICT} = 1;

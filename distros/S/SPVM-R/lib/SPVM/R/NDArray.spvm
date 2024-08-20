@@ -45,6 +45,65 @@ class R::NDArray {
   
   has is_dim_read_only : ro byte;
   
+  # Class Methods
+  static method normalize_indexes_product : R::NDArray::Int[] ($indexes_product : R::NDArray::Int[], $dim : int[]) {
+    
+    unless ($indexes_product) {
+      die "The cartesian product of the indexes \$indexes_product must be defined.";
+    }
+    
+    unless ($dim) {
+      die "The dimensions \$dim muest be defined.";
+    }
+    
+    my $indexes_product_length = @$indexes_product;
+    
+    my $dim_length = @$dim;
+    
+    unless ($indexes_product_length <= $dim_length) {
+      die "The length of the cartesian product of the indexes \$indexes_product must be less than or equal to the length of the dimensions \$dim.";
+    }
+    
+    my $normalized_indexes_product = new R::NDArray::Int[$dim_length];
+    
+    for (my $indexes_product_index = 0; $indexes_product_index < $dim_length; $indexes_product_index++) {
+      
+      my $indexes = (R::NDArray::Int)undef;
+      
+      if ($indexes_product_index < $indexes_product_length) {
+        $indexes = $indexes_product->[$indexes_product_index];
+      }
+      
+      unless (!$indexes || $indexes->is_vector) {
+        die "The ${indexes_product_index}th element of the cartesian product of the indexes \$indexes_product must be a vector or undef.";
+      }
+      
+      my $dim_elem = $dim->[$indexes_product_index];
+      
+      if ($indexes) {
+        my $indexes_data = $indexes->data;
+        for (my $i = 0; $i < @$indexes_data; $i++) {
+          unless ($indexes_data->[$i] < $dim_elem) {
+            die "The ${i}th element of the data of the ${indexes_product_index}th element of the cartesian product of the indexes \$indexes_product must be less than the ${dim_elem}th element of the dimensions \$dim.";
+          }
+        }
+      }
+      else {
+        my $indexes_data = new int[$dim->[$indexes_product_index]];
+        
+        for (my $i = 0; $i < $dim_elem; $i++) {
+          $indexes_data->[$i] = $i;
+        }
+        
+        $indexes = R::NDArray::Int->new({data => $indexes_data});
+      }
+      
+      $normalized_indexes_product->[$indexes_product_index] = $indexes;
+    }
+    
+    return $normalized_indexes_product;
+  }
+  
   # Instance Methods
   protected method init : void ($options : object[] = undef) {
     
@@ -354,15 +413,15 @@ class R::NDArray {
     return $clone;
   }
   
-  method slice : R::NDArray ($asix_indexes_product : R::NDArray::Int[]) {
+  method slice : R::NDArray ($indexes_product : R::NDArray::Int[]) {
     
     my $dim = $self->{dim};
     
-    $asix_indexes_product = &normalize_asix_indexes_product($asix_indexes_product, $dim);
+    $indexes_product = &normalize_indexes_product($indexes_product, $dim);
     
-    my $ret_dim = &create_ret_dim($asix_indexes_product);
+    my $ret_dim = &create_ret_dim($indexes_product);
     
-    my $data_indexes = $self->create_data_indexes($asix_indexes_product, $dim);
+    my $data_indexes = $self->create_data_indexes($indexes_product, $dim);
     
     my $ret_data = $self->slice_data($data_indexes);
     
@@ -371,20 +430,20 @@ class R::NDArray {
     return $ret_ndarray;
   }
   
-  method slice_set : void ($asix_indexes_product : R::NDArray::Int[], $ndarray : R::NDArray) {
+  method slice_set : void ($indexes_product : R::NDArray::Int[], $ndarray : R::NDArray) {
     
     my $dim = $self->{dim};
     
-    $asix_indexes_product = &normalize_asix_indexes_product($asix_indexes_product, $dim);
+    $indexes_product = &normalize_indexes_product($indexes_product, $dim);
     
-    my $ret_dim = &create_ret_dim($asix_indexes_product);
+    my $ret_dim = &create_ret_dim($indexes_product);
     
-    my $data_indexes = $self->create_data_indexes($asix_indexes_product, $dim);
+    my $data_indexes = $self->create_data_indexes($indexes_product, $dim);
     
     my $equals_dropped_dim = R::Util->equals_dropped_dim($ndarray->dim, $ret_dim);
     
     unless ($equals_dropped_dim) {
-      die "The dimensions of \$ndarray must be compatible with dim created by \$asix_indexes_product.";
+      die "The dimensions of \$ndarray must be compatible with dim created by \$indexes_product.";
     }
     
     $self->slice_set_data($data_indexes, $ndarray->data);
@@ -544,64 +603,20 @@ class R::NDArray {
     }
   }
 
-  private static method normalize_asix_indexes_product : R::NDArray::Int[] ($asix_indexes_product : R::NDArray::Int[], $dim : int[]) {
+  private static method create_ret_dim : int[] ($indexes_product : R::NDArray::Int[]) {
     
-    unless ($asix_indexes_product) {
-      die "The indexes for n-dimensional array \$asix_indexes_product must be defined.";
-    }
+    my $indexes_product_length = @$indexes_product;
     
-    my $asix_indexes_product_length = @$asix_indexes_product;
+    my $ret_dim = new int[$indexes_product_length];
     
-    my $dim_length = @$dim;
-    
-    unless ($asix_indexes_product_length <= $dim_length) {
-      die "The length of indexes for n-dimensional array \$asix_indexes_product must be less than or equal to the length of dim field.";
-    }
-    
-    my $normalized_asix_indexes_product = new R::NDArray::Int[$dim_length];
-    
-    for (my $asix_indexes_product_index = 0; $asix_indexes_product_index < $dim_length; $asix_indexes_product_index++) {
+    for (my $i = 0; $i < $indexes_product_length; $i++) {
+      my $indexes = $indexes_product->[$i];
       
-      my $asix_indexes = (R::NDArray::Int)undef;
-      
-      if ($asix_indexes_product_index < $asix_indexes_product_length) {
-        $asix_indexes = $asix_indexes_product->[$asix_indexes_product_index];
-      }
-      
-      unless (!$asix_indexes || $asix_indexes->is_vector) {
-        die "The elem of indexes for n-dimensional array \$asix_indexes_product must be undef or vector.";
-      }
-      
-      unless ($asix_indexes) {
-        my $asix_indexes_data = new int[$dim->[$asix_indexes_product_index]];
-        
-        for (my $i = 0; $i < $dim->[$asix_indexes_product_index]; $i++) {
-          $asix_indexes_data->[$i] = $i;
-        }
-        
-        $asix_indexes = R::NDArray::Int->new({data => $asix_indexes_data});
-      }
-      
-      $normalized_asix_indexes_product->[$asix_indexes_product_index] = $asix_indexes;
-    }
-    
-    return $normalized_asix_indexes_product;
-  }
-  
-  private static method create_ret_dim : int[] ($asix_indexes_product : R::NDArray::Int[]) {
-    
-    my $asix_indexes_product_length = @$asix_indexes_product;
-    
-    my $ret_dim = new int[$asix_indexes_product_length];
-    
-    for (my $i = 0; $i < $asix_indexes_product_length; $i++) {
-      my $asix_indexes = $asix_indexes_product->[$i];
-      
-      if ($asix_indexes) {
-        $ret_dim->[$i] = $asix_indexes->length;
+      if ($indexes) {
+        $ret_dim->[$i] = $indexes->length;
       }
       else {
-        die "[Unexpected]\$asix_indexes must be defined.";
+        die "[Unexpected]\$indexes must be defined.";
       }
     }
     
@@ -761,9 +776,9 @@ class R::NDArray {
     }
   }
   
-  private precompile method create_data_indexes : int[] ($asix_indexes_product : R::NDArray::Int[], $dim : int[]) {
+  private precompile method create_data_indexes : int[] ($indexes_product : R::NDArray::Int[], $dim : int[]) {
     
-    my $ret_dim = &create_ret_dim($asix_indexes_product);
+    my $ret_dim = &create_ret_dim($indexes_product);
     
     my $ret_dim_length = @$ret_dim;
     
@@ -783,7 +798,7 @@ class R::NDArray {
         
         my $ret_coordinate_x = $ret_coordinate->[$coordinate_index];
         
-        $coordinate->[$coordinate_index] = $asix_indexes_product->[$coordinate_index]->data->[$ret_coordinate_x];
+        $coordinate->[$coordinate_index] = $indexes_product->[$coordinate_index]->data->[$ret_coordinate_x];
         
         if ($coordinate->[$coordinate_index] >= $dim->[$coordinate_index]) {
           die "Invalid coordinate.";

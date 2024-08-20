@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-my $VERSION = (qw$LastChangedRevision: 1957 $)[1];
+my $VERSION = (qw$LastChangedRevision: 1982 $)[1];
 
 =head1 NAME
 
@@ -187,13 +187,13 @@ my $neg_max = 86400;						# NCACHE TTL reporting threshold
 my $udp_timeout = 5;						# timeout for concurrent queries
 my $udp_wait	= 0.100;					# minimum polling interval
 
+my $zone = find_zonecut($domain);				# (also inverts IP address/prefix)
+
 local $SIG{__WARN__} = sub { };					# suppress all warnings
 
 my $resolver = Net::DNS::Resolver->new(@conf);			# create resolver object
 $resolver->nameservers(@nameserver) or die $resolver->string;
 
-
-my $zone = find_zonecut($domain);				# (also inverts IP address/prefix)
 
 my @ns = NS($zone);						# find NS serving zone
 die "\ninvalid: $domain\n\n", $resolver->string unless @ns;	# game over

@@ -71,7 +71,7 @@ my %WriteMakefileArgs = (
     "multidimensional" => 0,
     "parent" => 0
   },
-  "VERSION" => "1.022",
+  "VERSION" => "1.023",
   "test" => {
     "TESTS" => "t/*.t"
   }

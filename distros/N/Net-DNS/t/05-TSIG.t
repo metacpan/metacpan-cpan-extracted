@@ -1,5 +1,5 @@
 #!/usr/bin/perl
-# $Id: 05-TSIG.t 1910 2023-03-30 19:16:30Z willem $	-*-perl-*-
+# $Id: 05-TSIG.t 1980 2024-06-02 10:16:33Z willem $	-*-perl-*-
 #
 
 use strict;
@@ -79,9 +79,9 @@ for my $rr ( Net::DNS::RR->new( name => $name, type => $type, %$hash ) ) {
 
 
 for my $rr ( Net::DNS::RR->new( type => 'TSIG', key => '' ) ) {
-	ok( !$rr->verify(),	'verify fails on empty TSIG' );
+	ok( !$rr->verify(),	'verify() fails on empty TSIG' );
 	ok( $rr->vrfyerrstr(),	'vrfyerrstr() reports failure' );
-	ok( !$rr->other(),	'other undefined' );
+	ok( !$rr->other(),	'other() undefined' );
 	ok( $rr->time_signed(), 'time_signed() defined' );
 	exception( "TSIG key write-only", sub { $rr->key() } );
 }

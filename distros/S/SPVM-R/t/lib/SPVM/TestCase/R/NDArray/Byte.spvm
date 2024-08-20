@@ -89,6 +89,23 @@ class TestCase::R::NDArray::Byte {
       }
     }
     
+    # Exceptions
+    {
+      {
+        my $ndarray = R::NDArray::Byte->new;
+        
+        my $lenght = -1;
+        eval { $ndarray->create_default_data($lenght); }
+        
+        unless ($@) {
+          return 0;
+        }
+      }
+      
+    }
+    
+    $@ = undef;
+    
     return 1;
   }
   

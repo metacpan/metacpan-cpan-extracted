@@ -1,9 +1,9 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2019-2022 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2019-2024 -- leonerd@leonerd.org.uk
 
-package Future::AsyncAwait::Awaitable 0.66;
+package Future::AsyncAwait::Awaitable 0.67;
 
 use v5.14;
 use warnings;
@@ -65,7 +65,7 @@ set, or default to C<Future> if not.
 Generate a new immediate future that is successful. The future will already be
 ready and have the list of values set as its result.
 
-   $f = $CLASS->AWAIT_NEW_DONE( @results )
+   $f = $CLASS->AWAIT_NEW_DONE( @results );
 
    # $f->AWAIT_IS_READY will be true
    # $f->AWAIT_GET will return @results
@@ -75,7 +75,7 @@ ready and have the list of values set as its result.
 Generate a new immediate future that is failed. The future will already be
 ready and invoking the L</AWAIT_GET> method will throw the given exception.
 
-   $f = $CLASS->AWAIT_NEW_FAIL( $message )
+   $f = $CLASS->AWAIT_NEW_FAIL( $message );
 
    # $f->AWAIT_IS_READY will be true
    # $f->AWAIT_GET will throw $message
@@ -88,7 +88,7 @@ Generate a new pending future of the same type as an existing one, which is
 not modified by doing so. It will only be invoked on instances that are
 currently pending.
 
-   $new_f = $f->AWAIT_CLONE
+   $new_f = $f->AWAIT_CLONE;
 
 If the instance has any fields that are required for successful operation
 (such as application-wide context or event system components) these ought to
@@ -100,7 +100,7 @@ as pending callbacks or partial results.
 Sets the success result of an existing still-pending future. It will only be
 invoked on future instances that are currently pending.
 
-   $f->AWAIT_DONE( @results )
+   $f->AWAIT_DONE( @results );
 
    # $f->AWAIT_IS_READY will now be true
    # $f->AWAIT_GET will now return @results
@@ -110,7 +110,7 @@ invoked on future instances that are currently pending.
 Sets the failure result of an existing still-pending future. It will only be
 invoked on future instances that are currently pending.
 
-   $f->AWAIT_FAIL( $message )
+   $f->AWAIT_FAIL( $message );
 
    # $f->AWAIT_IS_READY will now be true
    # $f->AWAIT_GET will now throw $message
@@ -120,14 +120,14 @@ invoked on future instances that are currently pending.
 Returns true if a future is ready (successful, failed or cancelled); false if
 still pending.
 
-   $bool = $f->AWAIT_IS_READY
+   $bool = $f->AWAIT_IS_READY;
 
 =head2 AWAIT_IS_CANCELLED
 
 Returns true is a future has already been cancelled; false if still pending,
 successful or failed.
 
-   $bool = $f->AWAIT_IS_CANCELLED
+   $bool = $f->AWAIT_IS_CANCELLED;
 
 An implementation that does not support cancellation can simply return a
 constant false here:
@@ -140,9 +140,9 @@ Yields the result of a successful future (or just the first value if called in
 scalar context). Throws the failure message as an exception if called on a a
 failed one. Will not be invoked on a pending or cancelled future.
 
-   @result = $f->AWAIT_GET
-   $result = $f->AWAIT_GET
-   $f->AWAIT_GET
+   @result = $f->AWAIT_GET;
+   $result = $f->AWAIT_GET;
+   $f->AWAIT_GET;
 
 =head2 AWAIT_ON_READY
 
@@ -150,13 +150,13 @@ Attach a new CODE reference to be invoked when the future becomes ready (by
 success or failure). The arguments and context that C<$code> is invoked with
 are unspecified.
 
-   $f->AWAIT_ON_READY( $code )
+   $f->AWAIT_ON_READY( $code );
 
 =head2 AWAIT_CHAIN_CANCEL
 
 Attach a future instance to be cancelled when another one is cancelled.
 
-   $f1->AWAIT_CHAIN_CANCEL( $f2 )
+   $f1->AWAIT_CHAIN_CANCEL( $f2 );
 
 When C<$f1> is cancelled, then C<$f2> is cancelled. There is no link from
 C<$f2> back to C<$f1> - whenever C<$f2> changes state here, nothing special
@@ -174,7 +174,7 @@ that name will be repurposed for attaching code blocks in a later version.
 
 Attach a new CODE reference to be invoked when the future is cancelled.
 
-   $f->AWAIT_ON_CANCEL( $code )
+   $f->AWAIT_ON_CANCEL( $code );
 
 An implementation that does not support cancellation can simply ignore this
 method.
@@ -187,9 +187,9 @@ Called by the toplevel C<await> expression in order to run the event system
 and wait for the instance to be ready. It should return results or throw an
 exception in the same manner as L</AWAIT_GET>.
 
-   @result = $f->AWAIT_WAIT
-   $result = $f->AWAIT_WAIT
-   $f->AWAIT_WAIT
+   @result = $f->AWAIT_WAIT;
+   $result = $f->AWAIT_WAIT;
+   $f->AWAIT_WAIT;
 
 =cut
 

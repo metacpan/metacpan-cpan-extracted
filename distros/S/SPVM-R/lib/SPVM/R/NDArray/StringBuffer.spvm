@@ -38,11 +38,10 @@ class R::NDArray::StringBuffer extends R::NDArray {
     
     my $elem = $data->[$data_index];
     
-    unless ($elem) {
-      return undef;
+    my $string = (string)undef;
+    if ($data->[$data_index]) {
+      $string = $data->[$data_index]->to_string;
     }
-    
-    my $string = $elem->to_string;
     
     return $string;
   }
@@ -54,29 +53,21 @@ class R::NDArray::StringBuffer extends R::NDArray {
   
   method elem_clone : void ($dist_data : StringBuffer[], $dist_data_index : int, $src_data : StringBuffer[], $src_data_index : int) {
     
-    my $src_elem = $src_data->[$src_data_index];
-    
-    if ($src_elem) {
-      $dist_data->[$dist_data_index] = StringBuffer->new($src_elem->to_string);
-    }
-    else {
-      $dist_data->[$dist_data_index] = undef;
+    if ($src_data->[$src_data_index]) {
+      $dist_data->[$dist_data_index] = StringBuffer->new($src_data->[$src_data_index]->to_string);
     }
   }
   
   method elem_cmp : int ($a_data : StringBuffer[], $a_data_index : int, $b_data : StringBuffer[], $b_data_index : int) {
     
-    my $a_elem = $a_data->[$a_data_index];
-    
     my $a_string = (string)undef;
-    if ($a_elem) {
-      $a_string = $a_elem->to_string;
+    if ($a_data->[$a_data_index]) {
+      $a_string = $a_data->[$a_data_index]->to_string;
     }
     
-    my $b_elem = $b_data->[$b_data_index];
     my $b_string = (string)undef;
-    if ($b_elem) {
-      $b_string = $b_elem->to_string;
+    if ($b_data->[$b_data_index]) {
+      $b_string = $b_data->[$b_data_index]->to_string;
     }
     
     my $cmp = $a_string cmp $b_string;
@@ -98,8 +89,8 @@ class R::NDArray::StringBuffer extends R::NDArray {
     return (R::NDArray::StringBuffer)$self->SUPER::clone($shallow);
   }
   
-  method slice : R::NDArray::StringBuffer ($asix_indexes_product : R::NDArray::Int[]) {
-    return (R::NDArray::StringBuffer)$self->SUPER::slice($asix_indexes_product);
+  method slice : R::NDArray::StringBuffer ($indexes_product : R::NDArray::Int[]) {
+    return (R::NDArray::StringBuffer)$self->SUPER::slice($indexes_product);
   }
   
 }
