@@ -69,7 +69,9 @@ if ( $Update ) {
 
     if ( $ARGS{Description} ) {
 
-        if ( $ARGS{Description} ne $form_attribute->Description ) {
+        if ($ARGS{Description} !~ /^[\w\s]+$/) {
+            push @results, loc('Invalid form name (can only contain letters, numbers, underscore, and spaces): [_1]', $ARGS{Description});
+        } elsif ( $ARGS{Description} ne $form_attribute->Description ) {
             my $attr = RT::Attribute->new( RT->SystemUser );
             my ($ret) = $attr->LoadByCols( Name => 'FormTools Form', Description => $ARGS{Description} );
             if ($ret) {

@@ -16,6 +16,20 @@ R::OP::Matrix class in L<SPVM> has methods for operations for n-dimension arrays
 
   use R::OP::Matrix;
 
+=head1 Related Modules
+
+=over 2
+
+=item * L<R::OP::Matrix::Float|SPVM::R::OP::Matrix::Float>
+
+=item * L<R::OP::Matrix::Double|SPVM::R::OP::Matrix::Double>
+
+=item * L<R::OP::Matrix::FloatComplex|SPVM::R::OP::Matrix::FloatComplex>
+
+=item * L<R::OP::Matrix::DoubleComplex|SPVM::R::OP::Matrix::DoubleComplex>
+
+=back
+
 =head1 Class Methods
 
 =head2 cbind
@@ -57,20 +71,6 @@ The n-dimention array $y_ndarray must be a matrix. Otherwise, an exception is th
 The type of the n-dimention array $x_ndarray must be eqaul to the type of the n-dimention array $y_ndarray. Otherwise, an exception is thrown.
 
 The column numbers of the n-dimention array $x_ndarray must be equal to the column numbers of the n-dimention array $y_ndarray. Otherwise, an exception is thrown.
-
-=head1 Related Modules
-
-=over 2
-
-=item * L<R::OP::Matrix::Float|SPVM::R::OP::Matrix::Float>
-
-=item * L<R::OP::Matrix::Double|SPVM::R::OP::Matrix::Double>
-
-=item * L<R::OP::Matrix::FloatComplex|SPVM::R::OP::Matrix::FloatComplex>
-
-=item * L<R::OP::Matrix::DoubleComplex|SPVM::R::OP::Matrix::DoubleComplex>
-
-=back
 
 =head1 See Also
 

@@ -114,7 +114,7 @@ my %tests = (
 );
 
 print "running benchmarks with sets of size ",
-  scalar @a, " and ", scalar @b, "\n";
+    scalar @a, " and ", scalar @b, "\n";
 for my $test ( sort keys %tests ) {
     print "\n$test:\n";
     cmpthese(

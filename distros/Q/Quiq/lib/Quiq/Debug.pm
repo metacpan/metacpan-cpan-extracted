@@ -1,5 +1,7 @@
 # -----------------------------------------------------------------------------
 
+=encoding utf8
+
 =head1 NAME
 
 Quiq::Debug - Hilfe beim Debuggen von Programmen
@@ -19,10 +21,11 @@ use v5.10;
 use strict;
 use warnings;
 
-our $VERSION = '1.218';
+our $VERSION = '1.219';
 
 use Data::Printer color=>{string=>'black'};
 use Data::Printer ();
+use Quiq::Path;
 
 # -----------------------------------------------------------------------------
 
@@ -112,9 +115,75 @@ sub modulePaths {
 
 # -----------------------------------------------------------------------------
 
+=head2 Subroutines
+
+=head3 findSubroutine() - Suche Subroutine
+
+=head4 Synopsis
+
+  @arr | $str = $this->findSubroutine($pattern);
+
+=head4 Description
+
+Suche die Subroutines, die den Pattern $pattern erfüllen, in den
+Moduldateien (.pm) entlang der Pfade in @INC. Im Array-Kontext liefere die
+Liste der Modulnamen, im Skalarkontext die Liste als Zeichenkette (ein
+Modulpfad pro Zeile).
+
+=head4 Example
+
+B<ANPASSEN>
+
+Die aktuell geladenen Moduldateien auf STDOUT ausgeben:
+
+  print Quiq::Debug->findSubroutine;
+  ==>
+  /home/fs/lib/perl5/Quiq/Debug.pm
+  /home/fs/lib/perl5/Quiq/Object.pm
+  /home/fs/lib/perl5/Perl/Quiq/Stacktrace.pm
+  /usr/share/perl/5.20/base.pm
+  /usr/share/perl/5.20/strict.pm
+  /usr/share/perl/5.20/vars.pm
+  /usr/share/perl/5.20/warnings.pm
+  /usr/share/perl/5.20/warnings/register.pm
+
+=cut
+
+# -----------------------------------------------------------------------------
+
+sub findSubroutine {
+    my ($this,$pattern) = @_;
+
+    my $p = Quiq::Path->new;
+
+    $pattern = qr/(sub\s+$pattern)/;
+
+    my @modules;
+    for my $dir (@INC) {
+        if (!-d $dir) {
+            next;
+        }
+        # say "*** $dir ***";
+        my @files = $p->find($dir,-pattern=>qr/\.pm$/);
+        for my $file (@files) {
+            my $data = $p->read($file);
+            if ($data =~ /$pattern/) {
+                say "*** $file ***";
+                while ($data =~ /$pattern/g) {
+                    say $1;
+                }
+            }
+        }
+    }
+
+    return;
+}
+
+# -----------------------------------------------------------------------------
+
 =head1 VERSION
 
-1.218
+1.219
 
 =head1 AUTHOR
 

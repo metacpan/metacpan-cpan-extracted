@@ -4,7 +4,7 @@
       "Stanis Trendelenburg <trendels@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.032, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.031, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -16,53 +16,78 @@
    "prereqs" : {
       "configure" : {
          "requires" : {
-            "ExtUtils::MakeMaker" : "0",
-            "perl" : "5.012000"
+            "ExtUtils::MakeMaker" : "0"
+         },
+         "suggests" : {
+            "JSON::PP" : "2.27300"
          }
       },
       "develop" : {
          "requires" : {
             "Pod::Coverage::TrustPod" : "0",
+            "Test::CPAN::Changes" : "0.19",
+            "Test::CPAN::Meta" : "0",
+            "Test::CPAN::Meta::JSON" : "0.16",
+            "Test::EOL" : "0",
             "Test::Kwalitee" : "1.21",
+            "Test::Mojibake" : "0",
             "Test::More" : "0.88",
+            "Test::NoTabs" : "0",
             "Test::Perl::Critic" : "0",
             "Test::Pod" : "1.41",
-            "Test::Pod::Coverage" : "1.08"
+            "Test::Pod::Coverage" : "1.08",
+            "Test::Portability::Files" : "0",
+            "Test::Spelling" : "0.12",
+            "Test::Version" : "1"
          }
       },
       "runtime" : {
          "requires" : {
-            "Exporter" : "0",
-            "perl" : "5.012000"
+            "perl" : "5.006000"
          }
       },
       "test" : {
+         "recommends" : {
+            "CPAN::Meta" : "2.120900"
+         },
          "requires" : {
-            "Test::More" : "0",
-            "perl" : "5.012000"
+            "ExtUtils::MakeMaker" : "0",
+            "File::Spec" : "0",
+            "IO::Handle" : "0",
+            "IPC::Open3" : "0",
+            "Test::More" : "0.88"
          }
       }
    },
    "provides" : {
       "Set::Tiny" : {
          "file" : "lib/Set/Tiny.pm",
-         "version" : "0.05"
+         "version" : "0.06"
       }
    },
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
-         "web" : "https://github.com/glasswalk3r/set-tiny/issues"
+         "web" : "https://github.com/haarg/Set-Tiny/issues"
       },
       "repository" : {
          "type" : "git",
-         "url" : "https://github.com/glasswalk3r/set-tiny.git",
-         "web" : "https://github.com/glasswalk3r/set-tiny"
+         "url" : "https://github.com/haarg/Set-Tiny.git",
+         "web" : "https://github.com/haarg/Set-Tiny"
       }
    },
-   "version" : "0.05",
+   "version" : "0.06",
+   "x_contributors" : [
+      "Alberto Manuel Brand\u00e3o Sim\u00f5es <ambs@cpan.org>",
+      "Alceu Rodrigues de Freitas Junior <glasswalk3r@yahoo.com.br>",
+      "brian greenfield <briang@cpan.org>",
+      "Graham Knop <haarg@haarg.org>",
+      "Ricky Morse <remorse@mgh.harvard.edu>",
+      "Stanis Trendelenburg <stanis.trendelenburg@gmail.com>"
+   ],
    "x_generated_by_perl" : "v5.38.2",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.38",
-   "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.37",
+   "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later",
+   "x_use_unsafe_inc" : 0
 }
 

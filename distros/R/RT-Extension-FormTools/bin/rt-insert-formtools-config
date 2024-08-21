@@ -1,11 +1,11 @@
-#!/Users/jason/perl5/perlbrew/perls/rt-5.36.1/bin/perl
+#!/home/brad/perl5/perlbrew/perls/perl-5.34.0/bin/perl
 ### before: #!@PERL@
 
 use strict;
 use warnings;
 
 ### after:     use lib qw(@RT_LIB_PATH@);
-    use lib qw(/Users/jason/code/BestPractical/rts/rt5-astound-dev/local/lib /Users/jason/code/BestPractical/rts/rt5-astound-dev/lib);
+    use lib qw(/home/brad/BPS/work/rts/astound-form-tools/local/lib /home/brad/BPS/work/rts/astound-form-tools/lib);
 
 use RT::Interface::CLI  qw(Init);
 
@@ -27,6 +27,10 @@ Pod::Usage::pod2usage() unless @ARGV == 1;
 
 unless ( $OPT{'form-name'} ) {
     die "form-name is required to name the new form";
+}
+
+unless ($OPT{'form-name'} =~ /^[\w\s]+$/) {
+    die 'Invalid form name (can only contain letters, numbers, underscore, and spaces)';
 }
 
 my ($filename) = @ARGV;

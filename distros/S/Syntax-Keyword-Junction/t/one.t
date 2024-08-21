@@ -1,4 +1,5 @@
 use strict;
+use warnings;
 use Test::More tests => 99;
 
 use Syntax::Keyword::Junction 'one';

@@ -1,5 +1,8 @@
 Revision history for RT-Extension-FormTools
 
+1.13 2024-08-20
+ - Validate form names with the same regex used when loading a form (Arnaud Virlet)
+
 1.12 2024-08-02
  - Make remaining core ticket fields available to forms (Due Date, Time
    Estimated)

@@ -229,22 +229,6 @@ Slices this data frame given the column names $colnames and the product of axis 
 
 This method calls L<R::NDArray#slice|SPVM::R::NDArray#slice> method for the n-dimensional array of each column in this data frame.
 
-=head2 set_order
-
-C<method set_order : void ($data_indexes_ndarray : L<R::NDArray::Int|SPVM::R::NDArray::Int>);>
-
-Calls L<R::NDArray#set_order|SPVM::R::NDArray#set_order> method for the n-dimeniaonal array of each column in this data frame.
-
-=head2 sort
-
-C<method sort : void ($colnames_with_sort_order : string[]);>
-
-Sort data in the n-dimensional array in this data frame given the column name with the sort order $colnames_with_sort_order.
-
-Implementation:
-
-This method calls L</"order"> method given $colnames_with_sort_order and calls L</"set_order"> method givne the return value of L</"order"> method.
-
 =head2 order
 
 C<method order : L<R::NDArray::Int|SPVM::R::NDArray::Int> ($colnames_with_sort_order : string[]);>
@@ -279,6 +263,22 @@ If the column named $colname does not exist, an excetpion is thrown.
 ($colname is the column part of $colnames_with_sort_order.)
 
 If the column name with the sort order is invalid format, an exception is thrown.
+
+=head2 set_order
+
+C<method set_order : void ($data_indexes_ndarray : L<R::NDArray::Int|SPVM::R::NDArray::Int>);>
+
+Calls L<R::NDArray#set_order|SPVM::R::NDArray#set_order> method for the n-dimeniaonal array of each column in this data frame.
+
+=head2 sort
+
+C<method sort : void ($colnames_with_sort_order : string[]);>
+
+Sort data in the n-dimensional array in this data frame given the column name with the sort order $colnames_with_sort_order.
+
+Implementation:
+
+This method calls L</"order"> method given $colnames_with_sort_order and calls L</"set_order"> method givne the return value of L</"order"> method.
 
 =head1 See Also
 

@@ -29,6 +29,10 @@ unless ( $OPT{'form-name'} ) {
     die "form-name is required to name the new form";
 }
 
+unless ($OPT{'form-name'} =~ /^[\w\s]+$/) {
+    die 'Invalid form name (can only contain letters, numbers, underscore, and spaces)';
+}
+
 my ($filename) = @ARGV;
 die "Not a file: $filename\n" unless -f $filename;
 die "Cannot read file: $filename\n" unless -r $filename;

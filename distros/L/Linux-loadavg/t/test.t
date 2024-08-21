@@ -3,20 +3,25 @@
 
 #########################
 
-use Test;
-BEGIN { plan tests => 8, todo => [] };
-use Linux::loadavg;
-1 && ok(1); # If we made it this far, we're ok.
+use v5.12;
+use strict;
+use warnings;
 
-#########################
+use Test2::Tools::Basic;
 
-# Insert your test code below, the Test module is use()ed here so read
-# its man page ( perldoc Test ) for help writing this test script.
+plan(8);
 
-2 && ok((@a = loadavg())  == 3);
-3 && ok((@a = loadavg(2)) == 2);
-4 && ok((@a = loadavg(1)) == 1);
-5 && ok(LOADAVG_1MIN == 0);
-6 && ok(LOADAVG_5MIN == 1);
-7 && ok(LOADAVG_15MIN == 2);
-8 && ok(sub { foreach my $i (0..1_234_567) { loadavg()} 1});
+use Linux::loadavg ':all';
+
+ok(sub {loadavg() == 3},'loadavg()');
+ok(sub {loadavg(1) == 1},'loadavg(1)');
+ok(sub {loadavg(2) == 2},'loadavg(2)');
+ok(sub {loadavg(3) == 3},'loadavg(3)');
+ok(LOADAVG_1MIN()==0,'Export: LOADAVG_1MIN');
+ok(LOADAVG_5MIN()==1,'Export: LOADAVG_5MIN');
+ok(LOADAVG_15MIN()==2,'Export: LOADAVG_15MIN');
+ok(sub {sleep 10; 1}, 'Repeat (a lot!)');
+
+diag(sprintf("The current load is: (%s)\n",join(',',loadavg)));
+
+done_testing;

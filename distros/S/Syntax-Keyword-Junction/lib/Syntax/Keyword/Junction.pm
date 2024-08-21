@@ -1,11 +1,9 @@
 package Syntax::Keyword::Junction;
-
 use strict;
 use warnings;
+use 5.006;
 
-our $VERSION = '0.003008'; # VERSION
-
-# ABSTRACT: Perl6 style Junction operators in Perl5
+our $VERSION = '0.003009';
 
 require Syntax::Keyword::Junction::All;
 require Syntax::Keyword::Junction::Any;
@@ -13,12 +11,12 @@ require Syntax::Keyword::Junction::None;
 require Syntax::Keyword::Junction::One;
 
 use Sub::Exporter::Progressive -setup => {
-   exports => [qw( all any none one )],
-   groups => {
-      default => [qw( all any none one )],
-      # for the switch from Exporter
-      ALL     => [qw( all any none one )],
-   },
+  exports => [qw( all any none one )],
+  groups => {
+    default => [qw( all any none one )],
+    # for the switch from Exporter
+    ALL     => [qw( all any none one )],
+  },
 };
 
 sub all  { Syntax::Keyword::Junction::All->new(@_)  }
@@ -34,13 +32,11 @@ __END__
 
 =encoding UTF-8
 
+=for :stopwords Arthur Axel "fREW" Schmidt Carl Franks
+
 =head1 NAME
 
-Syntax::Keyword::Junction - Perl6 style Junction operators in Perl5
-
-=head1 VERSION
-
-version 0.003008
+Syntax::Keyword::Junction - Comparisons against multiple values
 
 =head1 SYNOPSIS
 
@@ -58,7 +54,7 @@ version 0.003008
     ...
   }
 
-  if (all(@input) <= @limits) {
+  if (all(@input) <= scalar @limits) {
     ...
   }
 
@@ -83,8 +79,8 @@ or if you want to rename an export, use L<Sub::Exporter> options:
 This is a lightweight module which provides 'Junction' operators, the most
 commonly used being C<any> and C<all>.
 
-Inspired by the Perl6 design docs,
-L<http://dev.perl.org/perl6/doc/design/exe/E06.html>.
+Inspired by the Perl 6 design docs,
+L<https://web.archive.org/web/20230922160729/https://raku.org/archive/doc/design/exe/E06.html#The%20Wonderful%20World%20of%20Junctions>.
 
 Provides a limited subset of the functionality of L<Quantum::Superpositions>,
 see L</"SEE ALSO"> for comment.
@@ -144,18 +140,18 @@ the operator used.
 You cannot alter junctions.  Instead, you can create new junctions out of old
 junctions.  You can do this by calling the C<values> method on a junction.
 
- my $numbers = any(qw/1 2 3 4 5/);
- print $numbers == 3 ? 'Yes' : 'No';   # Yes
+  my $numbers = any(qw/1 2 3 4 5/);
+  print $numbers == 3 ? 'Yes' : 'No';   # Yes
 
- $numbers = any( grep { $_ != 3 } $numbers->values );
- print $numbers == 3 ? 'Yes' : 'No';   # No
+  $numbers = any( grep { $_ != 3 } $numbers->values );
+  print $numbers == 3 ? 'Yes' : 'No';   # No
 
 You can also use the C<map> method:
 
- my $numbers = any(qw/1 2 3 4 5/);
- my $prime   = $numbers->map( \&is_prime );
+  my $numbers = any(qw/1 2 3 4 5/);
+  my $prime   = $numbers->map( \&is_prime );
 
- say for $prime->values; # prints 0, 1, 1, 0, 1
+  say for $prime->values; # prints 0, 1, 1, 0, 1
 
 =head1 EXPORT
 
@@ -188,15 +184,71 @@ Add overloading for arithmetic operators, such that this works:
 
 This module is actually a fork of L<Perl6::Junction> with very few
 (initial) changes.  The reason being that we want to avoid the
-incendiary name containing Perl6.
+incendiary name containing Perl 6.
 
 L<Quantum::Superpositions> provides the same functionality as this, and
 more. However, this module provides this limited functionality at a much
 greater runtime speed, with my benchmarks showing between 500% and 6000%
 improvement.
 
-L<http://dev.perl.org/perl6/doc/design/exe/E06.html> - "The Wonderful World
-of Junctions".
+L<https://web.archive.org/web/20230922160729/https://raku.org/archive/doc/design/exe/E06.html#The%20Wonderful%20World%20of%20Junctions> - "The Wonderful World of Junctions".
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website
+L<https://github.com/haarg/Syntax-Keyword-Junction/issues>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
+
+=head1 CONTRIBUTORS
+
+=for stopwords Arthur Axel 'fREW' Schmidt Carl Franks David Steinbrunner Graham Knop Maxime Soulé Michael Schout Olivier Mengué Paul Cochrane Ricardo Signes Rob Hoelz
+
+=over 4
+
+=item *
+
+Arthur Axel 'fREW' Schmidt <frioux@gmail.com>
+
+=item *
+
+Carl Franks <cpan@fireartist.com>
+
+=item *
+
+David Steinbrunner <dsteinbrunner@pobox.com>
+
+=item *
+
+Graham Knop <haarg@haarg.org>
+
+=item *
+
+Maxime Soulé <btik-cpan@scoubidou.com>
+
+=item *
+
+Michael Schout <schoutm@gmail.com>
+
+=item *
+
+Olivier Mengué <dolmen@cpan.org>
+
+=item *
+
+Paul Cochrane <paul.cochrane@posteo.de>
+
+=item *
+
+Ricardo Signes <rjbs@cpan.org>
+
+=item *
+
+Rob Hoelz <rob@hoelz.ro>
+
+=back
 
 =head1 AUTHORS
 
@@ -214,7 +266,7 @@ Carl Franks
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2014 by Arthur Axel "fREW" Schmidt.
+This software is copyright (c) 2024 by Arthur Axel "fREW" Schmidt.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

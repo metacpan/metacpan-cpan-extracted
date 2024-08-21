@@ -2896,7 +2896,7 @@ AV *dbd_st_fetch( SV *sth,
               if( longTruncOk )
                 warn( "%s", msg );
               else
-                croak( msg );
+                croak("%s", msg);
             }
             else if( ChopBlanks && SQL_CHAR == fbh->dbtype )
               sv_setpvn( sv,

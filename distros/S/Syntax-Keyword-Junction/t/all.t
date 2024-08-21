@@ -1,4 +1,5 @@
 use strict;
+use warnings;
 use Test::More tests => 91;
 
 use Syntax::Keyword::Junction 'all';

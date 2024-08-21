@@ -20,6 +20,132 @@
 #######################################################################
 
 
+2024-08-20  Brian M. Kelly <Brian.Kelly@fullauto.com>
+
+        * Version 1.0000761 released
+
+        * Corrected module dependency ordering
+
+2024-08-20  Brian M. Kelly <Brian.Kelly@fullauto.com>
+
+        * Version 1.0000760 released
+
+        * Final Low Memory banner changes
+
+2024-08-20  Brian M. Kelly <Brian.Kelly@fullauto.com>
+
+        * Version 1.0000759 released
+
+        * More Low Memory banner changes
+
+2024-08-20  Brian M. Kelly <Brian.Kelly@fullauto.com>
+
+        * Version 1.0000758 released
+
+        * More Low Memory banner changes
+
+2024-08-20  Brian M. Kelly <Brian.Kelly@fullauto.com>
+
+        * Version 1.0000757 released
+
+        * Low Memory banner
+
+2024-08-20  Brian M. Kelly <Brian.Kelly@fullauto.com>
+
+        * Version 1.0000756 released
+
+        * More kill cpan parent process experiment
+
+2024-08-20  Brian M. Kelly <Brian.Kelly@fullauto.com>
+
+        * Version 1.0000755 released
+
+        * More kill cpan parent process experiment
+
+2024-08-20  Brian M. Kelly <Brian.Kelly@fullauto.com>
+
+        * Version 1.0000754 released
+
+        * More kill cpan parent process experiment
+
+2024-08-20  Brian M. Kelly <Brian.Kelly@fullauto.com>
+
+        * Version 1.0000753 released
+
+        * More kill cpan parent process experiment
+
+2024-08-20  Brian M. Kelly <Brian.Kelly@fullauto.com>
+
+        * Version 1.0000752 released
+
+        * More kill cpan parent process experiment
+
+2024-08-20  Brian M. Kelly <Brian.Kelly@fullauto.com>
+
+        * Version 1.0000751 released
+
+        * More kill cpan parent process experiment
+
+2024-08-20  Brian M. Kelly <Brian.Kelly@fullauto.com>
+
+        * Version 1.0000750 released
+
+        * More kill cpan parent process experiment
+
+2024-08-20  Brian M. Kelly <Brian.Kelly@fullauto.com>
+
+        * Version 1.0000749 released
+
+        * Kill cpan parent process experiment
+
+2024-08-20  Brian M. Kelly <Brian.Kelly@fullauto.com>
+
+        * Version 1.0000748 released
+
+        * Memory experiment
+
+2024-08-20  Brian M. Kelly <Brian.Kelly@fullauto.com>
+
+        * Version 1.0000747 released
+
+        * Corrected more module dependency ordering
+
+2024-08-20  Brian M. Kelly <Brian.Kelly@fullauto.com>
+
+        * Version 1.0000746 released
+
+        * Corrected more module dependency ordering
+
+2024-08-20  Brian M. Kelly <Brian.Kelly@fullauto.com>
+
+        * Version 1.0000745 released
+
+        * Corrected more module dependency ordering
+
+2024-08-20  Brian M. Kelly <Brian.Kelly@fullauto.com>
+
+        * Version 1.0000744 released
+
+        * Corrected more module dependency ordering
+
+2024-08-20  Brian M. Kelly <Brian.Kelly@fullauto.com>
+
+        * Version 1.0000743 released
+
+        * Fixed amazon YAML install
+
+2024-08-20  Brian M. Kelly <Brian.Kelly@fullauto.com>
+
+        * Version 1.0000742 released
+
+        * Fixed typo extra ";" breaking Makefile.PL
+
+2024-08-20  Brian M. Kelly <Brian.Kelly@fullauto.com>
+
+        * Version 1.0000741 released
+
+        * Corrected more module dependencies
+
 2024-08-19  Brian M. Kelly <Brian.Kelly@fullauto.com>
 
         * Version 1.0000740 released

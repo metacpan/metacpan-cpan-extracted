@@ -1,15 +1,14 @@
-#!/usr/bin/env perl
-
 use strict;
 use warnings;
 
 use Test::More;
-use Test::Requires {
-   'Sub::Exporter' => 0.986,
+use Test::Needs {
+  'Sub::Exporter' => 0.986,
+  'syntax'        => 0,
 };
 
 use syntax junction => {
-   -all => { -prefix => 'syntax_' }
+  -all => { -prefix => 'syntax_' }
 };
 
 use Syntax::Keyword::Junction -all => { -prefix => 'orig_' };

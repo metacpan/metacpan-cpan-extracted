@@ -1,0 +1,6 @@
+Revision history for Perl extension Tk::PodViewer.
+
+0.01  Tue Aug 20 2024
+	- original version; created by h2xs 1.23 Sun Aug  4 11:30:37 2024 with options 
+		-X Tk::PodViewer
+

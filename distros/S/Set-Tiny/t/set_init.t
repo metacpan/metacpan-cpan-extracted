@@ -1,10 +1,10 @@
 use warnings;
 use strict;
-use Test::More tests => 7;
+use Test::More tests => 6;
 
 # test to make sure that the short initializer (`set()`) works
 
-use_ok 'Set::Tiny', qw(set);
+use Set::Tiny qw(set);
 
 my $a = set();
 my $b = set(qw( a b c ));

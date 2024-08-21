@@ -1,6 +1,6 @@
 --- #YAML:1.0
 name:                Linux-loadavg
-version:             0.09
+version:             0.10
 abstract:            Get system load averages (via getloadavg(3C) system call)
 license:             ~
 author:              

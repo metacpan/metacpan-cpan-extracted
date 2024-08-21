@@ -1,25 +1,66 @@
 ---
-abstract: 'Perl6 style Junction operators in Perl5'
+abstract: 'Comparisons against multiple values'
 author:
   - 'Arthur Axel "fREW" Schmidt <frioux+cpan@gmail.com>'
   - 'Carl Franks'
 build_requires:
+  ExtUtils::MakeMaker: '0'
+  File::Spec: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
   Test::More: '0.88'
-  Test::Requires: '0.07'
+  Test::Needs: '0.002006'
 configure_requires:
-  ExtUtils::MakeMaker: '6.30'
+  ExtUtils::MakeMaker: '0'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 5.019, CPAN::Meta::Converter version 2.141170'
+generated_by: 'Dist::Zilla version 6.031, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: '1.4'
 name: Syntax-Keyword-Junction
+provides:
+  Syntax::Feature::Junction:
+    file: lib/Syntax/Feature/Junction.pm
+    version: '0.003009'
+  Syntax::Keyword::Junction:
+    file: lib/Syntax/Keyword/Junction.pm
+    version: '0.003009'
+  Syntax::Keyword::Junction::All:
+    file: lib/Syntax/Keyword/Junction/All.pm
+    version: '0.003009'
+  Syntax::Keyword::Junction::Any:
+    file: lib/Syntax/Keyword/Junction/Any.pm
+    version: '0.003009'
+  Syntax::Keyword::Junction::Base:
+    file: lib/Syntax/Keyword/Junction/Base.pm
+    version: '0.003009'
+  Syntax::Keyword::Junction::None:
+    file: lib/Syntax/Keyword/Junction/None.pm
+    version: '0.003009'
+  Syntax::Keyword::Junction::One:
+    file: lib/Syntax/Keyword/Junction/One.pm
+    version: '0.003009'
 requires:
   Sub::Exporter::Progressive: '0.001006'
   parent: '0'
-  syntax: '0'
+  perl: '5.006'
 resources:
-  homepage: https://github.com/frioux/Syntax-Keyword-Junction
-  repository: https://github.com/frioux/Syntax-Keyword-Junction.git
-version: '0.003008'
+  bugtracker: https://github.com/haarg/Syntax-Keyword-Junction/issues
+  repository: https://github.com/haarg/Syntax-Keyword-Junction.git
+version: '0.003009'
+x_contributors:
+  - "Arthur Axel 'fREW' Schmidt <frioux@gmail.com>"
+  - 'Carl Franks <cpan@fireartist.com>'
+  - 'David Steinbrunner <dsteinbrunner@pobox.com>'
+  - 'Graham Knop <haarg@haarg.org>'
+  - 'Maxime Soulé <btik-cpan@scoubidou.com>'
+  - 'Michael Schout <schoutm@gmail.com>'
+  - 'Olivier Mengué <dolmen@cpan.org>'
+  - 'Paul Cochrane <paul.cochrane@posteo.de>'
+  - 'Ricardo Signes <rjbs@cpan.org>'
+  - 'Rob Hoelz <rob@hoelz.ro>'
+x_generated_by_perl: v5.38.2
+x_serialization_backend: 'YAML::Tiny version 1.74'
+x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'
+x_use_unsafe_inc: 0

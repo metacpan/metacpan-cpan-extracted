@@ -25,7 +25,7 @@
 
     On UNIX:
 	export DB2_HOME=<path to CLI DRIVER installation>/clidriver
-	export PERL5LIB=~/lib/perl5/lib/perl5/site_perl:$HOME/DBD-DB2-1.89/tests:$HOME/DBD-DB2-1.89/Constants
+	export PERL5LIB=~/lib/perl5/lib/perl5/site_perl:$HOME/DBD-DB2-1.88/tests:$HOME/DBD-DB2-1.88/Constants
 	
     perl Makefile.PL            # use a perl that's in your PATH
     make

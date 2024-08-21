@@ -1,0 +1,89 @@
+
+=head1 HEAD1 NORMAL B<BOLD> I<ITALIC> B<I<BOLD and ITALIC>>
+
+=over 4
+
+This text should be indented.
+
+=back
+
+An item list
+
+=over 4
+
+=item B<We have an item>
+
+Some item text
+
+=item B<And another>
+
+Some item text
+
+=item B<A sublist>
+
+=over 4
+
+=item B<We have an item>
+
+Some item text
+
+=item B<And another>
+
+Some item text
+
+=back
+
+End of sub list
+
+=back
+
+End of list
+
+=head2 HEAD2 STYLES
+
+test B<bold>.
+
+test C<code item>.
+
+test F<file item>.
+
+test I<italic>.
+
+test L<link>.
+
+=head3 HEAD3 VERBATIM
+
+ This should be formatted as verbatim. This should be formatted as verbatim. This should be formatted as verbatim. This should be formatted as verbatim.
+ This should be formatted as verbatim. This should be formatted as verbatim. This should be formatted as verbatim. This should be formatted as verbatim.
+
+Indented verbatim:
+
+=over 4
+
+ This should be formatted as verbatim. This should be formatted as verbatim. This should be formatted as verbatim. This should be formatted as verbatim.
+ This should be formatted as verbatim. This should be formatted as verbatim. This should be formatted as verbatim. This should be formatted as verbatim.
+
+=back
+
+=head4 HEAD4 IGNORE
+
+=begin special
+
+Ignoring =begin and =end tags
+
+=end special
+
+=for comment
+Ignoring =for tag
+
+The escape E<23> command. Ignoring the X<X command>. Ignoring the Z<> command.
+
+=head5 HEAD5 NORMAL B<BOLD> I<ITALIC> B<I<BOLD and ITALIC>>
+
+Some text blah blih bluh.
+
+=head6 HEAD6 NORMAL B<BOLD> I<ITALIC> B<I<BOLD and ITALIC>>
+
+Some text blah blih bluh.
+
+

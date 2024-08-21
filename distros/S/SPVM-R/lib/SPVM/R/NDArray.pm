@@ -107,6 +107,16 @@ If you get all indexes of a dimension, you can use C<undef>. This is the same as
   # Same also
   my $ret_ndarray = $ndarray->slice([IOP->undef, IOP->c([1, 2]), IOP->c([2])]);
 
+=head2 NA Representation
+
+A n-dimensional array in L<SPVM::R> cannot have a real NA element, but the data that represents NA is able to be defined.
+
+Integral types cannot represent NA.
+
+Floating point types represent NA using C<NaN>.
+
+Object types represent NA using C<undef>.
+
 =head1 Fields
 
 =head2 data
@@ -467,6 +477,8 @@ Not implemented.
 C<method elem_is_na : int ($data : object, $data_index : int);>
 
 Checks if an element represets NA.
+
+See L</"Na Representation"> about NA representation.
 
 This method will be implemented in a child class.
 

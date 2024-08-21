@@ -1,3 +1,8 @@
+0.101 2024-08-21
+  [Document Improvement]
+    * Add "Features" section.
+    * Improve docs.
+    
 0.100 2024-08-20
   [Major Release]
     * All tests are finished.

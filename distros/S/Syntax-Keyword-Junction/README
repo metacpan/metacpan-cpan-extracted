@@ -1,8 +1,5 @@
 NAME
-    Syntax::Keyword::Junction - Perl6 style Junction operators in Perl5
-
-VERSION
-    version 0.003008
+    Syntax::Keyword::Junction - Comparisons against multiple values
 
 SYNOPSIS
       use Syntax::Keyword::Junction qw/ all any none one /;
@@ -19,7 +16,7 @@ SYNOPSIS
         ...
       }
 
-      if (all(@input) <= @limits) {
+      if (all(@input) <= scalar @limits) {
         ...
       }
 
@@ -43,8 +40,9 @@ DESCRIPTION
     This is a lightweight module which provides 'Junction' operators, the
     most commonly used being "any" and "all".
 
-    Inspired by the Perl6 design docs,
-    <http://dev.perl.org/perl6/doc/design/exe/E06.html>.
+    Inspired by the Perl 6 design docs,
+    <https://web.archive.org/web/20230922160729/https://raku.org/archive/doc
+    /design/exe/E06.html#The%20Wonderful%20World%20of%20Junctions>.
 
     Provides a limited subset of the functionality of
     Quantum::Superpositions, see "SEE ALSO" for comment.
@@ -99,18 +97,18 @@ ALTERING JUNCTIONS
     old junctions. You can do this by calling the "values" method on a
     junction.
 
-     my $numbers = any(qw/1 2 3 4 5/);
-     print $numbers == 3 ? 'Yes' : 'No';   # Yes
+      my $numbers = any(qw/1 2 3 4 5/);
+      print $numbers == 3 ? 'Yes' : 'No';   # Yes
 
-     $numbers = any( grep { $_ != 3 } $numbers->values );
-     print $numbers == 3 ? 'Yes' : 'No';   # No
+      $numbers = any( grep { $_ != 3 } $numbers->values );
+      print $numbers == 3 ? 'Yes' : 'No';   # No
 
     You can also use the "map" method:
 
-     my $numbers = any(qw/1 2 3 4 5/);
-     my $prime   = $numbers->map( \&is_prime );
+      my $numbers = any(qw/1 2 3 4 5/);
+      my $prime   = $numbers->map( \&is_prime );
 
-     say for $prime->values; # prints 0, 1, 1, 0, 1
+      say for $prime->values; # prints 0, 1, 1, 0, 1
 
 EXPORT
     'all', 'any', 'none', 'one', as requested.
@@ -139,15 +137,44 @@ TO DO
 SEE ALSO
     This module is actually a fork of Perl6::Junction with very few
     (initial) changes. The reason being that we want to avoid the incendiary
-    name containing Perl6.
+    name containing Perl 6.
 
     Quantum::Superpositions provides the same functionality as this, and
     more. However, this module provides this limited functionality at a much
     greater runtime speed, with my benchmarks showing between 500% and 6000%
     improvement.
 
-    <http://dev.perl.org/perl6/doc/design/exe/E06.html> - "The Wonderful
-    World of Junctions".
+    <https://web.archive.org/web/20230922160729/https://raku.org/archive/doc
+    /design/exe/E06.html#The%20Wonderful%20World%20of%20Junctions> - "The
+    Wonderful World of Junctions".
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://github.com/haarg/Syntax-Keyword-Junction/issues>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+CONTRIBUTORS
+    *   Arthur Axel 'fREW' Schmidt <frioux@gmail.com>
+
+    *   Carl Franks <cpan@fireartist.com>
+
+    *   David Steinbrunner <dsteinbrunner@pobox.com>
+
+    *   Graham Knop <haarg@haarg.org>
+
+    *   Maxime SoulÃ© <btik-cpan@scoubidou.com>
+
+    *   Michael Schout <schoutm@gmail.com>
+
+    *   Olivier MenguÃ© <dolmen@cpan.org>
+
+    *   Paul Cochrane <paul.cochrane@posteo.de>
+
+    *   Ricardo Signes <rjbs@cpan.org>
+
+    *   Rob Hoelz <rob@hoelz.ro>
 
 AUTHORS
     *   Arthur Axel "fREW" Schmidt <frioux+cpan@gmail.com>
@@ -155,7 +182,7 @@ AUTHORS
     *   Carl Franks
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2014 by Arthur Axel "fREW" Schmidt.
+    This software is copyright (c) 2024 by Arthur Axel "fREW" Schmidt.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.

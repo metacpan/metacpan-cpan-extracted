@@ -139,10 +139,12 @@ Internals
     Requestors
     Cc
     AdminCc
+    Owner
     Subject
     Content
     Attach
     Due
+    TimeEstimated
 
     Any other argument to name is assumed to be the name of a custom field.
 

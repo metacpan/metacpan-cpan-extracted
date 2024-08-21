@@ -1,6 +1,6 @@
 package SPVM::R;
 
-our $VERSION = "0.100";
+our $VERSION = "0.101";
 
 1;
 
@@ -11,6 +11,24 @@ SPVM::R - Porting R language Features
 =head1 Description
 
 R class in L<SPVM> is a port of the L<R language|https://www.r-project.org/> features.
+
+=head1 Features
+
+=over 2
+
+=item * L<N-dimensional arrays|SPVM::R::NDArray> and L<their operations|SPVM::R::OP>, such as addition, subtraction, multiplication, division, modulo(or remainder), sum, max, min, mean, cumulative sum, cumulative product, trigonometric functions, exponential functions, log functions.
+
+=item * Support of L<sequence creation|SPVM::R::OP::Int/"seq">, L<repetition|SPVM::R::OP/"rep">, L<slice|SPVM::R::NDArray/"slice">, L<order|SPVM::R::NDArray/"order">, L<sort|SPVM::R::NDArray/"sort_asc"> of a n-dimensional array.
+
+=item * Various types of n-dimensional arrays(L<byte|SPVM::R::OP::Byte>, L<short|SPVM::R::OP::Short>, L<int|SPVM::R::OP::Int>, L<long|SPVM::R::OP::Long>, L<float|SPVM::R::OP::Float>, L<double|SPVM::R::OP::Double>, L<float complex|SPVM::R::OP::FloatComplex>, L<double complex|SPVM::R::OP::DoubleComplex>, L<string|SPVM::R::OP::String>, L<variable-length string|SPVM::R::OP::StringBuffer>, L<datetime|SPVM::R::OP::Time::Piece>).
+
+=item * Support of L<NA representation|SPVM::R::NDArray/"NA Representation">.
+
+=item * L<Data frame|SPVM::R::DataFrame> and L<its operations|SPVM::R::OP::DataFrame>.
+
+=item * Support of L<slice|SPVM::R::DataFrame/"slice">(L<subset|SPVM::R::OP::DataFrame/"subset">), L<order|SPVM::R::DataFrame/"order">, L<sort|SPVM::R::DataFrame/"sort"> of a data frame.
+
+=back
 
 =head1 Usage
 
@@ -180,6 +198,8 @@ L<SPVM::R Tutorial|https://github.com/yuki-kimoto/SPVM-R/wiki/SPVM%3A%3AR-Tutori
 =head2 Matrix Operations
 
 =over 2
+
+=item * L<R::OP::Matrix|SPVM::R::OP::Matrix>
 
 =item * L<R::OP::Matrix::Float|SPVM::R::OP::Matrix::Float>
 

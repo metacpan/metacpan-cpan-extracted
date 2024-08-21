@@ -21,7 +21,7 @@ our @ISA = qw(Rose::Object);
 
 our $Error;
 
-our $VERSION = '0.785';
+our $VERSION = '0.786';
 
 our $Debug = 0;
 
@@ -976,7 +976,20 @@ sub has_dbh { defined shift->{'dbh'} }
 sub dbi_connect
 {
   shift;
-  $Debug && warn "DBI->connect('$_[1]', '$_[2]', ...)\n";
+
+  if($Debug)
+  {
+    require Data::Dumper;
+    local $Data::Dumper::Terse = 1;
+    local $Data::Dumper::Indent = 1;
+    local $Data::Dumper::Maxdepth = 1;
+    local $Data::Dumper::Quotekeys = 0;
+    local $Data::Dumper::Sortkeys = 1;
+    my $options = Data::Dumper::Dumper($_[3] || {});
+    $options =~ s/\n\s*/ /g;
+    warn "DBI->connect('$_[0]', '$_[1]', ..., $options)\n";
+  }
+
   DBI->connect(@_);
 }
 

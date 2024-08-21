@@ -2,7 +2,7 @@ use warnings;
 use strict;
 use Test::More tests => 60;
 
-use_ok 'Set::Tiny';
+use Set::Tiny;
 
 my $a = Set::Tiny->new;
 my $b = Set::Tiny->new(qw( a b c ));
@@ -26,12 +26,14 @@ is $b->member('a'),  'a',   "member() is an alias for element()";
 is_deeply [ $a->elements ],      [],            "elements() of emtpy set";
 is_deeply [ sort $b->elements ], [qw( a b c )], "elements()";
 is_deeply [ sort $b->members ], [qw( a b c )],
-  "members() is an alias for elements()";
+    "members() is an alias for elements()";
 
 ok $b->contains(qw( a c )), to_s( $b, " contains 'a' and 'c'" );
 ok $b->has(qw( a c )),      "has() is an alias for contains()";
 ok !$a->contains('b'),      to_s( $a, " does not contain 'b'" );
 ok $a->contains(),          to_s( $a, " contains the empty list" );
+my @contains = $b->contains('z');
+is_deeply \@contains, [''], 'false contains return is boolean false';
 
 ok $a->is_null,  to_s( $a, " is empty" );
 ok !$b->is_null, to_s( $b, " is not empty" );
@@ -66,23 +68,23 @@ ok $a->is_disjoint($b),  to_s( $a, " and ", $b, " are disjoint" );
 ok !$b->is_disjoint($b), to_s( $b, " and ", $b, " are not disjoint" );
 
 ok !$a->is_properly_intersecting($b),
-  to_s( $a, " is not properly intersecting ", $b );
+    to_s( $a, " is not properly intersecting ", $b );
 ok !$a->is_properly_intersecting($a),
-  to_s( $a, " is not properly intersecting ", $a );
+    to_s( $a, " is not properly intersecting ", $a );
 ok !$b->is_properly_intersecting($b),
-  to_s( $b, " is not properly intersecting ", $b );
+    to_s( $b, " is not properly intersecting ", $b );
 
 my $c = Set::Tiny->new(qw( c d e ));
 ok $b->is_properly_intersecting($c),
-  to_s( $b, " is properly intersecting ", $c );
+    to_s( $b, " is properly intersecting ", $c );
 
 my $d1 = $b->difference($c);
 my $d2 = $c->difference($b);
 
 is $d1->as_string, '(a b)',
-  to_s( "difference of ", $b, " and ", $c, " is ", $d1 );
+    to_s( "difference of ", $b, " and ", $c, " is ", $d1 );
 is $d2->as_string, '(d e)',
-  to_s( "difference of ", $c, " and ", $b, " is ", $d2 );
+    to_s( "difference of ", $c, " and ", $b, " is ", $d2 );
 
 my $u  = $b->union($c);
 my $i  = $b->intersection($c);
@@ -90,17 +92,17 @@ my $i2 = $b->intersection2($c);
 my $s  = $b->symmetric_difference($c);
 
 is $u->as_string, '(a b c d e)',
-  to_s( "union of ", $b, " and ", $c, " is ", $u );
+    to_s( "union of ", $b, " and ", $c, " is ", $u );
 is $i->as_string, '(c)',
-  to_s( "intersection of ", $b, " and ", $c, " is ", $i );
+    to_s( "intersection of ", $b, " and ", $c, " is ", $i );
 is $i2->as_string, '(c)',
-  to_s( "intersection2 of ", $b, " and ", $c, " is ", $i2 );
+    to_s( "intersection2 of ", $b, " and ", $c, " is ", $i2 );
 is $s->as_string, '(a b d e)',
-  to_s( "symmetric difference of ", $b, " and ", $c, " is ", $s );
+    to_s( "symmetric difference of ", $b, " and ", $c, " is ", $s );
 
 $s = $b->unique($c);
 is $s->as_string, '(a b d e)',
-  "unique() is an alias for symmetric_difference()";
+    "unique() is an alias for symmetric_difference()";
 
 $b->clear;
 is $b->as_string, "()", "clear()";

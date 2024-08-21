@@ -4,7 +4,7 @@ package Alien::RtMidi;
 
 # ABSTRACT: Install RtMidi
 
-our $VERSION = '0.05';
+our $VERSION = '0.06';
 
 use parent qw/ Alien::Base /;
 
@@ -29,7 +29,7 @@ Alien::RtMidi - Install RtMidi
 
 =head1 VERSION
 
-version 0.05
+version 0.06
 
 =head1 SYNOPSIS
 
@@ -91,7 +91,7 @@ John Barrett <john@jbrt.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2023 by John Barrett.
+This software is copyright (c) 2024 by John Barrett.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

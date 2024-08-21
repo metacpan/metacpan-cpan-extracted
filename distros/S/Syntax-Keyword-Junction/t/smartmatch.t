@@ -1,16 +1,20 @@
 use strict;
+use warnings;
 use Test::More;
-use Test::Requires {
-   'Sub::Exporter' => 0.986,
-};
-no if $] > 5.017010, warnings => 'experimental::smartmatch';
+
+use Syntax::Keyword::Junction;
+use Syntax::Keyword::Junction::Base;
+
 BEGIN {
-    plan skip_all => "~~ support requires v5.10.1" unless $] >= 5.010001;
+  unless (Syntax::Keyword::Junction::Base::_WANT_SMARTMATCH) {
+    plan skip_all => "~~ support requires Perl version >= 5.10.1 and < 5.41.0";
+  }
 }
 
-plan tests => 16;
+no if Syntax::Keyword::Junction::Base::_SMARTMATCH_WARNING_CATEGORY,
+  warnings => Syntax::Keyword::Junction::Base::_SMARTMATCH_WARNING_CATEGORY;
 
-use syntax 'junction';
+plan tests => 16;
 
 my $is_1 = sub { $_[0] == 1 };
 my $is_2 = sub { $_[0] == 2 };

@@ -1,6 +1,11 @@
 Revision history for perl module Alien::RtMidi
 
-0.05 2022-02-00
+0.06 2024-06-20
+
+  - Updated for RtMidi v6
+  - Download via https only
+
+0.05 2023-03-13
 
   - Updated for RtMidi v5
   - Install point releases if they exist

@@ -57,11 +57,11 @@ msgid "Could not update description: %1"
 msgstr ""
 
 #. ($msg)
-#: html/Admin/FormTools/Create.html:62
+#: html/Admin/FormTools/Create.html:65
 msgid "Couldn't create the form: %1"
 msgstr ""
 
-#: html/Admin/FormTools/Advanced.html:95 html/Admin/FormTools/Modify.html:688
+#: html/Admin/FormTools/Advanced.html:97 html/Admin/FormTools/Modify.html:688
 msgid "Couldn't decode JSON"
 msgstr ""
 
@@ -76,12 +76,12 @@ msgid "Couldn't enable %1: %2"
 msgstr ""
 
 #. ($msg)
-#: html/Admin/FormTools/Advanced.html:105 html/Admin/FormTools/Modify.html:673 html/Admin/FormTools/Modify.html:722
+#: html/Admin/FormTools/Advanced.html:107 html/Admin/FormTools/Modify.html:673 html/Admin/FormTools/Modify.html:722
 msgid "Couldn't update content: %1"
 msgstr ""
 
 #. ($msg)
-#: html/Admin/FormTools/Advanced.html:84
+#: html/Admin/FormTools/Advanced.html:86
 msgid "Couldn't update name: %1"
 msgstr ""
 
@@ -98,7 +98,7 @@ msgid "Create, modify and disable forms"
 msgstr ""
 
 #. ($Description)
-#: html/Admin/FormTools/Create.html:56
+#: html/Admin/FormTools/Create.html:59
 msgid "Created form %1"
 msgstr ""
 
@@ -197,8 +197,14 @@ msgstr ""
 msgid "Invalid JSON"
 msgstr ""
 
+#. ($ARGS{Description})
+#. ($Description)
+#: html/Admin/FormTools/Advanced.html:73 html/Admin/FormTools/Create.html:70
+msgid "Invalid form name (can only contain letters, numbers, underscore, and spaces): %1"
+msgstr ""
+
 #. ($Queue)
-#: html/Admin/FormTools/Create.html:42
+#: html/Admin/FormTools/Create.html:45
 msgid "Invalid queue %1"
 msgstr ""
 
@@ -210,7 +216,7 @@ msgstr ""
 msgid "Left"
 msgstr ""
 
-#: html/Admin/FormTools/Advanced.html:90 html/Admin/FormTools/Create.html:29
+#: html/Admin/FormTools/Advanced.html:92 html/Admin/FormTools/Create.html:29
 msgid "Missing Name"
 msgstr ""
 
@@ -251,7 +257,7 @@ msgstr ""
 
 #. ($ARGS{Description})
 #. ($Description)
-#: html/Admin/FormTools/Advanced.html:76 html/Admin/FormTools/Create.html:36
+#: html/Admin/FormTools/Advanced.html:78 html/Admin/FormTools/Create.html:39
 msgid "Name %1 already exists"
 msgstr ""
 
@@ -295,7 +301,7 @@ msgstr ""
 msgid "Require if"
 msgstr ""
 
-#: html/FormTools/Field:165 html/FormTools/Field:354
+#: html/FormTools/Field:165 html/FormTools/Field:358
 msgid "Required"
 msgstr ""
 
@@ -347,7 +353,7 @@ msgstr ""
 msgid "Update"
 msgstr ""
 
-#: html/Admin/FormTools/Advanced.html:102 html/Admin/FormTools/Modify.html:670 html/Admin/FormTools/Modify.html:719
+#: html/Admin/FormTools/Advanced.html:104 html/Admin/FormTools/Modify.html:670 html/Admin/FormTools/Modify.html:719
 msgid "Updated content"
 msgstr ""
 
@@ -355,7 +361,7 @@ msgstr ""
 msgid "Updated description"
 msgstr ""
 
-#: html/Admin/FormTools/Advanced.html:81
+#: html/Admin/FormTools/Advanced.html:83
 msgid "Updated name"
 msgstr ""
 

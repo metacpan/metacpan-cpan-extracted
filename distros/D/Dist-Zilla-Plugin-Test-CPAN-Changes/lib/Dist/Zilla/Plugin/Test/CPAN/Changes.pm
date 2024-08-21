@@ -1,20 +1,70 @@
-package Dist::Zilla::Plugin::Test::CPAN::Changes;
+package Dist::Zilla::Plugin::Test::CPAN::Changes; # git description: v0.012-5-g02db9b7
 use strict;
 use warnings;
 # ABSTRACT: release tests for your changelog
-our $VERSION = '0.012'; # VERSION
+
+our $VERSION = '0.013';
 
 use Moose;
-use Data::Section -setup;
+use Sub::Exporter::ForMethods;
+use Data::Section 0.200002 { installer => Sub::Exporter::ForMethods::method_installer }, '-setup';
+
 with
     'Dist::Zilla::Role::FileGatherer',
-    'Dist::Zilla::Role::PrereqSource';
+    'Dist::Zilla::Role::PrereqSource',
+    'Dist::Zilla::Role::TextTemplate';
 
+#pod =head1 SYNOPSIS
+#pod
+#pod In C<dist.ini>:
+#pod
+#pod     [Test::CPAN::Changes]
+#pod
+#pod =begin :prelude
+#pod
+#pod =for test_synopsis BEGIN { die "SKIP: synopsis isn't perl code" }
+#pod
+#pod =end :prelude
+#pod
+#pod =head1 DESCRIPTION
+#pod
+#pod This is an extension of L<Dist::Zilla::Plugin::InlineFiles>, providing the
+#pod following file:
+#pod
+#pod     xt/release/cpan-changes.t - a standard Test::CPAN::Changes test
+#pod
+#pod See L<Test::CPAN::Changes> for what this test does.
+#pod
+#pod =head1 CONFIGURATION OPTIONS
+#pod
+#pod =head2 changelog
+#pod
+#pod The file name of the change log file to test. Defaults to F<Changes>.
+#pod
+#pod If you want to use a different filename for whatever reason, do:
+#pod
+#pod     [Test::CPAN::Changes]
+#pod     changelog = CHANGES
+#pod
+#pod and that file will be tested instead.
+#pod
+#pod =head2 filename
+#pod
+#pod The name of the test file to be generated. Defaults to
+#pod F<xt/release/cpan-changes.t>.
+#pod
+#pod =cut
 
 has changelog => (
     is      => 'ro',
     isa     => 'Str',
     default => 'Changes',
+);
+
+has filename => (
+    is      => 'ro',
+    isa     => 'Str',
+    default => 'xt/release/cpan-changes.t',
 );
 
 around dump_config => sub
@@ -24,6 +74,7 @@ around dump_config => sub
 
     $config->{+__PACKAGE__} = {
         changelog => $self->changelog,
+        filename  => $self->filename,
         blessed($self) ne __PACKAGE__
             ? ( version => (defined __PACKAGE__->VERSION ? __PACKAGE__->VERSION : 'dev') )
             : (),
@@ -31,26 +82,31 @@ around dump_config => sub
     return $config;
 };
 
+#pod =for Pod::Coverage gather_files register_prereqs
+#pod
+#pod =cut
 
 sub gather_files {
     my $self = shift;
 
     require Dist::Zilla::File::InMemory;
 
-    for my $file (qw( xt/release/cpan-changes.t )){
-        my $content = ${$self->section_data($file)};
+    my $content = ${$self->section_data('__TEST__')};
 
-        my $changes_filename = $self->changelog;
+    my $final_content = $self->fill_in_string(
+        $content,
+        {
+            changes_filename => \($self->changelog),
+            plugin           => \$self,
+        },
+    );
 
-        $content =~ s/CHANGESFILENAME/$changes_filename/;
-        $content =~ s/PLUGIN/ref($self)/e;
-        $content =~ s/VERSION/$self->VERSION || '<self>'/e;
+    $self->add_file( Dist::Zilla::File::InMemory->new(
+        name => $self->filename,
+        content => $final_content,
+    ));
 
-        $self->add_file( Dist::Zilla::File::InMemory->new(
-            name => $file,
-            content => $content,
-        ));
-    }
+    return;
 }
 
 # Register the release test prereq as a "develop requires"
@@ -87,7 +143,7 @@ Dist::Zilla::Plugin::Test::CPAN::Changes - release tests for your changelog
 
 =head1 VERSION
 
-version 0.012
+version 0.013
 
 =for test_synopsis BEGIN { die "SKIP: synopsis isn't perl code" }
 
@@ -106,41 +162,79 @@ following file:
 
 See L<Test::CPAN::Changes> for what this test does.
 
-=head2 Alternate changelog filenames
+=head1 CONFIGURATION OPTIONS
 
-L<CPAN::Changes::Spec> specifies that the changelog will be called 'Changes' -
-if you want to use a different filename for whatever reason, do:
+=head2 changelog
+
+The file name of the change log file to test. Defaults to F<Changes>.
+
+If you want to use a different filename for whatever reason, do:
 
     [Test::CPAN::Changes]
     changelog = CHANGES
 
 and that file will be tested instead.
 
+=head2 filename
+
+The name of the test file to be generated. Defaults to
+F<xt/release/cpan-changes.t>.
+
 =for Pod::Coverage gather_files register_prereqs
 
-=head1 AVAILABILITY
+=head1 SUPPORT
 
-The project homepage is L<http://metacpan.org/release/Dist-Zilla-Plugin-Test-CPAN-Changes/>.
+Bugs may be submitted through L<https://github.com/doherty/Dist-Zilla-Plugin-Test-CPAN-Changes/issues>.
 
-The latest version of this module is available from the Comprehensive Perl
-Archive Network (CPAN). Visit L<http://www.perl.com/CPAN/> to find a CPAN
-site near you, or see L<https://metacpan.org/module/Dist::Zilla::Plugin::Test::CPAN::Changes/>.
+There is also a mailing list available for users of this distribution, at
+L<http://dzil.org/#mailing-list>.
 
-=head1 SOURCE
+There is also an irc channel available for users of this distribution, at
+L<C<#distzilla> on C<irc.perl.org>|irc://irc.perl.org/#distzilla>.
 
-The development version is on github at L<http://github.com/doherty/Dist-Zilla-Plugin-Test-CPAN-Changes>
-and may be cloned from L<git://github.com/doherty/Dist-Zilla-Plugin-Test-CPAN-Changes.git>
-
-=head1 BUGS AND LIMITATIONS
-
-You can make new bug reports, and view existing ones, through the
-web interface at L<https://github.com/doherty/Dist-Zilla-Plugin-Test-CPAN-Changes/issues>.
+I am also usually active on irc, as 'ether' at C<irc.perl.org> and C<irc.libera.chat>.
 
 =head1 AUTHOR
 
 Mike Doherty <doherty@cpan.org>
 
-=head1 COPYRIGHT AND LICENSE
+=head1 CONTRIBUTORS
+
+=for stopwords Mike Doherty Karen Etheridge Olivier Mengué Graham Knop Kent Fredric Mark Gardner Nelo Onyiah
+
+=over 4
+
+=item *
+
+Mike Doherty <mike@mikedoherty.ca>
+
+=item *
+
+Karen Etheridge <ether@cpan.org>
+
+=item *
+
+Olivier Mengué <dolmen@cpan.org>
+
+=item *
+
+Graham Knop <haarg@haarg.org>
+
+=item *
+
+Kent Fredric <kentfredric@gmail.com>
+
+=item *
+
+Mark Gardner <mgardner@ariasystems.com>
+
+=item *
+
+Nelo Onyiah <nelo.onyiah@gmail.com>
+
+=back
+
+=head1 COPYRIGHT AND LICENCE
 
 This software is copyright (c) 2011 by Mike Doherty.
 
@@ -150,14 +244,14 @@ the same terms as the Perl 5 programming language system itself.
 =cut
 
 __DATA__
-__[ xt/release/cpan-changes.t ]__
+__[ __TEST__ ]__
 use strict;
 use warnings;
 
-# this test was generated with PLUGIN VERSION
+# this test was generated with {{ ref($plugin) . ' ' . $plugin->VERSION }}
 
 use Test::More 0.96 tests => 1;
 use Test::CPAN::Changes;
 subtest 'changes_ok' => sub {
-    changes_file_ok('CHANGESFILENAME');
+    changes_file_ok('{{ $changes_filename }}');
 };

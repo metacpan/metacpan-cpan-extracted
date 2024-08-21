@@ -1,5 +1,17 @@
 Revision history for JSON-Relaxed
 
+0.000
+
+	- Use TO_JSON or FREEZE method to serialize objects.
+	- Allow conversion of Data::Properties data (requires
+	  ChordPro::Config::Properties).
+	- Add overload for 0+ to booleans to fix problems with
+	  using booleans in numeric comparisons.
+	- Fix issue #5.
+	- Fix null not being stored in array.
+	- Fix pretty boolean ("true" instead of "1").
+	- Add conversion from/to YAML and TOML.
+
 0.096	2024-06-17
 
 	- More pretty strings.

@@ -25,7 +25,7 @@
 #
 ################################################################
 
-our $VERSION='1.0000740';
+our $VERSION='1.0000761';
 
 #print `env`,"\n\n\n";
 
@@ -582,7 +582,7 @@ END
    } return 0
 } 
 
-our $tee='';our $log='';
+our $tee='';our $log='';our $release='';
 $SIG{ INT } = sub{ eval { require Term::ReadKey };
                    unless ($@) { Term::ReadKey::ReadMode(0) };
                    print "\n";
@@ -1716,7 +1716,7 @@ sub look_inside_dir {
    return '';
 
 }
-   
+
 sub fa_install_mod {
    
    my $p=$_[0];
@@ -2210,23 +2210,68 @@ sub size_fmt {
    }
    return sprintf("%.2f TB",$size / (1024*1024*1024*1024));
 }
-if (exists $amazon{instance_type} && $amazon{instance_type}=~/micro|nano/) {
-   unless (grep { /CPAN|SKIP/ } @ARGV) {
-      my $cwd=&cwd;
-      my $argvs=join " ", @ARGV;
-      my $exec_cmd="sudo su -c 'sync;echo 3 > /proc/sys/vm/drop_caches';"
-                  ."cd \"$cwd\";$^X Makefile.PL $argvs CPAN";
-      exec $exec_cmd;
-   } elsif (!grep { /SKIP/ } @ARGV) {
-      pop @ARGV;
-      fa_system('sudo dnf -y install perl-Net-SSLeay.x86_64 perl-JSON.noarch');
-      eval {
-         local $SIG{__DIE__}; # No sigdie handler;
-         require CPAN;
-         {
-            CPAN::Shell->get('Capture::Tiny');
+if (exists $amazon{instance_type}) {
+   if ($amazon{instance_type}=~/micro|nano/) {
+      unless (grep { /CPAN|SKIP/ } @ARGV) {
+         my $cwd=&cwd;
+         my $argvs=join " ", @ARGV;
+         my $exec_cmd="sudo su -c 'sync;echo 3 > /proc/sys/vm/drop_caches';"
+                     ."swapoff -a && swapon -a;"
+                     ."cd \"$cwd\";$^X Makefile.PL $argvs CPAN";
+         exec $exec_cmd;
+      } elsif (!grep { /SKIP/ } @ARGV) {
+         pop @ARGV;
+         fa_system('sudo dnf -y install perl-YAML.noarch perl-Net-SSLeay.x86_64');
+         print "\n";
+	 my $memavail=`sudo cat /proc/meminfo | grep MemAvailable`;
+	 $memavail=~s/^.*?(\d+).*$/$1/s;
+	 print "MEMAVAIL=$memavail<==\n";
+         eval {
+            local $SIG{__DIE__}; # No sigdie handler
+            CPAN::HandleConfig->load;
+         };
+         my $low_mem=<<'END';
+
+    _    _____      __   __  __ ___ __  __  ___  _____   ___
+   | |  / _ \ \    / /  |  \/  | __|  \/  |/ _ \| _ \ \ / / |
+   | |_| (_) \ \/\/ /   | |\/| | _|| |\/| | (_) |   /\ V /|_|
+   |____\___/ \_/\_/    |_|  |_|___|_|  |_|\___/|_|_\ |_| (_)
+
+END
+         my $d = $CPAN::Config->{build_dir};
+	 $d=~s/^(.*)\/.*$/$1/;
+         $release=`cat $d/Metadata | grep -a Net-FullAuto`;
+	 chomp($release);
+	 $release=~s/^.*\n.*RE\/(.*)\s*CPAN.*$/$1/s;
+         $low_mem.=<<END;
+   Installing FullAuto on an Amazon AWS $amazon{instance_type} instance via
+   the commandline CPAN utility requires a different approach. The
+   CPAN utility places its entire module catalog in memory, and on
+   a $amazon{instance_type} instance, there just isn't the capacity
+   to make things work as expected. Instead, exit out of the CPAN
+   utility, and then restart it, but run the bottom command instead:
+
+   cpan[3]> exit  ( <== type 'exit' at prompt *first*, then restart cpan )
+
+   cpan[1]> install $release
+
+END
+         $memavail=`sudo cat /proc/meminfo | grep MemAvailable`;
+         my $mem_avail=$memavail;
+         $memavail=~s/^.*?(\d+).*$/$1/s;
+         print "$memavail\n\n";
+         if (int($mem_avail)<220000) {
+            print "$low_mem\n\n";
+            exit;
+         } else {
+            my $exec_cmd="sudo su -c 'sync;echo 3 > /proc/sys/vm/drop_caches';"
+                        ."swapoff -a && swapon -a;"
+                        ."$^X Makefile.PL SKIP CPAN";
+            exec $exec_cmd;
          }
-      };
+      }
+   } elsif (!grep { /SKIP/ } @ARGV) {
+      fa_system('sudo dnf -y install perl-YAML.noarch');
    }
 }
 print "\n";
@@ -2280,6 +2325,7 @@ if (($^O ne 'MSWin32') && ($^O ne 'MSWin64') && !grep { /^GETBERK$/ } @ARGV) {
    &fa_install_module('Locale::Maketext::Simple','install','Makefile');
    eval {
       local $SIG{__DIE__}; # No sigdie handler;
+      local $SIG{TERM};
       require Test::Tester;
    };
    if ($@) {
@@ -2315,6 +2361,7 @@ if (($^O ne 'MSWin32') && ($^O ne 'MSWin64') && !grep { /^GETBERK$/ } @ARGV) {
          /(?:use[-_]?)?internet|online|connect_to_internet_ok/i } @ARGV)) {
       eval {
          local $SIG{__DIE__}; # No sigdie handler;
+         local $SIG{TERM};  
          require CPAN;
          {
             local *STDOUT;
@@ -2336,6 +2383,7 @@ if (($^O ne 'MSWin32') && ($^O ne 'MSWin64') && !grep { /^GETBERK$/ } @ARGV) {
    }
    eval {
       local $SIG{__DIE__}; # No sigdie handler;
+      local $SIG{TERM};
       require Module::Build;
    };
    if ((!($@) && $Module::Build::VERSION<=$mod_build_version) || $@
@@ -2389,6 +2437,7 @@ if (($^O ne 'MSWin32') && ($^O ne 'MSWin64') && !grep { /^GETBERK$/ } @ARGV) {
    &fa_install_module('Regexp::IPv6','install','Makefile');
    eval {
       local $SIG{__DIE__}; # No sigdie handler
+      local $SIG{TERM};
       require Net::SSLeay;
    };
    if ($@) {
@@ -2447,6 +2496,7 @@ if (($^O ne 'MSWin32') && ($^O ne 'MSWin64') && !grep { /^GETBERK$/ } @ARGV) {
    &fa_install_module('PadWalker','install','Makefile');
    eval {
       local $SIG{__DIE__}; # No sigdie handler
+      local $SIG{TERM};
       require Data::Dump::Streamer;
    };
    if ($@ || grep { /-*(?:add|all)[-_]?dependencies/i } @ARGV) {
@@ -2477,8 +2527,8 @@ if (($^O ne 'MSWin32') && ($^O ne 'MSWin64') && !grep { /^GETBERK$/ } @ARGV) {
    &fa_install_module('IO::String','install','Makefile');
    &fa_install_module('Digest::HMAC','install','Makefile');
    &fa_install_module('Digest::SHA3','install','Makefile');
-   &fa_install_module('Types::Standard','install','Makefile');
    &fa_install_module('Exporter::Tiny','install','Makefile');
+   &fa_install_module('Types::Standard','install','Makefile');
    &fa_install_module('Type::Tiny','install','Makefile');
    &fa_install_module('Crypt::Cipher::AES','install','Makefile');
    &fa_install_module('Sub::Defer','install','Makefile');
@@ -2490,13 +2540,18 @@ if (($^O ne 'MSWin32') && ($^O ne 'MSWin64') && !grep { /^GETBERK$/ } @ARGV) {
    &fa_install_module('Sub::Exporter::Progressive','install','Makefile');
    &fa_install_module('Variable::Magic','install','Makefile');
    &fa_install_module('CPAN::Meta::Check','install','Makefile');
+   &fa_install_module('Dist::CheckConflicts','install','Makefile');
+   &fa_install_module('Module::Implementation','install','Makefile');
    &fa_install_module('Package::Stash::XS','install','Makefile');
    &fa_install_module('Package::Stash','install','Makefile');
-   &fa_install_module('Module::Implementation','install','Makefile');
-   &fa_install_module('namespace::clean','install','Makefile');
    &fa_install_module('B::Hooks::EndOfScope','install','Makefile');
+   &fa_install_module('B::Hooks::OP::Check','install','Makefile');
+   &fa_install_module('namespace::clean','install','Makefile');
    &fa_install_module('Sub::Identify','install','Makefile');
    &fa_install_module('namespace::autoclean','install','Makefile');
+   &fa_install_module('multidimensional','install','Makefile');
+   &fa_install_module('bareword::filehandles','install','Makefile');
+   &fa_install_module('indirect','install','Makefile');
    &fa_install_module('strictures','install','Makefile');
    &fa_install_module('Crypt::PBKDF2','install','Makefile');
    &fa_install_module('Crypt::CBC','install','Makefile');
@@ -2504,7 +2559,6 @@ if (($^O ne 'MSWin32') && ($^O ne 'MSWin64') && !grep { /^GETBERK$/ } @ARGV) {
    &fa_install_module('Test::Manifest','install','Makefile');
    &fa_install_module('Crypt::Rijndael','install','Makefile');
    &fa_install_module('File::Remove','install','Makefile');
-   &fa_install_module('Exporter::Tiny','install','Makefile');
    &fa_install_module('List::Util','install','Makefile');
    &fa_install_module('List::MoreUtils::XS','install','Makefile');
    &fa_install_module('List::MoreUtils','install','Makefile');
@@ -2524,11 +2578,7 @@ if (($^O ne 'MSWin32') && ($^O ne 'MSWin64') && !grep { /^GETBERK$/ } @ARGV) {
    &fa_install_module('MRO::Compat','install','Makefile');
    &fa_install_module('Sub::Install','install','Makefile');
    &fa_install_module('Data::OptList','install','Makefile');
-   &fa_install_module('B::Hooks::OP::Check','install','Makefile');
    &fa_install_module('Lexical::SealRequireHints','install','Build');
-   &fa_install_module('multidimensional','install','Makefile');
-   &fa_install_module('bareword::filehandles','install','Makefile');
-   &fa_install_module('indirect','install','Makefile');
    &fa_install_module('Devel::GlobalDestruction','install','Makefile');
    &fa_install_module('Import::Into','install','Makefile');
    &fa_install_module('Sub::Exporter','install','Makefile');
@@ -4496,6 +4546,7 @@ if (-e "/bin/grep") {
 my $get_BerkeleyDB=0;
 eval {
    local $SIG{__DIE__}; # No sigdie handler
+   local $SIG{TERM};
    require BerkeleyDB;
 };
 if ($@) {
@@ -4517,6 +4568,7 @@ if ($@) {
 my $cpan_error='';
 eval {
    local $SIG{__DIE__}; # No sigdie handler
+   local $SIG{TERM};
    require CPAN::Mini;
    import CPAN::Mini;
 };
@@ -4801,6 +4853,7 @@ my $B_flag=1;
 while (1) {
    eval {
       local $SIG{__DIE__}; # No sigdie handler
+      local $SIG{TERM};
       my %hash=();
       require BerkeleyDB;
       my $db = tie %hash, "BerkeleyDB::Btree",
@@ -5666,8 +5719,10 @@ if (keys %amazon) {
 } elsif (!exists $ENV{FA_BERKELEY}) {
    {
       local $SIG{__DIE__}; # No sigdie handler
+      local $SIG{TERM};
       eval {
          local $SIG{ALRM} = sub { die "alarm\n" }; # NB: \n required
+         local $SIG{TERM};
          alarm $timeout;
          my @list=();
          my %perms_menu=();

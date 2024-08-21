@@ -30,37 +30,44 @@ if ( $Create ) {
     push @results, loc('Missing Queue') unless $Queue;
 
     if ( $Description && $Queue ) {
-        my $form = RT::Attribute->new( $session{CurrentUser} );
-        my ($ret) = $form->LoadByCols( Name => 'FormTools Form', Description => $Description );
-        if ($ret) {
-            push @results, loc( 'Name [_1] already exists', $Description );
-        }
 
-        my $queue_obj = RT::Queue->new( $session{CurrentUser} );
-        $queue_obj->Load($Queue);
-        if ( !$queue_obj->Id ) {
-            push @results, loc( 'Invalid queue [_1]', $Queue );
-        }
+        if ( $Description =~ /^[\w\s]+$/ ) {
 
-        # It indicates something wrong if @results is not empty
-        if ( !@results ) {
-            my ( $ret, $msg ) = $form->Create(
-                Name        => 'FormTools Form',
-                Description => $ARGS{Description},
-                Object      => RT->System,
-                Content     => { queue => $queue_obj->Name },
-            );
-
+            my $form = RT::Attribute->new( $session{CurrentUser} );
+            my ($ret) = $form->LoadByCols( Name => 'FormTools Form', Description => $Description );
             if ($ret) {
-                MaybeRedirectForResults(
-                    Actions   => [ loc('Created form [_1]', $Description) ],
-                    Path      => '/Admin/FormTools/Modify.html',
-                    Arguments => { id => $form->Id },
+                push @results, loc( 'Name [_1] already exists', $Description );
+            }
+
+            my $queue_obj = RT::Queue->new( $session{CurrentUser} );
+            $queue_obj->Load($Queue);
+            if ( !$queue_obj->Id ) {
+                push @results, loc( 'Invalid queue [_1]', $Queue );
+            }
+
+            # It indicates something wrong if @results is not empty
+            if ( !@results ) {
+                my ( $ret, $msg ) = $form->Create(
+                    Name        => 'FormTools Form',
+                    Description => $ARGS{Description},
+                    Object      => RT->System,
+                    Content     => { queue => $queue_obj->Name },
                 );
+
+                if ($ret) {
+                    MaybeRedirectForResults(
+                        Actions   => [ loc('Created form [_1]', $Description) ],
+                        Path      => '/Admin/FormTools/Modify.html',
+                        Arguments => { id => $form->Id },
+                    );
+                }
+                else {
+                    push @results, loc( "Couldn't create the form: [_1]", $msg );
+                }
             }
-            else {
-                push @results, loc( "Couldn't create the form: [_1]", $msg );
-            }
+
+        } else {
+            push @results, loc("Invalid form name (can only contain letters, numbers, underscore, and spaces): [_1]", $Description);
         }
     }
 

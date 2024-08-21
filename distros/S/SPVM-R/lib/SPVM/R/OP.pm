@@ -23,6 +23,46 @@ R::OP class in L<SPVM> has methods for operations for L<R::NDArray|SPVM::R::NDAr
   
   my $equals_dim = R::OP->equals_dim($ndarray1, $ndarray2);
 
+=head1 Related Modules
+
+=over 2
+
+=item * L<R::OP|SPVM::R::OP>
+
+=item * L<R::OP::Byte|SPVM::R::OP::Byte>
+
+=item * L<R::OP::Short|SPVM::R::OP::Short>
+
+=item * L<R::OP::Int|SPVM::R::OP::Int>
+
+=item * L<R::OP::Long|SPVM::R::OP::Long>
+
+=item * L<R::OP::Float|SPVM::R::OP::Float>
+
+=item * L<R::OP::Double|SPVM::R::OP::Double>
+
+=item * L<R::OP::FloatComplex|SPVM::R::OP::FloatComplex>
+
+=item * L<R::OP::DoubleComplex|SPVM::R::OP::DoubleComplex>
+
+=item * L<R::OP::AnyObject|SPVM::R::OP::AnyObject>
+
+=item * L<R::OP::String|SPVM::R::OP::String>
+
+=item * L<R::OP::StringBuffer|SPVM::R::OP::StringBuffer>
+
+=item * L<R::OP::Time::Piece|SPVM::R::OP::Time::Piece>
+
+=item * L<R::OP::Matrix::Float|SPVM::R::OP::Matrix::Float>
+
+=item * L<R::OP::Matrix::Double|SPVM::R::OP::Matrix::Double>
+
+=item * L<R::OP::Matrix::FloatComplex|SPVM::R::OP::Matrix::FloatComplex>
+
+=item * L<R::OP::Matrix::DoubleComplex|SPVM::R::OP::Matrix::DoubleComplex>
+
+=back
+
 =head1 Class Methods
 
 =head2 equals_dim
@@ -86,46 +126,6 @@ Creates a new L<R::NDArray::Int|SPVM::R::NDArray::Int> object by performing L<R:
 Exceptions:
 
 The n-dimensional array $x_ndarray must be defined. Otherwise an exception is thrown.
-
-=head1 Related Modules
-
-=over 2
-
-=item * L<R::OP|SPVM::R::OP>
-
-=item * L<R::OP::Byte|SPVM::R::OP::Byte>
-
-=item * L<R::OP::Short|SPVM::R::OP::Short>
-
-=item * L<R::OP::Int|SPVM::R::OP::Int>
-
-=item * L<R::OP::Long|SPVM::R::OP::Long>
-
-=item * L<R::OP::Float|SPVM::R::OP::Float>
-
-=item * L<R::OP::Double|SPVM::R::OP::Double>
-
-=item * L<R::OP::FloatComplex|SPVM::R::OP::FloatComplex>
-
-=item * L<R::OP::DoubleComplex|SPVM::R::OP::DoubleComplex>
-
-=item * L<R::OP::AnyObject|SPVM::R::OP::AnyObject>
-
-=item * L<R::OP::String|SPVM::R::OP::String>
-
-=item * L<R::OP::StringBuffer|SPVM::R::OP::StringBuffer>
-
-=item * L<R::OP::Time::Piece|SPVM::R::OP::Time::Piece>
-
-=item * L<R::OP::Matrix::Float|SPVM::R::OP::Matrix::Float>
-
-=item * L<R::OP::Matrix::Double|SPVM::R::OP::Matrix::Double>
-
-=item * L<R::OP::Matrix::FloatComplex|SPVM::R::OP::Matrix::FloatComplex>
-
-=item * L<R::OP::Matrix::DoubleComplex|SPVM::R::OP::Matrix::DoubleComplex>
-
-=back
 
 =head1 See Also
 

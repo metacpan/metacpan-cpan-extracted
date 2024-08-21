@@ -3,7 +3,7 @@
 use v5.26;
 use strict;
 
-use Test::More tests => 3;
+use Test::More tests => 6;
 use JSON::Relaxed;
 note("JSON::Relaxed version $JSON::Relaxed::VERSION\n");
 
@@ -58,3 +58,38 @@ pdf.formats {
   first.footer : [ "%{copyright}" "" "" ]
 }
 EOD
+
+#### Object serialization
+
+my $data = { a => bless { "xx" => { a => "yy" } } => 'Ape' };
+
+# Used serializer.
+is( $p->encode( data => $data ), "a{a:yy}", "Objects" );
+
+package Ape {
+
+sub TO_JSON { $_[0]->{xx} }
+
+}
+
+$data = { a => bless {} => 'Nut' };
+
+# "true" is just another string.
+is( $p->encode( data => $data ), "a:\"true\"", "Objects" );
+
+package Nut {
+
+sub TO_JSON { "true" }
+
+}
+
+$data = { a => bless {} => 'Mice' };
+
+# A boolean object is boolean.
+is( $p->encode( data => $data ), "a:true", "Objects" );
+
+package Mice {
+
+sub TO_JSON { $JSON::Boolean::true }
+
+}

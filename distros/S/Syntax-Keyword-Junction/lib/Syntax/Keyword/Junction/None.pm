@@ -1,17 +1,18 @@
 package Syntax::Keyword::Junction::None;
-
 use strict;
 use warnings;
 
-our $VERSION = '0.003008'; # VERSION
+our $VERSION = '0.003009';
 
 use parent 'Syntax::Keyword::Junction::Base';
 
 BEGIN {
-  if ($] >= 5.010001) {
-    eval q|
+  if (Syntax::Keyword::Junction::Base::_WANT_SMARTMATCH) {
+    eval '#line '.(__LINE__+1).' "' . __FILE__.qq["\n] . <<'END_CODE' or die $@;
+no if Syntax::Keyword::Junction::Base::_SMARTMATCH_WARNING_CATEGORY,
+  warnings => Syntax::Keyword::Junction::Base::_SMARTMATCH_WARNING_CATEGORY;
+
 sub match {
-    no if $] > 5.017010, warnings => 'experimental::smartmatch';
     my ( $self, $other, $is_rhs ) = @_;
 
     if ($is_rhs) {
@@ -28,7 +29,9 @@ sub match {
 
     return 1;
 }
-|
+
+1;
+END_CODE
   }
 }
 
@@ -210,13 +213,16 @@ __END__
 
 =encoding UTF-8
 
-=head1 NAME
+=for :stopwords Arthur Axel "fREW" Schmidt Carl Franks
 
-Syntax::Keyword::Junction::None
+=head1 BUGS
 
-=head1 VERSION
+Please report any bugs or feature requests on the bugtracker website
+L<https://github.com/haarg/Syntax-Keyword-Junction/issues>
 
-version 0.003008
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
 
 =head1 AUTHORS
 
@@ -234,7 +240,7 @@ Carl Franks
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2014 by Arthur Axel "fREW" Schmidt.
+This software is copyright (c) 2024 by Arthur Axel "fREW" Schmidt.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

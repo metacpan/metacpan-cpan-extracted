@@ -35,3 +35,6 @@ Revision history for Perl extension Linux::loadavg.
 
 0.09  Sun Aug 17 10:33:00 2009
         - Removed C++ style commented out XS code
+
+0.10  Tue Aug 20 23:08:00 2024
+        - Updated XS code (borrowed some from Sys::LoadAvg)

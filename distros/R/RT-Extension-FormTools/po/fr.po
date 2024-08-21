@@ -65,11 +65,11 @@ msgid "Could not update description: %1"
 msgstr "Impossible de mettre à jour la description: %1"
 
 #. ($msg)
-#: html/Admin/FormTools/Create.html:62
+#: html/Admin/FormTools/Create.html:65
 msgid "Couldn't create the form: %1"
 msgstr "Impossible de créer le formulaire: %1"
 
-#: html/Admin/FormTools/Advanced.html:95 html/Admin/FormTools/Modify.html:688
+#: html/Admin/FormTools/Advanced.html:97 html/Admin/FormTools/Modify.html:688
 msgid "Couldn't decode JSON"
 msgstr "Impossible de décoder le JSON"
 
@@ -84,12 +84,12 @@ msgid "Couldn't enable %1: %2"
 msgstr "Impossible d'activer %1: %2"
 
 #. ($msg)
-#: html/Admin/FormTools/Advanced.html:105 html/Admin/FormTools/Modify.html:673 html/Admin/FormTools/Modify.html:722
+#: html/Admin/FormTools/Advanced.html:107 html/Admin/FormTools/Modify.html:673 html/Admin/FormTools/Modify.html:722
 msgid "Couldn't update content: %1"
 msgstr "Impossible de mettre à jour le contenu: %1"
 
 #. ($msg)
-#: html/Admin/FormTools/Advanced.html:84
+#: html/Admin/FormTools/Advanced.html:86
 msgid "Couldn't update name: %1"
 msgstr "Impossible de mettre à jour le nom: %1"
 
@@ -106,7 +106,7 @@ msgid "Create, modify and disable forms"
 msgstr "Créer, modifier et désactiver les formulaires"
 
 #. ($Description)
-#: html/Admin/FormTools/Create.html:56
+#: html/Admin/FormTools/Create.html:59
 msgid "Created form %1"
 msgstr "Formulaire %1 créé"
 
@@ -205,8 +205,14 @@ msgstr "Inclure les formulaires désactivés dans la liste."
 msgid "Invalid JSON"
 msgstr "JSON invalide"
 
+#. ($ARGS{Description})
+#. ($Description)
+#: html/Admin/FormTools/Advanced.html:73 html/Admin/FormTools/Create.html:70
+msgid "Invalid form name (can only contain letters, numbers, underscore, and spaces): %1"
+msgstr "Nom de formulaire invalide (ne peut contenir que des lettres, des chiffres, des tirets du bas et des espaces): %1"
+
 #. ($Queue)
-#: html/Admin/FormTools/Create.html:42
+#: html/Admin/FormTools/Create.html:45
 msgid "Invalid queue %1"
 msgstr "File %1 invalide"
 
@@ -218,7 +224,7 @@ msgstr "Libellé"
 msgid "Left"
 msgstr "Gauche"
 
-#: html/Admin/FormTools/Advanced.html:90 html/Admin/FormTools/Create.html:29
+#: html/Admin/FormTools/Advanced.html:92 html/Admin/FormTools/Create.html:29
 msgid "Missing Name"
 msgstr "Nom manquant"
 
@@ -259,7 +265,7 @@ msgstr "Nom"
 
 #. ($ARGS{Description})
 #. ($Description)
-#: html/Admin/FormTools/Advanced.html:76 html/Admin/FormTools/Create.html:36
+#: html/Admin/FormTools/Advanced.html:78 html/Admin/FormTools/Create.html:39
 msgid "Name %1 already exists"
 msgstr "Le nom %1 existe déjà"
 
@@ -303,7 +309,7 @@ msgstr "Requis"
 msgid "Require if"
 msgstr "Requis si"
 
-#: html/FormTools/Field:165 html/FormTools/Field:354
+#: html/FormTools/Field:165 html/FormTools/Field:358
 msgid "Required"
 msgstr "Requis"
 
@@ -355,7 +361,7 @@ msgstr "Impossible de définir l'icône du formulaire"
 msgid "Update"
 msgstr "Mettre à jour"
 
-#: html/Admin/FormTools/Advanced.html:102 html/Admin/FormTools/Modify.html:670 html/Admin/FormTools/Modify.html:719
+#: html/Admin/FormTools/Advanced.html:104 html/Admin/FormTools/Modify.html:670 html/Admin/FormTools/Modify.html:719
 msgid "Updated content"
 msgstr "Contenu mis à jour"
 
@@ -363,7 +369,7 @@ msgstr "Contenu mis à jour"
 msgid "Updated description"
 msgstr "Description mise à jour"
 
-#: html/Admin/FormTools/Advanced.html:81
+#: html/Admin/FormTools/Advanced.html:83
 msgid "Updated name"
 msgstr "Nom mis à jour"
 

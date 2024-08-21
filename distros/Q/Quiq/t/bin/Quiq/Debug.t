@@ -24,6 +24,17 @@ sub test_modulePaths : Test(1) {
 
 # -----------------------------------------------------------------------------
 
+sub test_findSubroutine : Test(0) {
+    my $self = shift;
+
+    # FIXME: Anpassen
+
+    # my $str = Quiq::Debug->findSubroutine;
+    # $self->like($str,qr|Quiq/Debug|);
+}
+
+# -----------------------------------------------------------------------------
+
 package main;
 Quiq::Debug::Test->runTests;
 
