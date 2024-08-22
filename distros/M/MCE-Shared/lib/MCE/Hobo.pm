@@ -13,7 +13,7 @@ no warnings qw( threads recursion uninitialized once redefine );
 
 package MCE::Hobo;
 
-our $VERSION = '1.891';
+our $VERSION = '1.892';
 
 ## no critic (BuiltinFunctions::ProhibitStringyEval)
 ## no critic (Subroutines::ProhibitExplicitReturnUndef)
@@ -112,9 +112,9 @@ sub init {
    $mngd->{MGR_ID} = "$$.$_tid", $mngd->{PKG} = $pkg,
    $mngd->{WRK_ID} =  $$;
 
-   &_force_reap($pkg), $_DATA->{$pkg}->clear() if ( exists $_LIST->{$pkg} );
+   &_force_reap($pkg), $_DATA->{$pkg}->clear() if ( defined $_LIST->{$pkg} );
 
-   if ( !exists $_LIST->{$pkg} ) {
+   if ( !defined $_LIST->{$pkg} ) {
       $MCE::_GMUTEX->lock() if ( $_tid && $MCE::_GMUTEX );
       sleep 0.015 if $_tid;
 
@@ -368,7 +368,7 @@ sub finish {
    if ( $pkg eq 'MCE' ) {
       for my $key ( keys %{ $_LIST } ) { MCE::Hobo->finish($key); }
    }
-   elsif ( exists $_LIST->{$pkg} ) {
+   elsif ( defined $_LIST->{$pkg} ) {
       return if $MCE::Signal::KILLED;
 
       if ( exists $_DELY->{$pkg} ) {
@@ -438,7 +438,7 @@ sub join {
 
    if ( $self->{REAPED} ) {
       _croak('Hobo already joined') unless exists( $self->{RESULT} );
-      $_LIST->{$pkg}->del($wrk_id) if ( exists $_LIST->{$pkg} );
+      $_LIST->{$pkg}->del($wrk_id) if ( defined $_LIST->{$pkg} );
 
       return ( defined wantarray )
          ? wantarray ? @{ delete $self->{RESULT} } : delete( $self->{RESULT} )->[-1]
@@ -503,14 +503,14 @@ sub list {
    _croak('Usage: MCE::Hobo->list()') if ref($_[0]);
    my $pkg = "$$.$_tid.".caller();
 
-   ( exists $_LIST->{$pkg} ) ? $_LIST->{$pkg}->vals() : ();
+   ( defined $_LIST->{$pkg} ) ? $_LIST->{$pkg}->vals() : ();
 }
 
 sub list_pids {
    _croak('Usage: MCE::Hobo->list_pids()') if ref($_[0]);
    my $pkg = "$$.$_tid.".caller(); local $_;
 
-   ( exists $_LIST->{$pkg} ) ? map { $_->pid } $_LIST->{$pkg}->vals() : ();
+   ( defined $_LIST->{$pkg} ) ? map { $_->pid } $_LIST->{$pkg}->vals() : ();
 }
 
 sub list_joinable {
@@ -561,7 +561,7 @@ sub pending {
    _croak('Usage: MCE::Hobo->pending()') if ref($_[0]);
    my $pkg = "$$.$_tid.".caller();
 
-   ( exists $_LIST->{$pkg} ) ? $_LIST->{$pkg}->len() : 0;
+   ( defined $_LIST->{$pkg} ) ? $_LIST->{$pkg}->len() : 0;
 }
 
 sub pid {
@@ -592,7 +592,7 @@ sub wait_all {
    my $pkg = "$$.$_tid.".caller();
 
    return wantarray ? () : 0
-      if ( !exists $_LIST->{$pkg} || !$_LIST->{$pkg}->len() );
+      if ( !defined $_LIST->{$pkg} || !$_LIST->{$pkg}->len() );
 
    local $_; ( wantarray )
       ? map { $_->join(); $_ } $_LIST->{$pkg}->vals()
@@ -606,7 +606,7 @@ sub wait_one {
    my $pkg = "$$.$_tid.".caller();
 
    return undef
-      if ( !exists $_LIST->{$pkg} || !$_LIST->{$pkg}->len() );
+      if ( !defined $_LIST->{$pkg} || !$_LIST->{$pkg}->len() );
 
    _wait_one($pkg);
 }
@@ -735,7 +735,7 @@ sub _exit {
 
 sub _force_reap {
    my ( $count, $pkg ) = ( 0, @_ );
-   return unless ( exists $_LIST->{$pkg} && $_LIST->{$pkg}->len() );
+   return unless ( defined $_LIST->{$pkg} && $_LIST->{$pkg}->len() );
 
    for my $hobo ( $_LIST->{$pkg}->vals() ) {
       next if $hobo->{IGNORE};
@@ -1010,7 +1010,7 @@ MCE::Hobo - A threads-like parallelization module
 
 =head1 VERSION
 
-This document describes MCE::Hobo version 1.891
+This document describes MCE::Hobo version 1.892
 
 =head1 SYNOPSIS
 

@@ -1,51 +1,44 @@
 
 SV *
-name(self)
-    SV *self
+name(FieldMeta *self)
   ALIAS:
     name  = 0
     sigil = 1
     class = 2
   CODE:
-  {
-    FieldMeta *meta = NUM2PTR(FieldMeta *, SvUV(SvRV(self)));
     switch(ix) {
       case 0:
-        RETVAL = SvREFCNT_inc(meta->name);
+        RETVAL = SvREFCNT_inc(self->name);
         break;
       case 1:
-        RETVAL = newSVpvn(SvPVX(meta->name), 1);
+        RETVAL = newSVpvn(SvPVX(self->name), 1);
         break;
       case 2:
         RETVAL = newSV(0);
-        sv_setref_uv(RETVAL, "Object::Pad::MOP::Class", PTR2UV(meta->class));
+        sv_setref_uv(RETVAL, "Object::Pad::MOP::Class", PTR2UV(self->class));
         break;
 
       default: RETVAL = NULL;
     }
-  }
   OUTPUT:
     RETVAL
 
 void
-value(self, obj)
-    SV *self
+value(FieldMeta *self, obj)
     SV *obj
   PPCODE:
   {
-    FieldMeta *meta = NUM2PTR(FieldMeta *, SvUV(SvRV(self)));
-    ClassMeta *classmeta = meta->class;
     SV *objrv;
 
     if(!SvROK(obj) || !SvOBJECT(objrv = SvRV(obj)))
       croak("Cannot fetch field value of a non-instance");
 
-    SV *value = get_obj_fieldsv(obj, classmeta, meta);
+    SV *value = get_obj_fieldsv(obj, self);
 
     /* We must prevent caller from assigning to non-scalar fields, in case
      * they break the SvTYPE of the value. We can't cancel the CvLVALUE but we
      * can yield a READONLY value in this case */
-    if(SvPV_nolen(meta->name)[0] != '$') {
+    if(SvPV_nolen(self->name)[0] != '$') {
       value = sv_mortalcopy(value);
       SvREADONLY_on(value);
     }
@@ -56,28 +49,22 @@ value(self, obj)
   }
 
 bool
-has_attribute(self, name)
-    SV *self
+has_attribute(FieldMeta *self, name)
     SV *name
   CODE:
   {
-    FieldMeta *meta = NUM2PTR(FieldMeta *, SvUV(SvRV(self)));
-
-    const struct FieldHook *hook = mop_field_get_attribute(meta, SvPV_nolen(name));
+    const struct FieldHook *hook = mop_field_get_attribute(self, SvPV_nolen(name));
     RETVAL = !!hook;
   }
   OUTPUT:
     RETVAL
 
 SV *
-get_attribute_value(self, name)
-    SV *self
+get_attribute_value(FieldMeta *self, name)
     SV *name
   CODE:
   {
-    FieldMeta *meta = NUM2PTR(FieldMeta *, SvUV(SvRV(self)));
-
-    const struct FieldHook *hook = mop_field_get_attribute(meta, SvPV_nolen(name));
+    const struct FieldHook *hook = mop_field_get_attribute(self, SvPV_nolen(name));
     if(!hook)
       croak("Field does not have an attribute called %" SVf, SVfARG(name));
 
@@ -87,14 +74,11 @@ get_attribute_value(self, name)
     RETVAL
 
 void
-get_attribute_values(self, name)
-    SV *self
+get_attribute_values(FieldMeta *self, name)
     SV *name
   PPCODE:
   {
-    FieldMeta *meta = NUM2PTR(FieldMeta *, SvUV(SvRV(self)));
-
-    AV *values = mop_field_get_attribute_values(meta, SvPV_nolen(name));
+    AV *values = mop_field_get_attribute_values(self, SvPV_nolen(name));
     if(!values)
       croak("Field does not have an attribute called %" SVf, SVfARG(name));
 

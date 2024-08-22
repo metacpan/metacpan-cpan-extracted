@@ -49,7 +49,7 @@ my $finder = Commandable::Finder::Packages->new(
 
    my $inv = Commandable::Invocation->new( "" );
 
-   is( [ $cmd->parse_invocation( $inv ) ], [ {} ],
+   is( [ $finder->parse_invocation( $cmd, $inv ) ], [ {} ],
       '$cmd->parse_invocation with no options' );
    ok( !length $inv->peek_remaining, '->parse_invocation consumed input' );
 }
@@ -60,7 +60,7 @@ my $finder = Commandable::Finder::Packages->new(
 
    my $inv = Commandable::Invocation->new( "--verbose" );
 
-   is( [ $cmd->parse_invocation( $inv ) ], [ { verbose => 1 } ],
+   is( [ $finder->parse_invocation( $cmd, $inv ) ], [ { verbose => 1 } ],
       '$cmd->parse_invocation with longname' );
    ok( !length $inv->peek_remaining, '->parse_invocation consumed input' );
 }
@@ -71,7 +71,7 @@ my $finder = Commandable::Finder::Packages->new(
 
    my $inv = Commandable::Invocation->new( "-v" );
 
-   is( [ $cmd->parse_invocation( $inv ) ], [ { verbose => 1 } ],
+   is( [ $finder->parse_invocation( $cmd, $inv ) ], [ { verbose => 1 } ],
       '$cmd->parse_invocation with shortname' );
    ok( !length $inv->peek_remaining, '->parse_invocation consumed input' );
 }
@@ -82,7 +82,7 @@ my $finder = Commandable::Finder::Packages->new(
 
    my $inv = Commandable::Invocation->new( "-h" );
 
-   is( [ $cmd->parse_invocation( $inv ) ], [ { hyphenated_name => 1 } ],
+   is( [ $finder->parse_invocation( $cmd, $inv ) ], [ { hyphenated_name => 1 } ],
       '$cmd->parse_invocation with hyphenated name' );
    ok( !length $inv->peek_remaining, '->parse_invocation consumed input' );
 }
@@ -93,7 +93,7 @@ my $finder = Commandable::Finder::Packages->new(
 
    my $inv = Commandable::Invocation->new( "--target TARG" );
 
-   is( [ $cmd->parse_invocation( $inv ) ], [ { target => "TARG" } ],
+   is( [ $finder->parse_invocation( $cmd, $inv ) ], [ { target => "TARG" } ],
       '$cmd->parse_invocation with space-separated value' );
    ok( !length $inv->peek_remaining, '->parse_invocation consumed input' );
 }
@@ -104,7 +104,7 @@ my $finder = Commandable::Finder::Packages->new(
 
    my $inv = Commandable::Invocation->new( "--target=TARG" );
 
-   is( [ $cmd->parse_invocation( $inv ) ], [ { target => "TARG" } ],
+   is( [ $finder->parse_invocation( $cmd, $inv ) ], [ { target => "TARG" } ],
       '$cmd->parse_invocation with equals-separated value' );
    ok( !length $inv->peek_remaining, '->parse_invocation consumed input' );
 }
@@ -115,7 +115,7 @@ my $finder = Commandable::Finder::Packages->new(
 
    my $inv = Commandable::Invocation->new( "--multi=one --multi two" );
 
-   is( [ $cmd->parse_invocation( $inv ) ], [ { multi => [ qw(one two) ] } ],
+   is( [ $finder->parse_invocation( $cmd, $inv ) ], [ { multi => [ qw(one two) ] } ],
       '$cmd->parse_invocation with repeated value' );
    ok( !length $inv->peek_remaining, '->parse_invocation consumed input' );
 }
@@ -126,7 +126,7 @@ my $finder = Commandable::Finder::Packages->new(
 
    my $inv = Commandable::Invocation->new( "" );
 
-   is( [ $cmd->parse_invocation( $inv ) ], [ { default => "value" } ],
+   is( [ $finder->parse_invocation( $cmd, $inv ) ], [ { default => "value" } ],
       '$cmd->parse_invocation with default option' );
    ok( !length $inv->peek_remaining, '->parse_invocation consumed input' );
 }
@@ -137,7 +137,7 @@ my $finder = Commandable::Finder::Packages->new(
 
    my $inv = Commandable::Invocation->new( "" );
 
-   is( [ $cmd->parse_invocation( $inv ) ], [ { silent => 1 } ],
+   is( [ $finder->parse_invocation( $cmd, $inv ) ], [ { silent => 1 } ],
       '$cmd->parse_invocation with negatable option' );
    ok( !length $inv->peek_remaining, '->parse_invocation consumed input' );
 }
@@ -148,7 +148,7 @@ my $finder = Commandable::Finder::Packages->new(
 
    my $inv = Commandable::Invocation->new( "--no-silent" );
 
-   is( [ $cmd->parse_invocation( $inv ) ], [ { silent => undef } ],
+   is( [ $finder->parse_invocation( $cmd, $inv ) ], [ { silent => undef } ],
       '$cmd->parse_invocation with negated option' );
    ok( !length $inv->peek_remaining, '->parse_invocation consumed input' );
 }
@@ -159,7 +159,7 @@ my $finder = Commandable::Finder::Packages->new(
 
    my $inv = Commandable::Invocation->new( "-v -v -v" );
 
-   is( [ $cmd->parse_invocation( $inv ) ], [ { verbose => 3 } ],
+   is( [ $finder->parse_invocation( $cmd, $inv ) ], [ { verbose => 3 } ],
       '$cmd->parse_invocation with repeated incrementable option' );
    ok( !length $inv->peek_remaining, '->parse_invocation consumed input' );
 }
@@ -170,7 +170,7 @@ my $finder = Commandable::Finder::Packages->new(
 
    my $inv = Commandable::Invocation->new( "-v3" );
 
-   like( dies { $cmd->parse_invocation( $inv ) },
+   like( dies { $finder->parse_invocation( $cmd, $inv ) },
       qr/^Unexpected value for parameter verbose/,
       '$cmd->parse_invocation fails with value to incrementable option' );
 }
@@ -182,13 +182,13 @@ my $finder = Commandable::Finder::Packages->new(
    my $inv = Commandable::Invocation->new( "-n1" );
 
    ok( lives {
-      is( [ $cmd->parse_invocation( $inv ) ], [ { number => 1 } ],
+      is( [ $finder->parse_invocation( $cmd, $inv ) ], [ { number => 1 } ],
          '$cmd->parse_invocation with integer-numerical option' );
       } );
 
    $inv = Commandable::Invocation->new( "-nBAD" );
 
-   like( dies { $cmd->parse_invocation( $inv ) },
+   like( dies { $finder->parse_invocation( $cmd, $inv ) },
       qr/^Value for parameter number must be an integer/,
       '$cmd->parse_invocation fails with non-integer value' );
 }

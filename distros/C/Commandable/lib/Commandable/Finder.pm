@@ -1,12 +1,13 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2021-2023 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2021-2024 -- leonerd@leonerd.org.uk
 
-package Commandable::Finder 0.11;
+package Commandable::Finder 0.12;
 
-use v5.14;
+use v5.26;
 use warnings;
+use experimental qw( signatures );
 
 use Carp;
 use List::Util 'max';
@@ -53,7 +54,7 @@ L<Commandable::Finder::Packages>
 
 =head2 configure
 
-   $finder = $finder->configure( %conf )
+   $finder = $finder->configure( %conf );
 
 Sets configuration options on the finder instance. Returns the finder instance
 itself, to permit easy chaining.
@@ -79,11 +80,8 @@ C<--verbose 3>).
 
 =cut
 
-sub configure
+sub configure ( $self, %conf )
 {
-   my $self = shift;
-   my %conf = @_;
-
    exists $conf{$_} and $self->{config}{$_} = delete $conf{$_}
       for qw( allow_multiple_commands require_order bundling );
 
@@ -94,23 +92,149 @@ sub configure
 
 =head2 find_commands
 
-   @commands = $finder->find_commands
+   @commands = $finder->find_commands;
 
 Returns a list of command instances, in no particular order. Each will be an
 instance of L<Commandable::Command>.
 
 =head2 find_command
 
-   $command = $finder->find_command( $cmdname )
+   $command = $finder->find_command( $cmdname );
 
 Returns a command instance of the given name as an instance of
 L<Commandable::Command>, or C<undef> if there is none.
 
 =cut
 
+=head2 parse_invocation
+
+   @vals = $finder->parse_invocation( $command, $cinv );
+
+I<Since version 0.12.>
+
+Parses values out of a L<Commandable::Invocation> instance according to the
+specification for the command's arguments. Returns a list of perl values
+suitable to pass into the function implementing the command.
+
+This method will throw an exception if mandatory arguments are missing.
+
+=cut
+
+sub parse_invocation ( $self, $command, $cinv )
+{
+   my @args;
+
+   if( my %optspec = $command->options ) {
+      push @args, my $opts = {};
+      my @remaining;
+
+      while( defined( my $token = $cinv->pull_token ) ) {
+         last if $token eq "--";
+
+         my $spec;
+         my $value_in_token;
+         my $token_again;
+
+         my $value = 1;
+         if( $token =~ s/^--([^=]+)(=|$)// ) {
+            my ( $opt, $equal ) = ($1, $2);
+            if( !$optspec{$opt} and $opt =~ /no-(.+)/ ) {
+               $spec = $optspec{$1} and $spec->negatable
+                  or die "Unrecognised option name --$opt\n";
+               $value = undef;
+            }
+            else {
+               $spec = $optspec{$opt} or die "Unrecognised option name --$opt\n";
+               $value_in_token = length $equal;
+            }
+         }
+         elsif( $token =~ s/^-(.)// ) {
+            $spec = $optspec{$1} or die "Unrecognised option name -$1\n";
+            if( $spec->mode_expects_value ) {
+               $value_in_token = length $token;
+            }
+            elsif( $self->{config}{bundling} and length $token and length($1) == 1 ) {
+               $token_again = "-$token";
+               undef $token;
+            }
+         }
+         else {
+            push @remaining, $token;
+            if( $self->{config}{require_order} ) {
+               last;
+            }
+            else {
+               next;
+            }
+         }
+
+         my $name = $spec->name;
+
+         if( $spec->mode_expects_value ) {
+            $value = $value_in_token ? $token
+                                     : ( $cinv->pull_token // die "Expected value for option --$name\n" );
+         }
+         else {
+            die "Unexpected value for parameter $name\n" if $value_in_token or length $token;
+         }
+
+         if( defined( my $typespec = $spec->typespec ) ) {
+            if( $typespec eq "i" ) {
+               $value =~ m/^-?\d+$/ or
+                  die "Value for parameter $name must be an integer\n";
+            }
+         }
+
+         $name =~ s/-/_/g;
+
+         if( $spec->mode eq "multi_value" ) {
+            push @{ $opts->{$name} }, $value;
+         }
+         elsif( $spec->mode eq "inc" ) {
+            $opts->{$name}++;
+         }
+         else {
+            $opts->{$name} = $value;
+         }
+
+         $token = $token_again, redo if defined $token_again;
+      }
+
+      $cinv->putback_tokens( @remaining );
+
+      foreach my $spec ( values %optspec ) {
+         my $name = $spec->name;
+         $opts->{$name} = $spec->default if defined $spec->default and !exists $opts->{$name};
+      }
+   }
+
+   foreach my $argspec ( $command->arguments ) {
+      my $val = $cinv->pull_token;
+      if( defined $val ) {
+         if( $argspec->slurpy ) {
+            my @vals = ( $val );
+            while( defined( $val = $cinv->pull_token ) ) {
+               push @vals, $val;
+            }
+            $val = \@vals;
+         }
+         push @args, $val;
+      }
+      elsif( !$argspec->optional ) {
+         die "Expected a value for '".$argspec->name."' argument\n";
+      }
+      else {
+         # optional argument was missing; this is the end of the args
+         last;
+      }
+   }
+
+   return @args;
+}
+
 =head2 find_and_invoke
 
-   $result = $finder->find_and_invoke( $cinv )
+   $result = $finder->find_and_invoke( $cinv );
 
 A convenient wrapper around the common steps of finding a command named after
 the initial token in a L<Commandable::Invocation>, parsing arguments from it,
@@ -122,11 +246,8 @@ while the invocation string is non-empty.
 
 =cut
 
-sub find_and_invoke
+sub find_and_invoke ( $self, $cinv )
 {
-   my $self = shift;
-   my ( $cinv ) = @_;
-
    my $multiple = $self->{config}{allow_multiple_commands};
 
    my $result;
@@ -137,7 +258,7 @@ sub find_and_invoke
       my $cmd = $self->find_command( $cmdname ) or
          die "Unrecognised command '$cmdname'";
 
-      my @args = $cmd->parse_invocation( $cinv );
+      my @args = $self->parse_invocation( $cmd, $cinv );
 
       !$multiple and length $cinv->peek_remaining and
          die "Unrecognised extra input: " . $cinv->peek_remaining . "\n";
@@ -155,24 +276,22 @@ sub find_and_invoke
 
 =head2 find_and_invoke_list
 
-   $result = $finder->find_and_invoke_list( @tokens )
+   $result = $finder->find_and_invoke_list( @tokens );
 
 A further convenience around creating a L<Commandable::Invocation> from the
 given list of values and using that to invoke a command.
 
 =cut
 
-sub find_and_invoke_list
+sub find_and_invoke_list ( $self, @args )
 {
-   my $self = shift;
-
    require Commandable::Invocation;
-   return $self->find_and_invoke( Commandable::Invocation->new_from_tokens( @_ ) );
+   return $self->find_and_invoke( Commandable::Invocation->new_from_tokens( @args ) );
 }
 
 =head2 find_and_invoke_ARGV
 
-   $result = $finder->find_and_invoke_ARGV()
+   $result = $finder->find_and_invoke_ARGV();
 
 A further convenience around creating a L<Commandable::Invocation> from the
 C<@ARGV> array and using that to invoke a command. Often this allows an entire
@@ -183,9 +302,9 @@ wrapper script to be created in a single line of code:
 
 =cut
 
-sub find_and_invoke_ARGV
+sub find_and_invoke_ARGV ( $self )
 {
-   shift->find_and_invoke_list( @ARGV );
+   $self->find_and_invoke_list( @ARGV );
 }
 
 =head1 BUILTIN COMMANDS
@@ -194,11 +313,8 @@ The following built-in commands are automatically provided.
 
 =cut
 
-sub add_builtin_commands
+sub add_builtin_commands ( $self, $commands )
 {
-   my $self = shift;
-   my ( $commands ) = @_;
-
    $commands->{help} =
       Commandable::Command->new(
          name => "help",
@@ -218,10 +334,8 @@ sub add_builtin_commands
 }
 
 # TODO: some pretty output formatting maybe using S:T:Terminal?
-sub _print_table2
+sub _print_table2 ( $sep, @rows )
 {
-   my ( $sep, @rows ) = @_;
-
    my $max_len = max map { length $_->[0] } @rows;
 
    Commandable::Output->printf( "%-*s%s%s\n",
@@ -250,12 +364,16 @@ descriptive text.
 With a command name argument, prints more descriptive text about that command,
 additionally detailing the arguments.
 
+The package that implements a particular command can provide more output by
+implementing a method called C<commandable_more_help>, which will take as a
+single argument the name of the command being printed. It should make use of
+the various printing methods in L<Commandable::Output> to generate whatever
+extra output it wishes.
+
 =cut
 
-sub builtin_command_helpsummary
+sub builtin_command_helpsummary ( $self )
 {
-   my $self = shift;
-
    my @commands = sort { $a->name cmp $b->name } $self->find_commands;
 
    _print_table2 ": ", map {
@@ -263,11 +381,8 @@ sub builtin_command_helpsummary
    } @commands;
 }
 
-sub builtin_command_helpcmd
+sub builtin_command_helpcmd ( $self, $cmdname )
 {
-   my $self = shift;
-   my ( $cmdname ) = @_;
-
    my $cmd = $self->find_command( $cmdname ) or
       die "Unrecognised command '$cmdname' - see 'help' for a list of commands\n";
 
@@ -333,6 +448,13 @@ sub builtin_command_helpcmd
            $_->description ]
       } @argspecs;
    }
+
+   my $cmdpkg = $cmd->package;
+   if( $cmdpkg->can( "commandable_more_help" ) ) {
+      $cmdpkg->commandable_more_help( $cmdname );
+   }
+
+   return 0;
 }
 
 =head1 AUTHOR

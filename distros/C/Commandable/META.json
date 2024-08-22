@@ -4,7 +4,7 @@
       "Paul Evans <leonerd@leonerd.org.uk>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.4231",
+   "generated_by" : "Module::Build version 0.4234",
    "license" : [
       "perl_5"
    ],
@@ -22,52 +22,53 @@
       "runtime" : {
          "requires" : {
             "Module::Pluggable::Object" : "0",
-            "perl" : "5.014"
+            "experimental" : "0",
+            "meta" : "0.003_003",
+            "perl" : "5.026"
          }
       },
       "test" : {
          "requires" : {
-            "Test2::V0" : "0",
-            "Test::NoWarnings" : "0"
+            "Test2::V0" : "0"
          }
       }
    },
    "provides" : {
       "Commandable" : {
          "file" : "lib/Commandable.pm",
-         "version" : "0.11"
+         "version" : "0.12"
       },
       "Commandable::Command" : {
          "file" : "lib/Commandable/Command.pm",
-         "version" : "0.11"
+         "version" : "0.12"
       },
       "Commandable::Finder" : {
          "file" : "lib/Commandable/Finder.pm",
-         "version" : "0.11"
+         "version" : "0.12"
       },
       "Commandable::Finder::MethodAttributes" : {
          "file" : "lib/Commandable/Finder/MethodAttributes.pm",
-         "version" : "0.11"
+         "version" : "0.12"
       },
       "Commandable::Finder::Packages" : {
          "file" : "lib/Commandable/Finder/Packages.pm",
-         "version" : "0.11"
+         "version" : "0.12"
       },
       "Commandable::Finder::SubAttributes" : {
          "file" : "lib/Commandable/Finder/SubAttributes.pm",
-         "version" : "0.11"
+         "version" : "0.12"
       },
       "Commandable::Finder::SubAttributes::Attrs" : {
          "file" : "lib/Commandable/Finder/SubAttributes/Attrs.pm",
-         "version" : "0.11"
+         "version" : "0.12"
       },
       "Commandable::Invocation" : {
          "file" : "lib/Commandable/Invocation.pm",
-         "version" : "0.11"
+         "version" : "0.12"
       },
       "Commandable::Output" : {
          "file" : "lib/Commandable/Output.pm",
-         "version" : "0.11"
+         "version" : "0.12"
       }
    },
    "release_status" : "stable",
@@ -76,6 +77,6 @@
          "http://dev.perl.org/licenses/"
       ]
    },
-   "version" : "0.11",
-   "x_serialization_backend" : "JSON::PP version 4.07"
+   "version" : "0.12",
+   "x_serialization_backend" : "JSON::PP version 4.16"
 }

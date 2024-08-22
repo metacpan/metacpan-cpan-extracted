@@ -62,9 +62,10 @@ use POSIX qw/strftime/;
 my $now = time; # The number of seconds since the Epoch, 1970-01-01 00:00:00 +0000 (UTC)
 my %t = ('s' => $now);
 my @fmt = qw/%a %A %b %B %d %e %H %I %j %m %M %p %S %U %w %W %y %Y/;
-my @adt = split /\s+/, strftime(join(' ', @fmt), localtime($now));
+my @adt = split /#+/, strftime(join('#', @fmt), localtime($now));
+#diag explain \@adt;
 for (@fmt) { s/%//; $t{$_} = shift @adt };
-#diag explain \%t;
+diag explain \%t;
 
 # RFC 3339/ISO 8601
 my $rfc = '%Y-%m-%dT%H:%M:%S';

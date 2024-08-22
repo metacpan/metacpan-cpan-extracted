@@ -8,10 +8,10 @@ my $build_requires = {
     };
 
 my $prereq_pm = {
+        'Acrux'                 => 0.05,    # Ubuntu = libacrux-perl                RHEL = perl-Acrux
         'Mojolicious'           => 7.94,    # Ubuntu = libmojolicious-perl          RHEL = perl-Mojolicious
-        'Mojolicious::Plugin::ConfigGeneral' => 1.02, # RHEL = perl-Mojolicious-Plugin-ConfigGeneral
+        'Mojolicious::Plugin::ConfigGeneral' => 1.04, # RHEL = perl-Mojolicious-Plugin-ConfigGeneral
         'WWW::Suffit'           => 1.08,    # Ubuntu = libwww-suffit-perl           RHEL = perl-WWW-Suffit
-        'WWW::Suffit::API'      => 1.00,    # Ubuntu = libwww-suffit-api-perl       RHEL = perl-WWW-Suffit-API
         'WWW::Suffit::Plugin::CommonHelpers'    => 1.00,    # Ubuntu = libwww-suffit-plugin-commonhelpers-perl  RHEL = perl-WWW-Suffit-Plugin-CommonHelpers
         'WWW::Suffit::Plugin::Syslog'           => 1.00,    # Ubuntu = libwww-suffit-plugin-syslog-perl         RHEL = perl-WWW-Suffit-Plugin-Syslog
     };

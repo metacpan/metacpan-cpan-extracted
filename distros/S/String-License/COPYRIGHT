@@ -294,20 +294,11 @@ Files: INSTALL
 Copyright: Unknown
 License: Unknown
 
-Files: Changes
- META.json
- META.yml
- dist.ini
- doap.ttl
- lib/String/License.pm
- lib/String/License/Naming.pm
- lib/String/License/Naming/Custom.pm
- lib/String/License/Naming/SPDX.pm
+Files: dist.ini
  t/OSI.t
  t/S-L-Names-Custom.t
  t/S-L-Names-SPDX.t
  t/SPDX.t
- t/Software-License.t
  t/basic-lib-no-RE2.t
  t/devscripts.t
  t/exception.t
@@ -315,10 +306,22 @@ Files: Changes
  t/flaws.t
  t/grant.t
  t/lib/Test2/Require/TestCorpus.pm
- t/lib/Test2/ScanCode.pm
  t/lib/Uncruft.pm
  t/license.t
 Copyright: Copyright 2023 Jonas Smedegaard.
+License: AGPL_3
+
+Files: Changes
+ META.json
+ META.yml
+ doap.ttl
+ lib/String/License.pm
+ lib/String/License/Naming.pm
+ lib/String/License/Naming/Custom.pm
+ lib/String/License/Naming/SPDX.pm
+ t/Software-License.t
+ t/lib/Test2/ScanCode.pm
+Copyright: Copyright 2024 Jonas Smedegaard.
 License: AGPL_3
 
 Files: COPYRIGHT
@@ -331,37 +334,37 @@ Files: t/grant/LGPL/Model.pm
 Copyright: Copyright 2016 Jonas Smedegaard.
 License: AGPL_3
 
-Files: t/devscripts/artistic-2-0-modules.pm
-Copyright: Copyright (C) 2009 by Moritz Lenz and the SVG::Plot contributors (see file.
-License: Artistic-2.0
-
 Files: Makefile.PL
 Copyright: Copyright 2020 Toby Inkster.
 License: GPL-1.0+ or Artistic-1.0
 
+Files: t/devscripts/artistic-2-0-modules.pm
+Copyright: Copyright (C) 2009 by Moritz Lenz and the SVG::Plot contributors (see file.
+License: Artistic-2.0
+
 License: AGPL_3
- This software is Copyright (c) 2023 by Jonas Smedegaard.
+ This software is Copyright (c) 2024 by Jonas Smedegaard.
  
  This is free software, licensed under:
  
    The GNU Affero General Public License, Version 3, November 2007
 
 License: Artistic-1.0
- This software is Copyright (c) 2023 by the copyright holder(s).
+ This software is Copyright (c) 2024 by the copyright holder(s).
  
  This is free software, licensed under:
  
    The Artistic License 1.0
 
 License: GPL-1.0
- This software is Copyright (c) 2023 by the copyright holder(s).
+ This software is Copyright (c) 2024 by the copyright holder(s).
  
  This is free software, licensed under:
  
    The GNU General Public License, Version 1, February 1989
 
 License: Artistic-2.0
- This software is Copyright (c) 2023 by the copyright holder(s).
+ This software is Copyright (c) 2024 by the copyright holder(s).
  
  This is free software, licensed under:
  

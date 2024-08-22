@@ -1,12 +1,13 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2021 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2021-2024 -- leonerd@leonerd.org.uk
 
-package Commandable::Finder::SubAttributes 0.11;
+package Commandable::Finder::SubAttributes 0.12;
 
-use v5.14;
+use v5.26;
 use warnings;
+use experimental qw( signatures );
 use base qw( Commandable::Finder );
 
 use Carp;
@@ -108,12 +109,11 @@ provided by the invocation.
 
 =cut
 
-sub import
+sub import ( $pkg, @syms )
 {
-   my $pkg = shift;
    my $caller = caller;
 
-   foreach ( @_ ) {
+   foreach ( @syms ) {
       if( $_ eq ":attrs" ) {
          HAVE_ATTRIBUTE_STORAGE or
             croak "Cannot import :attrs as Attribute::Storage is not available";
@@ -166,11 +166,8 @@ configuration options.
 
 =cut
 
-sub new
+sub new ( $class, %args )
 {
-   my $class = shift;
-   my %args = @_;
-
    HAVE_ATTRIBUTE_STORAGE or
       croak "Cannot create a $class as Attribute::Storage is not available";
 
@@ -215,30 +212,23 @@ these are particularly convenient for wrapper scripts:
 
 =cut
 
-sub new_for_caller
+sub new_for_caller ( $class, @args )
 {
-   my $class = shift;
-   return $class->new( package => scalar caller, @_ );
+   return $class->new( package => scalar caller, @args );
 }
 
-sub new_for_main
+sub new_for_main ( $class, @args )
 {
-   my $class = shift;
-   return $class->new( package => "main", @_ );
+   return $class->new( package => "main", @args );
 }
 
-sub _wrap_code
+sub _wrap_code ( $self, $code )
 {
-   my $self = shift;
-   my ( $code ) = @_;
-
    return $code;
 }
 
-sub _commands
+sub _commands ( $self )
 {
-   my $self = shift;
-
    my $prefix = qr/$self->{name_prefix}/;
 
    my %subs = Attribute::Storage::find_subs_with_attr(
@@ -273,7 +263,6 @@ sub _commands
          options     => $opts,
          package     => $self->{package},
          code        => $self->_wrap_code( $code ),
-         config      => $self->{config},
       );
    }
 
@@ -282,18 +271,13 @@ sub _commands
    return \%commands;
 }
 
-sub find_commands
+sub find_commands ( $self )
 {
-   my $self = shift;
-
    return values %{ $self->_commands };
 }
 
-sub find_command
+sub find_command ( $self, $cmd )
 {
-   my $self = shift;
-   my ( $cmd ) = @_;
-
    return $self->_commands->{$cmd};
 }
 

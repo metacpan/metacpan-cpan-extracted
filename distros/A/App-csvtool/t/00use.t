@@ -6,6 +6,7 @@ use warnings;
 use Test2::V0;
 
 require App::csvtool;
+require App::csvtool::Smudge;
 require App::csvtool::Timetools;
 
 pass( "Modules loaded" );

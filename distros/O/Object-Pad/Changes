@@ -1,5 +1,14 @@
 Revision history for Object-Pad
 
+0.811   2024-08-21
+        [CHANGES]
+         * Accept requesting additional attributes to the
+           `$classmeta->add_field` MOP method
+         * XS API changes:
+            + `get_obj_fieldsv()` does not need to take a ClassMeta argument
+            + Added `mop_field_get_class()`
+            + Added `get_field_for_padix()`
+
 0.810   2024-08-10
         [CHANGES]
          * Use `File::ShareDir` for storing .h include file, rather than

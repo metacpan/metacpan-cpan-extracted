@@ -10,7 +10,68 @@ WWW::Suffit::Server - The Suffit API web-server class
 
 =head1 SYNOPSIS
 
-    WWW::Suffit::Server;
+    use Mojo::File qw/ path /;
+
+    my $root = path()->child('test')->to_string;
+    my $app = MyApp->new(
+        project_name => 'MyApp',
+        project_version => '0.01',
+        moniker => 'myapp',
+        debugmode => 1,
+        loglevel => 'debug',
+        max_history_size => 25,
+
+        # System
+        uid => 1000,
+        gid => 1000,
+
+        # Dirs and files
+        homedir => path($root)->child('share')->make_path->to_string,
+        datadir => path($root)->child('var')->make_path->to_string,
+        tempdir => path($root)->child('tmp')->make_path->to_string,
+        documentroot => path($root)->child('www')->make_path->to_string,
+        logfile => path($root)->child('log')->make_path->child('myapp.log')->to_string,
+        pidfile => path($root)->child('run')->make_path->child('myapp.pid')->to_string,
+
+        # Server
+        server_addr => '*',
+        server_port => 8080,
+        server_url => 'http://127.0.0.1:8080',
+        trustedproxies => ['127.0.0.1'],
+        accepts => 10000,
+        clients => 1000,
+        requests => 100,
+        workers => 4,
+        spare => 2,
+        reload_sig => 'USR2',
+        no_daemonize => 1,
+
+        # Security
+        mysecret => 'Eph9Ce$quo.p2@oW3',
+        rsa_keysize => 2048,
+        private_key => undef, # Auto
+        public_key => undef, # Auto
+
+        # Initialization options
+        all_features    => 'no',
+        config_opts     => {
+            file => path($root)->child('etc')->make_path->child('myapp.conf')->to_string,
+            defaults => {foo => 'bar'},
+        },
+    );
+
+    # Run preforked application
+    $app->preforked_run( 'start' );
+
+    1;
+
+    package MyApp;
+
+    use Mojo::Base 'WWW::Suffit::Server';
+
+    sub init { shift->routes->any('/' => {text => 'Hello World!'}) }
+
+    1;
 
 =head1 DESCRIPTION
 
@@ -24,7 +85,38 @@ This module provides API web-server functionality
         # ...
     }
 
+Options passed as arguments to the startup function allow you to customize
+the initialization of plugins at the level of your descendant class, and
+options are considered to have higher priority than attributes of the same name.
+
 List of allowed options (pairs of name-value):
+
+=head2 admin_routes_opts
+
+    admin_routes_opts => {
+        prefix_path => "/admin",
+        prefix_name => "admin",
+    }
+
+=over 8
+
+=item prefix_name
+
+    prefix_name => "admin"
+
+This option defines prefix of admin api route name
+
+Default: 'admin'
+
+=item prefix_path
+
+    prefix_path => "/admin"
+
+This option defines prefix of admin api route
+
+Default: '/admin'
+
+=back
 
 =head2 all_features
 
@@ -34,16 +126,95 @@ This option enables all of the init_* options, which are described bellow
 
 Default: off
 
+=head2 api_routes_opts
+
+    api_routes_opts => {
+        prefix_path => "/api",
+        prefix_name => "api",
+    }
+
+=over 8
+
+=item prefix_name
+
+    prefix_name => "api"
+
+This option defines prefix of api route name
+
+Default: 'api'
+
+=item prefix_path
+
+    prefix_path => "/api"
+
+This option defines prefix of api route
+
+Default: '/api'
+
+=back
+
+=head2 authdb_opts
+
+    authdb_opts => {
+        uri => "sqlite://<PATH_TO_DB_FILE>?sqlite_unicode=1",
+        cachedconnection => 'on',
+        cacheexpiration => 300,
+        cachemaxkeys => 1024*1024,
+        sourcefile => '/tmp/authdb.json',
+    }
+
+=over 8
+
+=item uri, url
+
+    uri => "sqlite:///tmp/auth.db?sqlite_unicode=1",
+
+Default: See config C<AuthDBURL> or C<AuthDBURI> directive
+
+=item cachedconnection
+
+    cachedconnection => 'on',
+
+Default: See config C<AuthDBCachedConnection> directive. Default: on
+
+=item cacheexpire, cacheexpiration
+
+    cacheexpiration => 300,
+
+Default: See config C<AuthDBCacheExpire> or C<AuthDBCacheExpiration> directive. Default: 300
+
+=item cachemaxkeys
+
+    cachemaxkeys => 1024*1024,
+
+Default: See config C<AuthDBCacheMaxKeys> directive. Default: 1024*1024
+
+=item sourcefile
+
+    sourcefile => '/tmp/authdb.json',
+
+Default: See config C<AuthDBSourceFile> directive
+
+=back
+
 =head2 config_opts
 
     config_opts => { ... }
 
-This option sets L<WWW::Suffit::Plugin::ConfigGeneral> plugin options
+This option sets L<Mojolicious::Plugin::ConfigGeneral> plugin options
 
 Default:
 
     `noload => 1` if $self->configobj exists
     `defaults => $self->config` if $self->config is not void
+
+=head2 init_admin_routes
+
+    init_admin_routes => 'on'
+
+This option enables Admin Suffit API routes
+
+Default: off
 
 =head2 init_authdb
 
@@ -57,7 +228,7 @@ Default: off
 
     init_api_routes => 'on'
 
-Enable Suffit API routes
+This option enables Suffit API routes
 
 Default: off
 
@@ -66,6 +237,14 @@ Default: off
     init_rsa_keys => 'on'
 
 This option enables RSA keys initialize
+
+Default: off
+
+=head2 init_user_routes
+
+    init_user_routes => 'on'
+
+This option enables User Suffit API routes
 
 Default: off
 
@@ -78,6 +257,33 @@ This option sets L<WWW::Suffit::Plugin::Syslog> plugin options
 Default:
 
     `enable => 1` if the `Log` config directive is "syslog"
+
+=head2 user_routes_opts
+
+    user_routes_opts => {
+        prefix_path => "/user",
+        prefix_name => "user",
+    }
+
+=over 8
+
+=item prefix_name
+
+    prefix_name => "user"
+
+This option defines prefix of user api route name
+
+Default: 'user'
+
+=item prefix_path
+
+    prefix_path => "/user"
+
+This option defines prefix of user api route
+
+Default: '/user'
+
+=back
 
 =head1 ATTRIBUTES
 
@@ -226,13 +432,13 @@ Default: current class name
 
 =head2 private_key
 
-    private_key => '...',
+    private_key => '...'
 
 Private RSA key
 
 =head2 project_version
 
-    project_version => '0.01',
+    project_version => '0.01'
 
 The project version. For example: 1.00
 
@@ -262,6 +468,16 @@ See L<Mojo::Server::Daemon/max_requests>
 The signal name that will be used to receive reload commands from the system
 
 Default: USR2
+
+=head2 rsa_keysize
+
+    rsa_keysize => 2048
+
+RSA key size
+
+See C<RSA_KeySize> configuration directive
+
+Default: 2048
 
 =head2 server_addr
 
@@ -334,6 +550,13 @@ See L<Mojo::Server::Prefork/workers>
 
 This class inherits all methods from L<Mojolicious> and implements the following new ones
 
+=head2 init
+
+    $app->init;
+
+This is your main hook into the Suffit application, it will be called at application startup
+immediately after calling the Mojolicious startup hook. Meant to be overloaded in a your subclass
+
 =head2 listeners
 
 This method returns server listeners as list of URLs
@@ -393,7 +616,7 @@ The reload hook
 
 =head2 startup
 
-Mojolicious application startup method
+Main L<Mojolicious/startup> hook
 
 =head1 HELPERS
 
@@ -403,6 +626,35 @@ This class implements the following helpers
 
 This is access method to the AuthDB object (state object)
 
+=head2 clientid
+
+    my $clientid = $app->clientid;
+
+This helper returns client ID that calculates from C<User-Agent>
+and C<Remote-Address> headers:
+
+    md5(User-Agent . Remote-Address)
+
+=head2 gen_cachekey
+
+    my $cachekey = $app->gen_cachekey;
+    my $cachekey = $app->gen_cachekey(16);
+
+This helper helps generate the new CacheKey for caching user data
+that was got from authorization database
+
+=head2 gen_rsakeys
+
+    my %keysdata = $app->gen_rsakeys;
+    my %keysdata = $app->gen_rsakeys( 2048 );
+
+This helper generates RSA keys pair and returns structure as hash:
+
+    private_key => '...',
+    public_key  => '...',
+    key_size    => 2048,
+    error       => '...',
+
 =head2 jwt
 
 This helper makes JWT object with RSA keys and returns it
@@ -410,6 +662,458 @@ This helper makes JWT object with RSA keys and returns it
 =head2 token
 
 This helper performs get of current token from HTTP Request headers
+
+=head1 CONFIGURATION
+
+This class supports the following configuration directives
+
+=head2 GENERAL DIRECTIVES
+
+=over 8
+
+=item Log
+
+    Log         Syslog
+    Log         File
+
+This directive defines the log provider. Supported providers: C<File>, C<Syslog>
+
+Default: File
+
+=item LogFile
+
+    LogFile     /var/log/myapp.log
+
+This directive sets the path to logfile
+
+Default: /var/log/E<lt>MONIKERE<gt>.log
+
+=item LogLevel
+
+    LogLevel    warn
+
+This directive defines log level.
+
+Available log levels are C<trace>, C<debug>, C<info>, C<warn>, C<error> and C<fatal>, in that order.
+
+Default: warn
+
+=back
+
+=head2 SERVER DIRECTIVES
+
+=over 8
+
+=item ListenURL
+
+    ListenURL http://127.0.0.1:8008
+    ListenURL http://127.0.0.1:8009
+    ListenURL 'https://*:3000?cert=/x/server.crt&key=/y/server.key&ca=/z/ca.crt'
+
+Directives that specify additional listening addresses in URL form
+
+B<NOTE!> This is a multiple directive
+
+Default: none
+
+=item ListenAddr
+
+    ListenAddr  *
+    ListenAddr  0.0.0.0
+    ListenAddr  127.0.0.1
+
+This directive sets the master listen address
+
+Default: * (0.0.0.0)
+
+=item ListenPort
+
+    ListenPort  8080
+    ListenPort  80
+    ListenPort  443
+
+This directive sets the master listen port
+
+Default: 8080
+
+=item Accepts
+
+    Accepts     0
+
+Maximum number of connections a worker is allowed to accept, before
+stopping gracefully and then getting replaced with a newly started worker,
+defaults to the value of "accepts" in L<Mojo::Server::Prefork>.
+Setting the value to 0 will allow workers to accept new connections
+indefinitely
+
+Default: 0
+
+=item Clients
+
+    Clients     1000
+
+Maximum number of accepted connections each worker process is allowed to
+handle concurrently, before stopping to accept new incoming connections,
+defaults to 100. Note that high concurrency works best with applications
+that perform mostly non-blocking operations, to optimize for blocking
+operations you can decrease this value and increase "workers" instead
+for better performance
+
+Default: 1000
+
+=item Requests
+
+    Requests    100
+
+Maximum number of keep-alive requests per connection
+
+Default: 100
+
+=item Spare
+
+    Spare       2
+
+Temporarily spawn up to this number of additional workers if there
+is a need, defaults to 2. This allows for new workers to be started while
+old ones are still shutting down gracefully, drastically reducing the
+performance cost of worker restarts
+
+Default: 2
+
+=item Workers
+
+    Workers     4
+
+Number of worker processes, defaults to 4. A good rule of thumb is two
+worker processes per CPU core for applications that perform mostly
+non-blocking operations, blocking operations often require more and
+benefit from decreasing concurrency with "clients" (often as low as 1)
+
+Default: 4
+
+=item TrustedProxy
+
+    TrustedProxy  127.0.0.1
+    TrustedProxy  10.0.0.0/8
+    TrustedProxy  172.16.0.0/12
+    TrustedProxy  192.168.0.0/16
+    TrustedProxy  fc00::/7
+
+Trusted reverse proxies, addresses or networks in C<CIDR> form.
+The real IP address takes from C<X-Forwarded-For> header
+
+B<NOTE!> This is a multiple directive
+
+Default: All reverse proxies will be passed
+
+=item Reload_Sig
+
+    Reload_Sig  USR2
+    Reload_Sig  HUP
+
+This directive sets the dafault signal name that will be used to receive reload commands from the system
+
+Default: USR2
+
+=back
+
+=head2 SSL/TLS SERVER DIRECTIVES
+
+=over 8
+
+=item TLS
+
+    TLS         enabled
+
+This directive enables or disables the TLS (https) listening
+
+Default: disabled
+
+=item TLS_CA, TLS_Cert, TLS_Key
+
+    TLS_CA      certs/ca.crt
+    TLS_Cert    certs/server.crt
+    TLS_Key     certs/server.key
+
+Paths to TLS files. Absolute or relative paths (started from /etc/E<lt>MONIKERE<gt>)
+
+B<TLS_CA> - Path to TLS certificate authority file used to verify the peer certificate.
+B<TLS_Cert> - Path to the TLS cert file, defaults to a built-in test certificate.
+B<TLS_Key> - Path to the TLS key file, defaults to a built-in test key
+
+Default: none
+
+=item TLS_Ciphers, TLS_Verify, TLS_Version
+
+    TLS_Version     TLSv1_2
+    TLS_Ciphers     AES128-GCM-SHA256:RC4:HIGH:!MD5:!aNULL:!EDH
+    TLS_Verify      0x00
+
+Directives for setting TLS extra data
+
+TLS cipher specification string. For more information about the format see
+L<https://www.openssl.org/docs/manmaster/man1/ciphers.html/CIPHER-STRINGS>.
+B<TLS_Verify> - TLS verification mode. B<TLS_Version> - TLS protocol version.
+
+Default: none
+
+=item TLS_FD, TLS_Reuse, TLS_Single_Accept
+
+B<TLS_FD> - File descriptor with an already prepared listen socket.
+B<TLS_Reuse> - Allow multiple servers to use the same port with the C<SO_REUSEPORT> socket option.
+B<TLS_Single_Accept> - Only accept one connection at a time.
+
+=back
+
+=head2 SECURITY DIRECTIVES
+
+=over 8
+
+=item PrivateKeyFile, PublicKeyFile
+
+    PrivateKeyFile /var/lib/myapp/rsa-private.key
+    PublicKeyFile  /var/lib/myapp/rsa-public.key
+
+Private and Public RSA key files
+If not possible to read files by the specified paths, they will
+be created automatically
+
+Defaults:
+
+    PrivateKeyFile /var/lib/E<lt>MONIKERE<gt>/rsa-private.key
+    PublicKeyFile  /var/lib/E<lt>MONIKERE<gt>/rsa-public.key
+
+=item RSA_KeySize
+
+    RSA_KeySize     2048
+
+RSA Key size. This is size (length) of the RSA Key.
+Allowed key sizes in bits: C<512>, C<1024>, C<2048>, C<3072>, C<4096>
+
+Default: 2048
+
+=item Secret
+
+    Secret      "My$ecretPhr@se!"
+
+HMAC secret passphrase
+
+Default: md5(rsa_private_file)
+
+=back
+
+=head2 ATHORIZATION DIRECTIVES
+
+=over 8
+
+=item AuthDBURL, AuthDBURI
+
+    AuthDBURI "mysql://user:pass@mysql.example.com/authdb \
+           ?mysql_auto_reconnect=1&mysql_enable_utf8=1"
+    AuthDBURI "sqlite:///var/lib/myapp/auth.db?sqlite_unicode=1"
+
+Authorization database connect string (Data Source URI)
+This directive written in the URI form
+
+Default: "sqlite:///var/lib/E<lt>MONIKERE<gt>/auth.db?sqlite_unicode=1"
+
+=item AuthDBCachedConnection
+
+    AuthDBCachedConnection  1
+    AuthDBCachedConnection  Yes
+    AuthDBCachedConnection  On
+    AuthDBCachedConnection  Enable
+
+This directive defines status of caching while establishing of connection to database
+
+See L<WWW::Suffit::AuthDB/cached>
+
+Default: false (no caching connection)
+
+=item AuthDBCacheExpire, AuthDBCacheExpiration
+
+    AuthDBCacheExpiration    300
+
+The expiration time
+
+See L<WWW::Suffit::AuthDB/expiration>
+
+Default: 300 (5 min)
+
+=item AuthDBCacheMaxKeys
+
+    AuthDBCacheMaxKeys  1024
+
+The maximum keys number in cache
+
+See L<WWW::Suffit::AuthDB/max_keys>
+
+Default: 1024*1024 (1`048`576 keys max)
+
+=item AuthDBSourceFile
+
+    AuthDBSourceFile /var/lib/myapp/authdb.json
+
+Authorization database source file path.
+This is simple JSON file that contains three blocks: users, groups and realms.
+
+Default: /var/lib/E<lt>MONIKERE<gt>/authdb.json
+
+=item Token
+
+    Token   ed23...3c0a
+
+Development token directive
+This development directive allows authorization without getting real C<Authorization>
+header from the client request
+
+Default: none
+
+=back
+
+=head1 EXAMPLE
+
+Example of well-structured simplified web application
+
+    # mkdir lib
+    # touch lib/MyApp.pm
+    # chmod 644 lib/MyApp.pm
+
+We will start by C<MyApp.pm> that contains main application class and controller class
+
+    package MyApp;
+
+    use Mojo::Base 'WWW::Suffit::Server';
+
+    our $VERSION = '1.00';
+
+    sub init {
+        my $self = shift;
+        my $r = $self->routes;
+        $r->any('/' => {text => 'Your test server is working!'})->name('index');
+        $r->get('/test')->to('example#test')->name('test');
+    }
+
+    1;
+
+    package MyApp::Controller::Example;
+
+    use Mojo::Base 'Mojolicious::Controller';
+
+    sub test {
+        my $self = shift;
+        $self->render(text => 'Hello World!');
+    }
+
+    1;
+
+The C<init> method gets called right after instantiation and is the place where the whole your application gets set up
+
+    # mkdir bin
+    # touch bin/myapp.pl
+    # chmod 644 bin/myapp.pl
+
+C<myapp.pl> itself can now be created as simplified application script to allow running tests.
+
+    #!/usr/bin/perl -w
+    use strict;
+    use warnings;
+
+    use Mojo::File qw/ curfile path /;
+
+    use lib curfile->dirname->sibling('lib')->to_string;
+
+    use Mojo::Server;
+
+    my $root = curfile->dirname->child('test')->to_string;
+
+    Mojo::Server->new->build_app('MyApp',
+        debugmode => 1,
+        loglevel => 'debug',
+        homedir => path($root)->child('www')->make_path->to_string,
+        datadir => path($root)->child('var')->make_path->to_string,
+        tempdir => path($root)->child('tmp')->make_path->to_string,
+        config_opts     => {
+            noload => 1, # force disable loading config from file
+            defaults => {
+                foo => 'bar',
+            },
+        },
+    )->start();
+
+Now try to run it
+
+    # perl bin/myapp.pl daemon -l http://*:8080
+
+Now let's get to simplified testing
+
+    # mkdir t
+    # touch t/myapp.t
+    # chmod 644 t/myapp.t
+
+Full L<Mojolicious> applications are easy to test, so C<t/myapp.t> can be containts:
+
+    use strict;
+    use warnings;
+
+    use Test::More;
+    use Test::Mojo;
+
+    use Mojo::File qw/ path /;
+
+    use MyApp;
+
+    my $root = path()->child('test')->to_string;
+
+    my $t = Test::Mojo->new(MyApp->new(
+        homedir => path($root)->child('www')->make_path->to_string,
+        datadir => path($root)->child('var')->make_path->to_string,
+        tempdir => path($root)->child('tmp')->make_path->to_string,
+        config_opts     => {
+            noload => 1, # force disable loading config from file
+            defaults => {
+                foo => 'bar',
+            },
+        },
+    ));
+
+    subtest 'Test workflow' => sub {
+
+        $t->get_ok('/')
+          ->status_is(200)
+          ->content_like(qr/working!/, 'right content by GET /');
+
+        $t->post_ok('/' => form => {'_' => time})
+          ->status_is(200)
+          ->content_like(qr/working!/, 'right content by POST /');
+
+        $t->get_ok('/test')
+          ->status_is(200)
+          ->content_like(qr/World/, 'right content by GET /test');
+
+    };
+
+    done_testing();
+
+Now try to test
+
+    # prove -lv t/myapp.t
+
+And our final directory structure should be looking like this
+
+    MyApp
+    +- bin
+    |  +- myapp.pl
+    +- lib
+    |  +- MyApp.pm
+    +- t
+    |  +- myapp.t
+    +- test
+       +- tmp
+       +- var
+       +- www
+
+Test-driven development takes a little getting used to, but can be a very powerful tool
 
 =head1 HISTORY
 
@@ -421,7 +1125,7 @@ See C<TODO> file
 
 =head1 SEE ALSO
 
-L<Mojolicious>, L<WWW::Suffit>, L<WWW::Suffit::RSA>, L<WWW::Suffit::JWT>, L<WWW::Suffit::AuthDB>
+L<Mojolicious>, L<WWW::Suffit>, L<WWW::Suffit::RSA>, L<WWW::Suffit::JWT>, L<WWW::Suffit::API>, L<WWW::Suffit::AuthDB>
 
 =head1 AUTHOR
 
@@ -440,27 +1144,28 @@ See C<LICENSE> file and L<https://dev.perl.org/licenses/>
 
 =cut
 
-our $VERSION = '1.10';
+our $VERSION = '1.11';
 
 use Mojo::Base 'Mojolicious';
 
-use Carp qw/carp croak/;
+use Carp qw/ carp croak /;
 use POSIX qw//;
 use File::Spec;
 
 use Mojo::URL;
 use Mojo::File qw/ path /;
 use Mojo::Home qw//;
-use Mojo::Util qw/decamelize steady_time/; # decamelize(ref($self))
-use Mojo::Loader qw/load_class/;
+use Mojo::Util qw/ decamelize steady_time md5_sum /; # decamelize(ref($self))
+use Mojo::Loader qw/ load_class /;
 use Mojo::Server::Prefork;
+
+use Acrux::Util qw/ color parse_time_offset randchars /;
+use Acrux::RefUtil qw/ as_array_ref as_hash_ref isnt_void is_true_flag /;
 
 use WWW::Suffit::Const qw/
         :general :security :session :dir :server
         AUTHDBFILE JWT_REGEXP
     /;
-use WWW::Suffit::Util qw/ color parse_time_offset /;
-use WWW::Suffit::RefUtil qw/ as_array_ref as_hash_ref isnt_void is_true_flag /;
 use WWW::Suffit::Cache;
 use WWW::Suffit::RSA;
 use WWW::Suffit::JWT;
@@ -499,6 +1204,7 @@ has 'max_history_size' => MAX_HISTORY_SIZE;
 has 'mysecret' => DEFAULT_SECRET; # Secret
 has 'private_key' => '';    # Private RSA key
 has 'public_key' => '';     # Public RSA key
+has 'rsa_keysize' => sub { shift->conf->latest("/rsa_keysize") };
 has 'trustedproxies' => sub { [grep {length} @{(shift->conf->list("/trustedproxy"))}] };
 
 # Prefork
@@ -512,6 +1218,15 @@ has 'no_daemonize';
 has 'uid';
 has 'gid';
 
+# Startup options as attributes
+has [qw/all_features init_rsa_keys init_authdb init_api_routes init_user_routes init_admin_routes/];
+has 'config_opts' => sub { {} };
+has 'syslog_opts' => sub { {} };
+has 'authdb_opts' => sub { {} };
+has 'api_routes_opts' => sub { {} };
+has 'user_routes_opts' => sub { {} };
+has 'admin_routes_opts' => sub { {} };
+
 sub raise {
     my $self = shift;
     say STDERR color "bright_red" => @_;
@@ -522,14 +1237,15 @@ sub startup {
     my $self = shift;
     my $opts = @_ ? @_ > 1 ? {@_} : {%{$_[0]}} : {};
     $self->project_name(ref($self)) unless defined $self->project_name;
+    $self->project_version($self->VERSION) unless defined $self->project_version;
     $self->raise("Incorrect `project_name`") unless $self->project_name;
     $self->raise("Incorrect `project_version`") unless $self->project_version;
     unshift @{$self->plugins->namespaces}, 'WWW::Suffit::Plugin'; # Add another namespace to load plugins from
     push @{$self->routes->namespaces}, 'WWW::Suffit::Server'; # Add Server routes namespace
-    my $all_features = is_true_flag($opts->{all_features}); # on/off
+    my $all_features = is_true_flag($opts->{all_features} // $self->all_features); # on/off
 
     # Get all ConfigGeneral configuration attributes
-    my $config_opts = as_hash_ref($opts->{config_opts}) || {};
+    my $config_opts = as_hash_ref($opts->{config_opts} || $self->config_opts) || {};
     if (my $configobj = $self->configobj) {
         $self->raise("The `configobj` must be Config::General object")
             unless ref($configobj) eq 'Config::General';
@@ -551,7 +1267,7 @@ sub startup {
     $self->plugin('ConfigGeneral' => $config_opts);
 
     # Syslog
-    my $syslog_opts = as_hash_ref($opts->{syslog_opts}) || {};
+    my $syslog_opts = as_hash_ref($opts->{syslog_opts} || $self->syslog_opts) || {};
     my $syslogen = ($self->conf->latest('/log') && $self->conf->latest('/log') =~ /syslog/i) ? 1 : 0;
     unless (exists($syslog_opts->{enable})) { $syslog_opts->{enable} = $syslogen };
     $self->plugin('Syslog' => $syslog_opts);
@@ -565,8 +1281,11 @@ sub startup {
     $self->log->path($self->logfile) if $self->logfile;
 
     # Helpers
-    $self->helper('token'               => \&_getToken);
-    $self->helper('jwt'                 => \&_getJWT);
+    $self->helper('token'       => \&_getToken);
+    $self->helper('jwt'         => \&_getJWT);
+    $self->helper('clientid'    => \&_genClientId);
+    $self->helper('gen_cachekey'=> \&_genCacheKey);
+    $self->helper('gen_rsakeys' => \&_genRSAKeys);
 
     # DataDir (variable data, caches, temp files and etc.) -- /var/lib/<MONIKER>
     $self->datadir(path(SHAREDSTATEDIR, $self->moniker)->to_string()) unless defined $self->datadir;
@@ -595,12 +1314,12 @@ sub startup {
     $self->secrets([$self->mysecret]);
 
     # Init RSA keys (optional)
-    if ($all_features || is_true_flag($opts->{init_rsa_keys})) {
+    if ($all_features || is_true_flag($opts->{init_rsa_keys} // $self->init_rsa_keys)) {
         my $private_key_file = $self->conf->latest("/privatekeyfile") || path($self->datadir, PRIVATEKEYFILE)->to_string;
         my $public_key_file = $self->conf->latest("/publickeyfile") || path($self->datadir, PUBLICKEYFILE)->to_string;
         if ((!-r $private_key_file) and (!-r $public_key_file)) {
             my $rsa = WWW::Suffit::RSA->new();
-            $rsa->key_size($self->conf->latest("/rsa_keysize")) if $self->conf->latest("/rsa_keysize");
+            $rsa->key_size($self->rsa_keysize) if $self->rsa_keysize;
             $rsa->keygen;
             path($private_key_file)->spew($rsa->private_key)->chmod(0600);
             $self->private_key($rsa->private_key);
@@ -616,16 +1335,33 @@ sub startup {
         }
     }
 
-    # Init AuthDB (optional)
-    if ($all_features || is_true_flag($opts->{init_authdb})) {
-        _load_module("WWW::Suffit::AuthDB");
+    # Init AuthDB plugin (optional)
+    if ($all_features || is_true_flag($opts->{init_authdb} // $self->init_authdb)) {
+        #_load_module("WWW::Suffit::AuthDB");
+        my $authdb_opts = as_hash_ref($opts->{authdb_opts} || $self->authdb_opts) || {};
         my $authdb_file = path($self->datadir, AUTHDBFILE)->to_string;
-        my $authdb_uri = $self->conf->latest("/authdburi") || qq{sqlite://$authdb_file?sqlite_unicode=1};
-        $self->log->info(sprintf("AuthDB URI: \"%s\"", $authdb_uri));
-        $self->helper(authdb => sub { state $authdb = WWW::Suffit::AuthDB->new(dsuri => $authdb_uri) });
-    } else {
-        $self->helper(authdb => sub { return undef });
+        my $authdb_uri = $authdb_opts->{uri} || $authdb_opts->{url}
+            || $self->conf->latest("/authdburl") || $self->conf->latest("/authdburi")
+            || qq{sqlite://$authdb_file?sqlite_unicode=1};
+        $self->plugin('AuthDB' => {
+            ds          => $authdb_uri,
+            cached      => $authdb_opts->{cachedconnection} // $self->conf->latest("/authdbcachedconnection") // 'on',
+            expiration  => $authdb_opts->{cacheexpire} || $authdb_opts->{cacheexpiration} ||
+                           parse_time_offset($self->conf->latest("/authdbcacheexpire") || $self->conf->latest("/authdbcacheexpiration")),
+            max_keys    => $authdb_opts->{cachemaxkeys} || $self->conf->latest("/authdbcachemaxkeys"),
+            sourcefile  => $authdb_opts->{sourcefile} || $self->conf->latest("/authdbsourcefile"),
+        });
+        $self->authdb->with_roles(qw/+CRUD +AAA/);
+        #$self->log->info(sprintf("AuthDB URI: \"%s\"", $authdb_uri));
     }
+
+    # Set API routes plugin (optional)
+    $self->plugin('API' => as_hash_ref($opts->{api_routes_opts} || $self->api_routes_opts) || {})
+        if $all_features || is_true_flag($opts->{init_api_routes} // $self->init_api_routes);
+    $self->plugin('API::User' => as_hash_ref($opts->{user_routes_opts} || $self->user_routes_opts) || {})
+        if $all_features || is_true_flag($opts->{init_user_routes} // $self->init_user_routes);
+    $self->plugin('API::Admin' => as_hash_ref($opts->{admin_routes_opts} || $self->admin_routes_opts) || {})
+        if $all_features || is_true_flag($opts->{init_admin_routes} // $self->init_admin_routes);
 
     # Hooks
     $self->hook(before_dispatch => sub {
@@ -633,31 +1369,12 @@ sub startup {
         $c->res->headers->server(sprintf("%s/%s", $self->project_name, $self->project_version)); # Set Server header
     });
 
-    # Skip set routing (optional)
-    return $self unless $all_features || is_true_flag($opts->{init_api_routes});
-
-    # General routes related to the Suffit API
-    my $r = $self->routes;
-
-    # API routes with token or cookie authorization
-    my $authorized = $r->under('/api')->to('auth#is_authorized')->name('api');
-    $authorized->get('/')->to('API#api')->name('api-data');
-    $authorized->get('/check')->to('API#check')->name('api-check');
-    $authorized->get('/status')->to('API#status')->name('api-status');
-
-    # API::NoAPI
-    $authorized->get('/file')->to('API::NoAPI#file_list')->name('api-file-list');
-    $authorized->get('/file/*filepath')->to('API::NoAPI#file_download')->name('api-file-download');
-    $authorized->put('/file/*filepath')->to('API::NoAPI#file_upload')->name('api-file-upload');
-    $authorized->delete('/file/*filepath')->to('API::NoAPI#file_remove')->name('api-file-remove');
-
-    # API::V1
-    $authorized->post('/v1/authn')->to('API::V1#authn')->name('api-v1-authn');
-    $authorized->post('/v1/authz')->to('API::V1#authz')->name('api-v1-authz');
-    $authorized->get('/v1/publicKey')->to('API::V1#public_key')->name('api-v1-publickey');
+    # Init hook
+    $self->init;
 
     return $self;
 }
+sub init { } # Overload it
 sub reload { # Reload hook
     my $self = shift;
     $self->log->warn("Request for reload $$");
@@ -885,6 +1602,35 @@ sub _getJWT {
         private_key => $self->app->private_key,
         public_key  => $self->app->public_key,
     );
+}
+sub _genCacheKey {
+    my $self = shift;
+    my $len = shift || 12;
+    return randchars($len);
+}
+sub _genRSAKeys {
+    my $self = shift;
+    my $key_size = shift || $self->app->rsa_keysize;
+    my $rsa = WWW::Suffit::RSA->new();
+       $rsa->key_size($key_size) if $key_size;
+       $rsa->keygen;
+    my ($private_key, $public_key) = ($rsa->private_key // '', $rsa->public_key // '');
+    return (
+        private_key => $private_key,
+        public_key  => $public_key,
+        key_size    => $rsa->key_size,
+        error       => $rsa->error
+            ? sprintf("Error occurred while generation %s bit RSA keys: %s",  $rsa->key_size // '?', $rsa->error)
+            : '',
+    );
+}
+sub _genClientId {
+    my $self = shift;
+    my $user_agent = $self->req->headers->header('User-Agent') // 'unknown';
+    my $remote_address = $self->remote_ip($self->app->trustedproxies)
+        || $self->tx->remote_address || '::1';
+    # md5(User-Agent . Remote-Address)
+    return md5_sum(sprintf("%s%s", $user_agent, $remote_address));
 }
 
 1;

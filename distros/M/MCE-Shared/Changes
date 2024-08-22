@@ -1,6 +1,11 @@
 
 Revision history for Perl module MCE::Shared.
 
+1.892 Wed Aug 21 15:30:00 EST 2024
+
+  * Fix for MCE::Hobo, Can't call method "len" on an undefined value
+    during global destruction. Thanks, @exodist.
+
 1.891 Wed Jun 19 22:00:00 EST 2024
 
   * In scalar context, MCE::Hobo->init returns a guard to call finish

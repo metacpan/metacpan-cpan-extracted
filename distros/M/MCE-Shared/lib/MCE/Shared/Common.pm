@@ -13,7 +13,7 @@ no warnings qw( threads recursion uninitialized numeric );
 
 package MCE::Shared::Common;
 
-our $VERSION = '1.891';
+our $VERSION = '1.892';
 
 # pipeline ( [ func1, @args ], [ func2, @args ], ... )
 
@@ -67,7 +67,7 @@ MCE::Shared::Common - Common API for data classes
 
 =head1 VERSION
 
-This document describes MCE::Shared::Common version 1.891
+This document describes MCE::Shared::Common version 1.892
 
 =head1 DESCRIPTION
 

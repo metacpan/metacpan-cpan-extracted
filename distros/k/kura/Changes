@@ -1,5 +1,8 @@
 Revision history for Perl extension kura
 
+0.03 2024-08-21T14:53:54Z
+    - Fixed integration test. #1
+
 0.02 2024-08-18T23:19:04Z
     - Add integration test.
 

@@ -13,7 +13,7 @@ use 5.010001;
 
 no warnings qw( threads recursion uninitialized numeric );
 
-our $VERSION = '1.891';
+our $VERSION = '1.892';
 
 ## no critic (TestingAndDebugging::ProhibitNoStrict)
 
@@ -100,7 +100,7 @@ MCE::Shared::Scalar - Scalar helper class
 
 =head1 VERSION
 
-This document describes MCE::Shared::Scalar version 1.891
+This document describes MCE::Shared::Scalar version 1.892
 
 =head1 DESCRIPTION
 

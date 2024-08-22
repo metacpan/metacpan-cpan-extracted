@@ -104,3 +104,4 @@ t/94experimental.t
 t/95utf8.t
 t/99pod.t
 t/lib/91rt141483Role.pm
+typemap

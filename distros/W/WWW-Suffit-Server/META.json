@@ -4,7 +4,7 @@
       "Serz Minus (Sergey Lepenkov) <abalama@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -33,10 +33,10 @@
       },
       "runtime" : {
          "requires" : {
+            "Acrux" : "0.05",
             "Mojolicious" : "7.94",
-            "Mojolicious::Plugin::ConfigGeneral" : "1.02",
+            "Mojolicious::Plugin::ConfigGeneral" : "1.04",
             "WWW::Suffit" : "1.08",
-            "WWW::Suffit::API" : "1",
             "WWW::Suffit::Plugin::CommonHelpers" : "1",
             "WWW::Suffit::Plugin::Syslog" : "1",
             "perl" : "5.020"
@@ -55,6 +55,6 @@
          "web" : "https://sourceforge.net/p/www-suffit-server/code/ci/master/tree/"
       }
    },
-   "version" : "1.10",
-   "x_serialization_backend" : "JSON::PP version 4.02"
+   "version" : "1.11",
+   "x_serialization_backend" : "JSON::PP version 4.16"
 }

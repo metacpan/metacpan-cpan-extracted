@@ -14,7 +14,7 @@ BEGIN {
 
 use Graph::AdjacencyMap qw(:flags :fields);
 
-our $VERSION = '0.9729';
+our $VERSION = '0.9730';
 
 require 5.006; # Weak references are absolutely required.
 
@@ -191,6 +191,8 @@ sub new {
         __carp_confess "Graph: edges should be an array ref of array refs"
 	    if ref $opt{edges} ne 'ARRAY';
 	@E = @{ delete $opt{edges} };
+	__carp_confess "Graph: edges should be array refs"
+	    if grep ref $_ ne 'ARRAY', @E;
     }
 
     _opt_unknown(\%opt);
@@ -202,20 +204,14 @@ sub new {
 	if ($eflags & _COUNT) && ($eflags & _MULTI);
 
     my $g = bless [ ], ref $class || $class;
-
     $g->[ _F ] = $gflags;
     $g->[ _G ] = 0;
     $g->[ _V ] = _make_v($vflags);
     $g->[ _E ] = _make_e($is_hyper, $eflags);
-
-    $g->add_vertices(@V) if @V;
-
-    __carp_confess "Graph: edges should be array refs"
-	if grep ref $_ ne 'ARRAY', @E;
-    $g->add_edges(@E);
-
     $g->[ _U ] = do { require Graph::UnionFind; Graph::UnionFind->new }
 	if $gflags & _UNIONFIND;
+    $g->add_vertices(@V) if @V;
+    $g->add_edges(@E) if @E;
 
     return $g;
 }
@@ -557,7 +553,7 @@ sub _cessors_by_radius {
     my ($g, @v) = @_;
     require Set::Object;
     my ($init, $next) = map Set::Object->new(@v), 1..2;
-    my $self = Set::Object->new(grep $g->has_edge($_, $_), @v) if $self_only_if_loop;
+    my $self = $self_only_if_loop ? Set::Object->new(grep $g->has_edge($_, $_), @v) : undef;
     my ($got, $found) = map Set::Object->new, 1..2;
     while (!defined $radius or $radius-- > 0) {
 	$found->insert($g->$method($next->members));
@@ -873,143 +869,59 @@ sub find_a_cycle {
 # Attributes.
 
 my @generic_methods = (
-    [ 'set_attribute', \&_set_attribute ],
-    [ 'set_attributes', \&_set_attributes ],
-    [ 'has_attributes', \&_has_attributes ],
-    [ 'has_attribute', \&_has_attribute ],
-    [ 'get_attributes', \&_get_attributes ],
-    [ 'get_attribute', \&_get_attribute ],
-    [ 'get_attribute_names', \&_get_attribute_names ],
-    [ 'get_attribute_values', \&_get_attribute_values ],
-    [ 'delete_attributes', \&_delete_attributes ],
-    [ 'delete_attribute', \&_delete_attribute ],
+    [ 'set_attribute', 'my (\$attr, \$value) = splice \@_, -2; &$add unless &$has;',
+      '\$_[0]->[ $offset ]->_set_path_attr( \@args, \$attr, \$value );' ],
+    [ 'set_attributes', 'my \$attr = pop; &$add unless &$has;',
+      '\$_[0]->[ $offset ]->_set_path_attrs( \@args, \$attr );', ],
+    [ 'has_attributes', 'return 0 unless &$has;',
+      '\$_[0]->[ $offset ]->_has_path_attrs( \@args );', ],
+    [ 'has_attribute', 'my \$attr = pop; return 0 unless &$has;',
+      '\$_[0]->[ $offset ]->_has_path_attr( \@args, \$attr );', ],
+    [ 'get_attributes', 'return undef unless &$has;',
+      'scalar \$_[0]->[ $offset ]->_get_path_attrs( \@args );', ],
+    [ 'get_attribute', 'my \$attr = pop; return undef unless &$has;',
+      'scalar \$_[0]->[ $offset ]->_get_path_attr( \@args, \$attr );', ],
+    [ 'get_attribute_names', 'return unless &$has;',
+      '\$_[0]->[ $offset ]->_get_path_attr_names( \@args );', ],
+    [ 'get_attribute_values', 'return unless &$has;',
+      '\$_[0]->[ $offset ]->_get_path_attr_values( \@args );', ],
+    [ 'delete_attributes', 'return undef unless &$has;',
+      '\$_[0]->[ $offset ]->_del_path_attrs( \@args );', ],
+    [ 'delete_attribute', 'my \$attr = pop; return undef unless &$has;',
+      '\$_[0]->[ $offset ]->_del_path_attr( \@args, \$attr );', ],
 );
-my %entity2offset = (vertex => _V, edge => _E);
-my %entity2args = (edge => '_vertex_ids');
+my %entity2offset = (vertex => '_V', edge => '_E');
+my %entity2args = (edge => '&_vertex_ids');
+my $template_mid = 'my \@args = @{[ $args || "\@_[1..\$#_]" ]};$munge';
 for my $entity (qw(vertex edge)) {
     no strict 'refs';
-    my $expect_non = \&{ "expect_non_multi${entity}" };
-    my $expect_yes = \&{ "expect_multi${entity}" };
-    my $args_non = \&{ $entity2args{$entity} } if $entity2args{$entity};
-    my $args_yes = \&{ $entity2args{$entity}.'_multi' } if $entity2args{$entity};
+    my $has_base = 'has_' . $entity;
+    my $add_base = 'add_' . $entity;
     my $offset = $entity2offset{$entity};
     for my $t (@generic_methods) {
-	my ($raw, $func) = @$t;
+	my ($raw, $t1, $t2) = @$t;
 	my ($first, $rest) = ($raw =~ /^(\w+?)_(.+)/);
-	my $m = join '_', $first, $entity, $rest;
 	my $is_vertex = $entity eq 'vertex';
-	*$m = sub {
-	    &$expect_non; push @_, 0, $entity, $offset, $args_non, $is_vertex; goto &$func;
-	};
-	*{$m.'_by_id'} = sub {
-	    &$expect_yes; push @_, 1, $entity, $offset, $args_yes, $is_vertex; goto &$func;
-	};
+	my $m = join '_', $first, $entity, $rest;
+	my ($args, $munge, $has, $add) = ($entity2args{$entity}, $is_vertex ? '' : "\n\@args = &is_undirected ? [sort \@args] : [\@args];", $has_base, $add_base);
+	my $func_text = "qq{sub $m {\n&expect_non_multi$entity;\n$t1\n$template_mid\n$t2\n}}\n"; #warn "$m:\n$func_text\n";
+	my $tv2 = eval $func_text; #warn "$m v2:\n$tv2\n";
+	eval $tv2; die if $@;
+	$m .= '_by_id';
+	($args, $munge, $has, $add) = ($entity2args{$entity} && "$entity2args{$entity}_multi", $is_vertex ? '' : "\n\@args = (&is_undirected ? [sort \@args[0..\$#args-1]] : [\@args[0..\$#args-1]], \$args[-1]);", $has_base.'_by_id', $add_base.'_by_id');
+	$func_text = "qq{sub $m {\n&expect_multi$entity;\n$t1\n$template_mid\n$t2\n}}\n"; #warn "$m:\n$func_text\n";
+	$tv2 = eval $func_text; #warn "$m v2:\n$tv2\n";
+	eval $tv2; die if $@;
     }
 }
 
-sub _munge_args {
-    my ($is_vertex, $is_multi, $is_undirected, @args) = @_;
-    return \@args if !$is_vertex and !$is_undirected and !$is_multi;
-    return [ sort @args ] if !$is_vertex and !$is_multi;
-    return @args if $is_vertex;
-    my $id = pop @args;
-    ($is_undirected ? [ sort @args ] : \@args, $id);
-}
-
-sub _set_attribute {
-    my ($is_multi, $entity, $offset, $args, $is_vertex) = splice @_, -5, 5;
-    my $value = pop;
-    my $attr = pop;
-    no strict 'refs';
-    &{ 'add_' . $entity . ($is_multi ? '_by_id' : '') } unless &{ 'has_' . $entity . ($is_multi ? '_by_id' : '') };
-    my @args = ($entity eq 'edge') ? &$args : @_[1..$#_];
-    @args = _munge_args($is_vertex, $is_multi, &is_undirected, @args);
-    $_[0]->[ $offset ]->_set_path_attr( @args, $attr, $value );
-}
-
-sub _set_attributes {
-    my ($is_multi, $entity, $offset, $args, $is_vertex) = splice @_, -5, 5;
-    my $attr = pop;
-    no strict 'refs';
-    &{ 'add_' . $entity . ($is_multi ? '_by_id' : '') } unless &{ 'has_' . $entity . ($is_multi ? '_by_id' : '') };
-    my @args = ($entity eq 'edge') ? &$args : @_[1..$#_];
-    @args = _munge_args($is_vertex, $is_multi, &is_undirected, @args);
-    $_[0]->[ $offset ]->_set_path_attrs( @args, $attr );
-}
-
-sub _has_attributes {
-    my ($is_multi, $entity, $offset, $args, $is_vertex) = splice @_, -5, 5;
-    no strict 'refs';
-    return 0 unless &{ 'has_' . $entity . ($is_multi ? '_by_id' : '') };
-    my @args = ($entity eq 'edge') ? &$args : @_[1..$#_];
-    @args = _munge_args($is_vertex, $is_multi, &is_undirected, @args);
-    $_[0]->[ $offset ]->_has_path_attrs( @args );
-}
-
-sub _has_attribute {
-    my ($is_multi, $entity, $offset, $args, $is_vertex) = splice @_, -5, 5;
-    my $attr = pop;
-    no strict 'refs';
-    return 0 unless &{ 'has_' . $entity . ($is_multi ? '_by_id' : '') };
-    my @args = ($entity eq 'edge') ? &$args : @_[1..$#_];
-    @args = _munge_args($is_vertex, $is_multi, &is_undirected, @args);
-    $_[0]->[ $offset ]->_has_path_attr( @args, $attr );
-}
-
-sub _get_attributes {
-    my ($is_multi, $entity, $offset, $args, $is_vertex) = splice @_, -5, 5;
-    no strict 'refs';
-    return undef unless &{ 'has_' . $entity . ($is_multi ? '_by_id' : '') };
-    my @args = ($entity eq 'edge') ? &$args : @_[1..$#_];
-    @args = _munge_args($is_vertex, $is_multi, &is_undirected, @args);
-    scalar $_[0]->[ $offset ]->_get_path_attrs( @args );
-}
-
-sub _get_attribute {
-    my ($is_multi, $entity, $offset, $args, $is_vertex) = splice @_, -5, 5;
-    no strict 'refs';
-    my $attr = pop;
-    return undef unless &{ 'has_' . $entity . ($is_multi ? '_by_id' : '') };
-    my @args = ($entity eq 'edge') ? &$args : @_[1..$#_];
-    @args = _munge_args($is_vertex, $is_multi, &is_undirected, @args);
-    scalar $_[0]->[ $offset ]->_get_path_attr( @args, $attr );
-}
-
-sub _get_attribute_names {
-    my ($is_multi, $entity, $offset, $args, $is_vertex) = splice @_, -5, 5;
-    no strict 'refs';
-    return unless &{ 'has_' . $entity . ($is_multi ? '_by_id' : '') };
-    my @args = ($entity eq 'edge') ? &$args : @_[1..$#_];
-    @args = _munge_args($is_vertex, $is_multi, &is_undirected, @args);
-    $_[0]->[ $offset ]->_get_path_attr_names( @args );
-}
-
-sub _get_attribute_values {
-    my ($is_multi, $entity, $offset, $args, $is_vertex) = splice @_, -5, 5;
-    no strict 'refs';
-    return unless &{ 'has_' . $entity . ($is_multi ? '_by_id' : '') };
-    my @args = ($entity eq 'edge') ? &$args : @_[1..$#_];
-    @args = _munge_args($is_vertex, $is_multi, &is_undirected, @args);
-    $_[0]->[ $offset ]->_get_path_attr_values( @args );
-}
-
-sub _delete_attributes {
-    my ($is_multi, $entity, $offset, $args, $is_vertex) = splice @_, -5, 5;
-    no strict 'refs';
-    return undef unless &{ 'has_' . $entity . ($is_multi ? '_by_id' : '') };
-    my @args = ($entity eq 'edge') ? &$args : @_[1..$#_];
-    @args = _munge_args($is_vertex, $is_multi, &is_undirected, @args);
-    $_[0]->[ $offset ]->_del_path_attrs( @args );
-}
-
-sub _delete_attribute {
-    my ($is_multi, $entity, $offset, $args, $is_vertex) = splice @_, -5, 5;
-    my $attr = pop;
-    no strict 'refs';
-    return undef unless &{ 'has_' . $entity . ($is_multi ? '_by_id' : '') };
-    my @args = ($entity eq 'edge') ? &$args : @_[1..$#_];
-    @args = _munge_args($is_vertex, $is_multi, &is_undirected, @args);
-    $_[0]->[ $offset ]->_del_path_attr( @args, $attr );
+sub get_edge_attribute_all {
+  my ($g, $u, $v, $name) = @_;
+  die "no attribute name given" if !defined $name;
+  grep defined(),
+    &is_multiedged ? (map $g->get_edge_attribute_by_id($u, $v, $_, $name),
+      $g->get_multiedge_ids($u, $v))
+      : $g->get_edge_attribute($u, $v, $name);
 }
 
 sub add_vertices {
@@ -1563,7 +1475,7 @@ sub random_graph {
     __carp_confess "Graph::random_graph: argument 'vertices' missing or undef"
 	unless defined $opt{vertices};
     srand delete $opt{random_seed} if exists $opt{random_seed};
-    my $random_edge = delete $opt{random_edge} if exists $opt{random_edge};
+    my $random_edge = delete $opt{random_edge};
     my @V;
     if (my $ref = ref $opt{vertices}) {
 	__carp_confess "Graph::random_graph: argument 'vertices' illegal"
@@ -2308,7 +2220,7 @@ sub _SPT_add {
     my ($g, $h, $HF, $r, $attr, $unseen, $etc) = @_;
     my $etc_r = $etc->{ $r } || 0;
     for my $s ( grep exists $unseen->{ $_ }, $g->successors( $r ) ) {
-	my $t = $g->get_edge_attribute( $r, $s, $attr );
+	my ($t) = sort {$a<=>$b} $g->get_edge_attribute_all($r, $s, $attr);
 	$t = 1 unless defined $t;
 	__carp_confess "Graph::SPT_Dijkstra: edge $r-$s is negative ($t)"
 	    if $t < 0;
@@ -2324,7 +2236,7 @@ sub _SPT_add {
 
 sub _SPT_Dijkstra_compute {
     require Graph::SPTHeapElem;
-    my $sptg = $_[0]->_heap_walk($_[0]->new, \&_SPT_add, {}, @_[1..$#_]);
+    my $sptg = $_[0]->_heap_walk($_[0]->new(multiedged=>0), \&_SPT_add, {}, @_[1..$#_]);
     $sptg->set_graph_attribute('SPT_Dijkstra_root', $_[4]);
     $sptg;
 }
@@ -2362,7 +2274,7 @@ sub SP_Dijkstra {
 sub __SPT_Bellman_Ford {
     my ($g, $u, $v, $attr, $d, $p, $c0, $c1) = @_;
     return unless $c0->{ $u };
-    my $w = $g->get_edge_attribute($u, $v, $attr);
+    my ($w) = sort {$a<=>$b} $g->get_edge_attribute_all($u, $v, $attr);
     $w = 1 unless defined $w;
     if (defined $d->{ $v }) {
 	if (defined $d->{ $u }) {
@@ -2405,7 +2317,7 @@ sub _SPT_Bellman_Ford {
     for my $e ($g->edges) {
 	my ($u, $v) = @$e;
 	if (defined $d{ $u } && defined $d{ $v }) {
-	    my $d = $g->get_edge_attribute($u, $v, $attr);
+	    my ($d) = sort {$a<=>$b} $g->get_edge_attribute_all($u, $v, $attr);
 	    __carp_confess "Graph::SPT_Bellman_Ford: negative cycle exists"
 		if defined $d && $d{ $v } > $d{ $u } + $d;
 	}
@@ -2417,11 +2329,11 @@ sub _SPT_Bellman_Ford {
 sub _SPT_Bellman_Ford_compute {
     my ($g, @args) = @_;
     my ($p, $d) = $g->_SPT_Bellman_Ford(@args);
-    my $h = $g->new;
+    my $h = $g->new(multiedged=>0);
     for my $v (keys %$p) {
 	my $u = $p->{ $v };
-	$h->set_edge_attribute( $u, $v, $args[6],
-				$g->get_edge_attribute($u, $v, $args[6]));
+	my ($w) = sort {$a<=>$b} $g->get_edge_attribute_all($u, $v, $args[6]);
+	$h->set_edge_attribute( $u, $v, $args[6], $w);
 	$h->set_vertex_attributes( $v, { $args[6], $d->{ $v }, p => $u } );
     }
     $h->set_graph_attribute('SPT_Bellman_Ford_root', $args[3]);

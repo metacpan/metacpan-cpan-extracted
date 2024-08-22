@@ -136,8 +136,10 @@ sub parse_skipfile ($file)
 	return $skips;
 }
 
-sub are_licensed_like_scancode ( $testpaths, $skipfile = undef,
-	$overrides = undef )
+sub are_licensed_like_scancode (
+	$testpaths, $skipfile = undef,
+	$overrides = undef
+	)
 {
 	my ( $ctx, $licenses, $skiplist, $failures );
 

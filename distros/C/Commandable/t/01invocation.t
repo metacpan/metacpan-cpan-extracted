@@ -4,9 +4,15 @@ use v5.14;
 use warnings;
 
 use Test2::V0;
-use Test::NoWarnings ();
 
 use Commandable::Invocation;
+
+my $warnings = "";
+$SIG{__WARN__} = sub {
+   local $SIG{__WARN__};
+   $warnings .= join "", @_;
+   warn @_;
+};
 
 # tokens
 {
@@ -89,5 +95,5 @@ use Commandable::Invocation;
    is( $inv->pull_token, "three four", '->pull_token from new_from_tokens' );
 }
 
-Test::NoWarnings::had_no_warnings;
+is( $warnings, "", 'had no warnings' );
 done_testing;

@@ -3,11 +3,11 @@
 # See https://creativecommons.org/publicdomain/zero/1.0/
 # The author, Jim Avera (jim.avera at gmail) has waived all copyright and
 # related or neighboring rights.  Attribution is requested but is not required.
-use strict; use warnings FATAL => 'all'; use 5.010;
+use strict; use warnings FATAL => 'all';
 
 { no strict 'refs'; ${__PACKAGE__."::VER"."SION"} = "dev"; }
-our $VERSION = "0.002"; # Future: V ERSION from Dist::Zilla::Plugin::OurPkgVersion
-our $DATE = '2024-07-07'; # DATE from Dist::Zilla::Plugin::OurDate
+our $VERSION = '1.009'; # VERSION from Dist::Zilla::Plugin::OurPkgVersion
+our $DATE = '2024-08-21'; # DATE from Dist::Zilla::Plugin::OurDate
 
 #use 5.12; # for unicode_strings
 use v5.18; # for lexical_subs

@@ -285,6 +285,22 @@ If you don't supply one of these forms, we assume you are specifying the date yo
 
 Returns offset of time (in secs)
 
+=head2 prompt
+
+    my $value = prompt($message);
+    my $value = prompt($message, $default);
+
+The C<prompt()> is an extremely simple function, based on the extremely simple prompt
+offered by L<ExtUtils::MakeMaker>. In many cases this function just to prompt for input
+
+This function displays the message as a prompt for input and returns the (chomped)
+response from the user, or the default if the response was empty
+
+If the program is not running interactively, the default will be used without prompting.
+If no default is provided, an empty string will be used instead
+
+See also: L<ExtUtils::MakeMaker/prompt>, L<IO::Prompt::Tiny>
+
 =head2 randchars
 
     $rand = randchars( $n ); # default chars collection: 0..9,'a'..'z','A'..'Z'
@@ -508,8 +524,6 @@ See C<LICENSE> file and L<https://dev.perl.org/licenses/>
 
 =cut
 
-our $VERSION = '0.01';
-
 use Carp qw/ carp croak /;
 use IO::File qw//;
 use Term::ANSIColor qw/ colored /;
@@ -536,6 +550,7 @@ our @EXPORT_OK = (qw/
         parse_expire parse_time_offset
         os_type is_os_type
         color load_class
+        prompt
     /, @EXPORT);
 
 use constant HUMAN_SUFFIXES => {
@@ -557,7 +572,7 @@ use constant DTF => {
     MOYS => [qw/Jan Feb Mar Apr May Jun Jul Aug Sep Oct Nov Dec/], # Short
 };
 
-# See Perl::OSType
+# See Perl::OSType and Devel::CheckOS
 my %OSTYPES = qw(
     aix         Unix
     bsdos       Unix
@@ -1036,6 +1051,34 @@ sub os_type {
 sub is_os_type {
     my $type = shift || return;
     return os_type(shift) eq $type;
+}
+
+# Copied from ExtUtils::MakeMaker and IO::Prompt::Tiny
+sub prompt {
+    my $msg = shift // '';
+    my $def = shift // '';
+    my $dispdef = length($def) ? "[$def] " : " ";
+
+    # Flush vars
+    local $|=1;
+    local $\;
+
+    # Prompt message
+    print length($msg) ? "$msg $dispdef" : "$dispdef";
+
+    my $ans;
+    if (!IS_TTY && eof STDIN) {
+        print "$def\n";
+    } else {
+        $ans = <STDIN>;
+        if( defined $ans ) {
+            chomp $ans;
+        } else { # user hit ctrl-D
+            print "\n";
+        }
+    }
+
+    return (!defined $ans || $ans eq '') ? $def : $ans;
 }
 
 1;

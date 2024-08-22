@@ -1,12 +1,13 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2019-2023 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2019-2024 -- leonerd@leonerd.org.uk
 
-package Commandable::Finder::Packages 0.11;
+package Commandable::Finder::Packages 0.12;
 
-use v5.14;
+use v5.26;
 use warnings;
+use experimental qw( signatures );
 use base qw( Commandable::Finder );
 
 use Carp;
@@ -153,11 +154,8 @@ configuration options.
 
 =cut
 
-sub new
+sub new ( $class, %args )
 {
-   my $class = shift;
-   my %args = @_;
-
    my $base = ( delete $args{base} ) or croak "Require 'base'";
 
    my $name_method        = ( delete $args{name_method} )        // "COMMAND_NAME";
@@ -190,10 +188,8 @@ sub new
    return $self;
 }
 
-sub packages
+sub packages ( $self )
 {
-   my $self = shift;
-
    my $name_method = $self->{methods}{name};
 
    my $packages = $self->{cache_packages} //= [ $self->{mp}->plugins ];
@@ -201,10 +197,8 @@ sub packages
    return @$packages;
 }
 
-sub _commands
+sub _commands ( $self )
 {
-   my $self = shift;
-
    my $name_method = $self->{methods}{name};
    return $self->{cache_commands} //= do {
       my %commands;
@@ -243,7 +237,6 @@ sub _commands
 
             package => $pkg,
             code    => $code,
-            config  => $self->{config},
          );
       }
 
@@ -253,18 +246,13 @@ sub _commands
    };
 }
 
-sub find_commands
+sub find_commands ( $self )
 {
-   my $self = shift;
-
    return values %{ $self->_commands };
 }
 
-sub find_command
+sub find_command ( $self, $cmd )
 {
-   my $self = shift;
-   my ( $cmd ) = @_;
-
    return $self->_commands->{$cmd};
 }
 

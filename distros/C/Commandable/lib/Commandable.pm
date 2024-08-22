@@ -3,7 +3,7 @@
 #
 #  (C) Paul Evans, 2018-2023 -- leonerd@leonerd.org.uk
 
-package Commandable 0.11;
+package Commandable 0.12;
 
 use v5.14;
 use warnings;

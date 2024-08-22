@@ -1,12 +1,13 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2022 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2022-2024 -- leonerd@leonerd.org.uk
 
-package Commandable::Finder::MethodAttributes 0.11;
+package Commandable::Finder::MethodAttributes 0.12;
 
 use v5.14;
 use warnings;
+use experimental qw( signatures );
 use base qw( Commandable::Finder::SubAttributes );
 
 use Carp;
@@ -69,11 +70,8 @@ Any additional arguments are passed to the superclass constructor.
 
 =cut
 
-sub new
+sub new ( $class, %args )
 {
-   my $class = shift;
-   my %args = @_;
-
    my $object = delete $args{object} or croak "Require 'object'";
    $args{package} = ref $object;
 
@@ -84,11 +82,8 @@ sub new
    return $self;
 }
 
-sub _wrap_code
+sub _wrap_code ( $self, $code )
 {
-   my $self = shift;
-   my ( $code ) = @_;
-
    my $object = $self->{object};
 
    return sub {

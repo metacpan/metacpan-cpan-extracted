@@ -49,7 +49,7 @@ sub run_cmd
    my $toolpkg = $cmd->package;
 
    $toolpkg->run(
-      $cmd->parse_invocation( Commandable::Invocation->new( $opts ) ),
+      $finder->parse_invocation( $cmd, Commandable::Invocation->new( $opts ) ),
       ( map { mkreader( $_ ) } @data_in ),
       mkoutput( \my @out ),
    );

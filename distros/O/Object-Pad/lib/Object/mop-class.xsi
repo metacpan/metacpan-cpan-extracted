@@ -82,66 +82,51 @@ _create_class(pkg, name, ...)
     RETVAL
 
 bool
-is_class(self)
-    SV *self
+is_class(ClassMeta *self)
   ALIAS:
     is_class = METATYPE_CLASS
     is_role  = METATYPE_ROLE
   CODE:
-  {
-    ClassMeta *meta = NUM2PTR(ClassMeta *, SvUV(SvRV(self)));
-    RETVAL = (meta->type == ix);
-  }
+    RETVAL = (self->type == ix);
   OUTPUT:
     RETVAL
 
 SV *
-name(self)
-    SV *self
+name(ClassMeta *self)
   CODE:
-  {
-    ClassMeta *meta = NUM2PTR(ClassMeta *, SvUV(SvRV(self)));
-    RETVAL = SvREFCNT_inc(meta->name);
-  }
+    RETVAL = SvREFCNT_inc(self->name);
   OUTPUT:
     RETVAL
 
 void
-superclasses(self)
-    SV *self
+superclasses(ClassMeta *self)
   PPCODE:
-  {
-    ClassMeta *meta = NUM2PTR(ClassMeta *, SvUV(SvRV(self)));
-
-    if(meta->type == METATYPE_CLASS && meta->cls.supermeta) {
+    if(self->type == METATYPE_CLASS && self->cls.supermeta) {
       PUSHs(sv_newmortal());
-      sv_setref_uv(ST(0), "Object::Pad::MOP::Class", PTR2UV(meta->cls.supermeta));
+      sv_setref_uv(ST(0), "Object::Pad::MOP::Class", PTR2UV(self->cls.supermeta));
       XSRETURN(1);
     }
 
     XSRETURN(0);
-  }
 
 void
-direct_roles(self)
-    SV *self
+direct_roles(ClassMeta *self)
   ALIAS:
     direct_roles = 0
     all_roles    = 1
   PPCODE:
   {
-    ClassMeta *meta = NUM2PTR(ClassMeta *, SvUV(SvRV(self)));
     U32 count = 0;
 
     /* TODO Consider recursion */
     U32 i;
-    switch(meta->type) {
+    switch(self->type) {
       case METATYPE_CLASS: {
         U32 nroles;
         RoleEmbedding **embeddings = NULL;
         switch(ix) {
-          case 0: embeddings = mop_class_get_direct_roles(meta, &nroles); break;
-          case 1: embeddings = mop_class_get_all_roles(meta, &nroles); break;
+          case 0: embeddings = mop_class_get_direct_roles(self, &nroles); break;
+          case 1: embeddings = mop_class_get_all_roles(self, &nroles); break;
         }
 
         for(i = 0; i < nroles; i++) {
@@ -161,14 +146,12 @@ direct_roles(self)
   }
 
 void
-add_role(self, role)
-    SV *self
+add_role(ClassMeta *self, role)
     SV *role
   ALIAS:
     compose_role = 0
   CODE:
   {
-    ClassMeta *meta = NUM2PTR(ClassMeta *, SvUV(SvRV(self)));
     ClassMeta *rolemeta = NULL;
 
     PERL_UNUSED_VAR(ix);
@@ -177,7 +160,7 @@ add_role(self, role)
       if(!sv_derived_from(role, "Object::Pad::MOP::Class"))
         croak("Expected a role name string or Object::Pad::MOP::Class; got %" SVf, SVfARG(role));
 
-      rolemeta = NUM2PTR(ClassMeta *, SvUV(SvRV(role)));
+      rolemeta = MUST_CLASSMETA_FROM_RV(role);
     }
     else {
       HV *rolestash = gv_stashsv(role, 0);
@@ -193,26 +176,21 @@ add_role(self, role)
     if(!rolemeta || rolemeta->type != METATYPE_ROLE)
       croak("%" SVf " is not a role", SVfARG(role));
 
-    mop_class_begin(meta);
+    mop_class_begin(self);
 
-    mop_class_add_role(meta, rolemeta);
+    mop_class_add_role(self, rolemeta);
   }
 
 void
-add_BUILD(self, code)
-    SV *self
+add_BUILD(ClassMeta *self, code)
     CV *code
   CODE:
-  {
-    ClassMeta *meta = NUM2PTR(ClassMeta *, SvUV(SvRV(self)));
-    mop_class_begin(meta);
+    mop_class_begin(self);
 
-    mop_class_add_BUILD(meta, (CV *)SvREFCNT_inc((SV *)code));
-  }
+    mop_class_add_BUILD(self, (CV *)SvREFCNT_inc((SV *)code));
 
 SV *
-add_method(self, mname, ...)
-    SV *self
+add_method(ClassMeta *self, mname, ...)
     SV *mname
   CODE:
   {
@@ -227,14 +205,13 @@ add_method(self, mname, ...)
     /* Take a copy now to run FETCH magic */
     mname = sv_2mortal(newSVsv(mname));
 
-    ClassMeta *meta = NUM2PTR(ClassMeta *, SvUV(SvRV(self)));
-    mop_class_begin(meta);
+    mop_class_begin(self);
 
     if(SvOK(mname) && SvPOK(mname) && strEQ(SvPVX(mname), "BUILD")) {
       croak("Adding a method called BUILD is not supported; use ->add_BUILD directly");
     }
 
-    MethodMeta *methodmeta = mop_class_add_method_cv(meta, mname, (CV *)SvREFCNT_inc(CV_FROM_REF(ref)));
+    MethodMeta *methodmeta = mop_class_add_method_cv(self, mname, (CV *)SvREFCNT_inc(CV_FROM_REF(ref)));
 
     static const char *args[] = {
       "common",
@@ -255,18 +232,16 @@ add_method(self, mname, ...)
     RETVAL
 
 void
-get_direct_method(self, methodname)
-    SV *self
+get_direct_method(ClassMeta *self, methodname)
     SV *methodname
   ALIAS:
     get_method = 1
   PPCODE:
   {
-    ClassMeta *meta = NUM2PTR(ClassMeta *, SvUV(SvRV(self)));
     bool recurse = !!ix;
 
     do {
-      AV *methods = meta->direct_methods;
+      AV *methods = self->direct_methods;
       U32 nmethods = av_count(methods);
 
       U32 i;
@@ -281,23 +256,21 @@ get_direct_method(self, methodname)
         XSRETURN(1);
       }
 
-      if(meta->type == METATYPE_CLASS)
-        meta = meta->cls.supermeta;
+      if(self->type == METATYPE_CLASS)
+        self = self->cls.supermeta;
       else
-        meta = NULL;
-    } while(recurse && meta);
+        self = NULL;
+    } while(recurse && self);
 
     croak("Class %" SVf " does not have a method called '%" SVf "'",
-      meta->name, methodname);
+      self->name, methodname);
   }
 
 void
-direct_methods(self)
-    SV *self
+direct_methods(ClassMeta *self)
   ALIAS:
     all_methods = 1
   PPCODE:
-    ClassMeta *meta = NUM2PTR(ClassMeta *, SvUV(SvRV(self)));
     bool recurse = !!ix;
 
     /* A hash to remove overrides */
@@ -310,7 +283,7 @@ direct_methods(self)
     U32 retcount = 0;
 
     do {
-      AV *methods = meta->direct_methods;
+      AV *methods = self->direct_methods;
       U32 nmethods = av_count(methods);
 
       EXTEND(SP, retcount + nmethods);  /* might be an overestimate but don't worry */
@@ -328,38 +301,32 @@ direct_methods(self)
         hv_store_ent(mnames, methodmeta->name, &PL_sv_yes, 0);
       }
 
-      if(meta->type == METATYPE_CLASS)
-        meta = meta->cls.supermeta;
+      if(self->type == METATYPE_CLASS)
+        self = self->cls.supermeta;
       else
-        meta = NULL;
-    } while(recurse && meta);
+        self = NULL;
+    } while(recurse && self);
 
     XSRETURN(retcount);
 
 void
-add_required_method(self, mname)
-    SV *self
+add_required_method(ClassMeta *self, mname)
     SV *mname
   CODE:
-  {
-    ClassMeta *meta = NUM2PTR(ClassMeta *, SvUV(SvRV(self)));
-    mop_class_begin(meta);
+    mop_class_begin(self);
 
-    mop_class_add_required_method(meta, mname);
-  }
+    mop_class_add_required_method(self, mname);
 
 SV *
-add_field(self, fieldname, ...)
-    SV *self
+add_field(ClassMeta *self, fieldname, ...)
     SV *fieldname
   CODE:
   {
     dKWARG(2);
 
-    ClassMeta *meta = NUM2PTR(ClassMeta *, SvUV(SvRV(self)));
-    mop_class_begin(meta);
+    mop_class_begin(self);
 
-    FieldMeta *fieldmeta = mop_class_add_field(meta, sv_mortalcopy(fieldname));
+    FieldMeta *fieldmeta = mop_class_add_field(self, sv_mortalcopy(fieldname));
 
     static const char *args[] = {
       "default",
@@ -369,6 +336,7 @@ add_field(self, fieldname, ...)
       "mutator",
       "accessor",
       "weak",
+      "attributes",
       NULL,
     };
     while(KWARG_NEXT(args)) {
@@ -400,6 +368,19 @@ add_field(self, fieldname, ...)
         case 6: /* weak */
           mop_field_apply_attribute(fieldmeta, "weak", NULL);
           break;
+
+        case 7: /* attributes */
+        {
+          if(!SvROK(kwval) || SvTYPE(SvRV(kwval)) != SVt_PVAV)
+            croak("Expected 'attributes' to be given an ARRAY reference");
+          AV *attributes = AV_FROM_REF(kwval);
+          for(IV ix = 0; ix < av_count(attributes); ix += 2) {
+            SV *attrname = *av_fetch(attributes, ix, 0);
+            SV *attrval  = ix+1 < av_count(attributes) ? *av_fetch(attributes, ix + 1, 0) : &PL_sv_undef;
+
+            mop_field_apply_attribute(fieldmeta, SvPV_nolen(attrname), attrval);
+          }
+        }
       }
     }
 
@@ -412,14 +393,11 @@ add_field(self, fieldname, ...)
     RETVAL
 
 void
-get_field(self, fieldname)
-    SV *self
+get_field(ClassMeta *self, fieldname)
     SV *fieldname
   PPCODE:
   {
-    ClassMeta *meta = NUM2PTR(ClassMeta *, SvUV(SvRV(self)));
-
-    FieldMeta *fieldmeta = mop_class_find_field(meta, fieldname, FIND_FIELD_ONLY_DIRECT);
+    FieldMeta *fieldmeta = mop_class_find_field(self, fieldname, FIND_FIELD_ONLY_DIRECT);
     if(fieldmeta) {
       ST(0) = sv_newmortal();
       sv_setref_iv(ST(0), "Object::Pad::MOP::Field", PTR2UV(fieldmeta));
@@ -427,16 +405,13 @@ get_field(self, fieldname)
     }
 
     croak("Class %" SVf " does not have a field called '%" SVf "'",
-      meta->name, fieldname);
+      self->name, fieldname);
   }
 
 void
-fields(self)
-    SV *self
+fields(ClassMeta *self)
   PPCODE:
-    ClassMeta *meta = NUM2PTR(ClassMeta *, SvUV(SvRV(self)));
-
-    AV *fields = meta->fields;
+    AV *fields = self->fields;
     U32 nfields = av_count(fields);
 
     EXTEND(SP, nfields);
@@ -455,15 +430,12 @@ fields(self)
     XSRETURN(retcount);
 
 void
-required_method_names(self)
-    SV *self
+required_method_names(ClassMeta *self)
   PPCODE:
-    ClassMeta *meta = NUM2PTR(ClassMeta *, SvUV(SvRV(self)));
-
-    if(meta->type != METATYPE_ROLE)
+    if(self->type != METATYPE_ROLE)
       croak("Can only call ->required_method_names on a metaclass for a role");
 
-    AV *required_methods = meta->requiremethods;
+    AV *required_methods = self->requiremethods;
     U32 nmethods = av_count(required_methods);
 
     EXTEND(SP, nmethods);
@@ -475,9 +447,6 @@ required_method_names(self)
     XSRETURN(nmethods);
 
 void
-seal(self)
-    SV *self
+seal(ClassMeta *self)
   CODE:
-    ClassMeta *meta = NUM2PTR(ClassMeta *, SvUV(SvRV(self)));
-
-    mop_class_seal(meta);
+    mop_class_seal(self);

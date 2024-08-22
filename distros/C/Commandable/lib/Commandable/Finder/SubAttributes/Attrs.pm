@@ -1,40 +1,47 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2021-2023 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2021-2024 -- leonerd@leonerd.org.uk
 
-package Commandable::Finder::SubAttributes::Attrs 0.11;
+package Commandable::Finder::SubAttributes::Attrs 0.12;
 
-use v5.14;
+use v5.26;
 use warnings;
+use experimental qw( signatures );
 
 use Carp;
+use meta 0.003_003;
+no warnings qw( meta::experimental );
 
 use Attribute::Storage;
 
-sub import_into
-{
-   my $pkg = shift;
-   my ( $caller ) = @_;
+=head1 NAME
 
+C<Commandable::Finder::SubAttributes::Attrs> - subroutine attribute definitions for C<Commandable::Finder::SubAttributes>
+
+=head1 DESCRIPTION
+
+This module contains the attribute definitions to apply to subroutines when
+using L<Commandable::Finder::SubAttributes>. It should not be used directly.
+
+=cut
+
+sub import_into ( $pkg, $caller )
+{
    # Importing these lexically is a bit of a mess.
-   no strict 'refs';
-   *{"${caller}::MODIFY_CODE_ATTRIBUTES"} = \&MODIFY_CODE_ATTRIBUTES;
-   push @{"${caller}::ISA"}, __PACKAGE__;
+   my $callermeta = meta::package->get( $caller );
+
+   $callermeta->add_symbol( '&MODIFY_CODE_ATTRIBUTES' => \&MODIFY_CODE_ATTRIBUTES );
+   push @{ $callermeta->get_or_add_symbol( '@ISA' )->reference }, __PACKAGE__;
 }
 
-sub Command_description :ATTR(CODE)
+sub Command_description :ATTR(CODE) ( $class, $text )
 {
-   my $class = shift;
-   my ( $text ) = @_;
    return $text;
 }
 
-sub Command_arg :ATTR(CODE,MULTI)
+sub Command_arg :ATTR(CODE,MULTI) ( $class, $args, $name, $description )
 {
-   my $class = shift;
-   my ( $args, $name, $description ) = @_;
-
    my $optional = $name =~ s/\?$//;
    my $slurpy   = $name =~ s/\.\.\.$//;
 
@@ -51,11 +58,8 @@ sub Command_arg :ATTR(CODE,MULTI)
    return $args;
 }
 
-sub Command_opt :ATTR(CODE,MULTI)
+sub Command_opt :ATTR(CODE,MULTI) ( $class, $opts, $name, $description = undef, $default = undef )
 {
-   my $class = shift;
-   my ( $opts, $name, $description, $default ) = @_;
-
    my $mode = "set";
    $mode = "value" if $name =~ s/=$//;
    $mode = "inc"   if $name =~ s/\+$//;
@@ -76,5 +80,11 @@ sub Command_opt :ATTR(CODE,MULTI)
 
    return $opts;
 }
+
+=head1 AUTHOR
+
+Paul Evans <leonerd@leonerd.org.uk>
+
+=cut
 
 0x55AA;

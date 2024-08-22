@@ -438,15 +438,7 @@ static int build_classlike(pTHX_ OP **out, XSParseKeywordPiece *args[], size_t n
 
   SV *packagever = args[argi++]->sv;
 
-  if(args[argi++]->i)
-    /* isa */
-    croak("ARGH should not have seen any 'isa' keywords");
-
   ClassMeta *meta = mop_create_class(type, packagename);
-
-  int nimplements = args[argi++]->i;
-  if(nimplements)
-    croak("ARGH should not have seen any 'does' keywords");
 
   int nattrs = args[argi++]->i;
   if(nattrs) {
@@ -589,14 +581,6 @@ static int build_classlike(pTHX_ OP **out, XSParseKeywordPiece *args[], size_t n
 static const struct XSParseKeywordPieceType pieces_classlike[] = {
   XPK_PACKAGENAME_OPT,
   XPK_VSTRING_OPT,
-  XPK_OPTIONAL(
-    XPK_LITERAL("isa"),
-    XPK_FAILURE("The 'isa' modifier keyword is no longer available; use 'inherit' instead")
-  ),
-  XPK_REPEATED(
-    XPK_LITERAL("does"),
-    XPK_FAILURE("The 'does' modifier keyword is no longer available; use 'apply' instead")
-  ),
   XPK_ATTRIBUTES,
   {0}
 };
@@ -1778,6 +1762,34 @@ static SV *S_ref_field_class(pTHX_ SV *want_fieldname, SV *fieldstore, ClassMeta
   }
 
   return NULL;
+}
+
+/* Handy functions for MOP wrapper methods */
+#define MUST_CLASSMETA_FROM_RV(self)  S_must_classmeta_from_rv(aTHX_ self)
+static ClassMeta *S_must_classmeta_from_rv(pTHX_ SV *self)
+{
+  if(!(SvROK(self) && sv_derived_from(self, "Object::Pad::MOP::Class")))
+    croak("Expected an Object::Pad::MOP::Class instance");
+
+  return MUST_CLASSMETA(NUM2PTR(ClassMeta *, SvUV(SvRV(self))));
+}
+
+#define MUST_FIELDMETA_FROM_RV(self)  S_must_fieldmeta_from_rv(aTHX_ self)
+static FieldMeta *S_must_fieldmeta_from_rv(pTHX_ SV *self)
+{
+  if(!(SvROK(self) && sv_derived_from(self, "Object::Pad::MOP::Field")))
+    croak("Expected an Object::Pad::MOP::Field instance");
+
+  return MUST_FIELDMETA(NUM2PTR(FieldMeta *, SvUV(SvRV(self))));
+}
+
+#define MUST_METHODMETA_FROM_RV(self)  S_must_methodmeta_from_rv(aTHX_ self)
+static MethodMeta *S_must_methodmeta_from_rv(pTHX_ SV *self)
+{
+  if(!(SvROK(self) && sv_derived_from(self, "Object::Pad::MOP::Method")))
+    croak("Expected an Object::Pad::MOP::Method instance");
+
+  return MUST_METHODMETA(NUM2PTR(MethodMeta *, SvUV(SvRV(self))));
 }
 
 MODULE = Object::Pad    PACKAGE = Object::Pad::MOP::Class

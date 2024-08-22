@@ -23,7 +23,7 @@ List of predefined the Suffit API methods
 
 =head2 authn
 
-    my $status = $client->authn($username, $password);
+    my $status = $client->authn($username, $password, $address);
 
 Performs user authentication on the OWL system
 
@@ -70,7 +70,7 @@ Serż Minus (Sergey Lepenkov) L<https://www.serzik.com> E<lt>abalama@cpan.orgE<g
 
 =head1 COPYRIGHT
 
-Copyright (C) 1998-2023 D&D Corporation. All Rights Reserved
+Copyright (C) 1998-2024 D&D Corporation. All Rights Reserved
 
 =head1 LICENSE
 
@@ -80,8 +80,6 @@ modify it under the same terms as Perl itself.
 See C<LICENSE> file and L<https://dev.perl.org/licenses/>
 
 =cut
-
-our $VERSION = '1.02';
 
 use parent qw/ WWW::Suffit::Client /;
 
@@ -94,6 +92,7 @@ sub authn {
     my $self = shift;
     my $username = shift;
     my $password = shift;
+    my $address = shift;
     my $encrypted = 0;
 
     if (length($self->public_key)) {
@@ -110,6 +109,7 @@ sub authn {
     my %data = ();
     $data{username} = $username if defined $username;
     $data{password} = $password if defined $password;
+    $data{address} = $address if defined $address;
     $data{encrypted} = \$encrypted,
 
     # Request

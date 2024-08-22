@@ -3,10 +3,11 @@
 #
 #  (C) Paul Evans, 2024 -- leonerd@leonerd.org.uk
 
-package App::csvtool::Timetools 0.02;
+package App::csvtool::Timetools 0.03;
 
 use v5.26;
 use warnings;
+use experimental 'signatures';
 
 =head1 NAME
 
@@ -58,22 +59,16 @@ use constant COMMON_COMMAND_OPTS => (
    { name => "utc|U", description => "Use UTC instead of local time" },
 );
 
-sub formattime
+sub formattime ( $pkg, $opts, $time )
 {
-   shift;
-   my ( $opts, $time ) = @_;
-
    my $TIMEFMT = $opts->{timefmt};
    my @t = $opts->{utc} ? gmtime( $time ) : localtime( $time );
 
    return strftime( $TIMEFMT, @t );
 }
 
-sub parsetime
+sub parsetime ( $pkg, $opts, $str )
 {
-   shift;
-   my ( $opts, $str ) = @_;
-
    my $TIMEFMT = $opts->{timefmt};
    my @t = ( strptime $str, $TIMEFMT )[0..5]; # take only sec-year, ignore wday/yday
    grep { defined } @t or
@@ -122,10 +117,8 @@ The field index to format the timestamp into (defaults to 1).
    use constant WANT_READER => 1;
    use constant WANT_OUTPUT => 1;
 
-   sub run
+   sub run ( $pkg, $opts, $reader, $output )
    {
-      shift;
-      my ( $opts, $reader, $output ) = @_;
       my $FIELD = $opts->{field}; $FIELD--;
 
       while( my $row = $reader->() ) {
@@ -164,10 +157,8 @@ The field index to parse the timestamp from (defaults to 1).
    use constant WANT_READER => 1;
    use constant WANT_OUTPUT => 1;
 
-   sub run
+   sub run ( $pkg, $opts, $reader, $output )
    {
-      shift;
-      my ( $opts, $reader, $output ) = @_;
       my $FIELD = $opts->{field}; $FIELD--;
 
       while( my $row = $reader->() ) {
@@ -211,10 +202,8 @@ Reverses the order of sorting.
    use constant WANT_READER => 1;
    use constant WANT_OUTPUT => 1;
 
-   sub run
+   sub run ( $pkg, $opts, $reader, $output )
    {
-      shift;
-      my ( $opts, $reader, $output ) = @_;
       my $FIELD = $opts->{field}; $FIELD--;
 
       my @rows;

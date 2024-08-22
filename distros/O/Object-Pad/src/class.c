@@ -676,6 +676,41 @@ static PADOFFSET S_find_padix_for_field(pTHX_ FieldMeta *fieldmeta)
 #endif
 }
 
+FieldMeta *ObjectPad_get_field_for_padix(pTHX_ PADOFFSET padix)
+{
+  CV *scope = PL_compcv;
+
+  ClassMeta *classmeta = get_compclassmeta();
+
+  while(scope && scope != classmeta->methodscope) {
+    PADNAMELIST *pnl = PadlistNAMES(CvPADLIST(scope));
+    PADNAME *name = PadnamelistARRAY(pnl)[padix];
+
+    /* field names are all OUTER vars */
+    if(!PadnameOUTER(name))
+      return NULL;
+
+    padix = PARENT_PAD_INDEX(name);
+    scope = CvOUTSIDE(scope);
+  }
+
+  if(!scope)
+    return NULL;
+
+  /* padix refers to the pad offset within the methodscope, and we know that
+   * the method scope contains all the fields in the right order
+   */
+  AV *fields = classmeta->fields;
+  if(av_count(fields) <= (padix - 1))
+    return NULL;
+
+  FieldMeta *fieldmeta = MUST_FIELDMETA(AvARRAY(fields)[padix - 1]);
+
+  /* TODO: assert on the field name being equal to the padname */
+
+  return fieldmeta;
+}
+
 #define make_methstart_ops(meta, outerscope)  S_make_methstart_ops(aTHX_ meta, outerscope)
 static OP *S_make_methstart_ops(pTHX_ ClassMeta *meta, CV *outerscope)
 {
@@ -2361,6 +2396,15 @@ ClassMeta *ObjectPad_mop_create_class(pTHX_ enum MetaType type, SV *name)
     assert(PL_compcv);
   }
 
+  ENTER;
+  SAVEGENERICSV(PL_curstash);
+
+  PL_curstash = (HV *)SvREFCNT_inc(meta->stash);
+  if(!IN_PERL_COMPILETIME) {
+    // We need to trick this too
+    SAVESPTR(PL_curcop); PL_curcop = &PL_compiling;
+  }
+
   /* Prepare meta->initfields for containing a CV parsing operation */
   {
     I32 floor_ix = start_subparse(FALSE, 0);
@@ -2411,24 +2455,19 @@ ClassMeta *ObjectPad_mop_create_class(pTHX_ enum MetaType type, SV *name)
 
   {
     /* Inject the constructor */
-    SV *newname = newSVpvf("%" SVf "::new", name);
-    SAVEFREESV(newname);
-
     CV *newcv;
     if(type == METATYPE_CLASS) {
-      newcv = newXS_flags(SvPV_nolen(newname), injected_constructor, __FILE__, NULL, SvFLAGS(newname) & SVf_UTF8);
+      newcv = newXS_flags("new", injected_constructor, __FILE__, NULL, 0);
     }
     else {
-      newcv = newXS_flags(SvPV_nolen(newname), injected_constructor_role, __FILE__, NULL, SvFLAGS(newname) & SVf_UTF8);
+      newcv = newXS_flags("new", injected_constructor_role, __FILE__, NULL, 0);
     }
 
     CvXSUBANY(newcv).any_ptr = meta;
   }
 
   {
-    SV *doesname = newSVpvf("%" SVf "::DOES", name);
-    SAVEFREESV(doesname);
-    CV *doescv = newXS_flags(SvPV_nolen(doesname), injected_DOES, __FILE__, NULL, SvFLAGS(doesname) & SVf_UTF8);
+    CV *doescv = newXS_flags("DOES", injected_DOES, __FILE__, NULL, 0);
     CvXSUBANY(doescv).any_ptr = meta;
   }
 
@@ -2444,6 +2483,24 @@ ClassMeta *ObjectPad_mop_create_class(pTHX_ enum MetaType type, SV *name)
     newCONSTSUB(meta->stash, "META", sv);
   }
 
+#if HAVE_PERL_VERSION(5, 26, 0)
+  /* On Perl 5.26 and above we can create and grab the @ISA array now while
+   * we have the PL_curstash set right
+   * On earlier perls it doesn't work this way so we have to go the long way
+   * around
+   */
+  meta->isa = get_av("ISA", GV_ADDMG);
+#else
+  {
+    SV *isaname = newSVpvf("%" SVf "::ISA", name);
+    SAVEFREESV(isaname);
+
+    meta->isa = get_av(SvPV_nolen(isaname), GV_ADD | (SvFLAGS(isaname) & SVf_UTF8));
+  }
+#endif
+
+  LEAVE;
+
   return meta;
 }
 
@@ -2454,15 +2511,7 @@ void ObjectPad_mop_class_set_superclass(pTHX_ ClassMeta *meta, SV *superclassnam
   if(meta->has_superclass)
     croak("Class already has a superclass, cannot add another");
 
-  AV *isa;
-  {
-    SV *isaname = newSVpvf("%" SVf "::ISA", meta->name);
-    SAVEFREESV(isaname);
-
-    isa = get_av(SvPV_nolen(isaname), GV_ADD | (SvFLAGS(isaname) & SVf_UTF8));
-  }
-
-  av_push(isa, SvREFCNT_inc(superclassname));
+  av_push(meta->isa, SvREFCNT_inc(superclassname));
 
   ClassMeta *supermeta = NULL;
 
@@ -2627,12 +2676,8 @@ void ObjectPad_mop_class_begin(pTHX_ ClassMeta *meta)
     /* idempotent */
     return;
 
-  SV *isaname = newSVpvf("%" SVf "::ISA", meta->name);
-  SAVEFREESV(isaname);
-
   if(meta->type == METATYPE_CLASS && !meta->cls.supermeta) {
-    AV *isa = get_av(SvPV_nolen(isaname), GV_ADD | (SvFLAGS(isaname) & SVf_UTF8));
-    av_push(isa, newSVpvs("Object::Pad::UNIVERSAL"));
+    av_push(meta->isa, newSVpvs("Object::Pad::UNIVERSAL"));
   }
 
   if(meta->type == METATYPE_CLASS &&

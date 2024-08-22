@@ -1,12 +1,13 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2018 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2018-2024 -- leonerd@leonerd.org.uk
 
-package Commandable::Invocation 0.11;
+package Commandable::Invocation 0.12;
 
-use v5.14;
+use v5.26;
 use warnings;
+use experimental qw( signatures );
 
 =head1 NAME
 
@@ -54,11 +55,8 @@ Constructs a new instance, initialised to contain the given text string.
 
 =cut
 
-sub new
+sub new ( $class, $text )
 {
-   my $class = shift;
-   my ( $text ) = @_;
-
    $text =~ s/^\s+//;
 
    return bless {
@@ -79,11 +77,8 @@ cases where text has already been parsed and split into tokens.
 
 =cut
 
-sub new_from_tokens
+sub new_from_tokens ( $class, @tokens )
 {
-   my $class = shift;
-   my ( @tokens ) = @_;
-
    my $self = $class->new( "" );
    $self->putback_tokens( @tokens );
 
@@ -94,10 +89,8 @@ sub new_from_tokens
 
 =cut
 
-sub _next_token
+sub _next_token ( $self )
 {
-   my $self = shift;
-
    if( $self->{text} =~ m/^"/ ) {
       $self->{text} =~ m/^"((?:\\.|[^"])*)"\s*/ and
          $self->{trim_pos} = $+[0], return $self->_unescape( $1 );
@@ -110,29 +103,19 @@ sub _next_token
    return undef;
 }
 
-sub _escape
+sub _escape ( $self, $s )
 {
-   my $self = shift;
-   my ( $s ) = @_;
-
-   $s =~ s/(["\\])/\\$1/g;
-
-   return $s;
+   return $s =~ s/(["\\])/\\$1/gr;
 }
 
-sub _unescape
+sub _unescape ( $self, $s )
 {
-   my $self = shift;
-   my ( $s ) = @_;
-
-   $s =~ s/\\(["\\])/$1/g;
-
-   return $s;
+   return $s =~ s/\\(["\\])/$1/gr;
 }
 
 =head2 peek_token
 
-   $token = $inv->peek_token
+   $token = $inv->peek_token;
 
 Looks at, but does not remove, the next token in the text string. Subsequent
 calls to this method will yield the same string, as will the next call to
@@ -140,25 +123,21 @@ L</pull_token>.
 
 =cut
 
-sub peek_token
+sub peek_token ( $self )
 {
-   my $self = shift;
-
    return $self->{next_token} //= $self->_next_token;
 }
 
 =head2 pull_token
 
-   $token = $inv->pull_token
+   $token = $inv->pull_token;
 
 Removes the next token from the text string and returns it.
 
 =cut
 
-sub pull_token
+sub pull_token ( $self )
 {
-   my $self = shift;
-
    my $token = $self->{next_token} //= $self->_next_token;
 
    substr $self->{text}, 0, $self->{trim_pos}, "" if defined $token;
@@ -169,7 +148,7 @@ sub pull_token
 
 =head2 peek_remaining
 
-   $text = $inv->peek_remaining
+   $text = $inv->peek_remaining;
 
 I<Since version 0.04.>
 
@@ -177,16 +156,14 @@ Returns the entire unparsed content of the rest of the text string.
 
 =cut
 
-sub peek_remaining
+sub peek_remaining ( $self )
 {
-   my $self = shift;
-
    return $self->{text};
 }
 
 =head2 putback_tokens
 
-   $inv->putback_tokens( @tokens )
+   $inv->putback_tokens( @tokens );
 
 I<Since version 0.02.>
 
@@ -201,15 +178,13 @@ positional arguments after the options have been parsed and removed from it.
 
 =cut
 
-sub putback_tokens
+sub putback_tokens ( $self, @tokens )
 {
-   my $self = shift;
-
    $self->{text} = join " ",
       ( map {
          my $s = $self->_escape( $_ );
          $s =~ m/ / ? qq("$s") : $s
-      } @_ ),
+      } @tokens ),
       ( length $self->{text} ? $self->{text} : () );
 }
 

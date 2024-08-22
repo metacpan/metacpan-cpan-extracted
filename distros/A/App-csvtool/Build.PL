@@ -8,8 +8,9 @@ my $build = Module::Build->new(
    module_name => 'App::csvtool',
    requires => {
       'perl' => '5.026',
+      'experimental' => 0,
 
-      'Commandable::Finder::Packages' => '0.11',
+      'Commandable::Finder::Packages' => '0.12',
       'Commandable::Invocation' => '0.03',
       'File::Basename' => 0,
       'Getopt::Long' => 0,

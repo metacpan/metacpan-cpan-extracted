@@ -73,7 +73,7 @@ use File::Spec qw//;
 
 use constant {
     # System constants
-    IS_TTY              => !!(-t STDOUT),
+    IS_TTY              => !!(-t STDIN && (-t STDOUT || !(-f STDOUT || -c STDOUT))), # See Prompt::Timeout
     IS_ROOT             => !!($> == 0),
 
     # Date and time formats (see strftime(3))

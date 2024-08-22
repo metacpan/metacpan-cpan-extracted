@@ -12,7 +12,6 @@
 use Test::More;
 use Acrux::Util qw/fdatetime truncstr words/;
 
-ok(Acrux::Util->VERSION, 'Version');
 ok(fdatetime(time), 'DateTime');
 
 # TruncSTR

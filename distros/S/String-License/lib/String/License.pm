@@ -4,7 +4,7 @@ use warnings;
 use feature qw(signatures);
 no warnings qw(experimental::signatures);
 
-use Feature::Compat::Class 0.04;
+use Feature::Compat::Class 0.07;
 
 =head1 NAME
 
@@ -12,7 +12,7 @@ String::License - detect source code license statements in a text string
 
 =head1 VERSION
 
-Version v0.0.9
+Version v0.0.11
 
 =head1 SYNOPSIS
 
@@ -35,7 +35,7 @@ and serializes them in a normalized format.
 
 =cut
 
-package String::License v0.0.9;
+package String::License v0.0.11;
 
 use Carp         qw(croak);
 use Log::Any     ();
@@ -55,13 +55,12 @@ class Tag {
 	field $begin : param;
 	field $end : param;
 
-	method name () { return $name }
 	method data () { return lc __CLASS__, $name, $desc, $begin, $end }
 }
 
-class Exception : isa(Tag) { }
+class Exception : isa(Tag) {;}
 
-class Flaw : isa(Tag) { }
+class Flaw : isa(Tag) {;}
 
 class Licensing {
 	field $name : param;
@@ -70,9 +69,9 @@ class Licensing {
 	method data () { return lc __CLASS__, $name, $desc }
 }
 
-class Fulltext : isa(Tag) { }
+class Fulltext : isa(Tag) {;}
 
-class Grant : isa(Tag) { }
+class Grant : isa(Tag) {;}
 
 class String::License;
 

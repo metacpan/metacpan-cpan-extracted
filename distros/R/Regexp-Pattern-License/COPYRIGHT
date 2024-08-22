@@ -3,15 +3,8 @@ Upstream-Name: Regexp-Pattern-License
 Upstream-Contact: Jonas Smedegaard (JONASS) <jonass@cpan.org>
 Source: https://metacpan.org/pod/Regexp::Pattern::License
 
-Files: Changes
- META.json
- META.yml
- doap.ttl
- lib/Regexp/Pattern/License.pm
- lib/Regexp/Pattern/License/Parts.pm
- t/01-basic.t
+Files: t/01-basic.t
  t/02-regexp-pattern.t
- t/02-regexp-pattern_RE2.t
  t/02-regexp-pattern_RE2_missing.t
  t/02-structure.t
  t/03-match-normalized.t
@@ -38,8 +31,18 @@ Files: Changes
  t/coverage-wikidata.t
  t/lib/Test2/Tools/LicenseObject.pm
  t/lib/Test2/Tools/LicenseRegistry.pm
- t/version.t
 Copyright: Copyright 2023 Jonas Smedegaard.
+License: GPL-3.0
+
+Files: Changes
+ META.json
+ META.yml
+ doap.ttl
+ lib/Regexp/Pattern/License.pm
+ lib/Regexp/Pattern/License/Parts.pm
+ t/02-regexp-pattern_RE2.t
+ t/version.t
+Copyright: Copyright 2024 Jonas Smedegaard.
 License: GPL-3.0
 
 Files: INSTALL
@@ -65,21 +68,21 @@ Copyright: Copyright 2020 Toby Inkster.
 License: GPL-1.0+ or Artistic-1.0
 
 License: GPL-3.0
- This software is Copyright (c) 2023 by Jonas Smedegaard.
+ This software is Copyright (c) 2024 by Jonas Smedegaard.
  
  This is free software, licensed under:
  
    The GNU General Public License, Version 3, June 2007
 
 License: Artistic-1.0
- This software is Copyright (c) 2023 by the copyright holder(s).
+ This software is Copyright (c) 2024 by the copyright holder(s).
  
  This is free software, licensed under:
  
    The Artistic License 1.0
 
 License: GPL-1.0
- This software is Copyright (c) 2023 by the copyright holder(s).
+ This software is Copyright (c) 2024 by the copyright holder(s).
  
  This is free software, licensed under:
  

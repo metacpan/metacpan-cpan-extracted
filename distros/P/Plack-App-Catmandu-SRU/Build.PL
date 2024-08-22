@@ -18,7 +18,7 @@ my %module_build_args = (
     "=over 4"
   ],
   "dist_name" => "Plack-App-Catmandu-SRU",
-  "dist_version" => "0.01",
+  "dist_version" => "0.02",
   "license" => "perl",
   "module_name" => "Plack::App::Catmandu::SRU",
   "recursive_test_files" => 1,

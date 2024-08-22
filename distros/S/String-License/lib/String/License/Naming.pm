@@ -4,7 +4,7 @@ use warnings;
 use feature qw(signatures);
 no warnings qw(experimental::signatures);
 
-use Feature::Compat::Class 0.04;
+use Feature::Compat::Class 0.07;
 
 =head1 NAME
 
@@ -12,7 +12,7 @@ String::License::Naming - base class for names of licenses and license naming sc
 
 =head1 VERSION
 
-Version v0.0.9
+Version v0.0.11
 
 =head1 DESCRIPTION
 
@@ -25,15 +25,15 @@ e.g. L<String::License::Naming::SPDX>.
 
 =cut
 
-package String::License::Naming v0.0.9;
+package String::License::Naming v0.0.11;
 
 use namespace::clean;
 
 class String::License::Naming;
 
-method list_schemes () {...}
+method list_schemes () { ...; }
 
-method list_licenses () {...}
+method list_licenses () { ...; }
 
 sub resolve_shortnames ( $keys, $schemes, $bootstrap = undef )
 {

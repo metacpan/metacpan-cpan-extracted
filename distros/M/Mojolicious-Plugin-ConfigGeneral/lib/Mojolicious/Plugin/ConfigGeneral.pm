@@ -6,10 +6,6 @@ package Mojolicious::Plugin::ConfigGeneral;
 
 Mojolicious::Plugin::ConfigGeneral - Config::General Configuration Plugin for Mojolicious
 
-=head1 VERSION
-
-Version 1.02
-
 =head1 SYNOPSIS
 
     use Mojolicious::Plugin::ConfigGeneral;
@@ -152,7 +148,7 @@ See C<LICENSE> file and L<https://dev.perl.org/licenses/>
 
 =cut
 
-our $VERSION = '1.03';
+our $VERSION = '1.04';
 
 use Mojo::Base 'Mojolicious::Plugin';
 use Config::General qw//;

@@ -44,6 +44,11 @@ FieldMeta *ObjectPad_mop_create_field(pTHX_ SV *fieldname, FIELDOFFSET fieldix, 
   return fieldmeta;
 }
 
+ClassMeta *ObjectPad_mop_field_get_class(pTHX_ FieldMeta *fieldmeta)
+{
+  return fieldmeta->class;
+}
+
 SV *ObjectPad_mop_field_get_name(pTHX_ FieldMeta *fieldmeta)
 {
   return fieldmeta->name;
@@ -172,9 +177,16 @@ static void register_field_attribute(const char *name, const struct FieldHookFun
   fieldattrs = reg;
 }
 
-static void apply_attribute(pTHX_ FieldMeta *fieldmeta, const char *name, bool parse_value, SV *value)
+enum {
+  APPLY_ATTRIBUTE_PARSE             = (1<<0),
+  APPLY_ATTRIBUTE_USE_RUNTIME_HINTS = (1<<1),
+};
+
+static void apply_attribute(pTHX_ FieldMeta *fieldmeta, const char *name, SV *value, U8 flags)
 {
+  bool use_runtime_hints = flags & APPLY_ATTRIBUTE_USE_RUNTIME_HINTS;
   HV *hints = GvHV(PL_hintgv);
+  COPHH *cophh = CopHINTHASH_get(PL_curcop);
 
   if(value && (!SvPOK(value) || !SvCUR(value)))
     value = NULL;
@@ -184,9 +196,16 @@ static void apply_attribute(pTHX_ FieldMeta *fieldmeta, const char *name, bool p
     if(!strEQ(name, reg->name))
       continue;
 
-    if(reg->funcs->permit_hintkey &&
-       (!hints || !hv_fetch(hints, reg->funcs->permit_hintkey, reg->permit_hintkeylen, 0)))
-      continue;
+    if(reg->funcs->permit_hintkey) {
+      if(use_runtime_hints) {
+        if(!cophh_fetch_pvn(cophh, reg->funcs->permit_hintkey, reg->permit_hintkeylen, 0, 0))
+          continue;
+      }
+      else {
+        if(!hints || !hv_fetch(hints, reg->funcs->permit_hintkey, reg->permit_hintkeylen, 0))
+          continue;
+      }
+    }
 
     break;
   }
@@ -199,7 +218,7 @@ static void apply_attribute(pTHX_ FieldMeta *fieldmeta, const char *name, bool p
   if((reg->funcs->flags & OBJECTPAD_FLAG_ATTR_MUST_VALUE) && !value)
     croak("Attribute :%s requires a value", name);
 
-  if(parse_value && reg->funcs->parse)
+  if((flags & APPLY_ATTRIBUTE_PARSE) && reg->funcs->parse)
     value = (*reg->funcs->parse)(aTHX_ fieldmeta, value, reg->funcdata);
 
   SV *attrdata = value;
@@ -229,12 +248,13 @@ static void apply_attribute(pTHX_ FieldMeta *fieldmeta, const char *name, bool p
 
 void ObjectPad_mop_field_apply_attribute(pTHX_ FieldMeta *fieldmeta, const char *name, SV *value)
 {
-  apply_attribute(aTHX_ fieldmeta, name, false, value);
+  bool runtime = !IN_PERL_COMPILETIME;
+  apply_attribute(aTHX_ fieldmeta, name, value, runtime ? APPLY_ATTRIBUTE_USE_RUNTIME_HINTS : 0);
 }
 
 void ObjectPad_mop_field_parse_and_apply_attribute(pTHX_ FieldMeta *fieldmeta, const char *name, SV *value)
 {
-  apply_attribute(aTHX_ fieldmeta, name, true, value);
+  apply_attribute(aTHX_ fieldmeta, name, value, APPLY_ATTRIBUTE_PARSE);
 }
 
 static FieldAttributeRegistration *get_active_registration(pTHX_ const char *name)
@@ -310,10 +330,12 @@ AV *ObjectPad_mop_field_get_attribute_values(pTHX_ FieldMeta *fieldmeta, const c
   return ret;
 }
 
-SV *ObjectPad_get_obj_fieldsv(pTHX_ SV *self, ClassMeta *classmeta, FieldMeta *fieldmeta)
+SV *ObjectPad_get_obj_fieldsv(pTHX_ SV *self, FieldMeta *fieldmeta)
 {
   SV *fieldstore;
   FIELDOFFSET fieldix;
+
+  ClassMeta *classmeta = fieldmeta->class;
 
   assert(SvROK(self));
   assert(SvOBJECT(SvRV(self)));

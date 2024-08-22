@@ -1,0 +1,13 @@
+ClassMeta *   CLASSMETA
+FieldMeta *   FIELDMETA
+MethodMeta *  METHODMETA
+
+INPUT
+CLASSMETA
+  $var = MUST_CLASSMETA_FROM_RV($arg);
+
+FIELDMETA
+  $var = MUST_FIELDMETA_FROM_RV($arg);
+
+METHODMETA
+  $var = MUST_METHODMETA_FROM_RV($arg);

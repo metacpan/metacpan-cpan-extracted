@@ -1,5 +1,10 @@
 # Version/Revision history
 
+1.03 Wed 21 Aug 2024 19:31:59 MSK
+    * Added address attribute to authn method
+    * Added apicode method
+    * Added api_status method
+
 1.02 Fri 01 Dec 2023 10:46:08 MSK
     * Added the apierr method to main client module
 

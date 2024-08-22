@@ -136,6 +136,9 @@ ClassMeta *ObjectPad_get_compclassmeta(pTHX);
 #define extend_pad_vars(meta)  ObjectPad_extend_pad_vars(aTHX_ meta)
 void ObjectPad_extend_pad_vars(pTHX_ const ClassMeta *meta);
 
+#define get_field_for_padix(padix)  ObjectPad_get_field_for_padix(aTHX_ padix)
+FieldMeta *ObjectPad_get_field_for_padix(pTHX_ PADOFFSET padix);
+
 #define newMETHSTARTOP(flags)  ObjectPad_newMETHSTARTOP(aTHX_ flags)
 OP *ObjectPad_newMETHSTARTOP(pTHX_ U32 flags);
 
@@ -159,8 +162,8 @@ SV *ObjectPad_get_obj_backingav(pTHX_ SV *self, enum ReprType repr, bool create)
 #define get_obj_fieldstore(self, repr, create)  ObjectPad_get_obj_fieldstore(aTHX_ self, repr, create)
 SV *ObjectPad_get_obj_fieldstore(pTHX_ SV *self, enum ReprType repr, bool create);
 
-#define get_obj_fieldsv(self, classmeta, fieldmeta)  ObjectPad_get_obj_fieldsv(aTHX_ self, classmeta, fieldmeta)
-SV *ObjectPad_get_obj_fieldsv(pTHX_ SV *self, ClassMeta *classmeta, FieldMeta *fieldmeta);
+#define get_obj_fieldsv(self, fieldmeta)  ObjectPad_get_obj_fieldsv(aTHX_ self, fieldmeta)
+SV *ObjectPad_get_obj_fieldsv(pTHX_ SV *self, FieldMeta *fieldmeta);
 
 /* Class API */
 #define mop_create_class(type, name)  ObjectPad_mop_create_class(aTHX_ type, name)
@@ -237,6 +240,9 @@ FieldMeta *ObjectPad_mop_create_field(pTHX_ SV *fieldname, FIELDOFFSET fieldix, 
 
 #define mop_field_seal(fieldmeta)  ObjectPad_mop_field_seal(aTHX_ fieldmeta)
 void ObjectPad_mop_field_seal(pTHX_ FieldMeta *fieldmeta);
+
+#define mop_field_get_class(fieldmeta)  ObjectPad_mop_field_get_class(aTHX_ fieldmeta)
+ClassMeta *ObjectPad_mop_field_get_class(pTHX_ FieldMeta *fieldmeta);
 
 #define mop_field_get_name(fieldmeta)  ObjectPad_mop_field_get_name(aTHX_ fieldmeta)
 SV *ObjectPad_mop_field_get_name(pTHX_ FieldMeta *fieldmeta);

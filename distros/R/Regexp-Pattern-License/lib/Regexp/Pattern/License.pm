@@ -19,11 +19,11 @@ Regexp::Pattern::License - Regular expressions for legal licenses
 
 =head1 VERSION
 
-Version v3.11.1
+Version v3.11.2
 
 =cut
 
-our $VERSION = version->declare("v3.11.1");
+our $VERSION = version->declare("v3.11.2");
 
 =head1 SYNOPSIS
 
@@ -614,8 +614,6 @@ $RE{except_autoconf_2_g10} = {
 		'g10 Code GmbH gives unlimited permission',
 	'pat.alt.subject.trait.part.part2' =>
 		'Certain portions of the mk[word]\.awk source text are designed',
-	'pat.alt.subject.trait.part.part3' =>
-		'If your modification has such potential, you must delete',
 };
 
 $RE{except_autoconf_3} = {
@@ -15550,7 +15548,7 @@ for my $id (@_OBJECTS) {
 					re::engine::RE2->import(
 						-strict  => 1,
 						-max_mem => 8 << 21,
-					);
+					) if $CAN_RE2;
 				}
 				return qr/$pat/;
 			}

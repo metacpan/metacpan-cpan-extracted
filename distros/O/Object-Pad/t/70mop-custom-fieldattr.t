@@ -54,4 +54,19 @@ EOPERL
    qr/^Attribute :SomeAttr requires a value at /,
    'field attribute that requires a value complains when missing one' );
 
+# custom attributes can be applied via MOP
+{
+   my $classmeta = Object::Pad::MOP::Class->create_class( "WithAttrMOP" );
+
+   BEGIN { $^H{"t/SomeAttr"}++ }
+   my $fieldmeta = $classmeta->add_field( '$field',
+      attributes => [
+         "SomeAttr" => "the value",
+      ],
+   );
+
+   ok( $fieldmeta->has_attribute( "SomeAttr" ), 'MOP-added $field has :SomeAttr' );
+   is( $fieldmeta->get_attribute_value( "SomeAttr" ), "result-3", 'stored value for :SomeAttr' );
+}
+
 done_testing;

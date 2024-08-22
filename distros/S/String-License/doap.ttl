@@ -818,7 +818,7 @@
 	dc:contributor       <http://purl.org/NET/cpan-uri/person/jonass>;
 	doap-deps:runtime-recommendation [ doap-deps:on "re::engine::RE2"^^doap-deps:CpanId ];
 	doap-deps:runtime-requirement [ doap-deps:on "Array::IntSpan"^^doap-deps:CpanId ], [
-		doap-deps:on "Feature::Compat::Class 0.04"^^doap-deps:CpanId;
+		doap-deps:on "Feature::Compat::Class 0.07"^^doap-deps:CpanId;
 	], [ doap-deps:on "List::Util 1.45"^^doap-deps:CpanId ], [ doap-deps:on "Log::Any"^^doap-deps:CpanId ], [ doap-deps:on "namespace::clean"^^doap-deps:CpanId ], [ doap-deps:on "Path::Tiny 0.062"^^doap-deps:CpanId ], [
 		doap-deps:on "Regexp::Pattern 0.2.12"^^doap-deps:CpanId;
 	], [
@@ -827,7 +827,7 @@
 	doap-deps:test-recommendation [ doap-deps:on "File::BaseDir"^^doap-deps:CpanId ], [
 		doap-deps:on "Regexp::Pattern::License 3.9.0"^^doap-deps:CpanId;
 	], [
-		doap-deps:on "Software::LicenseUtils 0.104004"^^doap-deps:CpanId;
+		doap-deps:on "Software::LicenseUtils 0.104006"^^doap-deps:CpanId;
 	], [ doap-deps:on "YAML::XS"^^doap-deps:CpanId ];
 	doap-deps:test-requirement [
 		doap-deps:on "Test::Without::Module"^^doap-deps:CpanId;
@@ -842,12 +842,52 @@
 	doap:maintainer      <http://purl.org/NET/cpan-uri/person/jonass>;
 	doap:name            "String-License";
 	doap:programming-language "Perl";
-	doap:release         <http://purl.org/NET/cpan-uri/dist/String-License/v_v0-0-1>, <http://purl.org/NET/cpan-uri/dist/String-License/v_v0-0-2>, <http://purl.org/NET/cpan-uri/dist/String-License/v_v0-0-3>, <http://purl.org/NET/cpan-uri/dist/String-License/v_v0-0-4>, <http://purl.org/NET/cpan-uri/dist/String-License/v_v0-0-5>, <http://purl.org/NET/cpan-uri/dist/String-License/v_v0-0-6>, <http://purl.org/NET/cpan-uri/dist/String-License/v_v0-0-7>, <http://purl.org/NET/cpan-uri/dist/String-License/v_v0-0-8>, <http://purl.org/NET/cpan-uri/dist/String-License/v_v0-0-9>;
+	doap:release         <http://purl.org/NET/cpan-uri/dist/String-License/v_v0-0-1>, <http://purl.org/NET/cpan-uri/dist/String-License/v_v0-0-10>, <http://purl.org/NET/cpan-uri/dist/String-License/v_v0-0-11>, <http://purl.org/NET/cpan-uri/dist/String-License/v_v0-0-2>, <http://purl.org/NET/cpan-uri/dist/String-License/v_v0-0-3>, <http://purl.org/NET/cpan-uri/dist/String-License/v_v0-0-4>, <http://purl.org/NET/cpan-uri/dist/String-License/v_v0-0-5>, <http://purl.org/NET/cpan-uri/dist/String-License/v_v0-0-6>, <http://purl.org/NET/cpan-uri/dist/String-License/v_v0-0-7>, <http://purl.org/NET/cpan-uri/dist/String-License/v_v0-0-8>, <http://purl.org/NET/cpan-uri/dist/String-License/v_v0-0-9>;
 	doap:repository      [
 		a doap:GitRepository;
 		doap:browse <https://salsa.debian.org/build-common-team/p5-string-license>;
 	];
 	doap:shortdesc       "detect source code license statements in a text string".
+
+<http://purl.org/NET/cpan-uri/dist/String-License/v_v0-0-10>
+	a                    doap:Version;
+	dc:identifier        "String-License-v0.0.10"^^xsd:string;
+	dc:issued            "2024-08-21"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Tests;
+			rdfs:label "update test Software-License.t and tighten to require 0.104006";
+		], [
+			a doap-changeset:Tests;
+			rdfs:label "update test Software-License.t, and tighten to require Regexp::Pattern::License 3.11.0";
+			doap-bugs:fixes <https://bugs.debian.org/1054364>;
+			doap-changeset:thanks <http://webid.debian.net/maintainers/gregoa>, <http://webid.debian.net/maintainers/roland>;
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/jonass>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/J/JO/JONASS/String-License-v0.0.10.tar.gz>;
+	doap:revision        "v0.0.10"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/String-License/v_v0-0-11>
+	a                    doap:Version;
+	dc:identifier        "String-License-v0.0.11"^^xsd:string;
+	dc:issued            "2024-08-22"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Tests;
+			rdfs:label "disambiguate empty code blocks to not confuse perl < 5.26";
+			doap-bugs:fixes <http://purl.org/NET/cpan-uri/rt/ticket/155041>;
+			doap-changeset:thanks <http://purl.org/NET/cpan-uri/person/srezic>;
+		], [
+			a doap-changeset:Tests;
+			rdfs:label "tighten to require Feature::Compat::Class v0.07";
+			doap-bugs:fixes <http://purl.org/NET/cpan-uri/rt/ticket/155042>;
+			doap-changeset:thanks <http://purl.org/NET/cpan-uri/person/srezic>;
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/jonass>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/J/JO/JONASS/String-License-v0.0.11.tar.gz>;
+	doap:revision        "v0.0.11"^^xsd:string.
 
 <http://purl.org/NET/cpan-uri/dist/String-License/v_v0-0-1>
 	a                    doap:Version;
@@ -983,6 +1023,9 @@
 	doap-changeset:changeset [
 		doap-changeset:item [
 			a doap-changeset:Bugfix;
+			rdfs:label "stepwise detect prepended version, with Regexp::Pattern::License v3.11.0";
+		], [
+			a doap-changeset:Bugfix;
 			rdfs:label "stepwise detect version_only, with Regexp::Pattern::License v3.11.0";
 		], [
 			a doap-changeset:Tests;
@@ -1026,9 +1069,6 @@
 		], [
 			a doap-changeset:Change;
 			rdfs:label "tighten positioning and reporting of stepwise detected version";
-		], [
-			a doap-changeset:Bugfix;
-			rdfs:label "stepwise detect prepended version, with Regexp::Pattern::License v3.11.0";
 		];
 	];
 	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/jonass>;
@@ -1104,6 +1144,16 @@
 	doap-bugs:id         "148507"^^xsd:string;
 	doap-bugs:page       <https://rt.cpan.org/Ticket/Display.html?id=148507>.
 
+<http://purl.org/NET/cpan-uri/rt/ticket/155041>
+	a                    doap-bugs:Issue;
+	doap-bugs:id         "155041"^^xsd:string;
+	doap-bugs:page       <https://rt.cpan.org/Ticket/Display.html?id=155041>.
+
+<http://purl.org/NET/cpan-uri/rt/ticket/155042>
+	a                    doap-bugs:Issue;
+	doap-bugs:id         "155042"^^xsd:string;
+	doap-bugs:page       <https://rt.cpan.org/Ticket/Display.html?id=155042>.
+
 <http://webid.debian.net/maintainers/abe>
 	foaf:mbox            <mailto:abe@debian.org>;
 	foaf:name            "Axel Beckert".
@@ -1135,6 +1185,10 @@
 <http://webid.debian.net/maintainers/pabs>
 	foaf:mbox            <mailto:pabs@debian.org>;
 	foaf:name            "Paul Wise".
+
+<http://webid.debian.net/maintainers/roland>
+	foaf:mbox            <mailto:roland@debian.org>;
+	foaf:name            "Roland Rosenfeld".
 
 <http://webid.debian.net/maintainers/stuart>
 	foaf:mbox            <mailto:stuart@debian.org>;

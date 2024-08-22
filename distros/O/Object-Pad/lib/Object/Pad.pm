@@ -3,7 +3,7 @@
 #
 #  (C) Paul Evans, 2019-2024 -- leonerd@leonerd.org.uk
 
-package Object::Pad 0.810;
+package Object::Pad 0.811;
 
 use v5.14;
 use warnings;

@@ -4,7 +4,7 @@ use warnings;
 use feature qw(signatures);
 no warnings qw(experimental::signatures);
 
-use Feature::Compat::Class 0.04;
+use Feature::Compat::Class 0.07;
 
 =head1 NAME
 
@@ -12,7 +12,7 @@ String::License::Naming - names of licenses and license naming schemes
 
 =head1 VERSION
 
-Version v0.0.9
+Version v0.0.11
 
 =head1 SYNOPSIS
 
@@ -52,7 +52,7 @@ or as fallback by an internal name.
 
 =cut
 
-package String::License::Naming::Custom v0.0.9;
+package String::License::Naming::Custom v0.0.11;
 
 use Carp       qw(croak);
 use Log::Any   ();

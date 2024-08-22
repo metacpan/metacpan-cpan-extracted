@@ -32,6 +32,7 @@ struct ClassMeta {
 
   SV *name;
   HV *stash;
+  AV *isa;             /* cached pointer to the @ISA array for the stash */
   AV *pending_submeta; /* NULL, or AV containing raw ClassMeta pointers to subclasses pending seal */
   AV *hooks;           /* NULL, or AV of raw pointers directly to ClassHook structs */
   AV *fields;          /* each elem is a raw pointer directly to a FieldMeta */

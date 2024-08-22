@@ -20,6 +20,36 @@
 #######################################################################
 
 
+2024-08-21  Brian M. Kelly <Brian.Kelly@fullauto.com>
+
+        * Version 1.0000766 released
+
+        * remove SKIP from figlet reloop
+
+2024-08-21  Brian M. Kelly <Brian.Kelly@fullauto.com>
+
+        * Version 1.0000765 released
+
+        * more figlet memory work
+
+2024-08-21  Brian M. Kelly <Brian.Kelly@fullauto.com>
+
+        * Version 1.0000764 released
+
+        * figlet memory test
+
+2024-08-21  Brian M. Kelly <Brian.Kelly@fullauto.com>
+
+        * Version 1.0000763 released
+
+        * Less greedy matching for tar file
+
+2024-08-20  Brian M. Kelly <Brian.Kelly@fullauto.com>
+
+        * Version 1.0000762 released
+
+        * "Really" Final Low Memory banner changes
+
 2024-08-20  Brian M. Kelly <Brian.Kelly@fullauto.com>
 
         * Version 1.0000761 released

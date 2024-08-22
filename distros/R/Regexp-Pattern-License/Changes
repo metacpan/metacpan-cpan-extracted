@@ -7,6 +7,20 @@ Home page:    <https://metacpan.org/release/Regexp-Pattern-License>
 Bug tracker:  <https://bugs.debian.org/libregexp-pattern-license-perl>
 Maintainer:   Jonas Smedegaard (JONASS) <jonass@cpan.org>
 
+v3.11.2	2024-08-21
+
+ [ Bug Fixes ]
+ - fix only load re::engine::RE2 when available, silencing warning since
+   perl 5.40
+   Niko Tyni++
+ - tighten fulltext pattern for object except_autoconf_2_g10
+   Evangelos Ribeiro Tzaras++
+
+ [ Documentation ]
+ - fix spelling of word supersede in changelog
+ - refer to Test2::Tools::LicenseObject (not Test2::Tools::LicenseRegistry)
+   in changelog entry for release v3.9.4
+
 v3.11.1	2023-08-08
 
  [ Test Suite ]
@@ -77,7 +91,7 @@ v3.9.4	2022-02-12
  - drop unused code in legacy test library MyTest
  - rename test library Test2::Regexp::Pattern::License ->
    Test2::Tools::LicenseRegistry
- - rewrite test library MyTest.pm as Test2::Tools::LicenseRegistry
+ - rewrite test library MyTest.pm as Test2::Tools::LicenseObject
  - skip test if re object is a native Regexp object with perl before v5.12
    (where RE2 engine is unlikely to be available anyway)
  - streamline test library Test2::Tools::LicenseObject
@@ -158,9 +172,9 @@ v3.9.0	2021-08-14
  - Added: add license objects bsd_3_clause_eclipse bsd_3_clause_refractions
  - Added: add/update lots of alt.org.wikidata names and captions
  - Added: support engine => none (for returning a uncompiled regexp string)
- - Removed: deprecate license object python: superceded by psf_2 and
+ - Removed: deprecate license object python: superseded by psf_2 and
    python_2
- - Removed: deprecate license object wordnet_3: superceded by wordnet
+ - Removed: deprecate license object wordnet_3: superseded by wordnet
    (license is unversioned, version belongs to software project)
  - add alternative clashing names for objects mit_new x11
  - add annotation [+]
@@ -531,9 +545,9 @@ v3.3.1	2020-05-17
  - drop alternate british caption: covered by synthesized subject pattern
  - extend gnu patterns to cover FSF online and postal addresses
  - generalize use of semicolon as internal variable SC
- - license objects: drop most custom subject pattern grant, superceded by
+ - license objects: drop most custom subject pattern grant, superseded by
    synthesized pattern
- - license objects: drop most custom subject pattern name, superceded by
+ - license objects: drop most custom subject pattern name, superseded by
    synthesized pattern
  - optimize slightly: sort keys after grep (not before)
  - relax internal variable gpl to cover lowercase 'license'

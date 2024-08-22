@@ -7,6 +7,23 @@ Home page:    <https://metacpan.org/release/String-License>
 Bug tracker:  <https://rt.cpan.org/Dist/Display.html?Queue=String-License>
 Maintainer:   Jonas Smedegaard (JONASS) <jonass@cpan.org>
 
+v0.0.11	2024-08-22
+
+ [ Test Suite ]
+ - disambiguate empty code blocks to not confuse perl < 5.26
+   Slaven Rezić++
+ - tighten to require Feature::Compat::Class v0.07
+   Slaven Rezić++
+
+v0.0.10	2024-08-21
+
+ [ Test Suite ]
+ - update test Software-License.t and tighten to require 0.104006
+ - update test Software-License.t, and tighten to require
+   Regexp::Pattern::License 3.11.0
+   Gregor Hermann++
+   Roland Rosenfeld++
+
 v0.0.9	2023-07-04
 
  [ Bug Fixes ]

@@ -25,7 +25,7 @@
 #
 ################################################################
 
-our $VERSION='1.0000761';
+our $VERSION='1.0000766';
 
 #print `env`,"\n\n\n";
 
@@ -1276,14 +1276,15 @@ END
          my $cmd="tar zxvf dependencies/FIGlet_fonts/fig*gz;".
                  "cd figlet-2.2.5;make install";
          fa_system($cmd);
-         if (exists $amazon{instance_type} &&
-               $amazon{instance_type}=~/micro|nano/) {
-            unless (grep { /figlet/ } @ARGV) {
-               my $argvs=join " ", @ARGV;
-               my $exec_cmd="sudo su -c 'sync;echo 3 > /proc/sys/vm/drop_caches';"
-                           ."$^X Makefile.PL SKIP $argvs figlet 1";
-               exec $exec_cmd;
-            }
+      }
+      if (exists $amazon{instance_type} &&
+            $amazon{instance_type}=~/micro|nano/) {
+         unless (grep { /figlet/ } @ARGV) {
+            my $argvs=join " ", @ARGV;
+            my $exec_cmd="sudo su -c 'sync;echo 3 > /proc/sys/vm/drop_caches';"
+                        ."swapoff -a && swapon -a;"
+                        ."$^X Makefile.PL $argvs figlet 1";
+            exec $exec_cmd;
          }
       }
    }
@@ -1304,10 +1305,10 @@ END
    ======================================================================
    This message times out in two minutes so FullAuto Install can continue
    ======================================================================
-    ___     _ _   _       _                    _    _
-   | __|  _| | | /_\ _  _| |_ ___   ___ _ _   | |  (_)_ _ _  ___ __
-   | _| || | | |/ _ \ || |  _/ _ \ / _ \ ' \  | |__| | ' \ || \ \ /
-   |_| \_,_|_|_/_/ \_\_,_|\__\___/ \___/_||_| |____|_|_||_\_,_/_\_\
+    ___     _ _   _       _                      _    _
+   | __|  _| | | /_\ _  _| |_ ___    ___ _ _    | |  (_)_ _ _  ___ __
+   | _| || | | |/ _ \ || |  _/ _ \  / _ \ ' \   | |__| | ' \ || \ \ /
+   |_| \_,_|_|_/_/ \_\_,_|\__\___/  \___/_||_|  |____|_|_||_\_,_/_\_\
 
    In order to install FullAuto on Linux servers, a number of
    prerequisite dependencies must be installed or present. Allow
@@ -1351,13 +1352,14 @@ END
          my $cmd="tar zxvf dependencies/FIGlet_fonts/fig*gz;".
                  "cd figlet-2.2.5;make install";
          fa_system($cmd);
-         if (exists $amazon{instance_type} && $amazon{instance_type}=~/micro|nano/) {
-            unless (grep { /figlet/ } @ARGV) {
-               my $argvs=join " ", @ARGV;
-               my $exec_cmd="sudo su -c 'sync;echo 3 > /proc/sys/vm/drop_caches';".
-                            "$^X Makefile.PL SKIP $argvs figlet 1";
-               exec $exec_cmd;
-            }
+      }
+      if (exists $amazon{instance_type} && $amazon{instance_type}=~/micro|nano/) {
+         unless (grep { /figlet/ } @ARGV) {
+            my $argvs=join " ", @ARGV;
+            my $exec_cmd="sudo su -c 'sync;echo 3 > /proc/sys/vm/drop_caches';"
+                        ."swapoff -a && swapon -a;"
+                        ."$^X Makefile.PL $argvs figlet 1";
+            exec $exec_cmd;
          }
       }
    }
@@ -2225,7 +2227,6 @@ if (exists $amazon{instance_type}) {
          print "\n";
 	 my $memavail=`sudo cat /proc/meminfo | grep MemAvailable`;
 	 $memavail=~s/^.*?(\d+).*$/$1/s;
-	 print "MEMAVAIL=$memavail<==\n";
          eval {
             local $SIG{__DIE__}; # No sigdie handler
             CPAN::HandleConfig->load;
@@ -2242,16 +2243,22 @@ END
 	 $d=~s/^(.*)\/.*$/$1/;
          $release=`cat $d/Metadata | grep -a Net-FullAuto`;
 	 chomp($release);
+
+print "WHAT IS RELEASE FOR PARSING:\n\n$release<==\n\n";
+
 	 $release=~s/^.*\n.*RE\/(.*)\s*CPAN.*$/$1/s;
+print "PARSING OUTCOME=$release<==\n\n";
          $low_mem.=<<END;
    Installing FullAuto on an Amazon AWS $amazon{instance_type} instance via
-   the commandline CPAN utility requires a different approach. The
-   CPAN utility places its entire module catalog in memory, and on
-   a $amazon{instance_type} instance, there just isn't the capacity
-   to make things work as expected. Instead, exit out of the CPAN
-   utility, and then restart it, but run the bottom command instead:
+   the commandline cpan utility requires a different approach. The cpan
+   utility places its entire module catalog in memory, and on an aws
+   $amazon{instance_type} instance, there just isn't the capacity to make it work
+   as expected. Instead, exit out of the cpan utility, and then restart it,
+   but run the bottom command *instead* of "install Net::FullAuto":
 
-   cpan[3]> exit  ( <== type 'exit' at prompt *first*, then restart cpan )
+   cpan[3]> exit    ( <== type 'exit' at prompt *first*, then restart cpan )
+   
+   \$ <sudo> cpan    ( <== restart 'cpan' [if sudo was used, use it again])
 
    cpan[1]> install $release
 
@@ -2259,8 +2266,8 @@ END
          $memavail=`sudo cat /proc/meminfo | grep MemAvailable`;
          my $mem_avail=$memavail;
          $memavail=~s/^.*?(\d+).*$/$1/s;
-         print "$memavail\n\n";
-         if (int($mem_avail)<220000) {
+         print "$mem_avail\n\n";
+         if (int($memavail)<220000) {
             print "$low_mem\n\n";
             exit;
          } else {
@@ -4738,7 +4745,7 @@ if ($get_BerkeleyDB && $^O ne 'cygwin') {
             print "***** Untar4: ",
                $CPAN::Config->{tar}," xvf $filename\n";
             fa_system($CPAN::Config->{tar}." xvf $filename"); 
-            $filename=~/^(.*)_(\d+).tar$/;
+            $filename=~/^(.*?)_(\d+).tar$/;
             $filename=$1;
             my $uniq=$2;
             sleep 2;
@@ -5100,7 +5107,7 @@ sub download_berkeleydb {
       fa_system($CPAN::Config->{tar}." xvf $filename");
    }
    sleep 5;
-   $filename=~/^.*\/(.*)_(.*).tar$/;
+   $filename=~/^.*\/(.*?)_(.*).tar$/;
    $filename=$1;
    my $uniq=$2;
    fa_system("mv -v \"$filename\" \"${filename}_$uniq\"");

@@ -1,5 +1,13 @@
 # Version/Revision history
 
+1.11 Wed 21 Aug 2024 18:02:20 MSK
+    * Added new version of WWW::Suffit::AuthDB supported
+    * Added clientid helper
+    * Added gen_cachekey helper
+    * Added gen_rsakeys helper
+    * Documentation modified
+    * All API libraries have been moved to WWW::Suffit::API module
+
 1.10 Mon 15 Apr 2024 10:15:30 MSK
     * Switched from Mojo::Cache to WWW::Suffit::Cache for working with caches
     * Added "prerun" callback function to the preforked_run method

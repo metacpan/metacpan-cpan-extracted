@@ -3,10 +3,11 @@
 #
 #  (C) Paul Evans, 2021-2024 -- leonerd@leonerd.org.uk
 
-package App::csvtool 0.02;
+package App::csvtool 0.03;
 
 use v5.26;
 use warnings;
+use experimental 'signatures';
 
 use Commandable 0.11;
 
@@ -50,10 +51,8 @@ emitted. This can be used to create spaces and pad out the data.
    use constant WANT_READER => 1;
    use constant WANT_OUTPUT => 1;
 
-   sub run
+   sub run ( $pkg, $opts, $reader, $output )
    {
-      shift;
-      my ( $opts, $reader, $output ) = @_;
       my @FIELDS = split m/,/, $opts->{fields};
 
       # 1-indexed
@@ -101,10 +100,8 @@ Output only the lines that do not match the filter pattern.
    use constant WANT_READER => 1;
    use constant WANT_OUTPUT => 1;
 
-   sub run
+   sub run ( $pkg, $opts, $pattern, $reader, $output )
    {
-      shift;
-      my ( $opts, $pattern, $reader, $output ) = @_;
       my $FIELD = $opts->{field};
       my $INVERT = $opts->{invert_match} // 0;
 
@@ -147,10 +144,8 @@ of the given number.
    use constant WANT_READER => 1;
    use constant WANT_OUTPUT => 1;
 
-   sub run
+   sub run ( $pkg, $opts, $reader, $output )
    {
-      shift;
-      my ( $opts, $reader, $output ) = @_;
       my $LINES = $opts->{lines};
 
       if( $LINES > 0 ) {
@@ -214,11 +209,8 @@ Use the same field index for both files.
    use constant WANT_READER => 2;
    use constant WANT_OUTPUT => 1;
 
-   sub run
+   sub run ( $pkg, $opts, $reader1, $reader2, $output )
    {
-      shift;
-      my ( $opts, $reader1, $reader2, $output ) = @_;
-
       my $FIELD1 = $opts->{field1} // $opts->{field}; $FIELD1--;
       my $FIELD2 = $opts->{field2} // $opts->{field}; $FIELD2--;
 
@@ -275,10 +267,8 @@ Reverses the order of sorting.
    use constant WANT_READER => 1;
    use constant WANT_OUTPUT => 1;
 
-   sub run
+   sub run ( $pkg, $opts, $reader, $output )
    {
-      shift;
-      my ( $opts, $reader, $output ) = @_;
       my $FIELD = $opts->{field};
 
       # 1-indexed
@@ -331,10 +321,8 @@ of the given number.
    use constant WANT_READER => 1;
    use constant WANT_OUTPUT => 1;
 
-   sub run
+   sub run ( $pkg, $opts, $reader, $output )
    {
-      shift;
-      my ( $opts, $reader, $output ) = @_;
       my $LINES = $opts->{lines};
 
       if( $LINES > 0 ) {
@@ -381,10 +369,8 @@ The field index to select rows on (defaults to 1).
    use constant WANT_READER => 1;
    use constant WANT_OUTPUT => 1;
 
-   sub run
+   sub run ( $pkg, $opts, $reader, $output )
    {
-      shift;
-      my ( $opts, $reader, $output ) = @_;
       my $FIELD = $opts->{field};
 
       # 1-based

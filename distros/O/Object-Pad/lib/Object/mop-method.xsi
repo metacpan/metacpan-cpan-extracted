@@ -1,24 +1,20 @@
 
 SV *
-name(self)
-    SV *self
+name(MethodMeta *self)
   ALIAS:
     name      = 0
     class     = 1
     is_common = 2
   CODE:
-  {
-    MethodMeta *meta = NUM2PTR(MethodMeta *, SvUV(SvRV(self)));
     switch(ix) {
-      case 0: RETVAL = SvREFCNT_inc(meta->name); break;
+      case 0: RETVAL = SvREFCNT_inc(self->name); break;
       case 1:
         RETVAL = newSV(0);
-        sv_setref_uv(RETVAL, "Object::Pad::MOP::Class", PTR2UV(meta->class));
+        sv_setref_uv(RETVAL, "Object::Pad::MOP::Class", PTR2UV(self->class));
         break;
-      case 2: RETVAL = boolSV(meta->is_common); break;
+      case 2: RETVAL = boolSV(self->is_common); break;
 
       default: RETVAL = NULL;
     }
-  }
   OUTPUT:
     RETVAL

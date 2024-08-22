@@ -3,6 +3,7 @@ bin/csvtool
 Build.PL
 Changes
 lib/App/csvtool.pm
+lib/App/csvtool/Smudge.pm
 lib/App/csvtool/Timetools.pm
 LICENSE
 MANIFEST			This list of files
@@ -20,5 +21,6 @@ t/10uniq.t
 t/20strftime.t
 t/20strptime.t
 t/20tsort.t
+t/30smudge.t
 t/99pod.t
 t/lib/TestAppcsvtool.pm

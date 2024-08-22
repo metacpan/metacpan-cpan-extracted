@@ -10,12 +10,13 @@ my $build = Module::Build->new(
       'Module::Build' => "0.4004", # test_requires
    },
    requires => {
-      'perl' => '5.014',
+      'perl' => '5.026',
+      'experimental' => 0,
+      'meta' => '0.003_003',
 
       'Module::Pluggable::Object' => 0,
    },
    test_requires => {
-      'Test::NoWarnings' => 0,
       'Test2::V0' => 0,
    },
    license => 'perl',

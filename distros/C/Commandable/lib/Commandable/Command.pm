@@ -1,27 +1,30 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2021-2023 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2021-2024 -- leonerd@leonerd.org.uk
 
-package Commandable::Command 0.11;
+package Commandable::Command 0.12;
 
-use v5.14;
+use v5.26;
 use warnings;
+use experimental qw( signatures );
 
 =head1 NAME
 
 C<Commandable::Command> - represent metadata for an invokable command
 
+=head1 DESCRIPTION
+
+Objects in this class are returned by a L<Commandable::Finder> instance to
+represent individual commands that exist.
+
 =cut
 
-sub new
+sub new ( $class, %args )
 {
-   my $class = shift;
-   my %args = @_;
    $args{arguments} //= [];
    $args{options}   //= {};
-   $args{config}    //= {};
-   bless [ @args{qw( name description arguments options package code config )} ], $class;
+   bless [ @args{qw( name description arguments options package code )} ], $class;
 }
 
 =head1 ACCESSORS
@@ -54,7 +57,7 @@ A (possibly-empty) kvlist of option metadata structures.
 
 =head2 package
 
-   $pkg = $command->packaage;
+   $pkg = $command->package;
 
 The package name as a plain string.
 
@@ -64,12 +67,6 @@ The package name as a plain string.
 
 A CODE reference to the code actually implementing the command.
 
-=head2 config
-
-   $conf = $command->config;
-
-A HASH reference to the configuration of the command.
-
 =cut
 
 sub name        { shift->[0] }
@@ -78,7 +75,6 @@ sub arguments   { @{ shift->[2] } }
 sub options     { %{ shift->[3] } }
 sub package     { shift->[4] }
 sub code        { shift->[5] }
-sub config      { shift->[6] }
 
 =head1 METHODS
 
@@ -86,130 +82,9 @@ sub config      { shift->[6] }
 
 =head2 parse_invocation
 
-   @vals = $command->parse_invocation( $cinv );
-
-Parses values out of a L<Commandable::Invocation> instance according to the
-specification for the command's arguments. Returns a list of perl values
-suitable to pass into the function implementing the command.
-
-This method will throw an exception if mandatory arguments are missing.
+I<Since version 0.12> this method has been moved to L<Commandable::Finder>.
 
 =cut
-
-sub parse_invocation
-{
-   my $self = shift;
-   my ( $cinv ) = @_;
-
-   my @args;
-
-   if( my %optspec = $self->options ) {
-      push @args, my $opts = {};
-      my @remaining;
-
-      while( defined( my $token = $cinv->pull_token ) ) {
-         last if $token eq "--";
-
-         my $spec;
-         my $value_in_token;
-         my $token_again;
-
-         my $value = 1;
-         if( $token =~ s/^--([^=]+)(=|$)// ) {
-            my ( $opt, $equal ) = ($1, $2);
-            if( !$optspec{$opt} and $opt =~ /no-(.+)/ ) {
-               $spec = $optspec{$1} and $spec->negatable
-                  or die "Unrecognised option name --$opt\n";
-               $value = undef;
-            }
-            else {
-               $spec = $optspec{$opt} or die "Unrecognised option name --$opt\n";
-               $value_in_token = length $equal;
-            }
-         }
-         elsif( $token =~ s/^-(.)// ) {
-            $spec = $optspec{$1} or die "Unrecognised option name -$1\n";
-            if( $spec->mode_expects_value ) {
-               $value_in_token = length $token;
-            }
-            elsif( $self->config->{bundling} and length $token and length($1) == 1 ) {
-               $token_again = "-$token";
-               undef $token;
-            }
-         }
-         else {
-            push @remaining, $token;
-            if( $self->config->{require_order} ) {
-               last;
-            }
-            else {
-               next;
-            }
-         }
-
-         my $name = $spec->name;
-
-         if( $spec->mode_expects_value ) {
-            $value = $value_in_token ? $token
-                                     : ( $cinv->pull_token // die "Expected value for option --$name\n" );
-         }
-         else {
-            die "Unexpected value for parameter $name\n" if $value_in_token or length $token;
-         }
-
-         if( defined( my $typespec = $spec->typespec ) ) {
-            if( $typespec eq "i" ) {
-               $value =~ m/^-?\d+$/ or
-                  die "Value for parameter $name must be an integer\n";
-            }
-         }
-
-         $name =~ s/-/_/g;
-
-         if( $spec->mode eq "multi_value" ) {
-            push @{ $opts->{$name} }, $value;
-         }
-         elsif( $spec->mode eq "inc" ) {
-            $opts->{$name}++;
-         }
-         else {
-            $opts->{$name} = $value;
-         }
-
-         $token = $token_again, redo if defined $token_again;
-      }
-
-      $cinv->putback_tokens( @remaining );
-
-      foreach my $spec ( values %optspec ) {
-         my $name = $spec->name;
-         $opts->{$name} = $spec->default if defined $spec->default and !exists $opts->{$name};
-      }
-   }
-
-   foreach my $argspec ( $self->arguments ) {
-      my $val = $cinv->pull_token;
-      if( defined $val ) {
-         if( $argspec->slurpy ) {
-            my @vals = ( $val );
-            while( defined( $val = $cinv->pull_token ) ) {
-               push @vals, $val;
-            }
-            $val = \@vals;
-         }
-         push @args, $val;
-      }
-      elsif( !$argspec->optional ) {
-         die "Expected a value for '".$argspec->name."' argument\n";
-      }
-      else {
-         # optional argument was missing; this is the end of the args
-         last;
-      }
-   }
-
-   return @args;
-}
 
 package # hide
    Commandable::Command::_Argument;
@@ -245,10 +120,8 @@ entire remaining list of tokens provided by the user.
 
 =cut
 
-sub new
+sub new ( $class, %args )
 {
-   my $class = shift;
-   my %args = @_;
    bless [ @args{qw( name description optional slurpy )} ], $class;
 }
 
@@ -330,10 +203,8 @@ The C<i> type must be a string giving a (possibly-negative) decimal integer.
 
 =cut
 
-sub new
+sub new ( $class, %args )
 {
-   my $class = shift;
-   my %args = @_;
    warn "Use of $args{name} in a Commandable command option name; should be " . $args{name} =~ s/:$/=/r
       if $args{name} =~ m/:$/;
    $args{typespec} = $2 if $args{name} =~ s/([=:])(.+?)$/$1/;

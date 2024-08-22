@@ -1,12 +1,13 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2022 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2022-2024 -- leonerd@leonerd.org.uk
 
-package Commandable::Output 0.11;
+package Commandable::Output 0.12;
 
-use v5.14;
+use v5.26;
 use warnings;
+use experimental qw( signatures );
 
 use constant HAVE_STRING_TAGGED => defined eval {
    require String::Tagged;
@@ -45,11 +46,8 @@ method.
 
 =cut
 
-sub _format_string
+sub _format_string ( $self, $text, $tagmethod )
 {
-   my $self = shift;
-   my ( $text, $tagmethod ) = @_;
-
    return $text unless HAVE_STRING_TAGGED;
 
    my %tags;
@@ -64,7 +62,7 @@ sub _format_string
 
 =head2 printf
 
-   Commandable::Output->printf( $format, @args )
+   Commandable::Output->printf( $format, @args );
 
 The main output method, used to send messages for display to the user. The
 arguments are formatted into a single string by Perl's C<printf> function.
@@ -98,11 +96,8 @@ L<String::Tagged::Formatting> conventions.
 
 =cut
 
-sub printf
+sub printf ( $self, $format, @args )
 {
-   shift;
-   my ( $format, @args ) = @_;
-
    if( HAVE_STRING_TAGGED_TERMINAL ) {
       String::Tagged::Terminal->new_from_formatting(
          String::Tagged->from_sprintf( $format, @args )
@@ -115,7 +110,7 @@ sub printf
 
 =head2 print_heading
 
-   Commandable::Output->print_heading( $text, $level )
+   Commandable::Output->print_heading( $text, $level );
 
 Used to send output that should be considered like a section heading.
 I<$level> may be an integer used to express sub-levels; increasing values from
@@ -126,17 +121,14 @@ then prints it using L</printf> with a trailing linefeed.
 
 =cut
 
-sub print_heading
+sub print_heading ( $self, $text, $level = 1 )
 {
-   my $self = shift;
-   my ( $text, $level ) = @_;
-
    $self->printf( "%s\n", $self->format_heading( $text, $level ) );
 }
 
 =head2 format_heading
 
-   $str = Commandable::Output->format_heading( $text, $level )
+   $str = Commandable::Output->format_heading( $text, $level );
 
 Returns a value for printing, to represent a section heading for the given
 text and level.
@@ -166,19 +158,14 @@ use constant TAGS_FOR_HEADING_1 => ( under => 1 );
 use constant TAGS_FOR_HEADING_2 => ( under => 1, fg => "vga:cyan", );
 use constant TAGS_FOR_HEADING_3 => ( bold => 1 );
 
-sub format_heading
+sub format_heading ( $self, $text, $level = 1 )
 {
-   my $self = shift;
-   my ( $text, $level ) = @_;
-
-   $level //= 1;
-
    return $self->_format_string( $text, "TAGS_FOR_HEADING_$level" );
 }
 
 =head2 format_note
 
-   $str = Commandable::Output->format_note( $text, $level )
+   $str = Commandable::Output->format_note( $text, $level );
 
 Returns a value for printing, to somehow highlight the given text (which
 should be a short word or string) at the given level.
@@ -208,13 +195,8 @@ use constant TAGS_FOR_NOTE_0 => ( bold => 1, fg => "vga:yellow" );
 use constant TAGS_FOR_NOTE_1 => ( bold => 1, fg => "vga:cyan" );
 use constant TAGS_FOR_NOTE_2 => ( bold => 1, fg => "vga:magenta" );
 
-sub format_note
+sub format_note ( $self, $text, $level = 0 )
 {
-   my $self = shift;
-   my ( $text, $level ) = @_;
-
-   $level //= 0;
-
    return $self->_format_string( $text, "TAGS_FOR_NOTE_$level" );
 }
 

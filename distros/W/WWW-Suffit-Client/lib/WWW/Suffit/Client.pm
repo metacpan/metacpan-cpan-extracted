@@ -38,6 +38,12 @@ This library provides methods for access to Suffit API servers
 
 List of extended API methods
 
+=head2 apicode
+
+    my $apicode = $client->apicode;
+
+This method returns the API error code in format: Exxxx
+
 =head2 apierr
 
     die $client->apierr;
@@ -62,6 +68,13 @@ Returns API check-status. 0 - Error; 1 - Ok
     my $status = $client->api_data( URLorPath );
 
 Gets API data
+
+=head2 api_status
+
+    my $status = $client->api_status;
+    my $status = $client->api_status( URLorPath );
+
+Gets API stat data
 
 =head2 api_token
 
@@ -97,7 +110,7 @@ Serż Minus (Sergey Lepenkov) L<https://www.serzik.com> E<lt>abalama@cpan.orgE<g
 
 =head1 COPYRIGHT
 
-Copyright (C) 1998-2023 D&D Corporation. All Rights Reserved
+Copyright (C) 1998-2024 D&D Corporation. All Rights Reserved
 
 =head1 LICENSE
 
@@ -108,7 +121,7 @@ See C<LICENSE> file and L<https://dev.perl.org/licenses/>
 
 =cut
 
-our $VERSION = '1.02';
+our $VERSION = '1.03';
 
 use parent qw/ WWW::Suffit::UserAgent /;
 
@@ -119,9 +132,16 @@ use WWW::Suffit::Const qw/ :MIME /;
 sub apierr {
     my $self = shift;
     return $self->res->json("/message") || $self->error || $self->res->message
-};
+}
 
-sub api_check {
+sub apicode {
+    my $self = shift;
+    return $self->res->json("/code") || ($self->res->json("/status")
+        ? 'E0000'
+        : sprintf("E0%s", $self->code || '200'));
+}
+
+sub api_check { # /api/check
     my $self = shift;
     my $url = shift || 'check'; # URL or String (e.g.: api/check)
     my $status = $self->request(GET => $self->str2url($url),
@@ -140,7 +160,16 @@ sub api_check {
 
     return $status;
 }
-sub api_data {
+sub api_status { # /api/status
+    my $self = shift;
+    my $url = shift || 'status'; # URL or String (e.g.: api/status)
+    return $self->request(GET => $self->str2url($url),
+        { # Headers
+            Accept => CONTENT_TYPE_JSON, # "*/*"
+        }
+    );
+}
+sub api_data { # /api
     my $self = shift;
     my $url = shift || ''; # URL or String (e.g.: api)
     return $self->request(GET => $self->str2url($url),
@@ -149,7 +178,7 @@ sub api_data {
         }
     );
 }
-sub api_token {
+sub api_token { # /api/user/token
     my $self = shift;
     return $self->request(POST => $self->str2url("user/token"), # e.g.: api/user/token
         { # Headers
@@ -166,7 +195,7 @@ sub authorize { # System authorization, NO USER PUBLIC method!
     $options->{username} = $username if defined $username;
     $options->{password} = $password if defined $password;
 
-    return $self->request(POST => $self->str2url("/authorize"),
+    return $self->request(POST => $self->str2url("authorize"),
         { # Headers
             Accept => CONTENT_TYPE_JSON, # "*/*"
         },

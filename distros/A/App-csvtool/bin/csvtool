@@ -47,7 +47,7 @@ GetOptionsFromArray( \@common_opts,
    'tab' => sub { $DELIM = "\t" },
 ) or exit(1);
 
-my @args = $cmd->parse_invocation( $cinv );
+my @args = $finder->parse_invocation( $cmd, $cinv );
 
 $toolpkg or
    exit $cmd->code->( @args );
