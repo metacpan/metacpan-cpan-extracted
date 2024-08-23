@@ -1,5 +1,11 @@
 Revision history for Perl module Module::Generic
 
+v0.37.3 2024-06-27T05:48:07+0900
+    - Updated method 'read' in Module::Generic::File to return an array of file objects if the option 'as_object' is provided and when dealing with directories.
+    - Slight correction to Module::Generic::Null to properly return an object in object context.
+    - Corrected dependency to perl v5.28 and on I18N::Langinfo v0.17 (Gitlab issue #10 brought by 
+Graham Knop)
+
 v0.37.2 2024-05-09T21:40:22+0900
     - Added method _set_get_enum in Module::Generic
     - Corrected unit test in t/10.file.t

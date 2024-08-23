@@ -1,7 +1,7 @@
 package Langertha::Engine::Ollama;
 our $AUTHORITY = 'cpan:GETTY';
 # ABSTRACT: Ollama API
-$Langertha::Engine::Ollama::VERSION = '0.004';
+$Langertha::Engine::Ollama::VERSION = '0.005';
 use Moose;
 use File::ShareDir::ProjectDistDir qw( :all );
 use Carp qw( croak );
@@ -56,7 +56,7 @@ sub default_embedding_model { 'mxbai-embed-large' }
 sub openapi_file { yaml => dist_file('Langertha','ollama.yaml') };
 
 has keep_alive => (
-  isa => 'Int',
+  isa => 'Str',
   is => 'ro',
   predicate => 'has_keep_alive',
 );
@@ -165,7 +165,7 @@ Langertha::Engine::Ollama - Ollama API
 
 =head1 VERSION
 
-version 0.004
+version 0.005
 
 =head1 SYNOPSIS
 

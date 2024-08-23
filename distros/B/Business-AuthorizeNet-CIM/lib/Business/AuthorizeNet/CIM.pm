@@ -1,5 +1,6 @@
 package Business::AuthorizeNet::CIM;
-$Business::AuthorizeNet::CIM::VERSION = '0.17';
+$Business::AuthorizeNet::CIM::VERSION = '0.18';
+
 # ABSTRACT: Authorize.Net Customer Information Manager (CIM) Web Services API
 
 use strict;
@@ -11,7 +12,7 @@ use XML::Simple 'XMLin';
 
 sub new {
     my $class = shift;
-    my $args = scalar @_ % 2 ? shift : {@_};
+    my $args  = scalar @_ % 2 ? shift : {@_};
 
     # validate
     $args->{login}          or croak 'login is required';
@@ -37,6 +38,7 @@ sub _need_payment_profiles_section {
            exists $args->{billTo}
         || exists $args->{creditCard}
         || exists $args->{bankAccount}
+        || exists $args->{opaqueData}
         || ($args->{use_shipToList_as_billTo} and $args->{shipToList});
 }
 
@@ -96,6 +98,13 @@ sub createCustomerProfile {
             }
             $writer->endTag('bankAccount');
         }
+        if (exists $args->{opaqueData}) {
+            $writer->startTag('opaqueData');
+            foreach my $k (qw/dataDescriptor dataValue/) {
+                $writer->dataElement($k, $args->{opaqueData}->{$k});
+            }
+            $writer->endTag('opaqueData');
+        }
 
         $writer->endTag('payment');
         $writer->endTag('paymentProfiles');
@@ -138,7 +147,7 @@ sub createCustomerPaymentProfileRequest {
     $writer->dataElement('name',           $self->{login});
     $writer->dataElement('transactionKey', $self->{transactionKey});
     $writer->endTag('merchantAuthentication');
-    $writer->dataElement('refId', $args->{refId}) if exists $args->{refId};
+    $writer->dataElement('refId',             $args->{refId}) if exists $args->{refId};
     $writer->dataElement('customerProfileId', $args->{customerProfileId});
     $writer->startTag('paymentProfile');
     $writer->dataElement('customerType', $args->{'customerType'}) if exists $args->{'customerType'};
@@ -171,6 +180,13 @@ sub createCustomerPaymentProfileRequest {
         }
         $writer->endTag('bankAccount');
     }
+    if (exists $args->{opaqueData}) {
+        $writer->startTag('opaqueData');
+        foreach my $k (qw/dataDescriptor dataValue/) {
+            $writer->dataElement($k, $args->{opaqueData}->{$k});
+        }
+        $writer->endTag('opaqueData');
+    }
 
     $writer->endTag('payment');
     $writer->endTag('paymentProfile');
@@ -199,7 +215,7 @@ sub createCustomerShippingAddressRequest {
     $writer->dataElement('name',           $self->{login});
     $writer->dataElement('transactionKey', $self->{transactionKey});
     $writer->endTag('merchantAuthentication');
-    $writer->dataElement('refId', $args->{refId}) if exists $args->{refId};
+    $writer->dataElement('refId',             $args->{refId}) if exists $args->{refId};
     $writer->dataElement('customerProfileId', $args->{customerProfileId});
     $writer->startTag('address');
 
@@ -289,7 +305,7 @@ sub createCustomerProfileTransaction {
         if exists $args->{taxExempt};
     $writer->dataElement('recurringBilling', $args->{recurringBilling})
         if exists $args->{recurringBilling};
-    $writer->dataElement('cardCode', $args->{cardCode}) if exists $args->{cardCode};
+    $writer->dataElement('cardCode',      $args->{cardCode}) if exists $args->{cardCode};
     $writer->dataElement('splitTenderId', $args->{splitTenderId})
         if exists $args->{splitTenderId};
     $writer->dataElement('approvalCode', $args->{approvalCode})
@@ -413,7 +429,9 @@ sub getCustomerPaymentProfileRequest {
     $writer->endTag('merchantAuthentication');
     $writer->dataElement('customerProfileId',        $customerProfileId);
     $writer->dataElement('customerPaymentProfileId', $customerPaymentProfileId);
+
     if ($args) {
+
         # for backwards compatability, if a true non-hash value is passed through
         # we want to act as though we were passed the legacy boolean flag for setting
         # 'unmaskExpirationDate' directly.
@@ -514,7 +532,7 @@ sub updateCustomerPaymentProfile {
     $writer->dataElement('name',           $self->{login});
     $writer->dataElement('transactionKey', $self->{transactionKey});
     $writer->endTag('merchantAuthentication');
-    $writer->dataElement('refId', $args->{refId}) if exists $args->{refId};
+    $writer->dataElement('refId',             $args->{refId}) if exists $args->{refId};
     $writer->dataElement('customerProfileId', $args->{customerProfileId});
 
     $writer->startTag('paymentProfile');
@@ -548,6 +566,13 @@ sub updateCustomerPaymentProfile {
         }
         $writer->endTag('bankAccount');
     }
+    if (exists $args->{opaqueData}) {
+        $writer->startTag('opaqueData');
+        foreach my $k (qw/dataDescriptor dataValue/) {
+            $writer->dataElement($k, $args->{opaqueData}->{$k});
+        }
+        $writer->endTag('opaqueData');
+    }
 
     $writer->endTag('payment');
     $writer->dataElement('customerPaymentProfileId', $args->{customerPaymentProfileId});
@@ -577,7 +602,7 @@ sub updateCustomerShippingAddress {
     $writer->dataElement('name',           $self->{login});
     $writer->dataElement('transactionKey', $self->{transactionKey});
     $writer->endTag('merchantAuthentication');
-    $writer->dataElement('refId', $args->{refId}) if exists $args->{refId};
+    $writer->dataElement('refId',             $args->{refId}) if exists $args->{refId};
     $writer->dataElement('customerProfileId', $args->{customerProfileId})
         if exists $args->{customerProfileId};
     $writer->startTag('address');
@@ -667,7 +692,7 @@ sub getTransactionDetailsRequest {
     $writer->startTag('getTransactionDetailsRequest', xmlns => 'AnetApi/xml/v1/schema/AnetApiSchema.xsd');
     $self->_addAuthentication($writer);
 
-    $writer->dataElement(refId => $args->{refId}) if defined $args->{refId};
+    $writer->dataElement(refId   => $args->{refId}) if defined $args->{refId};
     $writer->dataElement(transId => $args->{transId});
 
     $writer->endTag('getTransactionDetailsRequest');
@@ -685,7 +710,7 @@ sub getTransactionListForCustomerRequest {
     $writer->startTag('getTransactionListForCustomerRequest', xmlns => 'AnetApi/xml/v1/schema/AnetApiSchema.xsd');
     $self->_addAuthentication($writer);
 
-    $writer->dataElement(refId => $args->{refId}) if defined $args->{refId};
+    $writer->dataElement(refId                    => $args->{refId}) if defined $args->{refId};
     $writer->dataElement(customerProfileId        => $args->{customerProfileId});
     $writer->dataElement(customerPaymentProfileId => $args->{customerPaymentProfileId})
         if $args->{customerPaymentProfileId};
@@ -726,7 +751,7 @@ sub getSettledBatchListRequest {
     $writer->startTag('getSettledBatchListRequest', xmlns => 'AnetApi/xml/v1/schema/AnetApiSchema.xsd');
     $self->_addAuthentication($writer);
 
-    $writer->dataElement(refId => $args->{refId}) if defined $args->{refId};
+    $writer->dataElement(refId             => $args->{refId}) if defined $args->{refId};
     $writer->dataElement(includeStatistics => $args->{includeStatistics})
         if defined $args->{includeStatistics};
     $writer->dataElement(firstSettlementDate => $args->{firstSettlementDate})
@@ -749,7 +774,7 @@ sub getTransactionListRequest {
     $writer->startTag('getTransactionListRequest', xmlns => 'AnetApi/xml/v1/schema/AnetApiSchema.xsd');
     $self->_addAuthentication($writer);
 
-    $writer->dataElement(refId => $args->{refId}) if defined $args->{refId};
+    $writer->dataElement(refId   => $args->{refId}) if defined $args->{refId};
     $writer->dataElement(batchId => $args->{batchId});
 
     $self->_addHash($writer, 'sorting', $args, qw<orderBy orderDescending>);
@@ -785,11 +810,7 @@ sub _send {
 
     $xml = '<?xml version="1.0" encoding="utf-8"?>' . "\n" . $xml;
     print "<!-- $xml -->\n\n" if $self->{debug};
-    my $resp = $self->{ua}->post(
-        $self->{url},
-        Content        => $xml,
-        'Content-Type' => 'text/xml'
-    );
+    my $resp = $self->{ua}->post($self->{url}, Content => $xml, 'Content-Type' => 'text/xml');
     print "<!-- " . $resp->content . " -->\n\n" if $self->{debug};
 
     my $d = XMLin($resp->content, SuppressEmpty => '');
@@ -810,7 +831,7 @@ Business::AuthorizeNet::CIM - Authorize.Net Customer Information Manager (CIM) W
 
 =head1 VERSION
 
-version 0.17
+version 0.18
 
 =head1 SYNOPSIS
 
@@ -918,6 +939,16 @@ customer shipping addresses for the customer profile.
             bankName   => $bankName, # Optional
         },
 
+        # opaqueData is required when using the Authorize.Net's Accept.js approach.
+        # Note: Testing so far has indicatated that for new customer profiles using opaqueData,
+        #       the "billTo" section has been required to be present or a "bank validation error"
+        #       has been thrown. This same behavior has not been noticed when creating an empty
+        #       customer profile and then adding a payment profile to it.
+        opaqueData => {
+            dataDescriptor => $dataDescriptor, # Required, for Accept.js use COMMON.ACCEPT.INAPP.PAYMENT, see documentation for others
+            dataValue      => $dataValue, # Required, a one-time base64 encoded, encrypted payment data
+        },
+
         shipToList => {
             firstName => $firstName,
             lastName  => $lastName,
@@ -971,6 +1002,11 @@ Create a new customer payment profile for an existing customer profile. You can 
             nameOnAccount => $nameOnAccount,
             echeckType => $echeckType, # Optionaal, one of CCD, PPD, TEL, WEB
             bankName   => $bankName, # Optional
+        },
+
+        opaqueData => { # required when using the Authorize.Net's Accept.js approach.
+            dataDescriptor => $dataDescriptor, # Required, for Accept.js use COMMON.ACCEPT.INAPP.PAYMENT, see documentation for others
+            dataValue      => $dataValue, # Required, a one-time base64 encoded, encrypted payment data
         },
     );
 
@@ -1223,6 +1259,10 @@ Update a customer payment profile for an existing customer profile.
             echeckType => $echeckType, # Optionaal, one of CCD, PPD, TEL, WEB
             bankName   => $bankName, # Optional
         },
+        opaqueData => { # required when using the Authorize.Net's Accept.js approach.
+            dataDescriptor => $dataDescriptor, # Required, for Accept.js use COMMON.ACCEPT.INAPP.PAYMENT, see documentation for others
+            dataValue      => $dataValue, # Required, a one-time base64 encoded, encrypted payment data
+        },
     );
 
 =head3 updateCustomerShippingAddress
@@ -1372,7 +1412,7 @@ Olaf Alders
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018 by Fayland Lam.
+This software is copyright (c) 2024 by Fayland Lam.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

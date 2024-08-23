@@ -79,7 +79,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (double x(); double [o]y(num); int s; int n=>num)
+  Signature: (double x(); double [o]y(num); int s; IV n=>num)
 
 =for ref
 
@@ -133,7 +133,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (double x(); double [o]y(num); int s; int n=>num)
+  Signature: (double x(); double [o]y(num); int s; IV n=>num)
 
 =for ref
 
@@ -187,7 +187,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (double x(); double [o]y(num); int s; int n=>num)
+  Signature: (double x(); double [o]y(num); int s; IV n=>num)
 
 =for ref
 
@@ -241,7 +241,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (double x(); double [o]y(num); int s; int n=>num)
+  Signature: (double x(); double [o]y(num); int s; IV n=>num)
 
 =for ref
 
@@ -295,7 +295,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (double x(); double [o]y(num); int s; int n=>num)
+  Signature: (double x(); double [o]y(num); int s; IV n=>num)
 
 =for ref
 
@@ -349,7 +349,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (double x(); double [o]y(num); int s; int n=>num)
+  Signature: (double x(); double [o]y(num); int s; IV n=>num)
 
 =for ref
 

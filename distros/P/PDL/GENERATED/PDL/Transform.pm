@@ -728,21 +728,11 @@ sub map {
   my ($out, @odims, $ohdr);
   if(UNIVERSAL::isa($tmp,'PDL')) {
     @odims = $tmp->dims;
-    my($x);
-    if(defined ($x = $tmp->gethdr)) {
-      my(%b) = %{$x};
-#line 1565 "transform.pd"
-      $ohdr = \%b;
-    }
+    if (defined(my $x = $tmp->gethdr)) { $ohdr = {%$x} }
   } elsif(ref $tmp eq 'HASH') {
     # (must be a fits header -- or would be filtered above)
-    for my $i(1..$tmp->{NAXIS}){
-      push(@odims,$tmp->{"NAXIS$i"});
-    }
-    # deep-copy fits header into output
-    my %foo = %{$tmp};
-#line 1574 "transform.pd"
-    $ohdr = \%foo;
+    @odims = map $tmp->{"NAXIS$_"}, 1..$tmp->{NAXIS};
+    $ohdr = {%$tmp}; # copy FITS header into output
   } elsif(ref $tmp eq 'ARRAY') {
     @odims = @$tmp;
   } else {
@@ -764,16 +754,14 @@ sub map {
   ## Figure out the dimensionality of the
   ## transform itself (extra dimensions come along for the ride)
   my $nd = $me->{odim} || $me->{idim} || 2;
-  my @sizes = $out->dims;
-  my @dd = @sizes;
-
+  my @dd = my @sizes = $out->dims;
   splice @dd,$nd; # Cut out dimensions after the end
 
   # Check that there are elements in the output fields...
   barf "map: output has no dims!\n"
         unless(@dd);
   my $ddtotal = 1;
-  map {$ddtotal *= $_} @dd;
+  $ddtotal *= $_ for @dd;
   barf "map: output has no elements (at least one dim is 0)!\n"
      unless($ddtotal);
 
@@ -936,7 +924,7 @@ sub map {
           ### These are the CROTA<n>, PCi_j, and CDi_j.
           delete @{$out->hdr}{
               grep /(^CROTA\d*$)|(^(CD|PC)\d+_\d+[A-Z]?$)/, keys %{$out->hdr}
-#line 1771 "transform.pd"
+#line 1760 "transform.pd"
           };
       } else {
           # Non-rectified output -- generate a CDi_j matrix instead of the simple formalism.
@@ -980,7 +968,7 @@ sub map {
           ## Eliminate competing header pointing tags if they exist
           delete @{$out->hdr}{
               grep /(^CROTA\d*$)|(^(PC)\d+_\d+[A-Z]?$)|(CDELT\d*$)/, keys %{$out->hdr}
-#line 1814 "transform.pd"
+#line 1803 "transform.pd"
           };
       }
     }
@@ -1091,7 +1079,7 @@ sub map {
   }
   return $out;
 }
-#line 1095 "Transform.pm"
+#line 1083 "Transform.pm"
 
 *map = \&PDL::map;
 
@@ -1099,7 +1087,7 @@ sub map {
 
 
 
-#line 1931 "transform.pd"
+#line 1920 "transform.pd"
 
 ######################################################################
 
@@ -1139,7 +1127,7 @@ sub unmap {
   return $me->inverse->map($data,@params);
 }
 
-#line 1974 "transform.pd"
+#line 1963 "transform.pd"
 
 =head2 t_inverse
 
@@ -1183,7 +1171,7 @@ sub inverse {
   }, ref $me;
 }
 
-#line 2021 "transform.pd"
+#line 2010 "transform.pd"
 
 =head2 t_compose
 
@@ -1279,7 +1267,7 @@ sub compose {
   return bless($me,'PDL::Transform::Composition');
 }
 
-#line 2120 "transform.pd"
+#line 2109 "transform.pd"
 
 =head2 t_wrap
 
@@ -1346,7 +1334,7 @@ sub _pow_op {
     t_compose(@l);
 }
 
-#line 2193 "transform.pd"
+#line 2182 "transform.pd"
 
 =head2 t_identity
 
@@ -1380,7 +1368,7 @@ sub new {
   return bless $me,$class;
 }
 
-#line 2231 "transform.pd"
+#line 2220 "transform.pd"
 
 =head2 t_lookup
 
@@ -1633,7 +1621,7 @@ sub t_lookup {
   return $me;
 }
 
-#line 2491 "transform.pd"
+#line 2480 "transform.pd"
 
 =head2 t_linear
 
@@ -1738,6 +1726,7 @@ the type/unit fields are currently ignored by t_linear.
 { package PDL::Transform::Linear;
 our @ISA = ('PDL::Transform');
 *_opt = \&PDL::Transform::_opt;
+*barf = \&PDL::Transform::barf;
 *identity = \&PDL::MatrixOps::identity;
 
 sub PDL::Transform::t_linear { PDL::Transform::Linear->new(@_); }
@@ -1884,10 +1873,10 @@ sub new {
   ##############################
   # The meat -- just shift, matrix-multiply, and shift again.
   $me->{func} = sub {
-    my($in,$opt) = @_;
-    my($d) = $opt->{matrix}->dim(0)-1;
-    barf("Linear transform: transform is $d-D; data only ".($in->dim(0))."\n")
-        if($in->dim(0) < $d);
+    my ($in,$opt) = @_;
+    my $d = $opt->{matrix}->dim(0)-1;
+    barf("Linear transform: transform is @{[$d+1]}-D; data is ".$in->dim(0))
+        if $in->dim(0) <= $d;
     my $x = $in->slice("0:$d")->copy + $opt->{pre};
     my $out = $in->is_inplace ? $in : $in->copy;
     $out->slice("0:$d") .= $x x $opt->{matrix} + $opt->{post};
@@ -1895,12 +1884,12 @@ sub new {
   };
 
   $me->{inv} = (defined $me->{params}{inverse}) ? sub {
-    my($in,$opt) = @_;
-    my($d) = $opt->{inverse}->dim(0)-1;
-    barf("Linear transform: transform is $d-D; data only ".($in->dim(0))."\n")
-        if($in->dim(0) < $d);
-    my($x) = $in->slice("0:$d")->copy - $opt->{post};
-    my($out) = $in->is_inplace ? $in : $in->copy;
+    my ($in,$opt) = @_;
+    my $d = $opt->{inverse}->dim(0)-1;
+    barf("Linear transform: transform is @{[$d+1]}-D; data is ".$in->dim(0))
+        if $in->dim(0) <= $d;
+    my $x = $in->slice("0:$d")->copy - $opt->{post};
+    my $out = $in->is_inplace ? $in : $in->copy;
     my $tmp; # work around perl -d "feature"
     ($tmp = $out->slice("0:$d")) .= $x x $opt->{inverse} - $opt->{pre};
     $out;
@@ -1944,7 +1933,7 @@ sub stringify {
 }
 }
 
-#line 2805 "transform.pd"
+#line 2795 "transform.pd"
 
 =head2 t_scale
 
@@ -1965,12 +1954,12 @@ sub t_scale {
     my($scale) = shift;
     my($y) = shift;
     return t_linear(scale=>$scale,%{$y})
-#line 2826 "transform.pd"
+#line 2816 "transform.pd"
         if(ref $y eq 'HASH');
     t_linear(Scale=>$scale,$y,@_);
 }
 
-#line 2833 "transform.pd"
+#line 2823 "transform.pd"
 
 =head2 t_offset
 
@@ -1991,13 +1980,13 @@ sub t_offset {
     my($pre) = shift;
     my($y) = shift;
     return t_linear(pre=>$pre,%{$y})
-#line 2854 "transform.pd"
+#line 2844 "transform.pd"
         if(ref $y eq 'HASH');
 
     t_linear(pre=>$pre,$y,@_);
 }
 
-#line 2862 "transform.pd"
+#line 2852 "transform.pd"
 
 =head2 t_rot
 
@@ -2019,13 +2008,13 @@ sub t_rotate    {
     my $rot = shift;
     my($y) = shift;
     return t_linear(rot=>$rot,%{$y})
-#line 2884 "transform.pd"
+#line 2874 "transform.pd"
         if(ref $y eq 'HASH');
 
     t_linear(rot=>$rot,$y,@_);
 }
 
-#line 2894 "transform.pd"
+#line 2884 "transform.pd"
 
 =head2 t_fits
 
@@ -2041,8 +2030,8 @@ You feed in a hash ref or a PDL with one of those as a header, and you
 get back a transform that converts 0-originated, pixel-centered
 coordinates into scientific coordinates via the transformation in the
 FITS header.  For most FITS headers, the transform is reversible, so
-applying the inverse goes the other way.  This is just a convenience
-subclass of PDL::Transform::Linear, but with unit/type support
+applying the inverse goes the other way.  This is just an instance
+of PDL::Transform::Linear, but with unit/type support
 using the FITS header you supply.
 
 For now, this transform is rather limited -- it really ought to
@@ -2052,7 +2041,7 @@ the whole transform framework.
 
 This transform implements the linear transform part of the WCS FITS
 standard outlined in Greisen & Calabata 2002 (A&A in press; find it at
-"http://arxiv.org/abs/astro-ph/0207407").
+L<https://arxiv.org/abs/astro-ph/0207407>).
 
 As a special case, you can pass in the boolean option "ignore_rgb"
 (default 0), and if you pass in a 3-D FITS header in which the last
@@ -2072,7 +2061,7 @@ sub t_fits {
   $hdr = $hdr->gethdr
     if(defined $hdr && UNIVERSAL::isa($hdr,'PDL'));
 
-  croak('PDL::Transform::FITS::new requires a FITS header hash\n')
+  croak('t_fits requires a FITS header hash\n')
     if(!defined $hdr || ref $hdr ne 'HASH' || !defined($hdr->{NAXIS}));
 
   my($n) = $hdr->{NAXIS}; $n = $n->at(0) if(UNIVERSAL::isa($n,'PDL'));
@@ -2099,7 +2088,7 @@ sub t_fits {
       my $tmp; # work around perl -d "feature"
       ($tmp = $matrix->slice("(".($1-1)."),(".($2-1).")")) .= $hdr->{$h};
     }
-    print "PDL::Transform::FITS: Detected CDi_j matrix: \n",$matrix,"\n"
+    print "t_fits: Detected CDi_j matrix: \n",$matrix,"\n"
       if($PDL::Transform::debug);
 
   } else {
@@ -2107,7 +2096,7 @@ sub t_fits {
     #
     # PCi_j + CDELTi formalism
     # If PCi_j aren't present, and N=2, then try using CROTA or
-    # CROTA2 to generate a rotation matrix instea.
+    # CROTA2 to generate a rotation matrix instead.
     #
 
     my($cdm) = PDL->zeroes($n,$n);
@@ -2125,17 +2114,14 @@ sub t_fits {
         my $tmp; # work around perl -d "feature"
         ($tmp = $cpm->slice("(".($1-1)."),(".($2-1).")")) .= $hdr->{$h};
       }
-      print "PDL::Transform::FITS: Detected PCi_j matrix: \n",$cpm,"\n"
+      print "t_fits: Detected PCi_j matrix: \n",$cpm,"\n"
         if($PDL::Transform::debug && @hgrab);
 
-    } elsif($n==2 && ( defined $hdr->{CROTA} || defined $hdr->{CROTA1} || defined $hdr->{CROTA2}) ) {
+    } elsif ($n==2 && grep defined $hdr->{$_}, qw(CROTA CROTA1 CROTA2)) {
 
         ## CROTA is deprecated; CROTA1 was used for a while but is unofficial;
         ## CROTA2 is encouraged instead.
-      my $cr;
-      $cr = $hdr->{CROTA2} unless defined $cr;
-      $cr = $hdr->{CROTA} unless defined $cr;
-      $cr = $hdr->{CROTA1} unless defined $cr;
+      my $cr = $hdr->{CROTA2} // $hdr->{CROTA} // $hdr->{CROTA1};
 
       $cr *= $PDL::Transform::DEG2RAD;
         # Rotation matrix rotates counterclockwise to get from sci to pixel coords
@@ -2189,7 +2175,7 @@ sub t_fits {
   return $me;
 }
 
-#line 3066 "transform.pd"
+#line 3053 "transform.pd"
 
 =head2 t_code
 
@@ -2282,7 +2268,7 @@ sub t_code {
   $me;
 }
 
-#line 3165 "transform.pd"
+#line 3152 "transform.pd"
 
 =head2 t_cylindrical
 
@@ -2454,7 +2440,7 @@ sub t_radial {
   $me;
 }
 
-#line 3343 "transform.pd"
+#line 3330 "transform.pd"
 
 =head2 t_quadratic
 
@@ -2569,7 +2555,7 @@ sub t_quadratic {
     $me;
 }
 
-#line 3462 "transform.pd"
+#line 3449 "transform.pd"
 
 =head2 t_cubic
 
@@ -2709,7 +2695,7 @@ sub t_cubic {
     $me;
 }
 
-#line 3608 "transform.pd"
+#line 3595 "transform.pd"
 
 =head2 t_quartic
 
@@ -2828,7 +2814,7 @@ sub t_quartic {
     $me;
 }
 
-#line 3731 "transform.pd"
+#line 3718 "transform.pd"
 
 =head2 t_spherical
 
@@ -2961,7 +2947,7 @@ sub t_spherical {
     $me;
   }
 
-#line 3868 "transform.pd"
+#line 3855 "transform.pd"
 
 =head2 t_projective
 
@@ -3179,7 +3165,7 @@ sub stringify {
   $out .= "fwd ". ((defined ($me->{func})) ? ( (ref($me->{func}) eq 'CODE') ? "ok" : "non-CODE(!!)" ): "missing")."; ";
   $out .= "inv ". ((defined ($me->{inv})) ?  ( (ref($me->{inv}) eq 'CODE') ? "ok" : "non-CODE(!!)" ):"missing").".\n";
 }
-#line 3183 "Transform.pm"
+#line 3169 "Transform.pm"
 
 # Exit with OK status
 

@@ -2,7 +2,7 @@ package Catmandu::Store::OpenSearch::Bag;
 
 use Catmandu::Sane;
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 use Catmandu::Hits;
 use Cpanel::JSON::XS qw(encode_json decode_json);
@@ -35,7 +35,7 @@ sub BUILD {
 sub create_index ($self) {
     my $index_api = $self->store->os->index;
     my $res       = $index_api->exists(index => $self->index);
-
+    use Data::Dumper;say Dumper($res);
     if ($res->code() eq "200") {
         # all ok
     } elsif ($res->code eq "404") {
@@ -225,6 +225,7 @@ sub search ($self, %args) {
 
     my %os_args = (%args, index => $self->index, track_total_hits => "true");
     $os_args{from} = $start if $start;
+    $os_args{size} = $limit;
 
     my $res = $self->store->os->search->search(%os_args);
     if ($res->code ne "200") {

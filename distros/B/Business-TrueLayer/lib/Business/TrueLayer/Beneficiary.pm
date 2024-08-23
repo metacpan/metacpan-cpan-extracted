@@ -29,9 +29,9 @@ use namespace::autoclean;
 
 =item type (Str)
 
-=item account_holder_name (Str)
+=item account_holder_name (Str) [optional]
 
-=item reference (Str)
+=item reference (Str) [optional]
 
 =item merchant_account_id (Str) [optional]
 
@@ -43,8 +43,6 @@ use namespace::autoclean;
 
 has [ qw/
     type
-    account_holder_name
-    reference
 / ] => (
     is       => 'ro',
     isa      => 'Str',
@@ -53,6 +51,8 @@ has [ qw/
 
 has [ qw/
     merchant_account_id
+    account_holder_name
+    reference
 / ] => (
     is       => 'ro',
     isa      => 'Str',

@@ -27,6 +27,7 @@
   </li>
   <li><a href="#WIDGET-METHODS">WIDGET METHODS</a></li>
   <li><a href="#DEPENDS">DEPENDS</a></li>
+  <li><a href="#SEE-ALSO">SEE ALSO</a></li>
 </ul>
 
 <h1 id="NAME">NAME</h1>
@@ -35,15 +36,15 @@
 
 <h1 id="AUTHOR">AUTHOR</h1>
 
-<p>(c) 1996-2023, Jim Turner, <code>&lt;https://metacpan.org/author/TURNERJW&gt;</code>.</p>
+<p>(c) 1996-2024, Jim Turner, <code>&lt;https://metacpan.org/author/TURNERJW&gt;</code>.</p>
 
 <h1 id="ACKNOWLEDGEMENTS">ACKNOWLEDGEMENTS</h1>
 
-<p>This is a derived work from Tk::FileDialog, Tk::Listbox and Tk::HList.</p>
+<p>This is a derived work from <a>Tk::FileDialog</a>.</p>
 
 <h1 id="LICENSE-AND-COPYRIGHT">LICENSE AND COPYRIGHT</h1>
 
-<p>Copyright (c) 1996-2023 Jim Turner <code>&lt;mailto:turnerjw784@yahoo.com&gt;</code>. All rights reserved.</p>
+<p>Copyright (c) 1996-2024 Jim Turner <code>&lt;mailto:turnerjw784@yahoo.com&gt;</code>. All rights reserved.</p>
 
 <p>Tk::JFileDialog is free software; you can redistribute it and/or modify it under the terms of the GNU Lesser General Public License as published by the Free Software Foundation; either version 2.1 of the License, or (at your option) any later version.</p>
 
@@ -121,7 +122,7 @@ exit(0);</code></pre>
 
 <p>The widget is based on the Tk::FileDialog widget by Brent B. Powers. It uses and depends on the author&#39;s Tk::JBrowseEntry widget and adds numerous features, such as optional history and favorites files, handles MS-Windows drive letters, additional key bindings, etc.</p>
 
-<p>To use JFileDialog, simply create your JFileDialog objects during initialization (or at least before a Show). When you wish to display the JFileDialog, invoke the &#39;Show&#39; method on the JFileDialog object; The method will return either a file name, a path name, or undef. undef is returned only if the user pressed the Cancel button.</p>
+<p>To use JFileDialog, simply create your JFileDialog objects during initialization (or at least before a Show() call). When you wish to display the JFileDialog, invoke the &#39;Show&#39; method on the JFileDialog object; The method will return either a file name, a path name, or undef. undef is returned only if the user pressed the Cancel button.</p>
 
 <h1 id="WIDGET-OPTIONS">WIDGET OPTIONS</h1>
 
@@ -164,7 +165,7 @@ exit(0);</code></pre>
 <dt id="FNameList"><b>-FNameList</b></dt>
 <dd>
 
-<p>Optional reference to a list of specific file names to be displayed in the file list. User can be forced to select a file from this specific list by further constraints such as <b>-DisableFPat</b> =&gt; 1, <b>-Create</b> =&gt; -1, <b>-SelDir</b> =&gt; -1, and <b>-DisableShowAll</b> =&gt; 1. The list can contain any combination of file names (ie. <i>&quot;file.ext&quot;</i>, absolute paths, ie. <i>&quot;/home/user/file.ext&quot;</i>, or relative paths, ie. <i>&quot;user/file.ext&quot;</i> or I&quot;&lt;c:file.ext&gt;. The files will be compared against the current path and, if matching (and existing, if <b>-Create</b> &lt; 1), will be shown in the drop-down list.</p>
+<p>Optional reference to a list of specific file names to be displayed in the file list. User can be forced to select a file from this specific list by further constraints such as <b>-DisableFPat</b> =&gt; 1, <b>-Create</b> =&gt; -1, <b>-SelDir</b> =&gt; -1, and <b>-DisableShowAll</b> =&gt; 1. The list can contain any combination of file names (ie. <i>&quot;file.ext&quot;</i>, absolute paths, ie. <i>&quot;/home/user/file.ext&quot;</i>, or relative paths, ie. <i>&quot;user/file.ext&quot;</i> or <i>&quot;c:file.ext&quot;</i>. The files will be compared against the current path and, if matching (and existing, if <b>-Create</b> &lt; 1), will be shown in the drop-down list.</p>
 
 <p>Default: <i>none</i> (show all files otherwise matching any other filters found in the current path.</p>
 
@@ -218,7 +219,7 @@ exit(0);</code></pre>
 
 <p>If set, allows user to delete items from the history dropdown list and thus the history file.</p>
 
-<p>Default: <i>0</i> (false)&gt; (do not allow user to remove items in history).</p>
+<p>Default: <i>0 (false)</i> (do not allow user to remove items in history).</p>
 
 <p>NOTE: requires Tk::JBrowseEntry v5.0 or later to work.</p>
 
@@ -234,7 +235,9 @@ exit(0);</code></pre>
 <dt id="History"><b>-History</b></dt>
 <dd>
 
-<p>Used with the &quot;-HistFile&quot; option. Specifies how many files to retain in the history list. Zero means keep all. Default: <i>20</i> (keep last 20).</p>
+<p>Used with the &quot;-HistFile&quot; option. Specifies how many files to retain in the history list. Zero means keep all.</p>
+
+<p>Default: <i>20</i> (keep last 20).</p>
 
 </dd>
 <dt id="HistUsePath"><b>-HistUsePath</b></dt>
@@ -256,7 +259,7 @@ exit(0);</code></pre>
 <dt id="Horiz"><b>-Horiz</b></dt>
 <dd>
 
-<p><i>TRUE</i> sets the File List box to be to the right of the Directory List Box. If 0, the File List box will be below the Directory List box.</p>
+<p><i>1 (true)</i> sets the File List box to be to the right of the Directory List Box. If <i>0 (false)</i>, the File List box will be below the Directory List box.</p>
 
 <p>Default: <i>true</i> (display the listboxes side-by-side).</p>
 
@@ -292,13 +295,27 @@ exit(0);</code></pre>
 <dt id="Path"><b>-Path</b></dt>
 <dd>
 
-<p>The initial (default) selection path. The default is the current working directory. If specified, pressing [Reset] will switch the directory dialog back to this path. Default: none (use current working directory).</p>
+<p>The initial (default) selection path. The default is the current working directory. If specified, pressing [Reset] will switch the directory dialog back to this path.</p>
+
+<p>Default: none (use current working directory).</p>
 
 </dd>
 <dt id="PathFile"><b>-PathFile</b></dt>
 <dd>
 
-<p>Specifies a file containing a list of &quot;favorite paths&quot; bookmarks to show in a dropdown list allowing quick-changes in directories. Default: <i>undef</i> (no favorite path file or dropdown list).</p>
+<p>Specifies a file containing a list of &quot;favorite paths&quot; bookmarks to show in a dropdown list allowing quick-changes in directories.</p>
+
+<p>Default: <i>undef</i> (no favorite path file or dropdown list).</p>
+
+</dd>
+<dt id="PreserveSelection"><b>-PreserveSelection</b></dt>
+<dd>
+
+<p><b>NEW</b> with Version 2.40+:</p>
+
+<p>Normally JFileDialog will &quot;highlight&quot; the file or directory selected (replace any current PRIMARY selection text with that highlighted name), making it easily pasteable into the calling program, if needed. Setting this option to a true value will first save the currently selected text in the calling program (the PRIMARY selection buffer) before doing this and restore that post- selection. This can be particularly handy in text editor applications where one wishes to preserve whatever they have currently selected before invoking JFileDialog to select a file / directory, then restoring that as the selected text instead of the file / directory name selected in JBrowseEntry, ie. when selecting a file to save the currently selected content into.</p>
+
+<p>Default: <i>0</i> (False) - overwrite (do not preserve) any data in the PRIMARY selection buffer.</p>
 
 </dd>
 <dt id="QuickSelect"><b>-QuickSelect</b></dt>
@@ -332,7 +349,7 @@ exit(0);</code></pre>
 <dt id="SelHook"><b>-SelHook</b></dt>
 <dd>
 
-<p>SelHook is configured with a reference to a routine that will be called when a fileis chosen. The function is called with a sole parameter of the full path and file name of the file chosen. If the Create flag is disabled (and the user is not allowedto specify new files), the file will be known to exist at the time that SelHook is called. Note that SelHook will also be called with directories if the SelDir Flag is enabled, and that the JFileDialog box will still be displayed. The JFileDialog box should <b>not</b> be destroyed from within the SelHook routine, although it may generally be configured.</p>
+<p>SelHook is configured with a reference to a routine that will be called when a file is chosen. The function is called with a sole parameter of the full path and file name of the file chosen. If the Create flag is disabled (and the user is not allowedto specify new files), the file will be known to exist at the time that SelHook is called. Note that SelHook will also be called with directories if the SelDir Flag is enabled, and that the JFileDialog box will still be displayed. The JFileDialog box should <b>not</b> be destroyed from within the SelHook routine, although it may generally be configured.</p>
 
 <p>SelHook routines return 0 to reject the selection and allow the user to reselect, and any other value to accept the selection. If a SelHook routine returns non-zero, the JFileDialog will immediately be withdrawn, and the file will be returned to the caller.</p>
 
@@ -368,7 +385,9 @@ exit(0);</code></pre>
 <dt id="Title"><b>-Title</b></dt>
 <dd>
 
-<p>The Title of the dialog box. Default: <i>&#39;Select File:&#39;</i>.</p>
+<p>The Title of the dialog box.</p>
+
+<p>Default: <i>&#39;Select File:&#39;</i>.</p>
 
 </dd>
 </dl>
@@ -494,13 +513,15 @@ exit(0);</code></pre>
 <dt id="SortButtonLabel"><b>-SortButtonLabel</b></dt>
 <dd>
 
-<p>The text for the Sort/Atime button. Default: <i>&#39;Atime&#39;</i>.</p>
+<p>The text for the Sort/Atime button.</p>
+
+<p>Default: <i>&#39;Atime&#39;</i>.</p>
 
 </dd>
 <dt id="SortOrder"><b>-SortOrder</b></dt>
 <dd>
 
-<p>Order to display files in the file list box (&#39;Name&#39; or &#39;Date&#39;) If <i>&#39;Date&#39;</i>, then the day and time is displayed in the box before the name, (but not included when selected)</p>
+<p>Order to display files in the file list box (&#39;Name&#39; or &#39;Date&#39;) If <i>&#39;Date&#39;</i>, then the day and time is displayed in the box before the name (but not included when selected).</p>
 
 <p>Default: <i>Name</i>.</p>
 
@@ -572,6 +593,10 @@ $fd-&gt;Show;</code></pre>
 <h1 id="DEPENDS">DEPENDS</h1>
 
 <p>Cwd, <a>File::Glob</a>, <a>Tk</a>, <a>Tk::Dialog</a> (or <a>Tk::JDialog</a> if installed), <a>Tk::JBrowseEntry</a></p>
+
+<h1 id="SEE-ALSO">SEE ALSO</h1>
+
+<p><a>Tk::FileDialog</a>, <a>Tk::JBrowseEntry</a>, and <a>Tk::Listbox</a></p>
 
 
 </body>

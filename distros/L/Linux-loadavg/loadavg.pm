@@ -1,6 +1,8 @@
 package Linux::loadavg;
 
-use v5.12;
+our $VERSION = '0.11';
+
+use v5.8;
 use strict;
 use warnings;
 use Carp;
@@ -32,7 +34,6 @@ our @EXPORT = qw(
    LOADAVG_5MIN
    LOADAVG_15MIN
 );
-our $VERSION = '0.09';
 
 sub LOADAVG_1MIN  {0};
 sub LOADAVG_5MIN  {1};

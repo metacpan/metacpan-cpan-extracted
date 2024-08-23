@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Module Generic - ~/lib/Module/Generic/Null.pm
-## Version v1.1.1
+## Version v1.1.2
 ## Copyright(c) 2022 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2021/03/20
-## Modified 2022/08/05
+## Modified 2024/06/27
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -19,14 +19,16 @@ BEGIN
 {
     use strict;
     use warnings;
-    use overload ('""'     => sub{ '' },
-                  'eq'     => sub { _obj_eq(@_) },
-                  'ne'     => sub { !_obj_eq(@_) },
-                  fallback => 1,
-                 );
+    use overload (
+        '""'    => sub{ return },
+        'eq'    => sub{ _obj_eq(@_) },
+        'ne'    => sub{ !_obj_eq(@_) },
+        'bool'  => sub{0},
+        fallback => 1,
+    );
     use Scalar::Util ();
     use Want;
-    our( $VERSION ) = 'v1.1.1';
+    our( $VERSION ) = 'v1.1.2';
 };
 
 use strict;
@@ -59,9 +61,10 @@ sub _obj_eq
         return( '' eq $other );
     }
     # Otherwise some reference data to which we cannot compare
-    return( 0 ) ;
+    return(0) ;
 }
 
+# NOTE: AUTOLOAD
 AUTOLOAD
 {
     my( $method ) = our $AUTOLOAD =~ /([^:]+)$/;
@@ -93,7 +96,8 @@ AUTOLOAD
     if( $what eq 'OBJECT' )
     {
         # No, this is NOT a typo. rreturn() is a function of module Want
-        rreturn( $_[0] );
+        # rreturn( $_[0] );
+        rreturn( $self );
     }
     elsif( $what eq 'CODE' )
     {

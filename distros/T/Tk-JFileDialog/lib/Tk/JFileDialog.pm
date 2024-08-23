@@ -16,7 +16,7 @@
 package Tk::JFileDialog;
 
 use vars qw($VERSION $bummer $MAXWIDTH);
-our $VERSION = '2.31';
+our $VERSION = '2.40';
 our $MAXWIDTH = 60;  #AVG. CHARACTERS.
 
 require 5.002;
@@ -110,7 +110,7 @@ sub Populate
 	foreach my $i (keys %{$args[0]})
 	{
 		$FDialog->{'Configure'}{$i} = $args[0]->{$i}
-			if ($i =~ /^\-(?:HistFile|History|QuickSelect|PathFile|HistDeleteOk|HistUsePath|HistUsePathButton|SortButton|SelDir|ShowFileList|ShowDirList|noselecttext|maxwidth|FPatOnly|nonLatinFilenames)$/o);
+			if ($i =~ /^\-(?:HistFile|History|QuickSelect|PathFile|HistDeleteOk|HistUsePath|HistUsePathButton|SortButton|SelDir|ShowFileList|ShowDirList|noselecttext|maxwidth|FPatOnly|nonLatinFilenames|PreserveSelection)$/o);
 	}
 	$FDialog->bind('<Control-Tab>',sub
 	{
@@ -142,6 +142,12 @@ sub Populate
 	$FDialog->{'Configure'}{'-SortOrder'} = 'Name';
 
 	$FDialog->BuildFDWindow;
+	#HIDDEN DUMMY WIDGET USED FOR (RE)SETTING PRIMARY SELECTION:
+	#(PROGRAMMER NOTE:IDK OF ANY OTHER WAY TO PROGRAMMATICALLY SET THE PRIMARY SELECTION)
+	$FDialog->{'_DummyTextWidget_'} = $FDialog->Entry(
+			-textvariable => \$FDialog->{'SelectText'},
+			-width => 1
+	);
 	#$FDialog->{'activefore'} = $FDialog->{'SABox'}->cget(-foreground);
 	$FDialog->{'inactivefore'} = $FDialog->{'SABox'}->cget(-disabledforeground);
 
@@ -198,6 +204,7 @@ sub Populate
 			-EDlgText		=> ['PASSIVE', undef, undef, "You must specify an existing file.\n"
 					. "(\$errnames not found)"],
 			-nonLatinFilenames => ['PASSIVE', undef, undef, 0],
+			-PreserveSelection => ['PASSIVE', undef, undef, 0],
 			);
 }
 
@@ -254,6 +261,7 @@ sub SetButton
 		## Return the current value
 		$self->{$widg}->cget(-text);
 		$self->{$widg}->bind('<Return>',sub {$self->{$widg}->Invoke;});
+		$self->bind('<Escape>',sub {$self->{$widg}->Invoke;})  if ($widg eq 'Can');
 	}
 }
 
@@ -338,6 +346,12 @@ sub Show
 	$self->SetFlag('Horiz');
 	$self->SetFlag('Grab');
 	#$self->SetFlag('SelDir');
+
+	$self->{'SelectText'} = '';
+	if ($self->{'Configure'}{'-PreserveSelection'}) {
+		eval { $self->{'SelectText'} = $self->SelectionGet(-selection => 'PRIMARY') };
+		$self->{'SelectText'} = ''  unless (defined $self->{'SelectText'});
+	}
 
 	## Set up, or remove, the directory box
 	&BuildListBoxes($self);
@@ -472,6 +486,10 @@ sub Show
 	($self->{'Configure'}{'-DestroyOnHide'} == 1) ? $self->destroy : $self->withdraw;
 #    &$old_focus;
 #    &$old_grab;
+	$self->{'_DummyTextWidget_'}->selectionRange(0,'end')
+		if ($self->{'Configure'}{'-PreserveSelection'}
+				&& length($self->{'SelectText'}) > 0);
+
 	return $self->{'RetFile'};
 }
 
@@ -2187,20 +2205,20 @@ __END__
 =head1 NAME
 
 Tk::JFileDialog - A highly configurable File and Directory Dialog 
-widget for Perl/Tk.  
+widget for Perl/Tk.
 
 =head1 AUTHOR
 
-(c) 1996-2023, Jim Turner, C<< <https://metacpan.org/author/TURNERJW> >>.
+(c) 1996-2024, Jim Turner, C<< <https://metacpan.org/author/TURNERJW> >>.
 
 =head1 ACKNOWLEDGEMENTS
 
-This is a derived work from Tk::FileDialog, Tk::Listbox and Tk::HList.
+This is a derived work from L<Tk::FileDialog>.
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (c) 1996-2023 Jim Turner C<< <mailto:turnerjw784@yahoo.com> >>.
-All rights reserved.  
+Copyright (c) 1996-2024 Jim Turner C<< <mailto:turnerjw784@yahoo.com> >>.
+All rights reserved.
 
 Tk::JFileDialog is free software; you can redistribute it and/or
 modify it under the terms of the GNU Lesser General Public
@@ -2292,10 +2310,10 @@ numerous features, such as optional history and favorites files,
 handles MS-Windows drive letters, additional key bindings, etc.
 
 To use JFileDialog, simply create your JFileDialog objects during 
-initialization (or at least before a Show).  When you wish to display the 
-JFileDialog, invoke the 'Show' method on the JFileDialog object;  The method 
-will return either a file name, a path name, or undef.  undef is returned only 
-if the user pressed the Cancel button.
+initialization (or at least before a Show() call).  When you wish to display 
+the JFileDialog, invoke the 'Show' method on the JFileDialog object;  The 
+method will return either a file name, a path name, or undef.  undef is 
+returned only if the user pressed the Cancel button.
 
 =head1 WIDGET OPTIONS
 
@@ -2344,7 +2362,7 @@ list.  User can be forced to select a file from this specific list by further
 constraints such as B<-DisableFPat> => 1, B<-Create> => -1, B<-SelDir> => -1, 
 and B<-DisableShowAll> => 1.  The list can contain any combination of file 
 names (ie. I<"file.ext">, absolute paths, ie. I<"/home/user/file.ext">, or 
-relative paths, ie. I<"user/file.ext"> or I"<c:file.ext>.  The files will be 
+relative paths, ie. I<"user/file.ext"> or I<"c:file.ext">.  The files will be 
 compared against the current path and, if matching (and existing, 
 if B<-Create> < 1), will be shown in the drop-down list.  
 
@@ -2402,7 +2420,7 @@ Default:  I<1> (file dialog will grab focus and be "modal").
 If set, allows user to delete items from the history dropdown list and thus 
 the history file.  
 
-Default:  I<0> (false)> (do not allow user to remove items in history).
+Default:  I<0 (false)> (do not allow user to remove items in history).
 
 NOTE:  requires Tk::JBrowseEntry v5.0 or later to work.
 
@@ -2418,7 +2436,8 @@ Default:  I<undef> (no history file or drop-down).
 =item B<-History>
 
 Used with the "-HistFile" option.  Specifies how many files to retain in the 
-history list.  Zero means keep all.  
+history list.  Zero means keep all.
+
 Default:  I<20> (keep last 20).
 
 =item B<-HistUsePath>
@@ -2435,14 +2454,14 @@ Default:  I<undef> (not set).
 
 Set (check or uncheck) the "Keep Path" checkbox created if "-HistUsePath" 
 option is set, otherwise, ignored.  The state of this button can also be 
-fetched by calling the B<getHistUsePathButton()> method, which returns 1 or 0. 
+fetched by calling the B<getHistUsePathButton()> method, which returns 1 or 0.
 
 Default:  I<0 (false)> (unchecked).
 
 =item B<-Horiz>
 
-I<TRUE> sets the File List box to be to the right of the Directory List Box.  
-If 0, the File List box will be below the Directory List box.  
+I<1 (true)> sets the File List box to be to the right of the Directory List Box.  
+If I<0 (false)>, the File List box will be below the Directory List box.  
 
 Default:  I<true> (display the listboxes side-by-side).
 
@@ -2487,14 +2506,34 @@ the text to not be selected (highlighted).
 
 The initial (default) selection path.  The default is the current 
 working directory.  If specified, pressing [Reset] will switch the directory 
-dialog back to this path.  
+dialog back to this path.
+
 Default:  none (use current working directory).
 
 =item B<-PathFile>
 
 Specifies a file containing a list of "favorite paths" bookmarks to show in a 
-dropdown list allowing quick-changes in directories.  
+dropdown list allowing quick-changes in directories.
+
 Default:  I<undef> (no favorite path file or dropdown list).
+
+=item B<-PreserveSelection>
+
+B<NEW> with Version 2.40+:
+
+Normally JFileDialog will "highlight" the file or directory selected (replace 
+any current PRIMARY selection text with that highlighted name), making it 
+easily pasteable into the calling program, if needed.  Setting this option to a 
+true value will first save the currently selected text in the calling program 
+(the PRIMARY selection buffer) before doing this and restore that post-
+selection.  This can be particularly handy in text editor applications where 
+one wishes to preserve whatever they have currently selected before invoking 
+JFileDialog to select a file / directory, then restoring that as the selected 
+text instead of the file / directory name selected in JBrowseEntry, ie. when 
+selecting a file to save the currently selected content into.
+
+Default:  I<0> (False) - overwrite (do not preserve) any data in the PRIMARY 
+selection buffer.
 
 =item B<-QuickSelect>
 
@@ -2536,7 +2575,7 @@ Default: I<'browse'> (selecting only a single file from the list allowed).
 =item B<-SelHook>
 
 SelHook is configured with a reference to a routine that will be called when 
-a fileis chosen. The function is called with a sole parameter of the full path 
+a file is chosen. The function is called with a sole parameter of the full path 
 and file name of the file chosen. If the Create flag is disabled (and the user 
 is not allowedto specify new files), the file will be known to exist at the 
 time that SelHook is called. Note that SelHook will also be called with 
@@ -2582,7 +2621,8 @@ Default:  I<true> (enable).
 
 =item B<-Title>
 
-The Title of the dialog box.  
+The Title of the dialog box.
+
 Default:  I<'Select File:'>.
 
 =back
@@ -2598,96 +2638,97 @@ be changed.
 
 The text for the Cancel button.  
 
-Default: I<'Cancel'>.
+Default:  I<'Cancel'>.
 
 =item B<-CdoutButtonLabel>
 
 The text for the JFM4 Filemanager "Current" Directory button. 
 
-Default: I<'C~dout'>.
+Default:  I<'C~dout'>.
 
 =item B<-CWDButtonLabel>
 
 The text for the Cdout Directory button.  
 
-Default: I<'C~WD'>.
+Default:  I<'C~WD'>.
 
 =item B<-DirLBCaption>
 
-The Caption above the Directory List Box.  
+The Caption above the Directory List Box.
 
-Default: I<'Folders:'> on Windows sytems, I<'Directories:'> on all others.
+Default:  I<'Folders:'> on Windows sytems, I<'Directories:'> on all others.
 
 =item B<-FileEntryLabel>
 
-The label to the left of the File Entry.  
+The label to the left of the File Entry.
 
-Default: I<'File:'>.
+Default:  I<'File:'>.
 
 =item B<-FltEntryLabel>
 
-The label to the left of the Filter entry.  
+The label to the left of the Filter entry.
 
 Default:  I<'Filter:'>.
 
 =item B<-FileLBCaption>
 
-The Caption above the File List Box.  
+The Caption above the File List Box.
 
 Default:  I<'Files'>.
 
 =item B<-HomeButtonLabel>
 
-The text for the Home directory button.  
+The text for the Home directory button.
 
 Default:  I<'Home'>.
 
 =item B<-OKButtonLabel>
 
-The text for the OK button.  
+The text for the OK button.
 
 Default:  I<'Ok'>.
 
 =item B<-PathEntryLabel>
 
-The label to the left of the Path Entry.  
+The label to the left of the Path Entry.
 
 Default:  I<'Path:'>.
 
 =item B<-RescanButtonLabel>
 
-The text for the Rescan button.  
+The text for the Rescan button.
 
 Default:  I<'Refresh'>.
 
 =item B<-ResetButtonLabel>
 
-The text for the Reset button.  
+The text for the Reset button.
 
 Default:  I<'Re~set'>.
 
 =item B<-ShowAllLabel>
 
-The text of the Show All Checkbutton.  
+The text of the Show All Checkbutton.
 
 Default:  I<'Show All'>.
 
 =item B<-SortButton>
 
-Whether or not to display a checkbox to change file box list sort order.  
+Whether or not to display a checkbox to change file box list sort order.
 
 Default:  I<TRUE> (show).
 
 =item B<-SortButtonLabel>
 
-The text for the Sort/Atime button.  
+The text for the Sort/Atime button.
+
 Default:  I<'Atime'>.
 
 =item B<-SortOrder>
 
 Order to display files in the file list box ('Name' or 'Date')
 If I<'Date'>, then the day and time is displayed in the box before 
-the name, (but not included when selected)
+the name (but not included when selected).
 
 Default:  I<Name>.
 
@@ -2705,13 +2746,13 @@ of the error. These switches allow some configuration of that dialog box.
 
 DEPRECIATED (now ignored)! - The message of the Error Dialog Box.  
 The variables $path, $file, and $filename
-(the full path and filename of the selected file) are available.  
+(the full path and filename of the selected file) are available.
 
 Default:  I<"You must specify an existing file.\n($filename not found)">.
 
 =item B<-EDlgTitle>
 
-The title of the Error Dialog Box.  
+The title of the Error Dialog Box.
 
 Default:  I<'Incorrect entry or selection!'>.
 
@@ -2768,5 +2809,9 @@ specified by B<-Path>, if specified, or the current working directory).
 
 Cwd, L<File::Glob>, L<Tk>, L<Tk::Dialog> (or L<Tk::JDialog> if installed), 
 L<Tk::JBrowseEntry>
+
+=head1 SEE ALSO
+
+L<Tk::FileDialog>, L<Tk::JBrowseEntry>, and L<Tk::Listbox>
 
 =cut

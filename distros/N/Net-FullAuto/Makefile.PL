@@ -25,9 +25,12 @@
 #
 ################################################################
 
-our $VERSION='1.0000766';
+our $VERSION='1.0000772';
 
-#print `env`,"\n\n\n";
+print "STARTING FREEMEM: ".`sudo cat /proc/meminfo | grep MemFree`;
+print "STARTING AVAILABLE: ".`sudo cat /proc/meminfo | grep MemAvailable`;
+
+print `env`,"\n\n\n";
 
 if ($ENV{'AUTOMATED_TESTING'}) {
 #if (1) {
@@ -202,13 +205,13 @@ BEGIN { # FullAuto© MICROSOFT WINDOWS INSTALLER
       my $token=`curl -X PUT  -s "http://169.254.169.254/latest/api/token" -H "X-aws-ec2-metadata-token-ttl-seconds: 21600"`;
       my $instance_type=`curl -s -H "X-aws-ec2-metadata-token: $token" http://169.254.169.254/latest/meta-data/instance-type`;
       $amazon{instance_type}=$instance_type;
-      #print `sudo cat /proc/meminfo | grep MemFree`;
-      #print `sudo cat /proc/meminfo | grep MemAvailable`;
+      print "FREEMEM AFTER AMAZON CHECK: ",`sudo cat /proc/meminfo | grep MemFree`;
+      print "AVAILABLE AFTER AMAZON CHECK: ",`sudo cat /proc/meminfo | grep MemAvailable`;
       if ($instance_type=~/micro|nano/) {
-         `sudo su -c 'sync;echo 3 > /proc/sys/vm/drop_caches'`
+	      #`sudo su -c 'sync;echo 3 > /proc/sys/vm/drop_caches'`
       }
-      #print `sudo cat /proc/meminfo | grep MemFree`;
-      #print `sudo cat /proc/meminfo | grep MemAvailable`;
+      print "FREEMEM AFTER CLEAR CACHES: ",`sudo cat /proc/meminfo | grep MemFree`;
+      print "AVAILABLE AFTER CLEAR CACHES: ",`sudo cat /proc/meminfo | grep MemAvailable`;
    }
 
 };
@@ -1259,7 +1262,20 @@ END
    unless (exists $groups{'Installed'}->{'Development tools'}) {
       fa_system("sudo yum -y update");
       fa_system("sudo yum -y clean all");
-      fa_system("sudo yum -y groupinstall 'Development tools'");
+      if (exists $amazon{instance_type} &&
+            $amazon{instance_type}=~/micro|nano/) {
+         unless (grep { /devtools/ } @ARGV) {
+            my $argvs=join " ", @ARGV;
+            my $exec_cmd="sudo su -c '"
+                        ."yum -y groupinstall \'Development tools\';"
+                        ."sync;echo 3 > /proc/sys/vm/drop_caches;"
+                        ."swapoff -a && swapon -a';"
+                        ."$^X Makefile.PL $argvs SKIP devtools 1";
+            exec $exec_cmd;
+         }
+      } else {
+         fa_system("sudo yum -y groupinstall 'Development tools'");
+      }
    }
    unless (-1<index $yins,'openssl-devel') {
       fa_system("sudo yum -y install 'openssl-devel'");
@@ -1293,7 +1309,7 @@ END
    }
 
 } elsif (((exists $amazon{'amazon_linux'}) || (exists $amazon{'centos'}) ||
-      ($system_type eq 'centos')) && !grep { /SKIP|CPAN/i } @ARGV) {
+      ($system_type eq 'centos')) && !grep { /SKIP|CPAN|figlet/i } @ARGV) {
 
    # Most Linux systems need a lot of helper software like compilers
    # to install all module dependencies. It is assumed users attempting
@@ -1336,36 +1352,44 @@ END
    }
    print "\n\n   FullAuto install continues . . .\n\n";
 
-   my $yins=`yum list installed`;
-   unless (-1<index $yins,'openssl-devel') {
-      fa_system("sudo yum -y install 'openssl-devel'");
-   }
-   unless (-1<index $yins,'zlib-devel') {
-      fa_system("sudo yum -y install 'zlib-devel'");
-   }
-   unless (-1<index $yins,'wget') {
-      fa_system("sudo yum -y install 'wget'");
-   }
+   print 'BEFORE YUM ',`sudo cat /proc/meminfo | grep MemFree`;
+   print 'BEFORE YUM ',`sudo cat /proc/meminfo | grep MemAvailable`;sleep 10;
+   #my $yins=`yum list installed`;
+   #unless (-1<index $yins,'openssl-devel') {
+   #   fa_system("sudo yum -y install 'openssl-devel'");
+   #}
+   #unless (-1<index $yins,'zlib-devel') {
+   #   fa_system("sudo yum -y install 'zlib-devel'");
+   #}
+   #unless (-1<index $yins,'wget') {
+   #   fa_system("sudo yum -y install wget openssl-devel zlib-devel");
+   #}
+   print 'After YUM ',`sudo cat /proc/meminfo | grep MemFree`;
+   print 'After YUM ',`sudo cat /proc/meminfo | grep MemAvailable`;sleep 10;
    unless (-e '/usr/local/bin/figlet') {
+      fa_system("sudo yum -y install wget openssl-devel zlib-devel");
       fa_system("(wget $fs;tar zxvf fig*gz;cd figlet-2.2.5;make install)");
       unless (-e "figlet-2.2.5.tar.gz") {
          my $cmd="tar zxvf dependencies/FIGlet_fonts/fig*gz;".
                  "cd figlet-2.2.5;make install";
          fa_system($cmd);
       }
-      if (exists $amazon{instance_type} && $amazon{instance_type}=~/micro|nano/) {
-         unless (grep { /figlet/ } @ARGV) {
-            my $argvs=join " ", @ARGV;
-            my $exec_cmd="sudo su -c 'sync;echo 3 > /proc/sys/vm/drop_caches';"
-                        ."swapoff -a && swapon -a;"
-                        ."$^X Makefile.PL $argvs figlet 1";
-            exec $exec_cmd;
-         }
-      }
-   }
-   unless (-1<index $yins,'nano') {
+      #if (exists $amazon{instance_type} && $amazon{instance_type}=~/micro|nano/) {
+      #   unless (grep { /figlet/ } @ARGV) {
+      #      my $argvs=join " ", @ARGV;
+      #      my $exec_cmd="sudo su -c 'sync;echo 3 > /proc/sys/vm/drop_caches';"
+      #                  ."swapoff -a && swapon -a;"
+      #                  ."$^X Makefile.PL $argvs figlet 1";
+      #      exec $exec_cmd;
+      #   }
+      #}
       fa_system("sudo yum -y install 'nano'");
    }
+   #print 'After figlet ',`sudo cat /proc/meminfo | grep MemFree`;
+   #print 'After figlet ',`sudo cat /proc/meminfo | grep MemAvailable`;sleep 10;
+   #unless (-1<index $yins,'nano') {
+      #fa_system("sudo yum -y install 'nano'");
+   #}
 
 } elsif (!can_cc() && (exists $amazon{'suse'})) {
 
@@ -1611,7 +1635,7 @@ sub fa_find_latest {
    }
    $look=~s/::/-/g;
    print "***** Looking for Most Recent \"$look Dir\" \n";
-   if (exists $amazon{instance_type} && $amazon{instance_type}=~/micro|nano/) {
+   if (exists $amazon{instance_type} && $amazon{instance_type}=~/micro/) {
       #print `sudo cat /proc/meminfo | grep MemFree`;
       #print `sudo cat /proc/meminfo | grep MemAvailable`;
       fa_system("sudo su -c 'sync;echo 3 > /proc/sys/vm/drop_caches'");
@@ -2059,7 +2083,7 @@ END
                }
                close FH;
             } elsif (exists $amazon{instance_type} &&
-                  $amazon{instance_type}=~/micro|nano/) {
+                  $amazon{instance_type}=~/micro/) {
                print "*** Running ${sudo}make install\n";
                if ($ARGV[$#ARGV]=~/^(\d+)$/) {
                   pop @ARGV;pop @ARGV;
@@ -2122,7 +2146,7 @@ END
          exec "$sudo$^X Makefile.PL SKIP $argvs $p $exec_cnt";
       }
    } elsif (exists $amazon{instance_type} &&
-         $amazon{instance_type}=~/micro|nano/) { 
+         $amazon{instance_type}=~/micro/) { 
       print "*** $p Loaded Successfully\n";
       $ENV{LOADED_MODULES}.="|$p";
       $exec_cnt=0;
@@ -2213,8 +2237,12 @@ sub size_fmt {
    return sprintf("%.2f TB",$size / (1024*1024*1024*1024));
 }
 if (exists $amazon{instance_type}) {
-   if ($amazon{instance_type}=~/micro|nano/) {
+   if ($amazon{instance_type}=~/micro/) {
+	   print "ARGVVVVVV=",join ' ',@ARGV,"\n";
       unless (grep { /CPAN|SKIP/ } @ARGV) {
+         fa_system('sudo dnf -y install perl-YAML.noarch perl-Net-SSLeay.x86_64');
+print "BEFORE CPAN LOOPING FREEMEM: ".`sudo cat /proc/meminfo | grep MemFree`;
+print "BEFORE CPAN LOOPING STARTING AVAILABLE: ".`sudo cat /proc/meminfo | grep MemAvailable`;
          my $cwd=&cwd;
          my $argvs=join " ", @ARGV;
          my $exec_cmd="sudo su -c 'sync;echo 3 > /proc/sys/vm/drop_caches';"
@@ -2223,9 +2251,10 @@ if (exists $amazon{instance_type}) {
          exec $exec_cmd;
       } elsif (!grep { /SKIP/ } @ARGV) {
          pop @ARGV;
-         fa_system('sudo dnf -y install perl-YAML.noarch perl-Net-SSLeay.x86_64');
+         #fa_system('sudo dnf -y install perl-YAML.noarch perl-Net-SSLeay.x86_64');
          print "\n";
 	 my $memavail=`sudo cat /proc/meminfo | grep MemAvailable`;
+print "BEFORE LOADING CPAN TO CHECK FOR RELEASE: $memavail\n";
 	 $memavail=~s/^.*?(\d+).*$/$1/s;
          eval {
             local $SIG{__DIE__}; # No sigdie handler
@@ -2246,7 +2275,7 @@ END
 
 print "WHAT IS RELEASE FOR PARSING:\n\n$release<==\n\n";
 
-	 $release=~s/^.*\n.*RE\/(.*)\s*CPAN.*$/$1/s;
+	 $release=~s/^.*\n.*RE\/(.*?)\s+CPAN.*$/$1/s;
 print "PARSING OUTCOME=$release<==\n\n";
          $low_mem.=<<END;
    Installing FullAuto on an Amazon AWS $amazon{instance_type} instance via
@@ -2267,18 +2296,19 @@ END
          my $mem_avail=$memavail;
          $memavail=~s/^.*?(\d+).*$/$1/s;
          print "$mem_avail\n\n";
-         if (int($memavail)<220000) {
+         #if (int($memavail)<220000) {
+         if (int($memavail)<150000) {
             print "$low_mem\n\n";
             exit;
          } else {
-            my $exec_cmd="sudo su -c 'sync;echo 3 > /proc/sys/vm/drop_caches';"
-                        ."swapoff -a && swapon -a;"
-                        ."$^X Makefile.PL SKIP CPAN";
-            exec $exec_cmd;
+            #my $exec_cmd="sudo su -c 'sync;echo 3 > /proc/sys/vm/drop_caches';"
+            #            ."swapoff -a && swapon -a;"
+            #            ."$^X Makefile.PL SKIP CPAN";
+            #exec $exec_cmd;
          }
       }
    } elsif (!grep { /SKIP/ } @ARGV) {
-      fa_system('sudo dnf -y install perl-YAML.noarch');
+	   #fa_system('sudo dnf -y install perl-YAML.noarch');
    }
 }
 print "\n";
@@ -4735,8 +4765,7 @@ if ($get_BerkeleyDB && $^O ne 'cygwin') {
             my $filenm=$file;
             $file=~s/.tar.gz$//;
             $filename="${file}_${$}.tar.gz";
-            sleep 2;
-	    fa_system("cp -v \"$dir/$filenm\" \"",&cwd."/$filename\"");
+	    fa_system('cp -v "'.$dir.'/'.$filenm.'" "'.&cwd.'/'.$filename.'"');
             my $so=fa_system($CPAN::Config->{gzip}." -d $filename");
             if ($so==-1) {
                fa_die("Cannot gunzip $filename: $!\n");
@@ -6468,6 +6497,9 @@ sub MY::tools_other {
 
    $inherited =~
       s/^(MV.*)$/$1\nSED = sed/m;
+  
+   $inherited =~
+      s/^(SED.*)$/$1\nSHA = sha256sum/m;
 
    $inherited; #
 
@@ -6681,7 +6713,16 @@ sub MY::dist_core {
 
    my $inherited = shift->SUPER::dist_core(@_);
 
-   $inherited =~ s/tar$/tar\n\t\$(MV) \$(DISTVNAME).tar\$(SUFFIX) dist/m;
+   if (grep { /-*(?:add|all)[-_]?dependencies/i } @ARGV) {
+
+      $inherited =~ s/tar$/tar\n\t\$(SHA) \$(DISTVNAME).tar\$(SUFFIX) > dist\/\$(DISTVNAME).tar\$(SUFFIX).sha256/m;
+      $inherited =~ s/sha256$/sha256\n\t\$(MV) \$(DISTVNAME).tar\$(SUFFIX) dist/m;
+
+   } else {
+
+      $inherited =~ s/tar$/tar\n\t\$(MV) \$(DISTVNAME).tar\$(SUFFIX) dist/m;
+
+   }
 
    $inherited; #
 

@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 
-use PDL::Types qw(types);
+use PDL::Types qw(types ppdefs_all);
 
 pp_bless('PDL::GSL::RNG'); # make the functions generated go into our namespace, and
 				# not PDL's namespace
@@ -279,7 +279,7 @@ Example:
 
 =for ref
 
-Shuffles values in ndarray
+Shuffles values in ndarray, treating it as flat.
 
 Usage:
 
@@ -291,19 +291,19 @@ Usage:
 
 =for ref
 
-Shuffles values in ndarray
+Returns values in Perl list, shuffled.
 
 Usage:
 
 =for usage
 
-   $rng->ran_shuffle_vec(@vec);
+   @shuffled = $rng->ran_shuffle_vec(@vec);
 
 =head2 ran_choose
 
 =for ref
 
-Chooses values from C<$inndarray> to C<$outndarray>.
+Chooses values from C<$inndarray> to C<$outndarray>, treating both as flat.
 
 Usage:
 
@@ -416,14 +416,14 @@ my ($obj,' . $par . '@var) = @_;';
     }
 
 $s .= 'if (ref($var[0]) eq \'PDL\') {
-    _' . $fname . '_int($var[0],' . $par . '$$obj);
+    _' . $fname . '_int($var[0],' . $par . '$obj);
     return $var[0];
 }
 else {
     my $p;
 
     $p = zeroes @var;
-    _' . $fname . '_int($p,' . $par . '$$obj);
+    _' . $fname . '_int($p,' . $par . '$obj);
     return $p;
 }
 }
@@ -435,22 +435,125 @@ pp_addhdr('
 
 #include "gsl/gsl_rng.h"
 #include "gsl/gsl_randist.h"
-
-
 ');
+
+use Config;
+my %p_type = (
+  'double' => 'double',
+  'unsigned int' => $Config{intsize} == 4 ? 'uint' :
+    $Config{intsize} == 8 ? 'ulonglong' : die("Unknown intsize, not [48]"),
+  'size_t' => 'SIZE',
+);
+use Text::ParseWords qw(shellwords);
+chomp(my $header = `gsl-config --cflags`);
+$header =~ s#\\#/#g; # win32
+($header) = map {s/^-I//;$_} grep /^-I/, shellwords $header;
+$header .= '/gsl/gsl_randist.h';
+my $h = do { open my $fh, "<", $header or die "$header: $!"; local $/ = undef; <$fh> };
+my @defs;
+DEF: for my $def ($h =~ m/(double\s+gsl_ran_\S*_pdf\s*\(.+?\))/sg) {
+  local $_ = $def;
+  s/\n\s+/ /xmsg;
+  s/const //g;
+  if (m/^(\w+)\s+(\w+)\s*\(\s*(.+)\s*\)/s) {
+    my ($out_type, $function, $pars) = ($1, $2, $3);
+    my @pars = split /,/, $pars;
+    for (@pars) {
+      die "Couldn't parse '$_' in '$def'" if !m/^(.+?)(\w+)\s*(\[\s*\])?\s*$/;
+      my ($type, $par, $vec) = ($1, $2, $3);
+      next DEF if $type =~ /gsl_ran_discrete_t/;
+      s/^ | $//g for ($type, $par);
+      $par = lc $par;
+        # numbers interfere with $ISGOOD in BadCode
+      $par =~ s/1/a/g;
+      $par =~ s/2/b/g;
+      die("unknown type '$type' in '$def'") if !$p_type{$type};
+      $_ = [$p_type{$type}, $par, $vec ? 1 : ()];
+    }
+    push @defs, [ $out_type, $function, \@pars ];
+  }
+}
+@defs = sort { $a->[1] cmp $b->[1] } @defs; # sort by function name
+my @export_names;
+for my $f (@defs) {
+  my ($out_type, $function, $pars) = @$f;
+  my ($p, $code) = gen_def($out_type, $function, @$pars);
+  (my $pp_name = $function) =~ s/^gsl_//;
+  push @export_names, $pp_name;
+  pp_def($pp_name,
+    HandleBad => 1,
+    GenericTypes => ['D'],
+    Pars => $p,
+    Code => $code,
+    Doc  => '',
+  );
+}
+sub gen_def {
+  my ($out_type, $function, @pars) = @_;
+  my $SIZEVAR;
+  my @formal_pars = map {
+    if ($_->[0] eq 'SIZE') {
+      die "$function got second sizevar (@$_) but already got '$SIZEVAR'"
+        if $SIZEVAR;
+      $SIZEVAR = $_->[1];
+      ()
+    } else {
+      my $prefix = $_->[0] eq 'double' ? '' : "$_->[0] ";
+      my $suffix = !$_->[2] ? '()' :
+        $SIZEVAR ? "($SIZEVAR)" :
+        die "$function got vector par (@$_) but no sizevar";
+      $prefix.$_->[1].$suffix
+    }
+  } @pars;
+  my $pars = join '; ', @formal_pars, '[o]out()';
+  my @call_pars = map $_->[0] eq 'SIZE' ? "\$SIZE($_->[1])" :
+    $_->[2] ? "\$P($_->[1])" : "\$$_->[1]()",
+    @pars;
+  my $code = join "\n", "PDL_IF_BAD(char anybad=0;,)",
+    (map $_->[2] ?
+      "PDL_IF_BAD(loop ($SIZEVAR) %{ if (\$ISBAD($_->[1]())) { anybad=1; break; } %},)" :
+      "PDL_IF_BAD(if ( \$ISBAD($_->[1]())) anybad=1;,)",
+      grep $_->[0] ne 'SIZE', @pars),
+    "PDL_IF_BAD(if (anybad) { \$SETBAD(out()); continue; },)",
+    "\$out() = $function(@{[join ', ', @call_pars]});\n";
+  return ($pars, $code);
+}
 
 sub pp_defnd { # hide the docs
   my ($name, %hash) = @_;
   pp_def($name,%hash,Doc=>undef);
 }
 
-pp_def(
-       'get_uniform',
+pp_def('ran_shuffle_1d',
+       Pars => '[io]a(n)',
+       GenericTypes => [ppdefs_all()],
+       OtherPars => 'gsl_rng *rng',
+       Code => '
+gsl_ran_shuffle($COMP(rng), $P(a), $SIZE(n), sizeof($GENERIC()));
+',
+       PMCode => <<'EOF',
+sub ran_shuffle_1d { _ran_shuffle_1d_int(@_[1,0]) }
+EOF
+       Doc => <<'EOF',
+=for ref
+
+Takes n-dimensional ndarray, and shuffles it along its zero-th dimension.
+
+Usage:
+
+=for usage
+
+  $vec2d = sequence(10,10);
+  $rng->ran_shuffle_1d($vec2d);
+EOF
+);
+
+pp_def('get_uniform',
        Pars => '[o]a()',
        GenericTypes => ['F','D'],
-       OtherPars => 'IV rng',
+       OtherPars => 'gsl_rng *rng',
        Code => '
-$a() = gsl_rng_uniform(INT2PTR(gsl_rng *, $COMP(rng)));',
+$a() = gsl_rng_uniform($COMP(rng));',
        PMCode => make_get_sub('get_uniform',''),
        Doc => <<'EOF',
 =for ref
@@ -474,13 +577,12 @@ Example:
 EOF
 );
 
-pp_def(
-       'get_uniform_pos',
+pp_def('get_uniform_pos',
        Pars => '[o]a()',
        GenericTypes => ['F','D'],
-       OtherPars => 'IV rng',
+       OtherPars => 'gsl_rng *rng',
        Code => '
-$a() = gsl_rng_uniform_pos(INT2PTR(gsl_rng *, $COMP(rng)));',
+$a() = gsl_rng_uniform_pos($COMP(rng));',
        PMCode => make_get_sub('get_uniform_pos',''),
        Doc => <<'EOF',
 =for ref
@@ -504,13 +606,12 @@ Example:
 EOF
 );
 
-pp_def(
-       'get',
+pp_def('get',
        Pars => '[o]a()',
        GenericTypes => ['F','D'],
-       OtherPars => 'IV rng',
+       OtherPars => 'gsl_rng *rng',
        Code => '
-$a() = gsl_rng_get(INT2PTR(gsl_rng *, $COMP(rng)));',
+$a() = gsl_rng_get($COMP(rng));',
        PMCode => make_get_sub('get',''),
        Doc => <<'EOF',
 =for ref
@@ -535,13 +636,12 @@ Example:
 EOF
 );
 
-pp_def(
-       'get_int',
+pp_def('get_int',
        Pars => '[o]a()',
        GenericTypes => ['F','D'],
-       OtherPars => 'int n; IV rng',
+       OtherPars => 'IV n; gsl_rng *rng',
        Code => '
-$a() = gsl_rng_uniform_int(INT2PTR(gsl_rng *, $COMP(rng)),$COMP(n));',
+$a() = gsl_rng_uniform_int($COMP(rng),$COMP(n));',
        PMCode => make_get_sub('get_int','$n,'),
        Doc => <<'EOF',
 =for ref
@@ -571,7 +671,7 @@ EOF
 sub add_randist {
   my ($name,$doc,$params) = @_;
   my $npar = @$params;
-  my $pars1=join '; ', (map "double $_", @$params), 'IV rng';
+  my $pars1=join '; ', (map "double $_", @$params), 'gsl_rng *rng';
   my $fcall1=join ',', map "\$COMP($_)", @$params;
   my $arglist=join '', map "\$$_,", @$params;
   my $pars2=join ';', map "$_()", @$params;
@@ -584,18 +684,18 @@ sub add_randist {
 	 GenericTypes => ['F','D'],
 	 OtherPars => $pars1,
 	 Code =>'
-$output() = gsl_ran_' . $name . '(INT2PTR(gsl_rng *, $COMP(rng)),' . $fcall1 . ');',
+$output() = gsl_ran_' . $name . '($COMP(rng),' . $fcall1 . ');',
 	 PMCode =>'
 sub ran_' . $name . ' {
 my ($obj,' . $arglist . '@var) = @_;
 if (ref($var[0]) eq \'PDL\') {
-    _ran_' . $name . '_int($var[0],' . $arglist . '$$obj);
+    _ran_' . $name . '_int($var[0],' . $arglist . '$obj);
     return $var[0];
 }
 else {
     my $p;
     $p = zeroes @var;
-    _ran_' . $name . '_int($p,' . $arglist . '$$obj);
+    _ran_' . $name . '_int($p,' . $arglist . '$obj);
     return $p;
 }
 }
@@ -625,14 +725,14 @@ EOF
 	 'ran_' . $name . '_var',
 	 Pars => $pars2 . ';[o]output()',
 	 GenericTypes => ['F','D'],
-	 OtherPars => 'IV rng',
+	 OtherPars => 'gsl_rng *rng',
 	 Code =>'
-$output() = gsl_ran_' . $name . '(INT2PTR(gsl_rng *, $COMP(rng)),' . $fcall2 . ');',
+$output() = gsl_ran_' . $name . '($COMP(rng),' . $fcall2 . ');',
 	 PMCode =>'
 sub ran_' . $name . '_var {
 my ($obj,@var) = @_;
     if (scalar(@var) != ' . $npar . ') {barf("Bad number of parameters!");}
-    _ran_' . $name . '_var_int(@var,my $x=PDL->null,$$obj);
+    _ran_' . $name . '_var_int(@var,my $x=PDL->null,$obj);
     return $x;
 }
 ',
@@ -693,18 +793,17 @@ add_randist('logarithmic', 'integer values from the logarithmic distribution.',[
 
 # specific randist
 
-pp_def(
-       'ran_additive_gaussian',
+pp_def('ran_additive_gaussian',
        Pars => '[o]x()',
        GenericTypes => ['F','D'],
-       OtherPars => 'double sigma; IV rng',
-       Code =>'$x() += gsl_ran_gaussian(INT2PTR(gsl_rng *, $COMP(rng)), $COMP(sigma));',
+       OtherPars => 'double sigma; gsl_rng *rng',
+       Code =>'$x() += gsl_ran_gaussian($COMP(rng), $COMP(sigma));',
        PMCode =>'
        sub ran_additive_gaussian {
 	 my ($obj,$sigma,$var) = @_;
 	 barf("In additive gaussian mode you must specify an ndarray!")
 	   if ref($var) ne \'PDL\';
-	 _ran_additive_gaussian_int($var,$sigma,$$obj);
+	 _ran_additive_gaussian_int($var,$sigma,$obj);
 	 return $var;
        }
        ',
@@ -727,18 +826,17 @@ Example:
 EOF
 );
 
-pp_def(
-       'ran_additive_poisson',
+pp_def('ran_additive_poisson',
        Pars => '[o]x()',
        GenericTypes => ['F','D'],
-       OtherPars => 'double sigma; IV rng',
-       Code =>'$x() += gsl_ran_poisson(INT2PTR(gsl_rng *, $COMP(rng)), $COMP(sigma));',
+       OtherPars => 'double sigma; gsl_rng *rng',
+       Code =>'$x() += gsl_ran_poisson($COMP(rng), $COMP(sigma));',
        PMCode =>'
        sub ran_additive_poisson {
 	 my ($obj,$sigma,$var) = @_;
 	 barf("In additive poisson mode you must specify an ndarray!")
 	   if ref($var) ne \'PDL\';
-	 _ran_additive_poisson_int($var,$sigma,$$obj);
+	 _ran_additive_poisson_int($var,$sigma,$obj);
 	 return $var;
        }
        ',
@@ -761,18 +859,17 @@ Example:
 EOF
 );
 
-pp_def(
-       'ran_feed_poisson',
+pp_def('ran_feed_poisson',
        Pars => '[o]x()',
        GenericTypes => ['F','D'],
-       OtherPars => 'IV rng',
-       Code =>'$x() = gsl_ran_poisson(INT2PTR(gsl_rng *, $COMP(rng)), $x());',
+       OtherPars => 'gsl_rng *rng',
+       Code =>'$x() = gsl_ran_poisson($COMP(rng), $x());',
        PMCode =>'
        sub ran_feed_poisson {
 	 my ($obj,$var) = @_;
 	 barf("In poisson mode you must specify an ndarray!")
 	   if ref($var) ne \'PDL\';
-	 _ran_feed_poisson_int($var,$$obj);
+	 _ran_feed_poisson_int($var,$obj);
 	 return $var;
        }
        ',
@@ -796,14 +893,13 @@ Example:
 EOF
 );
 
-pp_def(
-	'ran_bivariate_gaussian',
+pp_def('ran_bivariate_gaussian',
 	Pars => '[o]x(n)',
 	GenericTypes => ['F','D'],
-	OtherPars => 'double sigma_x; double sigma_y; double rho; IV rng',
+	OtherPars => 'double sigma_x; double sigma_y; double rho; gsl_rng *rng',
         Code => <<'EOF',
 double xx,yy;
-gsl_ran_bivariate_gaussian(INT2PTR(gsl_rng *, $COMP(rng)), $COMP(sigma_x), $COMP(sigma_y),$COMP(rho), &xx, &yy);
+gsl_ran_bivariate_gaussian($COMP(rng), $COMP(sigma_x), $COMP(sigma_y),$COMP(rho), &xx, &yy);
 $x(n=>0)=xx;
 $x(n=>1)=yy;
 EOF
@@ -812,7 +908,7 @@ sub ran_bivariate_gaussian {
  my ($obj,$sigma_x,$sigma_y,$rho,$n) = @_;
  barf("Not enough parameters for gaussian bivariate!") if $n<=0;
  my $p = zeroes(2,$n);
- _ran_bivariate_gaussian_int($p,$sigma_x,$sigma_y,$rho,$$obj);
+ _ran_bivariate_gaussian_int($p,$sigma_x,$sigma_y,$rho,$obj);
  return $p;
 }
 EOF
@@ -835,26 +931,24 @@ Example:
 EOF
 );
 
-pp_defnd(
-	'ran_dir_2d',
+pp_defnd('ran_dir_2d',
 	Pars => '[o]x(n)',
 	GenericTypes => ['F','D'],
-	OtherPars => 'IV rng',
+	OtherPars => 'gsl_rng *rng',
         Code =>'
 double xx,yy;
-gsl_ran_dir_2d(INT2PTR(gsl_rng *, $COMP(rng)), &xx, &yy);
+gsl_ran_dir_2d($COMP(rng), &xx, &yy);
 $x(n=>0)=xx;
 $x(n=>1)=yy;
 ');
 
-pp_defnd(
-	'ran_dir_3d',
+pp_defnd('ran_dir_3d',
 	Pars => '[o]x(n)',
 	GenericTypes => ['F','D'],
-	OtherPars => 'IV rng',
+	OtherPars => 'gsl_rng *rng',
         Code =>'
 double xx,yy,zz;
-gsl_ran_dir_3d(INT2PTR(gsl_rng *, $COMP(rng)), &xx, &yy, &zz);
+gsl_ran_dir_3d($COMP(rng), &xx, &yy, &zz);
 $x(n=>0)=xx;
 $x(n=>1)=yy;
 $x(n=>2)=zz;
@@ -862,14 +956,13 @@ $x(n=>2)=zz;
 
 my $MAX_DIMENSIONS = 100;
 
-pp_defnd(
-	'ran_dir_nd',
+pp_defnd('ran_dir_nd',
 	Pars => '[o]x(n)',
 	GenericTypes => ['F','D'],
-	OtherPars => 'int ns => n; IV rng',
+	OtherPars => 'IV ns => n; gsl_rng *rng',
         Code =>'
 double xxx[' . $MAX_DIMENSIONS .'];
-gsl_ran_dir_nd(INT2PTR(gsl_rng *, $COMP(rng)), $COMP(ns), xxx);
+gsl_ran_dir_nd($COMP(rng), $COMP(ns), xxx);
 loop (n) %{ $x() = xxx[n]; %}');
 
 pp_addpm('
@@ -877,32 +970,31 @@ pp_addpm('
 	 my ($obj,$ndim,$n) = @_;
 	 barf("Not enough parameters for random vectors!") if $n<=0;
 	 my $p = zeroes($ndim,$n);
-	 if ($ndim==2) { ran_dir_2d($p,$$obj); }
-	 elsif ($ndim==3) { ran_dir_3d($p,$$obj); }
-	 elsif ($ndim>=4 && $ndim<=' . $MAX_DIMENSIONS . ') { ran_dir_nd($p,$ndim,$$obj); }
+	 if ($ndim==2) { ran_dir_2d($p,$obj); }
+	 elsif ($ndim==3) { ran_dir_3d($p,$obj); }
+	 elsif ($ndim>=4 && $ndim<=' . $MAX_DIMENSIONS . ') { ran_dir_nd($p,$ndim,$obj); }
 	 else { barf("Bad number of dimensions!"); }
 	 return $p;
        }
        ');
 
-pp_def(
-	'ran_discrete',
+pp_def('ran_discrete',
 	Pars => '[o]x()',
 	GenericTypes => ['F','D'],
-	OtherPars => 'IV rng_discrete; IV rng',
+	OtherPars => 'gsl_ran_discrete_t *rng_discrete; gsl_rng *rng',
         Code =>'
-$x()=gsl_ran_discrete(INT2PTR(gsl_rng *, $COMP(rng)), INT2PTR(gsl_ran_discrete_t *, $COMP(rng_discrete))); ',
+$x()=gsl_ran_discrete($COMP(rng), $COMP(rng_discrete)); ',
         PMCode =>'
 sub ran_discrete {
 my ($obj, $rdt, @var) = @_;
 if (ref($var[0]) eq \'PDL\') {
-    _ran_discrete_int($var[0], $$rdt, $$obj);
+    _ran_discrete_int($var[0], $rdt, $obj);
     return $var[0];
 }
 else {
     my $p;
     $p = zeroes @var;
-    _ran_discrete_int($p, $$rdt, $$obj);
+    _ran_discrete_int($p, $rdt, $obj);
     return $p;
 }
 }
@@ -932,38 +1024,24 @@ EOF
   pp_addpm('
 sub ran_shuffle_vec {
 my ($obj,@in) = @_;
-my (@out,$i,$p);
-
-$p = long [0..$#in];
-$obj->ran_shuffle($p);
-for($i=0;$i<scalar(@in);$i++) {
-$out[$p->at($i)]=$in[$i];
-}
-return @out;
+$obj->ran_shuffle(my $p = PDL->sequence(PDL::indx(), 0+@in));
+@in[$p->list];
 }
 ');
 
   pp_addpm('
 sub ran_choose_vec {
 my ($obj,$nout,@in) = @_;
-my (@out,$i,$pin,$pout);
-
-$pin = long [0..$#in];
-$pout = long [0..($nout-1)];
-$obj->ran_choose($pin,$pout);
-for($i=0;$i<$nout;$i++) {
-$out[$i]=$in[$pout->at($i)];
-}
-return @out;
+$obj->ran_choose(PDL->sequence(PDL::indx(), 0+@in),my $pout = PDL->zeroes(PDL::indx(), $nout));
+@in[$pout->list];
 }
 ');
 
 
-pp_def(
-	'ran_ver',
+pp_def('ran_ver',
 	Pars => '[o]x(n)',
 	GenericTypes => ['F','D'],
-	OtherPars => 'double x0; double r;int ns => n; IV rng',
+	OtherPars => 'double x0; double r;IV ns => n; gsl_rng *rng',
         Code =>'
 double xx=$COMP(x0);
 
@@ -973,7 +1051,7 @@ loop (n) %{ $x() = xx; xx = $COMP(r)*(1-xx)*xx; %}',
 	 my ($obj,$x0,$r,$n) = @_;
 	 barf("Not enough parameters for ran_ver!") if $n<=0;
 	 my $p = zeroes($n);
-	 _ran_ver_int($p,$x0,$r,$n,$$obj);
+	 _ran_ver_int($p,$x0,$r,$n,$obj);
 	 return $p;
        }
        ',
@@ -991,13 +1069,12 @@ Usage:
 EOF
 );
 
-pp_def(
-	'ran_caos',
+pp_def('ran_caos',
 	Pars => '[o]x(n)',
 	GenericTypes => ['F','D'],
-	OtherPars => 'double m; int ns => n; IV rng',
+	OtherPars => 'double m; IV ns => n; gsl_rng *rng',
         Code =>'
-double xx=gsl_ran_gaussian(INT2PTR(gsl_rng *, $COMP(rng)),0.1)+0.5;
+double xx=gsl_ran_gaussian($COMP(rng),0.1)+0.5;
 
 loop (n) %{ $x() = (xx-0.5)*$COMP(m); xx = 4.0*(1-xx)*xx; %}',
         PMCode =>'
@@ -1005,7 +1082,7 @@ loop (n) %{ $x() = (xx-0.5)*$COMP(m); xx = 4.0*(1-xx)*xx; %}',
 	 my ($obj,$m,$n) = @_;
 	 barf("Not enough parameters for ran_caos!") if $n<=0;
 	 my $p = zeroes($n);
-	 _ran_caos_int($p,$m,$n,$$obj);
+	 _ran_caos_int($p,$m,$n,$obj);
 	 return $p;
        }
        ',
@@ -1146,21 +1223,19 @@ DESTROY(sv)
   SV * sv
  CODE:
   gsl_rng *rng = INT2PTR(gsl_rng *, SvIV((SV*)SvRV(sv)));
-  /* fprintf(stderr,"Freeing %d\n",rng); */
-  gsl_rng_free((gsl_rng *) rng);
+  gsl_rng_free(rng);
 
 gsl_ran_discrete_t *
 ran_discrete_preproc(rng, p)
   gsl_rng * rng
   pdl * p
      CODE:
-       int n;
-
+       IV n;
        if (p->ndims!=1 || p->datatype!=PDL_D) {
 	 barf("Bad input to ran_discrete_preproc!");
        }
-       n = p->dims[0];
        PDL->barf_if_error(PDL->make_physical(p));
+       n = p->dims[0];
        RETVAL = gsl_ran_discrete_preproc(n,(double *) p->data);
      OUTPUT:
        RETVAL
@@ -1170,12 +1245,12 @@ ran_shuffle(rng, in)
   gsl_rng * rng
   pdl * in
  CODE:
-  int size, n;
-
-  n = in->nvals;
+  IV size, n;
   PDL->barf_if_error(PDL->make_physical(in));
+  n = in->nvals;
   size = PDL->howbig(in->datatype);
-  gsl_ran_shuffle(rng,(double *) in->data,n,size);
+  gsl_ran_shuffle(rng,in->data,n,size);
+  PDL->changed(in, PDL_PARENTDATACHANGED, 0);
 
 void
 ran_choose(rng, in, out)
@@ -1183,21 +1258,23 @@ ran_choose(rng, in, out)
   pdl * in
   pdl * out
  CODE:
-  int size, n,m;
+  IV size, n,m;
 
-  n = in->nvals;
-  m = out->nvals;
   if (in->datatype != out->datatype) barf("Data Types must match for ran_chooser");
   PDL->barf_if_error(PDL->make_physical(in));
   PDL->barf_if_error(PDL->make_physical(out));
+  n = in->nvals;
+  m = out->nvals;
   size = PDL->howbig(in->datatype);
-  gsl_ran_choose(rng,(double *) out->data, m, (double *) in->data,n,size);
+  gsl_ran_choose(rng,out->data, m, in->data,n,size);
+  PDL->changed(out, PDL_PARENTDATACHANGED, 0);
 ');
 
 pp_core_importList(' qw/ zeroes long barf  /');  # import just a named list to our namespace, so we don't get warning
 				     # messages like 'warning 'min' redefined at line ...'
 
 pp_export_nothing;  # set to not export anything. (This is a OO package, it doesn't need to export any methods.)
+pp_add_exported(@export_names); # ... except functions suitable for that
 
 pp_add_boot('gsl_set_error_handler_off();
 ');

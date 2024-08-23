@@ -37,7 +37,7 @@ resources:
   bugtracker: https://github.com/LibreCat/Catmandu-Store-OpenSearch/issues
   homepage: https://github.com/LibreCat/Catmandu-Store-OpenSearch
   repository: https://github.com/LibreCat/Catmandu-Store-OpenSearch.git
-version: '0.01'
+version: '0.02'
 x_contributors:
   - 'Nicolas Franck <nicolas.franck@ugent.be>'
 x_generated_by_perl: v5.22.1

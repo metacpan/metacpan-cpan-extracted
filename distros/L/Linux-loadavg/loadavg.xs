@@ -7,6 +7,8 @@
 #include "XSUB.h"
 #include "stdlib.h"
 
+/* VERSION: 0.11 */
+
 MODULE = Linux::loadavg		PACKAGE = Linux::loadavg		
 
 void
@@ -29,4 +31,3 @@ PPCODE:
    for(i=0; i<nelem; i++) {
      PUSHs(sv_2mortal(newSVnv(loadavg[i])));
    }
-//   XSRETURN(nelem);

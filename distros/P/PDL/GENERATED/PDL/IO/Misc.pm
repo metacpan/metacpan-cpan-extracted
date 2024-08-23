@@ -1255,7 +1255,7 @@ sub rcube {
 
 =for sig
 
-  Signature: ([o] nums(n); int [o] ierr(n); PerlIO *fp; int num => n)
+  Signature: ([o] nums(n); int [o] ierr(n); PerlIO *fp; IV num => n)
 
 =for ref
 

@@ -1,7 +1,7 @@
 package Langertha::Role::Models;
 our $AUTHORITY = 'cpan:GETTY';
 # ABSTRACT: Role for APIs with several models
-$Langertha::Role::Models::VERSION = '0.004';
+$Langertha::Role::Models::VERSION = '0.005';
 use Moose::Role;
 
 requires qw(
@@ -46,7 +46,7 @@ Langertha::Role::Models - Role for APIs with several models
 
 =head1 VERSION
 
-version 0.004
+version 0.005
 
 =for :stopwords cpan testmatrix url bugtracker rt cpants kwalitee diff irc mailto metadata placeholders metacpan
 

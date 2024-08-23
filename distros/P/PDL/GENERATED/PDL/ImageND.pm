@@ -559,7 +559,7 @@ sub PDL::convolveND {
   my $aa = $x->range( -$koff, $adims + $kdims, $opt->{Boundary} )
                ->sever;
 
-  if($fft) {
+  if ($fft) {
     require PDL::FFT;
 
     print "convolveND: using FFT method\n" if($PDL::debug);

@@ -29,7 +29,7 @@ Catmandu::OAI - Catmandu modules for working with OAI repositories
 
 =cut
 
-our $VERSION = '0.20';
+our $VERSION = '0.21';
 
 =head1 MODULES
 

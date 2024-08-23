@@ -1,5 +1,8 @@
 Revision history for Business-TrueLayer
 
+0.03     2024-08-22
+        - Support mandate creation and payment creation from mandates
+
 0.02     2023-12-08
         - auth_host moves to Request, and Authenticator only uses host internally
         - Refactor api_post() and api_get() to use _ua_request()

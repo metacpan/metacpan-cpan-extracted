@@ -33,7 +33,7 @@ print OUT <<'EOF';
 
 #ifdef PDL_DEBUGGING
 extern int pdl_debugging;
-#define PDLDEBUG_f(a)           if(pdl_debugging) { a; fflush(stdout); }
+#define PDLDEBUG_f(a) do {if (pdl_debugging) { a; fflush(stdout); }} while (0)
 #else
 #define PDLDEBUG_f(a)
 #endif
@@ -266,11 +266,8 @@ PDL_TYPELIST_ALL(X)
   /* Physical data representation of the parent has changed (e.g.           */
   /* physical transposition), so incs etc. need to be recalculated.         */
 #define  PDL_ANYCHANGED          (PDL_PARENTDATACHANGED|PDL_PARENTDIMSCHANGED)
-  /* Dataflow tracking flags -- F/B for forward/back.  These get set        */
-  /* by transformations when they are set up.                               */
+  /* Dataflow forward flag request        */
 #define  PDL_DATAFLOW_F          0x0010
-#define  PDL_DATAFLOW_B          0x0020
-#define  PDL_DATAFLOW_ANY        (PDL_DATAFLOW_F|PDL_DATAFLOW_B)
   /* Was this PDL null originally?                                          */
 #define  PDL_NOMYDIMS            0x0040
   /* Dims should be received via trans.                                     */
@@ -280,19 +277,18 @@ PDL_TYPELIST_ALL(X)
 #define  PDL_OPT_ANY_OK          (PDL_OPT_VAFFTRANSOK)
   /* This is the hdrcpy flag                                                */
 #define  PDL_HDRCPY              0x0200
-  /* This is a badval flag for this PDL (hmmm -- there is also a flag       */
-  /* in the struct itself -- must be clearer about what this is for. --CED) */
+  /* This is a badval flag for this PDL as set by "badflag"                 */
 #define  PDL_BADVAL              0x0400
-  /* Debugging flag                                                         */
-#define  PDL_TRACEDEBUG          0x0800
+  /* If ndarray was created by PDL API but then got SV attached             */
+#define  PDL_DYNLANG_NODESTROY   0x0800
   /* inplace flag                                                           */
 #define  PDL_INPLACE             0x1000
   /* Flag indicating destruction in progress                                */
-#define         PDL_DESTROYING          0x2000
+#define  PDL_DESTROYING          0x2000
   /* If this flag is set, you must not alter the data pointer nor           */
-  /* free this ndarray nor use datasv (which should be null).                */
-  /* This means e.g. that the ndarray is mmapped from a file                 */
-#define         PDL_DONTTOUCHDATA       0x4000
+  /* free this ndarray nor use datasv (which should be null).               */
+  /* This means e.g. that the ndarray is mmapped from a file                */
+#define  PDL_DONTTOUCHDATA       0x4000
   /* whether the given pdl is getting its dims from the given trans */
 #define PDL_DIMS_FROM_TRANS(wtrans,pdl) (((pdl)->state & PDL_MYDIMS_TRANS) \
                 && (pdl)->trans_parent == (pdl_trans *)(wtrans))
@@ -302,13 +298,12 @@ PDL_TYPELIST_ALL(X)
  X(PDL_PARENTDATACHANGED) \
  X(PDL_PARENTDIMSCHANGED) \
  X(PDL_DATAFLOW_F) \
- X(PDL_DATAFLOW_B) \
  X(PDL_NOMYDIMS) \
  X(PDL_MYDIMS_TRANS) \
  X(PDL_OPT_VAFFTRANSOK) \
  X(PDL_HDRCPY) \
  X(PDL_BADVAL) \
- X(PDL_TRACEDEBUG) \
+ X(PDL_DYNLANG_NODESTROY) \
  X(PDL_INPLACE) \
  X(PDL_DESTROYING) \
  X(PDL_DONTTOUCHDATA)

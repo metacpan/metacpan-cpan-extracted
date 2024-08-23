@@ -81,7 +81,7 @@ while C<P(1) = p(1)>, C<Q(1) = 1 - p(1)>.
 
 
 
-#line 144 "gsl_cdf.pd"
+#line 134 "gsl_cdf.pd"
 
 =head2 The Beta Distribution (gsl_cdf_beta_*)
 
@@ -95,7 +95,7 @@ These functions compute the cumulative distribution functions P(x), Q(x) and the
 
 =for sig
 
-  Signature: (double x(); double a(); double b(); double [o]out())
+  Signature: (x(); a(); b(); [o]out())
 
 =for ref
 
@@ -120,7 +120,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (double p(); double a(); double b(); double [o]out())
+  Signature: (p(); a(); b(); [o]out())
 
 =for ref
 
@@ -145,7 +145,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (double x(); double a(); double b(); double [o]out())
+  Signature: (x(); a(); b(); [o]out())
 
 =for ref
 
@@ -170,7 +170,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (double q(); double a(); double b(); double [o]out())
+  Signature: (q(); a(); b(); [o]out())
 
 =for ref
 
@@ -190,7 +190,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 144 "gsl_cdf.pd"
+#line 134 "gsl_cdf.pd"
 
 =head2 The Binomial Distribution (gsl_cdf_binomial_*)
 
@@ -204,7 +204,7 @@ These functions compute the cumulative distribution functions P(k), Q(k) for the
 
 =for sig
 
-  Signature: (ushort k(); double p(); ushort n(); double [o]out())
+  Signature: (ulonglong k(); p(); ulonglong n(); [o]out())
 
 =for ref
 
@@ -229,7 +229,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (ushort k(); double p(); ushort n(); double [o]out())
+  Signature: (ulonglong k(); p(); ulonglong n(); [o]out())
 
 =for ref
 
@@ -249,7 +249,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 144 "gsl_cdf.pd"
+#line 134 "gsl_cdf.pd"
 
 =head2 The Cauchy Distribution (gsl_cdf_cauchy_*)
 
@@ -263,7 +263,7 @@ These functions compute the cumulative distribution functions P(x), Q(x) and the
 
 =for sig
 
-  Signature: (double x(); double a(); double [o]out())
+  Signature: (x(); a(); [o]out())
 
 =for ref
 
@@ -288,7 +288,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (double p(); double a(); double [o]out())
+  Signature: (p(); a(); [o]out())
 
 =for ref
 
@@ -313,7 +313,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (double x(); double a(); double [o]out())
+  Signature: (x(); a(); [o]out())
 
 =for ref
 
@@ -338,7 +338,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (double q(); double a(); double [o]out())
+  Signature: (q(); a(); [o]out())
 
 =for ref
 
@@ -358,7 +358,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 144 "gsl_cdf.pd"
+#line 134 "gsl_cdf.pd"
 
 =head2 The Chi-squared Distribution (gsl_cdf_chisq_*)
 
@@ -372,7 +372,7 @@ These functions compute the cumulative distribution functions P(x), Q(x) and the
 
 =for sig
 
-  Signature: (double x(); double nu(); double [o]out())
+  Signature: (x(); nu(); [o]out())
 
 =for ref
 
@@ -397,7 +397,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (double p(); double nu(); double [o]out())
+  Signature: (p(); nu(); [o]out())
 
 =for ref
 
@@ -422,7 +422,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (double x(); double nu(); double [o]out())
+  Signature: (x(); nu(); [o]out())
 
 =for ref
 
@@ -447,7 +447,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (double q(); double nu(); double [o]out())
+  Signature: (q(); nu(); [o]out())
 
 =for ref
 
@@ -467,7 +467,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 144 "gsl_cdf.pd"
+#line 134 "gsl_cdf.pd"
 
 =head2 The Exponential Distribution (gsl_cdf_exponential_*)
 
@@ -481,7 +481,7 @@ These functions compute the cumulative distribution functions P(x), Q(x) and the
 
 =for sig
 
-  Signature: (double x(); double mu(); double [o]out())
+  Signature: (x(); mu(); [o]out())
 
 =for ref
 
@@ -506,7 +506,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (double p(); double mu(); double [o]out())
+  Signature: (p(); mu(); [o]out())
 
 =for ref
 
@@ -531,7 +531,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (double x(); double mu(); double [o]out())
+  Signature: (x(); mu(); [o]out())
 
 =for ref
 
@@ -556,7 +556,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (double q(); double mu(); double [o]out())
+  Signature: (q(); mu(); [o]out())
 
 =for ref
 
@@ -576,7 +576,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 144 "gsl_cdf.pd"
+#line 134 "gsl_cdf.pd"
 
 =head2 The Exponential Power Distribution (gsl_cdf_exppow_*)
 
@@ -590,7 +590,7 @@ These functions compute the cumulative distribution functions P(x), Q(x) for the
 
 =for sig
 
-  Signature: (double x(); double a(); double b(); double [o]out())
+  Signature: (x(); a(); b(); [o]out())
 
 =for ref
 
@@ -615,7 +615,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (double x(); double a(); double b(); double [o]out())
+  Signature: (x(); a(); b(); [o]out())
 
 =for ref
 
@@ -635,7 +635,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 144 "gsl_cdf.pd"
+#line 134 "gsl_cdf.pd"
 
 =head2 The F-distribution (gsl_cdf_fdist_*)
 
@@ -649,7 +649,7 @@ These functions compute the cumulative distribution functions P(x), Q(x) and the
 
 =for sig
 
-  Signature: (double x(); double nua(); double nub(); double [o]out())
+  Signature: (x(); nu1(); nu2(); [o]out())
 
 =for ref
 
@@ -674,7 +674,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (double p(); double nua(); double nub(); double [o]out())
+  Signature: (p(); nu1(); nu2(); [o]out())
 
 =for ref
 
@@ -699,7 +699,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (double x(); double nua(); double nub(); double [o]out())
+  Signature: (x(); nu1(); nu2(); [o]out())
 
 =for ref
 
@@ -724,7 +724,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (double q(); double nua(); double nub(); double [o]out())
+  Signature: (q(); nu1(); nu2(); [o]out())
 
 =for ref
 
@@ -744,7 +744,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 144 "gsl_cdf.pd"
+#line 134 "gsl_cdf.pd"
 
 =head2 The Flat (Uniform) Distribution (gsl_cdf_flat_*)
 
@@ -758,7 +758,7 @@ These functions compute the cumulative distribution functions P(x), Q(x) and the
 
 =for sig
 
-  Signature: (double x(); double a(); double b(); double [o]out())
+  Signature: (x(); a(); b(); [o]out())
 
 =for ref
 
@@ -783,7 +783,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (double p(); double a(); double b(); double [o]out())
+  Signature: (p(); a(); b(); [o]out())
 
 =for ref
 
@@ -808,7 +808,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (double x(); double a(); double b(); double [o]out())
+  Signature: (x(); a(); b(); [o]out())
 
 =for ref
 
@@ -833,7 +833,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (double q(); double a(); double b(); double [o]out())
+  Signature: (q(); a(); b(); [o]out())
 
 =for ref
 
@@ -853,7 +853,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 144 "gsl_cdf.pd"
+#line 134 "gsl_cdf.pd"
 
 =head2 The Gamma Distribution (gsl_cdf_gamma_*)
 
@@ -867,7 +867,7 @@ These functions compute the cumulative distribution functions P(x), Q(x) and the
 
 =for sig
 
-  Signature: (double x(); double a(); double b(); double [o]out())
+  Signature: (x(); a(); b(); [o]out())
 
 =for ref
 
@@ -892,7 +892,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (double p(); double a(); double b(); double [o]out())
+  Signature: (p(); a(); b(); [o]out())
 
 =for ref
 
@@ -917,7 +917,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (double x(); double a(); double b(); double [o]out())
+  Signature: (x(); a(); b(); [o]out())
 
 =for ref
 
@@ -942,7 +942,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (double q(); double a(); double b(); double [o]out())
+  Signature: (q(); a(); b(); [o]out())
 
 =for ref
 
@@ -962,7 +962,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 144 "gsl_cdf.pd"
+#line 134 "gsl_cdf.pd"
 
 =head2 The Gaussian Distribution (gsl_cdf_gaussian_*)
 
@@ -976,7 +976,7 @@ These functions compute the cumulative distribution functions P(x), Q(x) and the
 
 =for sig
 
-  Signature: (double x(); double sigma(); double [o]out())
+  Signature: (x(); sigma(); [o]out())
 
 =for ref
 
@@ -1001,7 +1001,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (double p(); double sigma(); double [o]out())
+  Signature: (p(); sigma(); [o]out())
 
 =for ref
 
@@ -1026,7 +1026,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (double x(); double sigma(); double [o]out())
+  Signature: (x(); sigma(); [o]out())
 
 =for ref
 
@@ -1051,7 +1051,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (double q(); double sigma(); double [o]out())
+  Signature: (q(); sigma(); [o]out())
 
 =for ref
 
@@ -1071,7 +1071,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 144 "gsl_cdf.pd"
+#line 134 "gsl_cdf.pd"
 
 =head2 The Geometric Distribution (gsl_cdf_geometric_*)
 
@@ -1085,7 +1085,7 @@ These functions compute the cumulative distribution functions P(k), Q(k) for the
 
 =for sig
 
-  Signature: (ushort k(); double p(); double [o]out())
+  Signature: (ulonglong k(); p(); [o]out())
 
 =for ref
 
@@ -1110,7 +1110,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (ushort k(); double p(); double [o]out())
+  Signature: (ulonglong k(); p(); [o]out())
 
 =for ref
 
@@ -1130,7 +1130,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 144 "gsl_cdf.pd"
+#line 134 "gsl_cdf.pd"
 
 =head2 The Type-1 Gumbel Distribution (gsl_cdf_gumbel1_*)
 
@@ -1144,7 +1144,7 @@ These functions compute the cumulative distribution functions P(x), Q(x) and the
 
 =for sig
 
-  Signature: (double x(); double a(); double b(); double [o]out())
+  Signature: (x(); a(); b(); [o]out())
 
 =for ref
 
@@ -1169,7 +1169,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (double p(); double a(); double b(); double [o]out())
+  Signature: (p(); a(); b(); [o]out())
 
 =for ref
 
@@ -1194,7 +1194,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (double x(); double a(); double b(); double [o]out())
+  Signature: (x(); a(); b(); [o]out())
 
 =for ref
 
@@ -1219,7 +1219,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (double q(); double a(); double b(); double [o]out())
+  Signature: (q(); a(); b(); [o]out())
 
 =for ref
 
@@ -1239,7 +1239,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 144 "gsl_cdf.pd"
+#line 134 "gsl_cdf.pd"
 
 =head2 The Type-2 Gumbel Distribution (gsl_cdf_gumbel2_*)
 
@@ -1253,7 +1253,7 @@ These functions compute the cumulative distribution functions P(x), Q(x) and the
 
 =for sig
 
-  Signature: (double x(); double a(); double b(); double [o]out())
+  Signature: (x(); a(); b(); [o]out())
 
 =for ref
 
@@ -1278,7 +1278,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (double p(); double a(); double b(); double [o]out())
+  Signature: (p(); a(); b(); [o]out())
 
 =for ref
 
@@ -1303,7 +1303,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (double x(); double a(); double b(); double [o]out())
+  Signature: (x(); a(); b(); [o]out())
 
 =for ref
 
@@ -1328,7 +1328,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (double q(); double a(); double b(); double [o]out())
+  Signature: (q(); a(); b(); [o]out())
 
 =for ref
 
@@ -1348,7 +1348,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 144 "gsl_cdf.pd"
+#line 134 "gsl_cdf.pd"
 
 =head2 The Hypergeometric Distribution (gsl_cdf_hypergeometric_*)
 
@@ -1362,7 +1362,7 @@ These functions compute the cumulative distribution functions P(k), Q(k) for the
 
 =for sig
 
-  Signature: (ushort k(); ushort na(); ushort nb(); ushort t(); double [o]out())
+  Signature: (ulonglong k(); ulonglong n1(); ulonglong n2(); ulonglong t(); [o]out())
 
 =for ref
 
@@ -1387,7 +1387,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (ushort k(); ushort na(); ushort nb(); ushort t(); double [o]out())
+  Signature: (ulonglong k(); ulonglong n1(); ulonglong n2(); ulonglong t(); [o]out())
 
 =for ref
 
@@ -1407,7 +1407,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 144 "gsl_cdf.pd"
+#line 134 "gsl_cdf.pd"
 
 =head2 The Laplace Distribution (gsl_cdf_laplace_*)
 
@@ -1421,7 +1421,7 @@ These functions compute the cumulative distribution functions P(x), Q(x) and the
 
 =for sig
 
-  Signature: (double x(); double a(); double [o]out())
+  Signature: (x(); a(); [o]out())
 
 =for ref
 
@@ -1446,7 +1446,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (double p(); double a(); double [o]out())
+  Signature: (p(); a(); [o]out())
 
 =for ref
 
@@ -1471,7 +1471,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (double x(); double a(); double [o]out())
+  Signature: (x(); a(); [o]out())
 
 =for ref
 
@@ -1496,7 +1496,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (double q(); double a(); double [o]out())
+  Signature: (q(); a(); [o]out())
 
 =for ref
 
@@ -1516,7 +1516,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 144 "gsl_cdf.pd"
+#line 134 "gsl_cdf.pd"
 
 =head2 The Logistic Distribution (gsl_cdf_logistic_*)
 
@@ -1530,7 +1530,7 @@ These functions compute the cumulative distribution functions P(x), Q(x) and the
 
 =for sig
 
-  Signature: (double x(); double a(); double [o]out())
+  Signature: (x(); a(); [o]out())
 
 =for ref
 
@@ -1555,7 +1555,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (double p(); double a(); double [o]out())
+  Signature: (p(); a(); [o]out())
 
 =for ref
 
@@ -1580,7 +1580,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (double x(); double a(); double [o]out())
+  Signature: (x(); a(); [o]out())
 
 =for ref
 
@@ -1605,7 +1605,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (double q(); double a(); double [o]out())
+  Signature: (q(); a(); [o]out())
 
 =for ref
 
@@ -1625,7 +1625,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 144 "gsl_cdf.pd"
+#line 134 "gsl_cdf.pd"
 
 =head2 The Lognormal Distribution (gsl_cdf_lognormal_*)
 
@@ -1639,7 +1639,7 @@ These functions compute the cumulative distribution functions P(x), Q(x) and the
 
 =for sig
 
-  Signature: (double x(); double zeta(); double sigma(); double [o]out())
+  Signature: (x(); zeta(); sigma(); [o]out())
 
 =for ref
 
@@ -1664,7 +1664,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (double p(); double zeta(); double sigma(); double [o]out())
+  Signature: (p(); zeta(); sigma(); [o]out())
 
 =for ref
 
@@ -1689,7 +1689,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (double x(); double zeta(); double sigma(); double [o]out())
+  Signature: (x(); zeta(); sigma(); [o]out())
 
 =for ref
 
@@ -1714,7 +1714,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (double q(); double zeta(); double sigma(); double [o]out())
+  Signature: (q(); zeta(); sigma(); [o]out())
 
 =for ref
 
@@ -1739,7 +1739,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (ushort k(); double p(); double n(); double [o]out())
+  Signature: (ulonglong k(); p(); n(); [o]out())
 
 =for ref
 
@@ -1764,7 +1764,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (ushort k(); double p(); double n(); double [o]out())
+  Signature: (ulonglong k(); p(); n(); [o]out())
 
 =for ref
 
@@ -1784,7 +1784,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 144 "gsl_cdf.pd"
+#line 134 "gsl_cdf.pd"
 
 =head2 The Pareto Distribution (gsl_cdf_pareto_*)
 
@@ -1798,7 +1798,7 @@ These functions compute the cumulative distribution functions P(x), Q(x) and the
 
 =for sig
 
-  Signature: (double x(); double a(); double b(); double [o]out())
+  Signature: (x(); a(); b(); [o]out())
 
 =for ref
 
@@ -1823,7 +1823,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (double p(); double a(); double b(); double [o]out())
+  Signature: (p(); a(); b(); [o]out())
 
 =for ref
 
@@ -1848,7 +1848,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (double x(); double a(); double b(); double [o]out())
+  Signature: (x(); a(); b(); [o]out())
 
 =for ref
 
@@ -1873,7 +1873,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (double q(); double a(); double b(); double [o]out())
+  Signature: (q(); a(); b(); [o]out())
 
 =for ref
 
@@ -1893,7 +1893,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 144 "gsl_cdf.pd"
+#line 134 "gsl_cdf.pd"
 
 =head2 The Pascal Distribution (gsl_cdf_pascal_*)
 
@@ -1907,7 +1907,7 @@ These functions compute the cumulative distribution functions P(k), Q(k) for the
 
 =for sig
 
-  Signature: (ushort k(); double p(); ushort n(); double [o]out())
+  Signature: (ulonglong k(); p(); ulonglong n(); [o]out())
 
 =for ref
 
@@ -1932,7 +1932,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (ushort k(); double p(); ushort n(); double [o]out())
+  Signature: (ulonglong k(); p(); ulonglong n(); [o]out())
 
 =for ref
 
@@ -1952,7 +1952,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 144 "gsl_cdf.pd"
+#line 134 "gsl_cdf.pd"
 
 =head2 The Poisson Distribution (gsl_cdf_poisson_*)
 
@@ -1966,7 +1966,7 @@ These functions compute the cumulative distribution functions P(k), Q(k) for the
 
 =for sig
 
-  Signature: (ushort k(); double mu(); double [o]out())
+  Signature: (ulonglong k(); mu(); [o]out())
 
 =for ref
 
@@ -1991,7 +1991,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (ushort k(); double mu(); double [o]out())
+  Signature: (ulonglong k(); mu(); [o]out())
 
 =for ref
 
@@ -2011,7 +2011,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 144 "gsl_cdf.pd"
+#line 134 "gsl_cdf.pd"
 
 =head2 The Rayleigh Distribution (gsl_cdf_rayleigh_*)
 
@@ -2025,7 +2025,7 @@ These functions compute the cumulative distribution functions P(x), Q(x) and the
 
 =for sig
 
-  Signature: (double x(); double sigma(); double [o]out())
+  Signature: (x(); sigma(); [o]out())
 
 =for ref
 
@@ -2050,7 +2050,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (double p(); double sigma(); double [o]out())
+  Signature: (p(); sigma(); [o]out())
 
 =for ref
 
@@ -2075,7 +2075,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (double x(); double sigma(); double [o]out())
+  Signature: (x(); sigma(); [o]out())
 
 =for ref
 
@@ -2100,7 +2100,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (double q(); double sigma(); double [o]out())
+  Signature: (q(); sigma(); [o]out())
 
 =for ref
 
@@ -2120,7 +2120,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 144 "gsl_cdf.pd"
+#line 134 "gsl_cdf.pd"
 
 =head2 The t-distribution (gsl_cdf_tdist_*)
 
@@ -2134,7 +2134,7 @@ These functions compute the cumulative distribution functions P(x), Q(x) and the
 
 =for sig
 
-  Signature: (double x(); double nu(); double [o]out())
+  Signature: (x(); nu(); [o]out())
 
 =for ref
 
@@ -2159,7 +2159,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (double p(); double nu(); double [o]out())
+  Signature: (p(); nu(); [o]out())
 
 =for ref
 
@@ -2184,7 +2184,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (double x(); double nu(); double [o]out())
+  Signature: (x(); nu(); [o]out())
 
 =for ref
 
@@ -2209,7 +2209,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (double q(); double nu(); double [o]out())
+  Signature: (q(); nu(); [o]out())
 
 =for ref
 
@@ -2229,7 +2229,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 144 "gsl_cdf.pd"
+#line 134 "gsl_cdf.pd"
 
 =head2 The Unit Gaussian Distribution (gsl_cdf_ugaussian_*)
 
@@ -2243,7 +2243,7 @@ These functions compute the cumulative distribution functions P(x), Q(x) and the
 
 =for sig
 
-  Signature: (double x(); double [o]out())
+  Signature: (x(); [o]out())
 
 =for ref
 
@@ -2268,7 +2268,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (double p(); double [o]out())
+  Signature: (p(); [o]out())
 
 =for ref
 
@@ -2293,7 +2293,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (double x(); double [o]out())
+  Signature: (x(); [o]out())
 
 =for ref
 
@@ -2318,7 +2318,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (double q(); double [o]out())
+  Signature: (q(); [o]out())
 
 =for ref
 
@@ -2338,7 +2338,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 144 "gsl_cdf.pd"
+#line 134 "gsl_cdf.pd"
 
 =head2 The Weibull Distribution (gsl_cdf_weibull_*)
 
@@ -2352,7 +2352,7 @@ These functions compute the cumulative distribution functions P(x), Q(x) and the
 
 =for sig
 
-  Signature: (double x(); double a(); double b(); double [o]out())
+  Signature: (x(); a(); b(); [o]out())
 
 =for ref
 
@@ -2377,7 +2377,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (double p(); double a(); double b(); double [o]out())
+  Signature: (p(); a(); b(); [o]out())
 
 =for ref
 
@@ -2402,7 +2402,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (double x(); double a(); double b(); double [o]out())
+  Signature: (x(); a(); b(); [o]out())
 
 =for ref
 
@@ -2427,7 +2427,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (double q(); double a(); double b(); double [o]out())
+  Signature: (q(); a(); b(); [o]out())
 
 =for ref
 
@@ -2449,7 +2449,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 176 "gsl_cdf.pd"
+#line 168 "gsl_cdf.pd"
 
 =head1 AUTHOR
 

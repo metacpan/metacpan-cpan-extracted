@@ -3,13 +3,13 @@ NAME
     for Perl/Tk.
 
 AUTHOR
-    (c) 1996-2023, Jim Turner, "<https://metacpan.org/author/TURNERJW>".
+    (c) 1996-2024, Jim Turner, "<https://metacpan.org/author/TURNERJW>".
 
 ACKNOWLEDGEMENTS
-    This is a derived work from Tk::FileDialog, Tk::Listbox and Tk::HList.
+    This is a derived work from Tk::FileDialog.
 
 LICENSE AND COPYRIGHT
-    Copyright (c) 1996-2023 Jim Turner "<mailto:turnerjw784@yahoo.com>". All
+    Copyright (c) 1996-2024 Jim Turner "<mailto:turnerjw784@yahoo.com>". All
     rights reserved.
 
     Tk::JFileDialog is free software; you can redistribute it and/or modify
@@ -98,10 +98,10 @@ DESCRIPTION
     MS-Windows drive letters, additional key bindings, etc.
 
     To use JFileDialog, simply create your JFileDialog objects during
-    initialization (or at least before a Show). When you wish to display the
-    JFileDialog, invoke the 'Show' method on the JFileDialog object; The
-    method will return either a file name, a path name, or undef. undef is
-    returned only if the user pressed the Cancel button.
+    initialization (or at least before a Show() call). When you wish to
+    display the JFileDialog, invoke the 'Show' method on the JFileDialog
+    object; The method will return either a file name, a path name, or
+    undef. undef is returned only if the user pressed the Cancel button.
 
 WIDGET OPTIONS
     Any of the following configuration items may be set via the configure
@@ -146,7 +146,7 @@ WIDGET OPTIONS
         -Create => -1, -SelDir => -1, and -DisableShowAll => 1. The list can
         contain any combination of file names (ie. *"file.ext"*, absolute
         paths, ie. *"/home/user/file.ext"*, or relative paths, ie.
-        *"user/file.ext"* or I"<c:file.ext>. The files will be compared
+        *"user/file.ext"* or *"c:file.ext"*. The files will be compared
         against the current path and, if matching (and existing, if -Create
         < 1), will be shown in the drop-down list.
 
@@ -202,8 +202,7 @@ WIDGET OPTIONS
         If set, allows user to delete items from the history dropdown list
         and thus the history file.
 
-        Default: *0* (false)> (do not allow user to remove items in
-        history).
+        Default: *0 (false)* (do not allow user to remove items in history).
 
         NOTE: requires Tk::JBrowseEntry v5.0 or later to work.
 
@@ -217,8 +216,9 @@ WIDGET OPTIONS
 
     -History
         Used with the "-HistFile" option. Specifies how many files to retain
-        in the history list. Zero means keep all. Default: *20* (keep last
-        20).
+        in the history list. Zero means keep all.
+
+        Default: *20* (keep last 20).
 
     -HistUsePath
         If set, the path is set to that of the last file selected from the
@@ -238,9 +238,9 @@ WIDGET OPTIONS
         Default: *0 (false)* (unchecked).
 
     -Horiz
-        *TRUE* sets the File List box to be to the right of the Directory
-        List Box. If 0, the File List box will be below the Directory List
-        box.
+        *1 (true)* sets the File List box to be to the right of the
+        Directory List Box. If *0 (false)*, the File List box will be below
+        the Directory List box.
 
         Default: *true* (display the listboxes side-by-side).
 
@@ -283,13 +283,34 @@ WIDGET OPTIONS
     -Path
         The initial (default) selection path. The default is the current
         working directory. If specified, pressing [Reset] will switch the
-        directory dialog back to this path. Default: none (use current
-        working directory).
+        directory dialog back to this path.
+
+        Default: none (use current working directory).
 
     -PathFile
         Specifies a file containing a list of "favorite paths" bookmarks to
         show in a dropdown list allowing quick-changes in directories.
+
         Default: *undef* (no favorite path file or dropdown list).
+
+    -PreserveSelection
+        NEW with Version 2.40+:
+
+        Normally JFileDialog will "highlight" the file or directory selected
+        (replace any current PRIMARY selection text with that highlighted
+        name), making it easily pasteable into the calling program, if
+        needed. Setting this option to a true value will first save the
+        currently selected text in the calling program (the PRIMARY
+        selection buffer) before doing this and restore that post-
+        selection. This can be particularly handy in text editor
+        applications where one wishes to preserve whatever they have
+        currently selected before invoking JFileDialog to select a file /
+        directory, then restoring that as the selected text instead of the
+        file / directory name selected in JBrowseEntry, ie. when selecting a
+        file to save the currently selected content into.
+
+        Default: *0* (False) - overwrite (do not preserve) any data in the
+        PRIMARY selection buffer.
 
     -QuickSelect
         If set to 0, user must invoke the "OK" button to complete selection
@@ -331,7 +352,7 @@ WIDGET OPTIONS
 
     -SelHook
         SelHook is configured with a reference to a routine that will be
-        called when a fileis chosen. The function is called with a sole
+        called when a file is chosen. The function is called with a sole
         parameter of the full path and file name of the file chosen. If the
         Create flag is disabled (and the user is not allowedto specify new
         files), the file will be known to exist at the time that SelHook is
@@ -376,7 +397,9 @@ WIDGET OPTIONS
         Default: *true* (enable).
 
     -Title
-        The Title of the dialog box. Default: *'Select File:'*.
+        The Title of the dialog box.
+
+        Default: *'Select File:'*.
 
   Labels and Captions
     For support of internationalization, the text on any of the subwidgets
@@ -455,12 +478,14 @@ WIDGET OPTIONS
         Default: *TRUE* (show).
 
     -SortButtonLabel
-        The text for the Sort/Atime button. Default: *'Atime'*.
+        The text for the Sort/Atime button.
+
+        Default: *'Atime'*.
 
     -SortOrder
         Order to display files in the file list box ('Name' or 'Date') If
         *'Date'*, then the day and time is displayed in the box before the
-        name, (but not included when selected)
+        name (but not included when selected).
 
         Default: *Name*.
 
@@ -527,4 +552,7 @@ WIDGET METHODS
 DEPENDS
     Cwd, File::Glob, Tk, Tk::Dialog (or Tk::JDialog if installed),
     Tk::JBrowseEntry
+
+SEE ALSO
+    Tk::FileDialog, Tk::JBrowseEntry, and Tk::Listbox
 

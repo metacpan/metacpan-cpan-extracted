@@ -383,7 +383,10 @@ my $sl22 = $sl2->slice('');
 my $roots = pdl '[1 -2396-2796i -778800+5024412i 2652376792-1643494392i -684394069604-217389559200i]'; # gives 4 roots of 599+699i
 PDL::polyroots($roots->re, $roots->im, $sl11, $sl22);
 my $got;
-ok all(approx $got=$xx->slice('(0)'), 599), "col=0" or diag "got=$got";
+ok all(approx $got=$xx->slice('(0)'), 599), "col=0"
+  or diag "roots=$roots\n",
+  "roots:", PDL::Core::pdump($roots),
+  "got=$got\n", "return=", PDL::polyroots($roots->re, $roots->im);
 ok all(approx $got=$xx->slice('(1)'), 699), "col=1" or diag "got=$got";
 
 eval {(my $y = zeroes(3,6)) += sequence(6,6)->mv(1,0)->slice("1:-1:2")};
@@ -468,6 +471,20 @@ ok all(approx($pd_nd, $p_nd)), "rldND():Nd";
 my $v_nd = $p_nd->clump(2);
 my $k_nd = $v_nd->enumvec();
 ok all(approx($k_nd, pdl(long,[0,1,2,0,1,0,0]))), "enumvec():Nd";
+
+# from PDL::CCS tests revealing enumvec bug
+my $col = pdl("[5 5 4 4 4 3 3 3 3 2 2 2 1 1 0]")->transpose;
+$got = $col->enumvec;
+ok all(approx($got, pdl('[0 1 0 1 2 0 1 2 3 0 1 2 0 1 0]'))), 'enumvec'
+  or diag "got=$got";
+$col = pdl("[0 0 1 1 2 2 2 3 3 3 3 4 4 4 5 5]")->transpose;
+$got = $col->enumvec;
+ok all(approx($got, pdl('[0 1 0 1 0 1 2 0 1 2 3 0 1 2 0 1]'))), 'enumvec 2'
+  or diag "got=$got";
+$col = pdl("[0 0 1 1 2 2 2 3 3 3 3 4 4 4 5 5 6]")->transpose;
+$got = $col->enumvec;
+ok all(approx($got, pdl('[0 1 0 1 0 1 2 0 1 2 3 0 1 2 0 1 0]'))), 'enumvec 3'
+  or diag "got=$got";
 
 ## 13..17: test rldseq(), rleseq()
 my $lens = pdl(long,[qw(3 0 1 4 2)]);

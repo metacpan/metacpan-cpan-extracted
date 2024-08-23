@@ -236,6 +236,12 @@ sub _ua_request (
         my $detail = $res_content->{detail};
         my $message = defined $detail ? "$title - $detail" : $title;
 
+        if ( $res_content->{errors} ) {
+            $message .= ' ';
+            $message .= join( "; ",$_->@* )
+                for values $res_content->{errors}->%*
+        }
+
         croak( "TrueLayer $method $url returned $code: $message" );
     }
 

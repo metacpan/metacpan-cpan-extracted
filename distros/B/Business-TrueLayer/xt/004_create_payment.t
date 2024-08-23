@@ -35,7 +35,7 @@ my $Payment = $TrueLayer->create_payment({
         },
         "beneficiary" => {
             "type"                => "merchant_account",
-            "merchant_account_id" => "5b7adbf4-f289-48a7-b451-bc236443397c",
+            "merchant_account_id" => "660ce241-9dfd-b67f-772e-79cca8995f8d",
             "account_holder_name" => "btdt",
             "reference"           => "payment-ref-$$"
         }

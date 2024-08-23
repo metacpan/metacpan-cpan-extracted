@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Module Generic - ~/lib/Module/Generic/File.pm
-## Version v0.8.3
+## Version v0.8.4
 ## Copyright(c) 2024 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2021/05/20
-## Modified 2024/05/06
+## Modified 2024/06/27
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -127,7 +127,7 @@ BEGIN
     # Catching non-ascii characters: [^\x00-\x7F]
     # Credits to: File::Util
     $ILLEGAL_CHARACTERS = qr/[\x5C\/\|\015\012\t\013\*\"\?\<\:\>]/;
-    our $VERSION = 'v0.8.3';
+    our $VERSION = 'v0.8.4';
 };
 
 use strict;
@@ -2725,7 +2725,54 @@ sub read
                 return( $self->error( "An unexpected error has occurred while trying to read from ", ( $self->is_dir ? 'directory' : 'file' ), " \"${file}\": $@" ) );
             }
             return if( !scalar( @all ) );
-            return( grep( !/^\./, @all ) ) if( $opts->{exclude_invisible} );
+
+            if( $opts->{sort} )
+            {
+                my $basedir = $self->filename;
+                if( $opts->{sort} eq 'modify' )
+                {
+                    if( $opts->{reverse} )
+                    {
+                        @all = sort{ [stat( "${basedir}/${b}" )]->[9] <=> [stat( "${basedir}/${a}" )]->[9] } @all;
+                    }
+                    else
+                    {
+                        @all = sort{ [stat( "${basedir}/${a}" )]->[9] <=> [stat( "${basedir}/${b}" )]->[9] } @all;
+                    }
+                }
+                elsif( $opts->{sort} eq 'access' )
+                {
+                    if( $opts->{reverse} )
+                    {
+                        @all = sort{ [stat( "${basedir}/${b}" )]->[8] <=> [stat( "${basedir}/${a}" )]->[8] } @all;
+                    }
+                    else
+                    {
+                        @all = sort{ [stat( "${basedir}/${a}" )]->[8] <=> [stat( "${basedir}/${b}" )]->[8] } @all;
+                    }
+                }
+                elsif( ref( $opts->{sort} ) eq 'CODE' )
+                {
+                    @all = sort{ $opts->{sort}->( $a, $b ) } @all;
+                }
+                else
+                {
+                    @all = sort{ $a cmp $b } @all;
+                }
+            }
+
+            if( $opts->{as_object} )
+            {
+                @all = grep( !/^\./, @all ) if( $opts->{exclude_invisible} );
+                for( my $i = 0; $i < scalar( @all ); $i++ )
+                {
+                    $all[$i] = $self->new( $all[$i], base_dir => $self->filename ) || return( $self->pass_error );
+                }
+            }
+            else
+            {
+                return( grep( !/^\./, @all ) ) if( $opts->{exclude_invisible} );
+            }
             return( @all );
         }
         else
@@ -4591,7 +4638,7 @@ Module::Generic::File - File Object Abstraction Class
 
 =head1 VERSION
 
-    v0.8.3
+    v0.8.4
 
 =head1 DESCRIPTION
 

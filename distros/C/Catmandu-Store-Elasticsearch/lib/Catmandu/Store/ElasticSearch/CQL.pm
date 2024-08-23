@@ -2,7 +2,7 @@ package Catmandu::Store::ElasticSearch::CQL;
 
 use Catmandu::Sane;
 
-our $VERSION = '1.0202';
+our $VERSION = '1.0204';
 
 use Catmandu::Util qw(require_package trim);
 use CQL::Parser;
@@ -80,7 +80,8 @@ sub _parse_term_node {
     my $term = $node->getTerm;
 
     if ($term =~ $RE_MATCH_ALL) {
-        return {match_all => {}};
+        $query->{match_all} = +{};
+        return $query;
     }
 
     my $qualifier = $node->getQualifier;

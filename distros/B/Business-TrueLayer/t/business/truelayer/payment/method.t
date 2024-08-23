@@ -43,27 +43,4 @@ is( $Method->type,'bank_transfer','->type' );
 isa_ok( $Method->beneficiary,'Business::TrueLayer::Beneficiary' );
 isa_ok( $Method->provider,'Business::TrueLayer::Provider' );
 
-subtest 'no provider_selection' => sub {
-
-    my $Method = Business::TrueLayer::Payment::Method->new(
-        {
-            "type"               => "bank_transfer",
-            "beneficiary" => {
-                "type"                => "merchant_account",
-                "verification"        => { "type" => "automated" },
-                "merchant_account_id" => "AB8FA060-3F1B-4AE8-9692-4AA3131020D0",
-                "account_holder_name" => "Ben Eficiary",
-                "reference"           => "payment-ref"
-            }
-        }
-    );
-
-    isa_ok(
-        $Method,
-        'Business::TrueLayer::Payment::Method',
-    );
-
-    ok( ! $Method->provider,'! ->provider' );
-};
-
 done_testing();

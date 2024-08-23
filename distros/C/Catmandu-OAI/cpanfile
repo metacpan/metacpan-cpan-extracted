@@ -8,7 +8,7 @@ on 'test', sub {
 };
 
 requires 'Catmandu', '>=1.0306';
-requires 'Catmandu::XML', '0.16';
+requires 'Catmandu::XML', '>=0.16';
 requires 'XML::LibXML', 0;
 requires 'HTTP::OAI', '>=4.03';
 requires 'Moo', '>=1.0';
@@ -19,7 +19,3 @@ requires 'URI','0';
 
 # Need recent SSL to talk to https endpoint correctly
 requires 'IO::Socket::SSL', '>=1.993';
-
-feature 'xslt' => sub {
-    requires 'Catmandu::XML', '>=0.15';
-};

@@ -4,13 +4,6 @@ use version;
 use Catmandu::Importer::OAI;
 use Test::More;
 
-plan(skip_all => 'Catmandu::XML >= 0.15 required')
-    unless eval { 
-        require Catmandu::XML;
-        require XML::LibXML;
-        version->parse($Catmandu::XML::VERSION) >= version->parse("0.15")
-    };
-
 my $dom = XML::LibXML->load_xml( location => 't/epicur.xml' );
 
 sub oai_xslt {

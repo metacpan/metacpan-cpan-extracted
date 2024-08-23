@@ -1190,6 +1190,7 @@ static inline PDL_Double PDL_xform_aux ( pdl *map, PDL_Indx *coords, PDL_Double 
    /* Increment the pixel counter */
    if (!pdl_broadcast_nd_step(npdls, offs, 0, ndims, incs, out->dims, ovec)) break;
   } while (1);
+  PDL->changed(out, PDL_PARENTDATACHANGED, 0);
 +==EOD_map_c_code==
 
         Doc=><<'+==EOD_map_doc==',
@@ -1559,19 +1560,11 @@ sub map {
   my ($out, @odims, $ohdr);
   if(UNIVERSAL::isa($tmp,'PDL')) {
     @odims = $tmp->dims;
-    my($x);
-    if(defined ($x = $tmp->gethdr)) {
-      my(%b) = %{$x};
-      $ohdr = \%b;
-    }
+    if (defined(my $x = $tmp->gethdr)) { $ohdr = {%$x} }
   } elsif(ref $tmp eq 'HASH') {
     # (must be a fits header -- or would be filtered above)
-    for my $i(1..$tmp->{NAXIS}){
-      push(@odims,$tmp->{"NAXIS$i"});
-    }
-    # deep-copy fits header into output
-    my %foo = %{$tmp};
-    $ohdr = \%foo;
+    @odims = map $tmp->{"NAXIS$_"}, 1..$tmp->{NAXIS};
+    $ohdr = {%$tmp}; # copy FITS header into output
   } elsif(ref $tmp eq 'ARRAY') {
     @odims = @$tmp;
   } else {
@@ -1593,19 +1586,16 @@ sub map {
   ## Figure out the dimensionality of the
   ## transform itself (extra dimensions come along for the ride)
   my $nd = $me->{odim} || $me->{idim} || 2;
-  my @sizes = $out->dims;
-  my @dd = @sizes;
-
+  my @dd = my @sizes = $out->dims;
   splice @dd,$nd; # Cut out dimensions after the end
 
   # Check that there are elements in the output fields...
   barf "map: output has no dims!\n"
         unless(@dd);
   my $ddtotal = 1;
-  map {$ddtotal *= $_} @dd;
+  $ddtotal *= $_ for @dd;
   barf "map: output has no elements (at least one dim is 0)!\n"
      unless($ddtotal);
-
 
   ##############################
   # If necessary, generate an appropriate FITS header for the output.
@@ -2593,6 +2583,7 @@ the type/unit fields are currently ignored by t_linear.
 { package PDL::Transform::Linear;
 our @ISA = ('PDL::Transform');
 *_opt = \&PDL::Transform::_opt;
+*barf = \&PDL::Transform::barf;
 *identity = \&PDL::MatrixOps::identity;
 
 sub PDL::Transform::t_linear { PDL::Transform::Linear->new(@_); }
@@ -2739,10 +2730,10 @@ sub new {
   ##############################
   # The meat -- just shift, matrix-multiply, and shift again.
   $me->{func} = sub {
-    my($in,$opt) = @_;
-    my($d) = $opt->{matrix}->dim(0)-1;
-    barf("Linear transform: transform is $d-D; data only ".($in->dim(0))."\n")
-        if($in->dim(0) < $d);
+    my ($in,$opt) = @_;
+    my $d = $opt->{matrix}->dim(0)-1;
+    barf("Linear transform: transform is @{[$d+1]}-D; data is ".$in->dim(0))
+        if $in->dim(0) <= $d;
     my $x = $in->slice("0:$d")->copy + $opt->{pre};
     my $out = $in->is_inplace ? $in : $in->copy;
     $out->slice("0:$d") .= $x x $opt->{matrix} + $opt->{post};
@@ -2750,12 +2741,12 @@ sub new {
   };
 
   $me->{inv} = (defined $me->{params}{inverse}) ? sub {
-    my($in,$opt) = @_;
-    my($d) = $opt->{inverse}->dim(0)-1;
-    barf("Linear transform: transform is $d-D; data only ".($in->dim(0))."\n")
-        if($in->dim(0) < $d);
-    my($x) = $in->slice("0:$d")->copy - $opt->{post};
-    my($out) = $in->is_inplace ? $in : $in->copy;
+    my ($in,$opt) = @_;
+    my $d = $opt->{inverse}->dim(0)-1;
+    barf("Linear transform: transform is @{[$d+1]}-D; data is ".$in->dim(0))
+        if $in->dim(0) <= $d;
+    my $x = $in->slice("0:$d")->copy - $opt->{post};
+    my $out = $in->is_inplace ? $in : $in->copy;
     my $tmp; # work around perl -d "feature"
     ($tmp = $out->slice("0:$d")) .= $x x $opt->{inverse} - $opt->{pre};
     $out;
@@ -2907,8 +2898,8 @@ You feed in a hash ref or a PDL with one of those as a header, and you
 get back a transform that converts 0-originated, pixel-centered
 coordinates into scientific coordinates via the transformation in the
 FITS header.  For most FITS headers, the transform is reversible, so
-applying the inverse goes the other way.  This is just a convenience
-subclass of PDL::Transform::Linear, but with unit/type support
+applying the inverse goes the other way.  This is just an instance
+of PDL::Transform::Linear, but with unit/type support
 using the FITS header you supply.
 
 For now, this transform is rather limited -- it really ought to
@@ -2918,7 +2909,7 @@ the whole transform framework.
 
 This transform implements the linear transform part of the WCS FITS
 standard outlined in Greisen & Calabata 2002 (A&A in press; find it at
-"http://arxiv.org/abs/astro-ph/0207407").
+L<https://arxiv.org/abs/astro-ph/0207407>).
 
 As a special case, you can pass in the boolean option "ignore_rgb"
 (default 0), and if you pass in a 3-D FITS header in which the last
@@ -2938,7 +2929,7 @@ sub t_fits {
   $hdr = $hdr->gethdr
     if(defined $hdr && UNIVERSAL::isa($hdr,'PDL'));
 
-  croak('PDL::Transform::FITS::new requires a FITS header hash\n')
+  croak('t_fits requires a FITS header hash\n')
     if(!defined $hdr || ref $hdr ne 'HASH' || !defined($hdr->{NAXIS}));
 
   my($n) = $hdr->{NAXIS}; $n = $n->at(0) if(UNIVERSAL::isa($n,'PDL'));
@@ -2965,7 +2956,7 @@ sub t_fits {
       my $tmp; # work around perl -d "feature"
       ($tmp = $matrix->slice("(".($1-1)."),(".($2-1).")")) .= $hdr->{$h};
     }
-    print "PDL::Transform::FITS: Detected CDi_j matrix: \n",$matrix,"\n"
+    print "t_fits: Detected CDi_j matrix: \n",$matrix,"\n"
       if($PDL::Transform::debug);
 
   } else {
@@ -2973,7 +2964,7 @@ sub t_fits {
     #
     # PCi_j + CDELTi formalism
     # If PCi_j aren't present, and N=2, then try using CROTA or
-    # CROTA2 to generate a rotation matrix instea.
+    # CROTA2 to generate a rotation matrix instead.
     #
 
     my($cdm) = PDL->zeroes($n,$n);
@@ -2992,17 +2983,14 @@ sub t_fits {
         my $tmp; # work around perl -d "feature"
         ($tmp = $cpm->slice("(".($1-1)."),(".($2-1).")")) .= $hdr->{$h};
       }
-      print "PDL::Transform::FITS: Detected PCi_j matrix: \n",$cpm,"\n"
+      print "t_fits: Detected PCi_j matrix: \n",$cpm,"\n"
         if($PDL::Transform::debug && @hgrab);
 
-    } elsif($n==2 && ( defined $hdr->{CROTA} || defined $hdr->{CROTA1} || defined $hdr->{CROTA2}) ) {
+    } elsif ($n==2 && grep defined $hdr->{$_}, qw(CROTA CROTA1 CROTA2)) {
 
         ## CROTA is deprecated; CROTA1 was used for a while but is unofficial;
         ## CROTA2 is encouraged instead.
-      my $cr;
-      $cr = $hdr->{CROTA2} unless defined $cr;
-      $cr = $hdr->{CROTA} unless defined $cr;
-      $cr = $hdr->{CROTA1} unless defined $cr;
+      my $cr = $hdr->{CROTA2} // $hdr->{CROTA} // $hdr->{CROTA1};
 
       $cr *= $PDL::Transform::DEG2RAD;
         # Rotation matrix rotates counterclockwise to get from sci to pixel coords

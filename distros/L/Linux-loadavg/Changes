@@ -38,3 +38,7 @@ Revision history for Perl extension Linux::loadavg.
 
 0.10  Tue Aug 20 23:08:00 2024
         - Updated XS code (borrowed some from Sys::LoadAvg)
+
+0.11  Fri Aug 23 11:37:00 2024
+	- Change back to Test::Simple
+	- Update version in .pm file and clean up of XS file

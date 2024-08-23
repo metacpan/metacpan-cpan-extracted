@@ -10,7 +10,7 @@ build_requires:
 configure_requires:
   Module::Build::Tiny: '0.034'
 dynamic_config: 0
-generated_by: 'Dist::Milla version v1.0.20, Dist::Zilla version 6.017, CPAN::Meta::Converter version 2.150005'
+generated_by: 'Dist::Milla version v1.0.22, Dist::Zilla version 6.032, CPAN::Meta::Converter version 2.150001'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -24,11 +24,6 @@ no_index:
     - share
     - t
     - xt
-optional_features:
-  xslt:
-    description: xslt
-    requires:
-      Catmandu::XML: '0.15'
 requires:
   Catmandu: '1.0306'
   Catmandu::XML: '0.16'
@@ -45,7 +40,7 @@ resources:
   bugtracker: https://github.com/LibreCat/Catmandu-OAI/issues
   homepage: https://github.com/LibreCat/Catmandu-OAI
   repository: https://github.com/LibreCat/Catmandu-OAI.git
-version: '0.20'
+version: '0.21'
 x_contributors:
   - 'Christian Pietsch <christian.pietsch@uni-bielefeld.de>'
   - 'Jakob Voss <voss@gbv.de>'
@@ -55,7 +50,7 @@ x_contributors:
   - 'Nicolas Steenlant <nicolas.steenlant@ugent.be>'
   - 'Patrick Hochstenbach <patrick.hochstenbach@ugent.be>'
   - 'Yanick Champoux <yanick@babyl.dyndns.org>'
-x_generated_by_perl: v5.24.0
-x_serialization_backend: 'YAML::Tiny version 1.73'
+x_generated_by_perl: v5.22.1
+x_serialization_backend: 'YAML::Tiny version 1.74'
 x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'
 x_static_install: 1

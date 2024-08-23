@@ -54,7 +54,7 @@ WriteMakefile(
         'File::MMagic'          => '1.30',
         'File::Spec'            => '3.73',
         # Core module
-        'I18N::Langinfo'        => '0.21',
+        'I18N::Langinfo'        => '0.17',
         'IO::Dir'               => '1.41',
         'IO::File'              => '1.41',
         'IO::Scalar'            => '2.113',
@@ -89,7 +89,8 @@ WriteMakefile(
         'open'          => 0,
     },
     LICENSE             => 'perl_5',
-    MIN_PERL_VERSION    => 'v5.26.1',
+    # 2018-06-23
+    MIN_PERL_VERSION    => 'v5.28.0',
     (MM->can('signature_target') ? (SIGN => 1) : ()),
     dist                => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', DIST_CP => 'cp' },
     clean               => { FILES => 'Module-Generic-*' },

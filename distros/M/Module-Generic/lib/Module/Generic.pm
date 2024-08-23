@@ -1,11 +1,11 @@
 ## -*- perl -*-
 ##----------------------------------------------------------------------------
 ## Module Generic - ~/lib/Module/Generic.pm
-## Version v0.37.2
+## Version v0.37.3
 ## Copyright(c) 2024 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2019/08/24
-## Modified 2024/05/09
+## Modified 2024/06/27
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -51,7 +51,7 @@ BEGIN
     our @EXPORT      = qw( );
     our @EXPORT_OK   = qw( subclasses );
     our %EXPORT_TAGS = ();
-    our $VERSION     = 'v0.37.2';
+    our $VERSION     = 'v0.37.3';
     # local $^W;
     # mod_perl/2.0.10
     if( exists( $ENV{MOD_PERL} )
@@ -1895,11 +1895,6 @@ sub pass_error
         require Module::Generic::Null;
         my $null = Module::Generic::Null->new( $err, { debug => $this->{debug}, has_error => 1 });
         rreturn( $null );
-    }
-    if( $self->debug )
-    {
-        my $wantarray = wantarray();
-        my $caller = [caller(1)];
     }
     return;
 }
@@ -9498,7 +9493,7 @@ Quick way to create a class with feature-rich methods
 
 =head1 VERSION
 
-    v0.37.2
+    v0.37.3
 
 =head1 DESCRIPTION
 

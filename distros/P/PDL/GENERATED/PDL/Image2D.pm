@@ -202,7 +202,7 @@ sub PDL::med2d {
 
 =for sig
 
-  Signature: (a(m,n); [o]b(m,n); indx [t]mapi(isize=CALC($SIZE(p) + $SIZE(m))); indx [t]mapj(jsize=CALC($SIZE(q) + $SIZE(n))); int p_size=>p; int q_size=>q; int opt)
+  Signature: (a(m,n); [o]b(m,n); indx [t]mapi(isize=CALC($SIZE(p) + $SIZE(m))); indx [t]mapj(jsize=CALC($SIZE(q) + $SIZE(n))); IV p_size=>p; IV q_size=>q; int opt)
 
 =for ref
 
@@ -434,7 +434,7 @@ something with negatives in...) then the output values are set bad.
 
 
 
-#line 740 "image2d.pd"
+#line 723 "image2d.pd"
 
 =head2 crop
 
@@ -463,7 +463,7 @@ sub PDL::crop {
   $x1->cat($x2, $y1, $y2)->mv(-1,0);
 }
 
-#line 770 "image2d.pd"
+#line 753 "image2d.pd"
 
 =head2 cc8compt
 
@@ -549,7 +549,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 937 "image2d.pd"
+#line 920 "image2d.pd"
 
 =head2 polyfill
 
@@ -604,7 +604,7 @@ sub PDL::polyfill {
 
 *polyfill = \&PDL::polyfill;
 
-#line 994 "image2d.pd"
+#line 977 "image2d.pd"
 
 =head2 pnpoly
 
@@ -684,7 +684,7 @@ sub PDL::pnpoly {
 
 *pnpoly = \&PDL::pnpoly;
 
-#line 1077 "image2d.pd"
+#line 1060 "image2d.pd"
 
 =head2 polyfillv
 
@@ -849,7 +849,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 1363 "image2d.pd"
+#line 1346 "image2d.pd"
 
 =head2 fitwarp2d
 
@@ -1269,7 +1269,7 @@ sub PDL::applywarp2d {
 
 =for sig
 
-  Signature: (img(m,n); ldouble px(np,np); ldouble py(np,np); [o] warp(m,n); ldouble [t] poly(np); ldouble [t] kernel(ns); char *kernel_type; double noval; int nsamples => ns)
+  Signature: (img(m,n); ldouble px(np,np); ldouble py(np,np); [o] warp(m,n); ldouble [t] poly(np); ldouble [t] kernel(ns); char *kernel_type; double noval; IV nsamples => ns)
 
 =for ref
 

@@ -3,7 +3,7 @@
 #
 package PDL::GSL::RNG;
 
-our @EXPORT_OK = qw( );
+our @EXPORT_OK = qw( ran_bernoulli_pdf ran_beta_pdf ran_binomial_pdf ran_bivariate_gaussian_pdf ran_cauchy_pdf ran_chisq_pdf ran_dirichlet_pdf ran_erlang_pdf ran_exponential_pdf ran_exppow_pdf ran_fdist_pdf ran_flat_pdf ran_gamma_pdf ran_gaussian_pdf ran_gaussian_tail_pdf ran_geometric_pdf ran_gumbel1_pdf ran_gumbel2_pdf ran_hypergeometric_pdf ran_landau_pdf ran_laplace_pdf ran_logarithmic_pdf ran_logistic_pdf ran_lognormal_pdf ran_multinomial_pdf ran_negative_binomial_pdf ran_pareto_pdf ran_pascal_pdf ran_poisson_pdf ran_rayleigh_pdf ran_rayleigh_tail_pdf ran_tdist_pdf ran_ugaussian_pdf ran_ugaussian_tail_pdf ran_weibull_pdf );
 our %EXPORT_TAGS = (Func=>\@EXPORT_OK);
 
 use PDL::Core qw/ zeroes long barf  /;
@@ -306,7 +306,7 @@ Example:
 
 =for ref
 
-Shuffles values in ndarray
+Shuffles values in ndarray, treating it as flat.
 
 Usage:
 
@@ -318,19 +318,19 @@ Usage:
 
 =for ref
 
-Shuffles values in ndarray
+Returns values in Perl list, shuffled.
 
 Usage:
 
 =for usage
 
-   $rng->ran_shuffle_vec(@vec);
+   @shuffled = $rng->ran_shuffle_vec(@vec);
 
 =head2 ran_choose
 
 =for ref
 
-Chooses values from C<$inndarray> to C<$outndarray>.
+Chooses values from C<$inndarray> to C<$outndarray>, treating both as flat.
 
 Usage:
 
@@ -394,11 +394,924 @@ Example:
 #line 395 "RNG.pm"
 
 
+=head2 ran_bernoulli_pdf
+
+=for sig
+
+  Signature: (uint k(); p(); [o]out())
+
+=for ref
+
+=for bad
+
+ran_bernoulli_pdf processes bad values.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
+
+=cut
+
+
+
+
+*ran_bernoulli_pdf = \&PDL::GSL::RNG::ran_bernoulli_pdf;
+
+
+
+
+
+
+=head2 ran_beta_pdf
+
+=for sig
+
+  Signature: (x(); a(); b(); [o]out())
+
+=for ref
+
+=for bad
+
+ran_beta_pdf processes bad values.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
+
+=cut
+
+
+
+
+*ran_beta_pdf = \&PDL::GSL::RNG::ran_beta_pdf;
+
+
+
+
+
+
+=head2 ran_binomial_pdf
+
+=for sig
+
+  Signature: (uint k(); p(); uint n(); [o]out())
+
+=for ref
+
+=for bad
+
+ran_binomial_pdf processes bad values.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
+
+=cut
+
+
+
+
+*ran_binomial_pdf = \&PDL::GSL::RNG::ran_binomial_pdf;
+
+
+
+
+
+
+=head2 ran_bivariate_gaussian_pdf
+
+=for sig
+
+  Signature: (x(); y(); sigma_x(); sigma_y(); rho(); [o]out())
+
+=for ref
+
+=for bad
+
+ran_bivariate_gaussian_pdf processes bad values.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
+
+=cut
+
+
+
+
+*ran_bivariate_gaussian_pdf = \&PDL::GSL::RNG::ran_bivariate_gaussian_pdf;
+
+
+
+
+
+
+=head2 ran_cauchy_pdf
+
+=for sig
+
+  Signature: (x(); a(); [o]out())
+
+=for ref
+
+=for bad
+
+ran_cauchy_pdf processes bad values.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
+
+=cut
+
+
+
+
+*ran_cauchy_pdf = \&PDL::GSL::RNG::ran_cauchy_pdf;
+
+
+
+
+
+
+=head2 ran_chisq_pdf
+
+=for sig
+
+  Signature: (x(); nu(); [o]out())
+
+=for ref
+
+=for bad
+
+ran_chisq_pdf processes bad values.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
+
+=cut
+
+
+
+
+*ran_chisq_pdf = \&PDL::GSL::RNG::ran_chisq_pdf;
+
+
+
+
+
+
+=head2 ran_dirichlet_pdf
+
+=for sig
+
+  Signature: (alpha(k); theta(k); [o]out())
+
+=for ref
+
+=for bad
+
+ran_dirichlet_pdf processes bad values.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
+
+=cut
+
+
+
+
+*ran_dirichlet_pdf = \&PDL::GSL::RNG::ran_dirichlet_pdf;
+
+
+
+
+
+
+=head2 ran_erlang_pdf
+
+=for sig
+
+  Signature: (x(); a(); n(); [o]out())
+
+=for ref
+
+=for bad
+
+ran_erlang_pdf processes bad values.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
+
+=cut
+
+
+
+
+*ran_erlang_pdf = \&PDL::GSL::RNG::ran_erlang_pdf;
+
+
+
+
+
+
+=head2 ran_exponential_pdf
+
+=for sig
+
+  Signature: (x(); mu(); [o]out())
+
+=for ref
+
+=for bad
+
+ran_exponential_pdf processes bad values.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
+
+=cut
+
+
+
+
+*ran_exponential_pdf = \&PDL::GSL::RNG::ran_exponential_pdf;
+
+
+
+
+
+
+=head2 ran_exppow_pdf
+
+=for sig
+
+  Signature: (x(); a(); b(); [o]out())
+
+=for ref
+
+=for bad
+
+ran_exppow_pdf processes bad values.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
+
+=cut
+
+
+
+
+*ran_exppow_pdf = \&PDL::GSL::RNG::ran_exppow_pdf;
+
+
+
+
+
+
+=head2 ran_fdist_pdf
+
+=for sig
+
+  Signature: (x(); nua(); nub(); [o]out())
+
+=for ref
+
+=for bad
+
+ran_fdist_pdf processes bad values.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
+
+=cut
+
+
+
+
+*ran_fdist_pdf = \&PDL::GSL::RNG::ran_fdist_pdf;
+
+
+
+
+
+
+=head2 ran_flat_pdf
+
+=for sig
+
+  Signature: (x(); a(); b(); [o]out())
+
+=for ref
+
+=for bad
+
+ran_flat_pdf processes bad values.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
+
+=cut
+
+
+
+
+*ran_flat_pdf = \&PDL::GSL::RNG::ran_flat_pdf;
+
+
+
+
+
+
+=head2 ran_gamma_pdf
+
+=for sig
+
+  Signature: (x(); a(); b(); [o]out())
+
+=for ref
+
+=for bad
+
+ran_gamma_pdf processes bad values.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
+
+=cut
+
+
+
+
+*ran_gamma_pdf = \&PDL::GSL::RNG::ran_gamma_pdf;
+
+
+
+
+
+
+=head2 ran_gaussian_pdf
+
+=for sig
+
+  Signature: (x(); sigma(); [o]out())
+
+=for ref
+
+=for bad
+
+ran_gaussian_pdf processes bad values.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
+
+=cut
+
+
+
+
+*ran_gaussian_pdf = \&PDL::GSL::RNG::ran_gaussian_pdf;
+
+
+
+
+
+
+=head2 ran_gaussian_tail_pdf
+
+=for sig
+
+  Signature: (x(); a(); sigma(); [o]out())
+
+=for ref
+
+=for bad
+
+ran_gaussian_tail_pdf processes bad values.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
+
+=cut
+
+
+
+
+*ran_gaussian_tail_pdf = \&PDL::GSL::RNG::ran_gaussian_tail_pdf;
+
+
+
+
+
+
+=head2 ran_geometric_pdf
+
+=for sig
+
+  Signature: (uint k(); p(); [o]out())
+
+=for ref
+
+=for bad
+
+ran_geometric_pdf processes bad values.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
+
+=cut
+
+
+
+
+*ran_geometric_pdf = \&PDL::GSL::RNG::ran_geometric_pdf;
+
+
+
+
+
+
+=head2 ran_gumbel1_pdf
+
+=for sig
+
+  Signature: (x(); a(); b(); [o]out())
+
+=for ref
+
+=for bad
+
+ran_gumbel1_pdf processes bad values.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
+
+=cut
+
+
+
+
+*ran_gumbel1_pdf = \&PDL::GSL::RNG::ran_gumbel1_pdf;
+
+
+
+
+
+
+=head2 ran_gumbel2_pdf
+
+=for sig
+
+  Signature: (x(); a(); b(); [o]out())
+
+=for ref
+
+=for bad
+
+ran_gumbel2_pdf processes bad values.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
+
+=cut
+
+
+
+
+*ran_gumbel2_pdf = \&PDL::GSL::RNG::ran_gumbel2_pdf;
+
+
+
+
+
+
+=head2 ran_hypergeometric_pdf
+
+=for sig
+
+  Signature: (uint k(); uint na(); uint nb(); uint t(); [o]out())
+
+=for ref
+
+=for bad
+
+ran_hypergeometric_pdf processes bad values.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
+
+=cut
+
+
+
+
+*ran_hypergeometric_pdf = \&PDL::GSL::RNG::ran_hypergeometric_pdf;
+
+
+
+
+
+
+=head2 ran_landau_pdf
+
+=for sig
+
+  Signature: (x(); [o]out())
+
+=for ref
+
+=for bad
+
+ran_landau_pdf processes bad values.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
+
+=cut
+
+
+
+
+*ran_landau_pdf = \&PDL::GSL::RNG::ran_landau_pdf;
+
+
+
+
+
+
+=head2 ran_laplace_pdf
+
+=for sig
+
+  Signature: (x(); a(); [o]out())
+
+=for ref
+
+=for bad
+
+ran_laplace_pdf processes bad values.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
+
+=cut
+
+
+
+
+*ran_laplace_pdf = \&PDL::GSL::RNG::ran_laplace_pdf;
+
+
+
+
+
+
+=head2 ran_logarithmic_pdf
+
+=for sig
+
+  Signature: (uint k(); p(); [o]out())
+
+=for ref
+
+=for bad
+
+ran_logarithmic_pdf processes bad values.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
+
+=cut
+
+
+
+
+*ran_logarithmic_pdf = \&PDL::GSL::RNG::ran_logarithmic_pdf;
+
+
+
+
+
+
+=head2 ran_logistic_pdf
+
+=for sig
+
+  Signature: (x(); a(); [o]out())
+
+=for ref
+
+=for bad
+
+ran_logistic_pdf processes bad values.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
+
+=cut
+
+
+
+
+*ran_logistic_pdf = \&PDL::GSL::RNG::ran_logistic_pdf;
+
+
+
+
+
+
+=head2 ran_lognormal_pdf
+
+=for sig
+
+  Signature: (x(); zeta(); sigma(); [o]out())
+
+=for ref
+
+=for bad
+
+ran_lognormal_pdf processes bad values.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
+
+=cut
+
+
+
+
+*ran_lognormal_pdf = \&PDL::GSL::RNG::ran_lognormal_pdf;
+
+
+
+
+
+
+=head2 ran_multinomial_pdf
+
+=for sig
+
+  Signature: (p(k); uint n(k); [o]out())
+
+=for ref
+
+=for bad
+
+ran_multinomial_pdf processes bad values.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
+
+=cut
+
+
+
+
+*ran_multinomial_pdf = \&PDL::GSL::RNG::ran_multinomial_pdf;
+
+
+
+
+
+
+=head2 ran_negative_binomial_pdf
+
+=for sig
+
+  Signature: (uint k(); p(); n(); [o]out())
+
+=for ref
+
+=for bad
+
+ran_negative_binomial_pdf processes bad values.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
+
+=cut
+
+
+
+
+*ran_negative_binomial_pdf = \&PDL::GSL::RNG::ran_negative_binomial_pdf;
+
+
+
+
+
+
+=head2 ran_pareto_pdf
+
+=for sig
+
+  Signature: (x(); a(); b(); [o]out())
+
+=for ref
+
+=for bad
+
+ran_pareto_pdf processes bad values.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
+
+=cut
+
+
+
+
+*ran_pareto_pdf = \&PDL::GSL::RNG::ran_pareto_pdf;
+
+
+
+
+
+
+=head2 ran_pascal_pdf
+
+=for sig
+
+  Signature: (uint k(); p(); uint n(); [o]out())
+
+=for ref
+
+=for bad
+
+ran_pascal_pdf processes bad values.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
+
+=cut
+
+
+
+
+*ran_pascal_pdf = \&PDL::GSL::RNG::ran_pascal_pdf;
+
+
+
+
+
+
+=head2 ran_poisson_pdf
+
+=for sig
+
+  Signature: (uint k(); mu(); [o]out())
+
+=for ref
+
+=for bad
+
+ran_poisson_pdf processes bad values.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
+
+=cut
+
+
+
+
+*ran_poisson_pdf = \&PDL::GSL::RNG::ran_poisson_pdf;
+
+
+
+
+
+
+=head2 ran_rayleigh_pdf
+
+=for sig
+
+  Signature: (x(); sigma(); [o]out())
+
+=for ref
+
+=for bad
+
+ran_rayleigh_pdf processes bad values.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
+
+=cut
+
+
+
+
+*ran_rayleigh_pdf = \&PDL::GSL::RNG::ran_rayleigh_pdf;
+
+
+
+
+
+
+=head2 ran_rayleigh_tail_pdf
+
+=for sig
+
+  Signature: (x(); a(); sigma(); [o]out())
+
+=for ref
+
+=for bad
+
+ran_rayleigh_tail_pdf processes bad values.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
+
+=cut
+
+
+
+
+*ran_rayleigh_tail_pdf = \&PDL::GSL::RNG::ran_rayleigh_tail_pdf;
+
+
+
+
+
+
+=head2 ran_tdist_pdf
+
+=for sig
+
+  Signature: (x(); nu(); [o]out())
+
+=for ref
+
+=for bad
+
+ran_tdist_pdf processes bad values.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
+
+=cut
+
+
+
+
+*ran_tdist_pdf = \&PDL::GSL::RNG::ran_tdist_pdf;
+
+
+
+
+
+
+=head2 ran_ugaussian_pdf
+
+=for sig
+
+  Signature: (x(); [o]out())
+
+=for ref
+
+=for bad
+
+ran_ugaussian_pdf processes bad values.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
+
+=cut
+
+
+
+
+*ran_ugaussian_pdf = \&PDL::GSL::RNG::ran_ugaussian_pdf;
+
+
+
+
+
+
+=head2 ran_ugaussian_tail_pdf
+
+=for sig
+
+  Signature: (x(); a(); [o]out())
+
+=for ref
+
+=for bad
+
+ran_ugaussian_tail_pdf processes bad values.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
+
+=cut
+
+
+
+
+*ran_ugaussian_tail_pdf = \&PDL::GSL::RNG::ran_ugaussian_tail_pdf;
+
+
+
+
+
+
+=head2 ran_weibull_pdf
+
+=for sig
+
+  Signature: (x(); a(); b(); [o]out())
+
+=for ref
+
+=for bad
+
+ran_weibull_pdf processes bad values.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
+
+=cut
+
+
+
+
+*ran_weibull_pdf = \&PDL::GSL::RNG::ran_weibull_pdf;
+
+
+
+
+
+
+=head2 ran_shuffle_1d
+
+=for sig
+
+  Signature: ([io]a(n); gsl_rng *rng)
+
+=for ref
+
+Takes n-dimensional ndarray, and shuffles it along its zero-th dimension.
+
+Usage:
+
+=for usage
+
+  $vec2d = sequence(10,10);
+  $rng->ran_shuffle_1d($vec2d);
+
+=for bad
+
+ran_shuffle_1d does not process bad values.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
+
+=cut
+
+
+
+
+sub ran_shuffle_1d { _ran_shuffle_1d_int(@_[1,0]) }
+
+
+
+*ran_shuffle_1d = \&PDL::GSL::RNG::ran_shuffle_1d;
+
+
+
+
+
+
 =head2 get_uniform
 
 =for sig
 
-  Signature: ([o]a(); IV rng)
+  Signature: ([o]a(); gsl_rng *rng)
 
 =for ref
 
@@ -432,14 +1345,14 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 sub get_uniform {
 my ($obj,@var) = @_;if (ref($var[0]) eq 'PDL') {
-    _get_uniform_int($var[0],$$obj);
+    _get_uniform_int($var[0],$obj);
     return $var[0];
 }
 else {
     my $p;
 
     $p = zeroes @var;
-    _get_uniform_int($p,$$obj);
+    _get_uniform_int($p,$obj);
     return $p;
 }
 }
@@ -457,7 +1370,7 @@ else {
 
 =for sig
 
-  Signature: ([o]a(); IV rng)
+  Signature: ([o]a(); gsl_rng *rng)
 
 =for ref
 
@@ -491,14 +1404,14 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 sub get_uniform_pos {
 my ($obj,@var) = @_;if (ref($var[0]) eq 'PDL') {
-    _get_uniform_pos_int($var[0],$$obj);
+    _get_uniform_pos_int($var[0],$obj);
     return $var[0];
 }
 else {
     my $p;
 
     $p = zeroes @var;
-    _get_uniform_pos_int($p,$$obj);
+    _get_uniform_pos_int($p,$obj);
     return $p;
 }
 }
@@ -516,7 +1429,7 @@ else {
 
 =for sig
 
-  Signature: ([o]a(); IV rng)
+  Signature: ([o]a(); gsl_rng *rng)
 
 =for ref
 
@@ -551,14 +1464,14 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 sub get {
 my ($obj,@var) = @_;if (ref($var[0]) eq 'PDL') {
-    _get_int($var[0],$$obj);
+    _get_int($var[0],$obj);
     return $var[0];
 }
 else {
     my $p;
 
     $p = zeroes @var;
-    _get_int($p,$$obj);
+    _get_int($p,$obj);
     return $p;
 }
 }
@@ -576,7 +1489,7 @@ else {
 
 =for sig
 
-  Signature: ([o]a(); int n; IV rng)
+  Signature: ([o]a(); IV n; gsl_rng *rng)
 
 =for ref
 
@@ -611,14 +1524,14 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 sub get_int {
 my ($obj,$n,@var) = @_;if (!($n>0)) {barf("first parameter must be an int >0")};if (ref($var[0]) eq 'PDL') {
-    _get_int_int($var[0],$n,$$obj);
+    _get_int_int($var[0],$n,$obj);
     return $var[0];
 }
 else {
     my $p;
 
     $p = zeroes @var;
-    _get_int_int($p,$n,$$obj);
+    _get_int_int($p,$n,$obj);
     return $p;
 }
 }
@@ -636,7 +1549,7 @@ else {
 
 =for sig
 
-  Signature: ([o]output(); double sigma; IV rng)
+  Signature: ([o]output(); double sigma; gsl_rng *rng)
 
 =for ref
 
@@ -670,13 +1583,13 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 sub ran_gaussian {
 my ($obj,$sigma,@var) = @_;
 if (ref($var[0]) eq 'PDL') {
-    _ran_gaussian_int($var[0],$sigma,$$obj);
+    _ran_gaussian_int($var[0],$sigma,$obj);
     return $var[0];
 }
 else {
     my $p;
     $p = zeroes @var;
-    _ran_gaussian_int($p,$sigma,$$obj);
+    _ran_gaussian_int($p,$sigma,$obj);
     return $p;
 }
 }
@@ -694,7 +1607,7 @@ else {
 
 =for sig
 
-  Signature: (sigma();[o]output(); IV rng)
+  Signature: (sigma();[o]output(); gsl_rng *rng)
 
 =for ref
 
@@ -721,7 +1634,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 sub ran_gaussian_var {
 my ($obj,@var) = @_;
     if (scalar(@var) != 1) {barf("Bad number of parameters!");}
-    _ran_gaussian_var_int(@var,my $x=PDL->null,$$obj);
+    _ran_gaussian_var_int(@var,my $x=PDL->null,$obj);
     return $x;
 }
 
@@ -738,7 +1651,7 @@ my ($obj,@var) = @_;
 
 =for sig
 
-  Signature: ([o]output(); double tail; IV rng)
+  Signature: ([o]output(); double tail; gsl_rng *rng)
 
 =for ref
 
@@ -772,13 +1685,13 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 sub ran_ugaussian_tail {
 my ($obj,$tail,@var) = @_;
 if (ref($var[0]) eq 'PDL') {
-    _ran_ugaussian_tail_int($var[0],$tail,$$obj);
+    _ran_ugaussian_tail_int($var[0],$tail,$obj);
     return $var[0];
 }
 else {
     my $p;
     $p = zeroes @var;
-    _ran_ugaussian_tail_int($p,$tail,$$obj);
+    _ran_ugaussian_tail_int($p,$tail,$obj);
     return $p;
 }
 }
@@ -796,7 +1709,7 @@ else {
 
 =for sig
 
-  Signature: (tail();[o]output(); IV rng)
+  Signature: (tail();[o]output(); gsl_rng *rng)
 
 =for ref
 
@@ -823,7 +1736,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 sub ran_ugaussian_tail_var {
 my ($obj,@var) = @_;
     if (scalar(@var) != 1) {barf("Bad number of parameters!");}
-    _ran_ugaussian_tail_var_int(@var,my $x=PDL->null,$$obj);
+    _ran_ugaussian_tail_var_int(@var,my $x=PDL->null,$obj);
     return $x;
 }
 
@@ -840,7 +1753,7 @@ my ($obj,@var) = @_;
 
 =for sig
 
-  Signature: ([o]output(); double mu; IV rng)
+  Signature: ([o]output(); double mu; gsl_rng *rng)
 
 =for ref
 
@@ -874,13 +1787,13 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 sub ran_exponential {
 my ($obj,$mu,@var) = @_;
 if (ref($var[0]) eq 'PDL') {
-    _ran_exponential_int($var[0],$mu,$$obj);
+    _ran_exponential_int($var[0],$mu,$obj);
     return $var[0];
 }
 else {
     my $p;
     $p = zeroes @var;
-    _ran_exponential_int($p,$mu,$$obj);
+    _ran_exponential_int($p,$mu,$obj);
     return $p;
 }
 }
@@ -898,7 +1811,7 @@ else {
 
 =for sig
 
-  Signature: (mu();[o]output(); IV rng)
+  Signature: (mu();[o]output(); gsl_rng *rng)
 
 =for ref
 
@@ -925,7 +1838,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 sub ran_exponential_var {
 my ($obj,@var) = @_;
     if (scalar(@var) != 1) {barf("Bad number of parameters!");}
-    _ran_exponential_var_int(@var,my $x=PDL->null,$$obj);
+    _ran_exponential_var_int(@var,my $x=PDL->null,$obj);
     return $x;
 }
 
@@ -942,7 +1855,7 @@ my ($obj,@var) = @_;
 
 =for sig
 
-  Signature: ([o]output(); double pa; IV rng)
+  Signature: ([o]output(); double pa; gsl_rng *rng)
 
 =for ref
 
@@ -976,13 +1889,13 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 sub ran_laplace {
 my ($obj,$pa,@var) = @_;
 if (ref($var[0]) eq 'PDL') {
-    _ran_laplace_int($var[0],$pa,$$obj);
+    _ran_laplace_int($var[0],$pa,$obj);
     return $var[0];
 }
 else {
     my $p;
     $p = zeroes @var;
-    _ran_laplace_int($p,$pa,$$obj);
+    _ran_laplace_int($p,$pa,$obj);
     return $p;
 }
 }
@@ -1000,7 +1913,7 @@ else {
 
 =for sig
 
-  Signature: (pa();[o]output(); IV rng)
+  Signature: (pa();[o]output(); gsl_rng *rng)
 
 =for ref
 
@@ -1027,7 +1940,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 sub ran_laplace_var {
 my ($obj,@var) = @_;
     if (scalar(@var) != 1) {barf("Bad number of parameters!");}
-    _ran_laplace_var_int(@var,my $x=PDL->null,$$obj);
+    _ran_laplace_var_int(@var,my $x=PDL->null,$obj);
     return $x;
 }
 
@@ -1044,7 +1957,7 @@ my ($obj,@var) = @_;
 
 =for sig
 
-  Signature: ([o]output(); double pa; double pb; IV rng)
+  Signature: ([o]output(); double pa; double pb; gsl_rng *rng)
 
 =for ref
 
@@ -1078,13 +1991,13 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 sub ran_exppow {
 my ($obj,$pa,$pb,@var) = @_;
 if (ref($var[0]) eq 'PDL') {
-    _ran_exppow_int($var[0],$pa,$pb,$$obj);
+    _ran_exppow_int($var[0],$pa,$pb,$obj);
     return $var[0];
 }
 else {
     my $p;
     $p = zeroes @var;
-    _ran_exppow_int($p,$pa,$pb,$$obj);
+    _ran_exppow_int($p,$pa,$pb,$obj);
     return $p;
 }
 }
@@ -1102,7 +2015,7 @@ else {
 
 =for sig
 
-  Signature: (pa();pb();[o]output(); IV rng)
+  Signature: (pa();pb();[o]output(); gsl_rng *rng)
 
 =for ref
 
@@ -1129,7 +2042,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 sub ran_exppow_var {
 my ($obj,@var) = @_;
     if (scalar(@var) != 2) {barf("Bad number of parameters!");}
-    _ran_exppow_var_int(@var,my $x=PDL->null,$$obj);
+    _ran_exppow_var_int(@var,my $x=PDL->null,$obj);
     return $x;
 }
 
@@ -1146,7 +2059,7 @@ my ($obj,@var) = @_;
 
 =for sig
 
-  Signature: ([o]output(); double pa; IV rng)
+  Signature: ([o]output(); double pa; gsl_rng *rng)
 
 =for ref
 
@@ -1180,13 +2093,13 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 sub ran_cauchy {
 my ($obj,$pa,@var) = @_;
 if (ref($var[0]) eq 'PDL') {
-    _ran_cauchy_int($var[0],$pa,$$obj);
+    _ran_cauchy_int($var[0],$pa,$obj);
     return $var[0];
 }
 else {
     my $p;
     $p = zeroes @var;
-    _ran_cauchy_int($p,$pa,$$obj);
+    _ran_cauchy_int($p,$pa,$obj);
     return $p;
 }
 }
@@ -1204,7 +2117,7 @@ else {
 
 =for sig
 
-  Signature: (pa();[o]output(); IV rng)
+  Signature: (pa();[o]output(); gsl_rng *rng)
 
 =for ref
 
@@ -1231,7 +2144,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 sub ran_cauchy_var {
 my ($obj,@var) = @_;
     if (scalar(@var) != 1) {barf("Bad number of parameters!");}
-    _ran_cauchy_var_int(@var,my $x=PDL->null,$$obj);
+    _ran_cauchy_var_int(@var,my $x=PDL->null,$obj);
     return $x;
 }
 
@@ -1248,7 +2161,7 @@ my ($obj,@var) = @_;
 
 =for sig
 
-  Signature: ([o]output(); double sigma; IV rng)
+  Signature: ([o]output(); double sigma; gsl_rng *rng)
 
 =for ref
 
@@ -1282,13 +2195,13 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 sub ran_rayleigh {
 my ($obj,$sigma,@var) = @_;
 if (ref($var[0]) eq 'PDL') {
-    _ran_rayleigh_int($var[0],$sigma,$$obj);
+    _ran_rayleigh_int($var[0],$sigma,$obj);
     return $var[0];
 }
 else {
     my $p;
     $p = zeroes @var;
-    _ran_rayleigh_int($p,$sigma,$$obj);
+    _ran_rayleigh_int($p,$sigma,$obj);
     return $p;
 }
 }
@@ -1306,7 +2219,7 @@ else {
 
 =for sig
 
-  Signature: (sigma();[o]output(); IV rng)
+  Signature: (sigma();[o]output(); gsl_rng *rng)
 
 =for ref
 
@@ -1333,7 +2246,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 sub ran_rayleigh_var {
 my ($obj,@var) = @_;
     if (scalar(@var) != 1) {barf("Bad number of parameters!");}
-    _ran_rayleigh_var_int(@var,my $x=PDL->null,$$obj);
+    _ran_rayleigh_var_int(@var,my $x=PDL->null,$obj);
     return $x;
 }
 
@@ -1350,7 +2263,7 @@ my ($obj,@var) = @_;
 
 =for sig
 
-  Signature: ([o]output(); double x; double sigma; IV rng)
+  Signature: ([o]output(); double x; double sigma; gsl_rng *rng)
 
 =for ref
 
@@ -1385,13 +2298,13 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 sub ran_rayleigh_tail {
 my ($obj,$x,$sigma,@var) = @_;
 if (ref($var[0]) eq 'PDL') {
-    _ran_rayleigh_tail_int($var[0],$x,$sigma,$$obj);
+    _ran_rayleigh_tail_int($var[0],$x,$sigma,$obj);
     return $var[0];
 }
 else {
     my $p;
     $p = zeroes @var;
-    _ran_rayleigh_tail_int($p,$x,$sigma,$$obj);
+    _ran_rayleigh_tail_int($p,$x,$sigma,$obj);
     return $p;
 }
 }
@@ -1409,7 +2322,7 @@ else {
 
 =for sig
 
-  Signature: (x();sigma();[o]output(); IV rng)
+  Signature: (x();sigma();[o]output(); gsl_rng *rng)
 
 =for ref
 
@@ -1436,7 +2349,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 sub ran_rayleigh_tail_var {
 my ($obj,@var) = @_;
     if (scalar(@var) != 2) {barf("Bad number of parameters!");}
-    _ran_rayleigh_tail_var_int(@var,my $x=PDL->null,$$obj);
+    _ran_rayleigh_tail_var_int(@var,my $x=PDL->null,$obj);
     return $x;
 }
 
@@ -1453,7 +2366,7 @@ my ($obj,@var) = @_;
 
 =for sig
 
-  Signature: ([o]output(); double mu; double x; IV rng)
+  Signature: ([o]output(); double mu; double x; gsl_rng *rng)
 
 =for ref
 
@@ -1487,13 +2400,13 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 sub ran_levy {
 my ($obj,$mu,$x,@var) = @_;
 if (ref($var[0]) eq 'PDL') {
-    _ran_levy_int($var[0],$mu,$x,$$obj);
+    _ran_levy_int($var[0],$mu,$x,$obj);
     return $var[0];
 }
 else {
     my $p;
     $p = zeroes @var;
-    _ran_levy_int($p,$mu,$x,$$obj);
+    _ran_levy_int($p,$mu,$x,$obj);
     return $p;
 }
 }
@@ -1511,7 +2424,7 @@ else {
 
 =for sig
 
-  Signature: (mu();x();[o]output(); IV rng)
+  Signature: (mu();x();[o]output(); gsl_rng *rng)
 
 =for ref
 
@@ -1538,7 +2451,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 sub ran_levy_var {
 my ($obj,@var) = @_;
     if (scalar(@var) != 2) {barf("Bad number of parameters!");}
-    _ran_levy_var_int(@var,my $x=PDL->null,$$obj);
+    _ran_levy_var_int(@var,my $x=PDL->null,$obj);
     return $x;
 }
 
@@ -1555,7 +2468,7 @@ my ($obj,@var) = @_;
 
 =for sig
 
-  Signature: ([o]output(); double pa; double pb; IV rng)
+  Signature: ([o]output(); double pa; double pb; gsl_rng *rng)
 
 =for ref
 
@@ -1589,13 +2502,13 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 sub ran_gamma {
 my ($obj,$pa,$pb,@var) = @_;
 if (ref($var[0]) eq 'PDL') {
-    _ran_gamma_int($var[0],$pa,$pb,$$obj);
+    _ran_gamma_int($var[0],$pa,$pb,$obj);
     return $var[0];
 }
 else {
     my $p;
     $p = zeroes @var;
-    _ran_gamma_int($p,$pa,$pb,$$obj);
+    _ran_gamma_int($p,$pa,$pb,$obj);
     return $p;
 }
 }
@@ -1613,7 +2526,7 @@ else {
 
 =for sig
 
-  Signature: (pa();pb();[o]output(); IV rng)
+  Signature: (pa();pb();[o]output(); gsl_rng *rng)
 
 =for ref
 
@@ -1640,7 +2553,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 sub ran_gamma_var {
 my ($obj,@var) = @_;
     if (scalar(@var) != 2) {barf("Bad number of parameters!");}
-    _ran_gamma_var_int(@var,my $x=PDL->null,$$obj);
+    _ran_gamma_var_int(@var,my $x=PDL->null,$obj);
     return $x;
 }
 
@@ -1657,7 +2570,7 @@ my ($obj,@var) = @_;
 
 =for sig
 
-  Signature: ([o]output(); double la; double lb; IV rng)
+  Signature: ([o]output(); double la; double lb; gsl_rng *rng)
 
 =for ref
 
@@ -1691,13 +2604,13 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 sub ran_flat {
 my ($obj,$la,$lb,@var) = @_;
 if (ref($var[0]) eq 'PDL') {
-    _ran_flat_int($var[0],$la,$lb,$$obj);
+    _ran_flat_int($var[0],$la,$lb,$obj);
     return $var[0];
 }
 else {
     my $p;
     $p = zeroes @var;
-    _ran_flat_int($p,$la,$lb,$$obj);
+    _ran_flat_int($p,$la,$lb,$obj);
     return $p;
 }
 }
@@ -1715,7 +2628,7 @@ else {
 
 =for sig
 
-  Signature: (la();lb();[o]output(); IV rng)
+  Signature: (la();lb();[o]output(); gsl_rng *rng)
 
 =for ref
 
@@ -1742,7 +2655,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 sub ran_flat_var {
 my ($obj,@var) = @_;
     if (scalar(@var) != 2) {barf("Bad number of parameters!");}
-    _ran_flat_var_int(@var,my $x=PDL->null,$$obj);
+    _ran_flat_var_int(@var,my $x=PDL->null,$obj);
     return $x;
 }
 
@@ -1759,7 +2672,7 @@ my ($obj,@var) = @_;
 
 =for sig
 
-  Signature: ([o]output(); double mu; double sigma; IV rng)
+  Signature: ([o]output(); double mu; double sigma; gsl_rng *rng)
 
 =for ref
 
@@ -1793,13 +2706,13 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 sub ran_lognormal {
 my ($obj,$mu,$sigma,@var) = @_;
 if (ref($var[0]) eq 'PDL') {
-    _ran_lognormal_int($var[0],$mu,$sigma,$$obj);
+    _ran_lognormal_int($var[0],$mu,$sigma,$obj);
     return $var[0];
 }
 else {
     my $p;
     $p = zeroes @var;
-    _ran_lognormal_int($p,$mu,$sigma,$$obj);
+    _ran_lognormal_int($p,$mu,$sigma,$obj);
     return $p;
 }
 }
@@ -1817,7 +2730,7 @@ else {
 
 =for sig
 
-  Signature: (mu();sigma();[o]output(); IV rng)
+  Signature: (mu();sigma();[o]output(); gsl_rng *rng)
 
 =for ref
 
@@ -1844,7 +2757,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 sub ran_lognormal_var {
 my ($obj,@var) = @_;
     if (scalar(@var) != 2) {barf("Bad number of parameters!");}
-    _ran_lognormal_var_int(@var,my $x=PDL->null,$$obj);
+    _ran_lognormal_var_int(@var,my $x=PDL->null,$obj);
     return $x;
 }
 
@@ -1861,7 +2774,7 @@ my ($obj,@var) = @_;
 
 =for sig
 
-  Signature: ([o]output(); double nu; IV rng)
+  Signature: ([o]output(); double nu; gsl_rng *rng)
 
 =for ref
 
@@ -1895,13 +2808,13 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 sub ran_chisq {
 my ($obj,$nu,@var) = @_;
 if (ref($var[0]) eq 'PDL') {
-    _ran_chisq_int($var[0],$nu,$$obj);
+    _ran_chisq_int($var[0],$nu,$obj);
     return $var[0];
 }
 else {
     my $p;
     $p = zeroes @var;
-    _ran_chisq_int($p,$nu,$$obj);
+    _ran_chisq_int($p,$nu,$obj);
     return $p;
 }
 }
@@ -1919,7 +2832,7 @@ else {
 
 =for sig
 
-  Signature: (nu();[o]output(); IV rng)
+  Signature: (nu();[o]output(); gsl_rng *rng)
 
 =for ref
 
@@ -1946,7 +2859,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 sub ran_chisq_var {
 my ($obj,@var) = @_;
     if (scalar(@var) != 1) {barf("Bad number of parameters!");}
-    _ran_chisq_var_int(@var,my $x=PDL->null,$$obj);
+    _ran_chisq_var_int(@var,my $x=PDL->null,$obj);
     return $x;
 }
 
@@ -1963,7 +2876,7 @@ my ($obj,@var) = @_;
 
 =for sig
 
-  Signature: ([o]output(); double nu1; double nu2; IV rng)
+  Signature: ([o]output(); double nu1; double nu2; gsl_rng *rng)
 
 =for ref
 
@@ -1997,13 +2910,13 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 sub ran_fdist {
 my ($obj,$nu1,$nu2,@var) = @_;
 if (ref($var[0]) eq 'PDL') {
-    _ran_fdist_int($var[0],$nu1,$nu2,$$obj);
+    _ran_fdist_int($var[0],$nu1,$nu2,$obj);
     return $var[0];
 }
 else {
     my $p;
     $p = zeroes @var;
-    _ran_fdist_int($p,$nu1,$nu2,$$obj);
+    _ran_fdist_int($p,$nu1,$nu2,$obj);
     return $p;
 }
 }
@@ -2021,7 +2934,7 @@ else {
 
 =for sig
 
-  Signature: (nu1();nu2();[o]output(); IV rng)
+  Signature: (nu1();nu2();[o]output(); gsl_rng *rng)
 
 =for ref
 
@@ -2048,7 +2961,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 sub ran_fdist_var {
 my ($obj,@var) = @_;
     if (scalar(@var) != 2) {barf("Bad number of parameters!");}
-    _ran_fdist_var_int(@var,my $x=PDL->null,$$obj);
+    _ran_fdist_var_int(@var,my $x=PDL->null,$obj);
     return $x;
 }
 
@@ -2065,7 +2978,7 @@ my ($obj,@var) = @_;
 
 =for sig
 
-  Signature: ([o]output(); double nu; IV rng)
+  Signature: ([o]output(); double nu; gsl_rng *rng)
 
 =for ref
 
@@ -2100,13 +3013,13 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 sub ran_tdist {
 my ($obj,$nu,@var) = @_;
 if (ref($var[0]) eq 'PDL') {
-    _ran_tdist_int($var[0],$nu,$$obj);
+    _ran_tdist_int($var[0],$nu,$obj);
     return $var[0];
 }
 else {
     my $p;
     $p = zeroes @var;
-    _ran_tdist_int($p,$nu,$$obj);
+    _ran_tdist_int($p,$nu,$obj);
     return $p;
 }
 }
@@ -2124,7 +3037,7 @@ else {
 
 =for sig
 
-  Signature: (nu();[o]output(); IV rng)
+  Signature: (nu();[o]output(); gsl_rng *rng)
 
 =for ref
 
@@ -2151,7 +3064,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 sub ran_tdist_var {
 my ($obj,@var) = @_;
     if (scalar(@var) != 1) {barf("Bad number of parameters!");}
-    _ran_tdist_var_int(@var,my $x=PDL->null,$$obj);
+    _ran_tdist_var_int(@var,my $x=PDL->null,$obj);
     return $x;
 }
 
@@ -2168,7 +3081,7 @@ my ($obj,@var) = @_;
 
 =for sig
 
-  Signature: ([o]output(); double pa; double pb; IV rng)
+  Signature: ([o]output(); double pa; double pb; gsl_rng *rng)
 
 =for ref
 
@@ -2202,13 +3115,13 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 sub ran_beta {
 my ($obj,$pa,$pb,@var) = @_;
 if (ref($var[0]) eq 'PDL') {
-    _ran_beta_int($var[0],$pa,$pb,$$obj);
+    _ran_beta_int($var[0],$pa,$pb,$obj);
     return $var[0];
 }
 else {
     my $p;
     $p = zeroes @var;
-    _ran_beta_int($p,$pa,$pb,$$obj);
+    _ran_beta_int($p,$pa,$pb,$obj);
     return $p;
 }
 }
@@ -2226,7 +3139,7 @@ else {
 
 =for sig
 
-  Signature: (pa();pb();[o]output(); IV rng)
+  Signature: (pa();pb();[o]output(); gsl_rng *rng)
 
 =for ref
 
@@ -2253,7 +3166,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 sub ran_beta_var {
 my ($obj,@var) = @_;
     if (scalar(@var) != 2) {barf("Bad number of parameters!");}
-    _ran_beta_var_int(@var,my $x=PDL->null,$$obj);
+    _ran_beta_var_int(@var,my $x=PDL->null,$obj);
     return $x;
 }
 
@@ -2270,7 +3183,7 @@ my ($obj,@var) = @_;
 
 =for sig
 
-  Signature: ([o]output(); double m; IV rng)
+  Signature: ([o]output(); double m; gsl_rng *rng)
 
 =for ref
 
@@ -2304,13 +3217,13 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 sub ran_logistic {
 my ($obj,$m,@var) = @_;
 if (ref($var[0]) eq 'PDL') {
-    _ran_logistic_int($var[0],$m,$$obj);
+    _ran_logistic_int($var[0],$m,$obj);
     return $var[0];
 }
 else {
     my $p;
     $p = zeroes @var;
-    _ran_logistic_int($p,$m,$$obj);
+    _ran_logistic_int($p,$m,$obj);
     return $p;
 }
 }
@@ -2328,7 +3241,7 @@ else {
 
 =for sig
 
-  Signature: (m();[o]output(); IV rng)
+  Signature: (m();[o]output(); gsl_rng *rng)
 
 =for ref
 
@@ -2355,7 +3268,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 sub ran_logistic_var {
 my ($obj,@var) = @_;
     if (scalar(@var) != 1) {barf("Bad number of parameters!");}
-    _ran_logistic_var_int(@var,my $x=PDL->null,$$obj);
+    _ran_logistic_var_int(@var,my $x=PDL->null,$obj);
     return $x;
 }
 
@@ -2372,7 +3285,7 @@ my ($obj,@var) = @_;
 
 =for sig
 
-  Signature: ([o]output(); double pa; double lb; IV rng)
+  Signature: ([o]output(); double pa; double lb; gsl_rng *rng)
 
 =for ref
 
@@ -2406,13 +3319,13 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 sub ran_pareto {
 my ($obj,$pa,$lb,@var) = @_;
 if (ref($var[0]) eq 'PDL') {
-    _ran_pareto_int($var[0],$pa,$lb,$$obj);
+    _ran_pareto_int($var[0],$pa,$lb,$obj);
     return $var[0];
 }
 else {
     my $p;
     $p = zeroes @var;
-    _ran_pareto_int($p,$pa,$lb,$$obj);
+    _ran_pareto_int($p,$pa,$lb,$obj);
     return $p;
 }
 }
@@ -2430,7 +3343,7 @@ else {
 
 =for sig
 
-  Signature: (pa();lb();[o]output(); IV rng)
+  Signature: (pa();lb();[o]output(); gsl_rng *rng)
 
 =for ref
 
@@ -2457,7 +3370,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 sub ran_pareto_var {
 my ($obj,@var) = @_;
     if (scalar(@var) != 2) {barf("Bad number of parameters!");}
-    _ran_pareto_var_int(@var,my $x=PDL->null,$$obj);
+    _ran_pareto_var_int(@var,my $x=PDL->null,$obj);
     return $x;
 }
 
@@ -2474,7 +3387,7 @@ my ($obj,@var) = @_;
 
 =for sig
 
-  Signature: ([o]output(); double pa; double pb; IV rng)
+  Signature: ([o]output(); double pa; double pb; gsl_rng *rng)
 
 =for ref
 
@@ -2508,13 +3421,13 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 sub ran_weibull {
 my ($obj,$pa,$pb,@var) = @_;
 if (ref($var[0]) eq 'PDL') {
-    _ran_weibull_int($var[0],$pa,$pb,$$obj);
+    _ran_weibull_int($var[0],$pa,$pb,$obj);
     return $var[0];
 }
 else {
     my $p;
     $p = zeroes @var;
-    _ran_weibull_int($p,$pa,$pb,$$obj);
+    _ran_weibull_int($p,$pa,$pb,$obj);
     return $p;
 }
 }
@@ -2532,7 +3445,7 @@ else {
 
 =for sig
 
-  Signature: (pa();pb();[o]output(); IV rng)
+  Signature: (pa();pb();[o]output(); gsl_rng *rng)
 
 =for ref
 
@@ -2559,7 +3472,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 sub ran_weibull_var {
 my ($obj,@var) = @_;
     if (scalar(@var) != 2) {barf("Bad number of parameters!");}
-    _ran_weibull_var_int(@var,my $x=PDL->null,$$obj);
+    _ran_weibull_var_int(@var,my $x=PDL->null,$obj);
     return $x;
 }
 
@@ -2576,7 +3489,7 @@ my ($obj,@var) = @_;
 
 =for sig
 
-  Signature: ([o]output(); double pa; double pb; IV rng)
+  Signature: ([o]output(); double pa; double pb; gsl_rng *rng)
 
 =for ref
 
@@ -2610,13 +3523,13 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 sub ran_gumbel1 {
 my ($obj,$pa,$pb,@var) = @_;
 if (ref($var[0]) eq 'PDL') {
-    _ran_gumbel1_int($var[0],$pa,$pb,$$obj);
+    _ran_gumbel1_int($var[0],$pa,$pb,$obj);
     return $var[0];
 }
 else {
     my $p;
     $p = zeroes @var;
-    _ran_gumbel1_int($p,$pa,$pb,$$obj);
+    _ran_gumbel1_int($p,$pa,$pb,$obj);
     return $p;
 }
 }
@@ -2634,7 +3547,7 @@ else {
 
 =for sig
 
-  Signature: (pa();pb();[o]output(); IV rng)
+  Signature: (pa();pb();[o]output(); gsl_rng *rng)
 
 =for ref
 
@@ -2661,7 +3574,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 sub ran_gumbel1_var {
 my ($obj,@var) = @_;
     if (scalar(@var) != 2) {barf("Bad number of parameters!");}
-    _ran_gumbel1_var_int(@var,my $x=PDL->null,$$obj);
+    _ran_gumbel1_var_int(@var,my $x=PDL->null,$obj);
     return $x;
 }
 
@@ -2678,7 +3591,7 @@ my ($obj,@var) = @_;
 
 =for sig
 
-  Signature: ([o]output(); double pa; double pb; IV rng)
+  Signature: ([o]output(); double pa; double pb; gsl_rng *rng)
 
 =for ref
 
@@ -2712,13 +3625,13 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 sub ran_gumbel2 {
 my ($obj,$pa,$pb,@var) = @_;
 if (ref($var[0]) eq 'PDL') {
-    _ran_gumbel2_int($var[0],$pa,$pb,$$obj);
+    _ran_gumbel2_int($var[0],$pa,$pb,$obj);
     return $var[0];
 }
 else {
     my $p;
     $p = zeroes @var;
-    _ran_gumbel2_int($p,$pa,$pb,$$obj);
+    _ran_gumbel2_int($p,$pa,$pb,$obj);
     return $p;
 }
 }
@@ -2736,7 +3649,7 @@ else {
 
 =for sig
 
-  Signature: (pa();pb();[o]output(); IV rng)
+  Signature: (pa();pb();[o]output(); gsl_rng *rng)
 
 =for ref
 
@@ -2763,7 +3676,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 sub ran_gumbel2_var {
 my ($obj,@var) = @_;
     if (scalar(@var) != 2) {barf("Bad number of parameters!");}
-    _ran_gumbel2_var_int(@var,my $x=PDL->null,$$obj);
+    _ran_gumbel2_var_int(@var,my $x=PDL->null,$obj);
     return $x;
 }
 
@@ -2780,7 +3693,7 @@ my ($obj,@var) = @_;
 
 =for sig
 
-  Signature: ([o]output(); double mu; IV rng)
+  Signature: ([o]output(); double mu; gsl_rng *rng)
 
 =for ref
 
@@ -2814,13 +3727,13 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 sub ran_poisson {
 my ($obj,$mu,@var) = @_;
 if (ref($var[0]) eq 'PDL') {
-    _ran_poisson_int($var[0],$mu,$$obj);
+    _ran_poisson_int($var[0],$mu,$obj);
     return $var[0];
 }
 else {
     my $p;
     $p = zeroes @var;
-    _ran_poisson_int($p,$mu,$$obj);
+    _ran_poisson_int($p,$mu,$obj);
     return $p;
 }
 }
@@ -2838,7 +3751,7 @@ else {
 
 =for sig
 
-  Signature: (mu();[o]output(); IV rng)
+  Signature: (mu();[o]output(); gsl_rng *rng)
 
 =for ref
 
@@ -2865,7 +3778,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 sub ran_poisson_var {
 my ($obj,@var) = @_;
     if (scalar(@var) != 1) {barf("Bad number of parameters!");}
-    _ran_poisson_var_int(@var,my $x=PDL->null,$$obj);
+    _ran_poisson_var_int(@var,my $x=PDL->null,$obj);
     return $x;
 }
 
@@ -2882,7 +3795,7 @@ my ($obj,@var) = @_;
 
 =for sig
 
-  Signature: ([o]output(); double p; IV rng)
+  Signature: ([o]output(); double p; gsl_rng *rng)
 
 =for ref
 
@@ -2916,13 +3829,13 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 sub ran_bernoulli {
 my ($obj,$p,@var) = @_;
 if (ref($var[0]) eq 'PDL') {
-    _ran_bernoulli_int($var[0],$p,$$obj);
+    _ran_bernoulli_int($var[0],$p,$obj);
     return $var[0];
 }
 else {
     my $p;
     $p = zeroes @var;
-    _ran_bernoulli_int($p,$p,$$obj);
+    _ran_bernoulli_int($p,$p,$obj);
     return $p;
 }
 }
@@ -2940,7 +3853,7 @@ else {
 
 =for sig
 
-  Signature: (p();[o]output(); IV rng)
+  Signature: (p();[o]output(); gsl_rng *rng)
 
 =for ref
 
@@ -2967,7 +3880,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 sub ran_bernoulli_var {
 my ($obj,@var) = @_;
     if (scalar(@var) != 1) {barf("Bad number of parameters!");}
-    _ran_bernoulli_var_int(@var,my $x=PDL->null,$$obj);
+    _ran_bernoulli_var_int(@var,my $x=PDL->null,$obj);
     return $x;
 }
 
@@ -2984,7 +3897,7 @@ my ($obj,@var) = @_;
 
 =for sig
 
-  Signature: ([o]output(); double p; double n; IV rng)
+  Signature: ([o]output(); double p; double n; gsl_rng *rng)
 
 =for ref
 
@@ -3018,13 +3931,13 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 sub ran_binomial {
 my ($obj,$p,$n,@var) = @_;
 if (ref($var[0]) eq 'PDL') {
-    _ran_binomial_int($var[0],$p,$n,$$obj);
+    _ran_binomial_int($var[0],$p,$n,$obj);
     return $var[0];
 }
 else {
     my $p;
     $p = zeroes @var;
-    _ran_binomial_int($p,$p,$n,$$obj);
+    _ran_binomial_int($p,$p,$n,$obj);
     return $p;
 }
 }
@@ -3042,7 +3955,7 @@ else {
 
 =for sig
 
-  Signature: (p();n();[o]output(); IV rng)
+  Signature: (p();n();[o]output(); gsl_rng *rng)
 
 =for ref
 
@@ -3069,7 +3982,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 sub ran_binomial_var {
 my ($obj,@var) = @_;
     if (scalar(@var) != 2) {barf("Bad number of parameters!");}
-    _ran_binomial_var_int(@var,my $x=PDL->null,$$obj);
+    _ran_binomial_var_int(@var,my $x=PDL->null,$obj);
     return $x;
 }
 
@@ -3086,7 +3999,7 @@ my ($obj,@var) = @_;
 
 =for sig
 
-  Signature: ([o]output(); double p; double n; IV rng)
+  Signature: ([o]output(); double p; double n; gsl_rng *rng)
 
 =for ref
 
@@ -3123,13 +4036,13 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 sub ran_negative_binomial {
 my ($obj,$p,$n,@var) = @_;
 if (ref($var[0]) eq 'PDL') {
-    _ran_negative_binomial_int($var[0],$p,$n,$$obj);
+    _ran_negative_binomial_int($var[0],$p,$n,$obj);
     return $var[0];
 }
 else {
     my $p;
     $p = zeroes @var;
-    _ran_negative_binomial_int($p,$p,$n,$$obj);
+    _ran_negative_binomial_int($p,$p,$n,$obj);
     return $p;
 }
 }
@@ -3147,7 +4060,7 @@ else {
 
 =for sig
 
-  Signature: (p();n();[o]output(); IV rng)
+  Signature: (p();n();[o]output(); gsl_rng *rng)
 
 =for ref
 
@@ -3174,7 +4087,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 sub ran_negative_binomial_var {
 my ($obj,@var) = @_;
     if (scalar(@var) != 2) {barf("Bad number of parameters!");}
-    _ran_negative_binomial_var_int(@var,my $x=PDL->null,$$obj);
+    _ran_negative_binomial_var_int(@var,my $x=PDL->null,$obj);
     return $x;
 }
 
@@ -3191,7 +4104,7 @@ my ($obj,@var) = @_;
 
 =for sig
 
-  Signature: ([o]output(); double p; double n; IV rng)
+  Signature: ([o]output(); double p; double n; gsl_rng *rng)
 
 =for ref
 
@@ -3227,13 +4140,13 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 sub ran_pascal {
 my ($obj,$p,$n,@var) = @_;
 if (ref($var[0]) eq 'PDL') {
-    _ran_pascal_int($var[0],$p,$n,$$obj);
+    _ran_pascal_int($var[0],$p,$n,$obj);
     return $var[0];
 }
 else {
     my $p;
     $p = zeroes @var;
-    _ran_pascal_int($p,$p,$n,$$obj);
+    _ran_pascal_int($p,$p,$n,$obj);
     return $p;
 }
 }
@@ -3251,7 +4164,7 @@ else {
 
 =for sig
 
-  Signature: (p();n();[o]output(); IV rng)
+  Signature: (p();n();[o]output(); gsl_rng *rng)
 
 =for ref
 
@@ -3278,7 +4191,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 sub ran_pascal_var {
 my ($obj,@var) = @_;
     if (scalar(@var) != 2) {barf("Bad number of parameters!");}
-    _ran_pascal_var_int(@var,my $x=PDL->null,$$obj);
+    _ran_pascal_var_int(@var,my $x=PDL->null,$obj);
     return $x;
 }
 
@@ -3295,7 +4208,7 @@ my ($obj,@var) = @_;
 
 =for sig
 
-  Signature: ([o]output(); double p; IV rng)
+  Signature: ([o]output(); double p; gsl_rng *rng)
 
 =for ref
 
@@ -3329,13 +4242,13 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 sub ran_geometric {
 my ($obj,$p,@var) = @_;
 if (ref($var[0]) eq 'PDL') {
-    _ran_geometric_int($var[0],$p,$$obj);
+    _ran_geometric_int($var[0],$p,$obj);
     return $var[0];
 }
 else {
     my $p;
     $p = zeroes @var;
-    _ran_geometric_int($p,$p,$$obj);
+    _ran_geometric_int($p,$p,$obj);
     return $p;
 }
 }
@@ -3353,7 +4266,7 @@ else {
 
 =for sig
 
-  Signature: (p();[o]output(); IV rng)
+  Signature: (p();[o]output(); gsl_rng *rng)
 
 =for ref
 
@@ -3380,7 +4293,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 sub ran_geometric_var {
 my ($obj,@var) = @_;
     if (scalar(@var) != 1) {barf("Bad number of parameters!");}
-    _ran_geometric_var_int(@var,my $x=PDL->null,$$obj);
+    _ran_geometric_var_int(@var,my $x=PDL->null,$obj);
     return $x;
 }
 
@@ -3397,7 +4310,7 @@ my ($obj,@var) = @_;
 
 =for sig
 
-  Signature: ([o]output(); double n1; double n2; double t; IV rng)
+  Signature: ([o]output(); double n1; double n2; double t; gsl_rng *rng)
 
 =for ref
 
@@ -3434,13 +4347,13 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 sub ran_hypergeometric {
 my ($obj,$n1,$n2,$t,@var) = @_;
 if (ref($var[0]) eq 'PDL') {
-    _ran_hypergeometric_int($var[0],$n1,$n2,$t,$$obj);
+    _ran_hypergeometric_int($var[0],$n1,$n2,$t,$obj);
     return $var[0];
 }
 else {
     my $p;
     $p = zeroes @var;
-    _ran_hypergeometric_int($p,$n1,$n2,$t,$$obj);
+    _ran_hypergeometric_int($p,$n1,$n2,$t,$obj);
     return $p;
 }
 }
@@ -3458,7 +4371,7 @@ else {
 
 =for sig
 
-  Signature: (n1();n2();t();[o]output(); IV rng)
+  Signature: (n1();n2();t();[o]output(); gsl_rng *rng)
 
 =for ref
 
@@ -3485,7 +4398,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 sub ran_hypergeometric_var {
 my ($obj,@var) = @_;
     if (scalar(@var) != 3) {barf("Bad number of parameters!");}
-    _ran_hypergeometric_var_int(@var,my $x=PDL->null,$$obj);
+    _ran_hypergeometric_var_int(@var,my $x=PDL->null,$obj);
     return $x;
 }
 
@@ -3502,7 +4415,7 @@ my ($obj,@var) = @_;
 
 =for sig
 
-  Signature: ([o]output(); double p; IV rng)
+  Signature: ([o]output(); double p; gsl_rng *rng)
 
 =for ref
 
@@ -3536,13 +4449,13 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 sub ran_logarithmic {
 my ($obj,$p,@var) = @_;
 if (ref($var[0]) eq 'PDL') {
-    _ran_logarithmic_int($var[0],$p,$$obj);
+    _ran_logarithmic_int($var[0],$p,$obj);
     return $var[0];
 }
 else {
     my $p;
     $p = zeroes @var;
-    _ran_logarithmic_int($p,$p,$$obj);
+    _ran_logarithmic_int($p,$p,$obj);
     return $p;
 }
 }
@@ -3560,7 +4473,7 @@ else {
 
 =for sig
 
-  Signature: (p();[o]output(); IV rng)
+  Signature: (p();[o]output(); gsl_rng *rng)
 
 =for ref
 
@@ -3587,7 +4500,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 sub ran_logarithmic_var {
 my ($obj,@var) = @_;
     if (scalar(@var) != 1) {barf("Bad number of parameters!");}
-    _ran_logarithmic_var_int(@var,my $x=PDL->null,$$obj);
+    _ran_logarithmic_var_int(@var,my $x=PDL->null,$obj);
     return $x;
 }
 
@@ -3604,7 +4517,7 @@ my ($obj,@var) = @_;
 
 =for sig
 
-  Signature: ([o]x(); double sigma; IV rng)
+  Signature: ([o]x(); double sigma; gsl_rng *rng)
 
 =for ref
 
@@ -3637,7 +4550,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 	 my ($obj,$sigma,$var) = @_;
 	 barf("In additive gaussian mode you must specify an ndarray!")
 	   if ref($var) ne 'PDL';
-	 _ran_additive_gaussian_int($var,$sigma,$$obj);
+	 _ran_additive_gaussian_int($var,$sigma,$obj);
 	 return $var;
        }
        
@@ -3654,7 +4567,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: ([o]x(); double sigma; IV rng)
+  Signature: ([o]x(); double sigma; gsl_rng *rng)
 
 =for ref
 
@@ -3687,7 +4600,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 	 my ($obj,$sigma,$var) = @_;
 	 barf("In additive poisson mode you must specify an ndarray!")
 	   if ref($var) ne 'PDL';
-	 _ran_additive_poisson_int($var,$sigma,$$obj);
+	 _ran_additive_poisson_int($var,$sigma,$obj);
 	 return $var;
        }
        
@@ -3704,7 +4617,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: ([o]x(); IV rng)
+  Signature: ([o]x(); gsl_rng *rng)
 
 =for ref
 
@@ -3738,7 +4651,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 	 my ($obj,$var) = @_;
 	 barf("In poisson mode you must specify an ndarray!")
 	   if ref($var) ne 'PDL';
-	 _ran_feed_poisson_int($var,$$obj);
+	 _ran_feed_poisson_int($var,$obj);
 	 return $var;
        }
        
@@ -3755,7 +4668,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: ([o]x(n); double sigma_x; double sigma_y; double rho; IV rng)
+  Signature: ([o]x(n); double sigma_x; double sigma_y; double rho; gsl_rng *rng)
 
 =for ref
 
@@ -3787,7 +4700,7 @@ sub ran_bivariate_gaussian {
  my ($obj,$sigma_x,$sigma_y,$rho,$n) = @_;
  barf("Not enough parameters for gaussian bivariate!") if $n<=0;
  my $p = zeroes(2,$n);
- _ran_bivariate_gaussian_int($p,$sigma_x,$sigma_y,$rho,$$obj);
+ _ran_bivariate_gaussian_int($p,$sigma_x,$sigma_y,$rho,$obj);
  return $p;
 }
 
@@ -3814,27 +4727,27 @@ sub ran_bivariate_gaussian {
 
 
 
-#line 875 "gsl_random.pd"
+#line 966 "gsl_random.pd"
 
        sub ran_dir {
 	 my ($obj,$ndim,$n) = @_;
 	 barf("Not enough parameters for random vectors!") if $n<=0;
 	 my $p = zeroes($ndim,$n);
-	 if ($ndim==2) { ran_dir_2d($p,$$obj); }
-	 elsif ($ndim==3) { ran_dir_3d($p,$$obj); }
-	 elsif ($ndim>=4 && $ndim<=100) { ran_dir_nd($p,$ndim,$$obj); }
+	 if ($ndim==2) { ran_dir_2d($p,$obj); }
+	 elsif ($ndim==3) { ran_dir_3d($p,$obj); }
+	 elsif ($ndim>=4 && $ndim<=100) { ran_dir_nd($p,$ndim,$obj); }
 	 else { barf("Bad number of dimensions!"); }
 	 return $p;
        }
        
-#line 3831 "RNG.pm"
+#line 4744 "RNG.pm"
 
 
 =head2 ran_discrete
 
 =for sig
 
-  Signature: ([o]x(); IV rng_discrete; IV rng)
+  Signature: ([o]x(); gsl_ran_discrete_t *rng_discrete; gsl_rng *rng)
 
 =for ref
 
@@ -3869,13 +4782,13 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 sub ran_discrete {
 my ($obj, $rdt, @var) = @_;
 if (ref($var[0]) eq 'PDL') {
-    _ran_discrete_int($var[0], $$rdt, $$obj);
+    _ran_discrete_int($var[0], $rdt, $obj);
     return $var[0];
 }
 else {
     my $p;
     $p = zeroes @var;
-    _ran_discrete_int($p, $$rdt, $$obj);
+    _ran_discrete_int($p, $rdt, $obj);
     return $p;
 }
 }
@@ -3888,41 +4801,28 @@ else {
 
 
 
-#line 932 "gsl_random.pd"
+#line 1022 "gsl_random.pd"
 
 sub ran_shuffle_vec {
 my ($obj,@in) = @_;
-my (@out,$i,$p);
-
-$p = long [0..$#in];
-$obj->ran_shuffle($p);
-for($i=0;$i<scalar(@in);$i++) {
-$out[$p->at($i)]=$in[$i];
-}
-return @out;
+$obj->ran_shuffle(my $p = PDL->sequence(PDL::indx(), 0+@in));
+@in[$p->list];
 }
 
-#line 946 "gsl_random.pd"
+#line 1030 "gsl_random.pd"
 sub ran_choose_vec {
 my ($obj,$nout,@in) = @_;
-my (@out,$i,$pin,$pout);
-
-$pin = long [0..$#in];
-$pout = long [0..($nout-1)];
-$obj->ran_choose($pin,$pout);
-for($i=0;$i<$nout;$i++) {
-$out[$i]=$in[$pout->at($i)];
+$obj->ran_choose(PDL->sequence(PDL::indx(), 0+@in),my $pout = PDL->zeroes(PDL::indx(), $nout));
+@in[$pout->list];
 }
-return @out;
-}
-#line 3919 "RNG.pm"
+#line 4819 "RNG.pm"
 
 
 =head2 ran_ver
 
 =for sig
 
-  Signature: ([o]x(n); double x0; double r;int ns => n; IV rng)
+  Signature: ([o]x(n); double x0; double r;IV ns => n; gsl_rng *rng)
 
 =for ref
 
@@ -3950,7 +4850,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 	 my ($obj,$x0,$r,$n) = @_;
 	 barf("Not enough parameters for ran_ver!") if $n<=0;
 	 my $p = zeroes($n);
-	 _ran_ver_int($p,$x0,$r,$n,$$obj);
+	 _ran_ver_int($p,$x0,$r,$n,$obj);
 	 return $p;
        }
        
@@ -3967,7 +4867,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: ([o]x(n); double m; int ns => n; IV rng)
+  Signature: ([o]x(n); double m; IV ns => n; gsl_rng *rng)
 
 =for ref
 
@@ -3995,7 +4895,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 	 my ($obj,$m,$n) = @_;
 	 barf("Not enough parameters for ran_caos!") if $n<=0;
 	 my $p = zeroes($n);
-	 _ran_caos_int($p,$m,$n,$$obj);
+	 _ran_caos_int($p,$m,$n,$obj);
 	 return $p;
        }
        
@@ -4035,7 +4935,7 @@ PDL distribution, the copyright notice should be included in the file.
 The GSL RNG and randist modules were written by James Theiler.
 
 =cut
-#line 4039 "RNG.pm"
+#line 4939 "RNG.pm"
 
 # Exit with OK status
 

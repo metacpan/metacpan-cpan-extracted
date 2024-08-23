@@ -1,0 +1,383 @@
+NAME
+
+    Plack::App::Catmandu::OAI - drop in replacement for
+    Dancer::Plugin::Catmandu::OAI
+
+SYNOPSIS
+
+        use Plack::Builder;
+        Plack::App::Catmandu::OAI;
+    
+        builder {
+            enable 'ReverseProxy';
+            enable '+Dancer::Middleware::Rebase', base  => Catmandu->config->{uri_base}, strip => 1;
+            mount "/oai" => Plack::App::Catmandu::OAI->new(
+                repositoryName => 'my repo',
+                store => 'search',
+                bag   => 'publication',
+                cql_filter => 'type = dataset',
+                limit  => 100,
+                datestamp_field => 'date_updated',
+                deleted => sub { $_[0]->{deleted}; },
+                set_specs_for => sub {
+                    $_[0]->{specs};
+                }
+            )->to_app;
+        };
+
+CONSTRUCTOR ARGUMENTS
+
+    store
+
+      Type: string
+
+      Description: Name of Catmandu store in your catmandu store
+      configuration
+
+      Default: default
+
+    bag
+
+      Type: string
+
+      Description: Name of Catmandu bag in your catmandu store
+      configuration
+
+      Default: data
+
+      This must be a bag that implements Catmandu::CQLSearchable, and that
+      configures a cql_mapping
+
+    fix
+
+      Either name of fix, path to fix file or instance of Catmandu::Fix
+
+      This fix will be applied to every record found, either via GetRecord
+      or ListRecords
+
+    deleted
+
+      Type: code reference
+
+      Description: code reference that is supplied a record, and must
+      return 0 or 1 determing if that record is deleted or not.
+
+      Required: false
+
+    set_specs_for
+
+      Type: code reference
+
+      Description: code reference that is supplied a record, and must
+      return an array reference of strings, showing to which sets that
+      record belongs
+
+      Required: false
+
+    datestamp_field
+
+      Type: string
+
+      Description: name of the field in the record that contains the oai
+      record datestamp ('datestamp' in our example above)
+
+      Required: true
+
+    datestamp_index
+
+      Type: string
+
+      Description: Which CQL index should be used to find records within a
+      specified date range. If not specified, the value from the
+      'datestamp_field' setting is used
+
+      Required: false
+
+    repositoryName
+
+      Type: string
+
+      Description: name of the repository
+
+      Required: true
+
+    adminEmail
+
+      Type: array reference of non empty strings
+
+      Description: array reference of administrative emails. These will be
+      included in the Identify response.
+
+      Required: false
+
+    compression
+
+      Type: array reference of non empty strings
+
+      Description: a list compression encodings supported by the
+      repository. These will be included in the Identify response.
+
+      Required: false
+
+    description
+
+      Type: array reference of non empty strings
+
+      Description: a list of XML containers that describe your repository.
+      These will be included in the Identify response. Note that this
+      module will try to validate the XML data.
+
+      Required: false
+
+    earliestDatestamp
+
+      Type: string
+
+      Description: The earliest datestamp available in the dataset
+      formatted as YYYY-MM-DDTHH:MM:SSZ. This will be determined
+      dynamically if no static value is given.
+
+      Required: false
+
+    deletedRecord
+
+      Type: enumeration, having possible values no (default), persistent or
+      transient
+
+      Description: The policy for deleted records. See also:
+      https://www.openarchives.org/OAI/openarchivesprotocol.html#DeletedRecords
+
+      Required: 1
+
+    repositoryIdentifier
+
+      Type: string
+
+      Description: A prefix to use in OAI-PMH identifiers
+
+      Required: true
+
+    cql_filter
+
+      A global CQL query that is applied to all search requests (GetRecord,
+      ListRecords and ListIdentifiers). Use this to determine what records
+      from your underlying catmandu search store should be available to to
+      the OAI.
+
+    default_search_params
+
+      Extra search parameters added during search in your catmandu bag:
+
+          $bag->search(
+              %{$self->default_search_params},
+              cql_query    => $cql,
+              sru_sortkeys => $request->sortKeys,
+              limit        => $limit,
+              start        => $first - 1,
+          );
+
+      Must be a hash reference
+
+      Note that search parameter cql_query, sru_sortkeys, limit and start
+      are overwritten
+
+    search_strategy
+
+      Type: enumeration having possible value paginate (default), es.scroll
+      or filter
+
+      Description: strategy to implement paging of oai record results (in
+      ListRecords or ListIdentifiers). The default search strategy paginate
+      uses start and limit in the underlying search request, but that may
+      lead to deep paging problems. ElasticSearch for example will refuse
+      to return results after hit 10.000.
+
+      * paginate: use catmandu store search parameters start and limit in
+      order to advance to the next page. May result into a deep paging
+      problem, but serves as a convenient default for small repositories.
+
+      * es.scroll: use ElasticSearch scroll api
+      (https://www.elastic.co/guide/en/elasticsearch/reference/current/scroll-api.html#scroll-api-request)
+      to split into pages. As expected only useful for elasticsearch.
+      Elasticsearch stores a snapshot of the resultset for a certain amount
+      of time, returns the identifier (scroll_id) for that snapshot, and we
+      use that scroll_id as the cursor to the next page. Requesting the
+      first page however several times may cause a server downtime when the
+      resources are exhausted to store an additional snapshot. This option
+      is ONLY included as a deprecated option, never to be used anymore.
+
+      * filter: use prefix filtering to split into pages. Works by sorting
+      by on the primary identifier, and using a prefix query like "_id 
+      this_page.last_id"> to fetch the next page. This is the RECOMMENDED
+      approach cf.
+      https://solr.apache.org/guide/6_6/pagination-of-results.html#using-cursors
+
+      Required: 1
+
+    limit
+
+      The number of records to be returned in each OAI list record page
+
+      When not provided in the constructor, it is derived from the default
+      limit of your catmandu bag (see Catmandu::Searchable#default_limit)
+
+    delimiter
+
+      Type: string
+
+      Description: delimiter used in prefixing a record identifier with a
+      repositoryIdentifier.
+
+      Default: :
+
+      Required: false
+
+    sampleIdentifier
+
+      Type: non empty string
+
+      Description: sample identifier.
+
+      Required: true
+
+    xsl_stylesheet
+
+      Type: non empty string
+
+      Description: url to XSLT stylesheet. When given a link to this
+      stylesheet in every request of type ListRecords or ListIdentifiers.
+      Only useful in browser context where the browser use the stylesheet
+      for dynamic conversion.
+
+      Required: false
+
+    metadata_formats
+
+      Type: array reference of hash reference
+
+      Description: An array of metadataFormats that are supported. Every
+      object needs the following attributes:
+
+      * metadataPrefix: a short string for the name of the format * schema:
+      an URL to the XSD schema of this format * metadataNamespace: an XML
+      namespace for this format * template: path to a Template Toolkit file
+      to transform your records into this format * fix: optionally an array
+      of one or more Catmandu::Fix-es or Fix files
+
+      Required: true
+
+    sets
+
+      Type: array reference of hash references
+
+      Description: an array of OAI-PMH sets and the CQL query to retrieve
+      records in this set from the Catmandu::Store. Each object must have
+      the following attributes:
+
+      * setSpec: a short string for the same of the set * setName: a longer
+      description of the set * setDescription: an optional and repeatable
+      container that may hold community-specific XML-encoded data about the
+      set. Should be string or array of strings. * cql: the CQL command to
+      find records in this set in the Catmandu::Store
+
+      Required: false
+
+    granularity
+
+      Type: non empty string
+
+      Description: datestamp granularity. Default: YYYY-MM-DDThh:mm:ssZ.
+      This is validated against the returned record timestamps
+
+      Required: false
+
+    collectionIcon
+
+      Type: hash reference
+
+      Description: object containing attributes for collectionIcon as used
+      in the Identify response:
+
+      * url (required) * link * title * width * height
+
+      Required: false
+
+    get_record_cql_pattern
+
+      Type: non empty string
+
+      Description: CQL query template to use when fetching a single record.
+      Defaults to _id exact "%s". Note that the record identifier key as
+      defined by the catmandu bag is taken into account (which is _id by
+      default)
+
+      Required: true
+
+    datestamp_pattern
+
+      Type: non empty string
+
+      Description: datestamp pattern for OAI parameters from and until.
+      Example: %Y-%m-%dT%H:%M:%SZ
+
+      Required: true
+
+    template_options
+
+      An optional hash of configuration options that will be passed to
+      Catmandu::Exporter::Template or Template
+
+    As this is meant as a drop in replacement for
+    Dancer::Plugin::Catmandu::OAI all arguments should be the same.
+
+    So all arguments can be taken from your previous dancer plugin
+    configuration, if necessary:
+
+        use Dancer;
+        use Catmandu;
+        use Plack::Builder;
+        use Plack::App::Catmandu::OAI;
+    
+        my $dancer_app = sub {
+            Dancer->dance(Dancer::Request->new(env => $_[0]));
+        };
+    
+        builder {
+            enable 'ReverseProxy';
+            enable '+Dancer::Middleware::Rebase', base  => Catmandu->config->{uri_base}, strip => 1;
+        
+            mount "/oai" => Plack::App::Catmandu::OAI->new(
+                %{config->{plugins}->{'Catmandu::OAI'}}
+            )->to_app;
+    
+            mount "/" => builder {
+                # only create session cookies for dancer application
+                enable "Session";
+                mount '/' => $dancer_app;
+            };
+        };
+
+METHODS
+
+    to_app
+
+      returns Plack application that can be mounted. Path rebasements are
+      taken into account
+
+AUTHOR
+
+    Nicolas Franck, <nicolas.franck at ugent.be>
+
+IMPORTANT
+
+    This module is still a work in progress, and needs further testing
+    before using it in a production system
+
+LICENSE AND COPYRIGHT
+
+    This program is free software; you can redistribute it and/or modify it
+    under the terms of either: the GNU General Public License as published
+    by the Free Software Foundation; or the Artistic License.
+
+    See http://dev.perl.org/licenses/ for more information.
+

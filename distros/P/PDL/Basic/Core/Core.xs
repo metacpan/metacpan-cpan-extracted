@@ -23,6 +23,7 @@
     EXTEND(SP, to - from); \
     for (i=from; i<to; i++) { \
       SV *sv = sv_newmortal(); \
+      if (!trans->pdls[i]->sv) trans->pdls[i]->state |= PDL_DYNLANG_NODESTROY; \
       pdl_SetSV_PDL(sv, trans->pdls[i]); \
       PUSHs(sv); \
     }
@@ -97,9 +98,15 @@ DESTROY(sv)
   CODE:
     if (SvROK(sv) && SvTYPE(SvRV(sv)) == SVt_PVHV) return;
     self = pdl_SvPDLV(sv);
-    PDLDEBUG_f(printf("DESTROYING %p\n",(void*)self);)
-    if (self != NULL)
-      pdl_barf_if_error(pdl_destroy(self));
+    PDLDEBUG_f(printf("DESTROYING %p\n",self));
+    if (self == NULL) return;
+    if (self->state & PDL_DYNLANG_NODESTROY) {
+      PDLDEBUG_f(printf(" (actually just setting sv to NULL)\n"));
+      self->state &= ~PDL_DYNLANG_NODESTROY;
+      self->sv = NULL;
+      return;
+    }
+    pdl_barf_if_error(pdl_destroy(self));
 
 SV *
 new_from_specification(invoc, ...)
@@ -197,6 +204,17 @@ inplace(self, ...)
     RETVAL
 
 SV *
+flowing(self)
+  SV *self
+  CODE:
+    pdl *p = pdl_SvPDLV(self);
+    if (!p) barf("Failed to get PDL from arg");
+    p->state |= PDL_DATAFLOW_F;
+    SvREFCNT_inc(RETVAL = self);
+  OUTPUT:
+    RETVAL
+
+SV *
 topdl(klass, arg1, ...)
   SV *klass;
   SV *arg1;
@@ -205,7 +223,7 @@ topdl(klass, arg1, ...)
       (!SvROK(arg1) && SvTYPE(arg1) < SVt_PVAV) ||
       (SvROK(arg1) && SvTYPE(SvRV(arg1)) == SVt_PVAV)
     ) {
-      SP -= items; PUSHMARK(SP); SPAGAIN; /* these pass this set of args on */
+      PUSHMARK(SP - items); /* this passes current set of args on */
       int retvals = perl_call_method("new", G_SCALAR);
       SPAGAIN;
       if (retvals != 1) barf("new returned no values");
@@ -288,7 +306,7 @@ void
 dimincs_nophys(x)
   pdl *x
   PPCODE:
-    EXTEND(sp, x->ndims);
+    EXTEND(SP, x->ndims);
     PDL_Indx i;
     for(i=0; i<x->ndims; i++) mPUSHi(PDL_REPRINC(x,i));
 
@@ -297,7 +315,7 @@ void
 dims_nophys(x)
   pdl *x
   PPCODE:
-    EXTEND(sp, x->ndims);
+    EXTEND(SP, x->ndims);
     PDL_Indx i;
     for(i=0; i<x->ndims; i++) mPUSHi(x->dims[i]);
 
@@ -306,7 +324,7 @@ void
 broadcastids_nophys(x)
   pdl *x
   PPCODE:
-    EXTEND(sp, x->nbroadcastids);
+    EXTEND(SP, x->nbroadcastids);
     PDL_Indx i;
     for(i=0; i<x->nbroadcastids; i++) mPUSHi(x->broadcastids[i]);
 
@@ -316,13 +334,14 @@ firstvals_nophys(x)
   PPCODE:
     if (!(x->state & PDL_ALLOCATED)) barf("firstvals_nophys called on non-ALLOCATED %p", x);
     PDL_Indx i, maxvals = PDLMIN(10, x->nvals);
-    EXTEND(sp, maxvals);
+    EXTEND(SP, maxvals);
     for(i=0; i<maxvals; i++) {
       PDL_Anyval anyval = pdl_get_offs(x, i);
       if (anyval.type < 0) barf("Error getting value, type=%d", anyval.type);
       SV *sv = sv_newmortal();
       ANYVAL_TO_SV(sv, anyval);
       PUSHs(sv);
+      PUTBACK;
     }
 
 IV
@@ -365,7 +384,7 @@ freedata(it)
       pdl *it
       CODE:
 	if(it->datasv) {
-		PDLDEBUG_f(printf("pdl=%p SvREFCNT_dec datasv=%p\n",it,it->datasv);)
+		PDLDEBUG_f(printf("pdl=%p SvREFCNT_dec datasv=%p\n",it,it->datasv));
 		SvREFCNT_dec(it->datasv);
 		it->datasv=0;
 		it->data=0;
@@ -529,7 +548,7 @@ incs(x)
   PPCODE:
     if (!(x->flags & PDL_ITRANS_ISAFFINE)) barf("incs called on non-vaffine trans %p", x);
     PDL_Indx i, max = x->incs ? x->pdls[1]->ndims : 0;
-    EXTEND(sp, max);
+    EXTEND(SP, max);
     for(i=0; i<max; i++) mPUSHi(x->incs[i]);
 
 void
@@ -537,7 +556,7 @@ ind_sizes(x)
   pdl_trans *x;
   PPCODE:
     PDL_Indx i, max = x->vtable->ninds;
-    EXTEND(sp, max);
+    EXTEND(SP, max);
     for(i=0; i<max; i++) mPUSHi(x->ind_sizes[i]);
 
 void
@@ -545,7 +564,7 @@ inc_sizes(x)
   pdl_trans *x;
   PPCODE:
     PDL_Indx i, max = x->vtable->nind_ids;
-    EXTEND(sp, max);
+    EXTEND(SP, max);
     for(i=0; i<max; i++) mPUSHi(x->inc_sizes[i]);
 
 MODULE = PDL::Core     PACKAGE = PDL::Trans::VTable
@@ -568,7 +587,7 @@ void
 par_names(x)
   pdl_transvtable *x
   PPCODE:
-    EXTEND(sp, 2);
+    EXTEND(SP, 2);
     PDL_Indx i;
     for (i=0; i < 2; i++) {
       AV *av = (AV *)sv_2mortal((SV *)newAV());
@@ -1039,7 +1058,7 @@ dims(x)
 	PPCODE:
 		pdl_barf_if_error(pdl_make_physdims(x));
 		if (gimme == G_ARRAY) {
-			EXTEND(sp, x->ndims);
+			EXTEND(SP, x->ndims);
 			for(i=0; i<x->ndims; i++) mPUSHi(x->dims[i]);
 		}
 		else if (gimme == G_SCALAR) {
@@ -1079,7 +1098,7 @@ broadcastids(x)
 	PPCODE:
 		pdl_barf_if_error(pdl_make_physdims(x));
 		if (gimme == G_ARRAY) {
-			EXTEND(sp, x->nbroadcastids);
+			EXTEND(SP, x->nbroadcastids);
 			for(i=0; i<x->nbroadcastids; i++) mPUSHi(x->broadcastids[i]);
 		}
 		else if (gimme == G_SCALAR) {
@@ -1204,8 +1223,8 @@ broadcastover_n(code, pdl1, ...)
     ENTER; SAVETMPS;
     do {
 	dSP;
-	PUSHMARK(sp);
-	EXTEND(sp,items);
+	PUSHMARK(SP);
+	EXTEND(SP,items);
 	PUSHs(sv_2mortal(newSViv((sd-1))));
 	for(i=0; i<npdls; i++) {
 		SV *sv = sv_newmortal();
@@ -1294,8 +1313,8 @@ broadcastover(code, realdims, creating, nothers, pdl1, ...)
     do {  /* the actual broadcastloop */
 	pdl_trans *traff;
 	dSP;
-	PUSHMARK(sp);
-	EXTEND(sp,npdls+nothers);
+	PUSHMARK(SP);
+	EXTEND(SP,npdls+nothers);
 	for(i=0; i<npdls; i++) {
 	   /* just twiddle the offset - quick and dirty */
 	   /* we must twiddle both !! */

@@ -22,7 +22,7 @@ use MooseX::Aliases;
 use Moose::Util::TypeConstraints;
 no warnings qw/ experimental::signatures experimental::postderef /;
 
-use Business::TrueLayer::Beneficiary;
+with 'Business::TrueLayer::Types::Beneficiary';
 use Business::TrueLayer::Provider;
 
 use namespace::autoclean;
@@ -51,18 +51,10 @@ has [ qw/ type / ] => (
     required => 1,
 );
 
-coerce 'Business::TrueLayer::Beneficiary'
-    => from 'HashRef'
-    => via {
-        Business::TrueLayer::Beneficiary->new( %{ $_ } );
-    }
-;
-
-has beneficiary => (
+has [ qw/ mandate_id / ] => (
     is       => 'ro',
-    isa      => 'Business::TrueLayer::Beneficiary',
-    coerce   => 1,
-    required => 1,
+    isa      => 'Str',
+    required => 0,
 );
 
 coerce 'Business::TrueLayer::Provider'
@@ -80,9 +72,52 @@ has provider => (
     alias    => 'provider_selection',
 );
 
+has beneficiary => (
+    is       => 'ro',
+    isa      => 'Business::TrueLayer::Beneficiary',
+    coerce   => 1,
+    required => 0,
+);
+
+sub BUILD {
+	my ( $self ) = @_;
+
+	# the type defines the requirement for some of the
+	# attributes of this object
+	if ( $self->is_bank_transfer ) {
+		$self->beneficiary || die "payment_method of type 'bank_transfer'"
+			. " requires a beneficiary";
+
+		$self->provider || die "payment_method of type 'bank_transfer'"
+			. " requires a provider / provider_selection";
+
+	} elsif ( $self->is_mandate ) {
+		$self->mandate_id || die "payment_method of type 'mandate'"
+			. " requires a mandate_id";
+	}
+}
+
 =head1 METHODS
 
-None yet.
+=head2 is_bank_transfer
+
+=head2 is_mandate
+
+Check if the payment method is a particular type
+
+    if ( $PaymentMethod->is_bank_transfer ) {
+        ...
+    }
+
+=cut
+
+sub is_bank_transfer { shift->_is_type( 'bank_transfer' ); }
+sub is_mandate       { shift->_is_type( 'mandate' ); }
+
+sub _is_type ( $self,$type ) {
+    return ( $self->type // '' ) eq $type ? 1 : 0;
+}
+
 
 =head1 SEE ALSO
 

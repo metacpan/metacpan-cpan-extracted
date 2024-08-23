@@ -32,7 +32,7 @@ requires:
 resources:
   homepage: https://github.com/Getty/langertha
   repository: https://github.com/Getty/langertha.git
-version: '0.004'
+version: '0.005'
 x_Dist_Zilla:
   perl:
     version: '5.036000'
@@ -294,7 +294,7 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: '0.004'
+          tag: '0.005'
           tag_format: '%v'
           tag_message: v%V
         Dist::Zilla::Role::Git::Repo:

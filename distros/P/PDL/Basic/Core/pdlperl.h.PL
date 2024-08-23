@@ -30,17 +30,16 @@ print OUT <<'EOF';
   XSRETURN(1);
 
 #define PDL_MAKE_PERL_COMPLEX(output,r,i) { \
-        dSP; int count; double rval = r, ival = i; \
-        ENTER; SAVETMPS; PUSHMARK(sp); \
+        dSP; NV rval = r, ival = i; \
         perl_require_pv("PDL/Complex/Overloads.pm"); \
-        mXPUSHn(rval); \
-        mXPUSHn(ival); \
-        PUTBACK; \
-        count = perl_call_pv("PDL::Complex::Overloads::cplx", G_SCALAR); \
+        ENTER; SAVETMPS; \
+        PUSHMARK(SP); mXPUSHn(rval); mXPUSHn(ival); PUTBACK; \
+        int count = perl_call_pv("PDL::Complex::Overloads::cplx", G_SCALAR); \
         SPAGAIN; \
-        if (count != 1) croak("Failed to create PDL::Complex::Overloads object (%.9g, %.9g)", rval, ival); \
+        if (count != 1) croak("Failed to create PDL::Complex::Overloads object (%.9" NVgf ", %.9" NVgf ")", rval, ival); \
         sv_setsv(output, POPs); \
-        PUTBACK; FREETMPS; LEAVE; \
+        PUTBACK; \
+        FREETMPS; LEAVE; \
 }
 
 /***************
@@ -81,6 +80,10 @@ print OUT <<'EOF';
         NV tmp_NV = SvNV(sv2); \
         int datatype = forced_type >=0 ? forced_type : _pdl_whichdatatype_double(tmp_NV); \
         ANYVAL_FROM_CTYPE(outany, datatype, tmp_NV); \
+    } else if (SvIsUV(sv2)) { /* Perl unsigned int */ \
+        UV tmp_UV = SvUV(sv2); \
+        int datatype = forced_type >=0 ? forced_type : _pdl_whichdatatype_uint(tmp_UV); \
+        ANYVAL_FROM_CTYPE(outany, datatype, tmp_UV); \
     } else { /* Perl Int (e.g. 2) */ \
         IV tmp_IV = SvIV(sv2); \
         int datatype = forced_type >=0 ? forced_type : _pdl_whichdatatype_int(tmp_IV); \
@@ -96,7 +99,7 @@ print OUT <<'EOF';
     char *meths[] = { "Re", "Im" }; \
     ENTER; SAVETMPS; \
     for (i = 0; i < 2; i++) { \
-      PUSHMARK(sp); XPUSHs(insv); PUTBACK; \
+      PUSHMARK(SP); XPUSHs(insv); PUTBACK; \
       int count = perl_call_method(meths[i], G_SCALAR); \
       SPAGAIN; \
       if (count != 1) PDL_CORE_(pdl_barf)("Failed Math::Complex method '%s'", meths[i]); \
@@ -131,10 +134,15 @@ print OUT sprintf qq{#line %d "%s"\n}, __LINE__ + 2,  __FILE__;
 print OUT <<'EOF';
 /* Check minimum datatype required to represent number */
 #define PDL_TESTTYPE(sym, ctype, v) {ctype foo = v; if (v == foo) return sym;}
+static inline int _pdl_whichdatatype_uint(UV uv) {
+#define X(sym, ctype, ...) PDL_TESTTYPE(sym, ctype, uv)
+  PDL_TYPELIST_UNSIGNED(X)
+#undef X
+  croak("Something's gone wrong: %llu cannot be converted by whichdatatype", (unsigned long long)uv);
+}
 static inline int _pdl_whichdatatype_int(IV iv) {
 #define X(sym, ctype, ...) PDL_TESTTYPE(sym, ctype, iv)
-  PDL_TYPELIST_SIGNED(X) /* try all signed first */
-  PDL_TYPELIST_UNSIGNED(X) /* only gets here if positive and too big */
+  PDL_TYPELIST_SIGNED(X)
 #undef X
   croak("Something's gone wrong: %lld cannot be converted by whichdatatype", (long long)iv);
 }

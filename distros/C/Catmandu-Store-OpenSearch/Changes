@@ -1,4 +1,7 @@
 Revision history for Catmandu::Store::OpenSearch
 
+0.02  2024-08-22 16:56:56 CEST
+  - forgot to include search argument size=$limit
+
 0.01  2024-07-03 09:23:10 CEST
   - first release

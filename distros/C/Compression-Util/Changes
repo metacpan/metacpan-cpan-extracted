@@ -1,5 +1,24 @@
 Revision history for Compression-Util
 
+0.11    2024-08-22
+
+        [ADDITIONS]
+
+        - Added the `crc32()` function.
+        - Added the `int2bytes()` and `int2bytes_lsb()` functions.
+        - Added the `bzip2_compress()` and `bzip2_decompress()` functions.
+        - Added the `gzip_compress()` and `gzip_decompress()` functions.
+        - Added the `encode_alphabet_256()` and `encode_alphabet_256()` functions.
+
+        [IMPROVEMENTS]
+
+        - Minor documentation improvements.
+        - Slightly more efficient encoding of the alphabet, in function `encode_alphabet()`.
+
+        [CHANGES]
+
+        - Changed the default value of `$Compression::Util::LZ_MAX_LEN` from 258 to 32768. For some inputs, this results in better compression at no additional costs.
+
 0.10    2024-08-07
 
         [ADDITIONS]

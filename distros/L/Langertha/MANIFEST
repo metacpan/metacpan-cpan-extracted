@@ -18,6 +18,7 @@ docker-entrypoint.sh
 ex/ctx.pl
 ex/embedding.pl
 ex/json_grammar.pl
+ex/logic.pl
 ex/ollama.pl
 ex/sample.ogg
 ex/synopsis.pl

@@ -3,7 +3,7 @@ package Catmandu::Importer::OAI::Parser::marcxml;
 use Catmandu::Sane;
 use Moo;
 
-our $VERSION = '0.20';
+our $VERSION = '0.21';
 
 sub parse {
     my ($self,$dom) = @_;

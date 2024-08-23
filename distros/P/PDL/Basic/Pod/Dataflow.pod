@@ -49,16 +49,21 @@ type for the given transform:
 =head1 ONE-WAY
 
 You need to explicitly turn on one-way dataflow on an ndarray to activate
-it for non-flowing operations, so
+it for non-flowing operations (see L<PDL::Core/flowing>), so
 
 	pdl> $x = pdl 2,3,4;
-	pdl> $x->doflow;
-	pdl> $y = $x * 2;
+	pdl> $y = $x->flowing * 2;
 	pdl> print $y;
 	[4 6 8]
 	pdl> $x->set(0,5);
 	pdl> print $y;
 	[10 6 8]
+
+C<flowing> operates by turning on a flag that the core turns off
+immediately after acting on it (rather like C<inplace>), so it only
+operates on the next operation (aka transfrom) called on that ndarray,
+making that operation be a forward-flowing one. That lasts until the
+output(s) of that operation get C<sever>ed.
 
 It is not possible to turn on backwards dataflow (such as is used by
 C<slice>-type operations), because there is no general way for PDL (or
@@ -67,48 +72,200 @@ C<$z = $x * $y>, then adding one to C<$z>.
 
 Consider the following code:
 
-	$u = sequence(3,3); $u->doflow;
-	$v = ones(3,3); $v->doflow;
-	$w = $u + $v; $w->doflow; # must turn on for each
-	$y = $w + 1; $y->doflow;
+	$u = sequence(3,3);
+	$v = ones(3,3);
+	$w = $u->flowing + $v->flowing;
+	$y = $w->flowing + 1;
 	$x = $w->diagonal(0,1);
-	$x += 50;
-	$z = $w + 2;
+	$z = $w->flowing + 2;
 
-What do $y and $z contain now?
+As of 2.090, C<$x> will I<not> have backward dataflow. This is because
+PDL turns that off, on detecting an input with forward-only dataflow. This
+means PDL will only created directed I<acyclic> graphs of dataflow.
+It also means you can only modify the contents of C<$x> by modifying its
+"upstream" data sources.
 
-	pdl> p $y
-	[
-	 [52  3  4]
-	 [ 5 56  7]
-	 [ 8  9 60]
-	]
-	pdl> p $z
-	[
-	 [53  4  5]
-	 [ 6 57  8]
-	 [ 9 10 61]
-	]
+What do C<$x>, C<$y>, and C<$z> contain now?
 
-What about when $u is changed and a recalculation is triggered? A problem
-arises, in that PDL currently (as of 2.079) disallows (see F<pdlapi.c>),
-for normal transforms, output ndarrays with flow, or output ndarrays
-with any parent with dataflow. So C<$u++> throws an exception. But it
-is currently possible to use C<set>, which is a sort of micro-transform
-that calls (in the C API) C<PDL.set> to mutate the data, then
-C<PDL.changed> to trigger flow updates:
-
-	pdl> $u->set(1,1,90)
+	pdl> p $x
+	[1 5 9]
 	pdl> p $y
 	[
 	 [ 2  3  4]
-	 [ 5 92  7]
+	 [ 5  6  7]
 	 [ 8  9 10]
 	]
+	pdl> p $z
+	[
+	 [ 3  4  5]
+	 [ 6  7  8]
+	 [ 9 10 11]
+	]
 
-You'll notice that while the setting of C<1,1> (the middle) of $u updated
-$y, the changes to $y that resulted from adding 50 to the diagonal
-(via $x, and two-way flow) got lost. This is one-way flow.
+What about when C<$u> is changed and a recalculation is triggered?
+
+	pdl> $u += 7;
+	pdl> p $x
+	[8 12 16]
+	pdl> p $y
+	[
+	 [ 9 10 11]
+	 [12 13 14]
+	 [15 16 17]
+	]
+	pdl> p $z
+	[
+	 [10 11 12]
+	 [13 14 15]
+	 [16 17 18]
+	]
+
+=head2 Example of dataflow to implement 3D space calculations
+
+This is a complete, working example that demonstrates the use of
+enduring C<flowing> relationships to model 3D entities, through a few
+transformations:
+
+  {package PDL::3Space;
+  use PDL;
+  sub new { my ($class, $parent) = @_;
+    my $self = bless {basis_local=>identity(3), origin_local=>zeroes(3)}, $class;
+    if (defined $parent) {
+      $self->{parent} = $parent;
+      $self->{basis} = $self->{basis_local}->flowing x $parent->{basis}->flowing;
+      $self->{origin} = ($self->{origin_local}->flowing x $self->{basis}->flowing)->flowing + $parent->{origin}->flowing;
+    } else {
+      $self->{basis} = $self->{basis_local};
+      $self->{origin} = $self->{origin_local}->flowing x $self->{basis}->flowing;
+    }
+    $self;
+  }
+  use overload '""' => sub {$_[0]{basis}->glue(1,$_[0]{origin}).''};
+  sub basis_update { $_[0]{basis_local} .= $_[1] x $_[0]{basis_local} }
+  sub origin_move { $_[0]{origin_local} += $_[1] }
+  sub local { my $local = PDL::3Space->new; $local->{$_} .= $_[0]{$_} for qw(basis_local origin_local); $local}
+  }
+
+This is the class, heavily inspired by L<Math::3Space>, and
+following discussions on interoperation between that and PDL (see
+L<https://github.com/nrdvana/perl-Math-3Space/pull/8>). The C<basis>
+and C<origin> members are "subscribed" to both their own local basis
+and origin, and their parent's if any. The C<basis_update> and
+C<origin_move> methods only update the local members, and C<basis_update>
+does so in terms of its previous value.
+
+The demonstrating code has a boat, and bird within its frame of
+reference. Note that the "local" origin still gets affected by its
+local basis.
+
+The basis and origin are always in global coordinates, and thanks to
+dataflow, are only recalculated on demand.
+
+  $rot_90_about_z = PDL->pdl([0,1,0], [-1,0,0], [0,0,1]);
+
+  $boat = PDL::3Space->new;
+  print "boat=$boat";
+  $bird = PDL::3Space->new($boat);
+  print "bird=$bird";
+  # boat=
+  # [
+  #  [1 0 0]
+  #  [0 1 0]
+  #  [0 0 1]
+  #  [0 0 0]
+  # ]
+  # bird=
+  # [
+  #  [1 0 0]
+  #  [0 1 0]
+  #  [0 0 1]
+  #  [0 0 0]
+  # ]
+
+  $boat->basis_update($rot_90_about_z);
+  print "after boat rot:\nboat=$boat";
+  print "bird=$bird";
+  # after boat rot:
+  # boat=
+  # [
+  #  [ 0  1  0]
+  #  [-1  0  0]
+  #  [ 0  0  1]
+  #  [ 0  0  0]
+  # ]
+  # bird=
+  # [
+  #  [ 0  1  0]
+  #  [-1  0  0]
+  #  [ 0  0  1]
+  #  [ 0  0  0]
+  # ]
+
+  $boat->origin_move(PDL->pdl(1,0,0));
+  print "after boat move:\nboat=$boat";
+  print "bird=$bird";
+  print "bird local=".$bird->local;
+  # after boat move:
+  # boat=
+  # [
+  #  [ 0  1  0]
+  #  [-1  0  0]
+  #  [ 0  0  1]
+  #  [ 0  1  0]
+  # ]
+  # bird=
+  # [
+  #  [ 0  1  0]
+  #  [-1  0  0]
+  #  [ 0  0  1]
+  #  [ 0  1  0]
+  # ]
+  # bird local=
+  # [
+  #  [1 0 0]
+  #  [0 1 0]
+  #  [0 0 1]
+  #  [0 0 0]
+  # ]
+
+  $bird->basis_update($rot_90_about_z);
+  $bird->origin_move(PDL->pdl(1,0,1));
+  print "after bird rot and move:\nbird=$bird";
+  print "bird local=".$bird->local;
+  # after bird rot and move:
+  # bird=
+  # [
+  #  [-1  0  0]
+  #  [ 0 -1  0]
+  #  [ 0  0  1]
+  #  [-1  1  1]
+  # ]
+  # bird local=
+  # [
+  #  [ 0  1  0]
+  #  [-1  0  0]
+  #  [ 0  0  1]
+  #  [ 0  1  1]
+  # ]
+
+  $boat->basis_update(PDL::MatrixOps::identity(3) * 2);
+  print "after boat expand:\nboat=$boat";
+  print "bird=$bird";
+  # after boat expand:
+  # boat=
+  # [
+  #  [ 0  2  0]
+  #  [-2  0  0]
+  #  [ 0  0  2]
+  #  [ 0  2  0]
+  # ]
+  # bird=
+  # [
+  #  [-2  0  0]
+  #  [ 0 -2  0]
+  #  [ 0  0  2]
+  #  [-2  2  2]
+  # ]
 
 =head1 LAZY EVALUATION
 
@@ -128,19 +285,19 @@ as when tracking errors.
 There is an explanation for this behaviour: it may save cycles
 but more importantly, imagine the following:
 
-	pdl> $x = pdl 2,3,4; $x->doflow;
-	pdl> $y = pdl 5,6,7; $y->doflow;
-	pdl> $c = $x + $y;
-	pdl> $x->setdims([4]);
-	pdl> $y->setdims([4]);
-	pdl> print $c;
+	$x = pdl 2,3,4;
+	$y = pdl 5,6,7;
+	$z = $x->flowing + $y->flowing;
+	$x->setdims([4]);
+	$y->setdims([4]);
+	print $z;
 
-Now, if $c were evaluated between the two resizes, an error condition
+Now, if C<$z> were evaluated between the two resizes, an error condition
 of incompatible sizes would occur.
 
-What happens in the current version is that resizing $x raises
-a flag in $c: "PDL_PARENTDIMSCHANGED" and $y just raises the same flag
-again. When $c is next evaluated, the flags are checked and it is found
+What happens in the current version is that resizing C<$x> raises
+a flag in C<$z>: C<PDL_PARENTDIMSCHANGED> and C<$y> just raises the same flag
+again. When C<$z> is next evaluated, the flags are checked and it is found
 that a recalculation is needed.
 
 Of course, lazy evaluation can sometimes make debugging more painful
@@ -174,7 +331,7 @@ are connectors between ndarrays (with C<*>):
 This is what PDL actually has in memory after the first three lines.
 When $x is changed, $w changes due to C<diagonal> being a two-way operation.
 
-If you want flow from $w, you opt in using C<< $w->doflow >> (as shown
+If you want flow from $w, you opt in using C<< $w->flowing >> (as shown
 in this scenario). If you didn't, then don't enable it. If you have it
 but want to stop it, call C<< $ndarray->sever >>. That will destroy the
 ndarray's C<trans_parent> (here, a node marked with C<+>), and as you

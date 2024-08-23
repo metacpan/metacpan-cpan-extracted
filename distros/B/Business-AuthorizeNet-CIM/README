@@ -104,6 +104,16 @@ DESCRIPTION
                 bankName   => $bankName, # Optional
             },
     
+            # opaqueData is required when using the Authorize.Net's Accept.js approach.
+            # Note: Testing so far has indicatated that for new customer profiles using opaqueData,
+            #       the "billTo" section has been required to be present or a "bank validation error"
+            #       has been thrown. This same behavior has not been noticed when creating an empty
+            #       customer profile and then adding a payment profile to it.
+            opaqueData => {
+                dataDescriptor => $dataDescriptor, # Required, for Accept.js use COMMON.ACCEPT.INAPP.PAYMENT, see documentation for others
+                dataValue      => $dataValue, # Required, a one-time base64 encoded, encrypted payment data
+            },
+    
             shipToList => {
                 firstName => $firstName,
                 lastName  => $lastName,
@@ -158,6 +168,11 @@ DESCRIPTION
                 nameOnAccount => $nameOnAccount,
                 echeckType => $echeckType, # Optionaal, one of CCD, PPD, TEL, WEB
                 bankName   => $bankName, # Optional
+            },
+    
+            opaqueData => { # required when using the Authorize.Net's Accept.js approach.
+                dataDescriptor => $dataDescriptor, # Required, for Accept.js use COMMON.ACCEPT.INAPP.PAYMENT, see documentation for others
+                dataValue      => $dataValue, # Required, a one-time base64 encoded, encrypted payment data
             },
         );
 
@@ -410,6 +425,10 @@ DESCRIPTION
                 nameOnAccount => $nameOnAccount,
                 echeckType => $echeckType, # Optionaal, one of CCD, PPD, TEL, WEB
                 bankName   => $bankName, # Optional
+            },
+            opaqueData => { # required when using the Authorize.Net's Accept.js approach.
+                dataDescriptor => $dataDescriptor, # Required, for Accept.js use COMMON.ACCEPT.INAPP.PAYMENT, see documentation for others
+                dataValue      => $dataValue, # Required, a one-time base64 encoded, encrypted payment data
             },
         );
 

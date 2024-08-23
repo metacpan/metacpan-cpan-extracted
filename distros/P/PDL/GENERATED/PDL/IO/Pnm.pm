@@ -74,7 +74,7 @@ sub dmax {
 
 =for sig
 
-  Signature: (type(); byte+ [o] im(m,n); byte [t] buf(llen); int ms => m; int ns => n;
+  Signature: (type(); byte+ [o] im(m,n); byte [t] buf(llen); IV ms => m; IV ns => n;
 			int isbin; PerlIO *fp)
 
 =for ref
@@ -107,7 +107,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (type(); byte+ [o] im(m,n); int ms => m; int ns => n;
+  Signature: (type(); byte+ [o] im(m,n); IV ms => m; IV ns => n;
 			int format; PerlIO *fp)
 
 =for ref

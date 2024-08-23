@@ -1,5 +1,8 @@
 Revision history for Perl extension Business-AuthorizeNet-CIM
 
+0.18    2024-08-23
+        Allow for opaqueData to be sent through certain customer & payment profile requests (cblake777)
+
 0.17    2018-07-11
         add support for multiple optional fields being passed to
         getCustomerPaymentProfileRequest, instead of only allowing

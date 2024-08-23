@@ -9,13 +9,13 @@ import os
 import json
 from dataclasses import dataclass, InitVar
 
-ND2_JOB_METADATA = json.loads(os.environ['ND2_JOB_METADATA'])
+ND2_JOB_METADATA = json.loads(os.environ.get('ND2_JOB_METADATA', '{}'))
 
 
 @dataclass(frozen=True)
 class JobManager:
-    job: int
     action: str
+    job: int = 0
     entered: str = ''
     started: str = ''
     finished: str = ''
@@ -39,6 +39,9 @@ class JobManager:
 
     def id(self) -> int:
         return self.job
+
+    def extra(self) -> str:
+        return self.subaction
 
 
 job = JobManager(**ND2_JOB_METADATA)

@@ -29,7 +29,7 @@ $p->upd_data;
 
 {
   my $pa = pdl 2,3,4;
-  $pa->doflow;
+  $pa->flowing;
   my $pb = $pa + $pa;
   is "$pb", '[4 6 8]';
   $pa->set(0,50);
@@ -478,6 +478,12 @@ my $mt_info = $empty->info;
 $mt_info =~m/\[([\d,]+)\]/;
 my $mt_info_dims = pdl("$1");
 ok(any($mt_info_dims==0), "empty ndarray's info contains a 0 dimension");
+{
+    is($PDL::infoformat, "%C: %T %D", "check default info format");
+    local $PDL::infoformat = "default info format for %C";
+    is(pdl(2, 3)->info, "default info format for PDL",
+        "use default info format");
+}
 ok($null->isnull, "a null ndarray is null");
 ok($null->isempty, "a null ndarray is empty") or diag $null->info;
 ok(!$empty->isnull, "an empty ndarray is not null");
@@ -526,6 +532,18 @@ SKIP: {
   ok $straight_pdl == $multed, 'upgrade of large negative SV to ndarray'
     or diag "straight=$straight_pdl mult=$multed\n",
       "straight:", $straight_pdl->info, " mult:", $multed->info;
+  }
+  {
+  my $fromuv_r = pdl('10223372036854775507');
+  ok $fromuv_r > 0, 'UV real > 0';
+  my $fromuv_c = pdl('10223372036854775507i');
+  ok $fromuv_c->im > 0, 'UV complex->real > 0'
+    or diag "fromuv_c=$fromuv_c\nfromuv_c->im=", $fromuv_c->im,
+      "\nfromuv_r=$fromuv_r";
+  $fromuv_c = pdl('2+10223372036854775507i');
+  ok $fromuv_c->im > 0, 'UV complex->real > 0 with some real'
+    or diag "fromuv_c=$fromuv_c\nfromuv_c->im=", $fromuv_c->im,
+      "\nfromuv_r=$fromuv_r";
   }
   my $input = [
       -9223372036854775808, #min int64
@@ -714,6 +732,30 @@ isnt PDL::Core::pdumphash($slice), undef, 'pdumphash works with ndarray';
 isnt PDL::Core::pdumphash($tp), undef, 'pdumphash works with trans';
 my @pn = $vtable->par_names;
 is 0+@pn, 2, 'par_names returned 2 things';
+my $roots = pdl '[1 2i 3i 4i 5i]';
+eval {PDL::Core::pdump($roots)}; # gave "panic: attempt to copy freed scalar"
+is $@, '';
+{
+my $x = sequence 3; my $y = $x->flowing + 1;
+isnt $y->trans_parent, undef, '$y has parent';
+isnt PDL::Core::pdumphash($x), undef, 'pdumphash works';
+isnt $y->trans_parent, undef, '$y still has parent after pdumphash';
+$x += 3;
+is "$x", "[3 4 5]", '$x right value';
+is "$y", "[4 5 6]", '$y right value';
+ok !$y->fflows, 'y not "flowing"';
+$y->flowing;
+ok $y->fflows, 'y "flowing" on';
+my $z = $y + 1;
+isnt $z->trans_parent, undef, 'z has trans_parent';
+ok !$y->fflows, 'y "flowing" off again';
+eval {$y += 4};
+isnt $@, '', 'error on assigning to ndarray with inward but no outward flow';
+my $oneway_slice = $y->slice('0:1');
+is "$oneway_slice", '[4 5]';
+eval {$oneway_slice .= 11};
+isnt $@, '', 'error on assigning into one-way slice';
+}
 
 my $notouch = sequence(4);
 $notouch->set_donttouchdata(4 * PDL::Core::howbig($notouch->get_datatype));

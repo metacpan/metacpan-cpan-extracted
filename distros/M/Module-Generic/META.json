@@ -51,7 +51,7 @@
             "File::Glob" : "0",
             "File::MMagic" : "1.30",
             "File::Spec" : "3.73",
-            "I18N::Langinfo" : "0.21",
+            "I18N::Langinfo" : "0.17",
             "IO::Dir" : "1.41",
             "IO::File" : "1.41",
             "IO::Scalar" : "2.113",
@@ -73,7 +73,7 @@
             "overload" : "0",
             "overloading" : "0",
             "parent" : "0",
-            "perl" : "5.026001",
+            "perl" : "5.028000",
             "strict" : "0",
             "utf8" : "0",
             "version" : "0",
@@ -107,6 +107,6 @@
          "web" : "https://gitlab.com/jackdeguest/Module-Generic"
       }
    },
-   "version" : "v0.37.2",
+   "version" : "v0.37.3",
    "x_serialization_backend" : "JSON::PP version 4.07"
 }

@@ -18,7 +18,7 @@ my %module_build_args = (
     "=over 4"
   ],
   "dist_name" => "Catmandu-Store-OpenSearch",
-  "dist_version" => "0.01",
+  "dist_version" => "0.02",
   "license" => "perl",
   "module_name" => "Catmandu::Store::OpenSearch",
   "recommends" => {

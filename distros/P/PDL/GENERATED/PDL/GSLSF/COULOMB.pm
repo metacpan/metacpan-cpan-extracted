@@ -81,7 +81,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (double x(); double [o]fc(n); double [o]fcp(n); double [o]gc(n); double [o]gcp(n); int [o]ovfw(); double [o]fe(n); double [o]ge(n); double lam_min; int kmax=>n; double eta)
+  Signature: (double x(); double [o]fc(n); double [o]fcp(n); double [o]gc(n); double [o]gcp(n); int [o]ovfw(); double [o]fe(n); double [o]ge(n); double lam_min; IV kmax=>n; double eta)
 
 =for ref
 
@@ -108,7 +108,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (double x(); double [o]fc(n); int [o]ovfw(); double [o]fe(n); double lam_min; int kmax=>n; double eta)
+  Signature: (double x(); double [o]fc(n); int [o]ovfw(); double [o]fe(n); double lam_min; IV kmax=>n; double eta)
 
 =for ref
 

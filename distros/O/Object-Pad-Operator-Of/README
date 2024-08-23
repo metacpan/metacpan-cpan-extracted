@@ -1,0 +1,62 @@
+NAME
+
+    Object::Pad::Operator::Of - access fields of other instances
+
+SYNOPSIS
+
+    On Perl v5.38 or later:
+
+       use v5.38;
+       use Object::Pad;
+       use Object::Pad::Operator::Of;
+    
+       class Bucket {
+          field $size :param;
+    
+          use overload '<=>' => method ($other, $) {
+             return $size <=> $size of $other;
+          };
+       }
+
+DESCRIPTION
+
+    This module provides an infix operator for accessing fields of other
+    instances of an Object::Pad class, even if those fields do not have
+    accessor methods. This allows code to be written that can look into the
+    inner workings of other instances of the same class (or subclasses
+    thereof), in order to implement particular behaviours, such as sorting
+    comparisons.
+
+    Support for custom infix operators was added in the Perl 5.37.x
+    development cycle and is available from development release v5.37.7
+    onwards, and therefore in Perl v5.38 onwards. The documentation of
+    XS::Parse::Infix describes the situation in more detail.
+
+OPERATORS
+
+ of
+
+       my $value = $field of $other;
+
+    Yields the current value of the given field of a different instance
+    than $self. The field variable, on the left of the operator, must be
+    lexically visible in the current scope. The expression on the right
+    must yield an instance of the class that defines the field (or some
+    subclass of it); if not an exception is thrown.
+
+TODO
+
+      * Try to find a better operator name, which puts the object instance
+      on the left and the field on the right.
+
+      * Look into whether regular subs can also use of expressions.
+      Currently no fields are visible due to the way that Object::Pad
+      implements methods.
+
+      * Look into whether it might be possible to use of expressions as
+      lvalues, for mutation or assignment.
+
+AUTHOR
+
+    Paul Evans <leonerd@leonerd.org.uk>
+

@@ -1,0 +1,22 @@
+to run the author tests you will need a .json file that describes the
+config as so:
+
+    /path/to/working/business-truelayer > cat business-truelayer-credentials.json
+    {
+        "application_name" : "your_test_application_name",
+        "client_id" : "your_client_id"",
+        "client_secret" : "your_client_secret"",
+        "host" : "truelayer-sandbox.com",
+        "api_host" : "api.truelayer-sandbox.com",
+        "auth_host" : "auth.truelayer-sandbox.com",
+        "kid" : "your_kid"",
+        "private_key" : "/path/to/working/business-truelayer/your-ec512-private-key.pem"
+    }
+
+you will need to update the various values as defined by your sandbox
+setup, and create yourself a private and public key (see TrueLayer's)
+docs for that
+
+having created that you can run:
+
+    TRUELAYER_CREDENTIALS=business-truelayer-credentials.json prove -lr xt/

@@ -15,7 +15,6 @@
 
 use 5.036;
 use lib               qw(../lib);
-use Digest::CRC       qw();
 use List::Util        qw(max);
 use Compression::Util qw(:all);
 
@@ -272,7 +271,7 @@ sub extract ($in_fh, $output_file, $defined_output_file) {
         open $out_fh, '>:raw', $output_file or die "Can't create file <<$output_file>>: $!";
     }
 
-    my $crc32         = Digest::CRC->new(type => "crc32");
+    my $crc32         = 0;
     my $actual_length = 0;
     my $buffer        = '';
     my $search_window = '';
@@ -304,7 +303,7 @@ sub extract ($in_fh, $output_file, $defined_output_file) {
         }
 
         print $out_fh $chunk;
-        $crc32->add($chunk);
+        $crc32 = crc32($chunk, $crc32);
         $actual_length += length($chunk);
         $search_window = substr($search_window, -$window_size) if (length($search_window) > 2 * $window_size);
 
@@ -314,7 +313,7 @@ sub extract ($in_fh, $output_file, $defined_output_file) {
     $buffer = '';    # discard any padding bits
 
     my $stored_crc32 = bits2int_lsb($in_fh, 32, \$buffer);
-    my $actual_crc32 = $crc32->digest;
+    my $actual_crc32 = $crc32;
 
     say STDERR '';
 

@@ -2,19 +2,19 @@ package Compression::Util;
 
 use utf8;
 use 5.036;
-use List::Util qw(uniq max sum);
+use List::Util qw(min uniq max sum all);
 
 require Exporter;
 
 our @ISA = qw(Exporter);
 
-our $VERSION = '0.10';
+our $VERSION = '0.11';
 our $VERBOSE = 0;        # verbose mode
 
-our $LZ_MIN_LEN       = 4;      # minimum match length in LZ parsing
-our $LZ_MAX_LEN       = 258;    # maximum match length in LZ parsing
-our $LZ_MAX_DIST      = ~0;     # maximum allowed back-reference distance in LZ parsing
-our $LZ_MAX_CHAIN_LEN = 32;     # how many recent positions to remember in LZ parsing
+our $LZ_MIN_LEN       = 4;          # minimum match length in LZ parsing
+our $LZ_MAX_LEN       = 1 << 15;    # maximum match length in LZ parsing
+our $LZ_MAX_DIST      = ~0;         # maximum allowed back-reference distance in LZ parsing
+our $LZ_MAX_CHAIN_LEN = 32;         # how many recent positions to remember in LZ parsing
 
 # Arithmetic Coding settings
 use constant BITS         => 32;
@@ -24,6 +24,9 @@ use constant INITIAL_FREQ => 1;
 our %EXPORT_TAGS = (
     'all' => [
         qw(
+
+          crc32
+
           read_bit
           read_bit_lsb
 
@@ -32,6 +35,9 @@ our %EXPORT_TAGS = (
 
           int2bits
           int2bits_lsb
+
+          int2bytes
+          int2bytes_lsb
 
           bits2int
           bits2int_lsb
@@ -59,6 +65,12 @@ our %EXPORT_TAGS = (
           bwt_compress_symbolic
           bwt_decompress_symbolic
 
+          bzip2_compress
+          bzip2_decompress
+
+          gzip_compress
+          gzip_decompress
+
           mrl_compress
           mrl_decompress
 
@@ -83,6 +95,9 @@ our %EXPORT_TAGS = (
 
           encode_alphabet
           decode_alphabet
+
+          encode_alphabet_256
+          decode_alphabet_256
 
           deltas
           accumulate
@@ -197,7 +212,7 @@ sub read_bit_lsb ($fh, $bitstring) {
 
 sub read_bits ($fh, $bits_len) {
 
-    read($fh, (my $data), $bits_len >> 3);
+    read($fh, (my $data), $bits_len >> 3) // die "Read error: $!";
     $data = unpack('B*', $data);
 
     while (length($data) < $bits_len) {
@@ -213,7 +228,7 @@ sub read_bits ($fh, $bits_len) {
 
 sub read_bits_lsb ($fh, $bits_len) {
 
-    read($fh, (my $data), $bits_len >> 3);
+    read($fh, (my $data), $bits_len >> 3) // die "Read error: $!";
     $data = unpack('b*', $data);
 
     while (length($data) < $bits_len) {
@@ -235,13 +250,33 @@ sub int2bits_lsb ($value, $size) {
     scalar reverse sprintf("%0*b", $size, $value);
 }
 
+sub int2bytes ($value, $size) {
+    pack('B*', sprintf("%0*b", 8 * $size, $value));
+}
+
+sub int2bytes_lsb ($value, $size) {
+    pack('b*', scalar reverse sprintf("%0*b", 8 * $size, $value));
+}
+
 sub bytes2int($fh, $n) {
+
+    if (ref($fh) eq '') {
+        open my $fh2, '<:raw', \$fh;
+        return __SUB__->($fh2, $n);
+    }
+
     my $bytes = '';
     $bytes .= getc($fh) for (1 .. $n);
     oct('0b' . unpack('B*', $bytes));
 }
 
 sub bytes2int_lsb ($fh, $n) {
+
+    if (ref($fh) eq '') {
+        open my $fh2, '<:raw', \$fh;
+        return __SUB__->($fh2, $n);
+    }
+
     my $bytes = '';
     $bytes .= getc($fh) for (1 .. $n);
     oct('0b' . reverse unpack('b*', $bytes));
@@ -1359,7 +1394,7 @@ sub delta_decode ($fh) {
 # Alphabet encoding (from Bzip2)
 ################################
 
-sub _encode_alphabet_256 ($alphabet) {
+sub encode_alphabet_256 ($alphabet) {
 
     my %table;
     @table{@$alphabet} = ();
@@ -1367,10 +1402,10 @@ sub _encode_alphabet_256 ($alphabet) {
     my $populated = 0;
     my @marked;
 
-    for (my $i = 0 ; $i <= 255 ; $i += 32) {
+    for (my $i = 0 ; $i <= 255 ; $i += 16) {
 
         my $enc = 0;
-        foreach my $j (0 .. 31) {
+        foreach my $j (0 .. 15) {
             if (exists($table{$i + $j})) {
                 $enc |= 1 << $j;
             }
@@ -1380,36 +1415,39 @@ sub _encode_alphabet_256 ($alphabet) {
 
         if ($enc > 0) {
             $populated |= 1;
-            push @marked, 0xffffffff - $enc;
+            push @marked, $enc;
         }
     }
 
-    my $delta = delta_encode(\@marked);
+    my $bitstring = join('', map { int2bits_lsb($_, 16) } @marked);
 
-    $VERBOSE && say STDERR "Populated : ", sprintf('%08b', $populated);
+    $VERBOSE && say STDERR "Populated : ", sprintf('%016b', $populated);
     $VERBOSE && say STDERR "Marked    : @marked";
-    $VERBOSE && say STDERR "Delta len : ", length($delta);
+    $VERBOSE && say STDERR "Bits len  : ", length($bitstring);
 
     my $encoded = '';
-    $encoded .= chr($populated);
-    $encoded .= $delta;
+    $encoded .= int2bytes($populated, 2);
+    $encoded .= pack('B*', $bitstring);
     return $encoded;
 }
 
-sub _decode_alphabet_256 ($fh) {
+sub decode_alphabet_256 ($fh) {
 
-    my @populated = split(//, sprintf('%08b', ord(getc($fh))));
-    my @marked    = map { 0xffffffff - $_ } @{delta_decode($fh)};
+    if (ref($fh) eq '') {
+        open my $fh2, '<:raw', \$fh;
+        return __SUB__->($fh2);
+    }
 
     my @alphabet;
-    for (my $i = 0 ; $i <= 255 ; $i += 32) {
-        if (shift(@populated)) {
-            my $m = shift(@marked);
-            foreach my $j (0 .. 31) {
-                if ($m & 1) {
-                    push @alphabet, $i + $j;
+    my $l1 = bytes2int($fh, 2);
+
+    for my $i (0 .. 15) {
+        if ($l1 & (0x8000 >> $i)) {
+            my $l2 = bytes2int($fh, 2);
+            for my $j (0 .. 15) {
+                if ($l2 & (0x8000 >> $j)) {
+                    push @alphabet, 16 * $i + $j;
                 }
-                $m >>= 1;
             }
         }
     }
@@ -1419,10 +1457,18 @@ sub _decode_alphabet_256 ($fh) {
 
 sub encode_alphabet ($alphabet) {
 
-    my $max_symbol = max(@$alphabet) // -1;
+    my $max_symbol = $alphabet->[-1] // -1;
 
     if ($max_symbol <= 255) {
-        return (chr(1) . _encode_alphabet_256($alphabet));
+
+        my $delta = delta_encode($alphabet);
+        my $enc   = encode_alphabet_256($alphabet);
+
+        if (length($delta) < length($enc)) {
+            return (chr(0) . $delta);
+        }
+
+        return (chr(1) . $enc);
     }
 
     return (chr(0) . delta_encode($alphabet));
@@ -1436,7 +1482,7 @@ sub decode_alphabet ($fh) {
     }
 
     if (ord(getc($fh) // die "error") == 1) {
-        return _decode_alphabet_256($fh);
+        return decode_alphabet_256($fh);
     }
 
     return delta_decode($fh);
@@ -1610,7 +1656,7 @@ sub mrl_decompress($fh, $entropy_sub = \&decode_huffman_entry) {
 }
 
 ############################################################
-# Bzip2-like compression (BWT + MTF + ZRLE + Huffman coding)
+# BWT-based compression (BWT + MTF + ZRLE + Huffman coding)
 ############################################################
 
 sub bwt_compress ($chunk, $entropy_sub = \&create_huffman_entry) {
@@ -1653,7 +1699,7 @@ sub bwt_decompress ($fh, $entropy_sub = \&decode_huffman_entry) {
 }
 
 ###########################################
-# Bzip2-like compression (symbolic variant)
+# BWT-based compression (symbolic variant)
 ###########################################
 
 sub bwt_compress_symbolic ($symbols, $entropy_sub = \&create_huffman_entry) {
@@ -2586,11 +2632,11 @@ sub lzss_encode_fast($str) {
 # LZ77 encoding, inspired by LZ4
 ################################
 
-sub lz77_encode($chunk, $lzss_encode_sub = \&lzss_encode) {
+sub lz77_encode($chunk, $lzss_encoding_sub = \&lzss_encode) {
 
     local $LZ_MAX_LEN = ~0;    # maximum match length
 
-    my ($literals, $distances, $lengths) = $lzss_encode_sub->($chunk);
+    my ($literals, $distances, $lengths) = $lzss_encoding_sub->($chunk);
 
     my $literals_end = $#{$literals};
     my (@symbols, @len_symbols, @match_symbols, @dist_symbols);
@@ -2879,7 +2925,8 @@ sub lzb_decompress($fh) {
     my $search_window_size = 1 << 16;
 
     my $block_size = fibonacci_decode($fh)->[0] // die "decompression error";
-    read($fh, (my $block), $block_size);
+
+    read($fh, (my $block), $block_size) // die "Read error: $!";
 
     while ($block ne '') {
 
@@ -3066,6 +3113,1052 @@ sub lzw_decompress ($fh, $dec_method = \&abc_decode) {
     lzw_decode($dec_method->($fh));
 }
 
+###################################
+# CRC-32 Pure Perl implementation
+###################################
+
+sub _create_crc32_table {
+    my @table;
+    for my $i (0 .. 255) {
+        my $k = $i;
+        for (0 .. 7) {
+            if ($k & 1) {
+                $k >>= 1;
+                $k ^= 0xedb88320;
+            }
+            else {
+                $k >>= 1;
+            }
+        }
+        push(@table, $k & 0xffffffff);
+    }
+    return \@table;
+}
+
+sub crc32($str, $crc = 0) {
+    state $crc_table = _create_crc32_table();
+    $crc &= 0xffffffff;
+    $crc ^= 0xffffffff;
+    foreach my $c (unpack("C*", $str)) {
+        $crc = (($crc >> 8) ^ $crc_table->[($crc & 0xff) ^ $c]);
+    }
+    return (($crc & 0xffffffff) ^ 0xffffffff);
+}
+
+#############################
+# Bzip2 compression
+#############################
+
+sub _bzip2_encode_code_lengths($dict) {
+    my @lengths;
+
+    foreach my $symbol (0 .. max(keys %$dict) // 0) {
+        if (exists($dict->{$symbol})) {
+            push @lengths, length($dict->{$symbol});
+        }
+        else {
+            die "Incomplete Huffman tree not supported";
+            push @lengths, 0;
+        }
+    }
+
+    my $deltas = deltas(\@lengths);
+
+    $VERBOSE && say STDERR "Code lengths: (@lengths)";
+    $VERBOSE && say STDERR "Code lengths deltas: (@$deltas)";
+
+    my $bitstring = int2bits(shift(@$deltas), 5) . '0';
+
+    foreach my $d (@$deltas) {
+        $bitstring .= (($d > 0) ? ('10' x $d) : ('11' x abs($d))) . '0';
+    }
+
+    $VERBOSE && say STDERR "Deltas bitstring: $bitstring";
+
+    return $bitstring;
+}
+
+sub bzip2_compress($fh) {
+
+    if (ref($fh) eq '') {
+        open my $fh2, '<:raw', \$fh;
+        return __SUB__->($fh2);
+    }
+
+    my $level = 1;
+
+    # There is a CRC32 issue on some (binary) inputs, when using large chunk sizes
+    ## my $CHUNK_SIZE = 100_000 * $level;
+    my $CHUNK_SIZE = 1 << 16;
+
+    my $compressed .= "BZh" . $level;
+
+    state $block_header_bitstring = unpack("B48", "1AY&SY");
+    state $block_footer_bitstring = unpack("B48", "\27rE8P\x90");
+
+    my $bitstring    = '';
+    my $stream_crc32 = 0;
+
+    while (read($fh, (my $chunk), $CHUNK_SIZE)) {
+
+        $bitstring .= $block_header_bitstring;
+
+        # FIXME: there may be a bug in the computation of crc32
+        my $crc32 = crc32(pack('b*', unpack('B*', $chunk)));
+        $VERBOSE && say STDERR "CRC32: $crc32";
+
+        $crc32 = oct('0b' . int2bits_lsb($crc32, 32));
+        $VERBOSE && say STDERR "Bzip2-CRC32: $crc32";
+
+        # FIXME: there may be a bug in the computation of stream_crc32
+        $stream_crc32 = ($crc32 ^ (0xffffffff & (($stream_crc32 << 1) | ($stream_crc32 >> 31))));
+
+        $bitstring .= int2bits($crc32, 32);
+        $bitstring .= '0';                    # not randomized
+
+        my $rle4 = rle4_encode($chunk);
+        my ($bwt, $bwt_idx) = bwt_encode(symbols2string($rle4));
+
+        $bitstring .= int2bits($bwt_idx, 24);
+
+        my ($mtf, $alphabet) = mtf_encode($bwt);
+        $VERBOSE && say STDERR "Alphabet: (@$alphabet)";
+
+        $bitstring .= unpack('B*', encode_alphabet_256($alphabet));
+
+        my @zrle = reverse @{zrle_encode([reverse @$mtf])};
+
+        my $eob = scalar(@$alphabet) + 1;    # end-of-block symbol
+        $VERBOSE && say STDERR "EOB symbol: $eob";
+        push @zrle, $eob;
+
+        my ($dict) = huffman_from_symbols([@zrle, 0 .. $eob - 1]);
+        my $num_sels = int(sprintf('%.0f', 0.5 + (scalar(@zrle) / 50)));    # ceil(|zrle| / 50)
+        $VERBOSE && say STDERR "Number of selectors: $num_sels";
+
+        $bitstring .= int2bits(2,         3);
+        $bitstring .= int2bits($num_sels, 15);
+        $bitstring .= '0' x $num_sels;
+
+        $bitstring .= _bzip2_encode_code_lengths($dict) x 2;
+        $bitstring .= join('', @{$dict}{@zrle});
+
+        $compressed .= pack('B*', substr($bitstring, 0, length($bitstring) - (length($bitstring) % 8), ''));
+    }
+
+    $bitstring  .= $block_footer_bitstring;
+    $bitstring  .= int2bits($stream_crc32, 32);
+    $compressed .= pack('B*', $bitstring);
+
+    return $compressed;
+}
+
+#################################
+# Bzip2 decompression
+#################################
+
+sub bzip2_decompress($fh) {
+
+    if (ref($fh) eq '') {
+        open my $fh2, '<:raw', \$fh;
+        return __SUB__->($fh2);
+    }
+
+    state $MaxHuffmanBits = 20;
+    my $decompressed = '';
+
+    while (!eof($fh)) {
+
+        my $buffer = '';
+
+        (bytes2int($fh, 2) == 0x425a and getc($fh) eq 'h')
+          or die "Not a valid Bzip2 archive";
+
+        my $level = getc($fh);
+
+        if ($level !~ /^[1-9]\z/) {
+            die "Invalid level: $level";
+        }
+
+        $VERBOSE && say STDERR "Compression level: $level";
+
+        my $stream_crc32 = 0;
+
+        while (!eof($fh)) {
+
+            my $block_magic = pack "B48", join('', map { read_bit($fh, \$buffer) } 1 .. 48);
+
+            if ($block_magic eq "1AY&SY") {    # BlockHeader
+                $VERBOSE && say STDERR "Block header detected";
+
+                my $crc32 = bits2int($fh, 32, \$buffer);
+                $VERBOSE && say STDERR "CRC32 = $crc32";
+
+                $stream_crc32 = ($crc32 ^ (0xffffffff & (($stream_crc32 << 1) | ($stream_crc32 >> 31))));
+
+                my $randomized = read_bit($fh, \$buffer);
+                $randomized == 0 or die "randomized not supported";
+
+                my $bwt_idx = bits2int($fh, 24, \$buffer);
+                $VERBOSE && say STDERR "BWT index: $bwt_idx";
+
+                my @alphabet;
+                my $l1 = bits2int($fh, 16, \$buffer);
+                for my $i (0 .. 15) {
+                    if ($l1 & (0x8000 >> $i)) {
+                        my $l2 = bits2int($fh, 16, \$buffer);
+                        for my $j (0 .. 15) {
+                            if ($l2 & (0x8000 >> $j)) {
+                                push @alphabet, 16 * $i + $j;
+                            }
+                        }
+                    }
+                }
+
+                $VERBOSE && say STDERR "MTF alphabet: (@alphabet)";
+
+                my $num_trees = bits2int($fh, 3, \$buffer);
+                $VERBOSE && say STDERR "Number or trees: $num_trees";
+
+                my $num_sels = bits2int($fh, 15, \$buffer);
+                $VERBOSE && say STDERR "Number of selectors: $num_sels";
+
+                my @idxs;
+                for (1 .. $num_sels) {
+                    my $i = 0;
+                    while (read_bit($fh, \$buffer)) {
+                        $i += 1;
+                        ($i < $num_trees) or die "error";
+                    }
+                    push @idxs, $i;
+                }
+
+                my $sels = mtf_decode(\@idxs, [0 .. $num_trees - 1]);
+                $VERBOSE && say STDERR "Selectors: (@$sels)";
+
+                my $num_syms = scalar(@alphabet) + 2;
+
+                my @trees;
+                for (1 .. $num_trees) {
+                    my @clens;
+                    my $clen = bits2int($fh, 5, \$buffer);
+                    for (1 .. $num_syms) {
+                        while (1) {
+
+                            ($clen > 0 and $clen <= $MaxHuffmanBits) or die "invalid code length: $clen";
+
+                            if (not read_bit($fh, \$buffer)) {
+                                last;
+                            }
+
+                            $clen -= read_bit($fh, \$buffer) ? 1 : -1;
+                        }
+
+                        push @clens, $clen;
+                    }
+                    push @trees, \@clens;
+                    $VERBOSE && say STDERR "Code lengths: (@clens)";
+                }
+
+                foreach my $tree (@trees) {
+                    my $maxLen = max(@$tree);
+                    my $sum    = 1 << $maxLen;
+                    for my $clen (@$tree) {
+                        $sum -= (1 << $maxLen) >> $clen;
+                    }
+                    $sum == 0 or die "incomplete tree not supported: (@$tree)";
+                }
+
+                my @huffman_trees = map { (huffman_from_code_lengths($_))[1] } @trees;
+
+                my $eob = @alphabet + 1;
+
+                my @zrle;
+                my $code = '';
+
+                my $sel_idx = 0;
+                my $tree    = $huffman_trees[$sels->[$sel_idx]];
+                my $decoded = 50;
+
+                while (!eof($fh)) {
+                    $code .= read_bit($fh, \$buffer);
+
+                    if (length($code) > $MaxHuffmanBits) {
+                        die "[!] Something went wrong: length of code `$code` is > $MaxHuffmanBits.\n";
+                    }
+
+                    if (exists($tree->{$code})) {
+
+                        my $sym = $tree->{$code};
+
+                        if ($sym == $eob) {    # end of block marker
+                            $VERBOSE && say STDERR "EOB detected: $sym";
+                            last;
+                        }
+
+                        push @zrle, $sym;
+                        $code = '';
+
+                        if (--$decoded <= 0) {
+                            if (++$sel_idx <= $#$sels) {
+                                $tree = $huffman_trees[$sels->[$sel_idx]];
+                            }
+                            else {
+                                die "No more selectors";    # should not happen
+                            }
+                            $decoded = 50;
+                        }
+                    }
+                }
+
+                my @mtf = reverse @{zrle_decode([reverse @zrle])};
+                my $bwt = symbols2string mtf_decode(\@mtf, \@alphabet);
+
+                my $rle4 = string2symbols bwt_decode($bwt, $bwt_idx);
+                my $data = rle4_decode($rle4);
+                my $dec  = symbols2string($data);
+
+                my $new_crc32 = oct('0b' . int2bits_lsb(crc32(pack('b*', unpack('B*', $dec))), 32));
+
+                $VERBOSE && say STDERR "Computed CRC32: $new_crc32";
+
+                if ($crc32 != $new_crc32) {
+                    die "CRC32 error: $crc32 (stored) != $new_crc32 (actual)";
+                }
+
+                $decompressed .= $dec;
+            }
+            elsif ($block_magic eq "\27rE8P\x90") {    # BlockFooter
+                $VERBOSE && say STDERR "Block footer detected";
+                my $stored_stream_crc32 = bits2int($fh, 32, \$buffer);
+                $VERBOSE && say STDERR "Stream CRC: $stored_stream_crc32";
+
+                if ($stored_stream_crc32 != $stream_crc32) {
+                    die "Stream CRC32 error: $stored_stream_crc32 (stored) != $stream_crc32 (actual)";
+                }
+
+                $buffer = '';
+                last;
+            }
+            else {
+                die "Unknown block magic: $block_magic";
+            }
+        }
+
+        $VERBOSE && say STDERR "End of container";
+    }
+
+    return $decompressed;
+}
+
+########################################
+# GZIP compressor
+########################################
+
+sub _code_length_encoding ($dict) {
+
+    my @lengths;
+
+    foreach my $symbol (0 .. max(keys %$dict) // 0) {
+        if (exists($dict->{$symbol})) {
+            push @lengths, length($dict->{$symbol});
+        }
+        else {
+            push @lengths, 0;
+        }
+    }
+
+    my $size        = scalar(@lengths);
+    my $rl          = run_length(\@lengths);
+    my $offset_bits = '';
+
+    my @CL_symbols;
+
+    foreach my $pair (@$rl) {
+        my ($v, $run) = @$pair;
+
+        while ($v == 0 and $run >= 3) {
+
+            if ($run >= 11) {
+                push @CL_symbols, 18;
+                $run -= 11;
+                $offset_bits .= int2bits_lsb(min($run, 127), 7);
+                $run -= 127;
+            }
+
+            if ($run >= 3 and $run < 11) {
+                push @CL_symbols, 17;
+                $run -= 3;
+                $offset_bits .= int2bits_lsb(min($run, 7), 3);
+                $run -= 7;
+            }
+        }
+
+        if ($v == 0) {
+            push(@CL_symbols, (0) x $run) if ($run > 0);
+            next;
+        }
+
+        push @CL_symbols, $v;
+        $run -= 1;
+
+        while ($run >= 3) {
+            push @CL_symbols, 16;
+            $run -= 3;
+            $offset_bits .= int2bits_lsb(min($run, 3), 2);
+            $run -= 3;
+        }
+
+        push(@CL_symbols, ($v) x $run) if ($run > 0);
+    }
+
+    return (\@CL_symbols, $size, $offset_bits);
+}
+
+sub _cl_encoded_bitstring ($cl_dict, $cl_symbols, $offset_bits) {
+
+    my $bitstring = '';
+    foreach my $cl_symbol (@$cl_symbols) {
+        $bitstring .= $cl_dict->{$cl_symbol};
+        if ($cl_symbol == 16) {
+            $bitstring .= substr($offset_bits, 0, 2, '');
+        }
+        elsif ($cl_symbol == 17) {
+            $bitstring .= substr($offset_bits, 0, 3, '');
+        }
+        elsif ($cl_symbol == 18) {
+            $bitstring .= substr($offset_bits, 0, 7, '');
+        }
+    }
+
+    return $bitstring;
+}
+
+sub _create_cl_dictionary (@cl_symbols) {
+
+    my @keys;
+    my $freq = frequencies(\@cl_symbols);
+
+    while (1) {
+        my ($cl_dict) = huffman_from_freq($freq);
+
+        # The CL codes must have at most 7 bits
+        return $cl_dict if all { length($_) <= 7 } values %$cl_dict;
+
+        if (scalar(@keys) == 0) {
+            @keys = sort { $freq->{$b} <=> $freq->{$a} } keys %$freq;
+        }
+
+        # Scale down the frequencies and try again
+        foreach my $k (@keys) {
+            if ($freq->{$k} > 1) {
+                $freq->{$k} >>= 1;
+            }
+            else {
+                last;
+            }
+        }
+    }
+}
+
+sub _create_block_type_2 ($literals, $distances, $lengths) {
+
+    state $deflate_tables = [make_deflate_tables()];
+    my ($DISTANCE_SYMBOLS, $LENGTH_SYMBOLS, $LENGTH_INDICES) = @$deflate_tables;
+
+    my @CL_order = (16, 17, 18, 0, 8, 7, 9, 6, 10, 5, 11, 4, 12, 3, 13, 2, 14, 1, 15);
+
+    my $bitstring = '01';
+
+    my @len_symbols;
+    my @dist_symbols;
+    my $offset_bits = '';
+
+    foreach my $k (0 .. $#$literals) {
+
+        if ($lengths->[$k] == 0) {
+            push @len_symbols, $literals->[$k];
+            next;
+        }
+
+        my $len  = $lengths->[$k];
+        my $dist = $distances->[$k];
+
+        {
+            my $len_idx = $LENGTH_INDICES->[$len];
+            my ($min, $bits) = @{$LENGTH_SYMBOLS->[$len_idx]};
+
+            push @len_symbols, [$len_idx + 256 - 1, $bits];
+            $offset_bits .= int2bits_lsb($len - $min, $bits) if ($bits > 0);
+        }
+
+        {
+            my $dist_idx = find_deflate_index($dist, $DISTANCE_SYMBOLS);
+            my ($min, $bits) = @{$DISTANCE_SYMBOLS->[$dist_idx]};
+
+            push @dist_symbols, [$dist_idx - 1, $bits];
+            $offset_bits .= int2bits_lsb($dist - $min, $bits) if ($bits > 0);
+        }
+    }
+
+    push @len_symbols, 256;    # end-of-block marker
+
+    my ($dict)      = huffman_from_symbols([map { ref($_) eq 'ARRAY' ? $_->[0] : $_ } @len_symbols]);
+    my ($dist_dict) = huffman_from_symbols([map { $_->[0] } @dist_symbols]);
+
+    my ($LL_code_lengths,       $LL_cl_len,       $LL_offset_bits)       = _code_length_encoding($dict);
+    my ($distance_code_lengths, $distance_cl_len, $distance_offset_bits) = _code_length_encoding($dist_dict);
+
+    my $cl_dict = _create_cl_dictionary(@$LL_code_lengths, @$distance_code_lengths);
+
+    my @CL_code_lenghts;
+    foreach my $symbol (0 .. 18) {
+        if (exists($cl_dict->{$symbol})) {
+            push @CL_code_lenghts, length($cl_dict->{$symbol});
+        }
+        else {
+            push @CL_code_lenghts, 0;
+        }
+    }
+
+    # Put the CL codes in the required order
+    @CL_code_lenghts = @CL_code_lenghts[@CL_order];
+
+    while (scalar(@CL_code_lenghts) > 4 and $CL_code_lenghts[-1] == 0) {
+        pop @CL_code_lenghts;
+    }
+
+    my $CL_code_lengths_bitstring = join('', map { int2bits_lsb($_, 3) } @CL_code_lenghts);
+
+    my $LL_code_lengths_bitstring       = _cl_encoded_bitstring($cl_dict, $LL_code_lengths,       $LL_offset_bits);
+    my $distance_code_lengths_bitstring = _cl_encoded_bitstring($cl_dict, $distance_code_lengths, $distance_offset_bits);
+
+    # (5 bits) HLIT = (number of LL code entries present) - 257
+    my $HLIT = $LL_cl_len - 257;
+
+    # (5 bits) HDIST = (number of distance code entries present) - 1
+    my $HDIST = $distance_cl_len - 1;
+
+    # (4 bits) HCLEN = (number of CL code entries present) - 4
+    my $HCLEN = scalar(@CL_code_lenghts) - 4;
+
+    $bitstring .= int2bits_lsb($HLIT,  5);
+    $bitstring .= int2bits_lsb($HDIST, 5);
+    $bitstring .= int2bits_lsb($HCLEN, 4);
+
+    $bitstring .= $CL_code_lengths_bitstring;
+    $bitstring .= $LL_code_lengths_bitstring;
+    $bitstring .= $distance_code_lengths_bitstring;
+
+    foreach my $symbol (@len_symbols) {
+        if (ref($symbol) eq 'ARRAY') {
+
+            my ($len, $len_offset) = @$symbol;
+            $bitstring .= $dict->{$len};
+            $bitstring .= substr($offset_bits, 0, $len_offset, '') if ($len_offset > 0);
+
+            my ($dist, $dist_offset) = @{shift(@dist_symbols)};
+            $bitstring .= $dist_dict->{$dist};
+            $bitstring .= substr($offset_bits, 0, $dist_offset, '') if ($dist_offset > 0);
+        }
+        else {
+            $bitstring .= $dict->{$symbol};
+        }
+    }
+
+    return $bitstring;
+}
+
+sub _create_block_type_1 ($literals, $distances, $lengths) {
+
+    state $deflate_tables = [make_deflate_tables()];
+    my ($DISTANCE_SYMBOLS, $LENGTH_SYMBOLS, $LENGTH_INDICES) = @$deflate_tables;
+
+    state $dict;
+    state $dist_dict;
+
+    if (!defined($dict)) {
+
+        my @code_lengths = (0) x 288;
+        foreach my $i (0 .. 143) {
+            $code_lengths[$i] = 8;
+        }
+        foreach my $i (144 .. 255) {
+            $code_lengths[$i] = 9;
+        }
+        foreach my $i (256 .. 279) {
+            $code_lengths[$i] = 7;
+        }
+        foreach my $i (280 .. 287) {
+            $code_lengths[$i] = 8;
+        }
+
+        ($dict)      = huffman_from_code_lengths(\@code_lengths);
+        ($dist_dict) = huffman_from_code_lengths([(5) x 32]);
+    }
+
+    my $bitstring = '10';
+
+    foreach my $k (0 .. $#$literals) {
+
+        if ($lengths->[$k] == 0) {
+            $bitstring .= $dict->{$literals->[$k]};
+            next;
+        }
+
+        my $len  = $lengths->[$k];
+        my $dist = $distances->[$k];
+
+        {
+            my $len_idx = $LENGTH_INDICES->[$len];
+            my ($min, $bits) = @{$LENGTH_SYMBOLS->[$len_idx]};
+
+            $bitstring .= $dict->{$len_idx + 256 - 1};
+            $bitstring .= int2bits_lsb($len - $min, $bits) if ($bits > 0);
+        }
+
+        {
+            my $dist_idx = find_deflate_index($dist, $DISTANCE_SYMBOLS);
+            my ($min, $bits) = @{$DISTANCE_SYMBOLS->[$dist_idx]};
+
+            $bitstring .= $dist_dict->{$dist_idx - 1};
+            $bitstring .= int2bits_lsb($dist - $min, $bits) if ($bits > 0);
+        }
+    }
+
+    $bitstring .= $dict->{256};    # end-of-block symbol
+
+    return $bitstring;
+}
+
+sub _create_block_type_0($chunk) {
+
+    my $chunk_len = length($chunk);
+    my $len       = int2bits_lsb($chunk_len,             16);
+    my $nlen      = int2bits_lsb((~$chunk_len) & 0xffff, 16);
+
+    $len . $nlen;
+}
+
+sub gzip_compress ($in_fh, $lzss_encoding_sub = \&lzss_encode) {
+
+    if (ref($in_fh) eq '') {
+        open my $fh2, '<:raw', \$in_fh;
+        return __SUB__->($fh2);
+    }
+
+    my $compressed = '';
+
+    open my $out_fh, '>:raw', \$compressed;
+
+    local $Compression::Util::LZ_MIN_LEN       = 4;                # minimum match length in LZ parsing
+    local $Compression::Util::LZ_MAX_LEN       = 258;              # maximum match length in LZ parsing
+    local $Compression::Util::LZ_MAX_DIST      = (1 << 15) - 1;    # maximum allowed back-reference distance in LZ parsing
+    local $Compression::Util::LZ_MAX_CHAIN_LEN = 64;               # how many recent positions to remember in LZ parsing
+
+    state $MAGIC  = pack('C*', 0x1f, 0x8b);                        # magic MIME type
+    state $CM     = chr(0x08);                                     # 0x08 = DEFLATE
+    state $FLAGS  = chr(0x00);                                     # flags
+    state $MTIME  = pack('C*', (0x00) x 4);                        # modification time
+    state $XFLAGS = chr(0x00);                                     # extra flags
+    state $OS     = chr(0x03);                                     # 0x03 = Unix
+
+    print $out_fh $MAGIC, $CM, $FLAGS, $MTIME, $XFLAGS, $OS;
+
+    my $total_length = 0;
+    my $crc32        = 0;
+
+    my $bitstring = '';
+
+    if (eof($in_fh)) {                                             # empty file
+        $bitstring = '1' . '10' . '0000000';
+    }
+
+    state $CHUNK_SIZE = (1 << 15) - 1;
+
+    while (read($in_fh, (my $chunk), $CHUNK_SIZE)) {
+
+        $crc32 = crc32($chunk, $crc32);
+        $total_length += length($chunk);
+
+        my ($literals, $distances, $lengths) = $lzss_encoding_sub->($chunk);
+
+        $bitstring .= eof($in_fh) ? '1' : '0';
+
+        my $bt1_bitstring = _create_block_type_1($literals, $distances, $lengths);
+
+        # When block type 1 is larger than the input, then we have random uncompressible data: use block type 0
+        if ((length($bt1_bitstring) >> 3) > length($chunk) + 5) {
+
+            $VERBOSE && say STDERR ":: Using block type: 0";
+
+            $bitstring .= '00';
+
+            print $out_fh pack('b*', $bitstring);                     # pads to a byte
+            print $out_fh pack('b*', _create_block_type_0($chunk));
+            print $out_fh $chunk;
+
+            $bitstring = '';
+            next;
+        }
+
+        my $bt2_bitstring = _create_block_type_2($literals, $distances, $lengths);
+
+        # When block type 2 is larger than block type 1, then we may have very small data
+        if (length($bt2_bitstring) > length($bt1_bitstring)) {
+            $VERBOSE && say STDERR ":: Using block type: 1";
+            $bitstring .= $bt1_bitstring;
+        }
+        else {
+            $VERBOSE && say STDERR ":: Using block type: 2";
+            $bitstring .= $bt2_bitstring;
+        }
+
+        print $out_fh pack('b*', substr($bitstring, 0, length($bitstring) - (length($bitstring) % 8), ''));
+    }
+
+    if ($bitstring ne '') {
+        print $out_fh pack('b*', $bitstring);
+    }
+
+    print $out_fh pack('b*', int2bits_lsb($crc32,        32));
+    print $out_fh pack('b*', int2bits_lsb($total_length, 32));
+
+    return $compressed;
+}
+
+###################
+# GZIP DECOMPRESSOR
+###################
+
+sub _extract_block_type_0 ($in_fh, $buffer) {
+
+    my $len           = bits2int_lsb($in_fh, 16, $buffer);
+    my $nlen          = bits2int_lsb($in_fh, 16, $buffer);
+    my $expected_nlen = (~$len) & 0xffff;
+
+    if ($expected_nlen != $nlen) {
+        die "[!] The ~length value is not correct: $nlen (actual) != $expected_nlen (expected)\n";
+    }
+    else {
+        $VERBOSE && print STDERR ":: Chunk length: $len\n";
+    }
+
+    read($in_fh, (my $chunk), $len) // die "Read error: $!";
+    return $chunk;
+}
+
+sub _deflate_decode_huffman($in_fh, $buffer, $rev_dict, $dist_rev_dict, $search_window) {
+
+    state $deflate_tables = [make_deflate_tables()];
+    my ($DISTANCE_SYMBOLS, $LENGTH_SYMBOLS, $LENGTH_INDICES) = @$deflate_tables;
+
+    my $data = '';
+    my $code = '';
+
+    my $max_ll_code_len   = max(map { length($_) } keys %$rev_dict);
+    my $max_dist_code_len = max(map { length($_) } keys %$dist_rev_dict);
+
+    while (1) {
+        $code .= read_bit_lsb($in_fh, $buffer);
+
+        if (length($code) > $max_ll_code_len) {
+            die "[!] Something went wrong: length of LL code `$code` is > $max_ll_code_len.\n";
+        }
+
+        if (exists($rev_dict->{$code})) {
+
+            my $symbol = $rev_dict->{$code};
+
+            if ($symbol <= 255) {
+                $data           .= chr($symbol);
+                $$search_window .= chr($symbol);
+            }
+            elsif ($symbol == 256) {    # end-of-block marker
+                $code = '';
+                last;
+            }
+            else {                      # LZSS decoding
+                my ($length, $LL_bits) = @{$LENGTH_SYMBOLS->[$symbol - 256 + 1]};
+                $length += bits2int_lsb($in_fh, $LL_bits, $buffer) if ($LL_bits > 0);
+
+                my $dist_code = '';
+
+                while (1) {
+                    $dist_code .= read_bit_lsb($in_fh, $buffer);
+
+                    if (length($dist_code) > $max_dist_code_len) {
+                        die "[!] Something went wrong: length of distance code `$dist_code` is > $max_dist_code_len.\n";
+                    }
+
+                    if (exists($dist_rev_dict->{$dist_code})) {
+                        last;
+                    }
+                }
+
+                my ($dist, $dist_bits) = @{$DISTANCE_SYMBOLS->[$dist_rev_dict->{$dist_code} + 1]};
+                $dist += bits2int_lsb($in_fh, $dist_bits, $buffer) if ($dist_bits > 0);
+
+                if ($dist == 1) {
+                    $$search_window .= substr($$search_window, -1) x $length;
+                }
+                elsif ($dist >= $length) {    # non-overlapping matches
+                    $$search_window .= substr($$search_window, length($$search_window) - $dist, $length);
+                }
+                else {                        # overlapping matches
+                    foreach my $i (1 .. $length) {
+                        $$search_window .= substr($$search_window, length($$search_window) - $dist, 1);
+                    }
+                }
+
+                $data .= substr($$search_window, -$length);
+            }
+
+            $code = '';
+        }
+    }
+
+    if ($code ne '') {
+        die "[!] Something went wrong: code `$code` is not empty!\n";
+    }
+
+    return $data;
+}
+
+sub _extract_block_type_1 ($in_fh, $buffer, $search_window) {
+
+    state $rev_dict;
+    state $dist_rev_dict;
+
+    if (!defined($rev_dict)) {
+
+        my @code_lengths = (0) x 288;
+        foreach my $i (0 .. 143) {
+            $code_lengths[$i] = 8;
+        }
+        foreach my $i (144 .. 255) {
+            $code_lengths[$i] = 9;
+        }
+        foreach my $i (256 .. 279) {
+            $code_lengths[$i] = 7;
+        }
+        foreach my $i (280 .. 287) {
+            $code_lengths[$i] = 8;
+        }
+
+        (undef, $rev_dict)      = huffman_from_code_lengths(\@code_lengths);
+        (undef, $dist_rev_dict) = huffman_from_code_lengths([(5) x 32]);
+    }
+
+    _deflate_decode_huffman($in_fh, $buffer, $rev_dict, $dist_rev_dict, $search_window);
+}
+
+sub _decode_CL_lengths($in_fh, $buffer, $CL_rev_dict, $size) {
+
+    my @lengths;
+    my $code = '';
+
+    while (1) {
+        $code .= read_bit_lsb($in_fh, $buffer);
+
+        if (length($code) > 7) {
+            die "[!] Something went wrong: length of CL code `$code` is > 7.\n";
+        }
+
+        if (exists($CL_rev_dict->{$code})) {
+            my $CL_symbol = $CL_rev_dict->{$code};
+
+            if ($CL_symbol <= 15) {
+                push @lengths, $CL_symbol;
+            }
+            elsif ($CL_symbol == 16) {
+                push @lengths, ($lengths[-1]) x (3 + bits2int_lsb($in_fh, 2, $buffer));
+            }
+            elsif ($CL_symbol == 17) {
+                push @lengths, (0) x (3 + bits2int_lsb($in_fh, 3, $buffer));
+            }
+            elsif ($CL_symbol == 18) {
+                push @lengths, (0) x (11 + bits2int_lsb($in_fh, 7, $buffer));
+            }
+            else {
+                die "Unknown CL symbol: $CL_symbol\n";
+            }
+
+            $code = '';
+            last if (scalar(@lengths) >= $size);
+        }
+    }
+
+    if (scalar(@lengths) != $size) {
+        die "Something went wrong: size $size (expected) != ", scalar(@lengths);
+    }
+
+    if ($code ne '') {
+        die "Something went wrong: code `$code` is not empty!";
+    }
+
+    return @lengths;
+}
+
+sub _extract_block_type_2 ($in_fh, $buffer, $search_window) {
+
+    # (5 bits) HLIT = (number of LL code entries present) - 257
+    my $HLIT = bits2int_lsb($in_fh, 5, $buffer) + 257;
+
+    # (5 bits) HDIST = (number of distance code entries present) - 1
+    my $HDIST = bits2int_lsb($in_fh, 5, $buffer) + 1;
+
+    # (4 bits) HCLEN = (number of CL code entries present) - 4
+    my $HCLEN = bits2int_lsb($in_fh, 4, $buffer) + 4;
+
+    $VERBOSE && say STDERR ":: Number of LL codes: $HLIT";
+    $VERBOSE && say STDERR ":: Number of dist codes: $HDIST";
+    $VERBOSE && say STDERR ":: Number of CL codes: $HCLEN";
+
+    my @CL_code_lenghts = (0) x 19;
+    my @CL_order        = (16, 17, 18, 0, 8, 7, 9, 6, 10, 5, 11, 4, 12, 3, 13, 2, 14, 1, 15);
+
+    foreach my $i (0 .. $HCLEN - 1) {
+        $CL_code_lenghts[$CL_order[$i]] = bits2int_lsb($in_fh, 3, $buffer);
+    }
+
+    $VERBOSE && say STDERR ":: CL code lengths: @CL_code_lenghts";
+
+    my (undef, $CL_rev_dict) = huffman_from_code_lengths(\@CL_code_lenghts);
+
+    my @LL_CL_lengths   = _decode_CL_lengths($in_fh, $buffer, $CL_rev_dict, $HLIT);
+    my @dist_CL_lengths = _decode_CL_lengths($in_fh, $buffer, $CL_rev_dict, $HDIST);
+
+    my (undef, $LL_rev_dict)   = huffman_from_code_lengths(\@LL_CL_lengths);
+    my (undef, $dist_rev_dict) = huffman_from_code_lengths(\@dist_CL_lengths);
+
+    _deflate_decode_huffman($in_fh, $buffer, $LL_rev_dict, $dist_rev_dict, $search_window);
+}
+
+sub gzip_decompress ($in_fh) {
+
+    if (ref($in_fh) eq '') {
+        open my $fh2, '<:raw', \$in_fh;
+        return __SUB__->($fh2);
+    }
+
+    my $decompressed = '';
+
+    open my $out_fh, '>:raw', \$decompressed;
+
+    local $Compression::Util::LZ_MIN_LEN       = 4;                # minimum match length in LZ parsing
+    local $Compression::Util::LZ_MAX_LEN       = 258;              # maximum match length in LZ parsing
+    local $Compression::Util::LZ_MAX_DIST      = (1 << 15) - 1;    # maximum allowed back-reference distance in LZ parsing
+    local $Compression::Util::LZ_MAX_CHAIN_LEN = 64;               # how many recent positions to remember in LZ parsing
+
+    my $MAGIC = (getc($in_fh) // die "error") . (getc($in_fh) // die "error");
+
+    if ($MAGIC ne pack('C*', 0x1f, 0x8b)) {
+        die "Not a valid Gzip container!\n";
+    }
+
+    my $CM     = getc($in_fh) // die "error";                             # 0x08 = DEFLATE
+    my $FLAGS  = getc($in_fh) // die "error";                             # flags
+    my $MTIME  = join('', map { getc($in_fh) // die "error" } 1 .. 4);    # modification time
+    my $XFLAGS = getc($in_fh) // die "error";                             # extra flags
+    my $OS     = getc($in_fh) // die "error";                             # 0x03 = Unix
+
+    if ($CM ne chr(0x08)) {
+        die "Only DEFLATE compression method is supported (0x08)! Got: 0x", sprintf('%02x', ord($CM));
+    }
+
+    # TODO: add support for more attributes
+    my $has_filename = 0;
+    my $has_comment  = 0;
+
+    if ((ord($FLAGS) & 0b0000_1000) != 0) {
+        $has_filename = 1;
+    }
+
+    if ((ord($FLAGS) & 0b0001_0000) != 0) {
+        $has_comment = 1;
+    }
+
+    if ($has_filename) {
+        my $filename = read_null_terminated($in_fh);    # filename
+        $VERBOSE && say STDERR ":: Filename: ", $filename;
+    }
+
+    if ($has_comment) {
+        $VERBOSE && say STDERR ":: Comment: ", read_null_terminated($in_fh);
+    }
+
+    my $crc32         = 0;
+    my $actual_length = 0;
+    my $buffer        = '';
+    my $search_window = '';
+    my $window_size   = $Compression::Util::LZ_MAX_DIST;
+
+    while (1) {
+
+        my $is_last    = read_bit_lsb($in_fh, \$buffer);
+        my $block_type = bits2int_lsb($in_fh, 2, \$buffer);
+
+        my $chunk = '';
+
+        if ($block_type == 0) {
+            $VERBOSE && say STDERR "\n:: Extracting block of type 0";
+            $buffer = '';                                        # pad to a byte
+            $chunk  = _extract_block_type_0($in_fh, \$buffer);
+            $search_window .= $chunk;
+        }
+        elsif ($block_type == 1) {
+            $VERBOSE && say STDERR "\n:: Extracting block of type 1";
+            $chunk = _extract_block_type_1($in_fh, \$buffer, \$search_window);
+        }
+        elsif ($block_type == 2) {
+            $VERBOSE && say STDERR "\n:: Extracting block of type 2";
+            $chunk = _extract_block_type_2($in_fh, \$buffer, \$search_window);
+        }
+        else {
+            die "[!] Unknown block of type: $block_type";
+        }
+
+        print $out_fh $chunk;
+        $crc32 = crc32($chunk, $crc32);
+        $actual_length += length($chunk);
+        $search_window = substr($search_window, -$window_size) if (length($search_window) > 2 * $window_size);
+
+        last if $is_last;
+    }
+
+    $buffer = '';    # discard any padding bits
+
+    my $stored_crc32 = bits2int_lsb($in_fh, 32, \$buffer);
+    my $actual_crc32 = $crc32;
+
+    if ($stored_crc32 != $actual_crc32) {
+        die "[!] The CRC32 does not match: $actual_crc32 (actual) != $stored_crc32 (stored)\n";
+    }
+    else {
+        $VERBOSE && print STDERR ":: CRC32 value: $actual_crc32\n";
+    }
+
+    my $stored_length = bits2int_lsb($in_fh, 32, \$buffer);
+
+    if ($stored_length != $actual_length) {
+        die "[!] The length does not match: $actual_length (actual) != $stored_length (stored)\n";
+    }
+    else {
+        $VERBOSE && print STDERR ":: Total length: $actual_length\n";
+    }
+
+    if (eof($in_fh)) {
+        $VERBOSE && print STDERR "\n:: Reached the end of the file.\n";
+    }
+    else {
+        $VERBOSE && print STDERR "\n:: There is something else in the container! Trying to recurse!\n\n";
+        return ($decompressed . __SUB__->($in_fh));
+    }
+
+    return $decompressed;
+}
+
 1;
 
 __END__
@@ -3114,9 +4207,11 @@ B<Compression::Util> is a function-based module, implementing various techniques
     * Fibonacci coding
     * Elias gamma/omega coding
     * Delta coding
-    * Bzip2-like compression
+    * BWT-based compression
     * LZ77/LZSS compression
     * LZW compression
+    * Bzip2 (de)compression
+    * Gzip (de)compression
 
 The provided techniques can be easily combined in various ways to create powerful compressors, such as the Bzip2 compressor, which is a pipeline of the following methods:
 
@@ -3126,7 +4221,7 @@ The provided techniques can be easily combined in various ways to create powerfu
     4. Zero run-length encoding (ZRLE)
     5. Huffman coding
 
-This functionality is provided by the function C<bwt_compress()>, which can be explicitly implemented as:
+A simple BWT-based compression method (similar to Bzip2) is provided by the function C<bwt_compress()>, which can be explicitly implemented as:
 
     use 5.036;
     use Compression::Util qw(:all);
@@ -3183,7 +4278,7 @@ B<Compression::Util> provides the following package variables:
     $Compression::Util::VERBOSE = 0;           # true to enable verbose/debug mode
 
     $Compression::Util::LZ_MIN_LEN = 4;        # minimum match length in LZ parsing
-    $Compression::Util::LZ_MAX_LEN = 258;      # maximum match length in LZ parsing
+    $Compression::Util::LZ_MAX_LEN = 1 << 15;  # maximum match length in LZ parsing
 
     $Compression::Util::LZ_MAX_DIST = ~0;      # maximum back-reference distance allowed
     $Compression::Util::LZ_MAX_CHAIN_LEN = 32; # how many recent positions to remember for each match in LZ parsing
@@ -3209,7 +4304,7 @@ B<NOTE:> for C<lzss_encode_fast()> is recommended to set C<$LZ_MIN_LEN = 5>, whi
 
 Maximum length of a match in LZ parsing. The value must be an integer greater than or equal to C<0>.
 
-By default, C<$LZ_MAX_LEN> is set to C<258>.
+By default, C<$LZ_MAX_LEN> is set to C<32768>.
 
 B<NOTE:> the functions C<lz77_encode()> and C<lzb_compress()> will ignore this value and will always use unlimited match lengths.
 
@@ -3246,11 +4341,17 @@ B<NOTE:> the function C<lzss_encode_fast()> will ignore this value, always using
       mrl_compress_symbolic(\@symbols)     # Symbolic MRL compression (MTF+ZRLE+RLE4+Huffman coding)
       mrl_decompress_symbolic($fh)         # Inverse of the above method
 
-      bwt_compress($string)                # Bzip2-like compression (RLE4+BWT+MTF+ZRLE+Huffman coding)
+      bwt_compress($string)                # BWT-based compression (RLE4+BWT+MTF+ZRLE+Huffman coding)
       bwt_decompress($fh)                  # Inverse of the above method
 
-      bwt_compress_symbolic(\@symbols)     # Bzip2-like compression (RLE4+sBWT+MTF+ZRLE+Huffman coding)
+      bwt_compress_symbolic(\@symbols)     # Symbolic BWT-based compression (RLE4+sBWT+MTF+ZRLE+Huffman coding)
       bwt_decompress_symbolic($fh)         # Inverse of the above method
+
+      bzip2_compress($string)              # Compress a given string using the Bzip2 format
+      bzip2_decompress($fh)                # Inverse of the above method
+
+      gzip_compress($string)               # Compress a given string using the Gzip format
+      gzip_decompress($fh)                 # Inverse of the above method
 
       lzss_compress($string)               # LZSS + DEFLATE-like encoding of lengths and distances
       lzss_decompress($fh)                 # Inverse of the above method
@@ -3275,28 +4376,28 @@ B<NOTE:> the function C<lzss_encode_fast()> will ignore this value, always using
       deltas(\@ints)                       # Computes the differences between integers
       accumulate(\@deltas)                 # Inverse of the above method
 
-      delta_encode(\@ints)                 # Delta+RLE encoding of an array of integers
+      delta_encode(\@ints)                 # Delta+RLE encoding of an array-ref of integers
       delta_decode($fh)                    # Inverse of the above method
 
-      fibonacci_encode(\@symbols)          # Fibonacci coding of an array of symbols
+      fibonacci_encode(\@symbols)          # Fibonacci coding of an array-ref of symbols
       fibonacci_decode($fh)                # Inverse of the above method
 
-      elias_gamma_encode(\@symbols)        # Elias Gamma coding method of an array of symbols
+      elias_gamma_encode(\@symbols)        # Elias Gamma coding method of an array-ref of symbols
       elias_gamma_decode($fh)              # Inverse of the above method
 
-      elias_omega_encode(\@symbols)        # Elias Omega coding method of an array of symbols
+      elias_omega_encode(\@symbols)        # Elias Omega coding method of an array-ref of symbols
       elias_omega_decode($fh)              # Inverse of the above method
 
-      abc_encode(\@symbols)                # Adaptive Binary Concatenation method of an array of symbols
+      abc_encode(\@symbols)                # Adaptive Binary Concatenation method of an array-ref of symbols
       abc_decode($fh)                      # Inverse of the above method
 
-      obh_encode(\@symbols)                # Offset bits + Huffman coding of an array of symbols
+      obh_encode(\@symbols)                # Offset bits + Huffman coding of an array-ref of symbols
       obh_decode($fh)                      # Inverse of the above method
 
       bwt_encode($string)                  # Burrows-Wheeler transform
       bwt_decode($bwt, $idx)               # Inverse of Burrows-Wheeler transform
 
-      bwt_encode_symbolic(\@symbols)       # Burrows-Wheeler transform over an array of symbols
+      bwt_encode_symbolic(\@symbols)       # Burrows-Wheeler transform over an array-ref of symbols
       bwt_decode_symbolic(\@bwt, $idx)     # Inverse of symbolic Burrows-Wheeler transform
 
       mtf_encode(\@symbols)                # Move-to-front transform
@@ -3305,8 +4406,11 @@ B<NOTE:> the function C<lzss_encode_fast()> will ignore this value, always using
       encode_alphabet(\@alphabet)          # Encode an alphabet of symbols into a binary string
       decode_alphabet($fh)                 # Inverse of the above method
 
+      encode_alphabet_256(\@alphabet)      # Encode an alphabet of symbols (limited to [0..255]) into a binary string
+      decode_alphabet_256($fh)             # Inverse of the above method
+
       frequencies(\@symbols)               # Returns a dictionary with symbol frequencies
-      run_length(\@symbols, $max=undef)    # Run-length encoding, returning a 2D array
+      run_length(\@symbols, $max=undef)    # Run-length encoding, returning a 2D array-ref
 
       rle4_encode(\@symbols, $max=255)     # Run-length encoding with 4 or more consecutive characters
       rle4_decode(\@rle4)                  # Inverse of the above method
@@ -3314,16 +4418,18 @@ B<NOTE:> the function C<lzss_encode_fast()> will ignore this value, always using
       zrle_encode(\@symbols)               # Run-length encoding of zeros
       zrle_decode(\@zrle)                  # Inverse of the above method
 
-      ac_encode(\@symbols)                 # Arithmetic Coding applied on an array of symbols
+      ac_encode(\@symbols)                 # Arithmetic Coding applied on an array-ref of symbols
       ac_decode($bitstring, \%freq)        # Inverse of the above method
 
-      adaptive_ac_encode(\@symbols)               # Adaptive Arithmetic Coding applied on an array of symbols
+      adaptive_ac_encode(\@symbols)               # Adaptive Arithmetic Coding applied on an array-ref of symbols
       adaptive_ac_decode($bitstring, \@alphabet)  # Inverse of the above method
 
       lzw_encode($string)                  # LZW encoding of a given string
       lzw_decode(\@symbols)                # Inverse of the above method
 
 =head1 LOW-LEVEL FUNCTIONS
+
+      crc32($string, $prev_crc = 0)        # Compute the CRC32 value of a given string
 
       read_bit($fh, \$buffer)              # Read one bit from file-handle (MSB)
       read_bit_lsb($fh, \$buffer)          # Read one bit from file-handle (LSB)
@@ -3340,8 +4446,11 @@ B<NOTE:> the function C<lzss_encode_fast()> will ignore this value, always using
       bytes2int($fh, $n)                   # Read `$n` bytes from file-handle as an integer (MSB)
       bytes2int_lsb($fh, $n)               # Read `$n` bytes from file-handle as an integer (LSB)
 
+      int2bytes($symbol, $size)            # Convert an integer into `$size` bytes. (MSB)
+      int2bytes_lsb($symbol, $size)        # Convert an integer into `$size` bytes. (LSB)
+
       string2symbols($string)              # Returns an array-ref of code points
-      symbols2string(\@symbols)            # Returns a string, given an array of code points
+      symbols2string(\@symbols)            # Returns a string, given an array-ref of code points
 
       read_null_terminated($fh)            # Read a binary string that ends with NULL ("\0")
 
@@ -3349,23 +4458,34 @@ B<NOTE:> the function C<lzss_encode_fast()> will ignore this value, always using
       binary_vrl_decode($bitstring)        # Binary variable run-length decoding
 
       bwt_sort($string)                    # Burrows-Wheeler sorting
-      bwt_sort_symbolic(\@symbols)         # Burrows-Wheeler sorting, applied on an array of symbols
+      bwt_sort_symbolic(\@symbols)         # Burrows-Wheeler sorting, applied on an array-ref of symbols
 
       huffman_encode(\@symbols, \%dict)    # Huffman encoding
       huffman_decode($bitstring, \%dict)   # Huffman decoding, given a string of bits
 
-      huffman_from_freq(\%freq)            # Create Huffman dictionaries, given an hash of frequencies
-      huffman_from_symbols(\@symbols)      # Create Huffman dictionaries, given an array of symbols
-      huffman_from_code_lengths(\@lens)    # Create canonical Huffman codes, given an array of code lengths
+      huffman_from_freq(\%freq)            # Create Huffman dictionaries, given an hash-ref of frequencies
+      huffman_from_symbols(\@symbols)      # Create Huffman dictionaries, given an array-ref of symbols
+      huffman_from_code_lengths(\@lens)    # Create canonical Huffman codes, given an array-ref of code lengths
 
       make_deflate_tables($max_dist, $max_len) # Returns the DEFLATE tables for distance and length symbols
       find_deflate_index($value, \@table)      # Returns the index in a DEFLATE table, given a numerical value
 
-      lzss_encode($string)                     # LZSS encoding of a string into literals, distances and lengths
-      lzss_encode_fast($string)                # Fast-LZSS encoding of a string into literals, distances and lengths
-      lzss_decode(\@lits, \@idxs, \@lens)      # Inverse of the above two methods
+      lzss_encode($string)                     # LZSS encoding into literals, distances and lengths
+      lzss_encode_symbolic(\@symbols)          # LZSS encoding into literals, distances and lengths (symbolic)
 
-      deflate_encode(\@lits, \@idxs, \@lens)   # DEFLATE-like encoding of values returned by lzss_encode()
+      lzss_encode_fast($string)                # Fast-LZSS encoding into literals, distances and lengths
+      lzss_encode_fast_symbolic(\@symbols)     # Fast-LZSS encoding into literals, distances and lengths (symbolic)
+
+      lzss_decode(\@lits, \@dist, \@lens)          # Inverse of lzss_encode() and lzss_encode_fast()
+      lzss_decode_symbolic(\@lits, \@dist, \@lens) # Inverse of lzss_encode_symbolic() and lzss_encode_fast_symbolic()
+
+      lz77_encode($string)                         # LZ77 encoding into literals, distances, lengths and matches
+      lz77_encode_symbolic(\@symbols)              # LZ77 encoding into literals, distances, lengths and matches (symbolic)
+
+      lz77_decode(\@lits, \@dist, \@lens, \@matches)           # Inverse of lz77_encode()
+      lz77_decode_symbolic(\@lits, \@dist, \@lens, \@matches)  # Inverse of lz77_encode_symbolic()
+
+      deflate_encode(\@lits, \@dist, \@lens)   # DEFLATE-like encoding of values returned by lzss_encode()
       deflate_decode($fh)                      # Inverse of the above method
 
 =head1 INTERFACE FOR HIGH-LEVEL FUNCTIONS
@@ -3445,7 +4565,7 @@ The function accepts either a string or an array-ref of symbols as the first arg
     my $symbols = lz77_decompress_symbolic($fh);
     my $symbols = lz77_decompress_symbolic($string);
 
-Inverse of C<lz77_compress()> and C<lz77_compress_symbolic>, respectively.
+Inverse of C<lz77_compress()> and C<lz77_compress_symbolic()>, respectively.
 
 =head2 lzss_compress / lzss_compress_symbolic
 
@@ -3480,7 +4600,7 @@ The function accepts either a string or an array-ref of symbols as the first arg
     my $symbols = lzss_decompress_symbolic($fh);
     my $symbols = lzss_decompress_symbolic($string);
 
-Inverse of C<lzss_compress()> and C<lzss_compress_symbolic>, respectively.
+Inverse of C<lzss_compress()> and C<lzss_compress_symbolic()>, respectively.
 
 =head2 lzb_compress
 
@@ -3520,7 +4640,7 @@ Performs Lempel-Ziv-Welch (LZW) decompression on the provided string or file-han
     # Using Arithmetic Coding
     my $string = bwt_compress($data, \&create_ac_entry);
 
-High-level function that performs Bzip2-like compression on the provided data, using the pipeline:
+High-level function that performs BWT-based compression on the provided data, using the pipeline:
 
     1. rle4_encode
     2. bwt_encode
@@ -3561,6 +4681,35 @@ Similar to C<bwt_compress()>, except that it accepts an arbitrary array-ref of n
     my $symbols = bwt_decompress_symbolic($string, \&decode_ac_entry);
 
 Inverse of C<bwt_compress_symbolic()>.
+
+=head2 bzip2_compress
+
+    my $string = bzip2_compress($data);
+    my $string = bzip2_compress($fh);
+
+Valid Bzip2 compressor, given a string or an input file-handle.
+
+=head2 bzip2_decompress
+
+    my $data = bzip2_decompress($string);
+    my $data = bzip2_decompress($fh);
+
+Valid Bzip2 decompressor, given a string or an input file-handle.
+
+=head2 gzip_compress
+
+    my $string = gzip_compress($fh);
+    my $string = gzip_compress($data);
+    my $string = gzip_compress($data, \&lzss_encode_fast);  # using fast LZ-parsing
+
+Valid Gzip compressor, given a string or an input file-handle.
+
+=head2 gzip_decompress
+
+    my $data = gzip_decompress($string);
+    my $data = gzip_decompress($fh);
+
+Valid Bzip2 decompressor, given a string or an input file-handle.
 
 =head2 mrl_compress / mrl_compress_symbolic
 
@@ -3624,6 +4773,8 @@ Inverse of C<deltas()>.
 Encodes a sequence of integers (including negative integers) using Delta + Run-length + Elias omega coding, returning a binary string.
 
 Delta encoding calculates the difference between consecutive integers in the sequence and encodes these differences using Elias omega coding. When it's beneficial, runs of identical symbols are collapsed with RLE.
+
+This method supports both positive and negative integers.
 
 =head2 delta_decode
 
@@ -3769,16 +4920,20 @@ Optionally, the alphabet can be provided as a second argument. When two argument
 
 Inverse of C<mtf_encode()>.
 
-=head2 encode_alphabet
+=head2 encode_alphabet / encode_alphabet_256
 
-    my $string = encode_alphabet(\@alphabet);
+    my $string = encode_alphabet(\@alphabet);        # supports arbitrarily large symbols
+    my $string = encode_alphabet_256(\@alphabet);    # limited to symbols [0..255]
 
-Encodes an alphabet of symbols into a binary string.
+Encode a sorted alphabet of symbols into a binary string.
 
-=head2 decode_alphabet
+=head2 decode_alphabet / decode_alphabet_256
 
     my $alphabet = decode_alphabet($fh);
     my $alphabet = decode_alphabet($string);
+
+    my $alphabet = decode_alphabet_256($fh);
+    my $alphabet = decode_alphabet_256($string);
 
 Decodes an encoded alphabet, given a file-handle or a binary string, returning an array-ref of symbols. Inverse of C<encode_alphabet()>.
 
@@ -3894,6 +5049,13 @@ The function returns the decoded string.
 
 =head1 INTERFACE FOR LOW-LEVEL FUNCTIONS
 
+=head2 crc32
+
+    my $int32 = crc32($data);
+    my $int32 = crc32($data, $prev_crc32);
+
+Compute the CRC32 of a given string.
+
 =head2 read_bit
 
     my $bit = read_bit($fh, \$buffer);
@@ -3934,33 +5096,47 @@ Convert a non-negative integer to a bitstring of width C<$size>, in MSB order.
 
 Convert a non-negative integer to a bitstring of width C<$size>, in LSB order.
 
+=head2 int2bytes
+
+    my $string = int2bytes($symbol, $size);
+
+Convert a non-negative integer to a byte-string of width C<$size>, in MSB order.
+
+=head2 int2bytes_lsb
+
+    my $string = int2bytes_lsb($symbol, $size);
+
+Convert a non-negative integer to a byte-string of width C<$size>, in LSB order.
+
 =head2 bits2int
 
-    my $integer = bits2int($fh, $size, \$buffer)
+    my $integer = bits2int($fh, $size, \$buffer);
 
-Read C<$size> bits from file-handle C<$fh> and convert them to an integer, in MSB order. Inverse of C<int2bits()>.
+Read C<$size> bits from a file-handle C<$fh> and convert them to an integer, in MSB order. Inverse of C<int2bits()>.
 
 The function stores the extra bits inside the C<$buffer>, reading one character at a time from the file-handle.
 
 =head2 bits2int_lsb
 
-    my $integer = bits2int_lsb($fh, $size, \$buffer)
+    my $integer = bits2int_lsb($fh, $size, \$buffer);
 
-Read C<$size> bits from file-handle C<$fh> and convert them to an integer, in LSB order. Inverse of C<int2bits_lsb()>.
+Read C<$size> bits from a file-handle C<$fh> and convert them to an integer, in LSB order. Inverse of C<int2bits_lsb()>.
 
 The function stores the extra bits inside the C<$buffer>, reading one character at a time from the file-handle.
 
 =head2 bytes2int
 
     my $integer = bytes2int($fh, $n);
+    my $integer = bytes2int($str, $n);
 
-Read C<$n> bytes from file-handle C<$fh> and convert them to an integer, in MSB order.
+Read C<$n> bytes from a file-handle C<$fh> or from a string C<$str> and convert them to an integer, in MSB order.
 
 =head2 bytes2int_lsb
 
     my $integer = bytes2int_lsb($fh, $n);
+    my $integer = bytes2int_lsb($str, $n);
 
-Read C<$n> bytes from file-handle C<$fh> and convert them to an integer, in LSB order.
+Read C<$n> bytes from a file-handle C<$fh> or from a string C<$str> and convert them to an integer, in LSB order.
 
 =head2 string2symbols
 
@@ -4093,7 +5269,7 @@ The output can be decoded with C<lz77_decode()> and C<lz77_decode_symbolic()>, r
     my $string  = lz77_decode(\@literals, \@distances, \@lengths, \@matches);
     my $symbols = lz77_decode_symbolic(\@literals, \@distances, \@lengths, \@matches);
 
-Low-level function that performs decoding using the provided literals, lengths, matches and distances of matched sub-strings.
+Low-level function that performs decoding using the provided literals, distances, lengths and matches, returned by LZ77 encoding.
 
 Inverse of C<lz77_encode()> and C<lz77_encode_symbolic()>, respectively.
 
@@ -4115,7 +5291,7 @@ The function returns three values:
     $distances  # array-ref of back-reference distances
     $lengths    # array-ref of match lengths
 
-The output can be decoded with C<lzss_decode()> and C<lzss_decode_symbolic>, respectively.
+The output can be decoded with C<lzss_decode()> and C<lzss_decode_symbolic()>, respectively.
 
 =head2 lzss_decode / lzss_decode_symbolic
 
@@ -4232,9 +5408,18 @@ The functions can be combined in various ways, easily creating novel compression
         lz77_decode($literals, $distances, $lengths, $matches);
     };
 
-=head1 SEE ALSO
+=head1 REFERENCES
 
 =over 4
+
+=item * DEFLATE Compressed Data Format Specification
+        L<https://datatracker.ietf.org/doc/html/rfc1951>
+
+=item * GZIP file format specification
+        L<https://datatracker.ietf.org/doc/html/rfc1952>
+
+=item * BZIP2 Format Specification, by Joe Tsai:
+        L<https://github.com/dsnet/compress/blob/master/doc/bzip2-format.pdf>
 
 =item * Data Compression (Summer 2023) - Lecture 4 - The Unix 'compress' Program:
         L<https://youtube.com/watch?v=1cJL9Va80Pk>
@@ -4265,9 +5450,6 @@ The functions can be combined in various ways, easily creating novel compression
 
 =item * Basic arithmetic coder in C++:
         L<https://github.com/billbird/arith32>
-
-=item * My blog post on "Lossless Data Compression":
-        L<https://trizenx.blogspot.com/2023/09/lossless-data-compression.html>
 
 =back
 

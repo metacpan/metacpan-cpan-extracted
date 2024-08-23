@@ -1,0 +1,13 @@
+Build.PL
+Changes
+hax/newOP_CUSTOM.c.inc
+lib/Object/Pad/Operator/Of.pm
+lib/Object/Pad/Operator/Of.xs
+MANIFEST			This list of files
+t/00use.t
+t/01of.t
+t/99pod.t
+README
+LICENSE
+META.yml
+META.json

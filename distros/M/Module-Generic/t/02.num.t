@@ -79,6 +79,7 @@ else
     $grouping = CORE::length( $lconv->{grouping} // '' )
         ? [unpack( "C*", $lconv->{grouping} )]->[0]
         : [unpack( "C*", $lconv->{mon_grouping} )]->[0];
+    $grouping //= 0;
     $n = Module::Generic::Number->new( 10, precision => 2, debug => $DEBUG );
 }
 $sep_space = int( $lconv->{p_sep_by_space} // 0 ) > 0 ? qr/[[:blank:]\h]+/ : '';

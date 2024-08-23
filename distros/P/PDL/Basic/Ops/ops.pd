@@ -6,7 +6,9 @@ require PDL::Core::Dev;
 my $A = [ppdefs_all];
 my $C = [ppdefs_complex];
 my $F = [map $_->ppsym, grep $_->real && !$_->integer, types];
+$F = [(grep $_ ne 'D', @$F), 'D']; # so defaults to D if non-float given
 my $AF = [map $_->ppsym, grep !$_->integer, types];
+$AF = [(grep $_ ne 'D', @$AF), 'D']; # so defaults to D if non-float given
 my $T = [map $_->ppsym, grep $_->integer, types];
 my $U = [map $_->ppsym, grep $_->unsigned, types];
 my $S = [map $_->ppsym, grep $_->real && !$_->unsigned, types];
@@ -528,31 +530,29 @@ Algorithm from L<Wikipedia|http://en.wikipedia.org/wiki/Exponentiation_by_squari
 =cut
 
 },
-   Pars => 'a(); indx b(); [o] ans()',
+   Pars => 'a(); longlong b(); [o] ans()',
    GenericTypes => $AF,
    Code => pp_line_numbers(__LINE__, q{
-PDL_Indx n = $b();
+$GENERIC(b) n = $b();
+if (n == 0) {
+  $ans() = 1;
+  continue;
+}
 $GENERIC() y = 1;
 $GENERIC() x = $a();
 if (n < 0) {
-   x = 1 / x;
-   n = -n;
+  x = 1 / x;
+  n = -n;
 }
-if (n == 0) {
-   $ans() = 1;
-} else {
-    while (n > 1) {
-       if (n % 2 == 0) {
-          x = x * x;
-          n = n / 2;
-       } else {
-          y = x * y;
-          x = x * x;
-          n = (n - 1) / 2;
-       }
-   }
-   $ans() = x * y;
+while (n > 1) {
+  if (n % 2) {
+    y *= x;
+    n -= 1;
+  }
+  x *= x;
+  n /= 2;
 }
+$ans() = x * y;
 })
 );
 
@@ -570,18 +570,19 @@ sub PDL::abs { $_[0]->type->real ? goto &PDL::_rabs : goto &PDL::_cabs }
 EOPM
 pp_addpm(make_overload(qw(abs abs), 0, 0, 1));
 
-pp_addpm(<<'EOPM');
-
-=head2 abs2
-
-=for ref
-
-Returns the square of the absolute value of a number.
-
-=cut
-
-sub PDL::abs2 ($) { my $r = &PDL::abs; $r * $r }
-EOPM
+pp_def('abs2',
+  GenericTypes=>$A,
+  HandleBad => 1,
+  Pars => 'a(); real [o]b()',
+  Doc => 'Returns the square of the absolute value of a number.',
+  Code => <<'EOF',
+PDL_IF_BAD(if ($ISBAD(a())) { $SETBAD(b()); continue; },)
+$b() = PDL_IF_GENTYPE_REAL(
+  $a()*$a(),
+  creall($a())*creall($a()) + cimagl($a())*cimagl($a())
+);
+EOF
+);
 
 pp_def('r2C',
   GenericTypes=>[qw(G C F D)], # last one is default so here = D
@@ -627,7 +628,8 @@ sub warn_non_numeric_op_wrapper {
   }
 }
 
-{ package PDL;
+{ package # hide from MetaCPAN
+    PDL;
   use overload %OVERLOADS,
     "eq"    => PDL::Ops::warn_non_numeric_op_wrapper(\&PDL::eq, 'eq'),
     ".="    => sub {

@@ -22,7 +22,7 @@ use DynaLoader;
 
 
 
-#line 19 "bad.pd"
+#line 20 "bad.pd"
 
 =head1 NAME
 
@@ -73,7 +73,7 @@ Set to 1 as of PDL 2.035 as always available.
 
 
 
-#line 62 "bad.pd"
+#line 63 "bad.pd"
 
 $PDL::Bad::Status = 1;
 $PDL::Bad::UseNaN = 0;
@@ -87,7 +87,7 @@ use PDL::Primitive;
 ############################################################
 ############################################################
 
-#line 78 "bad.pd"
+#line 79 "bad.pd"
 ############################################################
 ############################################################
 
@@ -431,7 +431,7 @@ flag set.
 
 
 
-#line 511 "bad.pd"
+#line 512 "bad.pd"
 
 *nbad = \&PDL::nbad;
 sub PDL::nbad {
@@ -440,7 +440,7 @@ sub PDL::nbad {
 	return $tmp;
 }
 
-#line 511 "bad.pd"
+#line 512 "bad.pd"
 *ngood = \&PDL::ngood;
 sub PDL::ngood {
 	my($x) = @_; my $tmp;
@@ -448,7 +448,7 @@ sub PDL::ngood {
 	return $tmp;
 }
 
-#line 523 "bad.pd"
+#line 524 "bad.pd"
 
 =head2 nbad
 
@@ -912,7 +912,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 1064 "bad.pd"
+#line 1065 "bad.pd"
 
 =head1 AUTHOR
 

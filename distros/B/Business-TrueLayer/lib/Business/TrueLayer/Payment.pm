@@ -22,8 +22,10 @@ extends 'Business::TrueLayer::Request';
 use Moose::Util::TypeConstraints;
 no warnings qw/ experimental::signatures experimental::postderef /;
 
+with 'Business::TrueLayer::Types::User';
 use Business::TrueLayer::Payment::Method;
-use Business::TrueLayer::User;
+
+use namespace::autoclean;
 
 =head1 ATTRIBUTES
 
@@ -82,20 +84,6 @@ coerce 'Business::TrueLayer::Payment::Method'
 has payment_method => (
     is       => 'ro',
     isa      => 'Business::TrueLayer::Payment::Method',
-    coerce   => 1,
-    required => 1,
-);
-
-coerce 'Business::TrueLayer::User'
-    => from 'HashRef'
-    => via {
-        Business::TrueLayer::User->new( %{ $_ } );
-    }
-;
-
-has user => (
-    is       => 'ro',
-    isa      => 'Business::TrueLayer::User',
     coerce   => 1,
     required => 1,
 );

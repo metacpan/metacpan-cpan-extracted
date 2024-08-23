@@ -31,7 +31,7 @@ my @exports_normal   = (@EXPORT,
       empty dup dupN inflateN
       badflag
       convert inplace zeroes zeros ones nan inf i list listindices unpdl
-      set at flows broadcast_define over reshape dog cat barf type
+      set at broadcast_define over reshape dog cat barf type
       thread_define dummy mslice approx flat sclr squeeze
       get_autopthread_targ set_autopthread_targ get_autopthread_actual
       get_autopthread_dim get_autopthread_size set_autopthread_size) );
@@ -55,13 +55,14 @@ $PDL::doubleformat = "%10.8g";
 $PDL::indxformat   = "%12d";   # Default print format for PDL_Indx values
 $PDL::undefval     = 0;        # Value to use instead of undef when creating PDLs
 $PDL::toolongtoprint = 10000;  # maximum pdl size to stringify for printing
+$PDL::infoformat = "%C: %T %D";
 
 ################ Exportable functions of the Core ######################
 
 *at_c = *at_bad_c; # back-compat alias
 *thread_define = *broadcast_define;
 
-our @pdl_ones; # optimisation to provide a "one" of the right type to avoid converttype
+our @pdl_ones :shared; # optimisation to provide a "one" of the right type to avoid converttype
 for my $t (PDL::Types::types()) {
   my $conv = $t->convertfunc;
   no strict 'refs';
@@ -69,13 +70,13 @@ for my $t (PDL::Types::types()) {
     return $t unless @_;
     alltopdl('PDL', (@_>1 ? [@_] : shift), $t);
   };
-  $pdl_ones[$t->enum] = pdl($t, 1);
+  $pdl_ones[$t->enum] = $Config{useithreads} ? 1 : pdl($t, 1);
 }
 
 BEGIN {
 for (qw(
   inflateN badflag dup dupN howbig unpdl nelem inplace dims
-  list broadcastids listindices null set at flows sclr shape
+  list broadcastids listindices null set at sclr shape
   broadcast_define convert over dog cat mslice
   type approx dummy isempty string
 )) {
@@ -246,6 +247,16 @@ respectively.  The default default values are:
   $PDL::floatformat  = "%7g";
   $PDL::doubleformat = "%10.8g";
   $PDL::indxformat   = "%12d";
+
+=back
+
+=head3 C<$PDL::infoformat>
+
+=over 4
+
+The default format for C<info>.  The default value is:
+
+  $PDL::infoformat = "%C: %T %D";
 
 =back
 
@@ -747,7 +758,8 @@ sub topdl {PDL->topdl(@_)}
 
 ####################### Overloaded operators #######################
 
-{ package PDL;
+{ package # hide from MetaCPAN
+    PDL;
   use Carp;
   use overload
     '""' => \&PDL::Core::string,
@@ -799,69 +811,31 @@ sub piddle {PDL->pdl(@_)}
 sub pdl {PDL->pdl(@_)}
 sub PDL::pdl { shift->new(@_) }
 
-=head2 doflow
+=head2 flowing
 
 =for ref
 
-Turn on dataflow, forward only. This means any transformations (a.k.a. PDL
-operations) applied to this ndarray afterwards will have forward dataflow:
+Turn on dataflow, forward only, only for the next operation (cf
+L</inplace>), returning the ndarray argument.
+This means the next transformation (a.k.a. PDL
+operation) applied to this ndarray will have forward dataflow:
 
   $x = sequence 3;
-  $x->doflow;
-  $y = $x + 1;
-  $x += 3;
+  $y = $x->flowing + 1; # could instead do $x->flowing; $y = $x + 1
+  $x += 3; # this does not flow, but that would be an infinite loop anyway
   print "$y\n"; # [4 5 6]
 
-As of 2.064, the core API does I<not> automatically sever transformations
-that have forward dataflow into them:
-
-  # following from the above
-  $y->set(1, 9); # value now [4 9 6]
-  $x += 11;
-  print "$y\n"; # [15 16 17] - previously would have been [4 9 6]
-
-If you want to sever such transformations, call L</sever> on the child
-ndarray (above, C<$y>).
+This replaced C<doflow> as of 2.090. See L<PDL::Dataflow> for more.
 
 =for usage
 
- $x->doflow;  doflow($x);
-
-=cut
-
-sub PDL::doflow {
-	my $this = shift;
-	$this->set_dataflow_f(1);
-}
-
-=head2 flows
-
-=for ref
-
-Whether or not an ndarray is indulging in dataflow
-
-=for usage
-
- something if $x->flows; $hmm = flows($x);
-
-=cut
-
-sub PDL::flows {
- 	my $this = shift;
-         return ($this->fflows || $this->bflows);
-}
+ $x->flowing; flowing($x);
 
 =head2 fflows
 
 =for ref
 
 Returns whether the ndarray's C<PDL_DATAFLOW_F> flag is set.
-
-=head2 bflows
-
-=for ref
-
-Returns whether the ndarray's C<PDL_DATAFLOW_B> flag is set.
 
 =head2 new
 
@@ -2012,15 +1986,6 @@ my %info = (
 			       $state;
 			     },
 		 },
-	    F => {
-		  Name => 'Flow',
-		  Sub => sub { my $flows = '';
-			       $flows = ($_[0]->bflows ? 'b':'') .
-				 '~' . ($_[0]->fflows ? 'f':'')
-				   if ($_[0]->flows);
-			       $flows;
-			     },
-		 },
 	    M => {
 		  Name => 'Mem',
 		  Sub => sub { my ($size,$unit) = ($_[0]->allocated ?
@@ -2162,11 +2127,13 @@ Calculated memory consumption of this ndarray's data area
 
 =back
 
+The default format is C<"%C: %T %D">.
+This can be modified by assigning to C<$PDL::infoformat>.
 =cut
 
 sub PDL::info {
     my ($this,$str) = @_;
-    $str = "%C: %T %D" unless defined $str;
+    $str = $PDL::infoformat unless defined $str;
     return ref($this)."->null" if $this->isnull;
     my @hash = split /(%[-,0-9]*[.]?[0-9]*\w)/, $str;
     my @args = ();
@@ -2301,7 +2268,7 @@ sub pdumphash {
       ins => [map sprintf('0x%x', $_->address), @ins],
       outs => [map sprintf('0x%x', $_->address), @outs],
     };
-    pdumphash($_, $sofar) for @ins, @outs;
+    for my $r (@ins, @outs) { pdumphash($r, $sofar) if !$sofar->{sprintf '0x%x', $r->address}; }
   } else {
     my @ins = grep defined, $obj->trans_parent;
     my @outs = $obj->trans_children;
@@ -2321,7 +2288,7 @@ sub pdumphash {
       ins => [map sprintf('0x%x', $_->address), @ins],
       outs => [map sprintf('0x%x', $_->address), @outs],
     };
-    pdumphash($_, $sofar) for @ins, @outs;
+    for my $r (@ins, @outs) { pdumphash($r, $sofar) if !$sofar->{sprintf '0x%x', $r->address}; }
   }
   $sofar;
 }
@@ -2531,13 +2498,6 @@ sub alltopdl {
     return $_[1] if blessed($_[1]); # Fall through
     return $_[0]->new($_[1]);
 }
-
-=head2 tracedebug
-
-=for ref
-
-Sets whether an ndarray will have debugging info printed during use if a
-(Boolean) value is given. Returns the new value.
 
 =head2 donttouch
 

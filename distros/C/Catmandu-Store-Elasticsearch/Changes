@@ -1,5 +1,11 @@
 Revision history for Catmandu-Store-ElasticSearch
 
+1.0204  2024-08-22 17:33:40 CEST
+  - force reindex
+
+1.0203  2024-08-22 13:57:00 CEST
+  - fix cql match all query
+
 1.0202  2020-03-12 16:31:02 CET
   - only add type for es 1x-2.x in reader methods
 

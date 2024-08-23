@@ -1,3 +1,36 @@
+2.090 2024-08-23
+- remove PDL_DATAFLOW_B entirely as meaningless (#485)
+- now an error to output to ndarray with inward but no backward dataflow (#485)
+- now slices etc with dataflow turn off backward dataflow if any input has inward-only dataflow (#485)
+- add GSL::RNG::ran_shuffle_1d
+- add IO::Pic support for XBM
+- fix typemaps for future Perl versions (#487) - thanks @HaraldJoerg
+- $PDL::infoformat now default for info method (#491) - thanks @jo-37
+- move PDL::Graphics::LUT to PGPLOT distro
+- add GSL::RNG bindings for most _pdf functions
+- add demo of GSL::RNG
+- fix MatrixOps::eigens for asymmetric case inc complex eigenvectors
+- fix GSL problem on Windows (#493) - thanks @shawnlaffan for report
+- wfits fixed to handle multi HISTORY (#488, #489) - thanks @d-lamb for report
+
+2.089_02 2024-06-26
+- PDL::VectorValued::vcos into Primitive - thanks @moocow-the-bovine
+- remove PDL_TRACEDEBUG functionality
+- fix non-Perl created ndarray getting destroyed after Perl visibility (#484)
+- fix ones-optimisation problem in useithreads Perls which broke PDL::Parallel::threads
+- add Ufunc::magnover (https://github.com/nrdvana/perl-Math-3Space/pull/8)
+- Ops::abs2 now PP op that doesn't first calculate sqrt for complex
+- replace doflow,set_dataflow_f with one-shot-each-time flowing (#485)
+
+2.089_01 2024-06-05
+- add demo of GSL::CDF
+- floating-point-only operations in Ops, Primitive, Bad now default to double, not cldouble
+- fix treating a large Perl UV as an IV so getting sign wrong (#469)
+- remove obsolete $PP()
+- pptest.t now uses build dir to avoid noexec mount problems
+- on pdl_destroy, the sv member IV is set to 0 not a random number - thanks @fantasma13 for report
+- rename Primitive::srand to srandom to avoid clash with Perl (#472)
+
 2.089 2024-05-12
 - fix numerical misbehaviour in histogram etc on i686 (#474) - thanks @sebastic for report
 - add ANYVAL_FROM_SV parameter to control "undefval" warning
@@ -28,6 +61,7 @@
 2.086 2024-03-31
 - fix 64-bit problem in Minuit revealed by LTO (#468) - thanks @eli-schwartz for report
 - add pdl.ntrans_children to speed up destroying ndarrays (#421,#451)
+- PDL PGPLOT support has been moved to the PGPLOT CPAN distribution
 
 2.085_02 2024-03-25
 - PP add loop(n=value) idiom to start not at 0

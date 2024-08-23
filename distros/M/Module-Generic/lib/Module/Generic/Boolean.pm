@@ -53,7 +53,7 @@ sub as_scalar
     return( Module::Generic::Scalar->new( ${$_[0]} ) );
 }
 
-sub defined { return( 1 ); }
+sub defined { return(1); }
 
 sub true  () { $true  }
 sub false () { $false }

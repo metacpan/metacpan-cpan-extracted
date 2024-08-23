@@ -202,22 +202,17 @@ ok((stretcher(pdl([2,3],[3,4]))->flat == pdl(2,0,0,3,3,0,0,4))->all, "stretcher 
 }
 
 {
-### Check eigens
+### Check eigens with symmetric
 my $pa = pdl([3,4],[4,-3]);
 ### Check that eigens runs OK
 my ($vec,$val);
 lives_ok { ($vec,$val) = eigens $pa } "eigens runs OK";
-### Check that it really returns eigenvectors
-my $c = float(($pa x $vec) / $vec);
-#print "c is $c\n";
-ok(all($c->slice(":,0") == $c->slice(":,1")),"eigens really returns eigenvectors");
-### Check that the eigenvalues are correct for this matrix
-ok((float($val->slice("0")) == - float($val->slice("1")) and
-	float($val->slice("0") * $val->slice("1")) == float(-25)),"eigenvalues are correct");
+ok tapprox($vec, pdl('[0.8944 -0.4472; 0.4472 0.8944]'), 1e-4), 'vec ok';
+ok tapprox($val, pdl('[5 -5]'), 1e-4), 'val ok';
 }
 
 {
-### Check computations on larger matrix with known eigenvalue sum.
+### Check computations on larger symmetric matrix with known eigenvalue sum.
 my $m = pdl(
    [ 1.638,  2.153,  1.482,  1.695, -0.557, -2.443,  -0.71,  1.983],
    [ 2.153,  3.596,  2.461,  2.436, -0.591, -3.711, -0.493,  2.434],
@@ -232,23 +227,22 @@ my $esum=0;
 my ($vec,$val);
 eval {
     ($vec,$val) = eigens($m);
-    $esum=sprintf "%.3f", sum($val); #signature of eigenvalues
+    $esum = sum($val); #signature of eigenvalues
 };
-#print STDERR "eigensum for the 8x8: $esum\n";
-ok($esum == 61.308,"eigens sum for 8x8 correct answer");
+ok tapprox($esum, 61.308, 1e-3),"eigens sum for 8x8 correct answer";
 }
 
 {
 my $esum=0;
 lives_ok {
-    $esum = sprintf "%.3f", sum scalar eigens_sym($m);
+    $esum = sum scalar eigens_sym($m);
 } "eigens_sym for 8x8 ran OK";
-is($esum, 61.308, 'eigens_sym sum for 8x8 correct answer');
+ok tapprox($esum, 61.308, 1e-3),"eigens_sym sum for 8x8 correct answer";
+}
 }
 
 {
-if(0){ #fails because of bad eigenvectors
-#Check an assymmetric matrix:
+#Check an asymmetric matrix:
 my $pa = pdl ([4,-1], [2,1]);
 my $esum;
 my ($vec,$val);
@@ -258,18 +252,28 @@ lives_ok {
 };
 ok($esum == 5);
 }
+
+{
+#The below matrix has complex eigenvalues
+my ($rvec, $val) = eigens(pdl([1,1],[-1,1]));
+ok all(approx $rvec, pdl('[0.707i -0.707i; 0.707 0.707]'), 1e-3);
+ok all(approx $val, pdl('[1-i 1+i]'), 1e-3);
 }
 
+throws_ok { eigens(pdl '243 -54 0; 126 72 10; 144 -72 135') } qr/hqr2 function/;
+
+{
+#asymmetric case with complex eigenvectors
+my ($rvec, $val) = eigens(my $A = pdl '1 0 0 0; 0 1 0 0; 0 0 0 -1; 0 0 1 0');
+ok all(approx $val, pdl('-i i 1 1'), 1e-3) or diag $val;
+for my $i (0..3) {
+  my ($vals, $vecs) = ($val->slice($i), $rvec->slice($i));
+  ok all(approx $vals * $vecs, $A x $vecs, 1e-3)
+    or diag "index=$i vals=$vals vecs=$vecs";
+}
 }
 
 {
-
-if(0){ #eigens for asymmetric matrices disbled
-#The below matrix has complex eigenvalues
-my $should_be_nan = eval { sum(scalar eigens(pdl([1,1],[-1,1]))) };
-ok( ! ($should_be_nan == $should_be_nan)); #only NaN is not equal to itself
-}
-
 #check singular value decomposition for MxN matrices (M=#rows, N=#columns):
 
 my $svd_in = pdl([3,1,2,-1],[-1,3,0,2],[-2,3,0,0],[1,3,-1,2]);

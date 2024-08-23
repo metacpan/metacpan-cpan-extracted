@@ -30,11 +30,11 @@ my $self = {
   'libs' => '',
   'deps' => [],
 };
-my @deps = @{ $self->{deps} };
-my @typemaps = @{ $self->{typemaps} };
-my $libs = $self->{libs};
-my $inc = $self->{inc};
-my $CORE = undef;
+our @deps = @{ $self->{deps} };
+our @typemaps = @{ $self->{typemaps} };
+our $libs = $self->{libs};
+our $inc = $self->{inc};
+our $CORE = undef;
 foreach (@INC) {
   if ( -f "$_/PDL/Install/Files.pm") { $CORE = $_ . "/PDL/Install/"; last; }
 }
@@ -42,13 +42,11 @@ foreach (@INC) {
 sub deps { }
 # support: use Inline with => 'PDL';
 
-require Inline;
-
 sub Inline {
   my ($class, $lang) = @_;
   return {} if $lang eq 'Pdlpp';
-  unless($ENV{"PDL_Early_Inline"} // ($Inline::VERSION >= 0.68) ) {
-      die "PDL::Inline: requires Inline version 0.68 or higher to make sense\n  (yours is $Inline::VERSION). You should upgrade Inline, \n   or else set \$ENV{PDL_Early_Inline} to a true value to ignore this message.\n";
+  unless ($ENV{"PDL_Early_Inline"} || (($Inline::VERSION//0.68) >= 0.68)) {
+      die "PDL::Inline: requires Inline version 0.68 or higher to make sense\n  (yours is $Inline::VERSION). You should upgrade Inline,\n   or else set \$ENV{PDL_Early_Inline} to a true value to ignore this message.\n";
   }
   +{
     TYPEMAPS      => [ &PDL::Core::Dev::PDL_TYPEMAP ],

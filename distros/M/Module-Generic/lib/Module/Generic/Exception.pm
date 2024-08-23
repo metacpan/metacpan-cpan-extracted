@@ -300,11 +300,11 @@ sub _obj_eq
             $self->file eq $other->file &&
             $self->line == $other->line )
         {
-            return( 1 );
+            return(1);
         }
         else
         {
-            return( 0 );
+            return(0);
         }
     }
     # Compare error message
@@ -314,7 +314,7 @@ sub _obj_eq
         return( $me eq $other );
     }
     # Otherwise some reference data to which we cannot compare
-    return( 0 ) ;
+    return(0) ;
 }
 
 # NOTE: AUTOLOAD
@@ -459,7 +459,7 @@ It takes either an L<Module::Generic::Exception> object or an hash reference of 
     # or
 
     my $ex = Module::Generic::Exception->new( $other_exception_object_for_reuse );
-    # This will the I<object> property
+    # This will the object property
 
     # or
 
@@ -493,7 +493,7 @@ You can use C<locale> alternatively. See the L</lang> method below for more info
 
 =item * C<line>
 
-The line number in the file where the error occurred.This is populated using the L<Devel::StackTrace/"line">
+The line number in the file where the error occurred. This is populated using the L<Devel::StackTrace/"line">
 
 =item * C<locale>
 
@@ -511,7 +511,7 @@ When this is set, such as when another L<Module::Generic::Exception> object is p
 
 =item * C<package>
 
-The package name where the error occurred.  This is populated using the L<Devel::StackTrace/"package">
+The package name where the error occurred. This is populated using the L<Devel::StackTrace/"package">
 
 =item * C<retry_after>
 
@@ -523,7 +523,7 @@ This is used as a parameter to L<Devel::StackTrace> upon instantiation to instru
 
 =item * C<subroutine>
 
-The name of the sub routine from which this was called.  This is populated using the L<Devel::StackTrace/"subroutine">
+The name of the sub routine from which this was called. This is populated using the L<Devel::StackTrace/"subroutine">
 
 =item * C<type>
 

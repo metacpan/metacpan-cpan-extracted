@@ -92,3 +92,13 @@ Revision history for Tk-JFileDialog
         directory variables (which differ between Windows and Linux).
         * Add test to test harness to test for and report on the availibility 
         and usage of the optional Tk::JDialog module (for error dialogs).
+2.40    2024/08/22
+        * Add new option:  "-PreserveSelection" (boolean) to (if true) NOT 
+        replace any selected text in the PRIMARY selection cut-buffer with 
+        the selected/highlighted file chosen by this widget (Use case: text-
+        editing applications with option to save selected text to a file 
+        (then chosen by JFileDialog), etc.  Default is 0 (False) - replace 
+        selection w/selected file name as has previously been the case.
+        * Automatically default-bind the <Esc> key to the "Cancel button", if 
+        one is defined.
+        * Update copyright year & touch up pod docs.

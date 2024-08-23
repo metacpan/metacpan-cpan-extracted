@@ -1,7 +1,7 @@
 package Langertha::Engine::vLLM;
 our $AUTHORITY = 'cpan:GETTY';
 # ABSTRACT: vLLM inference server
-$Langertha::Engine::vLLM::VERSION = '0.004';
+$Langertha::Engine::vLLM::VERSION = '0.005';
 use Moose;
 use Carp qw( croak );
 
@@ -34,7 +34,7 @@ Langertha::Engine::vLLM - vLLM inference server
 
 =head1 VERSION
 
-version 0.004
+version 0.005
 
 =head1 SYNOPSIS
 

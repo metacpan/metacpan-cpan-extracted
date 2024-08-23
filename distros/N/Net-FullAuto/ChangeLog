@@ -20,6 +20,42 @@
 #######################################################################
 
 
+2024-08-22  Brian M. Kelly <Brian.Kelly@fullauto.com>
+
+        * Version 1.0000772 released
+
+        * More experiment to reduce yum memory impact
+
+2024-08-22  Brian M. Kelly <Brian.Kelly@fullauto.com>
+
+        * Version 1.0000771 released
+
+        * More experiment to reduce yum memory impact
+
+2024-08-22  Brian M. Kelly <Brian.Kelly@fullauto.com>
+
+        * Version 1.0000770 released
+
+        * More experiment to reduce yum memory impact
+
+2024-08-22  Brian M. Kelly <Brian.Kelly@fullauto.com>
+
+        * Version 1.0000769 released
+
+        * More experiment to reduce yum memory impact
+
+2024-08-22  Brian M. Kelly <Brian.Kelly@fullauto.com>
+
+        * Version 1.0000768 released
+
+        * Added sha256 file to complete distro
+
+2024-08-22  Brian M. Kelly <Brian.Kelly@fullauto.com>
+
+        * Version 1.0000767 released
+
+        * Experiment to reduce yum memory impact
+
 2024-08-21  Brian M. Kelly <Brian.Kelly@fullauto.com>
 
         * Version 1.0000766 released

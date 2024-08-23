@@ -450,7 +450,7 @@ If called in scalar context it hands back only the eigenvalues.  Ultimately,
 it should switch to a faster algorithm in this case (as discarding the
 eigenvectors is wasteful).
 
-The algorithm used is due to J. vonNeumann, which was a rediscovery of
+The algorithm used is due to J. von Neumann, which was a rediscovery of
 L<Jacobi's Method|http://en.wikipedia.org/wiki/Jacobi_eigenvalue_algorithm> .
 
 The eigenvectors are returned in COLUMNS of the returned PDL.  That
@@ -461,6 +461,23 @@ runs across their components.
     ($ev,$e) = eigens_sym $x;  # Make eigenvector matrix
     $vector = $ev->slice($n);       # Select nth eigenvector as a column-vector
     $vector = $ev->slice("($n)");     # Select nth eigenvector as a row-vector
+
+To compare with L<PDL::LinearAlgebra>:
+
+  use PDL::LinearAlgebra;
+  ($val, $rvec) = msymeigen($A = pdl([3,4], [4,-3]),1,1);
+  print $val->slice(1) * $rvec->slice(1);
+  #[
+  # [        -4.472136]
+  # [        -2.236068]
+  #]
+  print $A x $rvec->slice(1);
+  #[
+  # [        -4.472136]
+  # [        -2.236068]
+  #]
+  ($rvec, $val) = eigens_sym($A); # note return values other way round
+  # otherwise the same
 
 =for usage
 
@@ -477,26 +494,21 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-
-   sub PDL::eigens_sym {
-      my ($x) = @_;
-      my (@d) = $x->dims;
-      barf "Need real square matrix for eigens_sym"
-            if $#d < 1 or $d[0] != $d[1];
-      my ($sym) = 0.5*($x + $x->transpose);
-      my ($err) = PDL::max(abs($sym));
-      barf "Need symmetric component non-zero for eigens_sym"
-          if $err == 0;
-      $err = PDL::max(abs($x-$sym))/$err;
-      warn "Using symmetrized version of the matrix in eigens_sym"
-	if $err > 1e-5 && $PDL::debug;
-
-      &PDL::_eigens_sym_int($sym->squaretotri, my $ev=PDL->null, my $e=PDL->null);
-
-      return $ev->transpose, $e
-	if(wantarray);
-      $e;                #just eigenvalues
-   }
+sub PDL::eigens_sym {
+  my ($x) = @_;
+  my @d = $x->dims;
+  barf "Need real square matrix for eigens_sym"
+        if @d < 2 or $d[0] != $d[1];
+  my ($sym) = 0.5*($x + $x->transpose);
+  my ($err) = PDL::max(abs($sym));
+  barf "Need symmetric component non-zero for eigens_sym" if $err == 0;
+  $err = PDL::max(abs($x-$sym))/$err;
+  warn "Using symmetrized version of the matrix in eigens_sym"
+    if $err > 1e-5 && $PDL::debug;
+  PDL::_eigens_sym_int($sym->squaretotri, my $ev=PDL->null, my $e=PDL->null);
+  return ($ev->transpose, $e) if wantarray;
+  $e;                #just eigenvalues
+}
 
 
 
@@ -511,11 +523,11 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: ([phys]a(m); [o,phys]ev(l=2,n,n); [o,phys]e(l,n))
+  Signature: ([phys]a(n,n); complex [o,phys]ev(n,n); complex [o,phys]e(n))
 
 =for ref
 
-Real eigenvalues and -vectors of a real square matrix.
+Complex eigenvalues and -vectors of a real square matrix.
 
 (See also L<"eigens_sym"|/eigens_sym>, for eigenvalues and -vectors
 of a real, symmetric, square matrix).
@@ -524,24 +536,12 @@ The eigens function will attempt to compute the eigenvalues and
 eigenvectors of a square matrix with real components.  If the matrix
 is symmetric, the same underlying code as L<"eigens_sym"|/eigens_sym>
 is used.  If asymmetric, the eigenvalues and eigenvectors are computed
-with algorithms from the sslib library.  If any imaginary components
-exist in the eigenvalues, the results are currently considered to be
-invalid, and such eigenvalues are returned as "NaN"s.  This is true
-for eigenvectors also.  That is if there are imaginary components to
-any of the values in the eigenvector, the eigenvalue and corresponding
-eigenvectors are all set to "NaN".  Finally, if there are any repeated
-eigenvectors, they are replaced with all "NaN"s.
-
-Use of the eigens function on asymmetric matrices should be considered
-experimental!  For asymmetric matrices, nearly all observed matrices
-with real eigenvalues produce incorrect results, due to errors of the
-sslib algorithm.  If your assymmetric matrix returns all NaNs, do not
-assume that the values are complex.  Also, problems with memory access
-is known in this library.
+with algorithms from the sslib library. These are a slightly modified
+version of EISPACK's C<rg> code.
 
 Not all square matrices are diagonalizable.  If you feed in a
-non-diagonalizable matrix, then one or more of the eigenvectors will
-be set to NaN, along with the corresponding eigenvalues.
+non-diagonalizable matrix, then the algorithm may fail, in which case
+an exception will be thrown.
 
 C<eigens> is broadcastable, so you can solve 100 eigenproblems by
 feeding in a 3x3x100 array. Both C<$ev> and C<$e> get extra dimensions accordingly.
@@ -558,16 +558,27 @@ eigenvectors and the 1st dim runs across their components.
 	$vector = $ev->slice($n);   # Select nth eigenvector as a column-vector
 	$vector = $ev->slice("($n)"); # Select nth eigenvector as a row-vector
 
-DEVEL NOTES:
+To compare with L<PDL::LinearAlgebra>:
 
-For now, there is no distinction between a complex eigenvalue and an
-invalid eigenvalue, although the underlying code generates complex
-numbers.  It might be useful to be able to return complex eigenvalues.
+  use PDL::LinearAlgebra;
+  ($val, $lvec, $rvec) = meigen($A = pdl([4,-1], [2,1]),1,1);
+  print $val->slice(1) * $rvec->slice(1);
+  #[
+  # [0.894427190999916]
+  # [ 1.78885438199983]
+  #]
+  print $A x $rvec->slice(1);
+  #[
+  # [0.894427190999916]
+  # [ 1.78885438199983]
+  #]
+  ($rvec, $val) = eigens($A); # note return values other way round
+  # otherwise the same
 
 =for usage
 
-    ($ev, $e) = eigens($x); # e'vects & e'vals
-    $e = eigens($x);        # just eigenvalues
+  ($ev, $e) = eigens($x); # e'vects & e'vals
+  $e = eigens($x);        # just eigenvalues
 
 =for bad
 
@@ -579,38 +590,22 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-
-   sub PDL::eigens {
-      my ($x) = @_;
-      my (@d) = $x->dims;
-      barf "Need real square matrix for eigens"
-            if $#d < 1 or $d[0] != $d[1];
-      my $deviation = PDL::max(abs($x - $x->transpose))/PDL::max(abs($x));
-      if ( $deviation <= 1e-5 ) {
-          &PDL::_eigens_sym_int($x->squaretotri, my $ev=PDL->null, my $e=PDL->null);
-          return $ev->transpose, $e   if wantarray;
-          return $e;  #just eigenvalues
-      }
-      else {
-          if($PDL::verbose || $PDL::debug) {
-   	    print "eigens: using the asymmetric case from SSL\n";
-	  }
-	  if( !$PDL::eigens_bug_ack && !$ENV{PDL_EIGENS_ACK} ) {
-	    print STDERR "WARNING: using sketchy algorithm for PDL::eigens asymmetric case -- you might\n".
-	          "    miss an eigenvector or two\nThis should be fixed in PDL v2.5 (due 2009), \n".
-		  "    or you might fix it yourself (hint hint).  You can shut off this warning\n".
-		  "    by setting the variable $PDL::eigens_bug_ack, or the environment variable\n".
-		  "    PDL_EIGENS_HACK prior to calling eigens() with a non-symmetric matrix.\n";
-		  $PDL::eigens_bug_ack = 1;
-	  }
-
-          &PDL::_eigens_int($x->clump(0,1), my $ev=PDL->null, my $e=PDL->null);
-
-          return $ev->index(0)->transpose->sever, $e->index(0)->sever
-              if(wantarray);
-          return $e->index(0)->sever;  #just eigenvalues
-      }
-   }
+sub PDL::eigens {
+  my ($x) = @_;
+  my @d = $x->dims;
+  barf "Need real square matrix for eigens"
+        if @d < 2 or $d[0] != $d[1];
+  my $deviation = PDL::max(abs($x - $x->transpose))/PDL::max(abs($x));
+  if ( $deviation <= 1e-5 ) {
+    PDL::_eigens_sym_int($x->squaretotri, my $ev=PDL->null, my $e=PDL->null);
+    return $ev->transpose, $e   if wantarray;
+    return $e;  #just eigenvalues
+  } else {
+    PDL::_eigens_int($x, my $ev=PDL->null, my $e=PDL->null);
+    return $ev, $e if wantarray;
+    return $e;  #just eigenvalues
+  }
+}
 
 
 
@@ -691,7 +686,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 763 "matrixops.pd"
+#line 703 "matrixops.pd"
 
 =head2 lu_decomp
 
@@ -866,7 +861,7 @@ sub lu_decomp {
    wantarray ? ($out,$permute,$parity) : $out;
 }
 
-#line 942 "matrixops.pd"
+#line 882 "matrixops.pd"
 
 =head2 lu_decomp2
 
@@ -983,7 +978,7 @@ sub lu_decomp2 {
   wantarray ? ($out,$perm,$par) : $out;
 }
 
-#line 1064 "matrixops.pd"
+#line 1004 "matrixops.pd"
 
 =head2 lu_backsub
 
@@ -1208,7 +1203,7 @@ BROADCAST_OK:
    }
    $out;
 }
-#line 1212 "MatrixOps.pm"
+#line 1207 "MatrixOps.pm"
 
 
 =head2 simq
@@ -1328,7 +1323,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 1389 "matrixops.pd"
+#line 1329 "matrixops.pd"
 
 =head1 AUTHOR
 
@@ -1340,7 +1335,7 @@ itself.  If this file is separated from the PDL distribution, then the
 PDL copyright notice should be included in this file.
 
 =cut
-#line 1344 "MatrixOps.pm"
+#line 1339 "MatrixOps.pm"
 
 # Exit with OK status
 

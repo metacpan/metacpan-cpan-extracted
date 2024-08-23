@@ -7,21 +7,22 @@ use v5.12;
 use strict;
 use warnings;
 
-use Test2::Tools::Basic;
-
-plan(8);
+use Test::Simple tests => 8;
 
 use Linux::loadavg ':all';
 
-ok(sub {loadavg() == 3},'loadavg()');
-ok(sub {loadavg(1) == 1},'loadavg(1)');
-ok(sub {loadavg(2) == 2},'loadavg(2)');
-ok(sub {loadavg(3) == 3},'loadavg(3)');
+my @a;
+
+ok(@a = loadavg() && @a == 3,'loadavg()');
+ok(@a = loadavg(1) && @a == 1,'loadavg(1)');
+ok(@a = loadavg(2) && @a == 2,'loadavg(2)');
+ok(@a = loadavg(3) && @a == 3,'loadavg(3)');
 ok(LOADAVG_1MIN()==0,'Export: LOADAVG_1MIN');
 ok(LOADAVG_5MIN()==1,'Export: LOADAVG_5MIN');
 ok(LOADAVG_15MIN()==2,'Export: LOADAVG_15MIN');
-ok(sub {sleep 10; 1}, 'Repeat (a lot!)');
+ok(repeatN(1_000_000), 'Repeat 1,000,000 times');
 
-diag(sprintf("The current load is: (%s)\n",join(',',loadavg)));
-
-done_testing;
+sub repeatN {
+  @a = loadavg() for (1..shift);
+  @a == 3;
+}

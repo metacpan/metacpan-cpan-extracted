@@ -2,7 +2,7 @@ package Catmandu::Store::ElasticSearch::Bag;
 
 use Catmandu::Sane;
 
-our $VERSION = '1.0202';
+our $VERSION = '1.0204';
 
 use Catmandu::Hits;
 use Cpanel::JSON::XS qw(encode_json decode_json);

@@ -1,6 +1,6 @@
 package Catmandu::Store::OpenSearch::Searcher;
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 use Catmandu::Sane;
 use Moo;
