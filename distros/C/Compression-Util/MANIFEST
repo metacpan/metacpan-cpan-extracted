@@ -58,6 +58,8 @@ t/bzip2.t
 t/fast_lzss.t
 t/gzip.t
 t/gzip_fast.t
+t/lz4.t
+t/lz4_fast.t
 t/lz77.t
 t/lz77_abc_encode.t
 t/lz77_adaptive_arithmetic.t
@@ -71,6 +73,7 @@ t/lz77_with_bwt_symbolic.t
 t/lz77_with_lz77_symbolic.t
 t/lz77_with_mrl_symbolic.t
 t/lzb.t
+t/lzb_fast.t
 t/lzss.t
 t/lzss_adaptive_arithmetic.t
 t/lzss_arithmetic.t

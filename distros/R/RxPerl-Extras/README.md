@@ -60,9 +60,11 @@ The code samples in this section assume `$observer` has been set to:
 
 - op\_throttle\_time\_with\_both\_leading\_and\_trailing
 
-    Immediately emits events received if none have been emitted during the past `$duration`,
-    but if during the next `$duration` seconds after emitting, some next events are received,
-    the latest one of those will be emitted after `$duration`.
+    Similar to RxPerl's [op\_throttle](https://metacpan.org/pod/RxPerl#op_throttle), it immediately emits an event it received if none have been
+    emitted by this operator during the past `$duration` seconds, but if during the next `$duration` seconds some
+    next events are received, the latest one will be emitted as soon as `$duration` ends.
+
+        op_throttle_time_with_both_leading_and_trailing($duration)
 
         # 0, (pause 3 seconds) 4, complete
         rx_timer(0, 0.7)->pipe(

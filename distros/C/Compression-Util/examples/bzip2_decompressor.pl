@@ -206,7 +206,7 @@ while (!eof($fh)) {
                 warn "CRC32 error: $crc32 (stored) != $new_crc32 (actual)\n";
             }
 
-            $stream_crc32 = ($new_crc32 ^ (0xffffffff & (($stream_crc32 << 1) | ($stream_crc32 >> 31))));
+            $stream_crc32 = ($new_crc32 ^ (0xffffffff & ((0xffffffff & ($stream_crc32 << 1)) | (($stream_crc32 >> 31) & 0x1)))) & 0xffffffff;
 
             print $dec;
         }

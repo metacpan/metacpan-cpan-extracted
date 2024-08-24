@@ -1,13 +1,10 @@
-#!perl
-use 5.006;
-use strict;
-use warnings;
+use Modern::Perl;
+use open ':std', ':encoding(utf8)';
 use Test::More;
 
-plan tests => 1;
-
 BEGIN {
-    use_ok( 'DBIx::Squirrel' ) || print "Bail out!\n";
+    use_ok('DBIx::Squirrel') || print "Bail out!\n";
 }
 
-diag( "Testing DBIx::Squirrel $DBIx::Squirrel::VERSION, Perl $], $^X" );
+diag("Testing DBIx::Squirrel $DBIx::Squirrel::VERSION, Perl $], $^X");
+done_testing();

@@ -2,7 +2,7 @@ package Object::HashBase;
 use strict;
 use warnings;
 
-our $VERSION = '0.013';
+our $VERSION = '0.014';
 our $HB_VERSION = $VERSION;
 # The next line is for inlining
 # <-- START -->
@@ -67,8 +67,18 @@ sub do_import {
     my $attr_list = $Object::HashBase::ATTR_LIST{$into} ||= [];
     my $attr_subs = $Object::HashBase::ATTR_SUBS{$into} ||= {};
 
+    my @pre_init;
+    my @post_init;
+
+    my $add_new = 1;
+
+    if (my $have_new = $into->can('new')) {
+        my $new_lookup = $Object::HashBase::NEW_LOOKUP //= {};
+        $add_new = 0 unless $new_lookup->{$have_new};
+    }
+
     my %subs = (
-        ($into->can('new') ? () : (new => $class->can('_new'))),
+        ($add_new ? ($class->_build_new($into, \@pre_init, \@post_init)) : ()),
         (map %{$Object::HashBase::ATTR_SUBS{$_} || {}}, @{$isa}[1 .. $#$isa]),
         ($class->args_to_subs($attr_list, $attr_subs, \@_, $into)),
     );
@@ -169,43 +179,70 @@ sub attr_list {
     return @list;
 }
 
-sub _new {
+sub _build_new {
     my $class = shift;
+    my ($into, $pre_init, $post_init) = @_;
 
-    my $self;
+    my $add_pre_init  = sub(&) { push @$pre_init  => $_[-1] };
+    my $add_post_init = sub(&) { push @$post_init => $_[-1] };
 
-    if (@_ == 1) {
-        my $arg = shift;
-        my $type = ref($arg);
+    my $__pre_init = $into->can('_pre_init');
+    my $_pre_init  = $__pre_init ? sub { ($__pre_init->(), @$pre_init) } : sub { @$pre_init };
 
-        if ($type eq 'HASH') {
-            $self = bless({%$arg}, $class)
+    my $__post_init = $into->can('_post_init');
+    my $_post_init  = $__post_init ? sub { ($__post_init->(), @$post_init) } : sub {  @$post_init };
+
+    my $new = sub {
+        my $class = shift;
+
+        my $self;
+
+        if (@_ == 1) {
+            my $arg  = shift;
+            my $type = ref($arg);
+
+            if ($type eq 'HASH') {
+                $self = bless({%$arg}, $class);
+            }
+            else {
+                Carp::croak("Not sure what to do with '$type' in $class constructor")
+                    unless $type eq 'ARRAY';
+
+                my %proto;
+                my @attributes = attr_list($class);
+                while (@$arg) {
+                    my $val = shift @$arg;
+                    my $key = shift @attributes or Carp::croak("Too many arguments for $class constructor");
+                    $proto{$key} = $val;
+                }
+
+                $self = bless(\%proto, $class);
+            }
         }
         else {
-            Carp::croak("Not sure what to do with '$type' in $class constructor")
-                unless $type eq 'ARRAY';
-
-            my %proto;
-            my @attributes = attr_list($class);
-            while (@$arg) {
-                my $val = shift @$arg;
-                my $key = shift @attributes or Carp::croak("Too many arguments for $class constructor");
-                $proto{$key} = $val;
-            }
-
-            $self = bless(\%proto, $class);
+            $self = bless({@_}, $class);
         }
-    }
-    else {
-        $self = bless({@_}, $class);
-    }
 
-    $Object::HashBase::CAN_CACHE{$class} = $self->can('init')
-        unless exists $Object::HashBase::CAN_CACHE{$class};
+        $Object::HashBase::CAN_CACHE{$class} = $self->can('init')
+            unless exists $Object::HashBase::CAN_CACHE{$class};
 
-    $self->init if $Object::HashBase::CAN_CACHE{$class};
+        $self->$_() for $_pre_init->();
+        $self->init() if $Object::HashBase::CAN_CACHE{$class};
+        $self->$_() for reverse $_post_init->();
 
-    $self;
+        $self;
+    };
+
+    my $new_lookup = $Object::HashBase::NEW_LOOKUP //= {};
+    $new_lookup->{$new} = 1;
+
+    return (
+        new           => $new,
+        add_pre_init  => $add_pre_init,
+        add_post_init => $add_post_init,
+        _pre_init     => $_pre_init,
+        _post_init    => $_post_init,
+    );
 }
 
 1;
@@ -301,6 +338,52 @@ use it:
     # '+boo' means no setter or reader, just the BOO constant
 
     $one->{+FOO} = 'xxx';
+
+Add pre_init and post-init:
+
+B<Note:> These are not provided if you define your own new() method (via a stub
+at the top).
+
+B<Note:> Single inheritence should work with child classes doing the pre/post
+init subs during construction, so long as all classes in the chain use a
+generated new(). This will probably explode badly in multiple-inheritence.
+
+    package My::Class;
+    use strict;
+    use warnings;
+
+    # Generate 3 accessors
+    use Object::HashBase qw/foo -bar ^baz <bat >ban +boo/;
+
+    # Do more stuff before init, add as many as you like by calling this
+    # multiple times with a different code block each time
+    add_pre_init {
+        ...
+    };
+
+    # Chance to initialize defaults
+    sub init { ... }
+
+    # Do stuff after init, add as many as you want, they run in reverse order
+    add_post_init {
+        my $self = shift;
+        ...
+    };
+
+    sub print {
+        my $self = shift;
+        print join ", " => map { $self->{$_} } FOO, BAR, BAZ, BAT, BAN, BOO;
+    }
+
+You can also call add_pre_init and add_post_init as class methods from anywhere
+to add init and post-init to the class.
+
+B<Please note:> This will apply to all future instances of the object created,
+but not past ones. This is a form of meta-programming and it is easy to abuse.
+It is also helpful for extending Object::HashBase.
+
+    My::Class->add_pre_init(sub { ... });
+    My::Class->add_post_init(sub { ... });
 
 =head1 DESCRIPTION
 

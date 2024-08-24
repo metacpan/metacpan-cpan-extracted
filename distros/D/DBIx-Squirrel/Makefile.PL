@@ -19,6 +19,7 @@ my %WriteMakefileArgs = (
   "PREREQ_PM" => {
     "Carp" => 0,
     "DBI" => 0,
+    "Data::Alias" => 0,
     "Data::Dumper" => 0,
     "Data::Dumper::Concise" => 0,
     "Digest::SHA" => 0,
@@ -26,7 +27,6 @@ my %WriteMakefileArgs = (
     "JSON::Syck" => 0,
     "Memoize" => 0,
     "Modern::Perl" => 0,
-    "SQL::Abstract" => 0,
     "Scalar::Util" => 0,
     "Sub::Name" => 0,
     "YAML::Syck" => 0,
@@ -35,31 +35,32 @@ my %WriteMakefileArgs = (
     "strict" => 0
   },
   "TEST_REQUIRES" => {
-    "Capture::Tiny" => 0,
     "Cwd" => 0,
+    "DBD::Mock" => 0,
     "DBD::SQLite" => 0,
     "DBD::SQLite::Constants" => 0,
     "FindBin" => 0,
     "Test::More" => 0,
-    "Test::Most" => 0,
-    "autobox::Core" => 0,
+    "Test::Warn" => 0,
     "lib" => 0,
+    "open" => 0,
     "warnings" => 0
   },
-  "VERSION" => "1.2.11",
+  "VERSION" => "1.3.0",
   "test" => {
-    "TESTS" => "t/*.t t/00-unit-tests/*.t"
+    "TESTS" => "t/*.t"
   }
 );
 
 
 my %FallbackPrereqs = (
-  "Capture::Tiny" => 0,
   "Carp" => 0,
   "Cwd" => 0,
+  "DBD::Mock" => 0,
   "DBD::SQLite" => 0,
   "DBD::SQLite::Constants" => 0,
   "DBI" => 0,
+  "Data::Alias" => 0,
   "Data::Dumper" => 0,
   "Data::Dumper::Concise" => 0,
   "Digest::SHA" => 0,
@@ -68,16 +69,15 @@ my %FallbackPrereqs = (
   "JSON::Syck" => 0,
   "Memoize" => 0,
   "Modern::Perl" => 0,
-  "SQL::Abstract" => 0,
   "Scalar::Util" => 0,
   "Sub::Name" => 0,
   "Test::More" => 0,
-  "Test::Most" => 0,
+  "Test::Warn" => 0,
   "YAML::Syck" => 0,
-  "autobox::Core" => 0,
   "constant" => 0,
   "lib" => 0,
   "namespace::autoclean" => 0,
+  "open" => 0,
   "strict" => 0,
   "warnings" => 0
 );

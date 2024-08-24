@@ -64,6 +64,7 @@ t/SAMPLE.txt
 t/SAMPLE_euc-jp.txt
 t/SAMPLE_sjis.txt
 t/SEARCH.txt
+t/SEARCH_m.txt
 t/SEARCH_x.txt
 t/Util.pm
 t/line/00_load.t

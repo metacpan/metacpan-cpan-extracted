@@ -1,8 +1,9 @@
+#!/usr/bin/perl
 # -*- perl -*-
 #
 # $Id$
 #
-#  Copyright (c) 1994-2010  Tim Bunce  Ireland
+#  Copyright (c) 1994-2024  Tim Bunce  Ireland
 #
 # See COPYRIGHT section in DBI.pm for usage and distribution rights.
 
@@ -102,17 +103,30 @@ my %opts = (
 $opts{CAPI} = 'TRUE' if $Config{archname} =~ /-object\b/i;
 
 if (my $gccversion = $Config{gccversion}) {	# ask gcc to be more pedantic
-    warn "WARNING: Your GNU C $gccversion compiler is very old. Please upgrade it and rebuild perl.\n"
-	if $gccversion =~ m/^\D*(1|2\.[1-8])/;
-    print "Your perl was compiled with gcc (version $Config{gccversion}), okay.\n";
-    $gccversion =~ s/[^\d\.]//g; # just a number please
-    $opts{DEFINE} .= ' -W -Wall -Wpointer-arith -Wbad-function-cast';
-    $opts{DEFINE} .= ' -Wno-comment -Wno-sign-compare -Wno-cast-qual';
-    $opts{DEFINE} .= ' -Wmissing-noreturn -Wno-unused-parameter' if $gccversion ge "3.0";
-    if ($is_developer && $::opt_g) {
-        $opts{DEFINE} .= ' -DPERL_GCC_PEDANTIC -ansi -pedantic' if $gccversion ge "3.0";
-        $opts{DEFINE} .= ' -Wdisabled-optimization -Wformat'    if $gccversion ge "3.0";
-        $opts{DEFINE} .= ' -Wmissing-prototypes';
+    if ($gccversion =~ m/ clang ([0-9][-0-9.]*)/i) {
+      print "Your perl was compiled with Clang (version $1). As this is not GCC, version checking is skipped.\n";
+      # https://clang.llvm.org/docs/DiagnosticsReference.html
+      $opts{DEFINE} .= ' -W -Wall -Wpointer-arith -Wbad-function-cast';
+      $opts{DEFINE} .= ' -Wno-comment -Wno-sign-compare -Wno-cast-qual';
+      $opts{DEFINE} .= ' -Wmissing-noreturn -Wno-unused-parameter';
+      $opts{DEFINE} .= ' -Wno-compound-token-split-by-macro -Wno-constant-conversion';
+      $opts{DEFINE} .= ' -Wno-implicit-const-int-float-conversion';
+      if ($is_developer && $::opt_g) {
+          $opts{DEFINE} .= ' -Wmissing-prototypes';
+      }
+    } else {
+      warn "WARNING: Your GNU C $gccversion compiler is very old. Please upgrade it and rebuild perl.\n"
+          if $gccversion =~ m/^\D*(1|2\.[1-8])\b/;
+      print "Your perl was compiled with gcc (version $Config{gccversion}), okay.\n";
+      $gccversion =~ s/[^\d\.]//g; # just a number please
+      $opts{DEFINE} .= ' -W -Wall -Wpointer-arith -Wbad-function-cast';
+      $opts{DEFINE} .= ' -Wno-comment -Wno-sign-compare -Wno-cast-qual';
+      $opts{DEFINE} .= ' -Wmissing-noreturn -Wno-unused-parameter' if $gccversion ge "3.0";
+      if ($is_developer && $::opt_g) {
+          $opts{DEFINE} .= ' -DPERL_GCC_PEDANTIC -ansi -pedantic' if $gccversion ge "3.0";
+          $opts{DEFINE} .= ' -Wdisabled-optimization -Wformat'    if $gccversion ge "3.0";
+          $opts{DEFINE} .= ' -Wmissing-prototypes';
+      }
     }
 }
 
@@ -348,6 +362,14 @@ checkkeywords:
 	$(RM_RF) blib
 	find . -type f \( -name .svn -prune -o -name \*.pm -o -name \*.PL -o -name \*.pl \) \
             -exec bash -c '[ -z "$$(svn pg svn:keywords {})" ] && echo svn propset svn:keywords \"Id Revision\" {}' \;
+
+.PHONY:	doc
+doc:
+	perl make-doc.pl
+dbipport:
+	perl sandbox/genPPPort_h.pl
+ppport:		dbipport.h
+	perl dbipport.h --compat-version=5.8.0 DBI.xs
 
 checkpod:
 	$(RM_RF) blib

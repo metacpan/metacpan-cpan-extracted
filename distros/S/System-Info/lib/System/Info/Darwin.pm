@@ -5,7 +5,7 @@ use warnings;
 
 use base "System::Info::BSD";
 
-our $VERSION = "0.055";
+our $VERSION = "0.056";
 
 =head1 NAME
 
@@ -35,21 +35,25 @@ sub prepare_sysinfo {
 	$self->{__os} =~ s{\)$}{ - $kv)};
 	}
 
-    my $model = $system_profiler->{"machine name"} ||
-		$system_profiler->{"machine model"};
-
-    my $ncpu = # $scl->{"hw.ncpu"} ||
-	$system_profiler->{"number of cpus"};
+    # This is physical processors (sockets) which os not returned anywhere for Apple Silicon (implied 1)
+    my $ncpu = $system_profiler->{"number of cpus"} || 1;
     $system_profiler->{"total number of cores"} and
 	$ncpu .= " [$system_profiler->{'total number of cores'} cores]";
 
-    $self->{__cpu_type}  = $system_profiler->{"cpu type"}
-	if $system_profiler->{"cpu type"};
-    $self->{__cpu}       = # $scl->{"machdep.cpu.brand_string"} ||
-	"$model ($system_profiler->{'cpu speed'})";
+	# Confusingly, System::Info uses "cpu_type" for architecture and Apple uses
+	# "CPU Type" as the CPU model name. They are not the same thing.
+    $self->{__cpu}       = $system_profiler->{chip} ||
+	$system_profiler->{"cpu type"};
+    $self->{__cpu} .= " ($system_profiler->{'cpu speed'})"
+	if $system_profiler->{"cpu speed"};
+    $self->{__cpu_type}  = $system_profiler->{arch};
     $self->{__cpu_count} = $ncpu;
-    $scl->{"machdep.cpu.core_count"} and
-	$self->{_ncore}  = $scl->{"machdep.cpu.core_count"};
+    # _ncore reports hyperthreads for other platforms, so it would be
+    # hw.logicalcpu (or hw.logicalcpu_max which is the same unless the system
+    # has disabled cores).
+    # Alternative hw.ncpu is deprecated, keeping for ancient systems.
+    $self->{_ncore}      = $scl->{"hw.logicalcpu"}  || $scl->{"hw.ncpu"};
+    $self->{_phys_core}  = $scl->{"hw.physicalcpu"} || $scl->{"hw.ncpu"};
 
     my $osv = do {
 	local $^W = 0;
@@ -98,9 +102,8 @@ sub __get_system_profiler {
 	"processor speed"	=> "cpu speed",
 	"model name"		=> "machine name",
 	"model identifier"	=> "machine model",
-	"number of processors"  => "number of cpus",
-	"number of processors"  => "number of cpus",
-	"total number of cores" => "total number of cores",
+	"number of processors"	=> "number of cpus",
+	"total number of cores"	=> "total number of cores",
 	);
     for my $newkey (keys %keymap) {
 	my $oldkey = $keymap{$newkey};
@@ -109,12 +112,14 @@ sub __get_system_profiler {
 	}
 
     chomp ($system_profiler{"cpu type"} ||= `uname -m`);
-    $system_profiler{"cpu type"}  ||= "Unknown";
-    $system_profiler{"cpu type"}    =~ s/PowerPC\s*(\w+).*/macppc$1/;
     $system_profiler{"cpu speed"} ||= 0; # Mac M1 does not show CPU speed
     $system_profiler{"cpu speed"}   =~
 	s/(0(?:\.\d+)?)\s*GHz/sprintf "%d MHz", $1 * 1000/e;
-
+    $system_profiler{"cpu type"}  ||= "Unknown";
+    $system_profiler{"cpu type"}   =~ s/\s*\([\d.]+\)//
+	if $system_profiler{"cpu speed"};
+    chomp ($system_profiler{arch} ||= `uname -m`);
+    $system_profiler{arch}        ||= "Unknown";
     return \%system_profiler;
     } # __get_system_profiler
 
@@ -144,7 +149,7 @@ Mac::OSVersion
 
 =head1 COPYRIGHT AND LICENSE
 
-(c) 2016-2023, Abe Timmerman & H.Merijn Brand, All rights reserved.
+(c) 2016-2024, Abe Timmerman & H.Merijn Brand, All rights reserved.
 
 With contributions from Jarkko Hietaniemi, Campo Weijerman, Alan Burlison,
 Allen Smith, Alain Barbet, Dominic Dunlop, Rich Rauenzahn, David Cantrell.

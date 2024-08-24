@@ -1,13 +1,20 @@
 --- #YAML:1.0
-name:                Linux-loadavg
-version:             0.10
-abstract:            Get system load averages (via getloadavg(3C) system call)
-license:             ~
-author:              
-    - Niels van Dijke <CpanDotOrgAtPerlboyDotNet>
-generated_by:        ExtUtils::MakeMaker version 6.42
-distribution_type:   module
-requires:     
 meta-spec:
-    url:     http://module-build.sourceforge.net/META-spec-v1.3.html
-    version: 1.3
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Linux-loadavg
+version: 0.13
+abstract: Get system load averages (via getloadavg(3C) system call)
+author:              
+  - Niels van Dijke <CpanDotOrgAtPerlboyDotNet>
+license: perl
+distribution_type: module
+requires:
+  perl: 5.008
+  Carp: 0
+  Exporter: 0
+  DynaLoader: 0
+build_requires:
+  ExtUtils::MakeMaker: 6.42
+  Test::Simple: 0.90
+generated_by: ExtUtils::MakeMaker version 6.42

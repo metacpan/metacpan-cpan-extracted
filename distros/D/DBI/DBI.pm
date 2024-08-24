@@ -1,18 +1,23 @@
 # $Id$
 # vim: ts=8:sw=4:et
 #
-# Copyright (c) 1994-2012  Tim Bunce  Ireland
+# Copyright (c) 1994-2024  Tim Bunce  Ireland
 #
 # See COPYRIGHT section in pod text below for usage and distribution rights.
 #
 
 package DBI;
 
-require 5.008_001;
+require 5.008001;
 
+use strict;
+use warnings;
+
+our ($XS_VERSION, $VERSION);
 BEGIN {
-our $XS_VERSION = our $VERSION = "1.643"; # ==> ALSO update the version in the pod text below!
-$VERSION = eval $VERSION;
+$VERSION = "1.644"; # ==> ALSO update the version in the pod text below!
+$XS_VERSION = $VERSION;
+$VERSION =~ tr/_//d;
 }
 
 =head1 NAME
@@ -87,9 +92,9 @@ I<The synopsis above only lists the major methods and parameters.>
 
 =head3 General
 
-Before asking any questions, reread this document, consult the
-archives and read the DBI FAQ. The archives are listed
-at the end of this document and on the DBI home page L<http://dbi.perl.org/support/>
+Before asking any questions, reread this document, consult the archives and
+read the DBI FAQ. The archives are listed at the end of this document and on
+the DBI home page L<http://dbi.perl.org/support/>
 
 You might also like to read the Advanced DBI Tutorial at
 L<http://www.slideshare.net/Tim.Bunce/dbi-advanced-tutorial-2007>
@@ -121,29 +126,28 @@ DBI IRC Channel: #dbi on irc.perl.org (L<irc://irc.perl.org/#dbi>)
 
 =head3 Online
 
-StackOverflow has a DBI tag L<http://stackoverflow.com/questions/tagged/dbi>
+StackOverflow has a DBI tag L<https://stackoverflow.com/questions/tagged/dbi>
 with over 800 questions.
 
-The DBI home page at L<http://dbi.perl.org/> and the DBI FAQ
-at L<http://faq.dbi-support.com/> may be worth a visit.
-They include links to other resources, but I<are rather out-dated>.
+The DBI home page at L<https://dbi.perl.org/> might be worth a visit.
+It includes links to other resources, but I<is rather out-dated>.
 
 =head3 Reporting a Bug
 
 If you think you've found a bug then please read
 "How to Report Bugs Effectively" by Simon Tatham:
-L<http://www.chiark.greenend.org.uk/~sgtatham/bugs.html>.
+L<https://www.chiark.greenend.org.uk/~sgtatham/bugs.html>.
 
 If you think you've found a memory leak then read L</Memory Leaks>.
 
 Your problem is most likely related to the specific DBD driver module you're
-using. If that's the case then click on the 'Bugs' link on the L<http://metacpan.org>
+using. If that's the case then click on the 'Bugs' link on the L<https://metacpan.org>
 page for your driver. Only submit a bug report against the DBI itself if you're
 sure that your issue isn't related to the driver you're using.
 
 =head2 NOTES
 
-This is the DBI specification that corresponds to DBI version 1.642
+This is the DBI specification that corresponds to DBI version 1.644
 (see L<DBI::Changes> for details).
 
 The DBI is evolving at a steady pace, so it's good to check that
@@ -173,11 +177,12 @@ related to the DBI can be found at L<https://metacpan.org/search?q=DBI>.
 
 use Scalar::Util ();
 use Carp();
-use DynaLoader ();
+use XSLoader ();
 use Exporter ();
 
+our (@ISA, @EXPORT, @EXPORT_OK, %EXPORT_TAGS);
 BEGIN {
-@ISA = qw(Exporter DynaLoader);
+@ISA = qw(Exporter);
 
 # Make some utility functions available if asked for
 @EXPORT    = ();		    # we export nothing by default
@@ -269,15 +274,15 @@ $DBI::stderr = 2_000_000_000; # a very round number below 2**31
 # then you haven't installed the DBI correctly. Read the README
 # then install it again.
 if ( $ENV{DBI_PUREPERL} ) {
-    eval { bootstrap DBI $XS_VERSION } if       $ENV{DBI_PUREPERL} == 1;
+    eval { XSLoader::load('DBI', $XS_VERSION) } if       $ENV{DBI_PUREPERL} == 1;
     require DBI::PurePerl  if $@ or $ENV{DBI_PUREPERL} >= 2;
     $DBI::PurePerl ||= 0; # just to silence "only used once" warnings
 }
 else {
-    bootstrap DBI $XS_VERSION;
+    XSLoader::load( 'DBI', $XS_VERSION);
 }
 
-$EXPORT_TAGS{preparse_flags} = [ grep { /^DBIpp_\w\w_/ } keys %{__PACKAGE__."::"} ];
+$EXPORT_TAGS{preparse_flags} = [ grep { /^DBIpp_\w\w_/ } keys %DBI:: ];
 
 Exporter::export_ok_tags(keys %EXPORT_TAGS);
 
@@ -288,8 +293,6 @@ for (qw(trace_msg set_err parse_trace_flag parse_trace_flags)) {
   no strict;
   *$_ = \&{"DBD::_::common::$_"};
 }
-
-use strict;
 
 DBI->trace(split /=/, $ENV{DBI_TRACE}, 2) if $ENV{DBI_TRACE};
 
@@ -603,7 +606,7 @@ sub connect {
     $dsn ||= $ENV{DBI_DSN} || $ENV{DBI_DBNAME} || '' unless $old_driver;
 
     if ($DBI::dbi_debug) {
-	local $^W = 0;
+	no warnings;
 	pop @_ if $connect_meth ne 'connect';
 	my @args = @_; $args[2] = '****'; # hide password
 	DBI->trace_msg("    -> $class->$connect_meth(".join(", ",@args).")\n");
@@ -1133,10 +1136,6 @@ sub data_string_diff {
 		if !defined $b;
     }
 
-    require utf8;
-    # hack to cater for perl 5.6
-    *utf8::is_utf8 = sub { (DBI::neat(shift)=~/^"/) } unless defined &utf8::is_utf8;
-
     my @a_chars = (utf8::is_utf8($a)) ? unpack("U*", $a) : unpack("C*", $a);
     my @b_chars = (utf8::is_utf8($b)) ? unpack("U*", $b) : unpack("C*", $b);
     my $i = 0;
@@ -1166,11 +1165,6 @@ sub data_string_diff {
 sub data_string_desc {	# describe a data string
     my ($a) = @_;
     require bytes;
-    require utf8;
-
-    # hacks to cater for perl 5.6
-    *utf8::is_utf8 = sub { (DBI::neat(shift)=~/^"/) } unless defined &utf8::is_utf8;
-    *utf8::valid   = sub {                        1 } unless defined &utf8::valid;
 
     # Give sufficient info to help diagnose at least these kinds of situations:
     # - valid UTF8 byte sequence but UTF8 flag not set
@@ -1460,7 +1454,7 @@ sub _new_sth {	# called by DBD::<drivername>::db::prepare)
 
 {   package		# hide from PAUSE
 	DBD::_::dr;	# ====== DRIVER ======
-    @DBD::_::dr::ISA = qw(DBD::_::common);
+    our @ISA = qw(DBD::_::common);
     use strict;
 
     sub default_user {
@@ -1488,7 +1482,7 @@ sub _new_sth {	# called by DBD::<drivername>::db::prepare)
 	my ($dsn, $user, $auth, $attr) = @_;
 
 	my $cache = $drh->{CachedKids} ||= {};
-	my $key = do { local $^W;
+	my $key = do { no warnings;
 	    join "!\001", $dsn, $user, $auth, DBI::_concat_hash_sorted($attr, "=\001", ",\001", 0, 0)
 	};
 	my $dbh = $cache->{$key};
@@ -1525,7 +1519,7 @@ sub _new_sth {	# called by DBD::<drivername>::db::prepare)
 
 {   package		# hide from PAUSE
 	DBD::_::db;	# ====== DATABASE ======
-    @DBD::_::db::ISA = qw(DBD::_::common);
+    our @ISA = qw(DBD::_::common);
     use strict;
 
     sub clone {
@@ -1717,7 +1711,7 @@ sub _new_sth {	# called by DBD::<drivername>::db::prepare)
 	# active children. The XS template code does this. Drivers not using
 	# the template must handle clearing the cache themselves.
 	my $cache = $dbh->{CachedKids} ||= {};
-	my $key = do { local $^W;
+	my $key = do { no warnings;
 	    join "!\001", $statement, DBI::_concat_hash_sorted($attr, "=\001", ",\001", 0, 0)
 	};
 	my $sth = $cache->{$key};
@@ -1847,7 +1841,7 @@ sub _new_sth {	# called by DBD::<drivername>::db::prepare)
 
 {   package		# hide from PAUSE
 	DBD::_::st;	# ====== STATEMENT ======
-    @DBD::_::st::ISA = qw(DBD::_::common);
+    our @ISA = qw(DBD::_::common);
     use strict;
 
     sub bind_param { Carp::croak("Can't bind_param, not implement by driver") }
@@ -4558,7 +4552,7 @@ and your driver does not need them, then use C<undef> for each.
 There are several caveats to be aware of with this method if you want
 to use it for portable applications:
 
-B<*> For some drivers the value may only available immediately after
+B<*> For some drivers the value may only be available immediately after
 the insert statement has executed (e.g., mysql, Informix).
 
 B<*> For some drivers the $catalog, $schema, $table, and $field parameters
@@ -4707,7 +4701,7 @@ See L</fetchall_arrayref> method for more details.
   @ary = $dbh->selectall_array($statement, \%attr);
   @ary = $dbh->selectall_array($statement, \%attr, @bind_values);
 
-This is a convenience wrapper around L<selectall_arrayref> that returns
+This is a convenience wrapper around L</selectall_arrayref> that returns
 the rows directly as a list, rather than a reference to an array of rows.
 
 Note that if L</RaiseError> is not set then you can't tell the difference
@@ -5869,7 +5863,7 @@ will generate a warning and return undef.
 
 Why would you want to do this? You don't, forget I even mentioned it.
 Unless, that is, you're implementing something advanced like a
-multi-threaded connection pool. See L<DBI::Pool>.
+multi-threaded connection pool like C<DBI::Pool>.
 
 The returned $imp_data can be passed as a C<dbi_imp_data> attribute
 to a later connect() call, even in a separate thread in the same
@@ -6691,6 +6685,10 @@ fields values for each row are unique.  If multiple rows are returned
 with the same values for the key fields then later rows overwrite
 earlier ones.
 
+=head3 C<more_results>
+
+... not yet documented ...
+
 =head3 C<finish>
 
   $rc  = $sth->finish;
@@ -7473,8 +7471,11 @@ Using DBI with perl threads is not yet recommended for production
 environments. For more information see
 L<http://www.perlmonks.org/index.pl?node_id=288022>
 
-Note: There is a bug in perl 5.8.2 when configured with threads
-and debugging enabled (bug #24463) which causes a DBI test to fail.
+Note: There is a bug in perl 5.8.2 when configured with threads and
+debugging enabled (bug #24463) which would cause some DBI tests to fail.
+These tests have been disabled for perl-5.8.2 and below.
+
+Tests for inner method cache are disabled for perl-5.10.x
 
 =head2 Signal Handling and Canceling Operations
 
@@ -7699,12 +7700,10 @@ can be found in F<t/subclass.t> in the DBI distribution.
   use strict;
 
   use DBI;
-  use vars qw(@ISA);
-  @ISA = qw(DBI);
+  our @ISA = qw(DBI);
 
   package MySubDBI::db;
-  use vars qw(@ISA);
-  @ISA = qw(DBI::db);
+  our @ISA = qw(DBI::db);
 
   sub prepare {
     my ($dbh, @args) = @_;
@@ -7715,8 +7714,7 @@ can be found in F<t/subclass.t> in the DBI distribution.
   }
 
   package MySubDBI::st;
-  use vars qw(@ISA);
-  @ISA = qw(DBI::st);
+  our @ISA = qw(DBI::st);
 
   sub fetch {
     my ($sth, @args) = @_;
@@ -7939,7 +7937,7 @@ following logger module:
         $self->{_buf} .= shift;
     #
     # DBI feeds us pieces at a time, so accumulate a complete line
-    # before outputing
+    # before outputting
     #
         print $fh "At ", scalar localtime(), ':', $self->{_buf}, "\n" and
         $self->{_buf} = ''
@@ -8299,7 +8297,7 @@ Perl by Larry Wall and the C<perl5-porters>.
 
 =head1 COPYRIGHT
 
-The DBI module is Copyright (c) 1994-2012 Tim Bunce. Ireland.
+The DBI module is Copyright (c) 1994-2024 Tim Bunce. Ireland.
 All rights reserved.
 
 You may distribute under the terms of either the GNU General Public

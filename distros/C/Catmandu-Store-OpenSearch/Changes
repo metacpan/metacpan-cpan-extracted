@@ -1,5 +1,8 @@
 Revision history for Catmandu::Store::OpenSearch
 
+0.03  2024-08-23 18:23:26 CEST
+  - use bag->buffer_size in generator for bag and searcher like it was for elasticsearch
+
 0.02  2024-08-22 16:56:56 CEST
   - forgot to include search argument size=$limit
 

@@ -159,6 +159,14 @@ subtest 'op_distinct_until_changed' => sub {
     );
     obs_is $o, ['(ab)', {a => {name => 'Peter', grade => 'A'}, b => {name => 'Mary', grade => 'B'}}],
         'names';
+
+    $o = rx_of(1, 3, 2, 4, 2, 3, 5, 5, 1)->pipe(
+        op_distinct_until_changed(sub {
+            my ($previous_high_score, $current) = @_;
+            return $current <= $previous_high_score;
+        }),
+    );
+    obs_is $o, ['(1345)'], 'track high scores';
 };
 
 subtest 'op_distinct_until_key_changed' => sub {
@@ -753,6 +761,19 @@ subtest 'op_exhaust_map' => sub {
         k => [ 4, 2 ],
         l => [ 4, 3 ],
     }];
+
+    my @storage;
+    $o = rx_interval(1)->pipe(
+        op_exhaust_map(sub {
+            push @storage, @_;
+            my $p = Mojo::Promise->new;
+            rx_timer(1.99)->subscribe(sub { $p->resolve(1) });
+            return rx_from($p);
+        }),
+        op_take(2),
+    );
+    obs_is $o, ['---1-1'], 'ex 2';
+    is \@storage, [0, 0, 2, 2], 'push args';
 };
 
 subtest 'op_find' => sub {

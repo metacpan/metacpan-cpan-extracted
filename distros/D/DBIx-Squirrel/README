@@ -2,7 +2,7 @@ NAME
     DBIx::Squirrel - A "DBI" extension
 
 VERSION
-    version 1.2.10
+    version 1.3.0
 
 SYNOPSIS
         # ------------------
@@ -34,7 +34,7 @@ SYNOPSIS
         db(DBIx::Squirrel->connect($dsn, $user, $pass, \%attr));
 
         # First, we need to associate "product" with a result set, then use
-        # "product" to reference itt in future. The next time arguments are
+        # "product" to reference it in future. The next time arguments are
         # passed, they are treated as bind-values when the statement is
         # executed.
         #
@@ -708,8 +708,52 @@ DESCRIPTION
             ArtistId: 128
 
         Notice that we got nothing back for one of our artists? That's
-        because the artist in question is not in our database, and we cannot
-        apply a transformation to nothing.
+        because the artist in question is not in our database and we cannot
+        apply a transformation to nothing, so nothing is returned.
+
+REFERENCE
+    This section describes the "DBIx::Squirrel" interface. It covers new
+    features not present in the "DBI", as well as existing "DBI" features
+    whose behaviour have been altered by "DBIx::Squirrel".
+
+  Database Handle Methods
+   do
+   iterate
+   prepare
+   prepare_cached
+   results
+  Statement Handle Methods
+   bind
+   bind_param
+   execute
+   iterate
+   results
+  Iterator Objects
+   all
+   count
+   count_all
+   done
+    Alias *(see "finished")*.
+
+   execute
+   executed
+   find
+   finish
+   finished
+   first
+   iterate
+   new
+   next
+   one
+    Alias *(see "single")*.
+
+   remaining
+   reset
+   results
+   single
+   statement_handle
+   sth
+    Alias *(see "statement_handle")*.
 
 COPYRIGHT AND LICENSE
     The DBIx::Squirrel module is Copyright (c) 2020-2014 Iain Campbell. All

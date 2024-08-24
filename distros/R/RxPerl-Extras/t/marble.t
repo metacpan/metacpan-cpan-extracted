@@ -25,7 +25,22 @@ subtest 'op_exhaust_map_with_latest' => sub {
             return rx_timer(3)->pipe(op_map(sub { $val }));
         }),
     );
-    obs_is $o, ['---0--2------1--3------2--4'];
+    obs_is $o, ['---0--2------1--3------2--4'], 'standard';
+
+    my @storage;
+    $o = rx_interval(3)->pipe(
+        op_exhaust_map_with_latest(sub {
+            push @storage, (my @args = @_);
+            my $p = Mojo::Promise->new;
+            rx_timer(7)->subscribe(sub { $p->resolve($args[0]) });
+            return rx_from($p);
+        }),
+        op_take(2),
+    );
+    # obs_is $o, ['---1-1'], 'ex 2';
+    # is \@storage, [0, 0, 2, 2], 'push args';
+    obs_is $o, ['----------0------2'], 'marble 2';
+    is \@storage, [0, 0, 2, 2], 'push args';
 };
 
 subtest 'op_throttle_time_with_both_leading_and_trailing' => sub {
@@ -39,7 +54,15 @@ subtest 'op_throttle_time_with_both_leading_and_trailing' => sub {
         op_throttle_time_with_both_leading_and_trailing(7),
         op_take(2),
     );
-    obs_is $o, ['0------2'];
+    obs_is $o, ['0------2'], 'observable completes normally';
+
+    $o = rx_merge(
+        rx_timer(2),
+        rx_timer(10)->pipe(op_ignore_elements),
+    )->pipe(
+        op_throttle_time_with_both_leading_and_trailing(2),
+    );
+    obs_is $o, ['--0--------'], 'one event';
 };
 
 done_testing();

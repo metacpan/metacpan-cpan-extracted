@@ -15,7 +15,7 @@ our @EXPORT_OK = (
 );
 our %EXPORT_TAGS = (all => \@EXPORT_OK);
 
-our $VERSION = "v6.29.6";
+our $VERSION = "v6.29.7";
 
 1;
 __END__
@@ -474,7 +474,7 @@ L<https://rxjs.dev/api/operators/catchError>
 
     # foo, foo, foo, complete
     rx_throw_error('foo')->pipe(
-        op_catch_error(sub ($err, $caught) { rx_of($err, $err, $err) }),
+        op_catch_error(sub ($err, $caught) { rx_of($err, $err, $err) }), # could use $_ instead of $err here
     )->subscribe($observer);
 
 =item op_combine_latest_with

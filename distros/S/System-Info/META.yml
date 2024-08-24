@@ -1,7 +1,7 @@
 --- 
 abstract: Basic information about the system
 author: 
-  - H.Merijn Brand <hmbrand.org>
+  - H.Merijn Brand <hmbrand@cpan.org>
   - Abe Timmerman <abeltje@cpan.org>
 build_requires: 
   perl: '5.008'
@@ -17,7 +17,7 @@ name: System-Info
 provides: 
   System::Info: 
     file: lib/System/Info.pm
-    version: '0.064'
+    version: '0.065'
   System::Info::AIX: 
     file: lib/System/Info/AIX.pm
     version: '0.050'
@@ -32,7 +32,7 @@ provides:
     version: '0.050'
   System::Info::Darwin: 
     file: lib/System/Info/Darwin.pm
-    version: '0.055'
+    version: '0.056'
   System::Info::Generic: 
     file: lib/System/Info/Generic.pm
     version: '0.050'
@@ -47,7 +47,7 @@ provides:
     version: '0.050'
   System::Info::Linux: 
     file: lib/System/Info/Linux.pm
-    version: '0.053'
+    version: '0.054'
   System::Info::Solaris: 
     file: lib/System/Info/Solaris.pm
     version: '0.050'
@@ -58,7 +58,7 @@ provides:
     file: lib/System/Info/Windows.pm
     version: '0.051'
 recommends: 
-  Test::More: '1.302195'
+  Test::More: '1.302198'
 requires: 
   POSIX: 0
   Test::More: '0.88'
@@ -69,4 +69,4 @@ resources:
   bugtracker: https://github.com/Tux/System-Info/issues
   license: http://dev.perl.org/licenses/
   repository: https://github.com/Tux/System-Info
-version: '0.064'
+version: '0.065'

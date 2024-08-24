@@ -675,17 +675,17 @@ many forward references.  (Patches welcome!)
 
 
 use strict;
-use vars qw(@ISA @EXPORT @EXPORT_OK $VERSION);
+use warnings;
 use Exporter ();
 use UNIVERSAL ();
 use Carp;
 
 use DBI qw(dbi_time dbi_profile dbi_profile_merge_nodes dbi_profile_merge);
 
-$VERSION = "2.015065";
+our $VERSION = "2.015065";
 
-@ISA = qw(Exporter);
-@EXPORT = qw(
+our @ISA = qw(Exporter);
+our @EXPORT = qw(
     DBIprofile_Statement
     DBIprofile_MethodName
     DBIprofile_MethodClass
@@ -694,7 +694,7 @@ $VERSION = "2.015065";
     dbi_profile_merge
     dbi_time
 );
-@EXPORT_OK = qw(
+our @EXPORT_OK = qw(
     format_profile_thingy
 );
 
@@ -951,4 +951,3 @@ sub DESTROY {
 }
 
 1;
-

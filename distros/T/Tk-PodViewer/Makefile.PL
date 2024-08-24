@@ -2,6 +2,7 @@ use ExtUtils::MakeMaker;
 
 use strict;
 my %prereq = (
+	'Getopt::Long',       => '2.54',
 	'Pod::Simple'         => '3.43',
 	'Test::Tk'            => '3.04',
 	'Tk'                  => '804.030',
@@ -13,6 +14,7 @@ WriteMakefile(
 	PREREQ_PM			=> \%prereq,
 	ABSTRACT_FROM		=> 'lib/Tk/PodViewer.pm',
 	AUTHOR				=> 'Hans Jeuken <hanje at cpan dot org>',
+	EXE_FILES => ['bin/podviewer'],
 	LICENSE				=> 'perl',
     (eval { ExtUtils::MakeMaker->VERSION(6.46) } ? (META_MERGE => {
       'meta-spec' => { version => 2 },

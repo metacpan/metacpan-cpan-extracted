@@ -20,7 +20,7 @@ BEGIN {
 
 return 1 if $NO_RUN;
 
-our $VERSION = '0.013';
+our $VERSION = '0.014';
 # <-- START -->
 
 sub warnings(&) {
@@ -49,6 +49,34 @@ BEGIN {
     Object::HashBase::Test::is(FOO, 'foo', "FOO CONSTANT");
     Object::HashBase::Test::is(BAR, 'bar', "BAR CONSTANT");
     Object::HashBase::Test::is(BAZ, 'baz', "BAZ CONSTANT");
+}
+
+{
+    BEGIN {
+        $INC{'Object/HashBase/Test/HBaseINIT.pm'} = __FILE__;
+        $INC{'Object/HashBase/Test/HBaseINIT2.pm'} = __FILE__;
+    }
+
+    package
+        Object::HashBase::Test::HBaseINIT;
+    use Object::HashBase qw/foo bar baz/;
+
+    $main::counter = 0;
+    add_pre_init { shift->{pre_init_1} = $main::counter++ };
+    add_pre_init { shift->{pre_init_2} = $main::counter++ };
+    sub init { shift->{init} = $main::counter++ };
+    add_post_init { shift->{post_init_1} = $main::counter++ };
+    add_post_init { shift->{post_init_2} = $main::counter++ };
+
+    package
+        Object::HashBase::Test::HBaseINIT2;
+    use parent 'Object::HashBase::Test::HBaseINIT';
+    use Object::HashBase qw/boop/;
+
+    add_pre_init { shift->{pre_init_3} = $main::counter++ };
+    sub init { $_[0]->SUPER::init(); $_[0]->{init2} = $main::counter++ };
+    add_post_init { shift->{post_init_3} = $main::counter++ };
+
 }
 
 BEGIN {
@@ -81,6 +109,47 @@ is_deeply(
     },
     'hash'
 );
+
+{
+    my @warns;
+    local $SIG{__WARN__} = sub { push @warns => @_ };
+    Object::HashBase::Test::HBaseINIT->add_post_init(sub { shift->{late_post} = 'yes' });
+    ok(!@warns, "No Warnings adding a post-init") or diag(@_);
+}
+
+$main::counter = 0;
+my $two = Object::HashBase::Test::HBaseINIT->new();
+is_deeply(
+    $two,
+    {
+        pre_init_1  => 0,
+        pre_init_2  => 1,
+        init        => 2,
+        post_init_2 => 3,
+        post_init_1 => 4,
+        late_post   => 'yes',
+    },
+    "inits ran in the correct order"
+);
+
+$main::counter = 0;
+my $three = Object::HashBase::Test::HBaseINIT2->new();
+is_deeply(
+    $three,
+    {
+        pre_init_1  => 0,
+        pre_init_2  => 1,
+        pre_init_3  => 2,
+        init        => 3,
+        init2       => 4,
+        post_init_3 => 5,
+        post_init_2 => 6,
+        post_init_1 => 7,
+        late_post   => 'yes',
+    },
+    "inits ran in the correct order"
+);
+
 
 BEGIN {
     package

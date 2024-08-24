@@ -1,4 +1,5 @@
-#!perl -w                                         # -*- perl -*-
+#!/usr/bin/perl
+# -*- perl -*-
 # vim:sw=4:ts=8
 $|=1;
 
@@ -40,7 +41,7 @@ GetOptions(
 if (!$opt_dbm) {
     # pick first available, starting with SDBM_File
     for (qw( SDBM_File GDBM_File DB_File BerkeleyDB )) {
-        if (eval { local $^W; require "$_.pm" }) {
+        if (eval { no warnings; require "$_.pm" }) {
             $opt_dbm = ($_);
             last;
         }

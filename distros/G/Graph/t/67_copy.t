@@ -10,11 +10,9 @@ my ($g1, $g3, $g5) = map Graph::Undirected->new, 1..3;
 $_->add_path(qw(a b c)) for $g0, $g1;
 $_->add_path(qw(d b e)) for $g0, $g1;
 
-$_->add_path(qw(a b c d)) for $g2, $g3;
-$_->add_path(qw(c a)) for $g2, $g3;
+$_->add_path(qw(c a b c d)) for $g2, $g3;
 
-$_->add_path(qw(a b c)) for $g4, $g5;
-$_->add_path(qw(b a)) for $g4, $g5;
+$_->add_path(qw(b a b c)) for $g4, $g5;
 
 is $g0->copy, "a-b,b-c,b-e,d-b";
 is $g1->copy, "a=b,b=c,b=d,b=e";
@@ -37,6 +35,48 @@ is $g2->transpose, "a-c,b-a,c-b,d-c";
 is $g3->transpose, "a=b,a=c,b=c,c=d";
 is $g4->transpose, "a-b,b-a,c-b";
 is $g5->transpose, "a=b,b=c";
+
+$g0 = Graph::Directed->new(multivertexed=>1, multiedged=>1);
+$g1 = Graph::Undirected->new(multivertexed=>1, multiedged=>1);
+$_->add_path_by_id(qw(a b c), 'id') for $g0, $g1;
+$_->add_path_by_id(qw(d b e), 'id') for $g0, $g1;
+$_->set_vertex_attribute_by_id(qw(d 0 height 7)) for $g0, $g1;
+$_->set_edge_attribute_by_id(qw(d b id weight 5)) for $g0, $g1;
+is $g0, "a-b,b-c,b-e,d-b";
+is $g1, "a=b,b=c,b=d,b=e";
+my $expected = Graph::_deep_copy_best([$g1->as_hashes]);
+delete $expected->[0]{$_->[0]}{$_->[1]}{$_->[2]} for [qw(d 0 height)];
+delete $expected->[1]{$_->[0]}{$_->[1]}{$_->[2]}{$_->[3]} for [qw(d b id weight)];
+is_deeply [$g0->undirected_copy->as_hashes], $expected, 'undirected_copy preserve multi'
+  or diag 'got: ', explain([$g0->undirected_copy->as_hashes]),
+    'expected: ', explain($expected);
+is_deeply [$g0->undirected_copy_attributes->as_hashes], [$g1->as_hashes], 'undirected_copy_attributes'
+  or diag 'got: ', explain([$g0->undirected_copy_attributes->as_hashes]),
+    'expected: ', explain([$g1->as_hashes]);
+$expected = Graph::_deep_copy_best([$g0->as_hashes]);
+$expected->[1]{$_->[0]}{$_->[1]}{id} = {} for [qw(b a)],[qw(b d)],[qw(c b)],[qw(e b)];
+my $expected2 = Graph::_deep_copy_best($expected);
+$expected2->[1]{b}{d} = $expected2->[1]{d}{b};
+is_deeply [$g1->directed_copy_attributes->as_hashes], $expected2, 'directed_copy_attributes'
+  or diag 'got: ', explain([$g1->directed_copy_attributes->as_hashes]),
+    'expected: ', explain($expected2);
+delete $expected->[0]{$_->[0]}{$_->[1]}{$_->[2]} for [qw(d 0 height)];
+delete $expected->[1]{$_->[0]}{$_->[1]}{$_->[2]}{$_->[3]} for [qw(d b id weight)];
+is_deeply [$g1->directed_copy->as_hashes], $expected, 'directed_copy preserve multi'
+  or diag 'got: ', explain([$g1->directed_copy->as_hashes]),
+    'expected: ', explain($expected);
+$expected = Graph::_deep_copy_best([$g0->as_hashes]);
+delete $expected->[0]{$_->[0]}{$_->[1]}{$_->[2]} for [qw(d 0 height)];
+delete $expected->[1]{$_->[0]}{$_->[1]}{$_->[2]}{$_->[3]} for [qw(d b id weight)];
+is_deeply [$g0->copy->as_hashes], $expected, 'copy of directed preserve multi'
+  or diag 'got: ', explain([$g0->copy->as_hashes]),
+    'expected: ', explain($expected);
+$expected = Graph::_deep_copy_best([$g1->as_hashes]);
+delete $expected->[0]{$_->[0]}{$_->[1]}{$_->[2]} for [qw(d 0 height)];
+delete $expected->[1]{$_->[0]}{$_->[1]}{$_->[2]}{$_->[3]} for [qw(d b id weight)];
+is_deeply [$g1->copy->as_hashes], $expected, 'copy of undirected preserve multi'
+  or diag 'got: ', explain([$g1->copy->as_hashes]),
+    'expected: ', explain($expected);
 
 my $g6 = Graph->new;
 is($g6->complete->edges, 0);

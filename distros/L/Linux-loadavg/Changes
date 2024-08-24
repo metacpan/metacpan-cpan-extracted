@@ -42,3 +42,15 @@ Revision history for Perl extension Linux::loadavg.
 0.11  Fri Aug 23 11:37:00 2024
 	- Change back to Test::Simple
 	- Update version in .pm file and clean up of XS file
+
+0.12  Fri Aug 23 11:50:00 2024
+        - No code change, purely META.yml update to improve CPAN Testers results
+        - Minimum Perl dropped to v5.8
+
+0.13  Sat Aug 24 00:17:00 2024
+        - Update META.yml
+        - Update examples
+
+0.14  Sat Aug 24 01:22:00 2024
+        - POD fix
+        - Added LICENSE file to MANIFEST

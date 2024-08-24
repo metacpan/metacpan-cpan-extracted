@@ -3,12 +3,13 @@ package Compression::Util;
 use utf8;
 use 5.036;
 use List::Util qw(min uniq max sum all);
+use Carp       qw(confess);
 
 require Exporter;
 
 our @ISA = qw(Exporter);
 
-our $VERSION = '0.11';
+our $VERSION = '0.12';
 our $VERBOSE = 0;        # verbose mode
 
 our $LZ_MIN_LEN       = 4;          # minimum match length in LZ parsing
@@ -149,6 +150,9 @@ our %EXPORT_TAGS = (
           lzb_compress
           lzb_decompress
 
+          lz4_compress
+          lz4_decompress
+
           ac_encode
           ac_decode
 
@@ -195,7 +199,7 @@ our @EXPORT;
 sub read_bit ($fh, $bitstring) {
 
     if (($$bitstring // '') eq '') {
-        $$bitstring = unpack('b*', getc($fh) // die "can't read bit");
+        $$bitstring = unpack('b*', getc($fh) // confess "can't read bit");
     }
 
     chop($$bitstring);
@@ -204,7 +208,7 @@ sub read_bit ($fh, $bitstring) {
 sub read_bit_lsb ($fh, $bitstring) {
 
     if (($$bitstring // '') eq '') {
-        $$bitstring = unpack('B*', getc($fh) // die "can't read bit");
+        $$bitstring = unpack('B*', getc($fh) // confess "can't read bit");
     }
 
     chop($$bitstring);
@@ -212,11 +216,11 @@ sub read_bit_lsb ($fh, $bitstring) {
 
 sub read_bits ($fh, $bits_len) {
 
-    read($fh, (my $data), $bits_len >> 3) // die "Read error: $!";
+    read($fh, (my $data), $bits_len >> 3) // confess "Read error: $!";
     $data = unpack('B*', $data);
 
     while (length($data) < $bits_len) {
-        $data .= unpack('B*', getc($fh) // die "can't read bits");
+        $data .= unpack('B*', getc($fh) // confess "can't read bits");
     }
 
     if (length($data) > $bits_len) {
@@ -228,11 +232,11 @@ sub read_bits ($fh, $bits_len) {
 
 sub read_bits_lsb ($fh, $bits_len) {
 
-    read($fh, (my $data), $bits_len >> 3) // die "Read error: $!";
+    read($fh, (my $data), $bits_len >> 3) // confess "Read error: $!";
     $data = unpack('b*', $data);
 
     while (length($data) < $bits_len) {
-        $data .= unpack('b*', getc($fh) // die "can't read bits");
+        $data .= unpack('b*', getc($fh) // confess "can't read bits");
     }
 
     if (length($data) > $bits_len) {
@@ -261,7 +265,7 @@ sub int2bytes_lsb ($value, $size) {
 sub bytes2int($fh, $n) {
 
     if (ref($fh) eq '') {
-        open my $fh2, '<:raw', \$fh;
+        open(my $fh2, '<:raw', \$fh) or confess "error: $!";
         return __SUB__->($fh2, $n);
     }
 
@@ -273,7 +277,7 @@ sub bytes2int($fh, $n) {
 sub bytes2int_lsb ($fh, $n) {
 
     if (ref($fh) eq '') {
-        open my $fh2, '<:raw', \$fh;
+        open(my $fh2, '<:raw', \$fh) or confess "error: $!";
         return __SUB__->($fh2, $n);
     }
 
@@ -319,7 +323,7 @@ sub symbols2string ($symbols) {
 sub read_null_terminated ($fh) {
     my $string = '';
     while (1) {
-        my $c = getc($fh) // die "can't read character";
+        my $c = getc($fh) // confess "can't read character";
         last if $c eq "\0";
         $string .= $c;
     }
@@ -391,7 +395,7 @@ sub fibonacci_encode ($symbols) {
 sub fibonacci_decode ($fh) {
 
     if (ref($fh) eq '') {
-        open my $fh2, '<:raw', \$fh;
+        open(my $fh2, '<:raw', \$fh) or confess "error: $!";
         return __SUB__->($fh2);
     }
 
@@ -478,7 +482,7 @@ sub abc_encode ($integers) {
 sub abc_decode ($fh) {
 
     if (ref($fh) eq '') {
-        open my $fh2, '<:raw', \$fh;
+        open(my $fh2, '<:raw', \$fh) or confess "error: $!";
         return __SUB__->($fh2);
     }
 
@@ -543,7 +547,7 @@ sub ac_encode ($symbols) {
     my ($cf, $T) = _create_cfreq($freq);
 
     if ($T > MAX) {
-        die "Too few bits: $T > ${\MAX}";
+        confess "Too few bits: $T > ${\MAX}";
     }
 
     my $low      = 0;
@@ -558,10 +562,10 @@ sub ac_encode ($symbols) {
         $low  = ($low + int(($w * $cf->[$c]) / $T)) & MAX;
 
         if ($high > MAX) {
-            die "high > MAX: $high > ${\MAX}";
+            confess "high > MAX: $high > ${\MAX}";
         }
 
-        if ($low >= $high) { die "$low >= $high" }
+        if ($low >= $high) { confess "$low >= $high" }
 
         while (1) {
 
@@ -606,7 +610,7 @@ sub ac_encode ($symbols) {
 sub ac_decode ($fh, $freq) {
 
     if (ref($fh) eq '') {
-        open my $fh2, '<:raw', \$fh;
+        open(my $fh2, '<:raw', \$fh) or confess "error: $!";
         return __SUB__->($fh2, $freq);
     }
 
@@ -640,10 +644,10 @@ sub ac_decode ($fh, $freq) {
         $low  = ($low + int(($w * $cf->[$i]) / $T)) & MAX;
 
         if ($high > MAX) {
-            die "error";
+            confess "error";
         }
 
-        if ($low >= $high) { die "$low >= $high" }
+        if ($low >= $high) { confess "$low >= $high" }
 
         while (1) {
 
@@ -722,7 +726,7 @@ sub adaptive_ac_encode ($symbols) {
     @table{@alphabet} = (0 .. $alphabet_size);
 
     if ($T > MAX) {
-        die "Too few bits: $T > ${\MAX}";
+        confess "Too few bits: $T > ${\MAX}";
     }
 
     my $low      = 0;
@@ -740,10 +744,10 @@ sub adaptive_ac_encode ($symbols) {
         $T = _increment_freq($c, $alphabet_size, $freq, $cf);
 
         if ($high > MAX) {
-            die "high > MAX: $high > ${\MAX}";
+            confess "high > MAX: $high > ${\MAX}";
         }
 
-        if ($low >= $high) { die "$low >= $high" }
+        if ($low >= $high) { confess "$low >= $high" }
 
         while (1) {
 
@@ -788,7 +792,7 @@ sub adaptive_ac_encode ($symbols) {
 sub adaptive_ac_decode ($fh, $alphabet) {
 
     if (ref($fh) eq '') {
-        open my $fh2, '<:raw', \$fh;
+        open(my $fh2, '<:raw', \$fh) or confess "error: $!";
         return __SUB__->($fh2, $alphabet);
     }
 
@@ -822,10 +826,10 @@ sub adaptive_ac_decode ($fh, $alphabet) {
         $T = _increment_freq($i, $alphabet_size, $freq, $cf);
 
         if ($high > MAX) {
-            die "high > MAX: ($high > ${\MAX})";
+            confess "high > MAX: ($high > ${\MAX})";
         }
 
-        if ($low >= $high) { die "$low >= $high" }
+        if ($low >= $high) { confess "$low >= $high" }
 
         while (1) {
 
@@ -955,7 +959,7 @@ sub bwt_sort ($s, $LOOKAHEAD_LEN = 128) {    # O(n * LOOKAHEAD_LEN) space (fast)
 
 sub bwt_encode ($s, $LOOKAHEAD_LEN = 128) {
 
-    if (ref($s) eq 'ARRAY') {
+    if (ref($s) ne '') {
         return bwt_encode_symbolic($s);
     }
 
@@ -1278,7 +1282,7 @@ sub delta_encode ($integers) {
         $double = 1;
     }
     else {
-        die "[BUG] Unknown encoding method: $method";
+        confess "[BUG] Unknown encoding method: $method";
     }
 
     my $code      = '';
@@ -1325,7 +1329,7 @@ sub delta_encode ($integers) {
 sub delta_decode ($fh) {
 
     if (ref($fh) eq '') {
-        open my $fh2, '<:raw', \$fh;
+        open(my $fh2, '<:raw', \$fh) or confess "error: $!";
         return __SUB__->($fh2);
     }
 
@@ -1434,7 +1438,7 @@ sub encode_alphabet_256 ($alphabet) {
 sub decode_alphabet_256 ($fh) {
 
     if (ref($fh) eq '') {
-        open my $fh2, '<:raw', \$fh;
+        open(my $fh2, '<:raw', \$fh) or confess "error: $!";
         return __SUB__->($fh2);
     }
 
@@ -1477,11 +1481,11 @@ sub encode_alphabet ($alphabet) {
 sub decode_alphabet ($fh) {
 
     if (ref($fh) eq '') {
-        open my $fh2, '<:raw', \$fh;
+        open(my $fh2, '<:raw', \$fh) or confess "error: $!";
         return __SUB__->($fh2);
     }
 
-    if (ord(getc($fh) // die "error") == 1) {
+    if (ord(getc($fh) // confess "error") == 1) {
         return decode_alphabet_256($fh);
     }
 
@@ -1517,12 +1521,20 @@ sub mtf_encode ($symbols, $alphabet = undef) {
         @alphabet_copy   = @alphabet;
     }
 
-    @table[@alphabet] = (0 .. $#alphabet);
+    my $index;
+    my @indices = (0 .. $#alphabet);
 
     foreach my $c (@$symbols) {
-        push @C, (my $index = $table[$c]);
+
+        foreach my $i (@indices) {
+            if ($alphabet[$i] == $c) {
+                $index = $i;
+                last;
+            }
+        }
+
+        push @C, $index;
         unshift(@alphabet, splice(@alphabet, $index, 1));
-        @table[@alphabet[0 .. $index]] = (0 .. $index);
     }
 
     $return_alphabet || return \@C;
@@ -1635,7 +1647,7 @@ sub mrl_compress_symbolic ($symbols, $entropy_sub = \&create_huffman_entry) {
 sub mrl_decompress_symbolic ($fh, $entropy_sub = \&decode_huffman_entry) {
 
     if (ref($fh) eq '') {
-        open my $fh2, '<:raw', \$fh;
+        open(my $fh2, '<:raw', \$fh) or confess "error: $!";
         return __SUB__->($fh2, $entropy_sub);
     }
 
@@ -1661,7 +1673,7 @@ sub mrl_decompress($fh, $entropy_sub = \&decode_huffman_entry) {
 
 sub bwt_compress ($chunk, $entropy_sub = \&create_huffman_entry) {
 
-    if (ref($chunk) eq 'ARRAY') {
+    if (ref($chunk) ne '') {
         return bwt_compress_symbolic($chunk, $entropy_sub);
     }
 
@@ -1679,7 +1691,7 @@ sub bwt_compress ($chunk, $entropy_sub = \&create_huffman_entry) {
 sub bwt_decompress ($fh, $entropy_sub = \&decode_huffman_entry) {
 
     if (ref($fh) eq '') {
-        open my $fh2, '<:raw', \$fh;
+        open(my $fh2, '<:raw', \$fh) or confess "error: $!";
         return __SUB__->($fh2, $entropy_sub);
     }
 
@@ -1723,7 +1735,7 @@ sub bwt_compress_symbolic ($symbols, $entropy_sub = \&create_huffman_entry) {
 sub bwt_decompress_symbolic ($fh, $entropy_sub = \&decode_huffman_entry) {
 
     if (ref($fh) eq '') {
-        open my $fh2, '<:raw', \$fh;
+        open(my $fh2, '<:raw', \$fh) or confess "error: $!";
         return __SUB__->($fh2, $entropy_sub);
     }
 
@@ -1768,7 +1780,7 @@ sub create_ac_entry ($symbols) {
 sub decode_ac_entry ($fh) {
 
     if (ref($fh) eq '') {
-        open my $fh2, '<:raw', \$fh;
+        open(my $fh2, '<:raw', \$fh) or confess "error: $!";
         return __SUB__->($fh2);
     }
 
@@ -1810,7 +1822,7 @@ sub create_adaptive_ac_entry ($symbols) {
 sub decode_adaptive_ac_entry ($fh) {
 
     if (ref($fh) eq '') {
-        open my $fh2, '<:raw', \$fh;
+        open(my $fh2, '<:raw', \$fh) or confess "error: $!";
         return __SUB__->($fh2);
     }
 
@@ -1978,7 +1990,7 @@ sub create_huffman_entry ($symbols) {
 sub decode_huffman_entry ($fh) {
 
     if (ref($fh) eq '') {
-        open my $fh2, '<:raw', \$fh;
+        open(my $fh2, '<:raw', \$fh) or confess "error: $!";
         return __SUB__->($fh2);
     }
 
@@ -2045,7 +2057,7 @@ sub find_deflate_index ($value, $table) {
             return $i - 1;
         }
     }
-    die "error";
+    confess "error";
 }
 
 sub deflate_encode ($literals, $distances, $lengths, $entropy_sub = \&create_huffman_entry) {
@@ -2099,7 +2111,7 @@ sub deflate_encode ($literals, $distances, $lengths, $entropy_sub = \&create_huf
 sub deflate_decode ($fh, $entropy_sub = \&decode_huffman_entry) {
 
     if (ref($fh) eq '') {
-        open my $fh2, '<:raw', \$fh;
+        open(my $fh2, '<:raw', \$fh) or confess "error: $!";
         return __SUB__->($fh2, $entropy_sub);
     }
 
@@ -2164,7 +2176,7 @@ sub elias_gamma_encode ($integers) {
 sub elias_gamma_decode ($fh) {
 
     if (ref($fh) eq '') {
-        open my $fh2, '<:raw', \$fh;
+        open(my $fh2, '<:raw', \$fh) or confess "error: $!";
         return __SUB__->($fh2);
     }
 
@@ -2212,7 +2224,7 @@ sub elias_omega_encode ($integers) {
 sub elias_omega_decode ($fh) {
 
     if (ref($fh) eq '') {
-        open my $fh2, '<:raw', \$fh;
+        open(my $fh2, '<:raw', \$fh) or confess "error: $!";
         return __SUB__->($fh2);
     }
 
@@ -2248,31 +2260,28 @@ sub elias_omega_decode ($fh) {
 # LZSS SYMBOLIC
 ###################
 
-sub lzss_encode_symbolic ($symbols) {
+sub lzss_encode_symbolic($symbols, %params) {
 
     if (ref($symbols) eq '') {
-        return lzss_encode($symbols);
+        return lzss_encode($symbols, %params);
     }
 
-    my $la  = 0;
+    my $min_len       = $params{min_len}       // $LZ_MIN_LEN;
+    my $max_len       = $params{max_len}       // $LZ_MAX_LEN;
+    my $max_dist      = $params{max_dist}      // $LZ_MAX_DIST;
+    my $max_chain_len = $params{max_chain_len} // $LZ_MAX_CHAIN_LEN;
+
     my $end = $#$symbols;
-
-    my $min_len       = $LZ_MIN_LEN;          # minimum match length
-    my $max_len       = $LZ_MAX_LEN;          # maximum match length
-    my $max_dist      = $LZ_MAX_DIST;         # maximum offset distance
-    my $max_chain_len = $LZ_MAX_CHAIN_LEN;    # how many recent positions to keep track of
-
     my (@literals, @distances, @lengths, %table);
 
-    while ($la <= $end) {
-
+    for (my $la = 0 ; $la <= $end ;) {
         my $best_n = 1;
         my $best_p = $la;
 
         my $upto      = $la + $min_len - 1;
         my $lookahead = join(' ', @{$symbols}[$la .. ($upto > $end ? $end : $upto)]);
 
-        if (exists($table{$lookahead})) {
+        if (exists $table{$lookahead}) {
 
             foreach my $p (@{$table{$lookahead}}) {
 
@@ -2280,16 +2289,20 @@ sub lzss_encode_symbolic ($symbols) {
 
                 my $n = $min_len;
 
-                while ($la + $n <= $end and $symbols->[$la + $n - 1] == $symbols->[$p + $n - 1] and $n <= $max_len) {
-                    ++$n;
-                }
+                ++$n while ($la + $n <= $end and $symbols->[$la + $n - 1] == $symbols->[$p + $n - 1] and $n <= $max_len);
 
                 if ($n > $best_n) {
-                    $best_p = $p;
                     $best_n = $n;
+                    $best_p = $p;
+                    last if ($n > $max_len);
                 }
             }
+        }
 
+        if ($best_n == 1) {
+            $table{$lookahead} = [$la];
+        }
+        else {
             my @matched = @{$symbols}[$la .. $la + $best_n - 1];
             my @key_arr = @matched[0 .. $min_len - 1];
 
@@ -2297,18 +2310,11 @@ sub lzss_encode_symbolic ($symbols) {
 
                 my $key = join(' ', @key_arr);
                 unshift @{$table{$key}}, $la + $i;
-
-                if (scalar(@{$table{$key}}) > $max_chain_len) {
-                    pop @{$table{$key}};
-                }
+                pop @{$table{$key}} if (@{$table{$key}} > $max_chain_len);
 
                 shift(@key_arr);
                 push @key_arr, $matched[$i + $min_len];
             }
-        }
-
-        if ($best_n == 1) {
-            $table{$lookahead} = [$la];
         }
 
         if ($best_n > $min_len) {
@@ -2350,8 +2356,8 @@ sub lzss_decode_symbolic ($literals, $distances, $lengths) {
             next;
         }
 
-        my $length = $lengths->[$i]   // die "bad input";
-        my $dist   = $distances->[$i] // die "bad input";
+        my $length = $lengths->[$i]   // confess "bad input";
+        my $dist   = $distances->[$i] // confess "bad input";
 
         if ($dist >= $length) {    # non-overlapping matches
             push @data, @data[$data_len - $dist .. $data_len - $dist + $length - 1];
@@ -2375,58 +2381,57 @@ sub lzss_decode_symbolic ($literals, $distances, $lengths) {
 # LZSS Encoding
 ###################
 
-sub lzss_encode ($str) {
+sub lzss_encode ($str, %params) {
 
-    if (ref($str) eq 'ARRAY') {
-        return lzss_encode_symbolic($str);
+    if (ref($str) ne '') {
+        return lzss_encode_symbolic($str, %params);
     }
 
-    my $la      = 0;
+    my $min_len       = $params{min_len}       // $LZ_MIN_LEN;
+    my $max_len       = $params{max_len}       // $LZ_MAX_LEN;
+    my $max_dist      = $params{max_dist}      // $LZ_MAX_DIST;
+    my $max_chain_len = $params{max_chain_len} // $LZ_MAX_CHAIN_LEN;
+
     my @symbols = unpack('C*', $str);
     my $end     = $#symbols;
 
-    my $min_len       = $LZ_MIN_LEN;          # minimum match length
-    my $max_len       = $LZ_MAX_LEN;          # maximum match length
-    my $max_dist      = $LZ_MAX_DIST;         # maximum offset distance
-    my $max_chain_len = $LZ_MAX_CHAIN_LEN;    # how many recent positions to keep track of
-
     my (@literals, @distances, @lengths, %table);
 
-    while ($la <= $end) {
+    for (my $la = 0 ; $la <= $end ;) {
 
         my $best_n = 1;
         my $best_p = $la;
 
         my $lookahead = substr($str, $la, $min_len);
 
-        if (exists($table{$lookahead})) {
-
+        if (exists $table{$lookahead}) {
             foreach my $p (@{$table{$lookahead}}) {
 
                 last if ($la - $p > $max_dist);
 
                 my $n = $min_len;
 
-                while ($la + $n <= $end and $symbols[$la + $n - 1] == $symbols[$p + $n - 1] and $n <= $max_len) {
-                    ++$n;
-                }
+                ++$n while ($la + $n <= $end and $symbols[$la + $n - 1] == $symbols[$p + $n - 1] and $n <= $max_len);
 
                 if ($n > $best_n) {
                     $best_p = $p;
                     $best_n = $n;
+                    last if ($best_n > $max_len);
                 }
             }
+        }
+
+        if ($best_n == 1) {
+            $table{$lookahead} = [$la];
+        }
+        else {
 
             my $matched = substr($str, $la, $best_n);
 
-            foreach my $i (0 .. length($matched) - $min_len) {
-
+            foreach my $i (0 .. $best_n - $min_len) {
                 my $key = substr($matched, $i, $min_len);
                 unshift @{$table{$key}}, $la + $i;
-
-                if (scalar(@{$table{$key}}) > $max_chain_len) {
-                    pop @{$table{$key}};
-                }
+                pop(@{$table{$key}}) if (@{$table{$key}} > $max_chain_len);
             }
         }
 
@@ -2473,18 +2478,18 @@ sub lzss_decode ($literals, $distances, $lengths) {
             next;
         }
 
-        my $length = $lengths->[$i]   // die "bad input";
-        my $dist   = $distances->[$i] // die "bad input";
+        my $length = $lengths->[$i]   // confess "bad input";
+        my $dist   = $distances->[$i] // confess "bad input";
 
         if ($dist >= $length) {    # non-overlapping matches
-            $data .= substr($data, $data_len - $dist, $length) // die "bad input";
+            $data .= substr($data, $data_len - $dist, $length) // confess "bad input";
         }
         elsif ($dist == 1) {       # run-length of last character
             $data .= substr($data, -1) x $length;
         }
         else {                     # overlapping matches
             foreach my $i (1 .. $length) {
-                $data .= substr($data, $data_len + $i - $dist - 1, 1) // die "bad input";
+                $data .= substr($data, $data_len + $i - $dist - 1, 1) // confess "bad input";
             }
         }
 
@@ -2498,18 +2503,18 @@ sub lzss_decode ($literals, $distances, $lengths) {
 # LZSSF Compression
 ###################
 
-sub lzss_encode_fast_symbolic ($symbols) {
+sub lzss_encode_fast_symbolic ($symbols, %params) {
 
     if (ref($symbols) eq '') {
-        return lzss_encode_fast($symbols);
+        return lzss_encode_fast($symbols, %params);
     }
 
     my $la  = 0;
     my $end = $#$symbols;
 
-    my $min_len  = $LZ_MIN_LEN;     # minimum match length
-    my $max_len  = $LZ_MAX_LEN;     # maximum match length
-    my $max_dist = $LZ_MAX_DIST;    # maximum offset distance
+    my $min_len  = $params{min_len}  // $LZ_MIN_LEN;     # minimum match length
+    my $max_len  = $params{max_len}  // $LZ_MAX_LEN;     # maximum match length
+    my $max_dist = $params{max_dist} // $LZ_MAX_DIST;    # maximum offset distance
 
     my (@literals, @distances, @lengths, %table);
 
@@ -2526,9 +2531,7 @@ sub lzss_encode_fast_symbolic ($symbols) {
             my $p = $table{$lookahead};
             my $n = $min_len;
 
-            while ($la + $n <= $end and $symbols->[$la + $n - 1] == $symbols->[$p + $n - 1] and $n <= $max_len) {
-                ++$n;
-            }
+            ++$n while ($la + $n <= $end and $symbols->[$la + $n - 1] == $symbols->[$p + $n - 1] and $n <= $max_len);
 
             $best_p = $p;
             $best_n = $n;
@@ -2560,13 +2563,12 @@ sub lzss_encode_fast_symbolic ($symbols) {
     }
 
     return (\@literals, \@distances, \@lengths);
-
 }
 
-sub lzss_encode_fast($str) {
+sub lzss_encode_fast($str, %params) {
 
-    if (ref($str) eq 'ARRAY') {
-        return lzss_encode_fast_symbolic($str);
+    if (ref($str) ne '') {
+        return lzss_encode_fast_symbolic($str, %params);
     }
 
     my @symbols = unpack('C*', $str);
@@ -2574,9 +2576,9 @@ sub lzss_encode_fast($str) {
     my $la  = 0;
     my $end = $#symbols;
 
-    my $min_len  = $LZ_MIN_LEN;     # minimum match length
-    my $max_len  = $LZ_MAX_LEN;     # maximum match length
-    my $max_dist = $LZ_MAX_DIST;    # maximum offset distance
+    my $min_len  = $params{min_len}  // $LZ_MIN_LEN;     # minimum match length
+    my $max_len  = $params{max_len}  // $LZ_MAX_LEN;     # maximum match length
+    my $max_dist = $params{max_dist} // $LZ_MAX_DIST;    # maximum offset distance
 
     my (@literals, @distances, @lengths, %table);
 
@@ -2592,9 +2594,7 @@ sub lzss_encode_fast($str) {
             my $p = $table{$lookahead};
             my $n = $min_len;
 
-            while ($la + $n <= $end and $symbols[$la + $n - 1] == $symbols[$p + $n - 1] and $n <= $max_len) {
-                ++$n;
-            }
+            ++$n while ($la + $n <= $end and $symbols[$la + $n - 1] == $symbols[$p + $n - 1] and $n <= $max_len);
 
             $best_p = $p;
             $best_n = $n;
@@ -2690,14 +2690,14 @@ sub lz77_decode($symbols, $dist_symbols, $len_symbols, $match_symbols) {
 
     while (@symbols) {
 
-        my $len_byte = shift(@match_symbols) // die "bad input";
+        my $len_byte = shift(@match_symbols) // confess "bad input";
 
         my $literals_length = $len_byte >> 5;
         my $match_len       = $len_byte & 0b11111;
 
         if ($literals_length == 7) {
             while (1) {
-                my $byte_len = shift(@len_symbols) // die "bad input";
+                my $byte_len = shift(@len_symbols) // confess "bad input";
                 $literals_length += $byte_len;
                 last if $byte_len != 255;
             }
@@ -2710,23 +2710,23 @@ sub lz77_decode($symbols, $dist_symbols, $len_symbols, $match_symbols) {
 
         if ($match_len == 31) {
             while (1) {
-                my $byte_len = shift(@match_symbols) // die "bad input";
+                my $byte_len = shift(@match_symbols) // confess "bad input";
                 $match_len += $byte_len;
                 last if $byte_len != 255;
             }
         }
 
-        my $dist = shift(@dist_symbols) // die "bad input";
+        my $dist = shift(@dist_symbols) // confess "bad input";
 
         if ($dist >= $match_len) {    # non-overlapping matches
-            $data .= substr($data, $data_len - $dist, $match_len) // die "bad input";
+            $data .= substr($data, $data_len - $dist, $match_len) // confess "bad input";
         }
         elsif ($dist == 1) {          # run-length of last character
             $data .= substr($data, -1) x $match_len;
         }
         else {                        # overlapping matches
             foreach my $i (1 .. $match_len) {
-                $data .= substr($data, $data_len + $i - $dist - 1, 1) // die "bad input";
+                $data .= substr($data, $data_len + $i - $dist - 1, 1) // confess "bad input";
             }
         }
 
@@ -2748,14 +2748,14 @@ sub lz77_decode_symbolic($symbols, $dist_symbols, $len_symbols, $match_symbols) 
 
     while (@symbols) {
 
-        my $len_byte = shift(@match_symbols) // die "bad input";
+        my $len_byte = shift(@match_symbols) // confess "bad input";
 
         my $literals_length = $len_byte >> 5;
         my $match_len       = $len_byte & 0b11111;
 
         if ($literals_length == 7) {
             while (1) {
-                my $byte_len = shift(@len_symbols) // die "bad input";
+                my $byte_len = shift(@len_symbols) // confess "bad input";
                 $literals_length += $byte_len;
                 last if $byte_len != 255;
             }
@@ -2768,13 +2768,13 @@ sub lz77_decode_symbolic($symbols, $dist_symbols, $len_symbols, $match_symbols) 
 
         if ($match_len == 31) {
             while (1) {
-                my $byte_len = shift(@match_symbols) // die "bad input";
+                my $byte_len = shift(@match_symbols) // confess "bad input";
                 $match_len += $byte_len;
                 last if $byte_len != 255;
             }
         }
 
-        my $dist = shift(@dist_symbols) // die "bad input";
+        my $dist = shift(@dist_symbols) // confess "bad input";
 
         if ($dist >= $match_len) {    # non-overlapping matches
             push @data, @data[scalar(@data) - $dist .. scalar(@data) - $dist + $match_len - 1];
@@ -2804,7 +2804,7 @@ sub lz77_compress($chunk, $entropy_sub = \&create_huffman_entry, $lzss_encoding_
 sub lz77_decompress($fh, $entropy_sub = \&decode_huffman_entry) {
 
     if (ref($fh) eq '') {
-        open my $fh2, '<:raw', \$fh;
+        open(my $fh2, '<:raw', \$fh) or confess "error: $!";
         return __SUB__->($fh2, $entropy_sub);
     }
 
@@ -2819,7 +2819,7 @@ sub lz77_decompress($fh, $entropy_sub = \&decode_huffman_entry) {
 sub lz77_decompress_symbolic($fh, $entropy_sub = \&decode_huffman_entry) {
 
     if (ref($fh) eq '') {
-        open my $fh2, '<:raw', \$fh;
+        open(my $fh2, '<:raw', \$fh) or confess "error: $!";
         return __SUB__->($fh2, $entropy_sub);
     }
 
@@ -2845,7 +2845,7 @@ sub lzss_compress($chunk, $entropy_sub = \&create_huffman_entry, $lzss_encoding_
 sub lzss_decompress($fh, $entropy_sub = \&decode_huffman_entry) {
 
     if (ref($fh) eq '') {
-        open my $fh2, '<:raw', \$fh;
+        open(my $fh2, '<:raw', \$fh) or confess "error: $!";
         return __SUB__->($fh2, $entropy_sub);
     }
 
@@ -2856,7 +2856,7 @@ sub lzss_decompress($fh, $entropy_sub = \&decode_huffman_entry) {
 sub lzss_decompress_symbolic($fh, $entropy_sub = \&decode_huffman_entry) {
 
     if (ref($fh) eq '') {
-        open my $fh2, '<:raw', \$fh;
+        open(my $fh2, '<:raw', \$fh) or confess "error: $!";
         return __SUB__->($fh2, $entropy_sub);
     }
 
@@ -2870,10 +2870,11 @@ sub lzss_decompress_symbolic($fh, $entropy_sub = \&decode_huffman_entry) {
 
 sub lzb_compress ($chunk, $lzss_encoding_sub = \&lzss_encode) {
 
-    local $LZ_MAX_DIST = (1 << 16) - 1;
-    local $LZ_MAX_LEN  = ~0;
-
-    my ($literals, $distances, $lengths) = $lzss_encoding_sub->($chunk);
+    my ($literals, $distances, $lengths) = do {
+        local $LZ_MAX_DIST = (1 << 16) - 1;
+        local $LZ_MAX_LEN  = ~0;
+        $lzss_encoding_sub->($chunk);
+    };
 
     my $literals_end = $#{$literals};
     my $data         = '';
@@ -2916,7 +2917,7 @@ sub lzb_compress ($chunk, $lzss_encoding_sub = \&lzss_encode) {
 sub lzb_decompress($fh) {
 
     if (ref($fh) eq '') {
-        open my $fh2, '<:raw', \$fh;
+        open(my $fh2, '<:raw', \$fh) or confess "error: $!";
         return __SUB__->($fh2);
     }
 
@@ -2924,9 +2925,9 @@ sub lzb_decompress($fh) {
     my $search_window      = '';
     my $search_window_size = 1 << 16;
 
-    my $block_size = fibonacci_decode($fh)->[0] // die "decompression error";
+    my $block_size = fibonacci_decode($fh)->[0] // confess "decompression error";
 
-    read($fh, (my $block), $block_size) // die "Read error: $!";
+    read($fh, (my $block), $block_size) // confess "Read error: $!";
 
     while ($block ne '') {
 
@@ -3006,7 +3007,7 @@ sub obh_encode ($distances, $entropy_sub = \&create_huffman_entry) {
 sub obh_decode ($fh, $entropy_sub = \&decode_huffman_entry) {
 
     if (ref($fh) eq '') {
-        open my $fh2, '<:raw', \$fh;
+        open(my $fh2, '<:raw', \$fh) or confess "error: $!";
         return __SUB__->($fh2, $entropy_sub);
     }
 
@@ -3086,7 +3087,7 @@ sub lzw_decode ($compressed) {
         my $entry =
             ($k < $dict_size)  ? $dictionary[$k]
           : ($k == $dict_size) ? ($w . substr($w, 0, 1))
-          :                      die "Bad compressed k: $k";
+          :                      confess "Bad compressed k: $k";
 
         $result .= $entry;
 
@@ -3106,7 +3107,7 @@ sub lzw_compress ($chunk, $enc_method = \&abc_encode) {
 sub lzw_decompress ($fh, $dec_method = \&abc_decode) {
 
     if (ref($fh) eq '') {
-        open my $fh2, '<:raw', \$fh;
+        open(my $fh2, '<:raw', \$fh) or confess "error: $!";
         return __SUB__->($fh2, $dec_method);
     }
 
@@ -3157,7 +3158,7 @@ sub _bzip2_encode_code_lengths($dict) {
             push @lengths, length($dict->{$symbol});
         }
         else {
-            die "Incomplete Huffman tree not supported";
+            confess "Incomplete Huffman tree not supported";
             push @lengths, 0;
         }
     }
@@ -3181,7 +3182,7 @@ sub _bzip2_encode_code_lengths($dict) {
 sub bzip2_compress($fh) {
 
     if (ref($fh) eq '') {
-        open my $fh2, '<:raw', \$fh;
+        open(my $fh2, '<:raw', \$fh) or confess "error: $!";
         return __SUB__->($fh2);
     }
 
@@ -3191,7 +3192,7 @@ sub bzip2_compress($fh) {
     ## my $CHUNK_SIZE = 100_000 * $level;
     my $CHUNK_SIZE = 1 << 16;
 
-    my $compressed .= "BZh" . $level;
+    my $compressed = "BZh" . $level;
 
     state $block_header_bitstring = unpack("B48", "1AY&SY");
     state $block_footer_bitstring = unpack("B48", "\27rE8P\x90");
@@ -3211,7 +3212,7 @@ sub bzip2_compress($fh) {
         $VERBOSE && say STDERR "Bzip2-CRC32: $crc32";
 
         # FIXME: there may be a bug in the computation of stream_crc32
-        $stream_crc32 = ($crc32 ^ (0xffffffff & (($stream_crc32 << 1) | ($stream_crc32 >> 31))));
+        $stream_crc32 = ($crc32 ^ (0xffffffff & ((0xffffffff & ($stream_crc32 << 1)) | (($stream_crc32 >> 31) & 0x1)))) & 0xffffffff;
 
         $bitstring .= int2bits($crc32, 32);
         $bitstring .= '0';                    # not randomized
@@ -3260,7 +3261,7 @@ sub bzip2_compress($fh) {
 sub bzip2_decompress($fh) {
 
     if (ref($fh) eq '') {
-        open my $fh2, '<:raw', \$fh;
+        open(my $fh2, '<:raw', \$fh) or confess "error: $!";
         return __SUB__->($fh2);
     }
 
@@ -3272,12 +3273,12 @@ sub bzip2_decompress($fh) {
         my $buffer = '';
 
         (bytes2int($fh, 2) == 0x425a and getc($fh) eq 'h')
-          or die "Not a valid Bzip2 archive";
+          or confess "Not a valid Bzip2 archive";
 
         my $level = getc($fh);
 
         if ($level !~ /^[1-9]\z/) {
-            die "Invalid level: $level";
+            confess "Invalid level: $level";
         }
 
         $VERBOSE && say STDERR "Compression level: $level";
@@ -3294,10 +3295,10 @@ sub bzip2_decompress($fh) {
                 my $crc32 = bits2int($fh, 32, \$buffer);
                 $VERBOSE && say STDERR "CRC32 = $crc32";
 
-                $stream_crc32 = ($crc32 ^ (0xffffffff & (($stream_crc32 << 1) | ($stream_crc32 >> 31))));
+                $stream_crc32 = ($crc32 ^ (0xffffffff & ((0xffffffff & ($stream_crc32 << 1)) | (($stream_crc32 >> 31) & 0x1)))) & 0xffffffff;
 
                 my $randomized = read_bit($fh, \$buffer);
-                $randomized == 0 or die "randomized not supported";
+                $randomized == 0 or confess "randomized not supported";
 
                 my $bwt_idx = bits2int($fh, 24, \$buffer);
                 $VERBOSE && say STDERR "BWT index: $bwt_idx";
@@ -3328,7 +3329,7 @@ sub bzip2_decompress($fh) {
                     my $i = 0;
                     while (read_bit($fh, \$buffer)) {
                         $i += 1;
-                        ($i < $num_trees) or die "error";
+                        ($i < $num_trees) or confess "error";
                     }
                     push @idxs, $i;
                 }
@@ -3345,7 +3346,7 @@ sub bzip2_decompress($fh) {
                     for (1 .. $num_syms) {
                         while (1) {
 
-                            ($clen > 0 and $clen <= $MaxHuffmanBits) or die "invalid code length: $clen";
+                            ($clen > 0 and $clen <= $MaxHuffmanBits) or confess "invalid code length: $clen";
 
                             if (not read_bit($fh, \$buffer)) {
                                 last;
@@ -3366,7 +3367,7 @@ sub bzip2_decompress($fh) {
                     for my $clen (@$tree) {
                         $sum -= (1 << $maxLen) >> $clen;
                     }
-                    $sum == 0 or die "incomplete tree not supported: (@$tree)";
+                    $sum == 0 or confess "incomplete tree not supported: (@$tree)";
                 }
 
                 my @huffman_trees = map { (huffman_from_code_lengths($_))[1] } @trees;
@@ -3384,7 +3385,7 @@ sub bzip2_decompress($fh) {
                     $code .= read_bit($fh, \$buffer);
 
                     if (length($code) > $MaxHuffmanBits) {
-                        die "[!] Something went wrong: length of code `$code` is > $MaxHuffmanBits.\n";
+                        confess "[!] Something went wrong: length of code `$code` is > $MaxHuffmanBits.";
                     }
 
                     if (exists($tree->{$code})) {
@@ -3404,7 +3405,7 @@ sub bzip2_decompress($fh) {
                                 $tree = $huffman_trees[$sels->[$sel_idx]];
                             }
                             else {
-                                die "No more selectors";    # should not happen
+                                confess "No more selectors";    # should not happen
                             }
                             $decoded = 50;
                         }
@@ -3423,7 +3424,7 @@ sub bzip2_decompress($fh) {
                 $VERBOSE && say STDERR "Computed CRC32: $new_crc32";
 
                 if ($crc32 != $new_crc32) {
-                    die "CRC32 error: $crc32 (stored) != $new_crc32 (actual)";
+                    confess "CRC32 error: $crc32 (stored) != $new_crc32 (actual)";
                 }
 
                 $decompressed .= $dec;
@@ -3434,14 +3435,14 @@ sub bzip2_decompress($fh) {
                 $VERBOSE && say STDERR "Stream CRC: $stored_stream_crc32";
 
                 if ($stored_stream_crc32 != $stream_crc32) {
-                    die "Stream CRC32 error: $stored_stream_crc32 (stored) != $stream_crc32 (actual)";
+                    confess "Stream CRC32 error: $stored_stream_crc32 (stored) != $stream_crc32 (actual)";
                 }
 
                 $buffer = '';
                 last;
             }
             else {
-                die "Unknown block magic: $block_magic";
+                confess "Unknown block magic: $block_magic";
             }
         }
 
@@ -3743,7 +3744,7 @@ sub _create_block_type_0($chunk) {
 sub gzip_compress ($in_fh, $lzss_encoding_sub = \&lzss_encode) {
 
     if (ref($in_fh) eq '') {
-        open my $fh2, '<:raw', \$in_fh;
+        open(my $fh2, '<:raw', \$in_fh) or confess "error: $!";
         return __SUB__->($fh2);
     }
 
@@ -3751,17 +3752,16 @@ sub gzip_compress ($in_fh, $lzss_encoding_sub = \&lzss_encode) {
 
     open my $out_fh, '>:raw', \$compressed;
 
-    local $Compression::Util::LZ_MIN_LEN       = 4;                # minimum match length in LZ parsing
-    local $Compression::Util::LZ_MAX_LEN       = 258;              # maximum match length in LZ parsing
-    local $Compression::Util::LZ_MAX_DIST      = (1 << 15) - 1;    # maximum allowed back-reference distance in LZ parsing
-    local $Compression::Util::LZ_MAX_CHAIN_LEN = 64;               # how many recent positions to remember in LZ parsing
+    local $LZ_MIN_LEN  = 4 if ($LZ_MIN_LEN < 4);    # minimum match length in LZ parsing
+    local $LZ_MAX_LEN  = 258;                       # maximum match length in LZ parsing
+    local $LZ_MAX_DIST = (1 << 15) - 1;             # maximum allowed back-reference distance in LZ parsing
 
-    state $MAGIC  = pack('C*', 0x1f, 0x8b);                        # magic MIME type
-    state $CM     = chr(0x08);                                     # 0x08 = DEFLATE
-    state $FLAGS  = chr(0x00);                                     # flags
-    state $MTIME  = pack('C*', (0x00) x 4);                        # modification time
-    state $XFLAGS = chr(0x00);                                     # extra flags
-    state $OS     = chr(0x03);                                     # 0x03 = Unix
+    state $MAGIC  = pack('C*', 0x1f, 0x8b);         # magic MIME type
+    state $CM     = chr(0x08);                      # 0x08 = DEFLATE
+    state $FLAGS  = chr(0x00);                      # flags
+    state $MTIME  = pack('C*', (0x00) x 4);         # modification time
+    state $XFLAGS = chr(0x00);                      # extra flags
+    state $OS     = chr(0x03);                      # 0x03 = Unix
 
     print $out_fh $MAGIC, $CM, $FLAGS, $MTIME, $XFLAGS, $OS;
 
@@ -3770,7 +3770,7 @@ sub gzip_compress ($in_fh, $lzss_encoding_sub = \&lzss_encode) {
 
     my $bitstring = '';
 
-    if (eof($in_fh)) {                                             # empty file
+    if (eof($in_fh)) {                              # empty file
         $bitstring = '1' . '10' . '0000000';
     }
 
@@ -3838,13 +3838,13 @@ sub _extract_block_type_0 ($in_fh, $buffer) {
     my $expected_nlen = (~$len) & 0xffff;
 
     if ($expected_nlen != $nlen) {
-        die "[!] The ~length value is not correct: $nlen (actual) != $expected_nlen (expected)\n";
+        confess "[!] The ~length value is not correct: $nlen (actual) != $expected_nlen (expected)";
     }
     else {
         $VERBOSE && print STDERR ":: Chunk length: $len\n";
     }
 
-    read($in_fh, (my $chunk), $len) // die "Read error: $!";
+    read($in_fh, (my $chunk), $len) // confess "Read error: $!";
     return $chunk;
 }
 
@@ -3863,7 +3863,7 @@ sub _deflate_decode_huffman($in_fh, $buffer, $rev_dict, $dist_rev_dict, $search_
         $code .= read_bit_lsb($in_fh, $buffer);
 
         if (length($code) > $max_ll_code_len) {
-            die "[!] Something went wrong: length of LL code `$code` is > $max_ll_code_len.\n";
+            confess "[!] Something went wrong: length of LL code `$code` is > $max_ll_code_len.";
         }
 
         if (exists($rev_dict->{$code})) {
@@ -3888,7 +3888,7 @@ sub _deflate_decode_huffman($in_fh, $buffer, $rev_dict, $dist_rev_dict, $search_
                     $dist_code .= read_bit_lsb($in_fh, $buffer);
 
                     if (length($dist_code) > $max_dist_code_len) {
-                        die "[!] Something went wrong: length of distance code `$dist_code` is > $max_dist_code_len.\n";
+                        confess "[!] Something went wrong: length of distance code `$dist_code` is > $max_dist_code_len.";
                     }
 
                     if (exists($dist_rev_dict->{$dist_code})) {
@@ -3919,7 +3919,7 @@ sub _deflate_decode_huffman($in_fh, $buffer, $rev_dict, $dist_rev_dict, $search_
     }
 
     if ($code ne '') {
-        die "[!] Something went wrong: code `$code` is not empty!\n";
+        confess "[!] Something went wrong: code `$code` is not empty!";
     }
 
     return $data;
@@ -3962,7 +3962,7 @@ sub _decode_CL_lengths($in_fh, $buffer, $CL_rev_dict, $size) {
         $code .= read_bit_lsb($in_fh, $buffer);
 
         if (length($code) > 7) {
-            die "[!] Something went wrong: length of CL code `$code` is > 7.\n";
+            confess "[!] Something went wrong: length of CL code `$code` is > 7.";
         }
 
         if (exists($CL_rev_dict->{$code})) {
@@ -3981,7 +3981,7 @@ sub _decode_CL_lengths($in_fh, $buffer, $CL_rev_dict, $size) {
                 push @lengths, (0) x (11 + bits2int_lsb($in_fh, 7, $buffer));
             }
             else {
-                die "Unknown CL symbol: $CL_symbol\n";
+                confess "Unknown CL symbol: $CL_symbol";
             }
 
             $code = '';
@@ -3990,11 +3990,11 @@ sub _decode_CL_lengths($in_fh, $buffer, $CL_rev_dict, $size) {
     }
 
     if (scalar(@lengths) != $size) {
-        die "Something went wrong: size $size (expected) != ", scalar(@lengths);
+        confess "Something went wrong: size $size (expected) != ", scalar(@lengths);
     }
 
     if ($code ne '') {
-        die "Something went wrong: code `$code` is not empty!";
+        confess "Something went wrong: code `$code` is not empty!";
     }
 
     return @lengths;
@@ -4038,7 +4038,7 @@ sub _extract_block_type_2 ($in_fh, $buffer, $search_window) {
 sub gzip_decompress ($in_fh) {
 
     if (ref($in_fh) eq '') {
-        open my $fh2, '<:raw', \$in_fh;
+        open(my $fh2, '<:raw', \$in_fh) or confess "error: $!";
         return __SUB__->($fh2);
     }
 
@@ -4046,25 +4046,24 @@ sub gzip_decompress ($in_fh) {
 
     open my $out_fh, '>:raw', \$decompressed;
 
-    local $Compression::Util::LZ_MIN_LEN       = 4;                # minimum match length in LZ parsing
-    local $Compression::Util::LZ_MAX_LEN       = 258;              # maximum match length in LZ parsing
-    local $Compression::Util::LZ_MAX_DIST      = (1 << 15) - 1;    # maximum allowed back-reference distance in LZ parsing
-    local $Compression::Util::LZ_MAX_CHAIN_LEN = 64;               # how many recent positions to remember in LZ parsing
+    local $LZ_MIN_LEN  = 4 if ($LZ_MIN_LEN < 4);    # minimum match length in LZ parsing
+    local $LZ_MAX_LEN  = 258;                       # maximum match length in LZ parsing
+    local $LZ_MAX_DIST = (1 << 15) - 1;             # maximum allowed back-reference distance in LZ parsing
 
-    my $MAGIC = (getc($in_fh) // die "error") . (getc($in_fh) // die "error");
+    my $MAGIC = (getc($in_fh) // confess "error") . (getc($in_fh) // confess "error");
 
     if ($MAGIC ne pack('C*', 0x1f, 0x8b)) {
-        die "Not a valid Gzip container!\n";
+        confess "Not a valid Gzip container!";
     }
 
-    my $CM     = getc($in_fh) // die "error";                             # 0x08 = DEFLATE
-    my $FLAGS  = getc($in_fh) // die "error";                             # flags
-    my $MTIME  = join('', map { getc($in_fh) // die "error" } 1 .. 4);    # modification time
-    my $XFLAGS = getc($in_fh) // die "error";                             # extra flags
-    my $OS     = getc($in_fh) // die "error";                             # 0x03 = Unix
+    my $CM     = getc($in_fh) // confess "error";                             # 0x08 = DEFLATE
+    my $FLAGS  = getc($in_fh) // confess "error";                             # flags
+    my $MTIME  = join('', map { getc($in_fh) // confess "error" } 1 .. 4);    # modification time
+    my $XFLAGS = getc($in_fh) // confess "error";                             # extra flags
+    my $OS     = getc($in_fh) // confess "error";                             # 0x03 = Unix
 
     if ($CM ne chr(0x08)) {
-        die "Only DEFLATE compression method is supported (0x08)! Got: 0x", sprintf('%02x', ord($CM));
+        confess "Only DEFLATE compression method is supported (0x08)! Got: 0x", sprintf('%02x', ord($CM));
     }
 
     # TODO: add support for more attributes
@@ -4116,7 +4115,7 @@ sub gzip_decompress ($in_fh) {
             $chunk = _extract_block_type_2($in_fh, \$buffer, \$search_window);
         }
         else {
-            die "[!] Unknown block of type: $block_type";
+            confess "[!] Unknown block of type: $block_type";
         }
 
         print $out_fh $chunk;
@@ -4133,7 +4132,7 @@ sub gzip_decompress ($in_fh) {
     my $actual_crc32 = $crc32;
 
     if ($stored_crc32 != $actual_crc32) {
-        die "[!] The CRC32 does not match: $actual_crc32 (actual) != $stored_crc32 (stored)\n";
+        confess "[!] The CRC32 does not match: $actual_crc32 (actual) != $stored_crc32 (stored)";
     }
     else {
         $VERBOSE && print STDERR ":: CRC32 value: $actual_crc32\n";
@@ -4142,7 +4141,7 @@ sub gzip_decompress ($in_fh) {
     my $stored_length = bits2int_lsb($in_fh, 32, \$buffer);
 
     if ($stored_length != $actual_length) {
-        die "[!] The length does not match: $actual_length (actual) != $stored_length (stored)\n";
+        confess "[!] The length does not match: $actual_length (actual) != $stored_length (stored)";
     }
     else {
         $VERBOSE && print STDERR ":: Total length: $actual_length\n";
@@ -4154,6 +4153,258 @@ sub gzip_decompress ($in_fh) {
     else {
         $VERBOSE && print STDERR "\n:: There is something else in the container! Trying to recurse!\n\n";
         return ($decompressed . __SUB__->($in_fh));
+    }
+
+    return $decompressed;
+}
+
+###############################
+# LZ4 compressor
+###############################
+
+sub lz4_compress($fh, $lzss_encoding_sub = \&lzss_encode) {
+
+    if (ref($fh) eq '') {
+        open(my $fh2, '<:raw', \$fh) or confess "error: $!";
+        return __SUB__->($fh2);
+    }
+
+    my $compressed = '';
+
+    $compressed .= int2bytes_lsb(0x184D2204, 4);    # LZ4 magic number
+
+    my $fd = '';                                    # frame description
+    $fd .= chr(0b01_10_00_00);                      # flags (FLG)
+    $fd .= chr(0b0_111_0000);                       # block description (BD)
+
+    $compressed .= $fd;
+    $compressed .= chr(115);                        # header checksum
+
+    state $CHUNK_SIZE = 1 << 17;
+
+    while (read($fh, (my $chunk), $CHUNK_SIZE)) {
+
+        my ($literals, $distances, $lengths) = do {
+            local $LZ_MIN_LEN  = 4 if ($LZ_MIN_LEN < 4);
+            local $LZ_MAX_LEN  = ~0;
+            local $LZ_MAX_DIST = (1 << 16) - 1;
+            $lzss_encoding_sub->(substr($chunk, 0, -5));
+        };
+
+        # The last 5 bytes of each block must be literals
+        # https://github.com/lz4/lz4/issues/1495
+        push @$literals, unpack('C*', substr($chunk, -5));
+
+        my $literals_end = $#{$literals};
+
+        my $block = '';
+
+        for (my $i = 0 ; $i <= $literals_end ; ++$i) {
+
+            my @uncompressed;
+            while ($i <= $literals_end and defined($literals->[$i])) {
+                push @uncompressed, $literals->[$i];
+                ++$i;
+            }
+
+            my $literals_string = pack('C*', @uncompressed);
+            my $literals_length = scalar(@uncompressed);
+
+            my $match_len = $lengths->[$i] ? ($lengths->[$i] - 4) : 0;
+
+            $block .= chr((($literals_length >= 15 ? 15 : $literals_length) << 4) | ($match_len >= 15 ? 15 : $match_len));
+
+            $literals_length -= 15;
+            $match_len       -= 15;
+
+            while ($literals_length >= 0) {
+                $block .= ($literals_length >= 255 ? "\xff" : chr($literals_length));
+                $literals_length -= 255;
+            }
+
+            $block .= $literals_string;
+
+            my $dist = $distances->[$i] // last;
+            $block .= pack('b*', scalar reverse sprintf('%016b', $dist));
+
+            while ($match_len >= 0) {
+                $block .= ($match_len >= 255 ? "\xff" : chr($match_len));
+                $match_len -= 255;
+            }
+        }
+
+        if ($block ne '') {
+            $compressed .= int2bytes_lsb(length($block), 4);
+            $compressed .= $block;
+        }
+    }
+
+    $compressed .= int2bytes_lsb(0x00000000, 4);    # EndMark
+    return $compressed;
+}
+
+###############################
+# LZ4 decompressor
+###############################
+
+sub lz4_decompress($fh) {
+
+    if (ref($fh) eq '') {
+        open(my $fh2, '<:raw', \$fh) or confess "error: $!";
+        return __SUB__->($fh2);
+    }
+
+    my $decompressed = '';
+
+    while (!eof($fh)) {
+
+        bytes2int_lsb($fh, 4) == 0x184D2204 or confess "Incorrect LZ4 Frame magic number";
+
+        my $FLG = ord(getc($fh));
+        my $BD  = ord(getc($fh));
+
+        my $version    = $FLG & 0b11_00_00_00;
+        my $B_indep    = $FLG & 0b00_10_00_00;
+        my $B_checksum = $FLG & 0b00_01_00_00;
+        my $C_size     = $FLG & 0b00_00_10_00;
+        my $C_checksum = $FLG & 0b00_00_01_00;
+        my $DictID     = $FLG & 0b00_00_00_01;
+
+        my $Block_MaxSize = $BD & 0b0_111_0000;
+
+        $VERBOSE && say STDERR "Maximum block size: $Block_MaxSize";
+
+        if ($version != 0b01_00_00_00) {
+            confess "Error: Invalid version number";
+        }
+
+        if ($C_size) {
+            my $content_size = bytes2int_lsb($fh, 8);
+            $VERBOSE && say STDERR "Content size: ", $content_size;
+        }
+
+        if ($DictID) {
+            my $dict_id = bytes2int_lsb($fh, 4);
+            $VERBOSE && say STDERR "Dictionary ID: ", $dict_id;
+        }
+
+        my $header_checksum = ord(getc($fh));
+
+        # TODO: compute and verify the header checksum
+        $VERBOSE && say STDERR "Header checksum: ", $header_checksum;
+
+        my $decoded = '';
+
+        while (!eof($fh)) {
+
+            my $block_size = bytes2int_lsb($fh, 4);
+
+            if ($block_size == 0x00000000) {    # signifies an EndMark
+                $VERBOSE && say STDERR "Block size == 0";
+                last;
+            }
+
+            $VERBOSE && say STDERR "Block size: $block_size";
+
+            if ($block_size >> 31) {
+                $VERBOSE && say STDERR "Highest bit set: ", $block_size;
+                $block_size &= ((1 << 31) - 1);
+                $VERBOSE && say STDERR "Block size: ", $block_size;
+                my $uncompressed = '';
+                read($fh, $uncompressed, $block_size);
+                $decoded .= $uncompressed;
+            }
+            else {
+
+                my $compressed = '';
+                read($fh, $compressed, $block_size);
+
+                while ($compressed ne '') {
+                    my $len_byte = ord(substr($compressed, 0, 1, ''));
+
+                    my $literals_length = $len_byte >> 4;
+                    my $match_len       = $len_byte & 0b1111;
+
+                    ## say STDERR "Literal: ",   $literals_length;
+                    ## say STDERR "Match len: ", $match_len;
+
+                    if ($literals_length == 15) {
+                        while (1) {
+                            my $byte_len = ord(substr($compressed, 0, 1, ''));
+                            $literals_length += $byte_len;
+                            last if $byte_len != 255;
+                        }
+                    }
+
+                    ## say STDERR "Total literals length: ", $literals_length;
+
+                    my $literals = '';
+
+                    if ($literals_length > 0) {
+                        $literals = substr($compressed, 0, $literals_length, '');
+                    }
+
+                    if ($compressed eq '') {    # end of block
+                        $decoded .= $literals;
+                        last;
+                    }
+
+                    my $offset = oct('0b' . reverse unpack('b16', substr($compressed, 0, 2, '')));
+
+                    if ($offset == 0) {
+                        confess "Corrupted block";
+                    }
+
+                    ## say STDERR "Offset: $offset";
+
+                    if ($match_len == 15) {
+                        while (1) {
+                            my $byte_len = ord(substr($compressed, 0, 1, ''));
+                            $match_len += $byte_len;
+                            last if $byte_len != 255;
+                        }
+                    }
+
+                    $decoded .= $literals;
+                    $match_len += 4;
+
+                    ## say STDERR "Total match len: $match_len\n";
+
+                    if ($offset >= $match_len) {    # non-overlapping matches
+                        $decoded .= substr($decoded, length($decoded) - $offset, $match_len);
+                    }
+                    elsif ($offset == 1) {
+                        $decoded .= substr($decoded, -1) x $match_len;
+                    }
+                    else {                          # overlapping matches
+                        foreach my $i (1 .. $match_len) {
+                            $decoded .= substr($decoded, length($decoded) - $offset, 1);
+                        }
+                    }
+                }
+            }
+
+            if ($B_checksum) {
+                my $content_checksum = bytes2int_lsb($fh, 4);
+                $VERBOSE && say STDERR "Block checksum: $content_checksum";
+            }
+
+            if ($B_indep) {    # blocks are independent of each other
+                $decompressed .= $decoded;
+                $decoded = '';
+            }
+            elsif (length($decoded) > 2**16) {    # blocks are dependent
+                $decompressed .= substr($decoded, 0, -(2**16), '');
+            }
+        }
+
+        # TODO: compute and verify checksum
+        if ($C_checksum) {
+            my $content_checksum = bytes2int_lsb($fh, 4);
+            $VERBOSE && say STDERR "Content checksum: $content_checksum";
+        }
+
+        $decompressed .= $decoded;
     }
 
     return $decompressed;
@@ -4207,11 +4458,12 @@ B<Compression::Util> is a function-based module, implementing various techniques
     * Fibonacci coding
     * Elias gamma/omega coding
     * Delta coding
-    * BWT-based compression
-    * LZ77/LZSS compression
-    * LZW compression
+    * BWT-based (de)compression
+    * LZ77/LZSS (de)compression
+    * LZW (de)compression
     * Bzip2 (de)compression
     * Gzip (de)compression
+    * LZ4 (de)compression
 
 The provided techniques can be easily combined in various ways to create powerful compressors, such as the Bzip2 compressor, which is a pipeline of the following methods:
 
@@ -4370,6 +4622,9 @@ B<NOTE:> the function C<lzss_encode_fast()> will ignore this value, always using
 
       lzw_compress($string)                # LZW + abc_encode() compression
       lzw_decompress($fh)                  # Inverse of the above method
+
+      lz4_compress($string)                # Compress a given string using the LZ4 frame format
+      lz4_decompress($fh)                  # Inverse of the above method
 
 =head1 MEDIUM-LEVEL FUNCTIONS
 
@@ -4615,6 +4870,23 @@ High-level function that performs byte-oriented LZSS compression, inspired by LZ
     my $data = lzb_decompress($string);
 
 Inverse of C<lzb_compress()>.
+
+=head2 lz4_compress
+
+    my $string = lz4_compress($fh);
+    my $string = lz4_compress($data);
+    my $string = lz4_compress($data, \&lzss_encode_fast);   # with fast-LZ parsing
+
+Valid LZ4 compressor, using the LZ4 Frame format, given either a string or an input file-handle.
+
+The input data is split into chunks of length C<2**17> and compressed into independent LZ4 blocks.
+
+=head2 lz4_decompress
+
+    my $data = lz4_decompress($fh);
+    my $data = lz4_decompress($string);
+
+Decompress LZ4 Frame data, given either a string or an input file-handle. Concatenated LZ4 Frames are also supported.
 
 =head2 lzw_compress
 
@@ -5276,14 +5548,21 @@ Inverse of C<lz77_encode()> and C<lz77_encode_symbolic()>, respectively.
 =head2 lzss_encode / lzss_encode_fast / lzss_encode_symbolic / lzss_encode_fast_symbolic
 
     # Standard version
-    my ($literals, $distances, $lengths) = lzss_encode($data);
-    my ($literals, $distances, $lengths) = lzss_encode(\@symbols);
+    my ($literals, $distances, $lengths) = lzss_encode($data, %params);
+    my ($literals, $distances, $lengths) = lzss_encode(\@symbols, %params);
 
     # Faster version
-    my ($literals, $distances, $lengths) = lzss_encode_fast($data);
-    my ($literals, $distances, $lengths) = lzss_encode_fast(\@symbols);
+    my ($literals, $distances, $lengths) = lzss_encode_fast($data, %params);
+    my ($literals, $distances, $lengths) = lzss_encode_fast(\@symbols, %params);
 
 Low-level function that applies the LZSS (Lempel-Ziv-Storer-Szymanski) algorithm on the provided data.
+
+The accepted C<%params> are:
+
+    min_len         => $LZ_MIN_LEN,
+    max_len         => $LZ_MAX_LEN,
+    max_dist        => $LZ_MAX_DIST,
+    max_chain_len   => $LZ_MAX_CHAIN_LEN,
 
 The function returns three values:
 
@@ -5420,6 +5699,12 @@ The functions can be combined in various ways, easily creating novel compression
 
 =item * BZIP2 Format Specification, by Joe Tsai:
         L<https://github.com/dsnet/compress/blob/master/doc/bzip2-format.pdf>
+
+=item * LZ4 Frame format
+        L<https://github.com/lz4/lz4/blob/dev/doc/lz4_Frame_format.md>
+
+=item * LZ4 Block format
+        L<https://github.com/lz4/lz4/blob/dev/doc/lz4_Block_format.md>
 
 =item * Data Compression (Summer 2023) - Lecture 4 - The Unix 'compress' Program:
         L<https://youtube.com/watch?v=1cJL9Va80Pk>

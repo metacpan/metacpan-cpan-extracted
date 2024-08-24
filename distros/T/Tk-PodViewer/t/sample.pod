@@ -51,6 +51,10 @@ test I<italic>.
 
 test L<link>.
 
+test B<I<bold and italic>>
+
+test I<B<italic and bold>>
+
 =head3 HEAD3 VERBATIM
 
  This should be formatted as verbatim. This should be formatted as verbatim. This should be formatted as verbatim. This should be formatted as verbatim.
@@ -78,7 +82,7 @@ Ignoring =for tag
 
 The escape E<23> command. Ignoring the X<X command>. Ignoring the Z<> command.
 
-=head5 HEAD5 NORMAL B<BOLD> I<ITALIC> B<I<BOLD and ITALIC>>
+=head5 HEAD5 NORMAL B<BOLD> I<ITALIC> I<B<ITALIC and BOLD>>
 
 Some text blah blih bluh.
 

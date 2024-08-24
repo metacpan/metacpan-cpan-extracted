@@ -3,7 +3,7 @@ package RxPerl::Extras;
 use strict;
 use warnings;
 
-use RxPerl::Operators::Creation 'rx_observable', 'rx_timer';
+use RxPerl::Operators::Creation 'rx_observable', 'rx_timer', 'rx_defer';
 use RxPerl::Operators::Pipeable 'op_map', 'op_take';
 
 use Exporter 'import';
@@ -14,7 +14,7 @@ our @EXPORT_OK = qw/
 /;
 our %EXPORT_TAGS = (all => \@EXPORT_OK);
 
-our $VERSION = "v0.0.3";
+our $VERSION = "v0.0.4";
 
 sub op_exhaust_all_with_latest {
     return sub {
@@ -93,7 +93,13 @@ sub op_exhaust_map_with_latest {
         my ($source) = @_;
 
         return $source->pipe(
-            op_map($observable_factory),
+            op_map(sub {
+                my @args = @_;
+                rx_defer(sub {
+                    local $_ = $args[0];
+                    $observable_factory->(@args);
+                });
+            }),
             op_exhaust_all_with_latest(),
         );
     };
@@ -239,9 +245,11 @@ the latest of those events will be processed after exhaustion as well.
 
 =item op_throttle_time_with_both_leading_and_trailing
 
-Immediately emits events received if none have been emitted during the past C<$duration>,
-but if during the next C<$duration> seconds after emitting, some next events are received,
-the latest one of those will be emitted after C<$duration>.
+Similar to RxPerl's L<op_throttle|RxPerl/op_throttle>, it immediately emits an event it received if none have been
+emitted by this operator during the past C<$duration> seconds, but if during the next C<$duration> seconds some
+next events are received, the latest one will be emitted as soon as C<$duration> ends.
+
+    op_throttle_time_with_both_leading_and_trailing($duration)
 
     # 0, (pause 3 seconds) 4, complete
     rx_timer(0, 0.7)->pipe(

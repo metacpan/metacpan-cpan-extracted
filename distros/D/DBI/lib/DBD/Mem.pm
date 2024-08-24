@@ -1,3 +1,4 @@
+#!/usr/bin/perl
 # -*- perl -*-
 #
 #   DBD::Mem - A DBI driver for in-memory tables
@@ -21,9 +22,9 @@ use strict;
 package DBD::Mem;
 #################
 use base qw( DBI::DBD::SqlEngine );
-use vars qw($VERSION $ATTRIBUTION $drh);
-$VERSION     = '0.001';
-$ATTRIBUTION = 'DBD::Mem by Jens Rehsack';
+our $drh;
+our $VERSION     = '0.001';
+our $ATTRIBUTION = 'DBD::Mem by Jens Rehsack';
 
 # no need to have driver() unless you need private methods
 #
@@ -48,8 +49,8 @@ sub CLONE
 #####################
 package DBD::Mem::dr;
 #####################
-$DBD::Mem::dr::imp_data_size = 0;
-@DBD::Mem::dr::ISA           = qw(DBI::DBD::SqlEngine::dr);
+our $imp_data_size = 0;
+our @ISA           = qw(DBI::DBD::SqlEngine::dr);
 
 # you could put some :dr private methods here
 
@@ -60,8 +61,8 @@ $DBD::Mem::dr::imp_data_size = 0;
 #####################
 package DBD::Mem::db;
 #####################
-$DBD::Mem::db::imp_data_size = 0;
-@DBD::Mem::db::ISA           = qw(DBI::DBD::SqlEngine::db);
+our $imp_data_size = 0;
+our @ISA           = qw(DBI::DBD::SqlEngine::db);
 
 use Carp qw/carp/;
 
@@ -130,7 +131,7 @@ our @ISA           = qw(DBI::DBD::SqlEngine::st);
 package DBD::Mem::Statement;
 ############################
 
-@DBD::Mem::Statement::ISA = qw(DBI::DBD::SqlEngine::Statement);
+our @ISA = qw(DBI::DBD::SqlEngine::Statement);
 
 
 sub open_table ($$$$$)
@@ -163,7 +164,7 @@ use warnings;
 
 use Carp;
 
-@DBD::Mem::DataSource::ISA = "DBI::DBD::SqlEngine::DataSource";
+our @ISA = "DBI::DBD::SqlEngine::DataSource";
 
 sub complete_table_name ($$;$)
 {
@@ -185,7 +186,7 @@ package DBD::Mem::Table;
 
 use Carp qw/croak/;
 
-@DBD::Mem::Table::ISA = qw(DBI::DBD::SqlEngine::Table);
+our @ISA = qw(DBI::DBD::SqlEngine::Table);
 
 use Carp qw(croak);
 
@@ -300,8 +301,7 @@ DBD::Mem - a DBI driver for Mem & MLMem files
 and other variations on connect() as shown in the L<DBI> docs and 
 <DBI::DBD::SqlEngine metadata|DBI::DBD::SqlEngine/Metadata>.
 
-Use standard DBI prepare, execute, fetch, placeholders, etc.,
-see L<QUICK START> for an example.
+Use standard DBI prepare, execute, fetch, placeholders, etc.
 
 =head1 DESCRIPTION
 

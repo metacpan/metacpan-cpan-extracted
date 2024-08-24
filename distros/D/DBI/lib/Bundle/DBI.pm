@@ -1,8 +1,10 @@
+#!/usr/bin/perl
 # -*- perl -*-
 
 package Bundle::DBI;
 
 use strict;
+use warnings;
 our $VERSION = "12.008696";
 
 1;

@@ -1,4 +1,6 @@
 #include "EVAPI.h"
+#define PERL_NO_GET_CONTEXT
+#include "ppport.h"
 #include <stdio.h>
 #include <unistd.h>
 #include <fcntl.h>
@@ -8,9 +10,8 @@
 #include <netinet/ip.h>
 #include <netinet/tcp.h>
 #include <sys/uio.h>
-
-#include "ppport.h"
-
+#include <time.h>
+#include "picohttpparser-git/picohttpparser.c"
 
 ///////////////////////////////////////////////////////////////
 // "Compile Time Options" - See Feersum.pm POD for information
@@ -22,16 +23,11 @@
 #define READ_BUFSZ 4096
 #define READ_INIT_FACTOR 2
 #define READ_GROW_FACTOR 8
+#define READ_TIMEOUT 5.0
 
 #define AUTOCORK_WRITES 1
-
-#if 0
-# define FLASH_SOCKET_POLICY_SUPPORT
-#endif
-
-#ifndef FLASH_SOCKET_POLICY
-# define FLASH_SOCKET_POLICY "<?xml version=\"1.0\"?>\n<!DOCTYPE cross-domain-policy SYSTEM \"/xml/dtds/cross-domain-policy.dtd\">\n<cross-domain-policy>\n<site-control permitted-cross-domain-policies=\"master-only\"/>\n<allow-access-from domain=\"*\" to-ports=\"*\" secure=\"false\"/>\n</cross-domain-policy>\n"
-#endif
+#define KEEPALIVE_CONNECTION 0
+#define DATE_HEADER 1
 
 // may be lower for your platform (e.g. Solaris is 16).  See POD.
 #define FEERSUM_IOMATRIX_SIZE 64
@@ -43,14 +39,27 @@
 #endif
 
 ///////////////////////////////////////////////////////////////
-
-
 #ifdef __GNUC__
 # define likely(x)   __builtin_expect(!!(x), 1)
 # define unlikely(x) __builtin_expect(!!(x), 0)
 #else
 # define likely(x)   (x)
 # define unlikely(x) (x)
+#endif
+
+#ifndef HAS_ACCEPT4
+#ifdef __GLIBC_PREREQ
+#if __GLIBC_PREREQ(2, 10)
+    // accept4 is available
+    #define HAS_ACCEPT4 1
+#endif
+#endif
+#endif
+
+#ifndef HAS_ACCEPT4
+    #ifdef __NR_accept4
+        #define HAS_ACCEPT4 1
+    #endif
 #endif
 
 #ifndef CRLF
@@ -115,7 +124,6 @@
 #define trace3(...)
 #endif
 
-#include "picohttpparser-git/picohttpparser.c"
 #include "rinq.c"
 
 // Check FEERSUM_IOMATRIX_SIZE against what's actually usable on this
@@ -139,11 +147,15 @@ struct feer_req {
     SV *buf;
     const char* method;
     size_t method_len;
-    const char* path;
-    size_t path_len;
+    const char* uri;
+    size_t uri_len;
     int minor_version;
     size_t num_headers;
     struct phr_header headers[MAX_HEADERS];
+    SV* path;
+    SV* query;
+    SV* addr;
+    SV* port;
 };
 
 enum feer_respond_state {
@@ -162,17 +174,19 @@ enum feer_respond_state {
 } while (0)
 
 enum feer_receive_state {
-    RECEIVE_HEADERS = 0,
-    RECEIVE_BODY = 1,
-    RECEIVE_STREAMING = 2,
-    RECEIVE_SHUTDOWN = 3
+    RECEIVE_WAIT = 0,
+    RECEIVE_HEADERS = 1,
+    RECEIVE_BODY = 2,
+    RECEIVE_STREAMING = 3,
+    RECEIVE_SHUTDOWN = 4
 };
 #define RECEIVE_STR(_n,_s) do { \
     switch(_n) { \
-    case RECEIVE_HEADERS:   _s = "HEADERS(0)"; break; \
-    case RECEIVE_BODY:      _s = "BODY(1)"; break; \
-    case RECEIVE_STREAMING: _s = "STREAMING(2)"; break; \
-    case RECEIVE_SHUTDOWN:  _s = "SHUTDOWN(3)"; break; \
+    case RECEIVE_WAIT:      _s = "WAIT(0)"; break; \
+    case RECEIVE_HEADERS:   _s = "HEADERS(1)"; break; \
+    case RECEIVE_BODY:      _s = "BODY(2)"; break; \
+    case RECEIVE_STREAMING: _s = "STREAMING(3)"; break; \
+    case RECEIVE_SHUTDOWN:  _s = "SHUTDOWN(4)"; break; \
     } \
 } while (0)
 
@@ -197,11 +211,20 @@ struct feer_conn {
 
     enum feer_respond_state responding;
     enum feer_receive_state receiving;
+    bool is_keepalive;
 
-    int in_callback;
-    int is_http11:1;
-    int poll_write_cb_is_io_handle:1;
-    int auto_cl:1;
+    unsigned int in_callback;
+    unsigned int is_http11:1;
+    unsigned int poll_write_cb_is_io_handle:1;
+    unsigned int auto_cl:1;
+};
+
+enum feer_header_norm_style {
+    HEADER_NORM_SKIP = 0,
+    HEADER_NORM_UPCASE_DASH = 1,
+    HEADER_NORM_LOCASE_DASH = 2,
+    HEADER_NORM_UPCASE = 3,
+    HEADER_NORM_LOCASE = 4
 };
 
 typedef struct feer_conn feer_conn_handle; // for typemap
@@ -210,12 +233,26 @@ typedef struct feer_conn feer_conn_handle; // for typemap
 #define IsArrayRef(_x) (SvROK(_x) && SvTYPE(SvRV(_x)) == SVt_PVAV)
 #define IsCodeRef(_x) (SvROK(_x) && SvTYPE(SvRV(_x)) == SVt_PVCV)
 
+static SV* feersum_env_method(pTHX_ struct feer_req *r);
+static SV* feersum_env_uri(pTHX_ struct feer_req *r);
+static SV* feersum_env_protocol(pTHX_ struct feer_req *r);
+static void feersum_set_path_and_query(pTHX_ struct feer_req *r);
+static void feersum_set_remote_info(pTHX_ struct feer_req *r, struct sockaddr *sa);
 static HV* feersum_env(pTHX_ struct feer_conn *c);
+static SV* feersum_env_path(pTHX_ struct feer_req *r);
+static SV* feersum_env_query(pTHX_ struct feer_req *r);
+static HV* feersum_env_headers(pTHX_ struct feer_req *r, int norm);
+static SV* feersum_env_header(pTHX_ struct feer_req *r, SV* name);
+static SV* feersum_env_addr(pTHX_ struct feer_conn *c);
+static SV* feersum_env_port(pTHX_ struct feer_conn *c);
+static ssize_t feersum_env_content_length(pTHX_ struct feer_conn *c);
+static SV* feersum_env_io(pTHX_ struct feer_conn *c);
 static void feersum_start_response
     (pTHX_ struct feer_conn *c, SV *message, AV *headers, int streaming);
 static size_t feersum_write_whole_body (pTHX_ struct feer_conn *c, SV *body);
 static void feersum_handle_psgi_response(
     pTHX_ struct feer_conn *c, SV *ret, bool can_recurse);
+static bool feersum_set_keepalive (pTHX_ struct feer_conn *c, bool is_keepalive);
 static int feersum_close_handle(pTHX_ struct feer_conn *c, bool is_writer);
 static SV* feersum_conn_guard(pTHX_ struct feer_conn *c, SV *guard);
 
@@ -264,10 +301,12 @@ static bool request_cb_is_psgi = 0;
 static SV *shutdown_cb_cv = NULL;
 static bool shutting_down = 0;
 static int active_conns = 0;
-static double read_timeout = 5.0;
+static double read_timeout = READ_TIMEOUT;
 
 static SV *feer_server_name = NULL;
 static SV *feer_server_port = NULL;
+static bool is_tcp = 1;
+static bool is_keepalive = KEEPALIVE_CONNECTION;
 
 static ev_io accept_w;
 static ev_prepare ep;
@@ -282,6 +321,53 @@ static SV *psgi_serv10, *psgi_serv11, *crlf_sv;
 // TODO: make this thread-local if and when there are multiple C threads:
 struct ev_loop *feersum_ev_loop = NULL;
 static HV *feersum_tmpl_env = NULL;
+
+#define DATE_HEADER_LENGTH 37  // "Date: Thu, 01 Jan 1970 00:00:00 GMT\015\012"
+
+static const char *const DAYS[] = {"Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"};
+static const char *const MONTHS[] = {"Jan", "Feb", "Mar", "Apr", "May", "Jun",
+                                     "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"};
+
+static char DATE_BUF[DATE_HEADER_LENGTH+1] = "Date: The, 01 Jan 1970 00:00:00 GMT\015\012";
+static time_t LAST_GENERATED_TIME = 0;
+
+static INLINE_UNLESS_DEBUG void uint_to_str(unsigned int value, char *str) {
+    str[0] = (value / 10) + '0';
+    str[1] = (value % 10) + '0';
+}
+
+static INLINE_UNLESS_DEBUG void uint_to_str_4digits(unsigned int value, char *str) {
+    str[0] = (value / 1000) + '0';
+    str[1] = (value / 100) % 10 + '0';
+    str[2] = (value / 10) % 10 + '0';
+    str[3] = value % 10 + '0';
+}
+
+INLINE_UNLESS_DEBUG
+static void generate_date_header(void) {
+    time_t now = time(NULL);
+    if (now == LAST_GENERATED_TIME) return;
+
+    LAST_GENERATED_TIME = now;
+    struct tm *tm = gmtime(&now);
+
+    const char *day = DAYS[tm->tm_wday];
+    DATE_BUF[6] = day[0];
+    DATE_BUF[7] = day[1];
+    DATE_BUF[8] = day[2];
+
+    uint_to_str(tm->tm_mday, DATE_BUF + 11);
+
+    const char *month = MONTHS[tm->tm_mon];
+    DATE_BUF[14] = month[0];
+    DATE_BUF[15] = month[1];
+    DATE_BUF[16] = month[2];
+
+    uint_to_str_4digits(tm->tm_year + 1900, DATE_BUF + 18);
+    uint_to_str(tm->tm_hour, DATE_BUF + 23);
+    uint_to_str(tm->tm_min, DATE_BUF + 26);
+    uint_to_str(tm->tm_sec, DATE_BUF + 29);
+}
 
 INLINE_UNLESS_DEBUG
 static SV*
@@ -522,6 +608,9 @@ http_code_to_msg (int code) {
 static int
 prep_socket(int fd, int is_tcp)
 {
+#ifdef HAS_ACCEPT4
+    int flags = 1;
+#else
     int flags;
 
     // make it non-blocking
@@ -529,15 +618,15 @@ prep_socket(int fd, int is_tcp)
     if (unlikely(fcntl(fd, F_SETFL, flags) < 0))
         return -1;
 
+    flags = 1;
+#endif
     if (likely(is_tcp)) {
         // flush writes immediately
-        flags = 1;
         if (unlikely(setsockopt(fd, SOL_TCP, TCP_NODELAY, &flags, sizeof(int))))
             return -1;
     }
 
     // handle URG data inline
-    flags = 1;
     if (unlikely(setsockopt(fd, SOL_SOCKET, SO_OOBINLINE, &flags, sizeof(int))))
         return -1;
 
@@ -582,6 +671,7 @@ new_feer_conn (EV_P_ int conn_fd, struct sockaddr *sa)
     c->sa = sa;
     c->responding = RESPOND_NOT_STARTED;
     c->receiving = RECEIVE_HEADERS;
+    c->is_keepalive = 0;
 
     ev_io_init(&c->read_ev_io, try_conn_read, conn_fd, EV_READ);
     c->read_ev_io.data = (void *)c;
@@ -864,7 +954,8 @@ try_write_again_immediately:
         goto try_write_finished;
     }
 
-    for (i = m->offset; i < m->count && wrote > 0; i++) {
+    bool consume = 1;
+    for (i = m->offset; i < m->count && consume; i++) {
         struct iovec *v = &m->iov[i];
         if (unlikely(v->iov_len > wrote)) {
             trace3("offset vector %d  base=%p len=%"Sz_uf"\n",
@@ -872,7 +963,7 @@ try_write_again_immediately:
             v->iov_base += wrote;
             v->iov_len  -= wrote;
             // don't consume any more:
-            wrote = 0;
+            consume = 0;
         }
         else {
             trace3("consume vector %d base=%p len=%"Sz_uf" sv=%p\n",
@@ -928,10 +1019,29 @@ try_write_paused:
     goto try_write_cleanup;
 
 try_write_shutdown:
-    trace3("write SHUTDOWN %d, refcnt=%d, state=%d\n", c->fd, SvREFCNT(c->self), c->responding);
-    change_responding_state(c, RESPOND_SHUTDOWN);
-    stop_write_watcher(c);
-    safe_close_conn(c, "close at write shutdown");
+    if (likely(c->is_keepalive)) {
+        trace3("write SHUTDOWN, but KEEP %d, refcnt=%d, state=%d\n", c->fd, SvREFCNT(c->self), c->responding);
+        stop_write_watcher(c);
+        change_responding_state(c, RESPOND_NOT_STARTED);
+        change_receiving_state(c, RECEIVE_WAIT);
+        if (likely(c->req)) {
+            if (c->req->buf) SvREFCNT_dec(c->req->buf);
+            if (likely(c->req->path)) SvREFCNT_dec(c->req->path);
+            if (likely(c->req->query)) SvREFCNT_dec(c->req->query);
+            if (likely(c->req->addr)) SvREFCNT_dec(c->req->addr);
+            if (likely(c->req->port)) SvREFCNT_dec(c->req->port);
+            Safefree(c->req);
+        }
+        c->req = NULL;
+        start_read_watcher(c);
+        restart_read_timer(c);
+        trace3("connections active on %d\n", c->fd);
+    } else {
+        trace3("write SHUTDOWN %d, refcnt=%d, state=%d\n", c->fd, SvREFCNT(c->self), c->responding);
+        stop_write_watcher(c);
+        change_responding_state(c, RESPOND_SHUTDOWN);
+        safe_close_conn(c, "close at write shutdown");
+    }
 
 try_write_cleanup:
     SvREFCNT_dec(c->self);
@@ -953,7 +1063,7 @@ try_parse_http(struct feer_conn *c, size_t last_read)
 
     return phr_parse_request(SvPVX(c->rbuf), SvCUR(c->rbuf),
         &req->method, &req->method_len,
-        &req->path, &req->path_len, &req->minor_version,
+        &req->uri, &req->uri_len, &req->minor_version,
         req->headers, &req->num_headers,
         (SvCUR(c->rbuf)-last_read));
 }
@@ -1008,36 +1118,17 @@ try_conn_read(EV_P_ ev_io *w, int revents)
     trace("read %d %"Ssz_df"\n", w->fd, (Ssz)got_n);
     SvCUR(c->rbuf) += got_n;
     // likely = optimize for small requests
-    if (likely(c->receiving == RECEIVE_HEADERS)) {
-
-#ifdef FLASH_SOCKET_POLICY_SUPPORT
-        if (unlikely(*SvPVX(c->rbuf) == '<')) {
-            if (likely(SvCUR(c->rbuf) >= 22)) { // length of vvv
-                if (str_eq(SvPVX(c->rbuf), 22, "<policy-file-request/>", 22)) {
-                    add_const_to_wbuf(c, STR_WITH_LEN(FLASH_SOCKET_POLICY));
-                    conn_write_ready(c);
-                    stop_read_watcher(c);
-                    stop_read_timer(c);
-                    // TODO: keep-alives: be sure to remove the 22 bytes
-                    // out of the rbuf
-                    change_receiving_state(c, RECEIVE_SHUTDOWN);
-                    change_responding_state(c, RESPOND_SHUTDOWN);
-                    goto dont_read_again;
-                }
-            }
-            // "if prefixed with"
-            else if (likely(str_eq(SvPVX(c->rbuf), SvCUR(c->rbuf),
-                                   "<policy-file-request/>", SvCUR(c->rbuf))))
-            {
-                goto try_read_again;
-            }
-        }
-#endif
-
+    if (likely(c->receiving <= RECEIVE_HEADERS)) {
         int ret = try_parse_http(c, (size_t)got_n);
         if (ret == -1) goto try_read_bad;
-        if (ret == -2) goto try_read_again;
-
+#ifdef TCP_DEFER_ACCEPT
+        if (ret == -2) goto try_read_again_reset_timer;
+#else
+        if (ret == -2) {
+            if (is_tcp) goto try_read_again;
+            else goto try_read_again_reset_timer;
+        }
+#endif
         if (process_request_headers(c, ret))
             goto try_read_again_reset_timer;
         else
@@ -1105,7 +1196,7 @@ conn_read_timeout (EV_P_ ev_timer *w, int revents)
 
     trace("read timeout %d\n", c->fd);
 
-    if (likely(c->responding == RESPOND_NOT_STARTED)) {
+    if (likely(c->responding == RESPOND_NOT_STARTED) && c->receiving >= RECEIVE_HEADERS) {
         const char *msg;
         if (c->receiving == RECEIVE_HEADERS) {
             msg = "Headers took too long.";
@@ -1114,10 +1205,8 @@ conn_read_timeout (EV_P_ ev_timer *w, int revents)
             msg = "Timeout reading body.";
         }
         respond_with_server_error(c, msg, 0, 408);
-    }
-    else {
-        // XXX as of 0.984 this appears to be dead code
-        trace("read timeout while writing %d\n",c->fd);
+    } else {
+        trace("read timeout in keepalive conn: %d\n", c->fd);
         stop_write_watcher(c);
         stop_read_watcher(c);
         stop_read_timer(c);
@@ -1155,15 +1244,13 @@ accept_cb (EV_P_ ev_io *w, int revents)
     while (1) {
         sa_len = sizeof(struct sockaddr_storage);
         errno = 0;
-
+#ifdef HAS_ACCEPT4
+        int fd = accept4(w->fd, (struct sockaddr *)&sa_buf, &sa_len, SOCK_CLOEXEC|SOCK_NONBLOCK);
+#else
         int fd = accept(w->fd, (struct sockaddr *)&sa_buf, &sa_len);
+#endif
         trace("accepted fd=%d, errno=%d\n", fd, errno);
         if (fd == -1) break;
-
-        int is_tcp = 1;
-#ifdef AF_UNIX
-        if (unlikely(sa_buf.ss_family == AF_UNIX)) is_tcp = 0;
-#endif
 
         assert(sa_len <= sizeof(struct sockaddr_storage));
         if (unlikely(prep_socket(fd, is_tcp))) {
@@ -1176,9 +1263,19 @@ accept_cb (EV_P_ ev_io *w, int revents)
         struct sockaddr *sa = (struct sockaddr *)malloc(sa_len);
         memcpy(sa,&sa_buf,(size_t)sa_len);
         struct feer_conn *c = new_feer_conn(EV_A,fd,sa);
-        start_read_watcher(c);
-        restart_read_timer(c);
-        assert(SvREFCNT(c->self) == 3);
+#ifdef TCP_DEFER_ACCEPT
+        try_conn_read(EV_A, &c->read_ev_io, EV_READ);
+        assert(SvREFCNT(c->self) <= 3);
+#else
+        if (is_tcp) {
+            start_read_watcher(c);
+            restart_read_timer(c);
+            assert(SvREFCNT(c->self) == 3);
+        } else {
+            try_conn_read(EV_A, &c->read_ev_io, EV_READ);
+            assert(SvREFCNT(c->self) <= 3);
+        }
+#endif
         SvREFCNT_dec(c->self);
     }
 }
@@ -1206,8 +1303,10 @@ process_request_headers (struct feer_conn *c, int body_offset)
     trace("processing headers %d minor_version=%d\n",c->fd,req->minor_version);
     bool body_is_required;
     bool next_req_follows = 0;
+    bool got_content_length = 0;
 
     c->is_http11 = (req->minor_version == 1);
+    c->is_keepalive = is_keepalive && c->is_http11;
 
     change_receiving_state(c, RECEIVE_BODY);
 
@@ -1218,7 +1317,6 @@ process_request_headers (struct feer_conn *c, int body_offset)
         next_req_follows = 1;
     }
     else if (likely(str_eq("OPTIONS", 7, req->method, req->method_len))) {
-        body_is_required = 1;
         next_req_follows = 1;
     }
     else if (likely(str_eq("POST", 4, req->method, req->method_len))) {
@@ -1260,9 +1358,6 @@ process_request_headers (struct feer_conn *c, int body_offset)
     c->rbuf = new_rbuf;
     SvCUR_set(req->buf, body_offset);
 
-    if (likely(next_req_follows)) // optimize for GET
-        goto got_it_all;
-
     // determine how much we need to read
     int i;
     UV expected = 0;
@@ -1281,7 +1376,7 @@ process_request_headers (struct feer_conn *c, int body_offset)
                     goto got_bad_request;
                 }
                 else
-                    goto got_cl;
+                    got_content_length = 1;
             }
             else {
                 err_code = 400;
@@ -1289,9 +1384,30 @@ process_request_headers (struct feer_conn *c, int body_offset)
                 goto got_bad_request;
             }
         }
-        // TODO: support "Connection: close" bodies
+        else if (
+            unlikely(str_case_eq("connection", 10, hdr->name, hdr->name_len)))
+        {
+            if (likely(c->is_http11)
+                && likely(str_case_eq("close", 5, hdr->value, hdr->value_len))
+                && c->is_keepalive)
+            {
+                c->is_keepalive = 0;
+                trace("setting conn %d to close after response\n", c->fd);
+            }
+            else if (
+                likely(!c->is_http11)
+                && likely(str_case_eq("keep-alive", 10, hdr->value, hdr->value_len))
+                && !c->is_keepalive)
+            {
+                c->is_keepalive = 1;
+                trace("setting conn %d to keep after response\n", c->fd);
+            }
+        }
         // TODO: support "Transfer-Encoding: chunked" bodies
     }
+
+    if (likely(next_req_follows)) goto got_it_all; // optimize for GET
+    else if (likely(got_content_length)) goto got_cl;
 
     if (body_is_required) {
         // Go the nginx route...
@@ -1461,6 +1577,107 @@ needs_decode:
     SvCUR_set(sv, decoded-ptr);
 }
 
+INLINE_UNLESS_DEBUG void
+feersum_set_remote_info(pTHX_ struct feer_req *r, struct sockaddr *sa)
+{
+    switch (sa->sa_family) {
+        case AF_INET:
+            r->addr = newSV(INET_ADDRSTRLEN);
+            SvCUR_set(r->addr, INET_ADDRSTRLEN);
+            struct sockaddr_in *in = (struct sockaddr_in *)sa;
+            inet_ntop(AF_INET, &in->sin_addr, SvPVX(r->addr), INET_ADDRSTRLEN);
+            SvPOK_on(r->addr);
+            SvCUR_set(r->addr, strlen(SvPVX(r->addr)));
+            r->port = newSViv(ntohs(in->sin_port));
+            break;
+#ifdef AF_INET6
+        case AF_INET6:
+            r->addr = newSV(INET6_ADDRSTRLEN);
+            SvCUR_set(r->addr, INET6_ADDRSTRLEN);
+            struct sockaddr_in6 *in6 = (struct sockaddr_in6 *)sa;
+            inet_ntop(AF_INET6, &in6->sin6_addr, SvPVX(r->addr), INET6_ADDRSTRLEN);
+            SvPOK_on(r->addr);
+            SvCUR_set(r->addr, strlen(SvPVX(r->addr)));
+            r->port = newSViv(ntohs(in6->sin6_port));
+            break;
+#endif
+#ifdef AF_UNIX
+        case AF_UNIX:
+            r->addr = newSVpvs("unix");
+            r->port = newSViv(0);
+            break;
+#endif
+        default:
+            r->addr = newSVpvs("unspec");
+            r->port = newSViv(0);
+            break;
+    }
+}
+
+INLINE_UNLESS_DEBUG static SV*
+feersum_env_method(pTHX_ struct feer_req *r)
+{
+    return newSVpvn(r->method, r->method_len);
+}
+
+INLINE_UNLESS_DEBUG static SV*
+feersum_env_uri(pTHX_ struct feer_req *r)
+{
+    return newSVpvn(r->uri, r->uri_len);
+}
+
+INLINE_UNLESS_DEBUG static SV*
+feersum_env_protocol(pTHX_ struct feer_req *r)
+{
+    return (r->minor_version == 1) ? psgi_serv11 : psgi_serv10;
+}
+
+INLINE_UNLESS_DEBUG static void
+feersum_set_path_and_query(pTHX_ struct feer_req *r)
+{
+    const char *qpos = r->uri;
+    while (*qpos != '?' && qpos < r->uri + r->uri_len) qpos++;
+    if (*qpos == '?') {
+        r->path = newSVpvn(r->uri, (qpos - r->uri));
+        qpos++;
+        r->query = newSVpvn(qpos, r->uri_len - (qpos - r->uri));
+    } else {
+        r->path = feersum_env_uri(aTHX_ r);
+        r->query = newSVpvs("");
+    }
+    uri_decode_sv(r->path);
+}
+
+INLINE_UNLESS_DEBUG static SV*
+feersum_env_path(pTHX_ struct feer_req *r)
+{
+    if (unlikely(!r->path)) feersum_set_path_and_query(aTHX_ r);
+    return r->path;
+}
+
+INLINE_UNLESS_DEBUG static SV*
+feersum_env_query(pTHX_ struct feer_req *r)
+{
+    if (unlikely(!r->query)) feersum_set_path_and_query(aTHX_ r);
+    return r->query;
+}
+
+INLINE_UNLESS_DEBUG static SV*
+feersum_env_addr(pTHX_ struct feer_conn *c)
+{
+    struct feer_req *r = c->req;
+    if (unlikely(!r->addr)) feersum_set_remote_info(aTHX_ r, c->sa);
+    return r->addr;
+}
+
+INLINE_UNLESS_DEBUG static SV*
+feersum_env_port(pTHX_ struct feer_conn *c)
+{
+    struct feer_req *r = c->req;
+    if (unlikely(!r->port)) feersum_set_remote_info(aTHX_ r, c->sa);
+    return r->port;
+}
+
 static void
 feersum_init_tmpl_env(pTHX)
 {
@@ -1530,51 +1747,17 @@ feersum_env(pTHX_ struct feer_conn *c)
     e = newHVhv(feersum_tmpl_env);
 
     trace("generating header (fd %d) %.*s\n",
-        c->fd, (int)r->path_len, r->path);
+        c->fd, (int)r->uri_len, r->uri);
 
-    SV *path = newSVpvn(r->path, r->path_len);
-    hv_stores(e, "SERVER_NAME", newSVsv(feer_server_name));
-    hv_stores(e, "SERVER_PORT", newSVsv(feer_server_port));
-    hv_stores(e, "REQUEST_URI", path);
-    hv_stores(e, "REQUEST_METHOD", newSVpvn(r->method,r->method_len));
-    hv_stores(e, "SERVER_PROTOCOL", (r->minor_version == 1) ?
-        newSVsv(psgi_serv11) : newSVsv(psgi_serv10));
+    hv_stores(e, "SERVER_NAME", SvREFCNT_inc_simple(feer_server_name));
+    hv_stores(e, "SERVER_PORT", newSVsv_nomg(feer_server_port));
+    hv_stores(e, "REQUEST_URI", feersum_env_uri(aTHX_ r));
+    hv_stores(e, "REQUEST_METHOD", feersum_env_method(aTHX_ r));
+    hv_stores(e, "SERVER_PROTOCOL", SvREFCNT_inc_simple_NN(feersum_env_protocol(aTHX_ r)));
 
-    SV *addr = &PL_sv_undef;
-    SV *port = &PL_sv_undef;
-    const char *str_addr;
-    unsigned short s_port;
-
-    if (c->sa->sa_family == AF_INET) {
-        struct sockaddr_in *in = (struct sockaddr_in *)c->sa;
-        addr = newSV(INET_ADDRSTRLEN);
-        str_addr = inet_ntop(AF_INET,&in->sin_addr,SvPVX(addr),INET_ADDRSTRLEN);
-        s_port = ntohs(in->sin_port);
-    }
-#ifdef AF_INET6
-    else if (c->sa->sa_family == AF_INET6) {
-        struct sockaddr_in6 *in6 = (struct sockaddr_in6 *)c->sa;
-        addr = newSV(INET6_ADDRSTRLEN);
-        str_addr = inet_ntop(AF_INET6,&in6->sin6_addr,SvPVX(addr),INET6_ADDRSTRLEN);
-        s_port = ntohs(in6->sin6_port);
-    }
-#endif
-#ifdef AF_UNIX
-    else if (c->sa->sa_family == AF_UNIX) {
-        str_addr = "unix";
-        addr = newSV(sizeof(str_addr));
-        memcpy(SvPVX(addr), str_addr, sizeof(str_addr));
-        s_port = 0;
-    }
-#endif
-
-    if (likely(str_addr)) {
-        SvCUR(addr) = strlen(SvPVX(addr));
-        SvPOK_on(addr);
-        port = newSViv(s_port);
-    }
-    hv_stores(e, "REMOTE_ADDR", addr);
-    hv_stores(e, "REMOTE_PORT", port);
+    if (likely(!r->addr)) feersum_set_remote_info(aTHX_ r, c->sa);
+    hv_stores(e, "REMOTE_ADDR", SvREFCNT_inc_simple_NN(r->addr));
+    hv_stores(e, "REMOTE_PORT", SvREFCNT_inc_simple_NN(r->port));
 
     if (unlikely(c->expected_cl > 0)) {
         hv_stores(e, "CONTENT_LENGTH", newSViv(c->expected_cl));
@@ -1590,29 +1773,9 @@ feersum_env(pTHX_ struct feer_conn *c)
         sv_magicext(fake_fh, selfref, PERL_MAGIC_ext, &psgix_io_vtbl, NULL, 0);
         hv_stores(e, "psgix.io", fake_fh);
     }
-
-    {
-        const char *qpos = r->path;
-        SV *pinfo, *qstr;
-
-        // rather than memchr, for speed:
-        while (*qpos != '?' && qpos < r->path + r->path_len)
-            qpos++;
-
-        if (*qpos == '?') {
-            pinfo = newSVpvn(r->path, (qpos - r->path));
-            qpos++;
-            qstr = newSVpvn(qpos, r->path_len - (qpos - r->path));
-        }
-        else {
-            pinfo = newSVsv(path);
-            qstr = NULL; // use template default
-        }
-        uri_decode_sv(pinfo);
-        hv_stores(e, "PATH_INFO", pinfo);
-        if (qstr != NULL) // hv template defaults QUERY_STRING to empty
-            hv_stores(e, "QUERY_STRING", qstr);
-    }
+    if (likely(!r->path)) feersum_set_path_and_query(aTHX_ r);
+    hv_stores(e, "PATH_INFO", SvREFCNT_inc_simple_NN(r->path));
+    hv_stores(e, "QUERY_STRING", SvREFCNT_inc_simple_NN(r->query));
 
     SV *val = NULL;
     char *kbuf;
@@ -1671,6 +1834,71 @@ feersum_env(pTHX_ struct feer_conn *c)
     Safefree(kbuf);
 
     return e;
+}
+
+#define COPY_NORM_HEADER(_str) \
+for (i = 0; i < r->num_headers; i++) {\
+    struct phr_header *hdr = &(r->headers[i]);\
+    if (unlikely(hdr->name == NULL && val != NULL)) {\
+        sv_catpvn(*val, hdr->value, hdr->value_len);\
+        continue;\
+    }\
+    char *k = kbuf;\
+    for (j = 0; j < hdr->name_len; j++) { char n = hdr->name[j]; *k++ = _str; }\
+    if (unlikely(kbuflen < hdr->name_len)) { kbuflen = hdr->name_len; kbuf = Renew(kbuf, kbuflen, char); }\
+    SV** val = hv_fetch(e, kbuf, hdr->name_len, 1);\
+    if (unlikely(SvPOK(*val))) {\
+        sv_catpvn(*val, ", ", 2);\
+        sv_catpvn(*val, hdr->value, hdr->value_len);\
+    } else {\
+        sv_setpvn(*val, hdr->value, hdr->value_len);\
+    }\
+}\
+break;
+
+INLINE_UNLESS_DEBUG static HV*
+feersum_env_headers(pTHX_ struct feer_req *r, int norm)
+{
+    int i; int j; char* n; HV* e;
+    e = newHV();
+    SV** val;
+    char *kbuf;
+    size_t kbuflen = 64;
+    Newx(kbuf, kbuflen, char);
+    switch (norm) {
+        case HEADER_NORM_SKIP:
+            COPY_NORM_HEADER(n)
+        case HEADER_NORM_LOCASE:
+            COPY_NORM_HEADER(tolower(n))
+        case HEADER_NORM_UPCASE:
+            COPY_NORM_HEADER(toupper(n))
+        case HEADER_NORM_LOCASE_DASH:
+            COPY_NORM_HEADER((n == '-') ? '_' : tolower(n))
+        case HEADER_NORM_UPCASE_DASH:
+            COPY_NORM_HEADER((n == '-') ? '_' : toupper(n))
+    }
+    Safefree(kbuf);
+    return e;
+}
+
+INLINE_UNLESS_DEBUG static SV*
+feersum_env_header(pTHX_ struct feer_req *r, SV *name)
+{
+    int i;
+    for (i = 0; i < r->num_headers; i++) {
+        struct phr_header *hdr = &(r->headers[i]);
+        if (hdr->name == NULL) continue;
+        if (unlikely(str_case_eq(SvPVX(name), SvCUR(name), hdr->name, hdr->name_len))) {
+            return newSVpvn(hdr->value, hdr->value_len);
+        }
+    }
+    return &PL_sv_undef;
+}
+
+INLINE_UNLESS_DEBUG static ssize_t
+feersum_env_content_length(pTHX_ struct feer_conn *c)
+{
+    return c->expected_cl;
 }
 
 static void
@@ -1790,6 +2018,17 @@ feersum_write_whole_body (pTHX_ struct feer_conn *c, SV *body)
     else {
         body_is_string = 1;
     }
+
+    if (likely(c->is_http11)) {
+        #ifdef DATE_HEADER
+        generate_date_header();
+        #endif
+        add_const_to_wbuf(c, DATE_BUF, DATE_HEADER_LENGTH);
+        if (unlikely(!c->is_keepalive))
+            add_const_to_wbuf(c, "Connection: close" CRLF, 19);
+    }
+    else if (unlikely(c->is_keepalive))
+        add_const_to_wbuf(c, "Connection: keep-alive" CRLF, 24);
 
     SV *cl_sv; // content-length future
     struct iovec *cl_iov;
@@ -2221,6 +2460,27 @@ void
 accept_on_fd(SV *self, int fd)
     PPCODE:
 {
+    struct sockaddr_storage addr;
+    socklen_t addr_len = sizeof(addr);
+
+    if (getsockname(fd, (struct sockaddr*)&addr, &addr_len) == -1) perror("getsockname");
+    switch (addr.ss_family) {
+        case AF_INET:
+        case AF_INET6:
+            is_tcp = 1;
+#ifdef TCP_DEFER_ACCEPT
+            trace("going to defer accept on %d\n",fd);
+            if (setsockopt(fd, IPPROTO_TCP, TCP_DEFER_ACCEPT, &(int){1}, sizeof(int)) < 0)
+                perror("setsockopt TCP_DEFER_ACCEPT");
+#endif
+            break;
+#ifdef AF_UNIX
+        case AF_UNIX:
+            is_tcp = 0;
+            break;
+#endif
+    }
+
     trace("going to accept on %d\n",fd);
     feersum_ev_loop = EV_DEFAULT;
 
@@ -2311,11 +2571,20 @@ read_timeout (SV *self, ...)
         if (!(new_read_timeout > 0.0)) {
             croak("must set a positive (non-zero) value for the timeout");
         }
+        trace("set timeout %f\n", (double)new_read_timeout);
         read_timeout = (double) new_read_timeout;
     }
 }
     OUTPUT:
         RETVAL
+
+void
+set_keepalive (SV *self, SV *set)
+    PPCODE:
+{
+    trace("set keepalive %d\n", SvTRUE(set));
+    is_keepalive = SvTRUE(set);
+}
 
 void
 DESTROY (SV *self)
@@ -2624,6 +2893,13 @@ start_streaming (struct feer_conn *c, SV *message, AV *headers)
     OUTPUT:
         RETVAL
 
+int
+is_http11 (struct feer_conn *c)
+    CODE:
+        RETVAL = c->is_http11;
+    OUTPUT:
+        RETVAL
+
 size_t
 send_response (struct feer_conn *c, SV* message, AV *headers, SV *body)
     PROTOTYPE: $$\@$
@@ -2684,10 +2960,116 @@ env (struct feer_conn *c)
     OUTPUT:
         RETVAL
 
+SV *
+method (struct feer_conn *c)
+    PROTOTYPE: $
+    CODE:
+        struct feer_req *r = c->req;
+        RETVAL = feersum_env_method(aTHX_ r);
+    OUTPUT:
+        RETVAL
+
+SV *
+uri (struct feer_conn *c)
+    PROTOTYPE: $
+    CODE:
+        struct feer_req *r = c->req;
+        RETVAL = feersum_env_uri(aTHX_ r);
+    OUTPUT:
+        RETVAL
+
+SV *
+protocol (struct feer_conn *c)
+    PROTOTYPE: $
+    CODE:
+        struct feer_req *r = c->req;
+        RETVAL = SvREFCNT_inc_simple_NN(feersum_env_protocol(aTHX_ r));
+    OUTPUT:
+        RETVAL
+
+SV *
+path (struct feer_conn *c)
+    PROTOTYPE: $
+    CODE:
+        struct feer_req *r = c->req;
+        RETVAL = SvREFCNT_inc_simple_NN(feersum_env_path(aTHX_ r));
+    OUTPUT:
+        RETVAL
+
+SV *
+query (struct feer_conn *c)
+    PROTOTYPE: $
+    CODE:
+        struct feer_req *r = c->req;
+        RETVAL = SvREFCNT_inc_simple_NN(feersum_env_query(aTHX_ r));
+    OUTPUT:
+        RETVAL
+
+SV *
+remote_address (struct feer_conn *c)
+    PROTOTYPE: $
+    CODE:
+        RETVAL = SvREFCNT_inc_simple_NN(feersum_env_addr(aTHX_ c));
+    OUTPUT:
+        RETVAL
+
+SV *
+remote_port (struct feer_conn *c)
+    PROTOTYPE: $
+    CODE:
+        RETVAL = SvREFCNT_inc_simple_NN(feersum_env_port(aTHX_ c));
+    OUTPUT:
+        RETVAL
+
+ssize_t
+content_length (struct feer_conn *c)
+    PROTOTYPE: $
+    CODE:
+        RETVAL = feersum_env_content_length(aTHX_ c);
+    OUTPUT:
+        RETVAL
+
+SV *
+input (struct feer_conn *c)
+    PROTOTYPE: $
+    CODE:
+        if (likely(c->expected_cl > 0)) {
+            RETVAL = new_feer_conn_handle(aTHX_ c, 0);
+        } else {
+            RETVAL = &PL_sv_undef;
+        }
+    OUTPUT:
+        RETVAL
+
+SV *
+headers (struct feer_conn *c, int norm = 0)
+    PROTOTYPE: $;$
+    CODE:
+        struct feer_req *r = c->req;
+        RETVAL = newRV_noinc((SV*)feersum_env_headers(aTHX_ r, norm));
+    OUTPUT:
+        RETVAL
+
+SV *
+header (struct feer_conn *c, SV *name)
+    PROTOTYPE: $$
+    CODE:
+        struct feer_req *r = c->req;
+        RETVAL = feersum_env_header(aTHX_ r, name);
+    OUTPUT:
+        RETVAL
+
 int
 fileno (struct feer_conn *c)
     CODE:
         RETVAL = c->fd;
+    OUTPUT:
+        RETVAL
+
+bool
+is_keepalive (struct feer_conn *c)
+    CODE:
+        RETVAL = c->is_keepalive;
     OUTPUT:
         RETVAL
 
@@ -2720,6 +3102,10 @@ DESTROY (struct feer_conn *c)
 
     if (likely(c->req)) {
         if (c->req->buf) SvREFCNT_dec(c->req->buf);
+        if (likely(c->req->path)) SvREFCNT_dec(c->req->path);
+        if (likely(c->req->query)) SvREFCNT_dec(c->req->query);
+        if (likely(c->req->addr)) SvREFCNT_dec(c->req->addr);
+        if (likely(c->req->port)) SvREFCNT_dec(c->req->port);
         Safefree(c->req);
     }
 
@@ -2773,6 +3159,10 @@ BOOT:
 
         Zero(&psgix_io_vtbl, 1, MGVTBL);
         psgix_io_vtbl.svt_get = psgix_io_svt_get;
+        newCONSTSUB(feer_stash, "HEADER_NORM_UPCASE", newSViv(HEADER_NORM_UPCASE));
+        newCONSTSUB(feer_stash, "HEADER_NORM_LOCASE", newSViv(HEADER_NORM_LOCASE));
+        newCONSTSUB(feer_stash, "HEADER_NORM_UPCASE_DASH", newSViv(HEADER_NORM_UPCASE_DASH));
+        newCONSTSUB(feer_stash, "HEADER_NORM_LOCASE_DASH", newSViv(HEADER_NORM_LOCASE_DASH));
 
         trace3("Feersum booted, iomatrix %lu "
                 "(IOV_MAX=%u, FEERSUM_IOMATRIX_SIZE=%u), "

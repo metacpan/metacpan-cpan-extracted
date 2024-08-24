@@ -5,7 +5,7 @@ use Test::More;
 use Compression::Util qw(:all);
 use List::Util        qw(shuffle);
 
-plan tests => 771;
+plan tests => 820;
 
 ##################################
 
@@ -73,11 +73,16 @@ foreach my $str (
   ) {
     test_array(string2symbols($str));
 
-    is(bzip2_decompress(bzip2_compress($str)),                                           $str);
-    is(gzip_decompress(gzip_compress($str)),                                             $str);
-    is(gzip_decompress(gzip_compress($str, \&lzss_encode_fast)),                         $str);
-    is(lzb_decompress(lzb_compress($str)),                                               $str);
-    is(lzb_decompress(lzb_compress($str, \&lzss_encode_fast)),                           $str);
+    is(bzip2_decompress(bzip2_compress($str)),                   $str);
+    is(gzip_decompress(gzip_compress($str)),                     $str);
+    is(gzip_decompress(gzip_compress($str, \&lzss_encode_fast)), $str);
+
+    is(lzb_decompress(lzb_compress($str)),                     $str);
+    is(lzb_decompress(lzb_compress($str, \&lzss_encode_fast)), $str);
+
+    is(lz4_decompress(lz4_compress($str)),                     $str);
+    is(lz4_decompress(lz4_compress($str, \&lzss_encode_fast)), $str);
+
     is(lz77_decompress(lz77_compress($str)),                                             $str);
     is(lzss_decompress(lzss_compress($str)),                                             $str);
     is(lzss_decompress(lzss_compress($str, \&create_huffman_entry, \&lzss_encode_fast)), $str);
@@ -94,6 +99,16 @@ foreach my $str (
 is(bzip2_decompress(bzip2_compress('')),                   '');
 is(gzip_decompress(gzip_compress('')),                     '');
 is(gzip_decompress(gzip_compress('', \&lzss_encode_fast)), '');
+
+is(lzb_decompress(lzb_compress('')),                      '');
+is(lzb_decompress(lzb_compress('', \&lzss_encode_fast)),  '');
+is(lzb_decompress(lzb_compress('a')),                     'a');
+is(lzb_decompress(lzb_compress('a', \&lzss_encode_fast)), 'a');
+
+is(lz4_decompress(lz4_compress('')),                      '');
+is(lz4_decompress(lz4_compress('', \&lzss_encode_fast)),  '');
+is(lz4_decompress(lz4_compress('a')),                     'a');
+is(lz4_decompress(lz4_compress('a', \&lzss_encode_fast)), 'a');
 
 is(bwt_decompress(bwt_compress('a')),                                               'a');
 is(lzss_decompress(lzss_compress('a')),                                             'a');
@@ -171,6 +186,9 @@ is_deeply(lzss_decompress_symbolic(lzss_compress_symbolic([])),  []);
 
     is(lzb_decompress(lzb_compress($str)),                     $str);
     is(lzb_decompress(lzb_compress($str, \&lzss_encode_fast)), $str);
+
+    is(lz4_decompress(lz4_compress($str)),                     $str);
+    is(lz4_decompress(lz4_compress($str, \&lzss_encode_fast)), $str);
 
     is(lz77_decompress(lz77_compress($str)), $str);
     is(lz77_decompress(lz77_compress($str, \&create_ac_entry),          \&decode_ac_entry),          $str);
@@ -486,6 +504,43 @@ is(
     "hi there"
   );
 
+###################################################
+
+is(lz4_decompress("\4\"M\30d\@\xA7\0\0\0\0\5]\xCC\2"),                                               "");
+is(lz4_decompress("\4\"M\30`ps\0\0\0\0"),                                                            "");
+is(lz4_decompress("\4\"M\30d\@\xA7\1\0\0\x80a\0\0\0\0Vt\rU"),                                        "a");
+is(lz4_decompress("\4\"M\30`ps\2\0\0\0\20a\0\0\0\0"),                                                "a");
+is(lz4_decompress("\4\"M\30`ps\b\0\0\x002abc\3\0\20\n\0\0\0\0"),                                     "abcabcabc\n");
+is(lz4_decompress("\4\"M\30d\@\xA7\n\0\0\x80abcabcabc\n\0\0\0\0\xE9j\xA1C"),                         "abcabcabc\n");
+is(lz4_decompress("\4\"M\30`ps\13\0\0\0\xA0abcabcabc\n\0\0\0\0"),                                    "abcabcabc\n");
+is(lz4_decompress("\4\"M\30`ps\f\0\0\x003abc\3\0\31a\1\0\20\n\0\0\0\0"),                             "abcabcabcaaaaaaaaaaaaaaa\n");
+is(lz4_decompress("\4\"M\30d\@\xA7\17\0\0\x003abc\3\0\6\1\0Paaaa\n\0\0\0\0G}M\xC6"),                 "abcabcabcaaaaaaaaaaaaaaa\n");
+is(lz4_decompress("\4\"M\30`\@\x82\17\0\0\x003abc\3\0\6\1\0Paaaa\n\0\0\0\0"),                        "abcabcabcaaaaaaaaaaaaaaa\n");
+is(lz4_decompress("\4\"M\30p\@\xAD\17\0\0\x003abc\3\0\6\1\0Paaaa\n\xF6\xFE\xFE0\0\0\0\0"),           "abcabcabcaaaaaaaaaaaaaaa\n");
+is(lz4_decompress("\4\"M\30t\@\xBD\17\0\0\x003abc\3\0\5\1\0Paaaaa\a\x8A+\xDD\0\0\0\0\\\13\x81\xFE"), "abcabcabcaaaaaaaaaaaaaaa");
+is(lz4_decompress("\4\"M\30t\@\xBD\26\0\0\0\x92TOBEORNOT\t\0\x90TOBEORNOTb\xC52\32\0\0\0\0\x9Dn#B"), "TOBEORNOTTOBEORTOBEORNOT");
+is(lz4_decompress("\4\"M\30d\@\xA7\26\0\0\0\x92TOBEORNOT\t\0\x90TOBEORNOT\0\0\0\0\x9Dn#B"),          "TOBEORNOTTOBEORTOBEORNOT");
+is(lz4_decompress("\4\"M\30`ps\21\0\0\0\x92TOBEORNOT\t\0\4\17\0\20T\0\0\0\0"),                       "TOBEORNOTTOBEORTOBEORNOT");
+is(lz4_decompress("\4\"M\30`\@\x82\26\0\0\0\x92TOBEORNOT\t\0\x90TOBEORNOT\0\0\0\0"),                 "TOBEORNOTTOBEORTOBEORNOT");
+is(lz4_decompress("\4\"M\30p\@\xAD\26\0\0\0\x92TOBEORNOT\t\0\x90TOBEORNOTb\xC52\32\0\0\0\0"),        "TOBEORNOTTOBEORTOBEORNOT");
+
+is(
+    lz4_decompress("\4\"M\30d\@\xA7\16\0\0\x80Hello, World!\n\0\0\0\0\xE8C\xD0\x9E" . "\4\"M\30d\@\xA7\27\0\0\0\xE5Hello, World! \16\0Prld!\n\0\0\0\0\x9FL\"T"),
+    "Hello, World!\nHello, World! Hello, World!\n"
+  );
+
+is(
+    lz4_decompress(
+                       "\4\"M\30`ps\b\0\0\x002abc\3\0\20\n\0\0\0\0"
+                     . "\4\"M\30d\@\xA7\17\0\0\x003abc\3\0\6\1\0Paaaa\n\0\0\0\0G}M\xC6"
+                     . "\4\"M\30d\@\xA7\26\0\0\0\x92TOBEORNOT\t\0\x90TOBEORNOT\0\0\0\0\x9Dn#B"
+                     . "\4\"M\30t\@\xBD\17\0\0\x003abc\3\0\5\1\0Paaaaa\a\x8A+\xDD\0\0\0\0\\\13\x81\xFE"
+                  ),
+    "abcabcabc\n" . "abcabcabcaaaaaaaaaaaaaaa\n" . "TOBEORNOTTOBEORTOBEORNOT" . "abcabcabcaaaaaaaaaaaaaaa"
+  );
+
+###################################################
+
 {
 
     my $data = do {
@@ -501,6 +556,8 @@ is(
     is(lzss_decompress(lzss_compress($data, \&create_huffman_entry, \&lzss_encode_fast)), $data);
     is(lzb_decompress(lzb_compress($data)),                                               $data);
     is(lzb_decompress(lzb_compress($data, \&lzss_encode_fast)),                           $data);
+    is(lz4_decompress(lz4_compress($data)),                                               $data);
+    is(lz4_decompress(lz4_compress($data, \&lzss_encode_fast)),                           $data);
     is(bwt_decompress(bwt_compress($data)),                                               $data);
     is(mrl_decompress(mrl_compress($data)),                                               $data);
     is(lz77_decompress(lz77_compress($data)),                                             $data);

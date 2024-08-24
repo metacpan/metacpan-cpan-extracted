@@ -1,5 +1,11 @@
 Revision history for Perl extension Tk::PodViewer.
 
+0.02  Fri Aug 23 2024
+	- added demo executable 'podviewer'
+	- fixed zooming
+	- derived tags are now configured on the fly
+	- added options '-loadcall', '-scrollbars' and '-zoom'
+
 0.01  Tue Aug 20 2024
 	- original version; created by h2xs 1.23 Sun Aug  4 11:30:37 2024 with options 
 		-X Tk::PodViewer

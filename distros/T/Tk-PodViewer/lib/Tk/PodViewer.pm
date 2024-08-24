@@ -3,7 +3,7 @@ package Tk::PodViewer;
 use strict;
 use warnings;
 use vars qw($VERSION);
-$VERSION = '0.01';
+$VERSION = '0.02';
 use base qw(Tk::Derived Tk::Frame);
 
 Construct Tk::Widget 'PodViewer';
@@ -19,14 +19,6 @@ $mswin = 1 if $Config{'osname'} eq 'MSWin32';
 
 my @derivedtags = ('B', 'C', 'F', 'I', 'L', 'S');
 my $derivedreg = qr/^([^BCFILS]*)([BCFILS]*)$/;
-
-my %ignore = (
-	'begin' => 1,
-	'end' => 1,
-	'for' => 1,
-	'X' => 1,
-	'Z' => 1,
-);
 
 =head1 NAME
 
@@ -58,14 +50,31 @@ It supports most of the pod tags. It ignores the following tags:
 
 =over 4
 
-=item B<-fixedfontfamily>
+=item Switch: B<-fixedfontfamily>
 
 Default value 'Hack'. Specifies the font family for tags that require a fixed font
 family.
 
-=item B<-linkcolor>
+=item Switch: B<-loadcall>
 
-Default value '#0000FF' (blue). Specifies the foreground color for link tags.
+Callback called at the end of each load. Receives the source determinator
+as parameter.
+
+=item Name: B<linkColor>
+
+=item Class: B<LinkColor>
+
+=item Switch: B<-linkcolor>
+
+Default value '#3030DF' (light blue). Specifies the foreground color for link tags.
+
+=item Switch: B<-scrollbars>
+
+Only available at create time. Default value 'osoe'.
+
+=item Switch: B<-zoom>
+
+Default value 0. Set and get the zoom factor.
 
 =back
 
@@ -78,34 +87,36 @@ Default value '#0000FF' (blue). Specifies the foreground color for link tags.
 sub Populate {
 	my ($self,$args) = @_;
 
-	$self->SUPER::Populate($args);
+	my $scrollbars = delete $args->{'-scrollbars'};
+	$scrollbars = 'osoe' unless defined $scrollbars;
 
+	$self->SUPER::Populate($args);
+	
 	my $text = $self->Scrolled('ROText',
 		-width => 8,
 		-height => 8,
 		-insertwidth => 0,
-		-scrollbars => 'osoe',		
+		-scrollbars => $scrollbars,		
 		-wrap => 'word',
 	)->pack(-expand => 1, -fill => 'both');
 	$self->Advertise('txt', $text);
 	
-	$self->clear;
-	$self->clearHistory;
-	$self->{BASEFONTSIZE} = undef;
 	$self->{CURRENT} = undef;
-	$self->{TAGS} = [];
+	$self->{TAGS} = {};
 	$self->{ZOOM} = 0;
 
 	$self->ConfigSpecs(
 		-background => ['SELF', 'DESCENDANTS'],
 		-fixedfontfamily => ['PASSIVE', undef, undef, 'Hack'],
-		-linkcolor => ['PASSIVE', undef, undef, '#0000DF'],
+		-loadcall => ['CALLBACK', undef, undef, sub {}],
+		-linkcolor => ['PASSIVE', 'linkColor', 'LinkColor', '#3030DF'],
+		-zoom => ['METHOD'],
 		DEFAULT => [ $text ],
 	);
 	$self->Delegates(
 		DEFAULT => $text,
 	);
-	$self->after(10, ['configureTags', $self]);
+	$self->after(10, ['postConfig', $self]);
 }
 
 =item B<clear>
@@ -120,6 +131,7 @@ sub clear {
 	$self->{INDENTSTACK} = ['indent0'];
 	$self->{INITEM} = 0;
 	$self->{STACK} = [];
+	$self->Callback('-loadcall', '');
 }
 
 =item B<clearHistory>
@@ -130,8 +142,18 @@ Resets the history stack.
 
 sub clearHistory {
 	my $self = shift;
-	$self->{NEXT} = [];
+	$self->clearNext;
 	$self->{PREVIOUS} = [];
+}
+
+sub clearNext {
+	my $self = shift;
+	$self->{NEXT} = [];
+}
+
+sub clearTags {
+	my $self = shift;
+	$self->{TAGS} = {};
 }
 
 sub current {
@@ -146,6 +168,7 @@ sub configureDerived {
 	my $font = shift;
 	my @tags = @_;
 	@tags = @derivedtags unless @tags;
+#	my $font = $self->tagCget($tag, '-font');
 	my @result = ();
 	my $underline = $self->tagCget($tag, '-underline');
 	$underline = 0 unless defined $underline;
@@ -180,8 +203,10 @@ sub configureDerived {
 			push @tagopt, -wrap => 'none'
 		}
 		my $tfont = $self->fontCompose($font, @fontopt);
-		my $newstyle = "$tag$style";
+#		my $newstyle = "$tag$style";
+		my $newstyle = $self->tagDerived($tag, $style);
 		$self->tagConfigure($newstyle, @tagopt, -font => $tfont);
+		$self->tagNew($newstyle);
 		if ($style eq 'L') { #binding link
 			$self->tagBind($newstyle, '<Enter>', sub {
 				$self->{'cursor_save'} = $self->cget('-cursor'); 
@@ -215,8 +240,7 @@ sub configureTags {
 	my $font = $self->Subwidget('txt')->cget('-font');
 	my $family = $self->fontActual($font, '-family');
 	my $size = $self->fontActual($font, '-size');
-	$self->{BASEFONTSIZE} = $size;
-	my $zoomsize = $size + $self->zoom;
+	my $zoomsize = $size - $self->zoom;
 	my $hsize = $zoomsize + 1;
 	my @result = ();
 
@@ -230,22 +254,16 @@ sub configureTags {
 			
 		);
 		$self->tagConfigure($tag, -underline => 'true', -font => $font);
-		push @result, $tag;
-		push @result, $self->configureDerived($tag, $font);
 	}
 
 	#composing text font
 	my $tfont = $self->fontCompose($font, -size => $zoomsize);
 
-	#configuring item-text tags
+	#configuring item-text tag
 	$self->tagConfigure('item-text', -font => $tfont);
-	push @result, 'item-text';
-	push @result, $self->configureDerived('item-text', $tfont);
 
-	#configuring paragraph tags
+	#configuring paragraph tag
 	$self->tagConfigure('Para', -font => $tfont);
-	push @result, 'Para';
-	push @result, $self->configureDerived('Para', $tfont);
 
 	#configuring verbatim tag
 	my $vfont = $self->Font(
@@ -253,9 +271,25 @@ sub configureTags {
 		-size => $zoomsize,
 	);
 	$self->tagConfigure('Verbatim', -font => $vfont, -wrap => 'none');
-	push @result, 'Verbatim';
 
-	$self->{TAGS} = \@result
+	#reconfiguring existing tags
+	my @list = $self->tagList;
+	for (@list) {
+		my $tag = $_;
+		if ($tag =~ /^indent(\d+)$/) {
+			my $size = $self->indentSize($1);
+			$self->tagConfigure($tag,
+				-lmargin1 => $size,
+				-lmargin2 => $size,
+			);
+		} elsif ($tag =~ /$derivedreg/) {
+			my $base = $1;
+			my $dev = $2;
+			my $font = $self->tagCget($base, '-font');
+			my @der = split(//, $dev);
+			$self->configureDerived($base, $font, @der);
+		}
+	}
 }
 
 sub fontCompose {
@@ -280,7 +314,7 @@ sub fontCompose {
 
 sub ignore {
 	my ($self, $tag) = @_;
-	return exists $ignore{$tag}
+	return $tag eq 'X'
 }
 
 sub indentDown {
@@ -292,8 +326,8 @@ sub indentDown {
 sub indentSize {
 	my ($self, $indent) = @_;
 	my $font = $self->cget('-font');
-	my $size = $self->fontMeasure($font, '0123456789');
-	$size = int($size / 10);
+	my $size = $self->fontMeasure($font, 'ABCDEFGHIJKLMNOPQRSTUVWXYZ');
+	$size = int($size / 26);
 	return $size * $indent
 }
 
@@ -305,17 +339,18 @@ sub indentUp {
 	my ($self, $indent) = @_;
 	$indent = 2 unless defined $indent;
 	my $top = $self->indentStackTop;
-#	print "top $top\n";
 	$top =~ /(\d+)$/;
 	my $topsize = $1;
 	my $indentsize = $topsize + $indent;
 	my $size = $self->indentSize($indentsize);
-#	print "top $topsize, indent $indent, size $indentsize, $size px\n";
 	my $tag = "indent$indentsize";
-	$self->tagConfigure($tag,
-		-lmargin1 => $size,
-		-lmargin2 => $size,
-	);
+	unless ($self->tagExists($tag)) {
+		$self->tagConfigure($tag,
+			-lmargin1 => $size,
+			-lmargin2 => $size,
+		);
+		$self->tagNew($tag);
+	}
 	my $stack = $self->indentStack;
 	unshift @$stack, $tag
 }
@@ -353,10 +388,14 @@ sub linkClicked {
 	}
 }
 
-=item B<load>I<($source)>
+=item B<load>I<($source, ?$history?)>
 
 Parses I<$source>. I<$source> can be a file name, a module name or a reference
 tp a string.
+
+You can set $history to false if you do not want $source added
+to your history list. Usefull when reloading a source. By default it
+is set to true.
 
 =cut
 
@@ -371,6 +410,7 @@ sub load {
 		if ((defined $cur) and ($cur ne $source)) {
 			my $prev = $self->{PREVIOUS};
 			push @$prev, $cur;
+			$self->clearNext;
 		}
 	}
 	$self->current($source);
@@ -384,13 +424,21 @@ sub load {
 				last
 			}
 		}
+	} else {
+		for ('pod', 'pm') {
+			my $test = Tk::findINC("$source.$_");
+			if (defined $test) {
+				$source = $test;
+				last
+			}
+		}
 	}
 
 	#initializing pull parser
 	my $p = new Pod::Simple::PullParser;
 	$p->set_source($source);
 	
-	while(my $token = $p->get_token) {
+	while (my $token = $p->get_token) {
 		if($token->is_start) {
 			my $name = $token->tagname;
 			my $startline = $token->attr('start_line');
@@ -400,7 +448,9 @@ sub load {
 			} elsif (length($name) eq 1) {
 				my $tname = $self->stackTop;
 				if (defined $tname) {
+					my $font = $self->tagCget($tname, '-font');
 					my $der = $self->tagDerived($tname, $name);
+					$self->configureDerived($tname, $font, $name) unless $self->tagExists($der);
 					$self->stackPush($der);
 				}
 
@@ -455,6 +505,7 @@ sub load {
 			}
 		}
 	}
+	$self->Callback('-loadcall', $self->current);
 }
 
 =item B<next>
@@ -487,6 +538,13 @@ sub openURL {
 	} else {
 		system("xdg-open \"$url\"");
 	}
+}
+
+sub postConfig {
+	my $self = shift;
+	$self->clear;
+	$self->clearHistory;
+	$self->configureTags;
 }
 
 =item B<previous>
@@ -560,11 +618,22 @@ sub tagDerived {
 	}
 }
 
-sub tagList {
-	my $self = shift;
-	my $t = $self->{TAGS};
-	return @$t;
+sub tagExists {
+	my ($self, $tag) = @_;
+	return exists $self->tags->{$tag}
 }
+
+sub tagList {
+	my $hash = $_[0]->tags;
+	return sort keys %$hash
+}
+
+sub tagNew {
+	my ($self, $tag) = @_;
+	$self->tags->{$tag} = 1
+}
+
+sub tags { return $_[0]->{TAGS} }
 
 sub zoom {
 	my $self = shift;
@@ -591,7 +660,6 @@ Sets a new zoom size of original font sizes + $zoom pixels.
 
 sub zoomNew {
 	my ($self, $zoom) = @_;
-	$zoom = 0 - $zoom;
 	$self->zoom($zoom);
 	$self->configureTags;
 }
@@ -630,15 +698,11 @@ Hans Jeuken (hanje at cpan dot org)
 
 =head1 BUGS AND CAVEATS
 
-Calling the B<configureTags> method takes ages.
-
 If you find any bugs, please contact the author.
 
 =head1 TODO
 
 Change the S command into real non breakable spaces instead of just a wrap to none.
-
-Configure tags as the need arises instead of all at once.
 
 =head1 SEE ALSO
 

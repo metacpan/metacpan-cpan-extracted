@@ -7,7 +7,7 @@
 #include "XSUB.h"
 #include "stdlib.h"
 
-/* VERSION: 0.11 */
+/* VERSION: 0.14 */
 
 MODULE = Linux::loadavg		PACKAGE = Linux::loadavg		
 

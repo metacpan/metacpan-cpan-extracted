@@ -1,5 +1,8 @@
 Revision history for Dist-Zilla-PluginBundle-SHLOMIF
 
+0.000011    2024-08-23
+        - Prereq for Test::CPAN::Changes .
+
 0.000010    2020-01-19
         - Add some dependencies / deps / prerequisites / prereqs
         which were specified as "; authordep" in many "dist.ini"s.

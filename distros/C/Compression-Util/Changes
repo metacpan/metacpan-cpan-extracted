@@ -1,5 +1,20 @@
 Revision history for Compression-Util
 
+0.12    2024-08-23
+
+        [ADDITIONS]
+
+        - Added the `lz4_compress()` and `lz4_decompress()`  functions.
+
+        [IMPROVEMENTS]
+
+        - Slightly better performance in `mtf_encode()`.
+        - Replaced all "die" statements, with Carp::confess(), for better debugging.
+
+        [BUG-FIXES]
+
+        - Allow `$LZ77_MIN_LEN` to be set by the user to a value greater than 4, before calling `gzip_compress()`.
+
 0.11    2024-08-22
 
         [ADDITIONS]
@@ -8,7 +23,7 @@ Revision history for Compression-Util
         - Added the `int2bytes()` and `int2bytes_lsb()` functions.
         - Added the `bzip2_compress()` and `bzip2_decompress()` functions.
         - Added the `gzip_compress()` and `gzip_decompress()` functions.
-        - Added the `encode_alphabet_256()` and `encode_alphabet_256()` functions.
+        - Added the `encode_alphabet_256()` and `decode_alphabet_256()` functions.
 
         [IMPROVEMENTS]
 

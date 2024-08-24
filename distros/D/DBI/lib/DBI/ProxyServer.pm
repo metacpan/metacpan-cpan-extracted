@@ -1,3 +1,4 @@
+#!/usr/bin/perl
 #	$Header: /home/timbo/dbi/lib/DBI/RCS/ProxyServer.pm,v 11.9 2003/05/14 11:08:17 timbo Exp $
 # -*- perl -*-
 #
@@ -22,8 +23,8 @@
 ##############################################################################
 
 
-require 5.004;
 use strict;
+use warnings;
 
 use RPC::PlServer 0.2001;
 require DBI;
@@ -40,10 +41,8 @@ package DBI::ProxyServer;
 #
 ############################################################################
 
-use vars qw($VERSION @ISA);
-
-$VERSION = "0.3005";
-@ISA = qw(RPC::PlServer DBI);
+our $VERSION = "0.3005";
+our @ISA = qw(RPC::PlServer DBI);
 
 
 # Most of the options below are set to default values, we note them here
@@ -215,7 +214,7 @@ sub CallMethod {
     # $dbh. However, we'd have a reference loop in that case and
     # I would be concerned about garbage collection. :-(
     $dbh->{'private_server'} = $server;
-    $server->Debug("CallMethod: => " . do { local $^W; join(",", @_)});
+    $server->Debug("CallMethod: => " . do { no warnings; join(",", @_)});
     my @result = eval { $server->SUPER::CallMethod(@_) };
     my $msg = $@;
     undef $dbh->{'private_server'};
@@ -223,7 +222,7 @@ sub CallMethod {
 	$server->Debug("CallMethod died with: $@");
 	die $msg;
     } else {
-	$server->Debug("CallMethod: <= " . do { local $^W; join(",", @result) });
+	$server->Debug("CallMethod: <= " . do { no warnings; join(",", @result) });
     }
     @result;
 }
@@ -245,12 +244,12 @@ sub main {
 
 package DBI::ProxyServer::dr;
 
-@DBI::ProxyServer::dr::ISA = qw(DBI::dr);
+our @ISA = qw(DBI::dr);
 
 
 package DBI::ProxyServer::db;
 
-@DBI::ProxyServer::db::ISA = qw(DBI::db);
+our @ISA = qw(DBI::db);
 
 sub prepare {
     my($dbh, $statement, $attr, $params, $proto_ver) = @_;
@@ -315,7 +314,7 @@ sub table_info {
 
 package DBI::ProxyServer::st;
 
-@DBI::ProxyServer::st::ISA = qw(DBI::st);
+our @ISA = qw(DBI::st);
 
 sub execute {
     my $sth = shift; my $params = shift; my $proto_ver = shift;

@@ -12,10 +12,8 @@ BEGIN {
 }
 
 use namespace::autoclean;
-use SQL::Abstract;
+use Sub::Name;
 use DBIx::Squirrel::util qw/:constants :sql throw/;
-
-use constant E_BAD_SQL_ABSTRACT_METHOD => 'Unimplemented SQL::Abstract method';
 
 sub _root_class {
     my $root_class = ref($_[0]) || $_[0];
@@ -25,7 +23,7 @@ sub _root_class {
     return $root_class;
 }
 
-sub _private_attributes {
+sub _private {
     my $self = shift;
     return
       unless ref($self);
@@ -56,38 +54,6 @@ sub _private_attributes {
     return $self;
 }
 
-our $SQL_ABSTRACT = SQL::Abstract->new;
-
-sub abstract {
-    my $self        = shift;
-    my $method_name = shift;
-    my $method      = $SQL_ABSTRACT->can($method_name);
-    throw E_BAD_SQL_ABSTRACT_METHOD
-      unless $method;
-    return $self->do($method->($SQL_ABSTRACT, @_));
-}
-
-sub delete {
-    my $self = shift;
-    return scalar $self->abstract('delete', @_);
-}
-
-sub insert {
-    my $self = shift;
-    return scalar $self->abstract('insert', @_);
-}
-
-sub update {
-    my $self = shift;
-    return scalar $self->abstract('update', @_);
-}
-
-sub select {
-    my $self = shift;
-    my(undef, $result,) = $self->abstract('select', @_);
-    return $result;
-}
-
 sub prepare {
     my $self      = shift;
     my $statement = shift;
@@ -98,7 +64,7 @@ sub prepare {
     return
       unless defined($sth);
     bless $sth, $self->_root_class . '::st';
-    $sth->_private_attributes({
+    $sth->_private({
         Placeholders        => $placeholders,
         NormalisedStatement => $normalised_statement,
         OriginalStatement   => $original_statement,
@@ -117,22 +83,13 @@ sub prepare_cached {
     return
       unless defined($sth);
     bless $sth, $self->_root_class . '::st';
-    $sth->_private_attributes({
+    $sth->_private({
         Placeholders        => $placeholders,
         NormalisedStatement => $normalised_statement,
         OriginalStatement   => $original_statement,
         Hash                => $digest,
         CacheKey            => join('#', (caller(0))[1, 2]),
     });
-    return $sth;
-}
-
-sub execute {
-    my $self      = shift;
-    my $statement = shift;
-    my($res, $sth) = $self->do($statement, @_);
-    return $sth, $res
-      if wantarray;
     return $sth;
 }
 
@@ -172,80 +129,90 @@ sub do {
     return $sth->execute(@_);
 }
 
-BEGIN {
-    *iterate = *iterator = *it = sub {
-        my $self      = shift;
-        my $statement = shift;
-        my $sth       = do {
-            if (@_) {
-                if (ref($_[0])) {
-                    if (UNIVERSAL::isa($_[0], 'HASH')) {
-                        my $statement_attributes = shift;
-                        $self->prepare($statement, $statement_attributes);
-                    }
-                    elsif (UNIVERSAL::isa($_[0], 'ARRAY')) {
-                        $self->prepare($statement);
-                    }
-                    elsif (UNIVERSAL::isa($_[0], 'CODE')) {
-                        $self->prepare($statement);
-                    }
-                    else {
-                        throw E_EXP_REF;
-                    }
+sub iterate {
+    my $self      = shift;
+    my $statement = shift;
+    my $sth       = do {
+        if (@_) {
+            if (ref($_[0])) {
+                if (UNIVERSAL::isa($_[0], 'HASH')) {
+                    my $statement_attributes = shift;
+                    $self->prepare($statement, $statement_attributes);
+                }
+                elsif (UNIVERSAL::isa($_[0], 'ARRAY')) {
+                    $self->prepare($statement);
+                }
+                elsif (UNIVERSAL::isa($_[0], 'CODE')) {
+                    $self->prepare($statement);
                 }
                 else {
-                    if (defined($_[0])) {
-                        $self->prepare($statement);
-                    }
-                    else {
-                        shift;
-                        $self->prepare($statement, undef);
-                    }
+                    throw E_EXP_REF;
                 }
             }
             else {
-                $self->prepare($statement);
+                if (defined($_[0])) {
+                    $self->prepare($statement);
+                }
+                else {
+                    shift;
+                    $self->prepare($statement, undef);
+                }
             }
-        };
-        return $sth->iterate(@_);
+        }
+        else {
+            $self->prepare($statement);
+        }
     };
+    return $sth->iterate(@_);
+}
 
-    *results = *resultset = *rs = sub {
-        my $self      = shift;
-        my $statement = shift;
-        my $sth       = do {
-            if (@_) {
-                if (ref $_[0]) {
-                    if (UNIVERSAL::isa($_[0], 'HASH')) {
-                        my $statement_attributes = shift;
-                        $self->prepare($statement, $statement_attributes);
-                    }
-                    elsif (UNIVERSAL::isa($_[0], 'ARRAY')) {
-                        $self->prepare($statement);
-                    }
-                    elsif (UNIVERSAL::isa($_[0], 'CODE')) {
-                        $self->prepare($statement);
-                    }
-                    else {
-                        throw E_EXP_REF;
-                    }
+BEGIN {
+    *iterator = subname(iterator => \&iterate);
+    *itor     = subname(itor     => \&iterate);
+    *it       = subname(it       => \&iterate);
+}
+
+sub results {
+    my $self      = shift;
+    my $statement = shift;
+    my $sth       = do {
+        if (@_) {
+            if (ref $_[0]) {
+                if (UNIVERSAL::isa($_[0], 'HASH')) {
+                    my $statement_attributes = shift;
+                    $self->prepare($statement, $statement_attributes);
+                }
+                elsif (UNIVERSAL::isa($_[0], 'ARRAY')) {
+                    $self->prepare($statement);
+                }
+                elsif (UNIVERSAL::isa($_[0], 'CODE')) {
+                    $self->prepare($statement);
                 }
                 else {
-                    if (defined($_[0])) {
-                        $self->prepare($statement);
-                    }
-                    else {
-                        shift;
-                        $self->prepare($statement, undef);
-                    }
+                    throw E_EXP_REF;
                 }
             }
             else {
-                $self->prepare($statement);
+                if (defined($_[0])) {
+                    $self->prepare($statement);
+                }
+                else {
+                    shift;
+                    $self->prepare($statement, undef);
+                }
             }
-        };
-        return $sth->results(@_);
+        }
+        else {
+            $self->prepare($statement);
+        }
     };
+    return $sth->results(@_);
+}
+
+BEGIN {
+    *resultset = subname(resultset => \&results);
+    *rset      = subname(rset      => \&results);
+    *rs        = subname(rs        => \&results);
 }
 
 1;

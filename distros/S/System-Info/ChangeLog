@@ -1,3 +1,14 @@
+0.065	- 2024-08-23,  H.Merijn Brand
+    * Add android to linux detection  (pr#10, Dimitrios Kechagias)
+    * Chaches to darwin CPU detection (pr#11, Dimitrios Kechagias)
+    * Add Rockylinux-9.2
+    * Add Rockylinux-9.3
+    * It's 2024
+    * Add FreeBSD-13.3
+    * Add Devuan-5 (DrHyde)
+    * Tested with perl5.40
+    * Add NetBSD-9.99.18
+
 0.064	- 2023-07-31,  H.Merijn Brand
     * Refine requirements based on CVE's
     * Filter undefined values in CPU info (issue#9)

@@ -8,9 +8,11 @@ PPI::Token::Prototype - A subroutine prototype descriptor
 
 =head1 INHERITANCE
 
-  PPI::Token::End
-  isa PPI::Token
-      isa PPI::Element
+  PPI::Token::Prototype
+  isa PPI::Token::Quote::Literal
+      isa PPI::Token::Quote
+          isa PPI::Token
+              isa PPI::Element
 
 =head1 SYNOPSIS
 
@@ -49,7 +51,7 @@ L<PPI::Token> and L<PPI::Element> parent classes.
 use strict;
 use PPI::Token ();
 
-our $VERSION = '1.278';
+our $VERSION = '1.279';
 
 our @ISA = "PPI::Token::Quote::Literal";
 

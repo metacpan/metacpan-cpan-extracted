@@ -32,6 +32,7 @@
       },
       "runtime" : {
          "requires" : {
+            "Getopt::Long" : "2.54",
             "Pod::Simple" : "3.43",
             "Test::Tk" : "3.04",
             "Tk" : "804.030"
@@ -46,6 +47,6 @@
          "web" : "https://github.com/haje61/Tk-PodViewer"
       }
    },
-   "version" : "0.01",
+   "version" : "0.02",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

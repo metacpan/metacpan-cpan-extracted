@@ -23,7 +23,7 @@ our @EXPORT_OK = qw/
 /;
 our %EXPORT_TAGS = (all => \@EXPORT_OK);
 
-our $VERSION = "v6.29.6";
+our $VERSION = "v6.29.7";
 
 use constant rx_observable => 'RxPerl::Observable';
 use constant rx_behavior_subject => 'RxPerl::BehaviorSubject';

@@ -1,5 +1,5 @@
 package Dist::Zilla::PluginBundle::SHLOMIF;
-$Dist::Zilla::PluginBundle::SHLOMIF::VERSION = '0.000010';
+$Dist::Zilla::PluginBundle::SHLOMIF::VERSION = '0.000011';
 use 5.014;
 
 use Moose;
@@ -297,7 +297,7 @@ Dist::Zilla::PluginBundle::SHLOMIF - Dist::Zilla plugins for me
 
 =head1 VERSION
 
-version 0.000010
+version 0.000011
 
 =head1 SYNOPSIS
 
@@ -390,7 +390,7 @@ Shlomi Fish <shlomif@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2020 by Jesse Luehrs.
+This software is Copyright (c) 2024 by Jesse Luehrs.
 
 This is free software, licensed under:
 

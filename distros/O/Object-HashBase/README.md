@@ -84,6 +84,52 @@ use it:
 
     $one->{+FOO} = 'xxx';
 
+Add pre\_init and post-init:
+
+**Note:** These are not provided if you define your own new() method (via a stub
+at the top).
+
+**Note:** Single inheritence should work with child classes doing the pre/post
+init subs during construction, so long as all classes in the chain use a
+generated new(). This will probably explode badly in multiple-inheritence.
+
+    package My::Class;
+    use strict;
+    use warnings;
+
+    # Generate 3 accessors
+    use Object::HashBase qw/foo -bar ^baz <bat >ban +boo/;
+
+    # Do more stuff before init, add as many as you like by calling this
+    # multiple times with a different code block each time
+    add_pre_init {
+        ...
+    };
+
+    # Chance to initialize defaults
+    sub init { ... }
+
+    # Do stuff after init, add as many as you want, they run in reverse order
+    add_post_init {
+        my $self = shift;
+        ...
+    };
+
+    sub print {
+        my $self = shift;
+        print join ", " => map { $self->{$_} } FOO, BAR, BAZ, BAT, BAN, BOO;
+    }
+
+You can also call add\_pre\_init and add\_post\_init as class methods from anywhere
+to add init and post-init to the class.
+
+**Please note:** This will apply to all future instances of the object created,
+but not past ones. This is a form of meta-programming and it is easy to abuse.
+It is also helpful for extending Object::HashBase.
+
+    My::Class->add_pre_init(sub { ... });
+    My::Class->add_post_init(sub { ... });
+
 # DESCRIPTION
 
 This package is used to generate classes based on hashrefs. Using this class

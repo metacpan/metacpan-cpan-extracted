@@ -1,6 +1,6 @@
 package Linux::loadavg;
 
-our $VERSION = '0.11';
+our $VERSION = '0.14';
 
 use v5.8;
 use strict;
@@ -57,8 +57,8 @@ Linux::loadavg - Get system load averages (via getloadavg(3C) system call)
 
   use Linux::loadavg;
 
-  @avgs = loadavg();
-  printf "load average: %f %f %f\n", @avgs;
+  my @avgs = loadavg();
+  printf "Load average: %s (1m,5m,15m)\n", join(', ',@avgs);
   
 =head1 DESCRIPTION
 
@@ -94,11 +94,13 @@ When called without an argument, the loadavg() function returns all three load a
   # Autodetect Linux::loadavg or Solaris::loadavg
   die $@ if eval sprintf('use %s::loadavg qw(loadavg)', ucfirst $^O) || $@;
 
-  # get the first two load averages
+  # Get the first two load averages
+  my @avgs = loadavg(2);
+  printf "first load avg (1min): %f\n", $avgs[LOADAVG_1MIN];
+  printf "second load avg (5min): %f\n", $avgs[LOADAVG_5MIN];
 
-  @avgs = loadavg(2);
-  printf "first load avg (1min): %f\n", @avgs[LOADAVG_1MIN];
-  printf "second load avg (5min): %f\n", @avgs[LOADAVG_5MIN];
+  # Call and print only 5 minute value
+  printf "5 minute load: %f\n",(loadavg(2))[LOADAVG_5MIN];
 
 =head1 AUTHOR
 
@@ -106,11 +108,17 @@ Niels van Dijke, E<lt>CpanDotOrgAtPerlboyDotNetE<gt>
 
 =head1 CREDITS
 
-The Linux::loadavg is nearly one on one based on Solaris::loadavg. Therefore credits 
-should go to: Alexander Golomshtok (http://search.cpan.org/~agolomsh/)
+The Linux::loadavg was nearly one on one based on L<Solaris::loadavg>. Therefore credits 
+should go to: Alexander Golomshtok (L<https://metacpan.org/author/AGOLOMSH>). Version 0.10 and above the
+XS code has been improved using L<Sys::LoadAvg> XS code by Jeremy Madea (L<https://metacpan.org/author/JEREMY>).
+
+=head1 LICENSE
+
+This module has the same license as Perl 5 itself. The explicit license can be found in the LICENSE file
+distributed with the tar.gz archive.
 
 =head1 SEE ALSO
 
-L<perl>,L<getloadavg(3C)>,L<Solaris::loadavg>
+L<perl>,L<getloadavg(3C)>,L<Solaris::loadavg>,L<Sys::LoadAvg>
 
 =cut

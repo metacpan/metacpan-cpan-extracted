@@ -6,6 +6,7 @@ WriteMakefile
   'NAME' => 'Compression::Util',
   'VERSION_FROM' => 'lib/Compression/Util.pm',
   'PREREQ_PM' => {
+                   'Carp' => 0,
                    'Exporter' => 0,
                    'List::Util' => '1.45',
                    'Test::More' => 0

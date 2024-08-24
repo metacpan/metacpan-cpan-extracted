@@ -16,7 +16,7 @@ use Storable qw(dclone);
 my $using_dbd_gofer = ( $ENV{DBI_AUTOPROXY} || '' ) =~ /^dbi:Gofer.*transport=/i;
 
 use DBI;
-use vars qw( @mldbm_types @dbm_types );
+my ( @mldbm_types, @dbm_types );
 
 BEGIN
 {
@@ -47,7 +47,7 @@ BEGIN
     {
         # test with as many of the major DBM types as are available
         @dbm_types = grep {
-            eval { local $^W; require "$_.pm" }
+            eval { no warnings; require "$_.pm" }
         } @dbms;
     }
     elsif (@use_dbms)
@@ -62,7 +62,7 @@ BEGIN
         # (However, if SDBM_File is not available, then use another.)
         for my $dbm (@dbms)
         {
-            if ( eval { local $^W; require "$dbm.pm" } )
+            if ( eval { no warnings; require "$dbm.pm" } )
             {
                 @dbm_types = ($dbm);
                 last;

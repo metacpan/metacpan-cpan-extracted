@@ -29,7 +29,7 @@ our @EXPORT_OK = qw/
 /;
 our %EXPORT_TAGS = (all => \@EXPORT_OK);
 
-our $VERSION = "v6.29.6";
+our $VERSION = "v6.29.7";
 
 sub op_audit {
     my ($duration_selector) = @_;
@@ -774,7 +774,13 @@ sub op_exhaust_map {
         my ($source) = @_;
 
         return $source->pipe(
-            op_map($observable_factory),
+            op_map(sub {
+                my @args = @_;
+                rx_defer(sub {
+                    local $_ = $args[0];
+                    $observable_factory->(@args);
+                });
+            }),
             op_exhaust_all(),
         );
     };

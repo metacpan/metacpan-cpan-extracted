@@ -1,5 +1,11 @@
 Revision history for Perl extension RxPerl
 
+v6.29.7 2024-08-24T05:43:43Z
+
+    - fixed op_exhaust_map to behave like rxjs (not execute its callback until previous observable
+        has been completed)
+    - updated documentation on op_catch_error (regarding $_)
+
 v6.29.6 2024-08-20T08:48:53Z
 
     - fixed a bug in op_catch_error where its callback wasn't allowed to return an error-emitting observable

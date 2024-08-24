@@ -3,7 +3,7 @@ package System::Info;
 use strict;
 use warnings;
 
-our $VERSION = "0.064";
+our $VERSION = "0.065";
 
 use base "Exporter";
 our @EXPORT_OK = qw( &sysinfo &sysinfo_hash &si_uname );
@@ -72,7 +72,7 @@ sub new {
     $^O =~ m/haiku/              and return System::Info::Haiku->new;
     $^O =~ m/hp-?ux/i            and return System::Info::HPUX->new;
     $^O =~ m/irix/i              and return System::Info::Irix->new;
-    $^O =~ m/linux/i             and return System::Info::Linux->new;
+    $^O =~ m/linux|android/i     and return System::Info::Linux->new;
     $^O =~ m/solaris|sunos|osf/i and return System::Info::Solaris->new;
     $^O =~ m/VMS/                and return System::Info::VMS->new;
     $^O =~ m/mswin32|windows/i   and return System::Info::Windows->new;
@@ -109,11 +109,29 @@ C<sysinfo_hash> returns a hash reference with basic system information, like:
     osvers    => '4.13.10-1-default'
     }
 
+The C<cpu_cores> count refers to logical cores. On MacOS there is also a
+C<physical_cores> count, which will be the same as C<cpu_cores> for Apple Silicon,
+but not for an Intel Mac with SMT enabled:
+
+  { cpu            => 'Quad-Core Intel Core i7 (2 GHz)',
+    cpu_count      => '1 [4 cores]',
+    cpu_cores      => '8',
+    physical_cores => '4',
+    cpu_type       => 'x86_64',
+    distro         => 'Darwin 11.7.10',
+    hostname       => '192.168.1.6',
+    os             => 'darwin - 20.6.0 (Mac OS X - macOS 11.7.10 (20G1427))',
+    osname         => 'Darwin',
+    osvers         => '11.7.10'
+    }
+
 =cut
 
 sub sysinfo_hash {
-    my $si = System::Info->new;
+    my $si   = System::Info->new;
+    my %phys = $si->{_phys_core} ? (physical_cores => $si->{_phys_core}) : ();
     return {
+	%phys,
 	hostname  => $si->{_host},
 	cpu       => $si->{_cpu},
 	cpu_type  => $si->{_cpu_type},
@@ -290,7 +308,7 @@ Interface to FreeDesktop.Org's os-release standard.
 
 =head1 COPYRIGHT AND LICENSE
 
-(c) 2016-2023, Abe Timmerman & H.Merijn Brand, All rights reserved.
+(c) 2016-2024, Abe Timmerman & H.Merijn Brand, All rights reserved.
 
 With contributions from Jarkko Hietaniemi, Campo Weijerman, Alan Burlison,
 Allen Smith, Alain Barbet, Dominic Dunlop, Rich Rauenzahn, David Cantrell.

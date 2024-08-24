@@ -5,7 +5,7 @@ use warnings;
 
 use base "System::Info::Base";
 
-our $VERSION = "0.053";
+our $VERSION = "0.054";
 
 =head1 NAME
 
@@ -52,15 +52,17 @@ sub _file_info {
 	m/\S/ or next;
 	s/^\s+//;
 	s/\s+$//;
-	if (my ($k, $v) = (m/^(.*\S)\s*=\s*(\S.*)$/)) {
+	if (my ($k, $v) = (m/^\s*(.*\S)\s*=\s*(\S.*?)\s*$/)) {
 	    # Having a value prevails over being defined
 	    defined $os->{$k} and next;
 	    $v =~ s/^"\s*(.*?)\s*"$/$1/;
+	    $v =~ s/^'\s*(.*?)\s*'$/$1/;
 	    $v =~ m{^["(]?undef(?:ined)?[")]$}i and $v = "undefined";
 	    $os->{$k} = $v;
 	    next;
 	    }
-	m/^[12][0-9]{3}(?:,\s*[12][0-9]{3})*$/ and next; # Copyright years
+	m/^[12][0-9]{3}(?:,\s*[12][0-9]{3})*(?:\s*,\s*)*$/ and next; # Copyright years
+	m/^[12][0-9]{3}(?:,\s*[12][0-9]{3})*.*All rights reserved/i and next; # Copyright years
 	exists $os->{$_} or $os->{$_} = undef;
 	}
     close $fh;
@@ -130,6 +132,10 @@ sub prepare_os {
 	elsif ($os{DISTRIB_RELEASE} && $distro !~ m{\b$os{DISTRIB_RELEASE}\b}i) {
 	    $distro .= " $os{DISTRIB_RELEASE}";
 	    }
+	}
+    elsif ($os{DISTRIBVER} && defined $os{NETBSD_OFFICIAL_RELEASE}) { # NetBSD 9
+	my @k = grep m/^netbsd\s+\d/i => keys %os;
+	($distro = @k == 1 ? $k[0] : "NetBSD $os{DISTRIBVER}") =~ s{/.*}{};
 	}
     elsif ($os{PRETTY_NAME}) {
 	$distro = $os{PRETTY_NAME};          # "openSUSE 12.1 (Asparagus) (x86_64)"
@@ -512,7 +518,7 @@ __END__
 
 =head1 COPYRIGHT AND LICENSE
 
-(c) 2016-2023, Abe Timmerman & H.Merijn Brand, All rights reserved.
+(c) 2016-2024, Abe Timmerman & H.Merijn Brand, All rights reserved.
 
 With contributions from Jarkko Hietaniemi, Campo Weijerman, Alan Burlison,
 Allen Smith, Alain Barbet, Dominic Dunlop, Rich Rauenzahn, David Cantrell.

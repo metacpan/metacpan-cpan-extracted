@@ -2,7 +2,7 @@
  *
  * $Id$
  *
- * Copyright (c) 1994-2012  Tim Bunce  Ireland.
+ * Copyright (c) 1994-2024  Tim Bunce  Ireland.
  *
  * See COPYRIGHT section in DBI.pm for usage and distribution rights.
  */
@@ -30,41 +30,45 @@ static int use_xsbypass = 1; /* set in dbi_bootinit() */
 #define DBI_MAGIC '~'
 
 /* HvMROMETA introduced in 5.9.5, but mro_meta_init not exported in 5.10.0 */
-#if (PERL_VERSION < 10)
-#  define MY_cache_gen(stash) 0
-#else
-#  if ((PERL_VERSION == 10) && (PERL_SUBVERSION == 0))
-#    define MY_cache_gen(stash) \
-        (HvAUX(stash)->xhv_mro_meta \
-        ? HvAUX(stash)->xhv_mro_meta->cache_gen \
-        : 0)
+#if (PERL_REVISION == 5)
+#  if (PERL_VERSION < 10)
+#    define MY_cache_gen(stash) 0
 #  else
-#    define MY_cache_gen(stash) HvMROMETA(stash)->cache_gen
+#    if ((PERL_VERSION == 10) && (PERL_SUBVERSION == 0))
+#      define MY_cache_gen(stash) \
+          (HvAUX(stash)->xhv_mro_meta \
+          ? HvAUX(stash)->xhv_mro_meta->cache_gen \
+          : 0)
+#    else
+#      define MY_cache_gen(stash) HvMROMETA(stash)->cache_gen
+#    endif
 #  endif
 #endif
 
 /* If the tests fail with errors about 'setlinebuf' then try    */
 /* deleting the lines in the block below except the setvbuf one */
 #ifndef PerlIO_setlinebuf
-#ifdef HAS_SETLINEBUF
-#define PerlIO_setlinebuf(f)        setlinebuf(f)
-#else
-#ifndef USE_PERLIO
-#define PerlIO_setlinebuf(f)        setvbuf(f, Nullch, _IOLBF, 0)
-#endif
-#endif
+# ifdef HAS_SETLINEBUF
+#  define PerlIO_setlinebuf(f)        setlinebuf(f)
+# else
+#  ifndef USE_PERLIO
+#   define PerlIO_setlinebuf(f)        setvbuf(f, Nullch, _IOLBF, 0)
+#  endif
+# endif
 #endif
 
-#if (PERL_VERSION < 8) || ((PERL_VERSION == 8) && (PERL_SUBVERSION == 0))
-#define DBI_save_hv_fetch_ent
-#endif
+#if (PERL_REVISION == 5)
+# if (PERL_VERSION < 8) || ((PERL_VERSION == 8) && (PERL_SUBVERSION == 0))
+#  define DBI_save_hv_fetch_ent
+# endif
 
 /* prior to 5.8.9: when a CV is duped, the mg dup method is called,
  * then *afterwards*, any_ptr is copied from the old CV to the new CV.
  * This wipes out anything which the dup method did to any_ptr.
  * This needs working around */
-#if defined(USE_ITHREADS) && (PERL_VERSION == 8) && (PERL_SUBVERSION < 9)
+# if defined(USE_ITHREADS) && (PERL_VERSION == 8) && (PERL_SUBVERSION < 9)
 #  define BROKEN_DUP_ANY_PTR
+# endif
 #endif
 
 /* types of method name */
@@ -236,8 +240,10 @@ static MGVTBL dbi_ima_vtbl = { 0, 0, 0, 0, dbi_ima_free,
 #else
                                     0
 #endif
-#if (PERL_VERSION > 8) || ((PERL_VERSION == 8) && (PERL_SUBVERSION >= 9))
+#if (PERL_REVISION == 5)
+# if (PERL_VERSION > 8) || ((PERL_VERSION == 8) && (PERL_SUBVERSION >= 9))
                                     , 0
+# endif
 #endif
                                     };
 
@@ -1100,7 +1106,8 @@ dbih_inner(pTHX_ SV *orv, const char *what)
     if (!SvMAGICAL(ohv)) {
         if (!what)
             return NULL;
-        sv_dump(orv);
+        if (!hv_fetch(ohv,"_NO_DESTRUCT_WARN",17,0))
+	    sv_dump(orv);
         croak("%s handle %s is not a DBI handle (has no magic)",
                 what, neatsvpv(orv,0));
     }
@@ -2934,7 +2941,7 @@ dbi_profile(SV *h, imp_xxh_t *imp_xxh, SV *statement_sv, SV *method, NV t1, NV t
                 PUTBACK;
                 SAVE_DEFSV; /* local($_) = $statement */
                 DEFSV_set(statement_sv);
-                items = call_sv(code_sv, G_ARRAY);
+                items = call_sv(code_sv, G_LIST);
                 SPAGAIN;
                 SP -= items ;
                 ax = (SP - PL_stack_base) + 1 ;
@@ -2976,11 +2983,7 @@ dbi_profile(SV *h, imp_xxh_t *imp_xxh, SV *statement_sv, SV *method, NV t1, NV t
                             /* just using SvPV_nolen(method) sometimes causes an error: */
                             /* "Can't coerce GLOB to string" so we use gv_efullname()   */
                             SV *tmpsv = sv_2mortal(newSVpv("",0));
-#if (PERL_VERSION < 6)
-                            gv_efullname(tmpsv, (GV*)method);
-#else
                             gv_efullname4(tmpsv, (GV*)method, "", TRUE);
-#endif
                             p = SvPV_nolen(tmpsv);
                             if (*p == '*') ++p; /* skip past leading '*' glob sigil */
                         }
@@ -3191,7 +3194,7 @@ XS(XS_DBI_dispatch)
     SV **tmp_svp;
     SV **hook_svp = 0;
     MAGIC *mg;
-    int gimme = GIMME;
+    I32 gimme = GIMME_V;
     I32 trace_flags = DBIS->debug;      /* local copy may change during dispatch */
     I32 trace_level = (trace_flags & DBIc_TRACE_LEVEL_MASK);
     int is_DESTROY;
@@ -3598,15 +3601,13 @@ XS(XS_DBI_dispatch)
             PUSHs( ST(i) );
         }
         PUTBACK;
-        outitems = call_sv(code, G_ARRAY); /* call the callback code */
+        outitems = call_sv(code, G_LIST); /* call the callback code */
         MSPAGAIN;
 
         /* The callback code can undef $_ to indicate to skip dispatch */
         skip_dispatch = !SvOK(DEFSV);
-        /* put $_ back now, but with an incremented ref count to compensate
-         * for the ref count decrement that will happen when we exit the scope.
-         */
-        DEFSV_set(SvREFCNT_inc(orig_defsv));
+        /* put $_ back now */
+        DEFSV_set(orig_defsv);
 
         if (trace_level)
             PerlIO_printf(DBILOGFP, "%c   }} %s callback %s returned%s\n",
@@ -3865,7 +3866,7 @@ XS(XS_DBI_dispatch)
             PerlIO_printf(logfp,"%s)", (items > 3) ? ", ..." : "");
         }
 
-        if (gimme & G_ARRAY)
+        if (gimme & G_LIST)
              PerlIO_printf(logfp,"= (");
         else PerlIO_printf(logfp,"=");
         for(i=0; i < outitems; ++i) {
@@ -3892,7 +3893,7 @@ XS(XS_DBI_dispatch)
                     PerlIO_printf(logfp, "%ldkeys", (long)HvKEYS(SvRV(s)));
             }
         }
-        if (gimme & G_ARRAY) {
+        if (gimme & G_LIST) {
             PerlIO_printf(logfp," ) [%d items]", outitems);
         }
         if (is_fetch && row_count) {
@@ -4474,7 +4475,7 @@ BOOT:
     dbi_bootinit(NULL);
     /* make this sub into a fake XS so it can bee seen by DBD::* modules;
      * never actually call it as an XS sub, or it will crash and burn! */
-    (void) newXS("DBI::_dbi_state_lval", (XSUBADDR_t)_dbi_state_lval, __FILE__);
+    (void) newXS("DBI::_dbi_state_lval", (XSUBADDR_t)(void (*) (void))_dbi_state_lval, __FILE__);
 
 
 I32
@@ -4621,7 +4622,7 @@ _new_handle(class, parent, attr_ref, imp_datasv, imp_class)
     sv_2mortal(outer_ref);
     EXTEND(SP, 2);
     PUSHs(outer_ref);
-    if (GIMME != G_SCALAR) {
+    if (GIMME_V != G_SCALAR) {
         PUSHs(attr_ref);
     }
 
@@ -4658,7 +4659,7 @@ _handles(sv)
     (void)cv;
     EXTEND(SP, 2);
     PUSHs(oh);  /* returns outer handle then inner */
-    if (GIMME != G_SCALAR) {
+    if (GIMME_V != G_SCALAR) {
         PUSHs(ih);
     }
 
@@ -5022,7 +5023,7 @@ FETCH(sv)
                 meth, meth, HvNAME(imp_stash));
         }
         PUSHMARK(mark);  /* reset mark (implies one arg as we were called with one arg?) */
-        call_sv((SV*)GvCV(imp_gv), GIMME);
+        call_sv((SV*)GvCV(imp_gv), GIMME_V);
         SPAGAIN;
 #ifdef DBI_save_hv_fetch_ent
         PL_hv_fetch_ent_mh = save_mh;
@@ -5352,9 +5353,6 @@ fetchrow_hashref(sth, keyattrib=Nullch)
     }
     else {
         RETVAL = &PL_sv_undef;
-#if (PERL_VERSION < 4) || ((PERL_VERSION == 4) && (PERL_SUBVERSION <= 4))
-        RETVAL = newSV(0); /* mutable undef for 5.004_04 */
-#endif
     }
     SvREFCNT_dec(ka_rv);        /* since we created it          */
     OUTPUT:
@@ -5375,7 +5373,7 @@ fetch(sth)
     PUSHMARK(sp);
     XPUSHs(sth);
     PUTBACK;
-    num_fields = call_method("fetchrow", G_ARRAY);      /* XXX change the name later */
+    num_fields = call_method("fetchrow", G_LIST);      /* XXX change the name later */
     SPAGAIN;
     if (num_fields == 0) {
         ST(0) = &PL_sv_undef;

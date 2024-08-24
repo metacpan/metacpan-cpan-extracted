@@ -17,7 +17,7 @@
   <li><a href="#SYNOPSIS">SYNOPSIS</a></li>
   <li><a href="#DESCRIPTION">DESCRIPTION</a>
     <ul>
-      <li><a href="#Importing-the-package">Importing the package</a>
+      <li><a href="#IMPORTING">IMPORTING</a>
         <ul>
           <li><a href="#Database-Entity-Helper-Functions">Database Entity Helper Functions</a>
             <ul>
@@ -26,12 +26,12 @@
           </li>
         </ul>
       </li>
-      <li><a href="#Connecting-to-databases">Connecting to databases</a>
+      <li><a href="#CONNECTING-TO-DATABASES">CONNECTING TO DATABASES</a>
         <ul>
           <li><a href="#Cloning-database-connections">Cloning database connections</a></li>
         </ul>
       </li>
-      <li><a href="#Preparing-statements">Preparing statements</a>
+      <li><a href="#PREPARING-STATEMENTS">PREPARING STATEMENTS</a>
         <ul>
           <li><a href="#Placeholders">Placeholders</a>
             <ul>
@@ -40,7 +40,7 @@
           </li>
         </ul>
       </li>
-      <li><a href="#Iterators">Iterators</a>
+      <li><a href="#ITERATORS">ITERATORS</a>
         <ul>
           <li><a href="#Basic-Iterators">Basic Iterators</a>
             <ul>
@@ -54,9 +54,58 @@
           </li>
         </ul>
       </li>
-      <li><a href="#Transforming-results">Transforming results</a>
+      <li><a href="#TRANSFORMING-RESULTS">TRANSFORMING RESULTS</a>
         <ul>
           <li><a href="#Examples2">Examples</a></li>
+        </ul>
+      </li>
+      <li><a href="#REFERENCE">REFERENCE</a>
+        <ul>
+          <li><a href="#DBIx::Squirrel-Class-Methods">DBIx::Squirrel Class Methods</a>
+            <ul>
+              <li><a href="#connect">connect *</a></li>
+              <li><a href="#connect_cached">connect_cached *</a></li>
+            </ul>
+          </li>
+          <li><a href="#Database-Handle-Methods">Database Handle Methods</a>
+            <ul>
+              <li><a href="#do">do *</a></li>
+              <li><a href="#iterate">iterate</a></li>
+              <li><a href="#prepare">prepare *</a></li>
+              <li><a href="#prepare_cached">prepare_cached *</a></li>
+              <li><a href="#results">results</a></li>
+            </ul>
+          </li>
+          <li><a href="#Statement-Handle-Methods">Statement Handle Methods</a>
+            <ul>
+              <li><a href="#bind">bind</a></li>
+              <li><a href="#bind_param">bind_param *</a></li>
+              <li><a href="#execute">execute *</a></li>
+              <li><a href="#iterate1">iterate</a></li>
+              <li><a href="#results1">results</a></li>
+            </ul>
+          </li>
+          <li><a href="#Iterator-Objects">Iterator Objects</a>
+            <ul>
+              <li><a href="#all">all</a></li>
+              <li><a href="#buffer_size">buffer_size</a></li>
+              <li><a href="#buffer_size_slice">buffer_size_slice</a></li>
+              <li><a href="#count">count</a></li>
+              <li><a href="#execute1">execute</a></li>
+              <li><a href="#first">first</a></li>
+              <li><a href="#iterate2">iterate</a></li>
+              <li><a href="#last">last</a></li>
+              <li><a href="#next">next</a></li>
+              <li><a href="#one">one</a></li>
+              <li><a href="#remaining">remaining</a></li>
+              <li><a href="#reset">reset</a></li>
+              <li><a href="#rows">rows</a></li>
+              <li><a href="#single">single</a></li>
+              <li><a href="#slice">slice</a></li>
+              <li><a href="#slice_buffer_size">slice_buffer_size</a></li>
+              <li><a href="#sth">sth</a></li>
+            </ul>
+          </li>
         </ul>
       </li>
     </ul>
@@ -71,7 +120,7 @@
 
 <h1 id="VERSION">VERSION</h1>
 
-<p>version 1.2.11</p>
+<p>version 1.3.0</p>
 
 <h1 id="SYNOPSIS">SYNOPSIS</h1>
 
@@ -391,7 +440,7 @@ $id = $itr-&gt;iterate(&#39;Acme Rocket&#39;)-&gt;single;</code></pre>
 
 <p>The <code>DBIx::Squirrel</code> package extends the <code>DBI</code> by providing a few extra conveniences that are subtle and additive in nature, and, hopefully, quite useful.</p>
 
-<h2 id="Importing-the-package">Importing the package</h2>
+<h2 id="IMPORTING">IMPORTING</h2>
 
 <p>In the simplest case, just import the package as you would any other:</p>
 
@@ -496,7 +545,7 @@ while ( artists-&gt;next ) {
 </li>
 </ul>
 
-<h2 id="Connecting-to-databases">Connecting to databases</h2>
+<h2 id="CONNECTING-TO-DATABASES">CONNECTING TO DATABASES</h2>
 
 <p>Connecting to a database using <code>DBIx::Squirrel</code> may be done exactly as it would when using the <code>DBI</code>&#39;s <code>connect_cached</code> and <code>connect</code> methods.</p>
 
@@ -508,7 +557,7 @@ while ( artists-&gt;next ) {
 
 <p>This form clones another connection object and returns a brand new object that is blessed using the same class that invoked the <code>connect</code> method. The method will allow you to clone database connections created by the <code>DBI</code> and any subclasses (<code>DBIx::Squirrel</code> being one).</p>
 
-<h2 id="Preparing-statements">Preparing statements</h2>
+<h2 id="PREPARING-STATEMENTS">PREPARING STATEMENTS</h2>
 
 <p>Preparing a statement using <code>DBIx::Squirrel</code> may be done exactly as it would be done using the <code>DBI</code>&#39;s <code>prepare_cached</code> and <code>prepare</code> methods.</p>
 
@@ -586,7 +635,7 @@ $res = $sth-&gt;execute({&#39;:Name&#39; =&gt; &#39;Aerosmith&#39;});</code></pr
 </li>
 </ul>
 
-<h2 id="Iterators">Iterators</h2>
+<h2 id="ITERATORS">ITERATORS</h2>
 
 <p>In addition to statement objects, <code>DBIx::Squirrel</code> provides two kinds of iterator:</p>
 
@@ -642,7 +691,7 @@ $itr = $sth-&gt;results(
 
 <p>The <code>results</code> methods may be replaced by either of the <code>rs</code> or <code>resultset</code> aliases, if preferred.</p>
 
-<h2 id="Transforming-results">Transforming results</h2>
+<h2 id="TRANSFORMING-RESULTS">TRANSFORMING RESULTS</h2>
 
 <p>All <code>DBIx::Squirrel</code> iterators support an optional processing step called <i>transformation</i>.</p>
 
@@ -766,6 +815,345 @@ ArtistId: 128</code></pre>
 
 </li>
 </ol>
+
+<h2 id="REFERENCE">REFERENCE</h2>
+
+<p>This section describes the <code>DBIx::Squirrel</code> interface.</p>
+
+<p>Many of the methods (*) presented below may seem familiar to the experienced <code>DBI</code> user, and they should. They are documented here because <code>DBIx::Squirrel</code> makes subtle changes to their interfaces.</p>
+
+<p>Such changes are additive and unobtrusive in nature, in most cases, resulting in additional calling forms rather than any change in outcome. Unless a documented deviation from the standard <code>DBI</code> behaviour exists, one may safely assume that the <code>DBI</code> documentation still applies.</p>
+
+<p>Other parts of the <code>DBI</code> interface remain unaltered, as well as being accessible via <code>DBIx::Squirrel</code>.</p>
+
+<h3 id="DBIx::Squirrel-Class-Methods">DBIx::Squirrel Class Methods</h3>
+
+<h4 id="connect"><code>connect</code> *</h4>
+
+<pre><code>$dbh = DBIx::Squirrel-&gt;connect($data_source, $username, $password)
+            or die $DBIx::Squirrel::errstr;
+$dbh = DBIx::Squirrel-&gt;connect($data_source, $username, $password, \%attr)
+            or die $DBIx::Squirrel::errstr;
+$clone_dbh = DBIx::Squirrel-&gt;connect($dbh)
+            or die $DBIx::Squirrel::errstr;
+$clone_dbh = DBIx::Squirrel-&gt;connect($dbh, \%attr)
+            or die $DBIx::Squirrel::errstr;</code></pre>
+
+<h4 id="connect_cached"><code>connect_cached</code> *</h4>
+
+<pre><code>$dbh = DBIx::Squirrel-&gt;connect_cached($data_source, $username, $password)
+            or die $DBIx::Squirrel::errstr;
+$dbh = DBIx::Squirrel-&gt;connect_cached($data_source, $username, $password, \%attr)
+            or die $DBIx::Squirrel::errstr;</code></pre>
+
+<h3 id="Database-Handle-Methods">Database Handle Methods</h3>
+
+<h4 id="do"><code>do</code> *</h4>
+
+<pre><code>$rows = $dbh-&gt;do($statement)
+            or die $dbh-&gt;errstr;
+$rows = $dbh-&gt;do($statement, \%attr)
+            or die ...;
+$rows = $dbh-&gt;do($statement, \%attr, @bind_values)
+            or die ...;
+$rows = $dbh-&gt;do($statement, \%attr, %bind_mappings)
+            or die ...;
+$rows = $dbh-&gt;do($statement, \%attr, \@bind_values)
+            or die ...;
+$rows = $dbh-&gt;do($statement, \%attr, \%bind_mappings)
+            or die ...;
+$rows = $dbh-&gt;do($statement, @bind_values)
+            or die ...;
+$rows = $dbh-&gt;do($statement, %bind_mappings)
+            or die ...;
+$rows = $dbh-&gt;do($statement, \@bind_values)
+            or die ...;
+$rows = $dbh-&gt;do($statement, undef, \%bind_mappings)
+            or die ...;</code></pre>
+
+<p>Calling <code>do</code> in scalar-context works just as it does when using the <code>DBI</code>, although there are a few more calling forms.</p>
+
+<p>Calling <code>do</code> in list-context, however, is new behaviour and results in the return of a list comprised of two elements: the number of rows affected by the statement, as well as the statement handle:</p>
+
+<pre><code>($rows, $sth) = $dbh-&gt;do($statement)
+            or die $dbh-&gt;errstr;
+($rows, $sth) = $dbh-&gt;do($statement, \%attr)
+            or die ...;
+($rows, $sth) = $dbh-&gt;do($statement, \%attr, @bind_values)
+            or die ...;
+($rows, $sth) = $dbh-&gt;do($statement, \%attr, %bind_mappings)
+            or die ...;
+($rows, $sth) = $dbh-&gt;do($statement, \%attr, \@bind_values)
+            or die ...;
+($rows, $sth) = $dbh-&gt;do($statement, \%attr, \%bind_mappings)
+            or die ...;
+($rows, $sth) = $dbh-&gt;do($statement, @bind_values)
+            or die ...;
+($rows, $sth) = $dbh-&gt;do($statement, %bind_mappings)
+            or die ...;
+($rows, $sth) = $dbh-&gt;do($statement, \@bind_values)
+            or die ...;
+($rows, $sth) = $dbh-&gt;do($statement, undef, \%bind_mappings)
+            or die ...;</code></pre>
+
+<h4 id="iterate"><code>iterate</code></h4>
+
+<pre><code>$itor = $dbh-&gt;iterate($statement)
+            or die $dbh-&gt;errstr;
+$itor = $dbh-&gt;iterate($statement, @transforms)
+            or die $dbh-&gt;errstr;
+$itor = $dbh-&gt;iterate($statement, \%attr)
+            or die ...;
+$itor = $dbh-&gt;iterate($statement, \%attr, @transforms)
+            or die ...;
+$itor = $dbh-&gt;iterate($statement, \%attr, @bind_values)
+            or die ...;
+$itor = $dbh-&gt;iterate($statement, \%attr, @bind_values, @transforms)
+            or die ...;
+$itor = $dbh-&gt;iterate($statement, \%attr, %bind_mappings)
+            or die ...;
+$itor = $dbh-&gt;iterate($statement, \%attr, %bind_mappings, @transforms)
+            or die ...;
+$itor = $dbh-&gt;iterate($statement, \%attr, \@bind_values)
+            or die ...;
+$itor = $dbh-&gt;iterate($statement, \%attr, [@bind_values, @transforms])
+            or die ...;
+$itor = $dbh-&gt;iterate($statement, \%attr, \%bind_mappings)
+            or die ...;
+$itor = $dbh-&gt;iterate($statement, \%attr, \%bind_mappings, @transforms)
+            or die ...;
+$itor = $dbh-&gt;iterate($statement, @bind_values)
+            or die ...;
+$itor = $dbh-&gt;iterate($statement, @bind_values, @transforms)
+            or die ...;
+$itor = $dbh-&gt;iterate($statement, %bind_mappings)
+            or die ...;
+$itor = $dbh-&gt;iterate($statement, %bind_mappings, @transforms)
+            or die ...;
+$itor = $dbh-&gt;iterate($statement, \@bind_values)
+            or die ...;
+$itor = $dbh-&gt;iterate($statement, [@bind_values, @transforms])
+            or die ...;
+$itor = $dbh-&gt;iterate($statement, undef, \%bind_mappings)
+            or die ...;
+$itor = $dbh-&gt;iterate($statement, undef, \%bind_mappings, @transforms)
+            or die ...;</code></pre>
+
+<h4 id="prepare"><code>prepare</code> *</h4>
+
+<pre><code>$sth = $dbh-&gt;prepare($statement)          or die $dbh-&gt;errstr;
+$sth = $dbh-&gt;prepare($statement, \%attr)  or die $dbh-&gt;errstr;</code></pre>
+
+<p>The <code>prepare</code> method interface is identical in form to that provided by the <code>DBI</code>.</p>
+
+<p><code>DBIx::Squirrel</code> permits the use of one of a number of valid placeholder styles (<code>:name</code>, <code>:number</code>, <code>$number</code>, <code>?number</code>, <code>?</code>) within the statement-string.</p>
+
+<p>Statement-strings will be &quot;normalised&quot; to use the legacy <code>?</code> style, before being handed-off to the <code>DBI</code> method of the same name. In spite of this, you should still use key-value bindings if you opted for named placeholders.</p>
+
+<h4 id="prepare_cached"><code>prepare_cached</code> *</h4>
+
+<pre><code>$sth = $dbh-&gt;prepare_cached($statement)
+$sth = $dbh-&gt;prepare_cached($statement, \%attr)
+$sth = $dbh-&gt;prepare_cached($statement, \%attr, $if_active)</code></pre>
+
+<p>The <code>prepare_cached</code> method interface is identical in form to that provided by the <code>DBI</code>.</p>
+
+<p><code>DBIx::Squirrel</code> permits the use of one of a number of valid placeholder styles (<code>:name</code>, <code>:number</code>, <code>$number</code>, <code>?number</code>, <code>?</code>) within the statement-string.</p>
+
+<p>Statement-strings will be &quot;normalised&quot; to use the legacy <code>?</code> style, before being handed-off to the <code>DBI</code> method of the same name. In spite of this, you should still use key-value bindings if you opted for named placeholders.</p>
+
+<p>It is the normalised form of the statement that is cached by the <code>DBI</code>.</p>
+
+<h4 id="results"><code>results</code></h4>
+
+<pre><code>$itor = $dbh-&gt;results($statement)
+            or die $dbh-&gt;errstr;
+$itor = $dbh-&gt;results($statement, @transforms)
+            or die $dbh-&gt;errstr;
+$itor = $dbh-&gt;results($statement, \%attr)
+            or die ...;
+$itor = $dbh-&gt;results($statement, \%attr, @transforms)
+            or die ...;
+$itor = $dbh-&gt;results($statement, \%attr, @bind_values)
+            or die ...;
+$itor = $dbh-&gt;results($statement, \%attr, @bind_values, @transforms)
+            or die ...;
+$itor = $dbh-&gt;results($statement, \%attr, %bind_mappings)
+            or die ...;
+$itor = $dbh-&gt;results($statement, \%attr, %bind_mappings, @transforms)
+            or die ...;
+$itor = $dbh-&gt;results($statement, \%attr, \@bind_values)
+            or die ...;
+$itor = $dbh-&gt;results($statement, \%attr, [@bind_values, @transforms])
+            or die ...;
+$itor = $dbh-&gt;results($statement, \%attr, \%bind_mappings)
+            or die ...;
+$itor = $dbh-&gt;results($statement, \%attr, \%bind_mappings, @transforms)
+            or die ...;
+$itor = $dbh-&gt;results($statement, @bind_values)
+            or die ...;
+$itor = $dbh-&gt;results($statement, @bind_values, @transforms)
+            or die ...;
+$itor = $dbh-&gt;results($statement, %bind_mappings)
+            or die ...;
+$itor = $dbh-&gt;results($statement, %bind_mappings, @transforms)
+            or die ...;
+$itor = $dbh-&gt;results($statement, \@bind_values)
+            or die ...;
+$itor = $dbh-&gt;results($statement, [@bind_values, @transforms])
+            or die ...;
+$itor = $dbh-&gt;results($statement, undef, \%bind_mappings)
+            or die ...;
+$itor = $dbh-&gt;results($statement, undef, \%bind_mappings, @transforms)
+            or die ...;</code></pre>
+
+<h3 id="Statement-Handle-Methods">Statement Handle Methods</h3>
+
+<h4 id="bind"><code>bind</code></h4>
+
+<pre><code>$sth-&gt;bind(@bind_values);
+$sth-&gt;bind(\@bind_values);
+$sth-&gt;bind(%bind_mappings);
+$sth-&gt;bind(\%bind_mappings);</code></pre>
+
+<h4 id="bind_param"><code>bind_param</code> *</h4>
+
+<pre><code>$sth-&gt;bind_param($p_num, $bind_value);
+$sth-&gt;bind_param($p_num, $bind_value, \%attr);
+$sth-&gt;bind_param($p_num, $bind_value, $bind_type);
+$sth-&gt;bind_param($p_name, $bind_value);
+$sth-&gt;bind_param($p_name, $bind_value, \%attr);
+$sth-&gt;bind_param($p_name, $bind_value, $bind_type);</code></pre>
+
+<h4 id="execute"><code>execute</code> *</h4>
+
+<pre><code>$rv = $sth-&gt;execute();
+$rv = $sth-&gt;execute(@bind_values);
+$rv = $sth-&gt;execute(\@bind_values);
+$rv = $sth-&gt;execute(%bind_mappings);
+$rv = $sth-&gt;execute(\%bind_mappings);</code></pre>
+
+<h4 id="iterate1"><code>iterate</code></h4>
+
+<pre><code>$itor = $sth-&gt;iterate()
+            or die $dbh-&gt;errstr;
+$itor = $sth-&gt;iterate(@bind_values)
+            or die ...;
+$itor = $sth-&gt;iterate(@transforms)
+            or die $dbh-&gt;errstr;
+$itor = $sth-&gt;iterate(@bind_values, @transforms)
+            or die ...;
+$itor = $sth-&gt;iterate(%bind_mappings)
+            or die ...;
+$itor = $sth-&gt;iterate(%bind_mappings, @transforms)
+            or die ...;
+$itor = $sth-&gt;iterate(\@bind_values)
+            or die ...;
+$itor = $sth-&gt;iterate([@bind_values, @transforms])
+            or die ...;
+$itor = $sth-&gt;iterate(\%bind_mappings)
+            or die ...;
+$itor = $sth-&gt;iterate(\%bind_mappings, @transforms)
+            or die ...;</code></pre>
+
+<h4 id="results1"><code>results</code></h4>
+
+<pre><code>$itor = $sth-&gt;results()
+            or die $dbh-&gt;errstr;
+$itor = $sth-&gt;results(@bind_values)
+            or die ...;
+$itor = $sth-&gt;results(@transforms)
+            or die $dbh-&gt;errstr;
+$itor = $sth-&gt;results(@bind_values, @transforms)
+            or die ...;
+$itor = $sth-&gt;results(%bind_mappings)
+            or die ...;
+$itor = $sth-&gt;results(%bind_mappings, @transforms)
+            or die ...;
+$itor = $sth-&gt;results(\@bind_values)
+            or die ...;
+$itor = $sth-&gt;results([@bind_values, @transforms])
+            or die ...;
+$itor = $sth-&gt;results(\%bind_mappings)
+            or die ...;
+$itor = $sth-&gt;results(\%bind_mappings, @transforms)
+            or die ...;</code></pre>
+
+<h3 id="Iterator-Objects">Iterator Objects</h3>
+
+<h4 id="all"><code>all</code></h4>
+
+<pre><code>@ary = $itor-&gt;all();
+$ary_ref | undef = $itor-&gt;all();</code></pre>
+
+<p>Executes the iterator&#39;s underlying statement handle object.</p>
+
+<p>When called in list-context, the <code>all</code> method returns an array of all matching row objects.</p>
+
+<p>When called in scalar-context, this method returns a reference to an array of all matching row objects. Where no rows are matched, <code>undef</code> would be returned.</p>
+
+<h4 id="buffer_size"><code>buffer_size</code></h4>
+
+<h4 id="buffer_size_slice"><code>buffer_size_slice</code></h4>
+
+<p>Alias <i>(see <code>slice_buffer_size</code>)</i>.</p>
+
+<h4 id="count"><code>count</code></h4>
+
+<pre><code>$count = $itor-&gt;count();</code></pre>
+
+<p>Returns the number of rows by counting the number of times <code>next</code> can be called.</p>
+
+<h4 id="execute1"><code>execute</code></h4>
+
+<pre><code>$rv = $itor-&gt;execute());</code></pre>
+
+<p>Executes the iterator&#39;s underlying statemeent handle object.</p>
+
+<h4 id="first"><code>first</code></h4>
+
+<h4 id="iterate2"><code>iterate</code></h4>
+
+<pre><code>$itor | undef = $itor-&gt;iterate());</code></pre>
+
+<p>Executes the iterator&#39;s underlying statemeent handle object, returning the iterator object reference if execution was successful, or <code>undef</code> if not.</p>
+
+<h4 id="last"><code>last</code></h4>
+
+<h4 id="next"><code>next</code></h4>
+
+<h4 id="one"><code>one</code></h4>
+
+<p>Alias <i>(see <code>single</code>)</i>.</p>
+
+<h4 id="remaining"><code>remaining</code></h4>
+
+<pre><code>@ary = $itor-&gt;remaining();
+$ary_ref | undef = $itor-&gt;remaining();</code></pre>
+
+<p>When called in list-context, the <code>all</code> method returns an array of all matching row objects remaining to be fetched.</p>
+
+<p>When called in scalar-context, this method returns a reference to an array of all matching row objects remaining to be fetched. Where no rows are matched, <code>undef</code> would be returned.</p>
+
+<h4 id="reset"><code>reset</code></h4>
+
+<h4 id="rows"><code>rows</code></h4>
+
+<pre><code>$rv = $itor-&gt;rows();</code></pre>
+
+<p>Returns the number of rows aftected by non-SELECT statements.</p>
+
+<h4 id="single"><code>single</code></h4>
+
+<h4 id="slice"><code>slice</code></h4>
+
+<h4 id="slice_buffer_size"><code>slice_buffer_size</code></h4>
+
+<h4 id="sth"><code>sth</code></h4>
+
+<pre><code>$sth = $itor-&gt;sth();</code></pre>
+
+<p>Returns a reference to the statement handle object associated with the iterator.</p>
 
 <h1 id="COPYRIGHT-AND-LICENSE">COPYRIGHT AND LICENSE</h1>
 

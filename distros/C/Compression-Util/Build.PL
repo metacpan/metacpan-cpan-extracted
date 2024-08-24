@@ -35,6 +35,7 @@ my $builder = Module::Build->new(
                  'Test::More' => 0,
                  'List::Util' => '1.45',
                  'Exporter'   => 0,
+                 'Carp'       => 0,
                 },
     add_to_cleanup     => ['Compression-Util-*'],
     create_makefile_pl => 'traditional',

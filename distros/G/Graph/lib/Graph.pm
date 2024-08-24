@@ -14,7 +14,7 @@ BEGIN {
 
 use Graph::AdjacencyMap qw(:flags :fields);
 
-our $VERSION = '0.9730';
+our $VERSION = '0.9731';
 
 require 5.006; # Weak references are absolutely required.
 
@@ -958,6 +958,18 @@ sub add_edges {
     return $g;
 }
 
+sub add_edges_by_id {
+    &expect_multiedged;
+    my ($g, $id) = (shift, pop);
+    my @edges;
+    while (defined(my $u = shift @_)) {
+	push @edges, ref $u eq 'ARRAY' ? $u : @_ ? [ $u, shift @_ ]
+	    : __carp_confess "Graph::add_edges: missing end vertex";
+    }
+    $g->add_edge_by_id(@$_, $id) for @edges;
+    return $g;
+}
+
 sub rename_vertex {
     my $g = shift;
     $g->[ _V ]->rename_path(@_);
@@ -975,7 +987,7 @@ sub rename_vertices {
 sub as_hashes {
     my ($g) = @_;
     my (%v, %e, @e);
-    my ($is_hyper, $is_directed)= (&is_hyperedged, &is_directed);
+    my ($is_hyper, $is_directed) = (&is_hyperedged, &is_directed);
     if (&is_multivertexed) {
         for my $v ($g->unique_vertices) {
             $v{$v} = {
@@ -1012,23 +1024,8 @@ sub as_hashes {
 
 sub ingest {
     my ($g, $g2) = @_;
-    for my $v ($g2->vertices) {
-        if (&is_multivertexed) {
-            $g->set_vertex_attributes_by_id($v, $_, $g2->get_vertex_attributes_by_id($v, $_))
-                for $g2->get_multivertex_ids($v);
-        } else {
-            $g->set_vertex_attributes($v, $g2->get_vertex_attributes($v));
-        }
-        if (&is_multiedged) {
-            for my $e ($g2->edges_from($v)) {
-                $g->set_edge_attributes_by_id(@$e, $_, $g2->get_edge_attributes_by_id(@$e, $_))
-                    for $g2->get_multiedge_ids(@$e);
-            }
-        } else {
-            $g->set_edge_attributes(@$_, $g2->get_edge_attributes(@$_))
-                for $g2->edges_from($v);
-        }
-    }
+    _copy_vertices($g2, $g, 1);
+    _copy_edges($g2, $g, 1);
     $g;
 }
 
@@ -1038,11 +1035,9 @@ sub ingest {
 
 sub copy {
     my ($g, @args) = @_;
-    my %opt = _get_options( \@args );
-    no strict 'refs';
-    my $c = (ref $g)->new(map +($_ => &$_ ? 1 : 0), @GRAPH_PROPS_COPIED);
-    $c->add_vertices(&isolated_vertices);
-    $c->add_edges(&_edges05);
+    my $c = $g->new(@args);
+    _copy_vertices($g, $c);
+    _copy_edges($g, $c);
     return $c;
 }
 
@@ -1320,11 +1315,22 @@ sub add_weighted_edge_by_id {
     goto &set_edge_attribute_by_id;
 }
 
+sub add_path_by_id {
+    &expect_multiedged;
+    my ($g, $u, $id) = (shift, shift, pop);
+    my @edges;
+    while (@_) {
+	my $v = shift;
+	push @edges, [ $u, $v ];
+	$u = $v;
+    }
+    $g->add_edges_by_id(@edges, $id);
+    return $g;
+}
+
 sub add_weighted_path_by_id {
     &expect_multiedged;
-    my $g = shift;
-    my $id = pop;
-    my $u = shift;
+    my ($g, $u, $id) = (shift, shift, pop);
     while (@_) {
 	my ($w, $v) = splice @_, 0, 2;
 	$g->set_edge_attribute_by_id($u, $v, $id, $defattr, $w);
@@ -1717,25 +1723,100 @@ sub topological_sort {
 
 *toposort = \&topological_sort;
 
+sub _copy_vertices {
+  my ($g, $gc, $attr_too) = @_;
+  if (&is_multivertexed) {
+    for my $v (&_vertices05) {
+      if ($attr_too) {
+        $gc->set_vertex_attributes_by_id($v, $_, $g->get_vertex_attributes_by_id($v, $_))
+          for $g->get_multivertex_ids($v);
+      } else {
+        $gc->add_vertex_by_id($v, $_) for $g->get_multivertex_ids($v);
+      }
+    }
+  } else {
+    if ($attr_too) {
+      $gc->set_vertex_attributes($_, $g->get_vertex_attributes($_)) for &_vertices05;
+    } else {
+      $gc->add_vertices(&_vertices05);
+    }
+  }
+}
+
+sub _copy_edges {
+  my ($g, $gc, $attr_too, $mirror) = @_;
+  my @edges = &_edges05;
+  if (&is_multiedged) {
+    for my $e (@edges) {
+      for my $id ($g->get_multiedge_ids(@$e)) {
+        if ($attr_too) {
+          $gc->set_edge_attributes_by_id(@$e, $id, $g->get_edge_attributes_by_id(@$e, $id));
+          $gc->set_edge_attributes_by_id(reverse(@$e), $id, $g->get_edge_attributes_by_id(@$e, $id)) if $mirror;
+        } else {
+          $gc->add_edge_by_id(@$e, $id);
+          $gc->add_edge_by_id(reverse(@$e), $id) if $mirror;
+        }
+      }
+    }
+  } else {
+    if ($attr_too) {
+      $gc->set_edge_attributes(@$_, $g->get_edge_attributes(@$_))
+        for @edges;
+      if ($mirror) {
+        $gc->set_edge_attributes(reverse(@$_), $g->get_edge_attributes(@$_))
+          for @edges;
+      }
+    } else {
+      $gc->add_edges(@edges, !$mirror ? () : map [reverse @$_], @edges);
+    }
+  }
+}
+
 sub _undirected_copy_compute {
-  Graph->new(directed => 0, vertices => [&isolated_vertices], edges => [&_edges05]);
+  my $gc = $_[0]->new(undirected=>1);
+  _copy_vertices($_[0], $gc);
+  _copy_edges($_[0], $gc);
+  $gc;
 }
 
 sub undirected_copy {
-    &expect_directed;
-    return _check_cache($_[0], 'undirected_copy', [], \&_undirected_copy_compute);
+  &expect_directed;
+  _check_cache($_[0], 'undirected_copy', [], \&_undirected_copy_compute);
 }
 
 *undirected_copy_graph = \&undirected_copy;
 
+sub undirected_copy_attributes {
+  &expect_directed;
+  my $gc = $_[0]->new(undirected=>1);
+  $gc->set_graph_attributes($_[0]->get_graph_attributes);
+  _copy_vertices($_[0], $gc, 1);
+  _copy_edges($_[0], $gc, 1);
+  $gc;
+}
+
+sub _directed_copy_compute {
+  my $gc = $_[0]->new(undirected=>0);
+  _copy_vertices($_[0], $gc);
+  _copy_edges($_[0], $gc, 0, 1);
+  $gc;
+}
+
 sub directed_copy {
-    &expect_undirected;
-    my @edges = &_edges05;
-    Graph->new(directed => 1, vertices => [&isolated_vertices],
-	edges => [@edges, map [reverse @$_], @edges]);
+  &expect_undirected;
+  _check_cache($_[0], 'directed_copy', [], \&_directed_copy_compute);
 }
 
 *directed_copy_graph = \&directed_copy;
+
+sub directed_copy_attributes {
+  &expect_undirected;
+  my $gc = $_[0]->new(directed=>1);
+  $gc->set_graph_attributes($_[0]->get_graph_attributes);
+  _copy_vertices($_[0], $gc, 1);
+  _copy_edges($_[0], $gc, 1, 1);
+  $gc;
+}
 
 sub is_bipartite {
     &expect_undirected;
@@ -1797,6 +1878,7 @@ my %_cache_type =
      'SPT_Dijkstra'        => ['_spt_di', 'SPT_Dijkstra_root'],
      'SPT_Bellman_Ford'    => ['_spt_bf', 'SPT_Bellman_Ford_root'],
      'undirected_copy'     => ['_undirected'],
+     'directed_copy'       => ['_directed'],
      'transitive_closure_matrix' => ['_tcm'],
     );
 

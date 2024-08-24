@@ -68,6 +68,6 @@
          "web" : "https://github.com/graphviz-perl/Graph"
       }
    },
-   "version" : "0.9730",
+   "version" : "0.9731",
    "x_serialization_backend" : "JSON::PP version 4.04"
 }

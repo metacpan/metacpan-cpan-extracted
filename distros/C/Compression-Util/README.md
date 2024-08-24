@@ -42,11 +42,12 @@ $opts{d} ? decompress(\*STDIN, \*STDOUT) : compress(\*STDIN, \*STDOUT);
     * Fibonacci coding
     * Elias gamma/omega coding
     * Delta coding
-    * BWT-based compression
-    * LZ77/LZSS compression
-    * LZW compression
+    * BWT-based (de)compression
+    * LZ77/LZSS (de)compression
+    * LZW (de)compression
     * Bzip2 (de)compression
     * Gzip (de)compression
+    * LZ4 (de)compression
 
 The provided techniques can be easily combined in various ways to create powerful compressors, such as the Bzip2 compressor, which is a pipeline of the following methods:
 
@@ -212,6 +213,9 @@ By default, `$LZ_MAX_CHAIN_LEN` is set to `32`.
 
       lzw_compress($string)                # LZW + abc_encode() compression
       lzw_decompress($fh)                  # Inverse of the above method
+
+      lz4_compress($string)                # Compress a given string using the LZ4 frame format
+      lz4_decompress($fh)                  # Inverse of the above method
 ```
 
 # MEDIUM-LEVEL FUNCTIONS
@@ -486,6 +490,27 @@ High-level function that performs byte-oriented LZSS compression, inspired by LZ
 ```
 
 Inverse of `lzb_compress()`.
+
+## lz4\_compress
+
+```perl
+    my $string = lz4_compress($fh);
+    my $string = lz4_compress($data);
+    my $string = lz4_compress($data, \&lzss_encode_fast);   # with fast-LZ parsing
+```
+
+Valid LZ4 compressor, using the LZ4 Frame format, given either a string or an input file-handle.
+
+The input data is split into chunks of length `2**17` and compressed into independent LZ4 blocks.
+
+## lz4\_decompress
+
+```perl
+    my $data = lz4_decompress($fh);
+    my $data = lz4_decompress($string);
+```
+
+Decompress LZ4 Frame data, given either a string or an input file-handle. Concatenated LZ4 Frames are also supported.
 
 ## lzw\_compress
 
@@ -1298,15 +1323,24 @@ Inverse of `lz77_encode()` and `lz77_encode_symbolic()`, respectively.
 
 ```perl
     # Standard version
-    my ($literals, $distances, $lengths) = lzss_encode($data);
-    my ($literals, $distances, $lengths) = lzss_encode(\@symbols);
+    my ($literals, $distances, $lengths) = lzss_encode($data, %params);
+    my ($literals, $distances, $lengths) = lzss_encode(\@symbols, %params);
 
     # Faster version
-    my ($literals, $distances, $lengths) = lzss_encode_fast($data);
-    my ($literals, $distances, $lengths) = lzss_encode_fast(\@symbols);
+    my ($literals, $distances, $lengths) = lzss_encode_fast($data, %params);
+    my ($literals, $distances, $lengths) = lzss_encode_fast(\@symbols, %params);
 ```
 
 Low-level function that applies the LZSS (Lempel-Ziv-Storer-Szymanski) algorithm on the provided data.
+
+The accepted `%params` are:
+
+```perl
+    min_len         => $LZ_MIN_LEN,
+    max_len         => $LZ_MAX_LEN,
+    max_dist        => $LZ_MAX_DIST,
+    max_chain_len   => $LZ_MAX_CHAIN_LEN,
+```
 
 The function returns three values:
 
@@ -1469,6 +1503,10 @@ The functions can be combined in various ways, easily creating novel compression
     * [https://datatracker.ietf.org/doc/html/rfc1952](https://datatracker.ietf.org/doc/html/rfc1952)
 - BZIP2 Format Specification, by Joe Tsai:
     * [https://github.com/dsnet/compress/blob/master/doc/bzip2-format.pdf](https://github.com/dsnet/compress/blob/master/doc/bzip2-format.pdf)
+- LZ4 Frame format
+    * [https://github.com/lz4/lz4/blob/dev/doc/lz4\_Frame\_format.md](https://github.com/lz4/lz4/blob/dev/doc/lz4_Frame_format.md)
+- LZ4 Block format
+    * [https://github.com/lz4/lz4/blob/dev/doc/lz4\_Block\_format.md](https://github.com/lz4/lz4/blob/dev/doc/lz4_Block_format.md)
 - Data Compression (Summer 2023) - Lecture 4 - The Unix 'compress' Program:
     * [https://youtube.com/watch?v=1cJL9Va80Pk](https://youtube.com/watch?v=1cJL9Va80Pk)
 - Data Compression (Summer 2023) - Lecture 5 - Basic Techniques:

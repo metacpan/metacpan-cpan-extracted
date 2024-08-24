@@ -25,10 +25,11 @@
 #
 ################################################################
 
-our $VERSION='1.0000772';
+our $VERSION='1.0000776';
 
-print "STARTING FREEMEM: ".`sudo cat /proc/meminfo | grep MemFree`;
-print "STARTING AVAILABLE: ".`sudo cat /proc/meminfo | grep MemAvailable`;
+my $sudo=($^O eq 'cygwin')?'':'sudo ';
+print "AFTER BEGIN BLOCK FREEMEM: ".`${sudo}cat /proc/meminfo | grep MemFree`;
+print "AFTER BEGIN BLOCK STARTING AVAILABLE: ".`${sudo}cat /proc/meminfo | grep MemAvailable` unless $^O eq 'cygwin';
 
 print `env`,"\n\n\n";
 
@@ -123,6 +124,11 @@ our %amazon;
 $ENV{LOADED_MODULES}||='';
 BEGIN { # FullAuto© MICROSOFT WINDOWS INSTALLER
 
+my $sudo=($^O eq 'cygwin')?'':'sudo ';
+
+print "START OF BEGIN BLOCK FREEMEM: ".`${sudo}cat /proc/meminfo | grep MemFree`;
+print "START OF BEGIN BLOCK AVAILABLE: ".`${sudo}cat /proc/meminfo | grep MemAvailable` unless $^O eq 'cygwin';
+
    # All the code in this BEGIN block is used exclusively by the
    # FullAuto MS Windows Installer. You can download the Windows
    # Installer at:
@@ -208,7 +214,7 @@ BEGIN { # FullAuto© MICROSOFT WINDOWS INSTALLER
       print "FREEMEM AFTER AMAZON CHECK: ",`sudo cat /proc/meminfo | grep MemFree`;
       print "AVAILABLE AFTER AMAZON CHECK: ",`sudo cat /proc/meminfo | grep MemAvailable`;
       if ($instance_type=~/micro|nano/) {
-	      #`sudo su -c 'sync;echo 3 > /proc/sys/vm/drop_caches'`
+         `sudo su -c 'sync;echo 3 > /proc/sys/vm/drop_caches'`
       }
       print "FREEMEM AFTER CLEAR CACHES: ",`sudo cat /proc/meminfo | grep MemFree`;
       print "AVAILABLE AFTER CLEAR CACHES: ",`sudo cat /proc/meminfo | grep MemAvailable`;
@@ -605,72 +611,74 @@ $SIG{__DIE__} = sub{ eval { require Term::ReadKey };
 
 use Cwd qw/cwd/;
 use File::stat;
-{
-   local $SIG{__DIE__}; # No sigdie handler
+unless (grep { /CPAN|SKIP/ } @ARGV) {
+   {
+      local $SIG{__DIE__}; # No sigdie handler
    
-   # In keeping with the continuous integration approach, and since an
-   # increasing number of hosts are machine images, CPAN configuration and
-   # setup is automated to the greatest extent possible. Users are advised
-   # to allow this only on hosts where this is not a sensitive issue.
+      # In keeping with the continuous integration approach, and since an
+      # increasing number of hosts are machine images, CPAN configuration and
+      # setup is automated to the greatest extent possible. Users are advised
+      # to allow this only on hosts where this is not a sensitive issue.
  
-   eval {
-      if (!(-e "$ENV{HOME}/.cpan/CPAN/MyConfig.pm") && !old_cpan() && -e $^X) {
-         my $run_cpan="echo y | $^X -e \"require CPAN;".
-               'require CPAN::FirstTime;'.
-               '*{CPAN::FirstTime::_using_sudo}'. # Override default local::lib
-               '= sub { return 1 };'.             # Net::FullAuto is currently
-                                                  # not compatible with
-                                                  # local::lib. When CPAN is
-                                                  # found in an unconfigured 
-                                                  # condition, "sudo" instead
-                                                  # of local::lib is chosen.
-               "CPAN::FirstTime::init(\'$Config{privlib}\');\" 2>&1";
-         fa_system($run_cpan);
-      }
-      CPAN::HandleConfig->load;
-   };
-   if ($@) {
-      if ((-x "/usr/local/bin/perl") && ($^X ne "/usr/local/bin/perl")) {
-         my $timeout=300;my $a='';
-         my $toperror=$@;
-         my $die='';
-         eval {
-            local $SIG{ALRM} = sub { die "alarm\n" }; # NB: \n required
-            alarm $timeout;
-            my $message=<<END;
+      eval {
+         if (!(-e "$ENV{HOME}/.cpan/CPAN/MyConfig.pm") && !old_cpan() && -e $^X) {
+            my $run_cpan="echo y | $^X -e \"require CPAN;".
+                  'require CPAN::FirstTime;'.
+                  '*{CPAN::FirstTime::_using_sudo}'. # Override default local::lib
+                  '= sub { return 1 };'.             # Net::FullAuto is currently
+                                                     # not compatible with
+                                                     # local::lib. When CPAN is
+                                                     # found in an unconfigured 
+                                                     # condition, "sudo" instead
+                                                     # of local::lib is chosen.
+                  "CPAN::FirstTime::init(\'$Config{privlib}\');\" 2>&1";
+            fa_system($run_cpan);
+         }
+         CPAN::HandleConfig->load;
+      };
+      if ($@) {
+         if ((-x "/usr/local/bin/perl") && ($^X ne "/usr/local/bin/perl")) {
+            my $timeout=300;my $a='';
+            my $toperror=$@;
+            my $die='';
+            eval {
+               local $SIG{ALRM} = sub { die "alarm\n" }; # NB: \n required
+               alarm $timeout;
+               my $message=<<END;
 
-   ERROR!:  $toperror
+      ERROR!:  $toperror
+   
+               It appears that the perl installation used to run
+               Makefile.PL is an old system installation, and not
+               the intended one.
 
-            It appears that the perl installation used to run
-            Makefile.PL is an old system installation, and not
-            the intended one.
+               Another perl installation using /usr/local/bin/perl
+               as the primary executable has been discovered.
 
-            Another perl installation using /usr/local/bin/perl
-            as the primary executable has been discovered.
-
-            Would you like Makefile.PL to be run against that
-            installation?
+               Would you like Makefile.PL to be run against that
+               installation?
 
 END
 
-            my $fae="No   (FullAuto Setup will exit)";
-            my $menu1 = [
-                        $message,
-                        [ "Yes", sub{ return 'Yes' } ],
-                        [ $fae, sub{ return 'No' } ],
-                        ];
-            my $selection=&menu($menu1);
-            exit 0 if $selection eq ']quit[';
-            exit 0 if -1<index $selection, 'No   (';
-            my $argvs=join " ", @ARGV;
-            exec "/usr/local/bin/perl Makefile.PL $argvs";
-            alarm 0;
+               my $fae="No   (FullAuto Setup will exit)";
+               my $menu1 = [
+                           $message,
+                           [ "Yes", sub{ return 'Yes' } ],
+                           [ $fae, sub{ return 'No' } ],
+                           ];
+               my $selection=&menu($menu1);
+               exit 0 if $selection eq ']quit[';
+               exit 0 if -1<index $selection, 'No   (';
+               my $argvs=join " ", @ARGV;
+               exec "/usr/local/bin/perl Makefile.PL $argvs";
+               alarm 0;
+            };
+            fa_die("$@: $!\n") if $@;
          };
-         fa_die("$@: $!\n") if $@;
-      };
-      fa_die("$@: $!\n");
-   }
-};
+         fa_die("$@: $!\n");
+      }
+   };
+}
 use POSIX qw/strftime/;
 my $mycpantest=0; 
 our $cwd=&cwd;
@@ -2238,7 +2246,7 @@ sub size_fmt {
 }
 if (exists $amazon{instance_type}) {
    if ($amazon{instance_type}=~/micro/) {
-	   print "ARGVVVVVV=",join ' ',@ARGV,"\n";
+	   print "\@ARGV FOR CHECKING LOW MEMORY=",join ' ',@ARGV,"\n";
       unless (grep { /CPAN|SKIP/ } @ARGV) {
          fa_system('sudo dnf -y install perl-YAML.noarch perl-Net-SSLeay.x86_64');
 print "BEFORE CPAN LOOPING FREEMEM: ".`sudo cat /proc/meminfo | grep MemFree`;
@@ -2249,7 +2257,7 @@ print "BEFORE CPAN LOOPING STARTING AVAILABLE: ".`sudo cat /proc/meminfo | grep 
                      ."swapoff -a && swapon -a;"
                      ."cd \"$cwd\";$^X Makefile.PL $argvs CPAN";
          exec $exec_cmd;
-      } elsif (!grep { /SKIP/ } @ARGV) {
+      } elsif (!grep { /SKIP|CPAN/ } @ARGV) {
          pop @ARGV;
          #fa_system('sudo dnf -y install perl-YAML.noarch perl-Net-SSLeay.x86_64');
          print "\n";
@@ -2306,6 +2314,11 @@ END
             #            ."$^X Makefile.PL SKIP CPAN";
             #exec $exec_cmd;
          }
+      } elsif ($ARGV[$#ARGV] eq 'CPAN') {
+         pop @ARGV;
+         print "BEFORE ONE LAST MEM CLEAR ATTEMPT: ",`sudo cat /proc/meminfo | grep MemAvailable`;
+         fa_system("sudo su -c 'sync;echo 1 > /proc/sys/vm/drop_caches'");
+         print "AFTER ONE LAST MEM CLEAR ATTEMPT: ",`sudo cat /proc/meminfo | grep MemAvailable`;
       }
    } elsif (!grep { /SKIP/ } @ARGV) {
 	   #fa_system('sudo dnf -y install perl-YAML.noarch');

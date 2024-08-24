@@ -7,91 +7,88 @@ BEGIN {
     require DBIx::Squirrel
       unless defined($DBIx::Squirrel::VERSION);
     $DBIx::Squirrel::rs::VERSION = $DBIx::Squirrel::VERSION;
-    @DBIx::Squirrel::rs::ISA     = 'DBIx::Squirrel::it';
+    @DBIx::Squirrel::rs::ISA     = qw/DBIx::Squirrel::it/;
 }
 
 use namespace::autoclean;
 use Scalar::Util qw/weaken/;
 use Sub::Name;
+use DBIx::Squirrel::util qw/transform/;
 
-sub _fetch_row {
-    my($attr, $self) = shift->_private_attributes;
-    return
-      if $self->_no_more_rows;
-    return
-      if $self->_is_empty and not $self->_fetch;
-    my($head, @tail) = @{$attr->{buffer}};
-    $attr->{buffer}     = \@tail;
-    $attr->{row_count} += 1;
-    return $self->_transform($self->_rebless($head))
-      if @{$attr->{callbacks}};
-    return $self->_rebless($head);
-}
-
-sub _rebless {
-    no strict 'refs';    ## no critic
-    my $self = shift;
-    return
-      unless ref($self);
-    my($row_class, $row) = ($self->row_class, @_);
-    my $result_class = $self->result_class;
-    my $results_fn   = $row_class . '::results';
-    my $rs_fn        = $row_class . '::rs';
-    unless (defined(&{$rs_fn})) {
-        undef &{$rs_fn};
-        undef &{$results_fn};
-        *{$results_fn} = *{$rs_fn} = do {
-            weaken(my $rs = $self);
-            subname($rs_fn => sub {$rs});
-        };
-        @{$row_class . '::ISA'} = $result_class;
-    }
-    return $row_class->new($row);
-}
-
-sub _undef_autoloaded_accessors {
+sub _autoloaded_accessors_unload {
     no strict 'refs';    ## no critic
     my $self = shift;
     undef &{$_} foreach @{$self->row_class . '::AUTOLOAD_ACCESSORS'};
     return $self;
 }
 
-sub _slice {
-    my($attr, $self) = shift->_private_attributes;
-    my $slice = shift;
-    my $old   = defined($attr->{slice}) ? $attr->{slice} : '';
-    $self->SUPER::_slice($slice);
-    if (my $new = defined($attr->{slice}) ? $attr->{slice} : '') {
-        $self->_undef_autoloaded_accessors
-          if ref($new) ne ref($old) && %{$self->row_class . '::'};
-    }
-    return $self;
+sub _results_prep_for_transform {
+    my $self = shift;
+    return ref($_[0]) ? $self->_rebless(shift) : shift;
 }
 
-sub row_class {
-    my $self = shift;
-    return sprintf('DBIx::Squirrel::rs_0x%x', 0+ $self);
+sub _rebless {
+    no strict 'refs';    ## no critic
+    my $self         = shift;
+    my $row_class    = $self->row_class;
+    my $result_class = $self->result_class;
+    my $resultset_fn = $row_class . '::resultset';
+    my $results_fn   = $row_class . '::results';
+    my $rset_fn      = $row_class . '::rset';
+    my $rs_fn        = $row_class . '::rs';
+    unless (defined(&{$results_fn})) {
+        undef &{$resultset_fn};
+        undef &{$results_fn};
+        undef &{$rset_fn};
+        undef &{$rs_fn};
+        *{$resultset_fn} = *{$results_fn} = *{$rset_fn} = *{$rs_fn} = do {
+            weaken(my $results = $self);
+            subname($results_fn => sub {$results});
+        };
+        @{$row_class . '::ISA'} = $result_class;
+    }
+    my $result = shift;
+    return $row_class->new($result);
 }
 
 sub result_class {
-    return 'DBIx::Squirrel::rc';
+    return 'DBIx::Squirrel::result';
 }
 
 BEGIN {
     *row_base_class = *result_class;
 }
 
+sub row_class {
+    my $self  = shift;
+    my $class = ref($self);
+    return sprintf($class . '::Ox%x', 0+ $self);
+}
+
+sub slice {
+    my($attr, $self) = shift->_private;
+    my $slice = shift;
+    my $old   = defined($attr->{slice}) ? $attr->{slice} : '';
+    $self->SUPER::slice($slice);
+    if (my $new = defined($attr->{slice}) ? $attr->{slice} : '') {
+        if (ref($new) ne ref($old)) {
+            $self->_autoloaded_accessors_unload if %{$self->row_class . '::'};
+        }
+    }
+    return $self;
+}
+
 sub DESTROY {
     no strict 'refs';    ## no critic
-    return
-      if ${^GLOBAL_PHASE} eq 'DESTRUCT';
+    return if ${^GLOBAL_PHASE} eq 'DESTRUCT';
     local($., $@, $!, $^E, $?, $_);
     my $self      = shift;
     my $row_class = $self->row_class;
-    $self->_undef_autoloaded_accessors
-      if %{$row_class . '::'};
+    $self->_autoloaded_accessors_unload if %{$row_class . '::'};
     undef &{$row_class . '::rs'};
+    undef &{$row_class . '::rset'};
     undef &{$row_class . '::results'};
+    undef &{$row_class . '::resultset'};
     undef *{$row_class};
     return $self->SUPER::DESTROY;
 }

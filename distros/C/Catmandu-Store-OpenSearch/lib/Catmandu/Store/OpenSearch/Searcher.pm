@@ -1,6 +1,6 @@
 package Catmandu::Store::OpenSearch::Searcher;
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 use Catmandu::Sane;
 use Moo;
@@ -41,9 +41,9 @@ sub generator ($self) {
             my %args = (
                 index => $bag->index,
                 query => $self->query,
-                size  => $self->limit,
+                size  => $bag->buffer_size,
                 sort  => $self->sort,
-                track_total_hits => "true",
+                track_total_hits => "false",
             );
             if ($search_after) {
                 $args{search_after} = $search_after;
@@ -54,7 +54,6 @@ sub generator ($self) {
             if ($res->code ne "200") {
                 Catmandu::Error->throw(encode_json($res->error));
             }
-            return unless $res->data->{hits}{total}{value};
 
             $docs     = $res->data->{hits}{hits};
             return unless scalar(@$docs);

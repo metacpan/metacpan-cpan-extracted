@@ -18,10 +18,11 @@ no_index:
     - t
     - inc
 requires:
+  Getopt::Long: '2.54'
   Pod::Simple: '3.43'
   Test::Tk: '3.04'
   Tk: '804.030'
 resources:
   repository: git://github.com/haje61/Tk-PodViewer.git
-version: '0.01'
+version: '0.02'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

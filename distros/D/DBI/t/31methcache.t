@@ -11,19 +11,27 @@ use Config qw(%Config);
 my $has_threads = $Config{useithreads};
 die $use_threads_err if $has_threads && $use_threads_err;
 
+use Test::More;
+
+# weaken itself is buggy on 5.8.1 (magic killbackrefs panic
+#  triggered by threads, fixed in 5.8.2, but 5.8.2 has other
+#  issues that should have been fixed in 5.8.3, but 5.8.4 ..
+#  5.8.6 still fail where 5.8.7 PASSes
+if ($has_threads && $] < 5.008007) {
+    plan skip_all => "Test will fail in threaded perl <= 5.8.6";
+}
+if ($] >= 5.010000 && $] < 5.012000) {
+    plan skip_all => "Test will fail in perl-5.10.x";
+}
 
 use strict;
 
 $|=1;
 $^W=1;
 
+plan tests => 49;
 
-
-use Test::More tests => 49;
-
-BEGIN {
-    use_ok( 'DBI' );
-}
+use_ok( 'DBI' );
 
 sub new_handle {
     my $dbh = DBI->connect("dbi:Sponge:foo","","", {
@@ -57,7 +65,7 @@ sub Foo::local2 { [ "local2" ] };
 my $fetch_hook;
 {
     package Bar;
-    @Bar::ISA = qw(DBD::_::st);
+    our @ISA = qw(DBD::_::st);
     sub fetch { &$fetch_hook };
 }
 
@@ -143,9 +151,6 @@ run_tests("magic", new_handle());
 SKIP: {
     skip "no threads / perl < 5.8.9", 12 unless $has_threads;
 
-    skip "weaken itself is buggy on 5.8.1 (magic killbackrefs panic "
-        ."triggered by threads, fixed in 5.8.2)"
-    , 12 unless $] > 5.008001;
     # only enable this when handles are allowed to be shared across threads
     #{
     #    my @h = new_handle();

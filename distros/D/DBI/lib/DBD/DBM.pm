@@ -18,14 +18,15 @@
 #######################################################################
 require 5.008;
 use strict;
+use warnings;
 
 #################
 package DBD::DBM;
 #################
 use base qw( DBD::File );
-use vars qw($VERSION $ATTRIBUTION $drh $methods_already_installed);
-$VERSION     = '0.08';
-$ATTRIBUTION = 'DBD::DBM by Jens Rehsack';
+our ($drh,$methods_already_installed);
+our $VERSION     = '0.08';
+our $ATTRIBUTION = 'DBD::DBM by Jens Rehsack';
 
 # no need to have driver() unless you need private methods
 #
@@ -61,8 +62,8 @@ sub CLONE
 #####################
 package DBD::DBM::dr;
 #####################
-$DBD::DBM::dr::imp_data_size = 0;
-@DBD::DBM::dr::ISA           = qw(DBD::File::dr);
+our $imp_data_size = 0;
+our @ISA           = qw(DBD::File::dr);
 
 # you could put some :dr private methods here
 
@@ -73,8 +74,8 @@ $DBD::DBM::dr::imp_data_size = 0;
 #####################
 package DBD::DBM::db;
 #####################
-$DBD::DBM::db::imp_data_size = 0;
-@DBD::DBM::db::ISA           = qw(DBD::File::db);
+our $imp_data_size = 0;
+our @ISA           = qw(DBD::File::db);
 
 use Carp qw/carp/;
 
@@ -207,8 +208,8 @@ sub get_dbm_versions
 #####################
 package DBD::DBM::st;
 #####################
-$DBD::DBM::st::imp_data_size = 0;
-@DBD::DBM::st::ISA           = qw(DBD::File::st);
+our $imp_data_size = 0;
+our @ISA           = qw(DBD::File::st);
 
 sub FETCH
 {
@@ -245,7 +246,7 @@ sub dbm_schema
 package DBD::DBM::Statement;
 ############################
 
-@DBD::DBM::Statement::ISA = qw(DBD::File::Statement);
+our @ISA = qw(DBD::File::Statement);
 
 ########################
 package DBD::DBM::Table;
@@ -253,7 +254,7 @@ package DBD::DBM::Table;
 use Carp;
 use Fcntl;
 
-@DBD::DBM::Table::ISA = qw(DBD::File::Table);
+our @ISA = qw(DBD::File::Table);
 
 my $dirfext = $^O eq 'VMS' ? '.sdbm_dir' : '.dir';
 

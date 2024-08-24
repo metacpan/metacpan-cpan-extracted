@@ -444,7 +444,7 @@ apply to RxPerl too).
 
         # foo, foo, foo, complete
         rx_throw_error('foo')->pipe(
-            op_catch_error(sub ($err, $caught) { rx_of($err, $err, $err) }),
+            op_catch_error(sub ($err, $caught) { rx_of($err, $err, $err) }), # could use $_ instead of $err here
         )->subscribe($observer);
 
 - op\_combine\_latest\_with

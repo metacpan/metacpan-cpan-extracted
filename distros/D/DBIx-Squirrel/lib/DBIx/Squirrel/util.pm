@@ -7,9 +7,9 @@ BEGIN {
     require Exporter;
     @DBIx::Squirrel::util::ISA         = 'Exporter';
     %DBIx::Squirrel::util::EXPORT_TAGS = (
-        constants   => ['E_EXP_STATEMENT', 'E_EXP_STH',    'E_EXP_REF',],
-        diagnostics => ['Dumper',          'throw',        'whine',],
-        transform   => ['cbargs',          'cbargs_using', 'transform',],
+        constants   => ['E_EXP_STATEMENT', 'E_EXP_STH',       'E_EXP_REF',],
+        diagnostics => ['Dumper',          'throw',           'whine',],
+        transform   => ['part_args',       'part_args_using', 'transform',],
         sql => ['get_trimmed_sql_and_digest', 'normalise_statement', 'study_statement', 'trim_sql_string', 'hash_sql_string',],
     );
     @DBIx::Squirrel::util::EXPORT_OK = @{
@@ -24,17 +24,19 @@ BEGIN {
     };
 }
 
-use Carp ();
+use Carp;
 use Data::Dumper::Concise;
 use Digest::SHA qw/sha256_base64/;
 use Memoize;
-use Scalar::Util ();
-use Sub::Name    ();
+use Scalar::Util;
+use Sub::Name;
 
 use constant E_EXP_STATEMENT => 'Expected a statement';
 use constant E_EXP_STH       => 'Expected a statement handle';
 use constant E_EXP_REF       => 'Expected a reference to a HASH or ARRAY';
 use constant E_BAD_CB_LIST   => 'Expected a reference to a list of code-references, a code-reference, or undefined';
+
+our $NORMALISE_SQL = !!1;
 
 sub throw {
     @_ = do {
@@ -101,7 +103,7 @@ sub study_statement {
 sub normalise_statement {
     my($trimmed_sql, $digest) = &get_trimmed_sql_and_digest;
     my $normalised = $trimmed_sql;
-    $normalised =~ s{[\:\$\?]\w+\b}{?}g if $DBIx::Squirrel::NORMALISE_SQL;
+    $normalised =~ s{[\:\$\?]\w+\b}{?}g if $NORMALISE_SQL;
     return $normalised unless wantarray;
     return $normalised, $trimmed_sql, $digest;
 }
@@ -111,7 +113,7 @@ sub get_trimmed_sql_and_digest {
     my $sql_string        = do {
         if (ref $sth_or_sql_string) {
             if (UNIVERSAL::isa($sth_or_sql_string, 'DBIx::Squirrel::st')) {
-                trim_sql_string($sth_or_sql_string->_private_attributes->{OriginalStatement});
+                trim_sql_string($sth_or_sql_string->_private->{OriginalStatement});
             }
             elsif (UNIVERSAL::isa($sth_or_sql_string, 'DBI::st')) {
                 trim_sql_string($sth_or_sql_string->{Statement});
@@ -158,12 +160,12 @@ sub hash_sql_string {
     };
 }
 
-sub cbargs {
-    return cbargs_using([], @_);
+sub part_args {
+    return part_args_using([], @_);
 }
 
-sub cbargs_using {
-    my($c, @t) = do {
+sub part_args_using {
+    my($coderefs, @args) = do {
         if (defined($_[0])) {
             if (UNIVERSAL::isa($_[0], 'ARRAY')) {
                 @_;
@@ -180,8 +182,8 @@ sub cbargs_using {
             [], @_;
         }
     };
-    unshift @{$c}, pop @t while UNIVERSAL::isa($t[$#t], 'CODE');
-    return $c, @t;
+    unshift @{$coderefs}, pop @args while UNIVERSAL::isa($args[$#args], 'CODE');
+    return $coderefs, @args;
 }
 
 our $_result;
@@ -210,7 +212,7 @@ sub transform {
         }
     }
     return @_         if wantarray;
-    return scalar(@_) if @_ > 1;
+    return scalar(@_) if @_;
     return do {$_ = $_[0]};
 }
 

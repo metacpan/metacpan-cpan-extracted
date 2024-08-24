@@ -5,7 +5,7 @@ use warnings;
 use EV ();
 use Carp ();
 
-our $VERSION = '1.410';
+our $VERSION = '1.500';
 
 require Feersum::Connection;
 require Feersum::Connection::Handle;
@@ -17,6 +17,9 @@ XSLoader::load('Feersum', $VERSION);
 $VERSION = eval $VERSION; ## no critic (StringyEval, ConstantVersion)
 
 our $INSTANCE;
+
+use Exporter 'import';
+our @EXPORT_OK = qw(HEADER_NORM_UPCASE HEADER_NORM_LOCASE HEADER_NORM_LOCASE_DASH);
 
 sub new {
     unless ($INSTANCE) {
@@ -55,7 +58,7 @@ Feersum - A PSGI engine for Perl based on EV/libev
     use Feersum;
     my $ngn = Feersum->endjinn; # singleton
     $ngn->use_socket($io_socket);
-    
+
     # register a PSGI handler
     $ngn->psgi_request_handler(sub {
         my $env = shift;
@@ -63,7 +66,7 @@ Feersum - A PSGI engine for Perl based on EV/libev
             ['Content-Type'=>'text/plain'],
             ["You win one cryptosphere!\n"]];
     });
-    
+
     # register a Feersum handler:
     $ngn->request_handler(sub {
         my $req = shift;
@@ -269,7 +272,7 @@ the streaming callback B<MUST NOT> be called for the same reason.
     my $env = shift;
     return sub {
         my $fh = $env->{'psgix.io'};
-        syswrite $fh, 
+        syswrite $fh,
     };
 
 =back
@@ -457,6 +460,10 @@ propagated.
 
 Override Feersum's notion of what SERVER_HOST and SERVER_PORT should be.
 
+=item C<< set_keepalive($bool) >>
+
+Override Feersum's default keepalive behavior.
+
 =back
 
 =cut
@@ -514,29 +521,16 @@ is performed immediately.  In either case, non-blocking writes are used.
 Using the event loop is "nicer" but perhaps introduces latency, hence this
 option.
 
-=item FLASH_SOCKET_POLICY_SUPPORT
+=item KEEPALIVE_CONNECTION
 
-=item FLASH_SOCKET_POLICY
+Controls support of keepalive connections. Default is false.
+If enabled or set via Feersum->set_keepalive(1), then
+"Connection: keep-alive" for HTTP/1.0 and "Connection: close" for HTTP/1.1
+are acknowledged.
 
-FLASH_SOCKET_POLICY_SUPPORT defaults to disabled.
+=item READ_TIMEOUT
 
-When it's enabled, Feersum will detect a Flash C<< <policy-file-request/> >>
-packet and respond with the FLASH_SOCKET_POLICY string.
-
-The default FLASH_SOCKET_POLICY string looks like this:
-
-    <?xml version="1.0"?>
-    <!DOCTYPE cross-domain-policy SYSTEM "/xml/dtds/cross-domain-policy.dtd">
-    <cross-domain-policy>
-      <site-control permitted-cross-domain-policies="master-only"/>
-      <allow-access-from domain="*" to-ports="*" secure="false"/>
-    </cross-domain-policy>
-
-Since that's fairly wide-open, you may not wish to enable
-FLASH_SOCKET_POLICY_SUPPORT.
-
-Note that this feature likely won't work if you use a front-end HTTP server
-(e.g. nginx) since the request isn't valid HTTP.
+Controls read timeout. Default is 5.0 sec. It is also an keepalive timeout.
 
 =item FEERSUM_IOMATRIX_SIZE
 
@@ -545,7 +539,7 @@ value lower will use slightly less memory per connection at the cost of speed
 (and vice-versa for raising the value).  The effect is most noticeable when
 you're app is making a lot of sparce writes.  The default of 64 generally
 keeps usage under 4k per connection on full 64-bit platforms when you take
-into account the other connection and request structures. 
+into account the other connection and request structures.
 
 B<NOTE>: FEERSUM_IOMATRIX_SIZE cannot exceed your OS's defined IOV_MAX or
 UIO_MAXIOV constant.  Solaris defines IOV_MAX to be 16, making it the default
@@ -575,8 +569,6 @@ C<psgix.body.scalar_refs> feature.
 
 Please report bugs using http://github.com/stash/Feersum/issues/
 
-Keep-alive is ignored completely.
-
 Currently there's no way to limit the request entity length of a B<streaming>
 POST/PUT/etc.  This could lead to a DoS attack on a Feersum server.  Suggested
 remedy is to only run Feersum behind some other web server and to use that to
@@ -584,7 +576,7 @@ limit the entity size.
 
 Although not explicitly a bug, the following may cause undesirable behavior.
 Feersum will have set SIGPIPE to be ignored by the time your handler gets
-called.  If your handler needs to detect SIGPIPE, be sure to do a 
+called.  If your handler needs to detect SIGPIPE, be sure to do a
 C<local $SIG{PIPE} = ...> (L<perlipc>) to make it active just during the
 necessary scope.
 

@@ -1,7 +1,7 @@
 use Modern::Perl;
 
 package DBIx::Squirrel;
-$DBIx::Squirrel::VERSION = '1.2.11';
+$DBIx::Squirrel::VERSION = '1.3.0';
 =pod
 
 =encoding UTF-8
@@ -12,7 +12,7 @@ DBIx::Squirrel - A C<DBI> extension
 
 =head1 VERSION
 
-version 1.2.11
+version 1.3.0
 
 =head1 SYNOPSIS
 
@@ -333,13 +333,13 @@ use DBI;
 use Exporter;
 use Scalar::Util qw/reftype/;
 use Sub::Name;
-use DBIx::Squirrel::dr   ();
-use DBIx::Squirrel::db   ();
-use DBIx::Squirrel::st   ();
-use DBIx::Squirrel::it   ();
-use DBIx::Squirrel::rs   ();
-use DBIx::Squirrel::rc   ();
-use DBIx::Squirrel::util qw/throw uniq/;
+use DBIx::Squirrel::dr     ();
+use DBIx::Squirrel::db     ();
+use DBIx::Squirrel::st     ();
+use DBIx::Squirrel::it     ();
+use DBIx::Squirrel::rs     ();
+use DBIx::Squirrel::result ();
+use DBIx::Squirrel::util   qw/throw uniq/;
 
 BEGIN {
     @DBIx::Squirrel::ISA                          = 'DBI';
@@ -352,14 +352,17 @@ BEGIN {
     *DBIx::Squirrel::state                        = *DBI::state;
     *DBIx::Squirrel::connect                      = *DBIx::Squirrel::dr::connect;
     *DBIx::Squirrel::connect_cached               = *DBIx::Squirrel::dr::connect_cached;
-    *DBIx::Squirrel::SQL_ABSTRACT                 = *DBIx::Squirrel::db::SQL_ABSTRACT;
+    *DBIx::Squirrel::FINISH_ACTIVE_BEFORE_EXECUTE = *DBIx::Squirrel::st::FINISH_ACTIVE_BEFORE_EXECUTE;
     *DBIx::Squirrel::DEFAULT_SLICE                = *DBIx::Squirrel::it::DEFAULT_SLICE;
-    *DBIx::Squirrel::DEFAULT_MAXROWS              = *DBIx::Squirrel::it::DEFAULT_MAXROWS;
-    *DBIx::Squirrel::BUF_MULT                     = *DBIx::Squirrel::it::BUF_MULT;
-    *DBIx::Squirrel::BUF_MAXROWS                  = *DBIx::Squirrel::it::BUF_MAXROWS;
-    $DBIx::Squirrel::FINISH_ACTIVE_BEFORE_EXECUTE = !!1;
-    $DBIx::Squirrel::NORMALISE_SQL                = !!1;
-    *DBIx::Squirrel::NORMALIZE_SQL                = *DBIx::Squirrel::NORMALISE_SQL;
+    *DBIx::Squirrel::DEFAULT_BUFFER_SIZE          = *DBIx::Squirrel::it::DEFAULT_BUFFER_SIZE;
+    *DBIx::Squirrel::BUFFER_SIZE_LIMIT            = *DBIx::Squirrel::it::BUFFER_SIZE_LIMIT;
+    *DBIx::Squirrel::NORMALISE_SQL                = *DBIx::Squirrel::util::NORMALISE_SQL;
+    *DBIx::Squirrel::NORMALIZE_SQL                = *DBIx::Squirrel::util::NORMALISE_SQL;
+
+    unless (defined $DBIx::Squirrel::VERSION) {
+        my $v = "1.3.0";
+        *DBIx::Squirrel::VERSION = \$v;
+    }
 }
 
 use constant E_BAD_ENT_BIND     => 'Cannot associate with an invalid object';
@@ -466,7 +469,7 @@ The C<DBIx::Squirrel> package extends the C<DBI> by providing a few extra
 conveniences that are subtle and additive in nature, and, hopefully, quite
 useful.
 
-=head2 Importing the package
+=head2 IMPORTING
 
 In the simplest case, just import the package as you would any other:
 
@@ -598,7 +601,7 @@ to dip a toe in the water ahead of time:
 
 =back
 
-=head2 Connecting to databases
+=head2 CONNECTING TO DATABASES
 
 Connecting to a database using C<DBIx::Squirrel> may be done exactly as it
 would when using the C<DBI>'s C<connect_cached> and C<connect> methods.
@@ -615,7 +618,7 @@ that is blessed using the same class that invoked the C<connect> method.
 The method will allow you to clone database connections created by the
 C<DBI> and any subclasses (C<DBIx::Squirrel> being one).
 
-=head2 Preparing statements
+=head2 PREPARING STATEMENTS
 
 Preparing a statement using C<DBIx::Squirrel> may be done exactly as
 it would be done using the C<DBI>'s C<prepare_cached> and C<prepare>
@@ -704,7 +707,7 @@ Oracle named placeholders (C<:name>):
 
 =back
 
-=head2 Iterators
+=head2 ITERATORS
 
 In addition to statement objects, C<DBIx::Squirrel> provides two kinds
 of iterator:
@@ -769,7 +772,7 @@ created the first time they are used.
 The C<results> methods may be replaced by either of the C<rs> or C<resultset>
 aliases, if preferred.
 
-=head2 Transforming results
+=head2 TRANSFORMING RESULTS
 
 All C<DBIx::Squirrel> iterators support an optional processing step called
 I<transformation>.
@@ -927,6 +930,374 @@ the artist in question is not in our database and we cannot apply a
 transformation to nothing, so nothing is returned.
 
 =back
+
+=head2 REFERENCE
+
+This section describes the C<DBIx::Squirrel> interface.
+
+Many of the methods (*) presented below may seem familiar to the experienced
+C<DBI> user, and they should. They are documented here because C<DBIx::Squirrel>
+makes subtle changes to their interfaces.
+
+Such changes are additive and unobtrusive in nature, in most cases, resulting
+in additional calling forms rather than any change in outcome. Unless a
+documented deviation from the standard C<DBI> behaviour exists, one may
+safely assume that the C<DBI> documentation still applies.
+
+Other parts of the C<DBI> interface remain unaltered, as well as being
+accessible via C<DBIx::Squirrel>.
+
+=head3 DBIx::Squirrel Class Methods
+
+=head4 C<connect> *
+
+    $dbh = DBIx::Squirrel->connect($data_source, $username, $password)
+                or die $DBIx::Squirrel::errstr;
+    $dbh = DBIx::Squirrel->connect($data_source, $username, $password, \%attr)
+                or die $DBIx::Squirrel::errstr;
+    $clone_dbh = DBIx::Squirrel->connect($dbh)
+                or die $DBIx::Squirrel::errstr;
+    $clone_dbh = DBIx::Squirrel->connect($dbh, \%attr)
+                or die $DBIx::Squirrel::errstr;
+
+=head4 C<connect_cached> *
+
+    $dbh = DBIx::Squirrel->connect_cached($data_source, $username, $password)
+                or die $DBIx::Squirrel::errstr;
+    $dbh = DBIx::Squirrel->connect_cached($data_source, $username, $password, \%attr)
+                or die $DBIx::Squirrel::errstr;
+
+=head3 Database Handle Methods
+
+=head4 C<do> *
+
+    $rows = $dbh->do($statement)
+                or die $dbh->errstr;
+    $rows = $dbh->do($statement, \%attr)
+                or die ...;
+    $rows = $dbh->do($statement, \%attr, @bind_values)
+                or die ...;
+    $rows = $dbh->do($statement, \%attr, %bind_mappings)
+                or die ...;
+    $rows = $dbh->do($statement, \%attr, \@bind_values)
+                or die ...;
+    $rows = $dbh->do($statement, \%attr, \%bind_mappings)
+                or die ...;
+    $rows = $dbh->do($statement, @bind_values)
+                or die ...;
+    $rows = $dbh->do($statement, %bind_mappings)
+                or die ...;
+    $rows = $dbh->do($statement, \@bind_values)
+                or die ...;
+    $rows = $dbh->do($statement, undef, \%bind_mappings)
+                or die ...;
+
+Calling C<do> in scalar-context works just as it does when using the C<DBI>,
+although there are a few more calling forms.
+
+Calling C<do> in list-context, however, is new behaviour and results in the
+return of a list comprised of two elements: the number of rows affected by
+the statement, as well as the statement handle:
+
+    ($rows, $sth) = $dbh->do($statement)
+                or die $dbh->errstr;
+    ($rows, $sth) = $dbh->do($statement, \%attr)
+                or die ...;
+    ($rows, $sth) = $dbh->do($statement, \%attr, @bind_values)
+                or die ...;
+    ($rows, $sth) = $dbh->do($statement, \%attr, %bind_mappings)
+                or die ...;
+    ($rows, $sth) = $dbh->do($statement, \%attr, \@bind_values)
+                or die ...;
+    ($rows, $sth) = $dbh->do($statement, \%attr, \%bind_mappings)
+                or die ...;
+    ($rows, $sth) = $dbh->do($statement, @bind_values)
+                or die ...;
+    ($rows, $sth) = $dbh->do($statement, %bind_mappings)
+                or die ...;
+    ($rows, $sth) = $dbh->do($statement, \@bind_values)
+                or die ...;
+    ($rows, $sth) = $dbh->do($statement, undef, \%bind_mappings)
+                or die ...;
+
+=head4 C<iterate>
+
+    $itor = $dbh->iterate($statement)
+                or die $dbh->errstr;
+    $itor = $dbh->iterate($statement, @transforms)
+                or die $dbh->errstr;
+    $itor = $dbh->iterate($statement, \%attr)
+                or die ...;
+    $itor = $dbh->iterate($statement, \%attr, @transforms)
+                or die ...;
+    $itor = $dbh->iterate($statement, \%attr, @bind_values)
+                or die ...;
+    $itor = $dbh->iterate($statement, \%attr, @bind_values, @transforms)
+                or die ...;
+    $itor = $dbh->iterate($statement, \%attr, %bind_mappings)
+                or die ...;
+    $itor = $dbh->iterate($statement, \%attr, %bind_mappings, @transforms)
+                or die ...;
+    $itor = $dbh->iterate($statement, \%attr, \@bind_values)
+                or die ...;
+    $itor = $dbh->iterate($statement, \%attr, [@bind_values, @transforms])
+                or die ...;
+    $itor = $dbh->iterate($statement, \%attr, \%bind_mappings)
+                or die ...;
+    $itor = $dbh->iterate($statement, \%attr, \%bind_mappings, @transforms)
+                or die ...;
+    $itor = $dbh->iterate($statement, @bind_values)
+                or die ...;
+    $itor = $dbh->iterate($statement, @bind_values, @transforms)
+                or die ...;
+    $itor = $dbh->iterate($statement, %bind_mappings)
+                or die ...;
+    $itor = $dbh->iterate($statement, %bind_mappings, @transforms)
+                or die ...;
+    $itor = $dbh->iterate($statement, \@bind_values)
+                or die ...;
+    $itor = $dbh->iterate($statement, [@bind_values, @transforms])
+                or die ...;
+    $itor = $dbh->iterate($statement, undef, \%bind_mappings)
+                or die ...;
+    $itor = $dbh->iterate($statement, undef, \%bind_mappings, @transforms)
+                or die ...;
+
+=head4 C<prepare> *
+
+    $sth = $dbh->prepare($statement)          or die $dbh->errstr;
+    $sth = $dbh->prepare($statement, \%attr)  or die $dbh->errstr;
+
+The C<prepare> method interface is identical in form to that provided by the
+C<DBI>.
+
+C<DBIx::Squirrel> permits the use of one of a number of valid placeholder
+styles (C<:name>, C<:number>, C<$number>, C<?number>, C<?>) within the
+statement-string.
+
+Statement-strings will be "normalised" to use the legacy C<?> style, before
+being handed-off to the C<DBI> method of the same name. In spite of this,
+you should still use key-value bindings if you opted for named placeholders.
+
+=head4 C<prepare_cached> *
+
+    $sth = $dbh->prepare_cached($statement)
+    $sth = $dbh->prepare_cached($statement, \%attr)
+    $sth = $dbh->prepare_cached($statement, \%attr, $if_active)
+
+The C<prepare_cached> method interface is identical in form to that provided
+by the C<DBI>.
+
+C<DBIx::Squirrel> permits the use of one of a number of valid placeholder
+styles (C<:name>, C<:number>, C<$number>, C<?number>, C<?>) within the
+statement-string.
+
+Statement-strings will be "normalised" to use the legacy C<?> style, before
+being handed-off to the C<DBI> method of the same name. In spite of this,
+you should still use key-value bindings if you opted for named placeholders.
+
+It is the normalised form of the statement that is cached by the C<DBI>.
+
+=head4 C<results>
+
+    $itor = $dbh->results($statement)
+                or die $dbh->errstr;
+    $itor = $dbh->results($statement, @transforms)
+                or die $dbh->errstr;
+    $itor = $dbh->results($statement, \%attr)
+                or die ...;
+    $itor = $dbh->results($statement, \%attr, @transforms)
+                or die ...;
+    $itor = $dbh->results($statement, \%attr, @bind_values)
+                or die ...;
+    $itor = $dbh->results($statement, \%attr, @bind_values, @transforms)
+                or die ...;
+    $itor = $dbh->results($statement, \%attr, %bind_mappings)
+                or die ...;
+    $itor = $dbh->results($statement, \%attr, %bind_mappings, @transforms)
+                or die ...;
+    $itor = $dbh->results($statement, \%attr, \@bind_values)
+                or die ...;
+    $itor = $dbh->results($statement, \%attr, [@bind_values, @transforms])
+                or die ...;
+    $itor = $dbh->results($statement, \%attr, \%bind_mappings)
+                or die ...;
+    $itor = $dbh->results($statement, \%attr, \%bind_mappings, @transforms)
+                or die ...;
+    $itor = $dbh->results($statement, @bind_values)
+                or die ...;
+    $itor = $dbh->results($statement, @bind_values, @transforms)
+                or die ...;
+    $itor = $dbh->results($statement, %bind_mappings)
+                or die ...;
+    $itor = $dbh->results($statement, %bind_mappings, @transforms)
+                or die ...;
+    $itor = $dbh->results($statement, \@bind_values)
+                or die ...;
+    $itor = $dbh->results($statement, [@bind_values, @transforms])
+                or die ...;
+    $itor = $dbh->results($statement, undef, \%bind_mappings)
+                or die ...;
+    $itor = $dbh->results($statement, undef, \%bind_mappings, @transforms)
+                or die ...;
+
+=head3 Statement Handle Methods
+
+=head4 C<bind>
+
+    $sth->bind(@bind_values);
+    $sth->bind(\@bind_values);
+    $sth->bind(%bind_mappings);
+    $sth->bind(\%bind_mappings);
+
+=head4 C<bind_param> *
+
+    $sth->bind_param($p_num, $bind_value);
+    $sth->bind_param($p_num, $bind_value, \%attr);
+    $sth->bind_param($p_num, $bind_value, $bind_type);
+    $sth->bind_param($p_name, $bind_value);
+    $sth->bind_param($p_name, $bind_value, \%attr);
+    $sth->bind_param($p_name, $bind_value, $bind_type);
+
+=head4 C<execute> *
+
+    $rv = $sth->execute();
+    $rv = $sth->execute(@bind_values);
+    $rv = $sth->execute(\@bind_values);
+    $rv = $sth->execute(%bind_mappings);
+    $rv = $sth->execute(\%bind_mappings);
+
+=head4 C<iterate>
+
+    $itor = $sth->iterate()
+                or die $dbh->errstr;
+    $itor = $sth->iterate(@bind_values)
+                or die ...;
+    $itor = $sth->iterate(@transforms)
+                or die $dbh->errstr;
+    $itor = $sth->iterate(@bind_values, @transforms)
+                or die ...;
+    $itor = $sth->iterate(%bind_mappings)
+                or die ...;
+    $itor = $sth->iterate(%bind_mappings, @transforms)
+                or die ...;
+    $itor = $sth->iterate(\@bind_values)
+                or die ...;
+    $itor = $sth->iterate([@bind_values, @transforms])
+                or die ...;
+    $itor = $sth->iterate(\%bind_mappings)
+                or die ...;
+    $itor = $sth->iterate(\%bind_mappings, @transforms)
+                or die ...;
+
+=head4 C<results>
+
+    $itor = $sth->results()
+                or die $dbh->errstr;
+    $itor = $sth->results(@bind_values)
+                or die ...;
+    $itor = $sth->results(@transforms)
+                or die $dbh->errstr;
+    $itor = $sth->results(@bind_values, @transforms)
+                or die ...;
+    $itor = $sth->results(%bind_mappings)
+                or die ...;
+    $itor = $sth->results(%bind_mappings, @transforms)
+                or die ...;
+    $itor = $sth->results(\@bind_values)
+                or die ...;
+    $itor = $sth->results([@bind_values, @transforms])
+                or die ...;
+    $itor = $sth->results(\%bind_mappings)
+                or die ...;
+    $itor = $sth->results(\%bind_mappings, @transforms)
+                or die ...;
+
+=head3 Iterator Objects
+
+=head4 C<all>
+
+    @ary = $itor->all();
+    $ary_ref | undef = $itor->all();
+
+Executes the iterator's underlying statement handle object.
+
+When called in list-context, the C<all> method returns an array
+of all matching row objects.
+
+When called in scalar-context, this method returns a reference to
+an array of all matching row objects. Where no rows are matched,
+C<undef> would be returned.
+
+=head4 C<buffer_size>
+
+=head4 C<buffer_size_slice>
+
+Alias I<(see C<slice_buffer_size>)>.
+
+=head4 C<count>
+
+    $count = $itor->count();
+
+Returns the number of rows by counting the number of times C<next>
+can be called.
+
+=head4 C<execute>
+
+    $rv = $itor->execute());
+
+Executes the iterator's underlying statemeent handle object.
+
+=head4 C<first>
+
+=head4 C<iterate>
+
+    $itor | undef = $itor->iterate());
+
+Executes the iterator's underlying statemeent handle object,
+returning the iterator object reference if execution was successful,
+or C<undef> if not.
+
+=head4 C<last>
+
+=head4 C<next>
+
+=head4 C<one>
+
+Alias I<(see C<single>)>.
+
+=head4 C<remaining>
+
+    @ary = $itor->remaining();
+    $ary_ref | undef = $itor->remaining();
+
+When called in list-context, the C<all> method returns an array
+of all matching row objects remaining to be fetched.
+
+When called in scalar-context, this method returns a reference to
+an array of all matching row objects remaining to be fetched. Where
+no rows are matched, C<undef> would be returned.
+
+=head4 C<reset>
+
+=head4 C<rows>
+
+    $rv = $itor->rows();
+
+Returns the number of rows aftected by non-SELECT statements.
+
+=head4 C<single>
+
+=head4 C<slice>
+
+=head4 C<slice_buffer_size>
+
+=head4 C<sth>
+
+    $sth = $itor->sth();
+
+Returns a reference to the statement handle object associated with
+the iterator.
 
 =head1 COPYRIGHT AND LICENSE
 

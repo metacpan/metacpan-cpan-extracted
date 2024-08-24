@@ -2,7 +2,7 @@ package Catmandu::Store::OpenSearch::CQL;
 
 use Catmandu::Sane;
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 use Catmandu::Util qw(require_package trim);
 use CQL::Parser;

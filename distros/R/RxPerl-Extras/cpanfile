@@ -4,7 +4,5 @@ requires 'RxPerl';
 
 on 'test' => sub {
     requires 'Test2::V0';
-    # Promise::ES6 is broken in new Perls
-    requires 'Mojo::Promise';
-    requires 'Mojo::IOLoop';
+    requires 'Mojolicious', '8.15'; # for Mojo::Promise and Mojo::IOLoop
 };
