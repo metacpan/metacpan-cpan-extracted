@@ -1,7 +1,9 @@
 #! perl
 
 # Ease the life of the CPAN testers.
-exit 0 if $ENV{AUTOMATED_TESTING} && $] < 5.026000;
+BEGIN { exit 0 if $ENV{AUTOMATED_TESTING} && $] < 5.026000 }
+
+use v5.26;
 
 use ExtUtils::MakeMaker 7.24;	# comes with 5.26
 
@@ -39,14 +41,14 @@ WriteMakefile
  MAN3PODS	  => {
     'lib/ChordPro.pm'        => 'blib/man3/ChordPro.3pm',
     'lib/ChordPro/A2Crd.pm'  => 'blib/man3/ChordPro::A2Crd.3pm',
-    'lib/ChordPro/Config.pm' => 'blib/man3/ChordPro::Config.3pm',
     'lib/ChordPro/Wx.pm'     => 'blib/man3/ChordPro::Wx.3pm',
 		     },
  # Always require PDF::API2 or PDF::Builder and Text::Layout.
  PREREQ_PM      => {
 		    @pdfapi,
-		    'Text::Layout'		  => 0.032,
+		    'Text::Layout'		  => 0.038,
 		    'JSON::PP'			  => 2.27203,
+		    'JSON::XS'			  => 4.03,
 		    'String::Interpolate::Named'  => 1.030,
 		    'File::LoadLines'		  => 1.044,
 		    'File::HomeDir'		  => 1.004,
@@ -91,7 +93,7 @@ WriteMakefile
        },
        bugtracker => {
 	 web => "https://github.com/ChordPro/chordpro/issues",
-	 mailto => "info@chordpro.org",
+	 mailto => 'info@chordpro.org',
        },
     },
      provides => {
@@ -105,6 +107,7 @@ WriteMakefile
          file => [
 	    "lib/ChordPro/Songbook.pm",
 	    "lib/ChordPro/Chords.pm",
+	    "lib/ChordPro/Config.pm",
 	    "lib/ChordPro/Testing.pm",
 	    "lib/ChordPro/Utils.pm",
 	    "lib/ChordPro/Version.pm",

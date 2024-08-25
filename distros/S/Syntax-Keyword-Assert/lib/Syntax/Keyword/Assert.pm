@@ -1,4 +1,4 @@
-package Syntax::Keyword::Assert 0.11;
+package Syntax::Keyword::Assert 0.12;
 
 use v5.14;
 use warnings;

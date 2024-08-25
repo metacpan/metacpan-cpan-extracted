@@ -45,6 +45,7 @@ my $help = !!0;
 my $words = 24;
 my $compat_addresses = 1;
 my $segwit_addresses = 3;
+my $network = 'bitcoin';
 
 GetOptions(
 	'auto|a' => \$auto_entropy,
@@ -53,6 +54,7 @@ GetOptions(
 	'words|w=n' => \$words,
 	'compat_addrs|c=n' => \$compat_addresses,
 	'segwit_addrs|s=n' => \$segwit_addresses,
+	'network|n=s' => \$network,
 	'help|h' => \$help,
 );
 
@@ -108,6 +110,7 @@ my $bitcoin_data = App::Bitcoin::PaperWallet->generate($entropy, $pass, {
 	compat_addresses => $compat_addresses,
 	segwit_addresses => $segwit_addresses,
 	entropy_length => $entropy_length,
+	network => $network,
 });
 
 my @data;
@@ -198,6 +201,13 @@ A number of compat addresses to generate, by default 1.
 =item -s [NUMBER], --segwit_addrs [NUMBER]
 
 A number of segwit addresses to generate, by default 3.
+
+=item -n [STRING], --network [STRING]
+
+The identifier of the network for which to generate a wallet, by default
+'bitcoin'. See L<Bitcoin::Crypto::Network> for available networks. Note that
+not all networks support segregated witness addresses. If you specify a network
+which does not, the script will generate only non-segwit addresses.
 
 =item -h, --help
 

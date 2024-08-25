@@ -1,5 +1,5 @@
 package Bitcoin::Crypto::Types;
-$Bitcoin::Crypto::Types::VERSION = '2.006';
+$Bitcoin::Crypto::Types::VERSION = '2.007';
 use v5.10;
 use strict;
 use warnings;
@@ -190,6 +190,7 @@ Bitcoin::Crypto::Types - Bitcoin-specific data types
 		PSBTFieldType
 		IntMaxBits
 		SatoshiAmount
+		DerivationPath
 	);
 
 =head1 DESCRIPTION

@@ -1,4 +1,5 @@
-use Modern::Perl;
+use strict;
+use warnings;
 
 package T::Squirrel;
 

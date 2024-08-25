@@ -1,5 +1,5 @@
 This file contains message digests of all files listed in MANIFEST,
-signed via the Module::Signature module, version 0.79.
+signed via the Module::Signature module, version 0.88.
 
 To verify the content in this distribution, first make sure you have
 Module::Signature installed, then type:
@@ -12,43 +12,43 @@ the distribution may already have been compromised, and you should
 not run its Makefile.PL or Build.PL.
 
 -----BEGIN PGP SIGNED MESSAGE-----
-Hash: SHA1
+Hash: RIPEMD160
 
-SHA1 f9ee9f7f8c8aa718902737cdcadaef4bfcead556 CODE_OF_CONDUCT.md
-SHA1 caf3ffa9340bd922ba13f4b39f17dcb4d995b049 CONTRIBUTORS
-SHA1 18995ebd711c52579d4b86474da0fce8b81f2a94 Changes
-SHA1 1fdb4343640b1dc9bf826eda0dd096ecbf52930d INSTALL
-SHA1 3afb1adf0ac4cd8b95f83bb1c2408f91a2d65578 MANIFEST
-SHA1 0f9f4317d9d857598a99d218908c5c126a9f2656 META.json
-SHA1 7bf4ca7173584ab3ddbc4ec3d25421683883e8a8 META.yml
-SHA1 d97d6065096a58738d819ce1a4bbfd590aec7dad Makefile.PL
-SHA1 fd032bb7f7ddf19c25a7cceeb4f0e051c0f9b55a README.mkdn
-SHA1 aa5aaa1cf76c8d35eacb0b9c00ee947a4a0074fe cpanfile
-SHA1 a11c338007c6773c192c706ff93e2fd74c9b3f79 doap.xml
-SHA1 0bc4eff0fe3043f9fe2feb21b028780856e87203 examples/callback.pl
-SHA1 1b7dab748d481089c80d416d93b96115dc4486d4 examples/callback_data.pl
-SHA1 e14c174c581239b856e5b5c279716951a70f6eca examples/parallel_get.pl
-SHA1 6e7cc8fc20b231c464134cc8d78817d96adb865c lib/Parallel/ForkManager.pm
-SHA1 cbb09b55eae7487e6d870e6ce9ce3637d7cbaf20 lib/Parallel/ForkManager/Child.pm
-SHA1 cf594d03148422672ae1a3babd8a40d1fe5439d6 t/00-compile.t
-SHA1 4439fa08acd3f8cfe4658640218be5fc4ed6c260 t/00-load.t
-SHA1 b17d6b51a01b726b4499d0f4eb2f5d2512cf6c58 t/00-report-prereqs.dd
-SHA1 6348689eee69681210251892bd47cbfbb7507d7d t/00-report-prereqs.t
-SHA1 4db3efffcfef330a6451166d6c7993f92bbba218 t/01-utf8-all.t
-SHA1 7ff8a7ee4a5960791a23a739a43b1628279548ef t/02-callback.t
-SHA1 ff8a6cea67626e7da6bf58c29c9b994d3991e4c9 t/03-callback-data.t
-SHA1 19208bbd9b74cd32cbc76dcbaf67c8ca4c17e866 t/basic-methods.t
-SHA1 6dce2e71e2969e784eb9a390a63b95ea05baef54 t/callback.txt
-SHA1 cef973989a30e506d69e7ab93ad174fcd10a1d99 t/callback_data.txt
-SHA1 fabacecff55314ac9fddec9a583345bebe09663f t/changing-pids.t
-SHA1 e9904ab9b4005de2fcb193ace4657acd1c42f1b0 t/start_child.t
-SHA1 e5f4aae96fc318e949d2367743e5d2ee12063246 t/waitpid-conflict.t
-SHA1 a91aaaf17a7a2878a8b031d2f686dc4bebefd2e1 t/waitpid-waitonechild.t
-SHA1 2fb16c9b79833c349b8429bcb047ffcbf64772a6 t/waitpid_blocking.t
-SHA1 d1fe7d94b3edc7847eb187d4ee41f66e19cf8907 xt/release/unused-vars.t
+SHA256 6b8b4f51c17c403bd46035cb3ea1ca41e046f637f3a9900f6680bf605ebeb37b CODE_OF_CONDUCT.md
+SHA256 47bcc74af3df0a66736e8270334083eb6c8b0ac17f8fabcbeff14d2e36113d4a CONTRIBUTORS
+SHA256 16ff3c1f8b36681de3b659c68ffb5f37b648beeb339168f5187170fa891def54 Changes
+SHA256 e81a86115e96b54f7759bb88fb84b1336a53ffbf00719fb155f2c9f714d73990 INSTALL
+SHA256 8729339746f2a4452f389cdfdbc6990c05358db36a9412ba0c9ec43d1e29fa74 MANIFEST
+SHA256 ffbe0d15ba79de9106c7e53a483b1085c3bfe297ef6d5a0acb014f9dabf972a3 META.json
+SHA256 dc9b6c80d7ca9e9a5cc0ae8e0941e2bffa861e571291ed57b6d6d242a97e60e0 META.yml
+SHA256 a37bbc2cb36647a6c37e208c8beb3ab7491bb3b1b545541115c5aaaebf2055c9 Makefile.PL
+SHA256 a525520f32617d872df8417b188793ff4a85e745bf84dad3e2160b0695d1a0ad README.mkdn
+SHA256 4d187cfb96ad14e45fec4dee619d63e6b128e31989d9a6ba5cde4c18aa271fc1 cpanfile
+SHA256 7ee646aab0db6692773fc7a70709dd4fa50281a44efaca59ddc5e32148a15a2c doap.xml
+SHA256 9b446f0f7583af43a3808549f845b68afbecd197e09f6571301068ca5c26312c examples/callback.pl
+SHA256 7280e839ae368a28ef0c92a422a1e194829e32c7aa7c6dabc523a256562b7486 examples/callback_data.pl
+SHA256 b3453106820927e4408e351c9fcaa4bed543e86a8a160c2cd7722c616e913a2b examples/parallel_get.pl
+SHA256 47d4b8fa54935f8180948c034c5525a01f9171dbf09fb652f2e419e0ac3bfd48 lib/Parallel/ForkManager.pm
+SHA256 bb40b81b1b8f26c9c06955d6a862336df0df2fb9439235ff7299f75239454919 lib/Parallel/ForkManager/Child.pm
+SHA256 7b28a7baab483414e22e62e5fdfd536eafedb3d4cf39794f72a6db1bc49bad96 t/00-compile.t
+SHA256 c21c637106c01e91cf7fcc242246b2a6fe6751ba6a0ee1e4ab4d6de438ef9ac1 t/00-load.t
+SHA256 83eb95018d47b34eabde5c53f45ad49c00f3c4476bfc1d1ba91d8007e32293ed t/00-report-prereqs.dd
+SHA256 5996417e8ae9973f82860dcf6d5f180d285d5c4b046e0346d06ed22802a3452b t/00-report-prereqs.t
+SHA256 c2c63751fb447ef1cddac2708a4b9b16ac61bc30a245047ea1d7a95193569ace t/01-utf8-all.t
+SHA256 25095ceb0149f539fbb4f22d2830f52b899380854e8a3e6c0fde25ea2972754d t/02-callback.t
+SHA256 1b008cc31a6e8a2f4380ff7a5a302ab769cfc3fefb09af99a32335edfee80cfe t/03-callback-data.t
+SHA256 5ada0ce15cdb1b23e72aa63a4cb2fccd2bef7c93f534ed1fd9d8af22c99f6868 t/basic-methods.t
+SHA256 1d089a825a1b29a88c585a67e5b3622e891f401bab0a01642aa716db22a0a35e t/callback.txt
+SHA256 0bfec17233bfdd8d7c1cde30f79a409dc5587942cf45533ef99bcf4714c96739 t/callback_data.txt
+SHA256 bcc33a543a5286e033debed911f63480f9dadde32d2ca53bcb4070ea850752d2 t/changing-pids.t
+SHA256 a4264228d3ac5785fe5fe1a1631af38f515651f7c18d78ce0fe9a8342adf47a1 t/start_child.t
+SHA256 51024e4d4b704e152dae850342c4193233aa9a5ce171545d6a6fba5de5d58878 t/waitpid-conflict.t
+SHA256 d5482c15b6d2604563646517498bd884f6ceca16939d10e1010f16de5a5a1935 t/waitpid-waitonechild.t
+SHA256 6bd910bc57544c9e9bedc4ad4d4bc5728e02105f448bf39626380deefdb9e8ab t/waitpid_blocking.t
+SHA256 d34f839d8340478663bd6ae59c72760d7e1a2b7a2d4879ad1ec97db1a2271b2f xt/release/unused-vars.t
 -----BEGIN PGP SIGNATURE-----
 
-iEYEARECAAYFAlu75foACgkQ34Hwf+GwC4zSIQCgvIVJ5BUc4SUUtG3BXOSEfkj8
-QgYAoIHGY48CrkbFyNA+hDoiSs7e3bFN
-=jORY
+iF0EAREDAB0WIQS4RMr2LZlyA/IlbHHfgfB/4bALjAUCZsoiSwAKCRDfgfB/4bAL
+jKniAJ4+oNNUVjaOZR2eoXZB2h/8Vz/U6ACeIUEXh9C9hYDU+JHH7p7WziK4N14=
+=izdl
 -----END PGP SIGNATURE-----

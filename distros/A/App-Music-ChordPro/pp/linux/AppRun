@@ -1,7 +1,0 @@
-#!/bin/sh
-
-SELF=$(readlink -f "$0")
-HERE=${SELF%/*}
-
-export APPIMAGE_PACKAGED=1.00
-exec ${HERE}/wxchordpro ${1+"$@"}

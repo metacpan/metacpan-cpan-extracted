@@ -1,5 +1,9 @@
 Revision history for Perl extension App::Bitcoin::PaperWallet.
 
+1.13  Sun Aug 25 2024
+	- new option in paper-wallet: -n, --network - choose the network for which to generate the wallet (thanks @chromatic)
+	- switch test framework to Test2
+
 1.12  Sat Oct 28 2023
 	- new option in paper-wallet: -w, --words - choose the number of words
 	- new option in paper-wallet: -c, --compat_addrs - choose the number of compat addresses

@@ -1,7 +1,7 @@
 package Parallel::ForkManager::Child;
 our $AUTHORITY = 'cpan:DLUX';
 # ABSTRACT: role adopted by forked Parallel::ForkManager processes 
-$Parallel::ForkManager::Child::VERSION = '2.02';
+$Parallel::ForkManager::Child::VERSION = '2.03';
     
 
 use strict;
@@ -40,7 +40,7 @@ Parallel::ForkManager::Child - role adopted by forked Parallel::ForkManager proc
 
 =head1 VERSION
 
-version 2.02
+version 2.03
 
 =head1 SYNOPSIS 
 
@@ -87,7 +87,7 @@ Gabor Szabo <gabor@szabgab.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018, 2016, 2015 by Balázs Szabó.
+This software is copyright (c) 2024, 2015 by Balázs Szabó.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

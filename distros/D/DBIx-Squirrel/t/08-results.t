@@ -1,4 +1,5 @@
-use Modern::Perl;
+use strict;
+use warnings;
 use open ':std', ':encoding(utf8)';
 use Carp qw/croak/;
 use Test::More;
@@ -20,19 +21,17 @@ sub filter {($_->ArtistId < 128 or $_->ArtistId > 131) ? () : $_}
 # else just return the artist's Name-field.
 sub artist_name {($_->ArtistId == 128) ? ($_->Name, 'Envy of None', 'Alex Lifeson') : $_->[1]}
 
-subtest 'more results checks' => sub {
-    db(DBIx::Squirrel->connect(@TEST_DB_CONNECT_ARGS));
-    artist(db->results('SELECT * FROM artists WHERE ArtistId=? LIMIT 1'));
-    my $artist = artist->_private;
+db(DBIx::Squirrel->connect(@TEST_DB_CONNECT_ARGS));
+artist(db->results('SELECT * FROM artists WHERE ArtistId=? LIMIT 1'));
+my $artist = artist->_private;
 
-    artists(db->results('SELECT * FROM artists ORDER BY ArtistId' => \&filter => \&artist_name));
-    my $artists = artists->_private;
+artists(db->results('SELECT * FROM artists ORDER BY ArtistId' => \&filter => \&artist_name));
+my $artists = artists->_private;
 
-    # This test will exercise buffer control, transformations, pending results injection and
-    # results filtering.
-    my $results  = artists->all;
-    my $expected = ['Rush', 'Envy of None', 'Alex Lifeson', 'Simply Red', 'Skank', 'Smashing Pumpkins'];
-    is_deeply($results, $expected, 'iteration, filtering, injection ok');
-};
+# This test will exercise buffer control, transformations, pending results injection and
+# results filtering.
+my $results  = artists->all;
+my $expected = ['Rush', 'Envy of None', 'Alex Lifeson', 'Simply Red', 'Skank', 'Smashing Pumpkins'];
+is_deeply($results, $expected, 'iteration, filtering, injection ok');
 
 done_testing();

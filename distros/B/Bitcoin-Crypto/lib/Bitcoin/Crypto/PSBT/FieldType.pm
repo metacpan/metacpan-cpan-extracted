@@ -1,5 +1,5 @@
 package Bitcoin::Crypto::PSBT::FieldType;
-$Bitcoin::Crypto::PSBT::FieldType::VERSION = '2.006';
+$Bitcoin::Crypto::PSBT::FieldType::VERSION = '2.007';
 use v5.10;
 use strict;
 use warnings;

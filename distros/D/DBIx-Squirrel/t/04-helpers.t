@@ -1,4 +1,5 @@
-use Modern::Perl;
+use strict;
+use warnings;
 use open ':std', ':encoding(utf8)';
 use Carp qw/croak/;
 use Test::More;
@@ -16,16 +17,15 @@ BEGIN {
 
 diag("Testing DBIx::Squirrel $DBIx::Squirrel::VERSION, Perl $], $^X");
 
-subtest 'associate helper with database connection' => sub {
-    my $dbh = DBIx::Squirrel->connect(@MOCK_DB_CONNECT_ARGS);
-    isa_ok(db($dbh), 'DBIx::Squirrel::db');
-    is(db, $dbh, 'helper ("db") associated');
-};
+my $dbh;
+my $sth;
 
-subtest 'resolve helper; associate "st" helper with statement' => sub {
-    my $sth = db->prepare('SELECT * FROM artists');
-    isa_ok(st($sth), 'DBIx::Squirrel::st');
-    is(st, $sth, 'helper ("st") associated');
-};
+$dbh = DBIx::Squirrel->connect(@MOCK_DB_CONNECT_ARGS);
+isa_ok(db($dbh), 'DBIx::Squirrel::db');
+is(db, $dbh, 'helper ("db") associated');
+
+$sth = db->prepare('SELECT * FROM artists');
+isa_ok(st($sth), 'DBIx::Squirrel::st');
+is(st, $sth, 'helper ("st") associated');
 
 done_testing();

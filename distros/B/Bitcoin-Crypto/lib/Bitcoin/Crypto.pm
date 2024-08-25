@@ -1,5 +1,5 @@
 package Bitcoin::Crypto;
-$Bitcoin::Crypto::VERSION = '2.006';
+$Bitcoin::Crypto::VERSION = '2.007';
 use v5.10;
 use strict;
 use warnings;
@@ -170,6 +170,16 @@ L<https://github.com/bitcoin/bips>
 Bartosz Jarzyna E<lt>bbrtj.pro@gmail.comE<gt>
 
 Consider supporting my effort: L<https://bbrtj.eu/support>
+
+=head2 Contributors
+
+In no particular order:
+
+=over
+
+=item * chromatic
+
+=back
 
 =head1 COPYRIGHT AND LICENSE
 

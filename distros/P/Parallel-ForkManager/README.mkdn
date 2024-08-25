@@ -4,7 +4,7 @@ Parallel::ForkManager - A simple parallel processing fork manager
 
 # VERSION
 
-version 2.02
+version 2.03
 
 # SYNOPSIS
 
@@ -67,7 +67,7 @@ You must specify the maximum number of processes to be created. If you
 specify 0, then NO fork will be done; this is good for debugging purposes.
 
 Next, use $pm->start to do the fork. $pm returns 0 for the child process,
-and child pid for the parent process (see also ["fork()" in perlfunc(1p)](http://man.he.net/man1p/perlfunc)).
+and child pid for the parent process (see also ["fork" in perlfunc](https://metacpan.org/pod/perlfunc#fork)).
 The "and next" skips the internal loop in the parent process. NOTE:
 $pm->start dies if the fork fails.
 
@@ -91,26 +91,26 @@ C for child.
 
     The optional second parameter, $tempdir, is only used if you want the
     children to send back a reference to some data (see RETRIEVING DATASTRUCTURES
-    below). If not provided, it is set via a call to [File::Temp](https://metacpan.org/pod/File::Temp)::tempdir().
+    below). If not provided, it is set via a call to [File::Temp](https://metacpan.org/pod/File%3A%3ATemp)::tempdir().
 
     The new method will die if the temporary directory does not exist or it is not
     a directory.
 
-    Since version 2.00, the constructor can also be called in the typical Moo/Moose 
+    Since version 2.00, the constructor can also be called in the typical Moo/Moose
     fashion. I.e.
 
     ```perl
     my $fm = Parallel::ForkManager->new(
-        max_procs => 4,
+        max_proc => 4,
         tempdir => '...',
         child_role => 'Parallel::ForkManager::CustomChild',
     );
     ```
 
-- child\_role 
+- child\_role
 
-    Returns the name of the role consumed by the ForkManager object in 
-    child processes. Defaults to [Parallel::ForkManager::Child](https://metacpan.org/pod/Parallel::ForkManager::Child) and can 
+    Returns the name of the role consumed by the ForkManager object in
+    child processes. Defaults to [Parallel::ForkManager::Child](https://metacpan.org/pod/Parallel%3A%3AForkManager%3A%3AChild) and can
     be set to something else via the constructor.
 
 - start \[ $process\_identifier \]
@@ -163,7 +163,7 @@ C for child.
 
     Returns `true` if within the child or `false` if within the parent.
 
-- max\_procs 
+- max\_procs
 
     Returns the maximal number of processes the object will fork.
 
@@ -177,7 +177,7 @@ C for child.
     ```perl
     my @pids = $pm->running_procs;
 
-    my $nbr_children =- $pm->running_procs;
+    my $nbr_children = $pm->running_procs;
     ```
 
 - wait\_for\_available\_procs( $n )
@@ -185,12 +185,12 @@ C for child.
     Wait until `$n` available process slots are available.
     If `$n` is not given, defaults to _1_.
 
-- waitpid\_blocking\_sleep 
+- waitpid\_blocking\_sleep
 
     Returns the sleep period, in seconds, of the pseudo-blocking calls. The sleep
-    period can be a fraction of second. 
+    period can be a fraction of second.
 
-    Returns `0` if disabled. 
+    Returns `0` if disabled.
 
     Defaults to 1 second.
 
@@ -254,12 +254,12 @@ The callbacks can be defined with the following methods:
 
 # BLOCKING CALLS
 
-When it comes to waiting for child processes to terminate, `Parallel::ForkManager` is between 
+When it comes to waiting for child processes to terminate, `Parallel::ForkManager` is between
 a fork and a hard place (if you excuse the terrible pun). The underlying Perl `waitpid` function
-that the module relies on can block until either one specific or any child process 
+that the module relies on can block until either one specific or any child process
 terminate, but not for a process part of a given group.
 
-This means that the module can do one of two things when it waits for 
+This means that the module can do one of two things when it waits for
 one of its child processes to terminate:
 
 - Only wait for its own child processes
@@ -279,8 +279,8 @@ one of its child processes to terminate:
 
     This is the default behavior that the module will use.
     This is not the most efficient way to wait for child processes, but it's
-    the safest way to ensure that `Parallel::ForkManager` won't interfere with 
-    any other part of the codebase. 
+    the safest way to ensure that `Parallel::ForkManager` won't interfere with
+    any other part of the codebase.
 
     The sleep period is set via the method `set_waitpid_blocking_sleep`.
 
@@ -290,10 +290,10 @@ one of its child processes to terminate:
     block until any child process terminate. If the child process was not one of
     the monitored subprocesses, the wait will resume. This is more efficient, but mean
     that `P::FM` can captures (and discards) the termination notification that a different
-    part of the code might be waiting for. 
+    part of the code might be waiting for.
 
     If this is a race condition
-    that doesn't apply to your codebase, you can set the 
+    that doesn't apply to your codebase, you can set the
     _waitpid\_blocking\_sleep_ period to `0`, which will enable `waitpid` call blocking.
 
     ```perl
@@ -557,12 +557,12 @@ can add the following to your program:
 $pm->run_on_start(sub { srand });
 ```
 
-# EXTENDING 
+# EXTENDING
 
-As of version 2.0.0, `Parallel::ForkManager` uses [Moo](https://metacpan.org/pod/Moo) under the hood. When 
-a process is being forked from the parent object, the forked instance of the 
-object will be modified to consume the [Parallel::ForkManager::Child](https://metacpan.org/pod/Parallel::ForkManager::Child)
-role. All of this makes extending [Parallel::ForkManager](https://metacpan.org/pod/Parallel::ForkManager) to implement 
+As of version 2.0.0, `Parallel::ForkManager` uses [Moo](https://metacpan.org/pod/Moo) under the hood. When
+a process is being forked from the parent object, the forked instance of the
+object will be modified to consume the [Parallel::ForkManager::Child](https://metacpan.org/pod/Parallel%3A%3AForkManager%3A%3AChild)
+role. All of this makes extending [Parallel::ForkManager](https://metacpan.org/pod/Parallel%3A%3AForkManager) to implement
 any storing/retrieving mechanism or any other behavior fairly easy.
 
 ## Example: store and retrieve data via a web service
@@ -633,21 +633,21 @@ my $fm = Parallel::ForkManager->new(
 
 # SECURITY
 
-Parallel::ForkManager uses temporary files when 
+Parallel::ForkManager uses temporary files when
 a child process returns information to its parent process. The filenames are
-based on the process of the parent and child processes, so they are 
+based on the process of the parent and child processes, so they are
 fairly easy to guess. So if security is a concern in your environment, make sure
 the directory used by Parallel::ForkManager is restricted to the current user
 only (the default behavior is to create a directory,
-via [File::Temp](https://metacpan.org/pod/File::Temp)'s `tempdir`, which does that).
+via [File::Temp](https://metacpan.org/pod/File%3A%3ATemp)'s `tempdir`, which does that).
 
 # TROUBLESHOOTING
 
 ## PerlIO::gzip and Parallel::ForkManager do not play nice together
 
-If you are using [PerlIO::gzip](https://metacpan.org/pod/PerlIO::gzip) in your child processes, you may end up with 
+If you are using [PerlIO::gzip](https://metacpan.org/pod/PerlIO%3A%3Agzip) in your child processes, you may end up with
 garbled files. This is not really P::FM's fault, but rather a problem between
-[PerlIO::gzip](https://metacpan.org/pod/PerlIO::gzip) and `fork()` (see [https://rt.cpan.org/Public/Bug/Display.html?id=114557](https://rt.cpan.org/Public/Bug/Display.html?id=114557)).
+[PerlIO::gzip](https://metacpan.org/pod/PerlIO%3A%3Agzip) and `fork()` (see [https://rt.cpan.org/Public/Bug/Display.html?id=114557](https://rt.cpan.org/Public/Bug/Display.html?id=114557)).
 
 Fortunately, it seems there is an easy way to fix the problem by
 adding the "unix" layer? I.e.,
@@ -688,7 +688,7 @@ Ken Clarke <www.perlprogrammer.net>  (datastructure retrieval)
 
 # COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018, 2016, 2015 by Balázs Szabó.
+This software is copyright (c) 2024, 2015 by Balázs Szabó.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

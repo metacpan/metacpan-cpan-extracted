@@ -134,7 +134,7 @@ sub abc2svg( $song, %args ) {
     $kv = parse_kv( @pre ) if @pre;
     $kv = { %$kv, %{$elt->{opts}} };
     $kv->{split} //= 1;		# less overhead. really.
-    $kv->{scale} ||= 1;
+    $kv->{scale} ||= 1;		# with id: design scale
     $kv->{align} //= ($kv->{center}//0) ? "center" : "left";
     if ( $kv->{width} ) {
 	$pw = $kv->{width};
@@ -193,6 +193,7 @@ sub abc2svg( $song, %args ) {
 	       my ( $fn, $relay, $onerror ) = @_;
 	       if ( -s -r "$base/$fn" ) {
 		   $js->eval(slurp("$base/$_[0]"));
+		   $relay->() if $relay;
 	       }
 	       elsif ( $onerror ) {
 		   $onerror->();
@@ -207,19 +208,25 @@ sub abc2svg( $song, %args ) {
 	  ( args    => [ $src ],
 	    load    => sub { $js->eval(slurp("$base/$_[0]")) },
 	    abc2svg => $qjsdata,
-	    abc => '',			# global for 'toxxx.js'
+	    abc     => {},	# for backends
 	  );
 
 	warn( "+ QuickJS_XS[", CP->display($base), "] $src\n") if DEBUG;
+	my $hooks = "$base/../hooks.js";
+	undef $hooks unless -s $hooks;
+
 	eval {
 	    $js->eval( slurp("$base/abc2svg-1.js") );
+	    $js->eval( slurp($hooks) ) if $hooks;
 	    if ( -r "$base/../cmd.js" ) {
-		warn(" QuickJS_XS using ", CP->display("$base/../cmd.js"), "\n" )
+		warn(" QuickJS_XS using ", CP->display("$base/../cmd.js"),
+		     $hooks ? "+hooks" : "", "\n" )
 		  if DEBUG;
 		$js->eval( slurp("$base/../cmd.js") );
 	    }
 	    else {
-		warn(" QuickJS_XS using ", CP->display("$base/cmdline.js"), "\n" )
+		warn(" QuickJS_XS using ", CP->display("$base/cmdline.js"),
+		     $hooks ? "+hooks" : "", "\n" )
 		  if DEBUG;
 		$js->eval( slurp("$base/cmdline.js") );
 	    }
@@ -229,6 +236,11 @@ sub abc2svg( $song, %args ) {
 	warn($@) if $@;
 	undef $js;
 
+	if ( DEBUG ) {
+	    open( my $fd, '>:utf8', $out );
+	    print $fd join("\n", @lines), "\n";
+	    close($fd);
+	}
     }
 
     elsif ( $abc2svg->{method} eq QUICKJS ) {
@@ -319,11 +331,17 @@ sub abc2svg( $song, %args ) {
     warn("SVG: ", scalar(@lines), " lines (raw)\n") if DEBUG > 1;
 
     # Postprocess the SVG data.
+    my $staffbase;
     my $copy = 0;
     @data = ();
     my $lines = 1;
     while ( @lines ) {
 	$_ = shift(@lines);
+	if ( /\<!-- staffbase:(.*) --\>/ ) {
+	    $staffbase = $1;
+	    warn("ABC: staffbase = $staffbase\n") if DEBUG;
+	    next;
+	}
 	if ( /^<svg/ ) {
 	    $copy++;
 	}
@@ -344,17 +362,29 @@ sub abc2svg( $song, %args ) {
 	warn("SVG: ", 1+$lines, " lines (", -s $svg, " bytes)\n") if DEBUG > 1;
     }
 
+    my $scale;
+    my $design_scale;
+    if ( $kv->{scale} != 1 ) {
+	if ( $kv->{id} ) {
+	    $design_scale = $kv->{scale};
+	}
+	else {
+	    $scale = $kv->{scale};
+	}
+    }
     return
 	  { type => "image",
 	    line => $elt->{line},
 	    subtype => "svg",
 	    data => \@data,
-	    opts => { maybe id     => $kv->{id},
-		      maybe align  => $kv->{align},
-		      maybe scale  => $kv->{scale},
-		      maybe split  => $kv->{split},
-		      maybe spread => $kv->{spread},
-		      maybe sep    => $kv->{staffsep},
+	    opts => { maybe id           => $kv->{id},
+		      maybe align        => $kv->{align},
+		      maybe split        => $kv->{split},
+		      maybe spread       => $kv->{spread},
+		      maybe sep          => $kv->{staffsep},
+		      maybe base         => $staffbase,
+		      maybe scale        => $scale,
+		      maybe design_scale => $design_scale,
 		    } };
 }
 

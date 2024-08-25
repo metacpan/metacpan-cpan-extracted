@@ -1,5 +1,8 @@
 Revision history for Net-Silverpeak-Orchestrator
 
+0.015001  2024-08-24 19:44:11+02:00 Europe/Vienna
+    - fix list_domain_applications for Orchestrator version 9.3+
+
 0.015000  2024-08-16 09:37:50+02:00 Europe/Vienna
     - add get_appliance_bgp_system_config_allvrfs
 

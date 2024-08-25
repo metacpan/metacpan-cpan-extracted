@@ -7,7 +7,7 @@ use utf8;
 
 class  SVGPDF;
 
-our $VERSION = '0.086.2';
+our $VERSION = '0.087';
 
 =head1 NAME
 
@@ -205,8 +205,8 @@ sub BUILDARGS ( @args ) {
 }
 
 BUILD {
-    $verbose      = $atts->{verbose}      // 1;
     $debug        = $atts->{debug}        || 0;
+    $verbose      = $atts->{verbose}      // $debug;
     $grid         = $atts->{grid}         || 0;
     $prog         = $atts->{prog}         || 0;
     $debug_styles = $atts->{debug_styles} || $debug > 1;
@@ -488,9 +488,11 @@ method handle_svg ( $e ) {
     $xo->bbox(@bb);
 
     if ( my $c = $style->{"background-color"} ) {
-	$xo->fill_color($c);
-	$xo->rectangle(@bb);
-	$xo->fill;
+	if ( $c ne "none" ) {
+	    $xo->fill_color($c);
+	    $xo->rectangle(@bb);
+	    $xo->fill;
+	}
     }
 
     # Set up result forms.
@@ -768,6 +770,10 @@ The viewBox as specified in the SVG element.
 
 If no viewBox is specified it is set to C<0 0> I<W H>, where I<W> and
 I<H> are the width and the height.
+
+=item C<bbox>
+
+Same as the C<vbox>, but using bottom-left and top-right coordinates.
 
 =item C<width>
 

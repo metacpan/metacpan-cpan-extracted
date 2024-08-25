@@ -1,4 +1,5 @@
-use Modern::Perl;
+use strict;
+use warnings;
 
 package    # hide from PAUSE
   DBIx::Squirrel::util;
@@ -7,26 +8,30 @@ BEGIN {
     require Exporter;
     @DBIx::Squirrel::util::ISA         = 'Exporter';
     %DBIx::Squirrel::util::EXPORT_TAGS = (
-        constants   => ['E_EXP_STATEMENT', 'E_EXP_STH',       'E_EXP_REF',],
-        diagnostics => ['Dumper',          'throw',           'whine',],
-        transform   => ['part_args',       'part_args_using', 'transform',],
+        constants   => ['E_EXP_STATEMENT', 'E_EXP_STH', 'E_EXP_REF',],
+        diagnostics => ['throw',           'whine',],
+        transform   => ['part_args',       'transform',],
         sql => ['get_trimmed_sql_and_digest', 'normalise_statement', 'study_statement', 'trim_sql_string', 'hash_sql_string',],
     );
     @DBIx::Squirrel::util::EXPORT_OK = @{
         $DBIx::Squirrel::util::EXPORT_TAGS{all} = [
-            qw/uniq result/,
+            qw/
+              global_destruct_phase
+              uniq
+              result
+              /,
             do {
                 my %seen;
                 grep {!$seen{$_}++}
-                  map {@{$DBIx::Squirrel::util::EXPORT_TAGS{$_}}} (qw/constants diagnostics sql transform/,);
+                  map {@{$DBIx::Squirrel::util::EXPORT_TAGS{$_}}} qw/constants diagnostics sql transform/,;
             },
         ]
     };
 }
 
-use Carp;
-use Data::Dumper::Concise;
-use Digest::SHA qw/sha256_base64/;
+use Carp                     ();
+use Devel::GlobalDestruction ();
+use Digest::SHA              qw/sha256_base64/;
 use Memoize;
 use Scalar::Util;
 use Sub::Name;
@@ -37,6 +42,10 @@ use constant E_EXP_REF       => 'Expected a reference to a HASH or ARRAY';
 use constant E_BAD_CB_LIST   => 'Expected a reference to a list of code-references, a code-reference, or undefined';
 
 our $NORMALISE_SQL = !!1;
+
+# Perl versions older than 5.14 do not support ${^GLOBAL_PHASE}, so provide
+# a shim that works around the wrinkle.
+sub global_destruct_phase {Devel::GlobalDestruction::in_global_destruction()}
 
 sub throw {
     @_ = do {
@@ -161,30 +170,14 @@ sub hash_sql_string {
 }
 
 sub part_args {
-    return part_args_using([], @_);
+    my @args = reverse(@_);
+    my @coderefs;
+    unshift @coderefs, shift(@args) while UNIVERSAL::isa($args[0], 'CODE');
+    return \@coderefs, @args;
 }
 
-sub part_args_using {
-    my($coderefs, @args) = do {
-        if (defined($_[0])) {
-            if (UNIVERSAL::isa($_[0], 'ARRAY')) {
-                @_;
-            }
-            elsif (UNIVERSAL::isa($_[0], 'CODE')) {
-                [shift], @_;
-            }
-            else {
-                throw E_BAD_CB_LIST;
-            }
-        }
-        else {
-            shift;
-            [], @_;
-        }
-    };
-    unshift @{$coderefs}, pop @args while UNIVERSAL::isa($args[$#args], 'CODE');
-    return $coderefs, @args;
-}
+# Runtime scoping of $_result allows caller to import and use "result" instead
+# of "$_" during result transformation.
 
 our $_result;
 

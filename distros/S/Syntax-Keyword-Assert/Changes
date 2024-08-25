@@ -1,5 +1,8 @@
 Revision history for Perl extension Syntax-Keyword-Assert
 
+0.12 2024-08-24T13:17:33Z
+    - Fixed threaded perls bug #1
+
 0.11 2024-08-19T11:15:12Z
     - Fixed threaded perls #1
     - Improve Docs

@@ -1,4 +1,5 @@
-use Modern::Perl;
+use strict;
+use warnings;
 use open ':std', ':encoding(utf8)';
 use Test::More;
 
@@ -7,6 +8,8 @@ BEGIN {
 }
 
 diag("Testing DBIx::Squirrel $DBIx::Squirrel::VERSION, Perl $], $^X");
+
 ok(defined(&foo),                  'import "database_entity"');
 ok(defined(&bar) && defined(&baz), 'import "database_entities"');
+
 done_testing();

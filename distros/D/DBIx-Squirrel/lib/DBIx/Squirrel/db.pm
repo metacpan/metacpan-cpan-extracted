@@ -1,4 +1,5 @@
-use Modern::Perl;
+use strict;
+use warnings;
 no strict 'subs';    ## no critic
 
 package              # hide from PAUSE

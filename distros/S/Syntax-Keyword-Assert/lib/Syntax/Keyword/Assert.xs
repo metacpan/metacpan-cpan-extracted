@@ -5,7 +5,7 @@
 
 #include "XSParseKeyword.h"
 
-static bool is_strict(pTHX_)
+static bool is_strict(pTHX)
 {
     dSP;
 
@@ -39,7 +39,7 @@ static OP *make_xcroak(pTHX_ OP *msg)
 
 static int build_assert(pTHX_ OP **out, XSParseKeywordPiece *arg0, void *hookdata)
 {
-    if (is_strict(aTHX_)) {
+    if (is_strict(aTHX)) {
         // build the following code:
         //
         //   Syntax::Keyword::Assert::_croak "Assertion failed"

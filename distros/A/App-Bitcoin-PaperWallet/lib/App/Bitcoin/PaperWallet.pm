@@ -1,9 +1,10 @@
 package App::Bitcoin::PaperWallet;
-$App::Bitcoin::PaperWallet::VERSION = '1.12';
+$App::Bitcoin::PaperWallet::VERSION = '1.13';
 use v5.12;
 use warnings;
 
 use Bitcoin::Crypto qw(btc_extprv);
+use Bitcoin::Crypto::Network;
 use Bitcoin::Crypto::Util qw(generate_mnemonic mnemonic_from_entropy);
 use Digest::SHA qw(sha256);
 use Encode qw(encode);
@@ -28,6 +29,8 @@ sub generate
 	my $compat_addresses = $opts->{compat_addresses} // 1;
 	my $segwit_addresses = $opts->{segwit_addresses} // 3;
 	my $entropy_length = $opts->{entropy_length} // 256;
+	my $network = $opts->{network} ? Bitcoin::Crypto::Network->get($opts->{network}) : Bitcoin::Crypto::Network->get;
+	$network->set_single;
 
 	# warn about possible problem with entropy
 	warn "WARNING: entered entropy is too short, this wallet is insecure!\n"
@@ -39,12 +42,14 @@ sub generate
 	;
 
 	my $key = btc_extprv->from_mnemonic($mnemonic, $pass);
+	my @address_purposes = $network->supports_segwit()
+						 ? ([49 => $compat_addresses], [84 => $segwit_addresses])
+						 : ([44 => $compat_addresses + $segwit_addresses]);
 
 	return {
 		mnemonic => $mnemonic,
 		addresses => [
-			get_addresses($key, 49 => $compat_addresses),
-			get_addresses($key, 84 => $segwit_addresses),
+			map { get_addresses($key, @$_) } @address_purposes,
 		],
 	};
 }
@@ -168,7 +173,17 @@ L<Bitcoin::Crypto>
 
 Bartosz Jarzyna, E<lt>bbrtj.pro@gmail.comE<gt>
 
-Consider supporting: L<https://bbrtj.eu/support>
+Consider supporting my effort: L<https://bbrtj.eu/support>
+
+=head2 Contributors
+
+In no particular order:
+
+=over
+
+=item * chromatic
+
+=back
 
 =head1 COPYRIGHT AND LICENSE
 
@@ -177,7 +192,6 @@ Copyright (C) 2021 by Bartosz Jarzyna
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself, either Perl version 5.12.0 or,
 at your option, any later version of Perl 5 you may have available.
-
 
 =cut
 

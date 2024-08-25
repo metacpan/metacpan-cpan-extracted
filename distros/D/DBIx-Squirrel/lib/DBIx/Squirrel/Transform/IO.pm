@@ -1,4 +1,5 @@
-use Modern::Perl;
+use strict;
+use warnings;
 
 package    # hide from PAUSE
   DBIx::Squirrel::Transform::IO;

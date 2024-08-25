@@ -1,4 +1,5 @@
-use Modern::Perl;
+use strict;
+use warnings;
 
 package    # hide from PAUSE
   DBIx::Squirrel::it;
@@ -16,7 +17,7 @@ use namespace::autoclean;
 use Data::Alias  qw/alias/;
 use Scalar::Util qw/weaken/;
 use Sub::Name;
-use DBIx::Squirrel::util qw/throw transform whine/;
+use DBIx::Squirrel::util qw/part_args throw transform whine/;
 
 use constant E_BAD_STH         => 'Expected a statement handle object';
 use constant E_BAD_SLICE       => 'Slice must be a reference to an ARRAY or HASH';
@@ -67,17 +68,17 @@ sub BUFFER_SIZE_LIMIT () {$DBIx::Squirrel::it::BUFFER_SIZE_LIMIT}
 }
 
 sub DESTROY {
-    return if ${^GLOBAL_PHASE} eq 'DESTRUCT';
+    return if DBIx::Squirrel::util::global_destruct_phase();
     local($., $@, $!, $^E, $?, $_);
     my $self = shift;
-    $self->finish;
+    $self->_state_clear;
     $self->_private(undef);
     return;
 }
 
 sub new {
     my $class = ref($_[0]) ? ref(shift) : shift;
-    my($transforms, $sth, @bind_values) = DBIx::Squirrel::util::part_args(@_);
+    my($transforms, $sth, @bind_values) = part_args(@_);
     throw E_BAD_STH unless UNIVERSAL::isa($sth, 'DBIx::Squirrel::st');
     my $self = bless({}, $class);
     alias $self->{$_} = $sth->{$_} foreach qw/
@@ -112,7 +113,7 @@ sub new {
 }
 
 sub _buffer_charge {
-    my($attr, $self) = shift->_private;
+    my($attr, $self) = $_[0]->_private;
     unless ($self->{Executed}) {
         return unless defined($self->execute);
     }
@@ -120,31 +121,32 @@ sub _buffer_charge {
     my($sth, $slice, $buffer_size) = @{$attr}{qw/sth slice buffer_size/};
     my $rows = $sth->fetchall_arrayref($slice, $buffer_size);
     return 0 unless $rows;
-    if ($attr->{buffer_size} < BUFFER_SIZE_LIMIT) {
-        $self->_buffer_size_adjust if @{$rows} >= $attr->{buffer_size};
+    unless ($attr->{buffer_size_fixed}) {
+        if ($attr->{buffer_size} < BUFFER_SIZE_LIMIT) {
+            $self->_buffer_size_adjust if @{$rows} >= $attr->{buffer_size};
+        }
     }
     $attr->{buffer} = [defined($attr->{buffer}) ? (@{$attr->{buffer}}, @{$rows}) : @{$rows}];
     return do {$_ = scalar(@{$attr->{buffer}})};
 }
 
 sub _buffer_empty {
-    my($attr, $self) = shift->_private;
+    my($attr, $self) = $_[0]->_private;
     undef $_;
     return $attr->{buffer} && @{$attr->{buffer}} < 1;
 }
 
 # Where rows are buffered until fetched.
 sub _buffer_init {
-    my($attr, $self) = shift->_private;
-    my $key = 'buffer';
+    my($attr, $self) = $_[0]->_private;
     if ($self->{NUM_OF_FIELDS}) {
-        $attr->{$key} = @_ ? shift : [];
+        $attr->{buffer} = [];
     }
     return $self;
 }
 
 sub _buffer_size_adjust {
-    my($attr, $self) = shift->_private;
+    my($attr, $self) = $_[0]->_private;
     $attr->{buffer_size} *= 2;
     $attr->{buffer_size}  = BUFFER_SIZE_LIMIT if $attr->{buffer_size} > BUFFER_SIZE_LIMIT;
     return $self;
@@ -152,20 +154,26 @@ sub _buffer_size_adjust {
 
 # How many rows to buffer at a time.
 sub _buffer_size_init {
-    my($attr, $self) = shift->_private;
-    my $key = 'buffer_size';
+    my($attr, $self) = $_[0]->_private;
     if ($self->{NUM_OF_FIELDS}) {
-        $attr->{$key} = @_ ? shift : DEFAULT_BUFFER_SIZE;
+        $attr->{buffer_size} = DEFAULT_BUFFER_SIZE;
+    }
+    return $self;
+}
+
+sub _buffer_size_fixed_init {
+    my($attr, $self) = $_[0]->_private;
+    if ($self->{NUM_OF_FIELDS}) {
+        $attr->{buffer_size_fixed} = !!0;
     }
     return $self;
 }
 
 # The total number of rows fetched since execute was called.
 sub _results_count_init {
-    my($attr, $self) = shift->_private;
-    my $key = 'results_count';
+    my($attr, $self) = $_[0]->_private;
     if ($self->{NUM_OF_FIELDS}) {
-        $attr->{$key} = @_ ? shift : 0;
+        $attr->{results_count} = 0;
     }
     return $self;
 }
@@ -188,13 +196,13 @@ sub _results_fetch {
 }
 
 sub _results_pending {
-    my($attr, $self) = shift->_private;
+    my($attr, $self) = $_[0]->_private;
     return unless defined($attr->{results_pending});
     return !!@{$attr->{results_pending}};
 }
 
 sub _results_pending_fetch {
-    my($attr, $self) = shift->_private;
+    my($attr, $self) = $_[0]->_private;
     return unless defined($attr->{results_pending});
     my $result = shift(@{$attr->{results_pending}});
     $attr->{results_first} = $result unless $attr->{results_count}++;
@@ -232,7 +240,7 @@ sub _results_transform {
 }
 
 sub _state_clear {
-    my($attr, $self) = shift->_private;
+    my($attr, $self) = $_[0]->_private;
     foreach (
         qw/
         buffer
@@ -250,9 +258,10 @@ sub _state_clear {
 }
 
 sub _state_init {
-    my($attr, $self) = shift->_private;
+    my($attr, $self) = $_[0]->_private;
     $self->_buffer_init;
     $self->_buffer_size_init;
+    $self->_buffer_size_fixed_init;
     $self->_results_count_init;
     return $self;
 }
@@ -275,7 +284,8 @@ sub buffer_size {
         my $new_buffer_size = int(shift || DEFAULT_BUFFER_SIZE);
         throw E_BAD_BUFFER_SIZE
           if $new_buffer_size < DEFAULT_BUFFER_SIZE || $new_buffer_size > BUFFER_SIZE_LIMIT;
-        $attr->{buffer_size} = $new_buffer_size;
+        $attr->{buffer_size}       = $new_buffer_size;
+        $attr->{buffer_size_fixed} = !!1;
         return $self;
     }
     else {
@@ -284,7 +294,32 @@ sub buffer_size {
     }
 }
 
+sub buffer_size_slice {
+    my $self = shift;
+    return $self->buffer_size, $self->slice unless @_;
+    return $self->slice(shift)->buffer_size(shift) if ref($_[0]);
+    return $self->buffer_size(shift)->slice(shift);
+}
+
+# TODO I think I can make this non-impacting by noting the current
+#      results_count and then resetting and fast-forwarding to that
+#      position after the count is produced.
 sub count {
+    my($attr, $self) = shift->_private;
+    unless ($self->{Active} || $attr->{results_count}) {
+        unless (defined($self->execute(@_))) {
+            undef $_;
+            return;
+        }
+        while ($self->next) {;}
+    }
+    return do {$_ = $attr->{results_count}};
+}
+
+# TODO I think I can make this non-impacting by noting the current
+#      results_count and then resetting and fast-forwarding to that
+#      position after the count is produced.
+sub count_all {
     my($attr, $self) = shift->_private;
     unless ($self->{Active} || $attr->{results_count}) {
         unless (defined($self->execute(@_))) {
@@ -299,7 +334,7 @@ sub count {
 sub execute {
     my($attr, $self) = shift->_private;
     my $sth = $attr->{sth};
-    my($transforms, @bind_values) = DBIx::Squirrel::util::part_args(@_);
+    my($transforms, @bind_values) = part_args(@_);
     if (@{$transforms}) {
         $attr->{transforms} = $transforms;
     }
@@ -321,7 +356,7 @@ sub execute {
 }
 
 sub first {
-    my($attr, $self) = shift->_private;
+    my($attr, $self) = $_[0]->_private;
     return do {
         if (exists($attr->{results_first})) {
             $_ = $attr->{results_first};
@@ -342,7 +377,7 @@ sub iterate {
 }
 
 sub last {
-    my($attr, $self) = shift->_private;
+    my($attr, $self) = $_[0]->_private;
     $self->count;
     return do {
         if (exists($attr->{results_last})) {
@@ -356,11 +391,11 @@ sub last {
 }
 
 sub next {
-    return do {$_ = shift->_results_fetch};
+    return do {$_ = $_[0]->_results_fetch};
 }
 
 sub remaining {
-    my($attr, $self) = shift->_private;
+    my($attr, $self) = $_[0]->_private;
     my @rows = $self->_results_fetch;
     push @rows, $_ while $self->_results_fetch;
     return @rows if wantarray;
@@ -375,7 +410,7 @@ sub reset {
 }
 
 sub rows {
-    my($attr, $self) = shift->_private;
+    my($attr, $self) = $_[0]->_private;
     return $attr->{sth}->rows;
 }
 
@@ -426,17 +461,13 @@ sub slice {
 
 sub slice_buffer_size {
     my $self = shift;
-    return ($self->slice, $self->buffer_size) unless @_;
+    return $self->slice, $self->buffer_size unless @_;
     return $self->slice(shift)->buffer_size(shift) if ref($_[0]);
     return $self->buffer_size(shift)->slice(shift);
 }
 
-BEGIN {
-    *buffer_size_slice = subname(buffer_size_slice => \&slice_buffer_size);
-}
-
 sub sth {
-    my($attr, $self) = shift->_private;
+    my($attr, $self) = $_[0]->_private;
     return $attr->{sth};
 }
 

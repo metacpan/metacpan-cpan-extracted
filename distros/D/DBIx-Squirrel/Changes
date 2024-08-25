@@ -1,5 +1,25 @@
 Revision history for DBIx-Squirrel
 
+1.3.1   2024-08-24 14:10
+        - General code improvements.
+        - Removed unnecessary imports.
+        - Removed call to no longer extant iterator method from &DBIx::Squirrel::it::DESTROY.
+        - Added the "count_all" method back into the iterator class, as well as ensuring that "count"
+          does not affect a future call t "next".
+        - Addressed build failures revealed by the CPAN Testers Matrix:
+          - Rewrote &DBIx::Squirrel::util::part_args - failed on Perl versions <= 5.18.4;
+          - Back to using "strict" and "warnings" - Modern::Perl having some issues with a bundle "all"
+            in Perl versions <= 5.14.4.
+          - Perls versions <= 5.13 do not support ${^GLOBAL_PHASE}, so used Devel::GlobalDestruction
+            to work around the issue.
+          - Testing under Perls <= 5.13 seems to require "done_testing()" for each sub-test, as well
+            as at the end of the test script.
+          - Testing under Perls <= 5.11 does not support sub-test. I can live without them, so
+            have refactored the tests not to use them. Tests pass under Perl 5.10!
+        - The seemingly bottomless pit of joy that is documentation updates. I'm pushing this out,
+          knowing that there are gaps in the POD that must be filled. I want to get the remaining
+          red issues on the CPANTS matrix to go green, hence the expedited release. POD gaps will
+          be filled in future point releases.
 1.3.0   2024-08-23 21:00
         - Ground-up rewrite of iterators and result-set code.
         - Ground-up rewrite and simplification of test code.

@@ -1,4 +1,5 @@
-use Modern::Perl;
+use strict;
+use warnings;
 
 package    # hide from PAUSE
   DBIx::Squirrel::result;
@@ -23,8 +24,7 @@ sub new {
 }
 
 sub result_class {
-    my $self = shift;
-    return $self->results->result_class;
+    return $_[0]->results->result_class;
 }
 
 BEGIN {
@@ -32,8 +32,7 @@ BEGIN {
 }
 
 sub row_class {
-    my $self = shift;
-    return $self->results->row_class;
+    return $_[0]->results->row_class;
 }
 
 sub get_column {
@@ -41,17 +40,17 @@ sub get_column {
     return unless defined($name);
     if (UNIVERSAL::isa($self, 'ARRAY')) {
         throw E_STH_EXPIRED unless my $sth = $self->rs->sth;
-        my $idx = $sth->{NAME_lc_hash}{lc($name)};
-        throw E_UNKNOWN_COLUMN, $name unless defined($idx);
-        return $self->[$idx];
+        my $n = $sth->{NAME_lc_hash}{lc($name)};
+        throw E_UNKNOWN_COLUMN, $name unless defined($n);
+        return $self->[$n];
     }
     else {
         throw E_BAD_OBJECT unless UNIVERSAL::isa($self, 'HASH');
         return $self->{$name} if exists($self->{$name});
         local($_);
-        my($idx) = grep {lc eq $_[1]} keys(%{$self});
-        throw E_UNKNOWN_COLUMN, $name unless defined($idx);
-        return $self->{$idx};
+        my($n) = grep {lc eq $_[1]} keys(%{$self});
+        throw E_UNKNOWN_COLUMN, $name unless defined($n);
+        return $self->{$n};
     }
 }
 
@@ -80,9 +79,9 @@ sub AUTOLOAD {
         # to have the resulting accessor be as fast as it can be!
         if (UNIVERSAL::isa($self, 'ARRAY')) {
             throw E_STH_EXPIRED unless my $sth = $self->rs->sth;
-            my $idx = $sth->{NAME_lc_hash}{lc($name)};
-            throw E_UNKNOWN_COLUMN, $name unless defined($idx);
-            sub {$_[0][$idx]};
+            my $n = $sth->{NAME_lc_hash}{lc($name)};
+            throw E_UNKNOWN_COLUMN, $name unless defined($n);
+            sub {$_[0][$n]};
         }
         elsif (UNIVERSAL::isa($self, 'HASH')) {
             if (exists($self->{$name})) {
@@ -90,9 +89,9 @@ sub AUTOLOAD {
             }
             else {
                 local($_);
-                my($idx) = grep {lc eq $name} keys(%{$self});
-                throw E_UNKNOWN_COLUMN, $name unless defined($idx);
-                sub {$_[0]{$idx}};
+                my($n) = grep {lc eq $name} keys(%{$self});
+                throw E_UNKNOWN_COLUMN, $name unless defined($n);
+                sub {$_[0]{$n}};
             }
         }
         else {

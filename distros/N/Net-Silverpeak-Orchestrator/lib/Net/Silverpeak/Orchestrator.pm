@@ -1,5 +1,5 @@
 package Net::Silverpeak::Orchestrator;
-$Net::Silverpeak::Orchestrator::VERSION = '0.015000';
+$Net::Silverpeak::Orchestrator::VERSION = '0.015001';
 # ABSTRACT: Silverpeak Orchestrator REST API client library
 
 use 5.024;
@@ -500,8 +500,14 @@ sub delete_servicegroup($self, $name) {
 
 
 sub list_domain_applications($self, $resource_key='userDefined') {
-    my $res = $self->get('/gms/rest/applicationDefinition/dnsClassification',
-        { resourceKey => $resource_key });
+    my $res = $self->_is_version_93
+        ? $self->get('/gms/rest/applicationDefinition',
+            {
+                resourceKey => $resource_key,
+                base => 'dnsClassification',
+            })
+        : $self->get('/gms/rest/applicationDefinition/dnsClassification',
+            { resourceKey => $resource_key });
     $self->_error_handler($res)
         unless $res->code == 200;
     return $res->data;
@@ -585,7 +591,7 @@ Net::Silverpeak::Orchestrator - Silverpeak Orchestrator REST API client library
 
 =head1 VERSION
 
-version 0.015000
+version 0.015001
 
 =head1 SYNOPSIS
 

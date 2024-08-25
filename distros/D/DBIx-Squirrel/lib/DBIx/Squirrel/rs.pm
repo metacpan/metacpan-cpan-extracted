@@ -1,4 +1,5 @@
-use Modern::Perl;
+use strict;
+use warnings;
 
 package    # hide from PAUSE
   DBIx::Squirrel::rs;
@@ -15,6 +16,21 @@ use Scalar::Util qw/weaken/;
 use Sub::Name;
 use DBIx::Squirrel::util qw/transform/;
 
+sub DESTROY {
+    no strict 'refs';    ## no critic
+    return if DBIx::Squirrel::util::global_destruct_phase();
+    local($., $@, $!, $^E, $?, $_);
+    my $self      = shift;
+    my $row_class = $self->row_class;
+    $self->_autoloaded_accessors_unload if %{$row_class . '::'};
+    undef &{$row_class . '::rs'};
+    undef &{$row_class . '::rset'};
+    undef &{$row_class . '::results'};
+    undef &{$row_class . '::resultset'};
+    undef *{$row_class};
+    return $self->SUPER::DESTROY;
+}
+
 sub _autoloaded_accessors_unload {
     no strict 'refs';    ## no critic
     my $self = shift;
@@ -29,26 +45,23 @@ sub _results_prep_for_transform {
 
 sub _rebless {
     no strict 'refs';    ## no critic
-    my $self         = shift;
-    my $row_class    = $self->row_class;
-    my $result_class = $self->result_class;
-    my $resultset_fn = $row_class . '::resultset';
-    my $results_fn   = $row_class . '::results';
-    my $rset_fn      = $row_class . '::rset';
-    my $rs_fn        = $row_class . '::rs';
+    my $self       = shift;
+    my $row_class  = $self->row_class;
+    my $results_fn = $row_class . '::results';
     unless (defined(&{$results_fn})) {
+        my $resultset_fn = $row_class . '::resultset';
+        my $rset_fn      = $row_class . '::rset';
+        my $rs_fn        = $row_class . '::rs';
         undef &{$resultset_fn};
-        undef &{$results_fn};
         undef &{$rset_fn};
         undef &{$rs_fn};
         *{$resultset_fn} = *{$results_fn} = *{$rset_fn} = *{$rs_fn} = do {
             weaken(my $results = $self);
             subname($results_fn => sub {$results});
         };
-        @{$row_class . '::ISA'} = $result_class;
+        @{$row_class . '::ISA'} = ($self->result_class);
     }
-    my $result = shift;
-    return $row_class->new($result);
+    return $row_class->new(shift);
 }
 
 sub result_class {
@@ -60,9 +73,8 @@ BEGIN {
 }
 
 sub row_class {
-    my $self  = shift;
-    my $class = ref($self);
-    return sprintf($class . '::Ox%x', 0+ $self);
+    my $self = $_[0];
+    return sprintf('%s::Ox%x', ref($self), 0+ $self);
 }
 
 sub slice {
@@ -76,21 +88,6 @@ sub slice {
         }
     }
     return $self;
-}
-
-sub DESTROY {
-    no strict 'refs';    ## no critic
-    return if ${^GLOBAL_PHASE} eq 'DESTRUCT';
-    local($., $@, $!, $^E, $?, $_);
-    my $self      = shift;
-    my $row_class = $self->row_class;
-    $self->_autoloaded_accessors_unload if %{$row_class . '::'};
-    undef &{$row_class . '::rs'};
-    undef &{$row_class . '::rset'};
-    undef &{$row_class . '::results'};
-    undef &{$row_class . '::resultset'};
-    undef *{$row_class};
-    return $self->SUPER::DESTROY;
 }
 
 1;
