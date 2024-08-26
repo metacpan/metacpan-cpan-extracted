@@ -91,17 +91,18 @@
               <li><a href="#buffer_size">buffer_size</a></li>
               <li><a href="#buffer_size_slice">buffer_size_slice</a></li>
               <li><a href="#count">count</a></li>
-              <li><a href="#count_all">count_all</a></li>
+              <li><a href="#count_fetched">count_fetched</a></li>
               <li><a href="#execute1">execute</a></li>
               <li><a href="#first">first</a></li>
               <li><a href="#iterate2">iterate</a></li>
               <li><a href="#last">last</a></li>
+              <li><a href="#last_fetched">last_fetched</a></li>
               <li><a href="#next">next</a></li>
               <li><a href="#one">one</a></li>
               <li><a href="#remaining">remaining</a></li>
               <li><a href="#reset">reset</a></li>
               <li><a href="#rows">rows</a></li>
-              <li><a href="#single">single</a></li>
+              <li><a href="#single-or-one">single (or one)</a></li>
               <li><a href="#slice">slice</a></li>
               <li><a href="#slice_buffer_size">slice_buffer_size</a></li>
               <li><a href="#sth">sth</a></li>
@@ -121,7 +122,7 @@
 
 <h1 id="VERSION">VERSION</h1>
 
-<p>version 1.3.1</p>
+<p>version 1.3.4</p>
 
 <h1 id="SYNOPSIS">SYNOPSIS</h1>
 
@@ -1028,7 +1029,7 @@ $sth-&gt;bind_param($p_name, $bind_value, $bind_type);</code></pre>
 
 <h4 id="execute"><code>execute</code> *</h4>
 
-<pre><code>$rv = $sth-&gt;execute();
+<pre><code>$rv = $sth-&gt;execute;
 $rv = $sth-&gt;execute(@bind_values);
 $rv = $sth-&gt;execute(\@bind_values);
 $rv = $sth-&gt;execute(%bind_mappings);
@@ -1036,7 +1037,7 @@ $rv = $sth-&gt;execute(\%bind_mappings);</code></pre>
 
 <h4 id="iterate1"><code>iterate</code></h4>
 
-<pre><code>$itor = $sth-&gt;iterate()
+<pre><code>$itor = $sth-&gt;iterate
             or die $dbh-&gt;errstr;
 $itor = $sth-&gt;iterate(@bind_values)
             or die ...;
@@ -1059,7 +1060,7 @@ $itor = $sth-&gt;iterate(\%bind_mappings, @transforms)
 
 <h4 id="results1"><code>results</code></h4>
 
-<pre><code>$itor = $sth-&gt;results()
+<pre><code>$itor = $sth-&gt;results
             or die $dbh-&gt;errstr;
 $itor = $sth-&gt;results(@bind_values)
             or die ...;
@@ -1084,8 +1085,8 @@ $itor = $sth-&gt;results(\%bind_mappings, @transforms)
 
 <h4 id="all"><code>all</code></h4>
 
-<pre><code>@ary = $itor-&gt;all();
-$ary_ref | undef = $itor-&gt;all();</code></pre>
+<pre><code>@results = $itor-&gt;all;
+$results_or_undef = $itor-&gt;all;</code></pre>
 
 <p>Executes the iterator&#39;s underlying statement handle object.</p>
 
@@ -1149,71 +1150,161 @@ $DBIx::Squirrel::it::BUFFER_SIZE_LIMIT   = 64;  # maximum buffer-size</code></pr
 
 <h4 id="count"><code>count</code></h4>
 
-<pre><code>$count = $itor-&gt;count();</code></pre>
+<pre><code>$count = $itor-&gt;count;</code></pre>
 
-<p>Returns the number of rows fetched so far.</p>
+<p>Returns the total number of rows in the result set.</p>
 
-<p>If the iterator&#39;s statement has not yet been executed, it will be and a count of all rows will be returned. If the statement has been executed, and results have already been fetched, then only the current count is returned.</p>
+<p>If the iterator&#39;s statement has not yet been executed, it will be, and <code>undef</code> will be returned if the statement was not executed successfully.</p>
 
-<h4 id="count_all"><code>count_all</code></h4>
+<p>Any results remaining to be fetched are then fetched, counted and discarded, and the final count is returned.</p>
 
-<pre><code>$count = $itor-&gt;count_all();</code></pre>
+<p><i><b>BEWARE</b> that you should not use <code>next</code> after this method has been used!</i></p>
 
-<p>Returns the total number of rows.</p>
+<h4 id="count_fetched"><code>count_fetched</code></h4>
 
-<p>If the iterator&#39;s statement has not yet been executed, it will be. Once the iterator&#39;s statement has been executed, any remaining rows will be fetched, included in the count, and then immediately discarded.</p>
+<pre><code>$count = $itor-&gt;count_fetched;</code></pre>
 
-<p><b>BEWARE</b> that this method will, potentially, impact any planned call to <code>next</code> that didn&#39;t account for remaining rows to be fetched and discarded. Therefore, only use <code>count_all</code> when you know that <code>next</code> won&#39;t be called again.</p>
+<p>Returns the number of results fetched so far.</p>
+
+<p>If the iterator&#39;s statement has not yet been executed, it will be. Zero will be returned if the statement executed successfully, otherwise <code>undef</code> is returned.</p>
 
 <h4 id="execute1"><code>execute</code></h4>
 
-<pre><code>$rv = $itor-&gt;execute());</code></pre>
+<pre><code>$rv_or_undef = $itor-&gt;execute
+$rv_or_undef = $itor-&gt;execute(@bind_values)
+$rv_or_undef = $itor-&gt;execute(@transforms)
+$rv_or_undef = $itor-&gt;execute(@bind_values, @transforms)
+$rv_or_undef = $itor-&gt;execute(%bind_mappings)
+$rv_or_undef = $itor-&gt;execute(%bind_mappings, @transforms)
+$rv_or_undef = $itor-&gt;execute(\@bind_values)
+$rv_or_undef = $itor-&gt;execute([@bind_values, @transforms])
+$rv_or_undef = $itor-&gt;execute(\%bind_mappings)
+$rv_or_undef = $itor-&gt;execute(\%bind_mappings, @transforms)</code></pre>
 
-<p>Executes the iterator&#39;s underlying statemeent handle object.</p>
+<p>Executes the iterator&#39;s underlying statement, as well as resetting the iterator&#39;s internal state.</p>
+
+<p>When called with no arguments, any bind-values and transformations passed to the iterator at the time of construction will be honoured.</p>
 
 <h4 id="first"><code>first</code></h4>
 
+<pre><code>$result = $itor-&gt;first;</code></pre>
+
+<p>Returns the first result in the result set, or <code>undef</code> if there were no results.</p>
+
+<p>If the iterator&#39;s statement has not yet been executed, it will be, and <code>undef</code> will be returned if the statement was not executed successfully.</p>
+
+<p>If the first result hasn&#39;t yet been fetched, it will be and the first result is fetched and cached. The cached value is returned.</p>
+
+<p>The result of the statement&#39;s execution will be returned.</p>
+
 <h4 id="iterate2"><code>iterate</code></h4>
 
-<pre><code>$itor | undef = $itor-&gt;iterate());</code></pre>
+<pre><code>$itor_or_undef = $itor-&gt;iterate
+$itor_or_undef = $itor-&gt;iterate(@bind_values)
+$itor_or_undef = $itor-&gt;iterate(@transforms)
+$itor_or_undef = $itor-&gt;iterate(@bind_values, @transforms)
+$itor_or_undef = $itor-&gt;iterate(%bind_mappings)
+$itor_or_undef = $itor-&gt;iterate(%bind_mappings, @transforms)
+$itor_or_undef = $itor-&gt;iterate(\@bind_values)
+$itor_or_undef = $itor-&gt;iterate([@bind_values, @transforms])
+$itor_or_undef = $itor-&gt;iterate(\%bind_mappings)
+$itor_or_undef = $itor-&gt;iterate(\%bind_mappings, @transforms)</code></pre>
 
-<p>Executes the iterator&#39;s underlying statemeent handle object, returning the iterator object reference if execution was successful, or <code>undef</code> if not.</p>
+<p>Executes the iterator&#39;s underlying statement, as well as resetting the iterator&#39;s internal state.</p>
+
+<p>When called with no arguments, any bind-values and transformations passed to the iterator at the time of construction will be honoured.</p>
+
+<p>A reference to the iterator is returned if the statement was successfully executed, otherwise the method returns <code>undef</code>.</p>
 
 <h4 id="last"><code>last</code></h4>
 
+<pre><code>$result = $itor-&gt;last;</code></pre>
+
+<p>Returns the last result in the result set.</p>
+
+<p>If the iterator&#39;s statement has not yet been executed, it will be, and <code>undef</code> will be returned if the statement was not executed successfully.</p>
+
+<p>Any results remaining to be fetched are then fetched and discarded, and the last result fetched is returned.</p>
+
+<p><i><b>BEWARE</b> that you should not use <code>next</code> after this method has been used!</i></p>
+
+<h4 id="last_fetched"><code>last_fetched</code></h4>
+
+<pre><code>$result = $itor-&gt;last_fetched;</code></pre>
+
+<p>Returns the last result fetched.</p>
+
+<p>If the iterator&#39;s statement has not yet been executed, it will be, then <code>undef</code> is returned regardless of the statement execution&#39;s outcome.</p>
+
+<p>If the statement was previously executed then the last result fetched is always cached. The cached value is returned.</p>
+
 <h4 id="next"><code>next</code></h4>
+
+<pre><code>$result = $itor-&gt;next;</code></pre>
+
+<p>Returns the next result in the result set.</p>
+
+<p>If the iterator&#39;s statement has not yet been executed, it will be, and <code>undef</code> will be returned if the statement was not executed successfully.</p>
+
+<p>There are two potential side-effects that could result from a call to <code>next</code>:</p>
+
+<ul>
+
+<li><p>The first time it is called, the result returned will be cached and returned in any subsequent call to <code>first</code>.</p>
+
+</li>
+<li><p>Every time it is called, the most recent result returned will be cached and returned in any call to <code>last_fetched</code>, or <code>last</code> if it was the final result in the result set.</p>
+
+</li>
+</ul>
 
 <h4 id="one"><code>one</code></h4>
 
-<p>Alias <i>(see <code>single</code>)</i>.</p>
+<p>Alias (see <code>single</code>).</p>
 
 <h4 id="remaining"><code>remaining</code></h4>
 
-<pre><code>@ary = $itor-&gt;remaining();
-$ary_ref | undef = $itor-&gt;remaining();</code></pre>
-
-<p>When called in list-context, the <code>all</code> method returns an array of all matching row objects remaining to be fetched.</p>
-
-<p>When called in scalar-context, this method returns a reference to an array of all matching row objects remaining to be fetched. Where no rows are matched, <code>undef</code> would be returned.</p>
+<pre><code>@results = $itor-&gt;remaining;
+$results_or_undef = $itor-&gt;remaining;</code></pre>
 
 <h4 id="reset"><code>reset</code></h4>
 
+<pre><code>$itor = $itor-&gt;reset;</code></pre>
+
+<p>Executes the iterator&#39;s underlying statement handle object and resets any internal state.</p>
+
+<p>A reference to the iterator is always returned.</p>
+
 <h4 id="rows"><code>rows</code></h4>
 
-<pre><code>$rv = $itor-&gt;rows();</code></pre>
+<pre><code>$rows = $itor-&gt;rows;</code></pre>
 
 <p>Returns the number of rows aftected by non-SELECT statements.</p>
 
-<h4 id="single"><code>single</code></h4>
+<h4 id="single-or-one"><code>single</code> (or <code>one</code>)</h4>
+
+<pre><code>$result = $itor-&gt;single;</code></pre>
+
+<p>Returns the first result in the result set, or <code>undef</code> if there were no results.</p>
+
+<p>If the iterator&#39;s statement has not yet been executed, it will be, and <code>undef</code> will be returned if the statement was not executed successfully.</p>
+
+<p>If the first result hasn&#39;t yet been fetched, it will be and the first result is fetched and cached. The cached value is returned.</p>
+
+<p>If the result returned is one of many buffered, a warning will be issued:</p>
+
+<pre><code>Query would yield more than one result...</code></pre>
+
+<p>The warning is a reminder to include a LIMIT 1 constraint in the statement.</p>
 
 <h4 id="slice"><code>slice</code></h4>
 
-<pre><code>$slice = $itor-&gt;slice();
+<pre><code>$slice = $itor-&gt;slice;
 $itor = $itor-&gt;slice($slice);</code></pre>
 
 <p>May be used to determine how the iterator slices the results it fetches from the database. This may be an ARRAYREF or a HASHREF.</p>
 
-<p>To change this property, simply provide the new value as the argument. When used to change the buffer-size, a reference to the iterator is returned.</p>
+<p>To change this property, simply provide the new value as the argument. When used to change the slicing strategy, a reference to the iterator is returned.</p>
 
 <p>The following package global defines the default setting:</p>
 
@@ -1221,7 +1312,7 @@ $itor = $itor-&gt;slice($slice);</code></pre>
 
 <h4 id="slice_buffer_size"><code>slice_buffer_size</code></h4>
 
-<pre><code>($slice, $buffer_size) = $itor-&gt;slice_buffer_size();
+<pre><code>($slice, $buffer_size) = $itor-&gt;slice_buffer_size;
 $itor = $itor-&gt;slice_buffer_size($slice, $buffer_size);
 $itor = $itor-&gt;slice_buffer_size($buffer_size, $slice);</code></pre>
 
@@ -1257,9 +1348,9 @@ $DBIx::Squirrel::it::BUFFER_SIZE_LIMIT   = 64;  # maximum buffer-size</code></pr
 
 <h4 id="sth"><code>sth</code></h4>
 
-<pre><code>$sth = $itor-&gt;sth();</code></pre>
+<pre><code>$sth = $itor-&gt;sth;</code></pre>
 
-<p>Returns the iterator&#39;s statement handle object.</p>
+<p>Returns the iterator&#39;s underlying statement handle object.</p>
 
 <h1 id="COPYRIGHT-AND-LICENSE">COPYRIGHT AND LICENSE</h1>
 

@@ -1,4 +1,4 @@
-Test-Map-Tube
+Test::Map::Tube
 
 The README  is  used  to  introduce the module and provide instructions on how to
 install the module, any machine dependencies it may have (for example C compilers
@@ -29,21 +29,21 @@ command.
 
 You can also look for information at:
 
-    RT, CPAN's request tracker (report bugs here)
-        http://rt.cpan.org/NoAuth/Bugs.html?Dist=Test-Map-Tube
+    BUG Report
+        https://github.com/manwar/Test-Map-Tube/issues
 
-    AnnoCPAN, Annotated CPAN documentation
+    AnnoCPAN: Annotated CPAN documentation
         http://annocpan.org/dist/Test-Map-Tube
 
     CPAN Ratings
         http://cpanratings.perl.org/d/Test-Map-Tube
 
-    Search CPAN
-        http://search.cpan.org/dist/Test-Map-Tube/
+    Search MetaCPAN
+        https://metacpan.org/dist/Test-Map-Tube
 
 LICENSE AND COPYRIGHT
 
-Copyright (C) 2015 Mohammad S Anwar
+Copyright (C) 2015 - 2024 Mohammad Sajid Anwar
 
 This program is free software; you can redistribute it and/or modify it under the
 terms of the the Artistic License (2.0).You may obtain a copy of the full license

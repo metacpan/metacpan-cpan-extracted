@@ -1,3 +1,4 @@
+use 5.010_001;
 use strict;
 use warnings;
 
@@ -38,7 +39,6 @@ BEGIN {
 
 use Cwd qw/realpath/;
 use DBD::Mock;
-use DBD::SQLite::Constants qw/:file_open/;
 use Test::More;
 
 our $TEST_LIB_DIR = do {
@@ -64,7 +64,6 @@ our($TEST_DB_DSN, $TEST_DB_USERNAME, $TEST_DB_PASSWORD, $TEST_DB_ATTR) = (
         RaiseError                 => !!1,
         sqlite_unicode             => !!1,
         sqlite_see_if_its_a_number => !!1,
-        sqlite_open_flags          => SQLITE_OPEN_READONLY,
     },
 );
 our @TEST_DB_CREDENTIALS  = ($TEST_DB_USERNAME, $TEST_DB_PASSWORD);

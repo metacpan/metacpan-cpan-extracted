@@ -4,7 +4,7 @@
       "Kazumasa Utashiro"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Minilla/v3.1.23",
+   "generated_by" : "Minilla/v3.1.25",
    "license" : [
       "perl_5"
    ],
@@ -59,14 +59,14 @@
    "provides" : {
       "App::ansiprintf" : {
          "file" : "lib/App/ansiprintf.pm",
-         "version" : "2.06"
+         "version" : "2.0602"
       },
       "App::ansiprintf::Util" : {
          "file" : "lib/App/ansiprintf/Util.pm"
       },
       "Text::ANSI::Printf" : {
          "file" : "lib/Text/ANSI/Printf.pm",
-         "version" : "2.06"
+         "version" : "2.0602"
       }
    },
    "release_status" : "stable",
@@ -81,7 +81,7 @@
          "web" : "https://github.com/tecolicom/Text-ANSI-Printf"
       }
    },
-   "version" : "2.06",
+   "version" : "2.0602",
    "x_authority" : "cpan:UTASHIRO",
    "x_contributors" : [
       "Kazumasa Utashiro <kaz@utashiro.com>"

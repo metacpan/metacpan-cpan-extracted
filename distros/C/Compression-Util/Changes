@@ -1,5 +1,17 @@
 Revision history for Compression-Util
 
+0.13    2024-08-25
+
+        [IMPROVEMENTS]
+
+        - More Gzip flags are now recognized.
+        - Better compression ratio in bzip2_compress().
+
+        [BUG-FIXES]
+
+        - Fixed the extraction of Gzip data that contains a comment.
+        - Fixed a potential CRC32 issue in bzip2_compress() when data gets expanded.
+
 0.12    2024-08-23
 
         [ADDITIONS]

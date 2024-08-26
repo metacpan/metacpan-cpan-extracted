@@ -5,12 +5,16 @@ use lib 't/try/lib';
 use 5.014;
 
 BEGIN {
+    if ($] >= 5.041000) {
+        plan skip_all => "given/when not supported on perl >= 5.41";
+    }
     if (!eval { require Try::Tiny }) {
         plan skip_all => "This test requires Try::Tiny";
     }
 }
 
-no if $] >= 5.018, warnings => 'experimental::smartmatch';
+no if $] >= 5.018000, warnings => 'experimental::smartmatch';
+no if $] >= 5.037011, warnings => 'deprecated::smartmatch';
 
 use Try;
 

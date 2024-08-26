@@ -16,7 +16,7 @@ use strict; use warnings;
 # and remove such from their private copies of the code.
 use warnings FATAL => 'all';
 
-use feature qw(say switch state current_sub lexical_subs);
+use feature qw(say state current_sub lexical_subs);
 no warnings "experimental::lexical_subs";
 use utf8;
 
@@ -96,8 +96,8 @@ and fonts registered.
 package ODF::lpOD_Helper;
 
 { no strict 'refs'; ${__PACKAGE__."::VER"."SION"} = 997.999; }
-our $VERSION = '6.013'; # VERSION from Dist::Zilla::Plugin::OurPkgVersion
-our $DATE = '2024-07-06'; # DATE from Dist::Zilla::Plugin::OurDate
+our $VERSION = '6.014'; # VERSION from Dist::Zilla::Plugin::OurPkgVersion
+our $DATE = '2024-08-25'; # DATE from Dist::Zilla::Plugin::OurDate
 
 use Carp;
 use Data::Dumper::Interp 6.004 qw/visnew

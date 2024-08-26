@@ -9,7 +9,7 @@ require Exporter;
 
 our @ISA = qw(Exporter);
 
-our $VERSION = '0.12';
+our $VERSION = '0.13';
 our $VERBOSE = 0;        # verbose mode
 
 our $LZ_MIN_LEN       = 4;          # minimum match length in LZ parsing
@@ -3186,11 +3186,11 @@ sub bzip2_compress($fh) {
         return __SUB__->($fh2);
     }
 
-    my $level = 1;
+    my $level = 9;
 
-    # There is a CRC32 issue on some (binary) inputs, when using large chunk sizes
+    # There is a CRC32 issue on some non-compressible inputs, when using very large chunk sizes
     ## my $CHUNK_SIZE = 100_000 * $level;
-    my $CHUNK_SIZE = 1 << 16;
+    my $CHUNK_SIZE = 1 << 17;
 
     my $compressed = "BZh" . $level;
 
@@ -3204,14 +3204,12 @@ sub bzip2_compress($fh) {
 
         $bitstring .= $block_header_bitstring;
 
-        # FIXME: there may be a bug in the computation of crc32
         my $crc32 = crc32(pack('b*', unpack('B*', $chunk)));
         $VERBOSE && say STDERR "CRC32: $crc32";
 
         $crc32 = oct('0b' . int2bits_lsb($crc32, 32));
         $VERBOSE && say STDERR "Bzip2-CRC32: $crc32";
 
-        # FIXME: there may be a bug in the computation of stream_crc32
         $stream_crc32 = ($crc32 ^ (0xffffffff & ((0xffffffff & ($stream_crc32 << 1)) | (($stream_crc32 >> 31) & 0x1)))) & 0xffffffff;
 
         $bitstring .= int2bits($crc32, 32);
@@ -4057,7 +4055,7 @@ sub gzip_decompress ($in_fh) {
     }
 
     my $CM     = getc($in_fh) // confess "error";                             # 0x08 = DEFLATE
-    my $FLAGS  = getc($in_fh) // confess "error";                             # flags
+    my $FLAGS  = ord(getc($in_fh) // confess "error");                        # flags
     my $MTIME  = join('', map { getc($in_fh) // confess "error" } 1 .. 4);    # modification time
     my $XFLAGS = getc($in_fh) // confess "error";                             # extra flags
     my $OS     = getc($in_fh) // confess "error";                             # 0x03 = Unix
@@ -4066,25 +4064,50 @@ sub gzip_decompress ($in_fh) {
         confess "Only DEFLATE compression method is supported (0x08)! Got: 0x", sprintf('%02x', ord($CM));
     }
 
-    # TODO: add support for more attributes
-    my $has_filename = 0;
-    my $has_comment  = 0;
+    # Reference:
+    #   https://web.archive.org/web/20240221024029/https://forensics.wiki/gzip/
 
-    if ((ord($FLAGS) & 0b0000_1000) != 0) {
+    my $has_filename        = 0;
+    my $has_comment         = 0;
+    my $has_header_checksum = 0;
+    my $has_extra_fields    = 0;
+
+    if ($FLAGS & 0x08) {
         $has_filename = 1;
     }
 
-    if ((ord($FLAGS) & 0b0001_0000) != 0) {
+    if ($FLAGS & 0x10) {
         $has_comment = 1;
+    }
+
+    if ($FLAGS & 0x02) {
+        $has_header_checksum = 1;
+    }
+
+    if ($FLAGS & 0x04) {
+        $has_extra_fields = 1;
+    }
+
+    if ($has_extra_fields) {
+        my $size = bytes2int_lsb($in_fh, 2);
+        read($in_fh, (my $extra_field_data), $size) // confess "can't read extra field data: $!";
+        $VERBOSE && say STDERR ":: Extra field data: $extra_field_data";
     }
 
     if ($has_filename) {
         my $filename = read_null_terminated($in_fh);    # filename
-        $VERBOSE && say STDERR ":: Filename: ", $filename;
+        $VERBOSE && say STDERR ":: Filename: $filename";
     }
 
     if ($has_comment) {
-        $VERBOSE && say STDERR ":: Comment: ", read_null_terminated($in_fh);
+        my $comment = read_null_terminated($in_fh);     # comment
+        $VERBOSE && say STDERR ":: Comment: $comment";
+    }
+
+    # TODO: verify the header checksum
+    if ($has_header_checksum) {
+        my $header_checksum = bytes2int_lsb($in_fh, 2);
+        $VERBOSE && say STDERR ":: Header checksum: $header_checksum";
     }
 
     my $crc32         = 0;

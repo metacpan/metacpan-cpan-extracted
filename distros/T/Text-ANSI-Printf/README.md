@@ -5,7 +5,7 @@ Text::ANSI::Printf - printf function to print string including ANSI sequence
 
 # VERSION
 
-Version 2.06
+Version 2.0602
 
 # SYNOPSIS
 
@@ -35,36 +35,72 @@ based on its visible appearance.
 
 For example,
 
-    printf "| %-5s | %-5s | %-5s |\n", "Red", "Green", "Blue";
+    printf("| %-8s | %-8s | %-8s |\n", "Red", "Green", "Blue");
 
 this code produces the output like:
 
-    | Red   | Green | Blue  |
+<div>
+    <p><img width="300" src="https://raw.githubusercontent.com/tecolicom/Text-ANSI-Printf/master/images/plain.png">
+</div>
 
 However, if the arguments are colored by ANSI sequence,
 
-    printf("| %-5s | %-5s | %-5s |\n",
-           "\e[31mRed\e[m", "\e[32mGreen\e[m", "\e[34mBlue\e[m");
+    printf("| %-8s | %-8s | %-8s |\n",
+           "\e[31mRed\e[m", "\e[32;3mGreen\e[m", "\e[34;3;4mBlue\e[m");
 
 this code produces undesirable result:
 
-    | Red | Green | Blue |
+<div>
+    <p><img width="300" src="https://raw.githubusercontent.com/tecolicom/Text-ANSI-Printf/master/images/bad.png">
+</div>
 
-This is still better because it is readable, but if the result is
-shorter than the original string, for example, "%.3s", the result will
-be disastrous.
+This is still better because the output is readable, but if the result
+is shorter than the original string, for example, "%3.3s", the result
+will be disastrous.
 
 `ansi_printf` can be used to properly format colored text.
 
     use Text::ANSI::Printf 'ansi_printf';
-    ansi_printf("| %-5s | %-5s | %-5s |\n",
-           "\e[31mRed\e[m", "\e[32mGreen\e[m", "\e[34mBlue\e[m");
+    ansi_printf("| %-8s | %-8s | %-8s |\n",
+                "\e[31mRed\e[m", "\e[32;3mGreen\e[m", "\e[34;3;4mBlue\e[m");
+
+<div>
+    <p><img width="300" src="https://raw.githubusercontent.com/tecolicom/Text-ANSI-Printf/master/images/good.png">
+</div>
 
 It does not matter if the result is shorter than the original text.
 Next code produces `[R] [G] [B]` in proper color.
 
+    use Text::ANSI::Printf 'ansi_printf';
     ansi_printf("[%.1s] [%.1s] [%.1s]\n",
-           "\e[31mRed\e[m", "\e[32mGreen\e[m", "\e[34mBlue\e[m");
+                "\e[31mRed\e[m", "\e[32;3mGreen\e[m", "\e[34;3;4mBlue\e[m");
+
+<div>
+    <p><img width="300" src="https://raw.githubusercontent.com/tecolicom/Text-ANSI-Printf/master/images/shorten.png">
+</div>
+
+# RELATED TOOLS
+
+[Text::ANSI::Printf](https://metacpan.org/pod/Text%3A%3AANSI%3A%3APrintf) only prints strings including ANSI sequences, it
+does not generate ANSI colored text.  To produce colored text, use
+standard [Term::ANSIColor](https://metacpan.org/pod/Term%3A%3AANSIColor) or companion module
+[Term::ANSIColor::Concise](https://metacpan.org/pod/Term%3A%3AANSIColor%3A%3AConcise).  Using `ansi_color` function of
+[Term::ANSIColor::Concise](https://metacpan.org/pod/Term%3A%3AANSIColor%3A%3AConcise) module, above example can be written as
+follows.
+
+    use Text::ANSI::Printf 'ansi_printf';
+    use Term::ANSIColor::Concise 'ansi_color';
+    ansi_printf("| %-5s | %-5s | %-5s |\n",
+                ansi_color("R", "Red", "GI", "Green", "BIU", "Blue"));
+
+Using the command line interface, `ansiprintf`, and the companion
+command, `ansiecho`, the shell command can be executed as follows.
+
+    ansiprintf "| %-5s | %-5s | %-5s |\n" $(ansiecho -cR Red -cGI Green -cBIU Blue)
+
+In fact, this can be done with the `ansiecho` command alone.
+
+    ansiecho -f "| %-5s | %-5s | %-5s |" -cR Red -cGI Green -cBIU Blue
 
 # ARGUMENT REORDERING
 
@@ -137,7 +173,7 @@ Kazumasa Utashiro
 
 # LICENSE
 
-Copyright © 2020-2023 Kazumasa Utashiro.
+Copyright © 2020-2024 Kazumasa Utashiro.
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.

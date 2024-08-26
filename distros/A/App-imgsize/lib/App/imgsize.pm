@@ -1,19 +1,20 @@
 package App::imgsize;
 
-our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-12-24'; # DATE
-our $DIST = 'App-imgsize'; # DIST
-our $VERSION = '0.004'; # VERSION
-
 use strict;
 use warnings;
 
-our %SPEC;
-require Exporter;
-our @ISA       = qw(Exporter);
+use Exporter qw(import);
+
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2024-08-20'; # DATE
+our $DIST = 'App-imgsize'; # DIST
+our $VERSION = '0.006'; # VERSION
+
 our @EXPORT_OK = qw(imgsize);
 
-my $res_meta = {'table.fields' => [qw/filename filesize width height res_name/]};
+our %SPEC;
+
+our $res_meta = {'table.fields' => [qw/filename filesize width height res_name/]};
 
 $SPEC{imgsize} = {
     v => 1.1,
@@ -25,19 +26,19 @@ $SPEC{imgsize} = {
             schema => ['array*' => {of => 'filename*'}],
             req => 1,
             pos => 0,
-            greedy => 1,
+            slurpy => 1,
         },
         detail => {
             summary => 'Whether to show detailed records',
             schema => 'bool*',
-            description => <<'_',
+            description => <<'MARKDOWN',
 
 The default is to show detailed records when there are more than 1 filenames
 specified; when there is only 1 filename, will only show dimension in WxH format
 (e.g. 640x480). If this option is specified, will show detailed records even if
 there is only one filename specified.
 
-_
+MARKDOWN
             cmdline_aliases => {l=>{}},
         },
     },
@@ -66,6 +67,7 @@ _
     ],
     links => [
         {url=>'prog:calc-image-resized-size'},
+        {url=>'prog:pdfsize'},
     ],
 };
 sub imgsize {
@@ -120,7 +122,7 @@ App::imgsize - Show dimensions of image files
 
 =head1 VERSION
 
-This document describes version 0.004 of App::imgsize (from Perl distribution App-imgsize), released on 2020-12-24.
+This document describes version 0.006 of App::imgsize (from Perl distribution App-imgsize), released on 2024-08-20.
 
 =head1 SYNOPSIS
 
@@ -133,7 +135,7 @@ This document describes version 0.004 of App::imgsize (from Perl distribution Ap
 
 Usage:
 
- imgsize(%args) -> [status, msg, payload, meta]
+ imgsize(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
 Show dimensions of image files.
 
@@ -224,17 +226,19 @@ there is only one filename specified.
 
 =item * B<filenames>* => I<array[filename]>
 
+(No description)
+
 
 =back
 
 Returns an enveloped result (an array).
 
-First element (status) is an integer containing HTTP status code
+First element ($status_code) is an integer containing HTTP-like status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
-(msg) is a string containing error message, or 'OK' if status is
-200. Third element (payload) is optional, the actual result. Fourth
-element (meta) is called result metadata and is optional, a hash
-that contains extra information.
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
+element (%result_meta) is called result metadata and is optional, a hash
+that contains extra information, much like how HTTP response headers provide additional metadata.
 
 Return value:  (any)
 
@@ -246,23 +250,41 @@ Please visit the project's homepage at L<https://metacpan.org/release/App-imgsiz
 
 Source repository is at L<https://github.com/perlancar/perl-App-imgsize>.
 
-=head1 BUGS
-
-Please report any bugs or feature requests on the bugtracker website L<https://github.com/perlancar/perl-App-imgsize/issues>
-
-When submitting a bug or request, please include a test-file or a
-patch to an existing test-file that illustrates the bug or desired
-feature.
-
 =head1 AUTHOR
 
 perlancar <perlancar@cpan.org>
 
+=head1 CONTRIBUTING
+
+
+To contribute, you can send patches by email/via RT, or send pull requests on
+GitHub.
+
+Most of the time, you don't need to build the distribution yourself. You can
+simply modify the code, then test via:
+
+ % prove -l
+
+If you want to build the distribution (e.g. to try to install it locally on your
+system), you can install L<Dist::Zilla>,
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>,
+L<Pod::Weaver::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps required beyond
+that are considered a bug and can be reported to me.
+
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020, 2016 by perlancar@cpan.org.
+This software is copyright (c) 2024, 2020, 2016 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-imgsize>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
 
 =cut

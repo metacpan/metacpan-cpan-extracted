@@ -2,7 +2,7 @@
 use strict;
 use warnings;
 
-use 5.006;
+use 5.010001;
 
 use ExtUtils::MakeMaker;
 
@@ -14,12 +14,11 @@ my %WriteMakefileArgs = (
   },
   "DISTNAME" => "DBIx-Squirrel",
   "LICENSE" => "perl",
-  "MIN_PERL_VERSION" => "5.006",
+  "MIN_PERL_VERSION" => "5.010001",
   "NAME" => "DBIx::Squirrel",
   "PREREQ_PM" => {
     "Carp" => 0,
     "DBI" => 0,
-    "Data::Alias" => 0,
     "Data::Dumper" => 0,
     "Devel::GlobalDestruction" => 0,
     "Digest::SHA" => 0,
@@ -38,14 +37,13 @@ my %WriteMakefileArgs = (
     "Cwd" => 0,
     "DBD::Mock" => 0,
     "DBD::SQLite" => 0,
-    "DBD::SQLite::Constants" => 0,
     "FindBin" => 0,
     "Test::More" => 0,
     "Test::Warn" => 0,
     "lib" => 0,
     "open" => 0
   },
-  "VERSION" => "1.3.1",
+  "VERSION" => "1.3.5",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -57,9 +55,7 @@ my %FallbackPrereqs = (
   "Cwd" => 0,
   "DBD::Mock" => 0,
   "DBD::SQLite" => 0,
-  "DBD::SQLite::Constants" => 0,
   "DBI" => 0,
-  "Data::Alias" => 0,
   "Data::Dumper" => 0,
   "Devel::GlobalDestruction" => 0,
   "Digest::SHA" => 0,

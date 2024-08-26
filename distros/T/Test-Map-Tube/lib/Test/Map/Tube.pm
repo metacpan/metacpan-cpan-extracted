@@ -1,6 +1,6 @@
 package Test::Map::Tube;
 
-$Test::Map::Tube::VERSION   = '0.57';
+$Test::Map::Tube::VERSION   = '0.60';
 $Test::Map::Tube::AUTHORITY = 'cpan:MANWAR';
 
 =head1 NAME
@@ -9,7 +9,7 @@ Test::Map::Tube - Interface to test Map::Tube features.
 
 =head1 VERSION
 
-Version 0.57
+Version 0.60
 
 =cut
 
@@ -26,8 +26,8 @@ my $PLAN      = 0;
 
 =head1 DESCRIPTION
 
-It's main responsibilty  is  to validate the map data as used by the package that
-takes the role of L<Map::Tube>.You can also unit test map functions as well.
+Its main responsibilty is to validate the map data as used by the package that
+takes the role of L<Map::Tube>. You can also unit test map functions as well.
 
 =head1 SYNOPSIS
 
@@ -167,10 +167,17 @@ v0.15 or above.
 
 sub ok_map_routes($$;$) {
     my ($object, $routes, $message) = @_;
-
-    $TEST->plan(tests => 1) unless $PLAN;
-    my ($response, $error) = _ok_map_routes($object, $routes);
-    $TEST->is_num($response, $TEST_BOOL, $message||$error);
+    my @errors = _ok_map_routes($object, $routes);
+    if (!@errors) {
+      $TEST->plan(tests => 1) unless $PLAN;
+      return $TEST->is_num($TEST_BOOL, $TEST_BOOL, $message);
+    }
+    $TEST->plan(tests => 0+@errors) unless $PLAN;
+    for (@errors) {
+      my ($g, $e, $d) = @$_;
+      my ($gs, $es) = map join("\n", @{$_->nodes}), $g, $e;
+      $TEST->is_eq($gs, $es, $message||$d)
+    }
 }
 
 #
@@ -289,24 +296,21 @@ sub _ok_map_functions {
 
 sub _ok_map_routes {
     my ($object, $routes) = @_;
-
     return 0 unless (defined $object && $object->does('Map::Tube'));
-
     eval { $object->get_map_data };
     ($@) and (carp('no map data found') and return 0);
-
+    my @failed;
     foreach (@$routes) {
         chomp;
         next if /^\#/;
         next if /^\s+$/;
-
         my ($description, $from, $to, $route) = split /\|/;
         my $got = $object->get_shortest_route($from, $to);
         my $expected = _expected_route($object, $route);
-        return (0, "Failed: $description") unless Compare($got, $expected);
+        next if Compare($got, $expected);
+        push @failed, [$got, $expected, $description];
     }
-
-    return 1;
+    return @failed;
 }
 
 sub _expected_route {
@@ -325,11 +329,13 @@ sub _expected_route {
        });
 }
 
-=head1 BUGS
+=head1 CONTRIBUTORS
 
-None that I am aware of.Of course, if you find a bug, let me know, and I would do
-my best  to fix it.  This is still a very early version, so it is always possible
-that I have just "gotten it wrong" in some places.
+=over 2
+
+=item * Ed J
+
+=back
 
 =head1 SEE ALSO
 
@@ -341,7 +347,7 @@ that I have just "gotten it wrong" in some places.
 
 =head1 AUTHOR
 
-Mohammad S Anwar, C<< <mohammad.anwar at yahoo.com> >>
+Mohammad Sajid Anwar, C<< <mohammad.anwar at yahoo.com> >>
 
 =head1 REPOSITORY
 
@@ -349,9 +355,8 @@ L<https://github.com/manwar/Test-Map-Tube>
 
 =head1 BUGS
 
-Please report any bugs / feature requests to C<bug-test-map-tube at rt.cpan.org>,
-or through the web interface at L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Test-Map-Tube>.
-I will be notified, and then you'll automatically be notified of progress on your
+Please report any bugs or feature requests through the web interface at L<https://github.com/manwar/Test-Map-Tube/issues>.
+I will  be notified and then you'll automatically be notified of progress on your
 bug as I make changes.
 
 =head1 SUPPORT
@@ -364,9 +369,9 @@ You can also look for information at:
 
 =over 4
 
-=item * RT: CPAN's request tracker (report bugs here)
+=item * BUG Report
 
-L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=Test-Map-Tube>
+L<https://github.com/manwar/Test-Map-Tube/issues>
 
 =item * AnnoCPAN: Annotated CPAN documentation
 
@@ -376,15 +381,15 @@ L<http://annocpan.org/dist/Test-Map-Tube>
 
 L<http://cpanratings.perl.org/d/Test-Map-Tube>
 
-=item * Search CPAN
+=item * Search MetaCPAN
 
-L<http://search.cpan.org/dist/Test-Map-Tube/>
+L<https://metacpan.org/dist/Test-Map-Tube>
 
 =back
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (C) 2015 - 2019 Mohammad S Anwar.
+Copyright (C) 2015 - 2024 Mohammad Sajid Anwar.
 
 This  program  is  free software; you can redistribute it  and/or modify it under
 the  terms  of the the Artistic License (2.0). You may  obtain a copy of the full

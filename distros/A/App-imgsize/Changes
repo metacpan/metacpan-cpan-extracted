@@ -1,3 +1,15 @@
+0.006   2024-08-20  Released-By: PERLANCAR; Urgency: medium
+
+        - Make $res_meta accessible from other packages.
+
+
+0.005   2024-08-20  Released-By: PERLANCAR; Urgency: low
+
+        - No functional changes.
+
+        - [doc] Mention pdfsize.
+
+
 0.004   2020-12-24  Released-By: PERLANCAR; Urgency: low
 
 	- No functional changes.

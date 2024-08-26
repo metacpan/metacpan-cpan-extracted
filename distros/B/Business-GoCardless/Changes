@@ -1,5 +1,8 @@
 Revision history for Business-GoCardless
 
+0.44     2024-08-26
+        - Add consent_type to Business::GoCardless::Mandate
+
 0.43     2024-02-01
         - Make payout/payouts methods compatible with Pro API
 

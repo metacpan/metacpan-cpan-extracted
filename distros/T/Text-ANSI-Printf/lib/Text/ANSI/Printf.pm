@@ -1,6 +1,6 @@
 package Text::ANSI::Printf;
 
-our $VERSION = "2.06";
+our $VERSION = "2.0602";
 
 use v5.14;
 use warnings;
@@ -48,7 +48,7 @@ Text::ANSI::Printf - printf function to print string including ANSI sequence
 
 =head1 VERSION
 
-Version 2.06
+Version 2.0602
 
 =head1 SYNOPSIS
 
@@ -78,36 +78,98 @@ based on its visible appearance.
 
 For example,
 
-    printf "| %-5s | %-5s | %-5s |\n", "Red", "Green", "Blue";
+    printf("| %-8s | %-8s | %-8s |\n", "Red", "Green", "Blue");
 
 this code produces the output like:
 
+=begin :text
+
     | Red   | Green | Blue  |
+
+=end :text
+
+=begin html
+
+<p><img width="300" src="https://raw.githubusercontent.com/tecolicom/Text-ANSI-Printf/master/images/plain.png">
+
+=end html
 
 However, if the arguments are colored by ANSI sequence,
 
-    printf("| %-5s | %-5s | %-5s |\n",
-           "\e[31mRed\e[m", "\e[32mGreen\e[m", "\e[34mBlue\e[m");
+    printf("| %-8s | %-8s | %-8s |\n",
+           "\e[31mRed\e[m", "\e[32;3mGreen\e[m", "\e[34;3;4mBlue\e[m");
 
 this code produces undesirable result:
 
+=begin :text
+
     | Red | Green | Blue |
 
-This is still better because it is readable, but if the result is
-shorter than the original string, for example, "%.3s", the result will
-be disastrous.
+=end :text
+
+=begin html
+
+<p><img width="300" src="https://raw.githubusercontent.com/tecolicom/Text-ANSI-Printf/master/images/bad.png">
+
+=end html
+
+This is still better because the output is readable, but if the result
+is shorter than the original string, for example, "%3.3s", the result
+will be disastrous.
 
 C<ansi_printf> can be used to properly format colored text.
 
     use Text::ANSI::Printf 'ansi_printf';
-    ansi_printf("| %-5s | %-5s | %-5s |\n",
-           "\e[31mRed\e[m", "\e[32mGreen\e[m", "\e[34mBlue\e[m");
+    ansi_printf("| %-8s | %-8s | %-8s |\n",
+                "\e[31mRed\e[m", "\e[32;3mGreen\e[m", "\e[34;3;4mBlue\e[m");
+
+=begin html
+
+<p><img width="300" src="https://raw.githubusercontent.com/tecolicom/Text-ANSI-Printf/master/images/good.png">
+
+=end html
 
 It does not matter if the result is shorter than the original text.
 Next code produces C<[R] [G] [B]> in proper color.
 
+    use Text::ANSI::Printf 'ansi_printf';
     ansi_printf("[%.1s] [%.1s] [%.1s]\n",
-           "\e[31mRed\e[m", "\e[32mGreen\e[m", "\e[34mBlue\e[m");
+                "\e[31mRed\e[m", "\e[32;3mGreen\e[m", "\e[34;3;4mBlue\e[m");
+
+=begin :text
+
+    [R] [G] [B]
+
+=end :text
+
+=begin html
+
+<p><img width="300" src="https://raw.githubusercontent.com/tecolicom/Text-ANSI-Printf/master/images/shorten.png">
+
+=end html
+
+=head1 RELATED TOOLS
+
+L<Text::ANSI::Printf> only prints strings including ANSI sequences, it
+does not generate ANSI colored text.  To produce colored text, use
+standard L<Term::ANSIColor> or companion module
+L<Term::ANSIColor::Concise>.  Using C<ansi_color> function of
+L<Term::ANSIColor::Concise> module, above example can be written as
+follows.
+
+    use Text::ANSI::Printf 'ansi_printf';
+    use Term::ANSIColor::Concise 'ansi_color';
+    ansi_printf("| %-5s | %-5s | %-5s |\n",
+                ansi_color("R", "Red", "GI", "Green", "BIU", "Blue"));
+
+Using the command line interface, C<ansiprintf>, and the companion
+command, C<ansiecho>, the shell command can be executed as follows.
+
+    ansiprintf "| %-5s | %-5s | %-5s |\n" $(ansiecho -cR Red -cGI Green -cBIU Blue)
+
+In fact, this can be done with the C<ansiecho> command alone.
+
+    ansiecho -f "| %-5s | %-5s | %-5s |" -cR Red -cGI Green -cBIU Blue
 
 =head1 ARGUMENT REORDERING
 
@@ -187,7 +249,7 @@ Kazumasa Utashiro
 
 =head1 LICENSE
 
-Copyright © 2020-2023 Kazumasa Utashiro.
+Copyright © 2020-2024 Kazumasa Utashiro.
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.

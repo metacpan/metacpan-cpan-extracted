@@ -1,0 +1,4 @@
+Revision history for Task-MemManager
+
+0.01      2024-08-25 17:41:34-06:00 America/Denver
+First version incorporating allocators based on Perl and C (malloc/calloc)

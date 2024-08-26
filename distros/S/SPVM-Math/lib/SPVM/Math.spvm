@@ -2,7 +2,7 @@
 # MIT License
 
 class Math : precompile {
-  version "1.004";
+  version "1.004001";
   
   use Complex_2f;
   use Complex_2d;

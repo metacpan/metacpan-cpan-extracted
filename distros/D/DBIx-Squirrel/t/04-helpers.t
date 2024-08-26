@@ -1,3 +1,4 @@
+use 5.010_001;
 use strict;
 use warnings;
 use open ':std', ':encoding(utf8)';
@@ -9,7 +10,7 @@ use lib "$Bin/lib";
 
 BEGIN {
     use_ok('DBIx::Squirrel', database_entities => [qw/db st/]) || print "Bail out!\n";
-    use_ok('T::Squirrel')                                      || print "Bail out!\n";
+    use_ok('T::Squirrel',    qw/:var diagdump/)                || print "Bail out!\n";
 }
 
 # Helpers are accessible to the entire module and we will take full

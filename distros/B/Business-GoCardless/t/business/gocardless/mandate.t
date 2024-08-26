@@ -29,6 +29,7 @@ can_ok(
     qw/
 		created_at
         consent_parameters
+        consent_type
         funds_settlement
 		id
 		links
@@ -53,6 +54,7 @@ ok( ! $Mandate->failed,'failed' );
 ok( ! $Mandate->cancelled,'cancelled' );
 ok( ! $Mandate->expired,'expired' );
 ok( ! $Mandate->consent_parameters,'consent_parameters' );
+ok( ! $Mandate->consent_type,'consent_type' );
 ok( ! $Mandate->verified_at,'verified_at' );
 is( $Mandate->funds_settlement,'managed','funds_settlement' );
 ok( $Mandate->is_managed,'->is_managed' );

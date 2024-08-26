@@ -20,6 +20,7 @@ extends 'Business::GoCardless::Resource';
 
     created_at
     consent_parameters
+    consent_type
     funds_settlement
     id
     links
@@ -36,6 +37,7 @@ extends 'Business::GoCardless::Resource';
 has [ qw/
     created_at
     consent_parameters
+    consent_type
     funds_settlement
     id
     links

@@ -6,7 +6,7 @@
 use 5.018; # for unicode_strings, lexical_subs
 use strict; use warnings FATAL => 'all';
 no warnings "experimental::lexical_subs";
-use feature qw(switch state say lexical_subs fc);
+use feature qw(state say lexical_subs fc);
 use feature qw(unicode_strings unicode_eval evalbytes);
 use feature 'unicode_strings';
 use utf8;
@@ -17,8 +17,8 @@ package ODF::MailMerge;
 # ...but don't let CPAN or test harnes scanners see this as defining $VERSION
 { no strict 'refs'; ${__PACKAGE__."::VER"."SION"} = 999.999; }
 
-our $VERSION = '1.009'; # VERSION from Dist::Zilla::Plugin::OurPkgVersion
-our $DATE = '2024-08-21'; # DATE from Dist::Zilla::Plugin::OurDate
+our $VERSION = '1.010'; # VERSION from Dist::Zilla::Plugin::OurPkgVersion
+our $DATE = '2024-08-25'; # DATE from Dist::Zilla::Plugin::OurDate
 
 use Carp;
 our @CARP_NOT = ("ODF::lpOD_Helper", "ODF::lpOD");

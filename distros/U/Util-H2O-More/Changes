@@ -135,3 +135,47 @@
       (because it used o2h) fix (#20) - thank you!
     - pinned Util::H2O::More to Util::H2O 0.24
     - cleaned up o2d
+
+0.3.5 Sun Aug 25 18:13:00 2024
+    - updated POD
+    - added an optional flag to d2o that will allow one to one to call a
+      non-existing key using its setter form, and via AUTOLOAD will return
+      undef, this saves some code and piercing the veil into the HASH itself;
+    - For example,
+
+        Before, it is necessary to pierce the veil of the HASH ref:
+
+        my $hash_ref = somecall(..);
+        d2o $hash_ref;
+        my @mightexist = qw/foo bar baz/;
+        foreach my $k (@mightexist) {
+          say $hash_ref->$k if (exists $hash_ref->{$k}); #...before
+        } 
+
+        After, missing methods return undef:
+
+        my $hash_ref = somecall(..);
+        d2o -autoundef, $hash_ref;
+        my @mightexist = qw/foo bar baz/;
+        foreach my $k (@mightexist) {
+          say $hash_ref->$k if ($hash_ref->$k); #............after 
+        } 
+
+0.3.6 Sun Aug 26 00:55:00 2024
+        - cleaned up some POD
+        - added an alias "i" that does the same thing as "get" for
+          the virtual methods associated with the ARRAY accessors
+        - added before and after examples for some pathological uses
+          of deeply nested hashs and arrays as an example of the potential
+          for cleaning up old code with lots of HASH and ARRAY refs
+          very easily
+
+0.3.7 Sun Aug 26 01:05:00 2024
+        - cleaned up some POD
+        - added an alias "i" that does the same thing as "get" for
+          the virtual methods associated with the ARRAY accessors
+        - added before and after examples for some pathological uses
+          of deeply nested hashs and arrays as an example of the potential
+          for cleaning up old code with lots of HASH and ARRAY refs
+          very easily
+        - fixed test warnings

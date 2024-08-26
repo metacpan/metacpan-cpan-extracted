@@ -7,7 +7,7 @@ do { my $x = {
                       },
        'develop' => {
                       'recommends' => {
-                                        'Dist::Zilla::PluginBundle::Author::ETHER' => '0.158',
+                                        'Dist::Zilla::PluginBundle::Author::ETHER' => '0.163',
                                         'Dist::Zilla::PluginBundle::Git::VersionManager' => '0.007'
                                       },
                       'requires' => {
@@ -17,7 +17,6 @@ do { my $x = {
                                       'IPC::Open3' => '0',
                                       'Test::CPAN::Changes' => '0.19',
                                       'Test::CPAN::Meta' => '0',
-                                      'Test::CleanNamespaces' => '0.15',
                                       'Test::Kwalitee' => '1.21',
                                       'Test::MinimumVersion' => '0',
                                       'Test::Mojibake' => '0',
@@ -35,7 +34,6 @@ do { my $x = {
                                       'Carp' => '0',
                                       'Scalar::Util' => '0',
                                       'Tie::Hash' => '0',
-                                      'overload' => '0',
                                       'perl' => '5.006',
                                       'strict' => '0'
                                     }
@@ -50,6 +48,7 @@ do { my $x = {
                                    'File::Spec' => '0',
                                    'Storable' => '0',
                                    'Test::More' => '0',
+                                   'overload' => '0',
                                    'perl' => '5.006',
                                    'warnings' => '0'
                                  }
@@ -112,7 +111,6 @@ do { my $x = {
                                            'Dist::Zilla::Plugin::StaticInstall' => '0.005',
                                            'Dist::Zilla::Plugin::Test::CPAN::Changes' => '0.012',
                                            'Dist::Zilla::Plugin::Test::ChangesHasContent' => '0',
-                                           'Dist::Zilla::Plugin::Test::CleanNamespaces' => '0.006',
                                            'Dist::Zilla::Plugin::Test::Compile' => '2.039',
                                            'Dist::Zilla::Plugin::Test::Kwalitee' => '2.10',
                                            'Dist::Zilla::Plugin::Test::MinimumVersion' => '2.000010',

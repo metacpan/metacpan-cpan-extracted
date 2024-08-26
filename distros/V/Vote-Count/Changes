@@ -1,5 +1,5 @@
 Revision history for Vote::Count
-2.04  Aug 1999999999, 2024   given/when deprecation.
+2.05  Aug  25, 2024 deprecation of switch feature (given/when)
 2.03  Nov  11, 2022 remove ghost dependencies, review dependencies.
 2.01  June 30, 2021 lc tiebreakmethod in tiebreaker, improvements to untielist.
                     added strict moose attribute checking.

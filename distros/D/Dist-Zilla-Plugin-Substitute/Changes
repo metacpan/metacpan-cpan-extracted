@@ -1,5 +1,9 @@
 Revision history for Dist-Zilla-Plugin-Substitute
 
+0.008     2024-08-25 11:54:01+02:00 Europe/Brussels
+          - Make code argument optional
+          - Join lines with semicolons
+
 0.007     2022-12-02 23:32:38+01:00 Europe/Amsterdam
           - Add a mode parameter to plugin
 

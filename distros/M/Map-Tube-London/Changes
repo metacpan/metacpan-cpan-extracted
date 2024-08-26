@@ -1,5 +1,16 @@
 Revision history for Map::Tube::London
 
+1.37  2024-08-26
+      - sort london-map.json keys, thanks @mohawk2.
+
+1.36  2024-08-26
+      - Updated dependency on Map::Tube v3.72.
+      - Fixed unit test to respect the changes to Map::Tube.
+      - Fixed map data:
+          South Kensington <=> Knightsbridge
+          Gloucester Road  <=> South Kensington
+      - Updated copyright year.
+
 1.35  2022-05-19
       - Updated dependency on Map::Tube v3.66
       - Fixed line for South Kensington station.

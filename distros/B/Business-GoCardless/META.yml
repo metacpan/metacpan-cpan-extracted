@@ -39,5 +39,5 @@ resources:
   homepage: https://metacpan.org/module/Business::GoCardless
   license: http://dev.perl.org/licenses/
   repository: https://github.com/Humanstate/business-gocardless
-version: '0.43'
+version: '0.44'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

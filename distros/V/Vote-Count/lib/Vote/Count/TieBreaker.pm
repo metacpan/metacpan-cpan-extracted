@@ -2,7 +2,7 @@ use strict;
 use warnings;
 use 5.024;
 
-use feature qw /postderef signatures switch/;
+use feature qw /postderef signatures/;
 
 package Vote::Count::TieBreaker;
 use Moose::Role;

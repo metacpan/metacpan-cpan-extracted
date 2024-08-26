@@ -2,6 +2,7 @@ use strict;
 use warnings;
 
 use Test::More q//;
+use Test::Exception q//;
 use Util::H2O::More qw/h2o o2h d2o o2d/;
 
 # for included module required for testing
@@ -240,5 +241,9 @@ $foo2 = o2d $foo;
 like ref $foo, qr/Util::H2O::More::__a2o/, q{making sure o2d doesn't effect REF, consistent with o2h};
 
 is ref $foo2, q{ARRAY}, q{making sure o2d worked on an ARRAY blessed by d2o};
+
+dies_ok { $HoAoH->doesntexist } q{call to non-existing setter dies without '-autoundef'};
+
+dies_ok { $HoAoH->ten->doesntexist } q{call to non-existing setter dies without '-autoundef'};
 
 done_testing;

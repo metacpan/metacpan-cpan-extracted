@@ -5,7 +5,7 @@ greple - extensible grep with lexical expression and region control
 
 # VERSION
 
-Version 9.1504
+Version 9.1505
 
 # SYNOPSIS
 
@@ -492,6 +492,10 @@ If you don't want these conversion, use `-E` (or `--re`) option.
     `foo`, `bar`, and `baz` in any order.
 
         greple --stretch 'foo bar baz'
+
+    For all matches, the index is set to 0.  If multiple callback
+    functions are specified, the first match in the block will be
+    effective.
 
 - **--need**=_n_
 - **--allow**=_n_

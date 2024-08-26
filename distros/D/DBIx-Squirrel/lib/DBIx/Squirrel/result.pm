@@ -1,3 +1,4 @@
+use 5.010_001;
 use strict;
 use warnings;
 
@@ -5,8 +6,7 @@ package    # hide from PAUSE
   DBIx::Squirrel::result;
 
 BEGIN {
-    require DBIx::Squirrel
-      unless defined($DBIx::Squirrel::VERSION);
+    require DBIx::Squirrel unless %DBIx::Squirrel::;
     $DBIx::Squirrel::result::VERSION = $DBIx::Squirrel::VERSION;
 }
 
@@ -24,7 +24,7 @@ sub new {
 }
 
 sub result_class {
-    return $_[0]->results->result_class;
+    return shift->results->result_class;
 }
 
 BEGIN {
@@ -32,7 +32,7 @@ BEGIN {
 }
 
 sub row_class {
-    return $_[0]->results->row_class;
+    return shift->results->row_class;
 }
 
 sub get_column {

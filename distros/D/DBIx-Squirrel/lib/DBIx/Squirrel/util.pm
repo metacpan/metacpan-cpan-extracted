@@ -1,3 +1,4 @@
+use 5.010_001;
 use strict;
 use warnings;
 
@@ -122,7 +123,7 @@ sub get_trimmed_sql_and_digest {
     my $sql_string        = do {
         if (ref $sth_or_sql_string) {
             if (UNIVERSAL::isa($sth_or_sql_string, 'DBIx::Squirrel::st')) {
-                trim_sql_string($sth_or_sql_string->_private->{OriginalStatement});
+                trim_sql_string($sth_or_sql_string->_private_state->{OriginalStatement});
             }
             elsif (UNIVERSAL::isa($sth_or_sql_string, 'DBI::st')) {
                 trim_sql_string($sth_or_sql_string->{Statement});
@@ -159,20 +160,13 @@ sub trim_sql_string {
 memoize('hash_sql_string');
 
 sub hash_sql_string {
-    return do {
-        if (&is_viable_sql_string) {
-            &sha256_base64;
-        }
-        else {
-            undef;
-        }
-    };
+    return is_viable_sql_string(@_) ? sha256_base64(@_) : undef;
 }
 
 sub part_args {
-    my @args = reverse(@_);
+    my @args = @_;
     my @coderefs;
-    unshift @coderefs, shift(@args) while UNIVERSAL::isa($args[0], 'CODE');
+    unshift @coderefs, pop(@args) while UNIVERSAL::isa($args[-1], 'CODE');
     return \@coderefs, @args;
 }
 

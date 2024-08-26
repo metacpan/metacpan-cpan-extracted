@@ -4,7 +4,7 @@ use warnings;
 use 5.014;
 # ABSTRACT: DEPRECATED: write syntax extensions in perl
 
-our $VERSION = '0.09';
+our $VERSION = '0.10';
 
 use Devel::CallParser;
 use XSLoader;
@@ -67,7 +67,7 @@ Parse::Keyword - DEPRECATED: write syntax extensions in perl
 
 =head1 VERSION
 
-version 0.09
+version 0.10
 
 =head1 SYNOPSIS
 

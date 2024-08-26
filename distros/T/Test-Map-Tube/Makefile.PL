@@ -7,7 +7,7 @@ use ExtUtils::MakeMaker;
 
 WriteMakefile(
     NAME               => 'Test::Map::Tube',
-    AUTHOR             => q{Mohammad S Anwar <mohammad.anwar@yahoo.com>},
+    AUTHOR             => q{Mohammad Sajid Anwar <mohammad.anwar@yahoo.com>},
     VERSION_FROM       => 'lib/Test/Map/Tube.pm',
     ABSTRACT_FROM      => 'lib/Test/Map/Tube.pm',
     LICENSE            => 'artistic_2',
@@ -19,7 +19,7 @@ WriteMakefile(
         'Test::More' => 0,
     },
     PREREQ_PM => {
-        'Map::Tube'     => '3.64',
+        'Map::Tube'     => '3.70',
         'Data::Compare' => '1.25',
         'Test::Builder' => '1.001014',
     },
@@ -27,7 +27,7 @@ WriteMakefile(
     clean => { FILES => 'Test-Map-Tube-*' },
     (eval { ExtUtils::MakeMaker->VERSION(6.46) } ? (META_MERGE => {
         'meta-spec' => { version => 2 },
-        provides    => { 'Test::Map::Tube' => { file => 'lib/Test/Map/Tube.pm', version => '0.57' } },
+        provides    => { 'Test::Map::Tube' => { file => 'lib/Test/Map/Tube.pm', version => '0.60' } },
         resources   => {
             repository => {
                 type => 'git',

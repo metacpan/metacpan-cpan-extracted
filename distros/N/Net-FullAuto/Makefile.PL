@@ -25,7 +25,7 @@
 #
 ################################################################
 
-our $VERSION='1.0000776';
+our $VERSION='1.0000778';
 
 my $sudo=($^O eq 'cygwin')?'':'sudo ';
 print "AFTER BEGIN BLOCK FREEMEM: ".`${sudo}cat /proc/meminfo | grep MemFree`;
@@ -203,6 +203,27 @@ print "START OF BEGIN BLOCK AVAILABLE: ".`${sudo}cat /proc/meminfo | grep MemAva
       }
       @INC=@TMPINC;
    }
+   eval {
+      local $SIG{__DIE__}; # No sigdie handler
+      require CPAN;
+      CPAN::HandleConfig->load;
+   };
+   my $d = $CPAN::Config->{build_dir};
+   if (!(defined $d) || !(-d $d)) {
+      $d=(getpwuid $>)[7].'/.cpan/build';
+      unless (-d $d) {
+         unless (-d "/root/.cpan/build") {
+            fa_die("ERROR - Can't locate .cpan/build directory");
+         } else {
+            $d='/root/.cpan/build';
+         }
+      }
+   }
+   $ENV{CPAN_BUILD_DIR}=$d;
+   $ENV{CPAN_GZIP}=$CPAN::Config->{gzip} if defined $CPAN::Config->{gzip}
+      && $CPAN::Config->{gzip};
+   $ENV{CPAN_TAR}=$CPAN::Config->{tar} if defined $CPAN::Config->{tar}
+      && $CPAN::Config->{tar};
    # Bullet Proof Test for AWS EC2
    # https://serverfault.com/questions/462903/how-to-know-if-a-machine-is-an-ec2-instance
    $aws=`/bin/bash -c 'if [ -f /sys/hypervisor/uuid ];then if [ \`/bin/head -c 3 /sys/hypervisor/uuid\`=="ec2" ];then echo yes;else echo no;fi;elif [ -r /sys/devices/virtual/dmi/id/product_uuid ];then if [ \`/bin/head -c 3 /sys/devices/virtual/dmi/id/product_uuid\` == "EC2" ]; then echo yes;else echo no;fi;else if \$(curl -s -m 5 http://169.254.169.254/latest/dynamic/instance-identity/document | grep -q availabilityZone);then echo yes;else echo no;fi;fi'`;
@@ -1359,21 +1380,6 @@ END
       };
    }
    print "\n\n   FullAuto install continues . . .\n\n";
-
-   print 'BEFORE YUM ',`sudo cat /proc/meminfo | grep MemFree`;
-   print 'BEFORE YUM ',`sudo cat /proc/meminfo | grep MemAvailable`;sleep 10;
-   #my $yins=`yum list installed`;
-   #unless (-1<index $yins,'openssl-devel') {
-   #   fa_system("sudo yum -y install 'openssl-devel'");
-   #}
-   #unless (-1<index $yins,'zlib-devel') {
-   #   fa_system("sudo yum -y install 'zlib-devel'");
-   #}
-   #unless (-1<index $yins,'wget') {
-   #   fa_system("sudo yum -y install wget openssl-devel zlib-devel");
-   #}
-   print 'After YUM ',`sudo cat /proc/meminfo | grep MemFree`;
-   print 'After YUM ',`sudo cat /proc/meminfo | grep MemAvailable`;sleep 10;
    unless (-e '/usr/local/bin/figlet') {
       fa_system("sudo yum -y install wget openssl-devel zlib-devel");
       fa_system("(wget $fs;tar zxvf fig*gz;cd figlet-2.2.5;make install)");
@@ -1393,8 +1399,8 @@ END
       #}
       fa_system("sudo yum -y install 'nano'");
    }
-   #print 'After figlet ',`sudo cat /proc/meminfo | grep MemFree`;
-   #print 'After figlet ',`sudo cat /proc/meminfo | grep MemAvailable`;sleep 10;
+   print 'After figlet ',`sudo cat /proc/meminfo | grep MemFree`;
+   print 'After figlet ',`sudo cat /proc/meminfo | grep MemAvailable`;
    #unless (-1<index $yins,'nano') {
       #fa_system("sudo yum -y install 'nano'");
    #}
@@ -1635,7 +1641,7 @@ sub fa_err_exit {
 }
 
 sub fa_find_latest {
-
+print "fa_find_latest CALLER=",caller,"\n";
    my $temp=0;
    my $look=shift||'';
    unless ($look) {
@@ -1650,20 +1656,25 @@ sub fa_find_latest {
       #print `sudo cat /proc/meminfo | grep MemFree`;
       #print `sudo cat /proc/meminfo | grep MemAvailable`;
    }
-   eval {
-      local $SIG{__DIE__}; # No sigdie handler
-      CPAN::HandleConfig->load;
-   };
-   my $d = $CPAN::Config->{build_dir};
-   if (!(defined $d) || !(-d $d)) {
-      $d=(getpwuid $>)[7].'/.cpan/build';
-      unless (-d $d) {
-         unless (-d "/root/.cpan/build") {
-            fa_die("ERROR - Can't locate .cpan/build directory");
-         } else {
-            $d='/root/.cpan/build';
+   my $d=$ENV{CPAN_BUILD_DIR}||'';
+   unless ($d) {
+      eval {
+         local $SIG{__DIE__}; # No sigdie handler
+	 require CPAN;
+         CPAN::HandleConfig->load;
+      };
+      my $d = $CPAN::Config->{build_dir};
+      if (!(defined $d) || !(-d $d)) {
+         $d=(getpwuid $>)[7].'/.cpan/build';
+         unless (-d $d) {
+            unless (-d "/root/.cpan/build") {
+               fa_die("ERROR - Can't locate .cpan/build directory");
+            } else {
+               $d='/root/.cpan/build';
+            }
          }
       }
+      $ENV{CPAN_BUILD_DIR}=$d;
    }
    my $new='';my $file='';
    opendir(DH,$d) or
@@ -1762,52 +1773,125 @@ sub fa_install_mod {
    my $env=$_[6]||'';
    my $dir='';
    my $cpan_error='';
-   eval {
-      local $SIG{__DIE__}; # No sigdie handler
-      require CPAN::Mini;
-      import CPAN::Mini;
-   };
-   if (!$@ && grep { /-*(?:add|all)[-_]?dependencies/i } @ARGV) {
-      my $distribution = CPAN::Shell->expand(
-            "Module",$p 
-         )->distribution()->pretty_id();
-      my $let=unpack('a1',$distribution);
-      my $lett=unpack('a2',$distribution);
-      my $minicpan=CPAN::Mini->new(
+   unless (exists $amazon{instance_type} && $amazon{instance_type}=~/micro|nano/) {
+      eval {
+         local $SIG{__DIE__}; # No sigdie handler
+         require CPAN::Mini;
+         import CPAN::Mini;
+      };
+      if (!$@ && grep { /-*(?:add|all)[-_]?dependencies/i } @ARGV) {
+         my $distribution = CPAN::Shell->expand(
+               "Module",$p 
+            )->distribution()->pretty_id();
+         my $let=unpack('a1',$distribution);
+         my $lett=unpack('a2',$distribution);
+         my $minicpan=CPAN::Mini->new(
 
-         remote => "http://www.cpan.org",
-         local  => cwd()."/dependencies/CPAN",
-         log_level => 'debug',
-         exact_mirror => 1,
+            remote => "http://www.cpan.org",
+            local  => cwd()."/dependencies/CPAN",
+            log_level => 'debug',
+            exact_mirror => 1,
       
-      );
-      $minicpan->mirror_file(
-         "authors/id/$let/$lett/$distribution");
+         );
+         $minicpan->mirror_file(
+            "authors/id/$let/$lett/$distribution");
+      }
    }
-   my $mod_info='';my $instfile='';my $cpanfil='';
+   my $mod_info='';my $instfile='';my $cpanfil='';my $matchflag=0;
    if ($ENV{LOADED_MODULES}=~/[|]$p[|]|[|]$p$/) {
       return '';
    } elsif (!$version || (grep {
          /(?:use[-_]?)?internet|online|connect_to_internet_ok/i
          } @ARGV)) {
       print "\n";
-      local $SIG{__DIE__}; # No sigdie handler
-      CPAN::Shell->m($p);
-      eval {
-         local $SIG{__DIE__}; # No sigdie handler;
-         require CPAN;
-         {
-            local *STDOUT;
-            open(STDOUT, ">", \$mod_info);
-            CPAN::Shell->m($p);
+      my $instver='';my $cpanver='';my $cpanusr=''; 
+      if (exists $amazon{instance_type} && $amazon{instance_type}=~/micro|nano/) {
+         my $d = $ENV{CPAN_BUILD_DIR}||'';
+         $d=~s/^(.*)\/.*$/$1/;
+	 my $pp=$p;
+         $pp=~s/::/-/g;
+         my $info=`grep -a -A2 -B2 -m1 "/${pp}-[0-9]" "$d/Metadata" | sed 's/[^[:print:]]//g'`;
+         chomp($info);
+	 unless ($info) {
+            $info=`grep -a -A2 -B2 -m1 "$p" "$d/Metadata" | sed 's/[^[:print:]]//g'`;
          }
-      };
-      my $instver='';my $cpanver='';
-      if ($mod_info) {
-         ($instfile=$mod_info)=~s/^.*INST_FILE\s+([^\s]+).*$/$1/s;
-         ($instver=$mod_info)=~s/^.*INST_VERSION\s+([^\s]+).*$/$1/s;
-         ($cpanfil=$mod_info)=~s/^.*CPAN_FILE\s+([^\s]+).*$/$1/s;
-         ($cpanver=$mod_info)=~s/^.*CPAN_VERSION\s+([^\s]+).*$/$1/s;
+         foreach my $line (split /\n/, $info) {
+            if ($line=~s/^.*?[A-Z]\/[A-Z][A-Z]\/(.*$pp.*gz)CPAN_(?:FILE|COMMENT).*$/$1/ && $line=~/$pp/) {
+	       $cpanfil=$line;
+	    } elsif ($line=~s/^.*?CPAN_(?:FILE|COMMENT)[!|%]*[A-Z]\/[A-Z][A-Z]\/(.*$pp.*gz).*$/$1/ && $line=~/$pp/) {
+	       $cpanfil=$line;
+	       print "WHAT IS THIS=$cpanfil\n";
+            } elsif (-1<index $info,"CPAN_FILE$p") {
+               $cpanfil=$info;
+               $cpanfil=~s/^.*?[A-Z]\/[A-Z][A-Z]\/(.*?[.]gz).*$/$1/s;
+	       last;
+            } elsif ($info=~/$p:/ && $info=~/$pp-/) {
+	       my $info=`grep -a -A2 -B2 -m1 "${p}[^:]" "$d/Metadata" | sed 's/[^[:print:]]//g'`;	
+	       if ($info && $info=~/CPAN_VERSION$p\s/s) {
+		  $info=~/^(.*)CPAN_VERSION$p$/m;
+		  my $vers=$1;
+		  if ($vers) {
+                     $cpanfil=$info;
+		     $vers=quotemeta($vers);
+		     $cpanfil=~s/^.*?[A-Z]\/[A-Z][A-Z]\/([^\s]+[-]$vers\.tar\.gz)CPAN_FILE.*$/$1/s;
+		     $cpanfil=$1;
+		  }
+               }
+            } elsif ((-1<index $info,"CPAN_USERID") && ((-1<index $info,"CPAN_USERID$p") ||
+	          ($info=~/CPAN_USERID\n$p/s))) {
+	       my $usrr='';
+	       if (-1<index $info,"CPAN_USERID$p") {
+                  $info=~/^(.*)CPAN_USERID$p$/m;
+                  $usrr=$1;
+               } else {
+                  $info=~/^.*?CPAN_FILE\n(.*?)CPAN_USERID\n$p.*$/s;
+		  $usrr=$1; 
+               }
+               $cpanfil=$info;
+               $cpanfil=~s/^.*?[A-Z]\/[A-Z][A-Z]\/($usrr\/.*?\.tar\.gz)CPAN_FILE.*$/$1/s;
+               $cpanfil=$1;
+	       last;
+            } elsif ($line=~/CPAN_USERID.*$pp/) {
+               $line=~s/^.*?CPAN_USERID[!|%]*[A-Z]\/[A-Z][A-Z]\/(.*?$pp.*?gz).*$/$1/s;
+	       print "WHAT IS LINE=$line<==\n";
+	       $cpanfil=$line;
+	       last;
+            } elsif (-1<index $info,"FULLNAME$p") {
+               $info=~/^(.*)FULLNAME$p$/m;
+	       my $fyle=$1;
+	       my $info=`grep -a -A2 -B2 -m1 "$fyle" "$d/Metadata" | sed 's/[^[:print:]]//g'`;
+            }
+         }
+	 if (!$info) {
+            if ($p eq 'Test::Base') {
+               $cpanfil='INGY/Test-Base-0.89.tar.gz';
+            }
+         }
+         $cpanver=$cpanusr=$cpanfil;
+	 $cpanver=~s/^.*-(.*?).tar.gz$/$1/;
+         $cpanusr=~s/^(.*)\/.*.tar.gz$/$1/;
+
+	 print "\nINFO=$info\n\n";
+	 $matchflag=1 if -1<index $cpanfil,$pp;
+      } else {
+         local $SIG{__DIE__}; # No sigdie handler
+         CPAN::Shell->m($p);
+         eval {
+            local $SIG{__DIE__}; # No sigdie handler;
+            require CPAN;
+            {
+               local *STDOUT;
+               open(STDOUT, ">", \$mod_info);
+               CPAN::Shell->m($p);
+            }
+         };
+         my $instver='';my $cpanver='';
+         if ($mod_info) {
+            ($instfile=$mod_info)=~s/^.*INST_FILE\s+([^\s]+).*$/$1/s;
+            ($instver=$mod_info)=~s/^.*INST_VERSION\s+([^\s]+).*$/$1/s;
+            ($cpanfil=$mod_info)=~s/^.*CPAN_FILE\s+([^\s]+).*$/$1/s;
+            ($cpanver=$mod_info)=~s/^.*CPAN_VERSION\s+([^\s]+).*$/$1/s;
+         } $matchflag=1;
       }
       if (!$version && ($instver<$cpanver)) {
          unlink $instfile if $exec_cnt;
@@ -1815,6 +1899,7 @@ sub fa_install_mod {
       }
    } else {
       $cpanfil=$p;
+      $matchflag=1;
    }
    {
       local $SIG{__DIE__}; # No sigdie handler
@@ -1824,11 +1909,14 @@ sub fa_install_mod {
    my $testp=$p;
    $testp=~s/::/\//g;
    unless ($@) {
-      if ($version) {
+      if ($version && $matchflag) {
          my $ttmp='$ver=$'.$p.'::VERSION';
          eval $ttmp;
          $ver=eval $ver;
          $force=($ver<$version)?1:0;
+	 print "WHAT IS THIS SHIT=$p and $ver and $version\n";
+	 $force=0 if $p eq 'TimeDate' and $ver eq '1.21' and $version eq '2.33';
+	 $force=0 if $p eq 'IO::Tee' and $ver eq '0.65' and $version eq '0.66';
       } else { $force=0 } 
    } elsif ($@=~/attempt to reload/is){
       delete $INC{$p};
@@ -1861,7 +1949,8 @@ sub fa_install_mod {
       eval {
          local $SIG{__DIE__}; # No sigdie handler;
          require CPAN;
-         CPAN::Shell->notest('get',$p);
+	 #CPAN::Shell->notest('get',$p);
+	 CPAN::Shell->notest('get',$cpanfil);
       };
       if ($@) {
          fa_die("CPAN Error: $@ $!\n");
@@ -2333,14 +2422,14 @@ if (($^O ne 'MSWin32') && ($^O ne 'MSWin64') && !grep { /^GETBERK$/ } @ARGV) {
    &fa_install_module('YAML','install','Makefile');
    &fa_install_module('YAML::Tiny','install','Makefile');
    &fa_install_module('Test::LeakTrace','install','Makefile');
-   &fa_install_module('Time::Zone','install','Makefile');
+   &fa_install_module('TimeDate','install','Makefile'); # Time::Zone required
    &fa_install_module('HTTP::Date','install','Makefile');
    &fa_install_module('File::Listing','install','Makefile');
    &fa_install_module('HTML::Tagset','install','Makefile');
-   &fa_install_module('HTML::Entities','install','Makefile');
+   &fa_install_module('HTML::Parser','install','Makefile'); # HTML::Entities required
    &fa_install_module('Test::Deep','install','Makefile');
    &fa_install_module('Test::Requires','install','Makefile');
-   &fa_install_module('HTTP::CookieJar::LWP','install','Makefile');
+   &fa_install_module('HTTP::CookieJar','install','Makefile'); # HTTP::CookieJar::LWP required
    &fa_install_module('Digest::MD5','install','Makefile');
    &fa_install_module('Digest::SHA','install','Makefile');
    &fa_install_module('LWP::MediaTypes','install','Makefile');
@@ -2366,7 +2455,7 @@ if (($^O ne 'MSWin32') && ($^O ne 'MSWin64') && !grep { /^GETBERK$/ } @ARGV) {
          || grep { /-*(?:add|all)[-_]?dependencies/i } @ARGV) {
       &fa_install_module('HTTP::Daemon','install','Build');
    }
-   &fa_install_module('LWP','install','Makefile');
+   &fa_install_module('LWP::Debug','install','Makefile');
    &fa_install_module('CPAN::Mini','install','Makefile');
    &fa_install_module('ExtUtils::MakeMaker','install','Makefile');
    &fa_install_module('File::Which','install','Makefile');
@@ -2450,14 +2539,13 @@ if (($^O ne 'MSWin32') && ($^O ne 'MSWin64') && !grep { /^GETBERK$/ } @ARGV) {
    }
    if ($^O ne 'MSWin32' && $^O ne 'MSWin64' ||
          grep { /-*(?:add|all)[-_]?dependencies/i } @ARGV) {
-      &fa_install_module('IO::Pty','install','Makefile');
+      &fa_install_module('IO::Tty','install','Makefile'); # IO::Pty required
       unless (grep { /-*(?:add|all)[-_]?dependencies/i } @ARGV) {
          my $argv0=$ARGV[0]||'';
          exit if $argv0 eq 'install_IO_Pty_from_CPAN';
       }
    }
    &fa_install_module('IO::Tee','install','Makefile');
-   &fa_install_module('HTML::Parser','install','Makefile');
    &fa_install_module('Test::Warnings','install','Makefile');
    &fa_install_module('URI','install','Makefile');
    &fa_install_module('ExtUtils::HasCompiler','install','Makefile');
@@ -2480,7 +2568,7 @@ if (($^O ne 'MSWin32') && ($^O ne 'MSWin64') && !grep { /^GETBERK$/ } @ARGV) {
    &fa_install_module('Test::Most','install','Makefile');
    &fa_install_module('Convert::BinHex','install','Makefile');
    &fa_install_module('MIME::Base64','install','Makefile');
-   &fa_install_module('MIME::Entity','install','Makefile');
+   &fa_install_module('MIME::Tools','install','Makefile'); # MIME::Entity required
    &fa_install_module('Data::Dump','install','Makefile');
    &fa_install_module('File::HomeDir','install','Makefile');
    &fa_install_module('Want','install','Makefile');
@@ -2578,10 +2666,8 @@ if (($^O ne 'MSWin32') && ($^O ne 'MSWin64') && !grep { /^GETBERK$/ } @ARGV) {
    &fa_install_module('Digest::HMAC','install','Makefile');
    &fa_install_module('Digest::SHA3','install','Makefile');
    &fa_install_module('Exporter::Tiny','install','Makefile');
-   &fa_install_module('Types::Standard','install','Makefile');
    &fa_install_module('Type::Tiny','install','Makefile');
-   &fa_install_module('Crypt::Cipher::AES','install','Makefile');
-   &fa_install_module('Sub::Defer','install','Makefile');
+   &fa_install_module('CryptX','install','Makefile'); # Crypt::Cipher::AES required
    &fa_install_module('Sub::Quote','install','Makefile');
    &fa_install_module('Role::Tiny','install','Makefile');
    &fa_install_module('Moo','install','Makefile');
@@ -5111,15 +5197,17 @@ sub download_berkeleydb {
                exec $exec_cmd;
             }
          }
-         my $so=fa_system($CPAN::Config->{gzip}." -d $filename");
+	 my $gzip=$ENV{CPAN_GZIP}||$CPAN::Config->{gzip}||'gzip';
+         my $so=fa_system($gzip." -d $filename");
          if ($so==-1) {
             fa_die("Cannot gunzip $filename: $!\n");
          } else {
             $filename=~s/\.gz$//;
          }
+	 my $tar=$ENV{CPAN_TAR}||$CPAN::Config->{tar}||'tar';
          print "***** Untar1: sudo ",
-            $CPAN::Config->{tar}," xvf $filename\n";
-         fa_system("sudo ".$CPAN::Config->{tar}." xvf $filename");
+            $tar," xvf $filename\n";
+         fa_system("sudo ".$tar." xvf $filename");
       } else {
          unless ($already_downloaded) {
             select STDOUT;

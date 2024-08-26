@@ -3530,4 +3530,184 @@ class TestCase::Math {
     return 1;
   }
 
+  static method spvm_core_double_to_string_nan : int () {
+    
+    {
+      my $string = "NaN";
+      
+      my $ret = (double)$string;
+      
+      unless (Math->isnan($ret)) {
+        return 0;
+      }
+    }
+    
+    {
+      my $string = "NAN";
+      
+      my $ret = (double)$string;
+      
+      unless (Math->isnan($ret)) {
+        return 0;
+      }
+    }
+    
+    {
+      my $string = "Inf";
+      
+      my $ret = (double)$string;
+      
+      unless (Math->isinf($ret) && $ret > 0) {
+        return 0;
+      }
+    }
+    
+    {
+      my $string = "INF";
+      
+      my $ret = (double)$string;
+      
+      unless (Math->isinf($ret) && $ret > 0) {
+        return 0;
+      }
+    }
+    
+    {
+      my $string = "-Inf";
+      
+      my $ret = (double)$string;
+      
+      unless (Math->isinf($ret) && $ret < 0) {
+        return 0;
+      }
+    }
+    
+    return 1;
+  }
+  
+  static method spvm_core_double_to_string_inf : int () {
+    
+    {
+      my $string = "Inf";
+      
+      my $ret = (double)$string;
+      
+      unless (Math->isinf($ret) && $ret > 0) {
+        return 0;
+      }
+    }
+    
+    {
+      my $string = "INF";
+      
+      my $ret = (double)$string;
+      
+      unless (Math->isinf($ret) && $ret > 0) {
+        return 0;
+      }
+    }
+    
+    {
+      my $string = "-Inf";
+      
+      my $ret = (double)$string;
+      
+      unless (Math->isinf($ret) && $ret < 0) {
+        return 0;
+      }
+    }
+    
+    return 1;
+  }
+  
+  static method spvm_core_float_to_string_nan : int () {
+    
+    {
+      my $string = "NaN";
+      
+      my $ret = (float)$string;
+      
+      unless (Math->isnanf($ret)) {
+        return 0;
+      }
+    }
+    
+    {
+      my $string = "NAN";
+      
+      my $ret = (float)$string;
+      
+      unless (Math->isnanf($ret)) {
+        return 0;
+      }
+    }
+    
+    {
+      my $string = "Inf";
+      
+      my $ret = (float)$string;
+      
+      unless (Math->isinff($ret) && $ret > 0) {
+        return 0;
+      }
+    }
+    
+    {
+      my $string = "INF";
+      
+      my $ret = (float)$string;
+      
+      unless (Math->isinff($ret) && $ret > 0) {
+        return 0;
+      }
+    }
+    
+    {
+      my $string = "-Inf";
+      
+      my $ret = (float)$string;
+      
+      unless (Math->isinff($ret) && $ret < 0) {
+        return 0;
+      }
+    }
+    
+    return 1;
+  }
+  
+  static method spvm_core_float_to_string_inf : int () {
+    
+    {
+      my $string = "Inf";
+      
+      my $ret = (float)$string;
+      
+      unless (Math->isinff($ret) && $ret > 0) {
+        return 0;
+      }
+    }
+    
+    {
+      my $string = "INF";
+      
+      my $ret = (float)$string;
+      
+      unless (Math->isinff($ret) && $ret > 0) {
+        return 0;
+      }
+    }
+    
+    {
+      my $string = "-Inf";
+      
+      my $ret = (float)$string;
+      
+      unless (Math->isinff($ret) && $ret < 0) {
+        return 0;
+      }
+    }
+    
+    return 1;
+  }
+
 }

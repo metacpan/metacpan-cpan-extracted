@@ -13,7 +13,7 @@ use 5.006;
 use strict; use warnings;
 use Test::More;
 
-my $min_ver = '0.41';
+my $min_ver = '0.60';
 eval "use Test::Map::Tube $min_ver tests => 3";
 plan skip_all => "Test::Map::Tube $min_ver required." if $@;
 

@@ -1,3 +1,4 @@
+use 5.010_001;
 use strict;
 use warnings;
 use open ':std', ':encoding(utf8)';
@@ -23,7 +24,7 @@ sub artist_name {($_->[0] == 128) ? ($_->[1], 'Envy of None', 'Alex Lifeson') : 
 
 db(DBIx::Squirrel->connect(@TEST_DB_CONNECT_ARGS));
 artist(db->results('SELECT * FROM artists WHERE ArtistId=? LIMIT 1'));
-my $artist = artist->_private;
+my $artist = artist->_private_state;
 
 is_deeply($artist->{bind_values_initial}, [], 'bind_values_initial ok');
 ok(!exists($artist->{bind_values}), 'bind_values ok');
@@ -41,7 +42,7 @@ is_deeply($artist->{bind_values_initial}, [],    'bind_values_initial ok');
 is_deeply($artist->{bind_values},         [128], 'bind_values ok');
 
 artists(db->results('SELECT * FROM artists ORDER BY ArtistId' => \&filter => \&artist_name));
-my $artists = artists->_private;
+my $artists = artists->_private_state;
 
 # This test will exercise buffer control, transformations, pending results injection and
 # results filtering.

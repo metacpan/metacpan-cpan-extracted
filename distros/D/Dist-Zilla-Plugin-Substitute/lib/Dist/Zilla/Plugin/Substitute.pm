@@ -1,5 +1,5 @@
 package Dist::Zilla::Plugin::Substitute;
-$Dist::Zilla::Plugin::Substitute::VERSION = '0.007';
+$Dist::Zilla::Plugin::Substitute::VERSION = '0.008';
 use Moose;
 use Moose::Util::TypeConstraints;
 use MooseX::Types::Moose qw/ArrayRef CodeRef Str/;
@@ -15,15 +15,15 @@ with 'Dist::Zilla::Role::FileMunger',
 
 my $codeliteral = subtype as CodeRef;
 coerce $codeliteral, from ArrayRef, via {
-	my $code = sprintf 'sub { %s }', join "\n", @{$_};
+	my $code = sprintf "sub { %s }", join ";\n", @{$_};
 	eval $code or croak "Couldn't eval: $@";
 };
 
 has code => (
-	is       => 'ro',
-	isa      => $codeliteral,
-	coerce   => 1,
-	required => 1,
+	is        => 'ro',
+	isa       => $codeliteral,
+	coerce    => 1,
+	predicate => '_has_code',
 );
 has filename_code => (
 	is        => 'ro',
@@ -77,17 +77,18 @@ sub munge_files {
 sub munge_file {
 	my ($self, $file) = @_;
 
+	if ($self->_has_code) {
 	my $code = $self->code;
-
-	if ($self->mode eq 'lines') {
-		my @content = split /^/m, $file->content;
-		$code->() for @content;
-		$file->content(join '', @content);
-	}
-	else {
-		my $content = $file->content;
-		$code->() for $content;
-		$file->content($content);
+		if ($self->mode eq 'lines') {
+			my @content = split /^/m, $file->content;
+			$code->() for @content;
+			$file->content(join '', @content);
+		}
+		else {
+			my $content = $file->content;
+			$code->() for $content;
+			$file->content($content);
+		}
 	}
 
 	if ($self->_has_filename_code) {
@@ -116,7 +117,7 @@ Dist::Zilla::Plugin::Substitute - Substitutions for files in dzil
 
 =head1 VERSION
 
-version 0.007
+version 0.008
 
 =head1 SYNOPSIS
 
@@ -138,7 +139,7 @@ This module performs substitutions on files in Dist::Zilla.
 
 =head2 code (or content_code)
 
-An arrayref of lines of code. This is converted into a sub that's called for each line, with C<$_> containing that line. Alternatively, it may be a subref if passed from for example a pluginbundle. Mandatory.
+An arrayref of lines of code. This is converted into a sub that's called for each line, with C<$_> containing that line. Alternatively, it may be a subref if passed from for example a pluginbundle.
 
 =head2 mode
 

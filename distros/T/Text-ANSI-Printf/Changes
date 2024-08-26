@@ -1,5 +1,13 @@
 Revision history for Perl extension Text-ANSI-Printf
 
+2.0602 2024-08-26T04:09:38Z
+
+    - Include images in document.
+
+2.0601 2024-08-25T16:43:12Z
+
+    - Document update to include related tools infomation.
+
 2.06 2023-11-28T02:17:16Z
 
     - Initialize $REORDER variable only when not already defined.

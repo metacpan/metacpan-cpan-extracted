@@ -1,5 +1,11 @@
 Revision history for Map::Tube
 
+3.72  2024-08-26T01:50:00+00:00
+      - Revert changes done in v3.65.
+
+3.71  2024-08-26T00:50:00+00:00
+      - Updated requirement of Test::Map::Tube v0.60.
+
 3.70  2024-02-29T21:15:00+00:00
       - Corrected pod w.r.t the creator of new map Bielefeld.
 

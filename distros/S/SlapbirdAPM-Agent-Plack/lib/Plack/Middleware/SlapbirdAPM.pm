@@ -23,6 +23,7 @@ use Plack::Util::Accessor qw(key quiet);
 const my $SLAPBIRD_APM_URI => $ENV{SLAPBIRD_APM_DEV}
   ? $ENV{SLAPBIRD_APM_URI} . '/apm'
   : 'https://slapbirdapm.com/apm';
+const my $OS => System::Info->new->os;
 
 sub _unfold_headers {
     my ( $self, $headers ) = @_;
@@ -54,7 +55,7 @@ sub _call_home {
     $response{request_headers} =
       $self->_unfold_headers( $request->headers->psgi_flatten_without_sort() );
     $response{error}     = $error;
-    $response{os}        = System::Info->new->os;
+    $response{os}        = $OS;
     $response{requestor} = $request->header('x-slapbird-name');
     $response{handler}   = undef
       ; # TODO: (rf) Find a way to find something meaningful to fill this slot with.
@@ -63,7 +64,7 @@ sub _call_home {
     my $slapbird_response;
 
     try {
-        $response = $ua->post(
+        $slapbird_response = $ua->post(
             $SLAPBIRD_APM_URI,
             'Content-Type'   => 'application/json',
             'x-slapbird-apm' => $self->key,
@@ -77,15 +78,15 @@ sub _call_home {
         exit 0;
     };
 
-    if ( !$response->is_success ) {
-        if ( $response->code eq 429 ) {
+    if ( !$slapbird_response->is_success ) {
+        if ( $slapbird_response->code eq 429 ) {
             Carp::carp(
 "You've hit your maximum number of requests for today. Please visit slapbirdapm.com to upgrade your plan."
             ) unless $self->quiet;
         }
         Carp::carp(
 'Unable to communicate with Slapbird, this request has not been tracked got status code '
-              . $response->code );
+              . $slapbird_response->code );
     }
 
     exit 0;

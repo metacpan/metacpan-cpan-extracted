@@ -1,3 +1,8 @@
+1.004001  2024-08-26
+  [Test Improvement]
+    * Add tests for SPVM core string-to-double conversion for NaN and Inf.
+    * Add tests for SPVM core string-to-float conversion for NaN and Inf.
+    
 1.004  2024-06-24
   [Incompatible Changes]
     * Remove Math#cscamul method. This method was misnamed because it does not actually perform a scalar multiplication.

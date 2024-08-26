@@ -9,7 +9,7 @@ build_requires:
 configure_requires:
   Module::Build::Tiny: '0.035'
 dynamic_config: 0
-generated_by: 'Minilla/v3.1.23, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Minilla/v3.1.25, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -28,12 +28,12 @@ no_index:
 provides:
   App::ansiprintf:
     file: lib/App/ansiprintf.pm
-    version: '2.06'
+    version: '2.0602'
   App::ansiprintf::Util:
     file: lib/App/ansiprintf/Util.pm
   Text::ANSI::Printf:
     file: lib/Text/ANSI/Printf.pm
-    version: '2.06'
+    version: '2.0602'
 requires:
   Text::ANSI::Fold: '2.2103'
   Text::ANSI::Fold::Util: '1.01'
@@ -43,7 +43,7 @@ resources:
   bugtracker: https://github.com/tecolicom/Text-ANSI-Printf/issues
   homepage: https://github.com/tecolicom/Text-ANSI-Printf
   repository: https://github.com/tecolicom/Text-ANSI-Printf.git
-version: '2.06'
+version: '2.0602'
 x_authority: cpan:UTASHIRO
 x_contributors:
   - 'Kazumasa Utashiro <kaz@utashiro.com>'

@@ -37,7 +37,7 @@
    "provides" : {
       "Compression::Util" : {
          "file" : "lib/Compression/Util.pm",
-         "version" : "0.12"
+         "version" : "0.13"
       }
    },
    "release_status" : "stable",
@@ -53,6 +53,6 @@
          "url" : "https://github.com/trizen/Compression-Util"
       }
    },
-   "version" : "0.12",
+   "version" : "0.13",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

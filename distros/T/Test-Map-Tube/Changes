@@ -1,5 +1,14 @@
 Revision history for Perl extension Test::Map::Tube.
 
+0.60  Mon Aug 26 00:35:00 2024
+      - Updated README.
+
+0.59  Mon Aug 26 00:25:00 2024
+      - Updated pod and copyright year.
+
+0.58  Mon Aug 26 00:15:00 2024
+      - More diagnostics when ok_map_routes gets failures, thanks @mohawk2.
+
 0.57  Mon Sep 09 16:05:00 2019
       - Moved author test scripts to xt/ subfolder.
 

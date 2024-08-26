@@ -1,3 +1,4 @@
+use 5.010_001;
 use strict;
 use warnings;
 use open ':std', ':encoding(utf8)';

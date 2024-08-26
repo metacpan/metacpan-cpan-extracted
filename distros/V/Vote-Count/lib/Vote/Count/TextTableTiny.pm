@@ -1,5 +1,5 @@
 package Vote::Count::TextTableTiny;
-$Vote::Count::TextTableTiny::VERSION = '2.04';
+$Vote::Count::TextTableTiny::VERSION = '2.05';
 use 5.024;
 use strict;
 use warnings;

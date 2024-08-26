@@ -5,14 +5,14 @@
 # related or neighboring rights.  Attribution is requested but is not required.
 use strict; use warnings FATAL => 'all';
 
-our $VERSION = '1.023'; # VERSION
-our $DATE = '2024-08-19'; # DATE
+our $VERSION = '1.024'; # VERSION
+our $DATE = '2024-08-25'; # DATE
 
 #use 5.12; # for unicode_strings
 use v5.18; # for lexical_subs
 
 use strict; use warnings;
-use feature qw(switch state say lexical_subs fc);
+use feature qw(state say lexical_subs fc);
 use feature qw(unicode_strings unicode_eval evalbytes);
 no warnings "experimental::lexical_subs";
 

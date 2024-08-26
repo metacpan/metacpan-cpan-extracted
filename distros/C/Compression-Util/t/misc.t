@@ -5,7 +5,7 @@ use Test::More;
 use Compression::Util qw(:all);
 use List::Util        qw(shuffle);
 
-plan tests => 820;
+plan tests => 822;
 
 ##################################
 
@@ -494,6 +494,9 @@ is(
     ),
     "TOBEORNOTTOBEORTOBEORNOT\n"
   );
+
+is(gzip_decompress("\37\x8B\b\20\x9D\x9A\xC9f\2\3hello world\n\0KLJN\x84 \4\xE0\2\0\xE3#7]\25\0\0\0"),                 "abcabcabcaaaaaaaaaaa\n");
+is(gzip_decompress("\37\x8B\b\30\xA8\x9A\xC9f\0\3hello\0hi\n\0\xCBH\xCD\xC9\xC9W(\xCF/\xCAI\xE1\2\0-;\b\xAF\f\0\0\0"), "hello world\n");
 
 is(
     gzip_decompress(

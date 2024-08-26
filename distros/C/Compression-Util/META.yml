@@ -16,7 +16,7 @@ name: Compression-Util
 provides:
   Compression::Util:
     file: lib/Compression/Util.pm
-    version: '0.12'
+    version: '0.13'
 requires:
   Carp: '0'
   Exporter: '0'
@@ -28,5 +28,5 @@ resources:
   homepage: https://github.com/trizen/Compression-Util
   license: http://www.perlfoundation.org/artistic_license_2_0
   repository: https://github.com/trizen/Compression-Util
-version: '0.12'
+version: '0.13'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

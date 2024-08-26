@@ -6,10 +6,12 @@ use warnings;
 
 use Test::More;
 
-plan tests => 2;
+plan tests => 4;
 
 my @module_files = (
-    'Dist/Zilla/Plugin/Substitute.pm'
+    'Task/MemManager.pm',
+    'Task/MemManager/CMalloc.pm',
+    'Task/MemManager/PerlAlloc.pm'
 );
 
 

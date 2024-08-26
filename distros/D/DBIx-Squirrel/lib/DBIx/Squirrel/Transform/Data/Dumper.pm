@@ -7,10 +7,11 @@ package    # hide from PAUSE
 BEGIN {
     require DBIx::Squirrel
       unless defined($DBIx::Squirrel::VERSION);
+    require Exporter;
     $DBIx::Squirrel::Transform::Data::Dumper::VERSION   = $DBIx::Squirrel::VERSION;
     @DBIx::Squirrel::Transform::Data::Dumper::ISA       = qw/Exporter/;
-    @DBIx::Squirrel::Transform::Data::Dumper::EXPORT    = qw/as_perl/;
     @DBIx::Squirrel::Transform::Data::Dumper::EXPORT_OK = qw/as_perl/;
+    @DBIx::Squirrel::Transform::Data::Dumper::EXPORT    = @DBIx::Squirrel::Transform::Data::Dumper::EXPORT_OK;
 }
 
 use Data::Dumper;
@@ -24,7 +25,7 @@ sub as_perl {
         local($Data::Dumper::Quotekeys)     = !!0;
         local($Data::Dumper::Sortkeys)      = !!1;
         local($Data::Dumper::Trailingcomma) = !!1;
-        return Dumper(shift);
+        return Dumper(@_);
     };
 }
 

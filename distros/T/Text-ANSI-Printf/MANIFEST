@@ -4,6 +4,10 @@ LICENSE
 META.json
 README.md
 cpanfile
+images/bad.png
+images/good.png
+images/plain.png
+images/shorten.png
 lib/App/ansiprintf.pm
 lib/App/ansiprintf/Util.pm
 lib/Text/ANSI/Printf.pm
